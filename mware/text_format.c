@@ -17,6 +17,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/08/03 15:57:18  aleph
+ * Add include to fix warning for vsprintf()
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -35,8 +38,9 @@
 #include "formatwr.h" /* _formatted_write() */
 #include "font.h"
 #include "gfx.h"
+#include <stdio.h> /* vsprintf() */
 #include <stdarg.h>
-#include <string.h> /* strlen */
+#include <string.h> /* strlen() */
 
 /*!
  * Render string <code>str</code> in bitmap
