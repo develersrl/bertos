@@ -43,6 +43,9 @@
 
 /*
  * $Log$
+ * Revision 1.10  2004/07/29 22:57:09  bernie
+ * Doxygen fix.
+ *
  * Revision 1.9  2004/07/20 23:54:27  bernie
  * fifo_flush_locked(): New function;
  * Revamp documentation.
@@ -193,7 +196,8 @@ INLINE void fifo_flush(FIFOBuffer *fb)
 	/*!
 	 * Similar to fifo_isempty(), but with stronger guarantees for
 	 * concurrent access between user and interrupt code.
-	 * This is actually only needed for 8-bit processors.
+	 *
+	 * \note This is actually only needed for 8-bit processors.
 	 *
 	 * \sa fifo_isempty()
 	 */
