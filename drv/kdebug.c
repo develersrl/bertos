@@ -8,12 +8,16 @@
  *
  * \brief General pourpose debug support for embedded systems (implementation).
  *
+ * \version $Id$
  * \author Bernardo Innocenti <bernie@develer.com>
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
 /*#*
  *#* $Log$
+ *#* Revision 1.17  2004/10/03 18:41:28  bernie
+ *#* Restore \version header killed by mistake in previous commit.
+ *#*
  *#* Revision 1.16  2004/10/03 18:40:50  bernie
  *#* Use new CPU macros.
  *#*
