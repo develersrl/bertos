@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2004/12/31 16:43:23  bernie
+ *#* Move seek function last in VT.
+ *#*
  *#* Revision 1.2  2004/08/25 14:12:09  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -43,9 +46,9 @@ typedef struct _KFile
 {
 	ReadFunc_t		read;
 	WriteFunc_t		write;
-	SeekFunc_t		seek;
 	OpenFunc_t		open;
 	CloseFunc_t		close;
+	SeekFunc_t		seek;
 
 	/* NOTE: these must _NOT_ be size_t on 16bit CPUs! */
 	uint32_t		SeekPos;
