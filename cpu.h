@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.25  2004/12/08 08:31:02  bernie
+ *#* CPU_HARVARD: Define to 1 for AVR and DSP56K.
+ *#*
  *#* Revision 1.24  2004/12/08 08:04:13  bernie
  *#* Doxygen fixes.
  *#*
@@ -134,6 +137,7 @@
 	#define CPU_STACK_GROWS_UPWARD  1
 	#define CPU_SP_ON_EMPTY_SLOT	0
 	#define CPU_BYTE_ORDER          CPU_BIG_ENDIAN
+	#define CPU_HARVARD		1
 
 	/* Memory is word-addessed in the DSP56K */
 	#define CPU_BITS_PER_CHAR  16
@@ -184,6 +188,7 @@
 	#define CPU_STACK_GROWS_UPWARD  0
 	#define CPU_SP_ON_EMPTY_SLOT    1
 	#define CPU_BYTE_ORDER          CPU_LITTLE_ENDIAN
+	#define CPU_HARVARD		1
 
 	/*!
 	 * Initialization value for registers in stack frame.
