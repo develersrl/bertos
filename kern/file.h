@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/06/06 15:11:38  bernie
+ * Doxygenize.
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -37,7 +40,8 @@ typedef bool	(*CloseFunc_t)	(struct _KFile *fd);
 typedef bool	(*OpenFunc_t)	(struct _KFile *fd, const char *name, int mode);
 
 
-/* Context data for callback functions which operate on
+/*!
+ * Context data for callback functions which operate on
  * pseudo files.
  */
 typedef struct _KFile
