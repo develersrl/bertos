@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.16  2004/09/06 21:49:26  bernie
+ *#* CONFIG_TIMER_STROBE: be tolerant with missing optional macro.
+ *#*
  *#* Revision 1.15  2004/08/25 14:12:08  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -69,7 +72,7 @@
  * TIMER_STROBE_OFF and TIMER_STROBE_INIT and set
  * CONFIG_TIMER_STROBE to 1.
  */
-#ifndef CONFIG_TIMER_STROBE
+#if !defined(CONFIG_TIMER_STROBE) || !CONFIG_TIMER_STROBE
 	#define TIMER_STROBE_ON    do {/*nop*/} while(0)
 	#define TIMER_STROBE_OFF   do {/*nop*/} while(0)
 	#define TIMER_STROBE_INIT  do {/*nop*/} while(0)
