@@ -38,6 +38,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.23  2005/01/11 18:09:07  aleph
+ *#* Add ATmega8 SPI port definitions; Fix transmit complete IRQ bug; add strobe macros to uart1 and spi
+ *#*
  *#* Revision 1.22  2004/12/31 17:47:45  bernie
  *#* Rename UNUSED() to UNUSED_ARG().
  *#*
@@ -249,11 +252,21 @@
 
 
 /* SPI port and pin configuration */
-#define SPI_PORT      PORTB
-#define SPI_DDR       DDRB
-#define SPI_SCK_BIT   PB1
-#define SPI_MOSI_BIT  PB2
-#define SPI_MISO_BIT  PB3
+#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA103
+	#define SPI_PORT      PORTB
+	#define SPI_DDR       DDRB
+	#define SPI_SCK_BIT   PB1
+	#define SPI_MOSI_BIT  PB2
+	#define SPI_MISO_BIT  PB3
+#elif CPU_AVR_ATMEGA8
+	#define SPI_PORT      PORTB
+	#define SPI_DDR       DDRB
+	#define SPI_SCK_BIT   PB5
+	#define SPI_MOSI_BIT  PB3
+	#define SPI_MISO_BIT  PB4
+#else
+	#error Unknown architecture
+#endif
 
 /* USART register definitions */
 #if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128
@@ -268,6 +281,7 @@
 	#define UBRR0H UBRRH
 	#define SIG_UART0_DATA SIG_UART_DATA
 	#define SIG_UART0_RECV SIG_UART_RECV
+	#define SIG_UART0_TRANS SIG_UART_TRANS
 #elif CPU_AVR_ATMEGA103
 	#define AVR_HAS_UART1 0
 	#define UCSR0B UCR
@@ -276,6 +290,7 @@
 	#define UBRR0L UBRR
 	#define SIG_UART0_DATA SIG_UART_DATA
 	#define SIG_UART0_RECV SIG_UART_RECV
+	#define SIG_UART0_TRANS SIG_UART_TRANS
 #else
 	#error Unknown architecture
 #endif
@@ -359,6 +374,7 @@ static void uart0_init(
 {
 	SER_UART0_BUS_TXINIT;
 	RTS_ON;
+	SER_STROBE_INIT;
 }
 
 static void uart0_cleanup(UNUSED_ARG(struct SerialHardware *, _hw))
@@ -472,6 +488,8 @@ static void spi_init(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(struct
 	SPI_DDR &= ~BV(SPI_MISO_BIT);
 	/* Enable SPI, IRQ on, Master, CPU_CLOCK/16 */
 	SPCR = BV(SPE) | BV(SPIE) | BV(MSTR) | BV(SPR0);
+
+	SER_STROBE_INIT;
 }
 
 static void spi_cleanup(UNUSED_ARG(struct SerialHardware *, _hw))
@@ -853,6 +871,8 @@ SIGNAL(SIG_UART1_RECV)
  */
 SIGNAL(SIG_SPI)
 {
+	SER_STROBE_ON;
+
 	/* Read incoming byte. */
 	if (!fifo_isfull(&ser_spi->rxfifo))
 		fifo_push(&ser_spi->rxfifo, SPDR);
@@ -867,4 +887,6 @@ SIGNAL(SIG_SPI)
 		SPDR = fifo_pop(&ser_spi->txfifo);
 	else
 		UARTDescs[SER_SPI].sending = false;
+
+	SER_STROBE_OFF;
 }
