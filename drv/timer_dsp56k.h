@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/06/06 18:30:34  bernie
+ * Import DSP56800 changes from SC.
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -28,14 +31,13 @@
 
 #include <DSP56F807.h>
 #include <compiler.h>
+#include <hw.h>
 
-//! The system timer for events is currently TMRA0. We prefer A/B over C/D because
-//  A/B share the pin with the quadrature decoder module, and we do not need
-//  pins for our system timer.
-//  If you want to change this setting, you need also to modify the IRQ vector table.
-#define REG_SYSTEM_TIMER          (REG_TIMER_A + 0)
-#define SYSTEM_TIMER_IRQ_VECTOR   42   /* TMRA0 */
+// Calculate register pointer and irq vector from hw.h setting
+#define REG_SYSTEM_TIMER          PP_CAT(REG_TIMER_, SYSTEM_TIMER)
+#define SYSTEM_TIMER_IRQ_VECTOR   PP_CAT(IRQ_TIMER_, SYSTEM_TIMER)
 
+//! Prescaler for the system timer
 #define TIMER_PRESCALER           16
 
 //! Frequency of the hardware high precision timer
@@ -68,8 +70,6 @@ static void timer_hw_init(void)
 
 	// Small preprocessor trick to generate the REG_TIMER_CTRL_PRIMARY_IPBYNN macro
 	//  needed to set the prescaler
-	#define PP_CAT2(x,y)                      x ## y
-	#define PP_CAT(x,y)                       PP_CAT2(x,y)
 	#define REG_CONTROL_PRESCALER             PP_CAT(REG_TIMER_CTRL_PRIMARY_IPBY, TIMER_PRESCALER)
 
 	// Setup the counter and start counting
