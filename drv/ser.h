@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.19  2005/01/11 18:08:16  aleph
+ *#* Add missing include
+ *#*
  *#* Revision 1.18  2004/12/08 08:57:17  bernie
  *#* Rename time_t to mtime_t.
  *#*
@@ -72,6 +75,7 @@
 #include <mware/fifobuf.h>
 #include <compiler.h>
 #include <config.h>
+#include <macros.h> /* BV() */
 
 /*! \name Serial Error/status flags. */
 /*\{*/
