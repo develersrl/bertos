@@ -43,6 +43,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.16  2004/09/06 21:39:08  bernie
+ *#* Simplify code using ATOMIC().
+ *#*
  *#* Revision 1.15  2004/08/29 22:05:16  bernie
  *#* Rename BITS_PER_PTR to CPU_BITS_PER_PTR.
  *#*
@@ -84,7 +87,8 @@
 #ifndef MWARE_FIFO_H
 #define MWARE_FIFO_H
 
-#include "cpu.h"
+#include <cpu.h>
+#include <drv/kdebug.h>
 
 typedef struct FIFOBuffer
 {
@@ -93,6 +97,15 @@ typedef struct FIFOBuffer
 	unsigned char *begin;
 	unsigned char *end;
 } FIFOBuffer;
+
+
+#define ASSERT_VALID_FIFO(fifo) \
+	ATOMIC( \
+		ASSERT((fifo)->head >= (fifo)->begin); \
+		ASSERT((fifo)->head <= (fifo)->end); \
+		ASSERT((fifo)->tail >= (fifo)->begin); \
+		ASSERT((fifo)->tail <= (fifo)->end); \
+	)
 
 
 /*!
@@ -107,6 +120,7 @@ typedef struct FIFOBuffer
  */
 INLINE bool fifo_isempty(const FIFOBuffer *fb)
 {
+	//ASSERT_VALID_FIFO(fb);
 	return fb->head == fb->tail;
 }
 
@@ -126,6 +140,7 @@ INLINE bool fifo_isempty(const FIFOBuffer *fb)
  */
 INLINE bool fifo_isfull(const FIFOBuffer *fb)
 {
+	//ASSERT_VALID_FIFO(fb);
 	return
 		((fb->head == fb->begin) && (fb->tail == fb->end))
 		|| (fb->tail == fb->head - 1);
@@ -151,10 +166,12 @@ INLINE void fifo_push(FIFOBuffer *fb, unsigned char c)
 #ifdef __MWERKS__
 #pragma interrupt called
 #endif
+	//ASSERT_VALID_FIFO(fb);
+
 	/* Write at tail position */
 	*(fb->tail) = c;
 
-	if (fb->tail == fb->end)
+	if (UNLIKELY(fb->tail == fb->end))
 		/* wrap tail around */
 		fb->tail = fb->begin;
 	else
@@ -178,7 +195,9 @@ INLINE unsigned char fifo_pop(FIFOBuffer *fb)
 #ifdef __MWERKS__
 #pragma interrupt called
 #endif
-	if (fb->head == fb->end)
+	//ASSERT_VALID_FIFO(fb);
+
+	if (UNLIKELY(fb->head == fb->end))
 	{
 		/* wrap head around */
 		fb->head = fb->begin;
@@ -195,6 +214,7 @@ INLINE unsigned char fifo_pop(FIFOBuffer *fb)
  */
 INLINE void fifo_flush(FIFOBuffer *fb)
 {
+	//ASSERT_VALID_FIFO(fb);
 	fb->head = fb->tail;
 }
 
@@ -207,7 +227,8 @@ INLINE void fifo_flush(FIFOBuffer *fb)
 	 */
 	#define fifo_isempty_locked(fb) fifo_isempty((fb))
 	#define fifo_push_locked(fb, c) fifo_push((fb), (c))
-	#define fifo_flush_locked(fb) fifo_flush((fb))
+	#define fifo_pop_locked(fb)     fifo_pop((fb))
+	#define fifo_flush_locked(fb)   fifo_flush((fb))
 
 #else /* CPU_REG_BITS < CPU_BITS_PER_PTR */
 
@@ -222,12 +243,7 @@ INLINE void fifo_flush(FIFOBuffer *fb)
 	INLINE bool fifo_isempty_locked(const FIFOBuffer *fb)
 	{
 		bool result;
-		cpuflags_t flags;
-
-		DISABLE_IRQSAVE(flags);
-		result = fifo_isempty(fb);
-		ENABLE_IRQRESTORE(flags);
-
+		ATOMIC(result = fifo_isempty(fb));
 		return result;
 	}
 
@@ -242,12 +258,16 @@ INLINE void fifo_flush(FIFOBuffer *fb)
 	 */
 	INLINE void fifo_push_locked(FIFOBuffer *fb, unsigned char c)
 	{
-		cpuflags_t flags;
-		DISABLE_IRQSAVE(flags);
-		fifo_push(fb, c);
-		ENABLE_IRQRESTORE(flags);
+		ATOMIC(fifo_push(fb, c));
 	}
 
+	/* Probably not really needed, but hard to prove. */
+	INLINE unsigned char fifo_pop_locked(FIFOBuffer *fb)
+	{
+		unsigned char c;
+		ATOMIC(c = fifo_pop(fb));
+		return c;
+	}
 
 	/*!
 	 * Similar to fifo_flush(), but with stronger guarantees for
@@ -259,10 +279,7 @@ INLINE void fifo_flush(FIFOBuffer *fb)
 	 */
 	INLINE void fifo_flush_locked(FIFOBuffer *fb)
 	{
-		cpuflags_t flags;
-		DISABLE_IRQSAVE(flags);
-		fifo_flush(fb);
-		ENABLE_IRQRESTORE(flags);
+		ATOMIC(fifo_flush(fb));
 	}
 
 #endif /* CPU_REG_BITS < BITS_PER_PTR */
@@ -273,14 +290,9 @@ INLINE void fifo_flush(FIFOBuffer *fb)
  */
 INLINE bool fifo_isfull_locked(const FIFOBuffer *_fb)
 {
-	bool _result;
-	cpuflags_t _flags;
-
-	DISABLE_IRQSAVE(_flags);
-	_result = fifo_isfull(_fb);
-	ENABLE_IRQRESTORE(_flags);
-
-	return _result;
+	bool result;
+	ATOMIC(result = fifo_isfull(_fb));
+	return result;
 }
 
 
