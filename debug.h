@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.12  2005/02/18 11:18:33  bernie
+ *#* Fixes for Harvard processors from project_ks.
+ *#*
  *#* Revision 1.11  2005/02/16 20:29:48  bernie
  *#* TRACE(), TRACEMSG(): Reduce code and data footprint.
  *#*
@@ -34,34 +37,6 @@
  *#*
  *#* Revision 1.6  2004/12/08 08:52:00  bernie
  *#* Save some more RAM on AVR.
- *#*
- *#* Revision 1.5  2004/12/08 08:04:13  bernie
- *#* Doxygen fixes.
- *#*
- *#* Revision 1.4  2004/12/08 07:29:27  bernie
- *#* Fix Doxygen tags.
- *#*
- *#* Revision 1.3  2004/09/20 03:31:27  bernie
- *#* Sanitize for C++.
- *#*
- *#* Revision 1.2  2004/09/14 21:01:46  bernie
- *#* Mark assertions as LIKELY().
- *#*
- *#* Revision 1.1  2004/09/14 20:19:47  bernie
- *#* Unified debug macros.
- *#*
- *#* Revision 1.3  2004/09/06 12:11:29  bernie
- *#* Merge debug.h with DevLib.
- *#*
- *#* Revision 1.2  2004/08/13 03:22:07  bernie
- *#* Resurrect some debug macros from old projects.
- *#*
- *#* Revision 1.1  2004/08/12 06:56:35  bernie
- *#* Move debug.h from device/ to util/.
- *#*
- *#* Revision 1.1  2004/08/12 06:52:26  bernie
- *#* Factor out a few simple debug macros.
- *#*
  *#*/
 #ifndef DEVLIB_DEBUG_H
 #define DEVLIB_DEBUG_H
@@ -95,7 +70,6 @@
 	#endif
 	#endif
 #else /* !OS_HOSTED */
-	#include <config.h>
 	#include <compiler.h>
 #endif /* !OS_HOSTED */
 
@@ -159,6 +133,7 @@
 	#if OS_HOSTED
 		#include <stdio.h>
 		#include <stdarg.h>
+
 		INLINE void kdbg_init(void) { /* nop */ }
 		INLINE void kputchar(char c)
 		{
@@ -194,6 +169,9 @@
 		#define ASSERT_VALID_PTR_OR_NULL(p)  ASSERT((((p) == NULL) || ((unsigned long)(p) >= 0x200)))
 	#else /* !OS_HOSTED */
 
+		#include <config.h>  /* CONFIG_KDEBUG_ASSERT_NO_TEXT */
+		#include <cpu.h>  /* CPU_HARVARD */
+
 		/* These are implemented in drv/kdebug.c */
 		void kdbg_init(void);
 		void kputchar(char c);
@@ -206,28 +184,25 @@
 			void kputs_P(const char *PROGMEM str);
 			void kprintf_P(const char *PROGMEM fmt, ...) FORMAT(__printf__, 1, 2);
 			int __assert_P(const char *PROGMEM cond, const char *PROGMEM file, int line);
-			void __trace_P(const char *PROGMEM name);
-			void __tracemsg_P(const char *PROGMEM name, const char *PROGMEM fmt, ...);
+			void __trace_P(const char *func);
+			void __tracemsg_P(const char *func, const char *PROGMEM fmt, ...);
 			int __invalid_ptr_P(void *p, const char *PROGMEM name, const char *PROGMEM file, int line);
 			int __check_wall_P(long *wall, int size, const char * PGM_ATTR name, const char * PGM_ATTR file, int line);
 			#define kputs(str)  kputs_P(PSTR(str))
 			#define kprintf(fmt, ...)  kprintf_P(PSTR(fmt) ,## __VA_ARGS__)
 			#define __assert(cond, file, line)  __assert_P(PSTR(cond), PSTR(file), (line))
-			#define __trace(name)  __trace_P(PSTR(name))
-			#define __tracemsg(name, fmt, ...)  __trace_P(PSTR(name), PSTR(fmt), ## __VA_ARGS__)
+			#define __trace(func)  __trace_P(func)
+			#define __tracemsg(func, fmt, ...)  __tracemsg_P(func, PSTR(fmt), ## __VA_ARGS__)
 			#define __invalid_ptr(p, name, file, line)  __invalid_ptr_P((p), PSTR(name), PSTR(file), (line))
 			#define __check_wall(wall, size, name, file, line)  __check_wall_P(wall, size, PSTR(name), PSTR(file), (line))
 		#else /* !CPU_HARVARD */
 			void kputs(const char *str);
-			void kprintf(const char * fmt, ...) FORMAT(__printf__, 1, 2);
+			void kprintf(const char *fmt, ...) FORMAT(__printf__, 1, 2);
 			int __assert(const char *cond, const char *file, int line);
-			void __trace(const char *name);
-			void __tracemsg(const char *name, const char *fmt, ...);
+			void __trace(const char *func);
+			void __tracemsg(const char *func, const char *fmt, ...) FORMAT(__printf__, 2, 3);
 			int __invalid_ptr(void *p, const char *name, const char *file, int line);
 			int __check_wall(long *wall, int size, const char *name, const char *file, int line);
-
-			#define TRACE  __trace(__FUNCTION__)
-			#define TRACEMSG(msg,...) __tracemsg(__FUNCTION__, msg, ## __VA_ARGS__)
 		#endif /* !CPU_HARVARD */
 
 		#ifndef CONFIG_KDEBUG_ASSERT_NO_TEXT
@@ -240,6 +215,14 @@
 
 		#define ASSERT_VALID_PTR(p)         ((void)(LIKELY((p) >= 0x200) ? 0 : __invalid_ptr(p, #p, THIS_FILE, __LINE__)))
 		#define ASSERT_VALID_PTR_OR_NULL(p) ((void)(LIKELY((p == NULL) || ((p) >= 0x200)) ? 0 : __invalid_ptr((p), #p, THIS_FILE, __LINE__)))
+
+		#ifndef CONFIG_KDEBUG_DISABLE_TRACE
+			#define TRACE  __trace(__func__)
+			#define TRACEMSG(msg,...) __tracemsg(__func__, msg, ## __VA_ARGS__)
+		#else
+			#define TRACE  do {} while(0)
+			#define TRACEMSG(...)  do {} while(0)
+		#endif
 
 	#endif /* !OS_HOSTED */
 

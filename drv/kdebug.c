@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.22  2005/02/18 11:18:33  bernie
+ *#* Fixes for Harvard processors from project_ks.
+ *#*
  *#* Revision 1.21  2005/02/16 20:29:48  bernie
  *#* TRACE(), TRACEMSG(): Reduce code and data footprint.
  *#*
@@ -23,62 +26,6 @@
  *#*
  *#* Revision 1.19  2004/12/31 17:47:45  bernie
  *#* Rename UNUSED() to UNUSED_ARG().
- *#*
- *#* Revision 1.18  2004/12/08 08:52:00  bernie
- *#* Save some more RAM on AVR.
- *#*
- *#* Revision 1.17  2004/10/03 18:41:28  bernie
- *#* Restore \version header killed by mistake in previous commit.
- *#*
- *#* Revision 1.16  2004/10/03 18:40:50  bernie
- *#* Use new CPU macros.
- *#*
- *#* Revision 1.15  2004/09/14 21:03:46  bernie
- *#* Use debug.h instead of kdebug.h.
- *#*
- *#* Revision 1.14  2004/09/06 21:39:56  bernie
- *#* Allow partial redefinition of BUS macros.
- *#*
- *#* Revision 1.13  2004/08/29 22:04:26  bernie
- *#* Convert 485 macros to generic BUS macros;
- *#* kputchar(): New public function.
- *#*
- *#* Revision 1.12  2004/08/25 14:12:08  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.11  2004/08/24 16:19:08  bernie
- *#* kputchar(): New public function; Add missing dummy inlines for \!_DEBUG.
- *#*
- *#* Revision 1.10  2004/08/04 15:57:50  rasky
- *#* Cambiata la putchar per kdebug per DSP56k: la nuova funzione e' quella piu' a basso livello (assembly)
- *#*
- *#* Revision 1.9  2004/08/02 20:20:29  aleph
- *#* Merge from project_ks
- *#*
- *#* Revision 1.8  2004/07/30 14:26:33  rasky
- *#* Semplificato l'output dell'ASSERT
- *#* Aggiunta ASSERT2 con stringa di help opzionalmente disattivabile
- *#*
- *#* Revision 1.7  2004/07/30 14:15:53  rasky
- *#* Nuovo supporto unificato per detect della CPU
- *#*
- *#* Revision 1.6  2004/07/18 21:49:28  bernie
- *#* Add ATmega8 support.
- *#*
- *#* Revision 1.5  2004/06/27 15:20:26  aleph
- *#* Change UNUSED() macro to accept two arguments: type and name;
- *#* Add macro GNUC_PREREQ to detect GCC version during build;
- *#* Some spacing cleanups and typo fix
- *#*
- *#* Revision 1.4  2004/06/06 18:09:51  bernie
- *#* Import DSP56800 changes; Print broken wall bricks in hex.
- *#*
- *#* Revision 1.3  2004/06/03 11:27:09  bernie
- *#* Add dual-license information.
- *#*
- *#* Revision 1.2  2004/05/23 18:21:53  bernie
- *#* Trim CVS logs and cleanup header info.
- *#*
  *#*/
 
 #include <debug.h>
@@ -296,7 +243,7 @@ void kputchar(char c)
 }
 
 
-void PGM_FUNC(kvprintf)(const char * PGM_ATTR fmt, va_list ap)
+static void PGM_FUNC(kvprintf)(const char * PGM_ATTR fmt, va_list ap)
 {
 #if CONFIG_PRINTF
 	/* Mask serial TX intr */
@@ -380,18 +327,21 @@ int PGM_FUNC(__assert)(const char * PGM_ATTR cond, const char * PGM_ATTR file, i
 	return 1;
 }
 
-void PGM_FUNC(__trace)(const char * PGM_ATTR name)
+/*
+ * Unfortunately, there's no way to get __func__ in
+ * program memory, so we waste quite a lot of RAM in
+ * AVR and other Harvard processors.
+ */
+void PGM_FUNC(__trace)(const char *name)
 {
-	PGM_FUNC(kputs)(name);
-	PGM_FUNC(kputs)(PSTR("()\n"));
+	PGM_FUNC(kprintf)(PSTR("%s()\n"), name);
 }
 
-void PGM_FUNC(__tracemsg)(const char * PGM_ATTR name, const char * PGM_ATTR fmt, ...)
+void PGM_FUNC(__tracemsg)(const char *name, const char * PGM_ATTR fmt, ...)
 {
 	va_list ap;
 
-	PGM_FUNC(kputs)(name);
-	PGM_FUNC(kputs)(PSTR("(): "));
+	PGM_FUNC(kprintf)(PSTR("%s(): "), name);
 	va_start(ap, fmt);
 	PGM_FUNC(kvprintf)(fmt, ap);
 	va_end(ap);
