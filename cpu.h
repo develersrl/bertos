@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/07/20 16:06:04  bernie
+ * Add macros to handle endianess issues.
+ *
  * Revision 1.3  2004/07/18 21:49:51  bernie
  * Fixes for GCC 3.5.
  *
@@ -33,6 +36,11 @@
 //! Initialization value for registers in stack frame
 #define CPU_REG_INIT_VALUE(reg)     0
 
+// Macros for determining CPU endianness
+#define CPU_BIG_ENDIAN    0x1234
+#define CPU_LITTLE_ENDIAN 0x3412
+
+
 #if defined(__IAR_SYSTEMS_ICC) || defined(__IAR_SYSTEMS_ICC__)  /* 80C196 */
 
 	#define DISABLE_INTS            disable_interrupt()
@@ -46,6 +54,7 @@
 	#define CPU_REGS_CNT            16
 	#define CPU_STACK_GROWS_UPWARD  0
 	#define CPU_SP_ON_EMPTY_SLOT	0
+	#define CPU_BYTE_ORDER          CPU_LITTLE_ENDIAN
 
 #elif defined(__i386__) || defined(_MSC_VER) /* x86 */
 
@@ -60,6 +69,7 @@
 	#define CPU_REGS_CNT            7
 	#define CPU_STACK_GROWS_UPWARD  0
 	#define CPU_SP_ON_EMPTY_SLOT	0
+	#define CPU_BYTE_ORDER          CPU_LITTLE_ENDIAN
 
 #elif defined(__m56800E__) || defined(__m56800__) /* DSP56K */
 
@@ -80,6 +90,7 @@
 	#define CPU_SAVED_REGS_CNT      28
 	#define CPU_STACK_GROWS_UPWARD  1
 	#define CPU_SP_ON_EMPTY_SLOT	0
+	#define CPU_BYTE_ORDER          CPU_BIG_ENDIAN
 
 	#undef CPU_REG_INIT_VALUE
 	INLINE uint16_t CPU_REG_INIT_VALUE(int reg)
@@ -125,7 +136,7 @@
 	#define CPU_SAVED_REGS_CNT      18
 	#define CPU_STACK_GROWS_UPWARD  0
 	#define CPU_SP_ON_EMPTY_SLOT	1
-
+	#define CPU_BYTE_ORDER          CPU_LITTLE_ENDIAN
 #else
 	#error Unknown CPU
 #endif
@@ -201,5 +212,24 @@
 	#define CPU_PUSH_CALL_CONTEXT(sp, func) \
 		CPU_PUSH_WORD((sp), (func))
 #endif
+
+
+INLINE uint16_t htobe16(uint16_t n);
+INLINE uint16_t htobe16(uint16_t n)
+{
+	if (CPU_BYTE_ORDER == CPU_LITTLE_ENDIAN)
+		n = n << 8 | n >> 8;
+
+	return n;
+}
+
+INLINE uint16_t htole16(uint16_t n);
+INLINE uint16_t htole16(uint16_t n)
+{
+	if (CPU_BYTE_ORDER == CPU_BIG_ENDIAN)
+		n = n << 8 | n >> 8;
+
+	return n;
+}
 
 #endif /* CPU_H */
