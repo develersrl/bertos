@@ -38,8 +38,8 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.11  2004/08/25 14:12:08  rasky
- *#* Aggiornato il comment block dei log RCS
+ *#* Revision 1.12  2004/08/29 22:06:10  bernie
+ *#* Fix a bug in the (unused) RTS/CTS code; Clarify documentation.
  *#*
  *#* Revision 1.10  2004/08/10 06:30:41  bernie
  *#* Major redesign of serial bus policy handling.
@@ -72,9 +72,10 @@
 
 #include "ser.h"
 #include "ser_p.h"
-#include "kdebug.h"
 #include "config.h"
-#include "hw.h"
+#include "hw.h"  /* Required for bus macros overrides */
+
+#include <drv/kdebug.h>
 #include <drv/timer.h>
 #include <mware/fifobuf.h>
 
@@ -101,24 +102,7 @@
 
 
 /*!
- * \def CONFIG_SER_STROBE
- *
- * This is a debug facility that can be used to
- * monitor SER interrupt activity on an external pin.
- *
- * To use strobes, redefine the macros SER_STROBE_ON,
- * SER_STROBE_OFF and SER_STROBE_INIT and set
- * CONFIG_SER_STROBE to 1.
- */
-#ifndef CONFIG_SER_STROBE
-	#define SER_STROBE_ON    do {/*nop*/} while(0)
-	#define SER_STROBE_OFF   do {/*nop*/} while(0)
-	#define SER_STROBE_INIT  do {/*nop*/} while(0)
-#endif
-
-
-/*!
- * \name Overridable serial hooks
+ * \name Overridable serial bus hooks
  *
  * These can be redefined in hw.h to implement
  * special bus policies such as half-duplex, 485, etc.
@@ -260,28 +244,49 @@
 #endif
 
 
+/*!
+ * \def CONFIG_SER_STROBE
+ *
+ * This is a debug facility that can be used to
+ * monitor SER interrupt activity on an external pin.
+ *
+ * To use strobes, redefine the macros SER_STROBE_ON,
+ * SER_STROBE_OFF and SER_STROBE_INIT and set
+ * CONFIG_SER_STROBE to 1.
+ */
+#ifndef CONFIG_SER_STROBE
+	#define SER_STROBE_ON    do {/*nop*/} while(0)
+	#define SER_STROBE_OFF   do {/*nop*/} while(0)
+	#define SER_STROBE_INIT  do {/*nop*/} while(0)
+#endif
+
+
 /* From the high-level serial driver */
 extern struct Serial ser_handles[SER_CNT];
+
 
 /*!
  * Internal hardware state structure
  *
- * \a sending var is true if we are transmitting.
- * SPI note: this flag is necessary because the SPI sends and receives bytes
- * at the same time and the SPI IRQ is unique for send/receive.
- * The only way to start transmission is to write data in SPDR (this
- * is done by spi_starttx()). We do this *only* if a transfer is
- * not already started.
+ * The \a sending variable is true while the transmission
+ * interrupt is retriggering itself.
  *
  * For the USARTs the \a sending flag is useful for taking specific
  * actions before sending a burst of data, at the start of a trasmission
  * but not before every char sent.
+ *
+ * For the SPI, this flag is necessary because the SPI sends and receives
+ * bytes at the same time and the SPI IRQ is unique for send/receive.
+ * The only way to start transmission is to write data in SPDR (this
+ * is done by spi_starttx()). We do this *only* if a transfer is
+ * not already started.
  */
 struct AvrSerial
 {
 	struct SerialHardware hw;
 	volatile bool sending;
 };
+
 
 /*
  * These are to trick GCC into *not* using
@@ -340,7 +345,7 @@ static void uart0_setbaudrate(UNUSED(struct SerialHardware *, _hw), unsigned lon
 #endif
 	UBRR0L = (period);
 
-	DB(kprintf("uart0_setbaudrate(rate=%lu): period=%d\n", rate, period);)
+	//DB(kprintf("uart0_setbaudrate(rate=%lu): period=%d\n", rate, period);)
 }
 
 static void uart0_setparity(UNUSED(struct SerialHardware *, _hw), int parity)
@@ -389,7 +394,7 @@ static void uart1_setbaudrate(UNUSED(struct SerialHardware *, _hw), unsigned lon
 	UBRR1H = (period) >> 8;
 	UBRR1L = (period);
 
-	DB(kprintf("uart1_setbaudrate(rate=%ld): period=%d\n", rate, period);)
+	//DB(kprintf("uart1_setbaudrate(rate=%ld): period=%d\n", rate, period);)
 }
 
 static void uart1_setparity(UNUSED(struct SerialHardware *, _hw), int parity)
@@ -552,7 +557,7 @@ SIGNAL(SIG_UART0_DATA)
 	{
 		// Disable rx interrupt and tx, enable CTS interrupt
 		// UNTESTED
-		UCSR0B = BV(RXCIE) | BV(RXEN);
+		UCSR0B = BV(RXCIE) | BV(RXEN) | BV(TXEN);
 		sbi(EIFR, EIMSKB_CTS);
 		sbi(EIMSK, EIMSKB_CTS);
 	}
@@ -623,7 +628,7 @@ SIGNAL(SIG_UART1_DATA)
 	{
 		// Disable rx interrupt and tx, enable CTS interrupt
 		// UNTESTED
-		UCSR1B = BV(RXCIE) | BV(RXEN);
+		UCSR1B = BV(RXCIE) | BV(RXEN) | BV(TXEN);
 		sbi(EIFR, EIMSKB_CTS);
 		sbi(EIMSK, EIMSKB_CTS);
 	}
