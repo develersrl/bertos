@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.27  2004/10/21 10:09:40  bernie
+ *#* Remove spurious token in preprocessor directive.
+ *#*
  *#* Revision 1.26  2004/10/19 08:55:14  bernie
  *#* UNUSED_FUNC: New function attribute.
  *#*
@@ -262,7 +265,7 @@
  * \def COMPILER_STATEMENT_EXPRESSIONS
  * Support for macros with variable arguments.
  */
-#ifndef COMPILER_STATEMENT_EXPRESSIONS 0
+#ifndef COMPILER_STATEMENT_EXPRESSIONS
 #define COMPILER_STATEMENT_EXPRESSIONS 0
 #endif
 
