@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.25  2005/03/15 00:20:54  bernie
+ *#* proc_schedule(): New sanity check.
+ *#*
  *#* Revision 1.24  2005/01/08 09:20:54  bernie
  *#* Remove unused variable.
  *#*
@@ -295,6 +298,9 @@ void proc_schedule(void)
 
 	/* Remember old process to save its context later */
 	old_process = CurrentProcess;
+
+	/* Scheduling in interrupts is a nono. */
+	ASSERT(!IRQ_RUNNING());
 
 	/* Poll on the ready queue for the first ready process */
 	IRQ_SAVE_DISABLE(flags);
