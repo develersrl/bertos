@@ -1,9 +1,9 @@
 /*!
  * \file
  * <!--
- * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2001, 2002, 2003 Bernardo Innocenti <bernie@codewiz.org>
- * This file is part of DevLib - See devlib/README for information.
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \brief Additional support macros for compiler independance
@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.42  2005/02/16 20:28:46  bernie
+ *#* Move PGM macros to mware/pgm.h
+ *#*
  *#* Revision 1.41  2005/01/22 04:19:22  bernie
  *#* MTIME_INFINITE: New constant.
  *#*
@@ -22,102 +25,6 @@
  *#*
  *#* Revision 1.39  2005/01/08 08:49:39  bernie
  *#* Define PROGMEM on AVR only when not including pgmspace.h.
- *#*
- *#* Revision 1.38  2004/12/31 16:41:52  bernie
- *#* PROGMEM: Define to nothing for non-Harvard processors.
- *#*
- *#* Revision 1.37  2004/12/08 09:43:21  bernie
- *#* Metrowerks supports variadic macros.
- *#*
- *#* Revision 1.36  2004/12/08 08:55:54  bernie
- *#* Rename sigset_t to sigmask_t and time_t to mtime_t, to avoid conflicts with POSIX definitions.
- *#*
- *#* Revision 1.35  2004/12/08 07:35:51  bernie
- *#* Typo in macro name.
- *#*
- *#* Revision 1.34  2004/11/28 23:21:33  bernie
- *#* Use mtime_t instead of overloading ANSI time_t with new semantics.
- *#*
- *#* Revision 1.33  2004/11/16 23:09:40  bernie
- *#* size_t: Add 64bit definitions; time_t: Add 16bit hack for tiny CPUs.
- *#*
- *#* Revision 1.32  2004/11/16 22:42:44  bernie
- *#* Doxygen fixes.
- *#*
- *#* Revision 1.31  2004/11/16 22:37:28  bernie
- *#* IPTR: Remove obsolete definition.
- *#*
- *#* Revision 1.30  2004/11/16 22:30:19  bernie
- *#* Declare fixed-size types before other types.
- *#*
- *#* Revision 1.29  2004/11/16 20:34:40  bernie
- *#* UNUSED_VAR, USED_VAR, USED_FUNC: New macros; UNUSED_ARG: Rename from UNUSED.
- *#*
- *#* Revision 1.28  2004/10/21 11:03:52  bernie
- *#* Typo.
- *#*
- *#* Revision 1.27  2004/10/21 10:09:40  bernie
- *#* Remove spurious token in preprocessor directive.
- *#*
- *#* Revision 1.26  2004/10/19 08:55:14  bernie
- *#* UNUSED_FUNC: New function attribute.
- *#*
- *#* Revision 1.25  2004/10/19 07:14:20  bernie
- *#* Add macros to test for specific compiler features.
- *#*
- *#* Revision 1.24  2004/10/03 18:35:13  bernie
- *#* Poison C++ keywords in C programs for better portability.
- *#*
- *#* Revision 1.23  2004/09/20 03:30:27  bernie
- *#* Remove vsprintf_P() proto, no longer needed with avr-libc 1.0.4.
- *#*
- *#* Revision 1.22  2004/09/14 21:03:04  bernie
- *#* PURE_FUNC, CONST_FUNC, MUST_CHECK: New function attributes; LIKELY()/UNLIKELY(): Fix for non-integral expressions.
- *#*
- *#* Revision 1.21  2004/09/06 21:38:31  bernie
- *#* Misc documentation and style fixes.
- *#*
- *#* Revision 1.20  2004/08/29 21:57:58  bernie
- *#* Move back STATIC_ASSERT() to compiler.h as it's needed in cpu.h;
- *#* iptr_t, const_iptr_t: Replace IPTR macro with a real typedef.
- *#*
- *#* Revision 1.19  2004/08/25 14:12:08  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.18  2004/08/24 16:32:37  bernie
- *#* Document custom types.
- *#*
- *#* Revision 1.17  2004/08/24 13:32:14  bernie
- *#* PP_CAT(), PP_STRINGIZE(): Move back to compiler.h to break circular dependency between cpu.h/compiler.h/macros.h;
- *#* offsetof(), countof(): Move back to compiler.h to avoid including macros.h almost everywhere;
- *#* Trim CVS log;
- *#* Rename header guards;
- *#* Don't include arch_config.h in compiler.h as it's not needed there.
- *#*
- *#* Revision 1.16  2004/08/14 19:37:57  rasky
- *#* Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
- *#*
- *#* Revision 1.15  2004/08/13 03:23:26  bernie
- *#* Adjust a few MSVC tweaks from older projects.
- *#*
- *#* Revision 1.14  2004/08/10 06:56:29  bernie
- *#* RESTRICT: New C99-like macro; STATIC_ASSERT: Fix warning for multiple invocation in one file.
- *#*
- *#* Revision 1.13  2004/08/02 20:20:29  aleph
- *#* Merge from project_ks
- *#*
- *#* Revision 1.12  2004/08/01 01:21:17  bernie
- *#* LIKELY(), UNLIKELY(): New compiler-specific macros.
- *#*
- *#* Revision 1.11  2004/07/30 14:34:10  rasky
- *#* Vari fix per documentazione e commenti
- *#* Aggiunte PP_CATn e STATIC_ASSERT
- *#*
- *#* Revision 1.10  2004/07/30 14:15:53  rasky
- *#* Nuovo supporto unificato per detect della CPU
- *#*
- *#* Revision 1.9  2004/07/29 22:57:09  bernie
- *#* vsprintf(): Remove prototype for backwards compatibility with GCC 3.4; ssize_t: Add definition for inferior compilers.
  *#*/
 #ifndef DEVLIB_COMPILER_H
 #define DEVLIB_COMPILER_H
@@ -240,29 +147,17 @@
 		#define DEPRECATED  __attribute__((__deprecated__))
 	#endif
 
-	#if CPU_X86
+	#if CPU_AVR
+		#include <stddef.h>
+		#include <stdbool.h>
 
+		/* TODO: reorganize client code to include mware/pgm.h as needed. */
+		#include <mware/pgm.h>
+	#else
+		/* Include some standard C89/C99 stuff */
 		#include <stddef.h>
 		#include <setjmp.h>
 		#include <stdbool.h>
-
-	#elif CPU_AVR
-
-		#include <stddef.h>
-		#include <stdbool.h>
-
-		/* Support for harvard architectures */
-		#ifdef _PROGMEM
-			#include <avr/pgmspace.h>
-			#define PGM_READ_CHAR(s) pgm_read_byte(s)
-			#define PGM_FUNC(x) x ## _P
-			#define PGM_ATTR  PROGMEM
-		#else
-			/* We still need this for prototypes */
-			#define PROGMEM  __attribute__((__progmem__))
-			#define PSTR(s) ({static char __c[] PROGMEM = (s); __c;})
-		#endif
-
 	#endif
 
 	#ifndef __cplusplus
@@ -350,9 +245,6 @@
 #ifndef REGISTER
 #define REGISTER               /* nothing */
 #endif
-#ifndef PROGMEM
-#define PROGMEM                /* nothing */
-#endif
 #ifndef INTERRUPT
 #define INTERRUPT(x)           ERROR_NOT_IMPLEMENTED
 #endif
@@ -379,20 +271,6 @@
 #endif
 #ifndef MUST_CHECK
 #define MUST_CHECK             /* nothing */
-#endif
-
-/* Support for harvard architectures */
-#ifndef PSTR
-#define PSTR            /* nothing */
-#endif
-#ifndef PGM_READ_CHAR
-#define PGM_READ_CHAR(s) (*(s))
-#endif
-#ifndef PGM_FUNC
-#define PGM_FUNC(x) x
-#endif
-#ifndef PGM_ATTR
-#define PGM_ATTR        /* nothing */
 #endif
 
 /* Misc definitions */
@@ -438,18 +316,6 @@
 	#include <stdint.h>
 #endif
 
-/*!
- * \name Types for variables stored in program memory (harvard processors).
- * \{
- */
-typedef PROGMEM int8_t pgm_int8_t;
-typedef PROGMEM uint8_t pgm_uint8_t;
-typedef PROGMEM int16_t pgm_int16_t;
-typedef PROGMEM uint16_t pgm_uint16_t;
-typedef PROGMEM int32_t pgm_int32_t;
-typedef PROGMEM uint32_t pgm_uint32_t;
-/*\}*/
-
 #if CPU_AVR_ATMEGA8
 	/*
 	 * The ATmega8 has a very small Flash, so we can't afford
@@ -480,11 +346,17 @@ typedef unsigned char page_t;    /*!< Type for banked memory pages. */
 /*!
  * \name Standard type definitions.
  *
- * These should be in <sys/types.h>, but many compilers lack them.
+ * These should be in <sys/types.h> or <stddef.h>, but many compilers
+ * and C libraries lack them.
+ *
+ * We check for some common definitions to avoid redefinitions:
+ *
+ *    glibc, avr-libc: _SIZE_T_DEFINED
+ *    Darwin libc:     _BSD_SIZE_T_DEFINED_
  *
  * \{
  */
-#if !(defined(size_t) || defined(_SIZE_T_DEFINED))
+#if !(defined(size_t) || defined(_SIZE_T_DEFINED) || defined(_BSD_SIZE_T_DEFINED_))
 	#if CPU_REG_BITS > 32
 		/* 64bit. */
 		typedef unsigned long size_t;
