@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.9  2004/07/22 02:01:14  bernie
+ * Use TIMER_PRESCALER consistently.
+ *
  * Revision 1.8  2004/07/20 23:50:20  bernie
  * Also define TIMER_PRESCALER.
  *
@@ -52,7 +55,8 @@
 #endif
 
 
-#define timer_hw_irq()  /* Not needed, IRQ timer flag cleared automatically */
+/* Not needed, IRQ timer flag cleared automatically */
+#define timer_hw_irq() do {} while (0)
 
 #define TIMER_PRESCALER 64
 
@@ -77,10 +81,15 @@
 		TIFR = BV(OCF0) | BV(TOV0);
 
 		/* Setup Timer/Counter interrupt */
-		ASSR = 0x00;                  /* internal system clock */
-		TCCR0 = BV(WGM01) | BV(CS02); /* Clear on Compare match & prescaler = 64. When changing
-		                                 prescaler change TIMER_HW_HPTICKS_PER_SEC too */
-		TCNT0 = 0x00;                 /* initialization of Timer/Counter */
+		ASSR = 0x00;                  /* Internal system clock */
+		TCCR0 = BV(WGM01)             /* Clear on Compare match */
+			#if TIMER_PRESCALER == 64
+				| BV(CS02)
+			#else
+				#error Unsupported value of TIMER_PRESCALER
+			#endif
+		;
+		TCNT0 = 0x00;                 /* Initialization of Timer/Counter */
 		OCR0 = OCR_DIVISOR;           /* Timer/Counter Output Compare Register */
 
 		/* Enable timer interrupts: Timer/Counter2 Output Compare (OCIE2) */
@@ -91,7 +100,7 @@
 	}
 
 	//! Frequency of the hardware high precision timer
-	#define TIMER_HW_HPTICKS_PER_SEC  (CLOCK_FREQ / 64)
+	#define TIMER_HW_HPTICKS_PER_SEC  (CLOCK_FREQ / TIMER_PRESCALER)
 
 	INLINE hptime_t timer_hw_hpread(void)
 	{
@@ -148,6 +157,7 @@
 		TIFR = BV(OCF2) | BV(TOV2);
 
 		/* Setup Timer/Counter interrupt */
+#warning Aleph, please use TIMER_PRESCALER here
 		TCCR2 = BV(WGM21) | BV(CS21) | BV(CS20);
 		/* Clear on Compare match & prescaler = 64, internal sys clock.
 		   When changing prescaler change TIMER_HW_HPTICKS_PER_SEC too */
@@ -162,7 +172,7 @@
 	}
 
 	//! Frequency of the hardware high precision timer
-	#define TIMER_HW_HPTICKS_PER_SEC  (CLOCK_FREQ / 64)
+	#define TIMER_HW_HPTICKS_PER_SEC  (CLOCK_FREQ / TIMER_PRESCALER)
 
 	INLINE hptime_t timer_hw_hpread(void)
 	{
