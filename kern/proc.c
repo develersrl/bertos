@@ -17,8 +17,8 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.12  2004/08/25 14:12:09  rasky
- *#* Aggiornato il comment block dei log RCS
+ *#* Revision 1.13  2004/08/29 21:58:53  bernie
+ *#* Include macros.h explicityl.
  *#*
  *#* Revision 1.11  2004/08/24 16:09:08  bernie
  *#* Add missing header.
@@ -56,13 +56,14 @@
  *#*
  *#*/
 
-#include "cpu.h"
 #include "proc_p.h"
 #include "proc.h"
+#include "cpu.h"
 #include "event.h"
 #include "hw.h"
 #include <drv/kdebug.h>
 #include <arch_config.h>  /* ARCH_EMUL */
+#include <macros.h>  /* ABS() */
 
 #include <string.h> /* memset() */
 
