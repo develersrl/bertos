@@ -17,6 +17,9 @@
 
 /*
  * $Log$
+ * Revision 1.11  2004/08/05 17:39:56  bernie
+ * Fix a Doxygen tag.
+ *
  * Revision 1.10  2004/08/02 20:20:29  aleph
  * Merge from project_ks
  *
@@ -233,7 +236,7 @@
 
 
 /*!
- * \name SCHEDULER_IDLE
+ * \def SCHEDULER_IDLE
  *
  * \brief Invoked by the scheduler to stop the CPU when idle.
  *
