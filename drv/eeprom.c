@@ -1,8 +1,8 @@
 /*!
  * \file
  * <!--
- * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
- * This file is part of DevLib - See devlib/README for information.
+ * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \brief Driver for the 24xx16 and 24xx256 I2C EEPROMS (implementation)
@@ -16,17 +16,8 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.15  2005/01/06 16:09:40  aleph
- *#* Split twi/eeprom functions from eeprom module in separate twi module
- *#*
- *#* Revision 1.14  2004/12/13 12:07:06  bernie
- *#* DISABLE_IRQSAVE/ENABLE_IRQRESTORE: Convert to IRQ_SAVE_DISABLE/IRQ_RESTORE.
- *#*
- *#* Revision 1.13  2004/11/16 20:58:51  bernie
- *#* Add write verify.
- *#*
- *#* Revision 1.12  2004/11/02 17:50:01  bernie
- *#* CONFIG_EEPROM_VERIFY: New config option.
+ *#* Revision 1.16  2005/03/01 23:25:09  bernie
+ *#* Prune CVS log.
  *#*
  *#* Revision 1.11  2004/10/26 08:35:31  bernie
  *#* Reset watchdog for long operations.
@@ -36,31 +27,6 @@
  *#*
  *#* Revision 1.9  2004/09/14 21:03:46  bernie
  *#* Use debug.h instead of kdebug.h.
- *#*
- *#* Revision 1.8  2004/08/25 14:12:08  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.7  2004/08/24 16:48:40  bernie
- *#* Note reason for including <macros.h>
- *#*
- *#* Revision 1.6  2004/08/24 14:27:20  bernie
- *#* Doxygen fix.
- *#*
- *#* Revision 1.5  2004/08/24 13:46:48  bernie
- *#* Include <macros.h>.
- *#*
- *#* Revision 1.4  2004/08/10 06:57:22  bernie
- *#* eeprom_erase(): New function.
- *#*
- *#* Revision 1.3  2004/07/29 22:57:09  bernie
- *#* Add 24LC16 support.
- *#*
- *#* Revision 1.2  2004/07/22 01:24:43  bernie
- *#* Document AVR dependency.
- *#*
- *#* Revision 1.1  2004/07/20 17:11:18  bernie
- *#* Import into DevLib.
- *#*
  *#*/
 
 #include "eeprom.h"
