@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.24  2004/10/03 18:35:13  bernie
+ *#* Poison C++ keywords in C programs for better portability.
+ *#*
  *#* Revision 1.23  2004/09/20 03:30:27  bernie
  *#* Remove vsprintf_P() proto, no longer needed with avr-libc 1.0.4.
  *#*
@@ -193,6 +196,17 @@
 			#define PGM_ATTR  PROGMEM
 		#endif
 
+	#endif
+
+	#ifndef __cplusplus
+		/*
+		 * Disallow some C++ keywords as identifiers in C programs,
+		 * for improved portability.
+		 */
+		#pragma GCC poison new delete class template typename
+		#pragma GCC poison private protected public operator
+		#pragma GCC poison friend mutable using namespace
+		#pragma GCC poison cin cout cerr clog
 	#endif
 
 #elif defined(__MWERKS__) && CPU_DSP56K
