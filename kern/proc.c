@@ -17,6 +17,9 @@
 
 /*
  * $Log$
+ * Revision 1.11  2004/08/24 16:09:08  bernie
+ * Add missing header.
+ *
  * Revision 1.10  2004/08/24 16:07:01  bernie
  * Use kputs()/kputchar() when possible.
  *
@@ -56,6 +59,7 @@
 #include "event.h"
 #include "hw.h"
 #include <drv/kdebug.h>
+#include <arch_config.h>  /* ARCH_EMUL */
 
 #include <string.h> /* memset() */
 
