@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2004/12/08 08:51:34  bernie
+ *#* Add type-generic macros for C++.
+ *#*
  *#* Revision 1.8  2004/10/19 07:14:20  bernie
  *#* Add macros to test for specific compiler features.
  *#*
@@ -60,8 +63,17 @@
 
 #include <compiler.h>
 
-#if (COMPILER_STATEMENT_EXPRESSIONS && COMPILER_TYPEOF)
-	/* Type-generic macros */
+/* avr-gcc does not seem to support libstdc++ */
+#if defined(__cplusplus) && !CPU_AVR
+	/* Type-generic macros implemented with template functions. */
+	#include <algorithm>
+
+	template<class T> inline T ABS(T n) { return n >= 0 ? n : -n; }
+	#define MIN(a,b)   std::min(a, b)
+	#define MAX(a,b)   std::max(a, b)
+	#define SWAP(a,b)  std::swap(a, b)
+#elif (COMPILER_STATEMENT_EXPRESSIONS && COMPILER_TYPEOF)
+	/* Type-generic macros implemented with statement expressions. */
 	#define ABS(n) ({ \
 		__typeof__(n) _n = (n); \
 		(_n < 0) ? -_n : _n; \
@@ -88,7 +100,10 @@
 /*! Bound \a x between \a min and \a max. */
 #define MINMAX(min,x,max)  (MIN(MAX(min, x), max))
 
-#if COMPILER_TYPEOF
+#ifdef __cplusplus
+	/* Use standard implementation from <algorithm> */
+	#define SWAP(a,b)  std::swap(a, b)
+#elif COMPILER_TYPEOF
 	/*!
 	 * Type-generic macro to swap \a a with \a b.
 	 *
