@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.8  2004/07/20 23:50:20  bernie
+ * Also define TIMER_PRESCALER.
+ *
  * Revision 1.7  2004/07/20 23:49:40  bernie
  * Compute value of OCR_DIVISOR from CLOCK_FREQ.
  *
@@ -50,6 +53,8 @@
 
 
 #define timer_hw_irq()  /* Not needed, IRQ timer flag cleared automatically */
+
+#define TIMER_PRESCALER 64
 
 /*!
  * System timer: additional division after the prescaler
