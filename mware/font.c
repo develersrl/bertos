@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2004/12/31 16:42:55  bernie
+ *#* Sanitize for non-Harvard processors.
+ *#*
  *#* Revision 1.3  2004/08/25 14:12:09  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -43,7 +46,7 @@
 
 #include "font.h"
 
-const prog_uchar font[256 * 6] =
+const PROGMEM font[256 * 6] =
 {
 /* 0x00 */
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /*   */
@@ -333,4 +336,4 @@ const prog_uchar font[256 * 6] =
 	0x0A, 0x09, 0x0D, 0x0A, 0x00, 0x00, /* ý */
 	0x1E, 0x1E, 0x1E, 0x1E, 0x1E, 0x00, /* þ */
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00  /* ÿ */
-};        
+};

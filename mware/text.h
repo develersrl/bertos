@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2004/12/31 16:44:29  bernie
+ *#* Sanitize for non-Harvard processors.
+ *#*
  *#* Revision 1.8  2004/10/03 20:43:37  bernie
  *#* Import changes from project_ks.
  *#*
@@ -41,7 +44,10 @@
 #ifndef MWARE_TEXT_H
 #define MWARE_TEXT_H
 
-#include "compiler.h"
+#include <compiler.h>
+#include <macros.h> /* BV() */
+#include <cpu.h> /* CPU_HARVARD */
+
 #include <stdarg.h>
 
 /*!
@@ -97,14 +103,13 @@ int text_vwidthf(struct Bitmap *bm, const char * fmt, va_list ap);
 int text_widthf(struct Bitmap *bm, const char * fmt, ...) FORMAT(__printf__, 2, 3);
 
 /* Text formatting functions for program-memory strings (mware/text_format.c) */
-#if CPU_AVR
-#include <avr/pgmspace.h>
+#if CPU_HARVARD
 int text_puts_P(const char * PROGMEM str, struct Bitmap *bm);
 int text_vprintf_P(struct Bitmap *bm, const char * PROGMEM fmt, va_list ap);
 int text_printf_P(struct Bitmap *bm, const char * PROGMEM fmt, ...) FORMAT(__printf__, 2, 3);
 int text_xprintf_P(struct Bitmap *bm, uint8_t row, uint8_t col, uint16_t mode, const char * PROGMEM fmt, ...) FORMAT(__printf__, 5, 6);
 int text_vwidthf_P(struct Bitmap *bm, const char * PROGMEM fmt, va_list ap);
 int text_widthf_P(struct Bitmap *bm, const char * PROGMEM fmt, ...);
-#endif /* CPU_AVR */
+#endif /* CPU_HARVARD */
 
 #endif /* MWARE_TEXT_H */

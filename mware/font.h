@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2004/12/31 16:42:55  bernie
+ *#* Sanitize for non-Harvard processors.
+ *#*
  *#* Revision 1.3  2004/08/25 14:12:09  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -33,13 +36,13 @@
 #ifndef FONT_H
 #define FONT_H
 
-#include "avr/pgmspace.h"
+#include "compiler.h" /* PROGMEM */
 
 /* Font size (in pixel) */
 #define FONT_WIDTH 6
 #define FONT_HEIGHT 8
 
 /*! Font table */
-extern const prog_uchar font[256 * FONT_WIDTH];
+extern const PROGMEM uint8_t font[256 * FONT_WIDTH];
 
 #endif /* FONT_H */

@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2004/12/31 16:44:29  bernie
+ *#* Sanitize for non-Harvard processors.
+ *#*
  *#* Revision 1.8  2004/11/16 21:16:28  bernie
  *#* Update to new naming scheme in mware/gfx.c.
  *#*
@@ -58,7 +61,9 @@
 #include "gfx.h"
 #include "font.h"
 #include "text.h"
+
 #include <debug.h>
+
 
 /*!
  * Flags degli stili algoritmici
@@ -148,7 +153,7 @@ static int text_putglyph(char c, struct Bitmap *bm)
 		/* Per ogni colonna di dot del glyph... */
 		for (i = 0; i < glyph_width; ++i)
 		{
-			dots = pgm_read_byte(glyph);
+			dots = PGM_READ_CHAR(glyph);
 
 			/* Advance to next column in glyph.
 			 * Expand: advances only once every two columns
@@ -186,7 +191,7 @@ static int text_putglyph(char c, struct Bitmap *bm)
 	}
 	else /* No style: fast vanilla copy of glyph to line buffer */
 		while (glyph_width--)
-			*buf++ = pgm_read_byte(glyph++);
+			*buf++ = PGM_READ_CHAR(glyph++);
 
 	return c;
 }
