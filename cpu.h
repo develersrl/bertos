@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.18  2004/10/03 18:36:31  bernie
+ *#* IRQ_GETSTATE(): New macro; Rename IRQ macros for consistency.
+ *#*
  *#* Revision 1.17  2004/09/06 21:48:27  bernie
  *#* ATOMIC(): New macro.
  *#*
@@ -116,11 +119,11 @@
 
 #elif CPU_AVR
 
-	#define NOP                     asm volatile ("nop" ::)
-	#define DISABLE_INTS            asm volatile ("cli" ::)
-	#define ENABLE_INTS             asm volatile ("sei" ::)
+	#define NOP           asm volatile ("nop" ::)
+	#define IRQ_DISABLE   asm volatile ("cli" ::)
+	#define IRQ_ENABLE    asm volatile ("sei" ::)
 
-	#define DISABLE_IRQSAVE(x) \
+	#define IRQ_SAVE_DISABLE(x) \
 	do { \
 		__asm__ __volatile__( \
 			"in %0,__SREG__\n\t" \
@@ -129,12 +132,28 @@
 		); \
 	} while (0)
 
-	#define ENABLE_IRQRESTORE(x) \
+	#define IRQ_RESTORE(x) \
 	do { \
 		__asm__ __volatile__( \
 			"out __SREG__,%0" : /* no outputs */ : "r" (x) : "cc" \
 		); \
 	} while (0)
+
+	#define IRQ_GETSTATE() \
+	({ \
+		uint8_t sreg; \
+		__asm__ __volatile__( \
+			"in %0,__SREG__\n\t" \
+			: "=r" (sreg)  /* no inputs & no clobbers */ \
+		); \
+		(bool)(sreg & 0x80); \
+	})
+
+	/* OBSOLETE NAMES */
+	#define DISABLE_INTS IRQ_DISABLE
+	#define ENABLE_INTS  IRQ_ENABLE
+	#define DISABLE_IRQSAVE(x)   IRQ_SAVE_DISABLE(x)
+	#define ENABLE_IRQRESTORE(x) IRQ_RESTORE(x)
 
 	typedef uint8_t cpuflags_t;
 	typedef uint8_t cpustack_t;
