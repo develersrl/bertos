@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.22  2005/01/23 12:26:07  bernie
+ *#* Add missing header.
+ *#*
  *#* Revision 1.21  2004/12/13 12:07:06  bernie
  *#* DISABLE_IRQSAVE/ENABLE_IRQRESTORE: Convert to IRQ_SAVE_DISABLE/IRQ_RESTORE.
  *#*
@@ -58,7 +61,8 @@
 #define DRV_TIMER_AVR_H
 
 #include <arch_config.h> // ARCH_BOARD_KC
-#include "hw.h"
+#include <macros.h> // BV()
+#include <hw.h>
 
 #include <avr/signal.h>
 #include <avr/io.h>
