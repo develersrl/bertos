@@ -53,6 +53,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.14  2005/03/01 23:26:22  bernie
+ *#* Use shared hextab.
+ *#*
  *#* Revision 1.13  2005/02/18 12:33:25  bernie
  *#* Avoid strlen().
  *#*
@@ -73,8 +76,8 @@
  *#*/
 
 #include "formatwr.h"
-#include "pgm.h"
-//#include <compiler.h> /* progmem macros */
+#include <mware/pgm.h>
+#include <mware/hex.h>
 #include <config.h> /* CONFIG_ macros */
 #include <debug.h> /* ASSERT */
 
@@ -403,7 +406,7 @@ PGM_FUNC(_formatted_write)(const char * PGM_ATTR format,
 		flags.progmem = false;
 #endif
 		ptr = buf_pointer = &buf[0];
-		hex = "0123456789ABCDEF";
+		hex = HEX_tab;
 
 		/* check for leading '-', '+', ' ','#' or '0' flags  */
 		for (;;)
@@ -575,7 +578,7 @@ NEXT_FLAG:
 					precision++;
 #endif
 			case 'x':
-				hex = "0123456789abcdef";
+				hex = hex_tab;
 			case 'u':
 			case 'p':
 			case 'X':
