@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2004/09/14 20:59:04  bernie
+ *#* text_xprintf(): Support all styles; Pixel-wise text centering.
+ *#*
  *#* Revision 1.5  2004/08/25 14:12:09  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -110,18 +113,18 @@ int PGM_FUNC(text_printf)(struct Bitmap *bm, const char * PGM_ATTR fmt, ...)
  * of a Bitmap.
  *
  * \param bm Bitmap where to render the text
- * \param row  Starting row in character units (zero based)
- * \param col  Starting column in character units (zero based)
- * \param mode Formatting mode to use.  Can be TEXT_NORMAL,
- *        TEXT_FILL, TEXT_INVERT or TEXT_RIGHT or a combination
- *        of these flags ORed together.
+ * \param row   Starting row in character units (zero based)
+ * \param col   Starting column in character units (zero based)
+ * \param style Formatting style to use.  In addition to any STYLEF_
+ *        flag, it can be TEXT_NORMAL, TEXT_FILL, TEXT_INVERT or
+ *        TEXT_RIGHT, or a combination of these flags ORed together.
  * \param fmt  String possibly containing printf() formatting commands.
  *
  * \see text_puts() text_putchar() text_printf() text_vprintf()
  * \see text_moveto() text_style()
  */
 int PGM_FUNC(text_xprintf)(struct Bitmap *bm,
-		uint8_t row, uint8_t col, uint8_t mode, const char * PGM_ATTR fmt, ...)
+		uint8_t row, uint8_t col, uint16_t style, const char * PGM_ATTR fmt, ...)
 {
 	int len;
 	uint8_t oldstyle = 0;
@@ -131,30 +134,32 @@ int PGM_FUNC(text_xprintf)(struct Bitmap *bm,
 
 	text_moveto(bm, row, col);
 
-	if (mode & TEXT_INVERT)
-		oldstyle = text_style(STYLEF_INVERT, STYLEF_INVERT);
+	if (style & STYLEF_MASK)
+		oldstyle = text_style(style, STYLEF_MASK);
 
-	if (mode & (TEXT_CENTER | TEXT_RIGHT))
+	if (style & (TEXT_CENTER | TEXT_RIGHT))
 	{
-		uint8_t pad;
+		uint8_t pad = bm->width - PGM_FUNC(vsprintf)(NULL, fmt, ap) * FONT_WIDTH;
 
-		pad = bm->width/FONT_WIDTH - PGM_FUNC(vsprintf)(NULL, fmt, ap);
-
-		if (mode & TEXT_CENTER)
+		if (style & TEXT_CENTER)
 			pad /= 2;
 
-		while (pad--)
-			text_putchar(' ', bm);
+		if (style & TEXT_FILL)
+			gfx_RectFillC(bm, 0, row * FONT_HEIGHT, pad, (row + 1) * FONT_HEIGHT,
+				(style & STYLEF_INVERT) ? 0xFF : 0x00);
+
+		text_setcoord(bm, pad, row * FONT_HEIGHT);
 	}
 
 	len = PGM_FUNC(text_vprintf)(bm, fmt, ap);
 	va_end(ap);
 
-	if (mode & (TEXT_FILL | TEXT_CENTER))
-		while (bm->penX + FONT_WIDTH < bm->width)
-			text_putchar(' ', bm);
+	if (style & TEXT_FILL)
+		gfx_RectFillC(bm, bm->penX, row * FONT_HEIGHT, bm->width, (row + 1) * FONT_HEIGHT,
+			(style & STYLEF_INVERT) ? 0xFF : 0x00);
 
-	if (mode & TEXT_INVERT)
+	/* Restore old style */
+	if (style & STYLEF_MASK)
 		text_style(oldstyle, STYLEF_MASK);
 
 	return len;
