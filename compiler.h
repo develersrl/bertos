@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.30  2004/11/16 22:30:19  bernie
+ *#* Declare fixed-size types before other types.
+ *#*
  *#* Revision 1.29  2004/11/16 20:34:40  bernie
  *#* UNUSED_VAR, USED_VAR, USED_FUNC: New macros; UNUSED_ARG: Rename from UNUSED.
  *#*
@@ -368,28 +371,6 @@
 #endif
 
 
-/*
- * Standard type definitions.
- * These should be in <sys/types.h>, but many compilers lack them.
- */
-#if !(defined(size_t) || defined(_SIZE_T_DEFINED))
-	typedef unsigned int size_t;
-	typedef int ssize_t;
-#endif
-#if !(defined(_TIME_T_DEFINED) || defined(__time_t_defined))
-	typedef long time_t;
-#endif /* _TIME_T_DEFINED || __time_t_defined */
-
-/*! Bulk storage large enough for both pointers or integers */
-typedef void * iptr_t;
-typedef const void * const_iptr_t;
-#define IPTR iptr_t  /* OBSOLETE */
-
-typedef long utime_t;            /*!< Type for time expressed in microseconds */
-typedef unsigned char sig_t;     /*!< Type for signal bits */
-typedef unsigned char sigset_t;  /*!< Type for signal masks */
-typedef unsigned char page_t;    /*!< Type for banked memory pages */
-
 #if (defined(_MSC_VER) || defined(__IAR_SYSTEMS_ICC) || defined(__IAR_SYSTEMS_ICC__))
 	/*!
 	 * \name ISO C99 fixed-size types
@@ -411,6 +392,29 @@ typedef unsigned char page_t;    /*!< Type for banked memory pages */
 	/* This is the correct location. */
 	#include <stdint.h>
 #endif
+
+
+/*
+ * Standard type definitions.
+ * These should be in <sys/types.h>, but many compilers lack them.
+ */
+#if !(defined(size_t) || defined(_SIZE_T_DEFINED))
+	typedef unsigned int size_t;
+	typedef int ssize_t;
+#endif
+#if !(defined(_TIME_T_DEFINED) || defined(__time_t_defined))
+	typedef long time_t;
+#endif /* _TIME_T_DEFINED || __time_t_defined */
+
+/*! Bulk storage large enough for both pointers or integers */
+typedef void * iptr_t;
+typedef const void * const_iptr_t;
+#define IPTR iptr_t  /* OBSOLETE */
+
+typedef long utime_t;            /*!< Type for time expressed in microseconds */
+typedef unsigned char sig_t;     /*!< Type for signal bits */
+typedef unsigned char sigset_t;  /*!< Type for signal masks */
+typedef unsigned char page_t;    /*!< Type for banked memory pages */
 
 /*!
  * \name Types for hardware registers.
