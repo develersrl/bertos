@@ -41,6 +41,9 @@
 
 /*
  * $Log$
+ * Revision 1.6  2004/06/06 17:18:04  bernie
+ * Remove redundant declaration of fifo_isempty_locked().
+ *
  * Revision 1.5  2004/06/06 16:50:35  bernie
  * Import fixes for race conditions from project_ks.
  *
@@ -101,7 +104,6 @@ typedef struct FIFOBuffer
 
 /* Public function prototypes */
 INLINE bool fifo_isempty(const FIFOBuffer *fb);
-INLINE bool fifo_isempty_locked(const FIFOBuffer *fb);
 INLINE bool fifo_isfull(const FIFOBuffer *fb);
 INLINE bool fifo_isfull_locked(const FIFOBuffer *fb);
 #ifdef __MWERKS__
