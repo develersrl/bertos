@@ -38,6 +38,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.15  2004/09/14 21:05:36  bernie
+ *#* Use debug.h instead of kdebug.h; Use new AVR pin names; Spelling fixes.
+ *#*
  *#* Revision 1.14  2004/09/06 21:50:00  bernie
  *#* Spelling fixes.
  *#*
@@ -81,7 +84,7 @@
 #include "config.h"
 #include "hw.h"  /* Required for bus macros overrides */
 
-#include <drv/kdebug.h>
+#include <debug.h>
 #include <drv/timer.h>
 #include <mware/fifobuf.h>
 
@@ -220,9 +223,9 @@
 /* SPI port and pin configuration */
 #define SPI_PORT      PORTB
 #define SPI_DDR       DDRB
-#define SPI_SCK_BIT   PORTB1
-#define SPI_MOSI_BIT  PORTB2
-#define SPI_MISO_BIT  PORTB3
+#define SPI_SCK_BIT   PB1
+#define SPI_MOSI_BIT  PB2
+#define SPI_MISO_BIT  PB3
 
 /* USART registers definitions */
 #if defined(__AVR_ATmega64__) || defined(__AVR_ATmega128__)
@@ -706,7 +709,7 @@ SIGNAL(SIG_UART1_TRANS)
  * Serial 0 RX complete interrupt handler.
  *
  * This handler is interruptible.
- * Interrupt are re-enabled as soon as recv complete interrupt is
+ * Interrupt are reenabled as soon as recv complete interrupt is
  * disabled. Using INTERRUPT() is troublesome when the serial
  * is heavily loaded, because an interrupt could be retriggered
  * when executing the handler prologue before RXCIE is disabled.
@@ -746,7 +749,7 @@ SIGNAL(SIG_UART0_RECV)
 #endif
 	}
 
-	/* Re-enable receive complete int */
+	/* Reenable receive complete int */
 	//DISABLE_INTS;
 	//UCSR0B |= BV(RXCIE);
 
@@ -760,7 +763,7 @@ SIGNAL(SIG_UART0_RECV)
  * Serial 1 RX complete interrupt handler.
  *
  * This handler is interruptible.
- * Interrupt are re-enabled as soon as recv complete interrupt is
+ * Interrupt are reenabled as soon as recv complete interrupt is
  * disabled. Using INTERRUPT() is troublesome when the serial
  * is heavily loaded, because an interrupt could be retriggered
  * when executing the handler prologue before RXCIE is disabled.
