@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.34  2004/11/28 23:21:33  bernie
+ *#* Use mtime_t instead of overloading ANSI time_t with new semantics.
+ *#*
  *#* Revision 1.33  2004/11/16 23:09:40  bernie
  *#* size_t: Add 64bit definitions; time_t: Add 16bit hack for tiny CPUs.
  *#*
@@ -403,7 +406,32 @@
 #endif
 
 
-/*
+#if CPU_AVR_ATMEGA8
+	/*
+	 * The ATmega8 has a very small Flash, so we can't afford
+	 * to link in support routines for 32bit integer arithmetic.
+	 */
+	typedef int16_t mtime_t;  /*!< Type for time expressed in milliseconds. */
+	typedef int16_t utime_t;  /*!< Type for time expressed in microseconds. */
+	#define SIZEOF_MTIME_T (16 / CPU_BITS_PER_CHAR)
+	#define SIZEOF_UTIME_T (16 / CPU_BITS_PER_CHAR)
+#else
+	typedef int32_t mtime_t;  /*!< Type for time expressed in milliseconds. */
+	typedef int32_t utime_t;  /*!< Type for time expressed in microseconds. */
+	#define SIZEOF_MTIME_T (32 / CPU_BITS_PER_CHAR)
+	#define SIZEOF_UTIME_T (32 / CPU_BITS_PER_CHAR)
+#endif
+
+/*! Bulk storage large enough for both pointers or integers. */
+typedef void * iptr_t;
+typedef const void * const_iptr_t;
+
+typedef unsigned char sig_t;     /*!< Type for signal bits. */
+typedef unsigned char sigset_t;  /*!< Type for signal masks. */
+typedef unsigned char page_t;    /*!< Type for banked memory pages. */
+
+
+/*!
  * \name Standard type definitions.
  *
  * These should be in <sys/types.h>, but many compilers lack them.
@@ -421,32 +449,17 @@
 		typedef int ssize_t;
 	#endif
 #endif
+
 #if !(defined(_TIME_T_DEFINED) || defined(__time_t_defined))
-	/*
-	 * The ATmega8 has a very small Flash, so we can't afford to
-	 * link in support routines for 32bit integer arithmetic.
-	 */
-	#if CPU_AVR_ATMEGA8
-		typedef int time_t; /* 16bit. */
-		#define SIZEOF_TIME_T SIZEOF_INT
-	#else
-		typedef long time_t; /* 32bit or 64bit. */
-		#define SIZEOF_TIME_T SIZEOF_LONG
-	#endif
+	/*! For backwards compatibility.  Use mtime_t in new code. */
+	#define time_t mtime_t
+	#define SIZEOF_TIME_T SIZEOF_MTIME_T
 #else
 	/* Just a guess, but quite safe. */
 	#define SIZEOF_TIME_T SIZEOF_LONG
 #endif /* _TIME_T_DEFINED || __time_t_defined */
 /*\}*/
 
-/*! Bulk storage large enough for both pointers or integers. */
-typedef void * iptr_t;
-typedef const void * const_iptr_t;
-
-typedef long utime_t;            /*!< Type for time expressed in microseconds. */
-typedef unsigned char sig_t;     /*!< Type for signal bits. */
-typedef unsigned char sigset_t;  /*!< Type for signal masks. */
-typedef unsigned char page_t;    /*!< Type for banked memory pages. */
 
 /*!
  * \name Types for hardware registers.
