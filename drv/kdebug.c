@@ -1,14 +1,12 @@
 /*!
  * \file
  * <!--
- * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
- * Copyright 2000,2001,2002 Bernardo Innocenti <bernie@codewiz.org>
+ * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2000, 2001, 2002 Bernardo Innocenti <bernie@codewiz.org>
  * This file is part of DevLib - See devlib/README for information.
  * -->
  *
- * \brief General pourpose debug functions.
- *
- * \version $Id$
+ * \brief General pourpose debug support for embedded systems (implementation).
  *
  * \author Bernardo Innocenti <bernie@develer.com>
  * \author Stefano Fedrigo <aleph@develer.com>
@@ -16,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.16  2004/10/03 18:40:50  bernie
+ *#* Use new CPU macros.
+ *#*
  *#* Revision 1.15  2004/09/14 21:03:46  bernie
  *#* Use debug.h instead of kdebug.h.
  *#*
@@ -110,13 +111,15 @@
 		#define KDBG_UART0_BUS_TX    do {} while (0)
 		#endif
 
-		#if defined(__AVR_ATmega64__)
+		#if CPU_AVR_ATMEGA64
 			#define UCR UCSR0B
 			#define UDR UDR0
 			#define USR UCSR0A
-		#elif defined(__AVR_ATmega8__)
+		#elif CPU_AVR_ATMEGA8
 			#define UCR UCSRB
 			#define USR UCSRA
+		#else
+			#error Unknown CPU
 		#endif
 
 		#define KDBG_WAIT_READY()     do { loop_until_bit_is_set(USR, UDRE); } while(0)
@@ -216,7 +219,7 @@ void kdbg_init(void)
 	/* Compute the baud rate */
 	uint16_t period = (((CLOCK_FREQ / 16UL) + (CONFIG_KDEBUG_BAUDRATE / 2)) / CONFIG_KDEBUG_BAUDRATE) - 1;
 
-	#if defined(__AVR_ATmega64__)
+	#if CPU_AVR_ATMEGA64
 		#if CONFIG_KDEBUG_PORT == 0
 			UBRR0H = (uint8_t)(period>>8);
 			UBRR0L = (uint8_t)period;
@@ -228,14 +231,14 @@ void kdbg_init(void)
 		#else
 			#error CONFIG_KDEBUG_PORT must be either 0 or 1
 		#endif
-	#elif defined(__AVR_ATmega8__)
+	#elif CPU_AVR_ATMEGA8
 		UBRRH = (uint8_t)(period>>8);
 		UBRRL = (uint8_t)period;
-	#elif defined(__AVR_ATmega103__)
+	#elif CPU_AVR_ATMEGA103
 		UBRR = (uint8_t)period;
 		KDBG_UART0_BUS_INIT;
 	#else
-		#error Unknown arch
+		#error Unknown CPU
 	#endif
 
 #endif /* !CPU_I196 && !CPU_AVR */
