@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2004/12/08 08:56:58  bernie
+ *#* Reformat.
+ *#*
  *#* Revision 1.5  2004/09/06 21:40:50  bernie
  *#* Move buffer handling in chip-specific driver.
  *#*
@@ -37,22 +40,22 @@ struct Serial;
 
 struct SerialHardwareVT
 {
-	void (*init)(struct SerialHardware* ctx, struct Serial* ser);
-	void (*cleanup)(struct SerialHardware* ctx);
-	void (*setbaudrate)(struct SerialHardware* ctx, unsigned long rate);
-	void (*setparity)(struct SerialHardware* ctx, int parity);
-	void (*enabletxirq)(struct SerialHardware* ctx);
+	void (*init)(struct SerialHardware *ctx, struct Serial *ser);
+	void (*cleanup)(struct SerialHardware *ctx);
+	void (*setbaudrate)(struct SerialHardware *ctx, unsigned long rate);
+	void (*setparity)(struct SerialHardware *ctx, int parity);
+	void (*enabletxirq)(struct SerialHardware *ctx);
 };
 
 struct SerialHardware
 {
-	const struct SerialHardwareVT* table;
+	const struct SerialHardwareVT *table;
 	unsigned char *txbuffer;
 	unsigned char *rxbuffer;
 	size_t         txbuffer_size;
 	size_t         rxbuffer_size;
 };
 
-struct SerialHardware* ser_hw_getdesc(int unit);
+struct SerialHardware *ser_hw_getdesc(int unit);
 
 #endif /* DRV_SER_P_H */
