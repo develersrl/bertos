@@ -66,6 +66,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2004/09/14 21:06:44  bernie
+ *#* Use debug.h instead of kdebug.h.
+ *#*
  *#* Revision 1.7  2004/08/25 14:12:09  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -95,7 +98,7 @@
 #include "proc.h"
 #include "proc_p.h"
 #include "hw.h"
-#include <drv/kdebug.h>
+#include <debug.h>
 
 // FIXME
 #if CONFIG_KERN_SIGNALS

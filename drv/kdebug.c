@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.15  2004/09/14 21:03:46  bernie
+ *#* Use debug.h instead of kdebug.h.
+ *#*
  *#* Revision 1.14  2004/09/06 21:39:56  bernie
  *#* Allow partial redefinition of BUS macros.
  *#*
@@ -61,7 +64,8 @@
  *#*
  *#*/
 
-#include "kdebug.h"
+#include <debug.h>
+#include <cpu.h>
 #include "hw.h"
 #include "config.h"
 

@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.14  2004/09/14 21:06:44  bernie
+ *#* Use debug.h instead of kdebug.h.
+ *#*
  *#* Revision 1.13  2004/08/29 21:58:53  bernie
  *#* Include macros.h explicityl.
  *#*
@@ -61,7 +64,7 @@
 #include "cpu.h"
 #include "event.h"
 #include "hw.h"
-#include <drv/kdebug.h>
+#include <debug.h>
 #include <arch_config.h>  /* ARCH_EMUL */
 #include <macros.h>  /* ABS() */
 

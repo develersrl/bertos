@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2004/09/14 21:03:46  bernie
+ *#* Use debug.h instead of kdebug.h.
+ *#*
  *#* Revision 1.8  2004/08/25 14:12:08  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -46,7 +49,7 @@
 #include "eeprom.h"
 
 #include <mware/byteorder.h> /* cpu_to_be16() */
-#include <drv/kdebug.h>
+#include <debug.h>
 #include <hw.h>
 #include <macros.h>  // MIN()
 

@@ -1,7 +1,7 @@
 /*!
  * \file
  * <!--
- * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000 Bernardo Innocenti <bernie@develer.com>
  * This file is part of DevLib - See devlib/README for information.
  * -->
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.15  2004/09/14 21:07:18  bernie
+ *#* Use debug.h instead of kdebug.h.
+ *#*
  *#* Revision 1.14  2004/08/25 14:12:08  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -56,10 +59,10 @@
  *#*
  *#*/
 
-#include "hw.h"
-#include "kdebug.h"
 #include "timer.h"
+#include <cpu.h>
 #include CPU_HEADER(timer)
+#include <debug.h>
 
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 	#include <kern/proc.h>
