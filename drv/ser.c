@@ -28,6 +28,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.20  2004/10/19 11:48:00  bernie
+ *#* Remove unused variable.
+ *#*
  *#* Revision 1.19  2004/10/19 08:14:13  bernie
  *#* Fix a few longstanding bugs wrt status handling (made by rasky on scfirm).
  *#*
@@ -163,8 +166,6 @@ int ser_putchar(int c, struct Serial *port)
  */
 int ser_getchar(struct Serial *port)
 {
-	int result;
-
 	if (fifo_isempty_locked(&port->rxfifo))
 	{
 #if CONFIG_SER_RXTIMEOUT != -1
