@@ -6,15 +6,17 @@
  * This file is part of DevLib - See devlib/README for information.
  * -->
  *
- * \version $Id$
- *
- * \author Bernardo Innocenti <bernie@develer.com>
- *
  * \brief Additional support macros for compiler independance
+ *
+ * \version $Id$
+ * \author Bernardo Innocenti <bernie@develer.com>
  */
 
 /*#*
  *#* $Log$
+ *#* Revision 1.23  2004/09/20 03:30:27  bernie
+ *#* Remove vsprintf_P() proto, no longer needed with avr-libc 1.0.4.
+ *#*
  *#* Revision 1.22  2004/09/14 21:03:04  bernie
  *#* PURE_FUNC, CONST_FUNC, MUST_CHECK: New function attributes; LIKELY()/UNLIKELY(): Fix for non-integral expressions.
  *#*
@@ -184,16 +186,11 @@
 		#include <stddef.h>
 		#include <stdbool.h>
 
-		/* Missing printf-family functions in avr-libc/stdio.h */
-		#include <stdarg.h>
-		#include <avr/pgmspace.h>
-		int vsprintf_P(char *buf, const char * PROGMEM fmt, va_list ap);
-
 		/* Support for harvard architectures */
 		#ifdef _PROGMEM
 			#define PGM_READ_CHAR(s) pgm_read_byte(s)
 			#define PGM_FUNC(x) x ## _P
-			#define PGM_ATTR        PROGMEM
+			#define PGM_ATTR  PROGMEM
 		#endif
 
 	#endif
@@ -280,9 +277,11 @@
 
 /* Support for hybrid C/C++ applications. */
 #ifdef __cplusplus
+	#define EXTERN_C        extern "C"
 	#define EXTERN_C_BEGIN  extern "C" {
 	#define EXTERN_C_END    }
 #else
+	#define EXTERN_C        extern
 	#define EXTERN_C_BEGIN  /* nothing */
 	#define EXTERN_C_END    /* nothing */
 #endif
