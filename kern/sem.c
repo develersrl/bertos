@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/08/08 05:53:23  bernie
+ * Use DISABLE_IRQSAVE/ENABLE_IRQRESTORE; Cleanup documentation.
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -49,10 +52,14 @@ void sem_init(struct Semaphore *s)
  *
  * \note   each call to sem_attempt() must be matched by a
  *         call to sem_release().
+ *
+ * \see sem_obtain() sem_release()
  */
 bool sem_attempt(struct Semaphore *s)
 {
-	DISABLE_INTS;
+	cpuflags_t flags;
+	DISABLE_IRQSAVE(flags);
+
 	if ((!s->owner) || (s->owner == CurrentProcess))
 	{
 		s->owner = CurrentProcess;
@@ -60,7 +67,8 @@ bool sem_attempt(struct Semaphore *s)
 		ENABLE_INTS;
 		return true;
 	}
-	ENABLE_INTS;
+
+	ENABLE_IRQRESTORE(flags);
 	return false;
 }
 
@@ -79,30 +87,34 @@ bool sem_attempt(struct Semaphore *s)
  *       the most common case: the semaphore is free or locked
  *       by the calling process itself. Rearranging this code
  *       is probably a bad idea.
+ *
+ * \sa sem_release() sem_attempt()
  */
 void sem_obtain(struct Semaphore *s)
 {
-	DISABLE_INTS;
+	cpuflags_t flags;
+	DISABLE_IRQSAVE(flags);
 
 	/* Is the semaphore already locked by another process? */
-	if (s->owner && (s->owner != CurrentProcess))
+	if (UNLIKELY(s->owner && (s->owner != CurrentProcess)))
 	{
 		/* Append calling process to the wait queue */
 		ADDTAIL(&s->wait_queue, (Node *)CurrentProcess);
-		ENABLE_INTS;
+		ENABLE_IRQRESTORE(flags);
 
-		/* We will awake only when the current owner calls
-		 * ReleaseSemaphore(). Then, the semaphore will already
+		/*
+		 * We will wake up only when the current owner calls
+		 * sem_release(). Then, the semaphore will already
 		 * be locked for us.
 		 */
 		proc_schedule();
 	}
 	else
 	{
-		/* The semaphore is free: lock it */
+		/* The semaphore was free: lock it */
 		s->owner = CurrentProcess;
 		s->nest_count++;
-		ENABLE_INTS;
+		ENABLE_IRQRESTORE(flags);
 	}
 }
 
@@ -117,12 +129,16 @@ void sem_obtain(struct Semaphore *s)
  *       the most common case: the semaphore has been locked just
  *       once and nobody else was waiting for it. Rearranging
  *       this code is probably a bad idea.
+ *
+ * \sa sem_obtain() sem_attempt()
  */
 void sem_release(struct Semaphore *s)
 {
-	DISABLE_INTS;
+	cpuflags_t flags;
+	DISABLE_IRQSAVE(flags);
 
-	/* Decremement nesting count and check if the semaphore
+	/*
+	 * Decremement nesting count and check if the semaphore
 	 * has been fully unlocked
 	 */
 	if (--s->nest_count == 0)
@@ -142,6 +158,6 @@ void sem_release(struct Semaphore *s)
 		}
 	}
 
-	ENABLE_INTS;
+	ENABLE_IRQRESTORE(flags);
 }
 
