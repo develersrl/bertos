@@ -28,6 +28,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.21  2004/11/16 18:10:13  bernie
+ *#* Add sanity checks for missing configuration parameters.
+ *#*
  *#* Revision 1.20  2004/10/19 11:48:00  bernie
  *#* Remove unused variable.
  *#*
@@ -87,15 +90,39 @@
  *#*
  *#*/
 
-#include <mware/formatwr.h>
-#include <debug.h>
 #include "ser.h"
 #include "ser_p.h"
-#include "hw.h"
+#include <mware/formatwr.h>
+#include <debug.h>
+#include <hw.h>
+#include <config.h>
 
-#ifdef CONFIG_KERNEL
+/*
+ * Sanity check for config parameters required by this module.
+ */
+#if !defined(CONFIG_KERNEL) || ((CONFIG_KERNEL != 0) && CONFIG_KERNEL != 1)
+	#error CONFIG_KERNEL must be set to either 0 or 1 in config.h
+#endif
+#if !defined(CONFIG_SER_RXTIMEOUT)
+	#error CONFIG_SER_TXTIMEOUT missing in config.h
+#endif
+#if !defined(CONFIG_SER_RXTIMEOUT)
+	#error CONFIG_SER_RXTIMEOUT missing in config.h
+#endif
+#if !defined(CONFIG_SER_GETS) || ((CONFIG_SER_GETS != 0) && CONFIG_SER_GETS != 1)
+	#error CONFIG_SER_GETS must be set to either 0 or 1 in config.h
+#endif
+#if !defined(CONFIG_SER_DEFBAUDRATE)
+	#error CONFIG_SER_DEFBAUDRATE missing in config.h
+#endif
+#if !defined(CONFIG_PRINTF)
+	#error CONFIG_PRINTF missing in config.h
+#endif
+
+#if CONFIG_KERNEL
 	#include <kern/proc.h>
 #endif
+
 #if CONFIG_SER_TXTIMEOUT != -1 || CONFIG_SER_RXTIMEOUT != -1
 	#include <drv/timer.h>
 #endif
@@ -130,7 +157,7 @@ int ser_putchar(int c, struct Serial *port)
 		/* Attende finche' il buffer e' pieno... */
 		do
 		{
-#if defined(CONFIG_KERN_SCHED) && CONFIG_KERN_SCHED
+#if CONFIG_KERNEL && CONFIG_KERN_SCHED
 			/* Give up timeslice to other processes. */
 			proc_switch();
 #endif
@@ -174,7 +201,7 @@ int ser_getchar(struct Serial *port)
 		/* Wait while buffer is empty */
 		do
 		{
-#if defined(CONFIG_KERN_SCHED) && CONFIG_KERN_SCHED
+#if CONFIG_KERNEL && CONFIG_KERN_SCHED
 			/* Give up timeslice to other processes. */
 			proc_switch();
 #endif
@@ -411,10 +438,10 @@ void ser_drain(struct Serial *ser)
 {
 	while (!fifo_isempty(&ser->txfifo))
 	{
-#if defined(CONFIG_KERN_SCHED) && CONFIG_KERN_SCHED
+		#if CONFIG_KERNEL && CONFIG_KERN_SCHED
 			/* Give up timeslice to other processes. */
 			proc_switch();
-#endif
+		#endif
 	}
 }
 
@@ -451,6 +478,9 @@ struct Serial *ser_open(unsigned int unit)
 #if CONFIG_SER_DEFBAUDRATE
 	ser_setbaudrate(port, CONFIG_SER_DEFBAUDRATE);
 #endif
+
+	/* Clear error flags */
+	ser_setstatus(port, 0);
 
 	return port;
 }
