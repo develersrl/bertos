@@ -28,6 +28,9 @@
 
 /*
  * $Log$
+ * Revision 1.8  2004/07/29 22:57:09  bernie
+ * ser_drain(): New function; Make Serial::is_open a debug-only feature; Switch to new-style CONFIG_* macros.
+ *
  * Revision 1.7  2004/07/18 21:49:03  bernie
  * Make CONFIG_SER_DEFBAUDRATE optional.
  *
@@ -57,7 +60,7 @@
 #ifdef CONFIG_KERNEL
 	#include <kern/proc.h>
 #endif
-#if defined(CONFIG_SER_TXTIMEOUT) || defined(CONFIG_SER_RXTIMEOUT)
+#if CONFIG_SER_TXTIMEOUT != -1 || CONFIG_SER_RXTIMEOUT != -1
 	#include <drv/timer.h>
 #endif
 
@@ -83,7 +86,7 @@ int ser_putchar(int c, struct Serial *port)
 {
 	if (fifo_isfull_locked(&port->txfifo))
 	{
-#ifdef CONFIG_SER_TXTIMEOUT
+#if CONFIG_SER_TXTIMEOUT != -1
 		time_t start_time = timer_gettick();
 #endif
 
@@ -94,7 +97,7 @@ int ser_putchar(int c, struct Serial *port)
 			/* Give up timeslice to other processes. */
 			proc_switch();
 #endif
-#ifdef CONFIG_SER_TXTIMEOUT
+#if CONFIG_SER_TXTIMEOUT != -1
 			if (timer_gettick() - start_time >= port->txtimeout)
 			{
 				port->status |= SERRF_TXTIMEOUT;
@@ -130,17 +133,17 @@ int ser_getchar(struct Serial *port)
 
 	if (fifo_isempty_locked(&port->rxfifo))
 	{
-#ifdef CONFIG_SER_RXTIMEOUT
+#if CONFIG_SER_RXTIMEOUT != -1
 		time_t start_time = timer_gettick();
 #endif
 		/* Wait while buffer is empty */
 		do
 		{
-#ifdef CONFIG_KERN_SCHED
+#if defined(CONFIG_KERN_SCHED) && CONFIG_KERN_SCHED
 			/* Give up timeslice to other processes. */
 			proc_switch();
 #endif
-#ifdef CONFIG_SER_RXTIMEOUT
+#if CONFIG_SER_RXTIMEOUT != -1
 			if (timer_gettick() - start_time >= port->rxtimeout)
 			{
 				port->status |= SERRF_RXTIMEOUT;
@@ -175,6 +178,7 @@ int ser_getchar_nowait(struct Serial *port)
 }
 
 
+#if CONFIG_SER_GETS
 /*!
  * Read a line long at most as size and puts it
  * in buf.
@@ -188,9 +192,10 @@ int ser_gets(struct Serial *port, char *buf, int size)
 
 
 /*!
- * Read a line long at most as size and puts it
+ * Read a line long at most as size and put it
  * in buf, with optional echo.
- * \return number of chars read or EOF in case
+ *
+ * \return number of chars read, or EOF in case
  *         of error.
  */
 int ser_gets_echo(struct Serial *port, char *buf, int size, bool echo)
@@ -201,7 +206,11 @@ int ser_gets_echo(struct Serial *port, char *buf, int size, bool echo)
 	for (;;)
 	{
 		if ((c = ser_getchar(port)) == EOF)
+		{
+			buf[i] = '\0';
 			return -1;
+		}
+
 		/* FIXME */
 		if (c == '\r' || c == '\n' || i >= size-1)
 		{
@@ -217,6 +226,7 @@ int ser_gets_echo(struct Serial *port, char *buf, int size, bool echo)
 
 	return i;
 }
+#endif /* !CONFIG_SER_GETS */
 
 
 /*!
@@ -276,6 +286,7 @@ int ser_write(struct Serial *port, const void *_buf, size_t len)
 }
 
 
+#if CONFIG_PRINTF
 /*!
  * Formatted write
  */
@@ -291,14 +302,16 @@ int ser_printf(struct Serial *port, const char *format, ...)
 
 	return len;
 }
+#endif /* CONFIG_PRINTF */
 
-#if defined(CONFIG_SER_RXTIMEOUT) || defined(CONFIG_SER_TXTIMEOUT)
+
+#if CONFIG_SER_RXTIMEOUT != -1 || CONFIG_SER_TXTIMEOUT != -1
 void ser_settimeouts(struct Serial *port, time_t rxtimeout, time_t txtimeout)
 {
 	port->rxtimeout = rxtimeout;
 	port->txtimeout = txtimeout;
 }
-#endif /* defined(CONFIG_SER_RXTIMEOUT) || defined(CONFIG_SER_TXTIMEOUT) */
+#endif /* CONFIG_SER_RXTIMEOUT || CONFIG_SER_TXTIMEOUT */
 
 
 void ser_setbaudrate(struct Serial *port, unsigned long rate)
@@ -318,8 +331,27 @@ void ser_setparity(struct Serial *port, int parity)
  */
 void ser_purge(struct Serial *ser)
 {
-	fifo_flush(&ser->rxfifo);
-	fifo_flush(&ser->txfifo);
+	fifo_flush_locked(&ser->rxfifo);
+	fifo_flush_locked(&ser->txfifo);
+}
+
+/*!
+ * Wait until all pending output is completely
+ * transmitted to the other end.
+ *
+ * \note The current implementation only checks the
+ *       software transmission queue. Any hardware
+ *       FIFOs are ignored.
+ */
+void ser_drain(struct Serial *ser)
+{
+	while(!fifo_isempty(&ser->txfifo))
+	{
+#if defined(CONFIG_KERN_SCHED) && CONFIG_KERN_SCHED
+			/* Give up timeslice to other processes. */
+			proc_switch();
+#endif
+	}
 }
 
 
@@ -331,13 +363,12 @@ struct Serial *ser_open(unsigned int unit)
 	struct Serial *port;
 
 	ASSERT(unit < countof(ser_handles));
-
 	port = &ser_handles[unit];
 
 	ASSERT(!port->is_open);
+	DB(port->is_open = true;)
 
 	port->unit = unit;
-	port->is_open = true;
 
 	/* Initialize circular buffer */
 	fifo_init(&port->rxfifo, port->rxbuffer, sizeof(port->rxbuffer));
@@ -347,10 +378,10 @@ struct Serial *ser_open(unsigned int unit)
 	port->hw->table->init(port->hw, port);
 
 	/* Set default values */
-#if defined(CONFIG_SER_RXTIMEOUT) || defined(CONFIG_SER_TXTIMEOUT)
+#if CONFIG_SER_RXTIMEOUT != -1 || CONFIG_SER_TXTIMEOUT != -1
 	ser_settimeouts(port, CONFIG_SER_RXTIMEOUT, CONFIG_SER_TXTIMEOUT);
 #endif
-#if defined(CONFIG_SER_DEFBAUDRATE)
+#if CONFIG_SER_DEFBAUDRATE
 	ser_setbaudrate(port, CONFIG_SER_DEFBAUDRATE);
 #endif
 
@@ -364,8 +395,8 @@ struct Serial *ser_open(unsigned int unit)
 void ser_close(struct Serial *port)
 {
 	ASSERT(port->is_open);
+	DB(port->is_open = false;)
 
-	port->is_open = false;
 	port->hw->table->cleanup(port->hw);
 	port->hw = NULL;
 }

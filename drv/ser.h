@@ -14,6 +14,9 @@
 
 /*
  * $Log$
+ * Revision 1.6  2004/07/29 22:57:09  bernie
+ * ser_drain(): New function; Make Serial::is_open a debug-only feature; Switch to new-style CONFIG_* macros.
+ *
  * Revision 1.5  2004/07/18 21:54:23  bernie
  * Add ATmega8 support.
  *
@@ -30,9 +33,10 @@
 #ifndef DRV_SER_H
 #define DRV_SER_H
 
-#include "compiler.h"
 #include <mware/fifobuf.h>
-#include "config.h"
+#include <drv/kdebug.h>
+#include <compiler.h>
+#include <config.h>
 
 /*!
  * \name Serial Error/status flags
@@ -88,7 +92,7 @@
  */
 enum
 {
-#if defined(__AVR_ATmega64__)
+#if defined(__AVR_ATmega64__) || defined(__AVR_ATmega128__)
 	SER_UART0,
 	SER_UART1,
 	SER_SPI,
@@ -118,7 +122,7 @@ struct Serial
 	/*! Physical port number */
 	unsigned int unit;
 
-	bool is_open;
+	DB(bool is_open;)
 
 	/*!
 	 * \name FIFO transmit and receive buffers.
@@ -133,16 +137,16 @@ struct Serial
 	unsigned char rxbuffer[CONFIG_SER_RXBUFSIZE];
 	/* \} */
 
-#ifdef CONFIG_SER_RXTIMEOUT
+#if CONFIG_SER_RXTIMEOUT != -1
 	time_t rxtimeout;
 #endif
-#ifdef CONFIG_SER_TXTIMEOUT
+#if CONFIG_SER_TXTIMEOUT != -1
 	time_t txtimeout;
 #endif
 
 	/*! Holds the flags defined above.  Will be 0 when no errors have occurred. */
 	serstatus_t status;
-	
+
 	/*! Low-level interface to hardware. */
 	struct SerialHardware* hw;
 };
@@ -164,11 +168,9 @@ extern int ser_gets_echo(struct Serial *port, char *buf, int size, bool echo);
 
 extern void ser_setbaudrate(struct Serial *port, unsigned long rate);
 extern void ser_setparity(struct Serial *port, int parity);
+extern void ser_settimeouts(struct Serial *port, time_t rxtimeout, time_t txtimeout);
 extern void ser_purge(struct Serial *port);
-
-#if defined(CONFIG_SER_RXTIMEOUT) || defined(CONFIG_SER_TXTIMEOUT)
-	extern void ser_settimeouts(struct Serial *port, time_t rxtimeout, time_t txtimeout);
-#endif
+extern void ser_drain(struct Serial *port);
 
 extern struct Serial *ser_open(unsigned int unit);
 extern void ser_close(struct Serial *port);
