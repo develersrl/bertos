@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.13  2005/03/01 23:23:58  bernie
+ *#* Provide defaults for CONFIG_KDEBUG_DISABLE_TRACE and CONFIG_KDEBUG_ASSERT_NO_TEXT.
+ *#*
  *#* Revision 1.12  2005/02/18 11:18:33  bernie
  *#* Fixes for Harvard processors from project_ks.
  *#*
@@ -73,7 +76,22 @@
 	#include <compiler.h>
 #endif /* !OS_HOSTED */
 
+
 /*
+ * Defaults for rarely used config stuff.
+ */
+#ifndef CONFIG_KDEBUG_DISABLE_TRACE
+#define CONFIG_KDEBUG_DISABLE_TRACE  0
+#endif
+
+#ifndef CONFIG_KDEBUG_ASSERT_NO_TEXT
+#define CONFIG_KDEBUG_ASSERT_NO_TEXT  0
+#endif
+
+
+/*!
+ * \def _DEBUG
+ *
  * This preprocessor symbol is defined only in debug builds.
  *
  * The build infrastructure must arrange for _DEBUG to
@@ -143,13 +161,8 @@
 		{
 			fputs(str, stderr);
 		}
-		INLINE void kprintf(const char * fmt, ...) FORMAT(__printf__, 1, 2)
-		{
-			va_list ap;
-			va_start(ap, fmt);
-			vfprintf(stderr, fmt, ap);
-			va_end(ap);
-		}
+		/* G++ can't inline functions with variable arguments... */
+		#define kprintf(fmt, ...) fprintf(stderr, fmt, ## __VA_ARGS__)
 		void kdump(const void *buf, size_t len); /* UNIMPLEMENTED */
 
 		#ifndef ASSERT
@@ -205,7 +218,7 @@
 			int __check_wall(long *wall, int size, const char *name, const char *file, int line);
 		#endif /* !CPU_HARVARD */
 
-		#ifndef CONFIG_KDEBUG_ASSERT_NO_TEXT
+		#if !CONFIG_KDEBUG_ASSERT_NO_TEXT
 			#define ASSERT(x)         ((void)(LIKELY(x) ? 0 : __assert(#x, THIS_FILE, __LINE__)))
 			#define ASSERT2(x, help)  ((void)(LIKELY(x) ? 0 : __assert(help " (" #x ")", THIS_FILE, __LINE__)))
 		#else
@@ -216,7 +229,7 @@
 		#define ASSERT_VALID_PTR(p)         ((void)(LIKELY((p) >= 0x200) ? 0 : __invalid_ptr(p, #p, THIS_FILE, __LINE__)))
 		#define ASSERT_VALID_PTR_OR_NULL(p) ((void)(LIKELY((p == NULL) || ((p) >= 0x200)) ? 0 : __invalid_ptr((p), #p, THIS_FILE, __LINE__)))
 
-		#ifndef CONFIG_KDEBUG_DISABLE_TRACE
+		#if !CONFIG_KDEBUG_DISABLE_TRACE
 			#define TRACE  __trace(__func__)
 			#define TRACEMSG(msg,...) __tracemsg(__func__, msg, ## __VA_ARGS__)
 		#else
