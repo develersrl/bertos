@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.7  2004/08/24 16:53:43  bernie
+ * Add missing headers.
+ *
  * Revision 1.6  2004/06/07 18:10:06  aleph
  * Remove free pool of timers; use user-provided Timer structure instead
  *
@@ -32,11 +35,13 @@
  *
  */
 
-#include "hw.h"
-#include "kdebug.h"
-#include "timer.h"
 #include "buzzer.h"
+
+#include <drv/timer.h>
+#include <drv/kdebug.h>
 #include <kern/event.h>
+#include <hw.h>
+#include <arch_config.h>
 
 
 #if (ARCH & ARCH_EMUL)

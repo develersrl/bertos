@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/08/24 16:53:43  bernie
+ * Add missing headers.
+ *
  * Revision 1.3  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -24,6 +27,8 @@
  */
 #ifndef DRV_BUZZER_H
 #define DRV_BUZZER_H
+
+#include <compiler.h>
 
 extern void buz_init(void);
 extern void buz_beep(time_t time);
