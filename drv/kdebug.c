@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.20  2005/01/25 08:36:40  bernie
+ *#* kputnum(): Export.
+ *#*
  *#* Revision 1.19  2004/12/31 17:47:45  bernie
  *#* Rename UNUSED() to UNUSED_ARG().
  *#*
@@ -77,8 +80,9 @@
 
 #include <debug.h>
 #include <cpu.h>
-#include "hw.h"
-#include "config.h"
+#include <macros.h> /* for BV() */
+#include <config.h>
+#include <hw.h>
 
 #include <mware/formatwr.h> /* for _formatted_write() */
 
@@ -330,7 +334,7 @@ void PGM_FUNC(kputs)(const char * PGM_ATTR str)
 /*!
  * Cheap function to print small integers without using printf().
  */
-static int kputnum(int num)
+int kputnum(int num)
 {
 	int output_len = 0;
 	int divisor = 10000;

@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2005/01/25 08:36:40  bernie
+ *#* kputnum(): Export.
+ *#*
  *#* Revision 1.8  2005/01/11 18:08:08  aleph
  *#* Add empty kdump definition for debug off
  *#*
@@ -188,6 +191,7 @@
 		/* These are implemented in drv/kdebug.c */
 		void kdbg_init(void);
 		void kputchar(char c);
+		int kputnum(int num);
 		void kdump(const void *buf, size_t len);
 		void __init_wall(long *wall, int size);
 
@@ -328,6 +332,7 @@
 
 	INLINE void kdbg_init(void) { /* nop */ }
 	INLINE void kputchar(UNUSED_ARG(char, c)) { /* nop */ }
+	INLINE int kputnum(UNUSED_ARG(int, num)) { return 0; }
 	INLINE void kputs(UNUSED_ARG(const char *, str)) { /* nop */ }
 	INLINE void kdump(UNUSED_ARG(const void *, buf), UNUSED_ARG(size_t, len)) { /* nop */ }
 
