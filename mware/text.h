@@ -1,19 +1,23 @@
 /*!
  * \file
+ * <!--
  * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999 Bernardo Innocenti <bernie@develer.com>
  * This file is part of DevLib - See devlib/README for information.
+ * -->
  *
- * \version $Id$
+ * \brief Text graphic routines
  *
  * \author Bernardo Innocenti <bernie@develer.com>
  * \author Stefano Fedrigo <aleph@develer.com>
- *
- * \brief Text graphic routines
+ * \version $Id$
  */
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2004/09/20 03:28:49  bernie
+ *#* Fix header; Conditionalize AVR-specific code.
+ *#*
  *#* Revision 1.6  2004/09/14 20:57:30  bernie
  *#* Reformat.
  *#*
@@ -31,8 +35,8 @@
  *#*
  *#*/
 
-#ifndef TEXT_H
-#define TEXT_H
+#ifndef MWARE_TEXT_H
+#define MWARE_TEXT_H
 
 #include "compiler.h"
 #include <stdarg.h>
@@ -84,9 +88,12 @@ uint8_t text_style(uint8_t flags, uint8_t mask);
 void text_clear(struct Bitmap *bm);
 void text_clearLine(struct Bitmap *bm, int line);
 
+#if CPU_AVR
+#include <avr/pgmspace.h>
 int text_puts_P(const char * PROGMEM str, struct Bitmap *bm);
 int text_vprintf_P(struct Bitmap *bm, const char * PROGMEM fmt, va_list ap);
 int text_printf_P(struct Bitmap *bm, const char * PROGMEM fmt, ...) FORMAT(__printf__, 2, 3);
 int text_xprintf_P(struct Bitmap *bm, uint8_t row, uint8_t col, uint16_t mode, const char * PROGMEM fmt, ...) FORMAT(__printf__, 5, 6);
+#endif /* CPU_AVR */
 
-#endif /* TEXT_H */
+#endif /* MWARE_TEXT_H */
