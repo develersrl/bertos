@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.11  2004/08/03 15:53:17  aleph
+ * Fix spacing
+ *
  * Revision 1.10  2004/08/02 20:20:29  aleph
  * Merge from project_ks
  *
@@ -160,7 +163,7 @@
 		TIFR = BV(OCF2) | BV(TOV2);
 
 		/* Setup Timer/Counter interrupt */
-		TCCR2 = BV(WGM21) 
+		TCCR2 = BV(WGM21)
 			#if TIMER_PRESCALER == 64
 				| BV(CS21) | BV(CS20)
 			#else
