@@ -28,6 +28,9 @@
 
 /*
  * $Log$
+ * Revision 1.10  2004/08/10 06:29:50  bernie
+ * Rename timer_gettick() to timer_ticks().
+ *
  * Revision 1.9  2004/08/08 06:06:20  bernie
  * Use new-style CONFIG_ idiom; Fix module-wide documentation.
  *
@@ -90,7 +93,7 @@ int ser_putchar(int c, struct Serial *port)
 	if (fifo_isfull_locked(&port->txfifo))
 	{
 #if CONFIG_SER_TXTIMEOUT != -1
-		time_t start_time = timer_gettick();
+		time_t start_time = timer_ticks();
 #endif
 
 		/* Attende finche' il buffer e' pieno... */
@@ -101,7 +104,7 @@ int ser_putchar(int c, struct Serial *port)
 			proc_switch();
 #endif
 #if CONFIG_SER_TXTIMEOUT != -1
-			if (timer_gettick() - start_time >= port->txtimeout)
+			if (timer_ticks() - start_time >= port->txtimeout)
 			{
 				port->status |= SERRF_TXTIMEOUT;
 				return EOF;
@@ -137,7 +140,7 @@ int ser_getchar(struct Serial *port)
 	if (fifo_isempty_locked(&port->rxfifo))
 	{
 #if CONFIG_SER_RXTIMEOUT != -1
-		time_t start_time = timer_gettick();
+		time_t start_time = timer_ticks();
 #endif
 		/* Wait while buffer is empty */
 		do
@@ -147,7 +150,7 @@ int ser_getchar(struct Serial *port)
 			proc_switch();
 #endif
 #if CONFIG_SER_RXTIMEOUT != -1
-			if (timer_gettick() - start_time >= port->rxtimeout)
+			if (timer_ticks() - start_time >= port->rxtimeout)
 			{
 				port->status |= SERRF_RXTIMEOUT;
 				return EOF;
