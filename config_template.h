@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2004/12/08 08:04:28  bernie
+ *#* Add missing config options.
+ *#*
  *#* Revision 1.4  2004/08/25 14:12:08  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -113,6 +116,8 @@
 	 * using AVR multiprocessor serial mode
 	 */
 	#define CONFIG_SER_TXFILL        0
+
+	#define CONFIG_SER_STROBE        0
 /*\}*/
 
 /*!
@@ -134,6 +139,8 @@
 
 //! Hardware timer selection for drv/timer.c
 #define CONFIG_TIMER  TIMER_ON_OUTPUT_COMPARE2
+
+#define CONFIG_TIMER_STROBE  0
 
 //! EEPROM type for drv/eeprom.c
 #define CONFIG_EEPROM_TYPE EEPROM_24XX256
