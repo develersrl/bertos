@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/08/24 16:19:38  bernie
+ * Add missing header.
+ *
  * Revision 1.3  2004/07/30 14:24:16  rasky
  * Task switching con salvataggio perfetto stato di interrupt (SR)
  * Kernel monitor per dump informazioni su stack dei processi
@@ -29,6 +32,8 @@
 #ifndef CONFIG_KERN_H
 #define CONFIG_KERN_H
 
+#include <arch_config.h>  /* ARCH_EMUL */
+
 /*!
  * \name Modules activation
  *
@@ -37,7 +42,7 @@
 /*      Module/option          Active    Dependencies */
 #define CONFIG_KERN_SCHED       (1)
 #define CONFIG_KERN_SIGNALS     (1    && CONFIG_KERN_SCHED)
-#define CONFIG_KERN_TIMER       (1    && CONFIG_KERN_SIGNALS)
+#define CONFIG_KERN_TIMER       (1)
 #define CONFIG_KERN_HEAP        (0)
 #define CONFIG_KERN_SEMAPHORES  (0    && CONFIG_KERN_SIGNALS)
 #define CONFIG_KERN_MONITOR     (1    && CONFIG_KERN_SCHED)
@@ -61,7 +66,6 @@
 	#define CONFIG_KERN_STACKFILLCODE  0xA5A5
 	#define CONFIG_KERN_MEMFILLCODE    0xDBDB
 #endif
-
 
 
 #endif /*  CONFIG_KERN_H */
