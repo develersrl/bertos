@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.24  2005/01/08 09:20:54  bernie
+ *#* Remove unused variable.
+ *#*
  *#* Revision 1.23  2004/12/13 12:07:06  bernie
  *#* DISABLE_IRQSAVE/ENABLE_IRQRESTORE: Convert to IRQ_SAVE_DISABLE/IRQ_RESTORE.
  *#*
@@ -182,7 +185,6 @@ void proc_init(void)
 struct Process *proc_new_with_name(UNUSED(const char*, name), void (*entry)(void), iptr_t data, size_t stacksize, cpustack_t *stack_base)
 {
 	Process *proc;
-	cpuflags_t flags;
 	size_t i;
 	size_t proc_size_words = ROUND2(sizeof(Process), sizeof(cpustack_t)) / sizeof(cpustack_t);
 #if CONFIG_KERN_HEAP
