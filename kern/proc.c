@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.18  2004/10/19 08:54:43  bernie
+ *#* Initialize forbid_cnt; Formatting/comments fixes.
+ *#*
  *#* Revision 1.17  2004/10/19 08:47:13  bernie
  *#* proc_rename(), proc_forbid(), proc_permit(): New functions.
  *#*
@@ -112,17 +115,21 @@ uint16_t Quantum;
 extern List StackFreeList;
 #endif
 
-/* The main process (the one that executes main()) */
+/*! The main process (the one that executes main()). */
 struct Process MainProcess;
 
 
-static void proc_init_struct(Process* proc)
+static void proc_init_struct(Process *proc)
 {
-	/* Avoid warning for unused argument */
+	/* Avoid warning for unused argument. */
 	(void)proc;
 
 #if CONFIG_KERN_SIGNALS
 	proc->sig_recv = 0;
+#endif
+
+#if CONFIG_KERN_PREEMPTIVE
+	proc->forbid_cnt = 0;
 #endif
 
 #if CONFIG_KERN_HEAP
@@ -168,9 +175,7 @@ struct Process *proc_new_with_name(UNUSED(const char*, name), void (*entry)(void
 #endif
 
 #if (ARCH & ARCH_EMUL)
-	/* Ignore stack provided by caller
-	* and use the large enough default instead
-	*/
+	/* Ignore stack provided by caller and use the large enough default instead. */
 	stack_base = (cpustack_t *)StackFreeList.head;
 	REMOVE((Node *)stack_base);
 	stacksize = DEF_STACKSIZE;
@@ -424,6 +429,8 @@ void proc_permit(void)
 	/* No need to protect against interrupts here. */
 	--CurrentProcess->forbid_cnt;
 }
+
+#endif /* CONFIG_KERN_PREEMPTIVE */
 
 
 #if 0 /* Simple testcase for the scheduler */
