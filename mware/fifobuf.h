@@ -43,6 +43,9 @@
 
 /*
  * $Log$
+ * Revision 1.13  2004/08/24 13:16:11  bernie
+ * Add type-size definitions for preprocessor.
+ *
  * Revision 1.12  2004/08/02 20:20:29  aleph
  * Merge from project_ks
  *
@@ -190,14 +193,17 @@ INLINE void fifo_flush(FIFOBuffer *fb)
 }
 
 
-#if !CPU_AVR
+#if CPU_REG_BITS >= BITS_PER_PTR
 
-	/* No tricks needed on 16/32bit CPUs */
-#	define fifo_isempty_locked(fb) fifo_isempty((fb))
-#	define fifo_push_locked(fb, c) fifo_push((fb), (c))
-#	define fifo_flush_locked(fb) fifo_flush((fb))
+	/*
+	 * 16/32bit CPUs that can update a pointer with a single write
+	 * operation, no need to disable interrupts.
+	 */
+	#define fifo_isempty_locked(fb) fifo_isempty((fb))
+	#define fifo_push_locked(fb, c) fifo_push((fb), (c))
+	#define fifo_flush_locked(fb) fifo_flush((fb))
 
-#else /* !CPU_AVR */
+#else /* CPU_REG_BITS < BITS_PER_PTR */
 
 	/*!
 	 * Similar to fifo_isempty(), but with stronger guarantees for
@@ -219,6 +225,7 @@ INLINE void fifo_flush(FIFOBuffer *fb)
 		return result;
 	}
 
+
 	/*!
 	 * Similar to fifo_push(), but with stronger guarantees for
 	 * concurrent access between user and interrupt code.
@@ -234,6 +241,7 @@ INLINE void fifo_flush(FIFOBuffer *fb)
 		fifo_push(fb, c);
 		ENABLE_IRQRESTORE(flags);
 	}
+
 
 	/*!
 	 * Similar to fifo_flush(), but with stronger guarantees for
@@ -251,7 +259,7 @@ INLINE void fifo_flush(FIFOBuffer *fb)
 		ENABLE_IRQRESTORE(flags);
 	}
 
-#endif /* !CPU_AVR */
+#endif /* CPU_REG_BITS < BITS_PER_PTR */
 
 
 /*!

@@ -17,6 +17,9 @@
 
 /*
  * $Log$
+ * Revision 1.13  2004/08/24 13:16:00  bernie
+ * Add type-size definitions for preprocessor.
+ *
  * Revision 1.12  2004/08/14 19:37:57  rasky
  * Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
  *
@@ -78,6 +81,7 @@
 	typedef uint16_t cpuflags_t; // FIXME
 	typedef unsigned int cpustack_t;
 
+	#define CPU_REG_BITS            16
 	#define CPU_REGS_CNT            16
 	#define CPU_STACK_GROWS_UPWARD  0
 	#define CPU_SP_ON_EMPTY_SLOT	0
@@ -92,6 +96,7 @@
 	typedef uint32_t cpuflags_t; // FIXME
 	typedef uint32_t cpustack_t;
 
+	#define CPU_REG_BITS            32
 	#define CPU_REGS_CNT            7
 	#define CPU_STACK_GROWS_UPWARD  0
 	#define CPU_SP_ON_EMPTY_SLOT	0
@@ -111,11 +116,19 @@
 	typedef uint16_t cpuflags_t;
 	typedef unsigned int cpustack_t;
 
+	#define CPU_REG_BITS            16
 	#define CPU_REGS_CNT            FIXME
 	#define CPU_SAVED_REGS_CNT      8
 	#define CPU_STACK_GROWS_UPWARD  1
 	#define CPU_SP_ON_EMPTY_SLOT	0
 	#define CPU_BYTE_ORDER          CPU_BIG_ENDIAN
+
+	/* Memory is word-addessed in the DSP56K */
+	#define BITSP_PER_CHAR  16
+	#define SIZEOF_SHORT     1
+	#define SIZEOF_INT       1
+	#define SIZEOF_LONG      2
+	#define SIZEOF_PTR       1
 
 #elif CPU_AVR
 
@@ -143,10 +156,11 @@
 	typedef uint8_t cpustack_t;
 
 	/* Register counts include SREG too */
-	#define CPU_REGS_CNT            33
-	#define CPU_SAVED_REGS_CNT      19
+	#define CPU_REG_BITS            8
+	#define CPU_REGS_CNT           33
+	#define CPU_SAVED_REGS_CNT     19
 	#define CPU_STACK_GROWS_UPWARD  0
-	#define CPU_SP_ON_EMPTY_SLOT	1
+	#define CPU_SP_ON_EMPTY_SLOT    1
 	#define CPU_BYTE_ORDER          CPU_LITTLE_ENDIAN
 
 	/*!
@@ -239,6 +253,72 @@
 
 
 /*!
+ * \def SIZEOF_CHAR SIZEOF_SHORT SIZEOF_INT SIZEOF_LONG SIZEOF_PTR
+ * \def BITS_PER_CHAR BITS_PER_SHORT BITS_PER_INT BITS_PER_LONG BITS_PER_PTR
+ *
+ * \brief Default type sizes
+ *
+ * These defaults are reasonable for most 16/32bit machines.
+ * Some of these macros may be overridden by CPU-specific code above.
+ *
+ * ANSI C specifies that the following equations must be true:
+ * \code
+ *   sizeof(char) <= sizeof(short) <= sizeof(int) <= sizeof(long)
+ *   sizeof(float) <= sizeof(double)
+ *   BITS_PER_CHAR  >= 8
+ *   BITS_PER_SHORT >= 8
+ *   BITS_PER_INT   >= 16
+ *   BITS_PER_LONG  >= 32
+ * \end code
+ * \{
+ */
+#ifndef SIZEOF_CHAR
+#define SIZEOF_CHAR  1
+#endif
+
+#ifndef SIZEOF_SHORT
+#define SIZEOF_SHORT  2
+#endif
+
+#ifndef SIZEOF_INT
+#if CPU_REG_BITS < 32
+	#define SIZEOF_INT  2
+#else
+	#define SIZEOF_INT  4
+#endif
+#endif /* !SIZEOF_INT */
+
+#ifndef SIZEOF_LONG
+#define SIZEOF_LONG  4
+#endif
+
+#ifndef SIZEOF_PTR
+#define SIZEOF_PTR   SIZEOF_INT
+#endif
+
+#ifndef BITS_PER_CHAR
+#define BITS_PER_CHAR   (SIZEOF_CHAR * 8)
+#endif
+
+#ifndef BITS_PER_SHORT
+#define BITS_PER_SHORT  (SIZEOF_SHORT * BITS_PER_CHAR)
+#endif
+
+#ifndef BITS_PER_INT
+#define BITS_PER_INT    (SIZEOF_INT * BITS_PER_CHAR)
+#endif
+
+#ifndef BITS_PER_LONG
+#define BITS_PER_LONG   (SIZEOF_LONG * BITS_PER_CHAR)
+#endif
+
+#ifndef BITS_PER_PTR
+#define BITS_PER_PTR    (SIZEOF_PTR * BITS_PER_CHAR)
+#endif
+/*\}*/
+
+
+/*!
  * \def SCHEDULER_IDLE
  *
  * \brief Invoked by the scheduler to stop the CPU when idle.
@@ -253,8 +333,9 @@
 		EXTERN_C_BEGIN
 		void SchedulerIdle(void);
 		EXTERN_C_END
+		#define SCHEDULER_IDLE SchedulerIdle()
 	#else /* !ARCH_EMUL */
-		#define SCHEDULER_IDLE /* nothing */
+		#define SCHEDULER_IDLE do { /* nothing */ } while (0)
 	#endif /* !ARCH_EMUL */
 #endif /* !SCHEDULER_IDLE */
 
