@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2004/09/14 21:01:46  bernie
+ *#* Mark assertions as LIKELY().
+ *#*
  *#* Revision 1.1  2004/09/14 20:19:47  bernie
  *#* Unified debug macros.
  *#*
@@ -162,7 +165,7 @@
 		#define ASSERT_VALID_PTR_OR_NULL(p)  ASSERT((((p) == NULL) || ((unsigned long)(p) >= 0x200)))
 	#else /* !OS_HOSTED */
 
-		/* Implemented in drv/kdebug.h */
+		/* These are implemented in drv/kdebug.c */
 		void kdbg_init(void);
 		void kputchar(char c);
 		void kdump(const void *buf, size_t len);
@@ -188,18 +191,17 @@
 		int __check_wall(long *wall, int size, const char *name, const char *file, int line);
 
 		#ifndef CONFIG_KDEBUG_ASSERT_NO_TEXT
-			#define ASSERT(x)                   ((x) ? 0 : __assert(#x, THIS_FILE, __LINE__))
-			#define ASSERT2(x, help)            ((x) ? 0 : __assert(help " (" #x ")", THIS_FILE, __LINE__))
+			#define ASSERT(x)         (LIKELY(x) ? 0 : __assert(#x, THIS_FILE, __LINE__))
+			#define ASSERT2(x, help)  (LIKELY(x) ? 0 : __assert(help " (" #x ")", THIS_FILE, __LINE__))
 		#else
-			#define ASSERT(x)                   ((x) ? 0 : __assert("", THIS_FILE, __LINE__))
-			#define ASSERT2(x, help)            ASSERT(x)
+			#define ASSERT(x)         (LIKELY(x) ? 0 : __assert("", THIS_FILE, __LINE__))
+			#define ASSERT2(x, help)  ASSERT(x)
 		#endif
 
-		#define ASSERT_VALID_PTR(p)             (((p) >= 0x200) ? 0 : __invalid_ptr(p, #p, THIS_FILE, __LINE__))
-		#define ASSERT_VALID_PTR_OR_NULL(p)     (((p == NULL) || ((p) >= 0x200)) ? 0 : __invalid_ptr((p), #p, THIS_FILE, __LINE__))
-		#define TRACE                           kprintf("%s()\n", __FUNCTION__)
-		#define TRACEMSG(msg,...)               kprintf("%s(): " msg "\n", __FUNCTION__, ## __VA_ARGS__)
-
+		#define ASSERT_VALID_PTR(p)         (LIKELY((p) >= 0x200) ? 0 : __invalid_ptr(p, #p, THIS_FILE, __LINE__))
+		#define ASSERT_VALID_PTR_OR_NULL(p) (LIKELY((p == NULL) || ((p) >= 0x200)) ? 0 : __invalid_ptr((p), #p, THIS_FILE, __LINE__))
+		#define TRACE                       kprintf("%s()\n", __FUNCTION__)
+		#define TRACEMSG(msg,...)           kprintf("%s(): " msg "\n", __FUNCTION__, ## __VA_ARGS__)
 
 	#endif /* !OS_HOSTED */
 
