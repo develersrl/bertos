@@ -16,6 +16,9 @@
 
 /*
  * $Log$
+ * Revision 1.9  2004/08/02 20:20:29  aleph
+ * Merge from project_ks
+ *
  * Revision 1.8  2004/07/30 14:26:33  rasky
  * Semplificato l'output dell'ASSERT
  * Aggiunta ASSERT2 con stringa di help opzionalmente disattivabile
@@ -69,6 +72,19 @@
 #elif CPU_AVR
 	#include <avr/io.h>
 	#if CONFIG_KDEBUG_PORT == 0
+
+		/* External 485 transceiver on UART0 (to be overridden in "hw.h").  */
+		#if !defined(SER_UART0_485_INIT)
+			#if defined(SER_UART0_485_RX) || defined(SER_UART0_485_TX)
+				#error SER_UART0_485_INIT, SER_UART0_485_RX and SER_UART0_485_TX must be defined together
+			#endif
+			#define SER_UART0_485_INIT  do {} while (0)
+			#define SER_UART0_485_TX    do {} while (0)
+			#define SER_UART0_485_RX    do {} while (0)
+		#elif !defined(SER_UART0_485_RX) || !defined(SER_UART0_485_TX)
+			#error SER_UART0_485_INIT, SER_UART0_485_RX and SER_UART0_485_TX must be defined together
+		#endif
+
 		#if defined(__AVR_ATmega64__)
 			#define UCR UCSR0B
 			#define UDR UDR0
@@ -77,15 +93,63 @@
 			#define UCR UCSRB
 			#define USR UCSRA
 		#endif
+
 		#define KDBG_WAIT_READY()     do { loop_until_bit_is_set(USR, UDRE); } while(0)
-		#define KDBG_WRITE_CHAR(c)    do { UCR |= BV(TXEN); UDR = (c); } while(0)
-		#define KDBG_MASK_IRQ(old)    do { (old) = UCR & BV(TXCIE); cbi(UCR, TXCIE); } while(0)
-		#define KDBG_RESTORE_IRQ(old) do { UCR |= (old); } while(0)
+		#define KDBG_WAIT_TXDONE()    do { loop_until_bit_is_set(USR, TXC); } while(0)
+		/*
+		 * BUG: before sending a new character the TXC flag is cleared to allow
+		 * KDBG_WAIT_TXDONE() to work properly, but, if KDBG_WRITE_CHAR() is called
+		 * after the RXC flag is set by hardware, a new TXC could be generated
+		 * after we clear it and before the new character is put in UDR. In this
+		 * case if a 485 is used the transceiver will be put in RX mode while
+		 * transmitting the last char.
+		 */
+		#define KDBG_WRITE_CHAR(c)    do { USR |= BV(TXC); UDR = (c); } while(0)
+
+		#define KDBG_MASK_IRQ(old)    do { \
+			SER_UART0_485_TX; \
+			(old) = UCR; \
+			UCR |= BV(TXEN); \
+			UCR &= ~(BV(TXCIE) | BV(UDRIE)); \
+		} while(0)
+
+		#define KDBG_RESTORE_IRQ(old) do { \
+			KDBG_WAIT_TXDONE(); \
+			SER_UART0_485_RX; \
+			UCR = (old); \
+		} while(0)
+
 	#elif CONFIG_KDEBUG_PORT == 1
+
+		/* External 485 transceiver on UART1 (to be overridden in "hw.h").  */
+		#ifndef SER_UART1_485_INIT
+			#if defined(SER_UART1_485_RX) || defined(SER_UART1_485_TX)
+				#error SER_UART1_485_INIT, SER_UART1_485_RX and SER_UART1_485_TX must be defined together
+			#endif
+			#define SER_UART1_485_INIT  do {} while (0)
+			#define SER_UART1_485_TX    do {} while (0)
+			#define SER_UART1_485_RX    do {} while (0)
+		#elif !defined(SER_UART1_485_RX) || !defined(SER_UART1_485_TX)
+			#error SER_UART1_485_INIT, SER_UART1_485_RX and SER_UART1_485_TX must be defined together
+		#endif
+
 		#define KDBG_WAIT_READY()     do { loop_until_bit_is_set(UCSR1A, UDRE); } while(0)
-		#define KDBG_WRITE_CHAR(c)    do { UCSR1B |= BV(TXEN); UDR1 = (c); } while(0)
-		#define KDBG_MASK_IRQ(old)    do { (old) = UCSR1B & BV(TXCIE); cbi(UCSR1B, TXCIE); } while(0)
-		#define KDBG_RESTORE_IRQ(old) do { UCSR1B |= (old); } while(0)
+		#define KDBG_WAIT_TXDONE()    do { loop_until_bit_is_set(UCSR1A, TXC); } while(0)
+		#define KDBG_WRITE_CHAR(c)    do { UCSR1A |= BV(TXC); UDR1 = (c); } while(0)
+
+		#define KDBG_MASK_IRQ(old)    do { \
+			SER_UART1_485_TX; \
+			(old) = UCSR1B; \
+			UCSR1B |= BV(TXEN); \
+			UCSR1B &= ~(BV(TXCIE) | BV(UDRIE)); \
+		} while(0)
+
+		#define KDBG_RESTORE_IRQ(old) do { \
+			KDBG_WAIT_TXDONE(); \
+			SER_UART1_485_RX; \
+			UCSR1B = (old); \
+		} while(0)
+
 	#else
 		#error CONFIG_KDEBUG_PORT should be either 0 or 1
 	#endif
@@ -123,9 +187,11 @@ void kdbg_init(void)
 		#if CONFIG_KDEBUG_PORT == 0
 			UBRR0H = (uint8_t)(period>>8);
 			UBRR0L = (uint8_t)period;
+			SER_UART0_485_INIT;
 		#elif CONFIG_KDEBUG_PORT == 1
 			UBRR1H = (uint8_t)(period>>8);
 			UBRR1L = (uint8_t)period;
+			SER_UART1_485_INIT;
 		#else
 			#error CONFIG_KDEBUG_PORT must be either 0 or 1
 		#endif
@@ -134,6 +200,7 @@ void kdbg_init(void)
 		UBRRL = (uint8_t)period;
 	#elif defined(__AVR_ATmega103__)
 		UBRR = (uint8_t)period;
+		SER_UART0_485_INIT;
 	#else
 		#error Unknown arch
 	#endif

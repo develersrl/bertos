@@ -16,10 +16,18 @@
 
 #include <avr/io.h>
 
+/*
+ * NOTE: At each change of this function affecting proc.c
+ * (i.e. arguments, data stored in the stack) bump up version
+ * number in asm_switch_version().
+ */
+
 /* void asm_switch_context(void **new_sp, void **save_sp) */
 .globl asm_switch_context
 asm_switch_context:
 
+	in	r0,SREG-__SFR_OFFSET
+	push	r0
 ;	push	r0	caller-save
 ;	push	r1	caller-save
 	push	r2
@@ -98,5 +106,16 @@ asm_switch_context:
 	pop	r2
 ;	pop	r1	caller-save
 ;	pop	r0	caller-save
+	pop	r0
+	out	SREG-__SFR_OFFSET,r0
 
 	ret
+
+
+/* int asm_switch_version(void) */
+.globl asm_switch_version
+asm_switch_version:
+	ldi r24,lo8(1)
+	ldi r25,hi8(1)
+	ret
+

@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.10  2004/08/02 20:20:29  aleph
+ * Merge from project_ks
+ *
  * Revision 1.9  2004/07/22 02:01:14  bernie
  * Use TIMER_PRESCALER consistently.
  *
@@ -157,8 +160,13 @@
 		TIFR = BV(OCF2) | BV(TOV2);
 
 		/* Setup Timer/Counter interrupt */
-#warning Aleph, please use TIMER_PRESCALER here
-		TCCR2 = BV(WGM21) | BV(CS21) | BV(CS20);
+		TCCR2 = BV(WGM21) 
+			#if TIMER_PRESCALER == 64
+				| BV(CS21) | BV(CS20)
+			#else
+				#error Unsupported value of TIMER_PRESCALER
+			#endif
+		;
 		/* Clear on Compare match & prescaler = 64, internal sys clock.
 		   When changing prescaler change TIMER_HW_HPTICKS_PER_SEC too */
 		TCNT2 = 0x00;         /* initialization of Timer/Counter */

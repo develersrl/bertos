@@ -43,6 +43,9 @@
 
 /*
  * $Log$
+ * Revision 1.12  2004/08/02 20:20:29  aleph
+ * Merge from project_ks
+ *
  * Revision 1.11  2004/07/30 14:15:53  rasky
  * Nuovo supporto unificato per detect della CPU
  *
@@ -248,7 +251,7 @@ INLINE void fifo_flush(FIFOBuffer *fb)
 		ENABLE_IRQRESTORE(flags);
 	}
 
-#endif /* !__AVR__ */
+#endif /* !CPU_AVR */
 
 
 /*!

@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.11  2004/08/02 20:20:29  aleph
+ * Merge from project_ks
+ *
  * Revision 1.10  2004/07/30 14:15:53  rasky
  * Nuovo supporto unificato per detect della CPU
  *
@@ -216,7 +219,7 @@ DEFINE_TIMER_ISR
 		REMOVE((Node *)timer);
 
 		/* Execute the associated event */
-		event_doIntr(&timer->expire);
+		event_do(&timer->expire);
 	}
 #endif /* CONFIG_TIMER_DISABLE_EVENTS */
 

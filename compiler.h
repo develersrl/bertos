@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.13  2004/08/02 20:20:29  aleph
+ * Merge from project_ks
+ *
  * Revision 1.12  2004/08/01 01:21:17  bernie
  * LIKELY(), UNLIKELY(): New compiler-specific macros.
  *
@@ -256,9 +259,29 @@
 
 
 /* Simple macros */
-#define ABS(a)      (((a) < 0) ? -(a) : (a))
-#define MIN(a,b)    (((a) < (b)) ? (a) : (b))
-#define MAX(a,b)    (((a) > (b)) ? (a) : (b))
+#if GNUC_PREREQ(2,0)
+	#define ABS(n) ({ \
+		__typeof__(n) _n = (n); \
+		(_n < 0) ? -_n : _n; \
+	})
+	#define MIN(a,b) ({ \
+		__typeof__(a) _a = (a); \
+		__typeof__(b) _b = (b); \
+		(void)(&_a == &_b); /* ensure same type */ \
+		(_a < _b) ? _a : _b; \
+	})
+	#define MAX(a,b) ({ \
+		__typeof__(a) _a = (a); \
+		__typeof__(b) _b = (b); \
+		(void)(&_a == &_b); /* ensure same type */ \
+		(_a > _b) ? _a : _b; \
+	})
+#else /* !GNUC */
+	/* Buggy macros for inferior compilers */
+	#define ABS(a)		(((a) < 0) ? -(a) : (a))
+	#define MIN(a,b)	(((a) < (b)) ? (a) : (b))
+	#define MAX(a,b)	(((a) > (b)) ? (a) : (b))
+#endif /* !GNUC */
 
 #ifndef BV
 /*! Convert a bit value to a binary flag */

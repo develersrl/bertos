@@ -38,6 +38,9 @@
 
 /*
  * $Log$
+ * Revision 1.9  2004/08/02 20:20:29  aleph
+ * Merge from project_ks
+ *
  * Revision 1.8  2004/07/29 22:57:09  bernie
  * Several tweaks to reduce code size on ATmega8.
  *
@@ -83,11 +86,27 @@
 #endif
 
 /* External 485 transceiver on UART0 (to be overridden in "hw.h").  */
-#ifndef SER_UART0_485_INIT
-#define SER_UART0_485_INIT  do {} while (0)
+#if !defined(SER_UART0_485_INIT)
+	#if defined(SER_UART0_485_RX) || defined(SER_UART0_485_TX)
+		#error SER_UART0_485_INIT, SER_UART0_485_RX and SER_UART0_485_TX must be defined together
+	#endif
+	#define SER_UART0_485_INIT  do {} while (0)
+	#define SER_UART0_485_TX    do {} while (0)
+	/* SER_UART0_485_RX must not be defined! */
+#elif !defined(SER_UART0_485_RX) || !defined(SER_UART0_485_TX)
+	#error SER_UART0_485_INIT, SER_UART0_485_RX and SER_UART0_485_TX must be defined together
 #endif
-#ifndef SER_UART0_485_TX
-#define SER_UART0_485_TX    do {} while (0)
+
+/* External 485 transceiver on UART1 (to be overridden in "hw.h").  */
+#ifndef SER_UART1_485_INIT
+	#if defined(SER_UART1_485_RX) || defined(SER_UART1_485_TX)
+		#error SER_UART1_485_INIT, SER_UART1_485_RX and SER_UART1_485_TX must be defined together
+	#endif
+	#define SER_UART1_485_INIT  do {} while (0)
+	#define SER_UART1_485_TX    do {} while (0)
+	/* SER_UART1_485_RX must not be defined! */
+#elif !defined(SER_UART1_485_RX) || !defined(SER_UART1_485_TX)
+	#error SER_UART1_485_INIT, SER_UART1_485_RX and SER_UART1_485_TX must be defined together
 #endif
 
 
@@ -199,12 +218,13 @@ static void uart0_setbaudrate(UNUSED(struct SerialHardware *, _hw), unsigned lon
 {
 	/* Compute baud-rate period */
 	uint16_t period = (((CLOCK_FREQ / 16UL) + (rate / 2)) / rate) - 1;
-	DB(kprintf("uart0_setbaudrate(rate=%lu): period=%d\n", rate, period);)
 
 #ifndef __AVR_ATmega103__
 	UBRR0H = (period) >> 8;
 #endif
 	UBRR0L = (period);
+
+	DB(kprintf("uart0_setbaudrate(rate=%lu): period=%d\n", rate, period);)
 }
 
 static void uart0_setparity(UNUSED(struct SerialHardware *, _hw), int parity)
@@ -220,6 +240,10 @@ static void uart1_enabletxirq(UNUSED(struct SerialHardware *, _hw))
 {
 #if CONFIG_SER_TXFILL && (CONFIG_KBUS_PORT == 1)
 	UCSR1B = BV(RXCIE) | BV(UDRIE) | BV(RXEN) | BV(TXEN) | BV(UCSZ2);
+#elif defined(SER_UART1_485_TX)
+	/* Disable receiver, enable transmitter, switch 485 transceiver. */
+	UCSR1B = BV(UDRIE) | BV(TXEN);
+	SER_UART1_485_TX;
 #else
 	UCSR1B = BV(RXCIE) | BV(UDRIE) | BV(RXEN) | BV(TXEN);
 #endif
@@ -242,7 +266,7 @@ static void uart1_init(UNUSED(struct SerialHardware *, _hw), UNUSED(struct Seria
 #else
 	UCSR1B = BV(RXCIE) | BV(RXEN);
 #endif
-
+	SER_UART1_485_INIT;
 	RTS_ON;
 }
 
@@ -255,10 +279,11 @@ static void uart1_setbaudrate(UNUSED(struct SerialHardware *, _hw), unsigned lon
 {
 	/* Compute baud-rate period */
 	uint16_t period = (((CLOCK_FREQ / 16UL) + (rate / 2)) / rate) - 1;
-	DB(kprintf("uart1_setbaudrate(rate=%ld): period=%d\n", rate, period);)
 
 	UBRR1H = (period) >> 8;
 	UBRR1L = (period);
+
+	DB(kprintf("uart1_setbaudrate(rate=%ld): period=%d\n", rate, period);)
 }
 
 static void uart1_setparity(UNUSED(struct SerialHardware *, _hw), int parity)
@@ -409,6 +434,13 @@ SIGNAL(SIG_UART1_DATA)
 		 */
 		UCSR1B &= ~BV(TXB8);
 		UDR1 = SER_FILL_BYTE;
+#elif defined(SER_UART1_485_RX)
+		/*
+		 * - Disable UDR empty interrupt
+		 * - Disable the transmitter (the in-progress transfer will complete)
+		 * - Enable the transmit complete interrupt for the 485 tranceiver.
+		 */
+		UCSR1B = BV(TXCIE);
 #else
 		/* Disable UDR empty interrupt and transmitter */
 		UCSR1B = BV(RXCIE) | BV(RXEN);
@@ -432,6 +464,23 @@ SIGNAL(SIG_UART1_DATA)
 		UDR1 = fifo_pop(txfifo);
 	}
 }
+
+#ifdef SER_UART1_485_RX
+/*!
+ * Serial port 1 TX complete interrupt handler.
+ *
+ * \sa port 0 TX complete handler.
+ */
+SIGNAL(SIG_UART1_TRANS)
+{
+	/* Turn the 485 tranceiver into receive mode. */
+	SER_UART1_485_RX;
+
+	/* Enable UART receiver and receive interrupt. */
+	UCSR1B = BV(RXCIE) | BV(RXEN);
+}
+#endif /* SER_UART1_485_RX */
+
 #endif // AVR_HAS_UART1
 
 

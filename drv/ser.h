@@ -14,6 +14,9 @@
 
 /*
  * $Log$
+ * Revision 1.8  2004/08/02 20:20:29  aleph
+ * Merge from project_ks
+ *
  * Revision 1.7  2004/07/30 14:15:53  rasky
  * Nuovo supporto unificato per detect della CPU
  *
@@ -108,10 +111,9 @@ enum
 #else
 	#error unknown architecture
 #endif
-
-	SER_CNT       /**< Number of serial ports */
+	SER_CNT  /*!< Number of serial ports */
 };
-/* @} */
+/*\}*/
 
 
 struct SerialHardware;

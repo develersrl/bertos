@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.13  2004/08/02 20:20:29  aleph
+ * Merge from project_ks
+ *
  * Revision 1.12  2004/07/30 14:34:10  rasky
  * Vari fix per documentazione e commenti
  * Aggiunte PP_CATn e STATIC_ASSERT
@@ -62,7 +65,7 @@
 #include <mware/list.h>
 
 /*! Number of timer ticks per second. */
-#define TICKS_PER_SEC       1000
+#define TICKS_PER_SEC  ((time_t)1000)
 
 /* Function protos */
 extern void timer_init(void);
@@ -179,6 +182,19 @@ INLINE time_t timer_tick_unlocked(void)
 
 /* OBSOLETE */
 #define timer_gettick_irq timer_tick_unlocked
+
+
+/*!
+ * Return the minutes passed since timer start.
+ *
+ * The minutes uptime is computed directly from system tick counter:
+ * in case of a 4 bytes time_t after 71582 minutes the value will
+ * wrap around.
+ */
+INLINE time_t timer_minutes(void)
+{
+	return timer_gettick() / (TICKS_PER_SEC * 60);
+}
 
 #endif /* DRV_TIMER_H */
 

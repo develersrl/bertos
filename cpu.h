@@ -17,6 +17,9 @@
 
 /*
  * $Log$
+ * Revision 1.10  2004/08/02 20:20:29  aleph
+ * Merge from project_ks
+ *
  * Revision 1.9  2004/07/30 14:24:16  rasky
  * Task switching con salvataggio perfetto stato di interrupt (SR)
  * Kernel monitor per dump informazioni su stack dei processi
@@ -52,15 +55,12 @@
 #include "compiler.h"
 
 
-//! Initialization value for registers in stack frame
-#define CPU_REG_INIT_VALUE(reg)     0
-
-// Macros for determining CPU endianess
+// Macros for determining CPU endianness
 #define CPU_BIG_ENDIAN    0x1234
 #define CPU_LITTLE_ENDIAN 0x3412
 
 // Macros to include cpu-specific version of the headers
-#define CPU_HEADER(module)          PP_STRINGIZE(PP_CAT4(module, _, CPU_ID, .h))
+#define CPU_HEADER(module)          PP_STRINGIZE(PP_CAT3(module, _, CPU_ID).h)
 
 
 #if CPU_I196
@@ -136,11 +136,27 @@
 	typedef uint8_t cpuflags_t;
 	typedef uint8_t cpustack_t;
 
-	#define CPU_REGS_CNT            32
-	#define CPU_SAVED_REGS_CNT      18
+	/* Register counts include SREG too */
+	#define CPU_REGS_CNT            33
+	#define CPU_SAVED_REGS_CNT      19
 	#define CPU_STACK_GROWS_UPWARD  0
 	#define CPU_SP_ON_EMPTY_SLOT	1
 	#define CPU_BYTE_ORDER          CPU_LITTLE_ENDIAN
+
+	/*!
+	 * Initialization value for registers in stack frame.
+	 * The register index is not directly corrispondent to CPU
+	 * register numbers. Index 0 is the SREG register: the initial
+	 * value is all 0 but the interrupt bit (bit 7).
+	 */
+	#define CPU_REG_INIT_VALUE(reg) (reg == 0 ? 0x80 : 0)
+
+#endif
+
+
+//! Default for macro not defined in the right arch section
+#ifndef CPU_REG_INIT_VALUE
+	#define CPU_REG_INIT_VALUE(reg)     0
 #endif
 
 

@@ -17,6 +17,9 @@
 
 /*
  * $Log$
+ * Revision 1.7  2004/08/02 20:20:29  aleph
+ * Merge from project_ks
+ *
  * Revision 1.6  2004/07/30 14:24:16  rasky
  * Task switching con salvataggio perfetto stato di interrupt (SR)
  * Kernel monitor per dump informazioni su stack dei processi
@@ -47,7 +50,7 @@
 
 #include <string.h> /* memset() */
 
-/*! CPU dependent context switching routines 
+/*! CPU dependent context switching routines
  *  \note This function *MUST* preserve also the status of the interrupts.
  */
 extern void asm_switch_context(cpustack_t **new_sp, cpustack_t **save_sp);
@@ -157,6 +160,9 @@ void monitor_debug_stacks(void)
 
 static void proc_init_struct(Process* proc)
 {
+	/* Avoid warning for unused argument */
+	(void)proc;
+
 #if CONFIG_KERN_SIGNALS
 	proc->sig_recv = 0;
 #endif
@@ -165,6 +171,7 @@ static void proc_init_struct(Process* proc)
 	proc->flags = 0;
 #endif
 }
+
 
 void proc_init(void)
 {
