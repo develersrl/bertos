@@ -1,9 +1,9 @@
 /*!
  * \file
  * <!--
- * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000 Bernardo Innocenti <bernie@develer.com>
- * This file is part of DevLib - See devlib/README for information.
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \version $Id$
@@ -15,8 +15,8 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.22  2005/01/23 12:26:07  bernie
- *#* Add missing header.
+ *#* Revision 1.23  2005/03/01 23:24:51  bernie
+ *#* Tweaks for avr-libc 1.2.x.
  *#*
  *#* Revision 1.21  2004/12/13 12:07:06  bernie
  *#* DISABLE_IRQSAVE/ENABLE_IRQRESTORE: Convert to IRQ_SAVE_DISABLE/IRQ_RESTORE.
@@ -250,6 +250,11 @@
 
 		if (!_adc_trigger_lock)
 		{
+			// Backwards compatibility fix for avr-libc 1.0.4
+			#ifndef ADATE
+			#define ADATE ADFR
+			#endif
+
 			/*
 			 * Disable free-running mode to avoid starting a
 			 * new conversion before the ADC handler has read
@@ -260,7 +265,7 @@
 			 *
 			 * NOTE: writing 0 to ADSC and ADIF has no effect.
 			 */
-			ADCSRA = ADCSRA & ~(BV(ADFR) | BV(ADIF) | BV(ADSC));
+			ADCSRA = ADCSRA & ~(BV(ADATE) | BV(ADIF) | BV(ADSC));
 
 			ADC_SETCHN(_adc_idx_next);
 			_adc_trigger_lock = true;
