@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.36  2004/12/08 08:55:54  bernie
+ *#* Rename sigset_t to sigmask_t and time_t to mtime_t, to avoid conflicts with POSIX definitions.
+ *#*
  *#* Revision 1.35  2004/12/08 07:35:51  bernie
  *#* Typo in macro name.
  *#*
@@ -175,7 +178,6 @@
 #elif defined(_MSC_VER) /* Win32 emulation support */
 
 	#include <setjmp.h>
-	#include <time.h> /* for time_t */
 
 	/* FIXME: I can't remember why exactly this was needed (NdBernie) */
 	#define float double
@@ -219,12 +221,9 @@
 
 	#if CPU_X86
 
-		/* Hack to avoid conflicts with system type */
-		#define sigset_t system_sigset_t
 		#include <stddef.h>
 		#include <setjmp.h>
 		#include <stdbool.h>
-		#undef system_sigset_t
 
 	#elif CPU_AVR
 
@@ -430,7 +429,7 @@ typedef void * iptr_t;
 typedef const void * const_iptr_t;
 
 typedef unsigned char sig_t;     /*!< Type for signal bits. */
-typedef unsigned char sigset_t;  /*!< Type for signal masks. */
+typedef unsigned char sigmask_t; /*!< Type for signal masks. */
 typedef unsigned char page_t;    /*!< Type for banked memory pages. */
 
 
@@ -453,7 +452,7 @@ typedef unsigned char page_t;    /*!< Type for banked memory pages. */
 	#endif
 #endif
 
-#if !(defined(_TIME_T_DEFINED) || defined(__time_t_defined))
+#if !(defined(_TIME_T_DEFINED) || defined(__time_t_defined) || defined(_EMUL))
 	/*! For backwards compatibility.  Use mtime_t in new code. */
 	#define time_t mtime_t
 	#define SIZEOF_TIME_T SIZEOF_MTIME_T
