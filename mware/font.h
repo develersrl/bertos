@@ -1,8 +1,8 @@
 /*!
  * \file
  * <!--
- * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
- * This file is part of DevLib - See devlib/README for information.
+ * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \version $Id$
@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2005/03/01 23:26:45  bernie
+ *#* Use new CPU-neutral program-memory API.
+ *#*
  *#* Revision 1.4  2004/12/31 16:42:55  bernie
  *#* Sanitize for non-Harvard processors.
  *#*
@@ -33,16 +36,21 @@
  *#* Move font table in program memory; add font.h
  *#*
  *#*/
-#ifndef FONT_H
-#define FONT_H
+#ifndef MWARE_FONT_H
+#define MWARE_FONT_H
 
-#include "compiler.h" /* PROGMEM */
+#include <compiler.h> /* uint8_t */
+#include <mware/pgm.h> /* PROGMEM */
 
-/* Font size (in pixel) */
-#define FONT_WIDTH 6
-#define FONT_HEIGHT 8
+/*!
+ * \name Font size (in pixel)
+ * \{
+ */
+#define FONT_WIDTH   6
+#define FONT_HEIGHT  8
+/* \} */
 
 /*! Font table */
 extern const PROGMEM uint8_t font[256 * FONT_WIDTH];
 
-#endif /* FONT_H */
+#endif /* MWARE_FONT_H */

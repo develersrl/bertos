@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.12  2005/03/01 23:26:45  bernie
+ *#* Use new CPU-neutral program-memory API.
+ *#*
  *#* Revision 1.11  2004/12/08 08:06:16  bernie
  *#* Remove done todo.
  *#*
@@ -107,13 +110,16 @@ void gfx_bitmapClear(Bitmap *bm)
 
 
 #if CPU_HARVARD
+
+#include <avr/pgmspace.h> /* FIXME: memcpy_P() */
+
 /*!
  * Copy a raster picture located in program memory in the bitmap.
  * The size of the raster to copy *must* be the same of the raster bitmap.
  *
  * \note This function does \b not update the current pen position
  */
-void gfx_blit_P(Bitmap *bm, const prog_uchar *raster)
+void gfx_blit_P(Bitmap *bm, const pgm_uint8_t *raster)
 {
 	memcpy_P(bm->raster, raster, (bm->height / 8) * bm->width);
 }

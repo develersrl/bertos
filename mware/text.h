@@ -1,9 +1,9 @@
 /*!
  * \file
  * <!--
- * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999 Bernardo Innocenti <bernie@develer.com>
- * This file is part of DevLib - See devlib/README for information.
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \brief Text graphic routines (interface)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2005/03/01 23:26:46  bernie
+ *#* Use new CPU-neutral program-memory API.
+ *#*
  *#* Revision 1.9  2004/12/31 16:44:29  bernie
  *#* Sanitize for non-Harvard processors.
  *#*
@@ -104,6 +107,7 @@ int text_widthf(struct Bitmap *bm, const char * fmt, ...) FORMAT(__printf__, 2, 
 
 /* Text formatting functions for program-memory strings (mware/text_format.c) */
 #if CPU_HARVARD
+#include <mware/pgm.h>
 int text_puts_P(const char * PROGMEM str, struct Bitmap *bm);
 int text_vprintf_P(struct Bitmap *bm, const char * PROGMEM fmt, va_list ap);
 int text_printf_P(struct Bitmap *bm, const char * PROGMEM fmt, ...) FORMAT(__printf__, 2, 3);

@@ -1,8 +1,7 @@
 /*!
  * \file
  * <!--
- * Copyright 2004, 2005 Develer S.r.l. (http://www.develer.com/)
- * Copyright 2004 Giovanni Bajo
+ * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
  * This file is part of DevLib - See README.devlib for information.
  * -->
  *
@@ -40,6 +39,41 @@
 			); \
 			__result; \
 		})
+		#if 0 // 128/103
+		#define pgm_read_uint16_t(addr) \
+		({ \
+			uint32_t __addr32 = (uint32_t)(addr); \
+			uint16_t __result; \
+			__asm__ \
+			( \
+				"out %2, %C1"   "\n\t" \
+				"movw r30, %1"  "\n\t" \
+				"elpm %A0, Z+"  "\n\t" \
+				"elpm %B0, Z"   "\n\t" \
+				: "=r" (__result) \
+				: "r" (__addr32), \
+				  "I" (_SFR_IO_ADDR(RAMPZ)) \
+				: "r30", "r31" \
+			); \
+			__result; \
+		})
+		#endif
+
+		#define pgm_read_uint16_t(addr) \
+		({ \
+			uint16_t __addr16 = (uint16_t)(addr); \
+			uint16_t __result; \
+			__asm__ \
+			( \
+				"lpm %A0, Z+"   "\n\t" \
+				"lpm %B0, Z"    "\n\t" \
+				: "=r" (__result), "=z" (__addr16) \
+				: "1" (__addr16) \
+			); \
+			__result; \
+		})
+
+
 	#else
 		#define pgm_read_char(addr) \
 		({ \
@@ -55,10 +89,54 @@
 			); \
 			__result; \
 		})
+		#if 0 // 128/103
+		#define pgm_read_uint16_t(addr) \
+		({ \
+			uint32_t __addr32 = (uint32_t)(addr); \
+			uint16_t __result; \
+			__asm__ \
+			( \
+				"out %2, %C1"   "\n\t" \
+				"mov r31, %B1"  "\n\t" \
+				"mov r30, %A1"  "\n\t" \
+				"elpm"          "\n\t" \
+				"mov %A0, r0"   "\n\t" \
+				"in r0, %2"     "\n\t" \
+				"adiw r30, 1"   "\n\t" \
+				"adc r0, __zero_reg__" "\n\t" \
+				"out %2, r0"    "\n\t" \
+				"elpm"          "\n\t" \
+				"mov %B0, r0"   "\n\t" \
+				: "=r" (__result) \
+				: "r" (__addr32), \
+				  "I" (_SFR_IO_ADDR(RAMPZ)) \
+				: "r0", "r30", "r31" \
+			); \
+			__result; \
+		})
+		#endif
+		#define pgm_read_uint16_t(addr) \
+		({ \
+			uint16_t __addr16 = (uint16_t)(addr); \
+			uint16_t __result; \
+			__asm__ \
+			( \
+				"lpm"           "\n\t" \
+				"mov %A0, r0"   "\n\t" \
+				"adiw r30, 1"   "\n\t" \
+				"lpm"           "\n\t" \
+				"mov %B0, r0"   "\n\t" \
+				: "=r" (__result), "=z" (__addr16) \
+				: "1" (__addr16) \
+				: "r0" \
+			); \
+			__result; \
+		})
+
 	#endif
 
 	#define PROGMEM  __attribute__((__progmem__))
-	#define PSTR(s) ({static const char __c[] PROGMEM = (s); __c;})
+	#define PSTR(s) ({ static const char __c[] PROGMEM = (s); &__c[0]; })
 
 #elif CPU_HARVARD
 	#error Missing CPU support

@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2005/03/01 23:26:45  bernie
+ *#* Use new CPU-neutral program-memory API.
+ *#*
  *#* Revision 1.9  2005/01/20 18:46:31  aleph
  *#* Fix progmem includes.
  *#*
@@ -96,6 +99,7 @@ extern void gfx_lineTo     (Bitmap *bm, coord_t x,  coord_t y);
 extern void gfx_setClipRect(Bitmap *bm, coord_t xmin, coord_t ymin, coord_t xmax, coord_t ymax);
 
 #if CPU_HARVARD
+	#include <mware/pgm.h>
 	extern void gfx_blit_P(Bitmap *bm, const pgm_uint8_t *raster);
 #endif
 
