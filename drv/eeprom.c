@@ -2,7 +2,7 @@
  * \file
  * <!--
  * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * This file is part of DevLib - See devlib/README for information.
  * -->
  *
  * \brief Driver for the 24xx16 and 24xx256 I2C EEPROMS (implementation)
@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.12  2004/11/02 17:50:01  bernie
+ *#* CONFIG_EEPROM_VERIFY: New config option.
+ *#*
  *#* Revision 1.11  2004/10/26 08:35:31  bernie
  *#* Reset watchdog for long operations.
  *#*
@@ -57,11 +60,17 @@
 #include <mware/byteorder.h> /* cpu_to_be16() */
 #include <debug.h>
 #include <hw.h>
+#include <config.h>  // CONFIG_EEPROM_VERIFY
 #include <macros.h>  // MIN()
 
-#include <string.h> // memset()
+#include <string.h>  // memset()
 
 #include <avr/twi.h>
+
+// Configuration sanity checks
+#if !defined(CONFIG_EEPROM_VERIFY) || (CONFIG_EEPROM_VERIFY != 0 && CONFIG_EEPROM_VERIFY != 1)
+	#error CONFIG_EEPROM_VERIFY must be defined to either 0 or 1
+#endif
 
 
 /* Wait for TWINT flag set: bus is ready */
@@ -234,7 +243,7 @@ static bool twi_recv(void *_buf, size_t count)
  * Copy \c count bytes from buffer \c buf to
  * eeprom at address \c addr.
  */
-bool eeprom_write(e2addr_t addr, const void *buf, size_t count)
+static bool eeprom_writeRaw(e2addr_t addr, const void *buf, size_t count)
 {
 	bool result = true;
 	ASSERT(addr + count <= EEPROM_SIZE);
@@ -290,6 +299,65 @@ bool eeprom_write(e2addr_t addr, const void *buf, size_t count)
 	}
 
 	return result;
+}
+
+
+#if CONFIG_EEPROM_VERIFY
+/*!
+ * Check that the contents of an EEPROM range
+ * match with a provided data buffer.
+ */
+static bool eeprom_verify(e2addr_t addr, const void *buf, size_t count)
+{
+	uint8_t verify_buf[16];
+	bool result = true;
+
+	while (count && result)
+	{
+		/* Split read in smaller pieces */
+		size_t size = MIN(count, sizeof verify_buf);
+
+		/* Read back buffer */
+		if (eeprom_read(addr, verify_buf, size))
+		{
+			if (memcmp(buf, verify_buf, size) != 0)
+			{
+				TRACEMSG("Data mismatch!\n");
+				result = false;
+			}
+		}
+		else
+		{
+			TRACEMSG("Read error!\n");
+			result = false;
+		}
+
+		/* Update count and addr for next operation */
+		count -= size;
+		addr += size;
+		buf = ((const char *)buf) + size;
+	}
+
+	return result;
+}
+#endif /* CONFIG_EEPROM_VERIFY */
+
+
+bool eeprom_write(e2addr_t addr, const void *buf, size_t count)
+{
+#if CONFIG_EEPROM_VERIFY
+	int retries = 5;
+
+	while (retries--)
+		if (eeprom_writeRaw(addr, buf, count)
+				&& eeprom_verify(addr, buf, count))
+			return true;
+
+	return false;
+
+#else /* !CONFIG_EEPROM_VERIFY */
+	return eeprom_writeRaw(addr, buf, count);
+#endif /* !CONFIG_EEPROM_VERIFY */
 }
 
 

@@ -2,7 +2,7 @@
  * \file
  * <!--
  * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * This file is part of DevLib - See devlib/README for information.
  * -->
  *
  * \version $Id$
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2004/11/02 17:50:02  bernie
+ *#* CONFIG_EEPROM_VERIFY: New config option.
+ *#*
  *#* Revision 1.4  2004/08/25 14:12:08  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
