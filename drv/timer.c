@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.9  2004/07/21 00:15:13  bernie
+ * Put timer driver on diet.
+ *
  * Revision 1.8  2004/07/18 21:57:07  bernie
  * Fix preprocessor warning with potentially undefined symbol.
  *
@@ -62,7 +65,13 @@
 //! Master system clock (1ms accuracy)
 volatile time_t _clock;
 
-REGISTER static List timers_queue;      /*!< Active timers */
+
+#ifndef CONFIG_TIMER_DISABLE_EVENTS
+
+/*!
+ * List of active asynchronous timers.
+ */
+REGISTER static List timers_queue;
 
 
 /*!
@@ -116,6 +125,8 @@ Timer *timer_abort(Timer *timer)
 	return timer;
 }
 
+#endif /* CONFIG_TIMER_DISABLE_EVENTS */
+
 
 /*!
  * Wait for the specified amount of time (expressed in ms)
@@ -142,6 +153,7 @@ void timer_delay(time_t time)
 }
 
 
+#ifndef CONFIG_TIMER_DISABLE_UDELAY
 /*!
  * Wait for the specified amount of time (expressed in microseconds)
  *
@@ -166,6 +178,7 @@ void timer_udelay(utime_t usec_delay)
 	while (timer_hw_hpread() - start < delay)
 	{}
 }
+#endif /* CONFIG_TIMER_DISABLE_UDELAY */
 
 
 /*!
@@ -174,14 +187,18 @@ void timer_udelay(utime_t usec_delay)
  */
 DEFINE_TIMER_ISR
 {
-	/* With the Metrowerks compiler, the only way to force the compiler generate
-	   an interrupt service routine is to put a pragma directive within the function
-	   body. */
+	/*
+	 * With the Metrowerks compiler, the only way to force the compiler generate
+	 * an interrupt service routine is to put a pragma directive within the function
+	 * body.
+	 */
 	#ifdef __MWERKS__
 	#pragma interrupt saveall
 	#endif
 
+#ifndef CONFIG_TIMER_DISABLE_EVENTS
 	Timer *timer;
+#endif
 
 	TIMER_STROBE_ON;
 
@@ -190,6 +207,7 @@ DEFINE_TIMER_ISR
 	/* Update the master ms counter */
 	++_clock;
 
+#ifndef CONFIG_TIMER_DISABLE_EVENTS
 	/*
 	 * Check the first timer request in the list and process
 	 * it when it has expired. Repeat this check until the
@@ -209,6 +227,7 @@ DEFINE_TIMER_ISR
 		/* Execute the associated event */
 		event_doIntr(&timer->expire);
 	}
+#endif /* CONFIG_TIMER_DISABLE_EVENTS */
 
 	TIMER_STROBE_OFF;
 }
@@ -221,7 +240,9 @@ void timer_init(void)
 {
 	TIMER_STROBE_INIT;
 
+#ifndef CONFIG_TIMER_DISABLE_EVENTS
 	INITLIST(&timers_queue);
+#endif
 
 	_clock = 0;
 

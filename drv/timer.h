@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.10  2004/07/21 00:13:57  bernie
+ * Put timer driver on diet.
+ *
  * Revision 1.9  2004/07/20 23:45:01  bernie
  * Finally remove redundant protos.
  *
@@ -50,15 +53,33 @@
 #include "compiler.h"
 #include <mware/list.h>
 
+/*! Number of timer ticks per second. */
+#define TICKS_PER_SEC       1000
+
+/* Function protos */
+extern void timer_init(void);
+extern void timer_delay(time_t time);
+
+#ifndef CONFIG_TIMER_DISABLE_UDELAY
+extern void timer_udelay(utime_t utime);
+#endif
+
+
+#ifndef CONFIG_TIMER_DISABLE_EVENTS
+
 #ifdef CONFIG_KERNEL
 	#include <kern/event.h>
 #else
 	#include <mware/event.h>
 #endif
 
-/*! Number of timer ticks per second. */
-#define TICKS_PER_SEC       1000
-
+/*!
+ * The timer driver supports multiple ssynchronous timers
+ * that can trigger an event when they expire.
+ *
+ * \sa timer_add()
+ * \sa timer_abort()
+ */
 typedef struct Timer
 {
 	Node   link;      /*!< Link into timers queue */
@@ -67,12 +88,8 @@ typedef struct Timer
 	Event  expire;    /*!< Event to execute when the timer expires */
 } Timer;
 
-/* Function protos */
-extern void timer_init(void);
 extern void timer_add(Timer *timer);
 extern Timer *timer_abort(Timer *timer);
-extern void timer_delay(time_t time);
-extern void timer_udelay(utime_t utime);
 
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 
@@ -96,6 +113,7 @@ INLINE void timer_set_delay(Timer* timer, time_t delay)
 	timer->delay = delay;
 }
 
+#endif /* CONFIG_TIMER_DISABLE_EVENTS */
 
 extern volatile time_t _clock;
 
@@ -140,8 +158,9 @@ INLINE time_t timer_tick(void)
 
 
 /*!
- * Like \c timer_tick, faster version to be called
- * from interrupt context only.
+ * Faster version of timer_tick(), to be called only when the timer
+ * interrupt is disabled (DISABLE_INTS) or overridden by a
+ * higher-priority or non-nesting interrupt.
  *
  * \sa timer_tick
  */
