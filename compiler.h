@@ -15,6 +15,10 @@
 
 /*
  * $Log$
+ * Revision 1.8  2004/07/20 23:43:39  bernie
+ * Use attribute((always_inline)) to force inlining.  This fixes the much
+ * hated need of redundant prototypes for inline functions.
+ *
  * Revision 1.7  2004/07/20 23:26:48  bernie
  * Fix two errors introduced by previous commit.
  *
@@ -113,9 +117,9 @@
 	#define FORMAT(type,fmt,first)  __attribute__((__format__(type, fmt, first)))
 	#define NORETURN                __attribute__((__noreturn__))
 	#define UNUSED(type,arg)        __attribute__((__unused__)) type arg
-	#define INLINE extern inline
+	#define INLINE                  static inline __attribute__((__always_inline__))
 	#if GNUC_PREREQ(3,1)
-		#define DEPRECATED              __attribute__((__deprecated__))
+		#define DEPRECATED      __attribute__((__deprecated__))
 	#endif
 
 	#if defined(__i386__)
