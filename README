@@ -34,6 +34,28 @@ dependant on others to avoid code duplication, but most of the times
 you can configure out features you don't need.
 
 
+\section redist Directory Structure
+
+Most DevLib modules are sorted in subdirectories by their category:
+
+ - kern/ - Simple multitasking kernel implementation;
+ - drv/ - Hardware drivers;
+ - mware/ - Algorithms, containers and other standalone code;
+ - io/ - Infrastructure of I/O-related modules for hosted applications;
+ - os/ - OS-abstraction layers for hosted environments;
+
+The top-level directory contains a few support headers that are meant
+to be usable by any C or C++, embedded or hosted application.  The
+top-level directory also contains a few example templates for files
+that are meant to be customized on a per-application basis.  These
+files are \f hw.h, \f config.h, \f verstah.h and \f arch_config.h.
+
+To achieve the highest possible reusability, all devlib components DevLib
+are designed to have minimal inter-module and external dependencies.
+Most non-essential features can be configured out for applications
+with small memory footprint requirements.
+
+
 \section redist Redistribution
 
 DevLib is a collection of independent works originally written by
