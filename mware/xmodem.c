@@ -16,6 +16,9 @@
 
 /*
  * $Log$
+ * Revision 1.2  2004/08/12 23:24:07  bernie
+ * Rename UPDCRC() to UPDCRC16().
+ *
  * Revision 1.1  2004/08/11 19:54:22  bernie
  * Import XModem protocol into DevLib.
  *
@@ -231,7 +234,7 @@ bool xmodem_recv(KFile *fd)
 
 					/* Calculate block checksum or CRC */
 					if (usecrc)
-						crc = UPDCRC(c, crc);
+						crc = UPDCRC16(c, crc);
 					else
 						checksum += (char)c;
 				}
@@ -248,7 +251,7 @@ bool xmodem_recv(KFile *fd)
 
 				if (usecrc)
 				{
-					crc = UPDCRC(c, crc);
+					crc = UPDCRC16(c, crc);
 
 					/* Get CRC-16 LSB */
 					if ((c = ser_getchar()) == EOF)
@@ -257,7 +260,7 @@ bool xmodem_recv(KFile *fd)
 						break;
 					}
 
-					crc = UPDCRC(c, crc);
+					crc = UPDCRC16(c, crc);
 
 					if (crc)
 					{
@@ -411,15 +414,15 @@ bool xmodem_send(KFile *fd)
 			for (i = 0; i < XM_BUFSIZE; i++)
 			{
 				ser_putchar(block_buffer[i]);
-				crc = UPDCRC(block_buffer[i], crc);
+				crc = UPDCRC16(block_buffer[i], crc);
 				sum += block_buffer[i];
 			}
 
 			/* Send CRC/Checksum */
 			if (usecrc)
 			{
-				crc = UPDCRC(0, crc);
-				crc = UPDCRC(0, crc);
+				crc = UPDCRC16(0, crc);
+				crc = UPDCRC16(0, crc);
 				ser_putchar(crc >> 8);
 				ser_putchar(crc & 0xFF);
 			}
