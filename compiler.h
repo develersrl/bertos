@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.44  2005/03/29 06:39:59  bernie
+ *#* setjmp.h, time_t: Remove ancient retrocompatibility; Remove MSVC double to float hack.
+ *#*
  *#* Revision 1.43  2005/03/01 23:15:12  bernie
  *#* Remove compatibility hack.
  *#*
@@ -105,11 +108,6 @@
 
 #elif defined(_MSC_VER) /* Win32 emulation support */
 
-	#include <setjmp.h>
-
-	/* FIXME: I can't remember why exactly this was needed (NdBernie) */
-	#define float double
-
 	/* MSVC doesn't provide <stdbool.h>. */
 	#ifndef __cplusplus
 		#define true (1==1)
@@ -153,7 +151,6 @@
 	#else
 		/* Include some standard C89/C99 stuff */
 		#include <stddef.h>
-		#include <setjmp.h>
 		#include <stdbool.h>
 	#endif
 
@@ -180,7 +177,6 @@
 	#include <stdint.h>
 	#include <stddef.h>
 	#include <stdbool.h>
-	#include <setjmp.h>
 
 	// CodeWarrior has size_t as built-in type, but does not define this symbol.
 	#define _SIZE_T_DEFINED
@@ -364,15 +360,6 @@ typedef unsigned char page_t;    /*!< Type for banked memory pages. */
 		typedef int ssize_t;
 	#endif
 #endif
-
-#if !(defined(_TIME_T_DEFINED) || defined(__time_t_defined) || defined(_EMUL))
-	/*! For backwards compatibility.  Use mtime_t in new code. */
-	#define time_t mtime_t
-	#define SIZEOF_TIME_T SIZEOF_MTIME_T
-#else
-	/* Just a guess, but quite safe. */
-	#define SIZEOF_TIME_T SIZEOF_LONG
-#endif /* _TIME_T_DEFINED || __time_t_defined */
 /*\}*/
 
 
