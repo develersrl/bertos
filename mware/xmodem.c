@@ -28,6 +28,9 @@
 
 /*
  * $Log$
+ * Revision 1.7  2004/08/15 06:30:06  bernie
+ * Make the buffer a local variable, as documented.
+ *
  * Revision 1.6  2004/08/15 05:31:46  bernie
  * Add an #error to spread some FUD about the quality of this module;
  * Add a few TODOs from Rasky's review;
@@ -97,10 +100,6 @@
 #endif /* ARCH_BOOT */
 
 
-/*! Buffer to hold a block of data */
-static char block_buffer[XM_BUFSIZE];
-
-
 /*!
  * Decode serial driver errors and print them on the display.
  */
@@ -125,6 +124,7 @@ static void print_serial_error(struct Serial *port, int retries)
 	}
 }
 
+
 /*!
  * \brief Receive a file using the XModem protocol.
  *
@@ -135,6 +135,7 @@ static void print_serial_error(struct Serial *port, int retries)
  */
 bool xmodem_recv(struct Serial *port, KFile *fd)
 {
+	char block_buffer[XM_BUFSIZE]; /* Buffer to hold a block of data */
 	int c, i, blocksize;
 	int blocknr = 0, last_block_done = 0, retries = 0;
 	char *buf;
@@ -351,6 +352,7 @@ bool xmodem_recv(struct Serial *port, KFile *fd)
  */
 bool xmodem_send(struct Serial *port, KFile *fd)
 {
+	char block_buffer[XM_BUFSIZE]; /* Buffer to hold a block of data */
 	size_t size = -1;
 	int blocknr = 1, retries = 0, c, i;
 	bool proceed, usecrc = false;
