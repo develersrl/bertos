@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.17  2004/11/16 21:54:56  bernie
+ *#* Changes for SC Monoboard support.
+ *#*
  *#* Revision 1.16  2004/10/19 11:48:05  bernie
  *#* Reformat.
  *#*
@@ -146,8 +149,10 @@ enum
 	SER_UART0,
 	SER_SPI,
 #elif CPU_DSP56K
+	// \todo since we now support "fake" multiplexed serials, this should be moved to hw.h
 	SER_UART0,
-	SER_UART1,
+	SER_PUNTALI,
+	SER_BARCODE,
 #else
 	#error unknown architecture
 #endif

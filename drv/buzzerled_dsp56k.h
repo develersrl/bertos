@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2004/11/16 21:54:43  bernie
+ *#* Changes for SC Monoboard support.
+ *#*
  *#* Revision 1.3  2004/08/25 14:12:08  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -26,9 +29,66 @@
  *#*
  *#*/
 
+#ifndef DRV_BUZZERLED_DSP56K_H
+#define DRV_BUZZERLED_DSP56K_H
+
 #include <compiler.h>
 #include <hw.h>
 #include "pwm.h"
+
+#if ARCH & ARCH_HECO
+
+/*!
+ * \name Connection of the leds to the DSP:
+ * <pre>
+ *   Led       Line    DSP Pin
+ *   ---------------------------
+ *   YELLOW    T2      HOME1/TB3
+ *   GREEN     T3      INDX1/TB2
+ *   RED       T4      PHB1/TB1
+ * </pre>
+ */
+
+INLINE bool bld_is_inverted_intensity(enum BLD_DEVICE device)
+{
+	return (device == BLD_GREEN_LED
+	        || device == BLD_YELLOW_LED
+	        || device == BLD_RED_LED);
+}
+
+INLINE bool bld_is_pwm(enum BLD_DEVICE device)
+{
+	// Only the buzzer is connected to a PWM
+	return (device == BLD_BUZZER || device == BLD_READY_LED);
+}
+
+INLINE bool bld_is_timer(enum BLD_DEVICE device)
+{
+	// LEDs are connected to timers
+	return (device == BLD_GREEN_LED || device == BLD_YELLOW_LED || device == BLD_RED_LED);
+}
+
+INLINE uint16_t bld_get_pwm(enum BLD_DEVICE device)
+{
+	switch (device)
+	{
+	default: ASSERT(0);
+	case BLD_BUZZER: return 5;  // PWMA5
+	case BLD_READY_LED:  return 9;   // PWMB3
+	}
+}
+
+
+INLINE struct REG_TIMER_STRUCT* bld_get_timer(enum BLD_DEVICE device)
+{
+	switch (device)
+	{
+	default: ASSERT(0);
+	case BLD_GREEN_LED: return &REG_TIMER_B[2];
+	case BLD_RED_LED: return &REG_TIMER_B[1];
+	case BLD_YELLOW_LED: return &REG_TIMER_B[3];
+	}
+}
 
 INLINE void bld_hw_init(void)
 {
@@ -73,3 +133,12 @@ INLINE void bld_hw_set(enum BLD_DEVICE device, bool enable)
 		ASSERT(0);
 }
 
+#elif ARCH & ARCH_SC
+
+// We do not need inline functions here, because constant propagation is not big deal here
+void bld_hw_init(void);
+void bld_hw_set(enum BLD_DEVICE device, bool enable);
+
+#endif
+
+#endif /* DRV_BUZZERLED_DSP56K_H */
