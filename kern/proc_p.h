@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2004/10/19 11:47:07  bernie
+ *#* Add missing #endif.
+ *#*
  *#* Revision 1.9  2004/10/19 08:55:31  bernie
  *#* Define forbid_cnt.
  *#*
@@ -76,8 +79,9 @@ typedef struct Process
 	sigset_t     sig_recv;    /*!< Received signals */
 #endif
 
-#if CONFIG_PROC_PREEMPTIVE
+#if CONFIG_KERN_PREEMPTIVE
 	int          forbid_cnt;  /*!< Nesting count for proc_forbid()/proc_permit(). */
+#endif
 
 #if CONFIG_KERN_HEAP
 	uint16_t     flags;       /*!< Flags */
