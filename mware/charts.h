@@ -14,6 +14,9 @@
 
 /*
  * $Log$
+ * Revision 1.2  2004/08/11 07:32:54  bernie
+ * Refactor after the new mware/gfx API.
+ *
  * Revision 1.1  2004/08/04 03:16:30  bernie
  * Import simple chart drawing code.
  *
@@ -21,15 +24,7 @@
 #ifndef MWARE_CHARTS_H
 #define MWARE_CHARTS_H
 
-#include <gfx.h> /* vcoord_t */
-
-/*!
- * \name Width/height of the chart bitmap in pixels
- * \{
- */
-#define BM_WIDTH       PRT_HRES
-#define BM_HEIGHT      120
-/*\}*/
+#include <mware/gfx.h> /* vcoord_t */
 
 /*!
  * \name Width/height of the small ticks drawn over the axes
@@ -53,15 +48,15 @@
  * \name Chart size in pixels
  * \{
  */
-#define CHART_WIDTH     (BM_WIDTH - CHART_BORDERLEFT - CHART_BORDERRIGHT)
-#define CHART_HEIGHT    (BM_HEIGHT  - CHART_BORDERTOP - CHART_BORDERBOTTOM)
+#define CHART_WIDTH     (bm->width - CHART_BORDERLEFT - CHART_BORDERRIGHT)
+#define CHART_HEIGHT    (bm->height  - CHART_BORDERTOP - CHART_BORDERBOTTOM)
 /*\}*/
 
 
 /* Public function protos */
-extern BitMap *chart_init(vcoord_t xmin, vcoord_t ymin, float xmax, float ymax);
-extern void chart_drawAxis(BitMap *bm);
-extern void chart_drawCurve(BitMap *bm, const vcoord_t *curve_y, int curve_cnt);
-extern void chart_drawDots(BitMap *bm, const vcoord_t *dotsx, const float *dotsy, int cnt);
+extern void chart_init(Bitmap *bm, vcoord_t xmin, vcoord_t ymin, vcoord_t xmax, vcoord_t ymax);
+extern void chart_drawAxis(Bitmap *bm);
+extern void chart_drawCurve(Bitmap *bm, const vcoord_t *curve_y, int curve_cnt);
+extern void chart_drawDots(Bitmap *bm, const vcoord_t *dotsx, const vcoord_t *dotsy, int cnt);
 
 #endif /* MWARE_CHARTS_H */

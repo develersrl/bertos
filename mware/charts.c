@@ -26,6 +26,9 @@
 
 /*
  * $Log$
+ * Revision 1.2  2004/08/11 07:32:54  bernie
+ * Refactor after the new mware/gfx API.
+ *
  * Revision 1.1  2004/08/04 03:16:30  bernie
  * Import simple chart drawing code.
  *
@@ -35,38 +38,18 @@
 #include <mware/gfx.h>
 
 
-static Bitmap ChartBitmap;
-
-/*!
- * Raster buffer to draw into.
- *
- * Bits in the bitmap bytes have vertical orientation,
- * as required by the printer driver.
- */
-DECLARE_WALL(wall_before_raster, WALL_SIZE)
-static uint8_t ChartRaster[BM_WIDTH * ((BM_HEIGHT + 7) / 8)];
-DECLARE_WALL(wall_after_raster, WALL_SIZE)
-
-
-Bitmap *chart_init(vcoord_t xmin, vcoord_t ymin, vcoord_t xmax, vcoord_t ymax)
+void chart_init(Bitmap *bm, vcoord_t xmin, vcoord_t ymin, vcoord_t xmax, vcoord_t ymax)
 {
-	/* Initialize anti-corruption walls */
-	INIT_WALL(wall_before_raster, WALL_SIZE);
-	INIT_WALL(wall_after_raster, WALL_SIZE);
+	gfx_ClearBitmap(bm);
+	chart_drawAxis(bm);
 
-	gfx_InitBitMap(&ChartBitmap, ChartRaster, BM_WIDTH, BM_HEIGHT);
-	gfx_ClearBitMap(&ChartBitmap);
-	gfx_DrawAxis(&ChartBitmap);
+	gfx_SetClipRect(bm, CHART_BORDERLEFT, CHART_BORDERTOP,
+		bm->width - CHART_BORDERRIGHT - 1, bm->height - CHART_BORDERBOTTOM - 1);
 
-	gfx_SetClipRect(&ChartBitmap, CHART_BORDERLEFT, CHART_BORDERTOP,
-		BM_WIDTH - CHART_BORDERRIGHT - 1, BM_HEIGHT - CHART_BORDERBOTTOM - 1);
+	gfx_SetViewRect(bm, xmin, ymin, xmax, ymax);
 
-	gfx_SetViewRect(&ChartBitmap, xmin, ymin, xmax, ymax);
-
-	CHECK_WALL(wall_before_raster, WALL_SIZE);
-	CHECK_WALL(wall_after_raster, WALL_SIZE);
-
-	return &ChartBitmap;
+	//CHECK_WALL(wall_before_raster, WALL_SIZE);
+	//CHECK_WALL(wall_after_raster, WALL_SIZE);
 }
 
 
@@ -92,8 +75,8 @@ void chart_drawAxis(Bitmap *bm)
 	gfx_LineTo(bm, CHART_BORDERLEFT + CHART_WIDTH - 1, CHART_BORDERTOP + CHART_HEIGHT - 1);
 	gfx_LineTo(bm, CHART_BORDERLEFT + CHART_WIDTH - 4, CHART_BORDERTOP + CHART_HEIGHT - 3);
 
-	CHECK_WALL(wall_before_raster, WALL_SIZE);
-	CHECK_WALL(wall_after_raster, WALL_SIZE);
+	//CHECK_WALL(wall_before_raster, WALL_SIZE);
+	//CHECK_WALL(wall_after_raster, WALL_SIZE);
 }
 
 
@@ -111,8 +94,8 @@ void chart_drawCurve(Bitmap *bm, const vcoord_t *curve_y, int curve_cnt)
 	for (i = 1; i < curve_cnt; i++)
 		gfx_LineTo(bm, gfx_TransformX(bm, i), gfx_TransformY(bm, curve_y[i]));
 
-	CHECK_WALL(wall_before_raster, WALL_SIZE);
-	CHECK_WALL(wall_after_raster, WALL_SIZE);
+	//CHECK_WALL(wall_before_raster, WALL_SIZE);
+	//CHECK_WALL(wall_after_raster, WALL_SIZE);
 }
 
 
@@ -120,7 +103,7 @@ void chart_drawCurve(Bitmap *bm, const vcoord_t *curve_y, int curve_cnt)
  * Disegna dei dot in corrispondenza delle coppie (dotsx[i];dotsy[i])
  * Se dotsx e' NULL, i punti vengono disegnati ad intervalli regolari.
  */
-void chart_drawDots(BitMap *bm, const vcoord_t *dotsx, const vcoord_t *dotsy, int cnt)
+void chart_drawDots(Bitmap *bm, const vcoord_t *dotsx, const vcoord_t *dotsy, int cnt)
 {
 	int i;
 	coord_t x, y;
@@ -137,10 +120,10 @@ void chart_drawDots(BitMap *bm, const vcoord_t *dotsx, const vcoord_t *dotsy, in
 		gfx_DrawRect(bm, x - 1, y - 1, x + 1, y + 1);
 
 		/* Disegna ticks sull'asse X */
-		gfx_DrawLine(bm, x, BM_HEIGHT - 1, x, CHART_HEIGHT - 1);
+		gfx_DrawLine(bm, x, bm->height - 1, x, CHART_HEIGHT - 1);
 	}
 
-	CHECK_WALL(wall_before_raster, WALL_SIZE);
-	CHECK_WALL(wall_after_raster, WALL_SIZE);
+	//CHECK_WALL(wall_before_raster, WALL_SIZE);
+	//CHECK_WALL(wall_after_raster, WALL_SIZE);
 }
 
