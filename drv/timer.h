@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.23  2005/03/01 23:25:46  bernie
+ *#* Move event.h to mware/.
+ *#*
  *#* Revision 1.22  2004/12/13 12:07:06  bernie
  *#* DISABLE_IRQSAVE/ENABLE_IRQRESTORE: Convert to IRQ_SAVE_DISABLE/IRQ_RESTORE.
  *#*
@@ -99,11 +102,7 @@ extern void timer_udelay(utime_t utime);
 
 #ifndef CONFIG_TIMER_DISABLE_EVENTS
 
-#if CONFIG_KERNEL
-	#include <kern/event.h>
-#else
-	#include <mware/event.h>
-#endif
+#include <mware/event.h>
 
 /*!
  * The timer driver supports multiple synchronous timers
