@@ -28,6 +28,9 @@
 
 /*
  * $Log$
+ * Revision 1.6  2004/06/07 15:56:28  aleph
+ * Remove cast-as-lvalue extension abuse
+ *
  * Revision 1.5  2004/06/06 16:41:44  bernie
  * ser_putchar(): Use fifo_push_locked() to fix potential race on 8bit processors.
  *
@@ -254,12 +257,16 @@ int ser_print(struct Serial *port, const char *s)
  * \brief Write a buffer to serial.
  *
  * \return 0 if OK, EOF in case of error.
+ *
+ * \todo Optimize with fifo_pushblock()
  */
-int ser_write(struct Serial *port, const void *buf, size_t len)
+int ser_write(struct Serial *port, const void *_buf, size_t len)
 {
+	const char *buf = _buf;
+
 	while (len--)
 	{
-		if (ser_putchar(*((const char *)buf)++, port) == EOF)
+		if (ser_putchar(*buf++, port) == EOF)
 			return EOF;
 	}
 	return 0;
