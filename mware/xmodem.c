@@ -16,6 +16,9 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/08/12 23:35:50  bernie
+ * Replace a handmade loop with memset().
+ *
  * Revision 1.3  2004/08/12 23:34:36  bernie
  * Replace if/else with continue to reduce indentation level.
  *
@@ -34,6 +37,8 @@
 #include <drv/buzzer.h>
 #include <mware/crc.h>
 #include <mware/kfile.h>
+
+#include <string.h> /* for memset() */
 
 
 /*!
@@ -404,9 +409,7 @@ bool xmodem_send(KFile *fd)
 		}
 
 		/* Pad block with 0xFF if it's partially full */
-		if (size < XM_BUFSIZE)
-			for (i = size; i < XM_BUFSIZE; i++)
-				block_buffer[i] = (char)0xFF;
+		memset(block_buffer + size, 0xFF, XM_BUFSIZE - size);
 
 		/* Send block header (STX, blocknr, ~blocknr) */
 		ser_putchar(XM_STX);
