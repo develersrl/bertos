@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.6  2004/06/07 18:10:06  aleph
+ * Remove free pool of timers; use user-provided Timer structure instead
+ *
  * Revision 1.5  2004/06/07 15:54:23  aleph
  * Update to new event.h naming
  *
@@ -95,7 +98,7 @@
 
 
 /* Local vars */
-static Timer *buz_timer;
+static Timer buz_timer;
 static bool buz_timer_running;
 static time_t buz_repeat_interval;
 static time_t buz_repeat_duration;
@@ -112,8 +115,8 @@ static void buz_softint(void)
 		if (buz_repeat_interval)
 		{
 			/* Wait for interval time */
-			buz_timer->delay = buz_repeat_interval;
-			timer_add(buz_timer);
+			buz_timer.delay = buz_repeat_interval;
+			timer_add(&buz_timer);
 		}
 		else
 			buz_timer_running = false;
@@ -122,8 +125,8 @@ static void buz_softint(void)
 	{
 		/* Wait for beep time */
 		BUZZER_ON;
-		buz_timer->delay = buz_repeat_duration;
-		timer_add(buz_timer);
+		buz_timer.delay = buz_repeat_duration;
+		timer_add(&buz_timer);
 	}
 	else
 		buz_timer_running = false;
@@ -140,15 +143,15 @@ void buz_beep(time_t time)
 	/* Remove the software interrupt if it was already queued */
 	DISABLE_IRQSAVE(flags);
 	if (buz_timer_running)
-		timer_abort(buz_timer);
+		timer_abort(&buz_timer);
 
 	/* Turn on buzzer */
 	BUZZER_ON;
 
 	/* Add software interrupt to turn the buzzer off later */
 	buz_timer_running = true;
-	buz_timer->delay = time;
-	timer_add(buz_timer);
+	buz_timer.delay = time;
+	timer_add(&buz_timer);
 
 	ENABLE_IRQRESTORE(flags);
 }
@@ -176,7 +179,7 @@ void buz_repeat_stop(void)
 	/* Remove the software interrupt if it was already queued */
 	if (buz_timer_running)
 	{
-		timer_abort(buz_timer);
+		timer_abort(&buz_timer);
 		buz_timer_running = false;
 	}
 
@@ -195,7 +198,5 @@ void buz_init(void)
 	BUZZER_INIT;
 
 	/* Inizializza software interrupt */
-	buz_timer = timer_new();
-	ASSERT(buz_timer != NULL);
-	event_initSoftInt(&buz_timer->expire, (Hook)buz_softint, 0);
+	event_initSoftInt(&buz_timer.expire, (Hook)buz_softint, 0);
 }

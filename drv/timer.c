@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.6  2004/06/07 18:10:06  aleph
+ * Remove free pool of timers; use user-provided Timer structure instead
+ *
  * Revision 1.5  2004/06/07 15:56:55  aleph
  * Some tabs cleanup and add timer strobe macros
  *
@@ -36,8 +39,8 @@
 #include "kdebug.h"
 #include "timer.h"
 
-#ifdef CONFIG_KERN_SIGNALS
-#include <kern/proc.h>
+#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
+	#include <kern/proc.h>
 #endif
 
 #if (ARCH & ARCH_EMUL)
@@ -53,57 +56,10 @@
 #endif
 
 
-/*! Number of available timers */
-#define MAX_TIMERS 4
-
-
 //! Master system clock (1ms accuracy)
 volatile time_t _clock;
 
-static Timer soft_timers[MAX_TIMERS];   /*!< Pool of Timer structures */
-static List timers_pool;                /*!< Pool of free timers */
 REGISTER static List timers_queue;      /*!< Active timers */
-
-
-/*!
- * Return a new timer picking and removing it from the available
- * timers pool. Return NULL if no more timers are available.
- */
-Timer *timer_new(void)
-{
-	Timer *timer;
-	cpuflags_t flags;
-
-	DISABLE_IRQSAVE(flags);
-
-	/* Should never happen */
-	if (ISLISTEMPTY(&timers_pool))
-	{
-		ENABLE_IRQRESTORE(flags);
-		DB(kprintf("Tmrspool empty\n");)
-		return NULL;
-	}
-
-	/* Get a timer from the free pool */
-	timer = (Timer *)timers_pool.head;
-	REMOVE((Node *)timer);
-
-	ENABLE_IRQRESTORE(flags);
-
-	return timer;
-}
-
-
-/*!
- * Delete a timer, putting it in the available timers queue.
- */
-void timer_delete(Timer *timer)
-{
-	cpuflags_t flags;
-	DISABLE_IRQSAVE(flags);
-	ADDHEAD(&timers_pool, &timer->link);
-	ENABLE_IRQRESTORE(flags);
-}
 
 
 /*!
@@ -260,19 +216,11 @@ DEFINE_TIMER_ISR
  */
 void timer_init(void)
 {
-	int i;
-
 	TIMER_STROBE_INIT;
 
 	INITLIST(&timers_queue);
-	INITLIST(&timers_pool);
-
-	/* Init all software timers in the free pool */
-	for (i = 0; i < MAX_TIMERS; i++)
-		ADDTAIL(&timers_pool, (Node *)&soft_timers[i]);
 
 	_clock = 0;
 
 	timer_hw_init();
 }
-

@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.6  2004/06/07 18:10:06  aleph
+ * Remove free pool of timers; use user-provided Timer structure instead
+ *
  * Revision 1.5  2004/06/07 15:57:12  aleph
  * Add function prototypes
  *
@@ -52,8 +55,6 @@ typedef struct Timer
 
 /* Function protos */
 extern void timer_init(void);
-extern Timer *timer_new(void);
-extern void timer_delete(Timer *timer);
 extern void timer_add(Timer *timer);
 extern Timer *timer_abort(Timer *timer);
 extern void timer_delay(time_t time);
