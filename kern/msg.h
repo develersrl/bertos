@@ -18,6 +18,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2004/10/19 08:22:09  bernie
+ *#* msg_peek(): New function.
+ *#*
  *#* Revision 1.3  2004/08/25 14:12:09  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -68,6 +71,15 @@ INLINE void msg_put(MsgPort* port, Msg* msg)
 INLINE Msg* msg_get(MsgPort* port)
 {
 	return (Msg*)REMHEAD(&port->queue);
+}
+
+/* Peek the first message in the queue of \a port, or NULL if the port is empty */
+INLINE Msg *msg_peek(MsgPort *port)
+{
+	if (ISLISTEMPTY(&port->queue))
+		return NULL;
+
+	return (Msg *)port->queue.head;
 }
 
 /*! Send back (reply) \a msg to its sender */
