@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2005/01/14 00:47:56  aleph
+ *#* Rename callbacks; SerialHardwareVT.txSending: New callback.
+ *#*
  *#* Revision 1.6  2004/12/08 08:56:58  bernie
  *#* Reformat.
  *#*
@@ -42,9 +45,10 @@ struct SerialHardwareVT
 {
 	void (*init)(struct SerialHardware *ctx, struct Serial *ser);
 	void (*cleanup)(struct SerialHardware *ctx);
-	void (*setbaudrate)(struct SerialHardware *ctx, unsigned long rate);
-	void (*setparity)(struct SerialHardware *ctx, int parity);
-	void (*enabletxirq)(struct SerialHardware *ctx);
+	void (*setBaudrate)(struct SerialHardware *ctx, unsigned long rate);
+	void (*setParity)(struct SerialHardware *ctx, int parity);
+	void (*txStart)(struct SerialHardware *ctx);
+	bool (*txSending)(struct SerialHardware *ctx);
 };
 
 struct SerialHardware

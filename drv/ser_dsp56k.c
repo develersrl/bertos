@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2005/01/14 00:48:33  aleph
+ *#* Rename callbacks; SerialHardwareVT.txSending: New callback.
+ *#*
  *#* Revision 1.9  2004/12/08 09:42:55  bernie
  *#* Add support for multiplexed serial ports.
  *#*
@@ -138,6 +141,14 @@ static inline void enable_rx_irq(struct SerialHardware* _hw)
 	enable_rx_irq_bare(regs);
 }
 
+static inline bool tx_irq_enabled(struct SerialHardware* _hw)
+{
+	struct SCI* hw = (struct SCI*)_hw;
+	volatile struct REG_SCI_STRUCT* regs = hw->regs;
+
+	return (regs->CR & REG_SCI_CR_TEIE);
+}
+
 static void tx_isr(const struct SCI *hw)
 {
 #pragma interrupt warn
@@ -218,16 +229,12 @@ static void cleanup(struct SerialHardware* _hw)
 {
 	struct SCI* hw = (struct SCI*)_hw;
 
-	// Wait until we finish sending everything
-	ser_drain(hw->serial);
-	ser_purge(hw->serial);
-
 	// Uninstall the ISRs
 	disable_rx_irq(_hw);
 	disable_tx_irq(_hw);
 	irq_uninstall(hw->irq_tx);
 	irq_uninstall(hw->irq_rx);
-} 
+}
 
 static void setbaudrate(struct SerialHardware* _hw, unsigned long rate)
 {
@@ -295,9 +302,10 @@ static const struct SerialHardwareVT SCI_VT =
 {
 	.init = init,
 	.cleanup = cleanup,
-	.setbaudrate = setbaudrate,
-	.setparity = setparity,
-	.enabletxirq = enable_tx_irq,
+	.setBaudrate = setbaudrate,
+	.setParity = setparity,
+	.txStart = enable_tx_irq,
+	.txSending = tx_irq_enabled,
 };
 
 #if CONFIG_SER_MULTI
@@ -305,9 +313,10 @@ static const struct SerialHardwareVT SCI_MULTI_VT =
 {
 	.init = init_lock,
 	.cleanup = cleanup_unlock,
-	.setbaudrate = setbaudrate,
-	.setparity = setparity,
-	.enabletxirq = enable_tx_irq,
+	.setBaudrate = setbaudrate,
+	.setParity = setparity,
+	.txStart = enable_tx_irq,
+	.txSending = tx_irq_enabled,
 };
 #endif /* CONFIG_SER_MULTI */
 
