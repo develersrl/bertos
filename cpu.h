@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.26  2004/12/13 12:08:12  bernie
+ *#* DISABLE_IRQSAVE, ENABLE_IRQRESTORE, DISABLE_INTS, ENABLE_INTS: Remove obsolete macros.
+ *#*
  *#* Revision 1.25  2004/12/08 08:31:02  bernie
  *#* CPU_HARVARD: Define to 1 for AVR and DSP56K.
  *#*
@@ -200,23 +203,17 @@
 
 #endif
 
-/* OBSOLETE NAMES */
-#define DISABLE_INTS         IRQ_DISABLE
-#define ENABLE_INTS          IRQ_ENABLE
-#define DISABLE_IRQSAVE(x)   IRQ_SAVE_DISABLE(x)
-#define ENABLE_IRQRESTORE(x) IRQ_RESTORE(x)
-
 /*!
  * Execute \a CODE atomically with respect to interrupts.
  *
- * \see ENABLE_IRQSAVE DISABLE_IRQRESTORE
+ * \see IRQ_SAVE_DISABLE IRQ_RESTORE
  */
 #define ATOMIC(CODE) \
 	do { \
 		cpuflags_t __flags; \
-		DISABLE_IRQSAVE(__flags); \
+		IRQ_SAVE_DISABLE(__flags); \
 		CODE; \
-		ENABLE_IRQRESTORE(__flags); \
+		IRQ_RESTORE(__flags); \
 	} while (0)
 
 
