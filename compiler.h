@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.39  2005/01/08 08:49:39  bernie
+ *#* Define PROGMEM on AVR only when not including pgmspace.h.
+ *#*
  *#* Revision 1.38  2004/12/31 16:41:52  bernie
  *#* PROGMEM: Define to nothing for non-Harvard processors.
  *#*
@@ -248,8 +251,10 @@
 			#define PGM_READ_CHAR(s) pgm_read_byte(s)
 			#define PGM_FUNC(x) x ## _P
 			#define PGM_ATTR  PROGMEM
+		#else
+			/* We still need this for prototypes */
+			#define PROGMEM  __attribute__((__progmem__))
 		#endif
-		#define PROGMEM  __attribute__((__progmem__))
 
 	#endif
 
