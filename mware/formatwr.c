@@ -1,7 +1,7 @@
 /*!
  * \file
  * <!--
- * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
  * This file is part of DevLib - See devlib/README for information.
  * -->
  *
@@ -10,16 +10,18 @@
  * \brief Basic "printf", "sprintf" and "fprintf" formatter.
  *
  * This module is 100% reentrant and can be adapted to user-defined routines
- * that needs formatters with special properties like different output chann-
- * els or new format specifiers.
+ * that needs formatters with special properties like different output
+ * channels or new format specifiers.
  *
  * To reduce size in applications not using real numbers or long integers
  * the formatter may be compiled to exclude certain parts.  This is
- * controlled by giving a -D option a compilation time.
+ * controlled by giving a -D option a compilation time:
  *
- *    -DFLOAT_SUPPORT        Full ANSI formatter
- *    -DNO_FLOATS            Full ANSI except floats
- *    -DREDUCED_SUPPORT      Reduced 'int' type of converter
+ * \code
+ *  -D CONFIG_PRINTF_NOFLOAT      Exclude support for floats
+ *  -D CONFIG_PRINTF_REDUCED      Simplified formatter (see below)
+ *  -D CONFIG_PRINTF_NOMODIFIERS  Exclude 'l' and 'h' modifiers in reduced version
+ * \endcode
  *
  * The reduced version of formatter is suitable when program size is critical
  * rather than formatting power.  This routine uses less than 20 bytes of
@@ -34,12 +36,15 @@
  * It means that real variables are not supported as well as field
  * width and precision arguments.
  *
- * The last eight (h and l modifiers) can easily be removed by
- * removing the line "#define MODIFIERS_IN_REDUCED".
+ * The last eight (h and l modifiers) can easily be removed
+ * by defining the \c CONFIG_PRINTF_NOMODIFIERS macro.
  */
 
 /*
  * $Log$
+ * Revision 1.3  2004/07/18 22:00:15  bernie
+ * Reorganize configuration parameters to match DevLib's convention.
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -48,26 +53,13 @@
  *
  */
 
-/* bernie */
-#define FLOAT_SUPPORT
-#undef NO_FLOATS
-#undef REDUCED_SUPPORT
-
-#ifndef FLOAT_SUPPORT
-#ifndef NO_FLOATS
-#ifndef REDUCED_SUPPORT
-#error -DFLOAT_SUPPORT, -DNO_FLOATS or -DREDUCED_SUPPORT missing
-#endif
-#endif
-#endif
-
-/* Make it easy for customers to disable h and l
-   modifiers in REDUCED_SUPPORT by removing the next #define */
-#define MODIFIERS_IN_REDUCED
-
 #include "formatwr.h"
-#include "compiler.h" /* progmem macros */
+#include <compiler.h> /* progmem macros */
+#include <config.h> /* CONFIG_ macros */
+
+#ifndef CONFIG_PRINTF_NOFLOAT
 #include <float.h>
+#endif /* CONFIG_PRINTF_NOFLOAT */
 
 #ifndef FRMWRI_BUFSIZE
 /*bernie: save some memory, who cares about floats with lots of decimals? */
@@ -79,14 +71,14 @@
 #define MEM_ATTRIBUTE
 #endif
 
-#ifdef MODIFIERS_IN_REDUCED
+#ifndef CONFIG_PRINTF_NOMODIFIERS
 #define IS_SHORT (h_modifier || (sizeof(int) == 2 && !l_modifier))
 #else
 #define IS_SHORT (sizeof(int) == 2)
 #endif
 
 
-#ifdef FLOAT_SUPPORT
+#ifndef CONFIG_PRINTF_NOFLOAT
 
 static char *float_conversion(MEM_ATTRIBUTE long double value,
 		MEM_ATTRIBUTE short nr_of_digits,
@@ -137,15 +129,11 @@ static char *float_conversion(MEM_ATTRIBUTE long double value,
 		}
 		nr_of_digits--;
 		if (alternate_flag)
-		{
 			/* %#G - No removal of trailing zeros */
 			g_flag = 0;
-		}
 		else
-		{
 			/* %G - Removal of trailing zeros */
 			alternate_flag = 1;
-		}
 	}
 
 	/* %e or %E */
@@ -160,9 +148,7 @@ static char *float_conversion(MEM_ATTRIBUTE long double value,
 		{
 			*buf_pointer++ = '0';
 			if ((n = nr_of_digits) || alternate_flag)
-			{
 				*buf_pointer++ = '.';
-			}
 			i = 0;
 			while (--i > integral_10_log && nr_of_digits)
 			{
@@ -170,10 +156,8 @@ static char *float_conversion(MEM_ATTRIBUTE long double value,
 				nr_of_digits--;
 			}
 			if (integral_10_log < (-n - 1))
-			{
 				/* Nothing more to do */
 				goto CLEAN_UP;
-			}
 			dec_point_pos = 1;
 		}
 		else
@@ -189,9 +173,7 @@ static char *float_conversion(MEM_ATTRIBUTE long double value,
 		value *= 10; /* Prepare for next shot */
 		*buf_pointer++ = n + '0';
 		if ( ! i++ && (nr_of_digits || alternate_flag))
-		{
 			*buf_pointer++ = '.';
-		}
 	}
 
 	/* Rounding possible */
@@ -209,9 +191,7 @@ static char *float_conversion(MEM_ATTRIBUTE long double value,
 					n = 1;
 				}
 				else
-				{
 					n = 0;
-				}
 			}
 		} while (cp-- > buf);
 		if (n)
@@ -228,9 +208,7 @@ static char *float_conversion(MEM_ATTRIBUTE long double value,
 						cp--;
 					}
 					else
-					{
 						*cp = *(cp - 1);
-					}
 					cp--;
 				}
 				integral_10_log++;
@@ -253,13 +231,9 @@ CLEAN_UP:
 	if (g_flag)
 	{
 		while (*(buf_pointer - 1) == '0')
-		{
 			buf_pointer--;
-		}
 		if (*(buf_pointer - 1) == '.')
-		{
 			buf_pointer--;
-		}
 	}
 
 	/* %e or %E */
@@ -272,9 +246,7 @@ CLEAN_UP:
 			integral_10_log = -integral_10_log;
 		}
 		else
-		{
 			*buf_pointer++ = '+';
-		}
 		n = 0;
 		buf_pointer +=10;
 		do
@@ -290,7 +262,7 @@ CLEAN_UP:
 	return (buf_pointer);
 }
 
-#endif /* FLOAT_SUPPORT */
+#endif /* !CONFIG_PRINTF_NOFLOAT */
 
 /*!
  * This routine forms the core and entry of the formatter.
@@ -306,7 +278,7 @@ PGM_FUNC(_formatted_write)(const char * PGM_ATTR format,
 	MEM_ATTRIBUTE static char bad_conversion[] = "???";
 	MEM_ATTRIBUTE static char null_pointer[] = "<NULL>";
 
-#ifndef REDUCED_SUPPORT
+#ifndef CONFIG_PRINTF_REDUCED
 	MEM_ATTRIBUTE char format_flag;
 	MEM_ATTRIBUTE int precision;
 	MEM_ATTRIBUTE int n;
@@ -316,7 +288,7 @@ PGM_FUNC(_formatted_write)(const char * PGM_ATTR format,
 	MEM_ATTRIBUTE char nonzero_value;
 	MEM_ATTRIBUTE unsigned long ulong, div_factor;
 
-#ifdef FLOAT_SUPPORT
+#ifndef CONFIG_PRINTF_NOFLOAT
 	MEM_ATTRIBUTE long double fvalue;
 #endif
 
@@ -580,7 +552,7 @@ INTEGRAL_CONVERSION:
 				}
 				break;
 
-#ifdef FLOAT_SUPPORT
+#ifndef CONFIG_PRINTF_NOFLOAT
 			case 'g':
 			case 'G':
 				n = 1;
@@ -628,7 +600,7 @@ FLOATING_CONVERSION:
 				}
 				break;
 
-#else /* !FLOAT_SUPPORT */
+#else /* CONFIG_PRINTF_NOFLOAT */
 			case 'g':
 			case 'G':
 			case 'f':
@@ -638,7 +610,7 @@ FLOATING_CONVERSION:
 				while (*ptr)
 					ptr++;
 				break;
-#endif /* !FLOAT_SUPPORT */
+#endif /* CONFIG_PRINTF_NOFLOAT */
 
 			case '\0': /* Really bad place to find NUL in */
 				format--;
@@ -698,14 +670,16 @@ FLOATING_CONVERSION:
 			}
 	}
 
-#else /* REDUCED_SUPPORT STARTS HERE */
+#else /* CONFIG_PRINTF_REDUCED starts here */
 
-#ifdef MODIFIERS_IN_REDUCED
+#ifndef CONFIG_PRINTF_NOMODIFIERS
 	char l_modifier, h_modifier;
 	unsigned long u_val, div_val;
 #else
 	unsigned int u_val, div_val;
-#endif
+#endif /* CONFIG_PRINTF_NOMODIFIERS */
+
+	char l_modifier, h_modifier;
 	char format_flag;
 	unsigned int nr_of_chars, base;
 	char outChar;
@@ -722,7 +696,7 @@ FLOATING_CONVERSION:
 			nr_of_chars++;
 		}
 
-#ifdef MODIFIERS_IN_REDUCED
+#ifndef CONFIG_PRINTF_NOMODIFIERS
 		/*=================================*/
 		/* Optional 'l' or 'h' modifiers ? */
 		/*=================================*/
@@ -739,7 +713,7 @@ FLOATING_CONVERSION:
 				format++;
 				break;
 		}
-#endif
+#endif /* !CONFIG_PRINTF_NOMODIFIERS */
 
 		switch (format_flag = PGM_READ_CHAR(format++))
 		{
@@ -784,7 +758,7 @@ FLOATING_CONVERSION:
 					div_val = 0x10000000;
 
 CONVERSION_LOOP:
-#ifdef MODIFIERS_IN_REDUCED
+#ifndef CONFIG_PRINTF_NOMODIFIERS
 				if (h_modifier)
 					u_val = (format_flag == 'd') ?
 						(short)va_arg(ap, int) : (unsigned short)va_arg(ap, int);
@@ -793,9 +767,9 @@ CONVERSION_LOOP:
 				else
 					u_val = (format_flag == 'd') ?
 						va_arg(ap,int) : va_arg(ap,unsigned int);
-#else
+#else /* CONFIG_PRINTF_NOMODIFIERS */
 				u_val = va_arg(ap,int);
-#endif
+#endif /* CONFIG_PRINTF_NOMODIFIERS */
 				if (format_flag == 'd')
 				{
 					if (((int)u_val) < 0)
@@ -826,5 +800,5 @@ CONVERSION_LOOP:
 
 		} /* end switch(format_flag...) */
 	}
-#endif
+#endif /* CONFIG_PRINTF_REDUCED */
 }
