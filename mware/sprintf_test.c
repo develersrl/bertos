@@ -17,9 +17,6 @@ int main(UNUSED_ARG(int, argc), UNUSED_ARG(char **,argv))
 	snprintf(buf, sizeof buf, "%S", test_string_pgm);
 	assert(strcmp(buf, test_string_pgm) == 0);
 
-	snprintf(buf, sizeof buf, "%s", NULL);
-	assert(strcmp(buf, "<NULL>") == 0);
-
 	snprintf(buf, sizeof buf, "%d", 12345);
 	assert(strcmp(buf, "12345") == 0);
 
@@ -28,6 +25,15 @@ int main(UNUSED_ARG(int, argc), UNUSED_ARG(char **,argv))
 
 	snprintf(buf, sizeof buf, "%lu", 4294967295UL);
 	assert(strcmp(buf, "4294967295") == 0);
+
+	/*
+	 * Stress tests.
+	 */
+	snprintf(buf, sizeof buf, "%s", NULL);
+	assert(strcmp(buf, "<NULL>") == 0);
+	snprintf(buf, sizeof buf, "%k");
+	assert(strcmp(buf, "???") == 0);
+	sprintf(NULL, test_string); /* must not crash */
 
 	return 0;
 }
