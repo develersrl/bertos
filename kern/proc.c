@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.20  2004/11/16 22:37:14  bernie
+ *#* Replace IPTR with iptr_t.
+ *#*
  *#* Revision 1.19  2004/10/19 11:47:39  bernie
  *#* Kill warnings when !CONFIG_PROC_MONITOR.
  *#*
@@ -167,7 +170,7 @@ void proc_init(void)
  * \return Process structure of new created process
  *         if successful, NULL otherwise.
  */
-struct Process *proc_new_with_name(UNUSED(const char*, name), void (*entry)(void), IPTR data, size_t stacksize, cpustack_t *stack_base)
+struct Process *proc_new_with_name(UNUSED(const char*, name), void (*entry)(void), iptr_t data, size_t stacksize, cpustack_t *stack_base)
 {
 	Process *proc;
 	cpuflags_t flags;
@@ -396,7 +399,7 @@ struct Process *proc_current(void)
 /*!
  * Get the pointer to the user data of the current process
  */
-IPTR proc_current_user_data(void)
+iptr_t proc_current_user_data(void)
 {
 	return CurrentProcess->user_data;
 }

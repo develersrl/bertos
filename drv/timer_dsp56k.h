@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2004/11/16 22:37:14  bernie
+ *#* Replace IPTR with iptr_t.
+ *#*
  *#* Revision 1.5  2004/08/25 14:12:08  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -54,7 +57,7 @@
 //! Type of time expressed in ticks of the hardware high precision timer
 typedef uint16_t hptime_t;
 
-static void system_timer_isr(UNUSED(IPTR, arg));
+static void system_timer_isr(UNUSED(iptr_t, arg));
 
 static void timer_hw_init(void)
 {
@@ -102,6 +105,6 @@ INLINE hptime_t timer_hw_hpread(void)
 }
 
 #define DEFINE_TIMER_ISR \
-	static void system_timer_isr(UNUSED(IPTR, arg))
+	static void system_timer_isr(UNUSED(iptr_t, arg))
 
 #endif /* DRV_TIMER_DSP56_H */

@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2004/11/16 22:37:14  bernie
+ *#* Replace IPTR with iptr_t.
+ *#*
  *#* Revision 1.7  2004/10/19 08:54:55  bernie
  *#* Define forbid_cnt.
  *#*
@@ -41,7 +44,7 @@ struct Process;
 
 /* Task scheduling services */
 void proc_init(void);
-struct Process *proc_new_with_name(const char* name, void (*entry)(void), IPTR data, size_t stacksize, cpustack_t *stack);
+struct Process *proc_new_with_name(const char* name, void (*entry)(void), iptr_t data, size_t stacksize, cpustack_t *stack);
 
 #if !CONFIG_KERN_MONITOR
 	#define proc_new(entry,data,size,stack) proc_new_with_name(NULL,(entry),(data),(size),(stack))
@@ -53,7 +56,7 @@ void proc_exit(void);
 void proc_switch(void);
 void proc_test(void);
 struct Process* proc_current(void);
-IPTR proc_current_user_data(void);
+iptr_t proc_current_user_data(void);
 void proc_rename(struct Process* proc, const char* name);
 
 #if CONFIG_KERN_PREEMPTIVE

@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.17  2004/11/16 22:37:14  bernie
+ *#* Replace IPTR with iptr_t.
+ *#*
  *#* Revision 1.16  2004/08/25 14:12:08  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -167,11 +170,6 @@ INLINE time_t timer_ticks(void)
 	return result;
 }
 
-DEPRECATED INLINE time_t timer_gettick(void)
-{
-	return timer_ticks();
-}
-
 
 /*!
  * Faster version of timer_ticks(), to be called only when the timer
@@ -185,18 +183,12 @@ INLINE time_t timer_ticks_unlocked(void)
 	return _clock;
 }
 
-DEPRECATED INLINE time_t timer_gettick_irq(void)
-{
-	return timer_ticks_unlocked();
-}
-
 
 /*!
  * Return the minutes passed since timer start.
  *
- * The minutes uptime is computed directly from system tick counter:
- * in case of a 4 bytes time_t after 71582 minutes the value will
- * wrap around.
+ * The uptime in minutes is computed directly from system tick counter.
+ * This value wraps around every 71582 minutes with a 32bit time_t.
  */
 INLINE time_t timer_minutes(void)
 {

@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2004/11/16 22:37:14  bernie
+ *#* Replace IPTR with iptr_t.
+ *#*
  *#* Revision 1.10  2004/10/19 11:47:07  bernie
  *#* Add missing #endif.
  *#*
@@ -72,7 +75,7 @@ typedef struct Process
 {
 	Node         link;        /*!< Link Process into scheduler lists */
 	cpustack_t  *stack;       /*!< Per-process SP */
-	IPTR         user_data;   /*!< Custom data passed to the process */
+	iptr_t       user_data;   /*!< Custom data passed to the process */
 
 #if CONFIG_KERN_SIGNALS
 	sigset_t     sig_wait;    /*!< Signals the process is waiting for */
