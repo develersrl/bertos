@@ -17,6 +17,9 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/07/13 19:21:28  aleph
+ * Avoid warning for unused arg when compiled without some CONFIG_KERN_xx options
+ *
  * Revision 1.3  2004/06/06 18:37:57  bernie
  * Rename event macros to look like regular functions.
  *
@@ -69,6 +72,9 @@ struct Process MainProcess;
 
 static void proc_init_struct(Process* proc)
 {
+	/* Avoid warning for unused argument */
+	(void)proc;
+
 #if CONFIG_KERN_TIMER
 	event_initSignal(&proc->proc_timer.expire, proc, SIG_SINGLE);
 #endif
