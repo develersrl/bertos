@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2005/01/25 07:42:04  bernie
+ *#* Simplify.
+ *#*
  *#* Revision 1.10  2005/01/14 00:48:33  aleph
  *#* Rename callbacks; SerialHardwareVT.txSending: New callback.
  *#*
@@ -112,41 +115,36 @@ static inline void disable_rx_irq_bare(volatile struct REG_SCI_STRUCT* regs)
 static inline void disable_tx_irq(struct SerialHardware* _hw)
 {
 	struct SCI* hw = (struct SCI*)_hw;
-	volatile struct REG_SCI_STRUCT* regs = hw->regs;
 
-	disable_tx_irq_bare(regs);
+	disable_tx_irq_bare(hw->regs);
 }
 
 static inline void disable_rx_irq(struct SerialHardware* _hw)
 {
 	struct SCI* hw = (struct SCI*)_hw;
-	volatile struct REG_SCI_STRUCT* regs = hw->regs;
 
-	disable_rx_irq_bare(regs);
+	disable_rx_irq_bare(hw->regs);
 }
 
 static inline void enable_tx_irq(struct SerialHardware* _hw)
 {
 	struct SCI* hw = (struct SCI*)_hw;
-	volatile struct REG_SCI_STRUCT* regs = hw->regs;
 
-	enable_tx_irq_bare(regs);
+	enable_tx_irq_bare(hw->regs);
 }
 
 static inline void enable_rx_irq(struct SerialHardware* _hw)
 {
 	struct SCI* hw = (struct SCI*)_hw;
-	volatile struct REG_SCI_STRUCT* regs = hw->regs;
 
-	enable_rx_irq_bare(regs);
+	enable_rx_irq_bare(hw->regs);
 }
 
 static inline bool tx_irq_enabled(struct SerialHardware* _hw)
 {
 	struct SCI* hw = (struct SCI*)_hw;
-	volatile struct REG_SCI_STRUCT* regs = hw->regs;
 
-	return (regs->CR & REG_SCI_CR_TEIE);
+	return (hw->regs->CR & REG_SCI_CR_TEIE);
 }
 
 static void tx_isr(const struct SCI *hw)
