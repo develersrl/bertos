@@ -1,7 +1,7 @@
 /*!
  * \file
  * <!--
- * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000 Bernardo Innocenti <bernie@develer.com>
  * This file is part of DevLib - See devlib/README for information.
  * -->
@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.9  2004/07/20 23:45:01  bernie
+ * Finally remove redundant protos.
+ *
  * Revision 1.8  2004/07/18 21:57:32  bernie
  * timer_gettick(): Rename to timer_tick() and document better.
  *
@@ -70,15 +73,10 @@ extern void timer_add(Timer *timer);
 extern Timer *timer_abort(Timer *timer);
 extern void timer_delay(time_t time);
 extern void timer_udelay(utime_t utime);
-INLINE time_t timer_tick(void);
-INLINE time_t timer_tick_unlocked(void);
-INLINE void timer_set_event_softint(Timer* timer, Hook func, void* user_data);
-INLINE void timer_set_delay(Timer* timer, time_t delay);
 
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 
 /*! Set the timer so that it sends a signal when it expires */
-INLINE void timer_set_event_signal(Timer* timer, struct Process* proc, sigset_t sigs);
 INLINE void timer_set_event_signal(Timer* timer, struct Process* proc, sigset_t sigs)
 {
 	event_initSignal(&timer->expire, proc, sigs);

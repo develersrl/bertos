@@ -41,6 +41,9 @@
 
 /*
  * $Log$
+ * Revision 1.7  2004/07/20 23:46:29  bernie
+ * Finally remove redundant protos.
+ *
  * Revision 1.6  2004/06/06 17:18:04  bernie
  * Remove redundant declaration of fifo_isempty_locked().
  *
@@ -102,22 +105,6 @@ typedef struct FIFOBuffer
 } FIFOBuffer;
 
 
-/* Public function prototypes */
-INLINE bool fifo_isempty(const FIFOBuffer *fb);
-INLINE bool fifo_isfull(const FIFOBuffer *fb);
-INLINE bool fifo_isfull_locked(const FIFOBuffer *fb);
-#ifdef __MWERKS__
-#pragma interrupt called
-#endif
-INLINE void fifo_push(FIFOBuffer *fb, unsigned char c);
-#ifdef __MWERKS__
-#pragma interrupt called
-#endif
-INLINE unsigned char fifo_pop(FIFOBuffer *fb);
-INLINE void fifo_flush(FIFOBuffer *fb);
-INLINE void fifo_init(FIFOBuffer *fb, unsigned char *buf, size_t size);
-
-
 /*!
  * Check whether the fifo is empty
  *
@@ -171,6 +158,9 @@ INLINE bool fifo_isfull(const FIFOBuffer *fb)
  */
 INLINE void fifo_push(FIFOBuffer *fb, unsigned char c)
 {
+#ifdef __MWERKS__
+#pragma interrupt called
+#endif
 	/* Write at tail position */
 	*(fb->tail) = c;
 
@@ -195,6 +185,9 @@ INLINE void fifo_push(FIFOBuffer *fb, unsigned char c)
  */
 INLINE unsigned char fifo_pop(FIFOBuffer *fb)
 {
+#ifdef __MWERKS__
+#pragma interrupt called
+#endif
 	if (fb->head == fb->end)
 	{
 		/* wrap head around */

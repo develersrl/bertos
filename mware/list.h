@@ -13,6 +13,9 @@
 
 /*
  * $Log$
+ * Revision 1.5  2004/07/20 23:45:01  bernie
+ * Finally remove redundant protos.
+ *
  * Revision 1.4  2004/07/18 22:12:53  bernie
  * Fix warnings with GCC 3.3.2.
  *
@@ -121,7 +124,6 @@ typedef struct _List
  * \name Unlink a node from the head of the list \a l.
  * \return Pointer to node, or NULL if the list was empty.
  */
-INLINE Node *REMHEAD(List *l);
 INLINE Node *REMHEAD(List *l)
 {
 	Node *n;
@@ -139,7 +141,6 @@ INLINE Node *REMHEAD(List *l)
  * \name Unlink a node from the tail of the list \a l.
  * \return Pointer to node, or NULL if the list was empty.
  */
-INLINE Node *REMTAIL(List *l);
 INLINE Node *REMTAIL(List *l)
 {
 	Node *n;

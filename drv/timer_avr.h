@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.6  2004/07/20 23:48:16  bernie
+ * Finally remove redundant protos.
+ *
  * Revision 1.5  2004/07/18 22:16:35  bernie
  * Add missing header; Prevent warning for project_ks-specific code.
  *
@@ -82,7 +85,6 @@
 	//! Frequency of the hardware high precision timer
 	#define TIMER_HW_HPTICKS_PER_SEC  (CLOCK_FREQ / 64)
 
-	INLINE hptime_t timer_hw_hpread(void);
 	INLINE hptime_t timer_hw_hpread(void)
 	{
 		return TCNT0;
@@ -119,7 +121,6 @@
 	//! Frequency of the hardware high precision timer
 	#define TIMER_HW_HPTICKS_PER_SEC  (24000ul * 512)
 
-	INLINE hptime_t timer_hw_hpread(void);
 	INLINE hptime_t timer_hw_hpread(void)
 	{
 		return TCNT1;
@@ -155,7 +156,6 @@
 	//! Frequency of the hardware high precision timer
 	#define TIMER_HW_HPTICKS_PER_SEC  (CLOCK_FREQ / 64)
 
-	INLINE hptime_t timer_hw_hpread(void);
 	INLINE hptime_t timer_hw_hpread(void)
 	{
 		return TCNT2;
