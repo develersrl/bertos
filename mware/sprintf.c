@@ -5,15 +5,17 @@
  * This file is part of DevLib - See devlib/README for information.
  * -->
  *
+ * \brief sprintf() implementation based on _formatted_write()
+ *
  * \version $Id$
- *
  * \author Bernardo Innocenti <bernie@develer.com>
- *
- * \brief Simple sprintf() implementation based on _formatted_write()
  */
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2004/10/03 18:54:36  bernie
+ *#* sprintf(): Fix a serious bug; snprintf(): New function.
+ *#*
  *#* Revision 1.4  2004/08/25 14:12:09  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -74,13 +76,13 @@ int PGM_FUNC(vsprintf)(char * str, const char * PGM_ATTR fmt, va_list ap)
 	result = PGM_FUNC(_formatted_write)(
 			fmt, (str ? __str_put_char : __null_put_char), &str, ap);
 
-	/* terminate string */
+	/* Terminate string */
 	*str = '\0';
 
 	return result;
 }
 
-/* FIXME: sprintf_P is incorrectly declared in <stdio.h> */
+
 int PGM_FUNC(sprintf)(char *str, const char * fmt, ...)
 {
 	int result;
@@ -90,8 +92,56 @@ int PGM_FUNC(sprintf)(char *str, const char * fmt, ...)
 	result = PGM_FUNC(vsprintf)(str, fmt, ap);
 	va_end(ap);
 
-	/* terminate string */
-	*str = '\0';
+	return result;
+}
+
+/*!
+ * State information for __sn_put_char()
+ */
+struct __sn_state
+{
+	char *str;
+	size_t len;
+};
+
+/*!
+ * formatted_write() callback used [v]snprintf().
+ */
+static void __sn_put_char(char c, void *ptr)
+{
+	struct __sn_state *state = (struct __sn_state *)ptr;
+
+	if (state->len > 0)
+	{
+		--state->len;
+		*state->str++ = c;
+	}
+}
+
+
+int PGM_FUNC(vsnprintf)(char * str, size_t size, const char * PGM_ATTR fmt, va_list ap)
+{
+	int result;
+	struct __sn_state state = { str, size };
+
+	result = PGM_FUNC(_formatted_write)(
+			fmt, (str ? __sn_put_char : __null_put_char), &state, ap);
+
+	/* Terminate string */
+	*state.str = '\0';
+
+	return result;
+}
+
+
+int PGM_FUNC(snprintf)(char *str, size_t size, const char * fmt, ...)
+{
+	int result;
+	va_list ap;
+
+	va_start(ap, fmt);
+	result = PGM_FUNC(vsnprintf)(str, size, fmt, ap);
+	va_end(ap);
 
 	return result;
 }
