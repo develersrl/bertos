@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/06/06 16:09:22  bernie
+ * Reformat (from project_ks).
+ *
  * Revision 1.3  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -37,23 +40,23 @@
 	void Emul_BuzzerOff(void);
 	void Emul_BuzzerInit(void);
 
-#	define IS_BUZZER_ON  (Emul_IsBuzzerOn())
-#	define BUZZER_ON     (Emul_BuzzerOn())
-#	define BUZZER_OFF    (Emul_BuzzerOff())
-#	define BUZZER_INIT   (Emul_BuzzerInit())
+	#define IS_BUZZER_ON  (Emul_IsBuzzerOn())
+	#define BUZZER_ON     (Emul_BuzzerOn())
+	#define BUZZER_OFF    (Emul_BuzzerOff())
+	#define BUZZER_INIT   (Emul_BuzzerInit())
 
 #elif defined(__AVR__)
 
-#	define IS_BUZZER_ON  (PORTG & BV(PORTG0))
+	#define IS_BUZZER_ON  (PORTG & BV(PORTG0))
 
-	/**
+	/*!
 	 * Buzzer manipulation macros
 	 *
 	 * \note Some PORTG functions are being used from
 	 *       interrupt code, so we must be careful to
 	 *       avoid race conditions.
 	 */
-#	define BUZZER_ON \
+	#define BUZZER_ON \
 	do { \
 		cpuflags_t _flags; \
 		DISABLE_IRQSAVE(_flags); \
@@ -61,7 +64,7 @@
 		ENABLE_IRQRESTORE(_flags); \
 	} while (0)
 
-#	define BUZZER_OFF \
+	#define BUZZER_OFF \
 	do { \
 		cpuflags_t _flags; \
 		DISABLE_IRQSAVE(_flags); \
@@ -69,7 +72,7 @@
 		ENABLE_IRQRESTORE(_flags); \
 	} while (0)
 
-#	define BUZZER_INIT \
+	#define BUZZER_INIT \
 	do { \
 		cpuflags_t _flags; \
 		DISABLE_IRQSAVE(_flags); \
@@ -80,10 +83,10 @@
 
 #elif defined(__IAR_SYSTEMS_ICC) || defined(__IAR_SYSTEMS_ICC__) /* 80C196 */
 
-#	define IS_BUZZER_ON  (cpld->Buzzer & 1)
-#	define BUZZER_ON     (cpld->Buzzer = 1)
-#	define BUZZER_OFF    (cpld->Buzzer = 0)
-#	define BUZZER_INIT   (cpld->Buzzer = 0)
+	#define IS_BUZZER_ON  (cpld->Buzzer & 1)
+	#define BUZZER_ON     (cpld->Buzzer = 1)
+	#define BUZZER_OFF    (cpld->Buzzer = 0)
+	#define BUZZER_INIT   (cpld->Buzzer = 0)
 
 #endif /* ARCH, __AVR__, __IAR_SYSTEM_ICC */
 
