@@ -1,7 +1,7 @@
 /*!
  * \file
+ * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999 Bernardo Innocenti <bernie@develer.com>
- * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
  * This file is part of DevLib - See devlib/README for information.
  *
  * \version $Id$
@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2004/09/14 20:57:30  bernie
+ *#* Reformat.
+ *#*
  *#* Revision 1.5  2004/09/06 21:51:26  bernie
  *#* Extend interface to allow any algorithmic style.
  *#*
@@ -65,7 +68,6 @@
 
 /*! Escape sequences codes */
 #define ANSI_ESC_CLEARSCREEN 'c'
-
 
 
 /* Fwd decl */
