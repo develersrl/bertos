@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2005/01/20 18:46:31  aleph
+ *#* Fix progmem includes.
+ *#*
  *#* Revision 1.10  2005/01/08 09:20:12  bernie
  *#* Really make it work on both architectures.
  *#*
@@ -156,11 +159,7 @@ static int text_putglyph(char c, struct Bitmap *bm)
 		/* Per ogni colonna di dot del glyph... */
 		for (i = 0; i < glyph_width; ++i)
 		{
-			#if CPU_HARVARD
-				dots = PGM_READ_CHAR(glyph);
-			#else
-				dots = *glyph;
-			#endif
+			dots = PGM_READ_CHAR(glyph);
 
 			/* Advance to next column in glyph.
 			 * Expand: advances only once every two columns
@@ -198,13 +197,7 @@ static int text_putglyph(char c, struct Bitmap *bm)
 	}
 	else /* No style: fast vanilla copy of glyph to line buffer */
 		while (glyph_width--)
-		{
-			#if CPU_HARVARD
-				*buf++ = PGM_READ_CHAR(glyph++);
-			#else
-				*buf++ = *glyph++;
-			#endif
-		}
+			*buf++ = PGM_READ_CHAR(glyph++);
 
 	return c;
 }

@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2005/01/20 18:46:31  aleph
+ *#* Fix progmem includes.
+ *#*
  *#* Revision 1.8  2004/11/01 15:14:07  bernie
  *#* Update to current coding conventions.
  *#*
@@ -39,8 +42,9 @@
 #ifndef MWARE_GFX_H
 #define MWARE_GFX_H
 
-#include <compiler.h>
 #include <config.h>
+#include <compiler.h>
+#include <cpu.h>
 
 
 /*! Common type for coordinates expressed in pixel units */
@@ -91,10 +95,9 @@ extern void gfx_moveTo     (Bitmap *bm, coord_t x,  coord_t y);
 extern void gfx_lineTo     (Bitmap *bm, coord_t x,  coord_t y);
 extern void gfx_setClipRect(Bitmap *bm, coord_t xmin, coord_t ymin, coord_t xmax, coord_t ymax);
 
-#if CPU_AVR
-	#include <avr/pgmspace.h>
-	extern void gfx_blit_P(Bitmap *bm, const prog_uchar *raster);
-#endif /* CPU_AVR */
+#if CPU_HARVARD
+	extern void gfx_blit_P(Bitmap *bm, const pgm_uint8_t *raster);
+#endif
 
 
 #if CONFIG_GFX_VCOORDS
