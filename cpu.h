@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.17  2004/09/06 21:48:27  bernie
+ *#* ATOMIC(): New macro.
+ *#*
  *#* Revision 1.16  2004/08/29 21:58:33  bernie
  *#* Rename BITS_PER_XYZ macros; Add sanity checks.
  *#*
@@ -153,6 +156,19 @@
 	#define CPU_REG_INIT_VALUE(reg) (reg == 0 ? 0x80 : 0)
 
 #endif
+
+/*!
+ * Execute \a CODE atomically with respect to interrupts.
+ *
+ * \see ENABLE_IRQSAVE DISABLE_IRQRESTORE
+ */
+#define ATOMIC(CODE) \
+	do { \
+		cpuflags_t __flags; \
+		DISABLE_IRQSAVE(__flags); \
+		CODE; \
+		ENABLE_IRQRESTORE(__flags); \
+	} while (0)
 
 
 //! Default for macro not defined in the right arch section
