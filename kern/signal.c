@@ -2,15 +2,62 @@
  * \file
  * <!--
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
- * Copyright 1999,2000,2001 Bernardo Innocenti <bernie@develer.com>
+ * Copyright 1999, 2000, 2001 Bernardo Innocenti <bernie@develer.com>
  * This file is part of DevLib - See devlib/README for information.
  * -->
  *
  * \brief IPC signals implementation.
  *
- * Each process can wait for just one signal.
- * Multiple processes can wait for the same signal. In this
- * case, each signal will wake-up one of them.
+ * Signals are a low-level IPC primitive.  A process receives a signal
+ * when some external event has happened.  Like interrupt requests,
+ * signals do not carry any additional information.  If processing a
+ * specific event requires additional data, the process must obtain it
+ * through some other mechanism.
+ *
+ * Despite the name, one shouldn't confuse these signals with POSIX
+ * signals.  POSIX signals are usually executed synchronously, like
+ * software interrupts.
+ *
+ * In this implementation, each process has a limited set of signal
+ * bits (usually 32) and can wait for multiple signals at the same
+ * time using sig_wait().  Signals can also be polled using sig_check(),
+ * but a process spinning on its signals usually defeats their purpose
+ * of providing a multitasking-friendly infrastructure for event-driven
+ * applications.
+ *
+ * Signals are like flags: they are either active or inactive.  After an
+ * external event has delivered a particular signal, it remains raised until
+ * the process acknowledges it using either sig_wait() or sig_check().
+ * Counting signals is not a reliable way to count how many times a
+ * particular event has occurred, because the same signal may be
+ * delivered twice before the process can notice.
+ *
+ * Any execution context, including an interrupt handler, can deliver
+ * a signal to a process using sig_signal().  Multiple distinct signals
+ * may be delivered at once with a single invocation of sig_signal(),
+ * although this is rarely useful.
+ *
+ * There's no hardcoded mapping of specific events to signal bits.
+ * The meaning of a particular signal bit is defined by an agreement
+ * between the delivering entity and the receiving process.
+ * For instance, a terminal driver may be written to deliver
+ * a signal bit called SIG_INT when it reads the CTRL-C sequence
+ * from the keyboard, and a process may react to it by quitting.
+ *
+ * The SIG_SINGLE bit is reserved for a special purpose (this is
+ * more a suggestion than a constraint).  When a process wants
+ * wait for a single event on the fly, it needs not allocate a
+ * free signal from its pool.  Instead, SIG_SINGLE can be used
+ *
+ * The "event" module is a higher-level interface that can optionally
+ * deliver signals to processes.  Messages provide even higher-level
+ * IPC services built on signals.  Semaphore arbitration is also
+ * implemented using signals.
+ *
+ * Signals are very low overhead.  Using them exclusively to wait
+ * for multiple asynchronous events results in very simple dispatch
+ * logic with low processor and resource usage.
+ *
  *
  * \version $Id$
  *
@@ -19,6 +66,9 @@
 
 /*
  * $Log$
+ * Revision 1.5  2004/08/04 21:50:33  bernie
+ * Add extensive documentation.
+ *
  * Revision 1.4  2004/07/30 14:30:27  rasky
  * Resa la sig_signal interrupt safe (con il nuovo scheduler IRQ-safe)
  * Rimossa event_doIntr (ora inutile) e semplificata la logica delle macro con funzioni inline
