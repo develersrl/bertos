@@ -19,6 +19,11 @@
 	#include "arch_config.h"
 #endif
 
+#define APP_NAME "Appname"
+#define APP_DESCRIPTION "Long application name description"
+#define APP_AUTHOR "Develer"
+#define APP_COPYRIGHT "Copyright (C) 2004 by Develer (http://www.develer.com/)"
+
 #if (ARCH & ARCH_FOO)
 	#define VERS_MAJOR 0
 	#define VERS_MINOR 1
@@ -39,9 +44,13 @@
 	#define VERS_DBG ""
 #endif
 
-#define _MAKE_VERS(maj,min,rev)	#maj "." #min "." #rev VERS_LETTER VERS_DBG
-#define MAKE_VERS(maj,min,rev)	_MAKE_VERS(maj,min,rev)
-
+#define _STRINGIZE(a) #a
+/*! Build application version string (i.e.: "1.7.0") */
+#define MAKE_VERS(maj,min,rev) _STRINGIZE(maj) "." _STRINGIZE(min) "." _STRINGIZE(rev) VERS_LETTER VERS_DBG
 #define VERSION_TAG MAKE_VERS(VERS_MAJOR,VERS_MINOR,VERS_REV)
+
+/*! Build application version string suitable for MS windows resource files (i.e.: "1, 7, 0, 1") */
+#define MAKE_RCVERS(maj,min,rev,bld) _STRINGIZE(maj) ", " _STRINGIZE(min) ", " _STRINGIZE(rev) ", " _STRINGIZE(bld)
+#define RCVERSION_TAG MAKE_VERS(VERS_MAJOR,VERS_MINOR,VERS_REV)
 
 #endif /* VERSTAG_H */
