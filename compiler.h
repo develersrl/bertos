@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.41  2005/01/22 04:19:22  bernie
+ *#* MTIME_INFINITE: New constant.
+ *#*
  *#* Revision 1.40  2005/01/20 18:46:04  aleph
  *#* Add progmem datatypes; PSTR() definition.
  *#*
@@ -280,6 +283,8 @@
 	#define COMPILER_TYPEOF 1
 	#define COMPILER_STATEMENT_EXPRESSIONS 1
 
+	#define typeof __typeof__
+
 	#include <stdint.h>
 	#include <stddef.h>
 	#include <stdbool.h>
@@ -454,11 +459,13 @@ typedef PROGMEM uint32_t pgm_uint32_t;
 	typedef int16_t utime_t;  /*!< Type for time expressed in microseconds. */
 	#define SIZEOF_MTIME_T (16 / CPU_BITS_PER_CHAR)
 	#define SIZEOF_UTIME_T (16 / CPU_BITS_PER_CHAR)
+	#define MTIME_INFINITE 0x7FFFL
 #else
 	typedef int32_t mtime_t;  /*!< Type for time expressed in milliseconds. */
 	typedef int32_t utime_t;  /*!< Type for time expressed in microseconds. */
 	#define SIZEOF_MTIME_T (32 / CPU_BITS_PER_CHAR)
 	#define SIZEOF_UTIME_T (32 / CPU_BITS_PER_CHAR)
+	#define MTIME_INFINITE 0x7FFFFFFFL
 #endif
 
 /*! Bulk storage large enough for both pointers or integers. */
