@@ -2,7 +2,7 @@
  * \file
  * <!--
  * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
- * This file is part of DevLib - See devlib/README for information.
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \brief Driver for the AVR ATMega TWI (implementation)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2005/03/01 23:26:00  bernie
+ *#* Header fix.
+ *#*
  *#* Revision 1.2  2005/01/25 08:36:56  bernie
  *#* CONFIG_TWI_FREQ: New config param.
  *#*
@@ -30,7 +33,7 @@
 #include <cpu.h>
 #include <macros.h> // BV()
 
-#include <avr/twi.h>
+#include <compat/twi.h>
 
 
 /* Wait for TWINT flag set: bus is ready */
