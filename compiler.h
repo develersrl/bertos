@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.38  2004/12/31 16:41:52  bernie
+ *#* PROGMEM: Define to nothing for non-Harvard processors.
+ *#*
  *#* Revision 1.37  2004/12/08 09:43:21  bernie
  *#* Metrowerks supports variadic macros.
  *#*
@@ -150,7 +153,8 @@
 	#define REGISTER      shortad
 	#define INLINE        /* unsupported */
 
-	/* Imported from <longjmp.h>. Unfortunately, we can't just include
+	/*
+	 * Imported from <longjmp.h>. Unfortunately, we can't just include
 	 * this header because it typedefs jmp_buf to be an array of chars.
 	 * This would allow the compiler to place the buffer on an odd address.
 	 * The CPU _should_ be able to perform word accesses to
@@ -168,9 +172,9 @@
 	 */
 	struct _JMP_BUF
 	{
-		void *	sp;				/* Stack pointer */
-		void *	return_addr;	/* Return address */
-		int		lr[6];			/* 6 local registers */
+		void *sp;           /* Stack pointer */
+		void *return_addr;  /* Return address */
+		int lr[6];          /* 6 local registers */
 	};
 
 	typedef struct _JMP_BUF jmp_buf[1];
@@ -190,10 +194,10 @@
 	/* FIXME: I can't remember why exactly this was needed (NdBernie) */
 	#define float double
 
-	/* Fake bool support */
+	/* MSVC doesn't provide <stdbool.h>. */
 	#ifndef __cplusplus
-		#define true 1
-		#define false 0
+		#define true (1==1)
+		#define false (1!=1)
 		typedef int bool;
 	#endif /* !__cplusplus */
 
@@ -240,10 +244,12 @@
 
 		/* Support for harvard architectures */
 		#ifdef _PROGMEM
+			#include <avr/pgmspace.h>
 			#define PGM_READ_CHAR(s) pgm_read_byte(s)
 			#define PGM_FUNC(x) x ## _P
 			#define PGM_ATTR  PROGMEM
 		#endif
+		#define PROGMEM  __attribute__((__progmem__))
 
 	#endif
 
@@ -330,6 +336,9 @@
 #ifndef REGISTER
 #define REGISTER               /* nothing */
 #endif
+#ifndef PROGMEM
+#define PROGMEM                /* nothing */
+#endif
 #ifndef INTERRUPT
 #define INTERRUPT(x)           ERROR_NOT_IMPLEMENTED
 #endif
@@ -371,7 +380,6 @@
 #ifndef PGM_ATTR
 #define PGM_ATTR        /* nothing */
 #endif
-
 
 /* Misc definitions */
 #ifndef NULL
