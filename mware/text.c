@@ -1,8 +1,8 @@
 /*!
  * \file
  * <!--
+ * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999 Bernardo Innocenti <bernie@develer.com>
- * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
  * This file is part of DevLib - See devlib/README for information.
  * -->
  *
@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2004/08/29 22:04:53  bernie
+ *#* Fix Doxygen markup and indentation.
+ *#*
  *#* Revision 1.3  2004/08/25 14:12:09  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -54,6 +57,7 @@
 
 /*!
  * Flags degli stili algoritmici
+ *
  * La routine di rendering del testo e' in grado di applicare
  * delle semplici trasformazioni al font interno per generare
  * automaticamente degli stili predefiniti (bold, italic,
@@ -92,7 +96,7 @@ void text_setcoord(struct Bitmap *bm, int x, int y)
 
 
 /*!
- * Render char <code>c</code>
+ * Render char \a c on Bitmap \a bm
  */
 static int text_putglyph(char c, struct Bitmap *bm)
 {
@@ -194,14 +198,14 @@ int text_putchar(char c, struct Bitmap *bm)
 	{
 		switch (c)
 		{
-			case ANSI_ESC_CLEARSCREEN:
-				gfx_ClearBitmap(bm);
-				bm->penX = 0;
-				bm->penY = 0;
-				text_style(0, STYLEF_MASK);
-				break;
-			DB(default:
-				kprintf("Unknown ANSI esc code: %x\n", c);)
+		case ANSI_ESC_CLEARSCREEN:
+			gfx_ClearBitmap(bm);
+			bm->penX = 0;
+			bm->penY = 0;
+			text_style(0, STYLEF_MASK);
+			break;
+		DB(default:
+			kprintf("Unknown ANSI esc code: %x\n", c);)
 		}
 		ansi_mode = false;
 	}
