@@ -1,7 +1,7 @@
 /*!
  * \file
  * <!--
- * Copyright (C) 2003,2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
  * This file is part of DevLib - See devlib/README for information.
  * -->
  *
@@ -15,8 +15,8 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.6  2004/10/03 20:43:22  bernie
- *#* Import changes from sc/firmware.
+ *#* Revision 1.7  2004/10/19 08:57:15  bernie
+ *#* Bugfixes for DSP56K serial driver from scfirm.
  *#*
  *#* Revision 1.5  2004/08/25 14:12:08  rasky
  *#* Aggiornato il comment block dei log RCS
@@ -51,6 +51,11 @@
 	#error error flags do not match with register bits
 #endif
 
+static unsigned char ser0_fifo_rx[CONFIG_SER0_FIFOSIZE_RX];
+static unsigned char ser0_fifo_tx[CONFIG_SER0_FIFOSIZE_TX];
+static unsigned char ser1_fifo_rx[CONFIG_SER1_FIFOSIZE_RX];
+static unsigned char ser1_fifo_tx[CONFIG_SER1_FIFOSIZE_TX];
+
 struct SCI
 {
 	struct SerialHardware hw;
@@ -67,7 +72,7 @@ static inline void enable_tx_irq_bare(volatile struct REG_SCI_STRUCT* regs)
 
 static inline void enable_rx_irq_bare(volatile struct REG_SCI_STRUCT* regs)
 {
-	regs->CR |= REG_SCI_CR_RIE | REG_SCI_CR_REIE;
+	regs->CR |= REG_SCI_CR_RIE;
 }
 
 static inline void disable_tx_irq_bare(volatile struct REG_SCI_STRUCT* regs)
@@ -124,18 +129,29 @@ static void rx_isr(const struct SCI *hw)
 #pragma interrupt warn
 	volatile struct REG_SCI_STRUCT* regs = hw->regs;
 
+	// Propagate errors
 	hw->serial->status |= regs->SR & (SERRF_PARITYERROR |
 	                                  SERRF_RXSROVERRUN |
 	                                  SERRF_FRAMEERROR |
 	                                  SERRF_NOISEERROR);
 
+	/*
+	 * Serial IRQ can happen for two reason: data ready (RDRF) or overrun (OR)
+	 * If the data is ready, we need to fetch it from the data register or
+	 * the interrupt will retrigger immediatly. In case of overrun, instead,
+	 * the value of the data register is meaningless.
+	 */
+	if (regs->SR & REG_SCI_SR_RDRF)
+	{
+		unsigned char data = regs->DR;
+
+		if (fifo_isfull(&hw->serial->rxfifo))
 	if (fifo_isfull(&hw->serial->rxfifo))
 		hw->serial->status |= SERRF_RXFIFOOVERRUN;
 	else
 		fifo_push(&hw->serial->rxfifo, regs->DR);
 
-	// Writing anything to the status register clear the
-	//  error bits.
+	// Writing anything to the status register clear the error bits.
 	regs->SR = 0;
 }
 
@@ -202,14 +218,28 @@ static const struct SerialHardwareVT SCI_VT =
 static struct SCI SCIDescs[2] =
 {
 	{
-		.hw = { .table = &SCI_VT },
+		.hw =
+		{
+			.table = &SCI_VT,
+			.rxbuffer = ser0_fifo_rx,
+			.txbuffer = ser0_fifo_tx,
+			.rxbuffer_size = countof(ser0_fifo_rx),
+			.txbuffer_size = countof(ser0_fifo_tx),
+		},
 		.regs = &REG_SCI[0],
 		.irq_rx = IRQ_SCI0_RECEIVER_FULL,
 		.irq_tx = IRQ_SCI0_TRANSMITTER_READY,
 	},
 
 	{
-		.hw = { .table = &SCI_VT },
+		.hw =
+		{
+			.table = &SCI_VT,
+			.rxbuffer = ser1_fifo_rx,
+			.txbuffer = ser1_fifo_tx,
+			.rxbuffer_size = countof(ser1_fifo_rx),
+			.txbuffer_size = countof(ser1_fifo_tx),
+		},
 		.regs = &REG_SCI[1],
 		.irq_rx = IRQ_SCI1_RECEIVER_FULL,
 		.irq_tx = IRQ_SCI1_TRANSMITTER_READY,
