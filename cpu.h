@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.27  2004/12/31 17:02:47  bernie
+ *#* IRQ_SAVE_DISABLE(), IRQ_RESTORE(): Add null stubs for x86.
+ *#*
  *#* Revision 1.26  2004/12/13 12:08:12  bernie
  *#* DISABLE_IRQSAVE, ENABLE_IRQRESTORE, DISABLE_INTS, ENABLE_INTS: Remove obsolete macros.
  *#*
@@ -108,6 +111,8 @@
 	#define NOP                     asm volatile ("nop")
 	#define IRQ_DISABLE             /* nothing */
 	#define IRQ_ENABLE              /* nothing */
+	#define IRQ_SAVE_DISABLE(x)     /* nothing */
+	#define IRQ_RESTORE(x)          /* nothing */
 
 	typedef uint32_t cpuflags_t; // FIXME
 	typedef uint32_t cpustack_t;
