@@ -43,6 +43,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.15  2004/08/29 22:05:16  bernie
+ *#* Rename BITS_PER_PTR to CPU_BITS_PER_PTR.
+ *#*
  *#* Revision 1.14  2004/08/25 14:12:09  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -196,7 +199,7 @@ INLINE void fifo_flush(FIFOBuffer *fb)
 }
 
 
-#if CPU_REG_BITS >= BITS_PER_PTR
+#if CPU_REG_BITS >= CPU_BITS_PER_PTR
 
 	/*
 	 * 16/32bit CPUs that can update a pointer with a single write
@@ -206,7 +209,7 @@ INLINE void fifo_flush(FIFOBuffer *fb)
 	#define fifo_push_locked(fb, c) fifo_push((fb), (c))
 	#define fifo_flush_locked(fb) fifo_flush((fb))
 
-#else /* CPU_REG_BITS < BITS_PER_PTR */
+#else /* CPU_REG_BITS < CPU_BITS_PER_PTR */
 
 	/*!
 	 * Similar to fifo_isempty(), but with stronger guarantees for
