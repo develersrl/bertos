@@ -1,7 +1,7 @@
 /*!
  * \file
- * Copyright (C) 2003,2004 Develer S.r.l. (http://www.develer.com/)
- * Copyright (C) 1999 Bernardo Innocenti <bernie@develer.com>
+ * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 1999 Bernardo Innocenti <bernie@develer.com>
  * This file is part of DevLib - See devlib/README for information.
  *
  * \version $Id$
@@ -14,8 +14,8 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.5  2004/08/25 14:12:09  rasky
- *#* Aggiornato il comment block dei log RCS
+ *#* Revision 1.6  2004/09/14 21:01:08  bernie
+ *#* Rename rectangle drawing functions; Unify filled/cleared implementations.
  *#*
  *#* Revision 1.4  2004/08/10 07:00:16  bernie
  *#* Add missing header.
@@ -28,19 +28,6 @@
  *#*
  *#* Revision 1.1  2004/05/23 15:43:16  bernie
  *#* Import mware modules.
- *#*
- *#* Revision 1.4  2004/02/09 00:21:28  aleph
- *#* Various gfx fixes
- *#*
- *#* Revision 1.3  2004/01/27 23:24:19  aleph
- *#* Add new graphics primitives
- *#*
- *#* Revision 1.2  2004/01/07 23:33:01  aleph
- *#* Change copyright email
- *#*
- *#* Revision 1.1  2004/01/07 19:05:31  aleph
- *#* Add graphics routines
- *#*
  *#*/
 
 #ifndef MWARE_GFX_H
@@ -91,12 +78,18 @@ extern void gfx_InitBitmap(Bitmap *bm, uint8_t *raster, coord_t w, coord_t h);
 extern void gfx_ClearBitmap(Bitmap *bm);
 extern void gfx_blitBitmap_P(Bitmap *bm, const prog_uchar *raster);
 extern void gfx_DrawLine(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2);
-extern void gfx_FillRect(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2);
-extern void gfx_DrawRect(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2);
-extern void gfx_ClearRect(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2);
+extern void gfx_RectDraw(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2);
+extern void gfx_RectFillC(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2, uint8_t color);
+extern void gfx_RectFill(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2);
+extern void gfx_RectClear(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2);
 extern void gfx_MoveTo(Bitmap *bm, coord_t x, coord_t y);
 extern void gfx_LineTo(Bitmap *bm, coord_t x, coord_t y);
 extern void gfx_SetClipRect(Bitmap *bm, coord_t xmin, coord_t ymin, coord_t xmax, coord_t ymax);
+
+/* DEPRECATED names */
+#define gfx_DrawRect  gfx_RectDraw
+#define gfx_FillRect  gfx_RectFill
+#define gfx_ClearRect gfx_RectClear
 
 #if CONFIG_GFX_VCOORDS
 extern void gfx_SetViewRect(Bitmap *bm, vcoord_t x1, vcoord_t y1, vcoord_t x2, vcoord_t y2);

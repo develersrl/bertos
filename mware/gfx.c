@@ -1,7 +1,7 @@
 /*!
  * \file
  * <!--
- * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999 Bernardo Innocenti <bernie@develer.com>
  * This file is part of DevLib - See devlib/README for information.
  * -->
@@ -16,8 +16,8 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.6  2004/09/06 21:50:46  bernie
- *#* Clarify side-effects in documentation.
+ *#* Revision 1.7  2004/09/14 21:01:08  bernie
+ *#* Rename rectangle drawing functions; Unify filled/cleared implementations.
  *#*
  *#* Revision 1.4  2004/08/24 16:53:10  bernie
  *#* Use new-style config macros.
@@ -31,36 +31,43 @@
  *#*/
 
 #include "gfx.h"
-#include "config.h"
-#include <drv/kdebug.h>
+#include "config.h"  /* CONFIG_GFX_CLIPPING */
+#include <debug.h>
+#include <cpu.h>     /* CPU_AVR */
+#include <macros.h>  /* SWAP() */
 
 #include <string.h>
 
 
 /*!
- * Plot a point in bitmap.
+ * Plot a point in bitmap \a bm.
+ *
  * \note bm is evaluated twice
  */
 #define BM_PLOT(bm, x, y) \
 	( *((bm)->raster + ((y) / 8) * (bm)->width + (x)) |= 1 << ((y) % 8) )
 
 /*!
- * Clear a point in bitmap.
+ * Clear a point in bitmap \a bm.
+ *
  * \note bm is evaluated twice
  */
 #define BM_CLEAR(bm, x, y) \
 	( *((bm)->raster + ((y) / 8) * (bm)->width + (x)) &= ~(1 << ((y) % 8)) )
 
-/*! Swap a with b */
-#define SWAP(a, b) \
+/*!
+ * Set a point in bitmap \a bm to the specified color.
+ *
+ * \note bm is evaluated twice
+ * \note This macro is somewhat slower than BM_PLOT and BM_CLEAR.
+ * \see BM_PLOT BM_CLEAR
+ */
+#define BM_DRAWPIXEL(bm, x, y, fg_pen) \
 	do { \
-		(void)(&a == &b); /* type check */ \
-		typeof(a) tmp; \
-		tmp = (a); \
-		(a) = (b); \
-		(b) = tmp; \
+		uint8_t *p = (bm)->raster + ((y) / 8) * (bm)->width + (x); \
+		uint8_t mask = 1 << ((y) % 8); \
+		*p = (*p & ~mask) | ((fg_pen) ? mask : 0); \
 	} while (0)
-
 
 /*!
  * Initialize a Bitmap structure with the provided parameters.
@@ -88,6 +95,7 @@ void gfx_ClearBitmap(Bitmap *bm)
 }
 
 
+#if CPU_AVR
 /*!
  * Copy a raster picture located in program memory in the bitmap.
  * The size of the raster to copy *must* be the same of the raster bitmap.
@@ -98,6 +106,7 @@ void gfx_blitBitmap_P(Bitmap *bm, const prog_uchar *raster)
 {
 	memcpy_P(bm->raster, raster, bm->height/8 * bm->width);
 }
+#endif /* CPU_AVR */
 
 
 /*!
@@ -265,46 +274,14 @@ void gfx_LineTo(Bitmap *bm, coord_t x, coord_t y)
 
 
 /*!
- * Draw a filled rectangle.
- *
- * \note The bottom-right border of the rectangle is not drawn.
- *
- * \note This function does \b not update the current pen position
- */
-void gfx_FillRect(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
-{
-	coord_t x, y;
-
-	/* Sort coords */
-	if (x1 > x2) SWAP(x1, x2);
-	if (y1 > y2) SWAP(y1, y2);
-
-	/* Clip rect to bitmap bounds */
-	if (x1 < 0)             x1 = 0;
-	if (x2 < 0)             x2 = 0;
-	if (x1 > bm->width)     x1 = bm->width;
-	if (x2 > bm->width)     x2 = bm->width;
-	if (y1 < 0)             y1 = 0;
-	if (y2 < 0)             y2 = 0;
-	if (y1 > bm->width)     y1 = bm->width;
-	if (y2 > bm->width)     y2 = bm->width;
-
-	/* Draw rectangle */
-	for (x = x1; x < x2; x++)
-		for (y = y1; y < y2; y++)
-			BM_PLOT(bm, x, y);
-}
-
-
-/*!
- * Draw an empty rectangle.
+ * Draw an the outline of an hollow rectangle.
  *
  * \note The bottom-right border of the rectangle is not drawn.
  * \note This function does \b not update the current pen position
  */
-void gfx_DrawRect(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
+void gfx_RectDraw(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 {
-	/* Sort coords */
+	/* Sort coords (needed for correct bottom-right semantics) */
 	if (x1 > x2) SWAP(x1, x2);
 	if (y1 > y2) SWAP(y1, y2);
 
@@ -317,11 +294,13 @@ void gfx_DrawRect(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 
 
 /*!
- * Clear a rectangular area.
+ * Fill a rectangular area with \a color.
+ *
  * \note The bottom-right border of the rectangle is not drawn.
+ *
  * \note This function does \b not update the current pen position
  */
-void gfx_ClearRect(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
+void gfx_RectFillC(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2, uint8_t color)
 {
 	coord_t x, y;
 
@@ -339,10 +318,48 @@ void gfx_ClearRect(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 	if (y1 > bm->width)     y1 = bm->width;
 	if (y2 > bm->width)     y2 = bm->width;
 
-	/* Draw rectangle */
-	for (x = x1; x < x2; x++)
-		for (y = y1; y < y2; y++)
-			BM_CLEAR(bm, x, y);
+	/*
+	 * Draw rectangle
+	 * NOTE: Code paths are duplicated for efficiency
+	 */
+	if (color) /* fill */
+	{
+		for (x = x1; x < x2; x++)
+			for (y = y1; y < y2; y++)
+				BM_PLOT(bm, x, y);
+	}
+	else /* clear */
+	{
+		for (x = x1; x < x2; x++)
+			for (y = y1; y < y2; y++)
+				BM_CLEAR(bm, x, y);
+	}
+}
+
+
+/*!
+ * Draw a filled rectangle.
+ *
+ * \note The bottom-right border of the rectangle is not drawn.
+ *
+ * \note This function does \b not update the current pen position
+ */
+void gfx_RectFill(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
+{
+	gfx_RectFillC(bm, x1, y1, x2, y2, 0xFF);
+}
+
+
+/*!
+ * Clear a rectangular area.
+ *
+ * \note The bottom-right border of the rectangle is not drawn.
+ *
+ * \note This function does \b not update the current pen position
+ */
+void gfx_RectClear(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
+{
+	gfx_RectFillC(bm, x1, y1, x2, y2, 0x00);
 }
 
 
@@ -381,8 +398,8 @@ void gfx_SetViewRect(Bitmap *bm, vcoord_t x1, vcoord_t y1, vcoord_t x2, vcoord_t
 
 	bm->orgX    = x1;
 	bm->orgY    = y1;
-	bm->scaleX  = (vcoord_t)(bm->cr.xmax - bm->cr.xmin) / (vcoord_t)(x2 - x1);   /* +1 */
-	bm->scaleY  = (vcoord_t)(bm->cr.ymax - bm->cr.ymin) / (vcoord_t)(y2 - y1);   /* +1 */
+	bm->scaleX  = (vcoord_t)(bm->cr.xmax - bm->cr.xmin - 1) / (vcoord_t)(x2 - x1);
+	bm->scaleY  = (vcoord_t)(bm->cr.ymax - bm->cr.ymin - 1) / (vcoord_t)(y2 - y1);
 
 /*	DB(kprintf("orgX = %f, orgY = %f, scaleX = %f, scaleY = %f\n",
 		bm->orgX, bm->orgY, bm->scaleX, bm->scaleY);)
