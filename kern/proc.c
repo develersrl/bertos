@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.17  2004/10/19 08:47:13  bernie
+ *#* proc_rename(), proc_forbid(), proc_permit(): New functions.
+ *#*
  *#* Revision 1.16  2004/10/03 20:39:28  bernie
  *#* Import changes from sc/firmware.
  *#*
@@ -242,6 +245,14 @@ struct Process *proc_new_with_name(UNUSED(const char*, name), void (*entry)(void
 	return proc;
 }
 
+/*! Rename a process */
+void proc_rename(struct Process *proc, const char *name)
+{
+#if CONFIG_KERN_MONITOR
+	monitor_rename(proc, name);
+#endif
+}
+
 
 /*!
  * System scheduler: pass CPU control to the next process in
@@ -379,6 +390,41 @@ IPTR proc_current_user_data(void)
 {
 	return CurrentProcess->user_data;
 }
+
+
+#if CONFIG_KERN_PREEMPTIVE
+
+/*!
+ * Disable preemptive task switching.
+ *
+ * The scheduler maintains a per-process nesting counter.  Task switching is
+ * effectively re-enabled only when the number of calls to proc_permit()
+ * matches the number of calls to proc_forbid().
+ *
+ * Calling functions that could sleep while task switching is disabled
+ * is dangerous, although supported.  Preemptive task switching is
+ * resumed while the process is sleeping and disabled again as soon as
+ * it wakes up again.
+ *
+ * \sa proc_permit()
+ */
+void proc_forbid(void)
+{
+	/* No need to protect against interrupts here. */
+	++CurrentProcess->forbid_cnt;
+}
+
+/*!
+ * Re-enable preemptive task switching.
+ *
+ * \sa proc_forbid()
+ */
+void proc_permit(void)
+{
+	/* No need to protect against interrupts here. */
+	--CurrentProcess->forbid_cnt;
+}
+
 
 #if 0 /* Simple testcase for the scheduler */
 
