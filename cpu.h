@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.23  2004/11/16 22:41:58  bernie
+ *#* Support 64bit CPUs.
+ *#*
  *#* Revision 1.22  2004/11/16 21:57:59  bernie
  *#* CPU_IDLE: Rename from SCHEDULER_IDLE.
  *#*
@@ -327,7 +330,11 @@
 #endif /* !SIZEOF_INT */
 
 #ifndef SIZEOF_LONG
-#define SIZEOF_LONG  4
+#if CPU_REG_BITS > 32
+	#define SIZEOF_LONG  8
+#else
+	#define SIZEOF_LONG  4
+#endif
 #endif
 
 #ifndef SIZEOF_PTR
