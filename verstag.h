@@ -22,7 +22,7 @@
 #define APP_NAME "Appname"
 #define APP_DESCRIPTION "Long application name description"
 #define APP_AUTHOR "Develer"
-#define APP_COPYRIGHT "Copyright (C) 2004 by Develer (http://www.develer.com/)"
+#define APP_COPYRIGHT "Copyright 2004 Develer (http://www.develer.com/)"
 
 #if (ARCH & ARCH_FOO)
 	#define VERS_MAJOR 0
@@ -39,8 +39,8 @@
 #endif
 
 /*!
- * If _SNAPSHOT is defined, VERSION_TAG build the version using the compilation
- * date instead of building the numeric version string.
+ * If _SNAPSHOT is defined, \c VERS_TAG contains the build date
+ * date instead of a numeric version string.
  */
 #define _SNAPSHOT
 
@@ -56,9 +56,9 @@
 /*! Build application version string (i.e.: "1.7.0") */
 #define MAKE_VERS(maj,min,rev) _STRINGIZE(maj) "." _STRINGIZE(min) "." _STRINGIZE(rev) VERS_LETTER VERS_DBG
 #ifdef _SNAPSHOT
-	#define VERSION_TAG "snapshot" " " __DATE__ " " __TIME__ " " VERS_LETTER " " VERS_DBG
+	#define VERS_TAG "snapshot" " " __DATE__ " " __TIME__ " " VERS_LETTER " " VERS_DBG
 #else
-	#define VERSION_TAG MAKE_VERS(VERS_MAJOR,VERS_MINOR,VERS_REV)
+	#define VERS_TAG MAKE_VERS(VERS_MAJOR,VERS_MINOR,VERS_REV)
 #endif
 
 
