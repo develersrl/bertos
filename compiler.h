@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.18  2004/08/24 16:32:37  bernie
+ * Document custom types.
+ *
  * Revision 1.17  2004/08/24 13:32:14  bernie
  * PP_CAT(), PP_STRINGIZE(): Move back to compiler.h to break circular dependency between cpu.h/compiler.h/macros.h;
  * offsetof(), countof(): Move back to compiler.h to avoid including macros.h almost everywhere;
@@ -276,10 +279,10 @@
 /* FIXME: turn this into a typedef? */
 #define IPTR void *
 
-typedef long utime_t;
-typedef unsigned char sig_t;
-typedef unsigned char sigset_t;
-typedef unsigned char page_t;
+typedef long utime_t;            /*!< Type for time expressed in microseconds */
+typedef unsigned char sig_t;     /*!< Type for signal bits */
+typedef unsigned char sigset_t;  /*!< Type for signal masks */
+typedef unsigned char page_t;    /*!< Type for banked memory pages */
 
 #if (defined(_MSC_VER) || defined(__IAR_SYSTEMS_ICC) || defined(__IAR_SYSTEMS_ICC__))
 	/*!
