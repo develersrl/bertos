@@ -17,8 +17,8 @@
 
 /*
  * $Log$
- * Revision 1.13  2004/08/24 13:16:00  bernie
- * Add type-size definitions for preprocessor.
+ * Revision 1.14  2004/08/24 13:29:28  bernie
+ * Trim CVS log; Rename header guards.
  *
  * Revision 1.12  2004/08/14 19:37:57  rasky
  * Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
@@ -32,36 +32,11 @@
  * Revision 1.9  2004/07/30 14:24:16  rasky
  * Task switching con salvataggio perfetto stato di interrupt (SR)
  * Kernel monitor per dump informazioni su stack dei processi
- *
- * Revision 1.8  2004/07/30 14:15:53  rasky
- * Nuovo supporto unificato per detect della CPU
- *
- * Revision 1.7  2004/07/20 23:26:48  bernie
- * Fix two errors introduced by previous commit.
- *
- * Revision 1.6  2004/07/20 23:12:16  bernie
- * Rationalize and document SCHEDULER_IDLE.
- *
- * Revision 1.5  2004/07/20 16:20:35  bernie
- * Move byte-order macros to mware/byteorder.h; Add missing author names.
- *
- * Revision 1.4  2004/07/20 16:06:04  bernie
- * Add macros to handle endianess issues.
- *
- * Revision 1.3  2004/07/18 21:49:51  bernie
- * Fixes for GCC 3.5.
- *
- * Revision 1.2  2004/06/03 11:27:09  bernie
- * Add dual-license information.
- *
- * Revision 1.1  2004/05/23 17:48:35  bernie
- * Add top-level files.
- *
  */
-#ifndef CPU_H
-#define CPU_H
+#ifndef DEVLIB_CPU_H
+#define DEVLIB_CPU_H
 
-#include "compiler.h"
+#include "compiler.h" /* for uintXX_t, PP_CAT3(), PP_STRINGIZE() */
 
 
 // Macros for determining CPU endianness
@@ -339,4 +314,4 @@
 	#endif /* !ARCH_EMUL */
 #endif /* !SCHEDULER_IDLE */
 
-#endif /* CPU_H */
+#endif /* DEVLIB_CPU_H */
