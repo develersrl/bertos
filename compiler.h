@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.25  2004/10/19 07:14:20  bernie
+ *#* Add macros to test for specific compiler features.
+ *#*
  *#* Revision 1.24  2004/10/03 18:35:13  bernie
  *#* Poison C++ keywords in C programs for better portability.
  *#*
@@ -160,6 +163,11 @@
 
 #elif defined(__GNUC__)
 
+	/* Compiler features */
+	#define COMPILER_VARIADIC_MACROS 1 /* Even in C++ */
+	#define COMPILER_TYPEOF 1
+	#define COMPILER_STAEMENT_EXPRESSIONS 1
+
 	/* GCC attributes */
 	#define FORMAT(type,fmt,first)  __attribute__((__format__(type, fmt, first)))
 	#define NORETURN                __attribute__((__noreturn__))
@@ -211,6 +219,10 @@
 
 #elif defined(__MWERKS__) && CPU_DSP56K
 
+	/* Compiler features */
+	#define COMPILER_TYPEOF 1
+	#define COMPILER_STAEMENT_EXPRESSIONS 1
+
 	#include <stdint.h>
 	#include <stddef.h>
 	#include <stdbool.h>
@@ -223,6 +235,32 @@
 	#error unknown compiler
 #endif
 
+
+/* Defaults for compiler extensions. */
+
+/*!
+ * \def COMPILER_VARIADIC_MACROS
+ * Support for macros with variable arguments.
+ */
+#ifndef COMPILER_HAVE_VARIADIC_MACROS
+#define COMPILER_HAVE_VARIADIC_MACROS (COMPILER_C99 != 0)
+#endif
+
+/*!
+ * \def COMPILER_TYPEOF
+ * Support for macros with variable arguments.
+ */
+#ifndef COMPILER_TYPEOF
+#define COMPILER_TYPEOF 0
+#endif
+
+/*!
+ * \def COMPILER_STATEMENT_EXPRESSIONS
+ * Support for macros with variable arguments.
+ */
+#ifndef COMPILER_STATEMENT_EXPRESSIONS 0
+#define COMPILER_STATEMENT_EXPRESSIONS 0
+#endif
 
 /* A few defaults for missing compiler features. */
 #ifndef INLINE

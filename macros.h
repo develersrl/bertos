@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2004/10/19 07:14:20  bernie
+ *#* Add macros to test for specific compiler features.
+ *#*
  *#* Revision 1.7  2004/09/20 03:30:45  bernie
  *#* C++ also has variadic macros.
  *#*
@@ -57,8 +60,8 @@
 
 #include <compiler.h>
 
-/* Type-generic macros */
-#if GNUC_PREREQ(2,0)
+#if (COMPILER_STATEMENT_EXPRESSIONS && COMPILER_TYPEOF)
+	/* Type-generic macros */
 	#define ABS(n) ({ \
 		__typeof__(n) _n = (n); \
 		(_n < 0) ? -_n : _n; \
@@ -75,33 +78,38 @@
 		(void)(&_a == &_b); /* ensure same type */ \
 		(_a > _b) ? _a : _b; \
 	})
-#else /* !GNUC */
+#else /* !(COMPILER_STATEMENT_EXPRESSIONS && COMPILER_TYPEOF) */
 	/* Buggy macros for inferior compilers.  */
 	#define ABS(a)		(((a) < 0) ? -(a) : (a))
 	#define MIN(a,b)	(((a) < (b)) ? (a) : (b))
 	#define MAX(a,b)	(((a) > (b)) ? (a) : (b))
-#endif /* !GNUC */
+#endif /* !(COMPILER_STATEMENT_EXPRESSIONS && COMPILER_TYPEOF) */
 
-/*! Bound \a x between \a min and \a max */
+/*! Bound \a x between \a min and \a max. */
 #define MINMAX(min,x,max)  (MIN(MAX(min, x), max))
 
-/*!
- * Type-generic macro to swap a with b
- *
- * \note arguments are evaluated multiple times
- */
-#define SWAP(a, b) \
-	do { \
-		(void)(&(a) == &(b)); /* type check */ \
-		typeof(a) tmp; \
-		tmp = (a); \
-		(a) = (b); \
-		(b) = tmp; \
-	} while (0)
+#if COMPILER_TYPEOF
+	/*!
+	 * Type-generic macro to swap \a a with \a b.
+	 *
+	 * \note Arguments are evaluated multiple times.
+	 */
+	#define SWAP(a, b) \
+		do { \
+			(void)(&(a) == &(b)); /* type check */ \
+			typeof(a) tmp; \
+			tmp = (a); \
+			(a) = (b); \
+			(b) = tmp; \
+		} while (0)
+#else /* !COMPILER_TYPEOF */
+	/* Sub-optimal implementation that only works with integral types. */
+	#define SWAP(a, b) ((a) ^= (b) ^= (a) ^= (b))
+#endif /* COMPILER_TYPEOF */
 
 #ifndef BV
-/*! Convert a bit value to a binary flag */
-#define BV(x)       (1<<(x))
+	/*! Convert a bit value to a binary flag. */
+	#define BV(x)  (1<<(x))
 #endif
 
 /*! Round up \a x to an even multiple of the 2's power \a pad */
@@ -128,15 +136,15 @@
 #define UINT32_LOG2(x) \
 	((x < 65536UL) ? UINT16_LOG2(x) : UINT16_LOG2((x) >> 16) + 16)
 
-#if COMPILER_C99 || defined(__cplusplus)
-	/*! Count the number of arguments (up to 16) */
+#if COMPILER_VARIADIC_MACROS
+	/*! Count the number of arguments (up to 16). */
 	#define PP_COUNT(...) \
 		PP_COUNT__(__VA_ARGS__,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0)
 	#define PP_COUNT__(a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,count,...) \
 		count
 #endif
 
-#if COMPILER_C99 || defined(__cplusplus)
+#if COMPILER_VARIADIC_MACROS
 	/*!
 	 * \def BIT_CHANGE(reg, (mask, value), ...)
 	 *
@@ -174,7 +182,6 @@
 	 * \note This macro is available only in C99 because it makes use of variadic macros.
 	 * It would be possible to make up an implementation with a slightly different syntax
 	 * for use with C90 compilers, through Boost Preprocessor.
-	 *
 	 */
 
 	/*!
@@ -182,7 +189,6 @@
 	 *
 	 * Similar to BIT_CHANGE(), but get bits instead of masks (and applies BV() to convert
 	 * them to masks).
-	 *
 	 */
 
 	#define BIT_EXTRACT_FLAG_0(bit, value)  bit
@@ -235,7 +241,7 @@
 	#define BIT_CHANGE(reg, ...)        BIT_CHANGE__(reg, 0, __VA_ARGS__)
 	#define BIT_CHANGE_BV(reg, ...)     BIT_CHANGE__(reg, 1, __VA_ARGS__)
 
-#endif /* COMPILER_C99 */
+#endif /* COMPILER_VARIADIC_MACROS */
 
 #endif /* MACROS_H */
 
