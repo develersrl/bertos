@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/06/06 16:57:18  bernie
+ * Mark some functions INLINE instead of 'extern inline'.
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -48,8 +51,8 @@ extern void timer_add(Timer *timer);
 extern Timer *timer_abort(Timer *timer);
 extern void timer_delay(time_t time);
 extern void timer_udelay(utime_t utime);
-extern inline time_t timer_gettick(void);
-extern inline time_t timer_gettick_irq(void);
+INLINE time_t timer_gettick(void);
+INLINE time_t timer_gettick_irq(void);
 
 #ifdef CONFIG_KERN_SIGNALS
 /*! Set the timer so that it sends a signal when it expires */
@@ -78,7 +81,7 @@ INLINE void timer_set_delay(Timer* timer, time_t delay)
  * clock variable is larger than the processor word size and can't
  * be copied atomically.
  */
-extern inline time_t timer_gettick(void)
+INLINE time_t timer_gettick(void)
 {
 	extern volatile time_t _clock;
 
@@ -97,7 +100,7 @@ extern inline time_t timer_gettick(void)
  * Like \c timer_gettick, faster version to be called
  * from interrupt context only.
  */
-extern inline time_t timer_gettick_irq(void)
+INLINE time_t timer_gettick_irq(void)
 {
 	extern volatile time_t _clock;
 
