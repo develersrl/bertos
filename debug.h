@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2005/01/11 18:08:08  aleph
+ *#* Add empty kdump definition for debug off
+ *#*
  *#* Revision 1.7  2004/12/31 17:43:09  bernie
  *#* Use UNUSED_ARG instead of obsolete UNUSED macro.
  *#*
@@ -326,6 +329,8 @@
 	INLINE void kdbg_init(void) { /* nop */ }
 	INLINE void kputchar(UNUSED_ARG(char, c)) { /* nop */ }
 	INLINE void kputs(UNUSED_ARG(const char *, str)) { /* nop */ }
+	INLINE void kdump(UNUSED_ARG(const void *, buf), UNUSED_ARG(size_t, len)) { /* nop */ }
+
 	#ifdef __cplusplus
 		/* G++ can't inline functions with variable arguments... */
 		#define kprintf(fmt,...) do { (void)(fmt); } while(0)
