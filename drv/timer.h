@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.21  2004/12/09 08:35:21  bernie
+ *#* Replace IPTR with iptr_t.
+ *#*
  *#* Revision 1.20  2004/12/08 08:56:41  bernie
  *#* Rename sigset_t to sigmask_t; Reformat.
  *#*
@@ -128,7 +131,7 @@ INLINE void timer_set_event_signal(Timer *timer, struct Process *proc, sigmask_t
 #endif /* CONFIG_KERN_SIGNALS */
 
 /*! Set the timer so that it calls an user hook when it expires */
-INLINE void timer_set_event_softint(Timer *timer, Hook func, IPTR user_data)
+INLINE void timer_set_event_softint(Timer *timer, Hook func, iptr_t user_data)
 {
 	event_initSoftInt(&timer->expire, func, user_data);
 }
