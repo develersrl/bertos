@@ -15,6 +15,11 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/06/27 15:20:26  aleph
+ * Change UNUSED() macro to accept two arguments: type and name;
+ * Add macro GNUC_PREREQ to detect GCC version during build;
+ * Some spacing cleanups and typo fix
+ *
  * Revision 1.3  2004/06/06 18:00:39  bernie
  * PP_CAT(): New macro.
  *
@@ -30,6 +35,15 @@
 
 #include "arch_config.h"
 
+
+#if defined __GNUC__ && defined __GNUC_MINOR__
+	#define GNUC_PREREQ(maj, min) \
+		((__GNUC__ << 16) + __GNUC_MINOR__ >= ((maj) << 16) + (min))
+#else
+	#define GNUC_PREREQ(maj, min) 0
+#endif
+
+
 #if defined(__IAR_SYSTEMS_ICC) || defined(__IAR_SYSTEMS_ICC__)
 	#pragma language=extended
 	#define INTERRUPT(x)	interrupt [x]
@@ -39,7 +53,7 @@
 	/* GCC attributes */
 	#define FORMAT(type,fmt,first) /* nothing */
 	#define NORETURN               /* nothing */
-	#define UNUSED(arg)            arg
+	#define UNUSED(type,arg)       type arg
 
 	/* Imported from <longjmp.h>. Unfortunately, we can't just include
 	 * this header because it typedefs jmp_buf to be an array of chars.
@@ -87,7 +101,7 @@
 	/* GCC attributes */
 	#define FORMAT(type,fmt,first) /* nothing */
 	#define NORETURN               /* nothing */
-	#define UNUSED(arg)            arg
+	#define UNUSED(type,arg)       type arg
 	#define INLINE static inline
 
 	#ifdef __cplusplus
@@ -112,7 +126,7 @@
 	/* GCC attributes */
 	#define FORMAT(type,fmt,first)  __attribute__((__format__(type, fmt, first)))
 	#define NORETURN                __attribute__((__noreturn__))
-	#define UNUSED(arg)             __attribute__((__unused__)) arg
+	#define UNUSED(type,arg)        __attribute__((__unused__)) type arg
 	//FIXME #define INLINE static inline
 	#define INLINE extern inline
 
@@ -141,15 +155,17 @@
 		#include <stddef.h>
 		#include <stdbool.h>
 		#define FLASH		__attribute__((progmem))
-		#define REGISTER		/* nothing */
+		#define REGISTER    /* nothing */
 
 		/* Missing printf-family functions in avr-libc/stdio.h */
 		#include <stdarg.h>
 		#include <avr/pgmspace.h>
-		int vsprintf(char *buf, const char *fmt, va_list ap);
+		#if !GNUC_PREREQ(3,4)
+			int vsprintf(char *buf, const char *fmt, va_list ap);
+		#endif
 		int vsprintf_P(char *buf, const char * PROGMEM fmt, va_list ap);
 
-		/* Support for hardvard architectures */
+		/* Support for harvard architectures */
 		#ifdef _PROGMEM
 			#define PGM_READ_CHAR(s) pgm_read_byte(s)
 			#define PGM_FUNC(x) x ## _P
@@ -179,9 +195,9 @@
 	/* GCC attributes */
 	#define FORMAT(type,fmt,first)  /* nothing */
 	#define NORETURN                /* nothing */
-	#define UNUSED(arg)             arg
+	#define UNUSED(type,arg)        type arg
 
-	/* Support for hardvard architectures */
+	/* Support for harvard architectures */
 	#define PGM_READ_CHAR(s) (*(s))
 	#define PGM_FUNC		/* nothing */
 	#define PGM_ATTR		/* nothing */

@@ -14,6 +14,11 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/06/27 15:20:26  aleph
+ * Change UNUSED() macro to accept two arguments: type and name;
+ * Add macro GNUC_PREREQ to detect GCC version during build;
+ * Some spacing cleanups and typo fix
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -53,7 +58,7 @@ static void __str_put_char(char c, void *ptr)
 	(*((char **)ptr))++;
 }
 
-static void __null_put_char(UNUSED(char c), UNUSED(void *ptr))
+static void __null_put_char(UNUSED(char, c), UNUSED(void *, ptr))
 {
 	/* nop */
 }

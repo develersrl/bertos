@@ -16,6 +16,11 @@
 
 /*
  * $Log$
+ * Revision 1.5  2004/06/27 15:20:26  aleph
+ * Change UNUSED() macro to accept two arguments: type and name;
+ * Add macro GNUC_PREREQ to detect GCC version during build;
+ * Some spacing cleanups and typo fix
+ *
  * Revision 1.4  2004/06/06 18:09:51  bernie
  * Import DSP56800 changes; Print broken wall bricks in hex.
  *
@@ -134,7 +139,7 @@ void kdbg_init(void)
 /*!
  * Output one character to the debug console
  */
-static void kputchar(char c, UNUSED(void *unused))
+static void kputchar(char c, UNUSED(void *, unused))
 {
 	/* Poll while serial buffer is still busy */
 	KDBG_WAIT_READY();
