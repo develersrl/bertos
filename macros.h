@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/08/24 14:13:48  bernie
+ * Restore a few macros that were lost in the way.
+ *
  * Revision 1.2  2004/08/24 13:32:14  bernie
  * PP_CAT(), PP_STRINGIZE(): Move back to compiler.h to break circular dependency between cpu.h/compiler.h/macros.h;
  * offsetof(), countof(): Move back to compiler.h to avoid including macros.h almost everywhere;
@@ -45,10 +48,30 @@
 
 #include <compiler.h>
 
-/* Simple macros */
-#define ABS(a)      (((a) < 0) ? -(a) : (a))
-#define MIN(a,b)    (((a) < (b)) ? (a) : (b))
-#define MAX(a,b)    (((a) > (b)) ? (a) : (b))
+/* Type-generic macros */
+#if GNUC_PREREQ(2,0)
+	#define ABS(n) ({ \
+		__typeof__(n) _n = (n); \
+		(_n < 0) ? -_n : _n; \
+	})
+	#define MIN(a,b) ({ \
+		__typeof__(a) _a = (a); \
+		__typeof__(b) _b = (b); \
+		(void)(&_a == &_b); /* ensure same type */ \
+		(_a < _b) ? _a : _b; \
+	})
+	#define MAX(a,b) ({ \
+		__typeof__(a) _a = (a); \
+		__typeof__(b) _b = (b); \
+		(void)(&_a == &_b); /* ensure same type */ \
+		(_a > _b) ? _a : _b; \
+	})
+#else /* !GNUC */
+	/* Buggy macros for inferior compilers.  */
+	#define ABS(a)		(((a) < 0) ? -(a) : (a))
+	#define MIN(a,b)	(((a) < (b)) ? (a) : (b))
+	#define MAX(a,b)	(((a) > (b)) ? (a) : (b))
+#endif /* !GNUC */
 
 #ifndef BV
 /*! Convert a bit value to a binary flag */
@@ -89,8 +112,7 @@
 
 /*! Issue a compilation error if the \a condition is false */
 #define STATIC_ASSERT(condition)  \
-	extern char CT_ASSERT___[(condition) ? 1 : -1]
-
+	extern char PP_CAT(CT_ASSERT___, __LINE__)[(condition) ? 1 : -1]
 
 #if COMPILER_C99
 	/*!
