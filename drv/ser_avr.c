@@ -38,6 +38,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.17  2004/10/19 07:52:35  bernie
+ *#* Reset parity bits before overwriting them (Fixed by batt in project_ks).
+ *#*
  *#* Revision 1.16  2004/10/03 18:45:48  bernie
  *#* Convert to new-style config macros; Allow compiling with a C++ compiler (mostly).
  *#*
@@ -372,7 +375,7 @@ static void uart0_setbaudrate(UNUSED(struct SerialHardware *, _hw), unsigned lon
 static void uart0_setparity(UNUSED(struct SerialHardware *, _hw), int parity)
 {
 #if !CPU_AVR_ATMEGA103
-	UCSR0C |= (parity) << UPM0;
+	UCSR0C = (UCSR0C & ~(BV(UPM1) | BV(UPM0))) | ((parity) << UPM0);
 #endif
 }
 
@@ -420,7 +423,7 @@ static void uart1_setbaudrate(UNUSED(struct SerialHardware *, _hw), unsigned lon
 
 static void uart1_setparity(UNUSED(struct SerialHardware *, _hw), int parity)
 {
-	UCSR1C |= (parity) << UPM0;
+	UCSR1C = (UCSR1C & ~(BV(UPM1) | BV(UPM0))) | ((parity) << UPM0);
 }
 
 #endif // AVR_HAS_UART1
