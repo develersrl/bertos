@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.14  2004/08/10 06:56:29  bernie
+ * RESTRICT: New C99-like macro; STATIC_ASSERT: Fix warning for multiple invocation in one file.
+ *
  * Revision 1.13  2004/08/02 20:20:29  aleph
  * Merge from project_ks
  *
@@ -137,6 +140,7 @@
 	#define INLINE                  static inline __attribute__((__always_inline__))
 	#define LIKELY(x)               __builtin_expect((x), 1)
 	#define UNLIKELY(x)             __builtin_expect((x), 0)
+	#define RESTRICT		__restrict__
 	#if GNUC_PREREQ(3,1)
 		#define DEPRECATED      __attribute__((__deprecated__))
 	#endif
@@ -211,6 +215,9 @@
 #endif
 #ifndef UNLIKELY
 #define UNLIKELY(x)            x
+#endif
+#ifndef RESTRICT
+#define RESTRICT
 #endif
 
 /* Support for harvard architectures */
@@ -322,7 +329,7 @@
 
 /*! Issue a compilation error if the \a condition is false */
 #define STATIC_ASSERT(condition)  \
-	extern char CT_ASSERT___[(condition) ? 1 : -1]
+	extern char PP_CAT(CT_ASSERT___, __LINE__)[(condition) ? 1 : -1]
 
 /*
  * Standard type definitions
