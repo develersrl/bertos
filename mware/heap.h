@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.1  2004/07/31 16:33:58  rasky
+ * Spostato lo heap da kern/ a mware/
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
