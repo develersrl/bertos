@@ -38,6 +38,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.20  2004/12/13 11:51:43  bernie
+ *#* Fix a latent bug with reentrant serial IRQs.
+ *#*
  *#* Revision 1.19  2004/12/13 11:51:08  bernie
  *#* DISABLE_INTS/ENABLE_INTS: Convert to IRQ_DISABLE/IRQ_ENABLE.
  *#*
@@ -824,6 +827,7 @@ SIGNAL(SIG_UART1_RECV)
 #endif
 	}
 	/* Re-enable receive complete int */
+	//IRQ_DISABLE;
 	//UCSR1B |= BV(RXCIE);
 
 	SER_STROBE_OFF;
