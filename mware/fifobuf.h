@@ -43,6 +43,9 @@
 
 /*
  * $Log$
+ * Revision 1.11  2004/07/30 14:15:53  rasky
+ * Nuovo supporto unificato per detect della CPU
+ *
  * Revision 1.10  2004/07/29 22:57:09  bernie
  * Doxygen fix.
  *
@@ -184,14 +187,14 @@ INLINE void fifo_flush(FIFOBuffer *fb)
 }
 
 
-#if !defined(__AVR__)
+#if !CPU_AVR
 
 	/* No tricks needed on 16/32bit CPUs */
 #	define fifo_isempty_locked(fb) fifo_isempty((fb))
 #	define fifo_push_locked(fb, c) fifo_push((fb), (c))
-#	define fifo_flush_locked(fb, c) fifo_flush((fb), (c))
+#	define fifo_flush_locked(fb) fifo_flush((fb))
 
-#else /* !__AVR__ */
+#else /* !CPU_AVR */
 
 	/*!
 	 * Similar to fifo_isempty(), but with stronger guarantees for

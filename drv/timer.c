@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.10  2004/07/30 14:15:53  rasky
+ * Nuovo supporto unificato per detect della CPU
+ *
  * Revision 1.9  2004/07/21 00:15:13  bernie
  * Put timer driver on diet.
  *
@@ -44,23 +47,11 @@
 #include "hw.h"
 #include "kdebug.h"
 #include "timer.h"
+#include CPU_HEADER(timer)
 
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 	#include <kern/proc.h>
 #endif
-
-#if defined(ARCH_EMUL) && (ARCH & ARCH_EMUL)
-	#error To be recoded
-#elif defined(__AVR__)
-	#include "timer_avr.h"
-#elif defined(__IAR_SYSTEMS_ICC) || defined(__IAR_SYSTEMS_ICC__) /* 80C196 */
-	#include "timer_i196.h"
-#elif defined (__m56800__)
-	#include "timer_dsp56k.h"
-#else
-	#error Unknown system
-#endif
-
 
 //! Master system clock (1ms accuracy)
 volatile time_t _clock;

@@ -14,6 +14,9 @@
 
 /*
  * $Log$
+ * Revision 1.7  2004/07/30 14:15:53  rasky
+ * Nuovo supporto unificato per detect della CPU
+ *
  * Revision 1.6  2004/07/29 22:57:09  bernie
  * ser_drain(): New function; Make Serial::is_open a debug-only feature; Switch to new-style CONFIG_* macros.
  *
@@ -48,7 +51,7 @@
  *        which are from 0x0100 to 0x8000
  */
 /*\{*/
-#if defined(__AVR__)
+#if CPU_AVR
 	typedef uint8_t serstatus_t;
 
 	/* Software errors */
@@ -60,7 +63,7 @@
 	#define SERRF_RXSROVERRUN    BV(3)  /*!< Rx shift register overrun */
 	#define SERRF_FRAMEERROR     BV(4)  /*!< Stop bit missing */
 	#define SERRF_PARITYERROR    BV(7)  /*!< Parity error */
-#elif defined(__m56800__)
+#elif CPU_DSP56K
 	typedef uint16_t serstatus_t;
 
 	/* Software errors */
@@ -92,14 +95,14 @@
  */
 enum
 {
-#if defined(__AVR_ATmega64__) || defined(__AVR_ATmega128__)
+#if defined(CPU_AVR_ATMEGA64) || defined(CPU_AVR_ATMEGA128)
 	SER_UART0,
 	SER_UART1,
 	SER_SPI,
-#elif defined(__AVR_ATmega103__) || defined(__AVR_ATmega8__)
+#elif defined(CPU_AVR_ATMEGA103) || defined(CPU_AVR_ATMEGA8)
 	SER_UART0,
 	SER_SPI,
-#elif defined (__m56800__)
+#elif CPU_DSP56K
 	SER_UART0,
 	SER_UART1,
 #else

@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.10  2004/07/30 14:15:53  rasky
+ * Nuovo supporto unificato per detect della CPU
+ *
  * Revision 1.9  2004/07/29 22:57:09  bernie
  * vsprintf(): Remove prototype for backwards compatibility with GCC 3.4; ssize_t: Add definition for inferior compilers.
  *
@@ -50,6 +53,7 @@
 #define COMPILER_H
 
 #include "arch_config.h"
+#include "cpu_detect.h"
 
 
 #if defined __GNUC__ && defined __GNUC_MINOR__
@@ -125,7 +129,7 @@
 		#define DEPRECATED      __attribute__((__deprecated__))
 	#endif
 
-	#if defined(__i386__)
+	#if CPU_X86
 
 		/* hack to avoid conflicts with system type */
 		#define sigset_t system_sigset_t
@@ -134,7 +138,7 @@
 		#include <stdbool.h>
 		#undef system_sigset_t
 
-	#elif defined(__AVR__)
+	#elif CPU_AVR
 
 		#include <stddef.h>
 		#include <stdbool.h>
@@ -151,14 +155,17 @@
 			#define PGM_ATTR        PROGMEM
 		#endif
 
-	#endif /* CPU */
+	#endif
 
-#elif defined(__MWERKS__) && (defined(__m56800E__) || defined(__m56800__))
+#elif defined(__MWERKS__) && CPU_DSP56K
 
 	#include <stdint.h>
 	#include <stddef.h>
 	#include <stdbool.h>
 	#include <setjmp.h>
+
+	// CodeWarrior has size_t as built-in type, but does not define this symbol.
+	#define _SIZE_T_DEFINED
 
 #else
 	#error unknown compiler
@@ -301,6 +308,7 @@ typedef unsigned char page_t;
 	typedef unsigned short int  uint16_t;
 	typedef unsigned long int   uint32_t;
 #elif defined(__AVR__)
+	/* TODO: should this detect GCC+AVR combo, or just CPU_AVR? */
 	/* avr-libc is weird... */
 	#include <inttypes.h>
 #else
@@ -316,7 +324,7 @@ typedef unsigned char page_t;
  *
  * \{
  */
-#if (defined(__m56800E__) || defined(__m56800__))
+#if CPU_DSP56K
 	/* Registers can be accessed only through 16-bit pointers */
 	typedef volatile uint16_t  reg16_t;
 #else

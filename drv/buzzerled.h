@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/07/30 14:15:53  rasky
+ * Nuovo supporto unificato per detect della CPU
+ *
  * Revision 1.3  2004/07/14 14:04:29  rasky
  * Merge da SC: spostata bld_set inline perché si ottimizza parecchio tramite propagazione di costanti
  *
@@ -29,6 +32,8 @@
 #ifndef DRV_BUZZERLED_H
 #define DRV_BUZZERLED_H
 
+#include <cpu.h>
+
 /*! Include hw.h. We expect hw.h to define enum BLD_DEVICE, which must contain
  *  an enumarator for each device, plus a special symbol NUM_BLDS containing the
  *  number of devices.
@@ -40,11 +45,7 @@
  * should allow fast constant propagation for the common case (where the parameter
  * device is a constant).
  */
-#if defined(__m56800__)
-	#include "buzzerled_dsp56k.h"
-#else
-	#error Unsupported architecture
-#endif
+#include CPU_HEADER(buzzerled)
 
 
 /*! Initialize the buzzerled library.

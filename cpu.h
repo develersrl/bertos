@@ -17,6 +17,9 @@
 
 /*
  * $Log$
+ * Revision 1.8  2004/07/30 14:15:53  rasky
+ * Nuovo supporto unificato per detect della CPU
+ *
  * Revision 1.7  2004/07/20 23:26:48  bernie
  * Fix two errors introduced by previous commit.
  *
@@ -44,15 +47,19 @@
 
 #include "compiler.h"
 
+
 //! Initialization value for registers in stack frame
 #define CPU_REG_INIT_VALUE(reg)     0
 
-// Macros for determining CPU endianness
+// Macros for determining CPU endianess
 #define CPU_BIG_ENDIAN    0x1234
 #define CPU_LITTLE_ENDIAN 0x3412
 
+// Macros to include cpu-specific version of the headers
+#define CPU_HEADER(module)          PP_STRINGIZE(PP_CAT4(module, _, CPU_ID, .h))
 
-#if defined(__IAR_SYSTEMS_ICC) || defined(__IAR_SYSTEMS_ICC__)  /* 80C196 */
+
+#if CPU_I196
 
 	#define DISABLE_INTS            disable_interrupt()
 	#define ENABLE_INTS             enable_interrupt()
@@ -66,7 +73,7 @@
 	#define CPU_SP_ON_EMPTY_SLOT	0
 	#define CPU_BYTE_ORDER          CPU_LITTLE_ENDIAN
 
-#elif defined(__i386__) || defined(_MSC_VER) /* x86 */
+#elif CPU_X86
 
 	#define NOP                     asm volatile ("nop")
 	#define DISABLE_INTS            /* nothing */
@@ -80,7 +87,7 @@
 	#define CPU_SP_ON_EMPTY_SLOT	0
 	#define CPU_BYTE_ORDER          CPU_LITTLE_ENDIAN
 
-#elif defined(__m56800E__) || defined(__m56800__) /* DSP56K */
+#elif CPU_DSP56K
 
 	#define NOP                     asm(nop)
 	#define DISABLE_INTS            do { asm(bfset #0x0200,SR); asm(nop); } while (0)
@@ -144,8 +151,6 @@
 	#define CPU_STACK_GROWS_UPWARD  0
 	#define CPU_SP_ON_EMPTY_SLOT	1
 	#define CPU_BYTE_ORDER          CPU_LITTLE_ENDIAN
-#else
-	#error Unknown CPU
 #endif
 
 
@@ -192,7 +197,7 @@
 #endif
 
 
-#if defined(__m56800E__) || defined(__m56800__)
+#if CPU_DSP56K
 	/* DSP56k pushes both PC and SR to the stack in the JSR instruction, but
 	 * RTS discards SR while returning (it does not restore it). So we push
 	 * 0 to fake the same context.

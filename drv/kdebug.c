@@ -16,6 +16,9 @@
 
 /*
  * $Log$
+ * Revision 1.7  2004/07/30 14:15:53  rasky
+ * Nuovo supporto unificato per detect della CPU
+ *
  * Revision 1.6  2004/07/18 21:49:28  bernie
  * Add ATmega8 support.
  *
@@ -49,7 +52,7 @@
 	#define KDBG_WRITE_CHAR(c)     putchar((c))
 	#define KDBG_MASK_IRQ(old)     do {/*nop*/} while(0)
 	#define KDBG_RESTORE_IRQ()     do {/*nop*/} while(0)
-#elif defined(__I196__)
+#elif CPU_I196
 	#include "Util196.h"
 	#define KDBG_WAIT_READY()      do {} while (!(SP_STAT & (SPSF_TX_EMPTY | SPSF_TX_INT)))
 	#define KDBG_WRITE_CHAR(c)     do { SBUF = (c); } while(0)
@@ -59,7 +62,7 @@
 			INT_MASK1 &= ~INT1F_TI; \
 		} while(0)
 	#define KDBG_RESTORE_IRQ(old)  do { INT_MASK1 |= (old); }
-#elif defined(__AVR__)
+#elif CPU_AVR
 	#include <avr/io.h>
 	#if CONFIG_KDEBUG_PORT == 0
 		#if defined(__AVR_ATmega64__)
@@ -82,7 +85,7 @@
 	#else
 		#error CONFIG_KDEBUG_PORT should be either 0 or 1
 	#endif
-#elif defined(__MWERKS__) && (defined(__m56800E__) || defined(__m56800__))
+#elif defined(__MWERKS__) && CPU_DSP56K
 	/* Debugging go through the JTAG interface. The MSL library already
 	   implements the console I/O correctly. */
 	#include <stdio.h>
@@ -97,7 +100,7 @@
 
 void kdbg_init(void)
 {
-#if defined(__I196__)
+#if CPU_I196
 
 	/* Set serial port for 19200bps 8N1 */
 	INT_MASK1 &= ~(INT1F_TI | INT1F_RI);
@@ -107,7 +110,7 @@ void kdbg_init(void)
 	BAUD_RATE = 0x33;
 	BAUD_RATE = 0x80;
 
-#elif defined(__AVR__)
+#elif CPU_AVR
 
 	/* Compute the baud rate */
 	uint16_t period = (((CLOCK_FREQ / 16UL) + (CONFIG_KDEBUG_BAUDRATE / 2)) / CONFIG_KDEBUG_BAUDRATE) - 1;
@@ -131,7 +134,7 @@ void kdbg_init(void)
 		#error Unknown arch
 	#endif
 
-#endif /* !__I196__ && !__AVR__ */
+#endif /* !CPU_I196 && !CPU_AVR */
 
 	kputs("\n\n*** DBG START ***\n");
 }
