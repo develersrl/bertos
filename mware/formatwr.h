@@ -12,6 +12,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2005/01/08 08:50:06  bernie
+ *#* Make more portable.
+ *#*
  *#* Revision 1.5  2004/08/25 14:12:09  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -31,8 +34,9 @@
 #ifndef MWARE_FORMATWR_H
 #define MWARE_FORMATWR_H
 
-#include <stdarg.h>
+#include <stdarg.h> /* va_list */
 #include <config.h>
+#include <cpu.h>    /* CPU_HARVARD */
 
 /*!
  * \name _formatted_write() configuration
@@ -57,14 +61,13 @@ _formatted_write(
 	void *user_data,
 	va_list ap);
 
-#ifdef __AVR__
-	#include <avr/pgmspace.h>
+#if CPU_HARVARD
 	int _formatted_write_P(
 		const char * PROGMEM format,
 		void put_char_func(char c, void *user_data),
 		void *user_data,
 		va_list ap);
-#endif /* __AVR__ */
+#endif /* CPU_HARVARD */
 
 #endif /* MWARE_FORMATWR_H */
 
