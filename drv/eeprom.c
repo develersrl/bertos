@@ -8,14 +8,18 @@
  * \version $Id$
  *
  * \author Stefano Fedrigo <aleph@develer.com>
+ * \author Bernardo Innocenti <bernie@develer.com>
  *
- * \brief I2C eeprom driver
+ * \brief Driver for the 24xx16 and 24xx256 I2C EEPROMS (implementation)
  *
  * \note This implementation is AVR specific.
  */
 
 /*
  * $Log$
+ * Revision 1.3  2004/07/29 22:57:09  bernie
+ * Add 24LC16 support.
+ *
  * Revision 1.2  2004/07/22 01:24:43  bernie
  * Document AVR dependency.
  *
@@ -23,14 +27,12 @@
  * Import into DevLib.
  *
  */
-
 #include "eeprom.h"
 #include <mware/byteorder.h> /* cpu_to_be16() */
 #include <drv/kdebug.h>
 #include <hw.h>
 
 #include <avr/twi.h>
-
 
 /* Wait for TWINT flag set: bus is ready */
 #define WAIT_TWI_READY  do {} while (!(TWCR & BV(TWINT)))
@@ -67,16 +69,17 @@ static bool twi_start(void)
  */
 static bool twi_start_w(uint8_t slave_addr)
 {
-	//TRACE;
+	ASSERT(slave_addr < 8);
 
-	/* Do a loop on the select write sequence because if the
-	 * eeprom is busy writing precedently sent data it will respond
-	 * with NACK to the SLA_W control byte. In this case we have
-	 * to try until the eeprom reply with an ACK.
+	/*
+	 * Loop on the select write sequence: when the eeprom is busy
+	 * writing previously sent data it will reply to the SLA_W
+	 * control byte with a NACK.  In this case, we must
+	 * keep trying until the eeprom responds with an ACK.
 	 */
 	while (twi_start())
 	{
-		TWDR = SLA_W | ((slave_addr & 0x5) << 1);
+		TWDR = SLA_W | (slave_addr << 1);
 		TWCR = BV(TWINT) | BV(TWEN);
 		WAIT_TWI_READY;
 
@@ -100,11 +103,11 @@ static bool twi_start_w(uint8_t slave_addr)
  */
 static bool twi_start_r(uint8_t slave_addr)
 {
-	//TRACE;
+	ASSERT(slave_addr < 8);
 
 	if (twi_start())
 	{
-		TWDR = SLA_R | ((slave_addr & 0x5) << 1);
+		TWDR = SLA_R | (slave_addr << 1);
 		TWCR = BV(TWINT) | BV(TWEN);
 		WAIT_TWI_READY;
 
@@ -123,8 +126,6 @@ static bool twi_start_r(uint8_t slave_addr)
  */
 static void twi_stop(void)
 {
-	//TRACE;
-
 	TWCR = BV(TWINT) | BV(TWEN) | BV(TWSTO);
 }
 
@@ -137,8 +138,6 @@ static void twi_stop(void)
  */
 static bool twi_send(const uint8_t *buf, size_t count)
 {
-	//TRACE;
-
 	while (count--)
 	{
 		TWDR = *buf++;
@@ -166,8 +165,6 @@ static bool twi_send(const uint8_t *buf, size_t count)
  */
 static bool twi_recv(uint8_t *buf, size_t count)
 {
-	//TRACE;
-
 	/*
 	 * When reading the last byte the TWEA bit is not
 	 * set, and the eeprom should answer with NACK
@@ -199,27 +196,66 @@ static bool twi_recv(uint8_t *buf, size_t count)
 	return true;
 }
 
-
 /*!
  * Copy \c count bytes from buffer \c buf to
  * eeprom at address \c addr.
- *
- * \note No check is done for data crossing page
- *       boundaries.
  */
 bool eeprom_write(e2addr_t addr, const void *buf, size_t count)
 {
-	// eeprom accepts address as big endian
-	addr = cpu_to_be16(addr);
+	bool result = true;
+	ASSERT(addr + count <= EEPROM_SIZE);
 
-	bool res =
-		twi_start_w(0)
-		&& twi_send((uint8_t *)&addr, sizeof(addr))
-		&& twi_send(buf, count);
+	while (count && result)
+	{
+		/*
+		 * Split write in multiple sequential mode operations that
+		 * don't cross page boundaries.
+		 */
+		size_t size =
+			MIN(count, (size_t)(EEPROM_BLKSIZE - (addr & (EEPROM_BLKSIZE - 1))));
 
-	twi_stop();
+	#if CONFIG_EEPROM_TYPE == EEPROM_24XX16
+		/*
+		 * The 24LC16 uses the slave address as a 3-bit
+		 * block address.
+		 */
+		uint8_t blk_addr = (uint8_t)((addr >> 8) & 0x07);
+		uint8_t blk_offs = (uint8_t)addr;
 
-	return res;
+		result =
+			twi_start_w(blk_addr)
+			&& twi_send(&blk_offs, sizeof blk_offs)
+			&& twi_send(buf, size);
+
+	#elif CONFIG_EEPROM_TYPE == EEPROM_24XX256
+
+		// 24LC256 wants big-endian addresses
+		uint16_t addr_be = cpu_to_be16(addr);
+
+		result =
+			twi_start_w(0)
+			&& twi_send((uint8_t *)&addr_be, sizeof addr_be)
+			&& twi_send(buf, size);
+
+	#else
+		#error Unknown device type
+	#endif
+
+		twi_stop();
+
+		// DEBUG
+		//kprintf("addr=%d, count=%d, size=%d, *#?=%d\n",
+		//	addr, count, size,
+		//	(EEPROM_BLKSIZE - (addr & (EEPROM_BLKSIZE - 1)))
+		//);
+
+		/* Update count and addr for next operation */
+		count -= size;
+		addr += size;
+		buf = ((const char *)buf) + size;
+	}
+
+	return result;
 }
 
 
@@ -229,7 +265,25 @@ bool eeprom_write(e2addr_t addr, const void *buf, size_t count)
  */
 bool eeprom_read(e2addr_t addr, void *buf, size_t count)
 {
-	// eeprom accepts address as big endian
+	ASSERT(addr + count <= EEPROM_SIZE);
+
+#if CONFIG_EEPROM_TYPE == EEPROM_24XX16
+	/*
+	 * The 24LC16 uses the slave address as a 3-bit
+	 * block address.
+	 */
+	uint8_t blk_addr = (uint8_t)((addr >> 8) & 0x07);
+	uint8_t blk_offs = (uint8_t)addr;
+
+	bool res =
+		twi_start_w(blk_addr)
+		&& twi_send(&blk_offs, sizeof blk_offs)
+		&& twi_start_r(blk_addr)
+		&& twi_recv(buf, count);
+
+#elif CONFIG_EEPROM_TYPE == EEPROM_24XX256
+
+	// 24LC256 wants big-endian addresses
 	addr = cpu_to_be16(addr);
 
 	bool res =
@@ -237,6 +291,9 @@ bool eeprom_read(e2addr_t addr, void *buf, size_t count)
 		&& twi_send((uint8_t *)&addr, sizeof(addr))
 		&& twi_start_r(0)
 		&& twi_recv(buf, count);
+#else
+	#error Unknown device type
+#endif
 
 	twi_stop();
 
@@ -277,18 +334,26 @@ void eeprom_init(void)
 	cpuflags_t flags;
 	DISABLE_IRQSAVE(flags);
 
-	DDRD |= BV(PORTD0) | BV(PORTD1);
-	PORTD |= BV(PORTD0) | BV(PORTD1);
+#if defined(__AVR_ATmega64__)
+	PORTD |= BV(PD0) | BV(PD1);
+	DDRD |= BV(PD0) | BV(PD1);
+#elif defined(__AVR_ATmega8__)
+	PORTC |= BV(PC4) | BV(PC5);
+	DDRC |= BV(PC4) | BV(PC5);
+#else
+	#error Unsupported architecture
+#endif
 
 	/*
 	 * Set speed:
 	 * F = CLOCK_FREQ / (16 + 2*TWBR * 4^TWPS)
 	 */
-#	define TWI_FREQ  300000  /* 300 kHz */
-#	define TWI_PRESC 1       /* 4 ^ TWPS */
+	#define TWI_FREQ  300000  /* 300 kHz */
+	#define TWI_PRESC 1       /* 4 ^ TWPS */
 
 	TWBR = (CLOCK_FREQ / (2 * TWI_FREQ * TWI_PRESC)) - (8 / TWI_PRESC);
 	TWSR = 0;
+	TWCR = BV(TWEN);
 
 	ENABLE_IRQRESTORE(flags);
 }
@@ -296,16 +361,34 @@ void eeprom_init(void)
 
 #ifdef _DEBUG
 
+#include <string.h>
+
 void eeprom_test(void)
 {
-	static const char magic[] = "Humpty Dumpty";
-	char buf[sizeof magic];
+	static const char magic[13] = "Humpty Dumpty";
+	char buf[sizeof magic + 1];
+	size_t i;
 
-	// Write something to EEPROM and read it back
-	eeprom_write(0, magic, sizeof magic);
-	eeprom_read(0, buf, sizeof buf);
-	kprintf("EEPROM read: %s\n", buf);
+	// Write something to EEPROM using unaligned sequential writes
+	for (i = 0; i < 42; ++i)
+		eeprom_write(i * sizeof magic, magic, sizeof magic);
+
+	// Read back with single-byte reads
+	for (i = 0; i < 42 * sizeof magic; ++i)
+	{
+		eeprom_read(i, buf, 1);
+		kprintf("EEPROM byte read: %c (%d)\n", buf[0], buf[0]);
+		ASSERT(buf[0] == magic[i % sizeof magic]);
+	}
+
+	// Read back again using sequential reads
+	for (i = 0; i < 42; ++i)
+	{
+		memset(buf, 0, sizeof buf);
+		eeprom_read(i * sizeof magic, buf, sizeof magic);
+		kprintf("EEPROM seq read @ 0x%x: '%s'\n", i * sizeof magic, buf);
+		ASSERT(memcmp(buf, magic, sizeof magic) == 0);
+	}
 }
 
 #endif // _DEBUG
-
