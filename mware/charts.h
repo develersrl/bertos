@@ -18,8 +18,8 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.4  2004/08/25 14:12:09  rasky
- *#* Aggiornato il comment block dei log RCS
+ *#* Revision 1.5  2004/09/14 20:56:39  bernie
+ *#* Make more generic and adapt to new gfx functions.
  *#*
  *#* Revision 1.3  2004/08/11 19:39:12  bernie
  *#* Use chart_x_t and chart_y_t for the input dataset.
@@ -39,7 +39,7 @@
  * \{
  */
 #define TICKS_HEIGHT     2
-#define TICKS_WIDTH      3
+#define TICKS_WIDTH      2
 /*\}*/
 
 /*!
@@ -47,17 +47,9 @@
  * \{
  */
 #define CHART_BORDERTOP       0
-#define CHART_BORDERBOTTOM    TICKS_HEIGHT
-#define CHART_BORDERLEFT      TICKS_WIDTH
+#define CHART_BORDERBOTTOM    0
+#define CHART_BORDERLEFT      0
 #define CHART_BORDERRIGHT     0
-/*\}*/
-
-/*!
- * \name Chart size in pixels
- * \{
- */
-#define CHART_WIDTH     (bm->width - CHART_BORDERLEFT - CHART_BORDERRIGHT)
-#define CHART_HEIGHT    (bm->height  - CHART_BORDERTOP - CHART_BORDERBOTTOM)
 /*\}*/
 
 #ifndef CONFIG_CHART_TYPE_X
@@ -73,9 +65,10 @@ typedef CONFIG_CHART_TYPE_Y chart_y_t;
 
 
 /* Public function protos */
-extern void chart_init(Bitmap *bm, vcoord_t xmin, vcoord_t ymin, vcoord_t xmax, vcoord_t ymax);
-extern void chart_drawAxis(Bitmap *bm);
-extern void chart_drawCurve(Bitmap *bm, const chart_y_t *curve_y, int curve_cnt);
-extern void chart_drawDots(Bitmap *bm, const chart_x_t *dots_x, const chart_y_t *dots_y, int cnt);
+void chart_init(Bitmap *bm, coord_t xmin, coord_t ymin, coord_t xmax, coord_t ymax);
+void chart_setScale(Bitmap *bm, chart_x_t xmin, chart_y_t ymin, chart_x_t xmax, chart_y_t ymax);
+void chart_drawAxis(Bitmap *bm);
+void chart_drawCurve(Bitmap *bm, const chart_y_t *curve_y, int curve_cnt);
+void chart_drawDots(Bitmap *bm, const chart_x_t *dots_x, const chart_y_t *dots_y, int cnt);
 
 #endif /* MWARE_CHARTS_H */
