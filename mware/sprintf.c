@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2005/02/18 12:48:01  bernie
+ *#* Fix bug with NULL buffers (caught with unit test).
+ *#*
  *#* Revision 1.8  2005/02/18 12:34:29  bernie
  *#* Include <mware/pgm.h> explicitly for non-Harvard archs.
  *#*
@@ -61,15 +64,20 @@ static void __null_put_char(UNUSED_ARG(char, c), UNUSED_ARG(void *, ptr))
 }
 
 
-int PGM_FUNC(vsprintf)(char * str, const char * PGM_ATTR fmt, va_list ap)
+int PGM_FUNC(vsprintf)(char *str, const char * PGM_ATTR fmt, va_list ap)
 {
 	int result;
 
-	result = PGM_FUNC(_formatted_write)(
-			fmt, (str ? __str_put_char : __null_put_char), &str, ap);
+	if (str)
+	{
+		result = PGM_FUNC(_formatted_write)(fmt, __str_put_char, &str, ap);
 
-	/* Terminate string */
-	*str = '\0';
+		/* Terminate string */
+		*str = '\0';
+	}
+	else
+		result = PGM_FUNC(_formatted_write)(fmt, __null_put_char, 0, ap);
+
 
 	return result;
 }
@@ -118,15 +126,19 @@ int PGM_FUNC(vsnprintf)(char *str, size_t size, const char * PGM_ATTR fmt, va_li
 	/* Make room for traling '\0'. */
 	if (size--)
 	{
-		struct __sn_state state;
-		state.str = str;
-		state.len = size;
+		if (str)
+		{
+			struct __sn_state state;
+			state.str = str;
+			state.len = size;
 
-		result = PGM_FUNC(_formatted_write)(
-			fmt, (str ? __sn_put_char : __null_put_char), &state, ap);
+			result = PGM_FUNC(_formatted_write)(fmt, __sn_put_char, &state, ap);
 
-		/* Terminate string. */
-		*state.str = '\0';
+			/* Terminate string. */
+			*state.str = '\0';
+		}
+		else
+			result = PGM_FUNC(_formatted_write)(fmt, __null_put_char, 0, ap);
 	}
 
 	return result;
