@@ -28,6 +28,9 @@
 
 /*
  * $Log$
+ * Revision 1.5  2004/06/06 16:41:44  bernie
+ * ser_putchar(): Use fifo_push_locked() to fix potential race on 8bit processors.
+ *
  * Revision 1.4  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -96,7 +99,7 @@ int ser_putchar(int c, struct Serial *port)
 		while (fifo_isfull_locked(&port->txfifo));
 	}
 
-	fifo_push(&port->txfifo, (unsigned char)c);
+	fifo_push_locked(&port->txfifo, (unsigned char)c);
 
 	/* (re)trigger tx interrupt */
 	port->hw->table->enabletxirq(port->hw);
