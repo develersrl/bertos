@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.17  2004/09/14 21:07:09  bernie
+ *#* Include hw.h explicitly.
+ *#*
  *#* Revision 1.16  2004/09/06 21:49:26  bernie
  *#* CONFIG_TIMER_STROBE: be tolerant with missing optional macro.
  *#*
@@ -43,6 +46,8 @@
 #define DRV_TIMER_AVR_H
 
 #include <arch_config.h> // ARCH_BOARD_KC
+#include "hw.h"
+
 #include <avr/wdt.h>
 #include <avr/signal.h>
 
