@@ -16,6 +16,9 @@
 
 /*
  * $Log$
+ * Revision 1.5  2004/08/12 23:46:21  bernie
+ * Remove extra indentation level in switch statements.
+ *
  * Revision 1.4  2004/08/12 23:35:50  bernie
  * Replace a handmade loop with memset().
  *
@@ -192,136 +195,136 @@ bool xmodem_recv(KFile *fd)
 
 		switch (ser_getchar())
 		{
-			case XM_STX:  /* Start of header (1024-byte block) */
-				blocksize = 1024;
-				goto getblock;
+		case XM_STX:  /* Start of header (1024-byte block) */
+			blocksize = 1024;
+			goto getblock;
 
-			case XM_SOH:  /* Start of header (128-byte block) */
-				blocksize = 128;
+		case XM_SOH:  /* Start of header (128-byte block) */
+			blocksize = 128;
 
-			getblock:
-				/* Get block number */
-				c = ser_getchar();
+		getblock:
+			/* Get block number */
+			c = ser_getchar();
 
-				/* Check complemented block number */
-				if ((~c & 0xff) != ser_getchar())
-				{
-					lcd_printf(0, 3, LCD_FILL, "Bad blk (%d)", c);
-					purge = true;
-					break;
-				}
+			/* Check complemented block number */
+			if ((~c & 0xff) != ser_getchar())
+			{
+				lcd_printf(0, 3, LCD_FILL, "Bad blk (%d)", c);
+				purge = true;
+				break;
+			}
 
-				/* Determine which block is being sent */
-				if (c == (blocknr & 0xff))
-					/* Last block repeated */
-					lcd_printf(0, 2, LCD_FILL, "Repeat blk %d", blocknr);
-				else if (c == ((blocknr + 1) & 0xff))
-					/* Next block */
-					lcd_printf(0, 2, LCD_FILL, "Recv blk %d", ++blocknr);
-				else
-				{
-					/* Sync lost */
-					lcd_printf(0, 3, LCD_FILL, "Sync lost (%d/%d)", c, blocknr);
-					purge = true;
-					break;
-				}
+			/* Determine which block is being sent */
+			if (c == (blocknr & 0xff))
+				/* Last block repeated */
+				lcd_printf(0, 2, LCD_FILL, "Repeat blk %d", blocknr);
+			else if (c == ((blocknr + 1) & 0xff))
+				/* Next block */
+				lcd_printf(0, 2, LCD_FILL, "Recv blk %d", ++blocknr);
+			else
+			{
+				/* Sync lost */
+				lcd_printf(0, 3, LCD_FILL, "Sync lost (%d/%d)", c, blocknr);
+				purge = true;
+				break;
+			}
 
-				buf = block_buffer;	/* Reset pointer to start of buffer */
-				checksum = 0;
-				crc = 0;
-				for (i = 0; i < blocksize; i++)
-				{
-					if ((c = ser_getchar()) == EOF)
-					{
-						purge = true;
-						break;
-					}
-
-					/* Store in buffer */
-					*buf++ = (char)c;
-
-					/* Calculate block checksum or CRC */
-					if (usecrc)
-						crc = UPDCRC16(c, crc);
-					else
-						checksum += (char)c;
-				}
-
-				if (purge)
-					break;
-
-				/* Get the checksum byte or the CRC-16 MSB */
+			buf = block_buffer;	/* Reset pointer to start of buffer */
+			checksum = 0;
+			crc = 0;
+			for (i = 0; i < blocksize; i++)
+			{
 				if ((c = ser_getchar()) == EOF)
 				{
 					purge = true;
 					break;
 				}
 
+				/* Store in buffer */
+				*buf++ = (char)c;
+
+				/* Calculate block checksum or CRC */
 				if (usecrc)
-				{
 					crc = UPDCRC16(c, crc);
+				else
+					checksum += (char)c;
+			}
 
-					/* Get CRC-16 LSB */
-					if ((c = ser_getchar()) == EOF)
-					{
-						purge = true;
-						break;
-					}
+			if (purge)
+				break;
 
-					crc = UPDCRC16(c, crc);
+			/* Get the checksum byte or the CRC-16 MSB */
+			if ((c = ser_getchar()) == EOF)
+			{
+				purge = true;
+				break;
+			}
 
-					if (crc)
-					{
-						lcd_printf(0, 3, LCD_FILL, "Bad CRC: %04x", crc);
-						purge = true;
-						break;
-					}
-				}
-				/* Compare the checksum */
-				else if (c != checksum)
+			if (usecrc)
+			{
+				crc = UPDCRC16(c, crc);
+
+				/* Get CRC-16 LSB */
+				if ((c = ser_getchar()) == EOF)
 				{
-					lcd_printf(0, 3, LCD_FILL, "Bad sum: %04x/%04x", checksum, c);
 					purge = true;
 					break;
 				}
 
-				/*
-				 * Avoid flushing the same block twice.
-				 * This could happen when the sender does not receive our
-				 * acknowledge and resends the same block.
-				 */
-				if (last_block_done < blocknr)
+				crc = UPDCRC16(c, crc);
+
+				if (crc)
 				{
-					/* Call user function to flush the buffer */
-					if (fd->write(fd, block_buffer, blocksize))
-					{
-						/* Acknowledge block and clear error counter */
-						ser_putchar(XM_ACK);
-						retries = 0;
-						last_block_done = blocknr;
-					}
-					else
-					{
-						/* User callback failed: abort transfer immediately */
-						retries = XM_MAXRETRIES;
-						purge = true;
-					}
+					lcd_printf(0, 3, LCD_FILL, "Bad CRC: %04x", crc);
+					purge = true;
+					break;
 				}
-				break;
-
-			case XM_EOT:	/* End of transmission */
-				ser_putchar(XM_ACK);
-				lcd_printf(0, 2, LCD_FILL, "Transfer completed");
-				return true;
-
-			case EOF: /* Timeout or serial error */
+			}
+			/* Compare the checksum */
+			else if (c != checksum)
+			{
+				lcd_printf(0, 3, LCD_FILL, "Bad sum: %04x/%04x", checksum, c);
 				purge = true;
 				break;
+			}
 
-			default:
-				lcd_printf(0, 3, LCD_FILL, "Skipping garbage");
-				purge = true;
-				break;
+			/*
+			 * Avoid flushing the same block twice.
+			 * This could happen when the sender does not receive our
+			 * acknowledge and resends the same block.
+			 */
+			if (last_block_done < blocknr)
+			{
+				/* Call user function to flush the buffer */
+				if (fd->write(fd, block_buffer, blocksize))
+				{
+					/* Acknowledge block and clear error counter */
+					ser_putchar(XM_ACK);
+					retries = 0;
+					last_block_done = blocknr;
+				}
+				else
+				{
+					/* User callback failed: abort transfer immediately */
+					retries = XM_MAXRETRIES;
+					purge = true;
+				}
+			}
+			break;
+
+		case XM_EOT:	/* End of transmission */
+			ser_putchar(XM_ACK);
+			lcd_printf(0, 2, LCD_FILL, "Transfer completed");
+			return true;
+
+		case EOF: /* Timeout or serial error */
+			purge = true;
+			break;
+
+		default:
+			lcd_printf(0, 3, LCD_FILL, "Skipping garbage");
+			purge = true;
+			break;
 		}
 	} /* End forever */
 }
@@ -351,53 +354,53 @@ bool xmodem_send(KFile *fd)
 
 			switch (c = ser_getchar())
 			{
-				case XM_NAK:
-				case XM_C:
-					if (blocknr == 1)
+			case XM_NAK:
+			case XM_C:
+				if (blocknr == 1)
+				{
+					if (c == XM_C)
 					{
-						if (c == XM_C)
-						{
-							lcd_printf(0, 2, LCD_FILL, "Tx start (CRC)");
-							usecrc = true;
-						}
-						else
-							lcd_printf(0, 2, LCD_FILL, "Tx start (BCC)");
-
-						/* Call user function to read in one block */
-						size = fd->read(fd, block_buffer, XM_BUFSIZE);
+						lcd_printf(0, 2, LCD_FILL, "Tx start (CRC)");
+						usecrc = true;
 					}
 					else
-						lcd_printf(0, 2, LCD_FILL, "Resend blk %d", blocknr);
-					proceed = true;
-					break;
-
-				case XM_ACK:
-					/* End of transfer? */
-					if (!size)
-						return true;
+						lcd_printf(0, 2, LCD_FILL, "Tx start (BCC)");
 
 					/* Call user function to read in one block */
 					size = fd->read(fd, block_buffer, XM_BUFSIZE);
-					blocknr++;
-					retries = 0;
-					proceed = true;
-					lcd_printf(0, 2, LCD_FILL, "Send blk %d", blocknr);
+				}
+				else
+					lcd_printf(0, 2, LCD_FILL, "Resend blk %d", blocknr);
+				proceed = true;
+				break;
+
+			case XM_ACK:
+				/* End of transfer? */
+				if (!size)
+					return true;
+
+				/* Call user function to read in one block */
+				size = fd->read(fd, block_buffer, XM_BUFSIZE);
+				blocknr++;
+				retries = 0;
+				proceed = true;
+				lcd_printf(0, 2, LCD_FILL, "Send blk %d", blocknr);
+				break;
+
+			case EOF:
+				retries++;
+				SerialError(retries);
+				if (retries <= XM_MAXRETRIES)
 					break;
+				/* falling through! */
 
-				case EOF:
-					retries++;
-					SerialError(retries);
-					if (retries <= XM_MAXRETRIES)
-						break;
-					/* falling through! */
+			case XM_CAN:
+				lcd_printf(0, 2, LCD_FILL, "Transfer aborted");
+				return false;
 
-				case XM_CAN:
-					lcd_printf(0, 2, LCD_FILL, "Transfer aborted");
-					return false;
-
-				default:
-					lcd_printf(0, 3, LCD_FILL, "Skipping garbage");
-					break;
+			default:
+				lcd_printf(0, 3, LCD_FILL, "Skipping garbage");
+				break;
 			}
 		}
 		while (!proceed);
