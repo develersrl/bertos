@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.2  2004/07/20 17:09:11  bernie
+ * swab16(), swab32(), cpu_to_be32(), cpu_to_le32(): New functions.
+ *
  * Revision 1.1  2004/07/20 16:26:15  bernie
  * Import byte-order macros into DevLib.
  *
@@ -26,22 +29,50 @@
 #include <compiler.h>
 #include <cpu.h>
 
-INLINE uint16_t cpu_to_be16(uint16_t n);
-INLINE uint16_t cpu_to_be16(uint16_t n)
+/*!
+ * \brief Swap upper and lower bytes in a 16-bit value.
+ */
+INLINE uint16_t swab16(uint16_t x);
+INLINE uint16_t swab16(uint16_t x)
 {
-	if (CPU_BYTE_ORDER == CPU_LITTLE_ENDIAN)
-		n = n << 8 | n >> 8;
-
-	return n;
+	return    ((x & (uint16_t)0x00FFU) << 8)
+		| ((x & (uint16_t)0xFF00U) >> 8);
 }
 
-INLINE uint16_t cpu_to_le16(uint16_t n);
-INLINE uint16_t cpu_to_le16(uint16_t n)
+/*!
+ * \brief Reverse bytes in a 32-bit value (e.g.: 0x12345678 -> 0x78563412).
+ */
+INLINE uint16_t swab32(uint16_t x);
+INLINE uint16_t swab32(uint16_t x)
 {
-	if (CPU_BYTE_ORDER == CPU_BIG_ENDIAN)
-		n = n << 8 | n >> 8;
+	return    ((x & (uint32_t)0x000000FFUL) << 24)
+		| ((x & (uint32_t)0x0000FF00UL) <<  8)
+		| ((x & (uint32_t)0x00FF0000UL) >>  8)
+		| ((x & (uint32_t)0xFF000000UL) >> 24);
+}
 
-	return n;
+INLINE uint16_t cpu_to_be16(uint16_t x);
+INLINE uint16_t cpu_to_be16(uint16_t x)
+{
+	return (CPU_BYTE_ORDER == CPU_LITTLE_ENDIAN) ? swab16(x) : x;
+}
+
+INLINE uint16_t cpu_to_le16(uint16_t x);
+INLINE uint16_t cpu_to_le16(uint16_t x)
+{
+	return (CPU_BYTE_ORDER == CPU_BIG_ENDIAN) ? swab16(x) : x;
+}
+
+INLINE uint32_t cpu_to_be32(uint32_t x);
+INLINE uint32_t cpu_to_be32(uint32_t x)
+{
+	return (CPU_BYTE_ORDER == CPU_LITTLE_ENDIAN) ? swab32(x) : x;
+}
+
+INLINE uint32_t cpu_to_le32(uint32_t x);
+INLINE uint32_t cpu_to_le32(uint32_t x)
+{
+	return (CPU_BYTE_ORDER == CPU_BIG_ENDIAN) ? swab32(x) : x;
 }
 
 #endif /* MWARE_BYTEORDER_H */
