@@ -17,6 +17,9 @@
 
 /*
  * $Log$
+ * Revision 1.5  2004/08/24 13:46:48  bernie
+ * Include <macros.h>.
+ *
  * Revision 1.4  2004/08/10 06:57:22  bernie
  * eeprom_erase(): New function.
  *
@@ -30,13 +33,18 @@
  * Import into DevLib.
  *
  */
+
 #include "eeprom.h"
+
 #include <mware/byteorder.h> /* cpu_to_be16() */
 #include <drv/kdebug.h>
 #include <hw.h>
+#include <macros.h>
+
 #include <string.h> // memset()
 
 #include <avr/twi.h>
+
 
 /* Wait for TWINT flag set: bus is ready */
 #define WAIT_TWI_READY  do {} while (!(TWCR & BV(TWINT)))
