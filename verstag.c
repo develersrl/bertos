@@ -1,8 +1,8 @@
 /*!
  * \file
  * <!--
- * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
- * This file is part of DevLib - See devlib/README for information.
+ * Copyright 2004, 2005 Develer S.r.l. (http://www.develer.com/)
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \version $Id$
