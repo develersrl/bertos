@@ -38,6 +38,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.14  2004/09/06 21:50:00  bernie
+ *#* Spelling fixes.
+ *#*
  *#* Revision 1.13  2004/09/06 21:40:50  bernie
  *#* Move buffer handling in chip-specific driver.
  *#*
@@ -703,7 +706,7 @@ SIGNAL(SIG_UART1_TRANS)
  * Serial 0 RX complete interrupt handler.
  *
  * This handler is interruptible.
- * Interrupt are reenabled as soon as recv complete interrupt is
+ * Interrupt are re-enabled as soon as recv complete interrupt is
  * disabled. Using INTERRUPT() is troublesome when the serial
  * is heavily loaded, because an interrupt could be retriggered
  * when executing the handler prologue before RXCIE is disabled.
@@ -743,7 +746,7 @@ SIGNAL(SIG_UART0_RECV)
 #endif
 	}
 
-	/* Reenable receive complete int */
+	/* Re-enable receive complete int */
 	//DISABLE_INTS;
 	//UCSR0B |= BV(RXCIE);
 
@@ -757,7 +760,7 @@ SIGNAL(SIG_UART0_RECV)
  * Serial 1 RX complete interrupt handler.
  *
  * This handler is interruptible.
- * Interrupt are reenabled as soon as recv complete interrupt is
+ * Interrupt are re-enabled as soon as recv complete interrupt is
  * disabled. Using INTERRUPT() is troublesome when the serial
  * is heavily loaded, because an interrupt could be retriggered
  * when executing the handler prologue before RXCIE is disabled.
@@ -792,7 +795,7 @@ SIGNAL(SIG_UART1_RECV)
 			RTS_OFF;
 #endif
 	}
-	/* Reenable receive complete int */
+	/* Re-enable receive complete int */
 	//UCSR1B |= BV(RXCIE);
 
 	SER_STROBE_OFF;
