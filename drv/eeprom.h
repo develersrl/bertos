@@ -13,18 +13,21 @@
  * \brief Driver for the 24xx16 and 24xx256 I2C EEPROMS (interface)
  */
 
-/*
- * $Log$
- * Revision 1.3  2004/08/10 06:57:22  bernie
- * eeprom_erase(): New function.
- *
- * Revision 1.2  2004/07/29 22:57:09  bernie
- * Add 24LC16 support.
- *
- * Revision 1.1  2004/07/20 17:11:18  bernie
- * Import into DevLib.
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.4  2004/08/25 14:12:08  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.3  2004/08/10 06:57:22  bernie
+ *#* eeprom_erase(): New function.
+ *#*
+ *#* Revision 1.2  2004/07/29 22:57:09  bernie
+ *#* Add 24LC16 support.
+ *#*
+ *#* Revision 1.1  2004/07/20 17:11:18  bernie
+ *#* Import into DevLib.
+ *#*
+ *#*/
 #ifndef DRV_EEPROM_H
 #define DRV_EEPROM_H
 

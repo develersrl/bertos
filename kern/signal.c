@@ -64,29 +64,32 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-/*
- * $Log$
- * Revision 1.6  2004/08/14 19:37:57  rasky
- * Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
- *
- * Revision 1.5  2004/08/04 21:50:33  bernie
- * Add extensive documentation.
- *
- * Revision 1.4  2004/07/30 14:30:27  rasky
- * Resa la sig_signal interrupt safe (con il nuovo scheduler IRQ-safe)
- * Rimossa event_doIntr (ora inutile) e semplificata la logica delle macro con funzioni inline
- *
- * Revision 1.3  2004/07/30 14:24:16  rasky
- * Task switching con salvataggio perfetto stato di interrupt (SR)
- * Kernel monitor per dump informazioni su stack dei processi
- *
- * Revision 1.2  2004/06/03 11:27:09  bernie
- * Add dual-license information.
- *
- * Revision 1.1  2004/05/23 17:27:00  bernie
- * Import kern/ subdirectory.
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.7  2004/08/25 14:12:09  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.6  2004/08/14 19:37:57  rasky
+ *#* Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
+ *#*
+ *#* Revision 1.5  2004/08/04 21:50:33  bernie
+ *#* Add extensive documentation.
+ *#*
+ *#* Revision 1.4  2004/07/30 14:30:27  rasky
+ *#* Resa la sig_signal interrupt safe (con il nuovo scheduler IRQ-safe)
+ *#* Rimossa event_doIntr (ora inutile) e semplificata la logica delle macro con funzioni inline
+ *#*
+ *#* Revision 1.3  2004/07/30 14:24:16  rasky
+ *#* Task switching con salvataggio perfetto stato di interrupt (SR)
+ *#* Kernel monitor per dump informazioni su stack dei processi
+ *#*
+ *#* Revision 1.2  2004/06/03 11:27:09  bernie
+ *#* Add dual-license information.
+ *#*
+ *#* Revision 1.1  2004/05/23 17:27:00  bernie
+ *#* Import kern/ subdirectory.
+ *#*
+ *#*/
 
 #include "signal.h"
 #include "proc.h"

@@ -13,26 +13,29 @@
  * \brief Low-level timer module for AVR
  */
 
-/*
- * $Log$
- * Revision 1.14  2004/08/24 16:27:01  bernie
- * Add missing headers.
- *
- * Revision 1.13  2004/08/24 14:30:11  bernie
- * Use new-style config macros for drv/timer.c
- *
- * Revision 1.12  2004/08/10 06:59:45  bernie
- * CONFIG_TIMER_STROBE: Define no-op default macros.
- *
- * Revision 1.11  2004/08/03 15:53:17  aleph
- * Fix spacing
- *
- * Revision 1.10  2004/08/02 20:20:29  aleph
- * Merge from project_ks
- *
- * Revision 1.9  2004/07/22 02:01:14  bernie
- * Use TIMER_PRESCALER consistently.
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.15  2004/08/25 14:12:08  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.14  2004/08/24 16:27:01  bernie
+ *#* Add missing headers.
+ *#*
+ *#* Revision 1.13  2004/08/24 14:30:11  bernie
+ *#* Use new-style config macros for drv/timer.c
+ *#*
+ *#* Revision 1.12  2004/08/10 06:59:45  bernie
+ *#* CONFIG_TIMER_STROBE: Define no-op default macros.
+ *#*
+ *#* Revision 1.11  2004/08/03 15:53:17  aleph
+ *#* Fix spacing
+ *#*
+ *#* Revision 1.10  2004/08/02 20:20:29  aleph
+ *#* Merge from project_ks
+ *#*
+ *#* Revision 1.9  2004/07/22 02:01:14  bernie
+ *#* Use TIMER_PRESCALER consistently.
+ *#*/
 #ifndef DRV_TIMER_AVR_H
 #define DRV_TIMER_AVR_H
 

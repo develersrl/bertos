@@ -13,35 +13,38 @@
  * \brief Common and handy function macros
  */
 
-/*
- * $Log$
- * Revision 1.3  2004/08/24 14:13:48  bernie
- * Restore a few macros that were lost in the way.
- *
- * Revision 1.2  2004/08/24 13:32:14  bernie
- * PP_CAT(), PP_STRINGIZE(): Move back to compiler.h to break circular dependency between cpu.h/compiler.h/macros.h;
- * offsetof(), countof(): Move back to compiler.h to avoid including macros.h almost everywhere;
- * Trim CVS log;
- * Rename header guards;
- * Don't include arch_config.h in compiler.h as it's not needed there.
- *
- * Revision 1.1  2004/08/14 19:37:57  rasky
- * Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
- *
- * Revision 1.4  2004/08/14 18:36:50  rasky
- * Doxygen fix e un livello di parentesi aggiuntivi per la macro
- *
- * Revision 1.3  2004/08/12 20:01:32  rasky
- * Aggiunte macro BIT_CHANGE e BIT_CHANGE_BV
- *
- * Revision 1.2  2004/08/10 21:36:14  rasky
- * Aggiunto include macros.h dove serve
- * Aggiunta dipendenza da compiler.h in macros.h
- *
- * Revision 1.1  2004/08/10 21:30:00  rasky
- * Estratte le funzioni macro in macros.h
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.4  2004/08/25 14:12:08  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.3  2004/08/24 14:13:48  bernie
+ *#* Restore a few macros that were lost in the way.
+ *#*
+ *#* Revision 1.2  2004/08/24 13:32:14  bernie
+ *#* PP_CAT(), PP_STRINGIZE(): Move back to compiler.h to break circular dependency between cpu.h/compiler.h/macros.h;
+ *#* offsetof(), countof(): Move back to compiler.h to avoid including macros.h almost everywhere;
+ *#* Trim CVS log;
+ *#* Rename header guards;
+ *#* Don't include arch_config.h in compiler.h as it's not needed there.
+ *#*
+ *#* Revision 1.1  2004/08/14 19:37:57  rasky
+ *#* Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
+ *#*
+ *#* Revision 1.4  2004/08/14 18:36:50  rasky
+ *#* Doxygen fix e un livello di parentesi aggiuntivi per la macro
+ *#*
+ *#* Revision 1.3  2004/08/12 20:01:32  rasky
+ *#* Aggiunte macro BIT_CHANGE e BIT_CHANGE_BV
+ *#*
+ *#* Revision 1.2  2004/08/10 21:36:14  rasky
+ *#* Aggiunto include macros.h dove serve
+ *#* Aggiunta dipendenza da compiler.h in macros.h
+ *#*
+ *#* Revision 1.1  2004/08/10 21:30:00  rasky
+ *#* Estratte le funzioni macro in macros.h
+ *#*
+ *#*/
 
 #ifndef MACROS_H
 #define MACROS_H

@@ -15,24 +15,27 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-/*
- * $Log$
- * Revision 1.14  2004/08/24 13:29:28  bernie
- * Trim CVS log; Rename header guards.
- *
- * Revision 1.12  2004/08/14 19:37:57  rasky
- * Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
- *
- * Revision 1.11  2004/08/05 17:39:56  bernie
- * Fix a Doxygen tag.
- *
- * Revision 1.10  2004/08/02 20:20:29  aleph
- * Merge from project_ks
- *
- * Revision 1.9  2004/07/30 14:24:16  rasky
- * Task switching con salvataggio perfetto stato di interrupt (SR)
- * Kernel monitor per dump informazioni su stack dei processi
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.15  2004/08/25 14:12:08  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.14  2004/08/24 13:29:28  bernie
+ *#* Trim CVS log; Rename header guards.
+ *#*
+ *#* Revision 1.12  2004/08/14 19:37:57  rasky
+ *#* Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
+ *#*
+ *#* Revision 1.11  2004/08/05 17:39:56  bernie
+ *#* Fix a Doxygen tag.
+ *#*
+ *#* Revision 1.10  2004/08/02 20:20:29  aleph
+ *#* Merge from project_ks
+ *#*
+ *#* Revision 1.9  2004/07/30 14:24:16  rasky
+ *#* Task switching con salvataggio perfetto stato di interrupt (SR)
+ *#* Kernel monitor per dump informazioni su stack dei processi
+ *#*/
 #ifndef DEVLIB_CPU_H
 #define DEVLIB_CPU_H
 

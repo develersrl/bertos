@@ -14,27 +14,30 @@
  * \brief printf-family routines for text output
  */
 
-/*
- * $Log$
- * Revision 1.4  2004/08/05 18:46:44  bernie
- * Documentation improvements.
- *
- * Revision 1.3  2004/08/03 15:57:18  aleph
- * Add include to fix warning for vsprintf()
- *
- * Revision 1.2  2004/06/03 11:27:09  bernie
- * Add dual-license information.
- *
- * Revision 1.1  2004/05/23 15:43:16  bernie
- * Import mware modules.
- *
- * Revision 1.2  2004/03/26 18:50:50  bernie
- * Move _PROGMEM stuff to compiler.h
- *
- * Revision 1.1  2004/03/19 16:52:28  bernie
- * Move printf() like functions from text.c to text_format.c and add PROGMEM versions.
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.5  2004/08/25 14:12:09  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.4  2004/08/05 18:46:44  bernie
+ *#* Documentation improvements.
+ *#*
+ *#* Revision 1.3  2004/08/03 15:57:18  aleph
+ *#* Add include to fix warning for vsprintf()
+ *#*
+ *#* Revision 1.2  2004/06/03 11:27:09  bernie
+ *#* Add dual-license information.
+ *#*
+ *#* Revision 1.1  2004/05/23 15:43:16  bernie
+ *#* Import mware modules.
+ *#*
+ *#* Revision 1.2  2004/03/26 18:50:50  bernie
+ *#* Move _PROGMEM stuff to compiler.h
+ *#*
+ *#* Revision 1.1  2004/03/19 16:52:28  bernie
+ *#* Move printf() like functions from text.c to text_format.c and add PROGMEM versions.
+ *#*
+ *#*/
 
 #include "text.h"
 #include "formatwr.h" /* _formatted_write() */

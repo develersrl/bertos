@@ -13,21 +13,24 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-/*
- * $Log$
- * Revision 1.4  2004/07/22 01:08:43  bernie
- * swab32(): Fix a very serious bug.
- *
- * Revision 1.3  2004/07/20 23:47:12  bernie
- * Finally remove redundant protos.
- *
- * Revision 1.2  2004/07/20 17:09:11  bernie
- * swab16(), swab32(), cpu_to_be32(), cpu_to_le32(): New functions.
- *
- * Revision 1.1  2004/07/20 16:26:15  bernie
- * Import byte-order macros into DevLib.
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.5  2004/08/25 14:12:09  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.4  2004/07/22 01:08:43  bernie
+ *#* swab32(): Fix a very serious bug.
+ *#*
+ *#* Revision 1.3  2004/07/20 23:47:12  bernie
+ *#* Finally remove redundant protos.
+ *#*
+ *#* Revision 1.2  2004/07/20 17:09:11  bernie
+ *#* swab16(), swab32(), cpu_to_be32(), cpu_to_le32(): New functions.
+ *#*
+ *#* Revision 1.1  2004/07/20 16:26:15  bernie
+ *#* Import byte-order macros into DevLib.
+ *#*
+ *#*/
 
 #ifndef MWARE_BYTEORDER_H
 #define MWARE_BYTEORDER_H

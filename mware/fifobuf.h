@@ -41,39 +41,42 @@
  *		\code head == begin && tail == end \endcode
  */
 
-/*
- * $Log$
- * Revision 1.13  2004/08/24 13:16:11  bernie
- * Add type-size definitions for preprocessor.
- *
- * Revision 1.12  2004/08/02 20:20:29  aleph
- * Merge from project_ks
- *
- * Revision 1.11  2004/07/30 14:15:53  rasky
- * Nuovo supporto unificato per detect della CPU
- *
- * Revision 1.10  2004/07/29 22:57:09  bernie
- * Doxygen fix.
- *
- * Revision 1.9  2004/07/20 23:54:27  bernie
- * fifo_flush_locked(): New function;
- * Revamp documentation.
- *
- * Revision 1.8  2004/07/20 23:47:39  bernie
- * Finally remove redundant protos.
- *
- * Revision 1.7  2004/07/20 23:46:29  bernie
- * Finally remove redundant protos.
- *
- * Revision 1.6  2004/06/06 17:18:04  bernie
- * Remove redundant declaration of fifo_isempty_locked().
- *
- * Revision 1.5  2004/06/06 16:50:35  bernie
- * Import fixes for race conditions from project_ks.
- *
- * Revision 1.4  2004/06/06 16:11:17  bernie
- * Protect MetroWerks specific pragmas with #ifdef's
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.14  2004/08/25 14:12:09  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.13  2004/08/24 13:16:11  bernie
+ *#* Add type-size definitions for preprocessor.
+ *#*
+ *#* Revision 1.12  2004/08/02 20:20:29  aleph
+ *#* Merge from project_ks
+ *#*
+ *#* Revision 1.11  2004/07/30 14:15:53  rasky
+ *#* Nuovo supporto unificato per detect della CPU
+ *#*
+ *#* Revision 1.10  2004/07/29 22:57:09  bernie
+ *#* Doxygen fix.
+ *#*
+ *#* Revision 1.9  2004/07/20 23:54:27  bernie
+ *#* fifo_flush_locked(): New function;
+ *#* Revamp documentation.
+ *#*
+ *#* Revision 1.8  2004/07/20 23:47:39  bernie
+ *#* Finally remove redundant protos.
+ *#*
+ *#* Revision 1.7  2004/07/20 23:46:29  bernie
+ *#* Finally remove redundant protos.
+ *#*
+ *#* Revision 1.6  2004/06/06 17:18:04  bernie
+ *#* Remove redundant declaration of fifo_isempty_locked().
+ *#*
+ *#* Revision 1.5  2004/06/06 16:50:35  bernie
+ *#* Import fixes for race conditions from project_ks.
+ *#*
+ *#* Revision 1.4  2004/06/06 16:11:17  bernie
+ *#* Protect MetroWerks specific pragmas with #ifdef's
+ *#*/
 
 #ifndef MWARE_FIFO_H
 #define MWARE_FIFO_H

@@ -22,18 +22,21 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-/*
- * $Log$
- * Revision 1.3  2004/08/15 05:47:26  bernie
- * updcrc16(): inline version of UPDCRC16(); Cleanup documentation.
- *
- * Revision 1.2  2004/06/03 11:27:09  bernie
- * Add dual-license information.
- *
- * Revision 1.1  2004/06/03 08:58:16  bernie
- * Import into DevLib
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.4  2004/08/25 14:12:09  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.3  2004/08/15 05:47:26  bernie
+ *#* updcrc16(): inline version of UPDCRC16(); Cleanup documentation.
+ *#*
+ *#* Revision 1.2  2004/06/03 11:27:09  bernie
+ *#* Add dual-license information.
+ *#*
+ *#* Revision 1.1  2004/06/03 08:58:16  bernie
+ *#* Import into DevLib
+ *#*
+ *#*/
 #ifndef CRC_H
 #define CRC_H
 

@@ -26,48 +26,51 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-/*
- * $Log$
- * Revision 1.14  2004/08/24 16:22:57  bernie
- * Thinkos; Doxygen fixes
- *
- * Revision 1.13  2004/08/24 16:20:48  bernie
- * ser_read(): Make buffer argument void * for consistency with ANSI C and ser_write()
- *
- * Revision 1.12  2004/08/24 13:49:39  bernie
- * Fix thinko.
- *
- * Revision 1.11  2004/08/15 05:32:22  bernie
- * ser_resync(): New function.
- *
- * Revision 1.10  2004/08/10 06:29:50  bernie
- * Rename timer_gettick() to timer_ticks().
- *
- * Revision 1.9  2004/08/08 06:06:20  bernie
- * Use new-style CONFIG_ idiom; Fix module-wide documentation.
- *
- * Revision 1.8  2004/07/29 22:57:09  bernie
- * ser_drain(): New function; Make Serial::is_open a debug-only feature; Switch to new-style CONFIG_* macros.
- *
- * Revision 1.7  2004/07/18 21:49:03  bernie
- * Make CONFIG_SER_DEFBAUDRATE optional.
- *
- * Revision 1.6  2004/06/07 15:56:28  aleph
- * Remove cast-as-lvalue extension abuse
- *
- * Revision 1.5  2004/06/06 16:41:44  bernie
- * ser_putchar(): Use fifo_push_locked() to fix potential race on 8bit processors.
- *
- * Revision 1.4  2004/06/03 11:27:09  bernie
- * Add dual-license information.
- *
- * Revision 1.3  2004/06/02 21:35:24  aleph
- * Serial enhancements: interruptible receive handler and 8 bit serial status for AVR; remove volatile attribute to FIFOBuffer, useless for new fifobuf routens
- *
- * Revision 1.2  2004/05/23 18:21:53  bernie
- * Trim CVS logs and cleanup header info.
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.15  2004/08/25 14:12:08  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.14  2004/08/24 16:22:57  bernie
+ *#* Thinkos; Doxygen fixes
+ *#*
+ *#* Revision 1.13  2004/08/24 16:20:48  bernie
+ *#* ser_read(): Make buffer argument void *#* for consistency with ANSI C and ser_write()
+ *#*
+ *#* Revision 1.12  2004/08/24 13:49:39  bernie
+ *#* Fix thinko.
+ *#*
+ *#* Revision 1.11  2004/08/15 05:32:22  bernie
+ *#* ser_resync(): New function.
+ *#*
+ *#* Revision 1.10  2004/08/10 06:29:50  bernie
+ *#* Rename timer_gettick() to timer_ticks().
+ *#*
+ *#* Revision 1.9  2004/08/08 06:06:20  bernie
+ *#* Use new-style CONFIG_ idiom; Fix module-wide documentation.
+ *#*
+ *#* Revision 1.8  2004/07/29 22:57:09  bernie
+ *#* ser_drain(): New function; Make Serial::is_open a debug-only feature; Switch to new-style CONFIG_* macros.
+ *#*
+ *#* Revision 1.7  2004/07/18 21:49:03  bernie
+ *#* Make CONFIG_SER_DEFBAUDRATE optional.
+ *#*
+ *#* Revision 1.6  2004/06/07 15:56:28  aleph
+ *#* Remove cast-as-lvalue extension abuse
+ *#*
+ *#* Revision 1.5  2004/06/06 16:41:44  bernie
+ *#* ser_putchar(): Use fifo_push_locked() to fix potential race on 8bit processors.
+ *#*
+ *#* Revision 1.4  2004/06/03 11:27:09  bernie
+ *#* Add dual-license information.
+ *#*
+ *#* Revision 1.3  2004/06/02 21:35:24  aleph
+ *#* Serial enhancements: interruptible receive handler and 8 bit serial status for AVR; remove volatile attribute to FIFOBuffer, useless for new fifobuf routens
+ *#*
+ *#* Revision 1.2  2004/05/23 18:21:53  bernie
+ *#* Trim CVS logs and cleanup header info.
+ *#*
+ *#*/
 
 #include <mware/formatwr.h>
 #include <drv/kdebug.h>

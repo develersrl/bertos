@@ -12,33 +12,36 @@
  * \brief General pourpose graphics routines
  */
 
-/*
- * $Log$
- * Revision 1.4  2004/08/10 07:00:16  bernie
- * Add missing header.
- *
- * Revision 1.3  2004/08/04 03:16:59  bernie
- * Switch to new DevLib CONFIG_ convention.
- *
- * Revision 1.2  2004/06/03 11:27:09  bernie
- * Add dual-license information.
- *
- * Revision 1.1  2004/05/23 15:43:16  bernie
- * Import mware modules.
- *
- * Revision 1.4  2004/02/09 00:21:28  aleph
- * Various gfx fixes
- *
- * Revision 1.3  2004/01/27 23:24:19  aleph
- * Add new graphics primitives
- *
- * Revision 1.2  2004/01/07 23:33:01  aleph
- * Change copyright email
- *
- * Revision 1.1  2004/01/07 19:05:31  aleph
- * Add graphics routines
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.5  2004/08/25 14:12:09  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.4  2004/08/10 07:00:16  bernie
+ *#* Add missing header.
+ *#*
+ *#* Revision 1.3  2004/08/04 03:16:59  bernie
+ *#* Switch to new DevLib CONFIG_ convention.
+ *#*
+ *#* Revision 1.2  2004/06/03 11:27:09  bernie
+ *#* Add dual-license information.
+ *#*
+ *#* Revision 1.1  2004/05/23 15:43:16  bernie
+ *#* Import mware modules.
+ *#*
+ *#* Revision 1.4  2004/02/09 00:21:28  aleph
+ *#* Various gfx fixes
+ *#*
+ *#* Revision 1.3  2004/01/27 23:24:19  aleph
+ *#* Add new graphics primitives
+ *#*
+ *#* Revision 1.2  2004/01/07 23:33:01  aleph
+ *#* Change copyright email
+ *#*
+ *#* Revision 1.1  2004/01/07 19:05:31  aleph
+ *#* Add graphics routines
+ *#*
+ *#*/
 
 #ifndef MWARE_GFX_H
 #define MWARE_GFX_H

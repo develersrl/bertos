@@ -14,18 +14,21 @@
  * \brief General pourpose graphics routines
  */
 
-/*
- * $Log$
- * Revision 1.4  2004/08/24 16:53:10  bernie
- * Use new-style config macros.
- *
- * Revision 1.3  2004/08/04 03:16:59  bernie
- * Switch to new DevLib CONFIG_ convention.
- *
- * Revision 1.2  2004/06/03 11:27:09  bernie
- * Add dual-license information.
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.5  2004/08/25 14:12:09  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.4  2004/08/24 16:53:10  bernie
+ *#* Use new-style config macros.
+ *#*
+ *#* Revision 1.3  2004/08/04 03:16:59  bernie
+ *#* Switch to new DevLib CONFIG_ convention.
+ *#*
+ *#* Revision 1.2  2004/06/03 11:27:09  bernie
+ *#* Add dual-license information.
+ *#*
+ *#*/
 
 #include "gfx.h"
 #include "config.h"

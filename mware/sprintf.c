@@ -12,35 +12,38 @@
  * \brief Simple sprintf() implementation based on _formatted_write()
  */
 
-/*
- * $Log$
- * Revision 1.3  2004/06/27 15:20:26  aleph
- * Change UNUSED() macro to accept two arguments: type and name;
- * Add macro GNUC_PREREQ to detect GCC version during build;
- * Some spacing cleanups and typo fix
- *
- * Revision 1.2  2004/06/03 11:27:09  bernie
- * Add dual-license information.
- *
- * Revision 1.1  2004/05/23 15:43:16  bernie
- * Import mware modules.
- *
- * Revision 1.4  2004/04/03 20:42:27  aleph
- * Remove duplicated defines
- *
- * Revision 1.3  2004/03/24 15:48:53  bernie
- * Remove Copyright messages from Doxygen output
- *
- * Revision 1.2  2004/03/19 16:51:30  bernie
- * Add PROGMEM kludge.
- *
- * Revision 1.1  2004/02/23 09:45:09  aleph
- * Add missing library functions.
- *
- * Revision 1.1  2003/11/13 16:56:37  aleph
- * Add first implementation of dsp firmware
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.4  2004/08/25 14:12:09  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.3  2004/06/27 15:20:26  aleph
+ *#* Change UNUSED() macro to accept two arguments: type and name;
+ *#* Add macro GNUC_PREREQ to detect GCC version during build;
+ *#* Some spacing cleanups and typo fix
+ *#*
+ *#* Revision 1.2  2004/06/03 11:27:09  bernie
+ *#* Add dual-license information.
+ *#*
+ *#* Revision 1.1  2004/05/23 15:43:16  bernie
+ *#* Import mware modules.
+ *#*
+ *#* Revision 1.4  2004/04/03 20:42:27  aleph
+ *#* Remove duplicated defines
+ *#*
+ *#* Revision 1.3  2004/03/24 15:48:53  bernie
+ *#* Remove Copyright messages from Doxygen output
+ *#*
+ *#* Revision 1.2  2004/03/19 16:51:30  bernie
+ *#* Add PROGMEM kludge.
+ *#*
+ *#* Revision 1.1  2004/02/23 09:45:09  aleph
+ *#* Add missing library functions.
+ *#*
+ *#* Revision 1.1  2003/11/13 16:56:37  aleph
+ *#* Add first implementation of dsp firmware
+ *#*
+ *#*/
 
 #include "compiler.h"
 #include "formatwr.h"

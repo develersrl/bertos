@@ -11,28 +11,31 @@
  * \brief General pourpose double-linked lists
  */
 
-/*
- * $Log$
- * Revision 1.6  2004/07/30 14:34:10  rasky
- * Vari fix per documentazione e commenti
- * Aggiunte PP_CATn e STATIC_ASSERT
- *
- * Revision 1.5  2004/07/20 23:45:01  bernie
- * Finally remove redundant protos.
- *
- * Revision 1.4  2004/07/18 22:12:53  bernie
- * Fix warnings with GCC 3.3.2.
- *
- * Revision 1.3  2004/07/18 22:01:43  bernie
- * REMHEAD(), REMTAIL(): Move to list.h as inline functions.
- *
- * Revision 1.2  2004/06/03 11:27:09  bernie
- * Add dual-license information.
- *
- * Revision 1.1  2004/05/23 15:43:16  bernie
- * Import mware modules.
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.7  2004/08/25 14:12:09  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.6  2004/07/30 14:34:10  rasky
+ *#* Vari fix per documentazione e commenti
+ *#* Aggiunte PP_CATn e STATIC_ASSERT
+ *#*
+ *#* Revision 1.5  2004/07/20 23:45:01  bernie
+ *#* Finally remove redundant protos.
+ *#*
+ *#* Revision 1.4  2004/07/18 22:12:53  bernie
+ *#* Fix warnings with GCC 3.3.2.
+ *#*
+ *#* Revision 1.3  2004/07/18 22:01:43  bernie
+ *#* REMHEAD(), REMTAIL(): Move to list.h as inline functions.
+ *#*
+ *#* Revision 1.2  2004/06/03 11:27:09  bernie
+ *#* Add dual-license information.
+ *#*
+ *#* Revision 1.1  2004/05/23 15:43:16  bernie
+ *#* Import mware modules.
+ *#*
+ *#*/
 #ifndef MWARE_LIST_H
 #define MWARE_LIST_H
 

@@ -16,15 +16,18 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-/*
- * $Log$
- * Revision 1.2  2004/08/14 19:37:57  rasky
- * Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
- *
- * Revision 1.1  2004/06/06 15:11:08  bernie
- * Import into DevLib.
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.3  2004/08/25 14:12:09  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.2  2004/08/14 19:37:57  rasky
+ *#* Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
+ *#*
+ *#* Revision 1.1  2004/06/06 15:11:08  bernie
+ *#* Import into DevLib.
+ *#*
+ *#*/
 #ifndef KERN_MSG_H
 #define KERN_MSG_H
 

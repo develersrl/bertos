@@ -13,18 +13,21 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-/*
- * $Log$
- * Revision 1.3  2004/07/30 14:30:27  rasky
- * Resa la sig_signal interrupt safe (con il nuovo scheduler IRQ-safe)
- * Rimossa event_doIntr (ora inutile) e semplificata la logica delle macro con funzioni inline
- *
- * Revision 1.2  2004/06/03 11:27:09  bernie
- * Add dual-license information.
- *
- * Revision 1.1  2004/05/23 17:27:00  bernie
- * Import kern/ subdirectory.
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.4  2004/08/25 14:12:09  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.3  2004/07/30 14:30:27  rasky
+ *#* Resa la sig_signal interrupt safe (con il nuovo scheduler IRQ-safe)
+ *#* Rimossa event_doIntr (ora inutile) e semplificata la logica delle macro con funzioni inline
+ *#*
+ *#* Revision 1.2  2004/06/03 11:27:09  bernie
+ *#* Add dual-license information.
+ *#*
+ *#* Revision 1.1  2004/05/23 17:27:00  bernie
+ *#* Import kern/ subdirectory.
+ *#*/
 
 #ifndef KERN_SIGNAL_H
 #define KERN_SIGNAL_H

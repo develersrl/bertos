@@ -36,36 +36,39 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-/*
- * $Log$
- * Revision 1.10  2004/08/10 06:30:41  bernie
- * Major redesign of serial bus policy handling.
- *
- * Revision 1.9  2004/08/02 20:20:29  aleph
- * Merge from project_ks
- *
- * Revision 1.8  2004/07/29 22:57:09  bernie
- * Several tweaks to reduce code size on ATmega8.
- *
- * Revision 1.7  2004/07/18 21:54:23  bernie
- * Add ATmega8 support.
- *
- * Revision 1.5  2004/06/27 15:25:40  aleph
- * Add missing callbacks for SPI;
- * Change UNUSED() macro to new version with two args;
- * Use TX line filling only on the correct KBUS serial port;
- * Fix nasty IRQ disabling bug in recv complete hander for port 1.
- *
- * Revision 1.4  2004/06/03 11:27:09  bernie
- * Add dual-license information.
- *
- * Revision 1.3  2004/06/02 21:35:24  aleph
- * Serial enhancements: interruptible receive handler and 8 bit serial status for AVR; remove volatile attribute to FIFOBuffer, useless for new fifobuf routens
- *
- * Revision 1.2  2004/05/23 18:21:53  bernie
- * Trim CVS logs and cleanup header info.
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.11  2004/08/25 14:12:08  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.10  2004/08/10 06:30:41  bernie
+ *#* Major redesign of serial bus policy handling.
+ *#*
+ *#* Revision 1.9  2004/08/02 20:20:29  aleph
+ *#* Merge from project_ks
+ *#*
+ *#* Revision 1.8  2004/07/29 22:57:09  bernie
+ *#* Several tweaks to reduce code size on ATmega8.
+ *#*
+ *#* Revision 1.7  2004/07/18 21:54:23  bernie
+ *#* Add ATmega8 support.
+ *#*
+ *#* Revision 1.5  2004/06/27 15:25:40  aleph
+ *#* Add missing callbacks for SPI;
+ *#* Change UNUSED() macro to new version with two args;
+ *#* Use TX line filling only on the correct KBUS serial port;
+ *#* Fix nasty IRQ disabling bug in recv complete hander for port 1.
+ *#*
+ *#* Revision 1.4  2004/06/03 11:27:09  bernie
+ *#* Add dual-license information.
+ *#*
+ *#* Revision 1.3  2004/06/02 21:35:24  aleph
+ *#* Serial enhancements: interruptible receive handler and 8 bit serial status for AVR; remove volatile attribute to FIFOBuffer, useless for new fifobuf routens
+ *#*
+ *#* Revision 1.2  2004/05/23 18:21:53  bernie
+ *#* Trim CVS logs and cleanup header info.
+ *#*
+ *#*/
 
 #include "ser.h"
 #include "ser_p.h"

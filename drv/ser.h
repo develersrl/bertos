@@ -12,36 +12,39 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-/*
- * $Log$
- * Revision 1.10  2004/08/24 16:20:48  bernie
- * ser_read(): Make buffer argument void * for consistency with ANSI C and ser_write()
- *
- * Revision 1.9  2004/08/15 05:32:22  bernie
- * ser_resync(): New function.
- *
- * Revision 1.8  2004/08/02 20:20:29  aleph
- * Merge from project_ks
- *
- * Revision 1.7  2004/07/30 14:15:53  rasky
- * Nuovo supporto unificato per detect della CPU
- *
- * Revision 1.6  2004/07/29 22:57:09  bernie
- * ser_drain(): New function; Make Serial::is_open a debug-only feature; Switch to new-style CONFIG_* macros.
- *
- * Revision 1.5  2004/07/18 21:54:23  bernie
- * Add ATmega8 support.
- *
- * Revision 1.4  2004/06/03 11:27:09  bernie
- * Add dual-license information.
- *
- * Revision 1.3  2004/06/02 21:35:24  aleph
- * Serial enhancements: interruptible receive handler and 8 bit serial status for AVR; remove volatile attribute to FIFOBuffer, useless for new fifobuf routens
- *
- * Revision 1.2  2004/05/23 18:21:53  bernie
- * Trim CVS logs and cleanup header info.
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.11  2004/08/25 14:12:08  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.10  2004/08/24 16:20:48  bernie
+ *#* ser_read(): Make buffer argument void *#* for consistency with ANSI C and ser_write()
+ *#*
+ *#* Revision 1.9  2004/08/15 05:32:22  bernie
+ *#* ser_resync(): New function.
+ *#*
+ *#* Revision 1.8  2004/08/02 20:20:29  aleph
+ *#* Merge from project_ks
+ *#*
+ *#* Revision 1.7  2004/07/30 14:15:53  rasky
+ *#* Nuovo supporto unificato per detect della CPU
+ *#*
+ *#* Revision 1.6  2004/07/29 22:57:09  bernie
+ *#* ser_drain(): New function; Make Serial::is_open a debug-only feature; Switch to new-style CONFIG_* macros.
+ *#*
+ *#* Revision 1.5  2004/07/18 21:54:23  bernie
+ *#* Add ATmega8 support.
+ *#*
+ *#* Revision 1.4  2004/06/03 11:27:09  bernie
+ *#* Add dual-license information.
+ *#*
+ *#* Revision 1.3  2004/06/02 21:35:24  aleph
+ *#* Serial enhancements: interruptible receive handler and 8 bit serial status for AVR; remove volatile attribute to FIFOBuffer, useless for new fifobuf routens
+ *#*
+ *#* Revision 1.2  2004/05/23 18:21:53  bernie
+ *#* Trim CVS logs and cleanup header info.
+ *#*
+ *#*/
 #ifndef DRV_SER_H
 #define DRV_SER_H
 

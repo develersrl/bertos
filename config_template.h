@@ -44,18 +44,21 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-/*
- * $Log$
- * Revision 1.3  2004/08/24 14:30:11  bernie
- * Use new-style config macros for drv/timer.c
- *
- * Revision 1.2  2004/08/05 18:46:52  bernie
- * Documentation improvements.
- *
- * Revision 1.1  2004/07/29 23:34:32  bernie
- * Add template configuration file.
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.4  2004/08/25 14:12:08  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.3  2004/08/24 14:30:11  bernie
+ *#* Use new-style config macros for drv/timer.c
+ *#*
+ *#* Revision 1.2  2004/08/05 18:46:52  bernie
+ *#* Documentation improvements.
+ *#*
+ *#* Revision 1.1  2004/07/29 23:34:32  bernie
+ *#* Add template configuration file.
+ *#*
+ *#*/
 
 #ifndef CONFIG_COMMON_H
 #define CONFIG_COMMON_H

@@ -59,42 +59,45 @@
  * \author Giovanni Bajo <rasky@develer.com>
  */
 
-/*
- * $Log$
- * Revision 1.1  2004/07/14 14:08:16  rasky
- * Implementazione di una tabella hash
- *
- * Revision 1.13  2004/07/12 16:33:36  rasky
- * Aggiunta nuova ASSERT2, con stringa di descrizione del problema (disabilitabile tramite una macro di configurazione)
- * Modificato il codice del firmware per utilizzare ASSERT2
- * Modificato il progetto in modo da disabilitare le stringhe di errore nel target xROM-xRAM
- *
- * Revision 1.12  2004/06/14 15:15:24  rasky
- * Cambiato key_data in un union invece di castare
- * Aggiunto un ASSERT sull'indice calcolata nella key_internal_get_ptr
- *
- * Revision 1.11  2004/06/14 15:09:04  rasky
- * Cambiati i messaggi di assert (è inutile citare il nome della funzione)
- *
- * Revision 1.10  2004/06/14 15:07:38  rasky
- * Convertito il loop di calc_hash a interi (per farlo ottimizzare maggiormente)
- *
- * Revision 1.9  2004/06/14 14:59:40  rasky
- * Rinominanta la macro di configurazione per rispettare il namespace, e aggiunta in un punto in cui mancava
- *
- * Revision 1.8  2004/06/12 15:18:05  rasky
- * Nuova hashtable con chiave esterna o interna a scelta, come discusso
- *
- * Revision 1.7  2004/06/04 17:16:31  rasky
- * Fixato un bug nel caso in cui la chiave ecceda la dimensione massima: il clamp non può essere fatto dentro la perform_lookup perché anche la ht_insert deve avere il valore clampato a disposizione per fare la memcpy
- *
- * Revision 1.6  2004/05/26 16:36:50  rasky
- * Aggiunto il rationale per l'interfaccia degli iteratori
- *
- * Revision 1.5  2004/05/24 15:28:20  rasky
- * Sistemata la documentazione, rimossa keycmp in favore della memcmp
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.2  2004/08/25 14:12:09  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.1  2004/07/14 14:08:16  rasky
+ *#* Implementazione di una tabella hash
+ *#*
+ *#* Revision 1.13  2004/07/12 16:33:36  rasky
+ *#* Aggiunta nuova ASSERT2, con stringa di descrizione del problema (disabilitabile tramite una macro di configurazione)
+ *#* Modificato il codice del firmware per utilizzare ASSERT2
+ *#* Modificato il progetto in modo da disabilitare le stringhe di errore nel target xROM-xRAM
+ *#*
+ *#* Revision 1.12  2004/06/14 15:15:24  rasky
+ *#* Cambiato key_data in un union invece di castare
+ *#* Aggiunto un ASSERT sull'indice calcolata nella key_internal_get_ptr
+ *#*
+ *#* Revision 1.11  2004/06/14 15:09:04  rasky
+ *#* Cambiati i messaggi di assert (è inutile citare il nome della funzione)
+ *#*
+ *#* Revision 1.10  2004/06/14 15:07:38  rasky
+ *#* Convertito il loop di calc_hash a interi (per farlo ottimizzare maggiormente)
+ *#*
+ *#* Revision 1.9  2004/06/14 14:59:40  rasky
+ *#* Rinominanta la macro di configurazione per rispettare il namespace, e aggiunta in un punto in cui mancava
+ *#*
+ *#* Revision 1.8  2004/06/12 15:18:05  rasky
+ *#* Nuova hashtable con chiave esterna o interna a scelta, come discusso
+ *#*
+ *#* Revision 1.7  2004/06/04 17:16:31  rasky
+ *#* Fixato un bug nel caso in cui la chiave ecceda la dimensione massima: il clamp non può essere fatto dentro la perform_lookup perché anche la ht_insert deve avere il valore clampato a disposizione per fare la memcpy
+ *#*
+ *#* Revision 1.6  2004/05/26 16:36:50  rasky
+ *#* Aggiunto il rationale per l'interfaccia degli iteratori
+ *#*
+ *#* Revision 1.5  2004/05/24 15:28:20  rasky
+ *#* Sistemata la documentazione, rimossa keycmp in favore della memcmp
+ *#*
+ *#*/
 #include "hashtable.h"
 #include <drv/kdebug.h>
 #include <compiler.h>

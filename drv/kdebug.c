@@ -14,42 +14,45 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-/*
- * $Log$
- * Revision 1.11  2004/08/24 16:19:08  bernie
- * kputchar(): New public function; Add missing dummy inlines for \!_DEBUG.
- *
- * Revision 1.10  2004/08/04 15:57:50  rasky
- * Cambiata la putchar per kdebug per DSP56k: la nuova funzione e' quella piu' a basso livello (assembly)
- *
- * Revision 1.9  2004/08/02 20:20:29  aleph
- * Merge from project_ks
- *
- * Revision 1.8  2004/07/30 14:26:33  rasky
- * Semplificato l'output dell'ASSERT
- * Aggiunta ASSERT2 con stringa di help opzionalmente disattivabile
- *
- * Revision 1.7  2004/07/30 14:15:53  rasky
- * Nuovo supporto unificato per detect della CPU
- *
- * Revision 1.6  2004/07/18 21:49:28  bernie
- * Add ATmega8 support.
- *
- * Revision 1.5  2004/06/27 15:20:26  aleph
- * Change UNUSED() macro to accept two arguments: type and name;
- * Add macro GNUC_PREREQ to detect GCC version during build;
- * Some spacing cleanups and typo fix
- *
- * Revision 1.4  2004/06/06 18:09:51  bernie
- * Import DSP56800 changes; Print broken wall bricks in hex.
- *
- * Revision 1.3  2004/06/03 11:27:09  bernie
- * Add dual-license information.
- *
- * Revision 1.2  2004/05/23 18:21:53  bernie
- * Trim CVS logs and cleanup header info.
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.12  2004/08/25 14:12:08  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.11  2004/08/24 16:19:08  bernie
+ *#* kputchar(): New public function; Add missing dummy inlines for \!_DEBUG.
+ *#*
+ *#* Revision 1.10  2004/08/04 15:57:50  rasky
+ *#* Cambiata la putchar per kdebug per DSP56k: la nuova funzione e' quella piu' a basso livello (assembly)
+ *#*
+ *#* Revision 1.9  2004/08/02 20:20:29  aleph
+ *#* Merge from project_ks
+ *#*
+ *#* Revision 1.8  2004/07/30 14:26:33  rasky
+ *#* Semplificato l'output dell'ASSERT
+ *#* Aggiunta ASSERT2 con stringa di help opzionalmente disattivabile
+ *#*
+ *#* Revision 1.7  2004/07/30 14:15:53  rasky
+ *#* Nuovo supporto unificato per detect della CPU
+ *#*
+ *#* Revision 1.6  2004/07/18 21:49:28  bernie
+ *#* Add ATmega8 support.
+ *#*
+ *#* Revision 1.5  2004/06/27 15:20:26  aleph
+ *#* Change UNUSED() macro to accept two arguments: type and name;
+ *#* Add macro GNUC_PREREQ to detect GCC version during build;
+ *#* Some spacing cleanups and typo fix
+ *#*
+ *#* Revision 1.4  2004/06/06 18:09:51  bernie
+ *#* Import DSP56800 changes; Print broken wall bricks in hex.
+ *#*
+ *#* Revision 1.3  2004/06/03 11:27:09  bernie
+ *#* Add dual-license information.
+ *#*
+ *#* Revision 1.2  2004/05/23 18:21:53  bernie
+ *#* Trim CVS logs and cleanup header info.
+ *#*
+ *#*/
 
 #include "kdebug.h"
 #include "hw.h"

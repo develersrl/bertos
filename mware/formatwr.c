@@ -51,31 +51,34 @@
  * width and precision arguments.
  */
 
-/*
- * $Log$
- * Revision 1.7  2004/08/04 15:53:47  rasky
- * Nuove opzioni di configurazione per formatted_write e ridotto maggiormente l'utilizzo dellos tack
- *
- * Revision 1.6  2004/07/30 14:34:10  rasky
- * Vari fix per documentazione e commenti
- * Aggiunte PP_CATn e STATIC_ASSERT
- *
- * Revision 1.5  2004/07/29 22:57:09  bernie
- * Switch to new-style config handling.
- *
- * Revision 1.4  2004/07/21 00:20:20  bernie
- * Allow completely disabling printf()-like formatter.
- *
- * Revision 1.3  2004/07/18 22:00:15  bernie
- * Reorganize configuration parameters to match DevLib's convention.
- *
- * Revision 1.2  2004/06/03 11:27:09  bernie
- * Add dual-license information.
- *
- * Revision 1.1  2004/05/23 15:43:16  bernie
- * Import mware modules.
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.8  2004/08/25 14:12:09  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.7  2004/08/04 15:53:47  rasky
+ *#* Nuove opzioni di configurazione per formatted_write e ridotto maggiormente l'utilizzo dellos tack
+ *#*
+ *#* Revision 1.6  2004/07/30 14:34:10  rasky
+ *#* Vari fix per documentazione e commenti
+ *#* Aggiunte PP_CATn e STATIC_ASSERT
+ *#*
+ *#* Revision 1.5  2004/07/29 22:57:09  bernie
+ *#* Switch to new-style config handling.
+ *#*
+ *#* Revision 1.4  2004/07/21 00:20:20  bernie
+ *#* Allow completely disabling printf()-like formatter.
+ *#*
+ *#* Revision 1.3  2004/07/18 22:00:15  bernie
+ *#* Reorganize configuration parameters to match DevLib's convention.
+ *#*
+ *#* Revision 1.2  2004/06/03 11:27:09  bernie
+ *#* Add dual-license information.
+ *#*
+ *#* Revision 1.1  2004/05/23 15:43:16  bernie
+ *#* Import mware modules.
+ *#*
+ *#*/
 
 #include "formatwr.h"
 #include <compiler.h> /* progmem macros */

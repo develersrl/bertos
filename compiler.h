@@ -13,43 +13,46 @@
  * \brief Additional support macros for compiler independance
  */
 
-/*
- * $Log$
- * Revision 1.18  2004/08/24 16:32:37  bernie
- * Document custom types.
- *
- * Revision 1.17  2004/08/24 13:32:14  bernie
- * PP_CAT(), PP_STRINGIZE(): Move back to compiler.h to break circular dependency between cpu.h/compiler.h/macros.h;
- * offsetof(), countof(): Move back to compiler.h to avoid including macros.h almost everywhere;
- * Trim CVS log;
- * Rename header guards;
- * Don't include arch_config.h in compiler.h as it's not needed there.
- *
- * Revision 1.16  2004/08/14 19:37:57  rasky
- * Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
- *
- * Revision 1.15  2004/08/13 03:23:26  bernie
- * Adjust a few MSVC tweaks from older projects.
- *
- * Revision 1.14  2004/08/10 06:56:29  bernie
- * RESTRICT: New C99-like macro; STATIC_ASSERT: Fix warning for multiple invocation in one file.
- *
- * Revision 1.13  2004/08/02 20:20:29  aleph
- * Merge from project_ks
- *
- * Revision 1.12  2004/08/01 01:21:17  bernie
- * LIKELY(), UNLIKELY(): New compiler-specific macros.
- *
- * Revision 1.11  2004/07/30 14:34:10  rasky
- * Vari fix per documentazione e commenti
- * Aggiunte PP_CATn e STATIC_ASSERT
- *
- * Revision 1.10  2004/07/30 14:15:53  rasky
- * Nuovo supporto unificato per detect della CPU
- *
- * Revision 1.9  2004/07/29 22:57:09  bernie
- * vsprintf(): Remove prototype for backwards compatibility with GCC 3.4; ssize_t: Add definition for inferior compilers.
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.19  2004/08/25 14:12:08  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.18  2004/08/24 16:32:37  bernie
+ *#* Document custom types.
+ *#*
+ *#* Revision 1.17  2004/08/24 13:32:14  bernie
+ *#* PP_CAT(), PP_STRINGIZE(): Move back to compiler.h to break circular dependency between cpu.h/compiler.h/macros.h;
+ *#* offsetof(), countof(): Move back to compiler.h to avoid including macros.h almost everywhere;
+ *#* Trim CVS log;
+ *#* Rename header guards;
+ *#* Don't include arch_config.h in compiler.h as it's not needed there.
+ *#*
+ *#* Revision 1.16  2004/08/14 19:37:57  rasky
+ *#* Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
+ *#*
+ *#* Revision 1.15  2004/08/13 03:23:26  bernie
+ *#* Adjust a few MSVC tweaks from older projects.
+ *#*
+ *#* Revision 1.14  2004/08/10 06:56:29  bernie
+ *#* RESTRICT: New C99-like macro; STATIC_ASSERT: Fix warning for multiple invocation in one file.
+ *#*
+ *#* Revision 1.13  2004/08/02 20:20:29  aleph
+ *#* Merge from project_ks
+ *#*
+ *#* Revision 1.12  2004/08/01 01:21:17  bernie
+ *#* LIKELY(), UNLIKELY(): New compiler-specific macros.
+ *#*
+ *#* Revision 1.11  2004/07/30 14:34:10  rasky
+ *#* Vari fix per documentazione e commenti
+ *#* Aggiunte PP_CATn e STATIC_ASSERT
+ *#*
+ *#* Revision 1.10  2004/07/30 14:15:53  rasky
+ *#* Nuovo supporto unificato per detect della CPU
+ *#*
+ *#* Revision 1.9  2004/07/29 22:57:09  bernie
+ *#* vsprintf(): Remove prototype for backwards compatibility with GCC 3.4; ssize_t: Add definition for inferior compilers.
+ *#*/
 #ifndef DEVLIB_COMPILER_H
 #define DEVLIB_COMPILER_H
 

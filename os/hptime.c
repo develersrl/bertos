@@ -11,18 +11,21 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-/*
- * $Log$
- * Revision 1.3  2004/08/10 05:45:04  bernie
- * Fix spacing in header.
- *
- * Revision 1.2  2004/06/03 11:27:09  bernie
- * Add dual-license information.
- *
- * Revision 1.1  2004/06/03 09:01:06  bernie
- * Import into DevLib.
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.4  2004/08/25 14:12:09  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.3  2004/08/10 05:45:04  bernie
+ *#* Fix spacing in header.
+ *#*
+ *#* Revision 1.2  2004/06/03 11:27:09  bernie
+ *#* Add dual-license information.
+ *#*
+ *#* Revision 1.1  2004/06/03 09:01:06  bernie
+ *#* Import into DevLib.
+ *#*
+ *#*/
 
 #include "hptime.h"
 

@@ -14,12 +14,15 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-/*
- * $Log$
- * Revision 1.1  2004/08/04 02:35:54  bernie
- * Import simple RLE algorithm.
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.2  2004/08/25 14:12:09  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.1  2004/08/04 02:35:54  bernie
+ *#* Import simple RLE algorithm.
+ *#*
+ *#*/
 
 #include "rle.h"
 

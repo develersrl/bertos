@@ -16,15 +16,18 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-/*
- * $Log$
- * Revision 1.3  2004/08/11 19:39:12  bernie
- * Use chart_x_t and chart_y_t for the input dataset.
- *
- * Revision 1.1  2004/08/04 03:16:30  bernie
- * Import simple chart drawing code.
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.4  2004/08/25 14:12:09  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.3  2004/08/11 19:39:12  bernie
+ *#* Use chart_x_t and chart_y_t for the input dataset.
+ *#*
+ *#* Revision 1.1  2004/08/04 03:16:30  bernie
+ *#* Import simple chart drawing code.
+ *#*
+ *#*/
 #ifndef MWARE_CHARTS_H
 #define MWARE_CHARTS_H
 

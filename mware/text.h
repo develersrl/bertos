@@ -12,15 +12,18 @@
  * \brief Text graphic routines
  */
 
-/*
- * $Log$
- * Revision 1.3  2004/08/05 18:46:44  bernie
- * Documentation improvements.
- *
- * Revision 1.2  2004/06/03 11:27:09  bernie
- * Add dual-license information.
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.4  2004/08/25 14:12:09  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.3  2004/08/05 18:46:44  bernie
+ *#* Documentation improvements.
+ *#*
+ *#* Revision 1.2  2004/06/03 11:27:09  bernie
+ *#* Add dual-license information.
+ *#*
+ *#*/
 
 #ifndef TEXT_H
 #define TEXT_H

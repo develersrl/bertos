@@ -10,21 +10,24 @@
  *
  */
 
-/*
- * $Log$
- * Revision 1.1  2004/07/30 17:14:49  rasky
- * File sfuggito al commit precedente (nuova gestione unificata del detect della CPU
- *
- * Revision 1.2  2004/07/30 10:31:07  rasky
- * Aggiunto detect per ATmega128
- *
- * Revision 1.1  2004/07/22 16:37:34  rasky
- * Nuovo file cpu_detect.h per il detect della CPU
- * Nuova macro CPU_HEADER per includere l'header cpu-specific di ogni modulo
- * Razionalizzazione dei principali #ifdef per piattaforma con le nuove macro
- * Nuove macro-utility PP_STRINGIZE e PP_CATn
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.2  2004/08/25 14:12:08  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.1  2004/07/30 17:14:49  rasky
+ *#* File sfuggito al commit precedente (nuova gestione unificata del detect della CPU
+ *#*
+ *#* Revision 1.2  2004/07/30 10:31:07  rasky
+ *#* Aggiunto detect per ATmega128
+ *#*
+ *#* Revision 1.1  2004/07/22 16:37:34  rasky
+ *#* Nuovo file cpu_detect.h per il detect della CPU
+ *#* Nuova macro CPU_HEADER per includere l'header cpu-specific di ogni modulo
+ *#* Razionalizzazione dei principali #ifdef per piattaforma con le nuove macro
+ *#* Nuove macro-utility PP_STRINGIZE e PP_CATn
+ *#*
+ *#*/
 
 #ifndef CPU_DETECT_H
 #define CPU_DETECT_H

@@ -14,35 +14,38 @@
  * \brief Text graphic routines
  */
 
-/*
- * $Log$
- * Revision 1.2  2004/06/03 11:27:09  bernie
- * Add dual-license information.
- *
- * Revision 1.1  2004/05/23 15:43:16  bernie
- * Import mware modules.
- *
- * Revision 1.17  2004/05/15 16:57:01  aleph
- * Fixes for non-DEBUG build
- *
- * Revision 1.16  2004/04/03 20:42:49  aleph
- * Add text_clear()
- *
- * Revision 1.15  2004/03/24 15:03:45  bernie
- * Use explicit include paths; clean Doxygen comments
- *
- * Revision 1.14  2004/03/19 16:52:28  bernie
- * Move printf() like functions from text.c to text_format.c and add PROGMEM versions.
- *
- * Revision 1.13  2004/03/17 18:23:32  bernie
- * Oops.
- *
- * Revision 1.12  2004/03/17 18:03:22  bernie
- * Make diagnostic message shorter
- *
- * Revision 1.11  2004/03/13 22:52:54  aleph
- * documentation fixes
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.3  2004/08/25 14:12:09  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.2  2004/06/03 11:27:09  bernie
+ *#* Add dual-license information.
+ *#*
+ *#* Revision 1.1  2004/05/23 15:43:16  bernie
+ *#* Import mware modules.
+ *#*
+ *#* Revision 1.17  2004/05/15 16:57:01  aleph
+ *#* Fixes for non-DEBUG build
+ *#*
+ *#* Revision 1.16  2004/04/03 20:42:49  aleph
+ *#* Add text_clear()
+ *#*
+ *#* Revision 1.15  2004/03/24 15:03:45  bernie
+ *#* Use explicit include paths; clean Doxygen comments
+ *#*
+ *#* Revision 1.14  2004/03/19 16:52:28  bernie
+ *#* Move printf() like functions from text.c to text_format.c and add PROGMEM versions.
+ *#*
+ *#* Revision 1.13  2004/03/17 18:23:32  bernie
+ *#* Oops.
+ *#*
+ *#* Revision 1.12  2004/03/17 18:03:22  bernie
+ *#* Make diagnostic message shorter
+ *#*
+ *#* Revision 1.11  2004/03/13 22:52:54  aleph
+ *#* documentation fixes
+ *#*/
 
 #include "gfx.h"
 #include "font.h"

@@ -13,45 +13,48 @@
  * \brief Hardware independent timer driver (implementation)
  */
 
-/*
- * $Log$
- * Revision 1.13  2004/08/10 06:59:09  bernie
- * timer_gettick(): Rename to timer_ticks() and add backwards compatibility inline.
- *
- * Revision 1.12  2004/08/08 05:59:37  bernie
- * Remove a few useless casts.
- *
- * Revision 1.11  2004/08/02 20:20:29  aleph
- * Merge from project_ks
- *
- * Revision 1.10  2004/07/30 14:15:53  rasky
- * Nuovo supporto unificato per detect della CPU
- *
- * Revision 1.9  2004/07/21 00:15:13  bernie
- * Put timer driver on diet.
- *
- * Revision 1.8  2004/07/18 21:57:07  bernie
- * Fix preprocessor warning with potentially undefined symbol.
- *
- * Revision 1.6  2004/06/07 18:10:06  aleph
- * Remove free pool of timers; use user-provided Timer structure instead
- *
- * Revision 1.5  2004/06/07 15:56:55  aleph
- * Some tabs cleanup and add timer strobe macros
- *
- * Revision 1.4  2004/06/06 18:25:44  bernie
- * Rename event macros to look like regular functions.
- *
- * Revision 1.3  2004/06/06 17:18:42  bernie
- * Fix \!CONFIG_KERN_SIGNALS code paths.
- *
- * Revision 1.2  2004/06/03 11:27:09  bernie
- * Add dual-license information.
- *
- * Revision 1.1  2004/05/23 18:23:30  bernie
- * Import drv/timer module.
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.14  2004/08/25 14:12:08  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.13  2004/08/10 06:59:09  bernie
+ *#* timer_gettick(): Rename to timer_ticks() and add backwards compatibility inline.
+ *#*
+ *#* Revision 1.12  2004/08/08 05:59:37  bernie
+ *#* Remove a few useless casts.
+ *#*
+ *#* Revision 1.11  2004/08/02 20:20:29  aleph
+ *#* Merge from project_ks
+ *#*
+ *#* Revision 1.10  2004/07/30 14:15:53  rasky
+ *#* Nuovo supporto unificato per detect della CPU
+ *#*
+ *#* Revision 1.9  2004/07/21 00:15:13  bernie
+ *#* Put timer driver on diet.
+ *#*
+ *#* Revision 1.8  2004/07/18 21:57:07  bernie
+ *#* Fix preprocessor warning with potentially undefined symbol.
+ *#*
+ *#* Revision 1.6  2004/06/07 18:10:06  aleph
+ *#* Remove free pool of timers; use user-provided Timer structure instead
+ *#*
+ *#* Revision 1.5  2004/06/07 15:56:55  aleph
+ *#* Some tabs cleanup and add timer strobe macros
+ *#*
+ *#* Revision 1.4  2004/06/06 18:25:44  bernie
+ *#* Rename event macros to look like regular functions.
+ *#*
+ *#* Revision 1.3  2004/06/06 17:18:42  bernie
+ *#* Fix \!CONFIG_KERN_SIGNALS code paths.
+ *#*
+ *#* Revision 1.2  2004/06/03 11:27:09  bernie
+ *#* Add dual-license information.
+ *#*
+ *#* Revision 1.1  2004/05/23 18:23:30  bernie
+ *#* Import drv/timer module.
+ *#*
+ *#*/
 
 #include "hw.h"
 #include "kdebug.h"

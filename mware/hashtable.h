@@ -29,40 +29,43 @@
  * \author Giovanni Bajo <rasky@develer.com>
  */
 
-/*
- * $Log$
- * Revision 1.3  2004/08/14 19:37:57  rasky
- * Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
- *
- * Revision 1.2  2004/08/04 15:52:54  rasky
- * Merge da SC: fixato namespace dell'include guard
- *
- * Revision 1.1  2004/07/14 14:08:16  rasky
- * Implementazione di una tabella hash
- *
- * Revision 1.10  2004/06/14 15:17:15  rasky
- * Qualche fix alla documentazione Doxygen
- *
- * Revision 1.9  2004/06/14 15:15:24  rasky
- * Cambiato key_data in un union invece di castare
- * Aggiunto un ASSERT sull'indice calcolata nella key_internal_get_ptr
- *
- * Revision 1.8  2004/06/14 14:59:40  rasky
- * Rinominanta la macro di configurazione per rispettare il namespace, e aggiunta in un punto in cui mancava
- *
- * Revision 1.7  2004/06/12 15:18:05  rasky
- * Nuova hashtable con chiave esterna o interna a scelta, come discusso
- *
- * Revision 1.6  2004/05/26 16:33:31  rasky
- * Aggiunta interfaccia per visita della hashtable tramite iteratori
- *
- * Revision 1.5  2004/05/24 18:42:23  rasky
- * Fixato un commento doxygen
- *
- * Revision 1.4  2004/05/24 15:28:20  rasky
- * Sistemata la documentazione, rimossa keycmp in favore della memcmp
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.4  2004/08/25 14:12:09  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.3  2004/08/14 19:37:57  rasky
+ *#* Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
+ *#*
+ *#* Revision 1.2  2004/08/04 15:52:54  rasky
+ *#* Merge da SC: fixato namespace dell'include guard
+ *#*
+ *#* Revision 1.1  2004/07/14 14:08:16  rasky
+ *#* Implementazione di una tabella hash
+ *#*
+ *#* Revision 1.10  2004/06/14 15:17:15  rasky
+ *#* Qualche fix alla documentazione Doxygen
+ *#*
+ *#* Revision 1.9  2004/06/14 15:15:24  rasky
+ *#* Cambiato key_data in un union invece di castare
+ *#* Aggiunto un ASSERT sull'indice calcolata nella key_internal_get_ptr
+ *#*
+ *#* Revision 1.8  2004/06/14 14:59:40  rasky
+ *#* Rinominanta la macro di configurazione per rispettare il namespace, e aggiunta in un punto in cui mancava
+ *#*
+ *#* Revision 1.7  2004/06/12 15:18:05  rasky
+ *#* Nuova hashtable con chiave esterna o interna a scelta, come discusso
+ *#*
+ *#* Revision 1.6  2004/05/26 16:33:31  rasky
+ *#* Aggiunta interfaccia per visita della hashtable tramite iteratori
+ *#*
+ *#* Revision 1.5  2004/05/24 18:42:23  rasky
+ *#* Fixato un commento doxygen
+ *#*
+ *#* Revision 1.4  2004/05/24 15:28:20  rasky
+ *#* Sistemata la documentazione, rimossa keycmp in favore della memcmp
+ *#*
+ *#*/
 
 
 #ifndef MWARE_HASHTABLE_H

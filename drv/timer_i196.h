@@ -13,15 +13,18 @@
  * \brief Low-level timer module for AVR
  */
 
-/*
- * $Log$
- * Revision 1.2  2004/06/03 11:27:09  bernie
- * Add dual-license information.
- *
- * Revision 1.1  2004/05/23 18:23:30  bernie
- * Import drv/timer module.
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.3  2004/08/25 14:12:08  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.2  2004/06/03 11:27:09  bernie
+ *#* Add dual-license information.
+ *#*
+ *#* Revision 1.1  2004/05/23 18:23:30  bernie
+ *#* Import drv/timer module.
+ *#*
+ *#*/
 
 #ifndef TIMER_I196_H
 #define TIMER_I196_H

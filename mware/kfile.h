@@ -12,12 +12,15 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-/*
- * $Log$
- * Revision 1.1  2004/08/04 02:40:25  bernie
- * Add virtual file I/O interface.
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.2  2004/08/25 14:12:09  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.1  2004/08/04 02:40:25  bernie
+ *#* Add virtual file I/O interface.
+ *#*
+ *#*/
 #ifndef MWARE_KFILE_H
 #define MWARE_KFILE_H
 

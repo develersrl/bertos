@@ -13,27 +13,30 @@
  * \brief Buzzer driver
  */
 
-/*
- * $Log$
- * Revision 1.7  2004/08/24 16:53:43  bernie
- * Add missing headers.
- *
- * Revision 1.6  2004/06/07 18:10:06  aleph
- * Remove free pool of timers; use user-provided Timer structure instead
- *
- * Revision 1.5  2004/06/07 15:54:23  aleph
- * Update to new event.h naming
- *
- * Revision 1.4  2004/06/06 16:09:22  bernie
- * Reformat (from project_ks).
- *
- * Revision 1.3  2004/06/03 11:27:09  bernie
- * Add dual-license information.
- *
- * Revision 1.2  2004/05/23 18:21:53  bernie
- * Trim CVS logs and cleanup header info.
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.8  2004/08/25 14:12:08  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.7  2004/08/24 16:53:43  bernie
+ *#* Add missing headers.
+ *#*
+ *#* Revision 1.6  2004/06/07 18:10:06  aleph
+ *#* Remove free pool of timers; use user-provided Timer structure instead
+ *#*
+ *#* Revision 1.5  2004/06/07 15:54:23  aleph
+ *#* Update to new event.h naming
+ *#*
+ *#* Revision 1.4  2004/06/06 16:09:22  bernie
+ *#* Reformat (from project_ks).
+ *#*
+ *#* Revision 1.3  2004/06/03 11:27:09  bernie
+ *#* Add dual-license information.
+ *#*
+ *#* Revision 1.2  2004/05/23 18:21:53  bernie
+ *#* Trim CVS logs and cleanup header info.
+ *#*
+ *#*/
 
 #include "buzzer.h"
 

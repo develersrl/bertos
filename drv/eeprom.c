@@ -15,30 +15,33 @@
  * \note This implementation is AVR specific.
  */
 
-/*
- * $Log$
- * Revision 1.7  2004/08/24 16:48:40  bernie
- * Note reason for including <macros.h>
- *
- * Revision 1.6  2004/08/24 14:27:20  bernie
- * Doxygen fix.
- *
- * Revision 1.5  2004/08/24 13:46:48  bernie
- * Include <macros.h>.
- *
- * Revision 1.4  2004/08/10 06:57:22  bernie
- * eeprom_erase(): New function.
- *
- * Revision 1.3  2004/07/29 22:57:09  bernie
- * Add 24LC16 support.
- *
- * Revision 1.2  2004/07/22 01:24:43  bernie
- * Document AVR dependency.
- *
- * Revision 1.1  2004/07/20 17:11:18  bernie
- * Import into DevLib.
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.8  2004/08/25 14:12:08  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.7  2004/08/24 16:48:40  bernie
+ *#* Note reason for including <macros.h>
+ *#*
+ *#* Revision 1.6  2004/08/24 14:27:20  bernie
+ *#* Doxygen fix.
+ *#*
+ *#* Revision 1.5  2004/08/24 13:46:48  bernie
+ *#* Include <macros.h>.
+ *#*
+ *#* Revision 1.4  2004/08/10 06:57:22  bernie
+ *#* eeprom_erase(): New function.
+ *#*
+ *#* Revision 1.3  2004/07/29 22:57:09  bernie
+ *#* Add 24LC16 support.
+ *#*
+ *#* Revision 1.2  2004/07/22 01:24:43  bernie
+ *#* Document AVR dependency.
+ *#*
+ *#* Revision 1.1  2004/07/20 17:11:18  bernie
+ *#* Import into DevLib.
+ *#*
+ *#*/
 
 #include "eeprom.h"
 

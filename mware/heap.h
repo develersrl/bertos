@@ -18,21 +18,24 @@
  *
  */
 
-/*
- * $Log$
- * Revision 1.2  2004/08/04 15:54:18  rasky
- * Merge da SC: prima versione veramente funzionante
- *
- * Revision 1.1  2004/07/31 16:33:58  rasky
- * Spostato lo heap da kern/ a mware/
- *
- * Revision 1.2  2004/06/03 11:27:09  bernie
- * Add dual-license information.
- *
- * Revision 1.1  2004/05/23 17:27:00  bernie
- * Import kern/ subdirectory.
- *
- */
+/*#*
+ *#* $Log$
+ *#* Revision 1.3  2004/08/25 14:12:09  rasky
+ *#* Aggiornato il comment block dei log RCS
+ *#*
+ *#* Revision 1.2  2004/08/04 15:54:18  rasky
+ *#* Merge da SC: prima versione veramente funzionante
+ *#*
+ *#* Revision 1.1  2004/07/31 16:33:58  rasky
+ *#* Spostato lo heap da kern/ a mware/
+ *#*
+ *#* Revision 1.2  2004/06/03 11:27:09  bernie
+ *#* Add dual-license information.
+ *#*
+ *#* Revision 1.1  2004/05/23 17:27:00  bernie
+ *#* Import kern/ subdirectory.
+ *#*
+ *#*/
 
 #ifndef MWARE_HEAP_H
 #define MWARE_HEAP_H
