@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/06/06 18:00:39  bernie
+ * PP_CAT(): New macro.
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -240,6 +243,10 @@
 /*! Calculate a compile-time log2 for a uint32_t */
 #define UINT32_LOG2(x) \
 	((x < 65536UL) ? UINT16_LOG2(x) : UINT16_LOG2((x) >> 16) + 16)
+
+/*! Concatenate two different preprocessor tokens (allowing macros to expand) */
+#define PP_CAT(x,y)                       PP_CAT__(x,y)
+#define PP_CAT__(x,y)                     x ## y
 
 /* Type definitions - should go in <sys/types.h> */
 #if !(defined(size_t) || defined(_SIZE_T_DEFINED))
