@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.11  2004/07/29 22:40:12  bernie
+ * Spelling fix.
+ *
  * Revision 1.10  2004/07/21 00:13:57  bernie
  * Put timer driver on diet.
  *
@@ -74,7 +77,7 @@ extern void timer_udelay(utime_t utime);
 #endif
 
 /*!
- * The timer driver supports multiple ssynchronous timers
+ * The timer driver supports multiple synchronous timers
  * that can trigger an event when they expire.
  *
  * \sa timer_add()
