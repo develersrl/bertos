@@ -16,6 +16,9 @@
 
 /*
  * $Log$
+ * Revision 1.5  2004/08/24 16:19:08  bernie
+ * kputchar(): New public function; Add missing dummy inlines for \!_DEBUG.
+ *
  * Revision 1.4  2004/07/30 14:26:33  rasky
  * Semplificato l'output dell'ASSERT
  * Aggiunta ASSERT2 con stringa di help opzionalmente disattivabile
@@ -42,6 +45,7 @@
 
 #if defined(_DEBUG)
 	void kdbg_init(void);
+	void kputchar(char c);
 	void kdump(const void *buf, size_t len);
 
 	#ifdef __AVR__
@@ -66,7 +70,7 @@
 	void __init_wall(long *wall, int size);
 	int __check_wall(long *wall, int size, const char *name, const char *file, int line);
 
-	#define THIS_FILE                       __FILE__
+	#define THIS_FILE  __FILE__
 	#ifndef CONFIG_KDEBUG_ASSERT_NO_TEXT
 		#define ASSERT(x)                   ((x) ? 0 : __assert(#x, THIS_FILE, __LINE__))
 		#define ASSERT2(x, help)            ((x) ? 0 : __assert(help " (" #x ")", THIS_FILE, __LINE__))
@@ -90,20 +94,22 @@
 
 #else /* !_DEBUG */
 
-	#define ASSERT(x)
-	#define ASSERT2(x, help)
-	#define ASSERT_VALID_PTR(p)
-	#define ASSERT_VALID_PTR_OR_NULL(p)
-	#define TRACE                           do {} while(0)
-	#define TRACEMSG(x,...)                 do {} while(0)
-	#define DB(x)
+	#define ASSERT(x)                    do {} while(0)
+	#define ASSERT2(x, help)             do {} while(0)
+	#define ASSERT_VALID_PTR(p)          do {} while(0)
+	#define ASSERT_VALID_PTR_OR_NULL(p)  do {} while(0)
+	#define TRACE                        do {} while(0)
+	#define TRACEMSG(x,...)              do {} while(0)
+	#define DB(x)                        /* nothing */
 
 	#define DECLARE_WALL(name, size)
 	#define INIT_WALL(name)
 	#define CHECK_WALL(name)
 
-	INLINE void kdbg_init(void) {}
-	INLINE void kprintf(UNUSED(const char*, fmt), ...) {}
+	INLINE void kdbg_init(void) { /*nop*/ }
+	INLINE void kputchar(UNUSED(char, c)) { /*nop*/ }
+	INLINE void kputs(UNUSED(const char*, str)) { /*nop*/ }
+	INLINE void kprintf(UNUSED(const char*, fmt), ...) { /*nop*/ }
 
 #endif /* !_DEBUG */
 

@@ -16,6 +16,9 @@
 
 /*
  * $Log$
+ * Revision 1.11  2004/08/24 16:19:08  bernie
+ * kputchar(): New public function; Add missing dummy inlines for \!_DEBUG.
+ *
  * Revision 1.10  2004/08/04 15:57:50  rasky
  * Cambiata la putchar per kdebug per DSP56k: la nuova funzione e' quella piu' a basso livello (assembly)
  *
@@ -58,10 +61,11 @@
 
 #if defined(_EMUL)
 	#include <stdio.h>
-	#define KDBG_WAIT_READY()      do {/*nop*/} while(0)
+	#define KDBG_WAIT_READY()      do { /*nop*/ } while(0)
 	#define KDBG_WRITE_CHAR(c)     putchar((c))
-	#define KDBG_MASK_IRQ(old)     do {/*nop*/} while(0)
-	#define KDBG_RESTORE_IRQ()     do {/*nop*/} while(0)
+	#define KDBG_MASK_IRQ(old)     do { (void)(old); } while(0)
+	#define KDBG_RESTORE_IRQ()     do { /*nop*/ } while(0)
+	typedef kdbg_irqsave_t         char; /* unused */
 #elif CPU_I196
 	#include "Util196.h"
 	#define KDBG_WAIT_READY()      do {} while (!(SP_STAT & (SPSF_TX_EMPTY | SPSF_TX_INT)))
@@ -72,6 +76,7 @@
 			INT_MASK1 &= ~INT1F_TI; \
 		} while(0)
 	#define KDBG_RESTORE_IRQ(old)  do { INT_MASK1 |= (old); }
+	typedef kdbg_irqsave_t         uint16_t; /* FIXME: unconfirmed */
 #elif CPU_AVR
 	#include <avr/io.h>
 	#if CONFIG_KDEBUG_PORT == 0
@@ -122,6 +127,8 @@
 			UCR = (old); \
 		} while(0)
 
+		typedef kdbg_irqsave_t uint8_t;
+
 	#elif CONFIG_KDEBUG_PORT == 1
 
 		/* External 485 transceiver on UART1 (to be overridden in "hw.h").  */
@@ -153,6 +160,7 @@
 			UCSR1B = (old); \
 		} while(0)
 
+		typedef kdbg_irqsave_t uint8_t;
 	#else
 		#error CONFIG_KDEBUG_PORT should be either 0 or 1
 	#endif
@@ -160,10 +168,11 @@
 	/* Debugging go through the JTAG interface. The MSL library already
 	   implements the console I/O correctly. */
 	#include <stdio.h>
-	#define KDBG_WAIT_READY()
+	#define KDBG_WAIT_READY()         do { } while (0)
 	#define KDBG_WRITE_CHAR(c)        __put_char(c, stdout)
-	#define KDBG_MASK_IRQ(old)
-	#define KDBG_RESTORE_IRQ(old)
+	#define KDBG_MASK_IRQ(old)        do { (void)(old); } while (0)
+	#define KDBG_RESTORE_IRQ(old)     do { (void)(old); } while (0)
+	typedef kdbg_irqsave_t            uint8_t; /* unused */
 #else
 	#error Unknown architecture
 #endif
@@ -217,7 +226,7 @@ void kdbg_init(void)
 /*!
  * Output one character to the debug console
  */
-static void kputchar(char c, UNUSED(void *, unused))
+static void __kputchar(char c, UNUSED(void *, unused))
 {
 	/* Poll while serial buffer is still busy */
 	KDBG_WAIT_READY();
@@ -233,16 +242,29 @@ static void kputchar(char c, UNUSED(void *, unused))
 }
 
 
+void kputchar(char c)
+{
+	/* Mask serial TX intr */
+	kdbg_irqsave_t irqsave;
+	KDBG_MASK_IRQ(irqsave);
+
+	__kputchar(c, 0);
+
+	/* Restore serial TX intr */
+	KDBG_RESTORE_IRQ(irqsave);
+}
+
+
 void PGM_FUNC(kprintf)(const char * PGM_ATTR fmt, ...)
 {
 	va_list ap;
 
 	/* Mask serial TX intr */
-	unsigned char irqsave;
+	kdbg_irqsave_t irqsave;
 	KDBG_MASK_IRQ(irqsave);
 
 	va_start(ap, fmt);
-	PGM_FUNC(_formatted_write)(fmt, kputchar, 0, ap);
+	PGM_FUNC(_formatted_write)(fmt, __kputchar, 0, ap);
 	va_end(ap);
 
 	/* Restore serial TX intr */
@@ -255,11 +277,11 @@ void PGM_FUNC(kputs)(const char * PGM_ATTR str)
 	char c;
 
 	/* Mask serial TX intr */
-	unsigned char irqsave;
+	kdbg_irqsave_t irqsave;
 	KDBG_MASK_IRQ(irqsave);
 
 	while ((c = PGM_READ_CHAR(str++)))
-		kputchar(c, 0);
+		__kputchar(c, 0);
 
 	KDBG_RESTORE_IRQ(irqsave);
 }
