@@ -38,6 +38,12 @@
 	#error unknown architecture
 #endif
 
+/*!
+ * If _SNAPSHOT is defined, VERSION_TAG build the version using the compilation
+ * date instead of building the numeric version string.
+ */
+#define _SNAPSHOT
+
 #ifdef _DEBUG
 	#define VERS_DBG "D"
 #else
@@ -47,7 +53,11 @@
 #define _STRINGIZE(a) #a
 /*! Build application version string (i.e.: "1.7.0") */
 #define MAKE_VERS(maj,min,rev) _STRINGIZE(maj) "." _STRINGIZE(min) "." _STRINGIZE(rev) VERS_LETTER VERS_DBG
-#define VERSION_TAG MAKE_VERS(VERS_MAJOR,VERS_MINOR,VERS_REV)
+#ifdef _SNAPSHOT
+	#define VERSION_TAG "snapshot" " " __DATE__ " " __TIME__ " " VERS_LETTER " " VERS_DBG
+#else
+	#define VERSION_TAG MAKE_VERS(VERS_MAJOR,VERS_MINOR,VERS_REV)
+#endif
 
 /*! Build application version string suitable for MS windows resource files (i.e.: "1, 7, 0, 1") */
 #define MAKE_RCVERS(maj,min,rev,bld) _STRINGIZE(maj) ", " _STRINGIZE(min) ", " _STRINGIZE(rev) ", " _STRINGIZE(bld)
