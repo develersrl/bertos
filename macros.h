@@ -15,6 +15,13 @@
 
 /*
  * $Log$
+ * Revision 1.2  2004/08/24 13:32:14  bernie
+ * PP_CAT(), PP_STRINGIZE(): Move back to compiler.h to break circular dependency between cpu.h/compiler.h/macros.h;
+ * offsetof(), countof(): Move back to compiler.h to avoid including macros.h almost everywhere;
+ * Trim CVS log;
+ * Rename header guards;
+ * Don't include arch_config.h in compiler.h as it's not needed there.
+ *
  * Revision 1.1  2004/08/14 19:37:57  rasky
  * Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
  *
@@ -37,17 +44,6 @@
 #define MACROS_H
 
 #include <compiler.h>
-
-/* Quasi-ANSI macros */
-#ifndef offsetof
-	/*! offsetof(s,m) - Return the byte offset of the member \a m in struct \a s */
-	#define offsetof(s,m)   (size_t)&(((s *)0)->m)
-#endif
-#ifndef countof
-	/*! Count the number of elements in the static array \a a */
-	#define countof(a)      (sizeof(a) / sizeof(*(a)))
-#endif
-
 
 /* Simple macros */
 #define ABS(a)      (((a) < 0) ? -(a) : (a))
@@ -82,17 +78,6 @@
 /*! Calculate a compile-time log2 for a uint32_t */
 #define UINT32_LOG2(x) \
 	((x < 65536UL) ? UINT16_LOG2(x) : UINT16_LOG2((x) >> 16) + 16)
-
-/*! Concatenate two different preprocessor tokens (allowing macros to expand) */
-#define PP_CAT(x,y)         PP_CAT__(x,y)
-#define PP_CAT__(x,y)       x ## y
-#define PP_CAT3(x,y,z)      PP_CAT(PP_CAT(x,y),z)
-#define PP_CAT4(x,y,z,w)    PP_CAT(PP_CAT3(x,y,z),w)
-#define PP_CAT5(x,y,z,w,j)  PP_CAT(PP_CAT4(x,y,z,w),j)
-
-/*! String-ize a token (allowing macros to expand) */
-#define PP_STRINGIZE(x)     PP_STRINGIZE__(x)
-#define PP_STRINGIZE__(x)   #x
 
 #if COMPILER_C99
 	/*! Count the number of arguments (up to 16) */

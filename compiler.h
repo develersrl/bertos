@@ -15,6 +15,13 @@
 
 /*
  * $Log$
+ * Revision 1.17  2004/08/24 13:32:14  bernie
+ * PP_CAT(), PP_STRINGIZE(): Move back to compiler.h to break circular dependency between cpu.h/compiler.h/macros.h;
+ * offsetof(), countof(): Move back to compiler.h to avoid including macros.h almost everywhere;
+ * Trim CVS log;
+ * Rename header guards;
+ * Don't include arch_config.h in compiler.h as it's not needed there.
+ *
  * Revision 1.16  2004/08/14 19:37:57  rasky
  * Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
  *
@@ -39,39 +46,10 @@
  *
  * Revision 1.9  2004/07/29 22:57:09  bernie
  * vsprintf(): Remove prototype for backwards compatibility with GCC 3.4; ssize_t: Add definition for inferior compilers.
- *
- * Revision 1.8  2004/07/20 23:43:39  bernie
- * Use attribute((always_inline)) to force inlining.  This fixes the much
- * hated need of redundant prototypes for inline functions.
- *
- * Revision 1.7  2004/07/20 23:26:48  bernie
- * Fix two errors introduced by previous commit.
- *
- * Revision 1.6  2004/07/20 23:12:43  bernie
- * *** empty log message ***
- *
- * Revision 1.5  2004/07/20 17:08:03  bernie
- * Cleanup documentation
- *
- * Revision 1.4  2004/06/27 15:20:26  aleph
- * Change UNUSED() macro to accept two arguments: type and name;
- * Add macro GNUC_PREREQ to detect GCC version during build;
- * Some spacing cleanups and typo fix
- *
- * Revision 1.3  2004/06/06 18:00:39  bernie
- * PP_CAT(): New macro.
- *
- * Revision 1.2  2004/06/03 11:27:09  bernie
- * Add dual-license information.
- *
- * Revision 1.1  2004/05/23 17:48:35  bernie
- * Add top-level files.
- *
  */
-#ifndef COMPILER_H
-#define COMPILER_H
+#ifndef DEVLIB_COMPILER_H
+#define DEVLIB_COMPILER_H
 
-#include "arch_config.h"
 #include "cpu_detect.h"
 
 
@@ -87,6 +65,19 @@
 #else
 	#define COMPILER_C99      0
 #endif
+
+
+/*! Concatenate two different preprocessor tokens (allowing macros to expand) */
+#define PP_CAT(x,y)         PP_CAT__(x,y)
+#define PP_CAT__(x,y)       x ## y
+#define PP_CAT3(x,y,z)      PP_CAT(PP_CAT(x,y),z)
+#define PP_CAT4(x,y,z,w)    PP_CAT(PP_CAT3(x,y,z),w)
+#define PP_CAT5(x,y,z,w,j)  PP_CAT(PP_CAT4(x,y,z,w),j)
+
+/*! String-ize a token (allowing macros to expand) */
+#define PP_STRINGIZE(x)     PP_STRINGIZE__(x)
+#define PP_STRINGIZE__(x)   #x
+
 
 #if defined(__IAR_SYSTEMS_ICC) || defined(__IAR_SYSTEMS_ICC__)
 	#pragma language=extended
@@ -252,7 +243,7 @@
 
 /* Misc definitions */
 #ifndef NULL
-#define NULL  0
+#define NULL  (void *)0
 #endif
 #ifndef EOF
 #define	EOF   (-1)
@@ -282,6 +273,7 @@
 #endif /* _TIME_T_DEFINED || __time_t_defined */
 
 /*! Storage for pointers and integers */
+/* FIXME: turn this into a typedef? */
 #define IPTR void *
 
 typedef long utime_t;
@@ -290,9 +282,11 @@ typedef unsigned char sigset_t;
 typedef unsigned char page_t;
 
 #if (defined(_MSC_VER) || defined(__IAR_SYSTEMS_ICC) || defined(__IAR_SYSTEMS_ICC__))
-	/*
-	 * ISO C99 fixed-size types
+	/*!
+	 * \name ISO C99 fixed-size types
+	 *
 	 * These should be in <stdint.h>, but many compilers lack them.
+	 * \{
 	 */
 	typedef signed char         int8_t;
 	typedef short int           int16_t;
@@ -300,8 +294,8 @@ typedef unsigned char page_t;
 	typedef unsigned char       uint8_t;
 	typedef unsigned short int  uint16_t;
 	typedef unsigned long int   uint32_t;
-#elif defined(__AVR__)
-	/* TODO: should this detect GCC+AVR combo, or just CPU_AVR? */
+	/* \} */
+#elif defined(__GNUC__) && defined(__AVR__)
 	/* avr-libc is weird... */
 	#include <inttypes.h>
 #else
@@ -327,4 +321,24 @@ typedef unsigned char page_t;
 #endif
 /*\}*/
 
-#endif /* COMPILER_H */
+
+/* Quasi-ANSI macros */
+#ifndef offsetof
+	/*!
+	 * Return the byte offset of the member \a m in struct \a s
+	 *
+	 * \note This macro should be defined in "stddef.h" and is sometimes
+	 *       compiler-specific (g++ has a builtin for it).
+	 */
+	#define offsetof(s,m)  (size_t)&(((s *)0)->m)
+#endif
+#ifndef countof
+	/*!
+	 * Count the number of elements in the static array \a a
+	 *
+	 * \note This macro is non-standard, but implmenents a very common idiom
+	 */
+	#define countof(a)  (sizeof(a) / sizeof(*(a)))
+#endif
+
+#endif /* DEVLIB_COMPILER_H */
