@@ -14,6 +14,9 @@
 
 /*
  * $Log$
+ * Revision 1.9  2004/08/15 05:32:22  bernie
+ * ser_resync(): New function.
+ *
  * Revision 1.8  2004/08/02 20:20:29  aleph
  * Merge from project_ks
  *
@@ -174,6 +177,7 @@ extern int ser_gets_echo(struct Serial *port, char *buf, int size, bool echo);
 extern void ser_setbaudrate(struct Serial *port, unsigned long rate);
 extern void ser_setparity(struct Serial *port, int parity);
 extern void ser_settimeouts(struct Serial *port, time_t rxtimeout, time_t txtimeout);
+extern void ser_resync(struct Serial *port, time_t delay);
 extern void ser_purge(struct Serial *port);
 extern void ser_drain(struct Serial *port);
 

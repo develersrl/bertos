@@ -28,6 +28,9 @@
 
 /*
  * $Log$
+ * Revision 1.11  2004/08/15 05:32:22  bernie
+ * ser_resync(): New function.
+ *
  * Revision 1.10  2004/08/10 06:29:50  bernie
  * Rename timer_gettick() to timer_ticks().
  *
@@ -319,6 +322,33 @@ void ser_settimeouts(struct Serial *port, time_t rxtimeout, time_t txtimeout)
 }
 #endif /* CONFIG_SER_RXTIMEOUT || CONFIG_SER_TXTIMEOUT */
 
+#if CONFIG_SER_RXTIMEOUT != -1
+/*!
+ * Discard input to resynchronize with remote end
+ *
+ * Discard incoming data until the port stops receiving
+ * characters for at least \a delay milliseconds.
+ *
+ * \note Serial errors are reset before and after executing the purge.
+ */
+void ser_resync(struct Serial *port, time_t delay)
+{
+	time_t old_rxtimeout = port->rxtimeout;
+
+	ser_settimeouts(delay, ser->txtimeout);
+	do
+	{
+		ser_setstatus(port, 0);
+		ser_getchar(port);
+	}
+	while (!(ser_getstatus(port) & SERRF_RXTIMEOUT));
+
+	/* Restore port to an usable status */
+	ser_setstatus(port, 0);
+	ser_settimeouts(old_rxtimeout, ser->txtimeout);
+}
+#endif /* CONFIG_SER_RXTIMEOUT */
+
 
 void ser_setbaudrate(struct Serial *port, unsigned long rate)
 {
@@ -335,11 +365,12 @@ void ser_setparity(struct Serial *port, int parity)
 /*!
  * Flush both the RX and TX buffers.
  */
-void ser_purge(struct Serial *ser)
+void ser_purge(struct Serial *port)
 {
 	fifo_flush_locked(&ser->rxfifo);
 	fifo_flush_locked(&ser->txfifo);
 }
+
 
 /*!
  * Wait until all pending output is completely
@@ -351,7 +382,7 @@ void ser_purge(struct Serial *ser)
  */
 void ser_drain(struct Serial *ser)
 {
-	while(!fifo_isempty(&ser->txfifo))
+	while (!fifo_isempty(&ser->txfifo))
 	{
 #if defined(CONFIG_KERN_SCHED) && CONFIG_KERN_SCHED
 			/* Give up timeslice to other processes. */
