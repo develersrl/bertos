@@ -14,6 +14,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/08/04 03:16:59  bernie
+ * Switch to new DevLib CONFIG_ convention.
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -34,27 +37,27 @@
  *
  */
 
-#ifndef GFX_H
-#define GFX_H
+#ifndef MWARE_GFX_H
+#define MWARE_GFX_H
 
-#include "compiler.h"
-#include <avr/pgmspace.h>
+#include <compiler.h>
 
 
 /*! Common type for coordinates expressed in pixel units */
 typedef int coord_t;
 
-#ifdef CONFIG_LCD_VCOORDS
+#if CONFIG_GFX_VCOORDS
 /*! Common type for coordinates expressed in logical units */
 typedef float vcoord_t;
-#endif /* CONFIG_LCD_VCOORDS */
+#endif /* CONFIG_GFX_VCOORDS */
 
 
 typedef struct Rect { coord_t xmin, ymin, xmax, ymax; } Rect;
 
 
-/*! Control structure to draw in a bitmap */
-
+/*!
+ * Control structure to draw in a bitmap
+ */
 typedef struct Bitmap
 {
 	uint8_t *raster;        /*!< Pointer to byte array to hold the data */
@@ -63,11 +66,15 @@ typedef struct Bitmap
 
 	Rect cr;                /*!< Clip drawing inside this rectangle */
 
-#ifdef CONFIG_LCD_VCOORDS
-	/*! Logical coordinate system */
+#if CONFIG_GFX_VCOORDS
+	/*!
+	 * \name Logical coordinate system
+	 * \{
+	 */
 	vcoord_t orgX, orgY;
 	vcoord_t scaleX, scaleY;
-#endif /* CONFIG_LCD_VCOORDS */
+	/*\}*/
+#endif /* CONFIG_GFX_VCOORDS */
 
 } Bitmap;
 
@@ -84,11 +91,11 @@ extern void gfx_MoveTo(Bitmap *bm, coord_t x, coord_t y);
 extern void gfx_LineTo(Bitmap *bm, coord_t x, coord_t y);
 extern void gfx_SetClipRect(Bitmap *bm, coord_t xmin, coord_t ymin, coord_t xmax, coord_t ymax);
 
-#ifdef CONFIG_LCD_VCOORDS
+#if CONFIG_GFX_VCOORDS
 extern void gfx_SetViewRect(Bitmap *bm, vcoord_t x1, vcoord_t y1, vcoord_t x2, vcoord_t y2);
 extern coord_t gfx_TransformX(Bitmap *bm, vcoord_t x);
 extern coord_t gfx_TransformY(Bitmap *bm, vcoord_t y);
 extern void gfx_VDrawLine(Bitmap *bm, vcoord_t x1, vcoord_t y1, vcoord_t x2, vcoord_t y2);
-#endif /* CONFIG_LCD_VCOORDS */
+#endif /* CONFIG_GFX_VCOORDS */
 
-#endif /* GFX_H */
+#endif /* MWARE_GFX_H */

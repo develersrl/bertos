@@ -16,6 +16,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/08/04 03:16:59  bernie
+ * Switch to new DevLib CONFIG_ convention.
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -334,7 +337,7 @@ void gfx_SetClipRect(Bitmap *bm, coord_t minx, coord_t miny, coord_t maxx, coord
 }
 
 
-#ifdef CONFIG_LCD_VCOORDS
+#if CONFIG_GFX_VCOORDS
 /*!
  * Imposta gli estremi del sistema di coordinate cartesiane rispetto
  * al rettangolo di clipping della bitmap.
@@ -383,4 +386,4 @@ void gfx_VDrawLine(Bitmap *bm, vcoord_t x1, vcoord_t y1, vcoord_t x2, vcoord_t y
 		gfx_TransformX(bm, x1), gfx_TransformY(bm, y1),
 		gfx_TransformY(bm, x2), gfx_TransformY(bm, y2));
 }
-#endif /* CONFIG_LCD_VCOORDS */
+#endif /* CONFIG_GFX_VCOORDS */
