@@ -5,11 +5,11 @@
  * This file is part of DevLib - See devlib/README for information.
  * -->
  *
- * \brief Simple debug facilities for hosted and embedded C/C++ applications
+ * \brief Simple debug facilities for hosted and embedded C/C++ applications.
  *
- * Debug output goes to stderr in hosted applications.  Freestanding (AKA embedded)
- * applications use drv/kdebug.c to output diagnostic messages to a serial terminal
- * or a JTAG debugger.
+ * Debug output goes to stderr in hosted applications.
+ * Freestanding (AKA embedded) applications use \c drv/kdebug.c to output
+ * diagnostic messages to a serial terminal or a JTAG debugger.
  *
  * \version $Id$
  * \author Bernardo Innocenti <bernie@develer.com>
@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2004/12/08 08:04:13  bernie
+ *#* Doxygen fixes.
+ *#*
  *#* Revision 1.4  2004/12/08 07:29:27  bernie
  *#* Fix Doxygen tags.
  *#*
@@ -235,7 +238,7 @@
 	 * These macros help track some kinds of leaks in C++ programs.
 	 * Usage is as follows:
 	 *
-	 * \example
+	 * \code
 	 *   class Foo
 	 *   {
 	 *       DECLARE_INSTANCE_TRACKING(Foo)
@@ -264,8 +267,8 @@
 	 *        delete foo;
 	 *        ASSERT_ZERO_INSTANCES(Foo); // OK
 	 *   }
-	 *
-	 * \end example
+	 * \endcode
+	 * \{
 	 */
 	#define NEW_INSTANCE(CLASS)                do { ++CLASS::__instances } while (0)
 	#define DELETE_INSTANCE(CLASS)             do { --CLASS::__instances } while (0)
@@ -273,6 +276,7 @@
 	#define GET_INSTANCE_COUNT(CLASS)          (CLASS::__instances)
 	#define DECLARE_INSTANCE_TRACKING(CLASS)   static int __instances
 	#define IMPLEMENT_INSTANCE_TRACKING(CLASS) int CLASS::__instances = 0
+	/*\}*/
 
 #else /* !_DEBUG */
 

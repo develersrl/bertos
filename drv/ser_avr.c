@@ -38,6 +38,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.18  2004/12/08 08:03:48  bernie
+ *#* Doxygen fixes.
+ *#*
  *#* Revision 1.17  2004/10/19 07:52:35  bernie
  *#* Reset parity bits before overwriting them (Fixed by batt in project_ks).
  *#*
@@ -191,6 +194,9 @@
 	 *
 	 * The default is no action.
 	 */
+	#ifdef __doxygen__
+	#define SER_UART0_BUS_TXOFF
+	#endif
 #endif
 
 #ifndef SER_UART1_BUS_TXINIT
@@ -223,6 +229,9 @@
 	 *
 	 * \see SER_UART0_BUS_TXOFF
 	 */
+	#ifdef __doxygen__
+	#define SER_UART1_BUS_TXOFF
+	#endif
 #endif
 /*\}*/
 

@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.24  2004/12/08 08:04:13  bernie
+ *#* Doxygen fixes.
+ *#*
  *#* Revision 1.23  2004/11/16 22:41:58  bernie
  *#* Support 64bit CPUs.
  *#*
@@ -293,11 +296,7 @@
 
 
 /*!
- * \name Default type sizes
- *
- * \def SIZEOF_CHAR SIZEOF_SHORT SIZEOF_INT SIZEOF_LONG SIZEOF_PTR
- * \def CPU_BITS_PER_CHAR CPU_BITS_PER_SHORT CPU_BITS_PER_INT
- * \def CPU_BITS_PER_LONG CPU_BITS_PER_PTR
+ * \name Default type sizes.
  *
  * These defaults are reasonable for most 16/32bit machines.
  * Some of these macros may be overridden by CPU-specific code above.
