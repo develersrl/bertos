@@ -18,6 +18,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2004/11/01 15:14:07  bernie
+ *#* Update to current coding conventions.
+ *#*
  *#* Revision 1.9  2004/10/21 10:58:33  bernie
  *#* Add a TODO item.
  *#*
@@ -35,13 +38,12 @@
  *#*
  *#* Revision 1.2  2004/06/03 11:27:09  bernie
  *#* Add dual-license information.
- *#*
  *#*/
 
 #include "gfx.h"
 #include "config.h"  /* CONFIG_GFX_CLIPPING */
 #include <debug.h>
-#include <cpu.h>     /* CPU_AVR */
+#include <cpu.h>     /* CPU_HARVARD */
 #include <macros.h>  /* SWAP() */
 
 #include <string.h>
@@ -82,7 +84,7 @@
  *
  * \note The pen position is reset to the origin.
  */
-void gfx_InitBitmap(Bitmap *bm, uint8_t *raster, coord_t w, coord_t h)
+void gfx_bitmapInit(Bitmap *bm, uint8_t *raster, coord_t w, coord_t h)
 {
 	bm->raster = raster;
 	bm->width = w;
@@ -93,37 +95,39 @@ void gfx_InitBitmap(Bitmap *bm, uint8_t *raster, coord_t w, coord_t h)
 
 
 /*!
- * Clear the whole bitmap surface to all zeros
+ * Clear the whole bitmap surface to the background color.
  *
  * \note This function does \b not update the current pen position
  */
-void gfx_ClearBitmap(Bitmap *bm)
+void gfx_bitmapClear(Bitmap *bm)
 {
 	memset(bm->raster, 0, (bm->width * bm->height) / 8);
 }
 
 
-#if CPU_AVR
+#if CPU_HARVARD
 /*!
  * Copy a raster picture located in program memory in the bitmap.
  * The size of the raster to copy *must* be the same of the raster bitmap.
  *
  * \note This function does \b not update the current pen position
  */
-void gfx_blitBitmap_P(Bitmap *bm, const prog_uchar *raster)
+void gfx_blit_P(Bitmap *bm, const prog_uchar *raster)
 {
-	memcpy_P(bm->raster, raster, bm->height/8 * bm->width);
+	memcpy_P(bm->raster, raster, (bm->height / 8) * bm->width);
 }
-#endif /* CPU_AVR */
+#endif /* CPU_HARVARD */
 
 
 /*!
  * Draw a line on the bitmap \a bm using the specified start and end
  * coordinates.
  *
- * \note This function does \b not update the current pen position
+ * \note This function does \b not update the current pen position.
+ *
+ * \todo Optimize for vertical and horiziontal lines.
  */
-void gfx_DrawLine(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
+void gfx_line(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 {
 	int x, y, e, len, adx, ady, signx, signy;
 
@@ -262,7 +266,7 @@ void gfx_DrawLine(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 /*!
  * Move the current pen position to the specified coordinates.
  */
-void gfx_MoveTo(Bitmap *bm, coord_t x, coord_t y)
+void gfx_moveTo(Bitmap *bm, coord_t x, coord_t y)
 {
 	bm->penX = x;
 	bm->penY = y;
@@ -274,10 +278,10 @@ void gfx_MoveTo(Bitmap *bm, coord_t x, coord_t y)
  * \note This function moves the current pen position to the
  *       new coordinates.
  */
-void gfx_LineTo(Bitmap *bm, coord_t x, coord_t y)
+void gfx_lineTo(Bitmap *bm, coord_t x, coord_t y)
 {
-	gfx_DrawLine(bm, bm->penX, bm->penY, x, y);
-	gfx_MoveTo(bm, x, y);
+	gfx_line(bm, bm->penX, bm->penY, x, y);
+	gfx_moveTo(bm, x, y);
 }
 
 
@@ -287,17 +291,17 @@ void gfx_LineTo(Bitmap *bm, coord_t x, coord_t y)
  * \note The bottom-right border of the rectangle is not drawn.
  * \note This function does \b not update the current pen position
  */
-void gfx_RectDraw(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
+void gfx_rectDraw(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 {
 	/* Sort coords (needed for correct bottom-right semantics) */
 	if (x1 > x2) SWAP(x1, x2);
 	if (y1 > y2) SWAP(y1, y2);
 
 	/* Draw rectangle */
-	gfx_DrawLine(bm, x1,   y1,   x2-1, y1);
-	gfx_DrawLine(bm, x2-1, y1,   x2-1, y2-1);
-	gfx_DrawLine(bm, x2-1, y2-1, x1,   y2-1);
-	gfx_DrawLine(bm, x1,   y2-1, x1,   y1);
+	gfx_line(bm, x1,   y1,   x2-1, y1);
+	gfx_line(bm, x2-1, y1,   x2-1, y2-1);
+	gfx_line(bm, x2-1, y2-1, x1,   y2-1);
+	gfx_line(bm, x1,   y2-1, x1,   y1);
 }
 
 
@@ -308,7 +312,7 @@ void gfx_RectDraw(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
  *
  * \note This function does \b not update the current pen position
  */
-void gfx_RectFillC(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2, uint8_t color)
+void gfx_rectFillC(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2, uint8_t color)
 {
 	coord_t x, y;
 
@@ -352,9 +356,9 @@ void gfx_RectFillC(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2, u
  *
  * \note This function does \b not update the current pen position
  */
-void gfx_RectFill(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
+void gfx_rectFill(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 {
-	gfx_RectFillC(bm, x1, y1, x2, y2, 0xFF);
+	gfx_rectFillC(bm, x1, y1, x2, y2, 0xFF);
 }
 
 
@@ -365,16 +369,16 @@ void gfx_RectFill(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
  *
  * \note This function does \b not update the current pen position
  */
-void gfx_RectClear(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
+void gfx_rectClear(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 {
-	gfx_RectFillC(bm, x1, y1, x2, y2, 0x00);
+	gfx_rectFillC(bm, x1, y1, x2, y2, 0x00);
 }
 
 
 /*!
- * Imposta un rettangolo di clipping per il disegno nella bitmap
+ * Imposta un rettangolo di clipping per il disegno nella bitmap.
  */
-void gfx_SetClipRect(Bitmap *bm, coord_t minx, coord_t miny, coord_t maxx, coord_t maxy)
+void gfx_setClipRect(Bitmap *bm, coord_t minx, coord_t miny, coord_t maxx, coord_t maxy)
 {
 	ASSERT(minx < maxx);
 	ASSERT(miny < maxy);
@@ -399,7 +403,7 @@ void gfx_SetClipRect(Bitmap *bm, coord_t minx, coord_t miny, coord_t maxx, coord
  * Imposta gli estremi del sistema di coordinate cartesiane rispetto
  * al rettangolo di clipping della bitmap.
  */
-void gfx_SetViewRect(Bitmap *bm, vcoord_t x1, vcoord_t y1, vcoord_t x2, vcoord_t y2)
+void gfx_setViewRect(Bitmap *bm, vcoord_t x1, vcoord_t y1, vcoord_t x2, vcoord_t y2)
 {
 	ASSERT(x1 != x2);
 	ASSERT(y1 != y2);
@@ -419,7 +423,7 @@ void gfx_SetViewRect(Bitmap *bm, vcoord_t x1, vcoord_t y1, vcoord_t x2, vcoord_t
  * Transform a coordinate from the current reference system to a
  * pixel offset within the bitmap.
  */
-coord_t gfx_TransformX(Bitmap *bm, vcoord_t x)
+coord_t gfx_transformX(Bitmap *bm, vcoord_t x)
 {
 	return bm->cr.xmin + (coord_t)((x - bm->orgX) * bm->scaleX);
 }
@@ -428,19 +432,19 @@ coord_t gfx_TransformX(Bitmap *bm, vcoord_t x)
  * Transform a coordinate from the current reference system to a
  * pixel offset within the bitmap.
  */
-coord_t gfx_TransformY(Bitmap *bm, vcoord_t y)
+coord_t gfx_transformY(Bitmap *bm, vcoord_t y)
 {
 	return bm->cr.ymin + (coord_t)((y - bm->orgY) * bm->scaleY);
 }
 
 
 /*!
- * Draw a line from (x1;y1) to (x2;y2)
+ * Draw a line from (x1;y1) to (x2;y2).
  */
-void gfx_VDrawLine(Bitmap *bm, vcoord_t x1, vcoord_t y1, vcoord_t x2, vcoord_t y2)
+void gfx_vline(Bitmap *bm, vcoord_t x1, vcoord_t y1, vcoord_t x2, vcoord_t y2)
 {
-	gfx_DrawLine(bm,
-		gfx_TransformX(bm, x1), gfx_TransformY(bm, y1),
-		gfx_TransformY(bm, x2), gfx_TransformY(bm, y2));
+	gfx_line(bm,
+		gfx_transformX(bm, x1), gfx_transformY(bm, y1),
+		gfx_transformY(bm, x2), gfx_transformY(bm, y2));
 }
 #endif /* CONFIG_GFX_VCOORDS */

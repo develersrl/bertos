@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2004/11/01 15:14:07  bernie
+ *#* Update to current coding conventions.
+ *#*
  *#* Revision 1.7  2004/09/20 03:29:06  bernie
  *#* Conditionalize AVR-specific code.
  *#*
@@ -77,32 +80,28 @@ typedef struct Bitmap
 
 
 /* Function prototypes */
-extern void gfx_InitBitmap(Bitmap *bm, uint8_t *raster, coord_t w, coord_t h);
-extern void gfx_ClearBitmap(Bitmap *bm);
-extern void gfx_DrawLine(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2);
-extern void gfx_RectDraw(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2);
-extern void gfx_RectFillC(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2, uint8_t color);
-extern void gfx_RectFill(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2);
-extern void gfx_RectClear(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2);
-extern void gfx_MoveTo(Bitmap *bm, coord_t x, coord_t y);
-extern void gfx_LineTo(Bitmap *bm, coord_t x, coord_t y);
-extern void gfx_SetClipRect(Bitmap *bm, coord_t xmin, coord_t ymin, coord_t xmax, coord_t ymax);
+extern void gfx_bitmapInit (Bitmap *bm, uint8_t *raster, coord_t w, coord_t h);
+extern void gfx_bitmapClear(Bitmap *bm);
+extern void gfx_line       (Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2);
+extern void gfx_rectDraw   (Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2);
+extern void gfx_rectFillC  (Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2, uint8_t color);
+extern void gfx_rectFill   (Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2);
+extern void gfx_rectClear  (Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2);
+extern void gfx_moveTo     (Bitmap *bm, coord_t x,  coord_t y);
+extern void gfx_lineTo     (Bitmap *bm, coord_t x,  coord_t y);
+extern void gfx_setClipRect(Bitmap *bm, coord_t xmin, coord_t ymin, coord_t xmax, coord_t ymax);
 
 #if CPU_AVR
 	#include <avr/pgmspace.h>
-	extern void gfx_blitBitmap_P(Bitmap *bm, const prog_uchar *raster);
+	extern void gfx_blit_P(Bitmap *bm, const prog_uchar *raster);
 #endif /* CPU_AVR */
 
-/* DEPRECATED names */
-#define gfx_DrawRect  gfx_RectDraw
-#define gfx_FillRect  gfx_RectFill
-#define gfx_ClearRect gfx_RectClear
 
 #if CONFIG_GFX_VCOORDS
-extern void gfx_SetViewRect(Bitmap *bm, vcoord_t x1, vcoord_t y1, vcoord_t x2, vcoord_t y2);
-extern coord_t gfx_TransformX(Bitmap *bm, vcoord_t x);
-extern coord_t gfx_TransformY(Bitmap *bm, vcoord_t y);
-extern void gfx_VDrawLine(Bitmap *bm, vcoord_t x1, vcoord_t y1, vcoord_t x2, vcoord_t y2);
+extern void gfx_setViewRect(Bitmap *bm, vcoord_t x1, vcoord_t y1, vcoord_t x2, vcoord_t y2);
+extern coord_t gfx_transformX(Bitmap *bm, vcoord_t x);
+extern coord_t gfx_transformY(Bitmap *bm, vcoord_t y);
+extern void gfx_vline(Bitmap *bm, vcoord_t x1, vcoord_t y1, vcoord_t x2, vcoord_t y2);
 #endif /* CONFIG_GFX_VCOORDS */
 
 #endif /* MWARE_GFX_H */
