@@ -17,6 +17,9 @@
 
 /*
  * $Log$
+ * Revision 1.5  2004/07/14 14:18:09  rasky
+ * Merge da SC: Rimosso timer dentro il task, che è uno spreco di memoria per troppi task
+ *
  * Revision 1.4  2004/07/13 19:21:28  aleph
  * Avoid warning for unused arg when compiled without some CONFIG_KERN_xx options
  *
@@ -74,10 +77,6 @@ static void proc_init_struct(Process* proc)
 {
 	/* Avoid warning for unused argument */
 	(void)proc;
-
-#if CONFIG_KERN_TIMER
-	event_initSignal(&proc->proc_timer.expire, proc, SIG_SINGLE);
-#endif
 
 #if CONFIG_KERN_SIGNALS
 	proc->sig_recv = 0;

@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/07/14 14:18:09  rasky
+ * Merge da SC: Rimosso timer dentro il task, che è uno spreco di memoria per troppi task
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -42,7 +45,6 @@
 #include "config.h"
 #include "config_kern.h"
 #include <mware/list.h>
-#include <drv/timer.h>
 
 
 typedef struct Process
@@ -53,10 +55,6 @@ typedef struct Process
 #if CONFIG_KERN_SIGNALS
 	sigset_t     sig_wait;    /*!< Signals the process is waiting for */
 	sigset_t     sig_recv;    /*!< Received signals */
-#endif
-
-#if CONFIG_KERN_TIMER
-	struct Timer proc_timer;  /*!< Process own timer */
 #endif
 
 #if CONFIG_KERN_HEAP
