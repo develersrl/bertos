@@ -41,6 +41,9 @@
 
 /*
  * $Log$
+ * Revision 1.8  2004/07/20 23:47:39  bernie
+ * Finally remove redundant protos.
+ *
  * Revision 1.7  2004/07/20 23:46:29  bernie
  * Finally remove redundant protos.
  *
@@ -224,7 +227,6 @@ INLINE void fifo_flush(FIFOBuffer *fb)
 	 *
 	 * \sa fifo_isempty()
 	 */
-	INLINE bool fifo_isempty_locked(const FIFOBuffer *fb);
 	INLINE bool fifo_isempty_locked(const FIFOBuffer *fb)
 	{
 		bool result;
@@ -244,7 +246,6 @@ INLINE void fifo_flush(FIFOBuffer *fb)
 	 *
 	 * \sa fifo_push()
 	 */
-	INLINE void fifo_push_locked(FIFOBuffer *fb, unsigned char c);
 	INLINE void fifo_push_locked(FIFOBuffer *fb, unsigned char c)
 	{
 		cpuflags_t flags;
