@@ -6,15 +6,39 @@
  * This file is part of DevLib - See devlib/README for information.
  * -->
  *
- * \version $Id$
- *
- * \author Bernardo Innocenti <bernie@develer.com>
- *
  * \brief AVR UART and SPI I/O driver
+ *
+ * Rationale for project_ks hardware.
+ *
+ * The serial 0 on the board_kf board is used to communicate with the
+ * smart card, which has the TX and RX lines connected together. To
+ * allow the smart card to drive the RX line of the CPU the CPU TX has
+ * to be in a high impedance state.
+ * Whenever a transmission is done and there is nothing more to send
+ * the transmitter is turn off. The output pin is held in input with
+ * pull-up enabled, to avoid capturing noise from the nearby RX line.
+ *
+ * The line on the KBus port has to be active everytime, even when
+ * there is nothing to transmit, because the transmission of burst
+ * of data generate noise on the audio channels.
+ * This is accomplished with the multiprocessor mode of the ATmega64
+ * serial.
+ * The receiver keep MPCM bit always on. When useful data
+ * is trasmitted the address bit is set. The receiver hardware
+ * consider the frame as address info and receive it.
+ * When useless fill bytes are sent the address bit is cleared
+ * and the receiver will ignore them, avoiding useless triggering
+ * of RXC interrupt.
+ *
+ * \version $Id$
+ * \author Bernardo Innocenti <bernie@develer.com>
  */
 
 /*
  * $Log$
+ * Revision 1.6  2004/07/13 19:20:40  aleph
+ * Add and cleanup comments
+ *
  * Revision 1.5  2004/06/27 15:25:40  aleph
  * Add missing callbacks for SPI;
  * Change UNUSED() macro to new version with two args;
@@ -102,16 +126,14 @@ static void uart0_init(struct SerialHardware *_hw, struct Serial *ser)
 	PORTE |= BV(PORTE1);
 	ENABLE_IRQRESTORE(flags);
 
-	/* TODO: explain why TX is disabled whenever possible */
 #if defined(CONFIG_SER_TXFILL) && (CONFIG_KBUS_SERIAL_PORT == 0)
 	/*!
 	 * Set multiprocessor mode and 9 bit data frame.
 	 * The receiver keep MPCM bit always on. When useful data
-	 * is trasmitted the ninth bit is set. Receiver consider the
-	 * frame as address info and receive it.
+	 * is trasmitted the ninth bit is set and the receiver receive
+	 * the frame.
 	 * When useless fill bytes are sent the ninth bit is cleared
-	 * and the receiver will ignore them, avoiding useless triggering
-	 * of RXC interrupt.
+	 * and the receiver will ignore them.
 	 */
 	UCSR0A = BV(MPCM);
 	UCSR0B = BV(RXCIE) | BV(RXEN) | BV(UCSZ2);
@@ -129,7 +151,7 @@ static void uart0_cleanup(UNUSED(struct SerialHardware *, ctx))
 
 static void uart0_setbaudrate(UNUSED(struct SerialHardware *, ctx), unsigned long rate)
 {
-	// Compute baud-rate period
+	/* Compute baud-rate period */
 	uint16_t period = (((CLOCK_FREQ / 16UL) + (rate / 2)) / rate) - 1;
 
 #ifndef __AVR_ATmega103__
@@ -163,9 +185,8 @@ static void uart1_init(struct SerialHardware *_hw, struct Serial *ser)
 	PORTD |= BV(PORTD3);
 	ENABLE_IRQRESTORE(flags);
 
-	/* TODO: explain why TX is disabled whenever possible */
 #if defined(CONFIG_SER_TXFILL) && (CONFIG_KBUS_SERIAL_PORT == 1)
-	/*!  * See comment in uart0_init() */
+	/*! See comment in uart0_init() */
 	UCSR1A = BV(MPCM);
 	UCSR1B = BV(RXCIE) | BV(RXEN) | BV(UCSZ2);
 #else
@@ -182,7 +203,7 @@ static void uart1_cleanup(UNUSED(struct SerialHardware *, ctx))
 
 static void uart1_setbaudrate(UNUSED(struct SerialHardware *, ctx), unsigned long rate)
 {
-	// Compute baud-rate period
+	/* Compute baud-rate period */
 	uint16_t period = (((CLOCK_FREQ / 16UL) + (rate / 2)) / rate) - 1;
 
 	UBRR1H = (period) >> 8;
@@ -207,7 +228,19 @@ static void spi_init(struct SerialHardware *_hw, struct Serial *ser)
 	struct AvrSerial *hw = (struct AvrSerial *)_hw;
 	hw->serial = ser;
 
-	/* MOSI and SCK out, MISO in */
+	/*
+	 * Set MOSI and SCK ports out, MISO in.
+	 *
+	 * The ATmega64 datasheet explicitly states that the input/output
+	 * state of the SPI pins is not significant, as when the SPI is
+	 * active the I/O port are overrided.
+	 * This is *blatantly FALSE*.
+	 *
+	 * Moreover the MISO pin on the board_kc *must* be in high impedance
+	 * state even when the SPI is off, because the line is wired together
+	 * with the KBus serial RX, and the transmitter of the slave boards
+	 * could not be able to drive the line.
+	 */
 	SPI_DDR |= BV(SPI_MOSI_BIT) | BV(SPI_SCK_BIT);
 	SPI_DDR &= ~BV(SPI_MISO_BIT);
 	/* Enable SPI, IRQ on, Master, CPU_CLOCK/16 */
@@ -230,7 +263,6 @@ static void spi_setparity(UNUSED(struct SerialHardware *, ctx), UNUSED(int, pari
 {
 	// Do nothing
 }
-
 
 
 #if defined(CONFIG_SER_HW_HANDSHAKE)
@@ -337,7 +369,7 @@ SIGNAL(SIG_UART1_DATA)
  * This handler is interruptible.
  * Interrupt are reenabled as soon as recv complete interrupt is
  * disabled. Using INTERRUPT() is troublesome when the serial
- * is heavily loaded, because and interrupt could be retriggered
+ * is heavily loaded, because an interrupt could be retriggered
  * when executing the handler prologue before RXCIE is disabled.
  */
 #ifdef __AVR_ATmega103__
@@ -379,7 +411,7 @@ SIGNAL(SIG_UART0_RECV)
  * This handler is interruptible.
  * Interrupt are reenabled as soon as recv complete interrupt is
  * disabled. Using INTERRUPT() is troublesome when the serial
- * is heavily loaded, because and interrupt could be retriggered
+ * is heavily loaded, because an interrupt could be retriggered
  * when executing the handler prologue before RXCIE is disabled.
  */
 #ifndef __AVR_ATmega103__
@@ -419,7 +451,7 @@ SIGNAL(SIG_UART1_RECV)
  * This kludge is necessary because the SPI sends and receives bytes
  * at the same time and the SPI IRQ is unique for send/receive.
  * The only way to start transmission is to write data in SPDR (this
- * is done by ser_spi_starttx()). We do this *only* if a transfer is
+ * is done by spi_starttx()). We do this *only* if a transfer is
  * not already started.
  */
 static volatile bool spi_sending = false;
