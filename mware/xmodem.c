@@ -1,3 +1,4 @@
+#error This module has not been revised for the API changes in several DevLib modules
 /*!
  * \file
  * <!--
@@ -10,12 +11,29 @@
  * Suppots the CRC-16 and 1K-blocks variants of the standard.
  * \see ymodem.txt for the protocol description.
  *
+ * \todo Decouple this code from the LCD, buzzer and timer drivers
+ *       introducing user hooks or macros like CHECK_ABORT.
+ *
+ * \todo Break xmodem_send() and xmodem_recv() in smaller functions.
+ *
+ * \todo Add CONFIG_* vars to exclude either the receiver or the sender,
+ *       to reduce the footprint for applications that don't need both.
+ *
+ * \todo Maybe convert drv/ser.c to the KFile interface for symmetry and
+ *       flexibility.
+ *
  * \version $Id$
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
 /*
  * $Log$
+ * Revision 1.6  2004/08/15 05:31:46  bernie
+ * Add an #error to spread some FUD about the quality of this module;
+ * Add a few TODOs from Rasky's review;
+ * Update to the new drv/ser.c API;
+ * Move FlushSerial() to drv/ser.c and generalize.
+ *
  * Revision 1.5  2004/08/12 23:46:21  bernie
  * Remove extra indentation level in switch statements.
  *
@@ -84,16 +102,15 @@ static char block_buffer[XM_BUFSIZE];
 
 
 /*!
- * Decode serial driver errors and print
- * them on the display.
+ * Decode serial driver errors and print them on the display.
  */
-static void SerialError(int retries)
+static void print_serial_error(struct Serial *port, int retries)
 {
 	serstatus_t err, status;
 
 	/* Get serial error code and reset it */
-	status = ser_getstatus();
-	ser_setstatus(0);
+	status = ser_getstatus(port);
+	ser_setstatus(port, 0);
 
 	/* Mostra tutti gli errori in sequenza */
 	for (err = 0; status != 0; status >>= 1, err++)
@@ -108,22 +125,15 @@ static void SerialError(int retries)
 	}
 }
 
-
 /*!
- * Reset previous serial errors and flush the receive buffer
- * (set a short timeout to speed up purge)
+ * \brief Receive a file using the XModem protocol.
+ *
+ * \param port Serial port to use for transfer
+ * \param fd Destination file
+ *
+ * \note This function allocates a large amount of stack (>1KB).
  */
-static void FlushSerial(void)
-{
-	ser_setstatus(0);
-	ser_settimeouts(200, SER_DEFTXTIMEOUT);
-	while (ser_getchar() != EOF) {}
-	ser_settimeouts(SER_DEFRXTIMEOUT, SER_DEFTXTIMEOUT);
-	ser_setstatus(0);
-}
-
-
-bool xmodem_recv(KFile *fd)
+bool xmodem_recv(struct Serial *port, KFile *fd)
 {
 	int c, i, blocksize;
 	int blocknr = 0, last_block_done = 0, retries = 0;
@@ -137,16 +147,16 @@ bool xmodem_recv(KFile *fd)
 	lcd_printf(0, 2, LCD_FILL, "Starting Transfer...");
 	lcd_clear();
 	purge = true;
-	ser_settimeouts(SER_DEFRXTIMEOUT, SER_DEFTXTIMEOUT);
-	ser_setstatus(0);
+	ser_settimeouts(port, SER_DEFRXTIMEOUT, SER_DEFTXTIMEOUT);
+	ser_setstatus(port, 0);
 
 	/* Send initial NAK to start transmission */
 	for(;;)
 	{
 		if (CHECK_ABORT)
 		{
-			ser_putchar(XM_CAN);
-			ser_putchar(XM_CAN);
+			ser_putchar(XM_CAN, port);
+			ser_putchar(XM_CAN, port);
 			lcd_printf(0, 2, LCD_FILL, "Transfer aborted");
 			return false;
 		}
@@ -162,13 +172,13 @@ bool xmodem_recv(KFile *fd)
 			if (ser_getstatus())
 				SerialError(retries);
 
-			FlushSerial();
+			ser_resync(port, 200);
 			retries++;
 
 			if (retries >= XM_MAXRETRIES)
 			{
-				ser_putchar(XM_CAN);
-				ser_putchar(XM_CAN);
+				ser_putchar(XM_CAN, port);
+				ser_putchar(XM_CAN, port);
 				lcd_printf(0, 2, LCD_FILL, "Transfer aborted");
 				return false;
 			}
@@ -179,21 +189,21 @@ bool xmodem_recv(KFile *fd)
 				if (retries < XM_MAXCRCRETRIES)
 				{
 					lcd_printf(0, 2, LCD_FILL, "Request Tx (CRC)");
-					ser_putchar(XM_C);
+					ser_putchar(XM_C, port);
 				}
 				else
 				{
 					/* Give up with CRC and fall back to checksum */
 					usecrc = false;
 					lcd_printf(0, 2, LCD_FILL, "Request Tx (BCC)");
-					ser_putchar(XM_NAK);
+					ser_putchar(XM_NAK, port);
 				}
 			}
 			else
-				ser_putchar(XM_NAK);
+				ser_putchar(XM_NAK, port);
 		}
 
-		switch (ser_getchar())
+		switch (ser_getchar(port))
 		{
 		case XM_STX:  /* Start of header (1024-byte block) */
 			blocksize = 1024;
@@ -204,10 +214,10 @@ bool xmodem_recv(KFile *fd)
 
 		getblock:
 			/* Get block number */
-			c = ser_getchar();
+			c = ser_getchar(port);
 
 			/* Check complemented block number */
-			if ((~c & 0xff) != ser_getchar())
+			if ((~c & 0xff) != ser_getchar(port))
 			{
 				lcd_printf(0, 3, LCD_FILL, "Bad blk (%d)", c);
 				purge = true;
@@ -234,7 +244,7 @@ bool xmodem_recv(KFile *fd)
 			crc = 0;
 			for (i = 0; i < blocksize; i++)
 			{
-				if ((c = ser_getchar()) == EOF)
+				if ((c = ser_getchar(port)) == EOF)
 				{
 					purge = true;
 					break;
@@ -254,7 +264,7 @@ bool xmodem_recv(KFile *fd)
 				break;
 
 			/* Get the checksum byte or the CRC-16 MSB */
-			if ((c = ser_getchar()) == EOF)
+			if ((c = ser_getchar(port)) == EOF)
 			{
 				purge = true;
 				break;
@@ -265,7 +275,7 @@ bool xmodem_recv(KFile *fd)
 				crc = UPDCRC16(c, crc);
 
 				/* Get CRC-16 LSB */
-				if ((c = ser_getchar()) == EOF)
+				if ((c = ser_getchar(port)) == EOF)
 				{
 					purge = true;
 					break;
@@ -299,7 +309,7 @@ bool xmodem_recv(KFile *fd)
 				if (fd->write(fd, block_buffer, blocksize))
 				{
 					/* Acknowledge block and clear error counter */
-					ser_putchar(XM_ACK);
+					ser_putchar(XM_ACK, port);
 					retries = 0;
 					last_block_done = blocknr;
 				}
@@ -313,7 +323,7 @@ bool xmodem_recv(KFile *fd)
 			break;
 
 		case XM_EOT:	/* End of transmission */
-			ser_putchar(XM_ACK);
+			ser_putchar(XM_ACK, port);
 			lcd_printf(0, 2, LCD_FILL, "Transfer completed");
 			return true;
 
@@ -330,7 +340,16 @@ bool xmodem_recv(KFile *fd)
 }
 
 
-bool xmodem_send(KFile *fd)
+/*!
+ * \brief Transmit a file using the XModem protocol.
+ *
+ * \param port Serial port to use for transfer
+ * \param fd Source file
+ *
+ * \note This function allocates a large amount of stack for
+ *       the XModem transfer buffer (1KB).
+ */
+bool xmodem_send(struct Serial *port, KFile *fd)
 {
 	size_t size = -1;
 	int blocknr = 1, retries = 0, c, i;
@@ -339,9 +358,9 @@ bool xmodem_send(KFile *fd)
 	uint8_t sum;
 
 
-	ser_settimeouts(SER_DEFRXTIMEOUT, SER_DEFTXTIMEOUT);
-	ser_setstatus(0);
-	FlushSerial();
+	ser_settimeouts(port, SER_DEFRXTIMEOUT, SER_DEFTXTIMEOUT);
+	ser_setstatus(port, 0);
+	ser_purge(port);
 	lcd_printf(0, 2, LCD_FILL, "Wait remote host");
 
 	for(;;)
@@ -352,7 +371,7 @@ bool xmodem_send(KFile *fd)
 			if (CHECK_ABORT)
 				return false;
 
-			switch (c = ser_getchar())
+			switch (c = ser_getchar(port))
 			{
 			case XM_NAK:
 			case XM_C:
@@ -407,7 +426,7 @@ bool xmodem_send(KFile *fd)
 
 		if (!size)
 		{
-			ser_putchar(XM_EOT);
+			ser_putchar(XM_EOT, port);
 			continue;
 		}
 
@@ -415,16 +434,16 @@ bool xmodem_send(KFile *fd)
 		memset(block_buffer + size, 0xFF, XM_BUFSIZE - size);
 
 		/* Send block header (STX, blocknr, ~blocknr) */
-		ser_putchar(XM_STX);
-		ser_putchar(blocknr & 0xFF);
-		ser_putchar(~blocknr & 0xFF);
+		ser_putchar(XM_STX, port);
+		ser_putchar(blocknr & 0xFF, port);
+		ser_putchar(~blocknr & 0xFF, port);
 
 		/* Send block and compute its CRC/checksum */
 		sum = 0;
 		crc = 0;
 		for (i = 0; i < XM_BUFSIZE; i++)
 		{
-			ser_putchar(block_buffer[i]);
+			ser_putchar(block_buffer[i], port);
 			crc = UPDCRC16(block_buffer[i], crc);
 			sum += block_buffer[i];
 		}
@@ -434,10 +453,10 @@ bool xmodem_send(KFile *fd)
 		{
 			crc = UPDCRC16(0, crc);
 			crc = UPDCRC16(0, crc);
-			ser_putchar(crc >> 8);
-			ser_putchar(crc & 0xFF);
+			ser_putchar(crc >> 8, port);
+			ser_putchar(crc & 0xFF, port);
 		}
 		else
-			ser_putchar(sum);
+			ser_putchar(sum, port);
 	}
 }
