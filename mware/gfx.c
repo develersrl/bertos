@@ -16,8 +16,8 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.5  2004/08/25 14:12:09  rasky
- *#* Aggiornato il comment block dei log RCS
+ *#* Revision 1.6  2004/09/06 21:50:46  bernie
+ *#* Clarify side-effects in documentation.
  *#*
  *#* Revision 1.4  2004/08/24 16:53:10  bernie
  *#* Use new-style config macros.
@@ -64,6 +64,8 @@
 
 /*!
  * Initialize a Bitmap structure with the provided parameters.
+ *
+ * \note The pen position is reset to the origin.
  */
 void gfx_InitBitmap(Bitmap *bm, uint8_t *raster, coord_t w, coord_t h)
 {
@@ -77,6 +79,8 @@ void gfx_InitBitmap(Bitmap *bm, uint8_t *raster, coord_t w, coord_t h)
 
 /*!
  * Clear the whole bitmap surface to all zeros
+ *
+ * \note This function does \b not update the current pen position
  */
 void gfx_ClearBitmap(Bitmap *bm)
 {
@@ -87,6 +91,8 @@ void gfx_ClearBitmap(Bitmap *bm)
 /*!
  * Copy a raster picture located in program memory in the bitmap.
  * The size of the raster to copy *must* be the same of the raster bitmap.
+ *
+ * \note This function does \b not update the current pen position
  */
 void gfx_blitBitmap_P(Bitmap *bm, const prog_uchar *raster)
 {
@@ -94,6 +100,12 @@ void gfx_blitBitmap_P(Bitmap *bm, const prog_uchar *raster)
 }
 
 
+/*!
+ * Draw a line on the bitmap \a bm using the specified start and end
+ * coordinates.
+ *
+ * \note This function does \b not update the current pen position
+ */
 void gfx_DrawLine(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 {
 	int x, y, e, len, adx, ady, signx, signy;
@@ -230,13 +242,21 @@ void gfx_DrawLine(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 }
 
 
+/*!
+ * Move the current pen position to the specified coordinates.
+ */
 void gfx_MoveTo(Bitmap *bm, coord_t x, coord_t y)
 {
 	bm->penX = x;
 	bm->penY = y;
 }
 
-
+/*!
+ * Draw a line from the current pen position to the new coordinates.
+ *
+ * \note This function moves the current pen position to the
+ *       new coordinates.
+ */
 void gfx_LineTo(Bitmap *bm, coord_t x, coord_t y)
 {
 	gfx_DrawLine(bm, bm->penX, bm->penY, x, y);
@@ -246,7 +266,10 @@ void gfx_LineTo(Bitmap *bm, coord_t x, coord_t y)
 
 /*!
  * Draw a filled rectangle.
+ *
  * \note The bottom-right border of the rectangle is not drawn.
+ *
+ * \note This function does \b not update the current pen position
  */
 void gfx_FillRect(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 {
@@ -275,7 +298,9 @@ void gfx_FillRect(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 
 /*!
  * Draw an empty rectangle.
+ *
  * \note The bottom-right border of the rectangle is not drawn.
+ * \note This function does \b not update the current pen position
  */
 void gfx_DrawRect(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 {
@@ -294,6 +319,7 @@ void gfx_DrawRect(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 /*!
  * Clear a rectangular area.
  * \note The bottom-right border of the rectangle is not drawn.
+ * \note This function does \b not update the current pen position
  */
 void gfx_ClearRect(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 {
