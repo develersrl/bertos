@@ -34,7 +34,7 @@ dependant on others to avoid code duplication, but most of the times
 you can configure out features you don't need.
 
 
-\section redist Directory Structure
+\section structure Directory Structure
 
 Modules are sorted in subdirectories by their category:
 
