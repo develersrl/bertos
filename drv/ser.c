@@ -28,6 +28,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.23  2005/01/14 00:47:07  aleph
+ *#* ser_drain(): Wait for hw transmission complete.
+ *#*
  *#* Revision 1.22  2004/12/08 08:56:14  bernie
  *#* Rename time_t to mtime_t.
  *#*
@@ -178,7 +181,7 @@ int ser_putchar(int c, struct Serial *port)
 	fifo_push_locked(&port->txfifo, (unsigned char)c);
 
 	/* (re)trigger tx interrupt */
-	port->hw->table->enabletxirq(port->hw);
+	port->hw->table->txStart(port->hw);
 
 	/* Avoid returning signed extended char */
 	return (int)((unsigned char)c);
@@ -409,13 +412,13 @@ void ser_resync(struct Serial *port, mtime_t delay)
 
 void ser_setbaudrate(struct Serial *port, unsigned long rate)
 {
-	port->hw->table->setbaudrate(port->hw, rate);
+	port->hw->table->setBaudrate(port->hw, rate);
 }
 
 
 void ser_setparity(struct Serial *port, int parity)
 {
-	port->hw->table->setparity(port->hw, parity);
+	port->hw->table->setParity(port->hw, parity);
 }
 
 
@@ -439,7 +442,12 @@ void ser_purge(struct Serial *port)
  */
 void ser_drain(struct Serial *ser)
 {
-	while (!fifo_isempty(&ser->txfifo))
+	/*
+	 * Wait until the FIFO is empty, and then until the byte currently in
+	 * the hardware register gets shifted out.
+	 */
+	while (!fifo_isempty(&ser->txfifo)
+	       || ser->hw->table->txSending(ser->hw))
 	{
 		#if CONFIG_KERNEL && CONFIG_KERN_SCHED
 			/* Give up timeslice to other processes. */
@@ -497,6 +505,10 @@ void ser_close(struct Serial *port)
 	ASSERT(port->is_open);
 	DB(port->is_open = false;)
 
+	// Wait until we finish sending everything
+	ser_drain(port);
+	ser_purge(port);
+
 	port->hw->table->cleanup(port->hw);
-	port->hw = NULL;
+	DB(port->hw = NULL;)
 }
