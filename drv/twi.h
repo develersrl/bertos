@@ -2,7 +2,7 @@
  * \file
  * <!--
  * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
- * This file is part of DevLib - See devlib/README for information.
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \version $Id$
@@ -15,8 +15,8 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.1  2005/01/06 16:09:40  aleph
- *#* Split twi/eeprom functions from eeprom module in separate twi module
+ *#* Revision 1.2  2005/02/18 11:19:52  bernie
+ *#* Update copyright info.
  *#*
  *#*/
 #ifndef DRV_TWI_H
