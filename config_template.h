@@ -11,7 +11,7 @@
  * "config.h" and delete the CONFIG_ macros for the modules
  * you're not using.
  *
- * \para Working with multiple applications
+ * <h2>Working with multiple applications</h2>
  *
  * If your project is made of multiple DevLib-based applications,
  * create a custom "config.h" file in each application subdirectory
@@ -19,7 +19,7 @@
  * You can share common options by creationg a "config_common.h" header
  * and including it from all your "config.h" copies.
  *
- * \para Configuration style
+ * <h2>Configuration style</h2>
  *
  * For improved compile-time checking of configuration options,
  * the preferred way to use a \c CONFIG_ symbol is keeping it
@@ -46,6 +46,9 @@
 
 /*
  * $Log$
+ * Revision 1.2  2004/08/05 18:46:52  bernie
+ * Documentation improvements.
+ *
  * Revision 1.1  2004/07/29 23:34:32  bernie
  * Add template configuration file.
  *

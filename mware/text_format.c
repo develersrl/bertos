@@ -1,9 +1,8 @@
 /*!
  * \file
- *
  * <!--
+ * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999 Bernardo Innocenti <bernie@develer.com>
- * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
  * This file is part of DevLib - See devlib/README for information.
  * -->
  *
@@ -17,6 +16,9 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/08/05 18:46:44  bernie
+ * Documentation improvements.
+ *
  * Revision 1.3  2004/08/03 15:57:18  aleph
  * Add include to fix warning for vsprintf()
  *
@@ -43,7 +45,14 @@
 #include <string.h> /* strlen() */
 
 /*!
- * Render string <code>str</code> in bitmap
+ * Render string \a str in Bitmap \a bm at current cursor position
+ *
+ * \note Text formatting functions are also available with an _P suffix
+ *       accepting the source string from program memory.  This feature
+ *       is only available (and useful) on Harvard microprocessors such
+ *       as the AVR.
+ *
+ * \see text_putchar()
  */
 int PGM_FUNC(text_puts)(const char * PGM_ATTR str, struct Bitmap *bm)
 {
@@ -56,12 +65,30 @@ int PGM_FUNC(text_puts)(const char * PGM_ATTR str, struct Bitmap *bm)
 }
 
 
+/*!
+ * vprintf()-like formatter to render text in a Bitmap.
+ *
+ * Perform vprintf()-like formatting on the \a fmt format string using the
+ * variable-argument list \a ap.
+ * Render the resulting string in Bitmap \a bm starting at the current
+ * cursor position.
+ *
+ * \see text_puts() text_putchar() text_printf()
+ */
 int PGM_FUNC(text_vprintf)(struct Bitmap *bm, const char * PGM_ATTR fmt, va_list ap)
 {
 	return PGM_FUNC(_formatted_write)(fmt, (void (*)(char, void *))text_putchar, bm, ap);
 }
 
-
+/*!
+ * printf()-like formatter to render text in a Bitmap.
+ *
+ * Perform printf()-like formatting on the \a fmt format string.
+ * Render the resulting string in Bitmap \a bm starting at the
+ * current cursor position.
+ *
+ * \see text_puts() text_putchar() text_vprintf()
+ */
 int PGM_FUNC(text_printf)(struct Bitmap *bm, const char * PGM_ATTR fmt, ...)
 {
 	int len;
@@ -75,8 +102,23 @@ int PGM_FUNC(text_printf)(struct Bitmap *bm, const char * PGM_ATTR fmt, ...)
 }
 
 
+/*!
+ * Render the result of printf()-like formatting in a specified position
+ * of a Bitmap.
+ *
+ * \param bm Bitmap where to render the text
+ * \param row  Starting row in character units (zero based)
+ * \param col  Starting column in character units (zero based)
+ * \param mode Formatting mode to use.  Can be TEXT_NORMAL,
+ *        TEXT_FILL, TEXT_INVERT or TEXT_RIGHT or a combination
+ *        of these flags ORed together.
+ * \param fmt  String possibly containing printf() formatting commands.
+ *
+ * \see text_puts() text_putchar() text_printf() text_vprintf()
+ * \see text_moveto() text_style()
+ */
 int PGM_FUNC(text_xprintf)(struct Bitmap *bm,
-		uint8_t row, uint8_t col, uint8_t mode, const char * PGM_ATTR fmt, ...) 
+		uint8_t row, uint8_t col, uint8_t mode, const char * PGM_ATTR fmt, ...)
 {
 	int len;
 	uint8_t oldstyle = 0;

@@ -14,6 +14,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/08/05 18:46:44  bernie
+ * Documentation improvements.
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -25,27 +28,37 @@
 #include "compiler.h"
 #include <stdarg.h>
 
-/* Style flags */
+/*!
+ * \name Style flags
+ * \see text_style()
+ * \{
+ */
 #define STYLEF_BOLD        BV(0)
 #define STYLEF_ITALIC      BV(1)
 #define STYLEF_UNDERLINE   BV(2)
 #define STYLEF_INVERT      BV(3)
 #define STYLEF_EXPANDED    BV(4)
 #define STYLEF_CONDENSED   BV(5)
-#define STYLEF_STRIKEOUT   BV(6)  /* Not implemented */
+#define STYLEF_STRIKEOUT   BV(6)  /*<! Not implemented */
 
 #define STYLEF_MASK \
 	(STYLEF_BOLD | STYLEF_ITALIC | STYLEF_UNDERLINE | \
 	STYLEF_EXPANDED | STYLEF_CONDENSED | STYLEF_INVERT)
+/*\}*/
 
-/* Flags for text_xprintf() */
+/*!
+ * \name Formatting flags for text rendering
+ * \see text_xprintf()
+ * \{
+ */
 #define TEXT_NORMAL   0       /*!< Normal mode */
 #define TEXT_FILL     BV(0)   /*!< Fill rest of line with spaces */
 #define TEXT_CENTER   BV(1)   /*!< Center string in line */
 #define TEXT_INVERT   BV(2)   /*!< Inverted mode */
 #define TEXT_RIGHT    BV(3)   /*!< Right aligned */
+/*\}*/
 
-/* Escape sequences codes */
+/*! Escape sequences codes */
 #define ANSI_ESC_CLEARSCREEN 'c'
 
 
