@@ -12,6 +12,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2004/12/31 17:39:26  bernie
+ *#* Use C89 comments only.
+ *#*
  *#* Revision 1.2  2004/08/25 14:12:08  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -89,7 +92,7 @@
 #endif
 
 
-// Self-check for the detection: only one CPU must be detected
+/* Self-check for the detection: only one CPU must be detected */
 #if CPU_I196 + CPU_X86 + CPU_DSP56K + CPU_AVR == 0
 	#error Unknown CPU
 #elif !defined(CPU_ID)
