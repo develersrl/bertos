@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2005/01/22 04:21:20  bernie
+ *#* Add handy typedef for struct Semaphore.
+ *#*
  *#* Revision 1.3  2004/08/25 14:12:09  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -37,12 +40,12 @@
 struct Process;
 
 
-struct Semaphore
+typedef struct Semaphore
 {
 	struct Process *owner;
 	List            wait_queue;
 	int             nest_count;
-};
+} Semaphore;
 
 /*!
  * \name Process synchronization services
