@@ -1,9 +1,9 @@
 /*!
  * \file
  * <!--
- * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000, 2001, 2002 Bernardo Innocenti <bernie@codewiz.org>
- * This file is part of DevLib - See devlib/README for information.
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \brief General pourpose debug support for embedded systems (implementation).
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.21  2005/02/16 20:29:48  bernie
+ *#* TRACE(), TRACEMSG(): Reduce code and data footprint.
+ *#*
  *#* Revision 1.20  2005/01/25 08:36:40  bernie
  *#* kputnum(): Export.
  *#*
@@ -293,19 +296,14 @@ void kputchar(char c)
 }
 
 
-void PGM_FUNC(kprintf)(const char * PGM_ATTR fmt, ...)
+void PGM_FUNC(kvprintf)(const char * PGM_ATTR fmt, va_list ap)
 {
-
 #if CONFIG_PRINTF
-	va_list ap;
-
 	/* Mask serial TX intr */
 	kdbg_irqsave_t irqsave;
 	KDBG_MASK_IRQ(irqsave);
 
-	va_start(ap, fmt);
 	PGM_FUNC(_formatted_write)(fmt, __kputchar, 0, ap);
-	va_end(ap);
 
 	/* Restore serial TX intr */
 	KDBG_RESTORE_IRQ(irqsave);
@@ -315,6 +313,14 @@ void PGM_FUNC(kprintf)(const char * PGM_ATTR fmt, ...)
 #endif /* CONFIG_PRINTF */
 }
 
+void PGM_FUNC(kprintf)(const char * PGM_ATTR fmt, ...)
+{
+	va_list ap;
+
+	va_start(ap, fmt);
+	PGM_FUNC(kvprintf)(fmt, ap);
+	va_end(ap);
+}
 
 void PGM_FUNC(kputs)(const char * PGM_ATTR str)
 {
@@ -374,6 +380,22 @@ int PGM_FUNC(__assert)(const char * PGM_ATTR cond, const char * PGM_ATTR file, i
 	return 1;
 }
 
+void PGM_FUNC(__trace)(const char * PGM_ATTR name)
+{
+	PGM_FUNC(kputs)(name);
+	PGM_FUNC(kputs)(PSTR("()\n"));
+}
+
+void PGM_FUNC(__tracemsg)(const char * PGM_ATTR name, const char * PGM_ATTR fmt, ...)
+{
+	va_list ap;
+
+	PGM_FUNC(kputs)(name);
+	PGM_FUNC(kputs)(PSTR("(): "));
+	va_start(ap, fmt);
+	PGM_FUNC(kvprintf)(fmt, ap);
+	va_end(ap);
+}
 
 int PGM_FUNC(__invalid_ptr)(void *value, const char * PGM_ATTR name, const char * PGM_ATTR file, int line)
 {
