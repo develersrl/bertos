@@ -1,3 +1,22 @@
+/*!
+ * \file
+ * <!--
+ * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
+ * This file is part of DevLib - See devlib/README for information.
+ * -->
+ *
+ * \brief Pool macros.
+ *
+ * \version $Id$
+ * \author Giovanni Bajo <rasky@develer.com>
+ */
+
+/*#*
+ *#* $Log$
+ *#* Revision 1.3  2004/12/08 08:09:01  bernie
+ *#* Add missing header.
+ *#*
+ *#*/
 #ifndef MWARE_POOL_H
 #define MWARE_POOL_H
 
@@ -34,4 +53,4 @@
 #define pool_free(name, elem)          ADDHEAD(name, (Node*)elem)
 #define pool_empty(name)               ISLISTEMPTY(name)
 
-#endif
+#endif /* MWARE_POOL_H */
