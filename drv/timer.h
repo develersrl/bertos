@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.20  2004/12/08 08:56:41  bernie
+ *#* Rename sigset_t to sigmask_t; Reformat.
+ *#*
  *#* Revision 1.19  2004/12/08 08:30:37  bernie
  *#* Convert to mtime_t; timer_minutes(): Remove.
  *#*
@@ -117,7 +120,7 @@ extern Timer *timer_abort(Timer *timer);
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 
 /*! Set the timer so that it sends a signal when it expires */
-INLINE void timer_set_event_signal(Timer* timer, struct Process* proc, sigset_t sigs)
+INLINE void timer_set_event_signal(Timer *timer, struct Process *proc, sigmask_t sigs)
 {
 	event_initSignal(&timer->expire, proc, sigs);
 }
@@ -125,13 +128,13 @@ INLINE void timer_set_event_signal(Timer* timer, struct Process* proc, sigset_t 
 #endif /* CONFIG_KERN_SIGNALS */
 
 /*! Set the timer so that it calls an user hook when it expires */
-INLINE void timer_set_event_softint(Timer* timer, Hook func, void* user_data)
+INLINE void timer_set_event_softint(Timer *timer, Hook func, IPTR user_data)
 {
 	event_initSoftInt(&timer->expire, func, user_data);
 }
 
 /*! Set the timer delay (the time before the event will be triggered) */
-INLINE void timer_set_delay(Timer* timer, mtime_t delay)
+INLINE void timer_set_delay(Timer *timer, mtime_t delay)
 {
 	timer->delay = delay;
 }
