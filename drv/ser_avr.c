@@ -38,6 +38,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.25  2005/01/25 08:37:26  bernie
+ *#* CONFIG_SER_HWHANDSHAKE fixes.
+ *#*
  *#* Revision 1.24  2005/01/14 00:49:16  aleph
  *#* Rename callbacks; SerialHardwareVT.txSending: New callback; Add SPI_BUS macros.
  *#*
@@ -119,23 +122,17 @@
 #include <avr/io.h>
 
 
-/*!
- * \name Hardware handshake (RTS/CTS).
- * \{
- */
-#ifndef RTS_ON
-#define RTS_ON      do {} while (0)
+#if !CONFIG_SER_HWHANDSHAKE
+	/*!
+	 * \name Hardware handshake (RTS/CTS).
+	 * \{
+	 */
+	#define RTS_ON      do {} while (0)
+	#define RTS_OFF     do {} while (0)
+	#define IS_CTS_ON   true
+	#define EIMSKF_CTS  0 /*!< Dummy value, must be overridden */
+	/*\}*/
 #endif
-#ifndef RTS_OFF
-#define RTS_OFF     do {} while (0)
-#endif
-#ifndef IS_CTS_ON
-#define IS_CTS_ON   true
-#endif
-#ifndef EIMSKB_CTS
-#define EIMSKB_CTS  0 /*!< Dummy value, must be overridden */
-#endif
-/*\}*/
 
 
 /*!
@@ -436,7 +433,7 @@ static void uart0_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned
 	/* Compute baud-rate period */
 	uint16_t period = (((CLOCK_FREQ / 16UL) + (rate / 2)) / rate) - 1;
 
-#ifndef __AVR_ATmega103__
+#if !CPU_AVR_ATMEGA103
 	UBRR0H = (period) >> 8;
 #endif
 	UBRR0L = (period);
@@ -673,7 +670,7 @@ SIGNAL(SIG_CTS)
 {
 	// Re-enable UDR empty interrupt and TX, then disable CTS interrupt
 	UCSR0B = BV(RXCIE) | BV(UDRIE) | BV(RXEN) | BV(TXEN);
-	cbi(EIMSK, EIMSKB_CTS);
+	EIMSK &= ~EIMSKF_CTS;
 }
 
 #endif // CONFIG_SER_HWHANDSHAKE
@@ -701,8 +698,8 @@ SIGNAL(SIG_UART0_DATA)
 		// Disable rx interrupt and tx, enable CTS interrupt
 		// UNTESTED
 		UCSR0B = BV(RXCIE) | BV(RXEN) | BV(TXEN);
-		sbi(EIFR, EIMSKB_CTS);
-		sbi(EIMSK, EIMSKB_CTS);
+		EIFR |= EIMSKF_CTS;
+		EIMSK |= EIMSKF_CTS;
 	}
 #endif
 	else
@@ -772,8 +769,8 @@ SIGNAL(SIG_UART1_DATA)
 		// Disable rx interrupt and tx, enable CTS interrupt
 		// UNTESTED
 		UCSR1B = BV(RXCIE) | BV(RXEN) | BV(TXEN);
-		sbi(EIFR, EIMSKB_CTS);
-		sbi(EIMSK, EIMSKB_CTS);
+		EIFR |= EIMSKF_CTS;
+		EIMSK |= EIMSKF_CTS;
 	}
 #endif
 	else
