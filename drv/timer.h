@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.7  2004/06/27 15:26:17  aleph
+ * Declaration fix for build with GCC 3.4
+ *
  * Revision 1.6  2004/06/07 18:10:06  aleph
  * Remove free pool of timers; use user-provided Timer structure instead
  *
@@ -88,6 +91,8 @@ INLINE void timer_set_delay(Timer* timer, time_t delay)
 }
 
 
+extern volatile time_t _clock;
+
 /*!
  * Return the system tick counter (expressed in ms)
  * This function must disable interrupts on 8/16bit CPUs because the
@@ -96,8 +101,6 @@ INLINE void timer_set_delay(Timer* timer, time_t delay)
  */
 INLINE time_t timer_gettick(void)
 {
-	extern volatile time_t _clock;
-
 	time_t result;
 	cpuflags_t flags;
 
@@ -115,8 +118,6 @@ INLINE time_t timer_gettick(void)
  */
 INLINE time_t timer_gettick_irq(void)
 {
-	extern volatile time_t _clock;
-
 	return _clock;
 }
 
