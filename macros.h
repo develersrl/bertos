@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2004/09/14 21:02:04  bernie
+ *#* SWAP(), MINMAX(): New macros.
+ *#*
  *#* Revision 1.5  2004/08/29 21:57:58  bernie
  *#* Move back STATIC_ASSERT() to compiler.h as it's needed in cpu.h;
  *#* iptr_t, const_iptr_t: Replace IPTR macro with a real typedef.
@@ -76,6 +79,23 @@
 	#define MIN(a,b)	(((a) < (b)) ? (a) : (b))
 	#define MAX(a,b)	(((a) > (b)) ? (a) : (b))
 #endif /* !GNUC */
+
+/*! Bound \a x between \a min and \a max */
+#define MINMAX(min,x,max)  (MIN(MAX(min, x), max))
+
+/*!
+ * Type-generic macro to swap a with b
+ *
+ * \note arguments are evaluated multiple times
+ */
+#define SWAP(a, b) \
+	do { \
+		(void)(&(a) == &(b)); /* type check */ \
+		typeof(a) tmp; \
+		tmp = (a); \
+		(a) = (b); \
+		(b) = tmp; \
+	} while (0)
 
 #ifndef BV
 /*! Convert a bit value to a binary flag */
