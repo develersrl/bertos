@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.5  2004/07/18 22:16:35  bernie
+ * Add missing header; Prevent warning for project_ks-specific code.
+ *
  * Revision 1.4  2004/06/27 15:22:15  aleph
  * Fix spacing
  *
@@ -33,8 +36,9 @@
 #define DRV_TIMER_AVR_H
 
 #include <avr/wdt.h>
+#include <avr/signal.h>
 
-#if (ARCH & ARCH_BOARD_KC)
+#if defined(ARCH_BOARD_KC) && (ARCH & ARCH_BOARD_KC)
 	#include <drv/adc.h>
 #endif
 
