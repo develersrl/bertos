@@ -1,8 +1,8 @@
 /*!
  * \file
  * <!--
- * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
- * Copyright 2001,2002,2003 by Bernardo Innocenti <bernie@codewiz.org>
+ * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2001, 2002, 2003 by Bernardo Innocenti <bernie@codewiz.org>
  * This file is part of DevLib - See devlib/README for information.
  * -->
  *
@@ -12,8 +12,8 @@
  *
  * \brief Define version strings
  */
-#ifndef VERSTAG_H
-#define VERSTAG_H
+#ifndef DEVLIB_VERSTAG_H
+#define DEVLIB_VERSTAG_H
 
 #ifndef ARCH_CONFIG_H
 	#include "arch_config.h"
@@ -53,4 +53,4 @@
 #define MAKE_RCVERS(maj,min,rev,bld) _STRINGIZE(maj) ", " _STRINGIZE(min) ", " _STRINGIZE(rev) ", " _STRINGIZE(bld)
 #define RCVERSION_TAG MAKE_VERS(VERS_MAJOR,VERS_MINOR,VERS_REV)
 
-#endif /* VERSTAG_H */
+#endif /* DEVLIB_VERSTAG_H */
