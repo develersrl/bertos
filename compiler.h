@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.33  2004/11/16 23:09:40  bernie
+ *#* size_t: Add 64bit definitions; time_t: Add 16bit hack for tiny CPUs.
+ *#*
  *#* Revision 1.32  2004/11/16 22:42:44  bernie
  *#* Doxygen fixes.
  *#*
@@ -408,11 +411,31 @@
  * \{
  */
 #if !(defined(size_t) || defined(_SIZE_T_DEFINED))
-	typedef unsigned int size_t;
-	typedef int ssize_t;
+	#if CPU_REG_BITS > 32
+		/* 64bit. */
+		typedef unsigned long size_t;
+		typedef long ssize_t;
+	#else
+		/* 32bit or 16bit. */
+		typedef unsigned int size_t;
+		typedef int ssize_t;
+	#endif
 #endif
 #if !(defined(_TIME_T_DEFINED) || defined(__time_t_defined))
-	typedef long time_t;
+	/*
+	 * The ATmega8 has a very small Flash, so we can't afford to
+	 * link in support routines for 32bit integer arithmetic.
+	 */
+	#if CPU_AVR_ATMEGA8
+		typedef int time_t; /* 16bit. */
+		#define SIZEOF_TIME_T SIZEOF_INT
+	#else
+		typedef long time_t; /* 32bit or 64bit. */
+		#define SIZEOF_TIME_T SIZEOF_LONG
+	#endif
+#else
+	/* Just a guess, but quite safe. */
+	#define SIZEOF_TIME_T SIZEOF_LONG
 #endif /* _TIME_T_DEFINED || __time_t_defined */
 /*\}*/
 
