@@ -18,6 +18,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2005/02/09 21:48:30  bernie
+ *#* Doxygen fixes.
+ *#*
  *#* Revision 1.6  2005/01/22 04:20:26  bernie
  *#* Write extensive documentation; Add simple locking.
  *#*
@@ -176,7 +179,7 @@
  *			}
  *		}
  *	}
- * \end code
+ * \endcode
  */
 typedef struct MsgPort
 {
@@ -257,7 +260,7 @@ INLINE Msg *msg_get(MsgPort *port)
 	return msg;
 }
 
-/* Peek the first message in the queue of \a port, or NULL if the port is empty */
+/*! Peek the first message in the queue of \a port, or NULL if the port is empty. */
 INLINE Msg *msg_peek(MsgPort *port)
 {
 	Msg *msg;
