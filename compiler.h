@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.26  2004/10/19 08:55:14  bernie
+ *#* UNUSED_FUNC: New function attribute.
+ *#*
  *#* Revision 1.25  2004/10/19 07:14:20  bernie
  *#* Add macros to test for specific compiler features.
  *#*
@@ -177,6 +180,7 @@
 	#define UNLIKELY(x)             __builtin_expect(!!(x), 0)
 	#define PURE_FUNC               __attribute__((pure))
 	#define CONST_FUNC              __attribute__((const))
+	#define UNUSED_FUNC             __attribute__((unused))
 	#define RESTRICT                __restrict__
 	#define MUST_CHECK              __attribute__((warn_unused_result))
 	#if GNUC_PREREQ(3,1)
@@ -295,6 +299,9 @@
 #endif
 #ifndef CONST_FUNC
 #define CONST_FUNC             /* nothing */
+#endif
+#ifndef UNUSED_FUNC
+#define UNUSED_FUNC            /* nothing */
 #endif
 #ifndef RESTRICT
 #define RESTRICT               /* nothing */
