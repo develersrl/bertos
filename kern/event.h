@@ -1,9 +1,9 @@
 /*!
  * \file
  * <!--
- * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
- * Copyright 1999,2001,2003 Bernardo Innocenti <bernie@develer.com>
- * This file is part of DevLib - See devlib/README for information.
+ * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 1999, 2001, 2003 Bernardo Innocenti <bernie@develer.com>
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \brief Events handling
@@ -18,6 +18,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2005/01/24 04:22:02  bernie
+ *#* Update copyright information.
+ *#*
  *#* Revision 1.9  2005/01/24 04:19:55  bernie
  *#* Remove obsolete names.
  *#*
