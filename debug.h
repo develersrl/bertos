@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2004/12/08 08:52:00  bernie
+ *#* Save some more RAM on AVR.
+ *#*
  *#* Revision 1.5  2004/12/08 08:04:13  bernie
  *#* Doxygen fixes.
  *#*
@@ -73,6 +76,7 @@
 	#define UNUSED(type,name) type
 	#endif
 #else /* !OS_HOSTED */
+	#include <config.h>
 	#include <compiler.h>
 #endif /* !OS_HOSTED */
 
@@ -175,6 +179,7 @@
 		void kdbg_init(void);
 		void kputchar(char c);
 		void kdump(const void *buf, size_t len);
+		void __init_wall(long *wall, int size);
 
 		#ifdef __AVR__
 			#include <avr/pgmspace.h>
@@ -182,19 +187,19 @@
 			void kprintf_P(const char *PROGMEM fmt, ...) FORMAT(__printf__, 1, 2);
 			int __assert_P(const char *PROGMEM cond, const char *PROGMEM file, int line);
 			int __invalid_ptr_P(void *p, const char *PROGMEM name, const char *PROGMEM file, int line);
+			int __check_wall_P(long *wall, int size, const char * PGM_ATTR name, const char * PGM_ATTR file, int line);
 			#define kputs(str)  kputs_P(PSTR(str))
 			#define kprintf(fmt, ...)  kprintf_P(PSTR(fmt) ,## __VA_ARGS__)
 			#define __assert(cond, file, line)  __assert_P(PSTR(cond), PSTR(file), (line))
 			#define __invalid_ptr(p, name, file, line)  __invalid_ptr_P((p), PSTR(name), PSTR(file), (line))
+			#define __check_wall(wall, size, name, file, line)  __check_wall_P(wall, size, PSTR(name), PSTR(file), (line))
 		#else /* !__AVR__ */
 			void kputs(const char *str);
 			void kprintf(const char * fmt, ...) FORMAT(__printf__, 1, 2);
 			int __assert(const char *cond, const char *file, int line);
 			int __invalid_ptr(void *p, const char *name, const char *file, int line);
+			int __check_wall(long *wall, int size, const char *name, const char *file, int line);
 		#endif /* !__AVR__ */
-
-		void __init_wall(long *wall, int size);
-		int __check_wall(long *wall, int size, const char *name, const char *file, int line);
 
 		#ifndef CONFIG_KDEBUG_ASSERT_NO_TEXT
 			#define ASSERT(x)         ((void)(LIKELY(x) ? 0 : __assert(#x, THIS_FILE, __LINE__)))

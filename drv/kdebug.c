@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.18  2004/12/08 08:52:00  bernie
+ *#* Save some more RAM on AVR.
+ *#*
  *#* Revision 1.17  2004/10/03 18:41:28  bernie
  *#* Restore \version header killed by mistake in previous commit.
  *#*
@@ -285,6 +288,8 @@ void kputchar(char c)
 
 void PGM_FUNC(kprintf)(const char * PGM_ATTR fmt, ...)
 {
+
+#if CONFIG_PRINTF
 	va_list ap;
 
 	/* Mask serial TX intr */
@@ -297,6 +302,10 @@ void PGM_FUNC(kprintf)(const char * PGM_ATTR fmt, ...)
 
 	/* Restore serial TX intr */
 	KDBG_RESTORE_IRQ(irqsave);
+#else
+	/* A better than nothing printf() surrogate. */
+	PGM_FUNC(kputs)(fmt);
+#endif /* CONFIG_PRINTF */
 }
 
 
@@ -315,22 +324,61 @@ void PGM_FUNC(kputs)(const char * PGM_ATTR str)
 }
 
 
-int PGM_FUNC(__assert)(const char * PGM_ATTR cond, const char * PGM_ATTR file, int line)
+/*!
+ * Cheap function to print small integers without using printf().
+ */
+static int kputnum(int num)
+{
+	int output_len = 0;
+	int divisor = 10000;
+	int digit;
+
+	do
+	{
+		digit = num / divisor;
+		num %= divisor;
+
+		if (digit || output_len || divisor == 1)
+		{
+			kputchar(digit + '0');
+			++output_len;
+		}
+	}
+	while (divisor /= 10);
+
+	return output_len;
+}
+
+
+static void klocation(const char * PGM_ATTR file, int line)
 {
 	PGM_FUNC(kputs)(file);
-	PGM_FUNC(kprintf)(PSTR(":%d: Assertion failed: "), line);
+	kputchar(':');
+	kputnum(line);
+	PGM_FUNC(kputs)(PSTR(": "));
+}
+
+int PGM_FUNC(__assert)(const char * PGM_ATTR cond, const char * PGM_ATTR file, int line)
+{
+	klocation(file, line);
+	PGM_FUNC(kputs)(PSTR("Assertion failed: "));
 	PGM_FUNC(kputs)(cond);
-	PGM_FUNC(kputs)(PSTR("\n"));
+	kputchar('\n');
 	return 1;
 }
 
 
 int PGM_FUNC(__invalid_ptr)(void *value, const char * PGM_ATTR name, const char * PGM_ATTR file, int line)
 {
-	PGM_FUNC(kputs)(file);
-	PGM_FUNC(kprintf)(PSTR(":%d: Invalid pointer: "), line);
+	klocation(file, line);
+	PGM_FUNC(kputs)(PSTR("Invalid ptr: "));
 	PGM_FUNC(kputs)(name);
-	PGM_FUNC(kprintf)(PSTR(" = 0x%x\n"), value);
+	#if CONFIG_PRINTF
+		PGM_FUNC(kprintf)(PSTR(" = 0x%x\n"), value);
+	#else
+		(void)value;
+		kputchar('\n');
+	#endif
 	return 1;
 }
 
@@ -342,7 +390,7 @@ void __init_wall(long *wall, int size)
 }
 
 
-int __check_wall(long *wall, int size, const char *name, const char *file, int line)
+int PGM_FUNC(__check_wall)(long *wall, int size, const char * PGM_ATTR name, const char * PGM_ATTR file, int line)
 {
 	int i, fail = 0;
 
@@ -350,8 +398,14 @@ int __check_wall(long *wall, int size, const char *name, const char *file, int l
 	{
 		if (wall[i] != WALL_VALUE)
 		{
-			kprintf("%s:%d: Wall broken: %s[%d] (0x%p) = 0x%lx\n",
-				file, line, name, i, wall + i, wall[i]);
+			klocation(file, line);
+			PGM_FUNC(kputs)(PSTR("Wall broken: "));
+			PGM_FUNC(kputs)(name);
+			#if CONFIG_PRINTF
+				PGM_FUNC(kprintf)(PSTR("[%d] (0x%p) = 0x%lx\n"), i, wall + i, wall[i]);
+			#else
+				kputchar('\n');
+			#endif
 			fail = 1;
 		}
 	}
@@ -359,6 +413,8 @@ int __check_wall(long *wall, int size, const char *name, const char *file, int l
 	return fail;
 }
 
+
+#if CONFIG_PRINTF
 
 /*!
  * Dump binary data in hex
@@ -371,5 +427,7 @@ void kdump(const void *_buf, size_t len)
 		kprintf("%02X", *buf++);
 	kputchar('\n');
 }
+
+#endif /* CONFIG_PRINTF */
 
 #endif /* _DEBUG */
