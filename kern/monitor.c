@@ -1,0 +1,157 @@
+/*!
+ * \file
+ * <!--
+ * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
+ * This file is part of DevLib - See devlib/README for information.
+ * -->
+ *
+ * \brief Monitor to check for stack overflows
+ *
+ * \version $Id$
+ *
+ * \author Giovanni Bajo <rasky@develer.com>
+ */
+
+/*#*
+ *#* $Log$
+ *#* Revision 1.1  2004/10/03 20:39:03  bernie
+ *#* Import in DevLib.
+ *#*
+ *#* Revision 1.2  2004/10/03 20:36:43  bernie
+ *#* Use debug.h instead of drv/kdebug.h; Misc spacing/header fixes.
+ *#*
+ *#* Revision 1.1  2004/09/30 23:19:30  rasky
+ *#* Estratto il monitor degli stack da proc.c in due file a parte: monitor.c/h
+ *#* Rinominata monitor_debug_stacks in monitor_report
+ *#*/
+
+#include "monitor.h"
+
+#if CONFIG_KERN_MONITOR
+
+#include "proc_p.h"
+#include <mware/list.h>
+#include <drv/timer.h>
+#include <kern/proc.h>
+#include <macros.h>
+#include <debug.h>
+
+
+static List MonitorProcs;
+
+
+void monitor_init(void)
+{
+	INITLIST(&MonitorProcs);
+}
+
+
+void monitor_add(Process* proc, const char* name, cpustack_t* stack_base, size_t stack_size)
+{
+	proc->monitor.name = name;
+	proc->monitor.stack_base = stack_base;
+	proc->monitor.stack_size = stack_size;
+
+	ADDTAIL(&MonitorProcs, &proc->monitor.link);
+}
+
+
+void monitor_remove(Process* proc)
+{
+	REMOVE(&proc->monitor.link);
+}
+
+#define MONITOR_NODE_TO_PROCESS(node) \
+	(struct Process*)((char*)(node) - offsetof(struct Process, monitor.link))
+
+size_t monitor_check_stack(cpustack_t* stack_base, size_t stack_size)
+{
+	cpustack_t* beg;
+	cpustack_t* cur;
+	cpustack_t* end;
+	size_t sp_free;
+
+	beg = stack_base;
+	end = stack_base + stack_size / sizeof(cpustack_t) - 1;
+
+	if (CPU_STACK_GROWS_UPWARD)
+	{
+		cur = beg;
+		beg = end;
+		end = cur;
+	}
+
+	cur = beg;
+	while (cur != end)
+	{
+		if (*cur != CONFIG_KERN_STACKFILLCODE)
+			break;
+
+		if (CPU_STACK_GROWS_UPWARD)
+			cur--;
+		else
+			cur++;
+	}
+
+	sp_free = ABS(cur - beg) * sizeof(cpustack_t);
+	return sp_free;
+}
+
+
+void monitor_report(void)
+{
+	struct Process* p;
+	int i;
+
+	if (ISLISTEMPTY(&MonitorProcs))
+	{
+		kputs("No stacks registered in the monitor\n");
+		return;
+	}
+
+	kprintf("%-24s    %-6s%-8s%-8s%-8s\n", "Process name", "TCB", "SPbase", "SPsize", "SPfree");
+	for (i=0;i<56;i++)
+		kputchar('-');
+	kputchar('\n');
+
+	for (p = MONITOR_NODE_TO_PROCESS(MonitorProcs.head);
+		 p->monitor.link.succ;
+		 p = MONITOR_NODE_TO_PROCESS(p->monitor.link.succ))
+	{
+		size_t free = monitor_check_stack(p->monitor.stack_base, p->monitor.stack_size);
+		kprintf("%-24s    %04x    %04x    %4x    %4x\n", p->monitor.name, (uint16_t)p, (uint16_t)p->monitor.stack_base, (uint16_t)p->monitor.stack_size, (uint16_t)free);
+	}
+}
+
+
+static void monitor(void)
+{
+	struct Process* p;
+
+	while (1)
+	{
+		for (p = MONITOR_NODE_TO_PROCESS(MonitorProcs.head);
+			p->monitor.link.succ;
+			p = MONITOR_NODE_TO_PROCESS(p->monitor.link.succ))
+		{
+			size_t free = monitor_check_stack(p->monitor.stack_base, p->monitor.stack_size);
+
+			if (free < 0x20)
+			{
+				kprintf("MONITOR: ***************************************\n");
+				kprintf("MONITOR: WARNING: Free stack for process '%s' is only %04x chars\n", p->monitor.name, free);
+				kprintf("MONITOR: ***************************************\n\n");
+			}
+
+			timer_delay(500);
+		}
+	}
+}
+
+
+void monitor_start(size_t stacksize, cpustack_t *stack)
+{
+	proc_new(monitor, NULL, stacksize, stack);
+}
+
+#endif /* CONFIG_KERN_MONITOR */
