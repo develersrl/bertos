@@ -16,6 +16,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/08/12 23:34:36  bernie
+ * Replace if/else with continue to reduce indentation level.
+ *
  * Revision 1.2  2004/08/12 23:24:07  bernie
  * Rename UPDCRC() to UPDCRC16().
  *
@@ -395,39 +398,40 @@ bool xmodem_send(KFile *fd)
 		while (!proceed);
 
 		if (!size)
-			ser_putchar(XM_EOT);
-		else
 		{
-			/* Pad block with 0xFF if it's partially full */
-			if (size < XM_BUFSIZE)
-				for (i = size; i < XM_BUFSIZE; i++)
-					block_buffer[i] = (char)0xFF;
-
-			/* Send block header (STX, blocknr, ~blocknr) */
-			ser_putchar(XM_STX);
-			ser_putchar(blocknr & 0xFF);
-			ser_putchar(~blocknr & 0xFF);
-
-			/* Send block and compute its CRC/checksum */
-			sum = 0;
-			crc = 0;
-			for (i = 0; i < XM_BUFSIZE; i++)
-			{
-				ser_putchar(block_buffer[i]);
-				crc = UPDCRC16(block_buffer[i], crc);
-				sum += block_buffer[i];
-			}
-
-			/* Send CRC/Checksum */
-			if (usecrc)
-			{
-				crc = UPDCRC16(0, crc);
-				crc = UPDCRC16(0, crc);
-				ser_putchar(crc >> 8);
-				ser_putchar(crc & 0xFF);
-			}
-			else
-				ser_putchar(sum);
+			ser_putchar(XM_EOT);
+			continue;
 		}
+
+		/* Pad block with 0xFF if it's partially full */
+		if (size < XM_BUFSIZE)
+			for (i = size; i < XM_BUFSIZE; i++)
+				block_buffer[i] = (char)0xFF;
+
+		/* Send block header (STX, blocknr, ~blocknr) */
+		ser_putchar(XM_STX);
+		ser_putchar(blocknr & 0xFF);
+		ser_putchar(~blocknr & 0xFF);
+
+		/* Send block and compute its CRC/checksum */
+		sum = 0;
+		crc = 0;
+		for (i = 0; i < XM_BUFSIZE; i++)
+		{
+			ser_putchar(block_buffer[i]);
+			crc = UPDCRC16(block_buffer[i], crc);
+			sum += block_buffer[i];
+		}
+
+		/* Send CRC/Checksum */
+		if (usecrc)
+		{
+			crc = UPDCRC16(0, crc);
+			crc = UPDCRC16(0, crc);
+			ser_putchar(crc >> 8);
+			ser_putchar(crc & 0xFF);
+		}
+		else
+			ser_putchar(sum);
 	}
 }
