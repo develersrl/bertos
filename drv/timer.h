@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.14  2004/08/03 15:50:03  aleph
+ * Rename timer_tick() to timer_ticks()
+ *
  * Revision 1.13  2004/08/02 20:20:29  aleph
  * Merge from project_ks
  *
@@ -152,7 +155,7 @@ extern volatile time_t _clock;
  * clock variable is larger than the processor word size and can't
  * be copied atomically.
  */
-INLINE time_t timer_tick(void)
+INLINE time_t timer_ticks(void)
 {
 	time_t result;
 	cpuflags_t flags;
@@ -165,23 +168,23 @@ INLINE time_t timer_tick(void)
 }
 
 /* OBSOLETE */
-#define timer_gettick timer_tick
+#define timer_gettick timer_ticks
 
 
 /*!
- * Faster version of timer_tick(), to be called only when the timer
+ * Faster version of timer_ticks(), to be called only when the timer
  * interrupt is disabled (DISABLE_INTS) or overridden by a
  * higher-priority or non-nesting interrupt.
  *
- * \sa timer_tick
+ * \sa timer_ticks
  */
-INLINE time_t timer_tick_unlocked(void)
+INLINE time_t timer_ticks_unlocked(void)
 {
 	return _clock;
 }
 
 /* OBSOLETE */
-#define timer_gettick_irq timer_tick_unlocked
+#define timer_gettick_irq timer_ticks_unlocked
 
 
 /*!
@@ -193,7 +196,7 @@ INLINE time_t timer_tick_unlocked(void)
  */
 INLINE time_t timer_minutes(void)
 {
-	return timer_gettick() / (TICKS_PER_SEC * 60);
+	return timer_ticks() / (TICKS_PER_SEC * 60);
 }
 
 #endif /* DRV_TIMER_H */
