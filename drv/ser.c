@@ -28,6 +28,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.17  2004/09/14 21:06:07  bernie
+ *#* Use debug.h instead of kdebug.h; Spelling fixes.
+ *#*
  *#* Revision 1.16  2004/09/06 21:40:50  bernie
  *#* Move buffer handling in chip-specific driver.
  *#*
@@ -76,7 +79,7 @@
  *#*/
 
 #include <mware/formatwr.h>
-#include <drv/kdebug.h>
+#include <debug.h>
 #include "ser.h"
 #include "ser_p.h"
 #include "hw.h"
@@ -341,7 +344,7 @@ void ser_settimeouts(struct Serial *port, time_t rxtimeout, time_t txtimeout)
 
 #if CONFIG_SER_RXTIMEOUT != -1
 /*!
- * Discard input to resynchronize with remote end
+ * Discard input to resynchronize with remote end.
  *
  * Discard incoming data until the port stops receiving
  * characters for at least \a delay milliseconds.
