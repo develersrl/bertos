@@ -1,8 +1,8 @@
 /*!
  * \file
  * <!--
- * Copyright 2001,2004 Develer S.r.l. (http://www.develer.com/)
- * Copyright 1999,2000,2001 Bernardo Innocenti <bernie@develer.com>
+ * Copyright 2001, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 1999, 2000, 2001 Bernardo Innocenti <bernie@develer.com>
  * This file is part of DevLib - See devlib/README for information.
  * -->
  *
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2004/10/21 10:57:21  bernie
+ *#* Use proc_forbid()/proc_permit().
+ *#*
  *#* Revision 1.5  2004/10/21 10:48:57  bernie
  *#* sem_release(): Simplify (made by rasky on scfirm).
  *#*
@@ -29,7 +32,6 @@
  *#*
  *#* Revision 1.1  2004/05/23 17:27:00  bernie
  *#* Import kern/ subdirectory.
- *#*
  *#*/
 
 #include "sem.h"
@@ -40,7 +42,7 @@
 
 
 /*!
- * \brief Initialize a Semaphore structure
+ * \brief Initialize a Semaphore structure.
  */
 void sem_init(struct Semaphore *s)
 {
@@ -63,19 +65,18 @@ void sem_init(struct Semaphore *s)
  */
 bool sem_attempt(struct Semaphore *s)
 {
-	cpuflags_t flags;
-	DISABLE_IRQSAVE(flags);
+	bool result = false;
 
+	proc_forbid();
 	if ((!s->owner) || (s->owner == CurrentProcess))
 	{
 		s->owner = CurrentProcess;
 		s->nest_count++;
-		ENABLE_INTS;
-		return true;
+		result = true;
 	}
+	proc_permit();
 
-	ENABLE_IRQRESTORE(flags);
-	return false;
+	return result;
 }
 
 
@@ -98,21 +99,20 @@ bool sem_attempt(struct Semaphore *s)
  */
 void sem_obtain(struct Semaphore *s)
 {
-	cpuflags_t flags;
-	DISABLE_IRQSAVE(flags);
+	proc_forbid();
 
 	/* Is the semaphore already locked by another process? */
 	if (UNLIKELY(s->owner && (s->owner != CurrentProcess)))
 	{
 		/* Append calling process to the wait queue */
 		ADDTAIL(&s->wait_queue, (Node *)CurrentProcess);
-		ENABLE_IRQRESTORE(flags);
 
 		/*
 		 * We will wake up only when the current owner calls
 		 * sem_release(). Then, the semaphore will already
 		 * be locked for us.
 		 */
+		proc_permit();
 		proc_schedule();
 	}
 	else
@@ -120,13 +120,13 @@ void sem_obtain(struct Semaphore *s)
 		/* The semaphore was free: lock it */
 		s->owner = CurrentProcess;
 		s->nest_count++;
-		ENABLE_IRQRESTORE(flags);
+		proc_permit();
 	}
 }
 
 
 /*!
- * \brief Releases a lock on a previously locked semaphore.
+ * \brief Release a lock on a previously locked semaphore.
  *
  * If the nesting count of the semaphore reaches zero,
  * the next process waiting for it will be awaken.
@@ -140,12 +140,11 @@ void sem_obtain(struct Semaphore *s)
  */
 void sem_release(struct Semaphore *s)
 {
-	cpuflags_t flags;
-	DISABLE_IRQSAVE(flags);
+	proc_forbid();
 
 	/*
 	 * Decrement nesting count and check if the semaphore
-	 * has been fully unlocked
+	 * has been fully unlocked.
 	 */
 	if (--s->nest_count == 0)
 	{
@@ -155,7 +154,7 @@ void sem_release(struct Semaphore *s)
 		s->owner = NULL;
 
 		/* Give semaphore to the first applicant, if any */
-		if ((proc = (Process*)REMHEAD(&s->wait_queue)))
+		if (UNLIKELY((proc = (Process *)REMHEAD(&s->wait_queue))))
 		{
 			s->nest_count = 1;
 			s->owner = proc;
@@ -163,6 +162,5 @@ void sem_release(struct Semaphore *s)
 		}
 	}
 
-	ENABLE_IRQRESTORE(flags);
+	proc_permit();
 }
-
