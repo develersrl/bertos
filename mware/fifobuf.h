@@ -43,6 +43,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.18  2004/11/16 21:55:12  bernie
+ *#* Workaround for a known fifobuf bug.
+ *#*
  *#* Revision 1.17  2004/09/14 20:57:00  bernie
  *#* Use debug.h instead of kdebug.h.
  *#*
@@ -303,6 +306,9 @@ INLINE bool fifo_isfull_locked(const FIFOBuffer *_fb)
  */
 INLINE void fifo_init(FIFOBuffer *fb, unsigned char *buf, size_t size)
 {
+	/* FIFO buffers have a known bug with 1-byte buffers. */
+	ASSERT(size > 1);
+
 	fb->head = fb->tail = fb->begin = buf;
 	fb->end = buf + size - 1;
 }
