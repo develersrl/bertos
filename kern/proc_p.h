@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2004/10/19 08:55:31  bernie
+ *#* Define forbid_cnt.
+ *#*
  *#* Revision 1.8  2004/10/03 20:39:28  bernie
  *#* Import changes from sc/firmware.
  *#*
@@ -73,6 +76,9 @@ typedef struct Process
 	sigset_t     sig_recv;    /*!< Received signals */
 #endif
 
+#if CONFIG_PROC_PREEMPTIVE
+	int          forbid_cnt;  /*!< Nesting count for proc_forbid()/proc_permit(). */
+
 #if CONFIG_KERN_HEAP
 	uint16_t     flags;       /*!< Flags */
 	cpustack_t  *stack_base;  /*!< Base of process stack */
@@ -93,26 +99,24 @@ typedef struct Process
 
 
 /*!
- * \name Flags for Process.flags
+ * \name Flags for Process.flags.
  * \{
  */
 #define PF_FREESTACK  BV(0)  /*!< Free the stack when process dies */
 /*\}*/
 
 
-/*! Track running processes */
+/*! Track running processes. */
 extern REGISTER Process	*CurrentProcess;
 
-/*! Track ready processes */
+/*! Track ready processes. */
 extern REGISTER List     ProcReadyList;
 
 
-/*!
- * Enqueue a task in the ready list
- */
+/*! Enqueue a task in the ready list. */
 #define SCHED_ENQUEUE(proc)  ADDTAIL(&ProcReadyList, &(proc)->link)
 
-/*! Schedule to another process *without* adding the current to the ready list */
+/*! Schedule to another process *without* adding the current to the ready list. */
 void proc_schedule(void);
 
 #if CONFIG_KERN_MONITOR
@@ -122,8 +126,11 @@ void proc_schedule(void);
 	/*! Register a process into the monitor */
 	void monitor_add(Process *proc, const char *name, cpustack_t *stack, size_t stacksize);
 
-	/*! Deregister a process from the monitor */
+	/*! Unregister a process from the monitor */
 	void monitor_remove(Process *proc);
+
+	/*! Rename a process */
+	void monitor_rename(Process *proc, const char* name);
 #endif /* CONFIG_KERN_MONITOR */
 
 #endif /* KERN_PROC_P_H */

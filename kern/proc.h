@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2004/10/19 08:54:55  bernie
+ *#* Define forbid_cnt.
+ *#*
  *#* Revision 1.6  2004/10/03 20:44:18  bernie
  *#* Remove stale declarations (moved to monitor.h).
  *#*
@@ -51,14 +54,25 @@ void proc_switch(void);
 void proc_test(void);
 struct Process* proc_current(void);
 IPTR proc_current_user_data(void);
+void proc_rename(struct Process* proc, const char* name);
 
 #if CONFIG_KERN_PREEMPTIVE
-	#define	FORBID proc_forbid()
-	#define	PERMIT proc_permit()
+	void proc_forbid(void);
+	void proc_permit(void);
 #else
-	#define FORBID
-	#define PERMIT
+	INLINE void proc_forbid(void) { /* nop */ }
+	INLINE void proc_permit(void) { /* nop */ }
 #endif
+
+/*!
+ * Execute a block of \a CODE atomically with respect to task scheduling.
+ */
+#define PROC_ATOMIC(CODE) \
+	do { \
+		proc_forbid(); \
+		CODE; \
+		proc_permit(); \
+	} while(0)
 
 #endif /* KERN_PROC_H */
 
