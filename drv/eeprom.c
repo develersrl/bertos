@@ -17,6 +17,9 @@
 
 /*
  * $Log$
+ * Revision 1.6  2004/08/24 14:27:20  bernie
+ * Doxygen fix.
+ *
  * Revision 1.5  2004/08/24 13:46:48  bernie
  * Include <macros.h>.
  *
@@ -341,8 +344,8 @@ int eeprom_read_char(e2addr_t addr)
 /*!
  * Erase specified part of eeprom, writing 0xFF.
  *
- * \param addr  starting address
- * \param len   length of block to erase
+ * \param addr   starting address
+ * \param count  length of block to erase
  */
 void eeprom_erase(e2addr_t addr, size_t count)
 {
