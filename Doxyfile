@@ -976,8 +976,12 @@ INCLUDE_FILE_PATTERNS  =
 # undefined via #undef or recursively expanded use the := operator 
 # instead of the = operator.
 
-PREDEFINED             = __linux__ \
+PREDEFINED             = __doxygen__ \
+			 __linux__ \
                          __unix__ \
+			 __GNUC__ \
+			 __declspec(x) \
+			 _DEBUG=1 \
                          FORMAT(x,y,z)= \
                          PGM_FUNC(x)=x
 
