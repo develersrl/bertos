@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2004/10/03 20:39:28  bernie
+ *#* Import changes from sc/firmware.
+ *#*
  *#* Revision 1.7  2004/08/25 14:12:09  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -111,6 +114,17 @@ extern REGISTER List     ProcReadyList;
 
 /*! Schedule to another process *without* adding the current to the ready list */
 void proc_schedule(void);
+
+#if CONFIG_KERN_MONITOR
+	/*! Initialize the monitor */
+	void monitor_init(void);
+
+	/*! Register a process into the monitor */
+	void monitor_add(Process *proc, const char *name, cpustack_t *stack, size_t stacksize);
+
+	/*! Deregister a process from the monitor */
+	void monitor_remove(Process *proc);
+#endif /* CONFIG_KERN_MONITOR */
 
 #endif /* KERN_PROC_P_H */
 

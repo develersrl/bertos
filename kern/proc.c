@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.16  2004/10/03 20:39:28  bernie
+ *#* Import changes from sc/firmware.
+ *#*
  *#* Revision 1.15  2004/09/20 03:29:39  bernie
  *#* C++ fixes.
  *#*
@@ -108,96 +111,6 @@ extern List StackFreeList;
 
 /* The main process (the one that executes main()) */
 struct Process MainProcess;
-
-
-#if CONFIG_KERN_MONITOR
-List MonitorProcs;
-
-static void monitor_init(void)
-{
-	INITLIST(&MonitorProcs);
-}
-
-static void monitor_add(Process* proc, const char* name, cpustack_t* stack_base, size_t stack_size)
-{
-	proc->monitor.name = name;
-	proc->monitor.stack_base = stack_base;
-	proc->monitor.stack_size = stack_size;
-
-	ADDTAIL(&MonitorProcs, &proc->monitor.link);
-}
-
-static void monitor_remove(Process* proc)
-{
-	REMOVE(&proc->monitor.link);
-}
-
-#define MONITOR_NODE_TO_PROCESS(node) \
-	(struct Process*)((char*)(node) - offsetof(struct Process, monitor.link))
-
-size_t monitor_check_stack(cpustack_t* stack_base, size_t stack_size)
-{
-	cpustack_t* beg;
-	cpustack_t* cur;
-	cpustack_t* end;
-	size_t sp_free;
-
-	beg = stack_base;
-	end = stack_base + stack_size / sizeof(cpustack_t) - 1;
-
-	if (CPU_STACK_GROWS_UPWARD)
-	{
-		cur = beg;
-		beg = end;
-		end = cur;
-	}
-
-	cur = beg;
-	while (cur != end)
-	{
-		if (*cur != CONFIG_KERN_STACKFILLCODE)
-			break;
-
-		if (CPU_STACK_GROWS_UPWARD)
-			cur--;
-		else
-			cur++;
-	}
-
-	sp_free = ABS(cur - beg) * sizeof(cpustack_t);
-	return sp_free;
-}
-
-#if CONFIG_KERN_MONITOR
-
-void monitor_debug_stacks(void)
-{
-	struct Process* p;
-	int i;
-
-	if (ISLISTEMPTY(&MonitorProcs))
-	{
-		kputs("No stacks registered in the monitor\n");
-		return;
-	}
-
-	kprintf("%-24s    %-6s%-8s%-8s%-8s\n", "Process name", "TCB", "SPbase", "SPsize", "SPfree");
-	for (i=0;i<56;i++)
-		kputchar('-');
-	kputchar('\n');
-
-	for (p = MONITOR_NODE_TO_PROCESS(MonitorProcs.head);
-		 p->monitor.link.succ;
-		 p = MONITOR_NODE_TO_PROCESS(p->monitor.link.succ))
-	{
-		size_t free = monitor_check_stack(p->monitor.stack_base, p->monitor.stack_size);
-		kprintf("%-24s    %04x    %04x    %4x    %4x\n", p->monitor.name, (uint16_t)p, (uint16_t)p->monitor.stack_base, (uint16_t)p->monitor.stack_size, (uint16_t)free);
-	}
-}
-
-#endif /* CONFIG_KERN_MONITOR */
-
-#endif
 
 
 static void proc_init_struct(Process* proc)
@@ -468,6 +381,8 @@ IPTR proc_current_user_data(void)
 }
 
 #if 0 /* Simple testcase for the scheduler */
+
+#include <drv/timer.h>
 
 /*!
  * Proc scheduling test subthread 1

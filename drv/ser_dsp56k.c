@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2004/10/03 20:43:22  bernie
+ *#* Import changes from sc/firmware.
+ *#*
  *#* Revision 1.5  2004/08/25 14:12:08  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -26,15 +29,14 @@
  *#*
  *#* Revision 1.2  2004/05/23 18:21:53  bernie
  *#* Trim CVS logs and cleanup header info.
- *#*
  *#*/
 
 #include "ser.h"
 #include "ser_p.h"
-#include <drv/kdebug.h>
 #include <drv/irq.h>
+#include <debug.h>
 #include <hw.h>
-#include <DSP56F807.H>
+#include <DSP56F807.h>
 
 // GPIO E is shared with SPI (in DSP56807). Pins 0&1 are TXD0 and RXD0. To use
 //  the serial, we need to disable the GPIO functions on them.

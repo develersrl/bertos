@@ -1,8 +1,8 @@
 /*!
  * \file
  * <!--
- * Copyright (C) 2004 Giovanni Bajo
- * Copyright (C) 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2004 Giovanni Bajo
  * All Rights Reserved.
  * -->
  *
@@ -31,20 +31,8 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.4  2004/08/25 14:12:09  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.3  2004/08/14 19:37:57  rasky
- *#* Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
- *#*
- *#* Revision 1.2  2004/08/04 15:52:54  rasky
- *#* Merge da SC: fixato namespace dell'include guard
- *#*
- *#* Revision 1.1  2004/07/14 14:08:16  rasky
- *#* Implementazione di una tabella hash
- *#*
- *#* Revision 1.10  2004/06/14 15:17:15  rasky
- *#* Qualche fix alla documentazione Doxygen
+ *#* Revision 1.5  2004/10/03 20:43:22  bernie
+ *#* Import changes from sc/firmware.
  *#*
  *#* Revision 1.9  2004/06/14 15:15:24  rasky
  *#* Cambiato key_data in un union invece di castare
@@ -64,37 +52,39 @@
  *#*
  *#* Revision 1.4  2004/05/24 15:28:20  rasky
  *#* Sistemata la documentazione, rimossa keycmp in favore della memcmp
- *#*
  *#*/
-
 
 #ifndef MWARE_HASHTABLE_H
 #define MWARE_HASHTABLE_H
 
 #include <compiler.h>
 #include <macros.h>
-#include <drv/kdebug.h>
+#include <debug.h>
 
-/*! Enable/disable support to declare special hash tables which maintain a copy of
- *  the key internally instead of relying on the hook to extract it from the data.
+/*!
+ * Enable/disable support to declare special hash tables which maintain a copy of
+ * the key internally instead of relying on the hook to extract it from the data.
  */
 #define CONFIG_HT_OPTIONAL_INTERNAL_KEY      1
 
 //! Maximum length of the internal key (use (2^n)-1 for slight speedup)
 #define INTERNAL_KEY_MAX_LENGTH     15
 
-/*! Hook to get the key from \a data, which is an element of the hash table. The
- *  key must be returned together with \a key_length (in words).
+/*!
+ * Hook to get the key from \a data, which is an element of the hash table. The
+ * key must be returned together with \a key_length (in words).
  */
 typedef const void* (*hook_get_key)(const void* data, uint8_t* key_length);
 
-/*! Hash table description
+
+/*!
+ * Hash table description
  *
  * \note This structures MUST NOT be accessed directly. Its definition is
  * provided in the header file only for optimization purposes (see the rationale
  * in hashtable.c).
  *
- * \note If new elements must be added to this list, please double check 
+ * \note If new elements must be added to this list, please double check
  * \c DECLARE_HASHTABLE, which requires the existing elements to be at the top.
  */
 struct HashTable
@@ -110,6 +100,7 @@ struct HashTable
 	} key_data;
 };
 
+
 //! Iterator to walk the hash table
 typedef struct
 {
@@ -117,7 +108,9 @@ typedef struct
 	const void** end;
 } HashIterator;
 
-/*! Declare a hash table in the current scope
+
+/*!
+ * Declare a hash table in the current scope
  *
  * \param name Variable name
  * \param size Number of elements
@@ -154,7 +147,8 @@ typedef struct
 		static struct HashTable name = { name##_nodes, UINT32_LOG2(size), { true }, name##_keys }
 #endif
 
-/*! Initialize (and clear) a hash table in a memory buffer.
+/*!
+ * Initialize (and clear) a hash table in a memory buffer.
  *
  * \param ht Hash table declared with \c DECLARE_HASHTABLE
  *
@@ -164,7 +158,8 @@ typedef struct
  */
 void ht_init(struct HashTable* ht);
 
-/*! Insert an element into the hash table
+/*!
+ * Insert an element into the hash table
  *
  * \param ht Handle of the hash table
  * \param data Data to be inserted into the table
@@ -182,7 +177,8 @@ void ht_init(struct HashTable* ht);
  */
 bool ht_insert(struct HashTable* ht, const void* data);
 
-/*! Insert an element into the hash table
+/*!
+ * Insert an element into the hash table
  *
  * \param ht Handle of the hash table
  * \param key Key of the element
@@ -202,7 +198,8 @@ bool ht_insert(struct HashTable* ht, const void* data);
  */
 bool ht_insert_with_key(struct HashTable* ht, const void* key, uint8_t key_length, const void* data);
 
-/*! Find an element in the hash table
+/*!
+ * Find an element in the hash table
  *
  * \param ht Handle of the hash table
  * \param key Key of the element
@@ -231,11 +228,12 @@ INLINE HashIterator ht_iter_begin(struct HashTable* ht)
 	return h;
 }
 
-/*! Get an iterator to the (exclusive) end of the hash table \a ht
+/*!
+ * Get an iterator to the (exclusive) end of the hash table \a ht
  *
- *  \note Like in STL, the end iterator is not a valid iterator (you
- *  cannot call \c ht_iter_get() on it), and it must be used only to
- *  detect if we reached the end of the iteration (through \c ht_iter_cmp()).
+ * \note Like in STL, the end iterator is not a valid iterator (you
+ *       cannot call \c ht_iter_get() on it), and it must be used only to
+ *       detect if we reached the end of the iteration (through \c ht_iter_cmp()).
  */
 INLINE HashIterator ht_iter_end(struct HashTable* ht)
 {

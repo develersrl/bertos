@@ -1,8 +1,8 @@
 /*!
  * \file
  * <!--
- * Copyright (C) 2004 Giovanni Bajo
- * Copyright (C) 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2004 Giovanni Bajo
  * All Rights Reserved.
  * -->
  *
@@ -61,16 +61,8 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.2  2004/08/25 14:12:09  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.1  2004/07/14 14:08:16  rasky
- *#* Implementazione di una tabella hash
- *#*
- *#* Revision 1.13  2004/07/12 16:33:36  rasky
- *#* Aggiunta nuova ASSERT2, con stringa di descrizione del problema (disabilitabile tramite una macro di configurazione)
- *#* Modificato il codice del firmware per utilizzare ASSERT2
- *#* Modificato il progetto in modo da disabilitare le stringhe di errore nel target xROM-xRAM
+ *#* Revision 1.3  2004/10/03 20:43:22  bernie
+ *#* Import changes from sc/firmware.
  *#*
  *#* Revision 1.12  2004/06/14 15:15:24  rasky
  *#* Cambiato key_data in un union invece di castare
@@ -98,9 +90,11 @@
  *#* Sistemata la documentazione, rimossa keycmp in favore della memcmp
  *#*
  *#*/
+
 #include "hashtable.h"
-#include <drv/kdebug.h>
+#include <debug.h>
 #include <compiler.h>
+
 #include <string.h>
 
 
@@ -140,6 +134,7 @@ INLINE void node_get_key(struct HashTable* ht, HashNodePtr node, const void** ke
 		*key = ht->key_data.hook(*node, key_length);
 }
 
+
 INLINE bool node_key_match(struct HashTable* ht, HashNodePtr node, const void* key, uint8_t key_length)
 {
 	const void* key2;
@@ -149,6 +144,7 @@ INLINE bool node_key_match(struct HashTable* ht, HashNodePtr node, const void* k
 
 	return (key_length == key2_length && memcmp(key, key2, key_length) == 0);
 }
+
 
 static uint16_t calc_hash(const void* _key, uint8_t key_length)
 {
@@ -162,6 +158,7 @@ static uint16_t calc_hash(const void* _key, uint8_t key_length)
 
 	return hash ^ (hash >> 6) ^ (hash >> 13);
 }
+
 
 static HashNodePtr perform_lookup(struct HashTable* ht,
                                   const void* key, uint8_t key_length)
@@ -184,9 +181,9 @@ static HashNodePtr perform_lookup(struct HashTable* ht,
 	// Increment while going through the hash table in case of collision.
 	//  This implements the double-hash technique: we use the higher part
 	//  of the hash as a step increment instead of just going to the next
-	//  element, to minimize the collisions. 
+	//  element, to minimize the collisions.
 	// Notice that the number must be odd to be sure that the whole table
-	//  is traversed. Actually MCD(table_size, step) must be 1, but 
+	//  is traversed. Actually MCD(table_size, step) must be 1, but
 	//  table_size is always a power of 2, so we just ensure that step is
 	//  never a multiple of 2.
 	step = (ROTATE_RIGHT_16(hash, ht->max_elts_log2) & mask) | 1;
@@ -212,10 +209,12 @@ static HashNodePtr perform_lookup(struct HashTable* ht,
 	return NULL;
 }
 
+
 void ht_init(struct HashTable* ht)
 {
 	memset(ht->mem, 0, sizeof(ht->mem[0]) * (1 << ht->max_elts_log2));
 }
+
 
 static bool insert(struct HashTable* ht, const void* key, uint8_t key_length, const void* data)
 {
@@ -242,6 +241,7 @@ static bool insert(struct HashTable* ht, const void* key, uint8_t key_length, co
 	return true;
 }
 
+
 bool ht_insert_with_key(struct HashTable* ht, const void* key, uint8_t key_length, const void* data)
 {
 #ifdef _DEBUG
@@ -259,6 +259,7 @@ bool ht_insert_with_key(struct HashTable* ht, const void* key, uint8_t key_lengt
 
 	return insert(ht, key, key_length, data);
 }
+
 
 bool ht_insert(struct HashTable* ht, const void* data)
 {
@@ -279,10 +280,11 @@ bool ht_insert(struct HashTable* ht, const void* data)
 	return insert(ht, key, key_length, data);
 }
 
+
 const void* ht_find(struct HashTable* ht, const void* key, uint8_t key_length)
 {
 	HashNodePtr node;
-	
+
 	if (HT_HAS_INTERNAL_KEY(ht))
 		key_length = MIN(key_length, INTERNAL_KEY_MAX_LENGTH);
 
@@ -326,8 +328,8 @@ static bool single_test(void)
 	{
 		int k;
 		int klen;
-		
-		do 
+
+		do
 		{
 			klen = (rand() % 8) + 1;
 			for (k=0;k<klen;k++)
@@ -342,7 +344,7 @@ static bool single_test(void)
 	for (i=0;i<NUM_ELEMENTS;i++)
 	{
 		char *found1, *found2;
-		
+
 		found1 = (char*)ht_find_str(&test1, data[i]);
 		if (strcmp(found1, data[i]) != 0)
 		{
