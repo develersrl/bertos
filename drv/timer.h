@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.19  2004/12/08 08:30:37  bernie
+ *#* Convert to mtime_t; timer_minutes(): Remove.
+ *#*
  *#* Revision 1.18  2004/11/16 23:09:52  bernie
  *#* Disable timer_minutes() for targets with 16bit time_t.
  *#*
@@ -68,17 +71,17 @@
 #ifndef DRV_TIMER_H
 #define DRV_TIMER_H
 
-#include "cpu.h"
-#include "compiler.h"
-#include <config.h>
 #include <mware/list.h>
+#include <cpu.h>
+#include <compiler.h>
+#include <config.h>
 
 /*! Number of timer ticks per second. */
-#define TICKS_PER_SEC  ((time_t)1000)
+#define TICKS_PER_SEC  ((mtime_t)1000)
 
 /* Function protos */
 extern void timer_init(void);
-extern void timer_delay(time_t time);
+extern void timer_delay(mtime_t time);
 
 #ifndef CONFIG_TIMER_DISABLE_UDELAY
 extern void timer_udelay(utime_t utime);
@@ -102,10 +105,10 @@ extern void timer_udelay(utime_t utime);
  */
 typedef struct Timer
 {
-	Node   link;      /*!< Link into timers queue */
-	time_t delay;     /*!< Timer delay in ms */
-	time_t tick;      /*!< Timer will expire at this tick */
-	Event  expire;    /*!< Event to execute when the timer expires */
+	Node    link;     /*!< Link into timers queue */
+	mtime_t delay;    /*!< Timer delay in ms */
+	mtime_t tick;     /*!< Timer will expire at this tick */
+	Event   expire;   /*!< Event to execute when the timer expires */
 } Timer;
 
 extern void timer_add(Timer *timer);
@@ -128,14 +131,14 @@ INLINE void timer_set_event_softint(Timer* timer, Hook func, void* user_data)
 }
 
 /*! Set the timer delay (the time before the event will be triggered) */
-INLINE void timer_set_delay(Timer* timer, time_t delay)
+INLINE void timer_set_delay(Timer* timer, mtime_t delay)
 {
 	timer->delay = delay;
 }
 
 #endif /* CONFIG_TIMER_DISABLE_EVENTS */
 
-extern volatile time_t _clock;
+extern volatile mtime_t _clock;
 
 /*!
  * \brief Return the system tick counter (expressed in ms)
@@ -146,7 +149,7 @@ extern volatile time_t _clock;
  * The following code is safe:
  *
  * \code
- *   time_t tea_start_time = get_tick();
+ *   mtime_t tea_start_time = get_tick();
  *
  *   boil_water();
  *
@@ -154,16 +157,16 @@ extern volatile time_t _clock;
  *       printf("Your tea, Sir.\n");
  * \endcode
  *
- * When the tick counter increments every millisecond and time_t
+ * When the tick counter increments every millisecond and mtime_t
  * is 32bit wide, the tick count will overflow every 49.7 days.
  *
  * \note This function must disable interrupts on 8/16bit CPUs because the
  * clock variable is larger than the processor word size and can't
  * be copied atomically.
  */
-INLINE time_t timer_ticks(void)
+INLINE mtime_t timer_ticks(void)
 {
-	time_t result;
+	mtime_t result;
 	cpuflags_t flags;
 
 	DISABLE_IRQSAVE(flags);
@@ -181,31 +184,9 @@ INLINE time_t timer_ticks(void)
  *
  * \sa timer_ticks
  */
-INLINE time_t timer_ticks_unlocked(void)
+INLINE mtime_t timer_ticks_unlocked(void)
 {
 	return _clock;
 }
 
-
-/*
- * timer_minutes() makes no sense when time_t is 16bit because
- * it overflows every 65.536 seconds.
- */
-#if SIZEOF_TIME_T >= 4
-
-/*!
- * Return the minutes passed since timer start.
- *
- * The minutes uptime is computed directly from system tick counter:
- * in case of a 4 bytes time_t after 71582 minutes the value will
- * wrap around.
- */
-INLINE time_t timer_minutes(void)
-{
-	return timer_ticks() / (TICKS_PER_SEC * 60);
-}
-
-#endif /* SIZEOF_TIME_T >= 4 */
-
 #endif /* DRV_TIMER_H */
-
