@@ -1,8 +1,8 @@
 /*!
  * \file
  * <!--
- * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
- * This file is part of DevLib - See devlib/README for information.
+ * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \version $Id$
@@ -53,6 +53,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.12  2005/02/16 20:28:03  bernie
+ *#* Add %S formatter.
+ *#*
  *#* Revision 1.11  2005/02/16 16:51:29  bernie
  *#* Simplify float code.
  *#*
@@ -64,33 +67,11 @@
  *#*
  *#* Revision 1.8  2004/08/25 14:12:09  rasky
  *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.7  2004/08/04 15:53:47  rasky
- *#* Nuove opzioni di configurazione per formatted_write e ridotto maggiormente l'utilizzo dellos tack
- *#*
- *#* Revision 1.6  2004/07/30 14:34:10  rasky
- *#* Vari fix per documentazione e commenti
- *#* Aggiunte PP_CATn e STATIC_ASSERT
- *#*
- *#* Revision 1.5  2004/07/29 22:57:09  bernie
- *#* Switch to new-style config handling.
- *#*
- *#* Revision 1.4  2004/07/21 00:20:20  bernie
- *#* Allow completely disabling printf()-like formatter.
- *#*
- *#* Revision 1.3  2004/07/18 22:00:15  bernie
- *#* Reorganize configuration parameters to match DevLib's convention.
- *#*
- *#* Revision 1.2  2004/06/03 11:27:09  bernie
- *#* Add dual-license information.
- *#*
- *#* Revision 1.1  2004/05/23 15:43:16  bernie
- *#* Import mware modules.
- *#*
  *#*/
 
 #include "formatwr.h"
-#include <compiler.h> /* progmem macros */
+#include "pgm.h"
+//#include <compiler.h> /* progmem macros */
 #include <config.h> /* CONFIG_ macros */
 #include <debug.h> /* ASSERT */
 
@@ -110,11 +91,12 @@
 #if CONFIG_PRINTF
 
 #if CONFIG_PRINTF > PRINTF_NOFLOAT
-#include <float.h>
-#endif /* CONFIG_PRINTF > PRINTF_NOFLOAT */
+	#include <float.h>
 
-#if CONFIG_PRINTF > PRINTF_NOFLOAT
-/*bernie: save some memory, who cares about floats with lots of decimals? */
+	/* Maximum precision for floating point values */
+	typedef long double max_float_t;
+
+	/*bernie: save some memory, who cares about floats with lots of decimals? */
 	#define FRMWRI_BUFSIZE 134
 	#warning 134 is too much, the code must be fixed to have a lower precision limit
 #else
@@ -139,7 +121,7 @@
 
 #if CONFIG_PRINTF > PRINTF_NOFLOAT
 
-static char *float_conversion(MEM_ATTRIBUTE long double value,
+static char *float_conversion(MEM_ATTRIBUTE max_float_t value,
 		MEM_ATTRIBUTE short nr_of_digits,
 		MEM_ATTRIBUTE char *buf,
 		MEM_ATTRIBUTE char format_flag,
@@ -228,7 +210,7 @@ static char *float_conversion(MEM_ATTRIBUTE long double value,
 	i = dec_point_pos;
 	while (i <= nr_of_digits )
 	{
-		value -= (long double)(n = (short)value); /* n=Digit value=Remainder */
+		value -= (max_float_t)(n = (short)value); /* n=Digit value=Remainder */
 		value *= 10; /* Prepare for next shot */
 		*buf_pointer++ = n + '0';
 		if ( ! i++ && (nr_of_digits || alternate_flag))
@@ -354,24 +336,27 @@ PGM_FUNC(_formatted_write)(const char * PGM_ATTR format,
 		DIV_OCT,
 #endif
 	};
-	struct {
-		MEM_ATTRIBUTE enum PLUS_SPACE_FLAGS plus_space_flag : 2;
+	MEM_ATTRIBUTE struct {
+		enum PLUS_SPACE_FLAGS plus_space_flag : 2;
 #if CONFIG_PRINTF_OCTAL_FORMATTER
-		MEM_ATTRIBUTE enum DIV_FACTOR div_factor : 2;
+		enum DIV_FACTOR div_factor : 2;
 #else
-		MEM_ATTRIBUTE enum DIV_FACTOR div_factor : 1;
+		enum DIV_FACTOR div_factor : 1;
 #endif
-		MEM_ATTRIBUTE bool left_adjust : 1;
-		MEM_ATTRIBUTE bool l_L_modifier : 1;
-		MEM_ATTRIBUTE bool h_modifier : 1;
-		MEM_ATTRIBUTE bool alternate_flag : 1;
-		MEM_ATTRIBUTE bool nonzero_value : 1;
-		MEM_ATTRIBUTE bool zeropad : 1;
+		bool left_adjust : 1;
+		bool l_L_modifier : 1;
+		bool h_modifier : 1;
+		bool alternate_flag : 1;
+		bool nonzero_value : 1;
+		bool zeropad : 1;
+#if CPU_HARVARD
+		bool progmem : 1;
+#endif
 	} flags;
 	MEM_ATTRIBUTE unsigned long ulong;
 
 #if CONFIG_PRINTF >  PRINTF_NOFLOAT
-	MEM_ATTRIBUTE long double fvalue;
+	MEM_ATTRIBUTE max_float_t fvalue;
 #endif
 
 	MEM_ATTRIBUTE char *buf_pointer;
@@ -411,6 +396,9 @@ PGM_FUNC(_formatted_write)(const char * PGM_ATTR format,
 		flags.alternate_flag = false;
 		flags.plus_space_flag = PSF_NONE;
 		flags.zeropad = false;
+#if CPU_HARVARD
+		flags.progmem = false;
+#endif
 		ptr = buf_pointer = &buf[0];
 		hex = "0123456789ABCDEF";
 
@@ -548,15 +536,34 @@ NEXT_FLAG:
 				ptr++;
 				break;
 
+			/* Custom formatter for strings in program memory. */
+			case 'S':
+#if CPU_HARVARD
+				flags.progmem = true;
+#endif
+				/* Fall trough */
+
 			case 's':
 				if ( !(buf_pointer = va_arg(ap, char *)) )
 					buf_pointer = null_pointer;
 				if (precision < 0)
 					precision = 10000;
-				for (n=0; *buf_pointer++ && n < precision; n++)
-					;
-				ptr = --buf_pointer;
-				buf_pointer -= n;
+
+				/*
+				 * Move `ptr' to the last character of the
+				 * string that will be actually printed.
+				 */
+				ptr = buf_pointer;
+#if CPU_HARVARD
+				if (flags.progmem)
+				{
+					for (n=0; pgm_read_char(ptr) && n < precision; n++)
+						++ptr;
+				}
+				else
+#endif
+				for (n=0; *ptr && n < precision; n++)
+					++ptr;
 				break;
 
 #if CONFIG_PRINTF_OCTAL_FORMATTER
@@ -696,13 +703,13 @@ FLOATING_CONVERSION:
 					precision = 6;
 				}
 
-				if (sizeof(double) != sizeof(long double))
+				if (sizeof(double) != sizeof(max_float_t))
 				{
 					fvalue = flags.l_L_modifier ?
-						va_arg(ap,long double) : va_arg(ap,double);
+						va_arg(ap,max_float_t) : va_arg(ap,double);
 				}
 				else
-					fvalue = va_arg(ap,long double);
+					fvalue = va_arg(ap,max_float_t);
 
 				if (fvalue < 0)
 				{
@@ -771,13 +778,28 @@ FLOATING_CONVERSION:
 #endif
 		}
 
-		/* emit the string itself */
-		while (--precision >= 0)
+#if CPU_HARVARD
+		if (flags.progmem)
 		{
-			put_one_char(*buf_pointer++, secret_pointer);
+			while (--precision >= 0)
+			{
+				put_one_char(pgm_read_char(buf_pointer++), secret_pointer);
 #if CONFIG_PRINTF_COUNT_CHARS
-			nr_of_chars++;
+				nr_of_chars++;
 #endif
+			}
+		}
+		else
+#endif /* CPU_HARVARD */
+		{
+			/* emit the string itself */
+			while (--precision >= 0)
+			{
+				put_one_char(*buf_pointer++, secret_pointer);
+#if CONFIG_PRINTF_COUNT_CHARS
+				nr_of_chars++;
+#endif
+			}
 		}
 
 		/* emit trailing space characters */

@@ -12,6 +12,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2005/02/16 20:28:03  bernie
+ *#* Add %S formatter.
+ *#*
  *#* Revision 1.6  2005/01/08 08:50:06  bernie
  *#* Make more portable.
  *#*
@@ -62,6 +65,7 @@ _formatted_write(
 	va_list ap);
 
 #if CPU_HARVARD
+	#include "pgm.h"
 	int _formatted_write_P(
 		const char * PROGMEM format,
 		void put_char_func(char c, void *user_data),
