@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2004/12/08 07:29:27  bernie
+ *#* Fix Doxygen tags.
+ *#*
  *#* Revision 1.3  2004/09/20 03:31:27  bernie
  *#* Sanitize for C++.
  *#*
@@ -70,9 +73,7 @@
 	#include <compiler.h>
 #endif /* !OS_HOSTED */
 
-/*!
- * \def _DEBUG
- *
+/*
  * This preprocessor symbol is defined only in debug builds.
  *
  * The build infrastructure must arrange for _DEBUG to
@@ -113,7 +114,7 @@
 	 * statements conditioned on \c _DEBUG, avoiding the clutter
 	 * of #ifdef/#endif pairs.
 	 *
-	 * \example
+	 * \code
 	 *     struct FooBar
 	 *     {
 	 *         int foo;
@@ -125,8 +126,7 @@
          *             DB(--ref_count;)
 	 *         }
 	 *     };
-	 *
-	 * \endexample
+	 * \endcode
 	 */
 	#define DB(x) x
 
