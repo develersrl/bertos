@@ -17,6 +17,9 @@
 
 /*
  * $Log$
+ * Revision 1.9  2004/08/24 14:26:57  bernie
+ * monitor_debug_stacks(): Conditionally compile on CONFIG_KERN_MONITOR.
+ *
  * Revision 1.8  2004/08/14 19:37:57  rasky
  * Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
  *
@@ -146,6 +149,8 @@ size_t monitor_check_stack(cpustack_t* stack_base, size_t stack_size)
 	return sp_free;
 }
 
+#if CONFIG_KERN_MONITOR
+
 void monitor_debug_stacks(void)
 {
 	struct Process* p;
@@ -170,6 +175,8 @@ void monitor_debug_stacks(void)
 		kprintf("%-24s    %04x    %04x    %4x    %4x\n", p->monitor.name, (uint16_t)p, (uint16_t)p->monitor.stack_base, (uint16_t)p->monitor.stack_size, (uint16_t)free);
 	}
 }
+
+#endif /* CONFIG_KERN_MONITOR */
 
 #endif
 
