@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2004/12/31 17:43:09  bernie
+ *#* Use UNUSED_ARG instead of obsolete UNUSED macro.
+ *#*
  *#* Revision 1.6  2004/12/08 08:52:00  bernie
  *#* Save some more RAM on AVR.
  *#*
@@ -72,8 +75,12 @@
 	#ifndef INLINE
 	#define INLINE static inline
 	#endif
-	#ifndef UNUSED
-	#define UNUSED(type,name) type
+	#ifndef UNUSED_ARG
+	#ifdef __cplusplus
+		#define UNUSED_ARG(type,name) type
+	#else
+		#define UNUSED_ARG(type,name) type name
+	#endif
 	#endif
 #else /* !OS_HOSTED */
 	#include <config.h>
@@ -317,14 +324,14 @@
 	#define IMPLEMENT_INSTANCE_TRACKING(CLASS)
 
 	INLINE void kdbg_init(void) { /* nop */ }
-	INLINE void kputchar(UNUSED(char, c)) { /* nop */ }
-	INLINE void kputs(UNUSED(const char*, str)) { /* nop */ }
+	INLINE void kputchar(UNUSED_ARG(char, c)) { /* nop */ }
+	INLINE void kputs(UNUSED_ARG(const char *, str)) { /* nop */ }
 	#ifdef __cplusplus
 		/* G++ can't inline functions with variable arguments... */
 		#define kprintf(fmt,...) do { (void)(fmt); } while(0)
 	#else
 		/* ...but GCC can. */
-		INLINE void kprintf(UNUSED(const char*, fmt), ...) { /* nop */ }
+		INLINE void kprintf(UNUSED_ARG(const char *, fmt), ...) { /* nop */ }
 	#endif
 
 #endif /* _DEBUG */
