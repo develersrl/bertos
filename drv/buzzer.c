@@ -1,8 +1,8 @@
 /*!
  * \file
  * <!--
- * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
- * Copyright 1999,2003 Bernardo Innocenti <bernie@develer.com>
+ * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 1999, 2003 Bernardo Innocenti <bernie@develer.com>
  * This file is part of DevLib - See devlib/README for information.
  * -->
  *
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2004/09/14 21:01:25  bernie
+ *#* Use new AVR port pin names.
+ *#*
  *#* Revision 1.8  2004/08/25 14:12:08  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -41,8 +44,8 @@
 #include "buzzer.h"
 
 #include <drv/timer.h>
-#include <drv/kdebug.h>
 #include <kern/event.h>
+#include <debug.h>
 #include <hw.h>
 #include <arch_config.h>
 
@@ -61,7 +64,7 @@
 
 #elif defined(__AVR__)
 
-	#define IS_BUZZER_ON  (PORTG & BV(PORTG0))
+	#define IS_BUZZER_ON  (PORTG & BV(PG0))
 
 	/*!
 	 * Buzzer manipulation macros
@@ -74,7 +77,7 @@
 	do { \
 		cpuflags_t _flags; \
 		DISABLE_IRQSAVE(_flags); \
-		PORTG |= BV(PORTG0); \
+		PORTG |= BV(PG0); \
 		ENABLE_IRQRESTORE(_flags); \
 	} while (0)
 
@@ -82,7 +85,7 @@
 	do { \
 		cpuflags_t _flags; \
 		DISABLE_IRQSAVE(_flags); \
-		PORTG &= ~BV(PORTG0); \
+		PORTG &= ~BV(PG0); \
 		ENABLE_IRQRESTORE(_flags); \
 	} while (0)
 
@@ -90,8 +93,8 @@
 	do { \
 		cpuflags_t _flags; \
 		DISABLE_IRQSAVE(_flags); \
-		PORTG &= ~BV(PORTG0); \
-		DDRG |= BV(PORTG0); \
+		PORTG &= ~BV(PG0); \
+		DDRG |= BV(PG0); \
 		ENABLE_IRQRESTORE(_flags); \
 	} while (0)
 
