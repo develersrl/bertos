@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.20  2004/11/16 20:33:32  bernie
+ *#* CPU_HARVARD: New macro.
+ *#*
  *#* Revision 1.19  2004/10/03 20:43:54  bernie
  *#* Fix Doxygen markup.
  *#*
@@ -76,6 +79,7 @@
 	#define CPU_STACK_GROWS_UPWARD  0
 	#define CPU_SP_ON_EMPTY_SLOT	0
 	#define CPU_BYTE_ORDER          CPU_LITTLE_ENDIAN
+	#define CPU_HARVARD		0
 
 #elif CPU_X86
 
@@ -91,6 +95,7 @@
 	#define CPU_STACK_GROWS_UPWARD  0
 	#define CPU_SP_ON_EMPTY_SLOT	0
 	#define CPU_BYTE_ORDER          CPU_LITTLE_ENDIAN
+	#define CPU_HARVARD		0
 
 #elif CPU_DSP56K
 
@@ -112,6 +117,7 @@
 	#define CPU_STACK_GROWS_UPWARD  1
 	#define CPU_SP_ON_EMPTY_SLOT	0
 	#define CPU_BYTE_ORDER          CPU_BIG_ENDIAN
+	#define CPU_HARVARD		1
 
 	/* Memory is word-addessed in the DSP56K */
 	#define CPU_BITS_PER_CHAR  16
@@ -168,6 +174,7 @@
 	#define CPU_STACK_GROWS_UPWARD  0
 	#define CPU_SP_ON_EMPTY_SLOT    1
 	#define CPU_BYTE_ORDER          CPU_LITTLE_ENDIAN
+	#define CPU_HARVARD		1
 
 	/*!
 	 * Initialization value for registers in stack frame.
