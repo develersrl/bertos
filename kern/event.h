@@ -18,6 +18,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2005/01/24 04:19:55  bernie
+ *#* Remove obsolete names.
+ *#*
  *#* Revision 1.8  2005/01/24 04:19:05  bernie
  *#* Function pointer based event dispatching.
  *#*
@@ -138,12 +141,5 @@ INLINE void event_do(struct Event* e)
 {
 	e->action(e);
 }
-
-#ifdef CONFIG_KERN_OLDNAMES
-	#define INITEVENT_SIG  event_initSignal
-	#define INITEVENT_INT  event_initSoftInt
-	#define DOEVENT        event_do
-	#define DOEVENT_INTR   event_do
-#endif
 
 #endif /* KERN_EVENT_H */
