@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.43  2005/03/01 23:15:12  bernie
+ *#* Remove compatibility hack.
+ *#*
  *#* Revision 1.42  2005/02/16 20:28:46  bernie
  *#* Move PGM macros to mware/pgm.h
  *#*
@@ -22,9 +25,6 @@
  *#*
  *#* Revision 1.40  2005/01/20 18:46:04  aleph
  *#* Add progmem datatypes; PSTR() definition.
- *#*
- *#* Revision 1.39  2005/01/08 08:49:39  bernie
- *#* Define PROGMEM on AVR only when not including pgmspace.h.
  *#*/
 #ifndef DEVLIB_COMPILER_H
 #define DEVLIB_COMPILER_H
@@ -150,9 +150,6 @@
 	#if CPU_AVR
 		#include <stddef.h>
 		#include <stdbool.h>
-
-		/* TODO: reorganize client code to include mware/pgm.h as needed. */
-		#include <mware/pgm.h>
 	#else
 		/* Include some standard C89/C99 stuff */
 		#include <stddef.h>
