@@ -41,6 +41,9 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/06/06 16:11:17  bernie
+ * Protect MetroWerks specific pragmas with #ifdef's
+ *
  * Revision 1.3  2004/06/03 15:04:10  aleph
  * Merge improvements from project_ks (mainly inlining)
  *
@@ -98,9 +101,13 @@ INLINE bool fifo_isempty(const FIFOBuffer *fb);
 INLINE bool fifo_isempty_locked(const FIFOBuffer *fb);
 INLINE bool fifo_isfull(const FIFOBuffer *fb);
 INLINE bool fifo_isfull_locked(const FIFOBuffer *fb);
+#ifdef __MWERKS__
 #pragma interrupt called
+#endif
 INLINE void fifo_push(FIFOBuffer *fb, unsigned char c);
+#ifdef __MWERKS__
 #pragma interrupt called
+#endif
 INLINE unsigned char fifo_pop(FIFOBuffer *fb);
 INLINE void fifo_flush(FIFOBuffer *fb);
 INLINE void fifo_init(FIFOBuffer *fb, unsigned char *buf, size_t size);
