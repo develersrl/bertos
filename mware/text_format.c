@@ -6,16 +6,18 @@
  * This file is part of DevLib - See devlib/README for information.
  * -->
  *
- * \version $Id$
+ * \brief printf-family routines for text output
  *
+ * \version $Id$
  * \author Bernardo Innocenti <bernie@develer.com>
  * \author Stefano Fedrigo <aleph@develer.com>
- *
- * \brief printf-family routines for text output
  */
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2004/10/03 19:05:04  bernie
+ *#* text_widthf(), text_vwidthf(): New functions.
+ *#*
  *#* Revision 1.6  2004/09/14 20:59:04  bernie
  *#* text_xprintf(): Support all styles; Pixel-wise text centering.
  *#*
@@ -139,7 +141,7 @@ int PGM_FUNC(text_xprintf)(struct Bitmap *bm,
 
 	if (style & (TEXT_CENTER | TEXT_RIGHT))
 	{
-		uint8_t pad = bm->width - PGM_FUNC(vsprintf)(NULL, fmt, ap) * FONT_WIDTH;
+		uint8_t pad = bm->width - PGM_FUNC(text_vwidthf)(bm, fmt, ap);
 
 		if (style & TEXT_CENTER)
 			pad /= 2;
@@ -165,3 +167,27 @@ int PGM_FUNC(text_xprintf)(struct Bitmap *bm,
 	return len;
 }
 
+
+/*!
+ * Return the width in pixels of a vprintf()-formatted string.
+ */
+int PGM_FUNC(text_vwidthf)(UNUSED(struct Bitmap *, bm), const char * PGM_ATTR fmt, va_list ap)
+{
+	return PGM_FUNC(vsprintf)(NULL, fmt, ap) * FONT_WIDTH;
+}
+
+
+/*!
+ * Return the width in pixels of a printf()-formatted string.
+ */
+int PGM_FUNC(text_widthf)(struct Bitmap *bm, const char * PGM_ATTR fmt, ...)
+{
+	int width;
+
+	va_list ap;
+	va_start(ap, fmt);
+	width = PGM_FUNC(text_vwidthf)(bm, fmt, ap);
+	va_end(ap);
+
+	return width;
+}
