@@ -13,6 +13,10 @@
 
 /*
  * $Log$
+ * Revision 1.6  2004/07/30 14:34:10  rasky
+ * Vari fix per documentazione e commenti
+ * Aggiunte PP_CATn e STATIC_ASSERT
+ *
  * Revision 1.5  2004/07/20 23:45:01  bernie
  * Finally remove redundant protos.
  *
@@ -121,7 +125,7 @@ typedef struct _List
 #define ISLISTEMPTY(l)  ( (l)->head == (Node *)(&(l)->null) )
 
 /*!
- * \name Unlink a node from the head of the list \a l.
+ * Unlink a node from the head of the list \a l.
  * \return Pointer to node, or NULL if the list was empty.
  */
 INLINE Node *REMHEAD(List *l)
@@ -138,7 +142,7 @@ INLINE Node *REMHEAD(List *l)
 }
 
 /*!
- * \name Unlink a node from the tail of the list \a l.
+ * Unlink a node from the tail of the list \a l.
  * \return Pointer to node, or NULL if the list was empty.
  */
 INLINE Node *REMTAIL(List *l)

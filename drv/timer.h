@@ -15,6 +15,10 @@
 
 /*
  * $Log$
+ * Revision 1.12  2004/07/30 14:34:10  rasky
+ * Vari fix per documentazione e commenti
+ * Aggiunte PP_CATn e STATIC_ASSERT
+ *
  * Revision 1.11  2004/07/29 22:40:12  bernie
  * Spelling fix.
  *
@@ -54,6 +58,7 @@
 
 #include "cpu.h"
 #include "compiler.h"
+#include <config.h>
 #include <mware/list.h>
 
 /*! Number of timer ticks per second. */
@@ -128,14 +133,14 @@ extern volatile time_t _clock;
  *
  * The following code is safe:
  *
- * \example
+ * \code
  *   time_t tea_start_time = get_tick();
  *
  *   boil_water();
  *
  *   if (get_tick() - tea_start_time > TEAPOT_DELAY)
  *       printf("Your tea, Sir.\n");
- * \endexample
+ * \endcode
  *
  * When the tick counter increments every millisecond and time_t
  * is 32bit wide, the tick count will overflow every 49.7 days.

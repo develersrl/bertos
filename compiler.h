@@ -15,6 +15,10 @@
 
 /*
  * $Log$
+ * Revision 1.11  2004/07/30 14:34:10  rasky
+ * Vari fix per documentazione e commenti
+ * Aggiunte PP_CATn e STATIC_ASSERT
+ *
  * Revision 1.10  2004/07/30 14:15:53  rasky
  * Nuovo supporto unificato per detect della CPU
  *
@@ -241,9 +245,9 @@
 
 
 /* Simple macros */
-#define ABS(a)		(((a) < 0) ? -(a) : (a))
-#define MIN(a,b)	(((a) < (b)) ? (a) : (b))
-#define MAX(a,b)	(((a) > (b)) ? (a) : (b))
+#define ABS(a)      (((a) < 0) ? -(a) : (a))
+#define MIN(a,b)    (((a) < (b)) ? (a) : (b))
+#define MAX(a,b)    (((a) > (b)) ? (a) : (b))
 
 #ifndef BV
 /*! Convert a bit value to a binary flag */
@@ -272,9 +276,19 @@
 	((x < 65536UL) ? UINT16_LOG2(x) : UINT16_LOG2((x) >> 16) + 16)
 
 /*! Concatenate two different preprocessor tokens (allowing macros to expand) */
-#define PP_CAT(x,y)      PP_CAT__(x,y)
-#define PP_CAT__(x,y)    x ## y
+#define PP_CAT(x,y)         PP_CAT__(x,y)
+#define PP_CAT__(x,y)       x ## y
+#define PP_CAT3(x,y,z)      PP_CAT(PP_CAT(x,y),z)
+#define PP_CAT4(x,y,z,w)    PP_CAT(PP_CAT3(x,y,z),w)
+#define PP_CAT5(x,y,z,w,j)  PP_CAT(PP_CAT4(x,y,z,w),j)
 
+/*! String-ize a token (allowing macros to expand) */
+#define PP_STRINGIZE(x)     PP_STRINGIZE__(x)
+#define PP_STRINGIZE__(x)   #x
+
+/*! Issue a compilation error if the \a condition is false */
+#define STATIC_ASSERT(condition)  \
+	extern char CT_ASSERT___[(condition) ? 1 : -1]
 
 /*
  * Standard type definitions

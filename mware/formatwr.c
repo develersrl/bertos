@@ -31,6 +31,12 @@
  *   PRINTF_REDUCED      924byte (0x39C)
  *   PRINTF_NOMODIFIERS  416byte (0x1A0)
  *
+ * Code/data size in words on DSP56K with CodeWarrior 6.0:
+ *   PRINTF_FULL         1493/45
+ *   PRINTF_NOFLOAT      795/45
+ *   PRINTF_REDUCED      482/0
+ *   PRINTF_NOMODIFIERS  301/0
+ *
  * The reduced version of formatter is suitable when program size is critical
  * rather than formatting power.  This routine uses less than 20 bytes of
  * stack space which makes it practical even in systems with less than 256
@@ -47,6 +53,10 @@
 
 /*
  * $Log$
+ * Revision 1.6  2004/07/30 14:34:10  rasky
+ * Vari fix per documentazione e commenti
+ * Aggiunte PP_CATn e STATIC_ASSERT
+ *
  * Revision 1.5  2004/07/29 22:57:09  bernie
  * Switch to new-style config handling.
  *
