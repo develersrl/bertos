@@ -1,9 +1,9 @@
 /*!
  * \file
  * <!--
- * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999, 2003 Bernardo Innocenti <bernie@develer.com>
- * This file is part of DevLib - See devlib/README for information.
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \version $Id$
@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.13  2005/02/18 11:20:15  bernie
+ *#* Use mware/event.h; Update copyright info.
+ *#*
  *#* Revision 1.12  2004/12/13 12:07:06  bernie
  *#* DISABLE_IRQSAVE/ENABLE_IRQRESTORE: Convert to IRQ_SAVE_DISABLE/IRQ_RESTORE.
  *#*
@@ -27,34 +30,14 @@
  *#*
  *#* Revision 1.9  2004/09/14 21:01:25  bernie
  *#* Use new AVR port pin names.
- *#*
- *#* Revision 1.8  2004/08/25 14:12:08  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.7  2004/08/24 16:53:43  bernie
- *#* Add missing headers.
- *#*
- *#* Revision 1.6  2004/06/07 18:10:06  aleph
- *#* Remove free pool of timers; use user-provided Timer structure instead
- *#*
- *#* Revision 1.5  2004/06/07 15:54:23  aleph
- *#* Update to new event.h naming
- *#*
- *#* Revision 1.4  2004/06/06 16:09:22  bernie
- *#* Reformat (from project_ks).
- *#*
- *#* Revision 1.3  2004/06/03 11:27:09  bernie
- *#* Add dual-license information.
- *#*
- *#* Revision 1.2  2004/05/23 18:21:53  bernie
- *#* Trim CVS logs and cleanup header info.
- *#*
  *#*/
 
 #include "buzzer.h"
 
 #include <drv/timer.h>
-#include <kern/event.h>
+#include <mware/event.h>
+
+#include <macros.h> /* BV() */
 #include <debug.h>
 #include <hw.h>
 #include <arch_config.h>
