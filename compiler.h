@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.31  2004/11/16 22:37:28  bernie
+ *#* IPTR: Remove obsolete definition.
+ *#*
  *#* Revision 1.30  2004/11/16 22:30:19  bernie
  *#* Declare fixed-size types before other types.
  *#*
@@ -409,7 +412,6 @@
 /*! Bulk storage large enough for both pointers or integers */
 typedef void * iptr_t;
 typedef const void * const_iptr_t;
-#define IPTR iptr_t  /* OBSOLETE */
 
 typedef long utime_t;            /*!< Type for time expressed in microseconds */
 typedef unsigned char sig_t;     /*!< Type for signal bits */
