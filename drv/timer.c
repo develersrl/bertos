@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.5  2004/06/07 15:56:55  aleph
+ * Some tabs cleanup and add timer strobe macros
+ *
  * Revision 1.4  2004/06/06 18:25:44  bernie
  * Rename event macros to look like regular functions.
  *
@@ -38,17 +41,15 @@
 #endif
 
 #if (ARCH & ARCH_EMUL)
-
-# error To be recoded
-
+	#error To be recoded
 #elif defined(__AVR__)
-#	include "timer_avr.h"
+	#include "timer_avr.h"
 #elif defined(__IAR_SYSTEMS_ICC) || defined(__IAR_SYSTEMS_ICC__) /* 80C196 */
-#	include "timer_i196.h"
+	#include "timer_i196.h"
 #elif defined (__m56800__)
-#	include "timer_dsp56k.h"
+	#include "timer_dsp56k.h"
 #else
-#	error Unknown system
+	#error Unknown system
 #endif
 
 
@@ -184,6 +185,10 @@ void timer_delay(time_t time)
 
 /*!
  * Wait for the specified amount of time (expressed in microseconds)
+ *
+ * \bug In AVR arch the maximum amount of time that can be used as
+ *      delay could be very limited, depending on the hardware timer
+ *      used. Check timer_avr.h, and what register is used as hptime_t.
  */
 void timer_udelay(utime_t usec_delay)
 {
@@ -219,6 +224,8 @@ DEFINE_TIMER_ISR
 
 	Timer *timer;
 
+	TIMER_STROBE_ON;
+
 	timer_hw_irq();
 
 	/* Update the master ms counter */
@@ -243,8 +250,9 @@ DEFINE_TIMER_ISR
 		/* Execute the associated event */
 		event_doIntr(&timer->expire);
 	}
-}
 
+	TIMER_STROBE_OFF;
+}
 
 
 /*!
@@ -253,6 +261,8 @@ DEFINE_TIMER_ISR
 void timer_init(void)
 {
 	int i;
+
+	TIMER_STROBE_INIT;
 
 	INITLIST(&timers_queue);
 	INITLIST(&timers_pool);
