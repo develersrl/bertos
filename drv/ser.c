@@ -28,6 +28,9 @@
 
 /*
  * $Log$
+ * Revision 1.12  2004/08/24 13:49:39  bernie
+ * Fix thinko.
+ *
  * Revision 1.11  2004/08/15 05:32:22  bernie
  * ser_resync(): New function.
  *
@@ -367,8 +370,8 @@ void ser_setparity(struct Serial *port, int parity)
  */
 void ser_purge(struct Serial *port)
 {
-	fifo_flush_locked(&ser->rxfifo);
-	fifo_flush_locked(&ser->txfifo);
+	fifo_flush_locked(&port->rxfifo);
+	fifo_flush_locked(&port->txfifo);
 }
 
 
