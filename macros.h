@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2005/01/22 04:19:50  bernie
+ *#* Use non-uglified typeof().
+ *#*
  *#* Revision 1.9  2004/12/08 08:51:34  bernie
  *#* Add type-generic macros for C++.
  *#*
@@ -75,18 +78,18 @@
 #elif (COMPILER_STATEMENT_EXPRESSIONS && COMPILER_TYPEOF)
 	/* Type-generic macros implemented with statement expressions. */
 	#define ABS(n) ({ \
-		__typeof__(n) _n = (n); \
+		typeof(n) _n = (n); \
 		(_n < 0) ? -_n : _n; \
 	})
 	#define MIN(a,b) ({ \
-		__typeof__(a) _a = (a); \
-		__typeof__(b) _b = (b); \
+		typeof(a) _a = (a); \
+		typeof(b) _b = (b); \
 		(void)(&_a == &_b); /* ensure same type */ \
 		(_a < _b) ? _a : _b; \
 	})
 	#define MAX(a,b) ({ \
-		__typeof__(a) _a = (a); \
-		__typeof__(b) _b = (b); \
+		typeof(a) _a = (a); \
+		typeof(b) _b = (b); \
 		(void)(&_a == &_b); /* ensure same type */ \
 		(_a > _b) ? _a : _b; \
 	})
