@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.20  2004/11/16 20:59:46  bernie
+ *#* Include <avr/io.h> explicitly.
+ *#*
  *#* Revision 1.19  2004/10/19 08:56:41  bernie
  *#* TIMER_STROBE_ON, TIMER_STROBE_OFF, TIMER_STROBE_INIT: Move from timer_avr.h to timer.h, where they really belong.
  *#*
@@ -54,8 +57,8 @@
 #include <arch_config.h> // ARCH_BOARD_KC
 #include "hw.h"
 
-#include <avr/wdt.h>
 #include <avr/signal.h>
+#include <avr/io.h>
 
 #if defined(ARCH_BOARD_KC) && (ARCH & ARCH_BOARD_KC)
 	#include <drv/adc.h>
