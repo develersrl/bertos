@@ -6,15 +6,17 @@
  * This file is part of DevLib - See devlib/README for information.
  * -->
  *
- * \version $Id$
- *
- * \author Bernardo Innocenti <bernie@develer.com>
- *
  * \brief Hardware independent timer driver (implementation)
+ *
+ * \version $Id$
+ * \author Bernardo Innocenti <bernie@develer.com>
  */
 
 /*#*
  *#* $Log$
+ *#* Revision 1.17  2004/10/03 18:52:08  bernie
+ *#* Move \brief on top in header to please Doxygen.
+ *#*
  *#* Revision 1.16  2004/10/03 18:48:01  bernie
  *#* timer_delay(): Add a sanity check to avoid sleeping forever.
  *#*
