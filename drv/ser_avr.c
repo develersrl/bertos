@@ -1,8 +1,8 @@
-/**
+/*!
  * \file
  * <!--
  * Copyright 2000 Bernardo Innocenti <bernie@codewiz.org>
- * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
  * All Rights Reserved.
  * -->
  *
@@ -15,32 +15,9 @@
 
 /*
  * $Log$
- * Revision 1.1  2004/05/23 18:10:11  bernie
- * Import drv/ modules.
+ * Revision 1.2  2004/05/23 18:21:53  bernie
+ * Trim CVS logs and cleanup header info.
  *
- * Revision 1.30  2004/05/19 17:06:11  bernie
- * Serial TX fill mode
- *
- * Revision 1.29  2004/05/16 19:16:46  aleph
- * Serial always transmitting, first try
- *
- * Revision 1.28  2004/05/14 12:09:00  aleph
- * Fix TX port pull-ups
- *
- * Revision 1.27  2004/05/08 13:56:02  aleph
- * Adapt avr serial driver to new design
- *
- * Revision 1.25  2004/04/28 13:42:16  aleph
- * Serial port fixes
- *
- * Revision 1.24  2004/04/08 14:17:27  bernie
- * Change serial to disable TX when not sending data
- *
- * Revision 1.23  2004/04/03 20:39:41  aleph
- * Remove strobe
- *
- * Revision 1.22  2004/03/29 17:01:02  aleph
- * Add function to set serial parity, fix it when ser_open is used
  */
 
 #include "ser.h"
@@ -76,14 +53,14 @@ struct AvrSerial
 
 #ifdef __AVR_ATmega103__
 	/* Macro for ATmega103 compatibility */
-	#define UCSR0B UCR 
-	#define UDR0   UDR 
-	#define UCSR0A USR 
+	#define UCSR0B UCR
+	#define UDR0   UDR
+	#define UCSR0A USR
 	#define UBRR0L UBRR
 #else
-	#define UCR  UCSR0B 
-	#define UDR  UDR0  
-	#define USR  UCSR0A 
+	#define UCR  UCSR0B
+	#define UDR  UDR0
+	#define USR  UCSR0A
 #endif
 
 
@@ -384,7 +361,7 @@ static void spi_starttx(UNUSED(struct SerialHardware *ctx))
 	/* Send data only if the SPI is not already transmitting */
 	if (!spi_sending && !fifo_isempty(&ser_handles[SER_SPI].txfifo))
 	{
-		SPDR = fifo_pop(&ser_handles[SER_SPI].txfifo); 
+		SPDR = fifo_pop(&ser_handles[SER_SPI].txfifo);
 		spi_sending = true;
 	}
 
@@ -420,12 +397,12 @@ __interrupt void UART_TXC_interrupt(void)
 {
   UCSRB &= ~TXCIE;
   ReceiveMode();
-  UCSRB = RXCIE | RXEN | TXEN;  //Abilito l'Interrupt in ricezione e RX e TX  
+  UCSRB = RXCIE | RXEN | TXEN;  //Abilito l'Interrupt in ricezione e RX e TX
 }
 */
 
 
-static const struct SerialHardwareVT UART0_VT = 
+static const struct SerialHardwareVT UART0_VT =
 {
 	.init = uart0_init,
 	.cleanup = uart0_cleanup,
@@ -434,7 +411,7 @@ static const struct SerialHardwareVT UART0_VT =
 	.enabletxirq = uart0_enabletxirq,
 };
 
-static const struct SerialHardwareVT UART1_VT = 
+static const struct SerialHardwareVT UART1_VT =
 {
 	.init = uart1_init,
 	.cleanup = uart1_cleanup,
@@ -443,7 +420,7 @@ static const struct SerialHardwareVT UART1_VT =
 	.enabletxirq = uart1_enabletxirq,
 };
 
-static const struct SerialHardwareVT SPI_VT = 
+static const struct SerialHardwareVT SPI_VT =
 {
 	.init = spi_init,
 	.cleanup = spi_cleanup,
@@ -452,17 +429,17 @@ static const struct SerialHardwareVT SPI_VT =
 
 static struct AvrSerial UARTDescs[SER_CNT] =
 {
- 	{ 
- 		.hw = { .table = &UART0_VT }, 
- 	},
-	
-	{ 
-		.hw = { .table = &UART1_VT }, 
-	},  
+	{
+		.hw = { .table = &UART0_VT },
+	},
 
-	{ 
-		.hw = { .table = &SPI_VT }, 
-	},  
+	{
+		.hw = { .table = &UART1_VT },
+	},
+
+	{
+		.hw = { .table = &SPI_VT },
+	},
 };
 
 struct SerialHardware* ser_hw_getdesc(int unit)

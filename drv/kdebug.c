@@ -1,4 +1,4 @@
-/*
+/*!
  * \file
  * <!--
  * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,10 @@
  */
 
 /*
+ * $Log$
+ * Revision 1.2  2004/05/23 18:21:53  bernie
+ * Trim CVS logs and cleanup header info.
+ *
  */
 
 #include "kdebug.h"

@@ -1,8 +1,8 @@
 /*!
  * \file
  * <!--
- * Copyright 2000 Bernardo Innocenti <bernie@codewiz.org>
  * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2000 Bernardo Innocenti <bernie@codewiz.org>
  * All Rights Reserved.
  * -->
  *
@@ -14,38 +14,12 @@
 
 /*
  * $Log$
- * Revision 1.1  2004/05/23 18:10:11  bernie
- * Import drv/ modules.
+ * Revision 1.2  2004/05/23 18:21:53  bernie
+ * Trim CVS logs and cleanup header info.
  *
- * Revision 1.2  2004/04/21 17:38:24  rasky
- * New application
- *
- * Revision 1.16  2004/04/03 18:30:49  aleph
- * Move timeout defines in config, private define in .c
- *
- * Revision 1.15  2004/03/29 17:01:02  aleph
- * Add function to set serial parity, fix it when ser_open is used
- *
- * Revision 1.14  2004/03/29 16:19:33  aleph
- * Add ser_cleanup function; Various code improvements
- *
- * Revision 1.13  2004/03/24 15:22:27  aleph
- * Removed subdirs -I, fix header inclusion, move config.h in board_kf, kctrl
- *
- * Revision 1.12  2004/03/17 17:30:30  bernie
- * Add GCC format checks to printf()-like functions.
- *
- * Revision 1.11  2004/03/16 23:06:42  aleph
- * Doc fix
- *
- * Revision 1.10  2004/03/12 18:46:53  bernie
- * ser_read(): New function.
- *
- * Revision 1.9  2004/03/11 18:11:51  bernie
- * Cosmetic fixes
  */
-#ifndef SER_H
-#define SER_H
+#ifndef DRV_SER_H
+#define DRV_SER_H
 
 #include "compiler.h"
 #include <mware/fifobuf.h>
@@ -109,11 +83,11 @@ enum
 	#elif defined(__AVR_ATmega103__)
 	SER_UART0,
 	SER_SPI,
-	
+
 	#elif defined (__m56800__)
 	SER_UART0,
-	SER_UART1,	
-	
+	SER_UART1,
+
 	#else
 		#error unknown architecture
 	#endif
@@ -158,10 +132,9 @@ struct Serial
 
 	/*! Holds the flags defined above.  Will be 0 when no errors have occurred. */
 	REGISTER uint16_t status;
-	
+
 	/*! Low-level interface to hardware. */
 	struct SerialHardware* hw;
-	
 };
 
 
@@ -184,13 +157,13 @@ extern void ser_close(struct Serial *port);
 	extern void ser_settimeouts(struct Serial *port, time_t rxtimeout, time_t txtimeout);
 #endif
 
-/**
- * @name Additional functions implemented as macros
+/*!
+ * \name Additional functions implemented as macros
  *
- * @{
+ * \{
  */
 #define ser_getstatus(h)    ((h)->status)
 #define ser_setstatus(h, x) ((h)->status = (x))
-/* @} */
+/* \} */
 
-#endif /* SER_H */
+#endif /* DRV_SER_H */

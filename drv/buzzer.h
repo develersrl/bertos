@@ -1,8 +1,10 @@
 /*!
  * \file
- * Copyright (C) 1999,2003 Bernardo Innocenti <bernie@develer.com>
- * Copyright (C) 2003 Develer S.r.l. (http://www.develer.com/)
+ * <!--
+ * Copyright 2003 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 1999,2003 Bernardo Innocenti <bernie@develer.com>
  * All Rights Reserved.
+ * -->
  *
  * \version $Id$
  *
@@ -13,19 +15,16 @@
 
 /*
  * $Log$
- * Revision 1.1  2004/05/23 18:10:11  bernie
- * Import drv/ modules.
- *
- * Revision 1.1  2003/12/13 23:53:37  aleph
- * Add buzzer driver
+ * Revision 1.2  2004/05/23 18:21:53  bernie
+ * Trim CVS logs and cleanup header info.
  *
  */
-#ifndef BUZZER_H
-#define BUZZER_H
+#ifndef DRV_BUZZER_H
+#define DRV_BUZZER_H
 
 extern void buz_init(void);
 extern void buz_beep(time_t time);
 extern void buz_repeat_start(time_t duration, time_t interval);
 extern void buz_repeat_stop(void);
 
-#endif /* BUZZER_H */
+#endif /* DRV_BUZZER_H */

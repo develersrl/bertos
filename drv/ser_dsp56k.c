@@ -1,20 +1,30 @@
-/**
+/*!
  * \file
- * Copyright (C) 2003 Develer S.r.l. (http://www.develer.com/)
+ * <!--
+ * Copyright (C) 2003,2004 Develer S.r.l. (http://www.develer.com/)
  * All Rights Reserved.
+ * -->
  *
  * \version $Id$
  *
  * \author Stefano Fedrigo <aleph@develer.com>
+ * \author Giovanni Bajo <rasky@develer.com>
  *
  * \brief DSP5680x CPU specific serial I/O driver
  */
 
-#include <DSP56F807.H>
-#include <drv/kdebug.h>
-#include <hw.h>
+/*
+ * $Log$
+ * Revision 1.2  2004/05/23 18:21:53  bernie
+ * Trim CVS logs and cleanup header info.
+ *
+ */
+
 #include "ser.h"
 #include "ser_p.h"
+#include <drv/kdebug.h>
+#include <hw.h>
+#include <DSP56F807.H>
 
 // GPIO E is shared with SPI (in DSP56807). Pins 0&1 are TXD0 and RXD0. To use
 //  the serial, we need to disable the GPIO functions on them.
@@ -101,16 +111,16 @@ INLINE void rx_isr(struct SCI *hw)
 {
 	volatile struct REG_SCI_STRUCT* regs = hw->regs;
 
-	hw->serial->status |= regs->SR & (SERRF_PARITYERROR | 
-	                                  SERRF_RXSROVERRUN | 
-	                                  SERRF_FRAMEERROR | 
+	hw->serial->status |= regs->SR & (SERRF_PARITYERROR |
+	                                  SERRF_RXSROVERRUN |
+	                                  SERRF_FRAMEERROR |
 	                                  SERRF_NOISEERROR);
-	
+
 	if (fifo_isfull(&hw->serial->rxfifo))
 		hw->serial->status |= SERRF_RXFIFOOVERRUN;
 	else
 		fifo_push(&hw->serial->rxfifo, regs->DR);
-		
+
 	// Writing anything to the status register clear the
 	//  error bits.
 	regs->SR = 0;
@@ -124,10 +134,10 @@ static void init(struct SerialHardware* _hw, struct Serial* ser)
 	// Clear status register (IRQ/status flags)
 	(void)regs->SR;
 	regs->SR = 0;
-	
+
 	// Clear data register
 	(void)regs->DR;
-	
+
 	// Set priorities for both IRQs
 	irq_setpriority(hw->irq_tx, IRQ_PRIORITY_SCI_TX);
 	irq_setpriority(hw->irq_rx, IRQ_PRIORITY_SCI_RX);
@@ -135,7 +145,7 @@ static void init(struct SerialHardware* _hw, struct Serial* ser)
 	// Activate the RX error interrupts, and RX/TX transmissions
 	regs->CR = REG_SCI_CR_TE | REG_SCI_CR_RE;
 	enable_rx_irq_bare(regs);
-	
+
 	// Disable GPIO pins for TX and RX lines
 	REG_GPIO_SERIAL->PER |= REG_GPIO_SERIAL_MASK;
 
@@ -176,19 +186,19 @@ static const struct SerialHardwareVT SCI_VT =
 
 static struct SCI SCIDescs[2] =
 {
- 	{ 
- 		.hw = { .table = &SCI_VT }, 
- 		.regs = &REG_SCI[0],
- 		.irq_rx = IRQ_SCI0_RECEIVER_FULL,
- 		.irq_tx = IRQ_SCI0_TRANSMITTER_READY,
- 	},
-	
-	{ 
-		.hw = { .table = &SCI_VT }, 
+	{
+		.hw = { .table = &SCI_VT },
+		.regs = &REG_SCI[0],
+		.irq_rx = IRQ_SCI0_RECEIVER_FULL,
+		.irq_tx = IRQ_SCI0_TRANSMITTER_READY,
+	},
+
+	{
+		.hw = { .table = &SCI_VT },
 		.regs = &REG_SCI[1],
- 		.irq_rx = IRQ_SCI1_RECEIVER_FULL,
- 		.irq_tx = IRQ_SCI1_TRANSMITTER_READY,
-	},  
+		.irq_rx = IRQ_SCI1_RECEIVER_FULL,
+		.irq_tx = IRQ_SCI1_TRANSMITTER_READY,
+	},
 };
 
 

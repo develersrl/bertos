@@ -1,8 +1,8 @@
 /*!
  * \file
  * <!--
- * Copyright (C) 1999,2003 Bernardo Innocenti <bernie@develer.com>
- * Copyright (C) 2003 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 1999,2003 Bernardo Innocenti <bernie@develer.com>
  * All Rights Reserved.
  * -->
  *
@@ -15,23 +15,8 @@
 
 /*
  * $Log$
- * Revision 1.1  2004/05/23 18:10:11  bernie
- * Import drv/ modules.
- *
- * Revision 1.5  2004/04/04 17:44:51  aleph
- * Move event.h from mware to kern dir
- *
- * Revision 1.4  2004/03/24 15:03:45  bernie
- * Use explicit include paths; clean Doxygen comments
- *
- * Revision 1.3  2004/03/03 18:27:44  bernie
- * Fixed race conds with IRQ when fiddling with I/O ports
- *
- * Revision 1.2  2003/12/18 18:15:24  aleph
- * Use new IRQ disable/enable reentrant macros
- *
- * Revision 1.1  2003/12/13 23:53:37  aleph
- * Add buzzer driver
+ * Revision 1.2  2004/05/23 18:21:53  bernie
+ * Trim CVS logs and cleanup header info.
  *
  */
 

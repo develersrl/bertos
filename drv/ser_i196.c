@@ -1,8 +1,10 @@
-/**
+/*!
  * \file
- * Copyright (C) 2000 Bernardo Innocenti <bernie@codewiz.org>
+ * <!--
  * Copyright (C) 2003 Develer S.r.l. (http://www.develer.com/)
+ * Copyright (C) 2000 Bernardo Innocenti <bernie@codewiz.org>
  * All Rights Reserved.
+ * -->
  *
  * \version $Id$
  *
@@ -13,11 +15,8 @@
 
 /*
  * $Log$
- * Revision 1.1  2004/05/23 18:10:11  bernie
- * Import drv/ modules.
- *
- * Revision 1.1  2003/11/20 22:30:21  aleph
- * Add serial driver
+ * Revision 1.2  2004/05/23 18:21:53  bernie
+ * Trim CVS logs and cleanup header info.
  *
  */
 

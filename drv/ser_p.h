@@ -1,7 +1,9 @@
-/**
+/*!
  * \file
+ * <!--
  * Copyright (C) 2003,2004 Develer S.r.l. (http://www.develer.com/)
  * All Rights Reserved.
+ * -->
  *
  * \brief Hardware dependent serial driver (interface)
  *
@@ -13,22 +15,13 @@
 
 /*
  * $Log$
- * Revision 1.1  2004/05/23 18:10:11  bernie
- * Import drv/ modules.
- *
- * Revision 1.1  2004/05/14 12:47:26  rasky
- * Importato nuovo supporto seriale per AVR da Stefano
- *
- * Revision 1.3  2004/05/08 13:59:08  aleph
- * Fix header guard
- *
- * Revision 1.2  2004/05/08 13:58:36  aleph
- * Add log comment
+ * Revision 1.2  2004/05/23 18:21:53  bernie
+ * Trim CVS logs and cleanup header info.
  *
  */
 
-#ifndef _DRV_SER_P_H
-#define _DRV_SER_P_H
+#ifndef DRV_SER_P_H
+#define DRV_SER_P_H
 
 struct SerialHardware;
 struct Serial;
@@ -49,4 +42,4 @@ struct SerialHardware
 
 struct SerialHardware* ser_hw_getdesc(int unit);
 
-#endif // _DRV_SER_P_H
+#endif /* DRV_SER_P_H */

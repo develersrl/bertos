@@ -1,8 +1,8 @@
 /*!
  * \file
  * <!--
- * Copyright 2000 Bernardo Innocenti <bernie@codewiz.org>
  * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2000 Bernardo Innocenti <bernie@codewiz.org>
  * All Rights Reserved.
  * -->
  *
@@ -28,29 +28,9 @@
 
 /*
  * $Log$
- * Revision 1.1  2004/05/23 18:10:11  bernie
- * Import drv/ modules.
+ * Revision 1.2  2004/05/23 18:21:53  bernie
+ * Trim CVS logs and cleanup header info.
  *
- * Revision 1.5  2004/05/14 12:47:26  rasky
- * Importato nuovo supporto seriale per AVR da Stefano
- *
- * Revision 1.4  2004/04/29 16:40:23  rasky
- * Durante i busy loop della seriale, chiama la proc_switch() per cambiare processo
- *
- * Revision 1.3  2004/04/21 17:38:24  rasky
- * New application
- *
- * Revision 1.16  2004/04/03 18:30:49  aleph
- * Move timeout defines in config, private define in .c
- *
- * Revision 1.15  2004/03/29 17:01:02  aleph
- * Add function to set serial parity, fix it when ser_open is used
- *
- * Revision 1.14  2004/03/29 16:19:33  aleph
- * Add ser_cleanup function; Various code improvements
- *
- * Revision 1.13  2004/03/24 15:48:53  bernie
- * Remove Copyright messages from Doxygen output
  */
 
 #include <mware/formatwr.h>
