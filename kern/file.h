@@ -1,0 +1,55 @@
+/*!
+ * \file
+ * <!--
+ * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 1999,2001,2003 Bernardo Innocenti <bernie@develer.com>
+ * All Rights Reserved.
+ * -->
+ *
+ * \brief Interface to KFile virtual class
+ *
+ * \version $Id$
+ *
+ * \author Bernardo Innocenti <bernie@develer.com>
+ */
+
+/*
+ *	$Log$
+ *	Revision 1.1  2004/05/23 17:27:00  bernie
+ *	Import kern/ subdirectory.
+ *
+ */
+#ifndef KERN_KFILE_H
+#define KERN_KFILE_H
+
+#ifndef COMPILER_H
+#include <compiler.h>
+#endif
+
+struct _KFile;
+
+typedef size_t	(*ReadFunc_t)	(struct _KFile *fd, char *buf, size_t size);
+typedef size_t	(*WriteFunc_t)	(struct _KFile *fd, const char *buf, size_t size);
+typedef	bool	(*SeekFunc_t)	(struct _KFile *fd, int32_t offset);
+typedef bool	(*CloseFunc_t)	(struct _KFile *fd);
+typedef bool	(*OpenFunc_t)	(struct _KFile *fd, const char *name, int mode);
+
+
+/* Context data for callback functions which operate on
+ * pseudo files.
+ */
+typedef struct _KFile
+{
+	ReadFunc_t		Read;
+	WriteFunc_t		Write;
+	SeekFunc_t		Seek;
+/*	OpenFunc_t		Open;	unused */
+	CloseFunc_t		Close;
+
+	/* NOTE: these must _NOT_ be size_t on 16bit CPUs! */
+	uint32_t		SeekPos;
+	uint32_t		Size;
+} KFile;
+
+
+#endif /* KERN_KFILE_H */
