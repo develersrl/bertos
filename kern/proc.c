@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.15  2004/09/20 03:29:39  bernie
+ *#* C++ fixes.
+ *#*
  *#* Revision 1.14  2004/09/14 21:06:44  bernie
  *#* Use debug.h instead of kdebug.h.
  *#*
@@ -70,11 +73,13 @@
 
 #include <string.h> /* memset() */
 
-/*! CPU dependent context switching routines
- *  \note This function *MUST* preserve also the status of the interrupts.
+/*!
+ * CPU dependent context switching routines.
+ *
+ * \note This function *MUST* preserve also the status of the interrupts.
  */
-extern void asm_switch_context(cpustack_t **new_sp, cpustack_t **save_sp);
-extern int asm_switch_version(void);
+EXTERN_C void asm_switch_context(cpustack_t **new_sp, cpustack_t **save_sp);
+EXTERN_C int asm_switch_version(void);
 
 /*
  * The scheduer tracks ready and waiting processes
