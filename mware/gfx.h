@@ -14,6 +14,9 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/08/10 07:00:16  bernie
+ * Add missing header.
+ *
  * Revision 1.3  2004/08/04 03:16:59  bernie
  * Switch to new DevLib CONFIG_ convention.
  *
@@ -41,6 +44,7 @@
 #define MWARE_GFX_H
 
 #include <compiler.h>
+#include <config.h>
 
 
 /*! Common type for coordinates expressed in pixel units */
