@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.28  2004/10/21 11:03:52  bernie
+ *#* Typo.
+ *#*
  *#* Revision 1.27  2004/10/21 10:09:40  bernie
  *#* Remove spurious token in preprocessor directive.
  *#*
@@ -172,7 +175,7 @@
 	/* Compiler features */
 	#define COMPILER_VARIADIC_MACROS 1 /* Even in C++ */
 	#define COMPILER_TYPEOF 1
-	#define COMPILER_STAEMENT_EXPRESSIONS 1
+	#define COMPILER_STATEMENT_EXPRESSIONS 1
 
 	/* GCC attributes */
 	#define FORMAT(type,fmt,first)  __attribute__((__format__(type, fmt, first)))
@@ -228,7 +231,7 @@
 
 	/* Compiler features */
 	#define COMPILER_TYPEOF 1
-	#define COMPILER_STAEMENT_EXPRESSIONS 1
+	#define COMPILER_STATEMENT_EXPRESSIONS 1
 
 	#include <stdint.h>
 	#include <stddef.h>
