@@ -16,6 +16,9 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/08/24 16:53:10  bernie
+ * Use new-style config macros.
+ *
  * Revision 1.3  2004/08/04 03:16:59  bernie
  * Switch to new DevLib CONFIG_ convention.
  *
@@ -93,7 +96,7 @@ void gfx_DrawLine(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 	int x, y, e, len, adx, ady, signx, signy;
 
 
-#ifdef CONFIG_GFX_CLIPPING
+#if CONFIG_GFX_CLIPPING
 	/* FIXME: broken */
 
 	#define XMIN 0
@@ -149,7 +152,7 @@ void gfx_DrawLine(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 	#undef XMAX
 	#undef YMAX
 
-#endif /* CONFIG_GRAPH_CLIPPING */
+#endif /* CONFIG_GFX_CLIPPING */
 
 
 	if (x2 > x1)
