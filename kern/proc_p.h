@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.12  2004/12/08 08:57:35  bernie
+ *#* Rename sigset_t to sigmask_t.
+ *#*
  *#* Revision 1.11  2004/11/16 22:37:14  bernie
  *#* Replace IPTR with iptr_t.
  *#*
@@ -78,8 +81,8 @@ typedef struct Process
 	iptr_t       user_data;   /*!< Custom data passed to the process */
 
 #if CONFIG_KERN_SIGNALS
-	sigset_t     sig_wait;    /*!< Signals the process is waiting for */
-	sigset_t     sig_recv;    /*!< Received signals */
+	sigmask_t    sig_wait;    /*!< Signals the process is waiting for */
+	sigmask_t    sig_recv;    /*!< Received signals */
 #endif
 
 #if CONFIG_KERN_PREEMPTIVE

@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2004/12/08 08:57:35  bernie
+ *#* Rename sigset_t to sigmask_t.
+ *#*
  *#* Revision 1.4  2004/08/25 14:12:09  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -39,14 +42,13 @@
 struct Process;
 
 /* Inter-process Communication services */
-sigset_t sig_check(sigset_t sigs);
-void sig_signal(struct Process *proc, sigset_t sig);
-sigset_t sig_wait(sigset_t sigs);
+sigmask_t sig_check(sigmask_t sigs);
+void sig_signal(struct Process *proc, sigmask_t sig);
+sigmask_t sig_wait(sigmask_t sigs);
 
 
 /*!
  * \name Signal definitions
- *
  * \{
  */
 #define SIG_USER0    BV(0)  /*!< Free for user usage */

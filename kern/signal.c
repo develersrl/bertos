@@ -66,6 +66,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2004/12/08 08:57:35  bernie
+ *#* Rename sigset_t to sigmask_t.
+ *#*
  *#* Revision 1.8  2004/09/14 21:06:44  bernie
  *#* Use debug.h instead of kdebug.h.
  *#*
@@ -107,9 +110,9 @@
  * Check if any of the signals in \a sigs has occurred and clear them.
  * Return the signals that have occurred.
  */
-sigset_t sig_check(sigset_t sigs)
+sigmask_t sig_check(sigmask_t sigs)
 {
-	sigset_t result;
+	sigmask_t result;
 	cpuflags_t flags;
 
 	DISABLE_IRQSAVE(flags);
@@ -124,9 +127,9 @@ sigset_t sig_check(sigset_t sigs)
  * Sleep until any of the signals in \a sigs occurs.
  * Return the signal(s) that have awaked the process.
  */
-sigset_t sig_wait(sigset_t sigs)
+sigmask_t sig_wait(sigmask_t sigs)
 {
-	sigset_t result;
+	sigmask_t result;
 	cpuflags_t flags;
 
 	DISABLE_IRQSAVE(flags);
@@ -156,7 +159,7 @@ sigset_t sig_wait(sigset_t sigs)
  *
  * \note This call is interrupt safe.
  */
-void sig_signal(Process *proc, sigset_t sigs)
+void sig_signal(Process *proc, sigmask_t sigs)
 {
 	cpuflags_t flags;
 	DISABLE_IRQSAVE(flags);
