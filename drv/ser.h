@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.13  2004/09/14 21:04:57  bernie
+ *#* Don't vanely call kdebug.h.
+ *#*
  *#* Revision 1.12  2004/09/06 21:40:50  bernie
  *#* Move buffer handling in chip-specific driver.
  *#*
@@ -52,7 +55,6 @@
 #define DRV_SER_H
 
 #include <mware/fifobuf.h>
-#include <drv/kdebug.h>
 #include <compiler.h>
 #include <config.h>
 
@@ -139,7 +141,9 @@ struct Serial
 	/*! Physical port number */
 	unsigned int unit;
 
-	DB(bool is_open;)
+#ifdef _DEBUG
+	bool is_open;
+#endif
 
 	/*!
 	 * \name Transmit and receive FIFOs.
