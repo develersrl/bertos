@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2004/10/26 09:00:49  bernie
+ *#* Don't access serial data register twice.
+ *#*
  *#* Revision 1.7  2004/10/19 08:57:15  bernie
  *#* Bugfixes for DSP56K serial driver from scfirm.
  *#*
@@ -146,10 +149,10 @@ static void rx_isr(const struct SCI *hw)
 		unsigned char data = regs->DR;
 
 		if (fifo_isfull(&hw->serial->rxfifo))
-	if (fifo_isfull(&hw->serial->rxfifo))
-		hw->serial->status |= SERRF_RXFIFOOVERRUN;
-	else
-		fifo_push(&hw->serial->rxfifo, regs->DR);
+			hw->serial->status |= SERRF_RXFIFOOVERRUN;
+		else
+			fifo_push(&hw->serial->rxfifo, data);
+	}
 
 	// Writing anything to the status register clear the error bits.
 	regs->SR = 0;
