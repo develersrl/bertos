@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.12  2004/08/01 01:21:17  bernie
+ * LIKELY(), UNLIKELY(): New compiler-specific macros.
+ *
  * Revision 1.11  2004/07/30 14:34:10  rasky
  * Vari fix per documentazione e commenti
  * Aggiunte PP_CATn e STATIC_ASSERT
@@ -129,6 +132,8 @@
 	#define NORETURN                __attribute__((__noreturn__))
 	#define UNUSED(type,arg)        __attribute__((__unused__)) type arg
 	#define INLINE                  static inline __attribute__((__always_inline__))
+	#define LIKELY(x)               __builtin_expect((x), 1)
+	#define UNLIKELY(x)             __builtin_expect((x), 0)
 	#if GNUC_PREREQ(3,1)
 		#define DEPRECATED      __attribute__((__deprecated__))
 	#endif
@@ -197,6 +202,12 @@
 #endif
 #ifndef INTERRUPT
 #define INTERRUPT(x)           ERROR_NOT_IMPLEMENTED
+#endif
+#ifndef LIKELY
+#define LIKELY(x)              x
+#endif
+#ifndef UNLIKELY
+#define UNLIKELY(x)            x
 #endif
 
 /* Support for harvard architectures */
