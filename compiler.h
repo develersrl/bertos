@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.29  2004/11/16 20:34:40  bernie
+ *#* UNUSED_VAR, USED_VAR, USED_FUNC: New macros; UNUSED_ARG: Rename from UNUSED.
+ *#*
  *#* Revision 1.28  2004/10/21 11:03:52  bernie
  *#* Typo.
  *#*
@@ -180,13 +183,16 @@
 	/* GCC attributes */
 	#define FORMAT(type,fmt,first)  __attribute__((__format__(type, fmt, first)))
 	#define NORETURN                __attribute__((__noreturn__))
-	#define UNUSED(type,arg)        __attribute__((__unused__)) type arg
+	#define UNUSED_ARG(type,arg)    __attribute__((__unused__)) type arg
+	#define UNUSED_VAR(type,name)	__attribute__((__unused__)) type name
+	#define USED_VAR(type,name)	__attribute__((__used__)) type name
 	#define INLINE                  static inline __attribute__((__always_inline__))
 	#define LIKELY(x)               __builtin_expect(!!(x), 1)
 	#define UNLIKELY(x)             __builtin_expect(!!(x), 0)
 	#define PURE_FUNC               __attribute__((pure))
 	#define CONST_FUNC              __attribute__((const))
 	#define UNUSED_FUNC             __attribute__((unused))
+	#define USED_FUNC		__attribute__((__used__))
 	#define RESTRICT                __restrict__
 	#define MUST_CHECK              __attribute__((warn_unused_result))
 	#if GNUC_PREREQ(3,1)
@@ -285,8 +291,15 @@
 #ifndef DEPRECATED
 #define DEPRECATED             /* nothing */
 #endif
-#ifndef UNUSED
-#define UNUSED(type,arg)       type arg
+#ifndef UNUSED_ARG
+#define UNUSED_ARG(type,arg)   type arg
+#endif
+#define UNUSED                 UNUSED_ARG /* OBSOLETE */
+#ifndef UNUSED_VAR
+#define UNUSED_VAR(type,name)  type name
+#endif
+#ifndef USED_VAR
+#define USED_VAR(type,name)    type name
 #endif
 #ifndef REGISTER
 #define REGISTER               /* nothing */
@@ -308,6 +321,9 @@
 #endif
 #ifndef UNUSED_FUNC
 #define UNUSED_FUNC            /* nothing */
+#endif
+#ifndef USED_FUNC
+#define USED_FUNC              /* nothing */
 #endif
 #ifndef RESTRICT
 #define RESTRICT               /* nothing */
@@ -436,6 +452,6 @@ typedef unsigned char page_t;    /*!< Type for banked memory pages */
 
 /*! Issue a compilation error if the \a condition is false */
 #define STATIC_ASSERT(condition)  \
-	extern char PP_CAT(CT_ASSERT___, __LINE__)[(condition) ? 1 : -1]
+	UNUSED_VAR(extern char,PP_CAT(CT_ASSERT___, __LINE__)[(condition) ? 1 : -1])
 
 #endif /* DEVLIB_COMPILER_H */
