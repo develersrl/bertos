@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.18  2004/12/08 08:57:17  bernie
+ *#* Rename time_t to mtime_t.
+ *#*
  *#* Revision 1.17  2004/11/16 21:54:56  bernie
  *#* Changes for SC Monoboard support.
  *#*
@@ -104,6 +107,14 @@
 	#define SERRF_FRAMEERROR     BV(9)  /*!< Stop bit missing */
 	#define SERRF_NOISEERROR     BV(10) /*!< Noise error */
 	#define SERRF_RXSROVERRUN    BV(11) /*!< Rx shift register overrun */
+#elif defined(_EMUL)
+	typedef uint16_t serstatus_t;
+
+	/* Software errors */
+	#define SERRF_RXFIFOOVERRUN  BV(0)  /*!< Rx FIFO buffer overrun */
+	#define SERRF_RXTIMEOUT      BV(1)  /*!< Receive timeout */
+	#define SERRF_TXTIMEOUT      BV(2)  /*!< Transmit timeout */
+
 #else
 	#error unknown architecture
 #endif
@@ -153,6 +164,11 @@ enum
 	SER_UART0,
 	SER_PUNTALI,
 	SER_BARCODE,
+#elif defined(_EMUL)
+	SER_UART0,
+	#if CONFIG_EMUL_UART1
+		SER_UART1,
+	#endif
 #else
 	#error unknown architecture
 #endif
@@ -188,10 +204,10 @@ struct Serial
 	/* \} */
 
 #if CONFIG_SER_RXTIMEOUT != -1
-	time_t rxtimeout;
+	mtime_t rxtimeout;
 #endif
 #if CONFIG_SER_TXTIMEOUT != -1
-	time_t txtimeout;
+	mtime_t txtimeout;
 #endif
 
 	/*! Holds the flags defined above.  Will be 0 when no errors have occurred. */
@@ -218,8 +234,8 @@ extern int ser_gets_echo(struct Serial *port, char *buf, int size, bool echo);
 
 extern void ser_setbaudrate(struct Serial *port, unsigned long rate);
 extern void ser_setparity(struct Serial *port, int parity);
-extern void ser_settimeouts(struct Serial *port, time_t rxtimeout, time_t txtimeout);
-extern void ser_resync(struct Serial *port, time_t delay);
+extern void ser_settimeouts(struct Serial *port, mtime_t rxtimeout, mtime_t txtimeout);
+extern void ser_resync(struct Serial *port, mtime_t delay);
 extern void ser_purge(struct Serial *port);
 extern void ser_drain(struct Serial *port);
 

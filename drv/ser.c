@@ -28,6 +28,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.22  2004/12/08 08:56:14  bernie
+ *#* Rename time_t to mtime_t.
+ *#*
  *#* Revision 1.21  2004/11/16 18:10:13  bernie
  *#* Add sanity checks for missing configuration parameters.
  *#*
@@ -151,7 +154,7 @@ int ser_putchar(int c, struct Serial *port)
 	if (fifo_isfull_locked(&port->txfifo))
 	{
 #if CONFIG_SER_TXTIMEOUT != -1
-		time_t start_time = timer_ticks();
+		mtime_t start_time = timer_ticks();
 #endif
 
 		/* Attende finche' il buffer e' pieno... */
@@ -196,7 +199,7 @@ int ser_getchar(struct Serial *port)
 	if (fifo_isempty_locked(&port->rxfifo))
 	{
 #if CONFIG_SER_RXTIMEOUT != -1
-		time_t start_time = timer_ticks();
+		mtime_t start_time = timer_ticks();
 #endif
 		/* Wait while buffer is empty */
 		do
@@ -243,7 +246,7 @@ int ser_getchar_nowait(struct Serial *port)
 
 #if CONFIG_SER_GETS
 /*!
- * Read a line long at most as size and puts it
+ * Read a line long at most as size and put it
  * in buf.
  * \return number of chars read or EOF in case
  *         of error.
@@ -369,7 +372,7 @@ int ser_printf(struct Serial *port, const char *format, ...)
 
 
 #if CONFIG_SER_RXTIMEOUT != -1 || CONFIG_SER_TXTIMEOUT != -1
-void ser_settimeouts(struct Serial *port, time_t rxtimeout, time_t txtimeout)
+void ser_settimeouts(struct Serial *port, mtime_t rxtimeout, mtime_t txtimeout)
 {
 	port->rxtimeout = rxtimeout;
 	port->txtimeout = txtimeout;
@@ -385,9 +388,9 @@ void ser_settimeouts(struct Serial *port, time_t rxtimeout, time_t txtimeout)
  *
  * \note Serial errors are reset before and after executing the purge.
  */
-void ser_resync(struct Serial *port, time_t delay)
+void ser_resync(struct Serial *port, mtime_t delay)
 {
-	time_t old_rxtimeout = port->rxtimeout;
+	mtime_t old_rxtimeout = port->rxtimeout;
 
 	ser_settimeouts(port, delay, port->txtimeout);
 	do
