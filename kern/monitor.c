@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2004/10/26 09:01:15  bernie
+ *#* monitor_rename(): New function.
+ *#*
  *#* Revision 1.1  2004/10/03 20:39:03  bernie
  *#* Import in DevLib.
  *#*
@@ -59,6 +62,11 @@ void monitor_add(Process* proc, const char* name, cpustack_t* stack_base, size_t
 void monitor_remove(Process* proc)
 {
 	REMOVE(&proc->monitor.link);
+}
+
+void monitor_rename(Process *proc, const char* name)
+{
+	proc->monitor.name = name;
 }
 
 #define MONITOR_NODE_TO_PROCESS(node) \
