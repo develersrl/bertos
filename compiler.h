@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.21  2004/09/06 21:38:31  bernie
+ *#* Misc documentation and style fixes.
+ *#*
  *#* Revision 1.20  2004/08/29 21:57:58  bernie
  *#* Move back STATIC_ASSERT() to compiler.h as it's needed in cpu.h;
  *#* iptr_t, const_iptr_t: Replace IPTR macro with a real typedef.
@@ -163,7 +166,7 @@
 
 	#if CPU_X86
 
-		/* hack to avoid conflicts with system type */
+		/* Hack to avoid conflicts with system type */
 		#define sigset_t system_sigset_t
 		#include <stddef.h>
 		#include <setjmp.h>
@@ -306,7 +309,7 @@ typedef unsigned char page_t;    /*!< Type for banked memory pages */
 	typedef unsigned short int  uint16_t;
 	typedef unsigned long int   uint32_t;
 	/* \} */
-#elif defined(__GNUC__) && defined(__AVR__)
+#elif defined(__GNUC__) && CPU_AVR
 	/* avr-libc is weird... */
 	#include <inttypes.h>
 #else
@@ -336,7 +339,7 @@ typedef unsigned char page_t;    /*!< Type for banked memory pages */
 /* Quasi-ANSI macros */
 #ifndef offsetof
 	/*!
-	 * Return the byte offset of the member \a m in struct \a s
+	 * Return the byte offset of the member \a m in struct \a s.
 	 *
 	 * \note This macro should be defined in "stddef.h" and is sometimes
 	 *       compiler-specific (g++ has a builtin for it).
@@ -345,9 +348,9 @@ typedef unsigned char page_t;    /*!< Type for banked memory pages */
 #endif
 #ifndef countof
 	/*!
-	 * Count the number of elements in the static array \a a
+	 * Count the number of elements in the static array \a a.
 	 *
-	 * \note This macro is non-standard, but implmenents a very common idiom
+	 * \note This macro is non-standard, but implements a very common idiom
 	 */
 	#define countof(a)  (sizeof(a) / sizeof(*(a)))
 #endif
