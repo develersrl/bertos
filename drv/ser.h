@@ -14,6 +14,9 @@
 
 /*
  * $Log$
+ * Revision 1.10  2004/08/24 16:20:48  bernie
+ * ser_read(): Make buffer argument void * for consistency with ANSI C and ser_write()
+ *
  * Revision 1.9  2004/08/15 05:32:22  bernie
  * ser_resync(): New function.
  *
@@ -166,7 +169,7 @@ extern int ser_getchar(struct Serial *port);
 extern int ser_getchar_nowait(struct Serial *port);
 
 extern int ser_write(struct Serial *port, const void *buf, size_t len);
-extern int ser_read(struct Serial *port, char *buf, size_t size);
+extern int ser_read(struct Serial *port, void *buf, size_t size);
 
 extern int ser_print(struct Serial *port, const char *s);
 extern int ser_printf(struct Serial *port, const char *format, ...) FORMAT(__printf__, 2, 3);

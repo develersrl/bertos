@@ -28,6 +28,9 @@
 
 /*
  * $Log$
+ * Revision 1.13  2004/08/24 16:20:48  bernie
+ * ser_read(): Make buffer argument void * for consistency with ANSI C and ser_write()
+ *
  * Revision 1.12  2004/08/24 13:49:39  bernie
  * Fix thinko.
  *
@@ -247,7 +250,7 @@ int ser_gets_echo(struct Serial *port, char *buf, int size, bool echo)
  * \return number of bytes read or EOF in case
  *         of error.
  */
-int ser_read(struct Serial *port, char *buf, size_t size)
+int ser_read(struct Serial *port, void *buf, size_t size)
 {
 	size_t i = 0;
 	int c;
