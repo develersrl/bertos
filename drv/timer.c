@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.20  2004/11/16 20:59:06  bernie
+ *#* Add watchdog timer support.
+ *#*
  *#* Revision 1.19  2004/10/19 08:56:49  bernie
  *#* TIMER_STROBE_ON, TIMER_STROBE_OFF, TIMER_STROBE_INIT: Move from timer_avr.h to timer.h, where they really belong.
  *#*
@@ -75,8 +78,23 @@
 #include <hw.h>
 #include CPU_HEADER(timer)
 #include <debug.h>
+#include <config.h>
 
-#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
+/*
+ * Sanity check for config parameters required by this module.
+ */
+#if !defined(CONFIG_KERNEL) || ((CONFIG_KERNEL != 0) && CONFIG_KERNEL != 1)
+	#error CONFIG_KERNEL must be set to either 0 or 1 in config.h
+#endif
+#if !defined(CONFIG_WATCHDOG) || ((CONFIG_WATCHDOG != 0) && CONFIG_WATCHDOG != 1)
+	#error CONFIG_WATCHDOG must be set to either 0 or 1 in config.h
+#endif
+
+#if CONFIG_WATCHDOG
+	#include <drv/wdt.h>
+#endif
+
+#if CONFIG_KERNEL && CONFIG_KERN_SIGNALS
 	#include <kern/proc.h>
 #endif
 
@@ -192,7 +210,12 @@ void timer_delay(time_t time)
 	time_t start = timer_ticks();
 
 	/* Busy wait */
-	while (timer_ticks() - start < time) { /* nop */ }
+	while (timer_ticks() - start < time)
+	{
+#if CONFIG_WATCHDOG
+		wdt_reset();
+#endif
+	}
 
 #endif /* !CONFIG_KERN_SIGNALS */
 }
