@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.7  2004/07/18 21:54:53  bernie
+ * Fix preprocessor warning with potentially undefined symbol.
+ *
  * Revision 1.6  2004/06/07 18:10:06  aleph
  * Remove free pool of timers; use user-provided Timer structure instead
  *
@@ -43,7 +46,7 @@
 	#include <kern/proc.h>
 #endif
 
-#if (ARCH & ARCH_EMUL)
+#if defined(ARCH_EMUL) && (ARCH & ARCH_EMUL)
 	#error To be recoded
 #elif defined(__AVR__)
 	#include "timer_avr.h"
