@@ -17,8 +17,8 @@ together to form a multitasking kernel with some IPC functionality.
 Scope (or lack thereof)
 =======================
 
-There's no consistent scope or design guide-line for the components
-of DevLib (altough there's a common coding and documentation style).
+There is no consistent scope or design guide-line for the components
+of DevLib, altough there is a common coding and documentation style.
 Every piece of code that looks useful for more than one application
 may end up here, regardless of compatibility and fitness with other
 modules.
