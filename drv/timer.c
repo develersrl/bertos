@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.18  2004/10/14 23:14:05  bernie
+ *#* Fix longstanding problem with wrap-arounds.
+ *#*
  *#* Revision 1.17  2004/10/03 18:52:08  bernie
  *#* Move \brief on top in header to please Doxygen.
  *#*
@@ -102,14 +105,18 @@ void timer_add(Timer *timer)
 	/* Calculate expiration time for this timer */
 	timer->tick = _clock + timer->delay;
 
-	/* Search for the first node whose expiration time is
+	/*
+	 * Search for the first node whose expiration time is
 	 * greater than the timer we want to add.
 	 */
 	node = (Timer *)timers_queue.head;
 	while (node->link.succ)
 	{
-		/* Stop just after the insertion point */
-		if (node->tick > timer->tick)
+		/*
+		 * Stop just after the insertion point.
+		 * (this fancy compare takes care of wrap-arounds).
+		 */
+		if (node->tick - timer->tick > 0)
 			break;
 
 		/* Go to next node */
