@@ -53,6 +53,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2005/02/16 16:51:29  bernie
+ *#* Simplify float code.
+ *#*
  *#* Revision 1.10  2004/10/26 09:01:35  bernie
  *#* Fix spacing.
  *#*
@@ -92,16 +95,16 @@
 #include <debug.h> /* ASSERT */
 
 #ifndef CONFIG_PRINTF_N_FORMATTER
-	/*! Enable arcane %n formatter */
+	/*! Disable the arcane %n formatter. */
 	#define CONFIG_PRINTF_N_FORMATTER 0
 #endif
 
 #ifndef CONFIG_PRINTF_OCTAL_FORMATTER
-	/*! Enable %o formatter */
+	/*! Disable the %o formatter. */
 	#define CONFIG_PRINTF_OCTAL_FORMATTER 0
 #endif
 
-// True if we must keep a count of the number of characters we print
+/* True if we must keep a count of the number of characters we print. */
 #define CONFIG_PRINTF_COUNT_CHARS (CONFIG_PRINTF_RETURN_COUNT || CONFIG_PRINTF_N_FORMATTER)
 
 #if CONFIG_PRINTF
@@ -112,8 +115,8 @@
 
 #if CONFIG_PRINTF > PRINTF_NOFLOAT
 /*bernie: save some memory, who cares about floats with lots of decimals? */
-/*#define FRMWRI_BUFSIZE 134*/
-	#error 134 is too much, the code must be fixed to have a lower precision limit
+	#define FRMWRI_BUFSIZE 134
+	#warning 134 is too much, the code must be fixed to have a lower precision limit
 #else
 	/*
 	 * Conservative estimate. Should be (probably) 12 (which is the size necessary
@@ -122,6 +125,7 @@
 	#define FRMWRI_BUFSIZE 16
 #endif
 
+/* Probably useful for fancy microcontrollers such as the PIC, nobody knows. */
 #ifndef MEM_ATTRIBUTE
 #define MEM_ATTRIBUTE
 #endif
@@ -691,16 +695,16 @@ FLOATING_CONVERSION:
 				{
 					precision = 6;
 				}
+
 				if (sizeof(double) != sizeof(long double))
 				{
-					if ( (fvalue = flags.l_L_modifier ?
-								va_arg(ap,long double) : va_arg(ap,double)) < 0)
-					{
-						flags.plus_space_flag = PSF_MINUS;
-						fvalue = -fvalue;
-					}
+					fvalue = flags.l_L_modifier ?
+						va_arg(ap,long double) : va_arg(ap,double);
 				}
-				else if ( (fvalue = va_arg(ap,long double)) < 0)
+				else
+					fvalue = va_arg(ap,long double);
+
+				if (fvalue < 0)
 				{
 					flags.plus_space_flag = PSF_MINUS;
 					fvalue = -fvalue;
@@ -719,16 +723,6 @@ FLOATING_CONVERSION:
 				}
 				break;
 
-#else /* CONFIG_PRINTF <= PRINTF_NOFLOAT */
-			case 'g':
-			case 'G':
-			case 'f':
-			case 'e':
-			case 'E':
-				ptr = buf_pointer = bad_conversion;
-				while (*ptr)
-					ptr++;
-				break;
 #endif /* CONFIG_PRINTF <= PRINTF_NOFLOAT */
 
 			case '\0': /* Really bad place to find NUL in */
@@ -737,7 +731,7 @@ FLOATING_CONVERSION:
 			default:
 				/* Undefined conversion! */
 				ptr = buf_pointer = bad_conversion;
-				ptr += 3;
+				ptr += strlen(bad_conversion);
 				break;
 
 		}
