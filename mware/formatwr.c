@@ -53,6 +53,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.13  2005/02/18 12:33:25  bernie
+ *#* Avoid strlen().
+ *#*
  *#* Revision 1.12  2005/02/16 20:28:03  bernie
  *#* Add %S formatter.
  *#*
@@ -738,7 +741,7 @@ FLOATING_CONVERSION:
 			default:
 				/* Undefined conversion! */
 				ptr = buf_pointer = bad_conversion;
-				ptr += strlen(bad_conversion);
+				ptr += sizeof(bad_conversion) - 1;
 				break;
 
 		}
