@@ -18,6 +18,10 @@
 
 /*
  * $Log$
+ * Revision 1.5  2004/07/30 14:30:27  rasky
+ * Resa la sig_signal interrupt safe (con il nuovo scheduler IRQ-safe)
+ * Rimossa event_doIntr (ora inutile) e semplificata la logica delle macro con funzioni inline
+ *
  * Revision 1.4  2004/06/07 15:58:00  aleph
  * Add function prototypes
  *
@@ -128,47 +132,24 @@ INLINE Event event_createSignal(struct Process* proc, sig_t bit)
 	return e;
 }
 
-/*! Trigger an event */
-#define event_do(e) \
-do { \
-	if ((e)->action == EVENT_SIGNAL) \
-		sig_signal((e)->Ev.Sig.sig_proc, (e)->Ev.Sig.sig_bit); \
-	else if ((e)->action == EVENT_SOFTINT) \
-		(e)->Ev.Int.func((e)->Ev.Int.user_data); \
-} while (0)
-
-/*! Trigger an event (to be used inside interrupts) */
-#define event_doIntr(e) \
-do { \
-	if ((e)->action == EVENT_SIGNAL) \
-		_sig_signal((e)->Ev.Sig.sig_proc, (e)->Ev.Sig.sig_bit); \
-	else if ((e)->action == EVENT_SOFTINT) \
-		(e)->Ev.Int.func((e)->Ev.Int.user_data); \
-} while (0)
-
-#else /* !CONFIG_KERN_SIGNALS */
-
-/*! Trigger an event */
-#define event_do(e) \
-do { \
-	if ((e)->action == EVENT_SOFTINT) \
-		(e)->Ev.Int.func((e)->Ev.Int.user_data); \
-} while (0)
-
-/*! Trigger an event (to be used inside interrupts) */
-#define event_doIntr(e) \
-do { \
-	if ((e)->action == EVENT_SOFTINT) \
-		(e)->Ev.Int.func((e)->Ev.Int.user_data); \
-} while (0)
-
 #endif
+
+/*! Trigger an event */
+INLINE void event_do(struct Event* e)
+{
+	if ((e)->action == EVENT_SOFTINT)
+		(e)->Ev.Int.func((e)->Ev.Int.user_data);
+#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
+	else if ((e)->action == EVENT_SIGNAL)
+		sig_signal((e)->Ev.Sig.sig_proc, (e)->Ev.Sig.sig_bit);
+#endif
+}
 
 #ifdef CONFIG_KERN_OLDNAMES
 	#define INITEVENT_SIG  event_initSignal
 	#define INITEVENT_INT  event_initSoftInt
 	#define DOEVENT        event_do
-	#define DOEVENT_INTR   event_doIntr
+	#define DOEVENT_INTR   event_do
 #endif
 
 #endif /* KERN_EVENT_H */

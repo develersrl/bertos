@@ -19,6 +19,10 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/07/30 14:30:27  rasky
+ * Resa la sig_signal interrupt safe (con il nuovo scheduler IRQ-safe)
+ * Rimossa event_doIntr (ora inutile) e semplificata la logica delle macro con funzioni inline
+ *
  * Revision 1.3  2004/07/30 14:24:16  rasky
  * Task switching con salvataggio perfetto stato di interrupt (SR)
  * Kernel monitor per dump informazioni su stack dei processi
@@ -86,32 +90,12 @@ sigset_t sig_wait(sigset_t sigs)
  * Send the signals \a sigs to the process \a proc.
  * The process will be awaken if it was waiting for any of them.
  *
- * This call is interrupt safe (no \c DISABLE_INTS/ENABLE_INTS protection)
- */
-void _sig_signal(Process *proc, sigset_t sigs)
-{
-	/* Set the signals */
-	proc->sig_recv |= sigs;
-
-	/* Check if process needs to be awaken */
-	if (proc->sig_recv & proc->sig_wait)
-	{
-		/* Wake up process and enqueue in ready list */
-		proc->sig_wait = 0;
-		SCHED_ENQUEUE(proc);
-	}
-}
-
-
-/*!
- * Same as _sig_signal() with interrupt protection.
- *
- * \note Inlined manually because some compilers are too
- *       stupid to it automatically.
+ * \note This call is interrupt safe.
  */
 void sig_signal(Process *proc, sigset_t sigs)
 {
-	DISABLE_INTS;
+	cpuflags_t flags;
+	DISABLE_IRQSAVE(flags);
 
 	/* Set the signals */
 	proc->sig_recv |= sigs;
@@ -124,7 +108,7 @@ void sig_signal(Process *proc, sigset_t sigs)
 		SCHED_ENQUEUE(proc);
 	}
 
-	ENABLE_INTS;
+	ENABLE_IRQRESTORE(flags);
 }
 
 #endif /* CONFIG_KERN_SIGNALS */

@@ -15,6 +15,10 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/07/30 14:30:27  rasky
+ * Resa la sig_signal interrupt safe (con il nuovo scheduler IRQ-safe)
+ * Rimossa event_doIntr (ora inutile) e semplificata la logica delle macro con funzioni inline
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -34,7 +38,6 @@ struct Process;
 /* Inter-process Communication services */
 sigset_t sig_check(sigset_t sigs);
 void sig_signal(struct Process *proc, sigset_t sig);
-void _sig_signal(struct Process *proc, sigset_t sig);
 sigset_t sig_wait(sigset_t sigs);
 
 
