@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.12  2005/01/22 04:21:32  bernie
+ *#* Add integrity checks.
+ *#*
  *#* Revision 1.11  2004/12/31 16:44:11  bernie
  *#* list_remHead(), list_remTail(): Name like normal functions.
  *#*
@@ -117,6 +120,26 @@ typedef struct _List
 		(l)->null = NULL; \
 		(l)->tail = (Node *)(&(l)->head); \
 	} while (0)
+
+/* Make sure that a list is valid (it was initialized and is not corrupted) */
+#ifdef _DEBUG
+	#define LIST_ASSERT_VALID(l) \
+		do { \
+			Node *n, *pred; \
+			ASSERT((l)->head != NULL); \
+			ASSERT((l)->null == NULL); \
+			ASSERT((l)->tail != NULL); \
+			pred = (Node *)(&(l)->head); \
+			FOREACHNODE(n, l) \
+			{ \
+				ASSERT(n->pred == pred); \
+				pred = n; \
+			} \
+			ASSERT(n == (Node *)(&(l)->null)); \
+		} while (0)
+#else
+	#define LIST_ASSERT_VALID(l) do {} while (0)
+#endif
 
 /*! Add node to list head. */
 #define ADDHEAD(l,n) \

@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2005/01/22 04:20:42  bernie
+ *#* Add integrity checks.
+ *#*
  *#* Revision 1.7  2004/11/28 23:20:25  bernie
  *#* Remove obsolete INITLIST macro.
  *#*
@@ -42,6 +45,14 @@
 #include "proc_p.h"
 #include "signal.h"
 #include "hw.h"
+#include <debug.h>
+
+INLINE void sem_verify(struct Semaphore *s)
+{
+	LIST_ASSERT_VALID(&s->wait_queue);
+	ASSERT(s->nest_count >= 0);
+	ASSERT(s->nest_count < 128);   // heuristic max
+}
 
 
 /*!
@@ -71,6 +82,7 @@ bool sem_attempt(struct Semaphore *s)
 	bool result = false;
 
 	proc_forbid();
+	sem_verify(s);
 	if ((!s->owner) || (s->owner == CurrentProcess))
 	{
 		s->owner = CurrentProcess;
@@ -103,6 +115,7 @@ bool sem_attempt(struct Semaphore *s)
 void sem_obtain(struct Semaphore *s)
 {
 	proc_forbid();
+	sem_verify(s);
 
 	/* Is the semaphore already locked by another process? */
 	if (UNLIKELY(s->owner && (s->owner != CurrentProcess)))
@@ -120,6 +133,8 @@ void sem_obtain(struct Semaphore *s)
 	}
 	else
 	{
+		ASSERT(ISLISTEMPTY(&s->wait_queue));
+
 		/* The semaphore was free: lock it */
 		s->owner = CurrentProcess;
 		s->nest_count++;
@@ -144,6 +159,9 @@ void sem_obtain(struct Semaphore *s)
 void sem_release(struct Semaphore *s)
 {
 	proc_forbid();
+	sem_verify(s);
+
+	ASSERT(s->owner == CurrentProcess);
 
 	/*
 	 * Decrement nesting count and check if the semaphore
