@@ -1,7 +1,7 @@
 /*!
  * \file
  * <!--
- * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000 Bernardo Innocenti <bernie@codewiz.org>
  * This file is part of DevLib - See devlib/README for information.
  * -->
@@ -28,6 +28,9 @@
 
 /*
  * $Log$
+ * Revision 1.7  2004/07/18 21:49:03  bernie
+ * Make CONFIG_SER_DEFBAUDRATE optional.
+ *
  * Revision 1.6  2004/06/07 15:56:28  aleph
  * Remove cast-as-lvalue extension abuse
  *
@@ -347,7 +350,9 @@ struct Serial *ser_open(unsigned int unit)
 #if defined(CONFIG_SER_RXTIMEOUT) || defined(CONFIG_SER_TXTIMEOUT)
 	ser_settimeouts(port, CONFIG_SER_RXTIMEOUT, CONFIG_SER_TXTIMEOUT);
 #endif
+#if defined(CONFIG_SER_DEFBAUDRATE)
 	ser_setbaudrate(port, CONFIG_SER_DEFBAUDRATE);
+#endif
 
 	return port;
 }
