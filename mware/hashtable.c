@@ -61,6 +61,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2004/12/08 09:42:30  bernie
+ *#* Suppress warning.
+ *#*
  *#* Revision 1.3  2004/10/03 20:43:22  bernie
  *#* Import changes from sc/firmware.
  *#*
@@ -224,7 +227,7 @@ static bool insert(struct HashTable* ht, const void* key, uint8_t key_length, co
 		return false;
 
 	if (HT_HAS_INTERNAL_KEY(ht))
-		key_length = MIN(key_length, INTERNAL_KEY_MAX_LENGTH);
+		key_length = MIN(key_length, (uint8_t)INTERNAL_KEY_MAX_LENGTH);
 
 	node = perform_lookup(ht, key, key_length);
 	if (!node)
@@ -286,7 +289,7 @@ const void* ht_find(struct HashTable* ht, const void* key, uint8_t key_length)
 	HashNodePtr node;
 
 	if (HT_HAS_INTERNAL_KEY(ht))
-		key_length = MIN(key_length, INTERNAL_KEY_MAX_LENGTH);
+		key_length = MIN(key_length, (uint8_t)INTERNAL_KEY_MAX_LENGTH);
 
 	node = perform_lookup(ht, key, key_length);
 
