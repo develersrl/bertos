@@ -12,10 +12,15 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  *
  * \brief General pourpose graphics routines
+ *
+ * \todo Rename functions to match the coding-standard.
  */
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2004/10/21 10:58:33  bernie
+ *#* Add a TODO item.
+ *#*
  *#* Revision 1.8  2004/09/20 03:29:22  bernie
  *#* Relax assertion.
  *#*
