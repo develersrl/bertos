@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/07/30 14:27:49  rasky
+ * Aggiornati alcuni file DSP56k per la nuova libreria di IRQ management
+ *
  * Revision 1.3  2004/06/06 18:30:34  bernie
  * Import DSP56800 changes from SC.
  *
@@ -29,9 +32,11 @@
 #ifndef DRV_TIMER_DSP56K_H
 #define DRV_TIMER_DSP56K_H
 
+#include "timer.h"
 #include <DSP56F807.h>
 #include <compiler.h>
 #include <hw.h>
+#include <drv/irq.h>
 
 // Calculate register pointer and irq vector from hw.h setting
 #define REG_SYSTEM_TIMER          PP_CAT(REG_TIMER_, SYSTEM_TIMER)
@@ -45,6 +50,8 @@
 
 //! Type of time expressed in ticks of the hardware high precision timer
 typedef uint16_t hptime_t;
+
+static void system_timer_isr(UNUSED(IPTR, arg));
 
 static void timer_hw_init(void)
 {
@@ -65,7 +72,8 @@ static void timer_hw_init(void)
 	// The value for reload (at initializationa and after compare is met) is zero
 	REG_SYSTEM_TIMER->LOAD = 0;
 
-	// Set the interrupt priority
+	// Set the interrupt handler and priority
+	irq_install(SYSTEM_TIMER_IRQ_VECTOR, &system_timer_isr, NULL);
 	irq_setpriority(SYSTEM_TIMER_IRQ_VECTOR, IRQ_PRIORITY_SYSTEM_TIMER);
 
 	// Small preprocessor trick to generate the REG_TIMER_CTRL_PRIMARY_IPBYNN macro
@@ -90,9 +98,7 @@ INLINE hptime_t timer_hw_hpread(void)
 	return REG_SYSTEM_TIMER->CNTR;
 }
 
-void system_timer_isr(void);
-
 #define DEFINE_TIMER_ISR \
-	void system_timer_isr(void)
+	static void system_timer_isr(UNUSED(IPTR, arg))
 
 #endif /* DRV_TIMER_DSP56_H */

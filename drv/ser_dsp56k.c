@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/07/30 14:27:49  rasky
+ * Aggiornati alcuni file DSP56k per la nuova libreria di IRQ management
+ *
  * Revision 1.3  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -26,6 +29,7 @@
 #include "ser.h"
 #include "ser_p.h"
 #include <drv/kdebug.h>
+#include <drv/irq.h>
 #include <hw.h>
 #include <DSP56F807.H>
 
@@ -47,10 +51,9 @@ struct SCI
 	struct SerialHardware hw;
 	struct Serial* serial;
 	volatile struct REG_SCI_STRUCT* regs;
-	uint16_t irq_tx;
-	uint16_t irq_rx;
+	IRQ_VECTOR irq_tx;
+	IRQ_VECTOR irq_rx;
 };
-
 
 static inline void enable_tx_irq_bare(volatile struct REG_SCI_STRUCT* regs)
 {
@@ -96,8 +99,9 @@ static inline void enable_rx_irq(struct SerialHardware* _hw)
 	enable_rx_irq_bare(regs);
 }
 
-INLINE void tx_isr(struct SCI *hw)
+static void tx_isr(const struct SCI *hw)
 {
+#pragma interrupt warn
 	volatile struct REG_SCI_STRUCT* regs = hw->regs;
 
 	if (fifo_isempty(&hw->serial->txfifo))
@@ -110,8 +114,9 @@ INLINE void tx_isr(struct SCI *hw)
 	}
 }
 
-INLINE void rx_isr(struct SCI *hw)
+static void rx_isr(const struct SCI *hw)
 {
+#pragma interrupt warn
 	volatile struct REG_SCI_STRUCT* regs = hw->regs;
 
 	hw->serial->status |= regs->SR & (SERRF_PARITYERROR |
@@ -141,7 +146,9 @@ static void init(struct SerialHardware* _hw, struct Serial* ser)
 	// Clear data register
 	(void)regs->DR;
 
-	// Set priorities for both IRQs
+	// Install the handlers and set priorities for both IRQs
+	irq_install(hw->irq_tx, (isr_t)tx_isr, hw);
+	irq_install(hw->irq_rx, (isr_t)rx_isr, hw);
 	irq_setpriority(hw->irq_tx, IRQ_PRIORITY_SCI_TX);
 	irq_setpriority(hw->irq_rx, IRQ_PRIORITY_SCI_RX);
 
@@ -204,35 +211,6 @@ static struct SCI SCIDescs[2] =
 	},
 };
 
-
-
-void ser_hw_tx_isr_0(void);
-void ser_hw_tx_isr_0(void)
-{
-#pragma interrupt warn
-	tx_isr(&SCIDescs[0]);
-}
-
-void ser_hw_rx_isr_0(void);
-void ser_hw_rx_isr_0(void)
-{
-#pragma interrupt warn
-	rx_isr(&SCIDescs[0]);
-}
-
-void ser_hw_tx_isr_1(void);
-void ser_hw_tx_isr_1(void)
-{
-#pragma interrupt warn
-	tx_isr(&SCIDescs[1]);
-}
-
-void ser_hw_rx_isr_1(void);
-void ser_hw_rx_isr_1(void)
-{
-#pragma interrupt warn
-	rx_isr(&SCIDescs[1]);
-}
 
 struct SerialHardware* ser_hw_getdesc(int unit)
 {
