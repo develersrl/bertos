@@ -6,16 +6,18 @@
  * This file is part of DevLib - See devlib/README for information.
  * -->
  *
- * \version $Id$
+ * \brief Text graphic routines
  *
+ * \version $Id$
  * \author Bernardo Innocenti <bernie@develer.com>
  * \author Stefano Fedrigo <aleph@develer.com>
- *
- * \brief Text graphic routines
  */
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2004/09/20 03:28:28  bernie
+ *#* Fix header.
+ *#*
  *#* Revision 1.6  2004/09/14 20:57:15  bernie
  *#* Use debug.h instead of kdebug.h.
  *#*
