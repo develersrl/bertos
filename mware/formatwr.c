@@ -53,6 +53,9 @@
 
 /*
  * $Log$
+ * Revision 1.7  2004/08/04 15:53:47  rasky
+ * Nuove opzioni di configurazione per formatted_write e ridotto maggiormente l'utilizzo dellos tack
+ *
  * Revision 1.6  2004/07/30 14:34:10  rasky
  * Vari fix per documentazione e commenti
  * Aggiunte PP_CATn e STATIC_ASSERT
@@ -77,6 +80,20 @@
 #include "formatwr.h"
 #include <compiler.h> /* progmem macros */
 #include <config.h> /* CONFIG_ macros */
+#include <drv/kdebug.h> /* ASSERT */
+
+#ifndef CONFIG_PRINTF_N_FORMATTER
+	/*! Enable arcane %n formatter */
+	#define CONFIG_PRINTF_N_FORMATTER 0
+#endif
+
+#ifndef CONFIG_PRINTF_OCTAL_FORMATTER
+	/*! Enable %o formatter */
+	#define CONFIG_PRINTF_OCTAL_FORMATTER 0
+#endif
+
+// True if we must keep a count of the number of characters we print
+#define CONFIG_PRINTF_COUNT_CHARS (CONFIG_PRINTF_RETURN_COUNT || CONFIG_PRINTF_N_FORMATTER)
 
 #if CONFIG_PRINTF
 
@@ -84,10 +101,16 @@
 #include <float.h>
 #endif /* CONFIG_PRINTF > PRINTF_NOFLOAT */
 
-#ifndef FRMWRI_BUFSIZE
+#if CONFIG_PRINTF > PRINTF_NOFLOAT
 /*bernie: save some memory, who cares about floats with lots of decimals? */
 /*#define FRMWRI_BUFSIZE 134*/
-#define FRMWRI_BUFSIZE 32
+	#error 134 is too much, the code must be fixed to have a lower precision limit
+#else
+	/*
+	 * Conservative estimate. Should be (probably) 12 (which is the size necessary
+	 * to represent (2^32-1) in octal plus the sign bit 
+	 */
+	#define FRMWRI_BUFSIZE 16
 #endif
 
 #ifndef MEM_ATTRIBUTE
@@ -108,7 +131,7 @@ static char *float_conversion(MEM_ATTRIBUTE long double value,
 		MEM_ATTRIBUTE char *buf,
 		MEM_ATTRIBUTE char format_flag,
 		MEM_ATTRIBUTE char g_flag,
-		MEM_ATTRIBUTE char alternate_flag)
+		MEM_ATTRIBUTE bool alternate_flag)
 {
 	MEM_ATTRIBUTE char *cp;
 	MEM_ATTRIBUTE char *buf_pointer;
@@ -156,7 +179,7 @@ static char *float_conversion(MEM_ATTRIBUTE long double value,
 			g_flag = 0;
 		else
 			/* %G - Removal of trailing zeros */
-			alternate_flag = 1;
+			alternate_flag = true;
 	}
 
 	/* %e or %E */
@@ -302,14 +325,37 @@ PGM_FUNC(_formatted_write)(const char * PGM_ATTR format,
 	MEM_ATTRIBUTE static char bad_conversion[] = "???";
 	MEM_ATTRIBUTE static char null_pointer[] = "<NULL>";
 
-	MEM_ATTRIBUTE char format_flag;
 	MEM_ATTRIBUTE int precision;
 	MEM_ATTRIBUTE int n;
-	MEM_ATTRIBUTE int field_width, nr_of_chars;
-	MEM_ATTRIBUTE char plus_space_flag, left_adjust, l_L_modifier;
-	MEM_ATTRIBUTE char h_modifier, alternate_flag;
-	MEM_ATTRIBUTE char nonzero_value;
-	MEM_ATTRIBUTE unsigned long ulong, div_factor;
+#if CONFIG_PRINTF_COUNT_CHARS
+	MEM_ATTRIBUTE int nr_of_chars;
+#endif
+	MEM_ATTRIBUTE int field_width;
+	MEM_ATTRIBUTE char format_flag;
+	enum PLUS_SPACE_FLAGS {
+		PSF_NONE, PSF_PLUS, PSF_MINUS
+	};
+	enum DIV_FACTOR {
+		DIV_DEC, DIV_HEX,
+#if CONFIG_PRINTF_OCTAL_FORMATTER
+		DIV_OCT,
+#endif
+	};
+	struct {
+		MEM_ATTRIBUTE enum PLUS_SPACE_FLAGS plus_space_flag : 2;
+#if CONFIG_PRINTF_OCTAL_FORMATTER
+		MEM_ATTRIBUTE enum DIV_FACTOR div_factor : 2;
+#else
+		MEM_ATTRIBUTE enum DIV_FACTOR div_factor : 1;
+#endif
+		MEM_ATTRIBUTE bool left_adjust : 1;
+		MEM_ATTRIBUTE bool l_L_modifier : 1;
+		MEM_ATTRIBUTE bool h_modifier : 1;
+		MEM_ATTRIBUTE bool alternate_flag : 1;
+		MEM_ATTRIBUTE bool nonzero_value : 1;
+		MEM_ATTRIBUTE bool zeropad : 1;
+	} flags;
+	MEM_ATTRIBUTE unsigned long ulong;
 
 #if CONFIG_PRINTF >  PRINTF_NOFLOAT
 	MEM_ATTRIBUTE long double fvalue;
@@ -318,28 +364,40 @@ PGM_FUNC(_formatted_write)(const char * PGM_ATTR format,
 	MEM_ATTRIBUTE char *buf_pointer;
 	MEM_ATTRIBUTE char *ptr;
 	MEM_ATTRIBUTE const char *hex;
-	MEM_ATTRIBUTE char zeropad;
 	MEM_ATTRIBUTE char buf[FRMWRI_BUFSIZE];
 
+#if CONFIG_PRINTF_COUNT_CHARS
 	nr_of_chars = 0;
+#endif
 	for (;;)    /* Until full format string read */
 	{
 		while ((format_flag = PGM_READ_CHAR(format++)) != '%')    /* Until '%' or '\0' */
 		{
 			if (!format_flag)
+#if CONFIG_PRINTF_RETURN_COUNT
 				return (nr_of_chars);
+#else
+				return 0;
+#endif
 			put_one_char(format_flag, secret_pointer);
+#if CONFIG_PRINTF_COUNT_CHARS
 			nr_of_chars++;
+#endif
 		}
 		if (PGM_READ_CHAR(format) == '%')    /* %% prints as % */
 		{
 			format++;
 			put_one_char('%', secret_pointer);
+#if CONFIG_PRINTF_COUNT_CHARS
 			nr_of_chars++;
+#endif
 			continue;
 		}
 
-		plus_space_flag = left_adjust = alternate_flag = zeropad = 0;
+		flags.left_adjust = false;
+		flags.alternate_flag = false;
+		flags.plus_space_flag = PSF_NONE;
+		flags.zeropad = false;
 		ptr = buf_pointer = &buf[0];
 		hex = "0123456789ABCDEF";
 
@@ -349,19 +407,19 @@ PGM_FUNC(_formatted_write)(const char * PGM_ATTR format,
 			switch (PGM_READ_CHAR(format))
 			{
 				case ' ':
-					if (plus_space_flag)
+					if (flags.plus_space_flag)
 						goto NEXT_FLAG;
 				case '+':
-					plus_space_flag = PGM_READ_CHAR(format);
+					flags.plus_space_flag = PSF_PLUS;
 					goto NEXT_FLAG;
 				case '-':
-					left_adjust++;
+					flags.left_adjust = true;
 					goto NEXT_FLAG;
 				case '#':
-					alternate_flag++;
+					flags.alternate_flag = true;
 					goto NEXT_FLAG;
 				case '0':
-					zeropad++;
+					flags.zeropad = true;
 					goto NEXT_FLAG;
 			}
 			break;
@@ -376,7 +434,7 @@ NEXT_FLAG:
 			if (field_width < 0)
 			{
 				field_width = -field_width;
-				left_adjust++;
+				flags.left_adjust = true;
 			}
 			format++;
 		}
@@ -387,8 +445,8 @@ NEXT_FLAG:
 				field_width = field_width * 10 + (PGM_READ_CHAR(format++) - '0');
 		}
 
-		if (left_adjust)
-			zeropad = 0;
+		if (flags.left_adjust)
+			flags.zeropad = false;
 
 		/* Optional precision (or '*') */
 		if (PGM_READ_CHAR(format) == '.')
@@ -418,18 +476,19 @@ NEXT_FLAG:
 		 * decimal point, "precision" will be -1.
 		 */
 
-		l_L_modifier = h_modifier = 0;
+		flags.l_L_modifier = false;
+		flags.h_modifier = false;
 
 		/* Optional 'l','L' r 'h' modifier? */
 		switch (PGM_READ_CHAR(format))
 		{
 			case 'l':
 			case 'L':
-				l_L_modifier++;
+				flags.l_L_modifier = true;
 				format++;
 				break;
 			case 'h':
-				h_modifier++;
+				flags.h_modifier = true;
 				format++;
 				break;
 		}
@@ -441,7 +500,7 @@ NEXT_FLAG:
 		 */
 		switch (format_flag = PGM_READ_CHAR(format++))
 		{
-#if 0 /* bernie */
+#if CONFIG_PRINTF_N_FORMATTER
 			case 'n':
 				if (sizeof(short) != sizeof(int))
 				{
@@ -449,7 +508,7 @@ NEXT_FLAG:
 					{
 						if (h_modifier)
 							*va_arg(ap, short *) = nr_of_chars;
-						else if (l_L_modifier)
+						else if (flags.l_L_modifier)
 							*va_arg(ap, long *) = nr_of_chars;
 						else
 							*va_arg(ap, int *) = nr_of_chars;
@@ -464,7 +523,7 @@ NEXT_FLAG:
 				}
 				else
 				{
-					if (l_L_modifier)
+					if (flags.l_L_modifier)
 						*va_arg(ap, long *) = nr_of_chars;
 					else
 						*va_arg(ap, int *) = nr_of_chars;
@@ -487,9 +546,11 @@ NEXT_FLAG:
 				buf_pointer -= n;
 				break;
 
+#if CONFIG_PRINTF_OCTAL_FORMATTER
 			case 'o':
-				if (alternate_flag && !precision)
+				if (flags.alternate_flag && !precision)
 					precision++;
+#endif
 			case 'x':
 				hex = "0123456789abcdef";
 			case 'u':
@@ -502,15 +563,18 @@ NEXT_FLAG:
 				ulong = (unsigned long)va_arg(ap, char *);
 #endif /* 32bit pointers */
 				else if (sizeof(short) == sizeof(int))
-					ulong = l_L_modifier ?
+					ulong = flags.l_L_modifier ?
 						va_arg(ap, unsigned long) : (unsigned long)va_arg(ap, unsigned int);
 				else
-					ulong = h_modifier ?
+					ulong = flags.h_modifier ?
 						(unsigned long)(unsigned short) va_arg(ap, int)
 						: (unsigned long)va_arg(ap, int);
-				div_factor = (format_flag == 'o') ?
-					8 : (format_flag == 'u') ? 10 : 16;
-				plus_space_flag = 0;
+				flags.div_factor = 
+#if CONFIG_PRINTF_OCTAL_FORMATTER
+					(format_flag == 'o') ? DIV_OCT : 
+#endif
+					(format_flag == 'u') ? DIV_DEC : DIV_HEX;
+				flags.plus_space_flag = PSF_NONE;
 				goto INTEGRAL_CONVERSION;
 
 			case 'd':
@@ -519,60 +583,83 @@ NEXT_FLAG:
 				{
 					if ( (long)(ulong = va_arg(ap, unsigned long)) < 0)
 					{
-						plus_space_flag = '-';
+						flags.plus_space_flag = PSF_MINUS;
 						ulong = (unsigned long)(-((signed long)ulong));
 					}
 				}
 				else if (sizeof(short) == sizeof(int))
 				{
-					if ( (long)(ulong = l_L_modifier ?
+					if ( (long)(ulong = flags.l_L_modifier ?
 								va_arg(ap,unsigned long) : (unsigned long)va_arg(ap,int)) < 0)
 					{
-						plus_space_flag = '-';
+						flags.plus_space_flag = PSF_MINUS;
 						ulong = (unsigned long)(-((signed long)ulong));
 					}
 				}
 				else
 				{
-					if ( (signed long)(ulong = (unsigned long) (h_modifier ?
+					if ( (signed long)(ulong = (unsigned long) (flags.h_modifier ?
 									(short) va_arg(ap, int) : va_arg(ap,int))) < 0)
 					{
-						plus_space_flag = '-';
+						flags.plus_space_flag = PSF_MINUS;
 						ulong = (unsigned long)(-((signed long)ulong));
 					}
 				}
-				div_factor = 10;
+				flags.div_factor = DIV_DEC;
 
 				/* Now convert to digits */
 INTEGRAL_CONVERSION:
 				ptr = buf_pointer = &buf[FRMWRI_BUFSIZE - 1];
-				nonzero_value = (ulong != 0);
+				flags.nonzero_value = (ulong != 0);
 
 				/* No char if zero and zero precision */
-				if (precision != 0 || nonzero_value)
-					do
-						*--buf_pointer = hex[ulong % div_factor];
-					while (ulong /= div_factor);
+				if (precision != 0 || flags.nonzero_value)
+				{
+					switch (flags.div_factor)
+					{
+					case DIV_DEC:
+						do
+							*--buf_pointer = hex[ulong % 10];
+						while (ulong /= 10);
+						break;
+
+					case DIV_HEX:
+						do
+							*--buf_pointer = hex[ulong % 16];
+						while (ulong /= 16);
+						break;
+#if CONFIG_PRINTF_OCTAL_FORMATTER
+					case DIV_OCT:
+						do
+							*--buf_pointer = hex[ulong % 8];
+						while (ulong /= 8);
+						break;
+#endif
+					}
+				}
 
 				/* "precision" takes precedence */
 				if (precision < 0)
-					if (zeropad)
-						precision = field_width - (plus_space_flag != 0);
+					if (flags.zeropad)
+						precision = field_width - (flags.plus_space_flag != PSF_NONE);
 				while (precision > (int)(ptr - buf_pointer))
 					*--buf_pointer = '0';
 
-				if (alternate_flag && nonzero_value)
+				if (flags.alternate_flag && flags.nonzero_value)
 				{
 					if (format_flag == 'x' || format_flag == 'X')
 					{
 						*--buf_pointer = format_flag;
 						*--buf_pointer = '0';
 					}
+#if CONFIG_PRINTF_OCTAL_FORMATTER
 					else if ((format_flag == 'o') && (*buf_pointer != '0'))
 					{
 						*--buf_pointer = '0';
 					}
+#endif
 				}
+				ASSERT(buf_pointer >= buf);
 				break;
 
 #if CONFIG_PRINTF > PRINTF_NOFLOAT
@@ -597,16 +684,16 @@ FLOATING_CONVERSION:
 				}
 				if (sizeof(double) != sizeof(long double))
 				{
-					if ( (fvalue = l_L_modifier ?
+					if ( (fvalue = flags.l_L_modifier ?
 								va_arg(ap,long double) : va_arg(ap,double)) < 0)
 					{
-						plus_space_flag = '-';
+						flags.plus_space_flag = PSF_MINUS;
 						fvalue = -fvalue;
 					}
 				}
 				else if ( (fvalue = va_arg(ap,long double)) < 0)
 				{
-					plus_space_flag = '-';
+					flags.plus_space_flag = PSF_MINUS;
 					fvalue = -fvalue;
 				}
 				ptr = float_conversion (fvalue,
@@ -614,10 +701,10 @@ FLOATING_CONVERSION:
 						buf_pointer += field_width,
 						format_flag,
 						(char)n,
-						alternate_flag);
-				if (zeropad)
+						flags.alternate_flag);
+				if (flags.zeropad)
 				{
-					precision = field_width - (plus_space_flag != 0);
+					precision = field_width - (flags.plus_space_flag != PSF_NONE);
 					while (precision > ptr - buf_pointer)
 						*--buf_pointer = '0';
 				}
@@ -659,37 +746,45 @@ FLOATING_CONVERSION:
 		}
 		else
 		{
-			n = field_width - precision - (plus_space_flag != 0);
+			n = field_width - precision - (flags.plus_space_flag != PSF_NONE);
 		}
 
 		/* emit any leading pad characters */
-		if (!left_adjust)
+		if (!flags.left_adjust)
 			while (--n >= 0)
 			{
 				put_one_char(' ', secret_pointer);
+#if CONFIG_PRINTF_COUNT_CHARS
 				nr_of_chars++;
+#endif
 			}
 
 		/* emit flag characters (if any) */
-		if (plus_space_flag)
+		if (flags.plus_space_flag)
 		{
-			put_one_char(plus_space_flag, secret_pointer);
+			put_one_char(flags.plus_space_flag == PSF_PLUS ? '+' : '-', secret_pointer);
+#if CONFIG_PRINTF_COUNT_CHARS
 			nr_of_chars++;
+#endif
 		}
 
 		/* emit the string itself */
 		while (--precision >= 0)
 		{
 			put_one_char(*buf_pointer++, secret_pointer);
+#if CONFIG_PRINTF_COUNT_CHARS
 			nr_of_chars++;
+#endif
 		}
 
 		/* emit trailing space characters */
-		if (left_adjust)
+		if (flags.left_adjust)
 			while (--n >= 0)
 			{
 				put_one_char(' ', secret_pointer);
+#if CONFIG_PRINTF_COUNT_CHARS
 				nr_of_chars++;
+#endif
 			}
 	}
 

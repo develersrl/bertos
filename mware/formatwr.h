@@ -12,6 +12,9 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/08/04 15:53:47  rasky
+ * Nuove opzioni di configurazione per formatted_write e ridotto maggiormente l'utilizzo dellos tack
+ *
  * Revision 1.3  2004/07/29 22:57:09  bernie
  * Add values for new-style CONFIG_PRINTF option.
  *
@@ -26,6 +29,7 @@
 #define MWARE_FORMATWR_H
 
 #include <stdarg.h>
+#include <config.h>
 
 /*!
  * \name _formatted_write() configuration
@@ -38,8 +42,13 @@
 #define PRINTF_FULL        4
 /* \} */
 
+#ifndef CONFIG_PRINTF_RETURN_COUNT
+	/*! Enable/disable _formatted_write return value */
+	#define CONFIG_PRINTF_RETURN_COUNT 1
+#endif
 
-int _formatted_write(
+int
+_formatted_write(
 	const char *format,
 	void put_char_func(char c, void *user_data),
 	void *user_data,
