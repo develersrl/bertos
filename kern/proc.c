@@ -17,6 +17,9 @@
 
 /*
  * $Log$
+ * Revision 1.8  2004/08/14 19:37:57  rasky
+ * Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
+ *
  * Revision 1.7  2004/08/02 20:20:29  aleph
  * Merge from project_ks
  *
@@ -93,8 +96,9 @@ static void monitor_init(void)
 	INITLIST(&MonitorProcs);
 }
 
-static void monitor_add(Process* proc, cpustack_t* stack_base, size_t stack_size)
+static void monitor_add(Process* proc, const char* name, cpustack_t* stack_base, size_t stack_size)
 {
+	proc->monitor.name = name;
 	proc->monitor.stack_base = stack_base;
 	proc->monitor.stack_size = stack_size;
 
@@ -145,13 +149,25 @@ size_t monitor_check_stack(cpustack_t* stack_base, size_t stack_size)
 void monitor_debug_stacks(void)
 {
 	struct Process* p;
+	int i;
+
+	if (ISLISTEMPTY(&MonitorProcs))
+	{
+		kprintf("No stacks registered in the monitor\n");
+		return;
+	}
+
+	kprintf("%-24s    %-6s%-8s%-8s%-8s\n", "Process name", "TCB", "SPbase", "SPsize", "SPfree");
+	for (i=0;i<56;i++)
+		kprintf("-");
+	kprintf("\n");
 
 	for (p = MONITOR_NODE_TO_PROCESS(MonitorProcs.head);
 		 p->monitor.link.succ;
 		 p = MONITOR_NODE_TO_PROCESS(p->monitor.link.succ))
 	{
 		size_t free = monitor_check_stack(p->monitor.stack_base, p->monitor.stack_size);
-		kprintf("TCB: %x  sp_base: %x  sp_size: %x  sp_free: %x\n", (uint16_t)p, (uint16_t)p->monitor.stack_base, (uint16_t)p->monitor.stack_size, (uint16_t)free);
+		kprintf("%-24s    %04x    %04x    %4x    %4x\n", p->monitor.name, (uint16_t)p, (uint16_t)p->monitor.stack_base, (uint16_t)p->monitor.stack_size, (uint16_t)free);
 	}
 }
 
@@ -199,7 +215,7 @@ void proc_init(void)
  * \return Process structure of new created process
  *         if successful, NULL otherwise.
  */
-Process *proc_new(void (*entry)(void), size_t stacksize, cpustack_t *stack_base)
+struct Process *proc_new_with_name(UNUSED(const char*, name), void (*entry)(void), IPTR data, size_t stacksize, cpustack_t *stack_base)
 {
 	Process *proc;
 	cpuflags_t flags;
@@ -258,6 +274,7 @@ Process *proc_new(void (*entry)(void), size_t stacksize, cpustack_t *stack_base)
 	}
 
 	proc_init_struct(proc);
+	proc->user_data = data;
 
 #if CONFIG_KERN_HEAP
 	proc->stack_base = stack_base;
@@ -280,7 +297,7 @@ Process *proc_new(void (*entry)(void), size_t stacksize, cpustack_t *stack_base)
 	ENABLE_IRQRESTORE(flags);
 
 #if CONFIG_KERN_MONITOR
-	monitor_add(proc, stack_base, stacksize);
+	monitor_add(proc, name, stack_base, stacksize);
 #endif
 
 	return proc;
@@ -416,6 +433,13 @@ struct Process *proc_current(void)
 	return CurrentProcess;
 }
 
+/*!
+ * Get the pointer to the user data of the current process
+ */
+IPTR proc_current_user_data(void)
+{
+	return CurrentProcess->user_data;
+}
 
 #if 0 /* Simple testcase for the scheduler */
 
@@ -453,8 +477,8 @@ static cpustack_t proc_test_stack2[CONFIG_KERN_DEFSTACKSIZE/sizeof(cpustack_t)];
  */
 void NORETURN proc_test(void)
 {
-	proc_new(proc_test_thread1, sizeof(proc_test_stack1), proc_test_stack1);
-	proc_new(proc_test_thread2, sizeof(proc_test_stack2), proc_test_stack2);
+	proc_new(proc_test_thread1, NULL, sizeof(proc_test_stack1), proc_test_stack1);
+	proc_new(proc_test_thread2, NULL, sizeof(proc_test_stack2), proc_test_stack2);
 	kputs("Created tasks\n");
 
 	kputs("stack1:\n");

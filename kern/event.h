@@ -18,6 +18,9 @@
 
 /*
  * $Log$
+ * Revision 1.6  2004/08/14 19:37:57  rasky
+ * Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
+ *
  * Revision 1.5  2004/07/30 14:30:27  rasky
  * Resa la sig_signal interrupt safe (con il nuovo scheduler IRQ-safe)
  * Rimossa event_doIntr (ora inutile) e semplificata la logica delle macro con funzioni inline
@@ -104,7 +107,6 @@ INLINE Event event_createNone(void)
 	((e)->action = EVENT_SOFTINT,(e)->Ev.Int.func = (f), (e)->Ev.Int.user_data = (u))
 
 /*! Same as event_initSoftInt(), but returns the initialized event */
-INLINE Event event_createSoftInt(Hook func, void* user_data);
 INLINE Event event_createSoftInt(Hook func, void* user_data)
 {
 	Event e;
@@ -122,11 +124,10 @@ INLINE Event event_createSoftInt(Hook func, void* user_data)
 	((e)->action = EVENT_SIGNAL,(e)->Ev.Sig.sig_proc = (p), (e)->Ev.Sig.sig_bit = (s))
 
 /*! Same as event_initSignal(), but returns the initialized event */
-INLINE Event event_createSignal(struct Process* proc, sig_t bit);
 INLINE Event event_createSignal(struct Process* proc, sig_t bit)
 {
 	Event e;
-	e.action = EVENT_SOFTINT;
+	e.action = EVENT_SIGNAL;
 	e.Ev.Sig.sig_proc = proc;
 	e.Ev.Sig.sig_bit = bit;
 	return e;

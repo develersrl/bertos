@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/08/14 19:37:57  rasky
+ * Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
+ *
  * Revision 1.2  2004/08/04 15:54:18  rasky
  * Merge da SC: prima versione veramente funzionante
  *
@@ -31,6 +34,7 @@
 
 #include "heap.h"
 #include <string.h>           // memset()
+#include <macros.h>           // IS_POW2()
 #include <drv/kdebug.h>       // ASSERT()
 
 /* NOTE: struct size must be a 2's power! */

@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.16  2004/08/14 19:37:57  rasky
+ * Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
+ *
  * Revision 1.15  2004/08/13 03:23:26  bernie
  * Adjust a few MSVC tweaks from older projects.
  *
@@ -77,6 +80,12 @@
 		((__GNUC__ << 16) + __GNUC_MINOR__ >= ((maj) << 16) + (min))
 #else
 	#define GNUC_PREREQ(maj, min) 0
+#endif
+
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
+	#define COMPILER_C99      1
+#else
+	#define COMPILER_C99      0
 #endif
 
 #if defined(__IAR_SYSTEMS_ICC) || defined(__IAR_SYSTEMS_ICC__)
@@ -259,83 +268,6 @@
 	#define EXTERN_C_END    /* nothing */
 #endif
 
-
-/* Quasi-ANSI macros */
-#ifndef offsetof
-	/*! offsetof(s,m) - Return the byte offset of the member \a m in struct \a s */
-	#define offsetof(s,m)   (size_t)&(((s *)0)->m)
-#endif
-#ifndef countof
-	/*! Count the number of elements in the static array \a a */
-	#define countof(a) (sizeof(a) / sizeof(*(a)))
-#endif
-
-
-/* Simple macros */
-#if GNUC_PREREQ(2,0)
-	#define ABS(n) ({ \
-		__typeof__(n) _n = (n); \
-		(_n < 0) ? -_n : _n; \
-	})
-	#define MIN(a,b) ({ \
-		__typeof__(a) _a = (a); \
-		__typeof__(b) _b = (b); \
-		(void)(&_a == &_b); /* ensure same type */ \
-		(_a < _b) ? _a : _b; \
-	})
-	#define MAX(a,b) ({ \
-		__typeof__(a) _a = (a); \
-		__typeof__(b) _b = (b); \
-		(void)(&_a == &_b); /* ensure same type */ \
-		(_a > _b) ? _a : _b; \
-	})
-#else /* !GNUC */
-	/* Buggy macros for inferior compilers */
-	#define ABS(a)		(((a) < 0) ? -(a) : (a))
-	#define MIN(a,b)	(((a) < (b)) ? (a) : (b))
-	#define MAX(a,b)	(((a) > (b)) ? (a) : (b))
-#endif /* !GNUC */
-
-#ifndef BV
-/*! Convert a bit value to a binary flag */
-#define BV(x)	(1<<(x))
-#endif
-
-/*! Round up \a x to an even multiple of the 2's power \a pad */
-#define ROUND2(x, pad) (((x) + ((pad) - 1)) & ~((pad) - 1))
-
-/*! Calculate a compile-time log2 for a uint8_t */
-#define UINT8_LOG2(x) \
-	((x) < 2 ? 0 : \
-	 ((x) < 4 ? 1 : \
-	  ((x) < 8 ? 2 : \
-	   ((x) < 16 ? 3 : \
-	    ((x) < 32 ? 4 : \
-	     ((x) < 64 ? 5 : \
-	      ((x) < 128 ? 6 : 7)))))))
-
-/*! Calculate a compile-time log2 for a uint16_t */
-#define UINT16_LOG2(x) \
-	((x < 256) ? UINT8_LOG2(x) : UINT8_LOG2((x) >> 8) + 8)
-
-/*! Calculate a compile-time log2 for a uint32_t */
-#define UINT32_LOG2(x) \
-	((x < 65536UL) ? UINT16_LOG2(x) : UINT16_LOG2((x) >> 16) + 16)
-
-/*! Concatenate two different preprocessor tokens (allowing macros to expand) */
-#define PP_CAT(x,y)         PP_CAT__(x,y)
-#define PP_CAT__(x,y)       x ## y
-#define PP_CAT3(x,y,z)      PP_CAT(PP_CAT(x,y),z)
-#define PP_CAT4(x,y,z,w)    PP_CAT(PP_CAT3(x,y,z),w)
-#define PP_CAT5(x,y,z,w,j)  PP_CAT(PP_CAT4(x,y,z,w),j)
-
-/*! String-ize a token (allowing macros to expand) */
-#define PP_STRINGIZE(x)     PP_STRINGIZE__(x)
-#define PP_STRINGIZE__(x)   #x
-
-/*! Issue a compilation error if the \a condition is false */
-#define STATIC_ASSERT(condition)  \
-	extern char PP_CAT(CT_ASSERT___, __LINE__)[(condition) ? 1 : -1]
 
 /*
  * Standard type definitions

@@ -31,6 +31,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/08/14 19:37:57  rasky
+ * Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
+ *
  * Revision 1.2  2004/08/04 15:52:54  rasky
  * Merge da SC: fixato namespace dell'include guard
  *
@@ -66,7 +69,8 @@
 #define MWARE_HASHTABLE_H
 
 #include <compiler.h>
-#include <kdebug.h>
+#include <macros.h>
+#include <drv/kdebug.h>
 
 /*! Enable/disable support to declare special hash tables which maintain a copy of
  *  the key internally instead of relying on the hook to extract it from the data.

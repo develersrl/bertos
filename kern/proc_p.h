@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.5  2004/08/14 19:37:57  rasky
+ * Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
+ *
  * Revision 1.4  2004/07/30 14:24:16  rasky
  * Task switching con salvataggio perfetto stato di interrupt (SR)
  * Kernel monitor per dump informazioni su stack dei processi
@@ -54,6 +57,7 @@ typedef struct Process
 {
 	Node         link;        /*!< Link Process into scheduler lists */
 	cpustack_t  *stack;       /*!< Per-process SP */
+	IPTR         user_data;   /*!< Custom data passed to the process */
 
 #if CONFIG_KERN_SIGNALS
 	sigset_t     sig_wait;    /*!< Signals the process is waiting for */
@@ -70,6 +74,7 @@ typedef struct Process
 	struct ProcMonitor
 	{
 		Node link;
+		const char* name;
 		cpustack_t* stack_base;
 		size_t stack_size;
 	} monitor;

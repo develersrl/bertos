@@ -66,6 +66,9 @@
 
 /*
  * $Log$
+ * Revision 1.6  2004/08/14 19:37:57  rasky
+ * Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
+ *
  * Revision 1.5  2004/08/04 21:50:33  bernie
  * Add extensive documentation.
  *
@@ -89,6 +92,7 @@
 #include "proc.h"
 #include "proc_p.h"
 #include "hw.h"
+#include <drv/kdebug.h>
 
 // FIXME
 #if CONFIG_KERN_SIGNALS
@@ -127,6 +131,10 @@ sigset_t sig_wait(sigset_t sigs)
 		/* go to sleep and proc_schedule() another process */
 		CurrentProcess->sig_wait = sigs;
 		proc_schedule();
+
+		/* When we come back here, a signal must be arrived */
+		ASSERT(!CurrentProcess->sig_wait);
+		ASSERT(CurrentProcess->sig_recv);
 	}
 
 	/* Signals found: clear them and return */

@@ -18,6 +18,9 @@
 
 /*
  * $Log$
+ * Revision 1.2  2004/08/14 19:37:57  rasky
+ * Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
+ *
  * Revision 1.1  2004/06/06 15:11:08  bernie
  * Import into DevLib.
  *
@@ -26,6 +29,7 @@
 #define KERN_MSG_H
 
 #include "event.h"
+#include <mware/list.h>
 
 
 typedef struct MsgPort
@@ -43,17 +47,30 @@ typedef struct Msg
 } Msg;
 
 
-/*! Initialize a messge port */
-#define INITPORT(p)			INITLIST(&(p)->queue)
+/*! Initialize a message port */
+INLINE void msg_initPort(MsgPort* port, Event event)
+{
+	INITLIST(&port->queue);
+	port->evn = event;
+}
 
-/*! Queue a message to a message port */
-#define PUTMSG(p,m) (ADDTAIL(&(p)->queue,(Node *)(m)), DOEVENT(&(p)->evn))
-#define PUTMSG_INTR(p,m) (ADDTAIL(&(p)->queue,(Node *)(m)), DOEVENT_INTR(&(p)->evn))
+/*! Queue \a msg into \a port, triggering the associated event */
+INLINE void msg_put(MsgPort* port, Msg* msg)
+{
+	ADDTAIL(&port->queue, &msg->link);
+	event_do(&port->evn);
+}
 
-/*! Get first message from port's queue (returns NULL when the port is empty) */
-#define GETMSG(p) ((Msg *)REMHEAD(&(p)->queue))
+/* Get the first message from the queue of \a port, or NULL if the port is empty */
+INLINE Msg* msg_get(MsgPort* port)
+{
+	return (Msg*)REMHEAD(&port->queue);
+}
 
-/*! Reply a message to its sender */
-#define REPLYMSG(m) (PUTMSG((m)->replyPort,(m)))
+/*! Send back (reply) \a msg to its sender */
+INLINE void msg_reply(Msg* msg)
+{
+	msg_put(msg->replyPort, msg);
+}
 
 #endif /* KERN_MSG_H */

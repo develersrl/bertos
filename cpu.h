@@ -17,6 +17,9 @@
 
 /*
  * $Log$
+ * Revision 1.12  2004/08/14 19:37:57  rasky
+ * Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
+ *
  * Revision 1.11  2004/08/05 17:39:56  bernie
  * Fix a Doxygen tag.
  *
@@ -101,9 +104,9 @@
 	#define ENABLE_INTS             do { asm(bfclr #0x0200,SR); asm(nop); } while (0)
 
 	#define DISABLE_IRQSAVE(x)  \
-		do { asm(move SR,x); asm(bfset #0x0200,SR); } while (0)
+		do { (void)x; asm(move SR,x); asm(bfset #0x0200,SR); } while (0)
 	#define ENABLE_IRQRESTORE(x)  \
-		do { asm(move x,SR); } while (0)
+		do { (void)x; asm(move x,SR); } while (0)
 
 	typedef uint16_t cpuflags_t;
 	typedef unsigned int cpustack_t;
@@ -246,7 +249,7 @@
  */
 #ifndef SCHEDULER_IDLE
 	#if defined(ARCH_EMUL) && (ARCH & ARCH_EMUL)
-		/* This emulator hook should yeld the CPU to the host.  */
+		/* This emulator hook should yield the CPU to the host.  */
 		EXTERN_C_BEGIN
 		void SchedulerIdle(void);
 		EXTERN_C_END

@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/08/14 19:37:57  rasky
+ * Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
+ *
  * Revision 1.3  2004/07/30 14:31:23  rasky
  * Hunk sfuggito al commit precedente (aggiornamento kernel)
  *
@@ -38,11 +41,20 @@ struct Process;
 
 /* Task scheduling services */
 void proc_init(void);
-struct Process *proc_new(void (*entry)(void), size_t stacksize, cpustack_t *stack);
+struct Process *proc_new_with_name(const char* name, void (*entry)(void), IPTR data, size_t stacksize, cpustack_t *stack);
+
+#if !CONFIG_KERN_MONITOR
+	#define proc_new(entry,data,size,stack) proc_new_with_name(NULL,(entry),(data),(size),(stack))
+#else
+	#define proc_new(entry,data,size,stack) proc_new_with_name(#entry,(entry),(data),(size),(stack))
+#endif
+
 void proc_exit(void);
 void proc_switch(void);
 void proc_test(void);
 struct Process* proc_current(void);
+IPTR proc_current_user_data(void);
+
 
 #if CONFIG_KERN_MONITOR
 size_t monitor_check_stack(cpustack_t* stack_base, size_t stack_size);
