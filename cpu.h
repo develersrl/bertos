@@ -17,6 +17,9 @@
 
 /*
  * $Log$
+ * Revision 1.6  2004/07/20 23:12:16  bernie
+ * Rationalize and document SCHEDULER_IDLE.
+ *
  * Revision 1.5  2004/07/20 16:20:35  bernie
  * Move byte-order macros to mware/byteorder.h; Add missing author names.
  *
@@ -51,7 +54,6 @@
 	#define DISABLE_INTS            disable_interrupt()
 	#define ENABLE_INTS             enable_interrupt()
 	#define NOP                     nop_instruction()
-	#define SCHEDULER_IDLE          /* Hmmm... could we go in STOP mode? */
 
 	typedef uint16_t cpuflags_t; // FIXME
 	typedef unsigned int cpustack_t;
@@ -66,7 +68,6 @@
 	#define NOP                     asm volatile ("nop")
 	#define DISABLE_INTS            /* nothing */
 	#define ENABLE_INTS             /* nothing */
-	#define SCHEDULER_IDLE          SchedulerIdle()
 
 	typedef uint32_t cpuflags_t; // FIXME
 	typedef uint32_t cpustack_t;
@@ -81,7 +82,6 @@
 	#define NOP                     asm(nop)
 	#define DISABLE_INTS            do { asm(bfset #0x0200,SR); asm(nop); } while (0)
 	#define ENABLE_INTS             do { asm(bfclr #0x0200,SR); asm(nop); } while (0)
-	#define SCHEDULER_IDLE          /* nothing */
 
 	#define DISABLE_IRQSAVE(x)  \
 		do { asm(move SR,x); asm(bfset #0x0200,SR); } while (0)
@@ -116,7 +116,6 @@
 	#define NOP                     asm volatile ("nop" ::)
 	#define DISABLE_INTS            asm volatile ("cli" ::)
 	#define ENABLE_INTS             asm volatile ("sei" ::)
-	#define SCHEDULER_IDLE          /* nothing */
 
 	#define DISABLE_IRQSAVE(x) \
 	do { \
@@ -217,5 +216,26 @@
 	#define CPU_PUSH_CALL_CONTEXT(sp, func) \
 		CPU_PUSH_WORD((sp), (func))
 #endif
+
+
+/*!
+ * \name SCHEDULER_IDLE
+ *
+ * \brief Invoked by the scheduler to stop the CPU when idle.
+ *
+ * This hook can be redefined to put the CPU in low-power mode, or to
+ * profile system load with an external strobe, or to save CPU cycles
+ * in hosted environments such as emulators.
+ */
+#ifndef SCHEDULER_IDLE
+	#if (ARCH & ARCH_EMUL)
+		/* This emulator hook should yeld the CPU to the host.  */
+		EXTERN_C_BEGIN
+		void SchedulerIdle(void);
+		EXTERN_C_END
+	#else /* !ARCH_EMUL */
+		#define SCHEDULER_IDLE /* nothing */
+	#endif /* !ARCH_EMUL */
+#endif /* !SCHEDULER_IDLE */
 
 #endif /* CPU_H */
