@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/06/02 21:35:24  aleph
+ * Serial enhancements: interruptible receive handler and 8 bit serial status for AVR; remove volatile attribute to FIFOBuffer, useless for new fifobuf routens
+ *
  * Revision 1.2  2004/05/23 18:21:53  bernie
  * Trim CVS logs and cleanup header info.
  *
@@ -284,7 +287,13 @@ SIGNAL(SIG_UART1_DATA)
 
 
 /*!
- * Serial 0 RX complete interrupt handler
+ * Serial 0 RX complete interrupt handler.
+ *
+ * This handler is interruptible.
+ * Interrupt are reenabled as soon as recv complete interrupt is
+ * disabled. Using INTERRUPT() is troublesome when the serial
+ * is heavily loaded, because and interrupt could be retriggered
+ * when executing the handler prologue before RXCIE is disabled.
  */
 #ifdef __AVR_ATmega103__
 SIGNAL(SIG_UART_RECV)
@@ -292,6 +301,10 @@ SIGNAL(SIG_UART_RECV)
 SIGNAL(SIG_UART0_RECV)
 #endif
 {
+	/* Disable Recv complete IRQ */
+	UCR &= ~BV(RXCIE);
+	ENABLE_INTS;
+
 	/* Should be read before UDR */
 	ser_handles[SER_UART0].status |= USR & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
 
@@ -311,14 +324,26 @@ SIGNAL(SIG_UART0_RECV)
 			RTS_OFF;
 #endif
 	}
+	/* Reenable receive complete int */
+	UCR |= BV(RXCIE);
 }
 
 /*!
- * Serial 1 RX complete interrupt handler
+ * Serial 1 RX complete interrupt handler.
+ *
+ * This handler is interruptible.
+ * Interrupt are reenabled as soon as recv complete interrupt is
+ * disabled. Using INTERRUPT() is troublesome when the serial
+ * is heavily loaded, because and interrupt could be retriggered
+ * when executing the handler prologue before RXCIE is disabled.
  */
 #ifndef __AVR_ATmega103__
 SIGNAL(SIG_UART1_RECV)
 {
+	/* Disable Recv complete IRQ */
+	UCSR0B &= ~BV(RXCIE);
+	ENABLE_INTS;
+
 	/* Should be read before UDR */
 	ser_handles[SER_UART1].status |= UCSR1A & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
 
@@ -337,6 +362,8 @@ SIGNAL(SIG_UART1_RECV)
 			RTS_OFF;
 #endif
 	}
+	/* Reenable receive complete int */
+	UCSR0B |= BV(RXCIE);
 }
 #endif /* !__AVR_ATmega103__ */
 

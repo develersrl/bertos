@@ -28,6 +28,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/06/02 21:35:24  aleph
+ * Serial enhancements: interruptible receive handler and 8 bit serial status for AVR; remove volatile attribute to FIFOBuffer, useless for new fifobuf routens
+ *
  * Revision 1.2  2004/05/23 18:21:53  bernie
  * Trim CVS logs and cleanup header info.
  *
@@ -346,5 +349,5 @@ void ser_close(struct Serial *port)
 
 	port->is_open = false;
 	port->hw->table->cleanup(port->hw);
-	port->hw = NULL;	
+	port->hw = NULL;
 }

@@ -14,6 +14,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/06/02 21:35:24  aleph
+ * Serial enhancements: interruptible receive handler and 8 bit serial status for AVR; remove volatile attribute to FIFOBuffer, useless for new fifobuf routens
+ *
  * Revision 1.2  2004/05/23 18:21:53  bernie
  * Trim CVS logs and cleanup header info.
  *
@@ -36,6 +39,8 @@
  */
 /*\{*/
 #if defined(__AVR__)
+	typedef uint8_t serstatus_t;
+
 	/* Software errors */
 	#define SERRF_RXFIFOOVERRUN  BV(0)  /*!< Rx FIFO buffer overrun */
 	#define SERRF_RXTIMEOUT      BV(5)  /*!< Receive timeout */
@@ -46,6 +51,8 @@
 	#define SERRF_FRAMEERROR     BV(4)  /*!< Stop bit missing */
 	#define SERRF_PARITYERROR    BV(7)  /*!< Parity error */
 #elif defined(__m56800__)
+	typedef uint16_t serstatus_t;
+
 	/* Software errors */
 	#define SERRF_RXFIFOOVERRUN  BV(0)  /*!< Rx FIFO buffer overrun */
 	#define SERRF_RXTIMEOUT      BV(1)  /*!< Receive timeout */
@@ -117,8 +124,8 @@ struct Serial
 	 *
 	 * \{
 	 */
-	volatile FIFOBuffer txfifo;
-	volatile FIFOBuffer	rxfifo;
+	FIFOBuffer txfifo;
+	FIFOBuffer rxfifo;
 	unsigned char txbuffer[CONFIG_SER_TXBUFSIZE];
 	unsigned char rxbuffer[CONFIG_SER_RXBUFSIZE];
 	/* \} */
@@ -131,8 +138,8 @@ struct Serial
 #endif
 
 	/*! Holds the flags defined above.  Will be 0 when no errors have occurred. */
-	REGISTER uint16_t status;
-
+	serstatus_t status;
+	
 	/*! Low-level interface to hardware. */
 	struct SerialHardware* hw;
 };
