@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/07/30 14:31:23  rasky
+ * Hunk sfuggito al commit precedente (aggiornamento kernel)
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -40,6 +43,11 @@ void proc_exit(void);
 void proc_switch(void);
 void proc_test(void);
 struct Process* proc_current(void);
+
+#if CONFIG_KERN_MONITOR
+size_t monitor_check_stack(cpustack_t* stack_base, size_t stack_size);
+void monitor_debug_stacks(void);
+#endif
 
 #if CONFIG_KERN_PREEMPTIVE
 	#define	FORBID proc_forbid()
