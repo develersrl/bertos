@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.40  2005/01/20 18:46:04  aleph
+ *#* Add progmem datatypes; PSTR() definition.
+ *#*
  *#* Revision 1.39  2005/01/08 08:49:39  bernie
  *#* Define PROGMEM on AVR only when not including pgmspace.h.
  *#*
@@ -254,6 +257,7 @@
 		#else
 			/* We still need this for prototypes */
 			#define PROGMEM  __attribute__((__progmem__))
+			#define PSTR(s) ({static char __c[] PROGMEM = (s); __c;})
 		#endif
 
 	#endif
@@ -429,6 +433,17 @@
 	#include <stdint.h>
 #endif
 
+/*!
+ * \name Types for variables stored in program memory (harvard processors).
+ * \{
+ */
+typedef PROGMEM int8_t pgm_int8_t;
+typedef PROGMEM uint8_t pgm_uint8_t;
+typedef PROGMEM int16_t pgm_int16_t;
+typedef PROGMEM uint16_t pgm_uint16_t;
+typedef PROGMEM int32_t pgm_int32_t;
+typedef PROGMEM uint32_t pgm_uint32_t;
+/*\}*/
 
 #if CPU_AVR_ATMEGA8
 	/*
