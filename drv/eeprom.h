@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/08/10 06:57:22  bernie
+ * eeprom_erase(): New function.
+ *
  * Revision 1.2  2004/07/29 22:57:09  bernie
  * Add 24LC16 support.
  *
@@ -53,6 +56,7 @@ bool eeprom_write(e2addr_t addr, const void *buf, size_t count);
 bool eeprom_read(e2addr_t addr, void *buf, size_t count);
 bool eeprom_write_char(e2addr_t addr, char c);
 int eeprom_read_char(e2addr_t addr);
+void eeprom_erase(e2addr_t addr, size_t count);
 void eeprom_init(void);
 void eeprom_test(void);
 

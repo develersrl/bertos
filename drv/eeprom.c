@@ -17,6 +17,9 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/08/10 06:57:22  bernie
+ * eeprom_erase(): New function.
+ *
  * Revision 1.3  2004/07/29 22:57:09  bernie
  * Add 24LC16 support.
  *
@@ -31,6 +34,7 @@
 #include <mware/byteorder.h> /* cpu_to_be16() */
 #include <drv/kdebug.h>
 #include <hw.h>
+#include <string.h> // memset()
 
 #include <avr/twi.h>
 
@@ -323,6 +327,28 @@ int eeprom_read_char(e2addr_t addr)
 		return c;
 	else
 		return -1;
+}
+
+
+/*!
+ * Erase specified part of eeprom, writing 0xFF.
+ *
+ * \param addr  starting address
+ * \param len   length of block to erase
+ */
+void eeprom_erase(e2addr_t addr, size_t count)
+{
+	uint8_t buf[EEPROM_BLKSIZE];
+	memset(buf, 0xFF, sizeof buf);
+
+	// Clear all but struct hw_info at start of eeprom
+	while (count)
+	{
+		size_t size = MIN(count, sizeof buf);
+		eeprom_write(addr, buf, size);
+		addr += size;
+		count -= size;
+	}
 }
 
 
