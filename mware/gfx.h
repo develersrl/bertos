@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2004/09/20 03:29:06  bernie
+ *#* Conditionalize AVR-specific code.
+ *#*
  *#* Revision 1.6  2004/09/14 21:01:08  bernie
  *#* Rename rectangle drawing functions; Unify filled/cleared implementations.
  *#*
@@ -76,7 +79,6 @@ typedef struct Bitmap
 /* Function prototypes */
 extern void gfx_InitBitmap(Bitmap *bm, uint8_t *raster, coord_t w, coord_t h);
 extern void gfx_ClearBitmap(Bitmap *bm);
-extern void gfx_blitBitmap_P(Bitmap *bm, const prog_uchar *raster);
 extern void gfx_DrawLine(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2);
 extern void gfx_RectDraw(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2);
 extern void gfx_RectFillC(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2, uint8_t color);
@@ -85,6 +87,11 @@ extern void gfx_RectClear(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_
 extern void gfx_MoveTo(Bitmap *bm, coord_t x, coord_t y);
 extern void gfx_LineTo(Bitmap *bm, coord_t x, coord_t y);
 extern void gfx_SetClipRect(Bitmap *bm, coord_t xmin, coord_t ymin, coord_t xmax, coord_t ymax);
+
+#if CPU_AVR
+	#include <avr/pgmspace.h>
+	extern void gfx_blitBitmap_P(Bitmap *bm, const prog_uchar *raster);
+#endif /* CPU_AVR */
 
 /* DEPRECATED names */
 #define gfx_DrawRect  gfx_RectDraw
