@@ -1,8 +1,8 @@
 /*!
  * \file
  * <!--
- * Copyright (C) 2002,2004 Develer S.r.l. (http://www.develer.com/)
- * This file is part of DevLib - See devlib/README for information.
+ * Copyright 2002, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \brief sprintf() implementation based on _formatted_write()
@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2005/02/18 12:34:29  bernie
+ *#* Include <mware/pgm.h> explicitly for non-Harvard archs.
+ *#*
  *#* Revision 1.7  2004/12/31 17:47:45  bernie
  *#* Rename UNUSED() to UNUSED_ARG().
  *#*
@@ -34,8 +37,10 @@
  *#* Add dual-license information.
  *#*/
 
+#include <mware/formatwr.h>
+#include <mware/pgm.h>
 #include "compiler.h"
-#include "formatwr.h"
+
 #include <stdio.h>
 
 
