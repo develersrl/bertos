@@ -15,14 +15,8 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.5  2004/08/25 14:12:09  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.4  2004/08/14 19:37:57  rasky
- *#* Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
- *#*
- *#* Revision 1.3  2004/07/30 14:31:23  rasky
- *#* Hunk sfuggito al commit precedente (aggiornamento kernel)
+ *#* Revision 1.6  2004/10/03 20:44:18  bernie
+ *#* Remove stale declarations (moved to monitor.h).
  *#*
  *#* Revision 1.2  2004/06/03 11:27:09  bernie
  *#* Add dual-license information.
@@ -57,12 +51,6 @@ void proc_switch(void);
 void proc_test(void);
 struct Process* proc_current(void);
 IPTR proc_current_user_data(void);
-
-
-#if CONFIG_KERN_MONITOR
-size_t monitor_check_stack(cpustack_t* stack_base, size_t stack_size);
-void monitor_debug_stacks(void);
-#endif
 
 #if CONFIG_KERN_PREEMPTIVE
 	#define	FORBID proc_forbid()
