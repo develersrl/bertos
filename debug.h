@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2005/02/09 21:50:28  bernie
+ *#* Declare dummy ASSERT* macros as ((void)0) to work around a warning I can't remember any more.
+ *#*
  *#* Revision 1.9  2005/01/25 08:36:40  bernie
  *#* kputnum(): Export.
  *#*
@@ -309,12 +312,12 @@
 
 	#define DB(x)  /* nothing */
 	#ifndef ASSERT
-		#define ASSERT(x)  do {} while (0)
+		#define ASSERT(x)  ((void)0)
 	#endif /* ASSERT */
-	#define ASSERT2(x, help)             do {} while (0)
-	#define ASSERT_VALID_PTR(p)          do {} while (0)
-	#define ASSERT_VALID_PTR_OR_NULL(p)  do {} while (0)
-	#define ASSERT_VALID_OBJ(_t, _o)     do {} while (0)
+	#define ASSERT2(x, help)             ((void)0)
+	#define ASSERT_VALID_PTR(p)          ((void)0)
+	#define ASSERT_VALID_PTR_OR_NULL(p)  ((void)0)
+	#define ASSERT_VALID_OBJ(_t, _o)     ((void)0)
 	#define TRACE                        do {} while (0)
 	#define TRACEMSG(x,...)              do {} while (0)
 
