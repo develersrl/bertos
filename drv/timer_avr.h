@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/06/27 15:22:15  aleph
+ * Fix spacing
+ *
  * Revision 1.3  2004/06/07 15:57:40  aleph
  * Update to latest AVR timer code
  *
@@ -163,7 +166,7 @@
 
 	#define DEFINE_TIMER_ISR	\
 		static void timer_handler(void)
-	
+
 	DEFINE_TIMER_ISR;
 
 	/*
