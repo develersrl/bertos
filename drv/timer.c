@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.19  2004/10/19 08:56:49  bernie
+ *#* TIMER_STROBE_ON, TIMER_STROBE_OFF, TIMER_STROBE_INIT: Move from timer_avr.h to timer.h, where they really belong.
+ *#*
  *#* Revision 1.18  2004/10/14 23:14:05  bernie
  *#* Fix longstanding problem with wrap-arounds.
  *#*
@@ -69,12 +72,31 @@
 
 #include "timer.h"
 #include <cpu.h>
+#include <hw.h>
 #include CPU_HEADER(timer)
 #include <debug.h>
 
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 	#include <kern/proc.h>
 #endif
+
+
+/*!
+ * \def CONFIG_TIMER_STROBE
+ *
+ * This is a debug facility that can be used to
+ * monitor timer interrupt activity on an external pin.
+ *
+ * To use strobes, redefine the macros TIMER_STROBE_ON,
+ * TIMER_STROBE_OFF and TIMER_STROBE_INIT and set
+ * CONFIG_TIMER_STROBE to 1.
+ */
+#if !defined(CONFIG_TIMER_STROBE) || !CONFIG_TIMER_STROBE
+	#define TIMER_STROBE_ON    do {/*nop*/} while(0)
+	#define TIMER_STROBE_OFF   do {/*nop*/} while(0)
+	#define TIMER_STROBE_INIT  do {/*nop*/} while(0)
+#endif
+
 
 //! Master system clock (1ms accuracy)
 volatile time_t _clock;

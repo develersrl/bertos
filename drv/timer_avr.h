@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.19  2004/10/19 08:56:41  bernie
+ *#* TIMER_STROBE_ON, TIMER_STROBE_OFF, TIMER_STROBE_INIT: Move from timer_avr.h to timer.h, where they really belong.
+ *#*
  *#* Revision 1.18  2004/09/20 03:31:03  bernie
  *#* Fix racy racy code.
  *#*
@@ -68,23 +71,6 @@
 #define TIMER_ON_OUTPUT_COMPARE0  1
 #define TIMER_ON_OVERFLOW1        2
 #define TIMER_ON_OUTPUT_COMPARE2  3
-
-
-/*!
- * \def CONFIG_TIMER_STROBE
- *
- * This is a debug facility that can be used to
- * monitor timer interrupt activity on an external pin.
- *
- * To use strobes, redefine the macros TIMER_STROBE_ON,
- * TIMER_STROBE_OFF and TIMER_STROBE_INIT and set
- * CONFIG_TIMER_STROBE to 1.
- */
-#if !defined(CONFIG_TIMER_STROBE) || !CONFIG_TIMER_STROBE
-	#define TIMER_STROBE_ON    do {/*nop*/} while(0)
-	#define TIMER_STROBE_OFF   do {/*nop*/} while(0)
-	#define TIMER_STROBE_INIT  do {/*nop*/} while(0)
-#endif
 
 
 /* Not needed, IRQ timer flag cleared automatically */
