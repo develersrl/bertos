@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2004/11/16 21:15:19  bernie
+ *#* Fix off-by-one bug in [v]snprintf().
+ *#*
  *#* Revision 1.5  2004/10/03 18:54:36  bernie
  *#* sprintf(): Fix a serious bug; snprintf(): New function.
  *#*
@@ -111,7 +114,7 @@ static void __sn_put_char(char c, void *ptr)
 {
 	struct __sn_state *state = (struct __sn_state *)ptr;
 
-	if (state->len > 0)
+	if (state->len)
 	{
 		--state->len;
 		*state->str++ = c;
@@ -119,16 +122,23 @@ static void __sn_put_char(char c, void *ptr)
 }
 
 
-int PGM_FUNC(vsnprintf)(char * str, size_t size, const char * PGM_ATTR fmt, va_list ap)
+int PGM_FUNC(vsnprintf)(char *str, size_t size, const char * PGM_ATTR fmt, va_list ap)
 {
-	int result;
-	struct __sn_state state = { str, size };
+	int result = 0;
 
-	result = PGM_FUNC(_formatted_write)(
+	/* Make room for traling '\0'. */
+	if (size--)
+	{
+		struct __sn_state state;
+		state.str = str;
+		state.len = size;
+
+		result = PGM_FUNC(_formatted_write)(
 			fmt, (str ? __sn_put_char : __null_put_char), &state, ap);
 
-	/* Terminate string */
-	*state.str = '\0';
+		/* Terminate string. */
+		*state.str = '\0';
+	}
 
 	return result;
 }
