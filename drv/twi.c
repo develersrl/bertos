@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2005/01/25 08:36:56  bernie
+ *#* CONFIG_TWI_FREQ: New config param.
+ *#*
  *#* Revision 1.1  2005/01/06 16:09:40  aleph
  *#* Split twi/eeprom functions from eeprom module in separate twi module
  *#*
@@ -25,6 +28,7 @@
 #include <debug.h>
 #include <hw.h>
 #include <cpu.h>
+#include <macros.h> // BV()
 
 #include <avr/twi.h>
 
@@ -223,10 +227,13 @@ void twi_init(void)
 		 * Set speed:
 		 * F = CLOCK_FREQ / (16 + 2*TWBR * 4^TWPS)
 		 */
-		#define TWI_FREQ  300000L /* ~300 kHz */
+		#ifndef CONFIG_TWI_FREQ
+			#warning Using default value of 300000L for CONFIG_TWI_FREQ
+			#define CONFIG_TWI_FREQ  300000L /* ~300 kHz */
+		#endif
 		#define TWI_PRESC 1       /* 4 ^ TWPS */
 
-		TWBR = (CLOCK_FREQ / (2 * TWI_FREQ * TWI_PRESC)) - (8 / TWI_PRESC);
+		TWBR = (CLOCK_FREQ / (2 * CONFIG_TWI_FREQ * TWI_PRESC)) - (8 / TWI_PRESC);
 		TWSR = 0;
 		TWCR = BV(TWEN);
 	);
