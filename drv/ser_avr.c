@@ -38,6 +38,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.24  2005/01/14 00:49:16  aleph
+ *#* Rename callbacks; SerialHardwareVT.txSending: New callback; Add SPI_BUS macros.
+ *#*
  *#* Revision 1.23  2005/01/11 18:09:07  aleph
  *#* Add ATmega8 SPI port definitions; Fix transmit complete IRQ bug; add strobe macros to uart1 and spi
  *#*
@@ -247,6 +250,36 @@
 	#ifdef __doxygen__
 	#define SER_UART1_BUS_TXOFF
 	#endif
+#endif
+/*\}*/
+
+
+/*!
+ * \name Overridable SPI hooks
+ *
+ * These can be redefined in hw.h to implement
+ * special bus policies such as slave select pin handling, etc.
+ *
+ * \{
+ */
+#ifndef SER_SPI_BUS_TXINIT
+	/*!
+	 * \def SER_SPI_BUS_TXINIT
+	 *
+	 * Default TXINIT macro - invoked in spi_init()
+	 * The default is no action.
+	 */
+	#define SER_SPI_BUS_TXINIT
+#endif
+
+#ifndef SER_SPI_BUS_TXCLOSE
+	/*!
+	 * \def SER_SPI_BUS_TXCLOSE
+	 *
+	 * Invoked after the last character has been transmitted.
+	 * The default is no action.
+	 */
+	#define SER_SPI_BUS_TXCLOSE
 #endif
 /*\}*/
 
@@ -489,12 +522,17 @@ static void spi_init(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(struct
 	/* Enable SPI, IRQ on, Master, CPU_CLOCK/16 */
 	SPCR = BV(SPE) | BV(SPIE) | BV(MSTR) | BV(SPR0);
 
+	SER_SPI_BUS_TXINIT;
+
 	SER_STROBE_INIT;
 }
 
 static void spi_cleanup(UNUSED_ARG(struct SerialHardware *, _hw))
 {
 	SPCR = 0;
+
+	SER_SPI_BUS_TXCLOSE;
+
 	/* Set all pins as inputs */
 	SPI_DDR &= ~(BV(SPI_MISO_BIT) | BV(SPI_MOSI_BIT) | BV(SPI_SCK_BIT));
 }
@@ -528,6 +566,13 @@ static void spi_setparity(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(i
 	// nop
 }
 
+static bool tx_sending(struct SerialHardware* _hw)
+{
+	struct AvrSerial *hw = (struct AvrSerial *)_hw;
+	return hw->sending;
+}
+
+
 
 // FIXME: move into compiler.h?  Ditch?
 #if COMPILER_C99
@@ -546,9 +591,10 @@ static const struct SerialHardwareVT UART0_VT =
 {
 	C99INIT(init, uart0_init),
 	C99INIT(cleanup, uart0_cleanup),
-	C99INIT(setbaudrate, uart0_setbaudrate),
-	C99INIT(setparity, uart0_setparity),
-	C99INIT(enabletxirq, uart0_enabletxirq),
+	C99INIT(setBaudrate, uart0_setbaudrate),
+	C99INIT(setParity, uart0_setparity),
+	C99INIT(txStart, uart0_enabletxirq),
+	C99INIT(txSending, tx_sending),
 };
 
 #if AVR_HAS_UART1
@@ -556,9 +602,10 @@ static const struct SerialHardwareVT UART1_VT =
 {
 	C99INIT(init, uart1_init),
 	C99INIT(cleanup, uart1_cleanup),
-	C99INIT(setbaudrate, uart1_setbaudrate),
-	C99INIT(setparity, uart1_setparity),
-	C99INIT(enabletxirq, uart1_enabletxirq),
+	C99INIT(setBaudrate, uart1_setbaudrate),
+	C99INIT(setParity, uart1_setparity),
+	C99INIT(txStart, uart1_enabletxirq),
+	C99INIT(txSending, tx_sending),
 };
 #endif // AVR_HAS_UART1
 
@@ -566,9 +613,10 @@ static const struct SerialHardwareVT SPI_VT =
 {
 	C99INIT(init, spi_init),
 	C99INIT(cleanup, spi_cleanup),
-	C99INIT(setbaudrate, spi_setbaudrate),
-	C99INIT(setparity, spi_setparity),
-	C99INIT(enabletxirq, spi_starttx),
+	C99INIT(setBaudrate, spi_setbaudrate),
+	C99INIT(setParity, spi_setparity),
+	C99INIT(txStart, spi_starttx),
+	C99INIT(txSending, tx_sending),
 };
 
 static struct AvrSerial UARTDescs[SER_CNT] =
