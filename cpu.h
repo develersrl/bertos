@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.30  2005/03/15 00:20:09  bernie
+ *#* BREAKPOINT, IRQ_RUNNING(), IRQ_GETSTATE(): New DSP56K macros.
+ *#*
  *#* Revision 1.29  2005/02/16 20:33:24  bernie
  *#* Preliminary PPC support.
  *#*
@@ -107,6 +110,7 @@
 #elif CPU_DSP56K
 
 	#define NOP                     asm(nop)
+	#define BREAKPOINT              asm(debug)
 	#define IRQ_DISABLE             do { asm(bfset #0x0200,SR); asm(nop); } while (0)
 	#define IRQ_ENABLE              do { asm(bfclr #0x0200,SR); asm(nop); } while (0)
 
@@ -114,6 +118,22 @@
 		do { (void)x; asm(move SR,x); asm(bfset #0x0200,SR); } while (0)
 	#define IRQ_RESTORE(x)  \
 		do { (void)x; asm(move x,SR); } while (0)
+
+	static inline bool irq_running(void)
+	{
+		extern void *user_sp;
+		return !!user_sp;
+	}
+	#define IRQ_RUNNING() irq_running()
+
+	static inline bool irq_getstate(void)
+	{
+		uint16_t x;
+		asm(move SR,x);
+		return !(x & 0x0200);
+	}
+	#define IRQ_GETSTATE() irq_getstate()
+
 
 
 	typedef uint16_t cpuflags_t;
@@ -346,6 +366,11 @@
 #ifndef CPU_BITS_PER_PTR
 #define CPU_BITS_PER_PTR    (SIZEOF_PTR * CPU_BITS_PER_CHAR)
 #endif
+
+#ifndef BREAKPOINT
+#define BREAKPOINT /* nop */
+#endif
+
 /*\}*/
 
 /* Sanity checks for the above definitions */
