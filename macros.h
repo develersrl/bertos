@@ -5,16 +5,18 @@
  * This file is part of DevLib - See devlib/README for information.
  * -->
  *
- * \version $Id$
+ * \brief Common and handy function macros
  *
+ * \version $Id$
  * \author Bernardo Innocenti <bernie@develer.com>
  * \author Giovanni Bajo <rasky@develer.com>
- *
- * \brief Common and handy function macros
  */
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2004/09/20 03:30:45  bernie
+ *#* C++ also has variadic macros.
+ *#*
  *#* Revision 1.6  2004/09/14 21:02:04  bernie
  *#* SWAP(), MINMAX(): New macros.
  *#*
@@ -126,7 +128,7 @@
 #define UINT32_LOG2(x) \
 	((x < 65536UL) ? UINT16_LOG2(x) : UINT16_LOG2((x) >> 16) + 16)
 
-#if COMPILER_C99
+#if COMPILER_C99 || defined(__cplusplus)
 	/*! Count the number of arguments (up to 16) */
 	#define PP_COUNT(...) \
 		PP_COUNT__(__VA_ARGS__,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0)
@@ -134,7 +136,7 @@
 		count
 #endif
 
-#if COMPILER_C99
+#if COMPILER_C99 || defined(__cplusplus)
 	/*!
 	 * \def BIT_CHANGE(reg, (mask, value), ...)
 	 *
