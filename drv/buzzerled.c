@@ -27,6 +27,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2004/12/08 09:43:41  bernie
+ *#* Add a todo item.
+ *#*
  *#* Revision 1.4  2004/08/25 14:12:08  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -71,7 +74,8 @@ void bld_init(void)
 
 void bld_beep(enum BLD_DEVICE device, uint16_t duration)
 {
-	struct Timer* t = &timers[device];
+	// \todo This is not reentrant for the same device. FIXME!
+	struct Timer *t = &timers[device];
 	timer_set_delay(t, duration);
 	timer_set_event_softint(t, hook_turn_off, t);
 	timer_add(t);
