@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.2  2004/08/04 15:54:18  rasky
+ * Merge da SC: prima versione veramente funzionante
+ *
  * Revision 1.1  2004/07/31 16:33:58  rasky
  * Spostato lo heap da kern/ a mware/
  *
@@ -27,6 +30,8 @@
  */
 
 #include "heap.h"
+#include <string.h>           // memset()
+#include <drv/kdebug.h>       // ASSERT()
 
 /* NOTE: struct size must be a 2's power! */
 typedef struct _MemChunk
@@ -35,55 +40,61 @@ typedef struct _MemChunk
 	size_t size;
 } MemChunk;
 
-static REGISTER MemChunk *FreeList;	/* Head of the free list */
-static uint8_t Heap[HEAP_SIZE];		/* Heap memory block */
+STATIC_ASSERT(IS_POW2(sizeof(MemChunk)));
 
+#define FREE_FILL_CODE     0xDEAD
+#define ALLOC_FILL_CODE    0xBEEF
 
-
-void heap_init(void)
+void heap_init(struct Heap* h, void* memory, size_t size)
 {
 #ifdef _DEBUG
-	int i;
-
-	/* Fill the heap with a "DEAD" code to help debugging */
-	for (i = 0; i < HEAP_SIZE / sizeof (uint16_t); i++)
-		((uint16_t *)Heap)[i] = MEM_FILL_CODE;
+	memset(memory, FREE_FILL_CODE, size);
 #endif
 
 	/* Initialize heap with a single big chunk */
-	FreeList = (MemChunk *)Heap;
-	FreeList->next = NULL;
-	FreeList->size = sizeof(Heap);
+	h->FreeList = (MemChunk *)memory;
+	h->FreeList->next = NULL;
+	h->FreeList->size = size;
 }
 
 
-void *heap_alloc(size_t size)
+void *heap_allocmem(struct Heap* h, size_t size)
 {
 	MemChunk *chunk, *prev;
 
 	/* Round size up to the allocation granularity */
 	size = ROUND2(size, sizeof(MemChunk));
 
+	/* Handle allocations of 0 bytes */
+	if (!size)
+		size = sizeof(MemChunk);
+
 	/* Walk on the free list looking for any chunk big enough to
 	 * fit the requested block size.
 	 */
-	for (prev = (MemChunk *)&FreeList, chunk = FreeList;
+	for (prev = (MemChunk *)&h->FreeList, chunk = h->FreeList;
 		chunk;
 		prev = chunk, chunk = chunk->next)
 	{
-		if (chunk->size <= size)
+		if (chunk->size >= size)
 		{
 			if (chunk->size == size)
 			{
 				/* Just remove this chunk from the free list */
 				prev->next = chunk->next;
+				#ifdef _DEBUG
+					memset(chunk, ALLOC_FILL_CODE, size);
+				#endif
 				return (void *)chunk;
 			}
 			else
 			{
 				/* Allocate from the END of an existing chunk */
-				prev->size -= size;
-				return (void *)(((uint8_t *)prev) + prev->size);
+				chunk->size -= size;
+				#ifdef _DEBUG
+					memset((uint8_t *)chunk + chunk->size, ALLOC_FILL_CODE, size);
+				#endif
+				return (void *)((uint8_t *)chunk + chunk->size);
 			}
 		}
 	}
@@ -92,44 +103,66 @@ void *heap_alloc(size_t size)
 }
 
 
-void heap_free(void *mem, size_t size)
+void heap_freemem(struct Heap* h, void *mem, size_t size)
 {
 	MemChunk *prev;
+
+	ASSERT(mem);
+
+#ifdef _DEBUG
+	memset(mem, FREE_FILL_CODE, size);
+#endif
 
 	/* Round size up to the allocation granularity */
 	size = ROUND2(size, sizeof(MemChunk));
 
+	/* Handle allocations of 0 bytes */
+	if (!size)
+		size = sizeof(MemChunk);
+
 	/* Special case: first chunk in the free list */
-	if (((uint8_t *)mem) < ((uint8_t *)FreeList))
+	ASSERT((uint8_t*)mem != (uint8_t*)h->FreeList);
+	if (((uint8_t *)mem) < ((uint8_t *)h->FreeList))
 	{
 		/* Insert memory block before the current free list head */
 		prev = (MemChunk *)mem;
-		prev->next = FreeList;
+		prev->next = h->FreeList;
 		prev->size = size;
-		FreeList = prev;
+		h->FreeList = prev;
 	}
 	else /* Normal case: not the first chunk in the free list */
 	{
-		/* Walk on the free list. Stop at the insertion point */
-		prev = FreeList;
-		while ((prev->next >= ((MemChunk *)mem)) || (!prev->next))
+		/*
+		 * Walk on the free list. Stop at the insertion point (when mem
+		 * is between prev and prev->next)
+		 */
+		prev = h->FreeList;
+		while (prev->next < (MemChunk *)mem && prev->next)
 			prev = prev->next;
 
+		/* Make sure mem is not *within* prev */
+		ASSERT((uint8_t*)mem >= (uint8_t*)prev + prev->size);
+
 		/* Should it be merged with previous block? */
-		if (((uint8_t *)prev) + prev->Size == ((uint8_t *)mem))
+		if (((uint8_t *)prev) + prev->size == ((uint8_t *)mem))
 		{
 			/* Yes */
 			prev->size += size;
 		}
 		else /* not merged with previous chunk */
 		{
+			MemChunk *curr = (MemChunk*)mem;
+
 			/* insert it after the previous node
 			 * and move the 'prev' pointer forward
 			 * for the following operations
 			 */
-			((MemChunk *)mem)->next = prev->next;
-			prev->next = (MemChunk *)mem;
-			prev = (MemChunk *)mem;
+			curr->next = prev->next;
+			curr->size = size;
+			prev->next = curr;
+
+			/* Adjust for the following test */
+			prev = curr;
 		}
 	}
 
@@ -138,47 +171,40 @@ void heap_free(void *mem, size_t size)
 	{
 		prev->size += prev->next->size;
 		prev->next = prev->next->next;
+
+		/* There should be only one merge opportunity, becuase we always merge on free */
+		ASSERT((uint8_t*)prev + prev->size != (uint8_t*)prev->next);
 	}
 }
 
-#ifdef __POSIX__
+#if CONFIG_HEAP_MALLOC
 
-/*! ANSI/POSIX-like malloc() implementation based on heap_alloc()/heap_free() */
-void *malloc(size_t size)
+void *heap_malloc(struct Heap* h, size_t size)
+{
+	size_t *mem;
+
+	size += sizeof(size_t);
+	if ((mem = (size_t*)heap_allocmem(h, size)))
+		*mem++ = size;
+
+	return mem;
+}
+
+void *heap_calloc(struct Heap* h, size_t size)
 {
 	void *mem;
 
-	size += sizeof(size_t);
-
-	if (mem = heap_alloc(size))
-		*((size_t *)mem)++ = size;
+	if ((mem = heap_malloc(h, size)))
+		memset(mem, 0, size);
 
 	return mem;
 }
 
-
-/*! ANSI/POSIX-like calloc() implementation based on heap_alloc()/heap_free() */
-void *calloc(size_t nelem, size_t size)
+void heap_free(struct Heap* h, void *mem_)
 {
-	void *mem, *tmp;
-
-	size *= nelem;
-
-	if (mem = malloc(size))
-	{
-		tmp = mem;
-		while (size--)
-			((uint8_t *)tmp++) = 0;
-	}
-
-	return mem;
+	size_t* mem = (size_t*)mem_;
+	--mem;
+	heap_freemem(h, mem, *mem);
 }
 
-/*! ANSI/POSIX-like free() implementation based on heap_alloc()/heap_free() */
-void free(void *mem)
-{
-	((size_t *)mem)--;
-	heap_free(mem, *((size_t *)mem));
-}
-
-#endif /* __POSIX__ */
+#endif /* CONFIG_HEAP_MALLOC */

@@ -11,10 +11,18 @@
  * \version $Id$
  *
  * \author Bernardo Innocenti <bernie@develer.com>
+ *
+ * \todo Heap memory could be defined as an array of MemChunk, and used
+ * in this form also within the implementation. This would probably remove
+ * memory alignment problems, and also some aliasing issues.
+ *
  */
 
 /*
  * $Log$
+ * Revision 1.2  2004/08/04 15:54:18  rasky
+ * Merge da SC: prima versione veramente funzionante
+ *
  * Revision 1.1  2004/07/31 16:33:58  rasky
  * Spostato lo heap da kern/ a mware/
  *
@@ -26,22 +34,50 @@
  *
  */
 
-#ifndef KERN_HEAP_H
-#define KERN_HEAP_H
+#ifndef MWARE_HEAP_H
+#define MWARE_HEAP_H
 
-#include "compiler.h"
+#include <compiler.h>
+#include <config.h>
+
+struct _MemChunk;
+
+//! A heap
+struct Heap
+{
+	struct _MemChunk *FreeList;     //!< Head of the free list
+};
 
 
-/* Memory allocation services */
-void heap_init(void);
-void *heap_alloc(size_t size);
-void heap_free(void *mem, size_t size);
+//! Initialize \a heap within the buffer pointed by \a memory which is of \a size bytes
+void heap_init(struct Heap* heap, void* memory, size_t size);
 
-#ifdef __POSIX__ /* unused */
-void *malloc(size_t size);
-void *calloc(unsigned int nelem, size_t size);
-void free(void * mem);
-#endif /* __POSIX__ */
+//! Allocate a chunk of memory of \a size bytes from the heap
+void *heap_allocmem(struct Heap* heap, size_t size);
 
-#endif /* KERN_HEAP_H */
+//! Free a chunk of memory of \a size bytes from the heap
+void heap_freemem(struct Heap* heap, void *mem, size_t size);
 
+
+#define HNEW(heap, type) \
+	(type*)heap_allocmem(heap, sizeof(type))
+
+#define HNEWVEC(heap, type, nelem) \
+	(type*)heap_allocmem(heap, sizeof(type) * (nelem))
+
+#define HDELETE(heap, type, mem) \
+	heap_freemem(heap, mem, sizeof(type))
+
+#define HDELETEVEC(heap, type, nelem, mem) \
+	heap_freemem(heap, mem, sizeof(type) * (nelem))
+
+
+#if CONFIG_HEAP_MALLOC
+
+void *heap_malloc(struct Heap* heap, size_t size);
+void *heap_calloc(struct Heap* heap, size_t size);
+void heap_free(struct Heap* heap, void * mem);
+
+#endif
+
+#endif /* MWARE_HEAP_H */
