@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.19  2004/10/19 11:47:39  bernie
+ *#* Kill warnings when !CONFIG_PROC_MONITOR.
+ *#*
  *#* Revision 1.18  2004/10/19 08:54:43  bernie
  *#* Initialize forbid_cnt; Formatting/comments fixes.
  *#*
@@ -255,6 +258,8 @@ void proc_rename(struct Process *proc, const char *name)
 {
 #if CONFIG_KERN_MONITOR
 	monitor_rename(proc, name);
+#else
+	(void)proc; (void)name;
 #endif
 }
 
