@@ -16,6 +16,10 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.13  2004/08/29 22:04:26  bernie
+ *#* Convert 485 macros to generic BUS macros;
+ *#* kputchar(): New public function.
+ *#*
  *#* Revision 1.12  2004/08/25 14:12:08  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -67,8 +71,8 @@
 	#define KDBG_WAIT_READY()      do { /*nop*/ } while(0)
 	#define KDBG_WRITE_CHAR(c)     putchar((c))
 	#define KDBG_MASK_IRQ(old)     do { (void)(old); } while(0)
-	#define KDBG_RESTORE_IRQ()     do { /*nop*/ } while(0)
-	typedef kdbg_irqsave_t         char; /* unused */
+	#define KDBG_RESTORE_IRQ(old)  do { /*nop*/ } while(0)
+	typedef char kdbg_irqsave_t; /* unused */
 #elif CPU_I196
 	#include "Util196.h"
 	#define KDBG_WAIT_READY()      do {} while (!(SP_STAT & (SPSF_TX_EMPTY | SPSF_TX_INT)))
@@ -79,21 +83,25 @@
 			INT_MASK1 &= ~INT1F_TI; \
 		} while(0)
 	#define KDBG_RESTORE_IRQ(old)  do { INT_MASK1 |= (old); }
-	typedef kdbg_irqsave_t         uint16_t; /* FIXME: unconfirmed */
+	typedef uint16_t kdbg_irqsave_t; /* FIXME: unconfirmed */
 #elif CPU_AVR
 	#include <avr/io.h>
+
 	#if CONFIG_KDEBUG_PORT == 0
 
-		/* External 485 transceiver on UART0 (to be overridden in "hw.h").  */
-		#if !defined(SER_UART0_485_INIT)
-			#if defined(SER_UART0_485_RX) || defined(SER_UART0_485_TX)
-				#error SER_UART0_485_INIT, SER_UART0_485_RX and SER_UART0_485_TX must be defined together
+		/*
+		 * Support for special bus policies or external transceivers
+		 * on UART0 (to be overridden in "hw.h").
+		 */
+		#if !defined(KDBG_UART0_BUS_INIT)
+			#if defined(KDBG_UART0_BUS_RX) || defined(KDBG_UART0_BUS_TX)
+				#error KDBG_UART0_BUS_INIT, KDBG_UART0_BUS_RX and KDBG_UART0_BUS_TX must be defined together
 			#endif
-			#define SER_UART0_485_INIT  do {} while (0)
-			#define SER_UART0_485_TX    do {} while (0)
-			#define SER_UART0_485_RX    do {} while (0)
-		#elif !defined(SER_UART0_485_RX) || !defined(SER_UART0_485_TX)
-			#error SER_UART0_485_INIT, SER_UART0_485_RX and SER_UART0_485_TX must be defined together
+			#define KDBG_UART0_BUS_INIT  do {} while (0)
+			#define KDBG_UART0_BUS_TX    do {} while (0)
+			#define KDBG_UART0_BUS_RX    do {} while (0)
+		#elif !defined(KDBG_UART0_BUS_RX) || !defined(KDBG_UART0_BUS_TX)
+			#error KDBG_UART0_BUS_INIT, KDBG_UART0_BUS_RX and KDBG_UART0_BUS_TX must be defined together
 		#endif
 
 		#if defined(__AVR_ATmega64__)
@@ -108,17 +116,18 @@
 		#define KDBG_WAIT_READY()     do { loop_until_bit_is_set(USR, UDRE); } while(0)
 		#define KDBG_WAIT_TXDONE()    do { loop_until_bit_is_set(USR, TXC); } while(0)
 		/*
-		 * BUG: before sending a new character the TXC flag is cleared to allow
-		 * KDBG_WAIT_TXDONE() to work properly, but, if KDBG_WRITE_CHAR() is called
-		 * after the RXC flag is set by hardware, a new TXC could be generated
-		 * after we clear it and before the new character is put in UDR. In this
-		 * case if a 485 is used the transceiver will be put in RX mode while
-		 * transmitting the last char.
+		 * We must clear the TXC flag before sending a new character to allow
+		 * KDBG_WAIT_TXDONE() to work properly.
+		 *
+		 * BUG: if KDBG_WRITE_CHAR() is called after the TXC flag is set by hardware,
+		 * a new TXC could be generated after we've cleared it and before the new
+		 * character is written to UDR.  On a 485 bus, the transceiver will be put
+		 * in RX mode while still transmitting the last char.
 		 */
 		#define KDBG_WRITE_CHAR(c)    do { USR |= BV(TXC); UDR = (c); } while(0)
 
 		#define KDBG_MASK_IRQ(old)    do { \
-			SER_UART0_485_TX; \
+			KDBG_UART0_BUS_TX; \
 			(old) = UCR; \
 			UCR |= BV(TXEN); \
 			UCR &= ~(BV(TXCIE) | BV(UDRIE)); \
@@ -126,24 +135,27 @@
 
 		#define KDBG_RESTORE_IRQ(old) do { \
 			KDBG_WAIT_TXDONE(); \
-			SER_UART0_485_RX; \
+			KDBG_UART0_BUS_RX; \
 			UCR = (old); \
 		} while(0)
 
-		typedef kdbg_irqsave_t uint8_t;
+		typedef uint8_t kdbg_irqsave_t;
 
 	#elif CONFIG_KDEBUG_PORT == 1
 
-		/* External 485 transceiver on UART1 (to be overridden in "hw.h").  */
-		#ifndef SER_UART1_485_INIT
-			#if defined(SER_UART1_485_RX) || defined(SER_UART1_485_TX)
-				#error SER_UART1_485_INIT, SER_UART1_485_RX and SER_UART1_485_TX must be defined together
+		/*
+		 * Support for special bus policies or external transceivers
+		 * on UART1 (to be overridden in "hw.h").
+		 */
+		#ifndef KDBG_UART1_BUS_INIT
+			#if defined(KDBG_UART1_BUS_RX) || defined(KDBG_UART1_BUS_TX)
+				#error KDBG_UART1_BUS_INIT, KDBG_UART1_BUS_RX and KDBG_UART1_BUS_TX must be defined together
 			#endif
-			#define SER_UART1_485_INIT  do {} while (0)
-			#define SER_UART1_485_TX    do {} while (0)
-			#define SER_UART1_485_RX    do {} while (0)
-		#elif !defined(SER_UART1_485_RX) || !defined(SER_UART1_485_TX)
-			#error SER_UART1_485_INIT, SER_UART1_485_RX and SER_UART1_485_TX must be defined together
+			#define KDBG_UART1_BUS_INIT  do {} while (0)
+			#define KDBG_UART1_BUS_TX    do {} while (0)
+			#define KDBG_UART1_BUS_RX    do {} while (0)
+		#elif !defined(KDBG_UART1_BUS_RX) || !defined(KDBG_UART1_BUS_TX)
+			#error KDBG_UART1_BUS_INIT, KDBG_UART1_BUS_RX and KDBG_UART1_BUS_TX must be defined together
 		#endif
 
 		#define KDBG_WAIT_READY()     do { loop_until_bit_is_set(UCSR1A, UDRE); } while(0)
@@ -151,7 +163,7 @@
 		#define KDBG_WRITE_CHAR(c)    do { UCSR1A |= BV(TXC); UDR1 = (c); } while(0)
 
 		#define KDBG_MASK_IRQ(old)    do { \
-			SER_UART1_485_TX; \
+			KDBG_UART1_BUS_TX; \
 			(old) = UCSR1B; \
 			UCSR1B |= BV(TXEN); \
 			UCSR1B &= ~(BV(TXCIE) | BV(UDRIE)); \
@@ -159,11 +171,11 @@
 
 		#define KDBG_RESTORE_IRQ(old) do { \
 			KDBG_WAIT_TXDONE(); \
-			SER_UART1_485_RX; \
+			KDBG_UART1_BUS_RX; \
 			UCSR1B = (old); \
 		} while(0)
 
-		typedef kdbg_irqsave_t uint8_t;
+		typedef uint8_t kdbg_irqsave_t;
 	#else
 		#error CONFIG_KDEBUG_PORT should be either 0 or 1
 	#endif
@@ -175,7 +187,7 @@
 	#define KDBG_WRITE_CHAR(c)        __put_char(c, stdout)
 	#define KDBG_MASK_IRQ(old)        do { (void)(old); } while (0)
 	#define KDBG_RESTORE_IRQ(old)     do { (void)(old); } while (0)
-	typedef kdbg_irqsave_t            uint8_t; /* unused */
+	typedef uint8_t kdbg_irqsave_t; /* unused */
 #else
 	#error Unknown architecture
 #endif
@@ -202,11 +214,11 @@ void kdbg_init(void)
 		#if CONFIG_KDEBUG_PORT == 0
 			UBRR0H = (uint8_t)(period>>8);
 			UBRR0L = (uint8_t)period;
-			SER_UART0_485_INIT;
+			KDBG_UART0_BUS_INIT;
 		#elif CONFIG_KDEBUG_PORT == 1
 			UBRR1H = (uint8_t)(period>>8);
 			UBRR1L = (uint8_t)period;
-			SER_UART1_485_INIT;
+			KDBG_UART1_BUS_INIT;
 		#else
 			#error CONFIG_KDEBUG_PORT must be either 0 or 1
 		#endif
@@ -215,7 +227,7 @@ void kdbg_init(void)
 		UBRRL = (uint8_t)period;
 	#elif defined(__AVR_ATmega103__)
 		UBRR = (uint8_t)period;
-		SER_UART0_485_INIT;
+		KDBG_UART0_BUS_INIT;
 	#else
 		#error Unknown arch
 	#endif
@@ -290,7 +302,7 @@ void PGM_FUNC(kputs)(const char * PGM_ATTR str)
 }
 
 
-int PGM_FUNC(__assert)(const char * PGM_ATTR cond, const char *file, int line)
+int PGM_FUNC(__assert)(const char * PGM_ATTR cond, const char * PGM_ATTR file, int line)
 {
 	PGM_FUNC(kputs)(file);
 	PGM_FUNC(kprintf)(PSTR(":%d: Assertion failed: "), line);
@@ -344,7 +356,7 @@ void kdump(const void *_buf, size_t len)
 
 	while (len--)
 		kprintf("%02X", *buf++);
-	kputs("\n");
+	kputchar('\n');
 }
 
 #endif /* _DEBUG */
