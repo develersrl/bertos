@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2004/10/26 09:02:13  bernie
+ *#* heap_free(): Handle NULL pointers like free(), write documentation.
+ *#*
  *#* Revision 1.5  2004/10/03 20:43:22  bernie
  *#* Import changes from sc/firmware.
  *#*
@@ -201,11 +204,28 @@ void *heap_calloc(struct Heap* h, size_t size)
 	return mem;
 }
 
-void heap_free(struct Heap* h, void *mem_)
+/*!
+ * Free a block of memory, determining its size automatically.
+ *
+ * \param h    Heap from which the block was allocated.
+ * \param mem  Pointer to a block of memory previously allocated with
+ *             either heap_malloc() or heap_calloc().
+ *
+ * \note If \a mem is a NULL pointer, no operation is performed.
+ *
+ * \note Freeing the same memory block twice has undefined behavior.
+ *
+ * \note This function works like the ANSI C free().
+ */
+void heap_free(struct Heap *h, void *mem)
 {
-	size_t* mem = (size_t*)mem_;
-	--mem;
-	heap_freemem(h, mem, *mem);
+	size_t *_mem = (size_t *)mem;
+
+	if (_mem)
+	{
+		--_mem;
+		heap_freemem(h, _mem, *_mem);
+	}
 }
 
 #endif /* CONFIG_HEAP_MALLOC */
