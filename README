@@ -36,7 +36,7 @@ you can configure out features you don't need.
 
 \section redist Directory Structure
 
-Most DevLib modules are sorted in subdirectories by their category:
+Modules are sorted in subdirectories by their category:
 
  - kern/ - Simple multitasking kernel implementation;
  - drv/ - Hardware drivers;
