@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2004/11/16 21:16:56  bernie
+ *#* Update to new naming scheme in mware/gfx.c.
+ *#*
  *#* Revision 1.7  2004/10/03 19:05:04  bernie
  *#* text_widthf(), text_vwidthf(): New functions.
  *#*
@@ -147,7 +150,7 @@ int PGM_FUNC(text_xprintf)(struct Bitmap *bm,
 			pad /= 2;
 
 		if (style & TEXT_FILL)
-			gfx_RectFillC(bm, 0, row * FONT_HEIGHT, pad, (row + 1) * FONT_HEIGHT,
+			gfx_rectFillC(bm, 0, row * FONT_HEIGHT, pad, (row + 1) * FONT_HEIGHT,
 				(style & STYLEF_INVERT) ? 0xFF : 0x00);
 
 		text_setcoord(bm, pad, row * FONT_HEIGHT);
@@ -157,7 +160,7 @@ int PGM_FUNC(text_xprintf)(struct Bitmap *bm,
 	va_end(ap);
 
 	if (style & TEXT_FILL)
-		gfx_RectFillC(bm, bm->penX, row * FONT_HEIGHT, bm->width, (row + 1) * FONT_HEIGHT,
+		gfx_rectFillC(bm, bm->penX, row * FONT_HEIGHT, bm->width, (row + 1) * FONT_HEIGHT,
 			(style & STYLEF_INVERT) ? 0xFF : 0x00);
 
 	/* Restore old style */

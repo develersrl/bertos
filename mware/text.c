@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2004/11/16 21:16:28  bernie
+ *#* Update to new naming scheme in mware/gfx.c.
+ *#*
  *#* Revision 1.7  2004/09/20 03:28:28  bernie
  *#* Fix header.
  *#*
@@ -201,7 +204,7 @@ int text_putchar(char c, struct Bitmap *bm)
 		switch (c)
 		{
 		case ANSI_ESC_CLEARSCREEN:
-			gfx_ClearBitmap(bm);
+			gfx_bitmapClear(bm);
 			bm->penX = 0;
 			bm->penY = 0;
 			text_style(0, STYLEF_MASK);
@@ -243,7 +246,7 @@ void text_clear(struct Bitmap *bmp)
 
 void text_clearLine(struct Bitmap *bmp, int line)
 {
-	gfx_ClearRect(bmp, 0, line * FONT_HEIGHT, bmp->width, (line + 1) * FONT_HEIGHT);
+	gfx_rectClear(bmp, 0, line * FONT_HEIGHT, bmp->width, (line + 1) * FONT_HEIGHT);
 }
 
 
