@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.35  2004/12/08 07:35:51  bernie
+ *#* Typo in macro name.
+ *#*
  *#* Revision 1.34  2004/11/28 23:21:33  bernie
  *#* Use mtime_t instead of overloading ANSI time_t with new semantics.
  *#*
@@ -273,8 +276,8 @@
  * \def COMPILER_VARIADIC_MACROS
  * Support for macros with variable arguments.
  */
-#ifndef COMPILER_HAVE_VARIADIC_MACROS
-#define COMPILER_HAVE_VARIADIC_MACROS (COMPILER_C99 != 0)
+#ifndef COMPILER_VARIADIC_MACROS
+#define COMPILER_VARIADIC_MACROS (COMPILER_C99 != 0)
 #endif
 
 /*!
