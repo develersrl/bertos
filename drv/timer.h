@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.5  2004/06/07 15:57:12  aleph
+ * Add function prototypes
+ *
  * Revision 1.4  2004/06/06 18:25:44  bernie
  * Rename event macros to look like regular functions.
  *
@@ -47,6 +50,7 @@ typedef struct Timer
 	Event  expire;    /*!< Event to execute when the timer expires */
 } Timer;
 
+/* Function protos */
 extern void timer_init(void);
 extern Timer *timer_new(void);
 extern void timer_delete(Timer *timer);
@@ -56,14 +60,19 @@ extern void timer_delay(time_t time);
 extern void timer_udelay(utime_t utime);
 INLINE time_t timer_gettick(void);
 INLINE time_t timer_gettick_irq(void);
+INLINE void timer_set_event_softint(Timer* timer, Hook func, void* user_data);
+INLINE void timer_set_delay(Timer* timer, time_t delay);
 
-#ifdef CONFIG_KERN_SIGNALS
+#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
+
 /*! Set the timer so that it sends a signal when it expires */
+INLINE void timer_set_event_signal(Timer* timer, struct Process* proc, sigset_t sigs);
 INLINE void timer_set_event_signal(Timer* timer, struct Process* proc, sigset_t sigs)
 {
 	event_initSignal(&timer->expire, proc, sigs);
 }
-#endif
+
+#endif /* CONFIG_KERN_SIGNALS */
 
 /*! Set the timer so that it calls an user hook when it expires */
 INLINE void timer_set_event_softint(Timer* timer, Hook func, void* user_data)

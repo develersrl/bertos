@@ -18,6 +18,9 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/06/07 15:58:00  aleph
+ * Add function prototypes
+ *
  * Revision 1.3  2004/06/06 18:25:44  bernie
  * Rename event macros to look like regular functions.
  *
@@ -84,6 +87,7 @@ typedef struct Event
 	((e)->action = EVENT_IGNORE)
 
 /*! Same as event_initNone(), but returns the initialized event */
+INLINE Event event_createNone(void);
 INLINE Event event_createNone(void)
 {
 	Event e;
@@ -96,6 +100,7 @@ INLINE Event event_createNone(void)
 	((e)->action = EVENT_SOFTINT,(e)->Ev.Int.func = (f), (e)->Ev.Int.user_data = (u))
 
 /*! Same as event_initSoftInt(), but returns the initialized event */
+INLINE Event event_createSoftInt(Hook func, void* user_data);
 INLINE Event event_createSoftInt(Hook func, void* user_data)
 {
 	Event e;
@@ -113,6 +118,7 @@ INLINE Event event_createSoftInt(Hook func, void* user_data)
 	((e)->action = EVENT_SIGNAL,(e)->Ev.Sig.sig_proc = (p), (e)->Ev.Sig.sig_bit = (s))
 
 /*! Same as event_initSignal(), but returns the initialized event */
+INLINE Event event_createSignal(struct Process* proc, sig_t bit);
 INLINE Event event_createSignal(struct Process* proc, sig_t bit)
 {
 	Event e;
