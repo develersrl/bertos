@@ -16,9 +16,9 @@
  * 38400bps on a 16MHz 80196.
  *
  * MODULE CONFIGURATION
- *	\li \c CONFIG_SER_HWHANDSHAKE define this preprocessor symbol to enable
- *	support for RTS/CTS handshake. Support is incomplete/untested
- *	for 80196.
+ *
+ *  \li \c CONFIG_SER_HWHANDSHAKE - set to 1 to enable RTS/CTS handshake.
+ *         Support is incomplete/untested.
  *  \li \c CONFIG_SER_TXTIMEOUT - Enable software serial transmission timeouts
  *
  *
@@ -28,6 +28,9 @@
 
 /*
  * $Log$
+ * Revision 1.9  2004/08/08 06:06:20  bernie
+ * Use new-style CONFIG_ idiom; Fix module-wide documentation.
+ *
  * Revision 1.8  2004/07/29 22:57:09  bernie
  * ser_drain(): New function; Make Serial::is_open a debug-only feature; Switch to new-style CONFIG_* macros.
  *
@@ -93,7 +96,7 @@ int ser_putchar(int c, struct Serial *port)
 		/* Attende finche' il buffer e' pieno... */
 		do
 		{
-#ifdef CONFIG_KERN_SCHED
+#if defined(CONFIG_KERN_SCHED) && CONFIG_KERN_SCHED
 			/* Give up timeslice to other processes. */
 			proc_switch();
 #endif
