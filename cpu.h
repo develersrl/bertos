@@ -17,6 +17,9 @@
 
 /*
  * $Log$
+ * Revision 1.7  2004/07/20 23:26:48  bernie
+ * Fix two errors introduced by previous commit.
+ *
  * Revision 1.6  2004/07/20 23:12:16  bernie
  * Rationalize and document SCHEDULER_IDLE.
  *
@@ -228,7 +231,7 @@
  * in hosted environments such as emulators.
  */
 #ifndef SCHEDULER_IDLE
-	#if (ARCH & ARCH_EMUL)
+	#if defined(ARCH_EMUL) && (ARCH & ARCH_EMUL)
 		/* This emulator hook should yeld the CPU to the host.  */
 		EXTERN_C_BEGIN
 		void SchedulerIdle(void);

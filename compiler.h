@@ -15,8 +15,11 @@
 
 /*
  * $Log$
+ * Revision 1.7  2004/07/20 23:26:48  bernie
+ * Fix two errors introduced by previous commit.
+ *
  * Revision 1.6  2004/07/20 23:12:43  bernie
- * Reverse the logic to provide defaults for undefined macros.
+ * *** empty log message ***
  *
  * Revision 1.5  2004/07/20 17:08:03  bernie
  * Cleanup documentation
@@ -168,10 +171,10 @@
 #ifndef FORMAT
 #define FORMAT(type,fmt,first) /* nothing */
 #endif
-#ifndef
+#ifndef DEPRECATED
 #define DEPRECATED             /* nothing */
 #endif
-#ifndef
+#ifndef UNUSED
 #define UNUSED(type,arg)       type arg
 #endif
 #ifndef REGISTER
