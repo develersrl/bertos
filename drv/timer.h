@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.8  2004/07/18 21:57:32  bernie
+ * timer_gettick(): Rename to timer_tick() and document better.
+ *
  * Revision 1.7  2004/06/27 15:26:17  aleph
  * Declaration fix for build with GCC 3.4
  *
@@ -43,7 +46,12 @@
 #include "cpu.h"
 #include "compiler.h"
 #include <mware/list.h>
-#include <kern/event.h>
+
+#ifdef CONFIG_KERNEL
+	#include <kern/event.h>
+#else
+	#include <mware/event.h>
+#endif
 
 /*! Number of timer ticks per second. */
 #define TICKS_PER_SEC       1000
@@ -62,8 +70,8 @@ extern void timer_add(Timer *timer);
 extern Timer *timer_abort(Timer *timer);
 extern void timer_delay(time_t time);
 extern void timer_udelay(utime_t utime);
-INLINE time_t timer_gettick(void);
-INLINE time_t timer_gettick_irq(void);
+INLINE time_t timer_tick(void);
+INLINE time_t timer_tick_unlocked(void);
 INLINE void timer_set_event_softint(Timer* timer, Hook func, void* user_data);
 INLINE void timer_set_delay(Timer* timer, time_t delay);
 
@@ -94,12 +102,30 @@ INLINE void timer_set_delay(Timer* timer, time_t delay)
 extern volatile time_t _clock;
 
 /*!
- * Return the system tick counter (expressed in ms)
- * This function must disable interrupts on 8/16bit CPUs because the
+ * \brief Return the system tick counter (expressed in ms)
+ *
+ * The result is guaranteed to increment monotonically,
+ * but client code must be tolerant with respect to overflows.
+ *
+ * The following code is safe:
+ *
+ * \example
+ *   time_t tea_start_time = get_tick();
+ *
+ *   boil_water();
+ *
+ *   if (get_tick() - tea_start_time > TEAPOT_DELAY)
+ *       printf("Your tea, Sir.\n");
+ * \endexample
+ *
+ * When the tick counter increments every millisecond and time_t
+ * is 32bit wide, the tick count will overflow every 49.7 days.
+ *
+ * \note This function must disable interrupts on 8/16bit CPUs because the
  * clock variable is larger than the processor word size and can't
  * be copied atomically.
  */
-INLINE time_t timer_gettick(void)
+INLINE time_t timer_tick(void)
 {
 	time_t result;
 	cpuflags_t flags;
@@ -111,15 +137,23 @@ INLINE time_t timer_gettick(void)
 	return result;
 }
 
+/* OBSOLETE */
+#define timer_gettick timer_tick
+
 
 /*!
- * Like \c timer_gettick, faster version to be called
+ * Like \c timer_tick, faster version to be called
  * from interrupt context only.
+ *
+ * \sa timer_tick
  */
-INLINE time_t timer_gettick_irq(void)
+INLINE time_t timer_tick_unlocked(void)
 {
 	return _clock;
 }
+
+/* OBSOLETE */
+#define timer_gettick_irq timer_tick_unlocked
 
 #endif /* DRV_TIMER_H */
 
