@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2004/10/21 09:37:55  bernie
+ *#* Revamp documentation.
+ *#*
  *#* Revision 1.8  2004/10/19 08:46:34  bernie
  *#* Fix header.
  *#*
@@ -44,12 +47,27 @@
 #ifndef MWARE_LIST_H
 #define MWARE_LIST_H
 
+/*!
+ * This structure represents a node for bidirectional lists.
+ *
+ * Data is usually appended to nodes by making them the first
+ * field of another struture, as a poor-man's form of inheritance.
+ */
 typedef struct _Node
 {
 	struct _Node *succ;
 	struct _Node *pred;
 } Node;
 
+/*!
+ * Head of a doubly-linked list of \c Node structs.
+ *
+ * Lists must be initialized with LIST_INIT() prior to use.
+ *
+ * Nodes can be added and removed from either end of the list
+ * with O(1) performance.  Iterating over these lists can be
+ * tricky: use the FOREACHNODE() macro instead.
+ */
 typedef struct _List
 {
 	Node *head;
@@ -58,23 +76,24 @@ typedef struct _List
 } List;
 
 
-/*! Template for a list of \a T  structures */
+/*! Template for a list of \a T structures. */
 #define DECLARE_LIST(T) \
 	struct { T *head; T *null; T *tail; }
 
-/*! Template for a node in a list of \a T structures */
+/*! Template for a node in a list of \a T structures. */
 #define DECLARE_NODE(T) \
 	struct { T *succ; T *pred; }
 
-/*! Template for a node in a list of \a T structures */
+/*! Template for a node in a list of \a T structures. */
 #define DECLARE_NODE_ANON(T) \
 	T *succ; T *pred;
 
 /*!
- * Iterate over all nodes in a list. This statement defines a for cicle
- * accepting the following parameters:
- * \param n   node pointer to be used in each iteration
- * \param l   pointer to list
+ * Iterate over all nodes in a list.
+ *
+ * This macro generates a "for" statement using the following parameters:
+ * \param n   Node pointer to be used in each iteration.
+ * \param l   Pointer to list.
  */
 #define FOREACHNODE(n,l) \
 	for( \
@@ -83,15 +102,18 @@ typedef struct _List
 		(n) = (typeof(n))(((Node *)(n))->succ) \
 	)
 
-/*! Initialize a list */
-#define INITLIST(l) \
+/*! Initialize a list. */
+#define LIST_INIT(l) \
 	do { \
 		(l)->head = (Node *)(&(l)->null); \
 		(l)->null = NULL; \
 		(l)->tail = (Node *)(&(l)->head); \
 	} while (0)
 
-/*! Add node to list head */
+/* OBSOLETE */
+#define INITLIST(l) LIST_INIT(l)
+
+/*! Add node to list head. */
 #define ADDHEAD(l,n) \
 	do { \
 		(n)->succ = (l)->head; \
@@ -100,7 +122,7 @@ typedef struct _List
 		(l)->head = (n); \
 	} while (0)
 
-/*! Add node to list tail */
+/*! Add node to list tail. */
 #define ADDTAIL(l,n) \
 	do { \
 		(n)->succ = (Node *)(&(l)->null); \
@@ -110,9 +132,10 @@ typedef struct _List
 	} while (0)
 
 /*!
- * Insert node \a n before node \a ln
- * Note: you can't pass in a list header as \a ln, but
- * it is safe to pass list-\>head of an empty list.
+ * Insert node \a n before node \a ln.
+ *
+ * \note You can't pass in a list header as \a ln, but
+ *       it is safe to pass list-\>head of an empty list.
  */
 #define INSERTBEFORE(n,ln) \
 	do { \
@@ -122,18 +145,24 @@ typedef struct _List
 		(ln)->pred = (n); \
 	} while (0)
 
-/*! Remove \a n from whatever list it is in */
+/*!
+ * Remove \a n from whatever list it is in.
+ *
+ * \note Removing a node that has not previously been
+ *       inserted into a list invokes undefined behavior.
+ */
 #define REMOVE(n) \
 	do { \
 		(n)->pred->succ = (n)->succ; \
 		(n)->succ->pred = (n)->pred; \
 	} while (0)
 
-/*! Tell whether a list is empty */
+/*! Tell whether a list is empty. */
 #define ISLISTEMPTY(l)  ( (l)->head == (Node *)(&(l)->null) )
 
 /*!
  * Unlink a node from the head of the list \a l.
+ *
  * \return Pointer to node, or NULL if the list was empty.
  */
 INLINE Node *REMHEAD(List *l)
@@ -151,6 +180,7 @@ INLINE Node *REMHEAD(List *l)
 
 /*!
  * Unlink a node from the tail of the list \a l.
+ *
  * \return Pointer to node, or NULL if the list was empty.
  */
 INLINE Node *REMTAIL(List *l)
