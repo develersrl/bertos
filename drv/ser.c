@@ -28,6 +28,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.24  2005/01/21 20:13:15  aleph
+ *#* Fix drain at ser_close()
+ *#*
  *#* Revision 1.23  2005/01/14 00:47:07  aleph
  *#* ser_drain(): Wait for hw transmission complete.
  *#*
@@ -507,8 +510,13 @@ void ser_close(struct Serial *port)
 
 	// Wait until we finish sending everything
 	ser_drain(port);
-	ser_purge(port);
 
 	port->hw->table->cleanup(port->hw);
 	DB(port->hw = NULL;)
+
+	/*
+	 * We purge the FIFO buffer only after the low-level cleanup, so that
+	 * we are sure that there are no more interrupts.
+	 */
+	ser_purge(port);
 }
