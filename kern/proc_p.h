@@ -1,8 +1,8 @@
 /*!
  * \file
  * <!--
- * Copyright 2001,2004 Develer S.r.l. (http://www.develer.com/)
- * Copyright 1999,2000,2001 Bernardo Innocenti <bernie@develer.com>
+ * Copyright 2001, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 1999, 2000, 2001 Bernardo Innocenti <bernie@develer.com>
  * This file is part of DevLib - See devlib/README for information.
  * -->
  *
@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.6  2004/08/24 16:05:15  bernie
+ * Add missing headers; Reformat.
+ *
  * Revision 1.5  2004/08/14 19:37:57  rasky
  * Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
  *
@@ -44,11 +47,11 @@
  * Add multithreading kernel
  *
  */
-
 #ifndef KERN_PROC_P_H
 #define KERN_PROC_P_H
 
 #include "compiler.h"
+#include "cpu.h"        /* for cpu_stack_t */
 #include "config.h"
 #include "config_kern.h"
 #include <mware/list.h>
@@ -73,10 +76,10 @@ typedef struct Process
 #if CONFIG_KERN_MONITOR
 	struct ProcMonitor
 	{
-		Node link;
-		const char* name;
-		cpustack_t* stack_base;
-		size_t stack_size;
+		Node        link;
+		const char *name;
+		cpustack_t *stack_base;
+		size_t      stack_size;
 	} monitor;
 #endif
 
