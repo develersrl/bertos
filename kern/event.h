@@ -18,6 +18,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2005/01/24 04:19:05  bernie
+ *#* Function pointer based event dispatching.
+ *#*
  *#* Revision 1.7  2004/08/25 14:12:09  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -46,7 +49,7 @@
 
 #include <config.h>
 
-#ifdef CONFIG_KERNEL
+#if CONFIG_KERNEL
 	#include "config_kern.h"
 	#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 		#include "signal.h"
@@ -57,23 +60,12 @@
 /* Forward decl */
 struct Process;
 
-
-/*! Event types */
-enum EventAction
-{
-	EVENT_IGNORE,	/*!< No-op event */
-#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
-	EVENT_SIGNAL,	/*!< Send a signal to a process */
-#endif
-	EVENT_SOFTINT	/*!< Trigger a software interrupt (i.e.: call user hook) */
-};
-
 //! User defined callback type
 typedef void (*Hook)(void *);
 
 typedef struct Event
 {
-	enum EventAction action;
+	void (*action)(struct Event *);
 	union
 	{
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
@@ -91,29 +83,32 @@ typedef struct Event
 	} Ev;
 } Event;
 
+void event_hook_ignore(Event *event);
+void event_hook_signal(Event *event);
+void event_hook_softint(Event *event);
 
 /*! Initialize the event \a e as a no-op */
 #define event_initNone(e) \
-	((e)->action = EVENT_IGNORE)
+	((e)->action = event_hook_ignore)
 
 /*! Same as event_initNone(), but returns the initialized event */
 INLINE Event event_createNone(void);
 INLINE Event event_createNone(void)
 {
 	Event e;
-	e.action = EVENT_IGNORE;
+	e.action = event_hook_ignore;
 	return e;
 }
 
 /*! Initialize the event \a e with a software interrupt (call function \a f, with parameter \a u) */
 #define event_initSoftInt(e,f,u) \
-	((e)->action = EVENT_SOFTINT,(e)->Ev.Int.func = (f), (e)->Ev.Int.user_data = (u))
+	((e)->action = event_hook_softint,(e)->Ev.Int.func = (f), (e)->Ev.Int.user_data = (u))
 
 /*! Same as event_initSoftInt(), but returns the initialized event */
 INLINE Event event_createSoftInt(Hook func, void* user_data)
 {
 	Event e;
-	e.action = EVENT_SOFTINT;
+	e.action = event_hook_softint;
 	e.Ev.Int.func = func;
 	e.Ev.Int.user_data = user_data;
 	return e;
@@ -124,13 +119,13 @@ INLINE Event event_createSoftInt(Hook func, void* user_data)
 
 /*! Initialize the event \a e with a signal (send signal \a s to process \a p) */
 #define event_initSignal(e,p,s) \
-	((e)->action = EVENT_SIGNAL,(e)->Ev.Sig.sig_proc = (p), (e)->Ev.Sig.sig_bit = (s))
+	((e)->action = event_hook_signal,(e)->Ev.Sig.sig_proc = (p), (e)->Ev.Sig.sig_bit = (s))
 
 /*! Same as event_initSignal(), but returns the initialized event */
 INLINE Event event_createSignal(struct Process* proc, sig_t bit)
 {
 	Event e;
-	e.action = EVENT_SIGNAL;
+	e.action = event_hook_signal;
 	e.Ev.Sig.sig_proc = proc;
 	e.Ev.Sig.sig_bit = bit;
 	return e;
@@ -141,12 +136,7 @@ INLINE Event event_createSignal(struct Process* proc, sig_t bit)
 /*! Trigger an event */
 INLINE void event_do(struct Event* e)
 {
-	if ((e)->action == EVENT_SOFTINT)
-		(e)->Ev.Int.func((e)->Ev.Int.user_data);
-#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
-	else if ((e)->action == EVENT_SIGNAL)
-		sig_signal((e)->Ev.Sig.sig_proc, (e)->Ev.Sig.sig_bit);
-#endif
+	e->action(e);
 }
 
 #ifdef CONFIG_KERN_OLDNAMES
