@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.22  2004/11/16 21:57:59  bernie
+ *#* CPU_IDLE: Rename from SCHEDULER_IDLE.
+ *#*
  *#* Revision 1.21  2004/11/16 21:34:25  bernie
  *#* Commonize obsolete names for IRQ macros; Doxygen fixes.
  *#*
@@ -368,16 +371,19 @@ STATIC_ASSERT(sizeof(int) == SIZEOF_INT);
  * profile system load with an external strobe, or to save CPU cycles
  * in hosted environments such as emulators.
  */
-#ifndef SCHEDULER_IDLE
+#ifndef CPU_IDLE
 	#if defined(ARCH_EMUL) && (ARCH & ARCH_EMUL)
 		/* This emulator hook should yield the CPU to the host.  */
 		EXTERN_C_BEGIN
 		void SchedulerIdle(void);
 		EXTERN_C_END
-		#define SCHEDULER_IDLE SchedulerIdle()
+		#define CPU_IDLE SchedulerIdle()
 	#else /* !ARCH_EMUL */
-		#define SCHEDULER_IDLE do { /* nothing */ } while (0)
+		#define CPU_IDLE do { /* nothing */ } while (0)
 	#endif /* !ARCH_EMUL */
-#endif /* !SCHEDULER_IDLE */
+#endif /* !CPU_IDLE */
+
+/* OBSOLETE */
+#define SCHEDULER_IDLE CPU_IDLE
 
 #endif /* DEVLIB_CPU_H */
