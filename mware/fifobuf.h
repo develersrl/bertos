@@ -18,7 +18,7 @@
  * \li \c tail punta alla posizione successiva all'ultimo elemento inserito.
  * \li quando uno dei due puntatori raggiunge @c end, viene resettato a @c begin.
  *
- * <pre>
+ * \code
  *
  *  +-----------------------------------+
  *  |  vuoto  |   dati validi  |  vuoto |
@@ -26,7 +26,7 @@
  *  ^         ^                ^        ^
  *  begin    head             tail     end
  *
- * </pre>
+ * \endcode
  *
  * Il buffer e' VUOTO quando head e tail coincidono:
  *		\code head == tail \endcode
@@ -41,6 +41,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/06/03 15:04:10  aleph
+ * Merge improvements from project_ks (mainly inlining)
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -80,26 +83,27 @@
 #define MWARE_FIFO_H
 
 #include "cpu.h"
-#ifndef COMPILER_H
-#include "compiler.h"
-#endif
 
 typedef struct FIFOBuffer
 {
-	unsigned char *head;
-	unsigned char *tail;
+	unsigned char * volatile head;
+	unsigned char * volatile tail;
 	unsigned char *begin;
 	unsigned char *end;
 } FIFOBuffer;
 
+
 /* Public function prototypes */
-void fifo_init(volatile FIFOBuffer *fb, unsigned char *buf, size_t size);
-
+INLINE bool fifo_isempty(const FIFOBuffer *fb);
+INLINE bool fifo_isempty_locked(const FIFOBuffer *fb);
+INLINE bool fifo_isfull(const FIFOBuffer *fb);
+INLINE bool fifo_isfull_locked(const FIFOBuffer *fb);
 #pragma interrupt called
-void fifo_push(volatile FIFOBuffer *fb, unsigned char c);
-
+INLINE void fifo_push(FIFOBuffer *fb, unsigned char c);
 #pragma interrupt called
-unsigned char fifo_pop(volatile FIFOBuffer *fb);
+INLINE unsigned char fifo_pop(FIFOBuffer *fb);
+INLINE void fifo_flush(FIFOBuffer *fb);
+INLINE void fifo_init(FIFOBuffer *fb, unsigned char *buf, size_t size);
 
 
 /*!
@@ -109,7 +113,11 @@ unsigned char fifo_pop(volatile FIFOBuffer *fb);
  *       execution context is calling fifo_push() or fifo_pop()
  *       only if the CPU can atomically update a pointer.
  */
-#define fifo_isempty(fb)	((fb)->head == (fb)->tail)
+INLINE bool fifo_isempty(const FIFOBuffer *fb)
+{
+	return fb->head == fb->tail;
+}
+
 
 /*!
  * Check whether the fifo is full
@@ -124,14 +132,13 @@ unsigned char fifo_pop(volatile FIFOBuffer *fb);
  *       fifo_isfull() and fifo_push() are usually called
  *       in the producer context.
  */
-#define fifo_isfull(fb) \
-	((((fb)->head == (fb)->begin) && ((fb)->tail == (fb)->end)) \
-	|| ((fb)->tail == (fb)->head - 1))
+INLINE bool fifo_isfull(const FIFOBuffer *fb)
+{
+	return
+		((fb->head == fb->begin) && (fb->tail == fb->end))
+		|| (fb->tail == fb->head - 1);
+}
 
-/*!
- * Make the fifo empty, discarding all its current contents.
- */
-#define fifo_flush(fb)	((fb)->head = (fb)->tail)
 
 #if !defined(__AVR__)
 
@@ -140,26 +147,25 @@ unsigned char fifo_pop(volatile FIFOBuffer *fb);
 
 #else /* !__AVR__ */
 
-	INLINE bool fifo_isempty_locked(const volatile FIFOBuffer *_fb);
-	INLINE bool fifo_isempty_locked(const volatile FIFOBuffer *_fb)
+	INLINE bool fifo_isempty_locked(const FIFOBuffer *fb)
 	{
-		bool _result;
-		cpuflags_t _flags;
+		bool result;
+		cpuflags_t flags;
 
-		DISABLE_IRQSAVE(_flags);
-		_result = fifo_isempty(_fb);
-		ENABLE_IRQRESTORE(_flags);
+		DISABLE_IRQSAVE(flags);
+		result = fifo_isempty(fb);
+		ENABLE_IRQRESTORE(flags);
 
-		return _result;
+		return result;
 	}
 
 #endif /* !__AVR__ */
 
+
 /*!
  * Thread safe version of fifo_isfull()
  */
-INLINE bool fifo_isfull_locked(const volatile FIFOBuffer *_fb);
-INLINE bool fifo_isfull_locked(const volatile FIFOBuffer *_fb)
+INLINE bool fifo_isfull_locked(const FIFOBuffer *_fb)
 {
 	bool _result;
 	cpuflags_t _flags;
@@ -171,5 +177,131 @@ INLINE bool fifo_isfull_locked(const volatile FIFOBuffer *_fb)
 	return _result;
 }
 
-#endif /* MWARE_FIFOBUF_H */
+
+/*!
+ * Pop a character from the fifo buffer.
+ *
+ * \note Calling \c fifo_push() on a full buffer is undefined.
+ *       The caller must make sure the buffer has at least
+ *       one free slot before calling this function.
+ *
+ * \note It is safe to call fifo_pop() and fifo_push() from
+ *       concurrent contexts.
+ */
+INLINE void fifo_push(FIFOBuffer *fb, unsigned char c)
+{
+	/* Write at tail position */
+	*(fb->tail) = c;
+
+	if (fb->tail == fb->end)
+		/* wrap tail around */
+		fb->tail = fb->begin;
+	else
+		/* Move tail forward */
+		fb->tail++;
+}
+
+
+/*!
+ * Pop a character from the fifo buffer.
+ *
+ * \note Calling \c fifo_pop() on an empty buffer is undefined.
+ *       The caller must make sure the buffer contains at least
+ *       one character before calling this function.
+ *
+ * \note It is safe to call fifo_pop() and fifo_push() from
+ *       concurrent contexts.
+ */
+INLINE unsigned char fifo_pop(FIFOBuffer *fb)
+{
+	if (fb->head == fb->end)
+	{
+		/* wrap head around */
+		fb->head = fb->begin;
+		return *(fb->end);
+	}
+	else
+		/* move head forward */
+		return *(fb->head++);
+}
+
+
+/*!
+ * Make the fifo empty, discarding all its current contents.
+ */
+INLINE void fifo_flush(FIFOBuffer *fb)
+{
+	fb->head = fb->tail;
+}
+
+
+/*!
+ * FIFO Initialization.
+ */
+INLINE void fifo_init(FIFOBuffer *fb, unsigned char *buf, size_t size)
+{
+	fb->head = fb->tail = fb->begin = buf;
+	fb->end = buf + size - 1;
+}
+
+
+
+#if 0
+
+/*
+ * UNTESTED: if uncommented, to be moved in fifobuf.c
+ */
+void fifo_pushblock(FIFOBuffer *fb, unsigned char *block, size_t len)
+{
+	size_t freelen;
+
+	/* Se c'e' spazio da tail alla fine del buffer */
+	if (fb->tail >= fb->head)
+	{
+		freelen = fb->end - fb->tail + 1;
+
+		/* C'e' abbastanza spazio per scrivere tutto il blocco? */
+		if (freelen < len)
+		{
+			/* Scrivi quello che entra fino alla fine del buffer */
+			memcpy(fb->tail, block, freelen);
+			block += freelen;
+			len -= freelen;
+			fb->tail = fb->begin;
+		}
+		else
+		{
+			/* Scrivi tutto il blocco */
+			memcpy(fb->tail, block, len);
+			fb->tail += len;
+			return;
+		}
+	}
+
+	for(;;)
+	{
+		while (!(freelen = fb->head - fb->tail - 1))
+			Delay(FIFO_POLLDELAY);
+
+		/* C'e' abbastanza spazio per scrivere tutto il blocco? */
+		if (freelen < len)
+		{
+			/* Scrivi quello che entra fino alla fine del buffer */
+			memcpy(fb->tail, block, freelen);
+			block += freelen;
+			len -= freelen;
+			fb->tail += freelen;
+		}
+		else
+		{
+			/* Scrivi tutto il blocco */
+			memcpy(fb->tail, block, len);
+			fb->tail += len;
+			return;
+		}
+	}
+}
+#endif
+
+#endif /* MWARE_FIFO_H */
 
