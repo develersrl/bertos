@@ -16,6 +16,9 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/06/06 18:09:51  bernie
+ * Import DSP56800 changes; Print broken wall bricks in hex.
+ *
  * Revision 1.3  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -68,6 +71,14 @@
 	#else
 		#error CONFIG_KDEBUG_PORT should be either 0 or 1
 	#endif
+#elif defined(__MWERKS__) && (defined(__m56800E__) || defined(__m56800__))
+	/* Debugging go through the JTAG interface. The MSL library already
+	   implements the console I/O correctly. */
+	#include <stdio.h>
+	#define KDBG_WAIT_READY()
+	#define KDBG_WRITE_CHAR(c)        do { char ch=c; fwrite(&ch,1,1,stdout); } while (0)
+	#define KDBG_MASK_IRQ(old)
+	#define KDBG_RESTORE_IRQ(old)
 #else
 	#error Unknown architecture
 #endif
@@ -206,7 +217,7 @@ int __check_wall(long *wall, int size, const char *name, const char *file, int l
 	{
 		if (wall[i] != WALL_VALUE)
 		{
-			kprintf("%s:%d: Wall broken: %s[%d] (0x%p) = %ld\n",
+			kprintf("%s:%d: Wall broken: %s[%d] (0x%p) = 0x%lx\n",
 				file, line, name, i, wall + i, wall[i]);
 			fail = 1;
 		}
