@@ -1,8 +1,10 @@
 /*!
  * \file
- * Copyright (C) 2003,2004 Develer S.r.l. (http://www.develer.com/)
- * Copyright (C) 2001 Bernardo Innocenti <bernie@develer.com>
+ * <!--
+ * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2001 Bernardo Innocenti <bernie@develer.com>
  * This file is part of DevLib - See devlib/README for information.
+ * -->
  *
  * \version $Id$
  *
@@ -13,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2004/10/19 08:46:34  bernie
+ *#* Fix header.
+ *#*
  *#* Revision 1.7  2004/08/25 14:12:09  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
