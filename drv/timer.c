@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.23  2004/12/13 12:07:06  bernie
+ *#* DISABLE_IRQSAVE/ENABLE_IRQRESTORE: Convert to IRQ_SAVE_DISABLE/IRQ_RESTORE.
+ *#*
  *#* Revision 1.22  2004/12/08 09:12:09  bernie
  *#* Rename time_t to mtime_t.
  *#*
@@ -146,7 +149,7 @@ void timer_add(Timer *timer)
 	Timer *node;
 	cpuflags_t flags;
 
-	DISABLE_IRQSAVE(flags);
+	IRQ_SAVE_DISABLE(flags);
 
 	/* Calculate expiration time for this timer */
 	timer->tick = _clock + timer->delay;
@@ -172,19 +175,16 @@ void timer_add(Timer *timer)
 	/* Enqueue timer request into the list */
 	INSERTBEFORE(&timer->link, &node->link);
 
-	ENABLE_IRQRESTORE(flags);
+	IRQ_RESTORE(flags);
 }
 
 
 /*!
- * Remove a timer from the timer queue before it has expired
+ * Remove a timer from the timer queue before it has expired.
  */
 Timer *timer_abort(Timer *timer)
 {
-	cpuflags_t flags;
-	DISABLE_IRQSAVE(flags);
-	REMOVE(&timer->link);
-	ENABLE_IRQRESTORE(flags);
+	ATOMIC(REMOVE(&timer->link));
 
 	return timer;
 }
@@ -193,7 +193,7 @@ Timer *timer_abort(Timer *timer)
 
 
 /*!
- * Wait for the specified amount of time (expressed in ms)
+ * Wait for the specified amount of time (expressed in ms).
  */
 void timer_delay(mtime_t time)
 {
@@ -229,7 +229,7 @@ void timer_delay(mtime_t time)
 
 #ifndef CONFIG_TIMER_DISABLE_UDELAY
 /*!
- * Wait for the specified amount of time (expressed in microseconds)
+ * Wait for the specified amount of time (expressed in microseconds).
  *
  * \bug In AVR arch the maximum amount of time that can be used as
  *      delay could be very limited, depending on the hardware timer

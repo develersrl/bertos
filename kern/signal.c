@@ -66,6 +66,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2004/12/13 12:07:06  bernie
+ *#* DISABLE_IRQSAVE/ENABLE_IRQRESTORE: Convert to IRQ_SAVE_DISABLE/IRQ_RESTORE.
+ *#*
  *#* Revision 1.9  2004/12/08 08:57:35  bernie
  *#* Rename sigset_t to sigmask_t.
  *#*
@@ -103,7 +106,6 @@
 #include "hw.h"
 #include <debug.h>
 
-// FIXME
 #if CONFIG_KERN_SIGNALS
 
 /*!
@@ -115,10 +117,11 @@ sigmask_t sig_check(sigmask_t sigs)
 	sigmask_t result;
 	cpuflags_t flags;
 
-	DISABLE_IRQSAVE(flags);
+	IRQ_SAVE_DISABLE(flags);
 	result = CurrentProcess->sig_recv & sigs;
 	CurrentProcess->sig_recv &= ~sigs;
-	ENABLE_IRQRESTORE(flags);
+	IRQ_RESTORE(flags);
+
 	return result;
 }
 
@@ -132,7 +135,7 @@ sigmask_t sig_wait(sigmask_t sigs)
 	sigmask_t result;
 	cpuflags_t flags;
 
-	DISABLE_IRQSAVE(flags);
+	IRQ_SAVE_DISABLE(flags);
 
 	/* Loop until we get at least one of the signals */
 	while (!(result = CurrentProcess->sig_recv & sigs))
@@ -148,7 +151,8 @@ sigmask_t sig_wait(sigmask_t sigs)
 
 	/* Signals found: clear them and return */
 	CurrentProcess->sig_recv &= ~sigs;
-	ENABLE_IRQRESTORE(flags);
+
+	IRQ_RESTORE(flags);
 	return result;
 }
 
@@ -162,7 +166,7 @@ sigmask_t sig_wait(sigmask_t sigs)
 void sig_signal(Process *proc, sigmask_t sigs)
 {
 	cpuflags_t flags;
-	DISABLE_IRQSAVE(flags);
+	IRQ_SAVE_DISABLE(flags);
 
 	/* Set the signals */
 	proc->sig_recv |= sigs;
@@ -175,7 +179,7 @@ void sig_signal(Process *proc, sigmask_t sigs)
 		SCHED_ENQUEUE(proc);
 	}
 
-	ENABLE_IRQRESTORE(flags);
+	IRQ_RESTORE(flags);
 }
 
 #endif /* CONFIG_KERN_SIGNALS */

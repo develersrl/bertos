@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.21  2004/12/13 12:07:06  bernie
+ *#* DISABLE_IRQSAVE/ENABLE_IRQRESTORE: Convert to IRQ_SAVE_DISABLE/IRQ_RESTORE.
+ *#*
  *#* Revision 1.20  2004/11/16 20:59:46  bernie
  *#* Include <avr/io.h> explicitly.
  *#*
@@ -96,7 +99,7 @@
 	static void timer_hw_init(void)
 	{
 		cpuflags_t flags;
-		DISABLE_IRQSAVE(flags);
+		IRQ_SAVE_DISABLE(flags);
 
 		/* Reset Timer flags */
 		TIFR = BV(OCF0) | BV(TOV0);
@@ -117,7 +120,7 @@
 		TIMSK &= ~BV(TOIE0);
 		TIMSK |= BV(OCIE0);
 
-		ENABLE_IRQRESTORE(flags);
+		IRQ_RESTORE(flags);
 	}
 
 	//! Frequency of the hardware high precision timer
@@ -136,7 +139,7 @@
 	static void timer_hw_init(void)
 	{
 		cpuflags_t flags;
-		DISABLE_IRQSAVE(flags);
+		IRQ_SAVE_DISABLE(flags);
 
 		/* Reset Timer overflow flag */
 		TIFR |= BV(TOV1);
@@ -153,7 +156,7 @@
 		/* Enable timer interrupt: Timer/Counter1 Overflow */
 		TIMSK |= BV(TOIE1);
 
-		ENABLE_IRQRESTORE(flags);
+		IRQ_RESTORE(flags);
 	}
 
 	//! Frequency of the hardware high precision timer
@@ -172,7 +175,7 @@
 	static void timer_hw_init(void)
 	{
 		cpuflags_t flags;
-		DISABLE_IRQSAVE(flags);
+		IRQ_SAVE_DISABLE(flags);
 
 		/* Reset Timer flags */
 		TIFR = BV(OCF2) | BV(TOV2);
@@ -194,7 +197,7 @@
 		TIMSK &= ~BV(TOIE2);
 		TIMSK |= BV(OCIE2);
 
-		ENABLE_IRQRESTORE(flags);
+		IRQ_RESTORE(flags);
 	}
 
 	//! Frequency of the hardware high precision timer

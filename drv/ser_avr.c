@@ -38,6 +38,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.21  2004/12/13 12:07:06  bernie
+ *#* DISABLE_IRQSAVE/ENABLE_IRQRESTORE: Convert to IRQ_SAVE_DISABLE/IRQ_RESTORE.
+ *#*
  *#* Revision 1.20  2004/12/13 11:51:43  bernie
  *#* Fix a latent bug with reentrant serial IRQs.
  *#*
@@ -476,7 +479,7 @@ static void spi_starttx(struct SerialHardware *_hw)
 	struct AvrSerial *hw = (struct AvrSerial *)_hw;
 
 	cpuflags_t flags;
-	DISABLE_IRQSAVE(flags);
+	IRQ_SAVE_DISABLE(flags);
 
 	/* Send data only if the SPI is not already transmitting */
 	if (!hw->sending && !fifo_isempty(&ser_spi->txfifo))
@@ -485,7 +488,7 @@ static void spi_starttx(struct SerialHardware *_hw)
 		SPDR = fifo_pop(&ser_spi->txfifo);
 	}
 
-	ENABLE_IRQRESTORE(flags);
+	IRQ_RESTORE(flags);
 }
 
 static void spi_setbaudrate(UNUSED(struct SerialHardware *, _hw), UNUSED(unsigned long, rate))

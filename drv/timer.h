@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.22  2004/12/13 12:07:06  bernie
+ *#* DISABLE_IRQSAVE/ENABLE_IRQRESTORE: Convert to IRQ_SAVE_DISABLE/IRQ_RESTORE.
+ *#*
  *#* Revision 1.21  2004/12/09 08:35:21  bernie
  *#* Replace IPTR with iptr_t.
  *#*
@@ -173,11 +176,8 @@ extern volatile mtime_t _clock;
 INLINE mtime_t timer_ticks(void)
 {
 	mtime_t result;
-	cpuflags_t flags;
 
-	DISABLE_IRQSAVE(flags);
-	result = _clock;
-	ENABLE_IRQRESTORE(flags);
+	ATOMIC(result = _clock);
 
 	return result;
 }

@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.12  2004/12/13 12:07:06  bernie
+ *#* DISABLE_IRQSAVE/ENABLE_IRQRESTORE: Convert to IRQ_SAVE_DISABLE/IRQ_RESTORE.
+ *#*
  *#* Revision 1.11  2004/12/08 09:11:53  bernie
  *#* Rename time_t to mtime_t.
  *#*
@@ -76,36 +79,17 @@
 	#define IS_BUZZER_ON  (PORTG & BV(PG0))
 
 	/*!
-	 * Buzzer manipulation macros
+	 * \name Buzzer manipulation macros.
 	 *
 	 * \note Some PORTG functions are being used from
 	 *       interrupt code, so we must be careful to
 	 *       avoid race conditions.
+	 * \{
 	 */
-	#define BUZZER_ON \
-	do { \
-		cpuflags_t _flags; \
-		DISABLE_IRQSAVE(_flags); \
-		PORTG |= BV(PG0); \
-		ENABLE_IRQRESTORE(_flags); \
-	} while (0)
-
-	#define BUZZER_OFF \
-	do { \
-		cpuflags_t _flags; \
-		DISABLE_IRQSAVE(_flags); \
-		PORTG &= ~BV(PG0); \
-		ENABLE_IRQRESTORE(_flags); \
-	} while (0)
-
-	#define BUZZER_INIT \
-	do { \
-		cpuflags_t _flags; \
-		DISABLE_IRQSAVE(_flags); \
-		PORTG &= ~BV(PG0); \
-		DDRG |= BV(PG0); \
-		ENABLE_IRQRESTORE(_flags); \
-	} while (0)
+	#define BUZZER_ON ATOMIC(PORTG |= BV(PG0))
+	#define BUZZER_OFF ATOMIC(PORTG &= ~BV(PG0))
+	#define BUZZER_INIT ATOMIC(PORTG &= ~BV(PG0); DDRG |= BV(PG0);)
+	/*\}*/
 
 #elif defined(__IAR_SYSTEMS_ICC) || defined(__IAR_SYSTEMS_ICC__) /* 80C196 */
 
@@ -159,9 +143,9 @@ static void buz_softint(void)
 void buz_beep(mtime_t time)
 {
 	cpuflags_t flags;
+	IRQ_SAVE_DISABLE(flags);
 
 	/* Remove the software interrupt if it was already queued */
-	DISABLE_IRQSAVE(flags);
 	if (buz_timer_running)
 		timer_abort(&buz_timer);
 
@@ -173,7 +157,7 @@ void buz_beep(mtime_t time)
 	buz_timer.delay = time;
 	timer_add(&buz_timer);
 
-	ENABLE_IRQRESTORE(flags);
+	IRQ_RESTORE(flags);
 }
 
 
@@ -194,7 +178,7 @@ void buz_repeat_start(mtime_t duration, mtime_t interval)
 void buz_repeat_stop(void)
 {
 	cpuflags_t flags;
-	DISABLE_IRQSAVE(flags);
+	IRQ_SAVE_DISABLE(flags);
 
 	/* Remove the software interrupt if it was already queued */
 	if (buz_timer_running)
@@ -206,7 +190,7 @@ void buz_repeat_stop(void)
 	buz_repeat_interval = 0;
 	BUZZER_OFF;
 
-	ENABLE_IRQRESTORE(flags);
+	IRQ_RESTORE(flags);
 }
 
 

@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.14  2004/12/13 12:07:06  bernie
+ *#* DISABLE_IRQSAVE/ENABLE_IRQRESTORE: Convert to IRQ_SAVE_DISABLE/IRQ_RESTORE.
+ *#*
  *#* Revision 1.13  2004/11/16 20:58:51  bernie
  *#* Add write verify.
  *#*
@@ -63,6 +66,7 @@
 #include <mware/byteorder.h> /* cpu_to_be16() */
 #include <debug.h>
 #include <hw.h>
+#include <cpu.h>     // IRQ_SAVE_DISABLE(), IRQ_RESTORE()
 #include <config.h>  // CONFIG_EEPROM_VERIFY
 #include <macros.h>  // MIN()
 
@@ -470,7 +474,7 @@ void eeprom_erase(e2addr_t addr, size_t count)
 void eeprom_init(void)
 {
 	cpuflags_t flags;
-	DISABLE_IRQSAVE(flags);
+	IRQ_SAVE_DISABLE(flags);
 
 	/*
 	 * This is pretty useless according to AVR's datasheet,
@@ -500,7 +504,7 @@ void eeprom_init(void)
 	TWSR = 0;
 	TWCR = BV(TWEN);
 
-	ENABLE_IRQRESTORE(flags);
+	IRQ_RESTORE(flags);
 }
 
 

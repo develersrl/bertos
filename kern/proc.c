@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.23  2004/12/13 12:07:06  bernie
+ *#* DISABLE_IRQSAVE/ENABLE_IRQRESTORE: Convert to IRQ_SAVE_DISABLE/IRQ_RESTORE.
+ *#*
  *#* Revision 1.22  2004/12/13 11:51:08  bernie
  *#* DISABLE_INTS/ENABLE_INTS: Convert to IRQ_DISABLE/IRQ_ENABLE.
  *#*
@@ -251,9 +254,7 @@ struct Process *proc_new_with_name(UNUSED(const char*, name), void (*entry)(void
 		CPU_PUSH_WORD(proc->stack, CPU_REG_INIT_VALUE(i));
 
 	/* Add to ready list */
-	DISABLE_IRQSAVE(flags);
-	SCHED_ENQUEUE(proc);
-	ENABLE_IRQRESTORE(flags);
+	ATOMIC(SCHED_ENQUEUE(proc));
 
 #if CONFIG_KERN_MONITOR
 	monitor_add(proc, name, stack_base, stacksize);
@@ -294,7 +295,7 @@ void proc_schedule(void)
 	old_process = CurrentProcess;
 
 	/* Poll on the ready queue for the first ready process */
-	DISABLE_IRQSAVE(flags);
+	IRQ_SAVE_DISABLE(flags);
 	while (!(CurrentProcess = (struct Process *)REMHEAD(&ProcReadyList)))
 	{
 		/*
@@ -311,7 +312,7 @@ void proc_schedule(void)
 		SCHEDULER_IDLE;
 		IRQ_DISABLE;
 	}
-	ENABLE_IRQRESTORE(flags);
+	IRQ_RESTORE(flags);
 
 	/*
 	 * Optimization: don't switch contexts when the active
@@ -387,9 +388,9 @@ void proc_switch(void)
 	/* Just like proc_schedule, this function must not have auto variables. */
 	static cpuflags_t flags;
 
-	DISABLE_IRQSAVE(flags);
+	IRQ_SAVE_DISABLE(flags);
 	SCHED_ENQUEUE(CurrentProcess);
-	ENABLE_IRQRESTORE(flags);
+	IRQ_RESTORE(flags);
 
 	proc_schedule();
 }
