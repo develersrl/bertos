@@ -43,6 +43,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.19  2004/12/08 08:30:12  bernie
+ *#* Add missing header.
+ *#*
  *#* Revision 1.18  2004/11/16 21:55:12  bernie
  *#* Workaround for a known fifobuf bug.
  *#*
@@ -94,6 +97,7 @@
 #define MWARE_FIFO_H
 
 #include <cpu.h>
+#include <debug.h>
 
 typedef struct FIFOBuffer
 {
