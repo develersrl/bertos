@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/06/06 17:18:42  bernie
+ * Fix \!CONFIG_KERN_SIGNALS code paths.
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -156,7 +159,7 @@ Timer *timer_abort(Timer *timer)
  */
 void timer_delay(time_t time)
 {
-#ifdef CONFIG_KERN_SIGNALS
+#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 	Timer t;
 
 	ASSERT(!sig_check(SIG_SINGLE));
@@ -164,12 +167,17 @@ void timer_delay(time_t time)
 	timer_set_delay(&t, time);
 	timer_add(&t);
 	sig_wait(SIG_SINGLE);
-#else
+
+#else /* !CONFIG_KERN_SIGNALS */
+
 	time_t start = timer_gettick();
 
+	/* Busy wait */
 	while (timer_gettick() - start < time) { /* nop */ }
-#endif
+
+#endif /* !CONFIG_KERN_SIGNALS */
 }
+
 
 /*!
  * Wait for the specified amount of time (expressed in microseconds)
@@ -188,7 +196,7 @@ void timer_udelay(utime_t usec_delay)
 	hptime_t start = timer_hw_hpread();
 	hptime_t delay = (uint32_t)usec_delay * TIMER_HW_HPTICKS_PER_SEC / 1000000ul;
 
-	while (timer_hw_hpread() - start < delay) 
+	while (timer_hw_hpread() - start < delay)
 	{}
 }
 
