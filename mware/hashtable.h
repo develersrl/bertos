@@ -31,6 +31,9 @@
 
 /*
  * $Log$
+ * Revision 1.2  2004/08/04 15:52:54  rasky
+ * Merge da SC: fixato namespace dell'include guard
+ *
  * Revision 1.1  2004/07/14 14:08:16  rasky
  * Implementazione di una tabella hash
  *
@@ -59,8 +62,8 @@
  */
 
 
-#ifndef HASHTABLE_H
-#define HASHTABLE_H
+#ifndef MWARE_HASHTABLE_H
+#define MWARE_HASHTABLE_H
 
 #include <compiler.h>
 #include <kdebug.h>
@@ -262,4 +265,4 @@ INLINE HashIterator ht_iter_next(HashIterator h)
 	return h;
 }
 
-#endif /* HASHTABLE_H */
+#endif /* MWARE_HASHTABLE_H */
