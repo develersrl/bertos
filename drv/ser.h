@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.14  2004/10/03 18:43:18  bernie
+ *#* Fix a nasty bug caused by confusion between old-style and new-style configuration macros.
+ *#*
  *#* Revision 1.13  2004/09/14 21:04:57  bernie
  *#* Don't vanely call kdebug.h.
  *#*
@@ -112,11 +115,11 @@
  */
 enum
 {
-#if defined(CPU_AVR_ATMEGA64) || defined(CPU_AVR_ATMEGA128)
+#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128
 	SER_UART0,
 	SER_UART1,
 	SER_SPI,
-#elif defined(CPU_AVR_ATMEGA103) || defined(CPU_AVR_ATMEGA8)
+#elif CPU_AVR_ATMEGA103 || CPU_AVR_ATMEGA8
 	SER_UART0,
 	SER_SPI,
 #elif CPU_DSP56K
