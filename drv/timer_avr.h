@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.13  2004/08/24 14:30:11  bernie
+ * Use new-style config macros for drv/timer.c
+ *
  * Revision 1.12  2004/08/10 06:59:45  bernie
  * CONFIG_TIMER_STROBE: Define no-op default macros.
  *
@@ -65,6 +68,17 @@
 
 
 /*!
+ * Values for CONFIG_TIMER.
+ *
+ * Select which hardware timer interrupt to use for system clock and softtimers.
+ * \note The timer 1 overflow mode set the timer as a 24 kHz PWM.
+ */
+#define TIMER_ON_OUTPUT_COMPARE0  1
+#define TIMER_ON_OVERFLOW1        2
+#define TIMER_ON_OUTPUT_COMPARE2  3
+
+
+/*!
  * \def CONFIG_TIMER_STROBE
  *
  * This is a debug facility that can be used to
@@ -93,7 +107,7 @@
 #define OCR_DIVISOR  (CLOCK_FREQ / TIMER_PRESCALER / TICKS_PER_SEC - 1) /* 191 */
 
 /*! HW dependent timer initialization  */
-#if defined(CONFIG_TIMER_ON_TIMER0)
+#if (CONFIG_TIMER == TIMER_ON_OUTPUT_COMPARE0)
 
 	//! Type of time expressed in ticks of the hardware high-precision timer
 	typedef uint8_t hptime_t;
@@ -133,7 +147,7 @@
 		return TCNT0;
 	}
 
-#elif defined(CONFIG_TIMER_ON_TIMER1_OVERFLOW)
+#elif (CONFIG_TIMER == TIMER_ON_OVERFLOW1)
 
 	//! Type of time expressed in ticks of the hardware high precision timer
 	typedef uint16_t hptime_t;
@@ -169,7 +183,7 @@
 		return TCNT1;
 	}
 
-#elif defined(CONFIG_TIMER_ON_TIMER2)
+#elif (CONFIG_TIMER == TIMER_ON_OUTPUT_COMPARE2)
 
 	//! Type of time expressed in ticks of the hardware high precision timer
 	typedef uint8_t hptime_t;
@@ -211,11 +225,11 @@
 	}
 
 #else
-	#error Choose witch timer to use with CONFIG_TIMER_ON_TIMERx
-#endif /* CONFIG_TIMER_ON_TIMERx */
+	#error Unimplemented value for CONFIG_TIMER
+#endif /* CONFIG_TIMER */
 
 
-#if defined(CONFIG_TIMER_ON_TIMER1_OVERFLOW)
+#if (CONFIG_TIMER == TIMER_ON_OVERFLOW1)
 
 	#define DEFINE_TIMER_ISR	\
 		static void timer_handler(void)
@@ -270,18 +284,18 @@
 	#endif
 	}
 
-#elif defined (CONFIG_TIMER_ON_TIMER0)
+#elif (CONFIG_TIMER == TIMER_ON_OUTPUT_COMPARE0)
 
 	#define DEFINE_TIMER_ISR	\
 		SIGNAL(SIG_OUTPUT_COMPARE0)
 
-#elif defined(CONFIG_TIMER_ON_TIMER2)
+#elif (CONFIG_TIMER == TIMER_ON_OUTPUT_COMPARE2)
 
 	#define DEFINE_TIMER_ISR	\
 		SIGNAL(SIG_OUTPUT_COMPARE2)
 
 #else
-	#error Choose witch timer to use with CONFIG_TIMER_ON_TIMERx
-#endif /* CONFIG_TIMER_ON_TIMERx */
+	#error Unimplemented value for CONFIG_TIMER
+#endif /* CONFIG_TIMER */
 
 #endif /* DRV_TIMER_AVR_H */

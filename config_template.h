@@ -46,6 +46,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/08/24 14:30:11  bernie
+ * Use new-style config macros for drv/timer.c
+ *
  * Revision 1.2  2004/08/05 18:46:52  bernie
  * Documentation improvements.
  *
@@ -125,6 +128,9 @@
 	/*! Serial port speed for KBus communication */
 	#define CONFIG_KBUS_BAUDRATE  19200
 /*\}*/
+
+//! Hardware timer selection for drv/timer.c
+#define CONFIG_TIMER  TIMER_ON_OUTPUT_COMPARE2
 
 //! EEPROM type for drv/eeprom.c
 #define CONFIG_EEPROM_TYPE EEPROM_24XX256
