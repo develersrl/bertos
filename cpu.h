@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/07/18 21:49:51  bernie
+ * Fixes for GCC 3.5.
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -94,9 +97,9 @@
 
 #elif defined (__AVR__)
 
-	#define NOP                     asm volatile ("nop")
-	#define DISABLE_INTS            cli()
-	#define ENABLE_INTS             sei()
+	#define NOP                     asm volatile ("nop" ::)
+	#define DISABLE_INTS            asm volatile ("cli" ::)
+	#define ENABLE_INTS             asm volatile ("sei" ::)
 	#define SCHEDULER_IDLE          /* nothing */
 
 	#define DISABLE_IRQSAVE(x) \
