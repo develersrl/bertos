@@ -42,6 +42,9 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/07/21 00:20:20  bernie
+ * Allow completely disabling printf()-like formatter.
+ *
  * Revision 1.3  2004/07/18 22:00:15  bernie
  * Reorganize configuration parameters to match DevLib's convention.
  *
@@ -52,6 +55,8 @@
  * Import mware modules.
  *
  */
+
+#ifndef CONFIG_PRINTF_DISABLED
 
 #include "formatwr.h"
 #include <compiler.h> /* progmem macros */
@@ -802,3 +807,5 @@ CONVERSION_LOOP:
 	}
 #endif /* CONFIG_PRINTF_REDUCED */
 }
+
+#endif /* CONFIG_PRINTF_DISABLED */
