@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.5  2004/06/07 15:54:23  aleph
+ * Update to new event.h naming
+ *
  * Revision 1.4  2004/06/06 16:09:22  bernie
  * Reformat (from project_ks).
  *
@@ -194,5 +197,5 @@ void buz_init(void)
 	/* Inizializza software interrupt */
 	buz_timer = timer_new();
 	ASSERT(buz_timer != NULL);
-	INITEVENT_INT(&buz_timer->expire, (Hook)buz_softint, 0);
+	event_initSoftInt(&buz_timer->expire, (Hook)buz_softint, 0);
 }
