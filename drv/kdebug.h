@@ -16,6 +16,10 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/07/30 14:26:33  rasky
+ * Semplificato l'output dell'ASSERT
+ * Aggiunta ASSERT2 con stringa di help opzionalmente disattivabile
+ *
  * Revision 1.3  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -63,7 +67,14 @@
 	int __check_wall(long *wall, int size, const char *name, const char *file, int line);
 
 	#define THIS_FILE                       __FILE__
-	#define ASSERT(x)                       ((x) ? 0 : __assert(#x, THIS_FILE, __LINE__))
+	#ifndef CONFIG_KDEBUG_ASSERT_NO_TEXT
+		#define ASSERT(x)                   ((x) ? 0 : __assert(#x, THIS_FILE, __LINE__))
+		#define ASSERT2(x, help)            ((x) ? 0 : __assert(help " (" #x ")", THIS_FILE, __LINE__))
+	#else
+		#define ASSERT(x)                   ((x) ? 0 : __assert("", THIS_FILE, __LINE__))
+		#define ASSERT2(x, help)            ASSERT(x)
+	#endif
+
 	#define ASSERT_VALID_PTR(p)             ((p >= 0x200) ? 0 : __invalid_ptr(p, #p, THIS_FILE, __LINE__))
 	#define ASSERT_VALID_PTR_OR_NULL(p)     (((p == NULL) || (p >= 0x200)) ? 0 : __invalid_ptr(p, #p, THIS_FILE, __LINE__))
 	#define TRACE                           kprintf("%s()\n", __FUNCTION__)
@@ -80,6 +91,7 @@
 #else /* !_DEBUG */
 
 	#define ASSERT(x)
+	#define ASSERT2(x, help)
 	#define ASSERT_VALID_PTR(p)
 	#define ASSERT_VALID_PTR_OR_NULL(p)
 	#define TRACE                           do {} while(0)
@@ -89,6 +101,9 @@
 	#define DECLARE_WALL(name, size)
 	#define INIT_WALL(name)
 	#define CHECK_WALL(name)
+
+	INLINE void kdbg_init(void) {}
+	INLINE void kprintf(UNUSED(const char*, fmt), ...) {}
 
 #endif /* !_DEBUG */
 

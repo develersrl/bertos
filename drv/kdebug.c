@@ -16,6 +16,10 @@
 
 /*
  * $Log$
+ * Revision 1.8  2004/07/30 14:26:33  rasky
+ * Semplificato l'output dell'ASSERT
+ * Aggiunta ASSERT2 con stringa di help opzionalmente disattivabile
+ *
  * Revision 1.7  2004/07/30 14:15:53  rasky
  * Nuovo supporto unificato per detect della CPU
  *
@@ -194,9 +198,9 @@ void PGM_FUNC(kputs)(const char * PGM_ATTR str)
 int PGM_FUNC(__assert)(const char * PGM_ATTR cond, const char *file, int line)
 {
 	PGM_FUNC(kputs)(file);
-	PGM_FUNC(kprintf)(PSTR(":%d: Assertion failed: \""), line);
+	PGM_FUNC(kprintf)(PSTR(":%d: Assertion failed: "), line);
 	PGM_FUNC(kputs)(cond);
-	PGM_FUNC(kputs)(PSTR("\"\n"));
+	PGM_FUNC(kputs)(PSTR("\n"));
 	return 1;
 }
 
