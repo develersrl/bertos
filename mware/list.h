@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2004/12/31 16:44:11  bernie
+ *#* list_remHead(), list_remTail(): Name like normal functions.
+ *#*
  *#* Revision 1.10  2004/11/28 23:21:05  bernie
  *#* Remove obsolete INITLIST macro.
  *#*
@@ -167,7 +170,7 @@ typedef struct _List
  *
  * \return Pointer to node, or NULL if the list was empty.
  */
-INLINE Node *REMHEAD(List *l)
+INLINE Node *list_remHead(List *l)
 {
 	Node *n;
 
@@ -185,7 +188,7 @@ INLINE Node *REMHEAD(List *l)
  *
  * \return Pointer to node, or NULL if the list was empty.
  */
-INLINE Node *REMTAIL(List *l)
+INLINE Node *list_remTail(List *l)
 {
 	Node *n;
 
@@ -197,5 +200,9 @@ INLINE Node *REMTAIL(List *l)
 	n->pred->succ = (Node *)&l->null;
 	return n;
 }
+
+/* OBSOLETE names */
+#define REMHEAD list_remHead
+#define REMTAIL list_remTail
 
 #endif /* MWARE_LIST_H */
