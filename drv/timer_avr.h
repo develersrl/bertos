@@ -1,7 +1,7 @@
 /*!
  * \file
  * <!--
- * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000 Bernardo Innocenti <bernie@develer.com>
  * This file is part of DevLib - See devlib/README for information.
  * -->
@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.14  2004/08/24 16:27:01  bernie
+ * Add missing headers.
+ *
  * Revision 1.13  2004/08/24 14:30:11  bernie
  * Use new-style config macros for drv/timer.c
  *
@@ -29,36 +32,11 @@
  *
  * Revision 1.9  2004/07/22 02:01:14  bernie
  * Use TIMER_PRESCALER consistently.
- *
- * Revision 1.8  2004/07/20 23:50:20  bernie
- * Also define TIMER_PRESCALER.
- *
- * Revision 1.7  2004/07/20 23:49:40  bernie
- * Compute value of OCR_DIVISOR from CLOCK_FREQ.
- *
- * Revision 1.6  2004/07/20 23:48:16  bernie
- * Finally remove redundant protos.
- *
- * Revision 1.5  2004/07/18 22:16:35  bernie
- * Add missing header; Prevent warning for project_ks-specific code.
- *
- * Revision 1.4  2004/06/27 15:22:15  aleph
- * Fix spacing
- *
- * Revision 1.3  2004/06/07 15:57:40  aleph
- * Update to latest AVR timer code
- *
- * Revision 1.2  2004/06/03 11:27:09  bernie
- * Add dual-license information.
- *
- * Revision 1.1  2004/05/23 18:23:30  bernie
- * Import drv/timer module.
- *
  */
-
 #ifndef DRV_TIMER_AVR_H
 #define DRV_TIMER_AVR_H
 
+#include <arch_config.h> // ARCH_BOARD_KC
 #include <avr/wdt.h>
 #include <avr/signal.h>
 
