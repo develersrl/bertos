@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.21  2004/11/16 21:34:25  bernie
+ *#* Commonize obsolete names for IRQ macros; Doxygen fixes.
+ *#*
  *#* Revision 1.20  2004/11/16 20:33:32  bernie
  *#* CPU_HARVARD: New macro.
  *#*
@@ -57,19 +60,23 @@
 #include "compiler.h" /* for uintXX_t, PP_CAT3(), PP_STRINGIZE() */
 
 
-// Macros for determining CPU endianness
+/*!
+ * \name Macros for determining CPU endianness.
+ * \{
+ */
 #define CPU_BIG_ENDIAN    0x1234
 #define CPU_LITTLE_ENDIAN 0x3412
+/*\}*/
 
-// Macros to include cpu-specific version of the headers
+/*! Macro to include cpu-specific versions of the headers. */
 #define CPU_HEADER(module)          PP_STRINGIZE(PP_CAT3(module, _, CPU_ID).h)
 
 
 #if CPU_I196
 
-	#define DISABLE_INTS            disable_interrupt()
-	#define ENABLE_INTS             enable_interrupt()
 	#define NOP                     nop_instruction()
+	#define IRQ_DISABLE             disable_interrupt()
+	#define IRQ_ENABLE              enable_interrupt()
 
 	typedef uint16_t cpuflags_t; // FIXME
 	typedef unsigned int cpustack_t;
@@ -84,8 +91,8 @@
 #elif CPU_X86
 
 	#define NOP                     asm volatile ("nop")
-	#define DISABLE_INTS            /* nothing */
-	#define ENABLE_INTS             /* nothing */
+	#define IRQ_DISABLE             /* nothing */
+	#define IRQ_ENABLE              /* nothing */
 
 	typedef uint32_t cpuflags_t; // FIXME
 	typedef uint32_t cpustack_t;
@@ -100,13 +107,14 @@
 #elif CPU_DSP56K
 
 	#define NOP                     asm(nop)
-	#define DISABLE_INTS            do { asm(bfset #0x0200,SR); asm(nop); } while (0)
-	#define ENABLE_INTS             do { asm(bfclr #0x0200,SR); asm(nop); } while (0)
+	#define IRQ_DISABLE             do { asm(bfset #0x0200,SR); asm(nop); } while (0)
+	#define IRQ_ENABLE              do { asm(bfclr #0x0200,SR); asm(nop); } while (0)
 
-	#define DISABLE_IRQSAVE(x)  \
+	#define IRQ_SAVE_DISABLE(x)  \
 		do { (void)x; asm(move SR,x); asm(bfset #0x0200,SR); } while (0)
-	#define ENABLE_IRQRESTORE(x)  \
+	#define IRQ_RESTORE(x)  \
 		do { (void)x; asm(move x,SR); } while (0)
+
 
 	typedef uint16_t cpuflags_t;
 	typedef unsigned int cpustack_t;
@@ -117,7 +125,6 @@
 	#define CPU_STACK_GROWS_UPWARD  1
 	#define CPU_SP_ON_EMPTY_SLOT	0
 	#define CPU_BYTE_ORDER          CPU_BIG_ENDIAN
-	#define CPU_HARVARD		1
 
 	/* Memory is word-addessed in the DSP56K */
 	#define CPU_BITS_PER_CHAR  16
@@ -158,12 +165,6 @@
 		(bool)(sreg & 0x80); \
 	})
 
-	/* OBSOLETE NAMES */
-	#define DISABLE_INTS IRQ_DISABLE
-	#define ENABLE_INTS  IRQ_ENABLE
-	#define DISABLE_IRQSAVE(x)   IRQ_SAVE_DISABLE(x)
-	#define ENABLE_IRQRESTORE(x) IRQ_RESTORE(x)
-
 	typedef uint8_t cpuflags_t;
 	typedef uint8_t cpustack_t;
 
@@ -174,7 +175,6 @@
 	#define CPU_STACK_GROWS_UPWARD  0
 	#define CPU_SP_ON_EMPTY_SLOT    1
 	#define CPU_BYTE_ORDER          CPU_LITTLE_ENDIAN
-	#define CPU_HARVARD		1
 
 	/*!
 	 * Initialization value for registers in stack frame.
@@ -185,6 +185,12 @@
 	#define CPU_REG_INIT_VALUE(reg) (reg == 0 ? 0x80 : 0)
 
 #endif
+
+/* OBSOLETE NAMES */
+#define DISABLE_INTS         IRQ_DISABLE
+#define ENABLE_INTS          IRQ_ENABLE
+#define DISABLE_IRQSAVE(x)   IRQ_SAVE_DISABLE(x)
+#define ENABLE_IRQRESTORE(x) IRQ_RESTORE(x)
 
 /*!
  * Execute \a CODE atomically with respect to interrupts.
@@ -250,7 +256,8 @@
 
 
 #if CPU_DSP56K
-	/* DSP56k pushes both PC and SR to the stack in the JSR instruction, but
+	/*
+	 * DSP56k pushes both PC and SR to the stack in the JSR instruction, but
 	 * RTS discards SR while returning (it does not restore it). So we push
 	 * 0 to fake the same context.
 	 */
@@ -261,7 +268,8 @@
 		} while (0);
 
 #elif CPU_AVR
-	/* In AVR, the addresses are pushed into the stack as little-endian, while
+	/*
+	 * In AVR, the addresses are pushed into the stack as little-endian, while
 	 * memory accesses are big-endian (actually, it's a 8-bit CPU, so there is
 	 * no natural endianess).
 	 */
