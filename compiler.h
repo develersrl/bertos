@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.5  2004/07/20 17:08:03  bernie
+ * Cleanup documentation
+ *
  * Revision 1.4  2004/06/27 15:20:26  aleph
  * Change UNUSED() macro to accept two arguments: type and name;
  * Add macro GNUC_PREREQ to detect GCC version during build;
@@ -43,17 +46,28 @@
 	#define GNUC_PREREQ(maj, min) 0
 #endif
 
+/* A few defaults for missing compiler features. */
+#define INLINE                 static inline
+#define NORETURN               /* nothing */
+#define FORMAT(type,fmt,first) /* nothing */
+#define DEPRECATED             /* nothing */
+#define UNUSED(type,arg)       type arg
+#define REGISTER               /* nothing */
+#define INTERRUPT(x)           ERROR_NOT_IMPLEMENTED
+
+/* Support for harvard architectures */
+#define PGM_READ_CHAR(s) (*(s))
+#define PGM_FUNC(x) x
+#define PGM_ATTR        /* nothing */
 
 #if defined(__IAR_SYSTEMS_ICC) || defined(__IAR_SYSTEMS_ICC__)
 	#pragma language=extended
-	#define INTERRUPT(x)	interrupt [x]
-	#define REGISTER		shortad
-	#define ATOMIC			monitor
-
-	/* GCC attributes */
-	#define FORMAT(type,fmt,first) /* nothing */
-	#define NORETURN               /* nothing */
-	#define UNUSED(type,arg)       type arg
+	#undef  INTERRUPT
+	#define INTERRUPT(x)  interrupt [x]
+	#undef  REGISTER
+	#define REGISTER      shortad
+	#undef  INLINE
+	#define INLINE        /* unsupported */
 
 	/* Imported from <longjmp.h>. Unfortunately, we can't just include
 	 * this header because it typedefs jmp_buf to be an array of chars.
@@ -83,26 +97,16 @@
 	int setjmp(jmp_buf env);
 	void longjmp(jmp_buf env, int val);
 
-	#ifndef __cplusplus
-		#define true 1
-		#define false 0
-		typedef unsigned char bool;
-	#endif /* !__cplusplus */
+	/* Fake bool support */
+	#define true (1==1)
+	#define false (1!=1)
+	typedef unsigned char bool;
 
 #elif defined(_MSC_VER) /* Win32 emulation support */
 
 	#include <setjmp.h>
 	#include <time.h> /* for time_t */
 	#define float double
-
-	#define REGISTER		/* nothing */
-	#define INTERRUPT(x)	/* nothing */
-
-	/* GCC attributes */
-	#define FORMAT(type,fmt,first) /* nothing */
-	#define NORETURN               /* nothing */
-	#define UNUSED(type,arg)       type arg
-	#define INLINE static inline
 
 	#ifdef __cplusplus
 		extern "C" {
@@ -115,6 +119,7 @@
 	/* Ouch, ReleaseSemaphore() conflicts with a WIN32 call ;-( */
 	#define ReleaseSemaphore KReleaseSemaphore
 
+	/* Fake bool support */
 	#ifndef __cplusplus
 		#define true 1
 		#define false 0
@@ -124,11 +129,18 @@
 #elif defined(__GNUC__)
 
 	/* GCC attributes */
+	#undef  FORMAT
 	#define FORMAT(type,fmt,first)  __attribute__((__format__(type, fmt, first)))
+	#undef  NORETURN
 	#define NORETURN                __attribute__((__noreturn__))
+	#undef  UNUSED
 	#define UNUSED(type,arg)        __attribute__((__unused__)) type arg
-	//FIXME #define INLINE static inline
+	#undef  INLINE
 	#define INLINE extern inline
+	#if GNUC_PREREQ(3,1)
+		#undef DEPRECATED
+		#define DEPRECATED              __attribute__((__deprecated__))
+	#endif
 
 	#if defined(__i386__)
 
@@ -138,9 +150,6 @@
 		#include <setjmp.h>
 		#include <stdbool.h>
 		#undef system_sigset_t
-
-		#define REGISTER		/* nothing */
-		#define INTERRUPT(x)	/* nothing */
 
 		#ifdef __cplusplus
 			extern "C" {
@@ -154,8 +163,6 @@
 
 		#include <stddef.h>
 		#include <stdbool.h>
-		#define FLASH		__attribute__((progmem))
-		#define REGISTER    /* nothing */
 
 		/* Missing printf-family functions in avr-libc/stdio.h */
 		#include <stdarg.h>
@@ -167,13 +174,12 @@
 
 		/* Support for harvard architectures */
 		#ifdef _PROGMEM
+			#undef PGM_READ_CHAR
+			#undef PGM_FUNC
+			#undef PGM_ATTR
 			#define PGM_READ_CHAR(s) pgm_read_byte(s)
 			#define PGM_FUNC(x) x ## _P
-			#define PGM_ATTR	PROGMEM
-		#else
-			#define PGM_READ_CHAR(s) (*(s))
-			#define PGM_FUNC(x) x
-			#define PGM_ATTR	/*nop*/
+			#define PGM_ATTR        PROGMEM
 		#endif
 
 	#endif /* CPU */
@@ -185,22 +191,6 @@
 	#include <stdbool.h>
 	#include <setjmp.h>
 
-	#define FLASH           /* nothing */
-	#define REGISTER		/* nothing */
-	#define INTERRUPT(x)	ERROR_NOT_IMPLEMENTED
-	#define SCHEDULER_IDLE	/* nothing */
-	
-	#define INLINE          static inline
-
-	/* GCC attributes */
-	#define FORMAT(type,fmt,first)  /* nothing */
-	#define NORETURN                /* nothing */
-	#define UNUSED(type,arg)        type arg
-
-	/* Support for harvard architectures */
-	#define PGM_READ_CHAR(s) (*(s))
-	#define PGM_FUNC		/* nothing */
-	#define PGM_ATTR		/* nothing */
 	#define PSTR            /* nothing */
 
 #else
@@ -216,26 +206,24 @@
 #endif
 
 
-/* Quasi-ANSI macros
- *
- * offsetof(s,m) - Give the byte offset of the member <m> in struct <s>
- * countof(a) - Count the number of elements in the static array <a>
- */
+/* Quasi-ANSI macros */
 #ifndef offsetof
-#define offsetof(s,m)   (size_t)&(((s *)0)->m)
+	/*! offsetof(s,m) - Return the byte offset of the member \a m in struct \a s */
+	#define offsetof(s,m)   (size_t)&(((s *)0)->m)
+#endif
+#ifndef countof
+	/*! Count the number of elements in the static array \a a */
+	#define countof(a) (sizeof(a) / sizeof(*(a)))
 #endif
 
-#ifndef countof
-#define countof(a) (sizeof(a) / sizeof(*(a)))
-#endif
 
 /* Simple macros */
 #define ABS(a)		(((a) < 0) ? -(a) : (a))
 #define MIN(a,b)	(((a) < (b)) ? (a) : (b))
 #define MAX(a,b)	(((a) > (b)) ? (a) : (b))
 
-/*! Convert a bit value to a binary flag */
 #ifndef BV
+/*! Convert a bit value to a binary flag */
 #define BV(x)	(1<<(x))
 #endif
 
@@ -261,10 +249,14 @@
 	((x < 65536UL) ? UINT16_LOG2(x) : UINT16_LOG2((x) >> 16) + 16)
 
 /*! Concatenate two different preprocessor tokens (allowing macros to expand) */
-#define PP_CAT(x,y)                       PP_CAT__(x,y)
-#define PP_CAT__(x,y)                     x ## y
+#define PP_CAT(x,y)      PP_CAT__(x,y)
+#define PP_CAT__(x,y)    x ## y
 
-/* Type definitions - should go in <sys/types.h> */
+
+/*
+ * Standard type definitions
+ * These should be in <sys/types.h>, but many compilers lack them.
+ */
 #if !(defined(size_t) || defined(_SIZE_T_DEFINED))
 	#define size_t unsigned int
 #endif
@@ -280,8 +272,11 @@ typedef unsigned char sig_t;
 typedef unsigned char sigset_t;
 typedef unsigned char page_t;
 
-/* ISO C99 fixed-size types */
 #if (defined(_MSC_VER) || defined(__IAR_SYSTEMS_ICC) || defined(__IAR_SYSTEMS_ICC__))
+	/*
+	 * ISO C99 fixed-size types
+	 * These should be in <stdint.h>, but many compilers lack them.
+	 */
 	typedef signed char         int8_t;
 	typedef short int           int16_t;
 	typedef long int            int32_t;
@@ -289,11 +284,21 @@ typedef unsigned char page_t;
 	typedef unsigned short int  uint16_t;
 	typedef unsigned long int   uint32_t;
 #elif defined(__AVR__)
-#	include <inttypes.h>
+	/* avr-libc is weird... */
+	#include <inttypes.h>
 #else
-#	include <stdint.h>
+	/* This is the correct location. */
+	#include <stdint.h>
 #endif
 
+/*!
+ * \name Types for hardware registers.
+ *
+ * Only use these types for registers whose contents can
+ * be changed asynchronously by external hardware.
+ *
+ * \{
+ */
 #if (defined(__m56800E__) || defined(__m56800__))
 	/* Registers can be accessed only through 16-bit pointers */
 	typedef volatile uint16_t  reg16_t;
@@ -302,5 +307,6 @@ typedef unsigned char page_t;
 	typedef volatile uint16_t  reg16_t;
 	typedef volatile uint32_t  reg32_t;
 #endif
+/*\}*/
 
 #endif /* COMPILER_H */
