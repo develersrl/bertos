@@ -1,8 +1,8 @@
 /*!
  * \file
  * <!--
- * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
- * Copyright 2001,2002,2003 Bernardo Innocenti <bernie@codewiz.org>
+ * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2001, 2002, 2003 Bernardo Innocenti <bernie@codewiz.org>
  * This file is part of DevLib - See devlib/README for information.
  * -->
  *
@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.6  2004/07/20 23:12:43  bernie
+ * Reverse the logic to provide defaults for undefined macros.
+ *
  * Revision 1.5  2004/07/20 17:08:03  bernie
  * Cleanup documentation
  *
@@ -46,27 +49,10 @@
 	#define GNUC_PREREQ(maj, min) 0
 #endif
 
-/* A few defaults for missing compiler features. */
-#define INLINE                 static inline
-#define NORETURN               /* nothing */
-#define FORMAT(type,fmt,first) /* nothing */
-#define DEPRECATED             /* nothing */
-#define UNUSED(type,arg)       type arg
-#define REGISTER               /* nothing */
-#define INTERRUPT(x)           ERROR_NOT_IMPLEMENTED
-
-/* Support for harvard architectures */
-#define PGM_READ_CHAR(s) (*(s))
-#define PGM_FUNC(x) x
-#define PGM_ATTR        /* nothing */
-
 #if defined(__IAR_SYSTEMS_ICC) || defined(__IAR_SYSTEMS_ICC__)
 	#pragma language=extended
-	#undef  INTERRUPT
 	#define INTERRUPT(x)  interrupt [x]
-	#undef  REGISTER
 	#define REGISTER      shortad
-	#undef  INLINE
 	#define INLINE        /* unsupported */
 
 	/* Imported from <longjmp.h>. Unfortunately, we can't just include
@@ -108,14 +94,6 @@
 	#include <time.h> /* for time_t */
 	#define float double
 
-	#ifdef __cplusplus
-		extern "C" {
-	#endif
-			void SchedulerIdle(void);
-	#ifdef __cplusplus
-		}
-	#endif
-
 	/* Ouch, ReleaseSemaphore() conflicts with a WIN32 call ;-( */
 	#define ReleaseSemaphore KReleaseSemaphore
 
@@ -129,16 +107,11 @@
 #elif defined(__GNUC__)
 
 	/* GCC attributes */
-	#undef  FORMAT
 	#define FORMAT(type,fmt,first)  __attribute__((__format__(type, fmt, first)))
-	#undef  NORETURN
 	#define NORETURN                __attribute__((__noreturn__))
-	#undef  UNUSED
 	#define UNUSED(type,arg)        __attribute__((__unused__)) type arg
-	#undef  INLINE
 	#define INLINE extern inline
 	#if GNUC_PREREQ(3,1)
-		#undef DEPRECATED
 		#define DEPRECATED              __attribute__((__deprecated__))
 	#endif
 
@@ -150,14 +123,6 @@
 		#include <setjmp.h>
 		#include <stdbool.h>
 		#undef system_sigset_t
-
-		#ifdef __cplusplus
-			extern "C" {
-		#endif
-				void SchedulerIdle(void);
-		#ifdef __cplusplus
-			}
-		#endif
 
 	#elif defined(__AVR__)
 
@@ -174,9 +139,6 @@
 
 		/* Support for harvard architectures */
 		#ifdef _PROGMEM
-			#undef PGM_READ_CHAR
-			#undef PGM_FUNC
-			#undef PGM_ATTR
 			#define PGM_READ_CHAR(s) pgm_read_byte(s)
 			#define PGM_FUNC(x) x ## _P
 			#define PGM_ATTR        PROGMEM
@@ -191,18 +153,65 @@
 	#include <stdbool.h>
 	#include <setjmp.h>
 
-	#define PSTR            /* nothing */
-
 #else
 	#error unknown compiler
 #endif
 
+
+/* A few defaults for missing compiler features. */
+#ifndef INLINE
+#define INLINE                 static inline
+#endif
+#ifndef NORETURN
+#define NORETURN               /* nothing */
+#endif
+#ifndef FORMAT
+#define FORMAT(type,fmt,first) /* nothing */
+#endif
+#ifndef
+#define DEPRECATED             /* nothing */
+#endif
+#ifndef
+#define UNUSED(type,arg)       type arg
+#endif
+#ifndef REGISTER
+#define REGISTER               /* nothing */
+#endif
+#ifndef INTERRUPT
+#define INTERRUPT(x)           ERROR_NOT_IMPLEMENTED
+#endif
+
+/* Support for harvard architectures */
+#ifndef PSTR
+#define PSTR            /* nothing */
+#endif
+#ifndef PGM_READ_CHAR
+#define PGM_READ_CHAR(s) (*(s))
+#endif
+#ifndef PGM_FUNC
+#define PGM_FUNC(x) x
+#endif
+#ifndef PGM_ATTR
+#define PGM_ATTR        /* nothing */
+#endif
+
+
 /* Misc definitions */
 #ifndef NULL
-#define NULL	0
+#define NULL  0
 #endif
 #ifndef EOF
-#define	EOF		(-1)
+#define	EOF   (-1)
+#endif
+
+
+/* Support for hybrid C/C++ applications. */
+#ifdef __cplusplus
+	#define EXTERN_C_BEGIN  extern "C" {
+	#define EXTERN_C_END    }
+#else
+	#define EXTERN_C_BEGIN  /* nothing */
+	#define EXTERN_C_END    /* nothing */
 #endif
 
 
