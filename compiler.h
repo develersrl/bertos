@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.22  2004/09/14 21:03:04  bernie
+ *#* PURE_FUNC, CONST_FUNC, MUST_CHECK: New function attributes; LIKELY()/UNLIKELY(): Fix for non-integral expressions.
+ *#*
  *#* Revision 1.21  2004/09/06 21:38:31  bernie
  *#* Misc documentation and style fixes.
  *#*
@@ -157,11 +160,14 @@
 	#define NORETURN                __attribute__((__noreturn__))
 	#define UNUSED(type,arg)        __attribute__((__unused__)) type arg
 	#define INLINE                  static inline __attribute__((__always_inline__))
-	#define LIKELY(x)               __builtin_expect((x), 1)
-	#define UNLIKELY(x)             __builtin_expect((x), 0)
-	#define RESTRICT		__restrict__
+	#define LIKELY(x)               __builtin_expect(!!(x), 1)
+	#define UNLIKELY(x)             __builtin_expect(!!(x), 0)
+	#define PURE_FUNC               __attribute__((pure))
+	#define CONST_FUNC              __attribute__((const))
+	#define RESTRICT                __restrict__
+	#define MUST_CHECK              __attribute__((warn_unused_result))
 	#if GNUC_PREREQ(3,1)
-		#define DEPRECATED      __attribute__((__deprecated__))
+		#define DEPRECATED  __attribute__((__deprecated__))
 	#endif
 
 	#if CPU_X86
@@ -235,8 +241,17 @@
 #ifndef UNLIKELY
 #define UNLIKELY(x)            x
 #endif
+#ifndef PURE_FUNC
+#define PURE_FUNC              /* nothing */
+#endif
+#ifndef CONST_FUNC
+#define CONST_FUNC             /* nothing */
+#endif
 #ifndef RESTRICT
-#define RESTRICT
+#define RESTRICT               /* nothing */
+#endif
+#ifndef MUST_CHECK
+#define MUST_CHECK             /* nothing */
 #endif
 
 /* Support for harvard architectures */
