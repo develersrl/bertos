@@ -6,7 +6,7 @@
  * This file is part of DevLib - See devlib/README for information.
  * -->
  *
- * \brief Text graphic routines
+ * \brief Text graphic routines (interface)
  *
  * \author Bernardo Innocenti <bernie@develer.com>
  * \author Stefano Fedrigo <aleph@develer.com>
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2004/10/03 20:43:37  bernie
+ *#* Import changes from project_ks.
+ *#*
  *#* Revision 1.7  2004/09/20 03:28:49  bernie
  *#* Fix header; Conditionalize AVR-specific code.
  *#*
@@ -77,23 +80,31 @@
 /* Fwd decl */
 struct Bitmap;
 
+/* Low-level text functions (mware/text.c) */
 void text_moveto(struct Bitmap *bm, int row, int col);
 void text_setcoord(struct Bitmap *bm, int x, int y);
 int text_putchar(char c, struct Bitmap *bm);
-int text_puts(const char *str, struct Bitmap *bm);
-int text_vprintf(struct Bitmap *bm, const char *fmt, va_list ap);
-int text_printf(struct Bitmap *bm, const char *fmt, ...) FORMAT(__printf__, 2, 3);
-int text_xprintf(struct Bitmap *bm, uint8_t row, uint8_t col, uint16_t mode, const char *fmt, ...) FORMAT(__printf__, 5, 6);
 uint8_t text_style(uint8_t flags, uint8_t mask);
 void text_clear(struct Bitmap *bm);
 void text_clearLine(struct Bitmap *bm, int line);
 
+/* Text formatting functions (mware/text_format.c) */
+int text_puts(const char *str, struct Bitmap *bm);
+int text_vprintf(struct Bitmap *bm, const char *fmt, va_list ap);
+int text_printf(struct Bitmap *bm, const char *fmt, ...) FORMAT(__printf__, 2, 3);
+int text_xprintf(struct Bitmap *bm, uint8_t row, uint8_t col, uint16_t mode, const char *fmt, ...) FORMAT(__printf__, 5, 6);
+int text_vwidthf(struct Bitmap *bm, const char * fmt, va_list ap);
+int text_widthf(struct Bitmap *bm, const char * fmt, ...) FORMAT(__printf__, 2, 3);
+
+/* Text formatting functions for program-memory strings (mware/text_format.c) */
 #if CPU_AVR
 #include <avr/pgmspace.h>
 int text_puts_P(const char * PROGMEM str, struct Bitmap *bm);
 int text_vprintf_P(struct Bitmap *bm, const char * PROGMEM fmt, va_list ap);
 int text_printf_P(struct Bitmap *bm, const char * PROGMEM fmt, ...) FORMAT(__printf__, 2, 3);
 int text_xprintf_P(struct Bitmap *bm, uint8_t row, uint8_t col, uint16_t mode, const char * PROGMEM fmt, ...) FORMAT(__printf__, 5, 6);
+int text_vwidthf_P(struct Bitmap *bm, const char * PROGMEM fmt, va_list ap);
+int text_widthf_P(struct Bitmap *bm, const char * PROGMEM fmt, ...);
 #endif /* CPU_AVR */
 
 #endif /* MWARE_TEXT_H */
