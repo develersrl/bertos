@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2004/09/06 21:51:26  bernie
+ *#* Extend interface to allow any algorithmic style.
+ *#*
  *#* Revision 1.4  2004/08/25 14:12:09  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -55,10 +58,9 @@
  * \{
  */
 #define TEXT_NORMAL   0       /*!< Normal mode */
-#define TEXT_FILL     BV(0)   /*!< Fill rest of line with spaces */
-#define TEXT_CENTER   BV(1)   /*!< Center string in line */
-#define TEXT_INVERT   BV(2)   /*!< Inverted mode */
-#define TEXT_RIGHT    BV(3)   /*!< Right aligned */
+#define TEXT_FILL     BV(7)   /*!< Fill rest of line with spaces */
+#define TEXT_CENTER   BV(8)   /*!< Center string in line */
+#define TEXT_RIGHT    BV(9)   /*!< Right aligned */
 /*\}*/
 
 /*! Escape sequences codes */
@@ -75,13 +77,14 @@ int text_putchar(char c, struct Bitmap *bm);
 int text_puts(const char *str, struct Bitmap *bm);
 int text_vprintf(struct Bitmap *bm, const char *fmt, va_list ap);
 int text_printf(struct Bitmap *bm, const char *fmt, ...) FORMAT(__printf__, 2, 3);
-int text_xprintf(struct Bitmap *bm, uint8_t row, uint8_t col, uint8_t mode, const char *fmt, ...) FORMAT(__printf__, 5, 6);
+int text_xprintf(struct Bitmap *bm, uint8_t row, uint8_t col, uint16_t mode, const char *fmt, ...) FORMAT(__printf__, 5, 6);
 uint8_t text_style(uint8_t flags, uint8_t mask);
 void text_clear(struct Bitmap *bm);
+void text_clearLine(struct Bitmap *bm, int line);
 
 int text_puts_P(const char * PROGMEM str, struct Bitmap *bm);
 int text_vprintf_P(struct Bitmap *bm, const char * PROGMEM fmt, va_list ap);
 int text_printf_P(struct Bitmap *bm, const char * PROGMEM fmt, ...) FORMAT(__printf__, 2, 3);
-int text_xprintf_P(struct Bitmap *bm, uint8_t row, uint8_t col, uint8_t mode, const char * PROGMEM fmt, ...) FORMAT(__printf__, 5, 6);
+int text_xprintf_P(struct Bitmap *bm, uint8_t row, uint8_t col, uint16_t mode, const char * PROGMEM fmt, ...) FORMAT(__printf__, 5, 6);
 
 #endif /* TEXT_H */

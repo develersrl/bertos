@@ -16,11 +16,8 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.4  2004/08/29 22:04:53  bernie
- *#* Fix Doxygen markup and indentation.
- *#*
- *#* Revision 1.3  2004/08/25 14:12:09  rasky
- *#* Aggiornato il comment block dei log RCS
+ *#* Revision 1.5  2004/09/06 21:51:26  bernie
+ *#* Extend interface to allow any algorithmic style.
  *#*
  *#* Revision 1.2  2004/06/03 11:27:09  bernie
  *#* Add dual-license information.
@@ -236,6 +233,12 @@ void text_clear(struct Bitmap *bmp)
 {
 	text_putchar('\x1b', bmp);
 	text_putchar('c', bmp);
+}
+
+
+void text_clearLine(struct Bitmap *bmp, int line)
+{
+	gfx_ClearRect(bmp, 0, line * FONT_HEIGHT, bmp->width, (line + 1) * FONT_HEIGHT);
 }
 
 
