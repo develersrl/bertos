@@ -1,19 +1,32 @@
 /*!
  * \file
  * <!--
- * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999 Bernardo Innocenti <bernie@develer.com>
  * This file is part of DevLib - See devlib/README for information.
  * -->
  *
- * \brief Definitions for CRC generator
- * \version $Id$
+ * \brief XModem-CRC16 algorithm (interface)
  *
+ * \note This algorithm is incompatible with the CCITT-CRC16.
+ *
+ * This code is based on the article Copyright 1986 Stephen Satchell.
+ *
+ * Programmers may incorporate any or all code into their programs,
+ * giving proper credit within the source. Publication of the
+ * source routines is permitted so long as proper credit is given
+ * to Stephen Satchell, Satchell Evaluations and Chuck Forsberg,
+ * Omen Technology.
+ *
+ * \version $Id$
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
 /*
  * $Log$
+ * Revision 1.3  2004/08/15 05:47:26  bernie
+ * updcrc16(): inline version of UPDCRC16(); Cleanup documentation.
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -24,29 +37,39 @@
 #ifndef CRC_H
 #define CRC_H
 
+#include <compiler.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
-#include <stdint.h> // uint16_t
-#include <stddef.h> // size_t
 
 /* CRC table */
 extern const uint16_t crc16tab[256];
 
 
 /*!
- * updcrc macro derived from article Copyright (C) 1986 Stephen Satchell.
- * \note First argument must be in range 0 to 255.
- * \note Second argument is referenced twice.
+ * \brief Compute the updated CRC16 value for one octet (macro version)
  *
- * Programmers may incorporate any or all code into their programs,
- * giving proper credit within the source. Publication of the
- * source routines is permitted so long as proper credit is given
- * to Stephen Satchell, Satchell Evaluations and Chuck Forsberg,
- * Omen Technology.
+ * \note This version is only intended for old/broken compilers.
+ *       Use the inline function in new code.
+ *
+ * \param c New octet (range 0-255)
+ * \param oldcrc Previous CRC16 value (referenced twice, beware of side effects)
  */
 #define UPDCRC16(c, oldcrc) (crc16tab[((oldcrc) >> 8) ^ ((unsigned char)(c))] ^ ((oldcrc) << 8))
+
+
+#ifdef INLINE
+/*!
+ * \brief Compute the updated CRC16 value for one octet (macro version)
+ */
+INLINE uint16_t updcrc16(uint8_t c, uint16_t oldcrc)
+{
+	return crc16tab[(oldcrc >> 8) ^ c] ^ (oldcrc << 8);
+}
+#endif // INLINE
+
 
 /*!
  * This function implements the CRC 16 calculation on a buffer.
@@ -55,7 +78,7 @@ extern const uint16_t crc16tab[256];
  * \param buf  The buffer to perform CRC calculation on.
  * \param len  The length of the Buffer.
  *
- * \return The updated CRC 16 value.
+ * \return The updated CRC16 value.
  */
 extern uint16_t crc16(uint16_t crc, const void *buf, size_t len);
 
