@@ -28,6 +28,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.18  2004/09/20 03:31:15  bernie
+ *#* Sanitize for C++.
+ *#*
  *#* Revision 1.17  2004/09/14 21:06:07  bernie
  *#* Use debug.h instead of kdebug.h; Spelling fixes.
  *#*
@@ -304,7 +307,7 @@ int ser_print(struct Serial *port, const char *s)
  */
 int ser_write(struct Serial *port, const void *_buf, size_t len)
 {
-	const char *buf = _buf;
+	const char *buf = (const char *)_buf;
 
 	while (len--)
 	{

@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2004/09/20 03:31:27  bernie
+ *#* Sanitize for C++.
+ *#*
  *#* Revision 1.2  2004/09/14 21:01:46  bernie
  *#* Mark assertions as LIKELY().
  *#*
@@ -191,15 +194,15 @@
 		int __check_wall(long *wall, int size, const char *name, const char *file, int line);
 
 		#ifndef CONFIG_KDEBUG_ASSERT_NO_TEXT
-			#define ASSERT(x)         (LIKELY(x) ? 0 : __assert(#x, THIS_FILE, __LINE__))
-			#define ASSERT2(x, help)  (LIKELY(x) ? 0 : __assert(help " (" #x ")", THIS_FILE, __LINE__))
+			#define ASSERT(x)         ((void)(LIKELY(x) ? 0 : __assert(#x, THIS_FILE, __LINE__)))
+			#define ASSERT2(x, help)  ((void)(LIKELY(x) ? 0 : __assert(help " (" #x ")", THIS_FILE, __LINE__)))
 		#else
-			#define ASSERT(x)         (LIKELY(x) ? 0 : __assert("", THIS_FILE, __LINE__))
-			#define ASSERT2(x, help)  ASSERT(x)
+			#define ASSERT(x)         ((void)(LIKELY(x) ? 0 : __assert("", THIS_FILE, __LINE__)))
+			#define ASSERT2(x, help)  ((void)ASSERT(x))
 		#endif
 
-		#define ASSERT_VALID_PTR(p)         (LIKELY((p) >= 0x200) ? 0 : __invalid_ptr(p, #p, THIS_FILE, __LINE__))
-		#define ASSERT_VALID_PTR_OR_NULL(p) (LIKELY((p == NULL) || ((p) >= 0x200)) ? 0 : __invalid_ptr((p), #p, THIS_FILE, __LINE__))
+		#define ASSERT_VALID_PTR(p)         ((void)(LIKELY((p) >= 0x200) ? 0 : __invalid_ptr(p, #p, THIS_FILE, __LINE__)))
+		#define ASSERT_VALID_PTR_OR_NULL(p) ((void)(LIKELY((p == NULL) || ((p) >= 0x200)) ? 0 : __invalid_ptr((p), #p, THIS_FILE, __LINE__)))
 		#define TRACE                       kprintf("%s()\n", __FUNCTION__)
 		#define TRACEMSG(msg,...)           kprintf("%s(): " msg "\n", __FUNCTION__, ## __VA_ARGS__)
 
@@ -307,7 +310,13 @@
 	INLINE void kdbg_init(void) { /* nop */ }
 	INLINE void kputchar(UNUSED(char, c)) { /* nop */ }
 	INLINE void kputs(UNUSED(const char*, str)) { /* nop */ }
-	INLINE void kprintf(UNUSED(const char*, fmt), ...) { /* nop */ }
+	#ifdef __cplusplus
+		/* G++ can't inline functions with variable arguments... */
+		#define kprintf(fmt,...) do { (void)(fmt); } while(0)
+	#else
+		/* ...but GCC can. */
+		INLINE void kprintf(UNUSED(const char*, fmt), ...) { /* nop */ }
+	#endif
 
 #endif /* _DEBUG */
 

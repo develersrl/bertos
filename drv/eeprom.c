@@ -5,18 +5,20 @@
  * All Rights Reserved.
  * -->
  *
- * \version $Id$
- *
- * \author Stefano Fedrigo <aleph@develer.com>
- * \author Bernardo Innocenti <bernie@develer.com>
- *
  * \brief Driver for the 24xx16 and 24xx256 I2C EEPROMS (implementation)
  *
  * \note This implementation is AVR specific.
+ *
+ * \version $Id$
+ * \author Stefano Fedrigo <aleph@develer.com>
+ * \author Bernardo Innocenti <bernie@develer.com>
  */
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2004/09/20 03:31:22  bernie
+ *#* Sanitize for C++.
+ *#*
  *#* Revision 1.9  2004/09/14 21:03:46  bernie
  *#* Use debug.h instead of kdebug.h.
  *#*
@@ -160,8 +162,10 @@ static void twi_stop(void)
  *
  * \return true on success, false on error.
  */
-static bool twi_send(const uint8_t *buf, size_t count)
+static bool twi_send(const void *_buf, size_t count)
 {
+	const uint8_t *buf = (const uint8_t *)_buf;
+
 	while (count--)
 	{
 		TWDR = *buf++;
@@ -187,8 +191,10 @@ static bool twi_send(const uint8_t *buf, size_t count)
  *
  * \return true on success, false on error
  */
-static bool twi_recv(uint8_t *buf, size_t count)
+static bool twi_recv(void *_buf, size_t count)
 {
+	uint8_t *buf = (uint8_t *)_buf;
+
 	/*
 	 * When reading the last byte the TWEA bit is not
 	 * set, and the eeprom should answer with NACK
@@ -411,8 +417,8 @@ void eeprom_init(void)
 
 void eeprom_test(void)
 {
-	static const char magic[13] = "Humpty Dumpty";
-	char buf[sizeof magic + 1];
+	static const char magic[14] = "Humpty Dumpty";
+	char buf[sizeof magic];
 	size_t i;
 
 	// Write something to EEPROM using unaligned sequential writes
