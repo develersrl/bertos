@@ -6,6 +6,10 @@
  * -->
  *
  * \brief Poor man's hex arrays (implementation).
+ *
+ * \version $Id$
+ *
+ * \author Bernardo Innocenti <bernie@develer.com>
  */
 
 #ifndef MWARE_HEX_H
