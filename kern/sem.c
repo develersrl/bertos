@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2004/10/21 10:48:57  bernie
+ *#* sem_release(): Simplify (made by rasky on scfirm).
+ *#*
  *#* Revision 1.4  2004/08/25 14:12:09  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -141,20 +144,19 @@ void sem_release(struct Semaphore *s)
 	DISABLE_IRQSAVE(flags);
 
 	/*
-	 * Decremement nesting count and check if the semaphore
+	 * Decrement nesting count and check if the semaphore
 	 * has been fully unlocked
 	 */
 	if (--s->nest_count == 0)
 	{
+		Process *proc;
+
 		/* Disown semaphore */
 		s->owner = NULL;
 
-		/* Anybody still waiting for this semaphore? */
-		if (!ISLISTEMPTY(&s->wait_queue))
+		/* Give semaphore to the first applicant, if any */
+		if ((proc = (Process*)REMHEAD(&s->wait_queue)))
 		{
-			/* Give semaphore to the first applicant */
-			Process *proc = (Process *)s->wait_queue.head;
-			REMOVE((Node *)proc);
 			s->nest_count = 1;
 			s->owner = proc;
 			SCHED_ENQUEUE(proc);
