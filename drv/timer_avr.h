@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.7  2004/07/20 23:49:40  bernie
+ * Compute value of OCR_DIVISOR from CLOCK_FREQ.
+ *
  * Revision 1.6  2004/07/20 23:48:16  bernie
  * Finally remove redundant protos.
  *
@@ -52,7 +55,7 @@
  * System timer: additional division after the prescaler
  * 12288000 / 64 / 192 (0..191) = 1 ms
  */
-#define OCR_DIVISOR 191
+#define OCR_DIVISOR  (CLOCK_FREQ / TIMER_PRESCALER / TICKS_PER_SEC - 1) /* 191 */
 
 /*! HW dependent timer initialization  */
 #if defined(CONFIG_TIMER_ON_TIMER0)
