@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.14  2004/09/06 21:39:56  bernie
+ *#* Allow partial redefinition of BUS macros.
+ *#*
  *#* Revision 1.13  2004/08/29 22:04:26  bernie
  *#* Convert 485 macros to generic BUS macros;
  *#* kputchar(): New public function.
@@ -93,15 +96,14 @@
 		 * Support for special bus policies or external transceivers
 		 * on UART0 (to be overridden in "hw.h").
 		 */
-		#if !defined(KDBG_UART0_BUS_INIT)
-			#if defined(KDBG_UART0_BUS_RX) || defined(KDBG_UART0_BUS_TX)
-				#error KDBG_UART0_BUS_INIT, KDBG_UART0_BUS_RX and KDBG_UART0_BUS_TX must be defined together
-			#endif
-			#define KDBG_UART0_BUS_INIT  do {} while (0)
-			#define KDBG_UART0_BUS_TX    do {} while (0)
-			#define KDBG_UART0_BUS_RX    do {} while (0)
-		#elif !defined(KDBG_UART0_BUS_RX) || !defined(KDBG_UART0_BUS_TX)
-			#error KDBG_UART0_BUS_INIT, KDBG_UART0_BUS_RX and KDBG_UART0_BUS_TX must be defined together
+		#ifndef KDBG_UART0_BUS_INIT
+		#define KDBG_UART0_BUS_INIT  do {} while (0)
+		#endif
+		#ifndef KDBG_UART0_BUS_RX
+		#define KDBG_UART0_BUS_RX    do {} while (0)
+		#endif
+		#ifndef KDBG_UART0_BUS_TX
+		#define KDBG_UART0_BUS_TX    do {} while (0)
 		#endif
 
 		#if defined(__AVR_ATmega64__)
@@ -115,6 +117,7 @@
 
 		#define KDBG_WAIT_READY()     do { loop_until_bit_is_set(USR, UDRE); } while(0)
 		#define KDBG_WAIT_TXDONE()    do { loop_until_bit_is_set(USR, TXC); } while(0)
+
 		/*
 		 * We must clear the TXC flag before sending a new character to allow
 		 * KDBG_WAIT_TXDONE() to work properly.
@@ -127,10 +130,10 @@
 		#define KDBG_WRITE_CHAR(c)    do { USR |= BV(TXC); UDR = (c); } while(0)
 
 		#define KDBG_MASK_IRQ(old)    do { \
-			KDBG_UART0_BUS_TX; \
 			(old) = UCR; \
 			UCR |= BV(TXEN); \
 			UCR &= ~(BV(TXCIE) | BV(UDRIE)); \
+			KDBG_UART0_BUS_TX; \
 		} while(0)
 
 		#define KDBG_RESTORE_IRQ(old) do { \
@@ -148,14 +151,13 @@
 		 * on UART1 (to be overridden in "hw.h").
 		 */
 		#ifndef KDBG_UART1_BUS_INIT
-			#if defined(KDBG_UART1_BUS_RX) || defined(KDBG_UART1_BUS_TX)
-				#error KDBG_UART1_BUS_INIT, KDBG_UART1_BUS_RX and KDBG_UART1_BUS_TX must be defined together
-			#endif
-			#define KDBG_UART1_BUS_INIT  do {} while (0)
-			#define KDBG_UART1_BUS_TX    do {} while (0)
-			#define KDBG_UART1_BUS_RX    do {} while (0)
-		#elif !defined(KDBG_UART1_BUS_RX) || !defined(KDBG_UART1_BUS_TX)
-			#error KDBG_UART1_BUS_INIT, KDBG_UART1_BUS_RX and KDBG_UART1_BUS_TX must be defined together
+		#define KDBG_UART1_BUS_INIT  do {} while (0)
+		#endif
+		#ifndef KDBG_UART1_BUS_RX
+		#define KDBG_UART1_BUS_RX    do {} while (0)
+		#endif
+		#ifndef KDBG_UART1_BUS_TX
+		#define KDBG_UART1_BUS_TX    do {} while (0)
 		#endif
 
 		#define KDBG_WAIT_READY()     do { loop_until_bit_is_set(UCSR1A, UDRE); } while(0)
@@ -163,10 +165,10 @@
 		#define KDBG_WRITE_CHAR(c)    do { UCSR1A |= BV(TXC); UDR1 = (c); } while(0)
 
 		#define KDBG_MASK_IRQ(old)    do { \
-			KDBG_UART1_BUS_TX; \
 			(old) = UCSR1B; \
 			UCSR1B |= BV(TXEN); \
 			UCSR1B &= ~(BV(TXCIE) | BV(UDRIE)); \
+			KDBG_UART1_BUS_TX; \
 		} while(0)
 
 		#define KDBG_RESTORE_IRQ(old) do { \
