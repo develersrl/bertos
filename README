@@ -36,7 +36,7 @@ you can configure out features you don't need.
 
 \section structure Directory Structure
 
-Modules are sorted in subdirectories by their category:
+The modules are sorted in subdirectories by their category:
 
  - kern/ - Simple multitasking kernel implementation;
  - drv/ - Hardware drivers;
@@ -48,12 +48,12 @@ The top-level directory contains a few support headers that are meant
 to be usable by any C or C++, embedded or hosted application.  The
 top-level directory also contains a few example templates for files
 that are meant to be customized on a per-application basis.  These
-files are hw.h, config.h, verstah.h and arch_config.h.
+files are hw.h, config.h, verstag.h and arch_config.h.
 
-To achieve the highest possible reusability, all devlib components DevLib
-are designed to have minimal inter-module and external dependencies.
-Most non-essential features can be configured out for applications
-with small memory footprint requirements.
+To achieve the highest possible reusability, most DevLib components
+are designed for fine-grained modularity and minimal external
+dependencies.  Most non-essential features can be configured out for
+applications with small memory footprint requirements.
 
 
 \section redist Redistribution
