@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.28  2004/12/31 17:39:41  bernie
+ *#* Fix documentation.
+ *#*
  *#* Revision 1.27  2004/12/31 17:02:47  bernie
  *#* IRQ_SAVE_DISABLE(), IRQ_RESTORE(): Add null stubs for x86.
  *#*
@@ -75,7 +78,7 @@
 #ifndef DEVLIB_CPU_H
 #define DEVLIB_CPU_H
 
-#include "compiler.h" /* for uintXX_t, PP_CAT3(), PP_STRINGIZE() */
+#include "compiler.h" /* for uintXX_t */
 
 
 /*!
@@ -376,7 +379,7 @@ STATIC_ASSERT(sizeof(int) == SIZEOF_INT);
 
 
 /*!
- * \def SCHEDULER_IDLE
+ * \def CPU_IDLE
  *
  * \brief Invoked by the scheduler to stop the CPU when idle.
  *
