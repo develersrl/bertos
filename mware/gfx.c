@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2004/09/20 03:29:22  bernie
+ *#* Relax assertion.
+ *#*
  *#* Revision 1.7  2004/09/14 21:01:08  bernie
  *#* Rename rectangle drawing functions; Unify filled/cleared implementations.
  *#*
@@ -372,8 +375,8 @@ void gfx_SetClipRect(Bitmap *bm, coord_t minx, coord_t miny, coord_t maxx, coord
 	ASSERT(miny < maxy);
 	ASSERT(miny >= 0);
 	ASSERT(minx >= 0);
-	ASSERT(maxx < bm->width);
-	ASSERT(maxy < bm->height);
+	ASSERT(maxx <= bm->width);
+	ASSERT(maxy <= bm->height);
 
 	bm->cr.xmin = minx;
 	bm->cr.ymin = miny;
