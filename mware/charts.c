@@ -26,8 +26,8 @@
 
 /*
  * $Log$
- * Revision 1.2  2004/08/11 07:32:54  bernie
- * Refactor after the new mware/gfx API.
+ * Revision 1.3  2004/08/11 19:39:12  bernie
+ * Use chart_x_t and chart_y_t for the input dataset.
  *
  * Revision 1.1  2004/08/04 03:16:30  bernie
  * Import simple chart drawing code.
@@ -85,7 +85,7 @@ void chart_drawAxis(Bitmap *bm)
  * are identified by the \a curve_y array and X-coordinates are
  * are evenly spaced by one virtual unit.
  */
-void chart_drawCurve(Bitmap *bm, const vcoord_t *curve_y, int curve_cnt)
+void chart_drawCurve(Bitmap *bm, const chart_y_t *curve_y, int curve_cnt)
 {
 	int i;
 
@@ -103,19 +103,19 @@ void chart_drawCurve(Bitmap *bm, const vcoord_t *curve_y, int curve_cnt)
  * Disegna dei dot in corrispondenza delle coppie (dotsx[i];dotsy[i])
  * Se dotsx e' NULL, i punti vengono disegnati ad intervalli regolari.
  */
-void chart_drawDots(Bitmap *bm, const vcoord_t *dotsx, const vcoord_t *dotsy, int cnt)
+void chart_drawDots(Bitmap *bm, const chart_x_t *dots_x, const chart_y_t *dots_y, int cnt)
 {
 	int i;
 	coord_t x, y;
 
 	for (i = 0; i < cnt; i++)
 	{
-		if (dotsx)
-			x = gfx_TransformX(bm, dotsx[i]);
+		if (dots_x)
+			x = gfx_TransformX(bm, dots_x[i]);
 		else
 			x = gfx_TransformX(bm, i);
 
-		y = gfx_TransformY(bm, dotsy[i]);
+		y = gfx_TransformY(bm, dots_y[i]);
 
 		gfx_DrawRect(bm, x - 1, y - 1, x + 1, y + 1);
 
