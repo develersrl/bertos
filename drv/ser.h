@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.12  2004/09/06 21:40:50  bernie
+ *#* Move buffer handling in chip-specific driver.
+ *#*
  *#* Revision 1.11  2004/08/25 14:12:08  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -139,7 +142,7 @@ struct Serial
 	DB(bool is_open;)
 
 	/*!
-	 * \name FIFO transmit and receive buffers.
+	 * \name Transmit and receive FIFOs.
 	 *
 	 * Declared volatile because handled asinchronously by interrupts.
 	 *
@@ -147,8 +150,6 @@ struct Serial
 	 */
 	FIFOBuffer txfifo;
 	FIFOBuffer rxfifo;
-	unsigned char txbuffer[CONFIG_SER_TXBUFSIZE];
-	unsigned char rxbuffer[CONFIG_SER_RXBUFSIZE];
 	/* \} */
 
 #if CONFIG_SER_RXTIMEOUT != -1

@@ -28,6 +28,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.16  2004/09/06 21:40:50  bernie
+ *#* Move buffer handling in chip-specific driver.
+ *#*
  *#* Revision 1.15  2004/08/25 14:12:08  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -105,6 +108,7 @@ struct Serial ser_handles[SER_CNT];
  */
 int ser_putchar(int c, struct Serial *port)
 {
+	//ASSERT_VALID_FIFO(&port->txfifo);
 	if (fifo_isfull_locked(&port->txfifo))
 	{
 #if CONFIG_SER_TXTIMEOUT != -1
@@ -179,7 +183,7 @@ int ser_getchar(struct Serial *port)
 	 * Get a byte from the FIFO (avoiding sign-extension),
 	 * re-enable RTS, then return result.
 	 */
-	result = (int)(unsigned char)fifo_pop(&port->rxfifo);
+	result = (int)(unsigned char)fifo_pop_locked(&port->rxfifo);
 	return port->status ? EOF : result;
 }
 
@@ -195,7 +199,7 @@ int ser_getchar_nowait(struct Serial *port)
 		return EOF;
 
 	/* NOTE: the double cast prevents unwanted sign extension */
-	return (int)(unsigned char)fifo_pop(&port->rxfifo);
+	return (int)(unsigned char)fifo_pop_locked(&port->rxfifo);
 }
 
 
@@ -420,11 +424,12 @@ struct Serial *ser_open(unsigned int unit)
 
 	port->unit = unit;
 
-	/* Initialize circular buffer */
-	fifo_init(&port->rxfifo, port->rxbuffer, sizeof(port->rxbuffer));
-	fifo_init(&port->txfifo, port->txbuffer, sizeof(port->txbuffer));
-
 	port->hw = ser_hw_getdesc(unit);
+
+	/* Initialize circular buffers */
+	fifo_init(&port->txfifo, port->hw->txbuffer, port->hw->txbuffer_size);
+	fifo_init(&port->rxfifo, port->hw->rxbuffer, port->hw->rxbuffer_size);
+
 	port->hw->table->init(port->hw, port);
 
 	/* Set default values */

@@ -38,6 +38,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.13  2004/09/06 21:40:50  bernie
+ *#* Move buffer handling in chip-specific driver.
+ *#*
  *#* Revision 1.12  2004/08/29 22:06:10  bernie
  *#* Fix a bug in the (unused) RTS/CTS code; Clarify documentation.
  *#*
@@ -254,7 +257,7 @@
  * SER_STROBE_OFF and SER_STROBE_INIT and set
  * CONFIG_SER_STROBE to 1.
  */
-#ifndef CONFIG_SER_STROBE
+#if !defined(CONFIG_SER_STROBE) || !CONFIG_SER_STROBE
 	#define SER_STROBE_ON    do {/*nop*/} while(0)
 	#define SER_STROBE_OFF   do {/*nop*/} while(0)
 	#define SER_STROBE_INIT  do {/*nop*/} while(0)
@@ -263,6 +266,16 @@
 
 /* From the high-level serial driver */
 extern struct Serial ser_handles[SER_CNT];
+
+/* TX and RX buffers */
+static unsigned char uart0_txbuffer[CONFIG_UART0_TXBUFSIZE];
+static unsigned char uart0_rxbuffer[CONFIG_UART0_RXBUFSIZE];
+#if AVR_HAS_UART1
+	static unsigned char uart1_txbuffer[CONFIG_UART1_TXBUFSIZE];
+	static unsigned char uart1_rxbuffer[CONFIG_UART1_RXBUFSIZE];
+#endif
+static unsigned char spi_txbuffer[CONFIG_SPI_TXBUFSIZE];
+static unsigned char spi_rxbuffer[CONFIG_SPI_RXBUFSIZE];
 
 
 /*!
@@ -496,17 +509,35 @@ static const struct SerialHardwareVT SPI_VT =
 static struct AvrSerial UARTDescs[SER_CNT] =
 {
 	{
-		.hw = { .table = &UART0_VT },
+		.hw = {
+			.table = &UART0_VT,
+			.txbuffer = uart0_txbuffer,
+			.rxbuffer = uart0_rxbuffer,
+			.txbuffer_size = CONFIG_UART0_TXBUFSIZE,
+			.rxbuffer_size = CONFIG_UART0_RXBUFSIZE,
+		},
 		.sending = false,
 	},
 #if AVR_HAS_UART1
 	{
-		.hw = { .table = &UART1_VT },
+		.hw = {
+			.table = &UART1_VT,
+			.txbuffer = uart1_txbuffer,
+			.rxbuffer = uart1_rxbuffer,
+			.txbuffer_size = CONFIG_UART1_TXBUFSIZE,
+			.rxbuffer_size = CONFIG_UART1_RXBUFSIZE,
+		},
 		.sending = false,
 	},
 #endif
 	{
-		.hw = { .table = &SPI_VT   },
+		.hw = {
+			.table = &SPI_VT,
+			.txbuffer = spi_txbuffer,
+			.rxbuffer = spi_rxbuffer,
+			.txbuffer_size = CONFIG_SPI_TXBUFSIZE,
+			.rxbuffer_size = CONFIG_SPI_RXBUFSIZE,
+		},
 		.sending = false,
 	}
 };
@@ -676,14 +707,20 @@ SIGNAL(SIG_UART1_TRANS)
  * disabled. Using INTERRUPT() is troublesome when the serial
  * is heavily loaded, because an interrupt could be retriggered
  * when executing the handler prologue before RXCIE is disabled.
+ *
+ * \note The code that re-enables interrupts is commented out
+ *       because in some nasty cases the interrupt is retriggered.
+ *       This is probably due to the RXC flag being set before
+ *       RXCIE is cleared.  Unfortunately the RXC flag is read-only
+ *       and can't be cleared by code.
  */
 SIGNAL(SIG_UART0_RECV)
 {
 	SER_STROBE_ON;
 
 	/* Disable Recv complete IRQ */
-	UCSR0B &= ~BV(RXCIE);
-	ENABLE_INTS;
+	//UCSR0B &= ~BV(RXCIE);
+	//ENABLE_INTS;
 
 	/* Should be read before UDR */
 	ser_uart0->status |= UCSR0A & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
@@ -707,7 +744,8 @@ SIGNAL(SIG_UART0_RECV)
 	}
 
 	/* Reenable receive complete int */
-	UCSR0B |= BV(RXCIE);
+	//DISABLE_INTS;
+	//UCSR0B |= BV(RXCIE);
 
 	SER_STROBE_OFF;
 }
@@ -723,14 +761,16 @@ SIGNAL(SIG_UART0_RECV)
  * disabled. Using INTERRUPT() is troublesome when the serial
  * is heavily loaded, because an interrupt could be retriggered
  * when executing the handler prologue before RXCIE is disabled.
+ *
+ * \see SIGNAL(SIG_UART0_RECV)
  */
 SIGNAL(SIG_UART1_RECV)
 {
 	SER_STROBE_ON;
 
 	/* Disable Recv complete IRQ */
-	UCSR1B &= ~BV(RXCIE);
-	ENABLE_INTS;
+	//UCSR1B &= ~BV(RXCIE);
+	//ENABLE_INTS;
 
 	/* Should be read before UDR */
 	ser_uart1->status |= UCSR1A & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
@@ -740,8 +780,9 @@ SIGNAL(SIG_UART1_RECV)
 	 */
 	char c = UDR1;
 	struct FIFOBuffer * const rxfifo = &ser_uart1->rxfifo;
+	//ASSERT_VALID_FIFO(rxfifo);
 
-	if (fifo_isfull(rxfifo))
+	if (UNLIKELY(fifo_isfull(rxfifo)))
 		ser_uart1->status |= SERRF_RXFIFOOVERRUN;
 	else
 	{
@@ -752,7 +793,7 @@ SIGNAL(SIG_UART1_RECV)
 #endif
 	}
 	/* Reenable receive complete int */
-	UCSR1B |= BV(RXCIE);
+	//UCSR1B |= BV(RXCIE);
 
 	SER_STROBE_OFF;
 }

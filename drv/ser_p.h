@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2004/09/06 21:40:50  bernie
+ *#* Move buffer handling in chip-specific driver.
+ *#*
  *#* Revision 1.4  2004/08/25 14:12:08  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -44,6 +47,10 @@ struct SerialHardwareVT
 struct SerialHardware
 {
 	const struct SerialHardwareVT* table;
+	unsigned char *txbuffer;
+	unsigned char *rxbuffer;
+	size_t         txbuffer_size;
+	size_t         rxbuffer_size;
 };
 
 struct SerialHardware* ser_hw_getdesc(int unit);
