@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2004/12/08 09:11:53  bernie
+ *#* Rename time_t to mtime_t.
+ *#*
  *#* Revision 1.10  2004/10/03 18:38:51  bernie
  *#* Add missing AVR header; Fix header.
  *#*
@@ -117,8 +120,8 @@
 /* Local vars */
 static Timer buz_timer;
 static bool buz_timer_running;
-static time_t buz_repeat_interval;
-static time_t buz_repeat_duration;
+static mtime_t buz_repeat_interval;
+static mtime_t buz_repeat_duration;
 
 
 /*!
@@ -153,7 +156,7 @@ static void buz_softint(void)
 /*!
  * Beep for the specified ms time
  */
-void buz_beep(time_t time)
+void buz_beep(mtime_t time)
 {
 	cpuflags_t flags;
 
@@ -177,7 +180,7 @@ void buz_beep(time_t time)
 /*!
  * Start buzzer repetition
  */
-void buz_repeat_start(time_t duration, time_t interval)
+void buz_repeat_start(mtime_t duration, mtime_t interval)
 {
 	buz_repeat_interval = interval;
 	buz_repeat_duration = duration;

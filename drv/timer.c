@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.22  2004/12/08 09:12:09  bernie
+ *#* Rename time_t to mtime_t.
+ *#*
  *#* Revision 1.21  2004/11/28 23:20:25  bernie
  *#* Remove obsolete INITLIST macro.
  *#*
@@ -120,7 +123,7 @@
 
 
 //! Master system clock (1ms accuracy)
-volatile time_t _clock;
+volatile mtime_t _clock;
 
 
 #ifndef CONFIG_TIMER_DISABLE_EVENTS
@@ -192,7 +195,7 @@ Timer *timer_abort(Timer *timer)
 /*!
  * Wait for the specified amount of time (expressed in ms)
  */
-void timer_delay(time_t time)
+void timer_delay(mtime_t time)
 {
 #if defined(IRQ_GETSTATE)
 	/* We shouldn't sleep with interrupts disabled */
@@ -210,7 +213,7 @@ void timer_delay(time_t time)
 
 #else /* !CONFIG_KERN_SIGNALS */
 
-	time_t start = timer_ticks();
+	mtime_t start = timer_ticks();
 
 	/* Busy wait */
 	while (timer_ticks() - start < time)

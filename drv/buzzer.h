@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2004/12/08 09:11:53  bernie
+ *#* Rename time_t to mtime_t.
+ *#*
  *#* Revision 1.5  2004/08/25 14:12:08  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -34,8 +37,8 @@
 #include <compiler.h>
 
 extern void buz_init(void);
-extern void buz_beep(time_t time);
-extern void buz_repeat_start(time_t duration, time_t interval);
+extern void buz_beep(mtime_t time);
+extern void buz_repeat_start(mtime_t duration, mtime_t interval);
 extern void buz_repeat_stop(void);
 
 #endif /* DRV_BUZZER_H */
