@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/07/14 14:04:29  rasky
+ * Merge da SC: spostata bld_set inline perché si ottimizza parecchio tramite propagazione di costanti
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -32,18 +35,32 @@
  */
 #include <hw.h>
 
+
+/* Include hw-level implementation. This allows inlining of bld_set, which in turns
+ * should allow fast constant propagation for the common case (where the parameter
+ * device is a constant).
+ */
+#if defined(__m56800__)
+	#include "buzzerled_dsp56k.h"
+#else
+	#error Unsupported architecture
+#endif
+
+
 /*! Initialize the buzzerled library.
  *
  * \note This function must be called before any other function in the library.
  */
 void bld_init(void);
 
+
 /*! Set or reset a device.
  *
  * \param device Device to be set
  * \param enable Enable/disable status
  */
-void bld_set(enum BLD_DEVICE device, bool enable);
+#define bld_set(device, enable)  bld_hw_set(device, enable)
+
 
 /*! Enable a device for a certain interval of time
  *

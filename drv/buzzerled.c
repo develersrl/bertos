@@ -27,6 +27,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/07/14 14:04:29  rasky
+ * Merge da SC: spostata bld_set inline perché si ottimizza parecchio tramite propagazione di costanti
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -37,12 +40,6 @@
 
 #include "buzzerled.h"
 #include "timer.h"
-
-#if defined(__m56800__)
-	#include "buzzerled_dsp56k.h"
-#else
-	#error Unsupported architecture
-#endif
 
 static struct Timer timers[NUM_BLDS];
 static bool timer_go[NUM_BLDS];
@@ -67,11 +64,6 @@ static void hook_turn_off(void* parm)
 void bld_init(void)
 {
 	bld_hw_init();
-}
-
-void bld_set(enum BLD_DEVICE device, bool enable)
-{
-	bld_hw_set(device, enable);
 }
 
 void bld_beep(enum BLD_DEVICE device, uint16_t duration)
