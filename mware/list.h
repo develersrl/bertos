@@ -13,6 +13,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/07/18 22:01:43  bernie
+ * REMHEAD(), REMTAIL(): Move to list.h as inline functions.
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -111,15 +114,38 @@ typedef struct _List
 /*! Tell whether a list is empty */
 #define ISLISTEMPTY(l)  ( (l)->head == (Node *)(&(l)->null) )
 
-/*! \name Extract an element from the head/tail of the list. If the list empty, return NULL. */
-/*\{*/
-#define REMHEAD(l) _list_rem_head(l)
-#define REMTAIL(l) _list_rem_tail(l)
-/*\}*/
+/*!
+ * \name Unlink a node from the head of the list \a l.
+ * \return Pointer to node, or NULL if the list was empty.
+ */
+INLINE Node *REMHEAD(List *l)
+{
+	Node *n;
 
-/* Prototypes for out-of-line functions */
-Node *_list_rem_head(List *l);
-Node *_list_rem_tail(List *l);
+	if (ISLISTEMPTY(l))
+		return (Node *)0;
 
+	n = l->head;
+	l->head = n->succ;
+	n->succ->pred = (Node *)l;
+	return n;
+}
+
+/*!
+ * \name Unlink a node from the tail of the list \a l.
+ * \return Pointer to node, or NULL if the list was empty.
+ */
+INLINE Node *REMTAIL(List *l)
+{
+	Node *n;
+
+	if (ISLISTEMPTY(l))
+		return (Node *)0;
+
+	n = l->tail;
+	l->tail = n->pred;
+	n->pred->succ = (Node *)&l->null;
+	return n;
+}
 
 #endif /* MWARE_LIST_H */
