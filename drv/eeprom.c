@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2004/10/26 08:35:31  bernie
+ *#* Reset watchdog for long operations.
+ *#*
  *#* Revision 1.10  2004/09/20 03:31:22  bernie
  *#* Sanitize for C++.
  *#*
@@ -50,6 +53,7 @@
 
 #include "eeprom.h"
 
+#include <drv/wdt.h>
 #include <mware/byteorder.h> /* cpu_to_be16() */
 #include <debug.h>
 #include <hw.h>
@@ -292,6 +296,8 @@ bool eeprom_write(e2addr_t addr, const void *buf, size_t count)
 /*!
  * Copy \c count bytes at address \c addr
  * from eeprom to RAM to buffer \c buf.
+ *
+ * \return true on success.
  */
 bool eeprom_read(e2addr_t addr, void *buf, size_t count)
 {
@@ -370,6 +376,9 @@ void eeprom_erase(e2addr_t addr, size_t count)
 	// Clear all but struct hw_info at start of eeprom
 	while (count)
 	{
+		// Long operation, reset watchdog
+		wdt_reset();
+
 		size_t size = MIN(count, sizeof buf);
 		eeprom_write(addr, buf, size);
 		addr += size;
