@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.16  2004/10/03 18:48:01  bernie
+ *#* timer_delay(): Add a sanity check to avoid sleeping forever.
+ *#*
  *#* Revision 1.15  2004/09/14 21:07:18  bernie
  *#* Use debug.h instead of kdebug.h.
  *#*
@@ -139,6 +142,11 @@ Timer *timer_abort(Timer *timer)
  */
 void timer_delay(time_t time)
 {
+#if defined(IRQ_GETSTATE)
+	/* We shouldn't sleep with interrupts disabled */
+	ASSERT(IRQ_GETSTATE());
+#endif
+
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 	Timer t;
 
