@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.18  2004/09/20 03:31:03  bernie
+ *#* Fix racy racy code.
+ *#*
  *#* Revision 1.17  2004/09/14 21:07:09  bernie
  *#* Include hw.h explicitly.
  *#*
@@ -233,22 +236,6 @@
 	 */
 	SIGNAL(SIG_OVERFLOW1)
 	{
-		/*!
-		 * How many overflow we have to count before calling the true timer handler.
-		 * If timer overflow is at 24 kHz, with a value of 24 we have 1 ms between
-		 * each call.
-		 */
-		#define TIMER1_OVF_COUNT 24
-
-		static uint8_t count = TIMER1_OVF_COUNT;
-
-		count--;
-		if (!count)
-		{
-			timer_handler();
-			count = TIMER1_OVF_COUNT;
-		}
-
 	#if (ARCH & ARCH_BOARD_KC)
 		/*
 		 * Super-optimization-hack: switch CPU ADC mux here, ASAP after the start
@@ -259,18 +246,49 @@
 		 * of the handler.
 		 *
 		 * The switch is synchronized with the ADC handler using _adc_trigger_lock.
+		 *
+		 *      Mel (A Real Programmer)
 		 */
 		extern uint8_t _adc_idx_next;
 		extern bool _adc_trigger_lock;
 
 		if (!_adc_trigger_lock)
 		{
-			TIMER_STROBE_ON;
+			/*
+			 * Disable free-running mode to avoid starting a
+			 * new conversion before the ADC handler has read
+			 * the ongoing one.  This condition could occur
+			 * under very high interrupt load and would have the
+			 * unwanted effect of reading from the wrong ADC
+			 * channel.
+			 *
+			 * NOTE: writing 0 to ADSC and ADIF has no effect.
+			 */
+			ADCSRA = ADCSRA & ~(BV(ADFR) | BV(ADIF) | BV(ADSC));
+
 			ADC_SETCHN(_adc_idx_next);
-			TIMER_STROBE_OFF;
 			_adc_trigger_lock = true;
 		}
-	#endif
+	#endif // ARCH_BOARD_KC
+
+		/*!
+		 * How many timer overflows we must count before calling the real
+		 * timer handler.
+		 * When the timer is programmed to overflow at 24 kHz, a value of
+		 * 24 will result in 1ms between each call.
+		 */
+		#define TIMER1_OVF_COUNT 24
+		//#warning TIMER1_OVF_COUNT for timer at 12 kHz
+		//#define TIMER1_OVF_COUNT 12
+
+		static uint8_t count = TIMER1_OVF_COUNT;
+
+		count--;
+		if (!count)
+		{
+			timer_handler();
+			count = TIMER1_OVF_COUNT;
+		}
 	}
 
 #elif (CONFIG_TIMER == TIMER_ON_OUTPUT_COMPARE0)
