@@ -18,12 +18,13 @@
  * the transmitter is turn off. The output pin is held in input with
  * pull-up enabled, to avoid capturing noise from the nearby RX line.
  *
- * The line on the KBus port has to be active everytime, even when
- * there is nothing to transmit, because the transmission of burst
- * of data generate noise on the audio channels.
- * This is accomplished with the multiprocessor mode of the ATmega64
- * serial.
- * The receiver keep MPCM bit always on. When useful data
+ * The line on the KBus port must keep sending data, even when
+ * there is nothing to transmit, because a burst data transfer
+ * generates noise on the audio channels.
+ * This is accomplished using the multiprocessor mode of the
+ * ATmega64/128 serial.
+ *
+ * The receiver keeps the MPCM bit always on. When useful data
  * is trasmitted the address bit is set. The receiver hardware
  * consider the frame as address info and receive it.
  * When useless fill bytes are sent the address bit is cleared
@@ -36,8 +37,8 @@
 
 /*
  * $Log$
- * Revision 1.6  2004/07/13 19:20:40  aleph
- * Add and cleanup comments
+ * Revision 1.7  2004/07/18 21:54:23  bernie
+ * Add ATmega8 support.
  *
  * Revision 1.5  2004/06/27 15:25:40  aleph
  * Add missing callbacks for SPI;
@@ -63,6 +64,9 @@
 #include "hw.h"
 #include <mware/fifobuf.h>
 
+#include <avr/signal.h>
+
+
 extern struct Serial ser_handles[SER_CNT];
 
 struct AvrSerial
@@ -87,16 +91,27 @@ struct AvrSerial
 #define SPI_MISO_BIT  PORTB3
 
 
-#ifdef __AVR_ATmega103__
+#if defined(__AVR_ATmega64__) || defined(__AVR_ATmega128__)
+	#define AVR_HAS_UART1
+#elif defined(__AVR_ATmega8__)
+	#define UCSR0A UCSRA
+	#define UCSR0B UCSRB
+	#define UCSR0C UCSRC
+	#define UDR0   UDR
+	#define UBRR0L UBRRL
+	#define UBRR0H UBRRH
+	#define SIG_UART0_DATA SIG_UART_DATA
+	#define SIG_UART0_RECV SIG_UART_RECV
+#elif defined(__AVR_ATmega103__)
 	/* Macro for ATmega103 compatibility */
 	#define UCSR0B UCR
 	#define UDR0   UDR
 	#define UCSR0A USR
 	#define UBRR0L UBRR
+	#define SIG_UART0_DATA SIG_UART_DATA
+	#define SIG_UART0_RECV SIG_UART_RECV
 #else
-	#define UCR  UCSR0B
-	#define UDR  UDR0
-	#define USR  UCSR0A
+	#error Unknown architecture
 #endif
 
 
@@ -118,13 +133,15 @@ static void uart0_init(struct SerialHardware *_hw, struct Serial *ser)
 	struct AvrSerial *hw = (struct AvrSerial *)_hw;
 	hw->serial = ser;
 
+#if defined(ARCH_BOARD_KS) && (ARCH & ARCH_BOARD_KS)
 	/* Set TX port as input with pull-up enabled to avoid
-	 * noise on the remote RX when TX is disabled */
+	   noise on the remote RX when TX is disabled. */
 	cpuflags_t flags;
 	DISABLE_IRQSAVE(flags);
 	DDRE &= ~BV(PORTE1);
 	PORTE |= BV(PORTE1);
 	ENABLE_IRQRESTORE(flags);
+#endif /* ARCH_BOARD_KS */
 
 #if defined(CONFIG_SER_TXFILL) && (CONFIG_KBUS_SERIAL_PORT == 0)
 	/*!
@@ -153,6 +170,7 @@ static void uart0_setbaudrate(UNUSED(struct SerialHardware *, ctx), unsigned lon
 {
 	/* Compute baud-rate period */
 	uint16_t period = (((CLOCK_FREQ / 16UL) + (rate / 2)) / rate) - 1;
+	DB(kprintf("uart0_setbaudrate(rate=%ld): period=%d\n", rate, period);)
 
 #ifndef __AVR_ATmega103__
 	UBRR0H = (period) >> 8;
@@ -160,8 +178,14 @@ static void uart0_setbaudrate(UNUSED(struct SerialHardware *, ctx), unsigned lon
 	UBRR0L = (period);
 }
 
-
+static void uart0_setparity(UNUSED(struct SerialHardware *, ctx), int parity)
+{
 #ifndef __AVR_ATmega103__
+	UCSR0C |= (parity) << UPM0;
+#endif
+}
+
+#ifdef AVR_HAS_UART1
 
 static void uart1_enabletxirq(UNUSED(struct SerialHardware *, ctx))
 {
@@ -205,22 +229,20 @@ static void uart1_setbaudrate(UNUSED(struct SerialHardware *, ctx), unsigned lon
 {
 	/* Compute baud-rate period */
 	uint16_t period = (((CLOCK_FREQ / 16UL) + (rate / 2)) / rate) - 1;
+	DB(kprintf("uart1_setbaudrate(rate=%ld): period=%d\n", rate, period);)
 
 	UBRR1H = (period) >> 8;
 	UBRR1L = (period);
 }
 
-static void uart0_setparity(UNUSED(struct SerialHardware *, ctx), int parity)
-{
-	UCSR0C |= (parity) << UPM0;
-}
-
 static void uart1_setparity(UNUSED(struct SerialHardware *, ctx), int parity)
 {
+	// FIXME: move somewhere else
+	UCSR1C |= BV(USBS1); // 2 stop bits
 	UCSR1C |= (parity) << UPM0;
 }
 
-#endif /* !__AVR_ATmega103__ */
+#endif // AVR_HAS_UART1
 
 
 static void spi_init(struct SerialHardware *_hw, struct Serial *ser)
@@ -231,7 +253,7 @@ static void spi_init(struct SerialHardware *_hw, struct Serial *ser)
 	/*
 	 * Set MOSI and SCK ports out, MISO in.
 	 *
-	 * The ATmega64 datasheet explicitly states that the input/output
+	 * The ATmega64/128 datasheet explicitly states that the input/output
 	 * state of the SPI pins is not significant, as when the SPI is
 	 * active the I/O port are overrided.
 	 * This is *blatantly FALSE*.
@@ -271,7 +293,7 @@ static void spi_setparity(UNUSED(struct SerialHardware *, ctx), UNUSED(int, pari
 SIGNAL(SIG_CTS)
 {
 	// Re-enable UDR empty interrupt and TX, then disable CTS interrupt
-	UCR = BV(RXCIE) | BV(UDRIE) | BV(RXEN) | BV(TXEN);
+	UCSR0B = BV(RXCIE) | BV(UDRIE) | BV(RXEN) | BV(TXEN);
 	cbi(EIMSK, EIMSKB_CTS);
 }
 
@@ -281,11 +303,7 @@ SIGNAL(SIG_CTS)
 /*!
  * Serial 0 TX interrupt handler
  */
-#ifdef __AVR_ATmega103__
-SIGNAL(SIG_UART_DATA)
-#else
 SIGNAL(SIG_UART0_DATA)
-#endif
 {
 	if (fifo_isempty(&ser_handles[SER_UART0].txfifo))
 	{
@@ -299,14 +317,14 @@ SIGNAL(SIG_UART0_DATA)
 		UDR0 = SER_FILL_BYTE;
 #else
 		/* Disable UDR empty interrupt and transmitter */
-		UCR = BV(RXCIE) | BV(RXEN);
+		UCSR0B = BV(RXCIE) | BV(RXEN);
 #endif
 	}
 #if defined(CONFIG_SER_HWHANDSHAKE)
 	else if (IS_CTS_OFF)
 	{
 		// disable rx interrupt and tx, enable CTS interrupt
-		UCR = BV(RXCIE) | BV(RXEN);
+		UCSR0B = BV(RXCIE) | BV(RXEN);
 		sbi(EIFR, EIMSKB_CTS);
 		sbi(EIMSK, EIMSKB_CTS);
 	}
@@ -317,14 +335,16 @@ SIGNAL(SIG_UART0_DATA)
 		/* Send with ninth bit set. Receiver in MCPM mode will receive it */
 		UCSR0B |= BV(TXB8);
 #endif
-		UDR = fifo_pop(&ser_handles[SER_UART0].txfifo);
+		UDR0 = fifo_pop(&ser_handles[SER_UART0].txfifo);
 	}
 }
+
+
+#ifdef AVR_HAS_UART1
 
 /*!
  * Serial 1 TX interrupt handler
  */
-#ifndef __AVR_ATmega103__
 SIGNAL(SIG_UART1_DATA)
 {
 	if (fifo_isempty(&ser_handles[SER_UART1].txfifo))
@@ -360,7 +380,7 @@ SIGNAL(SIG_UART1_DATA)
 		UDR1 = fifo_pop(&ser_handles[SER_UART1].txfifo);
 	}
 }
-#endif /* !__AVR_ATmega103__ */
+#endif // AVR_HAS_UART1
 
 
 /*!
@@ -372,24 +392,20 @@ SIGNAL(SIG_UART1_DATA)
  * is heavily loaded, because an interrupt could be retriggered
  * when executing the handler prologue before RXCIE is disabled.
  */
-#ifdef __AVR_ATmega103__
-SIGNAL(SIG_UART_RECV)
-#else
 SIGNAL(SIG_UART0_RECV)
-#endif
 {
 	/* Disable Recv complete IRQ */
-	UCR &= ~BV(RXCIE);
+	UCSR0B &= ~BV(RXCIE);
 	ENABLE_INTS;
 
 	/* Should be read before UDR */
-	ser_handles[SER_UART0].status |= USR & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
+	ser_handles[SER_UART0].status |= UCSR0A & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
 
 	/* To clear the RXC flag we must _always_ read the UDR even when we're
 	 * not going to accept the incoming data, otherwise a new interrupt
 	 * will occur once the handler terminates.
 	 */
-	char c = UDR;
+	char c = UDR0;
 
 	if (fifo_isfull(&ser_handles[SER_UART0].rxfifo))
 		ser_handles[SER_UART0].status |= SERRF_RXFIFOOVERRUN;
@@ -402,8 +418,11 @@ SIGNAL(SIG_UART0_RECV)
 #endif
 	}
 	/* Reenable receive complete int */
-	UCR |= BV(RXCIE);
+	UCSR0B |= BV(RXCIE);
 }
+
+
+#ifdef AVR_HAS_UART1
 
 /*!
  * Serial 1 RX complete interrupt handler.
@@ -414,7 +433,6 @@ SIGNAL(SIG_UART0_RECV)
  * is heavily loaded, because an interrupt could be retriggered
  * when executing the handler prologue before RXCIE is disabled.
  */
-#ifndef __AVR_ATmega103__
 SIGNAL(SIG_UART1_RECV)
 {
 	/* Disable Recv complete IRQ */
@@ -442,7 +460,8 @@ SIGNAL(SIG_UART1_RECV)
 	/* Reenable receive complete int */
 	UCSR1B |= BV(RXCIE);
 }
-#endif /* !__AVR_ATmega103__ */
+
+#endif // AVR_HAS_UART1
 
 
 /*
@@ -494,18 +513,6 @@ SIGNAL(SIG_SPI)
 }
 
 
-/*
-
-#pragma vector = UART_TXC_vect
-__interrupt void UART_TXC_interrupt(void)
-{
-  UCSRB &= ~TXCIE;
-  ReceiveMode();
-  UCSRB = RXCIE | RXEN | TXEN;  //Abilito l'Interrupt in ricezione e RX e TX
-}
-*/
-
-
 static const struct SerialHardwareVT UART0_VT =
 {
 	.init = uart0_init,
@@ -515,6 +522,7 @@ static const struct SerialHardwareVT UART0_VT =
 	.enabletxirq = uart0_enabletxirq,
 };
 
+#ifdef AVR_HAS_UART1
 static const struct SerialHardwareVT UART1_VT =
 {
 	.init = uart1_init,
@@ -523,6 +531,7 @@ static const struct SerialHardwareVT UART1_VT =
 	.setparity = uart1_setparity,
 	.enabletxirq = uart1_enabletxirq,
 };
+#endif // AVR_HAS_UART1
 
 static const struct SerialHardwareVT SPI_VT =
 {
@@ -535,17 +544,11 @@ static const struct SerialHardwareVT SPI_VT =
 
 static struct AvrSerial UARTDescs[SER_CNT] =
 {
-	{
-		.hw = { .table = &UART0_VT },
-	},
-
-	{
-		.hw = { .table = &UART1_VT },
-	},
-
-	{
-		.hw = { .table = &SPI_VT },
-	},
+	{ .hw = { .table = &UART0_VT } },
+#ifdef AVR_HAS_UART1
+	{ .hw = { .table = &UART1_VT } },
+#endif // AVR_HAS_UART1
+	{ .hw = { .table = &SPI_VT } },
 };
 
 struct SerialHardware* ser_hw_getdesc(int unit)

@@ -16,6 +16,9 @@
 
 /*
  * $Log$
+ * Revision 1.6  2004/07/18 21:49:28  bernie
+ * Add ATmega8 support.
+ *
  * Revision 1.5  2004/06/27 15:20:26  aleph
  * Change UNUSED() macro to accept two arguments: type and name;
  * Add macro GNUC_PREREQ to detect GCC version during build;
@@ -59,10 +62,13 @@
 #elif defined(__AVR__)
 	#include <avr/io.h>
 	#if CONFIG_KDEBUG_PORT == 0
-		#ifndef __AVR_ATmega103__
+		#if defined(__AVR_ATmega64__)
 			#define UCR UCSR0B
 			#define UDR UDR0
 			#define USR UCSR0A
+		#elif defined(__AVR_ATmega8__)
+			#define UCR UCSRB
+			#define USR UCSRA
 		#endif
 		#define KDBG_WAIT_READY()     do { loop_until_bit_is_set(USR, UDRE); } while(0)
 		#define KDBG_WRITE_CHAR(c)    do { UCR |= BV(TXEN); UDR = (c); } while(0)
@@ -106,26 +112,21 @@ void kdbg_init(void)
 	/* Compute the baud rate */
 	uint16_t period = (((CLOCK_FREQ / 16UL) + (CONFIG_KDEBUG_BAUDRATE / 2)) / CONFIG_KDEBUG_BAUDRATE) - 1;
 
-	#ifdef __AVR_ATmega64__
+	#if defined(__AVR_ATmega64__)
 		#if CONFIG_KDEBUG_PORT == 0
-
-			/* Set the baud rate */
 			UBRR0H = (uint8_t)(period>>8);
 			UBRR0L = (uint8_t)period;
-
 		#elif CONFIG_KDEBUG_PORT == 1
-
 			UBRR1H = (uint8_t)(period>>8);
 			UBRR1L = (uint8_t)period;
-
 		#else
-			#error CONFIG_KDEBUG_PORT should be either 0 or 1
+			#error CONFIG_KDEBUG_PORT must be either 0 or 1
 		#endif
-	#elif defined (__AVR_ATmega103__)
-
-		/* Set the baud rate */
+	#elif defined(__AVR_ATmega8__)
+		UBRRH = (uint8_t)(period>>8);
+		UBRRL = (uint8_t)period;
+	#elif defined(__AVR_ATmega103__)
 		UBRR = (uint8_t)period;
-
 	#else
 		#error Unknown arch
 	#endif

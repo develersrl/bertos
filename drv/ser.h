@@ -14,6 +14,9 @@
 
 /*
  * $Log$
+ * Revision 1.5  2004/07/18 21:54:23  bernie
+ * Add ATmega8 support.
+ *
  * Revision 1.4  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -85,22 +88,19 @@
  */
 enum
 {
-	#if defined(__AVR_ATmega64__)
+#if defined(__AVR_ATmega64__)
 	SER_UART0,
 	SER_UART1,
 	SER_SPI,
-
-	#elif defined(__AVR_ATmega103__)
+#elif defined(__AVR_ATmega103__) || defined(__AVR_ATmega8__)
 	SER_UART0,
 	SER_SPI,
-
-	#elif defined (__m56800__)
+#elif defined (__m56800__)
 	SER_UART0,
 	SER_UART1,
-
-	#else
-		#error unknown architecture
-	#endif
+#else
+	#error unknown architecture
+#endif
 
 	SER_CNT       /**< Number of serial ports */
 };
@@ -152,20 +152,26 @@ struct Serial
 extern int ser_putchar(int c, struct Serial *port);
 extern int ser_getchar(struct Serial *port);
 extern int ser_getchar_nowait(struct Serial *port);
+
 extern int ser_write(struct Serial *port, const void *buf, size_t len);
 extern int ser_read(struct Serial *port, char *buf, size_t size);
+
 extern int ser_print(struct Serial *port, const char *s);
+extern int ser_printf(struct Serial *port, const char *format, ...) FORMAT(__printf__, 2, 3);
+
 extern int ser_gets(struct Serial *port, char *buf, int size);
 extern int ser_gets_echo(struct Serial *port, char *buf, int size, bool echo);
-extern int ser_printf(struct Serial *port, const char *format, ...) FORMAT(__printf__, 2, 3);
+
 extern void ser_setbaudrate(struct Serial *port, unsigned long rate);
 extern void ser_setparity(struct Serial *port, int parity);
 extern void ser_purge(struct Serial *port);
-extern struct Serial *ser_open(unsigned int unit);
-extern void ser_close(struct Serial *port);
+
 #if defined(CONFIG_SER_RXTIMEOUT) || defined(CONFIG_SER_TXTIMEOUT)
 	extern void ser_settimeouts(struct Serial *port, time_t rxtimeout, time_t txtimeout);
 #endif
+
+extern struct Serial *ser_open(unsigned int unit);
+extern void ser_close(struct Serial *port);
 
 /*!
  * \name Additional functions implemented as macros
