@@ -28,6 +28,9 @@
 
 /*
  * $Log$
+ * Revision 1.14  2004/08/24 16:22:57  bernie
+ * Thinkos; Doxygen fixes
+ *
  * Revision 1.13  2004/08/24 16:20:48  bernie
  * ser_read(): Make buffer argument void * for consistency with ANSI C and ser_write()
  *
@@ -245,21 +248,22 @@ int ser_gets_echo(struct Serial *port, char *buf, int size, bool echo)
 
 
 /*!
- * Read at most size bytes and puts them
- * in buf.
- * \return number of bytes read or EOF in case
- *         of error.
+ * Read at most \a size bytes from \a port and put them in \a buf
+ *
+ * \return number of bytes actually read, or EOF in
+ *         case of error.
  */
 int ser_read(struct Serial *port, void *buf, size_t size)
 {
 	size_t i = 0;
+	char *_buf = (char *)buf;
 	int c;
 
 	while (i < size)
 	{
 		if ((c = ser_getchar(port)) == EOF)
 			return EOF;
-		buf[i++] = c;
+		_buf[i++] = c;
 	}
 
 	return i;
@@ -341,7 +345,7 @@ void ser_resync(struct Serial *port, time_t delay)
 {
 	time_t old_rxtimeout = port->rxtimeout;
 
-	ser_settimeouts(delay, ser->txtimeout);
+	ser_settimeouts(port, delay, port->txtimeout);
 	do
 	{
 		ser_setstatus(port, 0);
@@ -351,7 +355,7 @@ void ser_resync(struct Serial *port, time_t delay)
 
 	/* Restore port to an usable status */
 	ser_setstatus(port, 0);
-	ser_settimeouts(old_rxtimeout, ser->txtimeout);
+	ser_settimeouts(port, old_rxtimeout, port->txtimeout);
 }
 #endif /* CONFIG_SER_RXTIMEOUT */
 
