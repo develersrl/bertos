@@ -11,10 +11,15 @@
  * \version $Id$
  *
  * \author Giovanni Bajo <rasky@develer.com>
+ * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Stefano Fedrigo <aleph@develer.com>
  */
 
 /*
  * $Log$
+ * Revision 1.5  2004/07/20 16:20:35  bernie
+ * Move byte-order macros to mware/byteorder.h; Add missing author names.
+ *
  * Revision 1.4  2004/07/20 16:06:04  bernie
  * Add macros to handle endianess issues.
  *
@@ -212,24 +217,5 @@
 	#define CPU_PUSH_CALL_CONTEXT(sp, func) \
 		CPU_PUSH_WORD((sp), (func))
 #endif
-
-
-INLINE uint16_t htobe16(uint16_t n);
-INLINE uint16_t htobe16(uint16_t n)
-{
-	if (CPU_BYTE_ORDER == CPU_LITTLE_ENDIAN)
-		n = n << 8 | n >> 8;
-
-	return n;
-}
-
-INLINE uint16_t htole16(uint16_t n);
-INLINE uint16_t htole16(uint16_t n)
-{
-	if (CPU_BYTE_ORDER == CPU_BIG_ENDIAN)
-		n = n << 8 | n >> 8;
-
-	return n;
-}
 
 #endif /* CPU_H */
