@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.18  2004/11/16 23:09:52  bernie
+ *#* Disable timer_minutes() for targets with 16bit time_t.
+ *#*
  *#* Revision 1.17  2004/11/16 22:37:14  bernie
  *#* Replace IPTR with iptr_t.
  *#*
@@ -84,7 +87,7 @@ extern void timer_udelay(utime_t utime);
 
 #ifndef CONFIG_TIMER_DISABLE_EVENTS
 
-#ifdef CONFIG_KERNEL
+#if CONFIG_KERNEL
 	#include <kern/event.h>
 #else
 	#include <mware/event.h>
@@ -184,16 +187,25 @@ INLINE time_t timer_ticks_unlocked(void)
 }
 
 
+/*
+ * timer_minutes() makes no sense when time_t is 16bit because
+ * it overflows every 65.536 seconds.
+ */
+#if SIZEOF_TIME_T >= 4
+
 /*!
  * Return the minutes passed since timer start.
  *
- * The uptime in minutes is computed directly from system tick counter.
- * This value wraps around every 71582 minutes with a 32bit time_t.
+ * The minutes uptime is computed directly from system tick counter:
+ * in case of a 4 bytes time_t after 71582 minutes the value will
+ * wrap around.
  */
 INLINE time_t timer_minutes(void)
 {
 	return timer_ticks() / (TICKS_PER_SEC * 60);
 }
+
+#endif /* SIZEOF_TIME_T >= 4 */
 
 #endif /* DRV_TIMER_H */
 
