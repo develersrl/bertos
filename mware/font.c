@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2005/01/08 09:20:38  bernie
+ *#* Add missing type in declaration.
+ *#*
  *#* Revision 1.4  2004/12/31 16:42:55  bernie
  *#* Sanitize for non-Harvard processors.
  *#*
@@ -46,7 +49,7 @@
 
 #include "font.h"
 
-const PROGMEM font[256 * 6] =
+const PROGMEM uint8_t font[256 * 6] =
 {
 /* 0x00 */
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /*   */
