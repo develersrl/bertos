@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2004/11/28 23:21:05  bernie
+ *#* Remove obsolete INITLIST macro.
+ *#*
  *#* Revision 1.9  2004/10/21 09:37:55  bernie
  *#* Revamp documentation.
  *#*
@@ -46,6 +49,8 @@
  *#*/
 #ifndef MWARE_LIST_H
 #define MWARE_LIST_H
+
+#include <compiler.h> // INLINE
 
 /*!
  * This structure represents a node for bidirectional lists.
@@ -109,9 +114,6 @@ typedef struct _List
 		(l)->null = NULL; \
 		(l)->tail = (Node *)(&(l)->head); \
 	} while (0)
-
-/* OBSOLETE */
-#define INITLIST(l) LIST_INIT(l)
 
 /*! Add node to list head. */
 #define ADDHEAD(l,n) \

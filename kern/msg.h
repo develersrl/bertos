@@ -18,6 +18,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2004/11/28 23:20:25  bernie
+ *#* Remove obsolete INITLIST macro.
+ *#*
  *#* Revision 1.4  2004/10/19 08:22:09  bernie
  *#* msg_peek(): New function.
  *#*
@@ -56,7 +59,7 @@ typedef struct Msg
 /*! Initialize a message port */
 INLINE void msg_initPort(MsgPort* port, Event event)
 {
-	INITLIST(&port->queue);
+	LIST_INIT(&port->queue);
 	port->evn = event;
 }
 

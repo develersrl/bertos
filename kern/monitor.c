@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2004/11/28 23:20:25  bernie
+ *#* Remove obsolete INITLIST macro.
+ *#*
  *#* Revision 1.2  2004/10/26 09:01:15  bernie
  *#* monitor_rename(): New function.
  *#*
@@ -45,7 +48,7 @@ static List MonitorProcs;
 
 void monitor_init(void)
 {
-	INITLIST(&MonitorProcs);
+	LIST_INIT(&MonitorProcs);
 }
 
 

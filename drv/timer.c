@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.21  2004/11/28 23:20:25  bernie
+ *#* Remove obsolete INITLIST macro.
+ *#*
  *#* Revision 1.20  2004/11/16 20:59:06  bernie
  *#* Add watchdog timer support.
  *#*
@@ -309,7 +312,7 @@ void timer_init(void)
 	TIMER_STROBE_INIT;
 
 #ifndef CONFIG_TIMER_DISABLE_EVENTS
-	INITLIST(&timers_queue);
+	LIST_INIT(&timers_queue);
 #endif
 
 	_clock = 0;

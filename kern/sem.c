@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2004/11/28 23:20:25  bernie
+ *#* Remove obsolete INITLIST macro.
+ *#*
  *#* Revision 1.6  2004/10/21 10:57:21  bernie
  *#* Use proc_forbid()/proc_permit().
  *#*
@@ -46,7 +49,7 @@
  */
 void sem_init(struct Semaphore *s)
 {
-	INITLIST(&s->wait_queue);
+	LIST_INIT(&s->wait_queue);
 	s->owner = NULL;
 	s->nest_count = 0;
 }

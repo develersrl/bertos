@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.21  2004/11/28 23:20:25  bernie
+ *#* Remove obsolete INITLIST macro.
+ *#*
  *#* Revision 1.20  2004/11/16 22:37:14  bernie
  *#* Replace IPTR with iptr_t.
  *#*
@@ -146,7 +149,7 @@ static void proc_init_struct(Process *proc)
 
 void proc_init(void)
 {
-	INITLIST(&ProcReadyList);
+	LIST_INIT(&ProcReadyList);
 
 #if CONFIG_KERN_MONITOR
 	monitor_init();

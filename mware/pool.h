@@ -13,7 +13,7 @@
 	INLINE void name##_init(void (*init_func)(type*)) \
 	{ \
 		int i; \
-		INITLIST(&name); \
+		LIST_INIT(&name); \
 		for (i=0;i<countof(name##_items);++i) \
 		{ \
 			if (init_func) init_func(&name##_items[i]); \
