@@ -53,6 +53,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2004/09/14 21:06:23  bernie
+ *#* Spelling fix.
+ *#*
  *#* Revision 1.8  2004/08/25 14:12:09  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -83,7 +86,7 @@
 #include "formatwr.h"
 #include <compiler.h> /* progmem macros */
 #include <config.h> /* CONFIG_ macros */
-#include <drv/kdebug.h> /* ASSERT */
+#include <debug.h> /* ASSERT */
 
 #ifndef CONFIG_PRINTF_N_FORMATTER
 	/*! Enable arcane %n formatter */
@@ -111,7 +114,7 @@
 #else
 	/*
 	 * Conservative estimate. Should be (probably) 12 (which is the size necessary
-	 * to represent (2^32-1) in octal plus the sign bit 
+	 * to represent (2^32-1) in octal plus the sign bit.
 	 */
 	#define FRMWRI_BUFSIZE 16
 #endif
