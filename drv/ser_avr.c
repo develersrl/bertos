@@ -38,6 +38,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.16  2004/10/03 18:45:48  bernie
+ *#* Convert to new-style config macros; Allow compiling with a C++ compiler (mostly).
+ *#*
  *#* Revision 1.15  2004/09/14 21:05:36  bernie
  *#* Use debug.h instead of kdebug.h; Use new AVR pin names; Spelling fixes.
  *#*
@@ -89,6 +92,7 @@
 #include <mware/fifobuf.h>
 
 #include <avr/signal.h>
+#include <avr/io.h>
 
 
 /*!
@@ -227,10 +231,10 @@
 #define SPI_MOSI_BIT  PB2
 #define SPI_MISO_BIT  PB3
 
-/* USART registers definitions */
-#if defined(__AVR_ATmega64__) || defined(__AVR_ATmega128__)
+/* USART register definitions */
+#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128
 	#define AVR_HAS_UART1 1
-#elif defined(__AVR_ATmega8__)
+#elif CPU_AVR_ATMEGA8
 	#define AVR_HAS_UART1 0
 	#define UCSR0A UCSRA
 	#define UCSR0B UCSRB
@@ -240,7 +244,7 @@
 	#define UBRR0H UBRRH
 	#define SIG_UART0_DATA SIG_UART_DATA
 	#define SIG_UART0_RECV SIG_UART_RECV
-#elif defined(__AVR_ATmega103__)
+#elif CPU_AVR_ATMEGA103
 	#define AVR_HAS_UART1 0
 	#define UCSR0B UCR
 	#define UDR0   UDR
@@ -308,12 +312,11 @@ struct AvrSerial
 
 
 /*
- * These are to trick GCC into *not* using
- * absolute addressing mode when accessing
- * ser_handles, which is very expensive.
+ * These are to trick GCC into *not* using absolute addressing mode
+ * when accessing ser_handles, which is very expensive.
  *
- * Accessing through these pointers generates
- * much shorter (and hopefully faster) code.
+ * Accessing through these pointers generates much shorter
+ * (and hopefully faster) code.
  */
 struct Serial *ser_uart0 = &ser_handles[SER_UART0];
 #if AVR_HAS_UART1
@@ -342,10 +345,9 @@ static void uart0_enabletxirq(struct SerialHardware *_hw)
 	struct AvrSerial *hw = (struct AvrSerial *)_hw;
 
 	/*
-	 * WARNING: racy code here!  The tx interrupt
-	 * sets hw->sending to false when it runs with
-	 * an empty fifo.  The order of the statements
-	 * in the if-block matters.
+	 * WARNING: racy code here!  The tx interrupt sets hw->sending to false
+	 * when it runs with an empty fifo.  The order of statements in the
+	 * if-block matters.
 	 */
 	if (!hw->sending)
 	{
@@ -369,7 +371,7 @@ static void uart0_setbaudrate(UNUSED(struct SerialHardware *, _hw), unsigned lon
 
 static void uart0_setparity(UNUSED(struct SerialHardware *, _hw), int parity)
 {
-#ifndef __AVR_ATmega103__
+#if !CPU_AVR_ATMEGA103
 	UCSR0C |= (parity) << UPM0;
 #endif
 }
@@ -479,72 +481,81 @@ static void spi_setparity(UNUSED(struct SerialHardware *, _hw), UNUSED(int, pari
 }
 
 
+// FIXME: move into compiler.h?  Ditch?
+#if COMPILER_C99
+	#define	C99INIT(name,val) .name = val
+#elif defined(__GNUC__)
+	#define C99INIT(name,val) name: val
+#else
+	#warning No designated initializers, double check your code
+	#define C99INIT(name,val) (val)
+#endif
 
 /*
  * High-level interface data structures
  */
 static const struct SerialHardwareVT UART0_VT =
 {
-	.init = uart0_init,
-	.cleanup = uart0_cleanup,
-	.setbaudrate = uart0_setbaudrate,
-	.setparity = uart0_setparity,
-	.enabletxirq = uart0_enabletxirq,
+	C99INIT(init, uart0_init),
+	C99INIT(cleanup, uart0_cleanup),
+	C99INIT(setbaudrate, uart0_setbaudrate),
+	C99INIT(setparity, uart0_setparity),
+	C99INIT(enabletxirq, uart0_enabletxirq),
 };
 
 #if AVR_HAS_UART1
 static const struct SerialHardwareVT UART1_VT =
 {
-	.init = uart1_init,
-	.cleanup = uart1_cleanup,
-	.setbaudrate = uart1_setbaudrate,
-	.setparity = uart1_setparity,
-	.enabletxirq = uart1_enabletxirq,
+	C99INIT(init, uart1_init),
+	C99INIT(cleanup, uart1_cleanup),
+	C99INIT(setbaudrate, uart1_setbaudrate),
+	C99INIT(setparity, uart1_setparity),
+	C99INIT(enabletxirq, uart1_enabletxirq),
 };
 #endif // AVR_HAS_UART1
 
 static const struct SerialHardwareVT SPI_VT =
 {
-	.init = spi_init,
-	.cleanup = spi_cleanup,
-	.setbaudrate = spi_setbaudrate,
-	.setparity = spi_setparity,
-	.enabletxirq = spi_starttx,
+	C99INIT(init, spi_init),
+	C99INIT(cleanup, spi_cleanup),
+	C99INIT(setbaudrate, spi_setbaudrate),
+	C99INIT(setparity, spi_setparity),
+	C99INIT(enabletxirq, spi_starttx),
 };
 
 static struct AvrSerial UARTDescs[SER_CNT] =
 {
 	{
-		.hw = {
-			.table = &UART0_VT,
-			.txbuffer = uart0_txbuffer,
-			.rxbuffer = uart0_rxbuffer,
-			.txbuffer_size = CONFIG_UART0_TXBUFSIZE,
-			.rxbuffer_size = CONFIG_UART0_RXBUFSIZE,
+		C99INIT(hw, /**/) {
+			C99INIT(table, &UART0_VT),
+			C99INIT(txbuffer, uart0_txbuffer),
+			C99INIT(rxbuffer, uart0_rxbuffer),
+			C99INIT(txbuffer_size, sizeof(uart0_txbuffer)),
+			C99INIT(rxbuffer_size, sizeof(uart0_rxbuffer)),
 		},
-		.sending = false,
+		C99INIT(sending, false),
 	},
 #if AVR_HAS_UART1
 	{
-		.hw = {
-			.table = &UART1_VT,
-			.txbuffer = uart1_txbuffer,
-			.rxbuffer = uart1_rxbuffer,
-			.txbuffer_size = CONFIG_UART1_TXBUFSIZE,
-			.rxbuffer_size = CONFIG_UART1_RXBUFSIZE,
+		C99INIT(hw, /**/) {
+			C99INIT(table, &UART1_VT),
+			C99INIT(txbuffer, uart1_txbuffer),
+			C99INIT(rxbuffer, uart1_rxbuffer),
+			C99INIT(txbuffer_size, sizeof(uart1_txbuffer)),
+			C99INIT(rxbuffer_size, sizeof(uart1_rxbuffer)),
 		},
-		.sending = false,
+		C99INIT(sending, false),
 	},
 #endif
 	{
-		.hw = {
-			.table = &SPI_VT,
-			.txbuffer = spi_txbuffer,
-			.rxbuffer = spi_rxbuffer,
-			.txbuffer_size = CONFIG_SPI_TXBUFSIZE,
-			.rxbuffer_size = CONFIG_SPI_RXBUFSIZE,
+		C99INIT(hw, /**/) {
+			C99INIT(table, &SPI_VT),
+			C99INIT(txbuffer, spi_txbuffer),
+			C99INIT(rxbuffer, spi_rxbuffer),
+			C99INIT(txbuffer_size, sizeof(spi_txbuffer)),
+			C99INIT(rxbuffer_size, sizeof(spi_rxbuffer)),
 		},
-		.sending = false,
+		C99INIT(sending, false),
 	}
 };
 
@@ -553,7 +564,6 @@ struct SerialHardware* ser_hw_getdesc(int unit)
 	ASSERT(unit < SER_CNT);
 	return &UARTDescs[unit].hw;
 }
-
 
 
 /*
