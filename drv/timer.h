@@ -15,11 +15,8 @@
 
 /*
  * $Log$
- * Revision 1.14  2004/08/03 15:50:03  aleph
- * Rename timer_tick() to timer_ticks()
- *
- * Revision 1.13  2004/08/02 20:20:29  aleph
- * Merge from project_ks
+ * Revision 1.15  2004/08/10 06:59:09  bernie
+ * timer_gettick(): Rename to timer_ticks() and add backwards compatibility inline.
  *
  * Revision 1.12  2004/07/30 14:34:10  rasky
  * Vari fix per documentazione e commenti
@@ -167,8 +164,10 @@ INLINE time_t timer_ticks(void)
 	return result;
 }
 
-/* OBSOLETE */
-#define timer_gettick timer_ticks
+DEPRECATED INLINE time_t timer_gettick(void)
+{
+	return timer_ticks();
+}
 
 
 /*!
@@ -183,8 +182,10 @@ INLINE time_t timer_ticks_unlocked(void)
 	return _clock;
 }
 
-/* OBSOLETE */
-#define timer_gettick_irq timer_ticks_unlocked
+DEPRECATED INLINE time_t timer_gettick_irq(void)
+{
+	return timer_ticks_unlocked();
+}
 
 
 /*!

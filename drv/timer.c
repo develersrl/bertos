@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.13  2004/08/10 06:59:09  bernie
+ * timer_gettick(): Rename to timer_ticks() and add backwards compatibility inline.
+ *
  * Revision 1.12  2004/08/08 05:59:37  bernie
  * Remove a few useless casts.
  *
@@ -141,10 +144,10 @@ void timer_delay(time_t time)
 
 #else /* !CONFIG_KERN_SIGNALS */
 
-	time_t start = timer_gettick();
+	time_t start = timer_ticks();
 
 	/* Busy wait */
-	while (timer_gettick() - start < time) { /* nop */ }
+	while (timer_ticks() - start < time) { /* nop */ }
 
 #endif /* !CONFIG_KERN_SIGNALS */
 }
