@@ -18,10 +18,18 @@
  * controlled by giving a -D option a compilation time:
  *
  * \code
- *  -D CONFIG_PRINTF_NOFLOAT      Exclude support for floats
- *  -D CONFIG_PRINTF_REDUCED      Simplified formatter (see below)
- *  -D CONFIG_PRINTF_NOMODIFIERS  Exclude 'l' and 'h' modifiers in reduced version
+ *  -D CONFIG_PRINTF=PRINTF_FULL         Full ANSI printf formatter
+ *  -D CONFIG_PRINTF=PRINTF_NOFLOAT      Exclude support for floats
+ *  -D CONFIG_PRINTF=PRINTF_REDUCED      Simplified formatter (see below)
+ *  -D CONFIG_PRINTF=PRINTF_NOMODIFIERS  Exclude 'l' and 'h' modifiers in reduced version
+ *  -D CONFIG_PRINTF=PRINTF_DISABLED     No formatter at all
  * \endcode
+ *
+ * Code size on AVR4 with GCC 3.4.1 (-O2):
+ *   PRINTF_FULL        2912byte (0xB60)
+ *   PRINTF_NOFLOAT     1684byte (0x694)
+ *   PRINTF_REDUCED      924byte (0x39C)
+ *   PRINTF_NOMODIFIERS  416byte (0x1A0)
  *
  * The reduced version of formatter is suitable when program size is critical
  * rather than formatting power.  This routine uses less than 20 bytes of
@@ -35,13 +43,13 @@
  *
  * It means that real variables are not supported as well as field
  * width and precision arguments.
- *
- * The last eight (h and l modifiers) can easily be removed
- * by defining the \c CONFIG_PRINTF_NOMODIFIERS macro.
  */
 
 /*
  * $Log$
+ * Revision 1.5  2004/07/29 22:57:09  bernie
+ * Switch to new-style config handling.
+ *
  * Revision 1.4  2004/07/21 00:20:20  bernie
  * Allow completely disabling printf()-like formatter.
  *
@@ -56,15 +64,15 @@
  *
  */
 
-#ifndef CONFIG_PRINTF_DISABLED
-
 #include "formatwr.h"
 #include <compiler.h> /* progmem macros */
 #include <config.h> /* CONFIG_ macros */
 
-#ifndef CONFIG_PRINTF_NOFLOAT
+#if CONFIG_PRINTF
+
+#if CONFIG_PRINTF > PRINTF_NOFLOAT
 #include <float.h>
-#endif /* CONFIG_PRINTF_NOFLOAT */
+#endif /* CONFIG_PRINTF > PRINTF_NOFLOAT */
 
 #ifndef FRMWRI_BUFSIZE
 /*bernie: save some memory, who cares about floats with lots of decimals? */
@@ -76,14 +84,14 @@
 #define MEM_ATTRIBUTE
 #endif
 
-#ifndef CONFIG_PRINTF_NOMODIFIERS
-#define IS_SHORT (h_modifier || (sizeof(int) == 2 && !l_modifier))
+#if CONFIG_PRINTF > PRINTF_NOMODIFIERS
+	#define IS_SHORT (h_modifier || (sizeof(int) == 2 && !l_modifier))
 #else
-#define IS_SHORT (sizeof(int) == 2)
-#endif
+	#define IS_SHORT (sizeof(int) == 2)
+#endif /* CONFIG_PRINTF > PRINTF_NOMODIFIERS */
 
 
-#ifndef CONFIG_PRINTF_NOFLOAT
+#if CONFIG_PRINTF > PRINTF_NOFLOAT
 
 static char *float_conversion(MEM_ATTRIBUTE long double value,
 		MEM_ATTRIBUTE short nr_of_digits,
@@ -267,7 +275,7 @@ CLEAN_UP:
 	return (buf_pointer);
 }
 
-#endif /* !CONFIG_PRINTF_NOFLOAT */
+#endif /* CONFIG_PRINTF > PRINTF_NOFLOAT */
 
 /*!
  * This routine forms the core and entry of the formatter.
@@ -280,10 +288,10 @@ PGM_FUNC(_formatted_write)(const char * PGM_ATTR format,
 		void *secret_pointer,
 		va_list ap)
 {
+#if CONFIG_PRINTF > PRINTF_REDUCED
 	MEM_ATTRIBUTE static char bad_conversion[] = "???";
 	MEM_ATTRIBUTE static char null_pointer[] = "<NULL>";
 
-#ifndef CONFIG_PRINTF_REDUCED
 	MEM_ATTRIBUTE char format_flag;
 	MEM_ATTRIBUTE int precision;
 	MEM_ATTRIBUTE int n;
@@ -293,7 +301,7 @@ PGM_FUNC(_formatted_write)(const char * PGM_ATTR format,
 	MEM_ATTRIBUTE char nonzero_value;
 	MEM_ATTRIBUTE unsigned long ulong, div_factor;
 
-#ifndef CONFIG_PRINTF_NOFLOAT
+#if CONFIG_PRINTF >  PRINTF_NOFLOAT
 	MEM_ATTRIBUTE long double fvalue;
 #endif
 
@@ -310,7 +318,7 @@ PGM_FUNC(_formatted_write)(const char * PGM_ATTR format,
 		{
 			if (!format_flag)
 				return (nr_of_chars);
-			put_one_char (format_flag, secret_pointer);
+			put_one_char(format_flag, secret_pointer);
 			nr_of_chars++;
 		}
 		if (PGM_READ_CHAR(format) == '%')    /* %% prints as % */
@@ -557,7 +565,7 @@ INTEGRAL_CONVERSION:
 				}
 				break;
 
-#ifndef CONFIG_PRINTF_NOFLOAT
+#if CONFIG_PRINTF > PRINTF_NOFLOAT
 			case 'g':
 			case 'G':
 				n = 1;
@@ -605,7 +613,7 @@ FLOATING_CONVERSION:
 				}
 				break;
 
-#else /* CONFIG_PRINTF_NOFLOAT */
+#else /* CONFIG_PRINTF <= PRINTF_NOFLOAT */
 			case 'g':
 			case 'G':
 			case 'f':
@@ -615,7 +623,7 @@ FLOATING_CONVERSION:
 				while (*ptr)
 					ptr++;
 				break;
-#endif /* CONFIG_PRINTF_NOFLOAT */
+#endif /* CONFIG_PRINTF <= PRINTF_NOFLOAT */
 
 			case '\0': /* Really bad place to find NUL in */
 				format--;
@@ -675,16 +683,15 @@ FLOATING_CONVERSION:
 			}
 	}
 
-#else /* CONFIG_PRINTF_REDUCED starts here */
+#else /* PRINTF_REDUCED starts here */
 
-#ifndef CONFIG_PRINTF_NOMODIFIERS
+#if CONFIG_PRINTF > PRINTF_NOMODIFIERS
 	char l_modifier, h_modifier;
 	unsigned long u_val, div_val;
 #else
 	unsigned int u_val, div_val;
-#endif /* CONFIG_PRINTF_NOMODIFIERS */
+#endif /* CONFIG_PRINTF > PRINTF_NOMODIFIERS */
 
-	char l_modifier, h_modifier;
 	char format_flag;
 	unsigned int nr_of_chars, base;
 	char outChar;
@@ -697,11 +704,11 @@ FLOATING_CONVERSION:
 		{
 			if (!format_flag)
 				return (nr_of_chars);
-			put_one_char (format_flag, secret_pointer);
+			put_one_char(format_flag, secret_pointer);
 			nr_of_chars++;
 		}
 
-#ifndef CONFIG_PRINTF_NOMODIFIERS
+#if CONFIG_PRINTF > PRINTF_NOMODIFIERS
 		/*=================================*/
 		/* Optional 'l' or 'h' modifiers ? */
 		/*=================================*/
@@ -718,22 +725,22 @@ FLOATING_CONVERSION:
 				format++;
 				break;
 		}
-#endif /* !CONFIG_PRINTF_NOMODIFIERS */
+#endif /* CONFIG_PRINTF > PRINTF_NOMODIFIERS */
 
 		switch (format_flag = PGM_READ_CHAR(format++))
 		{
 			case 'c':
 				format_flag = va_arg(ap, int);
 			default:
-				put_one_char (format_flag, secret_pointer);
+				put_one_char(format_flag, secret_pointer);
 				nr_of_chars++;
 				continue;
 
 			case 's':
 				ptr = va_arg(ap, char *);
-				while (format_flag = *ptr++)
+				while ((format_flag = *ptr++))
 				{
-					put_one_char (format_flag, secret_pointer);
+					put_one_char(format_flag, secret_pointer);
 					nr_of_chars++;
 				}
 				continue;
@@ -763,7 +770,7 @@ FLOATING_CONVERSION:
 					div_val = 0x10000000;
 
 CONVERSION_LOOP:
-#ifndef CONFIG_PRINTF_NOMODIFIERS
+#if CONFIG_PRINTF > PRINTF_NOMODIFIERS
 				if (h_modifier)
 					u_val = (format_flag == 'd') ?
 						(short)va_arg(ap, int) : (unsigned short)va_arg(ap, int);
@@ -772,15 +779,15 @@ CONVERSION_LOOP:
 				else
 					u_val = (format_flag == 'd') ?
 						va_arg(ap,int) : va_arg(ap,unsigned int);
-#else /* CONFIG_PRINTF_NOMODIFIERS */
+#else /* CONFIG_PRINTF > PRINTF_NOMODIFIERS */
 				u_val = va_arg(ap,int);
-#endif /* CONFIG_PRINTF_NOMODIFIERS */
+#endif /* CONFIG_PRINTF > PRINTF_NOMODIFIERS */
 				if (format_flag == 'd')
 				{
 					if (((int)u_val) < 0)
 					{
 						u_val = - u_val;
-						put_one_char ('-', secret_pointer);
+						put_one_char('-', secret_pointer);
 						nr_of_chars++;
 					}
 				}
@@ -792,11 +799,13 @@ CONVERSION_LOOP:
 				{
 					outChar = (u_val / div_val) + '0';
 					if (outChar > '9')
+					{
 						if (format_flag == 'x')
 							outChar += 'a'-'9'-1;
 						else
 							outChar += 'A'-'9'-1;
-					put_one_char (outChar, secret_pointer);
+					}
+					put_one_char(outChar, secret_pointer);
 					nr_of_chars++;
 					u_val %= div_val;
 					div_val /= base;
@@ -805,7 +814,7 @@ CONVERSION_LOOP:
 
 		} /* end switch(format_flag...) */
 	}
-#endif /* CONFIG_PRINTF_REDUCED */
+#endif /* CONFIG_PRINTF > PRINTF_REDUCED */
 }
 
-#endif /* CONFIG_PRINTF_DISABLED */
+#endif /* CONFIG_PRINTF */
