@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2004/09/14 20:57:15  bernie
+ *#* Use debug.h instead of kdebug.h.
+ *#*
  *#* Revision 1.5  2004/09/06 21:51:26  bernie
  *#* Extend interface to allow any algorithmic style.
  *#*
@@ -50,7 +53,7 @@
 #include "gfx.h"
 #include "font.h"
 #include "text.h"
-#include <drv/kdebug.h>
+#include <debug.h>
 
 /*!
  * Flags degli stili algoritmici

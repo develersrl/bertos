@@ -43,6 +43,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.17  2004/09/14 20:57:00  bernie
+ *#* Use debug.h instead of kdebug.h.
+ *#*
  *#* Revision 1.16  2004/09/06 21:39:08  bernie
  *#* Simplify code using ATOMIC().
  *#*
@@ -88,7 +91,6 @@
 #define MWARE_FIFO_H
 
 #include <cpu.h>
-#include <drv/kdebug.h>
 
 typedef struct FIFOBuffer
 {
