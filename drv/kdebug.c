@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.19  2004/12/31 17:47:45  bernie
+ *#* Rename UNUSED() to UNUSED_ARG().
+ *#*
  *#* Revision 1.18  2004/12/08 08:52:00  bernie
  *#* Save some more RAM on AVR.
  *#*
@@ -257,7 +260,7 @@ void kdbg_init(void)
 /*!
  * Output one character to the debug console
  */
-static void __kputchar(char c, UNUSED(void *, unused))
+static void __kputchar(char c, UNUSED_ARG(void *, unused))
 {
 	/* Poll while serial buffer is still busy */
 	KDBG_WAIT_READY();

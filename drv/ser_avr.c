@@ -38,6 +38,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.22  2004/12/31 17:47:45  bernie
+ *#* Rename UNUSED() to UNUSED_ARG().
+ *#*
  *#* Revision 1.21  2004/12/13 12:07:06  bernie
  *#* DISABLE_IRQSAVE/ENABLE_IRQRESTORE: Convert to IRQ_SAVE_DISABLE/IRQ_RESTORE.
  *#*
@@ -350,13 +353,15 @@ struct Serial *ser_spi = &ser_handles[SER_SPI];
 /*
  * Callbacks
  */
-static void uart0_init(UNUSED(struct SerialHardware *, _hw), UNUSED(struct Serial *, ser))
+static void uart0_init(
+	UNUSED_ARG(struct SerialHardware *, _hw),
+	UNUSED_ARG(struct Serial *, ser))
 {
 	SER_UART0_BUS_TXINIT;
 	RTS_ON;
 }
 
-static void uart0_cleanup(UNUSED(struct SerialHardware *, _hw))
+static void uart0_cleanup(UNUSED_ARG(struct SerialHardware *, _hw))
 {
 	UCSR0B = 0;
 }
@@ -377,7 +382,7 @@ static void uart0_enabletxirq(struct SerialHardware *_hw)
 	}
 }
 
-static void uart0_setbaudrate(UNUSED(struct SerialHardware *, _hw), unsigned long rate)
+static void uart0_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned long rate)
 {
 	/* Compute baud-rate period */
 	uint16_t period = (((CLOCK_FREQ / 16UL) + (rate / 2)) / rate) - 1;
@@ -390,7 +395,7 @@ static void uart0_setbaudrate(UNUSED(struct SerialHardware *, _hw), unsigned lon
 	//DB(kprintf("uart0_setbaudrate(rate=%lu): period=%d\n", rate, period);)
 }
 
-static void uart0_setparity(UNUSED(struct SerialHardware *, _hw), int parity)
+static void uart0_setparity(UNUSED_ARG(struct SerialHardware *, _hw), int parity)
 {
 #if !CPU_AVR_ATMEGA103
 	UCSR0C = (UCSR0C & ~(BV(UPM1) | BV(UPM0))) | ((parity) << UPM0);
@@ -399,14 +404,16 @@ static void uart0_setparity(UNUSED(struct SerialHardware *, _hw), int parity)
 
 #if AVR_HAS_UART1
 
-static void uart1_init(UNUSED(struct SerialHardware *, _hw), UNUSED(struct Serial *, ser))
+static void uart1_init(
+	UNUSED_ARG(struct SerialHardware *, _hw),
+	UNUSED_ARG(struct Serial *, ser))
 {
 	SER_UART1_BUS_TXINIT;
 	RTS_ON;
 	SER_STROBE_INIT;
 }
 
-static void uart1_cleanup(UNUSED(struct SerialHardware *, _hw))
+static void uart1_cleanup(UNUSED_ARG(struct SerialHardware *, _hw))
 {
 	UCSR1B = 0;
 }
@@ -428,7 +435,7 @@ static void uart1_enabletxirq(struct SerialHardware *_hw)
 	}
 }
 
-static void uart1_setbaudrate(UNUSED(struct SerialHardware *, _hw), unsigned long rate)
+static void uart1_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned long rate)
 {
 	/* Compute baud-rate period */
 	uint16_t period = (((CLOCK_FREQ / 16UL) + (rate / 2)) / rate) - 1;
@@ -439,14 +446,14 @@ static void uart1_setbaudrate(UNUSED(struct SerialHardware *, _hw), unsigned lon
 	//DB(kprintf("uart1_setbaudrate(rate=%ld): period=%d\n", rate, period);)
 }
 
-static void uart1_setparity(UNUSED(struct SerialHardware *, _hw), int parity)
+static void uart1_setparity(UNUSED_ARG(struct SerialHardware *, _hw), int parity)
 {
 	UCSR1C = (UCSR1C & ~(BV(UPM1) | BV(UPM0))) | ((parity) << UPM0);
 }
 
 #endif // AVR_HAS_UART1
 
-static void spi_init(UNUSED(struct SerialHardware *, _hw), UNUSED(struct Serial *, ser))
+static void spi_init(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(struct Serial *, ser))
 {
 	/*
 	 * Set MOSI and SCK ports out, MISO in.
@@ -467,7 +474,7 @@ static void spi_init(UNUSED(struct SerialHardware *, _hw), UNUSED(struct Serial 
 	SPCR = BV(SPE) | BV(SPIE) | BV(MSTR) | BV(SPR0);
 }
 
-static void spi_cleanup(UNUSED(struct SerialHardware *, _hw))
+static void spi_cleanup(UNUSED_ARG(struct SerialHardware *, _hw))
 {
 	SPCR = 0;
 	/* Set all pins as inputs */
@@ -491,12 +498,14 @@ static void spi_starttx(struct SerialHardware *_hw)
 	IRQ_RESTORE(flags);
 }
 
-static void spi_setbaudrate(UNUSED(struct SerialHardware *, _hw), UNUSED(unsigned long, rate))
+static void spi_setbaudrate(
+	UNUSED_ARG(struct SerialHardware *, _hw),
+	UNUSED_ARG(unsigned long, rate))
 {
 	// nop
 }
 
-static void spi_setparity(UNUSED(struct SerialHardware *, _hw), UNUSED(int, parity))
+static void spi_setparity(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(int, parity))
 {
 	// nop
 }

@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2004/12/31 17:47:45  bernie
+ *#* Rename UNUSED() to UNUSED_ARG().
+ *#*
  *#* Revision 1.8  2004/11/16 21:16:56  bernie
  *#* Update to new naming scheme in mware/gfx.c.
  *#*
@@ -174,7 +177,10 @@ int PGM_FUNC(text_xprintf)(struct Bitmap *bm,
 /*!
  * Return the width in pixels of a vprintf()-formatted string.
  */
-int PGM_FUNC(text_vwidthf)(UNUSED(struct Bitmap *, bm), const char * PGM_ATTR fmt, va_list ap)
+int PGM_FUNC(text_vwidthf)(
+	UNUSED_ARG(struct Bitmap *, bm),
+	const char * PGM_ATTR fmt,
+	va_list ap)
 {
 	return PGM_FUNC(vsprintf)(NULL, fmt, ap) * FONT_WIDTH;
 }
