@@ -1,9 +1,9 @@
 /*!
  * \file
  * <!--
- * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2004, 2005 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2004 Giovanni Bajo
- * This file is part of DevLib - See devlib/README for information.
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \brief CPU-specific definitions
@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.29  2005/02/16 20:33:24  bernie
+ *#* Preliminary PPC support.
+ *#*
  *#* Revision 1.28  2004/12/31 17:39:41  bernie
  *#* Fix documentation.
  *#*
@@ -28,52 +31,6 @@
  *#*
  *#* Revision 1.25  2004/12/08 08:31:02  bernie
  *#* CPU_HARVARD: Define to 1 for AVR and DSP56K.
- *#*
- *#* Revision 1.24  2004/12/08 08:04:13  bernie
- *#* Doxygen fixes.
- *#*
- *#* Revision 1.23  2004/11/16 22:41:58  bernie
- *#* Support 64bit CPUs.
- *#*
- *#* Revision 1.22  2004/11/16 21:57:59  bernie
- *#* CPU_IDLE: Rename from SCHEDULER_IDLE.
- *#*
- *#* Revision 1.21  2004/11/16 21:34:25  bernie
- *#* Commonize obsolete names for IRQ macros; Doxygen fixes.
- *#*
- *#* Revision 1.20  2004/11/16 20:33:32  bernie
- *#* CPU_HARVARD: New macro.
- *#*
- *#* Revision 1.19  2004/10/03 20:43:54  bernie
- *#* Fix Doxygen markup.
- *#*
- *#* Revision 1.18  2004/10/03 18:36:31  bernie
- *#* IRQ_GETSTATE(): New macro; Rename IRQ macros for consistency.
- *#*
- *#* Revision 1.17  2004/09/06 21:48:27  bernie
- *#* ATOMIC(): New macro.
- *#*
- *#* Revision 1.16  2004/08/29 21:58:33  bernie
- *#* Rename BITS_PER_XYZ macros; Add sanity checks.
- *#*
- *#* Revision 1.15  2004/08/25 14:12:08  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.14  2004/08/24 13:29:28  bernie
- *#* Trim CVS log; Rename header guards.
- *#*
- *#* Revision 1.12  2004/08/14 19:37:57  rasky
- *#* Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
- *#*
- *#* Revision 1.11  2004/08/05 17:39:56  bernie
- *#* Fix a Doxygen tag.
- *#*
- *#* Revision 1.10  2004/08/02 20:20:29  aleph
- *#* Merge from project_ks
- *#*
- *#* Revision 1.9  2004/07/30 14:24:16  rasky
- *#* Task switching con salvataggio perfetto stato di interrupt (SR)
- *#* Kernel monitor per dump informazioni su stack dei processi
  *#*/
 #ifndef DEVLIB_CPU_H
 #define DEVLIB_CPU_H
@@ -126,6 +83,26 @@
 	#define CPU_SP_ON_EMPTY_SLOT	0
 	#define CPU_BYTE_ORDER          CPU_LITTLE_ENDIAN
 	#define CPU_HARVARD		0
+
+#elif CPU_PPC
+	#define NOP                 asm volatile ("nop" ::)
+	#define IRQ_DISABLE         FIXME
+	#define IRQ_ENABLE          FIXME
+	#define IRQ_SAVE_DISABLE(x) FIXME
+	#define IRQ_RESTORE(x)      FIXME
+	#define IRQ_GETSTATE()      FIXME
+
+	typedef uint32_t cpuflags_t; // FIXME
+	typedef uint32_t cpustack_t; // FIXME
+
+	/* Register counts include SREG too */
+	#define CPU_REG_BITS           (CPU_PPC32 ? 32 : 64)
+	#define CPU_REGS_CNT           FIXME
+	#define CPU_SAVED_REGS_CNT     FIXME
+	#define CPU_STACK_GROWS_UPWARD 0  //FIXME
+	#define CPU_SP_ON_EMPTY_SLOT   0  //FIXME
+	#define CPU_BYTE_ORDER         (__BIG_ENDIAN__ ? CPU_BIG_ENDIAN : CPU_LITTLE_ENDIAN)
+	#define CPU_HARVARD            0
 
 #elif CPU_DSP56K
 
@@ -199,7 +176,7 @@
 	#define CPU_STACK_GROWS_UPWARD  0
 	#define CPU_SP_ON_EMPTY_SLOT    1
 	#define CPU_BYTE_ORDER          CPU_LITTLE_ENDIAN
-	#define CPU_HARVARD		1
+	#define CPU_HARVARD             1
 
 	/*!
 	 * Initialization value for registers in stack frame.

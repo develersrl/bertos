@@ -1,9 +1,9 @@
 /*!
  * \file
  * <!--
- * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2004, 2005 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2004 Giovanni Bajo
- * This file is part of DevLib - See devlib/README for information.
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \brief CPU detection through special preprocessor macros
@@ -12,6 +12,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2005/02/16 20:33:24  bernie
+ *#* Preliminary PPC support.
+ *#*
  *#* Revision 1.3  2004/12/31 17:39:26  bernie
  *#* Use C89 comments only.
  *#*
@@ -23,13 +26,6 @@
  *#*
  *#* Revision 1.2  2004/07/30 10:31:07  rasky
  *#* Aggiunto detect per ATmega128
- *#*
- *#* Revision 1.1  2004/07/22 16:37:34  rasky
- *#* Nuovo file cpu_detect.h per il detect della CPU
- *#* Nuova macro CPU_HEADER per includere l'header cpu-specific di ogni modulo
- *#* Razionalizzazione dei principali #ifdef per piattaforma con le nuove macro
- *#* Nuove macro-utility PP_STRINGIZE e PP_CATn
- *#*
  *#*/
 
 #ifndef CPU_DETECT_H
@@ -47,6 +43,25 @@
 	#define CPU_ID                  x86
 #else
 	#define CPU_X86                 0
+#endif
+
+#if defined (_ARCH_PPC) || defined(_ARCH_PPC64)
+	#define CPU_PPC                 1
+	#define CPU_ID                  ppc
+	#if defined(_ARCH_PPC)
+		#define CPU_PPC32       1
+	#else
+	        #define CPU_PPC32       0
+	#endif
+	#if defined(_ARCH_PPC64)
+		#define CPU_PPC64       1
+	#else
+	        #define CPU_PPC64       0
+	#endif
+#else
+	#define CPU_PPC                 0
+	#define CPU_PPC32               0
+	#define CPU_PPC64               0
 #endif
 
 #if defined(__m56800E__) || defined(__m56800__)
@@ -93,11 +108,11 @@
 
 
 /* Self-check for the detection: only one CPU must be detected */
-#if CPU_I196 + CPU_X86 + CPU_DSP56K + CPU_AVR == 0
+#if CPU_I196 + CPU_X86 + CPU_PPC + CPU_DSP56K + CPU_AVR == 0
 	#error Unknown CPU
 #elif !defined(CPU_ID)
 	#error CPU_ID not defined
-#elif CPU_I196 + CPU_X86 + CPU_DSP56K + CPU_AVR != 1
+#elif CPU_I196 + CPU_X86 + CPU_PPC + CPU_DSP56K + CPU_AVR != 1
 	#error Internal CPU configuration error
 #endif
 
