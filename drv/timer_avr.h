@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.12  2004/08/10 06:59:45  bernie
+ * CONFIG_TIMER_STROBE: Define no-op default macros.
+ *
  * Revision 1.11  2004/08/03 15:53:17  aleph
  * Fix spacing
  *
@@ -58,6 +61,23 @@
 
 #if defined(ARCH_BOARD_KC) && (ARCH & ARCH_BOARD_KC)
 	#include <drv/adc.h>
+#endif
+
+
+/*!
+ * \def CONFIG_TIMER_STROBE
+ *
+ * This is a debug facility that can be used to
+ * monitor timer interrupt activity on an external pin.
+ *
+ * To use strobes, redefine the macros TIMER_STROBE_ON,
+ * TIMER_STROBE_OFF and TIMER_STROBE_INIT and set
+ * CONFIG_TIMER_STROBE to 1.
+ */
+#ifndef CONFIG_TIMER_STROBE
+	#define TIMER_STROBE_ON    do {/*nop*/} while(0)
+	#define TIMER_STROBE_OFF   do {/*nop*/} while(0)
+	#define TIMER_STROBE_INIT  do {/*nop*/} while(0)
 #endif
 
 
