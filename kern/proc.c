@@ -17,6 +17,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/06/06 18:37:57  bernie
+ * Rename event macros to look like regular functions.
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -67,7 +70,7 @@ struct Process MainProcess;
 static void proc_init_struct(Process* proc)
 {
 #if CONFIG_KERN_TIMER
-	INITEVENT_SIG(&proc->proc_timer.expire, proc, SIG_SINGLE);
+	event_initSignal(&proc->proc_timer.expire, proc, SIG_SINGLE);
 #endif
 
 #if CONFIG_KERN_SIGNALS
