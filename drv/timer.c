@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.12  2004/08/08 05:59:37  bernie
+ * Remove a few useless casts.
+ *
  * Revision 1.11  2004/08/02 20:20:29  aleph
  * Merge from project_ks
  *
@@ -91,7 +94,7 @@ void timer_add(Timer *timer)
 	node = (Timer *)timers_queue.head;
 	while (node->link.succ)
 	{
-		/* Stop just after the insert point */
+		/* Stop just after the insertion point */
 		if (node->tick > timer->tick)
 			break;
 
@@ -100,7 +103,7 @@ void timer_add(Timer *timer)
 	}
 
 	/* Enqueue timer request into the list */
-	INSERTBEFORE((Node *)timer, (Node *)node);
+	INSERTBEFORE(&timer->link, &node->link);
 
 	ENABLE_IRQRESTORE(flags);
 }
@@ -113,7 +116,7 @@ Timer *timer_abort(Timer *timer)
 {
 	cpuflags_t flags;
 	DISABLE_IRQSAVE(flags);
-	REMOVE((Node *)timer);
+	REMOVE(&timer->link);
 	ENABLE_IRQRESTORE(flags);
 
 	return timer;
@@ -157,7 +160,7 @@ void timer_delay(time_t time)
  */
 void timer_udelay(utime_t usec_delay)
 {
-	if (usec_delay > 1000)
+	if (UNLIKELY(usec_delay > 1000))
 	{
 		timer_delay(usec_delay / 1000);
 		usec_delay %= 1000;
@@ -216,7 +219,7 @@ DEFINE_TIMER_ISR
 			break;
 
 		/* Retreat the expired timer */
-		REMOVE((Node *)timer);
+		REMOVE(&timer->link);
 
 		/* Execute the associated event */
 		event_do(&timer->expire);
