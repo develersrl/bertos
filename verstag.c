@@ -20,7 +20,7 @@
 #include "buildrev.h"
 
 const char vers_tag[] = VERS_TAG;
-const int vers_build_nr = VERS_BUILD;
 const char vers_build_str[] = _STRINGIZE(VERS_BUILD);
 const char vers_host[] = VERS_HOST;
+const int vers_build_nr = VERS_BUILD;
 
