@@ -8,13 +8,17 @@
  *
  * \version $Id$
  *
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \brief Buzzer driver (implementation)
  *
- * \brief Buzzer driver
+ * \version $Id$
+ * \author Bernardo Innocenti <bernie@develer.com>
  */
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2004/10/03 18:38:51  bernie
+ *#* Add missing AVR header; Fix header.
+ *#*
  *#* Revision 1.9  2004/09/14 21:01:25  bernie
  *#* Use new AVR port pin names.
  *#*
@@ -63,6 +67,8 @@
 	#define BUZZER_INIT   (Emul_BuzzerInit())
 
 #elif defined(__AVR__)
+
+	#include <avr/io.h>
 
 	#define IS_BUZZER_ON  (PORTG & BV(PG0))
 
