@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.16  2004/08/29 21:58:33  bernie
+ *#* Rename BITS_PER_XYZ macros; Add sanity checks.
+ *#*
  *#* Revision 1.15  2004/08/25 14:12:08  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -102,11 +105,11 @@
 	#define CPU_BYTE_ORDER          CPU_BIG_ENDIAN
 
 	/* Memory is word-addessed in the DSP56K */
-	#define BITSP_PER_CHAR  16
-	#define SIZEOF_SHORT     1
-	#define SIZEOF_INT       1
-	#define SIZEOF_LONG      2
-	#define SIZEOF_PTR       1
+	#define CPU_BITS_PER_CHAR  16
+	#define SIZEOF_SHORT        1
+	#define SIZEOF_INT          1
+	#define SIZEOF_LONG         2
+	#define SIZEOF_PTR          1
 
 #elif CPU_AVR
 
@@ -231,22 +234,23 @@
 
 
 /*!
- * \def SIZEOF_CHAR SIZEOF_SHORT SIZEOF_INT SIZEOF_LONG SIZEOF_PTR
- * \def BITS_PER_CHAR BITS_PER_SHORT BITS_PER_INT BITS_PER_LONG BITS_PER_PTR
+ * \name Default type sizes
  *
- * \brief Default type sizes
+ * \def SIZEOF_CHAR SIZEOF_SHORT SIZEOF_INT SIZEOF_LONG SIZEOF_PTR
+ * \def CPU_BITS_PER_CHAR CPU_BITS_PER_SHORT CPU_BITS_PER_INT
+ * \def CPU_BITS_PER_LONG CPU_BITS_PER_PTR
  *
  * These defaults are reasonable for most 16/32bit machines.
  * Some of these macros may be overridden by CPU-specific code above.
  *
- * ANSI C specifies that the following equations must be true:
+ * ANSI C requires that the following equations be true:
  * \code
  *   sizeof(char) <= sizeof(short) <= sizeof(int) <= sizeof(long)
  *   sizeof(float) <= sizeof(double)
- *   BITS_PER_CHAR  >= 8
- *   BITS_PER_SHORT >= 8
- *   BITS_PER_INT   >= 16
- *   BITS_PER_LONG  >= 32
+ *   CPU_BITS_PER_CHAR  >= 8
+ *   CPU_BITS_PER_SHORT >= 8
+ *   CPU_BITS_PER_INT   >= 16
+ *   CPU_BITS_PER_LONG  >= 32
  * \end code
  * \{
  */
@@ -274,26 +278,32 @@
 #define SIZEOF_PTR   SIZEOF_INT
 #endif
 
-#ifndef BITS_PER_CHAR
-#define BITS_PER_CHAR   (SIZEOF_CHAR * 8)
+#ifndef CPU_BITS_PER_CHAR
+#define CPU_BITS_PER_CHAR   (SIZEOF_CHAR * 8)
 #endif
 
-#ifndef BITS_PER_SHORT
-#define BITS_PER_SHORT  (SIZEOF_SHORT * BITS_PER_CHAR)
+#ifndef CPU_BITS_PER_SHORT
+#define CPU_BITS_PER_SHORT  (SIZEOF_SHORT * CPU_BITS_PER_CHAR)
 #endif
 
-#ifndef BITS_PER_INT
-#define BITS_PER_INT    (SIZEOF_INT * BITS_PER_CHAR)
+#ifndef CPU_BITS_PER_INT
+#define CPU_BITS_PER_INT    (SIZEOF_INT * CPU_BITS_PER_CHAR)
 #endif
 
-#ifndef BITS_PER_LONG
-#define BITS_PER_LONG   (SIZEOF_LONG * BITS_PER_CHAR)
+#ifndef CPU_BITS_PER_LONG
+#define CPU_BITS_PER_LONG   (SIZEOF_LONG * CPU_BITS_PER_CHAR)
 #endif
 
-#ifndef BITS_PER_PTR
-#define BITS_PER_PTR    (SIZEOF_PTR * BITS_PER_CHAR)
+#ifndef CPU_BITS_PER_PTR
+#define CPU_BITS_PER_PTR    (SIZEOF_PTR * CPU_BITS_PER_CHAR)
 #endif
 /*\}*/
+
+/* Sanity checks for the above definitions */
+STATIC_ASSERT(sizeof(char) == SIZEOF_CHAR);
+STATIC_ASSERT(sizeof(short) == SIZEOF_SHORT);
+STATIC_ASSERT(sizeof(long) == SIZEOF_LONG);
+STATIC_ASSERT(sizeof(int) == SIZEOF_INT);
 
 
 /*!
