@@ -15,6 +15,12 @@
 
 /*
  * $Log$
+ * Revision 1.5  2004/06/27 15:25:40  aleph
+ * Add missing callbacks for SPI;
+ * Change UNUSED() macro to new version with two args;
+ * Use TX line filling only on the correct KBUS serial port;
+ * Fix nasty IRQ disabling bug in recv complete hander for port 1.
+ *
  * Revision 1.4  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -74,9 +80,9 @@ struct AvrSerial
 #define SER_FILL_BYTE 0xAA
 
 
-static void uart0_enabletxirq(UNUSED(struct SerialHardware *ctx))
+static void uart0_enabletxirq(UNUSED(struct SerialHardware *, ctx))
 {
-#ifdef CONFIG_SER_TXFILL
+#if defined(CONFIG_SER_TXFILL) && (CONFIG_KBUS_SERIAL_PORT == 0)
 	UCSR0B = BV(RXCIE) | BV(UDRIE) | BV(RXEN) | BV(TXEN) | BV(UCSZ2);
 #else
 	UCSR0B = BV(RXCIE) | BV(UDRIE) | BV(RXEN) | BV(TXEN);
@@ -97,7 +103,7 @@ static void uart0_init(struct SerialHardware *_hw, struct Serial *ser)
 	ENABLE_IRQRESTORE(flags);
 
 	/* TODO: explain why TX is disabled whenever possible */
-#ifdef CONFIG_SER_TXFILL
+#if defined(CONFIG_SER_TXFILL) && (CONFIG_KBUS_SERIAL_PORT == 0)
 	/*!
 	 * Set multiprocessor mode and 9 bit data frame.
 	 * The receiver keep MPCM bit always on. When useful data
@@ -116,12 +122,12 @@ static void uart0_init(struct SerialHardware *_hw, struct Serial *ser)
 	RTS_ON;
 }
 
-static void uart0_cleanup(UNUSED(struct SerialHardware *ctx))
+static void uart0_cleanup(UNUSED(struct SerialHardware *, ctx))
 {
 	UCSR0B = 0;
 }
 
-static void uart0_setbaudrate(UNUSED(struct SerialHardware *ctx), unsigned long rate)
+static void uart0_setbaudrate(UNUSED(struct SerialHardware *, ctx), unsigned long rate)
 {
 	// Compute baud-rate period
 	uint16_t period = (((CLOCK_FREQ / 16UL) + (rate / 2)) / rate) - 1;
@@ -135,9 +141,13 @@ static void uart0_setbaudrate(UNUSED(struct SerialHardware *ctx), unsigned long 
 
 #ifndef __AVR_ATmega103__
 
-static void uart1_enabletxirq(UNUSED(struct SerialHardware *ctx))
+static void uart1_enabletxirq(UNUSED(struct SerialHardware *, ctx))
 {
+#if defined(CONFIG_SER_TXFILL) && (CONFIG_KBUS_SERIAL_PORT == 1)
+	UCSR1B = BV(RXCIE) | BV(UDRIE) | BV(RXEN) | BV(TXEN) | BV(UCSZ2);
+#else
 	UCSR1B = BV(RXCIE) | BV(UDRIE) | BV(RXEN) | BV(TXEN);
+#endif
 }
 
 static void uart1_init(struct SerialHardware *_hw, struct Serial *ser)
@@ -154,17 +164,23 @@ static void uart1_init(struct SerialHardware *_hw, struct Serial *ser)
 	ENABLE_IRQRESTORE(flags);
 
 	/* TODO: explain why TX is disabled whenever possible */
+#if defined(CONFIG_SER_TXFILL) && (CONFIG_KBUS_SERIAL_PORT == 1)
+	/*!  * See comment in uart0_init() */
+	UCSR1A = BV(MPCM);
+	UCSR1B = BV(RXCIE) | BV(RXEN) | BV(UCSZ2);
+#else
 	UCSR1B = BV(RXCIE) | BV(RXEN);
+#endif
 
 	RTS_ON;
 }
 
-static void uart1_cleanup(UNUSED(struct SerialHardware *ctx))
+static void uart1_cleanup(UNUSED(struct SerialHardware *, ctx))
 {
 	UCSR1B = 0;
 }
 
-static void uart1_setbaudrate(UNUSED(struct SerialHardware *ctx), unsigned long rate)
+static void uart1_setbaudrate(UNUSED(struct SerialHardware *, ctx), unsigned long rate)
 {
 	// Compute baud-rate period
 	uint16_t period = (((CLOCK_FREQ / 16UL) + (rate / 2)) / rate) - 1;
@@ -173,12 +189,12 @@ static void uart1_setbaudrate(UNUSED(struct SerialHardware *ctx), unsigned long 
 	UBRR1L = (period);
 }
 
-static void uart0_setparity(UNUSED(struct SerialHardware *ctx), int parity)
+static void uart0_setparity(UNUSED(struct SerialHardware *, ctx), int parity)
 {
 	UCSR0C |= (parity) << UPM0;
 }
 
-static void uart1_setparity(UNUSED(struct SerialHardware *ctx), int parity)
+static void uart1_setparity(UNUSED(struct SerialHardware *, ctx), int parity)
 {
 	UCSR1C |= (parity) << UPM0;
 }
@@ -198,11 +214,21 @@ static void spi_init(struct SerialHardware *_hw, struct Serial *ser)
 	SPCR = BV(SPE) | BV(SPIE) | BV(MSTR) | BV(SPR0);
 }
 
-static void spi_cleanup(UNUSED(struct SerialHardware *ctx))
+static void spi_cleanup(UNUSED(struct SerialHardware *, ctx))
 {
 	SPCR = 0;
 	/* Set all pins as inputs */
 	SPI_DDR &= ~(BV(SPI_MISO_BIT) | BV(SPI_MOSI_BIT) | BV(SPI_SCK_BIT));
+}
+
+static void spi_setbaudrate(UNUSED(struct SerialHardware *, ctx), UNUSED(unsigned long, rate))
+{
+	// Do nothing
+}
+
+static void spi_setparity(UNUSED(struct SerialHardware *, ctx), UNUSED(int, parity))
+{
+	// Do nothing
 }
 
 
@@ -231,7 +257,7 @@ SIGNAL(SIG_UART0_DATA)
 {
 	if (fifo_isempty(&ser_handles[SER_UART0].txfifo))
 	{
-#ifdef CONFIG_SER_TXFILL
+#if defined(CONFIG_SER_TXFILL) && (CONFIG_KBUS_SERIAL_PORT == 0)
 		/*
 		 * To avoid audio interference: always transmit useless char.
 		 * Send the byte with the ninth bit cleared, the receiver in MCPM mode
@@ -255,7 +281,7 @@ SIGNAL(SIG_UART0_DATA)
 #endif // CONFIG_SER_HWHANDSHAKE
 	else
 	{
-#ifdef CONFIG_SER_TXFILL
+#if defined(CONFIG_SER_TXFILL) && (CONFIG_KBUS_SERIAL_PORT == 0)
 		/* Send with ninth bit set. Receiver in MCPM mode will receive it */
 		UCSR0B |= BV(TXB8);
 #endif
@@ -271,8 +297,18 @@ SIGNAL(SIG_UART1_DATA)
 {
 	if (fifo_isempty(&ser_handles[SER_UART1].txfifo))
 	{
+#if defined(CONFIG_SER_TXFILL) && (CONFIG_KBUS_SERIAL_PORT == 1)
+		/*
+		 * To avoid audio interference: always transmit useless char.
+		 * Send the byte with the ninth bit cleared, the receiver in MCPM mode
+		 * will ignore it.
+		 */
+		UCSR1B &= ~BV(TXB8);
+		UDR1 = SER_FILL_BYTE;
+#else
 		/* Disable UDR empty interrupt and transmitter */
 		UCSR1B = BV(RXCIE) | BV(RXEN);
+#endif
 	}
 #if defined(CONFIG_SER_HWHANDSHAKE)
 	else if (IS_CTS_OFF)
@@ -284,7 +320,13 @@ SIGNAL(SIG_UART1_DATA)
 	}
 #endif // CONFIG_SER_HWHANDSHAKE
 	else
+	{
+#if defined(CONFIG_SER_TXFILL) && (CONFIG_KBUS_SERIAL_PORT == 1)
+		/* Send with ninth bit set. Receiver in MCPM mode will receive it */
+		UCSR1B |= BV(TXB8);
+#endif
 		UDR1 = fifo_pop(&ser_handles[SER_UART1].txfifo);
+	}
 }
 #endif /* !__AVR_ATmega103__ */
 
@@ -344,7 +386,7 @@ SIGNAL(SIG_UART0_RECV)
 SIGNAL(SIG_UART1_RECV)
 {
 	/* Disable Recv complete IRQ */
-	UCSR0B &= ~BV(RXCIE);
+	UCSR1B &= ~BV(RXCIE);
 	ENABLE_INTS;
 
 	/* Should be read before UDR */
@@ -366,7 +408,7 @@ SIGNAL(SIG_UART1_RECV)
 #endif
 	}
 	/* Reenable receive complete int */
-	UCSR0B |= BV(RXCIE);
+	UCSR1B |= BV(RXCIE);
 }
 #endif /* !__AVR_ATmega103__ */
 
@@ -382,7 +424,7 @@ SIGNAL(SIG_UART1_RECV)
  */
 static volatile bool spi_sending = false;
 
-static void spi_starttx(UNUSED(struct SerialHardware *ctx))
+static void spi_starttx(UNUSED(struct SerialHardware *, ctx))
 {
 	cpuflags_t flags;
 
@@ -454,6 +496,8 @@ static const struct SerialHardwareVT SPI_VT =
 {
 	.init = spi_init,
 	.cleanup = spi_cleanup,
+	.setbaudrate = spi_setbaudrate,
+	.setparity = spi_setparity,
 	.enabletxirq = spi_starttx,
 };
 
