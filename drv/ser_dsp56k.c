@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2004/12/08 09:42:55  bernie
+ *#* Add support for multiplexed serial ports.
+ *#*
  *#* Revision 1.8  2004/10/26 09:00:49  bernie
  *#* Don't access serial data register twice.
  *#*
@@ -43,8 +46,12 @@
 
 // GPIO E is shared with SPI (in DSP56807). Pins 0&1 are TXD0 and RXD0. To use
 //  the serial, we need to disable the GPIO functions on them.
-#define REG_GPIO_SERIAL         REG_GPIO_E
-#define REG_GPIO_SERIAL_MASK    0x3
+#define REG_GPIO_SERIAL_0       REG_GPIO_E
+#define REG_GPIO_SERIAL_MASK_0  0x03
+
+#define REG_GPIO_SERIAL_1       REG_GPIO_D
+#define REG_GPIO_SERIAL_MASK_1  0xC0
+
 
 // Check flag consistency
 #if (SERRF_PARITYERROR != REG_SCI_SR_PF) || \
@@ -59,6 +66,15 @@ static unsigned char ser0_fifo_tx[CONFIG_SER0_FIFOSIZE_TX];
 static unsigned char ser1_fifo_rx[CONFIG_SER1_FIFOSIZE_RX];
 static unsigned char ser1_fifo_tx[CONFIG_SER1_FIFOSIZE_TX];
 
+#if CONFIG_SER_MULTI
+	#include <kern/sem.h>
+
+	#define MAX_MULTI_GROUPS     1
+
+	struct Semaphore multi_sems[MAX_MULTI_GROUPS];
+#endif
+
+
 struct SCI
 {
 	struct SerialHardware hw;
@@ -66,6 +82,8 @@ struct SCI
 	volatile struct REG_SCI_STRUCT* regs;
 	IRQ_VECTOR irq_tx;
 	IRQ_VECTOR irq_rx;
+	int num_group;
+	int id;
 };
 
 static inline void enable_tx_irq_bare(volatile struct REG_SCI_STRUCT* regs)
@@ -94,6 +112,14 @@ static inline void disable_tx_irq(struct SerialHardware* _hw)
 	volatile struct REG_SCI_STRUCT* regs = hw->regs;
 
 	disable_tx_irq_bare(regs);
+}
+
+static inline void disable_rx_irq(struct SerialHardware* _hw)
+{
+	struct SCI* hw = (struct SCI*)_hw;
+	volatile struct REG_SCI_STRUCT* regs = hw->regs;
+
+	disable_rx_irq_bare(regs);
 }
 
 static inline void enable_tx_irq(struct SerialHardware* _hw)
@@ -181,16 +207,27 @@ static void init(struct SerialHardware* _hw, struct Serial* ser)
 	enable_rx_irq_bare(regs);
 
 	// Disable GPIO pins for TX and RX lines
-	REG_GPIO_SERIAL->PER |= REG_GPIO_SERIAL_MASK;
+	// \todo this should be divided into serial 0 and 1
+	REG_GPIO_SERIAL_0->PER |= REG_GPIO_SERIAL_MASK_0;
+	REG_GPIO_SERIAL_1->PER |= REG_GPIO_SERIAL_MASK_1;
 
 	hw->serial = ser;
 }
 
 static void cleanup(struct SerialHardware* _hw)
 {
-	// TODO!
-	ASSERT(0);
-}
+	struct SCI* hw = (struct SCI*)_hw;
+
+	// Wait until we finish sending everything
+	ser_drain(hw->serial);
+	ser_purge(hw->serial);
+
+	// Uninstall the ISRs
+	disable_rx_irq(_hw);
+	disable_tx_irq(_hw);
+	irq_uninstall(hw->irq_tx);
+	irq_uninstall(hw->irq_rx);
+} 
 
 static void setbaudrate(struct SerialHardware* _hw, unsigned long rate)
 {
@@ -209,7 +246,52 @@ static void setparity(struct SerialHardware* _hw, int parity)
 }
 
 
-static const struct SerialHardwareVT SCI_VT = 
+#if CONFIG_SER_MULTI
+
+static void multi_init(void)
+{
+	static bool flag = false;
+	int i;
+
+	if (flag)
+		return;
+
+	for (i = 0; i < MAX_MULTI_GROUPS; ++i)
+		sem_init(&multi_sems[i]);
+	flag = true;
+}
+
+static void init_lock(struct SerialHardware* _hw, struct Serial *ser)
+{
+	struct SCI* hw = (struct SCI*)_hw;
+
+	// Initialize the multi engine (if needed)
+	multi_init();
+
+	// Acquire the lock of the semaphore for this group
+	ASSERT(hw->num_group >= 0);
+	ASSERT(hw->num_group < MAX_MULTI_GROUPS);
+	sem_obtain(&multi_sems[hw->num_group]);
+
+	// Do a hardware switch to the given serial
+	ser_hw_switch(hw->num_group, hw->id);
+
+	init(_hw, ser);
+}
+
+static void cleanup_unlock(struct SerialHardware* _hw)
+{
+	struct SCI* hw = (struct SCI*)_hw;
+
+	cleanup(_hw);
+
+	sem_release(&multi_sems[hw->num_group]);
+}
+
+#endif /* CONFIG_SER_MULTI */
+
+
+static const struct SerialHardwareVT SCI_VT =
 {
 	.init = init,
 	.cleanup = cleanup,
@@ -218,40 +300,65 @@ static const struct SerialHardwareVT SCI_VT =
 	.enabletxirq = enable_tx_irq,
 };
 
-static struct SCI SCIDescs[2] =
+#if CONFIG_SER_MULTI
+static const struct SerialHardwareVT SCI_MULTI_VT =
 {
-	{
-		.hw =
-		{
-			.table = &SCI_VT,
-			.rxbuffer = ser0_fifo_rx,
-			.txbuffer = ser0_fifo_tx,
-			.rxbuffer_size = countof(ser0_fifo_rx),
-			.txbuffer_size = countof(ser0_fifo_tx),
-		},
-		.regs = &REG_SCI[0],
-		.irq_rx = IRQ_SCI0_RECEIVER_FULL,
-		.irq_tx = IRQ_SCI0_TRANSMITTER_READY,
-	},
-
-	{
-		.hw =
-		{
-			.table = &SCI_VT,
-			.rxbuffer = ser1_fifo_rx,
-			.txbuffer = ser1_fifo_tx,
-			.rxbuffer_size = countof(ser1_fifo_rx),
-			.txbuffer_size = countof(ser1_fifo_tx),
-		},
-		.regs = &REG_SCI[1],
-		.irq_rx = IRQ_SCI1_RECEIVER_FULL,
-		.irq_tx = IRQ_SCI1_TRANSMITTER_READY,
-	},
+	.init = init_lock,
+	.cleanup = cleanup_unlock,
+	.setbaudrate = setbaudrate,
+	.setparity = setparity,
+	.enabletxirq = enable_tx_irq,
 };
+#endif /* CONFIG_SER_MULTI */
 
+#define SCI_DESC_NORMAL(hwch) \
+	{ \
+		.hw = \
+		{ \
+			.table = &SCI_VT, \
+			.rxbuffer = ser ## hwch ## _fifo_rx, \
+			.txbuffer = ser ## hwch ## _fifo_tx, \
+			.rxbuffer_size = countof(ser ## hwch ## _fifo_rx), \
+			.txbuffer_size = countof(ser ## hwch ## _fifo_tx), \
+		}, \
+		.regs = &REG_SCI[hwch], \
+		.irq_rx = IRQ_SCI ## hwch ## _RECEIVER_FULL, \
+		.irq_tx = IRQ_SCI ## hwch ## _TRANSMITTER_READY, \
+		.num_group = -1, \
+		.id = -1, \
+	} \
+	/**/
+
+#if CONFIG_SER_MULTI
+#define SCI_DESC_MULTI(hwch, group_, id_) \
+	{ \
+		.hw = \
+		{ \
+			.table = &SCI_MULTI_VT, \
+			.rxbuffer = ser ## hwch ## _fifo_rx, \
+			.txbuffer = ser ## hwch ## _fifo_tx, \
+			.rxbuffer_size = countof(ser ## hwch ## _fifo_rx), \
+			.txbuffer_size = countof(ser ## hwch ## _fifo_tx), \
+		}, \
+		.regs = &REG_SCI[hwch], \
+		.irq_rx = IRQ_SCI ## hwch ## _RECEIVER_FULL, \
+		.irq_tx = IRQ_SCI ## hwch ## _TRANSMITTER_READY, \
+		.num_group = group_, \
+		.id = id_, \
+	} \
+	/**/
+#endif /* CONFIG_SER_MULTI */
+
+// \todo Move this into hw.h, with a little preprocessor magic
+static struct SCI SCIDescs[] =
+{
+	SCI_DESC_NORMAL(0),
+	SCI_DESC_MULTI(1, 0, 0),
+	SCI_DESC_MULTI(1, 0, 1),
+};
 
 struct SerialHardware* ser_hw_getdesc(int unit)
 {
-	ASSERT(unit < 2);
+	ASSERT(unit < countof(SCIDescs));
 	return &SCIDescs[unit].hw;
 }
