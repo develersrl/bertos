@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.19  2004/10/03 20:43:54  bernie
+ *#* Fix Doxygen markup.
+ *#*
  *#* Revision 1.18  2004/10/03 18:36:31  bernie
  *#* IRQ_GETSTATE(): New macro; Rename IRQ macros for consistency.
  *#*
@@ -286,7 +289,7 @@
  *   CPU_BITS_PER_SHORT >= 8
  *   CPU_BITS_PER_INT   >= 16
  *   CPU_BITS_PER_LONG  >= 32
- * \end code
+ * \endcode
  * \{
  */
 #ifndef SIZEOF_CHAR
