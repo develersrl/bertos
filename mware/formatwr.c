@@ -53,6 +53,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2004/10/26 09:01:35  bernie
+ *#* Fix spacing.
+ *#*
  *#* Revision 1.9  2004/09/14 21:06:23  bernie
  *#* Spelling fix.
  *#*
@@ -575,9 +578,9 @@ NEXT_FLAG:
 					ulong = flags.h_modifier ?
 						(unsigned long)(unsigned short) va_arg(ap, int)
 						: (unsigned long)va_arg(ap, int);
-				flags.div_factor = 
+				flags.div_factor =
 #if CONFIG_PRINTF_OCTAL_FORMATTER
-					(format_flag == 'o') ? DIV_OCT : 
+					(format_flag == 'o') ? DIV_OCT :
 #endif
 					(format_flag == 'u') ? DIV_DEC : DIV_HEX;
 				flags.plus_space_flag = PSF_NONE;
