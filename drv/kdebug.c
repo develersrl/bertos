@@ -16,6 +16,9 @@
 
 /*
  * $Log$
+ * Revision 1.10  2004/08/04 15:57:50  rasky
+ * Cambiata la putchar per kdebug per DSP56k: la nuova funzione e' quella piu' a basso livello (assembly)
+ *
  * Revision 1.9  2004/08/02 20:20:29  aleph
  * Merge from project_ks
  *
@@ -158,7 +161,7 @@
 	   implements the console I/O correctly. */
 	#include <stdio.h>
 	#define KDBG_WAIT_READY()
-	#define KDBG_WRITE_CHAR(c)        do { char ch=c; fwrite(&ch,1,1,stdout); } while (0)
+	#define KDBG_WRITE_CHAR(c)        __put_char(c, stdout)
 	#define KDBG_MASK_IRQ(old)
 	#define KDBG_RESTORE_IRQ(old)
 #else
