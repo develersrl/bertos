@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.37  2004/12/08 09:43:21  bernie
+ *#* Metrowerks supports variadic macros.
+ *#*
  *#* Revision 1.36  2004/12/08 08:55:54  bernie
  *#* Rename sigset_t to sigmask_t and time_t to mtime_t, to avoid conflicts with POSIX definitions.
  *#*
@@ -115,6 +118,11 @@
 		((__GNUC__ << 16) + __GNUC_MINOR__ >= ((maj) << 16) + (min))
 #else
 	#define GNUC_PREREQ(maj, min) 0
+#endif
+
+/* Some CW versions do not allow enabling C99 from the settings panel. */
+#if defined(__MWERKS__)
+	#pragma c99 on
 #endif
 
 #if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
@@ -253,6 +261,7 @@
 #elif defined(__MWERKS__) && CPU_DSP56K
 
 	/* Compiler features */
+	#define COMPILER_VARIADIC_MACROS 1
 	#define COMPILER_TYPEOF 1
 	#define COMPILER_STATEMENT_EXPRESSIONS 1
 
