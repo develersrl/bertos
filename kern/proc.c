@@ -17,6 +17,10 @@
 
 /*
  * $Log$
+ * Revision 1.6  2004/07/30 14:24:16  rasky
+ * Task switching con salvataggio perfetto stato di interrupt (SR)
+ * Kernel monitor per dump informazioni su stack dei processi
+ *
  * Revision 1.5  2004/07/14 14:18:09  rasky
  * Merge da SC: Rimosso timer dentro il task, che è uno spreco di memoria per troppi task
  *
@@ -43,8 +47,11 @@
 
 #include <string.h> /* memset() */
 
-/* CPU dependent context switching routines */
+/*! CPU dependent context switching routines 
+ *  \note This function *MUST* preserve also the status of the interrupts.
+ */
 extern void asm_switch_context(cpustack_t **new_sp, cpustack_t **save_sp);
+extern int asm_switch_version(void);
 
 /*
  * The scheduer tracks ready and waiting processes
@@ -55,6 +62,7 @@ extern void asm_switch_context(cpustack_t **new_sp, cpustack_t **save_sp);
  */
 REGISTER Process *CurrentProcess;
 REGISTER List     ProcReadyList;
+
 
 #if CONFIG_KERN_PREEMPTIVE
 /*
@@ -73,11 +81,82 @@ extern List StackFreeList;
 /* The main process (the one that executes main()) */
 struct Process MainProcess;
 
+
+#if CONFIG_KERN_MONITOR
+List MonitorProcs;
+
+static void monitor_init(void)
+{
+	INITLIST(&MonitorProcs);
+}
+
+static void monitor_add(Process* proc, cpustack_t* stack_base, size_t stack_size)
+{
+	proc->monitor.stack_base = stack_base;
+	proc->monitor.stack_size = stack_size;
+
+	ADDTAIL(&MonitorProcs, &proc->monitor.link);
+}
+
+static void monitor_remove(Process* proc)
+{
+	REMOVE(&proc->monitor.link);
+}
+
+#define MONITOR_NODE_TO_PROCESS(node) \
+	(struct Process*)((char*)(node) - offsetof(struct Process, monitor.link))
+
+size_t monitor_check_stack(cpustack_t* stack_base, size_t stack_size)
+{
+	cpustack_t* beg;
+	cpustack_t* cur;
+	cpustack_t* end;
+	size_t sp_free;
+
+	beg = stack_base;
+	end = stack_base + stack_size / sizeof(cpustack_t) - 1;
+
+	if (CPU_STACK_GROWS_UPWARD)
+	{
+		cur = beg;
+		beg = end;
+		end = cur;
+	}
+
+	cur = beg;
+	while (cur != end)
+	{
+		if (*cur != CONFIG_KERN_STACKFILLCODE)
+			break;
+
+		if (CPU_STACK_GROWS_UPWARD)
+			cur--;
+		else
+			cur++;
+	}
+
+	sp_free = ABS(cur - beg) * sizeof(cpustack_t);
+	return sp_free;
+}
+
+void monitor_debug_stacks(void)
+{
+	struct Process* p;
+
+	for (p = MONITOR_NODE_TO_PROCESS(MonitorProcs.head);
+		 p->monitor.link.succ;
+		 p = MONITOR_NODE_TO_PROCESS(p->monitor.link.succ))
+	{
+		size_t free = monitor_check_stack(p->monitor.stack_base, p->monitor.stack_size);
+		kprintf("TCB: %x  sp_base: %x  sp_size: %x  sp_free: %x\n", (uint16_t)p, (uint16_t)p->monitor.stack_base, (uint16_t)p->monitor.stack_size, (uint16_t)free);
+	}
+}
+
+#endif
+
+
 static void proc_init_struct(Process* proc)
 {
-	/* Avoid warning for unused argument */
-	(void)proc;
-
 #if CONFIG_KERN_SIGNALS
 	proc->sig_recv = 0;
 #endif
@@ -91,11 +170,19 @@ void proc_init(void)
 {
 	INITLIST(&ProcReadyList);
 
+#if CONFIG_KERN_MONITOR
+	monitor_init();
+#endif
+
 	/* We "promote" the current context into a real process. The only thing we have
-	   to do is create a PCB and make it current. We don't need to setup the stack
-	   pointer because it will be written the first time we switch to another process. */
+	 * to do is create a PCB and make it current. We don't need to setup the stack
+	 * pointer because it will be written the first time we switch to another process.
+	 */
 	proc_init_struct(&MainProcess);
 	CurrentProcess = &MainProcess;
+
+	/* Make sure the assembly routine is up-to-date with us */
+	ASSERT(asm_switch_version() == 1);
 }
 
 
@@ -108,6 +195,7 @@ void proc_init(void)
 Process *proc_new(void (*entry)(void), size_t stacksize, cpustack_t *stack_base)
 {
 	Process *proc;
+	cpuflags_t flags;
 	size_t i;
 	size_t proc_size_words = ROUND2(sizeof(Process), sizeof(cpustack_t)) / sizeof(cpustack_t);
 #if CONFIG_KERN_HEAP
@@ -141,10 +229,10 @@ Process *proc_new(void (*entry)(void), size_t stacksize, cpustack_t *stack_base)
 	ASSERT(stacksize);
 #endif
 
-#ifdef _DEBUG
+#if CONFIG_KERN_MONITOR
 	/* Fill-in the stack with a special marker to help debugging */
 	memset(stack_base, CONFIG_KERN_STACKFILLCODE, stacksize / sizeof(cpustack_t));
-#endif /* _DEBUG */
+#endif
 
 	/* Initialize the process control block */
 	if (CPU_STACK_GROWS_UPWARD)
@@ -180,9 +268,13 @@ Process *proc_new(void (*entry)(void), size_t stacksize, cpustack_t *stack_base)
 		CPU_PUSH_WORD(proc->stack, CPU_REG_INIT_VALUE(i));
 
 	/* Add to ready list */
-	DISABLE_INTS;
+	DISABLE_IRQSAVE(flags);
 	SCHED_ENQUEUE(proc);
-	ENABLE_INTS;
+	ENABLE_IRQRESTORE(flags);
+
+#if CONFIG_KERN_MONITOR
+	monitor_add(proc, stack_base, stacksize);
+#endif
 
 	return proc;
 }
@@ -203,29 +295,30 @@ void proc_schedule(void)
 	 * being switched out.
 	 */
 	static Process *old_process;
+	static cpuflags_t flags;
 
 	/* Remember old process to save its context later */
 	old_process = CurrentProcess;
-	CurrentProcess = NULL;
 
-	/* Poll on the ready queue for the first ready process
-	 */
-	for(;;) /* forever */
+	/* Poll on the ready queue for the first ready process */
+	DISABLE_IRQSAVE(flags);
+	while (!(CurrentProcess = (struct Process*)REMHEAD(&ProcReadyList)))
 	{
-		/* Do CPU specific idle processing (ARGH, should be moved to the end of the loop!) */
-		SCHEDULER_IDLE;
-
-		DISABLE_INTS;
-		if (!ISLISTEMPTY(&ProcReadyList))
-		{
-			/* Get process from ready list */
-			CurrentProcess = (Process *)ProcReadyList.head;
-			REMOVE((Node *)CurrentProcess);
-			ENABLE_INTS;
-			break;
-		}
+		/*
+		 * Make sure we physically reenable interrupts here, no matter what
+		 * the current task status is. This is important because if we
+		 * are idle-spinning, we must allow interrupts, otherwise no
+		 * process will ever wake up.
+		 *
+		 * \todo If there was a way to code sig_wait so that it does not
+		 * disable interrupts while waiting, there would not be any
+		 * reason to do this.
+		 */
 		ENABLE_INTS;
+		SCHEDULER_IDLE;
+		DISABLE_INTS;
 	}
+	ENABLE_IRQRESTORE(flags);
 
 	/* Optimization: don't switch contexts when the active
 	 * process has not changed.
@@ -282,6 +375,10 @@ void proc_exit(void)
 	 */
 #endif /* ARCH_EMUL */
 
+#if CONFIG_KERN_MONITOR
+	monitor_remove(CurrentProcess);
+#endif
+
 	CurrentProcess = NULL;
 	proc_schedule();
 	/* not reached */
@@ -293,9 +390,13 @@ void proc_exit(void)
  */
 void proc_switch(void)
 {
-	DISABLE_INTS;
+	/* Just like proc_schedule, this function must not have auto variables. */
+	static cpuflags_t flags;
+
+	DISABLE_IRQSAVE(flags);
 	SCHED_ENQUEUE(CurrentProcess);
-	ENABLE_INTS;
+	ENABLE_IRQRESTORE(flags);
+
 	proc_schedule();
 }
 

@@ -15,6 +15,10 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/07/30 14:24:16  rasky
+ * Task switching con salvataggio perfetto stato di interrupt (SR)
+ * Kernel monitor per dump informazioni su stack dei processi
+ *
  * Revision 1.3  2004/07/14 14:18:09  rasky
  * Merge da SC: Rimosso timer dentro il task, che è uno spreco di memoria per troppi task
  *
@@ -46,7 +50,6 @@
 #include "config_kern.h"
 #include <mware/list.h>
 
-
 typedef struct Process
 {
 	Node         link;        /*!< Link Process into scheduler lists */
@@ -62,6 +65,16 @@ typedef struct Process
 	cpustack_t  *stack_base;  /*!< Base of process stack */
 	size_t       stack_size;  /*!< Size of process stack */
 #endif
+
+#if CONFIG_KERN_MONITOR
+	struct ProcMonitor
+	{
+		Node link;
+		cpustack_t* stack_base;
+		size_t stack_size;
+	} monitor;
+#endif
+
 } Process;
 
 

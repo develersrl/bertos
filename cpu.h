@@ -17,6 +17,10 @@
 
 /*
  * $Log$
+ * Revision 1.9  2004/07/30 14:24:16  rasky
+ * Task switching con salvataggio perfetto stato di interrupt (SR)
+ * Kernel monitor per dump informazioni su stack dei processi
+ *
  * Revision 1.8  2004/07/30 14:15:53  rasky
  * Nuovo supporto unificato per detect della CPU
  *
@@ -102,26 +106,12 @@
 	typedef unsigned int cpustack_t;
 
 	#define CPU_REGS_CNT            FIXME
-	#define CPU_SAVED_REGS_CNT      28
+	#define CPU_SAVED_REGS_CNT      8
 	#define CPU_STACK_GROWS_UPWARD  1
 	#define CPU_SP_ON_EMPTY_SLOT	0
 	#define CPU_BYTE_ORDER          CPU_BIG_ENDIAN
 
-	#undef CPU_REG_INIT_VALUE
-	INLINE uint16_t CPU_REG_INIT_VALUE(int reg)
-	{
-		if (reg == 14)
-		{
-			uint16_t omr_img;
-			asm(move OMR, omr_img);
-			return omr_img & (BV(3)/*EX*/ | BV(1)/*MB*/ | BV(0)/*MA*/);
-		}
-		else if (reg == 16)/*M01*/
-			return 0xFFFF;
-		return 0;
-	}
-
-#elif defined (__AVR__)
+#elif CPU_AVR
 
 	#define NOP                     asm volatile ("nop" ::)
 	#define DISABLE_INTS            asm volatile ("cli" ::)
@@ -205,10 +195,10 @@
 	#define CPU_PUSH_CALL_CONTEXT(sp, func) \
 		do { \
 			CPU_PUSH_WORD((sp), (func)); \
-			CPU_PUSH_WORD((sp), 0); \
+			CPU_PUSH_WORD((sp), 0x100); \
 		} while (0);
 
-#elif defined (__AVR__)
+#elif CPU_AVR
 	/* In AVR, the addresses are pushed into the stack as little-endian, while
 	 * memory accesses are big-endian (actually, it's a 8-bit CPU, so there is
 	 * no natural endianess).

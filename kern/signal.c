@@ -19,6 +19,10 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/07/30 14:24:16  rasky
+ * Task switching con salvataggio perfetto stato di interrupt (SR)
+ * Kernel monitor per dump informazioni su stack dei processi
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -42,11 +46,12 @@
 sigset_t sig_check(sigset_t sigs)
 {
 	sigset_t result;
+	cpuflags_t flags;
 
-	DISABLE_INTS;
+	DISABLE_IRQSAVE(flags);
 	result = CurrentProcess->sig_recv & sigs;
 	CurrentProcess->sig_recv &= ~sigs;
-	ENABLE_INTS;
+	ENABLE_IRQRESTORE(flags);
 	return result;
 }
 
@@ -58,24 +63,22 @@ sigset_t sig_check(sigset_t sigs)
 sigset_t sig_wait(sigset_t sigs)
 {
 	sigset_t result;
+	cpuflags_t flags;
 
-	DISABLE_INTS;
+	DISABLE_IRQSAVE(flags);
 
-	for(;;)
+	/* Loop until we get at least one of the signals */
+	while (!(result = CurrentProcess->sig_recv & sigs))
 	{
-		/* Check if we got at least one of the signals */
-		if ((result = CurrentProcess->sig_recv & sigs))
-		{
-			/* Yes, clear signals and return */
-			CurrentProcess->sig_recv &= ~sigs;
-			ENABLE_INTS;
-			return result;
-		}
-
-		/* No, go to sleep and proc_schedule() another process */
+		/* go to sleep and proc_schedule() another process */
 		CurrentProcess->sig_wait = sigs;
 		proc_schedule();
 	}
+
+	/* Signals found: clear them and return */
+	CurrentProcess->sig_recv &= ~sigs;
+	ENABLE_IRQRESTORE(flags);
+	return result;
 }
 
 

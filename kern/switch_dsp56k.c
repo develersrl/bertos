@@ -14,6 +14,10 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/07/30 14:24:16  rasky
+ * Task switching con salvataggio perfetto stato di interrupt (SR)
+ * Kernel monitor per dump informazioni su stack dei processi
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -26,31 +30,6 @@ void asm_switch_context(void ** new_sp/*R2*/, void ** save_sp/*R3*/);
 asm void asm_switch_context(void ** new_sp, void ** save_sp)
 {
 	lea   (SP)+
-	move  n,x:(SP)+
-	move  x0,x:(SP)+
-	move  y0,x:(SP)+
-	move  y1,x:(SP)+
-	move  a0,x:(SP)+
-	move  a1,x:(SP)+
-	move  a2,x:(SP)+
-	move  b0,x:(SP)+
-	move  b1,x:(SP)+
-	move  b2,x:(SP)+
-	move  r0,x:(SP)+
-	move  r1,x:(SP)+
-	move  r2,x:(SP)+
-	move  r3,x:(SP)+
-
-	move  omr,x:(SP)+
-	move  la,x:(SP)+
-	move  m01,x:(SP)+
-	move  lc,x:(SP)+
-
-	;
-	; save hardware stack
-	;
-	move  hws,x:(SP)+
-	move  hws,x:(SP)+
 
 	; From the manual:
 	; The compiler uses page 0 address locations X: 0x0030 - 0x003F as register
@@ -80,13 +59,16 @@ asm void asm_switch_context(void ** new_sp, void ** save_sp)
 	move  y1,x:(SP)
 	
 	; 
-	; 28 words have been pushed on the stack.
+	; Switch stacks
 	nop
 	move SP, x:(R3)
 	nop
 	move x:(R2), SP
 	nop
 
+	;
+	; restore all saved registers
+	;
 	pop   y1
 	move  y1,x:<$3F
 	pop   y1
@@ -104,38 +86,13 @@ asm void asm_switch_context(void ** new_sp, void ** save_sp)
 	pop   y1
 	move  y1,x:<$38
 
-	;
-	; restore hardware stack
-	;
-	move  hws,la  ; Clear HWS to ensure proper reload
-	move  hws,la
-	pop   HWS
-	pop   HWS
-	
-	;
-	; restore all saved registers
-	;
-	pop   lc
-	pop   m01
-	pop   la
-	pop   omr
+	; SR is already pushed on the stack (normal call context). Use RTI to restore
+	; it, so that interrupt status is preserved across the tasks.
+	rti
+}
 
-	pop   r3
-	pop   r2
-	pop   r1
-	pop   r0
-	pop   b2
-	pop   b1
-	pop   b0
-	pop   a2
-	pop   a1
-	pop   a0
-
-	pop   y1
-	pop   y0
-	pop   x0
-
-	pop   n
-	
-	rts
+int asm_switch_version(void);
+int asm_switch_version(void)
+{
+	return 1;
 }

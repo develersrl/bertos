@@ -15,6 +15,10 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/07/30 14:24:16  rasky
+ * Task switching con salvataggio perfetto stato di interrupt (SR)
+ * Kernel monitor per dump informazioni su stack dei processi
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -36,6 +40,7 @@
 #define CONFIG_KERN_TIMER       (1    && CONFIG_KERN_SIGNALS)
 #define CONFIG_KERN_HEAP        (0)
 #define CONFIG_KERN_SEMAPHORES  (0    && CONFIG_KERN_SIGNALS)
+#define CONFIG_KERN_MONITOR     (1    && CONFIG_KERN_SCHED)
 /*\}*/
 
 /* EXPERIMENTAL */
@@ -52,9 +57,11 @@
 #endif
 
 /* Memory fill codes to help debugging */
-#ifdef _DEBUG
-	#define CONFIG_KERN_STACKFILLCODE  0xE1
-	#define CONFIG_KERN_MEMFILLCODE    0xDB
+#if CONFIG_KERN_MONITOR
+	#define CONFIG_KERN_STACKFILLCODE  0xA5A5
+	#define CONFIG_KERN_MEMFILLCODE    0xDBDB
 #endif
+
+
 
 #endif /*  CONFIG_KERN_H */
