@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.9  2004/07/29 22:57:09  bernie
+ * vsprintf(): Remove prototype for backwards compatibility with GCC 3.4; ssize_t: Add definition for inferior compilers.
+ *
  * Revision 1.8  2004/07/20 23:43:39  bernie
  * Use attribute((always_inline)) to force inlining.  This fixes the much
  * hated need of redundant prototypes for inline functions.
@@ -139,9 +142,6 @@
 		/* Missing printf-family functions in avr-libc/stdio.h */
 		#include <stdarg.h>
 		#include <avr/pgmspace.h>
-		#if !GNUC_PREREQ(3,4)
-			int vsprintf(char *buf, const char *fmt, va_list ap);
-		#endif
 		int vsprintf_P(char *buf, const char * PROGMEM fmt, va_list ap);
 
 		/* Support for harvard architectures */
@@ -274,7 +274,8 @@
  * These should be in <sys/types.h>, but many compilers lack them.
  */
 #if !(defined(size_t) || defined(_SIZE_T_DEFINED))
-	#define size_t unsigned int
+	typedef unsigned int size_t;
+	typedef int ssize_t;
 #endif
 #if !(defined(_TIME_T_DEFINED) || defined(__time_t_defined))
 	typedef long time_t;
