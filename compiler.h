@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.15  2004/08/13 03:23:26  bernie
+ * Adjust a few MSVC tweaks from older projects.
+ *
  * Revision 1.14  2004/08/10 06:56:29  bernie
  * RESTRICT: New C99-like macro; STATIC_ASSERT: Fix warning for multiple invocation in one file.
  *
@@ -119,10 +122,9 @@
 
 	#include <setjmp.h>
 	#include <time.h> /* for time_t */
-	#define float double
 
-	/* Ouch, ReleaseSemaphore() conflicts with a WIN32 call ;-( */
-	#define ReleaseSemaphore KReleaseSemaphore
+	/* FIXME: I can't remember why exactly this was needed (NdBernie) */
+	#define float double
 
 	/* Fake bool support */
 	#ifndef __cplusplus
@@ -130,6 +132,10 @@
 		#define false 0
 		typedef int bool;
 	#endif /* !__cplusplus */
+
+	/* These C99 functions are oddly named in MSVCRT32.lib */
+	#define snprintf _snprintf
+	#define vsnprintf _vsnprintf
 
 #elif defined(__GNUC__)
 
