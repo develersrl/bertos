@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2004/12/13 11:51:08  bernie
+ *#* DISABLE_INTS/ENABLE_INTS: Convert to IRQ_DISABLE/IRQ_ENABLE.
+ *#*
  *#* Revision 1.3  2004/08/25 14:12:08  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -38,12 +41,11 @@
 #	define TIMER_INIT \
 		TIMER2 = (65535 - TICKS_RATE); \
 		INT_MASK1 |= INT1F_T2OVF; \
-		\
-		DISABLE_INTS; \
-		WSR = 1; \
-		IOC3 |= IOC3F_T2_ENA; \
-		WSR = 0; \
-		ENABLE_INTS
+		ATOMIC( \
+			WSR = 1; \
+			IOC3 |= IOC3F_T2_ENA; \
+			WSR = 0; \
+		)
 
 #define DEFINE_TIMER_ISR \
 	INTERRUPT(0x38) void TM2_OVFL_interrupt(void);  \

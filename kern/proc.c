@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.22  2004/12/13 11:51:08  bernie
+ *#* DISABLE_INTS/ENABLE_INTS: Convert to IRQ_DISABLE/IRQ_ENABLE.
+ *#*
  *#* Revision 1.21  2004/11/28 23:20:25  bernie
  *#* Remove obsolete INITLIST macro.
  *#*
@@ -284,7 +287,7 @@ void proc_schedule(void)
 	 * the compiler might put them on the stack of the process
 	 * being switched out.
 	 */
-	static Process *old_process;
+	static struct Process *old_process;
 	static cpuflags_t flags;
 
 	/* Remember old process to save its context later */
@@ -292,7 +295,7 @@ void proc_schedule(void)
 
 	/* Poll on the ready queue for the first ready process */
 	DISABLE_IRQSAVE(flags);
-	while (!(CurrentProcess = (struct Process*)REMHEAD(&ProcReadyList)))
+	while (!(CurrentProcess = (struct Process *)REMHEAD(&ProcReadyList)))
 	{
 		/*
 		 * Make sure we physically reenable interrupts here, no matter what
@@ -300,22 +303,23 @@ void proc_schedule(void)
 		 * are idle-spinning, we must allow interrupts, otherwise no
 		 * process will ever wake up.
 		 *
-		 * \todo If there was a way to code sig_wait so that it does not
+		 * \todo If there was a way to write sig_wait() so that it does not
 		 * disable interrupts while waiting, there would not be any
 		 * reason to do this.
 		 */
-		ENABLE_INTS;
+		IRQ_ENABLE;
 		SCHEDULER_IDLE;
-		DISABLE_INTS;
+		IRQ_DISABLE;
 	}
 	ENABLE_IRQRESTORE(flags);
 
-	/* Optimization: don't switch contexts when the active
+	/*
+	 * Optimization: don't switch contexts when the active
 	 * process has not changed.
 	 */
 	if (CurrentProcess != old_process)
 	{
-		static cpustack_t* dummy;
+		static cpustack_t *dummy;
 
 #if CONFIG_KERN_PREEMPTIVE
 		/* Reset quantum for this process */

@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2004/12/13 11:51:08  bernie
+ *#* DISABLE_INTS/ENABLE_INTS: Convert to IRQ_DISABLE/IRQ_ENABLE.
+ *#*
  *#* Revision 1.4  2004/08/25 14:12:08  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -30,13 +33,13 @@
 #include "serhw.h"
 
 #define SER_HW_ENABLE_TX \
-	DISABLE_INTS; \
-	if (!ser_sending) \
-	{ \
-		ser_sending = true; \
-		(INT_PEND1 |= INT1F_TI) \
-	} \
-	ENABLE_INTS;
+	ATOMIC( \
+		if (!ser_sending) \
+		{ \
+			ser_sending = true; \
+			(INT_PEND1 |= INT1F_TI) \
+		} \
+	);
 
 static volatile bool ser_sending;
 

@@ -38,6 +38,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.19  2004/12/13 11:51:08  bernie
+ *#* DISABLE_INTS/ENABLE_INTS: Convert to IRQ_DISABLE/IRQ_ENABLE.
+ *#*
  *#* Revision 1.18  2004/12/08 08:03:48  bernie
  *#* Doxygen fixes.
  *#*
@@ -748,7 +751,7 @@ SIGNAL(SIG_UART0_RECV)
 
 	/* Disable Recv complete IRQ */
 	//UCSR0B &= ~BV(RXCIE);
-	//ENABLE_INTS;
+	//IRQ_ENABLE;
 
 	/* Should be read before UDR */
 	ser_uart0->status |= UCSR0A & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
@@ -772,7 +775,7 @@ SIGNAL(SIG_UART0_RECV)
 	}
 
 	/* Reenable receive complete int */
-	//DISABLE_INTS;
+	//IRQ_DISABLE;
 	//UCSR0B |= BV(RXCIE);
 
 	SER_STROBE_OFF;
@@ -798,7 +801,7 @@ SIGNAL(SIG_UART1_RECV)
 
 	/* Disable Recv complete IRQ */
 	//UCSR1B &= ~BV(RXCIE);
-	//ENABLE_INTS;
+	//IRQ_ENABLE;
 
 	/* Should be read before UDR */
 	ser_uart1->status |= UCSR1A & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
