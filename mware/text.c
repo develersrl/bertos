@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2005/01/08 09:20:12  bernie
+ *#* Really make it work on both architectures.
+ *#*
  *#* Revision 1.9  2004/12/31 16:44:29  bernie
  *#* Sanitize for non-Harvard processors.
  *#*
@@ -153,7 +156,11 @@ static int text_putglyph(char c, struct Bitmap *bm)
 		/* Per ogni colonna di dot del glyph... */
 		for (i = 0; i < glyph_width; ++i)
 		{
-			dots = PGM_READ_CHAR(glyph);
+			#if CPU_HARVARD
+				dots = PGM_READ_CHAR(glyph);
+			#else
+				dots = *glyph;
+			#endif
 
 			/* Advance to next column in glyph.
 			 * Expand: advances only once every two columns
@@ -191,7 +198,13 @@ static int text_putglyph(char c, struct Bitmap *bm)
 	}
 	else /* No style: fast vanilla copy of glyph to line buffer */
 		while (glyph_width--)
-			*buf++ = PGM_READ_CHAR(glyph++);
+		{
+			#if CPU_HARVARD
+				*buf++ = PGM_READ_CHAR(glyph++);
+			#else
+				*buf++ = *glyph++;
+			#endif
+		}
 
 	return c;
 }
