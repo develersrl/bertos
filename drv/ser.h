@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.20  2005/01/22 04:20:01  bernie
+ *#* Reformat.
+ *#*
  *#* Revision 1.19  2005/01/11 18:08:16  aleph
  *#* Add missing include
  *#*
@@ -89,7 +92,7 @@
 
 	/*
 	 * Hardware errors.
-         * These flags map directly to the AVR UART Status Register (USR).
+	 * These flags map directly to the AVR UART Status Register (USR).
 	 */
 	#define SERRF_RXSROVERRUN    BV(3)  /*!< Rx shift register overrun */
 	#define SERRF_FRAMEERROR     BV(4)  /*!< Stop bit missing */
@@ -126,7 +129,8 @@
 
 /*! \name Masks to group TX/RX errors. */
 /*\{*/
-#define SERRF_RX  (SERRF_RXFIFOOVERRUN \
+#define SERRF_RX \
+	( SERRF_RXFIFOOVERRUN \
 	| SERRF_RXTIMEOUT \
 	| SERRF_RXSROVERRUN \
 	| SERRF_PARITYERROR \
