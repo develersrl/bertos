@@ -15,7 +15,7 @@
 
 /*
  * $Log$
- * Revision 1.7  2004/07/18 21:54:53  bernie
+ * Revision 1.8  2004/07/18 21:57:07  bernie
  * Fix preprocessor warning with potentially undefined symbol.
  *
  * Revision 1.6  2004/06/07 18:10:06  aleph
