@@ -15,8 +15,9 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.4  2004/08/25 14:12:08  rasky
- *#* Aggiornato il comment block dei log RCS
+ *#* Revision 1.5  2004/08/29 21:57:58  bernie
+ *#* Move back STATIC_ASSERT() to compiler.h as it's needed in cpu.h;
+ *#* iptr_t, const_iptr_t: Replace IPTR macro with a real typedef.
  *#*
  *#* Revision 1.3  2004/08/24 14:13:48  bernie
  *#* Restore a few macros that were lost in the way.
@@ -112,10 +113,6 @@
 	#define PP_COUNT__(a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,count,...) \
 		count
 #endif
-
-/*! Issue a compilation error if the \a condition is false */
-#define STATIC_ASSERT(condition)  \
-	extern char PP_CAT(CT_ASSERT___, __LINE__)[(condition) ? 1 : -1]
 
 #if COMPILER_C99
 	/*!

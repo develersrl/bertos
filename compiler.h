@@ -15,6 +15,10 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.20  2004/08/29 21:57:58  bernie
+ *#* Move back STATIC_ASSERT() to compiler.h as it's needed in cpu.h;
+ *#* iptr_t, const_iptr_t: Replace IPTR macro with a real typedef.
+ *#*
  *#* Revision 1.19  2004/08/25 14:12:08  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -267,7 +271,7 @@
 
 
 /*
- * Standard type definitions
+ * Standard type definitions.
  * These should be in <sys/types.h>, but many compilers lack them.
  */
 #if !(defined(size_t) || defined(_SIZE_T_DEFINED))
@@ -278,9 +282,10 @@
 	typedef long time_t;
 #endif /* _TIME_T_DEFINED || __time_t_defined */
 
-/*! Storage for pointers and integers */
-/* FIXME: turn this into a typedef? */
-#define IPTR void *
+/*! Bulk storage large enough for both pointers or integers */
+typedef void * iptr_t;
+typedef const void * const_iptr_t;
+#define IPTR iptr_t  /* OBSOLETE */
 
 typedef long utime_t;            /*!< Type for time expressed in microseconds */
 typedef unsigned char sig_t;     /*!< Type for signal bits */
@@ -346,5 +351,9 @@ typedef unsigned char page_t;    /*!< Type for banked memory pages */
 	 */
 	#define countof(a)  (sizeof(a) / sizeof(*(a)))
 #endif
+
+/*! Issue a compilation error if the \a condition is false */
+#define STATIC_ASSERT(condition)  \
+	extern char PP_CAT(CT_ASSERT___, __LINE__)[(condition) ? 1 : -1]
 
 #endif /* DEVLIB_COMPILER_H */
