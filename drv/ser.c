@@ -28,6 +28,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.19  2004/10/19 08:14:13  bernie
+ *#* Fix a few longstanding bugs wrt status handling (made by rasky on scfirm).
+ *#*
  *#* Revision 1.18  2004/09/20 03:31:15  bernie
  *#* Sanitize for C++.
  *#*
@@ -144,7 +147,7 @@ int ser_putchar(int c, struct Serial *port)
 	/* (re)trigger tx interrupt */
 	port->hw->table->enabletxirq(port->hw);
 
-	/* Avoid returning signed estended char */
+	/* Avoid returning signed extended char */
 	return (int)((unsigned char)c);
 }
 
@@ -182,15 +185,16 @@ int ser_getchar(struct Serial *port)
 			}
 #endif /* CONFIG_SER_RXTIMEOUT */
 		}
-		while (fifo_isempty_locked(&port->rxfifo));
+		while (fifo_isempty_locked(&port->rxfifo) && (port->status & SERRF_RX) == 0);
 	}
 
 	/*
 	 * Get a byte from the FIFO (avoiding sign-extension),
 	 * re-enable RTS, then return result.
 	 */
-	result = (int)(unsigned char)fifo_pop_locked(&port->rxfifo);
-	return port->status ? EOF : result;
+	if (port->status & SERRF_RX)
+		return EOF;
+	return (int)(unsigned char)fifo_pop_locked(&port->rxfifo);
 }
 
 
@@ -327,7 +331,6 @@ int ser_printf(struct Serial *port, const char *format, ...)
 	va_list ap;
 	int len;
 
-	ser_setstatus(port, 0);
 	va_start(ap, format);
 	len = _formatted_write(format, (void (*)(char, void *))ser_putchar, port, ap);
 	va_end(ap);
@@ -433,6 +436,8 @@ struct Serial *ser_open(unsigned int unit)
 	port->hw = ser_hw_getdesc(unit);
 
 	/* Initialize circular buffers */
+	ASSERT(port->hw->txbuffer);
+	ASSERT(port->hw->rxbuffer);
 	fifo_init(&port->txfifo, port->hw->txbuffer, port->hw->txbuffer_size);
 	fifo_init(&port->rxfifo, port->hw->rxbuffer, port->hw->rxbuffer_size);
 
