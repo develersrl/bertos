@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.16  2004/10/19 11:48:05  bernie
+ *#* Reformat.
+ *#*
  *#* Revision 1.15  2004/10/19 08:11:53  bernie
  *#* SERRF_TX, SERRF_RX: New macros; Enhance documentation.
  *#*
@@ -92,7 +95,7 @@
 
 	/*
 	 * Hardware errors.
-         * These flags map directly to the SCI Control Register.
+	 * These flags map directly to the SCI Control Register.
 	 */
 	#define SERRF_PARITYERROR    BV(8)  /*!< Parity error */
 	#define SERRF_FRAMEERROR     BV(9)  /*!< Stop bit missing */
