@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/06/06 18:25:44  bernie
+ * Rename event macros to look like regular functions.
+ *
  * Revision 1.3  2004/06/06 16:57:18  bernie
  * Mark some functions INLINE instead of 'extern inline'.
  *
@@ -58,14 +61,14 @@ INLINE time_t timer_gettick_irq(void);
 /*! Set the timer so that it sends a signal when it expires */
 INLINE void timer_set_event_signal(Timer* timer, struct Process* proc, sigset_t sigs)
 {
-	INITEVENT_SIG(&timer->expire, proc, sigs);
+	event_initSignal(&timer->expire, proc, sigs);
 }
 #endif
 
 /*! Set the timer so that it calls an user hook when it expires */
 INLINE void timer_set_event_softint(Timer* timer, Hook func, void* user_data)
 {
-	INITEVENT_INT(&timer->expire, func, user_data);
+	event_initSoftInt(&timer->expire, func, user_data);
 }
 
 /*! Set the timer delay (the time before the event will be triggered) */

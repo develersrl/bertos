@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/06/06 18:25:44  bernie
+ * Rename event macros to look like regular functions.
+ *
  * Revision 1.3  2004/06/06 17:18:42  bernie
  * Fix \!CONFIG_KERN_SIGNALS code paths.
  *
@@ -238,7 +241,7 @@ DEFINE_TIMER_ISR
 		REMOVE((Node *)timer);
 
 		/* Execute the associated event */
-		DOEVENT_INTR(&timer->expire);
+		event_doIntr(&timer->expire);
 	}
 }
 

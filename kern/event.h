@@ -18,6 +18,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/06/06 18:25:44  bernie
+ * Rename event macros to look like regular functions.
+ *
  * Revision 1.2  2004/06/03 11:27:09  bernie
  * Add dual-license information.
  *
@@ -28,7 +31,7 @@
 #ifndef KERN_EVENT_H
 #define KERN_EVENT_H
 
-#include "config.h"
+#include <config.h>
 
 #ifdef CONFIG_KERNEL
 	#include "config_kern.h"
@@ -76,28 +79,60 @@ typedef struct Event
 } Event;
 
 
-/*! Initialize an event with a softint */
-#define INITEVENT_INT(e,f,u) \
+/*! Initialize the event \a e as a no-op */
+#define event_initNone(e) \
+	((e)->action = EVENT_IGNORE)
+
+/*! Same as event_initNone(), but returns the initialized event */
+INLINE Event event_createNone(void)
+{
+	Event e;
+	e.action = EVENT_IGNORE;
+	return e;
+}
+
+/*! Initialize the event \a e with a software interrupt (call function \a f, with parameter \a u) */
+#define event_initSoftInt(e,f,u) \
 	((e)->action = EVENT_SOFTINT,(e)->Ev.Int.func = (f), (e)->Ev.Int.user_data = (u))
+
+/*! Same as event_initSoftInt(), but returns the initialized event */
+INLINE Event event_createSoftInt(Hook func, void* user_data)
+{
+	Event e;
+	e.action = EVENT_SOFTINT;
+	e.Ev.Int.func = func;
+	e.Ev.Int.user_data = user_data;
+	return e;
+}
 
 
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 
-/*! Initialize an event with a signal */
-#define INITEVENT_SIG(e,p,s) \
+/*! Initialize the event \a e with a signal (send signal \a s to process \a p) */
+#define event_initSignal(e,p,s) \
 	((e)->action = EVENT_SIGNAL,(e)->Ev.Sig.sig_proc = (p), (e)->Ev.Sig.sig_bit = (s))
 
+/*! Same as event_initSignal(), but returns the initialized event */
+INLINE Event event_createSignal(struct Process* proc, sig_t bit)
+{
+	Event e;
+	e.action = EVENT_SOFTINT;
+	e.Ev.Sig.sig_proc = proc;
+	e.Ev.Sig.sig_bit = bit;
+	return e;
+}
+
 /*! Trigger an event */
-#define DOEVENT(e) \
+#define event_do(e) \
 do { \
 	if ((e)->action == EVENT_SIGNAL) \
-		sig_signal((e)->Ev.Sig.sig_proc, (e)->Sig.sig_bit); \
+		sig_signal((e)->Ev.Sig.sig_proc, (e)->Ev.Sig.sig_bit); \
 	else if ((e)->action == EVENT_SOFTINT) \
 		(e)->Ev.Int.func((e)->Ev.Int.user_data); \
 } while (0)
 
 /*! Trigger an event (to be used inside interrupts) */
-#define DOEVENT_INTR(e) \
+#define event_doIntr(e) \
 do { \
 	if ((e)->action == EVENT_SIGNAL) \
 		_sig_signal((e)->Ev.Sig.sig_proc, (e)->Ev.Sig.sig_bit); \
@@ -108,19 +143,26 @@ do { \
 #else /* !CONFIG_KERN_SIGNALS */
 
 /*! Trigger an event */
-#define DOEVENT(e) \
+#define event_do(e) \
 do { \
 	if ((e)->action == EVENT_SOFTINT) \
 		(e)->Ev.Int.func((e)->Ev.Int.user_data); \
 } while (0)
 
 /*! Trigger an event (to be used inside interrupts) */
-#define DOEVENT_INTR(e) \
+#define event_doIntr(e) \
 do { \
 	if ((e)->action == EVENT_SOFTINT) \
 		(e)->Ev.Int.func((e)->Ev.Int.user_data); \
 } while (0)
 
+#endif
+
+#ifdef CONFIG_KERN_OLDNAMES
+	#define INITEVENT_SIG  event_initSignal
+	#define INITEVENT_INT  event_initSoftInt
+	#define DOEVENT        event_do
+	#define DOEVENT_INTR   event_doIntr
 #endif
 
 #endif /* KERN_EVENT_H */
