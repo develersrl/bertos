@@ -10,10 +10,15 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  *
  * \brief I2C eeprom driver
+ *
+ * \note This implementation is AVR specific.
  */
 
 /*
  * $Log$
+ * Revision 1.2  2004/07/22 01:24:43  bernie
+ * Document AVR dependency.
+ *
  * Revision 1.1  2004/07/20 17:11:18  bernie
  * Import into DevLib.
  *
