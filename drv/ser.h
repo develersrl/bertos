@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.15  2004/10/19 08:11:53  bernie
+ *#* SERRF_TX, SERRF_RX: New macros; Enhance documentation.
+ *#*
  *#* Revision 1.14  2004/10/03 18:43:18  bernie
  *#* Fix a nasty bug caused by confusion between old-style and new-style configuration macros.
  *#*
@@ -61,15 +64,7 @@
 #include <compiler.h>
 #include <config.h>
 
-/*!
- * \name Serial Error/status flags
- *
- * Some of these flags map directly to the flags
- * in AVR UART Status Register(USR).
- * \todo  flags of DSP56k aren't mapped to these flags. Luckily
- *        these flags doesn't collide with the DSP56k ones,
- *        which are from 0x0100 to 0x8000
- */
+/*! \name Serial Error/status flags. */
 /*\{*/
 #if CPU_AVR
 	typedef uint8_t serstatus_t;
@@ -79,10 +74,14 @@
 	#define SERRF_RXTIMEOUT      BV(5)  /*!< Receive timeout */
 	#define SERRF_TXTIMEOUT      BV(6)  /*!< Transmit timeout */
 
-	/* Hardware errors */
+	/*
+	 * Hardware errors.
+         * These flags map directly to the AVR UART Status Register (USR).
+	 */
 	#define SERRF_RXSROVERRUN    BV(3)  /*!< Rx shift register overrun */
 	#define SERRF_FRAMEERROR     BV(4)  /*!< Stop bit missing */
 	#define SERRF_PARITYERROR    BV(7)  /*!< Parity error */
+	#define SERRF_NOISEERROR     0      /*!< Unsupported */
 #elif CPU_DSP56K
 	typedef uint16_t serstatus_t;
 
@@ -91,7 +90,10 @@
 	#define SERRF_RXTIMEOUT      BV(1)  /*!< Receive timeout */
 	#define SERRF_TXTIMEOUT      BV(2)  /*!< Transmit timeout */
 
-	/* Hardware errors */
+	/*
+	 * Hardware errors.
+         * These flags map directly to the SCI Control Register.
+	 */
 	#define SERRF_PARITYERROR    BV(8)  /*!< Parity error */
 	#define SERRF_FRAMEERROR     BV(9)  /*!< Stop bit missing */
 	#define SERRF_NOISEERROR     BV(10) /*!< Noise error */
@@ -101,7 +103,25 @@
 #endif
 /*\}*/
 
-/*! \name Parity settings for ser_setparity() */
+/*! \name Masks to group TX/RX errors. */
+/*\{*/
+#define SERRF_RX  (SERRF_RXFIFOOVERRUN \
+	| SERRF_RXTIMEOUT \
+	| SERRF_RXSROVERRUN \
+	| SERRF_PARITYERROR \
+	| SERRF_FRAMEERROR \
+	| SERRF_NOISEERROR)
+#define SERRF_TX  (SERRF_TXTIMEOUT)
+/*\}*/
+
+
+/*!
+ * \name Parity settings for ser_setparity().
+ *
+ * \note Values are AVR-specific for performance reasons.
+ *       Other processors should either decode them or
+ *       redefine these macros.
+ */
 /*\{*/
 #define SER_PARITY_NONE  0
 #define SER_PARITY_EVEN  2
