@@ -1,9 +1,9 @@
 /*!
  * \file
  * <!--
- * Copyright (C) 1999 Bernardo Innocenti <bernie@develer.com>
- * Copyright (C) 2003 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 1999 Bernardo Innocenti <bernie@develer.com>
+ * This file is part of DevLib - See devlib/README for information.
  * -->
  *
  * \version $Id$
@@ -16,26 +16,8 @@
 
 /*
  * $Log$
- * Revision 1.1  2004/05/23 15:43:16  bernie
- * Import mware modules.
- *
- * Revision 1.6  2004/03/24 15:03:45  bernie
- * Use explicit include paths; clean Doxygen comments
- *
- * Revision 1.5  2004/02/09 00:21:28  aleph
- * Various gfx fixes
- *
- * Revision 1.4  2004/01/27 23:24:19  aleph
- * Add new graphics primitives
- *
- * Revision 1.3  2004/01/13 00:05:23  aleph
- * Fix clipping bug
- *
- * Revision 1.2  2004/01/07 23:33:01  aleph
- * Change copyright email
- *
- * Revision 1.1  2004/01/07 19:05:31  aleph
- * Add graphics routines
+ * Revision 1.2  2004/06/03 11:27:09  bernie
+ * Add dual-license information.
  *
  */
 

@@ -1,8 +1,8 @@
 /*!
  * \file
  * <!--
- * Copyright (C) 2003,2004 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
+ * This file is part of DevLib - See devlib/README for information.
  * -->
  *
  * \brief Hardware dependent serial driver (interface)
@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/06/03 11:27:09  bernie
+ * Add dual-license information.
+ *
  * Revision 1.2  2004/05/23 18:21:53  bernie
  * Trim CVS logs and cleanup header info.
  *

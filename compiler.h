@@ -3,7 +3,7 @@
  * <!--
  * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2001,2002,2003 Bernardo Innocenti <bernie@codewiz.org>
- * All Rights Reserved.
+ * This file is part of DevLib - See devlib/README for information.
  * -->
  *
  * \version $Id$
@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.2  2004/06/03 11:27:09  bernie
+ * Add dual-license information.
+ *
  * Revision 1.1  2004/05/23 17:48:35  bernie
  * Add top-level files.
  *

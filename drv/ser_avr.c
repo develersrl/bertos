@@ -3,7 +3,7 @@
  * <!--
  * Copyright 2000 Bernardo Innocenti <bernie@codewiz.org>
  * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * This file is part of DevLib - See devlib/README for information.
  * -->
  *
  * \version $Id$
@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.4  2004/06/03 11:27:09  bernie
+ * Add dual-license information.
+ *
  * Revision 1.3  2004/06/02 21:35:24  aleph
  * Serial enhancements: interruptible receive handler and 8 bit serial status for AVR; remove volatile attribute to FIFOBuffer, useless for new fifobuf routens
  *

@@ -3,7 +3,7 @@
  * <!--
  * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2001,2002,2003 by Bernardo Innocenti <bernie@codewiz.org>
- * All Rights Reserved.
+ * This file is part of DevLib - See devlib/README for information.
  * -->
  *
  * \version $Id$

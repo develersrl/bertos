@@ -1,8 +1,8 @@
 /*!
  * \file
+ * Copyright (C) 2003,2004 Develer S.r.l. (http://www.develer.com/)
  * Copyright (C) 1999 Bernardo Innocenti <bernie@develer.com>
- * Copyright (C) 2003 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * This file is part of DevLib - See devlib/README for information.
  *
  * \version $Id$
  *
@@ -14,6 +14,9 @@
 
 /*
  * $Log$
+ * Revision 1.2  2004/06/03 11:27:09  bernie
+ * Add dual-license information.
+ *
  * Revision 1.1  2004/05/23 15:43:16  bernie
  * Import mware modules.
  *

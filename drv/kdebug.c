@@ -3,7 +3,7 @@
  * <!--
  * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000,2001,2002 Bernardo Innocenti <bernie@codewiz.org>
- * All Rights Reserved.
+ * This file is part of DevLib - See devlib/README for information.
  * -->
  *
  * \brief General pourpose debug functions.
@@ -16,6 +16,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2004/06/03 11:27:09  bernie
+ * Add dual-license information.
+ *
  * Revision 1.2  2004/05/23 18:21:53  bernie
  * Trim CVS logs and cleanup header info.
  *

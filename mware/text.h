@@ -1,8 +1,8 @@
 /*!
  * \file
- * Copyright (C) 1999 Bernardo Innocenti <bernie@develer.com>
- * Copyright (C) 2003 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * Copyright 1999 Bernardo Innocenti <bernie@develer.com>
+ * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
+ * This file is part of DevLib - See devlib/README for information.
  *
  * \version $Id$
  *
@@ -14,35 +14,8 @@
 
 /*
  * $Log$
- * Revision 1.1  2004/05/23 15:43:16  bernie
- * Import mware modules.
- *
- * Revision 1.9  2004/04/03 20:42:49  aleph
- * Add text_clear()
- *
- * Revision 1.8  2004/03/19 16:52:28  bernie
- * Move printf() like functions from text.c to text_format.c and add PROGMEM versions.
- *
- * Revision 1.7  2004/03/17 17:30:30  bernie
- * Add GCC format checks to printf()-like functions.
- *
- * Revision 1.6  2004/02/21 21:40:20  aleph
- * Various small fixes
- *
- * Revision 1.5  2004/02/18 11:50:10  aleph
- * Add right alignment to xprintf
- *
- * Revision 1.4  2004/01/13 12:15:28  aleph
- * Move font table in program memory; add font.h
- *
- * Revision 1.3  2004/01/13 00:06:47  aleph
- * Fix clipping and ANSI esc bug, add text_xprintf()
- *
- * Revision 1.2  2004/01/08 18:03:12  aleph
- * Add text functions to set coordinates
- *
- * Revision 1.1  2004/01/07 23:31:54  aleph
- * Add text routines
+ * Revision 1.2  2004/06/03 11:27:09  bernie
+ * Add dual-license information.
  *
  */
 

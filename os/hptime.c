@@ -2,7 +2,7 @@
  * \file
  * <!--
  * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
- * All rights reserved.
+ * This file is part of DevLib - See devlib/README for information.
  * -->
  *
  * \brief Portable abstraction for high-resolution time handling (implementation)
@@ -13,6 +13,9 @@
 
 /*
  * $Log$
+ * Revision 1.2  2004/06/03 11:27:09  bernie
+ * Add dual-license information.
+ *
  * Revision 1.1  2004/06/03 09:01:06  bernie
  * Import into DevLib.
  *

@@ -3,7 +3,7 @@
  * <!--
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2004 Giovanni Bajo
- * All Rights Reserved.
+ * This file is part of DevLib - See devlib/README for information.
  * -->
  *
  * \brief Generic library to handle buzzers and leds
@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.2  2004/06/03 11:27:09  bernie
+ * Add dual-license information.
+ *
  * Revision 1.1  2004/05/23 18:36:05  bernie
  * Import buzzerled driver.
  *

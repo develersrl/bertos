@@ -1,0 +1,43 @@
+
+Overview
+========
+
+DevLib is a collection of small reusable components designed by Develer
+for internal use in many embedded and portable applications.
+
+These source files are intended to be shared between very different
+environments, from 8bit processors to Linux and Win32 hosted
+applications, using a wide range of compilers.
+
+DevLib is not strictly a library or a portability layer.  It's also
+definitely not an OS, altough some of its components can be combined
+together to form a multitasking kernel with some IPC functionality.
+
+
+Scope (or lack thereof)
+=======================
+
+There's no consistent scope or design guide-line for the components
+of DevLib (altough there's a common coding and documentation style).
+Every piece of code that looks useful for more than one application
+may end up here, regardless of compatibility and fitness with other
+modules.
+
+Most of DevLib is written in C, but some services intended for higher
+level, OS-hosted applications are written in C++.  Some modules are
+dependant on others to avoid code duplication, but most of the times
+you can configure out features you don't need.
+
+
+Redistribution
+==============
+
+DevLib is a collection of independent works originally written by
+several different contributors.  Unless otherwise noted, all material
+is provided under the terms of the GPL (see LICENSE.GPL).
+
+Alternatively, when parts of DevLib are included in projects developed
+by Develer, said parts are subject to the same licensing terms covering
+the specific project, with the exception of clauses granting exclusive
+rights.
+

@@ -3,7 +3,7 @@
  * <!--
  * Copyright 2004 Giovanni Bajo
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * This file is part of DevLib - See devlib/README for information.
  * -->
  *
  * \version $Id$
@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.2  2004/06/03 11:27:09  bernie
+ * Add dual-license information.
+ *
  * Revision 1.1  2004/05/23 18:23:30  bernie
  * Import drv/timer module.
  *
