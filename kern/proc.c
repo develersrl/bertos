@@ -17,6 +17,9 @@
 
 /*
  * $Log$
+ * Revision 1.10  2004/08/24 16:07:01  bernie
+ * Use kputs()/kputchar() when possible.
+ *
  * Revision 1.9  2004/08/24 14:26:57  bernie
  * monitor_debug_stacks(): Conditionally compile on CONFIG_KERN_MONITOR.
  *
@@ -158,14 +161,14 @@ void monitor_debug_stacks(void)
 
 	if (ISLISTEMPTY(&MonitorProcs))
 	{
-		kprintf("No stacks registered in the monitor\n");
+		kputs("No stacks registered in the monitor\n");
 		return;
 	}
 
 	kprintf("%-24s    %-6s%-8s%-8s%-8s\n", "Process name", "TCB", "SPbase", "SPsize", "SPfree");
 	for (i=0;i<56;i++)
-		kprintf("-");
-	kprintf("\n");
+		kputchar('-');
+	kputchar('\n');
 
 	for (p = MONITOR_NODE_TO_PROCESS(MonitorProcs.head);
 		 p->monitor.link.succ;
