@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.13  2004/11/16 20:58:51  bernie
+ *#* Add write verify.
+ *#*
  *#* Revision 1.12  2004/11/02 17:50:01  bernie
  *#* CONFIG_EEPROM_VERIFY: New config option.
  *#*
@@ -298,6 +301,8 @@ static bool eeprom_writeRaw(e2addr_t addr, const void *buf, size_t count)
 		buf = ((const char *)buf) + size;
 	}
 
+	if (!result)
+		TRACEMSG("Write error!");
 	return result;
 }
 
@@ -306,6 +311,8 @@ static bool eeprom_writeRaw(e2addr_t addr, const void *buf, size_t count)
 /*!
  * Check that the contents of an EEPROM range
  * match with a provided data buffer.
+ *
+ * \return true on success.
  */
 static bool eeprom_verify(e2addr_t addr, const void *buf, size_t count)
 {
@@ -322,13 +329,13 @@ static bool eeprom_verify(e2addr_t addr, const void *buf, size_t count)
 		{
 			if (memcmp(buf, verify_buf, size) != 0)
 			{
-				TRACEMSG("Data mismatch!\n");
+				TRACEMSG("Data mismatch!");
 				result = false;
 			}
 		}
 		else
 		{
-			TRACEMSG("Read error!\n");
+			TRACEMSG("Read error!");
 			result = false;
 		}
 
@@ -401,6 +408,8 @@ bool eeprom_read(e2addr_t addr, void *buf, size_t count)
 
 	twi_stop();
 
+	if (!res)
+		TRACEMSG("Read error!");
 	return res;
 }
 
@@ -463,6 +472,13 @@ void eeprom_init(void)
 	cpuflags_t flags;
 	DISABLE_IRQSAVE(flags);
 
+	/*
+	 * This is pretty useless according to AVR's datasheet,
+	 * but it helps us driving the TWI data lines on boards
+	 * where the bus pull-up resistors are missing.  This is
+	 * probably due to some unwanted interaction between the
+	 * port pin and the TWI lines.
+	 */
 #if defined(__AVR_ATmega64__)
 	PORTD |= BV(PD0) | BV(PD1);
 	DDRD |= BV(PD0) | BV(PD1);
@@ -477,7 +493,7 @@ void eeprom_init(void)
 	 * Set speed:
 	 * F = CLOCK_FREQ / (16 + 2*TWBR * 4^TWPS)
 	 */
-	#define TWI_FREQ  300000  /* 300 kHz */
+	#define TWI_FREQ  100000  /* ~100 kHz */
 	#define TWI_PRESC 1       /* 4 ^ TWPS */
 
 	TWBR = (CLOCK_FREQ / (2 * TWI_FREQ * TWI_PRESC)) - (8 / TWI_PRESC);
