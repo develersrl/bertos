@@ -41,6 +41,9 @@
 
 /*
  * $Log$
+ * Revision 1.5  2004/06/06 16:50:35  bernie
+ * Import fixes for race conditions from project_ks.
+ *
  * Revision 1.4  2004/06/06 16:11:17  bernie
  * Protect MetroWerks specific pragmas with #ifdef's
  *
@@ -118,7 +121,10 @@ INLINE void fifo_init(FIFOBuffer *fb, unsigned char *buf, size_t size);
  *
  * \note Calling fifo_isempty() is safe while a concurrent
  *       execution context is calling fifo_push() or fifo_pop()
- *       only if the CPU can atomically update a pointer.
+ *       only if the CPU can atomically update a pointer
+ *       (which the AVR and other 8-bit processors can't do).
+ *
+ * \sa fifo_isempty_locked
  */
 INLINE bool fifo_isempty(const FIFOBuffer *fb)
 {
@@ -147,44 +153,6 @@ INLINE bool fifo_isfull(const FIFOBuffer *fb)
 }
 
 
-#if !defined(__AVR__)
-
-	/* No tricks needed on 16/32bit CPUs */
-#	define fifo_isempty_locked(fb) fifo_isempty((fb))
-
-#else /* !__AVR__ */
-
-	INLINE bool fifo_isempty_locked(const FIFOBuffer *fb)
-	{
-		bool result;
-		cpuflags_t flags;
-
-		DISABLE_IRQSAVE(flags);
-		result = fifo_isempty(fb);
-		ENABLE_IRQRESTORE(flags);
-
-		return result;
-	}
-
-#endif /* !__AVR__ */
-
-
-/*!
- * Thread safe version of fifo_isfull()
- */
-INLINE bool fifo_isfull_locked(const FIFOBuffer *_fb)
-{
-	bool _result;
-	cpuflags_t _flags;
-
-	DISABLE_IRQSAVE(_flags);
-	_result = fifo_isfull(_fb);
-	ENABLE_IRQRESTORE(_flags);
-
-	return _result;
-}
-
-
 /*!
  * Pop a character from the fifo buffer.
  *
@@ -193,7 +161,11 @@ INLINE bool fifo_isfull_locked(const FIFOBuffer *_fb)
  *       one free slot before calling this function.
  *
  * \note It is safe to call fifo_pop() and fifo_push() from
- *       concurrent contexts.
+ *       concurrent contexts, unless the CPU can't update
+ *       a pointer atomically (which the AVR and other 8-bit
+ *       processors can't do).
+ *
+ * \sa fifo_push_locked
  */
 INLINE void fifo_push(FIFOBuffer *fb, unsigned char c)
 {
@@ -240,6 +212,70 @@ INLINE void fifo_flush(FIFOBuffer *fb)
 {
 	fb->head = fb->tail;
 }
+
+
+#if !defined(__AVR__)
+
+	/* No tricks needed on 16/32bit CPUs */
+#	define fifo_isempty_locked(fb) fifo_isempty((fb))
+#	define fifo_push_locked(fb, c) fifo_push((fb), (c))
+
+#else /* !__AVR__ */
+
+	/*!
+	 * Similar to fifo_isempty(), but with stronger guarantees for
+	 * concurrent access between user and interrupt code.
+	 * This is actually only needed for 8-bit processors.
+	 *
+	 * \sa fifo_isempty()
+	 */
+	INLINE bool fifo_isempty_locked(const FIFOBuffer *fb);
+	INLINE bool fifo_isempty_locked(const FIFOBuffer *fb)
+	{
+		bool result;
+		cpuflags_t flags;
+
+		DISABLE_IRQSAVE(flags);
+		result = fifo_isempty(fb);
+		ENABLE_IRQRESTORE(flags);
+
+		return result;
+	}
+
+	/*!
+	 * Similar to fifo_push(), but with stronger guarantees for
+	 * concurrent access between user and interrupt code.
+	 * This is actually only needed for 8-bit processors.
+	 *
+	 * \sa fifo_push()
+	 */
+	INLINE void fifo_push_locked(FIFOBuffer *fb, unsigned char c);
+	INLINE void fifo_push_locked(FIFOBuffer *fb, unsigned char c)
+	{
+		cpuflags_t flags;
+		DISABLE_IRQSAVE(flags);
+		fifo_push(fb, c);
+		ENABLE_IRQRESTORE(flags);
+	}
+
+#endif /* !__AVR__ */
+
+
+/*!
+ * Thread safe version of fifo_isfull()
+ */
+INLINE bool fifo_isfull_locked(const FIFOBuffer *_fb)
+{
+	bool _result;
+	cpuflags_t _flags;
+
+	DISABLE_IRQSAVE(_flags);
+	_result = fifo_isfull(_fb);
+	ENABLE_IRQRESTORE(_flags);
+
+	return _result;
+}
+
 
 
 /*!
