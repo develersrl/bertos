@@ -17,6 +17,9 @@
 
 /*
  * $Log$
+ * Revision 1.7  2004/08/24 16:48:40  bernie
+ * Note reason for including <macros.h>
+ *
  * Revision 1.6  2004/08/24 14:27:20  bernie
  * Doxygen fix.
  *
@@ -42,7 +45,7 @@
 #include <mware/byteorder.h> /* cpu_to_be16() */
 #include <drv/kdebug.h>
 #include <hw.h>
-#include <macros.h>
+#include <macros.h>  // MIN()
 
 #include <string.h> // memset()
 
