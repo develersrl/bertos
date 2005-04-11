@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.1  2005/04/11 19:04:13  bernie
+ *#* Move top-level headers to cfg/ subdir.
+ *#*
  *#* Revision 1.44  2005/03/29 06:39:59  bernie
  *#* setjmp.h, time_t: Remove ancient retrocompatibility; Remove MSVC double to float hack.
  *#*

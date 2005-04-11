@@ -12,6 +12,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.1  2005/04/11 19:04:13  bernie
+ *#* Move top-level headers to cfg/ subdir.
+ *#*
  *#* Revision 1.4  2005/02/16 20:33:24  bernie
  *#* Preliminary PPC support.
  *#*

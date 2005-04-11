@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.1  2005/04/11 19:04:13  bernie
+ *#* Move top-level headers to cfg/ subdir.
+ *#*
  *#* Revision 1.5  2004/08/25 14:12:08  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*

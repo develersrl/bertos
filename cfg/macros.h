@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.1  2005/04/11 19:04:13  bernie
+ *#* Move top-level headers to cfg/ subdir.
+ *#*
  *#* Revision 1.10  2005/01/22 04:19:50  bernie
  *#* Use non-uglified typeof().
  *#*

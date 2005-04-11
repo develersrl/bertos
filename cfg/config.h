@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.1  2005/04/11 19:04:13  bernie
+ *#* Move top-level headers to cfg/ subdir.
+ *#*
  *#* Revision 1.5  2004/12/08 08:04:28  bernie
  *#* Add missing config options.
  *#*

@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.1  2005/04/11 19:04:13  bernie
+ *#* Move top-level headers to cfg/ subdir.
+ *#*
  *#* Revision 1.30  2005/03/15 00:20:09  bernie
  *#* BREAKPOINT, IRQ_RUNNING(), IRQ_GETSTATE(): New DSP56K macros.
  *#*

@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.1  2005/04/11 19:04:13  bernie
+ *#* Move top-level headers to cfg/ subdir.
+ *#*
  *#* Revision 1.13  2005/03/01 23:23:58  bernie
  *#* Provide defaults for CONFIG_KDEBUG_DISABLE_TRACE and CONFIG_KDEBUG_ASSERT_NO_TEXT.
  *#*
