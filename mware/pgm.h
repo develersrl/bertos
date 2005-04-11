@@ -164,9 +164,7 @@ typedef PROGMEM uint32_t pgm_uint32_t;
 /*\}*/
 
 /*!
- * \def PGM_READ_CHAR
- * \def PGM_FUNC
- * \def PGM_ATTR
+ * \name PGM support macros.
  *
  * These macros enable dual compilation of code for both program
  * and data memory.
@@ -193,6 +191,8 @@ typedef PROGMEM uint32_t pgm_uint32_t;
  *	// To be used when invoking inside other PGM_FUNC functions:
  *	PGM_FUNC(lcd_puts)(some_string);
  * \endcode
+ *
+ * \{
  */
 #ifdef _PROGMEM
 	#define PGM_READ_CHAR(s) pgm_read_char(s)
@@ -203,6 +203,7 @@ typedef PROGMEM uint32_t pgm_uint32_t;
 	#define PGM_FUNC(x)      x
 	#define PGM_ATTR         /* nothing */
 #endif
+/* \} */
 
 
 #endif /* MWARE_PGM_H */

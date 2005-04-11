@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2005/04/11 18:10:45  bernie
+ *#* Doxygen fixes.
+ *#*
  *#* Revision 1.1  2005/03/15 00:06:30  bernie
  *#* Simpler, smaller, faster.
  *#*
@@ -29,7 +32,7 @@
  *
  * \param first  Pointer to first byte of input range (STL-style).
  * \param last   Pointer to end of input range (STL-style).
- *               Pass NULL to parse up to the first \0.
+ *               Pass NULL to parse up to the first \\0.
  * \param val    Pointer to converted value.
  *
  * \return true for success, false for failure.
