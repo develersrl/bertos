@@ -1,7 +1,5 @@
  - Move kern/event.[ch] to mware/ (it can be used by freestanding apps too)
 
- - Move top-level headers to some subdirectory (port/?)
-
  - Adopt CppUnit or maybe CppUnit Lite
 
  - Write test for cxxutil/split.h
