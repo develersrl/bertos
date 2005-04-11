@@ -8,6 +8,9 @@
 # $Id$
 #
 # $Log$
+# Revision 1.3  2005/04/11 22:36:29  bernie
+# Fixes for sprintf_test.
+#
 # Revision 1.2  2005/02/28 10:46:44  bernie
 # Remove test binaries.
 #
@@ -19,10 +22,10 @@
 VERBOSE=1
 
 CC=gcc
-CFLAGS="-W -Wall -Wextra"
+CFLAGS="-W -Wall -Wextra -I. -fno-builtin -D_DEBUG"
 
 CXX=g++
-CXXFLAGS="-W -Wall -Wextra"
+CXXFLAGS="$CFLAGS"
 
 
 for test in `find . -name "*_test.*"`; do

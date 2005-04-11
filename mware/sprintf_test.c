@@ -1,5 +1,6 @@
 #include "sprintf.c"
 #include "formatwr.c"
+#include "hex.c"
 
 #include <assert.h> /* assert() */
 #include <string.h> /* strcmp() */
