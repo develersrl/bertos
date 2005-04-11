@@ -1,4 +1,4 @@
-# Doxyfile 1.4.1
+# Doxyfile 1.4.2
 
 # This file describes the settings to be used by the documentation system
 # doxygen (www.doxygen.org) for a project
@@ -167,6 +167,12 @@ INHERIT_DOCS           = YES
 # all members of a group must be documented explicitly.
 
 DISTRIBUTE_GROUP_DOC   = NO
+
+# If the SEPARATE_MEMBER_PAGES tag is set to YES, then doxygen will produce 
+# a new page for each member. If set to NO, the documentation of a member will 
+# be part of the file/class/namespace that contains it.
+
+SEPARATE_MEMBER_PAGES  = NO
 
 # The TAB_SIZE tag can be used to set the number of spaces in a tab. 
 # Doxygen uses this value to replace tabs by spaces in code fragments.
@@ -1006,7 +1012,7 @@ PREDEFINED             = __doxygen__ \
                          _DEBUG=1 \
                          FORMAT(x,y,z)= \
                          PGM_FUNC(x)=x \
-			 INLINE=inline
+                         INLINE=inline
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 
