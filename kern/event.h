@@ -18,6 +18,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.10  2005/01/24 04:22:02  bernie
  *#* Update copyright information.
  *#*
@@ -53,10 +56,10 @@
 #ifndef KERN_EVENT_H
 #define KERN_EVENT_H
 
-#include <config.h>
+#include <cfg/config.h>
 
 #if CONFIG_KERNEL
-	#include "config_kern.h"
+	#include <cfg/config_kern.h>
 	#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 		#include "signal.h"
 	#endif

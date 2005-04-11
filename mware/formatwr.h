@@ -12,6 +12,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.7  2005/02/16 20:28:03  bernie
  *#* Add %S formatter.
  *#*
@@ -38,8 +41,8 @@
 #define MWARE_FORMATWR_H
 
 #include <stdarg.h> /* va_list */
-#include <config.h>
-#include <cpu.h>    /* CPU_HARVARD */
+#include <cfg/config.h>
+#include <cfg/cpu.h>    /* CPU_HARVARD */
 
 /*!
  * \name _formatted_write() configuration

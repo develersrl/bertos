@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2005/04/11 19:10:27  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.1  2005/04/11 19:04:13  bernie
  *#* Move top-level headers to cfg/ subdir.
  *#*
@@ -38,7 +41,7 @@
 #ifndef CONFIG_KERN_H
 #define CONFIG_KERN_H
 
-#include <arch_config.h>  /* ARCH_EMUL */
+#include <cfg/arch_config.h>  /* ARCH_EMUL */
 
 /*!
  * \name Modules activation

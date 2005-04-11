@@ -31,6 +31,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.5  2004/10/03 20:43:22  bernie
  *#* Import changes from sc/firmware.
  *#*
@@ -57,9 +60,9 @@
 #ifndef MWARE_HASHTABLE_H
 #define MWARE_HASHTABLE_H
 
-#include <compiler.h>
-#include <macros.h>
-#include <debug.h>
+#include <cfg/compiler.h>
+#include <cfg/macros.h>
+#include <cfg/debug.h>
 
 /*!
  * Enable/disable support to declare special hash tables which maintain a copy of

@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.26  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.25  2005/03/15 00:20:54  bernie
  *#* proc_schedule(): New sanity check.
  *#*
@@ -94,12 +97,12 @@
 
 #include "proc_p.h"
 #include "proc.h"
-#include "cpu.h"
+#include <cfg/cpu.h>
 #include "event.h"
 #include "hw.h"
-#include <debug.h>
-#include <arch_config.h>  /* ARCH_EMUL */
-#include <macros.h>  /* ABS() */
+#include <cfg/debug.h>
+#include <cfg/arch_config.h>  /* ARCH_EMUL */
+#include <cfg/macros.h>  /* ABS() */
 
 #include <string.h> /* memset() */
 

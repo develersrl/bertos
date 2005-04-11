@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.24  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.23  2005/03/01 23:25:46  bernie
  *#* Move event.h to mware/.
  *#*
@@ -84,9 +87,9 @@
 #define DRV_TIMER_H
 
 #include <mware/list.h>
-#include <cpu.h>
-#include <compiler.h>
-#include <config.h>
+#include <cfg/cpu.h>
+#include <cfg/compiler.h>
+#include <cfg/config.h>
 
 /*! Number of timer ticks per second. */
 #define TICKS_PER_SEC  ((mtime_t)1000)

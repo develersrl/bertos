@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.3  2004/11/28 23:20:25  bernie
  *#* Remove obsolete INITLIST macro.
  *#*
@@ -39,8 +42,8 @@
 #include <mware/list.h>
 #include <drv/timer.h>
 #include <kern/proc.h>
-#include <macros.h>
-#include <debug.h>
+#include <cfg/macros.h>
+#include <cfg/debug.h>
 
 
 static List MonitorProcs;

@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.4  2005/01/22 04:21:20  bernie
  *#* Add handy typedef for struct Semaphore.
  *#*
@@ -33,7 +36,7 @@
 #ifndef KERN_SEM_H
 #define KERN_SEM_H
 
-#include "compiler.h"
+#include <cfg/compiler.h>
 #include <mware/list.h>
 
 /* Fwd decl */

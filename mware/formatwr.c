@@ -53,6 +53,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.15  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.14  2005/03/01 23:26:22  bernie
  *#* Use shared hextab.
  *#*
@@ -78,8 +81,8 @@
 #include "formatwr.h"
 #include <mware/pgm.h>
 #include <mware/hex.h>
-#include <config.h> /* CONFIG_ macros */
-#include <debug.h> /* ASSERT */
+#include <cfg/config.h> /* CONFIG_ macros */
+#include <cfg/debug.h> /* ASSERT */
 
 #ifndef CONFIG_PRINTF_N_FORMATTER
 	/*! Disable the arcane %n formatter. */

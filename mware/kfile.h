@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.3  2004/12/31 16:43:23  bernie
  *#* Move seek function last in VT.
  *#*
@@ -27,7 +30,7 @@
 #ifndef MWARE_KFILE_H
 #define MWARE_KFILE_H
 
-#include <compiler.h>
+#include <cfg/compiler.h>
 
 /* fwd decl */
 struct _KFile;

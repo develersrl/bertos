@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.8  2005/01/22 04:20:42  bernie
  *#* Add integrity checks.
  *#*
@@ -45,7 +48,7 @@
 #include "proc_p.h"
 #include "signal.h"
 #include "hw.h"
-#include <debug.h>
+#include <cfg/debug.h>
 
 INLINE void sem_verify(struct Semaphore *s)
 {

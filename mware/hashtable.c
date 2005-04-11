@@ -61,6 +61,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.4  2004/12/08 09:42:30  bernie
  *#* Suppress warning.
  *#*
@@ -95,8 +98,8 @@
  *#*/
 
 #include "hashtable.h"
-#include <debug.h>
-#include <compiler.h>
+#include <cfg/debug.h>
+#include <cfg/compiler.h>
 
 #include <string.h>
 

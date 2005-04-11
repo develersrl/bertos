@@ -43,6 +43,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.20  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.19  2004/12/08 08:30:12  bernie
  *#* Add missing header.
  *#*
@@ -96,8 +99,8 @@
 #ifndef MWARE_FIFO_H
 #define MWARE_FIFO_H
 
-#include <cpu.h>
-#include <debug.h>
+#include <cfg/cpu.h>
+#include <cfg/debug.h>
 
 typedef struct FIFOBuffer
 {

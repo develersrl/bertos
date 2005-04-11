@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.24  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.23  2004/12/13 12:07:06  bernie
  *#* DISABLE_IRQSAVE/ENABLE_IRQRESTORE: Convert to IRQ_SAVE_DISABLE/IRQ_RESTORE.
  *#*
@@ -83,11 +86,11 @@
  *#*/
 
 #include "timer.h"
-#include <cpu.h>
+#include <cfg/cpu.h>
 #include <hw.h>
 #include CPU_HEADER(timer)
-#include <debug.h>
-#include <config.h>
+#include <cfg/debug.h>
+#include <cfg/config.h>
 
 /*
  * Sanity check for config parameters required by this module.

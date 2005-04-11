@@ -38,6 +38,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.26  2005/04/11 19:10:27  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.25  2005/01/25 08:37:26  bernie
  *#* CONFIG_SER_HWHANDSHAKE fixes.
  *#*
@@ -111,10 +114,10 @@
 
 #include "ser.h"
 #include "ser_p.h"
-#include "config.h"
+#include <cfg/config.h>
 #include "hw.h"  /* Required for bus macros overrides */
 
-#include <debug.h>
+#include <cfg/debug.h>
 #include <drv/timer.h>
 #include <mware/fifobuf.h>
 

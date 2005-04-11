@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2005/04/11 19:10:27  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.1  2005/04/11 19:04:13  bernie
  *#* Move top-level headers to cfg/ subdir.
  *#*
@@ -35,7 +38,7 @@
 #ifndef DEVLIB_COMPILER_H
 #define DEVLIB_COMPILER_H
 
-#include "cpu_detect.h"
+#include <cfg/cpu_detect.h>
 
 
 #if defined __GNUC__ && defined __GNUC_MINOR__

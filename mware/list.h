@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.13  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.12  2005/01/22 04:21:32  bernie
  *#* Add integrity checks.
  *#*
@@ -56,7 +59,7 @@
 #ifndef MWARE_LIST_H
 #define MWARE_LIST_H
 
-#include <compiler.h> // INLINE
+#include <cfg/compiler.h> // INLINE
 
 /*!
  * This structure represents a node for bidirectional lists.

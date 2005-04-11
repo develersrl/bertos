@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.17  2005/04/11 19:10:27  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.16  2005/03/01 23:25:09  bernie
  *#* Prune CVS log.
  *#*
@@ -31,9 +34,9 @@
 
 #include "eeprom.h"
 
-#include <debug.h>
-#include <config.h>  // CONFIG_EEPROM_VERIFY
-#include <macros.h>  // MIN()
+#include <cfg/debug.h>
+#include <cfg/config.h>  // CONFIG_EEPROM_VERIFY
+#include <cfg/macros.h>  // MIN()
 #include <drv/twi.h>
 #include <drv/wdt.h>
 #include <mware/byteorder.h> // cpu_to_be16()

@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2005/04/11 19:10:27  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.5  2004/08/25 14:12:08  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -35,7 +38,7 @@
 #ifndef DRV_BUZZERLED_H
 #define DRV_BUZZERLED_H
 
-#include <cpu.h>
+#include <cfg/cpu.h>
 
 /*! Include hw.h. We expect hw.h to define enum BLD_DEVICE, which must contain
  *  an enumarator for each device, plus a special symbol NUM_BLDS containing the

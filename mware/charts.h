@@ -18,6 +18,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.5  2004/09/14 20:56:39  bernie
  *#* Make more generic and adapt to new gfx functions.
  *#*
@@ -32,7 +35,7 @@
 #define MWARE_CHARTS_H
 
 #include <mware/gfx.h> /* vcoord_t */
-#include <config.h> /* CONFIG_ stuff */
+#include <cfg/config.h> /* CONFIG_ stuff */
 
 /*!
  * \name Width/height of the small ticks drawn over the axes

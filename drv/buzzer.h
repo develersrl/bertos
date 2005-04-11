@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2005/04/11 19:10:27  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.6  2004/12/08 09:11:53  bernie
  *#* Rename time_t to mtime_t.
  *#*
@@ -34,7 +37,7 @@
 #ifndef DRV_BUZZER_H
 #define DRV_BUZZER_H
 
-#include <compiler.h>
+#include <cfg/compiler.h>
 
 extern void buz_init(void);
 extern void buz_beep(mtime_t time);

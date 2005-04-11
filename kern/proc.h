@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.8  2004/11/16 22:37:14  bernie
  *#* Replace IPTR with iptr_t.
  *#*
@@ -35,9 +38,9 @@
 #ifndef KERN_PROC_H
 #define KERN_PROC_H
 
-#include "compiler.h"
-#include "cpu.h"
-#include "config_kern.h"
+#include <cfg/compiler.h>
+#include <cfg/cpu.h>
+#include <cfg/config_kern.h>
 
 /* Fwd decl */
 struct Process;

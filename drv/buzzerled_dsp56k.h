@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2005/04/11 19:10:27  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.4  2004/11/16 21:54:43  bernie
  *#* Changes for SC Monoboard support.
  *#*
@@ -32,7 +35,7 @@
 #ifndef DRV_BUZZERLED_DSP56K_H
 #define DRV_BUZZERLED_DSP56K_H
 
-#include <compiler.h>
+#include <cfg/compiler.h>
 #include <hw.h>
 #include "pwm.h"
 

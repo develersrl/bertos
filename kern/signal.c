@@ -66,6 +66,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.10  2004/12/13 12:07:06  bernie
  *#* DISABLE_IRQSAVE/ENABLE_IRQRESTORE: Convert to IRQ_SAVE_DISABLE/IRQ_RESTORE.
  *#*
@@ -104,7 +107,7 @@
 #include "proc.h"
 #include "proc_p.h"
 #include "hw.h"
-#include <debug.h>
+#include <cfg/debug.h>
 
 #if CONFIG_KERN_SIGNALS
 

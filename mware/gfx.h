@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.10  2005/03/01 23:26:45  bernie
  *#* Use new CPU-neutral program-memory API.
  *#*
@@ -45,9 +48,9 @@
 #ifndef MWARE_GFX_H
 #define MWARE_GFX_H
 
-#include <config.h>
-#include <compiler.h>
-#include <cpu.h>
+#include <cfg/config.h>
+#include <cfg/compiler.h>
+#include <cfg/cpu.h>
 
 
 /*! Common type for coordinates expressed in pixel units */

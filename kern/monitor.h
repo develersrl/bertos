@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.1  2004/10/03 20:39:03  bernie
  *#* Import in DevLib.
  *#*
@@ -26,8 +29,8 @@
 #ifndef KERN_MONITOR_H
 #define KERN_MONITOR_H
 
-#include <cpu.h>
-#include <config_kern.h>
+#include <cfg/cpu.h>
+#include <cfg/config_kern.h>
 
 #if CONFIG_KERN_MONITOR
 

@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.3  2004/12/08 08:09:01  bernie
  *#* Add missing header.
  *#*
@@ -20,7 +23,7 @@
 #ifndef MWARE_POOL_H
 #define MWARE_POOL_H
 
-#include <macros.h>
+#include <cfg/macros.h>
 #include <mware/list.h>
 
 #define EXTERN_POOL(name) \

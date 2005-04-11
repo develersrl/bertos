@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.9  2005/02/18 12:48:01  bernie
  *#* Fix bug with NULL buffers (caught with unit test).
  *#*
@@ -42,7 +45,7 @@
 
 #include <mware/formatwr.h>
 #include <mware/pgm.h>
-#include "compiler.h"
+#include <cfg/compiler.h>
 
 #include <stdio.h>
 

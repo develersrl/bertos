@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.5  2004/12/08 08:57:35  bernie
  *#* Rename sigset_t to sigmask_t.
  *#*
@@ -35,7 +38,7 @@
 #ifndef KERN_SIGNAL_H
 #define KERN_SIGNAL_H
 
-#include "compiler.h"
+#include <cfg/compiler.h>
 
 
 /* Fwd decl */

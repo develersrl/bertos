@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2005/04/11 19:10:27  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.1  2004/12/31 17:40:00  bernie
  *#* Add a simple serial emulation driver.
  *#*
@@ -20,9 +23,9 @@
 
 #include "ser.h"
 #include "ser_p.h"
-#include "config.h"
+#include <cfg/config.h>
 
-#include <debug.h>
+#include <cfg/debug.h>
 #include <mware/fifobuf.h>
 
 #include <sys/types.h>

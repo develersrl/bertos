@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.24  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.23  2005/03/01 23:24:51  bernie
  *#* Tweaks for avr-libc 1.2.x.
  *#*
@@ -60,8 +63,8 @@
 #ifndef DRV_TIMER_AVR_H
 #define DRV_TIMER_AVR_H
 
-#include <arch_config.h> // ARCH_BOARD_KC
-#include <macros.h> // BV()
+#include <cfg/arch_config.h> // ARCH_BOARD_KC
+#include <cfg/macros.h> // BV()
 #include <hw.h>
 
 #include <avr/signal.h>

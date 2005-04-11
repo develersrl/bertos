@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2005/04/11 19:10:27  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.5  2004/11/02 17:50:02  bernie
  *#* CONFIG_EEPROM_VERIFY: New config option.
  *#*
@@ -34,8 +37,8 @@
 #ifndef DRV_EEPROM_H
 #define DRV_EEPROM_H
 
-#include <compiler.h>
-#include <config.h>
+#include <cfg/compiler.h>
+#include <cfg/config.h>
 
 /*!
  * \name Values for CONFIG_EEPROM_TYPE

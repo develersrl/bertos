@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.21  2005/04/11 19:10:27  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.20  2005/01/22 04:20:01  bernie
  *#* Reformat.
  *#*
@@ -76,9 +79,9 @@
 #define DRV_SER_H
 
 #include <mware/fifobuf.h>
-#include <compiler.h>
-#include <config.h>
-#include <macros.h> /* BV() */
+#include <cfg/compiler.h>
+#include <cfg/config.h>
+#include <cfg/macros.h> /* BV() */
 
 /*! \name Serial Error/status flags. */
 /*\{*/

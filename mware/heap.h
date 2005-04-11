@@ -20,6 +20,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.3  2004/08/25 14:12:09  rasky
  *#* Aggiornato il comment block dei log RCS
  *#*
@@ -40,8 +43,8 @@
 #ifndef MWARE_HEAP_H
 #define MWARE_HEAP_H
 
-#include <compiler.h>
-#include <config.h>
+#include <cfg/compiler.h>
+#include <cfg/config.h>
 
 struct _MemChunk;
 

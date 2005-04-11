@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.12  2005/04/11 19:10:27  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.11  2005/01/25 07:42:04  bernie
  *#* Simplify.
  *#*
@@ -46,7 +49,7 @@
 #include "ser.h"
 #include "ser_p.h"
 #include <drv/irq.h>
-#include <debug.h>
+#include <cfg/debug.h>
 #include <hw.h>
 #include <DSP56F807.h>
 

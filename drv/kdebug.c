@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.23  2005/04/11 19:10:27  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.22  2005/02/18 11:18:33  bernie
  *#* Fixes for Harvard processors from project_ks.
  *#*
@@ -28,10 +31,10 @@
  *#* Rename UNUSED() to UNUSED_ARG().
  *#*/
 
-#include <debug.h>
-#include <cpu.h>
-#include <macros.h> /* for BV() */
-#include <config.h>
+#include <cfg/debug.h>
+#include <cfg/cpu.h>
+#include <cfg/macros.h> /* for BV() */
+#include <cfg/config.h>
 #include <hw.h>
 
 #include <mware/formatwr.h> /* for _formatted_write() */

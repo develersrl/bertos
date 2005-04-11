@@ -22,7 +22,7 @@
 #ifndef MWARE_PGM_H
 #define MWARE_PGM_H
 
-#include <cpu_detect.h>
+#include <cfg/cpu_detect.h>
 
 #if CPU_AVR
 

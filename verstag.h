@@ -16,7 +16,7 @@
 #define DEVLIB_VERSTAG_H
 
 #ifndef ARCH_CONFIG_H
-	#include "arch_config.h"
+	#include <cfg/arch_config.h>
 #endif
 
 #define APP_NAME "Appname"

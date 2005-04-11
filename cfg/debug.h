@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2005/04/11 19:10:27  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.1  2005/04/11 19:04:13  bernie
  *#* Move top-level headers to cfg/ subdir.
  *#*
@@ -76,7 +79,7 @@
 	#endif
 	#endif
 #else /* !OS_HOSTED */
-	#include <compiler.h>
+	#include <cfg/compiler.h>
 #endif /* !OS_HOSTED */
 
 
@@ -185,8 +188,8 @@
 		#define ASSERT_VALID_PTR_OR_NULL(p)  ASSERT((((p) == NULL) || ((unsigned long)(p) >= 0x200)))
 	#else /* !OS_HOSTED */
 
-		#include <config.h>  /* CONFIG_KDEBUG_ASSERT_NO_TEXT */
-		#include <cpu.h>  /* CPU_HARVARD */
+		#include <cfg/config.h>  /* CONFIG_KDEBUG_ASSERT_NO_TEXT */
+		#include <cfg/cpu.h>  /* CPU_HARVARD */
 
 		/* These are implemented in drv/kdebug.c */
 		void kdbg_init(void);

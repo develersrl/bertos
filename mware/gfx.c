@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.13  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.12  2005/03/01 23:26:45  bernie
  *#* Use new CPU-neutral program-memory API.
  *#*
@@ -45,10 +48,10 @@
  *#*/
 
 #include "gfx.h"
-#include "config.h"  /* CONFIG_GFX_CLIPPING */
-#include <debug.h>
-#include <cpu.h>     /* CPU_HARVARD */
-#include <macros.h>  /* SWAP() */
+#include <cfg/config.h>  /* CONFIG_GFX_CLIPPING */
+#include <cfg/debug.h>
+#include <cfg/cpu.h>     /* CPU_HARVARD */
+#include <cfg/macros.h>  /* SWAP() */
 
 #include <string.h>
 

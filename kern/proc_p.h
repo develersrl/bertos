@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.13  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.12  2004/12/08 08:57:35  bernie
  *#* Rename sigset_t to sigmask_t.
  *#*
@@ -68,10 +71,10 @@
 #ifndef KERN_PROC_P_H
 #define KERN_PROC_P_H
 
-#include "compiler.h"
-#include "cpu.h"        /* for cpu_stack_t */
-#include "config.h"
-#include "config_kern.h"
+#include <cfg/compiler.h>
+#include <cfg/cpu.h>        /* for cpu_stack_t */
+#include <cfg/config.h>
+#include <cfg/config_kern.h>
 #include <mware/list.h>
 
 typedef struct Process

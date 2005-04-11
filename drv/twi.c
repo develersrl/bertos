@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.3  2005/03/01 23:26:00  bernie
  *#* Header fix.
  *#*
@@ -27,11 +30,11 @@
  *#*/
 
 #include "twi.h"
-#include "config.h"
-#include <debug.h>
+#include <cfg/config.h>
+#include <cfg/debug.h>
 #include <hw.h>
-#include <cpu.h>
-#include <macros.h> // BV()
+#include <cfg/cpu.h>
+#include <cfg/macros.h> // BV()
 
 #include <compat/twi.h>
 

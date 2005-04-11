@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.14  2005/04/11 19:10:27  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.13  2005/02/18 11:20:15  bernie
  *#* Use mware/event.h; Update copyright info.
  *#*
@@ -37,10 +40,10 @@
 #include <drv/timer.h>
 #include <mware/event.h>
 
-#include <macros.h> /* BV() */
-#include <debug.h>
+#include <cfg/macros.h> /* BV() */
+#include <cfg/debug.h>
 #include <hw.h>
-#include <arch_config.h>
+#include <cfg/arch_config.h>
 
 
 #if (ARCH & ARCH_EMUL)

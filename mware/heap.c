@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.6  2004/10/26 09:02:13  bernie
  *#* heap_free(): Handle NULL pointers like free(), write documentation.
  *#*
@@ -34,8 +37,8 @@
 
 #include "heap.h"
 #include <string.h>           // memset()
-#include <macros.h>           // IS_POW2()
-#include <debug.h>            // ASSERT()
+#include <cfg/macros.h>           // IS_POW2()
+#include <cfg/debug.h>            // ASSERT()
 
 /* NOTE: struct size must be a 2's power! */
 typedef struct _MemChunk

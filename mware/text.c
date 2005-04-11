@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.12  2005/04/11 19:10:28  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.11  2005/01/20 18:46:31  aleph
  *#* Fix progmem includes.
  *#*
@@ -68,7 +71,7 @@
 #include "font.h"
 #include "text.h"
 
-#include <debug.h>
+#include <cfg/debug.h>
 
 
 /*!

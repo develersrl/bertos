@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2005/04/11 19:10:27  bernie
+ *#* Include top-level headers from cfg/ subdir.
+ *#*
  *#* Revision 1.1  2005/04/11 19:04:13  bernie
  *#* Move top-level headers to cfg/ subdir.
  *#*
@@ -41,7 +44,7 @@
 #ifndef DEVLIB_CPU_H
 #define DEVLIB_CPU_H
 
-#include "compiler.h" /* for uintXX_t */
+#include <cfg/compiler.h> /* for uintXX_t */
 
 
 /*!
