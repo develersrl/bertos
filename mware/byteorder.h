@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2005/04/12 04:08:49  bernie
+ *#* host_to_net(16|32)(), net_to_host(16|32)(): New functions.
+ *#*
  *#* Revision 1.6  2005/04/11 19:10:28  bernie
  *#* Include top-level headers from cfg/ subdir.
  *#*
@@ -79,6 +82,26 @@ INLINE uint32_t cpu_to_be32(uint32_t x)
 INLINE uint32_t cpu_to_le32(uint32_t x)
 {
 	return (CPU_BYTE_ORDER == CPU_BIG_ENDIAN) ? swab32(x) : x;
+}
+
+INLINE uint16_t host_to_net16(uint16_t x)
+{
+	return (CPU_BYTE_ORDER == CPU_BIG_ENDIAN) ? x : swab16(x);
+}
+
+INLINE uint16_t net_to_host16(uint16_t x)
+{
+	return (CPU_BYTE_ORDER == CPU_BIG_ENDIAN) ? x : swab16(x);
+}
+
+INLINE uint32_t host_to_net32(uint32_t x)
+{
+	return (CPU_BYTE_ORDER == CPU_BIG_ENDIAN) ? x : swab32(x);
+}
+
+INLINE uint32_t net_to_host32(uint32_t x)
+{
+	return (CPU_BYTE_ORDER == CPU_BIG_ENDIAN) ? x : swab32(x);
 }
 
 #endif /* MWARE_BYTEORDER_H */
