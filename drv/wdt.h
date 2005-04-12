@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2005/04/12 01:37:17  bernie
+ *#* Prevent warning when watchdog is disabled.
+ *#*
  *#* Revision 1.3  2005/04/11 19:10:28  bernie
  *#* Include top-level headers from cfg/ subdir.
  *#*
@@ -74,6 +77,8 @@ INLINE void wdt_init(uint8_t timeout)
 	#else
 		#error unknown CPU
 	#endif
+#else
+	(void)timeout;
 #endif /* CONFIG_WATCHDOG */
 }
 
