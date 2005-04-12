@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.24  2005/04/12 01:36:37  bernie
+ *#* Add hack to enable TX line at module initialization.
+ *#*
  *#* Revision 1.23  2005/04/11 19:10:27  bernie
  *#* Include top-level headers from cfg/ subdir.
  *#*
@@ -67,9 +70,16 @@
 		/*
 		 * Support for special bus policies or external transceivers
 		 * on UART0 (to be overridden in "hw.h").
+		 *
+		 * HACK: if we don't set TXEN, kdbg disables the transmitter
+		 * after each output statement until the serial driver
+		 * is initialized.  These glitches confuse the debug
+		 * terminal that ends up printing some trash.
 		 */
 		#ifndef KDBG_UART0_BUS_INIT
-		#define KDBG_UART0_BUS_INIT  do {} while (0)
+		#define KDBG_UART0_BUS_INIT  do { \
+				UCSR0B = BV(TXEN); \
+			} while (0)
 		#endif
 		#ifndef KDBG_UART0_BUS_RX
 		#define KDBG_UART0_BUS_RX    do {} while (0)
@@ -123,9 +133,16 @@
 		/*
 		 * Support for special bus policies or external transceivers
 		 * on UART1 (to be overridden in "hw.h").
+		 *
+		 * HACK: if we don't set TXEN, kdbg disables the transmitter
+		 * after each output statement until the serial driver
+		 * is initialized.  These glitches confuse the debug
+		 * terminal that ends up printing some trash.
 		 */
 		#ifndef KDBG_UART1_BUS_INIT
-		#define KDBG_UART1_BUS_INIT  do {} while (0)
+		#define KDBG_UART1_BUS_INIT  do { \
+				UCSR1B = BV(TXEN); \
+			} while (0)
 		#endif
 		#ifndef KDBG_UART1_BUS_RX
 		#define KDBG_UART1_BUS_RX    do {} while (0)
