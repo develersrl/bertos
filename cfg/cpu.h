@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2005/04/12 04:06:17  bernie
+ *#* Catch missing CPU earlier.
+ *#*
  *#* Revision 1.2  2005/04/11 19:10:27  bernie
  *#* Include top-level headers from cfg/ subdir.
  *#*
@@ -212,6 +215,8 @@
 	 */
 	#define CPU_REG_INIT_VALUE(reg) (reg == 0 ? 0x80 : 0)
 
+#else
+	#error No CPU_... defined.
 #endif
 
 /*!
