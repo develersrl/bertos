@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2005/04/12 01:37:01  bernie
+ *#* Metrowerks touchups from HeCo.
+ *#*
  *#* Revision 1.2  2005/04/11 19:10:27  bernie
  *#* Include top-level headers from cfg/ subdir.
  *#*
@@ -137,14 +140,14 @@
 	#define NORETURN                __attribute__((__noreturn__))
 	#define UNUSED_ARG(type,arg)    __attribute__((__unused__)) type arg
 	#define UNUSED_VAR(type,name)	__attribute__((__unused__)) type name
-	#define USED_VAR(type,name)	__attribute__((__used__)) type name
+	#define USED_VAR(type,name)     __attribute__((__used__)) type name
 	#define INLINE                  static inline __attribute__((__always_inline__))
 	#define LIKELY(x)               __builtin_expect(!!(x), 1)
 	#define UNLIKELY(x)             __builtin_expect(!!(x), 0)
 	#define PURE_FUNC               __attribute__((pure))
 	#define CONST_FUNC              __attribute__((const))
 	#define UNUSED_FUNC             __attribute__((unused))
-	#define USED_FUNC		__attribute__((__used__))
+	#define USED_FUNC               __attribute__((__used__))
 	#define RESTRICT                __restrict__
 	#define MUST_CHECK              __attribute__((warn_unused_result))
 	#if GNUC_PREREQ(3,1)
@@ -171,7 +174,7 @@
 		#pragma GCC poison cin cout cerr clog
 	#endif
 
-#elif defined(__MWERKS__) && CPU_DSP56K
+#elif defined(__MWERKS__)
 
 	/* Compiler features */
 	#define COMPILER_VARIADIC_MACROS 1
@@ -179,6 +182,8 @@
 	#define COMPILER_STATEMENT_EXPRESSIONS 1
 
 	#define typeof __typeof__
+
+	#define UNUSED_ARG(type,arg)    type
 
 	#include <stdint.h>
 	#include <stddef.h>
