@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2005/06/14 06:15:10  bernie
+ *#* Add X86_64 support.
+ *#*
  *#* Revision 1.3  2005/04/12 04:06:17  bernie
  *#* Catch missing CPU earlier.
  *#*
@@ -81,20 +84,31 @@
 #elif CPU_X86
 
 	#define NOP                     asm volatile ("nop")
-	#define IRQ_DISABLE             /* nothing */
-	#define IRQ_ENABLE              /* nothing */
-	#define IRQ_SAVE_DISABLE(x)     /* nothing */
-	#define IRQ_RESTORE(x)          /* nothing */
+	#define IRQ_DISABLE             FIXME
+	#define IRQ_ENABLE              FIXME
+	#define IRQ_SAVE_DISABLE(x)     FIXME
+	#define IRQ_RESTORE(x)          FIXME
 
 	typedef uint32_t cpuflags_t; // FIXME
-	typedef uint32_t cpustack_t;
 
-	#define CPU_REG_BITS            32
 	#define CPU_REGS_CNT            7
 	#define CPU_STACK_GROWS_UPWARD  0
 	#define CPU_SP_ON_EMPTY_SLOT	0
 	#define CPU_BYTE_ORDER          CPU_LITTLE_ENDIAN
 	#define CPU_HARVARD		0
+
+	#if CPU_X86_64
+		typedef uint64_t cpustack_t;
+		#define CPU_REG_BITS    64
+
+		#ifdef __WIN64__
+			/* WIN64 is an IL32-P64 weirdo. */
+			#define SIZEOF_LONG  4
+		#endif
+	#else
+		typedef uint32_t cpustack_t;
+		#define CPU_REG_BITS    32
+	#endif
 
 #elif CPU_PPC
 	#define NOP                 asm volatile ("nop" ::)
@@ -355,7 +369,12 @@
 #endif
 
 #ifndef SIZEOF_PTR
-#define SIZEOF_PTR   SIZEOF_INT
+#if CPU_REG_BITS < 32
+	#define SIZEOF_PTR   2
+#elif CPU_REG_BITS == 32
+	#define SIZEOF_PTR   4
+#else /* CPU_REG_BITS > 32 */
+	#define SIZEOF_PTR   8
 #endif
 
 #ifndef CPU_BITS_PER_CHAR
@@ -389,7 +408,17 @@ STATIC_ASSERT(sizeof(char) == SIZEOF_CHAR);
 STATIC_ASSERT(sizeof(short) == SIZEOF_SHORT);
 STATIC_ASSERT(sizeof(long) == SIZEOF_LONG);
 STATIC_ASSERT(sizeof(int) == SIZEOF_INT);
-
+STATIC_ASSERT(sizeof(void *) == SIZEOF_PTR);
+STATIC_ASSERT(sizeof(int8_t) * CPU_BITS_PER_CHAR == 8);
+STATIC_ASSERT(sizeof(uint8_t) * CPU_BITS_PER_CHAR == 8);
+STATIC_ASSERT(sizeof(int16_t) * CPU_BITS_PER_CHAR == 16);
+STATIC_ASSERT(sizeof(uint16_t) * CPU_BITS_PER_CHAR == 16);
+STATIC_ASSERT(sizeof(int32_t) * CPU_BITS_PER_CHAR == 32);
+STATIC_ASSERT(sizeof(uint32_t) * CPU_BITS_PER_CHAR == 32);
+#ifdef __HAS_INT64_T__
+STATIC_ASSERT(sizeof(int64_t) * CPU_BITS_PER_CHAR == 64);
+STATIC_ASSERT(sizeof(uint64_t) * CPU_BITS_PER_CHAR == 64);
+#endif
 
 /*!
  * \def CPU_IDLE

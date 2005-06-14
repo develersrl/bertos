@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2005/06/14 06:15:10  bernie
+ *#* Add X86_64 support.
+ *#*
  *#* Revision 1.3  2005/04/12 01:37:01  bernie
  *#* Metrowerks touchups from HeCo.
  *#*
@@ -306,14 +309,22 @@
 	 * \{
 	 */
 	typedef signed char         int8_t;
-	typedef short int           int16_t;
-	typedef long int            int32_t;
 	typedef unsigned char       uint8_t;
+	typedef short int           int16_t;
 	typedef unsigned short int  uint16_t;
-	typedef unsigned long int   uint32_t;
+	typedef long int            int32_t; /* _WIN64 safe */
+	typedef unsigned long int   uint32_t; /* _WIN64 safe */
+
+	#ifdef _MSC_VER
+		typedef __int64              int64_t;
+		typedef unsigned __int64     uint64_t;
+	#else
+		typedef long long            int64_t;
+		typedef unsigned long long   uint64_t;
+	#endif
 	/* \} */
 #elif defined(__GNUC__) && CPU_AVR
-	/* avr-libc is weird... */
+	/* avr-libc is weird... (Fixed in avr-libc-1.2, hack to be removed soon) */
 	#include <inttypes.h>
 #else
 	/* This is the correct location. */
@@ -364,10 +375,18 @@ typedef unsigned char page_t;    /*!< Type for banked memory pages. */
 	#if CPU_REG_BITS > 32
 		/* 64bit. */
 		typedef unsigned long size_t;
-		typedef long ssize_t;
 	#else
 		/* 32bit or 16bit. */
 		typedef unsigned int size_t;
+	#endif
+#endif
+
+#if !(defined(ssize_t) || defined(__ssize_t_defined))
+	#if CPU_REG_BITS > 32
+		/* 64bit (32bit for _WIN64). */
+		typedef long ssize_t;
+	#else
+		/* 32bit or 16bit. */
 		typedef int ssize_t;
 	#endif
 #endif

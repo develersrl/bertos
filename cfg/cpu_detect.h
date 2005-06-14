@@ -12,6 +12,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2005/06/14 06:15:10  bernie
+ *#* Add X86_64 support.
+ *#*
  *#* Revision 1.1  2005/04/11 19:04:13  bernie
  *#* Move top-level headers to cfg/ subdir.
  *#*
@@ -41,11 +44,22 @@
 	#define CPU_I196                0
 #endif
 
-#if defined(__i386__) || defined(_MSC_VER)
+#if defined(__i386__) /* GCC */ \
+	|| (defined(_M_IX86) && !defined(_WIN64)) /* MSVC */
 	#define CPU_X86                 1
+	#define CPU_X86_32              1
+	#define CPU_X86_64              0
+	#define CPU_ID                  x86
+#elif defined(__x86_64__) /* GCC */ \
+	|| (defined(_M_IX86) && defined(_WIN64)) /* MSVC */
+	#define CPU_X86                 1
+	#define CPU_X86_32              0
+	#define CPU_X86_64              1
 	#define CPU_ID                  x86
 #else
 	#define CPU_X86                 0
+	#define CPU_I386                0
+	#define CPU_X86_64              0
 #endif
 
 #if defined (_ARCH_PPC) || defined(_ARCH_PPC64)
