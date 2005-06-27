@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2005/06/27 21:23:32  bernie
+ *#* ROUND_DOWN, ROUND_UP, ROUND_NEAREST: New macros.
+ *#*
  *#* Revision 1.2  2005/04/11 19:10:27  bernie
  *#* Include top-level headers from cfg/ subdir.
  *#*
@@ -138,6 +141,17 @@
 
 /*! Round up \a x to an even multiple of the 2's power \a pad */
 #define ROUND2(x, pad) (((x) + ((pad) - 1)) & ~((pad) - 1))
+
+/*!
+ * Integer round macros.
+ * Round \a x to a multiple of \a base.
+ * \note If \a x is signed these macros generate a lot of code.
+ * \{
+ */
+#define ROUND_DOWN(x, base)    ( (x) - ((x) % (base)) )
+#define ROUND_UP(x, base)      ( ((x) + (base) - 1) - (((x) + (base) - 1) % (base)) )
+#define ROUND_NEAREST(x, base) ( ((x) + (base) / 2) - (((x) + (base) / 2) % (base)) )
+/* \} */
 
 //! Check if \a x is an integer power of 2
 #define IS_POW2(x)     (!(bool)((x) & ((x)-1)))
