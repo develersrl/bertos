@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2005/06/27 21:23:55  bernie
+ *#* Rename cfg/config.h to appconfig.h.
+ *#*
  *#* Revision 1.2  2005/04/11 19:10:27  bernie
  *#* Include top-level headers from cfg/ subdir.
  *#*
@@ -188,7 +191,7 @@
 		#define ASSERT_VALID_PTR_OR_NULL(p)  ASSERT((((p) == NULL) || ((unsigned long)(p) >= 0x200)))
 	#else /* !OS_HOSTED */
 
-		#include <cfg/config.h>  /* CONFIG_KDEBUG_ASSERT_NO_TEXT */
+		#include <appconfig.h>  /* CONFIG_KDEBUG_ASSERT_NO_TEXT */
 		#include <cfg/cpu.h>  /* CPU_HARVARD */
 
 		/* These are implemented in drv/kdebug.c */
