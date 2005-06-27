@@ -12,10 +12,14 @@
  *
  * \version $Id$
  * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Francesco Sacchi <batt@develer.com>
  */
 
 /*#*
  *#* $Log$
+ *#* Revision 1.15  2005/06/27 21:25:50  bernie
+ *#* Modularize hardware access; Port to new timer interface.
+ *#*
  *#* Revision 1.14  2005/04/11 19:10:27  bernie
  *#* Include top-level headers from cfg/ subdir.
  *#*
@@ -35,56 +39,16 @@
  *#* Use new AVR port pin names.
  *#*/
 
-#include "buzzer.h"
+
+#include <hw_buzzer.h>
+#include <drv/buzzer.h>
 
 #include <drv/timer.h>
+#include <drv/sipo.h>
+
 #include <mware/event.h>
 
-#include <cfg/macros.h> /* BV() */
 #include <cfg/debug.h>
-#include <hw.h>
-#include <cfg/arch_config.h>
-
-
-#if (ARCH & ARCH_EMUL)
-
-	int Emul_IsBuzzerOn(void);
-	void Emul_BuzzerOn(void);
-	void Emul_BuzzerOff(void);
-	void Emul_BuzzerInit(void);
-
-	#define IS_BUZZER_ON  (Emul_IsBuzzerOn())
-	#define BUZZER_ON     (Emul_BuzzerOn())
-	#define BUZZER_OFF    (Emul_BuzzerOff())
-	#define BUZZER_INIT   (Emul_BuzzerInit())
-
-#elif defined(__AVR__)
-
-	#include <avr/io.h>
-
-	#define IS_BUZZER_ON  (PORTG & BV(PG0))
-
-	/*!
-	 * \name Buzzer manipulation macros.
-	 *
-	 * \note Some PORTG functions are being used from
-	 *       interrupt code, so we must be careful to
-	 *       avoid race conditions.
-	 * \{
-	 */
-	#define BUZZER_ON ATOMIC(PORTG |= BV(PG0))
-	#define BUZZER_OFF ATOMIC(PORTG &= ~BV(PG0))
-	#define BUZZER_INIT ATOMIC(PORTG &= ~BV(PG0); DDRG |= BV(PG0);)
-	/*\}*/
-
-#elif defined(__IAR_SYSTEMS_ICC) || defined(__IAR_SYSTEMS_ICC__) /* 80C196 */
-
-	#define IS_BUZZER_ON  (cpld->Buzzer & 1)
-	#define BUZZER_ON     (cpld->Buzzer = 1)
-	#define BUZZER_OFF    (cpld->Buzzer = 0)
-	#define BUZZER_INIT   (cpld->Buzzer = 0)
-
-#endif /* ARCH, __AVR__, __IAR_SYSTEM_ICC */
 
 
 /* Local vars */
@@ -105,7 +69,7 @@ static void buz_softint(void)
 		if (buz_repeat_interval)
 		{
 			/* Wait for interval time */
-			buz_timer.delay = buz_repeat_interval;
+			timer_setDelay(&buz_timer, ms_to_ticks(buz_repeat_interval));
 			timer_add(&buz_timer);
 		}
 		else
@@ -115,7 +79,7 @@ static void buz_softint(void)
 	{
 		/* Wait for beep time */
 		BUZZER_ON;
-		buz_timer.delay = buz_repeat_duration;
+		timer_setDelay(&buz_timer, ms_to_ticks(buz_repeat_duration));
 		timer_add(&buz_timer);
 	}
 	else
@@ -140,7 +104,7 @@ void buz_beep(mtime_t time)
 
 	/* Add software interrupt to turn the buzzer off later */
 	buz_timer_running = true;
-	buz_timer.delay = time;
+	timer_setDelay(&buz_timer, ms_to_ticks(time));
 	timer_add(&buz_timer);
 
 	IRQ_RESTORE(flags);
@@ -187,6 +151,7 @@ void buz_init(void)
 {
 	BUZZER_INIT;
 
+	BUZZER_HW_INIT;
 	/* Inizializza software interrupt */
-	event_initSoftInt(&buz_timer.expire, (Hook)buz_softint, 0);
+	timer_set_event_softint(&buz_timer, (Hook)buz_softint, 0);
 }
