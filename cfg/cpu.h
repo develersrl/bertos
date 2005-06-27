@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2005/06/27 21:24:17  bernie
+ *#* CPU_CSOURCE(): New macro.
+ *#*
  *#* Revision 1.4  2005/06/14 06:15:10  bernie
  *#* Add X86_64 support.
  *#*
@@ -63,6 +66,9 @@
 
 /*! Macro to include cpu-specific versions of the headers. */
 #define CPU_HEADER(module)          PP_STRINGIZE(PP_CAT3(module, _, CPU_ID).h)
+
+/*! Macro to include cpu-specific versions of implementation files. */
+#define CPU_CSOURCE(module)         PP_STRINGIZE(PP_CAT3(module, _, CPU_ID).c)
 
 
 #if CPU_I196
@@ -156,8 +162,6 @@
 		return !(x & 0x0200);
 	}
 	#define IRQ_GETSTATE() irq_getstate()
-
-
 
 	typedef uint16_t cpuflags_t;
 	typedef unsigned int cpustack_t;
