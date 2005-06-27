@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2005/06/27 21:24:37  bernie
+ *#* ticks_t: New typedef.
+ *#*
  *#* Revision 1.4  2005/06/14 06:15:10  bernie
  *#* Add X86_64 support.
  *#*
@@ -336,12 +339,14 @@
 	 * The ATmega8 has a very small Flash, so we can't afford
 	 * to link in support routines for 32bit integer arithmetic.
 	 */
+	typedef int16_t ticks_t;  /*!< Type for time expressed in ticks. */
 	typedef int16_t mtime_t;  /*!< Type for time expressed in milliseconds. */
 	typedef int16_t utime_t;  /*!< Type for time expressed in microseconds. */
 	#define SIZEOF_MTIME_T (16 / CPU_BITS_PER_CHAR)
 	#define SIZEOF_UTIME_T (16 / CPU_BITS_PER_CHAR)
 	#define MTIME_INFINITE 0x7FFFL
 #else
+	typedef int32_t ticks_t;  /*!< Type for time expressed in ticks. */
 	typedef int32_t mtime_t;  /*!< Type for time expressed in milliseconds. */
 	typedef int32_t utime_t;  /*!< Type for time expressed in microseconds. */
 	#define SIZEOF_MTIME_T (32 / CPU_BITS_PER_CHAR)
@@ -351,6 +356,8 @@
 
 /*! Bulk storage large enough for both pointers or integers. */
 typedef void * iptr_t;
+
+/*! Bulk storage large enough for both pointers to constants or integers. */
 typedef const void * const_iptr_t;
 
 typedef unsigned char sig_t;     /*!< Type for signal bits. */
