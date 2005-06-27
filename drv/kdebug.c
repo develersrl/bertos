@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.25  2005/06/27 21:26:24  bernie
+ *#* Misc PGM fixes.
+ *#*
  *#* Revision 1.24  2005/04/12 01:36:37  bernie
  *#* Add hack to enable TX line at module initialization.
  *#*
@@ -37,7 +40,7 @@
 #include <cfg/debug.h>
 #include <cfg/cpu.h>
 #include <cfg/macros.h> /* for BV() */
-#include <cfg/config.h>
+#include <appconfig.h>
 #include <hw.h>
 
 #include <mware/formatwr.h> /* for _formatted_write() */
@@ -88,7 +91,7 @@
 		#define KDBG_UART0_BUS_TX    do {} while (0)
 		#endif
 
-		#if CPU_AVR_ATMEGA64
+		#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128
 			#define UCR UCSR0B
 			#define UDR UDR0
 			#define USR UCSR0A
@@ -203,7 +206,7 @@ void kdbg_init(void)
 	/* Compute the baud rate */
 	uint16_t period = (((CLOCK_FREQ / 16UL) + (CONFIG_KDEBUG_BAUDRATE / 2)) / CONFIG_KDEBUG_BAUDRATE) - 1;
 
-	#if CPU_AVR_ATMEGA64
+	#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128
 		#if CONFIG_KDEBUG_PORT == 0
 			UBRR0H = (uint8_t)(period>>8);
 			UBRR0L = (uint8_t)period;
@@ -335,13 +338,13 @@ static void klocation(const char * PGM_ATTR file, int line)
 	PGM_FUNC(kputs)(file);
 	kputchar(':');
 	kputnum(line);
-	PGM_FUNC(kputs)(PSTR(": "));
+	PGM_FUNC(kputs)(PGM_STR(": "));
 }
 
 int PGM_FUNC(__assert)(const char * PGM_ATTR cond, const char * PGM_ATTR file, int line)
 {
 	klocation(file, line);
-	PGM_FUNC(kputs)(PSTR("Assertion failed: "));
+	PGM_FUNC(kputs)(PGM_STR("Assertion failed: "));
 	PGM_FUNC(kputs)(cond);
 	kputchar('\n');
 	return 1;
@@ -354,26 +357,27 @@ int PGM_FUNC(__assert)(const char * PGM_ATTR cond, const char * PGM_ATTR file, i
  */
 void PGM_FUNC(__trace)(const char *name)
 {
-	PGM_FUNC(kprintf)(PSTR("%s()\n"), name);
+	PGM_FUNC(kprintf)(PGM_STR("%s()\n"), name);
 }
 
 void PGM_FUNC(__tracemsg)(const char *name, const char * PGM_ATTR fmt, ...)
 {
 	va_list ap;
 
-	PGM_FUNC(kprintf)(PSTR("%s(): "), name);
+	PGM_FUNC(kprintf)(PGM_STR("%s(): "), name);
 	va_start(ap, fmt);
 	PGM_FUNC(kvprintf)(fmt, ap);
 	va_end(ap);
+	kputchar('\n');
 }
 
 int PGM_FUNC(__invalid_ptr)(void *value, const char * PGM_ATTR name, const char * PGM_ATTR file, int line)
 {
 	klocation(file, line);
-	PGM_FUNC(kputs)(PSTR("Invalid ptr: "));
+	PGM_FUNC(kputs)(PGM_STR("Invalid ptr: "));
 	PGM_FUNC(kputs)(name);
 	#if CONFIG_PRINTF
-		PGM_FUNC(kprintf)(PSTR(" = 0x%x\n"), value);
+		PGM_FUNC(kprintf)(PGM_STR(" = 0x%x\n"), (unsigned int)value);
 	#else
 		(void)value;
 		kputchar('\n');
@@ -398,10 +402,10 @@ int PGM_FUNC(__check_wall)(long *wall, int size, const char * PGM_ATTR name, con
 		if (wall[i] != WALL_VALUE)
 		{
 			klocation(file, line);
-			PGM_FUNC(kputs)(PSTR("Wall broken: "));
+			PGM_FUNC(kputs)(PGM_STR("Wall broken: "));
 			PGM_FUNC(kputs)(name);
 			#if CONFIG_PRINTF
-				PGM_FUNC(kprintf)(PSTR("[%d] (0x%p) = 0x%lx\n"), i, wall + i, wall[i]);
+				PGM_FUNC(kprintf)(PGM_STR("[%d] (0x%p) = 0x%lx\n"), i, wall + i, wall[i]);
 			#else
 				kputchar('\n');
 			#endif
