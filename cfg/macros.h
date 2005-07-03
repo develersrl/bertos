@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2005/07/03 15:19:09  bernie
+ *#* Doxygen fix.
+ *#*
  *#* Revision 1.3  2005/06/27 21:23:32  bernie
  *#* ROUND_DOWN, ROUND_UP, ROUND_NEAREST: New macros.
  *#*
@@ -143,7 +146,8 @@
 #define ROUND2(x, pad) (((x) + ((pad) - 1)) & ~((pad) - 1))
 
 /*!
- * Integer round macros.
+ * \name Integer round macros.
+ *
  * Round \a x to a multiple of \a base.
  * \note If \a x is signed these macros generate a lot of code.
  * \{

@@ -38,6 +38,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.27  2005/07/03 15:19:31  bernie
+ *#* Doxygen fix.
+ *#*
  *#* Revision 1.26  2005/04/11 19:10:27  bernie
  *#* Include top-level headers from cfg/ subdir.
  *#*
@@ -264,8 +267,6 @@
  */
 #ifndef SER_SPI_BUS_TXINIT
 	/*!
-	 * \def SER_SPI_BUS_TXINIT
-	 *
 	 * Default TXINIT macro - invoked in spi_init()
 	 * The default is no action.
 	 */
@@ -274,8 +275,6 @@
 
 #ifndef SER_SPI_BUS_TXCLOSE
 	/*!
-	 * \def SER_SPI_BUS_TXCLOSE
-	 *
 	 * Invoked after the last character has been transmitted.
 	 * The default is no action.
 	 */
