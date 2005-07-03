@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2005/07/03 15:18:52  bernie
+ *#* Typo.
+ *#*
  *#* Revision 1.3  2005/06/27 21:23:55  bernie
  *#* Rename cfg/config.h to appconfig.h.
  *#*
@@ -104,7 +107,7 @@
  * This preprocessor symbol is defined only in debug builds.
  *
  * The build infrastructure must arrange for _DEBUG to
- * be prepredefined for all source files being compiled.
+ * be predefined for all source files being compiled.
  *
  * This is compatible with the Microsoft convention for
  * the default Debug and Release targets.
