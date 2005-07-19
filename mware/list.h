@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.14  2005/07/19 07:25:18  bernie
+ *#* Refactor to remove type aliasing problems.
+ *#*
  *#* Revision 1.13  2005/04/11 19:10:28  bernie
  *#* Include top-level headers from cfg/ subdir.
  *#*
@@ -59,7 +62,8 @@
 #ifndef MWARE_LIST_H
 #define MWARE_LIST_H
 
-#include <cfg/compiler.h> // INLINE
+#include <cfg/compiler.h> /* INLINE */
+#include <cfg/debug.h> /* ASSERT() */
 
 /*!
  * This structure represents a node for bidirectional lists.
@@ -84,23 +88,72 @@ typedef struct _Node
  */
 typedef struct _List
 {
-	Node *head;
-	Node *null;
-	Node *tail;
+	Node head;
+	Node tail;
 } List;
 
 
-/*! Template for a list of \a T structures. */
-#define DECLARE_LIST(T) \
-	struct { T *head; T *null; T *tail; }
-
-/*! Template for a node in a list of \a T structures. */
-#define DECLARE_NODE(T) \
-	struct { T *succ; T *pred; }
-
-/*! Template for a node in a list of \a T structures. */
+/*!
+ * Template for a naked node in a list of \a T structures.
+ *
+ * To be used as data member in other structures:
+ *
+ * \code
+ *    struct Foo
+ *    {
+ *        DECLARE_NODE_ANON(struct Foo)
+ *        int a;
+ *        float b;
+ *    }
+ *
+ *    DECLARE_LIST_TYPE(Foo);
+ *
+ *    void foo(void)
+ *    {
+ *        static LIST_TYPE(Foo) foo_list;
+ *        static Foo foo1, foo2;
+ *        Foo *fp;
+ *
+ *        LIST_INIT(&foo_list);
+ *        LIST_ADDHEAD(&foo_list, &foo1);
+ *        INSERTBEFORE(&foo_list, &foo2);
+ *        FOREACHNODE(fp, &foo_list)
+ *		fp->a = 10;
+ *    }
+ *
+ * \endcode
+ */
 #define DECLARE_NODE_ANON(T) \
 	T *succ; T *pred;
+
+/*! Declare a typesafe node for structures of type \a T. */
+#define DECLARE_NODE_TYPE(T) \
+	typedef struct T##Node { T *succ; T *pred; } T##Node
+
+/*! Template for a list of \a T structures. */
+#define DECLARE_LIST_TYPE(T) \
+	DECLARE_NODE_TYPE(T); \
+	typedef struct T##List { \
+		 T##Node head; \
+		 T##Node tail; \
+	} T##List
+
+#define NODE_TYPE(T) T##Node
+#define LIST_TYPE(T) T##List
+
+/*!
+ * Get a pointer to the first node in a list.
+ *
+ * If \a l is empty, result points to l->tail.
+ */
+#define LIST_HEAD(l) ((l)->head.succ)
+
+/*!
+ * Get a pointer to the last node in a list.
+ *
+ * If \a l is empty, result points to l->head.
+ */
+#define LIST_TAIL(l) ((l)->tail.pred)
 
 /*!
  * Iterate over all nodes in a list.
@@ -109,9 +162,9 @@ typedef struct _List
  * \param n   Node pointer to be used in each iteration.
  * \param l   Pointer to list.
  */
-#define FOREACHNODE(n,l) \
+#define FOREACHNODE(n, l) \
 	for( \
-		(n) = (typeof(n))((l)->head); \
+		(n) = (typeof(n))LIST_HEAD(l); \
 		((Node *)(n))->succ; \
 		(n) = (typeof(n))(((Node *)(n))->succ) \
 	)
@@ -119,47 +172,56 @@ typedef struct _List
 /*! Initialize a list. */
 #define LIST_INIT(l) \
 	do { \
-		(l)->head = (Node *)(&(l)->null); \
-		(l)->null = NULL; \
-		(l)->tail = (Node *)(&(l)->head); \
+		(l)->head.succ = (typeof((l)->head.succ)) &(l)->tail; \
+		(l)->head.pred = NULL; \
+		(l)->tail.succ = NULL; \
+		(l)->tail.pred = (typeof((l)->tail.pred)) &(l)->head; \
 	} while (0)
 
-/* Make sure that a list is valid (it was initialized and is not corrupted) */
 #ifdef _DEBUG
+	/*! Make sure that a list is valid (it was initialized and is not corrupted). */
 	#define LIST_ASSERT_VALID(l) \
 		do { \
 			Node *n, *pred; \
-			ASSERT((l)->head != NULL); \
-			ASSERT((l)->null == NULL); \
-			ASSERT((l)->tail != NULL); \
-			pred = (Node *)(&(l)->head); \
+			ASSERT((l)->head.succ != NULL); \
+			ASSERT((l)->head.pred == NULL); \
+			ASSERT((l)->tail.succ == NULL); \
+			ASSERT((l)->tail.pred != NULL); \
+			pred = &(l)->head; \
 			FOREACHNODE(n, l) \
 			{ \
 				ASSERT(n->pred == pred); \
 				pred = n; \
 			} \
-			ASSERT(n == (Node *)(&(l)->null)); \
+			ASSERT(n == &(l)->tail); \
 		} while (0)
+
+	#define INVALIDATE_NODE(n) ((n)->succ = (n)->pred = NULL)
 #else
 	#define LIST_ASSERT_VALID(l) do {} while (0)
+	#define INVALIDATE_NODE(n) do {} while (0)
 #endif
 
 /*! Add node to list head. */
 #define ADDHEAD(l,n) \
 	do { \
-		(n)->succ = (l)->head; \
-		(n)->pred = (Node *)&(l)->head; \
+		ASSERT(l); \
+		ASSERT(n); \
+		(n)->succ = (l)->head.succ; \
+		(n)->pred = (l)->head.succ->pred; \
 		(n)->succ->pred = (n); \
-		(l)->head = (n); \
+		(n)->pred->succ = (n); \
 	} while (0)
 
 /*! Add node to list tail. */
 #define ADDTAIL(l,n) \
 	do { \
-		(n)->succ = (Node *)(&(l)->null); \
-		(n)->pred = (l)->tail; \
+		ASSERT(l); \
+		ASSERT(n); \
+		(n)->succ = &(l)->tail; \
+		(n)->pred = (l)->tail.pred; \
 		(n)->pred->succ = (n); \
-		(l)->tail = (n); \
+		(l)->tail.pred = (n); \
 	} while (0)
 
 /*!
@@ -168,7 +230,7 @@ typedef struct _List
  * \note You can't pass in a list header as \a ln, but
  *       it is safe to pass list-\>head of an empty list.
  */
-#define INSERTBEFORE(n,ln) \
+#define INSERT_BEFORE(n,ln) \
 	do { \
 		(n)->succ = (ln); \
 		(n)->pred = (ln)->pred; \
@@ -186,10 +248,11 @@ typedef struct _List
 	do { \
 		(n)->pred->succ = (n)->succ; \
 		(n)->succ->pred = (n)->pred; \
+		INVALIDATE_NODE(n); \
 	} while (0)
 
 /*! Tell whether a list is empty. */
-#define ISLISTEMPTY(l)  ( (l)->head == (Node *)(&(l)->null) )
+#define LIST_EMPTY(l)  ( (void *)((l)->head.succ) == (void *)(&(l)->tail) )
 
 /*!
  * Unlink a node from the head of the list \a l.
@@ -200,12 +263,14 @@ INLINE Node *list_remHead(List *l)
 {
 	Node *n;
 
-	if (ISLISTEMPTY(l))
+	if (LIST_EMPTY(l))
 		return (Node *)0;
 
-	n = l->head;
-	l->head = n->succ;
-	n->succ->pred = (Node *)l;
+	n = l->head.succ; /* Get first node. */
+	l->head.succ = n->succ; /* Link list head to second node. */
+	n->succ->pred = &l->head; /* Link second node to list head. */
+
+	INVALIDATE_NODE(n);
 	return n;
 }
 
@@ -218,17 +283,22 @@ INLINE Node *list_remTail(List *l)
 {
 	Node *n;
 
-	if (ISLISTEMPTY(l))
+	if (LIST_EMPTY(l))
 		return (Node *)0;
 
-	n = l->tail;
-	l->tail = n->pred;
-	n->pred->succ = (Node *)&l->null;
+	n = l->tail.pred; /* Get last node. */
+	l->tail.pred = n->pred; /* Link list tail to second last node. */
+	n->pred->succ = &l->tail; /* Link second last node to list tail. */
+
+	INVALIDATE_NODE(n);
 	return n;
 }
 
 /* OBSOLETE names */
 #define REMHEAD list_remHead
 #define REMTAIL list_remTail
+#define INSERTBEFORE INSERT_BEFORE
+#define ISLISTEMPTY LIST_EMPTY
+
 
 #endif /* MWARE_LIST_H */
