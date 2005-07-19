@@ -23,6 +23,7 @@
 #define MWARE_PGM_H
 
 #include <cfg/cpu_detect.h>
+#include <cfg/compiler.h> /* For intXX_t */
 
 #if CPU_AVR
 
@@ -135,8 +136,12 @@
 
 	#endif
 
+	#ifndef PROGMEM
 	#define PROGMEM  __attribute__((__progmem__))
+	#endif
+	#ifndef PSTR
 	#define PSTR(s) ({ static const char __c[] PROGMEM = (s); &__c[0]; })
+	#endif
 
 #elif CPU_HARVARD
 	#error Missing CPU support
@@ -197,10 +202,12 @@ typedef PROGMEM uint32_t pgm_uint32_t;
 #ifdef _PROGMEM
 	#define PGM_READ_CHAR(s) pgm_read_char(s)
 	#define PGM_FUNC(x)      x ## _P
+	#define PGM_STR(x)	 PSTR(x)
 	#define PGM_ATTR         PROGMEM
 #else
 	#define PGM_READ_CHAR(s) (*(s))
 	#define PGM_FUNC(x)      x
+	#define PGM_STR(x)	 x
 	#define PGM_ATTR         /* nothing */
 #endif
 /* \} */
