@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.25  2005/07/19 07:26:37  bernie
+ *#* Refactor to decouple timer ticks from milliseconds.
+ *#*
  *#* Revision 1.24  2005/04/11 19:10:28  bernie
  *#* Include top-level headers from cfg/ subdir.
  *#*
@@ -28,69 +31,15 @@
  *#*
  *#* Revision 1.20  2004/11/16 20:59:06  bernie
  *#* Add watchdog timer support.
- *#*
- *#* Revision 1.19  2004/10/19 08:56:49  bernie
- *#* TIMER_STROBE_ON, TIMER_STROBE_OFF, TIMER_STROBE_INIT: Move from timer_avr.h to timer.h, where they really belong.
- *#*
- *#* Revision 1.18  2004/10/14 23:14:05  bernie
- *#* Fix longstanding problem with wrap-arounds.
- *#*
- *#* Revision 1.17  2004/10/03 18:52:08  bernie
- *#* Move \brief on top in header to please Doxygen.
- *#*
- *#* Revision 1.16  2004/10/03 18:48:01  bernie
- *#* timer_delay(): Add a sanity check to avoid sleeping forever.
- *#*
- *#* Revision 1.15  2004/09/14 21:07:18  bernie
- *#* Use debug.h instead of kdebug.h.
- *#*
- *#* Revision 1.14  2004/08/25 14:12:08  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.13  2004/08/10 06:59:09  bernie
- *#* timer_gettick(): Rename to timer_ticks() and add backwards compatibility inline.
- *#*
- *#* Revision 1.12  2004/08/08 05:59:37  bernie
- *#* Remove a few useless casts.
- *#*
- *#* Revision 1.11  2004/08/02 20:20:29  aleph
- *#* Merge from project_ks
- *#*
- *#* Revision 1.10  2004/07/30 14:15:53  rasky
- *#* Nuovo supporto unificato per detect della CPU
- *#*
- *#* Revision 1.9  2004/07/21 00:15:13  bernie
- *#* Put timer driver on diet.
- *#*
- *#* Revision 1.8  2004/07/18 21:57:07  bernie
- *#* Fix preprocessor warning with potentially undefined symbol.
- *#*
- *#* Revision 1.6  2004/06/07 18:10:06  aleph
- *#* Remove free pool of timers; use user-provided Timer structure instead
- *#*
- *#* Revision 1.5  2004/06/07 15:56:55  aleph
- *#* Some tabs cleanup and add timer strobe macros
- *#*
- *#* Revision 1.4  2004/06/06 18:25:44  bernie
- *#* Rename event macros to look like regular functions.
- *#*
- *#* Revision 1.3  2004/06/06 17:18:42  bernie
- *#* Fix \!CONFIG_KERN_SIGNALS code paths.
- *#*
- *#* Revision 1.2  2004/06/03 11:27:09  bernie
- *#* Add dual-license information.
- *#*
- *#* Revision 1.1  2004/05/23 18:23:30  bernie
- *#* Import drv/timer module.
- *#*
  *#*/
 
 #include "timer.h"
 #include <cfg/cpu.h>
 #include <hw.h>
-#include CPU_HEADER(timer)
 #include <cfg/debug.h>
-#include <cfg/config.h>
+#include <appconfig.h>
+
+#include CPU_CSOURCE(timer)
 
 /*
  * Sanity check for config parameters required by this module.
@@ -128,8 +77,8 @@
 #endif
 
 
-//! Master system clock (1ms accuracy)
-volatile mtime_t _clock;
+//! Master system clock (1 tick accuracy)
+volatile ticks_t _clock;
 
 
 #ifndef CONFIG_TIMER_DISABLE_EVENTS
@@ -152,16 +101,21 @@ void timer_add(Timer *timer)
 	Timer *node;
 	cpuflags_t flags;
 
+
+	/* Inserting timers twice causes mayhem. */
+	ASSERT(timer->magic != TIMER_MAGIC_ACTIVE);
+	DB(timer->magic = TIMER_MAGIC_ACTIVE;)
+
 	IRQ_SAVE_DISABLE(flags);
 
 	/* Calculate expiration time for this timer */
-	timer->tick = _clock + timer->delay;
+	timer->tick = _clock + timer->_delay;
 
 	/*
 	 * Search for the first node whose expiration time is
 	 * greater than the timer we want to add.
 	 */
-	node = (Timer *)timers_queue.head;
+	node = (Timer *)LIST_HEAD(&timers_queue);
 	while (node->link.succ)
 	{
 		/*
@@ -188,6 +142,7 @@ void timer_add(Timer *timer)
 Timer *timer_abort(Timer *timer)
 {
 	ATOMIC(REMOVE(&timer->link));
+	DB(timer->magic = TIMER_MAGIC_INACTIVE;)
 
 	return timer;
 }
@@ -198,7 +153,7 @@ Timer *timer_abort(Timer *timer)
 /*!
  * Wait for the specified amount of time (expressed in ms).
  */
-void timer_delay(mtime_t time)
+void timer_delayTicks(ticks_t delay)
 {
 #if defined(IRQ_GETSTATE)
 	/* We shouldn't sleep with interrupts disabled */
@@ -210,16 +165,16 @@ void timer_delay(mtime_t time)
 
 	ASSERT(!sig_check(SIG_SINGLE));
 	timer_set_event_signal(&t, proc_current(), SIG_SINGLE);
-	timer_set_delay(&t, time);
+	timer_set_delay(&t, delay);
 	timer_add(&t);
 	sig_wait(SIG_SINGLE);
 
 #else /* !CONFIG_KERN_SIGNALS */
 
-	mtime_t start = timer_ticks();
+	ticks_t start = timer_clock();
 
 	/* Busy wait */
-	while (timer_ticks() - start < time)
+	while (timer_clock() - start < delay)
 	{
 #if CONFIG_WATCHDOG
 		wdt_reset();
@@ -231,6 +186,34 @@ void timer_delay(mtime_t time)
 
 
 #ifndef CONFIG_TIMER_DISABLE_UDELAY
+
+/*!
+ * Busy wait until the specified amount of high-precision ticks have elapsed.
+ *
+ * \note This function is interrupt safe, the only
+ *       requirement is a running hardware timer.
+ */
+void timer_busyWait(hptime_t delay)
+{
+	hptime_t now, prev = timer_hw_hpread();
+	hptime_t delta;
+
+	for(;;)
+	{
+		now = timer_hw_hpread();
+		/*
+		 * We rely on hptime_t being unsigned here to
+		 * reduce the modulo to an AND in the common
+		 * case of TIMER_HW_CNT.
+		 */
+		delta = (now - prev) % TIMER_HW_CNT;
+		if (delta >= delay)
+			break;
+		delay -= delta;
+		prev = now;
+	}
+}
+
 /*!
  * Wait for the specified amount of time (expressed in microseconds).
  *
@@ -238,22 +221,15 @@ void timer_delay(mtime_t time)
  *      delay could be very limited, depending on the hardware timer
  *      used. Check timer_avr.h, and what register is used as hptime_t.
  */
-void timer_udelay(utime_t usec_delay)
+void timer_delayHp(hptime_t delay)
 {
-	if (UNLIKELY(usec_delay > 1000))
+	if (UNLIKELY(delay > us_to_hptime(1000)))
 	{
-		timer_delay(usec_delay / 1000);
-		usec_delay %= 1000;
+		timer_delayTicks(delay / (TIMER_HW_HPTICKS_PER_SEC / TIMER_TICKS_PER_SEC));
+		delay %= (TIMER_HW_HPTICKS_PER_SEC / TIMER_TICKS_PER_SEC);
 	}
 
-	// FIXME: This multiplication is too slow at run-time. We should try and move it
-	//  to compile-time by exposing the TIMER_HW_HPTICKS_PER_SEC in the header
-	//  file.
-	hptime_t start = timer_hw_hpread();
-	hptime_t delay = (uint32_t)usec_delay * TIMER_HW_HPTICKS_PER_SEC / 1000000ul;
-
-	while (timer_hw_hpread() - start < delay)
-	{}
+	timer_busyWait(delay);
 }
 #endif /* CONFIG_TIMER_DISABLE_UDELAY */
 
@@ -292,14 +268,15 @@ DEFINE_TIMER_ISR
 	 * by expiry time, all the following requests are guaranteed
 	 * to expire later.
 	 */
-	while ((timer = (Timer *)timers_queue.head)->link.succ)
+	while ((timer = (Timer *)LIST_HEAD(&timers_queue))->link.succ)
 	{
 		/* This request in list has not yet expired? */
-		if (_clock < timer->tick)
+		if (_clock - timer->tick < 0)
 			break;
 
 		/* Retreat the expired timer */
 		REMOVE(&timer->link);
+		DB(timer->magic = TIMER_MAGIC_INACTIVE;)
 
 		/* Execute the associated event */
 		event_do(&timer->expire);
@@ -325,3 +302,95 @@ void timer_init(void)
 
 	timer_hw_init();
 }
+
+
+#if CONFIG_TEST
+
+static void timer_test_constants(void)
+{
+	kprintf("TIMER_PRESCALER=%d\n", TIMER_PRESCALER);
+	kprintf("TIMER_HW_HPTICKS_PER_SEC=%lu\n", TIMER_HW_HPTICKS_PER_SEC);
+	#ifdef TIMER1_OVF_COUNT
+		kprintf("TIMER1_OVF_COUNT=%d\n", (int)TIMER1_OVF_COUNT);
+	#endif
+	kprintf("TIMER_TICKS_PER_MSEC=%d\n", (int)TIMER_TICKS_PER_MSEC);
+	kprintf("\n");
+	kprintf("ms_to_ticks(100)=%lu\n", ms_to_ticks(100));
+	kprintf("ms_to_ticks(10000)=%lu\n", ms_to_ticks(10000));
+	kprintf("us_to_ticks(100)=%lu\n", us_to_ticks(100));
+	kprintf("us_to_ticks(10000)=%lu\n", us_to_ticks(10000));
+	kprintf("\n");
+	kprintf("ticks_to_ms(100)=%lu\n", ticks_to_ms(100));
+	kprintf("ticks_to_ms(10000)=%lu\n", ticks_to_ms(10000));
+	kprintf("ticks_to_us(100)=%lu\n", ticks_to_us(100));
+	kprintf("ticks_to_us(10000)=%lu\n", ticks_to_us(10000));
+	kprintf("\n");
+	kprintf("hptime_to_us(100)=%lu\n", hptime_to_us(100));
+	kprintf("hptime_to_us(10000)=%lu\n", hptime_to_us(10000));
+	kprintf("us_to_hptime(100)=%lu\n", us_to_hptime(100));
+	kprintf("us_to_hptime(10000)=%lu\n", us_to_hptime(10000));
+}
+
+static void timer_test_delay(void)
+{
+	int i;
+
+	kputs("Delay test\n");
+	for (i = 0; i < 1000; i += 100)
+	{
+		kprintf("delay %d...", i);
+		timer_delay(i);
+		kputs("done\n");
+	}
+}
+
+static void timer_test_hook(iptr_t _timer)
+{
+	Timer *timer = (Timer *)(void *)_timer;
+
+	kprintf("Timer %ld expired\n", ticks_to_ms(timer->_delay));
+	timer_add(timer);
+}
+
+static void timer_test_async(void)
+{
+	static Timer test_timers[5];
+	static const mtime_t test_delays[5] = { 170, 50, 310, 1500, 310 };
+	size_t i;
+
+	for (i = 0; i < countof(test_timers); ++i)
+	{
+		Timer *timer = &test_timers[i];
+		timer_setDelay(timer, ms_to_ticks(test_delays[i]));
+		timer_set_event_softint(timer, timer_test_hook, (iptr_t)timer);
+		timer_add(timer);
+	}
+}
+
+static void timer_test_poll(void)
+{
+	int secs = 0;
+	mtime_t start_time = ticks_to_ms(timer_clock());
+	mtime_t now;
+
+	while (secs <= 10)
+	{
+		now = ticks_to_ms(timer_clock());
+		if (now - start_time >= 1000)
+		{
+			++secs;
+			start_time += 1000;
+			kprintf("seconds = %d, ticks=%ld\n", secs, now);
+		}
+	}
+}
+
+void timer_test(void)
+{
+	timer_test_constants();
+	timer_test_delay();
+	timer_test_async();
+	timer_test_poll();
+}
+
+#endif /* CONFIG_TEST */
