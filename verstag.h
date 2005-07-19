@@ -16,13 +16,13 @@
 #define DEVLIB_VERSTAG_H
 
 #ifndef ARCH_CONFIG_H
-	#include <cfg/arch_config.h>
+	#include "arch_config.h"
 #endif
 
 #define APP_NAME "Appname"
 #define APP_DESCRIPTION "Long application name description"
 #define APP_AUTHOR "Develer"
-#define APP_COPYRIGHT "Copyright 2004 Develer (http://www.develer.com/)"
+#define APP_COPYRIGHT "Copyright 2005 Develer (http://www.develer.com/)"
 
 #if (ARCH & ARCH_FOO)
 	#define VERS_MAJOR 0
@@ -60,7 +60,6 @@
 #else
 	#define VERS_TAG MAKE_VERS(VERS_MAJOR,VERS_MINOR,VERS_REV)
 #endif
-
 
 /*! Build application version string suitable for MS windows resource files (i.e.: "1, 7, 0, 1") */
 #define MAKE_RCVERS(maj,min,rev,bld) _STRINGIZE(maj) ", " _STRINGIZE(min) ", " _STRINGIZE(rev) ", " _STRINGIZE(bld)
