@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2005/07/19 07:27:31  bernie
+ *#* Don't use CPU_REG_BITS from cpu.h to avoid circular header dependendy.
+ *#*
  *#* Revision 1.5  2005/06/27 21:24:37  bernie
  *#* ticks_t: New typedef.
  *#*
@@ -160,14 +163,9 @@
 		#define DEPRECATED  __attribute__((__deprecated__))
 	#endif
 
-	#if CPU_AVR
-		#include <stddef.h>
-		#include <stdbool.h>
-	#else
-		/* Include some standard C89/C99 stuff */
-		#include <stddef.h>
-		#include <stdbool.h>
-	#endif
+	/* Include some standard C89/C99 stuff */
+	#include <stddef.h>
+	#include <stdbool.h>
 
 	#ifndef __cplusplus
 		/*
@@ -379,22 +377,23 @@ typedef unsigned char page_t;    /*!< Type for banked memory pages. */
  * \{
  */
 #if !(defined(size_t) || defined(_SIZE_T_DEFINED) || defined(_BSD_SIZE_T_DEFINED_))
-	#if CPU_REG_BITS > 32
-		/* 64bit. */
+	#if CPU_X86
+		/* 32bit or 64bit (32bit for _WIN64). */
 		typedef unsigned long size_t;
 	#else
-		/* 32bit or 16bit. */
-		typedef unsigned int size_t;
+		#error Unknown CPU
 	#endif
 #endif
 
 #if !(defined(ssize_t) || defined(__ssize_t_defined))
-	#if CPU_REG_BITS > 32
-		/* 64bit (32bit for _WIN64). */
+	#if CPU_X86
+		/* 32bit or 64bit (32bit for _WIN64). */
 		typedef long ssize_t;
-	#else
-		/* 32bit or 16bit. */
+	#elif CPU_AVR
+		/* 16bit (missing in avr-libc's sys/types.h). */
 		typedef int ssize_t;
+	#else
+		#error Unknown CPU
 	#endif
 #endif
 /*\}*/
