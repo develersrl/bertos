@@ -12,6 +12,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2005/07/19 07:25:46  bernie
+ *#* Use appconfig.h instead of cfg/config.h.
+ *#*
  *#* Revision 1.8  2005/04/11 19:10:28  bernie
  *#* Include top-level headers from cfg/ subdir.
  *#*
@@ -41,7 +44,7 @@
 #define MWARE_FORMATWR_H
 
 #include <stdarg.h> /* va_list */
-#include <cfg/config.h>
+#include <appconfig.h>
 #include <cfg/cpu.h>    /* CPU_HARVARD */
 
 /*!
@@ -68,7 +71,7 @@ _formatted_write(
 	va_list ap);
 
 #if CPU_HARVARD
-	#include "pgm.h"
+	#include <mware/pgm.h>
 	int _formatted_write_P(
 		const char * PROGMEM format,
 		void put_char_func(char c, void *user_data),

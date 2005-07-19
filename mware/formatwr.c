@@ -53,6 +53,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.16  2005/07/19 07:25:46  bernie
+ *#* Use appconfig.h instead of cfg/config.h.
+ *#*
  *#* Revision 1.15  2005/04/11 19:10:28  bernie
  *#* Include top-level headers from cfg/ subdir.
  *#*
@@ -81,8 +84,8 @@
 #include "formatwr.h"
 #include <mware/pgm.h>
 #include <mware/hex.h>
-#include <cfg/config.h> /* CONFIG_ macros */
 #include <cfg/debug.h> /* ASSERT */
+#include <appconfig.h> /* CONFIG_ macros */
 
 #ifndef CONFIG_PRINTF_N_FORMATTER
 	/*! Disable the arcane %n formatter. */
