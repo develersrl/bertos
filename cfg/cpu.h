@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2005/07/19 07:26:49  bernie
+ *#* Add missing #endif.
+ *#*
  *#* Revision 1.5  2005/06/27 21:24:17  bernie
  *#* CPU_CSOURCE(): New macro.
  *#*
@@ -379,6 +382,7 @@
 	#define SIZEOF_PTR   4
 #else /* CPU_REG_BITS > 32 */
 	#define SIZEOF_PTR   8
+#endif
 #endif
 
 #ifndef CPU_BITS_PER_CHAR
