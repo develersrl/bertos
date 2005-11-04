@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2005/11/04 16:09:03  bernie
+ *#* Doxygen workaround.
+ *#*
  *#* Revision 1.4  2005/07/03 15:18:52  bernie
  *#* Typo.
  *#*
@@ -142,7 +145,7 @@
 	/*!
 	 * This macro can be used to conditionally exclude one or more
 	 * statements conditioned on \c _DEBUG, avoiding the clutter
-	 * of #ifdef/#endif pairs.
+	 * of ifdef/endif pairs.
 	 *
 	 * \code
 	 *     struct FooBar
