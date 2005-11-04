@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.1  2005/11/04 18:11:35  bernie
+ *#* Move graphics stuff from mware/ to gfx/.
+ *#*
  *#* Revision 1.10  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*

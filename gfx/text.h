@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.1  2005/11/04 18:11:35  bernie
+ *#* Move graphics stuff from mware/ to gfx/.
+ *#*
  *#* Revision 1.11  2005/04/11 19:10:28  bernie
  *#* Include top-level headers from cfg/ subdir.
  *#*
