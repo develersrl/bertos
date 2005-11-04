@@ -3,7 +3,7 @@
  * <!--
  * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999 Bernardo Innocenti <bernie@develer.com>
- * This file is part of DevLib - See devlib/README for information.
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \brief printf-family routines for text output
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2005/11/04 16:20:02  bernie
+ *#* Fix reference to README.devlib in header.
+ *#*
  *#* Revision 1.9  2004/12/31 17:47:45  bernie
  *#* Rename UNUSED() to UNUSED_ARG().
  *#*

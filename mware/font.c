@@ -3,7 +3,7 @@
  * <!--
  * Copyright (C) 2001 Bernardo Innocenti <bernie@codewiz.org>
  * Copyright (C) 2003,2004 Develer S.r.l. (http://www.develer.com/)
- * This file is part of DevLib - See devlib/README for information.
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \version $Id$
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2005/11/04 16:20:02  bernie
+ *#* Fix reference to README.devlib in header.
+ *#*
  *#* Revision 1.5  2005/01/08 09:20:38  bernie
  *#* Add missing type in declaration.
  *#*

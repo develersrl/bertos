@@ -2,7 +2,7 @@
  * \file
  * <!--
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
- * This file is part of DevLib - See devlib/README for information.
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \brief Events handling implementation
@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2005/11/04 16:20:02  bernie
+ *#* Fix reference to README.devlib in header.
+ *#*
  *#* Revision 1.1  2005/01/24 04:19:06  bernie
  *#* Function pointer based event dispatching.
  *#*

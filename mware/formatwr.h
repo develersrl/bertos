@@ -2,7 +2,7 @@
  * \file
  * <!--
  * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
- * This file is part of DevLib - See devlib/README for information.
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \version $Id$
@@ -12,6 +12,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2005/11/04 16:20:02  bernie
+ *#* Fix reference to README.devlib in header.
+ *#*
  *#* Revision 1.9  2005/07/19 07:25:46  bernie
  *#* Use appconfig.h instead of cfg/config.h.
  *#*

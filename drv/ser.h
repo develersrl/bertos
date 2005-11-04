@@ -3,7 +3,7 @@
  * <!--
  * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000 Bernardo Innocenti <bernie@codewiz.org>
- * This file is part of DevLib - See devlib/README for information.
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \brief High level serial I/O API
@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.22  2005/11/04 16:20:02  bernie
+ *#* Fix reference to README.devlib in header.
+ *#*
  *#* Revision 1.21  2005/04/11 19:10:27  bernie
  *#* Include top-level headers from cfg/ subdir.
  *#*

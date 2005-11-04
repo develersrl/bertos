@@ -2,7 +2,7 @@
  * \file
  * <!--
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
- * This file is part of DevLib - See devlib/README for information.
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \brief Functions to convert integers to/from host byte-order.
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2005/11/04 16:20:02  bernie
+ *#* Fix reference to README.devlib in header.
+ *#*
  *#* Revision 1.8  2005/06/14 06:16:03  bernie
  *#* Add all missing functions.
  *#*

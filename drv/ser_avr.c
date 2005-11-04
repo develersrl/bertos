@@ -3,7 +3,7 @@
  * <!--
  * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000 Bernardo Innocenti <bernie@codewiz.org>
- * This file is part of DevLib - See devlib/README for information.
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \brief AVR UART and SPI I/O driver
@@ -38,6 +38,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.28  2005/11/04 16:20:02  bernie
+ *#* Fix reference to README.devlib in header.
+ *#*
  *#* Revision 1.27  2005/07/03 15:19:31  bernie
  *#* Doxygen fix.
  *#*
