@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2005/11/04 17:47:26  bernie
+ *#* Fix one warning.
+ *#*
  *#* Revision 1.4  2005/11/04 17:43:27  bernie
  *#* Fix for LP64 architectures; Add some more tests.
  *#*
@@ -51,7 +54,7 @@ int main(UNUSED_ARG(int, argc), UNUSED_ARG(char **,argv))
 	TEST("%ld",  -12345678L,   "-12345678");
 	TEST("%lu", 4294967295UL, "4294967295");
 	TEST("%hd",     -12345,       "-12345");
-	TEST("%hu",      65535UL,      "65535");
+	TEST("%hu",      65535U,       "65535");
 
 	TEST("%8d",      123,       "     123");
 	TEST("%8d",     -123,       "    -123");
