@@ -40,6 +40,8 @@ The modules are sorted in subdirectories by their category:
 
  - kern/ - Simple multitasking kernel implementation;
  - drv/ - Hardware drivers;
+ - dt/ - Object oriented framework for simple GUIs.
+ - gfx/ - Simple bitmap graphics functions;
  - mware/ - Algorithms, containers and other standalone code;
  - io/ - Infrastructure of I/O-related modules for hosted applications;
  - os/ - OS-abstraction layers for hosted environments;
