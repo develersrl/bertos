@@ -53,6 +53,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.17  2005/11/04 17:43:27  bernie
+ *#* Fix for LP64 architectures; Add some more tests.
+ *#*
  *#* Revision 1.16  2005/07/19 07:25:46  bernie
  *#* Use appconfig.h instead of cfg/config.h.
  *#*
@@ -592,15 +595,15 @@ NEXT_FLAG:
 #if defined(__AVR__) || defined(__I196__) /* 16bit pointers */
 					ulong = (unsigned long)(unsigned short)va_arg(ap, char *);
 #else /* 32bit pointers */
-				ulong = (unsigned long)va_arg(ap, char *);
+					ulong = (unsigned long)va_arg(ap, char *);
 #endif /* 32bit pointers */
-				else if (sizeof(short) == sizeof(int))
-					ulong = flags.l_L_modifier ?
-						va_arg(ap, unsigned long) : (unsigned long)va_arg(ap, unsigned int);
+				else if (flags.l_L_modifier)
+					ulong = va_arg(ap, unsigned long);
+				else if (flags.h_modifier)
+					ulong = (unsigned long)(unsigned short)va_arg(ap, unsigned int);
 				else
-					ulong = flags.h_modifier ?
-						(unsigned long)(unsigned short) va_arg(ap, int)
-						: (unsigned long)va_arg(ap, int);
+					ulong = va_arg(ap, unsigned int);
+
 				flags.div_factor =
 #if CONFIG_PRINTF_OCTAL_FORMATTER
 					(format_flag == 'o') ? DIV_OCT :
@@ -611,32 +614,18 @@ NEXT_FLAG:
 
 			case 'd':
 			case 'i':
-				if (sizeof(short) == sizeof(long))
-				{
-					if ( (long)(ulong = va_arg(ap, unsigned long)) < 0)
-					{
-						flags.plus_space_flag = PSF_MINUS;
-						ulong = (unsigned long)(-((signed long)ulong));
-					}
-				}
-				else if (sizeof(short) == sizeof(int))
-				{
-					if ( (long)(ulong = flags.l_L_modifier ?
-								va_arg(ap,unsigned long) : (unsigned long)va_arg(ap,int)) < 0)
-					{
-						flags.plus_space_flag = PSF_MINUS;
-						ulong = (unsigned long)(-((signed long)ulong));
-					}
-				}
+				if (flags.l_L_modifier)
+					ulong = (unsigned long)(long)va_arg(ap, long);
 				else
+					ulong = (unsigned long)(long)va_arg(ap, int);
+
+				/* Extract sign */
+				if ((signed long)ulong < 0)
 				{
-					if ( (signed long)(ulong = (unsigned long) (flags.h_modifier ?
-									(short) va_arg(ap, int) : va_arg(ap,int))) < 0)
-					{
-						flags.plus_space_flag = PSF_MINUS;
-						ulong = (unsigned long)(-((signed long)ulong));
-					}
+					flags.plus_space_flag = PSF_MINUS;
+					ulong = (unsigned long)(-((signed long)ulong));
 				}
+
 				flags.div_factor = DIV_DEC;
 
 				/* Now convert to digits */
