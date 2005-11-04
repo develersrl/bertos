@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.16  2005/11/04 16:19:33  bernie
+ *#* buz_init(): Restore IRQ protection as in project_bko.
+ *#*
  *#* Revision 1.15  2005/06/27 21:25:50  bernie
  *#* Modularize hardware access; Port to new timer interface.
  *#*
@@ -145,13 +148,17 @@ void buz_repeat_stop(void)
 
 
 /*!
- * Initialize buzzer
+ * Initialize buzzer.
  */
 void buz_init(void)
 {
-	BUZZER_INIT;
+	cpuflags_t flags;
+	IRQ_SAVE_DISABLE(flags);
 
 	BUZZER_HW_INIT;
-	/* Inizializza software interrupt */
+
+	IRQ_RESTORE(flags);
+
+	/* Init software interrupt. */
 	timer_set_event_softint(&buz_timer, (Hook)buz_softint, 0);
 }
