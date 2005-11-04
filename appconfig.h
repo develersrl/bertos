@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.1  2005/11/04 17:42:12  bernie
+ *#* Move cfg/config.h to appconfig.h.
+ *#*
  *#* Revision 1.1  2005/04/11 19:04:13  bernie
  *#* Move top-level headers to cfg/ subdir.
  *#*
