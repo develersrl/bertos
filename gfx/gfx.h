@@ -1,6 +1,6 @@
 /*!
  * \file
- * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999 Bernardo Innocenti <bernie@develer.com>
  * This file is part of DevLib - See README.devlib for information.
  *
@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2005/11/04 18:17:45  bernie
+ *#* Fix header guards and includes for new location of gfx module.
+ *#*
  *#* Revision 1.1  2005/11/04 18:11:35  bernie
  *#* Move graphics stuff from mware/ to gfx/.
  *#*
@@ -28,31 +31,10 @@
  *#*
  *#* Revision 1.9  2005/01/20 18:46:31  aleph
  *#* Fix progmem includes.
- *#*
- *#* Revision 1.8  2004/11/01 15:14:07  bernie
- *#* Update to current coding conventions.
- *#*
- *#* Revision 1.7  2004/09/20 03:29:06  bernie
- *#* Conditionalize AVR-specific code.
- *#*
- *#* Revision 1.6  2004/09/14 21:01:08  bernie
- *#* Rename rectangle drawing functions; Unify filled/cleared implementations.
- *#*
- *#* Revision 1.4  2004/08/10 07:00:16  bernie
- *#* Add missing header.
- *#*
- *#* Revision 1.3  2004/08/04 03:16:59  bernie
- *#* Switch to new DevLib CONFIG_ convention.
- *#*
- *#* Revision 1.2  2004/06/03 11:27:09  bernie
- *#* Add dual-license information.
- *#*
- *#* Revision 1.1  2004/05/23 15:43:16  bernie
- *#* Import mware modules.
  *#*/
 
-#ifndef MWARE_GFX_H
-#define MWARE_GFX_H
+#ifndef GFX_GFX_H
+#define GFX_GFX_H
 
 #include <cfg/config.h>
 #include <cfg/compiler.h>
@@ -120,4 +102,4 @@ extern coord_t gfx_transformY(Bitmap *bm, vcoord_t y);
 extern void gfx_vline(Bitmap *bm, vcoord_t x1, vcoord_t y1, vcoord_t x2, vcoord_t y2);
 #endif /* CONFIG_GFX_VCOORDS */
 
-#endif /* MWARE_GFX_H */
+#endif /* GFX_GFX_H */

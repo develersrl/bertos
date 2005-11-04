@@ -18,6 +18,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2005/11/04 18:17:45  bernie
+ *#* Fix header guards and includes for new location of gfx module.
+ *#*
  *#* Revision 1.1  2005/11/04 18:11:35  bernie
  *#* Move graphics stuff from mware/ to gfx/.
  *#*
@@ -37,10 +40,10 @@
  *#* Import simple chart drawing code.
  *#*
  *#*/
-#ifndef MWARE_CHARTS_H
-#define MWARE_CHARTS_H
+#ifndef GFX_CHARTS_H
+#define GFX_CHARTS_H
 
-#include <mware/gfx.h> /* vcoord_t */
+#include <gfx/gfx.h>    /* vcoord_t */
 #include <cfg/config.h> /* CONFIG_ stuff */
 
 /*!
@@ -80,4 +83,4 @@ void chart_drawAxis(Bitmap *bm);
 void chart_drawCurve(Bitmap *bm, const chart_y_t *curve_y, int curve_cnt);
 void chart_drawDots(Bitmap *bm, const chart_x_t *dots_x, const chart_y_t *dots_y, int cnt);
 
-#endif /* MWARE_CHARTS_H */
+#endif /* GFX_CHARTS_H */

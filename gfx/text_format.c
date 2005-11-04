@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2005/11/04 18:17:45  bernie
+ *#* Fix header guards and includes for new location of gfx module.
+ *#*
  *#* Revision 1.1  2005/11/04 18:11:35  bernie
  *#* Move graphics stuff from mware/ to gfx/.
  *#*
@@ -56,10 +59,11 @@
  *#*
  *#*/
 
-#include "text.h"
-#include "formatwr.h" /* _formatted_write() */
-#include "font.h"
-#include "gfx.h"
+#include <gfx/text.h>
+#include <gfx/font.h>
+#include <gfx/gfx.h>
+#include <mware/formatwr.h> /* _formatted_write() */
+
 #include <stdio.h> /* vsprintf() */
 #include <stdarg.h>
 #include <string.h> /* strlen() */

@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2005/11/04 18:17:45  bernie
+ *#* Fix header guards and includes for new location of gfx module.
+ *#*
  *#* Revision 1.1  2005/11/04 18:11:35  bernie
  *#* Move graphics stuff from mware/ to gfx/.
  *#*
@@ -50,8 +53,8 @@
  *#*
  *#*/
 
-#ifndef MWARE_TEXT_H
-#define MWARE_TEXT_H
+#ifndef GFX_TEXT_H
+#define GFX_TEXT_H
 
 #include <cfg/compiler.h>
 #include <cfg/macros.h> /* BV() */
@@ -122,4 +125,4 @@ int text_vwidthf_P(struct Bitmap *bm, const char * PROGMEM fmt, va_list ap);
 int text_widthf_P(struct Bitmap *bm, const char * PROGMEM fmt, ...);
 #endif /* CPU_HARVARD */
 
-#endif /* MWARE_TEXT_H */
+#endif /* GFX_TEXT_H */

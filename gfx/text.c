@@ -1,7 +1,7 @@
 /*!
  * \file
  * <!--
- * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999 Bernardo Innocenti <bernie@develer.com>
  * This file is part of DevLib - See README.devlib for information.
  * -->
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2005/11/04 18:17:45  bernie
+ *#* Fix header guards and includes for new location of gfx module.
+ *#*
  *#* Revision 1.1  2005/11/04 18:11:35  bernie
  *#* Move graphics stuff from mware/ to gfx/.
  *#*
@@ -73,9 +76,9 @@
  *#* documentation fixes
  *#*/
 
-#include "gfx.h"
-#include "font.h"
-#include "text.h"
+#include <gfx/gfx.h>
+#include <gfx/font.h>
+#include <gfx/text.h>
 
 #include <cfg/debug.h>
 

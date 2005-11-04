@@ -1,8 +1,8 @@
 /*!
  * \file
  * <!--
- * Copyright (C) 2001 Bernardo Innocenti <bernie@codewiz.org>
- * Copyright (C) 2003,2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2001 Bernardo Innocenti <bernie@codewiz.org>
  * This file is part of DevLib - See README.devlib for information.
  * -->
  *
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2005/11/04 18:17:45  bernie
+ *#* Fix header guards and includes for new location of gfx module.
+ *#*
  *#* Revision 1.1  2005/11/04 18:11:35  bernie
  *#* Move graphics stuff from mware/ to gfx/.
  *#*
@@ -35,22 +38,6 @@
  *#*
  *#* Revision 1.1  2004/05/23 15:43:16  bernie
  *#* Import mware modules.
- *#*
- *#* Revision 1.5  2004/03/24 15:48:53  bernie
- *#* Remove Copyright messages from Doxygen output
- *#*
- *#* Revision 1.4  2004/03/03 18:30:17  bernie
- *#* Substitute left triangle glyph with left arrow
- *#*
- *#* Revision 1.3  2004/02/28 14:48:33  aleph
- *#* Improve arrow glyphs
- *#*
- *#* Revision 1.2  2004/01/13 12:15:28  aleph
- *#* Move font table in program memory; add font.h
- *#*
- *#* Revision 1.1  2004/01/07 23:31:54  aleph
- *#* Add text routines
- *#*
  *#*/
 
 #include "font.h"

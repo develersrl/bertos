@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2005/11/04 18:17:45  bernie
+ *#* Fix header guards and includes for new location of gfx module.
+ *#*
  *#* Revision 1.1  2005/11/04 18:11:35  bernie
  *#* Move graphics stuff from mware/ to gfx/.
  *#*
@@ -42,8 +45,8 @@
  *#* Move font table in program memory; add font.h
  *#*
  *#*/
-#ifndef MWARE_FONT_H
-#define MWARE_FONT_H
+#ifndef GFX_FONT_H
+#define GFX_FONT_H
 
 #include <cfg/compiler.h> /* uint8_t */
 #include <mware/pgm.h> /* PROGMEM */
@@ -56,7 +59,7 @@
 #define FONT_HEIGHT  8
 /* \} */
 
-/*! Font table */
+/*! Font table. */
 extern const PROGMEM uint8_t font[256 * FONT_WIDTH];
 
-#endif /* MWARE_FONT_H */
+#endif /* GFX_FONT_H */

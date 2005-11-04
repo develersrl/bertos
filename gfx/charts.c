@@ -26,6 +26,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2005/11/04 18:17:45  bernie
+ *#* Fix header guards and includes for new location of gfx module.
+ *#*
  *#* Revision 1.1  2005/11/04 18:11:35  bernie
  *#* Move graphics stuff from mware/ to gfx/.
  *#*
@@ -46,7 +49,7 @@
  *#*
  *#*/
 
-#include "charts.h"
+#include <gfx/charts.h>
 #include <mware/gfx.h>
 
 

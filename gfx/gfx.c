@@ -1,7 +1,7 @@
 /*!
  * \file
  * <!--
- * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999 Bernardo Innocenti <bernie@develer.com>
  * This file is part of DevLib - See README.devlib for information.
  * -->
@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2005/11/04 18:17:45  bernie
+ *#* Fix header guards and includes for new location of gfx module.
+ *#*
  *#* Revision 1.1  2005/11/04 18:11:35  bernie
  *#* Move graphics stuff from mware/ to gfx/.
  *#*
@@ -27,33 +30,9 @@
  *#*
  *#* Revision 1.12  2005/03/01 23:26:45  bernie
  *#* Use new CPU-neutral program-memory API.
- *#*
- *#* Revision 1.11  2004/12/08 08:06:16  bernie
- *#* Remove done todo.
- *#*
- *#* Revision 1.10  2004/11/01 15:14:07  bernie
- *#* Update to current coding conventions.
- *#*
- *#* Revision 1.9  2004/10/21 10:58:33  bernie
- *#* Add a TODO item.
- *#*
- *#* Revision 1.8  2004/09/20 03:29:22  bernie
- *#* Relax assertion.
- *#*
- *#* Revision 1.7  2004/09/14 21:01:08  bernie
- *#* Rename rectangle drawing functions; Unify filled/cleared implementations.
- *#*
- *#* Revision 1.4  2004/08/24 16:53:10  bernie
- *#* Use new-style config macros.
- *#*
- *#* Revision 1.3  2004/08/04 03:16:59  bernie
- *#* Switch to new DevLib CONFIG_ convention.
- *#*
- *#* Revision 1.2  2004/06/03 11:27:09  bernie
- *#* Add dual-license information.
  *#*/
 
-#include "gfx.h"
+#include <gfx/gfx.h>
 #include <cfg/config.h>  /* CONFIG_GFX_CLIPPING */
 #include <cfg/debug.h>
 #include <cfg/cpu.h>     /* CPU_HARVARD */
