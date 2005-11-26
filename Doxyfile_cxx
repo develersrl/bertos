@@ -1,4 +1,4 @@
-# Doxyfile 1.4.4
+# Doxyfile 1.4.5
 
 # This file describes the settings to be used by the documentation system
 # doxygen (www.doxygen.org) for a project
@@ -161,13 +161,6 @@ DETAILS_AT_TOP         = NO
 
 INHERIT_DOCS           = YES
 
-# If member grouping is used in the documentation and the DISTRIBUTE_GROUP_DOC 
-# tag is set to YES, then doxygen will reuse the documentation of the first 
-# member in the group (if any) for the other members of the group. By default 
-# all members of a group must be documented explicitly.
-
-DISTRIBUTE_GROUP_DOC   = NO
-
 # If the SEPARATE_MEMBER_PAGES tag is set to YES, then doxygen will produce 
 # a new page for each member. If set to NO, the documentation of a member will 
 # be part of the file/class/namespace that contains it.
@@ -195,12 +188,28 @@ ALIASES                =
 
 OPTIMIZE_OUTPUT_FOR_C  = NO
 
-# Set the OPTIMIZE_OUTPUT_JAVA tag to YES if your project consists of Java sources 
-# only. Doxygen will then generate output that is more tailored for Java. 
+# Set the OPTIMIZE_OUTPUT_JAVA tag to YES if your project consists of Java 
+# sources only. Doxygen will then generate output that is more tailored for Java. 
 # For instance, namespaces will be presented as packages, qualified scopes 
 # will look different, etc.
 
 OPTIMIZE_OUTPUT_JAVA   = NO
+
+# If you use STL classes (i.e. std::string, std::vector, etc.) but do not want to 
+# include (a tag file for) the STL sources as input, then you should 
+# set this tag to YES in order to let doxygen match functions declarations and 
+# definitions whose arguments contain STL classes (e.g. func(std::string); v.s. 
+# func(std::string) {}). This also make the inheritance and collaboration 
+# diagrams that involve STL classes more complete and accurate.
+
+BUILTIN_STL_SUPPORT    = YES
+
+# If member grouping is used in the documentation and the DISTRIBUTE_GROUP_DOC 
+# tag is set to YES, then doxygen will reuse the documentation of the first 
+# member in the group (if any) for the other members of the group. By default 
+# all members of a group must be documented explicitly.
+
+DISTRIBUTE_GROUP_DOC   = NO
 
 # Set the SUBGROUPING tag to YES (the default) to allow class member groups of 
 # the same type (for instance a group of public functions) to be put as a 
@@ -385,7 +394,7 @@ SHOW_DIRECTORIES       = YES
 # version control system). Doxygen will invoke the program by executing (via 
 # popen()) the command <command> <input-file>, where <command> is the value of 
 # the FILE_VERSION_FILTER tag, and <input-file> is the name of an input file 
-# provided by doxygen. Whatever the progam writes to standard output 
+# provided by doxygen. Whatever the program writes to standard output 
 # is used as the file version. See the manual for examples.
 
 FILE_VERSION_FILTER    = 
@@ -457,7 +466,7 @@ INPUT                  =
 # and *.h) to filter out the source-files in the directories. If left 
 # blank the following patterns are tested: 
 # *.c *.cc *.cxx *.cpp *.c++ *.java *.ii *.ixx *.ipp *.i++ *.inl *.h *.hh *.hxx 
-# *.hpp *.h++ *.idl *.odl *.cs *.php *.php3 *.inc *.m *.mm
+# *.hpp *.h++ *.idl *.odl *.cs *.php *.php3 *.inc *.m *.mm *.py
 
 FILE_PATTERNS          = *.c \
                          *.cc \
@@ -985,7 +994,7 @@ MACRO_EXPANSION        = YES
 
 # If the EXPAND_ONLY_PREDEF and MACRO_EXPANSION tags are both set to YES 
 # then the macro expansion is limited to the macros specified with the 
-# PREDEFINED and EXPAND_AS_PREDEFINED tags.
+# PREDEFINED and EXPAND_AS_DEFINED tags.
 
 EXPAND_ONLY_PREDEF     = YES
 
