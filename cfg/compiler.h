@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2005/11/27 23:33:05  bernie
+ *#* Drop avr-libc hack for missing stdint.h.
+ *#*
  *#* Revision 1.6  2005/07/19 07:27:31  bernie
  *#* Don't use CPU_REG_BITS from cpu.h to avoid circular header dependendy.
  *#*
@@ -324,11 +327,8 @@
 		typedef unsigned long long   uint64_t;
 	#endif
 	/* \} */
-#elif defined(__GNUC__) && CPU_AVR
-	/* avr-libc is weird... (Fixed in avr-libc-1.2, hack to be removed soon) */
-	#include <inttypes.h>
 #else
-	/* This is the correct location. */
+	/* This is the standard location. */
 	#include <stdint.h>
 #endif
 
