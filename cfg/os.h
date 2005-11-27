@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2005/11/27 23:32:42  bernie
+ *#* Add CPU fallback for OS_ID.
+ *#*
  *#* Revision 1.4  2005/11/27 03:07:13  bernie
  *#* IRQ_SAVE_DISABLE(): Really block signals.
  *#*
@@ -113,8 +116,6 @@
 	#define OS_QT 0
 #endif
 
-
-
 /*
  * Summarize hosted environments as OS_HOSTED and embedded
  * environment with OS_EMBEDDED.
@@ -125,6 +126,9 @@
 #else
 	#define OS_HOSTED   0
 	#define OS_EMBEDDED 1
+
+	/* Embedded environments fall back to CPU-specific code. */
+	#define OS_ID       CPU_ID
 #endif
 
 /* Self-check for the detection */
