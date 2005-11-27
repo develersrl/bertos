@@ -18,6 +18,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2005/11/27 03:02:55  bernie
+ *#* Convert to appconfig.h.
+ *#*
  *#* Revision 1.1  2005/11/27 01:39:48  bernie
  *#* Move event.[ch] from kern/ to mware/.
  *#*
@@ -59,7 +62,7 @@
 #ifndef KERN_EVENT_H
 #define KERN_EVENT_H
 
-#include <cfg/config.h>
+#include <appconfig.h>
 
 #if CONFIG_KERNEL
 	#include <cfg/config_kern.h>
