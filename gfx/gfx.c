@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2005/11/27 23:33:40  bernie
+ *#* Use appconfig.h instead of cfg/config.h.
+ *#*
  *#* Revision 1.2  2005/11/04 18:17:45  bernie
  *#* Fix header guards and includes for new location of gfx module.
  *#*
@@ -32,8 +35,8 @@
  *#* Use new CPU-neutral program-memory API.
  *#*/
 
-#include <gfx/gfx.h>
-#include <cfg/config.h>  /* CONFIG_GFX_CLIPPING */
+#include "gfx.h"
+#include <appconfig.h>  /* CONFIG_GFX_CLIPPING */
 #include <cfg/debug.h>
 #include <cfg/cpu.h>     /* CPU_HARVARD */
 #include <cfg/macros.h>  /* SWAP() */

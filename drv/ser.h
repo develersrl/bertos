@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.23  2005/11/27 23:33:40  bernie
+ *#* Use appconfig.h instead of cfg/config.h.
+ *#*
  *#* Revision 1.22  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -83,8 +86,8 @@
 
 #include <mware/fifobuf.h>
 #include <cfg/compiler.h>
-#include <cfg/config.h>
 #include <cfg/macros.h> /* BV() */
+#include <appconfig.h>
 
 /*! \name Serial Error/status flags. */
 /*\{*/

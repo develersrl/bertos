@@ -18,6 +18,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2005/11/27 23:36:18  bernie
+ *#* Use appconfig.h instead of cfg/config.h.
+ *#*
  *#* Revision 1.2  2005/11/04 18:17:45  bernie
  *#* Fix header guards and includes for new location of gfx module.
  *#*
@@ -44,7 +47,7 @@
 #define GFX_CHARTS_H
 
 #include <gfx/gfx.h>    /* vcoord_t */
-#include <cfg/config.h> /* CONFIG_ stuff */
+#include <appconfig.h> /* CONFIG_ stuff */
 
 /*!
  * \name Width/height of the small ticks drawn over the axes

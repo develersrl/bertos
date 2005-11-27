@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2005/11/27 23:33:40  bernie
+ *#* Use appconfig.h instead of cfg/config.h.
+ *#*
  *#* Revision 1.2  2005/11/04 18:17:45  bernie
  *#* Fix header guards and includes for new location of gfx module.
  *#*
@@ -36,7 +39,7 @@
 #ifndef GFX_GFX_H
 #define GFX_GFX_H
 
-#include <cfg/config.h>
+#include <appconfig.h>
 #include <cfg/compiler.h>
 #include <cfg/cpu.h>
 

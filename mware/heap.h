@@ -20,6 +20,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2005/11/27 23:36:19  bernie
+ *#* Use appconfig.h instead of cfg/config.h.
+ *#*
  *#* Revision 1.5  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -47,7 +50,7 @@
 #define MWARE_HEAP_H
 
 #include <cfg/compiler.h>
-#include <cfg/config.h>
+#include <appconfig.h>
 
 struct _MemChunk;
 

@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2005/11/27 23:33:40  bernie
+ *#* Use appconfig.h instead of cfg/config.h.
+ *#*
  *#* Revision 1.7  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -41,7 +44,7 @@
 #define DRV_EEPROM_H
 
 #include <cfg/compiler.h>
-#include <cfg/config.h>
+#include <appconfig.h>
 
 /*!
  * \name Values for CONFIG_EEPROM_TYPE

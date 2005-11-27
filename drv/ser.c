@@ -28,6 +28,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.27  2005/11/27 23:33:40  bernie
+ *#* Use appconfig.h instead of cfg/config.h.
+ *#*
  *#* Revision 1.26  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -110,7 +113,7 @@
 #include <mware/formatwr.h>
 #include <cfg/debug.h>
 #include <hw.h>
-#include <cfg/config.h>
+#include <appconfig.h>
 
 /*
  * Sanity check for config parameters required by this module.

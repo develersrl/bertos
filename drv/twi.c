@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2005/11/27 23:33:40  bernie
+ *#* Use appconfig.h instead of cfg/config.h.
+ *#*
  *#* Revision 1.4  2005/04/11 19:10:28  bernie
  *#* Include top-level headers from cfg/ subdir.
  *#*
@@ -30,11 +33,12 @@
  *#*/
 
 #include "twi.h"
-#include <cfg/config.h>
+
 #include <cfg/debug.h>
-#include <hw.h>
 #include <cfg/cpu.h>
 #include <cfg/macros.h> // BV()
+#include <hw.h>
+#include <appconfig.h>
 
 #include <compat/twi.h>
 

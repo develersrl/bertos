@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.18  2005/11/27 23:33:40  bernie
+ *#* Use appconfig.h instead of cfg/config.h.
+ *#*
  *#* Revision 1.17  2005/04/11 19:10:27  bernie
  *#* Include top-level headers from cfg/ subdir.
  *#*
@@ -35,7 +38,7 @@
 #include "eeprom.h"
 
 #include <cfg/debug.h>
-#include <cfg/config.h>  // CONFIG_EEPROM_VERIFY
+#include <appconfig.h>  // CONFIG_EEPROM_VERIFY
 #include <cfg/macros.h>  // MIN()
 #include <drv/twi.h>
 #include <drv/wdt.h>
