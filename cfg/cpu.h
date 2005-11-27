@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2005/11/27 03:04:38  bernie
+ *#* Add POSIX emulation for IRQ_* macros; Add Qt support.
+ *#*
  *#* Revision 1.6  2005/07/19 07:26:49  bernie
  *#* Add missing #endif.
  *#*
@@ -93,12 +96,17 @@
 #elif CPU_X86
 
 	#define NOP                     asm volatile ("nop")
-	#define IRQ_DISABLE             FIXME
-	#define IRQ_ENABLE              FIXME
-	#define IRQ_SAVE_DISABLE(x)     FIXME
-	#define IRQ_RESTORE(x)          FIXME
 
-	typedef uint32_t cpuflags_t; // FIXME
+	/* Get IRQ_* definitions from the hosting environment. */
+	#include <cfg/os.h>
+	#if OS_EMBEDDED
+		#define IRQ_DISABLE             FIXME
+		#define IRQ_ENABLE              FIXME
+		#define IRQ_SAVE_DISABLE(x)     FIXME
+		#define IRQ_RESTORE(x)          FIXME
+		typedef uint32_t cpuflags_t; // FIXME
+	#endif /* OS_EMBEDDED */
+
 
 	#define CPU_REGS_CNT            7
 	#define CPU_STACK_GROWS_UPWARD  0
@@ -121,6 +129,7 @@
 
 #elif CPU_PPC
 	#define NOP                 asm volatile ("nop" ::)
+
 	#define IRQ_DISABLE         FIXME
 	#define IRQ_ENABLE          FIXME
 	#define IRQ_SAVE_DISABLE(x) FIXME
