@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.27  2005/11/27 03:04:08  bernie
+ *#* Move test code to timer_test.c; Add OS_HOSTED support.
+ *#*
  *#* Revision 1.26  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -38,11 +41,19 @@
 
 #include "timer.h"
 #include <cfg/cpu.h>
-#include <hw.h>
+#include <cfg/os.h>
 #include <cfg/debug.h>
 #include <appconfig.h>
 
-#include CPU_CSOURCE(timer)
+/*
+ * Include platform-specific binding code if we're hosted.
+ * Try the CPU specific one for bare-metal environments.
+ */
+#if OS_HOSTED
+	#include OS_CSOURCE(timer)
+#else
+	#include CPU_CSOURCE(timer)
+#endif
 
 /*
  * Sanity check for config parameters required by this module.
@@ -305,95 +316,3 @@ void timer_init(void)
 
 	timer_hw_init();
 }
-
-
-#if CONFIG_TEST
-
-static void timer_test_constants(void)
-{
-	kprintf("TIMER_PRESCALER=%d\n", TIMER_PRESCALER);
-	kprintf("TIMER_HW_HPTICKS_PER_SEC=%lu\n", TIMER_HW_HPTICKS_PER_SEC);
-	#ifdef TIMER1_OVF_COUNT
-		kprintf("TIMER1_OVF_COUNT=%d\n", (int)TIMER1_OVF_COUNT);
-	#endif
-	kprintf("TIMER_TICKS_PER_MSEC=%d\n", (int)TIMER_TICKS_PER_MSEC);
-	kprintf("\n");
-	kprintf("ms_to_ticks(100)=%lu\n", ms_to_ticks(100));
-	kprintf("ms_to_ticks(10000)=%lu\n", ms_to_ticks(10000));
-	kprintf("us_to_ticks(100)=%lu\n", us_to_ticks(100));
-	kprintf("us_to_ticks(10000)=%lu\n", us_to_ticks(10000));
-	kprintf("\n");
-	kprintf("ticks_to_ms(100)=%lu\n", ticks_to_ms(100));
-	kprintf("ticks_to_ms(10000)=%lu\n", ticks_to_ms(10000));
-	kprintf("ticks_to_us(100)=%lu\n", ticks_to_us(100));
-	kprintf("ticks_to_us(10000)=%lu\n", ticks_to_us(10000));
-	kprintf("\n");
-	kprintf("hptime_to_us(100)=%lu\n", hptime_to_us(100));
-	kprintf("hptime_to_us(10000)=%lu\n", hptime_to_us(10000));
-	kprintf("us_to_hptime(100)=%lu\n", us_to_hptime(100));
-	kprintf("us_to_hptime(10000)=%lu\n", us_to_hptime(10000));
-}
-
-static void timer_test_delay(void)
-{
-	int i;
-
-	kputs("Delay test\n");
-	for (i = 0; i < 1000; i += 100)
-	{
-		kprintf("delay %d...", i);
-		timer_delay(i);
-		kputs("done\n");
-	}
-}
-
-static void timer_test_hook(iptr_t _timer)
-{
-	Timer *timer = (Timer *)(void *)_timer;
-
-	kprintf("Timer %ld expired\n", ticks_to_ms(timer->_delay));
-	timer_add(timer);
-}
-
-static void timer_test_async(void)
-{
-	static Timer test_timers[5];
-	static const mtime_t test_delays[5] = { 170, 50, 310, 1500, 310 };
-	size_t i;
-
-	for (i = 0; i < countof(test_timers); ++i)
-	{
-		Timer *timer = &test_timers[i];
-		timer_setDelay(timer, ms_to_ticks(test_delays[i]));
-		timer_set_event_softint(timer, timer_test_hook, (iptr_t)timer);
-		timer_add(timer);
-	}
-}
-
-static void timer_test_poll(void)
-{
-	int secs = 0;
-	mtime_t start_time = ticks_to_ms(timer_clock());
-	mtime_t now;
-
-	while (secs <= 10)
-	{
-		now = ticks_to_ms(timer_clock());
-		if (now - start_time >= 1000)
-		{
-			++secs;
-			start_time += 1000;
-			kprintf("seconds = %d, ticks=%ld\n", secs, now);
-		}
-	}
-}
-
-void timer_test(void)
-{
-	timer_test_constants();
-	timer_test_delay();
-	timer_test_async();
-	timer_test_poll();
-}
-
-#endif /* CONFIG_TEST */

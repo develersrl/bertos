@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.27  2005/11/27 03:04:19  bernie
+ *#* Move test code to timer_test.c; Add OS_HOSTED support.
+ *#*
  *#* Revision 1.26  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -92,11 +95,21 @@
 #ifndef DRV_TIMER_H
 #define DRV_TIMER_H
 
-#include <cfg/debug.h>
-
-#include CPU_HEADER(timer)
-#include <mware/list.h>
+#include <cfg/os.h>
 #include <cfg/cpu.h>
+
+/*
+ * Include platform-specific binding header if we're hosted.
+ * Try the CPU specific one for bare-metal environments.
+ */
+#if OS_HOSTED
+	#include OS_HEADER(timer)
+#else
+	#include CPU_HEADER(timer)
+#endif
+
+#include <mware/list.h>
+#include <cfg/debug.h>
 #include <cfg/compiler.h>
 #include <appconfig.h>
 
@@ -193,7 +206,7 @@ INLINE hptime_t us_to_hptime(utime_t us)
 	#if TIMER_HW_HPTICKS_PER_SEC > 10000000UL
 		return(us * ((TIMER_HW_HPTICKS_PER_SEC + 500000UL) / 1000000UL));
 	#else
-		return((us * TIMER_HW_HPTICKS_PER_SEC + 500000UL) / 1000000UL));
+		return((us * TIMER_HW_HPTICKS_PER_SEC + 500000UL) / 1000000UL);
 	#endif /* TIMER_HW_HPTICKS_PER_SEC > 10000000UL */
 }
 
