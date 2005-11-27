@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2005/11/27 03:04:57  bernie
+ *#* CONFIG_WATCHDOG: New config option.
+ *#*
  *#* Revision 1.1  2005/11/04 17:42:12  bernie
  *#* Move cfg/config.h to appconfig.h.
  *#*
@@ -146,7 +149,11 @@
 //! Hardware timer selection for drv/timer.c
 #define CONFIG_TIMER  TIMER_ON_OUTPUT_COMPARE2
 
+//! Debug timer interrupt using a strobe pin.
 #define CONFIG_TIMER_STROBE  0
+
+//! Enable watchdog timer.
+#define CONFIG_WATCHDOG  1
 
 //! EEPROM type for drv/eeprom.c
 #define CONFIG_EEPROM_TYPE EEPROM_24XX256
