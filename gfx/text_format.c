@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2005/11/27 23:31:58  bernie
+ *#* Reorder includes.
+ *#*
  *#* Revision 1.2  2005/11/04 18:17:45  bernie
  *#* Fix header guards and includes for new location of gfx module.
  *#*
@@ -59,10 +62,11 @@
  *#*
  *#*/
 
-#include <gfx/text.h>
+#include "text.h"
+
+#include <mware/formatwr.h> /* _formatted_write() */
 #include <gfx/font.h>
 #include <gfx/gfx.h>
-#include <mware/formatwr.h> /* _formatted_write() */
 
 #include <stdio.h> /* vsprintf() */
 #include <stdarg.h>

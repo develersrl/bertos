@@ -26,6 +26,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2005/11/27 23:33:29  bernie
+ *#* Reorder includes.
+ *#*
  *#* Revision 1.2  2005/11/04 18:17:45  bernie
  *#* Fix header guards and includes for new location of gfx module.
  *#*
@@ -49,8 +52,8 @@
  *#*
  *#*/
 
-#include <gfx/charts.h>
-#include <mware/gfx.h>
+#include "charts.h"
+#include <gfx/gfx.h>
 
 
 #ifndef CONFIG_CHART_ARROWS
