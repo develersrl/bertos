@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2005/11/27 03:03:08  bernie
+ *#* Add Qt support hack.
+ *#*
  *#* Revision 1.5  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -33,7 +36,7 @@
 #ifndef DRV_WDT_H
 #define DRV_WDT_H
 
-#include <cfg/config.h>
+#include <appconfig.h>
 #include <cfg/compiler.h> // INLINE
 
 /* Configury sanity check */
@@ -43,8 +46,11 @@
 
 #if CONFIG_WATCHDOG
 	#include <cfg/cpu.h>
+	#include <cfg/os.h>
 
-	#if CPU_AVR
+	#if OS_QT
+		#include <qapplication.h>
+	#elif CPU_AVR
 		#include <avr/io.h>
 		#include <cfg/macros.h> // BV()
 	#else
@@ -58,7 +64,11 @@
 INLINE void wdt_reset(void)
 {
 #if CONFIG_WATCHDOG
-	#if CPU_AVR
+	#if OS_QT
+		// Let Qt handle events
+		ASSERT(qApp);
+		qApp->processEvents();
+	#elif CPU_AVR
 		__asm__ __volatile__ ("wdr");
 	#else
 		#error unknown CPU
@@ -74,7 +84,14 @@ INLINE void wdt_reset(void)
 INLINE void wdt_init(uint8_t timeout)
 {
 #if CONFIG_WATCHDOG
-	#if CPU_AVR
+	#if OS_QT
+		// create a dummy QApplication object
+		if (!qApp)
+		{
+			int argc;
+			new QApplication(argc, (char **)NULL);
+		}
+	#elif CPU_AVR
 		WDTCR |= BV(WDCE) | BV(WDE);
 		WDTCR = timeout;
 	#else
@@ -88,7 +105,9 @@ INLINE void wdt_init(uint8_t timeout)
 INLINE void wdt_start(void)
 {
 #if CONFIG_WATCHDOG
-	#if CPU_AVR
+	#if OS_QT
+		// NOP
+	#elif CPU_AVR
 		WDTCR |= BV(WDE);
 	#else
 		#error unknown CPU
@@ -99,7 +118,9 @@ INLINE void wdt_start(void)
 INLINE void wdt_stop(void)
 {
 #if CONFIG_WATCHDOG
-	#if CPU_AVR
+	#if OS_QT
+		// NOP
+	#elif CPU_AVR
 		WDTCR |= BV(WDCE) | BV(WDE);
 		WDTCR &= ~BV(WDE);
 	#else
