@@ -9,11 +9,14 @@
  *
  * \author Bernardo Innocenti <bernie@develer.com>
  *
- * \brief Low-level timer module for AVR (interface).
+ * \brief Low-level timer module for Qt emulator (interface).
  */
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2005/11/27 03:57:00  bernie
+ *#* Documentation fixes.
+ *#*
  *#* Revision 1.1  2005/11/27 03:06:36  bernie
  *#* Qt timer emulation.
  *#*
@@ -33,7 +36,7 @@ typedef unsigned int hptime_t;
 /// Frequency of the hardware high-precision timer.
 #define TIMER_HW_HPTICKS_PER_SEC  1000
 
-/// Not needed, IRQ timer flag cleared automatically.
+/// Not needed.
 #define timer_hw_irq() do {} while (0)
 
 
