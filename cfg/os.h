@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2005/11/27 03:07:13  bernie
+ *#* IRQ_SAVE_DISABLE(): Really block signals.
+ *#*
  *#* Revision 1.3  2005/11/27 03:02:40  bernie
  *#* Add POSIX emulation for IRQ_* macros; Add Qt support.
  *#*
@@ -74,7 +77,7 @@
 	do { \
 		sigset_t sigs; \
 		sigemptyset(&sigs); \
-		sigprocmask(SIG_SETMASK, &sigs, &old_sigs); \
+		sigprocmask(SIG_BLOCK, &sigs, &old_sigs); \
 	} while (0)
 
 	#define IRQ_RESTORE(old_sigs) \
