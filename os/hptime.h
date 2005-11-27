@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2005/11/27 03:57:22  bernie
+ *#* Use C99 types to match cfg/compiler.h without depending on it.
+ *#*
  *#* Revision 1.5  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -38,10 +41,10 @@ extern "C" {
 
 #ifdef _WIN32
 
-	/* type for time expressed in ms */
+	/** type for time expressed in ms */
 	typedef unsigned long mtime_t;
 
-	/* our type for "high precision absolute time" */
+	/** our type for "high precision absolute time" */
 	typedef unsigned __int64 hptime_t;
 
 	#define HPTIME_TICKS_PER_SECOND		((hptime_t)10000000I64)
@@ -50,21 +53,23 @@ extern "C" {
 
 #elif defined(__unix__)
 
-	/* type for time expressed in ms */
-	typedef long mtime_t;
+	#include <stdint.h>
 
-	/* our type for "high precision absolute time" */
-	typedef long long hptime_t;
+	/** type for time expressed in ms */
+	typedef int32_t mtime_t;
 
-	#define HPTIME_TICKS_PER_SECOND		((hptime_t)1000000LL)
-	#define HPTIME_TICKS_PER_MILLISEC	((hptime_t)1000LL)
-	#define HPTIME_TICKS_PER_MICRO		((hptime_t)1LL)
+	/** our type for "high precision absolute time" */
+	typedef int64_t hptime_t;
+
+	#define HPTIME_TICKS_PER_SECOND		1000000LL
+	#define HPTIME_TICKS_PER_MILLISEC	1000LL
+	#define HPTIME_TICKS_PER_MICRO		1LL
 
 #else /* !__unix__ */
 	#error OS dependent support code missing for this OS
 #endif /* !__unix__ */
 
-/*!
+/**
  * Return the current time with the maximum precision made available from the hosting OS
  */
 extern hptime_t hptime_get(void);
