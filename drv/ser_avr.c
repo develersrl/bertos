@@ -38,6 +38,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.29  2005/11/27 23:31:48  bernie
+ *#* Support avr-libc 1.4.
+ *#*
  *#* Revision 1.28  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -120,15 +123,19 @@
 
 #include "ser.h"
 #include "ser_p.h"
-#include <cfg/config.h>
 #include "hw.h"  /* Required for bus macros overrides */
+#include <appconfig.h>
 
 #include <cfg/debug.h>
 #include <drv/timer.h>
 #include <mware/fifobuf.h>
 
-#include <avr/signal.h>
 #include <avr/io.h>
+#if defined(__AVR_LIBC_VERSION__) && (__AVR_LIBC_VERSION__ >= 10400UL)
+	#include <avr/interrupt.h>
+#else
+	#include <avr/signal.h>
+#endif
 
 
 #if !CONFIG_SER_HWHANDSHAKE
