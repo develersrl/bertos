@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2005/11/27 03:58:18  bernie
+ *#* Add POSIX timer emulator.
+ *#*
  *#* Revision 1.1  2005/11/27 03:04:08  bernie
  *#* Move test code to timer_test.c; Add OS_HOSTED support.
  *#*
@@ -20,6 +23,7 @@
 
 #include "timer.c"
 #include "mware/event.c"
+#include "os/hptime.c"
 
 static void timer_test_constants(void)
 {

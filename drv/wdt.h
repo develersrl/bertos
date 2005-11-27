@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2005/11/27 03:58:40  bernie
+ *#* Add POSIX timer emulator.
+ *#*
  *#* Revision 1.6  2005/11/27 03:03:08  bernie
  *#* Add Qt support hack.
  *#*
@@ -50,6 +53,8 @@
 
 	#if OS_QT
 		#include <qapplication.h>
+	#elif OS_POSIX
+		#include <sys/select.h>
 	#elif CPU_AVR
 		#include <avr/io.h>
 		#include <cfg/macros.h> // BV()
@@ -68,6 +73,9 @@ INLINE void wdt_reset(void)
 		// Let Qt handle events
 		ASSERT(qApp);
 		qApp->processEvents();
+	#elif OS_POSIX
+		static struct timeval tv = { 0, 0 };
+		select(0, NULL, NULL, NULL, &tv);
 	#elif CPU_AVR
 		__asm__ __volatile__ ("wdr");
 	#else
@@ -85,12 +93,15 @@ INLINE void wdt_init(uint8_t timeout)
 {
 #if CONFIG_WATCHDOG
 	#if OS_QT
-		// create a dummy QApplication object
+		// Create a dummy QApplication object
 		if (!qApp)
 		{
 			int argc;
 			new QApplication(argc, (char **)NULL);
 		}
+		(void)timeout;
+	#elif OS_POSIX
+		(void)timeout; // NOP
 	#elif CPU_AVR
 		WDTCR |= BV(WDCE) | BV(WDE);
 		WDTCR = timeout;
@@ -107,6 +118,8 @@ INLINE void wdt_start(void)
 #if CONFIG_WATCHDOG
 	#if OS_QT
 		// NOP
+	#elif OS_POSIX
+		// NOP
 	#elif CPU_AVR
 		WDTCR |= BV(WDE);
 	#else
@@ -119,6 +132,8 @@ INLINE void wdt_stop(void)
 {
 #if CONFIG_WATCHDOG
 	#if OS_QT
+		// NOP
+	#elif OS_POSIX
 		// NOP
 	#elif CPU_AVR
 		WDTCR |= BV(WDCE) | BV(WDE);
