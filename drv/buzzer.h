@@ -1,7 +1,7 @@
 /*!
  * \file
  * <!--
- * Copyright 2003 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003,2005 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999,2003 Bernardo Innocenti <bernie@develer.com>
  * This file is part of DevLib - See README.devlib for information.
  * -->
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2005/11/27 23:32:15  bernie
+ *#* Update copyright information.
+ *#*
  *#* Revision 1.8  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
