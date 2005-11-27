@@ -18,6 +18,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.1  2005/11/27 01:39:48  bernie
+ *#* Move event.[ch] from kern/ to mware/.
+ *#*
  *#* Revision 1.11  2005/04/11 19:10:28  bernie
  *#* Include top-level headers from cfg/ subdir.
  *#*
@@ -65,9 +68,6 @@
 	#endif
 #endif
 
-
-/* Forward decl */
-struct Process;
 
 //! User defined callback type
 typedef void (*Hook)(void *);

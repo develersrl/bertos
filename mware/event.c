@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.1  2005/11/27 01:39:48  bernie
+ *#* Move event.[ch] from kern/ to mware/.
+ *#*
  *#* Revision 1.2  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
