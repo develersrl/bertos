@@ -1,6 +1,3 @@
- - Move kern/event.[ch] to mware/ (it can be used by freestanding apps too)
-
- - Adopt CppUnit or maybe CppUnit Lite
-
  - Write test for cxxutil/split.h
 
+ - Write simulators for serial and lcd drivers.
