@@ -38,6 +38,7 @@ you can configure out features you don't need.
 
 The modules are sorted in subdirectories by their category:
 
+ - cfg/ - Configuration and portability headers;
  - kern/ - Simple multitasking kernel implementation;
  - drv/ - Hardware drivers;
  - dt/ - Object oriented framework for simple GUIs.
@@ -45,12 +46,13 @@ The modules are sorted in subdirectories by their category:
  - mware/ - Algorithms, containers and other standalone code;
  - io/ - Infrastructure of I/O-related modules for hosted applications;
  - os/ - OS-abstraction layers for hosted environments;
+ - qtext/ - Qt extension classes;
 
-The top-level directory contains a few support headers that are meant
-to be usable by any C or C++, embedded or hosted application.  The
-top-level directory also contains a few example templates for files
+The cfg directory contains a few support headers that are meant
+to be usable by any C or C++, embedded or hosted application.
+The top-level directory contains a few example templates for files
 that are meant to be customized on a per-application basis.  These
-files are hw.h, config.h, verstag.h and arch_config.h.
+files are hw.h, appconfig.h, verstag.h and arch_config.h.
 
 To achieve the highest possible reusability, most DevLib components
 are designed for fine-grained modularity and minimal external
