@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2006/01/16 03:28:25  bernie
+ *#* Remove redundant mtime_t definition (cfg/compiler.h has one already).
+ *#*
  *#* Revision 1.6  2005/11/27 03:57:22  bernie
  *#* Use C99 types to match cfg/compiler.h without depending on it.
  *#*
@@ -41,11 +44,8 @@ extern "C" {
 
 #ifdef _WIN32
 
-	/** type for time expressed in ms */
-	typedef unsigned long mtime_t;
-
 	/** our type for "high precision absolute time" */
-	typedef unsigned __int64 hptime_t;
+	typedef __int64 hptime_t;
 
 	#define HPTIME_TICKS_PER_SECOND		((hptime_t)10000000I64)
 	#define HPTIME_TICKS_PER_MILLISEC	((hptime_t)10000I64)
@@ -54,9 +54,6 @@ extern "C" {
 #elif defined(__unix__)
 
 	#include <stdint.h>
-
-	/** type for time expressed in ms */
-	typedef int32_t mtime_t;
 
 	/** our type for "high precision absolute time" */
 	typedef int64_t hptime_t;
