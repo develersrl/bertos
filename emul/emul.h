@@ -1,0 +1,68 @@
+/**
+ * \file
+ * <!--
+ * Copyright 2006 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2000, 2001 Bernardo Innocenti <bernie@codewiz.org>
+ * All Rights Reserved.
+ * -->
+ *
+ * \version $Id$
+ *
+ * \author Bernardo Innocenti <bernie@develer.com>
+ *
+ * \brief Qt-based emulator framework for embedded applications (interface)
+ */
+
+/*#*
+ *#* $Log$
+ *#* Revision 1.1  2006/01/16 03:37:12  bernie
+ *#* Add emulator skeleton.
+ *#*
+ *#*/
+
+#ifndef EMUL_EMUL_H
+#define EMUL_EMUL_H
+
+#include <cfg/compiler.h>
+
+#ifdef __cplusplus
+
+// fwd decls
+class QApplication;
+class EmulWin;
+class EmulPRT;
+class EmulLCD;
+class EmulKBD;
+class QCheckBox;
+class QSlider;
+class QLabel;
+
+class Emulator
+{
+// data members
+public:
+	QApplication	*emulApp;	///< QT Application.
+	EmulWin			*emulWin;	///< Main window.
+
+	EmulLCD			*emulLCD;	///< Display emulator.
+	EmulKBD			*emulKBD;	///< Keyboard emulator.
+
+// construction
+	Emulator(int &argc, char **argv);
+	~Emulator();
+
+// public methods
+	int exec(void (*entry)(void));
+	void quit();
+};
+
+extern Emulator *emul;
+
+#endif /* __cplusplus */
+
+EXTERN_C void emul_init(int *argc, char *argv[]);
+EXTERN_C void emul_cleanup();
+EXTERN_C void emul_idle();
+
+#endif /* EMUL_EMUL_H */
+
