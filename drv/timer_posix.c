@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/01/16 03:30:21  bernie
+ *#* Make header C++ friendly.
+ *#*
  *#* Revision 1.1  2005/11/27 03:58:18  bernie
  *#* Add POSIX timer emulator.
  *#*
@@ -34,7 +37,7 @@
 void timer_isr(int);
 
 /// HW dependent timer initialization.
-extern "C" static void timer_hw_init(void)
+EXTERN_C static void timer_hw_init(void)
 {
 	struct sigaction sa;
 	memset(&sa, 0, sizeof(sa));
@@ -55,7 +58,7 @@ extern "C" static void timer_hw_init(void)
 	setitimer(ITIMER_REAL, &itv, NULL);
 }
 
-extern "C" INLINE hptime_t timer_hw_hpread(void)
+INLINE hptime_t timer_hw_hpread(void)
 {
 	return hptime_get();
 }

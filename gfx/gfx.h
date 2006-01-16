@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/01/16 03:30:57  bernie
+ *#* Make header C++ friendly.
+ *#*
  *#* Revision 1.3  2005/11/27 23:33:40  bernie
  *#* Use appconfig.h instead of cfg/config.h.
  *#*
@@ -43,6 +46,7 @@
 #include <cfg/compiler.h>
 #include <cfg/cpu.h>
 
+EXTERN_C_BEGIN
 
 /*! Common type for coordinates expressed in pixel units */
 typedef int coord_t;
@@ -104,5 +108,7 @@ extern coord_t gfx_transformX(Bitmap *bm, vcoord_t x);
 extern coord_t gfx_transformY(Bitmap *bm, vcoord_t y);
 extern void gfx_vline(Bitmap *bm, vcoord_t x1, vcoord_t y1, vcoord_t x2, vcoord_t y2);
 #endif /* CONFIG_GFX_VCOORDS */
+
+EXTERN_C_END
 
 #endif /* GFX_GFX_H */
