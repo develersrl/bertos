@@ -18,6 +18,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/01/16 03:27:49  bernie
+ *#* Rename sig_t to sigbit_t to avoid clash with POSIX.
+ *#*
  *#* Revision 1.2  2005/11/27 03:02:55  bernie
  *#* Convert to appconfig.h.
  *#*
@@ -84,7 +87,7 @@ typedef struct Event
 		struct
 		{
 			struct Process *sig_proc;  /* Process to be signalled */
-			sig_t           sig_bit;   /* Signal to send */
+			sigbit_t        sig_bit;   /* Signal to send */
 		} Sig;
 #endif
 		struct
@@ -117,7 +120,7 @@ INLINE Event event_createNone(void)
 	((e)->action = event_hook_softint,(e)->Ev.Int.func = (f), (e)->Ev.Int.user_data = (u))
 
 /*! Same as event_initSoftInt(), but returns the initialized event */
-INLINE Event event_createSoftInt(Hook func, void* user_data)
+INLINE Event event_createSoftInt(Hook func, void *user_data)
 {
 	Event e;
 	e.action = event_hook_softint;
@@ -134,7 +137,7 @@ INLINE Event event_createSoftInt(Hook func, void* user_data)
 	((e)->action = event_hook_signal,(e)->Ev.Sig.sig_proc = (p), (e)->Ev.Sig.sig_bit = (s))
 
 /*! Same as event_initSignal(), but returns the initialized event */
-INLINE Event event_createSignal(struct Process* proc, sig_t bit)
+INLINE Event event_createSignal(struct Process *proc, sigbit_t bit)
 {
 	Event e;
 	e.action = event_hook_signal;
@@ -146,7 +149,7 @@ INLINE Event event_createSignal(struct Process* proc, sig_t bit)
 #endif
 
 /*! Trigger an event */
-INLINE void event_do(struct Event* e)
+INLINE void event_do(struct Event *e)
 {
 	e->action(e);
 }

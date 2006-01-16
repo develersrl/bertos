@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2006/01/16 03:27:49  bernie
+ *#* Rename sig_t to sigbit_t to avoid clash with POSIX.
+ *#*
  *#* Revision 1.7  2005/11/27 23:33:05  bernie
  *#* Drop avr-libc hack for missing stdint.h.
  *#*
@@ -358,7 +361,7 @@ typedef void * iptr_t;
 /*! Bulk storage large enough for both pointers to constants or integers. */
 typedef const void * const_iptr_t;
 
-typedef unsigned char sig_t;     /*!< Type for signal bits. */
+typedef unsigned char sigbit_t;  /*!< Type for signal bits. */
 typedef unsigned char sigmask_t; /*!< Type for signal masks. */
 typedef unsigned char page_t;    /*!< Type for banked memory pages. */
 
