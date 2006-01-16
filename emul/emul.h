@@ -3,7 +3,7 @@
  * <!--
  * Copyright 2006 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000, 2001 Bernardo Innocenti <bernie@codewiz.org>
- * All Rights Reserved.
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \version $Id$
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/01/16 03:51:51  bernie
+ *#* Fix boilerplate.
+ *#*
  *#* Revision 1.1  2006/01/16 03:37:12  bernie
  *#* Add emulator skeleton.
  *#*
