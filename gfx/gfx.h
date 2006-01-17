@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/01/17 02:31:29  bernie
+ *#* Add bitmap format support; Improve some comments.
+ *#*
  *#* Revision 1.4  2006/01/16 03:30:57  bernie
  *#* Make header C++ friendly.
  *#*
@@ -67,6 +70,7 @@ typedef struct Bitmap
 {
 	uint8_t *raster;        /*!< Pointer to byte array to hold the data */
 	coord_t width, height;  /*!< Width/Height in pixels */
+	coord_t stride;		/*!< Bytes per row. */
 	coord_t penX, penY;     /*!< Current pen position MoveTo()/LineTo() */
 
 	Rect cr;                /*!< Clip drawing inside this rectangle */

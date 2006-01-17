@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/01/17 02:31:29  bernie
+ *#* Add bitmap format support; Improve some comments.
+ *#*
  *#* Revision 1.3  2005/11/27 23:33:40  bernie
  *#* Use appconfig.h instead of cfg/config.h.
  *#*
@@ -43,36 +46,60 @@
 
 #include <string.h>
 
+/**
+ * \name Known pixel formats for bitmap representation.
+ * \{
+ */
+#define BITMAP_FMT_PLANAR_H_MSB  1  /**< Planar pixels, horizontal bytes, MSB left. */
+#define BITMAP_FMT_PLANAR_V_LSB  2  /**< Planar pixels, vertical bytes, LSB top. */
+/* \} */
+
+#if CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_H_MSB
+
+	#define BM_ADDR(bm, x, y)  ((bm)->raster + (y) * (bm)->stride + ((x) / 8))
+	#define BM_MASK(bm, x, y)  (1 << (7 - (x) % 8))
+
+#elif CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_V_LSB
+
+	#define BM_ADDR(bm, x, y)  ((bm)->raster + ((y) / 8) * (bm)->stride + (x))
+	#define BM_MASK(bm, x, y)  (1 << ((y) % 8))
+
+#else
+	#error Unknown value of CONFIG_BITMAP_FMT
+#endif /* CONFIG_BITMAP_FMT */
 
 /*!
  * Plot a point in bitmap \a bm.
  *
- * \note bm is evaluated twice
+ * \note bm is evaluated twice.
+ * \see BM_CLEAR BM_DRAWPIXEL
  */
 #define BM_PLOT(bm, x, y) \
-	( *((bm)->raster + ((y) / 8) * (bm)->width + (x)) |= 1 << ((y) % 8) )
+	( *BM_ADDR(bm, x, y) |= BM_MASK(bm, x, y) )
 
 /*!
  * Clear a point in bitmap \a bm.
  *
- * \note bm is evaluated twice
+ * \note bm is evaluated twice.
+ * \see BM_PLOT BM_DRAWPIXEL
  */
 #define BM_CLEAR(bm, x, y) \
-	( *((bm)->raster + ((y) / 8) * (bm)->width + (x)) &= ~(1 << ((y) % 8)) )
+	( *BM_ADDR(bm, x, y) &= ~BM_MASK(bm, x, y) )
 
 /*!
  * Set a point in bitmap \a bm to the specified color.
  *
- * \note bm is evaluated twice
+ * \note bm is evaluated twice.
  * \note This macro is somewhat slower than BM_PLOT and BM_CLEAR.
  * \see BM_PLOT BM_CLEAR
  */
 #define BM_DRAWPIXEL(bm, x, y, fg_pen) \
 	do { \
-		uint8_t *p = (bm)->raster + ((y) / 8) * (bm)->width + (x); \
-		uint8_t mask = 1 << ((y) % 8); \
+		uint8_t *p = BM_ADDR(bm, x, y); \
+		uint8_t mask = BM_MASK(bm, x, y); \
 		*p = (*p & ~mask) | ((fg_pen) ? mask : 0); \
 	} while (0)
+
 
 /*!
  * Initialize a Bitmap structure with the provided parameters.
@@ -84,8 +111,20 @@ void gfx_bitmapInit(Bitmap *bm, uint8_t *raster, coord_t w, coord_t h)
 	bm->raster = raster;
 	bm->width = w;
 	bm->height = h;
+	#if (CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_H_MSB)
+		bm->stride = (w + 7) / 8;
+	#elif CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_V_LSB
+		bm->stride = w;
+	#else
+		#error Unknown value of CONFIG_BITMAP_FMT
+	#endif /* CONFIG_BITMAP_FMT */
 	bm->penX = 0;
 	bm->penY = 0;
+
+	bm->cr.xmin = 0;
+	bm->cr.ymin = 0;
+	bm->cr.xmax = w;
+	bm->cr.ymax = h;
 }
 
 
@@ -133,51 +172,59 @@ void gfx_line(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 #if CONFIG_GFX_CLIPPING
 	/* FIXME: broken */
 
-	#define XMIN 0
-	#define YMIN 0
-	#define XMAX (bm->width - 1)
-	#define YMAX (bm->height - 1)
+	#define XMIN (bm->cr.xmin)
+	#define YMIN (bm->cr.ymin)
+	#define XMAX (bm->cr.xmax - 1)
+	#define YMAX (bm->cr.ymax - 1)
 
 	/* Clipping */
 	if (x1 < XMIN)
 	{
-		y1 = y2 - ((x2 - XMIN) * (y2 - y1)) / (x2 - x1);
+		if (x2 != x1)
+			y1 = y2 - ((x2 - XMIN) * (y2 - y1)) / (x2 - x1);
 		x1 = XMIN;
 	}
 	if (y1 < YMIN)
 	{
-		x1 = x2 - ((y2 - YMIN) * (x2 - x1)) / (y2 - y1);
+		if (y2 != y1)
+			x1 = x2 - ((y2 - YMIN) * (x2 - x1)) / (y2 - y1);
 		y1 = YMIN;
 	}
 	if (x2 < XMIN)
 	{
-		y2 = y2 - ((XMIN - x1) * (y2 - y1)) / (x2 - x1);
+		if (x2 != x1)
+			y2 = y2 - ((XMIN - x1) * (y2 - y1)) / (x2 - x1);
 		x2 = XMIN;
 	}
 	if (y2 < YMIN)
 	{
-		x2 = x2 - ((YMIN - y1) * (x2 - x1)) / (y2 - y1);
+		if (y2 != y1)
+			x2 = x2 - ((YMIN - y1) * (x2 - x1)) / (y2 - y1);
 		y2 = YMIN;
 	}
 
 	if (x1 > XMAX)
 	{
-		y1 = ((x2 - XMAX) * (y2 - y1)) / (x2 - x1);
+		if (x2 != x1)
+			y1 = ((x2 - XMAX) * (y2 - y1)) / (x2 - x1);
 		x1 = XMAX;
 	}
 	if (y1 > YMAX)
 	{
-		x1 = ((y2 - YMAX) * (x2 - x1)) / (y2 - y1);
+		if (y2 != y1)
+			x1 = ((y2 - YMAX) * (x2 - x1)) / (y2 - y1);
 		y1 = YMAX;
 	}
 	if (x2 > XMAX)
 	{
-		y2 = ((XMAX - x1) * (y2 - y1)) / (x2 - x1);
+		if (x2 != x1)
+			y2 = ((XMAX - x1) * (y2 - y1)) / (x2 - x1);
 		x2 = XMAX;
 	}
 	if (y2 > YMAX)
 	{
-		x2 = ((YMAX - y1) * (x2 - x1)) / (y2 - y1);
+		if (y2 != y1)
+			x2 = ((YMAX - y1) * (x2 - x1)) / (y2 - y1);
 		y2 = YMAX;
 	}
 
@@ -286,7 +333,7 @@ void gfx_lineTo(Bitmap *bm, coord_t x, coord_t y)
 /*!
  * Draw an the outline of an hollow rectangle.
  *
- * \note The bottom-right border of the rectangle is not drawn.
+ * \note The bottom-right corner of the rectangle is drawn at (x2-1;y2-1).
  * \note This function does \b not update the current pen position
  */
 void gfx_rectDraw(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
@@ -308,7 +355,7 @@ void gfx_rectDraw(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
  *
  * \note The bottom-right border of the rectangle is not drawn.
  *
- * \note This function does \b not update the current pen position
+ * \note This function does \b not update the current pen position.
  */
 void gfx_rectFillC(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2, uint8_t color)
 {
@@ -352,7 +399,7 @@ void gfx_rectFillC(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2, u
  *
  * \note The bottom-right border of the rectangle is not drawn.
  *
- * \note This function does \b not update the current pen position
+ * \note This function does \b not update the current pen position.
  */
 void gfx_rectFill(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 {
@@ -363,9 +410,9 @@ void gfx_rectFill(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 /*!
  * Clear a rectangular area.
  *
- * \note The bottom-right border of the rectangle is not drawn.
+ * \note The bottom-right border of the rectangle is not cleared.
  *
- * \note This function does \b not update the current pen position
+ * \note This function does \b not update the current pen position.
  */
 void gfx_rectClear(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 {
