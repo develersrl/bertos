@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/01/17 23:00:26  bernie
+ *#* Don't use hardcoded coordinates.
+ *#*
  *#* Revision 1.2  2006/01/17 02:31:57  bernie
  *#* Test gfx with the usual pentagons.
  *#*
@@ -43,24 +46,26 @@ int main(int argc, char *argv[])
 
 	coord_t x = 0, y = LCD_WIDTH / 2;
 	coord_t xdir = +1, ydir = -1;
+	Bitmap *bm = &lcd_bitmap;
 
 	for(;;)
 	{
-		gfx_bitmapClear(&lcd_bitmap);
-		gfx_rectDraw(&lcd_bitmap, 10, 10, LCD_WIDTH-10, LCD_HEIGHT-10);
-		gfx_setClipRect(&lcd_bitmap, 10, 10, LCD_WIDTH-10, LCD_HEIGHT-10);
-		magic(&lcd_bitmap, x, y);
+		gfx_bitmapClear(bm);
+		gfx_setClipRect(bm, 0, 0, bm->width, bm->height);
+		gfx_rectDraw(bm, 10, 10, bm->width-10, bm->height-10);
+		gfx_setClipRect(bm, 11, 11, bm->width-11, bm->height-11);
+		magic(bm, x, y);
 
 		x += xdir;
 		y += ydir;
-		if (x >= LCD_WIDTH)  xdir = -1;
+		if (x >= bm->width)  xdir = -1;
 		if (x <= -50)        xdir = +1;
-		if (y >= LCD_HEIGHT) ydir = -1;
+		if (y >= bm->height) ydir = -1;
 		if (y <= -50)        ydir = +1;
 
-		lcd_blit_bitmap(&lcd_bitmap);
+		lcd_blit_bitmap(bm);
 		emul_idle();
-		usleep(100);
+		usleep(10000);
 	}
 
 	emul_cleanup();
