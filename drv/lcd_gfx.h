@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/01/17 22:59:48  bernie
+ *#* Hardcode a different display size.
+ *#*
  *#* Revision 1.1  2006/01/16 03:50:57  bernie
  *#* Import into DevLib.
  *#*
@@ -69,8 +72,8 @@
 #define LCD_MIN_PWM 130
 
 /* Display bitmap dims */
-#define LCD_WIDTH 122
-#define LCD_HEIGHT 32
+#define LCD_WIDTH 128
+#define LCD_HEIGHT 64
 
 /* fwd decl */
 struct Bitmap;
