@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/01/17 02:30:06  bernie
+ *#* Add new config vars.
+ *#*
  *#* Revision 1.2  2005/11/27 03:04:57  bernie
  *#* CONFIG_WATCHDOG: New config option.
  *#*
@@ -157,5 +160,11 @@
 
 //! EEPROM type for drv/eeprom.c
 #define CONFIG_EEPROM_TYPE EEPROM_24XX256
+
+/// Select bitmap pixel format.
+#define CONFIG_BITMAP_FMT  BITMAP_FMT_PLANAR_H_MSB
+
+/// Enable line clipping algorithm
+#define CONFIG_GFX_CLIPPING 1
 
 #endif /* CONFIG_COMMON_H */
