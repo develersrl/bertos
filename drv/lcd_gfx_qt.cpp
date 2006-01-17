@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/01/17 02:30:43  bernie
+ *#* Fix QImage format.
+ *#*
  *#* Revision 1.1  2006/01/16 03:51:35  bernie
  *#* Add LCD Qt emulator.
  *#*
@@ -21,6 +24,7 @@
 
 #include "lcd_gfx_qt.h"
 #include <emul/emul.h>
+#include <cfg/debug.h>
 
 #include <qpainter.h>
 #include <qimage.h>
@@ -68,7 +72,7 @@ QSize EmulLCD::sizeHint() const
 
 void EmulLCD::drawContents(QPainter *p)
 {
-	QImage img(raster, WIDTH, HEIGHT, 1, NULL, 0, QImage::IgnoreEndian);
+	QImage img(raster, WIDTH, HEIGHT, 1, NULL, 0, QImage::BigEndian);
 
 	p->setBackgroundMode(OpaqueMode);
 	p->setPen(fg_color);
@@ -95,7 +99,7 @@ void EmulLCD::writeRaster(uint8_t *new_raster)
  * as required by the LCD driver.
  */
 DECLARE_WALL(wall_before_raster, WALL_SIZE)
-static uint8_t lcd_raster[EmulLCD::WIDTH * ((EmulLCD::HEIGHT + 7) / 8)];
+static uint8_t lcd_raster[(EmulLCD::WIDTH + 7 / 8) * EmulLCD::HEIGHT];
 DECLARE_WALL(wall_after_raster, WALL_SIZE)
 
 /*! Default LCD bitmap */
@@ -103,12 +107,16 @@ struct Bitmap lcd_bitmap;
 
 extern "C" void lcd_init(void)
 {
+	//INIT_WALL(wall_before_raster);
+	//INIT_WALL(wall_after_raster);
 	gfx_bitmapInit(&lcd_bitmap, lcd_raster, EmulLCD::WIDTH, EmulLCD::HEIGHT);
 	gfx_bitmapClear(&lcd_bitmap);
 }
 
 extern "C" void lcd_blit_bitmap(Bitmap *bm)
 {
+	//CHECK_WALL(wall_before_raster);
+	//CHECK_WALL(wall_after_raster);
 	emul->emulLCD->writeRaster(bm->raster);
 }
 
