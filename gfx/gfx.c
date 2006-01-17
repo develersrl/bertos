@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/01/17 22:59:23  bernie
+ *#* Implement correct line clipping algorithm.
+ *#*
  *#* Revision 1.4  2006/01/17 02:31:29  bernie
  *#* Add bitmap format support; Improve some comments.
  *#*
@@ -157,84 +160,21 @@ void gfx_blit_P(Bitmap *bm, const pgm_uint8_t *raster)
 
 
 /*!
- * Draw a line on the bitmap \a bm using the specified start and end
- * coordinates.
+ * Draw a sloped line without performing clipping.
  *
- * \note This function does \b not update the current pen position.
+ * Parameters are the same of gfx_line().
+ * This routine is based on the Bresenham Line-Drawing Algorithm.
+ *
+ * \note Passing coordinates outside the bitmap boundaries will
+ *       result in memory trashing.
  *
  * \todo Optimize for vertical and horiziontal lines.
+ *
+ * \sa gfx_line()
  */
-void gfx_line(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
+static void gfx_lineUnclipped(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 {
 	int x, y, e, len, adx, ady, signx, signy;
-
-
-#if CONFIG_GFX_CLIPPING
-	/* FIXME: broken */
-
-	#define XMIN (bm->cr.xmin)
-	#define YMIN (bm->cr.ymin)
-	#define XMAX (bm->cr.xmax - 1)
-	#define YMAX (bm->cr.ymax - 1)
-
-	/* Clipping */
-	if (x1 < XMIN)
-	{
-		if (x2 != x1)
-			y1 = y2 - ((x2 - XMIN) * (y2 - y1)) / (x2 - x1);
-		x1 = XMIN;
-	}
-	if (y1 < YMIN)
-	{
-		if (y2 != y1)
-			x1 = x2 - ((y2 - YMIN) * (x2 - x1)) / (y2 - y1);
-		y1 = YMIN;
-	}
-	if (x2 < XMIN)
-	{
-		if (x2 != x1)
-			y2 = y2 - ((XMIN - x1) * (y2 - y1)) / (x2 - x1);
-		x2 = XMIN;
-	}
-	if (y2 < YMIN)
-	{
-		if (y2 != y1)
-			x2 = x2 - ((YMIN - y1) * (x2 - x1)) / (y2 - y1);
-		y2 = YMIN;
-	}
-
-	if (x1 > XMAX)
-	{
-		if (x2 != x1)
-			y1 = ((x2 - XMAX) * (y2 - y1)) / (x2 - x1);
-		x1 = XMAX;
-	}
-	if (y1 > YMAX)
-	{
-		if (y2 != y1)
-			x1 = ((y2 - YMAX) * (x2 - x1)) / (y2 - y1);
-		y1 = YMAX;
-	}
-	if (x2 > XMAX)
-	{
-		if (x2 != x1)
-			y2 = ((XMAX - x1) * (y2 - y1)) / (x2 - x1);
-		x2 = XMAX;
-	}
-	if (y2 > YMAX)
-	{
-		if (y2 != y1)
-			x2 = ((YMAX - y1) * (x2 - x1)) / (y2 - y1);
-		y2 = YMAX;
-	}
-
-	#undef XMIN
-	#undef YMIN
-	#undef XMAX
-	#undef YMAX
-
-#endif /* CONFIG_GFX_CLIPPING */
-
 
 	if (x2 > x1)
 	{
@@ -274,8 +214,8 @@ void gfx_line(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 		while (len--)
 		{
 			/* Sanity check */
-			if ((x >= 0) && (x < bm->width) && (y >= 0) && (y < bm->height))
-				BM_PLOT(bm, x, y);
+			ASSERT((x >= 0) && (x < bm->width) && (y >= 0) && (y < bm->height));
+			BM_PLOT(bm, x, y);
 			x += signx;
 			e += ady;
 			if (e >= 0)
@@ -294,8 +234,8 @@ void gfx_line(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 		while (len--)
 		{
 			/* Sanity check */
-			if ((x >= 0) && (x < bm->width) && (y >= 0) && (y < bm->height))
-				BM_PLOT(bm, x, y);
+			ASSERT ((x >= 0) && (x < bm->width) && (y >= 0) && (y < bm->height));
+			BM_PLOT(bm, x, y);
 			y += signy;
 			e += adx;
 			if (e >= 0)
@@ -307,9 +247,105 @@ void gfx_line(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 	}
 }
 
+//! Helper routine for gfx_line().
+static int gfx_findRegion(int x, int y, Rect *cr)
+{
+	int code = 0;
+
+	if (y >= cr->ymax)
+		code |= 1; /* below */
+	else if (y < cr->ymin)
+		code |= 2; /* above */
+
+	if (x >= cr->xmax)
+		code |= 4; /* right */
+	else if (x < cr->xmin)
+		code |= 8; /* left */
+
+	return code;
+}
+
+/**
+ * Draw a sloped line segment.
+ *
+ * Draw a sloped line segment identified by the provided
+ * start and end coordinates on the bitmap \a bm.
+ *
+ * The line endpoints are clipped inside the current bitmap
+ * clipping rectangle using the Cohen-Sutherland algorithm,
+ * which is very fast.
+ *
+ * \note The point at coordinates \a x2 \a y2 is not drawn.
+ *
+ * \note This function does \b not update the current pen position.
+ *
+ * \todo Compute updated Bresenham error term.
+ */
+void gfx_line(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
+{
+#if CONFIG_GFX_CLIPPING
+	int clip1 = gfx_findRegion(x1, y1, &bm->cr);
+	int clip2 = gfx_findRegion(x2, y2, &bm->cr);
+
+	/* Loop while there is at least one point outside */
+	while (clip1 | clip2)
+	{
+		/* Check for line totally outside */
+		if (clip1 & clip2)
+			return;
+
+		int c = clip1 ? clip1 : clip2;
+		int x, y;
+
+		if (c & 1) /* Below */
+		{
+			x = x1 + (x2 - x1) * (bm->cr.ymax - y1) / (y2 - y1);
+			y = bm->cr.ymax - 1;
+		}
+		else if (c & 2) /* Above */
+		{
+			x = x1 + (x2 - x1) * (bm->cr.ymin - y1) / (y2 - y1);
+			y = bm->cr.ymin;
+		}
+		else if (c & 4) /* Right */
+		{
+			y = y1 + (y2 - y1) * (bm->cr.xmax - x1) / (x2 - x1);
+			x = bm->cr.xmax - 1;
+		}
+		else /* Left */
+		{
+			y = y1 + (y2 - y1) * (bm->cr.xmin - x1) / (x2 - x1);
+			x = bm->cr.xmin;
+		}
+
+		if (c == clip1) /* First endpoint was clipped */
+		{
+			// TODO: adjust Bresenham error term
+			//coord_t clipdx = ABS(x - x1);
+			//coord_t clipdy = ABS(y - y1);
+			//e += (clipdy * e2) + ((clipdx - clipdy) * e1);
+
+			x1 = x;
+			y1 = y;
+			clip1 = gfx_findRegion(x1, y1, &bm->cr);
+		}
+		else /* Second endpoint was clipped */
+		{
+			x2 = x;
+			y2 = y;
+			clip2 = gfx_findRegion(x2, y2, &bm->cr);
+		}
+	}
+#endif /* CONFIG_GFX_CLIPPING */
+
+	gfx_lineUnclipped(bm, x1, y1, x2, y2);
+}
 
 /*!
  * Move the current pen position to the specified coordinates.
+ *
+ * The pen position is used for drawing operations such as
+ * gfx_lineTo(), which can be used to draw polygons.
  */
 void gfx_moveTo(Bitmap *bm, coord_t x, coord_t y)
 {
@@ -322,6 +358,8 @@ void gfx_moveTo(Bitmap *bm, coord_t x, coord_t y)
  *
  * \note This function moves the current pen position to the
  *       new coordinates.
+ *
+ * \sa gfx_line()
  */
 void gfx_lineTo(Bitmap *bm, coord_t x, coord_t y)
 {
@@ -331,10 +369,10 @@ void gfx_lineTo(Bitmap *bm, coord_t x, coord_t y)
 
 
 /*!
- * Draw an the outline of an hollow rectangle.
+ * Draw the perimeter of an hollow rectangle.
  *
  * \note The bottom-right corner of the rectangle is drawn at (x2-1;y2-1).
- * \note This function does \b not update the current pen position
+ * \note This function does \b not update the current pen position.
  */
 void gfx_rectDraw(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 {
@@ -365,20 +403,19 @@ void gfx_rectFillC(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2, u
 	if (x1 > x2) SWAP(x1, x2);
 	if (y1 > y2) SWAP(y1, y2);
 
-	/* Clip rect to bitmap bounds */
-	if (x1 < 0)             x1 = 0;
-	if (x2 < 0)             x2 = 0;
-	if (x1 > bm->width)     x1 = bm->width;
-	if (x2 > bm->width)     x2 = bm->width;
-	if (y1 < 0)             y1 = 0;
-	if (y2 < 0)             y2 = 0;
-	if (y1 > bm->width)     y1 = bm->width;
-	if (y2 > bm->width)     y2 = bm->width;
+#if CONFIG_GFX_CLIPPING
+	/* Clip rect to bitmap clip region */
+	if (x1 < bm->cr.xmin)   x1 = bm->cr.xmin;
+	if (x2 < bm->cr.xmin)   x2 = bm->cr.xmin;
+	if (x1 > bm->cr.xmax)   x1 = bm->cr.xmax;
+	if (x2 > bm->cr.xmax)   x2 = bm->cr.xmax;
+	if (y1 < bm->cr.ymin)   y1 = bm->cr.ymin;
+	if (y2 < bm->cr.ymin)   y2 = bm->cr.ymin;
+	if (y1 > bm->cr.ymax)   y1 = bm->cr.ymax;
+	if (y2 > bm->cr.ymax)   y2 = bm->cr.ymax;
+#endif
 
-	/*
-	 * Draw rectangle
-	 * NOTE: Code paths are duplicated for efficiency
-	 */
+	/* NOTE: Code paths are duplicated for efficiency */
 	if (color) /* fill */
 	{
 		for (x = x1; x < x2; x++)
@@ -421,7 +458,14 @@ void gfx_rectClear(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 
 
 /*!
- * Imposta un rettangolo di clipping per il disegno nella bitmap.
+ * Set the bitmap clipping rectangle to the specified coordinates.
+ *
+ * All drawing performed on the bitmap will be clipped inside this
+ * rectangle.
+ *
+ * \note Following the convention used in all other operations, the
+ *       top-left pixels of the rectangle are included, while the
+ *       bottom-right pixels are considered outside the clipping region.
  */
 void gfx_setClipRect(Bitmap *bm, coord_t minx, coord_t miny, coord_t maxx, coord_t maxy)
 {
