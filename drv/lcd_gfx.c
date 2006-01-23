@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/01/23 23:11:27  bernie
+ *#* Use RASTER_SIZE() to compute... err... the raster size.
+ *#*
  *#* Revision 1.1  2006/01/16 03:50:57  bernie
  *#* Import into DevLib.
  *#*
@@ -222,7 +225,7 @@
  * as required by the LCD driver.
  */
 DECLARE_WALL(wall_before_raster, WALL_SIZE)
-static uint8_t lcd_raster[LCD_WIDTH * ((LCD_HEIGHT + 7) / 8)];
+static uint8_t lcd_raster[RASTER_SIZE(LCD_WIDTH, LCD_HEIGHT)];
 DECLARE_WALL(wall_after_raster, WALL_SIZE)
 
 /*! Default LCD bitmap */
