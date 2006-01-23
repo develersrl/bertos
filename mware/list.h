@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.16  2006/01/23 23:10:38  bernie
+ *#* REVERSE_FOREACH_NODE(): New macro; FOREACHNODE(): Rename to FOREACH_NODE.
+ *#*
  *#* Revision 1.15  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -87,7 +90,7 @@ typedef struct _Node
  *
  * Nodes can be added and removed from either end of the list
  * with O(1) performance.  Iterating over these lists can be
- * tricky: use the FOREACHNODE() macro instead.
+ * tricky: use the FOREACH_NODE() macro instead.
  */
 typedef struct _List
 {
@@ -118,9 +121,9 @@ typedef struct _List
  *        Foo *fp;
  *
  *        LIST_INIT(&foo_list);
- *        LIST_ADDHEAD(&foo_list, &foo1);
+ *        ADDHEAD(&foo_list, &foo1);
  *        INSERTBEFORE(&foo_list, &foo2);
- *        FOREACHNODE(fp, &foo_list)
+ *        FOREACH_NODE(fp, &foo_list)
  *		fp->a = 10;
  *    }
  *
@@ -165,11 +168,27 @@ typedef struct _List
  * \param n   Node pointer to be used in each iteration.
  * \param l   Pointer to list.
  */
-#define FOREACHNODE(n, l) \
+#define FOREACH_NODE(n, l) \
 	for( \
 		(n) = (typeof(n))LIST_HEAD(l); \
 		((Node *)(n))->succ; \
 		(n) = (typeof(n))(((Node *)(n))->succ) \
+	)
+
+#define FOREACHNODE FOREACH_NODE /* OBSOLETE */
+
+/*!
+ * Iterate backwards over all nodes in a list.
+ *
+ * This macro generates a "for" statement using the following parameters:
+ * \param n   Node pointer to be used in each iteration.
+ * \param l   Pointer to list.
+ */
+#define REVERSE_FOREACH_NODE(n, l) \
+	for( \
+		(n) = (typeof(n))LIST_TAIL(l); \
+		((Node *)(n))->pred; \
+		(n) = (typeof(n))(((Node *)(n))->pred) \
 	)
 
 /*! Initialize a list. */
@@ -191,7 +210,7 @@ typedef struct _List
 			ASSERT((l)->tail.succ == NULL); \
 			ASSERT((l)->tail.pred != NULL); \
 			pred = &(l)->head; \
-			FOREACHNODE(n, l) \
+			FOREACH_NODE(n, l) \
 			{ \
 				ASSERT(n->pred == pred); \
 				pred = n; \
