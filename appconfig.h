@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/01/23 23:12:27  bernie
+ *#* Enable CONFIG_GFX_VCOORDS.
+ *#*
  *#* Revision 1.3  2006/01/17 02:30:06  bernie
  *#* Add new config vars.
  *#*
@@ -164,7 +167,10 @@
 /// Select bitmap pixel format.
 #define CONFIG_BITMAP_FMT  BITMAP_FMT_PLANAR_H_MSB
 
-/// Enable line clipping algorithm
+/// Enable line clipping algorithm.
 #define CONFIG_GFX_CLIPPING 1
+
+/// Enable virtual coordinate system.
+#define CONFIG_GFX_VCOORDS 1
 
 #endif /* CONFIG_COMMON_H */
