@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/01/23 23:13:04  bernie
+ *#* RECT_WIDTH(), RECT_HEIGHT(), RASTER_SIZE(): New macros.
+ *#*
  *#* Revision 1.5  2006/01/17 02:31:29  bernie
  *#* Add bitmap format support; Improve some comments.
  *#*
@@ -60,7 +63,43 @@ typedef float vcoord_t;
 #endif /* CONFIG_GFX_VCOORDS */
 
 
+/**
+ * Describe a rectangular area with coordinates expressed in pixels.
+ *
+ * The rectangle is represented in terms of its top/left and
+ * right/bottom borders.
+ *
+ * In some cases, rectangles are assumed to obey to the
+ * following invariants:
+ *
+ *    xmin <= xmax
+ *    ymin <= ymax
+ *
+ * Oddly, the xmin and ymin coordinates are inclusive, while the
+ * xmax and ymax coordinates are non-inclusive.  This design
+ * decision makes several computations simpler and lets you
+ * specify empty (0x0) rectangles without breaking the
+ * invariants.
+ *
+ * Computing the size of a rectangle can be done by simply
+ * subtracting the maximum X or Y coordinate from the minimum
+ * X or Y coordinate.
+ */
 typedef struct Rect { coord_t xmin, ymin, xmax, ymax; } Rect;
+
+/**
+ * Return the width of a rectangle in pixels.
+ *
+ * \note The argument \a r is evaluated twice.
+ */
+#define RECT_WIDTH(r)   ((r)->xmax - (r)->xmin)
+
+/**
+ * Return the height of a rectangle in pixels.
+ *
+ * \note The argument \a r is evaluated twice.
+ */
+#define RECT_HEIGHT(r)  ((r)->ymax - (r)->ymin)
 
 
 /*!
@@ -87,10 +126,28 @@ typedef struct Bitmap
 
 } Bitmap;
 
+#if CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_H_MSB
+	/**
+	 * Compute the size in bytes of a raster suitable for
+	 * holding a bitmap of \a width x \a height pixels.
+	 */
+	#define RASTER_SIZE(width, height) ( ((width) + 7 / 8) * (height) )
+
+#elif CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_V_LSB
+	/**
+	 * Compute the size in bytes of a raster suitable for
+	 * holding a bitmap of \a width x \a height pixels.
+	 */
+	#define RASTER_SIZE(width, height) ( (width) * (((height) + 7) / 8) )
+#else
+	#error Unknown value of CONFIG_BITMAP_FMT
+#endif /* CONFIG_BITMAP_FMT */
+
 
 /* Function prototypes */
 extern void gfx_bitmapInit (Bitmap *bm, uint8_t *raster, coord_t w, coord_t h);
 extern void gfx_bitmapClear(Bitmap *bm);
+extern void gfx_blit       (Bitmap *dst, Rect *rect, Bitmap *src, coord_t srcx, coord_t srcy);
 extern void gfx_line       (Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2);
 extern void gfx_rectDraw   (Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2);
 extern void gfx_rectFillC  (Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2, uint8_t color);
@@ -104,7 +161,6 @@ extern void gfx_setClipRect(Bitmap *bm, coord_t xmin, coord_t ymin, coord_t xmax
 	#include <mware/pgm.h>
 	extern void gfx_blit_P(Bitmap *bm, const pgm_uint8_t *raster);
 #endif
-
 
 #if CONFIG_GFX_VCOORDS
 extern void gfx_setViewRect(Bitmap *bm, vcoord_t x1, vcoord_t y1, vcoord_t x2, vcoord_t y2);
