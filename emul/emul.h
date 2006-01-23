@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/01/23 23:12:08  bernie
+ *#* Let Doxygen see through C++ protected section.
+ *#*
  *#* Revision 1.2  2006/01/16 03:51:51  bernie
  *#* Fix boilerplate.
  *#*
@@ -28,7 +31,7 @@
 
 #include <cfg/compiler.h>
 
-#ifdef __cplusplus
+#if defined(__cplusplus) || defined(__doxygen__)
 
 // fwd decls
 class QApplication;
