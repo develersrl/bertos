@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/01/23 23:13:39  bernie
+ *#* gfx_blit(): New function, but dog slow for now.
+ *#*
  *#* Revision 1.5  2006/01/17 22:59:23  bernie
  *#* Implement correct line clipping algorithm.
  *#*
@@ -72,7 +75,7 @@
 #endif /* CONFIG_BITMAP_FMT */
 
 /*!
- * Plot a point in bitmap \a bm.
+ * Plot a pixel in bitmap \a bm.
  *
  * \note bm is evaluated twice.
  * \see BM_CLEAR BM_DRAWPIXEL
@@ -81,7 +84,7 @@
 	( *BM_ADDR(bm, x, y) |= BM_MASK(bm, x, y) )
 
 /*!
- * Clear a point in bitmap \a bm.
+ * Clear a pixel in bitmap \a bm.
  *
  * \note bm is evaluated twice.
  * \see BM_PLOT BM_DRAWPIXEL
@@ -90,7 +93,7 @@
 	( *BM_ADDR(bm, x, y) &= ~BM_MASK(bm, x, y) )
 
 /*!
- * Set a point in bitmap \a bm to the specified color.
+ * Set a pixel in bitmap \a bm to the specified color.
  *
  * \note bm is evaluated twice.
  * \note This macro is somewhat slower than BM_PLOT and BM_CLEAR.
@@ -103,6 +106,16 @@
 		*p = (*p & ~mask) | ((fg_pen) ? mask : 0); \
 	} while (0)
 
+/*!
+ * Get the value of the pixel in bitmap \a bm.
+ *
+ * \return The returned value is either 0 or 1.
+ *
+ * \note bm is evaluated twice.
+ * \see BM_DRAWPIXEL
+ */
+#define BM_READPIXEL(bm, x, y) \
+	( *BM_ADDR(bm, x, y) & BM_MASK(bm, x, y) ? 1 : 0 )
 
 /*!
  * Initialize a Bitmap structure with the provided parameters.
@@ -124,21 +137,23 @@ void gfx_bitmapInit(Bitmap *bm, uint8_t *raster, coord_t w, coord_t h)
 	bm->penX = 0;
 	bm->penY = 0;
 
+#if CONFIG_GFX_CLIPPING
 	bm->cr.xmin = 0;
 	bm->cr.ymin = 0;
 	bm->cr.xmax = w;
 	bm->cr.ymax = h;
+#endif /* CONFIG_GFX_CLIPPING */
 }
 
 
 /*!
  * Clear the whole bitmap surface to the background color.
  *
- * \note This function does \b not update the current pen position
+ * \note This function does \b not update the current pen position.
  */
 void gfx_bitmapClear(Bitmap *bm)
 {
-	memset(bm->raster, 0, (bm->width * bm->height) / 8);
+	memset(bm->raster, 0, RASTER_SIZE(bm->width, bm->height));
 }
 
 
@@ -158,6 +173,46 @@ void gfx_blit_P(Bitmap *bm, const pgm_uint8_t *raster)
 }
 #endif /* CPU_HARVARD */
 
+/**
+ * Copy a rectangular area of a bitmap on another bitmap.
+ *
+ * Blitting is a common copy operation involving two bitmaps.
+ * A rectangular area of the source bitmap is copied bit-wise
+ * to a different position in the destination bitmap.
+ *
+ * \note Using the same bitmap for \a src and \a dst is unsupported.
+ *
+ * \param dst Bitmap where the operation writes
+ *
+ */
+void gfx_blit(Bitmap *dst, Rect *rect, Bitmap *src, coord_t srcx, coord_t srcy)
+{
+	coord_t dxmin, dymin, dxmax, dymax;
+	coord_t dx, dy, sx, sy;
+
+	/*
+	 * Clip coordinates inside dst->cr and src->width/height.
+	 */
+	dxmin = rect->xmin;
+	if (dxmin < dst->cr.xmin)
+	{
+		srcx += dst->cr.xmin - dxmin;
+		dxmin = dst->cr.xmin;
+	}
+	dymin = rect->ymin;
+	if (dymin < dst->cr.ymin)
+	{
+		srcy += dst->cr.ymin - dymin;
+		dymin = dst->cr.ymin;
+	}
+	dxmax = MIN(MIN(rect->xmax, rect->xmin + src->width), dst->cr.xmax);
+	dymax = MIN(MIN(rect->ymax, rect->ymin + src->height), dst->cr.ymax);
+
+	/* TODO: make it not as dog slow as this */
+	for (dx = dxmin, sx = srcx; dx < dxmax; ++dx, ++sx)
+		for (dy = dymin, sy = srcy; dy < dymax; ++dy, ++sy)
+			BM_DRAWPIXEL(dst, dx, dy, BM_READPIXEL(src, sx, sy));
+}
 
 /*!
  * Draw a sloped line without performing clipping.
