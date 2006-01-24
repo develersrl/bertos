@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/01/24 21:55:43  aleph
+ *#* gfx_blit_P(): use RASTER_SIZE() to calculate raster size
+ *#*
  *#* Revision 1.1  2006/01/24 02:17:49  bernie
  *#* Split out gfx.c into bitmap.c and line.c.
  *#*
@@ -83,7 +86,7 @@ void gfx_bitmapClear(Bitmap *bm)
  */
 void gfx_blit_P(Bitmap *bm, const pgm_uint8_t *raster)
 {
-	memcpy_P(bm->raster, raster, (bm->height / 8) * bm->width);
+	memcpy_P(bm->raster, raster, RASTER_SIZE(bm->width, bm->height));
 }
 #endif /* CPU_HARVARD */
 
