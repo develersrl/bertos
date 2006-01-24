@@ -11,208 +11,23 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  * \author Stefano Fedrigo <aleph@develer.com>
  *
- * \brief General pourpose graphics routines
+ * \brief Line drawing graphics routines
  */
 
 /*#*
  *#* $Log$
- *#* Revision 1.6  2006/01/23 23:13:39  bernie
- *#* gfx_blit(): New function, but dog slow for now.
+ *#* Revision 1.1  2006/01/24 02:17:49  bernie
+ *#* Split out gfx.c into bitmap.c and line.c.
  *#*
- *#* Revision 1.5  2006/01/17 22:59:23  bernie
- *#* Implement correct line clipping algorithm.
- *#*
- *#* Revision 1.4  2006/01/17 02:31:29  bernie
- *#* Add bitmap format support; Improve some comments.
- *#*
- *#* Revision 1.3  2005/11/27 23:33:40  bernie
- *#* Use appconfig.h instead of cfg/config.h.
- *#*
- *#* Revision 1.2  2005/11/04 18:17:45  bernie
- *#* Fix header guards and includes for new location of gfx module.
- *#*
- *#* Revision 1.1  2005/11/04 18:11:35  bernie
- *#* Move graphics stuff from mware/ to gfx/.
- *#*
- *#* Revision 1.14  2005/11/04 16:20:02  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.13  2005/04/11 19:10:28  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.12  2005/03/01 23:26:45  bernie
- *#* Use new CPU-neutral program-memory API.
  *#*/
 
 #include "gfx.h"
-#include <appconfig.h>  /* CONFIG_GFX_CLIPPING */
-#include <cfg/debug.h>
+#include "gfx_p.h"
+
+#include <cfg/debug.h>   /* ASSERT() */
 #include <cfg/cpu.h>     /* CPU_HARVARD */
 #include <cfg/macros.h>  /* SWAP() */
-
-#include <string.h>
-
-/**
- * \name Known pixel formats for bitmap representation.
- * \{
- */
-#define BITMAP_FMT_PLANAR_H_MSB  1  /**< Planar pixels, horizontal bytes, MSB left. */
-#define BITMAP_FMT_PLANAR_V_LSB  2  /**< Planar pixels, vertical bytes, LSB top. */
-/* \} */
-
-#if CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_H_MSB
-
-	#define BM_ADDR(bm, x, y)  ((bm)->raster + (y) * (bm)->stride + ((x) / 8))
-	#define BM_MASK(bm, x, y)  (1 << (7 - (x) % 8))
-
-#elif CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_V_LSB
-
-	#define BM_ADDR(bm, x, y)  ((bm)->raster + ((y) / 8) * (bm)->stride + (x))
-	#define BM_MASK(bm, x, y)  (1 << ((y) % 8))
-
-#else
-	#error Unknown value of CONFIG_BITMAP_FMT
-#endif /* CONFIG_BITMAP_FMT */
-
-/*!
- * Plot a pixel in bitmap \a bm.
- *
- * \note bm is evaluated twice.
- * \see BM_CLEAR BM_DRAWPIXEL
- */
-#define BM_PLOT(bm, x, y) \
-	( *BM_ADDR(bm, x, y) |= BM_MASK(bm, x, y) )
-
-/*!
- * Clear a pixel in bitmap \a bm.
- *
- * \note bm is evaluated twice.
- * \see BM_PLOT BM_DRAWPIXEL
- */
-#define BM_CLEAR(bm, x, y) \
-	( *BM_ADDR(bm, x, y) &= ~BM_MASK(bm, x, y) )
-
-/*!
- * Set a pixel in bitmap \a bm to the specified color.
- *
- * \note bm is evaluated twice.
- * \note This macro is somewhat slower than BM_PLOT and BM_CLEAR.
- * \see BM_PLOT BM_CLEAR
- */
-#define BM_DRAWPIXEL(bm, x, y, fg_pen) \
-	do { \
-		uint8_t *p = BM_ADDR(bm, x, y); \
-		uint8_t mask = BM_MASK(bm, x, y); \
-		*p = (*p & ~mask) | ((fg_pen) ? mask : 0); \
-	} while (0)
-
-/*!
- * Get the value of the pixel in bitmap \a bm.
- *
- * \return The returned value is either 0 or 1.
- *
- * \note bm is evaluated twice.
- * \see BM_DRAWPIXEL
- */
-#define BM_READPIXEL(bm, x, y) \
-	( *BM_ADDR(bm, x, y) & BM_MASK(bm, x, y) ? 1 : 0 )
-
-/*!
- * Initialize a Bitmap structure with the provided parameters.
- *
- * \note The pen position is reset to the origin.
- */
-void gfx_bitmapInit(Bitmap *bm, uint8_t *raster, coord_t w, coord_t h)
-{
-	bm->raster = raster;
-	bm->width = w;
-	bm->height = h;
-	#if (CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_H_MSB)
-		bm->stride = (w + 7) / 8;
-	#elif CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_V_LSB
-		bm->stride = w;
-	#else
-		#error Unknown value of CONFIG_BITMAP_FMT
-	#endif /* CONFIG_BITMAP_FMT */
-	bm->penX = 0;
-	bm->penY = 0;
-
-#if CONFIG_GFX_CLIPPING
-	bm->cr.xmin = 0;
-	bm->cr.ymin = 0;
-	bm->cr.xmax = w;
-	bm->cr.ymax = h;
-#endif /* CONFIG_GFX_CLIPPING */
-}
-
-
-/*!
- * Clear the whole bitmap surface to the background color.
- *
- * \note This function does \b not update the current pen position.
- */
-void gfx_bitmapClear(Bitmap *bm)
-{
-	memset(bm->raster, 0, RASTER_SIZE(bm->width, bm->height));
-}
-
-
-#if CPU_HARVARD
-
-#include <avr/pgmspace.h> /* FIXME: memcpy_P() */
-
-/*!
- * Copy a raster picture located in program memory in the bitmap.
- * The size of the raster to copy *must* be the same of the raster bitmap.
- *
- * \note This function does \b not update the current pen position
- */
-void gfx_blit_P(Bitmap *bm, const pgm_uint8_t *raster)
-{
-	memcpy_P(bm->raster, raster, (bm->height / 8) * bm->width);
-}
-#endif /* CPU_HARVARD */
-
-/**
- * Copy a rectangular area of a bitmap on another bitmap.
- *
- * Blitting is a common copy operation involving two bitmaps.
- * A rectangular area of the source bitmap is copied bit-wise
- * to a different position in the destination bitmap.
- *
- * \note Using the same bitmap for \a src and \a dst is unsupported.
- *
- * \param dst Bitmap where the operation writes
- *
- */
-void gfx_blit(Bitmap *dst, Rect *rect, Bitmap *src, coord_t srcx, coord_t srcy)
-{
-	coord_t dxmin, dymin, dxmax, dymax;
-	coord_t dx, dy, sx, sy;
-
-	/*
-	 * Clip coordinates inside dst->cr and src->width/height.
-	 */
-	dxmin = rect->xmin;
-	if (dxmin < dst->cr.xmin)
-	{
-		srcx += dst->cr.xmin - dxmin;
-		dxmin = dst->cr.xmin;
-	}
-	dymin = rect->ymin;
-	if (dymin < dst->cr.ymin)
-	{
-		srcy += dst->cr.ymin - dymin;
-		dymin = dst->cr.ymin;
-	}
-	dxmax = MIN(MIN(rect->xmax, rect->xmin + src->width), dst->cr.xmax);
-	dymax = MIN(MIN(rect->ymax, rect->ymin + src->height), dst->cr.ymax);
-
-	/* TODO: make it not as dog slow as this */
-	for (dx = dxmin, sx = srcx; dx < dxmax; ++dx, ++sx)
-		for (dy = dymin, sy = srcy; dy < dymax; ++dy, ++sy)
-			BM_DRAWPIXEL(dst, dx, dy, BM_READPIXEL(src, sx, sy));
-}
+#include <appconfig.h>   /* CONFIG_GFX_CLIPPING */
 
 /*!
  * Draw a sloped line without performing clipping.
@@ -509,36 +324,6 @@ void gfx_rectFill(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 void gfx_rectClear(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 {
 	gfx_rectFillC(bm, x1, y1, x2, y2, 0x00);
-}
-
-
-/*!
- * Set the bitmap clipping rectangle to the specified coordinates.
- *
- * All drawing performed on the bitmap will be clipped inside this
- * rectangle.
- *
- * \note Following the convention used in all other operations, the
- *       top-left pixels of the rectangle are included, while the
- *       bottom-right pixels are considered outside the clipping region.
- */
-void gfx_setClipRect(Bitmap *bm, coord_t minx, coord_t miny, coord_t maxx, coord_t maxy)
-{
-	ASSERT(minx < maxx);
-	ASSERT(miny < maxy);
-	ASSERT(miny >= 0);
-	ASSERT(minx >= 0);
-	ASSERT(maxx <= bm->width);
-	ASSERT(maxy <= bm->height);
-
-	bm->cr.xmin = minx;
-	bm->cr.ymin = miny;
-	bm->cr.xmax = maxx;
-	bm->cr.ymax = maxy;
-
-/*	DB(kprintf("cr.xmin = %d, cr.ymin = %d, cr.xmax = %d, cr.ymax = %d\n",
-		bm->cr.xMin, bm->cr.ymin, bm->cr.xmax, bm->cr.ymax);)
-*/
 }
 
 
