@@ -20,6 +20,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/01/26 00:36:48  bernie
+ *#* Const correctness for some new functions.
+ *#*
  *#* Revision 1.1  2006/01/23 23:14:29  bernie
  *#* Implement simple, but impressive windowing system.
  *#*
@@ -78,7 +81,7 @@ void win_compose(Window *w);
 void win_open(Window *w, Window *parent);
 void win_close(Window *w);
 void win_raise(Window *w);
-void win_setGeometry(Window *w, Rect *new_geom);
+void win_setGeometry(Window *w, const Rect *new_geom);
 void win_move(Window *w, coord_t left, coord_t top);
 void win_resize(Window *w, coord_t width, coord_t height);
 void win_create(Window *w, Bitmap *bm);

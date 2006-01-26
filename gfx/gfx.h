@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2006/01/26 00:36:48  bernie
+ *#* Const correctness for some new functions.
+ *#*
  *#* Revision 1.6  2006/01/23 23:13:04  bernie
  *#* RECT_WIDTH(), RECT_HEIGHT(), RASTER_SIZE(): New macros.
  *#*
@@ -147,7 +150,7 @@ typedef struct Bitmap
 /* Function prototypes */
 extern void gfx_bitmapInit (Bitmap *bm, uint8_t *raster, coord_t w, coord_t h);
 extern void gfx_bitmapClear(Bitmap *bm);
-extern void gfx_blit       (Bitmap *dst, Rect *rect, Bitmap *src, coord_t srcx, coord_t srcy);
+extern void gfx_blit       (Bitmap *dst, const Rect *rect, const Bitmap *src, coord_t srcx, coord_t srcy);
 extern void gfx_line       (Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2);
 extern void gfx_rectDraw   (Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2);
 extern void gfx_rectFillC  (Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2, uint8_t color);

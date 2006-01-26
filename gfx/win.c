@@ -20,6 +20,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/01/26 00:36:48  bernie
+ *#* Const correctness for some new functions.
+ *#*
  *#* Revision 1.1  2006/01/23 23:14:29  bernie
  *#* Implement simple, but impressive windowing system.
  *#*
@@ -112,7 +115,7 @@ void win_raise(Window *w)
  * \see win_move()
  * \see win_resize()
  */
-void win_setGeometry(Window *w, Rect *new_geom)
+void win_setGeometry(Window *w, const Rect *new_geom)
 {
 	// requires C99?
 	// memcpy(&w->geom, new_geom, sizeof(w->geom));

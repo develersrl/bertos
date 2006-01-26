@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/01/26 00:36:48  bernie
+ *#* Const correctness for some new functions.
+ *#*
  *#* Revision 1.2  2006/01/24 21:55:43  aleph
  *#* gfx_blit_P(): use RASTER_SIZE() to calculate raster size
  *#*
@@ -102,7 +105,7 @@ void gfx_blit_P(Bitmap *bm, const pgm_uint8_t *raster)
  * \param dst Bitmap where the operation writes
  *
  */
-void gfx_blit(Bitmap *dst, Rect *rect, Bitmap *src, coord_t srcx, coord_t srcy)
+void gfx_blit(Bitmap *dst, const Rect *rect, const Bitmap *src, coord_t srcx, coord_t srcy)
 {
 	coord_t dxmin, dymin, dxmax, dymax;
 	coord_t dx, dy, sx, sy;
