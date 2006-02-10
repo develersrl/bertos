@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/02/10 12:34:33  bernie
+ *#* Add missing config options for gfx and kbd.
+ *#*
  *#* Revision 1.4  2006/01/23 23:12:27  bernie
  *#* Enable CONFIG_GFX_VCOORDS.
  *#*
@@ -170,7 +173,13 @@
 /// Enable line clipping algorithm.
 #define CONFIG_GFX_CLIPPING 1
 
+/// Enable text rendering in bitmaps.
+#define CONFIG_GFX_TEXT 1
+
 /// Enable virtual coordinate system.
 #define CONFIG_GFX_VCOORDS 1
+
+/// Keyboard polling method
+#define CONFIG_KBD_POLL  KBD_POLL_SOFTINT
 
 #endif /* CONFIG_COMMON_H */
