@@ -1,7 +1,7 @@
 /*!
  * \file
  * <!--
- * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2005, 2006 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000 Bernardo Innocenti <bernie@develer.com>
  * This file is part of DevLib - See README.devlib for information.
  * -->
@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.28  2006/02/10 12:32:52  bernie
+ *#* Update Copyright year.
+ *#*
  *#* Revision 1.27  2005/11/27 03:04:08  bernie
  *#* Move test code to timer_test.c; Add OS_HOSTED support.
  *#*
