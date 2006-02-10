@@ -20,6 +20,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/02/10 12:25:41  bernie
+ *#* Add missing header.
+ *#*
  *#* Revision 1.2  2006/01/26 00:36:48  bernie
  *#* Const correctness for some new functions.
  *#*
@@ -29,6 +32,7 @@
  *#*/
 
 #include "win.h"
+#include <mware/list.h>
 
 /**
  * Map the contents of all child-windows into the bitmap of \a w.
