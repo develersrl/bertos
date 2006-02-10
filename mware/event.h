@@ -18,6 +18,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/02/10 12:24:42  bernie
+ *#* Fix standalone build.
+ *#*
  *#* Revision 1.3  2006/01/16 03:27:49  bernie
  *#* Rename sig_t to sigbit_t to avoid clash with POSIX.
  *#*
@@ -65,6 +68,7 @@
 #ifndef KERN_EVENT_H
 #define KERN_EVENT_H
 
+#include <cfg/compiler.h>
 #include <appconfig.h>
 
 #if CONFIG_KERNEL

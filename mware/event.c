@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/02/10 12:24:42  bernie
+ *#* Fix standalone build.
+ *#*
  *#* Revision 1.1  2005/11/27 01:39:48  bernie
  *#* Move event.[ch] from kern/ to mware/.
  *#*
@@ -30,7 +33,7 @@
 
 #include "event.h"
 
-void event_hook_ignore(Event *e)
+void event_hook_ignore(UNUSED_ARG(Event *, e))
 {
 }
 
