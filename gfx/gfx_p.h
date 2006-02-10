@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/02/10 12:28:33  bernie
+ *#* Add font support in bitmaps; Make bitmap formats public.
+ *#*
  *#* Revision 1.1  2006/01/26 00:32:49  bernie
  *#* Graphics private header.
  *#*
@@ -23,13 +26,6 @@
 #ifndef GFX_GFX_P_H
 #define GFX_GFX_P_H
 
-/**
- * \name Known pixel formats for bitmap representation.
- * \{
- */
-#define BITMAP_FMT_PLANAR_H_MSB  1  /**< Planar pixels, horizontal bytes, MSB left. */
-#define BITMAP_FMT_PLANAR_V_LSB  2  /**< Planar pixels, vertical bytes, LSB top. */
-/* \} */
 
 #if CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_H_MSB
 
