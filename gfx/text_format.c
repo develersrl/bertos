@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/02/10 12:31:33  bernie
+ *#* Add multiple font support in bitmaps.
+ *#*
  *#* Revision 1.3  2005/11/27 23:31:58  bernie
  *#* Reorder includes.
  *#*
@@ -167,17 +170,17 @@ int PGM_FUNC(text_xprintf)(struct Bitmap *bm,
 			pad /= 2;
 
 		if (style & TEXT_FILL)
-			gfx_rectFillC(bm, 0, row * FONT_HEIGHT, pad, (row + 1) * FONT_HEIGHT,
+			gfx_rectFillC(bm, 0, row * bm->font->height, pad, (row + 1) * bm->font->height,
 				(style & STYLEF_INVERT) ? 0xFF : 0x00);
 
-		text_setcoord(bm, pad, row * FONT_HEIGHT);
+		text_setcoord(bm, pad, row * bm->font->height);
 	}
 
 	len = PGM_FUNC(text_vprintf)(bm, fmt, ap);
 	va_end(ap);
 
 	if (style & TEXT_FILL)
-		gfx_rectFillC(bm, bm->penX, row * FONT_HEIGHT, bm->width, (row + 1) * FONT_HEIGHT,
+		gfx_rectFillC(bm, bm->penX, row * bm->font->height, bm->width, (row + 1) * bm->font->height,
 			(style & STYLEF_INVERT) ? 0xFF : 0x00);
 
 	/* Restore old style */
@@ -196,7 +199,7 @@ int PGM_FUNC(text_vwidthf)(
 	const char * PGM_ATTR fmt,
 	va_list ap)
 {
-	return PGM_FUNC(vsprintf)(NULL, fmt, ap) * FONT_WIDTH;
+	return PGM_FUNC(vsprintf)(NULL, fmt, ap) * bm->font->width;
 }
 
 

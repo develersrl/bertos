@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/02/10 12:29:05  bernie
+ *#* Add multiple font support in bitmaps.
+ *#*
  *#* Revision 1.2  2005/11/04 18:17:45  bernie
  *#* Fix header guards and includes for new location of gfx module.
  *#*
@@ -42,7 +45,7 @@
 
 #include "font.h"
 
-const PROGMEM uint8_t font[256 * 6] =
+static const PROGMEM uint8_t default_font_glyphs[256 * 6] =
 {
 /* 0x00 */
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /*   */
@@ -333,3 +336,11 @@ const PROGMEM uint8_t font[256 * 6] =
 	0x1E, 0x1E, 0x1E, 0x1E, 0x1E, 0x00, /* þ */
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00  /* ÿ */
 };
+
+struct Font default_font =
+{
+	/* .glyph = */  default_font_glyphs,
+	/* .width = */  6,
+	/* .height = */ 8
+};
+

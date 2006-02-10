@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/02/10 12:29:05  bernie
+ *#* Add multiple font support in bitmaps.
+ *#*
  *#* Revision 1.2  2005/11/04 18:17:45  bernie
  *#* Fix header guards and includes for new location of gfx module.
  *#*
@@ -51,15 +54,22 @@
 #include <cfg/compiler.h> /* uint8_t */
 #include <mware/pgm.h> /* PROGMEM */
 
-/*!
- * \name Font size (in pixel)
- * \{
- */
-#define FONT_WIDTH   6
-#define FONT_HEIGHT  8
-/* \} */
+typedef struct Font
+{
+	/**
+	 * Pointer to glyph data.
+	 *
+	 * Data is an array of at most 256 glyphs packed together.
+	 * Raster format must be the same of the bitmap.
+	 */
+	const PROGMEM uint8_t * const glyph;
 
-/*! Font table. */
-extern const PROGMEM uint8_t font[256 * FONT_WIDTH];
+	uint8_t width;    /**< Pixel width of character cell. */
+	uint8_t height;   /**< Pixel height of character cell. */
+
+} Font;
+
+/**< The default font. */
+extern struct Font default_font;
 
 #endif /* GFX_FONT_H */

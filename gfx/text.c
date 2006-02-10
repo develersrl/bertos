@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/02/10 12:31:55  bernie
+ *#* Add multiple font support in bitmaps.
+ *#*
  *#* Revision 1.2  2005/11/04 18:17:45  bernie
  *#* Fix header guards and includes for new location of gfx module.
  *#*
@@ -79,6 +82,7 @@
 #include <gfx/gfx.h>
 #include <gfx/font.h>
 #include <gfx/text.h>
+#include <gfx/text.h>
 
 #include <cfg/debug.h>
 
@@ -104,12 +108,12 @@ static bool ansi_mode = false;
 void text_moveto(struct Bitmap *bm, int row, int col)
 {
 	ASSERT(col >= 0);
-	ASSERT(col < bm->width / FONT_WIDTH);
+	ASSERT(col < bm->width / bm->font->width);
 	ASSERT(row >= 0);
-	ASSERT(row < bm->height / FONT_HEIGHT);
+//	ASSERT(row < bm->height / bm->font->height);
 
-	bm->penX = col * FONT_WIDTH;
-	bm->penY = row * FONT_HEIGHT;
+	bm->penX = col * bm->font->width;
+	bm->penY = row * bm->font->height;
 }
 
 
@@ -134,11 +138,11 @@ static int text_putglyph(char c, struct Bitmap *bm)
 	uint8_t *buf;
 
 	/*
-	 * Il carattere da stampare viene usato come indice per prelevare
-	 * la prima colonna di dots del glyph all'interno del font.
+	 * Compute the first column of pixels of the selected glyph,
+	 * using the character code to index the glyph array.
 	 */
-	glyph = font + (((unsigned char)c) * FONT_WIDTH);
-	glyph_width = FONT_WIDTH;
+	glyph_width = bm->font->width;
+	glyph = &bm->font->glyph[(unsigned char)c * (((glyph_width + 7) / 8) * bm->font->height) ];
 
 	if (text_styles & STYLEF_CONDENSED)
 		--glyph_width;
@@ -147,12 +151,13 @@ static int text_putglyph(char c, struct Bitmap *bm)
 		glyph_width *= 2;
 
 	/* The y coord is rounded at multiples of 8 for simplicity */
-	bm->penY &= ~((coord_t)7);
+//	bm->penY &= ~((coord_t)7);
 
 	/* Check if glyph to write fits in the bitmap */
-	if ((bm->penX < 0) || (bm->penX + glyph_width > bm->width) ||
-		(bm->penY < 0) || (bm->penY + FONT_HEIGHT > bm->height))
+	if ((bm->penX < 0) || (bm->penX + glyph_width > bm->width)
+		|| (bm->penY < 0) || (bm->penY + bm->font->height > bm->height))
 	{
+		kprintf("w=%d, h=%d\n", glyph_width, bm->font->height);
 		DB(kprintf("bad coords x=%d y=%d\n", bm->penX, bm->penY);)
 		return 0;
 	}
@@ -160,7 +165,7 @@ static int text_putglyph(char c, struct Bitmap *bm)
 	/* Locate position where to write in the raster */
 	buf = bm->raster + bm->penY / 8 * bm->width + bm->penX;
 
-	bm->penX += glyph_width;
+//	bm->penX += glyph_width;
 
 	/* If some styles are set */
 	if (text_styles)
@@ -207,9 +212,14 @@ static int text_putglyph(char c, struct Bitmap *bm)
 			*buf++ = dots;
 		}
 	}
-	else /* No style: fast vanilla copy of glyph to line buffer */
-		while (glyph_width--)
-			*buf++ = PGM_READ_CHAR(glyph++);
+	else
+	{
+		/* No style: fast vanilla copy of glyph to line buffer */
+		gfx_blitRaster(bm, bm->penX, bm->penY, glyph, glyph_width, bm->font->height);
+//		while (glyph_width--)
+//			*buf++ = PGM_READ_CHAR(glyph++);
+	}
+	bm->penX += glyph_width;
 
 	return c;
 }
@@ -243,9 +253,9 @@ int text_putchar(char c, struct Bitmap *bm)
 	}
 	else if (c == '\n')  /* Go one line down on a line-feed */
 	{
-		if (bm->penY + FONT_HEIGHT < bm->height)
+		if (bm->penY + bm->font->height < bm->height)
 		{
-			bm->penY += FONT_HEIGHT;
+			bm->penY += bm->font->height;
 			bm->penX = 0;
 		}
 	}
@@ -267,9 +277,9 @@ void text_clear(struct Bitmap *bmp)
 }
 
 
-void text_clearLine(struct Bitmap *bmp, int line)
+void text_clearLine(struct Bitmap *bm, int line)
 {
-	gfx_rectClear(bmp, 0, line * FONT_HEIGHT, bmp->width, (line + 1) * FONT_HEIGHT);
+	gfx_rectClear(bm, 0, line * bm->font->height, bm->width, (line + 1) * bm->font->height);
 }
 
 
