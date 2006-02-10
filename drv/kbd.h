@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/02/10 12:38:16  bernie
+ *#* Add preliminary FreeRTOS support; Enforce CONFIG_* definitions.
+ *#*
  *#* Revision 1.1  2005/06/27 21:28:45  bernie
  *#* Import generic keyboard driver.
  *#*
@@ -25,9 +28,10 @@
 
 #include <kbd_map.h>
 #include <cfg/compiler.h>
-#include <arch_config.h>
 #include <mware/list.h>
 
+#define KBD_POLL_SOFTINT  1
+#define KBD_POLL_FREERTOS 2
 
 /*!
  * Keyboard handler descriptor

@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/02/10 12:36:20  bernie
+ *#* Add preliminary FreeRTOS support; Enforce CONFIG_* definitions.
+ *#*
  *#* Revision 1.1  2005/06/27 21:28:45  bernie
  *#* Import generic keyboard driver.
  *#*
@@ -30,7 +33,10 @@
 
 #include <cfg/debug.h>
 
-
+/* Configuration sanity checks */
+#if !defined(CONFIG_KBD_POLL) || (CONFIG_KBD_POLL != KBD_POLL_SOFTINT && CONFIG_KBD_POLL != CONFIG_POLL_FREERTOS)
+	#error CONFIG_KBD_POLL must be defined to either KBD_POLL_SOFTINT or CONFIG_POLL_FREERTOS
+#endif
 
 
 #define KBD_CHECK_INTERVAL  10  /*!< (ms) Timing for kbd softint */
@@ -52,7 +58,7 @@ static enum { KS_IDLE, KS_REPDELAY, KS_REPEAT } kbd_rptStatus;
 static volatile keymask_t kbd_buf; /*!< Single entry keyboard buffer */
 static volatile keymask_t kbd_cnt; /*!< Number of keypress events in \c kbd_buf */
 
-static Timer kbd_timer;            /*!< KeyboardKBD_BEEP_TIME softtimer */
+static Timer kbd_timer;            /*!< Keyboard softtimer */
 
 static List kbd_rawHandlers;       /*!< Raw keyboard handlers */
 static List kbd_handlers;          /*!< Cooked keyboard handlers */
@@ -67,9 +73,15 @@ static KbdHandler kbd_lngHandler;  /*!< Long pression keys handler */
 
 
 /*!
- * Keyboard soft-irq handler.
+ * Poll keyboard and dispatch keys to handlers.
+ *
+ * Read the key states and invoke all keyboard
+ * handlers to process the new state.
+ *
+ * Call this function periodically using a software
+ * timer, an interrupt or a process.
  */
-static void kbd_softint(UNUSED_ARG(iptr_t, arg))
+static void kbd_poll(void)
 {
 	/*! Currently depressed key */
 	static keymask_t current_key;
@@ -91,10 +103,34 @@ static void kbd_softint(UNUSED_ARG(iptr_t, arg))
 		FOREACHNODE(handler, &kbd_handlers)
 			key = handler->hook(key);
 	}
+}
 
+#if CONFIG_KBD_POLL == KBD_POLL_SOFTINT
+
+/*!
+ * Keyboard soft-irq handler.
+ */
+static void kbd_softint(UNUSED_ARG(iptr_t, arg))
+{
+	kbd_poll();
 	timer_add(&kbd_timer);
 }
 
+#elif CONFIG_KBD_POLL == CONFIG_POLL_FREERTOS
+
+#include "FreeRTOS.h"
+#include "task.h"
+
+static portTASK_FUNCTION(kbd_poll, arg)
+{
+	for (;;)
+	{
+		kbd_poll(0);
+		timer_delay(KBD_CHECK_INTERVAL);
+	}
+}
+
+#endif /* CONFIG_KBD_POLL */
 
 /*!
  * \brief Read a key from the keyboard buffer.
@@ -111,6 +147,10 @@ static void kbd_softint(UNUSED_ARG(iptr_t, arg))
 keymask_t kbd_peek(void)
 {
 	keymask_t key = 0;
+
+// FIXME
+	extern void schedule(void);
+	schedule();
 
 	/* Extract an event from the keyboard buffer */
 	IRQ_DISABLE;
@@ -209,8 +249,10 @@ static keymask_t kbd_defHandlerFunc(keymask_t key)
 		kbd_buf = key;
 		kbd_cnt = 1;
 
+#if KBD_BEEP_TIME
 		if (!(key & K_REPEAT))
 			buz_beep(KBD_BEEP_TIME);
+#endif
 	}
 
 	/* Eat all input */
@@ -343,13 +385,7 @@ static keymask_t kbd_rptHandlerFunc(keymask_t key)
  */
 void kbd_init(void)
 {
-
-	cpuflags_t flags;
-	IRQ_SAVE_DISABLE(flags);
-
 	KBD_HW_INIT;
-
-	IRQ_RESTORE(flags);
 
 	/* Init handlers lists */
 	LIST_INIT(&kbd_handlers);
@@ -382,8 +418,16 @@ void kbd_init(void)
 	kbd_defHandler.pri = -128; /* lowest priority */
 	kbd_addHandler(&kbd_defHandler);
 
+#if CONFIG_KBD_POLL == KBD_POLL_SOFTINT
 	/* Add kbd handler to soft timers list */
 	event_initSoftInt(&kbd_timer.expire, kbd_softint, 0);
 	timer_setDelay(&kbd_timer, ms_to_ticks(KBD_CHECK_INTERVAL));
 	timer_add(&kbd_timer);
+#elif CONFIG_KBD_POLL == CONFIG_POLL_FREERTOS
+	/* Create a timer specific thread */
+	xTaskCreate(kbd_poll, "kbd_poll", CONFIG_STACK_KBD,
+			NULL, CONFIG_PRI_KBD, NULL);
+#else
+	#error "Define keyboard poll method"
+#endif
 }
