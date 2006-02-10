@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/02/10 12:26:19  bernie
+ *#* Add STYLEF_TALL (unimplemented).
+ *#*
  *#* Revision 1.2  2005/11/04 18:17:45  bernie
  *#* Fix header guards and includes for new location of gfx module.
  *#*
@@ -74,10 +77,12 @@
 #define STYLEF_EXPANDED    BV(4)
 #define STYLEF_CONDENSED   BV(5)
 #define STYLEF_STRIKEOUT   BV(6)  /*<! Not implemented */
+#define STYLEF_TALL        BV(7)  /*<! Not implemented */
 
 #define STYLEF_MASK \
-	(STYLEF_BOLD | STYLEF_ITALIC | STYLEF_UNDERLINE | \
-	STYLEF_EXPANDED | STYLEF_CONDENSED | STYLEF_INVERT)
+	(STYLEF_BOLD | STYLEF_ITALIC | STYLEF_UNDERLINE \
+	| STYLEF_INVERT | STYLEF_EXPANDED | STYLEF_CONDENSED \
+	| STYLEF_STRIKEOUT | STYLEF_TALL)
 /*\}*/
 
 /*!
@@ -86,9 +91,9 @@
  * \{
  */
 #define TEXT_NORMAL   0       /*!< Normal mode */
-#define TEXT_FILL     BV(7)   /*!< Fill rest of line with spaces */
-#define TEXT_CENTER   BV(8)   /*!< Center string in line */
-#define TEXT_RIGHT    BV(9)   /*!< Right aligned */
+#define TEXT_FILL     BV(13)  /*!< Fill rest of line with spaces */
+#define TEXT_CENTER   BV(14)  /*!< Center string in line */
+#define TEXT_RIGHT    BV(15)  /*!< Right aligned */
 /*\}*/
 
 /*! Escape sequences codes */
