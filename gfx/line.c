@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/02/10 12:26:58  bernie
+ *#* Check CONFIG_* constraints.
+ *#*
  *#* Revision 1.1  2006/01/24 02:17:49  bernie
  *#* Split out gfx.c into bitmap.c and line.c.
  *#*
@@ -28,6 +31,14 @@
 #include <cfg/cpu.h>     /* CPU_HARVARD */
 #include <cfg/macros.h>  /* SWAP() */
 #include <appconfig.h>   /* CONFIG_GFX_CLIPPING */
+
+/* Configuration sanity checks */
+#if !defined(CONFIG_GFX_CLIPPING) || (CONFIG_GFX_CLIPPING != 0 && CONFIG_GFX_CLIPPING != 1)
+	#error CONFIG_GFX_CLIPPING must be defined to either 0 or 1
+#endif
+#if !defined(CONFIG_GFX_VCOORDS) || (CONFIG_GFX_VCOORDS != 0 && CONFIG_GFX_VCOORDS != 1)
+	#error CONFIG_GFX_VCOORDS must be defined to either 0 or 1
+#endif
 
 /*!
  * Draw a sloped line without performing clipping.
@@ -283,7 +294,7 @@ void gfx_rectFillC(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2, u
 	if (y2 < bm->cr.ymin)   y2 = bm->cr.ymin;
 	if (y1 > bm->cr.ymax)   y1 = bm->cr.ymax;
 	if (y2 > bm->cr.ymax)   y2 = bm->cr.ymax;
-#endif
+#endif /* CONFIG_GFX_CLIPPING */
 
 	/* NOTE: Code paths are duplicated for efficiency */
 	if (color) /* fill */
