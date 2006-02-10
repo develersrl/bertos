@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/02/10 12:35:31  bernie
+ *#* Enforce CONFIG_* definitions.
+ *#*
  *#* Revision 1.2  2006/01/23 23:11:27  bernie
  *#* Use RASTER_SIZE() to compute... err... the raster size.
  *#*
@@ -37,7 +40,16 @@
 #include <stdbool.h>
 #include <inttypes.h>
 
-#ifdef CONFIG_LCD_SOFTINT_REFRESH
+/* Configuration sanity checks */
+#if !defined(CONFIG_LCD_SOFTINT_REFRESH) || (CONFIG_LCD_SOFTINT_REFRESH != 0 && CONFIG_LCD_SOFTINT_REFRESH != 1)
+	#error CONFIG_LCD_SOFTINT_REFRESH must be defined to either 0 or 1
+#endif
+#if !defined(CONFIG_LCD_SOFTINT_REFRESH) || (CONFIG_LCD_SOFTINT_REFRESH != 0 && CONFIG_LCD_SOFTINT_REFRESH != 1)
+	#error CONFIG_LCD_SOFTINT_REFRESH must be defined to either 0 or 1
+#endif
+
+
+#if CONFIG_LCD_SOFTINT_REFRESH
 
 	/*! Interval between softint driven lcd refresh */
 #	define LCD_REFRESH_INTERVAL 20  /* 20ms -> 50fps */
@@ -180,7 +192,7 @@
 /* Status flags */
 #define LCDF_BUSY BV(7)
 
-#ifdef CONFIG_LCD_WAIT
+#if CONFIG_LCD_WAIT
 /*!
  * \code
  *      __              __
@@ -232,7 +244,7 @@ DECLARE_WALL(wall_after_raster, WALL_SIZE)
 struct Bitmap lcd_bitmap;
 
 
-#ifdef CONFIG_LCD_SOFTINT_REFRESH
+#if CONFIG_LCD_SOFTINT_REFRESH
 
 /*! Timer for regular LCD refresh */
 static Timer *lcd_refresh_timer;
@@ -408,7 +420,7 @@ void lcd_blit_bitmap(Bitmap *bm)
 }
 
 
-#ifdef CONFIG_LCD_SOFTINT_REFRESH
+#if CONFIG_LCD_SOFTINT_REFRESH
 
 static void lcd_refresh_softint(void)
 {
@@ -474,7 +486,7 @@ void lcd_init(void)
 	gfx_bitmapInit(&lcd_bitmap, lcd_raster, LCD_WIDTH, LCD_HEIGHT);
 	gfx_bitmapClear(&lcd_bitmap);
 
-#ifdef CONFIG_LCD_SOFTINT_REFRESH
+#if CONFIG_LCD_SOFTINT_REFRESH
 
 	/* Init IRQ driven LCD refresh */
 	lcd_refresh_timer = timer_new();
