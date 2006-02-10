@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.17  2006/02/10 12:30:18  bernie
+ *#* Push interrupt protection inside hw module.
+ *#*
  *#* Revision 1.16  2005/11/04 16:19:33  bernie
  *#* buz_init(): Restore IRQ protection as in project_bko.
  *#*
@@ -42,12 +45,10 @@
  *#* Use new AVR port pin names.
  *#*/
 
+#include "buzzer.h"
 
 #include <hw_buzzer.h>
-#include <drv/buzzer.h>
-
 #include <drv/timer.h>
-#include <drv/sipo.h>
 
 #include <mware/event.h>
 
@@ -152,12 +153,7 @@ void buz_repeat_stop(void)
  */
 void buz_init(void)
 {
-	cpuflags_t flags;
-	IRQ_SAVE_DISABLE(flags);
-
 	BUZZER_HW_INIT;
-
-	IRQ_RESTORE(flags);
 
 	/* Init software interrupt. */
 	timer_set_event_softint(&buz_timer, (Hook)buz_softint, 0);
