@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2006/02/10 12:38:00  bernie
+ *#* Add support for ARM on IAR.
+ *#*
  *#* Revision 1.8  2006/01/16 03:27:49  bernie
  *#* Rename sig_t to sigbit_t to avoid clash with POSIX.
  *#*
@@ -91,44 +94,65 @@
 
 
 #if defined(__IAR_SYSTEMS_ICC) || defined(__IAR_SYSTEMS_ICC__)
+
 	#pragma language=extended
-	#define INTERRUPT(x)  interrupt [x]
-	#define REGISTER      shortad
-	#define INLINE        /* unsupported */
 
-	/*
-	 * Imported from <longjmp.h>. Unfortunately, we can't just include
-	 * this header because it typedefs jmp_buf to be an array of chars.
-	 * This would allow the compiler to place the buffer on an odd address.
-	 * The CPU _should_ be able to perform word accesses to
-	 * unaligned data, but there are *BUGS* in the 80196KC with
-	 * some combinations of opcodes and addressing modes. One of
-	 * these, "ST SP,[?GR]+" is used in the longjmp() implementation
-	 * provided by the IAR compiler ANSI C library. When ?GR contains
-	 * an odd address, surprisingly the CPU will copy the high order
-	 * byte of the source operand (SP) in the low order byte of the
-	 * destination operand (the memory location pointed to by ?GR).
-	 *
-	 * We also need to replace the library setjmp()/longjmp() with
-	 * our own versions because the IAR implementation "forgets" to
-	 * save the contents of local registers (?LR).
-	 */
-	struct _JMP_BUF
-	{
-		void *sp;           /* Stack pointer */
-		void *return_addr;  /* Return address */
-		int lr[6];          /* 6 local registers */
-	};
+	// IAR has size_t as built-in type, but does not define this symbol.
+	#define _SIZE_T_DEFINED
 
-	typedef struct _JMP_BUF jmp_buf[1];
+	#ifdef CPU_ARM
 
-	int setjmp(jmp_buf env);
-	void longjmp(jmp_buf env, int val);
+		#define COMPILER_VARIADIC_MACROS 1
 
-	/* Fake bool support */
-	#define true (1==1)
-	#define false (1!=1)
-	typedef unsigned char bool;
+		#define INTERRUPT(x)  __irq __arm void x (void)
+		#define REGISTER      register
+		#define INLINE        static inline
+
+		/* Include some standard C89/C99 stuff */
+		#include <stddef.h>
+		#include <stdbool.h>
+
+	#else /* CPU_I196 */
+
+		#define INTERRUPT(x)  interrupt [x]
+		#define REGISTER      shortad
+		#define INLINE        /* unsupported */
+
+		/*
+		 * Imported from <longjmp.h>. Unfortunately, we can't just include
+		 * this header because it typedefs jmp_buf to be an array of chars.
+		 * This would allow the compiler to place the buffer on an odd address.
+		 * The CPU _should_ be able to perform word accesses to
+		 * unaligned data, but there are *BUGS* in the 80196KC with
+		 * some combinations of opcodes and addressing modes. One of
+		 * these, "ST SP,[?GR]+" is used in the longjmp() implementation
+		 * provided by the IAR compiler ANSI C library. When ?GR contains
+		 * an odd address, surprisingly the CPU will copy the high order
+		 * byte of the source operand (SP) in the low order byte of the
+		 * destination operand (the memory location pointed to by ?GR).
+		 *
+		 * We also need to replace the library setjmp()/longjmp() with
+		 * our own versions because the IAR implementation "forgets" to
+		 * save the contents of local registers (?LR).
+		 */
+		struct _JMP_BUF
+		{
+			void *sp;           /* Stack pointer */
+			void *return_addr;  /* Return address */
+			int lr[6];          /* 6 local registers */
+		};
+
+		typedef struct _JMP_BUF jmp_buf[1];
+
+		int setjmp(jmp_buf env);
+		void longjmp(jmp_buf env, int val);
+
+		/* Fake bool support */
+		#define true (1==1)
+		#define false (1!=1)
+		typedef unsigned char bool;
+
+	#endif /* !CPU_I196 */
 
 #elif defined(_MSC_VER) /* Win32 emulation support */
 
@@ -219,7 +243,7 @@
 
 /*!
  * \def COMPILER_TYPEOF
- * Support for macros with variable arguments.
+ * Support for dynamic type identification.
  */
 #ifndef COMPILER_TYPEOF
 #define COMPILER_TYPEOF 0
@@ -227,7 +251,7 @@
 
 /*!
  * \def COMPILER_STATEMENT_EXPRESSIONS
- * Support for macros with variable arguments.
+ * Support for statement expressions.
  */
 #ifndef COMPILER_STATEMENT_EXPRESSIONS
 #define COMPILER_STATEMENT_EXPRESSIONS 0

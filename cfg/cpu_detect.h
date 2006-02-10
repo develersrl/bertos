@@ -12,6 +12,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/02/10 12:37:37  bernie
+ *#* Add support for ARM on IAR.
+ *#*
  *#* Revision 1.2  2005/06/14 06:15:10  bernie
  *#* Add X86_64 support.
  *#*
@@ -37,8 +40,17 @@
 #ifndef CPU_DETECT_H
 #define CPU_DETECT_H
 
-#if defined(__IAR_SYSTEMS_ICC) || defined(__IAR_SYSTEMS_ICC__)
-	#define CPU_I196                1
+#if defined(__arm__) /* GCC */ \
+	|| defined(__ARM4TM__) /* IAR: defined for all cores >= 4tm */
+	#define CPU_ARM                 1
+	#define CPU_ID                  arm
+#else
+	#define CPU_ARM                 0
+#endif
+
+#if (defined(__IAR_SYSTEMS_ICC__) || defined(__IAR_SYSTEMS_ICC)) \
+	&& !defined(__ARM4TM__) /* IAR: if not ARM assume I196 */
+	#define CPU_I196		1
 	#define CPU_ID                  i196
 #else
 	#define CPU_I196                0
@@ -125,11 +137,11 @@
 
 
 /* Self-check for the detection: only one CPU must be detected */
-#if CPU_I196 + CPU_X86 + CPU_PPC + CPU_DSP56K + CPU_AVR == 0
+#if CPU_ARM + CPU_I196 + CPU_X86 + CPU_PPC + CPU_DSP56K + CPU_AVR == 0
 	#error Unknown CPU
 #elif !defined(CPU_ID)
 	#error CPU_ID not defined
-#elif CPU_I196 + CPU_X86 + CPU_PPC + CPU_DSP56K + CPU_AVR != 1
+#elif CPU_ARM + CPU_I196 + CPU_X86 + CPU_PPC + CPU_DSP56K + CPU_AVR != 1
 	#error Internal CPU configuration error
 #endif
 

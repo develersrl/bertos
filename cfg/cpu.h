@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2006/02/10 12:37:45  bernie
+ *#* Add support for ARM on IAR.
+ *#*
  *#* Revision 1.7  2005/11/27 03:04:38  bernie
  *#* Add POSIX emulation for IRQ_* macros; Add Qt support.
  *#*
@@ -126,6 +129,107 @@
 		typedef uint32_t cpustack_t;
 		#define CPU_REG_BITS    32
 	#endif
+
+#elif CPU_ARM
+
+	#ifdef __IAR_SYSTEMS_ICC__
+
+		#include <inarm.h>
+
+		#define NOP         __no_operation()
+		#define IRQ_DISABLE __disable_interrupt()
+		#define IRQ_ENABLE  __enable_interrupt()
+
+		#define IRQ_SAVE_DISABLE(x) \
+		do { \
+			(x) = __get_CPSR(); \
+			__disable_interrupt(); \
+		} while (0)
+
+		#define IRQ_RESTORE(x) \
+		do { \
+			__set_CPSR(x); \
+		} while (0)
+
+		#define IRQ_GETSTATE() \
+			((bool)(__get_CPSR() & 0xb0))
+
+	#else /* __IAR_SYSTEMS_ICC__ */
+
+		#warning "IRQ_ macros need testing!"
+
+		#define NOP         asm volatile ("mov r0,r0" ::)
+
+		#define IRQ_DISABLE \
+		do { \
+			asm volatile ( \
+				"mrs r0, cpsr\n\t" \
+				"orr r0, r0, #0xb0\n\t" \
+				"msr cpsr, r0" \
+				:: \
+			); \
+		} while (0)
+
+		#define IRQ_ENABLE \
+		do { \
+			asm volatile ( \
+				"mrs r0, cpsr\n\t" \
+				"bic r0, r0, #0xb0\n\t" \
+				"msr cpsr, r0" \
+				:: \
+			); \
+		} while (0)
+
+		#define IRQ_SAVE_DISABLE(x) \
+		do { \
+			asm volatile ( \
+				"mrs r0, cpsr\n\t" \
+				"mov %0, r0\n\t" \
+				"orr r0, r0, #0xb0\n\t" \
+				"msr cpsr, r0" \
+				: "=r" (x) \
+				: /* no inputs */ \
+				: "r0" \
+			); \
+		} while (0)
+
+		#define IRQ_RESTORE(x) \
+		do { \
+			asm volatile ( \
+				"mov r0, %0\n\t" \
+				"msr cpsr, r0" \
+				: /* no outputs */ \
+				: "r" (x) \
+				: "r0" \
+			); \
+		} while (0)
+
+		#define IRQ_GETSTATE() \
+		({ \
+			uint32_t sreg; \
+			asm volatile ( \
+				"mrs r0, cpsr\n\t" \
+				"mov %0, r0" \
+				: "=r" (sreg)
+				: /* no inputs */
+				: "r0" \
+			); \
+			(bool)(sreg & 0xb0); \
+		})
+
+	#endif /* __IAR_SYSTEMS_ICC_ */
+
+	typedef uint32_t cpuflags_t;
+	typedef uint32_t cpustack_t;
+
+	/* Register counts include SREG too */
+	#define CPU_REG_BITS           32
+	#define CPU_REGS_CNT           16
+	#define CPU_SAVED_REGS_CNT     FIXME
+	#define CPU_STACK_GROWS_UPWARD 0  //FIXME
+	#define CPU_SP_ON_EMPTY_SLOT   0  //FIXME
+	#define CPU_BYTE_ORDER         (__BIG_ENDIAN__ ? CPU_BIG_ENDIAN : CPU_LITTLE_ENDIAN)
+	#define CPU_HARVARD            0
 
 #elif CPU_PPC
 	#define NOP                 asm volatile ("nop" ::)
