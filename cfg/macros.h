@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/02/10 12:36:57  bernie
+ *#* Pacify IAR warnings for side-effects.
+ *#*
  *#* Revision 1.5  2005/11/04 16:20:01  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -137,7 +140,13 @@
 		} while (0)
 #else /* !COMPILER_TYPEOF */
 	/* Sub-optimal implementation that only works with integral types. */
-	#define SWAP(a, b) ((a) ^= (b) ^= (a) ^= (b))
+	#define SWAP(a, b) \
+		do { \
+			(a) ^= (b); \
+			(b) ^= (a); \
+			(a) ^= (b); \
+		} while (0)
+
 #endif /* COMPILER_TYPEOF */
 
 #ifndef BV
