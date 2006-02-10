@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/02/10 11:30:37  bernie
+ *#* C++ fixes.
+ *#*
  *#* Revision 1.1  2005/03/01 23:31:02  bernie
  *#* String table and localization stuff.
  *#*
@@ -35,13 +38,13 @@ enum
 #define MSG_BUFSIZE 6144 /* FIXME: how much? */
 
 /* String tables */
-extern const char *msg_strings[MSG_COUNT];
+extern const char *msg_strings const [MSG_COUNT];
 /* extern char msg_buf[MSG_BUFSIZE]; */
 
 
 /* Macros to access translated messages */
 #define MSG(x)  msg_strings[x]
-#define PTRMSG(x)  ((unsigned int)(x) < 256 ? msg_strings[(unsigned int)(x)] : (const char *)(x))
+#define PTRMSG(x)  ((x) < (const_iptr_t)256 ? msg_strings[(unsigned int)(x)] : (const char *)(x))
 
 
 #endif /* MWARE_MSG_H */
