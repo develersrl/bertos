@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/02/10 12:33:49  bernie
+ *#* Make emulator display a bit larger.
+ *#*
  *#* Revision 1.3  2006/01/23 23:11:07  bernie
  *#* Use RASTER_SIZE() to compute... err... the raster size.
  *#*
@@ -98,6 +101,7 @@ void EmulLCD::writeRaster(uint8_t *new_raster)
 
 /*!
  * Raster buffer to draw into.
+ *
  * Bits in the bitmap bytes have vertical orientation,
  * as required by the LCD driver.
  */
@@ -108,18 +112,18 @@ DECLARE_WALL(wall_after_raster, WALL_SIZE)
 /*! Default LCD bitmap */
 struct Bitmap lcd_bitmap;
 
-extern "C" void lcd_init(void)
+/*extern "C"*/ void lcd_init(void)
 {
-	//INIT_WALL(wall_before_raster);
-	//INIT_WALL(wall_after_raster);
+	//FIXME INIT_WALL(wall_before_raster);
+	//FIXME INIT_WALL(wall_after_raster);
 	gfx_bitmapInit(&lcd_bitmap, lcd_raster, EmulLCD::WIDTH, EmulLCD::HEIGHT);
 	gfx_bitmapClear(&lcd_bitmap);
 }
 
-extern "C" void lcd_blit_bitmap(Bitmap *bm)
+/*extern "C"*/ void lcd_blit_bitmap(Bitmap *bm)
 {
-	//CHECK_WALL(wall_before_raster);
-	//CHECK_WALL(wall_after_raster);
+	//FIXME CHECK_WALL(wall_before_raster);
+	//FIXME CHECK_WALL(wall_after_raster);
 	emul->emulLCD->writeRaster(bm->raster);
 }
 

@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/02/10 12:33:51  bernie
+ *#* Make emulator display a bit larger.
+ *#*
  *#* Revision 1.1  2006/01/16 03:51:35  bernie
  *#* Add LCD Qt emulator.
  *#*
@@ -37,7 +40,7 @@ class EmulLCD : public QFrame
 
 public:
 // Attributes
-	enum { WIDTH = 128, HEIGHT = 64 };
+	enum { WIDTH = 320, HEIGHT = 200 };
 
 // Construction
 	EmulLCD(QWidget *parent = 0, const char *name = 0);
