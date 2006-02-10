@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/02/10 12:32:33  bernie
+ *#* Add multiple font support in bitmaps; gfx_blitRaster(): New function.
+ *#*
  *#* Revision 1.3  2006/01/26 00:36:48  bernie
  *#* Const correctness for some new functions.
  *#*
@@ -33,9 +36,13 @@
 #include <cfg/debug.h>  /* ASSERT() */
 #include <cfg/cpu.h>    /* CPU_HARVARD */
 #include <cfg/macros.h> /* MIN() */
-#include <appconfig.h>  /* CONFIG_GFX_CLIPPING */
 
 #include <string.h>     /* memset() */
+
+#if CONFIG_GFX_TEXT
+#include <gfx/font.h>   /* default_font */
+#endif
+
 
 /*!
  * Initialize a Bitmap structure with the provided parameters.
@@ -56,6 +63,10 @@ void gfx_bitmapInit(Bitmap *bm, uint8_t *raster, coord_t w, coord_t h)
 	#endif /* CONFIG_BITMAP_FMT */
 	bm->penX = 0;
 	bm->penY = 0;
+
+#if CONFIG_GFX_TEXT
+	gfx_setFont(bm, &default_font);
+#endif
 
 #if CONFIG_GFX_CLIPPING
 	bm->cr.xmin = 0;
@@ -135,6 +146,37 @@ void gfx_blit(Bitmap *dst, const Rect *rect, const Bitmap *src, coord_t srcx, co
 }
 
 
+void gfx_blitRaster(Bitmap *dst, coord_t dxmin, coord_t dymin, const uint8_t *raster, coord_t w, coord_t h)
+{
+	coord_t dxmax, dymax;
+	coord_t sxmin = 0, symin = 0;
+	coord_t dx, dy, sx, sy;
+
+	/*
+	 * Clip coordinates inside dst->cr.
+	 */
+	if (dx < dst->cr.xmin)
+	{
+		sxmin += dst->cr.xmin - dxmin;
+		dxmin = dst->cr.xmin;
+	}
+	if (dy < dst->cr.ymin)
+	{
+		symin += dst->cr.ymin - dymin;
+		dymin = dst->cr.ymin;
+	}
+	dxmax = MIN(dxmin + w, dst->cr.xmax);
+	dymax = MIN(dymin + h, dst->cr.ymax);
+
+	/* TODO: make it not as dog slow as this */
+	for (dx = dxmin, sx = sxmin; dx < dxmax; ++dx, ++sx)
+		for (dy = dymin, sy = symin; dy < dymax; ++dy, ++sy)
+			BM_DRAWPIXEL(dst, dx, dy,
+				(raster[sy * ((w + 7) / 8) + sx / 8] & (1 << (7 - sx % 8))) ? 1 : 0
+			);
+}
+
+
 /*!
  * Set the bitmap clipping rectangle to the specified coordinates.
  *
@@ -163,3 +205,4 @@ void gfx_setClipRect(Bitmap *bm, coord_t minx, coord_t miny, coord_t maxx, coord
 		bm->cr.xMin, bm->cr.ymin, bm->cr.xmax, bm->cr.ymax);
 */
 }
+
