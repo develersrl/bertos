@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/02/10 12:34:52  bernie
+ *#* Remove spurious EXTERN_C.
+ *#*
  *#* Revision 1.2  2006/01/16 03:30:21  bernie
  *#* Make header C++ friendly.
  *#*
@@ -37,7 +40,7 @@
 void timer_isr(int);
 
 /// HW dependent timer initialization.
-EXTERN_C static void timer_hw_init(void)
+static void timer_hw_init(void)
 {
 	struct sigaction sa;
 	memset(&sa, 0, sizeof(sa));
