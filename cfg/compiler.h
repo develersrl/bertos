@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2006/02/15 09:12:01  bernie
+ *#* Fixes for ARM/IAR support.
+ *#*
  *#* Revision 1.9  2006/02/10 12:38:00  bernie
  *#* Add support for ARM on IAR.
  *#*
@@ -97,22 +100,22 @@
 
 	#pragma language=extended
 
-	// IAR has size_t as built-in type, but does not define this symbol.
-	#define _SIZE_T_DEFINED
-
-	#ifdef CPU_ARM
+	#if CPU_ARM
 
 		#define COMPILER_VARIADIC_MACROS 1
 
 		#define INTERRUPT(x)  __irq __arm void x (void)
-		#define REGISTER      register
 		#define INLINE        static inline
 
 		/* Include some standard C89/C99 stuff */
 		#include <stddef.h>
+		#include <stdint.h>
 		#include <stdbool.h>
 
-	#else /* CPU_I196 */
+	#elif CPU_I196
+
+		// IAR has size_t as built-in type, but does not define this symbol.
+		#define _SIZE_T_DEFINED
 
 		#define INTERRUPT(x)  interrupt [x]
 		#define REGISTER      shortad
@@ -152,7 +155,9 @@
 		#define false (1!=1)
 		typedef unsigned char bool;
 
-	#endif /* !CPU_I196 */
+	#else
+		#error Unsupported CPU
+	#endif
 
 #elif defined(_MSC_VER) /* Win32 emulation support */
 
@@ -195,6 +200,7 @@
 
 	/* Include some standard C89/C99 stuff */
 	#include <stddef.h>
+	#include <stdint.h>
 	#include <stdbool.h>
 
 	#ifndef __cplusplus
@@ -219,8 +225,8 @@
 
 	#define UNUSED_ARG(type,arg)    type
 
-	#include <stdint.h>
 	#include <stddef.h>
+	#include <stdint.h>
 	#include <stdbool.h>
 
 	// CodeWarrior has size_t as built-in type, but does not define this symbol.
@@ -325,18 +331,21 @@
 	#define EXTERN_C        extern "C"
 	#define EXTERN_C_BEGIN  extern "C" {
 	#define EXTERN_C_END    }
+	#define EXTERN_CONST	extern const
 #else
 	#define EXTERN_C        extern
 	#define EXTERN_C_BEGIN  /* nothing */
 	#define EXTERN_C_END    /* nothing */
+	#define EXTERN_CONST	const
 #endif
 
 
-#if (defined(_MSC_VER) || defined(__IAR_SYSTEMS_ICC) || defined(__IAR_SYSTEMS_ICC__))
+#if defined(_MSC_VER)
+	|| ((defined(__IAR_SYSTEMS_ICC) || defined(__IAR_SYSTEMS_ICC__)) && CPU_I196)
 	/*!
 	 * \name ISO C99 fixed-size types
 	 *
-	 * These should be in <stdint.h>, but many compilers lack them.
+	 * These should be in <stdint.h>, but a few compilers lack them.
 	 * \{
 	 */
 	typedef signed char         int8_t;
@@ -400,10 +409,12 @@ typedef unsigned char page_t;    /*!< Type for banked memory pages. */
  *
  *    glibc, avr-libc: _SIZE_T_DEFINED
  *    Darwin libc:     _BSD_SIZE_T_DEFINED_
+ *    IAR ARM:         _SIZE_T
  *
  * \{
  */
-#if !(defined(size_t) || defined(_SIZE_T_DEFINED) || defined(_BSD_SIZE_T_DEFINED_))
+#if !(defined(size_t) || defined(_SIZE_T_DEFINED) || defined(_BSD_SIZE_T_DEFINED_) \
+	|| defined(_SIZE_T))
 	#if CPU_X86
 		/* 32bit or 64bit (32bit for _WIN64). */
 		typedef unsigned long size_t;
@@ -416,6 +427,8 @@ typedef unsigned char page_t;    /*!< Type for banked memory pages. */
 	#if CPU_X86
 		/* 32bit or 64bit (32bit for _WIN64). */
 		typedef long ssize_t;
+	#elif CPU_ARM
+		typedef int ssize_t;
 	#elif CPU_AVR
 		/* 16bit (missing in avr-libc's sys/types.h). */
 		typedef int ssize_t;
