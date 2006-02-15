@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/02/15 09:12:33  bernie
+ *#* Don't mask useful user signals on UNIX.
+ *#*
  *#* Revision 1.5  2005/11/27 23:32:42  bernie
  *#* Add CPU fallback for OS_ID.
  *#*
@@ -58,28 +61,37 @@
 	/*
 	 * The POSIX moral equivalent of disabling IRQs is disabling signals.
 	 */
-	#define _XOPEN_SOURCE 600 /* Avoid BSDish stuff */
-	#undef _GNU_SOURCE /* This implies _BSD_SOURCE and is predefined on Linux. */
+//	#define _XOPEN_SOURCE 600 /* Avoid BSDish stuff */
+//	#undef _GNU_SOURCE /* This implies _BSD_SOURCE and is predefined on Linux. */
 	#include <signal.h>
 	typedef sigset_t cpuflags_t;
+
+	#define SET_ALL_SIGNALS(sigs) \
+	do { \
+		sigfillset(&sigs); \
+		sigdelset(&sigs, SIGINT); \
+		sigdelset(&sigs, SIGSTOP); \
+		sigdelset(&sigs, SIGCONT); \
+	} while(0)
+
 	#define IRQ_DISABLE \
 	do { \
 		sigset_t sigs; \
-		sigfillset(&sigs); \
+		SET_ALL_SIGNALS(sigs); \
 		sigprocmask(SIG_BLOCK, &sigs, NULL); \
 	} while (0)
 
 	#define IRQ_ENABLE \
 	do { \
 		sigset_t sigs; \
-		sigemptyset(&sigs); \
+		SET_ALL_SIGNALS(sigs); \
 		sigprocmask(SIG_UNBLOCK, &sigs, NULL); \
 	} while (0)
 
 	#define IRQ_SAVE_DISABLE(old_sigs) \
 	do { \
 		sigset_t sigs; \
-		sigemptyset(&sigs); \
+		SET_ALL_SIGNALS(sigs); \
 		sigprocmask(SIG_BLOCK, &sigs, &old_sigs); \
 	} while (0)
 
