@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/02/15 09:11:17  bernie
+ *#* Add keyboard emulator.
+ *#*
  *#* Revision 1.2  2006/01/16 03:51:51  bernie
  *#* Fix boilerplate.
  *#*
@@ -27,6 +30,7 @@
 
 #include <drv/lcd_gfx_qt.h>
 #include <emul/emul.h>
+#include <emul/emulkbd.h>
 
 #include <cassert>
 #include <qlayout.h>
@@ -40,7 +44,7 @@
 #include <qtimer.h>
 #include <qapplication.h>
 
-EmulWin::EmulWin(Emulator *e) : QMainWindow(0, "SarfEmul", WDestructiveClose)
+EmulWin::EmulWin(Emulator *e) : QMainWindow(0, "DevLibEmul", WDestructiveClose)
 {
 	// "File" menu
 	QPopupMenu * file = new QPopupMenu(this);
@@ -69,6 +73,16 @@ EmulWin::EmulWin(Emulator *e) : QMainWindow(0, "SarfEmul", WDestructiveClose)
 		// LCD
 		QHBoxLayout *lay_lcd = new QHBoxLayout(box_right, 4);
 		lay_lcd->addWidget(e->emulLCD = new EmulLCD(central));
+
+		// Keyboard
+		QHBoxLayout *lay_kbd = new QHBoxLayout(box_right, 4);
+			lay_kbd->addWidget(e->emulKbd = new EmulKbd(central));
+
+	// Setup keyboard: Label   Keycode     Row Col MRow MCol
+	e->emulKbd->addKey("^",    Key_Up,     0,  0,  0,   0);
+	e->emulKbd->addKey("v",    Key_Down,   1,  0,  0,   1);
+	e->emulKbd->addKey("OK",   Key_Return, 0,  1,  0,   2);
+	e->emulKbd->addKey("ESC",  Key_Escape, 1,  1,  0,   3);
 }
 
 

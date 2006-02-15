@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/02/15 09:11:17  bernie
+ *#* Add keyboard emulator.
+ *#*
  *#* Revision 1.3  2006/01/23 23:12:08  bernie
  *#* Let Doxygen see through C++ protected section.
  *#*
@@ -38,7 +41,7 @@ class QApplication;
 class EmulWin;
 class EmulPRT;
 class EmulLCD;
-class EmulKBD;
+class EmulKbd;
 class QCheckBox;
 class QSlider;
 class QLabel;
@@ -47,11 +50,11 @@ class Emulator
 {
 // data members
 public:
-	QApplication	*emulApp;	///< QT Application.
-	EmulWin			*emulWin;	///< Main window.
+	QApplication  *emulApp; ///< QT Application.
+	EmulWin       *emulWin; ///< Main window.
 
-	EmulLCD			*emulLCD;	///< Display emulator.
-	EmulKBD			*emulKBD;	///< Keyboard emulator.
+	EmulLCD       *emulLCD; ///< Display emulator.
+	EmulKbd       *emulKbd; ///< Keyboard emulator.
 
 // construction
 	Emulator(int &argc, char **argv);

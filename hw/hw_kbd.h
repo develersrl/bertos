@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/02/15 09:13:42  bernie
+ *#* Add keyboard emulator.
+ *#*
  *#* Revision 1.1  2006/02/10 12:31:03  bernie
  *#* Add templates for hw definitions.
  *#*
@@ -24,46 +27,24 @@
 #ifndef HW_KBD_H
 #define HW_KBD_H
 
-
 #include "kbd_map.h"
 #include <cfg/macros.h>
-#include <cfg/debug.h>
-
-
- /*!
- * \name CPU ports <-> switches assignement
- * @{
- */
 
 #define K_RPT_MASK (K_UP | K_DOWN | K_OK | K_CANCEL)
-/*@}*/
-
 
 #define KBD_HW_INIT \
 	do { \
 	} while (0)
 
+extern "C" int emul_kbdReadCols(void);
 
-/*!
+/**
  * Read the keyboard ports and return the mask of
  * depressed keys.
  */
 INLINE keymask_t kbd_readkeys(void)
 {
-	keymask_t key = 0;
-
-	uint32_t mask = 0xF;
-
-	if (!(mask & 1))
-		key |= K_OK;
-	if (!(mask & 2))
-		key |= K_CANCEL;
-	if (!(mask & 4))
-		key |= K_UP;
-	if (!(mask & 8))
-		key |= K_DOWN;
-
-	return key;
+	return (keymask_t)emul_kbdReadCols();
 }
 
 #endif /* HW_KBD_H */
