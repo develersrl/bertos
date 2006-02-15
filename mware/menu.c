@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/02/15 09:10:51  bernie
+ *#* Make title bold; Fix height when we have no menubar.
+ *#*
  *#* Revision 1.1  2006/02/10 12:29:36  bernie
  *#* Add menu system.
  *#*
@@ -158,7 +161,7 @@ static void menu_layout(
 	ypos = menu->startrow;
 
 	if (title)
-		text_xprintf(menu->bitmap, ypos++, 0, TEXT_FILL, title);
+		text_xprintf(menu->bitmap, ypos++, 0, STYLEF_BOLD | TEXT_FILL, title);
 
 	for (
 		cnt = 0, item = &menu->items[first_item];
@@ -307,7 +310,9 @@ iptr_t menu_handle(const struct Menu *menu)
 	items_per_page =
 		(menu->bitmap->height / menu->bitmap->font->height)
 		- menu->startrow
+#if CONFIG_MENU_MENUBAR
 		- 1 /* menu bar labels */
+#endif
 		- (menu->title ? 1 : 0);
 
 	/* Selected item should be a visible entry */
