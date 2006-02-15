@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/02/15 09:10:15  bernie
+ *#* Implement prop fonts; Fix algo styles.
+ *#*
  *#* Revision 1.4  2006/02/10 12:32:33  bernie
  *#* Add multiple font support in bitmaps; gfx_blitRaster(): New function.
  *#*
@@ -36,6 +39,7 @@
 #include <cfg/debug.h>  /* ASSERT() */
 #include <cfg/cpu.h>    /* CPU_HARVARD */
 #include <cfg/macros.h> /* MIN() */
+#include <appconfig.h>  /* CONFIG_GFX_CLIPPING */
 
 #include <string.h>     /* memset() */
 
@@ -146,7 +150,7 @@ void gfx_blit(Bitmap *dst, const Rect *rect, const Bitmap *src, coord_t srcx, co
 }
 
 
-void gfx_blitRaster(Bitmap *dst, coord_t dxmin, coord_t dymin, const uint8_t *raster, coord_t w, coord_t h)
+void gfx_blitRaster(Bitmap *dst, coord_t dxmin, coord_t dymin, const uint8_t *raster, coord_t w, coord_t h, coord_t stride)
 {
 	coord_t dxmax, dymax;
 	coord_t sxmin = 0, symin = 0;
@@ -155,12 +159,12 @@ void gfx_blitRaster(Bitmap *dst, coord_t dxmin, coord_t dymin, const uint8_t *ra
 	/*
 	 * Clip coordinates inside dst->cr.
 	 */
-	if (dx < dst->cr.xmin)
+	if (dxmin < dst->cr.xmin)
 	{
 		sxmin += dst->cr.xmin - dxmin;
 		dxmin = dst->cr.xmin;
 	}
-	if (dy < dst->cr.ymin)
+	if (dymin < dst->cr.ymin)
 	{
 		symin += dst->cr.ymin - dymin;
 		dymin = dst->cr.ymin;
@@ -171,9 +175,7 @@ void gfx_blitRaster(Bitmap *dst, coord_t dxmin, coord_t dymin, const uint8_t *ra
 	/* TODO: make it not as dog slow as this */
 	for (dx = dxmin, sx = sxmin; dx < dxmax; ++dx, ++sx)
 		for (dy = dymin, sy = symin; dy < dymax; ++dy, ++sy)
-			BM_DRAWPIXEL(dst, dx, dy,
-				(raster[sy * ((w + 7) / 8) + sx / 8] & (1 << (7 - sx % 8))) ? 1 : 0
-			);
+			BM_DRAWPIXEL(dst, dx, dy, RAST_READPIXEL(raster, sx, sy, stride));
 }
 
 

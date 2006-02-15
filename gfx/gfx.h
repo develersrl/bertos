@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2006/02/15 09:10:15  bernie
+ *#* Implement prop fonts; Fix algo styles.
+ *#*
  *#* Revision 1.8  2006/02/10 12:28:33  bernie
  *#* Add font support in bitmaps; Make bitmap formats public.
  *#*
@@ -118,7 +121,7 @@ typedef struct Bitmap
 	Rect cr;                /*!< Clip drawing inside this rectangle */
 
 #if CONFIG_GFX_TEXT
-	struct Font *font;      /**< Current font for text rendering. */
+	const struct Font *font;/**< Current font for text rendering. */
 #endif
 #if CONFIG_GFX_VCOORDS
 	/*!
@@ -154,7 +157,7 @@ typedef struct Bitmap
 void gfx_bitmapInit (Bitmap *bm, uint8_t *raster, coord_t w, coord_t h);
 void gfx_bitmapClear(Bitmap *bm);
 void gfx_blit       (Bitmap *dst, const Rect *rect, const Bitmap *src, coord_t srcx, coord_t srcy);
-void gfx_blitRaster (Bitmap *dst, coord_t dx, coord_t dy, const uint8_t *raster, coord_t w, coord_t h);
+void gfx_blitRaster (Bitmap *dst, coord_t dx, coord_t dy, const uint8_t *raster, coord_t w, coord_t h, coord_t stride);
 void gfx_line       (Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2);
 void gfx_rectDraw   (Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2);
 void gfx_rectFillC  (Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2, uint8_t color);
@@ -170,7 +173,7 @@ void gfx_setClipRect(Bitmap *bm, coord_t xmin, coord_t ymin, coord_t xmax, coord
 #endif
 
 #if CONFIG_GFX_TEXT
-INLINE void gfx_setFont(Bitmap *bm, Font *font)
+INLINE void gfx_setFont(Bitmap *bm, const struct Font *font)
 {
 	bm->font = font;
 }

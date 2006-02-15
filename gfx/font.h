@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/02/15 09:10:15  bernie
+ *#* Implement prop fonts; Fix algo styles.
+ *#*
  *#* Revision 1.3  2006/02/10 12:29:05  bernie
  *#* Add multiple font support in bitmaps.
  *#*
@@ -62,14 +65,22 @@ typedef struct Font
 	 * Data is an array of at most 256 glyphs packed together.
 	 * Raster format must be the same of the bitmap.
 	 */
-	const PROGMEM uint8_t * const glyph;
+	const PROGMEM uint8_t *glyph;
 
-	uint8_t width;    /**< Pixel width of character cell. */
-	uint8_t height;   /**< Pixel height of character cell. */
+	uint8_t width;     /**< Pixel width of character cell. */
+	uint8_t height;    /**< Pixel height of character cell. */
+
+	uint8_t first;     /**< First encoded character in glyph array. */
+	uint8_t last;      /**< Last encoded character in glyph array (inclusive). */
+
+	/** Array of glyph offsets in bytes. NULL for fixed-width fonts. */
+	const PROGMEM uint16_t *offset;
+	const PROGMEM uint8_t *widths;
 
 } Font;
 
-/**< The default font. */
-extern struct Font default_font;
+/** The default font. */
+#define default_font font_ncenB18
+extern const struct Font default_font;
 
 #endif /* GFX_FONT_H */

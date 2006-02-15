@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/02/15 09:10:15  bernie
+ *#* Implement prop fonts; Fix algo styles.
+ *#*
  *#* Revision 1.3  2006/02/10 12:31:55  bernie
  *#* Add multiple font support in bitmaps.
  *#*
@@ -84,6 +87,8 @@
 #include <gfx/text.h>
 #include <gfx/text.h>
 
+#include <gfx/gfx_p.h> // FIXME: BM_DRAWPIXEL
+
 #include <cfg/debug.h>
 
 
@@ -110,7 +115,7 @@ void text_moveto(struct Bitmap *bm, int row, int col)
 	ASSERT(col >= 0);
 	ASSERT(col < bm->width / bm->font->width);
 	ASSERT(row >= 0);
-//	ASSERT(row < bm->height / bm->font->height);
+	ASSERT(row < bm->height / bm->font->height);
 
 	bm->penX = col * bm->font->width;
 	bm->penY = row * bm->font->height;
@@ -128,21 +133,50 @@ void text_setcoord(struct Bitmap *bm, int x, int y)
 
 
 /*!
- * Render char \a c on Bitmap \a bm
+ * Render char \a c on Bitmap \a bm.
  */
 static int text_putglyph(char c, struct Bitmap *bm)
 {
 	const uint8_t * PROGMEM glyph;  /* font is in progmem */
-	uint8_t glyph_width;
-	uint8_t i;
-	uint8_t *buf;
+	uint8_t glyph_width, glyph_height, glyph_height_bytes;
+	unsigned char index = (unsigned char)c;
 
-	/*
-	 * Compute the first column of pixels of the selected glyph,
-	 * using the character code to index the glyph array.
-	 */
-	glyph_width = bm->font->width;
-	glyph = &bm->font->glyph[(unsigned char)c * (((glyph_width + 7) / 8) * bm->font->height) ];
+	/* Check for out of range char and replace with '?' or first char in font. */
+	if (index < bm->font->first || index > bm->font->last)
+	{
+		kprintf("Illegal char '%c' (0x%02x)\n", index, index);
+		if ('?' >= bm->font->first && '?' <= bm->font->last)
+			index = '?';
+		else
+			index = bm->font->first;
+	}
+
+	/* Make character relative to font start */
+	index -= bm->font->first;
+
+	glyph_height = bm->font->height;
+	// FIXME: for vertical fonts only
+	glyph_height_bytes = (glyph_height + 7) / 8;
+
+	if (bm->font->offset)
+	{
+		/* Proportional font */
+		glyph_width = bm->font->widths[index]; /* TODO: optimize away */
+		glyph = bm->font->glyph + bm->font->offset[index];
+	}
+	else
+	{
+		/*
+		 * Fixed-width font: compute the first column of pixels
+		 * of the selected glyph using the character code to index
+		 * the glyph array.
+		 */
+		glyph_width = bm->font->width;
+
+		//For horizontal fonts
+		//glyph = bm->font->glyph + index * (((glyph_width + 7) / 8) * glyph_height);
+		glyph = bm->font->glyph + index * glyph_height_bytes * glyph_width;
+	}
 
 	if (text_styles & STYLEF_CONDENSED)
 		--glyph_width;
@@ -150,75 +184,73 @@ static int text_putglyph(char c, struct Bitmap *bm)
 	if (text_styles & STYLEF_EXPANDED)
 		glyph_width *= 2;
 
-	/* The y coord is rounded at multiples of 8 for simplicity */
-//	bm->penY &= ~((coord_t)7);
-
-	/* Check if glyph to write fits in the bitmap */
-	if ((bm->penX < 0) || (bm->penX + glyph_width > bm->width)
-		|| (bm->penY < 0) || (bm->penY + bm->font->height > bm->height))
-	{
-		kprintf("w=%d, h=%d\n", glyph_width, bm->font->height);
-		DB(kprintf("bad coords x=%d y=%d\n", bm->penX, bm->penY);)
-		return 0;
-	}
-
-	/* Locate position where to write in the raster */
-	buf = bm->raster + bm->penY / 8 * bm->width + bm->penX;
-
-//	bm->penX += glyph_width;
-
-	/* If some styles are set */
+	/* Slow path for styled glyphs */
 	if (text_styles)
 	{
-		uint8_t prev_dots = 0, italic_prev_dots = 0, new_dots;
+		uint8_t prev_dots = 0, italic_prev_dots = 0;
 		uint8_t dots;
+		uint8_t row, col;
 
-		/* Per ogni colonna di dot del glyph... */
-		for (i = 0; i < glyph_width; ++i)
+		/* Check if glyph fits in the bitmap. */
+		if ((bm->penX < 0) || (bm->penX + glyph_width > bm->width)
+			|| (bm->penY < 0) || (bm->penY + glyph_height > bm->height))
 		{
-			dots = PGM_READ_CHAR(glyph);
+			kprintf("bad coords x=%d y=%d\n", bm->penX, bm->penY);
+			return 0;
+		}
 
-			/* Advance to next column in glyph.
-			 * Expand: advances only once every two columns
-			 */
-			if (!(text_styles & STYLEF_EXPANDED) || (i & 1))
-				glyph++;
-
-			/* Italic: get lower 4 dots from previous column */
-			if (text_styles & STYLEF_ITALIC)
+		for (row = 0; row < glyph_height_bytes; ++row)
+		{
+			/* For each dot column in the glyph... */
+			for (col = 0; col < glyph_width; ++col)
 			{
-				new_dots = dots;
-				dots = (dots & 0xF0) | italic_prev_dots;
-				italic_prev_dots = new_dots & 0x0F;
+				uint8_t src_col = col;
+				uint8_t i;
+
+				/* Expanded style: advances only once every two columns. */
+				if (text_styles & STYLEF_EXPANDED)
+					src_col /= 2;
+
+				/* Fetch a column of dots from glyph. */
+				dots = PGM_READ_CHAR(glyph + src_col * glyph_height_bytes + row);
+
+				/* Italic: get lower 4 dots from previous column */
+				if (text_styles & STYLEF_ITALIC)
+				{
+					uint8_t new_dots = dots;
+					dots = (dots & 0xF0) | italic_prev_dots;
+					italic_prev_dots = new_dots & 0x0F;
+				}
+
+				/* Bold: "or" pixels with the previous column */
+				if (text_styles & STYLEF_BOLD)
+				{
+					uint8_t new_dots = dots;
+					dots |= prev_dots;
+					prev_dots = new_dots;
+				}
+
+				/* Underlined: turn on base pixel */
+				if (text_styles & STYLEF_UNDERLINE)
+					dots |= 0x80;
+
+				/* Inverted: invert pixels */
+				if (text_styles & STYLEF_INVERT)
+					dots = ~dots;
+
+				/* Output dots */
+				for (i = 0; i < 8 && (row * 8) + i < glyph_height; ++i)
+					BM_DRAWPIXEL(bm, bm->penX + col, bm->penY + row * 8 + i, dots & (1<<i));
 			}
-
-			/* Bold: "or" pixels with the previous column */
-			if (text_styles & STYLEF_BOLD)
-			{
-				new_dots = dots;
-				dots |= prev_dots;
-				prev_dots = new_dots;
-			}
-
-			/* Underlined: turn on base pixel */
-			if (text_styles & STYLEF_UNDERLINE)
-				dots |= 0x80;
-
-			/* Inverted: invert pixels */
-			if (text_styles & STYLEF_INVERT)
-				dots = ~dots;
-
-			/* Output dots */
-			*buf++ = dots;
 		}
 	}
 	else
 	{
-		/* No style: fast vanilla copy of glyph to line buffer */
-		gfx_blitRaster(bm, bm->penX, bm->penY, glyph, glyph_width, bm->font->height);
-//		while (glyph_width--)
-//			*buf++ = PGM_READ_CHAR(glyph++);
+		/* No style: fast vanilla copy of glyph to bitmap */
+		gfx_blitRaster(bm, bm->penX, bm->penY, glyph, glyph_width, glyph_height, glyph_height_bytes);
 	}
+
+	/* Update current pen position */
 	bm->penX += glyph_width;
 
 	return c;
