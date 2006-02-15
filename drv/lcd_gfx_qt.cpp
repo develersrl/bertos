@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/02/15 09:13:16  bernie
+ *#* Switch to BITMAP_FMT_PLANAR_V_LSB.
+ *#*
  *#* Revision 1.4  2006/02/10 12:33:49  bernie
  *#* Make emulator display a bit larger.
  *#*
@@ -31,6 +34,7 @@
 #include "lcd_gfx_qt.h"
 #include <emul/emul.h>
 #include <cfg/debug.h>
+#include <gfx/gfx.h> // CONFIG_BITMAP_FMT
 
 #include <qpainter.h>
 #include <qimage.h>
@@ -88,7 +92,30 @@ void EmulLCD::drawContents(QPainter *p)
 
 void EmulLCD::writeRaster(uint8_t *new_raster)
 {
+#if CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_H_MSB
+
+	/* Straight copy */
 	memcpy(raster, new_raster, sizeof(raster));
+
+#elif CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_V_LSB
+
+	/* Rotation */
+	for (int y = 0; y < HEIGHT; ++y)
+	{
+		for (int xbyte = 0; xbyte < WIDTH/8; ++xbyte)
+		{
+			uint8_t v = 0;
+			for (int xbit = 0; xbit < 8; ++xbit)
+				v |= (new_raster[(xbyte * 8 + xbit) + (y / 8) * WIDTH] & (1 << (y%8)) )
+					? (1 << (7 - xbit)) : 0;
+
+			raster[y * ((WIDTH + 7) / 8) + xbyte] = v;
+		}
+	}
+
+#else
+	#error Unsupported bitmap format
+#endif
 
 	QPainter p(this);
 	drawContents(&p);

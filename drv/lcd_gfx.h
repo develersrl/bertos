@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/02/15 09:13:16  bernie
+ *#* Switch to BITMAP_FMT_PLANAR_V_LSB.
+ *#*
  *#* Revision 1.3  2006/02/10 12:33:51  bernie
  *#* Make emulator display a bit larger.
  *#*
@@ -35,8 +38,8 @@
 #define LCD_MIN_PWM 130
 
 /* Display bitmap dims */
-#define LCD_WIDTH  320
-#define LCD_HEIGHT 200
+#define LCD_WIDTH  128
+#define LCD_HEIGHT 64
 
 /* fwd decl */
 struct Bitmap;

@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/02/15 09:12:56  bernie
+ *#* Switch to BITMAP_FMT_PLANAR_V_LSB.
+ *#*
  *#* Revision 1.5  2006/02/10 12:34:33  bernie
  *#* Add missing config options for gfx and kbd.
  *#*
@@ -168,7 +171,7 @@
 #define CONFIG_EEPROM_TYPE EEPROM_24XX256
 
 /// Select bitmap pixel format.
-#define CONFIG_BITMAP_FMT  BITMAP_FMT_PLANAR_H_MSB
+#define CONFIG_BITMAP_FMT  BITMAP_FMT_PLANAR_V_LSB
 
 /// Enable line clipping algorithm.
 #define CONFIG_GFX_CLIPPING 1

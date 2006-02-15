@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/02/15 09:13:16  bernie
+ *#* Switch to BITMAP_FMT_PLANAR_V_LSB.
+ *#*
  *#* Revision 1.2  2006/02/10 12:33:51  bernie
  *#* Make emulator display a bit larger.
  *#*
@@ -40,7 +43,7 @@ class EmulLCD : public QFrame
 
 public:
 // Attributes
-	enum { WIDTH = 320, HEIGHT = 200 };
+	enum { WIDTH = 128, HEIGHT = 64 };
 
 // Construction
 	EmulLCD(QWidget *parent = 0, const char *name = 0);
