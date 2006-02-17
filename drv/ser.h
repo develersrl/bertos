@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.25  2006/02/17 22:28:00  bernie
+ *#* Rename ser_emul.c to ser_posix.c.
+ *#*
  *#* Revision 1.24  2006/02/17 22:23:06  bernie
  *#* Update POSIX serial emulator.
  *#*
@@ -90,7 +93,7 @@
 #include <mware/fifobuf.h>
 #include <cfg/compiler.h>
 #include <cfg/macros.h> /* BV() */
-#include <cfg/arch_config.h> /* ARCH_EMUL */
+#include <cfg/os.h>
 #include <appconfig.h>
 
 /*! \name Serial Error/status flags. */
@@ -127,7 +130,7 @@
 	#define SERRF_FRAMEERROR     BV(9)  /*!< Stop bit missing */
 	#define SERRF_NOISEERROR     BV(10) /*!< Noise error */
 	#define SERRF_RXSROVERRUN    BV(11) /*!< Rx shift register overrun */
-#elif ARCH & ARCH_EMUL
+#elif OS_HOSTED
 	typedef uint16_t serstatus_t;
 
 	/* Software errors */
@@ -191,7 +194,7 @@ enum
 	SER_UART0,
 	SER_PUNTALI,
 	SER_BARCODE,
-#elif ARCH & ARCH_EMUL
+#elif OS_HOSTED
 	SER_UART0,
 	SER_UART1,
 #else

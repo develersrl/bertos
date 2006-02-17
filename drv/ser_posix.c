@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.1  2006/02/17 22:28:00  bernie
+ *#* Rename ser_emul.c to ser_posix.c.
+ *#*
  *#* Revision 1.4  2006/02/17 22:23:06  bernie
  *#* Update POSIX serial emulator.
  *#*
