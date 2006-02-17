@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/02/17 22:24:21  bernie
+ *#* Update POSIX timer emulator.
+ *#*
  *#* Revision 1.3  2006/02/10 12:34:52  bernie
  *#* Remove spurious EXTERN_C.
  *#*
@@ -55,8 +58,8 @@ static void timer_hw_init(void)
 	// Setup POSIX realtime timer to interrupt every 10ms.
 	static struct itimerval itv =
 	{
-		{ 0, 1000 }, /* it_interval */
-		{ 0, 1000 }  /* it_value */
+		{ 0, 1000 / TIMER_TICKS_PER_MSEC }, /* it_interval */
+		{ 0, 1000 / TIMER_TICKS_PER_MSEC }  /* it_value */
 	};
 	setitimer(ITIMER_REAL, &itv, NULL);
 }

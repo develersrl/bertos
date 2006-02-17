@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.28  2006/02/17 22:24:21  bernie
+ *#* Update POSIX timer emulator.
+ *#*
  *#* Revision 1.27  2005/11/27 03:04:19  bernie
  *#* Move test code to timer_test.c; Add OS_HOSTED support.
  *#*
@@ -236,10 +239,6 @@ INLINE void timer_udelay(utime_t delay)
 	timer_delayHp(us_to_hptime(delay));
 }
 #endif
-
-#if CONFIG_TEST
-void timer_test(void);
-#endif /* CONFIG_TEST */
 
 #ifndef CONFIG_TIMER_DISABLE_EVENTS
 
