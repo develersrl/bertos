@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2006/02/17 22:28:19  bernie
+ *#* Add missing UART definitions.
+ *#*
  *#* Revision 1.6  2006/02/15 09:12:56  bernie
  *#* Switch to BITMAP_FMT_PLANAR_V_LSB.
  *#*
@@ -112,13 +115,21 @@
  * \name Serial driver parameters
  * \{
  */
-	/*! Size of the outbound FIFO buffer for all ports (bytes) */
-	#define CONFIG_SER_TXBUFSIZE  32
-	/*! Size of the inbound FIFO buffer for all ports (bytes) */
-	#define CONFIG_SER_RXBUFSIZE  64
+	/*! [bytes] Size of the outbound FIFO buffer for port 0. */
+	#define CONFIG_UART0_TXBUFSIZE  32
+
+	/*! [bytes] Size of the inbound FIFO buffer for port 0. */
+	#define CONFIG_UART0_RXBUFSIZE  64
+
+	/*! [bytes] Size of the outbound FIFO buffer for port 1. */
+	#define CONFIG_UART1_TXBUFSIZE  32
+
+	/*! [bytes] Size of the inbound FIFO buffer for port 1. */
+	#define CONFIG_UART1_RXBUFSIZE  64
 
 	/*! Default transmit timeout (ms). Set to -1 to disable timeout support */
 	#define CONFIG_SER_TXTIMEOUT    -1
+
 	/*! Default receive timeout (ms). Set to -1 to disable timeout support */
 	#define CONFIG_SER_RXTIMEOUT    -1
 
@@ -130,6 +141,9 @@
 
 	/*! Enable ser_gets() and ser_gets_echo() */
 	#define CONFIG_SER_GETS          0
+
+	/** Enable second serial port in emulator. */
+	#define CONFIG_EMUL_UART1        0
 
 	/*!
 	 * Transmit always something on serial port 0 TX
@@ -184,5 +198,8 @@
 
 /// Keyboard polling method
 #define CONFIG_KBD_POLL  KBD_POLL_SOFTINT
+
+/// Enable button bar behind menus
+#define CONFIG_MENU_MENUBAR  0
 
 #endif /* CONFIG_COMMON_H */
