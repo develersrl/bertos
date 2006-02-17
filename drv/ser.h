@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.24  2006/02/17 22:23:06  bernie
+ *#* Update POSIX serial emulator.
+ *#*
  *#* Revision 1.23  2005/11/27 23:33:40  bernie
  *#* Use appconfig.h instead of cfg/config.h.
  *#*
@@ -87,6 +90,7 @@
 #include <mware/fifobuf.h>
 #include <cfg/compiler.h>
 #include <cfg/macros.h> /* BV() */
+#include <cfg/arch_config.h> /* ARCH_EMUL */
 #include <appconfig.h>
 
 /*! \name Serial Error/status flags. */
@@ -123,7 +127,7 @@
 	#define SERRF_FRAMEERROR     BV(9)  /*!< Stop bit missing */
 	#define SERRF_NOISEERROR     BV(10) /*!< Noise error */
 	#define SERRF_RXSROVERRUN    BV(11) /*!< Rx shift register overrun */
-#elif defined(_EMUL)
+#elif ARCH & ARCH_EMUL
 	typedef uint16_t serstatus_t;
 
 	/* Software errors */
@@ -131,13 +135,18 @@
 	#define SERRF_RXTIMEOUT      BV(1)  /*!< Receive timeout */
 	#define SERRF_TXTIMEOUT      BV(2)  /*!< Transmit timeout */
 
+	/* Hardware errors */
+	#define SERRF_RXSROVERRUN    0      /*!< Unsupported in emulated serial port. */
+	#define SERRF_FRAMEERROR     0      /*!< Unsupported in emulated serial port. */
+	#define SERRF_PARITYERROR    0      /*!< Unsupported in emulated serial port. */
+	#define SERRF_NOISEERROR     0      /*!< Unsupported in emulated serial port. */
+
 #else
 	#error unknown architecture
 #endif
 /*\}*/
 
-/*! \name Masks to group TX/RX errors. */
-/*\{*/
+/** Mask to group all RX errors. */
 #define SERRF_RX \
 	( SERRF_RXFIFOOVERRUN \
 	| SERRF_RXTIMEOUT \
@@ -145,8 +154,9 @@
 	| SERRF_PARITYERROR \
 	| SERRF_FRAMEERROR \
 	| SERRF_NOISEERROR)
+
+/** Mask to group all TX errors. */
 #define SERRF_TX  (SERRF_TXTIMEOUT)
-/*\}*/
 
 
 /*!
@@ -181,11 +191,9 @@ enum
 	SER_UART0,
 	SER_PUNTALI,
 	SER_BARCODE,
-#elif defined(_EMUL)
+#elif ARCH & ARCH_EMUL
 	SER_UART0,
-	#if CONFIG_EMUL_UART1
-		SER_UART1,
-	#endif
+	SER_UART1,
 #else
 	#error unknown architecture
 #endif

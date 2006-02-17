@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2006/02/17 22:23:06  bernie
+ *#* Update POSIX serial emulator.
+ *#*
  *#* Revision 1.8  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -40,6 +43,8 @@
 
 #ifndef DRV_SER_P_H
 #define DRV_SER_P_H
+
+#include <cfg/compiler.h> /* size_t */
 
 struct SerialHardware;
 struct Serial;

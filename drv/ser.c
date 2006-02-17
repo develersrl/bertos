@@ -28,6 +28,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.28  2006/02/17 22:23:06  bernie
+ *#* Update POSIX serial emulator.
+ *#*
  *#* Revision 1.27  2005/11/27 23:33:40  bernie
  *#* Use appconfig.h instead of cfg/config.h.
  *#*
@@ -112,7 +115,7 @@
 #include "ser_p.h"
 #include <mware/formatwr.h>
 #include <cfg/debug.h>
-#include <hw.h>
+//#include <hw.h>
 #include <appconfig.h>
 
 /*

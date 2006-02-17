@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/02/17 22:23:06  bernie
+ *#* Update POSIX serial emulator.
+ *#*
  *#* Revision 1.3  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -26,10 +29,12 @@
 
 #include "ser.h"
 #include "ser_p.h"
-#include <cfg/config.h>
 
 #include <cfg/debug.h>
+#include <cfg/compiler.h>
 #include <mware/fifobuf.h>
+
+#include <appconfig.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -43,10 +48,8 @@ extern struct Serial ser_handles[SER_CNT];
 /* TX and RX buffers */
 static unsigned char uart0_txbuffer[CONFIG_UART0_TXBUFSIZE];
 static unsigned char uart0_rxbuffer[CONFIG_UART0_RXBUFSIZE];
-#if CONFIG_EMUL_UART1
-	static unsigned char uart1_txbuffer[CONFIG_UART1_TXBUFSIZE];
-	static unsigned char uart1_rxbuffer[CONFIG_UART1_RXBUFSIZE];
-#endif
+static unsigned char uart1_txbuffer[CONFIG_UART1_TXBUFSIZE];
+static unsigned char uart1_rxbuffer[CONFIG_UART1_RXBUFSIZE];
 
 
 /*!
@@ -79,29 +82,35 @@ static void uart_cleanup(UNUSED_ARG(struct SerialHardware *, _hw))
 	hw->fd = -1;
 }
 
-static void uart_enabletxirq(struct SerialHardware * _hw)
+static void uart_txStart(struct SerialHardware * _hw)
 {
 	struct EmulSerial *hw = (struct EmulSerial *)_hw;
 
 	while(!fifo_isempty(&hw->ser->txfifo))
 	{
-		fputc(fifo_pop(&hw->ser->txfifo), hw->fd);
+		char c = fifo_pop(&hw->ser->txfifo);
+		write(hw->fd, &c, 1);
 	}
 }
 
-static void uart_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned long rate)
+static bool uart_txSending(UNUSED_ARG(struct SerialHardware *, _hw))
+{
+	return false;
+}
+
+
+static void uart_setBaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned long rate)
 {
 	TRACEMSG("rate=%lu", rate);
 	// TODO
 
 }
 
-static void uart_setparity(UNUSED_ARG(struct SerialHardware *, _hw), int parity)
+static void uart_setParity(UNUSED_ARG(struct SerialHardware *, _hw), int parity)
 {
 	TRACEMSG("parity=%d", parity);
 	// TODO
 }
-
 
 // FIXME: move into compiler.h?  Ditch?
 #if COMPILER_C99
@@ -114,55 +123,45 @@ static void uart_setparity(UNUSED_ARG(struct SerialHardware *, _hw), int parity)
 #endif
 
 /*
- * High-level interface data structures
+ * High-level interface data structures.
  */
-static const struct SerialHardwareVT UART0_VT =
+static const struct SerialHardwareVT uart_vtable =
 {
 	C99INIT(init, uart_init),
 	C99INIT(cleanup, uart_cleanup),
-	C99INIT(setbaudrate, uart_setbaudrate),
-	C99INIT(setparity, uart_setparity),
-	C99INIT(enabletxirq, uart_enabletxirq),
+	C99INIT(setBaudrate, uart_setBaudrate),
+	C99INIT(setParity, uart_setParity),
+	C99INIT(txStart, uart_txStart),
+	C99INIT(txSending, uart_txSending),
 };
-
-#if CONFIG_EMUL_UART1
-static const struct SerialHardwareVT UART1_VT =
-{
-	C99INIT(init, uart_init),
-	C99INIT(cleanup, uart_cleanup),
-	C99INIT(setbaudrate, uart_setbaudrate),
-	C99INIT(setparity, uart_setparity),
-	C99INIT(enabletxirq, uart_enabletxirq),
-};
-#endif // CONFIG_EMUL_UART1
 
 static struct EmulSerial UARTDescs[SER_CNT] =
 {
 	{
 		C99INIT(hw, /**/) {
-			C99INIT(table, &UART0_VT),
+			C99INIT(table, &uart_vtable),
 			C99INIT(txbuffer, uart0_txbuffer),
 			C99INIT(rxbuffer, uart0_rxbuffer),
 			C99INIT(txbuffer_size, sizeof(uart0_txbuffer)),
 			C99INIT(rxbuffer_size, sizeof(uart0_rxbuffer)),
 		},
+		C99INIT(ser, NULL),
 		C99INIT(fd, -1),
 	},
-#if CONFIG_EMUL_UART1
 	{
 		C99INIT(hw, /**/) {
-			C99INIT(table, &UART1_VT),
+			C99INIT(table, &uart_vtable),
 			C99INIT(txbuffer, uart1_txbuffer),
 			C99INIT(rxbuffer, uart1_rxbuffer),
 			C99INIT(txbuffer_size, sizeof(uart1_txbuffer)),
 			C99INIT(rxbuffer_size, sizeof(uart1_rxbuffer)),
 		},
+		C99INIT(ser, NULL),
 		C99INIT(fd, -1),
 	},
-#endif
 };
 
-struct SerialHardware* ser_hw_getdesc(int unit)
+struct SerialHardware *ser_hw_getdesc(int unit)
 {
 	ASSERT(unit < SER_CNT);
 	return &UARTDescs[unit].hw;

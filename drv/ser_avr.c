@@ -38,6 +38,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.30  2006/02/17 22:23:06  bernie
+ *#* Update POSIX serial emulator.
+ *#*
  *#* Revision 1.29  2005/11/27 23:31:48  bernie
  *#* Support avr-libc 1.4.
  *#*
@@ -664,7 +667,7 @@ static struct AvrSerial UARTDescs[SER_CNT] =
 	}
 };
 
-struct SerialHardware* ser_hw_getdesc(int unit)
+struct SerialHardware *ser_hw_getdesc(int unit)
 {
 	ASSERT(unit < SER_CNT);
 	return &UARTDescs[unit].hw;
