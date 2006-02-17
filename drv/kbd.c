@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/02/17 21:15:42  bernie
+ *#* Add MOD_CHECK() checks.
+ *#*
  *#* Revision 1.2  2006/02/10 12:36:20  bernie
  *#* Add preliminary FreeRTOS support; Enforce CONFIG_* definitions.
  *#*
@@ -32,6 +35,7 @@
 #include <drv/buzzer.h>
 
 #include <cfg/debug.h>
+#include <cfg/module.h>
 
 /* Configuration sanity checks */
 #if !defined(CONFIG_KBD_POLL) || (CONFIG_KBD_POLL != KBD_POLL_SOFTINT && CONFIG_KBD_POLL != CONFIG_POLL_FREERTOS)
@@ -379,12 +383,15 @@ static keymask_t kbd_rptHandlerFunc(keymask_t key)
 }
 
 
+MOD_DEFINE(kbd)
 
 /*!
  * Initialize keyboard ports and softtimer
  */
 void kbd_init(void)
 {
+	MOD_CHECK(buzzer);
+
 	KBD_HW_INIT;
 
 	/* Init handlers lists */
@@ -405,13 +412,11 @@ void kbd_init(void)
 	kbd_addHandler(&kbd_lngHandler);
 	#endif
 
-
 	/* Add repeat keyboard handler */
 	kbd_rptHandler.hook = kbd_rptHandlerFunc;
 	kbd_rptHandler.pri = 80; /* high priority */
 	kbd_rptHandler.flags = KHF_RAWKEYS;
 	kbd_addHandler(&kbd_rptHandler);
-
 
 	/* Add default keyboard handler */
 	kbd_defHandler.hook = kbd_defHandlerFunc;
@@ -419,15 +424,23 @@ void kbd_init(void)
 	kbd_addHandler(&kbd_defHandler);
 
 #if CONFIG_KBD_POLL == KBD_POLL_SOFTINT
+
+	MOD_CHECK(timer);
+
 	/* Add kbd handler to soft timers list */
 	event_initSoftInt(&kbd_timer.expire, kbd_softint, 0);
 	timer_setDelay(&kbd_timer, ms_to_ticks(KBD_CHECK_INTERVAL));
 	timer_add(&kbd_timer);
+
 #elif CONFIG_KBD_POLL == CONFIG_POLL_FREERTOS
+
 	/* Create a timer specific thread */
 	xTaskCreate(kbd_poll, "kbd_poll", CONFIG_STACK_KBD,
 			NULL, CONFIG_PRI_KBD, NULL);
+
 #else
 	#error "Define keyboard poll method"
 #endif
+
+	MOD_INIT(kbd);
 }

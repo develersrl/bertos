@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.18  2006/02/17 21:15:25  bernie
+ *#* Add MOD_CHECK() checks.
+ *#*
  *#* Revision 1.17  2006/02/10 12:30:18  bernie
  *#* Push interrupt protection inside hw module.
  *#*
@@ -53,6 +56,7 @@
 #include <mware/event.h>
 
 #include <cfg/debug.h>
+#include <cfg/module.h>
 
 
 /* Local vars */
@@ -147,14 +151,19 @@ void buz_repeat_stop(void)
 	IRQ_RESTORE(flags);
 }
 
+MOD_DEFINE(buzzer)
 
 /*!
  * Initialize buzzer.
  */
 void buz_init(void)
 {
+	MOD_CHECK(timer);
+
 	BUZZER_HW_INIT;
 
 	/* Init software interrupt. */
 	timer_set_event_softint(&buz_timer, (Hook)buz_softint, 0);
+
+	MOD_INIT(buzzer);
 }
