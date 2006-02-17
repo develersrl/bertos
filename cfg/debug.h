@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/02/17 22:28:37  bernie
+ *#* Support TRACE() and TRACEMSG() on hosted targets.
+ *#*
  *#* Revision 1.5  2005/11/04 16:09:03  bernie
  *#* Doxygen workaround.
  *#*
@@ -178,12 +181,14 @@
 		}
 		/* G++ can't inline functions with variable arguments... */
 		#define kprintf(fmt, ...) fprintf(stderr, fmt, ## __VA_ARGS__)
+		#define kvprintf(fmt, ap) vfprintf(stderr, fmt, ap)
 		void kdump(const void *buf, size_t len); /* UNIMPLEMENTED */
 
 		#ifndef ASSERT
 			#include <assert.h>
 			#define ASSERT(x) assert(x)
 		#endif /* ASSERT */
+		#define ASSERT2(x, help)  ASSERT(help && x)
 
 		/*!
 		 * Check that the given pointer is not NULL or pointing to raw memory.
@@ -195,6 +200,15 @@
 		#define ASSERT_VALID_PTR(p)  ASSERT((unsigned long)(p) > 0x200)
 
 		#define ASSERT_VALID_PTR_OR_NULL(p)  ASSERT((((p) == NULL) || ((unsigned long)(p) >= 0x200)))
+
+		#if !CONFIG_KDEBUG_DISABLE_TRACE
+			#define TRACE  kporintf("%s()\n", __func__)
+			#define TRACEMSG(msg,...) kprintf("%s(): " msg, __func__, ## __VA_ARGS__)
+		#else
+			#define TRACE  do {} while(0)
+			#define TRACEMSG(...)  do {} while(0)
+		#endif
+
 	#else /* !OS_HOSTED */
 
 		#include <appconfig.h>  /* CONFIG_KDEBUG_ASSERT_NO_TEXT */
