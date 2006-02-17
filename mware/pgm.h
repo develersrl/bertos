@@ -24,6 +24,7 @@
 
 #include <cfg/cpu_detect.h>
 #include <cfg/compiler.h> /* For intXX_t */
+#include <cfg/cpu.h> /* For CPU_HARVARD */
 
 #if CPU_AVR
 

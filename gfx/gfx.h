@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2006/02/17 22:24:40  bernie
+ *#* Fix undefined preprocessor symbol.
+ *#*
  *#* Revision 1.9  2006/02/15 09:10:15  bernie
  *#* Implement prop fonts; Fix algo styles.
  *#*
@@ -38,6 +41,14 @@
 
 #include <appconfig.h> /* CONFIG_GFX_* */
 
+/**
+ * \name Known pixel formats for bitmap representation.
+ * \{
+ */
+#define BITMAP_FMT_PLANAR_H_MSB  1  /**< Planar pixels, horizontal bytes, MSB left. */
+#define BITMAP_FMT_PLANAR_V_LSB  2  /**< Planar pixels, vertical bytes, LSB top. */
+/* \} */
+
 #if !defined(CONFIG_BITMAP_FMT) || (CONFIG_BITMAP_FMT != BITMAP_FMT_PLANAR_H_MSB && CONFIG_BITMAP_FMT != BITMAP_FMT_PLANAR_V_LSB)
 	#error CONFIG_BITMAP_FMT must be defined to either BITMAP_FMT_PLANAR_H_LSB or BITMAP_FMT_PLANAR_V_LSB
 #endif
@@ -47,14 +58,6 @@
 #if !defined(CONFIG_GFX_TEXT) || (CONFIG_GFX_TEXT != 0 && CONFIG_GFX_TEXT != 1)
 	#error CONFIG_GFX_TEXT must be defined to either 0 or 1
 #endif
-
-/**
- * \name Known pixel formats for bitmap representation.
- * \{
- */
-#define BITMAP_FMT_PLANAR_H_MSB  1  /**< Planar pixels, horizontal bytes, MSB left. */
-#define BITMAP_FMT_PLANAR_V_LSB  2  /**< Planar pixels, vertical bytes, LSB top. */
-/* \} */
 
 EXTERN_C_BEGIN
 
