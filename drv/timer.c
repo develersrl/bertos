@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.29  2006/02/17 22:24:07  bernie
+ *#* Add MOD_CHECK() checks.
+ *#*
  *#* Revision 1.28  2006/02/10 12:32:52  bernie
  *#* Update Copyright year.
  *#*
@@ -46,6 +49,7 @@
 #include <cfg/cpu.h>
 #include <cfg/os.h>
 #include <cfg/debug.h>
+#include <cfg/module.h>
 #include <appconfig.h>
 
 /*
@@ -303,6 +307,7 @@ DEFINE_TIMER_ISR
 	TIMER_STROBE_OFF;
 }
 
+MOD_DEFINE(timer)
 
 /*!
  * Initialize timer
@@ -318,4 +323,6 @@ void timer_init(void)
 	_clock = 0;
 
 	timer_hw_init();
+
+	MOD_INIT(timer);
 }
