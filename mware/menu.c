@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/02/20 14:34:32  bernie
+ *#* Include appconfig.h before using its definitions.
+ *#*
  *#* Revision 1.2  2006/02/15 09:10:51  bernie
  *#* Make title bold; Fix height when we have no menubar.
  *#*
@@ -67,22 +70,23 @@
 
 #include "menu.h"
 
-#if CONFIG_MENU_MENUBAR
-#include "menubar.h"
-#endif
-
 #include <gfx/gfx.h>
 #include <gfx/font.h>
 #include <gfx/text.h>
 #include <drv/kbd.h>
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
+#include <appconfig.h>
 
 #if CPU_HARVARD
 #include <avr/pgmspace.h> /* strncpy_P() */
 #endif
 
 #include <string.h> /* strcpy() */
+
+#if CONFIG_MENU_MENUBAR
+#include "menubar.h"
+#endif
 
 #if defined(CONFIG_LOCALE) && (CONFIG_LOCALE == 1)
 #include "msg.h"
