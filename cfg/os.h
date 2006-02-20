@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2006/02/20 01:46:59  bernie
+ *#* Port to MacOSX.
+ *#*
  *#* Revision 1.6  2006/02/15 09:12:33  bernie
  *#* Don't mask useful user signals on UNIX.
  *#*
@@ -53,7 +56,7 @@
 	#define OS_WIN32  0
 #endif
 
-#ifdef __unix__
+#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
 	#define OS_UNIX   1
 	#define OS_POSIX  1  /* Not strictly UNIX, but no way to autodetect it. */
 	#define OS_ID     posix
@@ -132,7 +135,7 @@
  * Summarize hosted environments as OS_HOSTED and embedded
  * environment with OS_EMBEDDED.
  */
-#if OS_WIN32 || OS_UNIX
+#if OS_WIN32 || OS_UNIX || OS_DARWIN
 	#define OS_HOSTED   1
 	#define OS_EMBEDDED 0
 #else

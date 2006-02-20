@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2006/02/20 01:46:46  bernie
+ *#* Port to MacOSX.
+ *#*
  *#* Revision 1.7  2006/01/16 03:28:25  bernie
  *#* Remove redundant mtime_t definition (cfg/compiler.h has one already).
  *#*
@@ -51,7 +54,7 @@ extern "C" {
 	#define HPTIME_TICKS_PER_MILLISEC	((hptime_t)10000I64)
 	#define HPTIME_TICKS_PER_MICRO		((hptime_t)10I64)
 
-#elif defined(__unix__)
+#elif defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
 
 	#include <stdint.h>
 

@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/02/20 01:46:46  bernie
+ *#* Port to MacOSX.
+ *#*
  *#* Revision 1.5  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -53,7 +56,7 @@ hptime_t hptime_get(void)
 	return (((hptime_t)ft.dwHighDateTime) << 32) + (hptime_t)ft.dwLowDateTime;
 }
 
-#elif defined(__unix__)
+#elif defined(__unix__) || defined(__APPLE__) && defined(__MACH__)
 
 #include <sys/time.h>
 
