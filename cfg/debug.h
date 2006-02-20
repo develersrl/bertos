@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2006/02/20 02:01:56  bernie
+ *#* Depend on cfg/os.h.
+ *#*
  *#* Revision 1.6  2006/02/17 22:28:37  bernie
  *#* Support TRACE() and TRACEMSG() on hosted targets.
  *#*
@@ -62,16 +65,7 @@
 #ifndef DEVLIB_DEBUG_H
 #define DEVLIB_DEBUG_H
 
-/*
- * Try to guess whether we're running in a hosted or embedded environment.
- */
-#ifndef OS_HOSTED
-	#if defined(__unix__) || defined(_WIN32)
-		#define OS_HOSTED  1
-	#else
-		#define OS_HOSTED  0
-	#endif
-#endif /* !OS_HOSTED */
+#include <cfg/os.h>
 
 #if OS_HOSTED
 	/*
