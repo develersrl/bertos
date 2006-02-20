@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2006/02/20 02:02:29  bernie
+ *#* Port to Qt 4.1.
+ *#*
  *#* Revision 1.7  2005/11/27 03:58:40  bernie
  *#* Add POSIX timer emulator.
  *#*
@@ -52,7 +55,11 @@
 	#include <cfg/os.h>
 
 	#if OS_QT
-		#include <qapplication.h>
+		#if _QT < 4
+			#include <qapplication.h>
+		#else
+			#include <QtGui/QApplication>
+		#endif
 	#elif OS_POSIX
 		#include <sys/select.h>
 	#elif CPU_AVR

@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/02/20 02:01:35  bernie
+ *#* Port to Qt 4.1.
+ *#*
  *#* Revision 1.1  2005/11/27 03:06:36  bernie
  *#* Qt timer emulation.
  *#*
@@ -22,8 +25,13 @@
 #include <cfg/compiler.h> /* hptime.t */
 
 // Qt headers
-#include <qdatetime.h>
-#include <qtimer.h>
+#if _QT < 4
+	#include <qdatetime.h>
+	#include <qtimer.h>
+#else
+	#include <QtCore/QDateTime>
+	#include <QtCore/QTimer>
+#endif
 
 
 // The user interrupt server routine

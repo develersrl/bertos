@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/02/20 02:00:40  bernie
+ *#* Port to Qt 4.1.
+ *#*
  *#* Revision 1.3  2006/02/15 09:13:16  bernie
  *#* Switch to BITMAP_FMT_PLANAR_V_LSB.
  *#*
@@ -28,8 +31,13 @@
 #ifndef DRV_LCD_GFX_QT_H
 #define DRV_LCD_GFX_QT_H
 
-#include <qframe.h>
-#include <qcolor.h>
+#if _QT < 4
+	#include <qframe.h>
+	#include <qcolor.h>
+#else
+	#include <QtGui/QColor>
+	#include <QtGui/QFrame>
+#endif
 
 // fwd decls
 class QSizePolicy;
@@ -53,8 +61,7 @@ public:
 protected:
 	virtual QSizePolicy sizePolicy() const;
 	virtual QSize sizeHint() const;
-//	virtual void paintEvent(QPaintEvent *event);
-	virtual void drawContents(QPainter *p);
+	virtual void paintEvent(QPaintEvent *event);
 
 // Operations
 public:

@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/02/20 02:00:39  bernie
+ *#* Port to Qt 4.1.
+ *#*
  *#* Revision 1.2  2006/01/16 03:51:51  bernie
  *#* Fix boilerplate.
  *#*
@@ -26,7 +29,11 @@
 #ifndef EMUL_EMULWIN_H
 #define EMUL_EMULWIN_H
 
-#include <qmainwindow.h>
+#if _QT < 4
+	#include <qmainwindow.h>
+#else
+	#include <QtGui/QMainWindow>
+#endif
 
 // fwd decls
 class Emulator;

@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/02/20 02:00:40  bernie
+ *#* Port to Qt 4.1.
+ *#*
  *#* Revision 1.5  2006/02/15 09:13:16  bernie
  *#* Switch to BITMAP_FMT_PLANAR_V_LSB.
  *#*
@@ -36,10 +39,17 @@
 #include <cfg/debug.h>
 #include <gfx/gfx.h> // CONFIG_BITMAP_FMT
 
-#include <qpainter.h>
-#include <qimage.h>
-#include <qsizepolicy.h>
-#include <qsize.h>
+#if _QT < 4
+	#include <qpainter.h>
+	#include <qimage.h>
+	#include <qsizepolicy.h>
+	#include <qsize.h>
+#else
+	#include <QtGui/QPainter>
+	#include <QtGui/QImage>
+	#include <QtGui/QSizePolicy>
+	#include <QtCore/QSize>
+#endif
 
 // Display colors
 #define LCD_FG_COLOR 0x0, 0x0, 0x0
@@ -47,7 +57,7 @@
 
 
 EmulLCD::EmulLCD(QWidget *parent, const char *name) :
-	QFrame(parent, name, WRepaintNoErase | WResizeNoErase),
+	QFrame(parent, name, Qt::WRepaintNoErase | Qt::WResizeNoErase),
 	fg_color(LCD_FG_COLOR),
 	bg_color(LCD_BG_COLOR)
 {
@@ -80,14 +90,15 @@ QSize EmulLCD::sizeHint() const
 }
 
 
-void EmulLCD::drawContents(QPainter *p)
+void EmulLCD::paintEvent(QPaintEvent * /*event*/)
 {
+	QPainter p(this);
 	QImage img(raster, WIDTH, HEIGHT, 1, NULL, 0, QImage::BigEndian);
 
-	p->setBackgroundMode(OpaqueMode);
-	p->setPen(fg_color);
-	p->setBackgroundColor(bg_color);
-	p->drawImage(frame_width, frame_width, img);
+	p.setBackgroundMode(Qt::OpaqueMode);
+	p.setPen(fg_color);
+	p.setBackgroundColor(bg_color);
+	p.drawImage(frame_width, frame_width, img);
 }
 
 void EmulLCD::writeRaster(uint8_t *new_raster)
@@ -117,8 +128,7 @@ void EmulLCD::writeRaster(uint8_t *new_raster)
 	#error Unsupported bitmap format
 #endif
 
-	QPainter p(this);
-	drawContents(&p);
+	repaint();
 }
 
 

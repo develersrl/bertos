@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/02/20 02:00:40  bernie
+ *#* Port to Qt 4.1.
+ *#*
  *#* Revision 1.2  2006/01/16 03:51:51  bernie
  *#* Fix boilerplate.
  *#*
@@ -25,9 +28,16 @@
 
 #include "emul.h"
 #include "emulwin.h"
+#include <cfg/module.h>
 
-#include <qapplication.h>
 #include <cstdlib> // std::exit()
+
+#if _QT < 4
+	#include <qapplication.h>
+#else
+	#include <QtGui/qapplication.h>
+#endif
+
 
 /// The global emulator instance.
 Emulator *emul;
@@ -36,7 +46,9 @@ Emulator::Emulator(int &argc, char **argv) :
 	emulApp(new QApplication(argc, argv)),
 	emulWin(new EmulWin(this))
 {
-	emulApp->setMainWidget(emulWin);
+	#if QT_VERSION < ((4 << 16) + (0 << 8) + 0)
+		emulApp->setMainWidget(emulWin);
+	#endif
 	emulWin->show();
 }
 
@@ -49,7 +61,7 @@ Emulator::~Emulator()
 }
 
 
-void Emulator::quit()
+NORETURN void Emulator::quit()
 {
 	// WHAT A KLUDGE!
 	this->~Emulator();
@@ -59,19 +71,21 @@ void Emulator::quit()
 	exit(0);
 }
 
+MOD_DEFINE(emul)
 
 /// Main emulator entry point.
 extern "C" void emul_init(int *argc, char *argv[])
 {
-	ASSERT(!emul);
-
 	// setup global emulator pointer
 	emul = new Emulator(*argc, argv);
+
+	MOD_INIT(emul);
 }
 
 extern "C" void emul_cleanup()
 {
-	ASSERT(emul);
+	MOD_CLEANUP(emul);
+
 	delete emul;
 	emul = NULL;
 }

@@ -20,7 +20,11 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#if _QT < 4
 #include <qframe.h>
+#else
+#include <QtGui/QFrame>
+#endif
 
 // fwd decl
 class QGridLayout;
@@ -38,7 +42,7 @@ protected:
 
 // Construction
 public:
-	EmulKbd(QWidget *parent = 0, const char *name = 0, WFlags f = 0);
+	EmulKbd(QWidget *parent = 0, const char *name = 0, Qt::WFlags f = 0);
 	virtual ~EmulKbd();
 
 // Public methods
@@ -63,7 +67,11 @@ protected:
 
 // Private helper class for EmulKbd
 // NOTE: with protected inheritance, dynamic_cast<> does not work (gcc 2.96)
+#if _QT < 4
 #include <qpushbutton.h>
+#else
+#include <QtGui/qpushbutton.h>
+#endif
 class EmulKey : public QPushButton
 {
 	Q_OBJECT

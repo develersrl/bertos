@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/02/20 02:00:39  bernie
+ *#* Port to Qt 4.1.
+ *#*
  *#* Revision 1.3  2006/02/15 09:11:17  bernie
  *#* Add keyboard emulator.
  *#*
@@ -33,19 +36,48 @@
 #include <emul/emulkbd.h>
 
 #include <cassert>
-#include <qlayout.h>
-#include <qlabel.h>
-#include <qslider.h>
-#include <qcheckbox.h>
-#include <qpopupmenu.h>
-#include <qmenubar.h>
-#include <qmessagebox.h>
-#include <qdatetime.h>
-#include <qtimer.h>
-#include <qapplication.h>
 
-EmulWin::EmulWin(Emulator *e) : QMainWindow(0, "DevLibEmul", WDestructiveClose)
+#if _QT < 4
+	#include <qlayout.h>
+	#include <qlabel.h>
+	#include <qslider.h>
+	#include <qcheckbox.h>
+	#include <qmenubar.h>
+	#include <qmessagebox.h>
+	#include <qdatetime.h>
+	#include <qtimer.h>
+	#include <qapplication.h>
+	#include <qpopupmenu.h>
+	#include <qevent.h>
+#else
+	#include <QtGui/QLayout>
+	#include <QtGui/QLabel>
+	#include <QtGui/QSlider>
+	#include <QtGui/QCheckBox>
+	#include <QtGui/QMenuBar>
+	#include <QtGui/QMessageBox>
+	#include <QtCore/QDateTime>
+	#include <QtCore/QTimer>
+	#include <QtGui/QApplication>
+	#include <QtGui/QCloseEvent>
+	//#include <Qt3Support/q3popupmenu.h>
+	//#define QPopupMenu Q3PopupMenu
+	#define QPopupMenu QMenu
+	using namespace Qt;
+#endif
+
+EmulWin::EmulWin(Emulator *e) : QMainWindow(0, "DevLibEmul",
+	#if _QT < 4
+		Qt::WDestructiveClose
+	#else
+		0
+	#endif
+)
 {
+	#if _QT >= 4
+		setAttribute(Qt::WA_DeleteOnClose);
+	#endif
+
 	// "File" menu
 	QPopupMenu * file = new QPopupMenu(this);
 	file->insertItem("&Quit", static_cast<QObject *>(e->emulApp), SLOT(closeAllWindows()), CTRL+Key_Q);

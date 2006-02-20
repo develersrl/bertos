@@ -16,13 +16,24 @@
 #include "emulkbd.h"
 #include "emul.h"
 
-#include <qpainter.h>
-#include <qpixmap.h>
-#include <qsizepolicy.h>
-#include <qsize.h>
-#include <qrect.h>
-#include <qlayout.h>
-#include <qobjectlist.h>
+#if _QT < 4
+	#include <qpainter.h>
+	#include <qpixmap.h>
+	#include <qsizepolicy.h>
+	#include <qsize.h>
+	#include <qrect.h>
+	#include <qlayout.h>
+	#include <qobjectlist.h>
+#else
+	#include <QtGui/QPainter>
+	#include <QtGui/QPixmap>
+	#include <QtGui/QSizePolicy>
+	#include <QtGui/QLayout>
+	#include <QtGui/QKeyEvent>
+	#include <QtCore/QEvent>
+	#include <QtCore/QSize>
+	#include <QtCore/QRect>
+#endif
 
 
 EmulKey::EmulKey(EmulKbd *kbd, const char *label, int _keycode, int _row, int _col) :
@@ -31,7 +42,7 @@ EmulKey::EmulKey(EmulKbd *kbd, const char *label, int _keycode, int _row, int _c
 	keycode(_keycode)
 {
 	// don't let the widget get focus
-	setFocusPolicy(QWidget::NoFocus);
+	setFocusPolicy(Qt::NoFocus);
 
 	// unused
 	connect(this, SIGNAL(pressed()), this, SLOT(keyPressed()));
@@ -76,14 +87,14 @@ void EmulKey::keyReleased(void)
 }
 
 
-EmulKbd::EmulKbd(QWidget *parent, const char *name, WFlags f) :
-	QFrame(parent, name, WRepaintNoErase | WResizeNoErase | f),
+EmulKbd::EmulKbd(QWidget *parent, const char *name, Qt::WFlags f) :
+	QFrame(parent, name, Qt::WRepaintNoErase | Qt::WResizeNoErase | f),
 	layout(new QGridLayout(this, 4, 4, 4)),
 	active_row(0)
 {
 	setFrameStyle(QFrame::Box | QFrame::Sunken);
 	setLineWidth(1);
-	setFocusPolicy(StrongFocus);
+	setFocusPolicy(Qt::StrongFocus);
 	frame_width = frameWidth();
 }
 
@@ -100,7 +111,7 @@ QSizePolicy EmulKbd::sizePolicy() const
 }
 
 
-void EmulKbd::resizeEvent(QResizeEvent * event)
+void EmulKbd::resizeEvent(QResizeEvent *event)
 {
 	// Let our superclass process the event first
 	QFrame::resizeEvent(event);
@@ -108,7 +119,7 @@ void EmulKbd::resizeEvent(QResizeEvent * event)
 
 
 // handle key presses for all keys in keyboard
-bool EmulKbd::event(QEvent * _e)
+bool EmulKbd::event(QEvent *_e)
 {
 	switch (_e->type())
 	{
@@ -123,10 +134,10 @@ bool EmulKbd::event(QEvent * _e)
 			if (!e->isAutoRepeat())
 			{
 				// scan all children
-				for (QObjectListIt it(*children()); *it; ++it)
+				for (QObjectList::const_iterator it(children().begin()); it != children().end(); ++it)
 				{
 					// only keys, not other children!
-					if ((*it)->metaObject() == EmulKey::staticMetaObject())
+					if ((*it)->metaObject() == &EmulKey::staticMetaObject)
 					// if ((key = dynamic_cast<EmulKey *>(*it)))
 					{
 						key = static_cast<EmulKey *>(*it);
