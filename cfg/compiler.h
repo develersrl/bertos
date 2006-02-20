@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2006/02/20 14:34:58  bernie
+ *#* Use portable type checking.
+ *#*
  *#* Revision 1.10  2006/02/15 09:12:01  bernie
  *#* Fixes for ARM/IAR support.
  *#*
@@ -196,6 +199,13 @@
 	#define MUST_CHECK              __attribute__((warn_unused_result))
 	#if GNUC_PREREQ(3,1)
 		#define DEPRECATED  __attribute__((__deprecated__))
+	#endif
+
+	#ifndef __cplusplus
+		#define ASSERT_TYPE_EQUAL(var1, var2) \
+			STATIC_ASSERT(__builtin_types_compatible_p(typeof(var1), typeof(var2)))
+		#define ASSERT_TYPE_IS(var, type) \
+			STATIC_ASSERT(__builtin_types_compatible_p(typeof(var), type))
 	#endif
 
 	/* Include some standard C89/C99 stuff */
@@ -479,6 +489,18 @@ typedef unsigned char page_t;    /*!< Type for banked memory pages. */
 
 /*! Issue a compilation error if the \a condition is false */
 #define STATIC_ASSERT(condition)  \
-	UNUSED_VAR(extern char,PP_CAT(CT_ASSERT___, __LINE__)[(condition) ? 1 : -1])
+	UNUSED_VAR(extern char, STATIC_ASSERTION_FAILED__[(condition) ? 1 : -1])
+
+#ifndef ASSERT_TYPE_EQUAL
+/*! Ensure two variables have the same type. */
+#define ASSERT_TYPE_EQUAL(var1, var2)  \
+		do { (void)(&(var1) == &(var2)); } while(0)
+#endif
+
+#ifndef ASSERT_TYPE_IS
+/*! Ensure variable is of specified type. */
+#define ASSERT_TYPE_IS(var, type)  \
+		do { (void)(&var == (type *)0); } while(0)
+#endif
 
 #endif /* DEVLIB_COMPILER_H */

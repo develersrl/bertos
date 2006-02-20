@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2006/02/20 14:34:58  bernie
+ *#* Use portable type checking.
+ *#*
  *#* Revision 1.6  2006/02/10 12:36:57  bernie
  *#* Pacify IAR warnings for side-effects.
  *#*
@@ -102,13 +105,13 @@
 	#define MIN(a,b) ({ \
 		typeof(a) _a = (a); \
 		typeof(b) _b = (b); \
-		(void)(&_a == &_b); /* ensure same type */ \
+		ASSERT_TYPE_EQUAL(_a, _b); \
 		(_a < _b) ? _a : _b; \
 	})
 	#define MAX(a,b) ({ \
 		typeof(a) _a = (a); \
 		typeof(b) _b = (b); \
-		(void)(&_a == &_b); /* ensure same type */ \
+		ASSERT_TYPE_EQUAL(_a, _b); \
 		(_a > _b) ? _a : _b; \
 	})
 #else /* !(COMPILER_STATEMENT_EXPRESSIONS && COMPILER_TYPEOF) */
@@ -132,8 +135,8 @@
 	 */
 	#define SWAP(a, b) \
 		do { \
-			(void)(&(a) == &(b)); /* type check */ \
 			typeof(a) tmp; \
+			ASSERT_TYPE_EQUAL(a, b); \
 			tmp = (a); \
 			(a) = (b); \
 			(b) = tmp; \
