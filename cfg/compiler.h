@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.12  2006/02/21 16:06:31  bernie
+ *#* Fix ssize_t redefinitions on glibc systems.
+ *#*
  *#* Revision 1.11  2006/02/20 14:34:58  bernie
  *#* Use portable type checking.
  *#*
@@ -212,6 +215,7 @@
 	#include <stddef.h>
 	#include <stdint.h>
 	#include <stdbool.h>
+	#include <sys/types.h> /* for ssize_t */
 
 	#ifndef __cplusplus
 		/*
@@ -417,7 +421,7 @@ typedef unsigned char page_t;    /*!< Type for banked memory pages. */
  *
  * We check for some common definitions to avoid redefinitions:
  *
- *    glibc, avr-libc: _SIZE_T_DEFINED
+ *    glibc, avr-libc: _SIZE_T_DEFINED, __ssize_t_defined
  *    Darwin libc:     _BSD_SIZE_T_DEFINED_
  *    IAR ARM:         _SIZE_T
  *
