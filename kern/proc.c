@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.28  2006/02/21 16:06:55  bernie
+ *#* Cleanup/update process scheduling.
+ *#*
  *#* Revision 1.27  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -100,9 +103,9 @@
 
 #include "proc_p.h"
 #include "proc.h"
+//#include "hw.h"
+#include <mware/event.h>
 #include <cfg/cpu.h>
-#include "event.h"
-#include "hw.h"
 #include <cfg/debug.h>
 #include <cfg/arch_config.h>  /* ARCH_EMUL */
 #include <cfg/macros.h>  /* ABS() */
@@ -191,7 +194,7 @@ void proc_init(void)
  * \return Process structure of new created process
  *         if successful, NULL otherwise.
  */
-struct Process *proc_new_with_name(UNUSED(const char*, name), void (*entry)(void), iptr_t data, size_t stacksize, cpustack_t *stack_base)
+struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(void), iptr_t data, size_t stacksize, cpustack_t *stack_base)
 {
 	Process *proc;
 	size_t i;
@@ -202,9 +205,9 @@ struct Process *proc_new_with_name(UNUSED(const char*, name), void (*entry)(void
 
 #if (ARCH & ARCH_EMUL)
 	/* Ignore stack provided by caller and use the large enough default instead. */
-	stack_base = (cpustack_t *)StackFreeList.head;
-	REMOVE((Node *)stack_base);
-	stacksize = DEF_STACKSIZE;
+	stack_base = (cpustack_t *)LIST_HEAD(&StackFreeList);
+	REMOVE(LIST_HEAD(&StackFreeList));
+	stacksize = CONFIG_KERN_DEFSTACKSIZE;
 #elif CONFIG_KERN_HEAP
 	/* Did the caller provide a stack for us? */
 	if (!stack_base)
@@ -360,8 +363,13 @@ void proc_schedule(void)
  */
 void proc_exit(void)
 {
+#if CONFIG_KERN_MONITOR
+	monitor_remove(CurrentProcess);
+#endif
+
 #if CONFIG_KERN_HEAP
-	/* The following code is BROKEN.
+	/*
+	 * The following code is BROKEN.
 	 * We are freeing our own stack before entering proc_schedule()
 	 * BAJO: A correct fix would be to rearrange the scheduler with
 	 *  an additional parameter which frees the old stack/process
@@ -373,20 +381,17 @@ void proc_exit(void)
 #endif
 
 #if (ARCH & ARCH_EMUL)
-#error This is wrong
+#warning This is wrong
 	/* Reinsert process stack in free list */
 	ADDHEAD(&StackFreeList, (Node *)(CurrentProcess->stack
-		- (DEF_STACKSIZE / sizeof(cpustack_t))));
+		- (CONFIG_KERN_DEFSTACKSIZE / sizeof(cpustack_t))));
 
-	/* NOTE: At this point the first two words of what used
+	/*
+	 * NOTE: At this point the first two words of what used
 	 * to be our stack contain a list node. From now on, we
 	 * rely on the compiler not reading/writing the stack.
 	 */
 #endif /* ARCH_EMUL */
-
-#if CONFIG_KERN_MONITOR
-	monitor_remove(CurrentProcess);
-#endif
 
 	CurrentProcess = NULL;
 	proc_schedule();

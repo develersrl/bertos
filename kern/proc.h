@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2006/02/21 16:06:55  bernie
+ *#* Cleanup/update process scheduling.
+ *#*
  *#* Revision 1.10  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -43,7 +46,7 @@
 
 #include <cfg/compiler.h>
 #include <cfg/cpu.h>
-#include <cfg/config_kern.h>
+#include <config_kern.h>
 
 /* Fwd decl */
 struct Process;
