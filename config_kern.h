@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2006/02/21 16:05:53  bernie
+ *#* Move from cfg/ to top-level.
+ *#*
  *#* Revision 1.3  2005/11/04 16:20:01  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -63,14 +66,12 @@
 /* EXPERIMENTAL */
 #define CONFIG_KERN_PREEMPTIVE  (0    && CONFIG_KERN_SCHED && CONFIG_KERN_TIMER)
 
-
-#define CONFIG_KERN_HEAPSIZE    0x4000  /*!< Heap size (16KB) */
-#define CONFIG_KERN_QUANTUM     50      /*!< Scheduler time sharing quantum in ticks */
+#define CONFIG_KERN_QUANTUM     50    /*!< Time sharing quantum in timer ticks. */
 
 #if (ARCH & ARCH_EMUL)
 	#define CONFIG_KERN_DEFSTACKSIZE  65536
 #else
-	#define CONFIG_KERN_DEFSTACKSIZE  128  /*!< Default stack size for each thread */
+	#define CONFIG_KERN_DEFSTACKSIZE  128  /*!< Default stack size for each thread. */
 #endif
 
 /* Memory fill codes to help debugging */
