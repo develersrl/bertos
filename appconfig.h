@@ -1,7 +1,7 @@
 /*!
  * \file
  * <!--
- * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
  * All Rights Reserved.
  * -->
  *
@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2006/02/21 16:06:05  bernie
+ *#* Update copyright info.
+ *#*
  *#* Revision 1.7  2006/02/17 22:28:19  bernie
  *#* Add missing UART definitions.
  *#*
