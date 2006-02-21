@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/02/21 21:28:02  bernie
+ *#* New time handling based on TIMER_TICKS_PER_SEC to support slow timers with ticks longer than 1ms.
+ *#*
  *#* Revision 1.4  2006/02/17 22:24:21  bernie
  *#* Update POSIX timer emulator.
  *#*
@@ -55,11 +58,11 @@ static void timer_hw_init(void)
 	sa.sa_flags = SA_RESTART;
 	sigaction(SIGALRM, &sa, NULL);
 
-	// Setup POSIX realtime timer to interrupt every 10ms.
+	// Setup POSIX realtime timer to interrupt every 1/TIMER_TICKS_PER_SEC.
 	static struct itimerval itv =
 	{
-		{ 0, 1000 / TIMER_TICKS_PER_MSEC }, /* it_interval */
-		{ 0, 1000 / TIMER_TICKS_PER_MSEC }  /* it_value */
+		{ 0, 1000000 / TIMER_TICKS_PER_SEC }, /* it_interval */
+		{ 0, 1000000 / TIMER_TICKS_PER_SEC }  /* it_value */
 	};
 	setitimer(ITIMER_REAL, &itv, NULL);
 }

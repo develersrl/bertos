@@ -1,8 +1,9 @@
+#error This code must be revised for the new timer API
 /*!
  * \file
  * <!--
- * Copyright 2000 Bernardo Innocenti
  * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2000 Bernardo Innocenti
  * This file is part of DevLib - See README.devlib for information.
  * -->
  *
@@ -15,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/02/21 21:28:02  bernie
+ *#* New time handling based on TIMER_TICKS_PER_SEC to support slow timers with ticks longer than 1ms.
+ *#*
  *#* Revision 1.5  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -35,20 +39,20 @@
 #ifndef TIMER_I196_H
 #define TIMER_I196_H
 
-	/*!
-	 * Retrigger TIMER2, adjusting the time to account for
-	 * the interrupt prologue latency.
-	 */
-#	define TIMER_RETRIGGER (TIMER2 -= TICKS_RATE)
+/*!
+ * Retrigger TIMER2, adjusting the time to account for
+ * the interrupt prologue latency.
+ */
+#define TIMER_RETRIGGER (TIMER2 -= TICKS_RATE)
 
-#	define TIMER_INIT \
-		TIMER2 = (65535 - TICKS_RATE); \
-		INT_MASK1 |= INT1F_T2OVF; \
-		ATOMIC( \
-			WSR = 1; \
-			IOC3 |= IOC3F_T2_ENA; \
-			WSR = 0; \
-		)
+#define TIMER_INIT \
+	TIMER2 = (65535 - TICKS_RATE); \
+	INT_MASK1 |= INT1F_T2OVF; \
+	ATOMIC( \
+		WSR = 1; \
+		IOC3 |= IOC3F_T2_ENA; \
+		WSR = 0; \
+	)
 
 #define DEFINE_TIMER_ISR \
 	INTERRUPT(0x38) void TM2_OVFL_interrupt(void);  \

@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/02/21 21:28:02  bernie
+ *#* New time handling based on TIMER_TICKS_PER_SEC to support slow timers with ticks longer than 1ms.
+ *#*
  *#* Revision 1.1  2005/11/27 03:58:18  bernie
  *#* Add POSIX timer emulator.
  *#*
@@ -26,12 +29,10 @@
 
 // HW dependent timer initialization
 
-#define DEFINE_TIMER_ISR     void timer_isr(int)
-#define TIMER_TICKS_PER_MSEC 1
+#define DEFINE_TIMER_ISR     void timer_isr(UNUSED_ARG(int, arg))
+#define TIMER_TICKS_PER_SEC  250
 #define TIMER_HW_CNT         (1<<31) /* We assume 32bit integers here */
 
-/// Type of time expressed in ticks of the hardware high-precision timer.
-//typedef unsigned int hptime_t;
 #include <os/hptime.h>
 
 /// Frequency of the hardware high-precision timer.

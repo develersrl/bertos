@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/02/21 21:28:02  bernie
+ *#* New time handling based on TIMER_TICKS_PER_SEC to support slow timers with ticks longer than 1ms.
+ *#*
  *#* Revision 1.2  2006/02/20 02:01:35  bernie
  *#* Port to Qt 4.1.
  *#*
@@ -78,9 +81,9 @@ public:
 		// Record initial time
 		system_time.start();
 
-		// Activate 1ms timer interrupt
+		// Activate timer interrupt
 		timer.connect(&timer, SIGNAL(timeout()), this, SLOT(timerInterrupt()));
-		timer.start(1);
+		timer.start(1000 / TIMER_TICKS_PER_SEC);
 
 		initialized = true;
 	}

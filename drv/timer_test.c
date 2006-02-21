@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/02/21 21:28:02  bernie
+ *#* New time handling based on TIMER_TICKS_PER_SEC to support slow timers with ticks longer than 1ms.
+ *#*
  *#* Revision 1.2  2005/11/27 03:58:18  bernie
  *#* Add POSIX timer emulator.
  *#*
@@ -34,7 +37,7 @@ static void timer_test_constants(void)
 	#ifdef TIMER1_OVF_COUNT
 		kprintf("TIMER1_OVF_COUNT=%d\n", (int)TIMER1_OVF_COUNT);
 	#endif
-	kprintf("TIMER_TICKS_PER_MSEC=%d\n", (int)TIMER_TICKS_PER_MSEC);
+	kprintf("TIMER_TICKS_PER_SEC=%d\n", (int)TIMER_TICKS_PER_SEC);
 	kprintf("\n");
 	kprintf("ms_to_ticks(100)=%lu\n", ms_to_ticks(100));
 	kprintf("ms_to_ticks(10000)=%lu\n", ms_to_ticks(10000));
@@ -115,4 +118,5 @@ int main(void)
 	timer_test_delay();
 	timer_test_async();
 	timer_test_poll();
+	return 0;
 }

@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.29  2006/02/21 21:28:02  bernie
+ *#* New time handling based on TIMER_TICKS_PER_SEC to support slow timers with ticks longer than 1ms.
+ *#*
  *#* Revision 1.28  2006/02/17 22:24:21  bernie
  *#* Update POSIX timer emulator.
  *#*
@@ -116,12 +119,6 @@
 #include <cfg/compiler.h>
 #include <appconfig.h>
 
-/*! Number of timer ticks per second. */
-#define TIMER_TICKS_PER_SEC  (TIMER_TICKS_PER_MSEC * 1000)
-
-/*! Number of ticks per microsecond */
-#define TIMER_TICKS_PER_USEC ((TIMER_TICKS_PER_MSEC + 500) / 1000)
-
 
 extern volatile ticks_t _clock;
 
@@ -171,56 +168,72 @@ INLINE ticks_t timer_clock_unlocked(void)
 
 //TODO: take care of slow timers so add convertions for seconds to ticks and viceversa.
 
-/*! Convert \a ms [ms] to ticks */
+/*! Convert \a ms [ms] to ticks. */
 INLINE ticks_t ms_to_ticks(mtime_t ms)
 {
-	return ms * TIMER_TICKS_PER_MSEC;
-}
-
-/*! Convert \a us [us] to ticks */
-INLINE ticks_t us_to_ticks(utime_t us)
-{
-#if TIMER_TICKS_PER_MSEC < 10000
-	return (us * TIMER_TICKS_PER_MSEC + 500) / 1000;
+#if TIMER_TICKS_PER_SEC < 1000
+	/* Slow timer: avoid rounding down too much. */
+	return (ms * TIMER_TICKS_PER_SEC) / 1000;
 #else
-	return (us * TIMER_TICKS_PER_USEC);
+	/* Fast timer: don't overflow ticks_t. */
+	return ms * ((TIMER_TICKS_PER_SEC + 500) / 1000);
 #endif
 }
 
-/*! Convert \a ticks [ticks] to ms */
-INLINE mtime_t ticks_to_ms(ticks_t ticks)
+/*! Convert \a us [us] to ticks. */
+INLINE ticks_t us_to_ticks(utime_t us)
 {
-	return (ticks + TIMER_TICKS_PER_MSEC / 2) / TIMER_TICKS_PER_MSEC;
+#if TIMER_TICKS_PER_SEC < 1000
+	/* Slow timer: avoid rounding down too much. */
+	return ((us / 1000) * TIMER_TICKS_PER_SEC) / 1000;
+#else
+	/* Fast timer: don't overflow ticks_t. */
+	return (us * ((TIMER_TICKS_PER_SEC + 500) / 1000)) / 1000;
+#endif
 }
 
-/*! Convert \a ticks [ticks] to us */
+/*! Convert \a ticks [ticks] to ms. */
+INLINE mtime_t ticks_to_ms(ticks_t ticks)
+{
+#if TIMER_TICKS_PER_SEC < 1000
+	/* Slow timer: avoid rounding down too much. */
+	return (ticks * 1000) / TIMER_TICKS_PER_SEC;
+#else
+	/* Fast timer: avoid overflowing ticks_t. */
+	return ticks / (TIMER_TICKS_PER_SEC / 1000);
+#endif
+}
+
+/*! Convert \a ticks [ticks] to us. */
 INLINE utime_t ticks_to_us(ticks_t ticks)
 {
-#if TIMER_TICKS_PER_USEC > 10
-	return (ticks / TIMER_TICKS_PER_USEC);
+#if TIMER_TICKS_PER_SEC < 1000
+	/* Slow timer: avoid rounding down too much. */
+	return ((ticks * 1000) / TIMER_TICKS_PER_SEC) * 1000;
 #else
-	return (ticks * 1000 + TIMER_TICKS_PER_MSEC / 2) / TIMER_TICKS_PER_MSEC;
+	/* Fast timer: avoid overflowing ticks_t. */
+	return (ticks / (TIMER_TICKS_PER_SEC / 1000)) * 1000;
 #endif
 }
 
 /*! Convert \a us [us] to hpticks */
 INLINE hptime_t us_to_hptime(utime_t us)
 {
-	#if TIMER_HW_HPTICKS_PER_SEC > 10000000UL
-		return(us * ((TIMER_HW_HPTICKS_PER_SEC + 500000UL) / 1000000UL));
-	#else
-		return((us * TIMER_HW_HPTICKS_PER_SEC + 500000UL) / 1000000UL);
-	#endif /* TIMER_HW_HPTICKS_PER_SEC > 10000000UL */
+#if TIMER_HW_HPTICKS_PER_SEC > 10000000UL
+	return(us * ((TIMER_HW_HPTICKS_PER_SEC + 500000UL) / 1000000UL));
+#else
+	return((us * TIMER_HW_HPTICKS_PER_SEC + 500000UL) / 1000000UL);
+#endif
 }
 
 /*! Convert \a hpticks [hptime] to usec */
 INLINE utime_t hptime_to_us(hptime_t hpticks)
 {
-	#if TIMER_HW_HPTICKS_PER_SEC < 100000UL
-		return(hpticks * (1000000UL / TIMER_HW_HPTICKS_PER_SEC));
-	#else
-		return((hpticks * 1000000UL) / TIMER_HW_HPTICKS_PER_SEC);
-	#endif /* TIMER_HW_HPTICKS_PER_SEC < 100000UL */
+#if TIMER_HW_HPTICKS_PER_SEC < 100000UL
+	return(hpticks * (1000000UL / TIMER_HW_HPTICKS_PER_SEC));
+#else
+	return((hpticks * 1000000UL) / TIMER_HW_HPTICKS_PER_SEC);
+#endif /* TIMER_HW_HPTICKS_PER_SEC < 100000UL */
 }
 
 

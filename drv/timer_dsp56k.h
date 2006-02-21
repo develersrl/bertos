@@ -1,8 +1,9 @@
+#error This code must be revised for the new timer API
 /*!
  * \file
  * <!--
- * Copyright 2004 Giovanni Bajo
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2004 Giovanni Bajo
  * This file is part of DevLib - See README.devlib for information.
  * -->
  *
@@ -15,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2006/02/21 21:28:02  bernie
+ *#* New time handling based on TIMER_TICKS_PER_SEC to support slow timers with ticks longer than 1ms.
+ *#*
  *#* Revision 1.8  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
