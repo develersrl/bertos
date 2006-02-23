@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/02/23 11:03:33  bernie
+ *#* Documentation fix.
+ *#*
  *#* Revision 1.2  2006/02/21 21:28:02  bernie
  *#* New time handling based on TIMER_TICKS_PER_SEC to support slow timers with ticks longer than 1ms.
  *#*
@@ -30,7 +33,10 @@
 // HW dependent timer initialization
 
 #define DEFINE_TIMER_ISR     void timer_isr(UNUSED_ARG(int, arg))
+
+/** Most Linux kernels can't do better than this (CONFIG_HZ=250). */
 #define TIMER_TICKS_PER_SEC  250
+
 #define TIMER_HW_CNT         (1<<31) /* We assume 32bit integers here */
 
 #include <os/hptime.h>
