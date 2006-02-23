@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.14  2006/02/23 08:36:33  bernie
+ *#* Emulate __func__ on MSVC.
+ *#*
  *#* Revision 1.13  2006/02/23 07:37:37  bernie
  *#* Compile fix for MSVC.
  *#*
@@ -180,6 +183,9 @@
 	/* These C99 functions are oddly named in MSVCRT32.lib */
 	#define snprintf _snprintf
 	#define vsnprintf _vsnprintf
+
+	/* MSVC doesn't support C99's __func__, but has a similar extension. */
+	#define __func__ __FUNCTION__
 
 #elif defined(__GNUC__)
 
