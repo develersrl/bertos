@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2006/02/23 09:09:28  bernie
+ *#* Remove Linux specific hack.
+ *#*
  *#* Revision 1.7  2006/02/20 01:46:59  bernie
  *#* Port to MacOSX.
  *#*
@@ -64,8 +67,6 @@
 	/*
 	 * The POSIX moral equivalent of disabling IRQs is disabling signals.
 	 */
-//	#define _XOPEN_SOURCE 600 /* Avoid BSDish stuff */
-//	#undef _GNU_SOURCE /* This implies _BSD_SOURCE and is predefined on Linux. */
 	#include <signal.h>
 	typedef sigset_t cpuflags_t;
 
