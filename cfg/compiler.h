@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.13  2006/02/23 07:37:37  bernie
+ *#* Compile fix for MSVC.
+ *#*
  *#* Revision 1.12  2006/02/21 16:06:31  bernie
  *#* Fix ssize_t redefinitions on glibc systems.
  *#*
@@ -354,7 +357,7 @@
 #endif
 
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) \
 	|| ((defined(__IAR_SYSTEMS_ICC) || defined(__IAR_SYSTEMS_ICC__)) && CPU_I196)
 	/*!
 	 * \name ISO C99 fixed-size types
@@ -422,7 +425,7 @@ typedef unsigned char page_t;    /*!< Type for banked memory pages. */
  * We check for some common definitions to avoid redefinitions:
  *
  *    glibc, avr-libc: _SIZE_T_DEFINED, __ssize_t_defined
- *    Darwin libc:     _BSD_SIZE_T_DEFINED_
+ *    Darwin libc:     _BSD_SIZE_T_DEFINED_, _SIZE_T
  *    IAR ARM:         _SIZE_T
  *
  * \{
@@ -437,7 +440,7 @@ typedef unsigned char page_t;    /*!< Type for banked memory pages. */
 	#endif
 #endif
 
-#if !(defined(ssize_t) || defined(__ssize_t_defined))
+#if !(defined(ssize_t) || defined(_SSIZE_T) || defined(__ssize_t_defined))
 	#if CPU_X86
 		/* 32bit or 64bit (32bit for _WIN64). */
 		typedef long ssize_t;
