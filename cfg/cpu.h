@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2006/02/23 09:08:43  bernie
+ *#* Add note for a frequently reported non-bug.
+ *#*
  *#* Revision 1.8  2006/02/10 12:37:45  bernie
  *#* Add support for ARM on IAR.
  *#*
@@ -70,7 +73,7 @@
  * \{
  */
 #define CPU_BIG_ENDIAN    0x1234
-#define CPU_LITTLE_ENDIAN 0x3412
+#define CPU_LITTLE_ENDIAN 0x3412 /* Look twice, pal. This is not a bug. */
 /*\}*/
 
 /*! Macro to include cpu-specific versions of the headers. */
