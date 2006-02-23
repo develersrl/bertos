@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2006/02/23 08:40:33  bernie
+ *#* TRACEMSG() support for compilers with no variadic macros.
+ *#*
  *#* Revision 1.8  2006/02/23 08:33:04  bernie
  *#* Fix for compilers without variadic macros support.
  *#*
@@ -205,7 +208,18 @@
 
 		#if !CONFIG_KDEBUG_DISABLE_TRACE
 			#define TRACE  kprintf("%s()\n", __func__)
-			#define TRACEMSG(msg,...) kprintf("%s(): " msg, __func__, ## __VA_ARGS__)
+			#if COMPILER_VARIADIC_MACROS
+				#define TRACEMSG(msg,...) kprintf("%s(): " msg, __func__, ## __VA_ARGS__)
+			#else
+				INLINE void TRACEMSG(const char *fmt, ...)
+				{
+					va_list va;
+					va_start(va, fmt);
+					kprintf("%s(): ", __func__);
+					kvprintf(fmt, va);
+					va_end(va);
+				}
+			#endif
 		#else
 			#define TRACE  do {} while(0)
 			#define TRACEMSG(...)  do {} while(0)
