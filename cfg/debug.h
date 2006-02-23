@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2006/02/23 08:33:04  bernie
+ *#* Fix for compilers without variadic macros support.
+ *#*
  *#* Revision 1.7  2006/02/20 02:01:56  bernie
  *#* Depend on cfg/os.h.
  *#*
@@ -184,8 +187,8 @@
 		#endif /* ASSERT */
 		#define ASSERT2(x, help)  ASSERT(help && x)
 
-		/*!
-		 * Check that the given pointer is not NULL or pointing to raw memory.
+		/**
+		 * Check that the given pointer is either NULL or pointing to valid memory.
 		 *
 		 * The assumption here is that valid pointers never point to low
 		 * memory regions.  This helps catching pointers taken from
@@ -193,10 +196,15 @@
 		 */
 		#define ASSERT_VALID_PTR(p)  ASSERT((unsigned long)(p) > 0x200)
 
+		/**
+		 * Check that the given pointer is not pointing to invalid memory.
+		 *
+		 * \see ASSERT_VALID_PTR()
+		 */
 		#define ASSERT_VALID_PTR_OR_NULL(p)  ASSERT((((p) == NULL) || ((unsigned long)(p) >= 0x200)))
 
 		#if !CONFIG_KDEBUG_DISABLE_TRACE
-			#define TRACE  kporintf("%s()\n", __func__)
+			#define TRACE  kprintf("%s()\n", __func__)
 			#define TRACEMSG(msg,...) kprintf("%s(): " msg, __func__, ## __VA_ARGS__)
 		#else
 			#define TRACE  do {} while(0)
@@ -348,7 +356,14 @@
 	#define ASSERT_VALID_PTR_OR_NULL(p)  ((void)0)
 	#define ASSERT_VALID_OBJ(_t, _o)     ((void)0)
 	#define TRACE                        do {} while (0)
-	#define TRACEMSG(x,...)              do {} while (0)
+	#if COMPILER_VARIADIC_MACROS
+		#define TRACEMSG(x, ...)         do {} while (0)
+	#else
+		INLINE void TRACEMSG(UNUSED_ARG(const char *, msg), ...)
+		{
+			/* NOP */
+		}
+	#endif
 
 	#define DECLARE_WALL(name, size)     /* nothing */
 	#define FWD_DECLARE_WALL(name, size) /* nothing */
@@ -368,12 +383,12 @@
 	INLINE void kputs(UNUSED_ARG(const char *, str)) { /* nop */ }
 	INLINE void kdump(UNUSED_ARG(const void *, buf), UNUSED_ARG(size_t, len)) { /* nop */ }
 
-	#ifdef __cplusplus
+	#if defined(__cplusplus) && COMPILER_VARIADIC_MACROS
 		/* G++ can't inline functions with variable arguments... */
 		#define kprintf(fmt,...) do { (void)(fmt); } while(0)
 	#else
 		/* ...but GCC can. */
-		INLINE void kprintf(UNUSED_ARG(const char *, fmt), ...) { /* nop */ }
+	    INLINE void kprintf(UNUSED_ARG(const char *, fmt), ...) { /* nop */ }
 	#endif
 
 #endif /* _DEBUG */
