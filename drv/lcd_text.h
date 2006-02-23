@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/02/23 10:59:14  bernie
+ *#* Documentation fixes.
+ *#*
  *#* Revision 1.1  2005/11/04 18:00:42  bernie
  *#* Import into DevLib.
  *#*
@@ -78,10 +81,12 @@ typedef struct _Layer
 	/*! Priority of this layer (greater in front of lesser). */
 	char pri;
 
-	/*!
-	 * Buffer per il salvataggio ed il ripristino del
-	 * contenuto del display. Le posizioni che contengono
-	 * il carattere '\0' sono trasparenti.
+	/**
+	 * Layer backing store buffer.
+	 *
+	 * All writes through the layer are copied into this buffer.
+	 * Characters cells with value 0 are transparent with respect
+	 * to other layers in the background.
 	 */
 	char buf[LCD_COLS * LCD_ROWS];
 } Layer;
