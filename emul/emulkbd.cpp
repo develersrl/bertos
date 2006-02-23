@@ -57,8 +57,7 @@ EmulKey::~EmulKey()
 
 
 /**
- * \reimp
- * Override standad QButton behaviour: we must also emit the signals
+ * Override standad QButton behaviour: we must also emit the signals.
  */
 // unused
 void EmulKey::setDown(bool enable)

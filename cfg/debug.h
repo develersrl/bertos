@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2006/02/23 11:17:16  bernie
+ *#* Documentation fixes.
+ *#*
  *#* Revision 1.10  2006/02/23 09:10:10  bernie
  *#* Add even more code duplication until we properly refactor debug.h.
  *#*
@@ -109,18 +112,19 @@
 #define CONFIG_KDEBUG_ASSERT_NO_TEXT  0
 #endif
 
+#if defined(__doxygen__)
+	/**
+	 * Preprocessor symbol defined only for debug builds.
+	 *
+	 * The build infrastructure must arrange for _DEBUG to
+	 * be predefined for all the source files being compiled.
+	 *
+	 * This is compatible with the MSVC convention for the
+	 * default Debug and Release project targets.
+	 */
+	#define _DEBUG 1
+#endif
 
-/*!
- * \def _DEBUG
- *
- * This preprocessor symbol is defined only in debug builds.
- *
- * The build infrastructure must arrange for _DEBUG to
- * be predefined for all source files being compiled.
- *
- * This is compatible with the Microsoft convention for
- * the default Debug and Release targets.
- */
 #ifdef _DEBUG
 
 	// STLport specific: enable extra checks

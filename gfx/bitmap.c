@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/02/23 11:17:16  bernie
+ *#* Documentation fixes.
+ *#*
  *#* Revision 1.5  2006/02/15 09:10:15  bernie
  *#* Implement prop fonts; Fix algo styles.
  *#*
@@ -117,8 +120,13 @@ void gfx_blit_P(Bitmap *bm, const pgm_uint8_t *raster)
  *
  * \note Using the same bitmap for \a src and \a dst is unsupported.
  *
- * \param dst Bitmap where the operation writes
- *
+ * \param dst  Bitmap where the operation writes.
+ * \param rect The (xmin;ymin) coordinates provide the top/left offset
+ *             for drawing in the destination bitmap.  If the source
+ *             bitmap is larger than the rectangle, drawing is clipped.
+ * \param src  Bitmap containing the source pixels.
+ * \param srcx Starting X offset in the source bitmap.
+ * \param srcy Starting Y offset in the source bitmap.
  */
 void gfx_blit(Bitmap *dst, const Rect *rect, const Bitmap *src, coord_t srcx, coord_t srcy)
 {
