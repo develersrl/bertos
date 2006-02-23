@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2006/02/23 09:10:10  bernie
+ *#* Add even more code duplication until we properly refactor debug.h.
+ *#*
  *#* Revision 1.9  2006/02/23 08:40:33  bernie
  *#* TRACEMSG() support for compilers with no variadic macros.
  *#*
@@ -179,8 +182,22 @@
 		{
 			fputs(str, stderr);
 		}
-		/* G++ can't inline functions with variable arguments... */
-		#define kprintf(fmt, ...) fprintf(stderr, fmt, ## __VA_ARGS__)
+		#if COMPILER_VARIADIC_MACROS
+			/* G++ can't inline functions with variable arguments... */
+			#define kprintf(fmt, ...) fprintf(stderr, fmt, ## __VA_ARGS__)
+		#else
+			INLINE int kprintf(const char *fmt, ...)
+			{
+				va_list ap;
+				int result;
+
+				va_start(ap, fmt);
+				result = kvprintf(fmt, ap);
+				va_end(ap);
+
+				return result;
+			}
+		#endif
 		#define kvprintf(fmt, ap) vfprintf(stderr, fmt, ap)
 		void kdump(const void *buf, size_t len); /* UNIMPLEMENTED */
 
