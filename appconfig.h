@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2006/02/24 00:27:35  bernie
+ *#* Enable kernel and fix Doxygen markup.
+ *#*
  *#* Revision 1.8  2006/02/21 16:06:05  bernie
  *#* Update copyright info.
  *#*
@@ -108,11 +111,11 @@
 #define CONFIG_PRINTF PRINTF_FULL
 
 /*!
- * Multithreading kernel
+ * Multithreading kernel.
  *
- * /sa config_kernel.h
+ * \sa config_kern.h
  */
-#define CONFIG_KERNEL 0
+#define CONFIG_KERNEL 1
 
 /*!
  * \name Serial driver parameters
