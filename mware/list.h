@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.17  2006/02/24 01:18:34  bernie
+ *#* LIST_ENQUEUE(): New macro; Remove obsolete names.
+ *#*
  *#* Revision 1.16  2006/01/23 23:10:38  bernie
  *#* REVERSE_FOREACH_NODE(): New macro; FOREACHNODE(): Rename to FOREACH_NODE.
  *#*
@@ -98,6 +101,15 @@ typedef struct _List
 	Node tail;
 } List;
 
+/**
+ * Extended node for priority queues.
+ */
+typedef struct _PriNode
+{
+	Node link;
+	int  pri;
+} PriNode;
+
 
 /*!
  * Template for a naked node in a list of \a T structures.
@@ -174,8 +186,6 @@ typedef struct _List
 		((Node *)(n))->succ; \
 		(n) = (typeof(n))(((Node *)(n))->succ) \
 	)
-
-#define FOREACHNODE FOREACH_NODE /* OBSOLETE */
 
 /*!
  * Iterate backwards over all nodes in a list.
@@ -276,6 +286,23 @@ typedef struct _List
 /*! Tell whether a list is empty. */
 #define LIST_EMPTY(l)  ( (void *)((l)->head.succ) == (void *)(&(l)->tail) )
 
+/**
+ * Insert a priority node in a priority queue.
+ *
+ * The new node is inserted immediately before the
+ * first node with lower priority or appended to
+ * the tail if no such node exists.
+ */
+#define LIST_ENQUEUE(list, node) \
+	do { \
+		PriNode *ln; \
+		FOREACH_NODE(ln, (list)) \
+			if (ln->pri < (node)->pri) \
+				break; \
+		INSERT_BEFORE(&(node)->link, &ln->link); \
+	} while (0)
+
+
 /*!
  * Unlink a node from the head of the list \a l.
  *
@@ -315,12 +342,5 @@ INLINE Node *list_remTail(List *l)
 	INVALIDATE_NODE(n);
 	return n;
 }
-
-/* OBSOLETE names */
-#define REMHEAD list_remHead
-#define REMTAIL list_remTail
-#define INSERTBEFORE INSERT_BEFORE
-#define ISLISTEMPTY LIST_EMPTY
-
 
 #endif /* MWARE_LIST_H */
