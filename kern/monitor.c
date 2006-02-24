@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/02/24 01:17:05  bernie
+ *#* Update for new emulator.
+ *#*
  *#* Revision 1.5  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -79,9 +82,9 @@ void monitor_rename(Process *proc, const char* name)
 }
 
 #define MONITOR_NODE_TO_PROCESS(node) \
-	(struct Process*)((char*)(node) - offsetof(struct Process, monitor.link))
+	(struct Process *)((char *)(node) - offsetof(struct Process, monitor.link))
 
-size_t monitor_check_stack(cpustack_t* stack_base, size_t stack_size)
+size_t monitor_checkStack(cpustack_t* stack_base, size_t stack_size)
 {
 	cpustack_t* beg;
 	cpustack_t* cur;
@@ -120,38 +123,39 @@ void monitor_report(void)
 	struct Process* p;
 	int i;
 
-	if (ISLISTEMPTY(&MonitorProcs))
+	if (LIST_EMPTY(&MonitorProcs))
 	{
 		kputs("No stacks registered in the monitor\n");
 		return;
 	}
 
-	kprintf("%-24s    %-6s%-8s%-8s%-8s\n", "Process name", "TCB", "SPbase", "SPsize", "SPfree");
+	kprintf("%-24s%-8s%-8s%-8s%-8s\n", "Process name", "TCB", "SPbase", "SPsize", "SPfree");
 	for (i=0;i<56;i++)
 		kputchar('-');
 	kputchar('\n');
 
-	for (p = MONITOR_NODE_TO_PROCESS(MonitorProcs.head);
+	for (p = MONITOR_NODE_TO_PROCESS(LIST_HEAD(&MonitorProcs));
 		 p->monitor.link.succ;
 		 p = MONITOR_NODE_TO_PROCESS(p->monitor.link.succ))
 	{
-		size_t free = monitor_check_stack(p->monitor.stack_base, p->monitor.stack_size);
-		kprintf("%-24s    %04x    %04x    %4x    %4x\n", p->monitor.name, (uint16_t)p, (uint16_t)p->monitor.stack_base, (uint16_t)p->monitor.stack_size, (uint16_t)free);
+		size_t free = monitor_checkStack(p->monitor.stack_base, p->monitor.stack_size);
+		kprintf("%-24s%8p%8p%8lx%8lx\n",
+			p->monitor.name, p, p->monitor.stack_base, p->monitor.stack_size, free);
 	}
 }
 
 
-static void monitor(void)
+static void NORETURN monitor(void)
 {
 	struct Process* p;
 
 	while (1)
 	{
-		for (p = MONITOR_NODE_TO_PROCESS(MonitorProcs.head);
+		for (p = MONITOR_NODE_TO_PROCESS(LIST_HEAD(&MonitorProcs));
 			p->monitor.link.succ;
 			p = MONITOR_NODE_TO_PROCESS(p->monitor.link.succ))
 		{
-			size_t free = monitor_check_stack(p->monitor.stack_base, p->monitor.stack_size);
+			size_t free = monitor_checkStack(p->monitor.stack_base, p->monitor.stack_size);
 
 			if (free < 0x20)
 			{

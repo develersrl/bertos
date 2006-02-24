@@ -66,6 +66,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.13  2006/02/24 01:17:05  bernie
+ *#* Update for new emulator.
+ *#*
  *#* Revision 1.12  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -107,9 +110,9 @@
  *#*/
 
 #include "signal.h"
-#include "proc.h"
-#include "proc_p.h"
-#include "hw.h"
+
+#include <kern/proc.h>
+#include <kern/proc_p.h>
 #include <cfg/debug.h>
 
 #if CONFIG_KERN_SIGNALS

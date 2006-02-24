@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2006/02/24 01:17:05  bernie
+ *#* Update for new emulator.
+ *#*
  *#* Revision 1.10  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -47,10 +50,9 @@
  *#*/
 
 #include "sem.h"
-#include "proc.h"
-#include "proc_p.h"
-#include "signal.h"
-#include "hw.h"
+#include <kern/proc.h>
+#include <kern/proc_p.h>
+#include <kern/signal.h>
 #include <cfg/debug.h>
 
 INLINE void sem_verify(struct Semaphore *s)
@@ -139,7 +141,7 @@ void sem_obtain(struct Semaphore *s)
 	}
 	else
 	{
-		ASSERT(ISLISTEMPTY(&s->wait_queue));
+		ASSERT(LIST_EMPTY(&s->wait_queue));
 
 		/* The semaphore was free: lock it */
 		s->owner = CurrentProcess;
@@ -181,7 +183,7 @@ void sem_release(struct Semaphore *s)
 		s->owner = NULL;
 
 		/* Give semaphore to the first applicant, if any */
-		if (UNLIKELY((proc = (Process *)REMHEAD(&s->wait_queue))))
+		if (UNLIKELY((proc = (Process *)list_remHead(&s->wait_queue))))
 		{
 			s->nest_count = 1;
 			s->owner = proc;

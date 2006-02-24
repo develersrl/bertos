@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/02/24 01:17:05  bernie
+ *#* Update for new emulator.
+ *#*
  *#* Revision 1.5  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -63,8 +66,8 @@ asm void asm_switch_context(void ** new_sp, void ** save_sp)
 	move  y1,x:(SP)+
 	move  x:<$3F,y1
 	move  y1,x:(SP)
-	
-	; 
+
+	;
 	; Switch stacks
 	nop
 	move SP, x:(R3)

@@ -18,6 +18,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/02/24 01:17:44  bernie
+ *#* Update for new emulator.
+ *#*
  *#* Revision 1.5  2006/02/24 00:26:21  bernie
  *#* Fix header name.
  *#*
@@ -77,7 +80,7 @@
 #if CONFIG_KERNEL
 	#include <config_kern.h>
 	#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
-		#include "signal.h"
+		#include <kern/signal.h>
 	#endif
 #endif
 

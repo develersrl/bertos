@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/02/24 01:17:05  bernie
+ *#* Update for new emulator.
+ *#*
  *#* Revision 1.3  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -33,7 +36,7 @@
 #define KERN_MONITOR_H
 
 #include <cfg/cpu.h>
-#include <cfg/config_kern.h>
+#include <config_kern.h>
 
 #if CONFIG_KERN_MONITOR
 
@@ -58,7 +61,7 @@ void monitor_start(size_t stacksize, cpustack_t *stack);
  * \note For this function to work, the stack must have been filled at startup with
  * CONFIG_KERN_STACKFILLCODE.
  */
-size_t monitor_check_stack(cpustack_t* stack_base, size_t stack_size);
+size_t monitor_checkStack(cpustack_t *stack_base, size_t stack_size);
 
 
 /*! Print a report of the stack status through kdebug */

@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.29  2006/02/24 01:17:05  bernie
+ *#* Update for new emulator.
+ *#*
  *#* Revision 1.28  2006/02/21 16:06:55  bernie
  *#* Cleanup/update process scheduling.
  *#*
@@ -308,12 +311,14 @@ void proc_schedule(void)
 	/* Remember old process to save its context later */
 	old_process = CurrentProcess;
 
+#ifdef IRQ_RUNNING
 	/* Scheduling in interrupts is a nono. */
 	ASSERT(!IRQ_RUNNING());
+#endif
 
 	/* Poll on the ready queue for the first ready process */
 	IRQ_SAVE_DISABLE(flags);
-	while (!(CurrentProcess = (struct Process *)REMHEAD(&ProcReadyList)))
+	while (!(CurrentProcess = (struct Process *)list_remHead(&ProcReadyList)))
 	{
 		/*
 		 * Make sure we physically reenable interrupts here, no matter what

@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.2  2006/02/24 01:17:05  bernie
+ * Update for new emulator.
+ *
  * Revision 1.1  2005/11/27 03:06:15  bernie
  * Add x86_64 task switching (to be updated to new-style scheduler).
  *
@@ -29,12 +32,11 @@
  *
  */
 
-!!!!!! THIS FILE HAS NOT BEEN REVISED FOR THE NEW SCHEDULER API !!!!!!
-
 /* I know it's ugly... */
 #.intel_syntax
 
-/* void AsmSwitchContext(void * new_sp, void ** save_sp) */
+/* void AsmSwitchContext(void **new_sp, void **save_sp) */
+/*                       %rdi           %rsi
 .globl AsmSwitchContext
 AsmSwitchContext:
 	pushq	%rax
@@ -45,7 +47,7 @@ AsmSwitchContext:
 	pushq	%rdi
 	pushq	%rbp
 	movq	%rsp,(%rsi)             /* *save_sp = rsp */
-	movq	%rdi,%rsp               /* rsp = new_sp */
+	movq	(%rdi),%rsp             /* rsp = *new_sp */
 	popq	%rbp
 	popq	%rdi
 	popq	%rsi
@@ -55,16 +57,9 @@ AsmSwitchContext:
 	popq	%rax
 	ret
 
-/* void AsmReplaceContext(void * new_sp, void ** dummy) */
-.globl AsmReplaceContext
-AsmReplaceContext:
-	movq	%rdi,%rsp                /* rsp = new_sp */
-	popq	%rbp
-	popq	%rdi
-	popq	%rsi
-	popq	%rdx
-	popq	%rcx
-	popq	%rbx
-	popq	%rax
+/* int asm_switch_version(void) */
+.globl asm_switch_version
+asm_switch_version:
+	mov	$1,%rax
 	ret
 
