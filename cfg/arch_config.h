@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/02/24 00:27:56  bernie
+ *#* Remove #error to allow compiling local demo.
+ *#*
  *#* Revision 1.2  2005/11/04 16:20:01  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -39,7 +42,6 @@
  * \name Architectures
  * \{
  */
-#error Add project-specific architectures
 #define ARCH_FOO     (1<<0)
 #define ARCH_BAR     (1<<1)
 #define ARCH_EMUL    (1<<8)
