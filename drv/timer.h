@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.30  2006/02/24 00:26:49  bernie
+ *#* Fixes for CONFIG_KERNEL.
+ *#*
  *#* Revision 1.29  2006/02/21 21:28:02  bernie
  *#* New time handling based on TIMER_TICKS_PER_SEC to support slow timers with ticks longer than 1ms.
  *#*
@@ -163,10 +166,6 @@ INLINE ticks_t timer_clock_unlocked(void)
 {
 	return _clock;
 }
-
-
-
-//TODO: take care of slow timers so add convertions for seconds to ticks and viceversa.
 
 /*! Convert \a ms [ms] to ticks. */
 INLINE ticks_t ms_to_ticks(mtime_t ms)

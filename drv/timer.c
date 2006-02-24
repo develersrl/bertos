@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.30  2006/02/24 00:26:49  bernie
+ *#* Fixes for CONFIG_KERNEL.
+ *#*
  *#* Revision 1.29  2006/02/17 22:24:07  bernie
  *#* Add MOD_CHECK() checks.
  *#*
@@ -76,8 +79,13 @@
 	#include <drv/wdt.h>
 #endif
 
-#if CONFIG_KERNEL && CONFIG_KERN_SIGNALS
-	#include <kern/proc.h>
+#if CONFIG_KERNEL
+	#include <config_kern.h>
+	#if CONFIG_KERN_SIGNALS
+		#include <kern/signal.h> /* sig_wait(), sig_check() */
+		#include <kern/proc.h>   /* proc_current() */
+		#include <cfg/macros.h>  /* BV() */
+	#endif
 #endif
 
 
@@ -151,7 +159,7 @@ void timer_add(Timer *timer)
 	}
 
 	/* Enqueue timer request into the list */
-	INSERTBEFORE(&timer->link, &node->link);
+	INSERT_BEFORE(&timer->link, &node->link);
 
 	IRQ_RESTORE(flags);
 }
@@ -171,8 +179,8 @@ Timer *timer_abort(Timer *timer)
 #endif /* CONFIG_TIMER_DISABLE_EVENTS */
 
 
-/*!
- * Wait for the specified amount of time (expressed in ms).
+/**
+ * Wait for the specified amount of timer ticks.
  */
 void timer_delayTicks(ticks_t delay)
 {
@@ -186,7 +194,7 @@ void timer_delayTicks(ticks_t delay)
 
 	ASSERT(!sig_check(SIG_SINGLE));
 	timer_set_event_signal(&t, proc_current(), SIG_SINGLE);
-	timer_set_delay(&t, delay);
+	timer_setDelay(&t, delay);
 	timer_add(&t);
 	sig_wait(SIG_SINGLE);
 
