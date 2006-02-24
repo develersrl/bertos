@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/02/24 00:27:14  bernie
+ *#* Use new naming convention for list macros.
+ *#*
  *#* Revision 1.3  2006/02/17 21:15:42  bernie
  *#* Add MOD_CHECK() checks.
  *#*
@@ -94,7 +97,7 @@ static void kbd_poll(void)
 	keymask_t key = kbd_readkeys();
 
 	/* Call raw input handlers */
-	FOREACHNODE(handler, &kbd_rawHandlers)
+	FOREACH_NODE(handler, &kbd_rawHandlers)
 		key = handler->hook(key);
 
 	/* If this key was not previously pressed */
@@ -104,7 +107,7 @@ static void kbd_poll(void)
 		current_key = key;
 
 		/* Call cooked input handlers */
-		FOREACHNODE(handler, &kbd_handlers)
+		FOREACH_NODE(handler, &kbd_handlers)
 			key = handler->hook(key);
 	}
 }
@@ -221,12 +224,12 @@ void kbd_addHandler(struct KbdHandler *handler)
 	 * Search for the first node whose priority
 	 * is lower than the timer we want to add.
 	 */
-	FOREACHNODE(node,list)
+	FOREACH_NODE(node,list)
 		if (node->pri < handler->pri)
 			break;
 
 	/* Enqueue handler in the handlers chain */
-	INSERTBEFORE(&handler->link, &node->link);
+	INSERT_BEFORE(&handler->link, &node->link);
 
 	IRQ_RESTORE(flags);
 }

@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/02/24 00:27:14  bernie
+ *#* Use new naming convention for list macros.
+ *#*
  *#* Revision 1.1  2005/11/04 18:00:42  bernie
  *#* Import into DevLib.
  *#*
@@ -278,7 +281,7 @@ int lcd_printf(Layer *layer, lcdpos_t addr, uint8_t mode, const char *format, ..
 
 
 /*!
- * Internal function to move a layer betweet two positions.
+ * Internal function to move a layer between two positions.
  *
  * \note The layer must be *already* enqueued in some list.
  * \note The display must be already locked!
@@ -296,12 +299,12 @@ static void lcd_enqueueLayer(Layer *layer, char pri)
 	 * Search for the first layer whose priority
 	 * is less or equal to the layer we are adding.
 	 */
-	FOREACHNODE(l2, &lcd_Layers)
+	FOREACH_NODE(l2, &lcd_Layers)
 		if (l2->pri <= pri)
 			break;
 
 	/* Enqueue layer */
-	INSERTBEFORE(layer, l2);
+	INSERT_BEFORE(layer, l2);
 }
 
 Layer *lcd_newLayer(char pri)
@@ -339,7 +342,7 @@ static void lcd_refresh(void)
 
 	for (addr = 0; addr < LCD_ROWS * LCD_COLS; ++addr)
 	{
-		FOREACHNODE(l, &lcd_Layers)
+		FOREACH_NODE(l, &lcd_Layers)
 		{
 			//kprintf("%d %x %p\n", addr, l->buf[0], l);
 			if (l->pri == LAYER_HIDDEN)
