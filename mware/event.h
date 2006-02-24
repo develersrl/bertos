@@ -18,6 +18,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/02/24 00:26:21  bernie
+ *#* Fix header name.
+ *#*
  *#* Revision 1.4  2006/02/10 12:24:42  bernie
  *#* Fix standalone build.
  *#*
@@ -72,7 +75,7 @@
 #include <appconfig.h>
 
 #if CONFIG_KERNEL
-	#include <cfg/config_kern.h>
+	#include <config_kern.h>
 	#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 		#include "signal.h"
 	#endif
