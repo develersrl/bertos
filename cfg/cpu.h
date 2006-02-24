@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2006/02/24 01:17:30  bernie
+ *#* CPU_SAVED_REGS_CNT: Declare for x86/x86_64.
+ *#*
  *#* Revision 1.9  2006/02/23 09:08:43  bernie
  *#* Add note for a frequently reported non-bug.
  *#*
@@ -115,6 +118,7 @@
 
 
 	#define CPU_REGS_CNT            7
+	#define CPU_SAVED_REGS_CNT	7
 	#define CPU_STACK_GROWS_UPWARD  0
 	#define CPU_SP_ON_EMPTY_SLOT	0
 	#define CPU_BYTE_ORDER          CPU_LITTLE_ENDIAN
@@ -446,7 +450,7 @@
 
 #else
 	#define CPU_PUSH_CALL_CONTEXT(sp, func) \
-		CPU_PUSH_WORD((sp), (func))
+		CPU_PUSH_WORD((sp), (cpustack_t)(func))
 #endif
 
 
