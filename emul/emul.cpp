@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/02/24 01:35:40  bernie
+ *#* Update for new emulator.
+ *#*
  *#* Revision 1.3  2006/02/20 02:00:40  bernie
  *#* Port to Qt 4.1.
  *#*
@@ -30,6 +33,12 @@
 #include "emulwin.h"
 #include <cfg/module.h>
 
+#include <appconfig.h>
+#if CONFIG_KERNEL
+	#include <config_kern.h>
+#endif
+
+
 #include <cstdlib> // std::exit()
 
 #if _QT < 4
@@ -41,6 +50,17 @@
 
 /// The global emulator instance.
 Emulator *emul;
+
+#if CONFIG_KERNEL
+	#include <mware/list.h>
+
+	/// List of process stacks
+	List StackFreeList;
+
+	// HACK: Reserve 64KB of stack space for kernel processes
+	const int NPROC = 8;
+	int stacks[NPROC][(64 * 1024) / sizeof(int)];
+#endif
 
 Emulator::Emulator(int &argc, char **argv) :
 	emulApp(new QApplication(argc, argv)),
@@ -78,6 +98,12 @@ extern "C" void emul_init(int *argc, char *argv[])
 {
 	// setup global emulator pointer
 	emul = new Emulator(*argc, argv);
+
+#if CONFIG_KERNEL
+	LIST_INIT(&StackFreeList);
+	for (int i = 0; i < NPROC; i++)
+		ADDTAIL(&StackFreeList, (Node *)stacks[i]);
+#endif
 
 	MOD_INIT(emul);
 }

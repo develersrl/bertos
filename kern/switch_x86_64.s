@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2006/02/24 01:35:40  bernie
+ * Update for new emulator.
+ *
  * Revision 1.2  2006/02/24 01:17:05  bernie
  * Update for new emulator.
  *
@@ -36,9 +39,9 @@
 #.intel_syntax
 
 /* void AsmSwitchContext(void **new_sp, void **save_sp) */
-/*                       %rdi           %rsi
-.globl AsmSwitchContext
-AsmSwitchContext:
+/*                       %rdi           %rsi            */
+.globl asm_switch_context
+asm_switch_context:
 	pushq	%rax
 	pushq	%rbx
 	pushq	%rcx
