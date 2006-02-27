@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.18  2006/02/27 22:40:21  bernie
+ *#* Add support for poor pre-C99 compilers.
+ *#*
  *#* Revision 1.17  2006/02/24 01:18:34  bernie
  *#* LIST_ENQUEUE(): New macro; Remove obsolete names.
  *#*
@@ -173,6 +176,13 @@ typedef struct _PriNode
  */
 #define LIST_TAIL(l) ((l)->tail.pred)
 
+// TODO: move in compiler.h
+#if COMPILER_TYPEOF
+	#define TYPEOF_OR_VOIDPTR(type) typeof(type)
+#else
+	#define TYPEOF_OR_VOIDPTR(type) void *
+#endif
+
 /*!
  * Iterate over all nodes in a list.
  *
@@ -182,9 +192,9 @@ typedef struct _PriNode
  */
 #define FOREACH_NODE(n, l) \
 	for( \
-		(n) = (typeof(n))LIST_HEAD(l); \
+		(n) = (TYPEOF_OR_VOIDPTR(n))LIST_HEAD(l); \
 		((Node *)(n))->succ; \
-		(n) = (typeof(n))(((Node *)(n))->succ) \
+		(n) = (TYPEOF_OR_VOIDPTR(n))(((Node *)(n))->succ) \
 	)
 
 /*!
@@ -196,18 +206,18 @@ typedef struct _PriNode
  */
 #define REVERSE_FOREACH_NODE(n, l) \
 	for( \
-		(n) = (typeof(n))LIST_TAIL(l); \
+		(n) = (TYPEOF_OR_VOIDPTR(n))LIST_TAIL(l); \
 		((Node *)(n))->pred; \
-		(n) = (typeof(n))(((Node *)(n))->pred) \
+		(n) = (TYPEOF_OR_VOIDPTR(n))(((Node *)(n))->pred) \
 	)
 
 /*! Initialize a list. */
 #define LIST_INIT(l) \
 	do { \
-		(l)->head.succ = (typeof((l)->head.succ)) &(l)->tail; \
+		(l)->head.succ = (TYPEOF_OR_VOIDPTR((l)->head.succ)) &(l)->tail; \
 		(l)->head.pred = NULL; \
 		(l)->tail.succ = NULL; \
-		(l)->tail.pred = (typeof((l)->tail.pred)) &(l)->head; \
+		(l)->tail.pred = (TYPEOF_OR_VOIDPTR((l)->tail.pred)) &(l)->head; \
 	} while (0)
 
 #ifdef _DEBUG
