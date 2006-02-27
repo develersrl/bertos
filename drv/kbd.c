@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/02/27 22:39:45  bernie
+ *#* Misc build and doc fixes from project_grl.
+ *#*
  *#* Revision 1.4  2006/02/24 00:27:14  bernie
  *#* Use new naming convention for list macros.
  *#*
@@ -39,6 +42,7 @@
 
 #include <cfg/debug.h>
 #include <cfg/module.h>
+#include <appconfig.h>
 
 /* Configuration sanity checks */
 #if !defined(CONFIG_KBD_POLL) || (CONFIG_KBD_POLL != KBD_POLL_SOFTINT && CONFIG_KBD_POLL != CONFIG_POLL_FREERTOS)
@@ -65,7 +69,9 @@ static enum { KS_IDLE, KS_REPDELAY, KS_REPEAT } kbd_rptStatus;
 static volatile keymask_t kbd_buf; /*!< Single entry keyboard buffer */
 static volatile keymask_t kbd_cnt; /*!< Number of keypress events in \c kbd_buf */
 
+#if CONFIG_KBD_POLL == KBD_POLL_SOFTINT
 static Timer kbd_timer;            /*!< Keyboard softtimer */
+#endif
 
 static List kbd_rawHandlers;       /*!< Raw keyboard handlers */
 static List kbd_handlers;          /*!< Cooked keyboard handlers */
@@ -128,11 +134,11 @@ static void kbd_softint(UNUSED_ARG(iptr_t, arg))
 #include "FreeRTOS.h"
 #include "task.h"
 
-static portTASK_FUNCTION(kbd_poll, arg)
+static portTASK_FUNCTION(kbd_task, arg)
 {
 	for (;;)
 	{
-		kbd_poll(0);
+		kbd_poll();
 		timer_delay(KBD_CHECK_INTERVAL);
 	}
 }
@@ -438,7 +444,7 @@ void kbd_init(void)
 #elif CONFIG_KBD_POLL == CONFIG_POLL_FREERTOS
 
 	/* Create a timer specific thread */
-	xTaskCreate(kbd_poll, "kbd_poll", CONFIG_STACK_KBD,
+	xTaskCreate(kbd_task, "kbd", CONFIG_STACK_KBD,
 			NULL, CONFIG_PRI_KBD, NULL);
 
 #else
