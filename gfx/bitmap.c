@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2006/03/07 22:18:04  bernie
+ *#* Correctly compute text width for prop fonts; Make styles a per-bitmap attribute.
+ *#*
  *#* Revision 1.6  2006/02/23 11:17:16  bernie
  *#* Documentation fixes.
  *#*
@@ -73,6 +76,7 @@ void gfx_bitmapInit(Bitmap *bm, uint8_t *raster, coord_t w, coord_t h)
 
 #if CONFIG_GFX_TEXT
 	gfx_setFont(bm, &default_font);
+	bm->styles = 0;
 #endif
 
 #if CONFIG_GFX_CLIPPING

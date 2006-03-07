@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2006/03/07 22:18:04  bernie
+ *#* Correctly compute text width for prop fonts; Make styles a per-bitmap attribute.
+ *#*
  *#* Revision 1.10  2006/02/17 22:24:40  bernie
  *#* Fix undefined preprocessor symbol.
  *#*
@@ -125,6 +128,15 @@ typedef struct Bitmap
 
 #if CONFIG_GFX_TEXT
 	const struct Font *font;/**< Current font for text rendering. */
+
+	/**
+	 * Algorithmic text style flags.
+	 *
+	 * The text rendering routine can apply a few simple transformations
+	 * to the current font in order to generate common styles such as
+	 * bold, italic and underline from plain glyphs.
+	 */
+	uint8_t styles;
 #endif
 #if CONFIG_GFX_VCOORDS
 	/*!

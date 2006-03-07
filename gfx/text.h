@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/03/07 22:18:04  bernie
+ *#* Correctly compute text width for prop fonts; Make styles a per-bitmap attribute.
+ *#*
  *#* Revision 1.3  2006/02/10 12:26:19  bernie
  *#* Add STYLEF_TALL (unimplemented).
  *#*
@@ -107,7 +110,7 @@ struct Bitmap;
 void text_moveto(struct Bitmap *bm, int row, int col);
 void text_setcoord(struct Bitmap *bm, int x, int y);
 int text_putchar(char c, struct Bitmap *bm);
-uint8_t text_style(uint8_t flags, uint8_t mask);
+uint8_t text_style(struct Bitmap *bm, uint8_t flags, uint8_t mask);
 void text_clear(struct Bitmap *bm);
 void text_clearLine(struct Bitmap *bm, int line);
 

@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/03/07 22:18:04  bernie
+ *#* Correctly compute text width for prop fonts; Make styles a per-bitmap attribute.
+ *#*
  *#* Revision 1.4  2006/02/10 12:31:33  bernie
  *#* Add multiple font support in bitmaps.
  *#*
@@ -160,7 +163,7 @@ int PGM_FUNC(text_xprintf)(struct Bitmap *bm,
 	text_moveto(bm, row, col);
 
 	if (style & STYLEF_MASK)
-		oldstyle = text_style(style, STYLEF_MASK);
+		oldstyle = text_style(bm, style, STYLEF_MASK);
 
 	if (style & (TEXT_CENTER | TEXT_RIGHT))
 	{
@@ -185,11 +188,65 @@ int PGM_FUNC(text_xprintf)(struct Bitmap *bm,
 
 	/* Restore old style */
 	if (style & STYLEF_MASK)
-		text_style(oldstyle, STYLEF_MASK);
+		text_style(bm, oldstyle, STYLEF_MASK);
 
 	return len;
 }
 
+
+struct TextWidthData
+{
+		Bitmap *bitmap;
+		coord_t width;
+};
+
+/**
+ * Compute width in pixels of a character.
+ *
+ * Compute the on screen width of a character, taking the
+ * current style and font into account.
+ *
+ * The width is accumulated in the WidthData structure
+ * passed as second argument.
+ *
+ * This is a formatted_write() callback used by text_vwidthf()
+ * to compute the length of a formatted string.
+ */
+static int text_charWidth(int c, struct TextWidthData *twd)
+{
+	unsigned char index = (unsigned char)c;
+	Bitmap *bm = twd->bitmap;
+	coord_t glyph_width;
+
+
+	if (index < bm->font->first || index > bm->font->last)
+	{
+		if ('?' >= bm->font->first && '?' <= bm->font->last)
+			index = '?';
+		else
+			index = bm->font->first;
+	}
+
+	/* Make character relative to font start */
+	index -= bm->font->first;
+
+	if (bm->font->offset)
+		/* Proportional font */
+		glyph_width = bm->font->widths[index]; /* TODO: optimize away */
+	else
+		/* Fixed width font */
+		glyph_width = bm->font->width;
+
+	if (bm->styles & STYLEF_CONDENSED)
+		--glyph_width;
+
+	if (bm->styles & STYLEF_EXPANDED)
+		glyph_width *= 2;
+
+	twd->width += glyph_width;
+
+	return c;
+}
 
 /*!
  * Return the width in pixels of a vprintf()-formatted string.
@@ -199,7 +256,15 @@ int PGM_FUNC(text_vwidthf)(
 	const char * PGM_ATTR fmt,
 	va_list ap)
 {
-	return PGM_FUNC(vsprintf)(NULL, fmt, ap) * bm->font->width;
+	/* Fixed font with no styles affecting the width? */
+	if (!bm->font->offset && !(bm->styles & (STYLEF_CONDENSED | STYLEF_EXPANDED)))
+		return PGM_FUNC(vsprintf)(NULL, fmt, ap) * bm->font->width;
+	else
+	{
+		struct TextWidthData twd = { bm, 0 };
+		_formatted_write(fmt, (void (*)(char, void *))text_charWidth, &twd, ap);
+		return twd.width;
+	}
 }
 
 

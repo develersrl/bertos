@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/03/07 22:18:04  bernie
+ *#* Correctly compute text width for prop fonts; Make styles a per-bitmap attribute.
+ *#*
  *#* Revision 1.4  2006/02/15 09:10:15  bernie
  *#* Implement prop fonts; Fix algo styles.
  *#*
@@ -92,16 +95,6 @@
 #include <cfg/debug.h>
 
 
-/*!
- * Flags degli stili algoritmici
- *
- * La routine di rendering del testo e' in grado di applicare
- * delle semplici trasformazioni al font interno per generare
- * automaticamente degli stili predefiniti (bold, italic,
- * underline) a partire dal set di caratteri plain.
- */
-static uint8_t text_styles;
-
 /*! ANSI escape sequences flag: true for ESC state on */
 static bool ansi_mode = false;
 
@@ -178,18 +171,19 @@ static int text_putglyph(char c, struct Bitmap *bm)
 		glyph = bm->font->glyph + index * glyph_height_bytes * glyph_width;
 	}
 
-	if (text_styles & STYLEF_CONDENSED)
-		--glyph_width;
-
-	if (text_styles & STYLEF_EXPANDED)
-		glyph_width *= 2;
-
 	/* Slow path for styled glyphs */
-	if (text_styles)
+	if (bm->styles)
 	{
 		uint8_t prev_dots = 0, italic_prev_dots = 0;
 		uint8_t dots;
 		uint8_t row, col;
+
+		/* This style alone could be handled by the fast path too */
+		if (bm->styles & STYLEF_CONDENSED)
+			--glyph_width;
+
+		if (bm->styles & STYLEF_EXPANDED)
+			glyph_width *= 2;
 
 		/* Check if glyph fits in the bitmap. */
 		if ((bm->penX < 0) || (bm->penX + glyph_width > bm->width)
@@ -208,14 +202,14 @@ static int text_putglyph(char c, struct Bitmap *bm)
 				uint8_t i;
 
 				/* Expanded style: advances only once every two columns. */
-				if (text_styles & STYLEF_EXPANDED)
+				if (bm->styles & STYLEF_EXPANDED)
 					src_col /= 2;
 
 				/* Fetch a column of dots from glyph. */
 				dots = PGM_READ_CHAR(glyph + src_col * glyph_height_bytes + row);
 
 				/* Italic: get lower 4 dots from previous column */
-				if (text_styles & STYLEF_ITALIC)
+				if (bm->styles & STYLEF_ITALIC)
 				{
 					uint8_t new_dots = dots;
 					dots = (dots & 0xF0) | italic_prev_dots;
@@ -223,7 +217,7 @@ static int text_putglyph(char c, struct Bitmap *bm)
 				}
 
 				/* Bold: "or" pixels with the previous column */
-				if (text_styles & STYLEF_BOLD)
+				if (bm->styles & STYLEF_BOLD)
 				{
 					uint8_t new_dots = dots;
 					dots |= prev_dots;
@@ -231,11 +225,11 @@ static int text_putglyph(char c, struct Bitmap *bm)
 				}
 
 				/* Underlined: turn on base pixel */
-				if (text_styles & STYLEF_UNDERLINE)
+				if (bm->styles & STYLEF_UNDERLINE)
 					dots |= 0x80;
 
 				/* Inverted: invert pixels */
-				if (text_styles & STYLEF_INVERT)
+				if (bm->styles & STYLEF_INVERT)
 					dots = ~dots;
 
 				/* Output dots */
@@ -272,7 +266,7 @@ int text_putchar(char c, struct Bitmap *bm)
 			gfx_bitmapClear(bm);
 			bm->penX = 0;
 			bm->penY = 0;
-			text_style(0, STYLEF_MASK);
+			text_style(bm, 0, STYLEF_MASK);
 			break;
 		DB(default:
 			kprintf("Unknown ANSI esc code: %x\n", c);)
@@ -324,20 +318,20 @@ void text_clearLine(struct Bitmap *bm, int line)
  *
  * Examples:
  * Turn on bold, leave other styles alone
- *   \code prt_style(STYLEF_BOLD, STYLEF_BOLD); \endcode
+ *   \code text_style(bm, STYLEF_BOLD, STYLEF_BOLD); \endcode
  *
  * Turn off bold and turn on italic, leave others as they are
- *   \code prt_style(STYLEF_ITALIC, STYLEF_BOLD | STYLEF_ITALIC); \endcode
+ *   \code text_style(bm, STYLEF_ITALIC, STYLEF_BOLD | STYLEF_ITALIC); \endcode
  *
  * Query current style without chaning it
- *   \code style = prt_style(0, 0); \endcode
+ *   \code style = text_style(bm, 0, 0); \endcode
  *
  * Reset all styles (plain text)
- *   \code prt_style(0, STYLE_MASK); \endcode
+ *   \code text_style(bm, 0, STYLE_MASK); \endcode
  */
-uint8_t text_style(uint8_t flags, uint8_t mask)
+uint8_t text_style(struct Bitmap *bm, uint8_t flags, uint8_t mask)
 {
-	uint8_t old = text_styles;
-	text_styles = (text_styles & ~mask) | flags;
+	uint8_t old = bm->styles;
+	bm->styles = (bm->styles & ~mask) | flags;
 	return old;
 }
