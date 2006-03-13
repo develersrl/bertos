@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2006/03/13 02:06:55  bernie
+ *#* ROUND_UP2: Rename from ROUND2.
+ *#*
  *#* Revision 1.7  2006/02/20 14:34:58  bernie
  *#* Use portable type checking.
  *#*
@@ -157,8 +160,11 @@
 	#define BV(x)  (1<<(x))
 #endif
 
-/*! Round up \a x to an even multiple of the 2's power \a pad */
-#define ROUND2(x, pad) (((x) + ((pad) - 1)) & ~((pad) - 1))
+/** Round up \a x to an even multiple of the 2's power \a pad. */
+#define ROUND_UP2(x, pad) (((x) + ((pad) - 1)) & ~((pad) - 1))
+
+/* OBSOLETE */
+#define ROUND2 ROUND_UP2
 
 /*!
  * \name Integer round macros.
@@ -172,7 +178,7 @@
 #define ROUND_NEAREST(x, base) ( ((x) + (base) / 2) - (((x) + (base) / 2) % (base)) )
 /* \} */
 
-//! Check if \a x is an integer power of 2
+/** Check if \a x is an integer power of 2. */
 #define IS_POW2(x)     (!(bool)((x) & ((x)-1)))
 
 /*! Calculate a compile-time log2 for a uint8_t */
