@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/03/13 02:06:04  bernie
+ *#* FONT_HAS_GLYPH(): New macro.
+ *#*
  *#* Revision 1.4  2006/02/15 09:10:15  bernie
  *#* Implement prop fonts; Fix algo styles.
  *#*
@@ -78,6 +81,11 @@ typedef struct Font
 	const PROGMEM uint8_t *widths;
 
 } Font;
+
+
+/** Return true if glyph \a c is available in \a font. */
+#define FONT_HAS_GLYPH(font, c) ((c) >= (font)->first && (c) <= (font)->last)
+
 
 /** The default font. */
 #define default_font font_ncenB18
