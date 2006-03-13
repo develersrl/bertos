@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/03/13 02:05:54  bernie
+ *#* Mark slow paths as UNLIKELY.
+ *#*
  *#* Revision 1.5  2006/03/07 22:18:04  bernie
  *#* Correctly compute text width for prop fonts; Make styles a per-bitmap attribute.
  *#*
@@ -219,7 +222,7 @@ static int text_charWidth(int c, struct TextWidthData *twd)
 	coord_t glyph_width;
 
 
-	if (index < bm->font->first || index > bm->font->last)
+	if (UNLIKELY(index < bm->font->first || index > bm->font->last))
 	{
 		if ('?' >= bm->font->first && '?' <= bm->font->last)
 			index = '?';

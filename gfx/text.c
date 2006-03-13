@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/03/13 02:05:54  bernie
+ *#* Mark slow paths as UNLIKELY.
+ *#*
  *#* Revision 1.5  2006/03/07 22:18:04  bernie
  *#* Correctly compute text width for prop fonts; Make styles a per-bitmap attribute.
  *#*
@@ -135,10 +138,10 @@ static int text_putglyph(char c, struct Bitmap *bm)
 	unsigned char index = (unsigned char)c;
 
 	/* Check for out of range char and replace with '?' or first char in font. */
-	if (index < bm->font->first || index > bm->font->last)
+	if (UNLIKELY(!FONT_HAS_GLYPH(bm->font, index)))
 	{
 		kprintf("Illegal char '%c' (0x%02x)\n", index, index);
-		if ('?' >= bm->font->first && '?' <= bm->font->last)
+		if (FONT_HAS_GLYPH(bm->font, '?'))
 			index = '?';
 		else
 			index = bm->font->first;
@@ -172,7 +175,7 @@ static int text_putglyph(char c, struct Bitmap *bm)
 	}
 
 	/* Slow path for styled glyphs */
-	if (bm->styles)
+	if (UNLIKELY(bm->styles))
 	{
 		uint8_t prev_dots = 0, italic_prev_dots = 0;
 		uint8_t dots;
@@ -258,7 +261,7 @@ static int text_putglyph(char c, struct Bitmap *bm)
 int text_putchar(char c, struct Bitmap *bm)
 {
 	/* Handle ANSI escape sequences */
-	if (ansi_mode)
+	if (UNLIKELY(ansi_mode))
 	{
 		switch (c)
 		{
@@ -309,9 +312,10 @@ void text_clearLine(struct Bitmap *bm, int line)
 }
 
 
-/*!
+/**
  * Set/clear algorithmic font style bits.
  *
+ * \param bm     Pointer to Bitmap to affect.
  * \param flags  Style flags to set
  * \param mask   Mask of flags to modify
  * \return       Old style flags
