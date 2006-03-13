@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2006/03/13 02:07:14  bernie
+ *#* Add TODO item.
+ *#*
  *#* Revision 1.6  2006/02/24 01:17:05  bernie
  *#* Update for new emulator.
  *#*
@@ -81,6 +84,7 @@ void monitor_rename(Process *proc, const char* name)
 	proc->monitor.name = name;
 }
 
+/* TODO: use containerof() */
 #define MONITOR_NODE_TO_PROCESS(node) \
 	(struct Process *)((char *)(node) - offsetof(struct Process, monitor.link))
 
