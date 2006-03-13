@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.15  2006/03/13 02:06:25  bernie
+ *#* containerof(): New macro.
+ *#*
  *#* Revision 1.14  2006/02/23 08:36:33  bernie
  *#* Emulate __func__ on MSVC.
  *#*
@@ -500,6 +503,23 @@ typedef unsigned char page_t;    /*!< Type for banked memory pages. */
 	#define countof(a)  (sizeof(a) / sizeof(*(a)))
 #endif
 
+/**
+ * Cast a member of a structure out to the containing structure.
+ *
+ * \param ptr     the pointer to the member.
+ * \param type    the type of the container struct this is embedded in.
+ * \param member  the name of the member within the struct.
+ */
+#if COMPILER_TYPEOF && COMPILER_STATEMENT_EXPRESSIONS
+	#define containerof(ptr, type, member) ({ \
+		const typeof( ((type *)0)->member ) *_mptr = (ptr); /* type check */ \
+		(type *)((char *)_mptr - offsetof(type, member)); \
+	})
+#else
+	#define containerof(ptr, type, member) \
+		( (type *)((char *)(ptr) - offsetof(type, member)) )
+#endif
+
 /*! Issue a compilation error if the \a condition is false */
 #define STATIC_ASSERT(condition)  \
 	UNUSED_VAR(extern char, STATIC_ASSERTION_FAILED__[(condition) ? 1 : -1])
@@ -511,9 +531,9 @@ typedef unsigned char page_t;    /*!< Type for banked memory pages. */
 #endif
 
 #ifndef ASSERT_TYPE_IS
-/*! Ensure variable is of specified type. */
+/** Ensure variable is of specified type. */
 #define ASSERT_TYPE_IS(var, type)  \
-		do { (void)(&var == (type *)0); } while(0)
+		do { (void)(&(var) == (type *)0); } while(0)
 #endif
 
 #endif /* DEVLIB_COMPILER_H */
