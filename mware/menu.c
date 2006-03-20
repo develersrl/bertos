@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/03/20 17:48:35  bernie
+ *#* Implement support for ROM menus.
+ *#*
  *#* Revision 1.3  2006/02/20 14:34:32  bernie
  *#* Include appconfig.h before using its definitions.
  *#*
@@ -103,16 +106,27 @@
 
 
 #ifdef _DEBUG
-/*!
+/**
  * Count the items present in a menu.
  */
-static int UNUSED_FUNC menu_count(const struct Menu *menu)
+static int menu_count(const struct Menu *menu)
 {
 	int cnt = 0;
-	struct MenuItem *item;
 
-	for (item = menu->items; item->label; ++item)
-		cnt++;
+	for (cnt = 0; /*NOP*/; ++cnt)
+	{
+		const MenuItem *item = &menu->items[cnt];
+#if CPU_HARVARD
+		MenuItem ram_item;
+		if (menu->flags & MF_ROMITEMS)
+		{
+			memcpy_P(&ram_item, item, sizeof(ram_item));
+			item = &ram_item;
+		}
+#endif
+		if (!(item->label || item->hook))
+			break;
+	}
 
 	return cnt;
 }
@@ -130,7 +144,17 @@ static void menu_update_menubar(
 		struct MenuBar *mb,
 		int selected)
 {
-	int item_flags = menu->items[selected].flags;
+	int item_flags;
+#if CPU_HARVARD
+	if (menu->flags & MF_ROMITEMS)
+	{
+		ASSERT(sizeof(menu->items[selected].flags) == sizeof(int));
+		item_flags = pgm_read_int(&menu->items[selected].flags);
+	}
+	else
+#endif
+		item_flags = menu->items[selected].flags;
+
 	const_iptr_t newlabel = (const_iptr_t)LABEL_OK;
 
 	if (item_flags & MIF_DISABLED)
@@ -158,7 +182,6 @@ static void menu_layout(
 		int items_per_page,
 		int selected)
 {
-	const MenuItem *item;
 	int ypos, cnt;
 	const char * PROGMEM title = PTRMSG(menu->title);
 
@@ -167,11 +190,18 @@ static void menu_layout(
 	if (title)
 		text_xprintf(menu->bitmap, ypos++, 0, STYLEF_BOLD | TEXT_FILL, title);
 
-	for (
-		cnt = 0, item = &menu->items[first_item];
-		cnt < items_per_page;
-		++cnt, ++item)
+	for (cnt = 0; cnt < items_per_page; ++cnt)
 	{
+		const MenuItem *item = &menu->items[first_item + cnt];
+#if CPU_HARVARD
+		MenuItem ram_item;
+		if (menu->flags & MF_ROMITEMS)
+		{
+			memcpy_P(&ram_item, item, sizeof(ram_item));
+			item = &ram_item;
+		}
+#endif
+
 		/* Check for end of menu */
 		if (!(item->label || item->hook))
 			break;
@@ -187,7 +217,7 @@ static void menu_layout(
 			(
 				menu->bitmap, ypos++, 0,
 				(first_item + cnt == selected) ? (STYLEF_INVERT | TEXT_FILL) : TEXT_FILL,
-				(item->flags & MIF_RAMLABEL) ? PSTR("%s%s") : PSTR("%S%s"),
+				(item->flags & MIF_RAMLABEL) ? PSTR("%s%S") : PSTR("%S%S"),
 				PTRMSG(item->label),
 				(item->flags & MIF_TOGGLE) ?
 					( (item->flags & MIF_CHECKED) ? PSTR(":ON") : PSTR(":OFF") )
@@ -234,32 +264,56 @@ static void menu_doselect(const struct Menu *menu, struct MenuItem *item)
 
 
 /*!
- * Return the previous visible item (rolls back to the last item)
+ * Return the next visible item (rolls back to the first item)
  */
 static int menu_next_visible_item(const struct Menu *menu, int index, int total)
 {
+	int item_flags;
+
 	do
 	{
 		if (++index >= total)
 		   index = 0;
+
+#if CPU_HARVARD
+		if (menu->flags & MF_ROMITEMS)
+		{
+			ASSERT(sizeof(menu->items[index].flags) == sizeof(int));
+			item_flags = pgm_read_int(&menu->items[index].flags);
+		}
+		else
+#endif
+			item_flags = menu->items[index].flags;
 	}
-	while (menu->items[index].flags & MIF_HIDDEN);
+	while (item_flags & MIF_HIDDEN);
 
 	return index;
 }
 
 
 /*!
- * Return the next visible item (rolls back to the first item)
+ * Return the previous visible item (rolls back to the last item)
  */
 static int menu_prev_visible_item(const struct Menu *menu, int index, int total)
 {
+	int item_flags;
+
 	do
 	{
 		if (--index < 0)
 			index = total - 1;
+
+#if CPU_HARVARD
+		if (menu->flags & MF_ROMITEMS)
+		{
+			ASSERT(sizeof(menu->items[index].flags) == sizeof(int));
+			item_flags = pgm_read_int(&menu->items[index].flags);
+		}
+		else
+#endif
+			item_flags = menu->items[index].flags;
 	}
-	while (menu->items[index].flags & MIF_HIDDEN);
+	while (item_flags & MIF_HIDDEN);
 
 	return index;
 }
@@ -293,22 +347,28 @@ iptr_t menu_handle(const struct Menu *menu)
 #endif /* CONFIG_MENU_MENUBAR */
 
 
-	/* Compute total number of items in menu (entries) and
+	/*
+	 * Compute total number of items in menu (entries) and
 	 * the number of visible entries, which excludes items
 	 * without a label.
 	 */
+	for (entries = 0, visible_entries = 0; /*NOP*/; ++entries)
 	{
-		struct MenuItem *item;
-
-		entries = 0;
-		visible_entries = 0;
-
-		for (item = menu->items; (item->label || item->hook); ++item)
+		const MenuItem *item = &menu->items[entries];
+#if CPU_HARVARD
+		MenuItem ram_item;
+		if (menu->flags & MF_ROMITEMS)
 		{
-			++entries;
-			if (!(item->flags & MIF_HIDDEN))
-				++visible_entries;
+			memcpy_P(&ram_item, item, sizeof(ram_item));
+			item = &ram_item;
 		}
+#endif
+
+		if (!(item->flags & MIF_HIDDEN))
+			++visible_entries;
+
+		if (!(item->label || item->hook))
+			break;
 	}
 
 	items_per_page =
@@ -347,6 +407,14 @@ iptr_t menu_handle(const struct Menu *menu)
 		if (key & K_OK)
 		{
 			struct MenuItem *item = &(menu->items[selected]);
+#if CPU_HARVARD
+			MenuItem ram_item;
+			if (menu->flags & MF_ROMITEMS)
+			{
+				memcpy_P(&ram_item, item, sizeof(ram_item));
+				item = &ram_item;
+			}
+#endif
 			menu_doselect(menu, item);
 
 			/* Return userdata as result */
@@ -381,6 +449,7 @@ iptr_t menu_handle(const struct Menu *menu)
 int menu_setFlags(struct Menu *menu, int idx, int flags)
 {
 	ASSERT(idx < menu_count(menu));
+	ASSERT(!(menu->flags & MF_ROMITEMS));
 
 	int old = menu->items[idx].flags;
 	menu->items[idx].flags |= flags;
@@ -400,6 +469,7 @@ int menu_setFlags(struct Menu *menu, int idx, int flags)
 int menu_clearFlags(struct Menu *menu, int idx, int flags)
 {
 	ASSERT(idx < menu_count(menu));
+	ASSERT(!(menu->flags & MF_ROMITEMS));
 
 	int old = menu->items[idx].flags;
 	menu->items[idx].flags &= ~flags;

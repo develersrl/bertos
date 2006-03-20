@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/03/20 17:48:35  bernie
+ *#* Implement support for ROM menus.
+ *#*
  *#* Revision 1.1  2006/02/10 12:29:36  bernie
  *#* Add menu system.
  *#*
@@ -97,6 +100,7 @@ typedef struct Menu
 
 #define MF_STICKY    BV(0)  /*!< Stay in the menu when the items called return */
 #define MF_TOPLEVEL  BV(1)  /*!< Top-level menu (do not display "back" label) */
+#define MF_ROMITEMS  BV(2)  /*!< Menu is in ROM (default is RAM) */
 
 
 /* Function prototypes */
