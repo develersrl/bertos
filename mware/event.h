@@ -18,6 +18,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2006/03/20 17:52:22  bernie
+ *#* Add missing forward declaration.
+ *#*
  *#* Revision 1.6  2006/02/24 01:17:44  bernie
  *#* Update for new emulator.
  *#*
@@ -82,6 +85,9 @@
 	#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 		#include <kern/signal.h>
 	#endif
+
+	/* Forward decl */
+	struct Process;
 #endif
 
 
