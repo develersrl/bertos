@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.19  2006/03/20 17:50:29  bernie
+ *#* Fix typo.
+ *#*
  *#* Revision 1.18  2006/02/27 22:40:21  bernie
  *#* Add support for poor pre-C99 compilers.
  *#*
@@ -137,7 +140,7 @@ typedef struct _PriNode
  *
  *        LIST_INIT(&foo_list);
  *        ADDHEAD(&foo_list, &foo1);
- *        INSERTBEFORE(&foo_list, &foo2);
+ *        INSERT_BEFORE(&foo_list, &foo2);
  *        FOREACH_NODE(fp, &foo_list)
  *		fp->a = 10;
  *    }
