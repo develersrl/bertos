@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2006/03/20 17:49:00  bernie
+ *#* Spacing fix.
+ *#*
  *#* Revision 1.10  2006/02/24 01:17:30  bernie
  *#* CPU_SAVED_REGS_CNT: Declare for x86/x86_64.
  *#*
@@ -118,7 +121,7 @@
 
 
 	#define CPU_REGS_CNT            7
-	#define CPU_SAVED_REGS_CNT	7
+	#define CPU_SAVED_REGS_CNT      7
 	#define CPU_STACK_GROWS_UPWARD  0
 	#define CPU_SP_ON_EMPTY_SLOT	0
 	#define CPU_BYTE_ORDER          CPU_LITTLE_ENDIAN
