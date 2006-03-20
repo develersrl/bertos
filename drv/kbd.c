@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/03/20 17:50:17  bernie
+ *#* Add FreeRTOS and Observers support.
+ *#*
  *#* Revision 1.5  2006/02/27 22:39:45  bernie
  *#* Misc build and doc fixes from project_grl.
  *#*
@@ -38,7 +41,6 @@
 
 #include <drv/timer.h>
 #include <drv/kbd.h>
-#include <drv/buzzer.h>
 
 #include <cfg/debug.h>
 #include <cfg/module.h>
@@ -48,7 +50,16 @@
 #if !defined(CONFIG_KBD_POLL) || (CONFIG_KBD_POLL != KBD_POLL_SOFTINT && CONFIG_KBD_POLL != CONFIG_POLL_FREERTOS)
 	#error CONFIG_KBD_POLL must be defined to either KBD_POLL_SOFTINT or CONFIG_POLL_FREERTOS
 #endif
+#if !defined(CONFIG_KBD_BEEP) || (CONFIG_KBD_BEEP != 0 && CONFIG_KBD_BEEP != 1)
+	#error CONFIG_KBD_BEEP must be defined to either 0 or 1
+#endif
+#if !defined(CONFIG_KBD_OBSERVER) || (CONFIG_KBD_OBSERVER != 0 && CONFIG_KBD_OBSERVER != 1)
+	#error CONFIG_KBD_OBSERVER must be defined to either 0 or 1
+#endif
 
+#if CONFIG_KBD_BEEP
+	#include <drv/buzzer.h>
+#endif
 
 #define KBD_CHECK_INTERVAL  10  /*!< (ms) Timing for kbd softint */
 #define KBD_DEBOUNCE_TIME   30  /*!< (ms) Debounce time */
@@ -83,6 +94,10 @@ static KbdHandler kbd_rptHandler;  /*!< Auto-repeat keyboard handler */
 static KbdHandler kbd_lngHandler;  /*!< Long pression keys handler */
 #endif
 
+#if CONFIG_KBD_OBSERVER
+	#include <mware/observer.h>
+	Subject kbd_subject;
+#endif
 
 
 /*!
@@ -162,6 +177,7 @@ keymask_t kbd_peek(void)
 	keymask_t key = 0;
 
 // FIXME
+	/* Let other tasks run for a while */
 	extern void schedule(void);
 	schedule();
 
@@ -177,7 +193,6 @@ keymask_t kbd_peek(void)
 	return key;
 }
 
-
 /*!
  * Wait for a keypress and return the mask of depressed keys.
  *
@@ -188,6 +203,7 @@ keymask_t kbd_get(void)
 	keymask_t key;
 
 	while (!(key = kbd_peek())) {}
+
 	return key;
 }
 
@@ -262,10 +278,14 @@ static keymask_t kbd_defHandlerFunc(keymask_t key)
 		kbd_buf = key;
 		kbd_cnt = 1;
 
-#if KBD_BEEP_TIME
-		if (!(key & K_REPEAT))
-			buz_beep(KBD_BEEP_TIME);
-#endif
+		#if CONFIG_KBD_OBSERVER
+			observer_notify(&kbd_subject, KBD_EVENT_KEY, &key);
+		#endif
+
+		#if CONFIG_KBD_BEEP
+			if (!(key & K_REPEAT))
+				buz_beep(KBD_BEEP_TIME);
+		#endif
 	}
 
 	/* Eat all input */
@@ -332,9 +352,10 @@ static keymask_t kbd_lngHandlerFunc(keymask_t key)
  */
 static keymask_t kbd_rptHandlerFunc(keymask_t key)
 {
-	/*! Timer for keyboard repeat events */
+	/* Timer for keyboard repeat events. */
 	static ticks_t repeat_time;
 
+	/* Current repeat rate (for acceleration). */
 	static ticks_t repeat_rate; /*! Current repeat rate (for acceleration) */
 
 	ticks_t now = timer_clock();
@@ -399,7 +420,9 @@ MOD_DEFINE(kbd)
  */
 void kbd_init(void)
 {
+#if CONFIG_KBD_BEEP
 	MOD_CHECK(buzzer);
+#endif
 
 	KBD_HW_INIT;
 
@@ -431,6 +454,10 @@ void kbd_init(void)
 	kbd_defHandler.hook = kbd_defHandlerFunc;
 	kbd_defHandler.pri = -128; /* lowest priority */
 	kbd_addHandler(&kbd_defHandler);
+
+#if CONFIG_KBD_OBSERVER
+	observer_InitSubject(&kbd_subject);
+#endif
 
 #if CONFIG_KBD_POLL == KBD_POLL_SOFTINT
 

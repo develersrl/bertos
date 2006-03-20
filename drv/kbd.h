@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/03/20 17:50:17  bernie
+ *#* Add FreeRTOS and Observers support.
+ *#*
  *#* Revision 1.3  2006/02/27 22:39:45  bernie
  *#* Misc build and doc fixes from project_grl.
  *#*
@@ -32,6 +35,7 @@
 #include <kbd_map.h>
 #include <cfg/compiler.h>
 #include <mware/list.h>
+#include <appconfig.h> // CONFIG_KBD_OBSERVER
 
 /**
  * \name Keyboard polling modes.
@@ -58,11 +62,24 @@ typedef struct KbdHandler
 #define KHF_RAWKEYS	BV(0)           /*!< Handler gets raw key events */
 
 
-extern void kbd_init(void);
-extern keymask_t kbd_peek(void);
-extern keymask_t kbd_get(void);
-extern keymask_t kbd_get_timeout(mtime_t timeout);
-extern void kbd_addHandler(struct KbdHandler *handler);
-extern void kbd_remHandler(struct KbdHandler *handler);
+void kbd_init(void);
+keymask_t kbd_peek(void);
+keymask_t kbd_get(void);
+keymask_t kbd_get_timeout(mtime_t timeout);
+void kbd_addHandler(struct KbdHandler *handler);
+void kbd_remHandler(struct KbdHandler *handler);
+
+#if CONFIG_KBD_OBSERVER
+	struct Subject;
+
+	/** Subject structure for keyboard observers. */
+	extern struct Subject kbd_subject;
+
+	enum
+	{
+		/* Event for key presses. */
+		KBD_EVENT_KEY = 0x100
+	};
+#endif
 
 #endif /* DRV_KBD_H */
