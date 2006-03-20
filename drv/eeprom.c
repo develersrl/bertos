@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.19  2006/03/20 17:49:50  bernie
+ *#* Make the TWI driver more generic to work with devices other than EEPROMS.
+ *#*
  *#* Revision 1.18  2005/11/27 23:33:40  bernie
  *#* Use appconfig.h instead of cfg/config.h.
  *#*
@@ -52,6 +55,18 @@
 	#error CONFIG_EEPROM_VERIFY must be defined to either 0 or 1
 #endif
 
+/**
+ * EEPROM ID code
+ */
+#define EEPROM_ID  0xA0
+
+/**
+ * This macros form the correct slave address for EEPROMs
+ */
+#define EEPROM_ADDR(x) (EEPROM_ID | (((uint8_t)(x)) << 1))
+
+
+
 
 /*!
  * Copy \c count bytes from buffer \c buf to
@@ -80,7 +95,7 @@ static bool eeprom_writeRaw(e2addr_t addr, const void *buf, size_t count)
 		uint8_t blk_offs = (uint8_t)addr;
 
 		result =
-			twi_start_w(blk_addr)
+			twi_start_w(EEPROM_ADDR(blk_addr))
 			&& twi_send(&blk_offs, sizeof blk_offs)
 			&& twi_send(buf, size);
 
@@ -90,7 +105,7 @@ static bool eeprom_writeRaw(e2addr_t addr, const void *buf, size_t count)
 		uint16_t addr_be = cpu_to_be16(addr);
 
 		result =
-			twi_start_w(0)
+			twi_start_w(EEPROM_ID)
 			&& twi_send((uint8_t *)&addr_be, sizeof addr_be)
 			&& twi_send(buf, size);
 
@@ -198,9 +213,9 @@ bool eeprom_read(e2addr_t addr, void *buf, size_t count)
 	uint8_t blk_offs = (uint8_t)addr;
 
 	bool res =
-		twi_start_w(blk_addr)
+		twi_start_w(EEPROM_ADDR(blk_addr))
 		&& twi_send(&blk_offs, sizeof blk_offs)
-		&& twi_start_r(blk_addr)
+		&& twi_start_r(EEPROM_ADDR(blk_addr))
 		&& twi_recv(buf, count);
 
 #elif CONFIG_EEPROM_TYPE == EEPROM_24XX256
@@ -209,9 +224,9 @@ bool eeprom_read(e2addr_t addr, void *buf, size_t count)
 	addr = cpu_to_be16(addr);
 
 	bool res =
-		twi_start_w(0)
+		twi_start_w(EEPROM_ID)
 		&& twi_send((uint8_t *)&addr, sizeof(addr))
-		&& twi_start_r(0)
+		&& twi_start_r(EEPROM_ID)
 		&& twi_recv(buf, count);
 #else
 	#error Unknown device type

@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/03/20 17:49:49  bernie
+ *#* Make the TWI driver more generic to work with devices other than EEPROMS.
+ *#*
  *#* Revision 1.3  2005/04/11 19:10:28  bernie
  *#* Include top-level headers from cfg/ subdir.
  *#*
@@ -27,9 +30,10 @@
 
 #include <cfg/compiler.h>
 
-bool twi_start_w(uint8_t slave_addr);
-bool twi_start_r(uint8_t slave_addr);
+bool twi_start_w(uint8_t id);
+bool twi_start_r(uint8_t id);
 void twi_stop(void);
+bool twi_put(const uint8_t data);
 bool twi_send(const void *_buf, size_t count);
 bool twi_recv(void *_buf, size_t count);
 void twi_init(void);

@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/03/20 17:49:50  bernie
+ *#* Make the TWI driver more generic to work with devices other than EEPROMS.
+ *#*
  *#* Revision 1.5  2005/11/27 23:33:40  bernie
  *#* Use appconfig.h instead of cfg/config.h.
  *#*
@@ -46,11 +49,7 @@
 /* Wait for TWINT flag set: bus is ready */
 #define WAIT_TWI_READY  do {} while (!(TWCR & BV(TWINT)))
 
-/*! \name EEPROM control codes */
-/*@{*/
-#define SLA_W  0xA0
-#define SLA_R  0xA1
-/*@}*/
+#define READ_BIT BV(0)
 
 
 /*!
@@ -73,13 +72,13 @@ static bool twi_start(void)
 
 /*!
  * Send START condition and select slave for write.
+ * \c id is the device id comprehensive of address left shifted by 1.
+ * The LSB of \c id is ignored and reset to 0 for write operation.
  *
  * \return true on success, false otherwise.
  */
-bool twi_start_w(uint8_t slave_addr)
+bool twi_start_w(uint8_t id)
 {
-	ASSERT(slave_addr < 8);
-
 	/*
 	 * Loop on the select write sequence: when the eeprom is busy
 	 * writing previously sent data it will reply to the SLA_W
@@ -88,7 +87,7 @@ bool twi_start_w(uint8_t slave_addr)
 	 */
 	while (twi_start())
 	{
-		TWDR = SLA_W | (slave_addr << 1);
+		TWDR = id & ~READ_BIT;
 		TWCR = BV(TWINT) | BV(TWEN);
 		WAIT_TWI_READY;
 
@@ -107,16 +106,16 @@ bool twi_start_w(uint8_t slave_addr)
 
 /*!
  * Send START condition and select slave for read.
+ * \c id is the device id comprehensive of address left shifted by 1.
+ * The LSB of \c id is ignored and set to 1 for read operation.
  *
  * \return true on success, false otherwise.
  */
-bool twi_start_r(uint8_t slave_addr)
+bool twi_start_r(uint8_t id)
 {
-	ASSERT(slave_addr < 8);
-
 	if (twi_start())
 	{
-		TWDR = SLA_R | (slave_addr << 1);
+		TWDR = id | READ_BIT;
 		TWCR = BV(TWINT) | BV(TWEN);
 		WAIT_TWI_READY;
 
@@ -135,7 +134,27 @@ bool twi_start_r(uint8_t slave_addr)
  */
 void twi_stop(void)
 {
-	TWCR = BV(TWINT) | BV(TWEN) | BV(TWSTO);
+        TWCR = BV(TWINT) | BV(TWEN) | BV(TWSTO);
+}
+
+
+/*!
+ * Put a single byte in master transmitter mode
+ * to the selected slave device through the TWI bus.
+ *
+ * \return true on success, false on error.
+ */
+bool twi_put(const uint8_t data)
+{
+	TWDR = data;
+	TWCR = BV(TWINT) | BV(TWEN);
+	WAIT_TWI_READY;
+	if (TW_STATUS != TW_MT_DATA_ACK)
+	{
+		kprintf("!TW_MT_DATA_ACK: %x\n", TWSR);
+		return false;
+	}
+	return true;
 }
 
 
@@ -151,16 +170,9 @@ bool twi_send(const void *_buf, size_t count)
 
 	while (count--)
 	{
-		TWDR = *buf++;
-		TWCR = BV(TWINT) | BV(TWEN);
-		WAIT_TWI_READY;
-		if (TW_STATUS != TW_MT_DATA_ACK)
-		{
-			kprintf("!TW_MT_DATA_ACK: %x\n", TWSR);
+		if (!twi_put(*buf++))
 			return false;
-		}
 	}
-
 	return true;
 }
 
