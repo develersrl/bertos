@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2006/03/20 17:51:55  bernie
+ *#* Cleanups.
+ *#*
  *#* Revision 1.6  2006/03/13 02:05:54  bernie
  *#* Mark slow paths as UNLIKELY.
  *#*
@@ -199,8 +202,8 @@ int PGM_FUNC(text_xprintf)(struct Bitmap *bm,
 
 struct TextWidthData
 {
-		Bitmap *bitmap;
-		coord_t width;
+	Bitmap *bitmap;
+	coord_t width;
 };
 
 /**
@@ -222,9 +225,9 @@ static int text_charWidth(int c, struct TextWidthData *twd)
 	coord_t glyph_width;
 
 
-	if (UNLIKELY(index < bm->font->first || index > bm->font->last))
+	if (UNLIKELY(!FONT_HAS_GLYPH(bm->font, index)))
 	{
-		if ('?' >= bm->font->first && '?' <= bm->font->last)
+		if (!FONT_HAS_GLYPH(bm->font, '?'))
 			index = '?';
 		else
 			index = bm->font->first;

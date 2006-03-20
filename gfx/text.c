@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2006/03/20 17:51:55  bernie
+ *#* Cleanups.
+ *#*
  *#* Revision 1.6  2006/03/13 02:05:54  bernie
  *#* Mark slow paths as UNLIKELY.
  *#*
@@ -152,7 +155,7 @@ static int text_putglyph(char c, struct Bitmap *bm)
 
 	glyph_height = bm->font->height;
 	// FIXME: for vertical fonts only
-	glyph_height_bytes = (glyph_height + 7) / 8;
+	glyph_height_bytes = ROUND_UP2(glyph_height, 8);
 
 	if (bm->font->offset)
 	{
@@ -177,6 +180,7 @@ static int text_putglyph(char c, struct Bitmap *bm)
 	/* Slow path for styled glyphs */
 	if (UNLIKELY(bm->styles))
 	{
+		uint8_t styles = bm->styles;
 		uint8_t prev_dots = 0, italic_prev_dots = 0;
 		uint8_t dots;
 		uint8_t row, col;
@@ -205,14 +209,14 @@ static int text_putglyph(char c, struct Bitmap *bm)
 				uint8_t i;
 
 				/* Expanded style: advances only once every two columns. */
-				if (bm->styles & STYLEF_EXPANDED)
+				if (styles & STYLEF_EXPANDED)
 					src_col /= 2;
 
 				/* Fetch a column of dots from glyph. */
 				dots = PGM_READ_CHAR(glyph + src_col * glyph_height_bytes + row);
 
 				/* Italic: get lower 4 dots from previous column */
-				if (bm->styles & STYLEF_ITALIC)
+				if (styles & STYLEF_ITALIC)
 				{
 					uint8_t new_dots = dots;
 					dots = (dots & 0xF0) | italic_prev_dots;
@@ -220,7 +224,7 @@ static int text_putglyph(char c, struct Bitmap *bm)
 				}
 
 				/* Bold: "or" pixels with the previous column */
-				if (bm->styles & STYLEF_BOLD)
+				if (styles & STYLEF_BOLD)
 				{
 					uint8_t new_dots = dots;
 					dots |= prev_dots;
@@ -228,11 +232,12 @@ static int text_putglyph(char c, struct Bitmap *bm)
 				}
 
 				/* Underlined: turn on base pixel */
-				if (bm->styles & STYLEF_UNDERLINE)
-					dots |= 0x80;
+				if ((styles & STYLEF_UNDERLINE)
+					&& (row == glyph_height_bytes - 1))
+					dots |= (1 << (glyph_height - row * 8 - 1));
 
 				/* Inverted: invert pixels */
-				if (bm->styles & STYLEF_INVERT)
+				if (styles & STYLEF_INVERT)
 					dots = ~dots;
 
 				/* Output dots */
