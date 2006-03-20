@@ -76,7 +76,8 @@
 		})
 
 
-	#else
+	#else /* !__AVR_ENHANCED__ */
+
 		#define pgm_read_char(addr) \
 		({ \
 			uint16_t __addr16 = (uint16_t)(addr); \
@@ -135,6 +136,12 @@
 			__result; \
 		})
 
+	#endif /* !__AVR_ENHANCED__ */
+
+	#if SIZEOF_INT == 2
+		#define pgm_read_int(addr) ((int)pgm_read_uint16_t(addr))
+	#else
+		#error Missing support for CPU word size != 16bit
 	#endif
 
 	#ifndef PROGMEM
@@ -153,7 +160,7 @@
 #endif
 
 #ifndef PROGMEM
-#define PROGMEM                /* nothing */
+#define PROGMEM         /* nothing */
 #endif
 
 /*!
