@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.16  2006/03/20 17:48:09  bernie
+ *#* Fix for avr-libc; INTERRUPT(): Remove macro.
+ *#*
  *#* Revision 1.15  2006/03/13 02:06:25  bernie
  *#* containerof(): New macro.
  *#*
@@ -227,7 +230,9 @@
 	#include <stddef.h>
 	#include <stdint.h>
 	#include <stdbool.h>
+	#if !CPU_AVR
 	#include <sys/types.h> /* for ssize_t */
+	#endif
 
 	#ifndef __cplusplus
 		/*
@@ -314,9 +319,6 @@
 #endif
 #ifndef REGISTER
 #define REGISTER               /* nothing */
-#endif
-#ifndef INTERRUPT
-#define INTERRUPT(x)           ERROR_NOT_IMPLEMENTED
 #endif
 #ifndef LIKELY
 #define LIKELY(x)              x
