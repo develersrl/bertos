@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.12  2006/03/21 10:52:39  bernie
+ *#* Update ARM support.
+ *#*
  *#* Revision 1.11  2006/03/20 17:49:00  bernie
  *#* Spacing fix.
  *#*
@@ -142,9 +145,30 @@
 
 #elif CPU_ARM
 
+	typedef uint32_t cpuflags_t;
+	typedef uint32_t cpustack_t;
+
+	/* Register counts include SREG too */
+	#define CPU_REG_BITS           32
+	#define CPU_REGS_CNT           16
+	#define CPU_SAVED_REGS_CNT     FIXME
+	#define CPU_STACK_GROWS_UPWARD 0  //FIXME
+	#define CPU_SP_ON_EMPTY_SLOT   0  //FIXME
+	#define CPU_BYTE_ORDER         (__BIG_ENDIAN__ ? CPU_BIG_ENDIAN : CPU_LITTLE_ENDIAN)
+	#define CPU_HARVARD            0
+
 	#ifdef __IAR_SYSTEMS_ICC__
 
 		#include <inarm.h>
+
+		#if __CPU_MODE__ == 1 /* Thumb */
+			/* Use stubs */
+			extern cpuflags_t get_CPSR(void);
+			extern void set_CPSR(cpuflags_t flags);
+		#else
+			#define get_CPSR __get_CPSR
+			#define set_CPSR __set_CPSR
+		#endif
 
 		#define NOP         __no_operation()
 		#define IRQ_DISABLE __disable_interrupt()
@@ -152,19 +176,21 @@
 
 		#define IRQ_SAVE_DISABLE(x) \
 		do { \
-			(x) = __get_CPSR(); \
+			(x) = get_CPSR(); \
 			__disable_interrupt(); \
 		} while (0)
 
 		#define IRQ_RESTORE(x) \
 		do { \
-			__set_CPSR(x); \
+			set_CPSR(x); \
 		} while (0)
 
 		#define IRQ_GETSTATE() \
-			((bool)(__get_CPSR() & 0xb0))
+			((bool)(get_CPSR() & 0xb0))
 
-	#else /* __IAR_SYSTEMS_ICC__ */
+		#define BREAKPOINT  /* asm("bkpt 0") DOES NOT WORK */
+
+	#else /* !__IAR_SYSTEMS_ICC__ */
 
 		#warning "IRQ_ macros need testing!"
 
@@ -228,18 +254,6 @@
 		})
 
 	#endif /* __IAR_SYSTEMS_ICC_ */
-
-	typedef uint32_t cpuflags_t;
-	typedef uint32_t cpustack_t;
-
-	/* Register counts include SREG too */
-	#define CPU_REG_BITS           32
-	#define CPU_REGS_CNT           16
-	#define CPU_SAVED_REGS_CNT     FIXME
-	#define CPU_STACK_GROWS_UPWARD 0  //FIXME
-	#define CPU_SP_ON_EMPTY_SLOT   0  //FIXME
-	#define CPU_BYTE_ORDER         (__BIG_ENDIAN__ ? CPU_BIG_ENDIAN : CPU_LITTLE_ENDIAN)
-	#define CPU_HARVARD            0
 
 #elif CPU_PPC
 	#define NOP                 asm volatile ("nop" ::)
