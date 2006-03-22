@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.12  2006/03/22 09:48:23  bernie
+ *#* Simplify.
+ *#*
  *#* Revision 1.11  2006/02/23 11:17:16  bernie
  *#* Documentation fixes.
  *#*
@@ -78,27 +81,7 @@
 #define DEVLIB_DEBUG_H
 
 #include <cfg/os.h>
-
-#if OS_HOSTED
-	/*
-	 * For now, avoid dependency on compiler.h
-	 */
-	#ifndef FORMAT
-	#define FORMAT(x,y,z) /* nothing */
-	#endif
-	#ifndef INLINE
-	#define INLINE static inline
-	#endif
-	#ifndef UNUSED_ARG
-	#ifdef __cplusplus
-		#define UNUSED_ARG(type,name) type
-	#else
-		#define UNUSED_ARG(type,name) type name
-	#endif
-	#endif
-#else /* !OS_HOSTED */
-	#include <cfg/compiler.h>
-#endif /* !OS_HOSTED */
+#include <cfg/compiler.h>
 
 
 /*
