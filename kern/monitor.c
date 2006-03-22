@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2006/03/22 09:49:22  bernie
+ *#* Reduce memory usage.
+ *#*
  *#* Revision 1.7  2006/03/13 02:07:14  bernie
  *#* Add TODO item.
  *#*
@@ -151,7 +154,7 @@ void monitor_report(void)
 
 static void NORETURN monitor(void)
 {
-	struct Process* p;
+	struct Process *p;
 
 	while (1)
 	{
@@ -162,11 +165,8 @@ static void NORETURN monitor(void)
 			size_t free = monitor_checkStack(p->monitor.stack_base, p->monitor.stack_size);
 
 			if (free < 0x20)
-			{
-				kprintf("MONITOR: ***************************************\n");
-				kprintf("MONITOR: WARNING: Free stack for process '%s' is only %04x chars\n", p->monitor.name, free);
-				kprintf("MONITOR: ***************************************\n\n");
-			}
+				kprintf("MONITOR: WARNING: Free stack for process '%s' is only %x chars\n",
+						p->monitor.name, free);
 
 			timer_delay(500);
 		}
