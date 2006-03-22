@@ -2,7 +2,7 @@
  * \file
  * <!--
  * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \brief DevLib configuration options
@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2006/03/22 09:48:51  bernie
+ *#* Add a few more config options.
+ *#*
  *#* Revision 1.9  2006/02/24 00:27:35  bernie
  *#* Enable kernel and fix Doxygen markup.
  *#*
@@ -72,25 +75,6 @@
  *#*
  *#* Revision 1.1  2005/11/04 17:42:12  bernie
  *#* Move cfg/config.h to appconfig.h.
- *#*
- *#* Revision 1.1  2005/04/11 19:04:13  bernie
- *#* Move top-level headers to cfg/ subdir.
- *#*
- *#* Revision 1.5  2004/12/08 08:04:28  bernie
- *#* Add missing config options.
- *#*
- *#* Revision 1.4  2004/08/25 14:12:08  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.3  2004/08/24 14:30:11  bernie
- *#* Use new-style config macros for drv/timer.c
- *#*
- *#* Revision 1.2  2004/08/05 18:46:52  bernie
- *#* Documentation improvements.
- *#*
- *#* Revision 1.1  2004/07/29 23:34:32  bernie
- *#* Add template configuration file.
- *#*
  *#*/
 
 #ifndef CONFIG_COMMON_H
@@ -204,6 +188,20 @@
 
 /// Keyboard polling method
 #define CONFIG_KBD_POLL  KBD_POLL_SOFTINT
+
+/// Enable keyboard event delivery to observers
+#define CONFIG_KBD_OBSERVER  0
+
+/// Enable key beeps
+#define CONFIG_KBD_BEEP 1
+
+/*!
+ * \name Type for the chart dataset
+ * \{
+ */
+#define CONFIG_CHART_TYPE_X uint8_t
+#define CONFIG_CHART_TYPE_Y uint8_t
+/*\}*/
 
 /// Enable button bar behind menus
 #define CONFIG_MENU_MENUBAR  0
