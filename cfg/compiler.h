@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.17  2006/03/22 09:48:35  bernie
+ *#* Formatting.
+ *#*
  *#* Revision 1.16  2006/03/20 17:48:09  bernie
  *#* Fix for avr-libc; INTERRUPT(): Remove macro.
  *#*
@@ -359,12 +362,12 @@
 	#define EXTERN_C        extern "C"
 	#define EXTERN_C_BEGIN  extern "C" {
 	#define EXTERN_C_END    }
-	#define EXTERN_CONST	extern const
+	#define EXTERN_CONST    extern const
 #else
 	#define EXTERN_C        extern
 	#define EXTERN_C_BEGIN  /* nothing */
 	#define EXTERN_C_END    /* nothing */
-	#define EXTERN_CONST	const
+	#define EXTERN_CONST    const
 #endif
 
 
