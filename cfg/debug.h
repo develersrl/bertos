@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.13  2006/03/22 13:34:34  bernie
+ *#* MSVC support.
+ *#*
  *#* Revision 1.12  2006/03/22 09:48:23  bernie
  *#* Simplify.
  *#*
@@ -173,6 +176,7 @@
 			/* G++ can't inline functions with variable arguments... */
 			#define kprintf(fmt, ...) fprintf(stderr, fmt, ## __VA_ARGS__)
 		#else
+			#define kvprintf(fmt, ap) vfprintf(stderr, fmt, ap)
 			INLINE int kprintf(const char *fmt, ...)
 			{
 				va_list ap;
@@ -185,7 +189,6 @@
 				return result;
 			}
 		#endif
-		#define kvprintf(fmt, ap) vfprintf(stderr, fmt, ap)
 		void kdump(const void *buf, size_t len); /* UNIMPLEMENTED */
 
 		#ifndef ASSERT

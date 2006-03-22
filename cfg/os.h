@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2006/03/22 13:34:34  bernie
+ *#* MSVC support.
+ *#*
  *#* Revision 1.8  2006/02/23 09:09:28  bernie
  *#* Remove Linux specific hack.
  *#*
@@ -55,6 +58,14 @@
 #ifdef _WIN32
 	#define OS_WIN32  1
 	#define OS_ID     win32
+
+	// FIXME: Maybe disable Win32 exceptions?
+	typedef int cpuflags_t;
+	#define IRQ_DISABLE                /* FIXME */
+	#define IRQ_ENABLE                 /* FIXME */
+	#define IRQ_SAVE_DISABLE(old_sigs) /* FIXME */
+	#define IRQ_RESTORE(old_sigs)      /* FIXME */
+
 #else
 	#define OS_WIN32  0
 #endif

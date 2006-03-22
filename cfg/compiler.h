@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.18  2006/03/22 13:34:34  bernie
+ *#* MSVC support.
+ *#*
  *#* Revision 1.17  2006/03/22 09:48:35  bernie
  *#* Formatting.
  *#*
@@ -195,6 +198,11 @@
 
 	/* MSVC doesn't support C99's __func__, but has a similar extension. */
 	#define __func__ __FUNCTION__
+
+	/* MSVC doesn't support C99's inline keyword */
+	#ifndef __cplusplus
+		#define INLINE __inline
+	#endif
 
 #elif defined(__GNUC__)
 
