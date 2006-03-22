@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2006/03/22 09:49:09  bernie
+ *#* Add FreeRTOS support.
+ *#*
  *#* Revision 1.8  2006/02/20 02:02:29  bernie
  *#* Port to Qt 4.1.
  *#*
@@ -44,6 +47,7 @@
 
 #include <appconfig.h>
 #include <cfg/compiler.h> // INLINE
+#include <cfg/arch_config.h>
 
 /* Configury sanity check */
 #if !defined(CONFIG_WATCHDOG) || (CONFIG_WATCHDOG != 0 && CONFIG_WATCHDOG != 1)
@@ -65,6 +69,8 @@
 	#elif CPU_AVR
 		#include <avr/io.h>
 		#include <cfg/macros.h> // BV()
+	#elif (ARCH & ARCH_FREERTOS)
+		#include <task.h> /* taskYIELD() */
 	#else
 		#error unknown CPU
 	#endif
@@ -83,6 +89,8 @@ INLINE void wdt_reset(void)
 	#elif OS_POSIX
 		static struct timeval tv = { 0, 0 };
 		select(0, NULL, NULL, NULL, &tv);
+	#elif (ARCH & ARCH_FREERTOS)
+		vTaskDelay(1);
 	#elif CPU_AVR
 		__asm__ __volatile__ ("wdr");
 	#else
@@ -109,6 +117,8 @@ INLINE void wdt_init(uint8_t timeout)
 		(void)timeout;
 	#elif OS_POSIX
 		(void)timeout; // NOP
+	#elif (ARCH & ARCH_FREERTOS)
+		/* nop */
 	#elif CPU_AVR
 		WDTCR |= BV(WDCE) | BV(WDE);
 		WDTCR = timeout;
@@ -127,6 +137,8 @@ INLINE void wdt_start(void)
 		// NOP
 	#elif OS_POSIX
 		// NOP
+	#elif (ARCH & ARCH_FREERTOS)
+		/* nop */
 	#elif CPU_AVR
 		WDTCR |= BV(WDE);
 	#else
@@ -142,6 +154,8 @@ INLINE void wdt_stop(void)
 		// NOP
 	#elif OS_POSIX
 		// NOP
+	#elif (ARCH & ARCH_FREERTOS)
+		/* nop */
 	#elif CPU_AVR
 		WDTCR |= BV(WDCE) | BV(WDE);
 		WDTCR &= ~BV(WDE);
