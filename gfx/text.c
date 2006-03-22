@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2006/03/22 09:50:37  bernie
+ *#* Use the same format for fonts and rasters.
+ *#*
  *#* Revision 1.7  2006/03/20 17:51:55  bernie
  *#* Cleanups.
  *#*
@@ -213,7 +216,7 @@ static int text_putglyph(char c, struct Bitmap *bm)
 					src_col /= 2;
 
 				/* Fetch a column of dots from glyph. */
-				dots = PGM_READ_CHAR(glyph + src_col * glyph_height_bytes + row);
+				dots = PGM_READ_CHAR(RAST_ADDR(glyph, src_col, row * 8, glyph_width));
 
 				/* Italic: get lower 4 dots from previous column */
 				if (styles & STYLEF_ITALIC)
@@ -249,7 +252,7 @@ static int text_putglyph(char c, struct Bitmap *bm)
 	else
 	{
 		/* No style: fast vanilla copy of glyph to bitmap */
-		gfx_blitRaster(bm, bm->penX, bm->penY, glyph, glyph_width, glyph_height, glyph_height_bytes);
+		gfx_blitRaster(bm, bm->penX, bm->penY, glyph, glyph_width, glyph_height, glyph_width);
 	}
 
 	/* Update current pen position */

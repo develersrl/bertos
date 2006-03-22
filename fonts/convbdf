@@ -111,9 +111,9 @@ while (<BDF>) {
 	
 		# GLYPH DATA
 		if ($IMAGE_VERTICAL) {
-			for (my $x = 0; $x < $width; $x++) {
-				my $bitstring = "";
-				for (my $k = 0; $k < int(($ch_height + $IMAGE_BITS - 1) / $IMAGE_BITS); $k++) {
+			my $bitstring = "";
+			for (my $k = 0; $k < int(($ch_height + $IMAGE_BITS - 1) / $IMAGE_BITS); $k++) {
+				for (my $x = 0; $x < $width; $x++) {
 					my $v = 0;
 					for (my $y = 0; $y < $IMAGE_BITS && ($y + $k * $IMAGE_BITS < $ch_height); ++$y) {
 						my $bit = ($bm[$k * $IMAGE_BITS + $y][int($x / $IMAGE_BITS)] & (1 << ($IMAGE_BITS - ($x % $IMAGE_BITS) - 1))) ? 1 : 0;

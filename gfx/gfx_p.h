@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/03/22 09:50:37  bernie
+ *#* Use the same format for fonts and rasters.
+ *#*
  *#* Revision 1.3  2006/02/15 09:10:15  bernie
  *#* Implement prop fonts; Fix algo styles.
  *#*
@@ -32,24 +35,19 @@
 
 #if CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_H_MSB
 
-	//TODO: Collapse with RAST_* macros
-	#define BM_ADDR(bm, x, y)  ((bm)->raster + (y) * (bm)->stride + ((x) / 8))
-	#define BM_MASK(bm, x, y)  (1 << (7 - (x) % 8))
-
 	#define RAST_ADDR(raster, x, y, stride)  ((raster) + (y) * (stride) + (x) / 8)
 	#define RAST_MASK(raster, x, y)		 (1 << (7 - (x) % 8))
 
 #elif CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_V_LSB
 
-	#define BM_ADDR(bm, x, y)  ((bm)->raster + ((y) / 8) * (bm)->stride + (x))
-	#define BM_MASK(bm, x, y)  (1 << ((y) % 8))
-
-	// FIXME: not the same format of bitmaps!
-	#define RAST_ADDR(raster, x, y, stride)  ((raster) + (y) / 8 + (x) * (stride))
+	#define RAST_ADDR(raster, x, y, stride)  ((raster) + ((y) / 8) * (stride) + (x))
 	#define RAST_MASK(raster, x, y)          (1 << ((y) % 8))
 #else
 	#error Unknown value of CONFIG_BITMAP_FMT
 #endif /* CONFIG_BITMAP_FMT */
+
+#define BM_ADDR(bm, x, y)  RAST_ADDR((bm)->raster, (x), (y), (bm)->stride)
+#define BM_MASK(bm, x, y)  RAST_MASK((bm)->raster, (x), (y))
 
 /*!
  * Plot a pixel in bitmap \a bm.
