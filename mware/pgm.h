@@ -210,12 +210,12 @@ typedef PROGMEM uint32_t pgm_uint32_t;
 #ifdef _PROGMEM
 	#define PGM_READ_CHAR(s) pgm_read_char(s)
 	#define PGM_FUNC(x)      x ## _P
-	#define PGM_STR(x)	 PSTR(x)
+	#define PGM_STR(x)       PSTR(x)
 	#define PGM_ATTR         PROGMEM
 #else
 	#define PGM_READ_CHAR(s) (*(s))
 	#define PGM_FUNC(x)      x
-	#define PGM_STR(x)	 x
+	#define PGM_STR(x)       x
 	#define PGM_ATTR         /* nothing */
 #endif
 /* \} */
