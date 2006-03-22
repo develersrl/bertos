@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2006/03/22 09:50:11  bernie
+ *#* Don't use C99 stuff.
+ *#*
  *#* Revision 1.7  2006/03/20 17:51:55  bernie
  *#* Cleanups.
  *#*
@@ -267,7 +270,9 @@ int PGM_FUNC(text_vwidthf)(
 		return PGM_FUNC(vsprintf)(NULL, fmt, ap) * bm->font->width;
 	else
 	{
-		struct TextWidthData twd = { bm, 0 };
+		struct TextWidthData twd;
+		twd.bitmap = bm;
+		twd.width = 0;
 		_formatted_write(fmt, (void (*)(char, void *))text_charWidth, &twd, ap);
 		return twd.width;
 	}
