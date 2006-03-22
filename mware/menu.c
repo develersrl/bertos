@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/03/22 09:49:51  bernie
+ *#* Simplifications from project_grl.
+ *#*
  *#* Revision 1.4  2006/03/20 17:48:35  bernie
  *#* Implement support for ROM menus.
  *#*
@@ -72,7 +75,6 @@
  *#*/
 
 #include "menu.h"
-
 #include <gfx/gfx.h>
 #include <gfx/font.h>
 #include <gfx/text.h>
@@ -80,12 +82,11 @@
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
 #include <appconfig.h>
+#include <string.h> /* strcpy() */
 
 #if CPU_HARVARD
 #include <avr/pgmspace.h> /* strncpy_P() */
 #endif
-
-#include <string.h> /* strcpy() */
 
 #if CONFIG_MENU_MENUBAR
 #include "menubar.h"
@@ -105,7 +106,6 @@
 #define DO_ABORT   do {} while(0)
 
 
-#ifdef _DEBUG
 /**
  * Count the items present in a menu.
  */
@@ -130,8 +130,26 @@ static int menu_count(const struct Menu *menu)
 
 	return cnt;
 }
-#endif /* _DEBUG */
 
+#if 0 /* UNUSED */
+/**
+ * Compute total number of visible entries, which excludes items
+ * without a label.
+ */
+static int menu_count_visible(const struct Menu *menu)
+{
+	struct MenuItem *item;
+	int visible_entries = 0;
+
+	for (item = menu->items; (item->label || item->hook); ++item)
+	{
+		if (!(item->flags & MIF_HIDDEN))
+			++visible_entries;
+	}
+
+	return visible_entries;
+}
+#endif
 
 #if CONFIG_MENU_MENUBAR
 
@@ -173,8 +191,8 @@ static void menu_update_menubar(
 #endif /* CONFIG_MENU_MENUBAR */
 
 
-/*!
- * Show a menu on the LCD display.
+/**
+ * Show a menu on the display.
  */
 static void menu_layout(
 		const struct Menu *menu,
@@ -188,7 +206,7 @@ static void menu_layout(
 	ypos = menu->startrow;
 
 	if (title)
-		text_xprintf(menu->bitmap, ypos++, 0, STYLEF_BOLD | TEXT_FILL, title);
+		text_xprintf(menu->bitmap, ypos++, 0, STYLEF_UNDERLINE | STYLEF_BOLD | TEXT_CENTER | TEXT_FILL, title);
 
 	for (cnt = 0; cnt < items_per_page; ++cnt)
 	{
@@ -263,11 +281,12 @@ static void menu_doselect(const struct Menu *menu, struct MenuItem *item)
 }
 
 
-/*!
+/**
  * Return the next visible item (rolls back to the first item)
  */
-static int menu_next_visible_item(const struct Menu *menu, int index, int total)
+static int menu_next_visible_item(const struct Menu *menu, int index)
 {
+	int total = menu_count(menu);
 	int item_flags;
 
 	do
@@ -291,11 +310,12 @@ static int menu_next_visible_item(const struct Menu *menu, int index, int total)
 }
 
 
-/*!
+/**
  * Return the previous visible item (rolls back to the last item)
  */
-static int menu_prev_visible_item(const struct Menu *menu, int index, int total)
+static int menu_prev_visible_item(const struct Menu *menu, int index)
 {
+	int total = menu_count(menu);
 	int item_flags;
 
 	do
@@ -324,7 +344,7 @@ static int menu_prev_visible_item(const struct Menu *menu, int index, int total)
  */
 iptr_t menu_handle(const struct Menu *menu)
 {
-	uint8_t entries, visible_entries, items_per_page;
+	uint8_t items_per_page;
 	uint8_t first_item, selected;
 
 #if CONFIG_MENU_MENUBAR
@@ -347,30 +367,6 @@ iptr_t menu_handle(const struct Menu *menu)
 #endif /* CONFIG_MENU_MENUBAR */
 
 
-	/*
-	 * Compute total number of items in menu (entries) and
-	 * the number of visible entries, which excludes items
-	 * without a label.
-	 */
-	for (entries = 0, visible_entries = 0; /*NOP*/; ++entries)
-	{
-		const MenuItem *item = &menu->items[entries];
-#if CPU_HARVARD
-		MenuItem ram_item;
-		if (menu->flags & MF_ROMITEMS)
-		{
-			memcpy_P(&ram_item, item, sizeof(ram_item));
-			item = &ram_item;
-		}
-#endif
-
-		if (!(item->flags & MIF_HIDDEN))
-			++visible_entries;
-
-		if (!(item->label || item->hook))
-			break;
-	}
-
 	items_per_page =
 		(menu->bitmap->height / menu->bitmap->font->height)
 		- menu->startrow
@@ -380,7 +376,7 @@ iptr_t menu_handle(const struct Menu *menu)
 		- (menu->title ? 1 : 0);
 
 	/* Selected item should be a visible entry */
-	first_item = selected = menu_next_visible_item(menu, -1, entries);
+	first_item = selected = menu_next_visible_item(menu, -1);
 
 	for(;;)
 	{
@@ -390,17 +386,17 @@ iptr_t menu_handle(const struct Menu *menu)
 		 * Keep selected item visible
 		 */
 		while (selected < first_item)
-			first_item = menu_prev_visible_item(menu, first_item, entries);
+			first_item = menu_prev_visible_item(menu, first_item);
 		while (selected >= first_item + items_per_page)
-			first_item = menu_next_visible_item(menu, first_item, entries);
+			first_item = menu_next_visible_item(menu, first_item);
 
 		/* Clear screen */
 		text_clear(menu->bitmap);
 		menu_layout(menu, first_item, items_per_page, selected);
 
-#if CONFIG_MENU_MENUBAR
-		menu_update_menubar(menu, &mb, selected);
-#endif
+		#if CONFIG_MENU_MENUBAR
+			menu_update_menubar(menu, &mb, selected);
+		#endif
 
 		key = kbd_get();
 
@@ -423,11 +419,11 @@ iptr_t menu_handle(const struct Menu *menu)
 		}
 		else if (key & K_UP)
 		{
-			selected = menu_prev_visible_item(menu, selected, entries);
+			selected = menu_prev_visible_item(menu, selected);
 		}
 		else if (key & K_DOWN)
 		{
-			selected = menu_next_visible_item(menu, selected, entries);
+			selected = menu_next_visible_item(menu, selected);
 		}
 		else if (key & K_CANCEL && !(menu->flags & MF_TOPLEVEL))
 		{
