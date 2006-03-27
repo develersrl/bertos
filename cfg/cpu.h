@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.13  2006/03/27 04:49:23  bernie
+ *#* CPU_IDLE(): Fix for new emulator.
+ *#*
  *#* Revision 1.12  2006/03/21 10:52:39  bernie
  *#* Update ARM support.
  *#*
@@ -75,6 +78,7 @@
 #define DEVLIB_CPU_H
 
 #include <cfg/compiler.h> /* for uintXX_t */
+#include <cfg/arch_config.h>  /* ARCH_EMUL */
 
 
 /*!
@@ -578,15 +582,12 @@ STATIC_ASSERT(sizeof(uint64_t) * CPU_BITS_PER_CHAR == 64);
 	#if defined(ARCH_EMUL) && (ARCH & ARCH_EMUL)
 		/* This emulator hook should yield the CPU to the host.  */
 		EXTERN_C_BEGIN
-		void SchedulerIdle(void);
+		void emul_idle(void);
 		EXTERN_C_END
-		#define CPU_IDLE SchedulerIdle()
+		#define CPU_IDLE emul_idle()
 	#else /* !ARCH_EMUL */
 		#define CPU_IDLE do { /* nothing */ } while (0)
 	#endif /* !ARCH_EMUL */
 #endif /* !CPU_IDLE */
-
-/* OBSOLETE */
-#define SCHEDULER_IDLE CPU_IDLE
 
 #endif /* DEVLIB_CPU_H */

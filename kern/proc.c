@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.30  2006/03/27 04:49:23  bernie
+ *#* CPU_IDLE(): Fix for new emulator.
+ *#*
  *#* Revision 1.29  2006/02/24 01:17:05  bernie
  *#* Update for new emulator.
  *#*
@@ -331,7 +334,7 @@ void proc_schedule(void)
 		 * reason to do this.
 		 */
 		IRQ_ENABLE;
-		SCHEDULER_IDLE;
+		CPU_IDLE;
 		IRQ_DISABLE;
 	}
 	IRQ_RESTORE(flags);
