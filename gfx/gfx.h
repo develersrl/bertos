@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.12  2006/03/27 04:48:56  bernie
+ *#* gfx_blitImage(): New function; gfx_blitRaster(): Fix clipping bug.
+ *#*
  *#* Revision 1.11  2006/03/07 22:18:04  bernie
  *#* Correctly compute text width for prop fonts; Make styles a per-bitmap attribute.
  *#*
@@ -121,7 +124,7 @@ typedef struct Bitmap
 {
 	uint8_t *raster;        /*!< Pointer to byte array to hold the data */
 	coord_t width, height;  /*!< Width/Height in pixels */
-	coord_t stride;		/*!< Bytes per row. */
+	coord_t stride;         /*!< Bytes per row. */
 	coord_t penX, penY;     /*!< Current pen position MoveTo()/LineTo() */
 
 	Rect cr;                /*!< Clip drawing inside this rectangle */
@@ -150,6 +153,19 @@ typedef struct Bitmap
 
 } Bitmap;
 
+/**
+ * Hold image pixels.
+ *
+ * \todo Use this as Bitmap and change Bitmap to Drawable.
+ */
+typedef struct Image
+{
+	const uint8_t *raster;   /*!< Pointer to byte array to hold the data. */
+	coord_t width;     /*!< Raster width in pixels. */
+	coord_t height;    /*!< Raster height in pixels. */
+	coord_t stride;    /*!< Bytes per row. */
+};
+
 #if CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_H_MSB
 	/**
 	 * Compute the size in bytes of a raster suitable for
@@ -173,6 +189,7 @@ void gfx_bitmapInit (Bitmap *bm, uint8_t *raster, coord_t w, coord_t h);
 void gfx_bitmapClear(Bitmap *bm);
 void gfx_blit       (Bitmap *dst, const Rect *rect, const Bitmap *src, coord_t srcx, coord_t srcy);
 void gfx_blitRaster (Bitmap *dst, coord_t dx, coord_t dy, const uint8_t *raster, coord_t w, coord_t h, coord_t stride);
+void gfx_blitImage  (Bitmap *dst, coord_t dx, coord_t dy, const Image *image);
 void gfx_line       (Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2);
 void gfx_rectDraw   (Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2);
 void gfx_rectFillC  (Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2, uint8_t color);

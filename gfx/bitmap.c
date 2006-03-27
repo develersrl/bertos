@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2006/03/27 04:48:56  bernie
+ *#* gfx_blitImage(): New function; gfx_blitRaster(): Fix clipping bug.
+ *#*
  *#* Revision 1.7  2006/03/07 22:18:04  bernie
  *#* Correctly compute text width for prop fonts; Make styles a per-bitmap attribute.
  *#*
@@ -162,9 +165,15 @@ void gfx_blit(Bitmap *dst, const Rect *rect, const Bitmap *src, coord_t srcx, co
 }
 
 
-void gfx_blitRaster(Bitmap *dst, coord_t dxmin, coord_t dymin, const uint8_t *raster, coord_t w, coord_t h, coord_t stride)
+/**
+ * Blit a raster to a Bitmap.
+ *
+ * \see gfx_blit()
+ */
+void gfx_blitRaster(Bitmap *dst, coord_t dxmin, coord_t dymin,
+		const uint8_t *raster, coord_t w, coord_t h, coord_t stride)
 {
-	coord_t dxmax, dymax;
+	coord_t dxmax = dxmin + w, dymax = dymin + h;
 	coord_t sxmin = 0, symin = 0;
 	coord_t dx, dy, sx, sy;
 
@@ -181,13 +190,29 @@ void gfx_blitRaster(Bitmap *dst, coord_t dxmin, coord_t dymin, const uint8_t *ra
 		symin += dst->cr.ymin - dymin;
 		dymin = dst->cr.ymin;
 	}
-	dxmax = MIN(dxmin + w, dst->cr.xmax);
-	dymax = MIN(dymin + h, dst->cr.ymax);
+	dxmax = MIN(dxmax, dst->cr.xmax);
+	dymax = MIN(dymax, dst->cr.ymax);
+
+	//kprintf("dxmin=%d, sxmin=%d, dxmax=%d; ", dxmin, sxmin, dxmax);
+	//kprintf("dymin=%d, symin=%d, dymax=%d\n", dymin, symin, dymax);
 
 	/* TODO: make it not as dog slow as this */
 	for (dx = dxmin, sx = sxmin; dx < dxmax; ++dx, ++sx)
 		for (dy = dymin, sy = symin; dy < dymax; ++dy, ++sy)
 			BM_DRAWPIXEL(dst, dx, dy, RAST_READPIXEL(raster, sx, sy, stride));
+}
+
+/**
+ * Blit an Image to a Bitmap.
+ *
+ * \see gfx_blit()
+ */
+void gfx_blitImage(Bitmap *dst, coord_t dxmin, coord_t dymin, const Image *image)
+{
+	ASSERT(image);
+
+	gfx_blitRaster(dst, dxmin, dymin,
+			image->raster, image->width, image->height, image->stride);
 }
 
 
