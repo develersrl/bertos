@@ -10,6 +10,9 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
+# Revision 1.2  2006/03/27 04:48:33  bernie
+# Add CXXFLAGS; Add recursive targets.
+#
 # Revision 1.1  2006/03/22 09:51:53  bernie
 # Add build infrastructure.
 #
@@ -96,9 +99,12 @@ TRG_BIN = $(TRG:%=$(OUTDIR)/%.bin)
 TRG_ROM = $(TRG:%=$(OUTDIR)/%.rom)
 TRG_COF = $(TRG:%=$(OUTDIR)/%.cof)
 
+
+RECURSIVE_TARGETS = all-recursive install-recursive clean-recursive
+
 # The default target
 .PHONY: all
-all:: $(TRG_S19) $(TRG_HEX)
+all:: all-recursive $(TRG_S19) $(TRG_HEX)
 
 # Generate project documentation
 .PHONY: docs
@@ -130,15 +136,15 @@ OBJ         += $$($(1)_OBJ)
 
 # Compile: instructions to create assembler and/or object files from C source
 $$($(1)_COBJ) : $$(OBJDIR)/$(1)/%.o : %.c
-	$L "$(1): Compiling $$<"
+	$L "$(1): Compiling $$< (C)"
 	@$$(MKDIR_P) $$(dir $$@)
 	$Q $$(CC) -c $$(CFLAGS) $$($(1)_CFLAGS) $$< -o $$@
 
 # Compile: instructions to create assembler and/or object files from C++ source
 $$($(1)_CXXOBJ) : $$(OBJDIR)/$(1)/%.o : %.cpp
-	$L "$(1): Compiling $$<"
+	$L "$(1): Compiling $$< (C++)"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(CXX) -c $$(CFLAGS) $$($(1)_CFLAGS) $$< -o $$@
+	$Q $$(CXX) -c $$(CXXFLAGS) $$($(1)_CXXFLAGS) $$< -o $$@
 
 # Generate assembly sources from C files (debug)
 $$(OBJDIR)/$(1)/%.s : %.c
@@ -235,12 +241,33 @@ $(foreach t,$(TRG),$(eval $(call build_target,$(t))))
 #	$(COFFCONVERT) -O coff-avr $< $@   # For use with AVRstudio 3
 
 #make instruction to delete created files
-clean:
+clean: clean-recursive
 	-$(RM_R) $(OBJDIR)
 	-$(RM_R) $(OUTDIR)
 
+$(RECURSIVE_TARGETS):
+	@target=`echo $@ | sed s/-recursive//`; \
+	for dir in $(SUBDIRS); do \
+		if [ -e $$dir/configure.in ] || [ -e $$dir/configure.ac ] && [ ! -x $$dir/configure ]; then \
+			echo "Running autogen.sh in $$dir..."; \
+			( cd $$dir && chmod a+x autogen.sh && ./autogen.sh && rm -f Makefile || exit 1 ); \
+		fi; \
+		if [ ! -e $$dir/Makefile ]; then \
+			if [ -e "$$dir/build-$(ARCH)" ]; then \
+				echo "Running build script in $$dir..."; \
+				( cd $$dir && chmod a+x build && ./build || exit 1 ); \
+			else \
+				echo "Running configure in $$dir..."; \
+				( cd $$dir && ./configure --prefix=$(PREFIX) || exit 1 ); \
+			fi; \
+		fi; \
+		$(MAKE) -C $$dir $$target || exit 1; \
+	done
+
 BUILDREV_H = buildrev.h
 
+ifeq ($(shell [ -e verstag.c ] && echo yes), yes)
+.PHONY: bumprev
 bumprev:
 	@buildnr=0; \
 	if [ -f $(BUILDREV_H) ]; then \
@@ -251,7 +278,13 @@ bumprev:
 	echo "#define VERS_BUILD $$buildnr" >"$(BUILDREV_H)"; \
 	echo "#define VERS_HOST  \"$$buildhost\"" >>"$(BUILDREV_H)"; \
 	echo "Building revision $$buildnr"
+else
+.PHONY: bumprev
+bumprev:
+
+endif
 
 # Include dependencies
+ifneq ($(strip $(OBJ)),)
 -include $(OBJ:%.o=%.d)
-
+endif

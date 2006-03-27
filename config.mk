@@ -10,6 +10,9 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
+# Revision 1.2  2006/03/27 04:48:33  bernie
+# Add CXXFLAGS; Add recursive targets.
+#
 # Revision 1.1  2006/03/22 09:51:53  bernie
 # Add build infrastructure.
 #
@@ -66,31 +69,51 @@ SHELL   = /bin/sh
 DOXYGEN = doxygen
 UISP    = uisp
 AVRDUDE = avrdude
+FLEXCAT = $(top_srcdir)/tools/flexcat/flexcat
 
 # output format can be srec, ihex (avrobj is always created)
 FORMAT = srec
 #FORMAT = ihex
 
+# Compiler flags for generating dependencies
+DEP_FLAGS = -MMD -MP
+
+# Compiler flags for generating source listings
+LIST_FLAGS = -Wa,-anhlmsd=$(@:.o=.lst)
+
+# Linker flags for generating map files
+MAP_FLAGS = -Wl,-Map=$(@:%.elf=%.map),--cref
+
+# Compiler warning flags for both C and C++
 WARNFLAGS = \
 	-W -Wformat -Wall -Wundef -Wpointer-arith -Wcast-qual \
-	-Wcast-align -Wwrite-strings -Wsign-compare -Wstrict-prototypes \
-	-Wmissing-prototypes -Wmissing-noreturn
+	-Wcast-align -Wwrite-strings -Wsign-compare \
+	-Wmissing-prototypes -Wmissing-noreturn \
+	-Wextra -Wstrict-aliasing=2
 
-# default compiler flags
-CFLAGS = $(INCDIR) $(OPTCFLAGS) $(DEBUGCFLAGS) $(WARNFLAGS) \
-	-MMD -MP -Wa,-anhlmsd=$(@:.o=.lst) -std=gnu99
+# Compiler warning flags for C only
+C_WARNFLAGS = \
+	-Wmissing-prototypes -Wstrict-prototypes
 
-# default compiler assembly flags
+# Default C compiler flags
+CFLAGS = $(INCDIR) $(OPTCFLAGS) $(DEBUGCFLAGS) $(WARNFLAGS) $(C_WARNFLAGS) \
+	$(DEP_FLAGS) $(LIST_FLAGS) -std=gnu99
+
+# Default C++ compiler flags
+CXXFLAGS = $(INCDIR) $(OPTCFLAGS) $(DEBUGCFLAGS) $(WARNFLAGS) \
+	$(DEP_FLAGS) $(LIST_FLAGS)
+
+# Default compiler assembly flags
 CPPAFLAGS = $(DEBUGCFLAGS) -MMD
 
-# default assembler flags
+# Default assembler flags
 ASFLAGS	= $(DEBUGCFLAGS)
 
-# default linker flags
-#LDFLAGS	= -Wl,-Map=$(@:%.elf=%.map),--cref -Wl,--reduce-memory-overheads
-LDFLAGS	= -Wl,-Map=$(@:%.elf=%.map),--cref -Wl,--gc-sections
+# Default linker flags
+#LDFLAGS = $(MAP_FLAGS) -Wl,--reduce-memory-overheads
+LDFLAGS	= $(MAP_FLAGS) -Wl,--gc-sections
 
-# flags for avrdude
+# Flags for avrdude
 AVRDUDEFLAGS = $(DPROG)
 
 # additional libs
