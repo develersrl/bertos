@@ -8,6 +8,9 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
+# Revision 1.2  2006/03/27 04:49:50  bernie
+# Add bouncing logo demo.
+#
 # Revision 1.1  2006/03/22 09:52:13  bernie
 # Add demo application.
 #
@@ -41,6 +44,7 @@ demo_CSRC = \
 	fonts/luBS14.c \
 	fonts/ncenB18.c \
 	icons/artwork.c \
+	icons/logo.c \
 	drv/kbd.c \
 	drv/timer.c \
 	drv/buzzer.c \
@@ -68,11 +72,12 @@ $(OBJDIR)/demo/drv/lcd_gfx_qt.o: drv/lcd_gfx_qt_moc.cpp
 EMUL_CFLAGS = -I/usr/local/kde4/include/Qt -I/usr/local/kde4/include -DQT_CLEAN_NAMESPACE -DQT3_SUPPORT
 EMUL_LDFLAGS = -L /usr/local/kde4/lib64 -lQtGui -lQtCore
 demo_CFLAGS = -Os -D_QT=4 -D'ARCH=ARCH_EMUL' -Ihw $(EMUL_CFLAGS)
+demo_CXXFLAGS = -Os -D_QT=4 -D'ARCH=ARCH_EMUL' -Ihw $(EMUL_CFLAGS)
 demo_LDFLAGS = $(EMUL_LDFLAGS)
 
 # Debug stuff
-#ifeq ($(demo_DEBUG),1)
-#	demo_CFLAGS += -D_DEBUG
+ifeq ($(demo_DEBUG),1)
+	demo_CFLAGS += -D_DEBUG
 #	demo_PCSRC += drv/kdebug.c
-#endif
+endif
 

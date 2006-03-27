@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/03/27 04:49:50  bernie
+ *#* Add bouncing logo demo.
+ *#*
  *#* Revision 1.1  2006/03/22 09:52:13  bernie
  *#* Add demo application.
  *#*
@@ -32,7 +35,7 @@
 #include <gfx/win.h>
 #include <gfx/text.h>
 #include <gfx/font.h>
-#include <icons/artwork.h>
+#include <icons/logo.h>
 #include <mware/menu.h>
 #include <cfg/macros.h>
 
@@ -108,15 +111,8 @@ void schedule(void)
 	usleep(10000);
 }
 
-int main(int argc, char *argv[])
+void hello_world(void)
 {
-	emul_init(&argc, argv);
-	timer_init();
-	buz_init();
-	kbd_init();
-	lcd_init();
-	proc_init();
-
 	gfx_bitmapClear(&lcd_bitmap);
 	extern const Font font_10x20;
 	extern const Font font_helvB10;
@@ -133,11 +129,58 @@ int main(int argc, char *argv[])
 		lcd_blit_bitmap(&lcd_bitmap);
 		emul_idle();
 	}
-	gfx_blitRaster(&lcd_bitmap, 0, 0, customer_pw_logo, 122, 32, 4);
-	lcd_blit_bitmap(&lcd_bitmap);
-	emul_idle();
-	sleep(1);
-	//timer_delay(1000);
+}
+
+/**
+ * Show the splash screen
+ */
+void bouncing_logo(void)
+{
+	const long SPEED_SCALE = 1000;
+	const long GRAVITY_ACCEL = 10;
+	const long BOUNCE_ELASTICITY = 2;
+	long h = (long)(-project_grl_logo.height) * SPEED_SCALE;
+	long speed = 1000;
+
+	/* Repeat until logo stands still on the bottom edge */
+	while (!((speed == 0) && (h == 0)))
+	{
+		/* Move */
+		h += speed;
+
+		/* Gravity acceleration */
+		speed += GRAVITY_ACCEL;
+
+		if (h > 0 && speed > 0)
+		{
+			/* Bounce */
+			speed = - (speed / BOUNCE_ELASTICITY);
+
+		}
+
+		/* Update graphics */
+		gfx_bitmapClear(&lcd_bitmap);
+		gfx_blitImage(&lcd_bitmap,
+			(lcd_bitmap.width - project_grl_logo.width) / 2,
+			h / SPEED_SCALE,
+			&project_grl_logo);
+		lcd_blit_bitmap(&lcd_bitmap);
+
+		timer_delay(10);
+	}
+}
+
+int main(int argc, char *argv[])
+{
+	emul_init(&argc, argv);
+	timer_init();
+	buz_init();
+	kbd_init();
+	lcd_init();
+	proc_init();
+
+	hello_world();
+	bouncing_logo();
 
 	const coord_t small_left = 45, small_top = 30, small_width = 50, small_height = 30;
 	const coord_t large_left = -10, large_top = 10, large_width = 85, large_height = 41;
