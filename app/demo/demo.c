@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/04/11 00:07:32  bernie
+ *#* Implemenent MF_SAVESEL flag.
+ *#*
  *#* Revision 1.2  2006/03/27 04:49:50  bernie
  *#* Add bouncing logo demo.
  *#*
@@ -44,27 +47,27 @@
 
 static struct MenuItem settings_items[] =
 {
-	{ (const_iptr_t)"settings_0", 0, (MenuHook)0,  (iptr_t)0        },
-	{ (const_iptr_t)"settings_1", 0, (MenuHook)0,  (iptr_t)0        },
-	{ (const_iptr_t)"settings_2", 0, (MenuHook)0, (iptr_t)0      },
-	{ (const_iptr_t)"settings_3", 0, (MenuHook)0,  (iptr_t)0   },
-	{ (const_iptr_t)"settings_4", 0, (MenuHook)0,  (iptr_t)0 },
-	{ (const_iptr_t)"settings_5", MIF_TOGGLE, (MenuHook)0, (iptr_t)0             },
+	{ (const_iptr_t)"System",     0, (MenuHook)0,  (iptr_t)0 },
+	{ (const_iptr_t)"Mouse",      0, (MenuHook)0,  (iptr_t)0 },
+	{ (const_iptr_t)"Keyboard",   0, (MenuHook)0,  (iptr_t)0 },
+	{ (const_iptr_t)"Networking", 0, (MenuHook)0,  (iptr_t)0 },
+	{ (const_iptr_t)"Date & Time",0, (MenuHook)0,  (iptr_t)0 },
+	{ (const_iptr_t)"Power Saving", MIF_TOGGLE, (MenuHook)0, (iptr_t)0 },
 	{ (const_iptr_t)0, 0, NULL, (iptr_t)0 }
 };
-static struct Menu settings_menu = { settings_items, "Settings Menu", MF_STICKY, &lcd_bitmap, 0 };
+static struct Menu settings_menu = { settings_items, "Settings Menu", MF_STICKY | MF_SAVESEL, &lcd_bitmap, 0 };
 
 /*** DISPLAY MENU ****************************/
 
 static struct MenuItem display_items[] =
 {
-	{ (const_iptr_t)"display_0", 0, (MenuHook)0,           (iptr_t)0 },
-	{ (const_iptr_t)"display_1", 0, (MenuHook)0, (iptr_t)0     },
-	{ (const_iptr_t)"display_2", 0, (MenuHook)0,   (iptr_t)0     },
-	{ (const_iptr_t)"display_3", 0, (MenuHook)0,  (iptr_t)0 },
+	{ (const_iptr_t)"Background", 0, (MenuHook)0, (iptr_t)0 },
+	{ (const_iptr_t)"Colors",     0, (MenuHook)0, (iptr_t)0 },
+	{ (const_iptr_t)"Style",      0, (MenuHook)0, (iptr_t)0 },
+	{ (const_iptr_t)"Icon Theme", 0, (MenuHook)0, (iptr_t)0 },
 	{ (const_iptr_t)0, 0, NULL, (iptr_t)0 }
 };
-static struct Menu display_menu = { display_items, "Display Menu", MF_STICKY, &lcd_bitmap, 0 };
+static struct Menu display_menu = { display_items, "Display Menu", MF_SAVESEL, &lcd_bitmap, 0 };
 
 
 /*** SETUP MENU ******************************/
@@ -77,7 +80,7 @@ static struct MenuItem setup_items[] =
 	{ (const_iptr_t)"Setup 3", 0, (MenuHook)NULL, (iptr_t)0    },
 	{ (const_iptr_t)0, 0, NULL, NULL }
 };
-static struct Menu setup_menu = { setup_items, "Setup Menu", MF_STICKY, &lcd_bitmap, 0 };
+static struct Menu setup_menu = { setup_items, "Setup Menu", MF_STICKY | MF_SAVESEL, &lcd_bitmap, 0 };
 
 
 /*** MAIN MENU *******************************/

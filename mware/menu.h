@@ -1,7 +1,7 @@
 /*!
  * \file
  * <!--
- * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000 Bernardo Innocenti <bernie@codewiz.org>
  * All Rights Reserved.
  * -->
@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/04/11 00:07:32  bernie
+ *#* Implemenent MF_SAVESEL flag.
+ *#*
  *#* Revision 1.3  2006/03/22 09:49:51  bernie
  *#* Simplifications from project_grl.
  *#*
@@ -106,16 +109,17 @@ typedef struct Menu
 	const_iptr_t     title;    /*!< Menu title (ID or ptr to string, 0 to disable) */
 	int              flags;    /*!< See MF_#? definitions below */
 	struct Bitmap   *bitmap;   /*!< Bitmap where the menu is rendered */
-	int              startrow; /*!< Display starting row */
+	int              selected; /*!< Initial selection (written to if #MF_SAVESEL is set). */
 } Menu;
 
 /**
  * \name Flags for Menu.flags.
  * \{
  */
-#define MF_STICKY    BV(0)  /*!< Stay in the menu when the items called return */
-#define MF_TOPLEVEL  BV(1)  /*!< Top-level menu (do not display "back" label) */
-#define MF_ROMITEMS  BV(2)  /*!< Menu is in ROM (default is RAM) */
+#define MF_STICKY   BV(0)  /**< Stay in the menu when the items called return */
+#define MF_TOPLEVEL BV(1)  /**< Top-level menu (do not display "back" label) */
+#define MF_ROMITEMS BV(2)  /**< Menu items are stored in ROM (default is RAM) */
+#define MF_SAVESEL  BV(3)  /**< Remember the selected item across invocations. */
 /* \} */
 
 /* Function prototypes */

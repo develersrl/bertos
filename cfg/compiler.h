@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.19  2006/04/11 00:07:33  bernie
+ *#* Implemenent MF_SAVESEL flag.
+ *#*
  *#* Revision 1.18  2006/03/22 13:34:34  bernie
  *#* MSVC support.
  *#*
@@ -371,11 +374,13 @@
 	#define EXTERN_C_BEGIN  extern "C" {
 	#define EXTERN_C_END    }
 	#define EXTERN_CONST    extern const
+	#define CONST_CAST(TYPE,EXPR)   (const_cast<TYPE>(EXPR))
 #else
 	#define EXTERN_C        extern
 	#define EXTERN_C_BEGIN  /* nothing */
 	#define EXTERN_C_END    /* nothing */
 	#define EXTERN_CONST    const
+	#define CONST_CAST(TYPE,EXPR)   ((TYPE)(EXPR)) /* FIXME: How can we suppress the warning in C? */
 #endif
 
 

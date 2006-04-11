@@ -1,7 +1,7 @@
 /*!
  * \file
  * <!--
- * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000 Bernardo Innocenti <bernie@codewiz.org>
  * All Rights Reserved.
  * -->
@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/04/11 00:07:32  bernie
+ *#* Implemenent MF_SAVESEL flag.
+ *#*
  *#* Revision 1.5  2006/03/22 09:49:51  bernie
  *#* Simplifications from project_grl.
  *#*
@@ -203,10 +206,36 @@ static void menu_layout(
 	int ypos, cnt;
 	const char * PROGMEM title = PTRMSG(menu->title);
 
-	ypos = menu->startrow;
+	ypos = 0;
 
 	if (title)
 		text_xprintf(menu->bitmap, ypos++, 0, STYLEF_UNDERLINE | STYLEF_BOLD | TEXT_CENTER | TEXT_FILL, title);
+
+#if CONFIG_MENU_SMOOTH
+	static coord_t yoffset = 0;
+	static int old_first_item = 0;
+	if (old_first_item != first_item)
+	{
+		if (old_first_item > first_item)
+		{
+			if (++yoffset > menu->bitmap->font->height)
+			{
+					yoffset = 0;
+					--old_first_item;
+			}
+		}
+		else
+		{
+			if (--yoffset < -menu->bitmap->font->height)
+			{
+					yoffset = 0;
+					++old_first_item;
+			}
+		}
+		first_item = old_first_item;
+	}
+	text_offset(menu->bitmap, 0, yoffset);
+#endif
 
 	for (cnt = 0; cnt < items_per_page; ++cnt)
 	{
@@ -369,14 +398,13 @@ iptr_t menu_handle(const struct Menu *menu)
 
 	items_per_page =
 		(menu->bitmap->height / menu->bitmap->font->height)
-		- menu->startrow
 #if CONFIG_MENU_MENUBAR
 		- 1 /* menu bar labels */
 #endif
 		- (menu->title ? 1 : 0);
 
 	/* Selected item should be a visible entry */
-	first_item = selected = menu_next_visible_item(menu, -1);
+	first_item = selected = menu_next_visible_item(menu, menu->selected - 1);
 
 	for(;;)
 	{
@@ -398,7 +426,11 @@ iptr_t menu_handle(const struct Menu *menu)
 			menu_update_menubar(menu, &mb, selected);
 		#endif
 
+#if CONFIG_MENU_SMOOTH
+		key = kbd_peek();
+#else
 		key = kbd_get();
+#endif
 
 		if (key & K_OK)
 		{
@@ -415,7 +447,12 @@ iptr_t menu_handle(const struct Menu *menu)
 
 			/* Return userdata as result */
 			if (!menu->flags & MF_STICKY)
+			{
+				/* Store currently selected item before leaving. */
+				if (menu->flags & MF_SAVESEL)
+					CONST_CAST(struct Menu *, menu)->selected = selected;
 				return item->userdata;
+			}
 		}
 		else if (key & K_UP)
 		{
@@ -427,6 +464,9 @@ iptr_t menu_handle(const struct Menu *menu)
 		}
 		else if (key & K_CANCEL && !(menu->flags & MF_TOPLEVEL))
 		{
+			/* Store currently selected item before leaving. */
+			if (menu->flags & MF_SAVESEL)
+				CONST_CAST(struct Menu *, menu)->selected = selected;
 			return 0;
 		}
 	}
