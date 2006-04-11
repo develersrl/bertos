@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2006/04/11 00:08:53  bernie
+ *#* Add smooth scrolling for menus.
+ *#*
  *#* Revision 1.10  2006/03/22 09:48:51  bernie
  *#* Add a few more config options.
  *#*
@@ -205,5 +208,8 @@
 
 /// Enable button bar behind menus
 #define CONFIG_MENU_MENUBAR  0
+
+/// Enable smooth scrolling in menus
+#define CONFIG_MENU_SMOOTH  1
 
 #endif /* CONFIG_COMMON_H */
