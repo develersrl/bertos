@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.13  2006/04/11 00:08:24  bernie
+ *#* text_offset(): New function, but I'm not quite confident with the design.
+ *#*
  *#* Revision 1.12  2006/03/27 04:48:56  bernie
  *#* gfx_blitImage(): New function; gfx_blitRaster(): Fix clipping bug.
  *#*
@@ -164,7 +167,7 @@ typedef struct Image
 	coord_t width;     /*!< Raster width in pixels. */
 	coord_t height;    /*!< Raster height in pixels. */
 	coord_t stride;    /*!< Bytes per row. */
-};
+} Image;
 
 #if CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_H_MSB
 	/**

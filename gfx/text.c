@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2006/04/11 00:08:24  bernie
+ *#* text_offset(): New function, but I'm not quite confident with the design.
+ *#*
  *#* Revision 1.8  2006/03/22 09:50:37  bernie
  *#* Use the same format for fonts and rasters.
  *#*
@@ -107,6 +110,14 @@
 /*! ANSI escape sequences flag: true for ESC state on */
 static bool ansi_mode = false;
 
+// FIXME: move in bitmap?
+static coord_t text_xoff, text_yoff;
+
+void text_offset(Bitmap *bm, coord_t x, coord_t y)
+{
+	text_xoff = x;
+	text_yoff = y;
+}
 
 /*!
  * Move (imaginary) cursor to column and row specified.
@@ -119,8 +130,8 @@ void text_moveto(struct Bitmap *bm, int row, int col)
 	ASSERT(row >= 0);
 	ASSERT(row < bm->height / bm->font->height);
 
-	bm->penX = col * bm->font->width;
-	bm->penY = row * bm->font->height;
+	bm->penX = col * bm->font->width + text_xoff;
+	bm->penY = row * bm->font->height + text_yoff;
 }
 
 

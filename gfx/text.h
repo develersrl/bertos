@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/04/11 00:08:24  bernie
+ *#* text_offset(): New function, but I'm not quite confident with the design.
+ *#*
  *#* Revision 1.4  2006/03/07 22:18:04  bernie
  *#* Correctly compute text width for prop fonts; Make styles a per-bitmap attribute.
  *#*
@@ -107,6 +110,7 @@
 struct Bitmap;
 
 /* Low-level text functions (mware/text.c) */
+void text_offset(struct Bitmap *bm, coord_t x, coord_t y);
 void text_moveto(struct Bitmap *bm, int row, int col);
 void text_setcoord(struct Bitmap *bm, int x, int y);
 int text_putchar(char c, struct Bitmap *bm);
