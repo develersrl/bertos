@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2006/04/27 05:43:08  bernie
+ *#* Fix naming conventions.
+ *#*
  *#* Revision 1.6  2006/02/20 02:00:40  bernie
  *#* Port to Qt 4.1.
  *#*
@@ -157,7 +160,7 @@ struct Bitmap lcd_bitmap;
 	gfx_bitmapClear(&lcd_bitmap);
 }
 
-/*extern "C"*/ void lcd_blit_bitmap(Bitmap *bm)
+/*extern "C"*/ void lcd_blitBitmap(Bitmap *bm)
 {
 	//FIXME CHECK_WALL(wall_before_raster);
 	//FIXME CHECK_WALL(wall_after_raster);

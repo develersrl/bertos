@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/04/27 05:43:07  bernie
+ *#* Fix naming conventions.
+ *#*
  *#* Revision 1.3  2006/04/11 00:07:32  bernie
  *#* Implemenent MF_SAVESEL flag.
  *#*
@@ -109,7 +112,7 @@ Window root_win;
 void schedule(void)
 {
 //	win_compose(&root_win);
-	lcd_blit_bitmap(root_win.bitmap);
+	lcd_blitBitmap(root_win.bitmap);
 	emul_idle();
 	usleep(10000);
 }
@@ -129,7 +132,7 @@ void hello_world(void)
 	text_xprintf(&lcd_bitmap, 1, 0, STYLEF_BOLD | TEXT_FILL | TEXT_CENTER, "Hello, world!");
 	for (int i = 0; i < 1000; ++i)
 	{
-		lcd_blit_bitmap(&lcd_bitmap);
+		lcd_blitBitmap(&lcd_bitmap);
 		emul_idle();
 	}
 }
@@ -167,7 +170,7 @@ void bouncing_logo(void)
 			(lcd_bitmap.width - project_grl_logo.width) / 2,
 			h / SPEED_SCALE,
 			&project_grl_logo);
-		lcd_blit_bitmap(&lcd_bitmap);
+		lcd_blitBitmap(&lcd_bitmap);
 
 		timer_delay(10);
 	}
@@ -262,7 +265,7 @@ int main(int argc, char *argv[])
 			win_raise(&large_win);
 
 		win_compose(&root_win);
-		lcd_blit_bitmap(root_win.bitmap);
+		lcd_blitBitmap(root_win.bitmap);
 		emul_idle();
 		usleep(10000);
 	}
