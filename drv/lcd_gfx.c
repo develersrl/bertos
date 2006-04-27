@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/04/27 05:40:11  bernie
+ *#* Naming convention fixes; Partial merge from project_grl.
+ *#*
  *#* Revision 1.3  2006/02/10 12:35:31  bernie
  *#* Enforce CONFIG_* definitions.
  *#*
@@ -188,6 +191,9 @@
 #define LCD_CMD_RMW_OFF     0xEE
 #define LCD_CMD_RESET       0xE2
 /*@}*/
+
+MOD_DEFINE(lcd)
+
 
 /* Status flags */
 #define LCDF_BUSY BV(7)
@@ -364,7 +370,7 @@ static inline void lcd_write(uint8_t c, uint8_t chip)
 /*!
  * Set LCD contrast PWM.
  */
-void lcd_setpwm(int duty)
+void lcd_setPwm(int duty)
 {
 	ASSERT(duty >= LCD_MIN_PWM);
 	ASSERT(duty <= LCD_MAX_PWM);
@@ -387,7 +393,7 @@ static void lcd_clear(void)
 }
 
 
-static void lcd_writeraster(const uint8_t *raster)
+static void lcd_writeRaster(const uint8_t *raster)
 {
 	uint8_t page, rows;
 	const uint8_t *right_raster;
@@ -413,16 +419,19 @@ static void lcd_writeraster(const uint8_t *raster)
 	}
 }
 
-
-void lcd_blit_bitmap(Bitmap *bm)
+/**
+ * Update the LCD display with data from the provided bitmap.
+ */
+void lcd_blitBitmap(Bitmap *bm)
 {
-	lcd_writeraster(bm->raster);
+	MOD_CHECK(lcd);
+	lcd_writeRaster(bm->raster);
 }
 
 
 #if CONFIG_LCD_SOFTINT_REFRESH
 
-static void lcd_refresh_softint(void)
+static void lcd_refreshSoftint(void)
 {
 	lcd_blit_bitmap(&lcd_bitmap);
 	timer_add(lcd_refresh_timer);
@@ -439,6 +448,8 @@ static void lcd_refresh_softint(void)
  */
 void lcd_init(void)
 {
+	MOD_CHECK(timer);
+
 	// FIXME: interrupts are already disabled when we get here?!?
 	cpuflags_t flags;
 	IRQ_SAVE_DISABLE(flags);
@@ -496,4 +507,6 @@ void lcd_init(void)
 	timer_add(lcd_refresh_timer);
 
 #endif /* CONFIG_LCD_SOFTINT_REFRESH */
+
+	MOD_INIT(lcd);
 }

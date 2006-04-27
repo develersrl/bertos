@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/04/27 05:40:11  bernie
+ *#* Naming convention fixes; Partial merge from project_grl.
+ *#*
  *#* Revision 1.4  2006/02/15 09:13:16  bernie
  *#* Switch to BITMAP_FMT_PLANAR_V_LSB.
  *#*
@@ -47,7 +50,7 @@ struct Bitmap;
 extern struct Bitmap lcd_bitmap;
 
 void lcd_init(void);
-void lcd_setpwm(int duty);
-void lcd_blit_bitmap(struct Bitmap *bm);
+void lcd_setPwm(int duty);
+void lcd_blitBitmap(struct Bitmap *bm);
 
 #endif /* LCD_GFX_H */
