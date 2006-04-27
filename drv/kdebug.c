@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.26  2006/04/27 05:40:27  bernie
+ *#* Break on assertion failures.
+ *#*
  *#* Revision 1.25  2005/06/27 21:26:24  bernie
  *#* Misc PGM fixes.
  *#*
@@ -347,6 +350,7 @@ int PGM_FUNC(__assert)(const char * PGM_ATTR cond, const char * PGM_ATTR file, i
 	PGM_FUNC(kputs)(PGM_STR("Assertion failed: "));
 	PGM_FUNC(kputs)(cond);
 	kputchar('\n');
+	BREAKPOINT;
 	return 1;
 }
 
