@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2006/04/27 05:39:23  bernie
+ *#* Enhance text rendering to arbitrary x,y coords.
+ *#*
  *#* Revision 1.9  2006/04/11 00:08:24  bernie
  *#* text_offset(): New function, but I'm not quite confident with the design.
  *#*
@@ -107,41 +110,35 @@
 #include <cfg/debug.h>
 
 
-/*! ANSI escape sequences flag: true for ESC state on */
+/**
+ * ANSI escape sequences flag: true for ESC state on.
+ *
+ * \fixme Move to Bitmap.flags.
+ */
 static bool ansi_mode = false;
 
-// FIXME: move in bitmap?
-static coord_t text_xoff, text_yoff;
-
-void text_offset(Bitmap *bm, coord_t x, coord_t y)
+/*!
+ * Move (imaginary) cursor to coordinates specified.
+ */
+void text_setCoord(struct Bitmap *bm, int x, int y)
 {
-	text_xoff = x;
-	text_yoff = y;
+	bm->penX = x;
+	bm->penY = y;
 }
+
 
 /*!
  * Move (imaginary) cursor to column and row specified.
  * Next text write will start a that row and col.
  */
-void text_moveto(struct Bitmap *bm, int row, int col)
+void text_moveTo(struct Bitmap *bm, int row, int col)
 {
 	ASSERT(col >= 0);
 	ASSERT(col < bm->width / bm->font->width);
 	ASSERT(row >= 0);
 	ASSERT(row < bm->height / bm->font->height);
 
-	bm->penX = col * bm->font->width + text_xoff;
-	bm->penY = row * bm->font->height + text_yoff;
-}
-
-
-/*!
- * Move (imaginary) cursor to coordinates specified.
- */
-void text_setcoord(struct Bitmap *bm, int x, int y)
-{
-	bm->penX = x;
-	bm->penY = y;
+	text_setCoord(bm, col * bm->font->width, row * bm->font->height);
 }
 
 

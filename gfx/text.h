@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/04/27 05:39:24  bernie
+ *#* Enhance text rendering to arbitrary x,y coords.
+ *#*
  *#* Revision 1.5  2006/04/11 00:08:24  bernie
  *#* text_offset(): New function, but I'm not quite confident with the design.
  *#*
@@ -68,6 +71,7 @@
 #include <cfg/compiler.h>
 #include <cfg/macros.h> /* BV() */
 #include <cfg/cpu.h> /* CPU_HARVARD */
+#include <gfx/gfx.h> /* coord_t */
 
 #include <stdarg.h>
 
@@ -110,9 +114,8 @@
 struct Bitmap;
 
 /* Low-level text functions (mware/text.c) */
-void text_offset(struct Bitmap *bm, coord_t x, coord_t y);
-void text_moveto(struct Bitmap *bm, int row, int col);
-void text_setcoord(struct Bitmap *bm, int x, int y);
+void text_moveTo(struct Bitmap *bm, int col, int row);
+void text_setCoord(struct Bitmap *bm, int x, int y);
 int text_putchar(char c, struct Bitmap *bm);
 uint8_t text_style(struct Bitmap *bm, uint8_t flags, uint8_t mask);
 void text_clear(struct Bitmap *bm);
@@ -122,6 +125,8 @@ void text_clearLine(struct Bitmap *bm, int line);
 int text_puts(const char *str, struct Bitmap *bm);
 int text_vprintf(struct Bitmap *bm, const char *fmt, va_list ap);
 int text_printf(struct Bitmap *bm, const char *fmt, ...) FORMAT(__printf__, 2, 3);
+int text_xyvprintf(struct Bitmap *bm, coord_t x, coord_t y, uint16_t mode, const char *fmt, va_list ap);
+int text_xyprintf(struct Bitmap *bm, coord_t x, coord_t col, uint16_t mode, const char *fmt, ...) FORMAT(__printf__, 5, 6);
 int text_xprintf(struct Bitmap *bm, uint8_t row, uint8_t col, uint16_t mode, const char *fmt, ...) FORMAT(__printf__, 5, 6);
 int text_vwidthf(struct Bitmap *bm, const char * fmt, va_list ap);
 int text_widthf(struct Bitmap *bm, const char * fmt, ...) FORMAT(__printf__, 2, 3);

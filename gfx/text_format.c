@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2006/04/27 05:39:24  bernie
+ *#* Enhance text rendering to arbitrary x,y coords.
+ *#*
  *#* Revision 1.8  2006/03/22 09:50:11  bernie
  *#* Don't use C99 stuff.
  *#*
@@ -144,32 +147,18 @@ int PGM_FUNC(text_printf)(struct Bitmap *bm, const char * PGM_ATTR fmt, ...)
 	return len;
 }
 
-
-/*!
- * Render the result of printf()-like formatting in a specified position
- * of a Bitmap.
+/**
+ * Render text with vprintf()-like formatting at a specified pixel position.
  *
- * \param bm Bitmap where to render the text
- * \param row   Starting row in character units (zero based)
- * \param col   Starting column in character units (zero based)
- * \param style Formatting style to use.  In addition to any STYLEF_
- *        flag, it can be TEXT_NORMAL, TEXT_FILL, TEXT_INVERT or
- *        TEXT_RIGHT, or a combination of these flags ORed together.
- * \param fmt  String possibly containing printf() formatting commands.
- *
- * \see text_puts() text_putchar() text_printf() text_vprintf()
- * \see text_moveto() text_style()
+ * \see text_xyprintf()
  */
-int PGM_FUNC(text_xprintf)(struct Bitmap *bm,
-		uint8_t row, uint8_t col, uint16_t style, const char * PGM_ATTR fmt, ...)
+int PGM_FUNC(text_xyvprintf)(struct Bitmap *bm,
+		coord_t x, coord_t y, uint16_t style, const char * PGM_ATTR fmt, va_list ap)
 {
 	int len;
 	uint8_t oldstyle = 0;
-	va_list ap;
 
-	va_start(ap, fmt);
-
-	text_moveto(bm, row, col);
+	text_setCoord(bm, x, y);
 
 	if (style & STYLEF_MASK)
 		oldstyle = text_style(bm, style, STYLEF_MASK);
@@ -182,22 +171,70 @@ int PGM_FUNC(text_xprintf)(struct Bitmap *bm,
 			pad /= 2;
 
 		if (style & TEXT_FILL)
-			gfx_rectFillC(bm, 0, row * bm->font->height, pad, (row + 1) * bm->font->height,
+			gfx_rectFillC(bm, 0, y, pad, y + bm->font->height,
 				(style & STYLEF_INVERT) ? 0xFF : 0x00);
 
-		text_setcoord(bm, pad, row * bm->font->height);
+		text_setCoord(bm, pad, y);
 	}
 
 	len = PGM_FUNC(text_vprintf)(bm, fmt, ap);
-	va_end(ap);
 
 	if (style & TEXT_FILL)
-		gfx_rectFillC(bm, bm->penX, row * bm->font->height, bm->width, (row + 1) * bm->font->height,
+		gfx_rectFillC(bm, bm->penX, y, bm->width, y + bm->font->height,
 			(style & STYLEF_INVERT) ? 0xFF : 0x00);
 
 	/* Restore old style */
 	if (style & STYLEF_MASK)
 		text_style(bm, oldstyle, STYLEF_MASK);
+
+	return len;
+}
+
+
+/**
+ * Render text with printf()-like formatting at a specified pixel position.
+ *
+ * \param bm Bitmap where to render the text
+ * \param x     [pixels] Initial X coordinate of text.
+ * \param y     [pixels] Coordinate of top border of text.
+ * \param style Formatting style to use.  In addition to any STYLEF_
+ *        flag, it can be TEXT_NORMAL, TEXT_FILL, TEXT_INVERT or
+ *        TEXT_RIGHT, or a combination of these flags ORed together.
+ * \param fmt  String possibly containing printf() formatting commands.
+ *
+ * \see text_puts() text_putchar() text_printf() text_vprintf()
+ * \see text_moveTo() text_style()
+ */
+int PGM_FUNC(text_xyprintf)(struct Bitmap *bm,
+		coord_t x, coord_t y, uint16_t style, const char * PGM_ATTR fmt, ...)
+{
+	int len;
+	va_list ap;
+
+	va_start(ap, fmt);
+	len = PGM_FUNC(text_xyvprintf)(bm, x, y, style, fmt, ap);
+	va_end(ap);
+
+	return len;
+}
+
+
+/**
+ * Render text with printf()-like formatting at a specified row/column position.
+ *
+ * \see text_xyprintf()
+ */
+int PGM_FUNC(text_xprintf)(struct Bitmap *bm,
+		uint8_t row, uint8_t col, uint16_t style, const char * PGM_ATTR fmt, ...)
+{
+	int len;
+	va_list ap;
+
+	va_start(ap, fmt);
+	len = PGM_FUNC(text_xyvprintf)(
+			bm, col * bm->font->width, row * bm->font->height,
+			style, fmt, ap);
+	va_end(ap);
 
 	return len;
 }

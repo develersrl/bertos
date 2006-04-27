@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.14  2006/04/27 05:39:24  bernie
+ *#* Enhance text rendering to arbitrary x,y coords.
+ *#*
  *#* Revision 1.13  2006/04/11 00:08:24  bernie
  *#* text_offset(): New function, but I'm not quite confident with the design.
  *#*
@@ -141,6 +144,8 @@ typedef struct Bitmap
 	 * The text rendering routine can apply a few simple transformations
 	 * to the current font in order to generate common styles such as
 	 * bold, italic and underline from plain glyphs.
+	 *
+	 * \see text_style()
 	 */
 	uint8_t styles;
 #endif

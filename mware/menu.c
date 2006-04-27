@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2006/04/27 05:39:24  bernie
+ *#* Enhance text rendering to arbitrary x,y coords.
+ *#*
  *#* Revision 1.6  2006/04/11 00:07:32  bernie
  *#* Implemenent MF_SAVESEL flag.
  *#*
@@ -91,6 +94,10 @@
 #include <avr/pgmspace.h> /* strncpy_P() */
 #endif
 
+#if CONFIG_MENU_SMOOTH
+#include <drv/lcd_gfx.h>
+#endif
+
 #if CONFIG_MENU_MENUBAR
 #include "menubar.h"
 #endif
@@ -100,7 +107,6 @@
 #else
 #define PTRMSG(x) ((const char *)x)
 #endif
-
 
 /* Temporary fake defines for ABORT stuff... */
 #define abort_top  0
@@ -133,26 +139,6 @@ static int menu_count(const struct Menu *menu)
 
 	return cnt;
 }
-
-#if 0 /* UNUSED */
-/**
- * Compute total number of visible entries, which excludes items
- * without a label.
- */
-static int menu_count_visible(const struct Menu *menu)
-{
-	struct MenuItem *item;
-	int visible_entries = 0;
-
-	for (item = menu->items; (item->label || item->hook); ++item)
-	{
-		if (!(item->flags & MIF_HIDDEN))
-			++visible_entries;
-	}
-
-	return visible_entries;
-}
-#endif
 
 #if CONFIG_MENU_MENUBAR
 
@@ -205,20 +191,35 @@ static void menu_layout(
 {
 	int ypos, cnt;
 	const char * PROGMEM title = PTRMSG(menu->title);
+	Bitmap *bm = menu->bitmap;
 
-	ypos = 0;
+	ypos = bm->cr.ymin;
 
 	if (title)
-		text_xprintf(menu->bitmap, ypos++, 0, STYLEF_UNDERLINE | STYLEF_BOLD | TEXT_CENTER | TEXT_FILL, title);
+	{
+		text_xyprintf(bm, 0, ypos, STYLEF_UNDERLINE | STYLEF_BOLD | TEXT_CENTER | TEXT_FILL, title);
+		ypos += bm->font->height;
+	}
 
 #if CONFIG_MENU_SMOOTH
 	static coord_t yoffset = 0;
 	static int old_first_item = 0;
+	static mtime_t old_time = 0; //UNUSED
+	static int speed;
+	coord_t old_ymin = bm->cr.ymin;
+
+	gfx_setClipRect(bm,
+		bm->cr.xmin, bm->cr.ymin + ypos,
+		bm->cr.xmax, bm->cr.ymax);
+
 	if (old_first_item != first_item)
 	{
+		speed = ABS(old_first_item - first_item) * 3;
+
 		if (old_first_item > first_item)
 		{
-			if (++yoffset > menu->bitmap->font->height)
+			yoffset += speed;
+			if (yoffset > bm->font->height)
 			{
 					yoffset = 0;
 					--old_first_item;
@@ -226,7 +227,8 @@ static void menu_layout(
 		}
 		else
 		{
-			if (--yoffset < -menu->bitmap->font->height)
+			yoffset -= speed;
+			if (yoffset < -bm->font->height)
 			{
 					yoffset = 0;
 					++old_first_item;
@@ -234,7 +236,7 @@ static void menu_layout(
 		}
 		first_item = old_first_item;
 	}
-	text_offset(menu->bitmap, 0, yoffset);
+	ypos += yoffset;
 #endif
 
 	for (cnt = 0; cnt < items_per_page; ++cnt)
@@ -257,12 +259,12 @@ static void menu_layout(
 		if (!(item->flags & MIF_HIDDEN))
 		{
 #if CPU_HARVARD
-			text_xprintf_P
+			text_xyprintf_P
 #else
-			text_xprintf
+			text_xyprintf
 #endif
 			(
-				menu->bitmap, ypos++, 0,
+				bm, 0, ypos,
 				(first_item + cnt == selected) ? (STYLEF_INVERT | TEXT_FILL) : TEXT_FILL,
 				(item->flags & MIF_RAMLABEL) ? PSTR("%s%S") : PSTR("%S%S"),
 				PTRMSG(item->label),
@@ -270,8 +272,18 @@ static void menu_layout(
 					( (item->flags & MIF_CHECKED) ? PSTR(":ON") : PSTR(":OFF") )
 					: ( (item->flags & MIF_CHECKED) ? PSTR("\04") : PSTR("") )
 			);
+			ypos += bm->font->height;
 		}
 	}
+
+#if CONFIG_MENU_SMOOTH
+	/* Restore old cliprect */
+	gfx_setClipRect(bm,
+			bm->cr.xmin, old_ymin,
+			bm->cr.xmax, bm->cr.ymax);
+
+	lcd_blitBitmap(&lcd_bitmap);
+#endif
 }
 
 
@@ -406,6 +418,9 @@ iptr_t menu_handle(const struct Menu *menu)
 	/* Selected item should be a visible entry */
 	first_item = selected = menu_next_visible_item(menu, menu->selected - 1);
 
+	/* Clear screen */
+	text_clear(menu->bitmap);
+
 	for(;;)
 	{
 		keymask_t key;
@@ -418,8 +433,6 @@ iptr_t menu_handle(const struct Menu *menu)
 		while (selected >= first_item + items_per_page)
 			first_item = menu_next_visible_item(menu, first_item);
 
-		/* Clear screen */
-		text_clear(menu->bitmap);
 		menu_layout(menu, first_item, items_per_page, selected);
 
 		#if CONFIG_MENU_MENUBAR
@@ -453,6 +466,9 @@ iptr_t menu_handle(const struct Menu *menu)
 					CONST_CAST(struct Menu *, menu)->selected = selected;
 				return item->userdata;
 			}
+
+			/* Clear screen */
+			text_clear(menu->bitmap);
 		}
 		else if (key & K_UP)
 		{
