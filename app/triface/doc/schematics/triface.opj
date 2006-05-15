@@ -29,9 +29,47 @@
       (Type "Report")))
   (Folder "Referenced Projects")
   (PartMRUSelector
+    (PORTRIGHT-L
+      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\CAPSYM.OLB")
+      (DeviceIndex "0"))
+    (JUMPER
+      (FullPartName "JUMPER.Normal")
+      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
+      (DeviceIndex "0"))
+    (GND_SIGNAL
+      (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\CAPSYM.OLB")
+      (DeviceIndex "0"))
+    (INDUCTOR
+      (FullPartName "INDUCTOR.Normal")
+      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\DISCRETE.OLB")
+      (DeviceIndex "0"))
+    (LM358
+      (FullPartName "LM358.Normal")
+      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\OPAMP.OLB")
+      (DeviceIndex "0"))
     (R
       (FullPartName "R.Normal")
       (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\DISCRETE.OLB")
+      (DeviceIndex "0"))
+    ("HEADER 2"
+      (FullPartName "HEADER 2.Normal")
+      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
+      (DeviceIndex "0"))
+    (D
+      (FullPartName "D.Normal")
+      (LibraryName "H:\SRC\WIN\DEVTOOLS\CADLIB\DEVELER.OLB")
+      (DeviceIndex "0"))
+    (FUSE
+      (FullPartName "FUSE.Normal")
+      (LibraryName "H:\SRC\WIN\DEVTOOLS\CADLIB\DEVELER.OLB")
+      (DeviceIndex "0"))
+    (RV
+      (FullPartName "RV.Normal")
+      (LibraryName "H:\SRC\WIN\DEVTOOLS\CADLIB\DEVELER.OLB")
+      (DeviceIndex "0"))
+    (LM317/TO220
+      (FullPartName "LM317/TO220.Normal")
+      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\REGULATOR.OLB")
       (DeviceIndex "0"))
     ("CAP NP"
       (FullPartName "CAP NP.Normal")
@@ -46,9 +84,6 @@
       (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
       (DeviceIndex "0"))
     (PORTLEFT-L
-      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\CAPSYM.OLB")
-      (DeviceIndex "0"))
-    (PORTRIGHT-L
       (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\CAPSYM.OLB")
       (DeviceIndex "0"))
     (PORTRIGHT-R
@@ -86,42 +121,6 @@
     (74HC14
       (FullPartName "74HC14.Normal")
       (LibraryName "C:\PROGRAMMI\ORCAD\CAPTURE\LIBRARY\GATE.OLB")
-      (DeviceIndex "0"))
-    (74HC132
-      (FullPartName "74HC132.Normal")
-      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\GATE.OLB")
-      (DeviceIndex "0"))
-    (ULN2803
-      (FullPartName "ULN2803.Normal")
-      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\TRANSISTOR.OLB")
-      (DeviceIndex "0"))
-    (CON3
-      (FullPartName "CON3.Normal")
-      (LibraryName "C:\PROGRAMMI\ORCAD\CAPTURE\LIBRARY\CONNECTOR.OLB")
-      (DeviceIndex "0"))
-    (CE
-      (FullPartName "CE.Normal")
-      (LibraryName "H:\SRC\PROJ_XXX\DOC\BOARD\FRANCESC.OLB")
-      (DeviceIndex "0"))
-    (UA7805CKC
-      (FullPartName "LM2931AT-5.0.Normal")
-      (LibraryName "H:\SRC\PROJ_XXX\DOC\BOARD\FRANCESC.OLB")
-      (DeviceIndex "0"))
-    (C
-      (FullPartName "C.Normal")
-      (LibraryName "H:\SRC\PROJ_XXX\DOC\BOARD\FRANCESC.OLB")
-      (DeviceIndex "0"))
-    (PONTE
-      (FullPartName "PONTE.Normal")
-      (LibraryName "H:\SRC\PROJ_XXX\DOC\BOARD\FRANCESC.OLB")
-      (DeviceIndex "0"))
-    (CON2
-      (FullPartName "CON2.Normal")
-      (LibraryName "C:\PROGRAMMI\ORCAD\CAPTURE\LIBRARY\CONNECTOR.OLB")
-      (DeviceIndex "0"))
-    (CON10
-      (FullPartName "CON10.Normal")
-      (LibraryName "C:\PROGRAMMI\ORCAD\CAPTURE\LIBRARY\CONNECTOR.OLB")
       (DeviceIndex "0")))
   (LastUsedLibraryBrowseDirectory "D:\OrCAD\tools\capture\library")
   (GlobalState
@@ -135,51 +134,11 @@
       (Path "Outputs")
       (Select "Design Resources"
          "H:\src\win\devtools\devlib\app\triface\doc\schematics\triface.dsn"
-         "TRIFACE BOARD" "HOST INTERFACE"))
+         "TRIFACE BOARD" "ANALOG"))
     (HierarchyView)
     (Doc
       (Type "COrCapturePMDoc")
       (Frame
         (Placement "44 0 1 -1 -1 -4 -23 0 312 0 463"))
-      (Tab 0))
-    (Doc
-      (Type "COrSchematicDoc")
-      (Frame
-        (Placement "44 0 1 -1 -1 -1 -1 198 1229 66 545")
-        (Scroll "0 0")
-        (Zoom "100")
-        (Occurrence "/"))
-      (Path "H:\SRC\WIN\DEVTOOLS\DEVLIB\APP\TRIFACE\DOC\SCHEMATICS\TRIFACE.DSN")
-      (Schematic "TRIFACE BOARD")
-      (Page "CPU"))
-    (Doc
-      (Type "COrSchematicDoc")
-      (Frame
-        (Placement "44 0 1 -1 -1 -1 -1 55 1086 5 606")
-        (Scroll "0 0")
-        (Zoom "100")
-        (Occurrence "/"))
-      (Path "H:\SRC\WIN\DEVTOOLS\DEVLIB\APP\TRIFACE\DOC\SCHEMATICS\TRIFACE.DSN")
-      (Schematic "TRIFACE BOARD")
-      (Page "HOST INTERFACE"))
-    (Doc
-      (Type "COrSchematicDoc")
-      (Frame
-        (Placement "44 2 3 -1 -1 -4 -23 84 1207 112 675")
-        (Scroll "0 144")
-        (Zoom "100")
-        (Occurrence "/"))
-      (Path "H:\SRC\WIN\DEVTOOLS\DEVLIB\APP\TRIFACE\DOC\SCHEMATICS\TRIFACE.DSN")
-      (Schematic "TRIFACE BOARD")
-      (Page "I/O"))
-    (Doc
-      (Type "COrSchematicDoc")
-      (Frame
-        (Placement "44 0 1 -1 -1 -1 -1 198 1229 198 677")
-        (Scroll "0 0")
-        (Zoom "100")
-        (Occurrence "/"))
-      (Path "H:\SRC\WIN\DEVTOOLS\DEVLIB\APP\TRIFACE\DOC\SCHEMATICS\TRIFACE.DSN")
-      (Schematic "TRIFACE BOARD")
-      (Page "POWER SUPPLY")))
+      (Tab 0)))
   (MPSSessionName "bernie"))
