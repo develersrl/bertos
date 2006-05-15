@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.1  2006/05/15 07:20:54  bernie
+ *#* Move menu to gui/.
+ *#*
  *#* Revision 1.4  2006/04/11 00:07:32  bernie
  *#* Implemenent MF_SAVESEL flag.
  *#*

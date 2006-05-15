@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.1  2006/05/15 07:20:54  bernie
+ *#* Move menu to gui/.
+ *#*
  *#* Revision 1.7  2006/04/27 05:39:24  bernie
  *#* Enhance text rendering to arbitrary x,y coords.
  *#*

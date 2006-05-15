@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/05/15 07:25:29  bernie
+ *#* Move menu to gui/.
+ *#*
  *#* Revision 1.4  2006/04/27 05:43:07  bernie
  *#* Fix naming conventions.
  *#*
@@ -41,8 +44,8 @@
 #include <gfx/win.h>
 #include <gfx/text.h>
 #include <gfx/font.h>
+#include <gui/menu.h>
 #include <icons/logo.h>
-#include <mware/menu.h>
 #include <cfg/macros.h>
 
 
