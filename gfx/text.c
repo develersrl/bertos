@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2006/05/15 07:21:06  bernie
+ *#* Doxygen fix.
+ *#*
  *#* Revision 1.10  2006/04/27 05:39:23  bernie
  *#* Enhance text rendering to arbitrary x,y coords.
  *#*
@@ -113,7 +116,7 @@
 /**
  * ANSI escape sequences flag: true for ESC state on.
  *
- * \fixme Move to Bitmap.flags.
+ * \todo Move to Bitmap.flags.
  */
 static bool ansi_mode = false;
 
