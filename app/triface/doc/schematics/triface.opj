@@ -29,15 +29,68 @@
       (Type "Report")))
   (Folder "Referenced Projects")
   (PartMRUSelector
+    (GND_SIGNAL
+      (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\CAPSYM.OLB")
+      (DeviceIndex "0"))
+    (CON32A
+      (FullPartName "CON32A.Normal")
+      (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
+      (DeviceIndex "0"))
+    (CON28C
+      (FullPartName "CON28C.Normal")
+      (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
+      (DeviceIndex "0"))
+    (CON2
+      (FullPartName "CON2.Normal")
+      (LibraryName "C:\PROGRAMMI\ORCAD\CAPTURE\LIBRARY\CONNECTOR.OLB")
+      (DeviceIndex "0"))
+    (PORTBOTH-L
+      (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\CAPSYM.OLB")
+      (DeviceIndex "0"))
+    (DS1302
+      (FullPartName "DS1302.Normal")
+      (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\MISC.OLB")
+      (DeviceIndex "0"))
+    (LED
+      (FullPartName "LED.Normal")
+      (LibraryName "H:\SRC\PROJ_XXX\DOC\BOARD\FRANCESC.OLB")
+      (DeviceIndex "0"))
+    (BUZZER
+      (FullPartName "BUZZER.Normal")
+      (LibraryName "H:\SRC\DEVTOOLS\CADLIB\DEVELER.OLB")
+      (DeviceIndex "0"))
+    (NPN
+      (FullPartName "NPN.Normal")
+      (LibraryName "H:\SRC\DEVTOOLS\CADLIB\DEVELER.OLB")
+      (DeviceIndex "0"))
+    (R
+      (FullPartName "R.Normal")
+      (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\DISCRETE.OLB")
+      (DeviceIndex "0"))
+    (CON10
+      (FullPartName "CON10.Normal")
+      (LibraryName "H:\SRC\DEVTOOLS\CADLIB\DEVELER.OLB")
+      (DeviceIndex "0"))
+    (CON20A
+      (FullPartName "CON20A.Normal")
+      (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
+      (DeviceIndex "0"))
+    (PORTRIGHT-R
+      (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\CAPSYM.OLB")
+      (DeviceIndex "0"))
+    (PORTLEFT-L
+      (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\CAPSYM.OLB")
+      (DeviceIndex "0"))
+    (CON16
+      (FullPartName "CON16.Normal")
+      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
+      (DeviceIndex "0"))
     (PORTRIGHT-L
       (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\CAPSYM.OLB")
       (DeviceIndex "0"))
     (JUMPER
       (FullPartName "JUMPER.Normal")
       (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
-      (DeviceIndex "0"))
-    (GND_SIGNAL
-      (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\CAPSYM.OLB")
       (DeviceIndex "0"))
     (INDUCTOR
       (FullPartName "INDUCTOR.Normal")
@@ -46,10 +99,6 @@
     (LM358
       (FullPartName "LM358.Normal")
       (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\OPAMP.OLB")
-      (DeviceIndex "0"))
-    (R
-      (FullPartName "R.Normal")
-      (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\DISCRETE.OLB")
       (DeviceIndex "0"))
     ("HEADER 2"
       (FullPartName "HEADER 2.Normal")
@@ -74,71 +123,19 @@
     ("CAP NP"
       (FullPartName "CAP NP.Normal")
       (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\DISCRETE.OLB")
-      (DeviceIndex "0"))
-    (QUARZO
-      (FullPartName "QUARZO.Normal")
-      (LibraryName "H:\SRC\WIN\DEVTOOLS\CADLIB\DEVELER.OLB")
-      (DeviceIndex "0"))
-    (CON24
-      (FullPartName "CON24.Normal")
-      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
-      (DeviceIndex "0"))
-    (PORTLEFT-L
-      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\CAPSYM.OLB")
-      (DeviceIndex "0"))
-    (PORTRIGHT-R
-      (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\CAPSYM.OLB")
-      (DeviceIndex "0"))
-    (PORTLEFT-R
-      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\CAPSYM.OLB")
-      (DeviceIndex "0"))
-    (LED
-      (FullPartName "LED.Normal")
-      (LibraryName "H:\SRC\PROJ_XXX\DOC\BOARD\FRANCESC.OLB")
-      (DeviceIndex "0"))
-    (MAX232
-      (FullPartName "MAX232.Normal")
-      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\LINEDRIVERRECEIVER.OLB")
-      (DeviceIndex "0"))
-    (GND
-      (LibraryName "C:\PROGRAMMI\ORCAD\CAPTURE\LIBRARY\CAPSYM.OLB")
-      (DeviceIndex "0"))
-    (VCC
-      (LibraryName "C:\PROGRAMMI\ORCAD\CAPTURE\LIBRARY\CAPSYM.OLB")
-      (DeviceIndex "0"))
-    (CON10A
-      (FullPartName "CON10A.Normal")
-      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
-      (DeviceIndex "0"))
-    (ATmega64-TQFP
-      (FullPartName "ATmega64-TQFP.Normal")
-      (LibraryName "H:\SRC\WIN\DEVTOOLS\CADLIB\DEVELER.OLB")
-      (DeviceIndex "0"))
-    (CON16
-      (FullPartName "CON16.Normal")
-      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
-      (DeviceIndex "0"))
-    (74HC14
-      (FullPartName "74HC14.Normal")
-      (LibraryName "C:\PROGRAMMI\ORCAD\CAPTURE\LIBRARY\GATE.OLB")
       (DeviceIndex "0")))
   (LastUsedLibraryBrowseDirectory "D:\OrCAD\tools\capture\library")
   (GlobalState
     (FileView
       (Path "Design Resources")
-      (Path "Design Resources"
-         "H:\src\win\devtools\devlib\app\triface\doc\schematics\triface.dsn")
-      (Path "Design Resources"
-         "H:\src\win\devtools\devlib\app\triface\doc\schematics\triface.dsn"
-         "TRIFACE BOARD")
+      (Path "Design Resources" ".\triface.dsn")
+      (Path "Design Resources" ".\triface.dsn" "TRIFACE BOARD")
       (Path "Outputs")
-      (Select "Design Resources"
-         "H:\src\win\devtools\devlib\app\triface\doc\schematics\triface.dsn"
-         "TRIFACE BOARD" "ANALOG"))
+      (Select "Design Resources" ".\triface.dsn" "TRIFACE BOARD" "CPU"))
     (HierarchyView)
     (Doc
       (Type "COrCapturePMDoc")
       (Frame
-        (Placement "44 0 1 -1 -1 -4 -23 0 312 0 463"))
+        (Placement "44 2 3 -1 -1 -4 -23 0 312 0 463"))
       (Tab 0)))
-  (MPSSessionName "bernie"))
+  (MPSSessionName "batt"))
