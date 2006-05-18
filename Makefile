@@ -6,6 +6,9 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
+# Revision 1.2  2006/05/18 00:40:10  bernie
+# Setup for AVR development.
+#
 # Revision 1.1  2006/03/22 09:51:53  bernie
 # Add build infrastructure.
 #
@@ -19,7 +22,8 @@ default: all
 include config.mk
 
 # Include subtargets
-include app/demo/demo.mk
+#include app/demo/demo.mk
+include app/triface/triface.mk
 
 include rules.mk
 

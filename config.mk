@@ -10,6 +10,9 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
+# Revision 1.3  2006/05/18 00:40:10  bernie
+# Setup for AVR development.
+#
 # Revision 1.2  2006/03/27 04:48:33  bernie
 # Add CXXFLAGS; Add recursive targets.
 #
@@ -37,15 +40,15 @@ OPTCFLAGS = -ffunction-sections -fdata-sections
 #DEBUGCFLAGS = -gdwarf-2
 
 # For GDB
-DEBUGCFLAGS = -g
+#DEBUGCFLAGS = -g
 
 #
 # define some variables based on the AVR base path in $(AVR)
 #
-CROSS   = 
+CROSS   = avr-
 CC      = $(CROSS)gcc
-AS      = $(CROSS)$(CC) -x assembler-with-cpp
-LD      = $(CROSS)$(CC)
+AS      = $(CC) -x assembler-with-cpp
+LD      = $(CC)
 OBJCOPY = $(CROSS)objcopy
 INSTALL = cp -a
 RM      = rm -f
@@ -110,8 +113,10 @@ CPPAFLAGS = $(DEBUGCFLAGS) -MMD
 ASFLAGS	= $(DEBUGCFLAGS)
 
 # Default linker flags
-#LDFLAGS = $(MAP_FLAGS) -Wl,--reduce-memory-overheads
-LDFLAGS	= $(MAP_FLAGS) -Wl,--gc-sections
+#LDFLAGS = $(MAP_FLAGS)
+
+#bernie: does not complain for missing symbols!
+#LDFLAGS = $(MAP_FLAGS) -Wl,--gc-sections
 
 # Flags for avrdude
 AVRDUDEFLAGS = $(DPROG)
