@@ -38,6 +38,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.31  2006/05/18 00:37:29  bernie
+ *#* Use hw_ser.h instead of ubiquitous hw.h.
+ *#*
  *#* Revision 1.30  2006/02/17 22:23:06  bernie
  *#* Update POSIX serial emulator.
  *#*
@@ -126,7 +129,7 @@
 
 #include "ser.h"
 #include "ser_p.h"
-#include "hw.h"  /* Required for bus macros overrides */
+#include "hw_ser.h"  /* Required for bus macros overrides */
 #include <appconfig.h>
 
 #include <cfg/debug.h>
