@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.26  2006/05/18 00:39:13  bernie
+ *#* Add struct Serial friendly typedef.
+ *#*
  *#* Revision 1.25  2006/02/17 22:28:00  bernie
  *#* Rename ser_emul.c to ser_posix.c.
  *#*
@@ -211,7 +214,7 @@ struct SerialHardware;
 extern const char * const serial_errors[8];
 
 /*! Serial handle structure */
-struct Serial
+typedef struct Serial
 {
 	/*! Physical port number */
 	unsigned int unit;
@@ -243,7 +246,7 @@ struct Serial
 
 	/*! Low-level interface to hardware. */
 	struct SerialHardware* hw;
-};
+} Serial;
 
 
 /* Function prototypes */
