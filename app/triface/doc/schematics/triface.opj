@@ -29,6 +29,20 @@
       (Type "Report")))
   (Folder "Referenced Projects")
   (PartMRUSelector
+    (LM385XX/TO92
+      (FullPartName "LM385XX/TO92.Normal")
+      (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\REGULATOR.OLB")
+      (DeviceIndex "0"))
+    (LM385/TO92
+      (FullPartName "LM385/TO92.Normal")
+      (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\REGULATOR.OLB")
+      (DeviceIndex "0"))
+    (PORTRIGHT-R
+      (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\CAPSYM.OLB")
+      (DeviceIndex "0"))
+    (GND
+      (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\CAPSYM.OLB")
+      (DeviceIndex "0"))
     (GND_SIGNAL
       (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\CAPSYM.OLB")
       (DeviceIndex "0"))
@@ -75,9 +89,6 @@
       (FullPartName "CON20A.Normal")
       (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
       (DeviceIndex "0"))
-    (PORTRIGHT-R
-      (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\CAPSYM.OLB")
-      (DeviceIndex "0"))
     (PORTLEFT-L
       (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\CAPSYM.OLB")
       (DeviceIndex "0"))
@@ -111,31 +122,35 @@
     (FUSE
       (FullPartName "FUSE.Normal")
       (LibraryName "H:\SRC\WIN\DEVTOOLS\CADLIB\DEVELER.OLB")
-      (DeviceIndex "0"))
-    (RV
-      (FullPartName "RV.Normal")
-      (LibraryName "H:\SRC\WIN\DEVTOOLS\CADLIB\DEVELER.OLB")
-      (DeviceIndex "0"))
-    (LM317/TO220
-      (FullPartName "LM317/TO220.Normal")
-      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\REGULATOR.OLB")
-      (DeviceIndex "0"))
-    ("CAP NP"
-      (FullPartName "CAP NP.Normal")
-      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\DISCRETE.OLB")
       (DeviceIndex "0")))
   (LastUsedLibraryBrowseDirectory "D:\OrCAD\tools\capture\library")
   (GlobalState
     (FileView
       (Path "Design Resources")
-      (Path "Design Resources" ".\triface.dsn")
-      (Path "Design Resources" ".\triface.dsn" "TRIFACE BOARD")
+      (Path "Design Resources"
+         "c:\documents and settings\batt\desktop\devtools\devlib\app\triface\doc\schematics\triface.dsn")
+      (Path "Design Resources"
+         "c:\documents and settings\batt\desktop\devtools\devlib\app\triface\doc\schematics\triface.dsn"
+         "TRIFACE BOARD")
       (Path "Outputs")
-      (Select "Design Resources" ".\triface.dsn" "TRIFACE BOARD" "CPU"))
+      (Select "Design Resources"
+         "c:\documents and settings\batt\desktop\devtools\devlib\app\triface\doc\schematics\triface.dsn"
+         "TRIFACE BOARD" "POWER SUPPLY"))
     (HierarchyView)
     (Doc
       (Type "COrCapturePMDoc")
       (Frame
-        (Placement "44 2 3 -1 -1 -4 -23 0 312 0 463"))
-      (Tab 0)))
+        (Placement "44 0 1 -1 -1 -4 -23 0 312 0 463"))
+      (Tab 0))
+    (Doc
+      (Type "COrSchematicDoc")
+      (Frame
+        (Placement "44 2 3 -1 -1 -4 -23 176 1170 176 796")
+        (Scroll "0 0")
+        (Zoom "119")
+        (Occurrence "/"))
+      (Path
+         "C:\DOCUMENTS AND SETTINGS\BATT\DESKTOP\DEVTOOLS\DEVLIB\APP\TRIFACE\DOC\SCHEMATICS\TRIFACE.DSN")
+      (Schematic "TRIFACE BOARD")
+      (Page "POWER SUPPLY")))
   (MPSSessionName "batt"))
