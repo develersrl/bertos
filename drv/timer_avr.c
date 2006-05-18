@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/05/18 00:37:58  bernie
+ *#* Don't include unneeded header hw.h.
+ *#*
  *#* Revision 1.1  2005/07/19 07:28:36  bernie
  *#* Refactor to decouple timer ticks from milliseconds.
  *#*
@@ -23,9 +26,7 @@
  *#*
  *#*/
 #include <drv/timer_avr.h>
-#include <arch_config.h> // ARCH_BOARD_KC
 #include <cfg/macros.h> // BV()
-#include <hw.h>
 
 #include <avr/signal.h>
 #include <avr/io.h>
