@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.27  2006/05/18 00:38:24  bernie
+ *#* Use hw_cpu.h instead of ubiquitous hw.h.
+ *#*
  *#* Revision 1.26  2006/02/21 21:28:02  bernie
  *#* New time handling based on TIMER_TICKS_PER_SEC to support slow timers with ticks longer than 1ms.
  *#*
@@ -43,8 +46,9 @@
 #ifndef DRV_TIMER_AVR_H
 #define DRV_TIMER_AVR_H
 
-#include <appconfig.h>  /* CONFIG_TIMER */
-#include <hw.h>
+#include <appconfig.h>     /* CONFIG_TIMER */
+#include <cfg/compiler.h>  /* uint8_t */
+#include <hw_cpu.h>        /* CLOCK_FREQ */
 
 /*!
  * \name Values for CONFIG_TIMER.
