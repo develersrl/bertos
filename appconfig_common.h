@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.1  2006/05/18 00:40:43  bernie
+ *#* Rename appconfig.h to appconfig_common.h.
+ *#*
  *#* Revision 1.11  2006/04/11 00:08:53  bernie
  *#* Add smooth scrolling for menus.
  *#*
@@ -120,6 +123,12 @@
 	/*! [bytes] Size of the inbound FIFO buffer for port 1. */
 	#define CONFIG_UART1_RXBUFSIZE  64
 
+	/*! [bytes] Size of the outbound FIFO buffer for SPI port (AVR only). */
+	#define CONFIG_SPI_TXBUFSIZE	16
+
+	/*! [bytes] Size of the inbound FIFO buffer for SPI port (AVR only). */
+	#define CONFIG_SPI_RXBUFSIZE	32
+
 	/*! Default transmit timeout (ms). Set to -1 to disable timeout support */
 	#define CONFIG_SER_TXTIMEOUT    -1
 
@@ -146,23 +155,6 @@
 	#define CONFIG_SER_TXFILL        0
 
 	#define CONFIG_SER_STROBE        0
-/*\}*/
-
-/*!
- * \name KBus configuration
- * \{
- */
-	/*! Board address for KBus */
-	#define CONFIG_KBUS_ADDR KBUS_ADDR_FOOBAR
-
-	/*! Disable KBUS escaping support */
-	#define CONFIG_KBUS_ESCAPE  0
-
-	/*! Serial port for internal KBUS communication */
-	#define CONFIG_KBUS_PORT  0
-
-	/*! Serial port speed for KBus communication */
-	#define CONFIG_KBUS_BAUDRATE  19200
 /*\}*/
 
 //! Hardware timer selection for drv/timer.c
