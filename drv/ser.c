@@ -28,6 +28,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.29  2006/05/18 00:39:30  bernie
+ *#* ser_open(): Document a bit more.
+ *#*
  *#* Revision 1.28  2006/02/17 22:23:06  bernie
  *#* Update POSIX serial emulator.
  *#*
@@ -473,7 +476,9 @@ void ser_drain(struct Serial *ser)
 
 
 /*!
- * Initialize serial
+ * Initialize a serial port.
+ *
+ * \param unit  Serial unit to open. Possible values are architecture dependant.
  */
 struct Serial *ser_open(unsigned int unit)
 {
