@@ -29,6 +29,14 @@
       (Type "Report")))
   (Folder "Referenced Projects")
   (PartMRUSelector
+    (ICL7642
+      (FullPartName "ICL7642.Normal")
+      (LibraryName "C:\PROGRAMMI\ORCAD\TOOLS\CAPTURE\LIBRARY\OPAMP.OLB")
+      (DeviceIndex "0"))
+    (LM324
+      (FullPartName "LM324.Normal")
+      (LibraryName "C:\PROGRAMMI\ORCAD\TOOLS\CAPTURE\LIBRARY\OPAMP.OLB")
+      (DeviceIndex "0"))
     (CON4
       (FullPartName "CON4.Normal")
       (LibraryName "C:\PROGRAMMI\ORCAD\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
@@ -115,14 +123,6 @@
     (CON20A
       (FullPartName "CON20A.Normal")
       (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
-      (DeviceIndex "0"))
-    (CON16
-      (FullPartName "CON16.Normal")
-      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
-      (DeviceIndex "0"))
-    (INDUCTOR
-      (FullPartName "INDUCTOR.Normal")
-      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\DISCRETE.OLB")
       (DeviceIndex "0")))
   (LastUsedLibraryBrowseDirectory
      "C:\Documents and Settings\Administrator\Desktop\src\devtools\cadlib")
@@ -134,11 +134,25 @@
       (Path "Design Resources"
          "C:\Documents and Settings\Administrator\Desktop\src\devtools\devlib\app\triface\doc\schematics\triface.dsn"
          "TRIFACE BOARD")
-      (Path "Outputs"))
+      (Path "Outputs")
+      (Select "Design Resources"
+         "C:\Documents and Settings\Administrator\Desktop\src\devtools\devlib\app\triface\doc\schematics\triface.dsn"
+         "TRIFACE BOARD" "ANALOG"))
     (HierarchyView)
     (Doc
       (Type "COrCapturePMDoc")
       (Frame
-        (Placement "44 2 3 -1 -1 -4 -23 0 312 0 463"))
-      (Tab 0)))
+        (Placement "44 0 1 -1 -1 -4 -23 0 312 0 463"))
+      (Tab 0))
+    (Doc
+      (Type "COrSchematicDoc")
+      (Frame
+        (Placement "44 0 1 -1 -1 -4 -23 66 976 66 570")
+        (Scroll "0 90")
+        (Zoom "100")
+        (Occurrence "/"))
+      (Path
+         "C:\DOCUMENTS AND SETTINGS\ADMINISTRATOR\DESKTOP\SRC\DEVTOOLS\DEVLIB\APP\TRIFACE\DOC\SCHEMATICS\TRIFACE.DSN")
+      (Schematic "TRIFACE BOARD")
+      (Page "ANALOG")))
   (MPSSessionName "Administrator"))
