@@ -29,6 +29,25 @@
       (Type "Report")))
   (Folder "Referenced Projects")
   (PartMRUSelector
+    (CON4
+      (FullPartName "CON4.Normal")
+      (LibraryName "C:\PROGRAMMI\ORCAD\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
+      (DeviceIndex "0"))
+    (JUMPER
+      (FullPartName "JUMPER.Normal")
+      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
+      (DeviceIndex "0"))
+    ("SW PUSHBUTTON"
+      (FullPartName "SW PUSHBUTTON.Normal")
+      (LibraryName "C:\PROGRAMMI\ORCAD\TOOLS\CAPTURE\LIBRARY\DISCRETE.OLB")
+      (DeviceIndex "0"))
+    (PORTRIGHT-L
+      (LibraryName "C:\PROGRAMMI\ORCAD\TOOLS\CAPTURE\LIBRARY\CAPSYM.OLB")
+      (DeviceIndex "0"))
+    (MAX690
+      (FullPartName "MAX690.Normal")
+      (LibraryName "C:\PROGRAMMI\ORCAD\TOOLS\CAPTURE\LIBRARY\MISCPOWER.OLB")
+      (DeviceIndex "0"))
     (GND_SIGNAL
       (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\CAPSYM.OLB")
       (DeviceIndex "0"))
@@ -36,9 +55,6 @@
       (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\CAPSYM.OLB")
       (DeviceIndex "0"))
     (PORTRIGHT-R
-      (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\CAPSYM.OLB")
-      (DeviceIndex "0"))
-    (PORTRIGHT-L
       (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\CAPSYM.OLB")
       (DeviceIndex "0"))
     (74HC595
@@ -104,40 +120,28 @@
       (FullPartName "CON16.Normal")
       (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
       (DeviceIndex "0"))
-    (JUMPER
-      (FullPartName "JUMPER.Normal")
-      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
-      (DeviceIndex "0"))
     (INDUCTOR
       (FullPartName "INDUCTOR.Normal")
       (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\DISCRETE.OLB")
-      (DeviceIndex "0"))
-    (LM358
-      (FullPartName "LM358.Normal")
-      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\OPAMP.OLB")
-      (DeviceIndex "0"))
-    ("HEADER 2"
-      (FullPartName "HEADER 2.Normal")
-      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
-      (DeviceIndex "0"))
-    (D
-      (FullPartName "D.Normal")
-      (LibraryName "H:\SRC\WIN\DEVTOOLS\CADLIB\DEVELER.OLB")
       (DeviceIndex "0")))
-  (LastUsedLibraryBrowseDirectory "D:\OrCAD\tools\capture\library")
+  (LastUsedLibraryBrowseDirectory
+     "C:\Documents and Settings\Administrator\Desktop\src\devtools\cadlib")
   (GlobalState
     (FileView
       (Path "Design Resources")
       (Path "Design Resources"
-         "c:\documents and settings\batt\desktop\devtools\devlib\app\triface\doc\schematics\triface.dsn")
+         "C:\Documents and Settings\Administrator\Desktop\src\devtools\devlib\app\triface\doc\schematics\triface.dsn")
       (Path "Design Resources"
-         "c:\documents and settings\batt\desktop\devtools\devlib\app\triface\doc\schematics\triface.dsn"
+         "C:\Documents and Settings\Administrator\Desktop\src\devtools\devlib\app\triface\doc\schematics\triface.dsn"
          "TRIFACE BOARD")
-      (Path "Outputs"))
+      (Path "Outputs")
+      (Select "Design Resources"
+         "C:\Documents and Settings\Administrator\Desktop\src\devtools\devlib\app\triface\doc\schematics\triface.dsn"
+         "TRIFACE BOARD" "CPU"))
     (HierarchyView)
     (Doc
       (Type "COrCapturePMDoc")
       (Frame
-        (Placement "44 0 1 -1 -1 -4 -23 0 312 0 463"))
+        (Placement "44 2 3 -1 -1 -4 -23 0 312 0 463"))
       (Tab 0)))
-  (MPSSessionName "batt"))
+  (MPSSessionName "Administrator"))
