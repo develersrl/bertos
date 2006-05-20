@@ -134,10 +134,7 @@
       (Path "Design Resources"
          "C:\Documents and Settings\Administrator\Desktop\src\devtools\devlib\app\triface\doc\schematics\triface.dsn"
          "TRIFACE BOARD")
-      (Path "Outputs")
-      (Select "Design Resources"
-         "C:\Documents and Settings\Administrator\Desktop\src\devtools\devlib\app\triface\doc\schematics\triface.dsn"
-         "TRIFACE BOARD" "CPU"))
+      (Path "Outputs"))
     (HierarchyView)
     (Doc
       (Type "COrCapturePMDoc")
