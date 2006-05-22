@@ -31,6 +31,10 @@
       (Type "Report")))
   (Folder "Referenced Projects")
   (PartMRUSelector
+    (JUMPER
+      (FullPartName "JUMPER.Normal")
+      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
+      (DeviceIndex "0"))
     (74HC7540
       (FullPartName "74HC7540.Normal")
       (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\GATE.OLB")
@@ -58,10 +62,6 @@
     (CON4
       (FullPartName "CON4.Normal")
       (LibraryName "C:\PROGRAMMI\ORCAD\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
-      (DeviceIndex "0"))
-    (JUMPER
-      (FullPartName "JUMPER.Normal")
-      (LibraryName "D:\ORCAD\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
       (DeviceIndex "0"))
     ("SW PUSHBUTTON"
       (FullPartName "SW PUSHBUTTON.Normal")
