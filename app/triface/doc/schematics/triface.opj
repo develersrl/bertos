@@ -23,12 +23,30 @@
     (BOM_Include_File "H:\SRC\WIN\TRIFACE\TRIFACE.INC")
     (BOM_Include_File_Combine_7.0 "{Item}\t{Quantity}\t{Reference}\t{Value}")
     (BOM_One_Part_Per_Line "FALSE")
-    (BOM_View_Output "FALSE"))
+    (BOM_View_Output "FALSE")
+    (Annotate_Page_Order "0")
+    (ANNOTATE_IncludeNonPrimitive "FALSE"))
   (Folder "Outputs"
     (File ".\triface.bom"
       (Type "Report")))
   (Folder "Referenced Projects")
   (PartMRUSelector
+    (74HC7540
+      (FullPartName "74HC7540.Normal")
+      (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\GATE.OLB")
+      (DeviceIndex "0"))
+    (CON10
+      (FullPartName "CON10.Normal")
+      (LibraryName "H:\SRC\DEVTOOLS\CADLIB\DEVELER.OLB")
+      (DeviceIndex "0"))
+    (D
+      (FullPartName "D.Normal")
+      (LibraryName "H:\SRC\WIN\DEVTOOLS\CADLIB\DEVELER.OLB")
+      (DeviceIndex "0"))
+    (CON6
+      (FullPartName "CON6.Normal")
+      (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
+      (DeviceIndex "0"))
     (ICL7642
       (FullPartName "ICL7642.Normal")
       (LibraryName "C:\PROGRAMMI\ORCAD\TOOLS\CAPTURE\LIBRARY\OPAMP.OLB")
@@ -107,22 +125,6 @@
     (BUZZER
       (FullPartName "BUZZER.Normal")
       (LibraryName "H:\SRC\DEVTOOLS\CADLIB\DEVELER.OLB")
-      (DeviceIndex "0"))
-    (NPN
-      (FullPartName "NPN.Normal")
-      (LibraryName "H:\SRC\DEVTOOLS\CADLIB\DEVELER.OLB")
-      (DeviceIndex "0"))
-    (R
-      (FullPartName "R.Normal")
-      (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\DISCRETE.OLB")
-      (DeviceIndex "0"))
-    (CON10
-      (FullPartName "CON10.Normal")
-      (LibraryName "H:\SRC\DEVTOOLS\CADLIB\DEVELER.OLB")
-      (DeviceIndex "0"))
-    (CON20A
-      (FullPartName "CON20A.Normal")
-      (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
       (DeviceIndex "0")))
   (LastUsedLibraryBrowseDirectory
      "C:\Documents and Settings\Administrator\Desktop\src\devtools\cadlib")
@@ -130,29 +132,18 @@
     (FileView
       (Path "Design Resources")
       (Path "Design Resources"
-         "C:\Documents and Settings\Administrator\Desktop\src\devtools\devlib\app\triface\doc\schematics\triface.dsn")
+         "c:\documents and settings\batt\desktop\devtools\devlib\app\triface\doc\schematics\triface.dsn")
       (Path "Design Resources"
-         "C:\Documents and Settings\Administrator\Desktop\src\devtools\devlib\app\triface\doc\schematics\triface.dsn"
+         "c:\documents and settings\batt\desktop\devtools\devlib\app\triface\doc\schematics\triface.dsn"
          "TRIFACE BOARD")
       (Path "Outputs")
       (Select "Design Resources"
-         "C:\Documents and Settings\Administrator\Desktop\src\devtools\devlib\app\triface\doc\schematics\triface.dsn"
-         "TRIFACE BOARD" "ANALOG"))
+         "c:\documents and settings\batt\desktop\devtools\devlib\app\triface\doc\schematics\triface.dsn"
+         "TRIFACE BOARD" "CPU"))
     (HierarchyView)
     (Doc
       (Type "COrCapturePMDoc")
       (Frame
-        (Placement "44 0 1 -1 -1 -4 -23 0 312 0 463"))
-      (Tab 0))
-    (Doc
-      (Type "COrSchematicDoc")
-      (Frame
-        (Placement "44 0 1 -1 -1 -4 -23 66 976 66 570")
-        (Scroll "0 90")
-        (Zoom "100")
-        (Occurrence "/"))
-      (Path
-         "C:\DOCUMENTS AND SETTINGS\ADMINISTRATOR\DESKTOP\SRC\DEVTOOLS\DEVLIB\APP\TRIFACE\DOC\SCHEMATICS\TRIFACE.DSN")
-      (Schematic "TRIFACE BOARD")
-      (Page "ANALOG")))
-  (MPSSessionName "Administrator"))
+        (Placement "44 2 3 -1 -1 -4 -23 0 312 0 463"))
+      (Tab 0)))
+  (MPSSessionName "batt"))
