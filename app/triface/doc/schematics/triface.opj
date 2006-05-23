@@ -139,11 +139,22 @@
       (Path "Outputs")
       (Select "Design Resources"
          "c:\documents and settings\batt\desktop\devtools\devlib\app\triface\doc\schematics\triface.dsn"
-         "TRIFACE BOARD" "POWER SUPPLY"))
+         "TRIFACE BOARD" "ANALOG"))
     (HierarchyView)
     (Doc
       (Type "COrCapturePMDoc")
       (Frame
-        (Placement "44 2 3 -1 -1 -4 -23 0 312 0 463"))
-      (Tab 0)))
+        (Placement "44 0 1 -1 -1 -4 -23 0 312 0 463"))
+      (Tab 0))
+    (Doc
+      (Type "COrSchematicDoc")
+      (Frame
+        (Placement "44 2 3 -1 -1 -4 -23 66 1106 66 538")
+        (Scroll "0 0")
+        (Zoom "100")
+        (Occurrence "/"))
+      (Path
+         "C:\DOCUMENTS AND SETTINGS\BATT\DESKTOP\DEVTOOLS\DEVLIB\APP\TRIFACE\DOC\SCHEMATICS\TRIFACE.DSN")
+      (Schematic "TRIFACE BOARD")
+      (Page "ANALOG")))
   (MPSSessionName "batt"))
