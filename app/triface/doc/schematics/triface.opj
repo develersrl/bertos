@@ -31,6 +31,10 @@
       (Type "Report")))
   (Folder "Referenced Projects")
   (PartMRUSelector
+    (CON34A
+      (FullPartName "CON34A.Normal")
+      (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\CONNECTOR.OLB")
+      (DeviceIndex "0"))
     (GND_SIGNAL
       (LibraryName "C:\ORCAD\ORCAD_10.5\TOOLS\CAPTURE\LIBRARY\CAPSYM.OLB")
       (DeviceIndex "0"))
@@ -121,18 +125,17 @@
     (LED
       (FullPartName "LED.Normal")
       (LibraryName "H:\SRC\PROJ_XXX\DOC\BOARD\FRANCESC.OLB")
-      (DeviceIndex "0"))
-    (BUZZER
-      (FullPartName "BUZZER.Normal")
-      (LibraryName "H:\SRC\DEVTOOLS\CADLIB\DEVELER.OLB")
       (DeviceIndex "0")))
   (LastUsedLibraryBrowseDirectory
      "C:\Documents and Settings\Administrator\Desktop\src\devtools\cadlib")
   (GlobalState
     (FileView
       (Path "Design Resources")
-      (Path "Design Resources" ".\triface.dsn")
-      (Path "Design Resources" ".\triface.dsn" "TRIFACE BOARD")
+      (Path "Design Resources"
+         "c:\documents and settings\batt\desktop\devtools\devlib\app\triface\doc\schematics\triface.dsn")
+      (Path "Design Resources"
+         "c:\documents and settings\batt\desktop\devtools\devlib\app\triface\doc\schematics\triface.dsn"
+         "TRIFACE BOARD")
       (Path "Outputs"))
     (HierarchyView)
     (Doc
@@ -144,8 +147,8 @@
       (Type "COrSchematicDoc")
       (Frame
         (Placement "44 2 3 -1 -1 -4 -23 44 1084 44 516")
-        (Scroll "0 0")
-        (Zoom "100")
+        (Scroll "966 240")
+        (Zoom "200")
         (Occurrence "/"))
       (Path
          "C:\DOCUMENTS AND SETTINGS\BATT\DESKTOP\DEVTOOLS\DEVLIB\APP\TRIFACE\DOC\SCHEMATICS\TRIFACE.DSN")
