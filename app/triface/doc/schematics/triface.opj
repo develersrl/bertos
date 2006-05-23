@@ -139,7 +139,7 @@
       (Path "Outputs")
       (Select "Design Resources"
          "c:\documents and settings\batt\desktop\devtools\devlib\app\triface\doc\schematics\triface.dsn"
-         "TRIFACE BOARD" "CPU"))
+         "TRIFACE BOARD" "POWER SUPPLY"))
     (HierarchyView)
     (Doc
       (Type "COrCapturePMDoc")
