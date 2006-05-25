@@ -15,7 +15,7 @@ if ($#ARGV < 0) {
 	exit -1;
 }
 
-$LAST_CHAR = 0x7e;
+$LAST_CHAR = 0xff;
 $IMAGE_BITS = 8;
 $IMAGE_NIBBLES = $IMAGE_BITS/4;
 $IMAGE_MASK = 0xff;
