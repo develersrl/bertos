@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/05/25 23:34:38  bernie
+ *#* Implement menu timeouts.
+ *#*
  *#* Revision 1.1  2006/05/15 07:20:54  bernie
  *#* Move menu to gui/.
  *#*
@@ -36,51 +39,6 @@
  *#*
  *#* Revision 1.2  2006/02/15 09:10:51  bernie
  *#* Make title bold; Fix height when we have no menubar.
- *#*
- *#* Revision 1.1  2006/02/10 12:29:36  bernie
- *#* Add menu system.
- *#*
- *#* Revision 1.48  2005/11/27 23:02:55  bernie
- *#* Move graphics modules from mware/ to gfx/.
- *#*
- *#* Revision 1.47  2005/11/16 18:10:19  bernie
- *#* Move top-level headers to cfg/ as in DevLib.
- *#*
- *#* Revision 1.46  2005/02/17 03:49:21  bernie
- *#* Update to new PGM api.
- *#*
- *#* Revision 1.45  2005/02/11 19:11:32  aleph
- *#* Move menu_displaymsg() in new displaymsg module
- *#*
- *#* Revision 1.44  2005/01/21 20:05:57  aleph
- *#* Fix build warning with debug off
- *#*
- *#* Revision 1.43  2005/01/13 16:56:36  aleph
- *#* Fix progmem includes.
- *#*
- *#* Revision 1.42  2004/10/31 11:02:15  aleph
- *#* Rename functions with correct codying conventions; Simplify version display
- *#*
- *#* Revision 1.41  2004/10/15 17:34:33  customer_pw
- *#* Fix menuitem max length
- *#*
- *#* Revision 1.40  2004/10/06 12:55:08  customer_pw
- *#* Declare unused (if !_DEBUG) menu_count()
- *#*
- *#* Revision 1.39  2004/10/01 14:04:59  customer_pw
- *#* Add accessor functions for menu flags
- *#*
- *#* Revision 1.38  2004/09/27 12:05:46  customer_pw
- *#* Use sel label for toggle menus and remove it
- *#*
- *#* Revision 1.37  2004/09/27 10:05:33  customer_pw
- *#* Menu cosmetic fixes
- *#*
- *#* Revision 1.36  2004/09/14 22:18:03  bernie
- *#* Adapt to stricter casting rules.
- *#*
- *#* Revision 1.35  2004/09/12 17:56:03  aleph
- *#* Include debug.h instead of drv/kdebug.h
  *#*/
 
 #include "menu.h"
@@ -99,6 +57,10 @@
 
 #if CONFIG_MENU_SMOOTH
 #include <drv/lcd_gfx.h>
+#endif
+
+#if (CONFIG_MENU_TIMEOUT != 0)
+#include <drv/timer.h>
 #endif
 
 #if CONFIG_MENU_MENUBAR
@@ -207,13 +169,12 @@ static void menu_layout(
 #if CONFIG_MENU_SMOOTH
 	static coord_t yoffset = 0;
 	static int old_first_item = 0;
-	static mtime_t old_time = 0; //UNUSED
 	static int speed;
 	coord_t old_ymin = bm->cr.ymin;
 
 	gfx_setClipRect(bm,
 		bm->cr.xmin, bm->cr.ymin + ypos,
-		bm->cr.xmax, bm->cr.ymax);
+		bm->cr.xmax, MIN(bm->cr.ymax, bm->cr.ymin + ypos + items_per_page * bm->font->height));
 
 	if (old_first_item != first_item)
 	{
@@ -238,8 +199,9 @@ static void menu_layout(
 			}
 		}
 		first_item = old_first_item;
+
+		ypos += yoffset;
 	}
-	ypos += yoffset;
 #endif
 
 	for (cnt = 0; cnt < items_per_page; ++cnt)
@@ -383,13 +345,17 @@ static int menu_prev_visible_item(const struct Menu *menu, int index)
 }
 
 
-/*!
+/**
  * Handle a menu and invoke hook functions for the selected menu items.
  */
 iptr_t menu_handle(const struct Menu *menu)
 {
 	uint8_t items_per_page;
 	uint8_t first_item, selected;
+
+#if (CONFIG_MENU_TIMEOUT != 0)
+	ticks_t now, menu_idle_time = timer_clock();
+#endif
 
 #if CONFIG_MENU_MENUBAR
 	struct MenuBar mb;
@@ -442,11 +408,18 @@ iptr_t menu_handle(const struct Menu *menu)
 			menu_update_menubar(menu, &mb, selected);
 		#endif
 
-#if CONFIG_MENU_SMOOTH
-		key = kbd_peek();
-#else
-		key = kbd_get();
-#endif
+		#if CONFIG_MENU_SMOOTH || (CONFIG_MENU_TIMEOUT != 0)
+			key = kbd_peek();
+		#else
+			key = kbd_get();
+		#endif
+
+		#if (CONFIG_MENU_TIMEOUT != 0)
+			/* Reset idle timer on key press. */
+			now = timer_clock();
+			if (key)
+				menu_idle_time = now;
+		#endif
 
 		if (key & K_OK)
 		{
@@ -481,7 +454,12 @@ iptr_t menu_handle(const struct Menu *menu)
 		{
 			selected = menu_next_visible_item(menu, selected);
 		}
-		else if (key & K_CANCEL && !(menu->flags & MF_TOPLEVEL))
+		else if (((key & K_CANCEL)
+			#if CONFIG_MENU_TIMEOUT != 0
+				|| (now - menu_idle_time > ms_to_ticks(CONFIG_MENU_TIMEOUT))
+			#endif
+				) && !(menu->flags & MF_TOPLEVEL)
+		)
 		{
 			/* Store currently selected item before leaving. */
 			if (menu->flags & MF_SAVESEL)
