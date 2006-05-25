@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/05/25 23:35:40  bernie
+ *#* Cleanup.
+ *#*
  *#* Revision 1.4  2006/03/22 09:50:37  bernie
  *#* Use the same format for fonts and rasters.
  *#*
@@ -42,6 +45,7 @@
 
 	#define RAST_ADDR(raster, x, y, stride)  ((raster) + ((y) / 8) * (stride) + (x))
 	#define RAST_MASK(raster, x, y)          (1 << ((y) % 8))
+
 #else
 	#error Unknown value of CONFIG_BITMAP_FMT
 #endif /* CONFIG_BITMAP_FMT */

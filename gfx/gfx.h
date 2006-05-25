@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.15  2006/05/25 23:35:40  bernie
+ *#* Cleanup.
+ *#*
  *#* Revision 1.14  2006/04/27 05:39:24  bernie
  *#* Enhance text rendering to arbitrary x,y coords.
  *#*
@@ -179,18 +182,19 @@ typedef struct Image
 	 * Compute the size in bytes of a raster suitable for
 	 * holding a bitmap of \a width x \a height pixels.
 	 */
-	#define RASTER_SIZE(width, height) ( ((width) + 7 / 8) * (height) )
+	#define RAST_SIZE(width, height) ( ((width) + 7 / 8) * (height) )
 
 #elif CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_V_LSB
 	/**
 	 * Compute the size in bytes of a raster suitable for
 	 * holding a bitmap of \a width x \a height pixels.
 	 */
-	#define RASTER_SIZE(width, height) ( (width) * (((height) + 7) / 8) )
+	#define RAST_SIZE(width, height) ( (width) * (((height) + 7) / 8) )
 #else
 	#error Unknown value of CONFIG_BITMAP_FMT
 #endif /* CONFIG_BITMAP_FMT */
 
+#define RASTER_SIZE RAST_SIZE /* OBSOLETE */
 
 /* Function prototypes */
 void gfx_bitmapInit (Bitmap *bm, uint8_t *raster, coord_t w, coord_t h);

@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2006/05/25 23:35:40  bernie
+ *#* Cleanup.
+ *#*
  *#* Revision 1.8  2006/03/27 04:48:56  bernie
  *#* gfx_blitImage(): New function; gfx_blitRaster(): Fix clipping bug.
  *#*
@@ -95,6 +98,7 @@ void gfx_bitmapInit(Bitmap *bm, uint8_t *raster, coord_t w, coord_t h)
  * Clear the whole bitmap surface to the background color.
  *
  * \note This function does \b not update the current pen position.
+ * \note This function bypasses the current clipping area.
  */
 void gfx_bitmapClear(Bitmap *bm)
 {
