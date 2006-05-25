@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.12  2006/05/25 23:35:22  bernie
+ *#* Implement correct and faster clipping for algo text.
+ *#*
  *#* Revision 1.11  2006/05/15 07:21:06  bernie
  *#* Doxygen fix.
  *#*
@@ -169,7 +172,7 @@ static int text_putglyph(char c, struct Bitmap *bm)
 
 	glyph_height = bm->font->height;
 	// FIXME: for vertical fonts only
-	glyph_height_bytes = ROUND_UP2(glyph_height, 8);
+	glyph_height_bytes = (glyph_height + 7) / 8;
 
 	if (bm->font->offset)
 	{
@@ -197,7 +200,19 @@ static int text_putglyph(char c, struct Bitmap *bm)
 		uint8_t styles = bm->styles;
 		uint8_t prev_dots = 0, italic_prev_dots = 0;
 		uint8_t dots;
-		uint8_t row, col;
+		uint8_t row, col, row_bit;
+
+		/*
+		 * To avoid repeating clipping and other expensive computations,
+		 * we cluster calls to gfx_blitRaster() using a small buffer.
+		 */
+		#define CONFIG_TEXT_RENDER_OPTIMIZE 1
+		#if CONFIG_TEXT_RENDER_OPTIMIZE
+			#define RENDER_BUF_WIDTH 12
+			#define RENDER_BUF_HEIGHT 8
+			uint8_t render_buf[RAST_SIZE(RENDER_BUF_WIDTH, RENDER_BUF_HEIGHT)];
+			uint8_t render_xpos = 0;
+		#endif
 
 		/* This style alone could be handled by the fast path too */
 		if (bm->styles & STYLEF_CONDENSED)
@@ -206,28 +221,19 @@ static int text_putglyph(char c, struct Bitmap *bm)
 		if (bm->styles & STYLEF_EXPANDED)
 			glyph_width *= 2;
 
-		/* Check if glyph fits in the bitmap. */
-		if ((bm->penX < 0) || (bm->penX + glyph_width > bm->width)
-			|| (bm->penY < 0) || (bm->penY + glyph_height > bm->height))
-		{
-			kprintf("bad coords x=%d y=%d\n", bm->penX, bm->penY);
-			return 0;
-		}
-
-		for (row = 0; row < glyph_height_bytes; ++row)
+		for (row = 0, row_bit = 0; row < glyph_height_bytes; ++row, row_bit += 8)
 		{
 			/* For each dot column in the glyph... */
 			for (col = 0; col < glyph_width; ++col)
 			{
 				uint8_t src_col = col;
-				uint8_t i;
 
 				/* Expanded style: advances only once every two columns. */
 				if (styles & STYLEF_EXPANDED)
 					src_col /= 2;
 
 				/* Fetch a column of dots from glyph. */
-				dots = PGM_READ_CHAR(RAST_ADDR(glyph, src_col, row * 8, glyph_width));
+				dots = PGM_READ_CHAR(RAST_ADDR(glyph, src_col, row_bit, glyph_width));
 
 				/* Italic: get lower 4 dots from previous column */
 				if (styles & STYLEF_ITALIC)
@@ -248,16 +254,40 @@ static int text_putglyph(char c, struct Bitmap *bm)
 				/* Underlined: turn on base pixel */
 				if ((styles & STYLEF_UNDERLINE)
 					&& (row == glyph_height_bytes - 1))
-					dots |= (1 << (glyph_height - row * 8 - 1));
+					dots |= (1 << (glyph_height - row_bit - 1));
 
 				/* Inverted: invert pixels */
 				if (styles & STYLEF_INVERT)
 					dots = ~dots;
 
 				/* Output dots */
-				for (i = 0; i < 8 && (row * 8) + i < glyph_height; ++i)
-					BM_DRAWPIXEL(bm, bm->penX + col, bm->penY + row * 8 + i, dots & (1<<i));
+				#if CONFIG_TEXT_RENDER_OPTIMIZE
+					render_buf[render_xpos++] = dots;
+					if (render_xpos == RENDER_BUF_WIDTH)
+					{
+						gfx_blitRaster(bm, bm->penX + col - render_xpos + 1, bm->penY + row_bit,
+							render_buf, render_xpos,
+							MIN((uint8_t)RENDER_BUF_HEIGHT, (uint8_t)(glyph_height - row_bit)),
+							RENDER_BUF_WIDTH);
+						render_xpos = 0;
+					}
+				#else
+					gfx_blitRaster(bm, bm->penX + col, bm->penY + row_bit,
+						&dots, 1, MIN((uint8_t)8, glyph_height - row_bit), 1);
+				#endif
 			}
+
+			#if CONFIG_TEXT_RENDER_OPTIMIZE
+				/* Flush out rest of render buffer */
+				if (render_xpos != 0)
+				{
+					gfx_blitRaster(bm, bm->penX + col - render_xpos, bm->penY + row_bit,
+						render_buf, render_xpos,
+						MIN((uint8_t)RENDER_BUF_HEIGHT, (uint8_t)(glyph_height - row_bit)),
+						RENDER_BUF_WIDTH);
+					render_xpos = 0;
+				}
+			#endif
 		}
 	}
 	else
