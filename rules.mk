@@ -10,6 +10,9 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
+# Revision 1.3  2006/05/27 22:42:24  bernie
+# Search for verstag.h in app subdirs first.
+#
 # Revision 1.2  2006/03/27 04:48:33  bernie
 # Add CXXFLAGS; Add recursive targets.
 #
@@ -138,25 +141,25 @@ OBJ         += $$($(1)_OBJ)
 $$($(1)_COBJ) : $$(OBJDIR)/$(1)/%.o : %.c
 	$L "$(1): Compiling $$< (C)"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(CC) -c $$(CFLAGS) $$($(1)_CFLAGS) $$< -o $$@
+	$Q $$(CC) -c $$($(1)_CFLAGS) $$(CFLAGS) $$< -o $$@
 
 # Compile: instructions to create assembler and/or object files from C++ source
 $$($(1)_CXXOBJ) : $$(OBJDIR)/$(1)/%.o : %.cpp
 	$L "$(1): Compiling $$< (C++)"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(CXX) -c $$(CXXFLAGS) $$($(1)_CXXFLAGS) $$< -o $$@
+	$Q $$(CXX) -c $$($(1)_CXXFLAGS) $$(CXXFLAGS) $$< -o $$@
 
 # Generate assembly sources from C files (debug)
 $$(OBJDIR)/$(1)/%.s : %.c
 	$L "$(1): Generating asm source $$<"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(CC) -S $$(CFLAGS) $$($(1)_CFLAGS) $$< -o $$@
+	$Q $$(CC) -S $$($(1)_CFLAGS) $$(CFLAGS) $$< -o $$@
 
 # Generate special progmem variant of a source file
 $$($(1)_PCOBJ) : $$(OBJDIR)/$(1)/%_P.o : %.c
 	$L "$(1): Compiling $$< (PROGMEM)"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(CC) -c -D_PROGMEM $$(CFLAGS) $$($(1)_CFLAGS) $$< -o $$@
+	$Q $$(CC) -c -D_PROGMEM $$($(1)_CFLAGS) $$(CFLAGS) $$< -o $$@
 
 # Assemble: instructions to create object file from assembler files
 $$($(1)_AOBJ): $$(OBJDIR)/$(1)/%.o : %.s
@@ -179,7 +182,7 @@ $$(OUTDIR)/$(1).elf: bumprev $$($(1)_OBJ) $$($(1)_LDSCRIPT)
 $$(OUTDIR)/$(1)_whole.elf: bumprev $$($(1)_SRC) $$($(1)_LDSCRIPT)
 	$L "$(1): Compiling and Linking whole program $$@"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(CC) $$($(1)_SRC) $$(CFLAGS) $$($(1)_CFLAGS) $$(LIB) $$(LDFLAGS) $$($(1)_LDFLAGS) -o $$@
+	$Q $$(CC) $$($(1)_SRC) $$($(1)_CFLAGS) $$(CFLAGS) $$(LIB) $$(LDFLAGS) $$($(1)_LDFLAGS) -o $$@
 
 # Flash target
 # NOTE: we retry in case of failure because the STK500 programmer is crappy
