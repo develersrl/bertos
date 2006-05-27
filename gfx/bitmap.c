@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2006/05/27 17:21:15  bernie
+ *#* Factor out, simplify and document clipping.
+ *#*
  *#* Revision 1.9  2006/05/25 23:35:40  bernie
  *#* Cleanup.
  *#*
@@ -122,6 +125,34 @@ void gfx_blit_P(Bitmap *bm, const pgm_uint8_t *raster)
 }
 #endif /* CPU_HARVARD */
 
+#if CONFIG_GFX_CLIPPING
+	/**
+	 * Clip destination coordinates inside a clipping range.
+	 *
+	 * This macro helps a drawing operation to adjust its
+	 * destination X and Y coordinates inside the destination
+	 * clipping range.
+	 *
+	 * The source start coordinate is adjusted as well
+	 * when destination start clipping occurs.
+	 */
+	#define gfx_clip(dmin, dmax, smin, cmin, cmax) \
+		do { \
+			if ((dmin) < (cmin)) \
+			{ \
+				(smin) += (cmin) - (dmin); \
+				(dmin) = (cmin); \
+			} \
+			(dmax) = MIN((dmax), (cmax)); \
+		} while(0)
+
+#else /* !CONFIG_GFX_CLIPPING */
+
+	#define gfx_clip(dmin, dmax, smin, cmin, cmax) do { } while (0)
+
+#endif /* !CONFIG_GFX_CLIPPING */
+
+
 /**
  * Copy a rectangular area of a bitmap on another bitmap.
  *
@@ -145,22 +176,19 @@ void gfx_blit(Bitmap *dst, const Rect *rect, const Bitmap *src, coord_t srcx, co
 	coord_t dx, dy, sx, sy;
 
 	/*
-	 * Clip coordinates inside dst->cr and src->width/height.
+	 * Pre-clip coordinates inside src->width/height.
 	 */
 	dxmin = rect->xmin;
-	if (dxmin < dst->cr.xmin)
-	{
-		srcx += dst->cr.xmin - dxmin;
-		dxmin = dst->cr.xmin;
-	}
 	dymin = rect->ymin;
-	if (dymin < dst->cr.ymin)
-	{
-		srcy += dst->cr.ymin - dymin;
-		dymin = dst->cr.ymin;
-	}
-	dxmax = MIN(MIN(rect->xmax, rect->xmin + src->width), dst->cr.xmax);
-	dymax = MIN(MIN(rect->ymax, rect->ymin + src->height), dst->cr.ymax);
+	dxmax = MIN(rect->xmax, rect->xmin + src->width);
+	dymax = MIN(rect->ymax, rect->ymin + src->height);
+
+	/* Perform regular clipping */
+	gfx_clip(dxmin, dxmax, srcx, dst->cr.xmin, dst->cr.xmax);
+	gfx_clip(dymin, dymax, srcy, dst->cr.ymin, dst->cr.ymax);
+
+	//kprintf("dxmin=%d, sxmin=%d, dxmax=%d; ", dxmin, sxmin, dxmax);
+	//kprintf("dymin=%d, symin=%d, dymax=%d\n", dymin, symin, dymax);
 
 	/* TODO: make it not as dog slow as this */
 	for (dx = dxmin, sx = srcx; dx < dxmax; ++dx, ++sx)
@@ -168,9 +196,10 @@ void gfx_blit(Bitmap *dst, const Rect *rect, const Bitmap *src, coord_t srcx, co
 			BM_DRAWPIXEL(dst, dx, dy, BM_READPIXEL(src, sx, sy));
 }
 
-
 /**
  * Blit a raster to a Bitmap.
+ *
+ * \todo Merge this function into gfx_blit()
  *
  * \see gfx_blit()
  */
@@ -181,21 +210,9 @@ void gfx_blitRaster(Bitmap *dst, coord_t dxmin, coord_t dymin,
 	coord_t sxmin = 0, symin = 0;
 	coord_t dx, dy, sx, sy;
 
-	/*
-	 * Clip coordinates inside dst->cr.
-	 */
-	if (dxmin < dst->cr.xmin)
-	{
-		sxmin += dst->cr.xmin - dxmin;
-		dxmin = dst->cr.xmin;
-	}
-	if (dymin < dst->cr.ymin)
-	{
-		symin += dst->cr.ymin - dymin;
-		dymin = dst->cr.ymin;
-	}
-	dxmax = MIN(dxmax, dst->cr.xmax);
-	dymax = MIN(dymax, dst->cr.ymax);
+	/* Perform regular clipping */
+	gfx_clip(dxmin, dxmax, sxmin, dst->cr.xmin, dst->cr.xmax);
+	gfx_clip(dymin, dymax, symin, dst->cr.ymin, dst->cr.ymax);
 
 	//kprintf("dxmin=%d, sxmin=%d, dxmax=%d; ", dxmin, sxmin, dxmax);
 	//kprintf("dymin=%d, symin=%d, dymax=%d\n", dymin, symin, dymax);
@@ -220,13 +237,15 @@ void gfx_blitImage(Bitmap *dst, coord_t dxmin, coord_t dymin, const Image *image
 }
 
 
-/*!
+#if CONFIG_GFX_CLIPPING
+
+/**
  * Set the bitmap clipping rectangle to the specified coordinates.
  *
  * All drawing performed on the bitmap will be clipped inside this
  * rectangle.
  *
- * \note Following the convention used in all other operations, the
+ * \note Following the convention used for all other operations, the
  *       top-left pixels of the rectangle are included, while the
  *       bottom-right pixels are considered outside the clipping region.
  */
@@ -244,8 +263,9 @@ void gfx_setClipRect(Bitmap *bm, coord_t minx, coord_t miny, coord_t maxx, coord
 	bm->cr.xmax = maxx;
 	bm->cr.ymax = maxy;
 
-/*	kprintf("cr.xmin = %d, cr.ymin = %d, cr.xmax = %d, cr.ymax = %d\n",
-		bm->cr.xMin, bm->cr.ymin, bm->cr.xmax, bm->cr.ymax);
-*/
+//	kprintf("cr.xmin = %d, cr.ymin = %d, cr.xmax = %d, cr.ymax = %d\n",
+//		bm->cr.xMin, bm->cr.ymin, bm->cr.xmax, bm->cr.ymax);
 }
+
+#endif /* CONFIG_GFX_CLIPPING */
 
