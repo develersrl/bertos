@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/05/27 17:17:34  bernie
+ *#* Optimize away divisions in RAST_ADDR/MASK macros.
+ *#*
  *#* Revision 1.5  2006/05/25 23:35:40  bernie
  *#* Cleanup.
  *#*
@@ -35,16 +38,23 @@
 #ifndef GFX_GFX_P_H
 #define GFX_GFX_P_H
 
+#include <gfx/gfx.h>
 
 #if CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_H_MSB
 
-	#define RAST_ADDR(raster, x, y, stride)  ((raster) + (y) * (stride) + (x) / 8)
-	#define RAST_MASK(raster, x, y)		 (1 << (7 - (x) % 8))
+	/* We use ucoord_t to let the compiler optimize away the division/modulo. */
+	#define RAST_ADDR(raster, x, y, stride) \
+			((raster) + (ucoord_t)(y) * (ucoord_t)(stride) + (ucoord_t)(x) / 8)
+	#define RAST_MASK(raster, x, y) \
+			(1 << (7 - (ucoord_t)(x) % 8))
 
 #elif CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_V_LSB
 
-	#define RAST_ADDR(raster, x, y, stride)  ((raster) + ((y) / 8) * (stride) + (x))
-	#define RAST_MASK(raster, x, y)          (1 << ((y) % 8))
+	/* We use ucoord_t to let the compiler optimize away the division/modulo. */
+	#define RAST_ADDR(raster, x, y, stride) \
+			((raster) + ((ucoord_t)(y) / 8) * (ucoord_t)(stride) + (ucoord_t)(x))
+	#define RAST_MASK(raster, x, y) \
+			(1 << ((ucoord_t)(y) % 8))
 
 #else
 	#error Unknown value of CONFIG_BITMAP_FMT

@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.16  2006/05/27 17:17:34  bernie
+ *#* Optimize away divisions in RAST_ADDR/MASK macros.
+ *#*
  *#* Revision 1.15  2006/05/25 23:35:40  bernie
  *#* Cleanup.
  *#*
@@ -78,6 +81,7 @@ EXTERN_C_BEGIN
 
 /*! Common type for coordinates expressed in pixel units */
 typedef int coord_t;
+typedef unsigned int ucoord_t;
 
 #if CONFIG_GFX_VCOORDS
 /*! Common type for coordinates expressed in logical units */
@@ -126,8 +130,11 @@ typedef struct Rect { coord_t xmin, ymin, xmax, ymax; } Rect;
 /* Fwd decl */
 struct Font;
 
-/*!
+/**
  * Control structure to draw in a bitmap
+ *
+ * \todo For better ortogonality, split this structure into
+ *       an Image and a plain drawing context called Painter.
  */
 typedef struct Bitmap
 {
