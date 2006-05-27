@@ -10,6 +10,9 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
+# Revision 1.4  2006/05/27 22:41:46  bernie
+# Tweak optimization flags for loops.
+#
 # Revision 1.3  2006/05/18 00:40:10  bernie
 # Setup for AVR development.
 #
@@ -33,19 +36,18 @@ DPROG = -V -c stk500 -P /dev/ttyS0
 # PonyProg serial programmer
 #DPROG = -c dasa2
 
-#OPTCFLAGS = -O3 # DANGER - DO NOT USE - DOESN'T WORK WITH 3.4.1 & 3.5 (HEAD)
-OPTCFLAGS = -ffunction-sections -fdata-sections 
+OPTCFLAGS = -ffunction-sections -fdata-sections -funsafe-loop-optimizations
 
 # For AVRStudio
 #DEBUGCFLAGS = -gdwarf-2
 
 # For GDB
-#DEBUGCFLAGS = -g
+DEBUGCFLAGS = -ggdb
 
 #
 # define some variables based on the AVR base path in $(AVR)
 #
-CROSS   = avr-
+CROSS   = 
 CC      = $(CROSS)gcc
 AS      = $(CC) -x assembler-with-cpp
 LD      = $(CC)
@@ -92,7 +94,8 @@ WARNFLAGS = \
 	-W -Wformat -Wall -Wundef -Wpointer-arith -Wcast-qual \
 	-Wcast-align -Wwrite-strings -Wsign-compare \
 	-Wmissing-prototypes -Wmissing-noreturn \
-	-Wextra -Wstrict-aliasing=2
+	-Wextra -Wstrict-aliasing=2 \
+	-Wunsafe-loop-optimizations
 
 # Compiler warning flags for C only
 C_WARNFLAGS = \
