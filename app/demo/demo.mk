@@ -8,6 +8,9 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
+# Revision 1.5  2006/05/27 22:42:02  bernie
+# Add verstag.
+#
 # Revision 1.4  2006/05/27 17:16:38  bernie
 # Make demos a bit more interesting.
 #
@@ -66,7 +69,8 @@ demo_CSRC = \
 	kern/proc.c \
 	kern/sem.c \
 	kern/signal.c \
-	kern/monitor.c
+	kern/monitor.c \
+	verstag.c
 
 demo_ASRC = \
 	kern/switch_x86_64.s
