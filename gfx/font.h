@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/05/27 22:31:34  bernie
+ *#* Switch to a smaller default fount.
+ *#*
  *#* Revision 1.5  2006/03/13 02:06:04  bernie
  *#* FONT_HAS_GLYPH(): New macro.
  *#*
@@ -88,7 +91,7 @@ typedef struct Font
 
 
 /** The default font. */
-#define default_font font_ncenB18
+#define default_font font_luBS14
 extern const struct Font default_font;
 
 #endif /* GFX_FONT_H */
