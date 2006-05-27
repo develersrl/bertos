@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/05/27 22:30:56  bernie
+ *#* Add some delay to slow things down.
+ *#*
  *#* Revision 1.4  2006/02/24 01:35:40  bernie
  *#* Update for new emulator.
  *#*
@@ -120,5 +123,6 @@ extern "C" void emul_idle()
 {
 	// We process GUI events when the application is idle.
 	emul->emulApp->processEvents();
+	usleep(1000);
 }
 
