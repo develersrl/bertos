@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.1  2006/05/27 22:30:22  bernie
+ *#* Move 6x8 font to fonts/.
+ *#*
  *#* Revision 1.3  2006/02/10 12:29:05  bernie
  *#* Add multiple font support in bitmaps.
  *#*
