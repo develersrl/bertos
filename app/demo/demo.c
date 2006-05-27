@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2006/05/27 22:31:18  bernie
+ *#* Clean it up a bit more.
+ *#*
  *#* Revision 1.6  2006/05/27 17:16:38  bernie
  *#* Make demos a bit more interesting.
  *#*
@@ -51,6 +54,18 @@
 #include <icons/logo.h>
 #include <cfg/macros.h>
 
+/**
+ * Draw a pentacle in the provided bitmap.
+ */
+void schedule(void)
+{
+	lcd_blitBitmap(&lcd_bitmap);
+	emul_idle();
+}
+
+/**
+ * Draw a pentacle in the provided bitmap.
+ */
 static void magic(struct Bitmap *bitmap, coord_t x, coord_t y)
 {
 	static const coord_t coords[] = { 120, 34, 90, 90, 30, 90, 0, 34, 60, 0, 90, 90, 0, 34, 120, 34, 30, 90, 60, 0 };
@@ -59,16 +74,6 @@ static void magic(struct Bitmap *bitmap, coord_t x, coord_t y)
 	gfx_moveTo(bitmap, coords[countof(coords)-2]/2 + x, coords[countof(coords)-1]/3 + y);
 	for (i = 0; i < countof(coords); i += 2)
 		gfx_lineTo(bitmap, coords[i]/2 + x, coords[i+1]/3 + y);
-}
-
-Window root_win;
-
-void schedule(void)
-{
-//	win_compose(&root_win);
-	lcd_blitBitmap(&lcd_bitmap);
-	emul_idle();
-	usleep(10000);
 }
 
 void hello_world(Bitmap *bm)
@@ -84,11 +89,8 @@ void hello_world(Bitmap *bm)
 	text_xprintf(bm, 1, 0, STYLEF_BOLD | TEXT_FILL | TEXT_CENTER,
 			"Hello, world!");
 
-	for (int i = 0; i < 1000; ++i)
-	{
-		lcd_blitBitmap(bm);
-		emul_idle();
-	}
+	lcd_blitBitmap(bm);
+	timer_delay(1000);
 
 	/* Restore old font */
     gfx_setFont(bm, old_font);
@@ -138,7 +140,7 @@ void win_demo(Bitmap *bm)
 	const coord_t small_left = 45, small_top = 30, small_width = 50, small_height = 30;
 	const coord_t large_left = -10, large_top = 10, large_width = 85, large_height = 41;
 
-	Window small_win, large_win;
+	Window root_win, small_win, large_win;
 	Bitmap small_bm, large_bm;
 	uint8_t small_raster[RASTER_SIZE(small_width, small_height)];
 	uint8_t large_raster[RASTER_SIZE(large_width, large_height)];
@@ -165,15 +167,13 @@ void win_demo(Bitmap *bm)
 
 	for(;;)
 	{
-		if (kbd_peek())
-			break;
-
 		/* Background animation */
+		bm = root_win.bitmap;
 		gfx_bitmapClear(bm);
-/*		gfx_setClipRect(bm, 0, 0, bm->width, bm->height);
-		gfx_rectDraw(bm, 10, 10, bm->width-10, bm->height-10);
-		gfx_setClipRect(bm, 11, 11, bm->width-11, bm->height-11);
-*/		magic(bm, x, y);
+//		gfx_setClipRect(bm, 0, 0, bm->width, bm->height);
+//		gfx_rectDraw(bm, 10, 10, bm->width-10, bm->height-10);
+//		gfx_setClipRect(bm, 11, 11, bm->width-11, bm->height-11);
+		magic(bm, x, y);
 		x += xdir;
 		y += ydir;
 		if (x >= bm->width)  xdir = -1;
@@ -211,9 +211,10 @@ void win_demo(Bitmap *bm)
 			win_raise(&large_win);
 
 		win_compose(&root_win);
-		lcd_blitBitmap(root_win.bitmap);
-		emul_idle();
-		usleep(10000);
+
+		/* Also does LCD refresh, etc. */
+		if (kbd_peek())
+			break;
 	}
 }
 
@@ -260,10 +261,12 @@ static struct Menu setup_menu = { setup_items, "Setup Menu", MF_STICKY | MF_SAVE
 
 static struct MenuItem main_items[] =
 {
-	{ (const_iptr_t)"Flying Win", 0, (MenuHook)win_demo, (iptr_t)&lcd_bitmap },
-	{ (const_iptr_t)"Settings", 0, (MenuHook)menu_handle, (iptr_t)&settings_menu },
-	{ (const_iptr_t)"Display", 0, (MenuHook)menu_handle, (iptr_t)&display_menu  },
-	{ (const_iptr_t)"Setup",   0, (MenuHook)menu_handle, (iptr_t)&setup_menu    },
+	{ (const_iptr_t)"Win Fly",     0, (MenuHook)win_demo,     (iptr_t)&lcd_bitmap    },
+	{ (const_iptr_t)"Bounce!",     0, (MenuHook)bouncing_logo,(iptr_t)&lcd_bitmap    },
+	{ (const_iptr_t)"Hello World", 0, (MenuHook)hello_world,  (iptr_t)&lcd_bitmap    },
+	{ (const_iptr_t)"Settings",    0, (MenuHook)menu_handle,  (iptr_t)&settings_menu },
+	{ (const_iptr_t)"Display",     0, (MenuHook)menu_handle,  (iptr_t)&display_menu  },
+	{ (const_iptr_t)"Setup",       0, (MenuHook)menu_handle,  (iptr_t)&setup_menu    },
 	{ (const_iptr_t)0, 0, NULL, (iptr_t)0 }
 };
 static struct Menu main_menu = { main_items, "Main Menu", MF_STICKY, &lcd_bitmap, 0 };
@@ -278,8 +281,6 @@ int main(int argc, char *argv[])
 	lcd_init();
 	proc_init();
 
-	hello_world(&lcd_bitmap);
-	bouncing_logo(&lcd_bitmap);
 	menu_handle(&main_menu);
 
 	emul_cleanup();
