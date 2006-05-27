@@ -1,7 +1,7 @@
-/*!
+/**
  * \file
  * <!--
- * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2005, 2006 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2001, 2002, 2003 by Bernardo Innocenti <bernie@codewiz.org>
  * This file is part of DevLib - See README.devlib for information.
  * -->
@@ -16,13 +16,13 @@
 #define DEVLIB_VERSTAG_H
 
 #ifndef ARCH_CONFIG_H
-	#include "arch_config.h"
+	#include "cfg/arch_config.h"
 #endif
 
 #define APP_NAME "Appname"
 #define APP_DESCRIPTION "Long application name description"
 #define APP_AUTHOR "Develer"
-#define APP_COPYRIGHT "Copyright 2005 Develer (http://www.develer.com/)"
+#define APP_COPYRIGHT "Copyright 2006 Develer (http://www.develer.com/)"
 
 #if (ARCH & ARCH_FOO)
 	#define VERS_MAJOR 0
