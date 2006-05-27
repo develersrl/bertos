@@ -8,6 +8,9 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
+# Revision 1.4  2006/05/27 17:16:38  bernie
+# Make demos a bit more interesting.
+#
 # Revision 1.3  2006/05/15 07:21:24  bernie
 # Use pkg-config.
 #
@@ -43,6 +46,7 @@ demo_CSRC = \
 	gfx/win.c \
 	gfx/text.c \
 	gfx/text_format.c \
+	gui/menu.c \
 	fonts/helvB10.c \
 	fonts/luBS14.c \
 	fonts/ncenB18.c \
@@ -56,7 +60,6 @@ demo_CSRC = \
 	mware/formatwr.c \
 	mware/hex.c \
 	mware/event.c \
-	mware/menu.c \
 	mware/observer.c \
 	mware/resource.c \
 	mware/sprintf.c \
@@ -74,8 +77,8 @@ $(OBJDIR)/demo/drv/lcd_gfx_qt.o: drv/lcd_gfx_qt_moc.cpp
 
 EMUL_CFLAGS = $(shell pkg-config QtGui --cflags) -DQT_CLEAN_NAMESPACE -DQT3_SUPPORT
 EMUL_LDFLAGS = $(shell pkg-config QtGui --libs)
-demo_CFLAGS = -Os -D_QT=4 -D'ARCH=ARCH_EMUL' -Ihw $(EMUL_CFLAGS)
-demo_CXXFLAGS = -Os -D_QT=4 -D'ARCH=ARCH_EMUL' -Ihw $(EMUL_CFLAGS)
+demo_CFLAGS = -Os -D_QT=4 -D'ARCH=ARCH_EMUL' -Iapp/demo -Ihw $(EMUL_CFLAGS)
+demo_CXXFLAGS = -Os -D_QT=4 -D'ARCH=ARCH_EMUL' -Iapp/demo -Ihw $(EMUL_CFLAGS)
 demo_LDFLAGS = $(EMUL_LDFLAGS)
 
 # Debug stuff

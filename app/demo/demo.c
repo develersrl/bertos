@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/05/27 17:16:38  bernie
+ *#* Make demos a bit more interesting.
+ *#*
  *#* Revision 1.5  2006/05/15 07:25:29  bernie
  *#* Move menu to gui/.
  *#*
@@ -48,58 +51,6 @@
 #include <icons/logo.h>
 #include <cfg/macros.h>
 
-
-/* SETTINGS SUBMENU ***************************/
-
-static struct MenuItem settings_items[] =
-{
-	{ (const_iptr_t)"System",     0, (MenuHook)0,  (iptr_t)0 },
-	{ (const_iptr_t)"Mouse",      0, (MenuHook)0,  (iptr_t)0 },
-	{ (const_iptr_t)"Keyboard",   0, (MenuHook)0,  (iptr_t)0 },
-	{ (const_iptr_t)"Networking", 0, (MenuHook)0,  (iptr_t)0 },
-	{ (const_iptr_t)"Date & Time",0, (MenuHook)0,  (iptr_t)0 },
-	{ (const_iptr_t)"Power Saving", MIF_TOGGLE, (MenuHook)0, (iptr_t)0 },
-	{ (const_iptr_t)0, 0, NULL, (iptr_t)0 }
-};
-static struct Menu settings_menu = { settings_items, "Settings Menu", MF_STICKY | MF_SAVESEL, &lcd_bitmap, 0 };
-
-/*** DISPLAY MENU ****************************/
-
-static struct MenuItem display_items[] =
-{
-	{ (const_iptr_t)"Background", 0, (MenuHook)0, (iptr_t)0 },
-	{ (const_iptr_t)"Colors",     0, (MenuHook)0, (iptr_t)0 },
-	{ (const_iptr_t)"Style",      0, (MenuHook)0, (iptr_t)0 },
-	{ (const_iptr_t)"Icon Theme", 0, (MenuHook)0, (iptr_t)0 },
-	{ (const_iptr_t)0, 0, NULL, (iptr_t)0 }
-};
-static struct Menu display_menu = { display_items, "Display Menu", MF_SAVESEL, &lcd_bitmap, 0 };
-
-
-/*** SETUP MENU ******************************/
-
-static struct MenuItem setup_items[] =
-{
-	{ (const_iptr_t)"Setup 0", 0, (MenuHook)NULL, (iptr_t)0    },
-	{ (const_iptr_t)"Setup 1", 0, (MenuHook)NULL, (iptr_t)0    },
-	{ (const_iptr_t)"Setup 2", 0, (MenuHook)NULL, (iptr_t)0    },
-	{ (const_iptr_t)"Setup 3", 0, (MenuHook)NULL, (iptr_t)0    },
-	{ (const_iptr_t)0, 0, NULL, NULL }
-};
-static struct Menu setup_menu = { setup_items, "Setup Menu", MF_STICKY | MF_SAVESEL, &lcd_bitmap, 0 };
-
-
-/*** MAIN MENU *******************************/
-
-static struct MenuItem main_items[] =
-{
-	{ (const_iptr_t)"Settings", 0, (MenuHook)menu_handle, (iptr_t)&settings_menu },
-	{ (const_iptr_t)"Display", 0, (MenuHook)menu_handle, (iptr_t)&display_menu  },
-	{ (const_iptr_t)"Setup",   0, (MenuHook)menu_handle, (iptr_t)&setup_menu    },
-	{ (const_iptr_t)0, 0, NULL, (iptr_t)0 }
-};
-static struct Menu main_menu = { main_items, "Main Menu", MF_STICKY, &lcd_bitmap, 0 };
-
 static void magic(struct Bitmap *bitmap, coord_t x, coord_t y)
 {
 	static const coord_t coords[] = { 120, 34, 90, 90, 30, 90, 0, 34, 60, 0, 90, 90, 0, 34, 120, 34, 30, 90, 60, 0 };
@@ -115,35 +66,38 @@ Window root_win;
 void schedule(void)
 {
 //	win_compose(&root_win);
-	lcd_blitBitmap(root_win.bitmap);
+	lcd_blitBitmap(&lcd_bitmap);
 	emul_idle();
 	usleep(10000);
 }
 
-void hello_world(void)
+void hello_world(Bitmap *bm)
 {
-	gfx_bitmapClear(&lcd_bitmap);
-	extern const Font font_10x20;
-	extern const Font font_helvB10;
-	extern const Font font_courB08;
-	extern const Font font_courB14;
-	extern const Font font_mono17;
-	extern const Font font_luBS14;
-	extern const Font font_ncenB18;
-	gfx_setFont(&lcd_bitmap, &font_luBS14);
+    const Font *old_font = bm->font;
 
-	text_xprintf(&lcd_bitmap, 1, 0, STYLEF_BOLD | TEXT_FILL | TEXT_CENTER, "Hello, world!");
+	gfx_bitmapClear(bm);
+
+	/* Set big font */
+	extern const Font font_ncenB18;
+	gfx_setFont(bm, &font_ncenB18);
+
+	text_xprintf(bm, 1, 0, STYLEF_BOLD | TEXT_FILL | TEXT_CENTER,
+			"Hello, world!");
+
 	for (int i = 0; i < 1000; ++i)
 	{
-		lcd_blitBitmap(&lcd_bitmap);
+		lcd_blitBitmap(bm);
 		emul_idle();
 	}
+
+	/* Restore old font */
+    gfx_setFont(bm, old_font);
 }
 
 /**
  * Show the splash screen
  */
-void bouncing_logo(void)
+void bouncing_logo(Bitmap *bm)
 {
 	const long SPEED_SCALE = 1000;
 	const long GRAVITY_ACCEL = 10;
@@ -168,29 +122,19 @@ void bouncing_logo(void)
 		}
 
 		/* Update graphics */
-		gfx_bitmapClear(&lcd_bitmap);
-		gfx_blitImage(&lcd_bitmap,
-			(lcd_bitmap.width - project_grl_logo.width) / 2,
+		gfx_bitmapClear(bm);
+		gfx_blitImage(bm,
+			(bm->width - project_grl_logo.width) / 2,
 			h / SPEED_SCALE,
 			&project_grl_logo);
-		lcd_blitBitmap(&lcd_bitmap);
+		lcd_blitBitmap(bm);
 
 		timer_delay(10);
 	}
 }
 
-int main(int argc, char *argv[])
+void win_demo(Bitmap *bm)
 {
-	emul_init(&argc, argv);
-	timer_init();
-	buz_init();
-	kbd_init();
-	lcd_init();
-	proc_init();
-
-	hello_world();
-	bouncing_logo();
-
 	const coord_t small_left = 45, small_top = 30, small_width = 50, small_height = 30;
 	const coord_t large_left = -10, large_top = 10, large_width = 85, large_height = 41;
 
@@ -199,7 +143,7 @@ int main(int argc, char *argv[])
 	uint8_t small_raster[RASTER_SIZE(small_width, small_height)];
 	uint8_t large_raster[RASTER_SIZE(large_width, large_height)];
 
-	win_create(&root_win,  &lcd_bitmap);
+	win_create(&root_win, bm);
 
 	gfx_bitmapInit(&large_bm, large_raster, large_width, large_height);
 	win_create(&large_win, &large_bm);
@@ -218,12 +162,13 @@ int main(int argc, char *argv[])
 	coord_t ydir_small = +1;
 	int raise_counter = 0;
 	int i;
-	Bitmap *bm;
 
 	for(;;)
 	{
+		if (kbd_peek())
+			break;
+
 		/* Background animation */
-		bm = &lcd_bitmap;
 		gfx_bitmapClear(bm);
 /*		gfx_setClipRect(bm, 0, 0, bm->width, bm->height);
 		gfx_rectDraw(bm, 10, 10, bm->width-10, bm->height-10);
@@ -235,8 +180,6 @@ int main(int argc, char *argv[])
 		if (x <= -50)        xdir = +1;
 		if (y >= bm->height) ydir = -1;
 		if (y <= -50)        ydir = +1;
-
-		menu_handle(&main_menu);
 
 		/* Large window animation */
 		bm = large_win.bitmap;
@@ -272,6 +215,72 @@ int main(int argc, char *argv[])
 		emul_idle();
 		usleep(10000);
 	}
+}
+
+
+/* SETTINGS SUBMENU ***************************/
+
+static struct MenuItem settings_items[] =
+{
+	{ (const_iptr_t)"System",     0, (MenuHook)0,  (iptr_t)0 },
+	{ (const_iptr_t)"Mouse",      0, (MenuHook)0,  (iptr_t)0 },
+	{ (const_iptr_t)"Keyboard",   0, (MenuHook)0,  (iptr_t)0 },
+	{ (const_iptr_t)"Networking", 0, (MenuHook)0,  (iptr_t)0 },
+	{ (const_iptr_t)"Date & Time",0, (MenuHook)0,  (iptr_t)0 },
+	{ (const_iptr_t)"Power Saving", MIF_TOGGLE, (MenuHook)0, (iptr_t)0 },
+	{ (const_iptr_t)0, 0, NULL, (iptr_t)0 }
+};
+static struct Menu settings_menu = { settings_items, "Settings Menu", MF_STICKY | MF_SAVESEL, &lcd_bitmap, 0 };
+
+/*** DISPLAY MENU ****************************/
+
+static struct MenuItem display_items[] =
+{
+	{ (const_iptr_t)"Background", 0, (MenuHook)0, (iptr_t)0 },
+	{ (const_iptr_t)"Colors",     0, (MenuHook)0, (iptr_t)0 },
+	{ (const_iptr_t)"Style",      0, (MenuHook)0, (iptr_t)0 },
+	{ (const_iptr_t)"Icon Theme", 0, (MenuHook)0, (iptr_t)0 },
+	{ (const_iptr_t)0, 0, NULL, (iptr_t)0 }
+};
+static struct Menu display_menu = { display_items, "Display Menu", MF_SAVESEL, &lcd_bitmap, 0 };
+
+
+/*** SETUP MENU ******************************/
+
+static struct MenuItem setup_items[] =
+{
+	{ (const_iptr_t)"S\xC8tup 0", 0, (MenuHook)NULL, (iptr_t)0    },
+	{ (const_iptr_t)"Set\xDAp 1", 0, (MenuHook)NULL, (iptr_t)0    },
+	{ (const_iptr_t)0, 0, NULL, NULL }
+};
+static struct Menu setup_menu = { setup_items, "Setup Menu", MF_STICKY | MF_SAVESEL, &lcd_bitmap, 0 };
+
+
+/*** MAIN MENU *******************************/
+
+static struct MenuItem main_items[] =
+{
+	{ (const_iptr_t)"Flying Win", 0, (MenuHook)win_demo, (iptr_t)&lcd_bitmap },
+	{ (const_iptr_t)"Settings", 0, (MenuHook)menu_handle, (iptr_t)&settings_menu },
+	{ (const_iptr_t)"Display", 0, (MenuHook)menu_handle, (iptr_t)&display_menu  },
+	{ (const_iptr_t)"Setup",   0, (MenuHook)menu_handle, (iptr_t)&setup_menu    },
+	{ (const_iptr_t)0, 0, NULL, (iptr_t)0 }
+};
+static struct Menu main_menu = { main_items, "Main Menu", MF_STICKY, &lcd_bitmap, 0 };
+
+
+int main(int argc, char *argv[])
+{
+	emul_init(&argc, argv);
+	timer_init();
+	buz_init();
+	kbd_init();
+	lcd_init();
+	proc_init();
+
+	hello_world(&lcd_bitmap);
+	bouncing_logo(&lcd_bitmap);
+	menu_handle(&main_menu);
 
 	emul_cleanup();
 	return 0;
