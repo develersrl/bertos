@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/05/28 12:17:56  bernie
+ *#* Drop almost all the Qt3 cruft.
+ *#*
  *#* Revision 1.4  2006/02/20 02:00:39  bernie
  *#* Port to Qt 4.1.
  *#*
@@ -37,78 +40,55 @@
 
 #include <cassert>
 
-#if _QT < 4
-	#include <qlayout.h>
-	#include <qlabel.h>
-	#include <qslider.h>
-	#include <qcheckbox.h>
-	#include <qmenubar.h>
-	#include <qmessagebox.h>
-	#include <qdatetime.h>
-	#include <qtimer.h>
-	#include <qapplication.h>
-	#include <qpopupmenu.h>
-	#include <qevent.h>
-#else
-	#include <QtGui/QLayout>
-	#include <QtGui/QLabel>
-	#include <QtGui/QSlider>
-	#include <QtGui/QCheckBox>
-	#include <QtGui/QMenuBar>
-	#include <QtGui/QMessageBox>
-	#include <QtCore/QDateTime>
-	#include <QtCore/QTimer>
-	#include <QtGui/QApplication>
-	#include <QtGui/QCloseEvent>
-	//#include <Qt3Support/q3popupmenu.h>
-	//#define QPopupMenu Q3PopupMenu
-	#define QPopupMenu QMenu
-	using namespace Qt;
-#endif
+#include <QtGui/QLayout>
+#include <QtGui/QLabel>
+#include <QtGui/QSlider>
+#include <QtGui/QCheckBox>
+#include <QtGui/QMenuBar>
+#include <QtGui/QMessageBox>
+#include <QtCore/QDateTime>
+#include <QtCore/QTimer>
+#include <QtGui/QApplication>
+#include <QtGui/QCloseEvent>
+using namespace Qt;
 
-EmulWin::EmulWin(Emulator *e) : QMainWindow(0, "DevLibEmul",
-	#if _QT < 4
-		Qt::WDestructiveClose
-	#else
-		0
-	#endif
-)
+EmulWin::EmulWin(Emulator *e)
 {
-	#if _QT >= 4
-		setAttribute(Qt::WA_DeleteOnClose);
-	#endif
+	setWindowTitle(tr("DevLib Emul Demo"));
+	setAttribute(Qt::WA_DeleteOnClose);
 
-	// "File" menu
-	QPopupMenu * file = new QPopupMenu(this);
-	file->insertItem("&Quit", static_cast<QObject *>(e->emulApp), SLOT(closeAllWindows()), CTRL+Key_Q);
+	// Create the menu bar
+		QMenu *file_menu = menuBar()->addMenu(tr("&File"));
+		file_menu->addAction(tr("&Quit"),
+				e->emulApp, SLOT(closeAllWindows()), CTRL+Key_Q);
 
-	// "Help" menu
-	QPopupMenu * help = new QPopupMenu(this);
-	help->insertItem("&About", this, SLOT(about()), Key_F1);
+		menuBar()->addSeparator();
 
-	// Menu bar
-	QMenuBar * menu = new QMenuBar(this);
-	menu->insertItem("&File", file);
-	menu->insertSeparator();
-	menu->insertItem("&Help", help);
+		QMenu *help_menu = menuBar()->addMenu(tr("&Help"));
+		help_menu->addAction(tr("&About"),
+				this, SLOT(about()), Key_F1);
+
 
 	// Make a central widget to contain the other widgets
 	QWidget *central = new QWidget(this);
 	setCentralWidget(central);
 
 	// Create a layout to position the widgets
-	QHBoxLayout *box_main = new QHBoxLayout(central, 4);
+	QHBoxLayout *box_main = new QHBoxLayout(central);
 
 	// Main layout
-	QVBoxLayout *box_right = new QVBoxLayout(box_main, 4);
+	QVBoxLayout *box_right = new QVBoxLayout();
+	box_main->addLayout(box_right);
 
 		// LCD
-		QHBoxLayout *lay_lcd = new QHBoxLayout(box_right, 4);
-		lay_lcd->addWidget(e->emulLCD = new EmulLCD(central));
+		QHBoxLayout *lay_lcd = new QHBoxLayout();
+		box_right->addLayout(lay_lcd);
+			lay_lcd->addStretch();
+			lay_lcd->addWidget(e->emulLCD = new EmulLCD(central));
+			lay_lcd->addStretch();
 
 		// Keyboard
-		QHBoxLayout *lay_kbd = new QHBoxLayout(box_right, 4);
-			lay_kbd->addWidget(e->emulKbd = new EmulKbd(central));
+		box_right->addWidget(e->emulKbd = new EmulKbd(central));
 
 	// Setup keyboard: Label   Keycode     Row Col MRow MCol
 	e->emulKbd->addKey("^",    Key_Up,     0,  0,  0,   0);

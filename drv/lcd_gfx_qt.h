@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/05/28 12:17:57  bernie
+ *#* Drop almost all the Qt3 cruft.
+ *#*
  *#* Revision 1.4  2006/02/20 02:00:40  bernie
  *#* Port to Qt 4.1.
  *#*
@@ -31,13 +34,8 @@
 #ifndef DRV_LCD_GFX_QT_H
 #define DRV_LCD_GFX_QT_H
 
-#if _QT < 4
-	#include <qframe.h>
-	#include <qcolor.h>
-#else
-	#include <QtGui/QColor>
-	#include <QtGui/QFrame>
-#endif
+#include <QtGui/QColor>
+#include <QtGui/QFrame>
 
 // fwd decls
 class QSizePolicy;

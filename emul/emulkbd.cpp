@@ -16,24 +16,14 @@
 #include "emulkbd.h"
 #include "emul.h"
 
-#if _QT < 4
-	#include <qpainter.h>
-	#include <qpixmap.h>
-	#include <qsizepolicy.h>
-	#include <qsize.h>
-	#include <qrect.h>
-	#include <qlayout.h>
-	#include <qobjectlist.h>
-#else
-	#include <QtGui/QPainter>
-	#include <QtGui/QPixmap>
-	#include <QtGui/QSizePolicy>
-	#include <QtGui/QLayout>
-	#include <QtGui/QKeyEvent>
-	#include <QtCore/QEvent>
-	#include <QtCore/QSize>
-	#include <QtCore/QRect>
-#endif
+#include <QtGui/QPainter>
+#include <QtGui/QPixmap>
+#include <QtGui/QSizePolicy>
+#include <QtGui/QLayout>
+#include <QtGui/QKeyEvent>
+#include <QtCore/QEvent>
+#include <QtCore/QSize>
+#include <QtCore/QRect>
 
 
 EmulKey::EmulKey(EmulKbd *kbd, const char *label, int _keycode, int _row, int _col) :
@@ -86,9 +76,9 @@ void EmulKey::keyReleased(void)
 }
 
 
-EmulKbd::EmulKbd(QWidget *parent, const char *name, Qt::WFlags f) :
-	QFrame(parent, name, Qt::WRepaintNoErase | Qt::WResizeNoErase | f),
-	layout(new QGridLayout(this, 4, 4, 4)),
+EmulKbd::EmulKbd(QWidget *parent, Qt::WFlags f) :
+	QFrame(parent, f),
+	layout(new QGridLayout(this)),
 	active_row(0)
 {
 	setFrameStyle(QFrame::Box | QFrame::Sunken);
@@ -106,7 +96,7 @@ EmulKbd::~EmulKbd()
 
 QSizePolicy EmulKbd::sizePolicy() const
 {
-	return QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, false);
+	return QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
 
@@ -190,6 +180,7 @@ int EmulKbd::readCols(void)
 	EmulKey *key;
 	int cols = 0;
 
+	// FIXME: QLayoutIterator is obsolete in Qt4
 	for(QLayoutIterator it(layout->iterator()); (item = it.current()); ++it)
 	{
 		key = static_cast<EmulKey *>(item->widget());

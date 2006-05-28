@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/05/28 12:17:56  bernie
+ *#* Drop almost all the Qt3 cruft.
+ *#*
  *#* Revision 1.3  2006/02/20 02:00:39  bernie
  *#* Port to Qt 4.1.
  *#*
@@ -29,11 +32,7 @@
 #ifndef EMUL_EMULWIN_H
 #define EMUL_EMULWIN_H
 
-#if _QT < 4
-	#include <qmainwindow.h>
-#else
-	#include <QtGui/QMainWindow>
-#endif
+#include <QtGui/QMainWindow>
 
 // fwd decls
 class Emulator;

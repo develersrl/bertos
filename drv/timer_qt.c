@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/05/28 12:17:57  bernie
+ *#* Drop almost all the Qt3 cruft.
+ *#*
  *#* Revision 1.3  2006/02/21 21:28:02  bernie
  *#* New time handling based on TIMER_TICKS_PER_SEC to support slow timers with ticks longer than 1ms.
  *#*
@@ -28,13 +31,8 @@
 #include <cfg/compiler.h> /* hptime.t */
 
 // Qt headers
-#if _QT < 4
-	#include <qdatetime.h>
-	#include <qtimer.h>
-#else
-	#include <QtCore/QDateTime>
-	#include <QtCore/QTimer>
-#endif
+#include <QtCore/QDateTime>
+#include <QtCore/QTimer>
 
 
 // The user interrupt server routine

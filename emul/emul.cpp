@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/05/28 12:17:57  bernie
+ *#* Drop almost all the Qt3 cruft.
+ *#*
  *#* Revision 1.5  2006/05/27 22:30:56  bernie
  *#* Add some delay to slow things down.
  *#*
@@ -44,11 +47,7 @@
 
 #include <cstdlib> // std::exit()
 
-#if _QT < 4
-	#include <qapplication.h>
-#else
-	#include <QtGui/qapplication.h>
-#endif
+#include <QtGui/qapplication.h>
 
 
 /// The global emulator instance.
@@ -69,9 +68,6 @@ Emulator::Emulator(int &argc, char **argv) :
 	emulApp(new QApplication(argc, argv)),
 	emulWin(new EmulWin(this))
 {
-	#if QT_VERSION < ((4 << 16) + (0 << 8) + 0)
-		emulApp->setMainWidget(emulWin);
-	#endif
 	emulWin->show();
 }
 

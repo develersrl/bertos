@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2006/05/28 12:17:57  bernie
+ *#* Drop almost all the Qt3 cruft.
+ *#*
  *#* Revision 1.7  2006/04/27 05:43:08  bernie
  *#* Fix naming conventions.
  *#*
@@ -34,7 +37,6 @@
  *#*
  *#* Revision 1.1  2006/01/16 03:51:35  bernie
  *#* Add LCD Qt emulator.
- *#*
  *#*/
 
 #include "lcd_gfx_qt.h"
@@ -42,17 +44,10 @@
 #include <cfg/debug.h>
 #include <gfx/gfx.h> // CONFIG_BITMAP_FMT
 
-#if _QT < 4
-	#include <qpainter.h>
-	#include <qimage.h>
-	#include <qsizepolicy.h>
-	#include <qsize.h>
-#else
-	#include <QtGui/QPainter>
-	#include <QtGui/QImage>
-	#include <QtGui/QSizePolicy>
-	#include <QtCore/QSize>
-#endif
+#include <QtGui/QPainter>
+#include <QtGui/QImage>
+#include <QtGui/QSizePolicy>
+#include <QtCore/QSize>
 
 // Display colors
 #define LCD_FG_COLOR 0x0, 0x0, 0x0
@@ -121,7 +116,7 @@ void EmulLCD::writeRaster(uint8_t *new_raster)
 			uint8_t v = 0;
 			for (int xbit = 0; xbit < 8; ++xbit)
 				v |= (new_raster[(xbyte * 8 + xbit) + (y / 8) * WIDTH] & (1 << (y%8)) )
-					? (1 << (7 - xbit)) : 0;
+					? 0 : (1 << (7 - xbit));
 
 			raster[y * ((WIDTH + 7) / 8) + xbyte] = v;
 		}
@@ -139,13 +134,13 @@ void EmulLCD::writeRaster(uint8_t *new_raster)
 #include <gfx/gfx.h>
 #include <cfg/debug.h>
 
-/*!
+DECLARE_WALL(wall_before_raster, WALL_SIZE)
+/**
  * Raster buffer to draw into.
  *
  * Bits in the bitmap bytes have vertical orientation,
  * as required by the LCD driver.
  */
-DECLARE_WALL(wall_before_raster, WALL_SIZE)
 static uint8_t lcd_raster[RASTER_SIZE(EmulLCD::WIDTH, EmulLCD::HEIGHT)];
 DECLARE_WALL(wall_after_raster, WALL_SIZE)
 
