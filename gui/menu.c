@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/05/28 15:03:31  bernie
+ *#* Avoid unnecessary rendering.
+ *#*
  *#* Revision 1.2  2006/05/25 23:34:38  bernie
  *#* Implement menu timeouts.
  *#*
@@ -81,7 +84,7 @@
 
 
 /**
- * Count the items present in a menu.
+ * Return the total number of items in in a menu.
  */
 static int menu_count(const struct Menu *menu)
 {
@@ -151,18 +154,28 @@ static void menu_update_menubar(
 static void menu_layout(
 		const struct Menu *menu,
 		int first_item,
-		int items_per_page,
-		int selected)
+		int selected,
+		bool redraw)
 {
-	int ypos, cnt;
+	coord_t ypos;
+	int i;
 	const char * PROGMEM title = PTRMSG(menu->title);
 	Bitmap *bm = menu->bitmap;
 
 	ypos = bm->cr.ymin;
 
+#if 0
+	if (redraw)
+	{
+		/* Clear screen */
+		text_clear(menu->bitmap);
+	}
+#endif
+
 	if (title)
 	{
-		text_xyprintf(bm, 0, ypos, STYLEF_UNDERLINE | STYLEF_BOLD | TEXT_CENTER | TEXT_FILL, title);
+		if (redraw)
+			text_xyprintf(bm, 0, ypos, STYLEF_UNDERLINE | STYLEF_BOLD | TEXT_CENTER | TEXT_FILL, title);
 		ypos += bm->font->height;
 	}
 
@@ -172,12 +185,14 @@ static void menu_layout(
 	static int speed;
 	coord_t old_ymin = bm->cr.ymin;
 
+	/* Clip drawing inside menu items area */
 	gfx_setClipRect(bm,
 		bm->cr.xmin, bm->cr.ymin + ypos,
-		bm->cr.xmax, MIN(bm->cr.ymax, bm->cr.ymin + ypos + items_per_page * bm->font->height));
+		bm->cr.xmax, bm->cr.ymax);
 
 	if (old_first_item != first_item)
 	{
+		/* Speed proportional to distance */
 		speed = ABS(old_first_item - first_item) * 3;
 
 		if (old_first_item > first_item)
@@ -198,15 +213,16 @@ static void menu_layout(
 					++old_first_item;
 			}
 		}
-		first_item = old_first_item;
+		first_item = MIN(old_first_item, menu_count(menu));
 
 		ypos += yoffset;
+		redraw = true;
 	}
-#endif
+#endif /* CONFIG_MENU_SMOOTH */
 
-	for (cnt = 0; cnt < items_per_page; ++cnt)
+	if (redraw) for (i = first_item; /**/; ++i)
 	{
-		const MenuItem *item = &menu->items[first_item + cnt];
+		const MenuItem *item = &menu->items[i];
 #if CPU_HARVARD
 		MenuItem ram_item;
 		if (menu->flags & MF_ROMITEMS)
@@ -215,6 +231,10 @@ static void menu_layout(
 			item = &ram_item;
 		}
 #endif
+
+		/* Check for end of room */
+		if (ypos > bm->cr.ymax)
+			break;
 
 		/* Check for end of menu */
 		if (!(item->label || item->hook))
@@ -230,7 +250,7 @@ static void menu_layout(
 #endif
 			(
 				bm, 0, ypos,
-				(first_item + cnt == selected) ? (STYLEF_INVERT | TEXT_FILL) : TEXT_FILL,
+				(i == selected) ? (STYLEF_INVERT | TEXT_FILL) : TEXT_FILL,
 				(item->flags & MIF_RAMLABEL) ? PSTR("%s%S") : PSTR("%S%S"),
 				PTRMSG(item->label),
 				(item->flags & MIF_TOGGLE) ?
@@ -242,12 +262,18 @@ static void menu_layout(
 	}
 
 #if CONFIG_MENU_SMOOTH
+	if (redraw)
+	{
+		/* Clear rest of area */
+		gfx_rectClear(bm, bm->cr.xmin, ypos, bm->cr.xmax, bm->cr.ymax);
+
+		lcd_blitBitmap(&lcd_bitmap);
+	}
+
 	/* Restore old cliprect */
 	gfx_setClipRect(bm,
 			bm->cr.xmin, old_ymin,
 			bm->cr.xmax, bm->cr.ymax);
-
-	lcd_blitBitmap(&lcd_bitmap);
 #endif
 }
 
@@ -351,7 +377,9 @@ static int menu_prev_visible_item(const struct Menu *menu, int index)
 iptr_t menu_handle(const struct Menu *menu)
 {
 	uint8_t items_per_page;
-	uint8_t first_item, selected;
+	uint8_t first_item = 0;
+	uint8_t selected;
+	bool redraw = true;
 
 #if (CONFIG_MENU_TIMEOUT != 0)
 	ticks_t now, menu_idle_time = timer_clock();
@@ -385,10 +413,9 @@ iptr_t menu_handle(const struct Menu *menu)
 		- (menu->title ? 1 : 0);
 
 	/* Selected item should be a visible entry */
-	first_item = selected = menu_next_visible_item(menu, menu->selected - 1);
-
-	/* Clear screen */
-	text_clear(menu->bitmap);
+	//first_item = selected = menu_next_visible_item(menu, menu->selected - 1);
+	selected = menu->selected;
+	first_item = 0;
 
 	for(;;)
 	{
@@ -402,7 +429,8 @@ iptr_t menu_handle(const struct Menu *menu)
 		while (selected >= first_item + items_per_page)
 			first_item = menu_next_visible_item(menu, first_item);
 
-		menu_layout(menu, first_item, items_per_page, selected);
+		menu_layout(menu, first_item, selected, redraw);
+		redraw = false;
 
 		#if CONFIG_MENU_MENUBAR
 			menu_update_menubar(menu, &mb, selected);
@@ -433,6 +461,7 @@ iptr_t menu_handle(const struct Menu *menu)
 			}
 #endif
 			menu_doselect(menu, item);
+			redraw = true;
 
 			/* Return userdata as result */
 			if (!menu->flags & MF_STICKY)
@@ -442,17 +471,16 @@ iptr_t menu_handle(const struct Menu *menu)
 					CONST_CAST(struct Menu *, menu)->selected = selected;
 				return item->userdata;
 			}
-
-			/* Clear screen */
-			text_clear(menu->bitmap);
 		}
 		else if (key & K_UP)
 		{
 			selected = menu_prev_visible_item(menu, selected);
+			redraw = true;
 		}
 		else if (key & K_DOWN)
 		{
 			selected = menu_next_visible_item(menu, selected);
+			redraw = true;
 		}
 		else if (((key & K_CANCEL)
 			#if CONFIG_MENU_TIMEOUT != 0
