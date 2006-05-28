@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/05/28 12:18:12  bernie
+ *#* Disable menu timeout.
+ *#*
  *#* Revision 1.1  2006/05/27 22:31:57  bernie
  *#* Add appconfig.h for demo app.
  *#*
@@ -208,7 +211,7 @@
 #define CONFIG_MENU_SMOOTH  1
 
 /// Abort menu after this amount of time.
-#define CONFIG_MENU_TIMEOUT 3000 /* ms */
+#define CONFIG_MENU_TIMEOUT 0 /* ms */
 
 /// Accept input implicitly after this amount of time.
 #define CONFIG_LEVELEDIT_TIMEOUT 3000 /* ms */
