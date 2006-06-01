@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/06/01 12:29:21  marco
+ *#* Add first simple protocol command (version request).
+ *#*
  *#* Revision 1.1  2006/05/18 00:41:47  bernie
  *#* New triface devlib application.
  *#*
@@ -24,6 +27,9 @@
 #include <drv/buzzer.h>
 #include <drv/ser.h>
 #include <cfg/macros.h>
+#include <mware/parser.h>
+
+#include "protocol.h"
 
 int main(void)
 {
@@ -36,11 +42,12 @@ int main(void)
 	Serial *host_port = ser_open(0);
 	ser_setbaudrate(host_port, 38400);
 
+	protocol_init(host_port);
 
 	// Main loop
 	for(;;)
 	{
-		ser_print(host_port, "Hello, world!\r\n");
+		protocol_run(host_port);
 	}
 
 	return 0;

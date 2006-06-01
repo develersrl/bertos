@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/06/01 12:29:21  marco
+ *#* Add first simple protocol command (version request).
+ *#*
  *#* Revision 1.1  2006/05/18 00:41:47  bernie
  *#* New triface devlib application.
  *#*
@@ -56,6 +59,10 @@
 
 /** Baud-rate for the kdebug console */
 #define CONFIG_KDEBUG_BAUDRATE  38400
+
+/** Serial port number for kdebug console */
+#define CONFIG_KDEBUG_PORT  0
+
 
 /**
  * printf()-style formatter configuration.
@@ -110,7 +117,7 @@
 	#define CONFIG_SER_DEFBAUDRATE   0
 
 	/** Enable ser_gets() and ser_gets_echo() */
-	#define CONFIG_SER_GETS          0
+	#define CONFIG_SER_GETS          1
 
 	/** Enable second serial port in emulator. */
 	#define CONFIG_EMUL_UART1        0
@@ -133,5 +140,8 @@
 
 /// Enable watchdog timer.
 #define CONFIG_WATCHDOG  0
+
+/// Enable internal parser commands.
+#define CONFIG_INTERNAL_COMMANDS  0
 
 #endif /* APPCONFIG_TRIFACE_H */
