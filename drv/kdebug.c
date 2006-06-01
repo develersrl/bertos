@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.27  2006/06/01 12:32:06  marco
+ *#* Updated include reference.
+ *#*
  *#* Revision 1.26  2006/04/27 05:40:27  bernie
  *#* Break on assertion failures.
  *#*
@@ -44,7 +47,7 @@
 #include <cfg/cpu.h>
 #include <cfg/macros.h> /* for BV() */
 #include <appconfig.h>
-#include <hw.h>
+#include <hw_cpu.h>     /* for CLOCK_FREQ */
 
 #include <mware/formatwr.h> /* for _formatted_write() */
 
