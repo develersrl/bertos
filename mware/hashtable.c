@@ -61,39 +61,8 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.5  2005/04/11 19:10:28  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.4  2004/12/08 09:42:30  bernie
- *#* Suppress warning.
- *#*
- *#* Revision 1.3  2004/10/03 20:43:22  bernie
- *#* Import changes from sc/firmware.
- *#*
- *#* Revision 1.12  2004/06/14 15:15:24  rasky
- *#* Cambiato key_data in un union invece di castare
- *#* Aggiunto un ASSERT sull'indice calcolata nella key_internal_get_ptr
- *#*
- *#* Revision 1.11  2004/06/14 15:09:04  rasky
- *#* Cambiati i messaggi di assert (è inutile citare il nome della funzione)
- *#*
- *#* Revision 1.10  2004/06/14 15:07:38  rasky
- *#* Convertito il loop di calc_hash a interi (per farlo ottimizzare maggiormente)
- *#*
- *#* Revision 1.9  2004/06/14 14:59:40  rasky
- *#* Rinominanta la macro di configurazione per rispettare il namespace, e aggiunta in un punto in cui mancava
- *#*
- *#* Revision 1.8  2004/06/12 15:18:05  rasky
- *#* Nuova hashtable con chiave esterna o interna a scelta, come discusso
- *#*
- *#* Revision 1.7  2004/06/04 17:16:31  rasky
- *#* Fixato un bug nel caso in cui la chiave ecceda la dimensione massima: il clamp non può essere fatto dentro la perform_lookup perché anche la ht_insert deve avere il valore clampato a disposizione per fare la memcpy
- *#*
- *#* Revision 1.6  2004/05/26 16:36:50  rasky
- *#* Aggiunto il rationale per l'interfaccia degli iteratori
- *#*
- *#* Revision 1.5  2004/05/24 15:28:20  rasky
- *#* Sistemata la documentazione, rimossa keycmp in favore della memcmp
+ *#* Revision 1.6  2006/06/01 12:27:39  marco
+ *#* Added utilities for protocols
  *#*
  *#*/
 
@@ -112,14 +81,14 @@ typedef const void** HashNodePtr;
 #define HT_HAS_INTERNAL_KEY(ht)        (CONFIG_HT_OPTIONAL_INTERNAL_KEY && ht->flags.key_internal)
 
 /*! For hash tables with internal keys, compute the pointer to the internal key for a given \a node. */
-INLINE uint8_t* key_internal_get_ptr(struct HashTable* ht, HashNodePtr node)
+INLINE uint8_t *key_internal_get_ptr(struct HashTable *ht, HashNodePtr node)
 {
 	uint8_t* key_buf = ht->key_data.mem;
 	size_t index;
 
 	// Compute the index of the node and use it to move within the whole key buffer
 	index = node - &ht->mem[0];
-	ASSERT(index < (1 << ht->max_elts_log2));
+	ASSERT(index < (size_t)(1 << ht->max_elts_log2));
 	key_buf += index * (INTERNAL_KEY_MAX_LENGTH + 1);
 
 	return key_buf;

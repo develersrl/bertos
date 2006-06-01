@@ -1,7 +1,7 @@
 /*!
  * \file
  * <!--
- * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2004, 2006 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2004 Giovanni Bajo
  * All Rights Reserved.
  * -->
@@ -31,30 +31,9 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.6  2005/04/11 19:10:28  bernie
- *#* Include top-level headers from cfg/ subdir.
+ *#* Revision 1.7  2006/06/01 12:27:39  marco
+ *#* Added utilities for protocols
  *#*
- *#* Revision 1.5  2004/10/03 20:43:22  bernie
- *#* Import changes from sc/firmware.
- *#*
- *#* Revision 1.9  2004/06/14 15:15:24  rasky
- *#* Cambiato key_data in un union invece di castare
- *#* Aggiunto un ASSERT sull'indice calcolata nella key_internal_get_ptr
- *#*
- *#* Revision 1.8  2004/06/14 14:59:40  rasky
- *#* Rinominanta la macro di configurazione per rispettare il namespace, e aggiunta in un punto in cui mancava
- *#*
- *#* Revision 1.7  2004/06/12 15:18:05  rasky
- *#* Nuova hashtable con chiave esterna o interna a scelta, come discusso
- *#*
- *#* Revision 1.6  2004/05/26 16:33:31  rasky
- *#* Aggiunta interfaccia per visita della hashtable tramite iteratori
- *#*
- *#* Revision 1.5  2004/05/24 18:42:23  rasky
- *#* Fixato un commento doxygen
- *#*
- *#* Revision 1.4  2004/05/24 15:28:20  rasky
- *#* Sistemata la documentazione, rimossa keycmp in favore della memcmp
  *#*/
 
 #ifndef MWARE_HASHTABLE_H
@@ -77,7 +56,7 @@
  * Hook to get the key from \a data, which is an element of the hash table. The
  * key must be returned together with \a key_length (in words).
  */
-typedef const void* (*hook_get_key)(const void* data, uint8_t* key_length);
+typedef const void *(*hook_get_key)(const void *data, uint8_t *key_length);
 
 
 /*!
@@ -92,14 +71,14 @@ typedef const void* (*hook_get_key)(const void* data, uint8_t* key_length);
  */
 struct HashTable
 {
-	const void** mem;            //!< Buckets of data
+	const void **mem;            //!< Buckets of data
 	uint16_t max_elts_log2;      //!< Log2 of the size of the table
 	struct {
 		bool key_internal : 1;   //!< true if the key is copied internally
 	} flags;
 	union {
 		hook_get_key hook;       //!< Hook to get the key
-		uint8_t* mem;            //!< Pointer to the key memory
+		uint8_t *mem;            //!< Pointer to the key memory
 	} key_data;
 };
 
@@ -130,7 +109,7 @@ typedef struct
 /*! Exactly like \c DECLARE_HASHTABLE, but the variable will be declared as static. */
 #define DECLARE_HASHTABLE_STATIC(name, size, hook_gk) \
 	static const void* name##_nodes[1 << UINT32_LOG2(size)]; \
-	static struct HashTable name = { name##_nodes, UINT32_LOG2(size), { false }, hook_gk }
+	static struct HashTable name = { name##_nodes, UINT32_LOG2(size), { false }, { hook_gk } }
 
 #if CONFIG_HT_OPTIONAL_INTERNAL_KEY
 	/*! Declare a hash table with internal copies of the keys. This version does not
