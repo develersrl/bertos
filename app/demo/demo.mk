@@ -8,6 +8,9 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
+# Revision 1.6  2006/06/02 12:27:36  bernie
+# Tweak apparence; enable assertions.
+#
 # Revision 1.5  2006/05/27 22:42:02  bernie
 # Add verstag.
 #
@@ -22,7 +25,6 @@
 #
 # Revision 1.1  2006/03/22 09:52:13  bernie
 # Add demo application.
-#
 #
 
 
@@ -81,13 +83,17 @@ $(OBJDIR)/demo/drv/lcd_gfx_qt.o: drv/lcd_gfx_qt_moc.cpp
 
 EMUL_CFLAGS = $(shell pkg-config QtGui --cflags) -DQT_CLEAN_NAMESPACE -DQT3_SUPPORT
 EMUL_LDFLAGS = $(shell pkg-config QtGui --libs)
-demo_CFLAGS = -Os -D_QT=4 -D'ARCH=ARCH_EMUL' -Iapp/demo -Ihw $(EMUL_CFLAGS)
-demo_CXXFLAGS = -Os -D_QT=4 -D'ARCH=ARCH_EMUL' -Iapp/demo -Ihw $(EMUL_CFLAGS)
+demo_CFLAGS = -D_QT=4 -D'ARCH=ARCH_EMUL' -Iapp/demo -Ihw $(EMUL_CFLAGS)
+demo_CXXFLAGS = -D_QT=4 -D'ARCH=ARCH_EMUL' -Iapp/demo -Ihw $(EMUL_CFLAGS)
 demo_LDFLAGS = $(EMUL_LDFLAGS)
 
 # Debug stuff
 ifeq ($(demo_DEBUG),1)
 	demo_CFLAGS += -D_DEBUG
+	demo_CXXFLAGS += -D_DEBUG
 #	demo_PCSRC += drv/kdebug.c
+else
+	demo_CFLAGS += -Os
+	demo_CXXFLAGS += -Os
 endif
 

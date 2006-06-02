@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2006/06/02 12:27:36  bernie
+ *#* Tweak apparence; enable assertions.
+ *#*
  *#* Revision 1.7  2006/05/27 22:31:18  bernie
  *#* Clean it up a bit more.
  *#*
@@ -219,13 +222,12 @@ void win_demo(Bitmap *bm)
 }
 
 
-/* SETTINGS SUBMENU ***************************/
+/* SETTINGS SUBMENU */
 
 static struct MenuItem settings_items[] =
 {
 	{ (const_iptr_t)"System",     0, (MenuHook)0,  (iptr_t)0 },
-	{ (const_iptr_t)"Mouse",      0, (MenuHook)0,  (iptr_t)0 },
-	{ (const_iptr_t)"Keyboard",   0, (MenuHook)0,  (iptr_t)0 },
+	{ (const_iptr_t)"Language",   0, (MenuHook)0,  (iptr_t)0 },
 	{ (const_iptr_t)"Networking", 0, (MenuHook)0,  (iptr_t)0 },
 	{ (const_iptr_t)"Date & Time",0, (MenuHook)0,  (iptr_t)0 },
 	{ (const_iptr_t)"Power Saving", MIF_TOGGLE, (MenuHook)0, (iptr_t)0 },
@@ -233,7 +235,22 @@ static struct MenuItem settings_items[] =
 };
 static struct Menu settings_menu = { settings_items, "Settings Menu", MF_STICKY | MF_SAVESEL, &lcd_bitmap, 0 };
 
-/*** DISPLAY MENU ****************************/
+
+/* MX SUBMENU */
+
+static struct MenuItem mx_items[] =
+{
+	{ (const_iptr_t)"Mouse",                  MIF_CHECKIT | MIF_EXCLUDE_1 | MIF_EXCLUDE_2, (MenuHook)0,  (iptr_t)0 },
+	{ (const_iptr_t)"Keyboard", MIF_CHECKED | MIF_CHECKIT | MIF_EXCLUDE_0 | MIF_EXCLUDE_2, (MenuHook)0,  (iptr_t)0 },
+	{ (const_iptr_t)"Joystick", MIF_CHECKIT | MIF_EXCLUDE_0 | MIF_EXCLUDE_1, (MenuHook)0,  (iptr_t)0 },
+	{ (const_iptr_t)"Autosave", MIF_CHECKED | MIF_CHECKIT | MIF_TOGGLE, (MenuHook)0,  (iptr_t)0 },
+	{ (const_iptr_t)0, 0, NULL, (iptr_t)0 }
+};
+
+static struct Menu mx_menu = { mx_items, (const_iptr_t)0, MF_STICKY | MF_SAVESEL, &lcd_bitmap, 0 };
+
+
+/* DISPLAY SUBMENU */
 
 static struct MenuItem display_items[] =
 {
@@ -246,27 +263,16 @@ static struct MenuItem display_items[] =
 static struct Menu display_menu = { display_items, "Display Menu", MF_SAVESEL, &lcd_bitmap, 0 };
 
 
-/*** SETUP MENU ******************************/
-
-static struct MenuItem setup_items[] =
-{
-	{ (const_iptr_t)"S\xC8tup 0", 0, (MenuHook)NULL, (iptr_t)0    },
-	{ (const_iptr_t)"Set\xDAp 1", 0, (MenuHook)NULL, (iptr_t)0    },
-	{ (const_iptr_t)0, 0, NULL, NULL }
-};
-static struct Menu setup_menu = { setup_items, "Setup Menu", MF_STICKY | MF_SAVESEL, &lcd_bitmap, 0 };
-
-
-/*** MAIN MENU *******************************/
+/* MAIN MENU */
 
 static struct MenuItem main_items[] =
 {
 	{ (const_iptr_t)"Win Fly",     0, (MenuHook)win_demo,     (iptr_t)&lcd_bitmap    },
 	{ (const_iptr_t)"Bounce!",     0, (MenuHook)bouncing_logo,(iptr_t)&lcd_bitmap    },
 	{ (const_iptr_t)"Hello World", 0, (MenuHook)hello_world,  (iptr_t)&lcd_bitmap    },
-	{ (const_iptr_t)"Settings",    0, (MenuHook)menu_handle,  (iptr_t)&settings_menu },
+	{ (const_iptr_t)"Menu MX",     0, (MenuHook)menu_handle,  (iptr_t)&mx_menu       },
 	{ (const_iptr_t)"Display",     0, (MenuHook)menu_handle,  (iptr_t)&display_menu  },
-	{ (const_iptr_t)"Setup",       0, (MenuHook)menu_handle,  (iptr_t)&setup_menu    },
+	{ (const_iptr_t)"Settings",    0, (MenuHook)menu_handle,  (iptr_t)&settings_menu },
 	{ (const_iptr_t)0, 0, NULL, (iptr_t)0 }
 };
 static struct Menu main_menu = { main_items, "Main Menu", MF_STICKY, &lcd_bitmap, 0 };
