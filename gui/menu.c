@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/06/02 12:26:18  bernie
+ *#* Draw graphical checkmarks.
+ *#*
  *#* Revision 1.3  2006/05/28 15:03:31  bernie
  *#* Avoid unnecessary rendering.
  *#*
@@ -243,20 +246,36 @@ static void menu_layout(
 		/* Only print visible items */
 		if (!(item->flags & MIF_HIDDEN))
 		{
+			if (item->flags & MIF_CHECKIT)
+			{
+				gfx_rectClear(bm, 0, ypos,
+						bm->font->height, ypos + bm->font->height);
+
+				if (item->flags & MIF_TOGGLE)
+					gfx_rectDraw(bm, 2, ypos + 2,
+							bm->font->height - 2, ypos + bm->font->height - 2);
+				if (item->flags & MIF_CHECKED)
+				{
+					gfx_line(bm,
+							3, ypos + 3,
+							bm->font->height - 3, ypos + bm->font->height - 3);
+					gfx_line(bm,
+							bm->font->height - 3, ypos + 3,
+							3, ypos + bm->font->height - 3);
+				}
+			}
+
 #if CPU_HARVARD
-			text_xyprintf_P
+			((item->flags & MIF_RAMLABEL) ? text_xyprintf : text_xyprintf_P)
 #else
 			text_xyprintf
 #endif
 			(
-				bm, 0, ypos,
+				bm, (item->flags & MIF_CHECKIT) ? bm->font->height : 0, ypos,
 				(i == selected) ? (STYLEF_INVERT | TEXT_FILL) : TEXT_FILL,
-				(item->flags & MIF_RAMLABEL) ? PSTR("%s%S") : PSTR("%S%S"),
-				PTRMSG(item->label),
-				(item->flags & MIF_TOGGLE) ?
-					( (item->flags & MIF_CHECKED) ? PSTR(":ON") : PSTR(":OFF") )
-					: ( (item->flags & MIF_CHECKED) ? PSTR("\04") : PSTR("") )
+				PTRMSG(item->label)
 			);
+
 			ypos += bm->font->height;
 		}
 	}
