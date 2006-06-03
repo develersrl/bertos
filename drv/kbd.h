@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/06/03 13:57:36  bernie
+ *#* Make keyboard repeat mask run-time configurable.
+ *#*
  *#* Revision 1.4  2006/03/20 17:50:17  bernie
  *#* Add FreeRTOS and Observers support.
  *#*
@@ -68,6 +71,7 @@ keymask_t kbd_get(void);
 keymask_t kbd_get_timeout(mtime_t timeout);
 void kbd_addHandler(struct KbdHandler *handler);
 void kbd_remHandler(struct KbdHandler *handler);
+keymask_t kbd_setRepeatMask(keymask_t mask);
 
 #if CONFIG_KBD_OBSERVER
 	struct Subject;

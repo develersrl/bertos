@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2006/06/03 13:57:36  bernie
+ *#* Make keyboard repeat mask run-time configurable.
+ *#*
  *#* Revision 1.6  2006/03/20 17:50:17  bernie
  *#* Add FreeRTOS and Observers support.
  *#*
@@ -79,6 +82,7 @@ static enum { KS_IDLE, KS_REPDELAY, KS_REPEAT } kbd_rptStatus;
 
 static volatile keymask_t kbd_buf; /*!< Single entry keyboard buffer */
 static volatile keymask_t kbd_cnt; /*!< Number of keypress events in \c kbd_buf */
+static keymask_t kbd_rpt_mask;     /**< Mask of repeatable keys. */
 
 #if CONFIG_KBD_POLL == KBD_POLL_SOFTINT
 static Timer kbd_timer;            /*!< Keyboard softtimer */
@@ -326,26 +330,34 @@ static keymask_t kbd_debHandlerFunc(keymask_t key)
 }
 
 #ifdef  K_LNG_MASK
-/*!
- * Handle long pression keys
+/**
+ * Handle long pression keys.
  */
 static keymask_t kbd_lngHandlerFunc(keymask_t key)
 {
-	static ticks_t stop;
+	static ticks_t start;
 	ticks_t now = timer_clock();
 
 	if (key & K_LNG_MASK)
 	{
-		if (now - stop > 0)
-			key &= K_LNG_MASK;
-		else
-			key &= ~K_LNG_MASK;
+		if (now - start > ms_to_ticks(KBD_LNG_DELAY))
+			key |= K_LONG;
 	}
 	else
-		stop = now + ms_to_ticks(KBD_LNG_DELAY);
+		start = now;
 	return key;
 }
 #endif
+
+/**
+ * Set current mask of repeatable keys.
+ */
+keymask_t kbd_setRepeatMask(keymask_t mask)
+{
+	keymask_t oldmask = kbd_rpt_mask;
+	ATOMIC(kbd_rpt_mask = mask);
+	return oldmask;
+}
 
 /*!
  * Handle keyboard repeat
@@ -363,7 +375,7 @@ static keymask_t kbd_rptHandlerFunc(keymask_t key)
 	switch (kbd_rptStatus)
 	{
 		case KS_IDLE:
-			if (key & K_RPT_MASK)
+			if (key & kbd_rpt_mask)
 			{
 				repeat_time = now;
 				kbd_rptStatus = KS_REPDELAY;
@@ -371,11 +383,11 @@ static keymask_t kbd_rptHandlerFunc(keymask_t key)
 			break;
 
 		case KS_REPDELAY:
-			if (key & K_RPT_MASK)
+			if (key & kbd_rpt_mask)
 			{
 				if (now - repeat_time > ms_to_ticks(KBD_REPEAT_DELAY))
 				{
-					key = (key & K_RPT_MASK) | K_REPEAT;
+					key = (key & kbd_rpt_mask) | K_REPEAT;
 					repeat_time = now;
 					repeat_rate = ms_to_ticks(KBD_REPEAT_RATE);
 					kbd_rptStatus = KS_REPEAT;
@@ -388,12 +400,12 @@ static keymask_t kbd_rptHandlerFunc(keymask_t key)
 			break;
 
 		case KS_REPEAT:
-			if (key & K_RPT_MASK)
+			if (key & kbd_rpt_mask)
 			{
 				if (now - repeat_time > repeat_rate)
 				{
 					/* Enqueue a new event in the buffer */
-					key = (key & K_RPT_MASK) | K_REPEAT;
+					key = (key & kbd_rpt_mask) | K_REPEAT;
 					repeat_time = now;
 
 					/* Repeat rate acceleration */
