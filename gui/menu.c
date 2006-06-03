@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/06/03 13:58:01  bernie
+ *#* Fix recursive timeout and add exit status information.
+ *#*
  *#* Revision 1.4  2006/06/02 12:26:18  bernie
  *#* Draw graphical checkmarks.
  *#*
@@ -113,9 +116,8 @@ static int menu_count(const struct Menu *menu)
 
 #if CONFIG_MENU_MENUBAR
 
-/*!
- * Update the menu bar according to the selected item
- * and redraw it.
+/**
+ * Update the menu bar according to the selected item and redraw it.
  */
 static void menu_update_menubar(
 		const struct Menu *menu,
@@ -233,7 +235,7 @@ static void menu_layout(
 			memcpy_P(&ram_item, item, sizeof(ram_item));
 			item = &ram_item;
 		}
-#endif
+#endif /* CPU_HARVARD */
 
 		/* Check for end of room */
 		if (ypos > bm->cr.ymax)
@@ -293,15 +295,18 @@ static void menu_layout(
 	gfx_setClipRect(bm,
 			bm->cr.xmin, old_ymin,
 			bm->cr.xmax, bm->cr.ymax);
-#endif
+
+#endif /* CONFIG_MENU_SMOOTH */
 }
 
 
-/*!
+/**
  * Handle menu item selection
  */
-static void menu_doselect(const struct Menu *menu, struct MenuItem *item)
+static iptr_t menu_doselect(const struct Menu *menu, struct MenuItem *item)
 {
+	iptr_t result = 0;
+
 	/* Exclude other items */
 	int mask, i;
 	for (mask = item->flags & MIF_EXCLUDE_MASK, i = 0; mask; mask >>= 1, ++i)
@@ -311,7 +316,7 @@ static void menu_doselect(const struct Menu *menu, struct MenuItem *item)
 	}
 
 	if (item->flags & MIF_DISABLED)
-		return;
+		return MENU_DISABLED;
 
 	/* Handle checkable items */
 	if (item->flags & MIF_TOGGLE)
@@ -322,13 +327,17 @@ static void menu_doselect(const struct Menu *menu, struct MenuItem *item)
 	/* Handle items with callback hooks */
 	if (item->hook)
 	{
-		/* Push a jmp buffer to abort the operation with the STOP key */
+		/* Push a jmp buffer to abort the operation with the STOP/CANCEL key */
 		if (!PUSH_ABORT)
 		{
-			item->hook(item->userdata);
+			result = item->hook(item->userdata);
 			POP_ABORT;
 		}
 	}
+	else
+		result = item->userdata;
+
+	return result;
 }
 
 
@@ -398,6 +407,7 @@ iptr_t menu_handle(const struct Menu *menu)
 	uint8_t items_per_page;
 	uint8_t first_item = 0;
 	uint8_t selected;
+	iptr_t result = 0;
 	bool redraw = true;
 
 #if (CONFIG_MENU_TIMEOUT != 0)
@@ -479,17 +489,21 @@ iptr_t menu_handle(const struct Menu *menu)
 				item = &ram_item;
 			}
 #endif
-			menu_doselect(menu, item);
+			result = menu_doselect(menu, item);
 			redraw = true;
 
-			/* Return userdata as result */
-			if (!menu->flags & MF_STICKY)
-			{
-				/* Store currently selected item before leaving. */
-				if (menu->flags & MF_SAVESEL)
-					CONST_CAST(struct Menu *, menu)->selected = selected;
-				return item->userdata;
-			}
+			/* Return immediately */
+			if (!(menu->flags & MF_STICKY))
+				break;
+
+			#if (CONFIG_MENU_TIMEOUT != 0)
+				/* Chain timeout */
+				if ((result == MENU_TIMEOUT) && !(menu->flags & MF_TOPLEVEL))
+					break;
+
+				/* Reset timeout */
+				menu_idle_time = timer_clock();
+			#endif
 		}
 		else if (key & K_UP)
 		{
@@ -501,19 +515,29 @@ iptr_t menu_handle(const struct Menu *menu)
 			selected = menu_next_visible_item(menu, selected);
 			redraw = true;
 		}
-		else if (((key & K_CANCEL)
-			#if CONFIG_MENU_TIMEOUT != 0
-				|| (now - menu_idle_time > ms_to_ticks(CONFIG_MENU_TIMEOUT))
-			#endif
-				) && !(menu->flags & MF_TOPLEVEL)
-		)
+		else if (!(menu->flags & MF_TOPLEVEL))
 		{
-			/* Store currently selected item before leaving. */
-			if (menu->flags & MF_SAVESEL)
-				CONST_CAST(struct Menu *, menu)->selected = selected;
-			return 0;
+			if (key & K_CANCEL)
+			{
+				result = MENU_CANCEL;
+				break;
+			}
+
+			#if CONFIG_MENU_TIMEOUT != 0
+				if (now - menu_idle_time > ms_to_ticks(CONFIG_MENU_TIMEOUT))
+				{
+					result = MENU_TIMEOUT;
+					break;
+				}
+			#endif
 		}
 	}
+
+	/* Store currently selected item before leaving. */
+	if (menu->flags & MF_SAVESEL)
+		CONST_CAST(struct Menu *, menu)->selected = selected;
+
+	return result;
 }
 
 

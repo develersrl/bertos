@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/06/03 13:58:02  bernie
+ *#* Fix recursive timeout and add exit status information.
+ *#*
  *#* Revision 1.1  2006/05/15 07:20:54  bernie
  *#* Move menu to gui/.
  *#*
@@ -67,7 +70,7 @@
 struct Bitmap;
 
 /** Menu callback function */
-typedef void (*MenuHook)(iptr_t userdata);
+typedef iptr_t (*MenuHook)(iptr_t userdata);
 
 /**
  * Menu item description.
@@ -123,6 +126,17 @@ typedef struct Menu
 #define MF_TOPLEVEL BV(1)  /**< Top-level menu (do not display "back" label) */
 #define MF_ROMITEMS BV(2)  /**< Menu items are stored in ROM (default is RAM) */
 #define MF_SAVESEL  BV(3)  /**< Remember the selected item across invocations. */
+/* \} */
+
+/**
+ * \name Special result codes for menu_handle().
+ * \{
+ */
+#define MENU_OK       ((iptr_t)0)
+#define MENU_CANCEL   ((iptr_t)-1)
+#define MENU_TIMEOUT  ((iptr_t)-2)
+#define MENU_ABORT    ((iptr_t)-3)
+#define MENU_DISABLED ((iptr_t)-4)
 /* \} */
 
 /* Function prototypes */
