@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.20  2006/06/10 05:36:15  bernie
+ *#* Convert to new Doxygen comments.
+ *#*
  *#* Revision 1.19  2006/04/11 00:07:33  bernie
  *#* Implemenent MF_SAVESEL flag.
  *#*
@@ -111,14 +114,14 @@
 #endif
 
 
-/*! Concatenate two different preprocessor tokens (allowing macros to expand) */
+/** Concatenate two different preprocessor tokens (allowing macros to expand) */
 #define PP_CAT(x,y)         PP_CAT__(x,y)
 #define PP_CAT__(x,y)       x ## y
 #define PP_CAT3(x,y,z)      PP_CAT(PP_CAT(x,y),z)
 #define PP_CAT4(x,y,z,w)    PP_CAT(PP_CAT3(x,y,z),w)
 #define PP_CAT5(x,y,z,w,j)  PP_CAT(PP_CAT4(x,y,z,w),j)
 
-/*! String-ize a token (allowing macros to expand) */
+/** String-ize a token (allowing macros to expand) */
 #define PP_STRINGIZE(x)     PP_STRINGIZE__(x)
 #define PP_STRINGIZE__(x)   #x
 
@@ -284,7 +287,7 @@
 
 /* Defaults for compiler extensions. */
 
-/*!
+/**
  * \def COMPILER_VARIADIC_MACROS
  * Support for macros with variable arguments.
  */
@@ -292,7 +295,7 @@
 #define COMPILER_VARIADIC_MACROS (COMPILER_C99 != 0)
 #endif
 
-/*!
+/**
  * \def COMPILER_TYPEOF
  * Support for dynamic type identification.
  */
@@ -300,7 +303,7 @@
 #define COMPILER_TYPEOF 0
 #endif
 
-/*!
+/**
  * \def COMPILER_STATEMENT_EXPRESSIONS
  * Support for statement expressions.
  */
@@ -386,7 +389,7 @@
 
 #if defined(_MSC_VER) \
 	|| ((defined(__IAR_SYSTEMS_ICC) || defined(__IAR_SYSTEMS_ICC__)) && CPU_I196)
-	/*!
+	/**
 	 * \name ISO C99 fixed-size types
 	 *
 	 * These should be in <stdint.h>, but a few compilers lack them.
@@ -417,33 +420,33 @@
 	 * The ATmega8 has a very small Flash, so we can't afford
 	 * to link in support routines for 32bit integer arithmetic.
 	 */
-	typedef int16_t ticks_t;  /*!< Type for time expressed in ticks. */
-	typedef int16_t mtime_t;  /*!< Type for time expressed in milliseconds. */
-	typedef int16_t utime_t;  /*!< Type for time expressed in microseconds. */
+	typedef int16_t ticks_t;  /**< Type for time expressed in ticks. */
+	typedef int16_t mtime_t;  /**< Type for time expressed in milliseconds. */
+	typedef int16_t utime_t;  /**< Type for time expressed in microseconds. */
 	#define SIZEOF_MTIME_T (16 / CPU_BITS_PER_CHAR)
 	#define SIZEOF_UTIME_T (16 / CPU_BITS_PER_CHAR)
 	#define MTIME_INFINITE 0x7FFFL
 #else
-	typedef int32_t ticks_t;  /*!< Type for time expressed in ticks. */
-	typedef int32_t mtime_t;  /*!< Type for time expressed in milliseconds. */
-	typedef int32_t utime_t;  /*!< Type for time expressed in microseconds. */
+	typedef int32_t ticks_t;  /**< Type for time expressed in ticks. */
+	typedef int32_t mtime_t;  /**< Type for time expressed in milliseconds. */
+	typedef int32_t utime_t;  /**< Type for time expressed in microseconds. */
 	#define SIZEOF_MTIME_T (32 / CPU_BITS_PER_CHAR)
 	#define SIZEOF_UTIME_T (32 / CPU_BITS_PER_CHAR)
 	#define MTIME_INFINITE 0x7FFFFFFFL
 #endif
 
-/*! Bulk storage large enough for both pointers or integers. */
+/** Bulk storage large enough for both pointers or integers. */
 typedef void * iptr_t;
 
-/*! Bulk storage large enough for both pointers to constants or integers. */
+/** Bulk storage large enough for both pointers to constants or integers. */
 typedef const void * const_iptr_t;
 
-typedef unsigned char sigbit_t;  /*!< Type for signal bits. */
-typedef unsigned char sigmask_t; /*!< Type for signal masks. */
-typedef unsigned char page_t;    /*!< Type for banked memory pages. */
+typedef unsigned char sigbit_t;  /**< Type for signal bits. */
+typedef unsigned char sigmask_t; /**< Type for signal masks. */
+typedef unsigned char page_t;    /**< Type for banked memory pages. */
 
 
-/*!
+/**
  * \name Standard type definitions.
  *
  * These should be in <sys/types.h> or <stddef.h>, but many compilers
@@ -483,7 +486,7 @@ typedef unsigned char page_t;    /*!< Type for banked memory pages. */
 /*\}*/
 
 
-/*!
+/**
  * \name Types for hardware registers.
  *
  * Only use these types for registers whose contents can
@@ -504,7 +507,7 @@ typedef unsigned char page_t;    /*!< Type for banked memory pages. */
 
 /* Quasi-ANSI macros */
 #ifndef offsetof
-	/*!
+	/**
 	 * Return the byte offset of the member \a m in struct \a s.
 	 *
 	 * \note This macro should be defined in "stddef.h" and is sometimes
@@ -513,7 +516,7 @@ typedef unsigned char page_t;    /*!< Type for banked memory pages. */
 	#define offsetof(s,m)  (size_t)&(((s *)0)->m)
 #endif
 #ifndef countof
-	/*!
+	/**
 	 * Count the number of elements in the static array \a a.
 	 *
 	 * \note This macro is non-standard, but implements a very common idiom
@@ -538,12 +541,12 @@ typedef unsigned char page_t;    /*!< Type for banked memory pages. */
 		( (type *)((char *)(ptr) - offsetof(type, member)) )
 #endif
 
-/*! Issue a compilation error if the \a condition is false */
+/** Issue a compilation error if the \a condition is false */
 #define STATIC_ASSERT(condition)  \
 	UNUSED_VAR(extern char, STATIC_ASSERTION_FAILED__[(condition) ? 1 : -1])
 
 #ifndef ASSERT_TYPE_EQUAL
-/*! Ensure two variables have the same type. */
+/** Ensure two variables have the same type. */
 #define ASSERT_TYPE_EQUAL(var1, var2)  \
 		do { (void)(&(var1) == &(var2)); } while(0)
 #endif

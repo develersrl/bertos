@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2006/06/10 05:37:03  bernie
+ *#* Convert to new Doxygen comments.
+ *#*
  *#* Revision 1.9  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -50,7 +53,7 @@
 #include <cfg/compiler.h>
 #include <cfg/cpu.h>
 
-/*!
+/**
  * Swap upper and lower bytes in a 16-bit value.
  */
 INLINE uint16_t swab16(uint16_t x)
@@ -59,7 +62,7 @@ INLINE uint16_t swab16(uint16_t x)
 		| ((x & (uint16_t)0xFF00U) >> 8);
 }
 
-/*!
+/**
  * Reverse bytes in a 32-bit value (e.g.: 0x12345678 -> 0x78563412).
  */
 INLINE uint32_t swab32(uint32_t x)
@@ -70,7 +73,7 @@ INLINE uint32_t swab32(uint32_t x)
 		| ((x & (uint32_t)0xFF000000UL) >> 24);
 }
 
-/*!
+/**
  * Reverse bytes in a float value.
  */
 INLINE float swab_float(float x)
@@ -177,7 +180,7 @@ INLINE float net_to_host_float(float x)
 
 #ifdef __cplusplus
 
-//! Type generic byte swapping.
+/// Type generic byte swapping.
 template<typename T>
 INLINE T swab(T x);
 
@@ -187,42 +190,42 @@ template<> INLINE int16_t  swab(int16_t x)  { return static_cast<int16_t>(swab16
 template<> INLINE int32_t  swab(int32_t x)  { return static_cast<int32_t>(swab32(static_cast<uint32_t>(x))); }
 template<> INLINE float    swab(float x)    { return swab_float(x); }
 
-//! Type generic conversion from CPU byte order to big-endian byte order.
+/// Type generic conversion from CPU byte order to big-endian byte order.
 template<typename T>
 INLINE T cpu_to_be(T x)
 {
 	return (CPU_BYTE_ORDER == CPU_LITTLE_ENDIAN) ? swab(x) : x;
 }
 
-//! Type generic conversion from CPU byte-order to little-endian.
+/// Type generic conversion from CPU byte-order to little-endian.
 template<typename T>
 INLINE T cpu_to_le(T x)
 {
 	return (CPU_BYTE_ORDER == CPU_BIG_ENDIAN) ? swab(x) : x;
 }
 
-//! Type generic conversion from big endian byte-order to CPU byte order.
+/// Type generic conversion from big endian byte-order to CPU byte order.
 template<typename T>
 INLINE T be_to_cpu(T x)
 {
 	return cpu_to_be(x);
 }
 
-//! Type generic conversion from little-endian byte order to CPU byte order.
+/// Type generic conversion from little-endian byte order to CPU byte order.
 template<typename T>
 INLINE T le_to_cpu(T x)
 {
 	return cpu_to_le(x);
 }
 
-//! Type generic conversion from network byte order to host byte order.
+/// Type generic conversion from network byte order to host byte order.
 template<typename T>
 INLINE T net_to_host(T x)
 {
 	return be_to_cpu(x);
 }
 
-//! Type generic conversion from host byte order to network byte order.
+/// Type generic conversion from host byte order to network byte order.
 template<typename T>
 INLINE T host_to_net(T x)
 {
