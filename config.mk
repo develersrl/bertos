@@ -10,8 +10,8 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
-# Revision 1.5  2006/06/12 21:37:01  marco
-# implemented some commands (ver and sleep)
+# Revision 1.6  2006/06/12 22:05:09  marco
+# Bring back config wrongly commited
 #
 # Revision 1.4  2006/05/27 22:41:46  bernie
 # Tweak optimization flags for loops.
@@ -31,8 +31,7 @@
 # Programmer type
 #
 # AVR ISP dongle that blows up easily
-DPROG = -V -c jtag2slow
-#-P /dev/ttyUSB0
+DPROG = -V -c stk500 -P /dev/ttyS0
 
 # STK200 parallel cable
 #DPROG = -c stk200 -E noreset
@@ -40,8 +39,7 @@ DPROG = -V -c jtag2slow
 # PonyProg serial programmer
 #DPROG = -c dasa2
 
-#OPTCFLAGS = -ffunction-sections -fdata-sections -funsafe-loop-optimizations
-OPTCFLAGS = -funsafe-loop-optimizations
+OPTCFLAGS = -ffunction-sections -fdata-sections -funsafe-loop-optimizations
 
 # For AVRStudio
 #DEBUGCFLAGS = -gdwarf-2
@@ -52,7 +50,7 @@ DEBUGCFLAGS = -ggdb
 #
 # define some variables based on the AVR base path in $(AVR)
 #
-CROSS   = avr-
+CROSS   = 
 CC      = $(CROSS)gcc
 AS      = $(CC) -x assembler-with-cpp
 LD      = $(CC)
@@ -121,7 +119,7 @@ CPPAFLAGS = $(DEBUGCFLAGS) -MMD
 ASFLAGS	= $(DEBUGCFLAGS)
 
 # Default linker flags
-LDFLAGS = $(MAP_FLAGS)
+#LDFLAGS = $(MAP_FLAGS)
 
 #bernie: does not complain for missing symbols!
 #LDFLAGS = $(MAP_FLAGS) -Wl,--gc-sections
