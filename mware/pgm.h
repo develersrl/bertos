@@ -150,6 +150,9 @@
 	#ifndef PSTR
 	#define PSTR(s) ({ static const char __c[] PROGMEM = (s); &__c[0]; })
 	#endif
+	#ifndef PFUNC
+	#define PFUNC(x)      x ## _P
+	#endif
 
 #elif CPU_HARVARD
 	#error Missing CPU support
@@ -157,6 +160,10 @@
 
 #ifndef PSTR
 #define PSTR            /* nothing */
+#endif
+
+#ifndef PFUNC
+#define PFUNC(x) x
 #endif
 
 #ifndef PROGMEM
@@ -209,7 +216,7 @@ typedef PROGMEM uint32_t pgm_uint32_t;
  */
 #ifdef _PROGMEM
 	#define PGM_READ_CHAR(s) pgm_read_char(s)
-	#define PGM_FUNC(x)      x ## _P
+	#define PGM_FUNC(x)      PFUNC(x)
 	#define PGM_STR(x)       PSTR(x)
 	#define PGM_ATTR         PROGMEM
 #else

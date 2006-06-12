@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/06/12 21:37:02  marco
+ *#* implemented some commands (ver and sleep)
+ *#*
  *#* Revision 1.2  2006/06/01 12:29:21  marco
  *#* Add first simple protocol command (version request).
  *#*
@@ -43,6 +46,7 @@ int main(void)
 	ser_setbaudrate(host_port, 38400);
 
 	protocol_init(host_port);
+	timer_delay(2000);
 
 	// Main loop
 	for(;;)

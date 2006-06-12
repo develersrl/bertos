@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/06/12 21:37:02  marco
+ *#* implemented some commands (ver and sleep)
+ *#*
  *#* Revision 1.1  2006/06/01 12:29:21  marco
  *#* Add first simple protocol command (version request).
  *#*
@@ -24,13 +27,20 @@
 #include "protocol.h"
 
 #include <drv/ser.h>
+#include <drv/timer.h>
 #include <mware/readline.h>
 #include <mware/parser.h>
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
 #include <verstag.h>
 
+#include <stdlib.h> /* malloc()
+		       TODO: substitute with a more appropriate
+		       memory allocator. */
+
 #include <string.h>
+
+#include <cmd_hunk.h>
 
 
 // DEBUG: set to 1 to force interactive mode
@@ -38,8 +48,9 @@
 
 /**
  * True if we are in interactive mode, false if we are in protocol mode.
- * In interactive mode, commands are read through readline() (prompt, completion,
- * history) without IDs, and replies/errors are sent to the serial output.
+ * In interactive mode, commands are read through readline() (prompt,
+ * completion, history) without IDs, and replies/errors are sent to the serial
+ * output.
  * In protocol mode, we implement the default protocol
  */
 static bool interactive;
@@ -62,32 +73,79 @@ INLINE void NAK(Serial *ser, const char *err)
 #endif
 }
 
+/*
+ * Print args on s, with format specified in t->result_fmt.
+ * Return number of valid arguments or -1 in case of error.
+ */
+static int protocol_reply(Serial *s, const struct CmdTemplate *t,
+			  const parms *args)
+{
+	int nres = strlen(t->result_fmt);
+
+	if (nres > 0)
+	{
+		for (int i = strlen(t->arg_fmt); i < nres; ++i)
+		{
+			if (t->result_fmt[i] == 'd')
+			{
+				ser_printf(s, "%ld", args[i].l);
+			}
+			else if (t->result_fmt[i] == 's')
+			{
+				ser_printf(s, "%s ", args[i].s);
+			}
+			else
+			{
+				return -1;
+			}
+		}
+	}
+	ser_print(s, "\r\n");
+	return nres;
+}
+
 static void protocol_parse(Serial *ser, const char *buf)
 {
 	const struct CmdTemplate *templ;
-	parms args[8]; // FIXME FIXME!!
 
+	/* Command check.  */
 	templ = parser_get_cmd_template(buf);
-
 	if (!templ)
 	{
-		NAK(ser, "invalid command");
+		NAK(ser, "Invalid command.");
 		return;
 	}
 
-	// Extract the arguments for the command
+	parms args[PARSER_MAX_ARGS];
+
+	/* Args Check.  */
 	if (!parser_get_cmd_arguments(buf, templ, args))
 	{
-		NAK(ser, "invalid arguments");
+		NAK(ser, "Invalid arguments.");
 		return;
 	}
 
-	// EXEC!
+	/* Execute. */
+	if (!parser_execute_cmd(templ, args))
+	{
+		NAK(ser, "Command failed.");
+	}
+	else
+	{
+		if (protocol_reply(ser, templ, args) < 0)
+		{
+			NAK(ser, "Invalid return format.");
+		}
+	}
+	return;
 }
 
 void protocol_run(Serial *ser)
 {
-	// \todo to be removed, we could probably access the serial FIFO directly
+	/**
+	 * \todo to be removed, we could probably access the serial FIFO
+	 * directly
+	 */
 	static char linebuf[80];
 
 	if (!interactive)
@@ -103,10 +161,13 @@ void protocol_run(Serial *ser)
 			if (linebuf[0] == 0x1B && linebuf[1] == 0x1B)  // ESC
 			{
 				interactive = true;
-				ser_printf(ser, "Entering interactive mode\r\n");
+				ser_printf(ser,
+					   "Entering interactive mode\r\n");
 			}
 			else
+			{
 				protocol_parse(ser, linebuf);
+			}
 		}
 	}
 	else
@@ -129,7 +190,8 @@ void protocol_run(Serial *ser)
 			if (!strcmp(buf, "exit") || !strcmp(buf, "quit"))
 			{
 				rl_clear_history(&rl_ctx);
-				ser_printf(ser, "Leaving interactive mode...\r\n");
+				ser_printf(ser,
+					   "Leaving interactive mode...\r\n");
 				interactive = FORCE_INTERACTIVE;
 			}
 			else
@@ -146,21 +208,50 @@ void protocol_run(Serial *ser)
 	}
 }
 
+/*
+ * Commands.
+ * TODO: Command declarations and definitions should be in another file(s).
+ * Maybe we should use CMD_HUNK_TEMPLATE.
+ *
+ */
+
+/* Version.  */
 static ResultCode cmd_ver(const char **str)
 {
 	*str = VERS_TAG;
-kprintf("hello, version world!\nver=" VERS_TAG "\n");
-	return RC_REPLY;
+	return 0;
 }
-static ResultCode cmd_add_hunk(parms args_results[])
+static ResultCode cmd_ver_hunk(parms args_results[])
 {
 	return cmd_ver(&args_results[0].s);
 }
+
 const struct CmdTemplate cmd_ver_template =
 {
-	"ver", "", "d", cmd_add_hunk
+	"ver", "", "s", cmd_ver_hunk, 0
 };
 
+//DECLARE_CMD_HUNK(ver, (NIL), (string)(NIL));
+
+/* Sleep.  */
+
+static ResultCode cmd_sleep(const long ms)
+{
+	timer_delay((mtime_t)ms);
+	return 0;
+}
+
+static ResultCode cmd_sleep_hunk(parms args[])
+{
+	return cmd_sleep(args[1].l);
+}
+
+const struct CmdTemplate cmd_sleep_template =
+{
+	"sleep", "d", "", cmd_sleep_hunk, 0
+};
+
+/* Register commands.  */
 static void protocol_registerCmds(void)
 {
 //	parser_register_cmd(&CMD_HUNK_TEMPLATE(quit));
@@ -175,6 +266,7 @@ static void protocol_registerCmds(void)
 //	parser_register_cmd(&CMD_HUNK_TEMPLATE(power_off));
 
 	parser_register_cmd(&cmd_ver_template);
+	parser_register_cmd(&cmd_sleep_template);
 }
 void protocol_init(Serial *ser)
 {

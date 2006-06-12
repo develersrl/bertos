@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/06/12 21:37:01  marco
+ *#* implemented some commands (ver and sleep)
+ *#*
  *#* Revision 1.2  2006/06/01 12:29:21  marco
  *#* Add first simple protocol command (version request).
  *#*
@@ -133,7 +136,7 @@
 /*\}*/
 
 /// Hardware timer selection for drv/timer.c
-#define CONFIG_TIMER  TIMER_ON_OUTPUT_COMPARE2
+#define CONFIG_TIMER  TIMER_ON_OUTPUT_COMPARE0
 
 /// Debug timer interrupt using a strobe pin.
 #define CONFIG_TIMER_STROBE  0

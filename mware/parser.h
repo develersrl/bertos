@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/06/12 21:37:02  marco
+ *#* implemented some commands (ver and sleep)
+ *#*
  *#* Revision 1.1  2006/06/01 12:27:39  marco
  *#* Added utilities for protocols
  *#*
@@ -57,10 +60,11 @@ typedef ResultCode (*CmdFuncPtr)(parms args_results[]);
  */
 struct CmdTemplate
 {
-	const char *name;          //!< name of command
-	const char *arg_fmt;       //!< format string for the input
-	const char *result_fmt;    //!< format string for the output
-	CmdFuncPtr func;           //!< pointer to the handler function
+	const char *name;          ///< Name of command
+	const char *arg_fmt;       ///< Format string for the input
+	const char *result_fmt;    ///< Format string for the output
+	CmdFuncPtr func;           ///< Pointer to the handler function
+	uint16_t   flags;          ///< Currently unused.
 };
 
 /**

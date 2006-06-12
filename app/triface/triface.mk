@@ -8,6 +8,9 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
+# Revision 1.3  2006/06/12 21:37:02  marco
+# implemented some commands (ver and sleep)
+#
 # Revision 1.2  2006/06/01 12:29:21  marco
 # Add first simple protocol command (version request).
 #
@@ -39,7 +42,8 @@ triface_CSRC = \
 
 triface_PCSRC += mware/formatwr.c
 
-triface_CFLAGS = -Os -D'ARCH=0' -Iapp/triface/hw -Iapp/triface
+#triface_CFLAGS = -O3 -D'ARCH=0' -Iapp/triface/hw -Iapp/triface
+triface_CFLAGS = -O0 -D'ARCH=0' -Iapp/triface/hw -Iapp/triface
 triface_MCU = atmega128
 
 # Debug stuff

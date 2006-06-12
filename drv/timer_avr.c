@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/06/12 21:37:02  marco
+ *#* implemented some commands (ver and sleep)
+ *#*
  *#* Revision 1.2  2006/05/18 00:37:58  bernie
  *#* Don't include unneeded header hw.h.
  *#*
@@ -28,7 +31,7 @@
 #include <drv/timer_avr.h>
 #include <cfg/macros.h> // BV()
 
-#include <avr/signal.h>
+#include <avr/interrupt.h>
 #include <avr/io.h>
 
 /*! HW dependent timer initialization  */

@@ -4,7 +4,7 @@ Command format:
   <command><SP><arg1><SP>...<argN><CR><LF>
 
 Where:
-  command - alphanurmeric command name
+  command - alphanumeric command name
   argN    - numeric argument (unsigned base 10, 0-65535)
 
 Positive response format:
