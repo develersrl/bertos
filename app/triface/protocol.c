@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/06/13 19:07:31  marco
+ *#* Fixed a bug in protocol_reply. Simplified rpc.
+ *#*
  *#* Revision 1.2  2006/06/12 21:37:02  marco
  *#* implemented some commands (ver and sleep)
  *#*
@@ -33,10 +36,6 @@
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
 #include <verstag.h>
-
-#include <stdlib.h> /* malloc()
-		       TODO: substitute with a more appropriate
-		       memory allocator. */
 
 #include <string.h>
 
@@ -80,19 +79,20 @@ INLINE void NAK(Serial *ser, const char *err)
 static int protocol_reply(Serial *s, const struct CmdTemplate *t,
 			  const parms *args)
 {
-	int nres = strlen(t->result_fmt);
+	unsigned short offset = strlen(t->arg_fmt) + 1;
+	unsigned short nres = strlen(t->result_fmt);
 
 	if (nres > 0)
 	{
-		for (int i = strlen(t->arg_fmt); i < nres; ++i)
+		for (unsigned short i = 0; i < nres; ++i)
 		{
 			if (t->result_fmt[i] == 'd')
 			{
-				ser_printf(s, "%ld", args[i].l);
+				ser_printf(s, "%ld", args[offset+i].l);
 			}
 			else if (t->result_fmt[i] == 's')
 			{
-				ser_printf(s, "%s ", args[i].s);
+				ser_printf(s, "%s ", args[offset+i].s);
 			}
 			else
 			{
@@ -216,39 +216,28 @@ void protocol_run(Serial *ser)
  */
 
 /* Version.  */
-static ResultCode cmd_ver(const char **str)
+
+
+static ResultCode cmd_ver(parms *args)
 {
-	*str = VERS_TAG;
+	args[1].s = VERS_TAG;
 	return 0;
 }
-static ResultCode cmd_ver_hunk(parms args_results[])
-{
-	return cmd_ver(&args_results[0].s);
-}
-
 const struct CmdTemplate cmd_ver_template =
 {
-	"ver", "", "s", cmd_ver_hunk, 0
+	"ver", "", "s", cmd_ver, 0
 };
 
-//DECLARE_CMD_HUNK(ver, (NIL), (string)(NIL));
+/* Sleep.  */ 
 
-/* Sleep.  */
-
-static ResultCode cmd_sleep(const long ms)
+static ResultCode cmd_sleep(parms *args)
 {
-	timer_delay((mtime_t)ms);
+	timer_delay((mtime_t)args[1].l);
 	return 0;
 }
-
-static ResultCode cmd_sleep_hunk(parms args[])
-{
-	return cmd_sleep(args[1].l);
-}
-
 const struct CmdTemplate cmd_sleep_template =
 {
-	"sleep", "d", "", cmd_sleep_hunk, 0
+	"sleep", "d", "", cmd_sleep, 0
 };
 
 /* Register commands.  */
