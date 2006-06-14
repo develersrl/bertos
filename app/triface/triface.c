@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/06/14 00:28:52  marco
+ *#* Removed initial delay.
+ *#*
  *#* Revision 1.3  2006/06/12 21:37:02  marco
  *#* implemented some commands (ver and sleep)
  *#*
@@ -46,7 +49,6 @@ int main(void)
 	ser_setbaudrate(host_port, 38400);
 
 	protocol_init(host_port);
-	timer_delay(2000);
 
 	// Main loop
 	for(;;)
