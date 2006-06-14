@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/06/14 01:03:01  marco
+ *#* Add response code. Add command ping.
+ *#*
  *#* Revision 1.4  2006/06/14 00:26:48  marco
  *#* Use new macros for defining commands.
  *#*
@@ -40,6 +43,7 @@
 #include <cfg/debug.h>
 #include <verstag.h>
 
+#include <stdlib.h>
 #include <string.h>
 
 #include <cmd_hunk.h>
@@ -80,32 +84,30 @@ INLINE void NAK(Serial *ser, const char *err)
  * Print args on s, with format specified in t->result_fmt.
  * Return number of valid arguments or -1 in case of error.
  */
-static int protocol_reply(Serial *s, const struct CmdTemplate *t,
+static bool protocol_reply(Serial *s, const struct CmdTemplate *t,
 			  const parms *args)
 {
 	unsigned short offset = strlen(t->arg_fmt) + 1;
 	unsigned short nres = strlen(t->result_fmt);
 
-	if (nres > 0)
+	ser_printf(s, "0");
+	for (unsigned short i = 0; i < nres; ++i)
 	{
-		for (unsigned short i = 0; i < nres; ++i)
+		if (t->result_fmt[i] == 'd')
 		{
-			if (t->result_fmt[i] == 'd')
-			{
-				ser_printf(s, "%ld", args[offset+i].l);
-			}
-			else if (t->result_fmt[i] == 's')
-			{
-				ser_printf(s, "%s ", args[offset+i].s);
-			}
-			else
-			{
-				return -1;
-			}
+			ser_printf(s, " %ld", args[offset+i].l);
+		}
+		else if (t->result_fmt[i] == 's')
+		{
+			ser_printf(s, " %s", args[offset+i].s);
+		}
+		else
+		{
+			abort();
 		}
 	}
-	ser_print(s, "\r\n");
-	return nres;
+	ser_printf(s, "\r\n");
+	return true;
 }
 
 static void protocol_parse(Serial *ser, const char *buf)
@@ -116,30 +118,27 @@ static void protocol_parse(Serial *ser, const char *buf)
 	templ = parser_get_cmd_template(buf);
 	if (!templ)
 	{
-		NAK(ser, "Invalid command.");
+		ser_print(ser, "-1 Invalid command.");
 		return;
 	}
 
 	parms args[PARSER_MAX_ARGS];
 
-	/* Args Check.  */
+	/* Args Check.  TODO: Handle different case. see doc/PROTOCOL .  */
 	if (!parser_get_cmd_arguments(buf, templ, args))
 	{
-		NAK(ser, "Invalid arguments.");
+		ser_print(ser, "-2 Invalid arguments.");
 		return;
 	}
 
 	/* Execute. */
-	if (!parser_execute_cmd(templ, args))
+	if(!parser_execute_cmd(templ, args))
 	{
-		NAK(ser, "Command failed.");
+		NAK(ser, "Error in executing command.");
 	}
-	else
+	if (!protocol_reply(ser, templ, args))
 	{
-		if (protocol_reply(ser, templ, args) < 0)
-		{
-			NAK(ser, "Invalid return format.");
-		}
+		NAK(ser, "Invalid return format.");
 	}
 	return;
 }
@@ -233,11 +232,18 @@ MAKE_CMD(sleep, "d", "",
 	0;
 }))
 
+/* Ping.  */
+MAKE_CMD(ping, "", "",
+({
+	0;
+}))
+
 /* Register commands.  */
 static void protocol_registerCmds(void)
 {
 	REGISTER_CMD(ver);
 	REGISTER_CMD(sleep);
+	REGISTER_CMD(ping);
 }
 
 /* Initialization: readline context, parser and register commands.  */
