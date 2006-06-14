@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/06/14 00:26:48  marco
+ *#* Use new macros for defining commands.
+ *#*
  *#* Revision 1.3  2006/06/13 19:07:31  marco
  *#* Fixed a bug in protocol_reply. Simplified rpc.
  *#*
@@ -41,6 +44,7 @@
 
 #include <cmd_hunk.h>
 
+#include "cmd_ctor.h"  // MAKE_CMD, REGISTER_CMD
 
 // DEBUG: set to 1 to force interactive mode
 #define FORCE_INTERACTIVE         1
@@ -216,52 +220,31 @@ void protocol_run(Serial *ser)
  */
 
 /* Version.  */
-
-
-static ResultCode cmd_ver(parms *args)
-{
+MAKE_CMD(ver, "", "s",
+({
 	args[1].s = VERS_TAG;
-	return 0;
-}
-const struct CmdTemplate cmd_ver_template =
-{
-	"ver", "", "s", cmd_ver, 0
-};
+	0;
+}))
 
-/* Sleep.  */ 
-
-static ResultCode cmd_sleep(parms *args)
-{
+/* Sleep.  */
+MAKE_CMD(sleep, "d", "",
+({
 	timer_delay((mtime_t)args[1].l);
-	return 0;
-}
-const struct CmdTemplate cmd_sleep_template =
-{
-	"sleep", "d", "", cmd_sleep, 0
-};
+	0;
+}))
 
 /* Register commands.  */
 static void protocol_registerCmds(void)
 {
-//	parser_register_cmd(&CMD_HUNK_TEMPLATE(quit));
-//	parser_register_cmd(&CMD_HUNK_TEMPLATE(exit));
-//	parser_register_cmd(&CMD_HUNK_TEMPLATE(wait));
-//	parser_register_cmd(&CMD_HUNK_TEMPLATE(delay));
-//	parser_register_cmd(&CMD_HUNK_TEMPLATE(SYN));
-//	parser_register_cmd(&CMD_HUNK_TEMPLATE(RST));
-//	parser_register_cmd(&CMD_HUNK_TEMPLATE(skip_end));
-//	parser_register_cmd(&CMD_HUNK_TEMPLATE(restart));
-//	parser_register_cmd(&CMD_HUNK_TEMPLATE(ver));
-//	parser_register_cmd(&CMD_HUNK_TEMPLATE(power_off));
-
-	parser_register_cmd(&cmd_ver_template);
-	parser_register_cmd(&cmd_sleep_template);
+	REGISTER_CMD(ver);
+	REGISTER_CMD(sleep);
 }
+
+/* Initialization: readline context, parser and register commands.  */
 void protocol_init(Serial *ser)
 {
 	interactive = FORCE_INTERACTIVE;
 
-	// Initialize the readline context used for interactive mode
 	rl_init_ctx(&rl_ctx);
 	rl_setprompt(&rl_ctx, ">> ");
 	rl_sethook_get(&rl_ctx, (getc_hook)ser_getchar, ser);
