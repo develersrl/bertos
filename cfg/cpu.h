@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.14  2006/07/19 12:54:12  bernie
+ *#* Documentation fixes.
+ *#*
  *#* Revision 1.13  2006/03/27 04:49:23  bernie
  *#* CPU_IDLE(): Fix for new emulator.
  *#*
@@ -81,7 +84,7 @@
 #include <cfg/arch_config.h>  /* ARCH_EMUL */
 
 
-/*!
+/**
  * \name Macros for determining CPU endianness.
  * \{
  */
@@ -89,10 +92,10 @@
 #define CPU_LITTLE_ENDIAN 0x3412 /* Look twice, pal. This is not a bug. */
 /*\}*/
 
-/*! Macro to include cpu-specific versions of the headers. */
+/** Macro to include cpu-specific versions of the headers. */
 #define CPU_HEADER(module)          PP_STRINGIZE(PP_CAT3(module, _, CPU_ID).h)
 
-/*! Macro to include cpu-specific versions of implementation files. */
+/** Macro to include cpu-specific versions of implementation files. */
 #define CPU_CSOURCE(module)         PP_STRINGIZE(PP_CAT3(module, _, CPU_ID).c)
 
 

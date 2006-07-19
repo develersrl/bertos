@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2006/07/19 12:53:58  bernie
+ *#* Documentation fixes.
+ *#*
  *#* Revision 1.8  2006/02/20 01:46:46  bernie
  *#* Port to MacOSX.
  *#*
@@ -58,7 +61,7 @@ extern "C" {
 
 	#include <stdint.h>
 
-	/** our type for "high precision absolute time" */
+	/** Type for "high precision absolute time". */
 	typedef int64_t hptime_t;
 
 	#define HPTIME_TICKS_PER_SECOND		1000000LL
