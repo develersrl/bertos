@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.21  2006/07/19 12:53:43  bernie
+ *#* Prune log.
+ *#*
  *#* Revision 1.20  2006/06/10 05:36:15  bernie
  *#* Convert to new Doxygen comments.
  *#*
@@ -73,21 +76,6 @@
  *#*
  *#* Revision 1.1  2005/04/11 19:04:13  bernie
  *#* Move top-level headers to cfg/ subdir.
- *#*
- *#* Revision 1.44  2005/03/29 06:39:59  bernie
- *#* setjmp.h, time_t: Remove ancient retrocompatibility; Remove MSVC double to float hack.
- *#*
- *#* Revision 1.43  2005/03/01 23:15:12  bernie
- *#* Remove compatibility hack.
- *#*
- *#* Revision 1.42  2005/02/16 20:28:46  bernie
- *#* Move PGM macros to mware/pgm.h
- *#*
- *#* Revision 1.41  2005/01/22 04:19:22  bernie
- *#* MTIME_INFINITE: New constant.
- *#*
- *#* Revision 1.40  2005/01/20 18:46:04  aleph
- *#* Add progmem datatypes; PSTR() definition.
  *#*/
 #ifndef DEVLIB_COMPILER_H
 #define DEVLIB_COMPILER_H
