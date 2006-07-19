@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004, 2005 Develer S.r.l. (http://www.develer.com/)
@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2005/04/12 01:37:50  bernie
  *#* Import into DevLib.
  *#*
@@ -46,7 +49,7 @@
 
 #include <avr/io.h>
 
-/*!
+/**
  * Send a character over the serial line.
  *
  * \return the character sent.
@@ -71,7 +74,7 @@ int _ser_putchar(int c)
 }
 
 
-/*!
+/**
  * Get a character from the serial line.
  * If ther is no character in the buffer this function wait until
  * one is received (no timeout).
@@ -87,7 +90,7 @@ int _ser_getchar(void)
 }
 
 
-/*!
+/**
  * Get a character from the receiver buffer
  * If the buffer is empty, ser_getchar_nowait() returns
  * immediatly EOF.
@@ -102,7 +105,7 @@ void _ser_settimeouts(void)
 {
 }
 
-/*!
+/**
  * Set the baudrate.
  */
 void _ser_setbaudrate(unsigned long rate)
@@ -114,7 +117,7 @@ void _ser_setbaudrate(unsigned long rate)
 	UBRR0L = (period);
 }
 
-/*!
+/**
  * Send a string.
  */
 int _ser_print(const char *s)
@@ -130,7 +133,7 @@ void _ser_setparity(int parity)
 	UCSR0C |= (UCSR0C & ~(BV(UPM1) | BV(UPM0))) | (parity << UPM0);	
 }
 
-/*!
+/**
  * Dummy functions.
  */
 void _ser_purge(void)
@@ -138,7 +141,7 @@ void _ser_purge(void)
 	while (_ser_getchar_nowait() != EOF) {}
 }
 
-/*!
+/**
  * Initialize serial.
  */
 struct Serial * _ser_open(void)
@@ -156,7 +159,7 @@ struct Serial * _ser_open(void)
 }
 
 
-/*!
+/**
  * Clean up serial port, disabling the associated hardware.
  */
 void _ser_close(void)

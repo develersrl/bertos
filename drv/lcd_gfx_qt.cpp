@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2006/07/19 12:56:25  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.8  2006/05/28 12:17:57  bernie
  *#* Drop almost all the Qt3 cruft.
  *#*
@@ -144,7 +147,7 @@ DECLARE_WALL(wall_before_raster, WALL_SIZE)
 static uint8_t lcd_raster[RASTER_SIZE(EmulLCD::WIDTH, EmulLCD::HEIGHT)];
 DECLARE_WALL(wall_after_raster, WALL_SIZE)
 
-/*! Default LCD bitmap */
+/** Default LCD bitmap */
 struct Bitmap lcd_bitmap;
 
 /*extern "C"*/ void lcd_init(void)

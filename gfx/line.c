@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.2  2006/02/10 12:26:58  bernie
  *#* Check CONFIG_* constraints.
  *#*
@@ -40,7 +43,7 @@
 	#error CONFIG_GFX_VCOORDS must be defined to either 0 or 1
 #endif
 
-/*!
+/**
  * Draw a sloped line without performing clipping.
  *
  * Parameters are the same of gfx_line().
@@ -128,7 +131,7 @@ static void gfx_lineUnclipped(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, co
 	}
 }
 
-//! Helper routine for gfx_line().
+/// Helper routine for gfx_line().
 static int gfx_findRegion(int x, int y, Rect *cr)
 {
 	int code = 0;
@@ -222,7 +225,7 @@ void gfx_line(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 	gfx_lineUnclipped(bm, x1, y1, x2, y2);
 }
 
-/*!
+/**
  * Move the current pen position to the specified coordinates.
  *
  * The pen position is used for drawing operations such as
@@ -234,7 +237,7 @@ void gfx_moveTo(Bitmap *bm, coord_t x, coord_t y)
 	bm->penY = y;
 }
 
-/*!
+/**
  * Draw a line from the current pen position to the new coordinates.
  *
  * \note This function moves the current pen position to the
@@ -249,7 +252,7 @@ void gfx_lineTo(Bitmap *bm, coord_t x, coord_t y)
 }
 
 
-/*!
+/**
  * Draw the perimeter of an hollow rectangle.
  *
  * \note The bottom-right corner of the rectangle is drawn at (x2-1;y2-1).
@@ -269,7 +272,7 @@ void gfx_rectDraw(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 }
 
 
-/*!
+/**
  * Fill a rectangular area with \a color.
  *
  * \note The bottom-right border of the rectangle is not drawn.
@@ -312,7 +315,7 @@ void gfx_rectFillC(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2, u
 }
 
 
-/*!
+/**
  * Draw a filled rectangle.
  *
  * \note The bottom-right border of the rectangle is not drawn.
@@ -325,7 +328,7 @@ void gfx_rectFill(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 }
 
 
-/*!
+/**
  * Clear a rectangular area.
  *
  * \note The bottom-right border of the rectangle is not cleared.
@@ -339,7 +342,7 @@ void gfx_rectClear(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 
 
 #if CONFIG_GFX_VCOORDS
-/*!
+/**
  * Imposta gli estremi del sistema di coordinate cartesiane rispetto
  * al rettangolo di clipping della bitmap.
  */
@@ -359,7 +362,7 @@ void gfx_setViewRect(Bitmap *bm, vcoord_t x1, vcoord_t y1, vcoord_t x2, vcoord_t
 }
 
 
-/*!
+/**
  * Transform a coordinate from the current reference system to a
  * pixel offset within the bitmap.
  */
@@ -368,7 +371,7 @@ coord_t gfx_transformX(Bitmap *bm, vcoord_t x)
 	return bm->cr.xmin + (coord_t)((x - bm->orgX) * bm->scaleX);
 }
 
-/*!
+/**
  * Transform a coordinate from the current reference system to a
  * pixel offset within the bitmap.
  */
@@ -378,7 +381,7 @@ coord_t gfx_transformY(Bitmap *bm, vcoord_t y)
 }
 
 
-/*!
+/**
  * Draw a line from (x1;y1) to (x2;y2).
  */
 void gfx_vline(Bitmap *bm, vcoord_t x1, vcoord_t y1, vcoord_t x2, vcoord_t y2)

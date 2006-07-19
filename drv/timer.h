@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.31  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.30  2006/02/24 00:26:49  bernie
  *#* Fixes for CONFIG_KERNEL.
  *#*
@@ -125,7 +128,7 @@
 
 extern volatile ticks_t _clock;
 
-/*!
+/**
  * \brief Return the system tick counter (expressed in ticks)
  *
  * The result is guaranteed to increment monotonically,
@@ -155,7 +158,7 @@ INLINE ticks_t timer_clock(void)
 	return result;
 }
 
-/*!
+/**
  * Faster version of timer_clock(), to be called only when the timer
  * interrupt is disabled (DISABLE_INTS) or overridden by a
  * higher-priority or non-nesting interrupt.
@@ -167,7 +170,7 @@ INLINE ticks_t timer_clock_unlocked(void)
 	return _clock;
 }
 
-/*! Convert \a ms [ms] to ticks. */
+/** Convert \a ms [ms] to ticks. */
 INLINE ticks_t ms_to_ticks(mtime_t ms)
 {
 #if TIMER_TICKS_PER_SEC < 1000
@@ -179,7 +182,7 @@ INLINE ticks_t ms_to_ticks(mtime_t ms)
 #endif
 }
 
-/*! Convert \a us [us] to ticks. */
+/** Convert \a us [us] to ticks. */
 INLINE ticks_t us_to_ticks(utime_t us)
 {
 #if TIMER_TICKS_PER_SEC < 1000
@@ -191,7 +194,7 @@ INLINE ticks_t us_to_ticks(utime_t us)
 #endif
 }
 
-/*! Convert \a ticks [ticks] to ms. */
+/** Convert \a ticks [ticks] to ms. */
 INLINE mtime_t ticks_to_ms(ticks_t ticks)
 {
 #if TIMER_TICKS_PER_SEC < 1000
@@ -203,7 +206,7 @@ INLINE mtime_t ticks_to_ms(ticks_t ticks)
 #endif
 }
 
-/*! Convert \a ticks [ticks] to us. */
+/** Convert \a ticks [ticks] to us. */
 INLINE utime_t ticks_to_us(ticks_t ticks)
 {
 #if TIMER_TICKS_PER_SEC < 1000
@@ -215,7 +218,7 @@ INLINE utime_t ticks_to_us(ticks_t ticks)
 #endif
 }
 
-/*! Convert \a us [us] to hpticks */
+/** Convert \a us [us] to hpticks */
 INLINE hptime_t us_to_hptime(utime_t us)
 {
 #if TIMER_HW_HPTICKS_PER_SEC > 10000000UL
@@ -225,7 +228,7 @@ INLINE hptime_t us_to_hptime(utime_t us)
 #endif
 }
 
-/*! Convert \a hpticks [hptime] to usec */
+/** Convert \a hpticks [hptime] to usec */
 INLINE utime_t hptime_to_us(hptime_t hpticks)
 {
 #if TIMER_HW_HPTICKS_PER_SEC < 100000UL
@@ -256,7 +259,7 @@ INLINE void timer_udelay(utime_t delay)
 
 #include <mware/event.h>
 
-/*!
+/**
  * The timer driver supports multiple synchronous timers
  * that can trigger an event when they expire.
  *
@@ -265,27 +268,27 @@ INLINE void timer_udelay(utime_t delay)
  */
 typedef struct Timer
 {
-	Node    link;     /*!< Link into timers queue */
-	ticks_t _delay;   /*!< Timer delay in ms */
-	ticks_t tick;     /*!< Timer will expire at this tick */
-	Event   expire;   /*!< Event to execute when the timer expires */
+	Node    link;     /**< Link into timers queue */
+	ticks_t _delay;   /**< Timer delay in ms */
+	ticks_t tick;     /**< Timer will expire at this tick */
+	Event   expire;   /**< Event to execute when the timer expires */
 	DB(uint16_t magic;)
 } Timer;
 
-/*! Timer is active when Timer.magic contains this value (for debugging purposes). */
+/** Timer is active when Timer.magic contains this value (for debugging purposes). */
 #define TIMER_MAGIC_ACTIVE    0xABBA
 #define TIMER_MAGIC_INACTIVE  0xBAAB
 
 extern void timer_add(Timer *timer);
 extern Timer *timer_abort(Timer *timer);
 
-/*! Set the timer so that it calls an user hook when it expires */
+/** Set the timer so that it calls an user hook when it expires */
 INLINE void timer_set_event_softint(Timer *timer, Hook func, iptr_t user_data)
 {
 	event_initSoftInt(&timer->expire, func, user_data);
 }
 
-/*! Set the timer delay (the time before the event will be triggered) */
+/** Set the timer delay (the time before the event will be triggered) */
 INLINE void timer_setDelay(Timer *timer, ticks_t delay)
 {
 	timer->_delay = delay;
@@ -295,7 +298,7 @@ INLINE void timer_setDelay(Timer *timer, ticks_t delay)
 
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 
-/*! Set the timer so that it sends a signal when it expires */
+/** Set the timer so that it sends a signal when it expires */
 INLINE void timer_set_event_signal(Timer *timer, struct Process *proc, sigmask_t sigs)
 {
 	event_initSignal(&timer->expire, proc, sigs);

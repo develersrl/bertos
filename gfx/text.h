@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.6  2006/04/27 05:39:24  bernie
  *#* Enhance text rendering to arbitrary x,y coords.
  *#*
@@ -75,7 +78,7 @@
 
 #include <stdarg.h>
 
-/*!
+/**
  * \name Style flags
  * \see text_style()
  * \{
@@ -95,18 +98,18 @@
 	| STYLEF_STRIKEOUT | STYLEF_TALL)
 /*\}*/
 
-/*!
+/**
  * \name Formatting flags for text rendering
  * \see text_xprintf()
  * \{
  */
-#define TEXT_NORMAL   0       /*!< Normal mode */
-#define TEXT_FILL     BV(13)  /*!< Fill rest of line with spaces */
-#define TEXT_CENTER   BV(14)  /*!< Center string in line */
-#define TEXT_RIGHT    BV(15)  /*!< Right aligned */
+#define TEXT_NORMAL   0       /**< Normal mode */
+#define TEXT_FILL     BV(13)  /**< Fill rest of line with spaces */
+#define TEXT_CENTER   BV(14)  /**< Center string in line */
+#define TEXT_RIGHT    BV(15)  /**< Right aligned */
 /*\}*/
 
-/*! Escape sequences codes */
+/** Escape sequences codes */
 #define ANSI_ESC_CLEARSCREEN 'c'
 
 

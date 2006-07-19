@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
@@ -43,6 +43,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.22  2006/07/19 12:56:27  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.21  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -123,7 +126,7 @@ typedef struct FIFOBuffer
 	)
 
 
-/*!
+/**
  * Check whether the fifo is empty
  *
  * \note Calling fifo_isempty() is safe while a concurrent
@@ -140,7 +143,7 @@ INLINE bool fifo_isempty(const FIFOBuffer *fb)
 }
 
 
-/*!
+/**
  * Check whether the fifo is full
  *
  * \note Calling fifo_isfull() is safe while a concurrent
@@ -162,7 +165,7 @@ INLINE bool fifo_isfull(const FIFOBuffer *fb)
 }
 
 
-/*!
+/**
  * Pop a character from the fifo buffer.
  *
  * \note Calling \c fifo_push() on a full buffer is undefined.
@@ -195,7 +198,7 @@ INLINE void fifo_push(FIFOBuffer *fb, unsigned char c)
 }
 
 
-/*!
+/**
  * Pop a character from the fifo buffer.
  *
  * \note Calling \c fifo_pop() on an empty buffer is undefined.
@@ -224,7 +227,7 @@ INLINE unsigned char fifo_pop(FIFOBuffer *fb)
 }
 
 
-/*!
+/**
  * Make the fifo empty, discarding all its current contents.
  */
 INLINE void fifo_flush(FIFOBuffer *fb)
@@ -247,7 +250,7 @@ INLINE void fifo_flush(FIFOBuffer *fb)
 
 #else /* CPU_REG_BITS < CPU_BITS_PER_PTR */
 
-	/*!
+	/**
 	 * Similar to fifo_isempty(), but with stronger guarantees for
 	 * concurrent access between user and interrupt code.
 	 *
@@ -263,7 +266,7 @@ INLINE void fifo_flush(FIFOBuffer *fb)
 	}
 
 
-	/*!
+	/**
 	 * Similar to fifo_push(), but with stronger guarantees for
 	 * concurrent access between user and interrupt code.
 	 *
@@ -284,7 +287,7 @@ INLINE void fifo_flush(FIFOBuffer *fb)
 		return c;
 	}
 
-	/*!
+	/**
 	 * Similar to fifo_flush(), but with stronger guarantees for
 	 * concurrent access between user and interrupt code.
 	 *
@@ -300,7 +303,7 @@ INLINE void fifo_flush(FIFOBuffer *fb)
 #endif /* CPU_REG_BITS < BITS_PER_PTR */
 
 
-/*!
+/**
  * Thread safe version of fifo_isfull()
  */
 INLINE bool fifo_isfull_locked(const FIFOBuffer *_fb)
@@ -311,7 +314,7 @@ INLINE bool fifo_isfull_locked(const FIFOBuffer *_fb)
 }
 
 
-/*!
+/**
  * FIFO Initialization.
  */
 INLINE void fifo_init(FIFOBuffer *fb, unsigned char *buf, size_t size)

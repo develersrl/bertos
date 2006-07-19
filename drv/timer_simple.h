@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
@@ -12,6 +12,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2005/04/12 01:37:50  bernie
  *#* Import into DevLib.
  *#*

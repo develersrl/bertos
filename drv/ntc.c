@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004, 2005 Develer S.r.l. (http://www.de+veler.com/)
@@ -20,6 +20,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2005/11/04 17:59:47  bernie
  *#* Import into DevLib.
  *#*
@@ -35,7 +38,7 @@
 
 DB(bool ntc_initialized;)
 
-/*!
+/**
  * Find in a table of values \a orig_table of size \a size, the index which
  * value is less or equal to \a val.
  *
@@ -63,7 +66,7 @@ static size_t upper_bound(const res_t *orig_table, size_t size, res_t val)
 }
 
 
-/*!
+/**
  * Read the temperature for the NTC channel \a dev.
  * First read the resistence of the NTC through ntc_hw_read(), then,
  * for the conversion from resistance to temperature, since the formula
@@ -122,7 +125,7 @@ deg_t ntc_read(NtcDev dev)
 }
 
 
-/*!
+/**
  * Init NTC hardware.
  */
 void ntc_init(void)

@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.19  2006/07/19 12:56:25  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.18  2006/02/17 21:15:25  bernie
  *#* Add MOD_CHECK() checks.
  *#*
@@ -66,7 +69,7 @@ static mtime_t buz_repeat_interval;
 static mtime_t buz_repeat_duration;
 
 
-/*!
+/**
  * Turn off buzzer, called by software timer
  */
 static void buz_softint(void)
@@ -95,7 +98,7 @@ static void buz_softint(void)
 }
 
 
-/*!
+/**
  * Beep for the specified ms time
  */
 void buz_beep(mtime_t time)
@@ -119,7 +122,7 @@ void buz_beep(mtime_t time)
 }
 
 
-/*!
+/**
  * Start buzzer repetition
  */
 void buz_repeat_start(mtime_t duration, mtime_t interval)
@@ -130,7 +133,7 @@ void buz_repeat_start(mtime_t duration, mtime_t interval)
 }
 
 
-/*!
+/**
  * Stop buzzer repetition
  */
 void buz_repeat_stop(void)
@@ -153,7 +156,7 @@ void buz_repeat_stop(void)
 
 MOD_DEFINE(buzzer)
 
-/*!
+/**
  * Initialize buzzer.
  */
 void buz_init(void)

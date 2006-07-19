@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004, 2005 Develer S.r.l. (http://www.develer.com/)
@@ -12,6 +12,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/07/19 12:56:25  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.3  2006/02/10 12:37:37  bernie
  *#* Add support for ARM on IAR.
  *#*

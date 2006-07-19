@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/07/19 12:56:25  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.5  2006/06/03 13:57:36  bernie
  *#* Make keyboard repeat mask run-time configurable.
  *#*
@@ -51,18 +54,18 @@
 #define KBD_POLL_FREERTOS 2
 /* \} */
 
-/*!
+/**
  * Keyboard handler descriptor
  */
 typedef struct KbdHandler
 {
 	Node link;
-	keymask_t (*hook)(keymask_t);   /*!< Hook function */
-	int8_t pri;                     /*!< Priority in input queue */
-	uint8_t flags;                  /*!< See below for definitions */
+	keymask_t (*hook)(keymask_t);   /**< Hook function */
+	int8_t pri;                     /**< Priority in input queue */
+	uint8_t flags;                  /**< See below for definitions */
 } KbdHandler;
 
-#define KHF_RAWKEYS	BV(0)           /*!< Handler gets raw key events */
+#define KHF_RAWKEYS	BV(0)           /**< Handler gets raw key events */
 
 
 void kbd_init(void);

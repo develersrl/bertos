@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2006/07/19 12:56:25  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.8  2005/11/27 23:33:40  bernie
  *#* Use appconfig.h instead of cfg/config.h.
  *#*
@@ -46,7 +49,7 @@
 #include <cfg/compiler.h>
 #include <appconfig.h>
 
-/*!
+/**
  * \name Values for CONFIG_EEPROM_TYPE
  * \{
  */
@@ -55,16 +58,16 @@
 /*\}*/
 
 #if CONFIG_EEPROM_TYPE == EEPROM_24XX16
-	#define EEPROM_BLKSIZE   0x10 //!< Eeprom block size (16byte)
-	#define EEPROM_SIZE     0x800 //!< Eeprom total size (2kB)
+	#define EEPROM_BLKSIZE   0x10 ///< Eeprom block size (16byte)
+	#define EEPROM_SIZE     0x800 ///< Eeprom total size (2kB)
 #elif CONFIG_EEPROM_TYPE == EEPROM_24XX256
-	#define EEPROM_BLKSIZE   0x40 //!< Eeprom block size (64byte)
-	#define EEPROM_SIZE    0x8000 //!< Eeprom total size (32kB)
+	#define EEPROM_BLKSIZE   0x40 ///< Eeprom block size (64byte)
+	#define EEPROM_SIZE    0x8000 ///< Eeprom total size (32kB)
 #else
 	#error Unsupported EEPROM type.
 #endif
 
-//! Type for EEPROM addresses
+/// Type for EEPROM addresses
 typedef uint16_t e2addr_t;
 
 bool eeprom_write(e2addr_t addr, const void *buf, size_t count);

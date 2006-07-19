@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2005/11/04 18:26:38  bernie
  *#* Import into DevLib.
  *#*
@@ -50,7 +53,7 @@
 
 #include <drv/lcd_text.h>
 
-/*!
+/**
  * Init.
  */
 void editint_init(DEditInt *e, dpos_t pos, dpos_t size, dcontext_t *context, int *value, int min, int max)
@@ -69,7 +72,7 @@ void editint_init(DEditInt *e, dpos_t pos, dpos_t size, dcontext_t *context, int
 	e->draw = editint_draw;
 }
 
-/*!
+/**
  * Handle the messages (edit the int).
  */
 void editint_update(DEditInt *e, dtag_t tag, dval_t _val)
@@ -122,7 +125,7 @@ void editint_update(DEditInt *e, dtag_t tag, dval_t _val)
 	}
 }
 
-/*!
+/**
  * Draw the integer on the context.
  */
 void editint_draw(DEditInt *e)

@@ -1,5 +1,5 @@
 #error This code must be revised for the new timer API
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.9  2006/02/21 21:28:02  bernie
  *#* New time handling based on TIMER_TICKS_PER_SEC to support slow timers with ticks longer than 1ms.
  *#*
@@ -58,13 +61,13 @@
 #define REG_SYSTEM_TIMER          PP_CAT(REG_TIMER_, SYSTEM_TIMER)
 #define SYSTEM_TIMER_IRQ_VECTOR   PP_CAT(IRQ_TIMER_, SYSTEM_TIMER)
 
-//! Prescaler for the system timer
+/// Prescaler for the system timer
 #define TIMER_PRESCALER           16
 
-//! Frequency of the hardware high precision timer
+/// Frequency of the hardware high precision timer
 #define TIMER_HW_HPTICKS_PER_SEC           (IPBUS_FREQ / TIMER_PRESCALER)
 
-//! Type of time expressed in ticks of the hardware high precision timer
+/// Type of time expressed in ticks of the hardware high precision timer
 typedef uint16_t hptime_t;
 
 static void system_timer_isr(UNUSED(iptr_t, arg));

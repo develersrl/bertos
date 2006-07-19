@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2005/11/04 18:26:38  bernie
  *#* Import into DevLib.
  *#*
@@ -50,13 +53,13 @@
 
 #include <cfg/macros.h>
 
-/*! Type for values associated with tags. */
+/** Type for values associated with tags. */
 typedef iptr_t dval_t;
 
-/*! Type for constant values associated with tags. */
+/** Type for constant values associated with tags. */
 typedef const_iptr_t const_dval_t;
 
-/*! Type for tag */
+/** Type for tag */
 typedef enum dtag_t
 {
 	TAG_END = 0,
@@ -73,13 +76,13 @@ typedef enum dtag_t
 	TAG_ERROR,
 } dtag_t;
 
-/*! This is the basic message structure used by all dnotifiers. */
+/** This is the basic message structure used by all dnotifiers. */
 typedef struct DTagItem
 {
 	dtag_t tag;
 	dval_t val;
 } DTagItem;
 
-/*! Marker to indicate the end of a map for message filtering/translating */
+/** Marker to indicate the end of a map for message filtering/translating */
 #define TAG_END_MARKER {{TAG_END, 0}, {TAG_END, 0}}
 #endif

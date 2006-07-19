@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004, 2005 Develer S.r.l. (http://www.develer.com/)
@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2006/07/19 12:56:25  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.9  2006/03/22 13:34:34  bernie
  *#* MSVC support.
  *#*
@@ -48,7 +51,7 @@
 #ifndef DEVLIB_OS_H
 #define DEVLIB_OS_H
 
-/*! Macro to include OS-specific versions of the headers. */
+/** Macro to include OS-specific versions of the headers. */
 #define OS_HEADER(module)  PP_STRINGIZE(PP_CAT3(module, _, OS_ID).h)
 #define OS_CSOURCE(module) PP_STRINGIZE(PP_CAT3(module, _, OS_ID).c)
 

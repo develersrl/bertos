@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/07/19 12:56:25  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.2  2006/02/24 00:27:14  bernie
  *#* Use new naming convention for list macros.
  *#*
@@ -52,11 +55,11 @@
 #include <string.h> // strlen()
 
 
-/*! Maximum number of layers. */
+/** Maximum number of layers. */
 #define LCD_LAYERS 6
 
 #if CONFIG_KERNEL
-	/*! Semaphore to arbitrate access to the display. */
+	/** Semaphore to arbitrate access to the display. */
 	static struct Semaphore lcd_semaphore;
 	#define LOCK_LCD	sem_obtain(&lcd_semaphore)
 	#define UNLOCK_LCD	sem_release(&lcd_semaphore)
@@ -72,14 +75,14 @@ static Layer lcd_LayersPool[LCD_LAYERS];
 static LIST_TYPE(Layer) lcd_Layers;
 static LIST_TYPE(Layer) lcd_FreeLayers;
 
-/*!
+/**
  * Current cursor status.
  *
  * One of LCD_CMD_CURSOR_OFF, LCD_CMD_CURSOR_BLOCK or LCD_CMD_CURSOR_LINE.
  */
 static uint8_t lcd_CursorStatus;
 
-/*! Current cursor position, encoded as a Cursor position and status. */
+/** Current cursor position, encoded as a Cursor position and status. */
 static lcdpos_t lcd_CursorAddr;
 
 
@@ -108,7 +111,7 @@ void lcd_unlock(void)
 #endif /* CONFIG_KERNEL */
 
 
-/*!
+/**
  * Write one character to the display at the current
  * cursor prosition, then move the cursor right. The
  * cursor is wrapped to the next line when it moves
@@ -280,7 +283,7 @@ int lcd_printf(Layer *layer, lcdpos_t addr, uint8_t mode, const char *format, ..
 }
 
 
-/*!
+/**
  * Internal function to move a layer between two positions.
  *
  * \note The layer must be *already* enqueued in some list.
@@ -330,7 +333,7 @@ Layer *lcd_newLayer(char pri)
 	return layer;
 }
 
-/*!
+/**
  * Redraw the display (internal).
  *
  * \note The display must be already locked.
@@ -363,7 +366,7 @@ static void lcd_refresh(void)
 	}
 }
 
-/*!
+/**
  * Rearrange layer depth and refresh display accordingly.
  *
  * \note Setting a priority of LAYER_HIDDEN makes the layer invisible.

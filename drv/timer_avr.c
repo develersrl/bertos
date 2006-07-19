@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.3  2006/06/12 21:37:02  marco
  *#* implemented some commands (ver and sleep)
  *#*
@@ -34,7 +37,7 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 
-/*! HW dependent timer initialization  */
+/** HW dependent timer initialization  */
 #if (CONFIG_TIMER == TIMER_ON_OUTPUT_COMPARE0)
 
 	static void timer_hw_init(void)

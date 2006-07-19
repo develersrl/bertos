@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004 Giovanni Bajo
@@ -43,6 +43,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:27  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2006/06/01 12:27:39  marco
  *#* Added utilities for protocols
  *#*

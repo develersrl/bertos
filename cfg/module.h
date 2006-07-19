@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2006 Develer S.r.l. (http://www.develer.com/)

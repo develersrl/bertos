@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.9  2006/04/27 05:39:24  bernie
  *#* Enhance text rendering to arbitrary x,y coords.
  *#*
@@ -90,7 +93,7 @@
 #include <stdarg.h>
 #include <string.h> /* strlen() */
 
-/*!
+/**
  * Render string \a str in Bitmap \a bm at current cursor position
  *
  * \note Text formatting functions are also available with an _P suffix
@@ -111,7 +114,7 @@ int PGM_FUNC(text_puts)(const char * PGM_ATTR str, struct Bitmap *bm)
 }
 
 
-/*!
+/**
  * vprintf()-like formatter to render text in a Bitmap.
  *
  * Perform vprintf()-like formatting on the \a fmt format string using the
@@ -126,7 +129,7 @@ int PGM_FUNC(text_vprintf)(struct Bitmap *bm, const char * PGM_ATTR fmt, va_list
 	return PGM_FUNC(_formatted_write)(fmt, (void (*)(char, void *))text_putchar, bm, ap);
 }
 
-/*!
+/**
  * printf()-like formatter to render text in a Bitmap.
  *
  * Perform printf()-like formatting on the \a fmt format string.
@@ -294,7 +297,7 @@ static int text_charWidth(int c, struct TextWidthData *twd)
 	return c;
 }
 
-/*!
+/**
  * Return the width in pixels of a vprintf()-formatted string.
  */
 int PGM_FUNC(text_vwidthf)(
@@ -316,7 +319,7 @@ int PGM_FUNC(text_vwidthf)(
 }
 
 
-/*!
+/**
  * Return the width in pixels of a printf()-formatted string.
  */
 int PGM_FUNC(text_widthf)(struct Bitmap *bm, const char * PGM_ATTR fmt, ...)

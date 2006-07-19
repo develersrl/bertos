@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2005/11/04 18:26:38  bernie
  *#* Import into DevLib.
  *#*
@@ -44,7 +47,7 @@
 #define EDIS_CURSORLEFT     BV(0)
 #define EDIS_WRAP           BV(1)
 
-/*! Type for edit style */
+/** Type for edit style */
 typedef uint16_t dstyle_t;
 
 typedef struct DEditInt

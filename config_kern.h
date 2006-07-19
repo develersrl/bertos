@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2001,2004 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2006/07/19 12:56:24  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.7  2006/02/21 16:05:53  bernie
  *#* Move from cfg/ to top-level.
  *#*
@@ -49,7 +52,7 @@
 
 #include <cfg/arch_config.h>  /* ARCH_EMUL */
 
-/*!
+/**
  * \name Modules activation
  *
  * \{
@@ -66,12 +69,12 @@
 /* EXPERIMENTAL */
 #define CONFIG_KERN_PREEMPTIVE  (0    && CONFIG_KERN_SCHED && CONFIG_KERN_TIMER)
 
-#define CONFIG_KERN_QUANTUM     50    /*!< Time sharing quantum in timer ticks. */
+#define CONFIG_KERN_QUANTUM     50    /**< Time sharing quantum in timer ticks. */
 
 #if (ARCH & ARCH_EMUL)
 	#define CONFIG_KERN_DEFSTACKSIZE  65536
 #else
-	#define CONFIG_KERN_DEFSTACKSIZE  128  /*!< Default stack size for each thread. */
+	#define CONFIG_KERN_DEFSTACKSIZE  128  /**< Default stack size for each thread. */
 #endif
 
 /* Memory fill codes to help debugging */

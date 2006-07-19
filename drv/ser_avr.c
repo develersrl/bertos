@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
@@ -38,6 +38,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.32  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.31  2006/05/18 00:37:29  bernie
  *#* Use hw_ser.h instead of ubiquitous hw.h.
  *#*
@@ -145,19 +148,19 @@
 
 
 #if !CONFIG_SER_HWHANDSHAKE
-	/*!
+	/**
 	 * \name Hardware handshake (RTS/CTS).
 	 * \{
 	 */
 	#define RTS_ON      do {} while (0)
 	#define RTS_OFF     do {} while (0)
 	#define IS_CTS_ON   true
-	#define EIMSKF_CTS  0 /*!< Dummy value, must be overridden */
+	#define EIMSKF_CTS  0 /**< Dummy value, must be overridden */
 	/*\}*/
 #endif
 
 
-/*!
+/**
  * \name Overridable serial bus hooks
  *
  * These can be redefined in hw.h to implement
@@ -178,7 +181,7 @@
  * \{
  */
 #ifndef SER_UART0_BUS_TXINIT
-	/*!
+	/**
 	 * Default TXINIT macro - invoked in uart0_init()
 	 *
 	 * - Enable both the receiver and the transmitter
@@ -190,7 +193,7 @@
 #endif
 
 #ifndef SER_UART0_BUS_TXBEGIN
-	/*!
+	/**
 	 * Invoked before starting a transmission
 	 *
 	 * - Enable both the receiver and the transmitter
@@ -202,7 +205,7 @@
 #endif
 
 #ifndef SER_UART0_BUS_TXCHAR
-	/*!
+	/**
 	 * Invoked to send one character.
 	 */
 	#define SER_UART0_BUS_TXCHAR(c) do { \
@@ -211,7 +214,7 @@
 #endif
 
 #ifndef SER_UART0_BUS_TXEND
-	/*!
+	/**
 	 * Invoked as soon as the txfifo becomes empty
 	 *
 	 * - Keep both the receiver and the transmitter enabled
@@ -224,7 +227,7 @@
 #endif
 
 #ifndef SER_UART0_BUS_TXOFF
-	/*!
+	/**
 	 * \def SER_UART0_BUS_TXOFF
 	 *
 	 * Invoked after the last character has been transmitted
@@ -237,31 +240,31 @@
 #endif
 
 #ifndef SER_UART1_BUS_TXINIT
-	/*! \sa SER_UART0_BUS_TXINIT */
+	/** \sa SER_UART0_BUS_TXINIT */
 	#define SER_UART1_BUS_TXINIT do { \
 		UCSR1B = BV(RXCIE) | BV(RXEN) | BV(TXEN); \
 	} while (0)
 #endif
 #ifndef SER_UART1_BUS_TXBEGIN
-	/*! \sa SER_UART0_BUS_TXBEGIN */
+	/** \sa SER_UART0_BUS_TXBEGIN */
 	#define SER_UART1_BUS_TXBEGIN do { \
 		UCSR1B = BV(RXCIE) | BV(UDRIE) | BV(RXEN) | BV(TXEN); \
 	} while (0)
 #endif
 #ifndef SER_UART1_BUS_TXCHAR
-	/*! \sa SER_UART0_BUS_TXCHAR */
+	/** \sa SER_UART0_BUS_TXCHAR */
 	#define SER_UART1_BUS_TXCHAR(c) do { \
 		UDR1 = (c); \
 	} while (0)
 #endif
 #ifndef SER_UART1_BUS_TXEND
-	/*! \sa SER_UART0_BUS_TXEND */
+	/** \sa SER_UART0_BUS_TXEND */
 	#define SER_UART1_BUS_TXEND do { \
 		UCSR1B = BV(RXCIE) | BV(RXEN) | BV(TXEN); \
 	} while (0)
 #endif
 #ifndef SER_UART1_BUS_TXOFF
-	/*!
+	/**
 	 * \def SER_UART1_BUS_TXOFF
 	 *
 	 * \see SER_UART0_BUS_TXOFF
@@ -273,7 +276,7 @@
 /*\}*/
 
 
-/*!
+/**
  * \name Overridable SPI hooks
  *
  * These can be redefined in hw.h to implement
@@ -282,7 +285,7 @@
  * \{
  */
 #ifndef SER_SPI_BUS_TXINIT
-	/*!
+	/**
 	 * Default TXINIT macro - invoked in spi_init()
 	 * The default is no action.
 	 */
@@ -290,7 +293,7 @@
 #endif
 
 #ifndef SER_SPI_BUS_TXCLOSE
-	/*!
+	/**
 	 * Invoked after the last character has been transmitted.
 	 * The default is no action.
 	 */
@@ -344,7 +347,7 @@
 #endif
 
 
-/*!
+/**
  * \def CONFIG_SER_STROBE
  *
  * This is a debug facility that can be used to
@@ -375,7 +378,7 @@ static unsigned char spi_txbuffer[CONFIG_SPI_TXBUFSIZE];
 static unsigned char spi_rxbuffer[CONFIG_SPI_RXBUFSIZE];
 
 
-/*!
+/**
  * Internal hardware state structure
  *
  * The \a sending variable is true while the transmission
@@ -683,7 +686,7 @@ struct SerialHardware *ser_hw_getdesc(int unit)
 
 #if CONFIG_SER_HWHANDSHAKE
 
-//! This interrupt is triggered when the CTS line goes high
+/// This interrupt is triggered when the CTS line goes high
 SIGNAL(SIG_CTS)
 {
 	// Re-enable UDR empty interrupt and TX, then disable CTS interrupt
@@ -694,7 +697,7 @@ SIGNAL(SIG_CTS)
 #endif // CONFIG_SER_HWHANDSHAKE
 
 
-/*!
+/**
  * Serial 0 TX interrupt handler
  */
 SIGNAL(SIG_UART0_DATA)
@@ -730,7 +733,7 @@ SIGNAL(SIG_UART0_DATA)
 }
 
 #ifdef SER_UART0_BUS_TXOFF
-/*!
+/**
  * Serial port 0 TX complete interrupt handler.
  *
  * This IRQ is usually disabled.  The UDR-empty interrupt
@@ -765,7 +768,7 @@ SIGNAL(SIG_UART0_TRANS)
 
 #if AVR_HAS_UART1
 
-/*!
+/**
  * Serial 1 TX interrupt handler
  */
 SIGNAL(SIG_UART1_DATA)
@@ -801,7 +804,7 @@ SIGNAL(SIG_UART1_DATA)
 }
 
 #ifdef SER_UART1_BUS_TXOFF
-/*!
+/**
  * Serial port 1 TX complete interrupt handler.
  *
  * \sa port 0 TX complete handler.
@@ -826,7 +829,7 @@ SIGNAL(SIG_UART1_TRANS)
 #endif // AVR_HAS_UART1
 
 
-/*!
+/**
  * Serial 0 RX complete interrupt handler.
  *
  * This handler is interruptible.
@@ -880,7 +883,7 @@ SIGNAL(SIG_UART0_RECV)
 
 #if AVR_HAS_UART1
 
-/*!
+/**
  * Serial 1 RX complete interrupt handler.
  *
  * This handler is interruptible.
@@ -929,7 +932,7 @@ SIGNAL(SIG_UART1_RECV)
 #endif // AVR_HAS_UART1
 
 
-/*!
+/**
  * SPI interrupt handler
  */
 SIGNAL(SIG_SPI)

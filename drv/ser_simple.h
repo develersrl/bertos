@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2005/04/12 01:37:50  bernie
  *#* Import into DevLib.
  *#*
@@ -49,20 +52,20 @@
 	typedef uint8_t serstatus_t;
 
 	/* Software errors */
-	#define SERRF_RXFIFOOVERRUN  BV(0)  /*!< Rx FIFO buffer overrun */
-	#define SERRF_RXTIMEOUT      BV(5)  /*!< Receive timeout */
-	#define SERRF_TXTIMEOUT      BV(6)  /*!< Transmit timeout */
+	#define SERRF_RXFIFOOVERRUN  BV(0)  /**< Rx FIFO buffer overrun */
+	#define SERRF_RXTIMEOUT      BV(5)  /**< Receive timeout */
+	#define SERRF_TXTIMEOUT      BV(6)  /**< Transmit timeout */
 
 	/* Hardware errors */
-	#define SERRF_RXSROVERRUN    BV(3)  /*!< Rx shift register overrun */
-	#define SERRF_FRAMEERROR     BV(4)  /*!< Stop bit missing */
-	#define SERRF_PARITYERROR    BV(7)  /*!< Parity error */
+	#define SERRF_RXSROVERRUN    BV(3)  /**< Rx shift register overrun */
+	#define SERRF_FRAMEERROR     BV(4)  /**< Stop bit missing */
+	#define SERRF_PARITYERROR    BV(7)  /**< Parity error */
 #else
 	#error unknown architecture
 #endif
 /*\}*/
 
-/*!
+/**
  * \name Serial hw numbers
  *
  * \{
@@ -79,12 +82,12 @@ enum
 #else
 	#error unknown architecture
 #endif
-	SER_CNT  /*!< Number of serial ports */
+	SER_CNT  /**< Number of serial ports */
 };
 /*\}*/
 #endif
 
-/*! \name Parity settings for ser_setparity() */
+/** \name Parity settings for ser_setparity() */
 /*\{*/
 #define SER_PARITY_NONE  0
 #define SER_PARITY_EVEN  2
@@ -92,7 +95,7 @@ enum
 /*\}*/
 
 
-/*! Serial handle structure */
+/** Serial handle structure */
 struct Serial;
 
 /* Function prototypes */
@@ -122,7 +125,7 @@ extern void _ser_purge(void);
 extern struct Serial *_ser_open(void);
 extern void _ser_close(void);
 
-/*!
+/**
  * \name Functions implemented as macros
  *
  * \{

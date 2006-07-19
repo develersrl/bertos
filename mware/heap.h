@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
@@ -20,6 +20,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2006/07/19 12:56:27  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.6  2005/11/27 23:36:19  bernie
  *#* Use appconfig.h instead of cfg/config.h.
  *#*
@@ -54,20 +57,20 @@
 
 struct _MemChunk;
 
-//! A heap
+/// A heap
 struct Heap
 {
-	struct _MemChunk *FreeList;     //!< Head of the free list
+	struct _MemChunk *FreeList;     ///< Head of the free list
 };
 
 
-//! Initialize \a heap within the buffer pointed by \a memory which is of \a size bytes
+/// Initialize \a heap within the buffer pointed by \a memory which is of \a size bytes
 void heap_init(struct Heap* heap, void* memory, size_t size);
 
-//! Allocate a chunk of memory of \a size bytes from the heap
+/// Allocate a chunk of memory of \a size bytes from the heap
 void *heap_allocmem(struct Heap* heap, size_t size);
 
-//! Free a chunk of memory of \a size bytes from the heap
+/// Free a chunk of memory of \a size bytes from the heap
 void heap_freemem(struct Heap* heap, void *mem, size_t size);
 
 

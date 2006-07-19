@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/07/19 12:56:28  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.3  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -30,7 +33,7 @@
 #include "rle.h"
 
 
-/*!
+/**
  * Run-length encode \a len bytes from the \a input buffer
  * to the \a output buffer.
  */
@@ -98,7 +101,7 @@ int rle(unsigned char *output, const unsigned char *input, int len)
 }
 
 
-/*!
+/**
  * Run-length decode from the \a input buffer to the \a output
  * buffer.
  *

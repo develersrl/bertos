@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2006 Develer S.r.l. (http://www.develer.com/)
@@ -20,6 +20,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.3  2006/02/10 12:25:41  bernie
  *#* Add missing header.
  *#*

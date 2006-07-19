@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.6  2006/03/20 17:49:50  bernie
  *#* Make the TWI driver more generic to work with devices other than EEPROMS.
  *#*
@@ -52,7 +55,7 @@
 #define READ_BIT BV(0)
 
 
-/*!
+/**
  * Send START condition on the bus.
  *
  * \return true on success, false otherwise.
@@ -70,7 +73,7 @@ static bool twi_start(void)
 }
 
 
-/*!
+/**
  * Send START condition and select slave for write.
  * \c id is the device id comprehensive of address left shifted by 1.
  * The LSB of \c id is ignored and reset to 0 for write operation.
@@ -104,7 +107,7 @@ bool twi_start_w(uint8_t id)
 }
 
 
-/*!
+/**
  * Send START condition and select slave for read.
  * \c id is the device id comprehensive of address left shifted by 1.
  * The LSB of \c id is ignored and set to 1 for read operation.
@@ -129,7 +132,7 @@ bool twi_start_r(uint8_t id)
 }
 
 
-/*!
+/**
  * Send STOP condition.
  */
 void twi_stop(void)
@@ -138,7 +141,7 @@ void twi_stop(void)
 }
 
 
-/*!
+/**
  * Put a single byte in master transmitter mode
  * to the selected slave device through the TWI bus.
  *
@@ -158,7 +161,7 @@ bool twi_put(const uint8_t data)
 }
 
 
-/*!
+/**
  * Send a sequence of bytes in master transmitter mode
  * to the selected slave device through the TWI bus.
  *
@@ -177,7 +180,7 @@ bool twi_send(const void *_buf, size_t count)
 }
 
 
-/*!
+/**
  * Receive a sequence of one or more bytes from the
  * selected slave device in master receive mode through
  * the TWI bus.
@@ -222,7 +225,7 @@ bool twi_recv(void *_buf, size_t count)
 }
 
 
-/*!
+/**
  * Initialize TWI module.
  */
 void twi_init(void)

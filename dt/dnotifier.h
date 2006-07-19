@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2005/11/04 18:26:38  bernie
  *#* Import into DevLib.
  *#*
@@ -45,21 +48,21 @@ struct DFilter;
 typedef void (* update_func_ptr)(struct DNotifier *, dtag_t, dval_t);
 typedef void (* update_filter_ptr)(struct DFilter *, dtag_t, dval_t);
 
-/*!
+/**
  * Base object for receive and forward messages.
  * It contains an update function used to update itslef and a list to
  * notify other DNotifer eventually connected.
  */
 typedef struct DNotifier
 {
-	//! Receive new attributes from other notifiers.
+	/// Receive new attributes from other notifiers.
 	update_func_ptr update;
 
-	//! List of target notifiers to set new attributes to.
+	/// List of target notifiers to set new attributes to.
 	List targets;
 } DNotifier;
 
-/*!
+/**
  * Map for messages.
  * Used to translate src message to dst message.
  */
@@ -70,45 +73,45 @@ typedef struct DFilterMap
 } DFilterMap;
 
 
-/*!
+/**
  * A filter is an interface between two notifier.
  * It can translate messages between them through a map (if it is not null).
  */
 typedef struct DFilter
 {
-	//! Allow creating a list of dfilter objects.
+	/// Allow creating a list of dfilter objects.
 	Node link;
 
-	//! Target of the filter
+	/// Target of the filter
 	DNotifier *target;
 
-	//! Update function called by the source dnotifier
+	/// Update function called by the source dnotifier
 	update_filter_ptr update;
 
-	//!Map for translating messages for target
+	///Map for translating messages for target
 	const DFilterMap *map;
 
-	//!Used in debug to prevent inserting this filter in more than one list
+	///Used in debug to prevent inserting this filter in more than one list
 	DB(uint8_t magic;)
 } DFilter;
 
-//! Type for filter-mask checking
+/// Type for filter-mask checking
 typedef uint16_t dfilter_mask_t;
 
-//! Filter init
+/// Filter init
 void filter_init(DFilter *f, const DFilterMap *map, bool masked, DNotifier *source, DNotifier *target);
 
-//! Filter update function without masking capabilities.
+/// Filter update function without masking capabilities.
 void filter_update(DFilter *f, dtag_t tag, dval_t val);
 
-//! Filter update function with masking capabilities.
+/// Filter update function with masking capabilities.
 void filter_mask_update(DFilter *f, dtag_t tag, dval_t val);
 
-//! Notifier init
+/// Notifier init
 void notifier_init(DNotifier *n);
 
 
-/*!
+/**
  * Macro to notify the target object.
  */
 INLINE void dnotify(DNotifier *target, dtag_t tag, dval_t val)
@@ -117,7 +120,7 @@ INLINE void dnotify(DNotifier *target, dtag_t tag, dval_t val)
 		target->update(target, tag, val);
 }
 
-/*!
+/**
  * Macro to notify all the targets of \a target object.
  */
 INLINE void dnotify_targets(DNotifier *target, dtag_t tag, dval_t val)
@@ -129,7 +132,7 @@ INLINE void dnotify_targets(DNotifier *target, dtag_t tag, dval_t val)
 }
 
 
-/*!
+/**
  * Macro that connect \a src notifier to \a tgt using \a map and passing \a opt for filtering option.
  * It declares a static filter to achieve connection and messages translation.
  * \note Due its static filter declaration, DCONNECT MUST NOT be used inside loops or in functions called multiple times.

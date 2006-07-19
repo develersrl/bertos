@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
@@ -53,6 +53,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.18  2006/07/19 12:56:27  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.17  2005/11/04 17:43:27  bernie
  *#* Fix for LP64 architectures; Add some more tests.
  *#*
@@ -91,12 +94,12 @@
 #include <appconfig.h> /* CONFIG_ macros */
 
 #ifndef CONFIG_PRINTF_N_FORMATTER
-	/*! Disable the arcane %n formatter. */
+	/** Disable the arcane %n formatter. */
 	#define CONFIG_PRINTF_N_FORMATTER 0
 #endif
 
 #ifndef CONFIG_PRINTF_OCTAL_FORMATTER
-	/*! Disable the %o formatter. */
+	/** Disable the %o formatter. */
 	#define CONFIG_PRINTF_OCTAL_FORMATTER 0
 #endif
 
@@ -320,7 +323,7 @@ CLEAN_UP:
 
 #endif /* CONFIG_PRINTF > PRINTF_NOFLOAT */
 
-/*!
+/**
  * This routine forms the core and entry of the formatter.
  *
  * The conversion performed conforms to the ANSI specification for "printf".

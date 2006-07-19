@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2001,2004 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.12  2006/07/19 12:56:27  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.11  2006/02/21 16:06:55  bernie
  *#* Cleanup/update process scheduling.
  *#*
@@ -76,7 +79,7 @@ void proc_rename(struct Process* proc, const char* name);
 	INLINE void proc_permit(void) { /* nop */ }
 #endif
 
-/*!
+/**
  * Execute a block of \a CODE atomically with respect to task scheduling.
  */
 #define PROC_ATOMIC(CODE) \

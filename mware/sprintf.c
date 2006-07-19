@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2002, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2006/07/19 12:56:28  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.10  2005/04/11 19:10:28  bernie
  *#* Include top-level headers from cfg/ subdir.
  *#*
@@ -98,7 +101,7 @@ int PGM_FUNC(sprintf)(char *str, const char * fmt, ...)
 	return result;
 }
 
-/*!
+/**
  * State information for __sn_put_char()
  */
 struct __sn_state
@@ -107,7 +110,7 @@ struct __sn_state
 	size_t len;
 };
 
-/*!
+/**
  * formatted_write() callback used [v]snprintf().
  */
 static void __sn_put_char(char c, void *ptr)

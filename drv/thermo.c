@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2005/11/04 17:59:47  bernie
  *#* Import into DevLib.
  *#*
@@ -30,13 +33,13 @@
 #include <cfg/debug.h>
 
 
-/*! Interval at which thermo control is performed. */
+/** Interval at which thermo control is performed. */
 #define THERMO_INTERVAL_MS      100
 
-/*! Number of different samples we interpolate over to get the hifi temperature. */
+/** Number of different samples we interpolate over to get the hifi temperature. */
 #define THERMO_HIFI_NUM_SAMPLES 10
 
-/*! Timer for thermo-regulation. */
+/** Timer for thermo-regulation. */
 static Timer thermo_timer;
 
 typedef struct ThermoControlDev
@@ -48,11 +51,11 @@ typedef struct ThermoControlDev
 	ticks_t        expire;
 } ThermoControlDev;
 
-/*! Array of thermo-devices. */
+/** Array of thermo-devices. */
 ThermoControlDev devs[THERMO_CNT];
 
 
-/*!
+/**
  * Return the status of the specific \a dev thermo-device.
  */
 thermostatus_t thermo_status(ThermoDev dev)
@@ -61,7 +64,7 @@ thermostatus_t thermo_status(ThermoDev dev)
 }
 
 
-/*!
+/**
  * Do a single thermo control for device \a dev.
  */
 static void thermo_do(ThermoDev index)
@@ -136,7 +139,7 @@ static void thermo_do(ThermoDev index)
 }
 
 
-/*!
+/**
  * Thermo soft interrupt.
  */
 static void thermo_softint(void)
@@ -150,7 +153,7 @@ static void thermo_softint(void)
 }
 
 
-/*!
+/**
  * Set the target temperature \a temperature for a specific \a dev thermo-device.
  */
 void thermo_setTarget(ThermoDev dev, deg_t temperature)
@@ -162,7 +165,7 @@ void thermo_setTarget(ThermoDev dev, deg_t temperature)
 	kprintf("setTarget dev[%d], T[%d.%d]\n", dev, temperature / 10, temperature % 10);
 }
 
-/*!
+/**
  * Starts a thermo-regulation for channel \a dev.
  */
 void thermo_start(ThermoDev dev)
@@ -184,7 +187,7 @@ void thermo_start(ThermoDev dev)
 	devs[dev].expire = timer_clock() + thermo_hw_timeout(dev);
 }
 
-/*!
+/**
  * Stops a thermo-regulation for channel \a dev.
  */
 void thermo_stop(ThermoDev dev)
@@ -196,7 +199,7 @@ void thermo_stop(ThermoDev dev)
 }
 
 
-/*!
+/**
  * Clear errors for channel \a dev.
  */
 void thermo_clearErrors(ThermoDev dev)
@@ -206,7 +209,7 @@ void thermo_clearErrors(ThermoDev dev)
 }
 
 
-/*!
+/**
  * Read the temperature of the thermo-device \a dev using mobile mean.
  */
 deg_t thermo_read_temperature(ThermoDev dev)
@@ -221,7 +224,7 @@ deg_t thermo_read_temperature(ThermoDev dev)
 }
 
 
-/*!
+/**
  * Init thermo-control and associated hw.
  */
 void thermo_init(void)

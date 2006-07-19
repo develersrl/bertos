@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
@@ -18,6 +18,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2006/07/19 12:56:27  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.7  2006/03/20 17:52:22  bernie
  *#* Add missing forward declaration.
  *#*
@@ -91,7 +94,7 @@
 #endif
 
 
-//! User defined callback type
+/// User defined callback type
 typedef void (*Hook)(void *);
 
 typedef struct Event
@@ -118,11 +121,11 @@ void event_hook_ignore(Event *event);
 void event_hook_signal(Event *event);
 void event_hook_softint(Event *event);
 
-/*! Initialize the event \a e as a no-op */
+/** Initialize the event \a e as a no-op */
 #define event_initNone(e) \
 	((e)->action = event_hook_ignore)
 
-/*! Same as event_initNone(), but returns the initialized event */
+/** Same as event_initNone(), but returns the initialized event */
 INLINE Event event_createNone(void);
 INLINE Event event_createNone(void)
 {
@@ -131,11 +134,11 @@ INLINE Event event_createNone(void)
 	return e;
 }
 
-/*! Initialize the event \a e with a software interrupt (call function \a f, with parameter \a u) */
+/** Initialize the event \a e with a software interrupt (call function \a f, with parameter \a u) */
 #define event_initSoftInt(e,f,u) \
 	((e)->action = event_hook_softint,(e)->Ev.Int.func = (f), (e)->Ev.Int.user_data = (u))
 
-/*! Same as event_initSoftInt(), but returns the initialized event */
+/** Same as event_initSoftInt(), but returns the initialized event */
 INLINE Event event_createSoftInt(Hook func, void *user_data)
 {
 	Event e;
@@ -148,11 +151,11 @@ INLINE Event event_createSoftInt(Hook func, void *user_data)
 
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 
-/*! Initialize the event \a e with a signal (send signal \a s to process \a p) */
+/** Initialize the event \a e with a signal (send signal \a s to process \a p) */
 #define event_initSignal(e,p,s) \
 	((e)->action = event_hook_signal,(e)->Ev.Sig.sig_proc = (p), (e)->Ev.Sig.sig_bit = (s))
 
-/*! Same as event_initSignal(), but returns the initialized event */
+/** Same as event_initSignal(), but returns the initialized event */
 INLINE Event event_createSignal(struct Process *proc, sigbit_t bit)
 {
 	Event e;
@@ -164,7 +167,7 @@ INLINE Event event_createSignal(struct Process *proc, sigbit_t bit)
 
 #endif
 
-/*! Trigger an event */
+/** Trigger an event */
 INLINE void event_do(struct Event *e)
 {
 	e->action(e);

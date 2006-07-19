@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.13  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.12  2006/05/25 23:35:22  bernie
  *#* Implement correct and faster clipping for algo text.
  *#*
@@ -123,7 +126,7 @@
  */
 static bool ansi_mode = false;
 
-/*!
+/**
  * Move (imaginary) cursor to coordinates specified.
  */
 void text_setCoord(struct Bitmap *bm, int x, int y)
@@ -133,7 +136,7 @@ void text_setCoord(struct Bitmap *bm, int x, int y)
 }
 
 
-/*!
+/**
  * Move (imaginary) cursor to column and row specified.
  * Next text write will start a that row and col.
  */
@@ -148,7 +151,7 @@ void text_moveTo(struct Bitmap *bm, int row, int col)
 }
 
 
-/*!
+/**
  * Render char \a c on Bitmap \a bm.
  */
 static int text_putglyph(char c, struct Bitmap *bm)
@@ -303,7 +306,7 @@ static int text_putglyph(char c, struct Bitmap *bm)
 }
 
 
-/*!
+/**
  * Render char \c c, with (currently) limited ANSI escapes
  * emulation support and '\n' for newline.
  */
@@ -345,7 +348,7 @@ int text_putchar(char c, struct Bitmap *bm)
 }
 
 
-/*!
+/**
  * Clear the screen and reset cursor position
  */
 void text_clear(struct Bitmap *bmp)

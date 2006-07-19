@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.10  2006/05/18 00:38:42  bernie
  *#* Work around missing ARCH_FREERTOS symbol.
  *#*
@@ -79,7 +82,7 @@
 	#endif
 #endif /* CONFIG_WATCHDOG */
 
-/*!
+/**
  * Reset the watchdog timer.
  */
 INLINE void wdt_reset(void)
@@ -102,7 +105,7 @@ INLINE void wdt_reset(void)
 #endif /* CONFIG_WATCHDOG */
 }
 
-/*!
+/**
  * Set watchdog timer timeout.
  *
  * \param timeout  0: 16.3ms, 7: 2.1s

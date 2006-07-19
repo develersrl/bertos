@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/07/19 12:56:27  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.4  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -30,7 +33,7 @@
 
 #include "crc.h"
 
-/*!
+/**
  * crctab calculated by Mark G. Mendel, Network Systems Corporation
  */
 const uint16_t crc16tab[256] = {

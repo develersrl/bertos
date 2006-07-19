@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.20  2006/07/19 12:56:28  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.19  2006/03/20 17:50:29  bernie
  *#* Fix typo.
  *#*
@@ -80,7 +83,7 @@
 #include <cfg/compiler.h> /* INLINE */
 #include <cfg/debug.h> /* ASSERT() */
 
-/*!
+/**
  * This structure represents a node for bidirectional lists.
  *
  * Data is usually appended to nodes by making them the first
@@ -92,7 +95,7 @@ typedef struct _Node
 	struct _Node *pred;
 } Node;
 
-/*!
+/**
  * Head of a doubly-linked list of \c Node structs.
  *
  * Lists must be initialized with LIST_INIT() prior to use.
@@ -117,7 +120,7 @@ typedef struct _PriNode
 } PriNode;
 
 
-/*!
+/**
  * Template for a naked node in a list of \a T structures.
  *
  * To be used as data member in other structures:
@@ -150,11 +153,11 @@ typedef struct _PriNode
 #define DECLARE_NODE_ANON(T) \
 	T *succ; T *pred;
 
-/*! Declare a typesafe node for structures of type \a T. */
+/** Declare a typesafe node for structures of type \a T. */
 #define DECLARE_NODE_TYPE(T) \
 	typedef struct T##Node { T *succ; T *pred; } T##Node
 
-/*! Template for a list of \a T structures. */
+/** Template for a list of \a T structures. */
 #define DECLARE_LIST_TYPE(T) \
 	DECLARE_NODE_TYPE(T); \
 	typedef struct T##List { \
@@ -165,14 +168,14 @@ typedef struct _PriNode
 #define NODE_TYPE(T) T##Node
 #define LIST_TYPE(T) T##List
 
-/*!
+/**
  * Get a pointer to the first node in a list.
  *
  * If \a l is empty, result points to l->tail.
  */
 #define LIST_HEAD(l) ((l)->head.succ)
 
-/*!
+/**
  * Get a pointer to the last node in a list.
  *
  * If \a l is empty, result points to l->head.
@@ -186,7 +189,7 @@ typedef struct _PriNode
 	#define TYPEOF_OR_VOIDPTR(type) void *
 #endif
 
-/*!
+/**
  * Iterate over all nodes in a list.
  *
  * This macro generates a "for" statement using the following parameters:
@@ -200,7 +203,7 @@ typedef struct _PriNode
 		(n) = (TYPEOF_OR_VOIDPTR(n))(((Node *)(n))->succ) \
 	)
 
-/*!
+/**
  * Iterate backwards over all nodes in a list.
  *
  * This macro generates a "for" statement using the following parameters:
@@ -214,7 +217,7 @@ typedef struct _PriNode
 		(n) = (TYPEOF_OR_VOIDPTR(n))(((Node *)(n))->pred) \
 	)
 
-/*! Initialize a list. */
+/** Initialize a list. */
 #define LIST_INIT(l) \
 	do { \
 		(l)->head.succ = (TYPEOF_OR_VOIDPTR((l)->head.succ)) &(l)->tail; \
@@ -224,7 +227,7 @@ typedef struct _PriNode
 	} while (0)
 
 #ifdef _DEBUG
-	/*! Make sure that a list is valid (it was initialized and is not corrupted). */
+	/** Make sure that a list is valid (it was initialized and is not corrupted). */
 	#define LIST_ASSERT_VALID(l) \
 		do { \
 			Node *n, *pred; \
@@ -247,7 +250,7 @@ typedef struct _PriNode
 	#define INVALIDATE_NODE(n) do {} while (0)
 #endif
 
-/*! Add node to list head. */
+/** Add node to list head. */
 #define ADDHEAD(l,n) \
 	do { \
 		ASSERT(l); \
@@ -258,7 +261,7 @@ typedef struct _PriNode
 		(n)->pred->succ = (n); \
 	} while (0)
 
-/*! Add node to list tail. */
+/** Add node to list tail. */
 #define ADDTAIL(l,n) \
 	do { \
 		ASSERT(l); \
@@ -269,7 +272,7 @@ typedef struct _PriNode
 		(l)->tail.pred = (n); \
 	} while (0)
 
-/*!
+/**
  * Insert node \a n before node \a ln.
  *
  * \note You can't pass in a list header as \a ln, but
@@ -283,7 +286,7 @@ typedef struct _PriNode
 		(ln)->pred = (n); \
 	} while (0)
 
-/*!
+/**
  * Remove \a n from whatever list it is in.
  *
  * \note Removing a node that has not previously been
@@ -296,7 +299,7 @@ typedef struct _PriNode
 		INVALIDATE_NODE(n); \
 	} while (0)
 
-/*! Tell whether a list is empty. */
+/** Tell whether a list is empty. */
 #define LIST_EMPTY(l)  ( (void *)((l)->head.succ) == (void *)(&(l)->tail) )
 
 /**
@@ -316,7 +319,7 @@ typedef struct _PriNode
 	} while (0)
 
 
-/*!
+/**
  * Unlink a node from the head of the list \a l.
  *
  * \return Pointer to node, or NULL if the list was empty.
@@ -336,7 +339,7 @@ INLINE Node *list_remHead(List *l)
 	return n;
 }
 
-/*!
+/**
  * Unlink a node from the tail of the list \a l.
  *
  * \return Pointer to node, or NULL if the list was empty.

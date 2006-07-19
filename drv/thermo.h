@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004, 2005 Develer S.r.l. (http://www.develer.com/)
@@ -26,6 +26,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2005/11/04 17:59:47  bernie
  *#* Import into DevLib.
  *#*
@@ -58,7 +61,7 @@
 void thermo_init(void);
 
 
-/*!
+/**
  * Set the target temperature at which a given device should be kept.
  *
  * \param dev Device
@@ -66,19 +69,19 @@ void thermo_init(void);
  */
 void thermo_setTarget(ThermoDev dev, deg_t temperature);
 
-/*! Start thermo control for a certain device \a dev */
+/** Start thermo control for a certain device \a dev */
 void thermo_start(ThermoDev dev);
 
-/*! Stop thermo control for a certain device \a dev */
+/** Stop thermo control for a certain device \a dev */
 void thermo_stop(ThermoDev dev);
 
-/*! Clear errors for channel \a dev */
+/** Clear errors for channel \a dev */
 void thermo_clearErrors(ThermoDev dev);
 
-/*! Return the status of the specific \a dev thermo-device. */
+/** Return the status of the specific \a dev thermo-device. */
 thermostatus_t thermo_status(ThermoDev dev);
 
-/*!
+/**
  * Return the current temperature of a device currently under thermo
  * control.
  *

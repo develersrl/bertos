@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2005/11/04 18:06:44  bernie
  *#* Import into DevLib.
  *#*
@@ -77,12 +80,12 @@
 
 #include <math.h>
 
-/*! Array  of triacs */
+/** Array  of triacs */
 static Triac triacs[TRIAC_CNT];
 
 DB(bool phase_initialized;)
 
-/*!
+/**
  * Zerocross interrupt, call when 220V cross zero.
  *
  * This function turn off all triacs that have duty < 100%
@@ -122,7 +125,7 @@ DEFINE_ZEROCROSS_ISR()
 
 
 
-/*!
+/**
  * Set duty of the triac channel \a dev (interrupt safe).
  */
 void phase_setDuty(TriacDev dev, triac_duty_t duty)
@@ -137,7 +140,7 @@ void phase_setDuty(TriacDev dev, triac_duty_t duty)
 
 
 
-/*!
+/**
  * Set duty of the triac channel \a dev (NOT INTERRUPT SAFE).
  */
 void phase_setDutyUnlock(TriacDev dev, triac_duty_t duty)
@@ -147,7 +150,7 @@ void phase_setDutyUnlock(TriacDev dev, triac_duty_t duty)
 
 
 
-/*!
+/**
  * Set power of the triac channel \a dev (interrupt safe).
  *
  * This function approsimate the sine wave to a triangular wave to compute
@@ -175,7 +178,7 @@ void phase_setPower(TriacDev dev, triac_power_t power)
 
 
 
-/*!
+/**
  * Soft int for each \a _dev triac.
  *
  * The triacs are turned on at different time to achieve phase control.
@@ -192,7 +195,7 @@ static void phase_softint(void *_dev)
 
 
 
-/*!
+/**
  * Initialize phase control driver
  */
 void phase_init(void)

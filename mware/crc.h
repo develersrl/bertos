@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
@@ -24,6 +24,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2006/07/19 12:56:27  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.6  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -57,7 +60,7 @@ extern "C" {
 extern const uint16_t crc16tab[256];
 
 
-/*!
+/**
  * \brief Compute the updated CRC16 value for one octet (macro version)
  *
  * \note This version is only intended for old/broken compilers.
@@ -70,7 +73,7 @@ extern const uint16_t crc16tab[256];
 
 
 #ifdef INLINE
-/*!
+/**
  * \brief Compute the updated CRC16 value for one octet (macro version)
  */
 INLINE uint16_t updcrc16(uint8_t c, uint16_t oldcrc)
@@ -80,7 +83,7 @@ INLINE uint16_t updcrc16(uint8_t c, uint16_t oldcrc)
 #endif // INLINE
 
 
-/*!
+/**
  * This function implements the CRC 16 calculation on a buffer.
  *
  * \param crc  Current CRC16 value.

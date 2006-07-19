@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2006/07/19 12:56:28  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.7  2006/07/19 12:53:58  bernie
  *#* Documentation fixes.
  *#*

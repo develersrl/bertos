@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2001, 2004 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.16  2006/07/19 12:56:27  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.15  2005/11/27 23:36:19  bernie
  *#* Use appconfig.h instead of cfg/config.h.
  *#*
@@ -85,23 +88,23 @@
 
 typedef struct Process
 {
-	Node         link;        /*!< Link Process into scheduler lists */
-	cpustack_t  *stack;       /*!< Per-process SP */
-	iptr_t       user_data;   /*!< Custom data passed to the process */
+	Node         link;        /**< Link Process into scheduler lists */
+	cpustack_t  *stack;       /**< Per-process SP */
+	iptr_t       user_data;   /**< Custom data passed to the process */
 
 #if CONFIG_KERN_SIGNALS
-	sigmask_t    sig_wait;    /*!< Signals the process is waiting for */
-	sigmask_t    sig_recv;    /*!< Received signals */
+	sigmask_t    sig_wait;    /**< Signals the process is waiting for */
+	sigmask_t    sig_recv;    /**< Received signals */
 #endif
 
 #if CONFIG_KERN_PREEMPTIVE
-	int          forbid_cnt;  /*!< Nesting count for proc_forbid()/proc_permit(). */
+	int          forbid_cnt;  /**< Nesting count for proc_forbid()/proc_permit(). */
 #endif
 
 #if CONFIG_KERN_HEAP
-	uint16_t     flags;       /*!< Flags */
-	cpustack_t  *stack_base;  /*!< Base of process stack */
-	size_t       stack_size;  /*!< Size of process stack */
+	uint16_t     flags;       /**< Flags */
+	cpustack_t  *stack_base;  /**< Base of process stack */
+	size_t       stack_size;  /**< Size of process stack */
 #endif
 
 #if CONFIG_KERN_MONITOR
@@ -117,38 +120,38 @@ typedef struct Process
 } Process;
 
 
-/*!
+/**
  * \name Flags for Process.flags.
  * \{
  */
-#define PF_FREESTACK  BV(0)  /*!< Free the stack when process dies */
+#define PF_FREESTACK  BV(0)  /**< Free the stack when process dies */
 /*\}*/
 
 
-/*! Track running processes. */
+/** Track running processes. */
 extern REGISTER Process	*CurrentProcess;
 
-/*! Track ready processes. */
+/** Track ready processes. */
 extern REGISTER List     ProcReadyList;
 
 
-/*! Enqueue a task in the ready list. */
+/** Enqueue a task in the ready list. */
 #define SCHED_ENQUEUE(proc)  ADDTAIL(&ProcReadyList, &(proc)->link)
 
-/*! Schedule to another process *without* adding the current to the ready list. */
+/** Schedule to another process *without* adding the current to the ready list. */
 void proc_schedule(void);
 
 #if CONFIG_KERN_MONITOR
-	/*! Initialize the monitor */
+	/** Initialize the monitor */
 	void monitor_init(void);
 
-	/*! Register a process into the monitor */
+	/** Register a process into the monitor */
 	void monitor_add(Process *proc, const char *name, cpustack_t *stack, size_t stacksize);
 
-	/*! Unregister a process from the monitor */
+	/** Unregister a process from the monitor */
 	void monitor_remove(Process *proc);
 
-	/*! Rename a process */
+	/** Rename a process */
 	void monitor_rename(Process *proc, const char* name);
 #endif /* CONFIG_KERN_MONITOR */
 

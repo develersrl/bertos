@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:25  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2005/06/27 21:28:31  bernie
  *#* Import ADC driver.
  *#*
@@ -27,7 +30,7 @@
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
 
-/*!Type for ADC return value. */
+/**Type for ADC return value. */
 typedef uint16_t adcread_t;
 
 #define adc_bits() ADC_BITS

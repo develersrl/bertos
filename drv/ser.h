@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.27  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.26  2006/05/18 00:39:13  bernie
  *#* Add struct Serial friendly typedef.
  *#*
@@ -99,53 +102,53 @@
 #include <cfg/os.h>
 #include <appconfig.h>
 
-/*! \name Serial Error/status flags. */
+/** \name Serial Error/status flags. */
 /*\{*/
 #if CPU_AVR
 	typedef uint8_t serstatus_t;
 
 	/* Software errors */
-	#define SERRF_RXFIFOOVERRUN  BV(0)  /*!< Rx FIFO buffer overrun */
-	#define SERRF_RXTIMEOUT      BV(5)  /*!< Receive timeout */
-	#define SERRF_TXTIMEOUT      BV(6)  /*!< Transmit timeout */
+	#define SERRF_RXFIFOOVERRUN  BV(0)  /**< Rx FIFO buffer overrun */
+	#define SERRF_RXTIMEOUT      BV(5)  /**< Receive timeout */
+	#define SERRF_TXTIMEOUT      BV(6)  /**< Transmit timeout */
 
 	/*
 	 * Hardware errors.
 	 * These flags map directly to the AVR UART Status Register (USR).
 	 */
-	#define SERRF_RXSROVERRUN    BV(3)  /*!< Rx shift register overrun */
-	#define SERRF_FRAMEERROR     BV(4)  /*!< Stop bit missing */
-	#define SERRF_PARITYERROR    BV(7)  /*!< Parity error */
-	#define SERRF_NOISEERROR     0      /*!< Unsupported */
+	#define SERRF_RXSROVERRUN    BV(3)  /**< Rx shift register overrun */
+	#define SERRF_FRAMEERROR     BV(4)  /**< Stop bit missing */
+	#define SERRF_PARITYERROR    BV(7)  /**< Parity error */
+	#define SERRF_NOISEERROR     0      /**< Unsupported */
 #elif CPU_DSP56K
 	typedef uint16_t serstatus_t;
 
 	/* Software errors */
-	#define SERRF_RXFIFOOVERRUN  BV(0)  /*!< Rx FIFO buffer overrun */
-	#define SERRF_RXTIMEOUT      BV(1)  /*!< Receive timeout */
-	#define SERRF_TXTIMEOUT      BV(2)  /*!< Transmit timeout */
+	#define SERRF_RXFIFOOVERRUN  BV(0)  /**< Rx FIFO buffer overrun */
+	#define SERRF_RXTIMEOUT      BV(1)  /**< Receive timeout */
+	#define SERRF_TXTIMEOUT      BV(2)  /**< Transmit timeout */
 
 	/*
 	 * Hardware errors.
 	 * These flags map directly to the SCI Control Register.
 	 */
-	#define SERRF_PARITYERROR    BV(8)  /*!< Parity error */
-	#define SERRF_FRAMEERROR     BV(9)  /*!< Stop bit missing */
-	#define SERRF_NOISEERROR     BV(10) /*!< Noise error */
-	#define SERRF_RXSROVERRUN    BV(11) /*!< Rx shift register overrun */
+	#define SERRF_PARITYERROR    BV(8)  /**< Parity error */
+	#define SERRF_FRAMEERROR     BV(9)  /**< Stop bit missing */
+	#define SERRF_NOISEERROR     BV(10) /**< Noise error */
+	#define SERRF_RXSROVERRUN    BV(11) /**< Rx shift register overrun */
 #elif OS_HOSTED
 	typedef uint16_t serstatus_t;
 
 	/* Software errors */
-	#define SERRF_RXFIFOOVERRUN  BV(0)  /*!< Rx FIFO buffer overrun */
-	#define SERRF_RXTIMEOUT      BV(1)  /*!< Receive timeout */
-	#define SERRF_TXTIMEOUT      BV(2)  /*!< Transmit timeout */
+	#define SERRF_RXFIFOOVERRUN  BV(0)  /**< Rx FIFO buffer overrun */
+	#define SERRF_RXTIMEOUT      BV(1)  /**< Receive timeout */
+	#define SERRF_TXTIMEOUT      BV(2)  /**< Transmit timeout */
 
 	/* Hardware errors */
-	#define SERRF_RXSROVERRUN    0      /*!< Unsupported in emulated serial port. */
-	#define SERRF_FRAMEERROR     0      /*!< Unsupported in emulated serial port. */
-	#define SERRF_PARITYERROR    0      /*!< Unsupported in emulated serial port. */
-	#define SERRF_NOISEERROR     0      /*!< Unsupported in emulated serial port. */
+	#define SERRF_RXSROVERRUN    0      /**< Unsupported in emulated serial port. */
+	#define SERRF_FRAMEERROR     0      /**< Unsupported in emulated serial port. */
+	#define SERRF_PARITYERROR    0      /**< Unsupported in emulated serial port. */
+	#define SERRF_NOISEERROR     0      /**< Unsupported in emulated serial port. */
 
 #else
 	#error unknown architecture
@@ -165,7 +168,7 @@
 #define SERRF_TX  (SERRF_TXTIMEOUT)
 
 
-/*!
+/**
  * \name Parity settings for ser_setparity().
  *
  * \note Values are AVR-specific for performance reasons.
@@ -178,7 +181,7 @@
 #define SER_PARITY_ODD   3
 /*\}*/
 
-/*!
+/**
  * \name Serial hw numbers
  *
  * \{
@@ -203,27 +206,27 @@ enum
 #else
 	#error unknown architecture
 #endif
-	SER_CNT  /*!< Number of serial ports */
+	SER_CNT  /**< Number of serial ports */
 };
 /*\}*/
 
 
 struct SerialHardware;
 
-/*! Human-readable serial error descriptions */
+/** Human-readable serial error descriptions */
 extern const char * const serial_errors[8];
 
-/*! Serial handle structure */
+/** Serial handle structure */
 typedef struct Serial
 {
-	/*! Physical port number */
+	/** Physical port number */
 	unsigned int unit;
 
 #ifdef _DEBUG
 	bool is_open;
 #endif
 
-	/*!
+	/**
 	 * \name Transmit and receive FIFOs.
 	 *
 	 * Declared volatile because handled asinchronously by interrupts.
@@ -241,10 +244,10 @@ typedef struct Serial
 	mtime_t txtimeout;
 #endif
 
-	/*! Holds the flags defined above.  Will be 0 when no errors have occurred. */
+	/** Holds the flags defined above.  Will be 0 when no errors have occurred. */
 	serstatus_t status;
 
-	/*! Low-level interface to hardware. */
+	/** Low-level interface to hardware. */
 	struct SerialHardware* hw;
 } Serial;
 
@@ -273,7 +276,7 @@ extern void ser_drain(struct Serial *port);
 extern struct Serial *ser_open(unsigned int unit);
 extern void ser_close(struct Serial *port);
 
-/*!
+/**
  * \name Additional functions implemented as macros
  *
  * \{

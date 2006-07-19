@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/07/19 12:56:27  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.4  2006/02/24 01:17:05  bernie
  *#* Update for new emulator.
  *#*
@@ -40,7 +43,7 @@
 
 #if CONFIG_KERN_MONITOR
 
-/*!
+/**
  * Start the kernel monitor. It is a special process which checks every second the stacks of the
  * running processes trying to detect stack overflows.
  *
@@ -53,7 +56,7 @@
 void monitor_start(size_t stacksize, cpustack_t *stack);
 
 
-/*!
+/**
  * Manually check if a given stack has overflown. This is used to check for stacks
  * of processes handled externally form the kernel, or for other stacks (for instance
  * the interrupt supervisor stack).
@@ -64,7 +67,7 @@ void monitor_start(size_t stacksize, cpustack_t *stack);
 size_t monitor_checkStack(cpustack_t *stack_base, size_t stack_size);
 
 
-/*! Print a report of the stack status through kdebug */
+/** Print a report of the stack status through kdebug */
 void monitor_report(void);
 
 

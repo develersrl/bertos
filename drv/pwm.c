@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2005/11/04 18:08:49  bernie
  *#* Import into DevLib.
  *#*
@@ -41,7 +44,7 @@
 #include <drv/pwm.h>
 #include <cfg/macros.h>
 
-/*!
+/**
  * Set duty of pwm channel \a dev.
  */
 void pwm_setDuty(PwmDev dev, pwm_duty_t duty)
@@ -51,7 +54,7 @@ void pwm_setDuty(PwmDev dev, pwm_duty_t duty)
 	pwm_hw_setDutyUnlock(dev, duty);
 }
 
-/*!
+/**
  * Initialize PWM hw.
  */
 void pwm_init(void)

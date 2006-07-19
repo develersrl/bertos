@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:25  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2005/06/27 21:28:31  bernie
  *#* Import ADC driver.
  *#*
@@ -31,7 +34,7 @@
 
 DB(bool adc_initialized = false;)
 
-/*!
+/**
  * Read the ADC channel \a ch.
  */
 adcread_t adc_read(uint16_t ch)
@@ -44,7 +47,7 @@ adcread_t adc_read(uint16_t ch)
 	return(adc_hw_read());
 }
 
-/*!
+/**
  * Initialize the ADC hardware.
  */
 void adc_init(void)

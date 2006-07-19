@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2005/04/12 01:37:50  bernie
  *#* Import into DevLib.
  *#*
@@ -56,7 +59,7 @@
 #define TIMER_PRESCALER  64UL
 #define TIMER_DELAY_1MS  (255 - CLOCK_FREQ / TIMER_PRESCALER / MS_PER_SEC)
 
-/*!
+/**
  * Wait \a time ms using timer 0.
  *
  */

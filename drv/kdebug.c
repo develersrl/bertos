@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.28  2006/07/19 12:56:25  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.27  2006/06/01 12:32:06  marco
  *#* Updated include reference.
  *#*
@@ -240,7 +243,7 @@ void kdbg_init(void)
 }
 
 
-/*!
+/**
  * Output one character to the debug console
  */
 static void __kputchar(char c, UNUSED_ARG(void *, unused))
@@ -313,7 +316,7 @@ void PGM_FUNC(kputs)(const char * PGM_ATTR str)
 }
 
 
-/*!
+/**
  * Cheap function to print small integers without using printf().
  */
 int kputnum(int num)
@@ -426,7 +429,7 @@ int PGM_FUNC(__check_wall)(long *wall, int size, const char * PGM_ATTR name, con
 
 #if CONFIG_PRINTF
 
-/*!
+/**
  * Dump binary data in hex
  */
 void kdump(const void *_buf, size_t len)

@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
@@ -18,6 +18,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2006/07/19 12:56:27  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.8  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -50,7 +53,7 @@
 #include <mware/list.h>
 
 
-/*!
+/**
  * Handle queues of messages associated an action.
  *
  * A message port is an abstraction used to exchange information
@@ -186,20 +189,20 @@
  */
 typedef struct MsgPort
 {
-	List  queue;   /*!< Messages queued at this port. */
-	Event event;   /*!< Event to trigger when a message arrives. */
+	List  queue;   /**< Messages queued at this port. */
+	Event event;   /**< Event to trigger when a message arrives. */
 } MsgPort;
 
 
 typedef struct Msg
 {
-	Node     link;      /*!< Link into message port queue. */
-	MsgPort *replyPort; /*!< Port to which the msg is to be replied. */
+	Node     link;      /**< Link into message port queue. */
+	MsgPort *replyPort; /**< Port to which the msg is to be replied. */
 	/* User data may follow */
 } Msg;
 
 
-/*!
+/**
  * Lock a message port.
  *
  * This is required before reading or manipulating
@@ -219,7 +222,7 @@ INLINE void msg_lockPort(MsgPort *port)
 	proc_forbid();
 }
 
-/*!
+/**
  * Unlock a message port.
  *
  * \see msg_lockPort()
@@ -230,14 +233,14 @@ INLINE void msg_unlockPort(MsgPort *port)
 }
 
 
-/*! Initialize a message port */
+/** Initialize a message port */
 INLINE void msg_initPort(MsgPort *port, Event event)
 {
 	LIST_INIT(&port->queue);
 	port->event = event;
 }
 
-/*! Queue \a msg into \a port, triggering the associated event */
+/** Queue \a msg into \a port, triggering the associated event */
 INLINE void msg_put(MsgPort *port, Msg *msg)
 {
 	msg_portLock(port);
@@ -247,7 +250,7 @@ INLINE void msg_put(MsgPort *port, Msg *msg)
 	event_do(&port->event);
 }
 
-/*!
+/**
  * Get the first message from the queue of \a port.
  *
  * \return Pointer to the message or NULL if the port was empty.
@@ -263,7 +266,7 @@ INLINE Msg *msg_get(MsgPort *port)
 	return msg;
 }
 
-/*! Peek the first message in the queue of \a port, or NULL if the port is empty. */
+/** Peek the first message in the queue of \a port, or NULL if the port is empty. */
 INLINE Msg *msg_peek(MsgPort *port)
 {
 	Msg *msg;
@@ -277,7 +280,7 @@ INLINE Msg *msg_peek(MsgPort *port)
 	return msg;
 }
 
-/*! Send back (reply) \a msg to its sender. */
+/** Send back (reply) \a msg to its sender. */
 INLINE void msg_reply(Msg *msg)
 {
 	msg_put(msg->replyPort, msg);

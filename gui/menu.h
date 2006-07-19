@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/07/19 12:56:27  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.2  2006/06/03 13:58:02  bernie
  *#* Fix recursive timeout and add exit status information.
  *#*
@@ -77,10 +80,10 @@ typedef iptr_t (*MenuHook)(iptr_t userdata);
  */
 typedef struct MenuItem
 {
-	const_iptr_t label;    /*!< Item label (ID or ptr to string, 0 to disable) */
-	int          flags;    /*!< See MIF_#? definitions below */
-	MenuHook     hook;     /*!< Callback function (NULL to terminate item list) */
-	iptr_t       userdata; /*!< User data to be passed back to the hook */
+	const_iptr_t label;    /**< Item label (ID or ptr to string, 0 to disable) */
+	int          flags;    /**< See MIF_#? definitions below */
+	MenuHook     hook;     /**< Callback function (NULL to terminate item list) */
+	iptr_t       userdata; /**< User data to be passed back to the hook */
 } MenuItem;
 
 /**
@@ -90,20 +93,20 @@ typedef struct MenuItem
 #define MIF_EXCLUDE_MASK    0x00FF /**< Mask for mutual exclusion map (shared with priority). */
 #define MIF_PRI_MASK        0x00FF /**< Mask for priority value (shared with mutual exclusion). */
 #define MIF_PRI(x)          ((x) & MIF_PRI_MASK) /**< Set menu item priority. */
-#define MIF_EXCLUDE_0       BV(0)  /*!< Exclude item 0 when this item is checked */
-#define MIF_EXCLUDE_1       BV(1)  /*!< Exclude item 1 when this item is checked */
-#define MIF_EXCLUDE_2       BV(2)  /*!< Exclude item 2 when this item is checked */
-#define MIF_EXCLUDE_3       BV(3)  /*!< Exclude item 3 when this item is checked */
-#define MIF_EXCLUDE_4       BV(4)  /*!< Exclude item 4 when this item is checked */
-#define MIF_EXCLUDE_5       BV(5)  /*!< Exclude item 5 when this item is checked */
-#define MIF_EXCLUDE_6       BV(6)  /*!< Exclude item 6 when this item is checked */
-#define MIF_EXCLUDE_7       BV(7)  /*!< Exclude item 7 when this item is checked */
-#define MIF_CHECKED         BV(8)  /*!< Item is currently checked */
-#define MIF_CHECKIT         BV(9)  /*!< Automatically check this item when selected */
-#define MIF_TOGGLE          BV(10) /*!< Toggle MIF_CHECKED when item is selected */
-#define MIF_HIDDEN          BV(11) /*!< This menu item is not visible */
-#define MIF_DISABLED        BV(12) /*!< This menu item is not visible */
-#define MIF_RAMLABEL        BV(13) /*!< Item label is stored in RAM, not in program memory */
+#define MIF_EXCLUDE_0       BV(0)  /**< Exclude item 0 when this item is checked */
+#define MIF_EXCLUDE_1       BV(1)  /**< Exclude item 1 when this item is checked */
+#define MIF_EXCLUDE_2       BV(2)  /**< Exclude item 2 when this item is checked */
+#define MIF_EXCLUDE_3       BV(3)  /**< Exclude item 3 when this item is checked */
+#define MIF_EXCLUDE_4       BV(4)  /**< Exclude item 4 when this item is checked */
+#define MIF_EXCLUDE_5       BV(5)  /**< Exclude item 5 when this item is checked */
+#define MIF_EXCLUDE_6       BV(6)  /**< Exclude item 6 when this item is checked */
+#define MIF_EXCLUDE_7       BV(7)  /**< Exclude item 7 when this item is checked */
+#define MIF_CHECKED         BV(8)  /**< Item is currently checked */
+#define MIF_CHECKIT         BV(9)  /**< Automatically check this item when selected */
+#define MIF_TOGGLE          BV(10) /**< Toggle MIF_CHECKED when item is selected */
+#define MIF_HIDDEN          BV(11) /**< This menu item is not visible */
+#define MIF_DISABLED        BV(12) /**< This menu item is not visible */
+#define MIF_RAMLABEL        BV(13) /**< Item label is stored in RAM, not in program memory */
 /* \} */
 
 /**
@@ -111,11 +114,11 @@ typedef struct MenuItem
  */
 typedef struct Menu
 {
-	MenuItem        *items;    /*!< Array of items (end with a NULL hook) */
-	const_iptr_t     title;    /*!< Menu title (ID or ptr to string, 0 to disable) */
-	int              flags;    /*!< See MF_#? definitions below */
-	struct Bitmap   *bitmap;   /*!< Bitmap where the menu is rendered */
-	int              selected; /*!< Initial selection (written to if #MF_SAVESEL is set). */
+	MenuItem        *items;    /**< Array of items (end with a NULL hook) */
+	const_iptr_t     title;    /**< Menu title (ID or ptr to string, 0 to disable) */
+	int              flags;    /**< See MF_#? definitions below */
+	struct Bitmap   *bitmap;   /**< Bitmap where the menu is rendered */
+	int              selected; /**< Initial selection (written to if #MF_SAVESEL is set). */
 } Menu;
 
 /**

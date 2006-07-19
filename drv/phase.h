@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2005/11/04 18:06:44  bernie
  *#* Import into DevLib.
  *#*
@@ -58,7 +61,7 @@
 #define TRIAC_MAX_POWER 100
 #define TRIAC_POWER_K   TRIAC_MAX_DUTY * (1 / sqrt(2 * TRIAC_MAX_POWER))
 
-/*!
+/**
  * \name Types for duty and power.
  * \{
  */
@@ -69,15 +72,15 @@ typedef uint16_t triac_power_t;
 
 DB(extern bool phase_initialized;)
 
-/*!
+/**
  * \name Type for triac control.
  * \{
  */
 typedef struct Triac
 {
-	Timer  timer;      /*!< Timer for phase control. */
-	triac_duty_t duty; /*!< Duty cycle of the channel. */
-	bool   running;    /*!< True when the timer is active. */
+	Timer  timer;      /**< Timer for phase control. */
+	triac_duty_t duty; /**< Duty cycle of the channel. */
+	bool   running;    /**< True when the timer is active. */
 } Triac;
 /* \} */
 

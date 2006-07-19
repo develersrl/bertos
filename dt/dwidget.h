@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2005/11/04 18:26:38  bernie
  *#* Import into DevLib.
  *#*
@@ -35,13 +38,13 @@
 #include <dt/dnotifier.h>
 #include <cfg/compiler.h>
 
-/*! Widget position. */
+/** Widget position. */
 typedef uint8_t dpos_t;
 
-/*! Widget drawing context. */
+/** Widget drawing context. */
 typedef iptr_t dcontext_t;
 
-/*! Widget definition. */
+/** Widget definition. */
 typedef struct DWidget
 {
 	DNotifier notifier;

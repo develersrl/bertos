@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004, 2005, 2006 Develer S.r.l. (http://www.develer.com/)
@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.31  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.30  2006/02/24 00:26:49  bernie
  *#* Fixes for CONFIG_KERNEL.
  *#*
@@ -89,7 +92,7 @@
 #endif
 
 
-/*!
+/**
  * \def CONFIG_TIMER_STROBE
  *
  * This is a debug facility that can be used to
@@ -106,19 +109,19 @@
 #endif
 
 
-//! Master system clock (1 tick accuracy)
+/// Master system clock (1 tick accuracy)
 volatile ticks_t _clock;
 
 
 #ifndef CONFIG_TIMER_DISABLE_EVENTS
 
-/*!
+/**
  * List of active asynchronous timers.
  */
 REGISTER static List timers_queue;
 
 
-/*!
+/**
  * Add the specified timer to the software timer service queue.
  * When the delay indicated by the timer expires, the timer
  * device will execute the event associated with it.
@@ -165,7 +168,7 @@ void timer_add(Timer *timer)
 }
 
 
-/*!
+/**
  * Remove a timer from the timer queue before it has expired.
  */
 Timer *timer_abort(Timer *timer)
@@ -216,7 +219,7 @@ void timer_delayTicks(ticks_t delay)
 
 #ifndef CONFIG_TIMER_DISABLE_UDELAY
 
-/*!
+/**
  * Busy wait until the specified amount of high-precision ticks have elapsed.
  *
  * \note This function is interrupt safe, the only
@@ -243,7 +246,7 @@ void timer_busyWait(hptime_t delay)
 	}
 }
 
-/*!
+/**
  * Wait for the specified amount of time (expressed in microseconds).
  *
  * \bug In AVR arch the maximum amount of time that can be used as
@@ -263,7 +266,7 @@ void timer_delayHp(hptime_t delay)
 #endif /* CONFIG_TIMER_DISABLE_UDELAY */
 
 
-/*!
+/**
  * Timer interrupt handler. Find soft timers expired and
  * trigger corresponding events.
  */
@@ -317,7 +320,7 @@ DEFINE_TIMER_ISR
 
 MOD_DEFINE(timer)
 
-/*!
+/**
  * Initialize timer
  */
 void timer_init(void)

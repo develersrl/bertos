@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/07/19 12:56:25  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.3  2006/02/24 00:27:56  bernie
  *#* Remove #error to allow compiling local demo.
  *#*
@@ -38,7 +41,7 @@
 #ifndef ARCH_CONFIG_H
 #define ARCH_CONFIG_H
 
-/*!
+/**
  * \name Architectures
  * \{
  */

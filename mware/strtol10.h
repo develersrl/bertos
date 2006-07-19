@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/07/19 12:56:28  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.2  2005/04/11 19:10:28  bernie
  *#* Include top-level headers from cfg/ subdir.
  *#*
@@ -29,7 +32,7 @@
 bool strtoul10(const char *first, const char *last, unsigned long *val);
 bool strtol10(const char *first, const char *last, long *val);
 
-/*!
+/**
  * Replacement for standard library function atol().
  */
 INLINE long atol(const char *str)
@@ -39,7 +42,7 @@ INLINE long atol(const char *str)
 	return val;
 }
 
-/*!
+/**
  * Replacement for standard library function atoi().
  */
 INLINE int atoi(const char *str)

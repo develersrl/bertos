@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004, 2005, 2006 Develer S.r.l. (http://www.develer.com/)
@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.10  2006/05/27 17:21:15  bernie
  *#* Factor out, simplify and document clipping.
  *#*
@@ -63,7 +66,7 @@
 #endif
 
 
-/*!
+/**
  * Initialize a Bitmap structure with the provided parameters.
  *
  * \note The pen position is reset to the origin.
@@ -97,7 +100,7 @@ void gfx_bitmapInit(Bitmap *bm, uint8_t *raster, coord_t w, coord_t h)
 }
 
 
-/*!
+/**
  * Clear the whole bitmap surface to the background color.
  *
  * \note This function does \b not update the current pen position.
@@ -113,7 +116,7 @@ void gfx_bitmapClear(Bitmap *bm)
 
 #include <avr/pgmspace.h> /* FIXME: memcpy_P() */
 
-/*!
+/**
  * Copy a raster picture located in program memory in the bitmap.
  * The size of the raster to copy *must* be the same of the raster bitmap.
  *

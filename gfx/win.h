@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2006 Develer S.r.l. (http://www.develer.com/)
@@ -20,6 +20,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/07/19 12:56:27  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.2  2006/01/26 00:36:48  bernie
  *#* Const correctness for some new functions.
  *#*

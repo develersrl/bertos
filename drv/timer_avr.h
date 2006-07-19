@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.28  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.27  2006/05/18 00:38:24  bernie
  *#* Use hw_cpu.h instead of ubiquitous hw.h.
  *#*
@@ -50,7 +53,7 @@
 #include <cfg/compiler.h>  /* uint8_t */
 #include <hw_cpu.h>        /* CLOCK_FREQ */
 
-/*!
+/**
  * \name Values for CONFIG_TIMER.
  *
  * Select which hardware timer interrupt to use for system clock and softtimers.
@@ -75,19 +78,19 @@
 	#define TIMER_TICKS_PER_SEC  1000
 	#define TIMER_HW_CNT         OCR_DIVISOR
 
-	//! Type of time expressed in ticks of the hardware high-precision timer
+	/// Type of time expressed in ticks of the hardware high-precision timer
 	typedef uint8_t hptime_t;
 
 #elif (CONFIG_TIMER == TIMER_ON_OVERFLOW1)
 
 	#define TIMER_PRESCALER      1
 	#define TIMER_HW_BITS        8
-	/*! This value is the maximum in overflow based timers. */
+	/** This value is the maximum in overflow based timers. */
 	#define TIMER_HW_CNT         (1 << TIMER_HW_BITS)
 	#define DEFINE_TIMER_ISR     SIGNAL(SIG_OVERFLOW1)
 	#define TIMER_TICKS_PER_SEC  ((TIMER_HW_HPTICKS_PER_SEC + TIMER_HW_CNT / 2) / TIMER_HW_CNT)
 
-	//! Type of time expressed in ticks of the hardware high precision timer
+	/// Type of time expressed in ticks of the hardware high precision timer
 	typedef uint16_t hptime_t;
 
 #elif (CONFIG_TIMER == TIMER_ON_OUTPUT_COMPARE2)
@@ -96,23 +99,23 @@
 	#define TIMER_HW_BITS        8
 	#define DEFINE_TIMER_ISR     SIGNAL(SIG_OUTPUT_COMPARE2)
 	#define TIMER_TICKS_PER_SEC  1000
-	/*! Value for OCR register in output-compare based timers. */
+	/** Value for OCR register in output-compare based timers. */
 	#define TIMER_HW_CNT         OCR_DIVISOR
 
 
-	//! Type of time expressed in ticks of the hardware high precision timer
+	/// Type of time expressed in ticks of the hardware high precision timer
 	typedef uint8_t hptime_t;
 
 #elif (CONFIG_TIMER == TIMER_ON_OVERFLOW3)
 
 	#define TIMER_PRESCALER      1
 	#define TIMER_HW_BITS        8
-	/*! This value is the maximum in overflow based timers. */
+	/** This value is the maximum in overflow based timers. */
 	#define TIMER_HW_CNT         (1 << TIMER_HW_BITS)
 	#define DEFINE_TIMER_ISR     SIGNAL(SIG_OVERFLOW3)
 	#define TIMER_TICKS_PER_SEC  ((TIMER_HW_HPTICKS_PER_SEC + TIMER_HW_CNT / 2) / TIMER_HW_CNT)
 
-	//! Type of time expressed in ticks of the hardware high precision timer
+	/// Type of time expressed in ticks of the hardware high precision timer
 	typedef uint16_t hptime_t;
 #else
 
@@ -120,16 +123,16 @@
 #endif /* CONFIG_TIMER */
 
 
-/*! Frequency of the hardware high precision timer. */
+/** Frequency of the hardware high precision timer. */
 #define TIMER_HW_HPTICKS_PER_SEC  ((CLOCK_FREQ + TIMER_PRESCALER / 2) / TIMER_PRESCALER)
 
-/*!
+/**
  * System timer: additional division after the prescaler
  * 12288000 / 64 / 192 (0..191) = 1 ms
  */
 #define OCR_DIVISOR  (((CLOCK_FREQ + TIMER_PRESCALER / 2) / TIMER_PRESCALER + TIMER_TICKS_PER_SEC / 2) / TIMER_TICKS_PER_SEC - 1)
 
-/*! Not needed, IRQ timer flag cleared automatically */
+/** Not needed, IRQ timer flag cleared automatically */
 #define timer_hw_irq() do {} while (0)
 
 

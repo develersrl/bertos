@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2006/07/19 12:56:25  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.8  2006/03/13 02:06:55  bernie
  *#* ROUND_UP2: Rename from ROUND2.
  *#*
@@ -124,14 +127,14 @@
 	#define MAX(a,b)	(((a) > (b)) ? (a) : (b))
 #endif /* !(COMPILER_STATEMENT_EXPRESSIONS && COMPILER_TYPEOF) */
 
-/*! Bound \a x between \a min and \a max. */
+/** Bound \a x between \a min and \a max. */
 #define MINMAX(min,x,max)  (MIN(MAX(min, x), max))
 
 #ifdef __cplusplus
 	/* Use standard implementation from <algorithm> */
 	#define SWAP(a,b)  std::swap(a, b)
 #elif COMPILER_TYPEOF
-	/*!
+	/**
 	 * Type-generic macro to swap \a a with \a b.
 	 *
 	 * \note Arguments are evaluated multiple times.
@@ -156,7 +159,7 @@
 #endif /* COMPILER_TYPEOF */
 
 #ifndef BV
-	/*! Convert a bit value to a binary flag. */
+	/** Convert a bit value to a binary flag. */
 	#define BV(x)  (1<<(x))
 #endif
 
@@ -166,7 +169,7 @@
 /* OBSOLETE */
 #define ROUND2 ROUND_UP2
 
-/*!
+/**
  * \name Integer round macros.
  *
  * Round \a x to a multiple of \a base.
@@ -181,7 +184,7 @@
 /** Check if \a x is an integer power of 2. */
 #define IS_POW2(x)     (!(bool)((x) & ((x)-1)))
 
-/*! Calculate a compile-time log2 for a uint8_t */
+/** Calculate a compile-time log2 for a uint8_t */
 #define UINT8_LOG2(x) \
 	((x) < 2 ? 0 : \
 	 ((x) < 4 ? 1 : \
@@ -191,16 +194,16 @@
 	     ((x) < 64 ? 5 : \
 	      ((x) < 128 ? 6 : 7)))))))
 
-/*! Calculate a compile-time log2 for a uint16_t */
+/** Calculate a compile-time log2 for a uint16_t */
 #define UINT16_LOG2(x) \
 	((x < 256) ? UINT8_LOG2(x) : UINT8_LOG2((x) >> 8) + 8)
 
-/*! Calculate a compile-time log2 for a uint32_t */
+/** Calculate a compile-time log2 for a uint32_t */
 #define UINT32_LOG2(x) \
 	((x < 65536UL) ? UINT16_LOG2(x) : UINT16_LOG2((x) >> 16) + 16)
 
 #if COMPILER_VARIADIC_MACROS
-	/*! Count the number of arguments (up to 16). */
+	/** Count the number of arguments (up to 16). */
 	#define PP_COUNT(...) \
 		PP_COUNT__(__VA_ARGS__,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0)
 	#define PP_COUNT__(a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,count,...) \
@@ -208,7 +211,7 @@
 #endif
 
 #if COMPILER_VARIADIC_MACROS
-	/*!
+	/**
 	 * \def BIT_CHANGE(reg, (mask, value), ...)
 	 *
 	 * This macro allows for efficient and compact bit toggling in a hardware
@@ -247,7 +250,7 @@
 	 * for use with C90 compilers, through Boost Preprocessor.
 	 */
 
-	/*!
+	/**
 	 * \def BIT_CHANGE_BV(reg, (bit, value), ...)
 	 *
 	 * Similar to BIT_CHANGE(), but get bits instead of masks (and applies BV() to convert

@@ -10,6 +10,9 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
+# Revision 1.4  2006/07/19 12:56:24  bernie
+# Convert to new Doxygen style.
+#
 # Revision 1.3  2006/05/27 22:42:24  bernie
 # Search for verstag.h in app subdirs first.
 #
@@ -191,6 +194,7 @@ flash_$(1): $(OUTDIR)/$(1).s19 flash_$(1)_local
 	if ! $(AVRDUDE) $(DPROG) -p $$($(1)_MCU) -U flash:w:$$< ; then \
 	     $(AVRDUDE) $(DPROG) -p $$($(1)_MCU) -U flash:w:$$< ; \
 	fi
+	#avarice --mkII -j usb --erase --program --verify --file images/triface.elf
 
 .PHONY: flash_$(1)_local
 flash_$(1)_local:

@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * Copyright 2003, 2004, 2005, 2006 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999 Bernardo Innocenti <bernie@develer.com>
@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.17  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.16  2006/05/27 17:17:34  bernie
  *#* Optimize away divisions in RAST_ADDR/MASK macros.
  *#*
@@ -79,12 +82,12 @@
 
 EXTERN_C_BEGIN
 
-/*! Common type for coordinates expressed in pixel units */
+/** Common type for coordinates expressed in pixel units */
 typedef int coord_t;
 typedef unsigned int ucoord_t;
 
 #if CONFIG_GFX_VCOORDS
-/*! Common type for coordinates expressed in logical units */
+/** Common type for coordinates expressed in logical units */
 typedef float vcoord_t;
 #endif /* CONFIG_GFX_VCOORDS */
 
@@ -138,12 +141,12 @@ struct Font;
  */
 typedef struct Bitmap
 {
-	uint8_t *raster;        /*!< Pointer to byte array to hold the data */
-	coord_t width, height;  /*!< Width/Height in pixels */
-	coord_t stride;         /*!< Bytes per row. */
-	coord_t penX, penY;     /*!< Current pen position MoveTo()/LineTo() */
+	uint8_t *raster;        /**< Pointer to byte array to hold the data */
+	coord_t width, height;  /**< Width/Height in pixels */
+	coord_t stride;         /**< Bytes per row. */
+	coord_t penX, penY;     /**< Current pen position MoveTo()/LineTo() */
 
-	Rect cr;                /*!< Clip drawing inside this rectangle */
+	Rect cr;                /**< Clip drawing inside this rectangle */
 
 #if CONFIG_GFX_TEXT
 	const struct Font *font;/**< Current font for text rendering. */
@@ -160,7 +163,7 @@ typedef struct Bitmap
 	uint8_t styles;
 #endif
 #if CONFIG_GFX_VCOORDS
-	/*!
+	/**
 	 * \name Logical coordinate system
 	 * \{
 	 */
@@ -178,10 +181,10 @@ typedef struct Bitmap
  */
 typedef struct Image
 {
-	const uint8_t *raster;   /*!< Pointer to byte array to hold the data. */
-	coord_t width;     /*!< Raster width in pixels. */
-	coord_t height;    /*!< Raster height in pixels. */
-	coord_t stride;    /*!< Bytes per row. */
+	const uint8_t *raster;   /**< Pointer to byte array to hold the data. */
+	coord_t width;     /**< Raster width in pixels. */
+	coord_t height;    /**< Raster height in pixels. */
+	coord_t stride;    /**< Bytes per row. */
 } Image;
 
 #if CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_H_MSB

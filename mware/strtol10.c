@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/07/19 12:56:28  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.2  2005/04/11 18:10:45  bernie
  *#* Doxygen fixes.
  *#*
@@ -23,7 +26,7 @@
 
 #include "strtol10.h"
 
-/*!
+/**
  * Convert a formatted base-10 ASCII number to unsigned long binary representation.
  *
  * Unlike the standard strtoul(), this function has an interface
@@ -58,7 +61,7 @@ bool strtoul10(const char *first, const char *last, unsigned long *val)
 }
 
 
-/*!
+/**
  * Convert a formatted base-10 ASCII number to signed long binary representation.
  *
  * \see strtoul10()

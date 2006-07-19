@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2005 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:28  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2005/03/01 23:31:02  bernie
  *#* String table and localization stuff.
  *#*
@@ -22,7 +25,7 @@
 
 #include "msg.h"
 
-/*!
+/**
  * Array of pointers to localized strings. Should be filled
  * by localization stuff, but not for now.
  */
@@ -41,7 +44,7 @@ const char *msg_strings[MSG_COUNT] = {
  */
 
 
-/*!
+/**
  * Untranslated constant strings used more than once are
  * grouped here to save ROM space.
  */

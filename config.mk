@@ -10,6 +10,9 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
+# Revision 1.7  2006/07/19 12:56:24  bernie
+# Convert to new Doxygen style.
+#
 # Revision 1.6  2006/06/12 22:05:09  marco
 # Bring back config wrongly commited
 #
@@ -36,6 +39,9 @@ DPROG = -V -c stk500 -P /dev/ttyS0
 # STK200 parallel cable
 #DPROG = -c stk200 -E noreset
 
+# JTAG ICE mkII
+#DPROG = avarice --mkII -j usb -l
+
 # PonyProg serial programmer
 #DPROG = -c dasa2
 
@@ -50,7 +56,7 @@ DEBUGCFLAGS = -ggdb
 #
 # define some variables based on the AVR base path in $(AVR)
 #
-CROSS   = 
+CROSS   = avr-
 CC      = $(CROSS)gcc
 AS      = $(CC) -x assembler-with-cpp
 LD      = $(CC)

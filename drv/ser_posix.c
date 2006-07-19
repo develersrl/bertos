@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2006/02/17 22:28:00  bernie
  *#* Rename ser_emul.c to ser_posix.c.
  *#*
@@ -55,7 +58,7 @@ static unsigned char uart1_txbuffer[CONFIG_UART1_TXBUFSIZE];
 static unsigned char uart1_rxbuffer[CONFIG_UART1_RXBUFSIZE];
 
 
-/*!
+/**
  * Internal state structure
  */
 struct EmulSerial

@@ -1,5 +1,5 @@
 #error This module has not been revised for the API changes in several DevLib modules
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
@@ -28,6 +28,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2006/07/19 12:56:28  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.9  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -71,22 +74,22 @@
 #include <string.h> /* for memset() */
 
 
-/*!
+/**
  * \name Protocol control codes
  * \{
  */
-#define XM_SOH  0x01  /*!< Start Of Header (128-byte block) */
-#define XM_STX  0x02  /*!< Start Of Header (1024-byte block) */
-#define XM_EOT  0x04  /*!< End Of Transmission */
-#define XM_ACK  0x06  /*!< Acknowledge block */
-#define XM_NAK  0x15  /*!< Negative Acknowledge */
-#define XM_C    0x43  /*!< Request CRC-16 transmission */
-#define XM_CAN  0x18  /*!< CANcel transmission */
+#define XM_SOH  0x01  /**< Start Of Header (128-byte block) */
+#define XM_STX  0x02  /**< Start Of Header (1024-byte block) */
+#define XM_EOT  0x04  /**< End Of Transmission */
+#define XM_ACK  0x06  /**< Acknowledge block */
+#define XM_NAK  0x15  /**< Negative Acknowledge */
+#define XM_C    0x43  /**< Request CRC-16 transmission */
+#define XM_CAN  0x18  /**< CANcel transmission */
 /*\}*/
 
-#define XM_MAXRETRIES     15  /*!< Max retries before giving up */
-#define XM_MAXCRCRETRIES   7  /*!< Max retries before switching to BCC */
-#define XM_BUFSIZE      1024  /*!< Size of block buffer */
+#define XM_MAXRETRIES     15  /**< Max retries before giving up */
+#define XM_MAXCRCRETRIES   7  /**< Max retries before switching to BCC */
+#define XM_BUFSIZE      1024  /**< Size of block buffer */
 
 
 #if (ARCH & ARCH_BOOT)
@@ -106,7 +109,7 @@
 #endif /* ARCH_BOOT */
 
 
-/*!
+/**
  * Decode serial driver errors and print them on the display.
  */
 static void print_serial_error(struct Serial *port, int retries)
@@ -131,7 +134,7 @@ static void print_serial_error(struct Serial *port, int retries)
 }
 
 
-/*!
+/**
  * \brief Receive a file using the XModem protocol.
  *
  * \param port Serial port to use for transfer
@@ -347,7 +350,7 @@ bool xmodem_recv(struct Serial *port, KFile *fd)
 }
 
 
-/*!
+/**
  * \brief Transmit a file using the XModem protocol.
  *
  * \param port Serial port to use for transfer

@@ -1,5 +1,5 @@
 #error This code must be revised for the new timer API
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.6  2006/02/21 21:28:02  bernie
  *#* New time handling based on TIMER_TICKS_PER_SEC to support slow timers with ticks longer than 1ms.
  *#*
@@ -39,7 +42,7 @@
 #ifndef TIMER_I196_H
 #define TIMER_I196_H
 
-/*!
+/**
  * Retrigger TIMER2, adjusting the time to account for
  * the interrupt prologue latency.
  */

@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2006/07/19 12:56:27  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.7  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -53,18 +56,18 @@ void sig_signal(struct Process *proc, sigmask_t sig);
 sigmask_t sig_wait(sigmask_t sigs);
 
 
-/*!
+/**
  * \name Signal definitions
  * \{
  */
-#define SIG_USER0    BV(0)  /*!< Free for user usage */
-#define SIG_USER1    BV(1)  /*!< Free for user usage */
-#define SIG_USER2    BV(2)  /*!< Free for user usage */
-#define SIG_USER3    BV(3)  /*!< Free for user usage */
-#define SIG_SYSTEM4  BV(4)  /*!< Reserved for system use */
-#define SIG_SYSTEM5  BV(5)  /*!< Reserved for system use */
-#define SIG_SYSTEM6  BV(6)  /*!< Reserved for system use */
-#define SIG_SINGLE   BV(7)  /*!< Used to wait for a single event */
+#define SIG_USER0    BV(0)  /**< Free for user usage */
+#define SIG_USER1    BV(1)  /**< Free for user usage */
+#define SIG_USER2    BV(2)  /**< Free for user usage */
+#define SIG_USER3    BV(3)  /**< Free for user usage */
+#define SIG_SYSTEM4  BV(4)  /**< Reserved for system use */
+#define SIG_SYSTEM5  BV(5)  /**< Reserved for system use */
+#define SIG_SYSTEM6  BV(6)  /**< Reserved for system use */
+#define SIG_SINGLE   BV(7)  /**< Used to wait for a single event */
 /*\}*/
 
 #endif /* KERN_SIGNAL_H */

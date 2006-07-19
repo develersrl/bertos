@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2005/11/04 18:26:38  bernie
  *#* Import into DevLib.
  *#*
@@ -34,7 +37,7 @@
 #include <dt/dwidget.h>
 #include <dt/dnotifier.h>
 
-/*!
+/**
  * Init the widget of \a pos and \a size on the drawing \a context.
  */
 void widget_init(DWidget *w, dpos_t pos, dpos_t size, dcontext_t *context)

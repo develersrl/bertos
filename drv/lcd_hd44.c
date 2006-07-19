@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:25  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2005/11/04 18:00:42  bernie
  *#* Import into DevLib.
  *#*
@@ -46,10 +49,10 @@
 	#error Incomplete or missing LCD_READ/LCD_WRITE macros
 #endif
 
-/*! Flag di stato del display */
+/** Flag di stato del display */
 #define LCDF_BUSY  BV(7)
 
-/*!
+/**
  * Addresses of LCD display character positions, expanded
  * for faster access (DB7 = 1).
  */
@@ -97,7 +100,7 @@ static const uint8_t lcd_address[] =
 
 STATIC_ASSERT(countof(lcd_address) == LCD_ROWS * LCD_COLS);
 
-/*!
+/**
  * Current display position. We remember this to optimize
  * LCD output by avoiding to set the address every time.
  */
@@ -260,7 +263,7 @@ extern uint8_t Emul_LCDReadData(void);
 #endif /* ARCH_EMUL */
 
 
-/*!
+/**
  * Wait until the LCD busy flag clears.
  */
 void lcd_waitBusy(void)
@@ -274,7 +277,7 @@ void lcd_waitBusy(void)
 }
 
 
-/*!
+/**
  * Move the cursor to \a addr, only if not already there.
  */
 void lcd_moveTo(uint8_t addr)
@@ -288,7 +291,7 @@ void lcd_moveTo(uint8_t addr)
 }
 
 
-/*!
+/**
  * Write a value in LCD data register, waiting for the busy flag.
  */
 void lcd_setReg(uint8_t val)
@@ -298,7 +301,7 @@ void lcd_setReg(uint8_t val)
 }
 
 #include <cfg/debug.h>
-/*!
+/**
  * Write the character \a c on display address \a addr.
  *
  * NOTE: argh, the HD44 lcd type is a bad beast: our
@@ -324,7 +327,7 @@ void lcd_putc(uint8_t addr, uint8_t c)
 }
 
 
-/*!
+/**
  * Remap the glyph of a character.
  *
  * glyph - bitmap of 8x8 bits.

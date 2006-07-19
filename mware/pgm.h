@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
@@ -170,7 +170,7 @@
 #define PROGMEM         /* nothing */
 #endif
 
-/*!
+/**
  * \name Types for variables stored in program memory (harvard processors).
  * \{
  */
@@ -183,7 +183,7 @@ typedef PROGMEM int32_t pgm_int32_t;
 typedef PROGMEM uint32_t pgm_uint32_t;
 /*\}*/
 
-/*!
+/**
  * \name PGM support macros.
  *
  * These macros enable dual compilation of code for both program

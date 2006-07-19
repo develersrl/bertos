@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/07/19 12:56:24  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.2  2006/05/28 12:18:12  bernie
  *#* Disable menu timeout.
  *#*
@@ -92,10 +95,10 @@
 #ifndef CONFIG_COMMON_H
 #define CONFIG_COMMON_H
 
-/*! Baud-rate for the kdebug console */
+/** Baud-rate for the kdebug console */
 #define CONFIG_KDEBUG_BAUDRATE  19200
 
-/*!
+/**
  * printf()-style formatter configuration.
  *
  * \sa PRINTF_DISABLED
@@ -106,54 +109,54 @@
  */
 #define CONFIG_PRINTF PRINTF_FULL
 
-/*!
+/**
  * Multithreading kernel.
  *
  * \sa config_kern.h
  */
 #define CONFIG_KERNEL 1
 
-/*!
+/**
  * \name Serial driver parameters
  * \{
  */
-	/*! [bytes] Size of the outbound FIFO buffer for port 0. */
+	/** [bytes] Size of the outbound FIFO buffer for port 0. */
 	#define CONFIG_UART0_TXBUFSIZE  32
 
-	/*! [bytes] Size of the inbound FIFO buffer for port 0. */
+	/** [bytes] Size of the inbound FIFO buffer for port 0. */
 	#define CONFIG_UART0_RXBUFSIZE  64
 
-	/*! [bytes] Size of the outbound FIFO buffer for port 1. */
+	/** [bytes] Size of the outbound FIFO buffer for port 1. */
 	#define CONFIG_UART1_TXBUFSIZE  32
 
-	/*! [bytes] Size of the inbound FIFO buffer for port 1. */
+	/** [bytes] Size of the inbound FIFO buffer for port 1. */
 	#define CONFIG_UART1_RXBUFSIZE  64
 
-	/*! [bytes] Size of the outbound FIFO buffer for SPI port (AVR only). */
+	/** [bytes] Size of the outbound FIFO buffer for SPI port (AVR only). */
 	#define CONFIG_SPI_TXBUFSIZE	16
 
-	/*! [bytes] Size of the inbound FIFO buffer for SPI port (AVR only). */
+	/** [bytes] Size of the inbound FIFO buffer for SPI port (AVR only). */
 	#define CONFIG_SPI_RXBUFSIZE	32
 
-	/*! Default transmit timeout (ms). Set to -1 to disable timeout support */
+	/** Default transmit timeout (ms). Set to -1 to disable timeout support */
 	#define CONFIG_SER_TXTIMEOUT    -1
 
-	/*! Default receive timeout (ms). Set to -1 to disable timeout support */
+	/** Default receive timeout (ms). Set to -1 to disable timeout support */
 	#define CONFIG_SER_RXTIMEOUT    -1
 
-	/*! Use RTS/CTS handshake */
+	/** Use RTS/CTS handshake */
 	#define CONFIG_SER_HWHANDSHAKE   0
 
-	/*! Default baud rate (set to 0 to disable) */
+	/** Default baud rate (set to 0 to disable) */
 	#define CONFIG_SER_DEFBAUDRATE   0
 
-	/*! Enable ser_gets() and ser_gets_echo() */
+	/** Enable ser_gets() and ser_gets_echo() */
 	#define CONFIG_SER_GETS          0
 
 	/** Enable second serial port in emulator. */
 	#define CONFIG_EMUL_UART1        0
 
-	/*!
+	/**
 	 * Transmit always something on serial port 0 TX
 	 * to avoid interference when sending burst of data,
 	 * using AVR multiprocessor serial mode
@@ -163,16 +166,16 @@
 	#define CONFIG_SER_STROBE        0
 /*\}*/
 
-//! Hardware timer selection for drv/timer.c
+/// Hardware timer selection for drv/timer.c
 #define CONFIG_TIMER  TIMER_ON_OUTPUT_COMPARE2
 
-//! Debug timer interrupt using a strobe pin.
+/// Debug timer interrupt using a strobe pin.
 #define CONFIG_TIMER_STROBE  0
 
-//! Enable watchdog timer.
+/// Enable watchdog timer.
 #define CONFIG_WATCHDOG  1
 
-//! EEPROM type for drv/eeprom.c
+/// EEPROM type for drv/eeprom.c
 #define CONFIG_EEPROM_TYPE EEPROM_24XX256
 
 /// Select bitmap pixel format.
@@ -196,7 +199,7 @@
 /// Enable key beeps.
 #define CONFIG_KBD_BEEP  1
 
-/*!
+/**
  * \name Type for the chart dataset
  * \{
  */

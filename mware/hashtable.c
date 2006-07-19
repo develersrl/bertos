@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
@@ -61,6 +61,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2006/07/19 12:56:27  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.6  2006/06/01 12:27:39  marco
  *#* Added utilities for protocols
  *#*
@@ -80,7 +83,7 @@ typedef const void** HashNodePtr;
 #define NODE_EMPTY(node)               (!*(node))
 #define HT_HAS_INTERNAL_KEY(ht)        (CONFIG_HT_OPTIONAL_INTERNAL_KEY && ht->flags.key_internal)
 
-/*! For hash tables with internal keys, compute the pointer to the internal key for a given \a node. */
+/** For hash tables with internal keys, compute the pointer to the internal key for a given \a node. */
 INLINE uint8_t *key_internal_get_ptr(struct HashTable *ht, HashNodePtr node)
 {
 	uint8_t* key_buf = ht->key_data.mem;

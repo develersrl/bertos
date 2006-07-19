@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2005/11/04 18:26:38  bernie
  *#* Import into DevLib.
  *#*
@@ -41,7 +44,7 @@
 #include <dt/dnotifier.h>
 #include <mware/list.h>
 
-/*!
+/**
  * Default update used to notify target: notify all trasparently all
  * targets in the list.
  */
@@ -50,7 +53,7 @@ static void notifier_update(DNotifier *n, dtag_t tag, dval_t val)
 	dnotify_targets(n, tag, val);
 }
 
-/*!
+/**
  * Init.
  */
 void notifier_init(DNotifier *n)
@@ -60,7 +63,7 @@ void notifier_init(DNotifier *n)
 	LIST_INIT(&n->targets);
 }
 
-/*!
+/**
  * Search in the map a tag and a val corresponding to the ones supplied.
  * If a match is found change them to the corresponding ones in the map.
  * If map is NULL the filter is trasparent and all messages sent to filter
@@ -95,7 +98,7 @@ void filter_update(DFilter *f, dtag_t tag, dval_t val)
 }
 
 
-/*!
+/**
  * Search in the table a tag corresponding to the one supplied and a val
  * that has at least the mask map supplied bits to one.
  * If a match is found change them to the corresponding ones in the map.
@@ -135,7 +138,7 @@ void filter_mask_update(DFilter *f, dtag_t tag, dval_t val)
 
 
 #define FILTER_MAGIC_ACTIVE 0xAA
-/*!
+/**
  * Init filter.
  * If \a masked is true, all the fields value in \a map must be interpreted as a mask of bits.
  */

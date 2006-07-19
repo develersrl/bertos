@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:25  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2005/11/04 18:00:42  bernie
  *#* Import into DevLib.
  *#*
@@ -38,7 +41,7 @@
 
 #include <cfg/compiler.h> /* For stdint types */
 
-/*!
+/**
  * \name Display dimensions (in chars)
  * \{
  */
@@ -46,19 +49,19 @@
 #define LCD_COLS  16
 /* \} */
 
-/*!
+/**
  * \name Hitachi HD44 commands.
  * \{
  */
 #define LCD_CMD_DISPLAY_INI      0x30
-//#define LCD_CMD_SETFUNC        0x38   /*!< 8 bits, 2 lines, 5x7 dots */
-#define LCD_CMD_SETFUNC          0x28   /*!< 4 bits, 2 lines, 5x7 dots */
-#define LCD_CMD_DISPLAY_ON       0x0F   /*!< Switch on display */
-#define LCD_CMD_DISPLAY_OFF      0x08   /*!< Switch off display */
-#define LCD_CMD_CLEAR            0x01   /*!< Clear display */
-#define LCD_CMD_CURSOR_BLOCK     0x0D   /*!< Show cursor (block) */
-#define LCD_CMD_CURSOR_LINE      0x0F   /*!< Show cursor (line) */
-#define LCD_CMD_CURSOR_OFF       0x0C   /*!< Hide cursor */
+//#define LCD_CMD_SETFUNC        0x38   /**< 8 bits, 2 lines, 5x7 dots */
+#define LCD_CMD_SETFUNC          0x28   /**< 4 bits, 2 lines, 5x7 dots */
+#define LCD_CMD_DISPLAY_ON       0x0F   /**< Switch on display */
+#define LCD_CMD_DISPLAY_OFF      0x08   /**< Switch off display */
+#define LCD_CMD_CLEAR            0x01   /**< Clear display */
+#define LCD_CMD_CURSOR_BLOCK     0x0D   /**< Show cursor (block) */
+#define LCD_CMD_CURSOR_LINE      0x0F   /**< Show cursor (line) */
+#define LCD_CMD_CURSOR_OFF       0x0C   /**< Hide cursor */
 #define LCD_CMD_DISPLAYMODE      0x06
 #define LCD_CMD_SET_CGRAMADDR    0x40
 #define LCD_CMD_RESET_DDRAM      0x80
@@ -68,7 +71,7 @@
 #define LCD_CMD_MOVESHIFT_RIGHT  0x04
 /*\}*/
 
-/*! Type for combined LCD cursor position (x,y). */
+/** Type for combined LCD cursor position (x,y). */
 typedef uint8_t lcdpos_t;
 
 void lcd_waitBusy(void);

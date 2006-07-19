@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004, 2006 Develer S.r.l. (http://www.develer.com/)
@@ -31,6 +31,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2006/07/19 12:56:27  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.7  2006/06/01 12:27:39  marco
  *#* Added utilities for protocols
  *#*
@@ -43,23 +46,23 @@
 #include <cfg/macros.h>
 #include <cfg/debug.h>
 
-/*!
+/**
  * Enable/disable support to declare special hash tables which maintain a copy of
  * the key internally instead of relying on the hook to extract it from the data.
  */
 #define CONFIG_HT_OPTIONAL_INTERNAL_KEY      1
 
-//! Maximum length of the internal key (use (2^n)-1 for slight speedup)
+/// Maximum length of the internal key (use (2^n)-1 for slight speedup)
 #define INTERNAL_KEY_MAX_LENGTH     15
 
-/*!
+/**
  * Hook to get the key from \a data, which is an element of the hash table. The
  * key must be returned together with \a key_length (in words).
  */
 typedef const void *(*hook_get_key)(const void *data, uint8_t *key_length);
 
 
-/*!
+/**
  * Hash table description
  *
  * \note This structures MUST NOT be accessed directly. Its definition is
@@ -71,19 +74,19 @@ typedef const void *(*hook_get_key)(const void *data, uint8_t *key_length);
  */
 struct HashTable
 {
-	const void **mem;            //!< Buckets of data
-	uint16_t max_elts_log2;      //!< Log2 of the size of the table
+	const void **mem;            ///< Buckets of data
+	uint16_t max_elts_log2;      ///< Log2 of the size of the table
 	struct {
-		bool key_internal : 1;   //!< true if the key is copied internally
+		bool key_internal : 1;   ///< true if the key is copied internally
 	} flags;
 	union {
-		hook_get_key hook;       //!< Hook to get the key
-		uint8_t *mem;            //!< Pointer to the key memory
+		hook_get_key hook;       ///< Hook to get the key
+		uint8_t *mem;            ///< Pointer to the key memory
 	} key_data;
 };
 
 
-//! Iterator to walk the hash table
+/// Iterator to walk the hash table
 typedef struct
 {
 	const void** pos;
@@ -91,7 +94,7 @@ typedef struct
 } HashIterator;
 
 
-/*!
+/**
  * Declare a hash table in the current scope
  *
  * \param name Variable name
@@ -106,13 +109,13 @@ typedef struct
 	static const void* name##_nodes[1 << UINT32_LOG2(size)]; \
 	struct HashTable name = { name##_nodes, UINT32_LOG2(size), { false }, hook_gk }
 
-/*! Exactly like \c DECLARE_HASHTABLE, but the variable will be declared as static. */
+/** Exactly like \c DECLARE_HASHTABLE, but the variable will be declared as static. */
 #define DECLARE_HASHTABLE_STATIC(name, size, hook_gk) \
 	static const void* name##_nodes[1 << UINT32_LOG2(size)]; \
 	static struct HashTable name = { name##_nodes, UINT32_LOG2(size), { false }, { hook_gk } }
 
 #if CONFIG_HT_OPTIONAL_INTERNAL_KEY
-	/*! Declare a hash table with internal copies of the keys. This version does not
+	/** Declare a hash table with internal copies of the keys. This version does not
 	 *  require a hook, nor it requires the user to allocate static memory for the keys.
 	 *  It is mostly suggested for tables whose keys are computed on the fly and need
 	 *  to be stored somewhere.
@@ -122,14 +125,14 @@ typedef struct
 		static const void* name##_nodes[1 << UINT32_LOG2(size)]; \
 		struct HashTable name = { name##_nodes, UINT32_LOG2(size), { true }, name##_keys }
 
-	/*! Exactly like \c DECLARE_HASHTABLE_INTERNALKEY, but the variable will be declared as static. */
+	/** Exactly like \c DECLARE_HASHTABLE_INTERNALKEY, but the variable will be declared as static. */
 	#define DECLARE_HASHTABLE_INTERNALKEY_STATIC(name, size) \
 		static uint8_t name##_keys[(1 << UINT32_LOG2(size)) * (INTERNAL_KEY_MAX_LENGTH + 1)]; \
 		static const void* name##_nodes[1 << UINT32_LOG2(size)]; \
 		static struct HashTable name = { name##_nodes, UINT32_LOG2(size), { true }, name##_keys }
 #endif
 
-/*!
+/**
  * Initialize (and clear) a hash table in a memory buffer.
  *
  * \param ht Hash table declared with \c DECLARE_HASHTABLE
@@ -140,7 +143,7 @@ typedef struct
  */
 void ht_init(struct HashTable* ht);
 
-/*!
+/**
  * Insert an element into the hash table
  *
  * \param ht Handle of the hash table
@@ -159,7 +162,7 @@ void ht_init(struct HashTable* ht);
  */
 bool ht_insert(struct HashTable* ht, const void* data);
 
-/*!
+/**
  * Insert an element into the hash table
  *
  * \param ht Handle of the hash table
@@ -180,7 +183,7 @@ bool ht_insert(struct HashTable* ht, const void* data);
  */
 bool ht_insert_with_key(struct HashTable* ht, const void* key, uint8_t key_length, const void* data);
 
-/*!
+/**
  * Find an element in the hash table
  *
  * \param ht Handle of the hash table
@@ -190,13 +193,13 @@ bool ht_insert_with_key(struct HashTable* ht, const void* key, uint8_t key_lengt
  */
 const void* ht_find(struct HashTable* ht, const void* key, uint8_t key_length);
 
-/*! Similar to \c ht_insert_with_key() but \a key is an ASCIIZ string */
+/** Similar to \c ht_insert_with_key() but \a key is an ASCIIZ string */
 #define ht_insert_str(ht, key, data)         ht_insert_with_key(ht, key, strlen(key), data)
 
-/*! Similar to \c ht_find() but \a key is an ASCIIZ string */
+/** Similar to \c ht_find() but \a key is an ASCIIZ string */
 #define ht_find_str(ht, key)                 ht_find(ht, key, strlen(key))
 
-//! Get an iterator to the begin of the hash table \a ht
+/// Get an iterator to the begin of the hash table \a ht
 INLINE HashIterator ht_iter_begin(struct HashTable* ht)
 {
 	HashIterator h;
@@ -210,7 +213,7 @@ INLINE HashIterator ht_iter_begin(struct HashTable* ht)
 	return h;
 }
 
-/*!
+/**
  * Get an iterator to the (exclusive) end of the hash table \a ht
  *
  * \note Like in STL, the end iterator is not a valid iterator (you
@@ -226,18 +229,18 @@ INLINE HashIterator ht_iter_end(struct HashTable* ht)
 	return h;
 }
 
-//! Compare \a it1 and \a it2 for equality
+/// Compare \a it1 and \a it2 for equality
 INLINE bool ht_iter_cmp(HashIterator it1, HashIterator it2)
 {
 	ASSERT(it1.end == it2.end);
 	return it1.pos == it2.pos;
 }
 
-//! Get the element within the hash table \a ht pointed by the iterator \a iter
+/// Get the element within the hash table \a ht pointed by the iterator \a iter
 INLINE const void* ht_iter_get(HashIterator iter)
 { return *iter.pos; }
 
-/*! Return an iterator pointing to the element following \a h
+/** Return an iterator pointing to the element following \a h
  *
  * \note The order of the elements visited during the iteration is casual,
  * and depends on the implementation.

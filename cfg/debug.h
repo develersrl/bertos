@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.14  2006/07/19 12:56:25  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.13  2006/03/22 13:34:34  bernie
  *#* MSVC support.
  *#*
@@ -129,7 +132,7 @@
 	#undef NDEBUG
 	#endif
 
-	/*!
+	/**
 	 * This macro duplicates the old MSVC trick of redefining
 	 * THIS_FILE locally to avoid the overhead of many duplicate
 	 * strings in ASSERT().
@@ -138,7 +141,7 @@
 		#define THIS_FILE  __FILE__
 	#endif
 
-	/*!
+	/**
 	 * This macro can be used to conditionally exclude one or more
 	 * statements conditioned on \c _DEBUG, avoiding the clutter
 	 * of ifdef/endif pairs.
@@ -291,7 +294,7 @@
 
 	#endif /* !OS_HOSTED */
 
-	/*!
+	/**
 	 * \name Walls to detect data corruption
 	 * \{
 	 */
@@ -303,7 +306,7 @@
 	#define CHECK_WALL(name)             __check_wall((name), countof(name), #name, THIS_FILE, __LINE__)
 	/*\}*/
 
-	/*!
+	/**
 	 * Check that the given pointer actually points to an object
 	 * of the specified type.
 	 */
@@ -312,7 +315,7 @@
 		ASSERT(dynamic_cast<_t>((_o)) != NULL); \
 	}
 
-	/*!
+	/**
 	 * \name Debug object creation and destruction.
 	 *
 	 * These macros help track some kinds of leaks in C++ programs.

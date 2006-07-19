@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2006/07/19 12:56:25  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.7  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -43,7 +46,7 @@
 
 #include <cfg/cpu.h>
 
-/*! Include hw.h. We expect hw.h to define enum BLD_DEVICE, which must contain
+/** Include hw.h. We expect hw.h to define enum BLD_DEVICE, which must contain
  *  an enumarator for each device, plus a special symbol NUM_BLDS containing the
  *  number of devices.
  */
@@ -57,14 +60,14 @@
 #include CPU_HEADER(buzzerled)
 
 
-/*! Initialize the buzzerled library.
+/** Initialize the buzzerled library.
  *
  * \note This function must be called before any other function in the library.
  */
 void bld_init(void);
 
 
-/*! Set or reset a device.
+/** Set or reset a device.
  *
  * \param device Device to be set
  * \param enable Enable/disable status
@@ -72,7 +75,7 @@ void bld_init(void);
 #define bld_set(device, enable)  bld_hw_set(device, enable)
 
 
-/*! Enable a device for a certain interval of time
+/** Enable a device for a certain interval of time
  *
  * \param device Device to be enabled
  * \param duration Number of milliseconds the device must be enabled
@@ -82,7 +85,7 @@ void bld_init(void);
 void bld_beep(enum BLD_DEVICE device, uint16_t duration);
 
 
-/*! Enable a device for a certain interval of time and wait.
+/** Enable a device for a certain interval of time and wait.
  *
  * \param device Device to be enabled
  * \param duration Number of milliseconds the device must be enabled

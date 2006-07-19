@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.2  2006/02/23 10:59:14  bernie
  *#* Documentation fixes.
  *#*
@@ -54,7 +57,7 @@
 #define LCD_CENTER     BV(1)   /* Center string in line */
 #define LCD_NOCURSOR   BV(2)   /* Scrittura senza spostamento cursore */
 
-/*! Special priority value for lcd_setLayerDepth(). */
+/** Special priority value for lcd_setLayerDepth(). */
 #define LAYER_HIDDEN   -128
 
 /* Compute LCD address from x/y coordinates */
@@ -64,21 +67,21 @@
 #define LCD_ROW2  (LCD_COLS * 2)
 #define LCD_ROW3  (LCD_COLS * 3)
 
-/*!
+/**
  * Overwrapping layer context.
  */
 typedef struct _Layer
 {
-	/*!
+	/**
 	 * Active layers are linked together in a list
 	 * sorted in top to bottom order.
 	 */
 	DECLARE_NODE_ANON(struct _Layer)
 
-	/*! Current XY address into this layer, for write operations. */
+	/** Current XY address into this layer, for write operations. */
 	lcdpos_t addr;
 
-	/*! Priority of this layer (greater in front of lesser). */
+	/** Priority of this layer (greater in front of lesser). */
 	char pri;
 
 	/**

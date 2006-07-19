@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.20  2006/07/19 12:56:25  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.19  2006/03/20 17:49:50  bernie
  *#* Make the TWI driver more generic to work with devices other than EEPROMS.
  *#*
@@ -68,7 +71,7 @@
 
 
 
-/*!
+/**
  * Copy \c count bytes from buffer \c buf to
  * eeprom at address \c addr.
  */
@@ -134,7 +137,7 @@ static bool eeprom_writeRaw(e2addr_t addr, const void *buf, size_t count)
 
 
 #if CONFIG_EEPROM_VERIFY
-/*!
+/**
  * Check that the contents of an EEPROM range
  * match with a provided data buffer.
  *
@@ -194,7 +197,7 @@ bool eeprom_write(e2addr_t addr, const void *buf, size_t count)
 }
 
 
-/*!
+/**
  * Copy \c count bytes at address \c addr
  * from eeprom to RAM to buffer \c buf.
  *
@@ -240,7 +243,7 @@ bool eeprom_read(e2addr_t addr, void *buf, size_t count)
 }
 
 
-/*!
+/**
  * Write a single character \a c at address \a addr.
  */
 bool eeprom_write_char(e2addr_t addr, char c)
@@ -249,7 +252,7 @@ bool eeprom_write_char(e2addr_t addr, char c)
 }
 
 
-/*!
+/**
  * Read a single character at address \a addr.
  *
  * \return the requested character or -1 in case of failure.
@@ -265,7 +268,7 @@ int eeprom_read_char(e2addr_t addr)
 }
 
 
-/*!
+/**
  * Erase specified part of eeprom, writing 0xFF.
  *
  * \param addr   starting address
@@ -290,7 +293,7 @@ void eeprom_erase(e2addr_t addr, size_t count)
 }
 
 
-/*!
+/**
  * Initialize TWI module.
  */
 void eeprom_init(void)

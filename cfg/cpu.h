@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004, 2005 Develer S.r.l. (http://www.develer.com/)
@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.15  2006/07/19 12:56:25  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.14  2006/07/19 12:54:12  bernie
  *#* Documentation fixes.
  *#*
@@ -372,7 +375,7 @@
 	#define CPU_BYTE_ORDER          CPU_LITTLE_ENDIAN
 	#define CPU_HARVARD             1
 
-	/*!
+	/**
 	 * Initialization value for registers in stack frame.
 	 * The register index is not directly corrispondent to CPU
 	 * register numbers. Index 0 is the SREG register: the initial
@@ -384,7 +387,7 @@
 	#error No CPU_... defined.
 #endif
 
-/*!
+/**
  * Execute \a CODE atomically with respect to interrupts.
  *
  * \see IRQ_SAVE_DISABLE IRQ_RESTORE
@@ -398,7 +401,7 @@
 	} while (0)
 
 
-//! Default for macro not defined in the right arch section
+/// Default for macro not defined in the right arch section
 #ifndef CPU_REG_INIT_VALUE
 	#define CPU_REG_INIT_VALUE(reg)     0
 #endif
@@ -478,7 +481,7 @@
 #endif
 
 
-/*!
+/**
  * \name Default type sizes.
  *
  * These defaults are reasonable for most 16/32bit machines.
@@ -572,7 +575,7 @@ STATIC_ASSERT(sizeof(int64_t) * CPU_BITS_PER_CHAR == 64);
 STATIC_ASSERT(sizeof(uint64_t) * CPU_BITS_PER_CHAR == 64);
 #endif
 
-/*!
+/**
  * \def CPU_IDLE
  *
  * \brief Invoked by the scheduler to stop the CPU when idle.

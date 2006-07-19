@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004, 2005, 2006 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.6  2006/05/27 17:17:34  bernie
  *#* Optimize away divisions in RAST_ADDR/MASK macros.
  *#*
@@ -63,7 +66,7 @@
 #define BM_ADDR(bm, x, y)  RAST_ADDR((bm)->raster, (x), (y), (bm)->stride)
 #define BM_MASK(bm, x, y)  RAST_MASK((bm)->raster, (x), (y))
 
-/*!
+/**
  * Plot a pixel in bitmap \a bm.
  *
  * \note bm is evaluated twice.
@@ -72,7 +75,7 @@
 #define BM_PLOT(bm, x, y) \
 	( *BM_ADDR(bm, x, y) |= BM_MASK(bm, x, y) )
 
-/*!
+/**
  * Clear a pixel in bitmap \a bm.
  *
  * \note bm is evaluated twice.
@@ -81,7 +84,7 @@
 #define BM_CLEAR(bm, x, y) \
 	( *BM_ADDR(bm, x, y) &= ~BM_MASK(bm, x, y) )
 
-/*!
+/**
  * Set a pixel in bitmap \a bm to the specified color.
  *
  * \note bm is evaluated twice.
@@ -95,7 +98,7 @@
 		*p = (*p & ~mask) | ((fg_pen) ? mask : 0); \
 	} while (0)
 
-/*!
+/**
  * Get the value of the pixel in bitmap \a bm.
  *
  * \return The returned value is either 0 or 1.

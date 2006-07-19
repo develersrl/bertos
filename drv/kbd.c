@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2006/07/19 12:56:25  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.7  2006/06/03 13:57:36  bernie
  *#* Make keyboard repeat mask run-time configurable.
  *#*
@@ -64,38 +67,38 @@
 	#include <drv/buzzer.h>
 #endif
 
-#define KBD_CHECK_INTERVAL  10  /*!< (ms) Timing for kbd softint */
-#define KBD_DEBOUNCE_TIME   30  /*!< (ms) Debounce time */
-#define KBD_BEEP_TIME        5  /*!< (ms) Duration of keybeep */
+#define KBD_CHECK_INTERVAL  10  /**< (ms) Timing for kbd softint */
+#define KBD_DEBOUNCE_TIME   30  /**< (ms) Debounce time */
+#define KBD_BEEP_TIME        5  /**< (ms) Duration of keybeep */
 
-#define KBD_REPEAT_DELAY   400  /*!< (ms) Keyboard repeat delay for first character */
-#define KBD_REPEAT_RATE    100  /*!< (ms) Initial interchar delay for keyboard repeat */
-#define KBD_REPEAT_MAXRATE  20  /*!< (ms) Minimum delay for keyboard repeat */
-#define KBD_REPEAT_ACCEL     5  /*!< (ms) Keyboard repeat speed increase */
+#define KBD_REPEAT_DELAY   400  /**< (ms) Keyboard repeat delay for first character */
+#define KBD_REPEAT_RATE    100  /**< (ms) Initial interchar delay for keyboard repeat */
+#define KBD_REPEAT_MAXRATE  20  /**< (ms) Minimum delay for keyboard repeat */
+#define KBD_REPEAT_ACCEL     5  /**< (ms) Keyboard repeat speed increase */
 
-#define KBD_LNG_DELAY     1000  /*!< (ms) Keyboard long pression keys delay */
+#define KBD_LNG_DELAY     1000  /**< (ms) Keyboard long pression keys delay */
 
 
-/*! Status for keyboard repeat state machine */
+/** Status for keyboard repeat state machine */
 static enum { KS_IDLE, KS_REPDELAY, KS_REPEAT } kbd_rptStatus;
 
 
-static volatile keymask_t kbd_buf; /*!< Single entry keyboard buffer */
-static volatile keymask_t kbd_cnt; /*!< Number of keypress events in \c kbd_buf */
+static volatile keymask_t kbd_buf; /**< Single entry keyboard buffer */
+static volatile keymask_t kbd_cnt; /**< Number of keypress events in \c kbd_buf */
 static keymask_t kbd_rpt_mask;     /**< Mask of repeatable keys. */
 
 #if CONFIG_KBD_POLL == KBD_POLL_SOFTINT
-static Timer kbd_timer;            /*!< Keyboard softtimer */
+static Timer kbd_timer;            /**< Keyboard softtimer */
 #endif
 
-static List kbd_rawHandlers;       /*!< Raw keyboard handlers */
-static List kbd_handlers;          /*!< Cooked keyboard handlers */
+static List kbd_rawHandlers;       /**< Raw keyboard handlers */
+static List kbd_handlers;          /**< Cooked keyboard handlers */
 
-static KbdHandler kbd_defHandler;  /*!< The default keyboard handler */
-static KbdHandler kbd_debHandler;  /*!< The debounce keyboard handler */
-static KbdHandler kbd_rptHandler;  /*!< Auto-repeat keyboard handler */
+static KbdHandler kbd_defHandler;  /**< The default keyboard handler */
+static KbdHandler kbd_debHandler;  /**< The debounce keyboard handler */
+static KbdHandler kbd_rptHandler;  /**< Auto-repeat keyboard handler */
 #ifdef  K_LNG_MASK
-static KbdHandler kbd_lngHandler;  /*!< Long pression keys handler */
+static KbdHandler kbd_lngHandler;  /**< Long pression keys handler */
 #endif
 
 #if CONFIG_KBD_OBSERVER
@@ -104,7 +107,7 @@ static KbdHandler kbd_lngHandler;  /*!< Long pression keys handler */
 #endif
 
 
-/*!
+/**
  * Poll keyboard and dispatch keys to handlers.
  *
  * Read the key states and invoke all keyboard
@@ -115,7 +118,7 @@ static KbdHandler kbd_lngHandler;  /*!< Long pression keys handler */
  */
 static void kbd_poll(void)
 {
-	/*! Currently depressed key */
+	/** Currently depressed key */
 	static keymask_t current_key;
 
 	struct KbdHandler *handler;
@@ -139,7 +142,7 @@ static void kbd_poll(void)
 
 #if CONFIG_KBD_POLL == KBD_POLL_SOFTINT
 
-/*!
+/**
  * Keyboard soft-irq handler.
  */
 static void kbd_softint(UNUSED_ARG(iptr_t, arg))
@@ -164,7 +167,7 @@ static portTASK_FUNCTION(kbd_task, arg)
 
 #endif /* CONFIG_KBD_POLL */
 
-/*!
+/**
  * \brief Read a key from the keyboard buffer.
  *
  * When a key is kept depressed between calls of this function a value
@@ -197,7 +200,7 @@ keymask_t kbd_peek(void)
 	return key;
 }
 
-/*!
+/**
  * Wait for a keypress and return the mask of depressed keys.
  *
  * \note This function is \b not interrupt safe!
@@ -212,7 +215,7 @@ keymask_t kbd_get(void)
 }
 
 
-/*!
+/**
  * Wait up to \c timeout ms for a keypress
  * and return the mask of depressed keys, or K_TIMEOUT
  * if the timeout was reacked.
@@ -268,7 +271,7 @@ void kbd_remHandler(struct KbdHandler *handler)
 }
 
 
-/*!
+/**
  * This is the default key handler, called after
  * all other handlers have had their chance to
  * do their special processing. This handler
@@ -296,18 +299,18 @@ static keymask_t kbd_defHandlerFunc(keymask_t key)
 	return 0;
 }
 
-/*!
+/**
  * Handle keyboard debounce
  */
 static keymask_t kbd_debHandlerFunc(keymask_t key)
 {
-	/*! Buffer for debounce */
+	/** Buffer for debounce */
 	static keymask_t debounce_key;
 
-	/*! Timer for keyboard debounce */
+	/** Timer for keyboard debounce */
 	static ticks_t debounce_time;
 
-	/*! Key aquired after debounce */
+	/** Key aquired after debounce */
 	static keymask_t new_key;
 
 
@@ -359,7 +362,7 @@ keymask_t kbd_setRepeatMask(keymask_t mask)
 	return oldmask;
 }
 
-/*!
+/**
  * Handle keyboard repeat
  */
 static keymask_t kbd_rptHandlerFunc(keymask_t key)
@@ -368,7 +371,7 @@ static keymask_t kbd_rptHandlerFunc(keymask_t key)
 	static ticks_t repeat_time;
 
 	/* Current repeat rate (for acceleration). */
-	static ticks_t repeat_rate; /*! Current repeat rate (for acceleration) */
+	static ticks_t repeat_rate; /** Current repeat rate (for acceleration) */
 
 	ticks_t now = timer_clock();
 
@@ -427,7 +430,7 @@ static keymask_t kbd_rptHandlerFunc(keymask_t key)
 
 MOD_DEFINE(kbd)
 
-/*!
+/**
  * Initialize keyboard ports and softtimer
  */
 void kbd_init(void)

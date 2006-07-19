@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/07/19 12:56:25  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.4  2006/04/27 05:40:11  bernie
  *#* Naming convention fixes; Partial merge from project_grl.
  *#*
@@ -54,18 +57,18 @@
 
 #if CONFIG_LCD_SOFTINT_REFRESH
 
-	/*! Interval between softint driven lcd refresh */
+	/** Interval between softint driven lcd refresh */
 #	define LCD_REFRESH_INTERVAL 20  /* 20ms -> 50fps */
 
 #endif /* CONFIG_LCD_SOFTINT_REFRESH */
 
-/*! Number of LCD pages */
+/** Number of LCD pages */
 #define LCD_PAGES 4
 
-/*! Width of an LCD page */
+/** Width of an LCD page */
 #define LCD_PAGESIZE (LCD_WIDTH / 2)
 
-/*!
+/**
  * \name LCD I/O pins/ports
  * @{
  */
@@ -83,7 +86,7 @@
 #define LCD_PE_E2    PE6
 /*@}*/
 
-/*!
+/**
  * \name DB high nibble (DB[4-7])
  * @{
  */
@@ -94,7 +97,7 @@
 #define LCD_DATA_HI_MASK    0xF0
 /*@}*/
 
-/*!
+/**
  * \name DB low nibble (DB[0-3])
  * @{
  */
@@ -105,7 +108,7 @@
 #define LCD_DATA_LO_MASK    0xF0
 /*@}*/
 
-/*!
+/**
  * \name LCD bus control macros
  * @{
  */
@@ -121,7 +124,7 @@
 #define LCD_CLR_E(x) (PORTE &= ~(x))
 /*@}*/
 
-/*!
+/**
  * \name Chip select bits for LCD_SET_E()
  * @{
  */
@@ -129,41 +132,41 @@
 #define LCDF_E2 (BV(LCD_PE_E2))
 /*@}*/
 
-/*! Read from the LCD data bus (DB[0-7]) */
+/** Read from the LCD data bus (DB[0-7]) */
 #define LCD_READ ( \
 		((LCD_DATA_LO_PIN & LCD_DATA_LO_MASK) >> LCD_DATA_LO_SHIFT) | \
 		((LCD_DATA_HI_PIN & LCD_DATA_HI_MASK) >> LCD_DATA_HI_SHIFT) \
 	)
 
-/*! Write to the LCD data bus (DB[0-7]) */
+/** Write to the LCD data bus (DB[0-7]) */
 #define LCD_WRITE(d) \
 	do { \
 		LCD_DATA_LO_PORT = (LCD_DATA_LO_PORT & ~LCD_DATA_LO_MASK) | (((d)<<LCD_DATA_LO_SHIFT) & LCD_DATA_LO_MASK); \
 		LCD_DATA_HI_PORT = (LCD_DATA_HI_PORT & ~LCD_DATA_HI_MASK) | (((d)<<LCD_DATA_HI_SHIFT) & LCD_DATA_HI_MASK); \
 	} while (0)
 
-/*! Set data bus direction to output (write to display) */
+/** Set data bus direction to output (write to display) */
 #define LCD_DB_OUT \
 	do { \
 		LCD_DATA_LO_DDR |= LCD_DATA_LO_MASK; \
 		LCD_DATA_HI_DDR |= LCD_DATA_HI_MASK; \
 	} while (0)
 
-/*! Set data bus direction to input (read from display) */
+/** Set data bus direction to input (read from display) */
 #define LCD_DB_IN \
 	do { \
 		LCD_DATA_LO_DDR &= ~LCD_DATA_LO_MASK; \
 		LCD_DATA_HI_DDR &= ~LCD_DATA_HI_MASK; \
 	} while (0)
 
-/*! Delay for tEW (160ns) */
+/** Delay for tEW (160ns) */
 #define LCD_DELAY_WRITE \
 	do { \
 		NOP; \
 		NOP; \
 	} while (0)
 
-/*! Delay for tACC6 (180ns) */
+/** Delay for tACC6 (180ns) */
 #define LCD_DELAY_READ \
 	do { \
 		NOP; \
@@ -172,7 +175,7 @@
 	} while (0)
 
 
-/*!
+/**
  * \name 32122A Commands
  * @{
  */
@@ -199,7 +202,7 @@ MOD_DEFINE(lcd)
 #define LCDF_BUSY BV(7)
 
 #if CONFIG_LCD_WAIT
-/*!
+/**
  * \code
  *      __              __
  * RS   __\____________/__
@@ -236,7 +239,7 @@ MOD_DEFINE(lcd)
 #endif /* CONFIG_LCD_WAIT */
 
 
-/*!
+/**
  * Raster buffer to draw into.
  *
  * Bits in the bitmap bytes have vertical orientation,
@@ -246,13 +249,13 @@ DECLARE_WALL(wall_before_raster, WALL_SIZE)
 static uint8_t lcd_raster[RASTER_SIZE(LCD_WIDTH, LCD_HEIGHT)];
 DECLARE_WALL(wall_after_raster, WALL_SIZE)
 
-/*! Default LCD bitmap */
+/** Default LCD bitmap */
 struct Bitmap lcd_bitmap;
 
 
 #if CONFIG_LCD_SOFTINT_REFRESH
 
-/*! Timer for regular LCD refresh */
+/** Timer for regular LCD refresh */
 static Timer *lcd_refresh_timer;
 
 #endif /* CONFIG_LCD_SOFTINT_REFRESH */
@@ -311,7 +314,7 @@ static inline uint8_t lcd_read(uint8_t chip)
 
 	WAIT_LCD;
 
-	/*!
+	/**
 	 * \code
 	 *      __________________
 	 * A0   __/            \__
@@ -343,7 +346,7 @@ static inline void lcd_write(uint8_t c, uint8_t chip)
 {
 	WAIT_LCD;
 
-	/*!
+	/**
 	 * \code
 	 *      __________________
 	 * A0   ___/          \___
@@ -367,7 +370,7 @@ static inline void lcd_write(uint8_t c, uint8_t chip)
 }
 
 
-/*!
+/**
  * Set LCD contrast PWM.
  */
 void lcd_setPwm(int duty)
@@ -440,7 +443,7 @@ static void lcd_refreshSoftint(void)
 #endif /* CONFIG_LCD_SOFTINT_REFRESH */
 
 
-/*!
+/**
  * Initialize LCD subsystem.
  *
  * \note The PWM used for LCD contrast is initialized in drv/pwm.c

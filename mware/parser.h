@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/07/19 12:56:28  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.2  2006/06/12 21:37:02  marco
  *#* implemented some commands (ver and sleep)
  *#*
@@ -35,10 +38,10 @@
  */
 typedef enum
 {
-	RC_ERROR  = -1, //!< Reply with error.
-	RC_OK     = 0,  //!< No reply (ignore reply arguments).
-	RC_REPLY  = 1,   //!< Reply command arguments.
-	RC_SKIP   = 2    //!< Skip following commands
+	RC_ERROR  = -1, ///< Reply with error.
+	RC_OK     = 0,  ///< No reply (ignore reply arguments).
+	RC_REPLY  = 1,   ///< Reply command arguments.
+	RC_SKIP   = 2    ///< Skip following commands
 } ResultCode;
 
 /** union that contains parameters passed to and from commands */
@@ -108,7 +111,7 @@ const char* parser_rl_match(void* dummy, const char* word, int word_len);
 bool parser_process_line(const char* line);
 
 
-/*!
+/**
  * Execute a command with its arguments, and fetch its results.
  *
  * \param templ Template of the command to be executed

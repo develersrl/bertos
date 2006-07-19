@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
@@ -28,6 +28,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.30  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.29  2006/05/18 00:39:30  bernie
  *#* ser_open(): Document a bit more.
  *#*
@@ -153,15 +156,15 @@
 
 
 /* Serial configuration parameters */
-#define SER_CTSDELAY	    70	/*!< CTS line retry interval (ms) */
-#define SER_TXPOLLDELAY	     2	/*!< Transmit buffer full retry interval (ms) */
-#define SER_RXPOLLDELAY	     2	/*!< Receive buffer empty retry interval (ms) */
+#define SER_CTSDELAY	    70	/**< CTS line retry interval (ms) */
+#define SER_TXPOLLDELAY	     2	/**< Transmit buffer full retry interval (ms) */
+#define SER_RXPOLLDELAY	     2	/**< Receive buffer empty retry interval (ms) */
 
 
 struct Serial ser_handles[SER_CNT];
 
 
-/*!
+/**
  * Inserisce il carattere c nel buffer di trasmissione.
  * Questa funzione mette il processo chiamante in attesa
  * quando il buffer e' pieno.
@@ -206,7 +209,7 @@ int ser_putchar(int c, struct Serial *port)
 }
 
 
-/*!
+/**
  * Preleva un carattere dal buffer di ricezione.
  * Questa funzione mette il processo chiamante in attesa
  * quando il buffer e' vuoto. L'attesa ha un timeout
@@ -250,7 +253,7 @@ int ser_getchar(struct Serial *port)
 }
 
 
-/*!
+/**
  * Preleva un carattere dal buffer di ricezione.
  * Se il buffer e' vuoto, ser_getchar_nowait() ritorna
  * immediatamente EOF.
@@ -266,7 +269,7 @@ int ser_getchar_nowait(struct Serial *port)
 
 
 #if CONFIG_SER_GETS
-/*!
+/**
  * Read a line long at most as size and put it
  * in buf.
  * \return number of chars read or EOF in case
@@ -278,7 +281,7 @@ int ser_gets(struct Serial *port, char *buf, int size)
 }
 
 
-/*!
+/**
  * Read a line long at most as size and put it
  * in buf, with optional echo.
  *
@@ -316,7 +319,7 @@ int ser_gets_echo(struct Serial *port, char *buf, int size, bool echo)
 #endif /* !CONFIG_SER_GETS */
 
 
-/*!
+/**
  * Read at most \a size bytes from \a port and put them in \a buf
  *
  * \return number of bytes actually read, or EOF in
@@ -339,7 +342,7 @@ int ser_read(struct Serial *port, void *buf, size_t size)
 }
 
 
-/*!
+/**
  * Write a string to serial.
  * \return 0 if OK, EOF in case of error.
  */
@@ -354,7 +357,7 @@ int ser_print(struct Serial *port, const char *s)
 }
 
 
-/*!
+/**
  * \brief Write a buffer to serial.
  *
  * \return 0 if OK, EOF in case of error.
@@ -375,7 +378,7 @@ int ser_write(struct Serial *port, const void *_buf, size_t len)
 
 
 #if CONFIG_PRINTF
-/*!
+/**
  * Formatted write
  */
 int ser_printf(struct Serial *port, const char *format, ...)
@@ -401,7 +404,7 @@ void ser_settimeouts(struct Serial *port, mtime_t rxtimeout, mtime_t txtimeout)
 #endif /* CONFIG_SER_RXTIMEOUT || CONFIG_SER_TXTIMEOUT */
 
 #if CONFIG_SER_RXTIMEOUT != -1
-/*!
+/**
  * Discard input to resynchronize with remote end.
  *
  * Discard incoming data until the port stops receiving
@@ -440,7 +443,7 @@ void ser_setparity(struct Serial *port, int parity)
 }
 
 
-/*!
+/**
  * Flush both the RX and TX buffers.
  */
 void ser_purge(struct Serial *port)
@@ -450,7 +453,7 @@ void ser_purge(struct Serial *port)
 }
 
 
-/*!
+/**
  * Wait until all pending output is completely
  * transmitted to the other end.
  *
@@ -475,7 +478,7 @@ void ser_drain(struct Serial *ser)
 }
 
 
-/*!
+/**
  * Initialize a serial port.
  *
  * \param unit  Serial unit to open. Possible values are architecture dependant.
@@ -517,7 +520,7 @@ struct Serial *ser_open(unsigned int unit)
 }
 
 
-/*!
+/**
  * Clean up serial port, disabling the associated hardware.
  */
 void ser_close(struct Serial *port)

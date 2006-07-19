@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/07/19 12:56:27  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.5  2006/06/03 13:58:01  bernie
  *#* Fix recursive timeout and add exit status information.
  *#*
@@ -541,7 +544,7 @@ iptr_t menu_handle(const struct Menu *menu)
 }
 
 
-/*!
+/**
  * Set flags on a menuitem.
  *
  * \param menu  Menu owner of the item to change.
@@ -561,7 +564,7 @@ int menu_setFlags(struct Menu *menu, int idx, int flags)
 }
 
 
-/*!
+/**
  * Clear flags on a menuitem.
  *
  * \param menu  Menu owner of the item to change.

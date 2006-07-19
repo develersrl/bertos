@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2001,2004 Develer S.r.l. (http://www.develer.com/)
@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.31  2006/07/19 12:56:27  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.30  2006/03/27 04:49:23  bernie
  *#* CPU_IDLE(): Fix for new emulator.
  *#*
@@ -118,7 +121,7 @@
 
 #include <string.h> /* memset() */
 
-/*!
+/**
  * CPU dependent context switching routines.
  *
  * \note This function *MUST* preserve also the status of the interrupts.
@@ -151,7 +154,7 @@ uint16_t Quantum;
 extern List StackFreeList;
 #endif
 
-/*! The main process (the one that executes main()). */
+/** The main process (the one that executes main()). */
 struct Process MainProcess;
 
 
@@ -194,7 +197,7 @@ void proc_init(void)
 }
 
 
-/*!
+/**
  * Create a new process, starting at the provided entry point.
  *
  * \return Process structure of new created process
@@ -283,7 +286,7 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 	return proc;
 }
 
-/*! Rename a process */
+/** Rename a process */
 void proc_rename(struct Process *proc, const char *name)
 {
 #if CONFIG_KERN_MONITOR
@@ -294,7 +297,7 @@ void proc_rename(struct Process *proc, const char *name)
 }
 
 
-/*!
+/**
  * System scheduler: pass CPU control to the next process in
  * the ready queue.
  *
@@ -366,7 +369,7 @@ void proc_schedule(void)
 }
 
 
-/*!
+/**
  * Terminate the current process
  */
 void proc_exit(void)
@@ -407,7 +410,7 @@ void proc_exit(void)
 }
 
 
-/*!
+/**
  * Co-operative context switch
  */
 void proc_switch(void)
@@ -423,7 +426,7 @@ void proc_switch(void)
 }
 
 
-/*!
+/**
  * Get the pointer to the current process
  */
 struct Process *proc_current(void)
@@ -431,7 +434,7 @@ struct Process *proc_current(void)
 	return CurrentProcess;
 }
 
-/*!
+/**
  * Get the pointer to the user data of the current process
  */
 iptr_t proc_current_user_data(void)
@@ -442,7 +445,7 @@ iptr_t proc_current_user_data(void)
 
 #if CONFIG_KERN_PREEMPTIVE
 
-/*!
+/**
  * Disable preemptive task switching.
  *
  * The scheduler maintains a per-process nesting counter.  Task switching is
@@ -462,7 +465,7 @@ void proc_forbid(void)
 	++CurrentProcess->forbid_cnt;
 }
 
-/*!
+/**
  * Re-enable preemptive task switching.
  *
  * \sa proc_forbid()
@@ -480,7 +483,7 @@ void proc_permit(void)
 
 #include <drv/timer.h>
 
-/*!
+/**
  * Proc scheduling test subthread 1
  */
 static void NORETURN proc_test_thread1(void)
@@ -493,7 +496,7 @@ static void NORETURN proc_test_thread1(void)
 	}
 }
 
-/*!
+/**
  * Proc scheduling test subthread 2
  */
 static void NORETURN proc_test_thread2(void)
@@ -509,7 +512,7 @@ static void NORETURN proc_test_thread2(void)
 static cpustack_t proc_test_stack1[CONFIG_KERN_DEFSTACKSIZE/sizeof(cpustack_t)];
 static cpustack_t proc_test_stack2[CONFIG_KERN_DEFSTACKSIZE/sizeof(cpustack_t)];
 
-/*!
+/**
  * Proc scheduling test
  */
 void NORETURN proc_test(void)

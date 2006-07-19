@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
@@ -12,6 +12,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2006/07/19 12:56:27  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.10  2005/11/04 16:20:02  bernie
  *#* Fix reference to README.devlib in header.
  *#*
@@ -50,7 +53,7 @@
 #include <appconfig.h>
 #include <cfg/cpu.h>    /* CPU_HARVARD */
 
-/*!
+/**
  * \name _formatted_write() configuration
  * \{
  */
@@ -62,7 +65,7 @@
 /* \} */
 
 #ifndef CONFIG_PRINTF_RETURN_COUNT
-	/*! Enable/disable _formatted_write return value */
+	/** Enable/disable _formatted_write return value */
 	#define CONFIG_PRINTF_RETURN_COUNT 1
 #endif
 

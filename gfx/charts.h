@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
@@ -18,6 +18,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.3  2005/11/27 23:36:18  bernie
  *#* Use appconfig.h instead of cfg/config.h.
  *#*
@@ -49,7 +52,7 @@
 #include <gfx/gfx.h>    /* vcoord_t */
 #include <appconfig.h> /* CONFIG_ stuff */
 
-/*!
+/**
  * \name Width/height of the small ticks drawn over the axes
  * \{
  */
@@ -57,7 +60,7 @@
 #define TICKS_WIDTH      2
 /*\}*/
 
-/*!
+/**
  * \name Chart frame dimensions
  * \{
  */

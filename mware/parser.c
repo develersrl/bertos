@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2003, 2006 Develer S.r.l. (http://www.develer.com/)
@@ -29,6 +29,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:28  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2006/06/01 12:27:39  marco
  *#* Added utilities for protocols
  *#*
@@ -47,14 +50,14 @@
 
 #define MAX_COMMANDS_NUMBER  128  // 64
 
-//! Hashtable hook to extract the key from a command
+/// Hashtable hook to extract the key from a command
 static const void* get_key_from_command(const void* cmd, uint8_t* length);
 
-//! Hashtable that handles the commands that can be executed
+/// Hashtable that handles the commands that can be executed
 DECLARE_HASHTABLE_STATIC(commands, MAX_COMMANDS_NUMBER, get_key_from_command);
 
 
-/*!
+/**
  * \brief Tokenize one word at a time from a text.
  *
  * This function is similar to strtok, but does not use any implicit
@@ -91,7 +94,7 @@ static bool get_word(const char **begin, const char **end)
 }
 
 
-/*!
+/**
  * \brief Command arguments parser.
  *
  * Using the format pointed by the argument fmt
@@ -216,7 +219,7 @@ static int printResult(struct Serial *ser, const char *fmt, parms result[])
 }
 #endif /* UNUSED_CODE */
 
-//! Hook provided by the parser for matching of command names (TAB completion) for readline
+/// Hook provided by the parser for matching of command names (TAB completion) for readline
 const char* parser_rl_match(UNUSED_ARG(void *,dummy), const char *word, int word_len)
 {
 	HashIterator cur;

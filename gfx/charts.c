@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
@@ -26,6 +26,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/07/19 12:56:26  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.3  2005/11/27 23:33:29  bernie
  *#* Reorder includes.
  *#*
@@ -79,7 +82,7 @@ void chart_setScale(Bitmap *bm, chart_x_t xmin, chart_y_t ymin, chart_x_t xmax, 
 }
 
 
-/*!
+/**
  * Draw the chart axes
  */
 void chart_drawAxis(Bitmap *bm)
@@ -115,7 +118,7 @@ void chart_drawAxis(Bitmap *bm)
 }
 
 
-/*!
+/**
  * Draw a set of \a curve_cnt connected segments, whose Y coordinates
  * are identified by the \a curve_y array and X-coordinates are
  * are evenly spaced by one virtual unit.
@@ -134,7 +137,7 @@ void chart_drawCurve(Bitmap *bm, const chart_y_t *curve_y, int curve_cnt)
 }
 
 
-/*!
+/**
  * Disegna dei dot in corrispondenza delle coppie (dotsx[i];dotsy[i])
  * Se dotsx e' NULL, i punti vengono disegnati ad intervalli regolari.
  */

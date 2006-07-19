@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
@@ -45,6 +45,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/07/19 12:56:28  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.1  2006/06/01 12:27:39  marco
  *#* Added utilities for protocols
  *#*
@@ -58,14 +61,14 @@
 #include <stdio.h>
 
 
-//! Enable compilation of the unit test code
+/// Enable compilation of the unit test code
 #define DEBUG_UNIT_TEST       0
 
-//! Enable dump of the history after each line
+/// Enable dump of the history after each line
 #define DEBUG_DUMP_HISTORY    0
 
 
-/*! Special keys (escape sequences converted to a single code) */
+/** Special keys (escape sequences converted to a single code) */
 enum RL_KEYS {
 	SPECIAL_KEYS = 0x1000,
 
@@ -117,12 +120,12 @@ enum RL_KEYS {
 	KEY_F10, KEY_F11, KEY_F12,
 };
 
-/*! Check if \a c is a separator between words.
+/** Check if \a c is a separator between words.
  *  \note Parameter \a c is evaluated multiple times
  */
 #define IS_WORD_SEPARATOR(c) ((c) == ' ' || (c) == '\0')
 
-//! Write the string \a txt to the IO output (without any kind of termination)
+/// Write the string \a txt to the IO output (without any kind of termination)
 INLINE void rl_puts(const struct RLContext* ctx, const char* txt)
 {
 	if (!ctx->put)
@@ -132,14 +135,14 @@ INLINE void rl_puts(const struct RLContext* ctx, const char* txt)
 		ctx->put(*txt++, ctx->put_param);
 }
 
-//! Write character \a ch to the IO output.
+/// Write character \a ch to the IO output.
 INLINE void rl_putc(const struct RLContext* ctx, char ch)
 {
 	if (ctx->put)
 		ctx->put(ch, ctx->put_param);
 }
 
-/*! Read a character from the IO into \a ch. This function also takes
+/** Read a character from the IO into \a ch. This function also takes
  *  care of converting the ANSI escape sequences into one of the codes
  *  defined in \c RL_KEYS.
  */
@@ -226,19 +229,19 @@ static bool pop_history(struct RLContext* ctx, int total_len)
 	return true;
 }
 
-//! Check if index \a i points to the begin of the history.
+/// Check if index \a i points to the begin of the history.
 INLINE bool is_history_begin(struct RLContext* ctx, int i)
 { return ctx->history + i == ctx->real_history; }
 
-//! Check if index \a i points to the (exclusive) end of history
+/// Check if index \a i points to the (exclusive) end of history
 INLINE bool is_history_end(struct RLContext* ctx, int i)
 { return ctx->history + i == ctx->real_history + HISTORY_SIZE; }
 
-//! Check if index \a i points to the (exclusive) end of history, or somewhere past the end.
+/// Check if index \a i points to the (exclusive) end of history, or somewhere past the end.
 INLINE bool is_history_past_end(struct RLContext* ctx, int i)
 { return ctx->history + i >= ctx->real_history + HISTORY_SIZE; }
 
-/*! Insert \a num_chars characters from \a ch into the history buffer at the
+/** Insert \a num_chars characters from \a ch into the history buffer at the
  *  position indicated by \a curpos. If needed, remove old history to make room.
  *  Returns true if everything was successful, false if there was no room to
  *  add the characters.
@@ -263,14 +266,14 @@ static bool insert_chars(struct RLContext* ctx, size_t *curpos, const char* ch, 
 	return true;
 }
 
-//! Insert a single character \a ch into the buffer (with the same semantic of \c insert_chars())
+/// Insert a single character \a ch into the buffer (with the same semantic of \c insert_chars())
 static bool insert_char(struct RLContext* ctx, size_t *curpos, char ch)
 {
 	return insert_chars(ctx, curpos, &ch, 1);
 }
 
 #if DEBUG_DUMP_HISTORY
-//! Dump the internal history of a context (used only for debug purposes)
+/// Dump the internal history of a context (used only for debug purposes)
 static void dump_history(struct RLContext* ctx)
 {
 	int k;
@@ -291,7 +294,7 @@ static void dump_history(struct RLContext* ctx)
 }
 #endif /* DEBUG_DUMP_HISTORY */
 
-//! Complete the current word. Return false if no unambiguous completion was found
+/// Complete the current word. Return false if no unambiguous completion was found
 static bool complete_word(struct RLContext *ctx, size_t *curpos)
 {
 	const char* completed_word;
@@ -420,7 +423,7 @@ const char* rl_readline(struct RLContext* ctx)
 
 #if DEBUG_UNIT_TEST
 
-/*! Perform the unit test for the readline library */
+/** Perform the unit test for the readline library */
 void rl_test(void);
 
 #if HISTORY_SIZE != 32
@@ -435,7 +438,7 @@ static int test_getc(void* data)
 	return *test_getc_ptr++;
 }
 
-/*! Perform a readline test. The function pipes the characters from \a input_buffer
+/** Perform a readline test. The function pipes the characters from \a input_buffer
  *  through the I/O to \c rl_readline(). After the whole string is sent, \c do_test()
  *  checks if the current history within the context match \a expected_history.
  */

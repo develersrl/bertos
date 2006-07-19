@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
@@ -66,6 +66,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.14  2006/07/19 12:56:27  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.13  2006/02/24 01:17:05  bernie
  *#* Update for new emulator.
  *#*
@@ -117,7 +120,7 @@
 
 #if CONFIG_KERN_SIGNALS
 
-/*!
+/**
  * Check if any of the signals in \a sigs has occurred and clear them.
  * Return the signals that have occurred.
  */
@@ -135,7 +138,7 @@ sigmask_t sig_check(sigmask_t sigs)
 }
 
 
-/*!
+/**
  * Sleep until any of the signals in \a sigs occurs.
  * Return the signal(s) that have awaked the process.
  */
@@ -166,7 +169,7 @@ sigmask_t sig_wait(sigmask_t sigs)
 }
 
 
-/*!
+/**
  * Send the signals \a sigs to the process \a proc.
  * The process will be awaken if it was waiting for any of them.
  *

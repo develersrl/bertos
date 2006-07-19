@@ -1,4 +1,4 @@
-/*!
+/**
  * \file
  * <!--
  * Copyright 2001, 2004 Develer S.r.l. (http://www.develer.com/)
@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.12  2006/07/19 12:56:27  bernie
+ *#* Convert to new Doxygen style.
+ *#*
  *#* Revision 1.11  2006/02/24 01:17:05  bernie
  *#* Update for new emulator.
  *#*
@@ -63,7 +66,7 @@ INLINE void sem_verify(struct Semaphore *s)
 }
 
 
-/*!
+/**
  * \brief Initialize a Semaphore structure.
  */
 void sem_init(struct Semaphore *s)
@@ -74,7 +77,7 @@ void sem_init(struct Semaphore *s)
 }
 
 
-/*!
+/**
  * \brief Attempt to lock a semaphore without waiting.
  *
  * \return true in case of success, false if the semaphore
@@ -103,7 +106,7 @@ bool sem_attempt(struct Semaphore *s)
 }
 
 
-/*!
+/**
  * \brief Lock a semaphore.
  *
  * If the semaphore is already owned by another process, the caller
@@ -151,7 +154,7 @@ void sem_obtain(struct Semaphore *s)
 }
 
 
-/*!
+/**
  * \brief Release a lock on a previously locked semaphore.
  *
  * If the nesting count of the semaphore reaches zero,
