@@ -1,7 +1,7 @@
 /**
  * \file
  * <!--
- * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000 Bernardo Innocenti <bernie@codewiz.org>
  * This file is part of DevLib - See README.devlib for information.
  * -->
@@ -28,6 +28,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.31  2006/07/21 10:58:00  batt
+ *#* Use timer_clock() instead of obsolete timer_ticks().
+ *#*
  *#* Revision 1.30  2006/07/19 12:56:26  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -121,7 +124,6 @@
 #include "ser_p.h"
 #include <mware/formatwr.h>
 #include <cfg/debug.h>
-//#include <hw.h>
 #include <appconfig.h>
 
 /*
@@ -178,7 +180,7 @@ int ser_putchar(int c, struct Serial *port)
 	if (fifo_isfull_locked(&port->txfifo))
 	{
 #if CONFIG_SER_TXTIMEOUT != -1
-		mtime_t start_time = timer_ticks();
+		ticks_t start_time = timer_clock();
 #endif
 
 		/* Attende finche' il buffer e' pieno... */
@@ -189,7 +191,7 @@ int ser_putchar(int c, struct Serial *port)
 			proc_switch();
 #endif
 #if CONFIG_SER_TXTIMEOUT != -1
-			if (timer_ticks() - start_time >= port->txtimeout)
+			if (timer_clock() - start_time >= port->txtimeout)
 			{
 				port->status |= SERRF_TXTIMEOUT;
 				return EOF;
@@ -223,7 +225,7 @@ int ser_getchar(struct Serial *port)
 	if (fifo_isempty_locked(&port->rxfifo))
 	{
 #if CONFIG_SER_RXTIMEOUT != -1
-		mtime_t start_time = timer_ticks();
+		ticks_t start_time = timer_clock();
 #endif
 		/* Wait while buffer is empty */
 		do
@@ -233,7 +235,7 @@ int ser_getchar(struct Serial *port)
 			proc_switch();
 #endif
 #if CONFIG_SER_RXTIMEOUT != -1
-			if (timer_ticks() - start_time >= port->rxtimeout)
+			if (timer_clock() - start_time >= port->rxtimeout)
 			{
 				port->status |= SERRF_RXTIMEOUT;
 				return EOF;
@@ -398,8 +400,8 @@ int ser_printf(struct Serial *port, const char *format, ...)
 #if CONFIG_SER_RXTIMEOUT != -1 || CONFIG_SER_TXTIMEOUT != -1
 void ser_settimeouts(struct Serial *port, mtime_t rxtimeout, mtime_t txtimeout)
 {
-	port->rxtimeout = rxtimeout;
-	port->txtimeout = txtimeout;
+	port->rxtimeout = ms_to_ticks(rxtimeout);
+	port->txtimeout = ms_to_ticks(txtimeout);
 }
 #endif /* CONFIG_SER_RXTIMEOUT || CONFIG_SER_TXTIMEOUT */
 
@@ -414,9 +416,9 @@ void ser_settimeouts(struct Serial *port, mtime_t rxtimeout, mtime_t txtimeout)
  */
 void ser_resync(struct Serial *port, mtime_t delay)
 {
-	mtime_t old_rxtimeout = port->rxtimeout;
+	mtime_t old_rxtimeout = ticks_to_ms(port->rxtimeout);
 
-	ser_settimeouts(port, delay, port->txtimeout);
+	ser_settimeouts(port, delay, ticks_to_ms(port->txtimeout));
 	do
 	{
 		ser_setstatus(port, 0);
@@ -426,7 +428,7 @@ void ser_resync(struct Serial *port, mtime_t delay)
 
 	/* Restore port to an usable status */
 	ser_setstatus(port, 0);
-	ser_settimeouts(port, old_rxtimeout, port->txtimeout);
+	ser_settimeouts(port, old_rxtimeout, ticks_to_ms(port->txtimeout));
 }
 #endif /* CONFIG_SER_RXTIMEOUT */
 
@@ -464,7 +466,7 @@ void ser_purge(struct Serial *port)
 void ser_drain(struct Serial *ser)
 {
 	/*
-	 * Wait until the FIFO is empty, and then until the byte currently in
+	 * Wait until the FIFO becomes empty, and then until the byte currently in
 	 * the hardware register gets shifted out.
 	 */
 	while (!fifo_isempty(&ser->txfifo)

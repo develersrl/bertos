@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.28  2006/07/21 10:58:00  batt
+ *#* Use timer_clock() instead of obsolete timer_ticks().
+ *#*
  *#* Revision 1.27  2006/07/19 12:56:26  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -238,10 +241,10 @@ typedef struct Serial
 	/* \} */
 
 #if CONFIG_SER_RXTIMEOUT != -1
-	mtime_t rxtimeout;
+	ticks_t rxtimeout;
 #endif
 #if CONFIG_SER_TXTIMEOUT != -1
-	mtime_t txtimeout;
+	ticks_t txtimeout;
 #endif
 
 	/** Holds the flags defined above.  Will be 0 when no errors have occurred. */
