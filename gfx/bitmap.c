@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.12  2006/08/01 12:23:39  bernie
+ *#* gfx_setClipRect(): Also define when CONFIG_GFX_VCOORDS is enabled; Extend documentation.
+ *#*
  *#* Revision 1.11  2006/07/19 12:56:26  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -240,7 +243,7 @@ void gfx_blitImage(Bitmap *dst, coord_t dxmin, coord_t dymin, const Image *image
 }
 
 
-#if CONFIG_GFX_CLIPPING
+#if CONFIG_GFX_CLIPPING || CONFIG_GFX_VCOORDS
 
 /**
  * Set the bitmap clipping rectangle to the specified coordinates.
@@ -248,9 +251,14 @@ void gfx_blitImage(Bitmap *dst, coord_t dxmin, coord_t dymin, const Image *image
  * All drawing performed on the bitmap will be clipped inside this
  * rectangle.
  *
+ * The clipping rectangle is also used as a bounding box for the
+ * logical view of the virtual coordinate system.
+ *
  * \note Following the convention used for all other operations, the
  *       top-left pixels of the rectangle are included, while the
  *       bottom-right pixels are considered outside the clipping region.
+ *
+ * \see gfx_setViewRect
  */
 void gfx_setClipRect(Bitmap *bm, coord_t minx, coord_t miny, coord_t maxx, coord_t maxy)
 {
