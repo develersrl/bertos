@@ -3,7 +3,7 @@
  * <!--
  * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000 Bernardo Innocenti <bernie@codewiz.org>
- * All Rights Reserved.
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \version $Id$
@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2006/08/01 12:22:46  bernie
+ *#* Mention DevLib license.
+ *#*
  *#* Revision 1.6  2006/07/19 12:56:27  bernie
  *#* Convert to new Doxygen style.
  *#*
