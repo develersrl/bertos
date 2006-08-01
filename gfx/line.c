@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/08/01 12:22:00  bernie
+ *#* gfx_findRegion(): Only define when CONFIG_GFX_CLIPPING is enabled.
+ *#*
  *#* Revision 1.3  2006/07/19 12:56:26  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -131,6 +134,8 @@ static void gfx_lineUnclipped(Bitmap *bm, coord_t x1, coord_t y1, coord_t x2, co
 	}
 }
 
+#if CONFIG_GFX_CLIPPING
+
 /// Helper routine for gfx_line().
 static int gfx_findRegion(int x, int y, Rect *cr)
 {
@@ -148,6 +153,8 @@ static int gfx_findRegion(int x, int y, Rect *cr)
 
 	return code;
 }
+
+#endif /* CONFIG_CLIPPING */
 
 /**
  * Draw a sloped line segment.
