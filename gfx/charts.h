@@ -18,6 +18,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/08/01 12:23:03  bernie
+ *#* Indentation fix.
+ *#*
  *#* Revision 1.4  2006/07/19 12:56:26  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -49,7 +52,7 @@
 #ifndef GFX_CHARTS_H
 #define GFX_CHARTS_H
 
-#include <gfx/gfx.h>    /* vcoord_t */
+#include <gfx/gfx.h>   /* vcoord_t */
 #include <appconfig.h> /* CONFIG_ stuff */
 
 /**
