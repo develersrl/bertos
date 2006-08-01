@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.18  2006/08/01 12:45:01  bernie
+ *#* Remove Bitmap::cr when not needed.
+ *#*
  *#* Revision 1.17  2006/07/19 12:56:26  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -146,7 +149,9 @@ typedef struct Bitmap
 	coord_t stride;         /**< Bytes per row. */
 	coord_t penX, penY;     /**< Current pen position MoveTo()/LineTo() */
 
+#if CONFIG_GFX_CLIPPING || CONFIG_GFX_VCOORDS
 	Rect cr;                /**< Clip drawing inside this rectangle */
+#endif
 
 #if CONFIG_GFX_TEXT
 	const struct Font *font;/**< Current font for text rendering. */
@@ -161,7 +166,8 @@ typedef struct Bitmap
 	 * \see text_style()
 	 */
 	uint8_t styles;
-#endif
+#endif /* CONFIG_GFX_TEXT */
+
 #if CONFIG_GFX_VCOORDS
 	/**
 	 * \name Logical coordinate system
