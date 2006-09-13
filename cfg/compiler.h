@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.23  2006/09/13 18:28:38  bernie
+ *#* Reformat.
+ *#*
  *#* Revision 1.22  2006/07/19 12:56:25  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -537,15 +540,15 @@ typedef unsigned char page_t;    /**< Type for banked memory pages. */
 	UNUSED_VAR(extern char, STATIC_ASSERTION_FAILED__[(condition) ? 1 : -1])
 
 #ifndef ASSERT_TYPE_EQUAL
-/** Ensure two variables have the same type. */
-#define ASSERT_TYPE_EQUAL(var1, var2)  \
-		do { (void)(&(var1) == &(var2)); } while(0)
+	/** Ensure two variables have the same type. */
+	#define ASSERT_TYPE_EQUAL(var1, var2)  \
+			do { (void)(&(var1) == &(var2)); } while(0)
 #endif
 
 #ifndef ASSERT_TYPE_IS
-/** Ensure variable is of specified type. */
-#define ASSERT_TYPE_IS(var, type)  \
-		do { (void)(&(var) == (type *)0); } while(0)
+	/** Ensure variable is of specified type. */
+	#define ASSERT_TYPE_IS(var, type)  \
+			do { (void)(&(var) == (type *)0); } while(0)
 #endif
 
 #endif /* DEVLIB_COMPILER_H */
