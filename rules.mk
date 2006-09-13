@@ -10,6 +10,9 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
+# Revision 1.6  2006/09/13 18:38:59  bernie
+# Sort CPP options to let apps override include paths.
+#
 # Revision 1.5  2006/09/13 18:30:52  bernie
 # Add CPPFLAGS to all rules.
 #
@@ -147,25 +150,25 @@ OBJ         += $$($(1)_OBJ)
 $$($(1)_COBJ) : $$(OBJDIR)/$(1)/%.o : %.c
 	$L "$(1): Compiling $$< (C)"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(CC) -c $$($(1)_CPPFLAGS) $$(CFLAGS) $$($(1)_CFLAGS) $$< -o $$@
+	$Q $$(CC) -c $$(CFLAGS) $$($(1)_CFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$< -o $$@
 
 # Compile: instructions to create assembler and/or object files from C++ source
 $$($(1)_CXXOBJ) : $$(OBJDIR)/$(1)/%.o : %.cpp
 	$L "$(1): Compiling $$< (C++)"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(CXX) -c $$($(1)_CPPFLAGS) $$(CXXFLAGS) $$($(1)_CXXFLAGS) $$< -o $$@
+	$Q $$(CXX) -c $$(CXXFLAGS) $$($(1)_CXXFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$< -o $$@
 
 # Generate assembly sources from C files (debug)
 $$(OBJDIR)/$(1)/%.s : %.c
 	$L "$(1): Generating asm source $$<"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(CC) -S $$($(1)_CPPFLAGS) $$(CFLAGS) $$($(1)_CFLAGS) $$< -o $$@
+	$Q $$(CC) -S $$(CFLAGS) $$($(1)_CFLAGS) $$($(1)_CPPFLAGS) $$< -o $$@
 
 # Generate special progmem variant of a source file
 $$($(1)_PCOBJ) : $$(OBJDIR)/$(1)/%_P.o : %.c
 	$L "$(1): Compiling $$< (PROGMEM)"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(CC) -c -D_PROGMEM $$($(1)_CPPFLAGS) $$(CFLAGS) $$($(1)_CFLAGS) $$< -o $$@
+	$Q $$(CC) -c -D_PROGMEM $$(CFLAGS) $$($(1)_CFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$< -o $$@
 
 # Assemble: instructions to create object file from assembler files
 $$($(1)_AOBJ): $$(OBJDIR)/$(1)/%.o : %.s
@@ -176,7 +179,7 @@ $$($(1)_AOBJ): $$(OBJDIR)/$(1)/%.o : %.s
 $$($(1)_CPPAOBJ): $$(OBJDIR)/$(1)/%.o : %.S
 	$L "$(1): Assembling with CPP $$<"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(CC) -c $$($(1)_CPPFLAGS) $$(CPPAFLAGS) $$($(1)_CPPAFLAGS) $$< -o $$@
+	$Q $$(CC) -c $$(CPPAFLAGS) $$($(1)_CPPAFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$< -o $$@
 
 # Link: instructions to create elf output file from object files
 $$(OUTDIR)/$(1).elf: bumprev $$($(1)_OBJ) $$($(1)_LDSCRIPT)
