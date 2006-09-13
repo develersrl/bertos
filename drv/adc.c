@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/09/13 18:30:07  bernie
+ *#* Add a FIXME.
+ *#*
  *#* Revision 1.2  2006/07/19 12:56:25  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -26,6 +29,8 @@
 
 #include <drv/adc.h>
 #include <drv/timer.h>
+
+// FIXME: move CPU specific part to adc_CPU.c
 #include <hw_adc.h>
 
 #include <cfg/debug.h>
