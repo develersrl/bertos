@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2006/09/13 13:58:32  bernie
+ *#* Add RenderHook support.
+ *#*
  *#* Revision 1.7  2006/08/01 12:22:46  bernie
  *#* Mention DevLib license.
  *#*
@@ -57,6 +60,7 @@
  *#*/
 
 #include "menu.h"
+
 #include <gfx/gfx.h>
 #include <gfx/font.h>
 #include <gfx/text.h>
@@ -87,6 +91,7 @@
 #else
 #define PTRMSG(x) ((const char *)x)
 #endif
+
 
 /* Temporary fake defines for ABORT stuff... */
 #define abort_top  0
@@ -158,6 +163,39 @@ static void menu_update_menubar(
 }
 #endif /* CONFIG_MENU_MENUBAR */
 
+
+static void menu_defaultRenderHook(struct Bitmap *bm, int ypos, bool selected, const struct MenuItem *item)
+{
+	if (item->flags & MIF_CHECKIT)
+	{
+		gfx_rectClear(bm, 0, ypos,
+				bm->font->height, ypos + bm->font->height);
+
+		if (item->flags & MIF_TOGGLE)
+			gfx_rectDraw(bm, 2, ypos + 2,
+					bm->font->height - 2, ypos + bm->font->height - 2);
+		if (item->flags & MIF_CHECKED)
+		{
+			gfx_line(bm,
+					3, ypos + 3,
+					bm->font->height - 3, ypos + bm->font->height - 3);
+			gfx_line(bm,
+					bm->font->height - 3, ypos + 3,
+					3, ypos + bm->font->height - 3);
+		}
+	}
+
+#if CPU_HARVARD
+	((item->flags & MIF_RAMLABEL) ? text_xyprintf : text_xyprintf_P)
+#else
+	text_xyprintf
+#endif
+	(
+		bm, (item->flags & MIF_CHECKIT) ? bm->font->height : 0, ypos,
+		selected ? (STYLEF_INVERT | TEXT_FILL) : TEXT_FILL,
+		PTRMSG(item->label)
+	);
+}
 
 /**
  * Show a menu on the display.
@@ -254,35 +292,11 @@ static void menu_layout(
 		/* Only print visible items */
 		if (!(item->flags & MIF_HIDDEN))
 		{
-			if (item->flags & MIF_CHECKIT)
-			{
-				gfx_rectClear(bm, 0, ypos,
-						bm->font->height, ypos + bm->font->height);
+			/* Check if a special render function is supplied, otherwise use defaults */
+			RenderHook renderhook = (item->flags & MIF_RENDERHOOK) ? (RenderHook)item->label : menu_defaultRenderHook;
 
-				if (item->flags & MIF_TOGGLE)
-					gfx_rectDraw(bm, 2, ypos + 2,
-							bm->font->height - 2, ypos + bm->font->height - 2);
-				if (item->flags & MIF_CHECKED)
-				{
-					gfx_line(bm,
-							3, ypos + 3,
-							bm->font->height - 3, ypos + bm->font->height - 3);
-					gfx_line(bm,
-							bm->font->height - 3, ypos + 3,
-							3, ypos + bm->font->height - 3);
-				}
-			}
-
-#if CPU_HARVARD
-			((item->flags & MIF_RAMLABEL) ? text_xyprintf : text_xyprintf_P)
-#else
-			text_xyprintf
-#endif
-			(
-				bm, (item->flags & MIF_CHECKIT) ? bm->font->height : 0, ypos,
-				(i == selected) ? (STYLEF_INVERT | TEXT_FILL) : TEXT_FILL,
-				PTRMSG(item->label)
-			);
+			/* Render menuitem */
+			renderhook(menu->bitmap, ypos++, (i == selected), item);
 
 			ypos += bm->font->height;
 		}

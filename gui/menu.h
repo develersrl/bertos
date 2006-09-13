@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/09/13 13:58:33  bernie
+ *#* Add RenderHook support.
+ *#*
  *#* Revision 1.3  2006/07/19 12:56:27  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -86,6 +89,9 @@ typedef struct MenuItem
 	iptr_t       userdata; /**< User data to be passed back to the hook */
 } MenuItem;
 
+/** Render hook callback function prototype */
+typedef void (*RenderHook)(struct Bitmap *bitmap, int ypos, bool selected, const struct MenuItem *item);
+
 /**
  * \name Flags for MenuItem.flags.
  * \{
@@ -107,6 +113,7 @@ typedef struct MenuItem
 #define MIF_HIDDEN          BV(11) /**< This menu item is not visible */
 #define MIF_DISABLED        BV(12) /**< This menu item is not visible */
 #define MIF_RAMLABEL        BV(13) /**< Item label is stored in RAM, not in program memory */
+#define MIF_RENDERHOOK      BV(14) /**< Menu render function is passed in label field */
 /* \} */
 
 /**
