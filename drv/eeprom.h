@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2006/09/13 18:29:54  bernie
+ *#* e2addr(): New macro.
+ *#*
  *#* Revision 1.9  2006/07/19 12:56:25  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -69,6 +72,17 @@
 
 /// Type for EEPROM addresses
 typedef uint16_t e2addr_t;
+
+/**
+ * Macro for E2Layout offset calculation
+ *
+ * \note We can't just use offsetof() here because we could use
+ *       non-constant expressions to access array elements.
+ *
+ * \note E2Layout is a structure that must be defined in user files.
+ */
+#define e2addr(x) ((e2addr_t)&(((struct E2Layout *)0)->x))
+
 
 bool eeprom_write(e2addr_t addr, const void *buf, size_t count);
 bool eeprom_read(e2addr_t addr, void *buf, size_t count);
