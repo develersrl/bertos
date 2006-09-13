@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/09/13 18:25:22  bernie
+ *#* Fix GCC error.
+ *#*
  *#* Revision 1.5  2006/07/19 12:56:26  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -109,13 +112,13 @@ public slots:
 
 
 /// HW dependent timer initialization.
-extern "C" static void timer_hw_init(void)
+static void timer_hw_init(void)
 {
 	// Kick EmulTimer initialization
 	EmulTimer::instance().init();
 }
 
-extern "C" INLINE hptime_t timer_hw_hpread(void)
+INLINE hptime_t timer_hw_hpread(void)
 {
 	return EmulTimer::instance().hpread();
 }
