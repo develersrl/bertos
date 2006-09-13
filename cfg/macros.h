@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2006/09/13 18:31:37  bernie
+ *#* BV8(), BV16(), BV32(): New macros for CPUs with small word size; SWAP_T(): New macro to support old compilers.
+ *#*
  *#* Revision 1.9  2006/07/19 12:56:25  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -158,10 +161,37 @@
 
 #endif /* COMPILER_TYPEOF */
 
+/**
+ * Macro to swap \a a with \a b, with explicit type \a T for dumb C89 compilers.
+ *
+ * \note Arguments are evaluated multiple times.
+ */
+#define SWAP_T(a, b, T) \
+	do { \
+		T tmp; \
+		ASSERT_TYPE_IS(a, T); \
+		ASSERT_TYPE_IS(b, T); \
+		tmp = (a); \
+		(a) = (b); \
+		(b) = tmp; \
+	} while (0)
+
+
 #ifndef BV
 	/** Convert a bit value to a binary flag. */
 	#define BV(x)  (1<<(x))
 #endif
+
+/** Same as BV() but with 32 bit result */
+#define BV32(x)  ((uint32_t)1<<(x))
+
+/** Same as BV() but with 16 bit result */
+#define BV16(x)  ((uint16_t)1<<(x))
+
+/** Same as BV() but with 8 bit result */
+#define BV8(x)  ((uint8_t)1<<(x))
+
+
 
 /** Round up \a x to an even multiple of the 2's power \a pad. */
 #define ROUND_UP2(x, pad) (((x) + ((pad) - 1)) & ~((pad) - 1))
