@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.29  2006/09/13 13:59:11  bernie
+ *#* Documentation fixes.
+ *#*
  *#* Revision 1.28  2006/07/21 10:58:00  batt
  *#* Use timer_clock() instead of obsolete timer_ticks().
  *#*
@@ -158,7 +161,10 @@
 #endif
 /*\}*/
 
-/** Mask to group all RX errors. */
+/**
+ * \name Masks to group TX/RX errors.
+ * \{
+ */
 #define SERRF_RX \
 	( SERRF_RXFIFOOVERRUN \
 	| SERRF_RXTIMEOUT \
@@ -166,9 +172,8 @@
 	| SERRF_PARITYERROR \
 	| SERRF_FRAMEERROR \
 	| SERRF_NOISEERROR)
-
-/** Mask to group all TX errors. */
 #define SERRF_TX  (SERRF_TXTIMEOUT)
+/*\}*/
 
 
 /**
@@ -177,8 +182,8 @@
  * \note Values are AVR-specific for performance reasons.
  *       Other processors should either decode them or
  *       redefine these macros.
+ * \{
  */
-/*\{*/
 #define SER_PARITY_NONE  0
 #define SER_PARITY_EVEN  2
 #define SER_PARITY_ODD   3
