@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2006/09/13 13:58:55  bernie
+ *#* text_moveTo(): Swap parameters.
+ *#*
  *#* Revision 1.7  2006/07/19 12:56:26  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -117,7 +120,7 @@
 struct Bitmap;
 
 /* Low-level text functions (mware/text.c) */
-void text_moveTo(struct Bitmap *bm, int col, int row);
+void text_moveTo(struct Bitmap *bm, int row, int col);
 void text_setCoord(struct Bitmap *bm, int x, int y);
 int text_putchar(char c, struct Bitmap *bm);
 uint8_t text_style(struct Bitmap *bm, uint8_t flags, uint8_t mask);
