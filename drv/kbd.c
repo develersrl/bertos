@@ -17,6 +17,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2006/09/13 18:25:45  bernie
+ *#* Merge CONFIG_KBD_LONGPRESS.
+ *#*
  *#* Revision 1.8  2006/07/19 12:56:25  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -62,6 +65,9 @@
 #if !defined(CONFIG_KBD_OBSERVER) || (CONFIG_KBD_OBSERVER != 0 && CONFIG_KBD_OBSERVER != 1)
 	#error CONFIG_KBD_OBSERVER must be defined to either 0 or 1
 #endif
+#if !defined(CONFIG_KBD_LONGPRESS) || (CONFIG_KBD_LONGPRESS != 0 && CONFIG_KBD_LONGPRESS != 1)
+	#error CONFIG_KBD_LONGPRESS must be defined to either 0 or 1
+#endif
 
 #if CONFIG_KBD_BEEP
 	#include <drv/buzzer.h>
@@ -97,7 +103,8 @@ static List kbd_handlers;          /**< Cooked keyboard handlers */
 static KbdHandler kbd_defHandler;  /**< The default keyboard handler */
 static KbdHandler kbd_debHandler;  /**< The debounce keyboard handler */
 static KbdHandler kbd_rptHandler;  /**< Auto-repeat keyboard handler */
-#ifdef  K_LNG_MASK
+
+#if CONFIG_KBD_LONGPRESS
 static KbdHandler kbd_lngHandler;  /**< Long pression keys handler */
 #endif
 
@@ -174,6 +181,8 @@ static portTASK_FUNCTION(kbd_task, arg)
  * is returned only after the time specified with KBD_REPAT_DELAY to
  * avoid too fast keyboard repeat.
  *
+ * \note Calls \c schedule() internally.
+ *
  * \note This function is \b not interrupt safe!
  *
  * \return The mask of depressed keys or 0 if no keys are depressed.
@@ -183,7 +192,7 @@ keymask_t kbd_peek(void)
 {
 	keymask_t key = 0;
 
-// FIXME
+// FIXME: make it optional
 	/* Let other tasks run for a while */
 	extern void schedule(void);
 	schedule();
@@ -332,7 +341,7 @@ static keymask_t kbd_debHandlerFunc(keymask_t key)
 	return new_key;
 }
 
-#ifdef  K_LNG_MASK
+#if CONFIG_KBD_LONGPRESS
 /**
  * Handle long pression keys.
  */
@@ -451,7 +460,7 @@ void kbd_init(void)
 	kbd_debHandler.flags = KHF_RAWKEYS;
 	kbd_addHandler(&kbd_debHandler);
 
-	#ifdef  K_LNG_MASK
+	#if CONFIG_KBD_LONGPRESS
 	/* Add long pression keyboard handler */
 	kbd_lngHandler.hook = kbd_lngHandlerFunc;
 	kbd_lngHandler.pri = 90; /* high priority */
@@ -479,7 +488,7 @@ void kbd_init(void)
 	MOD_CHECK(timer);
 
 	/* Add kbd handler to soft timers list */
-	event_initSoftInt(&kbd_timer.expire, kbd_softint, 0);
+	event_initSoftInt(&kbd_timer.expire, kbd_softint, NULL);
 	timer_setDelay(&kbd_timer, ms_to_ticks(KBD_CHECK_INTERVAL));
 	timer_add(&kbd_timer);
 
