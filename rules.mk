@@ -10,6 +10,9 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
+# Revision 1.5  2006/09/13 18:30:52  bernie
+# Add CPPFLAGS to all rules.
+#
 # Revision 1.4  2006/07/19 12:56:24  bernie
 # Convert to new Doxygen style.
 #
@@ -144,25 +147,25 @@ OBJ         += $$($(1)_OBJ)
 $$($(1)_COBJ) : $$(OBJDIR)/$(1)/%.o : %.c
 	$L "$(1): Compiling $$< (C)"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(CC) -c $$($(1)_CFLAGS) $$(CFLAGS) $$< -o $$@
+	$Q $$(CC) -c $$($(1)_CPPFLAGS) $$(CFLAGS) $$($(1)_CFLAGS) $$< -o $$@
 
 # Compile: instructions to create assembler and/or object files from C++ source
 $$($(1)_CXXOBJ) : $$(OBJDIR)/$(1)/%.o : %.cpp
 	$L "$(1): Compiling $$< (C++)"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(CXX) -c $$($(1)_CXXFLAGS) $$(CXXFLAGS) $$< -o $$@
+	$Q $$(CXX) -c $$($(1)_CPPFLAGS) $$(CXXFLAGS) $$($(1)_CXXFLAGS) $$< -o $$@
 
 # Generate assembly sources from C files (debug)
 $$(OBJDIR)/$(1)/%.s : %.c
 	$L "$(1): Generating asm source $$<"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(CC) -S $$($(1)_CFLAGS) $$(CFLAGS) $$< -o $$@
+	$Q $$(CC) -S $$($(1)_CPPFLAGS) $$(CFLAGS) $$($(1)_CFLAGS) $$< -o $$@
 
 # Generate special progmem variant of a source file
 $$($(1)_PCOBJ) : $$(OBJDIR)/$(1)/%_P.o : %.c
 	$L "$(1): Compiling $$< (PROGMEM)"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(CC) -c -D_PROGMEM $$($(1)_CFLAGS) $$(CFLAGS) $$< -o $$@
+	$Q $$(CC) -c -D_PROGMEM $$($(1)_CPPFLAGS) $$(CFLAGS) $$($(1)_CFLAGS) $$< -o $$@
 
 # Assemble: instructions to create object file from assembler files
 $$($(1)_AOBJ): $$(OBJDIR)/$(1)/%.o : %.s
@@ -173,7 +176,7 @@ $$($(1)_AOBJ): $$(OBJDIR)/$(1)/%.o : %.s
 $$($(1)_CPPAOBJ): $$(OBJDIR)/$(1)/%.o : %.S
 	$L "$(1): Assembling with CPP $$<"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(CC) -c $$(CPPAFLAGS) $$($(1)_CPPAFLAGS) $$< -o $$@
+	$Q $$(CC) -c $$($(1)_CPPFLAGS) $$(CPPAFLAGS) $$($(1)_CPPAFLAGS) $$< -o $$@
 
 # Link: instructions to create elf output file from object files
 $$(OUTDIR)/$(1).elf: bumprev $$($(1)_OBJ) $$($(1)_LDSCRIPT)
@@ -185,7 +188,7 @@ $$(OUTDIR)/$(1).elf: bumprev $$($(1)_OBJ) $$($(1)_LDSCRIPT)
 $$(OUTDIR)/$(1)_whole.elf: bumprev $$($(1)_SRC) $$($(1)_LDSCRIPT)
 	$L "$(1): Compiling and Linking whole program $$@"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(CC) $$($(1)_SRC) $$($(1)_CFLAGS) $$(CFLAGS) $$(LIB) $$(LDFLAGS) $$($(1)_LDFLAGS) -o $$@
+	$Q $$(CC) $$($(1)_SRC) $$(CFLAGS) $$($(1)_CFLAGS) $$(LIB) $$(LDFLAGS) $$($(1)_LDFLAGS) -o $$@
 
 # Flash target
 # NOTE: we retry in case of failure because the STK500 programmer is crappy
@@ -273,7 +276,7 @@ $(RECURSIVE_TARGETS):
 
 BUILDREV_H = buildrev.h
 
-ifeq ($(shell [ -e verstag.c ] && echo yes), yes)
+ifeq ($(shell [ -e verstag.c ] && echo yes),yes)
 .PHONY: bumprev
 bumprev:
 	@buildnr=0; \
