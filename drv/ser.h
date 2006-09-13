@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.30  2006/09/13 18:21:23  bernie
+ *#* Add configurable SPI pin mapping.
+ *#*
  *#* Revision 1.29  2006/09/13 13:59:11  bernie
  *#* Documentation fixes.
  *#*
@@ -175,6 +178,13 @@
 #define SERRF_TX  (SERRF_TXTIMEOUT)
 /*\}*/
 
+/** LSB or MSB first data order, used with SPI AVR serial */
+ * \name LSB or MSB first data order, used with SPI AVR serial
+ * \{
+ */
+#define SER_MSB_FIRST 0
+#define SER_LSB_FIRST 1
+/*\}*/
 
 /**
  * \name Parity settings for ser_setparity().

@@ -38,6 +38,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.33  2006/09/13 18:21:24  bernie
+ *#* Add configurable SPI pin mapping.
+ *#*
  *#* Revision 1.32  2006/07/19 12:56:26  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -306,12 +309,14 @@
 #if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA103
 	#define SPI_PORT      PORTB
 	#define SPI_DDR       DDRB
+	#define SPI_SS_BIT    PB0
 	#define SPI_SCK_BIT   PB1
 	#define SPI_MOSI_BIT  PB2
 	#define SPI_MISO_BIT  PB3
 #elif CPU_AVR_ATMEGA8
 	#define SPI_PORT      PORTB
 	#define SPI_DDR       DDRB
+	#define SPI_SS_BIT    PB2
 	#define SPI_SCK_BIT   PB5
 	#define SPI_MOSI_BIT  PB3
 	#define SPI_MISO_BIT  PB4
@@ -535,11 +540,60 @@ static void spi_init(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(struct
 	 * with the KBus serial RX, and the transmitter of the slave boards
 	 * would be unable to drive the line.
 	 */
-	SPI_DDR |= BV(SPI_MOSI_BIT) | BV(SPI_SCK_BIT);
-	SPI_DDR &= ~BV(SPI_MISO_BIT);
-	/* Enable SPI, IRQ on, Master, CPU_CLOCK/16 */
-	SPCR = BV(SPE) | BV(SPIE) | BV(MSTR) | BV(SPR0);
+	ATOMIC(SPI_DDR |= (BV(SPI_MOSI_BIT) | BV(SPI_SCK_BIT)));
 
+	/*
+	 * If the SPI master mode is activated and the SS pin is in input and tied low,
+	 * the SPI hardware will automatically switch to slave mode!
+	 * For proper communication this pins should therefore be:
+	 * - as output
+	 * - as input but tied high forever!
+	 * This driver set the pin as output.
+	 */
+	#warning SPI SS pin set as output for proper operation, check schematics for possible conflicts.
+	ATOMIC(SPI_DDR |= BV(SPI_SS_BIT));
+
+	ATOMIC(SPI_DDR &= ~BV(SPI_MISO_BIT));
+	/* Enable SPI, IRQ on, Master */
+	SPCR = BV(SPE) | BV(SPIE) | BV(MSTR);
+
+	/* Set data order */
+	#if CONFIG_SPI_DATA_ORDER == SER_LSB_FIRST
+		SPCR |= BV(DORD);
+	#endif
+
+	/* Set SPI clock rate */
+	#if CONFIG_SPI_CLOCK_DIV == 128
+		SPCR |= (BV(SPR1) | BV(SPR0));
+	#elif (CONFIG_SPI_CLOCK_DIV == 64 || CONFIG_SPI_CLOCK_DIV == 32)
+		SPCR |= BV(SPR1);
+	#elif (CONFIG_SPI_CLOCK_DIV == 16 || CONFIG_SPI_CLOCK_DIV == 8)
+		SPCR |= BV(SPR0);
+	#elif (CONFIG_SPI_CLOCK_DIV == 4 || CONFIG_SPI_CLOCK_DIV == 2)
+		// SPR0 & SDPR1 both at 0
+	#else
+		#error Unsupported SPI clock division factor.
+	#endif
+
+	/* Set SPI2X bit (spi double frequency) */
+	#if (CONFIG_SPI_CLOCK_DIV == 128 || CONFIG_SPI_CLOCK_DIV == 64 \
+	  || CONFIG_SPI_CLOCK_DIV == 16 || CONFIG_SPI_CLOCK_DIV == 4)
+		SPSR &= ~BV(SPI2X);
+	#elif (CONFIG_SPI_CLOCK_DIV == 32 || CONFIG_SPI_CLOCK_DIV == 8 || CONFIG_SPI_CLOCK_DIV == 2)
+		SPSR |= BV(SPI2X);
+	#else
+		#error Unsupported SPI clock division factor.
+	#endif
+
+	/* Set clock polarity */
+	#if CONFIG_SPI_CLOCK_POL == 1
+		SPCR |= BV(CPOL);
+	#endif
+
+	/* Set clock phase */
+	#if CONFIG_SPI_CLOCK_PHASE == 1
+		SPCR |= BV(CPHA);
+	#endif
 	SER_SPI_BUS_TXINIT;
 
 	SER_STROBE_INIT;
@@ -552,7 +606,7 @@ static void spi_cleanup(UNUSED_ARG(struct SerialHardware *, _hw))
 	SER_SPI_BUS_TXCLOSE;
 
 	/* Set all pins as inputs */
-	SPI_DDR &= ~(BV(SPI_MISO_BIT) | BV(SPI_MOSI_BIT) | BV(SPI_SCK_BIT));
+	ATOMIC(SPI_DDR &= ~(BV(SPI_MISO_BIT) | BV(SPI_MOSI_BIT) | BV(SPI_SCK_BIT) | BV(SPI_SS_BIT)));
 }
 
 static void spi_starttx(struct SerialHardware *_hw)
