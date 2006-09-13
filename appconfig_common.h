@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/09/13 18:29:22  bernie
+ *#* Add a few missing CONFIG_ definitions.
+ *#*
  *#* Revision 1.2  2006/07/19 12:56:24  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -86,8 +89,8 @@
  *#* Move cfg/config.h to appconfig.h.
  *#*/
 
-#ifndef CONFIG_COMMON_H
-#define CONFIG_COMMON_H
+#ifndef APPCONFIG_COMMON_H
+#define APPCONFIG_COMMON_H
 
 /** Baud-rate for the kdebug console */
 #define CONFIG_KDEBUG_BAUDRATE  19200
@@ -132,6 +135,18 @@
 	/** [bytes] Size of the inbound FIFO buffer for SPI port (AVR only). */
 	#define CONFIG_SPI_RXBUFSIZE	32
 
+	/** SPI data order (AVR only). */
+	#define CONFIG_SPI_DATA_ORDER	SER_MSB_FIRST
+
+	/** SPI clock division factor (AVR only). */
+	#define CONFIG_SPI_CLOCK_DIV	16
+
+	/** SPI clock polarity: 0 = normal low, 1 = normal high (AVR only). */
+	#define CONFIG_SPI_CLOCK_POL	0
+
+	/** SPI clock phase: 0 = sample on first edge, 1 = sample on second clock edge (AVR only). */
+	#define CONFIG_SPI_CLOCK_PHASE	0
+
 	/** Default transmit timeout (ms). Set to -1 to disable timeout support */
 	#define CONFIG_SER_TXTIMEOUT    -1
 
@@ -166,6 +181,9 @@
 /// Debug timer interrupt using a strobe pin.
 #define CONFIG_TIMER_STROBE  0
 
+/// Enable ADS strobe.
+#define CONFIG_ADC_STROBE  0
+
 /// Enable watchdog timer.
 #define CONFIG_WATCHDOG  1
 
@@ -176,13 +194,13 @@
 #define CONFIG_BITMAP_FMT  BITMAP_FMT_PLANAR_V_LSB
 
 /// Enable line clipping algorithm.
-#define CONFIG_GFX_CLIPPING 1
+#define CONFIG_GFX_CLIPPING  1
 
 /// Enable text rendering in bitmaps.
-#define CONFIG_GFX_TEXT 1
+#define CONFIG_GFX_TEXT  1
 
 /// Enable virtual coordinate system.
-#define CONFIG_GFX_VCOORDS 1
+#define CONFIG_GFX_VCOORDS  1
 
 /// Keyboard polling method
 #define CONFIG_KBD_POLL  KBD_POLL_SOFTINT
@@ -191,7 +209,10 @@
 #define CONFIG_KBD_OBSERVER  0
 
 /// Enable key beeps
-#define CONFIG_KBD_BEEP 1
+#define CONFIG_KBD_BEEP  1
+
+/// Enable long pression handler for keys
+#define CONFIG_KBD_LONGPRESS  1
 
 /**
  * \name Type for the chart dataset
@@ -207,4 +228,4 @@
 /// Enable smooth scrolling in menus
 #define CONFIG_MENU_SMOOTH  1
 
-#endif /* CONFIG_COMMON_H */
+#endif /* APPCONFIG_COMMON_H */

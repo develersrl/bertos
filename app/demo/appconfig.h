@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/09/13 18:29:22  bernie
+ *#* Add a few missing CONFIG_ definitions.
+ *#*
  *#* Revision 1.3  2006/07/19 12:56:24  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -92,8 +95,8 @@
  *#* Move cfg/config.h to appconfig.h.
  *#*/
 
-#ifndef CONFIG_COMMON_H
-#define CONFIG_COMMON_H
+#ifndef APPCONFIG_H
+#define APPCONFIG_H
 
 /** Baud-rate for the kdebug console */
 #define CONFIG_KDEBUG_BAUDRATE  19200
@@ -199,6 +202,9 @@
 /// Enable key beeps.
 #define CONFIG_KBD_BEEP  1
 
+/// Enable long pression handler for keys
+#define CONFIG_KBD_LONGPRESS  0
+
 /**
  * \name Type for the chart dataset
  * \{
@@ -219,4 +225,4 @@
 /// Accept input implicitly after this amount of time.
 #define CONFIG_LEVELEDIT_TIMEOUT 3000 /* ms */
 
-#endif /* CONFIG_COMMON_H */
+#endif /* APPCONFIG_H */
