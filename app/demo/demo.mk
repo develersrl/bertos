@@ -8,6 +8,9 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
+# Revision 1.7  2006/09/19 17:48:45  bernie
+# Remove artwork.c
+#
 # Revision 1.6  2006/06/02 12:27:36  bernie
 # Tweak apparence; enable assertions.
 #
@@ -34,8 +37,8 @@ demo_DEBUG = 1
 # Our target application
 TRG += demo
 
+# FIXME: we want to use g++ for C source too
 CC = g++
-CXX = g++
 
 demo_CXXSRC = \
 	emul/emul.cpp \
@@ -55,7 +58,6 @@ demo_CSRC = \
 	fonts/helvB10.c \
 	fonts/luBS14.c \
 	fonts/ncenB18.c \
-	icons/artwork.c \
 	icons/logo.c \
 	drv/kbd.c \
 	drv/timer.c \
