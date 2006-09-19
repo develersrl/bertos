@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/09/19 17:49:04  bernie
+ *#* Reindent.
+ *#*
  *#* Revision 1.5  2006/05/28 12:17:56  bernie
  *#* Drop almost all the Qt3 cruft.
  *#*
@@ -58,16 +61,15 @@ EmulWin::EmulWin(Emulator *e)
 	setAttribute(Qt::WA_DeleteOnClose);
 
 	// Create the menu bar
-		QMenu *file_menu = menuBar()->addMenu(tr("&File"));
-		file_menu->addAction(tr("&Quit"),
-				e->emulApp, SLOT(closeAllWindows()), CTRL+Key_Q);
+	QMenu *file_menu = menuBar()->addMenu(tr("&File"));
+	file_menu->addAction(tr("&Quit"),
+		e->emulApp, SLOT(closeAllWindows()), CTRL+Key_Q);
 
-		menuBar()->addSeparator();
+	menuBar()->addSeparator();
 
-		QMenu *help_menu = menuBar()->addMenu(tr("&Help"));
-		help_menu->addAction(tr("&About"),
-				this, SLOT(about()), Key_F1);
-
+	QMenu *help_menu = menuBar()->addMenu(tr("&Help"));
+	help_menu->addAction(tr("&About"),
+		this, SLOT(about()), Key_F1);
 
 	// Make a central widget to contain the other widgets
 	QWidget *central = new QWidget(this);
