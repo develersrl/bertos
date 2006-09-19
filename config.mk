@@ -10,6 +10,9 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
+# Revision 1.8  2006/09/19 17:50:56  bernie
+# Make native build the default.
+#
 # Revision 1.7  2006/07/19 12:56:24  bernie
 # Convert to new Doxygen style.
 #
@@ -56,8 +59,10 @@ DEBUGCFLAGS = -ggdb
 #
 # define some variables based on the AVR base path in $(AVR)
 #
-CROSS   = avr-
+CROSS   =
+#CROSS   = avr-
 CC      = $(CROSS)gcc
+CXX     = $(CROSS)g++
 AS      = $(CC) -x assembler-with-cpp
 LD      = $(CC)
 OBJCOPY = $(CROSS)objcopy
@@ -96,7 +101,8 @@ DEP_FLAGS = -MMD -MP
 LIST_FLAGS = -Wa,-anhlmsd=$(@:.o=.lst)
 
 # Linker flags for generating map files
-MAP_FLAGS = -Wl,-Map=$(@:%.elf=%.map),--cref
+#bernie: bogus binutils from Fedora 6 can't cope with this
+#MAP_FLAGS = -Wl,-Map=$(@:%.elf=%.map),--cref
 
 # Compiler warning flags for both C and C++
 WARNFLAGS = \
@@ -110,12 +116,15 @@ WARNFLAGS = \
 C_WARNFLAGS = \
 	-Wmissing-prototypes -Wstrict-prototypes
 
+# Default C preprocessor flags (for C, C++ and cpp+as)
+CPPFLAGS = $(INCDIR)
+
 # Default C compiler flags
-CFLAGS = $(INCDIR) $(OPTCFLAGS) $(DEBUGCFLAGS) $(WARNFLAGS) $(C_WARNFLAGS) \
+CFLAGS = $(OPTCFLAGS) $(DEBUGCFLAGS) $(WARNFLAGS) $(C_WARNFLAGS) \
 	$(DEP_FLAGS) $(LIST_FLAGS) -std=gnu99
 
 # Default C++ compiler flags
-CXXFLAGS = $(INCDIR) $(OPTCFLAGS) $(DEBUGCFLAGS) $(WARNFLAGS) \
+CXXFLAGS = $(OPTCFLAGS) $(DEBUGCFLAGS) $(WARNFLAGS) \
 	$(DEP_FLAGS) $(LIST_FLAGS)
 
 # Default compiler assembly flags
@@ -125,7 +134,7 @@ CPPAFLAGS = $(DEBUGCFLAGS) -MMD
 ASFLAGS	= $(DEBUGCFLAGS)
 
 # Default linker flags
-#LDFLAGS = $(MAP_FLAGS)
+LDFLAGS = $(MAP_FLAGS)
 
 #bernie: does not complain for missing symbols!
 #LDFLAGS = $(MAP_FLAGS) -Wl,--gc-sections
