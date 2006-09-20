@@ -15,6 +15,9 @@
 
 /*
  * $Log$
+ * Revision 1.4  2006/09/20 14:02:49  marco
+ * C-style comment.
+ *
  * Revision 1.3  2006/02/24 01:35:40  bernie
  * Update for new emulator.
  *
@@ -36,7 +39,7 @@
  */
 
 /* I know it's ugly... */
-#.intel_syntax
+/* .intel_syntax */
 
 /* void AsmSwitchContext(void **new_sp, void **save_sp) */
 /*                       %rdi           %rsi            */
