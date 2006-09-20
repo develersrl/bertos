@@ -10,6 +10,9 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
+# Revision 1.9  2006/09/20 14:28:42  marco
+# Add MOC. Changed OPTCFLAGS.
+#
 # Revision 1.8  2006/09/19 17:50:56  bernie
 # Make native build the default.
 #
@@ -38,6 +41,8 @@
 #
 # AVR ISP dongle that blows up easily
 DPROG = -V -c stk500 -P /dev/ttyS0
+#DPROG = -V -c jtag2slow
+#-P /dev/ttyUSB0
 
 # STK200 parallel cable
 #DPROG = -c stk200 -E noreset
@@ -48,7 +53,8 @@ DPROG = -V -c stk500 -P /dev/ttyS0
 # PonyProg serial programmer
 #DPROG = -c dasa2
 
-OPTCFLAGS = -ffunction-sections -fdata-sections -funsafe-loop-optimizations
+#OPTCFLAGS = -ffunction-sections -fdata-sections -funsafe-loop-optimizations
+OPTCFLAGS = -funsafe-loop-optimizations
 
 # For AVRStudio
 #DEBUGCFLAGS = -gdwarf-2
@@ -71,6 +77,7 @@ RM      = rm -f
 RM_R    = rm -rf
 RN      = mv
 MKDIR_P = mkdir -p
+MOC     = moc
 
 # For conversion from ELF to COFF for use in debugging / simulating in AVR Studio or VMLAB.
 COFFCONVERT=$(OBJCOPY) \
