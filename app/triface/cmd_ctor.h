@@ -29,7 +29,7 @@ const struct CmdTemplate cmd_ ## NAME ## _template =			\
 #define MAKE_CMD(NAME, ARGS, RES, BODY)					\
 static ResultCode cmd_ ## NAME (parms *args)				\
 {									\
-	return BODY;							\
+	return (ResultCode)BODY;			      		\
 }									\
 MAKE_TEMPLATE(NAME, ARGS, RES)
 
