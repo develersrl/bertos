@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2006/09/20 13:58:42  marco
+ *#* Used z modifier instead l.
+ *#*
  *#* Revision 1.9  2006/07/19 12:56:27  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -149,7 +152,7 @@ void monitor_report(void)
 		 p = MONITOR_NODE_TO_PROCESS(p->monitor.link.succ))
 	{
 		size_t free = monitor_checkStack(p->monitor.stack_base, p->monitor.stack_size);
-		kprintf("%-24s%8p%8p%8lx%8lx\n",
+		kprintf("%-24s%8p%8p%8zx%8zx\n",
 			p->monitor.name, p, p->monitor.stack_base, p->monitor.stack_size, free);
 	}
 }
