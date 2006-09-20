@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/09/20 20:02:43  marco
+ *#* Replaced ISLISTEMPTY with LIST_EMPTY
+ *#*
  *#* Revision 1.3  2006/07/19 12:56:25  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -49,6 +52,7 @@
 #include "lcd_hd44.h"
 #include <drv/timer.h> // timer_delay()
 #include <mware/formatwr.h> // _formatted_write()
+#include <mware/list.h> // LIST_EMPTY()
 #include <cfg/macros.h> // BV()
 #include <cfg/debug.h>
 
@@ -316,7 +320,7 @@ Layer *lcd_newLayer(char pri)
 
 	LOCK_LCD;
 
-	if (ISLISTEMPTY(&lcd_FreeLayers))
+	if (LIST_EMPTY(&lcd_FreeLayers))
 	{
 		UNLOCK_LCD;
 		//ASSERT(false);
