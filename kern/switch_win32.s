@@ -13,6 +13,8 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
+!!!!!! THIS FILE HAS NOT BEEN REVISED FOR THE NEW SCHEDULER API !!!!!!
+
 __declspec(naked) void AsmSwitchContext(void * new_sp, void ** save_sp)
 {
 	__asm
