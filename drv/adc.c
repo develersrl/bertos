@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2006/09/20 17:32:46  marco
+ *#* Use MOD_* macros instead of DB.
+ *#*
  *#* Revision 1.3  2006/09/13 18:30:07  bernie
  *#* Add a FIXME.
  *#*
@@ -33,11 +36,10 @@
 // FIXME: move CPU specific part to adc_CPU.c
 #include <hw_adc.h>
 
-#include <cfg/debug.h>
-#include <cfg/macros.h>
+#include <cfg/debug.h>     // ASSERT()
+#include <cfg/macros.h>    // MIN()
 #include <cfg/compiler.h>
-
-DB(bool adc_initialized = false;)
+#include <cfg/module.h>
 
 /**
  * Read the ADC channel \a ch.
@@ -52,6 +54,8 @@ adcread_t adc_read(uint16_t ch)
 	return(adc_hw_read());
 }
 
+MOD_DEFINE(adc)
+
 /**
  * Initialize the ADC hardware.
  */
@@ -61,6 +65,7 @@ void adc_init(void)
 	IRQ_SAVE_DISABLE(flags);
 
 	ADC_HW_INIT;
-	DB(adc_initialized = true;)
 	IRQ_RESTORE(flags);
+
+	MOD_INIT(adc);
 }
