@@ -53,6 +53,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.19  2006/09/20 13:58:17  marco
+ *#* Added z modifier in string format.
+ *#*
  *#* Revision 1.18  2006/07/19 12:56:27  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -498,11 +501,12 @@ NEXT_FLAG:
 		flags.l_L_modifier = false;
 		flags.h_modifier = false;
 
-		/* Optional 'l','L' r 'h' modifier? */
+		/* Optional 'l','L','z' or 'h' modifier? */
 		switch (PGM_READ_CHAR(format))
 		{
 			case 'l':
 			case 'L':
+			case 'z':
 				flags.l_L_modifier = true;
 				format++;
 				break;
@@ -820,7 +824,7 @@ FLOATING_CONVERSION:
 #else /* PRINTF_REDUCED starts here */
 
 #if CONFIG_PRINTF > PRINTF_NOMODIFIERS
-	char l_modifier, h_modifier;
+	bool l_modifier, h_modifier;
 	unsigned long u_val, div_val;
 #else
 	unsigned int u_val, div_val;
@@ -846,16 +850,16 @@ FLOATING_CONVERSION:
 		/*=================================*/
 		/* Optional 'l' or 'h' modifiers ? */
 		/*=================================*/
-		l_modifier = h_modifier = 0;
+		l_modifier = h_modifier = false;
 		switch (PGM_READ_CHAR(format))
 		{
 			case 'l':
-				l_modifier = 1;
+				l_modifier = true;
 				format++;
 				break;
 
 			case 'h':
-				h_modifier = 1;
+				h_modifier = true;
 				format++;
 				break;
 		}
