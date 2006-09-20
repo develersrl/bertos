@@ -10,6 +10,9 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
+# Revision 1.7  2006/09/20 14:28:08  marco
+# Workaround about moc generation.
+#
 # Revision 1.6  2006/09/13 18:38:59  bernie
 # Sort CPP options to let apps override include paths.
 #
@@ -232,6 +235,15 @@ endef
 # Generate build rules for all targets
 $(foreach t,$(TRG),$(eval $(call build_target,$(t))))
 
+# Generate Qt's moc files from headers
+# NOTE: moc totally sucks and can generate empty files for some error conditions,
+#       leading to puzzling linker errors.  Kill 'em and abort build.
+%_moc.cpp: %.h
+	$(MOC) -o $@ $<
+	if [ -s $< ]; then \
+		rm $@; \
+		exit 1; \
+	fi
 
 %.hex: %.elf
 	$(OBJCOPY) -O ihex $< $@
