@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/09/20 13:54:40  marco
+ *#* Added new SPI definitions.
+ *#*
  *#* Revision 1.4  2006/07/19 12:56:25  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -109,6 +112,18 @@
 
 	/** [bytes] Size of the inbound FIFO buffer for SPI port (AVR only). */
 	#define CONFIG_SPI_RXBUFSIZE	32
+
+	/** SPI data order (AVR only). */
+	#define CONFIG_SPI_DATA_ORDER	SER_MSB_FIRST
+
+	/** SPI clock division factor (AVR only). */
+	#define CONFIG_SPI_CLOCK_DIV	16
+
+	/** SPI clock polarity: 0 = normal low, 1 = normal high (AVR only). */
+	#define CONFIG_SPI_CLOCK_POL	0
+
+	/** SPI clock phase: 0 = sample on first edge, 1 = sample on second clock edge (AVR only). */
+	#define CONFIG_SPI_CLOCK_PHASE	0
 
 	/** Default transmit timeout (ms). Set to -1 to disable timeout support */
 	#define CONFIG_SER_TXTIMEOUT    -1
