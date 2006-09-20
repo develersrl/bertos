@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/09/20 19:55:01  marco
+ *#* Added CONFIG_LCD_4BIT.
+ *#*
  *#* Revision 1.2  2006/07/19 12:56:25  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -39,6 +42,7 @@
 #ifndef DRV_LCD_HD44_H
 #define DRV_LCD_HD44_H
 
+#include <appconfig.h>
 #include <cfg/compiler.h> /* For stdint types */
 
 /**
@@ -54,8 +58,13 @@
  * \{
  */
 #define LCD_CMD_DISPLAY_INI      0x30
-//#define LCD_CMD_SETFUNC        0x38   /**< 8 bits, 2 lines, 5x7 dots */
-#define LCD_CMD_SETFUNC          0x28   /**< 4 bits, 2 lines, 5x7 dots */
+
+#if CONFIG_LCD_4BIT
+	#define LCD_CMD_SETFUNC  0x28   /**< 4 bits, 2 lines, 5x7 dots */
+#else
+	#define LCD_CMD_SETFUNC  0x38   /**< 8 bits, 2 lines, 5x7 dots */
+#endif
+
 #define LCD_CMD_DISPLAY_ON       0x0F   /**< Switch on display */
 #define LCD_CMD_DISPLAY_OFF      0x08   /**< Switch off display */
 #define LCD_CMD_CLEAR            0x01   /**< Clear display */

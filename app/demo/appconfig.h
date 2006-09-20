@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2006/09/20 19:55:01  marco
+ *#* Added CONFIG_LCD_4BIT.
+ *#*
  *#* Revision 1.4  2006/09/13 18:29:22  bernie
  *#* Add a few missing CONFIG_ definitions.
  *#*
@@ -224,5 +227,8 @@
 
 /// Accept input implicitly after this amount of time.
 #define CONFIG_LEVELEDIT_TIMEOUT 3000 /* ms */
+
+/// LCD bus size. If 0 use 8bit bus.
+#define CONFIG_LCD_4BIT 0
 
 #endif /* APPCONFIG_H */

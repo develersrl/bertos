@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/09/20 19:55:01  marco
+ *#* Added CONFIG_LCD_4BIT.
+ *#*
  *#* Revision 1.2  2006/07/19 12:56:25  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -37,17 +40,9 @@
  *#*/
 
 #include "lcd_hd44.h"
-#include "lcd_bus_pz.h"
-#include <arch_config.h>
+#include "hw_lcd.h"
+#include <cfg/arch_config.h>
 #include <drv/timer.h>
-
-#if defined(LCD_READ_H) && defined(LCD_READ_L) && defined(LCD_WRITE_H) && defined(LCD_WRITE_L)
-	#define CONFIG_LCD_4BIT 1
-#elif defined(LCD_READ) && defined(LCD_WRITE)
-	#define CONFIG_LCD_4BIT 0
-#else
-	#error Incomplete or missing LCD_READ/LCD_WRITE macros
-#endif
 
 /** Flag di stato del display */
 #define LCDF_BUSY  BV(7)
@@ -184,7 +179,7 @@ INLINE uint8_t lcd_dataRead(void)
 	/* Read data */
 	LCD_SET_E;
 	LCD_DELAY_READ;
-	data |= LCD_READ;
+	data = LCD_READ;
 	LCD_CLR_E;
 	LCD_DELAY_READ;
 
@@ -391,8 +386,9 @@ void lcd_hw_init(void)
 	lcd_regWrite(LCD_CMD_CLEAR);
 	timer_delay(2);
 
-	//lcd_regWrite(LCD_CMD_RESET_DDRAM); 4 bit mode doesn't allow char reprogramming
-
+#if !CONFIG_LCD_4BIT
+	lcd_regWrite(LCD_CMD_RESET_DDRAM); // 4 bit mode doesn't allow char reprogramming
+#endif
 	lcd_regWrite(LCD_CMD_DISPLAYMODE);
 	timer_delay(2);
 }
