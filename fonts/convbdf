@@ -24,6 +24,7 @@ $IMAGE_VERTICAL = 1;
 $file = $ARGV[0];
 
 $font = $file;
+$font =~ s#.*/##; # remove path name
 $font =~ s/\.bdf//;
 $font =~ tr/a-zA-Z0-9_/_/cs;
 
