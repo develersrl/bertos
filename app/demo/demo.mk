@@ -8,6 +8,9 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
+# Revision 1.8  2006/09/20 14:27:22  marco
+# Added fonts, switch.S; fixed moc
+#
 # Revision 1.7  2006/09/19 17:48:45  bernie
 # Remove artwork.c
 #
@@ -30,6 +33,7 @@
 # Add demo application.
 #
 
+include fonts/fonts.mk
 
 # Set to 1 for debug builds
 demo_DEBUG = 1
@@ -74,14 +78,20 @@ demo_CSRC = \
 	kern/sem.c \
 	kern/signal.c \
 	kern/monitor.c \
+	kern/proc_test.c \
 	verstag.c
 
-demo_ASRC = \
-	kern/switch_x86_64.s
-
+demo_CPPASRC = \
+	kern/switch.S
 
 $(OBJDIR)/demo/emul/emulwin.o: emul/emulwin_moc.cpp 
 $(OBJDIR)/demo/drv/lcd_gfx_qt.o: drv/lcd_gfx_qt_moc.cpp
+$(OBJDIR)/demo/drv/timer.o: drv/timer_qt_moc.cpp
+$(OBJDIR)/demo/emul/emulkbd.o: emul/emulkbd_moc.cpp
+
+#FIXME: isn't there a way to avoid repeating the pattern rule?
+drv/timer_qt_moc.cpp: drv/timer_qt.c
+	$(MOC) -o $@ $<
 
 EMUL_CFLAGS = $(shell pkg-config QtGui --cflags) -DQT_CLEAN_NAMESPACE -DQT3_SUPPORT
 EMUL_LDFLAGS = $(shell pkg-config QtGui --libs)
