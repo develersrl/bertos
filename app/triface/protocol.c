@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2006/09/20 13:54:04  marco
+ *#* Usage examples of MAKE_CMD.
+ *#*
  *#* Revision 1.5  2006/06/14 01:03:01  marco
  *#* Add response code. Add command ping.
  *#*
@@ -46,7 +49,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <cmd_hunk.h>
+//#include <cmd_hunk.h>
 
 #include "cmd_ctor.h"  // MAKE_CMD, REGISTER_CMD
 
@@ -218,14 +221,15 @@ void protocol_run(Serial *ser)
  *
  */
 
-/* Version.  */
-MAKE_CMD(ver, "", "s",
-({
-	args[1].s = VERS_TAG;
-	0;
-}))
+/* Version. Example of declaring function and passing it to MAKE_CMD.  */
+static int ver_fn(const char **str)
+{
+	*str = VERS_TAG;
+	return 0;
+}
+MAKE_CMD(ver, "", "s", ver_fn(&args[1].s))
 
-/* Sleep.  */
+/* Sleep. Example of declaring function body directly in macro call.  */
 MAKE_CMD(sleep, "d", "",
 ({
 	timer_delay((mtime_t)args[1].l);
