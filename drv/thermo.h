@@ -26,6 +26,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/09/20 20:12:41  marco
+ *#* Names convention, MOD_* macros.
+ *#*
  *#* Revision 1.2  2006/07/19 12:56:26  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -88,7 +91,7 @@ thermostatus_t thermo_status(ThermoDev dev);
  * \param dev Device
  * \return Current temperature (Celsius degrees * 10)
  */
-deg_t thermo_read_temperature(ThermoDev dev);
+deg_t thermo_readTemperature(ThermoDev dev);
 
 
 #endif /* DRV_THERMO_H */

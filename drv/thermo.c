@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2006/09/20 20:12:41  marco
+ *#* Names convention, MOD_* macros.
+ *#*
  *#* Revision 1.2  2006/07/19 12:56:26  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -80,7 +83,7 @@ static void thermo_do(ThermoDev index)
 	if (++dev->cur_hifi_sample == THERMO_HIFI_NUM_SAMPLES)
 		dev->cur_hifi_sample = 0;
 
-	cur_temp = thermo_read_temperature(index);
+	cur_temp = thermo_readTemperature(index);
 
 	if (cur_temp == NTC_SHORT_CIRCUIT || cur_temp == NTC_OPEN_CIRCUIT)
 	{
@@ -212,10 +215,12 @@ void thermo_clearErrors(ThermoDev dev)
 /**
  * Read the temperature of the thermo-device \a dev using mobile mean.
  */
-deg_t thermo_read_temperature(ThermoDev dev)
+deg_t thermo_readTemperature(ThermoDev dev)
 {
 	int i;
 	long accum = 0;
+
+	MOD_CHECK(thermo);
 
 	for (i = 0; i < THERMO_HIFI_NUM_SAMPLES; i++)
 		accum += devs[dev].hifi_samples[i];
@@ -223,6 +228,7 @@ deg_t thermo_read_temperature(ThermoDev dev)
 	return (deg_t)(accum / THERMO_HIFI_NUM_SAMPLES);
 }
 
+MOD_DEFINE(thermo)
 
 /**
  * Init thermo-control and associated hw.
@@ -234,6 +240,8 @@ void thermo_init(void)
 	/* Set all status to off */
 	for (int i = 0; i < THERMO_CNT; i++)
 		devs[i].status = THERMO_OFF;
+
+	MOD_INIT(thermo);
 
 	timer_setDelay(&thermo_timer, ms_to_ticks(THERMO_INTERVAL_MS));
 	timer_set_event_softint(&thermo_timer, (Hook)thermo_softint, 0);
