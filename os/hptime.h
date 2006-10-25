@@ -22,9 +22,9 @@ extern "C" {
 	/** our type for "high precision absolute time" */
 	typedef __int64 hptime_t;
 
-	#define HPTIME_TICKS_PER_SECOND		((hptime_t)10000000I64)
-	#define HPTIME_TICKS_PER_MILLISEC	((hptime_t)10000I64)
-	#define HPTIME_TICKS_PER_MICRO		((hptime_t)10I64)
+	#define HPTIME_TICKS_PER_SECOND		(10000000I64)
+	#define HPTIME_TICKS_PER_MILLISEC	(10000I64)
+	#define HPTIME_TICKS_PER_MICRO		(10I64)
 
 #elif defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
 
@@ -33,9 +33,9 @@ extern "C" {
 	/** Type for "high precision absolute time". */
 	typedef int64_t hptime_t;
 
-	#define HPTIME_TICKS_PER_SECOND		((hptime_t)1000000LL)
-	#define HPTIME_TICKS_PER_MILLISEC	((hptime_t)1000LL)
-	#define HPTIME_TICKS_PER_MICRO		((hptime_t)1LL)
+	#define HPTIME_TICKS_PER_SECOND		(1000000LL)
+	#define HPTIME_TICKS_PER_MILLISEC	(1000LL)
+	#define HPTIME_TICKS_PER_MICRO		(1LL)
 
 #else /* !__unix__ */
 	#error OS dependent support code missing for this OS
