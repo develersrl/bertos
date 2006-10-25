@@ -10,35 +10,6 @@
  * \version $Id$
  * \author Bernardo Innocenti <bernie@develer.com>
  */
-
-/*#*
- *#* $Log$
- *#* Revision 1.8  2006/07/19 12:56:28  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.7  2006/07/19 12:53:58  bernie
- *#* Documentation fixes.
- *#*
- *#* Revision 1.6  2006/02/20 01:46:46  bernie
- *#* Port to MacOSX.
- *#*
- *#* Revision 1.5  2005/11/04 16:20:02  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.4  2004/08/25 14:12:09  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.3  2004/08/10 05:45:04  bernie
- *#* Fix spacing in header.
- *#*
- *#* Revision 1.2  2004/06/03 11:27:09  bernie
- *#* Add dual-license information.
- *#*
- *#* Revision 1.1  2004/06/03 09:01:06  bernie
- *#* Import into DevLib.
- *#*
- *#*/
-
 #include "hptime.h"
 
 #if defined(_WIN32)
