@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.32  2006/11/17 16:01:12  batt
+ *#* Serial status MUST be volatile.
+ *#*
  *#* Revision 1.31  2006/09/13 18:22:48  bernie
  *#* Typo.
  *#*
@@ -209,7 +212,7 @@
  */
 enum
 {
-#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128
+#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281
 	SER_UART0,
 	SER_UART1,
 	SER_SPI,
@@ -266,7 +269,7 @@ typedef struct Serial
 #endif
 
 	/** Holds the flags defined above.  Will be 0 when no errors have occurred. */
-	serstatus_t status;
+	volatile serstatus_t status;
 
 	/** Low-level interface to hardware. */
 	struct SerialHardware* hw;
