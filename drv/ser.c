@@ -28,6 +28,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.33  2006/11/17 18:15:55  batt
+ *#* Avoid race conditions.
+ *#*
  *#* Revision 1.32  2006/11/17 17:03:58  batt
  *#* Implement ser_setstatus and ser_getstatus as functions to avoid race conditions.
  *#*
@@ -196,7 +199,7 @@ int ser_putchar(int c, struct Serial *port)
 #if CONFIG_SER_TXTIMEOUT != -1
 			if (timer_clock() - start_time >= port->txtimeout)
 			{
-				port->status |= SERRF_TXTIMEOUT;
+				ATOMIC(port->status |= SERRF_TXTIMEOUT);
 				return EOF;
 			}
 #endif /* CONFIG_SER_TXTIMEOUT */
@@ -240,19 +243,19 @@ int ser_getchar(struct Serial *port)
 #if CONFIG_SER_RXTIMEOUT != -1
 			if (timer_clock() - start_time >= port->rxtimeout)
 			{
-				port->status |= SERRF_RXTIMEOUT;
+				ATOMIC(port->status |= SERRF_RXTIMEOUT);
 				return EOF;
 			}
 #endif /* CONFIG_SER_RXTIMEOUT */
 		}
-		while (fifo_isempty_locked(&port->rxfifo) && (port->status & SERRF_RX) == 0);
+		while (fifo_isempty_locked(&port->rxfifo) && (ser_getstatus(port) & SERRF_RX) == 0);
 	}
 
 	/*
 	 * Get a byte from the FIFO (avoiding sign-extension),
 	 * re-enable RTS, then return result.
 	 */
-	if (port->status & SERRF_RX)
+	if (ser_getstatus(port) & SERRF_RX)
 		return EOF;
 	return (int)(unsigned char)fifo_pop_locked(&port->rxfifo);
 }
