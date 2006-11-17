@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.33  2006/11/17 17:03:58  batt
+ *#* Implement ser_setstatus and ser_getstatus as functions to avoid race conditions.
+ *#*
  *#* Revision 1.32  2006/11/17 16:01:12  batt
  *#* Serial status MUST be volatile.
  *#*
@@ -300,13 +303,7 @@ extern void ser_drain(struct Serial *port);
 extern struct Serial *ser_open(unsigned int unit);
 extern void ser_close(struct Serial *port);
 
-/**
- * \name Additional functions implemented as macros
- *
- * \{
- */
-#define ser_getstatus(h)    ((h)->status)
-#define ser_setstatus(h, x) ((h)->status = (x))
-/* \} */
+extern serstatus_t ser_getstatus(struct Serial *port);
+extern void ser_setstatus(struct Serial *port, serstatus_t status);
 
 #endif /* DRV_SER_H */

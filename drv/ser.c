@@ -28,6 +28,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.32  2006/11/17 17:03:58  batt
+ *#* Implement ser_setstatus and ser_getstatus as functions to avoid race conditions.
+ *#*
  *#* Revision 1.31  2006/07/21 10:58:00  batt
  *#* Use timer_clock() instead of obsolete timer_ticks().
  *#*
@@ -452,6 +455,26 @@ void ser_purge(struct Serial *port)
 {
 	fifo_flush_locked(&port->rxfifo);
 	fifo_flush_locked(&port->txfifo);
+}
+
+/**
+ * Get status of port \c port.
+ */
+serstatus_t ser_getstatus(struct Serial *port)
+{
+	serstatus_t status;
+	ATOMIC(status = port->status);
+
+	return status;
+}
+
+
+/**
+ * Set new \c port status.
+ */
+void ser_setstatus(struct Serial *port, serstatus_t status)
+{
+	ATOMIC(port->status = status);
 }
 
 
