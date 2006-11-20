@@ -28,6 +28,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.34  2006/11/20 15:07:40  batt
+ *#* Revert unneeded locked functions.
+ *#*
  *#* Revision 1.33  2006/11/17 18:15:55  batt
  *#* Avoid race conditions.
  *#*
@@ -458,26 +461,6 @@ void ser_purge(struct Serial *port)
 {
 	fifo_flush_locked(&port->rxfifo);
 	fifo_flush_locked(&port->txfifo);
-}
-
-/**
- * Get status of port \c port.
- */
-serstatus_t ser_getstatus(struct Serial *port)
-{
-	serstatus_t status;
-	ATOMIC(status = port->status);
-
-	return status;
-}
-
-
-/**
- * Set new \c port status.
- */
-void ser_setstatus(struct Serial *port, serstatus_t status)
-{
-	ATOMIC(port->status = status);
 }
 
 
