@@ -38,6 +38,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.34  2006/11/23 13:19:02  batt
+ *#* Add support for ATmega1281.
+ *#*
  *#* Revision 1.33  2006/09/13 18:21:24  bernie
  *#* Add configurable SPI pin mapping.
  *#*
@@ -135,7 +138,9 @@
 
 #include "ser.h"
 #include "ser_p.h"
-#include "hw_ser.h"  /* Required for bus macros overrides */
+
+#include <hw_ser.h>  /* Required for bus macros overrides */
+#include <hw_cpu.h>  /* CLOCK_FREQ */
 #include <appconfig.h>
 
 #include <cfg/debug.h>
@@ -160,6 +165,28 @@
 	#define IS_CTS_ON   true
 	#define EIMSKF_CTS  0 /**< Dummy value, must be overridden */
 	/*\}*/
+#endif
+
+#if CPU_AVR_ATMEGA1281
+	#define BIT_RXCIE0 RXCIE0
+	#define BIT_RXEN0  RXEN0
+	#define BIT_TXEN0  TXEN0
+	#define BIT_UDRIE0 UDRIE0
+
+	#define BIT_RXCIE1 RXCIE1
+	#define BIT_RXEN1  RXEN1
+	#define BIT_TXEN1  TXEN1
+	#define BIT_UDRIE1 UDRIE1
+#else
+	#define BIT_RXCIE0 RXCIE
+	#define BIT_RXEN0  RXEN
+	#define BIT_TXEN0  TXEN
+	#define BIT_UDRIE0 UDRIE
+
+	#define BIT_RXCIE1 RXCIE
+	#define BIT_RXEN1  RXEN
+	#define BIT_TXEN1  TXEN
+	#define BIT_UDRIE1 UDRIE
 #endif
 
 
@@ -191,7 +218,7 @@
 	 * - Enable only the RX complete interrupt
 	 */
 	#define SER_UART0_BUS_TXINIT do { \
-		UCSR0B = BV(RXCIE) | BV(RXEN) | BV(TXEN); \
+		UCSR0B = BV(BIT_RXCIE0) | BV(BIT_RXEN0) | BV(BIT_TXEN0); \
 	} while (0)
 #endif
 
@@ -203,7 +230,7 @@
 	 * - Enable both the RX complete and UDR empty interrupts
 	 */
 	#define SER_UART0_BUS_TXBEGIN do { \
-		UCSR0B = BV(RXCIE) | BV(UDRIE) | BV(RXEN) | BV(TXEN); \
+		UCSR0B = BV(BIT_RXCIE0) | BV(BIT_UDRIE0) | BV(BIT_RXEN0) | BV(BIT_TXEN0); \
 	} while (0)
 #endif
 
@@ -225,7 +252,7 @@
 	 * - Disable the UDR empty interrupt
 	 */
 	#define SER_UART0_BUS_TXEND do { \
-		UCSR0B = BV(RXCIE) | BV(RXEN) | BV(TXEN); \
+		UCSR0B = BV(BIT_RXCIE0) | BV(BIT_RXEN0) | BV(BIT_TXEN0); \
 	} while (0)
 #endif
 
@@ -245,13 +272,13 @@
 #ifndef SER_UART1_BUS_TXINIT
 	/** \sa SER_UART0_BUS_TXINIT */
 	#define SER_UART1_BUS_TXINIT do { \
-		UCSR1B = BV(RXCIE) | BV(RXEN) | BV(TXEN); \
+		UCSR1B = BV(BIT_RXCIE1) | BV(BIT_RXEN1) | BV(BIT_TXEN1); \
 	} while (0)
 #endif
 #ifndef SER_UART1_BUS_TXBEGIN
 	/** \sa SER_UART0_BUS_TXBEGIN */
 	#define SER_UART1_BUS_TXBEGIN do { \
-		UCSR1B = BV(RXCIE) | BV(UDRIE) | BV(RXEN) | BV(TXEN); \
+		UCSR1B = BV(BIT_RXCIE1) | BV(BIT_UDRIE1) | BV(BIT_RXEN1) | BV(BIT_TXEN1); \
 	} while (0)
 #endif
 #ifndef SER_UART1_BUS_TXCHAR
@@ -263,7 +290,7 @@
 #ifndef SER_UART1_BUS_TXEND
 	/** \sa SER_UART0_BUS_TXEND */
 	#define SER_UART1_BUS_TXEND do { \
-		UCSR1B = BV(RXCIE) | BV(RXEN) | BV(TXEN); \
+		UCSR1B = BV(BIT_RXCIE1) | BV(BIT_RXEN1) | BV(BIT_TXEN1); \
 	} while (0)
 #endif
 #ifndef SER_UART1_BUS_TXOFF
@@ -306,7 +333,7 @@
 
 
 /* SPI port and pin configuration */
-#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA103
+#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA103 || CPU_AVR_ATMEGA1281
 	#define SPI_PORT      PORTB
 	#define SPI_DDR       DDRB
 	#define SPI_SS_BIT    PB0
@@ -325,7 +352,7 @@
 #endif
 
 /* USART register definitions */
-#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128
+#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281
 	#define AVR_HAS_UART1 1
 #elif CPU_AVR_ATMEGA8
 	#define AVR_HAS_UART1 0
@@ -470,7 +497,7 @@ static void uart0_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned
 static void uart0_setparity(UNUSED_ARG(struct SerialHardware *, _hw), int parity)
 {
 #if !CPU_AVR_ATMEGA103
-	UCSR0C = (UCSR0C & ~(BV(UPM1) | BV(UPM0))) | ((parity) << UPM0);
+	UCSR0C = (UCSR0C & ~(BV(UPM01) | BV(UPM00))) | ((parity) << UPM00);
 #endif
 }
 
@@ -520,7 +547,7 @@ static void uart1_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned
 
 static void uart1_setparity(UNUSED_ARG(struct SerialHardware *, _hw), int parity)
 {
-	UCSR1C = (UCSR1C & ~(BV(UPM1) | BV(UPM0))) | ((parity) << UPM0);
+	UCSR1C = (UCSR1C & ~(BV(UPM11) | BV(UPM10))) | ((parity) << UPM10);
 }
 
 #endif // AVR_HAS_UART1
@@ -754,7 +781,7 @@ SIGNAL(SIG_CTS)
 /**
  * Serial 0 TX interrupt handler
  */
-SIGNAL(SIG_UART0_DATA)
+SIGNAL(USART0_UDRE_vect)
 {
 	SER_STROBE_ON;
 
@@ -825,7 +852,7 @@ SIGNAL(SIG_UART0_TRANS)
 /**
  * Serial 1 TX interrupt handler
  */
-SIGNAL(SIG_UART1_DATA)
+SIGNAL(USART1_UDRE_vect)
 {
 	SER_STROBE_ON;
 
@@ -898,7 +925,7 @@ SIGNAL(SIG_UART1_TRANS)
  *       RXCIE is cleared.  Unfortunately the RXC flag is read-only
  *       and can't be cleared by code.
  */
-SIGNAL(SIG_UART0_RECV)
+SIGNAL(USART0_RX_vect)
 {
 	SER_STROBE_ON;
 
@@ -946,9 +973,9 @@ SIGNAL(SIG_UART0_RECV)
  * is heavily loaded, because an interrupt could be retriggered
  * when executing the handler prologue before RXCIE is disabled.
  *
- * \see SIGNAL(SIG_UART0_RECV)
+ * \see SIGNAL(USART1_RX_vect)
  */
-SIGNAL(SIG_UART1_RECV)
+SIGNAL(USART1_RX_vect)
 {
 	SER_STROBE_ON;
 
