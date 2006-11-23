@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.29  2006/11/23 13:19:39  batt
+ *#* Add BitBanged serial debug console.
+ *#*
  *#* Revision 1.28  2006/07/19 12:56:25  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -51,6 +54,7 @@
 #include <cfg/macros.h> /* for BV() */
 #include <appconfig.h>
 #include <hw_cpu.h>     /* for CLOCK_FREQ */
+#include <hw_ser.h>     /* Required for bus macros overrides */
 
 #include <mware/formatwr.h> /* for _formatted_write() */
 
@@ -63,6 +67,10 @@
 	#define KDBG_MASK_IRQ(old)     do { (void)(old); } while(0)
 	#define KDBG_RESTORE_IRQ(old)  do { /*nop*/ } while(0)
 	typedef char kdbg_irqsave_t; /* unused */
+
+	#if CONFIG_KDEBUG_PORT == 666
+		#error BITBANG debug console missing for this platform
+	#endif
 #elif CPU_I196
 	#include "Util196.h"
 	#define KDBG_WAIT_READY()      do {} while (!(SP_STAT & (SPSF_TX_EMPTY | SPSF_TX_INT)))
@@ -74,6 +82,10 @@
 		} while(0)
 	#define KDBG_RESTORE_IRQ(old)  do { INT_MASK1 |= (old); }
 	typedef uint16_t kdbg_irqsave_t; /* FIXME: unconfirmed */
+
+	#if CONFIG_KDEBUG_PORT == 666
+		#error BITBANG debug console missing for this platform
+	#endif
 #elif CPU_AVR
 	#include <avr/io.h>
 
@@ -81,7 +93,7 @@
 
 		/*
 		 * Support for special bus policies or external transceivers
-		 * on UART0 (to be overridden in "hw.h").
+		 * on UART0 (to be overridden in "hw_ser.h").
 		 *
 		 * HACK: if we don't set TXEN, kdbg disables the transmitter
 		 * after each output statement until the serial driver
@@ -144,7 +156,7 @@
 
 		/*
 		 * Support for special bus policies or external transceivers
-		 * on UART1 (to be overridden in "hw.h").
+		 * on UART1 (to be overridden in "hw_ser.h").
 		 *
 		 * HACK: if we don't set TXEN, kdbg disables the transmitter
 		 * after each output statement until the serial driver
@@ -181,8 +193,40 @@
 		} while(0)
 
 		typedef uint8_t kdbg_irqsave_t;
+
+	/*
+	 * Special debug port for BitBanged Serial see below for details...
+ 	 */
+	#elif CONFIG_KDEBUG_PORT == 666
+		#include "hw_ser.h"
+		#define KDBG_WAIT_READY()      do { /*nop*/ } while(0)
+		#define KDBG_WRITE_CHAR(c)     _kdebug_bitbang_putchar((c))
+		#define KDBG_MASK_IRQ(old)     do { IRQ_SAVE_DISABLE((old)); } while(0)
+		#define KDBG_RESTORE_IRQ(old)  do { IRQ_RESTORE((old)); } while(0)
+		typedef cpuflags_t kdbg_irqsave_t;
+
+		#define KDBG_DELAY (((CLOCK_FREQ + CONFIG_KDEBUG_BAUDRATE / 2) / CONFIG_KDEBUG_BAUDRATE) + 12) / 24
+
+		static void _kdebug_bitbang_delay(void)
+		{
+			unsigned long i;
+
+			for (i = 0; i < KDBG_DELAY; i++)
+			{
+				NOP;
+				NOP;
+				NOP;
+				NOP;
+				NOP;
+				NOP;
+				NOP;
+				NOP;
+				NOP;
+				NOP;
+			}
+		}
 	#else
-		#error CONFIG_KDEBUG_PORT should be either 0 or 1
+		#error CONFIG_KDEBUG_PORT should be either 0, 1 or 666
 	#endif
 #elif defined(__MWERKS__) && CPU_DSP56K
 	/* Debugging go through the JTAG interface. The MSL library already
@@ -193,9 +237,48 @@
 	#define KDBG_MASK_IRQ(old)        do { (void)(old); } while (0)
 	#define KDBG_RESTORE_IRQ(old)     do { (void)(old); } while (0)
 	typedef uint8_t kdbg_irqsave_t; /* unused */
+	#if CONFIG_KDEBUG_PORT == 666
+		#error BITBANG debug console missing for this platform
+	#endif
 #else
 	#error Unknown architecture
 #endif
+
+#if CONFIG_KDEBUG_PORT == 666
+	/**
+	 * Putchar for BITBANG serial debug console.
+	 * Sometimes, we can't permit to use a whole serial for debugging purpose.
+	 * Since debug console is in output only it is usefull to a single generic I/O pin for debug.
+	 * This is achieved by this simple function, that shift out the data like a UART, but
+	 * in software :)
+	 * The only requirement is that SER_BITBANG_* macros will be defined somewhere (usually hw_ser.h)
+	 * \note All interrupts are disabled during debug prints!
+	 */
+	static void _kdebug_bitbang_putchar(char c)
+	{
+		int i;
+
+		/* Start bit */
+		SER_BITBANG_LOW;
+		_kdebug_bitbang_delay();
+
+		/* Shift out data */
+		for (i = 0; i < 8; i++)
+		{
+			if (c & BV(i))
+				SER_BITBANG_HIGH;
+			else
+				SER_BITBANG_LOW;
+			_kdebug_bitbang_delay();
+		}
+
+		/* Stop bit */
+		SER_BITBANG_HIGH;
+		_kdebug_bitbang_delay();
+	}
+#endif
+
+
 
 
 void kdbg_init(void)
@@ -211,31 +294,34 @@ void kdbg_init(void)
 	BAUD_RATE = 0x80;
 
 #elif CPU_AVR
+	#if CONFIG_KDEBUG_PORT == 666
+		SER_BITBANG_INIT;
+	#else /* CONFIG_KDEBUG_PORT != 666 */
+		/* Compute the baud rate */
+		uint16_t period = (((CLOCK_FREQ / 16UL) + (CONFIG_KDEBUG_BAUDRATE / 2)) / CONFIG_KDEBUG_BAUDRATE) - 1;
 
-	/* Compute the baud rate */
-	uint16_t period = (((CLOCK_FREQ / 16UL) + (CONFIG_KDEBUG_BAUDRATE / 2)) / CONFIG_KDEBUG_BAUDRATE) - 1;
-
-	#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128
-		#if CONFIG_KDEBUG_PORT == 0
-			UBRR0H = (uint8_t)(period>>8);
-			UBRR0L = (uint8_t)period;
+		#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128
+			#if CONFIG_KDEBUG_PORT == 0
+				UBRR0H = (uint8_t)(period>>8);
+				UBRR0L = (uint8_t)period;
+				KDBG_UART0_BUS_INIT;
+			#elif CONFIG_KDEBUG_PORT == 1
+				UBRR1H = (uint8_t)(period>>8);
+				UBRR1L = (uint8_t)period;
+				KDBG_UART1_BUS_INIT;
+			#else
+				#error CONFIG_KDEBUG_PORT must be either 0 or 1
+			#endif
+		#elif CPU_AVR_ATMEGA8
+			UBRRH = (uint8_t)(period>>8);
+			UBRRL = (uint8_t)period;
+		#elif CPU_AVR_ATMEGA103
+			UBRR = (uint8_t)period;
 			KDBG_UART0_BUS_INIT;
-		#elif CONFIG_KDEBUG_PORT == 1
-			UBRR1H = (uint8_t)(period>>8);
-			UBRR1L = (uint8_t)period;
-			KDBG_UART1_BUS_INIT;
 		#else
-			#error CONFIG_KDEBUG_PORT must be either 0 or 1
+			#error Unknown CPU
 		#endif
-	#elif CPU_AVR_ATMEGA8
-		UBRRH = (uint8_t)(period>>8);
-		UBRRL = (uint8_t)period;
-	#elif CPU_AVR_ATMEGA103
-		UBRR = (uint8_t)period;
-		KDBG_UART0_BUS_INIT;
-	#else
-		#error Unknown CPU
-	#endif
+	#endif /* CONFIG_KDEBUG_PORT == 666 */
 
 #endif /* !CPU_I196 && !CPU_AVR */
 
