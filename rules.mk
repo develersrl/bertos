@@ -1,6 +1,6 @@
 #
 # $Id$
-# Copyright 2002, 2003, 2004 Develer S.r.l. (http://www.develer.com/)
+# Copyright 2002,2003,2004,2005,2006 Develer S.r.l. (http://www.develer.com/)
 # All rights reserved.
 #
 # Based on:
@@ -8,85 +8,6 @@
 #   Volker Oth 1/2000
 #
 # Author: Bernardo Innocenti <bernie@develer.com>
-#
-# $Log$
-# Revision 1.7  2006/09/20 14:28:08  marco
-# Workaround about moc generation.
-#
-# Revision 1.6  2006/09/13 18:38:59  bernie
-# Sort CPP options to let apps override include paths.
-#
-# Revision 1.5  2006/09/13 18:30:52  bernie
-# Add CPPFLAGS to all rules.
-#
-# Revision 1.4  2006/07/19 12:56:24  bernie
-# Convert to new Doxygen style.
-#
-# Revision 1.3  2006/05/27 22:42:24  bernie
-# Search for verstag.h in app subdirs first.
-#
-# Revision 1.2  2006/03/27 04:48:33  bernie
-# Add CXXFLAGS; Add recursive targets.
-#
-# Revision 1.1  2006/03/22 09:51:53  bernie
-# Add build infrastructure.
-#
-# Revision 1.39  2005/11/22 12:10:24  batt
-# Avoid double build version increment.
-#
-# Revision 1.38  2005/11/18 13:29:33  batt
-# Bumprev now work on linking and not only on make all.
-#
-# Revision 1.37  2005/03/20 03:59:44  bernie
-# Fix link message to display target file name.
-#
-# Revision 1.36  2004/10/29 17:05:33  customer_pw
-# Allow overriding flash_foobar rules.
-#
-# Revision 1.35  2004/10/20 10:00:14  customer_pw
-# Simplify variable
-#
-# Revision 1.34  2004/10/19 11:06:51  bernie
-# Set top_srcdir.
-#
-# Revision 1.33  2004/10/19 10:56:20  bernie
-# More specific logging messages.
-#
-# Revision 1.32  2004/10/18 14:40:45  customer_pw
-# Add fuse var empty check
-#
-# Revision 1.31  2004/10/15 17:49:27  batt
-# Do not verify avr chip after flashing to speed up the programming task.
-#
-# Revision 1.30  2004/10/09 10:34:16  aleph
-# Fix broken linker rule
-#
-# Revision 1.29  2004/10/08 17:26:50  customer_pw
-# No infinite loop in fuse programming rule; Better dependencies for linking.
-#
-# Revision 1.28  2004/10/03 18:26:52  bernie
-# Unparenthesize $Q.
-#
-# Revision 1.27  2004/09/30 14:49:53  customer_pw
-# Add silent build
-#
-# Revision 1.26  2004/09/28 16:58:52  customer_pw
-# Repeat twice eeprom flashing
-#
-# Revision 1.25  2004/09/27 12:20:13  customer_pw
-# Remove annoying flashing loop
-#
-# Revision 1.24  2004/09/23 17:19:50  customer_pw
-# Per-target fuse rules, with retry.
-#
-# Revision 1.23  2004/09/20 02:49:28  bernie
-# Use  for linking.
-#
-# Revision 1.22  2004/09/14 22:19:09  bernie
-# Create missing dirs.
-#
-# Revision 1.21  2004/08/31 10:25:10  customer_pw
-# Remove mainly useless -y write count option of avrdude
 #
 
 # Remove all default pattern rules
@@ -186,9 +107,10 @@ $$($(1)_CPPAOBJ): $$(OBJDIR)/$(1)/%.o : %.S
 
 # Link: instructions to create elf output file from object files
 $$(OUTDIR)/$(1).elf: bumprev $$($(1)_OBJ) $$($(1)_LDSCRIPT)
-	$L "$(1): Linking $$@"
+	$L "$(1): Linking $$(OUTDIR)/$(1)"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(LD) $$($(1)_OBJ) $$(LIB) $$(LDFLAGS) $$($(1)_LDFLAGS) -o $$@
+	$Q $$(LD) $$($(1)_OBJ) $$(LIB) $$(LDFLAGS) $$($(1)_LDFLAGS) -o $$(OUTDIR)/$(1)_nostrip
+	$Q $$(STRIP) -o $$(OUTDIR)/$(1) $$(OUTDIR)/$(1)_nostrip
 
 # Compile and link (program-at-a-time)
 $$(OUTDIR)/$(1)_whole.elf: bumprev $$($(1)_SRC) $$($(1)_LDSCRIPT)
