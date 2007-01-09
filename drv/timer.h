@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.32  2007/01/09 08:57:19  bernie
+ *#* Remove excess parentheses.
+ *#*
  *#* Revision 1.31  2006/07/19 12:56:26  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -222,9 +225,9 @@ INLINE utime_t ticks_to_us(ticks_t ticks)
 INLINE hptime_t us_to_hptime(utime_t us)
 {
 #if TIMER_HW_HPTICKS_PER_SEC > 10000000UL
-	return(us * ((TIMER_HW_HPTICKS_PER_SEC + 500000UL) / 1000000UL));
+	return us * ((TIMER_HW_HPTICKS_PER_SEC + 500000UL) / 1000000UL);
 #else
-	return((us * TIMER_HW_HPTICKS_PER_SEC + 500000UL) / 1000000UL);
+	return (us * TIMER_HW_HPTICKS_PER_SEC + 500000UL) / 1000000UL;
 #endif
 }
 
@@ -232,9 +235,9 @@ INLINE hptime_t us_to_hptime(utime_t us)
 INLINE utime_t hptime_to_us(hptime_t hpticks)
 {
 #if TIMER_HW_HPTICKS_PER_SEC < 100000UL
-	return(hpticks * (1000000UL / TIMER_HW_HPTICKS_PER_SEC));
+	return hpticks * (1000000UL / TIMER_HW_HPTICKS_PER_SEC);
 #else
-	return((hpticks * 1000000UL) / TIMER_HW_HPTICKS_PER_SEC);
+	return (hpticks * 1000000UL) / TIMER_HW_HPTICKS_PER_SEC;
 #endif /* TIMER_HW_HPTICKS_PER_SEC < 100000UL */
 }
 
