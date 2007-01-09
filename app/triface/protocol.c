@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2007/01/09 09:00:16  bernie
+ *#* Doxygen fix.
+ *#*
  *#* Revision 1.6  2006/09/20 13:54:04  marco
  *#* Usage examples of MAKE_CMD.
  *#*
@@ -72,6 +75,7 @@ static struct RLContext rl_ctx;
 /**
  * Send a NAK asking the host to send the current message again.
  *
+ * \param ser  serial port handle to output to.
  * \param err  human-readable description of the error for debug purposes.
  */
 INLINE void NAK(Serial *ser, const char *err)
