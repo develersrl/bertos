@@ -30,6 +30,13 @@ extern "C" {
 
 	#include <stdint.h> /* int64_t */
 
+	#ifndef DEVLIB_MTIME_DEFINED
+		#define DEVLIB_MTIME_DEFINED 1 /* Resolve conflict with <cfg/compiler.h> */
+		typedef int32_t mtime_t;
+		#define SIZEOF_MTIME_T (32 / CPU_BITS_PER_CHAR)
+		#define MTIME_INFINITE 0x7FFFFFFFL
+	#endif
+
 	/** Type for "high precision absolute time". */
 	typedef int64_t hptime_t;
 

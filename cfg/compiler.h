@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.24  2007/01/09 08:58:14  bernie
+ *#* Avoid dependency on cfg/compiler.h
+ *#*
  *#* Revision 1.23  2006/09/13 18:28:38  bernie
  *#* Reformat.
  *#*
@@ -422,11 +425,16 @@
 	#define MTIME_INFINITE 0x7FFFL
 #else
 	typedef int32_t ticks_t;  /**< Type for time expressed in ticks. */
-	typedef int32_t mtime_t;  /**< Type for time expressed in milliseconds. */
+
 	typedef int32_t utime_t;  /**< Type for time expressed in microseconds. */
-	#define SIZEOF_MTIME_T (32 / CPU_BITS_PER_CHAR)
 	#define SIZEOF_UTIME_T (32 / CPU_BITS_PER_CHAR)
-	#define MTIME_INFINITE 0x7FFFFFFFL
+
+	#ifndef DEVLIB_MTIME_DEFINED
+		#define DEVLIB_MTIME_DEFINED 1 /* Resolve conflict with <os/hptime.h> */
+		typedef int32_t mtime_t;  /**< Type for time expressed in milliseconds. */
+		#define SIZEOF_MTIME_T (32 / CPU_BITS_PER_CHAR)
+		#define MTIME_INFINITE 0x7FFFFFFFL
+	#endif
 #endif
 
 /** Bulk storage large enough for both pointers or integers. */
