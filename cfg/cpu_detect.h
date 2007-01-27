@@ -12,6 +12,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2007/01/27 20:48:36  batt
+ *#* Add support for ATMEGA1281.
+ *#*
  *#* Revision 1.4  2006/07/19 12:56:25  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -130,12 +133,19 @@
 	#else
 		#define CPU_AVR_ATMEGA8     0
 	#endif
+
+	#if defined(__AVR_ATmega1281__)
+		#define CPU_AVR_ATMEGA1281  1
+	#else
+		#define CPU_AVR_ATMEGA1281  0
+	#endif
 #else
 	#define CPU_AVR                 0
 	#define CPU_AVR_ATMEGA8         0
 	#define CPU_AVR_ATMEGA64        0
 	#define CPU_AVR_ATMEGA103       0
 	#define CPU_AVR_ATMEGA128       0
+	#define CPU_AVR_ATMEGA1281      0
 #endif
 
 
