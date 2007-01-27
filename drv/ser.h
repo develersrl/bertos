@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.35  2007/01/27 20:47:12  batt
+ *#* Add clear status.
+ *#*
  *#* Revision 1.34  2006/11/20 15:07:40  batt
  *#* Revert unneeded locked functions.
  *#*
@@ -302,6 +305,8 @@ extern void ser_settimeouts(struct Serial *port, mtime_t rxtimeout, mtime_t txti
 extern void ser_resync(struct Serial *port, mtime_t delay);
 extern void ser_purge(struct Serial *port);
 extern void ser_drain(struct Serial *port);
+
+extern void ser_clearstatus(struct Serial *port);
 
 extern struct Serial *ser_open(unsigned int unit);
 extern void ser_close(struct Serial *port);

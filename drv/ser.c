@@ -28,6 +28,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.35  2007/01/27 20:47:12  batt
+ *#* Add clear status.
+ *#*
  *#* Revision 1.34  2006/11/20 15:07:40  batt
  *#* Revert unneeded locked functions.
  *#*
@@ -451,6 +454,11 @@ void ser_setbaudrate(struct Serial *port, unsigned long rate)
 void ser_setparity(struct Serial *port, int parity)
 {
 	port->hw->table->setParity(port->hw, parity);
+}
+
+void ser_clearstatus(struct Serial *port)
+{
+	ser_setstatus(port, 0);
 }
 
 
