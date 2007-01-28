@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.30  2007/01/28 09:18:06  batt
+ *#* Merge from project_ks.
+ *#*
  *#* Revision 1.29  2006/11/23 13:19:39  batt
  *#* Add BitBanged serial debug console.
  *#*
@@ -205,7 +208,7 @@
 		#define KDBG_RESTORE_IRQ(old)  do { IRQ_RESTORE((old)); } while(0)
 		typedef cpuflags_t kdbg_irqsave_t;
 
-		#define KDBG_DELAY (((CLOCK_FREQ + CONFIG_KDEBUG_BAUDRATE / 2) / CONFIG_KDEBUG_BAUDRATE) + 12) / 24
+		#define KDBG_DELAY (((CLOCK_FREQ + CONFIG_KDEBUG_BAUDRATE / 2) / CONFIG_KDEBUG_BAUDRATE) + 7) / 14
 
 		static void _kdebug_bitbang_delay(void)
 		{
@@ -213,11 +216,6 @@
 
 			for (i = 0; i < KDBG_DELAY; i++)
 			{
-				NOP;
-				NOP;
-				NOP;
-				NOP;
-				NOP;
 				NOP;
 				NOP;
 				NOP;
@@ -248,7 +246,7 @@
 	/**
 	 * Putchar for BITBANG serial debug console.
 	 * Sometimes, we can't permit to use a whole serial for debugging purpose.
-	 * Since debug console is in output only it is usefull to a single generic I/O pin for debug.
+	 * Since debug console is in output only it is usefull to use a single generic I/O pin for debug.
 	 * This is achieved by this simple function, that shift out the data like a UART, but
 	 * in software :)
 	 * The only requirement is that SER_BITBANG_* macros will be defined somewhere (usually hw_ser.h)
@@ -257,24 +255,25 @@
 	static void _kdebug_bitbang_putchar(char c)
 	{
 		int i;
+		uint16_t data = c;
 
-		/* Start bit */
-		SER_BITBANG_LOW;
-		_kdebug_bitbang_delay();
+		/* Add stop bit */
+		data |= 0x0100;
+
+		/* Add start bit*/
+		data <<= 1;
 
 		/* Shift out data */
-		for (i = 0; i < 8; i++)
+		uint16_t shift = 1;
+		for (i = 0; i < 10; i++)
 		{
-			if (c & BV(i))
+			if (data & shift)
 				SER_BITBANG_HIGH;
 			else
 				SER_BITBANG_LOW;
 			_kdebug_bitbang_delay();
+			shift <<= 1;
 		}
-
-		/* Stop bit */
-		SER_BITBANG_HIGH;
-		_kdebug_bitbang_delay();
 	}
 #endif
 
