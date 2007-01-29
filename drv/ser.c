@@ -28,6 +28,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.36  2007/01/29 11:30:29  batt
+ *#* Reimplement ser_clearstatus as a macro.
+ *#*
  *#* Revision 1.35  2007/01/27 20:47:12  batt
  *#* Add clear status.
  *#*
@@ -454,11 +457,6 @@ void ser_setbaudrate(struct Serial *port, unsigned long rate)
 void ser_setparity(struct Serial *port, int parity)
 {
 	port->hw->table->setParity(port->hw, parity);
-}
-
-void ser_clearstatus(struct Serial *port)
-{
-	ser_setstatus(port, 0);
 }
 
 

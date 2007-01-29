@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.36  2007/01/29 11:30:30  batt
+ *#* Reimplement ser_clearstatus as a macro.
+ *#*
  *#* Revision 1.35  2007/01/27 20:47:12  batt
  *#* Add clear status.
  *#*
@@ -306,8 +309,6 @@ extern void ser_resync(struct Serial *port, mtime_t delay);
 extern void ser_purge(struct Serial *port);
 extern void ser_drain(struct Serial *port);
 
-extern void ser_clearstatus(struct Serial *port);
-
 extern struct Serial *ser_open(unsigned int unit);
 extern void ser_close(struct Serial *port);
 
@@ -318,6 +319,7 @@ extern void ser_close(struct Serial *port);
  */
 #define ser_getstatus(h)    ((h)->status)
 #define ser_setstatus(h, x) ((h)->status = (x))
+#define ser_clearstatus(h)  ser_setstatus(h, 0)
 /* \} */
 
 #endif /* DRV_SER_H */
