@@ -7,12 +7,23 @@
  *
  * \brief MD2 Message-Digest algorithm.
  *
+ * The algorithm takes as input a message of arbitrary length and produces
+ * as output a 128-bit message digest of the input.
+ * It is conjectured that it is computationally infeasible to produce
+ * two messages having the same message digest, or to produce any
+ * message having a given prespecified target message digest.
+ *
+ *
+ *
  * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2007/01/30 17:31:44  asterix
+ *#* Add function prototypes.
+ *#*
  *#* Revision 1.1  2007/01/30 15:53:26  batt
  *#* Add first md2 skel.
  *#*
@@ -35,5 +46,8 @@ typedef struct Md2Context
 	size_t counter;                         ///< Counter of remaining bytes.
 } Md2Context;
 
+void md2_init(Md2Context *context);
+void md2_update(Md2Context *context, void *block_in, size_t block_len);
+void md2_end(Md2Context *context, void *msg_digest);
 
 #endif /* ALGOS_MD2_H */
