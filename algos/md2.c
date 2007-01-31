@@ -13,8 +13,8 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.6  2007/01/31 16:53:30  asterix
- *#* Typo.
+ *#* Revision 1.7  2007/01/31 18:04:15  asterix
+ *#* Write md2_end function
  *#*
  *#* Revision 1.4  2007/01/31 13:51:57  asterix
  *#* Write md2_compute function.
@@ -178,9 +178,32 @@ void md2_update(Md2Context *context, void *block_in, size_t block_len)
 	
 }
 /**
- * 
+ * Ends MD2 message digest operation, writing the message digest and cleaning context.
  */
 void md2_end(Md2Context *context, void *msg_digest)
 {
+	/*
+	 * Pad remaning context buffer.
+	 */
+	md2_pad(context->buffer, CONFIG_MD2_BLOCK_LEN - context->counter);
 
+	/*
+	 * Update context and checksum.
+	 */
+	md2_update(context, context->buffer, CONFIG_MD2_BLOCK_LEN);
+		
+	md2_update(context, context->checksum, CONFIG_MD2_BLOCK_LEN);
+
+	/*
+	 * Copy first CONFIG_MD2_BLOCK_LEN byte of context's state
+	 * in msg_digest. The msg_digest is the message digest of
+	 * MD2 algorithm.
+	 */
+	memcpy(msg_digest, context->state, CONFIG_MD2_BLOCK_LEN);
+	
+	/*
+	 * Clean the context.
+	 */
+	memset(context, 0, sizeof(context));
+  
 }
