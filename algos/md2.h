@@ -21,6 +21,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2007/01/31 11:16:48  asterix
+ *#* Defined constants for algorithm compute
+ *#*
  *#* Revision 1.2  2007/01/30 17:31:44  asterix
  *#* Add function prototypes.
  *#*
@@ -35,14 +38,17 @@
 #include <cfg/compiler.h>
 #include <appconfig.h>
 
+#define COMPUTE_ARRAY_LEN 48     ///< Lenght of compute array.
+#define NUM_COMPUTE_ROUNDS 18    ///< Number of compute rounds.
+
 /**
  * Context for MD2 computation.
  */
 typedef struct Md2Context
 {
-	uint8_t buffer[CONFIG_MD2_BLOBK_LEN];   ///< Input buffer.
-	uint8_t state[CONFIG_MD2_BLOBK_LEN];    ///< Current state buffer.
-	uint8_t checksum[CONFIG_MD2_BLOBK_LEN]; ///< Checksum.
+	uint8_t buffer[CONFIG_MD2_BLOCK_LEN];   ///< Input buffer.
+	uint8_t state[CONFIG_MD2_BLOCK_LEN];    ///< Current state buffer.
+	uint8_t checksum[CONFIG_MD2_BLOCK_LEN]; ///< Checksum.
 	size_t counter;                         ///< Counter of remaining bytes.
 } Md2Context;
 
