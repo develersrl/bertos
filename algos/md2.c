@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2007/01/31 10:31:04  asterix
+ *#* Write md2_pad funtion.
+ *#*
  *#* Revision 1.2  2007/01/30 17:31:44  asterix
  *#* Add function prototypes.
  *#*
@@ -21,10 +24,17 @@
  *#*
  *#*/
 
+#include "md2.h"
+
+#include <string.h> //memset();
+#include <cfg/compiler.h>
+
 /*
- * Array of 256 byte pemutation contructed from digits of pi.
+ * Official array of 256 byte pemutation contructed from digits of pi, defined
+ * in the RFC 1319.
  */
-static uint8_t md2_perm[256] = {
+static uint8_t md2_perm[256] =
+{
   41, 46, 67, 201, 162, 216, 124, 1, 61, 54, 84, 161, 236, 240, 6,
   19, 98, 167, 5, 243, 192, 199, 115, 140, 152, 147, 43, 217, 188,
   76, 130, 202, 30, 155, 87, 60, 253, 212, 224, 22, 103, 66, 111, 24,
@@ -44,10 +54,20 @@ static uint8_t md2_perm[256] = {
   166, 119, 114, 248, 235, 117, 75, 10, 49, 68, 80, 180, 143, 237,
   31, 26, 219, 153, 141, 51, 159, 17, 131, 20
 };
-
-static void md2_pad(void *block)
+/**
+ * Pad function. Fill input array with unsigned char until 
+ * lenght of block is equal to CONFIG_MD2_BLOCK_LEN.
+ * 
+ */
+static void md2_pad(void *block, size_t len_pad)
 {
-
+	if (len_pad <= CONFIG_MD2_BLOCK_LEN)
+	{
+		for(int i=(CONFIG_MD2_BLOCK_LEN-len_pad);i<len_pad; i++)
+		{
+			block[i]=(uint8_t)len_pad;
+		}	
+	}
 }
 
 static void md2_compute(void *state, void *checksum, void *block)
@@ -55,6 +75,11 @@ static void md2_compute(void *state, void *checksum, void *block)
 
 }
 
+/**
+ * Algorithm initialization.
+ *
+ * \param empty context.
+ */
 void md2_init(Md2Context *context)
 {
 	context->counter=0;
@@ -62,12 +87,20 @@ void md2_init(Md2Context *context)
 	memset(context->checksum, 0, sizeof(context->checksum));
 
 }
-
+/**
+ * Update bock.
+ *
+ *
+ *
+ */
 void md2_update(Md2Context *context, void *block_in, size_t block_len)
 {
 
 }
 
+/**
+ * 
+ */
 void md2_end(Md2Context *context, void *msg_digest)
 {
 
