@@ -13,8 +13,8 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.5  2007/01/31 16:42:43  asterix
- *#* Write md2_update function.
+ *#* Revision 1.6  2007/01/31 16:53:30  asterix
+ *#* Typo.
  *#*
  *#* Revision 1.4  2007/01/31 13:51:57  asterix
  *#* Write md2_compute function.
@@ -134,10 +134,7 @@ void md2_init(Md2Context *context)
 
 }
 /**
- * Update bock.
- *
- *
- *
+ * Update block.
  */
 void md2_update(Md2Context *context, void *block_in, size_t block_len)
 {
@@ -152,14 +149,14 @@ void md2_update(Md2Context *context, void *block_in, size_t block_len)
 	 */
 	if(block_len > empty_block_len)
 	{
-		memcpy(context->buffer[store_block_len], block_in, empty_block_len);
+		memcpy(&context->buffer[store_block_len], block_in, empty_block_len);
 		md2_compute(context->state, context->checksum, context->buffer);
 		block_len -= empty_block_len;
 	}
 	else
 	{
 
-		memcpy(context->buffer[store_block_len], block_in, block_len);
+		memcpy(&context->buffer[store_block_len], block_in, block_len);
 		context->counter += block_len;
 
 	}
@@ -169,14 +166,14 @@ void md2_update(Md2Context *context, void *block_in, size_t block_len)
 	 */
 	for(int i = empty_block_len + 1;  i + CONFIG_MD2_BLOCK_LEN < block_len; i += CONFIG_MD2_BLOCK_LEN)
 	{
-		memcpy(context->buffer, block_in[i], CONFIG_MD2_BLOCK_LEN);
+		memcpy(context->buffer, &block_in[i], CONFIG_MD2_BLOCK_LEN);
 		md2_compute(context->state, context->checksum, context->buffer);
 	}
 
 	/*
 	 * Copy remaining block in context buffer and update context counter.
 	 */
-	memcpy(context->buffer, block_in[i], block_len - i);
+	memcpy(context->buffer,&block_in[i], block_len - i);
 	context->counter = block_len - i;
 	
 }
