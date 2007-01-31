@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2007/01/31 16:42:43  asterix
+ *#* Write md2_update function.
+ *#*
  *#* Revision 1.4  2007/01/31 13:51:57  asterix
  *#* Write md2_compute function.
  *#*
@@ -125,7 +128,7 @@ static void md2_compute(void *state, void *checksum, void *block)
  */
 void md2_init(Md2Context *context)
 {
-	context->counter=0;
+	context->counter = 0;
 	memset(context->state, 0, sizeof(context->state));
 	memset(context->checksum, 0, sizeof(context->checksum));
 
@@ -138,9 +141,45 @@ void md2_init(Md2Context *context)
  */
 void md2_update(Md2Context *context, void *block_in, size_t block_len)
 {
+	uint8_t store_block_len;    //Lenght of block store in context buffer
+	uint8_t empty_block_len;    //Lenght of block empty in context buffer
+	
+	store_block_len = context->counter;
+	empty_block_len = CONFIG_MD2_BLOCK_LEN - store_block_len;
+	
+	/*
+	 * Fill context buffer with input block and compute it.
+	 */
+	if(block_len > empty_block_len)
+	{
+		memcpy(context->buffer[store_block_len], block_in, empty_block_len);
+		md2_compute(context->state, context->checksum, context->buffer);
+		block_len -= empty_block_len;
+	}
+	else
+	{
 
+		memcpy(context->buffer[store_block_len], block_in, block_len);
+		context->counter += block_len;
+
+	}
+	
+	/*
+	 * Split input in block long CONFIG_MD2_BLOCK_LEN and compute it.
+	 */
+	for(int i = empty_block_len + 1;  i + CONFIG_MD2_BLOCK_LEN < block_len; i += CONFIG_MD2_BLOCK_LEN)
+	{
+		memcpy(context->buffer, block_in[i], CONFIG_MD2_BLOCK_LEN);
+		md2_compute(context->state, context->checksum, context->buffer);
+	}
+
+	/*
+	 * Copy remaining block in context buffer and update context counter.
+	 */
+	memcpy(context->buffer, block_in[i], block_len - i);
+	context->counter = block_len - i;
+	
 }
-
 /**
  * 
  */
