@@ -13,8 +13,8 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.3  2007/01/31 10:31:04  asterix
- *#* Write md2_pad funtion.
+ *#* Revision 1.4  2007/01/31 13:51:57  asterix
+ *#* Write md2_compute function.
  *#*
  *#* Revision 1.2  2007/01/30 17:31:44  asterix
  *#* Add function prototypes.
@@ -57,7 +57,7 @@ static uint8_t md2_perm[256] =
 /**
  * Pad function. Fill input array with unsigned char until 
  * lenght of block is equal to CONFIG_MD2_BLOCK_LEN.
- * 
+ *
  */
 static void md2_pad(void *block, size_t len_pad)
 {
@@ -72,7 +72,50 @@ static void md2_pad(void *block, size_t len_pad)
 
 static void md2_compute(void *state, void *checksum, void *block)
 {
+	int t=0;	
+	uint8_t compute_array[CONFIG_MD2_BLOCK_LEN * 3];
+	
+	/*
+ 	 * Copy state and checksum context in compute array. 
+ 	 */
+	memcpy(compute_array, state, CONFIG_MD2_BLOCK_LEN);
+	memcpy(compute_array + CONFIG_MD2_BLOCK_LEN, state, CONFIG_MD2_BLOCK_LEN);
+	
+	/*
+ 	 * Fill compute array with state XOR block
+ 	 */
+	for(int i=0; i< CONFIG_MD2_BLOCK_LEN; i++)
+		compute_array[i + (CONFIG_MD2_BLOCK_LEN * 2)] = state[i] ^ block[i];
+	
+	/*
+	 * Encryt block.
+	 */
+	for(i=0; i<NUM_COMPUTE_ROUNDS; i++)
+	{
+		for(int j=0; j<COMPUTE_ARRAY_LEN; j++)
+		{
+			compute_array[j] ^= md2_perm [t];
+			t = compute_array[j];
+		}
+		
+		t = (t + i) & 0xff; //modulo 256.
+	}
+	/*
+	 * Update checksum.	
+	 */
+	t = checksum[CONFIG_MD2_BLOCK_LEN - 1];
 
+	for(i=0; i< CONFIG_MD2_BLOCK_LEN; i++)
+	{
+		checksum[i]  ^= md2_perm [block[i] ^ t];
+		t = checksum[i];
+	}
+	
+	/*
+	 * Update state and clean compute array. 
+	 */
+	memcpy(state, compute_array, CONFIG_MD2_BLOCK_LEN);
+	memset(compute_array, 0, sizeof(compute_array));
 }
 
 /**
