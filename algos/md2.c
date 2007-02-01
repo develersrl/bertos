@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2007/02/01 14:45:56  asterix
+ *#* Rewrite md2_update function and fix some bug.
+ *#*
  *#* Revision 1.7  2007/01/31 18:04:15  asterix
  *#* Write md2_end function
  *#*
@@ -29,7 +32,7 @@
 
 #include "md2.h"
 
-#include <string.h> //memset();
+#include <string.h>           //memset(), memcpy();
 #include <cfg/compiler.h>
 
 /*
@@ -62,40 +65,50 @@ static uint8_t md2_perm[256] =
  * lenght of block is equal to CONFIG_MD2_BLOCK_LEN.
  *
  */
-static void md2_pad(void *block, size_t len_pad)
+static void md2_pad(void *_block, size_t len_pad)
 {
+	uint8_t *block;
+	
+	block = (uint8_t *)_block;
+
 	if (len_pad <= CONFIG_MD2_BLOCK_LEN)
 	{
-		for(int i=(CONFIG_MD2_BLOCK_LEN-len_pad);i<len_pad; i++)
+		for(int i = (CONFIG_MD2_BLOCK_LEN - len_pad); i<len_pad; i++)
 		{
-			block[i]=(uint8_t)len_pad;
+			block[i] = (uint8_t)len_pad;
 		}	
 	}
 }
 
-static void md2_compute(void *state, void *checksum, void *block)
+static void md2_compute(void *_state, void *_checksum, void *_block)
 {
-	int t=0;	
+	int t = 0;	
 	uint8_t compute_array[CONFIG_MD2_BLOCK_LEN * 3];
-	
+	uint8_t *state;
+	uint8_t *checksum;
+	uint8_t *block;
+
+	state = (uint8_t *)_state;
+	checksum  = (uint8_t *)_checksum;
+	block = (uint8_t *)_block;
 	/*
  	 * Copy state and checksum context in compute array. 
  	 */
 	memcpy(compute_array, state, CONFIG_MD2_BLOCK_LEN);
-	memcpy(compute_array + CONFIG_MD2_BLOCK_LEN, state, CONFIG_MD2_BLOCK_LEN);
+	memcpy(compute_array + CONFIG_MD2_BLOCK_LEN, block, CONFIG_MD2_BLOCK_LEN);
 	
 	/*
  	 * Fill compute array with state XOR block
  	 */
-	for(int i=0; i< CONFIG_MD2_BLOCK_LEN; i++)
+	for(int i = 0; i < CONFIG_MD2_BLOCK_LEN; i++)
 		compute_array[i + (CONFIG_MD2_BLOCK_LEN * 2)] = state[i] ^ block[i];
 	
 	/*
 	 * Encryt block.
 	 */
-	for(i=0; i<NUM_COMPUTE_ROUNDS; i++)
+	for(int i = 0; i < NUM_COMPUTE_ROUNDS; i++)
 	{
-		for(int j=0; j<COMPUTE_ARRAY_LEN; j++)
+		for(int j = 0; j < COMPUTE_ARRAY_LEN; j++)
 		{
 			compute_array[j] ^= md2_perm [t];
 			t = compute_array[j];
@@ -108,7 +121,7 @@ static void md2_compute(void *state, void *checksum, void *block)
 	 */
 	t = checksum[CONFIG_MD2_BLOCK_LEN - 1];
 
-	for(i=0; i< CONFIG_MD2_BLOCK_LEN; i++)
+	for(int i = 0; i < CONFIG_MD2_BLOCK_LEN; i++)
 	{
 		checksum[i]  ^= md2_perm [block[i] ^ t];
 		t = checksum[i];
@@ -136,45 +149,45 @@ void md2_init(Md2Context *context)
 /**
  * Update block.
  */
-void md2_update(Md2Context *context, void *block_in, size_t block_len)
-{
-	uint8_t store_block_len;    //Lenght of block store in context buffer
-	uint8_t empty_block_len;    //Lenght of block empty in context buffer
+void md2_update(Md2Context *context, void *_block_in, size_t block_len)
+{	
 	
-	store_block_len = context->counter;
-	empty_block_len = CONFIG_MD2_BLOCK_LEN - store_block_len;
+	uint8_t *block_in;
+	size_t len = CONFIG_MD2_BLOCK_LEN;
+	size_t i = 0;
 	
-	/*
-	 * Fill context buffer with input block and compute it.
-	 */
-	if(block_len > empty_block_len)
-	{
-		memcpy(&context->buffer[store_block_len], block_in, empty_block_len);
-		md2_compute(context->state, context->checksum, context->buffer);
-		block_len -= empty_block_len;
-	}
-	else
-	{
-
-		memcpy(&context->buffer[store_block_len], block_in, block_len);
-		context->counter += block_len;
-
-	}
+	block_in = (uint8_t *)_block_in;
 	
-	/*
-	 * Split input in block long CONFIG_MD2_BLOCK_LEN and compute it.
-	 */
-	for(int i = empty_block_len + 1;  i + CONFIG_MD2_BLOCK_LEN < block_len; i += CONFIG_MD2_BLOCK_LEN)
+	
+	while(block_len > 0)
 	{
-		memcpy(context->buffer, &block_in[i], CONFIG_MD2_BLOCK_LEN);
-		md2_compute(context->state, context->checksum, context->buffer);
+		len -= context->counter;   //Free space of buffer.
+
+		if (block_len > len)
+		{
+			/*
+			 * Fill or copy into buffer a input  block length CONFIG_MD2_BLOCK_LEN and compute it.
+			 */
+			memcpy(&context->buffer[context->counter], &block_in[i],len);
+			md2_compute(context->state,context->checksum, context->buffer);
+			context->counter = 0;
+			block_len -= len;
+		}
+		else
+		{
+			/*
+			 * Copy into buffer remaning input block.
+			 */	
+			memcpy(&context->buffer[context->counter], &block_in[i], block_len);
+			context->counter += len;
+			break;
+			
+
+		}
+		i = len;
+		len = CONFIG_MD2_BLOCK_LEN;
 	}
 
-	/*
-	 * Copy remaining block in context buffer and update context counter.
-	 */
-	memcpy(context->buffer,&block_in[i], block_len - i);
-	context->counter = block_len - i;
 	
 }
 /**
