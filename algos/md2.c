@@ -13,8 +13,8 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.10  2007/02/02 15:37:45  asterix
- *#* Change md2_end prototype. Remove a unneeded memcpy in md2_end. Add comments.
+ *#* Revision 1.11  2007/02/02 18:15:31  asterix
+ *#* Add function MD2_test. Fix bug in md2_update function.
  *#*
  *#* Revision 1.9  2007/02/02 13:10:01  asterix
  *#* Fix some bugs in md2_pad and md2_update fuction.
@@ -41,7 +41,7 @@
 #include <string.h>           //memset(), memcpy();
 #include <cfg/compiler.h>
 #include <cfg/debug.h>        //ASSERT()
-#include <cfg/macros.h>       //MIN()
+#include <cfg/macros.h>       //MIN(), countof();
 
 
 /*
@@ -159,32 +159,35 @@ void md2_init(Md2Context *context)
 /**
  * Update block.
  */
-void md2_update(Md2Context *context, void *_block_in, size_t block_len)
+void md2_update(Md2Context *context, const void *_block_in, size_t block_len)
 {
 
-	uint8_t *block_in;
+	const uint8_t *block_in;
+	size_t cpy_len;
 
-	/*
-	 * Choose a number of block that fill input context buffer.
-	 */
-	size_t missing_len = MIN(block_len, CONFIG_MD2_BLOCK_LEN - context->counter);
 
-	block_in = (uint8_t *)_block_in;
+	block_in = (const uint8_t *)_block_in;
 
 	while(block_len > 0)
 	{
 		/*
+		 * Choose a number of block that fill input context buffer.
+		 */
+		cpy_len = MIN(block_len, CONFIG_MD2_BLOCK_LEN - context->counter);
+
+		
+		/*
 		 * Copy in the buffer input block.
 		 */
-		memcpy(&context->buffer[context->counter], block_in, missing_len);
+		memcpy(&context->buffer[context->counter], block_in, cpy_len);
 
 		/*
 		 * Update a context counter, input block length and remaning 
 		 * context buffer block lenght.
 		 */
-		context->counter += missing_len;
-		block_len -= missing_len;
-		block_in += missing_len;
+		context->counter += cpy_len;
+		block_len -= cpy_len;
+		block_in += cpy_len;
 
 		/*
 		 * If buffer is full, compute it.
@@ -229,3 +232,60 @@ uint8_t  *md2_end(Md2Context *context)
 
 	return context->state; //return a pointer to message digest.
 }
+/**
+ * MD2 test fuction.
+ * This function test MD2 algorithm with a standard string specified
+ * in RFC 1319.
+ * 
+ * \note This test work with official array of 256 byte pemutation
+ * contructed from digits of pi, defined in the RFC 1319.
+ *
+ */
+bool md2_test(void)
+{
+
+	Md2Context context;
+
+	const char *test[] = 
+	{
+		"", 
+		"message digest",
+		"abcdefghijklmnopqrstuvwxyz",
+		"12345678901234567890123456789012345678901234567890123456789012345678901234567890"
+	};
+	
+
+	const uint8_t *result[] = {
+		"\x83\x50\xe5\xa3\xe2\x4c\x15\x3d\xf2\x27\x5c\x9f\x80\x69\x27\x73",
+		"\xab\x4f\x49\x6b\xfb\x2a\x53\x0b\x21\x9f\xf3\x30\x31\xfe\x06\xb0",
+		"\x4e\x8d\xdf\xf3\x65\x02\x92\xab\x5a\x41\x08\xc3\xaa\x47\x94\x0b",
+		"\xd5\x97\x6f\x79\xd8\x3d\x3a\x0d\xc9\x80\x6c\x3c\x66\xf3\xef\xd8",
+	};
+
+	
+	for (int i = 0; i < countof(test); i++)
+	{
+		md2_init(&context);
+		md2_update(&context, test[i], strlen(test[i]));
+
+		if(memcmp(result[i], md2_end(&context), CONFIG_MD2_BLOCK_LEN))
+			return false;	
+	}
+
+	return true;
+}
+
+#if 0
+
+#include <stdio.h>
+int main(int argc, char * argv[])
+{
+	if(md2_test())
+		printf("MD2 algorithm work well!\n");
+	else
+		printf("MD2 algorithm doesn't work well.\n");
+		
+}
+
+#endif
+

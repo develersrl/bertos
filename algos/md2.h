@@ -21,6 +21,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2007/02/02 18:15:31  asterix
+ *#* Add function MD2_test. Fix bug in md2_update function.
+ *#*
  *#* Revision 1.5  2007/02/02 15:37:45  asterix
  *#* Change md2_end prototype. Remove a unneeded memcpy in md2_end. Add comments.
  *#*
@@ -60,7 +63,8 @@ typedef struct Md2Context
 } Md2Context;
 
 void md2_init(Md2Context *context);
-void md2_update(Md2Context *context, void *block_in, size_t block_len);
+void md2_update(Md2Context *context, const void *block_in, size_t block_len);
 uint8_t *md2_end(Md2Context *context);
+bool md2_test(void);
 
 #endif /* ALGOS_MD2_H */
