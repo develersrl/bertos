@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2007/02/02 15:37:45  asterix
+ *#* Change md2_end prototype. Remove a unneeded memcpy in md2_end. Add comments.
+ *#*
  *#* Revision 1.9  2007/02/02 13:10:01  asterix
  *#* Fix some bugs in md2_pad and md2_update fuction.
  *#*
@@ -196,36 +199,33 @@ void md2_update(Md2Context *context, void *_block_in, size_t block_len)
 
 }
 /**
- * Ends MD2 message digest operation, writing the message digest and cleaning context.
+ * Ends an MD2 message digest operation.
+ * This fuction take an context and return a pointer
+ * to context state.
+ *
+ * \param context in input.
+ * \return a pointer to context state (message digest).
  */
-void md2_end(Md2Context *context, void *msg_digest)
+uint8_t  *md2_end(Md2Context *context)
 {
+
 	uint8_t buf[CONFIG_MD2_BLOCK_LEN];
 
 	/*
-	 * Pad remaning context buffer.
+	 * Fill remaning empty context buffer.
 	 */
 	md2_pad(buf, CONFIG_MD2_BLOCK_LEN - context->counter);
 
 	/*
-	 * Update context and checksum.
+	 * Update context buffer and compute it.
 	 */
 	md2_update(context, buf, CONFIG_MD2_BLOCK_LEN - context->counter);
 
-	memcpy(buf, context->checksum, CONFIG_MD2_BLOCK_LEN);
-
-	md2_update(context, buf, CONFIG_MD2_BLOCK_LEN);
-
 	/*
-	 * Copy first CONFIG_MD2_BLOCK_LEN byte of context's state
-	 * in msg_digest. The msg_digest is the message digest of
-	 * MD2 algorithm.
+	 * Add context checksum to message input.
 	 */
-	memcpy(msg_digest, context->state, CONFIG_MD2_BLOCK_LEN);
+	md2_update(context, context->checksum, CONFIG_MD2_BLOCK_LEN);
 
-	/*
-	 * Clean the context.
-	 */
-	memset(context, 0, sizeof(context));
 
+	return context->state; //return a pointer to message digest.
 }

@@ -21,6 +21,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2007/02/02 15:37:45  asterix
+ *#* Change md2_end prototype. Remove a unneeded memcpy in md2_end. Add comments.
+ *#*
  *#* Revision 1.4  2007/01/31 13:53:36  asterix
  *#* Define COMPUTE_ARRAY_LEN.
  *#*
@@ -58,6 +61,6 @@ typedef struct Md2Context
 
 void md2_init(Md2Context *context);
 void md2_update(Md2Context *context, void *block_in, size_t block_len);
-void md2_end(Md2Context *context, void *msg_digest);
+uint8_t *md2_end(Md2Context *context);
 
 #endif /* ALGOS_MD2_H */
