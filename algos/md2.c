@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.12  2007/02/05 16:52:44  asterix
+ *#* Add define for harvard architecture.
+ *#*
  *#* Revision 1.11  2007/02/02 18:15:31  asterix
  *#* Add function MD2_test. Fix bug in md2_update function.
  *#*
@@ -42,13 +45,15 @@
 #include <cfg/compiler.h>
 #include <cfg/debug.h>        //ASSERT()
 #include <cfg/macros.h>       //MIN(), countof();
+#include <mware/pgm.h>   
 
 
 /*
  * Official array of 256 byte pemutation contructed from digits of pi, defined
  * in the RFC 1319.
  */
-static uint8_t md2_perm[256] = {
+static const uint8_t PROGMEM md2_perm[256] = 
+{
   41, 46, 67, 201, 162, 216, 124, 1, 61, 54, 84, 161, 236, 240, 6,
   19, 98, 167, 5, 243, 192, 199, 115, 140, 152, 147, 43, 217, 188,
   76, 130, 202, 30, 155, 87, 60, 253, 212, 224, 22, 103, 66, 111, 24,
@@ -68,6 +73,12 @@ static uint8_t md2_perm[256] = {
   166, 119, 114, 248, 235, 117, 75, 10, 49, 68, 80, 180, 143, 237,
   31, 26, 219, 153, 141, 51, 159, 17, 131, 20
 };
+
+#if CPU_HARVARD
+	#define	MD2_PERM(x) pgm_read_char(&md2_perm[x]) //Read from program memory, if CPU is harvard
+#else
+	#define	MD2_PERM(x) md2_perm[x]                 //Normaly from a const array.
+#endif
 
 /**
  * Pad function. Put len_pad unsigned char in
@@ -120,7 +131,7 @@ static void md2_compute(void *_state, void *_checksum, void *_block)
 	{
 		for(int j = 0; j < COMPUTE_ARRAY_LEN; j++)
 		{
-			compute_array[j] ^= md2_perm [t];
+			compute_array[j] ^= MD2_PERM(t);
 			t = compute_array[j];
 		}
 
@@ -133,7 +144,7 @@ static void md2_compute(void *_state, void *_checksum, void *_block)
 
 	for(i = 0; i < CONFIG_MD2_BLOCK_LEN; i++)
 	{
-		checksum[i]  ^= md2_perm [block[i] ^ t];
+		checksum[i]  ^= MD2_PERM(block[i] ^ t);
 		t = checksum[i];
 	}
 
@@ -236,7 +247,7 @@ uint8_t  *md2_end(Md2Context *context)
  * MD2 test fuction.
  * This function test MD2 algorithm with a standard string specified
  * in RFC 1319.
- * 
+ *
  * \note This test work with official array of 256 byte pemutation
  * contructed from digits of pi, defined in the RFC 1319.
  *
@@ -246,14 +257,14 @@ bool md2_test(void)
 
 	Md2Context context;
 
-	const char *test[] = 
+	const char *test[] =
 	{
-		"", 
+		"",
 		"message digest",
 		"abcdefghijklmnopqrstuvwxyz",
 		"12345678901234567890123456789012345678901234567890123456789012345678901234567890"
 	};
-	
+
 
 	const uint8_t *result[] = {
 		"\x83\x50\xe5\xa3\xe2\x4c\x15\x3d\xf2\x27\x5c\x9f\x80\x69\x27\x73",
@@ -262,14 +273,14 @@ bool md2_test(void)
 		"\xd5\x97\x6f\x79\xd8\x3d\x3a\x0d\xc9\x80\x6c\x3c\x66\xf3\xef\xd8",
 	};
 
-	
+
 	for (int i = 0; i < countof(test); i++)
 	{
 		md2_init(&context);
 		md2_update(&context, test[i], strlen(test[i]));
 
 		if(memcmp(result[i], md2_end(&context), CONFIG_MD2_BLOCK_LEN))
-			return false;	
+			return false;
 	}
 
 	return true;
@@ -280,11 +291,12 @@ bool md2_test(void)
 #include <stdio.h>
 int main(int argc, char * argv[])
 {
+
 	if(md2_test())
 		printf("MD2 algorithm work well!\n");
 	else
 		printf("MD2 algorithm doesn't work well.\n");
-		
+
 }
 
 #endif
