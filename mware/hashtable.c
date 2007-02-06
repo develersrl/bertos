@@ -61,6 +61,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2007/02/06 16:05:01  asterix
+ *#* Replaced ROTATE_* with ROT* defined in macros.h
+ *#*
  *#* Revision 1.7  2006/07/19 12:56:27  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -72,12 +75,11 @@
 #include "hashtable.h"
 #include <cfg/debug.h>
 #include <cfg/compiler.h>
+#include <cfg/macros.h> //ROTL(), ROTR();
 
 #include <string.h>
 
 
-#define ROTATE_LEFT_16(num, count)     (((num) << (count)) | ((num) >> (16-(count))))
-#define ROTATE_RIGHT_16(num, count)    ROTATE_LEFT_16(num, 16-(count))
 
 typedef const void** HashNodePtr;
 #define NODE_EMPTY(node)               (!*(node))
@@ -132,7 +134,7 @@ static uint16_t calc_hash(const void* _key, uint8_t key_length)
 	int len = (int)key_length;
 
 	for (i = 0; i < len; ++i)
-		hash = ROTATE_LEFT_16(hash, 4) ^ key[i];
+		hash = ROTL(hash, 4) ^ key[i];
 
 	return hash ^ (hash >> 6) ^ (hash >> 13);
 }
@@ -164,7 +166,7 @@ static HashNodePtr perform_lookup(struct HashTable* ht,
 	//  is traversed. Actually MCD(table_size, step) must be 1, but
 	//  table_size is always a power of 2, so we just ensure that step is
 	//  never a multiple of 2.
-	step = (ROTATE_RIGHT_16(hash, ht->max_elts_log2) & mask) | 1;
+	step = (ROTR(hash, ht->max_elts_log2) & mask) | 1;
 
 	do
 	{
