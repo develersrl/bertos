@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.14  2007/02/06 09:47:53  asterix
+ *#* Typo.
+ *#*
  *#* Revision 1.13  2007/02/05 18:44:42  asterix
  *#* Add md2_perm function.
  *#*
@@ -84,12 +87,13 @@
 	
 	/**
 	 * Costant define for computing an array of 256 "casual" permutation.
+	 * \{
 	 */
 	#define K1 5
 	#define K2 3
 	#define R  2
 	#define X  172
-
+	/*\}*/
 
 uint8_t md2_perm(uint8_t i)
 {
