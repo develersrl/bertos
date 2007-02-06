@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2007/02/06 15:22:12  asterix
+ *#* Add ROTL and ROTR macros for bit rotating.
+ *#*
  *#* Revision 1.10  2006/09/13 18:31:37  bernie
  *#* BV8(), BV16(), BV32(): New macros for CPUs with small word size; SWAP_T(): New macro to support old compilers.
  *#*
@@ -338,6 +341,14 @@
 	#define BIT_CHANGE_BV(reg, ...)     BIT_CHANGE__(reg, 1, __VA_ARGS__)
 
 #endif /* COMPILER_VARIADIC_MACROS */
+
+/**
+ * Macro for rotating bit left or right.
+ * \{
+ */
+#define ROTR(var, rot) (((var) >> (rot)) | ((var) << ((sizeof(var) * 8) - (rot))))
+#define ROTL(var, rot) (((var) << (rot)) | ((var) >> ((sizeof(var) * 8) - (rot))))
+/*\}*/
 
 #endif /* MACROS_H */
 
