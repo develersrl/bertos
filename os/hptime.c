@@ -10,6 +10,7 @@
  * \version $Id$
  * \author Bernardo Innocenti <bernie@develer.com>
  */
+
 #include "hptime.h"
 
 #if defined(_WIN32)
