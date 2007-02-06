@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.14  2007/02/06 11:37:26  asterix
+ *#* Add CONFIG_MD2_STD_PERM for use standard permutation in MD2.
+ *#*
  *#* Revision 1.13  2007/01/31 13:49:40  asterix
  *#* Add config size block for MD2
  *#*
@@ -92,8 +95,8 @@
  *#* Move cfg/config.h to appconfig.h.
  *#*/
 
-#ifndef APPCONFIG_COMMON_H
-#define APPCONFIG_COMMON_H
+#ifndef APPCONFIG_H
+#define APPCONFIG_H
 
 /** Baud-rate for the kdebug console */
 #define CONFIG_KDEBUG_BAUDRATE  19200
@@ -234,4 +237,7 @@
 /// Size of block for MD2 algorithm 
 #define CONFIG_MD2_BLOCK_LEN 16
 
-#endif /* APPCONFIG_COMMON_H */
+/// Use standard permutation in MD2 algorithm
+#define CONFIG_MD2_STD_PERM 1
+
+#endif /* APPCONFIG_H */
