@@ -7,14 +7,24 @@
  *
  * \brief MD2 Message-Digest algorithm.
  *
+ * The MD2 algorithm work with a constant array of 256 permutationt
+ * defined in RFC1319. If you don't want to use a standard array of 
+ * permutatione you can use a md2_perm() function that generate an 
+ * array of 256 "casual" permutation. To swich from a standard array 
+ * to md2_perm function you must chanche CONFIG_MD2_STD_PERM defined in 
+ * appconfig.h.
+ * If you need to store array in program memory you must define 
+ * a macro _PROGMEM (for more info see mware/pgm.h).
+ *
+ *
  * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 
 /*#*
  *#* $Log$
- *#* Revision 1.14  2007/02/06 09:47:53  asterix
- *#* Typo.
+ *#* Revision 1.15  2007/02/06 15:53:34  asterix
+ *#* Add ROTR macro in m2d_perm, add comments, typos.
  *#*
  *#* Revision 1.13  2007/02/05 18:44:42  asterix
  *#* Add md2_perm function.
@@ -50,16 +60,16 @@
 #include <string.h>           //memset(), memcpy();
 #include <cfg/compiler.h>
 #include <cfg/debug.h>        //ASSERT()
-#include <cfg/macros.h>       //MIN(), countof();
+#include <cfg/macros.h>       //MIN(), countof(), ROTR();
 #include <mware/pgm.h>   
 
 
-#ifdef STD_PERMUTATION
+#if CONFIG_MD2_STD_PERM
 	/*
 	* Official array of 256 byte pemutation contructed from digits of pi, defined
 	* in the RFC 1319.
 	*/
-	static const uint8_t PROGMEM md2_perm[256] = 
+	static const uint8_t PGM_ATTR md2_perm[256] = 
 	{
 	41, 46, 67, 201, 162, 216, 124, 1, 61, 54, 84, 161, 236, 240, 6,
 	19, 98, 167, 5, 243, 192, 199, 115, 140, 152, 147, 43, 217, 188,
@@ -80,6 +90,8 @@
 	166, 119, 114, 248, 235, 117, 75, 10, 49, 68, 80, 180, 143, 237,
 	31, 26, 219, 153, 141, 51, 159, 17, 131, 20
 	};
+
+	#define MD2_PERM(x) PGM_READ_CHAR(&md2_perm[x])
 #else
 	/**
 	 * Md2_perm() function generate an array of 256 "casual" permutation.
@@ -95,33 +107,21 @@
 	#define X  172
 	/*\}*/
 
-uint8_t md2_perm(uint8_t i)
-{
+	static uint8_t md2_perm(uint8_t i)
+	{
 
-	i = i * K1;
-	i = (i >> R) ^ (i << R); //Rotate i for R times.
-	i ^=  X;
-	i = i * K2;
+		i = i * K1;
+		i = ROTR(i, R);
+		i ^=  X;
+		i = i * K2;
 
-	return i;
-}
-	
+		return i;
+	}
+
+	#define MD2_PERM(x) md2_perm(x)
+		
 #endif
 
-
-#if CPU_HARVARD 
-	#ifdef STD_PERMUTATION
-		#define	MD2_PERM(x) pgm_read_char(&md2_permr[x]) //Read from program memory, if CPU is harvard
-	#else
-		#define	MD2_PERM(x) pgm_read_char(&md2_permr(x)) //Read from program memory, if CPU is harvard
-	#endif
-#else
-	#ifdef STD_PERMUTATION
-		#define	MD2_PERM(x) md2_perm[x]                  //
-	#else
-		#define	MD2_PERM(x) md2_perm(x)                  //
-	#endif
-#endif
 
 /**
  * Pad function. Put len_pad unsigned char in
