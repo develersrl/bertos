@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2007/02/08 11:53:03  asterix
+ *#* Add EntrPool struct. Typos.
+ *#*
  *#* Revision 1.1  2007/02/08 11:13:41  asterix
  *#* Add function prototypes.
  *#*
@@ -25,14 +28,24 @@
 #include <cfg/compiler.h>
 #include <appconfig.h>
 
-
 /**
+ * Sturct data of entropy pool.
  */
-void add_entropy(void *data, size_t n_bit);
-size_t pool_size(void);
-void get_bit(void *data, size_t n_bit);
-void get_bit_n(void *data, size_t n_bit);
-bool save_pool(void);
-uint8_t load_pool(void);
+typedef struct EntrPool 
+{
+	size_t entropy;                                  ///< Actual value of entropy.
+	size_t pool_pos;                                 ///< Actual size of entropy pool.
+	size_t counter;                                  ///< Counter.
+	uint8_t pool_entropy[CONFIG_SIZE_ENTROPY_POOL];  ///< Entropy pool.
+
+} EntrPool;
+
+void init_pool(EntrPool *pool);
+void add_data(EntrPool *pool, void *data, size_t n_bit);
+size_t pool_size(EntrPool *pool);
+void get_bit(EntrPool *pool, void *data, size_t n_bit);
+void get_bit_n(EntrPool *pool, void *data, size_t n_bit);
+bool save_pool(void *data);
+uint8_t *load_pool(void);
 
 #endif /* RANDPOOL_H */

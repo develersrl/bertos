@@ -13,38 +13,46 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.1  2007/02/08 11:13:40  asterix
- *#* Add function prototypes.
+ *#* Revision 1.2  2007/02/08 11:53:03  asterix
+ *#* Add EntrPool struct. Typos.
  *#*
  *#*/
 
 #include "randpool.h"
+#include "md2.h"
 
 #include <cfg/compiler.h>
 #include <cfg/debug.h>        //ASSERT()
 
-
-void add_entropy(void *data, size_t n_bit)
+static void stir(EntrPool *pool)
 {
 }
 
-size_t pool_size(void)
+void init_pool(EntrPool *pool);
 {
 }
 
-void get_bit(void *data, size_t n_bit)
+void add_data(EntrPool *pool, void *data, size_t n_bit);
 {
 }
 
-void get_bit_n(void *data, size_t n_bit)
+size_t pool_size(EntrPool *pool);
 {
 }
 
-bool save_pool(void)
+void get_bit(EntrPool *pool, void *data, size_t n_bit);
 {
 }
 
-uint8_t load_pool(void)
+void get_bit_n(EntrPool *pool, void *data, size_t n_bit);
+{
+}
+
+bool save_pool(void *data);
+{
+}
+
+uint8_t *load_pool(void);
 {
 }
 
