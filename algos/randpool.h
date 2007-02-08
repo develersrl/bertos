@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2007/02/08 17:18:01  asterix
+ *#* Write add_data and stir function. Typos
+ *#*
  *#* Revision 1.3  2007/02/08 14:25:56  asterix
  *#* Typos.
  *#*
@@ -36,7 +39,7 @@
  */
 typedef struct EntrPool 
 {
-	size_t entropy;                                  ///< Actual value of entropy.
+	size_t entropy;                                  ///< Actual value of entropy (In bit).
 	size_t pool_pos_add;                             ///< Size of byte insert in entropy pool.
 	size_t pool_pos_get;                             ///< Size of byte take in entropy pool.
 	size_t counter;                                  ///< Counter.
