@@ -13,8 +13,8 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.4  2007/02/08 17:18:00  asterix
- *#* Write add_data and stir function. Typos
+ *#* Revision 1.5  2007/02/08 17:21:51  asterix
+ *#* Write pool_size function.
  *#*
  *#* Revision 1.3  2007/02/08 14:25:29  asterix
  *#* Write static funcion push_byte.
@@ -140,8 +140,12 @@ void add_data(EntrPool *pool, void *data, size_t n_bit)
 	pool->last_counter = event;
 }
 
+/**
+ * Get the actual value of entropy.
+ */
 size_t pool_size(EntrPool *pool)
 {
+	return pool->entropy;
 }
 
 void get_bit(EntrPool *pool, void *data, size_t n_bit)
