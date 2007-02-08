@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.3  2007/02/08 14:25:56  asterix
+ *#* Typos.
+ *#*
  *#* Revision 1.2  2007/02/08 11:53:03  asterix
  *#* Add EntrPool struct. Typos.
  *#*
@@ -34,8 +37,10 @@
 typedef struct EntrPool 
 {
 	size_t entropy;                                  ///< Actual value of entropy.
-	size_t pool_pos;                                 ///< Actual size of entropy pool.
+	size_t pool_pos_add;                             ///< Size of byte insert in entropy pool.
+	size_t pool_pos_get;                             ///< Size of byte take in entropy pool.
 	size_t counter;                                  ///< Counter.
+	size_t last_counter;                             ///< Last timer value.
 	uint8_t pool_entropy[CONFIG_SIZE_ENTROPY_POOL];  ///< Entropy pool.
 
 } EntrPool;
