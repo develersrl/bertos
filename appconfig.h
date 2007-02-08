@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.15  2007/02/08 14:20:35  asterix
+ *#* Add CONFIG_SIZE_ENTROPY_POOL.
+ *#*
  *#* Revision 1.14  2007/02/06 11:37:26  asterix
  *#* Add CONFIG_MD2_STD_PERM for use standard permutation in MD2.
  *#*
@@ -234,10 +237,13 @@
 /// Enable smooth scrolling in menus
 #define CONFIG_MENU_SMOOTH  1
 
-/// Size of block for MD2 algorithm 
+/// Size of block for MD2 algorithm.
 #define CONFIG_MD2_BLOCK_LEN 16
 
-/// Use standard permutation in MD2 algorithm
-#define CONFIG_MD2_STD_PERM 1
+/// Use standard permutation in MD2 algorithm.
+#define CONFIG_MD2_STD_PERM 0 
+
+/// Define a size, in byte, of entropy pool.
+#define CONFIG_SIZE_ENTROPY_POOL 160
 
 #endif /* APPCONFIG_H */
