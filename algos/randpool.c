@@ -13,8 +13,8 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.7  2007/02/09 15:49:54  asterix
- *#* Fix bug in randpool_stir and randpool_add. Typos.
+ *#* Revision 1.8  2007/02/09 17:27:09  asterix
+ *#* Write randpool_getN.
  *#*
  *#* Revision 1.6  2007/02/09 09:24:38  asterix
  *#* Typos. Add data_len in randpool_add and n_byte in randpool_push pototypes.
@@ -27,12 +27,13 @@
 #include "randpool.h"
 #include "md2.h"
 
-#include <string.h>            //memset(), memcpy();
+#include <string.h>          //memset(), memcpy();
 #include <cfg/compiler.h>
-#include <cfg/debug.h>        //ASSERT()
-#include <drv/timer.h>        //timer_clock();
+#include <cfg/debug.h>       //ASSERT()
+#include <cfg/macros.h>      //MIN()
+#include <drv/timer.h>       //timer_clock();
 
-#include <stdio.h>            //sprintf();
+#include <stdio.h>           //sprintf();
 
 
 
@@ -60,42 +61,7 @@ static void randpool_push(EntropyPool *pool, void *_byte, size_t n_byte)
 }
 
 
-/**
- * Add n_bit of  entropy in entropy pool.
- */
-void randpool_add(EntropyPool *pool, void *data, size_t data_len, size_t entropy)
-{
-	ticks_t event = timer_clock();
-	uint32_t delta;
-	uint8_t sep[] = "\xaa\xaa\xaa\xaa";  // ??
-
-	randpool_push(pool, data, data_len); //Insert data to entropy pool.
-
-	randpool_push(pool, sep, strlen(sep)); // ??
-
-	/*Difference of time between a two accese to entropy pool.*/
-	delta = event - pool->last_counter;
-
-	randpool_push(pool, &delta, sizeof(delta));
-
-	delta = delta & 0xff;
-
-	randpool_push(pool, &delta, sizeof(delta));
-
-	/*
-	 * Count of number entropy bit add with delta.
-	 */
-	while(delta)
-	{
-		delta >>= 1;
-		entropy++;
-	}
-
-	pool->entropy += entropy;      //Update a entropy of the pool.
-	pool->last_counter = event;
-}
-
-/* \
+/*
  * This function stir entropy pool with MD2 function hash.
  *
  */
@@ -133,6 +99,41 @@ static void randpool_stir(EntropyPool *pool)
 	pool->entropy = entropy; //Restore old value of entropy. We haven't add entropy.
 }
 
+/**
+ * Add n_bit of  entropy in entropy pool.
+ */
+void randpool_add(EntropyPool *pool, void *data, size_t data_len, size_t entropy)
+{
+	ticks_t event = timer_clock();
+	uint32_t delta;
+	uint8_t sep[] = "\xaa\xaa\xaa\xaa";  // ??
+
+	randpool_push(pool, data, data_len); //Insert data to entropy pool.
+
+	randpool_push(pool, sep, strlen(sep)); // ??
+
+	/*Difference of time between a two accese to entropy pool.*/
+	delta = event - pool->last_counter;
+
+	randpool_push(pool, &delta, sizeof(delta));
+
+	delta = delta & 0xff;
+
+	randpool_push(pool, &delta, sizeof(delta));
+
+	/*
+	 * Count of number entropy bit add with delta.
+	 */
+	while(delta)
+	{
+		delta >>= 1;
+		entropy++;
+	}
+
+	pool->entropy += entropy;      //Update a entropy of the pool.
+	pool->last_counter = event;
+}
+
 
 void randpool_init(EntropyPool *pool)
 {
@@ -158,8 +159,52 @@ void randpool_get(EntropyPool *pool, void *data, size_t n_byte)
 
 }
 
+/**
+ * Get n_byte from entropy pool. If n_byte is larger than number
+ * byte of entropy in entropy pool, rand_pool_getN continue
+ * to generate pseudocasual value from previous state of
+ * pool.
+ */
 void randpool_getN(EntropyPool *pool, void *data, size_t n_byte)
 {
+	Md2Context context;
+	size_t i = pool->pos_get;
+	int n = n_byte;
+	size_t len = MIN((size_t)CONFIG_MD2_BLOCK_LEN, n_byte);
+
+	/* Test if i + CONFIG_MD2_BLOCK_LEN  is inside of entropy pool.*/
+	ASSERT((CONFIG_MD2_BLOCK_LEN + i) < CONFIG_SIZE_ENTROPY_POOL);
+
+	md2_init(&context); 
+
+	while(n < 0)
+	{
+		/*Hash previous state of pool*/
+		md2_update(&context, &pool->pool_entropy[i], CONFIG_MD2_BLOCK_LEN);
+
+		memcpy(data, md2_end(&context), len);
+
+		n -= len; //Number of byte copied in data.
+
+		len = MIN(n, CONFIG_MD2_BLOCK_LEN);
+
+		i = (i + CONFIG_MD2_BLOCK_LEN) % CONFIG_SIZE_ENTROPY_POOL;
+
+		/* If we haven't more entropy pool to hash, we stir it.*/
+		if(i < CONFIG_MD2_BLOCK_LEN)
+		{
+			randpool_stir(pool);
+			i = pool->pos_get;
+		}
+	}
+	
+	pool->pos_get = i; //Current number of byte we get from pool.
+	
+	pool->entropy -= n_byte; //Update a entropy.
+
+	/*If we get all entropy entropy is 0*/
+	if(pool->entropy < 0) 
+		pool->entropy = 0;
 }
 
 bool randpool_save(void *data)
