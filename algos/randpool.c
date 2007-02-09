@@ -13,8 +13,8 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.8  2007/02/09 17:27:09  asterix
- *#* Write randpool_getN.
+ *#* Revision 1.9  2007/02/09 17:58:09  asterix
+ *#* Add macro CONFIG_RANDPOOL_TIMER.
  *#*
  *#* Revision 1.6  2007/02/09 09:24:38  asterix
  *#* Typos. Add data_len in randpool_add and n_byte in randpool_push pototypes.
@@ -35,7 +35,12 @@
 
 #include <stdio.h>           //sprintf();
 
-
+//TODO:
+#if CONFIG_RANDPOOL_TIMER 
+	#define TIMER() timer_clock()
+#else
+	#define TIMER() 0  //TODO:
+#endif
 
 /*
  * Insert bytes in entropy pool, making a XOR of bytes present
@@ -104,7 +109,7 @@ static void randpool_stir(EntropyPool *pool)
  */
 void randpool_add(EntropyPool *pool, void *data, size_t data_len, size_t entropy)
 {
-	ticks_t event = timer_clock();
+	ticks_t event = TIMER();
 	uint32_t delta;
 	uint8_t sep[] = "\xaa\xaa\xaa\xaa";  // ??
 
@@ -140,7 +145,7 @@ void randpool_init(EntropyPool *pool)
 
 	memset(pool, 0, sizeof(EntropyPool));
 	pool->pos_get = CONFIG_MD2_BLOCK_LEN;
-	pool->last_counter = timer_clock();
+	pool->last_counter = TIMER();
 
 	//TODO: inizializzazione del timer di sistema.
 
