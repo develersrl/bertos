@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2007/02/09 15:49:54  asterix
+ *#* Fix bug in randpool_stir and randpool_add. Typos.
+ *#*
  *#* Revision 1.6  2007/02/09 09:24:38  asterix
  *#* Typos. Add data_len in randpool_add and n_byte in randpool_push pototypes.
  *#*
@@ -37,7 +40,7 @@
  * Insert bytes in entropy pool, making a XOR of bytes present
  * in entropy pool.
  */
-static void randpool_push(EntrPool *pool, void *_byte, size_t n_byte)
+static void randpool_push(EntropyPool *pool, void *_byte, size_t n_byte)
 {
 	size_t i = pool->pos_add; // Current number of byte insert in entropy pool.
 	uint8_t *byte;
@@ -60,9 +63,9 @@ static void randpool_push(EntrPool *pool, void *_byte, size_t n_byte)
 /**
  * Add n_bit of  entropy in entropy pool.
  */
-void randpool_add(EntrPool *pool, void *data, size_t data_len, size_t entropy)
+void randpool_add(EntropyPool *pool, void *data, size_t data_len, size_t entropy)
 {
-	uint32_t event = timer_clock();
+	ticks_t event = timer_clock();
 	uint32_t delta;
 	uint8_t sep[] = "\xaa\xaa\xaa\xaa";  // ??
 
@@ -88,7 +91,7 @@ void randpool_add(EntrPool *pool, void *data, size_t data_len, size_t entropy)
 		entropy++;
 	}
 
-	pool->entropy = entropy;      //Update a entropy of the pool.
+	pool->entropy += entropy;      //Update a entropy of the pool.
 	pool->last_counter = event;
 }
 
@@ -96,31 +99,31 @@ void randpool_add(EntrPool *pool, void *data, size_t data_len, size_t entropy)
  * This function stir entropy pool with MD2 function hash.
  *
  */
-static void randpool_stir(EntrPool *pool)
+static void randpool_stir(EntropyPool *pool)
 {
 	size_t entropy = pool->entropy; //Save current calue of entropy.
 	Md2Context context;
-	uint8_t tmp_buf[(sizeof(size_t) * 2) + sizeof(int)];  //Temporary buffer.
+	uint8_t tmp_buf[((sizeof(size_t) * 2) + sizeof(int)) * 2]; //Temporary buffer.
 
-	md2_init(&context);
+	md2_init(&context); //Init MD2 algorithm.
 
 	randpool_add(pool, "", 0, 0);
 
-	for (int i = 0; i < (CONFIG_SIZE_ENTROPY_POOL / CONFIG_MD2_BLOCK_LEN); i++)
+	for (int i = 0; i < NUM_STIR_LOOP; i++)
 	{
-		sprintf(tmp_buf, "%x%x%x",pool->counter, i, pool->pos_add);
+		sprintf(tmp_buf, "%0x%0x%0x",pool->counter, i, pool->pos_add);
 
 		/*
 		 * Hash with MD2 algorithm the entropy pool.
 		 */
 		md2_update(&context, pool->pool_entropy, CONFIG_SIZE_ENTROPY_POOL);
 
-		md2_update(&context, tmp_buf, CONFIG_SIZE_ENTROPY_POOL);
+		md2_update(&context, tmp_buf, strlen(tmp_buf));
 
 		/*Insert a message digest in entropy pool.*/
 		randpool_push(pool, md2_end(&context), CONFIG_MD2_BLOCK_LEN);
 
-		pool->counter = (pool->counter + 1) & 0xFFFFFFFF; //Update a counter modulo 4.
+		pool->counter = (pool->counter + 1) & 0xFFFFFFFF; //Clamp a counter to 4 byte.
 
 	}
 
@@ -131,10 +134,10 @@ static void randpool_stir(EntrPool *pool)
 }
 
 
-void randpool_init(EntrPool *pool)
+void randpool_init(EntropyPool *pool)
 {
 
-	memset(pool, 0, sizeof(EntrPool));
+	memset(pool, 0, sizeof(EntropyPool));
 	pool->pos_get = CONFIG_MD2_BLOCK_LEN;
 	pool->last_counter = timer_clock();
 
@@ -145,17 +148,17 @@ void randpool_init(EntrPool *pool)
 /**
  * Get the actual value of entropy.
  */
-size_t randpool_size(EntrPool *pool)
+size_t randpool_size(EntropyPool *pool)
 {
 	return pool->entropy;
 }
 
-void randpool_get(EntrPool *pool, void *data, size_t n_byte)
+void randpool_get(EntropyPool *pool, void *data, size_t n_byte)
 {
 
 }
 
-void randpool_getN(EntrPool *pool, void *data, size_t n_byte)
+void randpool_getN(EntropyPool *pool, void *data, size_t n_byte)
 {
 }
 
