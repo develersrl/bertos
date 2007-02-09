@@ -1,7 +1,7 @@
 /**
  * \file
  * <!--
- * Copyright 2007 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2007 Develer S.r.l. (http://www.develer.com/);
  * This file is part of DevLib - See README.devlib for information.
  * -->
  *
@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2007/02/09 09:24:38  asterix
+ *#* Typos. Add data_len in randpool_add and n_byte in randpool_push pototypes.
+ *#*
  *#* Revision 1.4  2007/02/08 17:18:01  asterix
  *#* Write add_data and stir function. Typos
  *#*
@@ -39,21 +42,22 @@
  */
 typedef struct EntrPool 
 {
-	size_t entropy;                                  ///< Actual value of entropy (In bit).
-	size_t pool_pos_add;                             ///< Size of byte insert in entropy pool.
-	size_t pool_pos_get;                             ///< Size of byte take in entropy pool.
+	size_t entropy;                                  ///< Actual value of entropy (byte).
+	size_t pos_add;                                  ///< Size of byte insert in entropy pool.
+	size_t pos_get;                                  ///< Size of byte take in entropy pool.
 	size_t counter;                                  ///< Counter.
 	size_t last_counter;                             ///< Last timer value.
 	uint8_t pool_entropy[CONFIG_SIZE_ENTROPY_POOL];  ///< Entropy pool.
 
 } EntrPool;
 
-void init_pool(EntrPool *pool);
-void add_data(EntrPool *pool, void *data, size_t n_bit);
-size_t pool_size(EntrPool *pool);
-void get_bit(EntrPool *pool, void *data, size_t n_bit);
-void get_bit_n(EntrPool *pool, void *data, size_t n_bit);
-bool save_pool(void *data);
-uint8_t *load_pool(void);
+
+void randpool_add(EntrPool *pool, void *data, size_t data_len, size_t entropy);
+void randpool_init(EntrPool *pool);
+size_t randpool_size(EntrPool *pool);
+void randpool_get(EntrPool *pool, void *data, size_t n_byte);
+void randpool_getN(EntrPool *pool, void *data, size_t n_byte);
+bool randpool_save(void *data);
+uint8_t *randpool_load(void);
 
 #endif /* RANDPOOL_H */
