@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2007/02/12 09:40:43  asterix
+ *#* Remove randpool_load function. Add *data in randpool_init prototype.
+ *#*
  *#* Revision 1.6  2007/02/09 15:49:54  asterix
  *#* Fix bug in randpool_stir and randpool_add. Typos.
  *#*
@@ -58,11 +61,10 @@ typedef struct EntropyPool
 
 
 void randpool_add(EntropyPool *pool, void *data, size_t data_len, size_t entropy);
-void randpool_init(EntropyPool *pool);
+void randpool_init(EntropyPool *pool, void *_data, size_t len);
 size_t randpool_size(EntropyPool *pool);
 void randpool_get(EntropyPool *pool, void *data, size_t n_byte);
 void randpool_getN(EntropyPool *pool, void *data, size_t n_byte);
 bool randpool_save(void *data);
-uint8_t *randpool_load(void);
 
 #endif /* RANDPOOL_H */

@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2007/02/12 09:40:43  asterix
+ *#* Remove randpool_load function. Add *data in randpool_init prototype.
+ *#*
  *#* Revision 1.10  2007/02/12 09:03:32  asterix
  *#* Add CONFIG_RANDPOOL_TIMER macro to swich on or off timer support
  *#*
@@ -152,9 +155,16 @@ void randpool_add(EntropyPool *pool, void *data, size_t data_len, size_t entropy
 	pool->last_counter = event;
 }
 
-
-void randpool_init(EntropyPool *pool)
+/**
+ * Randpool function initialization.
+ * The entropy pool can be initialize also with 
+ * a previous entropy pool. 
+ */
+void randpool_init(EntropyPool *pool, void *_data, size_t len)
 {
+	uint8_t *data;
+
+	data = (uint8_t *)_data;
 
 	memset(pool, 0, sizeof(EntropyPool));
 	pool->pos_get = CONFIG_MD2_BLOCK_LEN;
@@ -163,6 +173,18 @@ void randpool_init(EntropyPool *pool)
 	pool->last_counter = timer_clock();
 #endif
 
+	ASSERT(len < CONFIG_SIZE_ENTROPY_POOL);
+
+	if(len > 0)
+	{
+		/*
+		 * Initialize a entropy pool with a 
+		 * previous pool, and assume all pool as
+		 * entropy.
+		 */
+		memcpy(pool->pool_entropy, data, len);
+		pool->entropy = len;
+	}
 
 }
 
@@ -228,10 +250,6 @@ void randpool_getN(EntropyPool *pool, void *data, size_t n_byte)
 }
 
 bool randpool_save(void *data)
-{
-}
-
-uint8_t *randpool_load(void)
 {
 }
 
