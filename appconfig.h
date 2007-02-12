@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.16  2007/02/12 15:29:41  asterix
+ *#* Add CONFIG_RANDPOOL_TIMER macro to swich on or off timer support in randpool.
+ *#*
  *#* Revision 1.15  2007/02/08 14:20:35  asterix
  *#* Add CONFIG_SIZE_ENTROPY_POOL.
  *#*
@@ -244,6 +247,9 @@
 #define CONFIG_MD2_STD_PERM 0 
 
 /// Define a size, in byte, of entropy pool.
-#define CONFIG_SIZE_ENTROPY_POOL 160
+#define CONFIG_SIZE_ENTROPY_POOL 64
+
+/// Turn on or off timer support in Randpool.
+#define CONFIG_RANDPOOL_TIMER 1
 
 #endif /* APPCONFIG_H */
