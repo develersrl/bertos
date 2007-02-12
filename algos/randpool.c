@@ -13,8 +13,8 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.11  2007/02/12 09:40:43  asterix
- *#* Remove randpool_load function. Add *data in randpool_init prototype.
+ *#* Revision 1.12  2007/02/12 09:47:39  asterix
+ *#* Remove randpool_save. Add randpool_pool.
  *#*
  *#* Revision 1.10  2007/02/12 09:03:32  asterix
  *#* Add CONFIG_RANDPOOL_TIMER macro to swich on or off timer support
@@ -248,8 +248,11 @@ void randpool_getN(EntropyPool *pool, void *data, size_t n_byte)
 	if(pool->entropy < 0) 
 		pool->entropy = 0;
 }
-
-bool randpool_save(void *data)
+/**
+ * Return a pointer to entropy pool.
+ */
+uint8_t *randpool_pool(EntropyPool *pool)
 {
+	return pool->pool_entropy;
 }
 
