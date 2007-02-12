@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.13  2007/02/12 18:25:34  asterix
+ *#* Fix bug in randpool_getN.
+ *#*
  *#* Revision 1.12  2007/02/12 09:47:39  asterix
  *#* Remove randpool_save. Add randpool_pool.
  *#*
@@ -207,20 +210,24 @@ void randpool_get(EntropyPool *pool, void *data, size_t n_byte)
  * to generate pseudocasual value from previous state of
  * pool.
  */
-void randpool_getN(EntropyPool *pool, void *data, size_t n_byte)
+void randpool_getN(EntropyPool *pool, void *_data, size_t n_byte)
 {
 	Md2Context context;
 	size_t i = pool->pos_get;
 	int n = n_byte;
 	size_t len = MIN((size_t)CONFIG_MD2_BLOCK_LEN, n_byte);
+	uint8_t *data;
+
+	data = (uint8_t *)_data;
 
 	/* Test if i + CONFIG_MD2_BLOCK_LEN  is inside of entropy pool.*/
 	ASSERT((CONFIG_MD2_BLOCK_LEN + i) < CONFIG_SIZE_ENTROPY_POOL);
 
 	md2_init(&context); 
 
-	while(n < 0)
+	while(n > 0)
 	{
+
 		/*Hash previous state of pool*/
 		md2_update(&context, &pool->pool_entropy[i], CONFIG_MD2_BLOCK_LEN);
 
@@ -247,7 +254,9 @@ void randpool_getN(EntropyPool *pool, void *data, size_t n_byte)
 	/*If we get all entropy entropy is 0*/
 	if(pool->entropy < 0) 
 		pool->entropy = 0;
+
 }
+
 /**
  * Return a pointer to entropy pool.
  */
