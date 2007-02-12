@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2007/02/12 09:03:32  asterix
+ *#* Add CONFIG_RANDPOOL_TIMER macro to swich on or off timer support
+ *#*
  *#* Revision 1.9  2007/02/09 17:58:09  asterix
  *#* Add macro CONFIG_RANDPOOL_TIMER.
  *#*
@@ -27,20 +30,18 @@
 #include "randpool.h"
 #include "md2.h"
 
+#include <stdio.h>           //sprintf();
 #include <string.h>          //memset(), memcpy();
+
 #include <cfg/compiler.h>
 #include <cfg/debug.h>       //ASSERT()
 #include <cfg/macros.h>      //MIN()
-#include <drv/timer.h>       //timer_clock();
 
-#include <stdio.h>           //sprintf();
-
-//TODO:
-#if CONFIG_RANDPOOL_TIMER 
-	#define TIMER() timer_clock()
-#else
-	#define TIMER() 0  //TODO:
+#if CONFIG_RANDPOOL_TIMER
+	#include <drv/timer.h>       //timer_clock();
 #endif
+
+
 
 /*
  * Insert bytes in entropy pool, making a XOR of bytes present
@@ -109,16 +110,20 @@ static void randpool_stir(EntropyPool *pool)
  */
 void randpool_add(EntropyPool *pool, void *data, size_t data_len, size_t entropy)
 {
-	ticks_t event = TIMER();
-	uint32_t delta;
 	uint8_t sep[] = "\xaa\xaa\xaa\xaa";  // ??
 
 	randpool_push(pool, data, data_len); //Insert data to entropy pool.
 
 	randpool_push(pool, sep, strlen(sep)); // ??
 
+#if CONFIG_RANDPOOL_TIMER
+
+	ticks_t event = timer_clock();
+	uint32_t delta;
+
 	/*Difference of time between a two accese to entropy pool.*/
 	delta = event - pool->last_counter;
+
 
 	randpool_push(pool, &delta, sizeof(delta));
 
@@ -135,6 +140,14 @@ void randpool_add(EntropyPool *pool, void *data, size_t data_len, size_t entropy
 		entropy++;
 	}
 
+#else
+	size_t event = 0;
+
+	/*Difference of time between a two accese to entropy pool.*/
+	event = pool->last_counter++;
+
+#endif
+
 	pool->entropy += entropy;      //Update a entropy of the pool.
 	pool->last_counter = event;
 }
@@ -145,9 +158,11 @@ void randpool_init(EntropyPool *pool)
 
 	memset(pool, 0, sizeof(EntropyPool));
 	pool->pos_get = CONFIG_MD2_BLOCK_LEN;
-	pool->last_counter = TIMER();
 
-	//TODO: inizializzazione del timer di sistema.
+#if CONFIG_RANDPOOL_TIMER
+	pool->last_counter = timer_clock();
+#endif
+
 
 }
 
