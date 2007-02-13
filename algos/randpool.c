@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.14  2007/02/13 09:57:12  asterix
+ *#* Add directive #if in struct EntropyPool, and remove #else in randpool_add.
+ *#*
  *#* Revision 1.13  2007/02/12 18:25:34  asterix
  *#* Fix bug in randpool_getN.
  *#*
@@ -146,16 +149,11 @@ void randpool_add(EntropyPool *pool, void *data, size_t data_len, size_t entropy
 		entropy++;
 	}
 
-#else
-	size_t event = 0;
-
-	/*Difference of time between a two accese to entropy pool.*/
-	event = pool->last_counter++;
+	pool->last_counter = event;
 
 #endif
 
 	pool->entropy += entropy;      //Update a entropy of the pool.
-	pool->last_counter = event;
 }
 
 /**

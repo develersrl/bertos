@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.9  2007/02/13 09:57:12  asterix
+ *#* Add directive #if in struct EntropyPool, and remove #else in randpool_add.
+ *#*
  *#* Revision 1.8  2007/02/12 09:47:39  asterix
  *#* Remove randpool_save. Add randpool_pool.
  *#*
@@ -54,7 +57,11 @@ typedef struct EntropyPool
 	size_t pos_add;                                  ///< Number of byte  idd in entropy pool.
 	size_t pos_get;                                  ///< Number of byte get in entropy pool.
 	size_t counter;                                  ///< Counter.
+
+#if CONFIG_RANDPOOL_TIMER
 	size_t last_counter;                             ///< Last timer value.
+#endif
+
 	uint8_t pool_entropy[CONFIG_SIZE_ENTROPY_POOL];  ///< Entropy pool.
 
 } EntropyPool;
