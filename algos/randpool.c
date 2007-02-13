@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.15  2007/02/13 15:09:19  asterix
+ *#* Fix bug in randpool_getN.
+ *#*
  *#* Revision 1.14  2007/02/13 09:57:12  asterix
  *#* Add directive #if in struct EntropyPool, and remove #else in randpool_add.
  *#*
@@ -212,7 +215,8 @@ void randpool_getN(EntropyPool *pool, void *_data, size_t n_byte)
 {
 	Md2Context context;
 	size_t i = pool->pos_get;
-	int n = n_byte;
+	size_t n = n_byte;
+	size_t pos_write = 0;  //Number of block has been written in data.
 	size_t len = MIN((size_t)CONFIG_MD2_BLOCK_LEN, n_byte);
 	uint8_t *data;
 
@@ -229,11 +233,12 @@ void randpool_getN(EntropyPool *pool, void *_data, size_t n_byte)
 		/*Hash previous state of pool*/
 		md2_update(&context, &pool->pool_entropy[i], CONFIG_MD2_BLOCK_LEN);
 
-		memcpy(data, md2_end(&context), len);
+		memcpy(&data[prev], md2_end(&context), len);
 
-		n -= len; //Number of byte copied in data.
+		pos_write += len;   //Update number of block has been written in data.
+		n -= len;           //Number of byte copied in data.
 
-		len = MIN(n, CONFIG_MD2_BLOCK_LEN);
+		len = MIN(n,(size_t)CONFIG_MD2_BLOCK_LEN);
 
 		i = (i + CONFIG_MD2_BLOCK_LEN) % CONFIG_SIZE_ENTROPY_POOL;
 
@@ -243,8 +248,10 @@ void randpool_getN(EntropyPool *pool, void *_data, size_t n_byte)
 			randpool_stir(pool);
 			i = pool->pos_get;
 		}
+
 	}
 	
+
 	pool->pos_get = i; //Current number of byte we get from pool.
 	
 	pool->entropy -= n_byte; //Update a entropy.
