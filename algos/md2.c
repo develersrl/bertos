@@ -23,6 +23,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.16  2007/02/15 13:29:49  asterix
+ *#* Add MD2_DIGEST_LEN macro.
+ *#*
  *#* Revision 1.15  2007/02/06 15:53:34  asterix
  *#* Add ROTR macro in m2d_perm, add comments, typos.
  *#*
@@ -322,7 +325,7 @@ bool md2_test(void)
 		md2_init(&context);
 		md2_update(&context, test[i], strlen(test[i]));
 
-		if(memcmp(result[i], md2_end(&context), CONFIG_MD2_BLOCK_LEN))
+		if(memcmp(result[i], md2_end(&context), MD2_DIGEST_LEN))
 			return false;
 	}
 

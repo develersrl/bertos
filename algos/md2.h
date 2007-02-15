@@ -21,6 +21,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2007/02/15 13:29:49  asterix
+ *#* Add MD2_DIGEST_LEN macro.
+ *#*
  *#* Revision 1.6  2007/02/02 18:15:31  asterix
  *#* Add function MD2_test. Fix bug in md2_update function.
  *#*
@@ -49,7 +52,7 @@
 
 #define NUM_COMPUTE_ROUNDS 18                        ///< Number of compute rounds.
 #define COMPUTE_ARRAY_LEN  CONFIG_MD2_BLOCK_LEN * 3     ///< Lenght of compute array.
-
+#define MD2_DIGEST_LEN CONFIG_MD2_BLOCK_LEN
 /**
  * Context for MD2 computation.
  */
