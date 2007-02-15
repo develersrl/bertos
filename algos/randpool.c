@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.18  2007/02/15 13:48:40  asterix
+ *#* Fix bug in randpool_init.
+ *#*
  *#* Revision 1.17  2007/02/15 13:40:42  asterix
  *#* Fix bug in randpool_add and randpool_strir.
  *#*
@@ -171,21 +174,20 @@ void randpool_init(EntropyPool *pool, void *_data, size_t len)
 	data = (uint8_t *)_data;
 
 	memset(pool, 0, sizeof(EntropyPool));
-	pool->pos_get = CONFIG_MD2_BLOCK_LEN;
+	pool->pos_get = MD2_DIGEST_LEN;
 
 #if CONFIG_RANDPOOL_TIMER
 	pool->last_counter = timer_clock();
 #endif
 
-	ASSERT(len < CONFIG_SIZE_ENTROPY_POOL);
-
-	if(len > 0)
+	if(data)
 	{
 		/*
 		 * Initialize a entropy pool with a 
 		 * previous pool, and assume all pool as
 		 * entropy.
 		 */
+		len = MIN(len,(size_t)CONFIG_SIZE_ENTROPY_POOL);
 		memcpy(pool->pool_entropy, data, len);
 		pool->entropy = len;
 	}
