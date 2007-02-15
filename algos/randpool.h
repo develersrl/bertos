@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2007/02/15 13:40:42  asterix
+ *#* Fix bug in randpool_add and randpool_strir.
+ *#*
  *#* Revision 1.9  2007/02/13 09:57:12  asterix
  *#* Add directive #if in struct EntropyPool, and remove #else in randpool_add.
  *#*
@@ -46,7 +49,6 @@
 #include <cfg/compiler.h>
 #include <appconfig.h>
 
-#define NUM_STIR_LOOP  CONFIG_SIZE_ENTROPY_POOL / CONFIG_MD2_BLOCK_LEN
 
 /**
  * Sturct data of entropy pool.
@@ -67,7 +69,7 @@ typedef struct EntropyPool
 } EntropyPool;
 
 
-void randpool_add(EntropyPool *pool, void *data, size_t data_len, size_t entropy);
+void randpool_add(EntropyPool *pool, void *data, size_t entropy);
 void randpool_init(EntropyPool *pool, void *_data, size_t len);
 size_t randpool_size(EntropyPool *pool);
 void randpool_get(EntropyPool *pool, void *data, size_t n_byte);
