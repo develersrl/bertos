@@ -13,8 +13,8 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.18  2007/02/15 13:48:40  asterix
- *#* Fix bug in randpool_init.
+ *#* Revision 1.19  2007/02/15 13:54:26  asterix
+ *#* Rename randpool_getN in randpool_get. Fix bug in randpool_get.
  *#*
  *#* Revision 1.17  2007/02/15 13:40:42  asterix
  *#* Fix bug in randpool_add and randpool_strir.
@@ -202,30 +202,25 @@ size_t randpool_size(EntropyPool *pool)
 	return pool->entropy;
 }
 
-void randpool_get(EntropyPool *pool, void *data, size_t n_byte)
-{
-
-}
-
 /**
- * Get n_byte from entropy pool. If n_byte is larger than number
- * byte of entropy in entropy pool, rand_pool_getN continue
+ * Get \param n_byte from entropy pool. If n_byte is larger than number
+ * byte of entropy in entropy pool, randpool_get continue
  * to generate pseudocasual value from previous state of
  * pool.
  */
-void randpool_getN(EntropyPool *pool, void *_data, size_t n_byte)
+void randpool_get(EntropyPool *pool, void *_data, size_t n_byte)
 {
 	Md2Context context;
 	size_t i = pool->pos_get;
 	size_t n = n_byte;
 	size_t pos_write = 0;  //Number of block has been written in data.
-	size_t len = MIN((size_t)CONFIG_MD2_BLOCK_LEN, n_byte);
+	size_t len = MIN((size_t)MD2_DIGEST_LEN, n_byte);
 	uint8_t *data;
 
 	data = (uint8_t *)_data;
 
 	/* Test if i + CONFIG_MD2_BLOCK_LEN  is inside of entropy pool.*/
-	ASSERT((CONFIG_MD2_BLOCK_LEN + i) < CONFIG_SIZE_ENTROPY_POOL);
+	ASSERT((MD2_DIGEST_LEN + i) < CONFIG_SIZE_ENTROPY_POOL);
 
 	md2_init(&context); 
 
@@ -233,19 +228,19 @@ void randpool_getN(EntropyPool *pool, void *_data, size_t n_byte)
 	{
 
 		/*Hash previous state of pool*/
-		md2_update(&context, &pool->pool_entropy[i], CONFIG_MD2_BLOCK_LEN);
+		md2_update(&context, &pool->pool_entropy[i], MD2_DIGEST_LEN);
 
 		memcpy(&data[pos_write], md2_end(&context), len);
 
 		pos_write += len;   //Update number of block has been written in data.
 		n -= len;           //Number of byte copied in data.
 
-		len = MIN(n,(size_t)CONFIG_MD2_BLOCK_LEN);
+		len = MIN(n,(size_t)MD2_DIGEST_LEN);
 
-		i = (i + CONFIG_MD2_BLOCK_LEN) % CONFIG_SIZE_ENTROPY_POOL;
+		i = (i + MD2_DIGEST_LEN) % CONFIG_SIZE_ENTROPY_POOL;
 
 		/* If we haven't more entropy pool to hash, we stir it.*/
-		if(i < CONFIG_MD2_BLOCK_LEN)
+		if(i < MD2_DIGEST_LEN)
 		{
 			randpool_stir(pool);
 			i = pool->pos_get;

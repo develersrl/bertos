@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2007/02/15 13:54:26  asterix
+ *#* Rename randpool_getN in randpool_get. Fix bug in randpool_get.
+ *#*
  *#* Revision 1.10  2007/02/15 13:40:42  asterix
  *#* Fix bug in randpool_add and randpool_strir.
  *#*
@@ -73,7 +76,6 @@ void randpool_add(EntropyPool *pool, void *data, size_t entropy);
 void randpool_init(EntropyPool *pool, void *_data, size_t len);
 size_t randpool_size(EntropyPool *pool);
 void randpool_get(EntropyPool *pool, void *data, size_t n_byte);
-void randpool_getN(EntropyPool *pool, void *data, size_t n_byte);
 uint8_t *randpool_pool(EntropyPool *pool);
 
 #endif /* RANDPOOL_H */
