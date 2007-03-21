@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2007/03/21 11:03:56  batt
+ *#* Add missing support for ATMega1281.
+ *#*
  *#* Revision 1.4  2006/07/19 12:56:26  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -37,6 +40,43 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 
+#if CPU_AVR_ATMEGA1281
+	#define REG_TIFR0 TIFR0
+	#define REG_TIFR2 TIFR2
+
+	#define REG_TIMSK0 TIMSK0
+	#define REG_TIMSK2 TIMSK2
+
+	#define REG_TCCR2A TCCR2A
+	#define REG_TCCR2B TCCR2B
+
+	#define REG_OCR2A  OCR2A
+
+	#define BIT_OCF0A  OCF0A
+	#define BIT_OCF2A  OCF2A
+
+	#define BIT_OCIE0A OCIE0A
+	#define BIT_OCIE2A OCIE2A
+#else
+	#define REG_TIFR0 TIFR
+	#define REG_TIFR2 TIFR
+
+	#define REG_TIMSK0 TIMSK
+	#define REG_TIMSK2 TIMSK
+
+	#define REG_TCCR2A TCCR2
+	#define REG_TCCR2B TCCR2
+
+	#define REG_OCR2A  OCR2
+
+	#define BIT_OCF0A  OCF0
+	#define BIT_OCF2A  OCF2
+
+	#define BIT_OCIE0A OCIE0
+	#define BIT_OCIE2A OCIE2
+#endif
+
+
 /** HW dependent timer initialization  */
 #if (CONFIG_TIMER == TIMER_ON_OUTPUT_COMPARE0)
 
@@ -46,7 +86,7 @@
 		IRQ_SAVE_DISABLE(flags);
 
 		/* Reset Timer flags */
-		TIFR = BV(OCF0) | BV(TOV0);
+		REG_TIFR0 = BV(BIT_OCF0A) | BV(TOV0);
 
 		/* Setup Timer/Counter interrupt */
 		ASSR = 0x00;                  /* Internal system clock */
@@ -61,8 +101,8 @@
 		OCR0 = OCR_DIVISOR;           /* Timer/Counter Output Compare Register */
 
 		/* Enable timer interrupts: Timer/Counter2 Output Compare (OCIE2) */
-		TIMSK &= ~BV(TOIE0);
-		TIMSK |= BV(OCIE0);
+		REG_TIMSK0 &= ~BV(TOIE0);
+		REG_TIMSK0 |= BV(OCIE0);
 
 		IRQ_RESTORE(flags);
 	}
@@ -119,24 +159,32 @@
 		IRQ_SAVE_DISABLE(flags);
 
 		/* Reset Timer flags */
-		TIFR = BV(OCF2) | BV(TOV2);
+		REG_TIFR2 = BV(BIT_OCF2A) | BV(TOV2);
 
 		/* Setup Timer/Counter interrupt */
-		TCCR2 = BV(WGM21)
-			#if TIMER_PRESCALER == 64
-				| BV(CS21) | BV(CS20)
-			#else
-				#error Unsupported value of TIMER_PRESCALER
-			#endif
-		;
+		REG_TCCR2A = 0;	// TCCR2 reg could be separate or a unique register with both A & B values, this is needed to
+		REG_TCCR2B = 0; // ensure correct initialization.
+
+		REG_TCCR2A = BV(WGM21);
+		#if TIMER_PRESCALER == 64
+		#if CPU_AVR_ATMEGA1281
+			// ATMega1281 has undocumented differences in timer2 prescaler!
+			REG_TCCR2B |= BV(CS22);
+		#else
+			REG_TCCR2B |= BV(CS21) | BV(CS20);
+		#endif
+		#else
+			#error Unsupported value of TIMER_PRESCALER
+		#endif
+
 		/* Clear on Compare match & prescaler = 64, internal sys clock.
 		   When changing prescaler change TIMER_HW_HPTICKS_PER_SEC too */
 		TCNT2 = 0x00;         /* initialization of Timer/Counter */
-		OCR2 = OCR_DIVISOR;   /* Timer/Counter Output Compare Register */
+		REG_OCR2A = OCR_DIVISOR;   /* Timer/Counter Output Compare Register */
 
 		/* Enable timer interrupts: Timer/Counter2 Output Compare (OCIE2) */
-		TIMSK &= ~BV(TOIE2);
-		TIMSK |= BV(OCIE2);
+		REG_TIMSK2 &= ~BV(TOIE2);
+		REG_TIMSK2 |= BV(BIT_OCIE2A);
 
 		IRQ_RESTORE(flags);
 	}

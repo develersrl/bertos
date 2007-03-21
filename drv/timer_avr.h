@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.29  2007/03/21 11:01:36  batt
+ *#* Add missing support for ATMega1281.
+ *#*
  *#* Revision 1.28  2006/07/19 12:56:26  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -97,7 +100,11 @@
 
 	#define TIMER_PRESCALER      64
 	#define TIMER_HW_BITS        8
-	#define DEFINE_TIMER_ISR     SIGNAL(SIG_OUTPUT_COMPARE2)
+	#if CPU_AVR_ATMEGA1281
+		#define DEFINE_TIMER_ISR     SIGNAL(SIG_OUTPUT_COMPARE2A)
+	#else
+		#define DEFINE_TIMER_ISR     SIGNAL(SIG_OUTPUT_COMPARE2)
+	#endif
 	#define TIMER_TICKS_PER_SEC  1000
 	/** Value for OCR register in output-compare based timers. */
 	#define TIMER_HW_CNT         OCR_DIVISOR
