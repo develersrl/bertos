@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.31  2007/06/07 14:25:30  batt
+ *#* Merge from project_ks
+ *#*
  *#* Revision 1.30  2007/01/28 09:18:06  batt
  *#* Merge from project_ks.
  *#*
@@ -63,6 +66,10 @@
 
 #ifdef _DEBUG
 
+#if CPU_HARVARD && !defined(_PROGMEM)
+	#error This module build correctly only in program memory!
+#endif
+
 #if defined(_EMUL)
 	#include <stdio.h>
 	#define KDBG_WAIT_READY()      do { /*nop*/ } while(0)
@@ -105,7 +112,7 @@
 		 */
 		#ifndef KDBG_UART0_BUS_INIT
 		#define KDBG_UART0_BUS_INIT  do { \
-				UCSR0B = BV(TXEN); \
+				UCSR0B = BV(TXEN0); \
 			} while (0)
 		#endif
 		#ifndef KDBG_UART0_BUS_RX
@@ -115,7 +122,7 @@
 		#define KDBG_UART0_BUS_TX    do {} while (0)
 		#endif
 
-		#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128
+		#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA168
 			#define UCR UCSR0B
 			#define UDR UDR0
 			#define USR UCSR0A
@@ -126,8 +133,8 @@
 			#error Unknown CPU
 		#endif
 
-		#define KDBG_WAIT_READY()     do { loop_until_bit_is_set(USR, UDRE); } while(0)
-		#define KDBG_WAIT_TXDONE()    do { loop_until_bit_is_set(USR, TXC); } while(0)
+		#define KDBG_WAIT_READY()     do { loop_until_bit_is_set(USR, UDRE0); } while(0)
+		#define KDBG_WAIT_TXDONE()    do { loop_until_bit_is_set(USR, TXC0); } while(0)
 
 		/*
 		 * We must clear the TXC flag before sending a new character to allow
@@ -138,12 +145,12 @@
 		 * character is written to UDR.  On a 485 bus, the transceiver will be put
 		 * in RX mode while still transmitting the last char.
 		 */
-		#define KDBG_WRITE_CHAR(c)    do { USR |= BV(TXC); UDR = (c); } while(0)
+		#define KDBG_WRITE_CHAR(c)    do { USR |= BV(TXC0); UDR = (c); } while(0)
 
 		#define KDBG_MASK_IRQ(old)    do { \
 			(old) = UCR; \
-			UCR |= BV(TXEN); \
-			UCR &= ~(BV(TXCIE) | BV(UDRIE)); \
+			UCR |= BV(TXEN0); \
+			UCR &= ~(BV(TXCIE0) | BV(UDRIE0)); \
 			KDBG_UART0_BUS_TX; \
 		} while(0)
 
@@ -168,7 +175,7 @@
 		 */
 		#ifndef KDBG_UART1_BUS_INIT
 		#define KDBG_UART1_BUS_INIT  do { \
-				UCSR1B = BV(TXEN); \
+				UCSR1B = BV(TXEN1); \
 			} while (0)
 		#endif
 		#ifndef KDBG_UART1_BUS_RX
@@ -178,14 +185,14 @@
 		#define KDBG_UART1_BUS_TX    do {} while (0)
 		#endif
 
-		#define KDBG_WAIT_READY()     do { loop_until_bit_is_set(UCSR1A, UDRE); } while(0)
-		#define KDBG_WAIT_TXDONE()    do { loop_until_bit_is_set(UCSR1A, TXC); } while(0)
-		#define KDBG_WRITE_CHAR(c)    do { UCSR1A |= BV(TXC); UDR1 = (c); } while(0)
+		#define KDBG_WAIT_READY()     do { loop_until_bit_is_set(UCSR1A, UDRE1); } while(0)
+		#define KDBG_WAIT_TXDONE()    do { loop_until_bit_is_set(UCSR1A, TXC1); } while(0)
+		#define KDBG_WRITE_CHAR(c)    do { UCSR1A |= BV(TXC1); UDR1 = (c); } while(0)
 
 		#define KDBG_MASK_IRQ(old)    do { \
 			(old) = UCSR1B; \
-			UCSR1B |= BV(TXEN); \
-			UCSR1B &= ~(BV(TXCIE) | BV(UDRIE)); \
+			UCSR1B |= BV(TXEN1); \
+			UCSR1B &= ~(BV(TXCIE1) | BV(UDRIE1)); \
 			KDBG_UART1_BUS_TX; \
 		} while(0)
 
@@ -299,7 +306,7 @@ void kdbg_init(void)
 		/* Compute the baud rate */
 		uint16_t period = (((CLOCK_FREQ / 16UL) + (CONFIG_KDEBUG_BAUDRATE / 2)) / CONFIG_KDEBUG_BAUDRATE) - 1;
 
-		#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128
+		#if (CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128)
 			#if CONFIG_KDEBUG_PORT == 0
 				UBRR0H = (uint8_t)(period>>8);
 				UBRR0L = (uint8_t)period;
@@ -311,6 +318,11 @@ void kdbg_init(void)
 			#else
 				#error CONFIG_KDEBUG_PORT must be either 0 or 1
 			#endif
+
+		#elif CPU_AVR_ATMEGA168
+			UBRR0H = (uint8_t)(period>>8);
+			UBRR0L = (uint8_t)period;
+			KDBG_UART0_BUS_INIT;
 		#elif CPU_AVR_ATMEGA8
 			UBRRH = (uint8_t)(period>>8);
 			UBRRL = (uint8_t)period;
