@@ -13,6 +13,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.20  2007/06/07 16:06:39  batt
+ *#* Fix some doxygen errors.
+ *#*
  *#* Revision 1.19  2007/02/15 13:54:26  asterix
  *#* Rename randpool_getN in randpool_get. Fix bug in randpool_get.
  *#*
@@ -124,7 +127,7 @@ static void randpool_stir(EntropyPool *pool)
 }
 
 /**
- * Add \param entropy bits from \param data buffer to the entropy \param pool.
+ * Add \param entropy bits from \param data buffer to the entropy \param pool
  */
 void randpool_add(EntropyPool *pool, void *data, size_t entropy)
 {
@@ -207,6 +210,9 @@ size_t randpool_size(EntropyPool *pool)
  * byte of entropy in entropy pool, randpool_get continue
  * to generate pseudocasual value from previous state of
  * pool.
+ * \param n_byte number fo bytes to read.
+ * \param pool is the pool entropy context.
+ * \param _data is the pointer to write the random data to.
  */
 void randpool_get(EntropyPool *pool, void *_data, size_t n_byte)
 {
@@ -222,7 +228,7 @@ void randpool_get(EntropyPool *pool, void *_data, size_t n_byte)
 	/* Test if i + CONFIG_MD2_BLOCK_LEN  is inside of entropy pool.*/
 	ASSERT((MD2_DIGEST_LEN + i) < CONFIG_SIZE_ENTROPY_POOL);
 
-	md2_init(&context); 
+	md2_init(&context);
 
 	while(n > 0)
 	{
@@ -247,10 +253,8 @@ void randpool_get(EntropyPool *pool, void *_data, size_t n_byte)
 		}
 
 	}
-	
 
 	pool->pos_get = i; //Current number of byte we get from pool.
-	
 	pool->entropy -= n_byte; //Update a entropy.
 
 	/*If we get all entropy entropy is 0*/

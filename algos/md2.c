@@ -8,12 +8,12 @@
  * \brief MD2 Message-Digest algorithm.
  *
  * The MD2 algorithm work with a constant array of 256 permutationt
- * defined in RFC1319. If you don't want to use a standard array of 
- * permutatione you can use a md2_perm() function that generate an 
- * array of 256 "casual" permutation. To swich from a standard array 
- * to md2_perm function you must chanche CONFIG_MD2_STD_PERM defined in 
+ * defined in RFC1319. If you don't want to use a standard array of
+ * permutatione you can use a md2_perm() function that generate an
+ * array of 256 "casual" permutation. To swich from a standard array
+ * to md2_perm function you must chanche CONFIG_MD2_STD_PERM defined in
  * appconfig.h.
- * If you need to store array in program memory you must define 
+ * If you need to store array in program memory you must define
  * a macro _PROGMEM (for more info see mware/pgm.h).
  *
  *
@@ -23,6 +23,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.17  2007/06/07 16:06:39  batt
+ *#* Fix some doxygen errors.
+ *#*
  *#* Revision 1.16  2007/02/15 13:29:49  asterix
  *#* Add MD2_DIGEST_LEN macro.
  *#*
@@ -64,7 +67,7 @@
 #include <cfg/compiler.h>
 #include <cfg/debug.h>        //ASSERT()
 #include <cfg/macros.h>       //MIN(), countof(), ROTR();
-#include <mware/pgm.h>   
+#include <mware/pgm.h>
 
 
 #if CONFIG_MD2_STD_PERM
@@ -72,7 +75,7 @@
 	* Official array of 256 byte pemutation contructed from digits of pi, defined
 	* in the RFC 1319.
 	*/
-	static const uint8_t PGM_ATTR md2_perm[256] = 
+	static const uint8_t PGM_ATTR md2_perm[256] =
 	{
 	41, 46, 67, 201, 162, 216, 124, 1, 61, 54, 84, 161, 236, 240, 6,
 	19, 98, 167, 5, 243, 192, 199, 115, 140, 152, 147, 43, 217, 188,
@@ -99,7 +102,7 @@
 	/**
 	 * Md2_perm() function generate an array of 256 "casual" permutation.
 	 */
-	
+
 	/**
 	 * Costant define for computing an array of 256 "casual" permutation.
 	 * \{
@@ -122,7 +125,7 @@
 	}
 
 	#define MD2_PERM(x) md2_perm(x)
-		
+
 #endif
 
 
@@ -204,7 +207,7 @@ static void md2_compute(void *_state, void *_checksum, void *_block)
 /**
  * Algorithm initialization.
  *
- * \param empty context.
+ * \param context empty context.
  */
 void md2_init(Md2Context *context)
 {
@@ -232,14 +235,14 @@ void md2_update(Md2Context *context, const void *_block_in, size_t block_len)
 		 */
 		cpy_len = MIN(block_len, CONFIG_MD2_BLOCK_LEN - context->counter);
 
-		
+
 		/*
 		 * Copy in the buffer input block.
 		 */
 		memcpy(&context->buffer[context->counter], block_in, cpy_len);
 
 		/*
-		 * Update a context counter, input block length and remaning 
+		 * Update a context counter, input block length and remaning
 		 * context buffer block lenght.
 		 */
 		context->counter += cpy_len;
