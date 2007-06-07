@@ -28,6 +28,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.37  2007/06/07 14:35:12  batt
+ *#* Merge from project_ks.
+ *#*
  *#* Revision 1.36  2007/01/29 11:30:29  batt
  *#* Reimplement ser_clearstatus as a macro.
  *#*
@@ -136,6 +139,11 @@
  *#*/
 
 #include "ser.h"
+
+#if CONFIG_WATCHDOG
+	#include "wdt.h"
+#endif
+
 #include "ser_p.h"
 #include <mware/formatwr.h>
 #include <cfg/debug.h>
@@ -201,6 +209,9 @@ int ser_putchar(int c, struct Serial *port)
 		/* Attende finche' il buffer e' pieno... */
 		do
 		{
+#if CONFIG_WATCHDOG
+			wdt_reset();
+#endif
 #if CONFIG_KERNEL && CONFIG_KERN_SCHED
 			/* Give up timeslice to other processes. */
 			proc_switch();
@@ -245,6 +256,9 @@ int ser_getchar(struct Serial *port)
 		/* Wait while buffer is empty */
 		do
 		{
+#if CONFIG_WATCHDOG
+			wdt_reset();
+#endif
 #if CONFIG_KERNEL && CONFIG_KERN_SCHED
 			/* Give up timeslice to other processes. */
 			proc_switch();
@@ -490,6 +504,9 @@ void ser_drain(struct Serial *ser)
 		#if CONFIG_KERNEL && CONFIG_KERN_SCHED
 			/* Give up timeslice to other processes. */
 			proc_switch();
+		#endif
+		#if CONFIG_WATCHDOG
+			wdt_reset();
 		#endif
 	}
 }

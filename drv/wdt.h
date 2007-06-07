@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.12  2007/06/07 14:35:12  batt
+ *#* Merge from project_ks.
+ *#*
  *#* Revision 1.11  2006/07/19 12:56:26  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -75,6 +78,9 @@
 	#elif CPU_AVR
 		#include <avr/io.h>
 		#include <cfg/macros.h> // BV()
+		#if CPU_AVR_ATMEGA1281  // Name is different in atmega1281
+			#define WDTCR WDTCSR
+		#endif
 	#elif defined(ARCH_FREERTOS) && (ARCH & ARCH_FREERTOS)
 		#include <task.h> /* taskYIELD() */
 	#else

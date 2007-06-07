@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2007/06/07 14:35:12  batt
+ *#* Merge from project_ks.
+ *#*
  *#* Revision 1.5  2007/03/21 11:03:56  batt
  *#* Add missing support for ATMega1281.
  *#*
@@ -37,10 +40,12 @@
 #include <drv/timer_avr.h>
 #include <cfg/macros.h> // BV()
 
+#include <cfg/cpu.h>
+
 #include <avr/interrupt.h>
 #include <avr/io.h>
 
-#if CPU_AVR_ATMEGA1281
+#if CPU_AVR_ATMEGA1281 || CPU_AVR_ATMEGA168
 	#define REG_TIFR0 TIFR0
 	#define REG_TIFR2 TIFR2
 
@@ -152,7 +157,6 @@
 	}
 
 #elif (CONFIG_TIMER == TIMER_ON_OUTPUT_COMPARE2)
-
 	static void timer_hw_init(void)
 	{
 		cpuflags_t flags;
@@ -167,8 +171,8 @@
 
 		REG_TCCR2A = BV(WGM21);
 		#if TIMER_PRESCALER == 64
-		#if CPU_AVR_ATMEGA1281
-			// ATMega1281 has undocumented differences in timer2 prescaler!
+		#if CPU_AVR_ATMEGA1281 || CPU_AVR_ATMEGA168
+			// ATMega1281 & ATMega168 have undocumented differences in timer2 prescaler!
 			REG_TCCR2B |= BV(CS22);
 		#else
 			REG_TCCR2B |= BV(CS21) | BV(CS20);

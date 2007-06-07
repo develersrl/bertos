@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.8  2007/06/07 14:35:12  batt
+ *#* Merge from project_ks.
+ *#*
  *#* Revision 1.7  2006/07/19 12:56:26  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -43,7 +46,7 @@
 #include <cfg/debug.h>
 #include <cfg/cpu.h>
 #include <cfg/macros.h> // BV()
-#include <hw.h>
+#include <hw_cpu.h>  /* CLOCK_FREQ */
 #include <appconfig.h>
 
 #include <compat/twi.h>
@@ -238,12 +241,12 @@ void twi_init(void)
 		 * probably due to some unwanted interaction between the
 		 * port pin and the TWI lines.
 		 */
-#if defined(__AVR_ATmega64__)
+#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281
 		PORTD |= BV(PD0) | BV(PD1);
-		DDRD |= BV(PD0) | BV(PD1);
-#elif defined(__AVR_ATmega8__)
+		DDRD  |= BV(PD0) | BV(PD1);
+#elif CPU_AVR_ATMEGA8
 		PORTC |= BV(PC4) | BV(PC5);
-		DDRC |= BV(PC4) | BV(PC5);
+		DDRC  |= BV(PC4) | BV(PC5);
 #else
 		#error Unsupported architecture
 #endif

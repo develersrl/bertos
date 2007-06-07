@@ -15,6 +15,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.33  2007/06/07 14:35:12  batt
+ *#* Merge from project_ks.
+ *#*
  *#* Revision 1.32  2007/01/09 08:57:19  bernie
  *#* Remove excess parentheses.
  *#*
@@ -166,7 +169,7 @@ INLINE ticks_t timer_clock(void)
  * interrupt is disabled (DISABLE_INTS) or overridden by a
  * higher-priority or non-nesting interrupt.
  *
- * \sa timer_ticks
+ * \sa timer_clock
  */
 INLINE ticks_t timer_clock_unlocked(void)
 {
