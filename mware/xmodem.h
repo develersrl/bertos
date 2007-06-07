@@ -9,10 +9,14 @@
  *
  * \version $Id$
  * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Francesco Sacchi <batt@develer.com>
  */
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2007/06/07 09:10:44  batt
+ *#* Fix some todos.
+ *#*
  *#* Revision 1.5  2006/07/19 12:56:28  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -34,13 +38,34 @@
  *#*/
 #ifndef MWARE_XMODEM_H
 #define MWARE_XMODEM_H
+#include <cfg/compiler.h>
+#include "kfile.h"
+
+/**
+ * Called to know if we want to abort data tranfer.
+ * Redefine to whatever you need.
+ * \{
+ */
+#ifndef XMODEM_CHECK_ABORT
+#define XMODEM_CHECK_ABORT (false)
+#endif
+/*\}*/
+
+
+/**
+ * Called to printf progress messages.
+ * Default to kprintf debug, redefine to whatever you need.
+ * \{
+ */
+#ifndef XMODEM_PROGRESS
+#define XMODEM_PROGRESS(msg, ...) kprintf(msg, ## __VA_ARGS__)
+#endif
+
 
 /* fwd decl */
-struct _KFile;
 struct Serial;
 
-bool xmodem_recv(struct Serial *port, struct _KFile *fd);
-bool xmodem_send(struct Serial *port, struct _KFile *fd);
+bool xmodem_recv(struct Serial *port, KFile *fd);
+bool xmodem_send(struct Serial *port, KFile *fd);
 
 #endif /* MWARE_XMODEM_H */
-

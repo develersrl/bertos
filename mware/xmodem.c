@@ -1,33 +1,30 @@
-#error This module has not been revised for the API changes in several DevLib modules
 /**
  * \file
  * <!--
- * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2004, 2005, 2006, 2007 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999, 2001 Bernardo Innocenti <bernie@develer.com>
  * This file is part of DevLib - See README.devlib for information.
  * -->
  * \brief X-Modem serial transmission protocol (implementation)
  *
- * Suppots the CRC-16 and 1K-blocks variants of the standard.
+ * Supports the CRC-16 and 1K-blocks variants of the standard.
  * \see ymodem.txt for the protocol description.
  *
- * \todo Decouple this code from the LCD, buzzer and timer drivers
- *       introducing user hooks or macros like CHECK_ABORT.
- *
  * \todo Break xmodem_send() and xmodem_recv() in smaller functions.
- *
- * \todo Add CONFIG_* vars to exclude either the receiver or the sender,
- *       to reduce the footprint for applications that don't need both.
  *
  * \todo Maybe convert drv/ser.c to the KFile interface for symmetry and
  *       flexibility.
  *
  * \version $Id$
  * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Francesco Sacchi <batt@develer.com>
  */
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2007/06/07 09:10:44  batt
+ *#* Fix some todos.
+ *#*
  *#* Revision 1.10  2006/07/19 12:56:28  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -66,12 +63,8 @@
 #include "xmodem.h"
 
 #include <drv/ser.h>
-#include <drv/lcd.h>
-#include <drv/buzzer.h>
-#include <mware/crc.h>
-#include <mware/kfile.h>
-
 #include <string.h> /* for memset() */
+#include <algos/crc.h>
 
 
 /**
@@ -89,58 +82,22 @@
 
 #define XM_MAXRETRIES     15  /**< Max retries before giving up */
 #define XM_MAXCRCRETRIES   7  /**< Max retries before switching to BCC */
-#define XM_BUFSIZE      1024  /**< Size of block buffer */
 
-
-#if (ARCH & ARCH_BOOT)
-	#include "kbdhw.h"
-	#if (ARCH & ARCH_SLIM)
-		#define CHECK_ABORT		KEYPRESSED_STOP
-	#elif (ARCH & ARCH_SARF)
-		#define CHECK_ABORT		KEYPRESSED_ESC
-	#endif
+#if CONFIG_XMODEM_1KCRC == 1
+	#define XM_BUFSIZE       1024  /**< 1024 bytes of block buffer */
 #else
-	#include "kbd.h"
-	#if (ARCH & ARCH_SLIM)
-		#define CHECK_ABORT		(kbd_getchar() == K_STOP)
-	#elif (ARCH & ARCH_SARF)
-		#define CHECK_ABORT		(kbd_getchar() == K_ESC)
-	#endif
-#endif /* ARCH_BOOT */
+	#define XM_BUFSIZE       128   /**< 128 bytes of block buffer */
+#endif
 
 
-/**
- * Decode serial driver errors and print them on the display.
- */
-static void print_serial_error(struct Serial *port, int retries)
-{
-	serstatus_t err, status;
-
-	/* Get serial error code and reset it */
-	status = ser_getstatus(port);
-	ser_setstatus(port, 0);
-
-	/* Mostra tutti gli errori in sequenza */
-	for (err = 0; status != 0; status >>= 1, err++)
-	{
-		/* Se il bit dell'errore e' settato */
-		if (status & 1)
-		{
-			lcd_printf(0, 3, LCD_FILL, "%s %d", serial_errors[err], retries);
-			buz_beep(200);
-			timer_delay(500);
-		}
-	}
-}
-
-
+#if CONFIG_XMODEM_RECV
 /**
  * \brief Receive a file using the XModem protocol.
  *
  * \param port Serial port to use for transfer
  * \param fd Destination file
  *
- * \note This function allocates a large amount of stack (>1KB).
+ * \note This function allocates a large amount of stack (\see XM_BUFSIZE).
  */
 bool xmodem_recv(struct Serial *port, KFile *fd)
 {
@@ -154,20 +111,18 @@ bool xmodem_recv(struct Serial *port, KFile *fd)
 	bool usecrc = true;
 
 
-	lcd_printf(0, 2, LCD_FILL, "Starting Transfer...");
-	lcd_clear();
+	XMODEM_PROGRESS("Starting Transfer...\n");
 	purge = true;
-	ser_settimeouts(port, SER_DEFRXTIMEOUT, SER_DEFTXTIMEOUT);
 	ser_setstatus(port, 0);
 
 	/* Send initial NAK to start transmission */
 	for(;;)
 	{
-		if (CHECK_ABORT)
+		if (XMODEM_CHECK_ABORT)
 		{
 			ser_putchar(XM_CAN, port);
 			ser_putchar(XM_CAN, port);
-			lcd_printf(0, 2, LCD_FILL, "Transfer aborted");
+			XMODEM_PROGRESS("Transfer aborted\n");
 			return false;
 		}
 
@@ -179,8 +134,8 @@ bool xmodem_recv(struct Serial *port, KFile *fd)
 		{
 			purge = false;
 
-			if (ser_getstatus())
-				SerialError(retries);
+			if (ser_getstatus(port))
+				XMODEM_PROGRESS("Retries %d\n", retries);
 
 			ser_resync(port, 200);
 			retries++;
@@ -189,7 +144,7 @@ bool xmodem_recv(struct Serial *port, KFile *fd)
 			{
 				ser_putchar(XM_CAN, port);
 				ser_putchar(XM_CAN, port);
-				lcd_printf(0, 2, LCD_FILL, "Transfer aborted");
+				XMODEM_PROGRESS("Transfer aborted\n");
 				return false;
 			}
 
@@ -198,14 +153,14 @@ bool xmodem_recv(struct Serial *port, KFile *fd)
 			{
 				if (retries < XM_MAXCRCRETRIES)
 				{
-					lcd_printf(0, 2, LCD_FILL, "Request Tx (CRC)");
+					XMODEM_PROGRESS("Request Tx (CRC)\n");
 					ser_putchar(XM_C, port);
 				}
 				else
 				{
 					/* Give up with CRC and fall back to checksum */
 					usecrc = false;
-					lcd_printf(0, 2, LCD_FILL, "Request Tx (BCC)");
+					XMODEM_PROGRESS("Request Tx (BCC)");
 					ser_putchar(XM_NAK, port);
 				}
 			}
@@ -215,9 +170,11 @@ bool xmodem_recv(struct Serial *port, KFile *fd)
 
 		switch (ser_getchar(port))
 		{
+		#if XM_BUFSIZE >= 1024
 		case XM_STX:  /* Start of header (1024-byte block) */
 			blocksize = 1024;
 			goto getblock;
+		#endif
 
 		case XM_SOH:  /* Start of header (128-byte block) */
 			blocksize = 128;
@@ -229,7 +186,7 @@ bool xmodem_recv(struct Serial *port, KFile *fd)
 			/* Check complemented block number */
 			if ((~c & 0xff) != ser_getchar(port))
 			{
-				lcd_printf(0, 3, LCD_FILL, "Bad blk (%d)", c);
+				XMODEM_PROGRESS("Bad blk (%d)\n", c);
 				purge = true;
 				break;
 			}
@@ -237,14 +194,14 @@ bool xmodem_recv(struct Serial *port, KFile *fd)
 			/* Determine which block is being sent */
 			if (c == (blocknr & 0xff))
 				/* Last block repeated */
-				lcd_printf(0, 2, LCD_FILL, "Repeat blk %d", blocknr);
+				XMODEM_PROGRESS("Repeat blk %d\n", blocknr);
 			else if (c == ((blocknr + 1) & 0xff))
 				/* Next block */
-				lcd_printf(0, 2, LCD_FILL, "Recv blk %d", ++blocknr);
+				XMODEM_PROGRESS("Recv blk %d\n", ++blocknr);
 			else
 			{
 				/* Sync lost */
-				lcd_printf(0, 3, LCD_FILL, "Sync lost (%d/%d)", c, blocknr);
+				XMODEM_PROGRESS("Sync lost (%d/%d)\n", c, blocknr);
 				purge = true;
 				break;
 			}
@@ -295,7 +252,7 @@ bool xmodem_recv(struct Serial *port, KFile *fd)
 
 				if (crc)
 				{
-					lcd_printf(0, 3, LCD_FILL, "Bad CRC: %04x", crc);
+					XMODEM_PROGRESS("Bad CRC: %04x\n", crc);
 					purge = true;
 					break;
 				}
@@ -303,7 +260,7 @@ bool xmodem_recv(struct Serial *port, KFile *fd)
 			/* Compare the checksum */
 			else if (c != checksum)
 			{
-				lcd_printf(0, 3, LCD_FILL, "Bad sum: %04x/%04x", checksum, c);
+				XMODEM_PROGRESS("Bad sum: %04x/%04x\n", checksum, c);
 				purge = true;
 				break;
 			}
@@ -334,7 +291,7 @@ bool xmodem_recv(struct Serial *port, KFile *fd)
 
 		case XM_EOT:	/* End of transmission */
 			ser_putchar(XM_ACK, port);
-			lcd_printf(0, 2, LCD_FILL, "Transfer completed");
+			XMODEM_PROGRESS("Transfer completed");
 			return true;
 
 		case EOF: /* Timeout or serial error */
@@ -342,22 +299,24 @@ bool xmodem_recv(struct Serial *port, KFile *fd)
 			break;
 
 		default:
-			lcd_printf(0, 3, LCD_FILL, "Skipping garbage");
+			XMODEM_PROGRESS("Skipping garbage");
 			purge = true;
 			break;
 		}
 	} /* End forever */
 }
+#endif
 
 
+#if CONFIG_XMODEM_SEND
 /**
- * \brief Transmit a file using the XModem protocol.
+ * \brief Transmit some data using the XModem protocol.
  *
  * \param port Serial port to use for transfer
  * \param fd Source file
  *
  * \note This function allocates a large amount of stack for
- *       the XModem transfer buffer (1KB).
+ *       the XModem transfer buffer (\see XM_BUFSIZE).
  */
 bool xmodem_send(struct Serial *port, KFile *fd)
 {
@@ -368,39 +327,43 @@ bool xmodem_send(struct Serial *port, KFile *fd)
 	uint16_t crc;
 	uint8_t sum;
 
+	/*
+	 * Reading a block can be very slow, so we read the first block early
+	 * to avoid receiving double XM_C char.
+	 * This could happen if we check for XM_C and then read the block, giving
+	 * the receiving device time to send another XM_C char misinterpretating
+	 * the blocks sent.
+	 */
+	size = fd->read(fd, block_buffer, XM_BUFSIZE);
 
-	ser_settimeouts(port, SER_DEFRXTIMEOUT, SER_DEFTXTIMEOUT);
 	ser_setstatus(port, 0);
 	ser_purge(port);
-	lcd_printf(0, 2, LCD_FILL, "Wait remote host");
+	XMODEM_PROGRESS("Wait remote host\n");
 
 	for(;;)
 	{
 		proceed = false;
 		do
 		{
-			if (CHECK_ABORT)
+			if (XMODEM_CHECK_ABORT)
 				return false;
 
 			switch (c = ser_getchar(port))
 			{
 			case XM_NAK:
-			case XM_C:
-				if (blocknr == 1)
-				{
-					if (c == XM_C)
-					{
-						lcd_printf(0, 2, LCD_FILL, "Tx start (CRC)");
-						usecrc = true;
-					}
-					else
-						lcd_printf(0, 2, LCD_FILL, "Tx start (BCC)");
+				XMODEM_PROGRESS("Resend blk %d\n", blocknr);
+				proceed = true;
+				break;
 
-					/* Call user function to read in one block */
-					size = fd->read(fd, block_buffer, XM_BUFSIZE);
+			case XM_C:
+				if (c == XM_C)
+				{
+					XMODEM_PROGRESS("Tx start (CRC)\n");
+					usecrc = true;
 				}
 				else
-					lcd_printf(0, 2, LCD_FILL, "Resend blk %d", blocknr);
+					XMODEM_PROGRESS("Tx start (BCC)\n");
+
 				proceed = true;
 				break;
 
@@ -411,25 +374,26 @@ bool xmodem_send(struct Serial *port, KFile *fd)
 
 				/* Call user function to read in one block */
 				size = fd->read(fd, block_buffer, XM_BUFSIZE);
+				XMODEM_PROGRESS("Send blk %d\n", blocknr);
 				blocknr++;
 				retries = 0;
 				proceed = true;
-				lcd_printf(0, 2, LCD_FILL, "Send blk %d", blocknr);
 				break;
 
 			case EOF:
+				ser_setstatus(port, 0);
 				retries++;
-				SerialError(retries);
+				XMODEM_PROGRESS("Retries %d\n", retries);
 				if (retries <= XM_MAXRETRIES)
 					break;
 				/* falling through! */
 
 			case XM_CAN:
-				lcd_printf(0, 2, LCD_FILL, "Transfer aborted");
+				XMODEM_PROGRESS("Transfer aborted\n");
 				return false;
 
 			default:
-				lcd_printf(0, 3, LCD_FILL, "Skipping garbage");
+				XMODEM_PROGRESS("Skipping garbage\n");
 				break;
 			}
 		}
@@ -445,7 +409,11 @@ bool xmodem_send(struct Serial *port, KFile *fd)
 		memset(block_buffer + size, 0xFF, XM_BUFSIZE - size);
 
 		/* Send block header (STX, blocknr, ~blocknr) */
-		ser_putchar(XM_STX, port);
+		#if XM_BUFSIZE == 128
+			ser_putchar(XM_SOH, port);
+		#else
+			ser_putchar(XM_STX, port);
+		#endif
 		ser_putchar(blocknr & 0xFF, port);
 		ser_putchar(~blocknr & 0xFF, port);
 
@@ -471,3 +439,4 @@ bool xmodem_send(struct Serial *port, KFile *fd)
 			ser_putchar(sum, port);
 	}
 }
+#endif
