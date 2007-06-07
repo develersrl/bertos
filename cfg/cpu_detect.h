@@ -12,6 +12,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.6  2007/06/07 14:42:54  batt
+ *#* Merge from project_ks.
+ *#*
  *#* Revision 1.5  2007/01/27 20:48:36  batt
  *#* Add support for ATMEGA1281.
  *#*
@@ -134,6 +137,12 @@
 		#define CPU_AVR_ATMEGA8     0
 	#endif
 
+	#if defined(__AVR_ATmega168__)
+		#define CPU_AVR_ATMEGA168   1
+	#else
+		#define CPU_AVR_ATMEGA168   0
+	#endif
+
 	#if defined(__AVR_ATmega1281__)
 		#define CPU_AVR_ATMEGA1281  1
 	#else
@@ -142,6 +151,7 @@
 #else
 	#define CPU_AVR                 0
 	#define CPU_AVR_ATMEGA8         0
+	#define CPU_AVR_ATMEGA168       0
 	#define CPU_AVR_ATMEGA64        0
 	#define CPU_AVR_ATMEGA103       0
 	#define CPU_AVR_ATMEGA128       0
