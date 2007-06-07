@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.1  2007/06/07 09:09:42  batt
+ *#* Move crc routines to algos/.
+ *#*
  *#* Revision 1.5  2006/07/19 12:56:27  bernie
  *#* Convert to new Doxygen style.
  *#*
