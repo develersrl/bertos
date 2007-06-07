@@ -17,7 +17,7 @@
 //#include <gui/levelbar.h>
 
 /* Type for level_init */
-#define LEVELEDIT_NOBAR  0  /**< Edit numeber only, without bar nor units */
+#define LEVELEDIT_NOBAR  0  /**< Edit number only, without bar nor units */
 #define LEVELEDIT_SINGLE 1  /**< Single channel editing */
 #define LEVELEDIT_DOUBLE 2  /**< Double channel editing */
 
