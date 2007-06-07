@@ -20,34 +20,57 @@
 #include <avr/io.h>
 #include <algos/rotating_hash.h>
 
+#define PAGEBUF 512
+
+typedef uint16_t page_addr_t;
+typedef uint16_t page_t;
+
+/**
+ * Temporary buffer for cointain data block to
+ * write on flash.
+ */
+static uint8_t page_buf[PAGEBUF];
+
+static page_t curr_pag_num = 0;
+
+
+
 /**
  * Erase Flash.
  */
 static void prog_erase_flash(void)
 {
 	uint32_t flash_addr;
+
 	/* Erase the flash ROM */
 	#ifdef LARGE_MEMORY
 		/*
-		* SPM uses Z pointer but the pointer is only 16 bit and
-		* can only address up to 64Kbytes FLASH. Higher locations
-		* require the use of RAMPZ
-		*/
+		 * SPM uses Z pointer but the pointer is only 16 bit and
+		 * can only address up to 64Kbytes FLASH. Higher locations
+		 * require the use of RAMPZ
+		 */
 		RAMPZ = 0x00;
 
-		for (flash_addr = 0; (flash_addr < (uint16_t)(APP_END & 0xFFFF)) | (RAMPZ == 0x00); flash_addr += PAGESIZE)
+		for (flash_addr = 0; (flash_addr < (uint16_t)(APP_END & 0xFFFF)) | (RAMPZ == 0x00);
 		{
 			wdt_reset();
 
-			write_page(flash_addr, BV(PGERS) + BV(SPMEN));             /* Page erase */
-			write_page(flash_addr, BV(REENABLE_RWW_BIT) + BV(SPMEN));  /* Re-enable the RWW section */
+			/* Page erase */
+			write_page(flash_addr, BV(PGERS) + BV(SPMEN));
 
-			if(flashgg_addr >= (0xFFFF - PAGESIZE))  /* Last section on lower 64k segment is erased */
-				RAMPZ = BV(RAMPZ0);          /* RAMPZ has to be incremented into upper 64k segment */
+			/* Re-enable the RWW section */
+			write_page(flash_addr, BV(REENABLE_RWW_BIT) + BV(SPMEN));
+
+			/* Last section on lower 64k segment is erased */
+			if(flashgg_addr >= (0xFFFF - PAGESIZE))
+
+				/* RAMPZ has to be incremented into upper 64k segment */
+				RAMPZ = BV(RAMPZ0);
 		}
 		RAMPZ = 0x00;
 	#else /* LARGE_MEMORY */
-		for (flash_addr = 0; flash_addr < APP_END; flash_addr += PAGESIZE)  /* Application section = 60 pages */
+		 /* Application section = 60 pages */
+		for (flash_addr = 0; flash_addr < APP_END; flash_addr += PAGESIZE)
 		{
 			wdt_reset();
 
@@ -66,6 +89,7 @@ static void prog_erase_flash(void)
 static void prog_pagewrite(uint16_t addr)
 {
 	write_page(addr, BV(PGWRT) + BV(SPMEN));
+
 	/* Re-enable the RWW section */
 	write_page(addr, BV(REENABLE_RWW_BIT) + BV(SPMEN));
 }
@@ -74,45 +98,52 @@ static void prog_pagewrite(uint16_t addr)
 /**
  * Write program memory.
  */
-rotating_t prog_write(struct _KFile *file, progress_func_t progress)
+size_t	prog_write(struct _KFile *fd, const char *buf, size_t size)
 {
-	size_t size;
-	rotating_t rot = 0;
-	uint32_t flash_addr = 0;
-	uint16_t page_addr;
-	uint8_t buf[PAGESIZE];
-	
-	/* We erase fash memory before to write inside */
-	prog_erase_flash();
 
-	for (;;)
+	page_t page;
+	page_addr_t page_addr;
+	size_t total_write = 0;
+	
+	while (size)
 	{
-		wdt_reset();
+		page = fd->SeekPos / PAGEBUF;
+		page_addr = fd->SeekPos % PAGEBUF;
+	
+		prog_loadPage(page);
+	
+		size_t wr_len = MIN(size, PAGEBUF - page_addr);
+		memcpy(page_buf + page_addr, buf, wr_len);
 
-		/* Read data from file */
-		size = file->read(file, buf, PAGESIZE);
-
-		/* If we reached end of file exit */
-		if (!size)
-			break;
-	
-		/* Update checksum */
-		rotating_update(buf, size, &rot);
-	
-		/* Fill the temporary buffer of the AVR */
-		for (page_addr = 0; page_addr < size; page_addr += 2)
-			fill_temp_buffer(buf[page_addr + 1] | (uint16_t)buf[page_addr] << 8, page_addr);
-		
-		/* Page write */
-		prog_pagewrite(flash_addr);
-	
-		/* Update progess (if present) */
-		if (progress)
-			if (!progress(file->SeekPos, file->Size))
-				break;
-		
-		flash_addr += size;
+		buf += wr_len;
+		fd->SeekPos += wr_len;
+		size -= wr_len;
+		total_write += wr_len;
 	}
+	return total_write;
+}
 
-	return rot
+void prog_flush(void)
+{
+		
+	/* Fill the temporary buffer of the AVR */
+	for (page_addr_t page_addr = 0; page_addr < PAGEBUF; page_addr += 2)
+		fill_temp_buffer(page_buf[page_addr + 1] | (uint16_t)page_buf[page_addr] << 8, page_addr);
+	
+
+	wdt_reset();
+
+	/* Page write */
+	prog_pagewrite(curr_page_num * PAGEBUF);
+}
+
+void prog_loadPage(page_t page)
+{
+	if (page != curr_page_num)
+	{
+		prog_flush();
+		// Load page
+		memcpy_P(page_buf, (const char *)(page * PAGEBUF), PAGEBUF);
+		curr_page_num = page;
+	}
 }
