@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2007/06/08 14:25:43  batt
+ *#* Merge from project_ks.
+ *#*
  *#* Revision 1.6  2006/07/19 12:56:28  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -60,8 +63,8 @@ typedef struct _KFile
 	SeekFunc_t		seek;
 
 	/* NOTE: these must _NOT_ be size_t on 16bit CPUs! */
-	uint32_t		SeekPos;
-	uint32_t		Size;
+	uint32_t		seek_pos;
+	uint32_t		size;
 } KFile;
 
 #endif /* MWARE_KFILE_H */
