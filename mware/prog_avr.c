@@ -99,6 +99,18 @@ static void prog_pagewrite(uint16_t addr)
 
 
 /**
+ * Delete a page in program memory.
+ */
+static void prog_pagedelete(uint16_t addr)
+{
+	/* Page erase */
+	write_page(addr, BV(PGERS) + BV(SPMEN));
+
+	/* Re-enable the RWW section */
+	write_page(addr, BV(REENABLE_RWW_BIT) + BV(SPMEN));
+}
+
+/**
  * Flush temporary buffer into flash memory.
  */
 static void prog_flush(void)
@@ -110,6 +122,9 @@ static void prog_flush(void)
 
 
 	wdt_reset();
+
+	/* Page delete */
+	prog_pagedelete(curr_page_num * PAGEBUF);
 
 	/* Page write */
 	prog_pagewrite(curr_page_num * PAGEBUF);
