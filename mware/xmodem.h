@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.7  2007/06/14 14:42:28  batt
+ *#* Move kfile to kern/ directory; remove duplicate file.h.
+ *#*
  *#* Revision 1.6  2007/06/07 09:10:44  batt
  *#* Fix some todos.
  *#*
@@ -39,7 +42,7 @@
 #ifndef MWARE_XMODEM_H
 #define MWARE_XMODEM_H
 #include <cfg/compiler.h>
-#include "kfile.h"
+#include <kern/kfile.h>
 
 /**
  * Called to know if we want to abort data tranfer.

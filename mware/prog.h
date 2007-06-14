@@ -21,7 +21,7 @@
 #define PROG_H
 
 #include <cfg/compiler.h>
-#include <mware/kfile.h>
+#include <kern/kfile.h>
 #include <algos/rotating_hash.h>
 
 /**
