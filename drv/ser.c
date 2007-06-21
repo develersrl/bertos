@@ -28,6 +28,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.38  2007/06/21 17:07:21  batt
+ *#* Remove CONFIG_WATCHDOG stuff: watchdog macros expand to nothing when wdt is active.
+ *#*
  *#* Revision 1.37  2007/06/07 14:35:12  batt
  *#* Merge from project_ks.
  *#*
@@ -140,9 +143,7 @@
 
 #include "ser.h"
 
-#if CONFIG_WATCHDOG
-	#include "wdt.h"
-#endif
+#include "wdt.h"
 
 #include "ser_p.h"
 #include <mware/formatwr.h>
@@ -209,9 +210,7 @@ int ser_putchar(int c, struct Serial *port)
 		/* Attende finche' il buffer e' pieno... */
 		do
 		{
-#if CONFIG_WATCHDOG
 			wdt_reset();
-#endif
 #if CONFIG_KERNEL && CONFIG_KERN_SCHED
 			/* Give up timeslice to other processes. */
 			proc_switch();
@@ -256,9 +255,7 @@ int ser_getchar(struct Serial *port)
 		/* Wait while buffer is empty */
 		do
 		{
-#if CONFIG_WATCHDOG
 			wdt_reset();
-#endif
 #if CONFIG_KERNEL && CONFIG_KERN_SCHED
 			/* Give up timeslice to other processes. */
 			proc_switch();
@@ -505,9 +502,7 @@ void ser_drain(struct Serial *ser)
 			/* Give up timeslice to other processes. */
 			proc_switch();
 		#endif
-		#if CONFIG_WATCHDOG
 			wdt_reset();
-		#endif
 	}
 }
 
