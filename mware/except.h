@@ -33,13 +33,13 @@ extern jmp_buf except_stack[EXCEPT_CONTEXTS];
 extern int except_top;
 
 #ifdef _DEBUG
-#	define PUSH_ABORT	ASSERT(abort_top < ABORT_CONTEXTS), setjmp(abort_stack[abort_top++]))
-#	define POP_ABORT	(ASSERT(abort_top > 0), --abort_top)
-#	define DO_ABORT		(ASSERT(abort_top > 0), longjmp(abort_stack[--abort_top], true))
+#	define PUSH_EXCEPT	ASSERT(except_top < EXCEPT_CONTEXTS), setjmp(except_stack[except_top++]))
+#	define POP_EXCEPT	(ASSERT(except_top > 0), --except_top)
+#	define DO_EXCEPT	(ASSERT(except_top > 0), longjmp(except_stack[--except_top], true))
 #else
-#	define PUSH_ABORT	(setjmp(abort_stack[abort_top++]))
-#	define POP_ABORT	(--abort_top)
-#	define DO_ABORT		(longjmp(abort_stack[--abort_top], true))
+#	define PUSH_EXCEPT	(setjmp(except_stack[except_top++]))
+#	define POP_EXCEPT	(--except_top)
+#	define DO_EXCEPT	(longjmp(except_stack[--except_top], true))
 #endif
 
 /**
@@ -92,15 +92,15 @@ extern int except_top;
  *    EXCEPT_DEFINE;
  * \endcode
  */
-#define TRY          if (PUSH_ABORT) { {
-#define TRY_END      } POP_ABORT; }
-#define CATCH        } POP_ABORT; } else {
+#define TRY          if (PUSH_EXCEPT) { {
+#define TRY_END      } POP_EXCEPT; }
+#define CATCH        } POP_EXCEPT; } else {
 #define CATCH_END    }
-#define THROW        DO_ABORT
+#define THROW        DO_EXCEPT
 
 
 #define EXCEPT_DEFINE \
-	jmp_buf abort_stack[ABORT_CONTEXTS]; \
-	int abort_top;
+	jmp_buf except_stack[EXCEPT_CONTEXTS]; \
+	int except_top;
 
 #endif /* MWARE_EXCEPT_H */
