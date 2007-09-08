@@ -32,15 +32,9 @@
 extern jmp_buf except_stack[EXCEPT_CONTEXTS];
 extern int except_top;
 
-#ifdef _DEBUG
-#	define PUSH_EXCEPT	ASSERT(except_top < EXCEPT_CONTEXTS), setjmp(except_stack[except_top++]))
-#	define POP_EXCEPT	(ASSERT(except_top > 0), --except_top)
-#	define DO_EXCEPT	(ASSERT(except_top > 0), longjmp(except_stack[--except_top], true))
-#else
-#	define PUSH_EXCEPT	(setjmp(except_stack[except_top++]))
-#	define POP_EXCEPT	(--except_top)
-#	define DO_EXCEPT	(longjmp(except_stack[--except_top], true))
-#endif
+#define PUSH_EXCEPT	(ASSERT(except_top < EXCEPT_CONTEXTS), setjmp(except_stack[except_top++]))
+#define POP_EXCEPT	(ASSERT(except_top > 0), --except_top)
+#define DO_EXCEPT	(ASSERT(except_top > 0), longjmp(except_stack[--except_top], true))
 
 /**
  * Jump buffer to use when throwing an exception or aborting an operation
