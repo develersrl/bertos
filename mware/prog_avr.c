@@ -1,7 +1,7 @@
 /**
  * \file
  * <!--
- * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2007 Develer S.r.l. (http://www.develer.com/)
  * All Rights Reserved.
  * -->
  *
@@ -9,180 +9,211 @@
  *
  * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
  */
 
 #include "prog.h"
+
+#include <string.h>
+
 #include <drv/wdt.h>
 #include <cfg/macros.h> // MIN()
 #include <cfg/compiler.h>
-#include <flash.h>
-#include <defines.h>
+#include <cfg/debug.h>
+
 #include <avr/io.h>
-#include <algos/rotating_hash.h>
+#include <avr/boot.h>
+#include <avr/pgmspace.h>
 
-#define PAGEBUF 512
-
-typedef uint16_t page_addr_t;
-typedef uint16_t page_t;
+typedef uint16_t avr_page_addr_t;
+typedef uint16_t avr_page_t;
 
 /**
- * Temporary buffer for cointain data block to
+ * Temporary buffer cointaing data block to
  * write on flash.
  */
-static uint8_t page_buf[PAGEBUF];
+static uint8_t page_buf[SPM_PAGESIZE];
+
+bool page_modified; /// Flag for checking if current page is modified.
 
 /**
- * Store current flash page memory in use.
+ * Current buffered page.
  */
-static page_t curr_pag_num = 0;
-
-
+static avr_page_t curr_page = 0;
 
 /**
- * Erase Flash.
- */
-static void prog_erase_flash(void)
-{
-	uint32_t flash_addr;
-
-	/* Erase the flash ROM */
-	#ifdef LARGE_MEMORY
-		/*
-		 * SPM uses Z pointer but the pointer is only 16 bit and
-		 * can only address up to 64Kbytes FLASH. Higher locations
-		 * require the use of RAMPZ
-		 */
-		RAMPZ = 0x00;
-
-		for (flash_addr = 0; (flash_addr < (uint16_t)(APP_END & 0xFFFF)) | (RAMPZ == 0x00));
-		{
-			wdt_reset();
-
-			/* Page erase */
-			write_page(flash_addr, BV(PGERS) + BV(SPMEN));
-
-			/* Re-enable the RWW section */
-			write_page(flash_addr, BV(REENABLE_RWW_BIT) + BV(SPMEN));
-
-			/* Last section on lower 64k segment is erased */
-			if(flashgg_addr >= (0xFFFF - PAGESIZE))
-
-				/* RAMPZ has to be incremented into upper 64k segment */
-				RAMPZ = BV(RAMPZ0);
-		}
-		RAMPZ = 0x00;
-	#else /* LARGE_MEMORY */
-		 /* Application section = 60 pages */
-		for (flash_addr = 0; flash_addr < APP_END; flash_addr += PAGESIZE)
-		{
-			wdt_reset();
-
-			/* Page erase */
-			write_page(flash_addr, BV(PGERS) + BV(SPMEN));
-			/* Re-enable RWW section */
-			write_page(flash_addr, BV(REENABLE_RWW_BIT) + BV(SPMEN));
-		}
-	#endif /* LARGE_MEMORY */
-}
-
-
-/**
- * Write a page in program memory.
- */
-static void prog_pagewrite(uint16_t addr)
-{
-	write_page(addr, BV(PGWRT) + BV(SPMEN));
-
-	/* Re-enable the RWW section */
-	write_page(addr, BV(REENABLE_RWW_BIT) + BV(SPMEN));
-}
-
-
-/**
- * Delete a page in program memory.
- */
-static void prog_pagedelete(uint16_t addr)
-{
-	/* Page erase */
-	write_page(addr, BV(PGERS) + BV(SPMEN));
-
-	/* Re-enable the RWW section */
-	write_page(addr, BV(REENABLE_RWW_BIT) + BV(SPMEN));
-}
-
-/**
- * Flush temporary buffer into flash memory.
+ * Write current buffered page in flash memory (if modified).
+ * This function erase flash memory page before writing.
  */
 static void prog_flush(void)
 {
+	if (page_modified)
+	{
+		kprintf("Flushing page %d\n", curr_page);
 
-	/* Fill the temporary buffer of the AVR */
-	for (page_addr_t page_addr = 0; page_addr < PAGEBUF; page_addr += 2)
-		fill_temp_buffer(page_buf[page_addr + 1] | (uint16_t)page_buf[page_addr] << 8, page_addr);
+		boot_spm_busy_wait();  // Wait while the SPM instruction is busy.
+
+		kprintf("Filling temparary page buffer...");
+		/* Fill the temporary buffer of the AVR */
+		for (avr_page_addr_t page_addr = 0; page_addr < SPM_PAGESIZE; page_addr += 2)
+		{
+			uint16_t word = ((uint16_t)page_buf[page_addr + 1] << 8) | page_buf[page_addr];
+
+			ATOMIC(boot_page_fill(page_addr, word));
+		}
+		kprintf("Done.\n");
+
+		wdt_reset();
+
+		kprintf("Erasing page, addr %d...", curr_page * SPM_PAGESIZE);
+
+		/* Page erase */
+		ATOMIC(boot_page_erase(curr_page * SPM_PAGESIZE));
+
+		/* Wait until the memory is erased. */
+		boot_spm_busy_wait();
+
+		kprintf("Done.\n");
+		kprintf("Writing page, addr %d...", curr_page * SPM_PAGESIZE);
+
+		/* Store buffer in flash page. */
+		ATOMIC(boot_page_write(curr_page * SPM_PAGESIZE));
+		boot_spm_busy_wait();  // Wait while the SPM instruction is busy.
+
+		/*
+		* Reenable RWW-section again. We need this if we want to jump back
+		* to the application after bootloading.
+		*/
+		ATOMIC(boot_rww_enable());
+
+		page_modified = false;
+		kprintf("Done.\n");
+	}
+}
 
 
-	wdt_reset();
-
-	/* Page delete */
-	prog_pagedelete(curr_page_num * PAGEBUF);
-
-	/* Page write */
-	prog_pagewrite(curr_page_num * PAGEBUF);
+/**
+ * Check current page and if \param page is different, load it in
+ * temporary buffer.
+ */
+static void prog_loadPage(avr_page_t page)
+{
+	if (page != curr_page)
+	{
+		prog_flush();
+		// Load page
+		memcpy_P(page_buf, (const char *)(page * SPM_PAGESIZE), SPM_PAGESIZE);
+		curr_page = page;
+		kprintf("Loaded page %d\n", curr_page);
+	}
 }
 
 /**
  * Write program memory.
- * This function to write on flash memory load a selected page from
- * flash memory and save it in temporary buffer. Them update temporary buffer
- * with \param buf data. We write in flash memory everery time we
- * change current page memory.
- * 
+ * Write \param size bytes from buffer \param buf to file \param *fd
+ * \note Write operations are buffered.
  */
-size_t	prog_write(struct _KFile *fd, const char *buf, size_t size)
+size_t prog_write(struct _KFile *fd, const void *_buf, size_t size)
 {
+	const uint8_t *buf =(const uint8_t *)_buf;
 
-	page_t page;
-	page_addr_t page_addr;
+	avr_page_t page;
+	avr_page_addr_t page_addr;
 	size_t total_write = 0;
-	size_t wr_len;
 
+	ASSERT(fd->seek_pos + size <= fd->size);
+	size = MIN((uint32_t)size, fd->size - fd->seek_pos);
+
+	kprintf("Writing at pos[%d]\n", fd->seek_pos);
 	while (size)
 	{
-		/* Current page memory */
-		page = fd->SeekPos / PAGEBUF;
-
-		/* Address in page memory */
-		page_addr = fd->SeekPos % PAGEBUF;
+		page = fd->seek_pos / SPM_PAGESIZE;
+		page_addr = fd->seek_pos % SPM_PAGESIZE;
 
 		prog_loadPage(page);
 
-		wr_len = MIN(size, PAGEBUF - page_addr);
+		size_t wr_len = MIN(size, SPM_PAGESIZE - page_addr);
 		memcpy(page_buf + page_addr, buf, wr_len);
+		page_modified = true;
 
 		buf += wr_len;
-		fd->SeekPos += wr_len;
+		fd->seek_pos += wr_len;
 		size -= wr_len;
 		total_write += wr_len;
 	}
-	/* Return total byte write on flash memory */
+	kprintf("written %d bytes\n", total_write);
 	return total_write;
 }
 
+/**
+ * Open flash file \param *fd.
+ * \param name and \param mode are unused, cause flash memory is
+ * threated like one file.
+ */
+bool prog_open(struct _KFile *fd, UNUSED_ARG(const char *, name), UNUSED_ARG(int, mode))
+{
+	curr_page = 0;
+	memcpy_P(page_buf, (const char *)(curr_page * SPM_PAGESIZE), SPM_PAGESIZE);
 
+	fd->seek_pos = 0;
+	fd->size = (uint16_t)(FLASHEND - CONFIG_BOOT_SIZE + 1);
+	page_modified = false;
+
+	kprintf("Flash file opened\n");
+	return true;
+}
 
 /**
- * Load select \param page memory buffer from AVR flash memory.
- * If select page is not current page, we flush it, and then we load
- * select page memory flash.
+ * Close file \param *fd
  */
-void prog_loadPage(page_t page)
+bool prog_close(UNUSED_ARG(struct _KFile *,fd))
 {
-	if (page != curr_page_num)
-	{
-		prog_flush();
-		/* Load selet page in temporary buffer store into RAM */
-		memcpy_P(page_buf, (const char *)(page * PAGEBUF), PAGEBUF);
-		/* Update current page */
-		curr_page_num = page;
-	}
+	prog_flush();
+	kprintf("Flash file closed\n");
+	return true;
 }
+
+/**
+ * Move \param *fd file seek position of \param offset bytes
+ * from current position.
+ */
+bool prog_seek(struct _KFile *fd, int32_t offset)
+{
+	ASSERT(fd->seek_pos + offset <= fd->size);
+
+	/* Bound check */
+	if (fd->seek_pos + offset > fd->size)
+		return false;
+
+	fd->seek_pos += offset;
+	kprintf("Flash seek to [%d]\n", fd->seek_pos);
+
+	return true;
+}
+
+/**
+ * Read from file \param *fd \param size bytes and put it in buffer \param *buf
+ * \return the number of bytes read.
+ */
+size_t	prog_read(struct _KFile *fd, void *buf, size_t size)
+{
+	ASSERT(fd->seek_pos + size <= fd->size);
+	size = MIN((uint32_t)size, fd->size - fd->seek_pos);
+
+	kprintf("Reading at pos[%d]\n", fd->seek_pos);
+	// Flush current buffered page (if modified).
+	prog_flush();
+
+	/*
+	 * AVR pointers are 16 bits wide, this hack is needed to avoid
+	 * compiler warning, cause fd->seek_pos is a 32bit offset.
+	 */
+	const uint8_t *pgm_addr = (const uint8_t *)0;
+	pgm_addr += fd->seek_pos;
+
+	memcpy_P(buf, pgm_addr, size);
+	fd->seek_pos += size;
+	kprintf("Read %d bytes\n", size);
+	return size;
+}
+
