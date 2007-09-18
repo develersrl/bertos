@@ -46,6 +46,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2007/09/18 10:16:59  batt
+ *#* Merge from triface.
+ *#*
  *#* Revision 1.3  2006/09/13 18:29:22  bernie
  *#* Add a few missing CONFIG_ definitions.
  *#*
@@ -111,7 +114,7 @@
  *
  * \sa config_kern.h
  */
-#define CONFIG_KERNEL 1
+#define CONFIG_KERNEL 0
 
 /**
  * \name Serial driver parameters

@@ -10,6 +10,9 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
+# Revision 1.10  2007/09/18 10:17:00  batt
+# Merge from triface.
+#
 # Revision 1.9  2006/09/20 14:28:42  marco
 # Add MOC. Changed OPTCFLAGS.
 #
@@ -38,9 +41,12 @@
 
 #
 # Programmer type
-#
+# see local pgm_config.mk for programmer customization.
+-include pgm_config.mk
+DPROG ?= -V -c stk500 -P /dev/ttyS0
+
 # AVR ISP dongle that blows up easily
-DPROG = -V -c stk500 -P /dev/ttyS0
+#DPROG = -V -c stk500 -P /dev/ttyS0
 #DPROG = -V -c jtag2slow
 #-P /dev/ttyUSB0
 
@@ -53,8 +59,8 @@ DPROG = -V -c stk500 -P /dev/ttyS0
 # PonyProg serial programmer
 #DPROG = -c dasa2
 
-#OPTCFLAGS = -ffunction-sections -fdata-sections -funsafe-loop-optimizations
-OPTCFLAGS = -funsafe-loop-optimizations
+OPTCFLAGS = -ffunction-sections -fdata-sections
+#OPTCFLAGS = -funsafe-loop-optimizations
 
 # For AVRStudio
 #DEBUGCFLAGS = -gdwarf-2
@@ -65,8 +71,7 @@ DEBUGCFLAGS = -ggdb
 #
 # define some variables based on the AVR base path in $(AVR)
 #
-CROSS   =
-#CROSS   = avr-
+CROSS   = avr-
 CC      = $(CROSS)gcc
 CXX     = $(CROSS)g++
 AS      = $(CC) -x assembler-with-cpp
@@ -117,7 +122,7 @@ WARNFLAGS = \
 	-Wcast-align -Wwrite-strings -Wsign-compare \
 	-Wmissing-prototypes -Wmissing-noreturn \
 	-Wextra -Wstrict-aliasing=2 \
-	-Wunsafe-loop-optimizations
+#	-Wunsafe-loop-optimizations
 
 # Compiler warning flags for C only
 C_WARNFLAGS = \
@@ -141,10 +146,10 @@ CPPAFLAGS = $(DEBUGCFLAGS) -MMD
 ASFLAGS	= $(DEBUGCFLAGS)
 
 # Default linker flags
-LDFLAGS = $(MAP_FLAGS)
+#LDFLAGS = $(MAP_FLAGS)
 
 #bernie: does not complain for missing symbols!
-#LDFLAGS = $(MAP_FLAGS) -Wl,--gc-sections
+LDFLAGS = $(MAP_FLAGS) -Wl,--gc-sections
 
 # Flags for avrdude
 AVRDUDEFLAGS = $(DPROG)
