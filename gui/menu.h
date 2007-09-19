@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2007/09/19 16:23:27  batt
+ *#* Fix doxygen warnings.
+ *#*
  *#* Revision 1.4  2006/09/13 13:58:33  bernie
  *#* Add RenderHook support.
  *#*
@@ -125,7 +128,7 @@ typedef struct Menu
 	const_iptr_t     title;    /**< Menu title (ID or ptr to string, 0 to disable) */
 	int              flags;    /**< See MF_#? definitions below */
 	struct Bitmap   *bitmap;   /**< Bitmap where the menu is rendered */
-	int              selected; /**< Initial selection (written to if #MF_SAVESEL is set). */
+	int              selected; /**< Initial selection (written to if MF_SAVESEL is set). */
 } Menu;
 
 /**

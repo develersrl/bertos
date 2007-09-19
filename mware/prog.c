@@ -42,7 +42,7 @@ uint8_t save_buf[TEST_SIZE];
 
 /**
  * Program memory read/write subtest.
- * Try to write/read in the same file location \param _size bytes.
+ * Try to write/read in the same \param f file location \param _size bytes.
  * \return true if all is ok, false otherwise
  * \note Restore file position at exit (if no error)
  * \note Test buffer \param buf must be filled with

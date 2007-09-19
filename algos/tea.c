@@ -41,6 +41,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2007/09/19 16:23:27  batt
+ *#* Fix doxygen warnings.
+ *#*
  *#* Revision 1.1  2007/06/07 09:13:40  batt
  *#* Add TEA enc/decryption algorithm.
  *#*
@@ -61,8 +64,8 @@ static uint32_t tea_func(uint32_t *in, uint32_t *sum, uint32_t *k)
  * \brief TEA encryption function.
  * This function encrypts <EM>v</EM> with <EM>k</EM> and returns the
  * encrypted data in <EM>v</EM>.
- * \param v Array of two long values containing the data block.
- * \param k Array of four long values containing the key.
+ * \param _v Array of two long values containing the data block.
+ * \param _k Array of four long values containing the key.
  */
 void tea_enc(void *_v, void *_k)
 {
@@ -90,8 +93,8 @@ void tea_enc(void *_v, void *_k)
  * \brief TEA decryption function.
  * This function decrypts <EM>v</EM> with <EM>k</EM> and returns the
  * decrypted data in <EM>v</EM>.
- * \param v Array of two long values containing the data block.
- *\param k Array of four long values containing the key.
+ * \param _v Array of two long values containing the data block.
+ * \param _k Array of four long values containing the key.
  */
 void tea_dec(void *_v, void *_k)
 {

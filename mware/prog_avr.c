@@ -110,7 +110,7 @@ static void prog_loadPage(avr_page_t page)
 
 /**
  * Write program memory.
- * Write \param size bytes from buffer \param buf to file \param *fd
+ * Write \param size bytes from buffer \param _buf to file \param *fd
  * \note Write operations are buffered.
  */
 size_t prog_write(struct _KFile *fd, const void *_buf, size_t size)
@@ -146,7 +146,7 @@ size_t prog_write(struct _KFile *fd, const void *_buf, size_t size)
 }
 
 /**
- * Open flash file \param *fd.
+ * Open flash file \param *fd
  * \param name and \param mode are unused, cause flash memory is
  * threated like one file.
  */
