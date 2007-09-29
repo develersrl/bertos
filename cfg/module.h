@@ -46,7 +46,7 @@
  *
  * \see MOD_INIT(), MOD_CHECK()
  */
-#define MOD_DEFINE(module)   DB(bool module ## _initialized;)
+#define MOD_DEFINE(module)   DB(extern bool module ## _initialized; bool module ## _initialized;)
 
 /**
  * Check that \a module was already initialized.

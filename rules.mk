@@ -24,6 +24,12 @@ Q := @
 L := @echo
 endif
 
+# Checker build
+ifeq ($(C),1)
+CC = $(CHECKER)
+CFLAGS += -Wundef -D__x86_64__=1 -D__unix__=1 -D__linux__=1 -D__STDC_VERSION__=199901L
+endif
+
 # Initialize $(top_srcdir) with current directory, unless it was already initialized
 top_srcdir ?= $(shell pwd)
 

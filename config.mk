@@ -10,6 +10,9 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
+# Revision 1.12  2007/09/29 16:57:39  bernie
+# Better sparse support.
+#
 # Revision 1.11  2007/09/29 15:54:14  bernie
 # Make demo Qt emulator compile again.
 #
@@ -86,6 +89,11 @@ RM      = rm -f
 RM_R    = rm -rf
 RN      = mv
 MKDIR_P = mkdir -p
+SHELL   = /bin/sh
+CHECKER = sparse
+DOXYGEN = doxygen
+AVRDUDE = avrdude
+FLEXCAT = $(top_srcdir)/tools/flexcat/flexcat
 
 # For conversion from ELF to COFF for use in debugging / simulating in AVR Studio or VMLAB.
 COFFCONVERT=$(OBJCOPY) \
@@ -99,11 +107,6 @@ INCDIR  = -I. -Ihw
 LIBDIR  = lib
 OBJDIR  = obj
 OUTDIR  = images
-SHELL   = /bin/sh
-DOXYGEN = doxygen
-UISP    = uisp
-AVRDUDE = avrdude
-FLEXCAT = $(top_srcdir)/tools/flexcat/flexcat
 
 # output format can be srec, ihex (avrobj is always created)
 FORMAT = srec

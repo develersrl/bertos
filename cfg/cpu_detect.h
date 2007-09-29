@@ -11,12 +11,6 @@
 #ifndef CPU_DETECT_H
 #define CPU_DETECT_H
 
-/* sparse? */
-#ifdef __CHECKER__
-	/* Any random CPU will do */
-	#define __arm__
-#endif
-
 #if defined(__arm__) /* GCC */ \
 	|| defined(__ARM4TM__) /* IAR: defined for all cores >= 4tm */
 	#define CPU_ARM                 1

@@ -12,12 +12,6 @@
 #ifndef HPTIME_H
 #define HPTIME_H
 
-/* sparse? */
-#ifdef __CHECKER__
-	/* Any random OS would do */
-	#define __unix__
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */

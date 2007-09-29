@@ -36,13 +36,14 @@ hptime_t hptime_get(void)
 
 #elif defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
 
-#include <sys/time.h>
+#include <sys/time.h> /* for gettimeofday() */
+#include <stddef.h> /* for NULL */
 
 hptime_t hptime_get(void)
 {
 	struct timeval tv;
 
-	gettimeofday(&tv, 0);
+	gettimeofday(&tv, NULL);
 	return (hptime_t)tv.tv_sec * HPTIME_TICKS_PER_SECOND
 		+ (hptime_t)tv.tv_usec;
 }
