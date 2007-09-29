@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.10  2007/09/29 16:30:37  bernie
+ *#* RASTER_SIZE(): Remove obsolete macro.
+ *#*
  *#* Revision 1.9  2006/09/20 14:29:34  marco
  *#* Add proc demo (not yet working).
  *#*
@@ -82,14 +85,14 @@ static void magic(struct Bitmap *bitmap, coord_t x, coord_t y)
 		gfx_lineTo(bitmap, coords[i]/2 + x, coords[i+1]/3 + y);
 }
 
-void hello_world(Bitmap *bm)
+static void hello_world(Bitmap *bm)
 {
+	extern const Font font_ncenB18;
     const Font *old_font = bm->font;
 
 	gfx_bitmapClear(bm);
 
 	/* Set big font */
-	extern const Font font_ncenB18;
 	gfx_setFont(bm, &font_ncenB18);
 
 	text_xprintf(bm, 1, 0, STYLEF_BOLD | TEXT_FILL | TEXT_CENTER,
@@ -105,7 +108,7 @@ void hello_world(Bitmap *bm)
 /**
  * Show the splash screen
  */
-void bouncing_logo(Bitmap *bm)
+static void bouncing_logo(Bitmap *bm)
 {
 	const long SPEED_SCALE = 1000;
 	const long GRAVITY_ACCEL = 10;
@@ -148,8 +151,8 @@ void win_demo(Bitmap *bm)
 
 	Window root_win, small_win, large_win;
 	Bitmap small_bm, large_bm;
-	uint8_t small_raster[RASTER_SIZE(small_width, small_height)];
-	uint8_t large_raster[RASTER_SIZE(large_width, large_height)];
+	uint8_t small_raster[RAST_SIZE(small_width, small_height)];
+	uint8_t large_raster[RAST_SIZE(large_width, large_height)];
 
 	win_create(&root_win, bm);
 

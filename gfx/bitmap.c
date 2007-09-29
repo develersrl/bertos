@@ -6,53 +6,11 @@
  * This file is part of DevLib - See README.devlib for information.
  * -->
  *
- * \version $Id$
- *
  * \author Bernardo Innocenti <bernie@develer.com>
  * \author Stefano Fedrigo <aleph@develer.com>
  *
  * \brief Bitmap manipulation routines.
  */
-
-/*#*
- *#* $Log$
- *#* Revision 1.12  2006/08/01 12:23:39  bernie
- *#* gfx_setClipRect(): Also define when CONFIG_GFX_VCOORDS is enabled; Extend documentation.
- *#*
- *#* Revision 1.11  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.10  2006/05/27 17:21:15  bernie
- *#* Factor out, simplify and document clipping.
- *#*
- *#* Revision 1.9  2006/05/25 23:35:40  bernie
- *#* Cleanup.
- *#*
- *#* Revision 1.8  2006/03/27 04:48:56  bernie
- *#* gfx_blitImage(): New function; gfx_blitRaster(): Fix clipping bug.
- *#*
- *#* Revision 1.7  2006/03/07 22:18:04  bernie
- *#* Correctly compute text width for prop fonts; Make styles a per-bitmap attribute.
- *#*
- *#* Revision 1.6  2006/02/23 11:17:16  bernie
- *#* Documentation fixes.
- *#*
- *#* Revision 1.5  2006/02/15 09:10:15  bernie
- *#* Implement prop fonts; Fix algo styles.
- *#*
- *#* Revision 1.4  2006/02/10 12:32:33  bernie
- *#* Add multiple font support in bitmaps; gfx_blitRaster(): New function.
- *#*
- *#* Revision 1.3  2006/01/26 00:36:48  bernie
- *#* Const correctness for some new functions.
- *#*
- *#* Revision 1.2  2006/01/24 21:55:43  aleph
- *#* gfx_blit_P(): use RASTER_SIZE() to calculate raster size
- *#*
- *#* Revision 1.1  2006/01/24 02:17:49  bernie
- *#* Split out gfx.c into bitmap.c and line.c.
- *#*
- *#*/
 
 #include "gfx.h"
 #include "gfx_p.h"
@@ -111,7 +69,7 @@ void gfx_bitmapInit(Bitmap *bm, uint8_t *raster, coord_t w, coord_t h)
  */
 void gfx_bitmapClear(Bitmap *bm)
 {
-	memset(bm->raster, 0, RASTER_SIZE(bm->width, bm->height));
+	memset(bm->raster, 0, RAST_SIZE(bm->width, bm->height));
 }
 
 
@@ -127,7 +85,7 @@ void gfx_bitmapClear(Bitmap *bm)
  */
 void gfx_blit_P(Bitmap *bm, const pgm_uint8_t *raster)
 {
-	memcpy_P(bm->raster, raster, RASTER_SIZE(bm->width, bm->height));
+	memcpy_P(bm->raster, raster, RAST_SIZE(bm->width, bm->height));
 }
 #endif /* CPU_HARVARD */
 

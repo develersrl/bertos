@@ -12,51 +12,6 @@
  * \brief General pourpose graphics routines
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.18  2006/08/01 12:45:01  bernie
- *#* Remove Bitmap::cr when not needed.
- *#*
- *#* Revision 1.17  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.16  2006/05/27 17:17:34  bernie
- *#* Optimize away divisions in RAST_ADDR/MASK macros.
- *#*
- *#* Revision 1.15  2006/05/25 23:35:40  bernie
- *#* Cleanup.
- *#*
- *#* Revision 1.14  2006/04/27 05:39:24  bernie
- *#* Enhance text rendering to arbitrary x,y coords.
- *#*
- *#* Revision 1.13  2006/04/11 00:08:24  bernie
- *#* text_offset(): New function, but I'm not quite confident with the design.
- *#*
- *#* Revision 1.12  2006/03/27 04:48:56  bernie
- *#* gfx_blitImage(): New function; gfx_blitRaster(): Fix clipping bug.
- *#*
- *#* Revision 1.11  2006/03/07 22:18:04  bernie
- *#* Correctly compute text width for prop fonts; Make styles a per-bitmap attribute.
- *#*
- *#* Revision 1.10  2006/02/17 22:24:40  bernie
- *#* Fix undefined preprocessor symbol.
- *#*
- *#* Revision 1.9  2006/02/15 09:10:15  bernie
- *#* Implement prop fonts; Fix algo styles.
- *#*
- *#* Revision 1.8  2006/02/10 12:28:33  bernie
- *#* Add font support in bitmaps; Make bitmap formats public.
- *#*
- *#* Revision 1.7  2006/01/26 00:36:48  bernie
- *#* Const correctness for some new functions.
- *#*
- *#* Revision 1.6  2006/01/23 23:13:04  bernie
- *#* RECT_WIDTH(), RECT_HEIGHT(), RASTER_SIZE(): New macros.
- *#*
- *#* Revision 1.5  2006/01/17 02:31:29  bernie
- *#* Add bitmap format support; Improve some comments.
- *#*/
-
 #ifndef GFX_GFX_H
 #define GFX_GFX_H
 
@@ -209,8 +164,6 @@ typedef struct Image
 #else
 	#error Unknown value of CONFIG_BITMAP_FMT
 #endif /* CONFIG_BITMAP_FMT */
-
-#define RASTER_SIZE RAST_SIZE /* OBSOLETE */
 
 /* Function prototypes */
 void gfx_bitmapInit (Bitmap *bm, uint8_t *raster, coord_t w, coord_t h);
