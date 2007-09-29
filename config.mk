@@ -10,6 +10,9 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
+# Revision 1.11  2007/09/29 15:54:14  bernie
+# Make demo Qt emulator compile again.
+#
 # Revision 1.10  2007/09/18 10:17:00  batt
 # Merge from triface.
 #
@@ -71,18 +74,18 @@ DEBUGCFLAGS = -ggdb
 #
 # define some variables based on the AVR base path in $(AVR)
 #
-CROSS   = avr-
+CROSS   = #avr-
 CC      = $(CROSS)gcc
 CXX     = $(CROSS)g++
 AS      = $(CC) -x assembler-with-cpp
 LD      = $(CC)
 OBJCOPY = $(CROSS)objcopy
+STRIP   = $(CROSS)strip
 INSTALL = cp -a
 RM      = rm -f
 RM_R    = rm -rf
 RN      = mv
 MKDIR_P = mkdir -p
-MOC     = moc
 
 # For conversion from ELF to COFF for use in debugging / simulating in AVR Studio or VMLAB.
 COFFCONVERT=$(OBJCOPY) \
@@ -120,7 +123,7 @@ LIST_FLAGS = -Wa,-anhlmsd=$(@:.o=.lst)
 WARNFLAGS = \
 	-W -Wformat -Wall -Wundef -Wpointer-arith -Wcast-qual \
 	-Wcast-align -Wwrite-strings -Wsign-compare \
-	-Wmissing-prototypes -Wmissing-noreturn \
+	-Wmissing-noreturn \
 	-Wextra -Wstrict-aliasing=2 \
 #	-Wunsafe-loop-optimizations
 

@@ -8,6 +8,9 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
+# Revision 1.9  2007/09/29 15:54:14  bernie
+# Make demo Qt emulator compile again.
+#
 # Revision 1.8  2006/09/20 14:27:22  marco
 # Added fonts, switch.S; fixed moc
 #
@@ -34,6 +37,7 @@
 #
 
 include fonts/fonts.mk
+include emul/emul.mk
 
 # Set to 1 for debug builds
 demo_DEBUG = 1
@@ -84,6 +88,7 @@ demo_CSRC = \
 demo_CPPASRC = \
 	kern/switch.S
 
+# FIXME: maybe this junk should go in emul/emul.mk?
 $(OBJDIR)/demo/emul/emulwin.o: emul/emulwin_moc.cpp 
 $(OBJDIR)/demo/drv/lcd_gfx_qt.o: drv/lcd_gfx_qt_moc.cpp
 $(OBJDIR)/demo/drv/timer.o: drv/timer_qt_moc.cpp
@@ -91,10 +96,9 @@ $(OBJDIR)/demo/emul/emulkbd.o: emul/emulkbd_moc.cpp
 
 #FIXME: isn't there a way to avoid repeating the pattern rule?
 drv/timer_qt_moc.cpp: drv/timer_qt.c
-	$(MOC) -o $@ $<
+	$(QT_MOC) -o $@ $<
 
-EMUL_CFLAGS = $(shell pkg-config QtGui --cflags) -DQT_CLEAN_NAMESPACE -DQT3_SUPPORT
-EMUL_LDFLAGS = $(shell pkg-config QtGui --libs)
+
 demo_CFLAGS = -D_QT=4 -D'ARCH=ARCH_EMUL' -Iapp/demo -Ihw $(EMUL_CFLAGS)
 demo_CXXFLAGS = -D_QT=4 -D'ARCH=ARCH_EMUL' -Iapp/demo -Ihw $(EMUL_CFLAGS)
 demo_LDFLAGS = $(EMUL_LDFLAGS)
