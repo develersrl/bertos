@@ -7,47 +7,15 @@
  * -->
  *
  * \brief CPU detection through special preprocessor macros
- *
  */
-
-/*#*
- *#* $Log$
- *#* Revision 1.6  2007/06/07 14:42:54  batt
- *#* Merge from project_ks.
- *#*
- *#* Revision 1.5  2007/01/27 20:48:36  batt
- *#* Add support for ATMEGA1281.
- *#*
- *#* Revision 1.4  2006/07/19 12:56:25  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.3  2006/02/10 12:37:37  bernie
- *#* Add support for ARM on IAR.
- *#*
- *#* Revision 1.2  2005/06/14 06:15:10  bernie
- *#* Add X86_64 support.
- *#*
- *#* Revision 1.1  2005/04/11 19:04:13  bernie
- *#* Move top-level headers to cfg/ subdir.
- *#*
- *#* Revision 1.4  2005/02/16 20:33:24  bernie
- *#* Preliminary PPC support.
- *#*
- *#* Revision 1.3  2004/12/31 17:39:26  bernie
- *#* Use C89 comments only.
- *#*
- *#* Revision 1.2  2004/08/25 14:12:08  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.1  2004/07/30 17:14:49  rasky
- *#* File sfuggito al commit precedente (nuova gestione unificata del detect della CPU
- *#*
- *#* Revision 1.2  2004/07/30 10:31:07  rasky
- *#* Aggiunto detect per ATmega128
- *#*/
-
 #ifndef CPU_DETECT_H
 #define CPU_DETECT_H
+
+/* sparse? */
+#ifdef __CHECKER__
+	/* Any random CPU will do */
+	#define __arm__
+#endif
 
 #if defined(__arm__) /* GCC */ \
 	|| defined(__ARM4TM__) /* IAR: defined for all cores >= 4tm */

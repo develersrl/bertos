@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.11  2007/09/29 16:19:47  bernie
+ *#* Changes to compile with sparse.
+ *#*
  *#* Revision 1.10  2006/07/19 12:56:25  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -150,7 +153,7 @@
  * Summarize hosted environments as OS_HOSTED and embedded
  * environment with OS_EMBEDDED.
  */
-#if OS_WIN32 || OS_UNIX || OS_DARWIN
+#if OS_WIN32 || OS_UNIX || OS_DARWIN || OS_QT
 	#define OS_HOSTED   1
 	#define OS_EMBEDDED 0
 #else

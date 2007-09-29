@@ -8,78 +8,10 @@
  *
  * \brief CPU-specific definitions
  *
- * \version $Id$
- *
  * \author Giovanni Bajo <rasky@develer.com>
  * \author Bernardo Innocenti <bernie@develer.com>
  * \author Stefano Fedrigo <aleph@develer.com>
  */
-
-/*#*
- *#* $Log$
- *#* Revision 1.15  2006/07/19 12:56:25  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.14  2006/07/19 12:54:12  bernie
- *#* Documentation fixes.
- *#*
- *#* Revision 1.13  2006/03/27 04:49:23  bernie
- *#* CPU_IDLE(): Fix for new emulator.
- *#*
- *#* Revision 1.12  2006/03/21 10:52:39  bernie
- *#* Update ARM support.
- *#*
- *#* Revision 1.11  2006/03/20 17:49:00  bernie
- *#* Spacing fix.
- *#*
- *#* Revision 1.10  2006/02/24 01:17:30  bernie
- *#* CPU_SAVED_REGS_CNT: Declare for x86/x86_64.
- *#*
- *#* Revision 1.9  2006/02/23 09:08:43  bernie
- *#* Add note for a frequently reported non-bug.
- *#*
- *#* Revision 1.8  2006/02/10 12:37:45  bernie
- *#* Add support for ARM on IAR.
- *#*
- *#* Revision 1.7  2005/11/27 03:04:38  bernie
- *#* Add POSIX emulation for IRQ_* macros; Add Qt support.
- *#*
- *#* Revision 1.6  2005/07/19 07:26:49  bernie
- *#* Add missing #endif.
- *#*
- *#* Revision 1.5  2005/06/27 21:24:17  bernie
- *#* CPU_CSOURCE(): New macro.
- *#*
- *#* Revision 1.4  2005/06/14 06:15:10  bernie
- *#* Add X86_64 support.
- *#*
- *#* Revision 1.3  2005/04/12 04:06:17  bernie
- *#* Catch missing CPU earlier.
- *#*
- *#* Revision 1.2  2005/04/11 19:10:27  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.1  2005/04/11 19:04:13  bernie
- *#* Move top-level headers to cfg/ subdir.
- *#*
- *#* Revision 1.30  2005/03/15 00:20:09  bernie
- *#* BREAKPOINT, IRQ_RUNNING(), IRQ_GETSTATE(): New DSP56K macros.
- *#*
- *#* Revision 1.29  2005/02/16 20:33:24  bernie
- *#* Preliminary PPC support.
- *#*
- *#* Revision 1.28  2004/12/31 17:39:41  bernie
- *#* Fix documentation.
- *#*
- *#* Revision 1.27  2004/12/31 17:02:47  bernie
- *#* IRQ_SAVE_DISABLE(), IRQ_RESTORE(): Add null stubs for x86.
- *#*
- *#* Revision 1.26  2004/12/13 12:08:12  bernie
- *#* DISABLE_IRQSAVE, ENABLE_IRQRESTORE, DISABLE_INTS, ENABLE_INTS: Remove obsolete macros.
- *#*
- *#* Revision 1.25  2004/12/08 08:31:02  bernie
- *#* CPU_HARVARD: Define to 1 for AVR and DSP56K.
- *#*/
 #ifndef DEVLIB_CPU_H
 #define DEVLIB_CPU_H
 
@@ -256,8 +188,8 @@
 			asm volatile ( \
 				"mrs r0, cpsr\n\t" \
 				"mov %0, r0" \
-				: "=r" (sreg)
-				: /* no inputs */
+				: "=r" (sreg) \
+				: /* no inputs */ \
 				: "r0" \
 			); \
 			(bool)(sreg & 0xb0); \
