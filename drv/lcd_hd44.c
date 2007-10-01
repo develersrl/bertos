@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.4  2007/10/01 10:46:09  batt
+ *#* Add light LCD position computation.
+ *#*
  *#* Revision 1.3  2006/09/20 19:55:01  marco
  *#* Added CONFIG_LCD_4BIT.
  *#*
@@ -44,9 +47,19 @@
 #include <cfg/arch_config.h>
 #include <drv/timer.h>
 
+#if defined(LCD_READ_H) && defined(LCD_READ_L) && defined(LCD_WRITE_H) && defined(LCD_WRITE_L)
+	#define CONFIG_LCD_4BIT 1
+#elif defined(LCD_READ) && defined(LCD_WRITE)
+	#define CONFIG_LCD_4BIT 0
+#else
+	#error Incomplete or missing LCD_READ/LCD_WRITE macros
+#endif
+
 /** Flag di stato del display */
 #define LCDF_BUSY  BV(7)
 
+#if CONFIG_LCD_ADDRESS_FAST == 1
+#define lcd_address(x) lcd_address[x]
 /**
  * Addresses of LCD display character positions, expanded
  * for faster access (DB7 = 1).
@@ -94,6 +107,26 @@ static const uint8_t lcd_address[] =
 };
 
 STATIC_ASSERT(countof(lcd_address) == LCD_ROWS * LCD_COLS);
+#else  /* CONFIG_LCD_ADDRESS_FAST == 0 */
+
+static uint8_t col_address[] =
+{
+	0x80,
+	0xC0,
+#if LCD_ROWS > 2
+	0x94,
+	0xD4
+#endif
+};
+
+/**
+ * Addresses of LCD display character positions, calculated runtime to save RAM
+ */
+static uint8_t lcd_address(uint8_t addr)
+{
+	return col_address[addr / LCD_COLS] + addr % LCD_COLS;
+}
+#endif /* CONFIG_LCD_ADDRESS_FAST */
 
 /**
  * Current display position. We remember this to optimize
@@ -280,7 +313,7 @@ void lcd_moveTo(uint8_t addr)
 	if (addr != lcd_current_addr)
 	{
 		lcd_waitBusy();
-		lcd_regWrite(lcd_address[addr]);
+		lcd_regWrite(lcd_address(addr));
 		lcd_current_addr = addr;
 	}
 }
@@ -306,7 +339,7 @@ void lcd_setReg(uint8_t val)
 void lcd_putc(uint8_t addr, uint8_t c)
 {
 	if (addr != lcd_current_addr)
-		lcd_setReg(lcd_address[addr]);
+		lcd_setReg(lcd_address(addr));
 
 	lcd_waitBusy();
 	lcd_dataWrite(c);
@@ -318,7 +351,7 @@ void lcd_putc(uint8_t addr, uint8_t c)
 
 	/* If we are at the end of a row put the cursor at the beginning of the next */
 	if (!(lcd_current_addr % LCD_COLS))
-		lcd_setReg(lcd_address[lcd_current_addr]);
+		lcd_setReg(lcd_address(lcd_current_addr));
 }
 
 
@@ -343,7 +376,7 @@ void lcd_remapChar(const char *glyph, char code)
 	}
 
 	/* Move back to original address */
-	lcd_setReg(lcd_address[lcd_current_addr]);
+	lcd_setReg(lcd_address(lcd_current_addr));
 }
 
 
