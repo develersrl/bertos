@@ -93,7 +93,7 @@ static void prog_flush(void)
 
 
 /**
- * Check current page and if \param page is different, load it in
+ * Check current page and if \a page is different, load it in
  * temporary buffer.
  */
 static void prog_loadPage(avr_page_t page)
@@ -110,7 +110,7 @@ static void prog_loadPage(avr_page_t page)
 
 /**
  * Write program memory.
- * Write \param size bytes from buffer \param _buf to file \param *fd
+ * Write \a size bytes from buffer \a _buf to file \a *fd
  * \note Write operations are buffered.
  */
 size_t prog_write(struct _KFile *fd, const void *_buf, size_t size)
@@ -146,8 +146,8 @@ size_t prog_write(struct _KFile *fd, const void *_buf, size_t size)
 }
 
 /**
- * Open flash file \param *fd
- * \param name and \param mode are unused, cause flash memory is
+ * Open flash file \a *fd
+ * \a name and \a mode are unused, cause flash memory is
  * threated like one file.
  */
 bool prog_open(struct _KFile *fd, UNUSED_ARG(const char *, name), UNUSED_ARG(int, mode))
@@ -164,7 +164,7 @@ bool prog_open(struct _KFile *fd, UNUSED_ARG(const char *, name), UNUSED_ARG(int
 }
 
 /**
- * Close file \param *fd
+ * Close file \a *fd
  */
 bool prog_close(UNUSED_ARG(struct _KFile *,fd))
 {
@@ -174,7 +174,7 @@ bool prog_close(UNUSED_ARG(struct _KFile *,fd))
 }
 
 /**
- * Move \param *fd file seek position of \param offset bytes
+ * Move \a *fd file seek position of \a offset bytes
  * from current position.
  */
 bool prog_seek(struct _KFile *fd, int32_t offset)
@@ -192,7 +192,7 @@ bool prog_seek(struct _KFile *fd, int32_t offset)
 }
 
 /**
- * Read from file \param *fd \param size bytes and put it in buffer \param *buf
+ * Read from file \a *fd \a size bytes and put it in buffer \a *buf
  * \return the number of bytes read.
  */
 size_t prog_read(struct _KFile *fd, void *buf, size_t size)
