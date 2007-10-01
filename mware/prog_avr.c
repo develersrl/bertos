@@ -195,7 +195,7 @@ bool prog_seek(struct _KFile *fd, int32_t offset)
  * Read from file \param *fd \param size bytes and put it in buffer \param *buf
  * \return the number of bytes read.
  */
-size_t	prog_read(struct _KFile *fd, void *buf, size_t size)
+size_t prog_read(struct _KFile *fd, void *buf, size_t size)
 {
 	ASSERT(fd->seek_pos + size <= fd->size);
 	size = MIN((uint32_t)size, fd->size - fd->seek_pos);
