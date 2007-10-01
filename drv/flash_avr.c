@@ -5,14 +5,19 @@
  * All Rights Reserved.
  * -->
  *
- * \brief Self programming routines
+ * \brief Self programming routines.
  *
  * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  * \author Daniele Basile <asterix@develer.com>
+ *
+ * This module implements a kfile-like access for Atmel avr
+ * internal flash.
+ * Internal flash writing access is controlled by BOOTSZ fuses, check
+ * datasheet for details.
  */
 
-#include "prog.h"
+#include "flash_avr.h"
 
 #include <string.h>
 
@@ -45,7 +50,7 @@ static avr_page_t curr_page = 0;
  * Write current buffered page in flash memory (if modified).
  * This function erase flash memory page before writing.
  */
-static void prog_flush(void)
+static void avrflash_flush(void)
 {
 	if (page_modified)
 	{
@@ -96,11 +101,11 @@ static void prog_flush(void)
  * Check current page and if \a page is different, load it in
  * temporary buffer.
  */
-static void prog_loadPage(avr_page_t page)
+static void avrflash_loadPage(avr_page_t page)
 {
 	if (page != curr_page)
 	{
-		prog_flush();
+		avrflash_flush();
 		// Load page
 		memcpy_P(page_buf, (const char *)(page * SPM_PAGESIZE), SPM_PAGESIZE);
 		curr_page = page;
@@ -113,7 +118,7 @@ static void prog_loadPage(avr_page_t page)
  * Write \a size bytes from buffer \a _buf to file \a *fd
  * \note Write operations are buffered.
  */
-size_t prog_write(struct _KFile *fd, const void *_buf, size_t size)
+static size_t avrflash_write(struct _KFile *fd, const void *_buf, size_t size)
 {
 	const uint8_t *buf =(const uint8_t *)_buf;
 
@@ -130,7 +135,7 @@ size_t prog_write(struct _KFile *fd, const void *_buf, size_t size)
 		page = fd->seek_pos / SPM_PAGESIZE;
 		page_addr = fd->seek_pos % SPM_PAGESIZE;
 
-		prog_loadPage(page);
+		avrflash_loadPage(page);
 
 		size_t wr_len = MIN(size, SPM_PAGESIZE - page_addr);
 		memcpy(page_buf + page_addr, buf, wr_len);
@@ -150,7 +155,7 @@ size_t prog_write(struct _KFile *fd, const void *_buf, size_t size)
  * \a name and \a mode are unused, cause flash memory is
  * threated like one file.
  */
-bool prog_open(struct _KFile *fd, UNUSED_ARG(const char *, name), UNUSED_ARG(int, mode))
+static bool avrflash_open(struct _KFile *fd, UNUSED_ARG(const char *, name), UNUSED_ARG(int, mode))
 {
 	curr_page = 0;
 	memcpy_P(page_buf, (const char *)(curr_page * SPM_PAGESIZE), SPM_PAGESIZE);
@@ -166,9 +171,9 @@ bool prog_open(struct _KFile *fd, UNUSED_ARG(const char *, name), UNUSED_ARG(int
 /**
  * Close file \a *fd
  */
-bool prog_close(UNUSED_ARG(struct _KFile *,fd))
+static bool avrflash_close(UNUSED_ARG(struct _KFile *,fd))
 {
-	prog_flush();
+	avrflash_flush();
 	kprintf("Flash file closed\n");
 	return true;
 }
@@ -177,7 +182,7 @@ bool prog_close(UNUSED_ARG(struct _KFile *,fd))
  * Move \a *fd file seek position of \a offset bytes
  * from current position.
  */
-bool prog_seek(struct _KFile *fd, int32_t offset)
+static bool avrflash_seek(struct _KFile *fd, int32_t offset)
 {
 	ASSERT(fd->seek_pos + offset <= fd->size);
 
@@ -195,14 +200,14 @@ bool prog_seek(struct _KFile *fd, int32_t offset)
  * Read from file \a *fd \a size bytes and put it in buffer \a *buf
  * \return the number of bytes read.
  */
-size_t prog_read(struct _KFile *fd, void *buf, size_t size)
+static size_t avrflash_read(struct _KFile *fd, void *buf, size_t size)
 {
 	ASSERT(fd->seek_pos + size <= fd->size);
 	size = MIN((uint32_t)size, fd->size - fd->seek_pos);
 
 	kprintf("Reading at pos[%d]\n", fd->seek_pos);
 	// Flush current buffered page (if modified).
-	prog_flush();
+	avrflash_flush();
 
 	/*
 	 * AVR pointers are 16 bits wide, this hack is needed to avoid
@@ -217,3 +222,124 @@ size_t prog_read(struct _KFile *fd, void *buf, size_t size)
 	return size;
 }
 
+/**
+ * Init AVR flash read/write file.
+ */
+void avrflash_init(struct _KFile *fd)
+{
+	// Set up flash programming functions.
+	fd.open = avrflash_open;
+	fd.close = avrflash_close;
+	fd.read = avrflash_read;
+	fd.write = avrflash_write;
+	fd.seek = avrflash_seek;
+}
+
+#if CONFIG_TEST
+
+#define TEST_SIZE 683
+#define ONE_BYTE_TEST_ADDRESS 347
+
+uint8_t test_buf[TEST_SIZE];
+uint8_t save_buf[TEST_SIZE];
+
+/**
+ * Program memory read/write subtest.
+ * Try to write/read in the same \param f file location \param _size bytes.
+ * \return true if all is ok, false otherwise
+ * \note Restore file position at exit (if no error)
+ * \note Test buffer \param buf must be filled with
+ * the following statement:
+ * <pre>
+ * buf[i] = i & 0xff
+ * </pre>
+ */
+static bool avrflash_rwTest(KFile *f, uint8_t *buf, size_t _size)
+{
+	int32_t size = _size;
+	// Write test buffer
+	if (f->write(f, buf, size) != size)
+		return false;
+	f->seek(f, -size);
+
+	// Reset test buffer
+	memset(buf, 0, size);
+
+	// Read flash in test buffer
+	if (f->read(f, buf, size) != size)
+		return false;
+	f->seek(f, -size);
+
+	// Check test result
+ 	for (size_t i = 0; i < size; i++)
+ 		if (buf[i] != (i & 0xff))
+			return false;
+
+	return true;
+}
+
+/**
+ * Test for program memory read/write.
+ */
+bool avrflash_test(void)
+{
+	KFile fd;
+
+	// Set up flash programming functions.
+	avrflash_init(&fd);
+
+	// Fill in test buffer
+	for (int i = 0; i < TEST_SIZE; i++)
+		test_buf[i] = (i & 0xff);
+
+	// Open flash
+	fd.open(&fd, NULL, 0);
+	// Save flash content (for later restore).
+	fd.read(&fd, save_buf, sizeof(save_buf));
+	fd.seek(&fd, -TEST_SIZE);
+
+	// Test flash read/write to address 0..TEST_SIZE
+	if (!avrflash_rwTest(&fd, test_buf, TEST_SIZE))
+		goto avrflash_test_end;
+
+	// One byte read/write test
+	fd.seek(&fd, ONE_BYTE_TEST_ADDRESS); // Random address
+	if (!avrflash_rwTest(&fd, test_buf, 1))
+		goto avrflash_test_end;
+	fd.seek(&fd, -(int32_t)ONE_BYTE_TEST_ADDRESS);
+
+	// Restore old flash data
+	if (fd.write(&fd, save_buf, sizeof(test_buf)) != TEST_SIZE)
+		goto avrflash_test_end;
+	fd.seek(&fd, -TEST_SIZE);
+
+	// Go to the Flash end
+	fd.seek(&fd, fd.size - TEST_SIZE);
+	// Save flash content (for later restore).
+	fd.read(&fd, save_buf, sizeof(save_buf));
+	fd.seek(&fd, -TEST_SIZE);
+
+	// Test flash read/write to address (FLASHEND - TEST_SIZE) ... FLASHEND
+	if (!avrflash_rwTest(&fd, test_buf, TEST_SIZE))
+		goto avrflash_test_end;
+
+	// Go to half test size.
+	fd.seek(&fd, (TEST_SIZE / 2));
+
+	// This test should FAIL, cause we try to write over file end.
+	if (avrflash_rwTest(&fd, test_buf, TEST_SIZE))
+		goto avrflash_test_end;
+
+	fd.seek(&fd, -TEST_SIZE);
+	// Restore old flash data
+	fd.write(&fd, save_buf, TEST_SIZE);
+
+	fd.close(&fd);
+	return true;
+
+avrflash_test_end:
+	fd.close(&fd);
+	return false;
+}
+
+#endif
