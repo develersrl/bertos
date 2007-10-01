@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.5  2007/10/01 18:59:27  batt
+ *#* Set to const col_address; add static assert check on array dimension.
+ *#*
  *#* Revision 1.4  2007/10/01 10:46:09  batt
  *#* Add light LCD position computation.
  *#*
@@ -109,7 +112,7 @@ static const uint8_t lcd_address[] =
 STATIC_ASSERT(countof(lcd_address) == LCD_ROWS * LCD_COLS);
 #else  /* CONFIG_LCD_ADDRESS_FAST == 0 */
 
-static uint8_t col_address[] =
+static const uint8_t col_address[] =
 {
 	0x80,
 	0xC0,
@@ -118,7 +121,7 @@ static uint8_t col_address[] =
 	0xD4
 #endif
 };
-
+STATIC_ASSERT(countof(col_address) == LCD_ROWS);
 /**
  * Addresses of LCD display character positions, calculated runtime to save RAM
  */
