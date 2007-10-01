@@ -19,6 +19,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2007/10/01 10:46:33  batt
+ *#* Add rotating hash init function.
+ *#*
  *#* Revision 1.1  2007/06/07 09:11:17  batt
  *#* Add rotating hash algorithm.
  *#*
@@ -33,6 +36,15 @@
 #include <cfg/compiler.h>
 
 typedef uint16_t rotating_t;
+
+
+/**
+ * Init rotating checksum.
+ */
+INLINE void rotating_init(rotating_t *rot)
+{
+	*rot = 0;
+}
 
 /**
  * Update checksum pointed by \c rot with \c c data.
