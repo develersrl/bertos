@@ -2,7 +2,7 @@
  * \file
  * <!--
  * Copyright 2007 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \brief Self programming routines (interface).
@@ -18,8 +18,8 @@
 #include <cfg/compiler.h>
 #include <kern/kfile.h>
 
-bool avrflash_test(void);
-void avrflash_init(struct _KFile *fd);
+bool flash_avr_test(void);
+void flash_avr_init(struct _KFile *fd);
 
 
 #endif /* DRV_FLASH_AVR_H */

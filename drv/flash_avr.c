@@ -2,7 +2,7 @@
  * \file
  * <!--
  * Copyright 2007 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * This file is part of DevLib - See README.devlib for information.
  * -->
  *
  * \brief Self programming routines.
@@ -19,16 +19,19 @@
 
 #include "flash_avr.h"
 
-#include <string.h>
-
-#include <drv/wdt.h>
-#include <cfg/macros.h> // MIN()
-#include <cfg/compiler.h>
-#include <cfg/debug.h>
-
 #include <avr/io.h>
 #include <avr/boot.h>
 #include <avr/pgmspace.h>
+
+#include <cfg/macros.h> // MIN()
+#include <cfg/compiler.h>
+#include <cfg/debug.h>
+#include <cfg/cpu.h>
+
+#include <drv/wdt.h>
+
+#include <string.h>
+#include <stdio.h>
 
 typedef uint16_t avr_page_addr_t;
 typedef uint16_t avr_page_t;
@@ -50,7 +53,7 @@ static avr_page_t curr_page = 0;
  * Write current buffered page in flash memory (if modified).
  * This function erase flash memory page before writing.
  */
-static void avrflash_flush(void)
+static void flash_avr_flush(void)
 {
 	if (page_modified)
 	{
@@ -70,7 +73,7 @@ static void avrflash_flush(void)
 
 		wdt_reset();
 
-		kprintf("Erasing page, addr %d...", curr_page * SPM_PAGESIZE);
+		kprintf("Erasing page, addr %u...", curr_page * SPM_PAGESIZE);
 
 		/* Page erase */
 		ATOMIC(boot_page_erase(curr_page * SPM_PAGESIZE));
@@ -79,7 +82,7 @@ static void avrflash_flush(void)
 		boot_spm_busy_wait();
 
 		kprintf("Done.\n");
-		kprintf("Writing page, addr %d...", curr_page * SPM_PAGESIZE);
+		kprintf("Writing page, addr %u...", curr_page * SPM_PAGESIZE);
 
 		/* Store buffer in flash page. */
 		ATOMIC(boot_page_write(curr_page * SPM_PAGESIZE));
@@ -101,11 +104,11 @@ static void avrflash_flush(void)
  * Check current page and if \a page is different, load it in
  * temporary buffer.
  */
-static void avrflash_loadPage(avr_page_t page)
+static void flash_avr_loadPage(avr_page_t page)
 {
 	if (page != curr_page)
 	{
-		avrflash_flush();
+		flash_avr_flush();
 		// Load page
 		memcpy_P(page_buf, (const char *)(page * SPM_PAGESIZE), SPM_PAGESIZE);
 		curr_page = page;
@@ -115,10 +118,10 @@ static void avrflash_loadPage(avr_page_t page)
 
 /**
  * Write program memory.
- * Write \a size bytes from buffer \a _buf to file \a *fd
+ * Write \a size bytes from buffer \a _buf to file \a fd
  * \note Write operations are buffered.
  */
-static size_t avrflash_write(struct _KFile *fd, const void *_buf, size_t size)
+static size_t flash_avr_write(struct _KFile *fd, const void *_buf, size_t size)
 {
 	const uint8_t *buf =(const uint8_t *)_buf;
 
@@ -129,13 +132,13 @@ static size_t avrflash_write(struct _KFile *fd, const void *_buf, size_t size)
 	ASSERT(fd->seek_pos + size <= fd->size);
 	size = MIN((uint32_t)size, fd->size - fd->seek_pos);
 
-	kprintf("Writing at pos[%d]\n", fd->seek_pos);
+	kprintf("Writing at pos[%u]\n", fd->seek_pos);
 	while (size)
 	{
 		page = fd->seek_pos / SPM_PAGESIZE;
 		page_addr = fd->seek_pos % SPM_PAGESIZE;
 
-		avrflash_loadPage(page);
+		flash_avr_loadPage(page);
 
 		size_t wr_len = MIN(size, SPM_PAGESIZE - page_addr);
 		memcpy(page_buf + page_addr, buf, wr_len);
@@ -146,16 +149,16 @@ static size_t avrflash_write(struct _KFile *fd, const void *_buf, size_t size)
 		size -= wr_len;
 		total_write += wr_len;
 	}
-	kprintf("written %d bytes\n", total_write);
+	kprintf("written %u bytes\n", total_write);
 	return total_write;
 }
 
 /**
- * Open flash file \a *fd
+ * Open flash file \a fd
  * \a name and \a mode are unused, cause flash memory is
  * threated like one file.
  */
-static bool avrflash_open(struct _KFile *fd, UNUSED_ARG(const char *, name), UNUSED_ARG(int, mode))
+static bool flash_avr_open(struct _KFile *fd, UNUSED_ARG(const char *, name), UNUSED_ARG(int, mode))
 {
 	curr_page = 0;
 	memcpy_P(page_buf, (const char *)(curr_page * SPM_PAGESIZE), SPM_PAGESIZE);
@@ -169,45 +172,65 @@ static bool avrflash_open(struct _KFile *fd, UNUSED_ARG(const char *, name), UNU
 }
 
 /**
- * Close file \a *fd
+ * Close file \a fd
  */
-static bool avrflash_close(UNUSED_ARG(struct _KFile *,fd))
+static bool flash_avr_close(UNUSED_ARG(struct _KFile *,fd))
 {
-	avrflash_flush();
+	flash_avr_flush();
 	kprintf("Flash file closed\n");
 	return true;
 }
 
 /**
- * Move \a *fd file seek position of \a offset bytes
+ * Move \a fd file seek position of \a offset bytes
  * from current position.
  */
-static bool avrflash_seek(struct _KFile *fd, int32_t offset)
+static int32_t flash_avr_seek(struct _KFile *fd, int32_t offset, int whence)
 {
-	ASSERT(fd->seek_pos + offset <= fd->size);
+	uint32_t seek_pos;
 
+	switch(whence)
+	{
+		case SEEK_SET:
+			seek_pos = 0;
+			break;
+		case SEEK_END:
+			seek_pos = fd->size - 1;
+			break;
+		case SEEK_CUR:
+			seek_pos = fd->seek_pos;
+			break;
+		default:
+			ASSERT(0);
+			return -1;
+			break;
+	}
+	
 	/* Bound check */
-	if (fd->seek_pos + offset > fd->size)
-		return false;
+	if (seek_pos + offset > fd->size)
+	{
+		ASSERT(0);
+		return -1;
+	}
 
-	fd->seek_pos += offset;
-	kprintf("Flash seek to [%d]\n", fd->seek_pos);
+	fd->seek_pos = seek_pos + offset;
+	kprintf("Flash seek to [%u]\n", fd->seek_pos);
 
-	return true;
+	return fd->seek_pos;
 }
 
 /**
- * Read from file \a *fd \a size bytes and put it in buffer \a *buf
+ * Read from file \a fd \a size bytes and put it in buffer \a buf
  * \return the number of bytes read.
  */
-static size_t avrflash_read(struct _KFile *fd, void *buf, size_t size)
+static size_t flash_avr_read(struct _KFile *fd, void *buf, size_t size)
 {
 	ASSERT(fd->seek_pos + size <= fd->size);
 	size = MIN((uint32_t)size, fd->size - fd->seek_pos);
 
-	kprintf("Reading at pos[%d]\n", fd->seek_pos);
+	kprintf("Reading at pos[%u]\n", fd->seek_pos);
 	// Flush current buffered page (if modified).
-	avrflash_flush();
+	flash_avr_flush();
 
 	/*
 	 * AVR pointers are 16 bits wide, this hack is needed to avoid
@@ -218,21 +241,21 @@ static size_t avrflash_read(struct _KFile *fd, void *buf, size_t size)
 
 	memcpy_P(buf, pgm_addr, size);
 	fd->seek_pos += size;
-	kprintf("Read %d bytes\n", size);
+	kprintf("Read %u bytes\n", size);
 	return size;
 }
 
 /**
  * Init AVR flash read/write file.
  */
-void avrflash_init(struct _KFile *fd)
+void flash_avr_init(struct _KFile *fd)
 {
 	// Set up flash programming functions.
-	fd.open = avrflash_open;
-	fd.close = avrflash_close;
-	fd.read = avrflash_read;
-	fd.write = avrflash_write;
-	fd.seek = avrflash_seek;
+	fd->open = flash_avr_open;
+	fd->close = flash_avr_close;
+	fd->read = flash_avr_read;
+	fd->write = flash_avr_write;
+	fd->seek = flash_avr_seek;
 }
 
 #if CONFIG_TEST
@@ -245,22 +268,22 @@ uint8_t save_buf[TEST_SIZE];
 
 /**
  * Program memory read/write subtest.
- * Try to write/read in the same \param f file location \param _size bytes.
+ * Try to write/read in the same \a f file location \a _size bytes.
  * \return true if all is ok, false otherwise
  * \note Restore file position at exit (if no error)
- * \note Test buffer \param buf must be filled with
+ * \note Test buffer \a buf must be filled with
  * the following statement:
  * <pre>
  * buf[i] = i & 0xff
  * </pre>
  */
-static bool avrflash_rwTest(KFile *f, uint8_t *buf, size_t _size)
+static bool flash_avr_rwTest(KFile *f, uint8_t *buf, size_t _size)
 {
 	int32_t size = _size;
 	// Write test buffer
 	if (f->write(f, buf, size) != size)
 		return false;
-	f->seek(f, -size);
+	f->seek(f, -size, SEEK_CUR);
 
 	// Reset test buffer
 	memset(buf, 0, size);
@@ -268,7 +291,7 @@ static bool avrflash_rwTest(KFile *f, uint8_t *buf, size_t _size)
 	// Read flash in test buffer
 	if (f->read(f, buf, size) != size)
 		return false;
-	f->seek(f, -size);
+	f->seek(f, -size, SEEK_CUR);
 
 	// Check test result
  	for (size_t i = 0; i < size; i++)
@@ -281,12 +304,12 @@ static bool avrflash_rwTest(KFile *f, uint8_t *buf, size_t _size)
 /**
  * Test for program memory read/write.
  */
-bool avrflash_test(void)
+bool flash_avr_test(void)
 {
 	KFile fd;
 
 	// Set up flash programming functions.
-	avrflash_init(&fd);
+	flash_avr_init(&fd);
 
 	// Fill in test buffer
 	for (int i = 0; i < TEST_SIZE; i++)
@@ -296,48 +319,51 @@ bool avrflash_test(void)
 	fd.open(&fd, NULL, 0);
 	// Save flash content (for later restore).
 	fd.read(&fd, save_buf, sizeof(save_buf));
-	fd.seek(&fd, -TEST_SIZE);
+	// Seek to addr 0
+	if (fd.seek(&fd, 0, SEEK_SET) != 0)
+		goto flash_avr_test_end;
 
 	// Test flash read/write to address 0..TEST_SIZE
-	if (!avrflash_rwTest(&fd, test_buf, TEST_SIZE))
-		goto avrflash_test_end;
+	if (!flash_avr_rwTest(&fd, test_buf, TEST_SIZE))
+		goto flash_avr_test_end;
 
 	// One byte read/write test
-	fd.seek(&fd, ONE_BYTE_TEST_ADDRESS); // Random address
-	if (!avrflash_rwTest(&fd, test_buf, 1))
-		goto avrflash_test_end;
-	fd.seek(&fd, -(int32_t)ONE_BYTE_TEST_ADDRESS);
+	fd.seek(&fd, ONE_BYTE_TEST_ADDRESS, SEEK_CUR); // Random address
+	if (!flash_avr_rwTest(&fd, test_buf, 1))
+		goto flash_avr_test_end;
+	fd.seek(&fd, -(int32_t)ONE_BYTE_TEST_ADDRESS, SEEK_CUR);
 
 	// Restore old flash data
 	if (fd.write(&fd, save_buf, sizeof(test_buf)) != TEST_SIZE)
-		goto avrflash_test_end;
-	fd.seek(&fd, -TEST_SIZE);
+		goto flash_avr_test_end;
+	fd.seek(&fd, -TEST_SIZE, SEEK_CUR);
 
 	// Go to the Flash end
-	fd.seek(&fd, fd.size - TEST_SIZE);
+	fd.seek(&fd, -TEST_SIZE, SEEK_END);
 	// Save flash content (for later restore).
 	fd.read(&fd, save_buf, sizeof(save_buf));
-	fd.seek(&fd, -TEST_SIZE);
+	fd.seek(&fd, -TEST_SIZE, SEEK_CUR);
 
 	// Test flash read/write to address (FLASHEND - TEST_SIZE) ... FLASHEND
-	if (!avrflash_rwTest(&fd, test_buf, TEST_SIZE))
-		goto avrflash_test_end;
+	if (!flash_avr_rwTest(&fd, test_buf, TEST_SIZE))
+		goto flash_avr_test_end;
 
 	// Go to half test size.
-	fd.seek(&fd, (TEST_SIZE / 2));
+	fd.seek(&fd, (TEST_SIZE / 2), SEEK_CUR);
 
 	// This test should FAIL, cause we try to write over file end.
-	if (avrflash_rwTest(&fd, test_buf, TEST_SIZE))
-		goto avrflash_test_end;
+	kprintf("This test should fail.\n");
+	if (flash_avr_rwTest(&fd, test_buf, TEST_SIZE))
+		goto flash_avr_test_end;
 
-	fd.seek(&fd, -TEST_SIZE);
+	fd.seek(&fd, -TEST_SIZE, SEEK_CUR);
 	// Restore old flash data
 	fd.write(&fd, save_buf, TEST_SIZE);
 
 	fd.close(&fd);
 	return true;
 
-avrflash_test_end:
+flash_avr_test_end:
 	fd.close(&fd);
 	return false;
 }
