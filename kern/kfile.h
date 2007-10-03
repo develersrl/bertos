@@ -14,6 +14,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2007/10/03 12:06:54  batt
+ *#* Add whence parameter to seek; change from char * to void * read/write input buffers.
+ *#*
  *#* Revision 1.1  2007/06/14 14:42:48  batt
  *#* Move kfile to kern/ directory; remove duplicate file.h.
  *#*
@@ -47,11 +50,11 @@
 /* fwd decl */
 struct _KFile;
 
-typedef size_t	(*ReadFunc_t)	(struct _KFile *fd, char *buf, size_t size);
-typedef size_t	(*WriteFunc_t)	(struct _KFile *fd, const char *buf, size_t size);
-typedef	bool	(*SeekFunc_t)	(struct _KFile *fd, int32_t offset);
-typedef bool	(*OpenFunc_t)	(struct _KFile *fd, const char *name, int mode);
-typedef bool	(*CloseFunc_t)	(struct _KFile *fd);
+typedef size_t	(*ReadFunc_t)  (struct _KFile *fd, void *buf, size_t size);
+typedef size_t	(*WriteFunc_t) (struct _KFile *fd, const void *buf, size_t size);
+typedef	int32_t (*SeekFunc_t)  (struct _KFile *fd, int32_t offset, int whence);
+typedef bool	(*OpenFunc_t)  (struct _KFile *fd, const char *name, int mode);
+typedef bool	(*CloseFunc_t) (struct _KFile *fd);
 
 
 /* Context data for callback functions which operate on
