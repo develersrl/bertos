@@ -14,8 +14,8 @@
 
 /*#*
  *#* $Log$
- *#* Revision 1.2  2007/10/03 12:06:54  batt
- *#* Add whence parameter to seek; change from char * to void * read/write input buffers.
+ *#* Revision 1.3  2007/10/04 19:39:25  batt
+ *#* Add seek constants.
  *#*
  *#* Revision 1.1  2007/06/14 14:42:48  batt
  *#* Move kfile to kern/ directory; remove duplicate file.h.
@@ -50,14 +50,27 @@
 /* fwd decl */
 struct _KFile;
 
+/**
+ * Costants for repositioning read/write file offset.
+ * These are needed because on some embedded platforms
+ * ANSI I/O library may not be present.
+ */
+typedef enum KSeekMode
+{
+	KSM_SEEK_SET, ///< Seek from file beginning.
+	KSM_SEEK_CUR, ///< Seek from file current position.
+	KSM_SEEK_END, ///< Seek from file end.
+} KSeekMode;
+
+
 typedef size_t	(*ReadFunc_t)  (struct _KFile *fd, void *buf, size_t size);
 typedef size_t	(*WriteFunc_t) (struct _KFile *fd, const void *buf, size_t size);
-typedef	int32_t (*SeekFunc_t)  (struct _KFile *fd, int32_t offset, int whence);
+typedef	int32_t (*SeekFunc_t)  (struct _KFile *fd, int32_t offset, KSeekMode whence);
 typedef bool	(*OpenFunc_t)  (struct _KFile *fd, const char *name, int mode);
 typedef bool	(*CloseFunc_t) (struct _KFile *fd);
 
-
-/* Context data for callback functions which operate on
+/**
+ * Context data for callback functions which operate on
  * pseudo files.
  */
 typedef struct _KFile
