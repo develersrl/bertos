@@ -185,19 +185,19 @@ static bool flash_avr_close(UNUSED_ARG(struct _KFile *,fd))
  * Move \a fd file seek position of \a offset bytes
  * from current position.
  */
-static int32_t flash_avr_seek(struct _KFile *fd, int32_t offset, int whence)
+static int32_t flash_avr_seek(struct _KFile *fd, int32_t offset, KSeekMode whence)
 {
 	uint32_t seek_pos;
 
 	switch(whence)
 	{
-		case SEEK_SET:
+		case KSM_SEEK_SET:
 			seek_pos = 0;
 			break;
-		case SEEK_END:
+		case KSM_SEEK_END:
 			seek_pos = fd->size - 1;
 			break;
-		case SEEK_CUR:
+		case KSM_SEEK_CUR:
 			seek_pos = fd->seek_pos;
 			break;
 		default:
@@ -205,7 +205,7 @@ static int32_t flash_avr_seek(struct _KFile *fd, int32_t offset, int whence)
 			return -1;
 			break;
 	}
-	
+
 	/* Bound check */
 	if (seek_pos + offset > fd->size)
 	{
