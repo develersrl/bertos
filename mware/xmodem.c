@@ -22,6 +22,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.12  2007/10/05 09:14:15  batt
+ *#* Fix some debug strings; suppress warning if XM_BUFSIZE < 1024.
+ *#*
  *#* Revision 1.11  2007/06/07 09:10:44  batt
  *#* Fix some todos.
  *#*
@@ -62,9 +65,13 @@
 
 #include "xmodem.h"
 
-#include <drv/ser.h>
+#include <appconfig.h>
 #include <string.h> /* for memset() */
+#include <drv/ser.h>
 #include <algos/crc.h>
+#include <cfg/debug.h>
+
+
 
 
 /**
@@ -160,7 +167,7 @@ bool xmodem_recv(struct Serial *port, KFile *fd)
 				{
 					/* Give up with CRC and fall back to checksum */
 					usecrc = false;
-					XMODEM_PROGRESS("Request Tx (BCC)");
+					XMODEM_PROGRESS("Request Tx (BCC)\n");
 					ser_putchar(XM_NAK, port);
 				}
 			}
@@ -178,7 +185,8 @@ bool xmodem_recv(struct Serial *port, KFile *fd)
 
 		case XM_SOH:  /* Start of header (128-byte block) */
 			blocksize = 128;
-
+			/* Needed to avoid warning if XM_BUFSIZE < 1024 */
+			goto getblock;
 		getblock:
 			/* Get block number */
 			c = ser_getchar(port);
@@ -291,7 +299,7 @@ bool xmodem_recv(struct Serial *port, KFile *fd)
 
 		case XM_EOT:	/* End of transmission */
 			ser_putchar(XM_ACK, port);
-			XMODEM_PROGRESS("Transfer completed");
+			XMODEM_PROGRESS("Transfer completed\n");
 			return true;
 
 		case EOF: /* Timeout or serial error */
@@ -299,7 +307,7 @@ bool xmodem_recv(struct Serial *port, KFile *fd)
 			break;
 
 		default:
-			XMODEM_PROGRESS("Skipping garbage");
+			XMODEM_PROGRESS("Skipping garbage\n");
 			purge = true;
 			break;
 		}
