@@ -21,6 +21,7 @@
 
 #if (defined(__IAR_SYSTEMS_ICC__) || defined(__IAR_SYSTEMS_ICC)) \
 	&& !defined(__ARM4TM__) /* IAR: if not ARM assume I196 */
+	#warning Assuming CPU is I196
 	#define CPU_I196		1
 	#define CPU_ID                  i196
 #else

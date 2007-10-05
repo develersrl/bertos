@@ -94,8 +94,8 @@
 	#define CPU_REG_BITS           32
 	#define CPU_REGS_CNT           16
 	#define CPU_SAVED_REGS_CNT     FIXME
-	#define CPU_STACK_GROWS_UPWARD 0  //FIXME
-	#define CPU_SP_ON_EMPTY_SLOT   0  //FIXME
+	#define CPU_STACK_GROWS_UPWARD 0
+	#define CPU_SP_ON_EMPTY_SLOT   0
 	#define CPU_BYTE_ORDER         (__BIG_ENDIAN__ ? CPU_BIG_ENDIAN : CPU_LITTLE_ENDIAN)
 	#define CPU_HARVARD            0
 
@@ -135,6 +135,7 @@
 	#else /* !__IAR_SYSTEMS_ICC__ */
 
 		#warning "IRQ_ macros need testing!"
+		#warning "Test now or die :-)"
 
 		#define NOP         asm volatile ("mov r0,r0" ::)
 
@@ -142,9 +143,9 @@
 		do { \
 			asm volatile ( \
 				"mrs r0, cpsr\n\t" \
-				"orr r0, r0, #0xb0\n\t" \
-				"msr cpsr, r0" \
-				:: \
+				"orr r0, r0, #0xc0\n\t" \
+				"msr cpsr_c, r0" \
+				::: "r0" \
 			); \
 		} while (0)
 
@@ -152,19 +153,18 @@
 		do { \
 			asm volatile ( \
 				"mrs r0, cpsr\n\t" \
-				"bic r0, r0, #0xb0\n\t" \
-				"msr cpsr, r0" \
-				:: \
+				"bic r0, r0, #0xc0\n\t" \
+				"msr cpsr_c, r0" \
+				::: "r0" \
 			); \
 		} while (0)
 
 		#define IRQ_SAVE_DISABLE(x) \
 		do { \
 			asm volatile ( \
-				"mrs r0, cpsr\n\t" \
-				"mov %0, r0\n\t" \
-				"orr r0, r0, #0xb0\n\t" \
-				"msr cpsr, r0" \
+				"mrs %0, cpsr\n\t" \
+				"orr r0, %0, #0xc0\n\t" \
+				"msr cpsr_c, r0" \
 				: "=r" (x) \
 				: /* no inputs */ \
 				: "r0" \
@@ -174,11 +174,9 @@
 		#define IRQ_RESTORE(x) \
 		do { \
 			asm volatile ( \
-				"mov r0, %0\n\t" \
-				"msr cpsr, r0" \
+				"msr cpsr_c, %0" \
 				: /* no outputs */ \
 				: "r" (x) \
-				: "r0" \
 			); \
 		} while (0)
 
@@ -186,16 +184,14 @@
 		({ \
 			uint32_t sreg; \
 			asm volatile ( \
-				"mrs r0, cpsr\n\t" \
-				"mov %0, r0" \
+				"mrs %0, cpsr\n\t" \
 				: "=r" (sreg) \
 				: /* no inputs */ \
-				: "r0" \
 			); \
-			(bool)(sreg & 0xb0); \
+			!((sreg & 0xc0) == 0xc0); \
 		})
 
-	#endif /* __IAR_SYSTEMS_ICC_ */
+	#endif /* !__IAR_SYSTEMS_ICC_ */
 
 #elif CPU_PPC
 	#define NOP                 asm volatile ("nop" ::)
