@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.31  2007/10/07 12:30:55  batt
+ *#* Add default timer for AVR.
+ *#*
  *#* Revision 1.30  2007/06/07 14:35:12  batt
  *#* Merge from project_ks.
  *#*
@@ -71,6 +74,8 @@
 #define TIMER_ON_OVERFLOW1        2
 #define TIMER_ON_OUTPUT_COMPARE2  3
 #define TIMER_ON_OVERFLOW3        4
+
+#define TIMER_DEFAULT TIMER_ON_OUTPUT_COMPARE0 ///< Default system timer
 /* \} */
 
 /*
