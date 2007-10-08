@@ -77,7 +77,7 @@ DEBUGCFLAGS = -ggdb
 #
 # define some variables based on the AVR base path in $(AVR)
 #
-CROSS   = #avr-
+CROSS   = arm-elf-
 CC      = $(CROSS)gcc
 CXX     = $(CROSS)g++
 AS      = $(CC) -x assembler-with-cpp
