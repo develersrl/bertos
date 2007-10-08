@@ -1,0 +1,70 @@
+BeRTOS								-*- outline -*-
+
+* Overwiew
+
+BeRTOS is a real-time operating system designed for building applications
+for embedded systems, like reference boards, test boards, or custom boards.
+
+It has a modular structure: its components can be used in very different
+environments, from 8-bit processor to Linux and Win32 hosted application
+(for debug purpose), using a wide range of compilers.
+
+* History and Motivation
+
+BeRTOS was born as a collection of usefull, highly optimized and fine-tuned
+libraries for embedded systems.  Each library had its own scope and could be
+used singularly in a project, though they were also meant to cooperate to
+build the wole underlying software layer commonly called "operating system".
+
+We have grown it following our guidelines: simplicity and beauty.
+These guidelines have make possible its evolution in a full-featured real
+time operating system, with more modularity than other embedded OS,
+without givin up reliability and performace.
+
+To achieve the highest possible reusability, most BeRTOS components are
+designed for fine-grained modularity and minimal external dependencies.
+Most non-essential features can be configured out for application with small
+memory footprint requirements.
+
+* Features
+
+  - multitasking kernel with IPC, semaphores, priority levels;
+  - a comprehensive set of generic drivers for a wide range of devices, 
+    which can be easily customized to the actual hardware: timer, serial, 
+    adc, ntc, pwm, stepper motors, dc motors, lcd, keyboards, buzzer, eeprom;
+  - full graphic subsystem for simple displays, with font support, bitmaps,
+    clipping, text formatting, interactive menus;
+  - simple console with command parser;
+  - readline-like support for command history;
+  - entropy generator and random numbers generator optimized for embedded
+    systems;
+  - checksumming and hashing functions (CRC, MD2);
+  - full hash-table implementation with double-hashing collisition resolution;
+  - XMODEM protocol implementation;
+  - RLE compression algorithm;
+
+* Directory Structure
+
+The modules are sorted in subdirectories by their category:
+
+  - algos/   : algorithms;
+  - app/     : demo application;
+  - cfg/     : configuration stuffs;
+  - cxxutil/ : c++ libraries;
+  - doc/     : documentation;
+  - drv/     : hardware drivers;
+  - dt/	     : ?
+  - emul/    : Qt-based emulator framework for embedded applications;
+  - fonts/   : fonts
+  - gfx/     : feneral pourpose graphics routines;
+  - gui/     : widgets for simples displays;
+  - hw/	     : hardware-specific decalrations;
+  - icons/   : conversion tool from image TXT format to LCD bitmap;
+  - io/	     : infrastructure of I/O-related modules for hosted applications;
+  - kern/    : multitasking kernel;
+  - mware/   : algorithms, containers and other standalone code;
+  - os/	     : OS-abstraction layers for hosted environments;
+  - qtext    : ?
+
+The top-level directory contains a few support headers that are meant to be
+usable by any C/C++ embedded or hosted application.
