@@ -36,9 +36,14 @@
  */
 #if (CONFIG_TIMER == TIMER_ON_PIT)
 
+	void timer_handler(void);
+
 	#define DEFINE_TIMER_ISR     void timer_handler(void)
 	#define TIMER_TICKS_PER_SEC  1000
-	#define TIMER_HW_CNT         FIXME
+	#define TIMER_HW_CNT         (CLOCK_FREQ / (16 * TIMER_TICKS_PER_SEC) - 1)
+
+	/** Frequency of the hardware high-precision timer. */
+	#define TIMER_HW_HPTICKS_PER_SEC (CLOCK_FREQ / 16)
 
 	/// Type of time expressed in ticks of the hardware high-precision timer
 	typedef uint32_t hptime_t;
@@ -47,7 +52,5 @@
 	#error Unimplemented value for CONFIG_TIMER
 #endif /* CONFIG_TIMER */
 
-/** Frequency of the hardware high-precision timer. */
-#define TIMER_HW_HPTICKS_PER_SEC FIXME
 
 #endif /* DRV_TIMER_AT91_H */

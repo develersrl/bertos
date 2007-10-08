@@ -12,49 +12,56 @@
  * \brief Low-level timer module for Atmel AT91 (inplementation).
  */
 
-#include <drv/timer_at91.h>
-#include <cfg/macros.h> // BV()
+#include "timer.h"
+#include "at91sam7s.h"
+#include "sysirq.h"
 
+#include <cfg/macros.h> // BV()
+#include <cfg/module.h>
 #include <cfg/cpu.h>
 
 
 /** HW dependent timer initialization  */
 #if (CONFIG_TIMER == TIMER_ON_PIT)
-	#warning Very untested!
-	INLINE static void timer_hw_irq(void)
+	INLINE void timer_hw_irq(void)
 	{
 		/* Reset counters, this is needed to reset timer and interrupt flags */
-		volatile uint32_t dummy = PIT_PIVR;
+		uint32_t dummy = PIVR;
+		(void) dummy;
 	}
 
-	INLINE static bool timer_hw_triggered(void)
+	INLINE bool timer_hw_triggered(void)
 	{
 		return PIT_SR & BV(PITS);
 	}
 
-	INLINE static void timer_hw_init(void)
+	INLINE void timer_hw_init(void)
 	{
 		cpuflags_t flags;
+
+		MOD_CHECK(sysirq);
+
 		IRQ_SAVE_DISABLE(flags);
 
-		PIT_MR = CLOCK_FREQ / (16 * TIMER_TICKS_PER_SEC) - 1;
+		PIT_MR = TIMER_HW_CNT;
 		/* Register system interrupt handler. */
 		sysirq_setHandler(SYSIRQ_PIT, timer_handler);
 
 		/* Enable interval timer and interval timer interrupts */
-		PIT_MR |= BV(PIT_PITEN);
+		PIT_MR |= BV(PITEN);
 		sysirq_setEnable(SYSIRQ_PIT, true);
 
 		/* Reset counters, this is needed to start timer and interrupt flags */
-		volatile uint32_t dummy = PIT_PIVR;
+		uint32_t dummy = PIVR;
+		(void) dummy;
 
 		IRQ_RESTORE(flags);
 	}
 
-	INLINE static hptime_t timer_hw_hpread(void)
+	INLINE hptime_t timer_hw_hpread(void)
 	{
 		/* In the upper part of PIT_PIIR there is unused data */
-		return PIT_PIIR & 0xfffff;
+		return PIIR & CPIV_MASK;
 	}
 
 #else

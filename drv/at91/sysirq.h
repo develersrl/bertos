@@ -15,6 +15,8 @@
 #ifndef DRV_AT91_SYSIRQ_H
 #define DRV_AT91_SYSIRQ_H
 
+#include <cfg/compiler.h>
+
 typedef void (* sysirq_handler_t)(void);   ///< Type for system irq handler.
 typedef void (* sysirq_setEnable_t)(bool); ///< Type for system irq enable/disable function.
 

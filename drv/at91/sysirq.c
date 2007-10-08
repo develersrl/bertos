@@ -18,7 +18,7 @@
  * independently.
  * However, there are a few sources called "system sources" that
  * share a common IRQ line and vector, called "system IRQ".
- * So a unique system IRQ handler is implemented here.
+ * So a unique system IRQ dispatcher is implemented here.
  * This module also contains an interface to manage every source
  * independently. It is possible to assign to every system IRQ
  * a specific IRQ handler.
@@ -28,16 +28,16 @@
  */
 
 #include "sysirq.h"
-#include "at91.h"
+#include "at91sam7s.h"
 #include <cfg/cpu.h>
-
-#warning Very untested!
+#include <cfg/module.h>
+#include <cfg/macros.h>
 
 /**
  * Enable/disable the Periodic Interrupt Timer
  * interrupt.
  */
-INLINE static void pit_setEnable(bool enable)
+INLINE void pit_setEnable(bool enable)
 {
 	if (enable)
 		PIT_MR |= BV(PITIEN);
@@ -72,7 +72,7 @@ STATIC_ASSERT(countof(sysirq_tab) == SYSIRQ_CNT);
 static void sysirq_dispatcher(void)
 {
 	#warning TODO add IRQ prologue/epilogue
-	for (int i = 0; i < countof(sysirq_tab); i++)
+	for (unsigned i = 0; i < countof(sysirq_tab); i++)
 	{
 		if (sysirq_tab[i].enabled
 		 && sysirq_tab[i].handler)
@@ -95,13 +95,13 @@ void sysirq_init(void)
 	IRQ_SAVE_DISABLE(flags);
 
 	/* Disable all system interrupts */
-	for (int i = 0; i < countof(sysirq_tab); i++)
+	for (unsigned i = 0; i < countof(sysirq_tab); i++)
 		sysirq_tab[i].setEnable(false);
 
 	/* Set the vector. */
-	AIC_SVR(SYSC_ID) = sysirq_handler;
+	AIC_SVR(SYSC_ID) = sysirq_dispatcher;
 	/* Initialize to edge triggered with defined priority. */
-	AIC_SMR(SYSC_ID) = BV(AIC_SRCTYPE_INT_EDGE_TRIGGERED) | SYSIRQ_PRIORITY;
+	AIC_SMR(SYSC_ID) = AIC_SRCTYPE_INT_EDGE_TRIGGERED | SYSIRQ_PRIORITY;
 	/* Clear interrupt */
 	AIC_ICCR = BV(SYSC_ID);
 
@@ -129,7 +129,7 @@ void sysirq_setEnable(sysirq_t irq, bool enable)
 	ASSERT(irq < SYSIRQ_CNT);
 
 	sysirq_tab[irq].setEnable(enable);
-	sysirq_enabled = enable;
+	sysirq_tab[irq].enabled = enable;
 }
 
 /**
@@ -139,5 +139,6 @@ bool sysirq_enabled(sysirq_t irq)
 {
 	ASSERT(irq >= 0);
 	ASSERT(irq < SYSIRQ_CNT);
+
 	return sysirq_tab[irq].enabled;
 }
