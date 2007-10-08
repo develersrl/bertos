@@ -17,16 +17,13 @@
 
 typedef void (* sysirq_handler_t)(void);   ///< Type for system irq handler.
 typedef void (* sysirq_setEnable_t)(bool); ///< Type for system irq enable/disable function.
-typedef bool (* sysirq_enable_t)(void);    ///< Type for system irq enable getter.
-typedef bool (* sysirq_trigger_t)(void);   ///< Type for system irq trigger getter.
 
 /**
  * Structure used to define a system interrupt source.
  */
 typedef struct SysIrq
 {
-	sysirq_enable_t enable;       ///< Getter for irq enable/disable state.
-	sysirq_trigger_t trigger;     ///< Getter for irq trigger state.
+	bool enabled;                 ///< Getter for irq enable/disable state.
 	sysirq_setEnable_t setEnable; ///< Setter for irq enable/disable state.
 	sysirq_handler_t handler;     ///< IRQ handler.
 } SysIrq;
@@ -44,6 +41,6 @@ typedef enum sysirq_t
 void sysirq_init(void);
 void sysirq_setHandler(sysirq_t irq, sysirq_handler_t handler);
 void sysirq_setEnable(sysirq_t irq, bool enable);
-bool sysirq_enable(sysirq_t irq);
+bool sysirq_enabled(sysirq_t irq);
 
 #endif /* ARCH_ARM_SYSIRQ_H */

@@ -16,6 +16,9 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.32  2007/10/08 12:14:32  batt
+ *#* Fix some review issues.
+ *#*
  *#* Revision 1.31  2007/10/07 12:30:55  batt
  *#* Add default timer for AVR.
  *#*
@@ -149,6 +152,9 @@
 
 /** Not needed, IRQ timer flag cleared automatically */
 #define timer_hw_irq() do {} while (0)
+
+/** Not needed, timer IRQ handler called only for timer source */
+#define timer_hw_triggered() (true)
 
 
 #endif /* DRV_TIMER_AVR_H */

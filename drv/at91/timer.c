@@ -23,12 +23,16 @@
 	#warning Very untested!
 	INLINE static void timer_hw_irq(void)
 	{
-		/* Reset counters, this is needed to start timer and interrupt flags */
+		/* Reset counters, this is needed to reset timer and interrupt flags */
 		volatile uint32_t dummy = PIT_PIVR;
 	}
 
+	INLINE static bool timer_hw_triggered(void)
+	{
+		return PIT_SR & BV(PITS);
+	}
 
-	static void timer_hw_init(void)
+	INLINE static void timer_hw_init(void)
 	{
 		cpuflags_t flags;
 		IRQ_SAVE_DISABLE(flags);
@@ -47,7 +51,7 @@
 		IRQ_RESTORE(flags);
 	}
 
-	INLINE hptime_t timer_hw_hpread(void)
+	INLINE static hptime_t timer_hw_hpread(void)
 	{
 		/* In the upper part of PIT_PIIR there is unused data */
 		return PIT_PIIR & 0xfffff;
