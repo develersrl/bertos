@@ -63,6 +63,14 @@ $(1)_ASFLAGS   += -mmcu=$$($(1)_MCU)
 $(1)_CPPAFLAGS += -mmcu=$$($(1)_MCU)
 $(1)_LDFLAGS   += -mmcu=$$($(1)_MCU)
 endif
+ifneq ($$(strip $$($(1)_CPU)),)
+# Define all project specific object files
+$(1)_CFLAGS    += -mcpu=$$($(1)_CPU)
+$(1)_CXXFLAGS  += -mcpu=$$($(1)_CPU)
+$(1)_ASFLAGS   += -mcpu=$$($(1)_CPU)
+$(1)_CPPAFLAGS += -mcpu=$$($(1)_CPU)
+$(1)_LDFLAGS   += -mcpu=$$($(1)_CPU)
+endif
 ifneq ($$(strip $$($(1)_LDSCRIPT)),)
 $(1)_LDFLAGS += -Wl,-T$$($(1)_LDSCRIPT)
 endif
