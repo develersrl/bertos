@@ -27,7 +27,7 @@
  * the GNU General Public License.
  *
  * Copyright 2002, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
- * This file is part of DevLib - See README.devlib for information.
+ *
  * -->
  *
  * \brief sprintf() implementation based on _formatted_write()

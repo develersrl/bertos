@@ -28,7 +28,7 @@
  *
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2004 Giovanni Bajo
- * This file is part of DevLib - See README.devlib for information.
+ *
  * -->
  *
  * \brief Hardware support for buzzers and leds in DSP56K-based boards

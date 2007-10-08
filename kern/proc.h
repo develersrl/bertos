@@ -28,7 +28,7 @@
  *
  * Copyright 2001,2004 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999,2000,2001 Bernardo Innocenti <bernie@develer.com>
- * This file is part of DevLib - See README.devlib for information.
+ *
  * -->
  *
  * \brief Process scheduler (public interface).

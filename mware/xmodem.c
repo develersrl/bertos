@@ -28,7 +28,7 @@
  *
  * Copyright 2004, 2005, 2006, 2007 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999, 2001 Bernardo Innocenti <bernie@develer.com>
- * This file is part of DevLib - See README.devlib for information.
+ *
  * -->
  * \brief X-Modem serial transmission protocol (implementation)
  *

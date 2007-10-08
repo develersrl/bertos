@@ -28,7 +28,7 @@
  *
  * Copyright 2006 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999 Bernardo Innocenti <bernie@develer.com>
- * This file is part of DevLib - See README.devlib for information.
+ *
  * -->
  *
  * \brief C++-like structured exception handling for C programs

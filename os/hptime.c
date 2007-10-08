@@ -27,7 +27,7 @@
  * the GNU General Public License.
  *
  * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
- * This file is part of DevLib - See README.devlib for information.
+ *
  * -->
  *
  * \brief Portable abstraction for high-resolution time handling (implementation)

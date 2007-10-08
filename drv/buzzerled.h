@@ -28,7 +28,7 @@
  *
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2004 Giovanni Bajo
- * This file is part of DevLib - See README.devlib for information.
+ *
  * -->
  *
  * \brief Generic library to handle buzzers and leds

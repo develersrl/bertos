@@ -28,7 +28,7 @@
  *
  * Copyright 2003,2005 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999,2003 Bernardo Innocenti <bernie@develer.com>
- * This file is part of DevLib - See README.devlib for information.
+ *
  * -->
  *
  * \version $Id$

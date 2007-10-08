@@ -28,7 +28,7 @@
  *
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999, 2000, 2001, 2003 Bernardo Innocenti <bernie@develer.com>
- * This file is part of DevLib - See README.devlib for information.
+ *
  * -->
  *
  * \brief Simple charts on top of mware/gfx routines (interface).

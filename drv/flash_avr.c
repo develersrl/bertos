@@ -27,7 +27,7 @@
  * the GNU General Public License.
  *
  * Copyright 2007 Develer S.r.l. (http://www.develer.com/)
- * This file is part of DevLib - See README.devlib for information.
+ *
  * -->
  *
  * \brief Self programming routines.
