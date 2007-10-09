@@ -127,8 +127,10 @@ void sysirq_init(void)
 	AIC_SVR(SYSC_ID) = sysirq_dispatcher;
 	/* Initialize to edge triggered with defined priority. */
 	AIC_SMR(SYSC_ID) = AIC_SRCTYPE_INT_EDGE_TRIGGERED | SYSIRQ_PRIORITY;
-	/* Clear interrupt */
+	/* Clear pending interrupt */
 	AIC_ICCR = BV(SYSC_ID);
+	/* Enable the system IRQ */
+	AIC_IECR = BV(SYSC_ID);
 
 	IRQ_RESTORE(flags);
 	MOD_INIT(sysirq);
