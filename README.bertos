@@ -1,6 +1,6 @@
 BeRTOS								-*- outline -*-
 
-* Overwiew
+* Overview
 
 BeRTOS is a real-time operating system designed for building applications
 for embedded systems, like reference boards, test boards, or custom boards.
@@ -11,15 +11,15 @@ environments, from 8-bit processor to Linux and Win32 hosted application
 
 * History and Motivation
 
-BeRTOS was born as a collection of usefull, highly optimized and fine-tuned
+BeRTOS was born as a collection of useful, highly optimized and fine-tuned
 libraries for embedded systems.  Each library had its own scope and could be
 used singularly in a project, though they were also meant to cooperate to
-build the wole underlying software layer commonly called "operating system".
+build the whole underlying software layer commonly called "operating system".
 
 We have grown it following our guidelines: simplicity and beauty.
-These guidelines have make possible its evolution in a full-featured real
-time operating system, with more modularity than other embedded OS,
-without givin up reliability and performace.
+These guidelines made it possible to evolve it in a full-featured real
+time operating system, with more modularity than many other embedded OSes,
+without giving up reliability and performace.
 
 To achieve the highest possible reusability, most BeRTOS components are
 designed for fine-grained modularity and minimal external dependencies.
@@ -39,7 +39,7 @@ memory footprint requirements.
   - entropy generator and random numbers generator optimized for embedded
     systems;
   - checksumming and hashing functions (CRC, MD2);
-  - full hash-table implementation with double-hashing collisition resolution;
+  - full hash-table implementation with double-hashing collision resolution;
   - XMODEM protocol implementation;
   - RLE compression algorithm;
 
@@ -49,16 +49,16 @@ The modules are sorted in subdirectories by their category:
 
   - algos/   : algorithms;
   - app/     : demo application;
-  - cfg/     : configuration stuffs;
+  - cfg/     : configuration stuff;
   - cxxutil/ : c++ libraries;
   - doc/     : documentation;
   - drv/     : hardware drivers;
   - dt/	     : ?
   - emul/    : Qt-based emulator framework for embedded applications;
   - fonts/   : fonts
-  - gfx/     : feneral pourpose graphics routines;
-  - gui/     : widgets for simples displays;
-  - hw/	     : hardware-specific decalrations;
+  - gfx/     : general purpose graphics routines;
+  - gui/     : widgets for simple displays;
+  - hw/	     : hardware-specific declarations;
   - icons/   : conversion tool from image TXT format to LCD bitmap;
   - io/	     : infrastructure of I/O-related modules for hosted applications;
   - kern/    : multitasking kernel;
