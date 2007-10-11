@@ -76,7 +76,7 @@
 
 #include <stdarg.h> /* va_list */
 #include <appconfig.h>
-#include <cfg/cpu.h>    /* CPU_HARVARD */
+#include <cpu/cpu.h>    /* CPU_HARVARD */
 
 /**
  * \name _formatted_write() configuration

@@ -130,7 +130,7 @@
 #ifndef MWARE_FIFO_H
 #define MWARE_FIFO_H
 
-#include <cfg/cpu.h>
+#include <cpu/cpu.h>
 #include <cfg/debug.h>
 
 typedef struct FIFOBuffer

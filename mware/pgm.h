@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2005 ,2006, 2007 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
@@ -47,9 +47,9 @@
 #ifndef MWARE_PGM_H
 #define MWARE_PGM_H
 
-#include <cfg/cpu_detect.h>
 #include <cfg/compiler.h> /* For intXX_t */
-#include <cfg/cpu.h> /* For CPU_HARVARD */
+#include <cpu/detect.h>
+#include <cpu/cpu.h> /* For CPU_HARVARD */
 
 #if CPU_AVR
 

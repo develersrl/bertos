@@ -76,7 +76,7 @@
 #define MWARE_BYTEORDER_H
 
 #include <cfg/compiler.h>
-#include <cfg/cpu.h>
+#include <cpu/cpu.h>
 
 /**
  * Swap upper and lower bytes in a 16-bit value.

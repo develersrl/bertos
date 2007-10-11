@@ -101,7 +101,7 @@
 
 #include <cfg/compiler.h>
 #include <cfg/macros.h> /* BV() */
-#include <cfg/cpu.h> /* CPU_HARVARD */
+#include <cpu/cpu.h> /* CPU_HARVARD */
 #include <gfx/gfx.h> /* coord_t */
 
 #include <stdarg.h>

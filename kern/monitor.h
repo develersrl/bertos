@@ -63,7 +63,7 @@
 #ifndef KERN_MONITOR_H
 #define KERN_MONITOR_H
 
-#include <cfg/cpu.h>
+#include <cpu/cpu.h>
 #include <config_kern.h>
 
 #if CONFIG_KERN_MONITOR

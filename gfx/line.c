@@ -59,7 +59,7 @@
 #include "gfx_p.h"
 
 #include <cfg/debug.h>   /* ASSERT() */
-#include <cfg/cpu.h>     /* CPU_HARVARD */
+#include <cpu/cpu.h>     /* CPU_HARVARD */
 #include <cfg/macros.h>  /* SWAP() */
 #include <appconfig.h>   /* CONFIG_GFX_CLIPPING */
 

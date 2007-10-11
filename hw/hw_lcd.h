@@ -52,7 +52,7 @@
 #include <appconfig.h>
 //#include <hw.h>
 
-#include <cfg/cpu.h>
+#include <cpu/cpu.h>
 #include <cfg/macros.h> /* BV() */
 #include <cfg/debug.h>
 

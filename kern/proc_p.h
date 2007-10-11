@@ -106,7 +106,7 @@
 #define KERN_PROC_P_H
 
 #include <cfg/compiler.h>
-#include <cfg/cpu.h>        /* for cpu_stack_t */
+#include <cpu/cpu.h>        /* for cpu_stack_t */
 #include <mware/list.h>
 #include <config_kern.h>
 #include <appconfig.h>

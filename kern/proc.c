@@ -142,7 +142,7 @@
 #include "proc.h"
 //#include "hw.h"
 #include <mware/event.h>
-#include <cfg/cpu.h>
+#include <cpu/cpu.h>
 #include <cfg/debug.h>
 #include <cfg/arch_config.h>  /* ARCH_EMUL */
 #include <cfg/macros.h>  /* ABS() */

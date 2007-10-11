@@ -73,7 +73,7 @@
 #define KERN_PROC_H
 
 #include <cfg/compiler.h>
-#include <cfg/cpu.h>
+#include <cpu/cpu.h>
 #include <config_kern.h>
 
 /* Fwd decl */
