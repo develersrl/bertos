@@ -45,7 +45,6 @@
 		#define CPU_ARM_AT91         1
 		#define CPU_ARM_AT91SAM7S32  1
 	#else
-		#define CPU_ARM_AT91         0
 		#define CPU_ARM_AT91SAM7S32  0
 	#endif
 
@@ -53,7 +52,6 @@
 		#define CPU_ARM_AT91         1
 		#define CPU_ARM_AT91SAM7S64  1
 	#else
-		#define CPU_ARM_AT91         0
 		#define CPU_ARM_AT91SAM7S64  0
 	#endif
 
@@ -61,7 +59,6 @@
 		#define CPU_ARM_AT91         1
 		#define CPU_ARM_AT91SAM7S128 1
 	#else
-		#define CPU_ARM_AT91         0
 		#define CPU_ARM_AT91SAM7S128 0
 	#endif
 
@@ -69,14 +66,19 @@
 		#define CPU_ARM_AT91         1
 		#define CPU_ARM_AT91SAM7S256 1
 	#else
-		#define CPU_ARM_AT91         0
 		#define CPU_ARM_AT91SAM7S256 0
 	#endif
 
-	#if CPU_ARM_AT91SAM7S32 + CPU_ARM_AT91SAM7S64 \
-	  + CPU_ARM_AT91SAM7S128 + CPU_ARM_AT91SAM7S256 != 1
-		#error ARM CPU configuration error
+	#if defined(CPU_ARM_AT91)
+		#if CPU_ARM_AT91SAM7S32 + CPU_ARM_AT91SAM7S64 \
+		+ CPU_ARM_AT91SAM7S128 + CPU_ARM_AT91SAM7S256 != 1
+			#error ARM CPU configuration error
+		#endif
+	/* #elif Add other ARM families here */
+	#else
+		#define CPU_ATM_AT91         0
 	#endif
+
 
 	#if CPU_ARM_AT91 + 0 /* Add other ARM families here */ != 1
 		#error ARM CPU configuration error
