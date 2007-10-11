@@ -71,7 +71,8 @@
 #include <cfg/debug.h>
 #include <appconfig.h>  // CONFIG_EEPROM_VERIFY
 #include <cfg/macros.h>  // MIN()
-#include <drv/twi.h>
+#include <cpu/cpu.h>
+#include CPU_HEADER(twi)
 #include <drv/wdt.h>
 #include <mware/byteorder.h> // cpu_to_be16()
 
