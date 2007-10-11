@@ -81,7 +81,7 @@
  *#*/
 
 #include <cfg/debug.h>
-#include <cfg/cpu.h>
+#include <cpu/cpu.h>
 #include <cfg/macros.h> /* for BV() */
 #include <appconfig.h>
 #include <hw_cpu.h>     /* for CLOCK_FREQ */

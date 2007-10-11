@@ -69,7 +69,7 @@
 #include "twi.h"
 
 #include <cfg/debug.h>
-#include <cfg/cpu.h>
+#include <cpu/cpu.h>
 #include <cfg/macros.h> // BV()
 #include <hw_cpu.h>  /* CLOCK_FREQ */
 #include <appconfig.h>

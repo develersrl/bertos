@@ -69,7 +69,7 @@
 #ifndef DRV_BUZZERLED_H
 #define DRV_BUZZERLED_H
 
-#include <cfg/cpu.h>
+#include <cpu/cpu.h>
 
 /** Include hw.h. We expect hw.h to define enum BLD_DEVICE, which must contain
  *  an enumarator for each device, plus a special symbol NUM_BLDS containing the

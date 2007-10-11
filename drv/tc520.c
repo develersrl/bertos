@@ -44,7 +44,7 @@
 #include <hw_tc520.h>
 
 #include <cfg/macros.h>
-#include <cfg/cpu.h>
+#include <cpu/cpu.h>
 #include <cfg/compiler.h>
 
 #include <drv/ser.h>

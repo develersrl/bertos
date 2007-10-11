@@ -62,7 +62,7 @@
 #include <gfx/gfx.h>
 #include <drv/timer.h>
 
-#include <cfg/cpu.h>
+#include <cpu/cpu.h>
 #include <hw.h>
 #include <cfg/macros.h> /* BV() */
 #include <cfg/debug.h>

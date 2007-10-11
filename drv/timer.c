@@ -38,7 +38,7 @@
  */
 
 #include "timer.h"
-#include <cfg/cpu.h>
+#include <cpu/cpu.h>
 #include <cfg/os.h>
 #include <cfg/debug.h>
 #include <cfg/module.h>

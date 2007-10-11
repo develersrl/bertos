@@ -38,108 +38,11 @@
  * \brief Hardware independent timer driver (interface)
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.33  2007/06/07 14:35:12  batt
- *#* Merge from project_ks.
- *#*
- *#* Revision 1.32  2007/01/09 08:57:19  bernie
- *#* Remove excess parentheses.
- *#*
- *#* Revision 1.31  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.30  2006/02/24 00:26:49  bernie
- *#* Fixes for CONFIG_KERNEL.
- *#*
- *#* Revision 1.29  2006/02/21 21:28:02  bernie
- *#* New time handling based on TIMER_TICKS_PER_SEC to support slow timers with ticks longer than 1ms.
- *#*
- *#* Revision 1.28  2006/02/17 22:24:21  bernie
- *#* Update POSIX timer emulator.
- *#*
- *#* Revision 1.27  2005/11/27 03:04:19  bernie
- *#* Move test code to timer_test.c; Add OS_HOSTED support.
- *#*
- *#* Revision 1.26  2005/11/04 16:20:02  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.25  2005/07/19 07:26:37  bernie
- *#* Refactor to decouple timer ticks from milliseconds.
- *#*
- *#* Revision 1.24  2005/04/11 19:10:28  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.23  2005/03/01 23:25:46  bernie
- *#* Move event.h to mware/.
- *#*
- *#* Revision 1.22  2004/12/13 12:07:06  bernie
- *#* DISABLE_IRQSAVE/ENABLE_IRQRESTORE: Convert to IRQ_SAVE_DISABLE/IRQ_RESTORE.
- *#*
- *#* Revision 1.21  2004/12/09 08:35:21  bernie
- *#* Replace IPTR with iptr_t.
- *#*
- *#* Revision 1.20  2004/12/08 08:56:41  bernie
- *#* Rename sigset_t to sigmask_t; Reformat.
- *#*
- *#* Revision 1.19  2004/12/08 08:30:37  bernie
- *#* Convert to mtime_t; timer_minutes(): Remove.
- *#*
- *#* Revision 1.18  2004/11/16 23:09:52  bernie
- *#* Disable timer_minutes() for targets with 16bit time_t.
- *#*
- *#* Revision 1.17  2004/11/16 22:37:14  bernie
- *#* Replace IPTR with iptr_t.
- *#*
- *#* Revision 1.16  2004/08/25 14:12:08  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.15  2004/08/10 06:59:09  bernie
- *#* timer_gettick(): Rename to timer_ticks() and add backwards compatibility inline.
- *#*
- *#* Revision 1.12  2004/07/30 14:34:10  rasky
- *#* Vari fix per documentazione e commenti
- *#* Aggiunte PP_CATn e STATIC_ASSERT
- *#*
- *#* Revision 1.11  2004/07/29 22:40:12  bernie
- *#* Spelling fix.
- *#*
- *#* Revision 1.10  2004/07/21 00:13:57  bernie
- *#* Put timer driver on diet.
- *#*
- *#* Revision 1.9  2004/07/20 23:45:01  bernie
- *#* Finally remove redundant protos.
- *#*
- *#* Revision 1.8  2004/07/18 21:57:32  bernie
- *#* timer_gettick(): Rename to timer_tick() and document better.
- *#*
- *#* Revision 1.7  2004/06/27 15:26:17  aleph
- *#* Declaration fix for build with GCC 3.4
- *#*
- *#* Revision 1.6  2004/06/07 18:10:06  aleph
- *#* Remove free pool of timers; use user-provided Timer structure instead
- *#*
- *#* Revision 1.5  2004/06/07 15:57:12  aleph
- *#* Add function prototypes
- *#*
- *#* Revision 1.4  2004/06/06 18:25:44  bernie
- *#* Rename event macros to look like regular functions.
- *#*
- *#* Revision 1.3  2004/06/06 16:57:18  bernie
- *#* Mark some functions INLINE instead of 'extern inline'.
- *#*
- *#* Revision 1.2  2004/06/03 11:27:09  bernie
- *#* Add dual-license information.
- *#*
- *#* Revision 1.1  2004/05/23 18:23:30  bernie
- *#* Import drv/timer module.
- *#*
- *#*/
 #ifndef DRV_TIMER_H
 #define DRV_TIMER_H
 
 #include <cfg/os.h>
-#include <cfg/cpu.h>
+#include <cpu/cpu.h>
 
 /*
  * Include platform-specific binding header if we're hosted.

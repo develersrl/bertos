@@ -65,7 +65,7 @@
 #include <drv/timer_avr.h>
 #include <cfg/macros.h> // BV()
 
-#include <cfg/cpu.h>
+#include <cpu/cpu.h>
 
 #include <avr/interrupt.h>
 #include <avr/io.h>

@@ -96,7 +96,7 @@
 
 
 #include <cfg/macros.h>
-#include <cfg/cpu.h>
+#include <cpu/cpu.h>
 #include <cfg/compiler.h>
 
 
