@@ -37,48 +37,6 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.32  2007/10/08 12:14:32  batt
- *#* Fix some review issues.
- *#*
- *#* Revision 1.31  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.30  2006/02/24 00:26:49  bernie
- *#* Fixes for CONFIG_KERNEL.
- *#*
- *#* Revision 1.29  2006/02/17 22:24:07  bernie
- *#* Add MOD_CHECK() checks.
- *#*
- *#* Revision 1.28  2006/02/10 12:32:52  bernie
- *#* Update Copyright year.
- *#*
- *#* Revision 1.27  2005/11/27 03:04:08  bernie
- *#* Move test code to timer_test.c; Add OS_HOSTED support.
- *#*
- *#* Revision 1.26  2005/11/04 16:20:02  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.25  2005/07/19 07:26:37  bernie
- *#* Refactor to decouple timer ticks from milliseconds.
- *#*
- *#* Revision 1.24  2005/04/11 19:10:28  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.23  2004/12/13 12:07:06  bernie
- *#* DISABLE_IRQSAVE/ENABLE_IRQRESTORE: Convert to IRQ_SAVE_DISABLE/IRQ_RESTORE.
- *#*
- *#* Revision 1.22  2004/12/08 09:12:09  bernie
- *#* Rename time_t to mtime_t.
- *#*
- *#* Revision 1.21  2004/11/28 23:20:25  bernie
- *#* Remove obsolete INITLIST macro.
- *#*
- *#* Revision 1.20  2004/11/16 20:59:06  bernie
- *#* Add watchdog timer support.
- *#*/
-
 #include "timer.h"
 #include <cfg/cpu.h>
 #include <cfg/os.h>
