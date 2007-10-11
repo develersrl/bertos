@@ -55,10 +55,10 @@
 /*\}*/
 
 /** Macro to include cpu-specific versions of the headers. */
-#define CPU_HEADER(module)          PP_STRINGIZE(PP_CAT3(module, _, CPU_ID).h)
+#define CPU_HEADER(module)          PP_STRINGIZE(drv/PP_CAT3(module, _, CPU_ID).h)
 
 /** Macro to include cpu-specific versions of implementation files. */
-#define CPU_CSOURCE(module)         PP_STRINGIZE(PP_CAT3(module, _, CPU_ID).c)
+#define CPU_CSOURCE(module)         PP_STRINGIZE(drv/PP_CAT3(module, _, CPU_ID).c)
 
 
 #if CPU_I196
@@ -160,10 +160,6 @@
 		#define BREAKPOINT  /* asm("bkpt 0") DOES NOT WORK */
 
 	#else /* !__IAR_SYSTEMS_ICC__ */
-
-		#warning "IRQ_ macros need testing!"
-		#warning "Test now or die :-)"
-
 		#define NOP         asm volatile ("mov r0,r0" ::)
 
 		#define IRQ_DISABLE \
