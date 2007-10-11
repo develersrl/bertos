@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2004, 2005 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2004, 2005, 2006, 2007 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2004 Giovanni Bajo
  *
  * -->
@@ -40,8 +40,58 @@
 	|| defined(__ARM4TM__) /* IAR: defined for all cores >= 4tm */
 	#define CPU_ARM                 1
 	#define CPU_ID                  arm
+
+	#if defined(__ARM_AT91SAM7S32__)
+		#define CPU_ARM_AT91         1
+		#define CPU_ARM_AT91SAM7S32  1
+	#else
+		#define CPU_ARM_AT91         0
+		#define CPU_ARM_AT91SAM7S32  0
+	#endif
+
+	#if defined(__ARM_AT91SAM7S64__)
+		#define CPU_ARM_AT91         1
+		#define CPU_ARM_AT91SAM7S64  1
+	#else
+		#define CPU_ARM_AT91         0
+		#define CPU_ARM_AT91SAM7S64  0
+	#endif
+
+	#if defined(__ARM_AT91SAM7S128__)
+		#define CPU_ARM_AT91         1
+		#define CPU_ARM_AT91SAM7S128 1
+	#else
+		#define CPU_ARM_AT91         0
+		#define CPU_ARM_AT91SAM7S128 0
+	#endif
+
+	#if defined(__ARM_AT91SAM7S256__)
+		#define CPU_ARM_AT91         1
+		#define CPU_ARM_AT91SAM7S256 1
+	#else
+		#define CPU_ARM_AT91         0
+		#define CPU_ARM_AT91SAM7S256 0
+	#endif
+
+	#if CPU_ARM_AT91SAM7S32 + CPU_ARM_AT91SAM7S64 \
+	  + CPU_ARM_AT91SAM7S128 + CPU_ARM_AT91SAM7S256 != 1
+		#error ARM CPU configuration error
+	#endif
+
+	#if CPU_ARM_AT91 + 0 /* Add other ARM families here */ != 1
+		#error ARM CPU configuration error
+	#endif
 #else
 	#define CPU_ARM                 0
+
+	/* ARM Families */
+	#define CPU_ARM_AT91            0
+
+	/* ARM CPUs */
+	#define CPU_ARM_AT91SAM7S32     0
+	#define CPU_ARM_AT91SAM7S64     0
+	#define CPU_ARM_AT91SAM7S128    0
+	#define CPU_ARM_AT91SAM7S256    0
 #endif
 
 #if (defined(__IAR_SYSTEMS_ICC__) || defined(__IAR_SYSTEMS_ICC)) \
@@ -135,6 +185,11 @@
 		#define CPU_AVR_ATMEGA1281  1
 	#else
 		#define CPU_AVR_ATMEGA1281  0
+	#endif
+
+	#if CPU_AVR_ATMEGA64 + CPU_AVR_ATMEGA103 + CPU_AVR_ATMEGA128 \
+	  + CPU_AVR_ATMEGA8 + CPU_AVR_ATMEGA168 + CPU_AVR_ATMEGA1281 != 1
+		#error AVR CPU configuration error
 	#endif
 #else
 	#define CPU_AVR                 0
