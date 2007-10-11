@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2004, 2005 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2004, 2005, 2006, 2007 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2004 Giovanni Bajo
  *
  * -->
@@ -36,10 +36,12 @@
  * \author Giovanni Bajo <rasky@develer.com>
  * \author Bernardo Innocenti <bernie@develer.com>
  * \author Stefano Fedrigo <aleph@develer.com>
+ * \author Francesco Sacchi <batt@develer.com>
  */
-#ifndef DEVLIB_CPU_H
-#define DEVLIB_CPU_H
+#ifndef CPU_CPU_H
+#define CPU_CPU_H
 
+#include "detect.h"
 #include <cfg/compiler.h> /* for uintXX_t */
 #include <cfg/arch_config.h>  /* ARCH_EMUL */
 
@@ -549,4 +551,4 @@ STATIC_ASSERT(sizeof(uint64_t) * CPU_BITS_PER_CHAR == 64);
 	#endif /* !ARCH_EMUL */
 #endif /* !CPU_IDLE */
 
-#endif /* DEVLIB_CPU_H */
+#endif /* CPU_CPU_H */
