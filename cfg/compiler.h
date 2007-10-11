@@ -114,7 +114,7 @@
 #ifndef DEVLIB_COMPILER_H
 #define DEVLIB_COMPILER_H
 
-#include <cfg/cpu_detect.h>
+#include <cpu/detect.h>
 
 
 #if defined __GNUC__ && defined __GNUC_MINOR__
