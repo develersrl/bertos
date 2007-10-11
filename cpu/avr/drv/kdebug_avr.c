@@ -153,8 +153,8 @@
 	typedef uint8_t kdbg_irqsave_t;
 
 /*
-	* Special debug port for BitBanged Serial see below for details...
-	*/
+ * Special debug port for BitBanged Serial see below for details...
+ */
 #elif CONFIG_KDEBUG_PORT == 666
 	#include "hw_ser.h"
 	#define KDBG_WAIT_READY()      do { /*nop*/ } while(0)
