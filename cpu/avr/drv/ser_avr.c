@@ -161,8 +161,8 @@
  *#*
  *#*/
 
-#include "ser.h"
-#include "ser_p.h"
+#include <drv/ser.h>
+#include <drv/ser_p.h>
 
 #include <hw_ser.h>  /* Required for bus macros overrides */
 #include <hw_cpu.h>  /* CLOCK_FREQ */
