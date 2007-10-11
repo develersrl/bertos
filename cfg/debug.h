@@ -263,7 +263,7 @@
 	#else /* !OS_HOSTED */
 
 		#include <appconfig.h>  /* CONFIG_KDEBUG_ASSERT_NO_TEXT */
-		#include <cfg/cpu.h>  /* CPU_HARVARD */
+		#include <cpu/cpu.h>  /* CPU_HARVARD */
 
 		/* These are implemented in drv/kdebug.c */
 		void kdbg_init(void);
