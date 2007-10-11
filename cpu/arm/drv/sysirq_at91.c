@@ -52,9 +52,9 @@
  * \see sysirq_setEnable
  */
 
-#include "sysirq.h"
-#include "at91sam7s.h"
-#include <cfg/cpu.h>
+#include "sysirq_at91.h"
+#include <io/at91sam7s.h>
+#include <cpu/cpu.h>
 #include <cfg/module.h>
 #include <cfg/macros.h>
 
