@@ -1,0 +1,94 @@
+/**
+ * \file
+ * <!--
+ * This file is part of BeRTOS.
+ *
+ * Bertos is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * As a special exception, you may use this file as part of a free software
+ * library without restriction.  Specifically, if other files instantiate
+ * templates or use macros or inline functions from this file, or you compile
+ * this file and link it with other files to produce an executable, this
+ * file does not by itself cause the resulting executable to be covered by
+ * the GNU General Public License.  This exception does not however
+ * invalidate any other reasons why the executable file might be covered by
+ * the GNU General Public License.
+ *
+ * Copyright 2007 Develer S.r.l. (http://www.develer.com/)
+ *
+ * -->
+ *
+ * \version $Id$
+ *
+ * \author Francesco Sacchi <batt@develer.com>
+ *
+ * \brief Low-level timer module for Atmel AT91 (inplementation).
+ */
+
+#include "timer_at91.h"
+#include "at91sam7s.h"
+#include "sysirq.h"
+
+#include <cfg/macros.h> // BV()
+#include <cfg/module.h>
+#include <cfg/cpu.h>
+
+
+/** HW dependent timer initialization  */
+#if (CONFIG_TIMER == TIMER_ON_PIT)
+	INLINE void timer_hw_irq(void)
+	{
+		/* Reset counters, this is needed to reset timer and interrupt flags */
+		uint32_t dummy = PIVR;
+		(void) dummy;
+	}
+
+	INLINE bool timer_hw_triggered(void)
+	{
+		return PIT_SR & BV(PITS);
+	}
+
+	INLINE void timer_hw_init(void)
+	{
+		cpuflags_t flags;
+
+		MOD_CHECK(sysirq);
+
+		IRQ_SAVE_DISABLE(flags);
+
+		PIT_MR = TIMER_HW_CNT;
+		/* Register system interrupt handler. */
+		sysirq_setHandler(SYSIRQ_PIT, timer_handler);
+
+		/* Enable interval timer and interval timer interrupts */
+		PIT_MR |= BV(PITEN);
+		sysirq_setEnable(SYSIRQ_PIT, true);
+
+		/* Reset counters, this is needed to start timer and interrupt flags */
+		uint32_t dummy = PIVR;
+		(void) dummy;
+
+		IRQ_RESTORE(flags);
+	}
+
+	INLINE hptime_t timer_hw_hpread(void)
+	{
+		/* In the upper part of PIT_PIIR there is unused data */
+		return PIIR & CPIV_MASK;
+	}
+
+#else
+	#error Unimplemented value for CONFIG_TIMER
+#endif /* CONFIG_TIMER */
