@@ -89,7 +89,7 @@
 #endif
 
 #if CONFIG_WATCHDOG
-	#include <cfg/cpu.h>
+	#include <cpu/cpu.h>
 	#include <cfg/os.h>
 
 	#if OS_QT
