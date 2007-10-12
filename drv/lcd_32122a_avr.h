@@ -60,8 +60,8 @@
  *#* Import into DevLib.
  *#*/
 
-#ifndef LCD_GFX_H
-#define LCD_GFX_H
+#ifndef LCD_32122A_AVR_H
+#define LCD_32122A_AVR_H
 
 /* Predefined LCD PWM contrast values */
 #define LCD_DEF_PWM 145
@@ -69,8 +69,8 @@
 #define LCD_MIN_PWM 130
 
 /* Display bitmap dims */
-#define LCD_WIDTH  128
-#define LCD_HEIGHT 64
+#define LCD_WIDTH 122
+#define LCD_HEIGHT 32
 
 /* fwd decl */
 struct Bitmap;
@@ -81,4 +81,4 @@ void lcd_init(void);
 void lcd_setPwm(int duty);
 void lcd_blitBitmap(struct Bitmap *bm);
 
-#endif /* LCD_GFX_H */
+#endif /* LCD_32122A_AVR_H */

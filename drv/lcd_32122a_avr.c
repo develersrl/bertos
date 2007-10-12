@@ -58,7 +58,7 @@
  *#*
  *#*/
 
-#include "lcd.h"
+#include "lcd_32122a_avr.h"
 #include <gfx/gfx.h>
 #include <drv/timer.h>
 
