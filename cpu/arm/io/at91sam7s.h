@@ -100,6 +100,9 @@
 #include "at91_aic.h"
 #include "at91_pit.h"
 #include "at91_pmc.h"
+#include "at91_mc.h"
+#include "at91_wdt.h"
+#include "at91_rstc.h"
 //TODO: add other peripherals
 
 /** Peripheral Identifiers and Interrupts */

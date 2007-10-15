@@ -76,11 +76,11 @@
 /** System Clock Enable, Disable and Status Register */
 /*\{*/
 #define PMC_SCER_OFF                0x00000000  ///< System clock enable register offset.
-#define PMC_SCER    (PMC_BASE + PMC_SCER_OFF)   ///< System clock enable register address.
+#define PMC_SCER    (*((volatile uint32_t *)(PMC_BASE + PMC_SCER_OFF)))   ///< System clock enable register address.
 #define PMC_SCDR_OFF                0x00000004  ///< System clock disable register offset.
-#define PMC_SCDR    (PMC_BASE + PMC_SCDR_OFF)   ///< System clock disable register address.
+#define PMC_SCDR    (*((volatile uint32_t *)(PMC_BASE + PMC_SCDR_OFF)))   ///< System clock disable register address.
 #define PMC_SCSR_OFF                0x00000008  ///< System clock status register offset.
-#define PMC_SCSR    (PMC_BASE + PMC_SCSR_OFF)   ///< System clock status register address.
+#define PMC_SCSR    (*((volatile uint32_t *)(PMC_BASE + PMC_SCSR_OFF)))   ///< System clock status register address.
 
 #define PMC_PCK                              0  ///< Processor clock.
 #define PMC_UDP                              7  ///< USB device port clock.
@@ -92,17 +92,17 @@
 /** Peripheral Clock Enable, Disable and Status Register */
 /*\{*/
 #define PMC_PCER_OFF                0x00000010  ///< Peripheral clock enable register offset.
-#define PMC_PCER    (PMC_BASE + PMC_PCER_OFF)   ///< Peripheral clock enable register address.
+#define PMC_PCER    (*((volatile uint32_t *)(PMC_BASE + PMC_PCER_OFF)))   ///< Peripheral clock enable register address.
 #define PMC_PCDR_OFF                0x00000014  ///< Peripheral clock disable register offset.
-#define PMC_PCDR    (PMC_BASE + PMC_PCDR_OFF)   ///< Peripheral clock disable register address.
+#define PMC_PCDR    (*((volatile uint32_t *)(PMC_BASE + PMC_PCDR_OFF)))   ///< Peripheral clock disable register address.
 #define PMC_PCSR_OFF                0x00000018  ///< Peripheral clock status register offset.
-#define PMC_PCSR    (PMC_BASE + PMC_PCSR_OFF)   ///< Peripheral clock status register address.
+#define PMC_PCSR    (*((volatile uint32_t *)(PMC_BASE + PMC_PCSR_OFF)))   ///< Peripheral clock status register address.
 /*\}*/
 
 /** Clock Generator Main Oscillator Register */
 /*\{*/
 #define CKGR_MOR_OFF                0x00000020  ///< Main oscillator register offset.
-#define CKGR_MOR    (PMC_BASE + CKGR_MOR_OFF)   ///< Main oscillator register address.
+#define CKGR_MOR    (*((volatile uint32_t *)(PMC_BASE + CKGR_MOR_OFF)))   ///< Main oscillator register address.
 
 #define CKGR_MOSCEN                          0  ///< Main oscillator enable.
 #define CKGR_OSCBYPASS                       1  ///< Main oscillator bypass.
@@ -113,7 +113,7 @@
 /** Clock Generator Main Clock Frequency Register */
 /*\{*/
 #define CKGR_MCFR_OFF               0x00000024  ///< Main clock frequency register offset.
-#define CKGR_MCFR   (PMC_BASE + CKGR_MCFR_OFF)  ///< Main clock frequency register address.
+#define CKGR_MCFR   (*((volatile uint32_t *)(PMC_BASE + CKGR_MCFR_OFF)))  ///< Main clock frequency register address.
 
 #define CKGR_MAINF_MASK             0x0000FFFF  ///< Main clock frequency mask mask.
 #define CKGR_MAINRDY                        16  ///< Main clock ready.
@@ -122,7 +122,7 @@
 /** PLL Registers */
 /*\{*/
 #define CKGR_PLLR_OFF               0x0000002C  ///< Clock generator PLL register offset.
-#define CKGR_PLLR   (PMC_BASE + CKGR_PLLR_OFF)  ///< Clock generator PLL register address.
+#define CKGR_PLLR   (*((volatile uint32_t *)(PMC_BASE + CKGR_PLLR_OFF)))  ///< Clock generator PLL register address.
 
 #define CKGR_DIV_MASK               0x000000FF  ///< Divider.
 #define CKGR_DIV_SHIFT                       0  ///< Least significant bit of the divider.
@@ -148,14 +148,14 @@
 /** Master Clock Register */
 /*\{*/
 #define PMC_MCKR_OFF                0x00000030  ///< Master clock register offset.
-#define PMC_MCKR    (PMC_BASE + PMC_MCKR_OFF)   ///< Master clock register address.
+#define PMC_MCKR    (*((volatile uint32_t *)(PMC_BASE + PMC_MCKR_OFF)))   ///< Master clock register address.
 
 #define PMC_PCKR0_OFF               0x00000040  ///< Programmable clock 0 register offset.
-#define PMC_PCKR0   (PMC_BASE + PMC_PCKR0_OFF)  ///< Programmable clock 0 register address.
+#define PMC_PCKR0   (*((volatile uint32_t *)(PMC_BASE + PMC_PCKR0_OFF)))  ///< Programmable clock 0 register address.
 #define PMC_PCKR1_OFF               0x00000044  ///< Programmable clock 1 register offset.
-#define PMC_PCKR1   (PMC_BASE + PMC_PCKR1_OFF)  ///< Programmable clock 1 register address.
+#define PMC_PCKR1   (*((volatile uint32_t *)(PMC_BASE + PMC_PCKR1_OFF)))  ///< Programmable clock 1 register address.
 #define PMC_PCKR2_OFF               0x00000048  ///< Programmable clock 2 register offset.
-#define PMC_PCKR2   (PMC_BASE + PMC_PCKR2_OFF)  ///< Programmable clock 2 register address.
+#define PMC_PCKR2   (*((volatile uint32_t *)(PMC_BASE + PMC_PCKR2_OFF)))  ///< Programmable clock 2 register address.
 
 #define PMC_CSS_MASK                0x00000003  ///< Clock selection mask.
 #define PMC_CSS_SLOW_CLK            0x00000000  ///< Slow clock selected.
@@ -176,13 +176,13 @@
 /** Power Management Status and Interrupt Registers */
 /*\{*/
 #define PMC_IER_OFF                 0x00000060  ///< Interrupt enable register offset.
-#define PMC_IER     (PMC_BASE + PMC_IER_OFF)    ///< Interrupt enable register address.
+#define PMC_IER     (*((volatile uint32_t *)(PMC_BASE + PMC_IER_OFF)))    ///< Interrupt enable register address.
 #define PMC_IDR_OFF                 0x00000064  ///< Interrupt disable register offset.
-#define PMC_IDR     (PMC_BASE + PMC_IDR_OFF)    ///< Interrupt disable register address.
+#define PMC_IDR     (*((volatile uint32_t *)(PMC_BASE + PMC_IDR_OFF)))    ///< Interrupt disable register address.
 #define PMC_SR_OFF                  0x00000068  ///< Status register offset.
-#define PMC_SR      (PMC_BASE + PMC_SR_OFF)     ///< Status register address.
+#define PMC_SR      (*((volatile uint32_t *)(PMC_BASE + PMC_SR_OFF)))     ///< Status register address.
 #define PMC_IMR_OFF                 0x0000006C  ///< Interrupt mask register offset.
-#define PMC_IMR     (PMC_BASE + PMC_IMR_OFF)    ///< Interrupt mask register address.
+#define PMC_IMR     (*((volatile uint32_t *)(PMC_BASE + PMC_IMR_OFF)))    ///< Interrupt mask register address.
 
 #define PMC_MOSCS                            0  ///< Main oscillator.
 #define PMC_LOCK                             2  ///< PLL lock.
