@@ -99,6 +99,7 @@
 
 #include "at91_aic.h"
 #include "at91_pit.h"
+#include "at91_pmc.h"
 //TODO: add other peripherals
 
 /** Peripheral Identifiers and Interrupts */
