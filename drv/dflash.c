@@ -104,25 +104,6 @@ static void send_cmd(dflashAddr_t page_addr, dflashAddr_t byte_addr, DFlashOpcod
 
 }
 
-
-//TODO: deve ritornare un bool?
-/**
- * Init data flash memory interface.
- */
-void dflash_init(struct _KFile *fd)
-{
-	// Set up data flash programming functions.
-	fd->open = dflash_open;
-	fd->close = dflash_close;
-	fd->read = dflash_read;
-	fd->write = dflash_write;
-	fd->seek = dflash_seek;
-
-	// Init data flash memory and micro pin.
-	dflash_pin_init();
-}
-
-
 /**
  * Reset dataflash memory function.
  *
@@ -130,7 +111,7 @@ void dflash_init(struct _KFile *fd)
  * with one pulse reset long about 10usec.
  *
  */
-void dflash_reset(void)
+static void dflash_reset(void)
 {
 	CS_ENABLE();
 	RESET_ENABLE();
@@ -321,4 +302,53 @@ static void dflash_write_block(dflashAddr_t byte_addr, DFlashOpcode opcode, uint
 
 	CS_DISABLE();
 
+}
+
+/**
+ * Open data flash file \a fd
+ * \a name and \a mode are unused, cause flash memory is
+ * threated like one file.
+ */
+static bool dflash_open(struct _KFile *fd, UNUSED_ARG(const char *, name), UNUSED_ARG(int, mode))
+{
+}
+
+/**
+ * Close file \a fd
+ */
+static bool dflash_close(UNUSED_ARG(struct _KFile *,fd))
+{
+}
+
+/**
+ * Move \a fd file seek position of \a offset bytes
+ * from current position.
+ */
+static int32_t dflash_seek(struct _KFile *fd, int32_t offset, KSeekMode whence)
+{
+}
+
+/**
+ * Read from file \a fd \a size bytes and put it in buffer \a buf
+ * \return the number of bytes read.
+ */
+static size_t dflash_read(struct _KFile *fd, void *buf, size_t size)
+{
+}
+
+//TODO: deve ritornare un bool?
+/**
+ * Init data flash memory interface.
+ */
+void dflash_init(struct _KFile *fd)
+{
+	// Set up data flash programming functions.
+	fd->open = dflash_open;
+	fd->close = dflash_close;
+	fd->read = dflash_read;
+	fd->write = dflash_write;
+	fd->seek = dflash_seek;
+
+	// Init data flash memory and micro pin.
+	dflash_pin_init();
 }

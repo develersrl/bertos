@@ -43,6 +43,8 @@
 
 #include <appconfig.h>
 
+#include <kern/kfile.h>
+
 #include <cfg/compiler.h>
 #include <drv/spi.h>
 
@@ -201,17 +203,7 @@ typedef enum {
 	/* \}*/
 } DFlashOpcode;
 
-bool dflash_init(void);
-void dflash_reset(void);
-uint8_t dflash_stat(void);
-
-uint8_t dflash_cmd(dflashAddr_t page_addr, dflashAddr_t byte_addr, DFlashOpcode opcode);
-
-uint8_t dflash_read_byte(dflashAddr_t page_addr, dflashAddr_t byte_addr, DFlashOpcode opcode);
-void dflash_read_block(dflashAddr_t page_addr, dflashAddr_t byte_addr, DFlashOpcode opcode, uint8_t *block, dflashSize_t len);
-
-void dflash_write_byte(dflashAddr_t byte_addr, DFlashOpcode opcode, uint8_t data);
-void dflash_write_block(dflashAddr_t byte_addr, DFlashOpcode opcode, uint8_t *block, dflashSize_t len);
+void dflash_init(struct _KFile *fd)
 
 #endif /* DFLASH_H */
 
