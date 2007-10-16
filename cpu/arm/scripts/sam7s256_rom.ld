@@ -79,7 +79,7 @@
  */
 
 
-ENTRY(ResetHandler)
+ENTRY(_init)
 SEARCH_DIR(.)
 OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
@@ -89,8 +89,8 @@ OUTPUT_ARCH(arm)
  */
 MEMORY
 {
-  rom(rx) : org = 0x00000000, len = 256k
-  ram(rw) : org = 0x00200000, len = 64k
+  rom(rx) : org = 0x00100000, len = 256k
+  ram(rwx) : org = 0x00200000, len = 64k
 }
 
 
@@ -108,19 +108,24 @@ SVC_STACK_SIZE = 0x0400;
  */
 SECTIONS
 {
-    .text :
-    {
-	    * (.vectors);
-	    . = ALIGN (4);
-	    * (.init);
-	    . = ALIGN (4);
-	    * (.rodata);
-	    . = ALIGN (4);
-	    * (.rodata*);
-	    . = ALIGN (4);
+	.text :
+	{
+		* (.vectors);
+		. = ALIGN (4);
+		* (.init);
+		. = ALIGN (4);
+		* (.rodata);
+		. = ALIGN (4);
+		* (.rodata*);
+		. = ALIGN (4);
+		* (.text);
+		. = ALIGN (4);
+		*(.glue_7t);
+    		. = ALIGN(4);
+    		*(.glue_7);
+    		. = ALIGN(4);
 	} > rom
 
-	. = ALIGN (4);
 	_etext = .;
 	PROVIDE (__etext = .);
 
