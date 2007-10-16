@@ -84,6 +84,15 @@ SEARCH_DIR(.)
 OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
 
+/*
+ * Define memory configuration for AT91SAM7S
+ */
+MEMORY
+{
+  rom(rx) : org = 0x00000000, len = 256k
+  ram(rw) : org = 0x00200000, len = 64k
+}
+
 
 /*
  * Define stack size here
@@ -95,44 +104,35 @@ UND_STACK_SIZE = 0x0100;
 SVC_STACK_SIZE = 0x0400;
 
 /*
- * Define memory configuration for AT91SAM7S
- */
-MEMORY
-{
-  rom(rx) : org = 0x00000000, len = 256k
-  ram(rw) : org = 0x00200000, len = 64k
-}
-
-/*
  * Allocate section memory
  */
 SECTIONS
 {
     .text :
     {
-	    * ( .vectors );
-	    . = ALIGN ( 4 );
-	    * ( .init );
-	    . = ALIGN ( 4 );
+	    * (.vectors);
+	    . = ALIGN (4);
+	    * (.init);
+	    . = ALIGN (4);
+	    * (.rodata);
+	    . = ALIGN (4);
+	    * (.rodata*);
+	    . = ALIGN (4);
 	} > rom
 
-	. = ALIGN ( 4 );
+	. = ALIGN (4);
 	_etext = .;
-	PROVIDE ( __etext = . );
+	PROVIDE (__etext = .);
 
-	.data : AT ( __etext )
+	.data : AT (__etext)
 	{
-		PROVIDE ( __data_start = . );
-		* ( .data )
-		. = ALIGN ( 4 );
+		PROVIDE (__data_start = .);
+		* (.data)
+		. = ALIGN (4);
 		_edata = .;
-		PROVIDE ( __data_end = . );
-	}
-	> ram
+		PROVIDE (__data_end = .);
+	} > ram
 
-/*
- * Allocate bss section and stack.
- */
 	.bss :
 	{
 		PROVIDE (__bss_start = .);
@@ -140,39 +140,41 @@ SECTIONS
 		*(COMMON)
 		. = ALIGN(4);
 		PROVIDE (__bss_end = .);
-
-		. = ALIGN(256);
-
-		PROVIDE (__stack_start = .);
-
-		PROVIDE (__stack_fiq_start = .);
-		. += FIQ_STACK_SIZE;
-		. = ALIGN(4);
-		PROVIDE (__stack_fiq_end = .);
-
-		PROVIDE (__stack_irq_start = .);
-		. += IRQ_STACK_SIZE;
-		. = ALIGN(4);
-		PROVIDE (__stack_irq_end = .);
-
-		PROVIDE (__stack_abt_start = .);
-		. += ABT_STACK_SIZE;
-		. = ALIGN(4);
-		PROVIDE (__stack_abt_end = .);
-
-		PROVIDE (__stack_und_start = .);
-		. += UND_STACK_SIZE;
-		. = ALIGN(4);
-		PROVIDE (__stack_und_end = .);
-
-		PROVIDE (__stack_svc_start = .);
-		. += SVC_STACK_SIZE;
-		. = ALIGN(4);
-		PROVIDE (__stack_svc_end = .);
-
-		PROVIDE (__stack_end = .);
-
-		PROVIDE (__heap_start = .);
 	} > ram
+
+/*
+ * Allocate stack at the end of bss section.
+ * Data heap is allocate at end of stack.
+ */
+	PROVIDE (__stack_start = .);
+
+	PROVIDE (__stack_fiq_start = .);
+	. += FIQ_STACK_SIZE;
+	. = ALIGN(4);
+	PROVIDE (__stack_fiq_end = .);
+
+	PROVIDE (__stack_irq_start = .);
+	. += IRQ_STACK_SIZE;
+	. = ALIGN(4);
+	PROVIDE (__stack_irq_end = .);
+
+	PROVIDE (__stack_abt_start = .);
+	. += ABT_STACK_SIZE;
+	. = ALIGN(4);
+	PROVIDE (__stack_abt_end = .);
+
+	PROVIDE (__stack_und_start = .);
+	. += UND_STACK_SIZE;
+	. = ALIGN(4);
+	PROVIDE (__stack_und_end = .);
+
+	PROVIDE (__stack_svc_start = .);
+	. += SVC_STACK_SIZE;
+	. = ALIGN(4);
+	PROVIDE (__stack_svc_end = .);
+
+	PROVIDE (__stack_end = .);
+
+	PROVIDE (__heap_start = .);
 
 }
