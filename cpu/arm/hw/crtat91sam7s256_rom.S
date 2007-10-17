@@ -70,56 +70,68 @@
  *
  */
 
-#include <cfg/clock.h>
-#include <cfg/memory.h>
+#include "hw_cpu.h"
 
-#include <arch/arm.h>
 
-#ifndef PLL_MUL_VAL
-#define PLL_MUL_VAL 72
+#if CLOCK_FREQ != 48023000L
+#error Clock registers set for 48MHz operation, revise following code if you want a different clock.
 #endif
 
-#ifndef PLL_DIV_VAL
-#define PLL_DIV_VAL 14
-#endif
+/**
+ * With a 18.420MHz cristal, master clock is:
+ * (((18.420 * PLL_MUL_VAL + 1) / PLL_DIV_VAL) / AT91MCK_PRES) = 48.023MHz
+ */
+#define PLL_MUL_VAL  72  /**< Real multiplier value is PLL_MUL_VAL + 1! */
+#define PLL_DIV_VAL  14
+#define AT91MCK_PRES PMC_PRES_CLK_2
 
-#if MASTER_CLOCK_PRES == 1
-#define AT91MCK_PRES    PMC_PRES_CLK
-#elif MASTER_CLOCK_PRES == 4
-#define AT91MCK_PRES    PMC_PRES_CLK_4
-#elif MASTER_CLOCK_PRES == 8
-#define AT91MCK_PRES    PMC_PRES_CLK_8
-#elif MASTER_CLOCK_PRES == 16
-#define AT91MCK_PRES    PMC_PRES_CLK_16
-#elif MASTER_CLOCK_PRES == 32
-#define AT91MCK_PRES    PMC_PRES_CLK_32
-#elif MASTER_CLOCK_PRES == 64
-#define AT91MCK_PRES    PMC_PRES_CLK_64
-#else
-#define AT91MCK_PRES    PMC_PRES_CLK_2
-#endif
+/**
+ * Register I/O adresses.
+ * \{
+ */
+#define MC_BASE             0xFFFFFF00
+#define MC_FMR_OFF          0x00000060
+#define MC_FWS_2R3W         0x00000100
 
-#ifndef IRQ_STACK_SIZE
-#define IRQ_STACK_SIZE  512
-#endif
+#define AIC_BASE            0xFFFFF000
+#define AIC_EOICR_OFF       0x00000130
+#define AIC_IDCR_OFF        0x00000124
 
-#ifndef FIQ_STACK_SIZE
-#define FIQ_STACK_SIZE  256
-#endif
+#define WDT_BASE            0xFFFFFD40
+#define WDT_MR_OFF          0x00000004
+#define WDT_WDDIS            (1 << 15)
 
-#ifndef ABT_STACK_SIZE
-#define ABT_STACK_SIZE  128
-#endif
+#define PMC_BASE            0xFFFFFC00
+#define PMC_SR_OFF          0x00000068
+#define PMC_MCKR_OFF        0x00000030
+#define PMC_MOSCS             (1 << 0)
+#define PMC_LOCK              (1 << 2)
+#define PMC_MCKRDY            (1 << 3)
+#define PMC_CSS_PLL_CLK     0x00000003
+#define PMC_PRES_CLK_2      0x00000004
 
-#ifndef UND_STACK_SIZE
-#define UND_STACK_SIZE  128
-#endif
+#define CKGR_MOR_OFF        0x00000020
+#define CKGR_PLLR_OFF       0x0000002C
+#define CKGR_MOSCEN           (1 << 0)
+#define CKGR_MUL_SHIFT              16
+#define CKGR_PLLCOUNT_SHIFT          8
 
+#define RSTC_MR             0xFFFFFD08
+#define RSTC_KEY            0xA5000000
+#define RSTC_URSTEN           (1 << 0)
+
+#define ARM_MODE_FIQ              0x11
+#define ARM_MODE_IRQ              0x12
+#define ARM_MODE_SVC              0x13
+#define ARM_MODE_ABORT            0x17
+#define ARM_MODE_UNDEF            0x1B
+
+/*\}*/
 
 /*
  * Section 0: Vector table and reset entry.
  */
-        .section .init0,"ax",%progbits
+        .section .vectors,"ax",%progbits
 
         .global __vectors
 __vectors:
@@ -139,33 +151,42 @@ __vectors:
         ldr     pc, [pc, #-0xF20]   /* Interrupt request, auto vectoring. */
         ldr     pc, [pc, #-0xF20]   /* Fast interrupt request, auto vectoring. */
 
-        .word   _start
+        .word   _init
         .word   __undef
         .word   __swi
         .word   __prefetch_abort
         .word   __data_abort
 
         .weak   __undef
-        .set    __undef, __xcpt_dummy
+        .set    __undef, __xcpt_dummy_undef
         .weak   __swi
-        .set    __swi, __xcpt_dummy
+        .set    __swi, __xcpt_dummy_swi
         .weak   __prefetch_abort
-        .set    __prefetch_abort, __xcpt_dummy
+        .set    __prefetch_abort, __xcpt_dummy_pref
         .weak   __data_abort
-        .set    __data_abort, __xcpt_dummy
+        .set    __data_abort, __xcpt_dummy_dab
 
-        .global __xcpt_dummy
-__xcpt_dummy:
-        b       __xcpt_dummy
+/**        .global __xcpt_dummy*/
+__xcpt_dummy_undef:
+        b       __xcpt_dummy_undef
+
+__xcpt_dummy_swi:
+        b       __xcpt_dummy_swi
+
+__xcpt_dummy_pref:
+        b       __xcpt_dummy_pref
+
+__xcpt_dummy_dab:
+        b       __xcpt_dummy_dab
+
 
         .ltorg
 /*
- * Section 1: Hardware initialization.
+ * Hardware initialization.
  */
-        .section .init1, "ax", %progbits
-        .globl	_start
-_start:
-
+        .section .init, "ax", %progbits
+        .globl	_init
+_init:
         /*
          * Use 2 cycles for flash access.
          */
@@ -206,7 +227,7 @@ wait_moscs:
          * PLLfreq = crystal / divider * (multiplier + 1)
          * Wait 28 clock cycles until PLL is locked.
          */
-        ldr     r0, =((PLL_MUL_VAL << CKGR_MUL_LSB) | (28 << CKGR_PLLCOUNT_LSB) | (PLL_DIV_VAL << CKGR_DIV_LSB))
+        ldr     r0, =((PLL_MUL_VAL << CKGR_MUL_SHIFT) | (28 << CKGR_PLLCOUNT_SHIFT) | PLL_DIV_VAL)
 
         str     r0, [r1, #CKGR_PLLR_OFF]
 wait_lock:
@@ -226,7 +247,7 @@ wait_presrdy:
 
         /*
          * Switch to PLL clock. Trying to set this together with the
-         * prescaler fails for unknown reason.
+         * prescaler fails (see datasheets).
          */
         ldr     r0, [r1, #PMC_MCKR_OFF]
         orr     r0, r0, #PMC_CSS_PLL_CLK
@@ -243,59 +264,28 @@ wait_pllsel:
         ldr     r1, =RSTC_MR
         str     r0, [r1, #0]
         
-        b       __set_stacks
-
-        .ltorg
-
-
-/*
- * Section 2: Set stack pointers.
- */
-        .section .init2,"ax",%progbits        
-        .global __set_stacks
-__set_stacks:
-
         /*
-         * Set exception stack pointers and enable interrupts.
+         * Set exception stack pointers
          */
-        ldr     r0, =__exp_stack
+        ldr     r0, =__stack_fiq_end
         msr     CPSR_c, #ARM_MODE_FIQ | 0xC0
         mov     r13, r0
-        sub     r0, r0, #FIQ_STACK_SIZE
+        ldr     r0, =__stack_irq_end
         msr     CPSR_c, #ARM_MODE_IRQ | 0xC0
         mov     r13, r0
-        sub     r0, r0, #IRQ_STACK_SIZE
+        ldr     r0, =__stack_abt_end
         msr     CPSR_c, #ARM_MODE_ABORT | 0xC0
         mov     r13, r0
-        sub     r0, r0, #ABT_STACK_SIZE
+        ldr     r0, =__stack_und_end
         msr     CPSR_c, #ARM_MODE_UNDEF | 0xC0
         mov     r13, r0
-        sub     r0, r0, #UND_STACK_SIZE
+        ldr     r0, =__stack_svc_end
         msr     CPSR_c, #ARM_MODE_SVC | 0xC0
         mov     r13, r0
-        b       __enter_mode
-        
-        .ltorg
 
-/*
- * Section 3: Enter user mode.
- */
-        .section .init3,"ax",%progbits
-
-        .global __enter_mode
-__enter_mode:
-
-        b       __clear_bss
-
-        .ltorg
-
-/*
- * Section 4: Clear bss and copy data.
- */
-        .section .init4,"ax",%progbits
-        .global __clear_bss
-__clear_bss:
-
+	/*
+	 * Clear .bss
+	 */
         ldr     r1, =__bss_start
         ldr     r2, =__bss_end
         ldr     r3, =0
@@ -321,22 +311,12 @@ _41:
         /*
          * Initialize user stack pointer.
          */
-        ldr     r13, =__stack
-        b       __call_rtos
-
-        .ltorg
-
-/*
- * Section 5: Call RTOS
- */
-        .section .init5,"ax",%progbits
-        .global __call_rtos
-__call_rtos:
+        ldr     r13, =__stack_end
 
         /*
-         * Jump to Nut/OS initialization.
+         * Jump to main
          */
-        ldr     r0, =NutInit
+        ldr     r0, =main
         bx      r0
 
 End:
