@@ -4,7 +4,7 @@ monitor sleep 500
 monitor poll
 monitor soft_reset_halt
 monitor arm7_9 sw_bkpts enable
-
+#monitor arm7_9 force_hw_bkpts enable
 # WDT_MR, disable watchdog 
 monitor mww 0xFFFFFD44 0x00008000
 
