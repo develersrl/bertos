@@ -144,7 +144,6 @@ void sysirq_init(void)
  */
 void sysirq_setHandler(sysirq_t irq, sysirq_handler_t handler)
 {
-	ASSERT(irq >= 0);
 	ASSERT(irq < SYSIRQ_CNT);
 	sysirq_tab[irq].handler = handler;
 }
@@ -154,7 +153,6 @@ void sysirq_setHandler(sysirq_t irq, sysirq_handler_t handler)
  */
 void sysirq_setEnable(sysirq_t irq, bool enable)
 {
-	ASSERT(irq >= 0);
 	ASSERT(irq < SYSIRQ_CNT);
 
 	sysirq_tab[irq].setEnable(enable);
@@ -166,7 +164,6 @@ void sysirq_setEnable(sysirq_t irq, bool enable)
  */
 bool sysirq_enabled(sysirq_t irq)
 {
-	ASSERT(irq >= 0);
 	ASSERT(irq < SYSIRQ_CNT);
 
 	return sysirq_tab[irq].enabled;
