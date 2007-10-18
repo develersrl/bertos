@@ -156,6 +156,23 @@
 
 /** \name Serial Error/status flags. */
 /*\{*/
+#if CPU_ARM
+	typedef uint32_t serstatus_t;
+
+	/* Software errors */
+	#define SERRF_RXFIFOOVERRUN  BV(0)  /**< Rx FIFO buffer overrun */
+	#define SERRF_RXTIMEOUT      BV(1)  /**< Receive timeout */
+	#define SERRF_TXTIMEOUT      BV(2)  /**< Transmit timeout */
+
+	/*
+	 * Hardware errors.
+	 * These flags map directly to the ARM USART Channel Status Register (US_CSR).
+	 */
+	#define SERRF_RXSROVERRUN    BV(5)  /**< Rx shift register overrun */
+	#define SERRF_FRAMEERROR     BV(6)  /**< Stop bit missing */
+	#define SERRF_PARITYERROR    BV(7)  /**< Parity error */
+	#define SERRF_NOISEERROR     0      /**< Unsupported */
+
 #if CPU_AVR
 	typedef uint8_t serstatus_t;
 
@@ -249,6 +266,10 @@
  */
 enum
 {
+#if CPU_ARM_AT91
+	SER_UART0,
+	SER_UART1,
+	SER_SPI,
 #if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281
 	SER_UART0,
 	SER_UART1,
