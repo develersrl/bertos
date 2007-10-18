@@ -114,7 +114,7 @@
 #define US_USART_MODE_MODEM     0x00000003      ///< Modem.
 #define US_USART_MODE_ISO7816T0 0x00000004      ///< ISO7816 protocol: T=0.
 #define US_USART_MODE_ISO7816T1 0x00000006      ///< ISO7816 protocol: T=1.
-#define US_USART_MODE_RS485     0x00000008      ///< IrDA.
+#define US_USART_MODE_IRDA      0x00000008      ///< IrDA.
 
 #define US_CLKS_MASK            0x00000030      ///< Clock selection mask.
 #define US_CLKS_MCK             0x00000000      ///< Master clock.
