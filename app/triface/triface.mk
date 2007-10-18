@@ -31,7 +31,7 @@ triface_CSRC = \
 	app/triface/protocol.c \
 	drv/timer.c \
 	drv/ser.c \
-	drv/ser_avr.c \
+	cpu/avr/drv/ser_avr.c \
 	mware/formatwr.c \
 	mware/hex.c \
 	mware/hashtable.c \
@@ -43,7 +43,7 @@ triface_CSRC = \
 triface_PCSRC += mware/formatwr.c
 
 #triface_CFLAGS = -O3 -D'ARCH=0' -Iapp/triface/hw -Iapp/triface
-triface_CFLAGS = -O0 -D'ARCH=0' -Iapp/triface/hw -Iapp/triface
+triface_CFLAGS = -O0 -D'ARCH=0' -Iapp/triface/hw -Iapp/triface -Icpu/avr
 triface_MCU = atmega128
 
 # Debug stuff

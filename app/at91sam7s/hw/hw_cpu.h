@@ -47,10 +47,8 @@
 #ifndef AT91SAM7SEK_HW_H
 #define AT91SAM7SEK_HW_H
 
-#include <appconfig.h>
-
-/// CPU Clock frequency (14.7456 MHz)
-#define CLOCK_FREQ     (14745600UL)
+/// CPU Clock frequency (48.023 MHz)
+#define CLOCK_FREQ     (48023000UL)
 
 
 /* Timer IRQ strobe */
