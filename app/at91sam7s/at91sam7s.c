@@ -72,15 +72,15 @@ static void leds_toggle(void)
 
 int main(void)
 {
-	//kdbg_init();
+	kdbg_init();
 	sysirq_init();
 	timer_init();
 	IRQ_ENABLE;
 
 	/* Disable all pullups */
 	PIOA_PUDR = 0xffffffff;
-	/* Set all port pin connected to PIOA */
-	PIOA_PER  = 0xffffffff;
+	/* Set PA0..3 connected to PIOA */
+	PIOA_PER  = 0x0000000f;
 	/* Set PA0..3 as output */
 	PIOA_OER  = 0x0000000f;
 	/* Disable multidrive on all pins */
@@ -99,6 +99,7 @@ int main(void)
 	// Main loop
 	for(;;)
 	{
+		kprintf("W la figa!\n");
 		iort+= 1;
 		iort1+= 1;
 		iort2+= 1;
