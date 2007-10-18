@@ -65,6 +65,11 @@ DPROG ?= -V -c stk500 -P /dev/ttyS0
 # PonyProg serial programmer
 #DPROG = -c dasa2
 
+# Set to 1 to build for embedded devices.
+# e.g. produce target.elf instead of target and target_nostrip
+EMBEDDED_TARGET = 1
+#EMBEDDED_TARGET = 0
+
 OPTCFLAGS = -ffunction-sections -fdata-sections
 #OPTCFLAGS = -funsafe-loop-optimizations
 
@@ -119,8 +124,11 @@ DEP_FLAGS = -MMD -MP
 LIST_FLAGS = -Wa,-anhlmsd=$(@:.o=.lst)
 
 # Linker flags for generating map files
-#bernie: bogus binutils from Fedora 6 can't cope with this
-#MAP_FLAGS = -Wl,-Map=$(@:%.elf=%.map),--cref
+ifeq ($(EMBEDDED_TARGET), 1)
+MAP_FLAGS = -Wl,-Map=$(@:%.elf=%.map),--cref
+else
+MAP_FLAGS = 
+endif
 
 # Compiler warning flags for both C and C++
 WARNFLAGS = \

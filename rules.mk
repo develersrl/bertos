@@ -46,7 +46,11 @@ RECURSIVE_TARGETS = all-recursive install-recursive clean-recursive
 
 # The default target
 .PHONY: all
-all:: all-recursive $(TRG_S19) $(TRG_HEX)
+ifeq ($(EMBEDDED_TARGET),1)
+all:: all-recursive $(TRG_S19) $(TRG_HEX) $(TRG_BIN)
+else
+all:: all-recursive $(TRG_ELF)
+endif
 
 # Generate project documentation
 .PHONY: docs
@@ -118,14 +122,19 @@ $$($(1)_CPPAOBJ): $$(OBJDIR)/$(1)/%.o : %.S
 	$L "$(1): Assembling with CPP $$<"
 	@$$(MKDIR_P) $$(dir $$@)
 	$Q $$(CC) -c $$(CPPAFLAGS) $$($(1)_CPPAFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$< -o $$@
+	
 
 # Link: instructions to create elf output file from object files
 $$(OUTDIR)/$(1).elf: bumprev $$($(1)_OBJ) $$($(1)_LDSCRIPT)
 	$L "$(1): Linking $$(OUTDIR)/$(1)"
 	@$$(MKDIR_P) $$(dir $$@)
+ifeq ($(EMBEDDED_TARGET), 1)
+	$Q $$(LD) $$($(1)_OBJ) $$(LIB) $$(LDFLAGS) $$($(1)_LDFLAGS) -o $$@
+else
 	$Q $$(LD) $$($(1)_OBJ) $$(LIB) $$(LDFLAGS) $$($(1)_LDFLAGS) -o $$(OUTDIR)/$(1)_nostrip
 	$Q $$(STRIP) -o $$(OUTDIR)/$(1) $$(OUTDIR)/$(1)_nostrip
-
+endif
+ 
 # Compile and link (program-at-a-time)
 $$(OUTDIR)/$(1)_whole.elf: bumprev $$($(1)_SRC) $$($(1)_LDSCRIPT)
 	$L "$(1): Compiling and Linking whole program $$@"
