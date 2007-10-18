@@ -78,7 +78,7 @@
 /** Watch Dog Control Register */
 /*\{*/
 #define WDT_CR_OFF          0x00000000  ///< Watchdog control register offset.
-#define WDT_CR  (*((volatile uint32_t *)(WDT_BASE + WDT_CR_OFF))) ///< Watchdog control register address.
+#define WDT_CR  (*((reg32_t *)(WDT_BASE + WDT_CR_OFF))) ///< Watchdog control register address.
 #define WDT_WDRSTT                   0  ///< Watchdog restart.
 #define WDT_KEY             0xA5000000  ///< Watchdog password.
 /*\}*/
@@ -86,7 +86,7 @@
 /** Watch Dog Mode Register */
 /*\{*/
 #define WDT_MR_OFF          0x00000004  ///< Mode register offset.
-#define WDT_MR  (*((volatile uint32_t *)(WDT_BASE + WDT_MR_OFF))) ///< Mode register address.
+#define WDT_MR  (*((reg32_t *)(WDT_BASE + WDT_MR_OFF))) ///< Mode register address.
 #define WDT_WDV_MASK        0x00000FFF  ///< Counter value mask.
 #define WDT_WDV_SHIFT                0  ///< Counter value LSB.
 #define WDT_WDFIEN                  12  ///< Fault interrupt enable.
@@ -102,7 +102,7 @@
 /** Watch Dog Status Register */
 /*\{*/
 #define WDT_SR_OFF          0x00000008  ///< Status register offset.
-#define WDT_SR  (*((volatile uint32_t *)(WDT_BASE + WDT_SR_OFF))) ///< Status register address.
+#define WDT_SR  (*((reg32_t *)(WDT_BASE + WDT_SR_OFF))) ///< Status register address.
 #define WDT_WDUNF                    0  ///< Watchdog underflow.
 #define WDT_WDERR                    1  ///< Watchdog error.
 /*\}*/

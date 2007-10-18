@@ -80,7 +80,7 @@
 /**
  * Source mode register array.
  */
-#define AIC_SMR(i)  (*((volatile uint32_t *)(AIC_BASE + (i) * 4)))
+#define AIC_SMR(i)  (*((reg32_t *)(AIC_BASE + (i) * 4)))
 
 /**
  * Priority mask.
@@ -124,38 +124,38 @@ typedef void (*irq_handler_t)(void);
 /** Interrupt Vector Register */
 /*\{*/
 #define AIC_IVR_OFF 0x00000100  ///< IRQ vector register offset.
-#define AIC_IVR     (*((volatile uint32_t *)(AIC_BASE + AIC_IVR_OFF))) ///< IRQ vector register address.
+#define AIC_IVR     (*((reg32_t *)(AIC_BASE + AIC_IVR_OFF))) ///< IRQ vector register address.
 /*\}*/
 
 /** Fast Interrupt Vector Register */
 /*\{*/
 #define AIC_FVR_OFF 0x00000104  ///< FIQ vector register offset.
-#define AIC_FVR     (*((volatile uint32_t *)(AIC_BASE + AIC_FVR_OFF))) ///< FIQ vector register address.
+#define AIC_FVR     (*((reg32_t *)(AIC_BASE + AIC_FVR_OFF))) ///< FIQ vector register address.
 /*\}*/
 
 /** Interrupt Status Register */
 /*\{*/
 #define AIC_ISR_OFF    0x00000108  ///< Interrupt status register offset.
-#define AIC_ISR        (*((volatile uint32_t *)(AIC_BASE + AIC_ISR_OFF))) ///< Interrupt status register address.
+#define AIC_ISR        (*((reg32_t *)(AIC_BASE + AIC_ISR_OFF))) ///< Interrupt status register address.
 #define AIC_IRQID_MASK 0x0000001F  ///< Current interrupt identifier mask.
 /*\}*/
 
 /** Interrupt Pending Register */
 /*\{*/
 #define AIC_IPR_OFF 0x0000010C  ///< Interrupt pending register offset.
-#define AIC_IPR     (*((volatile uint32_t *)(AIC_BASE + AIC_IPR_OFF))) ///< Interrupt pending register address.
+#define AIC_IPR     (*((reg32_t *)(AIC_BASE + AIC_IPR_OFF))) ///< Interrupt pending register address.
 /*\}*/
 
 /** Interrupt Mask Register */
 /*\{*/
 #define AIC_IMR_OFF 0x00000110  ///< Interrupt mask register offset.
-#define AIC_IMR     (*((volatile uint32_t *)(AIC_BASE + AIC_IMR_OFF))) ///< Interrupt mask register address.
+#define AIC_IMR     (*((reg32_t *)(AIC_BASE + AIC_IMR_OFF))) ///< Interrupt mask register address.
 /*\}*/
 
 /** Interrupt Core Status Register */
 /*\{*/
 #define AIC_CISR_OFF 0x00000114  ///< Core interrupt status register offset.
-#define AIC_CISR     (*((volatile uint32_t *)(AIC_BASE + AIC_CISR_OFF))) ///< Core interrupt status register address.
+#define AIC_CISR     (*((reg32_t *)(AIC_BASE + AIC_CISR_OFF))) ///< Core interrupt status register address.
 #define AIC_NFIQ     1  ///< Core FIQ Status
 #define AIC_NIRQ     2  ///< Core IRQ Status
 /*\}*/
@@ -163,61 +163,61 @@ typedef void (*irq_handler_t)(void);
 /** Interrupt Enable Command Register */
 /*\{*/
 #define AIC_IECR_OFF 0x00000120  ///< Interrupt enable command register offset.
-#define AIC_IECR     (*((volatile uint32_t *)(AIC_BASE + AIC_IECR_OFF)))   ///< Interrupt enable command register address.
+#define AIC_IECR     (*((reg32_t *)(AIC_BASE + AIC_IECR_OFF)))   ///< Interrupt enable command register address.
 /*\}*/
 
 /** Interrupt Disable Command Register */
 /*\{*/
 #define AIC_IDCR_OFF 0x00000124  ///< Interrupt disable command register offset.
-#define AIC_IDCR     (*((volatile uint32_t *)(AIC_BASE + AIC_IDCR_OFF)))   ///< Interrupt disable command register address.
+#define AIC_IDCR     (*((reg32_t *)(AIC_BASE + AIC_IDCR_OFF)))   ///< Interrupt disable command register address.
 /*\}*/
 
 /** Interrupt Clear Command Register */
 /*\{*/
 #define AIC_ICCR_OFF 0x00000128  ///< Interrupt clear command register offset.
-#define AIC_ICCR     (*((volatile uint32_t *)(AIC_BASE + AIC_ICCR_OFF)))   ///< Interrupt clear command register address.
+#define AIC_ICCR     (*((reg32_t *)(AIC_BASE + AIC_ICCR_OFF)))   ///< Interrupt clear command register address.
 /*\}*/
 
 /** Interrupt Set Command Register */
 /*\{*/
 #define AIC_ISCR_OFF 0x0000012C  ///< Interrupt set command register offset.
-#define AIC_ISCR     (*((volatile uint32_t *)(AIC_BASE + AIC_ISCR_OFF)))   ///< Interrupt set command register address.
+#define AIC_ISCR     (*((reg32_t *)(AIC_BASE + AIC_ISCR_OFF)))   ///< Interrupt set command register address.
 /*\}*/
 
 /** End Of Interrupt Command Register */
 /*\{*/
 #define AIC_EOICR_OFF 0x00000130  ///< End of interrupt command register offset.
-#define AIC_EOICR     (*((volatile uint32_t *)(AIC_BASE + AIC_EOICR_OFF)))  ///< End of interrupt command register address.
+#define AIC_EOICR     (*((reg32_t *)(AIC_BASE + AIC_EOICR_OFF)))  ///< End of interrupt command register address.
 /*\}*/
 
 /** Spurious Interrupt Vector Register */
 /*\{*/
 #define AIC_SPU_OFF 0x00000134  ///< Spurious vector register offset.
-#define AIC_SPU     (*((volatile uint32_t *)(AIC_BASE + AIC_SPU_OFF)==    ///< Spurious vector register address.
+#define AIC_SPU     (*((reg32_t *)(AIC_BASE + AIC_SPU_OFF)==    ///< Spurious vector register address.
 /*\}*/
 
 /** Debug Control Register */
 /*\{*/
 #define AIC_DCR_OFF 0x0000138   ///< Debug control register offset.
-#define AIC_DCR     (*((volatile uint32_t *)(AIC_BASE + AIC_DCR_OFF)))    ///< Debug control register address.
+#define AIC_DCR     (*((reg32_t *)(AIC_BASE + AIC_DCR_OFF)))    ///< Debug control register address.
 /*\}*/
 
 /** Fast Forcing Enable Register */
 /*\{*/
 #define AIC_FFER_OFF 0x00000140  ///< Fast forcing enable register offset.
-#define AIC_FFER     (*((volatile uint32_t *)(AIC_BASE + AIC_FFER_OFF)))   ///< Fast forcing enable register address.
+#define AIC_FFER     (*((reg32_t *)(AIC_BASE + AIC_FFER_OFF)))   ///< Fast forcing enable register address.
 /*\}*/
 
 /** Fast Forcing Disable Register */
 /*\{*/
 #define AIC_FFDR_OFF 0x00000144  ///< Fast forcing disable register address.
-#define AIC_FFDR     (*((volatile uint32_t *)(AIC_BASE + AIC_FFDR_OFF)))   ///< Fast forcing disable register address.
+#define AIC_FFDR     (*((reg32_t *)(AIC_BASE + AIC_FFDR_OFF)))   ///< Fast forcing disable register address.
 /*\}*/
 
 /** Fast Forcing Status Register */
 /*\{*/
 #define AIC_FFSR_OFF 0x00000148  ///< Fast forcing status register address.
-#define AIC_FFSR     (*((volatile uint32_t *)(AIC_BASE + AIC_FFSR_OFF)))   ///< Fast forcing status register address.
+#define AIC_FFSR     (*((reg32_t *)(AIC_BASE + AIC_FFSR_OFF)))   ///< Fast forcing status register address.
 /*\}*/
 
 #endif /* AT91_AIC_H */

@@ -117,7 +117,7 @@
 /** Single PIO Register Addresses */
 /*\{*/
 #if defined(PIO_BASE)
-	#define PIO_ACCESS(offset) (*((volatile uint32_t *)(PIO_BASE + (offset))))
+	#define PIO_ACCESS(offset) (*((reg32_t *)(PIO_BASE + (offset))))
 
 	#define PIO_PER     PIO_ACCESS(PIO_PER_OFF)    ///< PIO enable register address.
 	#define PIO_PDR     PIO_ACCESS(PIO_PDR_OFF)    ///< PIO disable register address.
@@ -162,7 +162,7 @@
 /** PIO A Register Addresses */
 /*\{*/
 #if defined(PIOA_BASE)
-	#define PIOA_ACCESS(offset) (*((volatile uint32_t *)(PIOA_BASE + (offset))))
+	#define PIOA_ACCESS(offset) (*((reg32_t *)(PIOA_BASE + (offset))))
 
 	#define PIOA_PER    PIOA_ACCESS(PIO_PER_OFF)   ///< PIO enable register address.
 	#define PIOA_PDR    PIOA_ACCESS(PIO_PDR_OFF)   ///< PIO disable register address.
@@ -207,7 +207,7 @@
 /** PIO B Register Addresses */
 /*\{*/
 #if defined(PIOB_BASE)
-	#define PIOB_ACCESS(offset) (*((volatile uint32_t *)(PIOB_BASE + (offset))))
+	#define PIOB_ACCESS(offset) (*((reg32_t *)(PIOB_BASE + (offset))))
 
 	#define PIOB_PER    PIOB_ACCESS(PIO_PER_OFF)   ///< PIO enable register address.
 	#define PIOB_PDR    PIOB_ACCESS(PIO_PDR_OFF)   ///< PIO disable register address.
@@ -252,7 +252,7 @@
 /** PIO C Register Addresses */
 /*\{*/
 #if defined(PIOC_BASE)
-	#define PIOC_ACCESS(offset) (*((volatile uint32_t *)(PIOC_BASE + (offset))))
+	#define PIOC_ACCESS(offset) (*((reg32_t *)(PIOC_BASE + (offset))))
 
 	#define PIOC_PER    PIOC_ACCESS(PIO_PER_OFF)   ///< PIO enable register address.
 	#define PIOC_PDR    PIOC_ACCESS(PIO_PDR_OFF)   ///< PIO disable register address.

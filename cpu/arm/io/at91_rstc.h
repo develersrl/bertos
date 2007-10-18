@@ -75,7 +75,7 @@
 
 /** Reset Controller Control Register */
 /*\{*/
-#define RSTC_CR         (*((volatile uint32_t *)(RSTC_BASE + 0x00)))      ///< Reset controller control register address.
+#define RSTC_CR         (*((reg32_t *)(RSTC_BASE + 0x00)))      ///< Reset controller control register address.
 #define RSTC_PROCRST                     0  ///< Processor reset.
 #define RSTC_PERRST                      2  ///< Peripheral reset.
 #define RSTC_EXTRST                      3  ///< External reset.
@@ -84,7 +84,7 @@
 
 /** Reset Controller Status Register */
 /*\{*/
-#define RSTC_SR         (*((volatile uint32_t *)(RSTC_BASE + 0x04)))      ///< Reset controller status register address.
+#define RSTC_SR         (*((reg32_t *)(RSTC_BASE + 0x04)))      ///< Reset controller status register address.
 #define RSTC_URSTS                       0  ///< User reset status.
 #define RSTC_BODSTS                      1  ///< Brownout detection status.
 #define RSTC_RSTTYP_MASK        0x00000700  ///< Reset type.
@@ -100,7 +100,7 @@
 
 /** Reset Controller Mode Register */
 /*\{*/
-#define RSTC_MR         (*((volatile uint32_t *)(RSTC_BASE + 0x08)))      ///< Reset controller mode register address.
+#define RSTC_MR         (*((reg32_t *)(RSTC_BASE + 0x08)))      ///< Reset controller mode register address.
 #define RSTC_URSTEN                      0  ///< User reset enable.
 #define RSTC_URSTIEN                     4  ///< User reset interrupt enable.
 #define RSTC_ERSTL_MASK         0x00000F00  ///< External reset length.

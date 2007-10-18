@@ -74,11 +74,11 @@
 #define AT91_MC_H
 
 #define MC_RCR_OFF              0x00000000      ///< MC remap control register offset.
-#define MC_RCR      (*((volatile uint32_t *)(MC_BASE + MC_RCR_OFF)))      ///< MC remap control register address.
+#define MC_RCR      (*((reg32_t *)(MC_BASE + MC_RCR_OFF)))      ///< MC remap control register address.
 #define MC_RCB                           0      ///< Remap command.
 
 #define MC_ASR_OFF              0x00000004      ///< MC abort status register offset.
-#define MC_ASR      (*((volatile uint32_t *)(MC_BASE + MC_ASR_OFF)))      ///< MC abort status register address.
+#define MC_ASR      (*((reg32_t *)(MC_BASE + MC_ASR_OFF)))      ///< MC abort status register address.
 #define MC_UNDADD                        0      ///< Undefined Addess Abort status.
 #define MC_MISADD                        1      ///< Misaligned Addess Abort status.
 #define MC_ABTSZ_MASK           0x00000300      ///< Abort size status mask.
@@ -95,10 +95,10 @@
 #define MC_SVMST_ARM            0x04000000      ///< Saved ARM abort source.
 
 #define MC_AASR_OFF             0x00000008      ///< MC abort address status register offset.
-#define MC_AASR     (*((volatile uint32_t *)(MC_BASE + MC_AASR_OFF)))     ///< MC abort address status register address.
+#define MC_AASR     (*((reg32_t *)(MC_BASE + MC_AASR_OFF)))     ///< MC abort address status register address.
 
 #define MC_FMR_OFF              0x00000060      ///< MC flash mode register offset.
-#define MC_FMR      (*((volatile uint32_t *)(MC_BASE + MC_FMR_OFF)))      ///< MC flash mode register address.
+#define MC_FMR      (*((reg32_t *)(MC_BASE + MC_FMR_OFF)))      ///< MC flash mode register address.
 #define MC_FRDY                          0      ///< Flash ready.
 #define MC_LOCKE                         2      ///< Lock error.
 #define MC_PROGE                         3      ///< Programming error.
@@ -111,7 +111,7 @@
 #define MC_FMCN_MASK            0x00FF0000      ///< Flash microsecond cycle number mask.
 
 #define MC_FCR_OFF              0x00000064      ///< MC flash command register offset.
-#define MC_FCR      (*((volatile uint32_t *)(MC_BASE + MC_FCR_OFF)))      ///< MC flash command register address.
+#define MC_FCR      (*((reg32_t *)(MC_BASE + MC_FCR_OFF)))      ///< MC flash command register address.
 #define MC_FCMD_MASK            0x0000000F      ///< Flash command mask.
 #define MC_FCMD_NOP             0x00000000      ///< No command.
 #define MC_FCMD_WP              0x00000001      ///< Write page.
@@ -126,7 +126,7 @@
 #define MC_KEY                  0x5A000000      ///< Writing protect key.
 
 #define MC_FSR_OFF              0x00000068      ///< MC flash status register offset.
-#define MC_FSR      (*((volatile uint32_t *)(MC_BASE + MC_FSR_OFF)))      ///< MC flash status register address.
+#define MC_FSR      (*((reg32_t *)(MC_BASE + MC_FSR_OFF)))      ///< MC flash status register address.
 #define MC_SECURITY                      4      ///< Security bit status.
 
 #define MC_GPNVM0                        8      ///< General purpose NVM bit 0.

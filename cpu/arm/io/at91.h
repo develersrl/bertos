@@ -77,7 +77,7 @@
 
 /**
  * Interrupt entry point.
- * Needed because AT91 uses an Interrupt Controlled with auto-vectoring.
+ * Needed because AT91 uses an Interrupt Controller with auto-vectoring.
  */
 #define IRQ_ENTRY() \
 	asm volatile("sub   lr, lr,#4"          "\n\t"  /* Adjust LR */ \
@@ -87,7 +87,7 @@
 
 /**
  * Interrupt exit.
- * Needed because AT91 uses an Interrupt Controlled with auto-vectoring.
+ * Needed because AT91 uses an Interrupt Controller with auto-vectoring.
  */
 #define IRQ_EXIT() \
 	asm volatile("ldmfd sp!, {r1}"          "\n\t"  /* Restore SPSR */ \

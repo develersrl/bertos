@@ -70,8 +70,10 @@
  * For additional information see http://www.ethernut.de/
  */
 
-#ifndef AT91SAM7S_H
-#define AT91SAM7S_H
+#ifndef AT91SAM7S256_H
+#define AT91SAM7S256_H
+
+#include <cfg/compiler.h>
 
 #define FLASH_BASE      0x100000UL
 #define RAM_BASE        0x200000UL
@@ -356,4 +358,4 @@
 #define PB30_PWM3_B         30
 /*\}*/
 
-#endif /* AT91SAM7S_H */
+#endif /* AT91SAM7S256_H */

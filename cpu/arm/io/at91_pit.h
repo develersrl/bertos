@@ -79,7 +79,7 @@
  *\{
  */
 #define PIT_MR_OFF 0x00000000 ///< Mode register offset.
-#define PIT_MR     (*((volatile uint32_t *)(PIT_BASE + PIT_MR_OFF))) ///< Mode register address.
+#define PIT_MR     (*((reg32_t *)(PIT_BASE + PIT_MR_OFF))) ///< Mode register address.
 
 #define PIV_MASK   0x000FFFFF ///< Periodic interval value mask.
 #define PIV_SHIFT  0          ///< Periodic interval value shift.
@@ -92,7 +92,7 @@
  *\{
  */
 #define PIT_SR_OFF 0x00000004 ///< Status register offset.
-#define PIT_SR     (*((volatile uint32_t *)(PIT_BASE + PIT_SR_OFF))) ///< Status register address.
+#define PIT_SR     (*((reg32_t *)(PIT_BASE + PIT_SR_OFF))) ///< Status register address.
 
 #define PITS       0          ///< Timer has reached PIV.
 /*\}*/
@@ -102,10 +102,10 @@
  *\{
  */
 #define PIVR_OFF    0x00000008 ///< Value register offset.
-#define PIVR        (*((volatile uint32_t *)(PIT_BASE + PIVR_OFF))) ///< Value register address.
+#define PIVR        (*((reg32_t *)(PIT_BASE + PIVR_OFF))) ///< Value register address.
 
 #define PIIR_OFF    0x0000000C ///< Image register offset.
-#define PIIR        (*((volatile uint32_t *)(PIT_BASE + PIIR_OFF))) ///< Image register address.
+#define PIIR        (*((reg32_t *)(PIT_BASE + PIIR_OFF))) ///< Image register address.
 #define CPIV_MASK   0x000FFFFF ///< Current periodic interval value mask.
 #define CPIV_SHIFT  0          ///< Current periodic interval value SHIFT.
 #define PICNT_MASK  0xFFF00000 ///< Periodic interval counter mask.
