@@ -42,9 +42,9 @@
 #include <cfg/macros.h>
 #include <io/arm.h>
 
-int iort = 23;
-int iort1 = 232;
-int iort2 = 233;
+static int iort = 23;
+static int iort1 = 232;
+static int iort2 = 233;
 
 Timer leds_timer;
 
