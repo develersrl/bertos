@@ -97,12 +97,18 @@
 #define VREG_BASE       0xFFFFFD60      ///< Voltage regulator mode controller base address.
 #define MC_BASE         0xFFFFFF00      ///< Memory controller base.
 
+#define PIO_HAS_MULTIDRIVER        1
+#define PIO_HAS_PULLUP             1
+#define PIO_HAS_PERIPHERALSELECT   1
+#define PIO_HAS_OUTPUTWRITEENABLE  1
+
 #include "at91_aic.h"
 #include "at91_pit.h"
 #include "at91_pmc.h"
 #include "at91_mc.h"
 #include "at91_wdt.h"
 #include "at91_rstc.h"
+#include "at91_pio.h"
 //TODO: add other peripherals
 
 /** Peripheral Identifiers and Interrupts */
@@ -145,16 +151,10 @@
 #define PDC_TXTEN       0x00000100      ///< Transmitter transfer enable.
 #define PDC_TXTDIS      0x00000200      ///< Transmitter transfer disable.
 
-#define DBGU_HAS_PDC
-#define SPI_HAS_PDC
-#define SSC_HAS_PDC
-#define USART_HAS_PDC
-
-#define PIO_HAS_MULTIDRIVER
-#define PIO_HAS_PULLUP
-#define PIO_HAS_PERIPHERALSELECT
-#define PIO_HAS_OUTPUTWRITEENABLE
-
+#define DBGU_HAS_PDC               1
+#define SPI_HAS_PDC                1
+#define SSC_HAS_PDC                1
+#define USART_HAS_PDC              1
 
 /** Historical SPI0 Peripheral Multiplexing Names */
 /*\{*/
@@ -274,29 +274,6 @@
 #define SPI1_CS3_PSR_OFF    PIO_BSR_OFF
 #endif
 
-/*\}*/
-
-/** EMAC Interface Peripheral Multiplexing */
-/*\{*/
-#define PB0_ETXCK_EREFCK_A  0
-#define PB1_ETXEN_A         1
-#define PB2_ETX0_A          2
-#define PB3_ETX1_A          3
-#define PB4_ECRS_A          4
-#define PB5_ERX0_A          5
-#define PB6_ERX1_A          6
-#define PB7_ERXER_A         7
-#define PB8_EMDC_A          8
-#define PB9_EMDIO_A         9
-#define PB10_ETX2_A         10
-#define PB11_ETX3_A         11
-#define PB12_ETXER_A        12
-#define PB13_ERX2_A         13
-#define PB14_ERX3_A         14
-#define PB15_ERXDV_ECRSDV_A 15
-#define PB16_ECOL_A         16
-#define PB17_ERXCK_A        17
-#define PB18_EF100_A        18
 /*\}*/
 
 /** Debug Unit Peripheral Multiplexing */
