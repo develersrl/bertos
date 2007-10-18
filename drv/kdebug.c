@@ -78,7 +78,7 @@ void kdbg_init(void)
 {
 	/* Init debug hw */
 	kdbg_hw_init();
-	kputs("\n\n*** DBG START ***\n");
+	kputs("\n\n*** BeRTOS DBG START ***\n");
 }
 
 
