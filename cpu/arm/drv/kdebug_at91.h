@@ -40,10 +40,6 @@
 #ifndef DRV_KDEBUG_AT91_H
 #define DRV_KDEBUG_AT91_H
 
-#include <appconfig.h>     /* CONFIG_TIMER */
-#include <cfg/compiler.h>  /* uint8_t */
-#include <hw_cpu.h>        /* CLOCK_FREQ */
-
 /**
  * \name Values for CONFIG_KDEBUG_PORT.
  *
