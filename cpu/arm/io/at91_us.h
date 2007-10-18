@@ -234,8 +234,6 @@
 #define US_BRGR_OFF             0x00000020      ///< USART baud rate register offset.
 #define US0_BRGR (*((reg32_t *)(USART0_BASE + US_BRGR_OFF)))    ///< Channel 0 baud rate register address.
 #define US1_BRGR (*((reg32_t *)(USART1_BASE + US_BRGR_OFF)))    ///< Channel 1 baud rate register address.
-#define US_BRGR_MASK            0x0000FFFF      ///< Clock divider.
-#define US_BRGR_FP_MASK         0x001F0000      ///< Fractional part.
 /*\}*/
 
 /**
