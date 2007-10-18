@@ -109,6 +109,7 @@
 #include "at91_wdt.h"
 #include "at91_rstc.h"
 #include "at91_pio.h"
+#include "at91_ser.h"
 //TODO: add other peripherals
 
 /** Peripheral Identifiers and Interrupts */
