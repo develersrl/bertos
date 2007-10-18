@@ -104,6 +104,11 @@
 #define PIO_HAS_PERIPHERALSELECT   1
 #define PIO_HAS_OUTPUTWRITEENABLE  1
 
+#define DBGU_HAS_PDC               1
+#define SPI_HAS_PDC                1
+#define SSC_HAS_PDC                1
+#define USART_HAS_PDC              1
+
 #include "at91_aic.h"
 #include "at91_pit.h"
 #include "at91_pmc.h"
@@ -111,6 +116,8 @@
 #include "at91_wdt.h"
 #include "at91_rstc.h"
 #include "at91_pio.h"
+#include "at91_us.h"
+#include "at91_dbgu.h"
 //TODO: add other peripherals
 
 /** Peripheral Identifiers and Interrupts */
@@ -152,11 +159,6 @@
 #define PDC_RXTDIS      0x00000002      ///< Receiver transfer disable.
 #define PDC_TXTEN       0x00000100      ///< Transmitter transfer enable.
 #define PDC_TXTDIS      0x00000200      ///< Transmitter transfer disable.
-
-#define DBGU_HAS_PDC               1
-#define SPI_HAS_PDC                1
-#define SSC_HAS_PDC                1
-#define USART_HAS_PDC              1
 
 /** Historical SPI0 Peripheral Multiplexing Names */
 /*\{*/
