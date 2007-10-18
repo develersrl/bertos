@@ -34,7 +34,7 @@
  *
  * \author Francesco Sacchi <batt@develer.com>
  *
- * AT91SAM7S register definitions.
+ * AT91SAM7S256 register definitions.
  * This file is based on NUT/OS implementation. See license below.
  */
 
@@ -109,7 +109,6 @@
 #include "at91_wdt.h"
 #include "at91_rstc.h"
 #include "at91_pio.h"
-#include "at91_ser.h"
 //TODO: add other peripherals
 
 /** Peripheral Identifiers and Interrupts */

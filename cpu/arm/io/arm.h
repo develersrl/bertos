@@ -34,76 +34,21 @@
  *
  * \author Francesco Sacchi <batt@develer.com>
  *
- * \brief AT91SAM7S-EK porting test.
+ * ARM I/O registers.
  */
 
-#include <drv/timer.h>
-#include <drv/sysirq_at91.h>
-#include <cfg/macros.h>
-#include <io/arm.h>
 
-int iort = 23;
-int iort1 = 232;
-int iort2 = 233;
+#ifndef ARM_H
+#define ARM_H
 
-Timer leds_timer;
+#include <cpu/detect.h>
 
-static void leds_toggle(void)
-{
-	uint8_t a = (~PIOA_ODSR & 0x0f);
-
-	if (a)
-	{
-		PIOA_SODR = a;
-		PIOA_CODR = a << 1;
-	}
-	else
-	{
-		PIOA_SODR  =  0x0f;
-		/* turn first led on */
-		PIOA_CODR  = 0x00000001;
-	}
-
-	/* Wait for interval time */
-	timer_setDelay(&leds_timer, ms_to_ticks(100));
-	timer_add(&leds_timer);
-}
+#if CPU_ARM_AT91
+	#include "at91.h"
+/*#elif  Add other ARM families here */
+#else
+	#error Unknown CPU
+#endif
 
 
-int main(void)
-{
-	//kdbg_init();
-	sysirq_init();
-	timer_init();
-	IRQ_ENABLE;
-
-	/* Disable all pullups */
-	PIOA_PUDR = 0xffffffff;
-	/* Set all port pin connected to PIOA */
-	PIOA_PER  = 0xffffffff;
-	/* Set PA0..3 as output */
-	PIOA_OER  = 0x0000000f;
-	/* Disable multidrive on all pins */
-	PIOA_MDDR = 0x0000000f;
-
-	/* Set PA0..3 to 1 to turn off leds */
-	PIOA_SODR  = 0x0000000f;
-	/* turn first led on */
-	PIOA_CODR  = 0x00000001;
-
-	timer_set_event_softint(&leds_timer, (Hook)leds_toggle, 0);
-	timer_setDelay(&leds_timer, ms_to_ticks(100));
-	timer_add(&leds_timer);
-
-
-	// Main loop
-	for(;;)
-	{
-		iort+= 1;
-		iort1+= 1;
-		iort2+= 1;
-	}
-
-	return 0;
-}
-
+#endif /* ARM_H */

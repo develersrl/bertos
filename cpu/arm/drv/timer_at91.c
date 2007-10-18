@@ -38,7 +38,7 @@
  */
 
 #include "timer_at91.h"
-#include <io/at91sam7s.h>
+#include <io/arm.h>
 #include "sysirq_at91.h"
 
 #include <cfg/macros.h> // BV()
