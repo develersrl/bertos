@@ -47,6 +47,7 @@
 #include <hw_ser.h>     /* Required for bus macros overrides */
 
 #include <mware/formatwr.h> /* for _formatted_write() */
+#include <mware/pgm.h>
 
 #ifdef _DEBUG
 
