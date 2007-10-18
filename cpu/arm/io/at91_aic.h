@@ -88,13 +88,14 @@
  */
 #define AIC_PRIOR_MASK 0x00000007
 
-/** 
+/**
  * Interrupt source type mask.
  * Internal interrupts can level sensitive or edge triggered.
  *
- * External interrupts can triggered on positive or negative levels or 
+ * External interrupts can triggered on positive or negative levels or
  * on rising or falling edges.
  */
+/*\{*/
 #define AIC_SRCTYPE_MASK 0x00000060
 
 #define AIC_SRCTYPE_INT_LEVEL_SENSITIVE 0x00000000      ///< Internal level sensitive.
