@@ -219,11 +219,16 @@
 		/**
 	 	 * Initialization value for registers in stack frame.
 	 	 * The register index is not directly corrispondent to CPU
-	 	 * register numbers, but is related to how are pushed to stack (\see asm_switch_context).
-		 * Index (CPU_SAVED_REGS_CNT - 1) is the CPSR register:
-		 * the initial value is taken from current CPSR.
+	 	 * register numbers, but is related to how are pushed to
+	 	 * stack (\see asm_switch_context).
+		 * Index (CPU_SAVED_REGS_CNT - 1) is the CPSR register,
+		 * the initial value is set to:
+		 * - All flags (N, Z, C, V) set to 0.
+		 * - IRQ and FIQ enabled.
+		 * - ARM state.
+		 * - CPU in Supervisor Mode (SVC).
 	 	 */
-		#define CPU_REG_INIT_VALUE(reg) (reg == (CPU_SAVED_REGS_CNT - 1) ? CPU_READ_FLAGS() : 0)
+		#define CPU_REG_INIT_VALUE(reg) (reg == (CPU_SAVED_REGS_CNT - 1) ? 0x13 : 0)
 
 	#endif /* !__IAR_SYSTEMS_ICC_ */
 
