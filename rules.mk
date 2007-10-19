@@ -40,6 +40,7 @@ TRG_HEX = $(TRG:%=$(OUTDIR)/%.hex)
 TRG_BIN = $(TRG:%=$(OUTDIR)/%.bin)
 TRG_ROM = $(TRG:%=$(OUTDIR)/%.rom)
 TRG_COF = $(TRG:%=$(OUTDIR)/%.cof)
+TRG_EXE = $(TRG:%=$(OUTDIR)/%)
 
 
 RECURSIVE_TARGETS = all-recursive install-recursive clean-recursive
@@ -49,7 +50,7 @@ RECURSIVE_TARGETS = all-recursive install-recursive clean-recursive
 ifeq ($(EMBEDDED_TARGET),1)
 all:: all-recursive $(TRG_S19) $(TRG_HEX) $(TRG_BIN)
 else
-all:: all-recursive $(TRG_ELF)
+all:: all-recursive $(TRG_EXE)
 endif
 
 # Generate project documentation
@@ -125,15 +126,15 @@ $$($(1)_CPPAOBJ): $$(OBJDIR)/$(1)/%.o : %.S
 	
 
 # Link: instructions to create elf output file from object files
-$$(OUTDIR)/$(1).elf: bumprev $$($(1)_OBJ) $$($(1)_LDSCRIPT)
-	$L "$(1): Linking $$(OUTDIR)/$(1)"
+$$(OUTDIR)/$(1).elf $$(OUTDIR)/$(1)_nostrip: bumprev $$($(1)_OBJ) $$($(1)_LDSCRIPT)
+	$L "$(1): Linking $$@"
 	@$$(MKDIR_P) $$(dir $$@)
-ifeq ($(EMBEDDED_TARGET), 1)
 	$Q $$(LD) $$($(1)_OBJ) $$(LIB) $$(LDFLAGS) $$($(1)_LDFLAGS) -o $$@
-else
-	$Q $$(LD) $$($(1)_OBJ) $$(LIB) $$(LDFLAGS) $$($(1)_LDFLAGS) -o $$(OUTDIR)/$(1)_nostrip
-	$Q $$(STRIP) -o $$(OUTDIR)/$(1) $$(OUTDIR)/$(1)_nostrip
-endif
+
+# Strip debug info
+$$(OUTDIR)/$(1): $$(OUTDIR)/$(1)_nostrip
+	$L "$(1): Generating stripped executable $$@"
+	$Q $$(STRIP) -o $$@ $$^
  
 # Compile and link (program-at-a-time)
 $$(OUTDIR)/$(1)_whole.elf: bumprev $$($(1)_SRC) $$($(1)_LDSCRIPT)
