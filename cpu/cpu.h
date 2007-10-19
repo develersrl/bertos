@@ -120,7 +120,7 @@
 	/* Register counts include SREG too */
 	#define CPU_REG_BITS           32
 	#define CPU_REGS_CNT           16
-	#define CPU_SAVED_REGS_CNT     FIXME
+	#define CPU_SAVED_REGS_CNT     9
 	#define CPU_STACK_GROWS_UPWARD 0
 	#define CPU_SP_ON_EMPTY_SLOT   0
 	#define CPU_BYTE_ORDER         (__BIG_ENDIAN__ ? CPU_BIG_ENDIAN : CPU_LITTLE_ENDIAN)
@@ -203,7 +203,7 @@
 			); \
 		} while (0)
 
-		#define IRQ_GETSTATE() \
+		#define CPU_READ_FLAGS() \
 		({ \
 			uint32_t sreg; \
 			asm volatile ( \
@@ -211,8 +211,19 @@
 				: "=r" (sreg) \
 				: /* no inputs */ \
 			); \
-			!((sreg & 0xc0) == 0xc0); \
+			sreg; \
 		})
+
+		#define IRQ_GETSTATE() (!((CPU_READ_FLAGS() & 0xc0) == 0xc0))
+
+		/**
+	 	 * Initialization value for registers in stack frame.
+	 	 * The register index is not directly corrispondent to CPU
+	 	 * register numbers, but is related to how are pushed to stack (\see asm_switch_context).
+		 * Index (CPU_SAVED_REGS_CNT - 1) is the CPSR register:
+		 * the initial value is taken from current CPSR.
+	 	 */
+		#define CPU_REG_INIT_VALUE(reg) (reg == (CPU_SAVED_REGS_CNT - 1) ? CPU_READ_FLAGS() : 0)
 
 	#endif /* !__IAR_SYSTEMS_ICC_ */
 
