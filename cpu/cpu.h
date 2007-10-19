@@ -205,7 +205,7 @@
 
 		#define CPU_READ_FLAGS() \
 		({ \
-			uint32_t sreg; \
+			cpuflags_t sreg; \
 			asm volatile ( \
 				"mrs %0, cpsr\n\t" \
 				: "=r" (sreg) \
