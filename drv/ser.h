@@ -148,15 +148,17 @@
 #ifndef DRV_SER_H
 #define DRV_SER_H
 
+#include <cpu/detect.h>
 #include <mware/fifobuf.h>
 #include <cfg/compiler.h>
 #include <cfg/macros.h> /* BV() */
 #include <cfg/os.h>
+
 #include <appconfig.h>
 
 /** \name Serial Error/status flags. */
 /*\{*/
-#if CPU_ARM
+#if CPU_ARM_AT91
 	typedef uint32_t serstatus_t;
 
 	/* Software errors */
@@ -173,7 +175,7 @@
 	#define SERRF_PARITYERROR    BV(7)  /**< Parity error */
 	#define SERRF_NOISEERROR     0      /**< Unsupported */
 
-#if CPU_AVR
+#elif CPU_AVR
 	typedef uint8_t serstatus_t;
 
 	/* Software errors */
@@ -270,7 +272,7 @@ enum
 	SER_UART0,
 	SER_UART1,
 	SER_SPI,
-#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281
+#elif CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281
 	SER_UART0,
 	SER_UART1,
 	SER_SPI,
