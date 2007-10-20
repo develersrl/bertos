@@ -187,10 +187,10 @@ static void serirq_dispatcher(void)
 {
 	IRQ_ENTRY();
 
-	if (US0_IMR | BV(US_RXRDY))
+	if (US0_IMR & BV(US_RXRDY))
 		serirq_rx();
 
-	if (US0_IMR | BV(US_TXRDY))
+	if (US0_IMR & BV(US_TXRDY))
 		serirq_tx();
 
 	IRQ_EXIT();
@@ -217,21 +217,23 @@ static void uart0_init(
 	PMC_PCER = BV(US0_ID);
 
     /* Disable GPIO on UART tx/rx pins. */
-	PIOA_PDR = BV(PA0_RXD0_A) | BV(PA1_TXD0_A);
+	PIOA_PDR = BV(PA5_RXD1_A) | BV(PA6_TXD1_A);
 
 	/* Reset UART. */
 	US0_CR = BV(US_RSTRX) | BV(US_RSTTX);
 
-	/* Enable Tx and Rx */
-	US0_CR = BV(US_RXEN) | BV(US_TXEN);
-
-	US0_IER = BV(US_RXRDY);
-
-    /* enable GPIO on UART tx/rx pins. */
-	PIOA_PER = BV(PA0_RXD0_A) | BV(PA1_TXD0_A);
 
 	/* Set serial param: mode Normal, 8bit data, 1bit stop */
 	US0_MR |= US_CHMODE_NORMAL | US_CHRL_8 | US_NBSTOP_1;
+
+	/* Enable Tx and Rx */
+	US0_CR = BV(US_RXEN) | BV(US_TXEN);
+
+	US0_IER = BV(US_RXRDY) | BV(US_TXRDY);
+
+    /* enable GPIO on UART tx/rx pins. */
+	PIOA_PER = BV(PA5_RXD1_A) | BV(PA6_TXD1_A);
+
 }
 
 static void uart0_cleanup(UNUSED_ARG(struct SerialHardware *, _hw))
@@ -332,3 +334,9 @@ static struct ArmSerial UARTDescs[SER_CNT] =
 		C99INIT(sending, false),
 	}
 };
+
+struct SerialHardware *ser_hw_getdesc(int unit)
+{
+	ASSERT(unit < SER_CNT);
+	return &UARTDescs[unit].hw;
+}
