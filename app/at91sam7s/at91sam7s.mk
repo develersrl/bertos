@@ -19,11 +19,14 @@ TRG += at91sam7s
 at91sam7s_CSRC = \
 	app/at91sam7s/at91sam7s.c \
 	drv/timer.c \
+	drv/ser.c \
 	cpu/arm/drv/sysirq_at91.c \
+	cpu/arm/drv/ser_at91.c \
 	mware/event.c \
 	mware/formatwr.c \
 	mware/hex.c
-	
+
+
 
 at91sam7s_CPPASRC = cpu/arm/hw/crtat91sam7s256_rom.S
 
