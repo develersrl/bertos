@@ -39,6 +39,7 @@
 
 #include <drv/timer.h>
 #include <drv/sysirq_at91.h>
+#include <drv/ser.h>
 #include <cfg/macros.h>
 #include <io/arm.h>
 
@@ -75,6 +76,13 @@ int main(void)
 	kdbg_init();
 	sysirq_init();
 	timer_init();
+
+
+	/* Open the main communication port */
+	Serial *host_port = ser_open(0);
+	ser_setbaudrate(host_port, 115200);
+	ser_setparity(host_port, SER_PARITY_NONE);
+
 	IRQ_ENABLE;
 
 	/* Disable all pullups */
@@ -91,14 +99,19 @@ int main(void)
 	/* turn first led on */
 	PIOA_CODR  = 0x00000001;
 
+
+
+
+/*
 	timer_set_event_softint(&leds_timer, (Hook)leds_toggle, 0);
 	timer_setDelay(&leds_timer, ms_to_ticks(100));
 	timer_add(&leds_timer);
-
+*/
 
 	// Main loop
 	for(;;)
 	{
+		ser_printf(host_port," %s", "a");
 		kprintf("W la figa!\n");
 		iort+= 1;
 		iort1+= 1;
