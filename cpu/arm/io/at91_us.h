@@ -79,7 +79,7 @@
 #define US_CR_OFF               0x00000000      ///< USART control register offset.
 #define US0_CR  (*((reg32_t *)(USART0_BASE + US_CR_OFF)))       ///< Channel 0 control register address.
 #define US1_CR  (*((reg32_t *)(USART1_BASE + US_CR_OFF)))       ///< Channel 1 control register address.
-#define US_RSTRX                         2      ///< Reset receiver. */
+#define US_RSTRX                         2      ///< Reset receiver.
 #define US_RSTTX                         3      ///< Reset transmitter.
 #define US_RXEN                          4      ///< Receiver enable.
 #define US_RXDIS                         5      ///< Receiver disable.
@@ -91,7 +91,7 @@
 #define US_STTTO                         11     ///< Start timeout.
 #define US_SENDA                         12     ///< Send next byte with address bit set.
 #define US_RSTIT                         13     ///< Reset interations.
-#define US_RTSNAK                        14     ///< Reset non acknowledge.
+#define US_RSTNAK                        14     ///< Reset non acknowledge.
 #define US_RETTO                         15     ///< Rearm time out.
 #define US_DTREN                         16     ///< Data terminal ready enable.
 #define US_DTRDIS                        17     ///< Data terminal ready disable.
