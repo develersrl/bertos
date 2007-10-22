@@ -145,10 +145,15 @@ static void serirq_tx(void)
 	{
 		/* Enable Tx and Rx */
 		US0_CR = BV(US_RXEN) | BV(US_TXEN);
+		/* Enable Rx interrupt */
+		US0_IER = BV(US_RXRDY);
+		/* Disable Tx interrupt */
+		US0_IDR = BV(US_TXRDY);
 	}
 	else
 	{
 		char c = fifo_pop(txfifo);
+		kprintf("Tx char: %c\n", c);
 		/* Send one char */
 		US0_THR = c;
 	}
@@ -163,7 +168,7 @@ static void serirq_rx(void)
 {
 	SER_STROBE_ON;
 
-	/* Should be read before UDR */
+	/* Should be read before US_CRS */
 	ser_uart0->status |= US0_CSR & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
 
 	char c = US0_RHR;
@@ -173,6 +178,7 @@ static void serirq_rx(void)
 		ser_uart0->status |= SERRF_RXFIFOOVERRUN;
 	else
 	{
+		kprintf("Recv char: %c\n", c);
 		fifo_push(rxfifo, c);
 	}
 
@@ -188,11 +194,15 @@ static void serirq_dispatcher(void)
 	IRQ_ENTRY();
 
 	if (US0_IMR & BV(US_RXRDY))
+	{
+		kprintf("IRQ RX\n");
 		serirq_rx();
-
+	}
 	if (US0_IMR & BV(US_TXRDY))
+	{
+		kprintf("IRQ TX\n");
 		serirq_tx();
-
+	}
 	IRQ_EXIT();
 }
 
@@ -219,17 +229,17 @@ static void uart0_init(
     /* Disable GPIO on UART tx/rx pins. */
 	PIOA_PDR = BV(5) | BV(6);
 
-	/* Set serial param: mode Normal, 8bit data, 1bit stop */
-	US0_MR = US_CHMODE_NORMAL | US_CHRL_8 | US_NBSTOP_1;
-
 	/* Reset UART. */
 	US0_CR = BV(US_RSTRX) | BV(US_RSTTX);
+
+	/* Set serial param: mode Normal, 8bit data, 1bit stop */
+	US0_MR = US_CHMODE_NORMAL | US_CHRL_8 | US_NBSTOP_1;
 
 	/* Enable Tx and Rx */
 	US0_CR = BV(US_RXEN) | BV(US_TXEN);
 
-	/* Enable Tx and Rx interrupt*/
-	US0_IER = BV(US_RXRDY) | BV(US_TXRDY);
+	/* Enable Rx interrupt*/
+	US0_IER = BV(US_RXRDY);
 
 
 }
@@ -253,6 +263,8 @@ static void uart0_enabletxirq(struct SerialHardware *_hw)
 		hw->sending = true;
 		/* Enable Tx and Rx */
 		US0_CR = BV(US_RXEN) | BV(US_TXEN);
+		/* Enable Tx and Rx interrupt*/
+		US0_IER = BV(US_TXRDY) | BV(US_RXRDY);
 	}
 }
 
