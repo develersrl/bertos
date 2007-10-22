@@ -94,7 +94,7 @@
  *
  * \sa config_kern.h
  */
-#define CONFIG_KERNEL 0
+#define CONFIG_KERNEL 1
 
 /**
  * \name Serial driver parameters

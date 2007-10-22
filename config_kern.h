@@ -99,7 +99,7 @@
 #if (ARCH & ARCH_EMUL)
 	#define CONFIG_KERN_DEFSTACKSIZE  65536
 #else
-	#define CONFIG_KERN_DEFSTACKSIZE  128  /**< Default stack size for each thread. */
+	#define CONFIG_KERN_DEFSTACKSIZE  1024  /**< Default stack size for each thread. */
 #endif
 
 /* Memory fill codes to help debugging */

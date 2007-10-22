@@ -37,8 +37,10 @@
  * \brief AT91SAM7S-EK porting test.
  */
 
+#include <cfg/macros.h>
 #include <drv/timer.h>
 #include <drv/sysirq_at91.h>
+#include <kern/proc.h>
 #include <drv/ser.h>
 #include <cfg/macros.h>
 #include <io/arm.h>
@@ -77,6 +79,10 @@ int main(void)
 	sysirq_init();
 	timer_init();
 
+	proc_init();
+	ASSERT(!IRQ_GETSTATE());
+
+
 
 	/* Open the main communication port */
 	Serial *host_port = ser_open(0);
@@ -84,6 +90,7 @@ int main(void)
 	ser_setparity(host_port, SER_PARITY_NONE);
 
 	IRQ_ENABLE;
+	ASSERT(IRQ_GETSTATE());
 
 	/* Disable all pullups */
 	PIOA_PUDR = 0xffffffff;
@@ -99,20 +106,16 @@ int main(void)
 	/* turn first led on */
 	PIOA_CODR  = 0x00000001;
 
-
-
-
-/*
 	timer_set_event_softint(&leds_timer, (Hook)leds_toggle, 0);
 	timer_setDelay(&leds_timer, ms_to_ticks(100));
 	timer_add(&leds_timer);
-*/
 
 	// Main loop
 	for(;;)
 	{
 		ser_printf(host_port," %s", "a");
 		kprintf("W la figa!\n");
+		proc_test();
 		iort+= 1;
 		iort1+= 1;
 		iort2+= 1;
