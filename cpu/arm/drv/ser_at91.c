@@ -203,36 +203,34 @@ static void uart0_init(
 	UNUSED_ARG(struct SerialHardware *, _hw),
 	UNUSED_ARG(struct Serial *, ser))
 {
+	/* Disable all interrupt */
+	US0_IDR = 0xFFFFFFFF;
 
 	/* Set the vector. */
 	AIC_SVR(US0_ID) = serirq_dispatcher;
 	/* Initialize to edge triggered with defined priority. */
 	AIC_SMR(US0_ID) = AIC_SRCTYPE_INT_EDGE_TRIGGERED;
-	/* Clear pending interrupt */
-	AIC_ICCR = BV(US0_ID);
-	/* Enable the system IRQ */
+	/* Enable the USART IRQ */
 	AIC_IECR = BV(US0_ID);
 
     /* Enable UART clock. */
 	PMC_PCER = BV(US0_ID);
 
     /* Disable GPIO on UART tx/rx pins. */
-	PIOA_PDR = BV(PA5_RXD1_A) | BV(PA6_TXD1_A);
+	PIOA_PDR = BV(5) | BV(6);
+
+	/* Set serial param: mode Normal, 8bit data, 1bit stop */
+	US0_MR = US_CHMODE_NORMAL | US_CHRL_8 | US_NBSTOP_1;
 
 	/* Reset UART. */
 	US0_CR = BV(US_RSTRX) | BV(US_RSTTX);
 
-
-	/* Set serial param: mode Normal, 8bit data, 1bit stop */
-	US0_MR |= US_CHMODE_NORMAL | US_CHRL_8 | US_NBSTOP_1;
-
 	/* Enable Tx and Rx */
 	US0_CR = BV(US_RXEN) | BV(US_TXEN);
 
+	/* Enable Tx and Rx interrupt*/
 	US0_IER = BV(US_RXRDY) | BV(US_TXRDY);
 
-    /* enable GPIO on UART tx/rx pins. */
-	PIOA_PER = BV(PA5_RXD1_A) | BV(PA6_TXD1_A);
 
 }
 
