@@ -106,7 +106,7 @@
 	 */
 	#if CPU_ARM_AT91
 		#define SER_UART0_BUS_TXINIT do { \
-			PIOA_PDR = BV(5) | BV(6);\
+			PIOA_PDR = BV(5) | BV(6); \
 			US0_CR = BV(US_RSTRX) | BV(US_RSTTX); \
 			US0_MR = US_CHMODE_NORMAL | US_CHRL_8 | US_NBSTOP_1; \
 			US0_CR = BV(US_RXEN) | BV(US_TXEN); \
@@ -163,7 +163,7 @@
 	#define SER_UART1_IRQ_INIT do { \
 		US1_IDR = 0xFFFFFFFF; \
 		/* Set the vector. */ \
-		AIC_SVR(US1_ID) = uart0_irq_dispatcher; \
+		AIC_SVR(US1_ID) = uart1_irq_dispatcher; \
 		/* Initialize to edge triggered with defined priority. */ \
 		AIC_SMR(US1_ID) = AIC_SRCTYPE_INT_EDGE_TRIGGERED; \
 		/* Enable the USART IRQ */ \
@@ -176,7 +176,7 @@
 	/** \sa SER_UART1_BUS_TXINIT */
 	#if CPU_ARM_AT91
 		#define SER_UART1_BUS_TXINIT do { \
-			PIOA_PDR = BV(0) | BV(1); \
+			PIOA_PDR = BV(21) | BV(22); \
 			US1_CR = BV(US_RSTRX) | BV(US_RSTTX); \
 			US1_MR = US_CHMODE_NORMAL | US_CHRL_8 | US_NBSTOP_1; \
 			US1_CR = BV(US_RXEN) | BV(US_TXEN); \
@@ -276,7 +276,7 @@ struct Serial *ser_uart1 = &ser_handles[SER_UART1];
 /**
  * Serial 0 TX interrupt handler
  */
-static void usart0_irq_tx(void)
+static void uart0_irq_tx(void)
 {
 	SER_STROBE_ON;
 
@@ -289,7 +289,7 @@ static void usart0_irq_tx(void)
 	else
 	{
 		char c = fifo_pop(txfifo);
-// 		kprintf("USART0 tx char: %c\n", c);
+		kprintf("USART0 tx char: %c\n", c);
 		SER_UART0_BUS_TXCHAR(c);
 	}
 
@@ -299,7 +299,7 @@ static void usart0_irq_tx(void)
 /**
  * Serial 0 RX complete interrupt handler.
  */
-static void usart0_irq_rx(void)
+static void uart0_irq_rx(void)
 {
 	SER_STROBE_ON;
 
@@ -313,7 +313,7 @@ static void usart0_irq_rx(void)
 		ser_uart0->status |= SERRF_RXFIFOOVERRUN;
 	else
 	{
-// 		kprintf("USART0 recv char: %c\n", c);
+		kprintf("USART0 recv char: %c\n", c);
 		fifo_push(rxfifo, c);
 	}
 
@@ -330,13 +330,13 @@ static void uart0_irq_dispatcher(void)
 
 	if (US0_IMR & BV(US_RXRDY))
 	{
-//		kprintf("IRQ RX USART0\n");
-		usart0_irq_rx();
+		kprintf("IRQ RX USART0\n");
+		uart0_irq_rx();
 	}
 	if (US0_IMR & BV(US_TXRDY))
 	{
-//		kprintf("IRQ TX USART0\n");
-		usart0_irq_tx();
+		kprintf("IRQ TX USART0\n");
+		uart0_irq_tx();
 	}
 	IRQ_EXIT();
 }
@@ -344,7 +344,7 @@ static void uart0_irq_dispatcher(void)
 /**
  * Serial 1 TX interrupt handler
  */
-static void usart1_irq_tx(void)
+static void uart1_irq_tx(void)
 {
 	SER_STROBE_ON;
 
@@ -357,7 +357,7 @@ static void usart1_irq_tx(void)
 	else
 	{
 		char c = fifo_pop(txfifo);
-// 		kprintf("USART1 tx char: %c\n", c);
+		kprintf("USART1 tx char: %c\n", c);
 		SER_UART1_BUS_TXCHAR(c);
 	}
 
@@ -367,7 +367,7 @@ static void usart1_irq_tx(void)
 /**
  * Serial 1 RX complete interrupt handler.
  */
-static void usart1_irq_rx(void)
+static void uart1_irq_rx(void)
 {
 	SER_STROBE_ON;
 
@@ -381,7 +381,7 @@ static void usart1_irq_rx(void)
 		ser_uart1->status |= SERRF_RXFIFOOVERRUN;
 	else
 	{
-// 		kprintf("USART1 recv char: %c\n", c);
+		kprintf("USART1 recv char: %c\n", c);
 		fifo_push(rxfifo, c);
 	}
 
@@ -398,13 +398,13 @@ static void uart1_irq_dispatcher(void)
 
 	if (US1_IMR & BV(US_RXRDY))
 	{
-//		kprintf("IRQ RX USART1\n");
-		usart1_irq_rx();
+		kprintf("IRQ RX USART1\n");
+		uart1_irq_rx();
 	}
 	if (US1_IMR & BV(US_TXRDY))
 	{
-//		kprintf("IRQ TX USART1\n");
-		usart1_irq_tx();
+		kprintf("IRQ TX USART1\n");
+		uart1_irq_tx();
 	}
 	IRQ_EXIT();
 }
@@ -510,7 +510,7 @@ static void uart1_enabletxirq(struct SerialHardware *_hw)
 static void uart1_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned long rate)
 {
 	/* Compute baud-rate period */
-	US0_BRGR = CLOCK_FREQ / (16 * rate);
+	US1_BRGR = CLOCK_FREQ / (16 * rate);
 	//DB(kprintf("uart0_setbaudrate(rate=%lu): period=%d\n", rate, period);)
 }
 
@@ -572,11 +572,11 @@ static const struct SerialHardwareVT UART0_VT =
 
 static const struct SerialHardwareVT UART1_VT =
 {
-	C99INIT(init, uart0_init),
-	C99INIT(cleanup, uart0_cleanup),
-	C99INIT(setBaudrate, uart0_setbaudrate),
-	C99INIT(setParity, uart0_setparity),
-	C99INIT(txStart, uart0_enabletxirq),
+	C99INIT(init, uart1_init),
+	C99INIT(cleanup, uart1_cleanup),
+	C99INIT(setBaudrate, uart1_setbaudrate),
+	C99INIT(setParity, uart1_setparity),
+	C99INIT(txStart, uart1_enabletxirq),
 	C99INIT(txSending, tx_sending),
 };
 
