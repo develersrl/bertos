@@ -74,7 +74,87 @@
  * \{
  */
 
+#ifndef SER_UART0_IRQ_INIT
+	/**
+	 * Default IRQ INIT macro - invoked in uart0_init()
+	 *
+	 * - Disable all interrupt
+	 * - Register USART0 interrupt
+	 * - Enable USART0 clock.
+	 */
+	#define SER_UART0_IRQ_INIT do { \
+		US0_IDR = 0xFFFFFFFF; \
+		/* Set the vector. */ \
+		AIC_SVR(US0_ID) = uart0_irq_dispatcher; \
+		/* Initialize to edge triggered with defined priority. */ \
+		AIC_SMR(US0_ID) = AIC_SRCTYPE_INT_EDGE_TRIGGERED; \
+		/* Enable the USART IRQ */ \
+		AIC_IECR = BV(US0_ID); \
+		PMC_PCER = BV(US0_ID); \
+	} while (0)
+#endif
 
+#ifndef SER_UART0_BUS_TXINIT
+	/**
+	 * Default TXINIT macro - invoked in uart0_init()
+	 *
+	 * - Disable GPIO on USART0 tx/rx pins
+	 * - Reset USART0
+	 * - Set serial param: mode Normal, 8bit data, 1bit stop
+	 * - Enable both the receiver and the transmitter
+	 * - Enable only the RX complete interrupt
+	 */
+	#if CPU_ARM_AT91
+		#define SER_UART0_BUS_TXINIT do { \
+			PIOA_PDR = BV(5) | BV(6);\
+			US0_CR = BV(US_RSTRX) | BV(US_RSTTX); \
+			US0_MR = US_CHMODE_NORMAL | US_CHRL_8 | US_NBSTOP_1; \
+			US0_CR = BV(US_RXEN) | BV(US_TXEN); \
+			US0_IER = BV(US_RXRDY); \
+		} while (0)
+	/*#elif  Add other ARM families here */
+	#else
+		#error Unknown CPU
+	#endif
+
+#endif
+
+#ifndef SER_UART0_BUS_TXBEGIN
+	/**
+	 * Invoked before starting a transmission
+	 *
+	 * - Enable both the receiver and the transmitter
+	 * - Enable both the RX complete and TX empty interrupts
+	 */
+	#define SER_UART0_BUS_TXBEGIN do { \
+		US0_CR = BV(US_RXEN) | BV(US_TXEN); \
+		US0_IER = BV(US_TXRDY) | BV(US_RXRDY); \
+	} while (0)
+#endif
+
+#ifndef SER_UART0_BUS_TXCHAR
+	/**
+	 * Invoked to send one character.
+	 */
+	#define SER_UART0_BUS_TXCHAR(c) do { \
+		US0_THR = c; \
+	} while (0)
+#endif
+
+#ifndef SER_UART0_BUS_TXEND
+	/**
+	 * Invoked as soon as the txfifo becomes empty
+	 *
+	 * - Keep both the receiver and the transmitter enabled
+	 * - Keep the RX complete interrupt enabled
+	 * - Disable the TX empty interrupts
+	 */
+	#define SER_UART0_BUS_TXEND do { \
+		US0_CR = BV(US_RXEN) | BV(US_TXEN); \
+		US0_IER = BV(US_RXRDY); \
+		US0_IDR = BV(US_TXRDY); \
+	} while (0)
+#endif
 
 /**
  * \def CONFIG_SER_STROBE
@@ -143,19 +223,13 @@ static void serirq_tx(void)
 
 	if (fifo_isempty(txfifo))
 	{
-		/* Enable Tx and Rx */
-		US0_CR = BV(US_RXEN) | BV(US_TXEN);
-		/* Enable Rx interrupt */
-		US0_IER = BV(US_RXRDY);
-		/* Disable Tx interrupt */
-		US0_IDR = BV(US_TXRDY);
+		SER_UART0_BUS_TXEND;
 	}
 	else
 	{
 		char c = fifo_pop(txfifo);
-		kprintf("Tx char: %c\n", c);
-		/* Send one char */
-		US0_THR = c;
+// 		kprintf("Tx char: %c\n", c);
+		SER_UART0_BUS_TXCHAR(c);
 	}
 
 	SER_STROBE_OFF;
@@ -178,7 +252,7 @@ static void serirq_rx(void)
 		ser_uart0->status |= SERRF_RXFIFOOVERRUN;
 	else
 	{
-		kprintf("Recv char: %c\n", c);
+// 		kprintf("Recv char: %c\n", c);
 		fifo_push(rxfifo, c);
 	}
 
@@ -188,19 +262,19 @@ static void serirq_rx(void)
 /**
  * Serial IRQ dispatcher.
  */
-static void serirq_dispatcher(void) __attribute__ ((naked));
-static void serirq_dispatcher(void)
+static void uart0_irq_dispatcher(void) __attribute__ ((naked));
+static void uart0_irq_dispatcher(void)
 {
 	IRQ_ENTRY();
 
 	if (US0_IMR & BV(US_RXRDY))
 	{
-		kprintf("IRQ RX\n");
+//		kprintf("IRQ RX\n");
 		serirq_rx();
 	}
 	if (US0_IMR & BV(US_TXRDY))
 	{
-		kprintf("IRQ TX\n");
+//		kprintf("IRQ TX\n");
 		serirq_tx();
 	}
 	IRQ_EXIT();
@@ -213,35 +287,9 @@ static void uart0_init(
 	UNUSED_ARG(struct SerialHardware *, _hw),
 	UNUSED_ARG(struct Serial *, ser))
 {
-	/* Disable all interrupt */
-	US0_IDR = 0xFFFFFFFF;
-
-	/* Set the vector. */
-	AIC_SVR(US0_ID) = serirq_dispatcher;
-	/* Initialize to edge triggered with defined priority. */
-	AIC_SMR(US0_ID) = AIC_SRCTYPE_INT_EDGE_TRIGGERED;
-	/* Enable the USART IRQ */
-	AIC_IECR = BV(US0_ID);
-
-    /* Enable UART clock. */
-	PMC_PCER = BV(US0_ID);
-
-    /* Disable GPIO on UART tx/rx pins. */
-	PIOA_PDR = BV(5) | BV(6);
-
-	/* Reset UART. */
-	US0_CR = BV(US_RSTRX) | BV(US_RSTTX);
-
-	/* Set serial param: mode Normal, 8bit data, 1bit stop */
-	US0_MR = US_CHMODE_NORMAL | US_CHRL_8 | US_NBSTOP_1;
-
-	/* Enable Tx and Rx */
-	US0_CR = BV(US_RXEN) | BV(US_TXEN);
-
-	/* Enable Rx interrupt*/
-	US0_IER = BV(US_RXRDY);
-
-
+	SER_UART0_IRQ_INIT;
+	SER_UART0_BUS_TXINIT;
+	SER_STROBE_INIT;
 }
 
 static void uart0_cleanup(UNUSED_ARG(struct SerialHardware *, _hw))
@@ -261,10 +309,7 @@ static void uart0_enabletxirq(struct SerialHardware *_hw)
 	if (!hw->sending)
 	{
 		hw->sending = true;
-		/* Enable Tx and Rx */
-		US0_CR = BV(US_RXEN) | BV(US_TXEN);
-		/* Enable Tx and Rx interrupt*/
-		US0_IER = BV(US_TXRDY) | BV(US_RXRDY);
+		SER_UART0_BUS_TXBEGIN;
 	}
 }
 
