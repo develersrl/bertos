@@ -156,6 +156,63 @@
 	} while (0)
 #endif
 
+/* End USART0 macros */
+
+#ifndef SER_UART1_IRQ_INIT
+	/** \sa SER_UART0_BUS_TXINIT */
+	#define SER_UART1_IRQ_INIT do { \
+		US1_IDR = 0xFFFFFFFF; \
+		/* Set the vector. */ \
+		AIC_SVR(US1_ID) = uart0_irq_dispatcher; \
+		/* Initialize to edge triggered with defined priority. */ \
+		AIC_SMR(US1_ID) = AIC_SRCTYPE_INT_EDGE_TRIGGERED; \
+		/* Enable the USART IRQ */ \
+		AIC_IECR = BV(US1_ID); \
+		PMC_PCER = BV(US1_ID); \
+	} while (0)
+#endif
+
+#ifndef SER_UART1_BUS_TXINIT
+	/** \sa SER_UART1_BUS_TXINIT */
+	#if CPU_ARM_AT91
+		#define SER_UART1_BUS_TXINIT do { \
+			PIOA_PDR = BV(0) | BV(1); \
+			US1_CR = BV(US_RSTRX) | BV(US_RSTTX); \
+			US1_MR = US_CHMODE_NORMAL | US_CHRL_8 | US_NBSTOP_1; \
+			US1_CR = BV(US_RXEN) | BV(US_TXEN); \
+			US1_IER = BV(US_RXRDY); \
+		} while (0)
+	/*#elif  Add other ARM families here */
+	#else
+		#error Unknown CPU
+	#endif
+
+#endif
+
+#ifndef SER_UART1_BUS_TXBEGIN
+	/** \sa SER_UART1_BUS_TXBEGIN */
+	#define SER_UART1_BUS_TXBEGIN do { \
+		US1_CR = BV(US_RXEN) | BV(US_TXEN); \
+		US1_IER = BV(US_TXRDY) | BV(US_RXRDY); \
+	} while (0)
+#endif
+
+#ifndef SER_UART1_BUS_TXCHAR
+	/** \sa SER_UART1_BUS_TXCHAR */
+	#define SER_UART1_BUS_TXCHAR(c) do { \
+		US1_THR = c; \
+	} while (0)
+#endif
+
+#ifndef SER_UART1_BUS_TXEND
+	/** \sa SER_UART1_BUS_TXEND */
+	#define SER_UART1_BUS_TXEND do { \
+		US1_CR = BV(US_RXEN) | BV(US_TXEN); \
+		US1_IER = BV(US_RXRDY); \
+		US1_IDR = BV(US_TXRDY); \
+	} while (0)
+#endif
+
 /**
  * \def CONFIG_SER_STROBE
  *
@@ -179,6 +236,9 @@ extern struct Serial ser_handles[SER_CNT];
 /* TX and RX buffers */
 static unsigned char uart0_txbuffer[CONFIG_UART0_TXBUFSIZE];
 static unsigned char uart0_rxbuffer[CONFIG_UART0_RXBUFSIZE];
+
+static unsigned char uart1_txbuffer[CONFIG_UART1_TXBUFSIZE];
+static unsigned char uart1_rxbuffer[CONFIG_UART1_RXBUFSIZE];
 
 /**
  * Internal hardware state structure
@@ -211,11 +271,12 @@ struct ArmSerial
  * (and hopefully faster) code.
  */
 struct Serial *ser_uart0 = &ser_handles[SER_UART0];
+struct Serial *ser_uart1 = &ser_handles[SER_UART1];
 
 /**
  * Serial 0 TX interrupt handler
  */
-static void serirq_tx(void)
+static void usart0_irq_tx(void)
 {
 	SER_STROBE_ON;
 
@@ -228,7 +289,7 @@ static void serirq_tx(void)
 	else
 	{
 		char c = fifo_pop(txfifo);
-// 		kprintf("Tx char: %c\n", c);
+// 		kprintf("USART0 tx char: %c\n", c);
 		SER_UART0_BUS_TXCHAR(c);
 	}
 
@@ -238,7 +299,7 @@ static void serirq_tx(void)
 /**
  * Serial 0 RX complete interrupt handler.
  */
-static void serirq_rx(void)
+static void usart0_irq_rx(void)
 {
 	SER_STROBE_ON;
 
@@ -252,7 +313,7 @@ static void serirq_rx(void)
 		ser_uart0->status |= SERRF_RXFIFOOVERRUN;
 	else
 	{
-// 		kprintf("Recv char: %c\n", c);
+// 		kprintf("USART0 recv char: %c\n", c);
 		fifo_push(rxfifo, c);
 	}
 
@@ -260,7 +321,7 @@ static void serirq_rx(void)
 }
 
 /**
- * Serial IRQ dispatcher.
+ * Serial IRQ dispatcher for USART0.
  */
 static void uart0_irq_dispatcher(void) __attribute__ ((naked));
 static void uart0_irq_dispatcher(void)
@@ -269,19 +330,86 @@ static void uart0_irq_dispatcher(void)
 
 	if (US0_IMR & BV(US_RXRDY))
 	{
-//		kprintf("IRQ RX\n");
-		serirq_rx();
+//		kprintf("IRQ RX USART0\n");
+		usart0_irq_rx();
 	}
 	if (US0_IMR & BV(US_TXRDY))
 	{
-//		kprintf("IRQ TX\n");
-		serirq_tx();
+//		kprintf("IRQ TX USART0\n");
+		usart0_irq_tx();
 	}
 	IRQ_EXIT();
 }
 
+/**
+ * Serial 1 TX interrupt handler
+ */
+static void usart1_irq_tx(void)
+{
+	SER_STROBE_ON;
+
+	struct FIFOBuffer * const txfifo = &ser_uart1->txfifo;
+
+	if (fifo_isempty(txfifo))
+	{
+		SER_UART1_BUS_TXEND;
+	}
+	else
+	{
+		char c = fifo_pop(txfifo);
+// 		kprintf("USART1 tx char: %c\n", c);
+		SER_UART1_BUS_TXCHAR(c);
+	}
+
+	SER_STROBE_OFF;
+}
+
+/**
+ * Serial 1 RX complete interrupt handler.
+ */
+static void usart1_irq_rx(void)
+{
+	SER_STROBE_ON;
+
+	/* Should be read before US_CRS */
+	ser_uart1->status |= US1_CSR & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
+
+	char c = US1_RHR;
+	struct FIFOBuffer * const rxfifo = &ser_uart1->rxfifo;
+
+	if (fifo_isfull(rxfifo))
+		ser_uart1->status |= SERRF_RXFIFOOVERRUN;
+	else
+	{
+// 		kprintf("USART1 recv char: %c\n", c);
+		fifo_push(rxfifo, c);
+	}
+
+	SER_STROBE_OFF;
+}
+
+/**
+ * Serial IRQ dispatcher for USART1.
+ */
+static void uart1_irq_dispatcher(void) __attribute__ ((naked));
+static void uart1_irq_dispatcher(void)
+{
+	IRQ_ENTRY();
+
+	if (US1_IMR & BV(US_RXRDY))
+	{
+//		kprintf("IRQ RX USART1\n");
+		usart1_irq_rx();
+	}
+	if (US1_IMR & BV(US_TXRDY))
+	{
+//		kprintf("IRQ TX USART1\n");
+		usart1_irq_tx();
+	}
+	IRQ_EXIT();
+}
 /*
- * Callbacks
+ * Callbacks for USART0
  */
 static void uart0_init(
 	UNUSED_ARG(struct SerialHardware *, _hw),
@@ -346,6 +474,72 @@ static void uart0_setparity(UNUSED_ARG(struct SerialHardware *, _hw), int parity
 	}
 
 }
+/*
+ * Callbacks for USART1
+ */
+static void uart1_init(
+	UNUSED_ARG(struct SerialHardware *, _hw),
+	UNUSED_ARG(struct Serial *, ser))
+{
+	SER_UART1_IRQ_INIT;
+	SER_UART1_BUS_TXINIT;
+	SER_STROBE_INIT;
+}
+
+static void uart1_cleanup(UNUSED_ARG(struct SerialHardware *, _hw))
+{
+	US1_CR = BV(US_RSTRX) | BV(US_RSTTX) | BV(US_RXDIS) | BV(US_TXDIS) | BV(US_RSTSTA);
+}
+
+static void uart1_enabletxirq(struct SerialHardware *_hw)
+{
+	struct ArmSerial *hw = (struct ArmSerial *)_hw;
+
+	/*
+	 * WARNING: racy code here!  The tx interrupt sets hw->sending to false
+	 * when it runs with an empty fifo.  The order of statements in the
+	 * if-block matters.
+	 */
+	if (!hw->sending)
+	{
+		hw->sending = true;
+		SER_UART1_BUS_TXBEGIN;
+	}
+}
+
+static void uart1_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned long rate)
+{
+	/* Compute baud-rate period */
+	US0_BRGR = CLOCK_FREQ / (16 * rate);
+	//DB(kprintf("uart0_setbaudrate(rate=%lu): period=%d\n", rate, period);)
+}
+
+static void uart1_setparity(UNUSED_ARG(struct SerialHardware *, _hw), int parity)
+{
+	/* Set UART parity */
+	switch(parity)
+	{
+		case SER_PARITY_NONE:
+		{
+            /* Parity mode. */
+			US1_MR |= US_PAR_MASK;
+			break;
+		}
+		case SER_PARITY_EVEN:
+		{
+            /* Even parity.*/
+			US1_MR |= US_PAR_EVEN;
+			break;
+		}
+		case SER_PARITY_ODD:
+		{
+            /* Odd parity.*/
+			US1_MR |= US_PAR_ODD;
+			break;
+		}
+	}
+
+}
 
 static bool tx_sending(struct SerialHardware* _hw)
 {
@@ -376,6 +570,16 @@ static const struct SerialHardwareVT UART0_VT =
 	C99INIT(txSending, tx_sending),
 };
 
+static const struct SerialHardwareVT UART1_VT =
+{
+	C99INIT(init, uart0_init),
+	C99INIT(cleanup, uart0_cleanup),
+	C99INIT(setBaudrate, uart0_setbaudrate),
+	C99INIT(setParity, uart0_setparity),
+	C99INIT(txStart, uart0_enabletxirq),
+	C99INIT(txSending, tx_sending),
+};
+
 static struct ArmSerial UARTDescs[SER_CNT] =
 {
 	{
@@ -385,6 +589,16 @@ static struct ArmSerial UARTDescs[SER_CNT] =
 			C99INIT(rxbuffer, uart0_rxbuffer),
 			C99INIT(txbuffer_size, sizeof(uart0_txbuffer)),
 			C99INIT(rxbuffer_size, sizeof(uart0_rxbuffer)),
+		},
+		C99INIT(sending, false),
+	},
+	{
+		C99INIT(hw, /**/) {
+			C99INIT(table, &UART1_VT),
+			C99INIT(txbuffer, uart1_txbuffer),
+			C99INIT(rxbuffer, uart1_rxbuffer),
+			C99INIT(txbuffer_size, sizeof(uart1_txbuffer)),
+			C99INIT(rxbuffer_size, sizeof(uart1_rxbuffer)),
 		},
 		C99INIT(sending, false),
 	}
