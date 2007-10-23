@@ -37,7 +37,7 @@
  */
 
 #include "kdebug_at91.h"
-#include <cfg/macros.h> /* for BV() */
+#include <cfg/macros.h> /* for BV(), DIV_ROUND */
 #include <appconfig.h>
 #include <hw_cpu.h>     /* for CLOCK_FREQ */
 #include <hw_ser.h>     /* Required for bus macros overrides */
@@ -71,7 +71,7 @@ INLINE void kdbg_hw_init(void)
 		/* Reset DBGU */
 		DBGU_CR =  BV(US_RSTRX) | BV(US_RSTTX) | BV(US_RXDIS) | BV(US_TXDIS);
 		/* Set baudrate */
-		DBGU_BRGR = (CLOCK_FREQ + (16 * CONFIG_KDEBUG_BAUDRATE) / 2) / (16 * CONFIG_KDEBUG_BAUDRATE);
+		DBGU_BRGR = DIV_ROUND(CLOCK_FREQ, 16 * CONFIG_KDEBUG_BAUDRATE);
 		/* Set DBGU mode to 8 data bits, no parity and 1 stop bit. */
 		DBGU_MR =  US_CHMODE_NORMAL | US_CHRL_8 | US_PAR_NO | US_NBSTOP_1;
 		/* Enable DBGU transmitter. */

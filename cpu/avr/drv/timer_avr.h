@@ -88,6 +88,7 @@
 
 #include <appconfig.h>     /* CONFIG_TIMER */
 #include <cfg/compiler.h>  /* uint8_t */
+#include <cfg/macros.h>    /* DIV_ROUND */
 #include <hw_cpu.h>        /* CLOCK_FREQ */
 
 /**
@@ -127,7 +128,7 @@
 	/** This value is the maximum in overflow based timers. */
 	#define TIMER_HW_CNT         (1 << TIMER_HW_BITS)
 	#define DEFINE_TIMER_ISR     SIGNAL(SIG_OVERFLOW1)
-	#define TIMER_TICKS_PER_SEC  ((TIMER_HW_HPTICKS_PER_SEC + TIMER_HW_CNT / 2) / TIMER_HW_CNT)
+	#define TIMER_TICKS_PER_SEC  DIV_ROUND(TIMER_HW_HPTICKS_PER_SEC, TIMER_HW_CNT)
 
 	/// Type of time expressed in ticks of the hardware high precision timer
 	typedef uint16_t hptime_t;
@@ -156,7 +157,7 @@
 	/** This value is the maximum in overflow based timers. */
 	#define TIMER_HW_CNT         (1 << TIMER_HW_BITS)
 	#define DEFINE_TIMER_ISR     SIGNAL(SIG_OVERFLOW3)
-	#define TIMER_TICKS_PER_SEC  ((TIMER_HW_HPTICKS_PER_SEC + TIMER_HW_CNT / 2) / TIMER_HW_CNT)
+	#define TIMER_TICKS_PER_SEC  DIV_ROUND(TIMER_HW_HPTICKS_PER_SEC, TIMER_HW_CNT)
 
 	/// Type of time expressed in ticks of the hardware high precision timer
 	typedef uint16_t hptime_t;
@@ -167,13 +168,13 @@
 
 
 /** Frequency of the hardware high precision timer. */
-#define TIMER_HW_HPTICKS_PER_SEC  ((CLOCK_FREQ + TIMER_PRESCALER / 2) / TIMER_PRESCALER)
+#define TIMER_HW_HPTICKS_PER_SEC  DIV_ROUND(CLOCK_FREQ, TIMER_PRESCALER)
 
 /**
  * System timer: additional division after the prescaler
  * 12288000 / 64 / 192 (0..191) = 1 ms
  */
-#define OCR_DIVISOR  (((CLOCK_FREQ + TIMER_PRESCALER / 2) / TIMER_PRESCALER + TIMER_TICKS_PER_SEC / 2) / TIMER_TICKS_PER_SEC - 1)
+#define OCR_DIVISOR  (DIV_ROUND(DIV_ROUND(CLOCK_FREQ, TIMER_PRESCALER), TIMER_TICKS_PER_SEC) - 1)
 
 /** Not needed, IRQ timer flag cleared automatically */
 #define timer_hw_irq() do {} while (0)

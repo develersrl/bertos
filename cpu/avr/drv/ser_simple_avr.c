@@ -136,7 +136,7 @@ void _ser_settimeouts(void)
 void _ser_setbaudrate(unsigned long rate)
 {
 	/* Compute baud-rate period */
-	uint16_t period = (((CLOCK_FREQ / 16UL) + (rate / 2)) / rate) - 1;
+	uint16_t period = DIV_ROUND(CLOCK_FREQ / 16UL, rate) - 1;
 
 	UBRR0H = (period) >> 8;
 	UBRR0L = (period);

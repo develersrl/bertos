@@ -168,6 +168,7 @@
 #include <hw_cpu.h>  /* CLOCK_FREQ */
 #include <appconfig.h>
 
+#include <cfg/macros.h> /* DIV_ROUND */
 #include <cfg/debug.h>
 #include <drv/timer.h>
 #include <mware/fifobuf.h>
@@ -509,7 +510,7 @@ static void uart0_enabletxirq(struct SerialHardware *_hw)
 static void uart0_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned long rate)
 {
 	/* Compute baud-rate period */
-	uint16_t period = (((CLOCK_FREQ / 16UL) + (rate / 2)) / rate) - 1;
+	uint16_t period = DIV_ROUND(CLOCK_FREQ / 16UL, rate) - 1;
 
 #if !CPU_AVR_ATMEGA103
 	UBRR0H = (period) >> 8;
@@ -562,7 +563,7 @@ static void uart1_enabletxirq(struct SerialHardware *_hw)
 static void uart1_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned long rate)
 {
 	/* Compute baud-rate period */
-	uint16_t period = (((CLOCK_FREQ / 16UL) + (rate / 2)) / rate) - 1;
+	uint16_t period = DIV_ROUND(CLOCK_FREQ / 16UL, rate) - 1;
 
 	UBRR1H = (period) >> 8;
 	UBRR1L = (period);

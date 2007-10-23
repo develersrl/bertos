@@ -42,8 +42,10 @@
 #define DRV_TIMER_H
 
 #include <cfg/os.h>
+#include <cfg/macros.h>
 #include <cpu/attr.h>
 #include <cpu/irq.h>
+
 
 /*
  * Include platform-specific binding header if we're hosted.
@@ -113,7 +115,7 @@ INLINE ticks_t ms_to_ticks(mtime_t ms)
 	return (ms * TIMER_TICKS_PER_SEC) / 1000;
 #else
 	/* Fast timer: don't overflow ticks_t. */
-	return ms * ((TIMER_TICKS_PER_SEC + 500) / 1000);
+	return ms * DIV_ROUND(TIMER_TICKS_PER_SEC, 1000);
 #endif
 }
 
@@ -125,7 +127,7 @@ INLINE ticks_t us_to_ticks(utime_t us)
 	return ((us / 1000) * TIMER_TICKS_PER_SEC) / 1000;
 #else
 	/* Fast timer: don't overflow ticks_t. */
-	return (us * ((TIMER_TICKS_PER_SEC + 500) / 1000)) / 1000;
+	return (us * DIV_ROUND(TIMER_TICKS_PER_SEC, 1000)) / 1000;
 #endif
 }
 
@@ -157,7 +159,7 @@ INLINE utime_t ticks_to_us(ticks_t ticks)
 INLINE hptime_t us_to_hptime(utime_t us)
 {
 #if TIMER_HW_HPTICKS_PER_SEC > 10000000UL
-	return us * ((TIMER_HW_HPTICKS_PER_SEC + 500000UL) / 1000000UL);
+	return us * DIV_ROUND(TIMER_HW_HPTICKS_PER_SEC, 1000000UL);
 #else
 	return (us * ((TIMER_HW_HPTICKS_PER_SEC + 500) / 1000UL) + 500) / 1000UL;
 #endif
@@ -167,9 +169,9 @@ INLINE hptime_t us_to_hptime(utime_t us)
 INLINE utime_t hptime_to_us(hptime_t hpticks)
 {
 #if TIMER_HW_HPTICKS_PER_SEC < 100000UL
-	return hpticks * ((1000000UL + TIMER_HW_HPTICKS_PER_SEC / 2) / TIMER_HW_HPTICKS_PER_SEC);
+	return hpticks * DIV_ROUND(1000000UL, TIMER_HW_HPTICKS_PER_SEC);
 #else
-	return (hpticks * 1000UL) / ((TIMER_HW_HPTICKS_PER_SEC + 500) / 1000UL);
+	return (hpticks * 1000UL) / DIV_ROUND(TIMER_HW_HPTICKS_PER_SEC, 1000UL);
 #endif /* TIMER_HW_HPTICKS_PER_SEC < 100000UL */
 }
 

@@ -78,7 +78,7 @@ DEFINE_ZEROCROSS_ISR()
 		if (triacs[dev].duty != TRIAC_MAX_DUTY)
 			TRIAC_OFF(dev);
 		/* Compute delay from duty */
-		timer_setDelay(&triacs[dev].timer, ((period * (TRIAC_MAX_DUTY - triacs[dev].duty) + TRIAC_MAX_DUTY / 2) / TRIAC_MAX_DUTY));
+		timer_setDelay(&triacs[dev].timer, DIV_ROUND(period * (TRIAC_MAX_DUTY - triacs[dev].duty), TRIAC_MAX_DUTY));
 
 		/* This check avoids inserting the same timer twice
 		 * in case of an intempestive zerocross or spike */

@@ -36,91 +36,8 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  * \author Giovanni Bajo <rasky@develer.com>
  */
-
-/*#*
- *#* $Log$
- *#* Revision 1.11  2007/02/06 15:22:12  asterix
- *#* Add ROTL and ROTR macros for bit rotating.
- *#*
- *#* Revision 1.10  2006/09/13 18:31:37  bernie
- *#* BV8(), BV16(), BV32(): New macros for CPUs with small word size; SWAP_T(): New macro to support old compilers.
- *#*
- *#* Revision 1.9  2006/07/19 12:56:25  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.8  2006/03/13 02:06:55  bernie
- *#* ROUND_UP2: Rename from ROUND2.
- *#*
- *#* Revision 1.7  2006/02/20 14:34:58  bernie
- *#* Use portable type checking.
- *#*
- *#* Revision 1.6  2006/02/10 12:36:57  bernie
- *#* Pacify IAR warnings for side-effects.
- *#*
- *#* Revision 1.5  2005/11/04 16:20:01  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.4  2005/07/03 15:19:09  bernie
- *#* Doxygen fix.
- *#*
- *#* Revision 1.3  2005/06/27 21:23:32  bernie
- *#* ROUND_DOWN, ROUND_UP, ROUND_NEAREST: New macros.
- *#*
- *#* Revision 1.2  2005/04/11 19:10:27  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.1  2005/04/11 19:04:13  bernie
- *#* Move top-level headers to cfg/ subdir.
- *#*
- *#* Revision 1.10  2005/01/22 04:19:50  bernie
- *#* Use non-uglified typeof().
- *#*
- *#* Revision 1.9  2004/12/08 08:51:34  bernie
- *#* Add type-generic macros for C++.
- *#*
- *#* Revision 1.8  2004/10/19 07:14:20  bernie
- *#* Add macros to test for specific compiler features.
- *#*
- *#* Revision 1.7  2004/09/20 03:30:45  bernie
- *#* C++ also has variadic macros.
- *#*
- *#* Revision 1.6  2004/09/14 21:02:04  bernie
- *#* SWAP(), MINMAX(): New macros.
- *#*
- *#* Revision 1.5  2004/08/29 21:57:58  bernie
- *#* Move back STATIC_ASSERT() to compiler.h as it's needed in cpu.h;
- *#* iptr_t, const_iptr_t: Replace IPTR macro with a real typedef.
- *#*
- *#* Revision 1.3  2004/08/24 14:13:48  bernie
- *#* Restore a few macros that were lost in the way.
- *#*
- *#* Revision 1.2  2004/08/24 13:32:14  bernie
- *#* PP_CAT(), PP_STRINGIZE(): Move back to compiler.h to break circular dependency between cpu.h/compiler.h/macros.h;
- *#* offsetof(), countof(): Move back to compiler.h to avoid including macros.h almost everywhere;
- *#* Trim CVS log;
- *#* Rename header guards;
- *#* Don't include arch_config.h in compiler.h as it's not needed there.
- *#*
- *#* Revision 1.1  2004/08/14 19:37:57  rasky
- *#* Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
- *#*
- *#* Revision 1.4  2004/08/14 18:36:50  rasky
- *#* Doxygen fix e un livello di parentesi aggiuntivi per la macro
- *#*
- *#* Revision 1.3  2004/08/12 20:01:32  rasky
- *#* Aggiunte macro BIT_CHANGE e BIT_CHANGE_BV
- *#*
- *#* Revision 1.2  2004/08/10 21:36:14  rasky
- *#* Aggiunto include macros.h dove serve
- *#* Aggiunta dipendenza da compiler.h in macros.h
- *#*
- *#* Revision 1.1  2004/08/10 21:30:00  rasky
- *#* Estratte le funzioni macro in macros.h
- *#*
- *#*/
-
-#ifndef MACROS_H
-#define MACROS_H
+#ifndef CFG_MACROS_H
+#define CFG_MACROS_H
 
 #include <cfg/compiler.h>
 
@@ -219,7 +136,12 @@
 /** Same as BV() but with 8 bit result */
 #define BV8(x)  ((uint8_t)1<<(x))
 
-
+/**
+ * Perform an integer division rounding the result to the nearest int value.
+ * \note \a divisor should preferibly be a costant, otherwise this macro generates
+ * 2 division. Also divisor is evaluated twice.
+ */
+#define DIV_ROUND(dividend, divisor)  (((dividend) + (divisor) / 2) / (divisor))
 
 /** Round up \a x to an even multiple of the 2's power \a pad. */
 #define ROUND_UP2(x, pad) (((x) + ((pad) - 1)) & ~((pad) - 1))
