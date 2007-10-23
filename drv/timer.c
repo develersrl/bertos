@@ -173,9 +173,9 @@ Timer *timer_abort(Timer *timer)
  */
 void timer_delayTicks(ticks_t delay)
 {
-#if defined(IRQ_GETSTATE)
+#if defined(IRQ_ENABLED)
 	/* We shouldn't sleep with interrupts disabled */
-	ASSERT(IRQ_GETSTATE());
+	ASSERT(IRQ_ENABLED());
 #endif
 
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS

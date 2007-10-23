@@ -80,7 +80,7 @@ int main(void)
 	timer_init();
 
 	proc_init();
-	ASSERT(!IRQ_GETSTATE());
+	ASSERT(!IRQ_ENABLED());
 
 
 
@@ -90,7 +90,7 @@ int main(void)
 	ser_setparity(host_port, SER_PARITY_NONE);
 
 	IRQ_ENABLE;
-	ASSERT(IRQ_GETSTATE());
+	ASSERT(IRQ_ENABLED());
 
 	/* Disable all pullups */
 	PIOA_PUDR = 0xffffffff;

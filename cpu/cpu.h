@@ -154,7 +154,7 @@
 			set_CPSR(x); \
 		} while (0)
 
-		#define IRQ_GETSTATE() \
+		#define IRQ_ENABLED() \
 			((bool)(get_CPSR() & 0xb0))
 
 		#define BREAKPOINT  /* asm("bkpt 0") DOES NOT WORK */
@@ -214,7 +214,7 @@
 			sreg; \
 		})
 
-		#define IRQ_GETSTATE() (!((CPU_READ_FLAGS() & 0xc0) == 0xc0))
+		#define IRQ_ENABLED() ((CPU_READ_FLAGS() & 0xc0) != 0xc0)
 
 		/**
 	 	 * Initialization value for registers in stack frame.
@@ -239,7 +239,7 @@
 	#define IRQ_ENABLE          FIXME
 	#define IRQ_SAVE_DISABLE(x) FIXME
 	#define IRQ_RESTORE(x)      FIXME
-	#define IRQ_GETSTATE()      FIXME
+	#define IRQ_ENABLED()      FIXME
 
 	typedef uint32_t cpuflags_t; // FIXME
 	typedef uint32_t cpustack_t; // FIXME
@@ -272,13 +272,13 @@
 	}
 	#define IRQ_RUNNING() irq_running()
 
-	static inline bool irq_getstate(void)
+	static inline bool irq_enabled(void)
 	{
 		uint16_t x;
 		asm(move SR,x);
 		return !(x & 0x0200);
 	}
-	#define IRQ_GETSTATE() irq_getstate()
+	#define IRQ_ENABLED() irq_enabled()
 
 	typedef uint16_t cpuflags_t;
 	typedef unsigned int cpustack_t;
@@ -320,7 +320,7 @@
 		); \
 	} while (0)
 
-	#define IRQ_GETSTATE() \
+	#define IRQ_ENABLED() \
 	({ \
 		uint8_t sreg; \
 		__asm__ __volatile__( \
