@@ -38,38 +38,11 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.8  2007/06/07 14:35:12  batt
- *#* Merge from project_ks.
- *#*
- *#* Revision 1.7  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.6  2006/03/20 17:49:50  bernie
- *#* Make the TWI driver more generic to work with devices other than EEPROMS.
- *#*
- *#* Revision 1.5  2005/11/27 23:33:40  bernie
- *#* Use appconfig.h instead of cfg/config.h.
- *#*
- *#* Revision 1.4  2005/04/11 19:10:28  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.3  2005/03/01 23:26:00  bernie
- *#* Header fix.
- *#*
- *#* Revision 1.2  2005/01/25 08:36:56  bernie
- *#* CONFIG_TWI_FREQ: New config param.
- *#*
- *#* Revision 1.1  2005/01/06 16:09:40  aleph
- *#* Split twi/eeprom functions from eeprom module in separate twi module
- *#*
- *#*/
-
 #include "twi.h"
 
 #include <cfg/debug.h>
-#include <cpu/cpu.h>
+#include <cpu/detect.h>
+#include <cpu/irq.h>
 #include <cfg/macros.h> // BV()
 #include <hw_cpu.h>  /* CLOCK_FREQ */
 #include <appconfig.h>

@@ -43,7 +43,8 @@
 
 #include <cfg/macros.h> // BV()
 #include <cfg/module.h>
-#include <cpu/cpu.h>
+#include <cpu/irq.h>
+#include <cpu/types.h>
 
 
 /** HW dependent timer initialization  */

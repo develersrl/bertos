@@ -38,34 +38,11 @@
  * \brief Low-level timer module for AVR (implementation).
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.6  2007/06/07 14:35:12  batt
- *#* Merge from project_ks.
- *#*
- *#* Revision 1.5  2007/03/21 11:03:56  batt
- *#* Add missing support for ATMega1281.
- *#*
- *#* Revision 1.4  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.3  2006/06/12 21:37:02  marco
- *#* implemented some commands (ver and sleep)
- *#*
- *#* Revision 1.2  2006/05/18 00:37:58  bernie
- *#* Don't include unneeded header hw.h.
- *#*
- *#* Revision 1.1  2005/07/19 07:28:36  bernie
- *#* Refactor to decouple timer ticks from milliseconds.
- *#*
- *#* Revision 1.1  2005/05/24 09:17:58  batt
- *#* Move drivers to top-level.
- *#*
- *#*/
 #include <drv/timer_avr.h>
 #include <cfg/macros.h> // BV()
 
-#include <cpu/cpu.h>
+#include <cpu/types.h>
+#include <cpu/irq.h>
 
 #include <avr/interrupt.h>
 #include <avr/io.h>

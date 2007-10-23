@@ -37,7 +37,6 @@
  */
 
 #include "kdebug_at91.h"
-#include <cpu/cpu.h>
 #include <cfg/macros.h> /* for BV() */
 #include <appconfig.h>
 #include <hw_cpu.h>     /* for CLOCK_FREQ */
@@ -77,24 +76,23 @@ INLINE void kdbg_hw_init(void)
 		DBGU_MR =  US_CHMODE_NORMAL | US_CHRL_8 | US_PAR_NO | US_NBSTOP_1;
 		/* Enable DBGU transmitter. */
 		DBGU_CR = BV(US_TXEN);
-		/* Disable PIO on DGBU tx pin. */
-		#if CPU_ARM_AT91SAM7S256
-			PIOA_PDR = BV(10);
-			PIOA_ASR = BV(10);
-		#else
+		#if !CPU_ARM_AT91SAM7S256
 			#warning Check Debug Unit AT91 pins on datasheet!
 		#endif
+		/* Disable PIO on DGBU tx pin. */
+		PIOA_PDR = BV(10);
+		PIOA_ASR = BV(10);
 		
 		#if 0 /* Disable Rx for now */
 		/* Enable DBGU receiver. */
 		DBGU_CR = BV(US_RXEN);
-		/* Disable PIO on DGBU rx pin. */
-		#if CPU_ARM_AT91SAM7S256
-			PIOA_PDR = BV(9);
-			PIOA_ASR = BV(9);
-		#else
-			#warning Check Debug pins on datasheet!
+		#if !CPU_ARM_AT91SAM7S256
+			#warning Check Debug Unit AT91 pins on datasheet!
 		#endif
+		/* Disable PIO on DGBU rx pin. */
+		PIOA_PDR = BV(9);
+		PIOA_ASR = BV(9);
+
 		#endif
 	#else
 		#error CONFIG_KDEBUG_PORT should be KDEBUG_PORT_DBGU

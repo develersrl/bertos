@@ -51,7 +51,7 @@
 #include <cfg/macros.h> // MIN()
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
-#include <cpu/cpu.h>
+#include <cpu/irq.h>
 
 #include <drv/wdt.h>
 

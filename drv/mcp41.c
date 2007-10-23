@@ -40,7 +40,6 @@
 #include <drv/timer.h>
 
 #include <cfg/macros.h>
-#include <cpu/cpu.h>
 #include <cfg/compiler.h>
 
 #include <hw_mcp41.h>

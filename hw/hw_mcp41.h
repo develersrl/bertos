@@ -42,7 +42,7 @@
 
 #include <mcp41_map.h>
 #include <cfg/compiler.h>
-#include <cpu/cpu.h>
+#include <cpu/irq.h>
 #include <avr/io.h>
 
 extern const uint16_t mcp41_ports[MCP41_CNT];

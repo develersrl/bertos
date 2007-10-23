@@ -39,30 +39,12 @@
  * \brief Displaytech 32122A LCD driver
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.5  2006/07/19 12:56:25  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.4  2006/04/27 05:40:11  bernie
- *#* Naming convention fixes; Partial merge from project_grl.
- *#*
- *#* Revision 1.3  2006/02/10 12:35:31  bernie
- *#* Enforce CONFIG_* definitions.
- *#*
- *#* Revision 1.2  2006/01/23 23:11:27  bernie
- *#* Use RASTER_SIZE() to compute... err... the raster size.
- *#*
- *#* Revision 1.1  2006/01/16 03:50:57  bernie
- *#* Import into DevLib.
- *#*
- *#*/
-
 #include "lcd_32122a_avr.h"
 #include <gfx/gfx.h>
 #include <drv/timer.h>
 
-#include <cpu/cpu.h>
+#include <cpu/irq.h>
+#include <cpu/types.h>
 #include <hw.h>
 #include <cfg/macros.h> /* BV() */
 #include <cfg/debug.h>

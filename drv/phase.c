@@ -37,66 +37,12 @@
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.2  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.1  2005/11/04 18:06:44  bernie
- *#* Import into DevLib.
- *#*
- *#* Revision 1.1  2005/05/24 09:17:58  batt
- *#* Move drivers to top-level.
- *#*
- *#* Revision 1.14  2005/05/20 12:21:05  batt
- *#* Reformat.
- *#*
- *#* Revision 1.13  2005/05/09 16:34:14  batt
- *#* Change some function names to accomplish coding standard; Add debug phase_initialized; Change duty_t and power_t to uint16_t.
- *#*
- *#* Revision 1.12  2005/05/04 17:22:30  batt
- *#* Workaround a Doxygen parsing problem.
- *#*
- *#* Revision 1.11  2005/05/02 09:05:03  batt
- *#* Rename duty_t and power_t in triac_duty_t and triac_power_t
- *#*
- *#* Revision 1.10  2005/05/02 08:48:55  batt
- *#* Disable interrupt only when necessary.
- *#*
- *#* Revision 1.9  2005/04/29 11:52:51  batt
- *#* Remove debug printf; Add a comment.
- *#*
- *#* Revision 1.8  2005/04/29 10:22:56  batt
- *#* Avoid retriggering TRIAC on low duty-cycle.
- *#*
- *#* Revision 1.7  2005/04/29 09:54:36  batt
- *#* Convert to new timer.
- *#*
- *#* Revision 1.6  2005/04/28 17:11:53  batt
- *#* Expand abbreviation.
- *#*
- *#* Revision 1.5  2005/04/28 15:10:11  batt
- *#* Use timer API to add and set events.
- *#*
- *#* Revision 1.4  2005/04/28 12:04:46  batt
- *#* Add some comments.
- *#*
- *#* Revision 1.3  2005/04/28 10:35:45  batt
- *#* Complete phase_setpower.
- *#*
- *#* Revision 1.2  2005/04/27 19:22:49  batt
- *#* Add duty_t, power_t, MAX_DUTY and MAX_POWER
- *#*
- *#* Revision 1.1  2005/04/27 17:13:56  batt
- *#* Add triac phase control driver.
- *#*
- *#*/
-
 #include <drv/timer.h>
 
 
 #include <cfg/macros.h>
-#include <cpu/cpu.h>
+#include <cpu/irq.h>
+#include <cpu/types.h>
 #include <cfg/compiler.h>
 
 

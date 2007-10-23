@@ -39,7 +39,8 @@
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-#include <cpu/cpu.h>
+#include <cpu/types.h>
+#include <cpu/attr.h>
 #include <cfg/macros.h> /* for BV() */
 #include <appconfig.h>
 #include <hw_cpu.h>     /* for CLOCK_FREQ */

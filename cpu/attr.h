@@ -31,15 +31,15 @@
  *
  * -->
  *
- * \brief CPU-specific definitions
+ * \brief CPU-specific attributes.
  *
  * \author Giovanni Bajo <rasky@develer.com>
  * \author Bernardo Innocenti <bernie@develer.com>
  * \author Stefano Fedrigo <aleph@develer.com>
  * \author Francesco Sacchi <batt@develer.com>
  */
-#ifndef CPU_CPU_H
-#define CPU_CPU_H
+#ifndef CPU_ATTR_H
+#define CPU_ATTR_H
 
 #include "detect.h"
 #include <cfg/compiler.h> /* for uintXX_t */
@@ -64,11 +64,6 @@
 #if CPU_I196
 
 	#define NOP                     nop_instruction()
-	#define IRQ_DISABLE             disable_interrupt()
-	#define IRQ_ENABLE              enable_interrupt()
-
-	typedef uint16_t cpuflags_t; // FIXME
-	typedef unsigned int cpustack_t;
 
 	#define CPU_REG_BITS            16
 	#define CPU_REGS_CNT            16
@@ -81,17 +76,6 @@
 
 	#define NOP                     asm volatile ("nop")
 
-	/* Get IRQ_* definitions from the hosting environment. */
-	#include <cfg/os.h>
-	#if OS_EMBEDDED
-		#define IRQ_DISABLE             FIXME
-		#define IRQ_ENABLE              FIXME
-		#define IRQ_SAVE_DISABLE(x)     FIXME
-		#define IRQ_RESTORE(x)          FIXME
-		typedef uint32_t cpuflags_t; // FIXME
-	#endif /* OS_EMBEDDED */
-
-
 	#define CPU_REGS_CNT            7
 	#define CPU_SAVED_REGS_CNT      7
 	#define CPU_STACK_GROWS_UPWARD  0
@@ -100,7 +84,6 @@
 	#define CPU_HARVARD		0
 
 	#if CPU_X86_64
-		typedef uint64_t cpustack_t;
 		#define CPU_REG_BITS    64
 
 		#ifdef __WIN64__
@@ -108,14 +91,10 @@
 			#define SIZEOF_LONG  4
 		#endif
 	#else
-		typedef uint32_t cpustack_t;
 		#define CPU_REG_BITS    32
 	#endif
 
 #elif CPU_ARM
-
-	typedef uint32_t cpuflags_t;
-	typedef uint32_t cpustack_t;
 
 	/* Register counts include SREG too */
 	#define CPU_REG_BITS           32
@@ -127,94 +106,9 @@
 	#define CPU_HARVARD            0
 
 	#ifdef __IAR_SYSTEMS_ICC__
-
-		#include <inarm.h>
-
-		#if __CPU_MODE__ == 1 /* Thumb */
-			/* Use stubs */
-			extern cpuflags_t get_CPSR(void);
-			extern void set_CPSR(cpuflags_t flags);
-		#else
-			#define get_CPSR __get_CPSR
-			#define set_CPSR __set_CPSR
-		#endif
-
 		#define NOP         __no_operation()
-		#define IRQ_DISABLE __disable_interrupt()
-		#define IRQ_ENABLE  __enable_interrupt()
-
-		#define IRQ_SAVE_DISABLE(x) \
-		do { \
-			(x) = get_CPSR(); \
-			__disable_interrupt(); \
-		} while (0)
-
-		#define IRQ_RESTORE(x) \
-		do { \
-			set_CPSR(x); \
-		} while (0)
-
-		#define IRQ_ENABLED() \
-			((bool)(get_CPSR() & 0xb0))
-
-		#define BREAKPOINT  /* asm("bkpt 0") DOES NOT WORK */
-
 	#else /* !__IAR_SYSTEMS_ICC__ */
 		#define NOP         asm volatile ("mov r0,r0" ::)
-
-		#define IRQ_DISABLE \
-		do { \
-			asm volatile ( \
-				"mrs r0, cpsr\n\t" \
-				"orr r0, r0, #0xc0\n\t" \
-				"msr cpsr_c, r0" \
-				::: "r0" \
-			); \
-		} while (0)
-
-		#define IRQ_ENABLE \
-		do { \
-			asm volatile ( \
-				"mrs r0, cpsr\n\t" \
-				"bic r0, r0, #0xc0\n\t" \
-				"msr cpsr_c, r0" \
-				::: "r0" \
-			); \
-		} while (0)
-
-		#define IRQ_SAVE_DISABLE(x) \
-		do { \
-			asm volatile ( \
-				"mrs %0, cpsr\n\t" \
-				"orr r0, %0, #0xc0\n\t" \
-				"msr cpsr_c, r0" \
-				: "=r" (x) \
-				: /* no inputs */ \
-				: "r0" \
-			); \
-		} while (0)
-
-		#define IRQ_RESTORE(x) \
-		do { \
-			asm volatile ( \
-				"msr cpsr_c, %0" \
-				: /* no outputs */ \
-				: "r" (x) \
-			); \
-		} while (0)
-
-		#define CPU_READ_FLAGS() \
-		({ \
-			cpuflags_t sreg; \
-			asm volatile ( \
-				"mrs %0, cpsr\n\t" \
-				: "=r" (sreg) \
-				: /* no inputs */ \
-			); \
-			sreg; \
-		})
-
-		#define IRQ_ENABLED() ((CPU_READ_FLAGS() & 0xc0) != 0xc0)
 
 		/**
 	 	 * Initialization value for registers in stack frame.
@@ -235,15 +129,6 @@
 #elif CPU_PPC
 	#define NOP                 asm volatile ("nop" ::)
 
-	#define IRQ_DISABLE         FIXME
-	#define IRQ_ENABLE          FIXME
-	#define IRQ_SAVE_DISABLE(x) FIXME
-	#define IRQ_RESTORE(x)      FIXME
-	#define IRQ_ENABLED()      FIXME
-
-	typedef uint32_t cpuflags_t; // FIXME
-	typedef uint32_t cpustack_t; // FIXME
-
 	/* Register counts include SREG too */
 	#define CPU_REG_BITS           (CPU_PPC32 ? 32 : 64)
 	#define CPU_REGS_CNT           FIXME
@@ -256,32 +141,6 @@
 #elif CPU_DSP56K
 
 	#define NOP                     asm(nop)
-	#define BREAKPOINT              asm(debug)
-	#define IRQ_DISABLE             do { asm(bfset #0x0200,SR); asm(nop); } while (0)
-	#define IRQ_ENABLE              do { asm(bfclr #0x0200,SR); asm(nop); } while (0)
-
-	#define IRQ_SAVE_DISABLE(x)  \
-		do { (void)x; asm(move SR,x); asm(bfset #0x0200,SR); } while (0)
-	#define IRQ_RESTORE(x)  \
-		do { (void)x; asm(move x,SR); } while (0)
-
-	static inline bool irq_running(void)
-	{
-		extern void *user_sp;
-		return !!user_sp;
-	}
-	#define IRQ_RUNNING() irq_running()
-
-	static inline bool irq_enabled(void)
-	{
-		uint16_t x;
-		asm(move SR,x);
-		return !(x & 0x0200);
-	}
-	#define IRQ_ENABLED() irq_enabled()
-
-	typedef uint16_t cpuflags_t;
-	typedef unsigned int cpustack_t;
 
 	#define CPU_REG_BITS            16
 	#define CPU_REGS_CNT            FIXME
@@ -301,37 +160,6 @@
 #elif CPU_AVR
 
 	#define NOP           asm volatile ("nop" ::)
-	#define IRQ_DISABLE   asm volatile ("cli" ::)
-	#define IRQ_ENABLE    asm volatile ("sei" ::)
-
-	#define IRQ_SAVE_DISABLE(x) \
-	do { \
-		__asm__ __volatile__( \
-			"in %0,__SREG__\n\t" \
-			"cli" \
-			: "=r" (x) : /* no inputs */ : "cc" \
-		); \
-	} while (0)
-
-	#define IRQ_RESTORE(x) \
-	do { \
-		__asm__ __volatile__( \
-			"out __SREG__,%0" : /* no outputs */ : "r" (x) : "cc" \
-		); \
-	} while (0)
-
-	#define IRQ_ENABLED() \
-	({ \
-		uint8_t sreg; \
-		__asm__ __volatile__( \
-			"in %0,__SREG__\n\t" \
-			: "=r" (sreg)  /* no inputs & no clobbers */ \
-		); \
-		(bool)(sreg & 0x80); \
-	})
-
-	typedef uint8_t cpuflags_t;
-	typedef uint8_t cpustack_t;
 
 	/* Register counts include SREG too */
 	#define CPU_REG_BITS            8
@@ -353,20 +181,6 @@
 #else
 	#error No CPU_... defined.
 #endif
-
-/**
- * Execute \a CODE atomically with respect to interrupts.
- *
- * \see IRQ_SAVE_DISABLE IRQ_RESTORE
- */
-#define ATOMIC(CODE) \
-	do { \
-		cpuflags_t __flags; \
-		IRQ_SAVE_DISABLE(__flags); \
-		CODE; \
-		IRQ_RESTORE(__flags); \
-	} while (0)
-
 
 /// Default for macro not defined in the right arch section
 #ifndef CPU_REG_INIT_VALUE
@@ -447,101 +261,6 @@
 		CPU_PUSH_WORD((sp), (cpustack_t)(func))
 #endif
 
-
-/**
- * \name Default type sizes.
- *
- * These defaults are reasonable for most 16/32bit machines.
- * Some of these macros may be overridden by CPU-specific code above.
- *
- * ANSI C requires that the following equations be true:
- * \code
- *   sizeof(char) <= sizeof(short) <= sizeof(int) <= sizeof(long)
- *   sizeof(float) <= sizeof(double)
- *   CPU_BITS_PER_CHAR  >= 8
- *   CPU_BITS_PER_SHORT >= 8
- *   CPU_BITS_PER_INT   >= 16
- *   CPU_BITS_PER_LONG  >= 32
- * \endcode
- * \{
- */
-#ifndef SIZEOF_CHAR
-#define SIZEOF_CHAR  1
-#endif
-
-#ifndef SIZEOF_SHORT
-#define SIZEOF_SHORT  2
-#endif
-
-#ifndef SIZEOF_INT
-#if CPU_REG_BITS < 32
-	#define SIZEOF_INT  2
-#else
-	#define SIZEOF_INT  4
-#endif
-#endif /* !SIZEOF_INT */
-
-#ifndef SIZEOF_LONG
-#if CPU_REG_BITS > 32
-	#define SIZEOF_LONG  8
-#else
-	#define SIZEOF_LONG  4
-#endif
-#endif
-
-#ifndef SIZEOF_PTR
-#if CPU_REG_BITS < 32
-	#define SIZEOF_PTR   2
-#elif CPU_REG_BITS == 32
-	#define SIZEOF_PTR   4
-#else /* CPU_REG_BITS > 32 */
-	#define SIZEOF_PTR   8
-#endif
-#endif
-
-#ifndef CPU_BITS_PER_CHAR
-#define CPU_BITS_PER_CHAR   (SIZEOF_CHAR * 8)
-#endif
-
-#ifndef CPU_BITS_PER_SHORT
-#define CPU_BITS_PER_SHORT  (SIZEOF_SHORT * CPU_BITS_PER_CHAR)
-#endif
-
-#ifndef CPU_BITS_PER_INT
-#define CPU_BITS_PER_INT    (SIZEOF_INT * CPU_BITS_PER_CHAR)
-#endif
-
-#ifndef CPU_BITS_PER_LONG
-#define CPU_BITS_PER_LONG   (SIZEOF_LONG * CPU_BITS_PER_CHAR)
-#endif
-
-#ifndef CPU_BITS_PER_PTR
-#define CPU_BITS_PER_PTR    (SIZEOF_PTR * CPU_BITS_PER_CHAR)
-#endif
-
-#ifndef BREAKPOINT
-#define BREAKPOINT /* nop */
-#endif
-
-/*\}*/
-
-/* Sanity checks for the above definitions */
-STATIC_ASSERT(sizeof(char) == SIZEOF_CHAR);
-STATIC_ASSERT(sizeof(short) == SIZEOF_SHORT);
-STATIC_ASSERT(sizeof(long) == SIZEOF_LONG);
-STATIC_ASSERT(sizeof(int) == SIZEOF_INT);
-STATIC_ASSERT(sizeof(void *) == SIZEOF_PTR);
-STATIC_ASSERT(sizeof(int8_t) * CPU_BITS_PER_CHAR == 8);
-STATIC_ASSERT(sizeof(uint8_t) * CPU_BITS_PER_CHAR == 8);
-STATIC_ASSERT(sizeof(int16_t) * CPU_BITS_PER_CHAR == 16);
-STATIC_ASSERT(sizeof(uint16_t) * CPU_BITS_PER_CHAR == 16);
-STATIC_ASSERT(sizeof(int32_t) * CPU_BITS_PER_CHAR == 32);
-STATIC_ASSERT(sizeof(uint32_t) * CPU_BITS_PER_CHAR == 32);
-#ifdef __HAS_INT64_T__
-STATIC_ASSERT(sizeof(int64_t) * CPU_BITS_PER_CHAR == 64);
-STATIC_ASSERT(sizeof(uint64_t) * CPU_BITS_PER_CHAR == 64);
-#endif
-
 /**
  * \def CPU_IDLE
  *
@@ -563,4 +282,4 @@ STATIC_ASSERT(sizeof(uint64_t) * CPU_BITS_PER_CHAR == 64);
 	#endif /* !ARCH_EMUL */
 #endif /* !CPU_IDLE */
 
-#endif /* CPU_CPU_H */
+#endif /* CPU_ATTR_H */

@@ -38,42 +38,12 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.12  2006/07/19 12:56:27  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.11  2006/02/21 16:06:55  bernie
- *#* Cleanup/update process scheduling.
- *#*
- *#* Revision 1.10  2005/11/04 16:20:02  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.9  2005/04/11 19:10:28  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.8  2004/11/16 22:37:14  bernie
- *#* Replace IPTR with iptr_t.
- *#*
- *#* Revision 1.7  2004/10/19 08:54:55  bernie
- *#* Define forbid_cnt.
- *#*
- *#* Revision 1.6  2004/10/03 20:44:18  bernie
- *#* Remove stale declarations (moved to monitor.h).
- *#*
- *#* Revision 1.2  2004/06/03 11:27:09  bernie
- *#* Add dual-license information.
- *#*
- *#* Revision 1.1  2004/05/23 17:27:00  bernie
- *#* Import kern/ subdirectory.
- *#*
- *#*/
 
 #ifndef KERN_PROC_H
 #define KERN_PROC_H
 
 #include <cfg/compiler.h>
-#include <cpu/cpu.h>
+#include <cpu/irq.h>
 #include <config_kern.h>
 
 /* Fwd decl */

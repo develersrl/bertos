@@ -40,109 +40,14 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.32  2006/09/20 14:19:23  marco
- *#* Restored test.
- *#*
- *#* Revision 1.31  2006/07/19 12:56:27  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.30  2006/03/27 04:49:23  bernie
- *#* CPU_IDLE(): Fix for new emulator.
- *#*
- *#* Revision 1.29  2006/02/24 01:17:05  bernie
- *#* Update for new emulator.
- *#*
- *#* Revision 1.28  2006/02/21 16:06:55  bernie
- *#* Cleanup/update process scheduling.
- *#*
- *#* Revision 1.27  2005/11/04 16:20:02  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.26  2005/04/11 19:10:28  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.25  2005/03/15 00:20:54  bernie
- *#* proc_schedule(): New sanity check.
- *#*
- *#* Revision 1.24  2005/01/08 09:20:54  bernie
- *#* Remove unused variable.
- *#*
- *#* Revision 1.23  2004/12/13 12:07:06  bernie
- *#* DISABLE_IRQSAVE/ENABLE_IRQRESTORE: Convert to IRQ_SAVE_DISABLE/IRQ_RESTORE.
- *#*
- *#* Revision 1.22  2004/12/13 11:51:08  bernie
- *#* DISABLE_INTS/ENABLE_INTS: Convert to IRQ_DISABLE/IRQ_ENABLE.
- *#*
- *#* Revision 1.21  2004/11/28 23:20:25  bernie
- *#* Remove obsolete INITLIST macro.
- *#*
- *#* Revision 1.20  2004/11/16 22:37:14  bernie
- *#* Replace IPTR with iptr_t.
- *#*
- *#* Revision 1.19  2004/10/19 11:47:39  bernie
- *#* Kill warnings when !CONFIG_PROC_MONITOR.
- *#*
- *#* Revision 1.18  2004/10/19 08:54:43  bernie
- *#* Initialize forbid_cnt; Formatting/comments fixes.
- *#*
- *#* Revision 1.17  2004/10/19 08:47:13  bernie
- *#* proc_rename(), proc_forbid(), proc_permit(): New functions.
- *#*
- *#* Revision 1.16  2004/10/03 20:39:28  bernie
- *#* Import changes from sc/firmware.
- *#*
- *#* Revision 1.15  2004/09/20 03:29:39  bernie
- *#* C++ fixes.
- *#*
- *#* Revision 1.14  2004/09/14 21:06:44  bernie
- *#* Use debug.h instead of kdebug.h.
- *#*
- *#* Revision 1.13  2004/08/29 21:58:53  bernie
- *#* Include macros.h explicityl.
- *#*
- *#* Revision 1.11  2004/08/24 16:09:08  bernie
- *#* Add missing header.
- *#*
- *#* Revision 1.10  2004/08/24 16:07:01  bernie
- *#* Use kputs()/kputchar() when possible.
- *#*
- *#* Revision 1.9  2004/08/24 14:26:57  bernie
- *#* monitor_debug_stacks(): Conditionally compile on CONFIG_KERN_MONITOR.
- *#*
- *#* Revision 1.8  2004/08/14 19:37:57  rasky
- *#* Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
- *#*
- *#* Revision 1.7  2004/08/02 20:20:29  aleph
- *#* Merge from project_ks
- *#*
- *#* Revision 1.6  2004/07/30 14:24:16  rasky
- *#* Task switching con salvataggio perfetto stato di interrupt (SR)
- *#* Kernel monitor per dump informazioni su stack dei processi
- *#*
- *#* Revision 1.5  2004/07/14 14:18:09  rasky
- *#* Merge da SC: Rimosso timer dentro il task, che è uno spreco di memoria per troppi task
- *#*
- *#* Revision 1.4  2004/07/13 19:21:28  aleph
- *#* Avoid warning for unused arg when compiled without some CONFIG_KERN_xx options
- *#*
- *#* Revision 1.3  2004/06/06 18:37:57  bernie
- *#* Rename event macros to look like regular functions.
- *#*
- *#* Revision 1.2  2004/06/03 11:27:09  bernie
- *#* Add dual-license information.
- *#*
- *#* Revision 1.1  2004/05/23 17:27:00  bernie
- *#* Import kern/ subdirectory.
- *#*
- *#*/
 
 #include "proc_p.h"
 #include "proc.h"
 //#include "hw.h"
 #include <mware/event.h>
-#include <cpu/cpu.h>
+#include <cpu/irq.h>
+#include <cpu/types.h>
+#include <cpu/attr.h>
 #include <cfg/debug.h>
 #include <cfg/arch_config.h>  /* ARCH_EMUL */
 #include <cfg/macros.h>  /* ABS() */

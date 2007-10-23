@@ -54,7 +54,8 @@
 
 #include "sysirq_at91.h"
 #include <io/arm.h>
-#include <cpu/cpu.h>
+#include <cpu/irq.h>
+#include <cpu/types.h>
 #include <cfg/module.h>
 #include <cfg/macros.h>
 

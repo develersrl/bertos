@@ -37,7 +37,7 @@
  */
 
 #include "observer.h"
-#include <cpu/cpu.h>  // IRQ_DISABLE/IRQ_ENABLE
+#include <cpu/irq.h>  // IRQ_DISABLE/IRQ_ENABLE
 
 
 void observer_SetEvent(Observer *observer, void (*event)(int event_id, void *param))

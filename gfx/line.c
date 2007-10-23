@@ -39,27 +39,10 @@
  * \brief Line drawing graphics routines
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.4  2006/08/01 12:22:00  bernie
- *#* gfx_findRegion(): Only define when CONFIG_GFX_CLIPPING is enabled.
- *#*
- *#* Revision 1.3  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.2  2006/02/10 12:26:58  bernie
- *#* Check CONFIG_* constraints.
- *#*
- *#* Revision 1.1  2006/01/24 02:17:49  bernie
- *#* Split out gfx.c into bitmap.c and line.c.
- *#*
- *#*/
-
 #include "gfx.h"
 #include "gfx_p.h"
 
 #include <cfg/debug.h>   /* ASSERT() */
-#include <cpu/cpu.h>     /* CPU_HARVARD */
 #include <cfg/macros.h>  /* SWAP() */
 #include <appconfig.h>   /* CONFIG_GFX_CLIPPING */
 

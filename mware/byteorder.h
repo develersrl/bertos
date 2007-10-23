@@ -38,45 +38,11 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.10  2006/06/10 05:37:03  bernie
- *#* Convert to new Doxygen comments.
- *#*
- *#* Revision 1.9  2005/11/04 16:20:02  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.8  2005/06/14 06:16:03  bernie
- *#* Add all missing functions.
- *#*
- *#* Revision 1.7  2005/04/12 04:08:49  bernie
- *#* host_to_net(16|32)(), net_to_host(16|32)(): New functions.
- *#*
- *#* Revision 1.6  2005/04/11 19:10:28  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.5  2004/08/25 14:12:09  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.4  2004/07/22 01:08:43  bernie
- *#* swab32(): Fix a very serious bug.
- *#*
- *#* Revision 1.3  2004/07/20 23:47:12  bernie
- *#* Finally remove redundant protos.
- *#*
- *#* Revision 1.2  2004/07/20 17:09:11  bernie
- *#* swab16(), swab32(), cpu_to_be32(), cpu_to_le32(): New functions.
- *#*
- *#* Revision 1.1  2004/07/20 16:26:15  bernie
- *#* Import byte-order macros into DevLib.
- *#*
- *#*/
-
 #ifndef MWARE_BYTEORDER_H
 #define MWARE_BYTEORDER_H
 
 #include <cfg/compiler.h>
-#include <cpu/cpu.h>
+#include <cpu/attr.h>
 
 /**
  * Swap upper and lower bytes in a 16-bit value.

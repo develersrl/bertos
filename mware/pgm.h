@@ -49,7 +49,8 @@
 
 #include <cfg/compiler.h> /* For intXX_t */
 #include <cpu/detect.h>
-#include <cpu/cpu.h> /* For CPU_HARVARD */
+#include <cpu/attr.h>     /* For CPU_HARVARD */
+#include <cpu/types.h>    /* For SIZEOF_INT */
 
 #if CPU_AVR
 

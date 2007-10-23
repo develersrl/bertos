@@ -38,70 +38,12 @@
  * \version $Id$
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.8  2006/09/13 13:58:55  bernie
- *#* text_moveTo(): Swap parameters.
- *#*
- *#* Revision 1.7  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.6  2006/04/27 05:39:24  bernie
- *#* Enhance text rendering to arbitrary x,y coords.
- *#*
- *#* Revision 1.5  2006/04/11 00:08:24  bernie
- *#* text_offset(): New function, but I'm not quite confident with the design.
- *#*
- *#* Revision 1.4  2006/03/07 22:18:04  bernie
- *#* Correctly compute text width for prop fonts; Make styles a per-bitmap attribute.
- *#*
- *#* Revision 1.3  2006/02/10 12:26:19  bernie
- *#* Add STYLEF_TALL (unimplemented).
- *#*
- *#* Revision 1.2  2005/11/04 18:17:45  bernie
- *#* Fix header guards and includes for new location of gfx module.
- *#*
- *#* Revision 1.1  2005/11/04 18:11:35  bernie
- *#* Move graphics stuff from mware/ to gfx/.
- *#*
- *#* Revision 1.11  2005/04/11 19:10:28  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.10  2005/03/01 23:26:46  bernie
- *#* Use new CPU-neutral program-memory API.
- *#*
- *#* Revision 1.9  2004/12/31 16:44:29  bernie
- *#* Sanitize for non-Harvard processors.
- *#*
- *#* Revision 1.8  2004/10/03 20:43:37  bernie
- *#* Import changes from project_ks.
- *#*
- *#* Revision 1.7  2004/09/20 03:28:49  bernie
- *#* Fix header; Conditionalize AVR-specific code.
- *#*
- *#* Revision 1.6  2004/09/14 20:57:30  bernie
- *#* Reformat.
- *#*
- *#* Revision 1.5  2004/09/06 21:51:26  bernie
- *#* Extend interface to allow any algorithmic style.
- *#*
- *#* Revision 1.4  2004/08/25 14:12:09  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.3  2004/08/05 18:46:44  bernie
- *#* Documentation improvements.
- *#*
- *#* Revision 1.2  2004/06/03 11:27:09  bernie
- *#* Add dual-license information.
- *#*
- *#*/
-
 #ifndef GFX_TEXT_H
 #define GFX_TEXT_H
 
 #include <cfg/compiler.h>
 #include <cfg/macros.h> /* BV() */
-#include <cpu/cpu.h> /* CPU_HARVARD */
+#include <cpu/attr.h> /* CPU_HARVARD */
 #include <gfx/gfx.h> /* coord_t */
 
 #include <stdarg.h>

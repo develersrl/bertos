@@ -39,39 +39,12 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.20  2006/07/19 12:56:25  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.19  2006/03/20 17:49:50  bernie
- *#* Make the TWI driver more generic to work with devices other than EEPROMS.
- *#*
- *#* Revision 1.18  2005/11/27 23:33:40  bernie
- *#* Use appconfig.h instead of cfg/config.h.
- *#*
- *#* Revision 1.17  2005/04/11 19:10:27  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.16  2005/03/01 23:25:09  bernie
- *#* Prune CVS log.
- *#*
- *#* Revision 1.11  2004/10/26 08:35:31  bernie
- *#* Reset watchdog for long operations.
- *#*
- *#* Revision 1.10  2004/09/20 03:31:22  bernie
- *#* Sanitize for C++.
- *#*
- *#* Revision 1.9  2004/09/14 21:03:46  bernie
- *#* Use debug.h instead of kdebug.h.
- *#*/
-
 #include "eeprom.h"
 
 #include <cfg/debug.h>
 #include <appconfig.h>  // CONFIG_EEPROM_VERIFY
 #include <cfg/macros.h>  // MIN()
-#include <cpu/cpu.h>
+#include <cpu/attr.h>
 #include CPU_HEADER(twi)
 #include <drv/wdt.h>
 #include <mware/byteorder.h> // cpu_to_be16()

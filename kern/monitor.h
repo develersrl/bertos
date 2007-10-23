@@ -37,33 +37,10 @@
  * \author Giovanni Bajo <rasky@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.5  2006/07/19 12:56:27  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.4  2006/02/24 01:17:05  bernie
- *#* Update for new emulator.
- *#*
- *#* Revision 1.3  2005/11/04 16:20:02  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.2  2005/04/11 19:10:28  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.1  2004/10/03 20:39:03  bernie
- *#* Import in DevLib.
- *#*
- *#* Revision 1.1  2004/09/30 23:19:30  rasky
- *#* Estratto il monitor degli stack da proc.c in due file a parte: monitor.c/h
- *#* Rinominata monitor_debug_stacks in monitor_report
- *#*
- *#*/
-
 #ifndef KERN_MONITOR_H
 #define KERN_MONITOR_H
 
-#include <cpu/cpu.h>
+#include <cpu/types.h>
 #include <config_kern.h>
 
 #if CONFIG_KERN_MONITOR

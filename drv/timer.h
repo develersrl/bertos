@@ -42,7 +42,8 @@
 #define DRV_TIMER_H
 
 #include <cfg/os.h>
-#include <cpu/cpu.h>
+#include <cpu/attr.h>
+#include <cpu/irq.h>
 
 /*
  * Include platform-specific binding header if we're hosted.

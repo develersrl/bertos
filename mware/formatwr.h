@@ -35,48 +35,12 @@
  * \brief Basic "printf", "sprintf" and "fprintf" formatter.
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.11  2006/07/19 12:56:27  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.10  2005/11/04 16:20:02  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.9  2005/07/19 07:25:46  bernie
- *#* Use appconfig.h instead of cfg/config.h.
- *#*
- *#* Revision 1.8  2005/04/11 19:10:28  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.7  2005/02/16 20:28:03  bernie
- *#* Add %S formatter.
- *#*
- *#* Revision 1.6  2005/01/08 08:50:06  bernie
- *#* Make more portable.
- *#*
- *#* Revision 1.5  2004/08/25 14:12:09  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.4  2004/08/04 15:53:47  rasky
- *#* Nuove opzioni di configurazione per formatted_write e ridotto maggiormente l'utilizzo dellos tack
- *#*
- *#* Revision 1.3  2004/07/29 22:57:09  bernie
- *#* Add values for new-style CONFIG_PRINTF option.
- *#*
- *#* Revision 1.2  2004/06/03 11:27:09  bernie
- *#* Add dual-license information.
- *#*
- *#* Revision 1.1  2004/05/23 15:43:16  bernie
- *#* Import mware modules.
- *#*
- *#*/
 #ifndef MWARE_FORMATWR_H
 #define MWARE_FORMATWR_H
 
 #include <stdarg.h> /* va_list */
 #include <appconfig.h>
-#include <cpu/cpu.h>    /* CPU_HARVARD */
+#include <cpu/attr.h>    /* CPU_HARVARD */
 
 /**
  * \name _formatted_write() configuration

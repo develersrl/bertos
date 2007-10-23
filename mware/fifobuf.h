@@ -66,71 +66,11 @@
  *		\code head == begin && tail == end \endcode
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.22  2006/07/19 12:56:27  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.21  2005/11/04 16:20:02  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.20  2005/04/11 19:10:28  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.19  2004/12/08 08:30:12  bernie
- *#* Add missing header.
- *#*
- *#* Revision 1.18  2004/11/16 21:55:12  bernie
- *#* Workaround for a known fifobuf bug.
- *#*
- *#* Revision 1.17  2004/09/14 20:57:00  bernie
- *#* Use debug.h instead of kdebug.h.
- *#*
- *#* Revision 1.16  2004/09/06 21:39:08  bernie
- *#* Simplify code using ATOMIC().
- *#*
- *#* Revision 1.15  2004/08/29 22:05:16  bernie
- *#* Rename BITS_PER_PTR to CPU_BITS_PER_PTR.
- *#*
- *#* Revision 1.14  2004/08/25 14:12:09  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.13  2004/08/24 13:16:11  bernie
- *#* Add type-size definitions for preprocessor.
- *#*
- *#* Revision 1.12  2004/08/02 20:20:29  aleph
- *#* Merge from project_ks
- *#*
- *#* Revision 1.11  2004/07/30 14:15:53  rasky
- *#* Nuovo supporto unificato per detect della CPU
- *#*
- *#* Revision 1.10  2004/07/29 22:57:09  bernie
- *#* Doxygen fix.
- *#*
- *#* Revision 1.9  2004/07/20 23:54:27  bernie
- *#* fifo_flush_locked(): New function;
- *#* Revamp documentation.
- *#*
- *#* Revision 1.8  2004/07/20 23:47:39  bernie
- *#* Finally remove redundant protos.
- *#*
- *#* Revision 1.7  2004/07/20 23:46:29  bernie
- *#* Finally remove redundant protos.
- *#*
- *#* Revision 1.6  2004/06/06 17:18:04  bernie
- *#* Remove redundant declaration of fifo_isempty_locked().
- *#*
- *#* Revision 1.5  2004/06/06 16:50:35  bernie
- *#* Import fixes for race conditions from project_ks.
- *#*
- *#* Revision 1.4  2004/06/06 16:11:17  bernie
- *#* Protect MetroWerks specific pragmas with #ifdef's
- *#*/
-
 #ifndef MWARE_FIFO_H
 #define MWARE_FIFO_H
 
-#include <cpu/cpu.h>
+#include <cpu/types.h>
+#include <cpu/irq.h>
 #include <cfg/debug.h>
 
 typedef struct FIFOBuffer

@@ -41,7 +41,6 @@
 #error Revise me!
 
 #include <cfg/debug.h>
-#include <cpu/cpu.h>
 #include <cfg/macros.h> /* for BV() */
 #include <appconfig.h>
 #include <hw_cpu.h>     /* for CLOCK_FREQ */

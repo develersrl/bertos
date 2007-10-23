@@ -39,20 +39,16 @@
  * \brief LCD low-level hardware macros
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.1  2006/09/20 17:39:24  marco
- *#* Low level lcd for avr.
- *#*
- *#*/
-
 #ifndef HW_LCD_H
 #define HW_LCD_H
 
 #include <appconfig.h>
 //#include <hw.h>
 
-#include <cpu/cpu.h>
+#include <cpu/attr.h>
+#include <cpu/irq.h>
+#include <cpu/types.h>
+
 #include <cfg/macros.h> /* BV() */
 #include <cfg/debug.h>
 
