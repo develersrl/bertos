@@ -77,8 +77,8 @@
  *#* Trim CVS logs and cleanup header info.
  *#*/
 
-#include "ser.h"
-#include "ser_p.h"
+#include <ser.h>
+#include <ser_p.h>
 #include <drv/irq.h>
 #include <cfg/debug.h>
 #include <hw.h>
