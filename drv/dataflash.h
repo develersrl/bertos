@@ -38,8 +38,8 @@
  */
 
 
-#ifndef DFLASH_H
-#define DFLASH_H
+#ifndef DATAFLASH_H
+#define DATAFLASH_H
 
 #include <kern/kfile.h>
 #include <cfg/compiler.h>
@@ -202,5 +202,5 @@ typedef enum {
 
 void dflash_init(struct _KFile *fd)
 
-#endif /* DFLASH_H */
+#endif /* DATAFLASH_H */
 
