@@ -61,11 +61,14 @@ static void send_cmd(dflashAddr_t page_addr, dflashAddr_t byte_addr, DFlashOpcod
 	/*
 	 * Make sure to toggle CS signal in order,
 	 * and reset dflash command decoder.
-	 * \{
+	 *
+	 * Note:
+	 * #define CS_TOGGLE() \
+	 * 		CS_DISABLE(); \
+	 * 		CS_ENABLE(); \
 	 */
-	CS_DISABLE();
-	CS_ENABLE();
-	/* \} */
+	CS_TOGGLE();
+
 
 	/*
 	 * To send one command to data flash memory, we send 4 byte.
@@ -174,9 +177,7 @@ static uint8_t dflash_stat(void)
 	 * and reset dflash command decoder.
 	 * \{
 	 */
-	CS_DISABLE();
-	CS_ENABLE();
-	/* \} */
+	CS_TOGGLE();
 
 	stat = spi_sendRecv(DFO_READ_STATUS);
 	stat = spi_sendRecv(0x00);
@@ -241,8 +242,8 @@ static uint8_t dflash_read_byte(dflashAddr_t page_addr, dflashAddr_t byte_addr, 
 }
 
 /**
- * Read \param len bytes from main data flash memory or buffer data
- * flash memory, and put it in \param *block.
+ * Read \a len bytes from main data flash memory or buffer data
+ * flash memory, and put it in \a *block.
  */
 static void dflash_read_block(dflashAddr_t page_addr, dflashAddr_t byte_addr, DFlashOpcode opcode, uint8_t *block, dflashSize_t len)
 {
@@ -269,24 +270,9 @@ static void dflash_read_block(dflashAddr_t page_addr, dflashAddr_t byte_addr, DF
 
 }
 
-/**
- * Write one byte in buffer buffer data flash memory.
- *
- * \note Isn't possible to write byte directly in main memory data
- * flash. To perform write in main memory you must before write in buffer
- * data flash memory, an then send command to write page in main memory.
- */
-static void dflash_write_byte(dflashAddr_t byte_addr, DFlashOpcode opcode, uint8_t data)
-{
-	send_cmd(0x00, byte_addr, opcode);
-
-	spi_sendRecv(data); //Write data byte.
-
-	CS_DISABLE();
-}
 
 /**
- * Write \param len bytes in buffer buffer data flash memory.
+ * Write \a len bytes in buffer buffer data flash memory.
  *
  * \note Isn't possible to write bytes directly in main memory data
  * flash. To perform write in main memory you must before write in buffer
@@ -295,7 +281,6 @@ static void dflash_write_byte(dflashAddr_t byte_addr, DFlashOpcode opcode, uint8
 static void dflash_write_block(dflashAddr_t byte_addr, DFlashOpcode opcode, uint8_t *block, dflashSize_t len)
 {
 
-
 	send_cmd(0x00, byte_addr, opcode);
 
 	spi_write(block, len); //Write len bytes.
@@ -303,6 +288,8 @@ static void dflash_write_block(dflashAddr_t byte_addr, DFlashOpcode opcode, uint
 	CS_DISABLE();
 
 }
+
+/* Kfile interface section */
 
 /**
  * Open data flash file \a fd
@@ -336,7 +323,6 @@ static size_t dflash_read(struct _KFile *fd, void *buf, size_t size)
 {
 }
 
-//TODO: deve ritornare un bool?
 /**
  * Init data flash memory interface.
  */
@@ -350,5 +336,5 @@ void dflash_init(struct _KFile *fd)
 	fd->seek = dflash_seek;
 
 	// Init data flash memory and micro pin.
-	dflash_pin_init();
+	ASSERT(dflash_pin_init());
 }
