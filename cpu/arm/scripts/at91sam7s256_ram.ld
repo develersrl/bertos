@@ -107,7 +107,7 @@ SECTIONS
 	} > ram
 
 	/*
-	 * Allocate stack at the end of bss section.
+	 * Allocated stack at the end of bss section.
 	 * Data heap is allocate at end of stack.
 	 */
 	PROVIDE (__stack_start = .);
