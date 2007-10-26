@@ -40,7 +40,6 @@
 
 #include <io/arm.h>
 
-// #include "ser_at91.h"
 #include <drv/ser.h>
 #include <drv/ser_p.h>
 
