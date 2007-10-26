@@ -30,7 +30,7 @@
  *
  * -->
  *
- *  \brief Function library for AT45DB081D Flash memory.
+ *  \brief Function library for AT45DBXX Data Flash memory.
  *
  *
  * \version $Id: dflash.c 15379 2007-03-28 15:46:09Z asterix $
