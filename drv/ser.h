@@ -148,83 +148,15 @@
 #ifndef DRV_SER_H
 #define DRV_SER_H
 
-#include <cpu/detect.h>
+
 #include <mware/fifobuf.h>
 #include <cfg/compiler.h>
-#include <cfg/macros.h> /* BV() */
-#include <cfg/os.h>
+
+#include CPU_HEADER(ser)
 
 #include <appconfig.h>
 
-/** \name Serial Error/status flags. */
-/*\{*/
-#if CPU_ARM_AT91
-	typedef uint32_t serstatus_t;
 
-	/* Software errors */
-	#define SERRF_RXFIFOOVERRUN  BV(0)  /**< Rx FIFO buffer overrun */
-	#define SERRF_RXTIMEOUT      BV(1)  /**< Receive timeout */
-	#define SERRF_TXTIMEOUT      BV(2)  /**< Transmit timeout */
-
-	/*
-	 * Hardware errors.
-	 * These flags map directly to the ARM USART Channel Status Register (US_CSR).
-	 */
-	#define SERRF_RXSROVERRUN    BV(5)  /**< Rx shift register overrun */
-	#define SERRF_FRAMEERROR     BV(6)  /**< Stop bit missing */
-	#define SERRF_PARITYERROR    BV(7)  /**< Parity error */
-	#define SERRF_NOISEERROR     0      /**< Unsupported */
-
-#elif CPU_AVR
-	typedef uint8_t serstatus_t;
-
-	/* Software errors */
-	#define SERRF_RXFIFOOVERRUN  BV(0)  /**< Rx FIFO buffer overrun */
-	#define SERRF_RXTIMEOUT      BV(5)  /**< Receive timeout */
-	#define SERRF_TXTIMEOUT      BV(6)  /**< Transmit timeout */
-
-	/*
-	 * Hardware errors.
-	 * These flags map directly to the AVR UART Status Register (USR).
-	 */
-	#define SERRF_RXSROVERRUN    BV(3)  /**< Rx shift register overrun */
-	#define SERRF_FRAMEERROR     BV(4)  /**< Stop bit missing */
-	#define SERRF_PARITYERROR    BV(7)  /**< Parity error */
-	#define SERRF_NOISEERROR     0      /**< Unsupported */
-#elif CPU_DSP56K
-	typedef uint16_t serstatus_t;
-
-	/* Software errors */
-	#define SERRF_RXFIFOOVERRUN  BV(0)  /**< Rx FIFO buffer overrun */
-	#define SERRF_RXTIMEOUT      BV(1)  /**< Receive timeout */
-	#define SERRF_TXTIMEOUT      BV(2)  /**< Transmit timeout */
-
-	/*
-	 * Hardware errors.
-	 * These flags map directly to the SCI Control Register.
-	 */
-	#define SERRF_PARITYERROR    BV(8)  /**< Parity error */
-	#define SERRF_FRAMEERROR     BV(9)  /**< Stop bit missing */
-	#define SERRF_NOISEERROR     BV(10) /**< Noise error */
-	#define SERRF_RXSROVERRUN    BV(11) /**< Rx shift register overrun */
-#elif OS_HOSTED
-	typedef uint16_t serstatus_t;
-
-	/* Software errors */
-	#define SERRF_RXFIFOOVERRUN  BV(0)  /**< Rx FIFO buffer overrun */
-	#define SERRF_RXTIMEOUT      BV(1)  /**< Receive timeout */
-	#define SERRF_TXTIMEOUT      BV(2)  /**< Transmit timeout */
-
-	/* Hardware errors */
-	#define SERRF_RXSROVERRUN    0      /**< Unsupported in emulated serial port. */
-	#define SERRF_FRAMEERROR     0      /**< Unsupported in emulated serial port. */
-	#define SERRF_PARITYERROR    0      /**< Unsupported in emulated serial port. */
-	#define SERRF_NOISEERROR     0      /**< Unsupported in emulated serial port. */
-
-#else
-	#error unknown architecture
-#endif
-/*\}*/
 
 /**
  * \name Masks to group TX/RX errors.
@@ -241,7 +173,7 @@
 /*\}*/
 
 /**
- * \name LSB or MSB first data order, used with SPI AVR serial
+ * \name LSB or MSB first data order for SPI driver.
  * \{
  */
 #define SER_MSB_FIRST 0
@@ -259,39 +191,6 @@
 #define SER_PARITY_NONE  0
 #define SER_PARITY_EVEN  2
 #define SER_PARITY_ODD   3
-/*\}*/
-
-/**
- * \name Serial hw numbers
- *
- * \{
- */
-enum
-{
-#if CPU_ARM_AT91
-	SER_UART0,
-	SER_UART1,
-	SER_SPI,
-#elif CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281
-	SER_UART0,
-	SER_UART1,
-	SER_SPI,
-#elif CPU_AVR_ATMEGA103 || CPU_AVR_ATMEGA8
-	SER_UART0,
-	SER_SPI,
-#elif CPU_DSP56K
-	// \todo since we now support "fake" multiplexed serials, this should be moved to hw.h
-	SER_UART0,
-	SER_PUNTALI,
-	SER_BARCODE,
-#elif OS_HOSTED
-	SER_UART0,
-	SER_UART1,
-#else
-	#error unknown architecture
-#endif
-	SER_CNT  /**< Number of serial ports */
-};
 /*\}*/
 
 
