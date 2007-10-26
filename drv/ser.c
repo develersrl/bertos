@@ -52,9 +52,7 @@
  */
 
 #include "ser.h"
-
 #include "wdt.h"
-
 #include "ser_p.h"
 #include <mware/formatwr.h>
 #include <cfg/debug.h>
