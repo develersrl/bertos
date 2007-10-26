@@ -41,15 +41,12 @@
 #ifndef DFLASH_H
 #define DFLASH_H
 
-#include <appconfig.h>
-
 #include <kern/kfile.h>
-
 #include <cfg/compiler.h>
 #include <drv/spi.h>
-
 #include "hw_spi.h"
 
+#include <appconfig.h>
 
 /**
  * Type definition for dflash memory.
@@ -57,18 +54,18 @@
 typedef uint32_t dflashAddr_t;
 typedef uint32_t dflashSize_t;
 
-#define RESET_PULSE_WIDTH   10   //Width of reset pulse in usec .
-#define BUSY_BIT	    0x80 //Select a busy bit in status register.
-#define CMP_BIT	            0x40 //Select a compare bit in status register.
+#define RESET_PULSE_WIDTH     10 // Width of reset pulse in usec.
+#define BUSY_BIT            0x80 // Select a busy bit in status register.
+#define CMP_BIT             0x40 // Select a compare bit in status register.
 
 /**
- * Select 2,3,4,5 bit of status register, that
- * bit indicate a id of desity device (see datasheet for
+ * Select 2,3,4,5 bits of status register, those
+ * bits indicate a id of density device (see datasheet for
  * more detail).
  */
 #define GET_ID_DESITY_DEVICE(reg_stat)\
   do {\
-		reg_stat &=  0x3C;\
+		reg_stat &= 0x3C;\
 		reg_stat >>= 2;\
   } while (0)
 
@@ -79,11 +76,11 @@ typedef uint32_t dflashSize_t;
  * level is low.
  * \{
  */
-#define RESET       PC0   ///Connect to RESET pin of flash memory
-#define WP          PC1   ///Connect to WP pin of flash memory
-#define DFLASH_PORT PORTC ///Micro pin PORT register.
-#define DFLASH_PIN  PINC  ///Micro pin PIN register.
-#define DFLASH_DDR  DDRC  ///Micro pin DDR register.
+#define RESET               PC0   ///<  Connect to RESET pin of flash memory
+#define WP                  PC1   ///<  Connect to WP pin of flash memory
+#define DFLASH_PORT         PORTC ///<  Micro pin PORT register.
+#define DFLASH_PIN          PINC  ///<  Micro pin PIN register.
+#define DFLASH_DDR          DDRC  ///<  Micro pin DDR register.
 /* \} */
 
 /**
@@ -100,9 +97,9 @@ typedef uint32_t dflashSize_t;
 /**
  * Commands pin.
  *
- * \note To reset flash memory it need a pulse
- * long about 10 usec, to do this we insert a
- * for cicle.
+ * \note To reset flash memory it needs a pulse
+ * long about 10 usec. To do this we insert a
+ * for cycle.
  *
  * \{
  */
@@ -123,25 +120,25 @@ typedef uint32_t dflashSize_t;
  * if memory defined are right (see dflash.c form more detail).
  * \{
  */
-#define AT45DB041B         1
-#define AT45DB081D         2
-#define AT45DB161D         3
+#define DFLASH_AT45DB041B         1
+#define DFLASH_AT45DB081D         2
+#define DFLASH_AT45DB161D         3
 
-#if CONFIG_DATA_FLASH == AT45DB161D
-	#define DFLASH_ID_DEVICE_DENSITY      0xb  ///This indicate AT45DB161D data flah memory.
-	#define DFLASH_PAGE_SIZE              528  ///Number of byte in one page.
-	#define DFLASH_PAGE_ADDRESS_BIT       10   ///Number bit for addressing one page.
-	#define DFLASH_NUM_PAGE               4096 ///Number page in data flash memory.
-#elif CONFIG_DATA_FLASH == AT45DB081D
-	#define DFLASH_ID_DEVICE_DENSITY      0x9  ///This indicate AT45DB081D data flah memory.
-	#define DFLASH_PAGE_SIZE              264  ///Number of byte in one page.
-	#define DFLASH_PAGE_ADDRESS_BIT       9    ///Number bit for addressing one page.
-	#define DFLASH_NUM_PAGE               4096 ///Number page in data flash memory.
-#elif CONFIG_DATA_FLASH == AT45DB041B
-	#define DFLASH_ID_DEVICE_DENSITY      0x7  ///This indicate AT45DB041B data flah memory.
-	#define DFLASH_PAGE_SIZE              264  ///Number of byte in one page.
-	#define DFLASH_PAGE_ADDRESS_BIT       9    ///Number bit for addressing one page.
-	#define DFLASH_NUM_PAGE               2048 ///Number page in data flash memory.
+#if CONFIG_DATA_FLASH == DFLASH_AT45DB161D
+	#define DFLASH_ID_DEVICE_DENSITY      0xb ///< This indicate AT45DB161D data flah memory.
+	#define DFLASH_PAGE_SIZE              528 ///< Number of byte in one page.
+	#define DFLASH_PAGE_ADDRESS_BIT        10 ///< Number bit for addressing one page.
+	#define DFLASH_NUM_PAGE              4096 ///< Number page in data flash memory.
+#elif CONFIG_DATA_FLASH == DFLASH_AT45DB081D
+	#define DFLASH_ID_DEVICE_DENSITY      0x9  ///< This indicate AT45DB081D data flah memory.
+	#define DFLASH_PAGE_SIZE              264  ///< Number of byte in one page.
+	#define DFLASH_PAGE_ADDRESS_BIT         9  ///< Number bit for addressing one page.
+	#define DFLASH_NUM_PAGE              4096  ///< Number page in data flash memory.
+#elif CONFIG_DATA_FLASH == DFLASH_AT45DB041B
+	#define DFLASH_ID_DEVICE_DENSITY      0x7  ///< This indicate AT45DB041B data flah memory.
+	#define DFLASH_PAGE_SIZE              264  ///< Number of byte in one page.
+	#define DFLASH_PAGE_ADDRESS_BIT         9  ///< Number bit for addressing one page.
+	#define DFLASH_NUM_PAGE              2048  ///< Number page in data flash memory.
 #else
 	#error Nothing memory defined in CONFIG_DATA_FLASH are support.
 #endif
@@ -157,49 +154,49 @@ typedef enum {
 	* \{
 	*/
 
-#if CONFIG_DATA_FLASH == AT45DB081D || CONFIG_DATA_FLASH == AT45DB161D
-	DFO_READ_FLASH_MEM_BYTE  = 0x0B, ///Continuos array read.
-#elif CONFIG_DATA_FLASH == AT45DB041B
-	DFO_READ_FLASH_MEM_BYTE  = 0xE8, ///Continuos array read.
+#if CONFIG_DATA_FLASH == DFLASH_AT45DB081D || CONFIG_DATA_FLASH == AT45DB161D
+	DFO_READ_FLASH_MEM_BYTE  = 0x0B, ///< Continuos array read.
+#elif CONFIG_DATA_FLASH == DFLASH_AT45DB041B
+	DFO_READ_FLASH_MEM_BYTE  = 0xE8, ///< Continuos array read.
 #else
-	#error Nothing memory define in CONFIG_DATA_FLASH are support.
+	#error No supported memory defined in CONFIG_DATA_FLASH.
 #endif
-	DFO_READ_FLASH_MEM       = 0xD2, ///Main memory page read.
-	DFO_READ_BUFF1           = 0xD4, ///SRAM buffer 1 read.
-	DFO_READ_BUFF2           = 0xD6, ///SRAM buffer 2 read.
+	DFO_READ_FLASH_MEM       = 0xD2, ///< Main memory page read.
+	DFO_READ_BUFF1           = 0xD4, ///< SRAM buffer 1 read.
+	DFO_READ_BUFF2           = 0xD6, ///< SRAM buffer 2 read.
 	/* \}*/
 
 	/**
 	* Program and erase commands data flash.
 	* \{
 	*/
-	DFO_WRITE_BUFF1          =  0x84, ///SRAM buffer 1 write.
-	DFO_WRITE_BUFF2          =  0x87, ///SRAM buffer 2 write.
-	DFO_WRITE_BUFF1_TO_MEM_E =  0x83, ///Buffer 1 to main memory page program with build-in erase.
-	DFO_WRITE_BUFF2_TO_MEM_E =  0x86, ///Buffer 2 to main memory page program with build-in erase.
-	DFO_WRITE_BUFF1_TO_MEM   =  0x88, ///Buffer 1 to main memory page program without build-in erase.
-	DFO_WRITE_BUFF2_TO_MEM   =  0x89, ///Buffer 2 to main memory page program without build-in erase.
-	DFO_ERASE_PAGE           =  0x81, ///Erase page.
-	DFO_ERASE_BLOCK          =  0x50, ///Erase block.
-	DFO_ERASE_SECTOR         =  0x7C, ///Erase sector.
-	DFO_WRITE_MEM_TR_BUFF1   =  0x82, ///Write main memory page program through buffer 1.
-	DFO_WRITE_MEM_TR_BUFF2   =  0x85, ///Write main memory page program through buffer 2.
+	DFO_WRITE_BUFF1          =  0x84, ///< SRAM buffer 1 write.
+	DFO_WRITE_BUFF2          =  0x87, ///< SRAM buffer 2 write.
+	DFO_WRITE_BUFF1_TO_MEM_E =  0x83, ///< Buffer 1 to main memory page program with build-in erase.
+	DFO_WRITE_BUFF2_TO_MEM_E =  0x86, ///< Buffer 2 to main memory page program with build-in erase.
+	DFO_WRITE_BUFF1_TO_MEM   =  0x88, ///< Buffer 1 to main memory page program without build-in erase.
+	DFO_WRITE_BUFF2_TO_MEM   =  0x89, ///< Buffer 2 to main memory page program without build-in erase.
+	DFO_ERASE_PAGE           =  0x81, ///< Erase page.
+	DFO_ERASE_BLOCK          =  0x50, ///< Erase block.
+	DFO_ERASE_SECTOR         =  0x7C, ///< Erase sector.
+	DFO_WRITE_MEM_TR_BUFF1   =  0x82, ///< Write main memory page program through buffer 1.
+	DFO_WRITE_MEM_TR_BUFF2   =  0x85, ///< Write main memory page program through buffer 2.
 	/* \}*/
 
 	/**
 	* Additional commands data flash.
 	* \{
 	*/
-	DFO_MOV_MEM_TO_BUFF1     =  0x53, ///Main mmemory to buffer 1 transfer.
-	DFO_MOV_MEM_TO_BUFF2     =  0x55, ///Main mmemory to buffer 2 transfer.
-	DFO_CMP_MEM_TO_BUFF1     =  0x60, ///Main mmemory to buffer 1 compare.
-	DFO_CMP_MEM_TO_BUFF2     =  0x61, ///Main mmemory to buffer 2 compare.
-	DFO_ARW_MEM_TR_BUFF1     =  0x58, ///Auto page rewrite through buffer 1.
-	DFO_ARW_MEM_TR_BUFF2     =  0x59, ///Auto page rewrite through buffer 2
-	DFO_PWR_DOWN             =  0xB9, ///Deep power-down.
-	DFO_RESUME_PWR_DOWN      =  0xAB, ///Resume from deep power-down.
-	DFO_READ_STATUS          =  0xD7, ///Status register read.
-	DFO_ID_DEV               =  0x9F  ///Manufacturer and device ID read.
+	DFO_MOV_MEM_TO_BUFF1     =  0x53, ///< Main mmemory to buffer 1 transfer.
+	DFO_MOV_MEM_TO_BUFF2     =  0x55, ///< Main mmemory to buffer 2 transfer.
+	DFO_CMP_MEM_TO_BUFF1     =  0x60, ///< Main mmemory to buffer 1 compare.
+	DFO_CMP_MEM_TO_BUFF2     =  0x61, ///< Main mmemory to buffer 2 compare.
+	DFO_ARW_MEM_TR_BUFF1     =  0x58, ///< Auto page rewrite through buffer 1.
+	DFO_ARW_MEM_TR_BUFF2     =  0x59, ///< Auto page rewrite through buffer 2
+	DFO_PWR_DOWN             =  0xB9, ///< Deep power-down.
+	DFO_RESUME_PWR_DOWN      =  0xAB, ///< Resume from deep power-down.
+	DFO_READ_STATUS          =  0xD7, ///< Status register read.
+	DFO_ID_DEV               =  0x9F  ///< Manufacturer and device ID read.
 	/* \}*/
 } DFlashOpcode;
 
