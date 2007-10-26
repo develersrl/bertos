@@ -40,7 +40,7 @@
 
 #include <io/arm.h>
 
-//#include "ser_at91.h"
+// #include "ser_at91.h"
 #include <drv/ser.h>
 #include <drv/ser_p.h>
 
@@ -52,6 +52,7 @@
 
 #include <appconfig.h>
 
+#define SERIRQ_PRIORITY 4 ///< default priority for serial irqs.
 
 /**
  * \name Overridable serial bus hooks
@@ -87,7 +88,7 @@
 		/* Set the vector. */ \
 		AIC_SVR(US0_ID) = uart0_irq_dispatcher; \
 		/* Initialize to edge triggered with defined priority. */ \
-		AIC_SMR(US0_ID) = AIC_SRCTYPE_INT_EDGE_TRIGGERED; \
+		AIC_SMR(US0_ID) = AIC_SRCTYPE_INT_EDGE_TRIGGERED | SERIRQ_PRIORITY; \
 		/* Enable the USART IRQ */ \
 		AIC_IECR = BV(US0_ID); \
 		PMC_PCER = BV(US0_ID); \
@@ -137,7 +138,7 @@
 	 * Invoked to send one character.
 	 */
 	#define SER_UART0_BUS_TXCHAR(c) do { \
-		US0_THR = c; \
+		US0_THR = (c); \
 	} while (0)
 #endif
 
@@ -165,7 +166,7 @@
 		/* Set the vector. */ \
 		AIC_SVR(US1_ID) = uart1_irq_dispatcher; \
 		/* Initialize to edge triggered with defined priority. */ \
-		AIC_SMR(US1_ID) = AIC_SRCTYPE_INT_EDGE_TRIGGERED; \
+		AIC_SMR(US1_ID) = AIC_SRCTYPE_INT_EDGE_TRIGGERED | SERIRQ_PRIORITY; \
 		/* Enable the USART IRQ */ \
 		AIC_IECR = BV(US1_ID); \
 		PMC_PCER = BV(US1_ID); \
@@ -200,7 +201,7 @@
 #ifndef SER_UART1_BUS_TXCHAR
 	/** \sa SER_UART1_BUS_TXCHAR */
 	#define SER_UART1_BUS_TXCHAR(c) do { \
-		US1_THR = c; \
+		US1_THR = (c); \
 	} while (0)
 #endif
 
@@ -289,7 +290,6 @@ static void uart0_irq_tx(void)
 	else
 	{
 		char c = fifo_pop(txfifo);
-		kprintf("USART0 tx char: %c\n", c);
 		SER_UART0_BUS_TXCHAR(c);
 	}
 
@@ -312,10 +312,7 @@ static void uart0_irq_rx(void)
 	if (fifo_isfull(rxfifo))
 		ser_uart0->status |= SERRF_RXFIFOOVERRUN;
 	else
-	{
-		kprintf("USART0 recv char: %c\n", c);
 		fifo_push(rxfifo, c);
-	}
 
 	SER_STROBE_OFF;
 }
@@ -329,15 +326,11 @@ static void uart0_irq_dispatcher(void)
 	IRQ_ENTRY();
 
 	if (US0_IMR & BV(US_RXRDY))
-	{
-		kprintf("IRQ RX USART0\n");
 		uart0_irq_rx();
-	}
+
 	if (US0_IMR & BV(US_TXRDY))
-	{
-		kprintf("IRQ TX USART0\n");
 		uart0_irq_tx();
-	}
+
 	IRQ_EXIT();
 }
 
@@ -357,7 +350,6 @@ static void uart1_irq_tx(void)
 	else
 	{
 		char c = fifo_pop(txfifo);
-		kprintf("USART1 tx char: %c\n", c);
 		SER_UART1_BUS_TXCHAR(c);
 	}
 
@@ -380,10 +372,7 @@ static void uart1_irq_rx(void)
 	if (fifo_isfull(rxfifo))
 		ser_uart1->status |= SERRF_RXFIFOOVERRUN;
 	else
-	{
-		kprintf("USART1 recv char: %c\n", c);
 		fifo_push(rxfifo, c);
-	}
 
 	SER_STROBE_OFF;
 }
@@ -397,15 +386,11 @@ static void uart1_irq_dispatcher(void)
 	IRQ_ENTRY();
 
 	if (US1_IMR & BV(US_RXRDY))
-	{
-		kprintf("IRQ RX USART1\n");
 		uart1_irq_rx();
-	}
+
 	if (US1_IMR & BV(US_TXRDY))
-	{
-		kprintf("IRQ TX USART1\n");
 		uart1_irq_tx();
-	}
+
 	IRQ_EXIT();
 }
 /*
