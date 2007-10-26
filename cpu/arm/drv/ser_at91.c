@@ -40,6 +40,7 @@
 
 #include <io/arm.h>
 
+#include <cpu/attr.h>
 #include <drv/ser.h>
 #include <drv/ser_p.h>
 
@@ -104,18 +105,16 @@
 	 * - Enable both the receiver and the transmitter
 	 * - Enable only the RX complete interrupt
 	 */
-	#if CPU_ARM_AT91
-		#define SER_UART0_BUS_TXINIT do { \
-			PIOA_PDR = BV(5) | BV(6); \
-			US0_CR = BV(US_RSTRX) | BV(US_RSTTX); \
-			US0_MR = US_CHMODE_NORMAL | US_CHRL_8 | US_NBSTOP_1; \
-			US0_CR = BV(US_RXEN) | BV(US_TXEN); \
-			US0_IER = BV(US_RXRDY); \
-		} while (0)
-	/*#elif  Add other ARM families here */
-	#else
-		#error Unknown CPU
+	#if !CPU_ARM_AT91SAM7S256
+		#warning Check USART0 pins!
 	#endif
+	#define SER_UART0_BUS_TXINIT do { \
+		PIOA_PDR = BV(5) | BV(6); \
+		US0_CR = BV(US_RSTRX) | BV(US_RSTTX); \
+		US0_MR = US_CHMODE_NORMAL | US_CHRL_8 | US_NBSTOP_1; \
+		US0_CR = BV(US_RXEN) | BV(US_TXEN); \
+		US0_IER = BV(US_RXRDY); \
+	} while (0)
 
 #endif
 
@@ -174,19 +173,16 @@
 
 #ifndef SER_UART1_BUS_TXINIT
 	/** \sa SER_UART1_BUS_TXINIT */
-	#if CPU_ARM_AT91
-		#define SER_UART1_BUS_TXINIT do { \
-			PIOA_PDR = BV(21) | BV(22); \
-			US1_CR = BV(US_RSTRX) | BV(US_RSTTX); \
-			US1_MR = US_CHMODE_NORMAL | US_CHRL_8 | US_NBSTOP_1; \
-			US1_CR = BV(US_RXEN) | BV(US_TXEN); \
-			US1_IER = BV(US_RXRDY); \
-		} while (0)
-	/*#elif  Add other ARM families here */
-	#else
-		#error Unknown CPU
+	#if !CPU_ARM_AT91SAM7S256
+		#warning Check USART1 pins!
 	#endif
-
+	#define SER_UART1_BUS_TXINIT do { \
+		PIOA_PDR = BV(21) | BV(22); \
+		US1_CR = BV(US_RSTRX) | BV(US_RSTTX); \
+		US1_MR = US_CHMODE_NORMAL | US_CHRL_8 | US_NBSTOP_1; \
+		US1_CR = BV(US_RXEN) | BV(US_TXEN); \
+		US1_IER = BV(US_RXRDY); \
+	} while (0)
 #endif
 
 #ifndef SER_UART1_BUS_TXBEGIN
@@ -273,125 +269,9 @@ struct ArmSerial
 struct Serial *ser_uart0 = &ser_handles[SER_UART0];
 struct Serial *ser_uart1 = &ser_handles[SER_UART1];
 
-/**
- * Serial 0 TX interrupt handler
- */
-static void uart0_irq_tx(void)
-{
-	SER_STROBE_ON;
 
-	struct FIFOBuffer * const txfifo = &ser_uart0->txfifo;
-
-	if (fifo_isempty(txfifo))
-	{
-		SER_UART0_BUS_TXEND;
-	}
-	else
-	{
-		char c = fifo_pop(txfifo);
-		SER_UART0_BUS_TXCHAR(c);
-	}
-
-	SER_STROBE_OFF;
-}
-
-/**
- * Serial 0 RX complete interrupt handler.
- */
-static void uart0_irq_rx(void)
-{
-	SER_STROBE_ON;
-
-	/* Should be read before US_CRS */
-	ser_uart0->status |= US0_CSR & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
-
-	char c = US0_RHR;
-	struct FIFOBuffer * const rxfifo = &ser_uart0->rxfifo;
-
-	if (fifo_isfull(rxfifo))
-		ser_uart0->status |= SERRF_RXFIFOOVERRUN;
-	else
-		fifo_push(rxfifo, c);
-
-	SER_STROBE_OFF;
-}
-
-/**
- * Serial IRQ dispatcher for USART0.
- */
-static void uart0_irq_dispatcher(void) __attribute__ ((naked));
-static void uart0_irq_dispatcher(void)
-{
-	IRQ_ENTRY();
-
-	if (US0_IMR & BV(US_RXRDY))
-		uart0_irq_rx();
-
-	if (US0_IMR & BV(US_TXRDY))
-		uart0_irq_tx();
-
-	IRQ_EXIT();
-}
-
-/**
- * Serial 1 TX interrupt handler
- */
-static void uart1_irq_tx(void)
-{
-	SER_STROBE_ON;
-
-	struct FIFOBuffer * const txfifo = &ser_uart1->txfifo;
-
-	if (fifo_isempty(txfifo))
-	{
-		SER_UART1_BUS_TXEND;
-	}
-	else
-	{
-		char c = fifo_pop(txfifo);
-		SER_UART1_BUS_TXCHAR(c);
-	}
-
-	SER_STROBE_OFF;
-}
-
-/**
- * Serial 1 RX complete interrupt handler.
- */
-static void uart1_irq_rx(void)
-{
-	SER_STROBE_ON;
-
-	/* Should be read before US_CRS */
-	ser_uart1->status |= US1_CSR & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
-
-	char c = US1_RHR;
-	struct FIFOBuffer * const rxfifo = &ser_uart1->rxfifo;
-
-	if (fifo_isfull(rxfifo))
-		ser_uart1->status |= SERRF_RXFIFOOVERRUN;
-	else
-		fifo_push(rxfifo, c);
-
-	SER_STROBE_OFF;
-}
-
-/**
- * Serial IRQ dispatcher for USART1.
- */
-static void uart1_irq_dispatcher(void) __attribute__ ((naked));
-static void uart1_irq_dispatcher(void)
-{
-	IRQ_ENTRY();
-
-	if (US1_IMR & BV(US_RXRDY))
-		uart1_irq_rx();
-
-	if (US1_IMR & BV(US_TXRDY))
-		uart1_irq_tx();
-
-	IRQ_EXIT();
-}
+static void uart0_irq_dispatcher(void);
+static void uart1_irq_dispatcher(void);
 /*
  * Callbacks for USART0
  */
@@ -434,13 +314,14 @@ static void uart0_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned
 
 static void uart0_setparity(UNUSED_ARG(struct SerialHardware *, _hw), int parity)
 {
+	US0_MR &= ~US_PAR_MASK;
 	/* Set UART parity */
 	switch(parity)
 	{
 		case SER_PARITY_NONE:
 		{
             /* Parity mode. */
-			US0_MR |= US_PAR_MASK;
+			US0_MR |= US_PAR_NO;
 			break;
 		}
 		case SER_PARITY_EVEN:
@@ -455,6 +336,8 @@ static void uart0_setparity(UNUSED_ARG(struct SerialHardware *, _hw), int parity
 			US0_MR |= US_PAR_ODD;
 			break;
 		}
+		default:
+			ASSERT(0);
 	}
 
 }
@@ -500,13 +383,14 @@ static void uart1_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned
 
 static void uart1_setparity(UNUSED_ARG(struct SerialHardware *, _hw), int parity)
 {
+	US1_MR &= ~US_PAR_MASK;
 	/* Set UART parity */
 	switch(parity)
 	{
 		case SER_PARITY_NONE:
 		{
             /* Parity mode. */
-			US1_MR |= US_PAR_MASK;
+			US1_MR |= US_PAR_NO;
 			break;
 		}
 		case SER_PARITY_EVEN:
@@ -521,6 +405,8 @@ static void uart1_setparity(UNUSED_ARG(struct SerialHardware *, _hw), int parity
 			US1_MR |= US_PAR_ODD;
 			break;
 		}
+		default:
+			ASSERT(0);
 	}
 
 }
@@ -592,4 +478,126 @@ struct SerialHardware *ser_hw_getdesc(int unit)
 {
 	ASSERT(unit < SER_CNT);
 	return &UARTDescs[unit].hw;
+}
+
+/**
+ * Serial 0 TX interrupt handler
+ */
+static void uart0_irq_tx(void)
+{
+	SER_STROBE_ON;
+
+	struct FIFOBuffer * const txfifo = &ser_uart0->txfifo;
+
+	if (fifo_isempty(txfifo))
+	{
+		SER_UART0_BUS_TXEND;
+		UARTDescs[SER_UART0].sending = false;
+	}
+	else
+	{
+		char c = fifo_pop(txfifo);
+		SER_UART0_BUS_TXCHAR(c);
+	}
+
+	SER_STROBE_OFF;
+}
+
+/**
+ * Serial 0 RX complete interrupt handler.
+ */
+static void uart0_irq_rx(void)
+{
+	SER_STROBE_ON;
+
+	/* Should be read before US_CRS */
+	ser_uart0->status |= US0_CSR & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
+
+	char c = US0_RHR;
+	struct FIFOBuffer * const rxfifo = &ser_uart0->rxfifo;
+
+	if (fifo_isfull(rxfifo))
+		ser_uart0->status |= SERRF_RXFIFOOVERRUN;
+	else
+		fifo_push(rxfifo, c);
+
+	SER_STROBE_OFF;
+}
+
+/**
+ * Serial IRQ dispatcher for USART0.
+ */
+static void uart0_irq_dispatcher(void) __attribute__ ((naked));
+static void uart0_irq_dispatcher(void)
+{
+	IRQ_ENTRY();
+
+	if (US0_IMR & BV(US_RXRDY))
+		uart0_irq_rx();
+
+	if (US0_IMR & BV(US_TXRDY))
+		uart0_irq_tx();
+
+	IRQ_EXIT();
+}
+
+/**
+ * Serial 1 TX interrupt handler
+ */
+static void uart1_irq_tx(void)
+{
+	SER_STROBE_ON;
+
+	struct FIFOBuffer * const txfifo = &ser_uart1->txfifo;
+
+	if (fifo_isempty(txfifo))
+	{
+		SER_UART1_BUS_TXEND;
+		UARTDescs[SER_UART1].sending = false;
+	}
+	else
+	{
+		char c = fifo_pop(txfifo);
+		SER_UART1_BUS_TXCHAR(c);
+	}
+
+	SER_STROBE_OFF;
+}
+
+/**
+ * Serial 1 RX complete interrupt handler.
+ */
+static void uart1_irq_rx(void)
+{
+	SER_STROBE_ON;
+
+	/* Should be read before US_CRS */
+	ser_uart1->status |= US1_CSR & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
+
+	char c = US1_RHR;
+	struct FIFOBuffer * const rxfifo = &ser_uart1->rxfifo;
+
+	if (fifo_isfull(rxfifo))
+		ser_uart1->status |= SERRF_RXFIFOOVERRUN;
+	else
+		fifo_push(rxfifo, c);
+
+	SER_STROBE_OFF;
+}
+
+/**
+ * Serial IRQ dispatcher for USART1.
+ */
+static void uart1_irq_dispatcher(void) __attribute__ ((naked));
+static void uart1_irq_dispatcher(void)
+{
+	IRQ_ENTRY();
+
+	if (US1_IMR & BV(US_RXRDY))
+		uart1_irq_rx();
+
+	if (US1_IMR & BV(US_TXRDY))
+		uart1_irq_tx();
+
+	IRQ_EXIT();
 }
