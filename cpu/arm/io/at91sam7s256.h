@@ -142,4 +142,12 @@
 #define IRQ1_ID     31      ///< External interrupt 1 ID.
 /*\}*/
 
+/** USART pins name */
+/*\{*/
+#define RXD0        5
+#define TXD0        6
+#define RXD1       21
+#define TXD1       22
+/*\}*/
+
 #endif /* AT91SAM7S256_H */

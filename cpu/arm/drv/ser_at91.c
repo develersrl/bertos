@@ -109,7 +109,7 @@
 		#warning Check USART0 pins!
 	#endif
 	#define SER_UART0_BUS_TXINIT do { \
-		PIOA_PDR = BV(5) | BV(6); \
+		PIOA_PDR = BV(RXD0) | BV(TXD0); \
 		US0_CR = BV(US_RSTRX) | BV(US_RSTTX); \
 		US0_MR = US_CHMODE_NORMAL | US_CHRL_8 | US_NBSTOP_1; \
 		US0_CR = BV(US_RXEN) | BV(US_TXEN); \
@@ -177,7 +177,7 @@
 		#warning Check USART1 pins!
 	#endif
 	#define SER_UART1_BUS_TXINIT do { \
-		PIOA_PDR = BV(21) | BV(22); \
+		PIOA_PDR = BV(RXD1) | BV(TXD1); \
 		US1_CR = BV(US_RSTRX) | BV(US_RSTTX); \
 		US1_MR = US_CHMODE_NORMAL | US_CHRL_8 | US_NBSTOP_1; \
 		US1_CR = BV(US_RXEN) | BV(US_TXEN); \
