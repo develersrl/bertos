@@ -33,7 +33,7 @@
  *  \brief Function library for AT45DBXX Data Flash memory.
  *
  *
- * \version $Id: dflash.c 15379 2007-03-28 15:46:09Z asterix $
+ * \version $Id: dataflash.c 15379 2007-03-28 15:46:09Z asterix $
  * \author Daniele Basile <asterix@develer.com>
  */
 
@@ -46,26 +46,32 @@
 #include <cfg/module.h>
 #include <drv/timer.h>
 #include <drv/spi.h>
-#include <drv/dflash.h>
+#include <drv/dataflash.h>
 
 #include "hw_spi.h"
+
+
+/**
+ * Global variable for store current and previous data
+ * flash memory page address during operation of writing.
+ */
+dataflash_t previous_page = 0;
+bool page_modified = false;
+
 
 /**
  * Send a generic command to data flash memory.
  * This function send only 4 byte, for opcode, page address and
  * byte address.
  */
-static void send_cmd(dflashAddr_t page_addr, dflashAddr_t byte_addr, DFlashOpcode opcode)
+static void send_cmd(dataflash_t page_addr, dataflash_t byte_addr, DFlashOpcode opcode)
 {
 
 	/*
 	 * Make sure to toggle CS signal in order,
-	 * and reset dflash command decoder.
+	 * and reset dataflash command decoder.
 	 *
-	 * Note:
-	 * #define CS_TOGGLE() \
-	 * 		CS_DISABLE(); \
-	 * 		CS_ENABLE(); \
+	 * \note This is equivalent to CS_DISABLE() immediately followed by CS_ENABLE()
 	 */
 	CS_TOGGLE();
 
@@ -94,8 +100,8 @@ static void send_cmd(dflashAddr_t page_addr, dflashAddr_t byte_addr, DFlashOpcod
 	 *  Send page address.
 	 * \{
 	 */
-	spi_sendRecv((uint8_t)(page_addr >> (16 - DFLASH_PAGE_ADDRESS_BIT)));
-	spi_sendRecv((uint8_t)((page_addr << (DFLASH_PAGE_ADDRESS_BIT - 8)) + (byte_addr >> 8)));
+	spi_sendRecv((uint8_t)(page_addr >> (16 - DATAFLASH_PAGE_ADDRESS_BIT)));
+	spi_sendRecv((uint8_t)((page_addr << (DATAFLASH_PAGE_ADDRESS_BIT - 8)) + (byte_addr >> 8)));
 	/*\}*/
 
 	/*
@@ -114,7 +120,7 @@ static void send_cmd(dflashAddr_t page_addr, dflashAddr_t byte_addr, DFlashOpcod
  * with one pulse reset long about 10usec.
  *
  */
-static void dflash_reset(void)
+static void dataflash_reset(void)
 {
 	CS_ENABLE();
 	RESET_ENABLE();
@@ -125,13 +131,13 @@ static void dflash_reset(void)
 }
 
 /**
- * dflash init function.
+ * dataflash init function.
  * This function initialize a micro pin and
  * SPI driver, and test if data flash memory
- * density is the same wich define in dflash.h.
+ * density is the same wich define in dataflash.h.
  */
-MOD_DEFINE(dflash);
-static bool dflash_pin_init(void)
+MOD_DEFINE(dataflash);
+static bool dataflash_pin_init(void)
 {
 	uint8_t stat;
 
@@ -143,20 +149,20 @@ static bool dflash_pin_init(void)
 	RESET_OUT();
 	WP_OUT();
 
-	dflash_reset();
+	dataflash_reset();
 
-	stat = dflash_stat();
+	stat = dataflash_stat();
 
-	MOD_INIT(dflash);
+	MOD_INIT(dataflash);
 
 	/*
-	 * 2,3,4,5 bit of 1 byte status register
-	 * indicate a device density of dflash memory
+	 * 2,3,4,5 bits of 1 byte status register
+	 * indicate a device density of dataflash memory
 	 * (see datasheet for more detail.)
 	 */
 	GET_ID_DESITY_DEVICE(stat);
 
-	if(stat == DFLASH_ID_DEVICE_DENSITY)
+	if(stat == DATAFLASH_ID_DEVICE_DENSITY)
 		return true;
 	else
 		return false;
@@ -168,13 +174,13 @@ static bool dflash_pin_init(void)
  * Read status register of dataflah memory.
  *
  */
-static uint8_t dflash_stat(void)
+static uint8_t dataflash_stat(void)
 {
 	uint8_t stat;
 
 	/*
 	 * Make sure to toggle CS signal in order,
-	 * and reset dflash command decoder.
+	 * and reset dataflash command decoder.
 	 * \{
 	 */
 	CS_TOGGLE();
@@ -191,7 +197,7 @@ static uint8_t dflash_stat(void)
  * return status register value.
  *
  */
-static uint8_t dflash_cmd(dflashAddr_t page_addr, dflashAddr_t byte_addr, DFlashOpcode opcode)
+static uint8_t dataflash_cmd(dataflash_t page_addr, dataflash_t byte_addr, DFlashOpcode opcode)
 {
 
 	send_cmd(page_addr, byte_addr, opcode);
@@ -203,9 +209,9 @@ static uint8_t dflash_cmd(dflashAddr_t page_addr, dflashAddr_t byte_addr, DFlash
 	 * We chech data flash memory state, and wait until busy-flag
 	 * is hight.
 	 */
-	while(!(dflash_stat() & BUSY_BIT));
+	while(!(dataflash_stat() & BUSY_BIT));
 
-	return (dflash_stat());
+	return (dataflash_stat());
 
 }
 
@@ -213,13 +219,13 @@ static uint8_t dflash_cmd(dflashAddr_t page_addr, dflashAddr_t byte_addr, DFlash
  * Read one byte from main data flash memory or buffer data
  * flash memory.
  */
-static uint8_t dflash_read_byte(dflashAddr_t page_addr, dflashAddr_t byte_addr, DFlashOpcode opcode)
+static uint8_t dataflash_read_byte(dataflash_t page_addr, dataflash_t byte_addr, DFlashOpcode opcode)
 {
 	uint8_t data;
 
 	send_cmd(page_addr, byte_addr, opcode);
 
-#if CONFIG_DATA_FLASH == AT45DB041B
+#if CONFIG_DATA_FLASH == DATAFLASH_AT45DB041B
 	if(opcode == DFO_READ_FLASH_MEM_BYTE)
 	{
 		/*
@@ -245,7 +251,7 @@ static uint8_t dflash_read_byte(dflashAddr_t page_addr, dflashAddr_t byte_addr, 
  * Read \a len bytes from main data flash memory or buffer data
  * flash memory, and put it in \a *block.
  */
-static void dflash_read_block(dflashAddr_t page_addr, dflashAddr_t byte_addr, DFlashOpcode opcode, uint8_t *block, dflashSize_t len)
+static void dataflash_read_block(dataflash_t page_addr, dataflash_t byte_addr, DFlashOpcode opcode, uint8_t *block, dataflashSize_t len)
 {
 
 	send_cmd(page_addr, byte_addr, opcode);
@@ -278,7 +284,7 @@ static void dflash_read_block(dflashAddr_t page_addr, dflashAddr_t byte_addr, DF
  * flash. To perform write in main memory you must before write in buffer
  * data flash memory, an then send command to write page in main memory.
  */
-static void dflash_write_block(dflashAddr_t byte_addr, DFlashOpcode opcode, uint8_t *block, dflashSize_t len)
+static void dataflash_write_block(dataflash_t byte_addr, DFlashOpcode opcode, uint8_t *block, dataflashSize_t len)
 {
 
 	send_cmd(0x00, byte_addr, opcode);
@@ -289,6 +295,33 @@ static void dflash_write_block(dflashAddr_t byte_addr, DFlashOpcode opcode, uint
 
 }
 
+
+/**
+ * Load selct page from dataflash memory to buffer.
+ */
+static void dataflash_loadPage(dataflash_t page_addr)
+{
+	dataflash_cmd(page_addr, 0x00, DFO_MOV_MEM_TO_BUFF1);
+
+	CS_DISABLE();
+}
+
+/**
+ * Flush select page (stored in buffer) in data flash main memory page.
+ */
+void dataflash_flush(void)
+{
+	if (page_modified)
+	{
+		dataflash_cmd(previous_page, 0x00, DFO_WRITE_BUFF1_TO_MEM_E);
+
+		CS_DISABLE();
+		page_modified = false;
+
+		kprintf("\n::=> Flush page:... <%ld>\n", previous_page);
+	}
+}
+
 /* Kfile interface section */
 
 /**
@@ -296,22 +329,34 @@ static void dflash_write_block(dflashAddr_t byte_addr, DFlashOpcode opcode, uint
  * \a name and \a mode are unused, cause flash memory is
  * threated like one file.
  */
-static bool dflash_open(struct _KFile *fd, UNUSED_ARG(const char *, name), UNUSED_ARG(int, mode))
+static bool dataflash_open(struct _KFile *fd, UNUSED_ARG(const char *, name), UNUSED_ARG(int, mode))
 {
+	MOD_CHECK(dataflash);
+
+	previous_page = 0;
+
+	/* Load select page memory from data flash memory*/
+	dataflash_loadPage(previous_page);
+
+	kprintf("dataflash file opened\n");
+	return true;
 }
 
 /**
  * Close file \a fd
  */
-static bool dflash_close(UNUSED_ARG(struct _KFile *,fd))
+static bool dataflash_close(UNUSED_ARG(struct _KFile *,fd))
 {
+	dataflash_flush();
+	kprintf("dataflash file closed\n");
+	return true;
 }
 
 /**
  * Move \a fd file seek position of \a offset bytes
  * from current position.
  */
-static int32_t dflash_seek(struct _KFile *fd, int32_t offset, KSeekMode whence)
+static int32_t dataflash_seek(struct _KFile *fd, int32_t offset, KSeekMode whence)
 {
 }
 
@@ -319,22 +364,66 @@ static int32_t dflash_seek(struct _KFile *fd, int32_t offset, KSeekMode whence)
  * Read from file \a fd \a size bytes and put it in buffer \a buf
  * \return the number of bytes read.
  */
-static size_t dflash_read(struct _KFile *fd, void *buf, size_t size)
+static size_t dataflash_read(struct _KFile *fd, void *buf, size_t size)
+{
+
+//TODO:
+
+	dataflashAddr_t byte_addr;
+	dataflashAddr_t page_addr;
+
+	uint8_t data;
+
+	kprintf(" Read at address:... %ld ",addr);
+
+	/*
+	 * We select from absolute address page address
+	 * and byte address in page.
+	 * \{
+	 */
+	page_addr = addr / (dataflashAddr_t)DATAFLASH_PAGE_SIZE;
+	byte_addr = addr % (dataflashAddr_t)DATAFLASH_PAGE_SIZE;
+	/* \} */
+
+	kprintf(" [page-<%ld>, byte-<%ld>]", page_addr, byte_addr);
+
+	/*
+	 * Flush current page in main memory if
+	 * we had been written a byte in memory
+	 */
+	dataflash_flush();
+
+	/*
+	 * Read byte in main page data flash memory.
+	 */
+	data = dataflash_read_byte(page_addr, byte_addr, DFO_READ_FLASH_MEM_BYTE);
+
+	kprintf(" ::=> Read data: %02x\n",data);
+
+	return data;
+}
+
+/**
+ * Write program memory.
+ * Write \a size bytes from buffer \a _buf to file \a fd
+ * \note Write operations are buffered.
+ */
+static size_t dataflash_write(struct _KFile *fd, const void *_buf, size_t size)
 {
 }
 
 /**
  * Init data flash memory interface.
  */
-void dflash_init(struct _KFile *fd)
+void dataflash_init(struct _KFile *fd)
 {
 	// Set up data flash programming functions.
-	fd->open = dflash_open;
-	fd->close = dflash_close;
-	fd->read = dflash_read;
-	fd->write = dflash_write;
-	fd->seek = dflash_seek;
+	fd->open = dataflash_open;
+	fd->close = dataflash_close;
+	fd->read = dataflash_read;
+	fd->write = dataflash_write;
+	fd->seek = dataflash_seek;
 
 	// Init data flash memory and micro pin.
-	ASSERT(dflash_pin_init());
+	ASSERT(dataflash_pin_init());
 }
