@@ -64,7 +64,7 @@ bool page_modified = false;
  * This function send only 4 byte, for opcode, page address and
  * byte address.
  */
-static void send_cmd(dataflash_t page_addr, dataflash_t byte_addr, DFlashOpcode opcode)
+static void send_cmd(dataflash_t page_addr, dataflash_t byte_addr, DataFlashOpcode opcode)
 {
 
 	/*
@@ -197,7 +197,7 @@ static uint8_t dataflash_stat(void)
  * return status register value.
  *
  */
-static uint8_t dataflash_cmd(dataflash_t page_addr, dataflash_t byte_addr, DFlashOpcode opcode)
+static uint8_t dataflash_cmd(dataflash_t page_addr, dataflash_t byte_addr, DataFlashOpcode opcode)
 {
 
 	send_cmd(page_addr, byte_addr, opcode);
@@ -219,7 +219,7 @@ static uint8_t dataflash_cmd(dataflash_t page_addr, dataflash_t byte_addr, DFlas
  * Read one byte from main data flash memory or buffer data
  * flash memory.
  */
-static uint8_t dataflash_read_byte(dataflash_t page_addr, dataflash_t byte_addr, DFlashOpcode opcode)
+static uint8_t dataflash_read_byte(dataflash_t page_addr, dataflash_t byte_addr, DataFlashOpcode opcode)
 {
 	uint8_t data;
 
@@ -251,7 +251,7 @@ static uint8_t dataflash_read_byte(dataflash_t page_addr, dataflash_t byte_addr,
  * Read \a len bytes from main data flash memory or buffer data
  * flash memory, and put it in \a *block.
  */
-static void dataflash_read_block(dataflash_t page_addr, dataflash_t byte_addr, DFlashOpcode opcode, uint8_t *block, dataflashSize_t len)
+static void dataflash_read_block(dataflash_t page_addr, dataflash_t byte_addr, DataFlashOpcode opcode, uint8_t *block, dataflashSize_t len)
 {
 
 	send_cmd(page_addr, byte_addr, opcode);
@@ -284,7 +284,7 @@ static void dataflash_read_block(dataflash_t page_addr, dataflash_t byte_addr, D
  * flash. To perform write in main memory you must before write in buffer
  * data flash memory, an then send command to write page in main memory.
  */
-static void dataflash_write_block(dataflash_t byte_addr, DFlashOpcode opcode, uint8_t *block, dataflashSize_t len)
+static void dataflash_write_block(dataflash_t byte_addr, DataFlashOpcode opcode, uint8_t *block, dataflashSize_t len)
 {
 
 	send_cmd(0x00, byte_addr, opcode);
@@ -334,6 +334,8 @@ static bool dataflash_open(struct _KFile *fd, UNUSED_ARG(const char *, name), UN
 	MOD_CHECK(dataflash);
 
 	previous_page = 0;
+	fd->seek_pos = 0;
+	fd->size = (dataflashAddr_t)DATAFLASH_PAGE_SIZE *	(dataflashAddr_t)DATAFLASH_NUM_PAGE;
 
 	/* Load select page memory from data flash memory*/
 	dataflash_loadPage(previous_page);
@@ -358,6 +360,36 @@ static bool dataflash_close(UNUSED_ARG(struct _KFile *,fd))
  */
 static int32_t dataflash_seek(struct _KFile *fd, int32_t offset, KSeekMode whence)
 {
+	uint32_t seek_pos;
+
+	switch(whence)
+	{
+		case KSM_SEEK_SET:
+			seek_pos = 0;
+			break;
+		case KSM_SEEK_END:
+			seek_pos = fd->size - 1;
+			break;
+		case KSM_SEEK_CUR:
+			seek_pos = fd->seek_pos;
+			break;
+		default:
+			ASSERT(0);
+			return -1;
+			break;
+	}
+
+	/* Bound check */
+	if (seek_pos + offset > fd->size)
+	{
+		ASSERT(0);
+		return -1;
+	}
+
+	fd->seek_pos = seek_pos + offset;
+	kprintf("Flash seek to [%u]\n", fd->seek_pos);
+
+	return fd->seek_pos;
 }
 
 /**
@@ -366,23 +398,23 @@ static int32_t dataflash_seek(struct _KFile *fd, int32_t offset, KSeekMode whenc
  */
 static size_t dataflash_read(struct _KFile *fd, void *buf, size_t size)
 {
-
-//TODO:
-
 	dataflashAddr_t byte_addr;
 	dataflashAddr_t page_addr;
+	uin8_t *data = (uint8_t *)buf;
 
-	uint8_t data;
 
-	kprintf(" Read at address:... %ld ",addr);
+	ASSERT(fd->seek_pos + size <= fd->size);
+	size = MIN((uint32_t)size, fd->size - fd->seek_pos);
+
+	kprintf("Reading at pos[%u]\n", fd->seek_pos);
 
 	/*
 	 * We select from absolute address page address
 	 * and byte address in page.
 	 * \{
 	 */
-	page_addr = addr / (dataflashAddr_t)DATAFLASH_PAGE_SIZE;
-	byte_addr = addr % (dataflashAddr_t)DATAFLASH_PAGE_SIZE;
+	page_addr = fd->seek_pos / (dataflashAddr_t)DATAFLASH_PAGE_SIZE;
+	byte_addr = fd->seek_pos % (dataflashAddr_t)DATAFLASH_PAGE_SIZE;
 	/* \} */
 
 	kprintf(" [page-<%ld>, byte-<%ld>]", page_addr, byte_addr);
@@ -396,11 +428,12 @@ static size_t dataflash_read(struct _KFile *fd, void *buf, size_t size)
 	/*
 	 * Read byte in main page data flash memory.
 	 */
-	data = dataflash_read_byte(page_addr, byte_addr, DFO_READ_FLASH_MEM_BYTE);
+	dataflash_read_block(page_addr, byte_addr, DFO_READ_FLASH_MEM_BYTE, data, size);
 
+	fd->seek_pos += size;
 	kprintf(" ::=> Read data: %02x\n",data);
 
-	return data;
+	return size;
 }
 
 /**
@@ -410,6 +443,59 @@ static size_t dataflash_read(struct _KFile *fd, void *buf, size_t size)
  */
 static size_t dataflash_write(struct _KFile *fd, const void *_buf, size_t size)
 {
+
+	dataflashAddr_t byte_addr;
+	dataflashAddr_t current_page;
+
+	uint8_t *data = (uint8_t *) _buf;
+
+	ASSERT(fd->seek_pos + size <= fd->size);
+	size = MIN((uint32_t)size, fd->size - fd->seek_pos);
+
+	kprintf("Writing at pos[%u]\n", fd->seek_pos);
+
+	while (size)
+	{
+		/*
+		* We select from absolute address page address
+		* and byte address in page.
+		* \{
+		*/
+		current_page = fd->seek_pos / (dataflashAddr_t)DATAFLASH_PAGE_SIZE;
+		byte_addr = fd->seek_pos % (dataflashAddr_t)DATAFLASH_PAGE_SIZE;
+		/* \} */
+
+		size_t wr_len = MIN(size, DATAFLASH_PAGE_SIZE - byte_addr);
+
+		kprintf(" [page-<%ld>, byte-<%ld>]",current_page, byte_addr);
+
+		if (current_page != previous_page)
+		{
+			/* Flush current page in main memory*/
+			dataflash_flush();
+			/* Load select page memory from data flash memory*/
+			dataflash_loadPage(current_page);
+
+			previous_page = current_page;
+			kprintf(" >> Load page: <%ld> ",current_page);
+		}
+		/*
+		* Write byte in current page, and set true
+		* page_modified flag.
+		*\{
+		*/
+		dataflash_write_byte(byte_addr, DFO_WRITE_BUFF1, data);
+		page_modified = true;
+		/* \} */
+
+		data += wr_len;
+		fd->seek_pos += wr_len;
+		size -= wr_len;
+		total_write += wr_len;
+	}
+
+	kprintf("written %u bytes\n", total_write);
+	return total_write;
 }
 
 /**
