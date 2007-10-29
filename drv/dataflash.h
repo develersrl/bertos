@@ -200,7 +200,8 @@ typedef enum {
 	/* \}*/
 } DataFlashOpcode;
 
-void dataflash_init(struct _KFile *fd)
+void dataflash_init(struct _KFile *fd);
+void hal_dflash_test(void);
 
 #endif /* DRV_DATAFLASH_H */
 
