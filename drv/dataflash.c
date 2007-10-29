@@ -513,3 +513,98 @@ void dataflash_init(struct _KFile *fd)
 	// Init data flash memory and micro pin.
 	ASSERT(dataflash_pin_init());
 }
+
+/**
+ * Test function for dataflash.
+ *
+ * This function test check low level driver for
+ * AT45xx (see dataflash.h for more info) data flash memory.
+ * We write a string in memory in some page ad read it.
+ */
+void dataflash_test(void)
+{
+	KFile fd;
+
+	dataflash_init(&fd);
+
+	uint8_t test_buf[] = "0123456789 Develer s.r.l.";
+	uint8_t cmp_buf[];
+
+	kprintf("\n======= Data Flash test function =========================================\n");
+	kprintf("\nThe string test is: %s\n\n", test_buf);
+
+	fd.open(&fd, NULL, 0);
+
+	/*  TEST 1 */
+
+	// Seek to addr 0
+	if (fd.seek(&fd, 0, SEEK_SET) != 0)
+		goto dataflash_test_end;
+
+	// Test flash write to address 0 (page 0)
+	if (!fd->write(&fd, test_buf, sizeof(test_buf)))
+		goto dataflash_test_end;
+
+	// Seek to addr 0
+	if (fd.seek(&fd, 0, SEEK_SET) != 0)
+		goto dataflash_test_end;
+
+	// Test flash read to address 0 (page 0)
+	if (!fd->read(&fd, cmp_buf, sizeof(test_buf)))
+		goto dataflash_test_end;
+
+	// Compare if are egual.
+	if ((memcmp(cmp_buf,test_buf, sizeof(test_buf)) == 0)
+		goto dataflash_test_end;
+
+	/*  TEST 2 */
+
+	// Go to middle address memory.
+	fd.seek(&fd, (((dataflashAddr_t)DFLASH_PAGE_SIZE * (dataflashAddr_t)DFLASH_NUM_PAGE) / 2), SEEK_CUR);
+
+	// Test flash write at the middle of memory
+	if (!fd->write(&fd, test_buf, sizeof(test_buf)))
+		goto dataflash_test_end;
+
+	// Go to middle address memory.
+	fd.seek(&fd, (((dataflashAddr_t)DFLASH_PAGE_SIZE * (dataflashAddr_t)DFLASH_NUM_PAGE) / 2), SEEK_CUR);
+
+	// Test flash read  at the middle of memory
+	if (!fd->read(&fd, cmp_buf, sizeof(test_buf)))
+		goto dataflash_test_end;
+
+	// Compare if are egual.
+	if ((memcmp(cmp_buf,test_buf, sizeof(test_buf)) == 0)
+		goto dataflash_test_end;
+
+	/*  TEST 3 */
+
+	// Go to end of data flash.
+	fd.seek(&fd, ((dataflashAddr_t)DFLASH_PAGE_SIZE * (dataflashAddr_t)DFLASH_NUM_PAGE) - sizeof(test_buf), SEEK_END);
+
+	// Test flash write at the end of memory
+	if (!fd->write(&fd, test_buf, sizeof(test_buf)))
+		goto dataflash_test_end;
+
+	// Go to end of data flash.
+	fd.seek(&fd, ((dataflashAddr_t)DFLASH_PAGE_SIZE * (dataflashAddr_t)DFLASH_NUM_PAGE) - sizeof(test_buf), SEEK_END);
+
+	// Test flash read at the end of memory
+	if (!fd->read(&fd, cmp_buf, sizeof(test_buf)))
+		goto dataflash_test_end;
+
+	// Compare if are egual.
+	if ((memcmp(cmp_buf,test_buf, sizeof(test_buf)) == 0)
+		goto dataflash_test_end;
+
+	kprintf("\n");
+
+	kprintf("\n====== Test end ===========================================================\n");
+	fd.close(&fd);
+	return true;
+
+dataflash_test_end:
+	fd.close(&fd);
+	return false;
+
+}
