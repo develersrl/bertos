@@ -198,7 +198,7 @@ typedef enum {
 	DFO_READ_STATUS          =  0xD7, ///< Status register read.
 	DFO_ID_DEV               =  0x9F  ///< Manufacturer and device ID read.
 	/* \}*/
-} DFlashOpcode;
+} DataFlashOpcode;
 
 void dataflash_init(struct _KFile *fd)
 
