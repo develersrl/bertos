@@ -38,8 +38,8 @@
  */
 
 
-#ifndef DATAFLASH_H
-#define DATAFLASH_H
+#ifndef DRV_DATAFLASH_H
+#define DRV_DATAFLASH_H
 
 #include <kern/kfile.h>
 #include <cfg/compiler.h>
@@ -51,8 +51,8 @@
 /**
  * Type definition for dflash memory.
  */
-typedef uint32_t dflashAddr_t;
-typedef uint32_t dflashSize_t;
+typedef uint32_t dataflashAddr_t;
+typedef uint32_t dataflashSize_t;
 
 #define RESET_PULSE_WIDTH     10 // Width of reset pulse in usec.
 #define BUSY_BIT            0x80 // Select a busy bit in status register.
@@ -76,11 +76,11 @@ typedef uint32_t dflashSize_t;
  * level is low.
  * \{
  */
-#define RESET               PC0   ///<  Connect to RESET pin of flash memory
-#define WP                  PC1   ///<  Connect to WP pin of flash memory
-#define DFLASH_PORT         PORTC ///<  Micro pin PORT register.
-#define DFLASH_PIN          PINC  ///<  Micro pin PIN register.
-#define DFLASH_DDR          DDRC  ///<  Micro pin DDR register.
+#define RESET                   PC0 ///<  Connect to RESET pin of flash memory
+#define WP                      PC1 ///<  Connect to WP pin of flash memory
+#define DATAFLASH_PORT        PORTC ///<  Micro pin PORT register.
+#define DATAFLASH_PIN          PINC ///<  Micro pin PIN register.
+#define DATAFLASH_DDR          DDRC ///<  Micro pin DDR register.
 /* \} */
 
 /**
@@ -88,10 +88,10 @@ typedef uint32_t dflashSize_t;
  *
  * \{
  */
-#define RESET_LOW()      do { DFLASH_PORT &= ~BV(RESET); } while(0)
-#define RESET_HIGH()     do { DFLASH_PORT |= BV(RESET); } while(0)
-#define WP_LOW()         do { DFLASH_PORT &= ~BV(WP); } while(0)
-#define WP_HIGH()        do { DFLASH_PORT |= BV(WP); } while(0)
+#define RESET_LOW()      do { DATAFLASHs_PORT &= ~BV(RESET); } while(0)
+#define RESET_HIGH()     do { DATAFLASH_PORT |= BV(RESET); } while(0)
+#define WP_LOW()         do { DATAFLASH_PORT &= ~BV(WP); } while(0)
+#define WP_HIGH()        do { DATAFLASH_PORT |= BV(WP); } while(0)
 /* \} */
 
 /**
@@ -103,8 +103,8 @@ typedef uint32_t dflashSize_t;
  *
  * \{
  */
-#define RESET_OUT()       do { DFLASH_DDR |= BV(RESET); } while(0)
-#define WP_OUT()          do { DFLASH_DDR |= BV(WP); } while(0)
+#define RESET_OUT()       do { DATAFLASH_DDR |= BV(RESET); } while(0)
+#define WP_OUT()          do { DATAFLASH_DDR |= BV(WP); } while(0)
 #define WRITE_ENABLE()    WP_HIGH()
 #define WRITE_DISABLE()   WP_LOW()
 #define RESET_ENABLE()    RESET_LOW()
@@ -116,29 +116,29 @@ typedef uint32_t dflashSize_t;
  * Memory definition.
  *
  * \note Below are defined valid flash memory support to
- * this drive. Every time we call dflash_init() function we check
- * if memory defined are right (see dflash.c form more detail).
+ * this drive. Every time we call dataflash_init() function we check
+ * if memory defined are right (see dataflash.c form more detail).
  * \{
  */
-#define DFLASH_AT45DB041B         1
-#define DFLASH_AT45DB081D         2
-#define DFLASH_AT45DB161D         3
+#define DATAFLASH_AT45DB041B         1
+#define DATAFLASH_AT45DB081D         2
+#define DATAFLASH_AT45DB161D         3
 
-#if CONFIG_DATA_FLASH == DFLASH_AT45DB161D
-	#define DFLASH_ID_DEVICE_DENSITY      0xb ///< This indicate AT45DB161D data flah memory.
-	#define DFLASH_PAGE_SIZE              528 ///< Number of byte in one page.
-	#define DFLASH_PAGE_ADDRESS_BIT        10 ///< Number bit for addressing one page.
-	#define DFLASH_NUM_PAGE              4096 ///< Number page in data flash memory.
-#elif CONFIG_DATA_FLASH == DFLASH_AT45DB081D
-	#define DFLASH_ID_DEVICE_DENSITY      0x9  ///< This indicate AT45DB081D data flah memory.
-	#define DFLASH_PAGE_SIZE              264  ///< Number of byte in one page.
-	#define DFLASH_PAGE_ADDRESS_BIT         9  ///< Number bit for addressing one page.
-	#define DFLASH_NUM_PAGE              4096  ///< Number page in data flash memory.
-#elif CONFIG_DATA_FLASH == DFLASH_AT45DB041B
-	#define DFLASH_ID_DEVICE_DENSITY      0x7  ///< This indicate AT45DB041B data flah memory.
-	#define DFLASH_PAGE_SIZE              264  ///< Number of byte in one page.
-	#define DFLASH_PAGE_ADDRESS_BIT         9  ///< Number bit for addressing one page.
-	#define DFLASH_NUM_PAGE              2048  ///< Number page in data flash memory.
+#if CONFIG_DATA_FLASH == DATAFLASH_AT45DB161D
+	#define DATAFLASH_ID_DEVICE_DENSITY      0xb ///< This indicate AT45DB161D data flah memory.
+	#define DATAFLASH_PAGE_SIZE              528 ///< Number of byte in one page.
+	#define DATAFLASH_PAGE_ADDRESS_BIT        10 ///< Number bit for addressing one page.
+	#define DATAFLASH_NUM_PAGE              4096 ///< Number page in data flash memory.
+#elif CONFIG_DATA_FLASH == DATAFLASH_AT45DB081D
+	#define DATAFLASH_ID_DEVICE_DENSITY      0x9  ///< This indicate AT45DB081D data flah memory.
+	#define DATAFLASH_PAGE_SIZE              264  ///< Number of byte in one page.
+	#define DATAFLASH_PAGE_ADDRESS_BIT         9  ///< Number bit for addressing one page.
+	#define DATAFLASH_NUM_PAGE              4096  ///< Number page in data flash memory.
+#elif CONFIG_DATA_FLASH == DATAFLASH_AT45DB041B
+	#define DATAFLASH_ID_DEVICE_DENSITY      0x7  ///< This indicate AT45DB041B data flah memory.
+	#define DATAFLASH_PAGE_SIZE              264  ///< Number of byte in one page.
+	#define DATAFLASH_PAGE_ADDRESS_BIT         9  ///< Number bit for addressing one page.
+	#define DATAFLASH_NUM_PAGE              2048  ///< Number page in data flash memory.
 #else
 	#error Nothing memory defined in CONFIG_DATA_FLASH are support.
 #endif
@@ -154,9 +154,9 @@ typedef enum {
 	* \{
 	*/
 
-#if CONFIG_DATA_FLASH == DFLASH_AT45DB081D || CONFIG_DATA_FLASH == AT45DB161D
+#if CONFIG_DATA_FLASH == DATAFLASH_AT45DB081D || CONFIG_DATA_FLASH == AT45DB161D
 	DFO_READ_FLASH_MEM_BYTE  = 0x0B, ///< Continuos array read.
-#elif CONFIG_DATA_FLASH == DFLASH_AT45DB041B
+#elif CONFIG_DATA_FLASH == DATAFLASH_AT45DB041B
 	DFO_READ_FLASH_MEM_BYTE  = 0xE8, ///< Continuos array read.
 #else
 	#error No supported memory defined in CONFIG_DATA_FLASH.
@@ -200,7 +200,7 @@ typedef enum {
 	/* \}*/
 } DFlashOpcode;
 
-void dflash_init(struct _KFile *fd)
+void dataflash_init(struct _KFile *fd)
 
-#endif /* DATAFLASH_H */
+#endif /* DRV_DATAFLASH_H */
 
