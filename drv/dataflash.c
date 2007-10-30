@@ -340,7 +340,7 @@ static bool dataflash_open(struct _KFile *fd, UNUSED_ARG(const char *, name), UN
 
 	previous_page = 0;
 	fd->seek_pos = 0;
-	fd->size = (dataflashAddr_t)DATAFLASH_PAGE_SIZE *	(dataflashAddr_t)DATAFLASH_NUM_PAGE;
+	fd->size = (dataflashAddr_t)DATAFLASH_PAGE_SIZE * (dataflashAddr_t)DATAFLASH_NUM_PAGE;
 
 	/* Load select page memory from data flash memory*/
 	dataflash_loadPage(previous_page);
@@ -369,19 +369,21 @@ static int32_t dataflash_seek(struct _KFile *fd, int32_t offset, KSeekMode whenc
 
 	switch(whence)
 	{
-		case KSM_SEEK_SET:
-			seek_pos = 0;
-			break;
-		case KSM_SEEK_END:
-			seek_pos = fd->size - 1;
-			break;
-		case KSM_SEEK_CUR:
-			seek_pos = fd->seek_pos;
-			break;
-		default:
-			ASSERT(0);
-			return -1;
-			break;
+
+	case KSM_SEEK_SET:
+		seek_pos = 0;
+		break;
+	case KSM_SEEK_END:
+		seek_pos = fd->size - 1;
+		break;
+	case KSM_SEEK_CUR:
+		seek_pos = fd->seek_pos;
+		break;
+	default:
+		ASSERT(0);
+		return -1;
+		break;
+
 	}
 
 	/* Bound check */
@@ -396,11 +398,6 @@ static int32_t dataflash_seek(struct _KFile *fd, int32_t offset, KSeekMode whenc
 
 	return fd->seek_pos;
 }
-
-/**
- * Read from file \a fd \a size bytes and put it in buffer \a buf
- * \return the number of bytes read.
- */
 
 /**
  * Read \a _buf lenght \a size byte from data flash memmory.
@@ -549,6 +546,9 @@ void dataflash_test(void)
 	uint8_t test_buf[] = "0123456789 Develer s.r.l.";
 	uint8_t cmp_buf[];
 
+	int tb_len = sizeof(test_buf);
+	int tmp_len = 0;
+
 	kprintf("\n======= Data Flash test function =========================================\n");
 	kprintf("\nThe string test is: %s\n\n", test_buf);
 
@@ -557,64 +557,105 @@ void dataflash_test(void)
 	/*  TEST 1 */
 
 	// Seek to addr 0
-	if (fd.seek(&fd, 0, SEEK_SET) != 0)
+	if (!fd.seek(&fd, 0, SEEK_SET))
 		goto dataflash_test_end;
 
 	// Test flash write to address 0 (page 0)
-	if (!fd->write(&fd, test_buf, sizeof(test_buf)))
+	tmp_len = fd->write(&fd, test_buf, len_tb)
+	if (len_tb != tmp_len)
+	{
+		kprintf("Test 1: Wrong numer write bytes! expecteded [%d], write [%d]\n", tb_len, tmp_len);
 		goto dataflash_test_end;
+	}
 
 	// Seek to addr 0
 	if (fd.seek(&fd, 0, SEEK_SET) != 0)
 		goto dataflash_test_end;
+	tmp_len = 0;
 
 	// Test flash read to address 0 (page 0)
-	if (!fd->read(&fd, cmp_buf, sizeof(test_buf)))
+	tmp_len = fd->read(&fd, cmp_buf, len_tb);
+	if (len_tb != tmp_len)
+	{
+		kprintf("Test 1: Wrong numer read bytes! expecteded [%d], read [%d]\n", tb_len, tmp_len);
 		goto dataflash_test_end;
+	}
 
-	// Compare if are egual.
-	if ((memcmp(cmp_buf,test_buf, sizeof(test_buf)) == 0)
+	// Compare if they are equal
+	if ((memcmp(cmp_buf,test_buf, len_tb) == 0)
+	{
+		kprintf("Test 1: Readed test buf don't much!\n");
 		goto dataflash_test_end;
+	}
 
 	/*  TEST 2 */
 
 	// Go to middle address memory.
-	fd.seek(&fd, (((dataflashAddr_t)DFLASH_PAGE_SIZE * (dataflashAddr_t)DFLASH_NUM_PAGE) / 2), SEEK_CUR);
+	if (!fd.seek(&fd, (((dataflashAddr_t)DFLASH_PAGE_SIZE * (dataflashAddr_t)DFLASH_NUM_PAGE) / 2), SEEK_CUR))
+		goto dataflash_test_end;
+	tmp_len = 0;
 
 	// Test flash write at the middle of memory
-	if (!fd->write(&fd, test_buf, sizeof(test_buf)))
+	tmp_len = fd->write(&fd, test_buf, len_tb);
+	if (len_tb != tmp_len)
+	{
+		kprintf("Test 2: Wrong numer write bytes! expecteded [%d], write [%d]\n", tb_len, tmp_len);
 		goto dataflash_test_end;
+	}
 
 	// Go to middle address memory.
-	fd.seek(&fd, (((dataflashAddr_t)DFLASH_PAGE_SIZE * (dataflashAddr_t)DFLASH_NUM_PAGE) / 2), SEEK_CUR);
+	if (!fd.seek(&fd, (((dataflashAddr_t)DFLASH_PAGE_SIZE * (dataflashAddr_t)DFLASH_NUM_PAGE) / 2), SEEK_CUR))
+		goto dataflash_test_end;
+	tmp_len = 0;
 
 	// Test flash read  at the middle of memory
-	if (!fd->read(&fd, cmp_buf, sizeof(test_buf)))
+	tmp_len = fd->read(&fd, cmp_buf, len_tb);
+	if (len_tb != tmp_len)
+	{
+		kprintf("Test 2: Wrong numer read bytes! expecteded [%d], read [%d]\n", tb_len, tmp_len);
 		goto dataflash_test_end;
+	}
 
-	// Compare if are egual.
-	if ((memcmp(cmp_buf,test_buf, sizeof(test_buf)) == 0)
+	// Compare if they are equal
+	if ((memcmp(cmp_buf,test_buf, len_tb) == 0)
+	{
+		kprintf("Test 2: Readed test buf don't much!\n");
 		goto dataflash_test_end;
-
+	}
 	/*  TEST 3 */
 
 	// Go to end of data flash.
-	fd.seek(&fd, ((dataflashAddr_t)DFLASH_PAGE_SIZE * (dataflashAddr_t)DFLASH_NUM_PAGE) - sizeof(test_buf), SEEK_END);
+	if(!fd.seek(&fd, ((dataflashAddr_t)DFLASH_PAGE_SIZE * (dataflashAddr_t)DFLASH_NUM_PAGE) - len_tb, SEEK_END));
+		goto dataflash_test_end;
+	tmp_len = 0;
 
 	// Test flash write at the end of memory
-	if (!fd->write(&fd, test_buf, sizeof(test_buf)))
+	tmp_len = fd->write(&fd, test_buf, len_tb);
+	if (len_tb != tmp_len)
+	{
+		kprintf("Test 3: Wrong numer write bytes! expecteded [%d], write [%d]\n", tb_len, tmp_len);
 		goto dataflash_test_end;
+	}
 
 	// Go to end of data flash.
-	fd.seek(&fd, ((dataflashAddr_t)DFLASH_PAGE_SIZE * (dataflashAddr_t)DFLASH_NUM_PAGE) - sizeof(test_buf), SEEK_END);
+	if(!fd.seek(&fd, ((dataflashAddr_t)DFLASH_PAGE_SIZE * (dataflashAddr_t)DFLASH_NUM_PAGE) - len_tb, SEEK_END));
+		goto dataflash_test_end;
+	tmp_len = 0
 
 	// Test flash read at the end of memory
-	if (!fd->read(&fd, cmp_buf, sizeof(test_buf)))
+	tmp_len = fd->read(&fd, cmp_buf, len_tb);
+	if (len_tb != tmp_len)
+	{
+		kprintf("Test 3: Wrong numer read bytes! expecteded [%d], read [%d]\n", tb_len, tmp_len);
 		goto dataflash_test_end;
+	}
 
-	// Compare if are egual.
-	if ((memcmp(cmp_buf,test_buf, sizeof(test_buf)) == 0)
+	// Compare if they are equal
+	if ((memcmp(cmp_buf,test_buf, len_tb) == 0)
+	{
+		kprintf("Test 3: Readed test buf don't much!\n");
 		goto dataflash_test_end;
+	}
 
 	kprintf("\n");
 
