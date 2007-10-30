@@ -55,8 +55,8 @@
  * Global variable for store current and previous data
  * flash memory page address during operation of writing.
  */
-dataflash_t previous_page = 0;
-bool page_modified = false;
+static dataflash_t previous_page = 0;
+static bool page_modified = false;
 
 
 /**
@@ -88,7 +88,6 @@ static void send_cmd(dataflash_t page_addr, dataflash_t byte_addr, DataFlashOpco
 	 *  hight part of address byte in third byte togheter low par of page
 	 *  address.
 	 *
-	 * \{
 	 */
 
 	/*
@@ -98,18 +97,15 @@ static void send_cmd(dataflash_t page_addr, dataflash_t byte_addr, DataFlashOpco
 
 	/*
 	 *  Send page address.
-	 * \{
 	 */
 	spi_sendRecv((uint8_t)(page_addr >> (16 - DATAFLASH_PAGE_ADDRESS_BIT)));
 	spi_sendRecv((uint8_t)((page_addr << (DATAFLASH_PAGE_ADDRESS_BIT - 8)) + (byte_addr >> 8)));
-	/*\}*/
 
 	/*
 	 * Send byte page address.
 	 */
 	spi_sendRecv((uint8_t)byte_addr);
 
-	/* \} */
 
 }
 
@@ -181,7 +177,6 @@ static uint8_t dataflash_stat(void)
 	/*
 	 * Make sure to toggle CS signal in order,
 	 * and reset dataflash command decoder.
-	 * \{
 	 */
 	CS_TOGGLE();
 
@@ -202,8 +197,7 @@ static uint8_t dataflash_cmd(dataflash_t page_addr, dataflash_t byte_addr, DataF
 
 	send_cmd(page_addr, byte_addr, opcode);
 
-	CS_DISABLE();
-	CS_ENABLE();
+	CS_TOGGLE();
 
 	/*
 	 * We chech data flash memory state, and wait until busy-flag
@@ -230,12 +224,10 @@ static uint8_t dataflash_read_byte(dataflash_t page_addr, dataflash_t byte_addr,
 	{
 		/*
 		 * Send 24 don't care bit.
-		 * \{
 		 */
 		spi_sendRecv(0x00);
 		spi_sendRecv(0x00);
 		spi_sendRecv(0x00);
-		/* \} */
 
 	}
 #endif
@@ -260,12 +252,11 @@ static void dataflash_read_block(dataflash_t page_addr, dataflash_t byte_addr, D
 	{
 		/*
 		 * Send 24 don't care bit.
-		 * \{
 		 */
 		spi_sendRecv(0x00);
 		spi_sendRecv(0x00);
 		spi_sendRecv(0x00);
-		/* \} */
+
 	}
 
 	spi_sendRecv(0x00);   //Send 8 don't care bit.
@@ -411,11 +402,10 @@ static size_t dataflash_read(struct _KFile *fd, void *buf, size_t size)
 	/*
 	 * We select from absolute address page address
 	 * and byte address in page.
-	 * \{
 	 */
 	page_addr = fd->seek_pos / (dataflashAddr_t)DATAFLASH_PAGE_SIZE;
 	byte_addr = fd->seek_pos % (dataflashAddr_t)DATAFLASH_PAGE_SIZE;
-	/* \} */
+
 
 	kprintf(" [page-<%ld>, byte-<%ld>]", page_addr, byte_addr);
 
@@ -459,11 +449,10 @@ static size_t dataflash_write(struct _KFile *fd, const void *_buf, size_t size)
 		/*
 		* We select from absolute address page address
 		* and byte address in page.
-		* \{
 		*/
 		current_page = fd->seek_pos / (dataflashAddr_t)DATAFLASH_PAGE_SIZE;
 		byte_addr = fd->seek_pos % (dataflashAddr_t)DATAFLASH_PAGE_SIZE;
-		/* \} */
+
 
 		size_t wr_len = MIN(size, DATAFLASH_PAGE_SIZE - byte_addr);
 
@@ -482,11 +471,10 @@ static size_t dataflash_write(struct _KFile *fd, const void *_buf, size_t size)
 		/*
 		* Write byte in current page, and set true
 		* page_modified flag.
-		*\{
 		*/
 		dataflash_write_byte(byte_addr, DFO_WRITE_BUFF1, data);
 		page_modified = true;
-		/* \} */
+
 
 		data += wr_len;
 		fd->seek_pos += wr_len;
