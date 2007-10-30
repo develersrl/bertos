@@ -183,6 +183,12 @@ static uint8_t dataflash_stat(void)
 	stat = spi_sendRecv(DFO_READ_STATUS);
 	stat = spi_sendRecv(0x00);
 
+	/*
+	 * Note: this function could be call one more time
+	 * to check register status (es. check if memory has been
+	 * teminate one operation), and so we don't disable CS to
+	 * allow fast reading of register status.
+	 */
 	return stat;
 }
 
@@ -195,6 +201,8 @@ static uint8_t dataflash_stat(void)
 static uint8_t dataflash_cmd(dataflash_t page_addr, dataflashOffset_t byte_addr, DataFlashOpcode opcode)
 {
 
+	uint8_t stat;
+
 	send_cmd(page_addr, byte_addr, opcode);
 
 	CS_TOGGLE();
@@ -205,7 +213,15 @@ static uint8_t dataflash_cmd(dataflash_t page_addr, dataflashOffset_t byte_addr,
 	 */
 	while(!(dataflash_stat() & BUSY_BIT));
 
-	return (dataflash_stat());
+	stat = dataflash_stat();
+
+	/*
+	 * Data flash has been terminate a sent command, and so
+	 * disable CS.
+	 */
+	CS_DISABLE();
+
+	return (stat);
 
 }
 
@@ -234,6 +250,7 @@ static uint8_t dataflash_read_byte(dataflash_t page_addr, dataflashOffset_t byte
 
 	spi_sendRecv(0x00);         //Send 8 don't care bit.
 	data = spi_sendRecv(0x00);  //Read byte.
+
 	CS_DISABLE();
 
 	return data;
@@ -293,8 +310,6 @@ static void dataflash_write_block(dataflashOffset_t byte_addr, DataFlashOpcode o
 static void dataflash_loadPage(dataflash_t page_addr)
 {
 	dataflash_cmd(page_addr, 0x00, DFO_MOV_MEM_TO_BUFF1);
-
-	CS_DISABLE();
 }
 
 /**
@@ -306,7 +321,6 @@ void dataflash_flush(void)
 	{
 		dataflash_cmd(previous_page, 0x00, DFO_WRITE_BUFF1_TO_MEM_E);
 
-		CS_DISABLE();
 		page_modified = false;
 
 		kprintf("\n::=> Flush page:... <%ld>\n", previous_page);
