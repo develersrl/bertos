@@ -401,6 +401,19 @@ static int32_t dataflash_seek(struct _KFile *fd, int32_t offset, KSeekMode whenc
  * Read from file \a fd \a size bytes and put it in buffer \a buf
  * \return the number of bytes read.
  */
+
+/**
+ * Read \a _buf lenght \a size byte from data flash memmory.
+ *
+ * \note For read in data flash memory, we
+ * check flag page_modified, if is true (that mean
+ * we had been written a byte in buffer memory) we
+ * flush current page in data flash main memory, and
+ * then read byte from memory, else we read byte
+ * directly from data flash main memory.
+ *
+ * \return the number of bytes read.
+ */
 static size_t dataflash_read(struct _KFile *fd, void *buf, size_t size)
 {
 	dataflashOffset_t byte_addr;
@@ -414,11 +427,10 @@ static size_t dataflash_read(struct _KFile *fd, void *buf, size_t size)
 	kprintf("Reading at pos[%u]\n", fd->seek_pos);
 
 	/*
-	 * We select from absolute address page address
-	 * and byte address in page.
+	 * We select page and offest from absolute address.
 	 */
 	page_addr = fd->seek_pos / (dataflashAddr_t)DATAFLASH_PAGE_SIZE;
-	byte_addr = fd->seek_pos % (dataflashAddr_t)DATAFLASH_PAGE_SIZE;
+	byte_addr = fd->seek_pos % (dataflashOffset_t)DATAFLASH_PAGE_SIZE;
 
 
 	kprintf(" [page-<%ld>, byte-<%ld>]", page_addr, byte_addr);
@@ -441,9 +453,15 @@ static size_t dataflash_read(struct _KFile *fd, void *buf, size_t size)
 }
 
 /**
- * Write program memory.
- * Write \a size bytes from buffer \a _buf to file \a fd
- * \note Write operations are buffered.
+ * Write \a _buf in data flash memory
+ *
+ * \note For write \a _buf in data flash memory, we must
+ * before write in buffer data flash memory, and at end of write,
+ * we put page in data flash main memory. If we write in two
+ * different page, we put in main memory current page and reload
+ * page witch we want write.
+ *
+ * \return the number of bytes write.
  */
 static size_t dataflash_write(struct _KFile *fd, const void *_buf, size_t size)
 {
@@ -461,11 +479,10 @@ static size_t dataflash_write(struct _KFile *fd, const void *_buf, size_t size)
 	while (size)
 	{
 		/*
-		* We select from absolute address page address
-		* and byte address in page.
+		* We select page and offest from absolute address.
 		*/
 		current_page = fd->seek_pos / (dataflashAddr_t)DATAFLASH_PAGE_SIZE;
-		byte_addr = fd->seek_pos % (dataflashAddr_t)DATAFLASH_PAGE_SIZE;
+		byte_addr = fd->seek_pos % (dataflashOffset_t)DATAFLASH_PAGE_SIZE;
 
 
 		size_t wr_len = MIN(size, DATAFLASH_PAGE_SIZE - byte_addr);
@@ -610,3 +627,4 @@ dataflash_test_end:
 	return false;
 
 }
+
