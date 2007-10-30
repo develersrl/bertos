@@ -52,6 +52,7 @@
  * Type definition for dflash memory.
  */
 typedef uint32_t dataflashAddr_t;
+typedef uint32_t dataflashOffset_t;
 typedef uint32_t dataflashSize_t;
 
 #define RESET_PULSE_WIDTH     10 // Width of reset pulse in usec.

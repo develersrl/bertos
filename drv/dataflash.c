@@ -64,7 +64,7 @@ static bool page_modified = false;
  * This function send only 4 byte, for opcode, page address and
  * byte address.
  */
-static void send_cmd(dataflash_t page_addr, dataflash_t byte_addr, DataFlashOpcode opcode)
+static void send_cmd(dataflash_t page_addr, dataflashOffset_t byte_addr, DataFlashOpcode opcode)
 {
 
 	/*
@@ -192,7 +192,7 @@ static uint8_t dataflash_stat(void)
  * return status register value.
  *
  */
-static uint8_t dataflash_cmd(dataflash_t page_addr, dataflash_t byte_addr, DataFlashOpcode opcode)
+static uint8_t dataflash_cmd(dataflash_t page_addr, dataflashOffset_t byte_addr, DataFlashOpcode opcode)
 {
 
 	send_cmd(page_addr, byte_addr, opcode);
@@ -213,7 +213,7 @@ static uint8_t dataflash_cmd(dataflash_t page_addr, dataflash_t byte_addr, DataF
  * Read one byte from main data flash memory or buffer data
  * flash memory.
  */
-static uint8_t dataflash_read_byte(dataflash_t page_addr, dataflash_t byte_addr, DataFlashOpcode opcode)
+static uint8_t dataflash_read_byte(dataflash_t page_addr, dataflashOffset_t byte_addr, DataFlashOpcode opcode)
 {
 	uint8_t data;
 
@@ -243,7 +243,7 @@ static uint8_t dataflash_read_byte(dataflash_t page_addr, dataflash_t byte_addr,
  * Read \a len bytes from main data flash memory or buffer data
  * flash memory, and put it in \a *block.
  */
-static void dataflash_read_block(dataflash_t page_addr, dataflash_t byte_addr, DataFlashOpcode opcode, uint8_t *block, dataflashSize_t len)
+static void dataflash_read_block(dataflash_t page_addr, dataflashOffset_t byte_addr, DataFlashOpcode opcode, uint8_t *block, dataflashSize_t len)
 {
 
 	send_cmd(page_addr, byte_addr, opcode);
@@ -275,7 +275,7 @@ static void dataflash_read_block(dataflash_t page_addr, dataflash_t byte_addr, D
  * flash. To perform write in main memory you must before write in buffer
  * data flash memory, an then send command to write page in main memory.
  */
-static void dataflash_write_block(dataflash_t byte_addr, DataFlashOpcode opcode, uint8_t *block, dataflashSize_t len)
+static void dataflash_write_block(dataflashOffset_t byte_addr, DataFlashOpcode opcode, uint8_t *block, dataflashSize_t len)
 {
 
 	send_cmd(0x00, byte_addr, opcode);
@@ -389,7 +389,7 @@ static int32_t dataflash_seek(struct _KFile *fd, int32_t offset, KSeekMode whenc
  */
 static size_t dataflash_read(struct _KFile *fd, void *buf, size_t size)
 {
-	dataflashAddr_t byte_addr;
+	dataflashOffset_t byte_addr;
 	dataflashAddr_t page_addr;
 	uin8_t *data = (uint8_t *)buf;
 
@@ -434,7 +434,7 @@ static size_t dataflash_read(struct _KFile *fd, void *buf, size_t size)
 static size_t dataflash_write(struct _KFile *fd, const void *_buf, size_t size)
 {
 
-	dataflashAddr_t byte_addr;
+	dataflashOffset_t byte_addr;
 	dataflashAddr_t current_page;
 
 	uint8_t *data = (uint8_t *) _buf;
