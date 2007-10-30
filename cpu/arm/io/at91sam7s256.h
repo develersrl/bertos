@@ -120,8 +120,10 @@
 #include "at91_dbgu.h"
 //TODO: add other peripherals
 
-/** Peripheral Identifiers and Interrupts */
-/*\{*/
+/**
+ * Peripheral Identifiers and Interrupts
+ *\{
+ */
 #define FIQ_ID      0       ///< Fast interrupt ID.
 #define SYSC_ID     1       ///< System controller interrupt.
 #define PIOA_ID     2       ///< Parallel I/O controller ID.
@@ -142,12 +144,24 @@
 #define IRQ1_ID     31      ///< External interrupt 1 ID.
 /*\}*/
 
-/** USART pins name */
-/*\{*/
+/**
+ * USART pins name
+ *\{
+ */
 #define RXD0        5
 #define TXD0        6
 #define RXD1       21
 #define TXD1       22
+/*\}*/
+
+/**
+ * SPI pins name
+ *\{
+ */
+#define NPCS0      11
+#define MISO       12
+#define MOSI       13
+#define SPCK       14
 /*\}*/
 
 #endif /* AT91SAM7S256_H */
