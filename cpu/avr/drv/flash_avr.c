@@ -210,7 +210,7 @@ static bool flash_avr_close(UNUSED_ARG(struct _KFile *,fd))
  * Move \a fd file seek position of \a offset bytes
  * from current position.
  */
-static int32_t flash_avr_seek(struct _KFile *fd, int32_t offset, KSeekMode whence)
+static int32_t flash_avr_seek(struct _KFile *fd, kfile_off_t offset, KSeekMode whence)
 {
 	uint32_t seek_pos;
 

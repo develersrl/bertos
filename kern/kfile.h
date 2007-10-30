@@ -45,6 +45,8 @@
 /* fwd decl */
 struct _KFile;
 
+typedef int32_t kfile_off_t;
+
 /**
  * Costants for repositioning read/write file offset.
  * These are needed because on some embedded platforms
@@ -60,7 +62,7 @@ typedef enum KSeekMode
 
 typedef size_t	(*ReadFunc_t)  (struct _KFile *fd, void *buf, size_t size);
 typedef size_t	(*WriteFunc_t) (struct _KFile *fd, const void *buf, size_t size);
-typedef	int32_t (*SeekFunc_t)  (struct _KFile *fd, int32_t offset, KSeekMode whence);
+typedef	int32_t (*SeekFunc_t)  (struct _KFile *fd, kfile_off_t offset, KSeekMode whence);
 typedef bool	(*OpenFunc_t)  (struct _KFile *fd, const char *name, int mode);
 typedef bool	(*CloseFunc_t) (struct _KFile *fd);
 
