@@ -210,6 +210,32 @@
 #endif
 
 /**
+ * \name Overridable SPI hooks
+ *
+ * These can be redefined in hw.h to implement
+ * special bus policies such as slave select pin handling, etc.
+ *
+ * \{
+ */
+#ifndef SER_SPI_BUS_TXINIT
+	/**
+	 * Default TXINIT macro - invoked in spi_init()
+	 * The default is no action.
+	 */
+	#define SER_SPI_BUS_TXINIT
+#endif
+
+#ifndef SER_SPI_BUS_TXCLOSE
+	/**
+	 * Invoked after the last character has been transmitted.
+	 * The default is no action.
+	 */
+	#define SER_SPI_BUS_TXCLOSE
+#endif
+/*\}*/
+
+
+/**
  * \def CONFIG_SER_STROBE
  *
  * This is a debug facility that can be used to
@@ -235,6 +261,9 @@ static unsigned char uart0_rxbuffer[CONFIG_UART0_RXBUFSIZE];
 
 static unsigned char uart1_txbuffer[CONFIG_UART1_TXBUFSIZE];
 static unsigned char uart1_rxbuffer[CONFIG_UART1_RXBUFSIZE];
+
+static unsigned char spi_txbuffer[CONFIG_SPI_TXBUFSIZE];
+static unsigned char spi_rxbuffer[CONFIG_SPI_RXBUFSIZE];
 
 /**
  * Internal hardware state structure
@@ -268,7 +297,7 @@ struct ArmSerial
  */
 struct Serial *ser_uart0 = &ser_handles[SER_UART0];
 struct Serial *ser_uart1 = &ser_handles[SER_UART1];
-
+struct Serial *ser_spi = &ser_handles[SER_SPI];
 
 static void uart0_irq_dispatcher(void);
 static void uart1_irq_dispatcher(void);
@@ -411,6 +440,123 @@ static void uart1_setparity(UNUSED_ARG(struct SerialHardware *, _hw), int parity
 
 }
 
+/* SPI driver */
+
+static void spi_init(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(struct Serial *, ser))
+{
+	/*
+	 * Set MOSI and SCK ports out, MISO in.
+	 *
+	 * The ATmega64/128 datasheet explicitly states that the input/output
+	 * state of the SPI pins is not significant, as when the SPI is
+	 * active the I/O port are overrided.
+	 * This is *blatantly FALSE*.
+	 *
+	 * Moreover, the MISO pin on the board_kc *must* be in high impedance
+	 * state even when the SPI is off, because the line is wired together
+	 * with the KBus serial RX, and the transmitter of the slave boards
+	 * would be unable to drive the line.
+	 */
+	ATOMIC(SPI_DDR |= (BV(SPI_MOSI_BIT) | BV(SPI_SCK_BIT)));
+
+	/*
+	 * If the SPI master mode is activated and the SS pin is in input and tied low,
+	 * the SPI hardware will automatically switch to slave mode!
+	 * For proper communication this pins should therefore be:
+	 * - as output
+	 * - as input but tied high forever!
+	 * This driver set the pin as output.
+	 */
+	#warning SPI SS pin set as output for proper operation, check schematics for possible conflicts.
+	ATOMIC(SPI_DDR |= BV(SPI_SS_BIT));
+
+	ATOMIC(SPI_DDR &= ~BV(SPI_MISO_BIT));
+	/* Enable SPI, IRQ on, Master */
+	SPCR = BV(SPE) | BV(SPIE) | BV(MSTR);
+
+	/* Set data order */
+	#if CONFIG_SPI_DATA_ORDER == SER_LSB_FIRST
+		SPCR |= BV(DORD);
+	#endif
+
+	/* Set SPI clock rate */
+	#if CONFIG_SPI_CLOCK_DIV == 128
+		SPCR |= (BV(SPR1) | BV(SPR0));
+	#elif (CONFIG_SPI_CLOCK_DIV == 64 || CONFIG_SPI_CLOCK_DIV == 32)
+		SPCR |= BV(SPR1);
+	#elif (CONFIG_SPI_CLOCK_DIV == 16 || CONFIG_SPI_CLOCK_DIV == 8)
+		SPCR |= BV(SPR0);
+	#elif (CONFIG_SPI_CLOCK_DIV == 4 || CONFIG_SPI_CLOCK_DIV == 2)
+		// SPR0 & SDPR1 both at 0
+	#else
+		#error Unsupported SPI clock division factor.
+	#endif
+
+	/* Set SPI2X bit (spi double frequency) */
+	#if (CONFIG_SPI_CLOCK_DIV == 128 || CONFIG_SPI_CLOCK_DIV == 64 \
+	  || CONFIG_SPI_CLOCK_DIV == 16 || CONFIG_SPI_CLOCK_DIV == 4)
+		SPSR &= ~BV(SPI2X);
+	#elif (CONFIG_SPI_CLOCK_DIV == 32 || CONFIG_SPI_CLOCK_DIV == 8 || CONFIG_SPI_CLOCK_DIV == 2)
+		SPSR |= BV(SPI2X);
+	#else
+		#error Unsupported SPI clock division factor.
+	#endif
+
+	/* Set clock polarity */
+	#if CONFIG_SPI_CLOCK_POL == 1
+		SPCR |= BV(CPOL);
+	#endif
+
+	/* Set clock phase */
+	#if CONFIG_SPI_CLOCK_PHASE == 1
+		SPCR |= BV(CPHA);
+	#endif
+	SER_SPI_BUS_TXINIT;
+
+	SER_STROBE_INIT;
+}
+
+static void spi_cleanup(UNUSED_ARG(struct SerialHardware *, _hw))
+{
+	SPCR = 0;
+
+	SER_SPI_BUS_TXCLOSE;
+
+	/* Set all pins as inputs */
+	ATOMIC(SPI_DDR &= ~(BV(SPI_MISO_BIT) | BV(SPI_MOSI_BIT) | BV(SPI_SCK_BIT) | BV(SPI_SS_BIT)));
+}
+
+static void spi_starttx(struct SerialHardware *_hw)
+{
+	struct AvrSerial *hw = (struct AvrSerial *)_hw;
+
+	cpuflags_t flags;
+	IRQ_SAVE_DISABLE(flags);
+
+	/* Send data only if the SPI is not already transmitting */
+	if (!hw->sending && !fifo_isempty(&ser_spi->txfifo))
+	{
+		hw->sending = true;
+		SPDR = fifo_pop(&ser_spi->txfifo);
+	}
+
+	IRQ_RESTORE(flags);
+}
+
+static void spi_setbaudrate(
+	UNUSED_ARG(struct SerialHardware *, _hw),
+	UNUSED_ARG(unsigned long, rate))
+{
+	// nop
+}
+
+static void spi_setparity(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(int, parity))
+{
+	// nop
+}
+
+
+
 static bool tx_sending(struct SerialHardware* _hw)
 {
 	struct ArmSerial *hw = (struct ArmSerial *)_hw;
@@ -450,6 +596,16 @@ static const struct SerialHardwareVT UART1_VT =
 	C99INIT(txSending, tx_sending),
 };
 
+static const struct SerialHardwareVT SPI_VT =
+{
+	C99INIT(init, spi_init),
+	C99INIT(cleanup, spi_cleanup),
+	C99INIT(setBaudrate, spi_setbaudrate),
+	C99INIT(setParity, spi_setparity),
+	C99INIT(txStart, spi_starttx),
+	C99INIT(txSending, tx_sending),
+};
+
 static struct ArmSerial UARTDescs[SER_CNT] =
 {
 	{
@@ -469,6 +625,16 @@ static struct ArmSerial UARTDescs[SER_CNT] =
 			C99INIT(rxbuffer, uart1_rxbuffer),
 			C99INIT(txbuffer_size, sizeof(uart1_txbuffer)),
 			C99INIT(rxbuffer_size, sizeof(uart1_rxbuffer)),
+		},
+		C99INIT(sending, false),
+	},
+	{
+		C99INIT(hw, /**/) {
+			C99INIT(table, &SPI_VT),
+			C99INIT(txbuffer, spi_txbuffer),
+			C99INIT(rxbuffer, spi_rxbuffer),
+			C99INIT(txbuffer_size, sizeof(spi_txbuffer)),
+			C99INIT(rxbuffer_size, sizeof(spi_rxbuffer)),
 		},
 		C99INIT(sending, false),
 	}
