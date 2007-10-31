@@ -39,31 +39,6 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.7  2007/01/09 09:00:16  bernie
- *#* Doxygen fix.
- *#*
- *#* Revision 1.6  2006/09/20 13:54:04  marco
- *#* Usage examples of MAKE_CMD.
- *#*
- *#* Revision 1.5  2006/06/14 01:03:01  marco
- *#* Add response code. Add command ping.
- *#*
- *#* Revision 1.4  2006/06/14 00:26:48  marco
- *#* Use new macros for defining commands.
- *#*
- *#* Revision 1.3  2006/06/13 19:07:31  marco
- *#* Fixed a bug in protocol_reply. Simplified rpc.
- *#*
- *#* Revision 1.2  2006/06/12 21:37:02  marco
- *#* implemented some commands (ver and sleep)
- *#*
- *#* Revision 1.1  2006/06/01 12:29:21  marco
- *#* Add first simple protocol command (version request).
- *#*
- *#*/
-
 #include "protocol.h"
 
 #include <drv/ser.h>

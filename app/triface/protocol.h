@@ -36,13 +36,6 @@
  * \author Marco Benelli <marco@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.1  2006/06/01 12:29:21  marco
- *#* Add first simple protocol command (version request).
- *#*
- *#*/
-
 #ifndef PROTOCOL_H
 #define PROTOCOL_H
 

@@ -38,22 +38,6 @@
  * \brief Windowing system test.
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.4  2006/06/14 00:28:52  marco
- *#* Removed initial delay.
- *#*
- *#* Revision 1.3  2006/06/12 21:37:02  marco
- *#* implemented some commands (ver and sleep)
- *#*
- *#* Revision 1.2  2006/06/01 12:29:21  marco
- *#* Add first simple protocol command (version request).
- *#*
- *#* Revision 1.1  2006/05/18 00:41:47  bernie
- *#* New triface devlib application.
- *#*
- *#*/
-
 #include <drv/timer.h>
 #include <drv/buzzer.h>
 #include <drv/ser.h>
