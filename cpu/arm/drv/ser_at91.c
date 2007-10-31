@@ -209,7 +209,7 @@
 	} while (0)
 #endif
 
-#if 0
+#if
 /**
  * \name Overridable SPI hooks
  *
@@ -263,7 +263,7 @@ static unsigned char uart0_rxbuffer[CONFIG_UART0_RXBUFSIZE];
 static unsigned char uart1_txbuffer[CONFIG_UART1_TXBUFSIZE];
 static unsigned char uart1_rxbuffer[CONFIG_UART1_RXBUFSIZE];
 
-#if 0
+#ifdef NOT_FOR_ARM_PORT_IT
 static unsigned char spi_txbuffer[CONFIG_SPI_TXBUFSIZE];
 static unsigned char spi_rxbuffer[CONFIG_SPI_RXBUFSIZE];
 #endif
@@ -301,7 +301,7 @@ struct ArmSerial
 struct Serial *ser_uart0 = &ser_handles[SER_UART0];
 struct Serial *ser_uart1 = &ser_handles[SER_UART1];
 
-#if 0
+#ifdef NOT_FOR_ARM_PORT_IT
 struct Serial *ser_spi = &ser_handles[SER_SPI];
 #endif
 
@@ -447,7 +447,7 @@ static void uart1_setparity(UNUSED_ARG(struct SerialHardware *, _hw), int parity
 }
 
 /* SPI driver */
-#if 0
+#ifdef NOT_FOR_ARM_PORT_IT
 static void spi_init(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(struct Serial *, ser))
 {
 	/*
@@ -602,7 +602,7 @@ static const struct SerialHardwareVT UART1_VT =
 	C99INIT(txSending, tx_sending),
 };
 
-#if 0
+#ifdef NOT_FOR_ARM_PORT_IT
 static const struct SerialHardwareVT SPI_VT =
 {
 	C99INIT(init, spi_init),
@@ -636,7 +636,7 @@ static struct ArmSerial UARTDescs[SER_CNT] =
 		},
 		C99INIT(sending, false),
 	},
-#if 0
+#ifdef NOT_FOR_ARM_PORT_IT
 	{
 		C99INIT(hw, /**/) {
 			C99INIT(table, &SPI_VT),
