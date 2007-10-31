@@ -41,67 +41,6 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.8  2006/07/19 12:56:27  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.7  2006/03/20 17:52:22  bernie
- *#* Add missing forward declaration.
- *#*
- *#* Revision 1.6  2006/02/24 01:17:44  bernie
- *#* Update for new emulator.
- *#*
- *#* Revision 1.5  2006/02/24 00:26:21  bernie
- *#* Fix header name.
- *#*
- *#* Revision 1.4  2006/02/10 12:24:42  bernie
- *#* Fix standalone build.
- *#*
- *#* Revision 1.3  2006/01/16 03:27:49  bernie
- *#* Rename sig_t to sigbit_t to avoid clash with POSIX.
- *#*
- *#* Revision 1.2  2005/11/27 03:02:55  bernie
- *#* Convert to appconfig.h.
- *#*
- *#* Revision 1.1  2005/11/27 01:39:48  bernie
- *#* Move event.[ch] from kern/ to mware/.
- *#*
- *#* Revision 1.11  2005/04/11 19:10:28  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.10  2005/01/24 04:22:02  bernie
- *#* Update copyright information.
- *#*
- *#* Revision 1.9  2005/01/24 04:19:55  bernie
- *#* Remove obsolete names.
- *#*
- *#* Revision 1.8  2005/01/24 04:19:05  bernie
- *#* Function pointer based event dispatching.
- *#*
- *#* Revision 1.7  2004/08/25 14:12:09  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.6  2004/08/14 19:37:57  rasky
- *#* Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
- *#*
- *#* Revision 1.5  2004/07/30 14:30:27  rasky
- *#* Resa la sig_signal interrupt safe (con il nuovo scheduler IRQ-safe)
- *#* Rimossa event_doIntr (ora inutile) e semplificata la logica delle macro con funzioni inline
- *#*
- *#* Revision 1.4  2004/06/07 15:58:00  aleph
- *#* Add function prototypes
- *#*
- *#* Revision 1.3  2004/06/06 18:25:44  bernie
- *#* Rename event macros to look like regular functions.
- *#*
- *#* Revision 1.2  2004/06/03 11:27:09  bernie
- *#* Add dual-license information.
- *#*
- *#* Revision 1.1  2004/05/23 17:27:00  bernie
- *#* Import kern/ subdirectory.
- *#*
- *#*/
 #ifndef KERN_EVENT_H
 #define KERN_EVENT_H
 

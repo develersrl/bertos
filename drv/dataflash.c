@@ -216,8 +216,7 @@ static uint8_t dataflash_cmd(dataflash_t page_addr, dataflashOffset_t byte_addr,
 	stat = dataflash_stat();
 
 	/*
-	 * Data flash has been terminate a sent command, and so
-	 * disable CS.
+	 * Data flash has completed a bus cycle, so disable CS.
 	 */
 	CS_DISABLE();
 
