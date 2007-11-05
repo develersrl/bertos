@@ -209,7 +209,7 @@
 	} while (0)
 #endif
 
-#if
+#if NOT_FOR_ARM_PORT_IT
 /**
  * \name Overridable SPI hooks
  *
