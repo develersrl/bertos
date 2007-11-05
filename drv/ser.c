@@ -378,6 +378,10 @@ void ser_setparity(struct Serial *port, int parity)
 	port->hw->table->setParity(port->hw, parity);
 }
 
+void ser_clearstatus(struct Serial *port)
+{
+       ser_setstatus(port, 0);
+}
 
 /**
  * Flush both the RX and TX buffers.

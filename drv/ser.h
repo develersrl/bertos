@@ -140,6 +140,7 @@ extern int ser_printf(struct Serial *port, const char *format, ...) FORMAT(__pri
 
 extern int ser_gets(struct Serial *port, char *buf, int size);
 extern int ser_gets_echo(struct Serial *port, char *buf, int size, bool echo);
+extern void ser_clearstatus(struct Serial *port);
 
 extern void ser_setbaudrate(struct Serial *port, unsigned long rate);
 extern void ser_setparity(struct Serial *port, int parity);
@@ -158,7 +159,6 @@ extern void ser_close(struct Serial *port);
  */
 #define ser_getstatus(h)    ((h)->status)
 #define ser_setstatus(h, x) ((h)->status = (x))
-#define ser_clearstatus(h)  ser_setstatus(h, 0)
 /* \} */
 
 #endif /* DRV_SER_H */
