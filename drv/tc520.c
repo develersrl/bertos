@@ -55,10 +55,14 @@ static Serial *spi_ser;
 
 /**
  * Start an AD conversion and return result.
+ *
  * To start a conversion first we must pull down CE pin.
  * The ADC starts a convertion and keeps the DV pin high until the end.
  * At this point, we can read the conversion value by SPI.
  * The convertion result is yield in 3 bytes.
+ *
+ * \verbatim
+ *
  * First byte:
  * bit | Value
  * ----|-------
@@ -75,8 +79,10 @@ static Serial *spi_ser;
  *  6  | data bit 0
  * 5:0 | '0'
  *
+ * \endverbatim
+ *
  * So, to get the result we must shift and recompose the bits.
- * \Note Ovverrange bit is handled as the 17th data bit.
+ * \note Overrange bit is handled as the 17th data bit.
  */
 tc520_data_t tc520_read(void)
 {
