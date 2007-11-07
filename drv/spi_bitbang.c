@@ -92,7 +92,7 @@ void spi_init(void)
 }
 
 /**
- * Read \param len from spi, and put it in \param buff.
+ * Read \param len from spi, and put it in \param _buff .
  */
 void spi_read(void *_buff, size_t len)
 {
@@ -105,7 +105,7 @@ void spi_read(void *_buff, size_t len)
 }
 
 /**
- * Write \param len to spi, and take it from \param buff.
+ * Write \param len to spi, and take it from \param _buff .
  */
 void spi_write(const void *_buff, size_t len)
 {
