@@ -75,4 +75,22 @@ The modules are sorted in subdirectories by their category:
 The top-level directory contains a few support headers that are meant to be
 usable by any C/C++ embedded or hosted application.
 
+\section license License
+
+BeRTOS is provided under the term of the GNU General Public License
+(see LICENSE.GPL) with following exception:
+
+\verbatim
+
+As a special exception, you may use this file as part of a free software
+library without restriction.  Specifically, if other files instantiate
+templates or use macros or inline functions from this file, or you compile
+this file and link it with other files to produce an executable, this
+file does not by itself cause the resulting executable to be covered by
+the GNU General Public License.  This exception does not however
+invalidate any other reasons why the executable file might be covered by
+the GNU General Public License.
+
+\endverbatim
+
 */
