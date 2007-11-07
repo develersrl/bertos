@@ -1,6 +1,12 @@
-BeRTOS								-*- outline -*-
+/*
+ * This document is automatically processed by Doxygen (http://www.doxygen.org/).
+ * Don't remove special formatting tags.
+ */
+/*!
 
-* Overview
+\mainpage
+
+\section overview Overview
 
 BeRTOS is a real-time operating system designed for building applications
 for embedded systems, like reference boards, test boards, or custom boards.
@@ -9,7 +15,7 @@ It has a modular structure: its components can be used in very different
 environments, from 8-bit processor to Linux and Win32 hosted application
 (for debug purpose), using a wide range of compilers.
 
-* History and Motivation
+\section history History and Motivation
 
 BeRTOS was born as a collection of useful, highly optimized and fine-tuned
 libraries for embedded systems.  Each library had its own scope and could be
@@ -26,7 +32,7 @@ designed for fine-grained modularity and minimal external dependencies.
 Most non-essential features can be configured out for application with small
 memory footprint requirements.
 
-* Features
+\section features Features
 
   - multitasking kernel with IPC, semaphores, priority levels;
   - a comprehensive set of generic drivers for a wide range of devices, 
@@ -43,7 +49,7 @@ memory footprint requirements.
   - XMODEM protocol implementation;
   - RLE compression algorithm;
 
-* Directory Structure
+\section structure Directory Structure
 
 The modules are sorted in subdirectories by their category:
 
@@ -68,3 +74,5 @@ The modules are sorted in subdirectories by their category:
 
 The top-level directory contains a few support headers that are meant to be
 usable by any C/C++ embedded or hosted application.
+
+*/
