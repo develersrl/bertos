@@ -38,14 +38,3 @@
  */
 
 
-#define SER_STROBE_ON    do {PIOA_SODR = BV(6);} while(0)
-#define SER_STROBE_OFF   do {PIOA_CODR = BV(6);} while(0)
-#define SER_STROBE_INIT  do {\
-	/* Set PA6 connected to PIOA */\
-	PIOA_PER = BV(6); \
-	/* Set PA6 as output */ \
-	PIOA_OER = BV(6); \
-	/* Disable multidrive on all pins */ \
-	PIOA_MDDR = BV(6); \
-} while(0)
-
