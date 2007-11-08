@@ -41,11 +41,11 @@ void NORETURN proc_test(void)
 	kputs("Created tasks\n");
 
 	kputs("stack1:\n");
-	#warning FIXME
-	//kdump(proc_test_stack1+sizeof(proc_test_stack1)-64, 64);
+//	#warning FIXME
+	kdump(proc_test_stack1+sizeof(proc_test_stack1)-64, 64);
 	kputs("stack2:\n");
-	#warning FIXME
-	//kdump(proc_test_stack2+sizeof(proc_test_stack1)-64, 64);
+//	#warning FIXME
+	kdump(proc_test_stack2+sizeof(proc_test_stack1)-64, 64);
 
 	for (;;)
 	{
