@@ -112,7 +112,7 @@ int main(void)
 	for(;;)
 	{
 		proc_test();
-		ser_printf(host_port, "From serial 0: %s\n", msg);
+		ser_printf(host_port, "From serial 0: %s\r\n", msg);
 	}
 	return 0;
 }
