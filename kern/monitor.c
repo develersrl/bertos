@@ -158,7 +158,7 @@ static void NORETURN monitor(void)
 
 			if (free < 0x20)
 				kprintf("MONITOR: WARNING: Free stack for process '%s' is only %x chars\n",
-						p->monitor.name, free);
+						p->monitor.name, (unsigned int)free);
 
 			timer_delay(500);
 		}
