@@ -98,12 +98,14 @@ static void sysirq_dispatcher(void) __attribute__ ((naked));
 static void sysirq_dispatcher(void)
 {
 	IRQ_ENTRY();
-	for (unsigned i = 0; i < countof(sysirq_tab); i++)
-	{
-		if (sysirq_tab[i].enabled
-		 && sysirq_tab[i].handler)
-			sysirq_tab[i].handler();
-	}
+
+	/* PIT */
+	if ((PIT_MR & BV(PITIEN))
+	    && (PIT_SR & BV(PITS))
+	    && sysirq_tab[SYSIRQ_PIT].handler)
+		sysirq_tab[SYSIRQ_PIT].handler();
+
+	/* TODO: add other system sources here */
 
 	IRQ_EXIT();
 }
@@ -123,8 +125,8 @@ void sysirq_init(void)
 	IRQ_SAVE_DISABLE(flags);
 
 	/* Disable all system interrupts */
-	for (unsigned i = 0; i < countof(sysirq_tab); i++)
-		sysirq_tab[i].setEnable(false);
+	PIT_MR &= BV(PITIEN);
+	/* TODO: add other system sources here */
 
 	/* Set the vector. */
 	AIC_SVR(SYSC_ID) = sysirq_dispatcher;
