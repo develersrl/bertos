@@ -97,10 +97,35 @@
 #define CONFIG_KERN_QUANTUM     50    /**< Time sharing quantum in timer ticks. */
 
 #if (ARCH & ARCH_EMUL)
-	#define CONFIG_KERN_DEFSTACKSIZE  65536
+	/* We need a large stack because system libraries are bloated */
+	#define CONFIG_PROC_DEFSTACKSIZE  65536
 #else
-	#define CONFIG_KERN_DEFSTACKSIZE  1024  /**< Default stack size for each thread. */
+	/**
+	 * Default stack size for each thread, in bytes.
+	 *
+	 * The goal here is to allow a minimal task to save all of its
+	 * registers twice, plus push a maximum of 32 variables on the
+	 * stack.
+	 *
+	 * The actual size computed by the default formula is:
+	 *   AVR:    102
+	 *   i386:   156
+	 *   ARM:    164
+	 *   x86_64: 184
+	 *
+	 * Note that on most 16bit architectures, interrupts will also
+	 * run on the stack of the currently running process.  Nested
+	 * interrupts will greatly increases the amount of stack space
+	 * required per process.  Use irqmanager to minimize stack
+	 * usage.
+	 */
+	#define CONFIG_PROC_DEFSTACKSIZE  \
+	    (CPU_SAVED_REGS_CNT * 2 * sizeof(cpu_stack_t) \
+	    + 32 * sizeof(int))
 #endif
+
+/* OBSOLETE */
+#define CONFIG_KERN_DEFSTACKSIZE CONFIG_PROC_DEFSTACKSIZE
 
 /* Memory fill codes to help debugging */
 #if CONFIG_KERN_MONITOR

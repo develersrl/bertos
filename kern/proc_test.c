@@ -28,8 +28,8 @@ static void NORETURN proc_test_thread2(void)
 	}
 }
 
-static cpustack_t proc_test_stack1[CONFIG_KERN_DEFSTACKSIZE/sizeof(cpustack_t)];
-static cpustack_t proc_test_stack2[CONFIG_KERN_DEFSTACKSIZE/sizeof(cpustack_t)];
+static cpustack_t proc_test_stack1[CONFIG_PROC_DEFSTACKSIZE / sizeof(cpustack_t)];
+static cpustack_t proc_test_stack2[CONFIG_PROC_DEFSTACKSIZE / sizeof(cpustack_t)];
 
 /**
  * Proc scheduling test

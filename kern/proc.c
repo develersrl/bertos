@@ -149,14 +149,14 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 	/* Ignore stack provided by caller and use the large enough default instead. */
 	stack_base = (cpustack_t *)LIST_HEAD(&StackFreeList);
 	REMOVE(LIST_HEAD(&StackFreeList));
-	stacksize = CONFIG_KERN_DEFSTACKSIZE;
+	stacksize = CONFIG_PROC_DEFSTACKSIZE;
 #elif CONFIG_KERN_HEAP
 	/* Did the caller provide a stack for us? */
 	if (!stack_base)
 	{
 		/* Did the caller specify the desired stack size? */
 		if (!stacksize)
-			stacksize = CONFIG_KERN_DEFSTACKSIZE + sizeof(Process);
+			stacksize = CONFIG_PROC_DEFSTACKSIZE + sizeof(Process);
 
 		/* Allocate stack dinamically */
 		if (!(stack_base = heap_alloc(stacksize)))
@@ -328,7 +328,7 @@ void proc_exit(void)
 #warning This is wrong
 	/* Reinsert process stack in free list */
 	ADDHEAD(&StackFreeList, (Node *)(CurrentProcess->stack
-		- (CONFIG_KERN_DEFSTACKSIZE / sizeof(cpustack_t))));
+		- (CONFIG_PROC_DEFSTACKSIZE / sizeof(cpustack_t))));
 
 	/*
 	 * NOTE: At this point the first two words of what used
