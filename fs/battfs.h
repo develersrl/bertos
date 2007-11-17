@@ -35,27 +35,40 @@
  * \author Francesco Sacchi <batt@develer.com>
  *
  * \brief BattFS: a filesystem for embedded platforms (interface).
+ * TODO: Add detailed filesystem description.
  */
 
 #ifndef FS_BATTFS_H
 #define FS_BATTFS_H
 
 #include <cfg/compiler.h> // uintXX_t; STATIC_ASSERT
+#include <algos/rotating_hash.h>
+
+typedef uint16_t filled_t;
+typedef uint16_t page_off_t;
+typedef uint8_t  inode_t;
+typedef uint8_t  seqnum_t;
+typedef rotating_t battfs_crc_t;
+
+typedef uint16_t battfs_page_t;
 
 /**
  * BattFS page header.
- * \note fields order is chosen to comply with alignment.
+ * \note fields order is chosen to comply
+ * with CPU alignment.
  */
 typedef struct BattFsPageHeader
 {
-	uint16_t filled;      ///< filled bytes in page.
-	uint16_t page_off;    ///< Page offset inside file.
-	uint8_t  inode;       ///< File inode (file identifier).
-	uint8_t  seqnum;      ///< bit[1:0]: Page sequence number; bit[7:2] unused for now, must be set to 1.
-	uint16_t crc;         ///< CRC of the page header.
+	inode_t      inode;    ///< File inode (file identifier).
+	seqnum_t     seqnum;   ///< bit[1:0]: Page sequence number; bit[7:2] unused for now, must be set to 1.
+	filled_t     filled;   ///< Filled bytes in page.
+	page_off_t   page_off; ///< Page offset inside file.
+	battfs_crc_t crc;      ///< CRC of the page header.
 } BattFsPageHeader;
 
-STATIC_ASSERT(sizeof(BattFsPageHeader) == 8);
+/* Ensure structure has no padding added */
+STATIC_ASSERT(sizeof(BattFsPageHeader) == sizeof(filled_t) + sizeof(page_off_t)
+              + sizeof(inode_t) + sizeof(seqnum_t) + siezof(BattFsDisk));
 
 /**
  * Reset page sequence number of struct \a m to default value (0xFF).
@@ -77,5 +90,53 @@ STATIC_ASSERT(sizeof(BattFsPageHeader) == 8);
  */
 #define INC_SEQ(m) SET_SEQ((m), SEQ(m) + 1)
 
+/* Fwd decl */
+struct BattFsDisk;
+
+/**
+ * Type interface for disk init function.
+ * \return true if all is ok, false otherwise.
+ */
+typedef bool (*disk_init_t) (struct BattFsDisk *d);
+
+/**
+ * Type interface for disk page read function.
+ * \a page is the page address, \a size the lenght to be read.
+ * \return the number of bytes read.
+ */
+typedef size_t (*disk_page_read_t) (struct BattFsDisk *d, void *buf, battfs_page_t page, size_t size);
+
+/**
+ * Type interface for disk page write function.
+ * \a page is the page address, \a size the lenght to be written.
+ * \return the number of bytes written.
+ */
+typedef size_t	(*disk_page_write_t) (struct BattFsDisk *d, const void *buf, battfs_page_t page, size_t size);
+
+/**
+ * Type interface for disk page erase function.
+ * \a page is the page address.
+ * \return true if all is ok, false otherwise.
+ */
+typedef bool (*disk_page_erase_t) (struct BattFsDisk *d, battfs_page_t page);
+
+typedef uint32_t disk_size_t ///< Type for disk sizes.
+
+/**
+ * Context used to describe a disk.
+ * This context structure will be used to access disk.
+ * Must be initialized by hw memory driver.
+ */
+typedef struct BattFsDisk
+{
+	disk_init_t init;        ///< Disk init.
+	disk_page_read_t  read;  ///< Page read.
+	disk_page_write_t write; ///< Page write.
+	disk_page_erase_t erase; ///< Page erase.
+
+	disk_size_t disk_size;   ///< Size of the disk, in bytes.
+	disk_size_t free_space;  ///< Free space on the disk, in bytes.
+	/* TODO add other fields. */
+} BattFsDisk;
 
 #endif /* FS_BATTFS_H */
