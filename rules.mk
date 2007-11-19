@@ -24,6 +24,9 @@ Q := @
 L := @echo
 endif
 
+# Select Bourne Again SHell as default make shell
+SHELL := bash
+
 # Checker build
 ifeq ($(C),1)
 CC = $(CHECKER)
