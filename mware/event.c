@@ -37,27 +37,6 @@
  * \author Giovanni Bajo <rasky@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.3  2006/07/19 12:56:27  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.2  2006/02/10 12:24:42  bernie
- *#* Fix standalone build.
- *#*
- *#* Revision 1.1  2005/11/27 01:39:48  bernie
- *#* Move event.[ch] from kern/ to mware/.
- *#*
- *#* Revision 1.2  2005/11/04 16:20:02  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.1  2005/01/24 04:19:06  bernie
- *#* Function pointer based event dispatching.
- *#*
- *#* Revision 1.1  2005/01/18 19:39:42  rasky
- *#* Cambiata la logica di dispatching degli eventi: si utilizza puntatori a funzione invece di inlinare i controlli
- *#*
- *#*/
 
 #include "event.h"
 

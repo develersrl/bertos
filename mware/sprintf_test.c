@@ -36,19 +36,6 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.6  2006/07/19 12:56:28  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.5  2005/11/04 17:47:26  bernie
- *#* Fix one warning.
- *#*
- *#* Revision 1.4  2005/11/04 17:43:27  bernie
- *#* Fix for LP64 architectures; Add some more tests.
- *#*
- *#*/
-
 #include "sprintf.c"
 #include "formatwr.c"
 #include "hex.c"

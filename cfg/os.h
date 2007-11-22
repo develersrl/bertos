@@ -37,45 +37,6 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.11  2007/09/29 16:19:47  bernie
- *#* Changes to compile with sparse.
- *#*
- *#* Revision 1.10  2006/07/19 12:56:25  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.9  2006/03/22 13:34:34  bernie
- *#* MSVC support.
- *#*
- *#* Revision 1.8  2006/02/23 09:09:28  bernie
- *#* Remove Linux specific hack.
- *#*
- *#* Revision 1.7  2006/02/20 01:46:59  bernie
- *#* Port to MacOSX.
- *#*
- *#* Revision 1.6  2006/02/15 09:12:33  bernie
- *#* Don't mask useful user signals on UNIX.
- *#*
- *#* Revision 1.5  2005/11/27 23:32:42  bernie
- *#* Add CPU fallback for OS_ID.
- *#*
- *#* Revision 1.4  2005/11/27 03:07:13  bernie
- *#* IRQ_SAVE_DISABLE(): Really block signals.
- *#*
- *#* Revision 1.3  2005/11/27 03:02:40  bernie
- *#* Add POSIX emulation for IRQ_* macros; Add Qt support.
- *#*
- *#* Revision 1.2  2005/11/04 16:20:01  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.1  2005/04/11 19:04:13  bernie
- *#* Move top-level headers to cfg/ subdir.
- *#*
- *#* Revision 1.1  2004/12/31 17:40:24  bernie
- *#* Add OS detection code.
- *#*
- *#*/
 #ifndef DEVLIB_OS_H
 #define DEVLIB_OS_H
 

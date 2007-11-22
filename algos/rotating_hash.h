@@ -42,18 +42,6 @@
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.2  2007/10/01 10:46:33  batt
- *#* Add rotating hash init function.
- *#*
- *#* Revision 1.1  2007/06/07 09:11:17  batt
- *#* Add rotating hash algorithm.
- *#*
- *#* Revision 1.1  2007/01/12 20:30:49  batt
- *#* Add right Rotating hash file.
- *#*
- *#*/
 
 #ifndef ALGOS_ROTATING_H
 #define ALGOS_ROTATING_H

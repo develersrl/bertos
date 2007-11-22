@@ -76,44 +76,6 @@
  * width and precision arguments.
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.19  2006/09/20 13:58:17  marco
- *#* Added z modifier in string format.
- *#*
- *#* Revision 1.18  2006/07/19 12:56:27  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.17  2005/11/04 17:43:27  bernie
- *#* Fix for LP64 architectures; Add some more tests.
- *#*
- *#* Revision 1.16  2005/07/19 07:25:46  bernie
- *#* Use appconfig.h instead of cfg/config.h.
- *#*
- *#* Revision 1.15  2005/04/11 19:10:28  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.14  2005/03/01 23:26:22  bernie
- *#* Use shared hextab.
- *#*
- *#* Revision 1.13  2005/02/18 12:33:25  bernie
- *#* Avoid strlen().
- *#*
- *#* Revision 1.12  2005/02/16 20:28:03  bernie
- *#* Add %S formatter.
- *#*
- *#* Revision 1.11  2005/02/16 16:51:29  bernie
- *#* Simplify float code.
- *#*
- *#* Revision 1.10  2004/10/26 09:01:35  bernie
- *#* Fix spacing.
- *#*
- *#* Revision 1.9  2004/09/14 21:06:23  bernie
- *#* Spelling fix.
- *#*
- *#* Revision 1.8  2004/08/25 14:12:09  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*/
 
 #include "formatwr.h"
 #include <mware/pgm.h>

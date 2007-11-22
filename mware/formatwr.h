@@ -1,7 +1,7 @@
 /**
  * \file
  * <!--
- * This file is part of BeRTOS.
+* This file is part of BeRTOS.
  *
  * Bertos is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

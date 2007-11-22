@@ -37,18 +37,6 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.4  2006/07/19 12:56:28  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.3  2006/02/10 11:30:48  bernie
- *#* C++ fixes.
- *#*
- *#* Revision 1.2  2005/03/01 23:32:05  bernie
- *#* Give due credit for this astounding creation.
- *#*
- *#*/
 
 #include "hex.h"
 
