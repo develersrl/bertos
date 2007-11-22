@@ -37,33 +37,6 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.3  2006/09/20 19:55:01  marco
- *#* Added CONFIG_LCD_4BIT.
- *#*
- *#* Revision 1.2  2006/07/19 12:56:25  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.1  2005/11/04 18:00:42  bernie
- *#* Import into DevLib.
- *#*
- *#* Revision 1.2  2005/06/14 14:43:43  bernie
- *#* Add DevLib headers.
- *#*
- *#* Revision 1.1  2005/05/24 09:17:58  batt
- *#* Move drivers to top-level.
- *#*
- *#* Revision 1.3  2005/04/22 13:14:58  batt
- *#* Better lcd rows and cols definition.
- *#*
- *#* Revision 1.2  2005/04/17 22:41:39  bernie
- *#* lcd_test(): Rename to lcd_hw_test() and conditionalize on CONFIG_TEST.
- *#*
- *#* Revision 1.1  2005/04/16 19:48:35  aleph
- *#* Rename lcd driver
- *#*/
-
 #ifndef DRV_LCD_HD44_H
 #define DRV_LCD_HD44_H
 

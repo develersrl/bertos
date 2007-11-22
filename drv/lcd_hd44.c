@@ -37,39 +37,6 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.5  2007/10/01 18:59:27  batt
- *#* Set to const col_address; add static assert check on array dimension.
- *#*
- *#* Revision 1.4  2007/10/01 10:46:09  batt
- *#* Add light LCD position computation.
- *#*
- *#* Revision 1.3  2006/09/20 19:55:01  marco
- *#* Added CONFIG_LCD_4BIT.
- *#*
- *#* Revision 1.2  2006/07/19 12:56:25  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.1  2005/11/04 18:00:42  bernie
- *#* Import into DevLib.
- *#*
- *#* Revision 1.2  2005/06/14 14:43:43  bernie
- *#* Add DevLib headers.
- *#*
- *#* Revision 1.1  2005/05/24 09:17:58  batt
- *#* Move drivers to top-level.
- *#*
- *#* Revision 1.9  2005/05/09 21:58:53  batt
- *#* Fix doxygen tags.
- *#*
- *#* Revision 1.8  2005/05/09 12:52:46  batt
- *#* lcd_dataRead(): Avoid bus collision; Add back *UNTESTED* 8bit bus support.
- *#*
- *#* Revision 1.7  2005/05/09 12:24:13  batt
- *#* lcd_putc(): Fix latent bug; lcd_hw_init(): Extend timings.
- *#*/
-
 #include "lcd_hd44.h"
 #include "hw_lcd.h"
 #include <cfg/arch_config.h>
