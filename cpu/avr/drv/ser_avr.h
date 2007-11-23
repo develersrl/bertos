@@ -34,8 +34,11 @@
  *
  * \author Daniele Basile <asterix@develer.com>
  *
- * \brief Low-level serial module for ARM (interface).
+ * \brief Low-level serial module for AVR (interface).
  */
+
+#ifndef DRV_SER_AVR_H
+#define DRV_SER_AVR_H
 
 #include <cfg/macros.h> /* BV() */
 #include <cfg/compiler.h>  /* uint32_t */
@@ -77,3 +80,5 @@ enum
 	SER_CNT  /**< Number of serial ports */
 };
 /*\}*/
+
+#endif /* DRV_SER_AVR_H */
