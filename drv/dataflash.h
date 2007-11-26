@@ -48,6 +48,8 @@
 
 #include <appconfig.h>
 
+#warning This driver must be test before use!
+
 /**
  * Type definition for dflash memory.
  */
@@ -202,7 +204,7 @@ typedef enum {
 } DataFlashOpcode;
 
 void dataflash_init(struct _KFile *fd);
-void hal_dflash_test(void);
+void dataflash_test(void);
 
 #endif /* DRV_DATAFLASH_H */
 
