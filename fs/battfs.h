@@ -42,13 +42,19 @@
 #define FS_BATTFS_H
 
 #include <cfg/compiler.h> // uintXX_t; STATIC_ASSERT
-#include <algo/rotating_hash.h>
+#include <cpu/types.h>
 
-typedef uint16_t filled_t;
+typedef uint16_t fill_t;
 typedef uint16_t pgoff_t;
+typedef pgoff_t  mark_t;
 typedef uint8_t  inode_t;
-typedef uint8_t  seqnum_t;
-typedef rotating_t fsc_t;
+typedef uint8_t  seq_t;
+typedef uint8_t  fsc_t;
+
+/**
+ * Reserve 2 bits from fill field to allocate seq number.
+ */
+#define FILLSIZE ((sizeof(filled_t) * CPU_BITS_PER_CHAR) - 2)
 
 /**
  * BattFS page header.
@@ -57,39 +63,24 @@ typedef rotating_t fsc_t;
  */
 typedef struct BattFsPageHeader
 {
-	inode_t  inode;  ///< File inode (file identifier).
-	seqnum_t seqnum; ///< bit[1:0]: Page sequence number; bit[7:2] unused for now, must be set to 1.
-	filled_t filled; ///< Filled bytes in page.
-	pgoff_t  pgoff;  ///< Page offset inside file.
-	fsc_t    fsc;    ///< CRC of the page header.
+	mark_t  mark;          ///< Marker used to keep trace of free/used pages.
+	pgoff_t pgoff;         ///< Page offset inside file.
+	fill_t  fill:FILLSIZE; ///< Filled bytes in page.
+	seq_t   seq:2;         ///< bit[1:0]: Page sequence number; bit[7:2] unused for now, must be set to 1.
+	inode_t inode;         ///< File inode (file identifier).
+	fsc_t   fsc;           ///< FSC of the page header.
 } BattFsPageHeader;
 
 /* Ensure structure has no padding added */
-STATIC_ASSERT(sizeof(BattFsPageHeader) == sizeof(filled_t) + sizeof(pgoff_t)
-              + sizeof(inode_t) + sizeof(seqnum_t) + sizeof(fsc_t));
-
-/**
- * Reset page sequence number of struct \a m to default value (0xFF).
- */
-#define RESET_SEQ(m) ((m).seqnum = 0xFF)
-
-/**
- * Get page sequence number from struct \a m.
- */
-#define SEQ(m) ((m).seqnum & 0x03)
-
-/**
- * Set sequence number of struct \a m to \a d.
- */
-#define SET_SEQ(m, d) ((m).seqnum = ((m).seqnum & 0xFC) | ((d) & 0x03))
-
-/**
- * Increment sequence number of struct \a m.
- */
-#define INC_SEQ(m) SET_SEQ((m), SEQ(m) + 1)
+STATIC_ASSERT(sizeof(BattFsPageHeader) == 8);
 
 /* Fwd decl */
 struct BattFsSuper;
+
+/**
+ * Type for disk page addressing.
+ */
+typedef uint32_t battfs_page_t;
 
 /**
  * Type interface for disk init function.
