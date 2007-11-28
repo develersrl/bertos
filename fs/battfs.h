@@ -54,7 +54,7 @@ typedef uint8_t  fsc_t;
 /**
  * Reserve 2 bits from fill field to allocate seq number.
  */
-#define FILLSIZE ((sizeof(filled_t) * CPU_BITS_PER_CHAR) - 2)
+#define FILLSIZE ((sizeof(fill_t) * CPU_BITS_PER_CHAR) - 2)
 
 /**
  * BattFS page header.
@@ -109,7 +109,7 @@ typedef size_t	(*disk_page_write_t) (struct BattFsSuper *d, const void *buf, bat
  */
 typedef bool (*disk_page_erase_t) (struct BattFsSuper *d, battfs_page_t page);
 
-typedef uint32_t disk_size_t ///< Type for disk sizes.
+typedef uint32_t disk_size_t; ///< Type for disk sizes.
 
 /**
  * Context used to describe a disk.
