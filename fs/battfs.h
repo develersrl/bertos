@@ -42,7 +42,7 @@
 #define FS_BATTFS_H
 
 #include <cfg/compiler.h> // uintXX_t; STATIC_ASSERT
-#include <cpu/types.h>
+#include <cpu/types.h> // CPU_BITS_PER_CHAR
 
 typedef uint16_t fill_t;
 typedef uint16_t pgoff_t;
@@ -55,6 +55,7 @@ typedef uint8_t  fsc_t;
  * Reserve 2 bits from fill field to allocate seq number.
  */
 #define FILLSIZE ((sizeof(fill_t) * CPU_BITS_PER_CHAR) - 2)
+
 
 /**
  * BattFS page header.
