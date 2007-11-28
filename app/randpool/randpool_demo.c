@@ -60,8 +60,8 @@
 #include <string.h>
 #include <cfg/compiler.h>
 #include <drv/timer.h>
-#include <algos/md2.h> 
-#include <algos/randpool.h>
+#include <algo/md2.h> 
+#include <algo/randpool.h>
 #include <unistd.h>
 
 #define LEN 256      //Size of buffer containing a random number.

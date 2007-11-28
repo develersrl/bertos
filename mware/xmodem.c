@@ -51,7 +51,7 @@
 #include <appconfig.h>
 #include <string.h> /* for memset() */
 #include <drv/ser.h>
-#include <algos/crc.h>
+#include <algo/crc.h>
 #include <cfg/debug.h>
 
 

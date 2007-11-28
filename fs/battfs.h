@@ -42,7 +42,7 @@
 #define FS_BATTFS_H
 
 #include <cfg/compiler.h> // uintXX_t; STATIC_ASSERT
-#include <algos/rotating_hash.h>
+#include <algo/rotating_hash.h>
 
 typedef uint16_t filled_t;
 typedef uint16_t page_off_t;
