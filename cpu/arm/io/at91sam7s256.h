@@ -158,7 +158,7 @@
  * SPI pins name
  *\{
  */
-#define NPCS0      11
+#define NPCS0      11  // Same as NSS pin.
 #define MISO       12
 #define MOSI       13
 #define SPCK       14
