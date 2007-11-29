@@ -134,9 +134,8 @@ static bool kfile_rwTest(KFile *f, uint8_t *buf, size_t _size)
  * you should pass an \p save_buf where test store exist data,
  * otherwise su must pass NULL.
  */
-bool kfile_test(uint8_t *test_buf, size_t _size , uint8_t *save_buf, size_t save_buf_size)
+bool kfile_test(KFile *fd, uint8_t *test_buf, size_t _size , uint8_t *save_buf, size_t save_buf_size)
 {
-	KFile fd;
 	int32_t size = _size;
 
 	/*
@@ -148,10 +147,15 @@ bool kfile_test(uint8_t *test_buf, size_t _size , uint8_t *save_buf, size_t save
 	 */
 	int32_t len = size/2;
 
+
+	/* Fill test buffer */
+ 	for (size_t i = 0; i < size; i++)
+ 		test_buf[i] = (i & 0xff);
+
 	/*
 	 * Open fd handler
 	 */
-	fd.open(&fd, NULL, 0);
+	fd->open(fd, NULL, 0);
 	kprintf("Opened fd handler..\n");
 
 	/*
@@ -160,25 +164,23 @@ bool kfile_test(uint8_t *test_buf, size_t _size , uint8_t *save_buf, size_t save
 	 */
 	if (save_buf != NULL)
 	{
-		fd.read(&fd, save_buf, save_buf_size);
-		kprintf("Saved content..form [%lu] to [%lu]\n", fd.seek_pos, fd.seek_pos + save_buf_size);
+		fd->read(fd, save_buf, save_buf_size);
+		kprintf("Saved content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + save_buf_size);
 	}
 
 	/* TEST 1 BEGIN. */
-	kprintf("Test 1: write from pos 0 to [%lu]\n", fd.size);
+	kprintf("Test 1: write from pos 0 to [%lu]\n", size);
 
 	/*
 	 * Seek to addr 0
 	 */
-	if (fd.seek(&fd, 0, KSM_SEEK_SET) != 0)
+	if (fd->seek(fd, 0, KSM_SEEK_SET) != 0)
 		goto kfile_test_end;
-
-	kprintf("Seek to [%lu], expected[0]\n", fd.seek_pos);
 
 	/*
 	 * Test flash read/write to address 0..size
 	 */
-	if (!kfile_rwTest(&fd, test_buf, size))
+	if (!kfile_rwTest(fd, test_buf, size))
 		goto kfile_test_end;
 
 	kprintf("Test 1: ok!\n");
@@ -188,24 +190,22 @@ bool kfile_test(uint8_t *test_buf, size_t _size , uint8_t *save_buf, size_t save
 	 */
 	if (save_buf != NULL)
 	{
-		fd.seek(&fd, 0, KSM_SEEK_SET);
+		fd->seek(fd, 0, KSM_SEEK_SET);
 
-		if (fd.write(&fd, save_buf, save_buf_size) != size)
+		if (fd->write(fd, save_buf, save_buf_size) != size)
 			goto kfile_test_end;
 
-		kprintf("Restore content..form [%lu] to [%lu]\n", fd.seek_pos, fd.seek_pos + save_buf_size);
+		kprintf("Restore content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + save_buf_size);
 	}
 	/* TEST 1 END. */
 
 	/* TEST 2 BEGIN. */
-	kprintf("Test 2: write from pos [%lu] to [%lu]\n", fd.size/2 , size);
+	kprintf("Test 2: write from pos [%lu] to [%lu]\n", fd->size/2 , size);
 
 	/*
 	 * Go to half test size.
 	 */
-	fd.seek(&fd, (fd.size/ 2), KSM_SEEK_SET);
-
-	kprintf("Seek to [%lu], expected[%lu]\n", fd.seek_pos, fd.size/2);
+	fd->seek(fd, (fd->size/ 2), KSM_SEEK_SET);
 
 	/*
 	 * If necessary, user could save content,
@@ -213,15 +213,15 @@ bool kfile_test(uint8_t *test_buf, size_t _size , uint8_t *save_buf, size_t save
 	 */
 	if (save_buf != NULL)
 	{
-		fd.read(&fd, save_buf, save_buf_size);
-		fd.seek(&fd, -size, KSM_SEEK_CUR);
-		kprintf("Saved content..form [%lu] to [%lu]\n", fd.seek_pos, fd.seek_pos + save_buf_size);
+		fd->read(fd, save_buf, save_buf_size);
+		fd->seek(fd, -size, KSM_SEEK_CUR);
+		kprintf("Saved content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + save_buf_size);
 	}
 
 	/*
 	 * Test flash read/write to address FLASHEND/2 ... FLASHEND/2 + size
 	 */
-	if (!kfile_rwTest(&fd, test_buf, size))
+	if (!kfile_rwTest(fd, test_buf, size))
 		goto kfile_test_end;
 
 	kprintf("Test 2: ok!\n");
@@ -231,24 +231,23 @@ bool kfile_test(uint8_t *test_buf, size_t _size , uint8_t *save_buf, size_t save
 	 */
 	if (save_buf != NULL)
 	{
-		fd.seek(&fd, -size, KSM_SEEK_CUR);
+		fd->seek(fd, -size, KSM_SEEK_CUR);
 
-		if (fd.write(&fd, save_buf, save_buf_size) != size)
+		if (fd->write(fd, save_buf, save_buf_size) != size)
 			goto kfile_test_end;
 
-		kprintf("Restore content..form [%lu] to [%lu]\n", fd.seek_pos, fd.seek_pos + save_buf_size);
+		kprintf("Restore content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + save_buf_size);
 	}
 
 	/* TEST 2 END. */
 
 	/* TEST 3 BEGIN. */
-	kprintf("Test 3: write outside of fd.size limit [%lu]\n", fd.size);
+	kprintf("Test 3: write outside of fd->size limit [%lu]\n", fd->size);
 
 	/*
 	 * Go to the Flash end
 	 */
-	fd.seek(&fd, -len, KSM_SEEK_END);
-	kprintf("Seek to [%lu], expected[%lu]\n", fd.seek_pos, fd.size - len);
+	fd->seek(fd, -len, KSM_SEEK_END);
 
 	/*
 	 * If necessary, user could save content,
@@ -258,15 +257,15 @@ bool kfile_test(uint8_t *test_buf, size_t _size , uint8_t *save_buf, size_t save
 	{
 		ASSERT(len > save_buf_size);
 
-		fd.read(&fd, save_buf, len);
-		fd.seek(&fd, -len, KSM_SEEK_CUR);
-		kprintf("Saved content..form [%lu] to [%lu]\n", fd.seek_pos, fd.seek_pos + len);
+		fd->read(fd, save_buf, len);
+		fd->seek(fd, -len, KSM_SEEK_CUR);
+		kprintf("Saved content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + len);
 	}
 
 	/*
 	 * Test flash read/write to address (FLASHEND - size) ... FLASHEND
 	 */
-	if (!kfile_rwTest(&fd, test_buf, size))
+	if (kfile_rwTest(fd, test_buf, size))
 		goto kfile_test_end;
 
 	kprintf("Test 3: ok !\n");
@@ -276,21 +275,21 @@ bool kfile_test(uint8_t *test_buf, size_t _size , uint8_t *save_buf, size_t save
 	 */
 	if (save_buf != NULL)
 	{
-		fd.seek(&fd, -len, KSM_SEEK_END);
+		fd->seek(fd, -len, KSM_SEEK_END);
 
-		if (fd.write(&fd, save_buf, len) != len)
+		if (fd->write(fd, save_buf, len) != len)
 			goto kfile_test_end;
 
-		kprintf("Restore content..form [%lu] to [%lu]\n", fd.seek_pos, fd.seek_pos + len);
+		kprintf("Restore content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + len);
 	}
 
 	/* TEST 3 END. */
 
-	fd.close(&fd);
+	fd->close(fd);
 	return true;
 
 kfile_test_end:
-	fd.close(&fd);
+	fd->close(fd);
 	return false;
 }
 
