@@ -42,6 +42,50 @@
 
 #include <kfile.h>
 
+#inclede <appconfig.h>
+
+
+/**
+ * Move \a fd file seek position of \a offset bytes
+ * from current position.
+ * This is a generic implementation of seek function, you should redefine
+ * it in your local module.
+ */
+int32_t kfile_seek(struct _KFile *fd, kfile_off_t offset, KSeekMode whence)
+{
+	uint32_t seek_pos;
+
+	switch(whence)
+	{
+
+	case KSM_SEEK_SET:
+		seek_pos = 0;
+		break;
+	case KSM_SEEK_END:
+		seek_pos = fd->size - 1;
+		break;
+	case KSM_SEEK_CUR:
+		seek_pos = fd->seek_pos;
+		break;
+	default:
+		ASSERT(0);
+		return -1;
+		break;
+
+	}
+
+	/* Bound check */
+	if (seek_pos + offset > fd->size)
+	{
+		ASSERT(0);
+		return -1;
+	}
+
+	fd->seek_pos = seek_pos + offset;
+	kprintf("Flash seek to [%lu]\n", fd->seek_pos);
+
+	return fd->seek_pos;
+}
 
 #if CONFIG_TEST
 
