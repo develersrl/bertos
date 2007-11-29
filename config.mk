@@ -10,39 +10,6 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 # $Log$
-# Revision 1.12  2007/09/29 16:57:39  bernie
-# Better sparse support.
-#
-# Revision 1.11  2007/09/29 15:54:14  bernie
-# Make demo Qt emulator compile again.
-#
-# Revision 1.10  2007/09/18 10:17:00  batt
-# Merge from triface.
-#
-# Revision 1.9  2006/09/20 14:28:42  marco
-# Add MOC. Changed OPTCFLAGS.
-#
-# Revision 1.8  2006/09/19 17:50:56  bernie
-# Make native build the default.
-#
-# Revision 1.7  2006/07/19 12:56:24  bernie
-# Convert to new Doxygen style.
-#
-# Revision 1.6  2006/06/12 22:05:09  marco
-# Bring back config wrongly commited
-#
-# Revision 1.4  2006/05/27 22:41:46  bernie
-# Tweak optimization flags for loops.
-#
-# Revision 1.3  2006/05/18 00:40:10  bernie
-# Setup for AVR development.
-#
-# Revision 1.2  2006/03/27 04:48:33  bernie
-# Add CXXFLAGS; Add recursive targets.
-#
-# Revision 1.1  2006/03/22 09:51:53  bernie
-# Add build infrastructure.
-#
 #
 
 #
@@ -82,7 +49,7 @@ DEBUGCFLAGS = -ggdb
 #
 # define some variables based on the AVR base path in $(AVR)
 #
-CROSS   = arm-elf-
+CROSS   = avr-
 CC      = $(CROSS)gcc
 CXX     = $(CROSS)g++
 AS      = $(CC) -x assembler-with-cpp
@@ -127,7 +94,7 @@ LIST_FLAGS = -Wa,-anhlmsd=$(@:.o=.lst)
 ifeq ($(EMBEDDED_TARGET), 1)
 MAP_FLAGS = -Wl,-Map=$(@:%.elf=%.map),--cref
 else
-MAP_FLAGS = 
+MAP_FLAGS =
 endif
 
 # Compiler warning flags for both C and C++
