@@ -53,7 +53,7 @@
  * This is a generic implementation of seek function, you should redefine
  * it in your local module.
  */
-int32_t kfile_seek(struct _KFile *fd, kfile_off_t offset, KSeekMode whence)
+kfile_off_t kfile_seek(struct _KFile *fd, kfile_off_t offset, KSeekMode whence)
 {
 	uint32_t seek_pos;
 
@@ -133,11 +133,6 @@ static bool kfile_rwTest(KFile *f, uint8_t *buf, size_t _size)
  * on \p fd handler. If you want not overwrite exist data
  * you should pass an \p save_buf where test store exist data,
  * otherwise su must pass NULL.
- *
- * \note some device (like flash memeory) not allow write on
- * existing data, and so this test use ASSERT macro to warn you if
- * you are writing on same fd.seek_pos.
- *
  */
 bool kfile_test(uint8_t *test_buf, size_t _size , uint8_t *save_buf, size_t save_buf_size)
 {

@@ -62,7 +62,7 @@ typedef enum KSeekMode
 
 typedef size_t	(*ReadFunc_t)  (struct _KFile *fd, void *buf, size_t size);
 typedef size_t	(*WriteFunc_t) (struct _KFile *fd, const void *buf, size_t size);
-typedef	int32_t (*SeekFunc_t)  (struct _KFile *fd, kfile_off_t offset, KSeekMode whence);
+typedef	kfile_off_t (*SeekFunc_t)  (struct _KFile *fd, kfile_off_t offset, KSeekMode whence);
 typedef bool	(*OpenFunc_t)  (struct _KFile *fd, const char *name, int mode);
 typedef bool	(*CloseFunc_t) (struct _KFile *fd);
 
@@ -87,7 +87,7 @@ typedef struct _KFile
 /*
  * Generic implementation of seek function.
  */
-int32_t kfile_seek(struct _KFile *fd, kfile_off_t offset, KSeekMode whence);
+kfile_off_t kfile_seek(struct _KFile *fd, kfile_off_t offset, KSeekMode whence);
 
 /*
  * Kfile test function
