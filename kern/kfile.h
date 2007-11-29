@@ -92,6 +92,6 @@ int32_t kfile_seek(struct _KFile *fd, kfile_off_t offset, KSeekMode whence);
 /*
  * Kfile test function
  */
-bool kfile_test(uint8_t *buf, size_t _size , uint8_t *save_buf, size_t * save_buf_size);
+bool kfile_test(uint8_t *buf, size_t _size , uint8_t *save_buf, size_t save_buf_size);
 
 #endif /* MWARE_KFILE_H */

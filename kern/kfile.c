@@ -40,9 +40,10 @@
  *
  */
 
-#include <kfile.h>
+#include <kern/kfile.h>
+#include <cfg/debug.h>
 
-#inclede <appconfig.h>
+#include <string.h>
 
 
 /**
@@ -127,8 +128,17 @@ static bool kfile_rwTest(KFile *f, uint8_t *buf, size_t _size)
 
 /**
  * Test for program memory read/write.
+ * This function write and read \p test_buf long \p _size
+ * on \p fd handler. If you want not overwrite exist data
+ * you should pass an \p save_buf where test store exist data,
+ * otherwise su must pass NULL.
+ *
+ * \note some device (like flash memeory) not allow write on
+ * existing data, and so this test use ASSERT macro to warn you if
+ * you are writing on same fd.seek_pos.
+ *
  */
-bool kfile_test(uint8_t *buf, size_t _size , uint8_t *save_buf, size_t * save_buf_size)
+bool kfile_test(uint8_t *test_buf, size_t _size , uint8_t *save_buf, size_t save_buf_size)
 {
 	KFile fd;
 	int32_t size = _size;
@@ -141,14 +151,6 @@ bool kfile_test(uint8_t *buf, size_t _size , uint8_t *save_buf, size_t * save_bu
 	 * we return.
 	 */
 	int32_t len = size/2;
-
-	/*
-	 * Fill in test buffer
-	 */
-	for (int i = 0; i < size; i++)
-		test_buf[i] = (i & 0xff);
-
-	kprintf("Generated test string..\n");
 
 	/*
 	 * Open fd handler
@@ -180,7 +182,7 @@ bool kfile_test(uint8_t *buf, size_t _size , uint8_t *save_buf, size_t * save_bu
 	/*
 	 * Test flash read/write to address 0..size
 	 */
-	if (!Kfile_rwTest(&fd, test_buf, size))
+	if (!kfile_rwTest(&fd, test_buf, size))
 		goto kfile_test_end;
 
 	kprintf("Test 1: ok!\n");
@@ -223,7 +225,7 @@ bool kfile_test(uint8_t *buf, size_t _size , uint8_t *save_buf, size_t * save_bu
 	/*
 	 * Test flash read/write to address FLASHEND/2 ... FLASHEND/2 + size
 	 */
-	if (!Kfile_rwTest(&fd, test_buf, size))
+	if (!kfile_rwTest(&fd, test_buf, size))
 		goto kfile_test_end;
 
 	kprintf("Test 2: ok!\n");
@@ -268,7 +270,7 @@ bool kfile_test(uint8_t *buf, size_t _size , uint8_t *save_buf, size_t * save_bu
 	/*
 	 * Test flash read/write to address (FLASHEND - size) ... FLASHEND
 	 */
-	if (!Kfile_rwTest(&fd, test_buf, size))
+	if (!kfile_rwTest(&fd, test_buf, size))
 		goto kfile_test_end;
 
 	kprintf("Test 3: ok !\n");
