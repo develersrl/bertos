@@ -45,6 +45,7 @@
 
 #include <string.h>
 
+#include <appconfig.h>
 
 /**
  * Move \a fd file seek position of \a offset bytes
