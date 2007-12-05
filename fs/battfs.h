@@ -49,7 +49,7 @@ typedef uint16_t pgoff_t;
 typedef pgoff_t  mark_t;
 typedef uint8_t  inode_t;
 typedef uint8_t  seq_t;
-typedef uint16_t  fcs_t;
+typedef uint16_t fcs_t;
 
 /**
  * BattFS page header.
