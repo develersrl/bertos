@@ -43,6 +43,7 @@
 
 #include <cfg/compiler.h> // uintXX_t; STATIC_ASSERT
 #include <cpu/types.h> // CPU_BITS_PER_CHAR
+#include <algo/rotating_hash.h>
 
 typedef uint16_t fill_t;
 typedef fill_t   pgaddr_t;
@@ -50,7 +51,7 @@ typedef uint16_t pgoff_t;
 typedef pgoff_t  mark_t;
 typedef uint8_t  inode_t;
 typedef uint8_t  seq_t;
-typedef uint16_t fcs_t;
+typedef rotating_t fcs_t;
 
 /**
  * BattFS page header.
@@ -65,8 +66,20 @@ typedef struct BattFsPageHeader
 	pgoff_t  pgoff; ///< Page offset inside file.
 	fill_t   fill;  ///< Filled bytes in page.
 	uint16_t rfu;   ///< Reserved for future use, 0xFFFF for now.
-	fcs_t    fcs;   ///< FCS (Frame Check Sequence) of the page header.
+
+	/**
+	 * FCS (Frame Check Sequence) of the page header.
+	 * \note This field must be the last one!
+	 *       This is needed because if the page is only partially
+	 *       written, we can use this to detect it.
+	 */
+	fcs_t fcs;
 } BattFsPageHeader;
+
+/**
+ * Max number of files.
+ */
+#define BATTFS_MAX_FILES (1 << (CPU_BITS_PER_CHAR * sizeof(inode_t)))
 
 /* Ensure structure has no padding added */
 STATIC_ASSERT(sizeof(BattFsPageHeader) == 12);
@@ -148,11 +161,6 @@ typedef struct BattFsSuper
 	/* TODO add other fields. */
 } BattFsSuper;
 
-/**
- * Initialize and mount disk described by
- * \a d.
- * \return false on errors, true otherwise.
- */
 bool battfs_init(struct BattFsSuper *d);
 
 #endif /* FS_BATTFS_H */
