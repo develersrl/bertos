@@ -45,6 +45,7 @@
 #include <cpu/types.h> // CPU_BITS_PER_CHAR
 
 typedef uint16_t fill_t;
+typedef fill_t   pgaddr_t;
 typedef uint16_t pgoff_t;
 typedef pgoff_t  mark_t;
 typedef uint8_t  inode_t;
@@ -76,34 +77,43 @@ struct BattFsSuper;
 /**
  * Type for disk page addressing.
  */
-typedef uint32_t battfs_page_t;
+typedef uint16_t pgcnt_t;
 
 /**
  * Type interface for disk init function.
  * \return true if all is ok, false otherwise.
  */
-typedef bool (*disk_init_t) (struct BattFsSuper *d);
+typedef bool (*disk_open_t) (struct BattFsSuper *d);
 
 /**
  * Type interface for disk page read function.
- * \a page is the page address, \a size the lenght to be read.
+ * \a page is the page address, \a addr the address inside the page,
+ * \a size the lenght to be read.
  * \return the number of bytes read.
  */
-typedef size_t (*disk_page_read_t) (struct BattFsSuper *d, void *buf, battfs_page_t page, size_t size);
+typedef size_t (*disk_page_read_t) (struct BattFsSuper *d, pgcnt_t page, pgaddr_t addr, void *buf, size_t);
 
 /**
  * Type interface for disk page write function.
- * \a page is the page address, \a size the lenght to be written.
+ * \a page is the page address, \a addr the address inside the page,
+ * \a size the lenght to be written.
  * \return the number of bytes written.
  */
-typedef size_t	(*disk_page_write_t) (struct BattFsSuper *d, const void *buf, battfs_page_t page, size_t size);
+typedef size_t	(*disk_page_write_t) (struct BattFsSuper *d, pgcnt_t page, pgaddr_t addr, void *buf, size_t);
 
 /**
  * Type interface for disk page erase function.
  * \a page is the page address.
  * \return true if all is ok, false otherwise.
  */
-typedef bool (*disk_page_erase_t) (struct BattFsSuper *d, battfs_page_t page);
+typedef bool (*disk_page_erase_t) (struct BattFsSuper *d, pgcnt_t page);
+
+/**
+ * Type interface for disk deinit function.
+ * \return true if all is ok, false otherwise.
+ */
+typedef bool (*disk_close_t) (struct BattFsSuper *d);
+
 
 typedef uint32_t disk_size_t; ///< Type for disk sizes.
 
@@ -114,14 +124,35 @@ typedef uint32_t disk_size_t; ///< Type for disk sizes.
  */
 typedef struct BattFsSuper
 {
-	disk_init_t init;        ///< Disk init.
+	disk_open_t open;        ///< Disk init.
 	disk_page_read_t  read;  ///< Page read.
 	disk_page_write_t write; ///< Page write.
 	disk_page_erase_t erase; ///< Page erase.
+	disk_close_t close;      ///< Disk deinit.
 
-	disk_size_t disk_size;   ///< Size of the disk, in bytes.
+	pgaddr_t page_size;      ///< Size of a disk page, in bytes.
+	pgcnt_t page_count;      ///< Number of pages on disk.
+
+	/**
+	 * Page allocation array.
+	 * This array must be allocated somewhere and
+	 * must have enough space for page_count elements.
+	 * Is used by the filesystem to represent
+	 * the entire disk in memory.
+	 */
+	pgcnt_t *page_array;     
+
+	disk_size_t disk_size;   ///< Size of the disk, in bytes (page_count * page_size).
 	disk_size_t free_bytes;  ///< Free space on the disk.
+	
 	/* TODO add other fields. */
 } BattFsSuper;
+
+/**
+ * Initialize and mount disk described by
+ * \a d.
+ * \return false on errors, true otherwise.
+ */
+bool battfs_init(struct BattFsSuper *d);
 
 #endif /* FS_BATTFS_H */
