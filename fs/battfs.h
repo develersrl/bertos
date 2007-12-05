@@ -49,7 +49,7 @@ typedef uint16_t pgoff_t;
 typedef pgoff_t  mark_t;
 typedef uint8_t  inode_t;
 typedef uint8_t  seq_t;
-typedef uint16_t  fsc_t;
+typedef uint16_t  fcs_t;
 
 /**
  * BattFS page header.
@@ -58,13 +58,13 @@ typedef uint16_t  fsc_t;
  */
 typedef struct BattFsPageHeader
 {
+	inode_t  inode; ///< File inode (file identifier).
+	seq_t    seq;   ///< Page sequence number.
 	mark_t   mark;  ///< Marker used to keep trace of free/used pages.
 	pgoff_t  pgoff; ///< Page offset inside file.
 	fill_t   fill;  ///< Filled bytes in page.
-	seq_t    seq;   ///< Page sequence number.
-	inode_t  inode; ///< File inode (file identifier).
 	uint16_t rfu;  ///< Reserved for future use, 0xFFFF for now.
-	fsc_t    fsc;   ///< FSC of the page header.
+	fcs_t    fcs;   ///< FCS (Frame Check Sequence) of the page header.
 } BattFsPageHeader;
 
 /* Ensure structure has no padding added */
