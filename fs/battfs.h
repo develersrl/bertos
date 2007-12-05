@@ -49,13 +49,7 @@ typedef uint16_t pgoff_t;
 typedef pgoff_t  mark_t;
 typedef uint8_t  inode_t;
 typedef uint8_t  seq_t;
-typedef uint8_t  fsc_t;
-
-/**
- * Reserve 2 bits from fill field to allocate seq number.
- */
-#define FILLSIZE ((sizeof(fill_t) * CPU_BITS_PER_CHAR) - 2)
-
+typedef uint16_t  fsc_t;
 
 /**
  * BattFS page header.
@@ -64,16 +58,17 @@ typedef uint8_t  fsc_t;
  */
 typedef struct BattFsPageHeader
 {
-	mark_t  mark;          ///< Marker used to keep trace of free/used pages.
-	pgoff_t pgoff;         ///< Page offset inside file.
-	fill_t  fill:FILLSIZE; ///< Filled bytes in page.
-	seq_t   seq:2;         ///< bit[1:0]: Page sequence number; bit[7:2] unused for now, must be set to 1.
-	inode_t inode;         ///< File inode (file identifier).
-	fsc_t   fsc;           ///< FSC of the page header.
+	mark_t   mark;  ///< Marker used to keep trace of free/used pages.
+	pgoff_t  pgoff; ///< Page offset inside file.
+	fill_t   fill;  ///< Filled bytes in page.
+	seq_t    seq;   ///< Page sequence number.
+	inode_t  inode; ///< File inode (file identifier).
+	uint16_t rfu;  ///< Reserved for future use, 0xFFFF for now.
+	fsc_t    fsc;   ///< FSC of the page header.
 } BattFsPageHeader;
 
 /* Ensure structure has no padding added */
-STATIC_ASSERT(sizeof(BattFsPageHeader) == 8);
+STATIC_ASSERT(sizeof(BattFsPageHeader) == 12);
 
 /* Fwd decl */
 struct BattFsSuper;
