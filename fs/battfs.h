@@ -63,7 +63,7 @@ typedef struct BattFsPageHeader
 	mark_t   mark;  ///< Marker used to keep trace of free/used pages.
 	pgoff_t  pgoff; ///< Page offset inside file.
 	fill_t   fill;  ///< Filled bytes in page.
-	uint16_t rfu;  ///< Reserved for future use, 0xFFFF for now.
+	uint16_t rfu;   ///< Reserved for future use, 0xFFFF for now.
 	fcs_t    fcs;   ///< FCS (Frame Check Sequence) of the page header.
 } BattFsPageHeader;
 
