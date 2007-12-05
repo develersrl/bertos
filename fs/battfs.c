@@ -142,7 +142,7 @@ bool battfs_init(struct BattFsSuper *disk)
 		rotating_init(&cks);
 		rotating_update(&hdr, sizeof(BattFsPageHeader) - sizeof(rotating_t), &cks);
 		if (cks == hdr.fcs)
-			filelen_table[page]++;
+			filelen_table[hdr.inode]++;
 		else
 		{
 			#warning Finish me!
