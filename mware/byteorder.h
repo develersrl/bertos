@@ -65,6 +65,15 @@ INLINE uint32_t swab32(uint32_t x)
 }
 
 /**
+ * Reverse bytes in a 64-bit value.
+ */
+INLINE uint64_t swab64(uint64_t x)
+{
+	return ( (uint64_t)swab32((x >> 32))
+		| (uint64_t)swab32(x & (uint32_t)0xFFFFFFFFUL) << 32);
+}
+
+/**
  * Reverse bytes in a float value.
  */
 INLINE float swab_float(float x)
@@ -99,6 +108,16 @@ INLINE uint32_t cpu_to_le32(uint32_t x)
 	return (CPU_BYTE_ORDER == CPU_BIG_ENDIAN) ? swab32(x) : x;
 }
 
+INLINE uint64_t cpu_to_be64(uint64_t x)
+{
+	return (CPU_BYTE_ORDER == CPU_LITTLE_ENDIAN) ? swab64(x) : x;
+}
+
+INLINE uint64_t cpu_to_le64(uint64_t x)
+{
+	return (CPU_BYTE_ORDER == CPU_BIG_ENDIAN) ? swab64(x) : x;
+}
+
 INLINE float cpu_to_be_float(float x)
 {
 	return (CPU_BYTE_ORDER == CPU_LITTLE_ENDIAN) ? swab_float(x) : x;
@@ -127,6 +146,16 @@ INLINE uint32_t be32_to_cpu(uint32_t x)
 INLINE uint32_t le32_to_cpu(uint32_t x)
 {
 	return cpu_to_le32(x);
+}
+
+INLINE uint64_t be64_to_cpu(uint64_t x)
+{
+	return cpu_to_be64(x);
+}
+
+INLINE uint64_t le64_to_cpu(uint64_t x)
+{
+	return cpu_to_le64(x);
 }
 
 INLINE float be_float_to_cpu(float x)
@@ -159,6 +188,16 @@ INLINE uint32_t net_to_host32(uint32_t x)
 	return be32_to_cpu(x);
 }
 
+INLINE uint64_t host_to_net64(uint64_t x)
+{
+	return cpu_to_be64(x);
+}
+
+INLINE uint64_t net_to_host64(uint64_t x)
+{
+	return be64_to_cpu(x);
+}
+
 INLINE float host_to_net_float(float x)
 {
 	return cpu_to_be_float(x);
@@ -177,8 +216,10 @@ INLINE T swab(T x);
 
 template<> INLINE uint16_t swab(uint16_t x) { return swab16(x); }
 template<> INLINE uint32_t swab(uint32_t x) { return swab32(x); }
+template<> INLINE uint64_t swab(uint64_t x) { return swab64(x); }
 template<> INLINE int16_t  swab(int16_t x)  { return static_cast<int16_t>(swab16(static_cast<uint16_t>(x))); }
 template<> INLINE int32_t  swab(int32_t x)  { return static_cast<int32_t>(swab32(static_cast<uint32_t>(x))); }
+template<> INLINE int64_t  swab(int64_t x)  { return static_cast<int64_t>(swab32(static_cast<uint64_t>(x))); }
 template<> INLINE float    swab(float x)    { return swab_float(x); }
 
 /// Type generic conversion from CPU byte order to big-endian byte order.
