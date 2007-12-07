@@ -120,7 +120,6 @@ static bool battfs_readHeader(struct BattFsSuper *disk, pgcnt_t page, struct Bat
 	/* Fix endianess */
 	battfs_to_cpu(hdr);
 
-	ASSERT(hdr->fill <= disk->page_size - sizeof(BattFsPageHeader));
 	return true;
 }
 
@@ -135,6 +134,16 @@ bool battfs_init(struct BattFsSuper *disk)
 	rotating_t cks;
 	pgoff_t filelen_table[BATTFS_MAX_FILES];
 
+	/* Sanity checks */
+	ASSERT(disk->open);
+	ASSERT(disk->read);
+	ASSERT(disk->write);
+	ASSERT(disk->erase);
+	ASSERT(disk->close);
+	ASSERT(disk->page_size);
+	ASSERT(disk->page_count);
+	ASSERT(disk->page_array);
+	
 	/* Init disk device */
 	if (!disk->open(disk))
 	{
@@ -163,14 +172,20 @@ bool battfs_init(struct BattFsSuper *disk)
 		rotating_update(&hdr, sizeof(BattFsPageHeader) - sizeof(rotating_t), &cks);
 		if (cks == hdr.fcs)
 		{
-			/* Page is valid */
+			/* Page is valid and is owned by a file */
+			ASSERT(hdr.inode != BATTFS_FREE_INODE);
 			filelen_table[hdr.inode]++;
 
+			ASSERT(hdr.fill <= disk->page_size - sizeof(BattFsPageHeader));
 			/* Keep trace of free space */
 			disk->free_bytes += disk->page_size - sizeof(BattFsPageHeader) - hdr.fill;
 		}
 		else
 		{
+			/* Increase free space */
+			filelen_table[BATTFS_FREE_INODE]++;
+			disk->free_bytes += disk->page_size - sizeof(BattFsPageHeader);
+			
 			/* Check if putting mark to MARK_PAGE_VALID makes fcs correct */
 			mark_t old_mark = hdr.mark;
 			hdr.mark = MARK_PAGE_VALID;
@@ -179,7 +194,7 @@ bool battfs_init(struct BattFsSuper *disk)
 			if (cks == hdr.fcs)
 			{
 				/*
-				 * This page is a valid free page.
+				 * This page is a valid and marked free page.
 				 * Update min and max free page sequence numbers.
 				 */
 				disk->min_free = MIN(disk->min_free, old_mark);
@@ -187,10 +202,6 @@ bool battfs_init(struct BattFsSuper *disk)
 			}
 			else
 				TRACEMSG("Page [%d] invalid, keeping as free\n", page);
-
-			/* Increase free space */
-			filelen_table[BATTFS_FREE_INODE]++;
-			disk->free_bytes += disk->page_size - sizeof(BattFsPageHeader);
 		}
 	}
 
