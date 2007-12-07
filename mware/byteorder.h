@@ -219,7 +219,7 @@ template<> INLINE uint32_t swab(uint32_t x) { return swab32(x); }
 template<> INLINE uint64_t swab(uint64_t x) { return swab64(x); }
 template<> INLINE int16_t  swab(int16_t x)  { return static_cast<int16_t>(swab16(static_cast<uint16_t>(x))); }
 template<> INLINE int32_t  swab(int32_t x)  { return static_cast<int32_t>(swab32(static_cast<uint32_t>(x))); }
-template<> INLINE int64_t  swab(int64_t x)  { return static_cast<int64_t>(swab32(static_cast<uint64_t>(x))); }
+template<> INLINE int64_t  swab(int64_t x)  { return static_cast<int64_t>(swab64(static_cast<uint64_t>(x))); }
 template<> INLINE float    swab(float x)    { return swab_float(x); }
 
 /// Type generic conversion from CPU byte order to big-endian byte order.
