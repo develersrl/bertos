@@ -39,7 +39,10 @@
 
 #include "battfs.h"
 
+#include <cfg/debug.h>
+#include <cfg/macros.h> /* MIN, MAX */
 #include <mware/byteorder.h> /* cpu_to_xx */
+
 
 #include <string.h> /* memset */
 
@@ -109,10 +112,15 @@ static bool battfs_readHeader(struct BattFsSuper *disk, pgcnt_t page, struct Bat
 	 */
 	if (disk->read(disk, page, disk->page_size - sizeof(BattFsPageHeader), hdr, sizeof(BattFsPageHeader))
 	    != sizeof(BattFsPageHeader))
+	{
+		TRACEMSG("Error: page[%d]\n", page);
 		return false;
+	}
 
 	/* Fix endianess */
 	battfs_to_cpu(hdr);
+
+	ASSERT(hdr->fill <= disk->page_size - sizeof(BattFsPageHeader));
 	return true;
 }
 
@@ -129,10 +137,22 @@ bool battfs_init(struct BattFsSuper *disk)
 
 	/* Init disk device */
 	if (!disk->open(disk))
+	{
+		TRACEMSG("Open error\n");
 		return false;
+	}
 
 	memset(filelen_table, 0, BATTFS_MAX_FILES * sizeof(pgoff_t));
 
+	/* Initialize min free sequence number to max value */
+	disk->min_free = MARK_PAGE_VALID;
+	/* Initialize max free sequence number to min value */
+	disk->max_free = 0;
+
+	disk->free_bytes = 0;
+	disk->disk_size = (disk_size_t)(disk->page_size - sizeof(BattFsPageHeader)) * disk->page_count;
+
+	/* Count the number of disk page per files */
 	for (pgcnt_t page = 0; page < disk->page_count; page++)
 	{
 		if (!battfs_readHeader(disk, page, &hdr))
@@ -142,12 +162,40 @@ bool battfs_init(struct BattFsSuper *disk)
 		rotating_init(&cks);
 		rotating_update(&hdr, sizeof(BattFsPageHeader) - sizeof(rotating_t), &cks);
 		if (cks == hdr.fcs)
+		{
+			/* Page is valid */
 			filelen_table[hdr.inode]++;
+
+			/* Keep trace of free space */
+			disk->free_bytes += disk->page_size - sizeof(BattFsPageHeader) - hdr.fill;
+		}
 		else
 		{
-			#warning Finish me!
+			/* Check if putting mark to MARK_PAGE_VALID makes fcs correct */
+			mark_t old_mark = hdr.mark;
+			hdr.mark = MARK_PAGE_VALID;
+			rotating_init(&cks);
+			rotating_update(&hdr, sizeof(BattFsPageHeader) - sizeof(rotating_t), &cks);
+			if (cks == hdr.fcs)
+			{
+				/*
+				 * This page is a valid free page.
+				 * Update min and max free page sequence numbers.
+				 */
+				disk->min_free = MIN(disk->min_free, old_mark);
+				disk->max_free = MAX(disk->max_free, old_mark);
+			}
+			else
+				TRACEMSG("Page [%d] invalid, keeping as free\n", page);
+
+			/* Increase free space */
+			filelen_table[BATTFS_FREE_INODE]++;
+			disk->free_bytes += disk->page_size - sizeof(BattFsPageHeader);
 		}
 	}
+
+	/* Once here, we have filelen_table filled with file lengths */
+	#warning Complete me!
 
 	
 	return true;	

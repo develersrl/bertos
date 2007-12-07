@@ -77,9 +77,20 @@ typedef struct BattFsPageHeader
 } BattFsPageHeader;
 
 /**
+ * Mark for valid pages.
+ * Simply set to 1 all field bits.
+ */
+#define MARK_PAGE_VALID ((1 << (CPU_BITS_PER_CHAR * sizeof(mark_t))) - 1)
+
+/**
  * Max number of files.
  */
 #define BATTFS_MAX_FILES (1 << (CPU_BITS_PER_CHAR * sizeof(inode_t)))
+
+/**
+ * Special inode used to identify free pages.
+ */
+#define BATTFS_FREE_INODE (BATTFS_MAX_FILES - 1)
 
 /* Ensure structure has no padding added */
 STATIC_ASSERT(sizeof(BattFsPageHeader) == 12);
@@ -153,7 +164,10 @@ typedef struct BattFsSuper
 	 * Is used by the filesystem to represent
 	 * the entire disk in memory.
 	 */
-	pgcnt_t *page_array;     
+	pgcnt_t *page_array;
+
+	mark_t min_free; ///< Lowest sequence number of free page
+	mark_t max_free; ///< Highest sequence number of free page
 
 	disk_size_t disk_size;   ///< Size of the disk, in bytes (page_count * page_size).
 	disk_size_t free_bytes;  ///< Free space on the disk.
