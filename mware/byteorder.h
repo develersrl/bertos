@@ -69,8 +69,8 @@ INLINE uint32_t swab32(uint32_t x)
  */
 INLINE uint64_t swab64(uint64_t x)
 {
-	return ( (uint64_t)swab32((x >> 32))
-		| (uint64_t)swab32(x & (uint32_t)0xFFFFFFFFUL) << 32);
+	return (uint64_t)swab32(x >> 32)
+		| ((uint64_t)swab32(x & 0xFFFFFFFFUL) << 32);
 }
 
 /**
