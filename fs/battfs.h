@@ -75,6 +75,9 @@ typedef struct BattFsPageHeader
 	 */
 	fcs_t fcs;
 } BattFsPageHeader;
+/* Ensure structure has no padding added */
+STATIC_ASSERT(sizeof(BattFsPageHeader) == 12);
+
 
 /**
  * Mark for valid pages.
@@ -91,9 +94,6 @@ typedef struct BattFsPageHeader
  * Special inode used to identify free pages.
  */
 #define BATTFS_FREE_INODE (BATTFS_MAX_FILES - 1)
-
-/* Ensure structure has no padding added */
-STATIC_ASSERT(sizeof(BattFsPageHeader) == 12);
 
 /* Fwd decl */
 struct BattFsSuper;
