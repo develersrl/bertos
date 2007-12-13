@@ -339,6 +339,7 @@ bool battfs_init(struct BattFsSuper *disk)
 				pgcnt_t new_page, old_page;
 				fill_t old_fill;
 
+				#warning fix seq wraparound!
 				if (hdr.seq > hdr_old.seq)
 				{
 					/* Actual header is newer than the previuos one */
