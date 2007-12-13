@@ -90,11 +90,6 @@ STATIC_ASSERT(sizeof(BattFsPageHeader) == 12);
  */
 #define BATTFS_MAX_FILES (1 << (CPU_BITS_PER_CHAR * sizeof(inode_t)))
 
-/**
- * Special inode used to identify free pages.
- */
-#define BATTFS_FREE_INODE (BATTFS_MAX_FILES - 1)
-
 /* Fwd decl */
 struct BattFsSuper;
 
@@ -102,6 +97,11 @@ struct BattFsSuper;
  * Type for disk page addressing.
  */
 typedef uint16_t pgcnt_t;
+
+/**
+ * Sentinel used to keep trace of unset pages in disk->pag_array.
+ */
+#define PAGE_UNSET_SENTINEL ((1 << (CPU_BITS_PER_CHAR * sizeof(pgcnt_t))) - 1)
 
 /**
  * Type interface for disk init function.

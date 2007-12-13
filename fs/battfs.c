@@ -44,7 +44,27 @@
 #include <mware/byteorder.h> /* cpu_to_xx */
 
 
-#include <string.h> /* memset */
+#include <string.h> /* memset, memmove */
+
+/**
+ * Convert mark_t from cpu endianess to filesystem endianness.
+ * \note filesystem is in little-endian format.
+ */
+INLINE mark_t cpu_to_mark_t(mark_t mark)
+{
+	STATIC_ASSERT(sizeof(mark_t) == 2);
+	return cpu_to_le16(mark);
+}
+
+/**
+ * Convert mark_t from filesystem endianness to cpu endianess.
+ * \note filesystem is in little-endian format.
+ */
+INLINE mark_t mark_t_to_cpu(mark_t mark)
+{
+	STATIC_ASSERT(sizeof(mark_t) == 2);
+	return le16_to_cpu(mark);
+}
 
 /**
  * Convert from cpu endianess to filesystem endianness.
@@ -55,8 +75,7 @@ INLINE void cpu_to_battfs(struct BattFsPageHeader *hdr)
 	STATIC_ASSERT(sizeof(hdr->inode) == 1);
 	STATIC_ASSERT(sizeof(hdr->seq) == 1);
 
-	STATIC_ASSERT(sizeof(hdr->mark) == 2);
-	hdr->mark = cpu_to_le16(hdr->mark);
+	hdr->mark = cpu_to_mark_t(hdr->mark);
 
 	STATIC_ASSERT(sizeof(hdr->fill) == 2);
 	hdr->fill = cpu_to_le16(hdr->fill);
@@ -81,8 +100,7 @@ INLINE void battfs_to_cpu(struct BattFsPageHeader *hdr)
 	STATIC_ASSERT(sizeof(hdr->inode) == 1);
 	STATIC_ASSERT(sizeof(hdr->seq) == 1);
 
-	STATIC_ASSERT(sizeof(hdr->mark) == 2);
-	hdr->mark = le16_to_cpu(hdr->mark);
+	hdr->mark = mark_t_to_cpu(hdr->mark);
 
 	STATIC_ASSERT(sizeof(hdr->fill) == 2);
 	hdr->fill = le16_to_cpu(hdr->fill);
@@ -124,6 +142,71 @@ static bool battfs_readHeader(struct BattFsSuper *disk, pgcnt_t page, struct Bat
 }
 
 /**
+ * Count the number of pages from
+ * inode 0 to \a inode in \a filelen_table.
+ */
+static pgcnt_t countPages(pgoff_t *filelen_table, inode_t inode)
+{
+	pgcnt_t cnt = 0;
+
+	for (inode_t i = 0; i < inode; i++)
+		cnt += filelen_table[i];
+
+	return cnt;
+}
+
+/**
+ * Move all pages in page allocation array from \a src to \a src + \a offset.
+ * The number of pages moved is page_count - MAX(dst, src).
+ */
+static void movePages(struct BattFsSuper *disk, pgcnt_t src, int offset)
+{
+	pgcnt_t dst = src + offset;
+	memmove(&disk->page_array[dst], &disk->page_array[src], disk->page_count - MAX(dst, src) * sizeof(pgcnt_t));
+	
+	if (offset < 0)
+	{
+		/* Fill empty space in array with sentinel */
+		for (pgcnt_t page = disk->page_count + offset; page < disk->page_count; page++)
+			disk->page_array[page] = PAGE_UNSET_SENTINEL;
+	}
+}
+
+/**
+ * Insert \a page into page allocation array of \a disk, using \a filelen_table and
+ * \a free_number to compure position.
+ */
+static void insertFreePage(struct BattFsSuper *disk, pgoff_t *filelen_table, mark_t free_number, pgcnt_t page)
+{
+	ASSERT(mark >= disk->min_free);
+	ASSERT(mark <= disk->max_free);
+
+	pgcnt_t free_pos = countPages(filelen_table, BATTFS_MAX_FILES - 1);
+	free_pos += free_number - disk->min_free;
+	ASSERT(disk->page_array[free_pos] == PAGE_UNSET_SENTINEL);
+	disk->page_array[free_pos] = page;
+}
+
+/**
+ * Mark \a page of \a disk as free.
+ * \note max_free of \a disk is increased by 1 and is used as
+ *       \a page free marker.
+ */
+static bool battfs_markFree(struct BattFsSuper *disk, pgcnt_t page)
+{
+	pgaddr_t addr = disk->page_size - sizeof(BattFsPageHeader) + offsetof(BattFsPageHeader, mark);
+	mark_t mark = cpu_to_mark_t(++disk->max_free);
+	if (!disk->write(disk, page, addr, &mark, sizeof(mark)))
+	{
+		TRACEMSG("error marking page [%d]\n", page);
+		return false;
+	}
+	else
+		return true;
+}
+
+
+/**
  * Initialize and mount disk described by
  * \a d.
  * \return false on errors, true otherwise.
@@ -142,12 +225,13 @@ bool battfs_init(struct BattFsSuper *disk)
 	ASSERT(disk->close);
 	ASSERT(disk->page_size);
 	ASSERT(disk->page_count);
+	ASSERT(disk->page_count < PAGE_UNSET_SENTINEL - 1);
 	ASSERT(disk->page_array);
 	
 	/* Init disk device */
 	if (!disk->open(disk))
 	{
-		TRACEMSG("Open error\n");
+		TRACEMSG("open error\n");
 		return false;
 	}
 
@@ -173,9 +257,9 @@ bool battfs_init(struct BattFsSuper *disk)
 		if (cks == hdr.fcs)
 		{
 			/* Page is valid and is owned by a file */
-			ASSERT(hdr.inode != BATTFS_FREE_INODE);
 			filelen_table[hdr.inode]++;
 
+			ASSERT(hdr.mark == MARK_PAGE_VALID);
 			ASSERT(hdr.fill <= disk->page_size - sizeof(BattFsPageHeader));
 			/* Keep trace of free space */
 			disk->free_bytes += disk->page_size - sizeof(BattFsPageHeader) - hdr.fill;
@@ -183,7 +267,6 @@ bool battfs_init(struct BattFsSuper *disk)
 		else
 		{
 			/* Increase free space */
-			filelen_table[BATTFS_FREE_INODE]++;
 			disk->free_bytes += disk->page_size - sizeof(BattFsPageHeader);
 			
 			/* Check if putting mark to MARK_PAGE_VALID makes fcs correct */
@@ -201,14 +284,114 @@ bool battfs_init(struct BattFsSuper *disk)
 				disk->max_free = MAX(disk->max_free, old_mark);
 			}
 			else
-				TRACEMSG("Page [%d] invalid, keeping as free\n", page);
+				TRACEMSG("page [%d] invalid, keeping as free\n", page);
 		}
 	}
 
 	/* Once here, we have filelen_table filled with file lengths */
-	#warning Complete me!
 
-	
+	/* Fill page array with sentinel */
+	for (pgcnt_t page = 0; page < disk->page_count; page++)
+		disk->page_array[page] = PAGE_UNSET_SENTINEL;
+
+	/* Fill page allocation array */
+	for (pgcnt_t page = 0; page < disk->page_count; page++)
+	{
+		if (!battfs_readHeader(disk, page, &hdr))
+			return false;
+
+		/* Check header FCS */
+		rotating_init(&cks);
+		rotating_update(&hdr, sizeof(BattFsPageHeader) - sizeof(rotating_t), &cks);
+		if (cks == hdr.fcs)
+		{
+			/* Page is valid and is owned by a file */
+			ASSERT(hdr.mark == MARK_PAGE_VALID);
+
+			/* Compute array position */
+			pgcnt_t array_pos = countPages(filelen_table, hdr.inode);
+			array_pos += hdr.pgoff;
+
+			/* Check if position is already used by another page of the same file */
+			if (disk->page_array[array_pos] == PAGE_UNSET_SENTINEL)
+				disk->page_array[array_pos] = page;
+			else
+			{
+				BattFsPageHeader hdr_old;
+				
+				if (!battfs_readHeader(disk, page, &hdr_old))
+					return false;
+
+				#ifdef _DEBUG
+				/* Check header FCS */
+				rotating_t cks_old;
+				rotating_init(&cks_old);
+				rotating_update(&hdr_old, sizeof(BattFsPageHeader) - sizeof(rotating_t), &cks_old);
+				ASSERT(cks_old == hdr_old.fcs);
+				#endif
+
+				/* Only the very same page with a different seq number can be here */
+				ASSERT(hdr.inode == hdr_old.inode);
+				ASSERT(hdr.pgoff == hdr_old.pgoff);
+				ASSERT(hdr.mark == hdr_old.mark);
+				ASSERT(hdr.seq != hdr_old.seq);
+
+				pgcnt_t new_page, old_page;
+				fill_t old_fill;
+
+				if (hdr.seq > hdr_old.seq)
+				{
+					/* Actual header is newer than the previuos one */
+					old_page = disk->page_array[array_pos];
+					new_page = page;
+					old_fill = hdr_old.fill;
+				}
+				else
+				{
+					/* Previous header is newer than the current one */
+					old_page = page;
+					new_page = disk->page_array[array_pos];
+					old_fill = hdr.fill;
+				}
+
+				/* Set new page */
+				disk->page_array[array_pos] = new_page;
+
+				/* Add free space */
+				disk->free_bytes -= disk->page_size - sizeof(BattFsPageHeader) - old_fill;
+
+				/* Shift all array one position to the left, overwriting duplicate page */
+				array_pos -= hdr.pgoff;
+				array_pos += filelen_table[hdr.inode];
+				movePages(disk, array_pos, -1);
+				
+				/* Decrease file page count */
+				filelen_table[hdr.inode]--;
+
+				/* Add old page to free pages pool */
+				if (!battfs_markFree(disk, old_page))
+					return false;
+
+				insertFreePage(disk, filelen_table, disk->max_free, old_page);
+			}
+		}
+		else
+		{
+			/* Check if putting mark to MARK_PAGE_VALID makes fcs correct */
+			mark_t old_mark = hdr.mark;
+			hdr.mark = MARK_PAGE_VALID;
+			rotating_init(&cks);
+			rotating_update(&hdr, sizeof(BattFsPageHeader) - sizeof(rotating_t), &cks);
+			if (cks == hdr.fcs)
+				/* Page is a valid marked page, insert in free list in correct order */
+				insertFreePage(disk, filelen_table, old_mark, page);
+			else
+				/* Page is not a valid marked page, insert at the end of list */
+				insertFreePage(disk, filelen_table, ++disk->max_free, page);
+		}
+	}
+
+	#warning Test me!	
 	return true;	
 }
 
