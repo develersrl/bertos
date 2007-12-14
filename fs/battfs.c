@@ -319,7 +319,7 @@ bool battfs_init(struct BattFsSuper *disk)
 			{
 				BattFsPageHeader hdr_old;
 				
-				if (!battfs_readHeader(disk, page, &hdr_old))
+				if (!battfs_readHeader(disk, disk->page_array[array_pos], &hdr_old))
 					return false;
 
 				#ifdef _DEBUG
@@ -359,7 +359,7 @@ bool battfs_init(struct BattFsSuper *disk)
 				disk->page_array[array_pos] = new_page;
 
 				/* Add free space */
-				disk->free_bytes -= disk->page_size - sizeof(BattFsPageHeader) - old_fill;
+				disk->free_bytes += old_fill;
 
 				/* Shift all array one position to the left, overwriting duplicate page */
 				array_pos -= hdr.pgoff;
