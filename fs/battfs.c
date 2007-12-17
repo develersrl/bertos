@@ -379,16 +379,15 @@ bool battfs_init(struct BattFsSuper *disk)
 		else
 		{
 			/* Check if putting mark to MARK_PAGE_VALID makes fcs correct */
-			mark_t old_mark = hdr.mark;
+			mark_t mark = hdr.mark;
 			hdr.mark = MARK_PAGE_VALID;
 			rotating_init(&cks);
 			rotating_update(&hdr, sizeof(BattFsPageHeader) - sizeof(rotating_t), &cks);
-			if (cks == hdr.fcs)
-				/* Page is a valid marked page, insert in free list in correct order */
-				insertFreePage(disk, filelen_table, old_mark, page);
-			else
+			if (cks != hdr.fcs)
 				/* Page is not a valid marked page, insert at the end of list */
-				insertFreePage(disk, filelen_table, ++disk->max_free, page);
+				mark = ++disk->max_free;
+
+			insertFreePage(disk, filelen_table, mark, page);
 		}
 	}
 
