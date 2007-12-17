@@ -174,7 +174,7 @@ static void movePages(struct BattFsSuper *disk, pgcnt_t src, int offset)
 
 /**
  * Insert \a page into page allocation array of \a disk, using \a filelen_table and
- * \a free_number to compure position.
+ * \a free_number to compute position.
  */
 static void insertFreePage(struct BattFsSuper *disk, pgoff_t *filelen_table, mark_t free_number, pgcnt_t page)
 {
@@ -269,7 +269,7 @@ bool battfs_init(struct BattFsSuper *disk)
 			/* Increase free space */
 			disk->free_bytes += disk->page_size - sizeof(BattFsPageHeader);
 			
-			/* Check if putting mark to MARK_PAGE_VALID makes fcs correct */
+			/* Check if setting mark to MARK_PAGE_VALID makes fcs correct */
 			mark_t old_mark = hdr.mark;
 			hdr.mark = MARK_PAGE_VALID;
 			rotating_init(&cks);
@@ -340,7 +340,7 @@ bool battfs_init(struct BattFsSuper *disk)
 				fill_t old_fill;
 
 				/* Fancy check to handle seq wraparound */
-				#define HALF_SEQ ((1 << (sizeof(seq_t) * CPU_BITS_PER_CHAR)) / 2)
+				#define HALF_SEQ (1 << ((sizeof(seq_t) * CPU_BITS_PER_CHAR) - 1))
 				if ((hdr.seq - hdr_old.seq) < HALF_SEQ)
 				{
 					/* Actual header is newer than the previuos one */
@@ -379,7 +379,7 @@ bool battfs_init(struct BattFsSuper *disk)
 		}
 		else
 		{
-			/* Check if putting mark to MARK_PAGE_VALID makes fcs correct */
+			/* Check if setting mark to MARK_PAGE_VALID makes fcs correct */
 			mark_t mark = hdr.mark;
 			hdr.mark = MARK_PAGE_VALID;
 			rotating_init(&cks);
