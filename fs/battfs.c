@@ -178,8 +178,8 @@ static void movePages(struct BattFsSuper *disk, pgcnt_t src, int offset)
  */
 static void insertFreePage(struct BattFsSuper *disk, pgoff_t *filelen_table, mark_t free_number, pgcnt_t page)
 {
-	ASSERT(mark >= disk->min_free);
-	ASSERT(mark <= disk->max_free);
+	ASSERT(free_number >= disk->min_free);
+	ASSERT(free_number <= disk->max_free);
 
 	pgcnt_t free_pos = countPages(filelen_table, BATTFS_MAX_FILES - 1);
 	free_pos += free_number - disk->min_free;
