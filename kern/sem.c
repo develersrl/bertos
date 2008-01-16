@@ -38,45 +38,6 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.12  2006/07/19 12:56:27  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.11  2006/02/24 01:17:05  bernie
- *#* Update for new emulator.
- *#*
- *#* Revision 1.10  2005/11/04 16:20:02  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.9  2005/04/11 19:10:28  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.8  2005/01/22 04:20:42  bernie
- *#* Add integrity checks.
- *#*
- *#* Revision 1.7  2004/11/28 23:20:25  bernie
- *#* Remove obsolete INITLIST macro.
- *#*
- *#* Revision 1.6  2004/10/21 10:57:21  bernie
- *#* Use proc_forbid()/proc_permit().
- *#*
- *#* Revision 1.5  2004/10/21 10:48:57  bernie
- *#* sem_release(): Simplify (made by rasky on scfirm).
- *#*
- *#* Revision 1.4  2004/08/25 14:12:09  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.3  2004/08/08 05:53:23  bernie
- *#* Use DISABLE_IRQSAVE/ENABLE_IRQRESTORE; Cleanup documentation.
- *#*
- *#* Revision 1.2  2004/06/03 11:27:09  bernie
- *#* Add dual-license information.
- *#*
- *#* Revision 1.1  2004/05/23 17:27:00  bernie
- *#* Import kern/ subdirectory.
- *#*/
-
 #include "sem.h"
 #include <kern/proc.h>
 #include <kern/proc_p.h>
@@ -85,6 +46,8 @@
 
 INLINE void sem_verify(struct Semaphore *s)
 {
+	(void)s;
+	ASSERT(s);
 	LIST_ASSERT_VALID(&s->wait_queue);
 	ASSERT(s->nest_count >= 0);
 	ASSERT(s->nest_count < 128);   // heuristic max
