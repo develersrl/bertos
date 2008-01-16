@@ -256,6 +256,30 @@
 			CPU_PUSH_WORD((sp), funcaddr>>8); \
 		} while (0)
 
+	/*
+	 * If the kernel is in idle-spinning, the processor execute:
+	 * 
+	 * IRQ_ENABLE;
+	 * CPU_IDLE;
+	 * IRQ_DISABLE;
+	 *
+	 * IRQ_ENABLE is translated in asm as "sei" and IRQ_DISABLE as "cli".
+	 * We could define CPU_IDLE to expand to none, so the resulting
+	 * asm code would be:
+	 *
+	 * sei;
+	 * cli;
+	 *
+	 * But Atmel datasheet states:
+	 * "When using the SEI instruction to enable interrupts,
+	 * the instruction following SEI will be executed *before*
+	 * any pending interrupts", so "cli" is executed before any
+	 * pending interrupt with the result that IRQs will *NOT*
+	 * be enabled!
+	 * To ensure that IRQ will run a NOP is required.
+	 */
+	#define CPU_IDLE NOP
+
 #else
 	#define CPU_PUSH_CALL_CONTEXT(sp, func) \
 		CPU_PUSH_WORD((sp), (cpustack_t)(func))
