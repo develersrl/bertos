@@ -31,8 +31,7 @@
  * -->
  *
  * \brief Virtual KFile I/O interface.
- * This module implement a standard fd.seek and a kfile
- * test function.
+ * This module implements some generic I/O interfaces for kfile.
  *
  * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
@@ -40,24 +39,144 @@
  *
  */
 
-#include <kern/kfile.h>
-#include <cfg/debug.h>
 
-#include <string.h>
-
+#include "kfile.h"
 #include <appconfig.h>
 
-/**
- * Move \a fd file seek position of \a offset bytes
- * from current position.
- * This is a generic implementation of seek function, you should redefine
- * it in your local module.
+#include <cfg/debug.h>
+#include <mware/formatwr.h>
+#include <string.h>
+
+/*
+ * Sanity check for config parameters required by this module.
  */
-kfile_off_t kfile_seek(struct _KFile *fd, kfile_off_t offset, KSeekMode whence)
+#if !defined(CONFIG_KFILE_GETS) || ((CONFIG_KFILE_GETS != 0) && CONFIG_KFILE_GETS != 1)
+	#error CONFIG_KFILE_GETS must be set to either 0 or 1 in appconfig.h
+#endif
+#if !defined(CONFIG_PRINTF)
+	#error CONFIG_PRINTF missing in appconfig.h
+#endif
+
+
+/**
+ * Generic putc implementation using \a fd->write.
+ */
+int kfile_putc(int _c, struct KFile *fd)
+{
+	unsigned char c = (unsigned char)_c;
+
+	if (kfile_write(fd, &c, sizeof(c)) == sizeof(c))
+		return (int)((unsigned char)_c);
+	else
+		return EOF;
+}
+
+/**
+ * Generic getc implementation using \a fd->read.
+ */
+int kfile_getc(struct KFile *fd)
+{
+	unsigned char c;
+
+	if (kfile_read(fd, &c, sizeof(c)) == sizeof(c))
+		return (int)((unsigned char)c);
+	else
+		return EOF;
+}
+
+#if CONFIG_PRINTF
+/**
+ * Formatted write.
+ */
+int kfile_printf(struct KFile *fd, const char *format, ...)
+{
+	va_list ap;
+	int len;
+
+	va_start(ap, format);
+	len = _formatted_write(format, (void (*)(char, void *))kfile_putc, fd, ap);
+	va_end(ap);
+
+	return len;
+}
+#endif /* CONFIG_PRINTF */
+
+/**
+ * Write a string to kfile \a fd.
+ * \return 0 if OK, EOF in case of error.
+ */
+int kfile_print(struct KFile *fd, const char *s)
+{
+	while (*s)
+	{
+		if (kfile_putc(*s++, fd) == EOF)
+			return EOF;
+	}
+	return 0;
+}
+
+#if CONFIG_KFILE_GETS
+/**
+ * Read a line long at most as size and put it
+ * in buf.
+ * \return number of chars read or EOF in case
+ *         of error.
+ */
+int kfile_gets(struct KFile *fd, char *buf, int size)
+{
+	return kfile_gets_echo(fd, buf, size, false);
+}
+
+
+/**
+ * Read a line long at most as size and put it
+ * in buf, with optional echo.
+ *
+ * \return number of chars read, or EOF in case
+ *         of error.
+ */
+int kfile_gets_echo(struct KFile *fd, char *buf, int size, bool echo)
+{
+	int i = 0;
+	int c;
+
+	for (;;)
+	{
+		if ((c = kfile_getc(fd)) == EOF)
+		{
+			buf[i] = '\0';
+			return -1;
+		}
+
+		/* FIXME */
+		if (c == '\r' || c == '\n' || i >= size-1)
+		{
+			buf[i] = '\0';
+			if (echo)
+				kfile_print(fd, "\r\n");
+			break;
+		}
+		buf[i++] = c;
+		if (echo)
+			kfile_putc(c, fd);
+	}
+
+	return i;
+}
+#endif /* !CONFIG_KFILE_GETS */
+
+
+/**
+ * Move \a fd file seek position of \a offset bytes from \a whence.
+ *
+ * This is a generic implementation of seek function, you can redefine
+ * it in your local module is needed.
+ */
+kfile_off_t kfile_genericSeek(struct KFile *fd, kfile_off_t offset, KSeekMode whence)
 {
 	uint32_t seek_pos;
 
-	switch(whence)
+	switch (whence)
 	{
 
 	case KSM_SEEK_SET:
@@ -71,20 +190,18 @@ kfile_off_t kfile_seek(struct _KFile *fd, kfile_off_t offset, KSeekMode whence)
 		break;
 	default:
 		ASSERT(0);
-		return -1;
+		return EOF;
 		break;
-
 	}
 
 	/* Bound check */
 	if (seek_pos + offset > fd->size)
 	{
 		ASSERT(0);
-		return -1;
+		return EOF;
 	}
 
 	fd->seek_pos = seek_pos + offset;
-	kprintf("Flash seek to [%lu]\n", fd->seek_pos);
 
 	return fd->seek_pos;
 }
@@ -92,8 +209,8 @@ kfile_off_t kfile_seek(struct _KFile *fd, kfile_off_t offset, KSeekMode whence)
 #if CONFIG_TEST
 
 /**
- * Program memory read/write subtest.
- * Try to write/read in the same \a f file location \a _size bytes.
+ * KFile read/write subtest.
+ * Try to write/read in the same \a f file location \a size bytes.
  * \return true if all is ok, false otherwise
  * \note Restore file position at exit (if no error)
  * \note Test buffer \a buf must be filled with
@@ -102,24 +219,31 @@ kfile_off_t kfile_seek(struct _KFile *fd, kfile_off_t offset, KSeekMode whence)
  * buf[i] = i & 0xff
  * </pre>
  */
-static bool kfile_rwTest(KFile *f, uint8_t *buf, size_t _size)
+static bool kfile_rwTest(KFile *f, uint8_t *buf, size_t size)
 {
-	int32_t size = _size;
-
-	// Write test buffer
-	if (f->write(f, buf, size) != size)
+	/*
+	 * Write test buffer
+	 */
+	if (kfile_write(f, buf, size) != size)
 		return false;
-	f->seek(f, -size, KSM_SEEK_CUR);
 
-	// Reset test buffer
+	kfile_seek(f, -(kfile_off_t)size, KSM_SEEK_CUR);
+
+	/*
+	 * Reset test buffer
+	 */
 	memset(buf, 0, size);
 
-	// Read flash in test buffer
-	if (f->read(f, buf, size) != size)
+	/*
+	 * Read file in test buffer
+	 */
+	if (kfile_read(f, buf, size) != size)
 		return false;
-	f->seek(f, -size, KSM_SEEK_CUR);
+	kfile_seek(f, -(kfile_off_t)size, KSM_SEEK_CUR);
 
-	// Check test result
+	/*
+	 * Check test result
+	 */
  	for (size_t i = 0; i < size; i++)
  		if (buf[i] != (i & 0xff))
 			return false;
@@ -128,24 +252,19 @@ static bool kfile_rwTest(KFile *f, uint8_t *buf, size_t _size)
 }
 
 /**
- * Test for program memory read/write.
- * This function write and read \p test_buf long \p _size
- * on \p fd handler. If you want not overwrite exist data
- * you should pass an \p save_buf where test store exist data,
- * otherwise su must pass NULL.
+ * KFile read/write test.
+ * This function write and read \a test_buf long \a size
+ * on \a fd handler.
+ * \a save_buf can be NULL or a buffer where to save previous file content.
  */
-bool kfile_test(KFile *fd, uint8_t *test_buf, size_t _size , uint8_t *save_buf, size_t save_buf_size)
+bool kfile_test(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size)
 {
-	int32_t size = _size;
-
 	/*
 	 * Part of test buf size that you would write.
-	 * This var is useded in test 3 to check fd.write
-	 * when write outside size limit. Normaly we want
-	 * perform a write until is space to write, otherwise
-	 * we return.
+	 * This var is used in test 3 to check kfile_write
+	 * when writing beyond filesize limit.
 	 */
-	int32_t len = size/2;
+	kfile_off_t len = size / 2;
 
 
 	/* Fill test buffer */
@@ -153,32 +272,26 @@ bool kfile_test(KFile *fd, uint8_t *test_buf, size_t _size , uint8_t *save_buf, 
  		test_buf[i] = (i & 0xff);
 
 	/*
-	 * Open fd handler
-	 */
-	fd->open(fd, NULL, 0);
-	kprintf("Opened fd handler..\n");
-
-	/*
-	 * If necessary, user could save content,
+	 * If necessary, user can save content,
 	 * for later restore.
 	 */
-	if (save_buf != NULL)
+	if (save_buf)
 	{
-		fd->read(fd, save_buf, save_buf_size);
-		kprintf("Saved content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + save_buf_size);
+		kfile_read(fd, save_buf, size);
+		kprintf("Saved content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + size);
 	}
 
 	/* TEST 1 BEGIN. */
 	kprintf("Test 1: write from pos 0 to [%lu]\n", size);
 
 	/*
-	 * Seek to addr 0
+	 * Seek to addr 0.
 	 */
-	if (fd->seek(fd, 0, KSM_SEEK_SET) != 0)
+	if (kfile_seek(fd, 0, KSM_SEEK_SET) != 0)
 		goto kfile_test_end;
 
 	/*
-	 * Test flash read/write to address 0..size
+	 * Test read/write to address 0..size
 	 */
 	if (!kfile_rwTest(fd, test_buf, size))
 		goto kfile_test_end;
@@ -186,40 +299,40 @@ bool kfile_test(KFile *fd, uint8_t *test_buf, size_t _size , uint8_t *save_buf, 
 	kprintf("Test 1: ok!\n");
 
 	/*
-	 * Restore previous read content
+	 * Restore previous read content.
 	 */
-	if (save_buf != NULL)
+	if (save_buf)
 	{
-		fd->seek(fd, 0, KSM_SEEK_SET);
+		kfile_seek(fd, 0, KSM_SEEK_SET);
 
-		if (fd->write(fd, save_buf, save_buf_size) != size)
+		if (kfile_write(fd, save_buf, size) != size)
 			goto kfile_test_end;
 
-		kprintf("Restore content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + save_buf_size);
+		kprintf("Restore content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + size);
 	}
 	/* TEST 1 END. */
 
 	/* TEST 2 BEGIN. */
-	kprintf("Test 2: write from pos [%lu] to [%lu]\n", fd->size/2 , size);
+	kprintf("Test 2: write from pos [%lu] to [%lu]\n", fd->size/2 , fd->size/2 + size);
 
 	/*
 	 * Go to half test size.
 	 */
-	fd->seek(fd, (fd->size/ 2), KSM_SEEK_SET);
+	kfile_seek(fd, (fd->size / 2), KSM_SEEK_SET);
 
 	/*
-	 * If necessary, user could save content,
+	 * If necessary, user can save content
 	 * for later restore.
 	 */
-	if (save_buf != NULL)
+	if (save_buf)
 	{
-		fd->read(fd, save_buf, save_buf_size);
-		fd->seek(fd, -size, KSM_SEEK_CUR);
-		kprintf("Saved content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + save_buf_size);
+		kfile_read(fd, save_buf, size);
+		kfile_seek(fd, -(kfile_off_t)size, KSM_SEEK_CUR);
+		kprintf("Saved content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + size);
 	}
 
 	/*
-	 * Test flash read/write to address FLASHEND/2 ... FLASHEND/2 + size
+	 * Test read/write to address filesize/2 ... filesize/2 + size
 	 */
 	if (!kfile_rwTest(fd, test_buf, size))
 		goto kfile_test_end;
@@ -227,57 +340,56 @@ bool kfile_test(KFile *fd, uint8_t *test_buf, size_t _size , uint8_t *save_buf, 
 	kprintf("Test 2: ok!\n");
 
 	/*
-	 * Restore previous read content
+	 * Restore previous content.
 	 */
-	if (save_buf != NULL)
+	if (save_buf)
 	{
-		fd->seek(fd, -size, KSM_SEEK_CUR);
+		kfile_seek(fd, -(kfile_off_t)size, KSM_SEEK_CUR);
 
-		if (fd->write(fd, save_buf, save_buf_size) != size)
+		if (kfile_write(fd, save_buf, size) != size)
 			goto kfile_test_end;
 
-		kprintf("Restore content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + save_buf_size);
+		kprintf("Restore content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + size);
 	}
 
 	/* TEST 2 END. */
 
 	/* TEST 3 BEGIN. */
 	kprintf("Test 3: write outside of fd->size limit [%lu]\n", fd->size);
+	kprintf("This test should FAIL!, you must see an assertion fail message.\n");
 
 	/*
 	 * Go to the Flash end
 	 */
-	fd->seek(fd, -len, KSM_SEEK_END);
+	kfile_seek(fd, -len, KSM_SEEK_END);
 
 	/*
-	 * If necessary, user could save content,
+	 * If necessary, user can save content,
 	 * for later restore.
 	 */
-	if (save_buf != NULL)
+	if (save_buf)
 	{
-		ASSERT(len > save_buf_size);
-
-		fd->read(fd, save_buf, len);
-		fd->seek(fd, -len, KSM_SEEK_CUR);
+		kfile_read(fd, save_buf, len);
+		kfile_seek(fd, -len, KSM_SEEK_CUR);
 		kprintf("Saved content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + len);
 	}
 
 	/*
-	 * Test flash read/write to address (FLASHEND - size) ... FLASHEND
+	 * Test read/write to address (filesize - size) ... filesize
 	 */
 	if (kfile_rwTest(fd, test_buf, size))
 		goto kfile_test_end;
 
-	kprintf("Test 3: ok !\n");
+	kprintf("Test 3: ok!\n");
 
 	/*
 	 * Restore previous read content
 	 */
-	if (save_buf != NULL)
+	if (save_buf)
 	{
-		fd->seek(fd, -len, KSM_SEEK_END);
+		kfile_seek(fd, -len, KSM_SEEK_END);
 
-		if (fd->write(fd, save_buf, len) != len)
+		if (kfile_write(fd, save_buf, len) != len)
 			goto kfile_test_end;
 
 		kprintf("Restore content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + len);
@@ -285,11 +397,11 @@ bool kfile_test(KFile *fd, uint8_t *test_buf, size_t _size , uint8_t *save_buf, 
 
 	/* TEST 3 END. */
 
-	fd->close(fd);
+	kfile_close(fd);
 	return true;
 
 kfile_test_end:
-	fd->close(fd);
+	kfile_close(fd);
 	return false;
 }
 
