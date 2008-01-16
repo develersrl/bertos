@@ -138,7 +138,7 @@ void monitor_report(void)
 		 p = MONITOR_NODE_TO_PROCESS(p->monitor.link.succ))
 	{
 		size_t free = monitor_checkStack(p->monitor.stack_base, p->monitor.stack_size);
-		kprintf("%-24s%8p%8p%8zx%8zx\n",
+		kprintf("%-24s%-8p%-8p%-8u%-8u\n",
 			p->monitor.name, p, p->monitor.stack_base, p->monitor.stack_size, free);
 	}
 }
@@ -157,7 +157,7 @@ static void NORETURN monitor(void)
 			size_t free = monitor_checkStack(p->monitor.stack_base, p->monitor.stack_size);
 
 			if (free < 0x20)
-				kprintf("MONITOR: WARNING: Free stack for process '%s' is only %x chars\n",
+				kprintf("MONITOR: WARNING: Free stack for process '%s' is only %u chars\n",
 						p->monitor.name, (unsigned int)free);
 
 			timer_delay(500);
