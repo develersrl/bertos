@@ -40,7 +40,7 @@
 #ifndef DRV_SER_H
 #define DRV_SER_H
 
-
+#include <kern/kfile.h>
 #include <mware/fifobuf.h>
 #include <cfg/compiler.h>
 
@@ -126,31 +126,32 @@ typedef struct Serial
 	struct SerialHardware* hw;
 } Serial;
 
+typedef struct KFileSerial
+{
+	KFile fd;
+	Serial *ser;
+} KFileSerial;
+
+INLINE KFileSerial * KFILESERIAL(KFile *fd)
+{
+	ASSERT(fd->_type == KFT_SERIAL);
+	return (KFileSerial *)fd;
+}
 
 /* Function prototypes */
-extern int ser_putchar(int c, struct Serial *port);
-extern int ser_getchar(struct Serial *port);
-extern int ser_getchar_nowait(struct Serial *port);
+//extern int ser_getchar_nowait(struct Serial *port);
 
-extern int ser_write(struct Serial *port, const void *buf, size_t len);
-extern int ser_read(struct Serial *port, void *buf, size_t size);
+void ser_setbaudrate(struct KFileSerial *fd, unsigned long rate);
+void ser_setparity(struct KFileSerial *fd, int parity);
+void ser_settimeouts(struct KFileSerial *fd, mtime_t rxtimeout, mtime_t txtimeout);
+void ser_resync(struct KFileSerial *fd, mtime_t delay);
 
-extern int ser_print(struct Serial *port, const char *s);
-extern int ser_printf(struct Serial *port, const char *format, ...) FORMAT(__printf__, 2, 3);
+void ser_purgeRx(struct KFileSerial *fd);
+void ser_purgeTx(struct KFileSerial *fd);
+void ser_purge(struct KFileSerial *fd);
+void ser_init(struct KFileSerial *fds, unsigned int unit);
+void spimaster_init(KFileSerial *fds, unsigned int unit);
 
-extern int ser_gets(struct Serial *port, char *buf, int size);
-extern int ser_gets_echo(struct Serial *port, char *buf, int size, bool echo);
-extern void ser_clearstatus(struct Serial *port);
-
-extern void ser_setbaudrate(struct Serial *port, unsigned long rate);
-extern void ser_setparity(struct Serial *port, int parity);
-extern void ser_settimeouts(struct Serial *port, mtime_t rxtimeout, mtime_t txtimeout);
-extern void ser_resync(struct Serial *port, mtime_t delay);
-extern void ser_purge(struct Serial *port);
-extern void ser_drain(struct Serial *port);
-
-extern struct Serial *ser_open(unsigned int unit);
-extern void ser_close(struct Serial *port);
 
 /**
  * \name Additional functions implemented as macros

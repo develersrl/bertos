@@ -58,6 +58,8 @@
 #include <cfg/debug.h>
 #include <appconfig.h>
 
+#include <string.h> /* memset */
+
 /*
  * Sanity check for config parameters required by this module.
  */
@@ -70,14 +72,8 @@
 #if !defined(CONFIG_SER_RXTIMEOUT)
 	#error CONFIG_SER_RXTIMEOUT missing in config.h
 #endif
-#if !defined(CONFIG_SER_GETS) || ((CONFIG_SER_GETS != 0) && CONFIG_SER_GETS != 1)
-	#error CONFIG_SER_GETS must be set to either 0 or 1 in config.h
-#endif
 #if !defined(CONFIG_SER_DEFBAUDRATE)
 	#error CONFIG_SER_DEFBAUDRATE missing in config.h
-#endif
-#if !defined(CONFIG_PRINTF)
-	#error CONFIG_PRINTF missing in config.h
 #endif
 
 #if CONFIG_KERNEL
@@ -106,7 +102,7 @@ struct Serial ser_handles[SER_CNT];
  * \return EOF in caso di errore o timeout, altrimenti
  *         il carattere inviato.
  */
-int ser_putchar(int c, struct Serial *port)
+static int ser_putchar(int c, struct Serial *port)
 {
 	//ASSERT_VALID_FIFO(&port->txfifo);
 	if (fifo_isfull_locked(&port->txfifo))
@@ -153,7 +149,7 @@ int ser_putchar(int c, struct Serial *port)
  * \return EOF in caso di errore o timeout, altrimenti
  *         il carattere ricevuto.
  */
-int ser_getchar(struct Serial *port)
+static int ser_getchar(struct Serial *port)
 {
 	if (fifo_isempty_locked(&port->rxfifo))
 	{
@@ -188,7 +184,7 @@ int ser_getchar(struct Serial *port)
 	return (int)(unsigned char)fifo_pop_locked(&port->rxfifo);
 }
 
-
+#if 0
 /**
  * Preleva un carattere dal buffer di ricezione.
  * Se il buffer e' vuoto, ser_getchar_nowait() ritorna
@@ -202,96 +198,31 @@ int ser_getchar_nowait(struct Serial *port)
 	/* NOTE: the double cast prevents unwanted sign extension */
 	return (int)(unsigned char)fifo_pop_locked(&port->rxfifo);
 }
-
-
-#if CONFIG_SER_GETS
-/**
- * Read a line long at most as size and put it
- * in buf.
- * \return number of chars read or EOF in case
- *         of error.
- */
-int ser_gets(struct Serial *port, char *buf, int size)
-{
-	return ser_gets_echo(port, buf, size, false);
-}
-
-
-/**
- * Read a line long at most as size and put it
- * in buf, with optional echo.
- *
- * \return number of chars read, or EOF in case
- *         of error.
- */
-int ser_gets_echo(struct Serial *port, char *buf, int size, bool echo)
-{
-	int i = 0;
-	int c;
-
-	for (;;)
-	{
-		if ((c = ser_getchar(port)) == EOF)
-		{
-			buf[i] = '\0';
-			return -1;
-		}
-
-		/* FIXME */
-		if (c == '\r' || c == '\n' || i >= size-1)
-		{
-			buf[i] = '\0';
-			if (echo)
-				ser_print(port, "\r\n");
-			break;
-		}
-		buf[i++] = c;
-		if (echo)
-			ser_putchar(c, port);
-	}
-
-	return i;
-}
-#endif /* !CONFIG_SER_GETS */
+#endif
 
 
 /**
  * Read at most \a size bytes from \a port and put them in \a buf
  *
- * \return number of bytes actually read, or EOF in
- *         case of error.
+ * \return number of bytes actually read.
  */
-int ser_read(struct Serial *port, void *buf, size_t size)
+static size_t ser_read(struct KFile *fd, void *_buf, size_t size)
 {
-	size_t i = 0;
-	char *_buf = (char *)buf;
-	int c;
+	KFileSerial *fds = KFILESERIAL(fd);
 
+	size_t i = 0;
+	char *buf = (char *)_buf;
+	int c;
+	
 	while (i < size)
 	{
-		if ((c = ser_getchar(port)) == EOF)
-			return EOF;
-		_buf[i++] = c;
+		if ((c = ser_getchar(fds->ser)) == EOF)
+			break;
+		buf[i++] = c;
 	}
 
 	return i;
 }
-
-
-/**
- * Write a string to serial.
- * \return 0 if OK, EOF in case of error.
- */
-int ser_print(struct Serial *port, const char *s)
-{
-	while (*s)
-	{
-		if (ser_putchar(*s++, port) == EOF)
-			return EOF;
-	}
-	return 0;
-}
-
 
 /**
  * \brief Write a buffer to serial.
@@ -300,42 +231,27 @@ int ser_print(struct Serial *port, const char *s)
  *
  * \todo Optimize with fifo_pushblock()
  */
-int ser_write(struct Serial *port, const void *_buf, size_t len)
+static size_t ser_write(struct KFile *fd, const void *_buf, size_t size)
 {
+	KFileSerial *fds = KFILESERIAL(fd);
 	const char *buf = (const char *)_buf;
+	size_t i = 0;
 
-	while (len--)
+	while (size--)
 	{
-		if (ser_putchar(*buf++, port) == EOF)
-			return EOF;
+		if (ser_putchar(*buf++, fds->ser) == EOF)
+			break;
+		i++;
 	}
-	return 0;
+	return i;
 }
-
-
-#if CONFIG_PRINTF
-/**
- * Formatted write
- */
-int ser_printf(struct Serial *port, const char *format, ...)
-{
-	va_list ap;
-	int len;
-
-	va_start(ap, format);
-	len = _formatted_write(format, (void (*)(char, void *))ser_putchar, port, ap);
-	va_end(ap);
-
-	return len;
-}
-#endif /* CONFIG_PRINTF */
 
 
 #if CONFIG_SER_RXTIMEOUT != -1 || CONFIG_SER_TXTIMEOUT != -1
-void ser_settimeouts(struct Serial *port, mtime_t rxtimeout, mtime_t txtimeout)
+void ser_settimeouts(struct KFileSerial *fd, mtime_t rxtimeout, mtime_t txtimeout)
 {
-	port->rxtimeout = ms_to_ticks(rxtimeout);
-	port->txtimeout = ms_to_ticks(txtimeout);
+	fd->ser->rxtimeout = ms_to_ticks(rxtimeout);
+	fd->ser->txtimeout = ms_to_ticks(txtimeout);
 }
 #endif /* CONFIG_SER_RXTIMEOUT || CONFIG_SER_TXTIMEOUT */
 
@@ -348,48 +264,73 @@ void ser_settimeouts(struct Serial *port, mtime_t rxtimeout, mtime_t txtimeout)
  *
  * \note Serial errors are reset before and after executing the purge.
  */
-void ser_resync(struct Serial *port, mtime_t delay)
+void ser_resync(struct KFileSerial *fd, mtime_t delay)
 {
-	mtime_t old_rxtimeout = ticks_to_ms(port->rxtimeout);
+	mtime_t old_rxtimeout = ticks_to_ms(fd->ser->rxtimeout);
 
-	ser_settimeouts(port, delay, ticks_to_ms(port->txtimeout));
+	ser_settimeouts(fd, delay, ticks_to_ms(fd->ser->txtimeout));
 	do
 	{
-		ser_setstatus(port, 0);
-		ser_getchar(port);
+		ser_setstatus(fd->ser, 0);
+		ser_getchar(fd->ser);
 	}
-	while (!(ser_getstatus(port) & SERRF_RXTIMEOUT));
+	while (!(ser_getstatus(fd->ser) & SERRF_RXTIMEOUT));
 
 	/* Restore port to an usable status */
-	ser_setstatus(port, 0);
-	ser_settimeouts(port, old_rxtimeout, ticks_to_ms(port->txtimeout));
+	ser_setstatus(fd->ser, 0);
+	ser_settimeouts(fd, old_rxtimeout, ticks_to_ms(fd->ser->txtimeout));
 }
 #endif /* CONFIG_SER_RXTIMEOUT */
 
 
-void ser_setbaudrate(struct Serial *port, unsigned long rate)
+void ser_setbaudrate(struct KFileSerial *fd, unsigned long rate)
 {
-	port->hw->table->setBaudrate(port->hw, rate);
+	fd->ser->hw->table->setBaudrate(fd->ser->hw, rate);
 }
 
 
-void ser_setparity(struct Serial *port, int parity)
+void ser_setparity(struct KFileSerial *fd, int parity)
 {
-	port->hw->table->setParity(port->hw, parity);
+	fd->ser->hw->table->setParity(fd->ser->hw, parity);
 }
 
-void ser_clearstatus(struct Serial *port)
+static int ser_error(struct KFile *fd)
 {
-       ser_setstatus(port, 0);
+	KFileSerial *fds = KFILESERIAL(fd);
+	return ser_getstatus(fds->ser);
 }
+
+static void ser_clearerr(struct KFile *fd)
+{
+	KFileSerial *fds = KFILESERIAL(fd);
+	ser_setstatus(fds->ser, 0);
+}
+
+
 
 /**
  * Flush both the RX and TX buffers.
  */
-void ser_purge(struct Serial *port)
+void ser_purge(struct KFileSerial *fd)
 {
-	fifo_flush_locked(&port->rxfifo);
-	fifo_flush_locked(&port->txfifo);
+	ser_purgeRx(fd);
+	ser_purgeTx(fd);
+}
+
+/**
+ * Flush RX buffer.
+ */
+void ser_purgeRx(struct KFileSerial *fd)
+{
+	fifo_flush_locked(&fd->ser->rxfifo);
+}
+
+/**
+ * Flush TX buffer.
+ */
+void ser_purgeTx(struct KFileSerial *fd)
+{
+	fifo_flush_locked(&fd->ser->txfifo);
 }
 
 
@@ -401,14 +342,16 @@ void ser_purge(struct Serial *port)
  *       software transmission queue. Any hardware
  *       FIFOs are ignored.
  */
-void ser_drain(struct Serial *ser)
+static int ser_flush(struct KFile *fd)
 {
+	KFileSerial *fds = KFILESERIAL(fd);
+	
 	/*
 	 * Wait until the FIFO becomes empty, and then until the byte currently in
 	 * the hardware register gets shifted out.
 	 */
-	while (!fifo_isempty(&ser->txfifo)
-	       || ser->hw->table->txSending(ser->hw))
+	while (!fifo_isempty(&fds->ser->txfifo)
+	       || fds->ser->hw->table->txSending(fds->ser->hw))
 	{
 		#if CONFIG_KERNEL && CONFIG_KERN_SCHED
 			/* Give up timeslice to other processes. */
@@ -416,6 +359,7 @@ void ser_drain(struct Serial *ser)
 		#endif
 			wdt_reset();
 	}
+	return 0;
 }
 
 
@@ -424,7 +368,7 @@ void ser_drain(struct Serial *ser)
  *
  * \param unit  Serial unit to open. Possible values are architecture dependant.
  */
-struct Serial *ser_open(unsigned int unit)
+static struct Serial *ser_open(struct KFileSerial *fd, unsigned int unit)
 {
 	struct Serial *port;
 
@@ -432,7 +376,7 @@ struct Serial *ser_open(unsigned int unit)
 	port = &ser_handles[unit];
 
 	ASSERT(!port->is_open);
-	DB(port->is_open = true;)
+	DB(port->is_open = true);
 
 	port->unit = unit;
 
@@ -446,12 +390,13 @@ struct Serial *ser_open(unsigned int unit)
 
 	port->hw->table->init(port->hw, port);
 
+	fd->ser = port;
 	/* Set default values */
 #if CONFIG_SER_RXTIMEOUT != -1 || CONFIG_SER_TXTIMEOUT != -1
-	ser_settimeouts(port, CONFIG_SER_RXTIMEOUT, CONFIG_SER_TXTIMEOUT);
+	ser_settimeouts(fd, CONFIG_SER_RXTIMEOUT, CONFIG_SER_TXTIMEOUT);
 #endif
 #if CONFIG_SER_DEFBAUDRATE
-	ser_setbaudrate(port, CONFIG_SER_DEFBAUDRATE);
+	ser_setbaudrate(fd, CONFIG_SER_DEFBAUDRATE);
 #endif
 
 	/* Clear error flags */
@@ -464,20 +409,106 @@ struct Serial *ser_open(unsigned int unit)
 /**
  * Clean up serial port, disabling the associated hardware.
  */
-void ser_close(struct Serial *port)
+static int ser_close(struct KFile *fd)
 {
+	KFileSerial *fds = KFILESERIAL(fd);
+	Serial *port = fds->ser;
+
 	ASSERT(port->is_open);
-	DB(port->is_open = false;)
+	DB(port->is_open = false);
 
 	// Wait until we finish sending everything
-	ser_drain(port);
+	ser_flush(fd);
 
 	port->hw->table->cleanup(port->hw);
-	DB(port->hw = NULL;)
+	DB(port->hw = NULL);
 
 	/*
 	 * We purge the FIFO buffer only after the low-level cleanup, so that
 	 * we are sure that there are no more interrupts.
 	 */
-	ser_purge(port);
+	ser_purge(fds);
+	return 0;
 }
+
+/**
+ * Reopen serial port.
+ */
+static struct KFile *ser_reopen(struct KFile *fd)
+{
+	KFileSerial *fds = KFILESERIAL(fd);
+
+	ser_close(fd);
+	ser_open(fds, fds->ser->unit);
+	return (KFile *)fds;
+}
+
+/**
+ * Init serial driver for \a unit.
+ */
+void ser_init(struct KFileSerial *fds, unsigned int unit)
+{
+	memset(fds, 0, sizeof(*fds));
+
+	DB(fds->fd._type = KFT_SERIAL);
+	fds->fd.reopen = ser_reopen;
+	fds->fd.close = ser_close;
+	fds->fd.read = ser_read;
+	fds->fd.write = ser_write;
+	fds->fd.flush = ser_flush;
+	fds->fd.error = ser_error;
+	fds->fd.clearerr = ser_clearerr;
+	ser_open(fds, unit);
+}
+
+
+/**
+ * Read data from SPI bus.
+ * Since we are master, we have to trigger slave by sending
+ * fake chars on the bus.
+ */
+static size_t spimaster_read(struct KFile *fd, void *buf, size_t size)
+{
+	KFileSerial *fd_spi = KFILESERIAL(fd);
+
+	ser_flush(&fd_spi->fd);
+	ser_purgeRx(fd_spi);
+
+	for (size_t i = 0; i < size; i++)
+		ser_putchar(0, fd_spi->ser);
+
+	return ser_read(&fd_spi->fd, buf, size);
+}
+
+/**
+ * Write data to SPI bus.
+ */
+static size_t spimaster_write(struct KFile *fd, const void *buf, size_t size)
+{
+	KFileSerial *fd_spi = KFILESERIAL(fd);
+	
+	ser_purgeRx(fd_spi);
+
+	return ser_write(&fd_spi->fd, buf, size);
+}
+
+
+/**
+ * Init SPI serial driver \a unit in master mode.
+ *
+ * This interface implements the SPI master protocol over a serial SPI
+ * driver. This is needed because normal serial driver send/receive data
+ * at the same time. SPI slaves like memories and other peripherals
+ * first receive and *then* send response back instead.
+ * To achieve this, when we are master and we are *sending*,
+ * we have to discard all incoming data. Then, when we want to
+ * receive, we must write fake data to SPI to trigger slave devices.
+ */
+void spimaster_init(KFileSerial *fds, unsigned int unit)
+{
+	ser_init(fds, unit);
+	fds->fd.read = spimaster_read;
+	fds->fd.write = spimaster_write;
+}
+
+
