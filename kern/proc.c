@@ -49,6 +49,7 @@
 #include <cpu/types.h>
 #include <cpu/attr.h>
 #include <cfg/debug.h>
+#include <cfg/module.h>
 #include <cfg/arch_config.h>  /* ARCH_EMUL */
 #include <cfg/macros.h>  /* ABS() */
 
@@ -109,6 +110,7 @@ static void proc_init_struct(Process *proc)
 #endif
 }
 
+MOD_DEFINE(proc);
 
 void proc_init(void)
 {
@@ -127,6 +129,7 @@ void proc_init(void)
 
 	/* Make sure the assembly routine is up-to-date with us */
 	ASSERT(asm_switch_version() == 1);
+	MOD_INIT(proc);
 }
 
 
@@ -240,12 +243,8 @@ void proc_rename(struct Process *proc, const char *name)
  */
 void proc_schedule(void)
 {
-	/* This function must not have any "auto" variables, otherwise
-	 * the compiler might put them on the stack of the process
-	 * being switched out.
-	 */
-	static struct Process *old_process;
-	static cpuflags_t flags;
+	struct Process *old_process;
+	cpuflags_t flags;
 
 	/* Remember old process to save its context later */
 	old_process = CurrentProcess;
@@ -281,7 +280,7 @@ void proc_schedule(void)
 	 */
 	if (CurrentProcess != old_process)
 	{
-		static cpustack_t *dummy;
+		cpustack_t *dummy;
 
 #if CONFIG_KERN_PREEMPTIVE
 		/* Reset quantum for this process */
@@ -348,8 +347,7 @@ void proc_exit(void)
  */
 void proc_switch(void)
 {
-	/* Just like proc_schedule, this function must not have auto variables. */
-	static cpuflags_t flags;
+	cpuflags_t flags;
 
 	IRQ_SAVE_DISABLE(flags);
 	SCHED_ENQUEUE(CurrentProcess);
