@@ -38,28 +38,11 @@
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.4  2006/09/20 17:32:46  marco
- *#* Use MOD_* macros instead of DB.
- *#*
- *#* Revision 1.3  2006/09/13 18:30:07  bernie
- *#* Add a FIXME.
- *#*
- *#* Revision 1.2  2006/07/19 12:56:25  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.1  2005/06/27 21:28:31  bernie
- *#* Import ADC driver.
- *#*
- *#*/
-
 
 #include <drv/adc.h>
 #include <drv/timer.h>
 
-// FIXME: move CPU specific part to adc_CPU.c
-#include <hw_adc.h>
+#include CPU_CSOURCE(adc)
 
 #include <cfg/debug.h>     // ASSERT()
 #include <cfg/macros.h>    // MIN()
@@ -69,28 +52,24 @@
 /**
  * Read the ADC channel \a ch.
  */
-adcread_t adc_read(uint16_t ch)
+adcread_t adc_read(adc_ch_t ch)
 {
-	ASSERT(ch <= (uint16_t)ADC_MUX_MAXCH);
-	ch = MIN(ch, (uint16_t)ADC_MUX_MAXCH);
+	ASSERT(ch <= (adc_ch_t)ADC_MUX_MAXCH);
+	ch = MIN(ch, (adc_ch_t)ADC_MUX_MAXCH);
 
 	adc_hw_select_ch(ch);
 
 	return(adc_hw_read());
 }
 
-MOD_DEFINE(adc)
+MOD_DEFINE(adc);
 
 /**
  * Initialize the ADC hardware.
  */
 void adc_init(void)
 {
-	cpuflags_t flags;
-	IRQ_SAVE_DISABLE(flags);
-
-	ADC_HW_INIT;
-	IRQ_RESTORE(flags);
+	adc_hw_init();
 
 	MOD_INIT(adc);
 }
