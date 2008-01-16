@@ -139,15 +139,17 @@
 
 #include "signal.h"
 
+#include <cfg/debug.h>
+#include <drv/timer.h>
 #include <kern/proc.h>
 #include <kern/proc_p.h>
-#include <cfg/debug.h>
+ 
 
 #if CONFIG_KERN_SIGNALS
 
 /**
  * Check if any of the signals in \a sigs has occurred and clear them.
- * Return the signals that have occurred.
+ * \return the signals that have occurred.
  */
 sigmask_t sig_check(sigmask_t sigs)
 {
@@ -165,7 +167,7 @@ sigmask_t sig_check(sigmask_t sigs)
 
 /**
  * Sleep until any of the signals in \a sigs occurs.
- * Return the signal(s) that have awaked the process.
+ * \return the signal(s) that have awaked the process.
  */
 sigmask_t sig_wait(sigmask_t sigs)
 {
@@ -191,6 +193,24 @@ sigmask_t sig_wait(sigmask_t sigs)
 
 	IRQ_RESTORE(flags);
 	return result;
+}
+
+/**
+ * Sleep until any of the signals in \a sigs or \a timeout ticks elapse.
+ * If the timeout elapse a SIG_TIMEOUT is added to the received signal(s).
+ * \return the signal(s) that have awaked the process.
+ * \note Caller must check return value to check which signal has awaked the process.
+ */
+sigmask_t sig_waitTimeout(sigmask_t sigs, ticks_t timeout)
+{
+	Timer t;
+
+	ASSERT(!sig_check(SIG_TIMEOUT));
+	ASSERT(!(sigs & SIG_TIMEOUT));
+	timer_set_event_signal(&t, proc_current(), SIG_TIMEOUT);
+	timer_setDelay(&t, timeout);
+	timer_add(&t);
+	return sig_wait(SIG_TIMEOUT | sigs);
 }
 
 
