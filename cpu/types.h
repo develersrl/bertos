@@ -49,6 +49,8 @@
 
 	typedef uint16_t cpuflags_t; // FIXME
 	typedef unsigned int cpustack_t;
+	#warning Verify following costant
+	#define SIZEOF_CPUSTACK_T 2
 
 #elif CPU_X86
 
@@ -60,29 +62,36 @@
 
 	#if CPU_X86_64
 		typedef uint64_t cpustack_t;
+		#define SIZEOF_CPUSTACK_T 8
 	#else
 		typedef uint32_t cpustack_t;
+		#define SIZEOF_CPUSTACK_T 4
 	#endif
 
 #elif CPU_ARM
 
 	typedef uint32_t cpuflags_t;
 	typedef uint32_t cpustack_t;
+	#define SIZEOF_CPUSTACK_T 4
 
 #elif CPU_PPC
 
 	typedef uint32_t cpuflags_t; // FIXME
 	typedef uint32_t cpustack_t; // FIXME
+	#define SIZEOF_CPUSTACK_T 4
 
 #elif CPU_DSP56K
 
 	typedef uint16_t cpuflags_t;
 	typedef unsigned int cpustack_t;
-
+	#warning Verify following costant
+	#define SIZEOF_CPUSTACK_T 2
+	
 #elif CPU_AVR
 
 	typedef uint8_t cpuflags_t;
 	typedef uint8_t cpustack_t;
+	#define SIZEOF_CPUSTACK_T 1
 
 #else
 	#error No CPU_... defined.
@@ -178,6 +187,7 @@ STATIC_ASSERT(sizeof(uint32_t) * CPU_BITS_PER_CHAR == 32);
 STATIC_ASSERT(sizeof(int64_t) * CPU_BITS_PER_CHAR == 64);
 STATIC_ASSERT(sizeof(uint64_t) * CPU_BITS_PER_CHAR == 64);
 #endif
+STATIC_ASSERT(sizeof(cpustack_t) == SIZEOF_CPUSTACK_T);
 
 
 #endif /* CPU_TYPES_H */
