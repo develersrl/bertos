@@ -37,27 +37,6 @@
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.2  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.1  2005/11/04 18:08:49  bernie
- *#* Import into DevLib.
- *#*
- *#* Revision 1.1  2005/05/24 09:17:58  batt
- *#* Move drivers to top-level.
- *#*
- *#* Revision 1.3  2005/05/09 16:36:12  batt
- *#* Change some function names to accomplish coding standard.
- *#*
- *#* Revision 1.2  2005/05/02 16:03:08  batt
- *#* Remove unusefull interrupt saving.
- *#*
- *#* Revision 1.1  2005/05/02 12:36:39  batt
- *#* Add pwm driver.
- *#*
- *#*/
 #ifndef DRV_PWM_H
 #define DRV_PWM_H
 

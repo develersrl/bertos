@@ -40,37 +40,6 @@
  * \brief Keyboard driver (implementation)
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.9  2006/09/13 18:25:45  bernie
- *#* Merge CONFIG_KBD_LONGPRESS.
- *#*
- *#* Revision 1.8  2006/07/19 12:56:25  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.7  2006/06/03 13:57:36  bernie
- *#* Make keyboard repeat mask run-time configurable.
- *#*
- *#* Revision 1.6  2006/03/20 17:50:17  bernie
- *#* Add FreeRTOS and Observers support.
- *#*
- *#* Revision 1.5  2006/02/27 22:39:45  bernie
- *#* Misc build and doc fixes from project_grl.
- *#*
- *#* Revision 1.4  2006/02/24 00:27:14  bernie
- *#* Use new naming convention for list macros.
- *#*
- *#* Revision 1.3  2006/02/17 21:15:42  bernie
- *#* Add MOD_CHECK() checks.
- *#*
- *#* Revision 1.2  2006/02/10 12:36:20  bernie
- *#* Add preliminary FreeRTOS support; Enforce CONFIG_* definitions.
- *#*
- *#* Revision 1.1  2005/06/27 21:28:45  bernie
- *#* Import generic keyboard driver.
- *#*
- *#*/
-
 #include <hw_kbd.h>
 
 #include <drv/timer.h>

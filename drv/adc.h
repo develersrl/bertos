@@ -38,32 +38,32 @@
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.3  2006/09/20 17:32:46  marco
- *#* Use MOD_* macros instead of DB.
- *#*
- *#* Revision 1.2  2006/07/19 12:56:25  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.1  2005/06/27 21:28:31  bernie
- *#* Import ADC driver.
- *#*
- *#*/
 
 #ifndef DRV_ADC_H
 #define DRV_ADC_H
 
-#include <hw_adc.h>
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
+#include <cpu/attr.h>
+#include CPU_HEADER(adc)
 
 /** Type for ADC return value. */
 typedef uint16_t adcread_t;
 
+/** Type for channel */
+typedef uint8_t adc_ch_t;
+
 #define adc_bits() ADC_BITS
 
-adcread_t adc_read(uint16_t ch);
+adcread_t adc_read(adc_ch_t ch);
 void adc_init(void);
+
+/**
+ * Macro used to convert data from adc range (0...(2 ^ADC_BITS - 1)) to
+ * \a y1 ... \a y2 range.
+ * \note \a y1, \a y2 can be negative, and put in ascending or descending order as well.
+ * \note \a data and \a y2 are evaluated only once, \a y1 twice.
+ */
+#define ADC_RANGECONV(data, y1, y2) ((((data) * ((y2) - (y1))) / ((1 << ADC_BITS) - 1)) + (y1))
 
 #endif /* DRV_ADC_H */
