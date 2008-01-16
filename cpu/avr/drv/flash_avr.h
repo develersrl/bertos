@@ -44,7 +44,7 @@
 #include <kern/kfile.h>
 
 bool flash_avr_test(void);
-void flash_avr_init(struct _KFile *fd);
+void flash_avr_init(struct KFile *fd);
 
 
 #endif /* DRV_FLASH_AVR_H */
