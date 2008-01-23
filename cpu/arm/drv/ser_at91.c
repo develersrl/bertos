@@ -708,10 +708,10 @@ static void uart0_irq_dispatcher(void)
 {
 	IRQ_ENTRY();
 
-	if (US0_IMR & BV(US_RXRDY))
+	if (US0_CSR & BV(US_RXRDY))
 		uart0_irq_rx();
 
-	if (US0_IMR & BV(US_TXRDY))
+	if (US0_CSR & BV(US_TXRDY))
 		uart0_irq_tx();
 
 	IRQ_EXIT();
@@ -769,10 +769,10 @@ static void uart1_irq_dispatcher(void)
 {
 	IRQ_ENTRY();
 
-	if (US1_IMR & BV(US_RXRDY))
+	if (US1_CSR & BV(US_RXRDY))
 		uart1_irq_rx();
 
-	if (US1_IMR & BV(US_TXRDY))
+	if (US1_CSR & BV(US_TXRDY))
 		uart1_irq_tx();
 
 	IRQ_EXIT();
