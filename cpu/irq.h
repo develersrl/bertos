@@ -156,10 +156,10 @@
 		 * Needed because AT91 uses an Interrupt Controller with auto-vectoring.
 		 */
 		#define IRQ_ENTRY() \
-			asm volatile("sub   lr, lr,#4"          "\n\t"  /* Adjust LR */ \
-				"stmfd sp!,{r0-r12,lr}"    "\n\t"  /* Save registers on IRQ stack. */ \
-				"mrs   r1, spsr"           "\n\t"  /* Save SPSR */ \
-				"stmfd sp!,{r1}"           "\n\t")     /* */
+			asm volatile("sub   lr, lr, #4"         "\n\t"  /* Adjust LR */ \
+			             "stmfd sp!, {r0-r12,lr}"   "\n\t"  /* Save registers on IRQ stack. */ \
+			             "mrs   r1, spsr"           "\n\t"  /* Save SPSR */ \
+			             "stmfd sp!, {r1}"          "\n\t")     /* */
 
 		/**
 		 * Interrupt exit.
@@ -167,11 +167,10 @@
 		 */
 		#define IRQ_EXIT() \
 			asm volatile("ldmfd sp!, {r1}"          "\n\t"  /* Restore SPSR */ \
-				"msr   spsr_c, r1"         "\n\t"  /* */ \
-				"ldr   r0, =0xFFFFF000"    "\n\t"  /* End of interrupt. */ \
-				"str   r0, [r0, #0x130]"   "\n\t"  /* */ \
-				"ldmfd sp!, {r0-r12, pc}^" "\n\t")     /* Restore registers and return. */
-
+			             "msr   spsr_c, r1"         "\n\t"  /* */ \
+			             "ldr   r0, =0xFFFFF000"    "\n\t"  /* End of interrupt. */ \
+			             "str   r0, [r0, #0x130]"   "\n\t"  /* */ \
+			             "ldmfd sp!, {r0-r12, pc}^" "\n\t")     /* Restore registers and return. */
 
 	#endif /* !__IAR_SYSTEMS_ICC_ */
 
