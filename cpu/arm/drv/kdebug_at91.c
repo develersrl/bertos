@@ -76,7 +76,7 @@ INLINE void kdbg_hw_init(void)
 		DBGU_MR =  US_CHMODE_NORMAL | US_CHRL_8 | US_PAR_NO | US_NBSTOP_1;
 		/* Enable DBGU transmitter. */
 		DBGU_CR = BV(US_TXEN);
-		#if !CPU_ARM_AT91SAM7S256
+		#if !CPU_ARM_AT91SAM7S256 && !CPU_ARM_AT91SAM7X256
 			#warning Check Debug Unit AT91 pins on datasheet!
 		#endif
 		/* Disable PIO on DGBU tx pin. */

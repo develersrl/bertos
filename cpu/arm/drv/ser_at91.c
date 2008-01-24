@@ -101,17 +101,17 @@
 	 *
 	 * - Disable GPIO on USART0 tx/rx pins
 	 * - Reset USART0
-	 * - Set serial param: mode Normal, 8bit data, 1bit stop
+	 * - Set serial param: mode Normal, 8bit data, 1bit stop, parity none
 	 * - Enable both the receiver and the transmitter
 	 * - Enable only the RX complete interrupt
 	 */
-	#if !CPU_ARM_AT91SAM7S256
+	#if !CPU_ARM_AT91SAM7S256 && !CPU_ARM_AT91SAM7X256
 		#warning Check USART0 pins!
 	#endif
 	#define SER_UART0_BUS_TXINIT do { \
 		PIOA_PDR = BV(RXD0) | BV(TXD0); \
 		US0_CR = BV(US_RSTRX) | BV(US_RSTTX); \
-		US0_MR = US_CHMODE_NORMAL | US_CHRL_8 | US_NBSTOP_1; \
+		US0_MR = US_CHMODE_NORMAL | US_CHRL_8 | US_NBSTOP_1 | US_PAR_NO; \
 		US0_CR = BV(US_RXEN) | BV(US_TXEN); \
 		US0_IER = BV(US_RXRDY); \
 	} while (0)
@@ -173,13 +173,13 @@
 
 #ifndef SER_UART1_BUS_TXINIT
 	/** \sa SER_UART1_BUS_TXINIT */
-	#if !CPU_ARM_AT91SAM7S256
+	#if !CPU_ARM_AT91SAM7S256 && !CPU_ARM_AT91SAM7X256
 		#warning Check USART1 pins!
 	#endif
 	#define SER_UART1_BUS_TXINIT do { \
 		PIOA_PDR = BV(RXD1) | BV(TXD1); \
 		US1_CR = BV(US_RSTRX) | BV(US_RSTTX); \
-		US1_MR = US_CHMODE_NORMAL | US_CHRL_8 | US_NBSTOP_1; \
+		US1_MR = US_CHMODE_NORMAL | US_CHRL_8 | US_NBSTOP_1 | US_PAR_NO; \
 		US1_CR = BV(US_RXEN) | BV(US_TXEN); \
 		US1_IER = BV(US_RXRDY); \
 	} while (0)
