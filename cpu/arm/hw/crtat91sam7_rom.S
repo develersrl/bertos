@@ -71,61 +71,67 @@
  */
 
 #include "hw_cpu.h"
+#include <cpu/detect.h>
 
 
 #if CLOCK_FREQ != 48023000L
 #error Clock registers set for 48MHz operation, revise following code if you want a different clock.
 #endif
 
-/**
- * With a 18.420MHz cristal, master clock is:
- * (((18.420 * PLL_MUL_VAL + 1) / PLL_DIV_VAL) / AT91MCK_PRES) = 48.023MHz
- */
-#define PLL_MUL_VAL  72  /**< Real multiplier value is PLL_MUL_VAL + 1! */
-#define PLL_DIV_VAL  14
-#define AT91MCK_PRES PMC_PRES_CLK_2
 
-/**
- * Register I/O adresses.
- * \{
- */
-#define MC_BASE             0xFFFFFF00
-#define MC_FMR_OFF          0x00000060
-#define MC_FWS_2R3W         0x00000100
+#if CPU_ARM_AT91SAM7S256 || CPU_ARM_AT91SAM7X256
+	/**
+	* With a 18.420MHz cristal, master clock is:
+	* (((18.420 * PLL_MUL_VAL + 1) / PLL_DIV_VAL) / AT91MCK_PRES) = 48.023MHz
+	*/
+	#define PLL_MUL_VAL  72  /**< Real multiplier value is PLL_MUL_VAL + 1! */
+	#define PLL_DIV_VAL  14
+	#define AT91MCK_PRES PMC_PRES_CLK_2
 
-#define AIC_BASE            0xFFFFF000
-#define AIC_EOICR_OFF       0x00000130
-#define AIC_IDCR_OFF        0x00000124
+	/**
+	* Register I/O adresses.
+	* \{
+	*/
+	#define MC_BASE             0xFFFFFF00
+	#define MC_FMR_OFF          0x00000060
+	#define MC_FWS_2R3W         0x00000100
 
-#define WDT_BASE            0xFFFFFD40
-#define WDT_MR_OFF          0x00000004
-#define WDT_WDDIS            (1 << 15)
+	#define AIC_BASE            0xFFFFF000
+	#define AIC_EOICR_OFF       0x00000130
+	#define AIC_IDCR_OFF        0x00000124
 
-#define PMC_BASE            0xFFFFFC00
-#define PMC_SR_OFF          0x00000068
-#define PMC_MCKR_OFF        0x00000030
-#define PMC_MOSCS             (1 << 0)
-#define PMC_LOCK              (1 << 2)
-#define PMC_MCKRDY            (1 << 3)
-#define PMC_CSS_PLL_CLK     0x00000003
-#define PMC_PRES_CLK_2      0x00000004
+	#define WDT_BASE            0xFFFFFD40
+	#define WDT_MR_OFF          0x00000004
+	#define WDT_WDDIS            (1 << 15)
 
-#define CKGR_MOR_OFF        0x00000020
-#define CKGR_PLLR_OFF       0x0000002C
-#define CKGR_MOSCEN           (1 << 0)
-#define CKGR_MUL_SHIFT              16
-#define CKGR_PLLCOUNT_SHIFT          8
+	#define PMC_BASE            0xFFFFFC00
+	#define PMC_SR_OFF          0x00000068
+	#define PMC_MCKR_OFF        0x00000030
+	#define PMC_MOSCS             (1 << 0)
+	#define PMC_LOCK              (1 << 2)
+	#define PMC_MCKRDY            (1 << 3)
+	#define PMC_CSS_PLL_CLK     0x00000003
+	#define PMC_PRES_CLK_2      0x00000004
 
-#define RSTC_MR             0xFFFFFD08
-#define RSTC_KEY            0xA5000000
-#define RSTC_URSTEN           (1 << 0)
+	#define CKGR_MOR_OFF        0x00000020
+	#define CKGR_PLLR_OFF       0x0000002C
+	#define CKGR_MOSCEN           (1 << 0)
+	#define CKGR_MUL_SHIFT              16
+	#define CKGR_PLLCOUNT_SHIFT          8
 
-#define ARM_MODE_FIQ              0x11
-#define ARM_MODE_IRQ              0x12
-#define ARM_MODE_SVC              0x13
-#define ARM_MODE_ABORT            0x17
-#define ARM_MODE_UNDEF            0x1B
+	#define RSTC_MR             0xFFFFFD08
+	#define RSTC_KEY            0xA5000000
+	#define RSTC_URSTEN           (1 << 0)
 
+	#define ARM_MODE_FIQ              0x11
+	#define ARM_MODE_IRQ              0x12
+	#define ARM_MODE_SVC              0x13
+	#define ARM_MODE_ABORT            0x17
+	#define ARM_MODE_UNDEF            0x1B
+
+#else
+	#error No register I/O definition for selected ARM CPU
+#endif
 /*\}*/
 
 /*
@@ -210,7 +216,7 @@ _init:
         str     r0, [r1, #WDT_MR_OFF]
 
         /*
-         * Enable the main oscillator. Set startup time of 6 * 8 slow 
+         * Enable the main oscillator. Set startup time of 6 * 8 slow
          * clock cycles and wait until oscillator is stabilized.
          */
         ldr     r1, =PMC_BASE
@@ -263,7 +269,7 @@ wait_pllsel:
         ldr     r0, =(RSTC_KEY | RSTC_URSTEN)
         ldr     r1, =RSTC_MR
         str     r0, [r1, #0]
-        
+
         /*
          * Set exception stack pointers
          */
