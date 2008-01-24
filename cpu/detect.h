@@ -41,6 +41,7 @@
 	#define CPU_ARM                 1
 	#define CPU_ID                  arm
 
+	// AT91SAM7S core family
 	#if defined(__ARM_AT91SAM7S32__)
 		#define CPU_ARM_AT91         1
 		#define CPU_ARM_AT91SAM7S32  1
@@ -69,11 +70,29 @@
 		#define CPU_ARM_AT91SAM7S256 0
 	#endif
 
+	// AT91SAM7X core family
+	#if defined(__ARM_AT91SAM7X128__)
+		#define CPU_ARM_AT91         1
+		#define CPU_ARM_AT91SAM7X128 1
+	#else
+		#define CPU_ARM_AT91SAM7X128 0
+	#endif
+
+	#if defined(__ARM_AT91SAM7X256__)
+		#define CPU_ARM_AT91         1
+		#define CPU_ARM_AT91SAM7X256 1
+	#else
+		#define CPU_ARM_AT91SAM7X256 0
+	#endif
+
+
 	#if defined(CPU_ARM_AT91)
 		#if CPU_ARM_AT91SAM7S32 + CPU_ARM_AT91SAM7S64 \
-		+ CPU_ARM_AT91SAM7S128 + CPU_ARM_AT91SAM7S256 != 1
+		+ CPU_ARM_AT91SAM7S128 + CPU_ARM_AT91SAM7S256 \
+		+ CPU_ARM_AT91SAM7X128 + CPU_ARM_AT91SAM7X256 != 1
 			#error ARM CPU configuration error
 		#endif
+
 	/* #elif Add other ARM families here */
 	#else
 		#define CPU_ATM_AT91         0
@@ -94,6 +113,8 @@
 	#define CPU_ARM_AT91SAM7S64     0
 	#define CPU_ARM_AT91SAM7S128    0
 	#define CPU_ARM_AT91SAM7S256    0
+	#define CPU_ARM_AT91SAM7X128    0
+	#define CPU_ARM_AT91SAM7X256    0
 #endif
 
 #if (defined(__IAR_SYSTEMS_ICC__) || defined(__IAR_SYSTEMS_ICC)) \
