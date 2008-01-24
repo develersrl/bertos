@@ -34,7 +34,7 @@
  *
  * \author Daniele Basile <asterix@develer.com>
  *
- * \brief Script linker for Atmel AT91 SAM7S256 processors.
+ * \brief Script linker for Atmel AT91SAM7_256 family processors.
  *
  */
 
@@ -45,7 +45,7 @@ OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
 
 /*
- * Define memory configuration for AT91SAM7S
+ * Define memory configuration for AT91SAM7_256 family
  */
 MEMORY
 {
