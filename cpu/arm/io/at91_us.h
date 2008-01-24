@@ -284,16 +284,16 @@
 #if USART_HAS_PDC
 
 	/**
-	* Receive Pointer Register
-	*/
+	 * Receive Pointer Register
+	 */
 	/*\{*/
 	#define US0_RPR (*((reg32_t *)(USART0_BASE + PERIPH_RPR_OFF)))      ///< Channel 0 receive pointer register address.
 	#define US1_RPR (*((reg32_t *)(USART1_BASE + PERIPH_RPR_OFF)))      ///< Channel 1 receive pointer register address.
 	/*\}*/
 
 	/**
-	* Receive Counter Register
-	*/
+	 * Receive Counter Register
+	 */
 	/*\{*/
 	#define US0_RCR (*((reg32_t *)(USART0_BASE + PERIPH_RCR_OFF)))      ///< Channel 0 receive counter register address.
 	#define US1_RCR (*((reg32_t *)(USART1_BASE + PERIPH_RCR_OFF)))      ///< Channel 1 receive counter register address.
