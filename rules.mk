@@ -83,6 +83,11 @@ ifneq ($$(strip $$($(1)_LDSCRIPT)),)
 $(1)_LDFLAGS += -Wl,-T$$($(1)_LDSCRIPT)
 endif
 
+$(1)_CC      = $$($(1)_CROSS)$$(CC)
+$(1)_CXX     = $$($(1)_CROSS)$$(CXX)
+$(1)_AS      = $$($(1)_CROSS)$$(AS)
+$(1)_OBJCOPY = $$($(1)_CROSS)$$(OBJCOPY)
+
 $(1)_COBJ    = $$(foreach file,$$($(1)_CSRC:%.c=%.o),$$(OBJDIR)/$(1)/$$(file))
 $(1)_CXXOBJ  = $$(foreach file,$$($(1)_CXXSRC:%.cpp=%.o),$$(OBJDIR)/$(1)/$$(file))
 $(1)_PCOBJ   = $$(foreach file,$$($(1)_PCSRC:%.c=%_P.o),$$(OBJDIR)/$(1)/$$(file))
@@ -92,58 +97,64 @@ $(1)_OBJ    := $$($(1)_COBJ) $$($(1)_CXXOBJ) $$($(1)_PCOBJ) $$($(1)_AOBJ) $$($(1
 $(1)_SRC    := $$($(1)_CSRC) $$($(1)_CXXSRC) $$($(1)_PCSRC) $$($(1)_ASRC) $$($(1)_CPPASRC)
 OBJ         += $$($(1)_OBJ)
 
+ifneq ($$(strip $$($(1)_CXXSRC)),)
+$(1)_LD = $$($(1)_CROSS)$$(LDXX)
+else
+$(1)_LD = $$($(1)_CROSS)$$(LD)
+endif
+
 # Compile: instructions to create assembler and/or object files from C source
 $$($(1)_COBJ) : $$(OBJDIR)/$(1)/%.o : %.c
 	$L "$(1): Compiling $$< (C)"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(CC) -c $$(CFLAGS) $$($(1)_CFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$< -o $$@
+	$Q $$($(1)_CC) -c $$(CFLAGS) $$($(1)_CFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$< -o $$@
 
 # Compile: instructions to create assembler and/or object files from C++ source
 $$($(1)_CXXOBJ) : $$(OBJDIR)/$(1)/%.o : %.cpp
 	$L "$(1): Compiling $$< (C++)"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(CXX) -c $$(CXXFLAGS) $$($(1)_CXXFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$< -o $$@
+	$Q $$($(1)_CXX) -c $$(CXXFLAGS) $$($(1)_CXXFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$< -o $$@
 
 # Generate assembly sources from C files (debug)
 $$(OBJDIR)/$(1)/%.s : %.c
 	$L "$(1): Generating asm source $$<"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(CC) -S $$(CFLAGS) $$($(1)_CFLAGS) $$($(1)_CPPFLAGS) $$< -o $$@
+	$Q $$($(1)_CC) -S $$(CFLAGS) $$($(1)_CFLAGS) $$($(1)_CPPFLAGS) $$< -o $$@
 
 # Generate special progmem variant of a source file
 $$($(1)_PCOBJ) : $$(OBJDIR)/$(1)/%_P.o : %.c
 	$L "$(1): Compiling $$< (PROGMEM)"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(CC) -c -D_PROGMEM $$(CFLAGS) $$($(1)_CFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$< -o $$@
+	$Q $$($(1)_CC) -c -D_PROGMEM $$(CFLAGS) $$($(1)_CFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$< -o $$@
 
 # Assemble: instructions to create object file from assembler files
 $$($(1)_AOBJ): $$(OBJDIR)/$(1)/%.o : %.s
 	$L "$(1): Assembling $$<"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(AS) -c $$(ASFLAGS) $$($(1)_ASFLAGS) $$< -o $$@
+	$Q $$($(1)_AS) -c $$(ASFLAGS) $$($(1)_ASFLAGS) $$< -o $$@
 
 $$($(1)_CPPAOBJ): $$(OBJDIR)/$(1)/%.o : %.S
 	$L "$(1): Assembling with CPP $$<"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(CC) -c $$(CPPAFLAGS) $$($(1)_CPPAFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$< -o $$@
+	$Q $$($(1)_CC) -c $$(CPPAFLAGS) $$($(1)_CPPAFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$< -o $$@
 	
 
 # Link: instructions to create elf output file from object files
 $$(OUTDIR)/$(1).elf $$(OUTDIR)/$(1)_nostrip: bumprev $$($(1)_OBJ) $$($(1)_LDSCRIPT)
 	$L "$(1): Linking $$@"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(LD) $$($(1)_OBJ) $$(LIB) $$(LDFLAGS) $$($(1)_LDFLAGS) -o $$@
+	$Q $$($(1)_LD) $$($(1)_OBJ) $$(LIB) $$(LDFLAGS) $$($(1)_LDFLAGS) -o $$@
 
 # Strip debug info
 $$(OUTDIR)/$(1): $$(OUTDIR)/$(1)_nostrip
 	$L "$(1): Generating stripped executable $$@"
-	$Q $$(STRIP) -o $$@ $$^
+	$Q $$($(1)_STRIP) -o $$@ $$^
  
 # Compile and link (program-at-a-time)
 $$(OUTDIR)/$(1)_whole.elf: bumprev $$($(1)_SRC) $$($(1)_LDSCRIPT)
 	$L "$(1): Compiling and Linking whole program $$@"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$(CC) $$($(1)_SRC) $$(CFLAGS) $$($(1)_CFLAGS) $$(LIB) $$(LDFLAGS) $$($(1)_LDFLAGS) -o $$@
+	$Q $$($(1)_CC) $$($(1)_SRC) $$(CFLAGS) $$($(1)_CFLAGS) $$(LIB) $$(LDFLAGS) $$($(1)_LDFLAGS) -o $$@
 
 # Flash target
 # NOTE: we retry in case of failure because the STK500 programmer is crappy
@@ -179,6 +190,23 @@ fuses_$(1):
 		     $(AVRDUDE) $(DPROG) -p $$($(1)_MCU) -U lock:w:$$($(1)_lock):m ; \
 		fi \
 	fi
+
+$$(OUTDIR)/$(1).hex: $$(OUTDIR)/$(1).elf
+	$$($(1)_OBJCOPY) -O ihex $$< $$@
+
+$$(OUTDIR)/$(1).s19: $$(OUTDIR)/$(1).elf
+	$$($(1)_OBJCOPY) -O srec $$< $$@
+
+$$(OUTDIR)/$(1).bin: $$(OUTDIR)/$(1).elf
+	$$($(1)_OBJCOPY) -O binary $$< $$@
+
+$$(OUTDIR)/$(1).obj: $$(OUTDIR)/$(1).elf
+	$$($(1)_OBJCOPY) -O avrobj $$< $$@
+
+$$(OUTDIR)/$(1).rom: $$(OUTDIR)/$(1).elf
+	$$($(1)_OBJCOPY) -O $$(FORMAT) $$< $$@
+#	$$($(1)_OBJCOPY) -j .eeprom --set-section-flags=.eeprom="alloc,load" -O $$(FORMAT) $$< $$(@:.rom=.eep)
+
 endef
 
 # Generate build rules for all targets
@@ -194,21 +222,6 @@ $(foreach t,$(TRG),$(eval $(call build_target,$(t))))
 		exit 1; \
 	fi
 
-%.hex: %.elf
-	$(OBJCOPY) -O ihex $< $@
-
-%.s19: %.elf
-	$(OBJCOPY) -O srec $< $@
-
-%.bin: %.elf
-	$(OBJCOPY) -O binary $< $@
-
-%.obj: %.elf
-	$(OBJCOPY) -O avrobj $< $@
-
-%.rom: %.elf
-	$(OBJCOPY) -O $(FORMAT) $< $@
-#	$(OBJCOPY) -j .eeprom --set-section-flags=.eeprom="alloc,load" -O $(FORMAT) $< $(@:.rom=.eep)
 
 %.cof: %.elf
 	$(COFFCONVERT) -O coff-ext-avr $< $@

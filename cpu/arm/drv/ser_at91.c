@@ -703,18 +703,17 @@ static void uart0_irq_rx(void)
 /**
  * Serial IRQ dispatcher for USART0.
  */
-static void uart0_irq_dispatcher(void) __attribute__ ((naked));
+static void uart0_irq_dispatcher(void) __attribute__ ((interrupt));
 static void uart0_irq_dispatcher(void)
 {
-	IRQ_ENTRY();
-
 	if (US0_CSR & BV(US_RXRDY))
 		uart0_irq_rx();
 
 	if (US0_CSR & BV(US_TXRDY))
 		uart0_irq_tx();
 
-	IRQ_EXIT();
+	/* Inform hw that we have served the IRQ */
+	AIC_EOICR = 0;
 }
 
 /**
@@ -764,16 +763,15 @@ static void uart1_irq_rx(void)
 /**
  * Serial IRQ dispatcher for USART1.
  */
-static void uart1_irq_dispatcher(void) __attribute__ ((naked));
+static void uart1_irq_dispatcher(void) __attribute__ ((interrupt));
 static void uart1_irq_dispatcher(void)
 {
-	IRQ_ENTRY();
-
 	if (US1_CSR & BV(US_RXRDY))
 		uart1_irq_rx();
 
 	if (US1_CSR & BV(US_TXRDY))
 		uart1_irq_tx();
 
-	IRQ_EXIT();
+	/* Inform hw that we have served the IRQ */
+	AIC_EOICR = 0;
 }

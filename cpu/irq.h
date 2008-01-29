@@ -151,27 +151,6 @@
 
 		#define IRQ_ENABLED() ((CPU_READ_FLAGS() & 0xc0) != 0xc0)
 
-		/**
-		 * Interrupt entry point.
-		 * Needed because AT91 uses an Interrupt Controller with auto-vectoring.
-		 */
-		#define IRQ_ENTRY() \
-			asm volatile("sub   lr, lr, #4"         "\n\t"  /* Adjust LR */ \
-			             "stmfd sp!, {r0-r12,lr}"   "\n\t"  /* Save registers on IRQ stack. */ \
-			             "mrs   r1, spsr"           "\n\t"  /* Save SPSR */ \
-			             "stmfd sp!, {r1}"          "\n\t")     /* */
-
-		/**
-		 * Interrupt exit.
-		 * Needed because AT91 uses an Interrupt Controller with auto-vectoring.
-		 */
-		#define IRQ_EXIT() \
-			asm volatile("ldmfd sp!, {r1}"          "\n\t"  /* Restore SPSR */ \
-			             "msr   spsr_c, r1"         "\n\t"  /* */ \
-			             "ldr   r0, =0xFFFFF000"    "\n\t"  /* End of interrupt. */ \
-			             "str   r0, [r0, #0x130]"   "\n\t"  /* */ \
-			             "ldmfd sp!, {r0-r12, pc}^" "\n\t")     /* Restore registers and return. */
-
 	#endif /* !__IAR_SYSTEMS_ICC_ */
 
 #elif CPU_PPC
@@ -179,7 +158,7 @@
 	#define IRQ_ENABLE          FIXME
 	#define IRQ_SAVE_DISABLE(x) FIXME
 	#define IRQ_RESTORE(x)      FIXME
-	#define IRQ_ENABLED()      FIXME
+	#define IRQ_ENABLED()       FIXME
 
 #elif CPU_DSP56K
 

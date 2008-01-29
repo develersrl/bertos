@@ -9,7 +9,6 @@
 #
 #
 
-
 # Set to 1 for debug builds
 at91sam7s_DEBUG = 1
 
@@ -25,18 +24,21 @@ at91sam7s_CSRC = \
 	mware/event.c \
 	mware/formatwr.c \
 	mware/hex.c \
+	kern/kfile.c \
 	kern/proc.c \
 	kern/proc_test.c \
 	kern/monitor.c \
-	kern/signal.c \
+	kern/signal.c
 
 at91sam7s_CPPASRC = \
-	cpu/arm/hw/crtat91sam7s256_rom.S \
+	cpu/arm/hw/crtat91sam7_rom.S \
 	kern/switch_arm.S
+
+at91sam7s_CROSS = arm-elf-
 
 at91sam7s_CPPAFLAGS = -O0 -g -gdwarf-2 -g -gen-debug
 at91sam7s_CPPFLAGS = -O0 -D'ARCH=0' -D__ARM_AT91SAM7S256__ -g3 -gdwarf-2 -fverbose-asm -Iapp/at91sam7s/hw -Iapp/at91sam7s -Icpu/arm
-at91sam7s_LDFLAGS = -nostartfiles -T cpu/arm/scripts/at91sam7s256_ram.ld -Wl,--no-warn-mismatch
+at91sam7s_LDFLAGS = -nostartfiles -T cpu/arm/scripts/at91sam7_256_ram.ld -Wl,--no-warn-mismatch
 
 at91sam7s_CPU = arm7tdmi
 

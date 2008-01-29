@@ -102,7 +102,8 @@
 	#define CPU_SAVED_REGS_CNT     9
 	#define CPU_STACK_GROWS_UPWARD 0
 	#define CPU_SP_ON_EMPTY_SLOT   0
-	#define CPU_BYTE_ORDER         (__BIG_ENDIAN__ ? CPU_BIG_ENDIAN : CPU_LITTLE_ENDIAN)
+	#warning Find a way to detect endianess at runtime
+	#define CPU_BYTE_ORDER         CPU_LITTLE_ENDIAN
 	#define CPU_HARVARD            0
 
 	#ifdef __IAR_SYSTEMS_ICC__

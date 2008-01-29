@@ -120,7 +120,7 @@
 	 * usage.
 	 */
 	#define CONFIG_PROC_DEFSTACKSIZE  \
-	    (CPU_SAVED_REGS_CNT * 2 * sizeof(cpu_stack_t) \
+	    (CPU_SAVED_REGS_CNT * 2 * sizeof(cpustack_t) \
 	    + 32 * sizeof(int))
 #endif
 
@@ -129,8 +129,22 @@
 
 /* Memory fill codes to help debugging */
 #if CONFIG_KERN_MONITOR
-	#define CONFIG_KERN_STACKFILLCODE  0xA5A5
-	#define CONFIG_KERN_MEMFILLCODE    0xDBDB
+	#include <cpu/types.h>
+	#if (SIZEOF_CPUSTACK_T == 1)
+		/* 8bit cpustack_t */
+		#define CONFIG_KERN_STACKFILLCODE  0xA5
+		#define CONFIG_KERN_MEMFILLCODE    0xDB
+	#elif (SIZEOF_CPUSTACK_T == 2)
+		/* 16bit cpustack_t */
+		#define CONFIG_KERN_STACKFILLCODE  0xA5A5
+		#define CONFIG_KERN_MEMFILLCODE    0xDBDB
+	#elif (SIZEOF_CPUSTACK_T == 4)
+		/* 16bit cpustack_t */
+		#define CONFIG_KERN_STACKFILLCODE  0xA5A5A5A5UL
+		#define CONFIG_KERN_MEMFILLCODE    0xDBDBDBDBUL
+	#else
+		#error No cpustack_t size supported!
+	#endif
 #endif
 
 

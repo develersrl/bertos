@@ -94,10 +94,9 @@ STATIC_ASSERT(countof(sysirq_tab) == SYSIRQ_CNT);
  * various sources (system timer, etc..) and calls
  * the corresponding handler.
  */
-static void sysirq_dispatcher(void) __attribute__ ((naked));
+static void sysirq_dispatcher(void) __attribute__ ((interrupt));
 static void sysirq_dispatcher(void)
 {
-	IRQ_ENTRY();
 	for (unsigned i = 0; i < countof(sysirq_tab); i++)
 	{
 		if (sysirq_tab[i].enabled
@@ -105,7 +104,8 @@ static void sysirq_dispatcher(void)
 			sysirq_tab[i].handler();
 	}
 
-	IRQ_EXIT();
+	/* Inform hw that we have served the IRQ */
+	AIC_EOICR = 0;
 }
 
 #define SYSIRQ_PRIORITY 0 ///< default priority for system irqs.

@@ -46,6 +46,7 @@
 #include <io/arm.h>
 
 Timer leds_timer;
+KFileSerial ser_fd;
 
 static void leds_toggle(void)
 {
@@ -79,12 +80,10 @@ int main(void)
 	proc_init();
 	ASSERT(!IRQ_ENABLED());
 
-
-
 	/* Open the main communication port */
-	Serial *host_port = ser_open(0);
-	ser_setbaudrate(host_port, 115200);
-	ser_setparity(host_port, SER_PARITY_NONE);
+	ser_init(&ser_fd, 0);
+	ser_setbaudrate(&ser_fd, 115200);
+	ser_setparity(&ser_fd, SER_PARITY_NONE);
 
 
 	IRQ_ENABLE;
@@ -112,7 +111,7 @@ int main(void)
 	for(;;)
 	{
 		proc_test();
-		ser_printf(host_port, "From serial 0: %s\r\n", msg);
+		kfile_printf(&ser_fd.fd, "From serial 0: %s\r\n", msg);
 	}
 	return 0;
 }

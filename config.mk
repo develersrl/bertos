@@ -49,13 +49,13 @@ DEBUGCFLAGS = -ggdb
 #
 # define some variables based on the AVR base path in $(AVR)
 #
-CROSS   = avr-
-CC      = $(CROSS)gcc
-CXX     = $(CROSS)g++
+#CROSS   = avr-
+CC      = gcc
+CXX     = g++
 AS      = $(CC) -x assembler-with-cpp
 LD      = $(CC)
-OBJCOPY = $(CROSS)objcopy
-STRIP   = $(CROSS)strip
+OBJCOPY = objcopy
+STRIP   = strip
 INSTALL = cp -a
 RM      = rm -f
 RM_R    = rm -rf

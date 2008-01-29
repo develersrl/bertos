@@ -138,7 +138,7 @@ void monitor_report(void)
 		 p = MONITOR_NODE_TO_PROCESS(p->monitor.link.succ))
 	{
 		size_t free = monitor_checkStack(p->monitor.stack_base, p->monitor.stack_size);
-		kprintf("%-24s%-8p%-8p%-8u%-8u\n",
+		kprintf("%-24s%-8p%-8p%-8lu%-8lu\n",
 			p->monitor.name, p, p->monitor.stack_base, p->monitor.stack_size, free);
 	}
 }

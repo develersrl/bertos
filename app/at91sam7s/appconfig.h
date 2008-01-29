@@ -142,9 +142,6 @@
 	/** Default baud rate (set to 0 to disable) */
 	#define CONFIG_SER_DEFBAUDRATE   0
 
-	/** Enable ser_gets() and ser_gets_echo() */
-	#define CONFIG_SER_GETS          0
-
 	/** Enable second serial port in emulator. */
 	#define CONFIG_EMUL_UART1        0
 
@@ -210,5 +207,12 @@
 
 /// Enable smooth scrolling in menus
 #define CONFIG_MENU_SMOOTH  1
+
+/** Enable kfile_gets() and kfile_gets_echo() */
+#define CONFIG_KFILE_GETS 0
+
+/// Disable tests.
+#define CONFIG_TEST 0
+
 
 #endif /* APPCONFIG_COMMON_H */
