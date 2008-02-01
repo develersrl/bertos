@@ -174,6 +174,7 @@ sigmask_t sig_waitTimeout(sigmask_t sigs, ticks_t timeout)
 	if (!(res & SIG_TIMEOUT) && !sig_check(SIG_TIMEOUT))
 		timer_abort(&t);
 	IRQ_RESTORE(flags);
+	return res;
 }
 
 
