@@ -185,7 +185,7 @@
 /*\}*/
 
 /**
- * USART pins name
+ * USART & DEBUG pin names
  *\{
  */
 #if CPU_ARM_AT91SAM7S256
@@ -193,16 +193,17 @@
 	#define TXD0        6
 	#define RXD1       21
 	#define TXD1       22
-
+	#define DTXD       10
+	#define DRXD        9
 #elif CPU_ARM_AT91SAM7X256
-	#define RXD0       0 // PA0
-	#define TXD0       1 // PA1
-	#define RXD1       5 // PA5
-	#define TXD1       6 // PA6
-
+	#define RXD0        0 // PA0
+	#define TXD0        1 // PA1
+	#define RXD1        5 // PA5
+	#define TXD1        6 // PA6
+	#define DTXD       28 // PA28
+	#define DRXD       27 // PA27
 #else
-	#error No USART pins name definition for selected ARM CPU
-
+	#error No USART & debug pin names definition for selected ARM CPU
 #endif
 /*\}*/
 
