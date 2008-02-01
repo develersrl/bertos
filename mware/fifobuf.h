@@ -131,7 +131,7 @@ INLINE bool fifo_isfull(const FIFOBuffer *fb)
 
 
 /**
- * Pop a character from the fifo buffer.
+ * Push a character on the fifo buffer.
  *
  * \note Calling \c fifo_push() on a full buffer is undefined.
  *       The caller must make sure the buffer has at least
