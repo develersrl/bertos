@@ -119,7 +119,7 @@ sigmask_t sig_check(sigmask_t sigs)
 
 /**
  * Sleep until any of the signals in \a sigs occurs.
- * \return the signal(s) that have awaked the process.
+ * \return the signal(s) that have awoken the process.
  */
 sigmask_t sig_wait(sigmask_t sigs)
 {
@@ -150,8 +150,8 @@ sigmask_t sig_wait(sigmask_t sigs)
 /**
  * Sleep until any of the signals in \a sigs or \a timeout ticks elapse.
  * If the timeout elapse a SIG_TIMEOUT is added to the received signal(s).
- * \return the signal(s) that have awaked the process.
- * \note Caller must check return value to check which signal has awaked the process.
+ * \return the signal(s) that have awoken the process.
+ * \note Caller must check return value to check which signal awoke the process.
  */
 sigmask_t sig_waitTimeout(sigmask_t sigs, ticks_t timeout)
 {
@@ -162,7 +162,7 @@ sigmask_t sig_waitTimeout(sigmask_t sigs, ticks_t timeout)
 	ASSERT(!sig_check(SIG_TIMEOUT));
 	ASSERT(!(sigs & SIG_TIMEOUT));
  	/* IRQ are needed to run timer */
-	ASSERT(IRQ_ENABLED);
+	ASSERT(IRQ_ENABLED());
 
 	timer_set_event_signal(&t, proc_current(), SIG_TIMEOUT);
 	timer_setDelay(&t, timeout);
@@ -179,7 +179,7 @@ sigmask_t sig_waitTimeout(sigmask_t sigs, ticks_t timeout)
 
 /**
  * Send the signals \a sigs to the process \a proc.
- * The process will be awaken if it was waiting for any of them.
+ * The process will be awoken if it was waiting for any of them.
  *
  * \note This call is interrupt safe.
  */
@@ -191,7 +191,7 @@ void sig_signal(Process *proc, sigmask_t sigs)
 	/* Set the signals */
 	proc->sig_recv |= sigs;
 
-	/* Check if process needs to be awaken */
+	/* Check if process needs to be awoken */
 	if (proc->sig_recv & proc->sig_wait)
 	{
 		/* Wake up process and enqueue in ready list */
