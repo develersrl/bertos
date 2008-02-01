@@ -89,54 +89,6 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.14  2006/07/19 12:56:27  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.13  2006/02/24 01:17:05  bernie
- *#* Update for new emulator.
- *#*
- *#* Revision 1.12  2005/11/04 16:20:02  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.11  2005/04/11 19:10:28  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.10  2004/12/13 12:07:06  bernie
- *#* DISABLE_IRQSAVE/ENABLE_IRQRESTORE: Convert to IRQ_SAVE_DISABLE/IRQ_RESTORE.
- *#*
- *#* Revision 1.9  2004/12/08 08:57:35  bernie
- *#* Rename sigset_t to sigmask_t.
- *#*
- *#* Revision 1.8  2004/09/14 21:06:44  bernie
- *#* Use debug.h instead of kdebug.h.
- *#*
- *#* Revision 1.7  2004/08/25 14:12:09  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.6  2004/08/14 19:37:57  rasky
- *#* Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
- *#*
- *#* Revision 1.5  2004/08/04 21:50:33  bernie
- *#* Add extensive documentation.
- *#*
- *#* Revision 1.4  2004/07/30 14:30:27  rasky
- *#* Resa la sig_signal interrupt safe (con il nuovo scheduler IRQ-safe)
- *#* Rimossa event_doIntr (ora inutile) e semplificata la logica delle macro con funzioni inline
- *#*
- *#* Revision 1.3  2004/07/30 14:24:16  rasky
- *#* Task switching con salvataggio perfetto stato di interrupt (SR)
- *#* Kernel monitor per dump informazioni su stack dei processi
- *#*
- *#* Revision 1.2  2004/06/03 11:27:09  bernie
- *#* Add dual-license information.
- *#*
- *#* Revision 1.1  2004/05/23 17:27:00  bernie
- *#* Import kern/ subdirectory.
- *#*
- *#*/
-
 #include "signal.h"
 
 #include <cfg/debug.h>
@@ -204,13 +156,24 @@ sigmask_t sig_wait(sigmask_t sigs)
 sigmask_t sig_waitTimeout(sigmask_t sigs, ticks_t timeout)
 {
 	Timer t;
+	sigmask_t res;
+	cpuflags_t flags;
 
 	ASSERT(!sig_check(SIG_TIMEOUT));
 	ASSERT(!(sigs & SIG_TIMEOUT));
+ 	/* IRQ are needed to run timer */
+	ASSERT(IRQ_ENABLED);
+
 	timer_set_event_signal(&t, proc_current(), SIG_TIMEOUT);
 	timer_setDelay(&t, timeout);
 	timer_add(&t);
-	return sig_wait(SIG_TIMEOUT | sigs);
+	res = sig_wait(SIG_TIMEOUT | sigs);
+
+	IRQ_SAVE_DISABLE(flags);
+	/* Remove timer if sigs occur before timer signal */
+	if (!(res & SIG_TIMEOUT) && !sig_check(SIG_TIMEOUT))
+		timer_abort(&t);
+	IRQ_RESTORE(flags);
 }
 
 
