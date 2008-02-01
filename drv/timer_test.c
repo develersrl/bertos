@@ -52,10 +52,9 @@
  *#*
  *#*/
 
-#include <cpu/irq.h>
-#include "timer.h"
-#include <mware/event.h>
-//#include "os/hptime.c"
+#include "timer.c"
+#include "mware/event.c"
+#include "os/hptime.c"
 
 static void timer_test_constants(void)
 {
@@ -135,18 +134,14 @@ static void timer_test_poll(void)
 			start_time += 1000;
 			kprintf("seconds = %d, ticks=%ld\n", secs, now);
 		}
-//		wdt_reset();
+		wdt_reset();
 	}
 }
 
 int main(void)
 {
-//	wdt_init(7);
-	kdbg_init();
-	sysirq_init();
+	wdt_init(7);
 	timer_init();
-	IRQ_ENABLE;
-
 	timer_test_constants();
 	timer_test_delay();
 	timer_test_async();

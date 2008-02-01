@@ -76,16 +76,23 @@ INLINE void kdbg_hw_init(void)
 		DBGU_MR =  US_CHMODE_NORMAL | US_CHRL_8 | US_PAR_NO | US_NBSTOP_1;
 		/* Enable DBGU transmitter. */
 		DBGU_CR = BV(US_TXEN);
+		#if !CPU_ARM_AT91SAM7S256 && !CPU_ARM_AT91SAM7X256
+			#warning Check Debug Unit AT91 pins on datasheet!
+		#endif
 		/* Disable PIO on DGBU tx pin. */
-		PIOA_PDR = BV(DTXD);
-		PIOA_ASR = BV(DTXD);
+		PIOA_PDR = BV(10);
+		PIOA_ASR = BV(10);
 		
 		#if 0 /* Disable Rx for now */
 		/* Enable DBGU receiver. */
 		DBGU_CR = BV(US_RXEN);
+		#if !CPU_ARM_AT91SAM7S256
+			#warning Check Debug Unit AT91 pins on datasheet!
+		#endif
 		/* Disable PIO on DGBU rx pin. */
- 		PIOA_PDR = BV(DRXD);
-		PIOA_ASR = BV(DRXD);
+		PIOA_PDR = BV(9);
+		PIOA_ASR = BV(9);
+
 		#endif
 	#else
 		#error CONFIG_KDEBUG_PORT should be KDEBUG_PORT_DBGU

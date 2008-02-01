@@ -1,6 +1,5 @@
 
 #include <kern/proc.h>
-#include <kern/monitor.h>
 #include <drv/timer.h>
 
 /**
@@ -29,16 +28,14 @@ static void NORETURN proc_test_thread2(void)
 	}
 }
 
-static cpustack_t proc_test_stack1[256];//CONFIG_PROC_DEFSTACKSIZE / sizeof(cpustack_t)];
-static cpustack_t proc_test_stack2[256];//CONFIG_PROC_DEFSTACKSIZE / sizeof(cpustack_t)];
-static cpustack_t monitor_stack[256];//CONFIG_PROC_DEFSTACKSIZE / sizeof(cpustack_t)];
+static cpustack_t proc_test_stack1[CONFIG_PROC_DEFSTACKSIZE / sizeof(cpustack_t)];
+static cpustack_t proc_test_stack2[CONFIG_PROC_DEFSTACKSIZE / sizeof(cpustack_t)];
 
 /**
  * Proc scheduling test
  */
 void NORETURN proc_test(void)
 {
-	monitor_start(sizeof(monitor_stack), monitor_stack);
 	proc_new(proc_test_thread1, NULL, sizeof(proc_test_stack1), proc_test_stack1);
 	proc_new(proc_test_thread2, NULL, sizeof(proc_test_stack2), proc_test_stack2);
 	kputs("Created tasks\n");
