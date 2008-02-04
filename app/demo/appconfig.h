@@ -69,62 +69,12 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.5  2006/09/20 19:55:01  marco
- *#* Added CONFIG_LCD_4BIT.
- *#*
- *#* Revision 1.4  2006/09/13 18:29:22  bernie
- *#* Add a few missing CONFIG_ definitions.
- *#*
- *#* Revision 1.3  2006/07/19 12:56:24  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.2  2006/05/28 12:18:12  bernie
- *#* Disable menu timeout.
- *#*
- *#* Revision 1.1  2006/05/27 22:31:57  bernie
- *#* Add appconfig.h for demo app.
- *#*
- *#* Revision 1.1  2006/05/18 00:40:43  bernie
- *#* Rename appconfig.h to appconfig_common.h.
- *#*
- *#* Revision 1.11  2006/04/11 00:08:53  bernie
- *#* Add smooth scrolling for menus.
- *#*
- *#* Revision 1.10  2006/03/22 09:48:51  bernie
- *#* Add a few more config options.
- *#*
- *#* Revision 1.9  2006/02/24 00:27:35  bernie
- *#* Enable kernel and fix Doxygen markup.
- *#*
- *#* Revision 1.8  2006/02/21 16:06:05  bernie
- *#* Update copyright info.
- *#*
- *#* Revision 1.7  2006/02/17 22:28:19  bernie
- *#* Add missing UART definitions.
- *#*
- *#* Revision 1.6  2006/02/15 09:12:56  bernie
- *#* Switch to BITMAP_FMT_PLANAR_V_LSB.
- *#*
- *#* Revision 1.5  2006/02/10 12:34:33  bernie
- *#* Add missing config options for gfx and kbd.
- *#*
- *#* Revision 1.4  2006/01/23 23:12:27  bernie
- *#* Enable CONFIG_GFX_VCOORDS.
- *#*
- *#* Revision 1.3  2006/01/17 02:30:06  bernie
- *#* Add new config vars.
- *#*
- *#* Revision 1.2  2005/11/27 03:04:57  bernie
- *#* CONFIG_WATCHDOG: New config option.
- *#*
- *#* Revision 1.1  2005/11/04 17:42:12  bernie
- *#* Move cfg/config.h to appconfig.h.
- *#*/
+#ifndef APPCONFIG_COMMON_H
+#define APPCONFIG_COMMON_H
 
-#ifndef APPCONFIG_H
-#define APPCONFIG_H
+/** kdebug console */
+#define CONFIG_KDEBUG_PORT 0
+
 
 /** Baud-rate for the kdebug console */
 #define CONFIG_KDEBUG_BAUDRATE  19200
@@ -145,7 +95,7 @@
  *
  * \sa config_kern.h
  */
-#define CONFIG_KERNEL 1
+#define CONFIG_KERNEL 0
 
 /**
  * \name Serial driver parameters
@@ -168,6 +118,18 @@
 
 	/** [bytes] Size of the inbound FIFO buffer for SPI port (AVR only). */
 	#define CONFIG_SPI_RXBUFSIZE	32
+
+	/** SPI data order (AVR only). */
+	#define CONFIG_SPI_DATA_ORDER	SER_MSB_FIRST
+
+	/** SPI clock division factor (AVR only). */
+	#define CONFIG_SPI_CLOCK_DIV	16
+
+	/** SPI clock polarity: 0 = normal low, 1 = normal high (AVR only). */
+	#define CONFIG_SPI_CLOCK_POL	0
+
+	/** SPI clock phase: 0 = sample on first edge, 1 = sample on second clock edge (AVR only). */
+	#define CONFIG_SPI_CLOCK_PHASE	0
 
 	/** Default transmit timeout (ms). Set to -1 to disable timeout support */
 	#define CONFIG_SER_TXTIMEOUT    -1
@@ -203,8 +165,11 @@
 /// Debug timer interrupt using a strobe pin.
 #define CONFIG_TIMER_STROBE  0
 
+/// Enable ADS strobe.
+#define CONFIG_ADC_STROBE  0
+
 /// Enable watchdog timer.
-#define CONFIG_WATCHDOG  1
+#define CONFIG_WATCHDOG  0
 
 /// EEPROM type for drv/eeprom.c
 #define CONFIG_EEPROM_TYPE EEPROM_24XX256
@@ -213,13 +178,13 @@
 #define CONFIG_BITMAP_FMT  BITMAP_FMT_PLANAR_V_LSB
 
 /// Enable line clipping algorithm.
-#define CONFIG_GFX_CLIPPING 1
+#define CONFIG_GFX_CLIPPING  1
 
 /// Enable text rendering in bitmaps.
-#define CONFIG_GFX_TEXT 1
+#define CONFIG_GFX_TEXT  1
 
 /// Enable virtual coordinate system.
-#define CONFIG_GFX_VCOORDS 1
+#define CONFIG_GFX_VCOORDS  1
 
 /// Keyboard polling method
 #define CONFIG_KBD_POLL  KBD_POLL_SOFTINT
@@ -227,11 +192,11 @@
 /// Enable keyboard event delivery to observers
 #define CONFIG_KBD_OBSERVER  0
 
-/// Enable key beeps.
+/// Enable key beeps
 #define CONFIG_KBD_BEEP  1
 
 /// Enable long pression handler for keys
-#define CONFIG_KBD_LONGPRESS  0
+#define CONFIG_KBD_LONGPRESS  1
 
 /**
  * \name Type for the chart dataset
@@ -244,16 +209,19 @@
 /// Enable button bar behind menus
 #define CONFIG_MENU_MENUBAR  0
 
-/// Enable smooth scrolling in menus.
+/// Enable smooth scrolling in menus
 #define CONFIG_MENU_SMOOTH  1
 
-/// Abort menu after this amount of time.
-#define CONFIG_MENU_TIMEOUT 0 /* ms */
+/// Size of block for MD2 algorithm.
+#define CONFIG_MD2_BLOCK_LEN 16
 
-/// Accept input implicitly after this amount of time.
-#define CONFIG_LEVELEDIT_TIMEOUT 3000 /* ms */
+/// Use standard permutation in MD2 algorithm.
+#define CONFIG_MD2_STD_PERM 0
 
-/// LCD bus size. If 0 use 8bit bus.
-#define CONFIG_LCD_4BIT 0
+/// Define a size, in byte, of entropy pool.
+#define CONFIG_SIZE_ENTROPY_POOL 64
+
+/// Turn on or off timer support in Randpool.
+#define CONFIG_RANDPOOL_TIMER 1
 
 #endif /* APPCONFIG_H */
