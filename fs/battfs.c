@@ -144,7 +144,7 @@ static bool battfs_readHeader(struct BattFsSuper *disk, pgcnt_t page, struct Bat
 	uint8_t buf[BATTFS_HEADER_LEN];
 	/*
 	 * Read header from disk.
-	 * header is actually a footer, and so
+	 * Header is actually a footer, and so
 	 * resides at page end.
 	 */
 	if (disk->read(disk, page, disk->page_size - BATTFS_HEADER_LEN - 1, buf, BATTFS_HEADER_LEN)
@@ -197,13 +197,13 @@ static void movePages(struct BattFsSuper *disk, pgcnt_t src, int offset)
  */
 static void insertFreePage(struct BattFsSuper *disk, pgoff_t *filelen_table, mark_t mark, pgcnt_t page)
 {
-	ASSERT(mark >= disk->free_min);
-	ASSERT(mark <= disk->free_max);
+	ASSERT(mark >= disk->free_start);
+	ASSERT(mark < disk->free_next);
 
 	pgcnt_t free_pos = countPages(filelen_table, BATTFS_MAX_FILES - 1);
-	free_pos += mark - disk->free_min;
-	TRACEMSG("mark:%d, page:%d, free_min:%d, free_max:%d, free_pos:%d\n",
-		mark, page, disk->free_min, disk->free_max, free_pos);
+	free_pos += mark - disk->free_start;
+	TRACEMSG("mark:%d, page:%d, free_start:%d, free_next:%d, free_pos:%d\n",
+		mark, page, disk->free_start, disk->free_next, free_pos);
 
 	ASSERT(disk->page_array[free_pos] == PAGE_UNSET_SENTINEL);
 	disk->page_array[free_pos] = page;
@@ -211,14 +211,14 @@ static void insertFreePage(struct BattFsSuper *disk, pgoff_t *filelen_table, mar
 
 /**
  * Mark \a page of \a disk as free.
- * \note free_max of \a disk is increased by 1 and is used as
- *       \a page free marker.
+ * \note free_next of \a disk is used as \a page free marker
+ * and is increased by 1.
  */
 static bool battfs_markFree(struct BattFsSuper *disk, struct BattFsPageHeader *hdr, pgcnt_t page)
 {
 	uint8_t buf[BATTFS_HEADER_LEN];
 
-	hdr->mark = disk->free_max++;
+	hdr->mark = disk->free_next;
 	hdr->fcs_free = computeFcsFree(hdr);
 	battfs_to_disk(hdr, buf);
 
@@ -228,7 +228,10 @@ static bool battfs_markFree(struct BattFsSuper *disk, struct BattFsPageHeader *h
 		return false;
 	}
 	else
+	{
+		disk->free_next++;
 		return true;
+	}
 }
 
 
@@ -243,8 +246,17 @@ bool battfs_init(struct BattFsSuper *disk)
 	pgoff_t filelen_table[BATTFS_MAX_FILES];
 	mark_t minl, maxl, minh, maxh;
 
-	/* Sanity checks */
+	/* Sanity check */
 	ASSERT(disk->open);
+
+	/* Init disk device */
+	if (!disk->open(disk))
+	{
+		TRACEMSG("open error\n");
+		return false;
+	}
+
+	/* Disk open must set all of these */
 	ASSERT(disk->read);
 	ASSERT(disk->write);
 	ASSERT(disk->erase);
@@ -253,23 +265,16 @@ bool battfs_init(struct BattFsSuper *disk)
 	ASSERT(disk->page_count);
 	ASSERT(disk->page_count < PAGE_UNSET_SENTINEL - 1);
 	ASSERT(disk->page_array);
-	
-	/* Init disk device */
-	if (!disk->open(disk))
-	{
-		TRACEMSG("open error\n");
-		return false;
-	}
 
 	memset(filelen_table, 0, BATTFS_MAX_FILES * sizeof(pgoff_t));
 
-	/* Initialize min and max counters to keep trace od fre blocks */
+	/* Initialize min and max counters to keep trace od free blocks */
 	minl = MAX_PAGE_ADDR;
 	maxl = 0;
 	minh = MAX_PAGE_ADDR | MARK_HALF_SIZE;
 	maxh = 0 | MARK_HALF_SIZE;
 
-	disk->free_bytes =0;
+	disk->free_bytes = 0;
 	disk->disk_size = (disk_size_t)(disk->page_size - BATTFS_HEADER_LEN) * disk->page_count;
 
 	/* Count the number of disk page per file */
@@ -281,12 +286,13 @@ bool battfs_init(struct BattFsSuper *disk)
 		/* Check header FCS */
 		if (hdr.fcs == computeFcs(&hdr))
 		{
-			/* Page is valid and is owned by a file */
-			filelen_table[hdr.inode]++;
-
 			ASSERT(hdr.mark == MARK_PAGE_VALID);
 			ASSERT(hdr.fcs_free == FCS_FREE_VALID);
 			ASSERT(hdr.fill <= disk->page_size - BATTFS_HEADER_LEN);
+
+			/* Page is valid and is owned by a file */
+			filelen_table[hdr.inode]++;
+
 			/* Keep trace of free space */
 			disk->free_bytes += disk->page_size - BATTFS_HEADER_LEN - hdr.fill;
 		}
@@ -295,7 +301,7 @@ bool battfs_init(struct BattFsSuper *disk)
 			/* Increase free space */
 			disk->free_bytes += disk->page_size - BATTFS_HEADER_LEN;
 			
-			/* Check if page is free */
+			/* Check if page is marked free */
 			if (hdr.fcs_free == computeFcsFree(&hdr))
 			{
 				/*
@@ -324,45 +330,48 @@ bool battfs_init(struct BattFsSuper *disk)
 	for (pgcnt_t page = 0; page < disk->page_count; page++)
 		disk->page_array[page] = PAGE_UNSET_SENTINEL;
 
-	/* Determine free_min & free_max */
+	/* Determine free_start & free_next */
 	if (maxl >= minl)
 	{
 		if (maxh >= minh)
 		{
 			if (maxl == minh - 1)
 			{
-				disk->free_min = minl;
-				disk->free_max = maxh;
+				disk->free_start = minl;
+				disk->free_next = maxh;
 			}
 			else
 			{
 				ASSERT(minl == 0);
 				ASSERT(maxh == (MAX_PAGE_ADDR | MARK_HALF_SIZE));
 
-				disk->free_min = minh;
-				disk->free_max = maxl;
+				disk->free_start = minh;
+				disk->free_next = maxl;
 			}
 		}
 		else
 		{
-			disk->free_min = minl;
-			disk->free_max = maxl;
+			disk->free_start = minl;
+			disk->free_next = maxl;
 		}
 	}
 	else if (maxh >= minh)
 	{
-		disk->free_min = minh;
-		disk->free_max = maxh;
+		disk->free_start = minh;
+		disk->free_next = maxh;
 	}
 	else
 	{
 		TRACEMSG("No valid marked free block found\n");
-		disk->free_min = 0;
-		#warning Check this!
-		disk->free_max = -1;
+		disk->free_start = 0;
+		disk->free_next = -1;
 	}
-	TRACEMSG("Free markers:\n minl %u\n maxl %u\n minh %u\n maxh %u\n free_min %u\n free_max %u\n",
-		minl, maxl, minh, maxh, disk->free_min, disk->free_max);
+
+	/* free_next should contain the first usable address */
+	disk->free_next++;
+
+	TRACEMSG("Free markers:\n minl %u\n maxl %u\n minh %u\n maxh %u\n free_start %u\n free_next %u\n",
+		minl, maxl, minh, maxh, disk->free_start, disk->free_next);
 
 
 	/* Fill page allocation array */
@@ -440,7 +449,7 @@ bool battfs_init(struct BattFsSuper *disk)
 				if (!battfs_markFree(disk, &hdr, old_page))
 					return false;
 
-				insertFreePage(disk, filelen_table, disk->free_max, old_page);
+				insertFreePage(disk, filelen_table, hdr.mark, old_page);
 			}
 		}
 		else
@@ -448,7 +457,7 @@ bool battfs_init(struct BattFsSuper *disk)
 			/* Check if page is free */
 			if (hdr.fcs_free != computeFcsFree(&hdr))
 				/* Page is not a valid marked page, insert at the end of list */
-				hdr.mark = ++disk->free_max;
+				hdr.mark = disk->free_next++;
 
 			insertFreePage(disk, filelen_table, hdr.mark, page);
 		}

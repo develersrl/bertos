@@ -196,8 +196,17 @@ typedef struct BattFsSuper
 	 */
 	pgcnt_t *page_array;
 
-	mark_t free_min;      ///< Lowest free page counter.
-	mark_t free_max;      ///< Highest free page counter.
+    /**
+	 * Lowest free page counter.
+	 * This is the counter of the first availble free page.
+	 */
+	mark_t free_start;
+
+    /**
+	 * Highest free page counter.
+	 * This value is the next to be used to mark a block as free.
+	 */
+	mark_t free_next;
 
 	disk_size_t disk_size;   ///< Size of the disk, in bytes (page_count * page_size).
 	disk_size_t free_bytes;  ///< Free space on the disk.
