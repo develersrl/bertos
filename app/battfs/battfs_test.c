@@ -56,7 +56,6 @@ static bool disk_open(struct BattFsSuper *d)
 	fseek(fp, 0, SEEK_END);
 	d->page_size = PAGE_SIZE;
 	d->page_count = ftell(fp) / d->page_size;
-	d->disk_size = d->page_size * d->page_count;
 	d->page_array = malloc(d->page_count * sizeof(pgcnt_t));
 	TRACEMSG("page_size:%d, page_count:%d, disk_size:%d\n", d->page_size, d->page_count, d->disk_size);
 	return (fp && d->page_array);
