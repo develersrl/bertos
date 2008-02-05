@@ -48,42 +48,72 @@
 typedef uint16_t fill_t;
 typedef fill_t   pgaddr_t;
 typedef uint16_t pgoff_t;
-typedef pgoff_t  mark_t;
+typedef uint32_t mark_t;
+typedef uint8_t  mark_roll_t;
 typedef uint8_t  inode_t;
 typedef uint8_t  seq_t;
 typedef rotating_t fcs_t;
 
 /**
- * BattFS page header.
- * \note fields order is chosen to comply
- * with CPU alignment.
+ * Size required for free block allocation is at least 1 bit more
+ * than page addressing.
+ */
+STATIC_ASSERT(sizeof(mark_t) > sizeof(pgaddr_t));
+
+/**
+ * BattFS page header, used to represent a page
+ * header in memory.
+ * To see how this is stored on disk:
+ * \see battfs_to_disk
+ * \see disk_to_battfs
  */
 typedef struct BattFsPageHeader
 {
 	inode_t  inode; ///< File inode (file identifier).
 	seq_t    seq;   ///< Page sequence number.
-	mark_t   mark;  ///< Marker used to keep trace of free/used pages.
-	pgoff_t  pgoff; ///< Page offset inside file.
 	fill_t   fill;  ///< Filled bytes in page.
-	uint16_t rfu;   ///< Reserved for future use, 0xFFFF for now.
+	pgoff_t  pgoff; ///< Page offset inside file.
+	mark_t   mark;  ///< Marker used to keep trace of free/used pages.
+
+	/**
+	 * FCS (Frame Check Sequence) of the page header once the page
+	 * as been marked as free.
+	 */
+	fcs_t fcs_free;
 
 	/**
 	 * FCS (Frame Check Sequence) of the page header.
-	 * \note This field must be the last one!
-	 *       This is needed because if the page is only partially
-	 *       written, we can use this to detect it.
 	 */
 	fcs_t fcs;
 } BattFsPageHeader;
-/* Ensure structure has no padding added */
-STATIC_ASSERT(sizeof(BattFsPageHeader) == 12);
+
+/**
+ * Size of the header once saved on disk.
+ * \see battfs_to_disk
+ * \see disk_to_battfs
+ */
+#define BATTFS_HEADER_LEN 13
+
+/**
+ * Marks for valid pages.
+ * Simply set to 1 all field bits.
+ * \{
+ */
+#define MARK_PAGE_VALID ((1LL << (CPU_BITS_PER_CHAR * sizeof(mark_t))) - 1)
+#define FCS_FREE_VALID  ((1 << (CPU_BITS_PER_CHAR * sizeof(fcs_t))) - 1)
+/* \} */
 
 
 /**
- * Mark for valid pages.
- * Simply set to 1 all field bits.
+ * Half-size of free page marker.
+ * Used to keep trace of free marker wrap-arounds.
  */
-#define MARK_PAGE_VALID ((1 << (CPU_BITS_PER_CHAR * sizeof(mark_t))) - 1)
+#define MARK_HALF_SIZE (1 << (CPU_BITS_PER_CHAR * sizeof(pgaddr_t) + 1))
+
+/**
+ * Maximum page address.
+ */
+#define MAX_PAGE_ADDR ((1 << (CPU_BITS_PER_CHAR * sizeof(pgaddr_t))) - 1)
 
 /**
  * Max number of files.
@@ -99,7 +129,7 @@ struct BattFsSuper;
 typedef uint16_t pgcnt_t;
 
 /**
- * Sentinel used to keep trace of unset pages in disk->pag_array.
+ * Sentinel used to keep trace of unset pages in disk->page_array.
  */
 #define PAGE_UNSET_SENTINEL ((1 << (CPU_BITS_PER_CHAR * sizeof(pgcnt_t))) - 1)
 
@@ -166,8 +196,8 @@ typedef struct BattFsSuper
 	 */
 	pgcnt_t *page_array;
 
-	mark_t min_free; ///< Lowest sequence number of free page
-	mark_t max_free; ///< Highest sequence number of free page
+	mark_t free_min;      ///< Lowest free page counter.
+	mark_t free_max;      ///< Highest free page counter.
 
 	disk_size_t disk_size;   ///< Size of the disk, in bytes (page_count * page_size).
 	disk_size_t free_bytes;  ///< Free space on the disk.
