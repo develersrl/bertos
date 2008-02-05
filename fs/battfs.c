@@ -53,38 +53,42 @@
  */
 INLINE void battfs_to_disk(struct BattFsPageHeader *hdr, uint8_t *buf)
 {
-	STATIC_ASSERT(BATTFS_HEADER_LEN == 13);
+	STATIC_ASSERT(BATTFS_HEADER_LEN == 12);
 	buf[0] = hdr->inode;
 
-	buf[1] = hdr->seq;
+	buf[1] = hdr->fill;
+	buf[2] = hdr->fill >> 8;
 
-	buf[2] = hdr->fill;
-	buf[3] = hdr->fill >> 8;
-
-	buf[4] = hdr->pgoff;
-	buf[5] = hdr->pgoff >> 8;
+	buf[3] = hdr->pgoff;
+	buf[4] = hdr->pgoff >> 8;
 
 	/*
 	 * Mark is at least 1 bit longer than page address.
 	 * Needed to take care of wraparonds.
 	 */
-	buf[6] = hdr->mark;
-	buf[7] = hdr->mark >> 8;
-	buf[8] = hdr->mark >> 16;
+	buf[5] = hdr->mark;
+	buf[6] = hdr->mark >> 8;
+
+	/*
+	 * First bit used by mark, last 2 bits used by seq.
+	 * Since only 2 pages with the same inode and pgoff
+	 * can exist at the same time, 2 bit for seq are enough.
+	 */
+	buf[7] = ((hdr->mark >> 16) & 0x01) | (hdr->seq << 6);
 
 	/*
 	 * This field must be the before the last one!
 	 */
-	buf[9] = hdr->fcs_free;
-	buf[10] = hdr->fcs_free >> 8;
+	buf[8] = hdr->fcs_free;
+	buf[9] = hdr->fcs_free >> 8;
 
 	/*
 	 * This field must be the last one!
 	 * This is needed because if the page is only partially
 	 * written, we can use this to detect it.
 	 */
-	buf[11] = hdr->fcs;
-	buf[12] = hdr->fcs >> 8;
+	buf[10] = hdr->fcs;
+	buf[11] = hdr->fcs >> 8;
 }
 
 /**
@@ -93,14 +97,14 @@ INLINE void battfs_to_disk(struct BattFsPageHeader *hdr, uint8_t *buf)
  */
 INLINE void disk_to_battfs(uint8_t *buf, struct BattFsPageHeader *hdr)
 {
-	STATIC_ASSERT(BATTFS_HEADER_LEN == 13);
+	STATIC_ASSERT(BATTFS_HEADER_LEN == 12);
 	hdr->inode = buf[0];
-	hdr->seq = buf[1];
-	hdr->fill = buf[3] << 8 | buf[2];
-	hdr->pgoff = buf[5] << 8 | buf[4];
-	hdr->mark = (mark_t)buf[8] << 16 | buf[7] << 8 | buf[6];
-	hdr->fcs_free = buf[10] << 8 | buf[9];
-	hdr->fcs = buf[12] << 8 | buf[11];
+	hdr->fill = buf[2] << 8 | buf[1];
+	hdr->pgoff = buf[4] << 8 | buf[3];
+	hdr->mark = (mark_t)(buf[7] & 0x01) << 16 | buf[6] << 8 | buf[5];
+	hdr->seq = buf[7] >> 6;
+	hdr->fcs_free = buf[9] << 8 | buf[8];
+	hdr->fcs = buf[11] << 8 | buf[10];
 }
 
 /**
@@ -316,7 +320,7 @@ bool battfs_init(struct BattFsSuper *disk)
 				else
 				{
 					minh = MIN(minh, hdr.mark);
-					maxl = MAX(maxl, hdr.mark);
+					maxh = MAX(maxh, hdr.mark);
 				}
 			}
 			else
@@ -364,7 +368,7 @@ bool battfs_init(struct BattFsSuper *disk)
 	{
 		TRACEMSG("No valid marked free block found\n");
 		disk->free_start = 0;
-		disk->free_next = -1;
+		disk->free_next = -1; //to be incremented ahead
 	}
 
 	/* free_next should contain the first usable address */

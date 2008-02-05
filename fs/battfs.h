@@ -92,7 +92,7 @@ typedef struct BattFsPageHeader
  * \see battfs_to_disk
  * \see disk_to_battfs
  */
-#define BATTFS_HEADER_LEN 13
+#define BATTFS_HEADER_LEN 12
 
 /**
  * Marks for valid pages.
