@@ -57,7 +57,7 @@ static bool disk_open(struct BattFsSuper *d)
 	d->page_size = PAGE_SIZE;
 	d->page_count = ftell(fp) / d->page_size;
 	d->page_array = malloc(d->page_count * sizeof(pgcnt_t));
-	TRACEMSG("page_size:%d, page_count:%d, disk_size:%d\n", d->page_size, d->page_count, d->disk_size);
+	TRACEMSG("page_size:%d, page_count:%d\n", d->page_size, d->page_count);
 	return (fp && d->page_array);
 }
 
@@ -68,7 +68,7 @@ static size_t disk_page_read(struct BattFsSuper *d, pgcnt_t page, pgaddr_t addr,
 	return fread(buf, 1, size, fp);
 }
 
-static size_t disk_page_write(struct BattFsSuper *d, pgcnt_t page, pgaddr_t addr, void *buf, size_t size)
+static size_t disk_page_write(struct BattFsSuper *d, pgcnt_t page, pgaddr_t addr, const void *buf, size_t size)
 {
 	TRACEMSG("page:%d, addr:%d, size:%d\n", page, addr, size);
 	fseek(fp, page * d->page_size + addr, SEEK_SET);
@@ -97,10 +97,10 @@ int main(int argc, char *argv[])
 {
 	if (argc < 2)
 	{
-		FILE *fpt = fopen(test_filename, "w+");
-		for (int i = 0; i < 32768; i++)
-			fputc(0xff, fpt);
-		fclose(fpt);
+/* 		FILE *fpt = fopen(test_filename, "w+");
+ 		for (int i = 0; i < 32768; i++)
+ 			fputc(0xff, fpt);
+ 		fclose(fpt);*/
 		filename = test_filename;
 	}
 	else
@@ -123,6 +123,27 @@ int main(int argc, char *argv[])
 			kprintf("%04d ", disk.page_array[i]);
 		}
 		kputchar('\n');
+
+		for (pgcnt_t i = 0; i < disk.page_count; i++)
+		{
+			if (i < disk.page_count / 2)
+			{
+				if (!battfs_writeTestBlock(&disk, i, i, i, i/3, 0, MARK_PAGE_VALID))
+				{
+					TRACEMSG("error writing:%d\n", i);
+					return 2;
+				}
+			}
+			else
+			{
+				if (!battfs_writeTestBlock(&disk, i, i, i, i/3, 0, i))
+				{
+					TRACEMSG("error writing:%d\n", i);
+					return 2;
+				}
+			}
+
+		}
 		return 0;
 	}
 	else

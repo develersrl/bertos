@@ -99,7 +99,7 @@ typedef struct BattFsPageHeader
  * Simply set to 1 all field bits.
  * \{
  */
-#define MARK_PAGE_VALID ((1LL << (CPU_BITS_PER_CHAR * sizeof(mark_t))) - 1)
+#define MARK_PAGE_VALID ((1 << (CPU_BITS_PER_CHAR * sizeof(pgaddr_t) + 1)) - 1)
 #define FCS_FREE_VALID  ((1 << (CPU_BITS_PER_CHAR * sizeof(fcs_t))) - 1)
 /* \} */
 
@@ -153,7 +153,7 @@ typedef size_t (*disk_page_read_t) (struct BattFsSuper *d, pgcnt_t page, pgaddr_
  * \a size the lenght to be written.
  * \return the number of bytes written.
  */
-typedef size_t	(*disk_page_write_t) (struct BattFsSuper *d, pgcnt_t page, pgaddr_t addr, void *buf, size_t);
+typedef size_t	(*disk_page_write_t) (struct BattFsSuper *d, pgcnt_t page, pgaddr_t addr, const void *buf, size_t);
 
 /**
  * Type interface for disk page erase function.
@@ -215,5 +215,6 @@ typedef struct BattFsSuper
 } BattFsSuper;
 
 bool battfs_init(struct BattFsSuper *d);
+bool battfs_writeTestBlock(struct BattFsSuper *disk, pgcnt_t page, inode_t inode, seq_t seq, fill_t fill, pgoff_t pgoff, mark_t mark);
 
 #endif /* FS_BATTFS_H */

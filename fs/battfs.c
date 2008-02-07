@@ -151,7 +151,7 @@ static bool battfs_readHeader(struct BattFsSuper *disk, pgcnt_t page, struct Bat
 	 * Header is actually a footer, and so
 	 * resides at page end.
 	 */
-	if (disk->read(disk, page, disk->page_size - BATTFS_HEADER_LEN - 1, buf, BATTFS_HEADER_LEN)
+	if (disk->read(disk, page, disk->page_size - BATTFS_HEADER_LEN, buf, BATTFS_HEADER_LEN)
 	    != BATTFS_HEADER_LEN)
 	{
 		TRACEMSG("Error: page[%d]\n", page);
@@ -161,6 +161,32 @@ static bool battfs_readHeader(struct BattFsSuper *disk, pgcnt_t page, struct Bat
 	/* Fill header */
 	disk_to_battfs(buf, hdr);
 
+	return true;
+}
+
+/**
+ * Write header of page \a page.
+ * \return true on success, false otherwise.
+ * \note \a hdr is dirtyed even on errors.
+ */
+static bool battfs_writeHeader(struct BattFsSuper *disk, pgcnt_t page, struct BattFsPageHeader *hdr)
+{
+	uint8_t buf[BATTFS_HEADER_LEN];
+
+	/* Fill buffer */
+	battfs_to_disk(hdr, buf);
+
+	/*
+	 * write header to disk.
+	 * Header is actually a footer, and so
+	 * resides at page end.
+	 */
+	if (disk->write(disk, page, disk->page_size - BATTFS_HEADER_LEN, buf, BATTFS_HEADER_LEN)
+	    != BATTFS_HEADER_LEN)
+	{
+		TRACEMSG("Error: page[%d]\n", page);
+		return false;
+	}
 	return true;
 }
 
@@ -313,7 +339,7 @@ static void findFreeStartNext(struct BattFsSuper *disk, mark_t minl, mark_t maxl
 		 * No valid interval found.
 		 * Hopefully the disk is brand new.
 		 */
-		TRACEMSG("No valid marked free block found, new disk?\n");
+		TRACEMSG("No valid marked free block found, new disk or disk full\n");
 		disk->free_start = 0;
 		disk->free_next = -1; //to be incremented ahead
 	}
@@ -562,3 +588,29 @@ bool battfs_init(struct BattFsSuper *disk)
 }
 
 
+bool battfs_writeTestBlock(struct BattFsSuper *disk, pgcnt_t page, inode_t inode, seq_t seq, fill_t fill, pgoff_t pgoff, mark_t mark)
+{
+	BattFsPageHeader hdr;
+	TRACEMSG("page %d, inode %d, pgoff %d\n", page, inode, pgoff);
+
+	hdr.inode = inode;
+	hdr.seq = seq;
+	hdr.fill = fill;
+	hdr.pgoff = pgoff;
+	hdr.mark = MARK_PAGE_VALID;
+	hdr.fcs_free = FCS_FREE_VALID;
+	hdr.fcs = computeFcs(&hdr);
+	if (mark != MARK_PAGE_VALID)
+	{
+		hdr.mark = mark;
+		hdr.fcs_free = computeFcsFree(&hdr);
+	}
+
+	if (!battfs_writeHeader(disk, page, &hdr))
+	{
+		TRACEMSG("error writing hdr\n");
+		return false;
+	}
+
+	return true;
+}
