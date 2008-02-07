@@ -71,9 +71,10 @@ typedef uint16_t e2addr_t;
  * \note We can't just use offsetof() here because we could use
  *       non-constant expressions to access array elements.
  *
- * \note E2Layout is a structure that must be defined in user files.
+ * \note 'type' is the structure type holding eeprom layout
+ *       and must be defined in user files.
  */
-#define e2addr(x) ((e2addr_t)&(((struct E2Layout *)0)->x))
+#define e2addr(type, field) ((e2addr_t)&(((type *)0)->field))
 
 
 bool eeprom_write(e2addr_t addr, const void *buf, size_t count);

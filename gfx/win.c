@@ -45,6 +45,12 @@
 
 /*#*
  *#* $Log$
+ *#* Revision 1.2  2006/08/01 17:26:04  batt
+ *#* Update docs.
+ *#*
+ *#* Revision 1.1  2006/08/01 15:43:01  batt
+ *#* Add in board_kd current edited channel visualization.
+ *#*
  *#* Revision 1.4  2006/07/19 12:56:26  bernie
  *#* Convert to new Doxygen style.
  *#*
@@ -65,8 +71,8 @@
 /**
  * Map the contents of all child-windows into the bitmap of \a w.
  *
- * Please note that recursively draw children into their parent
- * effectively damages the parent buffer.
+ * \note Recursively drawing children into their parent
+ *       effectively damages the parent buffer.
  */
 void win_compose(Window *w)
 {
@@ -201,7 +207,6 @@ void win_resize(Window *w, coord_t width, coord_t height)
 
 /**
  * Initialize a new window structure.
- *
  *
  * The new window initial position is set to (0,0).
  * The size is set to the size of the installed bitmap,
