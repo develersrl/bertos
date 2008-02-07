@@ -118,7 +118,7 @@ static fcs_t computeFcs(struct BattFsPageHeader *hdr)
 	battfs_to_disk(hdr, buf);
 	rotating_init(&cks);
 	/* fcs is at the end of whole header */
-	rotating_update(buf,BATTFS_HEADER_LEN - sizeof(fcs_t), &cks);
+	rotating_update(buf, BATTFS_HEADER_LEN - sizeof(fcs_t), &cks);
 	return cks;
 }
 
@@ -133,7 +133,7 @@ static fcs_t computeFcsFree(struct BattFsPageHeader *hdr)
 	battfs_to_disk(hdr, buf);
 	rotating_init(&cks);
 	/* fcs_free is just before fcs of whole header */
-	rotating_update(buf,BATTFS_HEADER_LEN - 2 * sizeof(fcs_t), &cks);
+	rotating_update(buf, BATTFS_HEADER_LEN - 2 * sizeof(fcs_t), &cks);
 	return cks;
 }
 
@@ -196,8 +196,8 @@ static void movePages(struct BattFsSuper *disk, pgcnt_t src, int offset)
 }
 
 /**
- * Insert \a page into page allocation array of \a disk, using \a filelen_table and
- * \a free_number to compute position.
+ * Insert \a page into page allocation array of \a disk,
+ * using  \a mark to compute position.
  */
 static void insertFreePage(struct BattFsSuper *disk, mark_t mark, pgcnt_t page)
 {
@@ -238,39 +238,106 @@ static bool battfs_markFree(struct BattFsSuper *disk, struct BattFsPageHeader *h
 	}
 }
 
-
 /**
- * Initialize and mount disk described by
- * \a d.
- * \return false on errors, true otherwise.
+ * Determine free_start and free_next blocks for \a disk
+ * using \a minl, \a maxl, \a minh, \a maxh.
+ *
+ * Mark_t is a type that has at least 1 bit more than
+ * pgaddr_t. So all free blocks can be numbered unsing
+ * at most half numbers of an mark_t type.
+ * The free blocks algorith increments by 1 the disk->free_next
+ * every time a page becomes free. So the free block sequence is
+ * guaranteed to be countiguous.
+ * Only wrap arounds may happen, but due to half size sequence limitation,
+ * there are only 4 possible situations:
+ *
+ * \verbatim
+ *    |------lower half------|-------upper half-------|
+ *
+ * 1) |------minl*****maxl---|------------------------|
+ * 2) |------minl********maxl|minh******maxh----------|
+ * 3) |----------------------|----minh*******maxh-----|
+ * 4) |minl******maxl--------|------------minh****maxh|
+ * \endverbatim
+ *
+ * Situations 1 and 3 are easy to detect, while 2 and 4 require more care.
  */
-bool battfs_init(struct BattFsSuper *disk)
+static void findFreeStartNext(struct BattFsSuper *disk, mark_t minl, mark_t maxl, mark_t minh, mark_t maxh)
 {
-	BattFsPageHeader hdr;
-	pgoff_t filelen_table[BATTFS_MAX_FILES];
-	mark_t minl, maxl, minh, maxh;
-
-	/* Sanity check */
-	ASSERT(disk->open);
-
-	/* Init disk device */
-	if (!disk->open(disk))
+	/* Determine free_start & free_next */
+	if (maxl >= minl)
 	{
-		TRACEMSG("open error\n");
-		return false;
+		/* Valid interval found in lower half */
+		if (maxh >= minh)
+		{
+			/* Valid interval also found in upper half */
+			if (maxl == minh - 1)
+			{
+				/* Interval starts in lower half and end in upper */
+				disk->free_start = minl;
+				disk->free_next = maxh;
+			}
+			else
+			{
+				/* Interval starts in upper half and end in lower */
+				ASSERT(minl == 0);
+				ASSERT(maxh == (MAX_PAGE_ADDR | MARK_HALF_SIZE));
+
+				disk->free_start = minh;
+				disk->free_next = maxl;
+			}
+		}
+		else
+		{
+			/*
+			 * Upper interval is invalid.
+			 * Use lower values.
+			 */
+			
+			disk->free_start = minl;
+			disk->free_next = maxl;
+		}
+	}
+	else if (maxh >= minh)
+	{
+		/*
+		 * Lower interval is invalid.
+		 * Use upper values.
+		 */
+		disk->free_start = minh;
+		disk->free_next = maxh;
+	}
+	else
+	{
+		/*
+		 * No valid interval found.
+		 * Hopefully the disk is brand new.
+		 */
+		TRACEMSG("No valid marked free block found, new disk?\n");
+		disk->free_start = 0;
+		disk->free_next = -1; //to be incremented ahead
 	}
 
-	/* Disk open must set all of these */
-	ASSERT(disk->read);
-	ASSERT(disk->write);
-	ASSERT(disk->erase);
-	ASSERT(disk->close);
-	ASSERT(disk->page_size);
-	ASSERT(disk->page_count);
-	ASSERT(disk->page_count < PAGE_UNSET_SENTINEL - 1);
-	ASSERT(disk->page_array);
+	/* free_next should contain the first usable address */
+	disk->free_next++;
 
-	memset(filelen_table, 0, BATTFS_MAX_FILES * sizeof(pgoff_t));
+	TRACEMSG("Free markers:\n minl %u\n maxl %u\n minh %u\n maxh %u\n free_start %u\n free_next %u\n",
+		minl, maxl, minh, maxh, disk->free_start, disk->free_next);
+}
+
+/**
+ * Count number of pages per file on \a disk.
+ * This information is registered in \a filelen_table.
+ * Array index represent file inode, while value contained
+ * is the number of pages used by that file.
+ *
+ * \return true if ok, false on disk read errors.
+ * \note The whole disk is scanned once.
+ */
+static bool countDiskFilePages(struct BattFsSuper *disk, pgoff_t *filelen_table)
+{
+	BattFsPageHeader hdr;
+	mark_t minl, maxl, minh, maxh;
 
 	/* Initialize min and max counters to keep trace od free blocks */
 	minl = MAX_PAGE_ADDR;
@@ -278,8 +345,6 @@ bool battfs_init(struct BattFsSuper *disk)
 	minh = MAX_PAGE_ADDR | MARK_HALF_SIZE;
 	maxh = 0 | MARK_HALF_SIZE;
 
-	disk->free_bytes = 0;
-	disk->disk_size = (disk_size_t)(disk->page_size - BATTFS_HEADER_LEN) * disk->page_count;
 
 	/* Count the number of disk page per file */
 	for (pgcnt_t page = 0; page < disk->page_count; page++)
@@ -327,57 +392,28 @@ bool battfs_init(struct BattFsSuper *disk)
 				TRACEMSG("page [%d] invalid, keeping as free\n", page);
 		}
 	}
+	findFreeStartNext(disk, minl, maxl, minh, maxh);
+	return true;
+}
 
-	/* Once here, we have filelen_table filled with file lengths */
-
-	/* Fill page array with sentinel */
-	for (pgcnt_t page = 0; page < disk->page_count; page++)
-		disk->page_array[page] = PAGE_UNSET_SENTINEL;
-
-	/* Determine free_start & free_next */
-	if (maxl >= minl)
-	{
-		if (maxh >= minh)
-		{
-			if (maxl == minh - 1)
-			{
-				disk->free_start = minl;
-				disk->free_next = maxh;
-			}
-			else
-			{
-				ASSERT(minl == 0);
-				ASSERT(maxh == (MAX_PAGE_ADDR | MARK_HALF_SIZE));
-
-				disk->free_start = minh;
-				disk->free_next = maxl;
-			}
-		}
-		else
-		{
-			disk->free_start = minl;
-			disk->free_next = maxl;
-		}
-	}
-	else if (maxh >= minh)
-	{
-		disk->free_start = minh;
-		disk->free_next = maxh;
-	}
-	else
-	{
-		TRACEMSG("No valid marked free block found\n");
-		disk->free_start = 0;
-		disk->free_next = -1; //to be incremented ahead
-	}
-
-	/* free_next should contain the first usable address */
-	disk->free_next++;
-
-	TRACEMSG("Free markers:\n minl %u\n maxl %u\n minh %u\n maxh %u\n free_start %u\n free_next %u\n",
-		minl, maxl, minh, maxh, disk->free_start, disk->free_next);
-
-
+/**
+ * Fill page allocation array of \a disk
+ * using file lenghts in \a filelen_table.
+ *
+ * The page allocation array is an array containings all files info.
+ * Is ordered by file, and within each file is ordered by page offset
+ * inside file.
+ * e.g. : at page array[0] you will find page address of the first page
+ * of the first file (if present).
+ * Free blocks are allocated after the last file starting from invalid ones
+ * and continuing with the marked free ones.
+ *
+ * \return true if ok, false on disk read errors.
+ * \note The whole disk is scanned once.
+ */
+static bool fillPageArray(struct BattFsSuper *disk, pgoff_t *filelen_table)
+{
+	BattFsPageHeader hdr;
 	/* Fill page allocation array */
 	for (pgcnt_t page = 0; page < disk->page_count; page++)
 	{
@@ -465,8 +501,63 @@ bool battfs_init(struct BattFsSuper *disk)
 			insertFreePage(disk, hdr.mark, page);
 		}
 	}
+	return true;
+}
 
-	#warning Test me!	
+/**
+ * Initialize and mount disk described by
+ * \a disk.
+ * \return false on errors, true otherwise.
+ */
+bool battfs_init(struct BattFsSuper *disk)
+{
+	pgoff_t filelen_table[BATTFS_MAX_FILES];
+
+	/* Sanity check */
+	ASSERT(disk->open);
+
+	/* Init disk device */
+	if (!disk->open(disk))
+	{
+		TRACEMSG("open error\n");
+		return false;
+	}
+
+	/* Disk open must set all of these */
+	ASSERT(disk->read);
+	ASSERT(disk->write);
+	ASSERT(disk->erase);
+	ASSERT(disk->close);
+	ASSERT(disk->page_size);
+	ASSERT(disk->page_count);
+	ASSERT(disk->page_count < PAGE_UNSET_SENTINEL - 1);
+	ASSERT(disk->page_array);
+
+	memset(filelen_table, 0, BATTFS_MAX_FILES * sizeof(pgoff_t));
+
+	disk->free_bytes = 0;
+	disk->disk_size = (disk_size_t)(disk->page_size - BATTFS_HEADER_LEN) * disk->page_count;
+
+	/* Count pages per file */
+	if (!countDiskFilePages(disk, filelen_table))
+	{
+		TRACEMSG("error counting file pages\n");
+		return false;
+	}
+
+	/* Once here, we have filelen_table filled with file lengths */
+
+	/* Fill page array with sentinel */
+	for (pgcnt_t page = 0; page < disk->page_count; page++)
+		disk->page_array[page] = PAGE_UNSET_SENTINEL;
+
+	/* Fill page allocation array using filelen_table */
+	if (!fillPageArray(disk, filelen_table))
+	{
+		TRACEMSG("error filling page array\n");
+		return false;
+	}
+
 	return true;	
 }
 
