@@ -199,14 +199,14 @@ static void movePages(struct BattFsSuper *disk, pgcnt_t src, int offset)
  * Insert \a page into page allocation array of \a disk, using \a filelen_table and
  * \a free_number to compute position.
  */
-static void insertFreePage(struct BattFsSuper *disk, pgoff_t *filelen_table, mark_t mark, pgcnt_t page)
+static void insertFreePage(struct BattFsSuper *disk, mark_t mark, pgcnt_t page)
 {
-	ASSERT(mark >= disk->free_start);
-	ASSERT(mark < disk->free_next);
+	ASSERT(mark - disk->free_start < disk->free_next - disk->free_start);
 
-	pgcnt_t free_pos = countPages(filelen_table, BATTFS_MAX_FILES - 1);
-	free_pos += mark - disk->free_start;
-	TRACEMSG("mark:%d, page:%d, free_start:%d, free_next:%d, free_pos:%d\n",
+	pgcnt_t free_pos = disk->page_count - disk->free_next + mark;
+	ASSERT(free_pos < disk->page_count);
+
+	TRACEMSG("mark:%u, page:%u, free_start:%u, free_next:%u, free_pos:%u\n",
 		mark, page, disk->free_start, disk->free_next, free_pos);
 
 	ASSERT(disk->page_array[free_pos] == PAGE_UNSET_SENTINEL);
@@ -452,17 +452,17 @@ bool battfs_init(struct BattFsSuper *disk)
 				if (!battfs_markFree(disk, &hdr, old_page))
 					return false;
 
-				insertFreePage(disk, filelen_table, hdr.mark, old_page);
+				insertFreePage(disk, hdr.mark, old_page);
 			}
 		}
 		else
 		{
 			/* Check if page is free */
 			if (hdr.fcs_free != computeFcsFree(&hdr))
-				/* Page is not a valid marked page, insert at the end of list */
-				hdr.mark = disk->free_next++;
+				/* Page is not a valid marked page, insert at list beginning */
+				hdr.mark = --disk->free_start;
 
-			insertFreePage(disk, filelen_table, hdr.mark, page);
+			insertFreePage(disk, hdr.mark, page);
 		}
 	}
 
