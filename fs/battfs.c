@@ -212,7 +212,7 @@ static pgcnt_t countPages(pgoff_t *filelen_table, inode_t inode)
 static void movePages(struct BattFsSuper *disk, pgcnt_t src, int offset)
 {
 	pgcnt_t dst = src + offset;
-	memmove(&disk->page_array[dst], &disk->page_array[src], disk->page_count - MAX(dst, src) * sizeof(pgcnt_t));
+	memmove(&disk->page_array[dst], &disk->page_array[src], (disk->page_count - MAX(dst, src)) * sizeof(pgcnt_t));
 	
 	if (offset < 0)
 	{
@@ -588,11 +588,18 @@ bool battfs_init(struct BattFsSuper *disk)
 	return true;	
 }
 
+/**
+ * Close \a disk.
+ */
+bool battfs_close(struct BattFsSuper *disk)
+{
+	return disk->close(disk);
+}
+
 
 bool battfs_writeTestBlock(struct BattFsSuper *disk, pgcnt_t page, inode_t inode, seq_t seq, fill_t fill, pgoff_t pgoff, mark_t mark)
 {
 	BattFsPageHeader hdr;
-	TRACEMSG("page %d, inode %d, pgoff %d\n", page, inode, pgoff);
 
 	hdr.inode = inode;
 	hdr.seq = seq;

@@ -215,6 +215,8 @@ typedef struct BattFsSuper
 } BattFsSuper;
 
 bool battfs_init(struct BattFsSuper *d);
+bool battfs_close(struct BattFsSuper *disk);
+
 bool battfs_writeTestBlock(struct BattFsSuper *disk, pgcnt_t page, inode_t inode, seq_t seq, fill_t fill, pgoff_t pgoff, mark_t mark);
 
 #endif /* FS_BATTFS_H */
