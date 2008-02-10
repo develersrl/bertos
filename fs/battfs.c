@@ -73,8 +73,9 @@ INLINE void battfs_to_disk(struct BattFsPageHeader *hdr, uint8_t *buf)
 	 * First bit used by mark, last 2 bits used by seq.
 	 * Since only 2 pages with the same inode and pgoff
 	 * can exist at the same time, 2 bit for seq are enough.
+	 * Unused bits are set to 1.
 	 */
-	buf[7] = ((hdr->mark >> 16) & 0x01) | (hdr->seq << 6);
+	buf[7] = ((hdr->mark >> 16) & 0x01) | (hdr->seq << 6) | ~(BV(7) | BV(6) | BV(0));
 
 	/*
 	 * This field must be the before the last one!
@@ -252,7 +253,7 @@ static bool battfs_markFree(struct BattFsSuper *disk, struct BattFsPageHeader *h
 	hdr->fcs_free = computeFcsFree(hdr);
 	battfs_to_disk(hdr, buf);
 
-	if (!disk->write(disk, page, disk->page_size - BATTFS_HEADER_LEN - 1, buf, BATTFS_HEADER_LEN))
+	if (!disk->write(disk, page, disk->page_size - BATTFS_HEADER_LEN, buf, BATTFS_HEADER_LEN))
 	{
 		TRACEMSG("error marking page [%d]\n", page);
 		return false;
@@ -269,9 +270,9 @@ static bool battfs_markFree(struct BattFsSuper *disk, struct BattFsPageHeader *h
  * using \a minl, \a maxl, \a minh, \a maxh.
  *
  * Mark_t is a type that has at least 1 bit more than
- * pgaddr_t. So all free blocks can be numbered unsing
- * at most half numbers of an mark_t type.
- * The free blocks algorith increments by 1 the disk->free_next
+ * pgaddr_t. So all free blocks can be numbered using
+ * at most half numbers of a mark_t type.
+ * The free blocks algorithm increments by 1 the disk->free_next
  * every time a page becomes free. So the free block sequence is
  * guaranteed to be countiguous.
  * Only wrap arounds may happen, but due to half size sequence limitation,
@@ -299,13 +300,13 @@ static void findFreeStartNext(struct BattFsSuper *disk, mark_t minl, mark_t maxl
 			/* Valid interval also found in upper half */
 			if (maxl == minh - 1)
 			{
-				/* Interval starts in lower half and end in upper */
+				/* Interval starts in lower half and ends in upper */
 				disk->free_start = minl;
 				disk->free_next = maxh;
 			}
 			else
 			{
-				/* Interval starts in upper half and end in lower */
+				/* Interval starts in upper half and ends in lower */
 				ASSERT(minl == 0);
 				ASSERT(maxh == (MAX_PAGE_ADDR | MARK_HALF_SIZE));
 
@@ -337,11 +338,11 @@ static void findFreeStartNext(struct BattFsSuper *disk, mark_t minl, mark_t maxl
 	{
 		/*
 		 * No valid interval found.
-		 * Hopefully the disk is brand new.
+		 * Hopefully the disk is brand new (or new).
 		 */
 		TRACEMSG("No valid marked free block found, new disk or disk full\n");
 		disk->free_start = 0;
-		disk->free_next = -1; //to be incremented ahead
+		disk->free_next = -1; //to be increased later
 	}
 
 	/* free_next should contain the first usable address */
@@ -426,12 +427,12 @@ static bool countDiskFilePages(struct BattFsSuper *disk, pgoff_t *filelen_table)
  * Fill page allocation array of \a disk
  * using file lenghts in \a filelen_table.
  *
- * The page allocation array is an array containings all files info.
+ * The page allocation array is an array containings all file infos.
  * Is ordered by file, and within each file is ordered by page offset
  * inside file.
  * e.g. : at page array[0] you will find page address of the first page
  * of the first file (if present).
- * Free blocks are allocated after the last file starting from invalid ones
+ * Free blocks are allocated after the last file, starting from invalid ones
  * and continuing with the marked free ones.
  *
  * \return true if ok, false on disk read errors.
