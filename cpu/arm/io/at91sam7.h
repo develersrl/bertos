@@ -136,6 +136,7 @@
 #include "at91_pio.h"
 #include "at91_us.h"
 #include "at91_dbgu.h"
+#include "at91_tc.h"
 //TODO: add other peripherals
 
 /**
@@ -235,7 +236,25 @@
 	#define SPI1_SPCK   22 // PA22
 
 #else
-	#error No SPI pins name definition for selected ARM CPU
+	#error No SPI pin names definition for selected ARM CPU
+
+#endif
+/*\}*/
+
+/**
+ * Timer counter pins definition.
+ *\{
+ */
+#if CPU_ARM_AT91SAM7X256
+	#define TIOA0  23 // PB23
+	#define TIOB0  24 // PB24
+	#define TIOA1  25 // PB25
+	#define TIOB1  26 // PB26
+	#define TIOA2  27 // PB27
+	#define TIOB2  28 // PB28
+
+#else
+	#error No Timer Conter pin names definition for selected ARM CPU
 
 #endif
 /*\}*/

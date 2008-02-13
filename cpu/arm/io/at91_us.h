@@ -30,7 +30,7 @@
  *
  * -->
  *
- * \version $Id: at91_aic.h 18260 2007-10-11 14:08:10Z batt $
+ * \version $Id: at91_us.h 20354 2008-01-23 11:51:13Z asterix $
  *
  * \author Daniele Basile <asterix@develer.com>
  *
