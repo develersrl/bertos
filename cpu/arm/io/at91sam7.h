@@ -76,7 +76,7 @@
 
 #include <cfg/compiler.h>
 
-#if CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7S256
+#if CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128 || CPU_ARM_AT91SAM7S256
 	#define FLASH_BASE      0x100000UL
 	#define RAM_BASE        0x200000UL
 
@@ -100,7 +100,7 @@
 	#define VREG_BASE       0xFFFFFD60      ///< Voltage regulator mode controller base address.
 	#define MC_BASE         0xFFFFFF00      ///< Memory controller base.
 
-	#if CPU_ARM_AT91SAM7X256
+	#if CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128
 		#define CAN_BASE        0xFFFD0000      ///< PWM controller base address.
 		#define EMAC_BASE       0xFFFDC000      ///< Ethernet MAC address.
 		#define SPI0_BASE       0xFFFE0000      ///< SPI0 base address.
@@ -143,7 +143,7 @@
  * Peripheral Identifiers and Interrupts
  *\{
  */
-#if CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7S256
+#if CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7S256 || CPU_ARM_AT91SAM7X128
 	#define FIQ_ID      0       ///< Fast interrupt ID.
 	#define SYSC_ID     1       ///< System controller interrupt.
 	#define US0_ID      6       ///< USART 0 ID.
@@ -159,7 +159,7 @@
 	#define IRQ0_ID     30      ///< External interrupt 0 ID.
 	#define IRQ1_ID     31      ///< External interrupt 1 ID.
 
-	#if CPU_ARM_AT91SAM7X256
+	#if CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128
 		#define PIOA_ID     2       ///< Parallel A I/O controller ID.
 		#define PIOB_ID     3       ///< Parallel B I/O controller ID.
 		#define SPI0_ID     4       ///< Serial peripheral interface 0 ID.
@@ -196,7 +196,7 @@
 	#define TXD1       22
 	#define DTXD       10
 	#define DRXD        9
-#elif CPU_ARM_AT91SAM7X256
+#elif CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128
 	#define RXD0        0 // PA0
 	#define TXD0        1 // PA1
 	#define RXD1        5 // PA5
@@ -218,7 +218,7 @@
 	#define MOSI       13
 	#define SPCK       14
 
-#elif CPU_ARM_AT91SAM7X256
+#elif CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128
 	#define SPI0_NPCS0  12 // Same as NSS pin. PA12
 	#define SPI0_NPCS1  13 // PA13
 	#define SPI0_NPCS2  14 // PA14
@@ -236,7 +236,7 @@
 	#define SPI1_SPCK   22 // PA22
 
 #else
-	#error No SPI pin names definition for selected ARM CPU
+	#error No SPI pins name definition for selected ARM CPU
 
 #endif
 /*\}*/
