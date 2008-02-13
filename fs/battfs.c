@@ -338,7 +338,7 @@ static void findFreeStartNext(struct BattFsSuper *disk, mark_t minl, mark_t maxl
 	{
 		/*
 		 * No valid interval found.
-		 * Hopefully the disk is brand new (or new).
+		 * Hopefully the disk is brand new (or full).
 		 */
 		TRACEMSG("No valid marked free block found, new disk or disk full\n");
 		disk->free_start = 0;
@@ -585,7 +585,51 @@ bool battfs_init(struct BattFsSuper *disk)
 		return false;
 	}
 
+	/* Init list for opened files. */
+	LIST_INIT(&disk->file_opened_list);
 	return true;	
+}
+
+/**
+ * Open file \a inode from \a disk in \a mode.
+ * File context is stored in \a fd.
+ * \return true if ok, false otherwise.
+ */
+bool battfs_fileopen(BattFsSuper *disk, KFileBattFs *fd, inode_t inode, filemode_t mode)
+{
+	Node *n;
+
+	memset(fd, 0, sizeof(*fd));
+
+	/* Insert file handle in list, ordered by inode, ascending order. */
+	FOREACH_NODE(n, &disk->file_opened_list)
+	{
+		KFileBattFs *file = containerof(n, KFileBattFs, link);
+		if (file->inode >= inode)
+			break;
+	}
+	INSERT_BEFORE(n, &fd->link);
+
+	/* Fill in data */
+	fd->inode = inode;
+	fd->mode = mode;
+	fd->disk = disk;
+
+#warning TODO battfs_read, battfs_write, etc...
+#if 0
+	fd->fd.read = battfs_read;
+	fd->fd.write = battfs_write;
+	fd->fd.close = battfs_close;
+	fd->fd.reopen = battfs_reopen;
+	fd->fd.flush = battfs_flush;
+	fd->fd.error = battfs_error;
+	fd->fd.clearerr = battfs_clearerr;
+#endif
+	fd->fd.seek = kfile_genericSeek;
+	DB(fd->fd._type = KFT_BATTFS);
+
+#warning Complete me :-)
+	return true;
 }
 
 /**

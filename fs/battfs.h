@@ -44,6 +44,8 @@
 #include <cfg/compiler.h> // uintXX_t; STATIC_ASSERT
 #include <cpu/types.h> // CPU_BITS_PER_CHAR
 #include <algo/rotating_hash.h>
+#include <mware/list.h>
+#include <kern/kfile.h>
 
 typedef uint16_t fill_t;
 typedef fill_t   pgaddr_t;
@@ -196,13 +198,13 @@ typedef struct BattFsSuper
 	 */
 	pgcnt_t *page_array;
 
-    /**
+        /**
 	 * Lowest free page counter.
 	 * This is the counter of the first availble free page.
 	 */
 	mark_t free_start;
 
-    /**
+        /**
 	 * Highest free page counter.
 	 * This value is the next to be used to mark a block as free.
 	 */
@@ -211,11 +213,34 @@ typedef struct BattFsSuper
 	disk_size_t disk_size;   ///< Size of the disk, in bytes (page_count * page_size).
 	disk_size_t free_bytes;  ///< Free space on the disk.
 	
+	List file_opened_list;       ///< List used to keep trace of open files.
 	/* TODO add other fields. */
 } BattFsSuper;
 
+typedef uint8_t filemode_t; ///< Type for file open.
+
+/**
+ * Describe a BattFs file usign a KFile.
+ */
+typedef struct KFileBattFs
+{
+	KFile fd;           ///< KFile context
+	Node link;          ///< Link for inserting in opened file list
+	inode_t inode;      ///< inode of the opened file
+	BattFsSuper *disk;  ///< Disk context
+	filemode_t mode;    ///< File open mode
+} KFileBattFs;
+
+INLINE KFileBattFs * KFILEBATTFS(KFile *fd)
+{
+	ASSERT(fd->_type == KFT_BATTFS);
+	return (KFileBattFs *)fd;
+}
+
 bool battfs_init(struct BattFsSuper *d);
 bool battfs_close(struct BattFsSuper *disk);
+
+bool battfs_fileopen(BattFsSuper *disk, KFileBattFs *fd, inode_t inode, filemode_t mode);
 
 bool battfs_writeTestBlock(struct BattFsSuper *disk, pgcnt_t page, inode_t inode, seq_t seq, fill_t fill, pgoff_t pgoff, mark_t mark);
 
