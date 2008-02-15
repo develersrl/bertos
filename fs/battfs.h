@@ -47,20 +47,20 @@
 #include <mware/list.h>
 #include <kern/kfile.h>
 
-typedef uint16_t fill_t;
-typedef fill_t   pgaddr_t;
-typedef uint16_t pgoff_t;
-typedef uint32_t mark_t;
-typedef uint8_t  mark_roll_t;
-typedef uint8_t  inode_t;
-typedef uint8_t  seq_t;
-typedef rotating_t fcs_t;
+typedef uint16_t fill_t;    ///< Type for keeping trace of space filled inside a page
+typedef fill_t   pgaddr_t;  ///< Type for addressing space inside a page
+typedef uint16_t pgcnt_t;   ///< Type for counting pages on disk
+typedef pgcnt_t  pgoff_t;   ///< Type for counting pages inside a file
+typedef uint32_t mark_t;    ///< Type for marking pages as free
+typedef uint8_t  inode_t;   ///< Type for file inodes
+typedef uint8_t  seq_t;     ///< Type for page seq number
+typedef rotating_t fcs_t;   ///< Type for header FCS.
 
 /**
  * Size required for free block allocation is at least 1 bit more
  * than page addressing.
  */
-STATIC_ASSERT(sizeof(mark_t) > sizeof(pgaddr_t));
+STATIC_ASSERT(sizeof(mark_t) > sizeof(pgcnt_t));
 
 /**
  * BattFS page header, used to represent a page
@@ -101,7 +101,7 @@ typedef struct BattFsPageHeader
  * Simply set to 1 all field bits.
  * \{
  */
-#define MARK_PAGE_VALID ((1 << (CPU_BITS_PER_CHAR * sizeof(pgaddr_t) + 1)) - 1)
+#define MARK_PAGE_VALID ((1 << (CPU_BITS_PER_CHAR * sizeof(pgcnt_t) + 1)) - 1)
 #define FCS_FREE_VALID  ((1 << (CPU_BITS_PER_CHAR * sizeof(fcs_t))) - 1)
 /* \} */
 
@@ -110,12 +110,12 @@ typedef struct BattFsPageHeader
  * Half-size of free page marker.
  * Used to keep trace of free marker wrap-arounds.
  */
-#define MARK_HALF_SIZE (1 << (CPU_BITS_PER_CHAR * sizeof(pgaddr_t) + 1))
+#define MARK_HALF_SIZE (1 << (CPU_BITS_PER_CHAR * sizeof(pgcnt_t) + 1))
 
 /**
  * Maximum page address.
  */
-#define MAX_PAGE_ADDR ((1 << (CPU_BITS_PER_CHAR * sizeof(pgaddr_t))) - 1)
+#define MAX_PAGE_ADDR ((1 << (CPU_BITS_PER_CHAR * sizeof(pgcnt_t))) - 1)
 
 /**
  * Max number of files.
@@ -124,11 +124,6 @@ typedef struct BattFsPageHeader
 
 /* Fwd decl */
 struct BattFsSuper;
-
-/**
- * Type for disk page addressing.
- */
-typedef uint16_t pgcnt_t;
 
 /**
  * Sentinel used to keep trace of unset pages in disk->page_array.
@@ -217,7 +212,18 @@ typedef struct BattFsSuper
 	/* TODO add other fields. */
 } BattFsSuper;
 
-typedef uint8_t filemode_t; ///< Type for file open.
+typedef uint8_t filemode_t; ///< Type for file open modes.
+typedef uint32_t file_size_t; ///< Type for file sizes.
+
+/**
+ * Modes for battfs_fileopen.
+ * \{
+ */
+#define BATTFS_CREATE BV(0)  ///< Create file if dos not exist
+#define BATTFS_RD     BV(1)  ///< Open file for reading
+#define BATTFS_WR     BV(2)  ///< Open file fir writing
+/*/}*/
+
 
 /**
  * Describe a BattFs file usign a KFile.
@@ -229,8 +235,13 @@ typedef struct KFileBattFs
 	inode_t inode;      ///< inode of the opened file
 	BattFsSuper *disk;  ///< Disk context
 	filemode_t mode;    ///< File open mode
+	pgcnt_t *start;     ///< Pointer to page_array file start position.
 } KFileBattFs;
 
+/**
+ * Macro used to cast a KFile to a KFileBattFs.
+ * Also perform dynamic type check.
+ */
 INLINE KFileBattFs * KFILEBATTFS(KFile *fd)
 {
 	ASSERT(fd->_type == KFT_BATTFS);
