@@ -170,7 +170,7 @@ int kfile_gets_echo(struct KFile *fd, char *buf, int size, bool echo)
  * Move \a fd file seek position of \a offset bytes from \a whence.
  *
  * This is a generic implementation of seek function, you can redefine
- * it in your local module is needed.
+ * it in your local module if needed.
  */
 kfile_off_t kfile_genericSeek(struct KFile *fd, kfile_off_t offset, KSeekMode whence)
 {
@@ -204,6 +204,18 @@ kfile_off_t kfile_genericSeek(struct KFile *fd, kfile_off_t offset, KSeekMode wh
 	fd->seek_pos = seek_pos + offset;
 
 	return fd->seek_pos;
+}
+
+/**
+ * Reopen file \a fd.
+ * This is a generic implementation that only flush file
+ * and reset seek_pos to 0.
+ */
+struct KFile * kfile_genericReopen(struct KFile *fd)
+{
+	kfile_flush(fd);
+	kfile_seek(fd, 0, KSM_SEEK_SET);
+	return fd;
 }
 
 #if CONFIG_TEST

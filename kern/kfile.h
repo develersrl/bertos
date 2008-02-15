@@ -210,6 +210,11 @@ typedef struct KFile
  */
 kfile_off_t kfile_genericSeek(struct KFile *fd, kfile_off_t offset, KSeekMode whence);
 
+/**
+ * Generic implementation of kfile_reopen.
+ */
+struct KFile * kfile_genericReopen(struct KFile *fd);
+
 int kfile_putc(int c, struct KFile *fd); ///< Generic putc implementation using kfile_write.
 int kfile_getc(struct KFile *fd);  ///< Generic getc implementation using kfile_read.
 int kfile_printf(struct KFile *fd, const char *format, ...);
