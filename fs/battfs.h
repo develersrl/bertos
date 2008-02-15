@@ -219,7 +219,7 @@ typedef uint32_t file_size_t; ///< Type for file sizes.
  * Modes for battfs_fileopen.
  * \{
  */
-#define BATTFS_CREATE BV(0)  ///< Create file if dos not exist
+#define BATTFS_CREATE BV(0)  ///< Create file if does not exist
 #define BATTFS_RD     BV(1)  ///< Open file for reading
 #define BATTFS_WR     BV(2)  ///< Open file fir writing
 /*/}*/
