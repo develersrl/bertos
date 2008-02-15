@@ -591,6 +591,118 @@ bool battfs_init(struct BattFsSuper *disk)
 }
 
 /**
+ * Flush file \a fd.
+ * \return 0 if ok, EOF on errors.
+ */
+static int battfs_flush(struct KFile *fd)
+{
+	(void)fd;
+	#warning TODO
+	return 0;
+}
+
+/**
+ * Close file \a fd.
+ * \return 0 if ok, EOF on errors.
+ */
+static int battfs_fileclose(struct KFile *fd)
+{
+	KFileBattFs *fdb = KFILEBATTFS(fd);
+
+	battfs_flush(fd);
+	REMOVE(&fdb->link);
+	return 0;
+}
+
+/**
+ * Read from file \a fd \a size bytes in \a buf.
+ * \return The number of bytes read.
+ */
+static size_t battfs_read(struct KFile *fd, void *_buf, size_t size)
+{
+	KFileBattFs *fdb = KFILEBATTFS(fd);
+	uint8_t *buf = (uint8_t *)_buf;
+
+	size_t total_read = 0;
+	pgoff_t pg_offset;
+	pgaddr_t addr_offset;
+	pgaddr_t read_len;
+
+	size = MIN(size, fd->size - fd->seek_pos);
+
+	while (size)
+	{
+		pg_offset = fd->seek_pos / (fdb->disk->page_size - BATTFS_HEADER_LEN);
+		addr_offset = fd->seek_pos % (fdb->disk->page_size - BATTFS_HEADER_LEN);
+		read_len = MIN(size, (size_t)(fdb->disk->page_size - BATTFS_HEADER_LEN - addr_offset));
+
+		/* Read from disk */
+		if (fdb->disk->read(fdb->disk, fdb->start[pg_offset], addr_offset, buf, read_len) != read_len)
+		{
+			#warning TODO set error?
+		}
+
+		size -= read_len;
+		fd->seek_pos += read_len;
+		total_read += read_len;
+		buf += read_len;
+	}
+	return total_read;
+}
+
+
+/**
+ * Search file \a inode in \a disk using a binary search.
+ * \return pointer to file start in disk->page_array
+ * if file exists, NULL otherwise.
+ */
+static pgcnt_t *findFile(BattFsSuper *disk, inode_t inode)
+{
+	BattFsPageHeader hdr;
+	pgcnt_t first = 0, page, last = disk->page_count -1;
+	fcs_t fcs;
+
+	while (first <= last)
+	{
+       		page = (first + last) / 2;
+
+		if (!battfs_readHeader(disk, disk->page_array[page], &hdr))
+			return NULL;
+
+		fcs = computeFcs(&hdr);
+		if (hdr.fcs == fcs && hdr.inode == inode)
+           		return (&disk->page_array[page]) - hdr.pgoff;
+       		else if (hdr.fcs == fcs && hdr.inode < inode)
+           		first = page + 1;
+       		else
+           		last = page - 1;
+	}
+
+	return NULL;
+}
+
+/**
+ * Count size of file \a inode on \a disk, starting at pointer \a start
+ * in disk->page_array. Size is written in \a size.
+ * \return true if all s ok, false on disk read errors.
+ */
+static bool countFileSize(BattFsSuper *disk, pgcnt_t *start, inode_t inode, file_size_t *size)
+{
+	*size = 0;
+	BattFsPageHeader hdr;
+
+	for (;;)
+	{
+		if (!battfs_readHeader(disk, *start++, &hdr))
+			return false;
+		if (hdr.fcs == computeFcs(&hdr) && hdr.inode == inode)
+			*size += hdr.fill;
+		else
+			return true;
+	}
+}
+
+/**
  * Open file \a inode from \a disk in \a mode.
  * File context is stored in \a fd.
  * \return true if ok, false otherwise.
@@ -601,7 +713,33 @@ bool battfs_fileopen(BattFsSuper *disk, KFileBattFs *fd, inode_t inode, filemode
 
 	memset(fd, 0, sizeof(*fd));
 
-	/* Insert file handle in list, ordered by inode, ascending order. */
+	/* Search file start point in disk page array */
+	fd->start = findFile(disk, inode);
+	if (fd->start == NULL)
+	{
+		if (!(mode & BATTFS_CREATE))
+			return false;
+
+		/* File does not exist, create it */
+		BattFsPageHeader hdr;
+		hdr.inode = inode;
+		hdr.seq = 0;
+		hdr.fill = 0;
+		hdr.pgoff = 0;
+		hdr.mark = MARK_PAGE_VALID;
+		hdr.fcs_free = FCS_FREE_VALID;
+		hdr.fcs = computeFcs(&hdr);
+		#warning TODO: get a free block and write on disk!
+	}
+
+	/* Fill file size */
+	if (!countFileSize(disk, fd->start, inode, &fd->fd.size))
+		return false;
+
+	/* Reset seek position */
+	fd->fd.seek_pos = 0;
+
+	/* Insert file handle in list, ordered by inode, ascending. */
 	FOREACH_NODE(n, &disk->file_opened_list)
 	{
 		KFileBattFs *file = containerof(n, KFileBattFs, link);
@@ -615,20 +753,21 @@ bool battfs_fileopen(BattFsSuper *disk, KFileBattFs *fd, inode_t inode, filemode
 	fd->mode = mode;
 	fd->disk = disk;
 
-#warning TODO battfs_read, battfs_write, etc...
-#if 0
-	fd->fd.read = battfs_read;
-	fd->fd.write = battfs_write;
-	fd->fd.close = battfs_close;
-	fd->fd.reopen = battfs_reopen;
+	fd->fd.close = battfs_fileclose;
 	fd->fd.flush = battfs_flush;
+	fd->fd.read = battfs_read;
+	fd->fd.reopen = kfile_genericReopen;
+	fd->fd.seek = kfile_genericSeek;
+	
+#warning TODO battfs_write, battfs_error, battfs_clearerr
+#if 0
+	fd->fd.write = battfs_write;
 	fd->fd.error = battfs_error;
 	fd->fd.clearerr = battfs_clearerr;
 #endif
-	fd->fd.seek = kfile_genericSeek;
+
 	DB(fd->fd._type = KFT_BATTFS);
 
-#warning Complete me :-)
 	return true;
 }
 
@@ -637,7 +776,18 @@ bool battfs_fileopen(BattFsSuper *disk, KFileBattFs *fd, inode_t inode, filemode
  */
 bool battfs_close(struct BattFsSuper *disk)
 {
-	return disk->close(disk);
+	Node *n;
+	int res = 0;
+
+	/* Close all open files */
+	FOREACH_NODE(n, &disk->file_opened_list)
+	{
+		KFileBattFs *file = containerof(n, KFileBattFs, link);
+		res += battfs_fileclose(&file->fd);
+	}
+
+	/* Close disk */
+	return disk->close(disk) && (res == 0);
 }
 
 
