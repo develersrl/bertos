@@ -405,6 +405,103 @@ static void test10(BattFsSuper *disk)
 	kprintf("Test10: passed\n");
 }
 
+static void test11(BattFsSuper *disk)
+{
+	KFileBattFs fd1;
+	uint8_t buf[16];
+
+	kprintf("Test11: read file test\n");
+
+	fp = fopen(test_filename, "w+");
+
+	unsigned int PAGE_FILL = 116;
+	unsigned int INODE = 0;
+	unsigned int INODE2 = 4;
+	unsigned int MODE = 0;
+
+	battfs_writeTestBlock(disk, 0, 123, 0, PAGE_FILL, 0, 1235);
+	battfs_writeTestBlock(disk, 1, INODE, 0, PAGE_FILL, 0, MARK_PAGE_VALID);
+	battfs_writeTestBlock(disk, 2, INODE, 3, PAGE_FILL, 1, MARK_PAGE_VALID);
+	battfs_writeTestBlock(disk, 3, INODE, 0, PAGE_FILL, 1, MARK_PAGE_VALID);
+	battfs_writeTestBlock(disk, 4, INODE2, 0, PAGE_FILL, 0, 1236);
+	battfs_writeTestBlock(disk, 5, INODE2, 0, PAGE_FILL, 0, MARK_PAGE_VALID);
+	battfs_writeTestBlock(disk, 6, INODE2, 1, PAGE_FILL, 1, MARK_PAGE_VALID);
+	battfs_writeTestBlock(disk, 7, INODE2, 0, PAGE_FILL, 1, MARK_PAGE_VALID);
+
+	fclose(fp);
+
+	ASSERT(battfs_init(disk));
+	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
+	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
+	ASSERT(fd1.fd.seek_pos == sizeof(buf));
+	for (size_t i = 0; i < sizeof(buf); i++)
+		ASSERT(buf[i] == 0);
+
+	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(battfs_close(disk));
+
+	kprintf("Test11: passed\n");
+}
+
+static void test12(BattFsSuper *disk)
+{
+	KFileBattFs fd1;
+
+	kprintf("Test12: read file test across page boundary and seek test\n");
+
+	fp = fopen(test_filename, "w+");
+
+	const unsigned int PAGE_FILL = 116;
+	unsigned int INODE = 0;
+	unsigned int MODE = 0;
+	uint8_t buf[PAGE_FILL + 10];
+
+	battfs_writeTestBlock(disk, 0, 123, 0, PAGE_FILL, 0, 1235);
+	battfs_writeTestBlock(disk, 1, INODE, 0, PAGE_FILL, 0, MARK_PAGE_VALID);
+	battfs_writeTestBlock(disk, 2, INODE, 3, PAGE_FILL, 1, MARK_PAGE_VALID);
+	battfs_writeTestBlock(disk, 3, INODE, 0, PAGE_FILL, 1, MARK_PAGE_VALID);
+	battfs_writeTestBlock(disk, 4, INODE, 0, PAGE_FILL, 0, 1236);
+	battfs_writeTestBlock(disk, 5, INODE, 0, PAGE_FILL, 2, MARK_PAGE_VALID);
+	battfs_writeTestBlock(disk, 6, INODE, 1, PAGE_FILL, 3, MARK_PAGE_VALID);
+	battfs_writeTestBlock(disk, 7, INODE, 0, PAGE_FILL, 3, MARK_PAGE_VALID);
+
+	fclose(fp);
+
+	ASSERT(battfs_init(disk));
+	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
+
+	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
+	ASSERT(fd1.fd.seek_pos == sizeof(buf));
+	for (size_t i = 0; i < sizeof(buf); i++)
+		ASSERT(buf[i] == 0);
+
+	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
+	ASSERT(fd1.fd.seek_pos == sizeof(buf) * 2);
+	for (size_t i = 0; i < sizeof(buf); i++)
+		ASSERT(buf[i] == 0);
+
+	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
+	ASSERT(fd1.fd.seek_pos == sizeof(buf) * 3);
+	for (size_t i = 0; i < sizeof(buf); i++)
+		ASSERT(buf[i] == 0);
+
+	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == 86);
+	ASSERT(fd1.fd.seek_pos == fd1.fd.size);
+	for (size_t i = 0; i < 86; i++)
+		ASSERT(buf[i] == 0);
+
+	ASSERT(kfile_seek(&fd1.fd, 0, KSM_SEEK_SET) == 0);
+	ASSERT(fd1.fd.seek_pos == 0);
+
+	ASSERT(kfile_seek(&fd1.fd, 0, KSM_SEEK_END) == fd1.fd.size);
+	ASSERT(fd1.fd.seek_pos = fd1.fd.size);
+
+	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(battfs_close(disk));
+
+	kprintf("Test12: passed\n");
+}
+
 
 
 
@@ -428,6 +525,8 @@ int main(void)
 	test8(&disk);
 	test9(&disk);
 	test10(&disk);
+	test11(&disk);
+	test12(&disk);
 	kprintf("All test passed!\n");
 
 	return 0;
