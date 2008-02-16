@@ -682,6 +682,14 @@ static pgcnt_t *findFile(BattFsSuper *disk, inode_t inode)
 }
 
 /**
+ * \return true if file \a inode exists on \a disk, false otherwise.
+ */
+bool battfs_fileExists(BattFsSuper *disk, inode_t inode)
+{
+	return findFile(disk, inode) != NULL;
+}
+
+/**
  * Count size of file \a inode on \a disk, starting at pointer \a start
  * in disk->page_array. Size is written in \a size.
  * \return true if all s ok, false on disk read errors.

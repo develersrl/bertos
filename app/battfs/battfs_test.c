@@ -357,12 +357,13 @@ static void test10(BattFsSuper *disk)
 
 	fp = fopen(test_filename, "w+");
 
-	#define PAGE_FILL 116
-	#define INODE 0
-	#define INODE2 4
-	#define MODE 0
+	unsigned int PAGE_FILL = 116;
+	unsigned int INODE = 0;
+	unsigned int INODE2 = 4;
+	unsigned int INEXISTENT_INODE = 123;
+	unsigned int MODE = 0;
 
-	battfs_writeTestBlock(disk, 0, INODE, 0, PAGE_FILL, 0, 1235);
+	battfs_writeTestBlock(disk, 0, 123, 0, PAGE_FILL, 0, 1235);
 	battfs_writeTestBlock(disk, 1, INODE, 0, PAGE_FILL, 0, MARK_PAGE_VALID);
 	battfs_writeTestBlock(disk, 2, INODE, 3, PAGE_FILL, 1, MARK_PAGE_VALID);
 	battfs_writeTestBlock(disk, 3, INODE, 0, PAGE_FILL, 1, MARK_PAGE_VALID);
@@ -374,7 +375,9 @@ static void test10(BattFsSuper *disk)
 	fclose(fp);
 
 	ASSERT(battfs_init(disk));
+	ASSERT(!battfs_fileExists(disk, INEXISTENT_INODE));
 
+	ASSERT(battfs_fileExists(disk, INODE));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
 	ASSERT(fd1.fd.size == PAGE_FILL * 2);
 	ASSERT(fd1.fd.seek_pos == 0);
@@ -384,6 +387,7 @@ static void test10(BattFsSuper *disk)
 	ASSERT(fd1.disk == disk);
 	ASSERT(LIST_HEAD(&disk->file_opened_list) == &fd1.link);
 
+	ASSERT(battfs_fileExists(disk, INODE2));
 	ASSERT(battfs_fileopen(disk, &fd2, INODE2, MODE));
 	ASSERT(fd2.fd.size == PAGE_FILL * 2);
 	ASSERT(fd2.fd.seek_pos == 0);

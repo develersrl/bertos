@@ -251,6 +251,7 @@ INLINE KFileBattFs * KFILEBATTFS(KFile *fd)
 bool battfs_init(struct BattFsSuper *d);
 bool battfs_close(struct BattFsSuper *disk);
 
+bool battfs_fileExists(BattFsSuper *disk, inode_t inode);
 bool battfs_fileopen(BattFsSuper *disk, KFileBattFs *fd, inode_t inode, filemode_t mode);
 
 bool battfs_writeTestBlock(struct BattFsSuper *disk, pgcnt_t page, inode_t inode, seq_t seq, fill_t fill, pgoff_t pgoff, mark_t mark);
