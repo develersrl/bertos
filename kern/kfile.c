@@ -183,7 +183,7 @@ kfile_off_t kfile_genericSeek(struct KFile *fd, kfile_off_t offset, KSeekMode wh
 		seek_pos = 0;
 		break;
 	case KSM_SEEK_END:
-		seek_pos = fd->size - 1;
+		seek_pos = fd->size;
 		break;
 	case KSM_SEEK_CUR:
 		seek_pos = fd->seek_pos;
