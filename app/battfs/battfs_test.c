@@ -98,39 +98,33 @@ static bool disk_close(struct BattFsSuper *d)
 
 static void testCheck(BattFsSuper *disk, pgcnt_t *reference)
 {
-	if (battfs_init(disk))
+	ASSERT(battfs_init(disk));
+	
+	for (int i = 0; i < disk->page_count; i++)
 	{
-		for (int i = 0; i < disk->page_count; i++)
+		if (disk->page_array[i] != reference[i])
 		{
-			if (disk->page_array[i] != reference[i])
+			kprintf("Error at addr %d: page_array read", i);
+			for (pgcnt_t i = 0; i < disk->page_count; i++)
 			{
-				kprintf("Error at addr %d: page_array read", i);
-				for (pgcnt_t i = 0; i < disk->page_count; i++)
-				{
-					if (!(i % 16))
-						kputchar('\n');
-					kprintf("%04d ", disk->page_array[i]);
-				}
-				kputchar('\n');
-				kprintf("Expected:");
-				for (pgcnt_t i = 0; i < disk->page_count; i++)
-				{
-					if (!(i % 16))
-						kputchar('\n');
-					kprintf("%04d ", reference[i]);
-				}
-				kputchar('\n');
-				battfs_close(disk);
-				exit(2);
+				if (!(i % 16))
+					kputchar('\n');
+				kprintf("%04d ", disk->page_array[i]);
 			}
+			kputchar('\n');
+			kprintf("Expected:");
+			for (pgcnt_t i = 0; i < disk->page_count; i++)
+			{
+				if (!(i % 16))
+					kputchar('\n');
+				kprintf("%04d ", reference[i]);
+			}
+			kputchar('\n');
+			battfs_close(disk);
+			exit(2);
 		}
-		battfs_close(disk);
 	}
-	else
-	{
-		kprintf("Error in battfs_init\n");
-		exit(1);
-	}
+	battfs_close(disk);
 }
 
 static void test1(BattFsSuper *disk)
@@ -355,6 +349,59 @@ static void test9(BattFsSuper *disk)
 	kprintf("Test9: passed\n");
 }
 
+static void test10(BattFsSuper *disk)
+{
+	KFileBattFs fd1;
+	KFileBattFs fd2;
+	kprintf("Test10: open file test, inode 0 and inode 4\n");
+
+	fp = fopen(test_filename, "w+");
+
+	#define PAGE_FILL 116
+	#define INODE 0
+	#define INODE2 4
+	#define MODE 0
+
+	battfs_writeTestBlock(disk, 0, INODE, 0, PAGE_FILL, 0, 1235);
+	battfs_writeTestBlock(disk, 1, INODE, 0, PAGE_FILL, 0, MARK_PAGE_VALID);
+	battfs_writeTestBlock(disk, 2, INODE, 3, PAGE_FILL, 1, MARK_PAGE_VALID);
+	battfs_writeTestBlock(disk, 3, INODE, 0, PAGE_FILL, 1, MARK_PAGE_VALID);
+	battfs_writeTestBlock(disk, 4, INODE2, 0, PAGE_FILL, 0, 1236);
+	battfs_writeTestBlock(disk, 5, INODE2, 0, PAGE_FILL, 0, MARK_PAGE_VALID);
+	battfs_writeTestBlock(disk, 6, INODE2, 1, PAGE_FILL, 1, MARK_PAGE_VALID);
+	battfs_writeTestBlock(disk, 7, INODE2, 0, PAGE_FILL, 1, MARK_PAGE_VALID);
+
+	fclose(fp);
+
+	ASSERT(battfs_init(disk));
+
+	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
+	ASSERT(fd1.fd.size == PAGE_FILL * 2);
+	ASSERT(fd1.fd.seek_pos == 0);
+	ASSERT(fd1.mode == MODE);
+	ASSERT(fd1.inode == INODE);
+	ASSERT(fd1.start == &disk->page_array[0]);
+	ASSERT(fd1.disk == disk);
+	ASSERT(LIST_HEAD(&disk->file_opened_list) == &fd1.link);
+
+	ASSERT(battfs_fileopen(disk, &fd2, INODE2, MODE));
+	ASSERT(fd2.fd.size == PAGE_FILL * 2);
+	ASSERT(fd2.fd.seek_pos == 0);
+	ASSERT(fd2.mode == MODE);
+	ASSERT(fd2.inode == INODE2);
+	ASSERT(fd2.start == &disk->page_array[2]);
+	ASSERT(fd2.disk == disk);
+ 	ASSERT(LIST_HEAD(&disk->file_opened_list)->succ == &fd2.link);
+
+	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(kfile_close(&fd2.fd) == 0);
+	ASSERT(LIST_EMPTY(&disk->file_opened_list));
+	ASSERT(battfs_close(disk));
+
+	kprintf("Test10: passed\n");
+}
+
+
 
 
 
@@ -376,6 +423,7 @@ int main(void)
 	test7(&disk);
 	test8(&disk);
 	test9(&disk);
+	test10(&disk);
 	kprintf("All test passed!\n");
 
 	return 0;
