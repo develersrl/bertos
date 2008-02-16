@@ -30,7 +30,7 @@
  *
  * -->
  *
- * \version $Id:$
+ * \version $Id$
  *
  * \author Francesco Sacchi <batt@develer.com>
  *

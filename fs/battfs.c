@@ -746,7 +746,7 @@ bool battfs_fileopen(BattFsSuper *disk, KFileBattFs *fd, inode_t inode, filemode
 		if (file->inode >= inode)
 			break;
 	}
-	INSERT_BEFORE(n, &fd->link);
+	INSERT_BEFORE(&fd->link, n);
 
 	/* Fill in data */
 	fd->inode = inode;
