@@ -387,6 +387,15 @@ static void test10(BattFsSuper *disk)
 	ASSERT(fd1.disk == disk);
 	ASSERT(LIST_HEAD(&disk->file_opened_list) == &fd1.link);
 
+	ASSERT(kfile_reopen(&fd1.fd) == &fd1.fd);
+	ASSERT(fd1.fd.size == PAGE_FILL * 2);
+	ASSERT(fd1.fd.seek_pos == 0);
+	ASSERT(fd1.mode == MODE);
+	ASSERT(fd1.inode == INODE);
+	ASSERT(fd1.start == &disk->page_array[0]);
+	ASSERT(fd1.disk == disk);
+	ASSERT(LIST_HEAD(&disk->file_opened_list) == &fd1.link);
+
 	ASSERT(battfs_fileExists(disk, INODE2));
 	ASSERT(battfs_fileopen(disk, &fd2, INODE2, MODE));
 	ASSERT(fd2.fd.size == PAGE_FILL * 2);
