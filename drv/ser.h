@@ -45,6 +45,8 @@
 #include <cfg/compiler.h>
 
 #if OS_HOSTED
+	#include <cfg/macros.h> /* BV() */
+
 	typedef uint16_t serstatus_t;
 
 	/* Software errors */
