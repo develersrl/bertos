@@ -142,6 +142,10 @@
 		/* 16bit cpustack_t */
 		#define CONFIG_KERN_STACKFILLCODE  0xA5A5A5A5UL
 		#define CONFIG_KERN_MEMFILLCODE    0xDBDBDBDBUL
+	#elif (SIZEOF_CPUSTACK_T == 8)
+		/* 16bit cpustack_t */
+		#define CONFIG_KERN_STACKFILLCODE  0xA5A5A5A5A5A5A5A5UL
+		#define CONFIG_KERN_MEMFILLCODE    0xDBDBDBDBDBDBDBDBUL
 	#else
 		#error No cpustack_t size supported!
 	#endif
