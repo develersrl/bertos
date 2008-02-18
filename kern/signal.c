@@ -161,7 +161,7 @@ sigmask_t sig_waitTimeout(sigmask_t sigs, ticks_t timeout)
 
 	ASSERT(!sig_check(SIG_TIMEOUT));
 	ASSERT(!(sigs & SIG_TIMEOUT));
- 	/* IRQ are needed to run timer */
+	/* IRQ are needed to run timer */
 	ASSERT(IRQ_ENABLED());
 
 	timer_set_event_signal(&t, proc_current(), SIG_TIMEOUT);
