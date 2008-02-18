@@ -213,7 +213,7 @@ static size_t ser_read(struct KFile *fd, void *_buf, size_t size)
 	size_t i = 0;
 	char *buf = (char *)_buf;
 	int c;
-	
+
 	while (i < size)
 	{
 		if ((c = ser_getchar(fds->ser)) == EOF)
@@ -345,7 +345,7 @@ void ser_purgeTx(struct KFileSerial *fd)
 static int ser_flush(struct KFile *fd)
 {
 	KFileSerial *fds = KFILESERIAL(fd);
-	
+
 	/*
 	 * Wait until the FIFO becomes empty, and then until the byte currently in
 	 * the hardware register gets shifted out.
@@ -486,7 +486,7 @@ static size_t spimaster_read(struct KFile *fd, void *buf, size_t size)
 static size_t spimaster_write(struct KFile *fd, const void *buf, size_t size)
 {
 	KFileSerial *fd_spi = KFILESERIAL(fd);
-	
+
 	ser_purgeRx(fd_spi);
 
 	return ser_write(&fd_spi->fd, buf, size);
@@ -510,5 +510,3 @@ void spimaster_init(KFileSerial *fds, unsigned int unit)
 	fds->fd.read = spimaster_read;
 	fds->fd.write = spimaster_write;
 }
-
-
