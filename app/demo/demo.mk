@@ -7,34 +7,6 @@
 #
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
-# $Log$
-# Revision 1.9  2007/09/29 15:54:14  bernie
-# Make demo Qt emulator compile again.
-#
-# Revision 1.8  2006/09/20 14:27:22  marco
-# Added fonts, switch.S; fixed moc
-#
-# Revision 1.7  2006/09/19 17:48:45  bernie
-# Remove artwork.c
-#
-# Revision 1.6  2006/06/02 12:27:36  bernie
-# Tweak apparence; enable assertions.
-#
-# Revision 1.5  2006/05/27 22:42:02  bernie
-# Add verstag.
-#
-# Revision 1.4  2006/05/27 17:16:38  bernie
-# Make demos a bit more interesting.
-#
-# Revision 1.3  2006/05/15 07:21:24  bernie
-# Use pkg-config.
-#
-# Revision 1.2  2006/03/27 04:49:50  bernie
-# Add bouncing logo demo.
-#
-# Revision 1.1  2006/03/22 09:52:13  bernie
-# Add demo application.
-#
 
 include fonts/fonts.mk
 include emul/emul.mk

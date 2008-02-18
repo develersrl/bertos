@@ -37,43 +37,6 @@
  * \brief Windowing system test.
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.10  2007/09/29 16:30:37  bernie
- *#* RASTER_SIZE(): Remove obsolete macro.
- *#*
- *#* Revision 1.9  2006/09/20 14:29:34  marco
- *#* Add proc demo (not yet working).
- *#*
- *#* Revision 1.8  2006/06/02 12:27:36  bernie
- *#* Tweak apparence; enable assertions.
- *#*
- *#* Revision 1.7  2006/05/27 22:31:18  bernie
- *#* Clean it up a bit more.
- *#*
- *#* Revision 1.6  2006/05/27 17:16:38  bernie
- *#* Make demos a bit more interesting.
- *#*
- *#* Revision 1.5  2006/05/15 07:25:29  bernie
- *#* Move menu to gui/.
- *#*
- *#* Revision 1.4  2006/04/27 05:43:07  bernie
- *#* Fix naming conventions.
- *#*
- *#* Revision 1.3  2006/04/11 00:07:32  bernie
- *#* Implemenent MF_SAVESEL flag.
- *#*
- *#* Revision 1.2  2006/03/27 04:49:50  bernie
- *#* Add bouncing logo demo.
- *#*
- *#* Revision 1.1  2006/03/22 09:52:13  bernie
- *#* Add demo application.
- *#*
- *#* Revision 1.1  2006/01/23 23:14:29  bernie
- *#* Implement simple, but impressive windowing system.
- *#*
- *#*/
-
 #include <emul/emul.h>
 #include <kern/proc.h>
 #include <drv/timer.h>
