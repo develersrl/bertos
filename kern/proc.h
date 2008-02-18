@@ -37,8 +37,6 @@
  *
  * \author Bernardo Innocenti <bernie@develer.com>
  */
-
-
 #ifndef KERN_PROC_H
 #define KERN_PROC_H
 
@@ -85,4 +83,3 @@ void proc_rename(struct Process *proc, const char* name);
 	} while(0)
 
 #endif /* KERN_PROC_H */
-
