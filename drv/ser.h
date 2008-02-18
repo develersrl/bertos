@@ -44,7 +44,31 @@
 #include <mware/fifobuf.h>
 #include <cfg/compiler.h>
 
-#include CPU_HEADER(ser)
+#if OS_HOSTED
+	typedef uint16_t serstatus_t;
+
+	/* Software errors */
+	#define SERRF_RXFIFOOVERRUN  BV(0)  /**< Rx FIFO buffer overrun */
+	#define SERRF_RXTIMEOUT      BV(1)  /**< Receive timeout */
+	#define SERRF_TXTIMEOUT      BV(2)  /**< Transmit timeout */
+
+	/* Hardware errors */
+	#define SERRF_RXSROVERRUN    0      /**< Unsupported in emulated serial port. */
+	#define SERRF_FRAMEERROR     0      /**< Unsupported in emulated serial port. */
+	#define SERRF_PARITYERROR    0      /**< Unsupported in emulated serial port. */
+	#define SERRF_NOISEERROR     0      /**< Unsupported in emulated serial port. */
+
+	enum
+	{
+		SER_UART0,
+		SER_UART1,
+
+		SER_CNT  /**< Number of serial ports */
+	};
+
+#else
+	#include CPU_HEADER(ser)
+#endif
 
 #include <appconfig.h>
 
