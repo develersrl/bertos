@@ -72,6 +72,9 @@
 #ifndef APPCONFIG_COMMON_H
 #define APPCONFIG_COMMON_H
 
+/** kdebug console */
+#define CONFIG_KDEBUG_PORT 0
+
 /** Baud-rate for the kdebug console */
 #define CONFIG_KDEBUG_BAUDRATE  19200
 
