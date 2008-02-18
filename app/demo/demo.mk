@@ -79,7 +79,7 @@ demo_LDFLAGS = $(EMUL_LDFLAGS)
 ifeq ($(demo_DEBUG),1)
 	demo_CFLAGS += -D_DEBUG
 	demo_CXXFLAGS += -D_DEBUG
-#	demo_PCSRC += drv/kdebug.c
+	demo_CSRC += drv/kdebug.c
 else
 	demo_CFLAGS += -Os
 	demo_CXXFLAGS += -Os
