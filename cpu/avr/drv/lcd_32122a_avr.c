@@ -253,7 +253,7 @@ MOD_DEFINE(lcd)
  * as required by the LCD driver.
  */
 DECLARE_WALL(wall_before_raster, WALL_SIZE)
-static uint8_t lcd_raster[RASTER_SIZE(LCD_WIDTH, LCD_HEIGHT)];
+static uint8_t lcd_raster[RAST_SIZE(LCD_WIDTH, LCD_HEIGHT)];
 DECLARE_WALL(wall_after_raster, WALL_SIZE)
 
 /** Default LCD bitmap */

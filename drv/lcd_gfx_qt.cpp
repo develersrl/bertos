@@ -37,36 +37,6 @@
  * \brief Custom control for graphics LCD emulation (interface)
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.9  2006/07/19 12:56:25  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.8  2006/05/28 12:17:57  bernie
- *#* Drop almost all the Qt3 cruft.
- *#*
- *#* Revision 1.7  2006/04/27 05:43:08  bernie
- *#* Fix naming conventions.
- *#*
- *#* Revision 1.6  2006/02/20 02:00:40  bernie
- *#* Port to Qt 4.1.
- *#*
- *#* Revision 1.5  2006/02/15 09:13:16  bernie
- *#* Switch to BITMAP_FMT_PLANAR_V_LSB.
- *#*
- *#* Revision 1.4  2006/02/10 12:33:49  bernie
- *#* Make emulator display a bit larger.
- *#*
- *#* Revision 1.3  2006/01/23 23:11:07  bernie
- *#* Use RASTER_SIZE() to compute... err... the raster size.
- *#*
- *#* Revision 1.2  2006/01/17 02:30:43  bernie
- *#* Fix QImage format.
- *#*
- *#* Revision 1.1  2006/01/16 03:51:35  bernie
- *#* Add LCD Qt emulator.
- *#*/
-
 #include "lcd_gfx_qt.h"
 #include <emul/emul.h>
 #include <cfg/debug.h>
@@ -169,7 +139,7 @@ DECLARE_WALL(wall_before_raster, WALL_SIZE)
  * Bits in the bitmap bytes have vertical orientation,
  * as required by the LCD driver.
  */
-static uint8_t lcd_raster[RASTER_SIZE(EmulLCD::WIDTH, EmulLCD::HEIGHT)];
+static uint8_t lcd_raster[RAST_SIZE(EmulLCD::WIDTH, EmulLCD::HEIGHT)];
 DECLARE_WALL(wall_after_raster, WALL_SIZE)
 
 /** Default LCD bitmap */
