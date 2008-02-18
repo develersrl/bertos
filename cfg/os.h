@@ -111,7 +111,7 @@
 	({ \
 		sigset_t sigs; \
 		sigprocmask(SIG_SETMASK, NULL, &sigs); \
-		sigismember(&sigs, SIGALRM) ? true : false; \
+		sigismember(&sigs, SIGALRM) ? false : true; \
 	 })
 
 #else
