@@ -65,6 +65,7 @@ SHELL   = /bin/sh
 CHECKER = sparse
 DOXYGEN = doxygen
 AVRDUDE = avrdude
+MOC     = moc-qt4
 FLEXCAT = $(top_srcdir)/tools/flexcat/flexcat
 
 # For conversion from ELF to COFF for use in debugging / simulating in AVR Studio or VMLAB.
