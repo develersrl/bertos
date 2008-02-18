@@ -217,8 +217,8 @@ $(foreach t,$(TRG),$(eval $(call build_target,$(t))))
 #       leading to puzzling linker errors.  Kill 'em and abort build.
 %_moc.cpp: %.h
 	$(MOC) -o $@ $<
-	if [ -s $< ]; then \
-		rm $@; \
+	if [ ! -s $< ]; then \
+		rm -f $@; \
 		exit 1; \
 	fi
 
