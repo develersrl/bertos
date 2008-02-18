@@ -175,7 +175,7 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 
 #if CONFIG_KERN_MONITOR
 	/* Fill-in the stack with a special marker to help debugging */
-	memset(stack_base, CONFIG_KERN_STACKFILLCODE, stacksize / sizeof(cpustack_t));
+	memset(stack_base, (char)CONFIG_KERN_STACKFILLCODE, stacksize);
 #endif
 
 	/* Initialize the process control block */
