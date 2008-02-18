@@ -45,8 +45,9 @@
 #include <cpu/types.h>
 #include <cfg/macros.h> /* for BV() */
 #include <appconfig.h>
-#include <hw_cpu.h>     /* for CLOCK_FREQ */
-#include <hw_ser.h>     /* Required for bus macros overrides */
+#warning what about these?
+//#include <hw_cpu.h>     /* for CLOCK_FREQ */
+//#include <hw_ser.h>     /* Required for bus macros overrides */
 
 #include <mware/formatwr.h> /* for _formatted_write() */
 #include <mware/pgm.h>
@@ -58,10 +59,10 @@
 #endif
 
 
-#if defined(_EMUL)
+#if OS_HOSTED
 	#include <stdio.h>
 	#define KDBG_WAIT_READY()      do { /*nop*/ } while(0)
-	#define KDBG_WRITE_CHAR(c)     putchar((c))
+	#define KDBG_WRITE_CHAR(c)     putc((c), stderr)
 	#define KDBG_MASK_IRQ(old)     do { (void)(old); } while(0)
 	#define KDBG_RESTORE_IRQ(old)  do { /*nop*/ } while(0)
 	typedef char kdbg_irqsave_t; /* unused */
@@ -228,7 +229,7 @@ int PGM_FUNC(__invalid_ptr)(void *value, const char * PGM_ATTR name, const char 
 	PGM_FUNC(kputs)(PGM_STR("Invalid ptr: "));
 	PGM_FUNC(kputs)(name);
 	#if CONFIG_PRINTF
-		PGM_FUNC(kprintf)(PGM_STR(" = 0x%x\n"), (unsigned int)value);
+		PGM_FUNC(kprintf)(PGM_STR(" = 0x%p\n"), value);
 	#else
 		(void)value;
 		kputchar('\n');

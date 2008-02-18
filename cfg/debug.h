@@ -112,144 +112,80 @@
 	 *
 	 *         void release()
 	 *         {
-         *             DB(--ref_count;)
+	 *             DB(--ref_count;)
 	 *         }
 	 *     };
 	 * \endcode
 	 */
 	#define DB(x) x
 
-	#if OS_HOSTED
-		#include <stdio.h>
-		#include <stdarg.h>
+	#include <appconfig.h>  /* CONFIG_KDEBUG_ASSERT_NO_TEXT */
+	#include <cpu/attr.h>  /* CPU_HARVARD */
 
-		INLINE void kdbg_init(void) { /* nop */ }
-		INLINE void kputchar(char c)
-		{
-			putc(c, stderr);
-		}
-		INLINE void kputs(const char *str)
-		{
-			fputs(str, stderr);
-		}
-		#if COMPILER_VARIADIC_MACROS
-			/* G++ can't inline functions with variable arguments... */
-			#define kprintf(fmt, ...) fprintf(stderr, fmt, ## __VA_ARGS__)
-		#else
-			#define kvprintf(fmt, ap) vfprintf(stderr, fmt, ap)
-			INLINE int kprintf(const char *fmt, ...)
-			{
-				va_list ap;
-				int result;
+	/* These are implemented in drv/kdebug.c */
+	void kdbg_init(void);
+	void kputchar(char c);
+	int kputnum(int num);
+	void kdump(const void *buf, size_t len);
+	void __init_wall(long *wall, int size);
 
-				va_start(ap, fmt);
-				result = kvprintf(fmt, ap);
-				va_end(ap);
+	#if CPU_HARVARD
+		#include <mware/pgm.h>
+		void kputs_P(const char *PROGMEM str);
+		void kprintf_P(const char *PROGMEM fmt, ...) FORMAT(__printf__, 1, 2);
+		int __assert_P(const char *PROGMEM cond, const char *PROGMEM file, int line);
+		void __trace_P(const char *func);
+		void __tracemsg_P(const char *func, const char *PROGMEM fmt, ...);
+		int __invalid_ptr_P(void *p, const char *PROGMEM name, const char *PROGMEM file, int line);
+		int __check_wall_P(long *wall, int size, const char * PGM_ATTR name, const char * PGM_ATTR file, int line);
+		#define kputs(str)  kputs_P(PSTR(str))
+		#define kprintf(fmt, ...)  kprintf_P(PSTR(fmt) ,## __VA_ARGS__)
+		#define __assert(cond, file, line)  __assert_P(PSTR(cond), PSTR(file), (line))
+		#define __trace(func)  __trace_P(func)
+		#define __tracemsg(func, fmt, ...)  __tracemsg_P(func, PSTR(fmt), ## __VA_ARGS__)
+		#define __invalid_ptr(p, name, file, line)  __invalid_ptr_P((p), PSTR(name), PSTR(file), (line))
+		#define __check_wall(wall, size, name, file, line)  __check_wall_P(wall, size, PSTR(name), PSTR(file), (line))
+	#else /* !CPU_HARVARD */
+		void kputs(const char *str);
+		void kprintf(const char *fmt, ...) FORMAT(__printf__, 1, 2);
+		int __assert(const char *cond, const char *file, int line);
+		void __trace(const char *func);
+		void __tracemsg(const char *func, const char *fmt, ...) FORMAT(__printf__, 2, 3);
+		int __invalid_ptr(void *p, const char *name, const char *file, int line);
+		int __check_wall(long *wall, int size, const char *name, const char *file, int line);
+	#endif /* !CPU_HARVARD */
 
-				return result;
-			}
-		#endif
-		void kdump(const void *buf, size_t len); /* UNIMPLEMENTED */
+	#if !CONFIG_KDEBUG_ASSERT_NO_TEXT
+		#define ASSERT(x)         ((void)(LIKELY(x) ? 0 : __assert(#x, THIS_FILE, __LINE__)))
+		#define ASSERT2(x, help)  ((void)(LIKELY(x) ? 0 : __assert(help " (" #x ")", THIS_FILE, __LINE__)))
+	#else
+		#define ASSERT(x)         ((void)(LIKELY(x) ? 0 : __assert("", THIS_FILE, __LINE__)))
+		#define ASSERT2(x, help)  ((void)ASSERT(x))
+	#endif
 
-		#ifndef ASSERT
-			#include <assert.h>
-			#define ASSERT(x) assert(x)
-		#endif /* ASSERT */
-		#define ASSERT2(x, help)  ASSERT(help && x)
+	/**
+	 * Check that the given pointer is either NULL or pointing to valid memory.
+	 *
+	 * The assumption here is that valid pointers never point to low
+	 * memory regions.  This helps catching pointers taken from
+	 * struct/class memebers when the struct pointer was NULL.
+	 */
+	#define ASSERT_VALID_PTR(p)         ((void)(LIKELY((p) >= 0x200) ? 0 : __invalid_ptr(p, #p, THIS_FILE, __LINE__)))
 
-		/**
-		 * Check that the given pointer is either NULL or pointing to valid memory.
-		 *
-		 * The assumption here is that valid pointers never point to low
-		 * memory regions.  This helps catching pointers taken from
-		 * struct/class memebers when the struct pointer was NULL.
-		 */
-		#define ASSERT_VALID_PTR(p)  ASSERT((unsigned long)(p) > 0x200)
+	/**
+	 * Check that the given pointer is not pointing to invalid memory.
+	 *
+	 * \see ASSERT_VALID_PTR()
+	 */
+	#define ASSERT_VALID_PTR_OR_NULL(p) ((void)(LIKELY((p == NULL) || ((p) >= 0x200)) ? 0 : __invalid_ptr((p), #p, THIS_FILE, __LINE__)))
 
-		/**
-		 * Check that the given pointer is not pointing to invalid memory.
-		 *
-		 * \see ASSERT_VALID_PTR()
-		 */
-		#define ASSERT_VALID_PTR_OR_NULL(p)  ASSERT((((p) == NULL) || ((unsigned long)(p) >= 0x200)))
-
-		#if !CONFIG_KDEBUG_DISABLE_TRACE
-			#define TRACE  kprintf("%s()\n", __func__)
-			#if COMPILER_VARIADIC_MACROS
-				#define TRACEMSG(msg,...) kprintf("%s(): " msg, __func__, ## __VA_ARGS__)
-			#else
-				INLINE void TRACEMSG(const char *fmt, ...)
-				{
-					va_list va;
-					va_start(va, fmt);
-					kprintf("%s(): ", __func__);
-					kvprintf(fmt, va);
-					va_end(va);
-				}
-			#endif
-		#else
-			#define TRACE  do {} while(0)
-			#define TRACEMSG(...)  do {} while(0)
-		#endif
-
-	#else /* !OS_HOSTED */
-
-		#include <appconfig.h>  /* CONFIG_KDEBUG_ASSERT_NO_TEXT */
-		#include <cpu/attr.h>  /* CPU_HARVARD */
-
-		/* These are implemented in drv/kdebug.c */
-		void kdbg_init(void);
-		void kputchar(char c);
-		int kputnum(int num);
-		void kdump(const void *buf, size_t len);
-		void __init_wall(long *wall, int size);
-
-		#if CPU_HARVARD
-			#include <mware/pgm.h>
-			void kputs_P(const char *PROGMEM str);
-			void kprintf_P(const char *PROGMEM fmt, ...) FORMAT(__printf__, 1, 2);
-			int __assert_P(const char *PROGMEM cond, const char *PROGMEM file, int line);
-			void __trace_P(const char *func);
-			void __tracemsg_P(const char *func, const char *PROGMEM fmt, ...);
-			int __invalid_ptr_P(void *p, const char *PROGMEM name, const char *PROGMEM file, int line);
-			int __check_wall_P(long *wall, int size, const char * PGM_ATTR name, const char * PGM_ATTR file, int line);
-			#define kputs(str)  kputs_P(PSTR(str))
-			#define kprintf(fmt, ...)  kprintf_P(PSTR(fmt) ,## __VA_ARGS__)
-			#define __assert(cond, file, line)  __assert_P(PSTR(cond), PSTR(file), (line))
-			#define __trace(func)  __trace_P(func)
-			#define __tracemsg(func, fmt, ...)  __tracemsg_P(func, PSTR(fmt), ## __VA_ARGS__)
-			#define __invalid_ptr(p, name, file, line)  __invalid_ptr_P((p), PSTR(name), PSTR(file), (line))
-			#define __check_wall(wall, size, name, file, line)  __check_wall_P(wall, size, PSTR(name), PSTR(file), (line))
-		#else /* !CPU_HARVARD */
-			void kputs(const char *str);
-			void kprintf(const char *fmt, ...) FORMAT(__printf__, 1, 2);
-			int __assert(const char *cond, const char *file, int line);
-			void __trace(const char *func);
-			void __tracemsg(const char *func, const char *fmt, ...) FORMAT(__printf__, 2, 3);
-			int __invalid_ptr(void *p, const char *name, const char *file, int line);
-			int __check_wall(long *wall, int size, const char *name, const char *file, int line);
-		#endif /* !CPU_HARVARD */
-
-		#if !CONFIG_KDEBUG_ASSERT_NO_TEXT
-			#define ASSERT(x)         ((void)(LIKELY(x) ? 0 : __assert(#x, THIS_FILE, __LINE__)))
-			#define ASSERT2(x, help)  ((void)(LIKELY(x) ? 0 : __assert(help " (" #x ")", THIS_FILE, __LINE__)))
-		#else
-			#define ASSERT(x)         ((void)(LIKELY(x) ? 0 : __assert("", THIS_FILE, __LINE__)))
-			#define ASSERT2(x, help)  ((void)ASSERT(x))
-		#endif
-
-		#define ASSERT_VALID_PTR(p)         ((void)(LIKELY((p) >= 0x200) ? 0 : __invalid_ptr(p, #p, THIS_FILE, __LINE__)))
-		#define ASSERT_VALID_PTR_OR_NULL(p) ((void)(LIKELY((p == NULL) || ((p) >= 0x200)) ? 0 : __invalid_ptr((p), #p, THIS_FILE, __LINE__)))
-
-		#if !CONFIG_KDEBUG_DISABLE_TRACE
-			#define TRACE  __trace(__func__)
-			#define TRACEMSG(msg,...) __tracemsg(__func__, msg, ## __VA_ARGS__)
-		#else
-			#define TRACE  do {} while(0)
-			#define TRACEMSG(...)  do {} while(0)
-		#endif
-
-	#endif /* !OS_HOSTED */
+	#if !CONFIG_KDEBUG_DISABLE_TRACE
+		#define TRACE  __trace(__func__)
+		#define TRACEMSG(msg,...) __tracemsg(__func__, msg, ## __VA_ARGS__)
+	#else
+		#define TRACE  do {} while(0)
+		#define TRACEMSG(...)  do {} while(0)
+	#endif
 
 	/**
 	 * \name Walls to detect data corruption
