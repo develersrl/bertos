@@ -102,14 +102,23 @@
 	#define CPU_SAVED_REGS_CNT     9
 	#define CPU_STACK_GROWS_UPWARD 0
 	#define CPU_SP_ON_EMPTY_SLOT   0
-	#warning Find a way to detect endianess at compile time
-	#define CPU_BYTE_ORDER         CPU_LITTLE_ENDIAN
 	#define CPU_HARVARD            0
 
 	#ifdef __IAR_SYSTEMS_ICC__
-		#define NOP         __no_operation()
+		#warning Check CPU_BYTE_ORDER
+		#define CPU_BYTE_ORDER (__BIG_ENDIAN__ ? CPU_BIG_ENDIAN : CPU_LITTLE_ENDIAN)
+
+		#define NOP            __no_operation()
 	#else /* !__IAR_SYSTEMS_ICC__ */
-		#define NOP         asm volatile ("mov r0,r0" ::)
+		#if defined(__ARMEB__)
+  			#define CPU_BYTE_ORDER CPU_BIG_ENDIAN
+  		#elif defined(__ARMEL__)
+  			#define CPU_BYTE_ORDER CPU_LITTLE_ENDIAN
+		#else
+			#error Unable to detect ARM endianness!
+  		#endif
+
+		#define NOP            asm volatile ("mov r0,r0" ::)
 
 		/**
 	 	 * Initialization value for registers in stack frame.
@@ -259,7 +268,7 @@
 
 	/*
 	 * If the kernel is in idle-spinning, the processor execute:
-	 * 
+	 *
 	 * IRQ_ENABLE;
 	 * CPU_IDLE;
 	 * IRQ_DISABLE;
