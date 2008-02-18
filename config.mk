@@ -54,6 +54,7 @@ CC      = gcc
 CXX     = g++
 AS      = $(CC) -x assembler-with-cpp
 LD      = $(CC)
+LDXX	= $(CXX)
 OBJCOPY = objcopy
 STRIP   = strip
 INSTALL = cp -a
