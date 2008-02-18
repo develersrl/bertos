@@ -106,6 +106,14 @@
 	do { \
 		sigprocmask(SIG_SETMASK, &old_sigs, NULL); \
 	} while (0)
+
+	#define IRQ_ENABLED() \
+	({ \
+		sigset_t sigs; \
+		sigprocmask(SIG_SETMASK, NULL, &sigs); \
+		sigismember(&sigs, SIGALRM) ? true : false; \
+	 })
+
 #else
 	#define OS_UNIX   0
 	#define OS_POSIX  0
