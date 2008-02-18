@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2005,2008 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
@@ -36,32 +36,6 @@
  *
  * \brief Low-level timer module for Qt emulator (implementation).
  */
-
-/*#*
- *#* $Log$
- *#* Revision 1.6  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.5  2006/02/21 21:28:02  bernie
- *#* New time handling based on TIMER_TICKS_PER_SEC to support slow timers with ticks longer than 1ms.
- *#*
- *#* Revision 1.4  2006/02/17 22:24:21  bernie
- *#* Update POSIX timer emulator.
- *#*
- *#* Revision 1.3  2006/02/10 12:34:52  bernie
- *#* Remove spurious EXTERN_C.
- *#*
- *#* Revision 1.2  2006/01/16 03:30:21  bernie
- *#* Make header C++ friendly.
- *#*
- *#* Revision 1.1  2005/11/27 03:58:18  bernie
- *#* Add POSIX timer emulator.
- *#*
- *#* Revision 1.1  2005/11/27 03:06:36  bernie
- *#* Qt timer emulation.
- *#*
- *#*/
-
 #include <cfg/compiler.h> // hptime.t
 #include <os/hptime.h>
 
@@ -99,4 +73,3 @@ INLINE hptime_t timer_hw_hpread(void)
 {
 	return hptime_get();
 }
-

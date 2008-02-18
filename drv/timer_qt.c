@@ -36,29 +36,6 @@
  *
  * \brief Low-level timer module for Qt emulator (implementation).
  */
-
-/*#*
- *#* $Log$
- *#* Revision 1.6  2006/09/13 18:25:22  bernie
- *#* Fix GCC error.
- *#*
- *#* Revision 1.5  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.4  2006/05/28 12:17:57  bernie
- *#* Drop almost all the Qt3 cruft.
- *#*
- *#* Revision 1.3  2006/02/21 21:28:02  bernie
- *#* New time handling based on TIMER_TICKS_PER_SEC to support slow timers with ticks longer than 1ms.
- *#*
- *#* Revision 1.2  2006/02/20 02:01:35  bernie
- *#* Port to Qt 4.1.
- *#*
- *#* Revision 1.1  2005/11/27 03:06:36  bernie
- *#* Qt timer emulation.
- *#*
- *#*/
-
 #include <cfg/compiler.h> /* hptime.t */
 
 // Qt headers
@@ -148,3 +125,5 @@ INLINE hptime_t timer_hw_hpread(void)
 	return EmulTimer::instance().hpread();
 }
 
+/** Not needed, timer IRQ handler called only for timer source */
+#define timer_hw_triggered() (true)
