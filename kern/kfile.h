@@ -175,6 +175,7 @@ typedef enum KFileType
 	KFT_GENERIC, ///< Generic
 	KFT_SERIAL,  ///< Serial driver
 	KFT_BATTFS,  ///< BattFS file
+	KFT_DATAFLASH, ///< Dataflash
 	KFT_CNT
 } KFileType;
 
