@@ -267,7 +267,7 @@
 		} while (0)
 
 	/*
-	 * If the kernel is in idle-spinning, the processor execute:
+	 * If the kernel is in idle-spinning, the processor executes:
 	 *
 	 * IRQ_ENABLE;
 	 * CPU_IDLE;

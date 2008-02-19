@@ -59,7 +59,7 @@
 
 
 /**
- * Generic putc implementation using \a fd->write.
+ * Generic putc() implementation using \a fd->write.
  */
 int kfile_putc(int _c, struct KFile *fd)
 {
@@ -72,7 +72,7 @@ int kfile_putc(int _c, struct KFile *fd)
 }
 
 /**
- * Generic getc implementation using \a fd->read.
+ * Generic getc() implementation using \a fd->read.
  */
 int kfile_getc(struct KFile *fd)
 {

@@ -33,11 +33,11 @@
  *
  * \brief Virtual KFile I/O interface.
  * KFile is a generic interface for file I/O.
- * Uses an of object oriented model to supply
+ * It uses an object-oriented model to supply
  * a generic interface for drivers to communicate.
- * This module contains only definitions,data structure
+ * This module contains only definitions, the instance structure
  * and an API.
- * Each KFile user should implement at least some core functions.
+ * Each KFile user should implement at least some methods.
  * E.G.
  * If you have a serial driver and want to comply to KFile interface,
  * you have to declare your context structure:
@@ -74,7 +74,7 @@
  * \endcode
  * KFILESERIAL macro helps to ensure that obj passed is really a Serial.
  *
- * KFile interface do not supply the open function: this is done deliberately,
+ * KFile interface do not supply the open function: this is deliberate,
  * because in embedded systems each device has its own init parameters.
  * For the same reason specific file settings (like baudrate for Serial, for example)
  * are demanded to specific driver implementation.
@@ -90,6 +90,7 @@
 
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
+#include <cfg/macros.h>
 
 /* fwd decl */
 struct KFile;
@@ -110,7 +111,7 @@ typedef enum KSeekMode
 
 /**
  * Prototypes for KFile access functions.
- * I/O file function must be ANSI compliant.
+ * I/O file functions must be ANSI compliant.
  * \note A KFile user can choose which function subset to implement,
  *       but has to set to NULL unimplemented features.
  * \{

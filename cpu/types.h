@@ -49,7 +49,7 @@
 
 	typedef uint16_t cpuflags_t; // FIXME
 	typedef unsigned int cpustack_t;
-	#warning Verify following costant
+	#warning Verify following constant
 	#define SIZEOF_CPUSTACK_T 2
 
 #elif CPU_X86
@@ -86,7 +86,7 @@
 	typedef unsigned int cpustack_t;
 	#warning Verify following costant
 	#define SIZEOF_CPUSTACK_T 2
-	
+
 #elif CPU_AVR
 
 	typedef uint8_t cpuflags_t;
