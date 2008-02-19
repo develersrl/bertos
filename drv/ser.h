@@ -171,6 +171,7 @@ void ser_setbaudrate(struct KFileSerial *fd, unsigned long rate);
 void ser_setparity(struct KFileSerial *fd, int parity);
 void ser_settimeouts(struct KFileSerial *fd, mtime_t rxtimeout, mtime_t txtimeout);
 void ser_resync(struct KFileSerial *fd, mtime_t delay);
+int ser_getchar_nowait(struct KFileSerial *fd);
 
 void ser_purgeRx(struct KFileSerial *fd);
 void ser_purgeTx(struct KFileSerial *fd);

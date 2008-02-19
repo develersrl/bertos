@@ -184,21 +184,19 @@ static int ser_getchar(struct Serial *port)
 	return (int)(unsigned char)fifo_pop_locked(&port->rxfifo);
 }
 
-#if 0
 /**
  * Preleva un carattere dal buffer di ricezione.
  * Se il buffer e' vuoto, ser_getchar_nowait() ritorna
  * immediatamente EOF.
  */
-int ser_getchar_nowait(struct Serial *port)
+int ser_getchar_nowait(struct KFileSerial *fd)
 {
-	if (fifo_isempty_locked(&port->rxfifo))
+	if (fifo_isempty_locked(&fd->ser->rxfifo))
 		return EOF;
 
 	/* NOTE: the double cast prevents unwanted sign extension */
-	return (int)(unsigned char)fifo_pop_locked(&port->rxfifo);
+	return (int)(unsigned char)fifo_pop_locked(&fd->ser->rxfifo);
 }
-#endif
 
 
 /**
@@ -467,17 +465,32 @@ void ser_init(struct KFileSerial *fds, unsigned int unit)
  * Since we are master, we have to trigger slave by sending
  * fake chars on the bus.
  */
-static size_t spimaster_read(struct KFile *fd, void *buf, size_t size)
+static size_t spimaster_read(struct KFile *fd, void *_buf, size_t size)
 {
 	KFileSerial *fd_spi = KFILESERIAL(fd);
 
 	ser_flush(&fd_spi->fd);
 	ser_purgeRx(fd_spi);
 
-	for (size_t i = 0; i < size; i++)
+	size_t total_rd = 0;
+	uint8_t *buf = (uint8_t *)_buf;
+	int c;
+
+	while (size--)
+	{
+		/*
+		 * Send and receive chars 1 by 1, otherwise the rxfifo
+		 * will overrun.
+		 */
 		ser_putchar(0, fd_spi->ser);
 
-	return ser_read(&fd_spi->fd, buf, size);
+		if ((c = ser_getchar(fd_spi->ser)) == EOF)
+			break;
+
+		*buf++ = c;
+		total_rd++;
+	}
+	return total_rd;
 }
 
 /**
@@ -510,3 +523,5 @@ void spimaster_init(KFileSerial *fds, unsigned int unit)
 	fds->fd.read = spimaster_read;
 	fds->fd.write = spimaster_write;
 }
+
+
