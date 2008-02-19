@@ -33,7 +33,7 @@
  * \brief Function library for AT45DB081D Flash memory.
  *
  *
- * \version $Id: dflash.h 15402 2007-04-10 09:10:56Z asterix $
+ * \version $Id: dataflash.h 20677 2008-02-19 14:29:52Z batt $
  * \author Daniele Basile <asterix@develer.com>
  */
 
@@ -43,127 +43,87 @@
 
 #include <kern/kfile.h>
 #include <cfg/compiler.h>
-#include <drv/spi.h>
-#include "hw_spi.h"
 
 #include <appconfig.h>
 
-#warning This driver must be test before use!
 
 /**
- * Type definition for dflash memory.
- */
-typedef uint32_t dataflashAddr_t;
-typedef uint32_t dataflashOffset_t;
-typedef uint32_t dataflashSize_t;
-
-#define RESET_PULSE_WIDTH     10 // Width of reset pulse in usec.
-#define BUSY_BIT            0x80 // Select a busy bit in status register.
-#define CMP_BIT             0x40 // Select a compare bit in status register.
-
-/**
- * Select 2,3,4,5 bits of status register, those
- * bits indicate a id of density device (see datasheet for
- * more detail).
- */
-#define GET_ID_DESITY_DEVICE(reg_stat)\
-  do {\
-		reg_stat &= 0x3C;\
-		reg_stat >>= 2;\
-  } while (0)
-
-/**
- * Pin definition.
- *
- * \note RESET and WP are asserted when logic
- * level is low.
+ * Type definitions for dflash memory.
  * \{
  */
-#define RESET                   PC0 ///<  Connect to RESET pin of flash memory
-#define WP                      PC1 ///<  Connect to WP pin of flash memory
-#define DATAFLASH_PORT        PORTC ///<  Micro pin PORT register.
-#define DATAFLASH_PIN          PINC ///<  Micro pin PIN register.
-#define DATAFLASH_DDR          DDRC ///<  Micro pin DDR register.
-/* \} */
+typedef uint32_t dataflash_page_t;
+typedef uint32_t dataflash_offset_t;
+typedef uint32_t dataflash_size_t;
+/*\}*/
 
 /**
- * Pin logic level.
  *
- * \{
  */
-#define RESET_LOW()      do { DATAFLASHs_PORT &= ~BV(RESET); } while(0)
-#define RESET_HIGH()     do { DATAFLASH_PORT |= BV(RESET); } while(0)
-#define WP_LOW()         do { DATAFLASH_PORT &= ~BV(WP); } while(0)
-#define WP_HIGH()        do { DATAFLASH_PORT |= BV(WP); } while(0)
-/* \} */
+typedef void (dataflash_setReset_t)(bool);
+typedef void (dataflash_setCS_t)(bool);
 
 /**
- * Commands pin.
+ * Memory definitions.
  *
- * \note To reset flash memory it needs a pulse
- * long about 10 usec. To do this we insert a
- * for cycle.
- *
- * \{
+ * List of supported memory devices by this drive.
+ * Every time we call dataflash_init() we check device id to
+ * ensure we choose the right memory configuration.
+ * (see dataflash.c for more details).
  */
-#define RESET_OUT()       do { DATAFLASH_DDR |= BV(RESET); } while(0)
-#define WP_OUT()          do { DATAFLASH_DDR |= BV(WP); } while(0)
-#define WRITE_ENABLE()    WP_HIGH()
-#define WRITE_DISABLE()   WP_LOW()
-#define RESET_ENABLE()    RESET_LOW()
-#define RESET_DISABLE()   RESET_HIGH()
-/* \} */
+typedef enum DataflashType
+{
+	DFT_AT45DB041B,
+	DFT_AT45DB081D,
+	DFT_AT45DB161D,
+	DFT_CNT
+} DataflashType;
 
 
 /**
- * Memory definition.
- *
- * \note Below are defined valid flash memory support to
- * this drive. Every time we call dataflash_init() function we check
- * if memory defined are right (see dataflash.c form more detail).
- * \{
+ * Dataflash KFile context structure.
  */
-#define DATAFLASH_AT45DB041B         1
-#define DATAFLASH_AT45DB081D         2
-#define DATAFLASH_AT45DB161D         3
+typedef struct KFileDataflash
+{
+	KFile fd;                       ///< File descriptor.
+	KFile *channel;                 ///< Dataflash comm channel (usually SPI).
+	DataflashType dev;              ///< Memory device type;
+	dataflash_page_t current_page;  ///< Current loaded dataflash page.
+	bool page_dirty;                ///< True if current_page is dirty (needs to be flushed).
+	dataflash_setReset_t *setReset; ///< Callback used to set reset pin of dataflash.
+	dataflash_setCS_t *setCS;       ///< Callback used to set CS pin of dataflash.
+} KFileDataflash;
 
-#if CONFIG_DATA_FLASH == DATAFLASH_AT45DB161D
-	#define DATAFLASH_ID_DEVICE_DENSITY      0xb ///< This indicate AT45DB161D data flah memory.
-	#define DATAFLASH_PAGE_SIZE              528 ///< Number of byte in one page.
-	#define DATAFLASH_PAGE_ADDRESS_BIT        10 ///< Number bit for addressing one page.
-	#define DATAFLASH_NUM_PAGE              4096 ///< Number page in data flash memory.
-#elif CONFIG_DATA_FLASH == DATAFLASH_AT45DB081D
-	#define DATAFLASH_ID_DEVICE_DENSITY      0x9  ///< This indicate AT45DB081D data flah memory.
-	#define DATAFLASH_PAGE_SIZE              264  ///< Number of byte in one page.
-	#define DATAFLASH_PAGE_ADDRESS_BIT         9  ///< Number bit for addressing one page.
-	#define DATAFLASH_NUM_PAGE              4096  ///< Number page in data flash memory.
-#elif CONFIG_DATA_FLASH == DATAFLASH_AT45DB041B
-	#define DATAFLASH_ID_DEVICE_DENSITY      0x7  ///< This indicate AT45DB041B data flah memory.
-	#define DATAFLASH_PAGE_SIZE              264  ///< Number of byte in one page.
-	#define DATAFLASH_PAGE_ADDRESS_BIT         9  ///< Number bit for addressing one page.
-	#define DATAFLASH_NUM_PAGE              2048  ///< Number page in data flash memory.
-#else
-	#error Nothing memory defined in CONFIG_DATA_FLASH are support.
-#endif
-/* \} */
+/**
+ * Convert + ASSERT from generic KFile to KFileDataflash.
+ */
+INLINE KFileDataflash * KFILEDATAFLASH(KFile *fd)
+{
+	ASSERT(fd->_type == KFT_DATAFLASH);
+	return (KFileDataflash *)fd;
+}
 
+#define RESET_PULSE_WIDTH     10 ///< Width of reset pulse in usec.
+#define BUSY_BIT            0x80 ///< Select a busy bit in status register.
+#define CMP_BIT             0x40 ///< Select a compare bit in status register.
+
+/**
+ * Select bits 2-5 of status register. These
+ * bits indicate device density (see datasheet for
+ * more details).
+ */
+#define GET_ID_DESITY_DEVICE(reg_stat) (((reg_stat) & 0x3C) >> 2)
 
 /**
  * Data flash opcode commands.
  */
-typedef enum {
+typedef enum DataFlashOpcode {
 	/**
-	* Read commands data flash.
+	* Dataflash read commands.
 	* \{
 	*/
+	DFO_READ_FLASH_MEM_BYTE_D  = 0x0B, ///< Continuos array read for D type memories.
+	DFO_READ_FLASH_MEM_BYTE_B  = 0xE8, ///< Continuos array read for B type memories.
 
-#if CONFIG_DATA_FLASH == DATAFLASH_AT45DB081D || CONFIG_DATA_FLASH == AT45DB161D
-	DFO_READ_FLASH_MEM_BYTE  = 0x0B, ///< Continuos array read.
-#elif CONFIG_DATA_FLASH == DATAFLASH_AT45DB041B
-	DFO_READ_FLASH_MEM_BYTE  = 0xE8, ///< Continuos array read.
-#else
-	#error No supported memory defined in CONFIG_DATA_FLASH.
-#endif
 	DFO_READ_FLASH_MEM       = 0xD2, ///< Main memory page read.
 	DFO_READ_BUFF1           = 0xD4, ///< SRAM buffer 1 read.
 	DFO_READ_BUFF2           = 0xD6, ///< SRAM buffer 2 read.
@@ -175,36 +135,48 @@ typedef enum {
 	*/
 	DFO_WRITE_BUFF1          =  0x84, ///< SRAM buffer 1 write.
 	DFO_WRITE_BUFF2          =  0x87, ///< SRAM buffer 2 write.
-	DFO_WRITE_BUFF1_TO_MEM_E =  0x83, ///< Buffer 1 to main memory page program with build-in erase.
-	DFO_WRITE_BUFF2_TO_MEM_E =  0x86, ///< Buffer 2 to main memory page program with build-in erase.
-	DFO_WRITE_BUFF1_TO_MEM   =  0x88, ///< Buffer 1 to main memory page program without build-in erase.
-	DFO_WRITE_BUFF2_TO_MEM   =  0x89, ///< Buffer 2 to main memory page program without build-in erase.
+	DFO_WRITE_BUFF1_TO_MEM_E =  0x83, ///< Buffer 1 to main memory page program with built-in erase.
+	DFO_WRITE_BUFF2_TO_MEM_E =  0x86, ///< Buffer 2 to main memory page program with built-in erase.
+	DFO_WRITE_BUFF1_TO_MEM   =  0x88, ///< Buffer 1 to main memory page program without built-in erase.
+	DFO_WRITE_BUFF2_TO_MEM   =  0x89, ///< Buffer 2 to main memory page program without built-in erase.
 	DFO_ERASE_PAGE           =  0x81, ///< Erase page.
 	DFO_ERASE_BLOCK          =  0x50, ///< Erase block.
 	DFO_ERASE_SECTOR         =  0x7C, ///< Erase sector.
-	DFO_WRITE_MEM_TR_BUFF1   =  0x82, ///< Write main memory page program through buffer 1.
-	DFO_WRITE_MEM_TR_BUFF2   =  0x85, ///< Write main memory page program through buffer 2.
+	DFO_WRITE_MEM_TR_BUFF1   =  0x82, ///< Write main memory page through buffer 1.
+	DFO_WRITE_MEM_TR_BUFF2   =  0x85, ///< Write main memory page through buffer 2.
 	/* \}*/
 
 	/**
-	* Additional commands data flash.
+	* Additional dataflash commands.
 	* \{
 	*/
-	DFO_MOV_MEM_TO_BUFF1     =  0x53, ///< Main mmemory to buffer 1 transfer.
-	DFO_MOV_MEM_TO_BUFF2     =  0x55, ///< Main mmemory to buffer 2 transfer.
-	DFO_CMP_MEM_TO_BUFF1     =  0x60, ///< Main mmemory to buffer 1 compare.
-	DFO_CMP_MEM_TO_BUFF2     =  0x61, ///< Main mmemory to buffer 2 compare.
+	DFO_MOV_MEM_TO_BUFF1     =  0x53, ///< Transfer main mmemory to buffer 1.
+	DFO_MOV_MEM_TO_BUFF2     =  0x55, ///< Transfer main mmemory to buffer 2.
+	DFO_CMP_MEM_TO_BUFF1     =  0x60, ///< Compare main mmemory with buffer 1.
+	DFO_CMP_MEM_TO_BUFF2     =  0x61, ///< Compare main mmemory with buffer 2.
 	DFO_ARW_MEM_TR_BUFF1     =  0x58, ///< Auto page rewrite through buffer 1.
 	DFO_ARW_MEM_TR_BUFF2     =  0x59, ///< Auto page rewrite through buffer 2
 	DFO_PWR_DOWN             =  0xB9, ///< Deep power-down.
 	DFO_RESUME_PWR_DOWN      =  0xAB, ///< Resume from deep power-down.
-	DFO_READ_STATUS          =  0xD7, ///< Status register read.
-	DFO_ID_DEV               =  0x9F  ///< Manufacturer and device ID read.
+	DFO_READ_STATUS          =  0xD7, ///< Read status register.
+	DFO_ID_DEV               =  0x9F  ///< Read manufacturer and device ID.
 	/* \}*/
 } DataFlashOpcode;
 
-void dataflash_init(struct _KFile *fd);
-void dataflash_test(void);
+
+/**
+ * Structure used to describe a dataflash memory.
+ */
+typedef struct DataflashInfo
+{
+	uint8_t density_id;       ///< Density id, used to check memory type.
+	dataflash_size_t page_size;       ///< Page size, in bytes.
+	uint8_t page_bits;        ///< Number of bits needed to access a page.
+	uint16_t page_cnt;        ///< Number of pages on memory.
+	DataFlashOpcode read_cmd; ///< Command to be used to perform a continuous array.
+} DataflashInfo;
+
+
+bool dataflash_init(KFileDataflash *fd, KFile *ch, DataflashType type, dataflash_setCS_t *setCS, dataflash_setReset_t *setReset);
 
 #endif /* DRV_DATAFLASH_H */
-
