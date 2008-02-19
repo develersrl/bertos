@@ -94,6 +94,11 @@ typedef struct KFileDataflash
 } KFileDataflash;
 
 /**
+ * ID for dataflash.
+ */
+#define KFT_DATAFLASH MAKE_ID('D', 'F', 'L', 'H')
+
+/**
  * Convert + ASSERT from generic KFile to KFileDataflash.
  */
 INLINE KFileDataflash * KFILEDATAFLASH(KFile *fd)

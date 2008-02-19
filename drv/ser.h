@@ -158,6 +158,12 @@ typedef struct KFileSerial
 	Serial *ser;
 } KFileSerial;
 
+/**
+ * ID for serial.
+ */
+#define KFT_SERIAL MAKE_ID('S', 'E', 'R', 'L')
+
+
 INLINE KFileSerial * KFILESERIAL(KFile *fd)
 {
 	ASSERT(fd->_type == KFT_SERIAL);

@@ -207,7 +207,7 @@ typedef struct BattFsSuper
 
 	disk_size_t disk_size;   ///< Size of the disk, in bytes (page_count * page_size).
 	disk_size_t free_bytes;  ///< Free space on the disk.
-	
+
 	List file_opened_list;       ///< List used to keep trace of open files.
 	/* TODO add other fields. */
 } BattFsSuper;
@@ -237,6 +237,11 @@ typedef struct KFileBattFs
 	filemode_t mode;    ///< File open mode
 	pgcnt_t *start;     ///< Pointer to page_array file start position.
 } KFileBattFs;
+
+/**
+ * Id for battfs file descriptors.
+ */
+#define KFT_BATTFS MAKE_ID('B', 'T', 'F', 'S')
 
 /**
  * Macro used to cast a KFile to a KFileBattFs.

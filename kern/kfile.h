@@ -165,21 +165,6 @@ typedef void (*ClearErrFunc_t) (struct KFile *fd);
 /* \} */
 
 /**
- * KFile type.
- * Used at runtime and in debug mode only to check
- * "dynamic casts".
- * \note Add here new KFile types.
- */
-typedef enum KFileType
-{
-	KFT_GENERIC, ///< Generic
-	KFT_SERIAL,  ///< Serial driver
-	KFT_BATTFS,  ///< BattFS file
-	KFT_DATAFLASH, ///< Dataflash
-	KFT_CNT
-} KFileType;
-
-/**
  * Context data for callback functions which operate on
  * pseudo files.
  * \note If you change interface, remember to add corresponding access function.
@@ -194,17 +179,12 @@ typedef struct KFile
 	FlushFunc_t    flush;
 	ErrorFunc_t    error;
 	ClearErrFunc_t clearerr;
-	DB(KFileType _type); ///< Used to keep trace, at runtime, of obj type.
+	DB(id_t _type); ///< Used to keep trace, at runtime, of obj type.
 
 	/* NOTE: these must _NOT_ be size_t on 16bit CPUs! */
 	uint32_t seek_pos;
 	uint32_t size;
 } KFile;
-
-/**
- * Check if \a fd is a generic KFile type.
- */
-#define KFILE_ASSERT_GENERIC(fd) ASSERT(fd->_type == KFT_GENERIC)
 
 /**
  * Generic implementation of kfile_seek.
