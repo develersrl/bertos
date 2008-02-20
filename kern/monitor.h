@@ -64,7 +64,7 @@ void monitor_start(size_t stacksize, cpustack_t *stack);
  * the interrupt supervisor stack).
  *
  * \note For this function to work, the stack must have been filled at startup with
- * #CONFIG_KERN_STACKFILLCODE.
+ * CONFIG_KERN_STACKFILLCODE.
  */
 size_t monitor_checkStack(cpustack_t *stack_base, size_t stack_size);
 

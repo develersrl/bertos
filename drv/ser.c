@@ -364,6 +364,7 @@ static int ser_flush(struct KFile *fd)
 /**
  * Initialize a serial port.
  *
+ * \param fd KFile Serial struct interface.
  * \param unit  Serial unit to open. Possible values are architecture dependant.
  */
 static struct Serial *ser_open(struct KFileSerial *fd, unsigned int unit)

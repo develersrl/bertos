@@ -295,7 +295,7 @@ static size_t flash25_write(struct KFile *fd, const void *_buf, size_t size)
  *
  * Erase a select \p sector of serial flash memory.
  *
- * \Note A sector size is FLASH25_SECTOR_SIZE.
+ * \note A sector size is FLASH25_SECTOR_SIZE.
  * This operation could take a while.
  */
 void flash25_sectorErase(Flash25Sector sector)
@@ -343,7 +343,7 @@ void flash25_sectorErase(Flash25Sector sector)
  *
  * Erase all sector of serial flash memory.
  *
- * \Note This operation could take a while.
+ * \note This operation could take a while.
  */
 void flash25_chipErase(void)
 {
