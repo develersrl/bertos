@@ -269,9 +269,9 @@
 #define TC2_IDR        (*((reg32_t *)(TC_BASE + TC_TC2_OFF + TC_IDR_OFF))) ///< Channel 2 interrupt disable register address.
 
 #define TC_IMR_OFF              0x0000002C      ///< Interrupt Mask Register offset.
-#define TC0_IMR        (*((reg32_t *)(TC_BASE + TC_TC0_OFF + TC_SR_OFF))) ///< Channel 0 interrupt mask register address.
-#define TC1_IMR        (*((reg32_t *)(TC_BASE + TC_TC1_OFF + TC_SR_OFF))) ///< Channel 1 interrupt mask register address.
-#define TC2_IMR        (*((reg32_t *)(TC_BASE + TC_TC2_OFF + TC_SR_OFF))) ///< Channel 2 interrupt mask register address.
+#define TC0_IMR        (*((reg32_t *)(TC_BASE + TC_TC0_OFF + TC_IMR_OFF))) ///< Channel 0 interrupt mask register address.
+#define TC1_IMR        (*((reg32_t *)(TC_BASE + TC_TC1_OFF + TC_IMR_OFF))) ///< Channel 1 interrupt mask register address.
+#define TC2_IMR        (*((reg32_t *)(TC_BASE + TC_TC2_OFF + TC_IMR_OFF))) ///< Channel 2 interrupt mask register address.
 
 #define TC_COVFS                         0      ///< Counter overflow flag.
 #define TC_LOVRS                         1      ///< Load overrun flag.
