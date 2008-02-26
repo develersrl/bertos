@@ -18,20 +18,6 @@
 -include pgm_config.mk
 DPROG ?= -V -c stk500 -P /dev/ttyS0
 
-# AVR ISP dongle that blows up easily
-#DPROG = -V -c stk500 -P /dev/ttyS0
-#DPROG = -V -c jtag2slow
-#-P /dev/ttyUSB0
-
-# STK200 parallel cable
-#DPROG = -c stk200 -E noreset
-
-# JTAG ICE mkII
-#DPROG = avarice --mkII -j usb -l
-
-# PonyProg serial programmer
-#DPROG = -c dasa2
-
 # Set to 1 to build for embedded devices.
 # e.g. produce target.elf instead of target and target_nostrip
 EMBEDDED_TARGET = 1
