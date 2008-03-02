@@ -53,24 +53,22 @@ memory footprint requirements.
 
 The modules are sorted in subdirectories by their category:
 
-  - algos/   : algorithms;
+  - algo/    : algorithms;
   - app/     : demo application;
   - cfg/     : configuration stuff;
-  - cxxutil/ : c++ libraries;
   - doc/     : documentation;
   - drv/     : hardware drivers;
-  - dt/	     : ?
+  - dt/	     : experimental object oriented gui toolkit;
   - emul/    : Qt-based emulator framework for embedded applications;
-  - fonts/   : fonts
+  - fonts/   : fonts;
+  - fs/      : file system related stuff;
   - gfx/     : general purpose graphics routines;
   - gui/     : widgets for simple displays;
   - hw/	     : hardware-specific declarations;
   - icons/   : conversion tool from image TXT format to LCD bitmap;
-  - io/	     : infrastructure of I/O-related modules for hosted applications;
   - kern/    : multitasking kernel;
   - mware/   : algorithms, containers and other standalone code;
   - os/	     : OS-abstraction layers for hosted environments;
-  - qtext    : ?
 
 The top-level directory contains a few support headers that are meant to be
 usable by any C/C++ embedded or hosted application.
