@@ -3,13 +3,8 @@
 # Copyright 2002,2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
 # All rights reserved.
 #
-# Based on:
-#   GCC-AVR standard Makefile part 1
-#   Volker Oth 1/2000
-#
 # Author: Bernardo Innocenti <bernie@develer.com>
-#
-# $Log$
+# Based on: GCC-AVR standard Makefile part 1, Volker Oth 1/2000
 #
 
 #

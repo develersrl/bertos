@@ -61,6 +61,14 @@ endif
 docs:
 	$Q $(DOXYGEN)
 
+# Generate ctags
+tags:
+	ctags -R --exclude=doc
+
+# Run testsuite
+check:
+	./run_tests.sh
+
 define build_target
 
 ifneq ($$(strip $$($(1)_MCU)),)
