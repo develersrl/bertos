@@ -180,6 +180,7 @@
 	#define USED_FUNC               __attribute__((__used__))
 	#define RESTRICT                __restrict__
 	#define MUST_CHECK              __attribute__((warn_unused_result))
+	#define PACKED                  __attribute__((packed))
 	#if GNUC_PREREQ(3,1)
 		#define DEPRECATED  __attribute__((__deprecated__))
 	#endif
@@ -309,6 +310,10 @@
 #ifndef MUST_CHECK
 #define MUST_CHECK             /* nothing */
 #endif
+#ifndef PACKED
+#define PACKED                 /* nothing */
+#endif
+
 
 /* Misc definitions */
 #ifndef NULL
