@@ -60,13 +60,33 @@
 		typeof(a) _a = (a); \
 		typeof(b) _b = (b); \
 		ASSERT_TYPE_EQUAL(_a, _b); \
-		(_a < _b) ? _a : _b; \
+		/** \
+		 * The (typeof(_a)) cast in necessary: \
+		 * result type of conditional expressions is \
+		 * *NOT* the type of the value returned but \
+		 * the type that would be produced if _a and _b \
+		 * were mixed in an expression. \
+		 * Even in _a and _b are of the same type, \
+		 * if mixed in an expression the type will be \
+		 * promoted to int! \
+		*/ \
+		((typeof(_a))((_a < _b) ? _a : _b)); \
 	})
 	#define MAX(a,b) ({ \
 		typeof(a) _a = (a); \
 		typeof(b) _b = (b); \
 		ASSERT_TYPE_EQUAL(_a, _b); \
-		(_a > _b) ? _a : _b; \
+		/** \
+		 * The (typeof(_a)) cast in necessary: \
+		 * result type of conditional expressions is \
+		 * *NOT* the type of the value returned but \
+		 * the type that would be produced if _a and _b \
+		 * were mixed in an expression. \
+		 * Even in _a and _b are of the same type, \
+		 * if mixed in an expression the type will be \
+		 * promoted to int! \
+		*/ \
+		((typeof(_a))((_a > _b) ? _a : _b)); \
 	})
 #else /* !(COMPILER_STATEMENT_EXPRESSIONS && COMPILER_TYPEOF) */
 	/* Buggy macros for inferior compilers.  */
