@@ -33,7 +33,7 @@
  *
  * \brief High level serial I/O API
  *
- * \version $Id: ser.h 19505 2007-10-19 10:18:35Z asterix $
+ * \version $Id: ser_at91.h 20552 2008-02-14 16:40:41Z batt $
  * \author Daniele Basile <asterix@develer.com>
  */
 
@@ -42,6 +42,7 @@
 
 #include <cfg/macros.h> /* BV() */
 #include <cfg/compiler.h>  /* uint32_t */
+#include <cpu/detect.h>  /* CPU_* */
 
 /** \name Serial Error/status flags. */
 /*\{*/
@@ -71,7 +72,10 @@ enum
 {
 SER_UART0,
 SER_UART1,
-SER_SPI,
+SER_SPI0,
+#if CPU_ARM_AT91SAM7X128 || CPU_ARM_AT91SAM7X256
+SER_SPI1,
+#endif
 SER_CNT  /**< Number of serial ports */
 };
 /*\}*/
