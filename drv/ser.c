@@ -85,33 +85,29 @@
 #endif
 
 
-/* Serial configuration parameters */
-#define SER_CTSDELAY	    70	/**< CTS line retry interval (ms) */
-#define SER_TXPOLLDELAY	     2	/**< Transmit buffer full retry interval (ms) */
-#define SER_RXPOLLDELAY	     2	/**< Receive buffer empty retry interval (ms) */
-
-
 struct Serial ser_handles[SER_CNT];
 
-
 /**
- * Inserisce il carattere c nel buffer di trasmissione.
- * Questa funzione mette il processo chiamante in attesa
- * quando il buffer e' pieno.
+ * Insert \a c in tx FIFO buffer.
+ * \note This function will switch out the calling process
+ * if the tx buffer is full. If the buffer is full
+ * and \a port->txtimeout is 0 return EOF immediatly.
  *
- * \return EOF in caso di errore o timeout, altrimenti
- *         il carattere inviato.
+ * \return EOF on error or timeout, \a c otherwise.
  */
 static int ser_putchar(int c, struct Serial *port)
 {
-	//ASSERT_VALID_FIFO(&port->txfifo);
 	if (fifo_isfull_locked(&port->txfifo))
 	{
 #if CONFIG_SER_TXTIMEOUT != -1
+		/* If timeout == 0 we don't want to wait */
+		if (port->txtimeout == 0)
+			return EOF;
+
 		ticks_t start_time = timer_clock();
 #endif
 
-		/* Attende finche' il buffer e' pieno... */
+		/* Wait while buffer is full... */
 		do
 		{
 			wdt_reset();
@@ -141,19 +137,22 @@ static int ser_putchar(int c, struct Serial *port)
 
 
 /**
- * Preleva un carattere dal buffer di ricezione.
- * Questa funzione mette il processo chiamante in attesa
- * quando il buffer e' vuoto. L'attesa ha un timeout
- * di ser_rxtimeout millisecondi.
+ * Fetch a character from the rx FIFO buffer.
+ * \note This function will switch out the calling process
+ * if the rx buffer is empty. If the buffer is empty
+ * and \a port->rxtimeout is 0 return EOF immediatly.
  *
- * \return EOF in caso di errore o timeout, altrimenti
- *         il carattere ricevuto.
+ * \return EOF on error or timeout, \a c otherwise.
  */
 static int ser_getchar(struct Serial *port)
 {
 	if (fifo_isempty_locked(&port->rxfifo))
 	{
 #if CONFIG_SER_RXTIMEOUT != -1
+		/* If timeout == 0 we don't want to wait for chars */
+		if (port->rxtimeout == 0)
+			return EOF;
+
 		ticks_t start_time = timer_clock();
 #endif
 		/* Wait while buffer is empty */
@@ -185,9 +184,10 @@ static int ser_getchar(struct Serial *port)
 }
 
 /**
- * Preleva un carattere dal buffer di ricezione.
- * Se il buffer e' vuoto, ser_getchar_nowait() ritorna
- * immediatamente EOF.
+ * Fetch a character from the rx FIFO buffer.
+ * If the buffer is empty, ser_getchar_nowait() returns
+ * EOF immediatly.
+ * \note Deprecated, use ser_getchar with rx_timeout set to 0.
  */
 int ser_getchar_nowait(struct KFileSerial *fd)
 {
@@ -197,6 +197,7 @@ int ser_getchar_nowait(struct KFileSerial *fd)
 	/* NOTE: the double cast prevents unwanted sign extension */
 	return (int)(unsigned char)fifo_pop_locked(&fd->ser->rxfifo);
 }
+
 
 
 /**
