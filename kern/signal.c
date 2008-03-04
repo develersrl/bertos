@@ -43,6 +43,15 @@
  * signals.  POSIX signals are usually executed synchronously, like
  * software interrupts.
  *
+ * Signals are very low overhead.  Using them exclusively to wait
+ * for multiple asynchronous events results in very simple dispatch
+ * logic with low processor and resource usage.
+ *
+ * The "event" module is a higher-level interface that can optionally
+ * deliver signals to processes.  Messages provide even higher-level
+ * IPC services built on signals.  Semaphore arbitration is also
+ * implemented using signals.
+ *
  * In this implementation, each process has a limited set of signal
  * bits (usually 32) and can wait for multiple signals at the same
  * time using sig_wait().  Signals can also be polled using sig_check(),
@@ -58,31 +67,33 @@
  * delivered twice before the process can notice.
  *
  * Any execution context, including an interrupt handler, can deliver
- * a signal to a process using sig_signal().  Multiple distinct signals
+ * a signal to a process using sig_signal().  Multiple independent signals
  * may be delivered at once with a single invocation of sig_signal(),
  * although this is rarely useful.
+ *
+ * \section signal_allocation Signal Allocation
  *
  * There's no hardcoded mapping of specific events to signal bits.
  * The meaning of a particular signal bit is defined by an agreement
  * between the delivering entity and the receiving process.
- * For instance, a terminal driver may be written to deliver
+ * For instance, a terminal driver may be designed to deliver
  * a signal bit called SIG_INT when it reads the CTRL-C sequence
  * from the keyboard, and a process may react to it by quitting.
  *
- * The SIG_SINGLE bit is reserved for a special purpose (this is
- * more a suggestion than a constraint).  When a process wants
- * wait for a single event on the fly, it needs not allocate a
- * free signal from its pool.  Instead, SIG_SINGLE can be used
+ * \section sig_single SIG_SINGLE
  *
- * The "event" module is a higher-level interface that can optionally
- * deliver signals to processes.  Messages provide even higher-level
- * IPC services built on signals.  Semaphore arbitration is also
- * implemented using signals.
- *
- * Signals are very low overhead.  Using them exclusively to wait
- * for multiple asynchronous events results in very simple dispatch
- * logic with low processor and resource usage.
- *
+ * The SIG_SINGLE bit is reserved as a convenient shortcut in those
+ * simple scenarios where a process needs to wait on just one event
+ * synchronously.  By using SIG_SINGLE, there's no need to allocate
+ * a specific signal from the free pool.  The constraints for safely
+ * accessing SIG_SINGLE are:
+ *  - The process MUST sig_wait() exclusively on SIG_SINGLE
+ *  - SIG_SIGNAL MUST NOT be left pending after use (sig_wait() will reset
+ *	  it automatically)
+ *  - Do not sleep between starting the asynchronous task that will fire
+ *    SIG_SINGLE, and the call to  sig_wait().
+ *  - Do not call system functions that may implicitly sleep, such as
+ *    timer_delayTickes().
  *
  * \version $Id$
  *
