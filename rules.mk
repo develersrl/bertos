@@ -59,15 +59,20 @@ endif
 # Generate project documentation
 .PHONY: docs
 docs:
+	$L "Building documentation"
 	$Q $(DOXYGEN)
 
 # Generate ctags
+.PHONY: tags
 tags:
-	ctags -R --exclude=doc
+	$L "Rebuilding C tags database"
+	$Q ctags -R --exclude=doc
 
 # Run testsuite
+.PHONY: check
 check:
-	./run_tests.sh
+	$L "Running testsuite"
+	$Q ./run_tests.sh
 
 define build_target
 
