@@ -69,33 +69,14 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.5  2006/09/20 13:54:40  marco
- *#* Added new SPI definitions.
- *#*
- *#* Revision 1.4  2006/07/19 12:56:25  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.3  2006/06/12 21:37:01  marco
- *#* implemented some commands (ver and sleep)
- *#*
- *#* Revision 1.2  2006/06/01 12:29:21  marco
- *#* Add first simple protocol command (version request).
- *#*
- *#* Revision 1.1  2006/05/18 00:41:47  bernie
- *#* New triface devlib application.
- *#*
- *#*/
-
 #ifndef APPCONFIG_TRIFACE_H
 #define APPCONFIG_TRIFACE_H
 
 /** Baud-rate for the kdebug console */
-#define CONFIG_KDEBUG_BAUDRATE  38400
+#define CONFIG_KDEBUG_BAUDRATE  115200
 
 /** Serial port number for kdebug console */
-#define CONFIG_KDEBUG_PORT  0
+#define CONFIG_KDEBUG_PORT  1
 
 
 /**
@@ -162,8 +143,14 @@
 	/** Default baud rate (set to 0 to disable) */
 	#define CONFIG_SER_DEFBAUDRATE   0
 
+	/** Host Port Baud Rate */
+	#define CONFIG_SER_HOSTPORTBAUDRATE	115200
+	
+	/** Host Port */
+	#define CONFIG_SER_HOSTPORT 1
+
 	/** Enable ser_gets() and ser_gets_echo() */
-	#define CONFIG_SER_GETS          1
+	#define CONFIG_SER_GETS          0
 
 	/** Enable second serial port in emulator. */
 	#define CONFIG_EMUL_UART1        0
@@ -179,15 +166,68 @@
 /*\}*/
 
 /// Hardware timer selection for drv/timer.c
-#define CONFIG_TIMER  TIMER_ON_OUTPUT_COMPARE0
+#define CONFIG_TIMER  TIMER_ON_OUTPUT_COMPARE2
 
 /// Debug timer interrupt using a strobe pin.
 #define CONFIG_TIMER_STROBE  0
 
+/// Enable ADS strobe.
+#define CONFIG_ADC_STROBE  0
+
 /// Enable watchdog timer.
 #define CONFIG_WATCHDOG  0
 
-/// Enable internal parser commands.
-#define CONFIG_INTERNAL_COMMANDS  0
+/// EEPROM type for drv/eeprom.c
+#define CONFIG_EEPROM_TYPE EEPROM_24XX256
+
+/// Select bitmap pixel format.
+#define CONFIG_BITMAP_FMT  BITMAP_FMT_PLANAR_V_LSB
+
+/// Enable line clipping algorithm.
+#define CONFIG_GFX_CLIPPING  1
+
+/// Enable text rendering in bitmaps.
+#define CONFIG_GFX_TEXT  1
+
+/// Enable virtual coordinate system.
+#define CONFIG_GFX_VCOORDS  1
+
+/// Keyboard polling method
+#define CONFIG_KBD_POLL  KBD_POLL_SOFTINT
+
+/// Enable keyboard event delivery to observers
+#define CONFIG_KBD_OBSERVER  0
+
+/// Enable key beeps
+#define CONFIG_KBD_BEEP  1
+
+/// Enable long pression handler for keys
+#define CONFIG_KBD_LONGPRESS  1
+
+/**
+ * \name Type for the chart dataset
+ * \{
+ */
+#define CONFIG_CHART_TYPE_X uint8_t
+#define CONFIG_CHART_TYPE_Y uint8_t
+/*\}*/
+
+/// Enable button bar behind menus
+#define CONFIG_MENU_MENUBAR  0
+
+/// Enable smooth scrolling in menus
+#define CONFIG_MENU_SMOOTH  1
+
+/// Size of block for MD2 algorithm.
+#define CONFIG_MD2_BLOCK_LEN 16
+
+/// Use standard permutation in MD2 algorithm.
+#define CONFIG_MD2_STD_PERM 0
+
+/// Define a size, in byte, of entropy pool.
+#define CONFIG_SIZE_ENTROPY_POOL 64
+
+/// Turn on or off timer support in Randpool.
+#define CONFIG_RANDPOOL_TIMER 1
 
 #endif /* APPCONFIG_TRIFACE_H */

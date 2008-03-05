@@ -26,9 +26,10 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2006 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
- * -->
+ * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2000 Bernardo Innocenti <bernie@codewiz.org>
+ *
+ * --> Rights Reserved.
  *
  * \brief Hardware-specific definitions
  *
@@ -36,13 +37,6 @@
  *
  * \author Bernardo Innocenti <bernie@develer.com>
  */
-
-/*#*
- *#* $Log$
- *#* Revision 1.1  2006/05/18 00:41:47  bernie
- *#* New triface devlib application.
- *#*
- *#*/
 
 #ifndef TRIFACE_HW_H
 #define TRIFACE_HW_H
@@ -61,3 +55,4 @@
 //#endif /* CONFIG_TIMER_STROBE */
 
 #endif /* TRIFACE_HW_H */
+

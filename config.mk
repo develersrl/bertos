@@ -30,14 +30,13 @@ DEBUGCFLAGS = -ggdb
 #
 # define some variables based on the AVR base path in $(AVR)
 #
-#CROSS   = avr-
-CC      = gcc
-CXX     = g++
+CROSS   = avr-
+CC      = $(CROSS)gcc
+CXX     = $(CROSS)g++
 AS      = $(CC) -x assembler-with-cpp
 LD      = $(CC)
-LDXX	= $(CXX)
-OBJCOPY = objcopy
-STRIP   = strip
+OBJCOPY = $(CROSS)objcopy
+STRIP   = $(CROSS)strip
 INSTALL = cp -a
 RM      = rm -f
 RM_R    = rm -rf
@@ -84,7 +83,7 @@ endif
 WARNFLAGS = \
 	-W -Wformat -Wall -Wundef -Wpointer-arith -Wcast-qual \
 	-Wcast-align -Wwrite-strings -Wsign-compare \
-	-Wmissing-noreturn \
+	-Wmissing-prototypes -Wmissing-noreturn \
 	-Wextra -Wstrict-aliasing=2 \
 #	-Wunsafe-loop-optimizations
 

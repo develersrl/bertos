@@ -26,7 +26,8 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2006 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2000 Bernardo Innocenti <bernie@codewiz.org>
  *
  * -->
  *
@@ -38,24 +39,45 @@
  * \brief Windowing system test.
  */
 
+
 #include <drv/timer.h>
 #include <drv/buzzer.h>
 #include <drv/ser.h>
 #include <cfg/macros.h>
 #include <mware/parser.h>
+#include <net/keytag.h>
+#include <drv/sipo.h>
 
 #include "protocol.h"
+#include "hw_input.h"
+#include "hw_adc.h"
 
 int main(void)
 {
+	/* SPI Port Initialization */
+	sipo_init();
+
 	kdbg_init();
 	timer_init();
-//	buz_init();
+	adc_init();
+	buz_init();
 
 	IRQ_ENABLE;
+	INPUT_INIT;
 
-	Serial *host_port = ser_open(0);
-	ser_setbaudrate(host_port, 38400);
+	/* Initialize Tag serial port and data structure */
+	TagPacket pkt;
+
+	/* Open the main communication port */
+	Serial *host_port = ser_open(CONFIG_SER_HOSTPORT);
+	ser_setbaudrate(host_port, CONFIG_SER_HOSTPORTBAUDRATE);
+
+	pkt.tag_ser = ser_open(TAG_SER_PORT);
+	ser_setbaudrate(pkt.tag_ser, TAG_SER_BAUDRATE);
+	pkt.comm_ser = host_port;
+	keytag_init(&pkt);
+
+
 
 	protocol_init(host_port);
 
@@ -63,6 +85,7 @@ int main(void)
 	for(;;)
 	{
 		protocol_run(host_port);
+		keytag_poll(&pkt);
 	}
 
 	return 0;

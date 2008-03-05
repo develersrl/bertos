@@ -36,6 +36,7 @@
  *
  * \author Marco Benelli <marco@develer.com>
  */
+
 #ifndef CMD_CTOR_H
 #define CMD_CTOR_H
 
@@ -45,17 +46,17 @@
 
 #define REGISTER_CMD(NAME) REGISTER_FUNCTION(&cmd_ ## NAME ## _template)
 
-#define MAKE_TEMPLATE(NAME, ARGS, RES)					\
+#define MAKE_TEMPLATE(NAME, ARGS, RES, FLAGS)				\
 const struct CmdTemplate cmd_ ## NAME ## _template =			\
 {									\
-	#NAME, ARGS, RES, cmd_ ## NAME, 0				\
+	#NAME, ARGS, RES, cmd_ ## NAME, FLAGS				\
 };
 
-#define MAKE_CMD(NAME, ARGS, RES, BODY)					\
+#define MAKE_CMD(NAME, ARGS, RES, BODY, FLAGS)				\
 static ResultCode cmd_ ## NAME (parms *args)				\
 {									\
 	return (ResultCode)BODY;			      		\
 }									\
-MAKE_TEMPLATE(NAME, ARGS, RES)
+MAKE_TEMPLATE(NAME, ARGS, RES, FLAGS)
 
 #endif // CMD_CTOR_H

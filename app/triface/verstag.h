@@ -26,8 +26,8 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2003, 2004, 2005, 2006 Develer S.r.l. (http://www.develer.com/)
- * Copyright 2001, 2002, 2003 by Bernardo Innocenti <bernie@codewiz.org>
+ * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2000 Bernardo Innocenti <bernie@codewiz.org>
  *
  * -->
  *
@@ -49,7 +49,7 @@
 #define APP_AUTHOR "Develer"
 #define APP_COPYRIGHT "Copyright 2006 Develer (http://www.develer.com/)"
 
-#define VERS_MAJOR 0
+#define VERS_MAJOR 1
 #define VERS_MINOR 1
 #define VERS_REV   0
 #define VERS_LETTER ""

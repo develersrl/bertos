@@ -26,7 +26,9 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2006 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2000 Bernardo Innocenti <bernie@codewiz.org>
+ *
  * -->
  *
  * \brief Implementation of the command protocol between the board and the host
@@ -41,13 +43,16 @@
 
 #include "protocol.h"
 
-#include <drv/ser.h>
+
 #include <drv/timer.h>
+#include <drv/ser.h>
 #include <mware/readline.h>
 #include <mware/parser.h>
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
-#include <verstag.h>
+#include <drv/sipo.h>
+#include <drv/wdt.h>
+#include "hw_adc.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -55,6 +60,12 @@
 //#include <cmd_hunk.h>
 
 #include "cmd_ctor.h"  // MAKE_CMD, REGISTER_CMD
+#include "hw_input.h"
+#include "verstag.h"
+#include <drv/buzzer.h>
+
+// Define the format string for ADC
+#define ADC_FORMAT_STR "dddd"
 
 // DEBUG: set to 1 to force interactive mode
 #define FORCE_INTERACTIVE         1
@@ -71,11 +82,10 @@ static bool interactive;
 /// Readline context, used for interactive mode.
 static struct RLContext rl_ctx;
 
-
+uint8_t reg_status_dout;
 /**
  * Send a NAK asking the host to send the current message again.
  *
- * \param ser  serial port handle to output to.
  * \param err  human-readable description of the error for debug purposes.
  */
 INLINE void NAK(Serial *ser, const char *err)
@@ -85,6 +95,11 @@ INLINE void NAK(Serial *ser, const char *err)
 #else
 	ser_printf(ser, "NAK\r\n");
 #endif
+}
+
+static void protocol_prompt(Serial *ser)
+{
+	ser_print(ser, ">> ");
 }
 
 /*
@@ -97,7 +112,6 @@ static bool protocol_reply(Serial *s, const struct CmdTemplate *t,
 	unsigned short offset = strlen(t->arg_fmt) + 1;
 	unsigned short nres = strlen(t->result_fmt);
 
-	ser_printf(s, "0");
 	for (unsigned short i = 0; i < nres; ++i)
 	{
 		if (t->result_fmt[i] == 'd')
@@ -108,6 +122,7 @@ static bool protocol_reply(Serial *s, const struct CmdTemplate *t,
 		{
 			ser_printf(s, " %s", args[offset+i].s);
 		}
+
 		else
 		{
 			abort();
@@ -125,7 +140,8 @@ static void protocol_parse(Serial *ser, const char *buf)
 	templ = parser_get_cmd_template(buf);
 	if (!templ)
 	{
-		ser_print(ser, "-1 Invalid command.");
+		ser_print(ser, "-1 Invalid command.\r\n");
+		protocol_prompt(ser);
 		return;
 	}
 
@@ -134,7 +150,8 @@ static void protocol_parse(Serial *ser, const char *buf)
 	/* Args Check.  TODO: Handle different case. see doc/PROTOCOL .  */
 	if (!parser_get_cmd_arguments(buf, templ, args))
 	{
-		ser_print(ser, "-2 Invalid arguments.");
+		ser_print(ser, "-2 Invalid arguments.\r\n");
+		protocol_prompt(ser);
 		return;
 	}
 
@@ -147,6 +164,8 @@ static void protocol_parse(Serial *ser, const char *buf)
 	{
 		NAK(ser, "Invalid return format.");
 	}
+
+	protocol_prompt(ser);
 	return;
 }
 
@@ -168,15 +187,20 @@ void protocol_run(Serial *ser)
 		// check message minimum length
 		if (linebuf[0])
 		{
-			if (linebuf[0] == 0x1B && linebuf[1] == 0x1B)  // ESC
+			/* If we enter lines beginning with sharp(#)
+			they are stripped out from commands */
+			if(linebuf[0] != '#')
 			{
-				interactive = true;
-				ser_printf(ser,
-					   "Entering interactive mode\r\n");
-			}
-			else
-			{
-				protocol_parse(ser, linebuf);
+				if (linebuf[0] == 0x1B && linebuf[1] == 0x1B)  // ESC
+				{
+					interactive = true;
+					ser_printf(ser,
+						"Entering interactive mode\r\n");
+				}
+				else
+				{
+					protocol_parse(ser, linebuf);
+				}
 			}
 		}
 	}
@@ -194,25 +218,30 @@ void protocol_run(Serial *ser)
 		 */
 		buf = rl_readline(&rl_ctx);
 
-		if (buf && buf[0] != '\0')
+		/* If we enter lines beginning with sharp(#)
+		they are stripped out from commands */
+		if(buf && buf[0] != '#')
 		{
-			// exit special case to immediately change serial input
-			if (!strcmp(buf, "exit") || !strcmp(buf, "quit"))
+			if (buf[0] != '\0')
 			{
-				rl_clear_history(&rl_ctx);
-				ser_printf(ser,
-					   "Leaving interactive mode...\r\n");
-				interactive = FORCE_INTERACTIVE;
-			}
-			else
-			{
-				//TODO: remove sequence numbers
-				linebuf[0] = '0';
-				linebuf[1] = ' ';
+				// exit special case to immediately change serial input
+				if (!strcmp(buf, "exit") || !strcmp(buf, "quit"))
+				{
+					rl_clear_history(&rl_ctx);
+					ser_printf(ser,
+						"Leaving interactive mode...\r\n");
+					interactive = FORCE_INTERACTIVE;
+				}
+				else
+				{
+					//TODO: remove sequence numbers
+					linebuf[0] = '0';
+					linebuf[1] = ' ';
 
-				strncpy(linebuf + 2, buf, sizeof(linebuf) - 3);
-				linebuf[sizeof(linebuf) - 1] = '\0';
-				protocol_parse(ser, linebuf);
+					strncpy(linebuf + 2, buf, sizeof(linebuf) - 3);
+					linebuf[sizeof(linebuf) - 1] = '\0';
+					protocol_parse(ser, linebuf);
+				}
 			}
 		}
 	}
@@ -225,26 +254,91 @@ void protocol_run(Serial *ser)
  *
  */
 
-/* Version. Example of declaring function and passing it to MAKE_CMD.  */
-static int ver_fn(const char **str)
-{
-	*str = VERS_TAG;
-	return 0;
-}
-MAKE_CMD(ver, "", "s", ver_fn(&args[1].s))
+MAKE_CMD(ver, "", "ddd",
+({
+	args[1].l = VERS_MAJOR;
+	args[2].l = VERS_MINOR;
+	args[3].l = VERS_REV;
+	0;
+}), 0);
 
 /* Sleep. Example of declaring function body directly in macro call.  */
 MAKE_CMD(sleep, "d", "",
 ({
 	timer_delay((mtime_t)args[1].l);
 	0;
-}))
+}), 0)
 
 /* Ping.  */
 MAKE_CMD(ping, "", "",
 ({
+	//Silence "args not used" warning.
+	(void)args;
 	0;
-}))
+}), 0)
+
+/* Dout  */
+MAKE_CMD(dout, "d", "",
+({
+	sipo_putchar((uint8_t)args[1].l);
+
+	//Store status of dout ports.
+	reg_status_dout = (uint8_t)args[1].l;
+	0;
+}), 0)
+
+/* rdout  read the status of out ports.*/
+MAKE_CMD(rdout, "", "d",
+({
+	args[1].l = reg_status_dout;
+	0;
+}), 0)
+
+/* Doutx sperimentale.......  */
+MAKE_CMD(doutx, "d", "",
+ ({
+	 sipo_putchar((uint8_t)args[1].l);
+	 
+	 //Store status of dout ports.
+	 reg_status_dout = (uint8_t)args[1].l;
+	 0;
+ }), 0)
+
+/* Reset */
+MAKE_CMD(reset, "", "",
+({
+	//Silence "args not used" warning.
+	(void)args;
+	wdt_init(7);
+	wdt_start();
+	0;
+}), 0)
+
+/* Din */
+MAKE_CMD(din, "", "d",
+({
+	args[1].l = INPUT_GET();
+	0;
+}), 0)
+
+
+
+/* Ain */
+MAKE_CMD(ain, "", ADC_FORMAT_STR,
+({
+	STATIC_ASSERT((sizeof(ADC_FORMAT_STR) - 1) == ADC_CHANNEL_NUM);
+	for(int i = 0; i < ADC_CHANNEL_NUM; i++)
+		args[i+1].l = adc_read_ai_channel(i);
+
+	0;
+}), 0)
+
+/* Beep  */
+MAKE_CMD(beep, "d", "",
+({
+	buz_beep(args[1].l);
+	0;
+}), 0)
 
 /* Register commands.  */
 static void protocol_registerCmds(void)
@@ -252,6 +346,15 @@ static void protocol_registerCmds(void)
 	REGISTER_CMD(ver);
 	REGISTER_CMD(sleep);
 	REGISTER_CMD(ping);
+	REGISTER_CMD(dout);
+	//Set off all dout ports.
+	reg_status_dout = 0;
+	REGISTER_CMD(rdout);
+	REGISTER_CMD(doutx);
+	REGISTER_CMD(reset);
+	REGISTER_CMD(din);
+	REGISTER_CMD(ain);
+	REGISTER_CMD(beep);
 }
 
 /* Initialization: readline context, parser and register commands.  */
@@ -260,12 +363,15 @@ void protocol_init(Serial *ser)
 	interactive = FORCE_INTERACTIVE;
 
 	rl_init_ctx(&rl_ctx);
-	rl_setprompt(&rl_ctx, ">> ");
+	//rl_setprompt(&rl_ctx, ">> ");
 	rl_sethook_get(&rl_ctx, (getc_hook)ser_getchar, ser);
 	rl_sethook_put(&rl_ctx, (putc_hook)ser_putchar, ser);
 	rl_sethook_match(&rl_ctx, parser_rl_match, NULL);
+	rl_sethook_clear(&rl_ctx, (clear_hook)ser_clearstatus,ser);
 
 	parser_init();
 
 	protocol_registerCmds();
+
+	protocol_prompt(ser);
 }

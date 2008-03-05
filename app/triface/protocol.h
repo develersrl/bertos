@@ -26,7 +26,9 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2006 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2000 Bernardo Innocenti <bernie@codewiz.org>
+ *
  * -->
  *
  * \brief Implementation of the command protocol between the board and the host
@@ -35,6 +37,7 @@
  *
  * \author Marco Benelli <marco@develer.com>
  */
+
 
 #ifndef PROTOCOL_H
 #define PROTOCOL_H
