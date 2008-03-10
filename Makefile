@@ -15,6 +15,6 @@ include config.mk
 
 #Include subtargets
 #include app/demo/demo.mk
-#include app/triface/triface.mk
+include app/triface/triface.mk
 #include app/at91sam7s/at91sam7s.mk
 include rules.mk
