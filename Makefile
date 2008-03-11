@@ -16,7 +16,7 @@ include config.mk
 #Include subtargets
 #include app/demo/demo.mk
 #include app/at91sam7s/at91sam7s.mk
-include app/battfs/battfs_test.mk
+#include app/battfs/battfs_test.mk
 include app/triface/triface.mk
 
 include rules.mk
