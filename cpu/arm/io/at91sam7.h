@@ -137,6 +137,7 @@
 #include "at91_us.h"
 #include "at91_dbgu.h"
 #include "at91_tc.h"
+#include "at91_adc.h"
 #include "at91_pwm.h"
 #include "at91_spi.h"
 #include "at91_twi.h"
@@ -256,8 +257,16 @@
 	#define TIOA2  27 // PB27
 	#define TIOB2  28 // PB28
 
+#elif CPU_ARM_AT91SAM7S256
+	#define TIOA0  0 // PA0
+	#define TIOB0  1 // PA1
+	#define TIOA1  15 // PA15
+	#define TIOB1  16 // PA16
+	#define TIOA2  26 // PA26
+	#define TIOB2  27 // PA27
+
 #else
-	#error No Timer Conter pin names definition for selected ARM CPU
+	#error No Timer Conter pins name definition for selected ARM CPU
 
 #endif
 /*\}*/
@@ -266,16 +275,29 @@
  * PWM pins definition.
  *\{
  */
+#define PWM_PIO_FUNCTION_A 1
+
 #if CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128
-	#define TIOA0  23 // PB23
-	#define TIOB0  24 // PB24
-	#define TIOA1  25 // PB25
-	#define TIOB1  26 // PB26
-	#define TIOA2  27 // PB27
-	#define TIOB2  28 // PB28
+	#if PWM_PIO_FUNCTION_A
+		#define PWM0  19 // PB19
+		#define PWM1  20 // PB20
+		#define PWM2  21 // PB21
+		#define PWM3  22 // PB22
+	#else
+		#define PWM0  27 // PB27
+		#define PWM1  28 // PB28
+		#define PWM2  29 // PB29
+		#define PWM3  30 // PB30
+
+
+#elif CPU_ARM_AT91SAM7S256
+	#define PWM0  11 // PA11
+	#define PWM1  12 // PA12
+	#define PWM2  13 // PA13
+	#define PWM3  14 // PA14
 
 #else
-	#error No Timer Conter pin names definition for selected ARM CPU
+	#error No PWM pins name definition for selected ARM CPU
 
 #endif
 /*\}*/
@@ -290,5 +312,29 @@
 #else
 	#error No TWI pin names definition for selected ARM CPU
 #endif
+
+/**
+ * ADC pins definition.
+ *\{
+ */
+#if CPU_ARM_AT91SAM7X256
+	#define ADTRG   18 // PB18
+	#define AD0     23 // PB27
+	#define AD1     24 // PB28
+	#define AD2     25 // PB29
+	#define AD3     26 // PB30
+
+#elif CPU_ARM_AT91SAM7S256
+	#define ADTRG   18 // PA8
+	#define AD0      0 // PA17
+	#define AD1      1 // PA18
+	#define AD2     15 // PA19
+	#define AD3     16 // PA20
+
+#else
+	#error No Timer Conter pin names definition for selected ARM CPU
+
+#endif
+/*\}*/
 
 #endif /* AT91SAM7_H */
