@@ -30,7 +30,7 @@
  *
  * -->
  *
- * \version $Id: at91_us.h 20354 2008-01-23 11:51:13Z asterix $
+ * \version $Id: at91_us.h 20544 2008-02-14 12:15:57Z batt $
  *
  * \author Daniele Basile <asterix@develer.com>
  *
@@ -340,120 +340,5 @@
 	#endif
 
 #endif  /* USART_HAS_PDC */
-
-
-/**
- * SPI Control Register
- * \{
- */
-#define	SPI_CR_OFF	    0x00000000  ///< Control register offset.
-#define SPI_CR          (*((reg32_t *)(SPI_BASE + SPI_CR_OFF))) ///< SPI control register.
-#define SPI_SPIEN                0 ///< SPI enable.
-#define SPI_SPIDIS               1 ///< SPI disable.
-#define SPI_SWRST                7 ///< Software reset.
-#define SPI_LASTXFER            24 ///< Last transfer.
-/*\}*/
-
-/**
- * SPI Mode Register
- * \{
- */
-#define SPI_MR_OFF      0x00000004  ///< Mode register offset.
-#define SPI_MR          (*((reg32_t *)(SPI_BASE + SPI_MR_OFF))) ///< SPI mode register.
-#define SPI_MSTR                 0  ///< Master mode.
-#define SPI_PS                   1  ///< Peripheral select.
-#define SPI_PCSDEC               2  ///< Chip select decode.
-#define SPI_MODFDIS              4  ///< Mode fault detection.
-#define SPI_LLB                  7  ///< Local loopback enable.
-#define SPI_PCS         0x000F0000  ///< Peripheral chip select mask.
-#define SPI_PCS_0       0x000E0000  ///< Peripheral chip select 0.
-#define SPI_PCS_1       0x000D0000  ///< Peripheral chip select 1.
-#define SPI_PCS_2       0x000B0000  ///< Peripheral chip select 2.
-#define SPI_PCS_3       0x00070000  ///< Peripheral chip select 3.
-#define SPI_PCS_LSB             16  ///< Least significant bit of peripheral chip select.
-#define SPI_DLYBCS      0xFF000000  ///< Mask for delay between chip selects.
-#define SPI_DLYBCS_LSB          24  ///< Least significant bit of delay between chip selects.
-/*\}*/
-
-/**
- * SPI Receive Data Register
- * \{
- */
-#define SPI_RDR_OFF     0x00000008  ///< Receive data register offset.
-#define SPI_RDR         (*((reg32_t *)(SPI_BASE + SPI_RDR_OFF))) ///< SPI receive data register.
-#define SPI_RD          0x0000FFFF  ///< Receive data mask.
-#define SPI_RD_LSB              0   ///< Least significant bit of receive data.
-/*\}*/
-
-/**
- * SPI Transmit Data Register
- * \{
- */
-#define SPI_TDR_OFF     0x0000000C  ///< Transmit data register offset.
-#define SPI_TDR         (*((reg32_t *)(SPI_BASE + SPI_TDR_OFF))) ///< SPI transmit data register.
-#define SPI_TD          0x0000FFFF  ///< Transmit data mask.
-#define SPI_TD_LSB              0   ///< Least significant bit of transmit data.
-/*\}*/
-
-/**
- * SPI Status and Interrupt Register
- * \{
- */
-#define SPI_SR_OFF      0x00000010  ///< Status register offset.
-#define SPI_SR          (*((reg32_t *)(SPI_BASE + SPI_SR_OFF))) ///< Status register.
-#define SPI_IER_OFF     0x00000014  ///< Interrupt enable register offset.
-#define SPI_IER         (*((reg32_t *)(SPI_BASE + SPI_IER_OFF))) ///< Interrupt enable register.
-#define SPI_IDR_OFF     0x00000018  ///< Interrupt disable register offset.
-#define SPI_IDR         (*((reg32_t *)(SPI_BASE + SPI_IDR_OFF))) ///< Interrupt disable register.
-#define SPI_IMR_OFF     0x0000001C  ///< Interrupt mask register offset.
-#define SPI_IMR         (*((reg32_t *)(SPI_BASE + SPI_IMR_OFF))) ///< Interrupt mask register.
-
-#define SPI_RDRF                 0  ///< Receive data register full.
-#define SPI_TDRE                 1  ///< Transmit data register empty.
-#define SPI_MODF                 2  ///< Mode fault error.
-#define SPI_OVRES                3  ///< Overrun error status.
-#define SPI_ENDRX                4  ///< End of RX buffer.
-#define SPI_ENDTX                5  ///< End of TX buffer.
-#define SPI_RXBUFF               6  ///< RX buffer full.
-#define SPI_TXBUFE               7  ///< TX buffer empty.
-#define SPI_NSSR                 8  ///< NSS rising.
-#define SPI_TXEMPTY              9  ///< Transmission register empty.
-#define SPI_SPIENS               16  ///< SPI enable status.
-/*\}*/
-
-/**
- * SPI Chip Select Registers
- * \{
- */
-#define SPI_CSR0_OFF    0x00000030  ///< Chip select register 0 offset.
-#define SPI_CS0         (*((reg32_t *)(SPI_BASE + SPI_CSR0_OFF))) ///<  Chip select register 0.
-#define SPI_CSR1_OFF    0x00000034  ///< Chip select register 1 offset.
-#define SPI_CS1         (*((reg32_t *)(SPI_BASE + SPI_CSR1_OFF))) ///<  Chip select register 1.
-#define SPI_CSR2_OFF    0x00000038  ///< Chip select register 2 offset.
-#define SPI_CS2         (*((reg32_t *)(SPI_BASE + SPI_CSR2_OFF))) ///<  Chip select register 2.
-#define SPI_CSR3_OFF    0x0000003C  ///< Chip select register 3 offset.
-#define SPI_CS3         (*((reg32_t *)(SPI_BASE + SPI_CSR3_OFF))) ///<  Chip select register 3.
-
-#define SPI_CPOL                 0  ///< Clock polarity.
-#define SPI_NCPHA                1  ///< Clock phase.
-#define SPI_CSAAT                3  ///< Chip select active after transfer.
-#define SPI_BITS        0x000000F0  ///< Bits per transfer mask.
-#define SPI_BITS_8      0x00000000  ///< 8 bits per transfer.
-#define SPI_BITS_9      0x00000010  ///< 9 bits per transfer.
-#define SPI_BITS_10     0x00000020  ///< 10 bits per transfer.
-#define SPI_BITS_11     0x00000030  ///< 11 bits per transfer.
-#define SPI_BITS_12     0x00000040  ///< 12 bits per transfer.
-#define SPI_BITS_13     0x00000050  ///< 13 bits per transfer.
-#define SPI_BITS_14     0x00000060  ///< 14 bits per transfer.
-#define SPI_BITS_15     0x00000070  ///< 15 bits per transfer.
-#define SPI_BITS_16     0x00000080  ///< 16 bits per transfer.
-#define SPI_BITS_LSB            4   ///< Least significant bit of bits per transfer.
-#define SPI_SCBR        0x0000FF00  ///< Serial clock baud rate mask.
-#define SPI_SCBR_LSB            8   ///< Least significant bit of serial clock baud rate.
-#define SPI_DLYBS       0x00FF0000  ///< Delay before SPCK mask.
-#define SPI_DLYBS_LSB           16  ///< Least significant bit of delay before SPCK.
-#define SPI_DLYBCT      0xFF000000  ///< Delay between consecutive transfers mask.
-#define SPI_DLYBCT_LSB          24  ///< Least significant bit of delay between consecutive transfers.
-/*\}*/
 
 #endif /* AT91_US_H */
