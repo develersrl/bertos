@@ -137,6 +137,9 @@
 #include "at91_us.h"
 #include "at91_dbgu.h"
 #include "at91_tc.h"
+#include "at91_pwm.h"
+#include "at91_spi.h"
+#include "at91_twi.h"
 //TODO: add other peripherals
 
 /**
@@ -176,7 +179,7 @@
 		/* ID 3 is reserved */
 		#define ADC_ID      4       ///< Analog to digital converter ID.
 		#define SPI_ID      5       ///< Serial peripheral interface ID.
-
+		#define SPI0_ID     SPI_ID  ///< Alias
 	#endif
 
 #else
@@ -213,10 +216,10 @@
  *\{
  */
 #if CPU_ARM_AT91SAM7S256
-	#define NPCS0      11  // Same as NSS pin.
-	#define MISO       12
-	#define MOSI       13
-	#define SPCK       14
+	#define SPI0_NPCS0      11  // Same as NSS pin.
+	#define SPI0_MISO       12
+	#define SPI0_MOSI       13
+	#define SPI0_SPCK       14
 
 #elif CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128
 	#define SPI0_NPCS0  12 // Same as NSS pin. PA12
@@ -245,7 +248,7 @@
  * Timer counter pins definition.
  *\{
  */
-#if CPU_ARM_AT91SAM7X256
+#if CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128
 	#define TIOA0  23 // PB23
 	#define TIOB0  24 // PB24
 	#define TIOA1  25 // PB25
@@ -258,5 +261,34 @@
 
 #endif
 /*\}*/
+
+/**
+ * PWM pins definition.
+ *\{
+ */
+#if CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128
+	#define TIOA0  23 // PB23
+	#define TIOB0  24 // PB24
+	#define TIOA1  25 // PB25
+	#define TIOB1  26 // PB26
+	#define TIOA2  27 // PB27
+	#define TIOB2  28 // PB28
+
+#else
+	#error No Timer Conter pin names definition for selected ARM CPU
+
+#endif
+/*\}*/
+
+/**
+ * TWI pins definition.
+ *\{
+ */
+#if CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128
+	#define TWD  10
+	#define TWCK 11
+#else
+	#error No TWI pin names definition for selected ARM CPU
+#endif
 
 #endif /* AT91SAM7_H */
