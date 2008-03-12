@@ -110,13 +110,19 @@
 	#define CONFIG_UART1_TXBUFSIZE  32
 
 	/** [bytes] Size of the inbound FIFO buffer for port 1. */
-	#define CONFIG_UART1_RXBUFSIZE  64
+	#define CONFIG_UART1_RXBUFSIZE  CONFIG_PROTOCOL_BUFLEN
 
-	/** [bytes] Size of the outbound FIFO buffer for SPI port (AVR only). */
-	#define CONFIG_SPI_TXBUFSIZE	16
+	/** [bytes] Size of the outbound FIFO buffer for SPI port 0. */
+	#define CONFIG_SPI0_TXBUFSIZE	16
 
-	/** [bytes] Size of the inbound FIFO buffer for SPI port (AVR only). */
-	#define CONFIG_SPI_RXBUFSIZE	32
+	/** [bytes] Size of the inbound FIFO buffer for SPI port 0. */
+	#define CONFIG_SPI0_RXBUFSIZE	32
+
+	/** [bytes] Size of the outbound FIFO buffer for SPI port 1. */
+	#define CONFIG_SPI1_TXBUFSIZE	16
+
+	/** [bytes] Size of the inbound FIFO buffer for SPI port 1. */
+	#define CONFIG_SPI1_RXBUFSIZE	32
 
 	/** SPI data order (AVR only). */
 	#define CONFIG_SPI_DATA_ORDER	SER_MSB_FIRST
@@ -222,5 +228,18 @@
 
 /// Turn on or off timer support in Randpool.
 #define CONFIG_RANDPOOL_TIMER 1
+
+/**
+ * ADC timing setting parameter
+ *
+ * - CONFIG_ADC_CLOCK is frequency clock for ADC conversion.
+ * - CONFIG_ADC_STARTUP_TIME  minimum time for startup a conversion in micro second.
+ * - CONFIG_ADC_SHTIME minimum time for sample and hold in nano second.
+ * \{
+ */
+#define CONFIG_ADC_CLOCK          4800000UL
+#define CONFIG_ADC_STARTUP_TIME        20
+#define CONFIG_ADC_SHTIME             834
+/* \} */
 
 #endif /* APPCONFIG_H */

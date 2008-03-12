@@ -551,6 +551,7 @@ static void spi0_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned 
 	SPI0_CSR0 |= DIV_ROUND(CLOCK_FREQ, rate) << SPI_SCBR_SHIFT;
 }
 
+#if CPU_ARM_AT91SAM7X128 || CPU_ARM_AT91SAM7X256
 /* SPI driver */
 static void spi1_init(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(struct Serial *, ser))
 {
@@ -633,6 +634,7 @@ static void spi1_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned 
 	ASSERT((uint8_t)DIV_ROUND(CLOCK_FREQ, rate));
 	SPI1_CSR0 |= DIV_ROUND(CLOCK_FREQ, rate) << SPI_SCBR_SHIFT;
 }
+#endif
 
 static void spi_setparity(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(int, parity))
 {
