@@ -288,6 +288,7 @@
 		#define PWM1  28 // PB28
 		#define PWM2  29 // PB29
 		#define PWM3  30 // PB30
+	#endif
 
 
 #elif CPU_ARM_AT91SAM7S256
