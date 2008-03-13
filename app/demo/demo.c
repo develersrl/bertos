@@ -101,7 +101,7 @@ static void bouncing_logo(Bitmap *bm)
 	const long SPEED_SCALE = 1000;
 	const long GRAVITY_ACCEL = 10;
 	const long BOUNCE_ELASTICITY = 2;
-	long h = (long)(-project_grl_logo.height) * SPEED_SCALE;
+	long h = (long)(-bertos_logo.height) * SPEED_SCALE;
 	long speed = 1000;
 
 	/* Repeat until logo stands still on the bottom edge */
@@ -123,9 +123,9 @@ static void bouncing_logo(Bitmap *bm)
 		/* Update graphics */
 		gfx_bitmapClear(bm);
 		gfx_blitImage(bm,
-			(bm->width - project_grl_logo.width) / 2,
+			(bm->width - bertos_logo.width) / 2,
 			h / SPEED_SCALE,
-			&project_grl_logo);
+			&bertos_logo);
 		lcd_blitBitmap(bm);
 
 		timer_delay(10);
