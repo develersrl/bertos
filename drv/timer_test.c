@@ -36,22 +36,6 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.4  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.3  2006/02/21 21:28:02  bernie
- *#* New time handling based on TIMER_TICKS_PER_SEC to support slow timers with ticks longer than 1ms.
- *#*
- *#* Revision 1.2  2005/11/27 03:58:18  bernie
- *#* Add POSIX timer emulator.
- *#*
- *#* Revision 1.1  2005/11/27 03:04:08  bernie
- *#* Move test code to timer_test.c; Add OS_HOSTED support.
- *#*
- *#*/
-
 #include "timer.c"
 #include "mware/event.c"
 #include "os/hptime.c"
