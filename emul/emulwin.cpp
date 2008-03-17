@@ -38,28 +38,6 @@
  * \brief Main Qt window for embedded applications emulator (implementation)
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.6  2006/09/19 17:49:04  bernie
- *#* Reindent.
- *#*
- *#* Revision 1.5  2006/05/28 12:17:56  bernie
- *#* Drop almost all the Qt3 cruft.
- *#*
- *#* Revision 1.4  2006/02/20 02:00:39  bernie
- *#* Port to Qt 4.1.
- *#*
- *#* Revision 1.3  2006/02/15 09:11:17  bernie
- *#* Add keyboard emulator.
- *#*
- *#* Revision 1.2  2006/01/16 03:51:51  bernie
- *#* Fix boilerplate.
- *#*
- *#* Revision 1.1  2006/01/16 03:37:12  bernie
- *#* Add emulator skeleton.
- *#*
- *#*/
-
 #include "emulwin.h"
 
 #include <drv/lcd_gfx_qt.h>
@@ -82,7 +60,7 @@ using namespace Qt;
 
 EmulWin::EmulWin(Emulator *e)
 {
-	setWindowTitle(tr("DevLib Emul Demo"));
+	setWindowTitle(tr("BeRTOS Emul Demo"));
 	setAttribute(Qt::WA_DeleteOnClose);
 
 	// Create the menu bar
@@ -140,9 +118,9 @@ void EmulWin::closeEvent(QCloseEvent *ce)
 void EmulWin::about()
 {
     QMessageBox::about(this,
-		"Embedded Application Emulator",
+		"BeRTOS Embedded Application Emulator",
 		"Version 0.1\n"
-		"Copyright 2006 Develer S.r.l. (http://www.develer.com/)\n"
+		"Copyright 2006, 2008 Develer S.r.l. (http://www.develer.com/)\n"
 		"Copyright 2001, 2002, 2003, 2005 Bernardo Innocenti <bernie@codewiz.org>\n"
 		"All rights reserved."
 	);
