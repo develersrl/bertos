@@ -39,30 +39,35 @@
  * \author Giovanni Bajo <rasky@develer.com>
  * \author Marco Benelli <marco@develer.com>
  * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
  */
 
 #include "protocol.h"
-
+#include "cmd_ctor.h"  // MAKE_CMD, REGISTER_CMD
+#include "verstag.h"
 
 #include <drv/timer.h>
 #include <drv/ser.h>
-#include <mware/readline.h>
-#include <mware/parser.h>
-#include <cfg/compiler.h>
-#include <cfg/debug.h>
 #include <drv/sipo.h>
 #include <drv/wdt.h>
+#include <drv/buzzer.h>
+
+#include <mware/readline.h>
+#include <mware/parser.h>
+
+#include <cfg/compiler.h>
+#include <cfg/debug.h>
+
+#include <kern/kfile.h>
+
 #include "hw_adc.h"
+#include "hw_input.h"
 
 #include <stdlib.h>
 #include <string.h>
 
 //#include <cmd_hunk.h>
 
-#include "cmd_ctor.h"  // MAKE_CMD, REGISTER_CMD
-#include "hw_input.h"
-#include "verstag.h"
-#include <drv/buzzer.h>
 
 // Define the format string for ADC
 #define ADC_FORMAT_STR "dddd"
@@ -88,25 +93,25 @@ uint8_t reg_status_dout;
  *
  * \param err  human-readable description of the error for debug purposes.
  */
-INLINE void NAK(Serial *ser, const char *err)
+INLINE void NAK(KFile *fd, const char *err)
 {
 #ifdef _DEBUG
-	ser_printf(ser, "NAK \"%s\"\r\n", err);
+	kfile_printf(fd, "NAK \"%s\"\r\n", err);
 #else
-	ser_printf(ser, "NAK\r\n");
+	kfile_printf(fd, "NAK\r\n");
 #endif
 }
 
-static void protocol_prompt(Serial *ser)
+static void protocol_prompt(KFile *fd)
 {
-	ser_print(ser, ">> ");
+	kfile_print(fd, ">> ");
 }
 
 /*
  * Print args on s, with format specified in t->result_fmt.
  * Return number of valid arguments or -1 in case of error.
  */
-static bool protocol_reply(Serial *s, const struct CmdTemplate *t,
+static bool protocol_reply(KFile *fd, const struct CmdTemplate *t,
 			  const parms *args)
 {
 	unsigned short offset = strlen(t->arg_fmt) + 1;
@@ -116,11 +121,11 @@ static bool protocol_reply(Serial *s, const struct CmdTemplate *t,
 	{
 		if (t->result_fmt[i] == 'd')
 		{
-			ser_printf(s, " %ld", args[offset+i].l);
+			kfile_printf(fd, " %ld", args[offset+i].l);
 		}
 		else if (t->result_fmt[i] == 's')
 		{
-			ser_printf(s, " %s", args[offset+i].s);
+			kfile_printf(fd, " %s", args[offset+i].s);
 		}
 
 		else
@@ -128,11 +133,11 @@ static bool protocol_reply(Serial *s, const struct CmdTemplate *t,
 			abort();
 		}
 	}
-	ser_printf(s, "\r\n");
+	kfile_printf(fd, "\r\n");
 	return true;
 }
 
-static void protocol_parse(Serial *ser, const char *buf)
+static void protocol_parse(KFile *fd, const char *buf)
 {
 	const struct CmdTemplate *templ;
 
@@ -140,8 +145,8 @@ static void protocol_parse(Serial *ser, const char *buf)
 	templ = parser_get_cmd_template(buf);
 	if (!templ)
 	{
-		ser_print(ser, "-1 Invalid command.\r\n");
-		protocol_prompt(ser);
+		kfile_print(fd, "-1 Invalid command.\r\n");
+		protocol_prompt(fd);
 		return;
 	}
 
@@ -150,26 +155,26 @@ static void protocol_parse(Serial *ser, const char *buf)
 	/* Args Check.  TODO: Handle different case. see doc/PROTOCOL .  */
 	if (!parser_get_cmd_arguments(buf, templ, args))
 	{
-		ser_print(ser, "-2 Invalid arguments.\r\n");
-		protocol_prompt(ser);
+		kfile_print(fd, "-2 Invalid arguments.\r\n");
+		protocol_prompt(fd);
 		return;
 	}
 
 	/* Execute. */
 	if(!parser_execute_cmd(templ, args))
 	{
-		NAK(ser, "Error in executing command.");
+		NAK(fd, "Error in executing command.");
 	}
-	if (!protocol_reply(ser, templ, args))
+	if (!protocol_reply(fd, templ, args))
 	{
-		NAK(ser, "Invalid return format.");
+		NAK(fd, "Invalid return format.");
 	}
 
-	protocol_prompt(ser);
+	protocol_prompt(fd);
 	return;
 }
 
-void protocol_run(Serial *ser)
+void protocol_run(KFile *fd)
 {
 	/**
 	 * \todo to be removed, we could probably access the serial FIFO
@@ -179,10 +184,10 @@ void protocol_run(Serial *ser)
 
 	if (!interactive)
 	{
-		ser_gets(ser, linebuf, sizeof(linebuf));
+		kfile_gets(fd, linebuf, sizeof(linebuf));
 
 		// reset serial port error anyway
-		ser_setstatus(ser, 0);
+		kfile_clearerr(fd);
 
 		// check message minimum length
 		if (linebuf[0])
@@ -194,12 +199,11 @@ void protocol_run(Serial *ser)
 				if (linebuf[0] == 0x1B && linebuf[1] == 0x1B)  // ESC
 				{
 					interactive = true;
-					ser_printf(ser,
-						"Entering interactive mode\r\n");
+					kfile_printf(fd, "Entering interactive mode\r\n");
 				}
 				else
 				{
-					protocol_parse(ser, linebuf);
+					protocol_parse(fd, linebuf);
 				}
 			}
 		}
@@ -228,8 +232,7 @@ void protocol_run(Serial *ser)
 				if (!strcmp(buf, "exit") || !strcmp(buf, "quit"))
 				{
 					rl_clear_history(&rl_ctx);
-					ser_printf(ser,
-						"Leaving interactive mode...\r\n");
+					kfile_printf(fd, "Leaving interactive mode...\r\n");
 					interactive = FORCE_INTERACTIVE;
 				}
 				else
@@ -240,7 +243,7 @@ void protocol_run(Serial *ser)
 
 					strncpy(linebuf + 2, buf, sizeof(linebuf) - 3);
 					linebuf[sizeof(linebuf) - 1] = '\0';
-					protocol_parse(ser, linebuf);
+					protocol_parse(fd, linebuf);
 				}
 			}
 		}
@@ -358,20 +361,20 @@ static void protocol_registerCmds(void)
 }
 
 /* Initialization: readline context, parser and register commands.  */
-void protocol_init(Serial *ser)
+void protocol_init(KFile *fd)
 {
 	interactive = FORCE_INTERACTIVE;
 
 	rl_init_ctx(&rl_ctx);
 	//rl_setprompt(&rl_ctx, ">> ");
-	rl_sethook_get(&rl_ctx, (getc_hook)ser_getchar, ser);
-	rl_sethook_put(&rl_ctx, (putc_hook)ser_putchar, ser);
+	rl_sethook_get(&rl_ctx, (getc_hook)kfile_getc, fd);
+	rl_sethook_put(&rl_ctx, (putc_hook)kfile_putc, fd);
 	rl_sethook_match(&rl_ctx, parser_rl_match, NULL);
-	rl_sethook_clear(&rl_ctx, (clear_hook)ser_clearstatus,ser);
+	rl_sethook_clear(&rl_ctx, (clear_hook)kfile_clearerr,fd);
 
 	parser_init();
 
 	protocol_registerCmds();
 
-	protocol_prompt(ser);
+	protocol_prompt(fd);
 }

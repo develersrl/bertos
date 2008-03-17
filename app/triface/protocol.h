@@ -42,10 +42,9 @@
 #ifndef PROTOCOL_H
 #define PROTOCOL_H
 
-// fwd decl
-struct Serial;
+#include <kern/kfile.h>
 
-void protocol_init(struct Serial *ser);
-void protocol_run(struct Serial *ser);
+void protocol_init(KFile *fd);
+void protocol_run(KFile *fd);
 
 #endif // PROTOOCOL_H

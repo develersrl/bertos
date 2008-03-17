@@ -56,12 +56,12 @@ static void keytag_clearPkt(struct TagPacket *pkt)
 	pkt->len = 0;
 }
 
-void keytag_init(struct TagPacket *pkt)
-{
-	keytag_clearPkt(pkt);
-}
+	void keytag_init(struct TagPacket *pkt)
+	{
+		keytag_clearPkt(pkt);
+	}
 
-void keytag_poll(struct TagPacket *pkt)
+	void keytag_poll(struct TagPacket *pkt)
 {
 	int c;
 

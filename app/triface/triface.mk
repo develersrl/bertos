@@ -40,10 +40,11 @@ triface_CSRC = \
 triface_PCSRC += mware/formatwr.c
 
 
-triface_CFLAGS = -O2 -D'ARCH=0' -Iapp/triface/hw -Iapp/triface -Icpu/avr
+triface_CFLAGS = -O2 -D'ARCH=0' -fno-strict-aliasing -Iapp/triface/hw -Iapp/triface -Icpu/avr
 triface_LDFLAGS = -Wl
 
 triface_MCU = atmega64
+triface_CROSS = avr-
 
 # Debug stuff
 ifeq ($(triface_DEBUG),1)

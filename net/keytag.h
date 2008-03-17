@@ -61,15 +61,15 @@
  */
 #define TAG_MAX_PRINT_CHARS 12
 
-#include <drv/ser.h>
+#include <kern/kfile.h>
 
 /**
  * Structure of a Tag packet
  */
 typedef struct TagPacket
 {
-	struct Serial *tag_ser;		// Tag serial
-	struct Serial *comm_ser;        // Communication serial
+	KFileSerial *tag_ser;		// Tag serial
+	KFileSerial *comm_ser;        // Communication serial
 	bool sync;                  	// Status flag: true if we find an STX
 	uint16_t len;            	// Packet lenght
 	uint8_t buf[TAG_MAX_LEN]; 	// Reception buffer

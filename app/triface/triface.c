@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2006, 2008 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000 Bernardo Innocenti <bernie@codewiz.org>
  *
  * -->
@@ -35,6 +35,7 @@
  *
  * \author Marco Benelli <marco@develer.com>
  * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
  *
  * \brief Windowing system test.
  */
@@ -43,14 +44,18 @@
 #include <drv/timer.h>
 #include <drv/buzzer.h>
 #include <drv/ser.h>
+#include <drv/sipo.h>
+
 #include <cfg/macros.h>
 #include <mware/parser.h>
 #include <net/keytag.h>
-#include <drv/sipo.h>
 
 #include "protocol.h"
 #include "hw_input.h"
 #include "hw_adc.h"
+
+
+static KFileSerial fd_ser;
 
 int main(void)
 {
@@ -69,24 +74,25 @@ int main(void)
 	TagPacket pkt;
 
 	/* Open the main communication port */
-	Serial *host_port = ser_open(CONFIG_SER_HOSTPORT);
-	ser_setbaudrate(host_port, CONFIG_SER_HOSTPORTBAUDRATE);
+	ser_init(&fd_ser, CONFIG_SER_HOSTPORT);
+	ser_setbaudrate(&fd_ser, CONFIG_SER_HOSTPORTBAUDRATE);
 
-	pkt.tag_ser = ser_open(TAG_SER_PORT);
+	ser_init(pkt.tag_ser, TAG_SER_PORT);
 	ser_setbaudrate(pkt.tag_ser, TAG_SER_BAUDRATE);
-	pkt.comm_ser = host_port;
+
+	pkt.comm_ser = &fd_ser;
 	keytag_init(&pkt);
 
-
-
-	protocol_init(host_port);
+	protocol_init(&fd_ser.fd);
 
 	// Main loop
 	for(;;)
 	{
-		protocol_run(host_port);
+		protocol_run(&fd_ser.fd);
 		keytag_poll(&pkt);
 	}
 
 	return 0;
 }
+
+
