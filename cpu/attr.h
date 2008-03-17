@@ -45,6 +45,7 @@
 #include <cfg/compiler.h> /* for uintXX_t */
 #include <cfg/arch_config.h>  /* ARCH_EMUL */
 
+#include "appconfig.h" // CONFIG_FAST_MEM
 
 /**
  * \name Macros for determining CPU endianness.
@@ -103,13 +104,19 @@
 	#define CPU_STACK_GROWS_UPWARD 0
 	#define CPU_SP_ON_EMPTY_SLOT   0
 	#define CPU_HARVARD            0
+	/*
+	 * Force compiler to realod context variable.
+	 */
+	#define CPU_MEMORY_BARRIER     asm volatile ("" : : : "memory")
 
 	#ifdef __IAR_SYSTEMS_ICC__
 		#warning Check CPU_BYTE_ORDER
 		#define CPU_BYTE_ORDER (__BIG_ENDIAN__ ? CPU_BIG_ENDIAN : CPU_LITTLE_ENDIAN)
 
 		#define NOP            __no_operation()
-	#else /* !__IAR_SYSTEMS_ICC__ */
+
+	#else /* GCC and compatibles */
+
 		#if defined(__ARMEB__)
   			#define CPU_BYTE_ORDER CPU_BIG_ENDIAN
   		#elif defined(__ARMEL__)
@@ -133,6 +140,34 @@
 		 * - CPU in Supervisor Mode (SVC).
 	 	 */
 		#define CPU_REG_INIT_VALUE(reg) (reg == (CPU_SAVED_REGS_CNT - 1) ? 0x13 : 0)
+
+		#if CONFIG_FAST_MEM
+			/**
+			 * Function attribute for use with performance critical code.
+			 *
+			 * On the AT91 family, code residing in flash has wait states.
+			 * Moving functions to the data section is a quick & dirty way
+			 * to get them transparently copied to SRAM for zero-wait-state
+			 * operation.
+			 */
+			#define FAST_FUNC __attribute__((section(".data")))
+
+			/**
+			 * Data attribute to move constant data to fast memory storage.
+			 *
+			 * \see FAST_FUNC
+			 */
+			#define FAST_RODATA __attribute__((section(".data")))
+
+		#else // !CONFIG_FAST_MEM
+			#define FAST_RODATA /**/
+			#define FAST_FUNC /**/
+		#endif
+
+		/**
+		 * Function attribute to declare an interrupt service routine.
+		 */
+		#define ISR_FUNC __attribute__((interrupt))
 
 	#endif /* !__IAR_SYSTEMS_ICC_ */
 

@@ -175,7 +175,7 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 
 #if CONFIG_KERN_MONITOR
 	/* Fill-in the stack with a special marker to help debugging */
-	memset(stack_base, (char)CONFIG_KERN_STACKFILLCODE, stacksize);
+	memset(stack_base, CONFIG_KERN_STACKFILLCODE, stacksize / sizeof(cpustack_t));
 #endif
 
 	/* Initialize the process control block */
@@ -264,12 +264,18 @@ void proc_schedule(void)
 		 * are idle-spinning, we must allow interrupts, otherwise no
 		 * process will ever wake up.
 		 *
+		 * During idle-spinning, can occur an interrupt, it may be able to
+		 * modify \p ProcReadyList. To ensure that compiler reload this
+		 * variable every while cycle we call CPU_MEMORY_BARRIER.
+		 * The memory barrier ensure that all variables used in this context
+		 * are reloaded.
 		 * \todo If there was a way to write sig_wait() so that it does not
 		 * disable interrupts while waiting, there would not be any
 		 * reason to do this.
 		 */
 		IRQ_ENABLE;
 		CPU_IDLE;
+		CPU_MEMORY_BARRIER;
 		IRQ_DISABLE;
 	}
 	IRQ_RESTORE(flags);
