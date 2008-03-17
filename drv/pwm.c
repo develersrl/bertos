@@ -29,26 +29,60 @@
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \version $Id$
  *
  * \brief PWM driver (implementation)
  *
  * \version $Id$
+ *
  * \author Francesco Sacchi <batt@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
  */
 
-#include <hw_pwm.h>
+#include <cpu/types.h>
+#include <cpu/irq.h>
+
 #include <drv/pwm.h>
+#include <drv/pwm_at91.h>
+
 #include <cfg/macros.h>
+#include <cfg/debug.h>
+
 
 /**
- * Set duty of pwm channel \a dev.
+ * Set duty of pwm channel \p dev.
  */
 void pwm_setDuty(PwmDev dev, pwm_duty_t duty)
 {
+	pwm_period_t period = 0;
+	pwm_duty_t real_duty = 0;
+
 	duty = MIN(duty, (pwm_duty_t)PWM_MAX_DUTY);
 
-	pwm_hw_setDutyUnlock(dev, duty);
+	period = pwm_hw_getPeriod(dev);
+
+	real_duty = (uint64_t)(duty * period) >> (uint64_t)PWM_MAX_PERIOD_LOG2;
+
+// 	kprintf("real_duty[%d] duty[%d], period[%d]\n", real_duty, duty, period);
+	pwm_hw_setDutyUnlock(dev, real_duty);
+}
+
+/**
+ * Set frequency of pwm channel \p dev at \p freq in Hz.
+ */
+void pwm_setFrequency(PwmDev dev, pwm_freq_t freq)
+{
+	pwm_hw_setFrequency(dev, freq);
+}
+
+/**
+ * Set duty of pwm channel \p dev.
+ */
+void pwm_enable(PwmDev dev, bool state)
+{
+	if (state)
+		pwm_hw_enable(dev);
+	else
+		pwm_hw_disable(dev);
 }
 
 /**
@@ -65,7 +99,11 @@ void pwm_init(void)
 	for (dev = 0; dev < PWM_CNT; dev++)
 		pwm_setDuty(dev, 0);
 
-	PWM_HW_INIT;
+	pwm_hw_init();
 
 	IRQ_RESTORE(flags);
 }
+
+
+
+
