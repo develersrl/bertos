@@ -30,8 +30,8 @@
  *
  * -->
  *
- * \brief Virtual KFile I/O interface.
- * This module implements some generic I/O interfaces for kfile.
+ * \brief Test suite for virtual KFile I/O interface.
+ * This module implements a test for some generic I/O interfaces for kfile.
  *
  * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
@@ -46,179 +46,6 @@
 #include <cfg/debug.h>
 #include <mware/formatwr.h>
 #include <string.h>
-
-/*
- * Sanity check for config parameters required by this module.
- */
-#if !defined(CONFIG_KFILE_GETS) || ((CONFIG_KFILE_GETS != 0) && CONFIG_KFILE_GETS != 1)
-	#error CONFIG_KFILE_GETS must be set to either 0 or 1 in appconfig.h
-#endif
-#if !defined(CONFIG_PRINTF)
-	#error CONFIG_PRINTF missing in appconfig.h
-#endif
-
-
-/**
- * Generic putc() implementation using \a fd->write.
- */
-int kfile_putc(int _c, struct KFile *fd)
-{
-	unsigned char c = (unsigned char)_c;
-
-	if (kfile_write(fd, &c, sizeof(c)) == sizeof(c))
-		return (int)((unsigned char)_c);
-	else
-		return EOF;
-}
-
-/**
- * Generic getc() implementation using \a fd->read.
- */
-int kfile_getc(struct KFile *fd)
-{
-	unsigned char c;
-
-	if (kfile_read(fd, &c, sizeof(c)) == sizeof(c))
-		return (int)((unsigned char)c);
-	else
-		return EOF;
-}
-
-#if CONFIG_PRINTF
-/**
- * Formatted write.
- */
-int kfile_printf(struct KFile *fd, const char *format, ...)
-{
-	va_list ap;
-	int len;
-
-	va_start(ap, format);
-	len = _formatted_write(format, (void (*)(char, void *))kfile_putc, fd, ap);
-	va_end(ap);
-
-	return len;
-}
-#endif /* CONFIG_PRINTF */
-
-/**
- * Write a string to kfile \a fd.
- * \return 0 if OK, EOF in case of error.
- */
-int kfile_print(struct KFile *fd, const char *s)
-{
-	while (*s)
-	{
-		if (kfile_putc(*s++, fd) == EOF)
-			return EOF;
-	}
-	return 0;
-}
-
-#if CONFIG_KFILE_GETS
-/**
- * Read a line long at most as size and put it
- * in buf.
- * \return number of chars read or EOF in case
- *         of error.
- */
-int kfile_gets(struct KFile *fd, char *buf, int size)
-{
-	return kfile_gets_echo(fd, buf, size, false);
-}
-
-
-/**
- * Read a line long at most as size and put it
- * in buf, with optional echo.
- *
- * \return number of chars read, or EOF in case
- *         of error.
- */
-int kfile_gets_echo(struct KFile *fd, char *buf, int size, bool echo)
-{
-	int i = 0;
-	int c;
-
-	for (;;)
-	{
-		if ((c = kfile_getc(fd)) == EOF)
-		{
-			buf[i] = '\0';
-			return -1;
-		}
-
-		/* FIXME */
-		if (c == '\r' || c == '\n' || i >= size-1)
-		{
-			buf[i] = '\0';
-			if (echo)
-				kfile_print(fd, "\r\n");
-			break;
-		}
-		buf[i++] = c;
-		if (echo)
-			kfile_putc(c, fd);
-	}
-
-	return i;
-}
-#endif /* !CONFIG_KFILE_GETS */
-
-
-/**
- * Move \a fd file seek position of \a offset bytes from \a whence.
- *
- * This is a generic implementation of seek function, you can redefine
- * it in your local module if needed.
- */
-kfile_off_t kfile_genericSeek(struct KFile *fd, kfile_off_t offset, KSeekMode whence)
-{
-	uint32_t seek_pos;
-
-	switch (whence)
-	{
-
-	case KSM_SEEK_SET:
-		seek_pos = 0;
-		break;
-	case KSM_SEEK_END:
-		seek_pos = fd->size;
-		break;
-	case KSM_SEEK_CUR:
-		seek_pos = fd->seek_pos;
-		break;
-	default:
-		ASSERT(0);
-		return EOF;
-		break;
-	}
-
-	/* Bound check */
-	if (seek_pos + offset > fd->size)
-	{
-		ASSERT(0);
-		return EOF;
-	}
-
-	fd->seek_pos = seek_pos + offset;
-
-	return fd->seek_pos;
-}
-
-/**
- * Reopen file \a fd.
- * This is a generic implementation that only flush file
- * and reset seek_pos to 0.
- */
-struct KFile * kfile_genericReopen(struct KFile *fd)
-{
-	kfile_flush(fd);
-	kfile_seek(fd, 0, KSM_SEEK_SET);
-	return fd;
-}
-
-#if CONFIG_TEST_KFILE
 
 /**
  * KFile read/write subtest.
@@ -417,4 +244,5 @@ kfile_test_end:
 	return false;
 }
 
-#endif /* CONFIG_TEST */
+
+
