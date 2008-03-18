@@ -111,6 +111,7 @@ EmulWin::~EmulWin()
 
 void EmulWin::closeEvent(QCloseEvent *ce)
 {
+	emul->quit();
 	ce->accept();
 }
 
