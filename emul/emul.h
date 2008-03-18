@@ -86,7 +86,6 @@ public:
 	~Emulator();
 
 // public methods
-	int exec(void (*entry)(void));
 	void quit();
 };
 
