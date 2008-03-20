@@ -275,7 +275,7 @@ void proc_schedule(void)
 		 */
 		IRQ_ENABLE;
 		CPU_IDLE;
-		CPU_MEMORY_BARRIER;
+		MEMORY_BARRIER;
 		IRQ_DISABLE;
 	}
 	IRQ_RESTORE(flags);

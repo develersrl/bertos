@@ -104,10 +104,6 @@
 	#define CPU_STACK_GROWS_UPWARD 0
 	#define CPU_SP_ON_EMPTY_SLOT   0
 	#define CPU_HARVARD            0
-	/*
-	 * Force compiler to realod context variable.
-	 */
-	#define CPU_MEMORY_BARRIER     asm volatile ("" : : : "memory")
 
 	#ifdef __IAR_SYSTEMS_ICC__
 		#warning Check CPU_BYTE_ORDER

@@ -37,8 +37,8 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-#ifndef DEVLIB_COMPILER_H
-#define DEVLIB_COMPILER_H
+#ifndef BERTOS_COMPILER_H
+#define BERTOS_COMPILER_H
 
 #include <cpu/detect.h>
 
@@ -181,6 +181,11 @@
 	#define RESTRICT                __restrict__
 	#define MUST_CHECK              __attribute__((warn_unused_result))
 	#define PACKED                  __attribute__((packed))
+	/**
+	 * Force compiler to realod context variable.
+	 */
+	#define MEMORY_BARRIER           asm volatile ("" : : : "memory")
+
 	#if GNUC_PREREQ(3,1)
 		#define DEPRECATED  __attribute__((__deprecated__))
 	#endif
@@ -210,6 +215,8 @@
 		#pragma GCC poison friend mutable using namespace
 		#pragma GCC poison cin cout cerr clog
 	#endif
+
+
 
 #elif defined(__MWERKS__)
 
@@ -313,6 +320,10 @@
 #ifndef PACKED
 #define PACKED                 /* nothing */
 #endif
+#ifndef MEMORY_BARRIER
+#define MEMORY_BARRIER         /* nothing */
+#warning No memory barrier defined for select compiler. If you use the kernel check it.
+#endif
 
 
 /* Misc definitions */
@@ -322,7 +333,6 @@
 #ifndef EOF
 #define	EOF   (-1)
 #endif
-
 
 /* Support for hybrid C/C++ applications. */
 #ifdef __cplusplus
@@ -515,4 +525,4 @@ typedef unsigned char page_t;    /**< Type for banked memory pages. */
 			do { (void)(&(var) == (type *)0); } while(0)
 #endif
 
-#endif /* DEVLIB_COMPILER_H */
+#endif /* BERTOS_COMPILER_H */
