@@ -43,8 +43,8 @@
  */
 
 
-#ifndef ALGOS_ROTATING_H
-#define ALGOS_ROTATING_H
+#ifndef ALGO_ROTATING_H
+#define ALGO_ROTATING_H
 
 #include <cfg/compiler.h>
 
@@ -79,4 +79,4 @@ INLINE void rotating_update(const void *_buf, size_t len, rotating_t *rot)
 }
 
 
-#endif // ALGOS_ROTATING_H
+#endif // ALGO_ROTATING_H

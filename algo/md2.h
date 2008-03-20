@@ -44,33 +44,8 @@
  * \author Daniele Basile <asterix@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.7  2007/02/15 13:29:49  asterix
- *#* Add MD2_DIGEST_LEN macro.
- *#*
- *#* Revision 1.6  2007/02/02 18:15:31  asterix
- *#* Add function MD2_test. Fix bug in md2_update function.
- *#*
- *#* Revision 1.5  2007/02/02 15:37:45  asterix
- *#* Change md2_end prototype. Remove a unneeded memcpy in md2_end. Add comments.
- *#*
- *#* Revision 1.4  2007/01/31 13:53:36  asterix
- *#* Define COMPUTE_ARRAY_LEN.
- *#*
- *#* Revision 1.3  2007/01/31 11:16:48  asterix
- *#* Defined constants for algorithm compute
- *#*
- *#* Revision 1.2  2007/01/30 17:31:44  asterix
- *#* Add function prototypes.
- *#*
- *#* Revision 1.1  2007/01/30 15:53:26  batt
- *#* Add first md2 skel.
- *#*
- *#*/
-
-#ifndef ALGOS_MD2_H
-#define ALGOS_MD2_H
+#ifndef ALGO_MD2_H
+#define ALGO_MD2_H
 
 #include <cfg/compiler.h>
 #include <appconfig.h>
@@ -95,4 +70,4 @@ void md2_update(Md2Context *context, const void *block_in, size_t block_len);
 uint8_t *md2_end(Md2Context *context);
 bool md2_test(void);
 
-#endif /* ALGOS_MD2_H */
+#endif /* ALGO_MD2_H */

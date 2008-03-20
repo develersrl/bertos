@@ -39,8 +39,8 @@
  * http://www.cl.cam.ac.uk/ftp/users/djw3/tea.ps.
  */
 
-#ifndef ALGOS_TEA_H
-#define ALGOS_TEA_H
+#ifndef ALGO_TEA_H
+#define ALGO_TEA_H
 
 #include <cfg/compiler.h>
 
@@ -53,5 +53,5 @@
 void tea_enc(void *_v, void *_k);
 void tea_dec(void *_v, void *_k);
 
-#endif /* ALGOS_TEA_H */
+#endif /* ALGO_TEA_H */
 

@@ -47,8 +47,8 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-#ifndef CRC_H
-#define CRC_H
+#ifndef ALGO_CRC_H
+#define ALGO_CRC_H
 
 #include <cfg/compiler.h>
 
@@ -99,4 +99,4 @@ extern uint16_t crc16(uint16_t crc, const void *buf, size_t len);
 }
 #endif /* __cplusplus */
 
-#endif /* CRC_H */
+#endif /* ALGO_CRC_H */
