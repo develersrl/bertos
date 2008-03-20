@@ -132,10 +132,10 @@
 	#define CONFIG_SPI_CLOCK_PHASE	0
 
 	/** Default transmit timeout (ms). Set to -1 to disable timeout support */
-	#define CONFIG_SER_TXTIMEOUT    -1
+	#define CONFIG_SER_TXTIMEOUT    100
 
 	/** Default receive timeout (ms). Set to -1 to disable timeout support */
-	#define CONFIG_SER_RXTIMEOUT    -1
+	#define CONFIG_SER_RXTIMEOUT	100
 
 	/** Use RTS/CTS handshake */
 	#define CONFIG_SER_HWHANDSHAKE   0
@@ -150,7 +150,7 @@
 	#define CONFIG_SER_HOSTPORT 1
 
 	/** Enable ser_gets() and ser_gets_echo() */
-	#define CONFIG_SER_GETS          0
+	#define CONFIG_SER_GETS          1
 
 	/** Enable second serial port in emulator. */
 	#define CONFIG_EMUL_UART1        0
@@ -165,8 +165,11 @@
 	#define CONFIG_SER_STROBE        0
 /*\}*/
 
+/// Enable kfiler_gets() and kfile_gets_echo()
+#define CONFIG_KFILE_GETS 1
+
 /// Hardware timer selection for drv/timer.c
-#define CONFIG_TIMER  TIMER_ON_OUTPUT_COMPARE2
+#define CONFIG_TIMER  TIMER_ON_OUTPUT_COMPARE0
 
 /// Debug timer interrupt using a strobe pin.
 #define CONFIG_TIMER_STROBE  0
@@ -175,59 +178,9 @@
 #define CONFIG_ADC_STROBE  0
 
 /// Enable watchdog timer.
-#define CONFIG_WATCHDOG  0
+#define CONFIG_WATCHDOG  1
 
-/// EEPROM type for drv/eeprom.c
-#define CONFIG_EEPROM_TYPE EEPROM_24XX256
-
-/// Select bitmap pixel format.
-#define CONFIG_BITMAP_FMT  BITMAP_FMT_PLANAR_V_LSB
-
-/// Enable line clipping algorithm.
-#define CONFIG_GFX_CLIPPING  1
-
-/// Enable text rendering in bitmaps.
-#define CONFIG_GFX_TEXT  1
-
-/// Enable virtual coordinate system.
-#define CONFIG_GFX_VCOORDS  1
-
-/// Keyboard polling method
-#define CONFIG_KBD_POLL  KBD_POLL_SOFTINT
-
-/// Enable keyboard event delivery to observers
-#define CONFIG_KBD_OBSERVER  0
-
-/// Enable key beeps
-#define CONFIG_KBD_BEEP  1
-
-/// Enable long pression handler for keys
-#define CONFIG_KBD_LONGPRESS  1
-
-/**
- * \name Type for the chart dataset
- * \{
- */
-#define CONFIG_CHART_TYPE_X uint8_t
-#define CONFIG_CHART_TYPE_Y uint8_t
-/*\}*/
-
-/// Enable button bar behind menus
-#define CONFIG_MENU_MENUBAR  0
-
-/// Enable smooth scrolling in menus
-#define CONFIG_MENU_SMOOTH  1
-
-/// Size of block for MD2 algorithm.
-#define CONFIG_MD2_BLOCK_LEN 16
-
-/// Use standard permutation in MD2 algorithm.
-#define CONFIG_MD2_STD_PERM 0
-
-/// Define a size, in byte, of entropy pool.
-#define CONFIG_SIZE_ENTROPY_POOL 64
-
-/// Turn on or off timer support in Randpool.
-#define CONFIG_RANDPOOL_TIMER 1
+/// Enable internal parser commands.
+#define CONFIG_INTERNAL_COMMANDS  0
 
 #endif /* APPCONFIG_TRIFACE_H */
