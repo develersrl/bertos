@@ -23,6 +23,7 @@ triface_lock = 0x2f
 triface_CSRC = \
 	app/triface/triface.c \
 	app/triface/protocol.c \
+	app/triface/hw/hw_adc.c \
 	drv/timer.c \
 	drv/ser.c \
 	cpu/avr/drv/ser_avr.c \
@@ -33,14 +34,15 @@ triface_CSRC = \
 	mware/readline.c \
 	mware/parser.c \
 	mware/event.c \
+	kern/kfile.c \
 	net/keytag.c \
-	hw/hw_adc.c \
 	drv/buzzer.c \
+	#
 
 triface_PCSRC += mware/formatwr.c
 
 
-triface_CFLAGS = -O2 -D'ARCH=0' -fno-strict-aliasing -Iapp/triface/hw -Iapp/triface -Icpu/avr
+triface_CFLAGS = -O2 -D'ARCH=0' -fno-strict-aliasing -Iapp/triface -Iapp/triface/hw -Icpu/avr
 triface_LDFLAGS = -Wl
 
 triface_MCU = atmega64
