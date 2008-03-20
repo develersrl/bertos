@@ -690,7 +690,7 @@ static const struct SerialHardwareVT SPI0_VT =
 	C99INIT(txStart, spi0_starttx),
 	C99INIT(txSending, tx_sending),
 };
-#if CPU_ARM_AT91SAM7X128 || CPU_ARM_AT91SAM7X128
+#if CPU_ARM_AT91SAM7X128 || CPU_ARM_AT91SAM7X256
 static const struct SerialHardwareVT SPI1_VT =
 {
 	C99INIT(init, spi1_init),
@@ -735,7 +735,7 @@ static struct ArmSerial UARTDescs[SER_CNT] =
 		},
 		C99INIT(sending, false),
 	},
-	#if CPU_ARM_AT91SAM7X128 || CPU_ARM_AT91SAM7X128
+	#if CPU_ARM_AT91SAM7X128 || CPU_ARM_AT91SAM7X256
 	{
 		C99INIT(hw, /**/) {
 			C99INIT(table, &SPI1_VT),
@@ -914,7 +914,7 @@ static void spi0_irq_handler(void)
 }
 
 
-#if CPU_ARM_AT91SAM7X128 || CPU_ARM_AT91SAM7X128
+#if CPU_ARM_AT91SAM7X128 || CPU_ARM_AT91SAM7X256
 /**
  * SPI1 interrupt handler
  */
