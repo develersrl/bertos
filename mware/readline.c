@@ -75,6 +75,7 @@
 #include <cfg/debug.h>
 
 #include <stdio.h>
+#include <drv/ser.h>
 
 
 /// Enable compilation of the unit test code
@@ -165,8 +166,14 @@ INLINE void rl_putc(const struct RLContext* ctx, char ch)
 static bool rl_getc(const struct RLContext* ctx, int* ch)
 {
 	int c = ctx->get(ctx->get_param);
+
 	if (c == EOF)
+	{
+		if (ctx->clear)
+			ctx->clear(ctx->clear_param);
+
 		return false;
+	}
 
 	if (c == 0x1B)
 	{
@@ -373,7 +380,7 @@ const char* rl_readline(struct RLContext* ctx)
 		char ch;
 		int c;
 
-		ASSERT(ctx->history - ctx->real_history + i < HISTORY_SIZE);
+		ASSERT(ctx->history - ctx->real_history + ctx->line_pos < HISTORY_SIZE);
 
 		if (!rl_getc(ctx, &c))
 			return NULL;
@@ -388,12 +395,17 @@ const char* rl_readline(struct RLContext* ctx)
 			if (!ctx->match)
 				return false;
 
-			complete_word(ctx, &i);
+			complete_word(ctx, &ctx->line_pos);
 			continue;
 		}
 
 		if (c == '\r' || c == '\n')
 		{
+			if (ctx->prompt)
+				rl_puts(ctx, ctx->prompt);
+
+			// Terminate line
+			insert_chars(ctx, &ctx->line_pos, NULL, 0);
 			rl_puts(ctx, "\r\n");
 			break;
 		}
@@ -402,9 +414,9 @@ const char* rl_readline(struct RLContext* ctx)
 		//  the start of the line
 		if (c == '\b')
 		{
-			if (ctx->history[i] != '\0')
+			if (ctx->history[ctx->line_pos] != '\0')
 			{
-				--i;
+				--ctx->line_pos;
 				rl_puts(ctx, "\b \b");
 			}
 			continue;
@@ -413,18 +425,22 @@ const char* rl_readline(struct RLContext* ctx)
 		// Add a character to the buffer, if possible
 		ch = (char)c;
 		ASSERT2(ch == c, "a special key was not properly handled");
-		if (insert_chars(ctx, &i, &ch, 1))
+		if (insert_chars(ctx, &ctx->line_pos, &ch, 1))
+		{
 			rl_putc(ctx, ch);
+		}
 		else
+		{
 			beep(ctx);
+		}
 	}
 
-	ctx->history_pos = i+1;
-	while (ctx->history[i] != '\0')
-		--i;
+	ctx->history_pos = ctx->line_pos + 1;
+	while (ctx->history[ctx->line_pos] != '\0')
+		--ctx->line_pos;
 
 	// Do not store empty lines in the history
-	if (i == ctx->history_pos - 1)
+	if (ctx->line_pos == ctx->history_pos - 1)
 		ctx->history_pos -= 1;
 
 #if DEBUG_DUMP_HISTORY
@@ -433,7 +449,7 @@ const char* rl_readline(struct RLContext* ctx)
 
 	// Since the current pointer now points to the separator, we need
 	//  to return the first character
-	return &ctx->history[i+1];
+	return &ctx->history[ctx->line_pos + 1];
 }
 
 

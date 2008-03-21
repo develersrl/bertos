@@ -58,6 +58,7 @@
 typedef int (*getc_hook)(void* user_data);
 typedef void (*putc_hook)(char ch, void* user_data);
 typedef const char* (*match_hook)(void* user_data, const char* word, int word_len);
+typedef void (*clear_hook)(void* user_data);
 
 struct RLContext
 {
@@ -70,11 +71,15 @@ struct RLContext
 	match_hook match;
 	void* match_param;
 
+	clear_hook clear;
+	void* clear_param;
+
 	const char* prompt;
 
 	char real_history[HISTORY_SIZE];
 	char* history;
 	size_t history_pos;
+	size_t line_pos;
 };
 
 INLINE void rl_init_ctx(struct RLContext *ctx)
@@ -98,6 +103,9 @@ INLINE void rl_sethook_put(struct RLContext* ctx, putc_hook put, void* put_param
 
 INLINE void rl_sethook_match(struct RLContext* ctx, match_hook match, void* match_param)
 { ctx->match = match; ctx->match_param = match_param; }
+
+INLINE void rl_sethook_clear(struct RLContext* ctx, clear_hook clear, void* clear_param)
+{ ctx->clear = clear; ctx->clear_param = clear_param; }
 
 INLINE void rl_setprompt(struct RLContext* ctx, const char* prompt)
 { ctx->prompt = prompt; }
