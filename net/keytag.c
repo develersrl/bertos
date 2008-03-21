@@ -44,6 +44,8 @@
 
 #include "keytag.h"
 
+#include <kern/kfile.h>
+
 #include <drv/timer.h>
 #include <drv/ser.h>
 
@@ -66,7 +68,7 @@ static void keytag_clearPkt(struct TagPacket *pkt)
 	int c;
 
 	/* Get all chars from buffer */
-	while ((c = ser_getchar_nowait(pkt->tag_ser)) != EOF)
+	while ((c = kfile_getc(&pkt->tag_ser->fd)) != EOF)
 	{
 		/* Search for STX char in received chars */
 		if (c == TAG_STX)
@@ -84,7 +86,7 @@ static void keytag_clearPkt(struct TagPacket *pkt)
 			{
 				pkt->buf[TAG_MAX_PRINT_CHARS] = '\x0';
 				/* Write read TAG on communication serial */
-				ser_printf(pkt->comm_ser, "tag %s", pkt->buf);
+				kfile_printf(&pkt->comm_ser->fd, "tag %s", pkt->buf);
 				pkt->sync = false;
 			}
 			else
