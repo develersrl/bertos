@@ -61,6 +61,8 @@
 
 #include <mware/hashtable.h>
 
+#include "appconfig.h"
+
 #define ARG_SEP_S " "
 #define ARG_SEP_C ' '
 

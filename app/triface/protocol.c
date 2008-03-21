@@ -45,6 +45,8 @@
 #include "protocol.h"
 #include "cmd_ctor.h"  // MAKE_CMD, REGISTER_CMD
 #include "verstag.h"
+#include "hw_adc.h"
+#include "hw_input.h"
 
 #include <drv/timer.h>
 #include <drv/ser.h>
@@ -60,14 +62,10 @@
 
 #include <kern/kfile.h>
 
-#include "hw_adc.h"
-#include "hw_input.h"
-
 #include <stdlib.h>
 #include <string.h>
 
-//#include <cmd_hunk.h>
-
+#include "appconfig.h"
 
 // Define the format string for ADC
 #define ADC_FORMAT_STR "dddd"
@@ -91,7 +89,8 @@ uint8_t reg_status_dout;
 /**
  * Send a NAK asking the host to send the current message again.
  *
- * \param err  human-readable description of the error for debug purposes.
+ * \a fd kfile handler for serial.
+ * \a err  human-readable description of the error for debug purposes.
  */
 INLINE void NAK(KFile *fd, const char *err)
 {
