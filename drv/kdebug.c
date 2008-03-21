@@ -38,12 +38,13 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-
-#include <cfg/debug.h>
 #include <cpu/irq.h>
 #include <cpu/attr.h>
 #include <cpu/types.h>
+
 #include <cfg/macros.h> /* for BV() */
+#include <cfg/debug.h>
+
 #include <appconfig.h>
 #warning what about these?
 //#include <hw_cpu.h>     /* for CLOCK_FREQ */

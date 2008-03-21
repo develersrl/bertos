@@ -38,6 +38,9 @@
 #ifndef NET_KEYTAG_H
 #define NET_KEYTAG_H
 
+#include <kern/kfile.h>
+#include <drv/ser.h>
+
 /**
  * Starting communication char (STX).
  */
@@ -60,8 +63,6 @@
  * Max number of chars to print in the communication serial
  */
 #define TAG_MAX_PRINT_CHARS 12
-
-#include <kern/kfile.h>
 
 /**
  * Structure of a Tag packet
