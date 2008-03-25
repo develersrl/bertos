@@ -31,7 +31,6 @@
  *
  * -->
  *
- * \brief Simple inter-process messaging system
  *
  * This module implements a common system for executing
  * a user defined action calling a hook function.
@@ -39,46 +38,9 @@
  * \version $Id$
  *
  * \author Bernardo Innocenti <bernie@develer.com>
- */
-
-/*#*
- *#* $Log$
- *#* Revision 1.9  2006/07/19 12:56:27  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.8  2005/11/04 16:20:02  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.7  2005/02/09 21:48:30  bernie
- *#* Doxygen fixes.
- *#*
- *#* Revision 1.6  2005/01/22 04:20:26  bernie
- *#* Write extensive documentation; Add simple locking.
- *#*
- *#* Revision 1.5  2004/11/28 23:20:25  bernie
- *#* Remove obsolete INITLIST macro.
- *#*
- *#* Revision 1.4  2004/10/19 08:22:09  bernie
- *#* msg_peek(): New function.
- *#*
- *#* Revision 1.3  2004/08/25 14:12:09  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.2  2004/08/14 19:37:57  rasky
- *#* Merge da SC: macros.h, pool.h, BIT_CHANGE, nome dei processi, etc.
- *#*
- *#* Revision 1.1  2004/06/06 15:11:08  bernie
- *#* Import into DevLib.
- *#*
- *#*/
-#ifndef KERN_MSG_H
-#define KERN_MSG_H
-
-#include "event.h"
-#include <mware/list.h>
-
-
-/**
+ *
+ * \brief Simple inter-process messaging system
+ *
  * Handle queues of messages associated an action.
  *
  * A message port is an abstraction used to exchange information
@@ -212,6 +174,16 @@
  *	}
  * \endcode
  */
+
+ */
+
+#ifndef KERN_MSG_H
+#define KERN_MSG_H
+
+#include "event.h"
+#include <mware/list.h>
+
+
 typedef struct MsgPort
 {
 	List  queue;   /**< Messages queued at this port. */
