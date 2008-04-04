@@ -16,11 +16,11 @@ TRG += battfs_test
 
 
 battfs_test_CSRC = \
-	fs/battfs.c \
+	bertos/fs/battfs.c \
 	app/battfs/battfs_test.c \
-	kern/kfile.c
+	bertos/kern/kfile.c
 
-battfs_test_CFLAGS = -O0 -D'ARCH=ARCH_EMUL' -D_EMUL -Iapp/battfs -Ihw -g3
+battfs_test_CFLAGS = -O0 -D'ARCH=ARCH_EMUL' -D_EMUL -Iapp/battfs -g3
 
 
 # Debug stuff
