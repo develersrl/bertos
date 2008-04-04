@@ -35,8 +35,8 @@ memory footprint requirements.
 \section features Features
 
   - multitasking kernel with IPC, semaphores, priority levels;
-  - a comprehensive set of generic drivers for a wide range of devices, 
-    which can be easily customized to the actual hardware: timer, serial, 
+  - a comprehensive set of generic drivers for a wide range of devices,
+    which can be easily customized to the actual hardware: timer, serial,
     adc, ntc, pwm, stepper motors, dc motors, lcd, keyboards, buzzer, eeprom;
   - full graphic subsystem for simple displays, with font support, bitmaps,
     clipping, text formatting, interactive menus;
@@ -53,22 +53,22 @@ memory footprint requirements.
 
 The modules are sorted in subdirectories by their category:
 
-  - algo/    : algorithms;
-  - app/     : demo application;
-  - cfg/     : configuration stuff;
-  - doc/     : documentation;
-  - drv/     : hardware drivers;
-  - dt/	     : experimental object oriented gui toolkit;
-  - emul/    : Qt-based emulator framework for embedded applications;
-  - fonts/   : fonts;
-  - fs/      : file system related stuff;
-  - gfx/     : general purpose graphics routines;
-  - gui/     : widgets for simple displays;
-  - hw/	     : hardware-specific declarations;
-  - icons/   : conversion tool from image TXT format to LCD bitmap;
-  - kern/    : multitasking kernel;
-  - mware/   : algorithms, containers and other standalone code;
-  - os/	     : OS-abstraction layers for hosted environments;
+  - app/            : demo applications;
+  - bertos/algo/    : algorithms;
+  - bertos/cfg/     : configuration stuff;
+  - bertos/drv/     : hardware drivers;
+  - bertos/dt/	    : experimental object oriented gui toolkit;
+  - bertos/emul/    : Qt-based emulator framework for embedded applications;
+  - bertos/fonts/   : fonts;
+  - bertos/fs/      : file system related stuff;
+  - bertos/gfx/     : general purpose graphics routines;
+  - bertos/gui/     : widgets for simple displays;
+  - bertos/hw/	    : hardware-specific declarations;
+  - bertos/icons/   : conversion tool from image TXT format to LCD bitmap;
+  - bertos/kern/    : multitasking kernel;
+  - bertos/mware/   : algorithms, containers and other standalone code;
+  - bertos/os/	    : OS-abstraction layers for hosted environments;
+  - doc/            : documentation;
 
 The top-level directory contains a few support headers that are meant to be
 usable by any C/C++ embedded or hosted application.
