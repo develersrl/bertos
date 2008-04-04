@@ -8,8 +8,8 @@
 # Author: Bernardo Innocenti <bernie@develer.com>
 #
 
-include fonts/fonts.mk
-include emul/emul.mk
+include bertos/fonts/fonts.mk
+include bertos/emul/emul.mk
 
 # Set to 1 for debug builds
 demo_DEBUG = 1
@@ -21,65 +21,65 @@ TRG += demo
 CC = g++
 
 demo_CXXSRC = \
-	emul/emul.cpp \
-	emul/emulwin.cpp \
-	emul/emulkbd.cpp \
-	drv/lcd_gfx_qt.cpp
+	bertos/emul/emul.cpp \
+	bertos/emul/emulwin.cpp \
+	bertos/emul/emulkbd.cpp \
+	bertos/drv/lcd_gfx_qt.cpp
 
 demo_CSRC = \
 	app/demo/demo.c \
-	os/hptime.c \
-	gfx/bitmap.c \
-	gfx/line.c \
-	gfx/win.c \
-	gfx/text.c \
-	gfx/text_format.c \
-	gui/menu.c \
-	fonts/helvB10.c \
-	fonts/luBS14.c \
-	fonts/ncenB18.c \
-	icons/logo.c \
-	drv/kbd.c \
-	drv/timer.c \
-	drv/buzzer.c \
-	drv/ser.c \
-	drv/ser_posix.c \
-	mware/formatwr.c \
-	mware/hex.c \
-	mware/event.c \
-	mware/observer.c \
-	mware/resource.c \
-	mware/sprintf.c \
-	kern/proc.c \
-	kern/sem.c \
-	kern/signal.c \
-	kern/monitor.c \
-	kern/proc_test.c \
-	verstag.c
+	bertos/os/hptime.c \
+	bertos/gfx/bitmap.c \
+	bertos/gfx/line.c \
+	bertos/gfx/win.c \
+	bertos/gfx/text.c \
+	bertos/gfx/text_format.c \
+	bertos/gui/menu.c \
+	bertos/fonts/helvB10.c \
+	bertos/fonts/luBS14.c \
+	bertos/fonts/ncenB18.c \
+	bertos/icons/logo.c \
+	bertos/drv/kbd.c \
+	bertos/drv/timer.c \
+	bertos/drv/buzzer.c \
+	bertos/drv/ser.c \
+	bertos/drv/ser_posix.c \
+	bertos/mware/formatwr.c \
+	bertos/mware/hex.c \
+	bertos/mware/event.c \
+	bertos/mware/observer.c \
+	bertos/mware/resource.c \
+	bertos/mware/sprintf.c \
+	bertos/kern/proc.c \
+	bertos/kern/sem.c \
+	bertos/kern/signal.c \
+	bertos/kern/monitor.c \
+	bertos/kern/proc_test.c \
+	bertos/verstag.c
 
 demo_CPPASRC = \
-	kern/switch.S
+	bertos/kern/switch.S
 
 # FIXME: maybe this junk should go in emul/emul.mk?
-$(OBJDIR)/demo/emul/emulwin.o: emul/emulwin_moc.cpp 
-$(OBJDIR)/demo/drv/lcd_gfx_qt.o: drv/lcd_gfx_qt_moc.cpp
-$(OBJDIR)/demo/drv/timer.o: drv/timer_qt_moc.cpp
-$(OBJDIR)/demo/emul/emulkbd.o: emul/emulkbd_moc.cpp
+$(OBJDIR)/demo/bertos/emul/emulwin.o: bertos/emul/emulwin_moc.cpp 
+$(OBJDIR)/demo/bertos/drv/lcd_gfx_qt.o: bertos/drv/lcd_gfx_qt_moc.cpp
+$(OBJDIR)/demo/bertos/drv/timer.o: bertos/drv/timer_qt_moc.cpp
+$(OBJDIR)/demo/bertos/emul/emulkbd.o: bertos/emul/emulkbd_moc.cpp
 
 #FIXME: isn't there a way to avoid repeating the pattern rule?
-drv/timer_qt_moc.cpp: drv/timer_qt.c
+bertos/drv/timer_qt_moc.cpp: bertos/drv/timer_qt.c
 	$(QT_MOC) -o $@ $<
 
 
-demo_CFLAGS = -D_QT=4 -D'ARCH=ARCH_EMUL' -Iapp/demo -Ihw $(EMUL_CFLAGS)
-demo_CXXFLAGS = -D_QT=4 -D'ARCH=ARCH_EMUL' -Iapp/demo -Ihw $(EMUL_CFLAGS)
+demo_CFLAGS = -D_QT=4 -D'ARCH=ARCH_EMUL' -Iapp/demo $(EMUL_CFLAGS)
+demo_CXXFLAGS = -D_QT=4 -D'ARCH=ARCH_EMUL' -Iapp/demo $(EMUL_CFLAGS)
 demo_LDFLAGS = $(EMUL_LDFLAGS)
 
 # Debug stuff
 ifeq ($(demo_DEBUG),1)
 	demo_CFLAGS += -D_DEBUG
 	demo_CXXFLAGS += -D_DEBUG
-	demo_CSRC += drv/kdebug.c
+	demo_CSRC += bertos/drv/kdebug.c
 else
 	demo_CFLAGS += -Os
 	demo_CXXFLAGS += -Os

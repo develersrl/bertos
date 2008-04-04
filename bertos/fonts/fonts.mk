@@ -9,4 +9,4 @@
 #
 
 %.c: %.bdf
-	fonts/convbdf $< > $@
+	bertos/fonts/convbdf $< > $@

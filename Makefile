@@ -11,7 +11,7 @@ V := 0
 
 default: all
 
-include config.mk
+include bertos/config.mk
 
 #Include subtargets
 include app/demo/demo.mk
@@ -19,4 +19,4 @@ include app/demo/demo.mk
 #include app/battfs/battfs_test.mk
 #include app/triface/triface.mk
 
-include rules.mk
+include bertos/rules.mk

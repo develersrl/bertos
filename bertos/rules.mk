@@ -266,7 +266,7 @@ $(RECURSIVE_TARGETS):
 
 BUILDREV_H = buildrev.h
 
-ifeq ($(shell [ -e verstag.c ] && echo yes),yes)
+ifeq ($(shell [ -e bertos/verstag.c ] && echo yes),yes)
 .PHONY: bumprev
 bumprev:
 	@buildnr=0; \

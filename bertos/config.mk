@@ -58,7 +58,7 @@ COFFCONVERT=$(OBJCOPY) \
 	--change-section-address .noinit-0x800000 \
 	--change-section-address .eeprom-0x810000
 
-INCDIR  = -I. -Ihw
+INCDIR  = -I. -Ibertos -Ibertos/hw
 LIBDIR  = lib
 OBJDIR  = obj
 OUTDIR  = images
