@@ -24,25 +24,25 @@ triface_CSRC = \
 	app/triface/triface.c \
 	app/triface/protocol.c \
 	app/triface/hw/hw_adc.c \
-	drv/timer.c \
-	drv/ser.c \
-	cpu/avr/drv/ser_avr.c \
-	cpu/avr/drv/sipo.c \
-	mware/formatwr.c \
-	mware/hex.c \
-	mware/hashtable.c \
-	mware/readline.c \
-	mware/parser.c \
-	mware/event.c \
-	kern/kfile.c \
-	net/keytag.c \
-	drv/buzzer.c \
+	bertos/drv/timer.c \
+	bertos/drv/ser.c \
+	bertos/cpu/avr/drv/ser_avr.c \
+	bertos/cpu/avr/drv/sipo.c \
+	bertos/mware/formatwr.c \
+	bertos/mware/hex.c \
+	bertos/mware/hashtable.c \
+	bertos/mware/readline.c \
+	bertos/mware/parser.c \
+	bertos/mware/event.c \
+	bertos/kern/kfile.c \
+	bertos/net/keytag.c \
+	bertos/drv/buzzer.c \
 	#
 
-triface_PCSRC += mware/formatwr.c
+triface_PCSRC += bertos/mware/formatwr.c
 
 
-triface_CFLAGS = -O2 -D'ARCH=0' -fno-strict-aliasing -Iapp/triface -Iapp/triface/hw -Icpu/avr
+triface_CFLAGS = -O2 -D'ARCH=0' -fno-strict-aliasing -Iapp/triface -Iapp/triface/hw -Ibertos/cpu/avr
 triface_LDFLAGS = -Wl
 
 triface_MCU = atmega64
@@ -51,6 +51,6 @@ triface_CROSS = avr-
 # Debug stuff
 ifeq ($(triface_DEBUG),1)
 	triface_CFLAGS += -D_DEBUG
-	triface_PCSRC += drv/kdebug.c
+	triface_PCSRC += bertos/drv/kdebug.c
 endif
 
