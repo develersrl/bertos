@@ -113,10 +113,10 @@
 	#define CONFIG_UART1_RXBUFSIZE  64
 
 	/** [bytes] Size of the outbound FIFO buffer for SPI port (AVR only). */
-	#define CONFIG_SPI_TXBUFSIZE	16
+	#define CONFIG_SPI0_TXBUFSIZE	16
 
 	/** [bytes] Size of the inbound FIFO buffer for SPI port (AVR only). */
-	#define CONFIG_SPI_RXBUFSIZE	32
+	#define CONFIG_SPI0_RXBUFSIZE	32
 
 	/** SPI data order (AVR only). */
 	#define CONFIG_SPI_DATA_ORDER	SER_MSB_FIRST
@@ -213,6 +213,8 @@
 
 /// Disable tests.
 #define CONFIG_TEST 0
+
+#define CONFIG_FAST_MEM 0
 
 
 #endif /* APPCONFIG_COMMON_H */

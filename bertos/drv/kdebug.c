@@ -46,9 +46,6 @@
 #include <cfg/debug.h>
 
 #include <appconfig.h>
-#warning what about these?
-//#include <hw_cpu.h>     /* for CLOCK_FREQ */
-//#include <hw_ser.h>     /* Required for bus macros overrides */
 
 #include <mware/formatwr.h> /* for _formatted_write() */
 #include <mware/pgm.h>

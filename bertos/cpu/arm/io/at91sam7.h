@@ -310,6 +310,9 @@
 #if CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128
 	#define TWD  10
 	#define TWCK 11
+#elif CPU_ARM_AT91SAM7S256
+	#define TWD  3
+	#define TWCK 4
 #else
 	#error No TWI pin names definition for selected ARM CPU
 #endif
