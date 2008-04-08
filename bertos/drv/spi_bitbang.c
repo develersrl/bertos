@@ -40,9 +40,9 @@
  */
 
 
-#include <cfg/cpu.h>
+#include <cpu/irq.h>
 #include <cfg/module.h>
-#include <drv/spi_emu.h>
+#include "spi_bitbang.h"
 #include "hw_spi.h"
 
 void spi_assertSS(void)

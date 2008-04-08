@@ -40,8 +40,8 @@
  */
 
 
-#ifndef DRV_SPI_EMU_H
-#define DRV_SPI_EMU_H
+#ifndef DRV_SPI_BITBANG_H
+#define DRV_SPI_BITBANG_H
 
 #include <cfg/compiler.h>
 #include <appconfig.h>
@@ -69,4 +69,4 @@ void spi_init(void);
 void spi_assertSS(void);
 void spi_deassertSS(void);
 
-#endif /* DRV_SPI_EMU_H */
+#endif /* DRV_SPI_BITBANG_H */
