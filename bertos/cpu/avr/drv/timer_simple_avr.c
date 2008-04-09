@@ -70,12 +70,12 @@
  *#* Simplified timer delay routines.
  *#*
  *#*/
-#include "hw.h"
-#include "timer_simple.h"
+#include "hw_cpu.h"
+#include "timer_simple_avr.h"
 #include <drv/wdt.h>
-#include <compiler.h>
-#include <cpu.h>
-#include <macros.h> /* BV() */
+#include <cfg/compiler.h>
+#include <cfg/macros.h> /* BV() */
+#include <hw_cpu.h>  /* CLOCK_FREQ */
 
 #include <avr/io.h>
 
