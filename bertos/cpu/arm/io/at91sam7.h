@@ -266,7 +266,7 @@
 	#define TIOB2  27 // PA27
 
 #else
-	#error No Timer Conter pins name definition for selected ARM CPU
+	#error No Timer Counter pins' names definition for selected ARM CPU
 
 #endif
 /*\}*/
@@ -298,7 +298,7 @@
 	#define PWM3  14 // PA14
 
 #else
-	#error No PWM pins name definition for selected ARM CPU
+	#error No PWM pins' names definition for selected ARM CPU
 
 #endif
 /*\}*/
@@ -314,7 +314,7 @@
 	#define TWD  3
 	#define TWCK 4
 #else
-	#error No TWI pin names definition for selected ARM CPU
+	#error No TWI pins' names definition for selected ARM CPU
 #endif
 
 /**
@@ -336,7 +336,7 @@
 	#define AD3     16 // PA20
 
 #else
-	#error No Timer Conter pin names definition for selected ARM CPU
+	#error No ADC pins' names definition for selected ARM CPU
 
 #endif
 /*\}*/
