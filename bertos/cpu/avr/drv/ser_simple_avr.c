@@ -65,12 +65,12 @@
  *#* Revision 1.1  2004/10/13 16:35:36  batt
  *#* New (simple) serial driver.
  *#*/
-#include "ser_simple.h"
+#include "ser_simple_avr.h"
 
-#include <compiler.h>
-#include <config.h>
-#include <macros.h> /* BV() */
-#include <hw.h>
+#include <cfg/compiler.h>
+#include <appconfig.h>
+#include <cfg/macros.h> /* BV() */
+#include "hw_cpu.h"
 
 #include <avr/io.h>
 

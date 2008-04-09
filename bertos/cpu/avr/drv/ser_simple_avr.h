@@ -68,8 +68,8 @@
 /* For checking which serial driver is linked */
 #define SER_SIMPLE
 
-#include <config.h>
-#include <compiler.h>
+#include <appconfig.h>
+#include <cfg/compiler.h>
 
 
 #if 0
