@@ -264,7 +264,7 @@ void proc_schedule(void)
 		 * are idle-spinning, we must allow interrupts, otherwise no
 		 * process will ever wake up.
 		 *
-		 * During idle-spinning, can occur an interrupt, it may be able to
+		 * During idle-spinning, an interrupt can occur and it may
 		 * modify \p ProcReadyList. To ensure that compiler reload this
 		 * variable every while cycle we call CPU_MEMORY_BARRIER.
 		 * The memory barrier ensure that all variables used in this context
