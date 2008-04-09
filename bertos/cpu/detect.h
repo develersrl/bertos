@@ -95,7 +95,7 @@
 
 	/* #elif Add other ARM families here */
 	#else
-		#define CPU_ATM_AT91         0
+		#define CPU_ARM_AT91         0
 	#endif
 
 
