@@ -291,6 +291,14 @@ INLINE void fifo_init(FIFOBuffer *fb, unsigned char *buf, size_t size)
 	fb->end = buf + size - 1;
 }
 
+/**
+ * \return Lenght of the FIFOBuffer \a fb.
+ */
+INLINE size_t fifo_len(FIFOBuffer *fb)
+{
+	return fb->end - fb->begin;
+}
+
 
 #if 0
 
