@@ -79,7 +79,7 @@
 #endif
 
 
-#if CPU_ARM_AT91SAM7S256 || CPU_ARM_AT91SAM7X256
+#if CPU_ARM_AT91SAM7S256 || CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128
 	/**
 	* With a 18.420MHz cristal, master clock is:
 	* (((18.420 * PLL_MUL_VAL + 1) / PLL_DIV_VAL) / AT91MCK_PRES) = 48.023MHz
@@ -110,7 +110,9 @@
 	#define PMC_MOSCS             (1 << 0)
 	#define PMC_LOCK              (1 << 2)
 	#define PMC_MCKRDY            (1 << 3)
+	#define PMC_CSS_MASK        0x00000003
 	#define PMC_CSS_PLL_CLK     0x00000003
+	#define PMC_PRES_MASK       0x0000001C
 	#define PMC_PRES_CLK_2      0x00000004
 
 	#define CKGR_MOR_OFF        0x00000020
@@ -227,6 +229,28 @@ wait_moscs:
         ldr     r0, [r1, #PMC_SR_OFF]
         tst     r0, #PMC_MOSCS
         beq     wait_moscs
+
+        /*
+         * Switch to Slow oscillator clock.
+         */
+        ldr     r0, [r1, #PMC_MCKR_OFF]
+        and     r0, r0, #~PMC_CSS_MASK
+        str     r0, [r1, #PMC_MCKR_OFF]
+wait_slowosc:
+        ldr     r0, [r1, #PMC_SR_OFF]
+        tst     r0, #PMC_MCKRDY
+        beq     wait_slowosc
+
+        /*
+         * Switch to prescaler div 1 factor.
+         */
+        ldr     r0, [r1, #PMC_MCKR_OFF]
+        and     r0, r0, #~PMC_PRES_MASK
+        str     r0, [r1, #PMC_MCKR_OFF]
+wait_presc:
+        ldr     r0, [r1, #PMC_SR_OFF]
+        tst     r0, #PMC_MCKRDY
+        beq     wait_presc
 
         /*
          * Set PLL:
