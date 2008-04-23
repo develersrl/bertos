@@ -287,8 +287,8 @@ static void uart0_init(
 	US0_IDR = 0xFFFFFFFF;
 	/* Set the vector. */
 	AIC_SVR(US0_ID) = uart0_irq_dispatcher;
-	/* Initialize to edge triggered with defined priority. */
-	AIC_SMR(US0_ID) = AIC_SRCTYPE_INT_EDGE_TRIGGERED | SERIRQ_PRIORITY;
+	/* Initialize to level sensitive with defined priority. */
+	AIC_SMR(US0_ID) = AIC_SRCTYPE_INT_LEVEL_SENSITIVE | SERIRQ_PRIORITY;
 	PMC_PCER = BV(US0_ID);
 
 	/*
@@ -382,8 +382,8 @@ static void uart1_init(
 	US1_IDR = 0xFFFFFFFF;
 	/* Set the vector. */
 	AIC_SVR(US1_ID) = uart1_irq_dispatcher;
-	/* Initialize to edge triggered with defined priority. */
-	AIC_SMR(US1_ID) = AIC_SRCTYPE_INT_EDGE_TRIGGERED | SERIRQ_PRIORITY;
+	/* Initialize to level sensitive with defined priority. */
+	AIC_SMR(US1_ID) = AIC_SRCTYPE_INT_LEVEL_SENSITIVE | SERIRQ_PRIORITY;
 	PMC_PCER = BV(US1_ID);
 
 	/*
