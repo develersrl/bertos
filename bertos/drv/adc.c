@@ -40,7 +40,6 @@
 
 
 #include <drv/adc.h>
-#include <drv/timer.h>
 
 #include CPU_CSOURCE(adc)
 
