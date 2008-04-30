@@ -62,7 +62,7 @@ void pwm_setDuty(PwmDev dev, pwm_duty_t duty)
 
 	real_duty = (uint64_t)(duty * period) >> (uint64_t)PWM_MAX_PERIOD_LOG2;
 
-// 	kprintf("real_duty[%d] duty[%d], period[%d]\n", real_duty, duty, period);
+// 	TRACEMSG("real_duty[%d] duty[%d], period[%d]", real_duty, duty, period);
 	pwm_hw_setDutyUnlock(dev, real_duty);
 }
 
@@ -95,11 +95,11 @@ void pwm_init(void)
 
 	IRQ_SAVE_DISABLE(flags);
 
+	pwm_hw_init();
+
 	/* set all pwm to 0 */
 	for (dev = 0; dev < PWM_CNT; dev++)
 		pwm_setDuty(dev, 0);
-
-	pwm_hw_init();
 
 	IRQ_RESTORE(flags);
 }

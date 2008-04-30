@@ -42,9 +42,13 @@
 
 #include <drv/pwm.h>
 #include <drv/pwm_at91.h>
+#include <drv/timer.h>
+#include <drv/sysirq_at91.h>
 
 #include <cfg/macros.h>
 #include <cfg/debug.h>
+
+#include <io/arm.h>
 
 /*
  * Esample of value for duty cycle"
@@ -60,14 +64,14 @@
 
 #define PWM_TEST_CH0                     0
 #define PWM_TEST_CH0_FREQ            100UL // 100Hz
-#define PWM_TEST_CH0_DUTY           0xCCCC // 80%
+#define PWM_TEST_CH0_DUTY           0xBFFF // 80%
 
 #define PWM_TEST_CH1                     1
 #define PWM_TEST_CH1_FREQ           1000UL  // 1000Hz
 #define PWM_TEST_CH1_DUTY           0xBFFF  // 75%
 
 #define PWM_TEST_CH2                     2
-#define PWM_TEST_CH2_FREQ            12356  // 12356Hz
+#define PWM_TEST_CH2_FREQ          12356UL  // 12356Hz
 #define PWM_TEST_CH2_DUTY           0x7FFF  // 50%
 
 #define PWM_TEST_CH3                     3
@@ -88,20 +92,67 @@
 void pwm_test(void)
 {
 
+	kputs("PWM test\n\n");
+
+	kputs("Init pwm..");
+
 	pwm_init();
-	kputs("Init pwm..\n");
+	kputs("done.\n");
 
 	PWM_TEST_CH_SET(0);
-	kprintf("Set pwm ch[%d] =>freq[%ld], duty[%d]\n", PWM_TEST_CH0, PWM_TEST_CH0_FREQ, PWM_TEST_CH0_DUTY);
+	kprintf("PWM test set ch[%d] =>freq[%ld], duty[%d]\n", PWM_TEST_CH0, PWM_TEST_CH0_FREQ, PWM_TEST_CH0_DUTY);
 	PWM_TEST_CH_SET(1);
-	kprintf("Set pwm ch[%d] =>freq[%ld], duty[%d]\n", PWM_TEST_CH1, PWM_TEST_CH1_FREQ, PWM_TEST_CH1_DUTY);
+	kprintf("PWM test set ch[%d] =>freq[%ld], duty[%d]\n", PWM_TEST_CH1, PWM_TEST_CH1_FREQ, PWM_TEST_CH1_DUTY);
 	PWM_TEST_CH_SET(2);
-	kprintf("Set pwm ch[%d] =>freq[%ld], duty[%d]\n", PWM_TEST_CH2, PWM_TEST_CH2_FREQ, PWM_TEST_CH2_DUTY);
+	kprintf("PWM test set ch[%d] =>freq[%ld], duty[%d]\n", PWM_TEST_CH2, PWM_TEST_CH2_FREQ, PWM_TEST_CH2_DUTY);
 	PWM_TEST_CH_SET(3);
-	kprintf("Set pwm ch[%d] =>freq[%ld], duty[%d]\n", PWM_TEST_CH3, PWM_TEST_CH3_FREQ, PWM_TEST_CH3_DUTY);
+	kprintf("PWM test set ch[%d] =>freq[%ld], duty[%d]\n", PWM_TEST_CH3, PWM_TEST_CH3_FREQ, PWM_TEST_CH3_DUTY);
 }
 
+int main(void)
+{
+	IRQ_ENABLE;
+	kdbg_init();
+	sysirq_init();
+	timer_init();
+	pwm_test();
 
+
+
+	kputs("Parto con il test!\n");
+	kprintf("PWM CURRENT ch[%d] => cmr[%ld], dty[%ld], prd[%ld], up[%ld]\n", PWM_TEST_CH0, PWM_CMR0, PWM_CDTY0, PWM_CPRD0, PWM_CUPD0);
+
+	for(;;)
+	{
+
+		pwm_setDuty(0,0);
+		timer_delay(5000);
+		kprintf("TEST10 => cmr[%ld], dty[%ld], prd[%ld], up[%ld]\n", PWM_CMR0, PWM_CDTY0, PWM_CPRD0, PWM_CUPD0);
+
+
+		pwm_setDuty(0,0x7FFF);
+		timer_delay(5000);
+		kprintf("TEST50 => cmr[%ld], dty[%ld], prd[%ld], up[%ld]\n", PWM_CMR0, PWM_CDTY0, PWM_CPRD0, PWM_CUPD0);
+
+
+		pwm_setDuty(0,0x5555);
+		timer_delay(5000);
+		kprintf("TEST33 => cmr[%ld], dty[%ld], prd[%ld], up[%ld]\n", PWM_CMR0, PWM_CDTY0, PWM_CPRD0, PWM_CUPD0);
+
+
+		pwm_setDuty(0,0xCCCC);
+		timer_delay(5000);
+		kprintf("TEST80 => cmr[%ld], dty[%ld], prd[%ld], up[%ld]\n", PWM_CMR0, PWM_CDTY0, PWM_CPRD0, PWM_CUPD0);
+		kputs("--------\n");
+
+
+// 		kprintf("PWM test ch[%d] => cmr[%ld], dty[%ld], prd[%ld], up[%ld]\n", PWM_TEST_CH0, PWM_CMR0, PWM_CDTY0, PWM_CPRD0, PWM_CUPD0);
+// 		kprintf("PWM test ch[%d] => cmr[%ld], dty[%ld], prd[%ld], up[%ld]\n", PWM_TEST_CH1, PWM_CMR1, PWM_CDTY1, PWM_CPRD1, PWM_CUPD1);
+// 		kprintf("PWM test ch[%d] => cmr[%ld], dty[%ld], prd[%ld], up[%ld]\n", PWM_TEST_CH2, PWM_CMR2, PWM_CDTY2, PWM_CPRD2, PWM_CUPD2);
+// 		kprintf("PWM test ch[%d] => cmr[%ld], dty[%ld], prd[%ld], up[%ld]\n", PWM_TEST_CH3, PWM_CMR3, PWM_CDTY3, PWM_CPRD3, PWM_CUPD3);
+	}
+
+}
 
 
 

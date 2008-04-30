@@ -35,6 +35,7 @@
  *
  * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
  */
 
 #ifndef DRV_PWM_H
@@ -43,11 +44,18 @@
 #include <pwm_map.h>
 #include <cfg/compiler.h>
 
+#define PWM_MAX_DUTY              ((pwm_duty_t)0xFFFF)
+#define PWM_MAX_PERIOD            0xFFFF
+#define PWM_MAX_PERIOD_LOG2           16
+
 typedef uint16_t pwm_duty_t;
+typedef uint32_t pwm_freq_t;
 
 void pwm_setDuty(PwmDev dev, pwm_duty_t duty);
+void pwm_setFrequency(PwmDev dev, pwm_freq_t freq);
+void pwm_enable(PwmDev dev, bool state);
 void pwm_init(void);
 
-#define PWM_MAX_DUTY 100
+void pwm_test(void);
 
 #endif /* DRV_PWM_H */
