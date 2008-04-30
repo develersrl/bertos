@@ -168,9 +168,9 @@
 #define TC_ENETRG                       12      ///< External event trigger enable.
 
 #define TC_WAVSEL_MASK          0x00006000      ///< Waveform selection mask.
-#define TC_WAVSEL_UP_RC         0x00000000      ///< UP mode whitout automatic trigger on RC compare.
+#define TC_WAVSEL_UP            0x00000000      ///< UP mode whitout automatic trigger on RC compare.
 #define TC_WAVSEL_UP_RC_TRG     0x00004000      ///< UP mode whit automatic trigger on RC compare.
-#define TC_WAVSEL_UPDOWN_RC     0x00002000      ///< UPDOWN mode whitout automatic trigger on RC compare.
+#define TC_WAVSEL_UPDOWN        0x00002000      ///< UPDOWN mode whitout automatic trigger on RC compare.
 #define TC_WAVSEL_UPDOWN_RC_TRG 0x00003000      ///< UPDOWN mode whit automatic trigger on RC compare.
 
 
