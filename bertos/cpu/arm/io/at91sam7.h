@@ -257,6 +257,9 @@
 	#define TIOA2  27 // PB27
 	#define TIOB2  28 // PB28
 
+	#define TIO_PIO_PDR     PIOB_PDR
+	#define TIO_PIO_ABSR    PIOB_ASR
+
 #elif CPU_ARM_AT91SAM7S256
 	#define TIOA0  0 // PA0
 	#define TIOB0  1 // PA1
@@ -265,37 +268,43 @@
 	#define TIOA2  26 // PA26
 	#define TIOB2  27 // PA27
 
+	#define TIO_PIO_PDR     PIOA_PDR
+	#define TIO_PIO_ABSR    PIOA_BSR
+
 #else
 	#error No Timer Counter pins' names definition for selected ARM CPU
 
 #endif
 /*\}*/
 
+
 /**
  * PWM pins definition.
  *\{
  */
-#define PWM_PIO_FUNCTION_A 1
-
 #if CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128
-	#if PWM_PIO_FUNCTION_A
-		#define PWM0  19 // PB19
-		#define PWM1  20 // PB20
-		#define PWM2  21 // PB21
-		#define PWM3  22 // PB22
-	#else
-		#define PWM0  27 // PB27
-		#define PWM1  28 // PB28
-		#define PWM2  29 // PB29
-		#define PWM3  30 // PB30
-	#endif
+	#define PWM0  19 // PB19
+	#define PWM1  20 // PB20
+	#define PWM2  21 // PB21
+	#define PWM3  22 // PB22
 
+	#define PWM_PIO_PDR     PIOB_PDR
+	#define PWM_PIO_PER     PIOB_PER
+	#define PWM_PIO_CODR    PIOB_CODR
+	#define PWM_PIO_OER     PIOB_OER
+	#define PWM_PIO_ABSR    PIOB_ASR
 
 #elif CPU_ARM_AT91SAM7S256
 	#define PWM0  11 // PA11
 	#define PWM1  12 // PA12
 	#define PWM2  13 // PA13
 	#define PWM3  14 // PA14
+
+	#define PWM_PIO_PDR     PIOA_PDR
+	#define PWM_PIO_PER     PIOA_PER
+	#define PWM_PIO_CODR    PIOA_CODR
+	#define PWM_PIO_OER     PIOA_OER
+	#define PWM_PIO_ABSR    PIOA_BSR
 
 #else
 	#error No PWM pins' names definition for selected ARM CPU
@@ -310,9 +319,11 @@
 #if CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128
 	#define TWD  10
 	#define TWCK 11
+
 #elif CPU_ARM_AT91SAM7S256
-	#define TWD  3
-	#define TWCK 4
+	#define TWD  3    //PA3
+	#define TWCK 4    //PA4
+
 #else
 	#error No TWI pins' names definition for selected ARM CPU
 #endif
