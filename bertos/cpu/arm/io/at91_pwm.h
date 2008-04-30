@@ -151,6 +151,7 @@
 #define PWM_CMR2    (*((reg32_t *)(PWMC_BASE + PWM_CMR_OFF + PWM_CH2_OFF))) ///< PWM Channel 2 Mode Register.
 #define PWM_CMR3    (*((reg32_t *)(PWMC_BASE + PWM_CMR_OFF + PWM_CH3_OFF))) ///< PWM Channel 3 Mode Register.
 
+#define PWM_CPRE_MCK_MASK       0x0000000F    ///< PWM Mode prescaler mask.
 #define PWM_CPRE_MCK            0             ///< PWM Mode prescaler set to MCK.
 #define PWM_CPRE_MCK_DIV2       1             ///< PWM Mode prescaler set to MCK/2.
 #define PWM_CPRE_MCK_DIV4       2             ///< PWM Mode prescaler set to MCK/4.
