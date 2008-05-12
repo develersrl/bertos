@@ -181,7 +181,7 @@
 
 #include <mware/event.h>
 #include <mware/list.h>
-
+#include <kern/proc.h>
 
 typedef struct MsgPort
 {
