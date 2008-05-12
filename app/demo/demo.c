@@ -39,6 +39,7 @@
 
 #include <emul/emul.h>
 #include <kern/proc.h>
+#include <kern/msg.h>
 #include <drv/timer.h>
 #include <drv/buzzer.h>
 #include <drv/lcd_gfx.h>

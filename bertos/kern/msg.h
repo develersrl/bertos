@@ -175,12 +175,11 @@
  * \endcode
  */
 
- */
 
 #ifndef KERN_MSG_H
 #define KERN_MSG_H
 
-#include "event.h"
+#include <mware/event.h>
 #include <mware/list.h>
 
 
@@ -214,7 +213,7 @@ typedef struct Msg
  *
  * \see msg_unlockPort()
  */
-INLINE void msg_lockPort(MsgPort *port)
+INLINE void msg_lockPort(UNUSED_ARG(MsgPort *, port))
 {
 	proc_forbid();
 }
@@ -224,7 +223,7 @@ INLINE void msg_lockPort(MsgPort *port)
  *
  * \see msg_lockPort()
  */
-INLINE void msg_unlockPort(MsgPort *port)
+INLINE void msg_unlockPort(UNUSED_ARG(MsgPort *, port))
 {
 	proc_permit();
 }
@@ -240,9 +239,9 @@ INLINE void msg_initPort(MsgPort *port, Event event)
 /** Queue \a msg into \a port, triggering the associated event */
 INLINE void msg_put(MsgPort *port, Msg *msg)
 {
-	msg_portLock(port);
+	msg_lockPort(port);
 	ADDTAIL(&port->queue, &msg->link);
-	msg_portUnlock(port);
+	msg_unlockPort(port);
 
 	event_do(&port->event);
 }
@@ -256,9 +255,9 @@ INLINE Msg *msg_get(MsgPort *port)
 {
 	Msg *msg;
 
-	msg_portLock(port);
-	msg = (Msg *)REMHEAD(&port->queue);
-	msg_portUnlock(port);
+	msg_lockPort(port);
+	msg = (Msg *)list_remHead(&port->queue);
+	msg_unlockPort(port);
 
 	return msg;
 }
@@ -268,11 +267,11 @@ INLINE Msg *msg_peek(MsgPort *port)
 {
 	Msg *msg;
 
-	msg_portLock(port);
-	msg = (Msg *)port->queue.head;
-	if (ISLISTEMPTY(&port->queue))
+	msg_lockPort(port);
+	msg = (Msg *)port->queue.head.succ;
+	if (LIST_EMPTY(&port->queue))
 		msg = NULL;
-	msg_portUnlock(port);
+	msg_unlockPort(port);
 
 	return msg;
 }
