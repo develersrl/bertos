@@ -18,5 +18,6 @@
 
 void dataflash_hw_init(void);
 void dataflash_hw_setCS(bool enable);
+void dataflash_hw_setReset(bool enable);
 
 #endif /* HW_DATAFLASH_H */

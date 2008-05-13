@@ -57,15 +57,19 @@ void dataflash_hw_init(void)
 void dataflash_hw_setCS(bool enable)
 {
 	if (enable)
+	{
 		/*
 		 * Put here your code to enable
 		 * dataflash memory
 		 */
+	}
 	else
+	{
 		/*
 		 * Put here your code to disable
 		 * dataflash memory
 		 */
+	}
 }
 
 /**
@@ -73,16 +77,25 @@ void dataflash_hw_setCS(bool enable)
  *
  * This function provide to send reset signal to
  * dataflash memory. You must impement it comly to a dataflash
- * memory datasheet that describe a reset procedure for select
- * device.
+ * memory datasheet to allow the drive to set a reset pin
+ * when \p enable flag is true, and disable it when is false.
  *
  */
-void dataflash_hw_reset(void)
+void dataflash_hw_setReset(bool enable)
 {
-    /*
-     * Put here your code to reset
-     * data flash memory
-     */
-
+	if (enable)
+	{
+		/*
+		 * Put here your code to set reset of
+		 * dataflash memory
+		 */
+	}
+	else
+	{
+		/*
+		 * Put here your code to clear reset of
+		 * dataflash memory
+		 */
+	}
 }
 
