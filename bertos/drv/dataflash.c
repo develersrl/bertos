@@ -449,7 +449,7 @@ bool dataflash_init(KFileDataflash *fd, KFile *ch, DataflashType dev, dataflash_
 {
 	uint8_t stat;
 
-	MOD_CHECK(dataflash_hw);
+	MOD_CHECK(hw_dataflash);
 
 	ASSERT(fd);
 	ASSERT(ch);
