@@ -32,6 +32,8 @@ MOD_DEFINE(hw_dataflash);
  */
 void dataflash_hw_init(void)
 {
+	#warning The data flash init pins function is not implemented!
+
     //Disable CS line (remove if not needed)
 	dataflash_hw_setCS(false);
 
@@ -56,6 +58,7 @@ void dataflash_hw_init(void)
  */
 void dataflash_hw_setCS(bool enable)
 {
+	#warning The data flash setCS function is not implemented!
 	if (enable)
 	{
 		/*
@@ -83,6 +86,7 @@ void dataflash_hw_setCS(bool enable)
  */
 void dataflash_hw_setReset(bool enable)
 {
+	#warning The data flash setReset function is not implemented!
 	if (enable)
 	{
 		/*
