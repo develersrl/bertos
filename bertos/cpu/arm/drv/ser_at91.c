@@ -792,6 +792,7 @@ static void uart0_irq_rx(void)
 
 	/* Should be read before US_CRS */
 	ser_uart0->status |= US0_CSR & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
+	US0_CR = BV(US_RSTSTA);
 
 	char c = US0_RHR;
 	struct FIFOBuffer * const rxfifo = &ser_uart0->rxfifo;
@@ -856,6 +857,7 @@ static void uart1_irq_rx(void)
 
 	/* Should be read before US_CRS */
 	ser_uart1->status |= US1_CSR & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
+	US1_CR = BV(US_RSTSTA);
 
 	char c = US1_RHR;
 	struct FIFOBuffer * const rxfifo = &ser_uart1->rxfifo;
