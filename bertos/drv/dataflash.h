@@ -44,9 +44,6 @@
 #include <kern/kfile.h>
 #include <cfg/compiler.h>
 
-#include <appconfig.h>
-
-
 /**
  * Type definitions for dflash memory.
  * \{
