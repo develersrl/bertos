@@ -40,42 +40,6 @@
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.19  2006/07/19 12:56:25  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.18  2006/02/17 21:15:25  bernie
- *#* Add MOD_CHECK() checks.
- *#*
- *#* Revision 1.17  2006/02/10 12:30:18  bernie
- *#* Push interrupt protection inside hw module.
- *#*
- *#* Revision 1.16  2005/11/04 16:19:33  bernie
- *#* buz_init(): Restore IRQ protection as in project_bko.
- *#*
- *#* Revision 1.15  2005/06/27 21:25:50  bernie
- *#* Modularize hardware access; Port to new timer interface.
- *#*
- *#* Revision 1.14  2005/04/11 19:10:27  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.13  2005/02/18 11:20:15  bernie
- *#* Use mware/event.h; Update copyright info.
- *#*
- *#* Revision 1.12  2004/12/13 12:07:06  bernie
- *#* DISABLE_IRQSAVE/ENABLE_IRQRESTORE: Convert to IRQ_SAVE_DISABLE/IRQ_RESTORE.
- *#*
- *#* Revision 1.11  2004/12/08 09:11:53  bernie
- *#* Rename time_t to mtime_t.
- *#*
- *#* Revision 1.10  2004/10/03 18:38:51  bernie
- *#* Add missing AVR header; Fix header.
- *#*
- *#* Revision 1.9  2004/09/14 21:01:25  bernie
- *#* Use new AVR port pin names.
- *#*/
-
 #include "buzzer.h"
 
 #include <hw_buzzer.h>

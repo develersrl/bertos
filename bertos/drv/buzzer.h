@@ -38,36 +38,6 @@
  * \brief Buzzer driver
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.10  2006/07/19 12:56:25  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.9  2005/11/27 23:32:15  bernie
- *#* Update copyright information.
- *#*
- *#* Revision 1.8  2005/11/04 16:20:02  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.7  2005/04/11 19:10:27  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.6  2004/12/08 09:11:53  bernie
- *#* Rename time_t to mtime_t.
- *#*
- *#* Revision 1.5  2004/08/25 14:12:08  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.4  2004/08/24 16:53:43  bernie
- *#* Add missing headers.
- *#*
- *#* Revision 1.3  2004/06/03 11:27:09  bernie
- *#* Add dual-license information.
- *#*
- *#* Revision 1.2  2004/05/23 18:21:53  bernie
- *#* Trim CVS logs and cleanup header info.
- *#*
- *#*/
 #ifndef DRV_BUZZER_H
 #define DRV_BUZZER_H
 
