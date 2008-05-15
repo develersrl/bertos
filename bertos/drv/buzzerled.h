@@ -43,11 +43,11 @@
 
 #include <cpu/attr.h>
 
-/** Include hw.h. We expect hw.h to define enum BLD_DEVICE, which must contain
+/** Include hw_buzzerled.h. We expect hw_buzzerled.h to define enum BLD_DEVICE, which must contain
  *  an enumarator for each device, plus a special symbol NUM_BLDS containing the
  *  number of devices.
  */
-#include <hw.h>
+#include <hw/hw_buzzerled.h>
 
 
 /* Include hw-level implementation. This allows inlining of bld_set, which in turns

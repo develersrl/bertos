@@ -51,7 +51,8 @@
  */
 
 #include "buzzerled.h"
-#include "timer.h"
+
+#include <drv/timer.h>
 
 static struct Timer timers[NUM_BLDS];
 static bool timer_go[NUM_BLDS];
