@@ -31,23 +31,25 @@
  *
  * -->
  *
+ * \brief Keyboard driver (implementation)
+ *
  * \version $Id$
  *
  * \author Bernardo Innocenti <bernie@develer.com>
  * \author Stefano Fedrigo <aleph@develer.com>
  * \author Francesco Sacchi <batt@develer.com>
  *
- * \brief Keyboard driver (implementation)
  */
 
 #include <hw_kbd.h>
+
+#include <appconfig.h>
 
 #include <drv/timer.h>
 #include <drv/kbd.h>
 
 #include <cfg/debug.h>
 #include <cfg/module.h>
-#include <appconfig.h>
 
 /* Configuration sanity checks */
 #if !defined(CONFIG_KBD_POLL) || (CONFIG_KBD_POLL != KBD_POLL_SOFTINT && CONFIG_KBD_POLL != CONFIG_POLL_FREERTOS)
