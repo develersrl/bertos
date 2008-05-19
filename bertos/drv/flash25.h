@@ -54,6 +54,29 @@ typedef uint32_t flash25Addr_t;
 typedef uint32_t flash25Size_t;
 typedef uint8_t flash25Offset_t;
 
+/**
+ * Flash25 KFile context structure.
+ */
+typedef struct KFileFlash25
+{
+	KFile fd;                       ///< File descriptor.
+	KFile *channel;                 ///< Dataflash comm channel (usually SPI).
+} KFileFlash25;
+
+/**
+ * ID for dataflash.
+ */
+#define KFT_FLASH25 MAKE_ID('F', 'L', '2', '5')
+
+
+/**
+ * Convert + ASSERT from generic KFile to KFileFlash25.
+ */
+INLINE KFileFlash25 * KFILEFLASH25(KFile *fd)
+{
+	ASSERT(fd->_type == KFT_FLASH25);
+	return (KFileFlash25 *)fd;
+}
 
 /**
  * Memory definition.
@@ -109,9 +132,9 @@ typedef enum {
 	FLASH25_SECT4            = 0x30000,  ///< Sector 4 (0x30000 -0x3FFFF)
 } Flash25Sector;
 
-void flash25_init(struct KFile *fd, struct KFile *_channel);
-void flash25_chipErase(void);
-void flash25_sectorErase(Flash25Sector sector);
+void flash25_init(KFileFlash25 *fd, KFile *ch);
+void flash25_chipErase(KFileFlash25 *fd);
+void flash25_sectorErase(KFileFlash25 *fd, Flash25Sector sector);
 bool flash25_test(KFile *channel);
 
 #endif /* DRV_FLASH25_H */

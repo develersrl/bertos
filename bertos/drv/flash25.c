@@ -55,20 +55,18 @@
 #include <drv/timer.h>
 #include <drv/flash25.h>
 
+#include <kern/kfile.h>
+
 #if CONFIG_KERNEL
 #include <kern/proc.h>
 #endif
 
-
-/**
- * Global definition of channel handler (usually SPI).
- */
-static KFile *channel;
+#warning this file was change, but is untest!
 
 /**
  * Wait until flash memory is ready.
  */
-static void flash25_waitReady(void)
+static void flash25_waitReady(KFileFlash25 *fd)
 {
 	uint8_t stat;
 
@@ -76,8 +74,8 @@ static void flash25_waitReady(void)
 	{
 		CS_ENABLE();
 
-		kfile_putc(FLASH25_RDSR, channel);
-		stat = kfile_getc(channel);
+		kfile_putc(FLASH25_RDSR, fd->channel);
+		stat = kfile_getc(fd->channel);
 
 		CS_DISABLE();
 
@@ -93,11 +91,11 @@ static void flash25_waitReady(void)
 /**
  * Send a single command to serial flash memory.
  */
-static void flash25_sendCmd(Flash25Opcode cmd)
+static void flash25_sendCmd(KFileFlash25 *fd, Flash25Opcode cmd)
 {
 	CS_ENABLE();
 
-	kfile_putc(cmd, channel);
+	kfile_putc(cmd, fd->channel);
 
 	CS_DISABLE();
 }
@@ -108,7 +106,7 @@ static void flash25_sendCmd(Flash25Opcode cmd)
  * try to read manufacturer id of serial memory,
  * then check if is equal to selected type.
  */
-static bool flash25_pin_init(void)
+static bool flash25_pin_init(KFileFlash25 *fd)
 {
 	uint8_t device_id;
 	uint8_t manufacturer;
@@ -121,10 +119,10 @@ static bool flash25_pin_init(void)
 	 * comunication channel
 	 * TODO:controllare se ha senso
 	 */
-	kfile_putc(FLASH25_RDID, channel);
+	kfile_putc(FLASH25_RDID, fd->channel);
 
-	manufacturer = kfile_getc(channel);
-	device_id = kfile_getc(channel);
+	manufacturer = kfile_getc(fd->channel);
+	device_id = kfile_getc(fd->channel);
 
 	CS_DISABLE();
 
@@ -142,15 +140,15 @@ static bool flash25_pin_init(void)
  * the size and seek_pos in kfile stucture.
  * Return a kfile pointer, after assert check.
  */
-static KFile * flash25_reopen(struct KFile *fd)
+static KFile * flash25_reopen(struct KFile *_fd)
 {
-	KFILE_ASSERT_GENERIC(fd);
+	KFileFlash25 *fd = KFILEFLASH25(_fd);
 
-	fd->seek_pos = 0;
-	fd->size = FLASH25_MEM_SIZE;
+	fd->fd.seek_pos = 0;
+	fd->fd.size = FLASH25_MEM_SIZE;
 
 	kprintf("flash25 file opened\n");
-	return fd;
+	return &fd->fd;
 }
 
 /**
@@ -176,33 +174,33 @@ static int flash25_close(UNUSED_ARG(struct KFile *,fd))
  *
  * \return the number of bytes read.
  */
-static size_t flash25_read(struct KFile *fd, void *buf, size_t size)
+static size_t flash25_read(struct KFile *_fd, void *buf, size_t size)
 {
 	uint8_t *data = (uint8_t *)buf;
 
-	KFILE_ASSERT_GENERIC(fd);
+	KFileFlash25 *fd = KFILEFLASH25(_fd);
 
-	ASSERT(fd->seek_pos + size <= fd->size);
-	size = MIN((uint32_t)size, fd->size - fd->seek_pos);
+	ASSERT(fd->fd.seek_pos + size <= fd->fd.size);
+	size = MIN((uint32_t)size, fd->fd.size - fd->fd.seek_pos);
 
 	//kprintf("Reading at addr[%lu], size[%d]\n", fd->seek_pos, size);
 	CS_ENABLE();
 
-	kfile_putc(FLASH25_READ, channel);
+	kfile_putc(FLASH25_READ, fd->channel);
 
 
 	/*
 	 * Address that we want to read.
 	 */
-	kfile_putc((fd->seek_pos >> 16) & 0xFF, channel);
-	kfile_putc((fd->seek_pos >> 8) & 0xFF, channel);
-	kfile_putc(fd->seek_pos & 0xFF, channel);
+	kfile_putc((fd->fd.seek_pos >> 16) & 0xFF, fd->channel);
+	kfile_putc((fd->fd.seek_pos >> 8) & 0xFF, fd->channel);
+	kfile_putc(fd->fd.seek_pos & 0xFF, fd->channel);
 
-	kfile_read(channel, data, size);
+	kfile_read(fd->channel, data, size);
 
 	CS_DISABLE();
 
-	fd->seek_pos += size;
+	fd->fd.seek_pos += size;
 
 	return size;
 }
@@ -226,30 +224,31 @@ static size_t flash25_read(struct KFile *fd, void *buf, size_t size)
  *
  * \return the number of bytes write.
  */
-static size_t flash25_write(struct KFile *fd, const void *_buf, size_t size)
+static size_t flash25_write(struct KFile *_fd, const void *_buf, size_t size)
 {
 	flash25Offset_t offset;
 	flash25Size_t total_write = 0;
 	flash25Size_t wr_len;
 	const uint8_t *data = (const uint8_t *) _buf;
 
-	KFILE_ASSERT_GENERIC(fd);
-	ASSERT(fd->seek_pos + size <= fd->size);
+	KFileFlash25 *fd = KFILEFLASH25(_fd);
 
-	size = MIN((flash25Size_t)size, fd->size - fd->seek_pos);
+	ASSERT(fd->fd.seek_pos + size <= fd->fd.size);
+
+	size = MIN((flash25Size_t)size, fd->fd.size - fd->fd.seek_pos);
 
 	while (size)
 	{
-		offset = fd->seek_pos % (flash25Size_t)FLASH25_PAGE_SIZE;
+		offset = fd->fd.seek_pos % (flash25Size_t)FLASH25_PAGE_SIZE;
 		wr_len = MIN((flash25Size_t)size, FLASH25_PAGE_SIZE - (flash25Size_t)offset);
 
-		kprintf("[seek_pos-<%lu>, offset-<%d>]\n", fd->seek_pos, offset);
+		kprintf("[seek_pos-<%lu>, offset-<%d>]\n", fd->fd.seek_pos, offset);
 
 		/*
 		 * We check serial flash memory state, and wait until ready-flag
 		 * is high.
 		 */
-		flash25_waitReady();
+		flash25_waitReady(fd);
 
 		/*
 		 * Start write cycle.
@@ -263,24 +262,24 @@ static size_t flash25_write(struct KFile *fd, const void *_buf, size_t size)
 		 * \note: the same byte cannot be reprogrammed without
 		 * erasing the whole sector first.
 		 */
-		flash25_sendCmd(FLASH25_WREN);
+		flash25_sendCmd(fd, FLASH25_WREN);
 
 		CS_ENABLE();
-		kfile_putc(FLASH25_PROGRAM, channel);
+		kfile_putc(FLASH25_PROGRAM, fd->channel);
 
 		/*
 		 * Address that we want to write.
 		 */
-		kfile_putc((fd->seek_pos >> 16) & 0xFF, channel);
-		kfile_putc((fd->seek_pos >> 8) & 0xFF, channel);
-		kfile_putc(fd->seek_pos & 0xFF, channel);
+		kfile_putc((fd->fd.seek_pos >> 16) & 0xFF, fd->channel);
+		kfile_putc((fd->fd.seek_pos >> 8) & 0xFF, fd->channel);
+		kfile_putc(fd->fd.seek_pos & 0xFF, fd->channel);
 
-		kfile_write(channel, data, wr_len);
+		kfile_write(fd->channel, data, wr_len);
 
 		CS_DISABLE();
 
 		data += wr_len;
-		fd->seek_pos += wr_len;
+		fd->fd.seek_pos += wr_len;
 		size -= wr_len;
 		total_write += wr_len;
 	}
@@ -297,7 +296,7 @@ static size_t flash25_write(struct KFile *fd, const void *_buf, size_t size)
  * \note A sector size is FLASH25_SECTOR_SIZE.
  * This operation could take a while.
  */
-void flash25_sectorErase(Flash25Sector sector)
+void flash25_sectorErase(KFileFlash25 *fd, Flash25Sector sector)
 {
 
 	/*
@@ -316,14 +315,14 @@ void flash25_sectorErase(Flash25Sector sector)
 	 * determinate if any address within the sector
 	 * is selected.
 	 */
-	kfile_putc(FLASH25_WREN, channel);
-	kfile_putc(FLASH25_SECTORE_ERASE, channel);
+	kfile_putc(FLASH25_WREN, fd->channel);
+	kfile_putc(FLASH25_SECTORE_ERASE,fd-> channel);
 
 	/*
 	 * Address inside the sector that we want to
 	 * erase.
 	 */
-	kfile_putc(sector, channel);
+	kfile_putc(sector, fd->channel);
 
 	CS_DISABLE();
 
@@ -331,7 +330,7 @@ void flash25_sectorErase(Flash25Sector sector)
 	 * We check serial flash memory state, and wait until ready-flag
 	 * is hight.
 	 */
-	flash25_waitReady();
+	flash25_waitReady(fd);
 
 	DB(kprintf("Erased sector [%d] in %d ms\n", sector, ticks_to_ms(timer_clock() - start_time)));
 
@@ -344,7 +343,7 @@ void flash25_sectorErase(Flash25Sector sector)
  *
  * \note This operation could take a while.
  */
-void flash25_chipErase(void)
+void flash25_chipErase(KFileFlash25 *fd)
 {
 	/*
 	 * Erase all chip could take a while,
@@ -358,14 +357,14 @@ void flash25_chipErase(void)
 	 * enable write with a WREN opcode command, before
 	 * the CHIP_ERASE opcode.
 	 */
-	flash25_sendCmd(FLASH25_WREN);
-	flash25_sendCmd(FLASH25_CHIP_ERASE);
+	flash25_sendCmd(fd, FLASH25_WREN);
+	flash25_sendCmd(fd, FLASH25_CHIP_ERASE);
 
 	/*
 	 * We check serial flash memory state, and wait until ready-flag
 	 * is high.
 	 */
-	flash25_waitReady();
+	flash25_waitReady(fd);
 
 	DB(kprintf("Erased all memory in %d ms\n", ticks_to_ms(timer_clock() - start_time)));
 
@@ -374,65 +373,33 @@ void flash25_chipErase(void)
 /**
  * Init data flash memory interface.
  */
-void flash25_init(struct KFile *fd, struct KFile *_channel)
+void flash25_init(KFileFlash25 *fd, KFile *ch)
 {
+
+	ASSERT(fd);
+	ASSERT(ch);
+
 	 //Set kfile struct type as a generic kfile structure.
-	DB(fd->_type = KFT_GENERIC);
+	DB(fd->fd._type = KFT_FLASH25);
 
 	// Set up data flash programming functions.
-	fd->reopen = flash25_reopen;
-	fd->close = flash25_close;
-	fd->read = flash25_read;
-	fd->write = flash25_write;
-	fd->seek = kfile_genericSeek;
+	fd->fd.reopen = flash25_reopen;
+	fd->fd.close = flash25_close;
+	fd->fd.read = flash25_read;
+	fd->fd.write = flash25_write;
+	fd->fd.seek = kfile_genericSeek;
 
 	/*
 	 * Init a local channel structure and flash kfile interface.
 	 */
-	channel = _channel;
-	flash25_reopen(fd);
+	fd->channel = ch;
+	flash25_reopen(&fd->fd);
 
 	/*
 	 * Init data flash memory and micro pin.
 	 */
-	if (!flash25_pin_init())
+	if (!flash25_pin_init(fd))
 		ASSERT(0);
 }
 
-#if CONFIG_TEST
 
-/**
- * Test function for flash25.
- *
- * \note: This implentation use a SPI channel.
- */
-bool flash25_test(KFile *channel)
-{
-	KFile fd;
-	uint8_t test_buf[256];
-
-	/*
-	 * Init a spi kfile interface and
-	 * flash driver.
-	 */
-	flash25_init(&fd, channel);
-
-	kprintf("Init serial flash\n");
-
-	flash25_chipErase();
-
-	flash25_sectorErase(FLASH25_SECT1);
-	flash25_sectorErase(FLASH25_SECT2);
-	flash25_sectorErase(FLASH25_SECT3);
-	flash25_sectorErase(FLASH25_SECT4);
-
-	/*
-	 * Launche a kfile test interface.
-	 */
-	kprintf("Kfile test start..\n");
-	if (!kfile_test(&fd, test_buf, NULL, sizeof(test_buf)))
-		return false;
-
-	return true;
-}
-#endif /* CONFIG_TEST */
