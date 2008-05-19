@@ -37,19 +37,6 @@
  * \brief dot-matrix LCD test.
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.3  2006/01/17 23:00:26  bernie
- *#* Don't use hardcoded coordinates.
- *#*
- *#* Revision 1.2  2006/01/17 02:31:57  bernie
- *#* Test gfx with the usual pentagons.
- *#*
- *#* Revision 1.1  2006/01/16 03:51:35  bernie
- *#* Add LCD Qt emulator.
- *#*
- *#*/
-
 #include <emul/emul.h>
 #include <drv/lcd_gfx.h>
 #include <gfx/gfx.h>
