@@ -52,8 +52,6 @@
 #define ARCH_FOO     BV(0)
 #define ARCH_BAR     BV(1)
 #define ARCH_EMUL    BV(2)
-#define ARCH_PIZZA   BV(3)
-#define ARCH_PROTO   BV(4)
 /*\}*/
 
 #endif /* ARCH_CONFIG_H */
