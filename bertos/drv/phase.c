@@ -29,11 +29,10 @@
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \version $Id$
- *
  * \brief Phase control driver (implementation)
  *
  * \version $Id$
+ *
  * \author Francesco Sacchi <batt@develer.com>
  */
 
