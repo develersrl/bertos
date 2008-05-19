@@ -14,7 +14,7 @@
 #ifndef NET_POCKETBUS_H
 #define NET_POCKETBUS_H
 
-#include <algos/rotating_hash.h>
+#include <algo/rotating_hash.h>
 #include <drv/ser.h>
 #include <kern/kfile.h>
 #include <cfg/compiler.h>
