@@ -38,42 +38,6 @@
  * \brief Font 8x6 IBM-PC 8bit
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.2  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.1  2006/05/27 22:30:22  bernie
- *#* Move 6x8 font to fonts/.
- *#*
- *#* Revision 1.3  2006/02/10 12:29:05  bernie
- *#* Add multiple font support in bitmaps.
- *#*
- *#* Revision 1.2  2005/11/04 18:17:45  bernie
- *#* Fix header guards and includes for new location of gfx module.
- *#*
- *#* Revision 1.1  2005/11/04 18:11:35  bernie
- *#* Move graphics stuff from mware/ to gfx/.
- *#*
- *#* Revision 1.6  2005/11/04 16:20:02  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.5  2005/01/08 09:20:38  bernie
- *#* Add missing type in declaration.
- *#*
- *#* Revision 1.4  2004/12/31 16:42:55  bernie
- *#* Sanitize for non-Harvard processors.
- *#*
- *#* Revision 1.3  2004/08/25 14:12:09  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.2  2004/06/03 11:27:09  bernie
- *#* Add dual-license information.
- *#*
- *#* Revision 1.1  2004/05/23 15:43:16  bernie
- *#* Import mware modules.
- *#*/
-
 #include "font.h"
 
 static const PROGMEM uint8_t default_font_glyphs[256 * 6] =
