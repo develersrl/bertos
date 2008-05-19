@@ -41,7 +41,13 @@
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#include <avr/io.h>
+/*
+ * We use a spi bus, thus include hardware specific definition.
+ * If you use another channel you must redefine this macros.
+ */
+#include "hw_spi.h"
+
+#include <appconfig.h>
 
 #include <cfg/macros.h>
 #include <cfg/debug.h>
@@ -53,13 +59,6 @@
 #include <kern/proc.h>
 #endif
 
-/*
- * We use a spi bus, thus include hardware specific definition.
- * If you use another channel you must redefine this macros.
- */
-#include "hw_spi.h"
-
-#include <appconfig.h>
 
 /**
  * Global definition of channel handler (usually SPI).
