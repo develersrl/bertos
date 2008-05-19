@@ -30,6 +30,7 @@
  * Copyright 1999, 2001 Bernardo Innocenti <bernie@develer.com>
  *
  * -->
+ *
  * \brief X-Modem serial transmission protocol (implementation)
  *
  * Supports the CRC-16 and 1K-blocks variants of the standard.
@@ -38,6 +39,7 @@
  * \todo Break xmodem_send() and xmodem_recv() in smaller functions.
  *
  * \version $Id$
+ *
  * \author Bernardo Innocenti <bernie@develer.com>
  * \author Francesco Sacchi <batt@develer.com>
  */
@@ -100,7 +102,7 @@ bool xmodem_recv(struct KFileSerial *port, KFile *fd)
 
 	XMODEM_PROGRESS("Starting Transfer...\n");
 	purge = true;
-	ser_clearerr(port);
+	kfile_clearerr(&port->fd);
 
 	/* Send initial NAK to start transmission */
 	for(;;)
@@ -278,7 +280,7 @@ bool xmodem_recv(struct KFileSerial *port, KFile *fd)
 			break;
 
 		case XM_EOT:	/* End of transmission */
-			kfile_putchar(XM_ACK, &port->fd);
+			kfile_putc(XM_ACK, &port->fd);
 			XMODEM_PROGRESS("Transfer completed\n");
 			return true;
 
@@ -420,8 +422,8 @@ bool xmodem_send(struct KFileSerial *port, KFile *fd)
 		{
 			crc = UPDCRC16(0, crc);
 			crc = UPDCRC16(0, crc);
-			ser_putchar(crc >> 8, port);
-			ser_putchar(crc & 0xFF, port);
+			kfile_putc(crc >> 8, &port->fd);
+			kfile_putc(crc & 0xFF, &port->fd);
 		}
 		else
 			kfile_putc(sum, &port->fd);
