@@ -333,6 +333,8 @@ static const PROGMEM uint8_t default_font_glyphs[256 * 6] =
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00  /* ÿ */
 };
 
+
+#ifndef default_font
 struct Font default_font =
 {
 	/* .glyph = */  default_font_glyphs,
@@ -340,3 +342,4 @@ struct Font default_font =
 	/* .height = */ 8
 };
 
+#endif
