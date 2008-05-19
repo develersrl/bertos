@@ -29,11 +29,11 @@
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \version $Id$
  *
  * \brief TC520 ADC driver (implementation)
  *
  * \version $Id$
+ *
  * \author Francesco Sacchi <batt@develer.com>
  * \author Marco Benelli <marco@develer.com>
  */
@@ -45,6 +45,10 @@
 
 #include <cfg/macros.h>
 #include <cfg/compiler.h>
+
+#warning This implementation is obsolete. Refactor with KFile interface.
+
+#if 0
 
 #include <drv/ser.h>
 
@@ -160,3 +164,5 @@ void tc520_init(Serial *spi_port)
 	ser_drain(spi_ser);
 	LOAD_HIGH();
 }
+
+#endif

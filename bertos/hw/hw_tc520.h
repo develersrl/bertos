@@ -29,7 +29,6 @@
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \version $Id$
  *
  * \brief TC520 hardware-specific definitions
  *
@@ -41,36 +40,31 @@
 #define HW_TC520_H
 
 #include <cfg/compiler.h>
-#include <avr/io.h>
 
-#define CE_PIN   PE6
-#define DV_PIN   PE5
-#define LOAD_PIN PE3
-#define READ_PIN PE4
+#warning This is hw example for TC520, you must implement it for your specific hardware
 
-#define TC520_DDR  DDRE
-#define TC520_PORT PORTE
-#define TC520_PIN  PINE
+#define CE_PIN      0
+#define DV_PIN      0
+#define LOAD_PIN    0
+#define READ_PIN    0
 
-#define DV_HIGH() (TC520_PIN & BV(DV_PIN))
-#define DV_LOW()  (!DV_HIGH())
 
-#define CE_HIGH() (TC520_PORT |= BV(CE_PIN))
-#define CE_LOW()  (TC520_PORT &= ~BV(CE_PIN))
+#define DV_HIGH()     /* Implement me! */
+#define DV_LOW()      /* Implement me! */
 
-#define LOAD_HIGH() (TC520_PORT |= BV(LOAD_PIN))
-#define LOAD_LOW()  (TC520_PORT &= ~BV(LOAD_PIN))
+#define CE_HIGH()     /* Implement me! */
+#define CE_LOW()      /* Implement me! */
 
-#define READ_HIGH() (TC520_PORT |= BV(READ_PIN))
-#define READ_LOW()  (TC520_PORT &= ~BV(READ_PIN))
+#define LOAD_HIGH()   /* Implement me! */
+#define LOAD_LOW()    /* Implement me! */
+
+#define READ_HIGH()   /* Implement me! */
+#define READ_LOW()    /* Implement me! */
 
 #define TC520_HW_INIT \
 do\
 {\
-	TC520_PORT |= (BV(CE_PIN) | BV(LOAD_PIN) | BV(READ_PIN));\
-	TC520_DDR  |= (BV(CE_PIN) | BV(LOAD_PIN) | BV(READ_PIN));\
-	TC520_DDR  &= ~BV(DV_PIN);\
-}\
-while(0)
+ /* Put here your code to init hardware */ \
+} while(0)
 
 #endif /* HW_TC520_H */
