@@ -43,6 +43,8 @@
 #ifndef ARCH_CONFIG_H
 #define ARCH_CONFIG_H
 
+#include <cfg/macros.h>
+
 /**
  * \name Architectures
  * \{
