@@ -31,14 +31,15 @@
  *
  * -->
  *
+ * \brief Font 8x6 IBM-PC 8bit
+ *
  * \version $Id$
  *
  * \author Bernardo Innocenti <bernie@develer.com>
  *
- * \brief Font 8x6 IBM-PC 8bit
  */
 
-#include "font.h"
+#include <gfx/font.h>
 
 static const PROGMEM uint8_t default_font_glyphs[256 * 6] =
 {
