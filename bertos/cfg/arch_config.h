@@ -31,11 +31,12 @@
  *
  * -->
  *
+ * \brief Set system configuration
+ *
  * \version $Id$
  *
  * \author Bernardo Innocenti <bernie@develer.com>
  *
- * \brief Set system configuration
  */
 
 
@@ -46,9 +47,11 @@
  * \name Architectures
  * \{
  */
-#define ARCH_FOO     (1<<0)
-#define ARCH_BAR     (1<<1)
-#define ARCH_EMUL    (1<<8)
+#define ARCH_FOO     BV(0)
+#define ARCH_BAR     BV(1)
+#define ARCH_EMUL    BV(2)
+#define ARCH_PIZZA   BV(3)
+#define ARCH_PROTO   BV(4)
 /*\}*/
 
 #endif /* ARCH_CONFIG_H */
