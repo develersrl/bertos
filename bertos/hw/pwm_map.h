@@ -29,38 +29,26 @@
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \brief MCP41 hardware-specific definitions
+ *
+ * \brief PWM map device.
  *
  * \version $Id$
- * \author Francesco Sacchi <batt@develer.com>
+ *
+ * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef HW_MCP41_H
-#define HW_MCP41_H
+#ifndef HW_PWM_MAP_H
+#define HW_PWM_MAP_H
 
-#include "mcp41_map.h"
+#warning TODO:This is an example implentation, you must implement it!
 
-#include <cfg/compiler.h>
-
-
-#warning TODO: This is example implementation, you must implement it!
-
-
-INLINE void SET_MCP41_DDR(Mcp41Dev dev)
+typedef enum
 {
-		/* Implement me! */
-		//Warning: this funtions is like avr target name,
-		//fix it to comply for all target.
-}
+	PWM_CH0 = 0,
 
-INLINE void MCP41_ON(Mcp41Dev i)
-{
-		/* Implement me! */
-}
+/*	add other PWM channel */
 
-INLINE void MCP41_OFF(Mcp41Dev i)
-{
-		/* Implement me! */
-}
+	PWM_CNT
+} PwmDev;
 
-#endif /* HW_MCP41_H */
+#endif /* HW_PWM_MAP_H */

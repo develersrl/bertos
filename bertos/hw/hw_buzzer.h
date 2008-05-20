@@ -38,23 +38,15 @@
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.2  2006/07/19 12:56:27  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.1  2006/02/10 12:31:03  bernie
- *#* Add templates for hw definitions.
- *#*
- *#*/
-
 #ifndef HW_BUZZER_H
 #define HW_BUZZER_H
 
-#define BUZZER_BIT     BV(1)
-#define IS_BUZZER_ON   0
-#define BUZZER_HW_INIT  do { } while (0)
-#define BUZZER_ON       do { } while (0)
-#define BUZZER_OFF      do { } while (0)
+#warning TODO:This is example implemetantion, you must implement it! 
+
+#define BUZZER_BIT      1 
+#define IS_BUZZER_ON    0
+#define BUZZER_HW_INIT  do { /* Implement me! */ } while (0)
+#define BUZZER_ON       do { /* Implement me! */ } while (0)
+#define BUZZER_OFF      do { /* Implement me! */ } while (0)
 
 #endif /* HW_BUZZER_H */

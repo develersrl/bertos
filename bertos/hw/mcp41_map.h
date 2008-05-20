@@ -40,13 +40,16 @@
 #ifndef MCP41_MAP_H
 #define MCP41_MAP_H
 
+#warning TODO:This is an example implentation, you must implement it!
+
 /** \name Enum for mcp41 pot evices.
  * \{
  */
 typedef enum Mcp41Dev
 {
 	MCP41_LED,
-	MCP41_PHOTO_GAIN,
+
+	/* put here other mcp41 device */
 
 	MCP41_CNT,
 } Mcp41Dev;

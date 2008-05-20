@@ -26,41 +26,21 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
+ * All Rights Reserved.
  * -->
  *
- * \brief MCP41 hardware-specific definitions
+ * \brief Phase control hardware-specific definitions
  *
  * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-#ifndef HW_MCP41_H
-#define HW_MCP41_H
+#ifndef HW_PHASE_H
+#define HW_PHASE_H
 
-#include "mcp41_map.h"
+#include "hw_phase.h"
 
-#include <cfg/compiler.h>
+#warning TODO:This is example implemetantion, you must implement it! 
 
-
-#warning TODO: This is example implementation, you must implement it!
-
-
-INLINE void SET_MCP41_DDR(Mcp41Dev dev)
-{
-		/* Implement me! */
-		//Warning: this funtions is like avr target name,
-		//fix it to comply for all target.
-}
-
-INLINE void MCP41_ON(Mcp41Dev i)
-{
-		/* Implement me! */
-}
-
-INLINE void MCP41_OFF(Mcp41Dev i)
-{
-		/* Implement me! */
-}
-
-#endif /* HW_MCP41_H */
+#endif /* HW_PHASE_H */

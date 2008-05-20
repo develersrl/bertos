@@ -39,32 +39,20 @@
  * \author Stefano Fedrigo <a@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.4  2006/07/19 12:56:27  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.3  2006/03/22 09:51:27  bernie
- *#* Wrap C++ stuff.
- *#*
- *#* Revision 1.2  2006/02/15 09:13:42  bernie
- *#* Add keyboard emulator.
- *#*
- *#* Revision 1.1  2006/02/10 12:31:03  bernie
- *#* Add templates for hw definitions.
- *#*
- *#*/
-
 #ifndef HW_KBD_H
 #define HW_KBD_H
 
 #include "kbd_map.h"
+
 #include <cfg/macros.h>
+
+#warning TODO:This is example implemetantion, you must implement it! 
 
 #define K_RPT_MASK (K_UP | K_DOWN | K_OK | K_CANCEL)
 
 #define KBD_HW_INIT \
 	do { \
+			/* Put here code to init hw */ \
 	} while (0)
 
 EXTERN_C int emul_kbdReadCols(void);

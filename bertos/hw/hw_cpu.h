@@ -26,41 +26,31 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2006 Develer S.r.l. (http://www.develer.com/)
+ * All Rights Reserved.
  * -->
  *
- * \brief MCP41 hardware-specific definitions
+ * \brief Hardware-specific definitions
  *
  * \version $Id$
- * \author Francesco Sacchi <batt@develer.com>
+ *
+ * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-#ifndef HW_MCP41_H
-#define HW_MCP41_H
+#ifndef HW_CPU_H
+#define HW_CPU_H
 
-#include "mcp41_map.h"
+#warning TODO:This is example implemetantion, you must implement it! 
 
-#include <cfg/compiler.h>
-
-
-#warning TODO: This is example implementation, you must implement it!
+/// CPU Clock frequency 
+#define CLOCK_FREQ     (10000000UL /* Implement me! */)
 
 
-INLINE void SET_MCP41_DDR(Mcp41Dev dev)
-{
-		/* Implement me! */
-		//Warning: this funtions is like avr target name,
-		//fix it to comply for all target.
-}
+/* Timer IRQ strobe */
+//#if CONFIG_TIMER_STROBE
+//	#define TIMER_STROBE_ON    /* Implement me! */
+//	#define TIMER_STROBE_OFF   /* Implement me! */
+//	#define TIMER_STROBE_INIT  /* Implement me! */
+//#endif /* CONFIG_TIMER_STROBE */
 
-INLINE void MCP41_ON(Mcp41Dev i)
-{
-		/* Implement me! */
-}
-
-INLINE void MCP41_OFF(Mcp41Dev i)
-{
-		/* Implement me! */
-}
-
-#endif /* HW_MCP41_H */
+#endif /*  HW_CPU_H */

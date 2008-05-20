@@ -39,20 +39,12 @@
  * \author Stefano Fedrigo <a@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.2  2006/07/19 12:56:27  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.1  2006/02/10 12:31:03  bernie
- *#* Add templates for hw definitions.
- *#*
- *#*/
-
 #ifndef HW_KBD_MAP_H
 #define HW_KBD_MAP_H
 
 #include <cfg/macros.h>
+
+#warning TODO:This is an example implentation, you must implement it!
 
 
 /**

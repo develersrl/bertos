@@ -26,41 +26,54 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
+ * All Rights Reserved.
  * -->
  *
- * \brief MCP41 hardware-specific definitions
+ * \brief Sensor hardware-specific definitions
  *
  * \version $Id$
- * \author Francesco Sacchi <batt@develer.com>
+ *
+ * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef HW_MCP41_H
-#define HW_MCP41_H
+#ifndef HW_SENSOR_H
+#define HW_SENSOR_H
 
-#include "mcp41_map.h"
+#warning TODO:This is example implemetantion, you must implement it! 
 
-#include <cfg/compiler.h>
-
-
-#warning TODO: This is example implementation, you must implement it!
+#define NUM_HOME_SENSORS 1
 
 
-INLINE void SET_MCP41_DDR(Mcp41Dev dev)
+INLINE bool hw_home_sensor_read(int sensor)
 {
 		/* Implement me! */
-		//Warning: this funtions is like avr target name,
-		//fix it to comply for all target.
+		
+		return 0;
 }
 
-INLINE void MCP41_ON(Mcp41Dev i)
+INLINE void hw_home_sensor_set_inverted(int sensor, bool inverted)
 {
 		/* Implement me! */
 }
 
-INLINE void MCP41_OFF(Mcp41Dev i)
+INLINE bool hw_level_sensor_read(int sensor)
+{
+		/* Implement me! */
+		
+		return 0;
+}
+
+INLINE void hw_level_sensor_set_inverted(int sensor, bool inverted)
 {
 		/* Implement me! */
 }
 
-#endif /* HW_MCP41_H */
+INLINE bool bld_hw_sensor_read(int sensor)
+{
+		/* Implement me! */
+		
+		return 0;
+}
+
+#endif /* HW_SENSOR_H */

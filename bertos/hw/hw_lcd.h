@@ -31,58 +31,50 @@
  *
  * -->
  *
+ * \brief LCD low-level hardware macros
+ *
  * \version $Id$
  *
  * \author Bernardo Innocenti <bernie@develer.com>
  * \author Stefano Fedrigo <aleph@develer.com>
  *
- * \brief LCD low-level hardware macros
  */
 
 #ifndef HW_LCD_H
 #define HW_LCD_H
 
 #include <appconfig.h>
-//#include <hw.h>
+
+#include <cfg/macros.h> /* BV() */
+#include <cfg/debug.h>
 
 #include <cpu/attr.h>
 #include <cpu/irq.h>
 #include <cpu/types.h>
 
-#include <cfg/macros.h> /* BV() */
-#include <cfg/debug.h>
-
-#include <avr/io.h>
-#include <stdbool.h>
-#include <inttypes.h>
+#warning TODO: This is example implementation, you must implement it!
 
 /**
  * \name LCD I/O pins/ports
  * @{
  */
-#define LCD_RS    BV(PG3)
-#define LCD_RW    BV(PG0)
-#define LCD_E     BV(PG2)
-#define LCD_DB0   BV(PA0)
-#define LCD_DB1   BV(PA1)
-#define LCD_DB2   BV(PA2)
-#define LCD_DB3   BV(PA3)
-#define LCD_DB4   BV(PA4)
-#define LCD_DB5   BV(PA5)
-#define LCD_DB6   BV(PA6)
-#define LCD_DB7   BV(PA7)
+#define LCD_RS    /* Implement me! */
+#define LCD_RW    /* Implement me! */
+#define LCD_E     /* Implement me! */
+#define LCD_DB0   /* Implement me! */
+#define LCD_DB1   /* Implement me! */
+#define LCD_DB2   /* Implement me! */
+#define LCD_DB3   /* Implement me! */
+#define LCD_DB4   /* Implement me! */
+#define LCD_DB5   /* Implement me! */
+#define LCD_DB6   /* Implement me! */
+#define LCD_DB7   /* Implement me! */
 /*@}*/
 
 /**
  * \name DB high nibble (DB[4-7])
  * @{
  */
-#define LCD_PORT     PORTG
-#define LCD_DB_PORT  PORTA
-#define LCD_PIN      PING
-#define LCD_DB_PIN   PINA
-#define LCD_DDR      DDRG
-#define LCD_DB_DDR   DDRA
 
 #if CONFIG_LCD_4BIT
 	#define LCD_MASK    (LCD_DB7 | LCD_DB6 | LCD_DB5 | LCD_DB4)
@@ -97,29 +89,29 @@
  * \name LCD bus control macros
  * @{
  */
-#define LCD_CLR_RS      (LCD_PORT &= ~LCD_RS)
-#define LCD_SET_RS      (LCD_PORT |=  LCD_RS)
-#define LCD_CLR_RD      (LCD_PORT &= ~LCD_RW)
-#define LCD_SET_RD      (LCD_PORT |=  LCD_RW)
-#define LCD_CLR_E       (LCD_PORT &= ~LCD_E)
-#define LCD_SET_E       (LCD_PORT |=  LCD_E)
+#define LCD_CLR_RS      /* Implement me! */
+#define LCD_SET_RS      /* Implement me! */
+#define LCD_CLR_RD      /* Implement me! */
+#define LCD_SET_RD      /* Implement me! */
+#define LCD_CLR_E       /* Implement me! */
+#define LCD_SET_E       /* Implement me! */
 
 #if CONFIG_LCD_4BIT
-	#define LCD_WRITE_H(x)  (LCD_DB_PORT = (LCD_DB_PORT & ~LCD_MASK) | (((x) >> (4 - LCD_SHIFT)) & LCD_MASK))
-	#define LCD_WRITE_L(x)  (LCD_DB_PORT = (LCD_DB_PORT & ~LCD_MASK) | (((x) << LCD_SHIFT) & LCD_MASK))
-	#define LCD_READ_H      ((LCD_DB_PIN & LCD_MASK) >> (4 - LCD_SHIFT))
-	#define LCD_READ_L      ((LCD_DB_PIN & LCD_MASK) >> LCD_SHIFT)
+	#define LCD_WRITE_H(x)  /* Implement me! */
+	#define LCD_WRITE_L(x)  /* Implement me! */
+	#define LCD_READ_H      /* Implement me! */
+	#define LCD_READ_L      /* Implement me! */
 #else
-	#define LCD_WRITE(x) (LCD_DB_PORT = (x))
-	#define LCD_READ (LCD_DB_PIN)
+	#define LCD_WRITE(x)    /* Implement me! */
+	#define LCD_READ        /* Implement me! */
 #endif
 /*@}*/
 
 /** Set data bus direction to output (write to display) */
-#define LCD_DB_OUT  (LCD_DB_DDR |= LCD_MASK)
+#define LCD_DB_OUT          /* Implement me! */
 
 /** Set data bus direction to input (read from display) */
-#define LCD_DB_IN   (LCD_DB_DDR &= ~LCD_MASK)
+#define LCD_DB_IN           /* Implement me! */
 
 /** Delay for write (Enable pulse width, 220ns) */
 #define LCD_DELAY_WRITE \
@@ -146,8 +138,11 @@ INLINE void lcd_bus_init(void)
 	cpuflags_t flags;
 	IRQ_SAVE_DISABLE(flags);
 
-	LCD_PORT = (LCD_PORT & ~(LCD_E | LCD_RW)) | LCD_RS;
-	LCD_DDR  |= LCD_RS | LCD_RW | LCD_E;
+	/*
+	 * Here set bus pin!
+	 * to init a lcd device.
+	 *
+	 */
 
 	/*
 	 * Data bus is in output state most of the time:

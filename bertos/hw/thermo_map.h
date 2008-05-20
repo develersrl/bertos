@@ -26,41 +26,45 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
+ * All Rights Reserved.
  * -->
  *
- * \brief MCP41 hardware-specific definitions
+ * \brief Thermo regulation control map definitions.
  *
  * \version $Id$
+ *
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-#ifndef HW_MCP41_H
-#define HW_MCP41_H
-
-#include "mcp41_map.h"
+#ifndef THERMO_MAP_H
+#define THERMO_MAP_H
 
 #include <cfg/compiler.h>
+#include <cfg/macros.h>
 
+#warning TODO:This is an example implentation, you must implement it!
 
-#warning TODO: This is example implementation, you must implement it!
+typedef uint8_t thermostatus_t;
 
+#define THERMO_OFF          0
+#define THERMO_HEATING      BV(0)
+#define THERMO_FREEZING     BV(1)
+#define THERMO_TGT_REACH    BV(2)
+#define THERMOERRF_NTCSHORT BV(3)
+#define THERMOERRF_NTCOPEN  BV(4)
+#define THERMOERRF_TIMEOUT  BV(5)
+#define THERMO_ACTIVE       BV(6)
 
-INLINE void SET_MCP41_DDR(Mcp41Dev dev)
+#define THERMO_ERRMASK      (THERMOERRF_NTCSHORT | THERMOERRF_NTCOPEN | THERMOERRF_TIMEOUT)
+
+typedef enum ThermoDev
 {
-		/* Implement me! */
-		//Warning: this funtions is like avr target name,
-		//fix it to comply for all target.
-}
+	THERMO_TEST,
 
-INLINE void MCP41_ON(Mcp41Dev i)
-{
-		/* Implement me! */
-}
+	/* Put here your thermo device */
 
-INLINE void MCP41_OFF(Mcp41Dev i)
-{
-		/* Implement me! */
-}
+	THERMO_CNT,
+} ThermoDev;
 
-#endif /* HW_MCP41_H */
+#endif /* THERMO_MAP_H */

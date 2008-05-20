@@ -26,41 +26,36 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
+ * All Rights Reserved.
  * -->
  *
- * \brief MCP41 hardware-specific definitions
+ * \brief NTC map definitions.
  *
  * \version $Id$
+ *
+ * \author Giovanni Bajo <rasky@develer.com>
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-#ifndef HW_MCP41_H
-#define HW_MCP41_H
-
-#include "mcp41_map.h"
+#ifndef NTC_MAP_H
+#define NTC_MAP_H
 
 #include <cfg/compiler.h>
 
+#warning TODO:This is an example implentation, you must implement it!
 
-#warning TODO: This is example implementation, you must implement it!
-
-
-INLINE void SET_MCP41_DDR(Mcp41Dev dev)
+/*! \name Enum for ntc devices.
+ * \{
+ */
+typedef enum NtcDev
 {
-		/* Implement me! */
-		//Warning: this funtions is like avr target name,
-		//fix it to comply for all target.
-}
+	NTC_TEST,
 
-INLINE void MCP41_ON(Mcp41Dev i)
-{
-		/* Implement me! */
-}
+	/* Put here your thermo device */
 
-INLINE void MCP41_OFF(Mcp41Dev i)
-{
-		/* Implement me! */
-}
+	NTC_CNT
+} NtcDev;
+/* \} */
 
-#endif /* HW_MCP41_H */
+#endif /* NTC_MAP_H */

@@ -26,41 +26,22 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2006 Develer S.r.l. (http://www.develer.com/)
+ * All Rights Reserved.
  * -->
  *
- * \brief MCP41 hardware-specific definitions
+ * \brief Serial hardware-specific definitions
  *
  * \version $Id$
- * \author Francesco Sacchi <batt@develer.com>
+ *
+ * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef HW_MCP41_H
-#define HW_MCP41_H
 
-#include "mcp41_map.h"
+#ifndef HW_SER_H
+#define HW_SER_H
 
-#include <cfg/compiler.h>
-
-
-#warning TODO: This is example implementation, you must implement it!
+#warning TODO:This is example implemetantion, you must implement it! 
 
 
-INLINE void SET_MCP41_DDR(Mcp41Dev dev)
-{
-		/* Implement me! */
-		//Warning: this funtions is like avr target name,
-		//fix it to comply for all target.
-}
-
-INLINE void MCP41_ON(Mcp41Dev i)
-{
-		/* Implement me! */
-}
-
-INLINE void MCP41_OFF(Mcp41Dev i)
-{
-		/* Implement me! */
-}
-
-#endif /* HW_MCP41_H */
+#endif /* HW_SER_H */
