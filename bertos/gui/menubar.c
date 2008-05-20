@@ -1,14 +1,42 @@
 /**
  * \file
+ * <!--
+ * This file is part of BeRTOS.
+ *
+ * Bertos is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * As a special exception, you may use this file as part of a free software
+ * library without restriction.  Specifically, if other files instantiate
+ * templates or use macros or inline functions from this file, or you compile
+ * this file and link it with other files to produce an executable, this
+ * file does not by itself cause the resulting executable to be covered by
+ * the GNU General Public License.  This exception does not however
+ * invalidate any other reasons why the executable file might be covered by
+ * the GNU General Public License.
+ *
  * Copyright 2004, 2008 Develer S.r.l. (http://www.develer.com/)
  * All Rights Reserved.
+ * -->
+ *
+ * \brief Graphics Menu bar widget
  *
  * \version $Id$
  *
  * \author Stefano Fedrigo <aleph@develer.com>
  * \author Francesco Sacchi <batt@develer.com>
  *
- * \brief Graphics Menu bar widget
  */
 
 #include "menubar.h"
@@ -18,6 +46,9 @@
 #include <gfx/font.h>
 #include <cfg/compiler.h>
 
+#warning FIXME:This module is obsolete, you must refactor it!
+
+#if 0
 #if CPU_AVR
 	#include <avr/pgmspace.h> /* strlen_P() */
 #else
@@ -43,11 +74,7 @@ static const pgm_char lab_10[] = " "DOWN_ARROW" ";
 static const pgm_char lab_11[] = " - ";
 static const pgm_char lab_12[] = " + ";
 static const pgm_char lab_13[] = "sel ";
-#if OEM_BRAND == OEM_CLAIRBROS
-static const pgm_char lab_14[] = "gain";
-#else
 static const pgm_char lab_14[] = "lock";
-#endif
 static const pgm_char lab_15[] = "unlock";
 static const pgm_char lab_16[] = "more";
 static const pgm_char lab_17[] = "edit";
@@ -148,3 +175,5 @@ void mbar_draw(const struct MenuBar *mb)
 
 	text_style(mb->bitmap, oldstyle, STYLEF_MASK);
 }
+#endif
+

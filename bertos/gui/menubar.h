@@ -1,41 +1,48 @@
 /**
  * \file
- * Copyright 2004, 2005 Develer S.r.l. (http://www.develer.com/)
+ * <!--
+ * This file is part of BeRTOS.
+ *
+ * Bertos is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * As a special exception, you may use this file as part of a free software
+ * library without restriction.  Specifically, if other files instantiate
+ * templates or use macros or inline functions from this file, or you compile
+ * this file and link it with other files to produce an executable, this
+ * file does not by itself cause the resulting executable to be covered by
+ * the GNU General Public License.  This exception does not however
+ * invalidate any other reasons why the executable file might be covered by
+ * the GNU General Public License.
+ *
+ * Copyright 2004, 2005, 2008 Develer S.r.l. (http://www.develer.com/)
  * All Rights Reserved.
+ * -->
+ *
+ * \brief Graphic menu bar widget.
  *
  * \version $Id$
  *
  * \author Stefano Fedrigo <aleph@develer.com>
  *
- * \brief Graphic menu bar widget.
  */
 
-/*#*
- *#* $Log: menubar.h,v $
- *#* Revision 1.17  2006/06/16 16:18:49  batt
- *#* Fix doxygen docs.
- *#*
- *#* Revision 1.16  2005/11/16 18:10:19  bernie
- *#* Move top-level headers to cfg/ as in DevLib.
- *#*
- *#* Revision 1.15  2005/02/17 03:49:21  bernie
- *#* Update to new PGM api.
- *#*
- *#* Revision 1.14  2004/10/31 11:02:15  aleph
- *#* Rename functions with correct codying conventions; Simplify version display
- *#*
- *#* Revision 1.13  2004/09/27 12:05:46  powersoft
- *#* Use sel label for toggle menus and remove it
- *#*
- *#* Revision 1.12  2004/09/27 10:05:33  powersoft
- *#* Menu cosmetic fixes
- *#*/
 #ifndef MWARE_MENUBAR_H
 #define MWARE_MENUBAR_H
 
 #include <appconfig.h>
 #include <cfg/compiler.h>
-#include <brand.h>
 
 /** Predefined labels ids */
 enum LabelId
@@ -53,11 +60,7 @@ enum LabelId
 	LABEL_MINUS,
 	LABEL_PLUS,
 	LABEL_SEL,
-	#if OEM_BRAND == OEM_CLAIRBROS
-	LABEL_GAIN,
-	#else
 	LABEL_LOCK,
-	#endif
 	LABEL_UNLOCK,
 	LABEL_MORE,
 	LABEL_EDIT,
