@@ -38,20 +38,10 @@
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.3  2006/09/20 20:12:41  marco
- *#* Names convention, MOD_* macros.
- *#*
- *#* Revision 1.2  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.1  2005/11/04 17:59:47  bernie
- *#* Import into DevLib.
- *#*
- *#*/
-#include <thermo_map.h>
-#include <hw_thermo.h>
+#include <hw/thermo_map.h>
+#include <hw/hw_thermo.h>
+
+#include <cfg/module.h>
 
 #include <drv/thermo.h>
 #include <drv/timer.h>

@@ -37,42 +37,6 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.4  2006/09/20 20:02:43  marco
- *#* Replaced ISLISTEMPTY with LIST_EMPTY
- *#*
- *#* Revision 1.3  2006/07/19 12:56:25  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.2  2006/02/24 00:27:14  bernie
- *#* Use new naming convention for list macros.
- *#*
- *#* Revision 1.1  2005/11/04 18:00:42  bernie
- *#* Import into DevLib.
- *#*
- *#* Revision 1.11  2005/06/14 14:43:43  bernie
- *#* Add DevLib headers.
- *#*
- *#* Revision 1.10  2005/06/06 17:41:57  batt
- *#* Add lcd_layerSet function.
- *#*
- *#* Revision 1.9  2005/06/01 16:40:07  batt
- *#* Remove debug string.
- *#*
- *#* Revision 1.8  2005/06/01 16:38:04  batt
- *#* Adapt to changes in mware/list.h.
- *#*
- *#* Revision 1.7  2005/06/01 10:45:22  batt
- *#* lcd_setAddr(): Bugfix boundary condition; Misc cleanup.
- *#*
- *#* Revision 1.6  2005/06/01 10:36:23  batt
- *#* Layer: Rename member variables and Doxygenize.
- *#*
- *#* Revision 1.5  2005/05/27 11:05:58  batt
- *#* Do not write on lcd if layer is hidden.
- *#*/
-
 #include "lcd_text.h"
 #include "lcd_hd44.h"
 #include <drv/timer.h> // timer_delay()
