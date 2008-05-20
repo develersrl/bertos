@@ -43,7 +43,7 @@ demo_CSRC = \
 	bertos/drv/timer.c \
 	bertos/drv/buzzer.c \
 	bertos/drv/ser.c \
-	bertos/drv/ser_posix.c \
+	bertos/emul/ser_posix.c \
 	bertos/mware/formatwr.c \
 	bertos/mware/hex.c \
 	bertos/mware/event.c \
@@ -67,7 +67,7 @@ $(OBJDIR)/demo/bertos/drv/timer.o: bertos/drv/timer_qt_moc.cpp
 $(OBJDIR)/demo/bertos/emul/emulkbd.o: bertos/emul/emulkbd_moc.cpp
 
 #FIXME: isn't there a way to avoid repeating the pattern rule?
-bertos/drv/timer_qt_moc.cpp: bertos/drv/timer_qt.c
+bertos/drv/timer_qt_moc.cpp: bertos/emul/timer_qt.c
 	$(QT_MOC) -o $@ $<
 
 
