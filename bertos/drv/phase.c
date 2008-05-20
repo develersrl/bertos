@@ -36,19 +36,21 @@
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-#include <drv/timer.h>
 
+#include <hw/hw_phase.h>
 
 #include <cfg/macros.h>
-#include <cpu/irq.h>
-#include <cpu/types.h>
 #include <cfg/compiler.h>
 
+#include <cpu/irq.h>
+#include <cpu/types.h>
 
-#include <hw_phase.h>
+#include <drv/timer.h>
 #include <drv/phase.h>
 
 #include <math.h>
+
+#warning FIXME:Generalize this moduele for all target supported.
 
 /** Array  of triacs */
 static Triac triacs[TRIAC_CNT];
