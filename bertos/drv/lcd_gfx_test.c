@@ -30,16 +30,23 @@
  *
  * -->
  *
+ * \brief dot-matrix LCD test.
+ *
  * \version $Id$
  *
  * \author Bernardo Innocenti <bernie@develer.com>
  *
- * \brief dot-matrix LCD test.
  */
 
-#include <emul/emul.h>
+
+#warning FIXME: broken test!
+
+#if 0
+
 #include <drv/lcd_gfx.h>
 #include <gfx/gfx.h>
+
+#include <emul/emul.h>
 
 static void magic(struct Bitmap *bitmap, coord_t x, coord_t y)
 {
@@ -83,3 +90,5 @@ int main(int argc, char *argv[])
 	emul_cleanup();
 	return 0;
 }
+
+#endif
