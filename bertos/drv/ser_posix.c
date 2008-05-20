@@ -36,39 +36,19 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.2  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.1  2006/02/17 22:28:00  bernie
- *#* Rename ser_emul.c to ser_posix.c.
- *#*
- *#* Revision 1.4  2006/02/17 22:23:06  bernie
- *#* Update POSIX serial emulator.
- *#*
- *#* Revision 1.3  2005/11/04 16:20:02  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.2  2005/04/11 19:10:27  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.1  2004/12/31 17:40:00  bernie
- *#* Add a simple serial emulation driver.
- *#*
- *#*/
-
-#include "ser.h"
-#include "ser_p.h"
+#include <appconfig.h>
 
 #include <cfg/debug.h>
 #include <cfg/compiler.h>
-#include <mware/fifobuf.h>
 
-#include <appconfig.h>
+#include <drv/ser.h>
+#include <drv/ser_p.h>
+
+#include <mware/fifobuf.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
+
 #include <fcntl.h> /* open() */
 #include <unistd.h> /* read(), write() */
 
