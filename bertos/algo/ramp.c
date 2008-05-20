@@ -107,11 +107,6 @@
 
 #include <string.h> // memcpy()
 
-/**
- * Multiply \p a and \p b two integer at 32 bit and extract the high 16 bit word.
- */
-#define FIX_MULT32(a,b)  (((uint64_t)(a)*(uint32_t)(b)) >> 16)
-
 void ramp_compute(struct Ramp *ramp, uint32_t clocksRamp, uint16_t clocksMinWL, uint16_t clocksMaxWL)
 {
 	ASSERT(clocksMaxWL >= clocksMinWL);

@@ -114,7 +114,10 @@
  */
 #define FREQ2MICROS(hz) (1000000UL / ((uint32_t)(hz)))
 
-
+/**
+ * Multiply \p a and \p b two integer at 32 bit and extract the high 16 bit word.
+ */
+#define FIX_MULT32(a,b)  (((uint64_t)(a)*(uint32_t)(b)) >> 16)
 
 /**
  * Structure holding pre-calculated data for speeding up real-time evaluation
