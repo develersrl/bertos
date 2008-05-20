@@ -38,14 +38,18 @@
 
 #include "leveledit.h"
 
+#include <appconfig.h>
 #include <cfg/macros.h> /* MAX() */
+
 #include <drv/kbd.h>
 #include <drv/timer.h>
+
 #include <gui/levelbar.h>
+
 #include <mware/pgm.h>
+
 #include <gfx/text.h>
 #include <gfx/font.h>
-#include <appconfig.h>
 
 #if CONFIG_MENU_MENUBAR
 #include <gui/menubar.h>
@@ -55,6 +59,8 @@
 #include <drv/lcd_gfx.h>
 #include <gui/guiman.h>
 // END project_grl LOCAL
+
+#warning FIXME: Revise me!
 
 #define LBAR_HEIGHT 16
 
