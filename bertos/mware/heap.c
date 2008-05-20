@@ -38,38 +38,12 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.9  2006/07/19 12:56:27  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.8  2005/11/04 16:20:02  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.7  2005/04/11 19:10:28  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.6  2004/10/26 09:02:13  bernie
- *#* heap_free(): Handle NULL pointers like free(), write documentation.
- *#*
- *#* Revision 1.5  2004/10/03 20:43:22  bernie
- *#* Import changes from sc/firmware.
- *#*
- *#* Revision 1.1  2004/07/31 16:33:58  rasky
- *#* Spostato lo heap da kern/ a mware/
- *#*
- *#* Revision 1.2  2004/06/03 11:27:09  bernie
- *#* Add dual-license information.
- *#*
- *#* Revision 1.1  2004/05/23 17:27:00  bernie
- *#* Import kern/ subdirectory.
- *#*
- *#*/
-
 #include "heap.h"
-#include <string.h>           // memset()
+
 #include <cfg/macros.h>           // IS_POW2()
 #include <cfg/debug.h>            // ASSERT()
+
+#include <string.h>           // memset()
 
 /* NOTE: struct size must be a 2's power! */
 typedef struct _MemChunk
@@ -144,7 +118,6 @@ void *heap_allocmem(struct Heap* h, size_t size)
 void heap_freemem(struct Heap* h, void *mem, size_t size)
 {
 	MemChunk *prev;
-
 	ASSERT(mem);
 
 #ifdef _DEBUG

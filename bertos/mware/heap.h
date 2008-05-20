@@ -43,42 +43,12 @@
  *
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.7  2006/07/19 12:56:27  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.6  2005/11/27 23:36:19  bernie
- *#* Use appconfig.h instead of cfg/config.h.
- *#*
- *#* Revision 1.5  2005/11/04 16:20:02  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.4  2005/04/11 19:10:28  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.3  2004/08/25 14:12:09  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.2  2004/08/04 15:54:18  rasky
- *#* Merge da SC: prima versione veramente funzionante
- *#*
- *#* Revision 1.1  2004/07/31 16:33:58  rasky
- *#* Spostato lo heap da kern/ a mware/
- *#*
- *#* Revision 1.2  2004/06/03 11:27:09  bernie
- *#* Add dual-license information.
- *#*
- *#* Revision 1.1  2004/05/23 17:27:00  bernie
- *#* Import kern/ subdirectory.
- *#*
- *#*/
-
 #ifndef MWARE_HEAP_H
 #define MWARE_HEAP_H
 
-#include <cfg/compiler.h>
 #include <appconfig.h>
+
+#include <cfg/compiler.h>
 
 struct _MemChunk;
 
