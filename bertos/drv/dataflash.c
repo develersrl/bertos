@@ -43,7 +43,9 @@
 #include <cfg/macros.h>
 #include <cfg/debug.h>
 #include <cfg/module.h>
+
 #include <drv/timer.h>
+
 #include <kern/kfile.h>
 
 #if CONFIG_KERNEL
