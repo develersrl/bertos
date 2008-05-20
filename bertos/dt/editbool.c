@@ -29,8 +29,6 @@
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \version $Id$
- *
  * \brief Edit bool widget (implementation).
  * This widget handles boolean editing.
  * The boolean value will be displayed using two strings:
@@ -39,25 +37,6 @@
  * \version $Id$
  * \author Francesco Sacchi <batt@ðeveler.com>
  */
-
-/*#*
- *#* $Log$
- *#* Revision 1.2  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.1  2005/11/04 18:26:38  bernie
- *#* Import into DevLib.
- *#*
- *#* Revision 1.3  2005/06/08 17:32:33  batt
- *#* Switch to new messaging system.
- *#*
- *#* Revision 1.2  2005/06/06 11:04:12  batt
- *#* Add some comments.
- *#*
- *#* Revision 1.1  2005/05/31 11:11:37  batt
- *#* Edit bool: first release.
- *#*
- *#*/
 
 #include <mware/editbool.h>
 #include <dt/dtag.h>
