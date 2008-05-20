@@ -38,16 +38,6 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.2  2006/07/19 12:56:28  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.1  2005/03/01 23:31:02  bernie
- *#* String table and localization stuff.
- *#*
- *#*/
-
 #include "msg.h"
 
 /**
@@ -73,6 +63,5 @@ const char *msg_strings[MSG_COUNT] = {
  * Untranslated constant strings used more than once are
  * grouped here to save ROM space.
  */
-const char
-	str_empty[] = "";
+const char str_empty[] = "";
 
