@@ -52,10 +52,14 @@
 
 #include "buzzerled.h"
 
+#include <appconfig.h>
 #include <drv/timer.h>
 
-static struct Timer timers[NUM_BLDS];
-static bool timer_go[NUM_BLDS];
+#warning FIXME:This drive is obsolete, you must refactor it.
+
+#if 0
+static struct Timer timers[CONFIG_NUM_BLDS];
+static bool timer_go[CONFIG_NUM_BLDS];
 
 INLINE enum BLD_DEVICE hook_parm_to_device(void* parm)
 {
@@ -96,4 +100,5 @@ void bld_beep_and_wait(enum BLD_DEVICE device, uint16_t duration)
 	timer_delay(duration);
 	bld_set(device, false);
 }
+#endif
 

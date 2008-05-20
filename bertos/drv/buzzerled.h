@@ -43,6 +43,9 @@
 
 #include <cpu/attr.h>
 
+#warning FIXME:This drive is obsolete, you must refactor it.
+
+#if 0
 /** Include hw_buzzerled.h. We expect hw_buzzerled.h to define enum BLD_DEVICE, which must contain
  *  an enumarator for each device, plus a special symbol NUM_BLDS containing the
  *  number of devices.
@@ -90,5 +93,7 @@ void bld_beep(enum BLD_DEVICE device, uint16_t duration);
  * \note This function is blocking, so it will return after the specified period of time.
  */
 void bld_beep_and_wait(enum BLD_DEVICE device, uint16_t duration);
+
+#endif
 
 #endif /* DRV_BUZZERLED_H */
