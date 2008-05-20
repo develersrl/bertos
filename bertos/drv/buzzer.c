@@ -42,7 +42,7 @@
 
 #include "buzzer.h"
 
-#include <hw_buzzer.h>
+#include <hw/hw_buzzer.h>
 #include <drv/timer.h>
 
 #include <mware/event.h>
