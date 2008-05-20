@@ -29,7 +29,6 @@
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \version $Id$
  *
  * \brief MCP41xxx digital potentiomenter driver (implementation)
  *
@@ -45,6 +44,8 @@
 #include <hw_mcp41.h>
 #include <drv/mcp41.h>
 #include <drv/ser.h>
+
+#warning FIXME:This implementation is obsolete. Refactor with KFile interface.
 
 static Serial *spi_ser;
 
