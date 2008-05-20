@@ -38,6 +38,7 @@
  */
 
 #include "blanker.h"
+
 #include <drv/kbd.h>
 #include <drv/timer.h>
 
@@ -49,6 +50,7 @@
 #define BLK_LCDON	power_LcdOn()
 #define BLK_LCDOFF	power_LcdOff()
 
+#warning FIXME:Revise me!
 
 /** Keyboard event handler to listen for key presses in blanker. */
 static KbdHandler blk_KbdHandler;
