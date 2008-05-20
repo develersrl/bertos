@@ -43,8 +43,9 @@
 #ifndef DRV_SPI_BITBANG_H
 #define DRV_SPI_BITBANG_H
 
-#include <cfg/compiler.h>
 #include <appconfig.h>
+
+#include <cfg/compiler.h>
 
 /**
  * Define send and receive order bit.

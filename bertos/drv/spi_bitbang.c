@@ -40,10 +40,11 @@
  */
 
 
-#include <cpu/irq.h>
-#include <cfg/module.h>
 #include "spi_bitbang.h"
-#include "hw_spi.h"
+#include <hw/hw_spi.h>
+
+#include <cfg/module.h>
+#include <cpu/irq.h>
 
 void spi_assertSS(void)
 {
