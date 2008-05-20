@@ -40,7 +40,6 @@
 #define DT_DNOTIFIER_H
 
 #include <cfg/debug.h>
-#include <cfg/macros.h>
 
 #include <dt/dtag.h>
 #include <mware/list.h>
@@ -130,8 +129,8 @@ INLINE void dnotify(DNotifier *target, dtag_t tag, dval_t val)
 INLINE void dnotify_targets(DNotifier *target, dtag_t tag, dval_t val)
 {
 	DFilter *f;
-	if (!ISLISTEMPTY(&target->targets))
-		FOREACHNODE(f, &target->targets)
+	if (!LIST_EMPTY(&target->targets))
+		FOREACH_NODE(f, &target->targets)
 			f->update(f, tag, val);
 }
 
