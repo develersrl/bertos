@@ -55,4 +55,4 @@ void editbool_update(DEditBool *e, dtag_t tag, dval_t val);
 void editbool_draw(DEditBool *e);
 
 
-#endif
+#endif /* DT_EDITBOOL_H */

@@ -36,7 +36,7 @@
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-#include <mware/editint.h>
+#include "editint.h"
 
 #include <cfg/macros.h>
 

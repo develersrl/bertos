@@ -38,7 +38,7 @@
  * \author Francesco Sacchi <batt@ðeveler.com>
  */
 
-#include <mware/editbool.h>
+#include "editbool.h"
 #include <dt/dtag.h>
 
 #include <drv/lcd_text.h>
