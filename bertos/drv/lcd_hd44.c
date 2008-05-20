@@ -37,9 +37,11 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-#include "lcd_hd44.h"
 #include "hw_lcd.h"
+
 #include <cfg/arch_config.h>
+
+#include <drv/lcd_hd44.h>
 #include <drv/timer.h>
 
 #if defined(LCD_READ_H) && defined(LCD_READ_L) && defined(LCD_WRITE_H) && defined(LCD_WRITE_L)
@@ -421,37 +423,4 @@ void lcd_hw_init(void)
 	timer_delay(2);
 }
 
-#if CONFIG_TEST
 
-void lcd_hw_test(void)
-{
-	lcd_regWrite(LCD_CMD_SET_DDRAMADDR | 3);
-	timer_delay(1);
-	kprintf("3 -> %02X\n", lcd_regRead());
-	timer_delay(1);
-
-	for (int i = 0; i < 10; i++)
-	{
-		lcd_dataWrite('c');
-		timer_delay(1);
-		kprintf("addr = %02X\n", lcd_regRead());
-		timer_delay(1);
-	}
-
-	lcd_regWrite(LCD_CMD_SET_DDRAMADDR | 0x4a);
-	timer_delay(1);
-	kprintf("4A -> %02X\n", lcd_regRead());
-	timer_delay(1);
-
-	lcd_regWrite(LCD_CMD_SET_DDRAMADDR | 0x52);
-	timer_delay(1);
-	kprintf("52 -> %02X\n", lcd_regRead());
-	timer_delay(1);
-
-	lcd_regWrite(LCD_CMD_SET_DDRAMADDR | 0x1F);
-	timer_delay(1);
-	kprintf("1F -> %02X\n", lcd_regRead());
-	timer_delay(1);
-}
-
-#endif /* CONFIG_TEST */
