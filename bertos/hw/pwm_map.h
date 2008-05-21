@@ -45,8 +45,14 @@
 typedef enum
 {
 	PWM_CH0 = 0,
+	PWM_CH1,
+	PWM_CH2,
+	PWM_CH3,
 
-/*	add other PWM channel */
+/*	
+ *	add other PWM channel or
+ *	change above.
+ */
 
 	PWM_CNT
 } PwmDev;

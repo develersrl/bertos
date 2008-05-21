@@ -41,7 +41,7 @@
 
 #include <cfg/compiler.h>
 
-#warning This is hw example for TC520, you must implement it for your specific hardware
+#warning TODO:This is example implemetantion, you must implement it! 
 
 #define CE_PIN      0
 #define DV_PIN      0
