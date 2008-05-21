@@ -43,6 +43,8 @@
 #ifndef MWARE_PARSER_H
 #define MWARE_PARSER_H
 
+#include <cpu/types.h>
+
 /** Max number of arguments and results for each command */
 #define PARSER_MAX_ARGS       8
 
