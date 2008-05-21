@@ -30,6 +30,9 @@
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
  * All Rights Reserved.
  * -->
+ *
+ * \brief Preprocessor magic to create hunks for the commands executed from the parser
+ *
  * This module permits to create hunks for the functions that must be executed through
  * RPC commands. For instance, given this code:
  *
@@ -62,43 +65,7 @@
  *
  * \author Giovanni Bajo <rasky@develer.com>
  *
- * \brief Preprocessor magic to create hunks for the commands executed from the parser
- *
  */
-
-/*#*
- *#* $Log$
- *#* Revision 1.2  2006/07/19 12:56:27  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.1  2006/06/01 12:27:39  marco
- *#* Added utilities for protocols
- *#*
- *#* Revision 1.8  2005/01/12 20:06:31  rasky
- *#* enum ResultCode è ora un typedef
- *#*
- *#* Revision 1.7  2004/12/14 15:10:53  user1
- *#* Bernardo e Francesco: Assegnazione di un codice di ritorno ai processi
- *#*
- *#* Revision 1.6  2004/12/02 17:43:15  rasky
- *#* Aggiunta la possibilità di settare le flag dei comandi con la nuova macro DECLARE_CMD_HUNK_FLAGS (altrimenti, il default è zero)
- *#*
- *#* Revision 1.5  2004/10/16 13:20:15  rasky
- *#* Aggiunto supporto per alias di uno stesso comando
- *#*
- *#* Revision 1.4  2004/08/25 14:17:10  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.3  2004/07/31 22:00:07  rasky
- *#* Fixata una dipendenza
- *#*
- *#* Revision 1.2  2004/07/31 14:32:58  rasky
- *#* args e results possono overlapparsi sempre grazie ai thunk generati: eliminati i due array separati per risparmiare memoria
- *#*
- *#* Revision 1.1  2004/05/22 16:29:16  rasky
- *#* Generazione degli hunk dei comandi RPC tramite preprocessore
- *#*
- *#*/
 
 #ifndef CMD_HUNK_H
 #define CMD_HUNK_H
