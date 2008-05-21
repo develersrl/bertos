@@ -41,8 +41,9 @@
 #ifndef SIPO_H
 #define SIPO_H
 
+#include "hw_sipo.h"
+
 #include <avr/io.h>
-#include <hw/hw_sipo.h>
 
 void sipo_init(void);
 void sipo_putchar(uint8_t c);

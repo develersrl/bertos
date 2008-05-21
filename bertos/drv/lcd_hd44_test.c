@@ -37,7 +37,7 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-#include <hw/hw_lcd.h>
+#include "hw_lcd.h"
 
 #include <cfg/arch_config.h>
 

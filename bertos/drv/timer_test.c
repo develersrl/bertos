@@ -36,9 +36,18 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-#include "timer.c"
-#include "mware/event.c"
-#include "os/hptime.c"
+#ifdef _TEST
+	#include "timer.c"
+	#include "mware/event.c"
+	#include "os/hptime.c"
+
+#else
+	#include <drv/timer.c>
+	#include <mware/event.c>
+	#include <drv/wdt.h>
+
+#endif
+
 
 static void timer_test_constants(void)
 {

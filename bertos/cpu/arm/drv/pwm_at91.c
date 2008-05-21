@@ -39,14 +39,15 @@
  */
 
 #include "pwm_at91.h"
+#include "hw_cpu.h"
 
-#include <hw/hw_cpu.h>
+#include "appconfig.h"
 
 #include <cfg/macros.h>
 #include <cfg/debug.h>
+
 #include <io/arm.h>
 
-#include "appconfig.h"
 
 /**
  * Register structure for pwm driver.

@@ -38,19 +38,22 @@
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#include <io/arm.h>
+#include "hw_ser.h"  /* Required for bus macros overrides */
+#include "hw_cpu.h"  /* CLOCK_FREQ */
 
-#include <cpu/attr.h>
-#include <drv/ser.h>
-#include <drv/ser_p.h>
-
-#include <hw/hw_ser.h>  /* Required for bus macros overrides */
-#include <hw/hw_cpu.h>  /* CLOCK_FREQ */
-
-#include <mware/fifobuf.h>
 #include <cfg/debug.h>
 
 #include <appconfig.h>
+
+#include <io/arm.h>
+
+#include <cpu/attr.h>
+
+#include <drv/ser.h>
+#include <drv/ser_p.h>
+
+#include <mware/fifobuf.h>
+
 
 #define SERIRQ_PRIORITY 4 ///< default priority for serial irqs.
 

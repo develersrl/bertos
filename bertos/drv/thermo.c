@@ -38,17 +38,17 @@
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-#include <hw/thermo_map.h>
-#include <hw/hw_thermo.h>
+#include "thermo_map.h"
+#include "hw_thermo.h"
 
 #include <cfg/module.h>
+#include <cfg/macros.h>
+#include <cfg/debug.h>
 
 #include <drv/thermo.h>
 #include <drv/timer.h>
 #include <drv/ntc.h>
 
-#include <cfg/macros.h>
-#include <cfg/debug.h>
 
 
 /** Interval at which thermo control is performed. */

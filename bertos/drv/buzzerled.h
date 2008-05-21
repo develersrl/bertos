@@ -50,7 +50,7 @@
  *  an enumarator for each device, plus a special symbol NUM_BLDS containing the
  *  number of devices.
  */
-#include <hw/hw_buzzerled.h>
+#include "hw_buzzerled.h"
 
 
 /* Include hw-level implementation. This allows inlining of bld_set, which in turns
