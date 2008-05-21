@@ -30,12 +30,6 @@
  * All Rights Reserved.
  * -->
  *
- * \version $Id$
- *
- * \author Bernardo Innocenti <bernie@develer.com>
- * \author Stefano Fedrigo <aleph@develer.com>
- * \author Giovanni Bajo <rasky@develer.com>
- *
  * \brief Serial protocol parser and commands.
  *
  * This file contains the serial protocol parser and
@@ -50,18 +44,28 @@
  * using an union: the element of the union to use for each
  * argument is determined by format strings present in the
  * CmdTemplate table.
+ *
+ * \version $Id$
+ *
+ * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Stefano Fedrigo <aleph@develer.com>
+ * \author Giovanni Bajo <rasky@develer.com>
+ *
+ *
  */
 
 
 #include "parser.h"
+
+#include "appconfig.h"
+
 #include <drv/ser.h>
+#include <mware/hashtable.h>
 
 #include <stdlib.h> // atol(), NULL
 #include <string.h> // strchr(), strcmp()
 
-#include <mware/hashtable.h>
 
-#include "appconfig.h"
 
 #define ARG_SEP_S " "
 #define ARG_SEP_C ' '

@@ -75,8 +75,6 @@
 #include <cfg/debug.h>
 
 #include <stdio.h>
-#include <drv/ser.h>
-
 
 /// Enable compilation of the unit test code
 #define DEBUG_UNIT_TEST       0

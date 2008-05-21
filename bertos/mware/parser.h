@@ -40,10 +40,8 @@
  */
 
 
-#ifndef PARSER_H
-#define PARSER_H
-
-#include <drv/ser.h>
+#ifndef MWARE_PARSER_H
+#define MWARE_PARSER_H
 
 /** Max number of arguments and results for each command */
 #define PARSER_MAX_ARGS       8
@@ -181,5 +179,5 @@ bool parser_get_cmd_arguments(const char* line, const struct CmdTemplate* templ,
 bool parser_get_cmd_id(const char* line, unsigned long* ID);
 
 
-#endif /* PARSER_H */
+#endif /* MWARE_PARSER_H */
 
