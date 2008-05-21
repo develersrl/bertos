@@ -358,6 +358,7 @@ void parser_register_cmd(const struct CmdTemplate* cmd)
 }
 
 #if CONFIG_INTERNAL_COMMANDS
+#warning FIXME:This code use boost lib, if you compile whit internal command you must fix it.
 static ResultCode cmd_help(void)
 {
 #ifdef _DEBUG
