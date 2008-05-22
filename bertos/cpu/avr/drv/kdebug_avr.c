@@ -39,12 +39,14 @@
  * \author Francesco Sacchi <batt@develer.com>
  */
 
+#include "hw_cpu.h"     /* for CLOCK_FREQ */
+#include "hw_ser.h"     /* Required for bus macros overrides */
+
+#include <appconfig.h>
+#include <cfg/macros.h> /* for BV(), DIV_ROUND */
+
 #include <cpu/types.h>
 #include <cpu/attr.h>
-#include <cfg/macros.h> /* for BV(), DIV_ROUND */
-#include <appconfig.h>
-#include <hw_cpu.h>     /* for CLOCK_FREQ */
-#include <hw_ser.h>     /* Required for bus macros overrides */
 
 #include <avr/io.h>
 
@@ -253,3 +255,4 @@ INLINE void kdbg_hw_init(void)
 		#endif
 	#endif /* CONFIG_KDEBUG_PORT == 666 */
 }
+
