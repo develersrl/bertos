@@ -46,7 +46,7 @@
 #include <cfg/macros.h>
 #include <cfg/compiler.h>
 
-#warning This implementation is obsolete. Refactor with KFile interface.
+#warning FIXME:This implementation is obsolete. Refactor with KFile interface.
 
 #if 0
 
