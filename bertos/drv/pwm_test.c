@@ -48,6 +48,10 @@
 #include <cfg/macros.h>
 #include <cfg/debug.h>
 
+
+#warning FIXME: This test is target specific, refactor it to be generic for all target!
+
+#if 0
 #include <io/arm.h>
 
 /*
@@ -109,6 +113,7 @@ void pwm_test(void)
 	kprintf("PWM test set ch[%d] =>freq[%ld], duty[%d]\n", PWM_TEST_CH3, PWM_TEST_CH3_FREQ, PWM_TEST_CH3_DUTY);
 }
 
+
 int main(void)
 {
 	IRQ_ENABLE;
@@ -154,6 +159,6 @@ int main(void)
 
 }
 
-
+#endif
 
 
