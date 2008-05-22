@@ -83,6 +83,14 @@ static const DataflashInfo mem_info[] =
 		.page_cnt = 4096,
 		.read_cmd = DFO_READ_FLASH_MEM_BYTE_D,
 	},
+	{
+		/* AT45DB642D */
+		.density_id = 0x0F,
+		.page_size = 1056,
+		.page_bits = 11,
+		.page_cnt = 8192,
+		.read_cmd = DFO_READ_FLASH_MEM_BYTE_D,
+	},
 	/* Add other memories here */
 };
 
