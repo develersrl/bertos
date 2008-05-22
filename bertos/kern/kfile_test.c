@@ -47,6 +47,8 @@
 #include <mware/formatwr.h>
 #include <string.h>
 
+#warning TODO:Refactor this module..
+
 /**
  * KFile read/write subtest.
  * Try to write/read in the same \a f file location \a size bytes.

@@ -49,6 +49,8 @@
 
 #include <cfg/debug.h>
 
+#warning FIXME:Review and refactor this test..
+
 bool flash25_test(KFile *channel)
 {
 	KFileFlash25 fd;

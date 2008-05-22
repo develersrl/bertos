@@ -36,18 +36,25 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
+
+#include <cfg/compiler.h>
+#include <cfg/test.h>
+#include <cfg/debug.h>
+
+#include <mware/pgm.h>
+
+#include <stdio.h>
+
+#include <string.h> /* strcmp() */
+
+#warning FIXME:Review and refactor this test..
+
+#ifdef _TEST
 #include "sprintf.c"
 #include "formatwr.c"
 #include "hex.c"
-#include <cfg/compiler.h>
-#include <mware/pgm.h>
-#include <stdio.h>
 
-#include <assert.h> /* assert() */
-#include <string.h> /* strcmp() */
-
-
-int main(UNUSED_ARG(int, argc), UNUSED_ARG(char **,argv))
+int main(void)
 {
 	char buf[256];
 	static const char test_string[] = "Hello, world!\n";
@@ -80,7 +87,6 @@ int main(UNUSED_ARG(int, argc), UNUSED_ARG(char **,argv))
 	TEST("%-8.2f", -123.456,    "-123.46 ");
 	TEST("%8.0f",  -123.456,    "    -123");
 
-#undef TEST
 
 	/*
 	 * Stress tests.
@@ -93,4 +99,6 @@ int main(UNUSED_ARG(int, argc), UNUSED_ARG(char **,argv))
 
 	return 0;
 }
+
+#endif /* _TEST */
 

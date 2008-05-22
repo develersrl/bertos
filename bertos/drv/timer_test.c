@@ -36,17 +36,12 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-#ifdef _TEST
-	#include "timer.c"
-	#include "mware/event.c"
-	#include "os/hptime.c"
+#include <cfg/test.h>
 
-#else
-	#include <drv/timer.c>
-	#include <mware/event.c>
-	#include <drv/wdt.h>
+#include <drv/timer.h>
+#include <drv/wdt.h>
 
-#endif
+#include <mware/event.h>
 
 
 static void timer_test_constants(void)
@@ -131,6 +126,12 @@ static void timer_test_poll(void)
 	}
 }
 
+#ifdef _TEST
+
+#include "timer.c"
+#include "mware/event.c"
+#include "os/hptime.c"
+
 int main(void)
 {
 	wdt_init(7);
@@ -141,3 +142,5 @@ int main(void)
 	timer_test_poll();
 	return 0;
 }
+#endif
+

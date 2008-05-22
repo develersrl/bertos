@@ -39,8 +39,6 @@
 
 #include "hw_lcd.h"
 
-#include <cfg/arch_config.h>
-
 #include <drv/timer.h>
 #include <drv/lcd_hd44.h>
 
@@ -76,6 +74,11 @@ void lcd_hw_test(void)
 }
 
 
+#ifdef _TEST
+
+#include <drv/timer.c>
+#include <drv/lcd_hd44.c>
+
 int main(void)
 {
 		lcd_hw_test();
@@ -86,3 +89,5 @@ int main(void)
 
 		return 0;
 }
+
+#endif
