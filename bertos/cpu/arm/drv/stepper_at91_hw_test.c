@@ -49,9 +49,9 @@
 
 #include "appconfig.h"
 
-#warning This test are incomplete.. you MUST review..
+#warning FIXME:This test is incomplete.. you MUST review..
 
-
+#if 0
 static void stepper_test_irq_schedule(struct Stepper *motor, stepper_time_t delay)
 {
 	stepper_tc_doPulse(motor->timer);
@@ -171,4 +171,5 @@ void stepper_timer_test_brute(void)
 	//Enable timer and trig it
 	TC2_CCR = BV(TC_CLKEN) | BV(TC_SWTRG);
 }
+#endif
 

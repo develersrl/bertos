@@ -105,6 +105,8 @@
 #include "ramp.h"
 #include <cfg/debug.h>
 
+#warning FIXME:Review and refactor this test..
+
 static bool ramp_test_single(uint32_t minFreq, uint32_t maxFreq, uint32_t length)
 {
     struct Ramp r;
