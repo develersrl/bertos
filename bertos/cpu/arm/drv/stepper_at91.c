@@ -263,16 +263,12 @@ static void ISR_FUNC stepper_tc0_irq(void)
 	 */
 	uint32_t  status_reg = TC0_SR & TC0_IMR;
 
-	if ((status_reg & BV(TC_CPBS)) && (status_reg & BV(TC_CPAS)))
-		STEPPER_STROBE_ON;
-
 	if (status_reg & BV(TC_CPAS))
 		stepper_tc_tio_irq(&stepper_timers[TC_TIOA0]);
 
 	if (status_reg & BV(TC_CPBS))
 		stepper_tc_tio_irq(&stepper_timers[TC_TIOB0]);
 
-	STEPPER_STROBE_OFF;
 	/* Inform hw that we have served the IRQ */
 	AIC_EOICR = 0;
 
@@ -283,7 +279,6 @@ static void ISR_FUNC stepper_tc0_irq(void)
  */
 static void ISR_FUNC stepper_tc1_irq(void)
 {
-	STEPPER_STROBE_ON_1;
 	/*
 	 * Warning: when we read the status_reg register, we reset it.
 	 * That mean if is occur an interrupt event we can read only
@@ -301,7 +296,6 @@ static void ISR_FUNC stepper_tc1_irq(void)
 
 	/* Inform hw that we have served the IRQ */
 	AIC_EOICR = 0;
-	STEPPER_STROBE_OFF_1;
 }
 
 
@@ -319,14 +313,12 @@ static void ISR_FUNC stepper_tc2_irq(void)
 	 */
 	uint32_t  status_reg = TC2_SR & TC2_IMR;
 
-	STEPPER_STROBE_ON_2;
 	if (status_reg & BV(TC_CPAS))
 		stepper_tc_tio_irq(&stepper_timers[TC_TIOA2]);
 
 	if (status_reg & BV(TC_CPBS))
 		stepper_tc_tio_irq(&stepper_timers[TC_TIOB2]);
 
-	STEPPER_STROBE_OFF_2;
 	/* Inform hw that we have served the IRQ */
 	AIC_EOICR = 0;
 
