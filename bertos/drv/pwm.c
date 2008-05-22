@@ -38,14 +38,15 @@
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#include <cpu/types.h>
-#include <cpu/irq.h>
-
-#include <drv/pwm.h>
-#include <drv/pwm_at91.h>
-
 #include <cfg/macros.h>
 #include <cfg/debug.h>
+
+#include <drv/pwm.h>
+
+#include CPU_HEADER(ser)
+
+#include <cpu/types.h>
+#include <cpu/irq.h>
 
 
 /**
