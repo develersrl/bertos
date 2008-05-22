@@ -30,11 +30,12 @@
  *
  * -->
  *
+ * \brief Low-level serial module for ARM (interface).
+ *
  * \version $Id: timer_arm.h 18273 2007-10-11 14:53:02Z batt $
  *
  * \author Daniele Basile <asterix@develer.com>
  *
- * \brief Low-level serial module for ARM (interface).
  */
 
 #include <cpu/detect.h>

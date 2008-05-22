@@ -30,11 +30,12 @@
  *
  * -->
  *
+ * \brief Low-level serial module for ARM (inplementation).
+ *
  * \version $Id: timer_arm.c 18260 2007-10-11 14:08:10Z batt $
  *
  * \author Daniele Basile <asterix@develer.com>
  *
- * \brief Low-level USART module for ARM (inplementation).
  */
 
 #include <cpu/detect.h>
