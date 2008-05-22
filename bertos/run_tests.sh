@@ -12,11 +12,10 @@
 VERBOSE=1
 
 CC=gcc
-CFLAGS="-W -Wall -Wextra -I. -fno-builtin -D_DEBUG"
+CFLAGS="-W -Wall -Wextra -I. -fno-builtin -D_DEBUG -D_TEST"
 
 CXX=g++
 CXXFLAGS="$CFLAGS"
-
 
 for test in `find . -name "*_test.*"`; do
 	[ $VERBOSE -gt 0 ] && echo "Running $test..."
