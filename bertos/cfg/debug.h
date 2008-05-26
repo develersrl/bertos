@@ -40,8 +40,8 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-#ifndef DEVLIB_DEBUG_H
-#define DEVLIB_DEBUG_H
+#ifndef CFG_DEBUG_H
+#define CFG_DEBUG_H
 
 #include <cfg/os.h>
 #include <cfg/compiler.h>
@@ -310,4 +310,4 @@
 
 #endif /* _DEBUG */
 
-#endif /* DEVLIB_DEBUG_H */
+#endif /* CFG_DEBUG_H */
