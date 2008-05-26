@@ -628,7 +628,7 @@ static size_t battfs_read(struct KFile *fd, void *_buf, size_t size)
 	pgaddr_t addr_offset;
 	pgaddr_t read_len;
 
-	size = MIN(size, fd->size - fd->seek_pos);
+	size = MIN((kfile_size_t)size, fd->size - fd->seek_pos);
 
 	while (size)
 	{
