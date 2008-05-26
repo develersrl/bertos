@@ -181,7 +181,7 @@ static size_t flash25_read(struct KFile *_fd, void *buf, size_t size)
 	KFileFlash25 *fd = KFILEFLASH25(_fd);
 
 	ASSERT(fd->fd.seek_pos + size <= fd->fd.size);
-	size = MIN((uint32_t)size, fd->fd.size - fd->fd.seek_pos);
+	size = MIN((kfile_size_t)size, fd->fd.size - fd->fd.seek_pos);
 
 	//kprintf("Reading at addr[%lu], size[%d]\n", fd->seek_pos, size);
 	CS_ENABLE();
@@ -235,7 +235,7 @@ static size_t flash25_write(struct KFile *_fd, const void *_buf, size_t size)
 
 	ASSERT(fd->fd.seek_pos + size <= fd->fd.size);
 
-	size = MIN((flash25Size_t)size, fd->fd.size - fd->fd.seek_pos);
+	size = MIN((kfile_size_t)size, fd->fd.size - fd->fd.seek_pos);
 
 	while (size)
 	{
