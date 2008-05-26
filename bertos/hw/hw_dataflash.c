@@ -42,7 +42,7 @@
 #include <cfg/module.h>
 #include <cfg/macros.h>
 
-#warning TODO:This is example implemetantion, you must implement it! 
+#warning TODO:This is an example implementation, you must implement it!
 
 MOD_DEFINE(hw_dataflash);
 

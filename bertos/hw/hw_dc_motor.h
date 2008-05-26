@@ -40,7 +40,7 @@
 #ifndef HW_DC_MOTOR_H
 #define HW_DC_MOTOR_H
 
-#warning TODO:This is example implemetantion, you must implement it! 
+#warning TODO:This is an example implementation, you must implement it!
 
 //DC motor 0
 #define DC_MOTOR0_EN_PIN      /* Implement me! */

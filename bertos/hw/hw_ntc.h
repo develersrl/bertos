@@ -98,7 +98,7 @@
 #include <drv/ntc.h>
 #include <drv/adc.h>
 
-#warning TODO:This is example implemetantion, you must implement it! 
+#warning TODO:This is an example implementation, you must implement it!
 
 extern const res_t      NTC_RSER[NTC_CNT];
 extern const res_t      NTC_RPAR[NTC_CNT];

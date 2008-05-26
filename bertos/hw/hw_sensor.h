@@ -40,7 +40,7 @@
 #ifndef HW_SENSOR_H
 #define HW_SENSOR_H
 
-#warning TODO:This is example implemetantion, you must implement it! 
+#warning TODO:This is an example implementation, you must implement it!
 
 #define NUM_HOME_SENSORS 1
 

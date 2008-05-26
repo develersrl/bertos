@@ -42,7 +42,7 @@
 
 #include <cfg/compiler.h>
 
-#warning TODO:This is example implemetantion, you must implement it! 
+#warning TODO:This is an example implentation, you must implement it!
 
 #define CE_PIN      0
 #define DV_PIN      0

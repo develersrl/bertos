@@ -44,7 +44,7 @@
 
 #include <cfg/compiler.h>
 
-#warning TODO:This is example implemetantion, you must implement it! 
+#warning TODO:This is an example implementation, you must implement it!
 
 #define PHASE_HW_INIT  do { /* Implement me! */ }while (0)
 

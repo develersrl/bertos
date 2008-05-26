@@ -46,7 +46,7 @@
 
 #include <cfg/macros.h>
 
-#warning TODO:This is example implemetantion, you must implement it! 
+#warning TODO:This is an example implementation, you must implement it!
 
 #define K_RPT_MASK (K_UP | K_DOWN | K_OK | K_CANCEL)
 

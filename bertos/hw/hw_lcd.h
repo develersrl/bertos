@@ -52,7 +52,7 @@
 #include <cpu/irq.h>
 #include <cpu/types.h>
 
-#warning TODO: This is example implementation, you must implement it!
+#warning TODO:This is an example implementation, you must implement it!
 
 /**
  * \name LCD I/O pins/ports

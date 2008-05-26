@@ -41,7 +41,7 @@
 #ifndef HW_BUZZERLED_H
 #define HW_BUZZERLED_H
 
-#warning TODO:This is example implemetantion, you must implement it! 
+#warning TODO:This is an example implementation, you must implement it!
 
 
 #endif /* HW_BUZZERLED_H */

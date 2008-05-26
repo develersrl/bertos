@@ -43,7 +43,7 @@
 #include <cfg/compiler.h>
 
 
-#warning TODO: This is example implementation, you must implement it!
+#warning TODO:This is an example implementation, you must implement it!
 
 
 INLINE void SET_MCP41_DDR(Mcp41Dev dev)

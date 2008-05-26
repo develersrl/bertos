@@ -40,7 +40,7 @@
 #include <cfg/macros.h>
 #include <cfg/compiler.h>
 
-#warning TODO: This is example implementation, you must implement it!
+#warning TODO:This is an example implementation, you must implement it!
 
 const uint16_t mcp41_ports[MCP41_CNT] = 
 {
