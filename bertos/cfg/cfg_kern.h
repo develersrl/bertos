@@ -38,10 +38,15 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-#ifndef CONFIG_KERN_H
-#define CONFIG_KERN_H
+#ifndef CFG_KERN_H
+#define CFG_KERN_H
 
-#include <cfg/arch_config.h>  /* ARCH_EMUL */
+#include <cfg/cfg_arch.h>  /* ARCH_EMUL */
+
+/**
+ * Multithreading kernel.
+ */
+#define CONFIG_KERNEL 0
 
 /**
  * \name Modules activation
@@ -117,5 +122,4 @@
 	#endif
 #endif
 
-
-#endif /*  CONFIG_KERN_H */
+#endif /*  CFG_KERN_H */
