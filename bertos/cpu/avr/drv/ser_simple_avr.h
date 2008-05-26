@@ -37,34 +37,12 @@
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.2  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.1  2005/04/12 01:37:50  bernie
- *#* Import into DevLib.
- *#*
- *#* Revision 1.5  2004/10/20 13:37:49  batt
- *#* Change testing of simple serial instead of ARCH_BOOT in sc driver.
- *#*
- *#* Revision 1.4  2004/10/15 12:22:04  batt
- *#* Readd ';' in setstatus macro.
- *#*
- *#* Revision 1.3  2004/10/15 12:13:57  batt
- *#* Correct \brief header.
- *#*
- *#* Revision 1.2  2004/10/15 11:54:21  batt
- *#* Reformat.
- *#*
- *#* Revision 1.1  2004/10/13 16:35:36  batt
- *#* New (simple) serial driver.
- *#*
- *#*
- */
-#ifndef SER_SIMPLE_H
-#define SER_SIMPLE_H
+#ifndef DRV_SER_SIMPLE_AVR_H
+#define DRV_SER_SIMPLE_AVR_H
 
+#warning FIXME:This module is obsolete, yuo must refactor it.
+
+#if 0
 /* For checking which serial driver is linked */
 #define SER_SIMPLE
 
@@ -168,4 +146,6 @@ extern void _ser_close(void);
 #define ser_setstatus(h, x)         do {(void)(x);} while(0)
 /* \} */
 
-#endif /* SER_SIMPLE_H */
+#endif /* DRV_SER_SIMPLE_AVR_H */
+
+#endif

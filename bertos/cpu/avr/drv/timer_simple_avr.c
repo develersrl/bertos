@@ -37,39 +37,9 @@
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.2  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.1  2005/04/12 01:37:50  bernie
- *#* Import into DevLib.
- *#*
- *#* Revision 1.8  2005/04/12 01:18:09  bernie
- *#* time_t -> mtime_t.
- *#*
- *#* Revision 1.7  2005/03/20 04:18:41  bernie
- *#* Fixes for CONFIG_WATCHDOG == 0.
- *#*
- *#* Revision 1.6  2004/10/27 09:38:07  aleph
- *#* Bootloader working with watchdog enabled
- *#*
- *#* Revision 1.5  2004/10/20 10:00:37  customer_pw
- *#* Add newline at eof
- *#*
- *#* Revision 1.4  2004/10/14 14:13:09  batt
- *#* Add comment.
- *#*
- *#* Revision 1.3  2004/10/14 13:29:20  batt
- *#* Fix 0ms delay bug.
- *#*
- *#* Revision 1.2  2004/10/13 17:53:05  batt
- *#* Delay with hw timer.
- *#*
- *#* Revision 1.1  2004/10/13 16:36:32  batt
- *#* Simplified timer delay routines.
- *#*
- *#*/
+#warning FIXME:This module is obsolete, yuo must refactor it.
+
+#if 0
 #include "hw_cpu.h"
 #include "timer_simple_avr.h"
 #include <drv/wdt.h>
@@ -106,3 +76,5 @@ void timer_delay(mtime_t time)
 #endif
 	}
 }
+#endif
+

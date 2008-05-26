@@ -36,35 +36,10 @@
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.2  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.1  2005/04/12 01:37:50  bernie
- *#* Import into DevLib.
- *#*
- *#* Revision 1.7  2005/01/23 12:24:27  bernie
- *#* Include macros.h for BV().
- *#*
- *#* Revision 1.6  2004/10/20 13:40:54  batt
- *#* Put {} instead of ; after while loop.
- *#*
- *#* Revision 1.5  2004/10/20 13:39:40  batt
- *#* Reformat.
- *#*
- *#* Revision 1.4  2004/10/20 13:30:02  batt
- *#* Optimization of UCSR0C writing
- *#*
- *#* Revision 1.3  2004/10/14 15:55:32  batt
- *#* Add ser_purge.
- *#*
- *#* Revision 1.2  2004/10/14 14:46:59  batt
- *#* Change baudrate calculation.
- *#*
- *#* Revision 1.1  2004/10/13 16:35:36  batt
- *#* New (simple) serial driver.
- *#*/
+
+#warning FIXME:This module is obsolete, yuo must refactor it.
+
+#if 0
 #include "ser_simple_avr.h"
 
 #include <cfg/compiler.h>
@@ -192,3 +167,6 @@ void _ser_close(void)
 	/* Disable Rx & Tx. */
 	UCSR0B &= ~(BV(RXEN) | BV(TXEN));
 }
+
+#endif
+
