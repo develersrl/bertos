@@ -219,19 +219,6 @@
 	 */
 	#define CPU_REG_INIT_VALUE(reg) (reg == 0 ? 0x80 : 0)
 
-	#warning FIXME:This macro are empty for AVR target, implent it!
-	/**
-	 * Function attribute for use with performance critical code.
-	 */
-	#define FAST_FUNC /* */
-
-	/**
-	 * Data attribute to move constant data to fast memory storage.
-	 *
-	 * \see FAST_FUNC
-	 */
-	#define FAST_RODATA /* */
-
 #else
 	#error No CPU_... defined.
 #endif
@@ -241,13 +228,26 @@
 	#define CPU_REG_INIT_VALUE(reg)     0
 #endif
 
-
 #ifndef CPU_STACK_GROWS_UPWARD
 	#error CPU_STACK_GROWS_UPWARD should have been defined to either 0 or 1
 #endif
 
 #ifndef CPU_SP_ON_EMPTY_SLOT
 	#error CPU_SP_ON_EMPTY_SLOT should have been defined to either 0 or 1
+#endif
+
+#ifndef FAST_FUNC
+	/**
+	 * Function attribute for use with performance critical code.
+	 */
+	#define FAST_FUNC /* */
+#endif
+
+#ifndef FAST_RODATA
+	/**
+	 * Data attribute to move constant data to fast memory storage.
+	 */
+	#define FAST_RODATA /* */
 #endif
 
 /*
