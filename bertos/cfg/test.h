@@ -41,11 +41,11 @@
 #define CFG_TEST_H
 
 /**
- * Silent an assert in test suite.
- * This is use when we do a test suite and we want test 
- * the error condition, so we now that an assert condition is false
- * but is not a really error. To ignore this error we mark it
- * with this macro, where str is a messge string of the assert
+ * Silent an assert in a test.
+ * This is useful when we run a test and we want to test
+ * an error condition. We know that an assert will fail but
+ * this is not really an error. To ignore that we mark it
+ * with this macro, where str is the message string of the assert
  * that we want to drop.
  */
 #define SILENT_ASSERT(str) \
