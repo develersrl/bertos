@@ -37,6 +37,9 @@
  * \author Daniele Basile <asterix@develer.com>
  */
 
+#include <cfg/macros.h>
+#include <cfg/debug.h>
+
 #include <cpu/types.h>
 #include <cpu/irq.h>
 
@@ -45,13 +48,6 @@
 #include <drv/timer.h>
 #include <drv/sysirq_at91.h>
 
-#include <cfg/macros.h>
-#include <cfg/debug.h>
-
-
-#warning FIXME: This test is target specific, refactor it to be generic for all target!
-
-#if 0
 #include <io/arm.h>
 
 /*
@@ -159,6 +155,5 @@ int main(void)
 
 }
 
-#endif
 
 
