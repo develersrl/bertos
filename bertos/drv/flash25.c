@@ -47,8 +47,6 @@
  */
 #include "hw_spi.h"
 
-#include <appconfig.h>
-
 #include <cfg/macros.h>
 #include <cfg/debug.h>
 

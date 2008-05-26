@@ -36,52 +36,15 @@
  * \author Daniele Basile <asterix@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.20  2007/06/07 16:06:39  batt
- *#* Fix some doxygen errors.
- *#*
- *#* Revision 1.19  2007/02/15 13:54:26  asterix
- *#* Rename randpool_getN in randpool_get. Fix bug in randpool_get.
- *#*
- *#* Revision 1.17  2007/02/15 13:40:42  asterix
- *#* Fix bug in randpool_add and randpool_strir.
- *#*
- *#* Revision 1.16  2007/02/13 15:11:37  asterix
- *#* Typo.
- *#*
- *#* Revision 1.14  2007/02/13 09:57:12  asterix
- *#* Add directive #if in struct EntropyPool, and remove #else in randpool_add.
- *#*
- *#* Revision 1.13  2007/02/12 18:25:34  asterix
- *#* Fix bug in randpool_getN.
- *#*
- *#* Revision 1.12  2007/02/12 09:47:39  asterix
- *#* Remove randpool_save. Add randpool_pool.
- *#*
- *#* Revision 1.10  2007/02/12 09:03:32  asterix
- *#* Add CONFIG_RANDPOOL_TIMER macro to swich on or off timer support
- *#*
- *#* Revision 1.9  2007/02/09 17:58:09  asterix
- *#* Add macro CONFIG_RANDPOOL_TIMER.
- *#*
- *#* Revision 1.6  2007/02/09 09:24:38  asterix
- *#* Typos. Add data_len in randpool_add and n_byte in randpool_push pototypes.
- *#*
- *#* Revision 1.3  2007/02/08 14:25:29  asterix
- *#* Write static funcion push_byte.
- *#*
- *#*/
-
 #include "randpool.h"
 #include "md2.h"
-
-#include <stdio.h>           //sprintf();
-#include <string.h>          //memset(), memcpy();
 
 #include <cfg/compiler.h>
 #include <cfg/debug.h>       //ASSERT()
 #include <cfg/macros.h>      //MIN(), ROUND_UP();
+
+#include <stdio.h>           //sprintf();
+#include <string.h>          //memset(), memcpy();
 
 #if CONFIG_RANDPOOL_TIMER
 	#include <drv/timer.h>       //timer_clock();

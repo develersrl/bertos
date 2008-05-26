@@ -31,11 +31,12 @@
  *
  * -->
  *
+ * \brief Hardware independent timer driver (interface)
+ *
  * \version $Id$
  *
  * \author Bernardo Innocenti <bernie@develer.com>
  *
- * \brief Hardware independent timer driver (interface)
  */
 
 #ifndef DRV_TIMER_H
@@ -43,6 +44,7 @@
 
 #include <cfg/os.h>
 #include <cfg/macros.h>
+
 #include <cpu/attr.h>
 #include <cpu/irq.h>
 
@@ -57,10 +59,11 @@
 	#include CPU_HEADER(timer)
 #endif
 
-#include <mware/list.h>
+#include <cfg/cfg_timer.h>
 #include <cfg/debug.h>
 #include <cfg/compiler.h>
-#include <appconfig.h>
+
+#include <mware/list.h>
 
 
 extern volatile ticks_t _clock;

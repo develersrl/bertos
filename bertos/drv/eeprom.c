@@ -40,10 +40,9 @@
 
 #include "eeprom.h"
 
+#include <cfg/cfg_eeprom.h>  // CONFIG_EEPROM_VERIFY
 #include <cfg/macros.h>  // MIN()
 #include <cfg/debug.h>
-
-#include <appconfig.h>  // CONFIG_EEPROM_VERIFY
 
 #include <cpu/attr.h>
 #include CPU_HEADER(twi)

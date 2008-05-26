@@ -39,7 +39,7 @@
 
 #include "hw_lcd.h"
 
-#include <cfg/arch_config.h>
+#include <cfg/cfg_arch.h>
 
 #include <drv/lcd_hd44.h>
 #include <drv/timer.h>

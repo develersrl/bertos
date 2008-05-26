@@ -40,9 +40,10 @@
 #ifndef KERN_PROC_H
 #define KERN_PROC_H
 
+#include <cfg/cfg_kern.h>
 #include <cfg/compiler.h>
+
 #include <cpu/irq.h>
-#include <config_kern.h>
 
 /* Fwd decl */
 struct Process;

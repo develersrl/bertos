@@ -40,7 +40,7 @@
 #ifndef DRV_LCD_HD44_H
 #define DRV_LCD_HD44_H
 
-#include <appconfig.h>
+#include <cfg/cfg_lcd.h>
 #include <cfg/compiler.h> /* For stdint types */
 
 /**

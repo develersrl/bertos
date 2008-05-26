@@ -42,8 +42,8 @@
 #ifndef DRV_EEPROM_H
 #define DRV_EEPROM_H
 
+#include <cfg/cfg_eeprom.h>
 #include <cfg/compiler.h>
-#include <appconfig.h>
 
 /**
  * \name Values for CONFIG_EEPROM_TYPE

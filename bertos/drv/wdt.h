@@ -40,9 +40,9 @@
 #ifndef DRV_WDT_H
 #define DRV_WDT_H
 
-#include <appconfig.h>
+#include <cfg/cfg_wdt.h>
 #include <cfg/compiler.h> // INLINE
-#include <cfg/arch_config.h>
+#include <cfg/cfg_arch.h>
 
 /* Configury sanity check */
 #if !defined(CONFIG_WATCHDOG) || (CONFIG_WATCHDOG != 0 && CONFIG_WATCHDOG != 1)

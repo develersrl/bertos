@@ -41,11 +41,10 @@
 #ifndef DRV_FLASH25_H
 #define DRV_FLASH25_H
 
-#include <kern/kfile.h>
 #include <cfg/compiler.h>
+#include <cfg/cfg_flash25.h>
 
-
-#include <appconfig.h>
+#include <kern/kfile.h>
 
 /**
  * Type definition for serial flash memory.

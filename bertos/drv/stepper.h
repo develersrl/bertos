@@ -21,6 +21,7 @@
 #define DRV_STEPPER_H
 
 #include <cfg/compiler.h>
+
 #include <algo/ramp.h>
 
 // Forward declaration

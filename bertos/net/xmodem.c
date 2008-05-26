@@ -47,14 +47,14 @@
 
 #include "xmodem.h"
 
-#include <appconfig.h>
-#include <string.h> /* for memset() */
-#include <drv/ser.h>
-#include <algo/crc.h>
 #include <cfg/debug.h>
+#include <cfg/cfg_xmodem.h>
 
+#include <drv/ser.h>
 
+#include <algo/crc.h>
 
+#include <string.h> /* for memset() */
 
 /**
  * \name Protocol control codes

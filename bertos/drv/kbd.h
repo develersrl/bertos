@@ -42,10 +42,12 @@
 #ifndef DRV_KBD_H
 #define DRV_KBD_H
 
-#include <kbd_map.h>
+#include "kbd_map.h"
+
+#include <cfg/cfg_kbd.h> // CONFIG_KBD_OBSERVER
 #include <cfg/compiler.h>
+
 #include <mware/list.h>
-#include <appconfig.h> // CONFIG_KBD_OBSERVER
 
 /**
  * \name Keyboard polling modes.
@@ -55,7 +57,6 @@
  * \{
  */
 #define KBD_POLL_SOFTINT  1
-#define KBD_POLL_FREERTOS 2
 /* \} */
 
 /**

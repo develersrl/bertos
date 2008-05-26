@@ -21,13 +21,13 @@
 #include "hw_stepper.h"
 #include "hw_sensor.h"
 
-#include "appconfig.h"
-
+#include <cfg/cfg_stepper.h>
 #include <cfg/debug.h>
 
 #include <kern/proc.h>
 
 #include <algo/ramp.h>
+
 #include <drv/stepper_at91.h>
 
 #include <string.h>  // memset

@@ -31,65 +31,24 @@
  *
  * -->
  *
+ * \brief Low-level timer module for AVR (interface).
+ *
  * \version $Id$
  *
  * \author Bernardo Innocenti <bernie@develer.com>
  * \author Francesco Sacchi <batt@develer.com>
  *
- * \brief Low-level timer module for AVR (interface).
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.32  2007/10/08 12:14:32  batt
- *#* Fix some review issues.
- *#*
- *#* Revision 1.31  2007/10/07 12:30:55  batt
- *#* Add default timer for AVR.
- *#*
- *#* Revision 1.30  2007/06/07 14:35:12  batt
- *#* Merge from project_ks.
- *#*
- *#* Revision 1.29  2007/03/21 11:01:36  batt
- *#* Add missing support for ATMega1281.
- *#*
- *#* Revision 1.28  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.27  2006/05/18 00:38:24  bernie
- *#* Use hw_cpu.h instead of ubiquitous hw.h.
- *#*
- *#* Revision 1.26  2006/02/21 21:28:02  bernie
- *#* New time handling based on TIMER_TICKS_PER_SEC to support slow timers with ticks longer than 1ms.
- *#*
- *#* Revision 1.25  2005/07/19 07:26:37  bernie
- *#* Refactor to decouple timer ticks from milliseconds.
- *#*
- *#* Revision 1.24  2005/04/11 19:10:28  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.23  2005/03/01 23:24:51  bernie
- *#* Tweaks for avr-libc 1.2.x.
- *#*
- *#* Revision 1.21  2004/12/13 12:07:06  bernie
- *#* DISABLE_IRQSAVE/ENABLE_IRQRESTORE: Convert to IRQ_SAVE_DISABLE/IRQ_RESTORE.
- *#*
- *#* Revision 1.20  2004/11/16 20:59:46  bernie
- *#* Include <avr/io.h> explicitly.
- *#*
- *#* Revision 1.19  2004/10/19 08:56:41  bernie
- *#* TIMER_STROBE_ON, TIMER_STROBE_OFF, TIMER_STROBE_INIT: Move from timer_avr.h to timer.h, where they really belong.
- *#*
- *#* Revision 1.18  2004/09/20 03:31:03  bernie
- *#* Fix racy racy code.
- *#*/
 #ifndef DRV_TIMER_AVR_H
 #define DRV_TIMER_AVR_H
 
-#include <appconfig.h>     /* CONFIG_TIMER */
+#include "hw_cpu.h"        /* CLOCK_FREQ */
+
+#include <cfg/cfg_timer.h>     /* CONFIG_TIMER */
 #include <cfg/compiler.h>  /* uint8_t */
 #include <cfg/macros.h>    /* DIV_ROUND */
-#include <hw_cpu.h>        /* CLOCK_FREQ */
+
 
 /**
  * \name Values for CONFIG_TIMER.

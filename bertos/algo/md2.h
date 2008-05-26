@@ -39,7 +39,6 @@
  * message having a given prespecified target message digest.
  *
  *
- *
  * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
@@ -47,8 +46,8 @@
 #ifndef ALGO_MD2_H
 #define ALGO_MD2_H
 
+#include <cfg/cfg_md2.h>
 #include <cfg/compiler.h>
-#include <appconfig.h>
 
 #define NUM_COMPUTE_ROUNDS 18                        ///< Number of compute rounds.
 #define COMPUTE_ARRAY_LEN  CONFIG_MD2_BLOCK_LEN * 3     ///< Lenght of compute array.

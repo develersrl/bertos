@@ -41,19 +41,19 @@
  *
  */
 
-#include <hw_kbd.h>
+#include "hw_kbd.h"
 
-#include <appconfig.h>
+#include <cfg/cfg_kbd.h>
+#include <cfg/debug.h>
+#include <cfg/module.h>
 
 #include <drv/timer.h>
 #include <drv/kbd.h>
 
-#include <cfg/debug.h>
-#include <cfg/module.h>
 
 /* Configuration sanity checks */
-#if !defined(CONFIG_KBD_POLL) || (CONFIG_KBD_POLL != KBD_POLL_SOFTINT && CONFIG_KBD_POLL != CONFIG_POLL_FREERTOS)
-	#error CONFIG_KBD_POLL must be defined to either KBD_POLL_SOFTINT or CONFIG_POLL_FREERTOS
+#if !defined(CONFIG_KBD_POLL) || (CONFIG_KBD_POLL != KBD_POLL_SOFTINT)
+	#error CONFIG_KBD_POLL must be defined to either KBD_POLL_SOFTINT
 #endif
 #if !defined(CONFIG_KBD_BEEP) || (CONFIG_KBD_BEEP != 0 && CONFIG_KBD_BEEP != 1)
 	#error CONFIG_KBD_BEEP must be defined to either 0 or 1
@@ -154,19 +154,8 @@ static void kbd_softint(UNUSED_ARG(iptr_t, arg))
 	timer_add(&kbd_timer);
 }
 
-#elif CONFIG_KBD_POLL == CONFIG_POLL_FREERTOS
-
-#include "FreeRTOS.h"
-#include "task.h"
-
-static portTASK_FUNCTION(kbd_task, arg)
-{
-	for (;;)
-	{
-		kbd_poll();
-		timer_delay(KBD_CHECK_INTERVAL);
-	}
-}
+#else 
+	#error "Define keyboard poll method"
 
 #endif /* CONFIG_KBD_POLL */
 
@@ -488,14 +477,9 @@ void kbd_init(void)
 	timer_setDelay(&kbd_timer, ms_to_ticks(KBD_CHECK_INTERVAL));
 	timer_add(&kbd_timer);
 
-#elif CONFIG_KBD_POLL == CONFIG_POLL_FREERTOS
-
-	/* Create a timer specific thread */
-	xTaskCreate(kbd_task, "kbd", CONFIG_STACK_KBD,
-			NULL, CONFIG_PRI_KBD, NULL);
-
 #else
 	#error "Define keyboard poll method"
+
 #endif
 
 	MOD_INIT(kbd);
