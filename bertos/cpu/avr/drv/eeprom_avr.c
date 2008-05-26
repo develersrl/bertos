@@ -32,7 +32,6 @@
  *
  * \brief Driver for the 24xx16 and 24xx256 I2C EEPROMS (implementation)
  *
- * \note This implementation is AVR specific.
  *
  * \version $Id$
  * \author Stefano Fedrigo <aleph@develer.com>
@@ -41,12 +40,16 @@
 
 #include "eeprom.h"
 
-#include <cfg/debug.h>
-#include <appconfig.h>  // CONFIG_EEPROM_VERIFY
 #include <cfg/macros.h>  // MIN()
+#include <cfg/debug.h>
+
+#include <appconfig.h>  // CONFIG_EEPROM_VERIFY
+
 #include <cpu/attr.h>
 #include CPU_HEADER(twi)
+
 #include <drv/wdt.h>
+
 #include <mware/byteorder.h> // cpu_to_be16()
 
 #include <string.h>  // memset()
