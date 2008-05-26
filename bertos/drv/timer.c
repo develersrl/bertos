@@ -39,14 +39,15 @@
 
 #include "timer.h"
 
-#include <cpu/attr.h>
-#include <cpu/types.h>
-#include <cpu/irq.h>
-
+#include <cfg/cfg_timer.h>
+#include <cfg/cfg_wdt.h>
 #include <cfg/os.h>
 #include <cfg/debug.h>
 #include <cfg/module.h>
-#include <appconfig.h>
+
+#include <cpu/attr.h>
+#include <cpu/types.h>
+#include <cpu/irq.h>
 
 /*
  * Include platform-specific binding code if we're hosted.

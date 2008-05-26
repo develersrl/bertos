@@ -40,10 +40,11 @@
 #include "gfx.h"
 #include "gfx_p.h"
 
-#include <cfg/debug.h>  /* ASSERT() */
-#include <cpu/attr.h>   /* CPU_HARVARD */
-#include <cfg/macros.h> /* MIN() */
-#include <appconfig.h>  /* CONFIG_GFX_CLIPPING */
+#include <cfg/cfg_gfx.h>  /* CONFIG_GFX_CLIPPING */
+#include <cfg/macros.h>   /* MIN() */
+#include <cfg/debug.h>    /* ASSERT() */
+
+#include <cpu/attr.h>     /* CPU_HARVARD */
 
 #include <string.h>     /* memset() */
 

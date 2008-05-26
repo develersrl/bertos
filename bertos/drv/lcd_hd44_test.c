@@ -38,9 +38,9 @@
  */
 
 #include "hw_lcd.h"
+#include "lcd_hd44.h"
 
 #include <drv/timer.h>
-#include <drv/lcd_hd44.h>
 
 void lcd_hw_test(void)
 {

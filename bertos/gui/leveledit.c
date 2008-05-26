@@ -38,7 +38,7 @@
 
 #include "leveledit.h"
 
-#include <appconfig.h>
+#include <cfg/cfg_gfx.h>
 #include <cfg/macros.h> /* MAX() */
 
 #include <drv/kbd.h>

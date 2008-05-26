@@ -61,19 +61,22 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-#include <drv/ser.h>
-#include <drv/ser_p.h>
+#include "hw_ser.h"  /* Required for bus macros overrides */
+#include "hw_cpu.h"  /* CLOCK_FREQ */
 
-#include <hw_ser.h>  /* Required for bus macros overrides */
-#include <hw_cpu.h>  /* CLOCK_FREQ */
-#include <appconfig.h>
+#include <cfg/cfg_ser.h>
 
 #include <cfg/macros.h> /* DIV_ROUND */
 #include <cfg/debug.h>
+
+#include <drv/ser.h>
+#include <drv/ser_p.h>
 #include <drv/timer.h>
+
 #include <mware/fifobuf.h>
 
 #include <avr/io.h>
+
 #if defined(__AVR_LIBC_VERSION__) && (__AVR_LIBC_VERSION__ >= 10400UL)
 	#include <avr/interrupt.h>
 #else

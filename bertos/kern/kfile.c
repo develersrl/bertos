@@ -41,10 +41,12 @@
 
 
 #include "kfile.h"
-#include <appconfig.h>
 
+#include <cfg/cfg_kfile.h>
 #include <cfg/debug.h>
+
 #include <mware/formatwr.h>
+
 #include <string.h>
 
 /*

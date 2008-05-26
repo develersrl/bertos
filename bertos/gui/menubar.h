@@ -41,7 +41,6 @@
 #ifndef MWARE_MENUBAR_H
 #define MWARE_MENUBAR_H
 
-#include <appconfig.h>
 #include <cfg/compiler.h>
 
 /** Predefined labels ids */

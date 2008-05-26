@@ -42,8 +42,6 @@
 #include "pwm_avr.h"
 #include "hw_cpu.h"
 
-#include "appconfig.h"
-
 #warning TODO:This is an exmple of implementation of PWM low level channel for AVR, implemnt it!
 
 /**

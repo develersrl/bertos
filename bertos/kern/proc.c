@@ -43,17 +43,19 @@
 
 #include "proc_p.h"
 #include "proc.h"
-//#include "hw.h"
-#include <mware/event.h>
+
+#include <cfg/cfg_arch.h>  /* ARCH_EMUL */
+#include <cfg/debug.h>
+#include <cfg/module.h>
+#include <cfg/macros.h>       /* ABS() */
+
 #include <cpu/irq.h>
 #include <cpu/types.h>
 #include <cpu/attr.h>
-#include <cfg/debug.h>
-#include <cfg/module.h>
-#include <cfg/arch_config.h>  /* ARCH_EMUL */
-#include <cfg/macros.h>  /* ABS() */
 
-#include <string.h> /* memset() */
+#include <mware/event.h>
+
+#include <string.h>           /* memset() */
 
 /**
  * CPU dependent context switching routines.

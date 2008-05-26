@@ -54,9 +54,12 @@
 #include "ser.h"
 #include "wdt.h"
 #include "ser_p.h"
-#include <mware/formatwr.h>
+
+#include <cfg/cfg_ser.h>
+#include <cfg/cfg_kern.h>
 #include <cfg/debug.h>
-#include <appconfig.h>
+
+#include <mware/formatwr.h>
 
 #include <string.h> /* memset */
 

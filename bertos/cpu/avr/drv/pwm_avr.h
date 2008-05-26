@@ -43,8 +43,6 @@
 
 #include "pwm_map.h"
 
-#include "appconfig.h"
-
 #include <cpu/types.h>
 
 #define PWM_HW_MAX_PRESCALER_STEP         10

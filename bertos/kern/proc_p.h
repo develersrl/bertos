@@ -41,11 +41,12 @@
 #ifndef KERN_PROC_P_H
 #define KERN_PROC_P_H
 
+#include <cfg/cfg_kern.h>
 #include <cfg/compiler.h>
+
 #include <cpu/types.h>        /* for cpu_stack_t */
+
 #include <mware/list.h>
-#include <config_kern.h>
-#include <appconfig.h>
 
 typedef struct Process
 {

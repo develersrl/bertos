@@ -42,9 +42,9 @@
 #include "gfx.h"
 #include "gfx_p.h"
 
+#include <cfg/cfg_gfx.h>   /* CONFIG_GFX_CLIPPING */
 #include <cfg/debug.h>   /* ASSERT() */
 #include <cfg/macros.h>  /* SWAP() */
-#include <appconfig.h>   /* CONFIG_GFX_CLIPPING */
 
 /* Configuration sanity checks */
 #if !defined(CONFIG_GFX_CLIPPING) || (CONFIG_GFX_CLIPPING != 0 && CONFIG_GFX_CLIPPING != 1)

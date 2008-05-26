@@ -38,9 +38,11 @@
 #ifndef MWARE_FORMATWR_H
 #define MWARE_FORMATWR_H
 
-#include <stdarg.h> /* va_list */
-#include <appconfig.h>
+#include <cfg/cfg_formatwr.h>
+
 #include <cpu/attr.h>    /* CPU_HARVARD */
+
+#include <stdarg.h>      /* va_list */
 
 /**
  * \name _formatted_write() configuration

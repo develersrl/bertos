@@ -15,10 +15,11 @@
 #ifndef GFX_GFX_H
 #define GFX_GFX_H
 
+#include <cfg/cfg_gfx.h>    /* CONFIG_GFX_* */
 #include <cfg/compiler.h>
-#include <cpu/attr.h>   /* CPU_HARVARD */
 
-#include <appconfig.h> /* CONFIG_GFX_* */
+#include <cpu/attr.h>       /* CPU_HARVARD */
+
 
 /**
  * \name Known pixel formats for bitmap representation.

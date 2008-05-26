@@ -57,7 +57,7 @@
 
 #include "parser.h"
 
-#include "appconfig.h"
+#include <cfg/cfg_parser.h>
 
 #include <drv/ser.h>
 #include <mware/hashtable.h>

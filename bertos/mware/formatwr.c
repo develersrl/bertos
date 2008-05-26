@@ -78,10 +78,12 @@
 
 
 #include "formatwr.h"
+
+#include <cfg/cfg_formatwr.h>  /* CONFIG_ macros */
+#include <cfg/debug.h>         /* ASSERT */
+
 #include <mware/pgm.h>
 #include <mware/hex.h>
-#include <cfg/debug.h> /* ASSERT */
-#include <appconfig.h> /* CONFIG_ macros */
 
 #ifndef CONFIG_PRINTF_N_FORMATTER
 	/** Disable the arcane %n formatter. */

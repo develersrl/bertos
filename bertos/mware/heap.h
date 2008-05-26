@@ -33,21 +33,20 @@
  *
  * \brief Heap subsystem (public interface).
  *
- * \version $Id$
- *
- * \author Bernardo Innocenti <bernie@develer.com>
- *
  * \todo Heap memory could be defined as an array of MemChunk, and used
  * in this form also within the implementation. This would probably remove
  * memory alignment problems, and also some aliasing issues.
+ *
+ * \version $Id$
+ *
+ * \author Bernardo Innocenti <bernie@develer.com>
  *
  */
 
 #ifndef MWARE_HEAP_H
 #define MWARE_HEAP_H
 
-#include <appconfig.h>
-
+#include <cfg/cfg_heap.h>
 #include <cfg/compiler.h>
 
 struct _MemChunk;

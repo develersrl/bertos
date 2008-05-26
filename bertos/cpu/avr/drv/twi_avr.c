@@ -40,12 +40,14 @@
 
 #include "twi_avr.h"
 
+#include "hw_cpu.h"  /* CLOCK_FREQ */
+
+#include <cfg/cfg_twi.h>
 #include <cfg/debug.h>
+#include <cfg/macros.h> // BV()
+
 #include <cpu/detect.h>
 #include <cpu/irq.h>
-#include <cfg/macros.h> // BV()
-#include <hw_cpu.h>  /* CLOCK_FREQ */
-#include <appconfig.h>
 
 #include <compat/twi.h>
 

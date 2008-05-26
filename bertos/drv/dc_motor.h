@@ -42,15 +42,15 @@
 
 #include "hw_dc_motor.h"
 
+#include <cfg/cfg_dc_motor.h>
+#include <cfg/macros.h>
+
 #include <algo/pid_control.h>
 
 #include <drv/pwm.h>
 #include <drv/timer.h>
 #include <drv/adc.h>
 
-#include <cfg/macros.h>
-
-#include "appconfig.h"
 
 /**
  * Define status bit for DC motor device.

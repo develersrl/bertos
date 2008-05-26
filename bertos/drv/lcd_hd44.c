@@ -38,10 +38,10 @@
  */
 
 #include "hw_lcd.h"
+#include "lcd_hd44.h"
 
 #include <cfg/cfg_arch.h>
 
-#include <drv/lcd_hd44.h>
 #include <drv/timer.h>
 
 #if defined(LCD_READ_H) && defined(LCD_READ_L) && defined(LCD_WRITE_H) && defined(LCD_WRITE_L)

@@ -52,12 +52,12 @@
 
 #include "buzzerled.h"
 
-#include <appconfig.h>
-#include <drv/timer.h>
-
 #warning FIXME:This drive is obsolete, you must refactor it.
 
 #if 0
+#include <cfg/cfg_buzzerled.h>
+#include <drv/timer.h>
+
 static struct Timer timers[CONFIG_NUM_BLDS];
 static bool timer_go[CONFIG_NUM_BLDS];
 

@@ -38,14 +38,14 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-#include <cpu/irq.h>
-#include <cpu/attr.h>
-#include <cpu/types.h>
+#include <cfg/cfg_debug.h>
 
 #include <cfg/macros.h> /* for BV() */
 #include <cfg/debug.h>
 
-#include <appconfig.h>
+#include <cpu/irq.h>
+#include <cpu/attr.h>
+#include <cpu/types.h>
 
 #include <mware/formatwr.h> /* for _formatted_write() */
 #include <mware/pgm.h>

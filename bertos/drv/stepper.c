@@ -28,7 +28,7 @@
 
 #include <algo/ramp.h>
 
-#include <drv/stepper_at91.h>
+#include CPU_HEADER(stepper)
 
 #include <string.h>  // memset
 
