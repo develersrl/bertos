@@ -58,7 +58,7 @@ pwm_period_t pwm_hw_getPeriod(PwmDev dev)
 	 * PWM channel
 	 */
 
-	return 0
+	return 0;
 }
 
 /**
