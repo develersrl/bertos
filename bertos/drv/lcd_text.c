@@ -27,7 +27,7 @@
  * the GNU General Public License.
  *
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
- *
+ * All Rights Reserved.
  * -->
  *
  * \brief Generic text LCD driver (impl.).
@@ -39,11 +39,14 @@
 
 #include "lcd_text.h"
 #include "lcd_hd44.h"
-#include <drv/timer.h> // timer_delay()
-#include <mware/formatwr.h> // _formatted_write()
-#include <mware/list.h> // LIST_EMPTY()
+
 #include <cfg/macros.h> // BV()
 #include <cfg/debug.h>
+
+#include <drv/timer.h> // timer_delay()
+
+#include <mware/formatwr.h> // _formatted_write()
+#include <mware/list.h> // LIST_EMPTY()
 
 #include <string.h> // strlen()
 
@@ -448,16 +451,4 @@ void lcd_init(void)
 	lcd_setCursor(0);
 }
 
-#if CONFIG_TEST
-void lcd_test(void)
-{
-	int i;
-
-	for (i = 0; i < LCD_ROWS * LCD_COLS; ++i)
-	{
-		lcd_putCharUnlocked('0' + (i % 10), lcd_DefLayer);
-		timer_delay(100);
-	}
-}
-#endif /* CONFIG_TEST */
 
