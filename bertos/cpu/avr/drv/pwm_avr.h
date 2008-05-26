@@ -38,11 +38,35 @@
  *
  */
 
-#include <cpu/detect.h>
+#ifndef DRV_PWM_AVR_H
+#define DRV_PWM_AVR_H
 
-#if CPU_AVR
-	#warning TODO:No AVR implementation of PWM.
-/*#elif  Add other AVR families here */
-#else
-	#error Unknown CPU
-#endif
+#include "pwm_map.h"
+
+#include "appconfig.h"
+
+#define PWM_HW_MAX_PRESCALER_STEP         10
+#define PWM_HW_MAX_PERIOD             0xFFFF
+
+/**
+ * Type definition for pwm period.
+ */
+typedef uint16_t pwm_period_t;
+
+/**
+ * Structur definition for pwm driver.
+ */
+typedef struct PwmChannel
+{
+	/*  */
+} PwmChannel;
+
+
+void pwm_hw_init(void);
+void pwm_hw_setFrequency(PwmDev dev, uint32_t freq);
+void pwm_hw_setDutyUnlock(PwmDev dev, uint16_t duty);
+void pwm_hw_disable(PwmDev dev);
+void pwm_hw_enable(PwmDev dev);
+pwm_period_t pwm_hw_getPeriod(PwmDev dev);
+
+#endif /* DRV_ADC_AT91_H */
