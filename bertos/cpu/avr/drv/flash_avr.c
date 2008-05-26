@@ -59,6 +59,9 @@
 
 #include <string.h>
 
+#warning FIXME:This module need to be refactor to kfile interface!
+#if 0
+
 /**
  * Definition of type for avr flash module.
  */
@@ -293,4 +296,5 @@ void flash_avr_init(struct KFile *fd)
 
 	flash_avr_open(fd);
 }
+#endif
 
