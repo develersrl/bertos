@@ -119,8 +119,8 @@
 	 */
 	#define DB(x) x
 
-	#include <appconfig.h>  /* CONFIG_KDEBUG_ASSERT_NO_TEXT */
-	#include <cpu/attr.h>  /* CPU_HARVARD */
+	#include <cfg/cfg_debug.h>   /* CONFIG_KDEBUG_ASSERT_NO_TEXT */
+	#include <cpu/attr.h>        /* CPU_HARVARD */
 
 	/* These are implemented in drv/kdebug.c */
 	void kdbg_init(void);
