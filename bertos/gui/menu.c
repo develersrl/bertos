@@ -39,60 +39,19 @@
  * \brief General pourpose menu handling functions
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.8  2006/09/13 13:58:32  bernie
- *#* Add RenderHook support.
- *#*
- *#* Revision 1.7  2006/08/01 12:22:46  bernie
- *#* Mention DevLib license.
- *#*
- *#* Revision 1.6  2006/07/19 12:56:27  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.5  2006/06/03 13:58:01  bernie
- *#* Fix recursive timeout and add exit status information.
- *#*
- *#* Revision 1.4  2006/06/02 12:26:18  bernie
- *#* Draw graphical checkmarks.
- *#*
- *#* Revision 1.3  2006/05/28 15:03:31  bernie
- *#* Avoid unnecessary rendering.
- *#*
- *#* Revision 1.2  2006/05/25 23:34:38  bernie
- *#* Implement menu timeouts.
- *#*
- *#* Revision 1.1  2006/05/15 07:20:54  bernie
- *#* Move menu to gui/.
- *#*
- *#* Revision 1.7  2006/04/27 05:39:24  bernie
- *#* Enhance text rendering to arbitrary x,y coords.
- *#*
- *#* Revision 1.6  2006/04/11 00:07:32  bernie
- *#* Implemenent MF_SAVESEL flag.
- *#*
- *#* Revision 1.5  2006/03/22 09:49:51  bernie
- *#* Simplifications from project_grl.
- *#*
- *#* Revision 1.4  2006/03/20 17:48:35  bernie
- *#* Implement support for ROM menus.
- *#*
- *#* Revision 1.3  2006/02/20 14:34:32  bernie
- *#* Include appconfig.h before using its definitions.
- *#*
- *#* Revision 1.2  2006/02/15 09:10:51  bernie
- *#* Make title bold; Fix height when we have no menubar.
- *#*/
-
 #include "menu.h"
+
+#include <appconfig.h>
+
+#include <cfg/compiler.h>
+#include <cfg/debug.h>
 
 #include <gfx/gfx.h>
 #include <gfx/font.h>
 #include <gfx/text.h>
+
 #include <drv/kbd.h>
-#include <cfg/compiler.h>
-#include <cfg/debug.h>
-#include <appconfig.h>
+
 #include <string.h> /* strcpy() */
 
 #if CPU_HARVARD
@@ -210,7 +169,9 @@ static void menu_defaultRenderHook(struct Bitmap *bm, int ypos, bool selected, c
 		}
 	}
 
-#if CPU_HARVARD
+#warning FIXME:REVISE this code!
+#if 0
+//#if CPU_HARVARD
 	((item->flags & MIF_RAMLABEL) ? text_xyprintf : text_xyprintf_P)
 #else
 	text_xyprintf
