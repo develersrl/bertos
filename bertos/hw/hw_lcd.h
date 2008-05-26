@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2005, 2008 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2001 Bernardo Innocenti <bernie@codewiz.org>
  *
  * -->
