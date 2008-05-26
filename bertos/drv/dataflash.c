@@ -348,7 +348,7 @@ static size_t dataflash_read(struct KFile *_fd, void *buf, size_t size)
 
 
 	ASSERT(fd->fd.seek_pos + size <= fd->fd.size);
-	size = MIN((uint32_t)size, fd->fd.size - fd->fd.seek_pos);
+	size = MIN((kfile_size_t)size, fd->fd.size - fd->fd.seek_pos);
 
 	kprintf("Reading at pos[%lu]\n", fd->fd.seek_pos);
 
@@ -399,7 +399,7 @@ static size_t dataflash_write(struct KFile *_fd, const void *_buf, size_t size)
 	const uint8_t *data = (const uint8_t *) _buf;
 
 	ASSERT(fd->fd.seek_pos + size <= fd->fd.size);
-	size = MIN((uint32_t)size, fd->fd.size - fd->fd.seek_pos);
+	size = MIN((kfile_size_t)size, fd->fd.size - fd->fd.seek_pos);
 
 	kprintf("Writing at pos[%lu]\n", fd->fd.seek_pos);
 
@@ -412,7 +412,7 @@ static size_t dataflash_write(struct KFile *_fd, const void *_buf, size_t size)
 		offset = fd->fd.seek_pos % mem_info[fd->dev].page_size;
 
 
-		size_t wr_len = MIN(size, mem_info[fd->dev].page_size - offset);
+		size_t wr_len = MIN((dataflash_size_t)size, mem_info[fd->dev].page_size - offset);
 
 		kprintf(" [page-<%ld>, byte-<%ld>]",new_page, offset);
 

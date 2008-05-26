@@ -32,8 +32,8 @@
  *
  * \brief Function library for AT45DB081D Flash memory.
  *
- *
  * \version $Id: dataflash.h 20677 2008-02-19 14:29:52Z batt $
+ *
  * \author Daniele Basile <asterix@develer.com>
  */
 
@@ -41,8 +41,9 @@
 #ifndef DRV_DATAFLASH_H
 #define DRV_DATAFLASH_H
 
-#include <kern/kfile.h>
 #include <cfg/compiler.h>
+
+#include <kern/kfile.h>
 
 /**
  * Type definitions for dflash memory.
@@ -69,9 +70,10 @@ typedef void (dataflash_setCS_t)(bool);
  */
 typedef enum DataflashType
 {
-	DFT_AT45DB041B,
+	DFT_AT45DB041B = 0,
 	DFT_AT45DB081D,
 	DFT_AT45DB161D,
+	DFT_AT45DB642D,
 	DFT_CNT
 } DataflashType;
 
