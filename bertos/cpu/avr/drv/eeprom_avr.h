@@ -27,15 +27,16 @@
  * the GNU General Public License.
  *
  * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
- *
+ * All Rights Reserved.
  * -->
+ *
+ * \brief Driver for the 24xx16 and 24xx256 I2C EEPROMS (interface)
  *
  * \version $Id$
  *
  * \author Stefano Fedrigo <aleph@develer.com>
  * \author Bernardo Innocenti <bernie@develer.com>
  *
- * \brief Driver for the 24xx16 and 24xx256 I2C EEPROMS (interface)
  */
 
 #ifndef DRV_EEPROM_H
