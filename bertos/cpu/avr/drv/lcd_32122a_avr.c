@@ -297,7 +297,7 @@ static bool lcd_check(void)
 */
 
 
-static inline void lcd_cmd(uint8_t cmd, uint8_t chip)
+static inline void lcd_32122_cmd(uint8_t cmd, uint8_t chip)
 {
 	WAIT_LCD;
 
@@ -321,7 +321,7 @@ static inline void lcd_cmd(uint8_t cmd, uint8_t chip)
 }
 
 
-static inline uint8_t lcd_read(uint8_t chip)
+static inline uint8_t lcd_32122_read(uint8_t chip)
 {
 	uint8_t data;
 
@@ -355,7 +355,7 @@ static inline uint8_t lcd_read(uint8_t chip)
 }
 
 
-static inline void lcd_write(uint8_t c, uint8_t chip)
+static inline void lcd_32122_write(uint8_t c, uint8_t chip)
 {
 	WAIT_LCD;
 
@@ -386,7 +386,7 @@ static inline void lcd_write(uint8_t c, uint8_t chip)
 /**
  * Set LCD contrast PWM.
  */
-void lcd_setPwm(int duty)
+void lcd_32122_setPwm(int duty)
 {
 	ASSERT(duty >= LCD_MIN_PWM);
 	ASSERT(duty <= LCD_MAX_PWM);
@@ -395,21 +395,21 @@ void lcd_setPwm(int duty)
 }
 
 
-static void lcd_clear(void)
+static void lcd_32122_clear(void)
 {
 	uint8_t page, j;
 
 	for (page = 0; page < LCD_PAGES; ++page)
 	{
-		lcd_cmd(LCD_CMD_COLADDR | 0, LCDF_E1 | LCDF_E2);
-		lcd_cmd(LCD_CMD_PAGEADDR | page, LCDF_E1 | LCDF_E2);
+		lcd_32122_cmd(LCD_CMD_COLADDR | 0, LCDF_E1 | LCDF_E2);
+		lcd_32122_cmd(LCD_CMD_PAGEADDR | page, LCDF_E1 | LCDF_E2);
 		for (j = 0; j < LCD_PAGESIZE; j++)
-			lcd_write(0, LCDF_E1 | LCDF_E2);
+			lcd_32122_write(0, LCDF_E1 | LCDF_E2);
 	}
 }
 
 
-static void lcd_writeRaster(const uint8_t *raster)
+static void lcd_32122_writeRaster(const uint8_t *raster)
 {
 	uint8_t page, rows;
 	const uint8_t *right_raster;
@@ -419,16 +419,16 @@ static void lcd_writeRaster(const uint8_t *raster)
 
 	for (page = 0; page < LCD_PAGES; ++page)
 	{
-		lcd_cmd(LCD_CMD_PAGEADDR | page, LCDF_E1 | LCDF_E2);
-		lcd_cmd(LCD_CMD_COLADDR | 0, LCDF_E1 | LCDF_E2);
+		lcd_32122_cmd(LCD_CMD_PAGEADDR | page, LCDF_E1 | LCDF_E2);
+		lcd_32122_cmd(LCD_CMD_COLADDR | 0, LCDF_E1 | LCDF_E2);
 
 		/* Super optimized lamer loop */
 		right_raster = raster + LCD_PAGESIZE;
 		rows = LCD_PAGESIZE;
 		do
 		{
-			lcd_write(*raster++, LCDF_E1);
-			lcd_write(*right_raster++, LCDF_E2);
+			lcd_32122_write(*raster++, LCDF_E1);
+			lcd_32122_write(*right_raster++, LCDF_E2);
 		}
 		while (--rows);
 		raster = right_raster;
@@ -438,16 +438,16 @@ static void lcd_writeRaster(const uint8_t *raster)
 /**
  * Update the LCD display with data from the provided bitmap.
  */
-void lcd_blitBitmap(Bitmap *bm)
+void lcd_32122_blitBitmap(Bitmap *bm)
 {
 	MOD_CHECK(lcd);
-	lcd_writeRaster(bm->raster);
+	lcd_32122_writeRaster(bm->raster);
 }
 
 
 #if CONFIG_LCD_SOFTINT_REFRESH
 
-static void lcd_refreshSoftint(void)
+static void lcd_32122_refreshSoftint(void)
 {
 	lcd_blit_bitmap(&lcd_bitmap);
 	timer_add(lcd_refresh_timer);
@@ -462,7 +462,7 @@ static void lcd_refreshSoftint(void)
  * \note The PWM used for LCD contrast is initialized in drv/pwm.c
  *       because it is the same PWM used for output attenuation.
  */
-void lcd_init(void)
+void lcd_32122_init(void)
 {
 	MOD_CHECK(timer);
 
@@ -497,9 +497,9 @@ void lcd_init(void)
 	timer_delay(20);
 	IRQ_SAVE_DISABLE(flags);
 
-	lcd_cmd(LCD_CMD_RESET, LCDF_E1 | LCDF_E2);
-	lcd_cmd(LCD_CMD_DISPLAY_ON, LCDF_E1 | LCDF_E2);
-	lcd_cmd(LCD_CMD_STARTLINE | 0, LCDF_E1 | LCDF_E2);
+	lcd_32122_cmd(LCD_CMD_RESET, LCDF_E1 | LCDF_E2);
+	lcd_32122_cmd(LCD_CMD_DISPLAY_ON, LCDF_E1 | LCDF_E2);
+	lcd_32122_cmd(LCD_CMD_STARTLINE | 0, LCDF_E1 | LCDF_E2);
 
 	/* Initialize anti-corruption walls for raster */
 	INIT_WALL(wall_before_raster);
@@ -507,8 +507,8 @@ void lcd_init(void)
 
 	IRQ_RESTORE(flags);
 
-	lcd_clear();
-	lcd_setpwm(LCD_DEF_PWM);
+	lcd_32122_clear();
+	lcd_32122_setpwm(LCD_DEF_PWM);
 
 	gfx_bitmapInit(&lcd_bitmap, lcd_raster, LCD_WIDTH, LCD_HEIGHT);
 	gfx_bitmapClear(&lcd_bitmap);

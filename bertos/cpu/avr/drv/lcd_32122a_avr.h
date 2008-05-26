@@ -39,27 +39,6 @@
  * \brief Displaytech 32122A LCD driver
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.6  2006/07/19 12:56:25  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.5  2006/04/27 05:40:11  bernie
- *#* Naming convention fixes; Partial merge from project_grl.
- *#*
- *#* Revision 1.4  2006/02/15 09:13:16  bernie
- *#* Switch to BITMAP_FMT_PLANAR_V_LSB.
- *#*
- *#* Revision 1.3  2006/02/10 12:33:51  bernie
- *#* Make emulator display a bit larger.
- *#*
- *#* Revision 1.2  2006/01/17 22:59:48  bernie
- *#* Hardcode a different display size.
- *#*
- *#* Revision 1.1  2006/01/16 03:50:57  bernie
- *#* Import into DevLib.
- *#*/
-
 #ifndef LCD_32122A_AVR_H
 #define LCD_32122A_AVR_H
 
@@ -77,8 +56,8 @@ struct Bitmap;
 
 extern struct Bitmap lcd_bitmap;
 
-void lcd_init(void);
-void lcd_setPwm(int duty);
-void lcd_blitBitmap(struct Bitmap *bm);
+void lcd_32122_init(void);
+void lcd_32122_setPwm(int duty);
+void lcd_32122_blitBitmap(struct Bitmap *bm);
 
 #endif /* LCD_32122A_AVR_H */
