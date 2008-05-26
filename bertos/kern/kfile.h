@@ -95,7 +95,8 @@
 /* fwd decl */
 struct KFile;
 
-typedef int32_t kfile_off_t; ///< KFile offset type, used by kfile_seek function.
+typedef int32_t kfile_off_t;    ///< KFile offset type, used by kfile_seek function.
+typedef int32_t kfile_size_t;   ///< KFile size type, used in kfile struct.
 
 /**
  * Costants for repositioning read/write file offset.
@@ -183,8 +184,8 @@ typedef struct KFile
 	DB(id_t _type); ///< Used to keep trace, at runtime, of obj type.
 
 	/* NOTE: these must _NOT_ be size_t on 16bit CPUs! */
-	uint32_t seek_pos;
-	uint32_t size;
+	kfile_off_t  seek_pos;
+	kfile_size_t size;
 } KFile;
 
 /**
