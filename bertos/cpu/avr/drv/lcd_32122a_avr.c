@@ -31,25 +31,31 @@
  *
  * -->
  *
+ * \brief Displaytech 32122A LCD driver
+ *
  * \version $Id$
  *
  * \author Bernardo Innocenti <bernie@develer.com>
  * \author Stefano Fedrigo <aleph@develer.com>
  *
- * \brief Displaytech 32122A LCD driver
  */
 
 #include "lcd_32122a_avr.h"
+
+#include "appconfig.h"
+
+#include <cfg/macros.h> /* BV() */
+#include <cfg/debug.h>
+#include <cfg/module.h>
+
 #include <gfx/gfx.h>
 #include <drv/timer.h>
 
 #include <cpu/irq.h>
 #include <cpu/types.h>
-#include <hw.h>
-#include <cfg/macros.h> /* BV() */
-#include <cfg/debug.h>
 
 #include <avr/io.h>
+
 #include <stdbool.h>
 #include <inttypes.h>
 
