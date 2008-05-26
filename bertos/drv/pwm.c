@@ -43,7 +43,7 @@
 
 #include <drv/pwm.h>
 
-#include CPU_HEADER(ser)
+#include CPU_HEADER(pwm)
 
 #include <cpu/types.h>
 #include <cpu/irq.h>
