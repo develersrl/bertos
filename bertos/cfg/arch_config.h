@@ -40,8 +40,8 @@
  */
 
 
-#ifndef ARCH_CONFIG_H
-#define ARCH_CONFIG_H
+#ifndef CFG_ARCH_CONFIG_H
+#define CFG_ARCH_CONFIG_H
 
 #include <cfg/macros.h>
 
@@ -54,4 +54,4 @@
 #define ARCH_EMUL    BV(2)
 /*\}*/
 
-#endif /* ARCH_CONFIG_H */
+#endif /* CFG_ARCH_CONFIG_H */
