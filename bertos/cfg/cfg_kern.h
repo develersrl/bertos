@@ -54,12 +54,12 @@
  * \{
  */
 /*      Module/option          Active    Dependencies */
-#define CONFIG_KERN_SCHED       (1)
-#define CONFIG_KERN_SIGNALS     (1    && CONFIG_KERN_SCHED)
-#define CONFIG_KERN_TIMER       (1)
+#define CONFIG_KERN_SCHED       (0)
+#define CONFIG_KERN_SIGNALS     (0    && CONFIG_KERN_SCHED)
+#define CONFIG_KERN_TIMER       (0)
 #define CONFIG_KERN_HEAP        (0)
 #define CONFIG_KERN_SEMAPHORES  (0    && CONFIG_KERN_SIGNALS)
-#define CONFIG_KERN_MONITOR     (1    && CONFIG_KERN_SCHED)
+#define CONFIG_KERN_MONITOR     (0    && CONFIG_KERN_SCHED)
 /*\}*/
 
 /* EXPERIMENTAL */

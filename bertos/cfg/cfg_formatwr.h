@@ -30,17 +30,27 @@
  * All Rights Reserved.
  * -->
  *
- * \brief Configuration file for DC motor module.
+ * \brief Configuration file for formatted write module.
  *
  * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef CFG_DC_MOTOR_H
-#define CFG_DC_MOTOR_H
+#ifndef CFG_FORMTWR_H
+#define CFG_FORMTWR_H
 
-//DC motor configuration
-#define CONFIG_NUM_DC_MOTOR       1
+/**
+ * printf()-style formatter configuration.
+ *
+ * \sa PRINTF_DISABLED
+ * \sa PRINTF_NOMODIFIERS
+ * \sa PRINTF_REDUCED
+ * \sa PRINTF_NOFLOAT
+ * \sa PRINTF_FULL
+ */
+#define CONFIG_PRINTF PRINTF_FULL
 
-#endif /* CFG_DC_MOTOR_H */
+
+#endif /* CFG_FORMTWR_H */
+

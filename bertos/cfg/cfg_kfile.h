@@ -30,17 +30,19 @@
  * All Rights Reserved.
  * -->
  *
- * \brief Configuration file for DC motor module.
+ * \brief Configuration file for KFile interface module.
  *
  * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef CFG_DC_MOTOR_H
-#define CFG_DC_MOTOR_H
+#ifndef CFG_KFILE_H
+#define CFG_KFILE_H
 
-//DC motor configuration
-#define CONFIG_NUM_DC_MOTOR       1
+/// TODO:
+#define CONFIG_KFILE_GETS 0
 
-#endif /* CFG_DC_MOTOR_H */
+#endif /* CFG_KFILE_H */
+
+

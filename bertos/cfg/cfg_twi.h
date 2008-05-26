@@ -30,17 +30,19 @@
  * All Rights Reserved.
  * -->
  *
- * \brief Configuration file for DC motor module.
+ * \brief Configuration file for TWI module.
  *
  * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef CFG_DC_MOTOR_H
-#define CFG_DC_MOTOR_H
+#ifndef CFG_TWI_H
+#define CFG_TWI_H
 
-//DC motor configuration
-#define CONFIG_NUM_DC_MOTOR       1
+/// Comunication frequency
+#define CONFIG_TWI_FREQ  1000000
 
-#endif /* CFG_DC_MOTOR_H */
+#endif /* CFG_TWI_H */
+
+

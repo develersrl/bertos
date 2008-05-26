@@ -30,17 +30,19 @@
  * All Rights Reserved.
  * -->
  *
- * \brief Configuration file for DC motor module.
+ * \brief Configuration file for heap module.
  *
  * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef CFG_DC_MOTOR_H
-#define CFG_DC_MOTOR_H
+#ifndef CFG_HEAP_H
+#define CFG_HEAP_H
 
-//DC motor configuration
-#define CONFIG_NUM_DC_MOTOR       1
+/// TODO
+#define CONFIG_HEAP_MALLOC     1
 
-#endif /* CFG_DC_MOTOR_H */
+#endif /* CFG_HEAP_H */
+
+

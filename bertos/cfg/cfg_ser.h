@@ -53,6 +53,13 @@
 /// [bytes] Size of the inbound FIFO buffer for port 1. 
 #define CONFIG_UART1_RXBUFSIZE  32
 
+
+/// [bytes] Size of the outbound FIFO buffer for SPI port (AVR only) 
+#define CONFIG_SPI_TXBUFSIZE    32
+
+/// [bytes] Size of the inbound FIFO buffer for SPI port (AVR only) 
+#define CONFIG_SPI_RXBUFSIZE    32
+
 /// [bytes] Size of the outbound FIFO buffer for SPI port 0. 
 #define CONFIG_SPI0_TXBUFSIZE	32
 

@@ -30,17 +30,19 @@
  * All Rights Reserved.
  * -->
  *
- * \brief Configuration file for DC motor module.
+ * \brief Configuration file for buzzerled module.
  *
  * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef CFG_DC_MOTOR_H
-#define CFG_DC_MOTOR_H
+#ifndef CFG_BUZZERLED_H
+#define CFG_BUZZERLED_H
 
-//DC motor configuration
-#define CONFIG_NUM_DC_MOTOR       1
+/// TODO
+#define CONFIG_NUM_BLDS     1
 
-#endif /* CFG_DC_MOTOR_H */
+
+#endif /* CFG_BUZZERLED_H */
+

@@ -40,8 +40,11 @@
 #ifndef CFG_STEPPER_H
 #define CFG_STEPPER_H
 
-/// Number of usable stepper motor.
+/// Max number of the stepper motor.
 #define CONFIG_NUM_STEPPER_MOTORS    1
+
+/// Max number of the timer usable on target to drive stepper motor.
+#define CONFIG_TC_STEPPER_MAX_NUM 6
 
 #endif /* CFG_STEPPER_H */
 

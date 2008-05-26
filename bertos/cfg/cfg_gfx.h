@@ -30,17 +30,45 @@
  * All Rights Reserved.
  * -->
  *
- * \brief Configuration file for DC motor module.
+ * \brief Configuration file for GFX module.
  *
  * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef CFG_DC_MOTOR_H
-#define CFG_DC_MOTOR_H
+#ifndef CFG_GFX_H
+#define CFG_GFX_H
 
-//DC motor configuration
-#define CONFIG_NUM_DC_MOTOR       1
+/// Enable line clipping algorithm.
+#define CONFIG_GFX_CLIPPING  1
 
-#endif /* CFG_DC_MOTOR_H */
+/// Enable text rendering in bitmaps.
+#define CONFIG_GFX_TEXT  1
+
+/// Enable virtual coordinate system.
+#define CONFIG_GFX_VCOORDS  1
+
+/// Select bitmap pixel format.
+#define CONFIG_BITMAP_FMT  BITMAP_FMT_PLANAR_V_LSB
+
+/**
+ * \name Type for the chart dataset
+ * \{
+ */
+#define CONFIG_CHART_TYPE_X uint8_t
+#define CONFIG_CHART_TYPE_Y uint8_t
+/*\}*/
+
+
+/// Enable button bar behind menus
+#define CONFIG_MENU_MENUBAR        0
+#define CONFIG_LEVELEDIT_TIMEOUT   0
+#define CONFIG_MENU_TIMEOUT        0
+
+/// Enable smooth scrolling in menus
+#define CONFIG_MENU_SMOOTH  1
+
+
+#endif /* CFG_GFX_H */
+

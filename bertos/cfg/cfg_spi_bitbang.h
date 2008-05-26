@@ -30,17 +30,18 @@
  * All Rights Reserved.
  * -->
  *
- * \brief Configuration file for DC motor module.
+ * \brief Configuration file for SPI bitbang module.
  *
  * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef CFG_DC_MOTOR_H
-#define CFG_DC_MOTOR_H
+#ifndef CFG_SPI_BITBANG_H
+#define CFG_SPI_BITBANG_H
 
-//DC motor configuration
-#define CONFIG_NUM_DC_MOTOR       1
+/// Set data order for emulated SPI
+#define CONFIG_SPI_DATAORDER      1
 
-#endif /* CFG_DC_MOTOR_H */
+#endif /* CFG_SPI_BITBANG_H */
+
