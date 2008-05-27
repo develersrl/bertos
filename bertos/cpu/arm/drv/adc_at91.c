@@ -48,18 +48,17 @@
 
 #include "adc_at91.h"
 
-#include <drv/adc.h>
-
+#include <cfg/cfg_adc.h>
+#include <cfg/cfg_kern.h>
 #include <cfg/macros.h>
 #include <cfg/compiler.h>
 
-#include <io/arm.h>
+#include <drv/adc.h>
 
-#include "appconfig.h"
+#include <io/arm.h>
 
 #if CONFIG_KERNEL
 	#include <cfg/module.h>
-	#include <config_kern.h>
 	#include <kern/proc.h>
 	#include <kern/signal.h>
 

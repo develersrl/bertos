@@ -40,8 +40,9 @@
 #ifndef DRV_MCP41_H
 #define DRV_MCP41_H
 
-#include <hw/mcp41_map.h>
+#include "mcp41_map.h"
 #include <cfg/compiler.h>
+
 #include <drv/ser.h>
 
 #define MCP41_WRITE_DATA 0x11

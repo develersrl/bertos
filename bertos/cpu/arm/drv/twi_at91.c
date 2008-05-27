@@ -39,6 +39,7 @@
 
 #include "twi_at91.h"
 
+#include <cfg/cfg_twi.h>
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
 #include <cfg/macros.h>

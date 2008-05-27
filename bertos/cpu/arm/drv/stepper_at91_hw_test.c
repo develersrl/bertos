@@ -39,6 +39,7 @@
 
 #include "stepper_at91.h"
 
+#include <cfg/cfg_stepper.h>
 #include <cfg/macros.h>
 #include <cfg/debug.h>
 
@@ -47,7 +48,6 @@
 
 #include <io/arm.h>
 
-#include "appconfig.h"
 
 #warning FIXME:This test is incomplete.. you MUST review..
 

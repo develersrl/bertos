@@ -39,9 +39,9 @@
  */
 
 #include <cfg/cfg_debug.h>
-
 #include <cfg/macros.h> /* for BV() */
 #include <cfg/debug.h>
+#include <cfg/os.h>
 
 #include <cpu/irq.h>
 #include <cpu/attr.h>

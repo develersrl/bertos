@@ -55,6 +55,7 @@
 
 #include "stepper_at91.h"
 
+#include <cfg/cfg_stepper.h>
 #include <cfg/macros.h>
 #include <cfg/debug.h>
 
@@ -63,7 +64,6 @@
 
 #include <io/arm.h>
 
-#include "appconfig.h"
 
 /*
  * Delay to set C compare to clear output

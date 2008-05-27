@@ -38,13 +38,14 @@
  * \author Marco Benelli <marco@develer.com>
  */
 
-#include <drv/tc520.h>
-#include <drv/timer.h>
 
-#include <hw_tc520.h>
+#include "hw_tc520.h"
 
 #include <cfg/macros.h>
 #include <cfg/compiler.h>
+
+#include <drv/tc520.h>
+#include <drv/timer.h>
 
 #warning FIXME:This implementation is obsolete. Refactor with KFile interface.
 

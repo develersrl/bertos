@@ -41,9 +41,9 @@
 #include "hw_ser.h"  /* Required for bus macros overrides */
 #include "hw_cpu.h"  /* CLOCK_FREQ */
 
+#include <cfg/cfg_ser.h>
 #include <cfg/debug.h>
 
-#include <appconfig.h>
 
 #include <io/arm.h>
 

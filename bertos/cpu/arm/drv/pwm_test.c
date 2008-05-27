@@ -90,7 +90,7 @@
  * Setup all needed to test PWM on AT91
  *
  */
-int pwm_setup(void)
+int pwm_testSetup(void)
 {
 	IRQ_ENABLE;
 	kdbg_init();
@@ -107,13 +107,13 @@ int pwm_setup(void)
  * Test suit for genation of pwm waveform.
  *
  */
-int pwm_test(void)
+int pwm_testRun(void)
 {
 
 	kputs("PWM test\n\n");
 
 	kputs("Init pwm..");
-	pwm_setup();
+	pwm_testSetup();
 	kputs("done.\n");
 
 	PWM_TEST_CH_SET(0);
@@ -131,7 +131,7 @@ int pwm_test(void)
 /**
  *
  */
-int pwm_tearDown(void)
+int pwm_testTearDown(void)
 {
 	/*    */
 	return 0;
@@ -141,7 +141,7 @@ int pwm_tearDown(void)
 
 int main(void)
 {
-	pwm_test();
+	pwm_testRun();
 
 
 

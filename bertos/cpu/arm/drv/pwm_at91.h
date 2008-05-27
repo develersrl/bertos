@@ -48,7 +48,6 @@
 
 #include <io/arm.h>
 
-#include "appconfig.h"
 
 #define PWM_HW_MAX_PRESCALER_STEP         10
 #define PWM_HW_MAX_PERIOD             0xFFFF

@@ -40,12 +40,11 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-#ifndef CFG_DEBUG_H
-#define CFG_DEBUG_H
+#ifndef BERTOS_DEBUG_H
+#define BERTOS_DEBUG_H
 
 #include <cfg/os.h>
 #include <cfg/compiler.h>
-
 
 /*
  * Defaults for rarely used config stuff.
@@ -310,4 +309,4 @@
 
 #endif /* _DEBUG */
 
-#endif /* CFG_DEBUG_H */
+#endif /* BERTOS_DEBUG_H */

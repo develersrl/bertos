@@ -41,6 +41,7 @@
 
 #include <cfg/cfg_timer.h>
 #include <cfg/cfg_wdt.h>
+#include <cfg/cfg_kern.h>
 #include <cfg/os.h>
 #include <cfg/debug.h>
 #include <cfg/module.h>
@@ -74,7 +75,6 @@
 #endif
 
 #if CONFIG_KERNEL
-	#include <config_kern.h>
 	#if CONFIG_KERN_PREEMPTIVE
 		#include <hw/switch.h>
 	#endif

@@ -36,12 +36,12 @@
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-#include <drv/timer.h>
+#include "hw_mcp41.h"
 
 #include <cfg/macros.h>
 #include <cfg/compiler.h>
 
-#include <hw_mcp41.h>
+#include <drv/timer.h>
 #include <drv/mcp41.h>
 #include <drv/ser.h>
 

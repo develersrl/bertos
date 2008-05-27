@@ -43,23 +43,12 @@
  *
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.2  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.1  2005/11/04 17:59:47  bernie
- *#* Import into DevLib.
- *#*
- *#* Revision 1.1  2005/05/24 09:17:58  batt
- *#* Move drivers to top-level.
- *#*/
-
-#include <drv/ntc.h>
-#include <hw_ntc.h>
-#include <ntc_map.h>
+#include "hw_ntc.h"
+#include "ntc_map.h"
 
 #include <cfg/debug.h>
+
+#include <drv/ntc.h>
 
 DB(bool ntc_initialized;)
 

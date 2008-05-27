@@ -56,6 +56,13 @@ void pwm_setFrequency(PwmDev dev, pwm_freq_t freq);
 void pwm_enable(PwmDev dev, bool state);
 void pwm_init(void);
 
-void pwm_test(void);
+/**
+ * Test function prototypes.
+ *
+ * See pwm_test.c for implemntation of these functions.
+ */
+int pwm_testRun(void);
+int pwm_testSetup(void);
+int pwm_testTearDown(void);
 
 #endif /* DRV_PWM_H */

@@ -41,10 +41,11 @@
 #ifndef DRV_ADC_AT91_H
 #define DRV_ADC_AT91_H
 
-#include <cfg/compiler.h>
-
 #include "hw_cpu.h"
-#include "appconfig.h"
+
+#include <cfg/cfg_adc.h>
+
+#include <cfg/compiler.h>
 
 /**
  * ADC config define.

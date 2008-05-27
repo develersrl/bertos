@@ -41,8 +41,7 @@
 
 #include "menu.h"
 
-#include <appconfig.h>
-
+#include <cfg/cfg_gfx.h>
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
 

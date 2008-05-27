@@ -37,10 +37,10 @@
  */
 
 #include "kdebug_at91.h"
-#include <hw_cpu.h>     /* for CLOCK_FREQ */
-#include <hw_ser.h>     /* Required for bus macros overrides */
+#include "hw_cpu.h"     /* for CLOCK_FREQ */
+#include "hw_ser.h"     /* Required for bus macros overrides */
 
-#include <appconfig.h>
+#include <cfg/cfg_debug.h>
 #include <cfg/macros.h> /* for BV(), DIV_ROUND */
 
 #include <io/arm.h>
