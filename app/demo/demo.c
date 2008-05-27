@@ -37,20 +37,25 @@
  * \brief Windowing system test.
  */
 
+#include <cfg/macros.h>
+
 #include <emul/emul.h>
+
 #include <kern/proc.h>
 #include <kern/msg.h>
+
 #include <drv/timer.h>
 #include <drv/buzzer.h>
 #include <drv/lcd_gfx.h>
 #include <drv/kbd.h>
+
 #include <gfx/gfx.h>
 #include <gfx/win.h>
 #include <gfx/text.h>
 #include <gfx/font.h>
+
 #include <gui/menu.h>
 #include <icons/logo.h>
-#include <cfg/macros.h>
 
 /**
  * Draw a pentacle in the provided bitmap.

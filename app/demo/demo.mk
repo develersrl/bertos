@@ -51,27 +51,27 @@ demo_CSRC = \
 	bertos/mware/resource.c \
 	bertos/mware/sprintf.c \
 	bertos/kern/proc.c \
+	bertos/kern/proc_test.c \
 	bertos/kern/sem.c \
 	bertos/kern/signal.c \
 	bertos/kern/monitor.c \
-	bertos/kern/proc_test.c \
 	bertos/verstag.c
 
 demo_CPPASRC = \
-	bertos/kern/switch.S
+	bertos/emul/switch.S
 
 # FIXME: maybe this junk should go in emul/emul.mk?
 $(OBJDIR)/demo/bertos/emul/emulwin.o: bertos/emul/emulwin_moc.cpp 
 $(OBJDIR)/demo/bertos/drv/lcd_gfx_qt.o: bertos/drv/lcd_gfx_qt_moc.cpp
-$(OBJDIR)/demo/bertos/drv/timer.o: bertos/drv/timer_qt_moc.cpp
+$(OBJDIR)/demo/bertos/drv/timer.o: bertos/emul/timer_qt_moc.cpp
 $(OBJDIR)/demo/bertos/emul/emulkbd.o: bertos/emul/emulkbd_moc.cpp
 
 #FIXME: isn't there a way to avoid repeating the pattern rule?
-bertos/drv/timer_qt_moc.cpp: bertos/emul/timer_qt.c
+bertos/emul/timer_qt_moc.cpp: bertos/emul/timer_qt.c
 	$(QT_MOC) -o $@ $<
 
 
-demo_CFLAGS = -D_QT=4 -D'ARCH=ARCH_EMUL' -Iapp/demo $(EMUL_CFLAGS)
+demo_CFLAGS = -D_QT=4 -D'ARCH=ARCH_EMUL' -Iapp/demo -Ibertos/emul $(EMUL_CFLAGS)
 demo_CXXFLAGS = -D_QT=4 -D'ARCH=ARCH_EMUL' -Iapp/demo $(EMUL_CFLAGS)
 demo_LDFLAGS = $(EMUL_LDFLAGS)
 
