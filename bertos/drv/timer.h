@@ -59,7 +59,7 @@
 	#include CPU_HEADER(timer)
 #endif
 
-#include <cfg/cfg_timer.h>
+#include "cfg/cfg_timer.h"
 #include <cfg/debug.h>
 #include <cfg/compiler.h>
 

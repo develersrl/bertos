@@ -79,7 +79,7 @@
 
 #include "formatwr.h"
 
-#include <cfg/cfg_formatwr.h>  /* CONFIG_ macros */
+#include "cfg/cfg_formatwr.h"  /* CONFIG_ macros */
 #include <cfg/debug.h>         /* ASSERT */
 
 #include <mware/pgm.h>

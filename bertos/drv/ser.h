@@ -72,7 +72,7 @@
 	#include CPU_HEADER(ser)
 #endif
 
-#include <cfg/cfg_ser.h>
+#include "cfg/cfg_ser.h"
 
 
 

@@ -38,7 +38,7 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-#include <cfg/cfg_debug.h>
+#include "cfg/cfg_debug.h"
 #include <cfg/macros.h> /* for BV() */
 #include <cfg/debug.h>
 #include <cfg/os.h>

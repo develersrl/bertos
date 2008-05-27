@@ -39,9 +39,9 @@
 
 #include "timer.h"
 
-#include <cfg/cfg_timer.h>
-#include <cfg/cfg_wdt.h>
-#include <cfg/cfg_kern.h>
+#include "cfg/cfg_timer.h"
+#include "cfg/cfg_wdt.h"
+#include "cfg/cfg_kern.h"
 #include <cfg/os.h>
 #include <cfg/debug.h>
 #include <cfg/module.h>

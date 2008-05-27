@@ -41,7 +41,7 @@
 #ifndef HW_STEPPER_H
 #define HW_STEPPER_H
 
-#include "hw_cpu.h"
+#include "hw/hw_cpu.h"
 
 #include <cfg/macros.h>
 

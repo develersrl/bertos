@@ -42,9 +42,9 @@
 #ifndef DRV_KBD_H
 #define DRV_KBD_H
 
-#include "kbd_map.h"
+#include "hw/kbd_map.h"
 
-#include <cfg/cfg_kbd.h> // CONFIG_KBD_OBSERVER
+#include "cfg/cfg_kbd.h" // CONFIG_KBD_OBSERVER
 #include <cfg/compiler.h>
 
 #include <mware/list.h>

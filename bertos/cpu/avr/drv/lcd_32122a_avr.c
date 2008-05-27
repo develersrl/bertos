@@ -42,7 +42,7 @@
 
 #include "lcd_32122a_avr.h"
 
-#include <cfg/cfg_lcd.h>
+#include "cfg/cfg_lcd.h"
 
 #include <cfg/macros.h> /* BV() */
 #include <cfg/debug.h>

@@ -43,9 +43,9 @@
 
 #include "detect.h"
 
-#include <cfg/cfg_attr.h>      /* CONFIG_FAST_MEM */
+#include "cfg/cfg_attr.h"      /* CONFIG_FAST_MEM */
 #include <cfg/compiler.h>      /* for uintXX_t */
-#include <cfg/cfg_arch.h>   /* ARCH_EMUL */
+#include "cfg/cfg_arch.h"   /* ARCH_EMUL */
 
 
 /**

@@ -40,7 +40,7 @@
 
 #include "eeprom.h"
 
-#include <cfg/cfg_eeprom.h>  // CONFIG_EEPROM_VERIFY
+#include "cfg/cfg_eeprom.h"  // CONFIG_EEPROM_VERIFY
 #include <cfg/macros.h>  // MIN()
 #include <cfg/debug.h>
 

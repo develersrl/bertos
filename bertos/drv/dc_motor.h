@@ -40,9 +40,9 @@
 #ifndef DRV_DC_MOTOR_H
 #define DRV_DC_MOTOR_H
 
-#include "hw_dc_motor.h"
+#include "hw/hw_dc_motor.h"
 
-#include <cfg/cfg_dc_motor.h>
+#include "cfg/cfg_dc_motor.h"
 #include <cfg/macros.h>
 
 #include <algo/pid_control.h>

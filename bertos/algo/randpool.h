@@ -40,7 +40,7 @@
 #ifndef ALGO_RANDPOOL_H
 #define ALGO_RANDPOOL_H
 
-#include <cfg/cfg_randpool.h>
+#include "cfg/cfg_randpool.h"
 #include <cfg/compiler.h>
 
 

@@ -70,7 +70,7 @@
  *
  */
 
-#include "hw_cpu.h"
+#include "hw/hw_cpu.h"
 #include <cpu/detect.h>
 
 

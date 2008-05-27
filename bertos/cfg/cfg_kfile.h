@@ -41,7 +41,7 @@
 #define CFG_KFILE_H
 
 /// TODO:
-#define CONFIG_KFILE_GETS 0
+#define CONFIG_KFILE_GETS 1
 
 #endif /* CFG_KFILE_H */
 

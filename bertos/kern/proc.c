@@ -44,7 +44,7 @@
 #include "proc_p.h"
 #include "proc.h"
 
-#include <cfg/cfg_arch.h>  /* ARCH_EMUL */
+#include "cfg/cfg_arch.h"  /* ARCH_EMUL */
 #include <cfg/debug.h>
 #include <cfg/module.h>
 #include <cfg/macros.h>       /* ABS() */

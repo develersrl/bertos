@@ -46,7 +46,7 @@
 #ifndef MWARE_HEAP_H
 #define MWARE_HEAP_H
 
-#include <cfg/cfg_heap.h>
+#include "cfg/cfg_heap.h"
 #include <cfg/compiler.h>
 
 struct _MemChunk;

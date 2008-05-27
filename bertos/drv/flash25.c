@@ -45,7 +45,7 @@
  * We use a spi bus, thus include hardware specific definition.
  * If you use another channel you must redefine this macros.
  */
-#include "hw_spi.h"
+#include "hw/hw_spi.h"
 
 #include <cfg/macros.h>
 #include <cfg/debug.h>

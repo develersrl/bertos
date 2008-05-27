@@ -43,7 +43,7 @@
 #ifndef HW_LCD_H
 #define HW_LCD_H
 
-#include <cfg/cfg_lcd.h>  /* CONFIG_LCD_4BIT */
+#include "cfg/cfg_lcd.h"  /* CONFIG_LCD_4BIT */
 #include <cfg/macros.h>   /* BV() */
 #include <cfg/debug.h>
 

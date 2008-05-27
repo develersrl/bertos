@@ -39,7 +39,7 @@
  */
 
 
-#include "hw_tc520.h"
+#include "hw/hw_tc520.h"
 
 #include <cfg/macros.h>
 #include <cfg/compiler.h>

@@ -43,7 +43,7 @@
 #ifndef DRV_SPI_BITBANG_H
 #define DRV_SPI_BITBANG_H
 
-#include <cfg/cfg_spi_bitbang.h>
+#include "cfg/cfg_spi_bitbang.h"
 
 #include <cfg/compiler.h>
 

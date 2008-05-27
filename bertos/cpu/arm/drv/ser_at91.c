@@ -38,10 +38,10 @@
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#include "hw_ser.h"  /* Required for bus macros overrides */
-#include "hw_cpu.h"  /* CLOCK_FREQ */
+#include "hw/hw_ser.h"  /* Required for bus macros overrides */
+#include "hw/hw_cpu.h"  /* CLOCK_FREQ */
 
-#include <cfg/cfg_ser.h>
+#include "cfg/cfg_ser.h"
 #include <cfg/debug.h>
 
 

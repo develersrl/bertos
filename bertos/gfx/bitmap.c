@@ -40,7 +40,7 @@
 #include "gfx.h"
 #include "gfx_p.h"
 
-#include <cfg/cfg_gfx.h>  /* CONFIG_GFX_CLIPPING */
+#include "cfg/cfg_gfx.h"  /* CONFIG_GFX_CLIPPING */
 #include <cfg/macros.h>   /* MIN() */
 #include <cfg/debug.h>    /* ASSERT() */
 

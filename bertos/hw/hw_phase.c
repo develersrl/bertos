@@ -39,7 +39,7 @@
 #ifndef HW_PHASE_H
 #define HW_PHASE_H
 
-#include "hw_phase.h"
+#include "hw/hw_phase.h"
 
 #warning TODO:This is an example implementation, you must implement it!
 

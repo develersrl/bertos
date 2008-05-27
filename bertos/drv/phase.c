@@ -37,7 +37,7 @@
  */
 
 
-#include "hw_phase.h"
+#include "hw/hw_phase.h"
 
 #include <cfg/macros.h>
 #include <cfg/compiler.h>

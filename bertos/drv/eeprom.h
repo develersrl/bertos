@@ -42,7 +42,7 @@
 #ifndef DRV_EEPROM_H
 #define DRV_EEPROM_H
 
-#include <cfg/cfg_eeprom.h>
+#include "cfg/cfg_eeprom.h"
 #include <cfg/compiler.h>
 
 /**

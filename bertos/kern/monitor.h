@@ -40,7 +40,7 @@
 #ifndef KERN_MONITOR_H
 #define KERN_MONITOR_H
 
-#include <cfg/cfg_kern.h>
+#include "cfg/cfg_kern.h"
 
 #include <cpu/types.h>
 

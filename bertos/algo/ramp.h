@@ -49,8 +49,9 @@
 #ifndef ALGO_RAMP_H
 #define ALGO_RAMP_H
 
+#include "hw/hw_stepper.h"
+
 #include <cfg/compiler.h>
-#include "hw_stepper.h"
 
 /**
  * Define whether the ramp will use floating point calculation within ramp_evaluate().

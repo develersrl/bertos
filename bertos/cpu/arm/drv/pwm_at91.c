@@ -39,7 +39,7 @@
  */
 
 #include "pwm_at91.h"
-#include "hw_cpu.h"
+#include "hw/hw_cpu.h"
 
 #include <cfg/macros.h>
 #include <cfg/debug.h>

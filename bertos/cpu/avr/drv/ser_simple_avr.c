@@ -45,7 +45,7 @@
 #include <cfg/compiler.h>
 #include <appconfig.h>
 #include <cfg/macros.h> /* BV() */
-#include "hw_cpu.h"
+#include "hw/hw_cpu.h"
 
 #include <avr/io.h>
 

@@ -43,8 +43,8 @@
  *
  */
 
-#include "hw_ntc.h"
-#include "ntc_map.h"
+#include "hw/hw_ntc.h"
+#include "hw/ntc_map.h"
 
 #include <cfg/debug.h>
 

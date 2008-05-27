@@ -40,9 +40,9 @@
 #ifndef DRV_AT91_TIMER_H
 #define DRV_AT91_TIMER_H
 
-#include "hw_cpu.h"            /* CLOCK_FREQ */
+#include "hw/hw_cpu.h"            /* CLOCK_FREQ */
 
-#include <cfg/cfg_timer.h>     /* CONFIG_TIMER */
+#include "cfg/cfg_timer.h"     /* CONFIG_TIMER */
 #include <cfg/compiler.h>      /* uint8_t */
 
 /**

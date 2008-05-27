@@ -42,7 +42,7 @@
 #define BERTOS_VERSTAG_H
 
 #ifndef CFG_ARCH_CONFIG_H
-	#include <cfg/cfg_arch.h>
+	#include "cfg/cfg_arch.h"
 #endif
 
 #define APP_NAME "Appname"

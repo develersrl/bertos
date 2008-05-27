@@ -41,7 +41,7 @@
 #ifndef CFG_KERN_H
 #define CFG_KERN_H
 
-#include <cfg/cfg_arch.h>  /* ARCH_EMUL */
+#include "cfg/cfg_arch.h"  /* ARCH_EMUL */
 
 /**
  * Multithreading kernel.

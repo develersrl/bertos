@@ -46,7 +46,7 @@
 #ifndef ALGO_MD2_H
 #define ALGO_MD2_H
 
-#include <cfg/cfg_md2.h>
+#include "cfg/cfg_md2.h"
 #include <cfg/compiler.h>
 
 #define NUM_COMPUTE_ROUNDS 18                        ///< Number of compute rounds.

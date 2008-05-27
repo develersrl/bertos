@@ -40,7 +40,7 @@
 #warning FIXME:This module is obsolete, yuo must refactor it.
 
 #if 0
-#include "hw_cpu.h"
+#include "hw/hw_cpu.h"
 #include "timer_simple_avr.h"
 #include <drv/wdt.h>
 #include <cfg/compiler.h>

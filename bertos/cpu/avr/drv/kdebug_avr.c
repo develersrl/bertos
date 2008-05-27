@@ -39,10 +39,10 @@
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-#include "hw_cpu.h"     /* for CLOCK_FREQ */
-#include "hw_ser.h"     /* Required for bus macros overrides */
+#include "hw/hw_cpu.h"     /* for CLOCK_FREQ */
+#include "hw/hw_ser.h"     /* Required for bus macros overrides */
 
-#include <cfg/cfg_debug.h>
+#include "cfg/cfg_debug.h"
 #include <cfg/macros.h> /* for BV(), DIV_ROUND */
 
 #include <cpu/types.h>
@@ -54,7 +54,7 @@
 
 	/*
 	 * Support for special bus policies or external transceivers
-	 * on UART0 (to be overridden in "hw_ser.h").
+	 * on UART0 (to be overridden in "hw/hw_ser.h").
 	 *
 	 * HACK: if we don't set TXEN, kdbg disables the transmitter
 	 * after each output statement until the serial driver
@@ -117,7 +117,7 @@
 
 	/*
 		* Support for special bus policies or external transceivers
-		* on UART1 (to be overridden in "hw_ser.h").
+		* on UART1 (to be overridden in "hw/hw_ser.h").
 		*
 		* HACK: if we don't set TXEN, kdbg disables the transmitter
 		* after each output statement until the serial driver
@@ -159,7 +159,7 @@
  * Special debug port for BitBanged Serial see below for details...
  */
 #elif CONFIG_KDEBUG_PORT == 666
-	#include "hw_ser.h"
+	#include "hw/hw_ser.h"
 	#define KDBG_WAIT_READY()      do { /*nop*/ } while(0)
 	#define KDBG_WRITE_CHAR(c)     _kdebug_bitbang_putchar((c))
 	#define KDBG_MASK_IRQ(old)     do { IRQ_SAVE_DISABLE((old)); } while(0)

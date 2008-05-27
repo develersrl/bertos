@@ -41,9 +41,9 @@
  *
  */
 
-#include "hw_kbd.h"
+#include "hw/hw_kbd.h"
 
-#include <cfg/cfg_kbd.h>
+#include "cfg/cfg_kbd.h"
 #include <cfg/debug.h>
 #include <cfg/module.h>
 

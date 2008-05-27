@@ -38,7 +38,7 @@
 #ifndef MWARE_FORMATWR_H
 #define MWARE_FORMATWR_H
 
-#include <cfg/cfg_formatwr.h>
+#include "cfg/cfg_formatwr.h"
 
 #include <cpu/attr.h>    /* CPU_HARVARD */
 

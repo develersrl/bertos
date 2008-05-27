@@ -38,36 +38,13 @@
  * \brief Qt-based emulator framework for embedded applications (implementation)
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.6  2006/05/28 12:17:57  bernie
- *#* Drop almost all the Qt3 cruft.
- *#*
- *#* Revision 1.5  2006/05/27 22:30:56  bernie
- *#* Add some delay to slow things down.
- *#*
- *#* Revision 1.4  2006/02/24 01:35:40  bernie
- *#* Update for new emulator.
- *#*
- *#* Revision 1.3  2006/02/20 02:00:40  bernie
- *#* Port to Qt 4.1.
- *#*
- *#* Revision 1.2  2006/01/16 03:51:51  bernie
- *#* Fix boilerplate.
- *#*
- *#* Revision 1.1  2006/01/16 03:37:12  bernie
- *#* Add emulator skeleton.
- *#*
- *#*/
-
 #include "emul.h"
 #include "emulwin.h"
+
+#include "cfg/cfg_kern.h"
+
 #include <cfg/module.h>
 
-#include <appconfig.h>
-#if CONFIG_KERNEL
-	#include <config_kern.h>
-#endif
 
 
 #include <cstdlib> // std::exit()

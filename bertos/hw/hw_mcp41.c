@@ -35,7 +35,7 @@
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-#include "hw_mcp41.h"
+#include "hw/hw_mcp41.h"
 
 #include <cfg/macros.h>
 #include <cfg/compiler.h>

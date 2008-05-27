@@ -42,7 +42,7 @@
 #ifndef HW_KBD_H
 #define HW_KBD_H
 
-#include "kbd_map.h"
+#include "hw/kbd_map.h"
 
 #include <cfg/macros.h>
 

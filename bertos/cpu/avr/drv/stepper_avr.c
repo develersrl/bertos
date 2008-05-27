@@ -40,7 +40,7 @@
 
 #include "stepper_avr.h"
 
-#include <cfg/cfg_stepper.h>
+#include "cfg/cfg_stepper.h"
 #include <cfg/macros.h>
 #include <cfg/debug.h>
 

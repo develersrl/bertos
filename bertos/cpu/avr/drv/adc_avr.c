@@ -37,8 +37,8 @@
 
 #include "adc_avr.h"
 
-#include <cfg/cfg_adc.h>
-#include <cfg/cfg_kern.h>
+#include "cfg/cfg_adc.h"
+#include "cfg/cfg_kern.h"
 #include <cfg/macros.h>
 #include <cfg/compiler.h>
 

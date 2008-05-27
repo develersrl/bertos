@@ -37,10 +37,11 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-#include "hw_lcd.h"
 #include "lcd_hd44.h"
 
-#include <cfg/cfg_arch.h>
+#include "hw/hw_lcd.h"
+
+#include "cfg/cfg_arch.h"
 
 #include <drv/timer.h>
 

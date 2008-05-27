@@ -41,9 +41,9 @@
 
 
 #include "spi_bitbang.h"
-#include "hw_spi.h"
+#include "hw/hw_spi.h"
 
-#include <cfg/cfg_spi_bitbang.h>
+#include "cfg/cfg_spi_bitbang.h"
 #include <cfg/module.h>
 
 #include <cpu/irq.h>

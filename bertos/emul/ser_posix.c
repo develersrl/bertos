@@ -36,7 +36,7 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-#include <appconfig.h>
+#include "cfg/cfg_ser.h"
 
 #include <cfg/debug.h>
 #include <cfg/compiler.h>

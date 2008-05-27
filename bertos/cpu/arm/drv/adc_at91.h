@@ -41,9 +41,9 @@
 #ifndef DRV_ADC_AT91_H
 #define DRV_ADC_AT91_H
 
-#include "hw_cpu.h"
+#include "hw/hw_cpu.h"
 
-#include <cfg/cfg_adc.h>
+#include "cfg/cfg_adc.h"
 
 #include <cfg/compiler.h>
 

@@ -96,7 +96,7 @@
 struct KFile;
 
 typedef int32_t kfile_off_t;    ///< KFile offset type, used by kfile_seek function.
-typedef int32_t kfile_size_t;   ///< KFile size type, used in kfile struct.
+typedef uint32_t kfile_size_t;   ///< KFile size type, used in kfile struct.
 
 /**
  * Costants for repositioning read/write file offset.

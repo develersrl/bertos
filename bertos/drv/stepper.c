@@ -18,10 +18,10 @@
 
 #include "stepper.h"
 
-#include "hw_stepper.h"
-#include "hw_sensor.h"
+#include "hw/hw_stepper.h"
+#include "hw/hw_sensor.h"
 
-#include <cfg/cfg_stepper.h>
+#include "cfg/cfg_stepper.h"
 #include <cfg/debug.h>
 
 #include <kern/proc.h>

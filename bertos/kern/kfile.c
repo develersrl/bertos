@@ -42,7 +42,7 @@
 
 #include "kfile.h"
 
-#include <cfg/cfg_kfile.h>
+#include "cfg/cfg_kfile.h"
 #include <cfg/debug.h>
 
 #include <mware/formatwr.h>

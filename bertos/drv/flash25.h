@@ -42,7 +42,7 @@
 #define DRV_FLASH25_H
 
 #include <cfg/compiler.h>
-#include <cfg/cfg_flash25.h>
+#include "cfg/cfg_flash25.h"
 
 #include <kern/kfile.h>
 

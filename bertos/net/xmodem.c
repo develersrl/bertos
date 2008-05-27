@@ -48,7 +48,7 @@
 #include "xmodem.h"
 
 #include <cfg/debug.h>
-#include <cfg/cfg_xmodem.h>
+#include "cfg/cfg_xmodem.h"
 
 #include <drv/ser.h>
 

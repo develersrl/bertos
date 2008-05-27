@@ -36,7 +36,7 @@
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-#include "hw_dataflash.h"
+#include "hw/hw_dataflash.h"
 
 #include <cfg/compiler.h>
 #include <cfg/module.h>

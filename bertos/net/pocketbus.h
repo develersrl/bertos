@@ -39,7 +39,7 @@
 #ifndef NET_POCKETBUS_H
 #define NET_POCKETBUS_H
 
-#include <cfg/cfg_pocketbus.h>        /* for CONFIG_POCKETBUS_BUFLEN */
+#include "cfg/cfg_pocketbus.h"        /* for CONFIG_POCKETBUS_BUFLEN */
 #include <cfg/compiler.h>
 
 #include <algo/rotating_hash.h>

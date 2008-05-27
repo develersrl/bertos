@@ -41,7 +41,7 @@
  */
 
 #include "dc_motor.h"
-#include "hw_dc_motor.h"
+#include "hw/hw_dc_motor.h"
 
 #include <algo/pid_control.h>
 

@@ -15,7 +15,7 @@
 #ifndef GFX_GFX_H
 #define GFX_GFX_H
 
-#include <cfg/cfg_gfx.h>    /* CONFIG_GFX_* */
+#include "cfg/cfg_gfx.h"    /* CONFIG_GFX_* */
 #include <cfg/compiler.h>
 
 #include <cpu/attr.h>       /* CPU_HARVARD */

@@ -44,7 +44,7 @@
 #ifndef GFX_CHARTS_H
 #define GFX_CHARTS_H
 
-#include <cfg/cfg_gfx.h> /* CONFIG_ stuff */
+#include "cfg/cfg_gfx.h" /* CONFIG_ stuff */
 
 #include <gfx/gfx.h>   /* vcoord_t */
 
