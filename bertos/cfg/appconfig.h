@@ -26,11 +26,11 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2006, 2008 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
- * \brief DevLib configuration options
+ * \brief BeRTOS configuration options
  *
  * You should copy this header in your project and rename it to
  * "config.h" and delete the CONFIG_ macros for the modules
@@ -38,7 +38,7 @@
  *
  * <h2>Working with multiple applications</h2>
  *
- * If your project is made of multiple DevLib-based applications,
+ * If your project is made of multiple BeRTOS-based applications,
  * create a custom "config.h" file in each application subdirectory
  * and play with the compiler include path to get the desired result.
  * You can share common options by creationg a "config_common.h" header
