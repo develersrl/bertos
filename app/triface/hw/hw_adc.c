@@ -39,7 +39,7 @@
  * \author Andrea Grandi <andrea@develer.com>
  */
 
-#include "hw_adc.h"
+#include "hw/hw_adc.h"
 
 
 #include <cfg/macros.h>

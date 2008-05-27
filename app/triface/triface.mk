@@ -26,6 +26,7 @@ triface_CSRC = \
 	app/triface/hw/hw_adc.c \
 	bertos/drv/timer.c \
 	bertos/drv/ser.c \
+	bertos/drv/buzzer.c \
 	bertos/cpu/avr/drv/ser_avr.c \
 	bertos/cpu/avr/drv/sipo.c \
 	bertos/mware/formatwr.c \
@@ -36,7 +37,6 @@ triface_CSRC = \
 	bertos/mware/event.c \
 	bertos/kern/kfile.c \
 	bertos/net/keytag.c \
-	bertos/drv/buzzer.c \
 	#
 
 triface_PCSRC += bertos/mware/formatwr.c

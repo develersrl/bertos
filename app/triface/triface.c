@@ -41,18 +41,21 @@
  */
 
 
+#include "protocol.h"
+#include "hw/hw_input.h"
+#include "hw/hw_adc.h"
+#include "cfg/cfg_ser.h"
+
+#include <cfg/macros.h>
+
 #include <drv/timer.h>
 #include <drv/buzzer.h>
 #include <drv/ser.h>
 #include <drv/sipo.h>
 
-#include <cfg/macros.h>
 #include <mware/parser.h>
 #include <net/keytag.h>
 
-#include "protocol.h"
-#include "hw_input.h"
-#include "hw_adc.h"
 
 
 static KFileSerial fd_ser;
@@ -74,8 +77,8 @@ int main(void)
 	TagPacket pkt;
 
 	/* Open the main communication port */
-	ser_init(&fd_ser, CONFIG_SER_HOSTPORT);
-	ser_setbaudrate(&fd_ser, CONFIG_SER_HOSTPORTBAUDRATE);
+	ser_init(&fd_ser, CONFIG_TRIFACE_PORT);
+	ser_setbaudrate(&fd_ser, CONFIG_TRIFACE_BAUDRATE);
 
 	ser_init(pkt.tag_ser, TAG_SER_PORT);
 	ser_setbaudrate(pkt.tag_ser, TAG_SER_BAUDRATE);

@@ -45,8 +45,8 @@
 #include "protocol.h"
 #include "cmd_ctor.h"  // MAKE_CMD, REGISTER_CMD
 #include "verstag.h"
-#include "hw_adc.h"
-#include "hw_input.h"
+#include "hw/hw_adc.h"
+#include "hw/hw_input.h"
 
 #include <drv/timer.h>
 #include <drv/ser.h>
@@ -64,8 +64,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-
-#include "appconfig.h"
 
 // Define the format string for ADC
 #define ADC_FORMAT_STR "dddd"
