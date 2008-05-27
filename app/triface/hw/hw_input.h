@@ -29,7 +29,7 @@
  * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000 Bernardo Innocenti <bernie@codewiz.org>
  *
- * -->>
+ * -->
  *
  * \brief Macro for HW_INPUT_H
  *
@@ -38,6 +38,7 @@
  *
  * \author Andrea Grandi <andrea@develer.com>
  */
+
 #ifndef HW_INPUT_H
 #define HW_INPUT_H
 

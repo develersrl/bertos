@@ -41,8 +41,6 @@
 #ifndef TRIFACE_HW_H
 #define TRIFACE_HW_H
 
-#include <appconfig.h>
-
 /// CPU Clock frequency (14.7456 MHz)
 #define CLOCK_FREQ     (14745600UL)
 
