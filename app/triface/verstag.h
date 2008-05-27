@@ -37,11 +37,12 @@
  *
  * \brief Declare application version strings
  */
-#ifndef DEVLIB_VERSTAG_H
-#define DEVLIB_VERSTAG_H
 
-#ifndef ARCH_CONFIG_H
-	#include "cfg/arch_config.h"
+#ifndef BERTOS_VERSTAG_H
+#define BERTOS_VERSTAG_H
+
+#ifndef CFG_ARCH_CONFIG_H
+	#include "cfg/cfg_arch.h"
 #endif
 
 #define APP_NAME "Triface"
@@ -91,4 +92,4 @@ extern const int vers_build_nr;
 /** Hostname of the machine used to build this binary (contains VERS_HOST) */
 extern const char vers_host[];
 
-#endif /* DEVLIB_VERSTAG_H */
+#endif /* BERTOS_VERSTAG_H */
