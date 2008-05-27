@@ -38,28 +38,10 @@
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.2  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.1  2005/11/04 17:59:47  bernie
- *#* Import into DevLib.
- *#*
- *#* Revision 1.3  2005/06/10 08:56:47  batt
- *#* Avoid calling DEG_T_TO_DEG().
- *#*
- *#* Revision 1.2  2005/06/10 08:54:58  batt
- *#* Rename deg_t conversion macros to accomplish coding standard.
- *#*
- *#* Revision 1.1  2005/05/24 09:17:58  batt
- *#* Move drivers to top-level.
- *#*/
-
 #ifndef DRV_NTC_H
 #define DRV_NTC_H
 
-#include <ntc_map.h>
+#include "hw/ntc_map.h"
 #include <cfg/debug.h>
 #include <cfg/compiler.h>
 

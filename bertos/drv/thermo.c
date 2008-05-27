@@ -38,7 +38,7 @@
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-#include "thermo_map.h"
+#include "hw/thermo_map.h"
 #include "hw/hw_thermo.h"
 
 #include <cfg/module.h>

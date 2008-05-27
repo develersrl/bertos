@@ -49,42 +49,12 @@
  *
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.3  2006/09/20 20:12:41  marco
- *#* Names convention, MOD_* macros.
- *#*
- *#* Revision 1.2  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.1  2005/11/04 17:59:47  bernie
- *#* Import into DevLib.
- *#*
- *#* Revision 1.2  2005/06/14 10:13:36  batt
- *#* Better thermo errors handling.
- *#*
- *#* Revision 1.1  2005/05/24 09:17:58  batt
- *#* Move drivers to top-level.
- *#*
- *#* Revision 1.4  2005/05/10 16:55:10  batt
- *#* Add timeout to thermo-regulator; better thermo control handling; change thermo_getStatus() to thermo_status().
- *#*
- *#* Revision 1.3  2005/05/10 09:26:54  batt
- *#* Add thermo_getStatus for getting status/errors of thermo control.
- *#*
- *#* Revision 1.2  2005/05/09 19:18:40  batt
- *#* Remove old logs.
- *#*
- *#* Revision 1.1  2005/05/09 16:40:44  batt
- *#* Add thermo-control driver
- *#*/
-
-
 #ifndef DRV_THERMO_H
 #define DRV_THERMO_H
 
+#include "hw/thermo_map.h"
+
 #include <drv/ntc.h>
-#include <thermo_map.h>
 
 void thermo_init(void);
 

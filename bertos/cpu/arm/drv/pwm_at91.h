@@ -41,7 +41,7 @@
 #ifndef DRV_PWM_AT91_H
 #define DRV_PWM_AT91_H
 
-#include "pwm_map.h"
+#include "hw/pwm_map.h"
 
 #include <cfg/compiler.h>
 #include <cfg/macros.h>

@@ -40,7 +40,7 @@
 #ifndef DRV_MCP41_H
 #define DRV_MCP41_H
 
-#include "mcp41_map.h"
+#include "hw/mcp41_map.h"
 #include <cfg/compiler.h>
 
 #include <drv/ser.h>

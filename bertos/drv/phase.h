@@ -37,50 +37,13 @@
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.2  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.1  2005/11/04 18:06:44  bernie
- *#* Import into DevLib.
- *#*
- *#* Revision 1.1  2005/05/24 09:17:58  batt
- *#* Move drivers to top-level.
- *#*
- *#* Revision 1.9  2005/05/09 16:34:14  batt
- *#* Change some function names to accomplish coding standard; Add debug phase_initialized; Change duty_t and power_t to uint16_t.
- *#*
- *#* Revision 1.8  2005/05/02 12:37:33  batt
- *#* Split hw triac map in phase_map.h.
- *#*
- *#* Revision 1.7  2005/05/02 09:05:03  batt
- *#* Rename duty_t and power_t in triac_duty_t and triac_power_t
- *#*
- *#* Revision 1.6  2005/04/28 15:10:11  batt
- *#* Use timer API to add and set events.
- *#*
- *#* Revision 1.5  2005/04/28 12:04:46  batt
- *#* Add some comments.
- *#*
- *#* Revision 1.4  2005/04/28 10:35:45  batt
- *#* Complete phase_setpower.
- *#*
- *#* Revision 1.3  2005/04/27 19:23:40  batt
- *#* Reformat.
- *#*
- *#* Revision 1.1  2005/04/27 17:13:56  batt
- *#* Add triac phase control driver.
- *#*
- *#*/
-
-
 #ifndef DRV_PHASE_H
 #define DRV_PHASE_H
 
-#include <drv/timer.h>
-#include <phase_map.h>
+#include "hw/phase_map.h"
 #include <cfg/debug.h>
+
+#include <drv/timer.h>
 
 #define TRIAC_MAX_DUTY  100
 #define TRIAC_MAX_POWER 100

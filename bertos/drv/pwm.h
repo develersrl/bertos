@@ -41,7 +41,7 @@
 #ifndef DRV_PWM_H
 #define DRV_PWM_H
 
-#include <pwm_map.h>
+#include "hw/pwm_map.h"
 #include <cfg/compiler.h>
 
 #define PWM_MAX_DUTY              ((pwm_duty_t)0xFFFF)
