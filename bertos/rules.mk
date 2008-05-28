@@ -264,7 +264,7 @@ $(RECURSIVE_TARGETS):
 		$(MAKE) -C $$dir $$target || exit 1; \
 	done
 
-BUILDREV_H = bertos/buildrev.h
+BUILDREV_H = buildrev.h
 
 ifeq ($(shell [ -e bertos/verstag.c ] && echo yes),yes)
 .PHONY: bumprev
