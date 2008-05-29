@@ -46,9 +46,9 @@
 #include <cfg/os.h>
 #include <cfg/compiler.h>
 
-		/*
-		 * Defaults for rarely used config stuff.
-		 */
+/*
+ * Defaults for rarely used config stuff.
+ */
 #ifndef CONFIG_KDEBUG_DISABLE_TRACE
 #define CONFIG_KDEBUG_DISABLE_TRACE  0
 #endif
@@ -58,67 +58,67 @@
 #endif
 
 #if defined(__doxygen__)
-			/**
-			 * Preprocessor symbol defined only for debug builds.
-			 *
-			 * The build infrastructure must arrange for _DEBUG to
-			 * be predefined for all the source files being compiled.
-			 *
-			 * This is compatible with the MSVC convention for the
-			 * default Debug and Release project targets.
-			 */
-			#define _DEBUG 1
+        /**
+         * Preprocessor symbol defined only for debug builds.
+         *
+         * The build infrastructure must arrange for _DEBUG to
+         * be predefined for all the source files being compiled.
+         *
+         * This is compatible with the MSVC convention for the
+         * default Debug and Release project targets.
+         */
+        #define _DEBUG 1
 #endif
 
 #ifdef _DEBUG
 
-			// STLport specific: enable extra checks
-			#define __STL_DEBUG 1
+        // STLport specific: enable extra checks
+        #define __STL_DEBUG 1
 
-			// MSVC specific: Enable memory allocation debug
-			#if defined(_MSC_VER)
-				#include <crtdbg.h>
-			#endif
+        // MSVC specific: Enable memory allocation debug
+        #if defined(_MSC_VER)
+                #include <crtdbg.h>
+        #endif
 
-			/*
-			 * On UNIX systems the extabilished practice is to define
-			 * NDEBUG for release builds and nothing for debug builds.
-			 */
-			#ifdef NDEBUG
-			#undef NDEBUG
-			#endif
+        /*
+         * On UNIX systems the extabilished practice is to define
+         * NDEBUG for release builds and nothing for debug builds.
+         */
+        #ifdef NDEBUG
+        #undef NDEBUG
+        #endif
 
-			/**
-			 * This macro duplicates the old MSVC trick of redefining
-			 * THIS_FILE locally to avoid the overhead of many duplicate
-			 * strings in ASSERT().
-			 */
-			#ifndef THIS_FILE
-				#define THIS_FILE  __FILE__
-			#endif
+        /**
+         * This macro duplicates the old MSVC trick of redefining
+         * THIS_FILE locally to avoid the overhead of many duplicate
+         * strings in ASSERT().
+         */
+        #ifndef THIS_FILE
+                #define THIS_FILE  __FILE__
+        #endif
 
-			/**
-			 * This macro can be used to conditionally exclude one or more
-			 * statements conditioned on \c _DEBUG, avoiding the clutter
-			 * of ifdef/endif pairs.
-			 *
-			 * \code
-			 *     struct FooBar
-			 *     {
-			 *         int foo;
-			 *         bool bar;
-			 *         DB(int ref_count;) // Track number of users
-			 *
-			 *         void release()
-			 *         {
-			 *             DB(--ref_count;)
-			 *         }
-			 *     };
-			 * \endcode
-			 */
-			#define DB(x) x
+        /**
+         * This macro can be used to conditionally exclude one or more
+         * statements conditioned on \c _DEBUG, avoiding the clutter
+         * of ifdef/endif pairs.
+         *
+         * \code
+         *     struct FooBar
+         *     {
+         *         int foo;
+         *         bool bar;
+         *         DB(int ref_count;) // Track number of users
+         *
+         *         void release()
+         *         {
+         *             DB(--ref_count;)
+         *         }
+         *     };
+         * \endcode
+         */
+        #define DB(x) x
 
-			#include "cfg/cfg_debug.h"   /* CONFIG_KDEBUG_ASSERT_NO_TEXT */
+        #include "cfg/cfg_debug.h"   /* CONFIG_KDEBUG_ASSERT_NO_TEXT */
 	#include <cpu/attr.h>        /* CPU_HARVARD */
 
 	/* These are implemented in drv/kdebug.c */
