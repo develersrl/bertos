@@ -42,7 +42,7 @@ triface_CSRC = \
 triface_PCSRC += bertos/mware/formatwr.c
 
 
-triface_CFLAGS = -O2 -D'ARCH=0' -fno-strict-aliasing -Iapp/triface -Iapp/triface -Ibertos/cpu/avr
+triface_CFLAGS = -O2 -D'ARCH=0' -fno-strict-aliasing -Iapp/triface -Ibertos/cpu/avr
 triface_LDFLAGS = -Wl
 
 triface_MCU = atmega64
