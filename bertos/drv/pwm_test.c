@@ -32,10 +32,34 @@
  *
  * \brief Test for PWM driver (implementation)
  *
+ * This is a simple test for PWM driver. This module
+ * is target independent, so you can test all target that
+ * BeRTOS support.
+ * To use this test you should include a pwm_map.h header where
+ * are defined the PWM channels for your target. Then you should add
+ * or remove a test setting in pwm_test_cfg array, and edit a value for
+ * your specific test.
+ * Afther this, all is ready and you can test PWM driver.
+ *
+ * The test check first if all PWM channel starts, and then try
+ * to change a PWM duty cicle for all channel.
+ * The change of duty cycle is operate when a PWM channel is enable,
+ * in this way you can see if a pwm signal is clean and work properly.
+ * The duty value is change incrementaly, and when it arrive to 100% or 0%,
+ * we reset the duty value and restart the test.
+ * Further the duty test, we check also a PWM polarity, infact when we
+ * reach a reset duty value, we invert a polary of PWM wavform.
+ * So you can see if the hardware manage correctly this situation.
+ *
+ * Note: To be simple and target independently we not use a timer module,
+ * and so the delay is do with a for cicle.
+ *
  * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  */
+
+#include "hw/pwm_map.h" // For PwmDev and channel avaible on thi target
 
 #include <cfg/macros.h>
 #include <cfg/debug.h>
@@ -44,13 +68,29 @@
 #include <cpu/irq.h>
 
 #include <drv/pwm.h>
-#include <drv/pwm_at91.h>
-#include <drv/timer.h>
-#include <drv/sysirq_at91.h>
+#include CPU_HEADER(pwm)
 
-#include <io/arm.h>
+#define DELAY_TIME   10000  // This is a number of for cycle before to set a new value of duty
+#define PWM_DUTY_INC   200  // Incremental value for duty
+
+
+/**
+ * Simple struct to store
+ * the testing value.
+ */
+typedef struct PwmTest
+{
+        int ch;
+        bool pol;
+        pwm_freq_t freq;
+        pwm_duty_t duty;
+} PwmTest;
 
 /*
+ * Test settings for each channel.
+ *
+ * Frequency value is in Hz.
+ *
  * Esample of value for duty cycle"
  *
  * - 100% => 0xFFFFFFFF
@@ -61,99 +101,138 @@
  * - 33%  => 0x55555555
  * - 16%  => 0x2AAAAAAA
  */
+static PwmTest pwm_test_cfg[PWM_CNT] =
+{
+        /* Channel, polarity, frequecy,   duty */
+        {        0,    false,    100UL,      0 }, /*     100Hz,  0% duty */
+        {        1,    false,   1000UL, 0x7FFF }, /*      1KHz, 50% duty */
+        {        2,    false,  12356UL, 0x5555 }, /* 12,356KHz, 33% duty */
+        {        3,    false, 100000UL, 0xCCCC }  /*    100KHz, 80% duty */
+};
 
-#define PWM_TEST_CH0                     0
-#define PWM_TEST_CH0_FREQ            100UL // 100Hz
-#define PWM_TEST_CH0_DUTY           0xBFFF // 80%
+/**
+ * Setup all needed to test PWM on AT91
+ *
+ */
+int pwm_testSetup(void)
+{
+	kputs("Init pwm..");
+	pwm_init();
+	kputs("done.\n");
 
-#define PWM_TEST_CH1                     1
-#define PWM_TEST_CH1_FREQ           1000UL  // 1000Hz
-#define PWM_TEST_CH1_DUTY           0xBFFF  // 75%
+	return 0;
+}
 
-#define PWM_TEST_CH2                     2
-#define PWM_TEST_CH2_FREQ          12356UL  // 12356Hz
-#define PWM_TEST_CH2_DUTY           0x7FFF  // 50%
-
-#define PWM_TEST_CH3                     3
-#define PWM_TEST_CH3_FREQ         100000UL  // 100KHz
-#define PWM_TEST_CH3_DUTY           0x5555  // 33%
-
-#define PWM_TEST_CH_SET(index) \
-	do { \
-			pwm_setFrequency(PWM_TEST_CH##index , PWM_TEST_CH##index##_FREQ); \
-			pwm_setDuty(PWM_TEST_CH##index, PWM_TEST_CH##index##_DUTY); \
-			pwm_enable(PWM_TEST_CH##index, true); \
-	} while (0)
 
 /**
  * Test suit for genation of pwm waveform.
  *
  */
-void pwm_test(void)
+int pwm_testRun(void)
 {
+        int duty = 0;
+        int delay = 0;
 
-	kputs("PWM test\n\n");
+        pwm_testSetup();
 
-	kputs("Init pwm..");
+        kputs("\n\n===== BeRTOS PWM test =====\n\n");
 
-	pwm_init();
-	kputs("done.\n");
+        for (int i = 0; i < PWM_CNT; i++)
+        {
+                kprintf("PWM test ch[%d]\n", pwm_test_cfg[i].ch);
 
-	PWM_TEST_CH_SET(0);
-	kprintf("PWM test set ch[%d] =>freq[%ld], duty[%d]\n", PWM_TEST_CH0, PWM_TEST_CH0_FREQ, PWM_TEST_CH0_DUTY);
-	PWM_TEST_CH_SET(1);
-	kprintf("PWM test set ch[%d] =>freq[%ld], duty[%d]\n", PWM_TEST_CH1, PWM_TEST_CH1_FREQ, PWM_TEST_CH1_DUTY);
-	PWM_TEST_CH_SET(2);
-	kprintf("PWM test set ch[%d] =>freq[%ld], duty[%d]\n", PWM_TEST_CH2, PWM_TEST_CH2_FREQ, PWM_TEST_CH2_DUTY);
-	PWM_TEST_CH_SET(3);
-	kprintf("PWM test set ch[%d] =>freq[%ld], duty[%d]\n", PWM_TEST_CH3, PWM_TEST_CH3_FREQ, PWM_TEST_CH3_DUTY);
+                kprintf("--> set pol[%d]", pwm_test_cfg[i].pol);
+                kputs(" (Note: if polarity is false the output waveform start at high level,\n see low level implentation for detail)");
+                pwm_setPolarity(pwm_test_cfg[i].ch, pwm_test_cfg[i].pol);
+                kputs("..ok\n");
+
+                kprintf("--> set freq[%ld]", pwm_test_cfg[i].freq);
+                pwm_setFrequency(pwm_test_cfg[i].ch, pwm_test_cfg[i].freq);
+                kputs("..ok\n");
+
+                kprintf("--> set duty[%d]", pwm_test_cfg[i].duty);
+                pwm_setDuty(pwm_test_cfg[i].ch, pwm_test_cfg[i].duty);
+                kputs("..ok\n");
+
+                kputs("--> Enable pwm");
+                pwm_enable(pwm_test_cfg[i].ch, true);
+                kputs("..ok\n");
+        }
+
+        kputs("\n-------------------------- Dinamic PWM test --------------------------\n");
+        kputs("We test if driver change correctly the duty cycle durind it working.\n");
+        kputs("On your oscilloscope you should see the pwm singal that increase until\n");
+        kputs("the duty value is 100%. After this value we invert a polarity of pwm,\n");
+        kputs("and repeat the test. But now you should see that pwm duty decreasing until\n");
+        kputs("0% duty value.\nAfter that, we repeat the test from beginning.\n\n");
+
+        for (;;)
+        {
+                if (delay == DELAY_TIME)
+                {
+                        for (int i = 0; i < PWM_CNT; i++)
+                        {
+                                kprintf("PWM test ch[%d]\n", pwm_test_cfg[i].ch);
+                                kprintf("--> set duty[%d]", duty);
+                                pwm_setDuty(pwm_test_cfg[i].ch, duty);
+                                kputs("..ok\n");
+                        }
+                        kputs("\n++++++++++++++++++++\n");
+                        duty += PWM_DUTY_INC;
+                        delay = 0;
+                }
+
+                //Reset duty cycle overflow
+                if (duty >= 0xFFFF)
+                {
+                        duty = 0;
+                        for (int i = 0; i < PWM_CNT; i++)
+                        {
+                                kputs("Duty reset, swap polarity:\n");
+                                kprintf("--> pol from [%d] to [%d]", pwm_test_cfg[i].pol, !pwm_test_cfg[i].pol);
+
+                                pwm_test_cfg[i].pol = !pwm_test_cfg[i].pol;
+                                pwm_setPolarity(pwm_test_cfg[i].ch, pwm_test_cfg[i].pol);
+
+                                kputs("..ok\n");
+                        }
+                        kputs("\n++++++++++++++++++++\n");
+                }
+                delay++;
+        }
+
+        return 0;
 }
 
+/**
+ * End a PWM Test.
+ * (Unused)
+ */
+int pwm_testTearDown(void)
+{
+	/*    */
+	return 0;
+}
 
+/*
+ * Empty main.
+ *
+ * Look it as exmple or use it if
+ * you want test a PWM driver stand alone.
+ */
+ #if 0
 int main(void)
 {
-	IRQ_ENABLE;
+        IRQ_ENABLE;
 	kdbg_init();
-	sysirq_init();
-	timer_init();
-	pwm_test();
 
+	pwm_testRun();
 
-
-	kputs("Parto con il test!\n");
-	kprintf("PWM CURRENT ch[%d] => cmr[%ld], dty[%ld], prd[%ld], up[%ld]\n", PWM_TEST_CH0, PWM_CMR0, PWM_CDTY0, PWM_CPRD0, PWM_CUPD0);
-
-	for(;;)
-	{
-
-		pwm_setDuty(0,0);
-		timer_delay(5000);
-		kprintf("TEST10 => cmr[%ld], dty[%ld], prd[%ld], up[%ld]\n", PWM_CMR0, PWM_CDTY0, PWM_CPRD0, PWM_CUPD0);
-
-
-		pwm_setDuty(0,0x7FFF);
-		timer_delay(5000);
-		kprintf("TEST50 => cmr[%ld], dty[%ld], prd[%ld], up[%ld]\n", PWM_CMR0, PWM_CDTY0, PWM_CPRD0, PWM_CUPD0);
-
-
-		pwm_setDuty(0,0x5555);
-		timer_delay(5000);
-		kprintf("TEST33 => cmr[%ld], dty[%ld], prd[%ld], up[%ld]\n", PWM_CMR0, PWM_CDTY0, PWM_CPRD0, PWM_CUPD0);
-
-
-		pwm_setDuty(0,0xCCCC);
-		timer_delay(5000);
-		kprintf("TEST80 => cmr[%ld], dty[%ld], prd[%ld], up[%ld]\n", PWM_CMR0, PWM_CDTY0, PWM_CPRD0, PWM_CUPD0);
-		kputs("--------\n");
-
-
-// 		kprintf("PWM test ch[%d] => cmr[%ld], dty[%ld], prd[%ld], up[%ld]\n", PWM_TEST_CH0, PWM_CMR0, PWM_CDTY0, PWM_CPRD0, PWM_CUPD0);
-// 		kprintf("PWM test ch[%d] => cmr[%ld], dty[%ld], prd[%ld], up[%ld]\n", PWM_TEST_CH1, PWM_CMR1, PWM_CDTY1, PWM_CPRD1, PWM_CUPD1);
-// 		kprintf("PWM test ch[%d] => cmr[%ld], dty[%ld], prd[%ld], up[%ld]\n", PWM_TEST_CH2, PWM_CMR2, PWM_CDTY2, PWM_CPRD2, PWM_CUPD2);
-// 		kprintf("PWM test ch[%d] => cmr[%ld], dty[%ld], prd[%ld], up[%ld]\n", PWM_TEST_CH3, PWM_CMR3, PWM_CDTY3, PWM_CPRD3, PWM_CUPD3);
-	}
+        for(;;)
+        {
+        }
 
 }
-
+#endif
 
 
