@@ -57,7 +57,7 @@ void pwm_setDuty(PwmDev dev, pwm_duty_t duty)
 	pwm_period_t period = 0;
 	pwm_duty_t real_duty = 0;
 
-	duty = MIN(duty, (pwm_duty_t)PWM_MAX_DUTY);
+	duty = MIN(duty, PWM_MAX_DUTY);
 
 	period = pwm_hw_getPeriod(dev);
 

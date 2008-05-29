@@ -39,6 +39,7 @@
  */
 
 #include "pwm_at91.h"
+#include "hw/pwm_map.h"
 #include "hw/hw_cpu.h"
 
 #include <cfg/macros.h>
@@ -56,6 +57,7 @@ static PwmChannel pwm_map[PWM_CNT] =
 {
 	{//PWM Channel 0
 		.duty_zero = false,
+		.pol = false,
 		.pwm_pin = BV(PWM0),
 		.mode_reg = &PWM_CMR0,
 		.duty_reg = &PWM_CDTY0,
@@ -64,6 +66,7 @@ static PwmChannel pwm_map[PWM_CNT] =
 	},
 	{//PWM Channel 1
 		.duty_zero = false,
+		.pol = false,
 		.pwm_pin = BV(PWM1),
 		.mode_reg = &PWM_CMR1,
 		.duty_reg = &PWM_CDTY1,
@@ -72,6 +75,7 @@ static PwmChannel pwm_map[PWM_CNT] =
 	},
 	{//PWM Channel 2
 		.duty_zero = false,
+        .pol = false,
 		.pwm_pin = BV(PWM2),
 		.mode_reg = &PWM_CMR2,
 		.duty_reg = &PWM_CDTY2,
@@ -80,6 +84,7 @@ static PwmChannel pwm_map[PWM_CNT] =
 	},
 	{//PWM Channel 3
 		.duty_zero = false,
+		.pol = false,
 		.pwm_pin = BV(PWM3),
 		.mode_reg = &PWM_CMR3,
 		.duty_reg = &PWM_CDTY3,
@@ -111,7 +116,7 @@ void pwm_hw_setFrequency(PwmDev dev, uint32_t freq)
 	for(int i = 0; i <= PWM_HW_MAX_PRESCALER_STEP; i++)
 	{
 		period = CLOCK_FREQ / (BV(i) * freq);
-// 		TRACEMSG("period[%d], prescale[%d]", period, i);
+// 		TRACEMSG("period[%ld], prescale[%d]", period, i);
 		if ((period < PWM_HW_MAX_PERIOD) && (period != 0))
 		{
 			//Clean previous channel prescaler, and set new
@@ -123,9 +128,7 @@ void pwm_hw_setFrequency(PwmDev dev, uint32_t freq)
 		}
 	}
 
-	PWM_ENA = BV(dev);
-
-// 	TRACEMSG("PWM ch[%d] period[%d]", dev, period);
+ 	TRACEMSG("PWM ch[%d] period[%ld]", dev, period);
 }
 
 /**
@@ -150,10 +153,22 @@ void pwm_hw_setDutyUnlock(PwmDev dev, uint16_t duty)
 	else
 	{
 		ASSERT(PWM_CCNT0);
+        /*
+         * If polarity flag is true we must invert
+         * PWM polarity.
+         */
+        if (pwm_map[dev].pol)
+        {
+            duty = (uint16_t)*pwm_map[dev].period_reg - duty;
+//            TRACEMSG("Inverted duty[%d], pol[%d]", duty, pwm_map[dev].pol);
+        }
+
 		PWM_PIO_PDR = pwm_map[dev].pwm_pin;
 		*pwm_map[dev].update_reg = duty;
 		pwm_map[dev].duty_zero = false;
 	}
+
+	PWM_ENA = BV(dev);
 
 // 	TRACEMSG("PWM ch[%d] duty[%d], period[%ld]", dev, duty, *pwm_map[dev].period_reg);
 }
@@ -176,6 +191,14 @@ void pwm_hw_disable(PwmDev dev)
 	PWM_PIO_PER = pwm_map[dev].pwm_pin;
 }
 
+/**
+ * Set PWM polarity to select pwm channel
+ */
+void pwm_hw_setPolarity(PwmDev dev, bool pol)
+{
+	pwm_map[dev].pol = pol;
+//    TRACEMSG("Set pol[%d]", pwm_map[dev].pol);
+}
 
 /**
  * Init pwm.
@@ -206,10 +229,14 @@ void pwm_hw_init(void)
 	/*
 	 * Set pwm mode:
 	 * - set period alidned to left
-	 * - set output waveform to low level
+	 * - set output waveform to start at high level
 	 * - allow duty cycle modify at next period event
 	 */
 	for (int ch = 0; ch < PWM_CNT; ch++)
+	{
 		*pwm_map[ch].mode_reg = 0;
+		*pwm_map[ch].mode_reg = BV(PWM_CPOL);
+	}
+
 }
 

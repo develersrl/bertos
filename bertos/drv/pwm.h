@@ -42,14 +42,29 @@
 #define DRV_PWM_H
 
 #include "hw/pwm_map.h"
+#include CPU_HEADER(pwm)
+
 #include <cfg/compiler.h>
 
 #define PWM_MAX_DUTY              ((pwm_duty_t)0xFFFF)
 #define PWM_MAX_PERIOD            0xFFFF
 #define PWM_MAX_PERIOD_LOG2           16
 
+/**
+ * PWM type define.
+ */
 typedef uint16_t pwm_duty_t;
 typedef uint32_t pwm_freq_t;
+
+
+
+/**
+ * Set PWM polarity of pwm \p dev.
+ */
+INLINE void pwm_setPolarity(PwmDev dev, bool pol)
+{
+    pwm_hw_setPolarity(dev, pol);
+}
 
 void pwm_setDuty(PwmDev dev, pwm_duty_t duty);
 void pwm_setFrequency(PwmDev dev, pwm_freq_t freq);
