@@ -85,35 +85,18 @@
 			pwm_enable(PWM_TEST_CH##index, true); \
 	} while (0)
 
-
-/**
- * Setup all needed to test PWM on AT91
- *
- */
-int pwm_testSetup(void)
-{
-	IRQ_ENABLE;
-	kdbg_init();
-	sysirq_init();
-	timer_init();
-
-	pwm_init();
-
-	return 0;
-}
-
-
 /**
  * Test suit for genation of pwm waveform.
  *
  */
-int pwm_testRun(void)
+void pwm_test(void)
 {
 
 	kputs("PWM test\n\n");
 
 	kputs("Init pwm..");
-	pwm_testSetup();
+
+	pwm_init();
 	kputs("done.\n");
 
 	PWM_TEST_CH_SET(0);
@@ -124,24 +107,16 @@ int pwm_testRun(void)
 	kprintf("PWM test set ch[%d] =>freq[%ld], duty[%d]\n", PWM_TEST_CH2, PWM_TEST_CH2_FREQ, PWM_TEST_CH2_DUTY);
 	PWM_TEST_CH_SET(3);
 	kprintf("PWM test set ch[%d] =>freq[%ld], duty[%d]\n", PWM_TEST_CH3, PWM_TEST_CH3_FREQ, PWM_TEST_CH3_DUTY);
-
-	return 0;
 }
 
-/**
- *
- */
-int pwm_testTearDown(void)
-{
-	/*    */
-	return 0;
-}
-
-#ifdef _TEST
 
 int main(void)
 {
-	pwm_testRun();
+	IRQ_ENABLE;
+	kdbg_init();
+	sysirq_init();
+	timer_init();
+	pwm_test();
 
 
 
@@ -179,6 +154,6 @@ int main(void)
 	}
 
 }
-#endif
+
 
 
