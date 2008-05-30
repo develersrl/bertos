@@ -1,0 +1,10 @@
+#Makefile for BeRTOS test.
+#This makefile was generated automatically.
+
+V:= 0
+default: all
+
+include bertos/config.mk
+include ./app/test/avrtest.mk
+include ./app/test/armtest.mk
+include bertos/rules.mk
