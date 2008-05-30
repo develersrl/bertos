@@ -58,14 +58,14 @@ ASRC=
 
 #Source to skip:
 if [ $1 = 'avr' ] ; then
-	CSRC=`echo $CSRC | sed "-e {s/${BERTOS_DIR_RE}\\/drv\\/kdebug\\.c//g}"`
-	CSRC=`echo $CSRC | sed "-e {s/${BERTOS_DIR_RE}\\/mware\\/formatwr\\.c//g}"`
+	CSRC=`echo $CSRC | sed -e "s/${BERTOS_DIR_RE}\\/drv\\/kdebug\\.c//g"`
+	CSRC=`echo $CSRC | sed -e "s/${BERTOS_DIR_RE}\\/mware\\/formatwr\\.c//g"`
 fi
 
 if [ $1 = 'arm' ] ; then
 	for i in $ARM_DRV_C_EXCLUDE_LIST ;
 		do
-			CSRC=`echo $CSRC | sed "-e {s/${ARM_DRV}\\/$i\\.c//g}"`
+			CSRC=`echo $CSRC | sed -e "s/${ARM_DRV}\\/$i\\.c//g"`
 		done
 fi
 
