@@ -46,6 +46,7 @@
 #include <cfg/os.h>
 #include <cfg/compiler.h>
 
+
 /*
  * Defaults for rarely used config stuff.
  */
@@ -184,6 +185,72 @@
 		#define TRACE  do {} while(0)
 		#define TRACEMSG(...)  do {} while(0)
 	#endif
+
+	/**
+	 * Multi level logging system.
+	 *
+	 * You can use these macro directy or using the cfg/log.h module
+	 * that provide a simple interface for using the logging multilevel system.
+	 * The priority level is order form error messages (hight priority) to info messages
+	 * (low priority), so if you choose a low level log message you can see also all message
+	 * that have a hight priority.
+	 *
+	 * \{
+	 */
+	/// Logging level definition
+	#define DBG_LOG_ERROR     0
+	#define DBG_LOG_WARNING   1
+	#define DBG_LOG_INFO      2
+
+	/// Logging verbose mode
+	#define DBG_LOG_VERBOSE   1
+	#define DBG_LOG_SILENT    0
+
+	#define DBG_ERROR(debug_level, mode, str,...) \
+	do { \
+			if(debug_level >= DBG_LOG_ERROR) \
+			{ \
+				if (mode == DBG_LOG_VERBOSE)\
+					kprintf("Error(%s():%d): "str, __func__, __LINE__, ## __VA_ARGS__); \
+				else \
+					kprintf("Error: "str,  ## __VA_ARGS__); \
+			} \
+			else \
+			{ \
+				/* NONE */ \
+			} \
+	} while (0)
+
+	#define DBG_WARNING(debug_level, mode, str,...) \
+	do { \
+			if(debug_level >= DBG_LOG_WARNING) \
+			{ \
+				if (mode == DBG_LOG_VERBOSE) \
+					kprintf("Warning(%s():%d): "str, __func__, __LINE__, ## __VA_ARGS__); \
+				else \
+					kprintf("Warning: "str,  ## __VA_ARGS__); \
+			} \
+			else \
+			{ \
+				/* NONE */ \
+			} \
+	} while (0)
+
+	#define DBG_INFO(debug_level, mode, str,...) \
+	do { \
+			if(debug_level >= DBG_LOG_INFO) \
+			{ \
+				if (mode == DBG_LOG_VERBOSE) \
+					kprintf("Info(%s():%d): "str, __func__, __LINE__, ## __VA_ARGS__); \
+				else \
+					kprintf("Info: "str,  ## __VA_ARGS__); \
+			} \
+			else \
+			{ \
+				/* NONE */ \
+			} \
+	} while (0)
+	/* \} */
 
 	/**
 	 * \name Walls to detect data corruption
