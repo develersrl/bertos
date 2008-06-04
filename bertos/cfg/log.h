@@ -32,30 +32,32 @@
  *
  * \brief Logging system module.
  *
- * This module implement a simple interface to use the multi level
- * logging system.
+ * This module implement a simple interface to use the multi level logging system.
  * The log message have the priority order, like this:
  *
  * - error message (most hight)
- * - warning message 
+ * - warning message
  * - info message (most low)
  *
  * With this priority system we can log only the message that have egual or major
- * priority than log level that you has been configurate. Further you can have a 
- * differ log level for each module that you want. To do this you just need to 
+ * priority than log level that you has been configurate. Further you can have a
+ * differ log level for each module that you want. To do this you just need to
  * define LOG_LEVEL in cfg of select module.
  * When you set a log level, the system logs only the message that have priority
  * egual or major that you have define, but the other logs function are not include
  * at compile time, so all used logs function are linked, but the other no.
  *
- * To use logging system you should include this module in your drive and use 
+ * To use logging system you should include this module in your drive and use
  * a LOG_ERROR, LOG_WARNING and LOG_INFO macros to set the level log of the message.
  * Then you should define a LOG_LEVEL and LOG_VERBOSE costant in your
  * cfg/cfg_<your_module_name>.h using the follow police:
- * 
+ *
+ * - in your file cfg/cfg_<module_name>.h, you define the logging
+ *   level and verbosity mode for your specific module:
+ *
  * \code
  *
- *	/**
+ *	**
  *	 * Logging level definition.
  *	 *
  *	 * Use 0 to log only the error messages
@@ -64,16 +66,26 @@
  *	 *
  *	#define <module_name>_LOG_LEVEL      2
  *
- *	/**
+ *	 **
  *	 * Set logging verbosity.
  *	 *
  *	 * If verbose is zero print short log messages.
  *	 *
  *	#define <module_name>_LOG_VERBOSE    1
  *
+ * \endcode
+ *
+ * - then, in the module that you use a logging macros you should define
+ *   a LOG_LEVEL and LOG_VERBOSE using the previous value that you have define
+ *   in cfg_<module_name>.h header. After this you should include the cfg/log.h
+ *   module:
+ *
+ * \code
+ *
  *	// Define logging setting (for cfg/log.h module).
  *	#define LOG_LEVEL       <module_name>_LOG_LEVEL
  *	#define LOG_VERBOSE     <module_name>_LOG_VERBOSE
+ *	#include <cfg/log.h>
  *
  * \endcode
  *
@@ -95,22 +107,48 @@
 
 #include <cfg/debug.h>
 
+
 // Use a default setting if nobody have define a log level
 #ifndef LOG_LEVEL
-#define LOG_LEVEL   DBG_LOG_ERROR
+#define LOG_LEVEL       LOG_LVL_ERR
 #endif
 
 // Use a default setting if nobody have define a log verbosity
-#ifndef LOG_VERBOSE
-#define LOG_VERBOSE   DBG_LOG_SILENT
+#ifndef LOG_VERBOSITY
+#define LOG_VERBOSITY   LOG_SILENT
 #endif
 
 /**
- *  Error log message.
- *  Use this macro to print error messages. This log level have hight priority,
- *  that means the error messages are always printed, if debug is enable.
- */
-#define LOG_ERROR(str,...)      DBG_ERROR(LOG_LEVEL, LOG_VERBOSE, str, ## __VA_ARGS__)
+* Multi level logging system.
+*
+* You can use these macro directy or using the cfg/log.h module
+* that provide a simple interface for using the logging multilevel system.
+* The priority level is order form error messages (hight priority) to info messages
+* (low priority), so if you choose a low level log message you can see also all message
+* that have a hight priority.
+*
+* \{
+*/
+/// Logging level definition
+#define LOG_LVL_ERR       0
+#define LOG_LVL_WARN      1
+#define LOG_LVL_INFO      2
+
+/// Logging verbose mode
+#define LOG_VERBOSE   1
+#define LOG_SILENT    0
+
+
+#if LOG_VERBOSITY == LOG_VERBOSE
+	#define LOG_PRINT(str_level, str,...)    kprintf("%s(%s():%d): "str, str_level, __func__, __LINE__, ## __VA_ARGS__)
+
+#elif LOG_VERBOSITY == LOG_SILENT
+	#define LOG_PRINT(str_level, str,...)    kprintf("%s: "str, str_level, ## __VA_ARGS__)
+
+#else
+	#error No log verbosity defined
+
+#endif
 
 /**
  * Log message level select.
@@ -118,20 +156,22 @@
  * also which print function are linked.
  * If you choose a low level of log you link all log function (error, warning and info),
  * but if choose a hight level you link only that have the priority egual or hight.
- * The priority level go from error (most hight) to info (most low) (see cfg/debug.h 
+ * The priority level go from error (most hight) to info (most low) (see cfg/debug.h
  * for more detail).
  *
  */
-#if (LOG_LEVEL <= DBG_LOG_INFO)
-	#define LOG_WARNING(str,...)    DBG_WARNING(LOG_LEVEL, LOG_VERBOSE,  str, ## __VA_ARGS__)
-	#define LOG_INFO(str,...)       DBG_INFO(LOG_LEVEL, LOG_VERBOSE, str, ## __VA_ARGS__)
+#define LOG_ERR(str,...)            LOG_PRINT("ERR", str, ## __VA_ARGS__)
 
-#elif (LOG_LEVEL <= DBG_LOG_WARNING)
-	#define LOG_WARNING(str,...)    DBG_WARNING(LOG_LEVEL, LOG_VERBOSE,  str, ## __VA_ARGS__)
+#if (LOG_LEVEL <= LOG_LVL_INFO)
+	#define LOG_WARN(str,...)       LOG_PRINT("WARN", str, ## __VA_ARGS__)
+	#define LOG_INFO(str,...)       LOG_PRINT("INFO", str, ## __VA_ARGS__)
+
+#elif (LOG_LEVEL <= LOG_LVL_WARN)
+	#define LOG_WARN(str,...)       LOG_PRINT("WARN", str, ## __VA_ARGS__)
 	#define LOG_INFO(str,...)       /* Nothing */
 
-#else /* LOG_LEVEL <= DBG_LOG_ERROR */
-	#define LOG_WARNING(str,...)    /* Nothing */
+#else /* LOG_LEVEL <= LOG_LVL_ERR */
+	#define LOG_WARN(str,...)       /* Nothing */
 	#define LOG_INFO(str,...)       /* Nothing */
 
 #endif
