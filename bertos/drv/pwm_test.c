@@ -52,7 +52,7 @@
  * So you can see if the hardware manage correctly this situation.
  *
  * Note: To be simple and target independently we not use a timer module,
- * and so the delay is do with a for cicle.
+ * and so the delay is do with a for cycle.
  *
  * \version $Id$
  *
@@ -60,7 +60,9 @@
  */
 
 #include "hw/pwm_map.h" // For PwmDev and channel avaible on thi target
+#include "cfg/cfg_pwm.h"
 
+#include <cfg/log.h>   // for logging system
 #include <cfg/macros.h>
 #include <cfg/debug.h>
 
@@ -116,9 +118,9 @@ static PwmTest pwm_test_cfg[PWM_CNT] =
  */
 int pwm_testSetup(void)
 {
-	kputs("Init pwm..");
+	LOG_INFO("Init pwm..");
 	pwm_init();
-	kputs("done.\n");
+	LOG_INFO("done.\n");
 
 	return 0;
 }
@@ -135,36 +137,35 @@ int pwm_testRun(void)
 
         pwm_testSetup();
 
-        kputs("\n\n===== BeRTOS PWM test =====\n\n");
+        LOG_INFO("\n\n===== BeRTOS PWM test =====\n\n");
 
         for (int i = 0; i < PWM_CNT; i++)
         {
-                kprintf("PWM test ch[%d]\n", pwm_test_cfg[i].ch);
-
-                kprintf("--> set pol[%d]", pwm_test_cfg[i].pol);
-                kputs(" (Note: if polarity is false the output waveform start at high level,\n see low level implentation for detail)");
+                LOG_INFO("PWM test ch[%d]\n", pwm_test_cfg[i].ch);
+                LOG_INFO("--> set pol[%d]", pwm_test_cfg[i].pol);
+                LOG_INFO("\n(Note: if polarity is false the output waveform start at high level,\n see low level implentation for detail)i\n");
                 pwm_setPolarity(pwm_test_cfg[i].ch, pwm_test_cfg[i].pol);
-                kputs("..ok\n");
+                LOG_INFO("..ok\n");
 
-                kprintf("--> set freq[%ld]", pwm_test_cfg[i].freq);
+                LOG_INFO("--> set freq[%ld]", pwm_test_cfg[i].freq);
                 pwm_setFrequency(pwm_test_cfg[i].ch, pwm_test_cfg[i].freq);
-                kputs("..ok\n");
+                LOG_INFO("..ok\n");
 
-                kprintf("--> set duty[%d]", pwm_test_cfg[i].duty);
+                LOG_INFO("--> set duty[%d]", pwm_test_cfg[i].duty);
                 pwm_setDuty(pwm_test_cfg[i].ch, pwm_test_cfg[i].duty);
-                kputs("..ok\n");
+                LOG_INFO("..ok\n");
 
-                kputs("--> Enable pwm");
+                LOG_INFO("--> Enable pwm");
                 pwm_enable(pwm_test_cfg[i].ch, true);
-                kputs("..ok\n");
+                LOG_INFO("..ok\n");
         }
 
-        kputs("\n-------------------------- Dinamic PWM test --------------------------\n");
-        kputs("We test if driver change correctly the duty cycle durind it working.\n");
-        kputs("On your oscilloscope you should see the pwm singal that increase until\n");
-        kputs("the duty value is 100%. After this value we invert a polarity of pwm,\n");
-        kputs("and repeat the test. But now you should see that pwm duty decreasing until\n");
-        kputs("0% duty value.\nAfter that, we repeat the test from beginning.\n\n");
+        LOG_INFO("\n-------------------------- Dinamic PWM test --------------------------\n");
+        LOG_INFO("We test if driver change correctly the duty cycle durind it working.\n");
+        LOG_INFO("On your oscilloscope you should see the pwm singal that increase until\n");
+        LOG_INFO("the duty value is 100%%. After this value we invert a polarity of pwm,\n");
+        LOG_INFO("and repeat the test. But now you should see that pwm duty decreasing until\n");
+        LOG_INFO("0%% duty value.\nAfter that, we repeat the test from beginning.\n\n");
 
         for (;;)
         {
@@ -172,12 +173,12 @@ int pwm_testRun(void)
                 {
                         for (int i = 0; i < PWM_CNT; i++)
                         {
-                                kprintf("PWM test ch[%d]\n", pwm_test_cfg[i].ch);
-                                kprintf("--> set duty[%d]", duty);
+                                LOG_INFO("PWM test ch[%d]\n", pwm_test_cfg[i].ch);
+                                LOG_INFO("--> set duty[%d]", duty);
                                 pwm_setDuty(pwm_test_cfg[i].ch, duty);
-                                kputs("..ok\n");
+                                LOG_INFO("..ok\n");
                         }
-                        kputs("\n++++++++++++++++++++\n");
+                        LOG_INFO("\n++++++++++++++++++++\n");
                         duty += PWM_DUTY_INC;
                         delay = 0;
                 }
@@ -188,15 +189,15 @@ int pwm_testRun(void)
                         duty = 0;
                         for (int i = 0; i < PWM_CNT; i++)
                         {
-                                kputs("Duty reset, swap polarity:\n");
-                                kprintf("--> pol from [%d] to [%d]", pwm_test_cfg[i].pol, !pwm_test_cfg[i].pol);
+                                LOG_INFO("Duty reset, swap polarity:\n");
+                                LOG_INFO("--> pol from [%d] to [%d]", pwm_test_cfg[i].pol, !pwm_test_cfg[i].pol);
 
                                 pwm_test_cfg[i].pol = !pwm_test_cfg[i].pol;
                                 pwm_setPolarity(pwm_test_cfg[i].ch, pwm_test_cfg[i].pol);
 
-                                kputs("..ok\n");
+                                LOG_INFO("..ok\n");
                         }
-                        kputs("\n++++++++++++++++++++\n");
+                        LOG_INFO("\n++++++++++++++++++++\n");
                 }
                 delay++;
         }
@@ -220,7 +221,7 @@ int pwm_testTearDown(void)
  * Look it as exmple or use it if
  * you want test a PWM driver stand alone.
  */
- #if 0
+#if 0
 int main(void)
 {
         IRQ_ENABLE;
