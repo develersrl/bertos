@@ -41,6 +41,23 @@
 #define CFG_ADC_H
 
 /**
+ * Logging level definition.
+ *
+ * Use 0 to log only the error messages
+ * Use 1 to log the error and warning messages
+ * Use 2 to log all messages
+ */
+#define ADC_LOG_LEVEL      2
+
+/**
+ * Set logging verbosity.
+ *
+ * If verbosity is zero print short log messages.
+ */
+#define ADC_LOG_VERBOSITY    1
+
+
+/**
  * ADC timing setting parameter
  *
  * - CONFIG_ADC_CLOCK is frequency clock for ADC conversion.
@@ -56,8 +73,6 @@
 /// ADC setting for AVR target
 #define CONFIG_ADC_AVR_REF      1
 #define CONFIG_ADC_AVR_DIVISOR  2
-
-
 
 /// Enable ADS strobe.
 #define CONFIG_ADC_STROBE  0

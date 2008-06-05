@@ -35,16 +35,17 @@
  *
  * This ADC module should be use both whit kernel or none.
  * If you are using a kernel, the adc drive does not wait the finish of
- * conversion but use a singal every time a required conversion are 
- * ended. This signal wake up a process that return a result of 
+ * conversion but use a singal every time a required conversion are
+ * ended. This signal wake up a process that return a result of
  * conversion. Otherwise, if you not use a kernl, this module wait
  * whit a loop the finishing of conversion.
  *
  *
  * \version $Id$
- * 
+ *
  * \author Daniele Basile <asterix@develer.com>
  */
+
 
 #include "adc_at91.h"
 
@@ -52,6 +53,11 @@
 #include "cfg/cfg_kern.h"
 #include <cfg/macros.h>
 #include <cfg/compiler.h>
+
+// Define logging setting (for cfg/log.h module).
+#define LOG_LEVEL         ADC_LOG_LEVEL
+#define LOG_VERBOSITY     ADC_LOG_VERBOSITY
+#include <cfg/log.h>
 
 #include <drv/adc.h>
 
@@ -171,23 +177,23 @@ INLINE void adc_hw_init(void)
 	#endif
 	/* \} */
 
-	TRACEMSG("prescaler[%ld], stup[%ld], shtim[%ld]\n",ADC_COMPUTED_PRESCALER,ADC_COMPUTED_STARTUPTIME,ADC_COMPUTED_SHTIME);
+	LOG_INFO("prescaler[%ld], stup[%ld], shtim[%ld]\n",ADC_COMPUTED_PRESCALER, ADC_COMPUTED_STARTUPTIME,  ADC_COMPUTED_SHTIME);
 
 
 	//Apply computed prescaler value
 	ADC_MR &= ~ADC_PRESCALER_MASK;
 	ADC_MR |= ((ADC_COMPUTED_PRESCALER << ADC_PRESCALER_SHIFT) & ADC_PRESCALER_MASK);
-	TRACEMSG("prescaler[%ld]\n", (ADC_COMPUTED_PRESCALER << ADC_PRESCALER_SHIFT) & ADC_PRESCALER_MASK);
+	LOG_INFO("prescaler[%ld]\n", (ADC_COMPUTED_PRESCALER << ADC_PRESCALER_SHIFT) & ADC_PRESCALER_MASK);
 
 	//Apply computed start up time
 	ADC_MR &= ~ADC_STARTUP_MASK;
 	ADC_MR |= ((ADC_COMPUTED_STARTUPTIME << ADC_STARTUP_SHIFT) & ADC_STARTUP_MASK);
-	TRACEMSG("sttime[%ld]\n", (ADC_COMPUTED_STARTUPTIME << ADC_STARTUP_SHIFT) & ADC_STARTUP_MASK);
+	LOG_INFO("sttime[%ld]\n", (ADC_COMPUTED_STARTUPTIME << ADC_STARTUP_SHIFT) & ADC_STARTUP_MASK);
 
 	//Apply computed sample and hold time
 	ADC_MR &= ~ADC_SHTIME_MASK;
 	ADC_MR |= ((ADC_COMPUTED_SHTIME << ADC_SHTIME_SHIFT) & ADC_SHTIME_MASK);
-	TRACEMSG("shtime[%ld]\n", (ADC_COMPUTED_SHTIME << ADC_SHTIME_SHIFT) & ADC_SHTIME_MASK);
+	LOG_INFO("shtime[%ld]\n", (ADC_COMPUTED_SHTIME << ADC_SHTIME_SHIFT) & ADC_SHTIME_MASK);
 
 	#if CONFIG_KERNEL
 		//Register and enable irq for adc.
