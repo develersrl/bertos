@@ -63,6 +63,8 @@
 
 	INLINE void timer_hw_init(void)
 	{
+		sysirq_init();
+
 		cpuflags_t flags;
 
 		MOD_CHECK(sysirq);
