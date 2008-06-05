@@ -61,10 +61,13 @@
 
 #include "hw/pwm_map.h" // For PwmDev and channel avaible on thi target
 #include "cfg/cfg_pwm.h"
-
-#include <cfg/log.h>   // for logging system
 #include <cfg/macros.h>
 #include <cfg/debug.h>
+
+// Define logging setting (for cfg/log.h module).
+#define LOG_LEVEL         PWM_LOG_LEVEL
+#define LOG_VERBOSITY     PWM_LOG_VERBOSITY
+#include <cfg/log.h>   // for logging system
 
 #include <cpu/types.h>
 #include <cpu/irq.h>
