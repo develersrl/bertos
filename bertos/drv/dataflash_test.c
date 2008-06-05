@@ -86,7 +86,7 @@
 #define DATAFLASH_TEST_STR_LEN                  12307
 
 // If you want use a rand function of standard library set to 1.
-#define DATAFLASH_USE_RAND_FUNC                     1
+#define DATAFLASH_USE_RAND_FUNC                     0
 /* \} */
 
 /*
@@ -121,11 +121,11 @@ int dataflash_testSetup(void)
          * Init SPI module and dataflash driver.
          */
         // Open SPI comunication channel
-        spimaster_init(&spi_fd, SER_SPI0);
-        LOG_INFO("SPI0 init..ok\n");
+        spimaster_init(&spi_fd, CONFIG_SPI_PORT);
+        LOG_INFO("SPI init..ok\n");
 
-        ser_setbaudrate(&spi_fd, 5000000UL);
-        LOG_INFO("SPI0 set baudrate..ok\n");
+        ser_setbaudrate(&spi_fd, CONFIG_SPI_BAUDRATE);
+        LOG_INFO("SPI set baudrate..ok\n");
 
         //Init dataflash memory
         dataflash_hw_init();

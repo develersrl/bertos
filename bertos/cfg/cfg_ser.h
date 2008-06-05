@@ -40,6 +40,19 @@
 #ifndef CFG_SER_H
 #define CFG_SER_H
 
+/**
+ * Example of setting for serial port and
+ * spi port.
+ * Edit these define for your project.
+ */
+/// Serial settings
+#define CONFIG_SER_PORT              0
+#define CONFIG_SER_BAUDRATE     115200
+
+/// Spi settings
+#define CONFIG_SPI_PORT               0
+#define CONFIG_SPI_BAUDRATE     5000000UL
+
 
 /// [bytes] Size of the outbound FIFO buffer for port 0. 
 #define CONFIG_UART0_TXBUFSIZE  32
