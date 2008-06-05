@@ -44,12 +44,21 @@
 
 #include "cfg/cfg_kfile.h"
 #include <cfg/debug.h>
+#include <cfg/module.h>
+
+// Define logging setting (for cfg/log.h module).
+#define LOG_LEVEL         KFILE_LOG_LEVEL
+#define LOG_VERBOSITY     KFILE_LOG_VERBOSITY
+#include <cfg/log.h>
 
 #include <mware/formatwr.h>
 
 #include <string.h>
 
-#warning TODO:Refactor this module..
+
+
+MOD_DEFINE(kfile_test);
+
 
 /**
  * KFile read/write subtest.
@@ -95,13 +104,27 @@ static bool kfile_rwTest(KFile *f, uint8_t *buf, size_t size)
 }
 
 /**
+ * Setup all needed for kfile test
+ */
+int kfile_testSetup(void)
+{
+        MOD_INIT(kfile_test);
+        LOG_INFO("Mod init..ok\n");
+
+        return 0;
+}
+
+
+/**
  * KFile read/write test.
  * This function write and read \a test_buf long \a size
  * on \a fd handler.
  * \a save_buf can be NULL or a buffer where to save previous file content.
  */
-bool kfile_test(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size)
+int kfile_testRun(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size)
 {
+        kfile_testSetup();
+
 	/*
 	 * Part of test buf size that you would write.
 	 * This var is used in test 3 to check kfile_write
@@ -121,11 +144,11 @@ bool kfile_test(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size)
 	if (save_buf)
 	{
 		kfile_read(fd, save_buf, size);
-		kprintf("Saved content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + size);
+		LOG_INFO("Saved content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + size);
 	}
 
 	/* TEST 1 BEGIN. */
-	kprintf("Test 1: write from pos 0 to [%lu]\n", size);
+	LOG_INFO("Test 1: write from pos 0 to [%lu]\n", size);
 
 	/*
 	 * Seek to addr 0.
@@ -139,7 +162,7 @@ bool kfile_test(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size)
 	if (!kfile_rwTest(fd, test_buf, size))
 		goto kfile_test_end;
 
-	kprintf("Test 1: ok!\n");
+	LOG_INFO("Test 1: ok!\n");
 
 	/*
 	 * Restore previous read content.
@@ -151,12 +174,12 @@ bool kfile_test(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size)
 		if (kfile_write(fd, save_buf, size) != size)
 			goto kfile_test_end;
 
-		kprintf("Restore content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + size);
+		LOG_INFO("Restore content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + size);
 	}
 	/* TEST 1 END. */
 
 	/* TEST 2 BEGIN. */
-	kprintf("Test 2: write from pos [%lu] to [%lu]\n", fd->size/2 , fd->size/2 + size);
+	LOG_INFO("Test 2: write from pos [%lu] to [%lu]\n", fd->size/2 , fd->size/2 + size);
 
 	/*
 	 * Go to half test size.
@@ -171,7 +194,7 @@ bool kfile_test(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size)
 	{
 		kfile_read(fd, save_buf, size);
 		kfile_seek(fd, -(kfile_off_t)size, KSM_SEEK_CUR);
-		kprintf("Saved content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + size);
+		LOG_INFO("Saved content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + size);
 	}
 
 	/*
@@ -180,7 +203,7 @@ bool kfile_test(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size)
 	if (!kfile_rwTest(fd, test_buf, size))
 		goto kfile_test_end;
 
-	kprintf("Test 2: ok!\n");
+	LOG_INFO("Test 2: ok!\n");
 
 	/*
 	 * Restore previous content.
@@ -192,14 +215,14 @@ bool kfile_test(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size)
 		if (kfile_write(fd, save_buf, size) != size)
 			goto kfile_test_end;
 
-		kprintf("Restore content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + size);
+		LOG_INFO("Restore content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + size);
 	}
 
 	/* TEST 2 END. */
 
 	/* TEST 3 BEGIN. */
-	kprintf("Test 3: write outside of fd->size limit [%lu]\n", fd->size);
-	kprintf("This test should FAIL!, you must see an assertion fail message.\n");
+	LOG_INFO("Test 3: write outside of fd->size limit [%lu]\n", fd->size);
+	LOG_INFO("This test should FAIL!, you must see an assertion fail message.\n");
 
 	/*
 	 * Go to the Flash end
@@ -214,7 +237,7 @@ bool kfile_test(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size)
 	{
 		kfile_read(fd, save_buf, len);
 		kfile_seek(fd, -len, KSM_SEEK_CUR);
-		kprintf("Saved content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + len);
+		LOG_INFO("Saved content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + len);
 	}
 
 	/*
@@ -232,21 +255,29 @@ bool kfile_test(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size)
 	{
 		kfile_seek(fd, -len, KSM_SEEK_END);
 
-		if (kfile_write(fd, save_buf, len) != len)
+		if ((kfile_off_t)kfile_write(fd, save_buf, len) != len)
 			goto kfile_test_end;
 
-		kprintf("Restore content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + len);
+		LOG_INFO("Restore content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + len);
 	}
 
 	/* TEST 3 END. */
 
 	kfile_close(fd);
-	return true;
+	return 0;
 
 kfile_test_end:
 	kfile_close(fd);
-	return false;
+	LOG_ERR("One kfile_test fail!\n");
+	return EOF;
 }
 
-
-
+/**
+ * End a dataflash Test.
+ * (Unused)
+ */
+int kfile_testTearDown(void)
+{
+	/*    */
+	return 0;
+}

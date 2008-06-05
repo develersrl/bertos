@@ -40,8 +40,24 @@
 #ifndef CFG_KFILE_H
 #define CFG_KFILE_H
 
+/**
+ * Logging level definition.
+ *
+ * Use 0 to log only the error messages
+ * Use 1 to log the error and warning messages
+ * Use 2 to log all messages
+ */
+#define KFILE_LOG_LEVEL      2
+
+/**
+ * Set logging verbosity.
+ *
+ * If verbosity is zero print short log messages.
+ */
+#define KFILE_LOG_VERBOSITY    1
+
 /// TODO:
-#define CONFIG_KFILE_GETS 1
+#define CONFIG_KFILE_GETS 0
 
 #endif /* CFG_KFILE_H */
 
