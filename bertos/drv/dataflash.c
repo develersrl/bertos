@@ -30,19 +30,25 @@
  *
  * -->
  *
- *  \brief Function library for AT45DBXX Data Flash memory.
+ *  \brief Function library for dataflash AT45DB family (implementation).
  *
  *
- * \version $Id: dataflash.c 20677 2008-02-19 14:29:52Z batt $
+ * \version $Id: dataflash.c 21658 2008-06-05 16:42:54Z asterix $
  * \author Daniele Basile <asterix@develer.com>
  * \author Francesco Sacchi <batt@develer.com>
  */
 
 #include "dataflash.h"
 
+#include "cfg/cfg_dataflash.h"
 #include <cfg/macros.h>
 #include <cfg/debug.h>
 #include <cfg/module.h>
+
+// Define logging setting (for cfg/log.h module).
+#define LOG_LEVEL         DATAFLASH_LOG_LEVEL
+#define LOG_VERBOSITY     DATAFLASH_LOG_VERBOSITY
+#include <cfg/log.h>
 
 #include <drv/timer.h>
 
@@ -184,9 +190,7 @@ static uint8_t dataflash_stat(KFileDataflash *fd)
 	 * and reset dataflash command decoder.
 	 */
 	CS_TOGGLE(fd);
-
 	kfile_putc(DFO_READ_STATUS, fd->channel);
-
 	return kfile_getc(fd->channel);
 }
 
@@ -290,7 +294,7 @@ static int dataflash_flush(KFile *_fd)
 
 		fd->page_dirty = false;
 
-		kprintf("Flushing page <%ld>\n", fd->current_page);
+		LOG_INFO("Flushing page {%ld}\n", fd->current_page);
 	}
 	return 0;
 }
@@ -303,7 +307,7 @@ static int dataflash_flush(KFile *_fd)
 static int dataflash_close(struct KFile *_fd)
 {
 	dataflash_flush(_fd);
-	TRACE;
+	LOG_INFO("Close.\n");
 	return 0;
 }
 
@@ -321,7 +325,7 @@ static KFile *dataflash_reopen(KFile *_fd)
 	/* Load selected page from dataflash memory */
 	dataflash_loadPage(fd, fd->current_page);
 
-	TRACE;
+	LOG_INFO("Reopen.\n");
 	return &fd->fd;
 }
 
@@ -350,7 +354,7 @@ static size_t dataflash_read(struct KFile *_fd, void *buf, size_t size)
 	ASSERT(fd->fd.seek_pos + size <= fd->fd.size);
 	size = MIN((kfile_size_t)size, fd->fd.size - fd->fd.seek_pos);
 
-	kprintf("Reading at pos[%lu]\n", fd->fd.seek_pos);
+	LOG_INFO("Reading at pos[%lu]\n", fd->fd.seek_pos);
 
 	/*
 	 * We select page and offest from absolute address.
@@ -358,7 +362,7 @@ static size_t dataflash_read(struct KFile *_fd, void *buf, size_t size)
 	page_addr = fd->fd.seek_pos / mem_info[fd->dev].page_size;
 	byte_addr = fd->fd.seek_pos % mem_info[fd->dev].page_size;
 
-	kprintf("[page-<%ld>, byte-<%ld>]", page_addr, byte_addr);
+	LOG_INFO("[page-{%ld}, byte-{%ld}]\n", page_addr, byte_addr);
 
 	/*
 	 * Flush current page in main memory if
@@ -372,7 +376,7 @@ static size_t dataflash_read(struct KFile *_fd, void *buf, size_t size)
 	dataflash_readBlock(fd, page_addr, byte_addr, mem_info[fd->dev].read_cmd, data, size);
 
 	fd->fd.seek_pos += size;
-	kprintf("Read %ld bytes\n", size);
+	LOG_INFO("Read %ld bytes\n", size);
 
 	return size;
 }
@@ -401,7 +405,7 @@ static size_t dataflash_write(struct KFile *_fd, const void *_buf, size_t size)
 	ASSERT(fd->fd.seek_pos + size <= fd->fd.size);
 	size = MIN((kfile_size_t)size, fd->fd.size - fd->fd.seek_pos);
 
-	kprintf("Writing at pos[%lu]\n", fd->fd.seek_pos);
+	LOG_INFO("Writing at pos[%lu]\n", fd->fd.seek_pos);
 
 	while (size)
 	{
@@ -414,7 +418,7 @@ static size_t dataflash_write(struct KFile *_fd, const void *_buf, size_t size)
 
 		size_t wr_len = MIN((dataflash_size_t)size, mem_info[fd->dev].page_size - offset);
 
-		kprintf(" [page-<%ld>, byte-<%ld>]",new_page, offset);
+		LOG_INFO("[page-{%ld}, byte-{%ld}]\n",new_page, offset);
 
 		if (new_page != fd->current_page)
 		{
@@ -424,7 +428,7 @@ static size_t dataflash_write(struct KFile *_fd, const void *_buf, size_t size)
 			dataflash_loadPage(fd, new_page);
 
 			fd->current_page = new_page;
-			kprintf(" >> Load page: <%ld> ", new_page);
+			LOG_INFO(" >> Load page: {%ld}\n", new_page);
 		}
 		/*
 		* Write byte in current page, and set true
@@ -439,7 +443,7 @@ static size_t dataflash_write(struct KFile *_fd, const void *_buf, size_t size)
 		total_write += wr_len;
 	}
 
-	kprintf("written %lu bytes\n", total_write);
+	LOG_INFO("written %lu bytes\n", total_write);
 	return total_write;
 }
 
@@ -481,7 +485,6 @@ bool dataflash_init(KFileDataflash *fd, KFile *ch, DataflashType dev, dataflash_
 	fd->fd.flush = dataflash_flush;
 
 	dataflash_reset(fd);
-
 	stat = dataflash_stat(fd);
 
 	/*

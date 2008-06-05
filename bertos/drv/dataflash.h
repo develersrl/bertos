@@ -30,9 +30,9 @@
  *
  * -->
  *
- * \brief Function library for AT45DB081D Flash memory.
+ * \brief Function library for dataflash AT45DB family (interface).
  *
- * \version $Id: dataflash.h 20677 2008-02-19 14:29:52Z batt $
+ * \version $Id: dataflash.h 21658 2008-06-05 16:42:54Z asterix $
  *
  * \author Daniele Basile <asterix@develer.com>
  */
@@ -182,5 +182,16 @@ typedef struct DataflashInfo
 
 
 bool dataflash_init(KFileDataflash *fd, KFile *ch, DataflashType type, dataflash_setCS_t *setCS, dataflash_setReset_t *setReset);
+
+/**
+ * To test data falsh drive you could use
+ * this functions. To use these functions make sure to include in your make file the
+ * drv/datafalsh_test.c source.
+ *
+ * (see drv/datafalsh_test.c for more detail)
+ */
+int dataflash_testSetup(void);
+int dataflash_testRun(void);
+int dataflash_testTearDown(void);
 
 #endif /* DRV_DATAFLASH_H */
