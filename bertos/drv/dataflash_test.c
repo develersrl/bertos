@@ -37,7 +37,7 @@
  * To test memory we fill one buffer with casual char, and write it in different
  * part of memory. After every write we read the data that we have been write
  * and compare this with test buffer, checking if write and read command work
- * correclty. We also check if driver work properly when we make a write out the 
+ * correclty. We also check if driver work properly when we make a write out the
  * limit of memory size.
  *
  * Note: dataflash driver use a kfile interface, so for write/read test
@@ -51,6 +51,9 @@
 
 #include "hw/hw_dataflash.h"
 #include "cfg/cfg_dataflash.h"
+#include "cfg/cfg_kern.h"
+
+#include <cfg/test.h>
 #include <cfg/debug.h>
 #include <cfg/module.h>
 
@@ -63,7 +66,7 @@
 #include <drv/ser.h>
 #include <drv/dataflash.h>
 
-
+#include <kern/proc.h>
 #include <kern/kfile.h>
 
 #include <string.h>
@@ -86,7 +89,7 @@
 #define DATAFLASH_TEST_STR_LEN                  12307
 
 // If you want use a rand function of standard library set to 1.
-#define DATAFLASH_USE_RAND_FUNC                     0
+#define DATAFLASH_USE_RAND_FUNC                     1
 /* \} */
 
 /*
@@ -108,6 +111,13 @@ static uint8_t save_buf[DATAFLASH_TEST_STR_LEN];
  */
 int dataflash_testSetup(void)
 {
+        kfile_testSetup();
+        LOG_INFO("KFILE setup..ok\n");
+
+        LOG_INFO("Check if kernel is enable (if enable you should see the assert message.)\n");
+        SILENT_ASSERT("bertos/drv/dataflash_test.c:119: Assertion failed: !CONFIG_KERNEL");
+        ASSERT(!CONFIG_KERNEL);
+
         /*
          * This test use a kfile_test module,
          * so should include source in your makefile.
@@ -121,11 +131,11 @@ int dataflash_testSetup(void)
          * Init SPI module and dataflash driver.
          */
         // Open SPI comunication channel
-        spimaster_init(&spi_fd, CONFIG_SPI_PORT);
-        LOG_INFO("SPI init..ok\n");
+        spimaster_init(&spi_fd, SER_SPI0);
+        LOG_INFO("SPI0 init..ok\n");
 
-        ser_setbaudrate(&spi_fd, CONFIG_SPI_BAUDRATE);
-        LOG_INFO("SPI set baudrate..ok\n");
+        ser_setbaudrate(&spi_fd, 5000000UL);
+        LOG_INFO("SPI0 set baudrate..ok\n");
 
         //Init dataflash memory
         dataflash_hw_init();
@@ -161,19 +171,10 @@ int dataflash_testSetup(void)
  */
 int dataflash_testRun(void)
 {
-        if (!dataflash_testSetup())
-        {
-                LOG_INFO("DATAFLASH setup..ok\n");
-        }
-        else
-        {
-                LOG_ERR("DATAFLASH setup..fail!\n");
-                return EOF;
-        }
-
         LOG_INFO("Run KFILE test.\n");
 
-        if (kfile_testRun(&dflash_fd.fd, test_buf, save_buf, sizeof(test_buf)))
+        SILENT_ASSERT("bertos/drv/dataflash.c:405: Assertion failed: fd->fd.seek_pos + size <= fd->fd.size");
+        if (kfile_testRun(&dflash_fd.fd, test_buf, save_buf, sizeof(test_buf)) != EOF)
         {
                 LOG_INFO("KFILE test..ok\n");
         }
@@ -207,6 +208,20 @@ int main(void)
 {
         IRQ_ENABLE;
 	kdbg_init();
+
+	#if CONFIG_KERNEL
+                proc_init();
+        #endif
+
+        if (!dataflash_testSetup())
+        {
+                LOG_INFO("DATAFLASH setup..ok\n");
+        }
+        else
+        {
+                LOG_ERR("DATAFLASH setup..fail!\n");
+                return EOF;
+        }
 
 	dataflash_testRun();
 
