@@ -47,6 +47,11 @@
  * this is not really an error. To ignore that we mark it
  * with this macro, where str is the message string of the assert
  * that we want to drop.
+ * To use this macro copy the assert log message, and paste as argument
+ * of this macro. In assert message log is report also the number line
+ * of the code that have generate the assert in this way you can trap
+ * only the select assert message.
+ *
  */
 #define SILENT_ASSERT(str) \
 		kputs("SILENT_ASSERT:$"str"$\n")

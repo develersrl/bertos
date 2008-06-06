@@ -47,17 +47,17 @@
  * Use 1 to log the error and warning messages
  * Use 2 to log all messages
  */
-#define KFILE_LOG_LEVEL      2
+#define KFILE_LOG_LEVEL        2
 
 /**
  * Set logging verbosity.
  *
  * If verbosity is zero print short log messages.
  */
-#define KFILE_LOG_VERBOSITY    1
+#define KFILE_LOG_VERBOSITY    0
 
-/// TODO:
-#define CONFIG_KFILE_GETS 0
+/// Enable the gets function with echo.
+#define CONFIG_KFILE_GETS      0
 
 #endif /* CFG_KFILE_H */
 
