@@ -40,11 +40,28 @@
 #ifndef CFG_STEPPER_H
 #define CFG_STEPPER_H
 
+/**
+ * Logging level definition.
+ *
+ * Use 0 to log only the error messages
+ * Use 1 to log the error and warning messages
+ * Use 2 to log all messages
+ */
+#define STEPPER_LOG_LEVEL           2
+
+/**
+ * Set logging verbosity.
+ *
+ * If verbosity is zero print short log messages.
+ */
+#define STEPPER_LOG_VERBOSITY        0
+
+
 /// Max number of the stepper motor.
-#define CONFIG_NUM_STEPPER_MOTORS    1
+#define CONFIG_NUM_STEPPER_MOTORS    6
 
 /// Max number of the timer usable on target to drive stepper motor.
-#define CONFIG_TC_STEPPER_MAX_NUM 6
+#define CONFIG_TC_STEPPER_MAX_NUM    6
 
 #endif /* CFG_STEPPER_H */
 

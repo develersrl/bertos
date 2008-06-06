@@ -24,6 +24,11 @@
 #include "cfg/cfg_stepper.h"
 #include <cfg/debug.h>
 
+// Define logging setting (for cfg/log.h module).
+#define LOG_LEVEL         STEPPER_LOG_LEVEL
+#define LOG_VERBOSITY     STEPPER_LOG_VERBOSITY
+#include <cfg/log.h>
+
 #include <kern/proc.h>
 
 #include <algo/ramp.h>
@@ -131,10 +136,8 @@ INLINE void FAST_FUNC stepper_schedule_irq(struct Stepper* motor, stepper_time_t
 
 static void stepper_accel(struct Stepper *motor)
 {
-#ifdef _DEBUG
-	uint16_t old_val = motor->rampValue;
-	uint32_t old_clock = motor->rampClock;
-#endif
+	DB(uint16_t old_val = motor->rampValue;)
+	DB(uint32_t old_clock = motor->rampClock;)
 
 	const struct Ramp *ramp = &motor->cfg->ramp;
 
@@ -144,13 +147,12 @@ static void stepper_accel(struct Stepper *motor)
 	motor->rampClock += motor->rampValue;
 	motor->rampStep++;
 
-#ifdef _DEBUG
-	if (old_val && motor->rampValue > old_val)
+	DB(if (old_val && motor->rampValue > old_val)
 	{
-		kprintf("Runtime ramp error: (max=%x, min=%x)\n", ramp->clocksMaxWL, ramp->clocksMinWL);
-		kprintf("    %04x @ %lu   -->   %04x @ %lu\n", old_val, old_clock, motor->rampValue, motor->rampClock);
-	}
-#endif
+		LOG_ERR("Runtime ramp error: (max=%x, min=%x)\n", ramp->clocksMaxWL, ramp->clocksMinWL);
+		LOG_ERR("    %04x @ %lu   -->   %04x @ %lu\n", old_val, old_clock, motor->rampValue, motor->rampClock);
+	})
+
 }
 
 static void stepper_decel(struct Stepper *motor)
@@ -269,7 +271,7 @@ static void stepper_checkLevelSensor(struct Stepper* motor)
 			// record current position, disable check and stop motor
 			motor->stepsDeaf = DEAFSTEPS_DEFAULT;
 			motor->stepsLevel = motor->step;
-//			motor->stepToReach = motor->step + motor->rampStep * motor->dir;
+                        //motor->stepToReach = motor->step + motor->rampStep * motor->dir;
 
 			motor->stepToReach = motor->step;
 			motor->rampClock = motor->cfg->ramp.clocksMaxWL;
@@ -305,11 +307,11 @@ static enum StepperState FAST_FUNC FSM_run(struct Stepper *motor)
 
 	if (distance == 0)
 		// Position reached - stop motor
-		//				motor->speed = SPEED_STOPPED;
+		//motor->speed = SPEED_STOPPED;
 		motor->rampStep = -1;
-		//				motor->rampClock = motor->ramp->clocksMaxWL;
-		//				motor->rampValue = 0;
-		//				motor->rampClock = motor->rampValue = motor->ramp->clocksMaxWL;
+		//motor->rampClock = motor->ramp->clocksMaxWL;
+		//motor->rampValue = 0;
+		//motor->rampClock = motor->rampValue = motor->ramp->clocksMaxWL;
 
 	else if (distance <= motor->rampStep)
 		stepper_decel(motor);
@@ -500,7 +502,7 @@ static enum StepperState FSM_init(struct Stepper* motor)
 	 * That will be our absolute zero.
 	 */
 
-	motor->step = motor->cfg->stepsInHome - 1;	// start counting down steps in home
+	motor->step = motor->cfg->stepsInHome - 1; // start counting down steps in home
 	motor->stepToReach = 0;
 
 	stepper_schedule_irq(motor, motor->cfg->clocksHome, true);
@@ -510,7 +512,7 @@ static enum StepperState FSM_init(struct Stepper* motor)
 static enum StepperState FSM_entering(struct Stepper* motor)
 {
 	// We must be in home
-//	ASSERT(stepper_readHome(motor));
+	//ASSERT(stepper_readHome(motor));
 
 	// if while entering the sensor we are no more in home we reset the steps
 	// counter (optical sensor)
@@ -557,7 +559,7 @@ static enum StepperState FSM_outhome(struct Stepper* motor)
 
     // We must be out of home: once we are no more in home
     // we just need to move away, even if not very precide (optical sensor)
-	// ASSERT(!stepper_readHome(motor));
+    // ASSERT(!stepper_readHome(motor));
 
     if(motor->step >= motor->cfg->stepsOutHome)
     {
@@ -783,7 +785,7 @@ int16_t stepper_get_stepCircular(struct Stepper *motor)
 	return motor->stepCircular;
 }
 
-int16_t	stepper_scaleSteps(struct Stepper *motor, int16_t dir)
+int16_t stepper_scaleSteps(struct Stepper *motor, int16_t dir)
 {
 	int16_t steps;
 
@@ -808,14 +810,14 @@ int16_t	stepper_scaleSteps(struct Stepper *motor, int16_t dir)
 
 static void stepper_enableCheckHome(struct Stepper *motor, bool bDirPositive)
 {
-	enum MotorHomeSensorCheck value = MOTOR_HOMESENSOR_NOCHECK;   // default
+	enum MotorHomeSensorCheck value = MOTOR_HOMESENSOR_NOCHECK; // default
 
 	motor->stepsTollMin = 0;
 
-    if(	(motor->stepToReach != STEPS_INFINITE_POSITIVE) &&
+    if((motor->stepToReach != STEPS_INFINITE_POSITIVE) &&
 		(motor->stepToReach != STEPS_INFINITE_NEGATIVE)  )
 	{
-		if(bDirPositive)    //	else if(motor->dir == DIR_POSITIVE)
+		if(bDirPositive) // else if(motor->dir == DIR_POSITIVE)
 		{
 			/* if the direction is positive (movement from 0 position),
 			 * if the starting position is inside home and the target position
@@ -857,8 +859,8 @@ static void stepper_enableCheckHome(struct Stepper *motor, bool bDirPositive)
 /**
  * Move motor to absolute position at specified speed
  *
- * \arg steps	position to reach in steps
- * \arg speed	speed in timer ticks (use TIME2CLOCKS() to convert)
+ * \arg steps position to reach in steps
+ * \arg speed speed in timer ticks (use TIME2CLOCKS() to convert)
  */
 int16_t stepper_move(struct Stepper *motor, int16_t steps, uint16_t speed, int16_t deafstep)
 {
