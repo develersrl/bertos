@@ -35,9 +35,9 @@
  * This module implement a simple interface to use the multi level logging system.
  * The log message have the priority order, like this:
  *
- * - error message (most hight)
- * - warning message
- * - info message (most low)
+ * - #error message (most hight)
+ * - #warning message
+ * - #info message (most low)
  *
  * With this priority system we can log only the message that have egual or major
  * priority than log level that you has been configurate. Further you can have a
@@ -50,9 +50,9 @@
  * To use logging system you should include this module in your drive and use
  * a LOG_ERROR, LOG_WARNING and LOG_INFO macros to set the level log of the message.
  * Then you should define a LOG_LEVEL and LOG_VERBOSE costant in your
- * cfg/cfg_<your_module_name>.h using the follow police:
+ * \c cfg/cfg_<your_module_name>.h using the follow police:
  *
- * - in your file cfg/cfg_<module_name>.h, you define the logging
+ * - in your file \c cfg/cfg_<module_name>.h, you define the logging
  *   level and verbosity mode for your specific module:
  *
  * \code
@@ -93,7 +93,7 @@
  * macros, the module use the default setting (see below).
  *
  * WARNING: when use the log.h module, and you want to set a your log level
- * make sure to include this module after a cfg_<module_name>.h, because the
+ * make sure to include this module after a \c cfg_<module_name>.h, because the
  * LOG_LEVEL and LOG_VERBOSE macros must be define before to include log module,
  * otherwise the log module use a default settings.
  *
