@@ -142,7 +142,7 @@ do { \
 /*
  * Set control status macro
  */
-#warning This macro is not implemented (see below)
+#warning TODO: This macro is not implemented (see below)
 
 #define STEPPER_SET_CONTROL_BIT_MACRO(index, flag) do { \
 		/* if (flag) */ \
@@ -154,7 +154,7 @@ do { \
 /*
  * Set current power macro
  */
-#warning This macro is not implemented (see below)
+#warning TODO: This macro is not implemented (see below)
 
 #define STEPPER_SET_POWER_CURRENT_MACRO(index, flag) do { \
 		/* if (flag) */ \
