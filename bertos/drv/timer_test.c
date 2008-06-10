@@ -43,6 +43,7 @@
 
 #include <mware/event.h>
 
+#warning TODO:Refactor this test to comply whit BeRTOS test policy.
 
 static void timer_test_constants(void)
 {
@@ -65,7 +66,7 @@ static void timer_test_constants(void)
 	kprintf("ticks_to_us(100)=%lu\n", ticks_to_us(100));
 	kprintf("ticks_to_us(10000)=%lu\n", ticks_to_us(10000));
 	kprintf("\n");
-	kprintf("hptime_to_us(100)=%lu\n", hptime_to_us(100));
+	kprintf("hptime_to_us(100)=%ld\n", hptime_to_us(100));
 	kprintf("hptime_to_us(10000)=%lu\n", hptime_to_us(10000));
 	kprintf("us_to_hptime(100)=%lu\n", us_to_hptime(100));
 	kprintf("us_to_hptime(10000)=%lu\n", us_to_hptime(10000));

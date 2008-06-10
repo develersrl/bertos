@@ -51,16 +51,25 @@ INLINE void SET_MCP41_DDR(Mcp41Dev dev)
 		/* Implement me! */
 		//Warning: this funtions is like avr target name,
 		//fix it to comply for all target.
+
+		//Only for test remove when implement this function
+		(void)dev;
 }
 
 INLINE void MCP41_ON(Mcp41Dev i)
 {
 		/* Implement me! */
+
+		//Only for test remove when implement this function
+		(void)i;
 }
 
 INLINE void MCP41_OFF(Mcp41Dev i)
 {
 		/* Implement me! */
+
+		//Only for test remove when implement this function
+		(void)i;
 }
 
 #endif /* HW_MCP41_H */

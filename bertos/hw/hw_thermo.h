@@ -119,7 +119,7 @@ INLINE void thermo_hw_off(ThermoDev dev)
 	switch (dev)
 	{
 	case THERMO_TEST:
-		phase_setPower(TRIAC_TEST, 0); 
+		phase_setPower(TRIAC_TEST, 0);
 		break;
 
 	/* Put here a thermo device to turn off */
