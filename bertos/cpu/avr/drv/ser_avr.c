@@ -31,32 +31,10 @@
  *
  * -->
  *
- * \brief AVR UART and SPI I/O driver
- *
- * Rationale for project_ks hardware.
- *
- * The serial 0 on the board_kf board is used to communicate with the
- * smart card, which has the TX and RX lines connected together. To
- * allow the smart card to drive the RX line of the CPU the CPU TX has
- * to be in a high impedance state.
- * Whenever a transmission is done and there is nothing more to send
- * the transmitter is turn off. The output pin is held in input with
- * pull-up enabled, to avoid capturing noise from the nearby RX line.
- *
- * The line on the KBus port must keep sending data, even when
- * there is nothing to transmit, because a burst data transfer
- * generates noise on the audio channels.
- * This is accomplished using the multiprocessor mode of the
- * ATmega64/128 serial.
- *
- * The receiver keeps the MPCM bit always on. When useful data
- * is trasmitted the address bit is set. The receiver hardware
- * consider the frame as address info and receive it.
- * When useless fill bytes are sent the address bit is cleared
- * and the receiver will ignore them, avoiding useless triggering
- * of RXC interrupt.
+ * \brief AVR UART and SPI I/O driver (Implementation)
  *
  * \version $Id$
+ *
  * \author Bernardo Innocenti <bernie@develer.com>
  * \author Stefano Fedrigo <aleph@develer.com>
  */
