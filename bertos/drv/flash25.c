@@ -59,7 +59,7 @@
 #include <kern/proc.h>
 #endif
 
-#warning this file was change, but is untest!
+#warning FIXME:This file was change, but is untest!
 
 /**
  * Wait until flash memory is ready.
@@ -178,7 +178,7 @@ static size_t flash25_read(struct KFile *_fd, void *buf, size_t size)
 
 	KFileFlash25 *fd = KFILEFLASH25(_fd);
 
-	ASSERT(fd->fd.seek_pos + size <= fd->fd.size);
+	ASSERT(fd->fd.seek_pos + (kfile_size_t)size <= fd->fd.size);
 	size = MIN((kfile_size_t)size, fd->fd.size - fd->fd.seek_pos);
 
 	//kprintf("Reading at addr[%lu], size[%d]\n", fd->seek_pos, size);
@@ -231,7 +231,7 @@ static size_t flash25_write(struct KFile *_fd, const void *_buf, size_t size)
 
 	KFileFlash25 *fd = KFILEFLASH25(_fd);
 
-	ASSERT(fd->fd.seek_pos + size <= fd->fd.size);
+	ASSERT(fd->fd.seek_pos + (kfile_size_t)size <= fd->fd.size);
 
 	size = MIN((kfile_size_t)size, fd->fd.size - fd->fd.seek_pos);
 

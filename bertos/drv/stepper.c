@@ -313,7 +313,7 @@ static enum StepperState FAST_FUNC FSM_run(struct Stepper *motor)
 		//motor->rampValue = 0;
 		//motor->rampClock = motor->rampValue = motor->ramp->clocksMaxWL;
 
-	else if (distance <= motor->rampStep)
+	else if (distance <= (uint16_t)motor->rampStep)
 		stepper_decel(motor);
 
 	// check whether the velocity must be changed
