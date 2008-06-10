@@ -75,7 +75,7 @@ bool flash25_test(KFile *channel)
 	 * Launche a kfile test interface.
 	 */
 	kprintf("Kfile test start..\n");
-	if (!kfile_test(&fd.fd, test_buf, NULL, sizeof(test_buf)))
+	if (!kfile_testRun(&fd.fd, test_buf, NULL, sizeof(test_buf)))
 		return false;
 
 	return true;
