@@ -42,6 +42,9 @@
 #define DRV_PWM_H
 
 #include "hw/pwm_map.h"
+
+#include <cpu/attr.h>
+
 #include CPU_HEADER(pwm)
 
 #include <cfg/compiler.h>

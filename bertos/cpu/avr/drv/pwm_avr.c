@@ -45,6 +45,22 @@
 #warning TODO:This is an exmple of implementation of PWM low level channel for AVR, implemnt it!
 
 /**
+ * Set PWM polarity to select pwm channel
+ */
+void pwm_hw_setPolarity(PwmDev dev, bool pol)
+{
+
+	/*
+	 * Put here a code to PWM polarity of select
+	 * PWM channel
+	 */
+
+	//Only for test remove when implement this function
+	(void)dev;
+	(void)pol;
+}
+
+/**
  * Get preiod from select channel
  *
  * \a dev channel
@@ -55,6 +71,9 @@ pwm_period_t pwm_hw_getPeriod(PwmDev dev)
 	 * Put here a code to get period value of select
 	 * PWM channel
 	 */
+
+	//Only for test remove when implement this function
+	(void)dev;
 
 	return 0;
 }
@@ -71,7 +90,10 @@ void pwm_hw_setFrequency(PwmDev dev, uint32_t freq)
 	 * PWM channel
 	 */
 
-// 	TRACEMSG("PWM ch[%d] period[%d]", dev, period);
+	//Only for test remove when implement this function
+	(void)dev;
+	(void)freq;
+
 }
 
 /**
@@ -86,7 +108,10 @@ void pwm_hw_setDutyUnlock(PwmDev dev, uint16_t duty)
 	 * PWM channel
 	 */
 
-// 	TRACEMSG("PWM ch[%d] duty[%d], period[%ld]", dev, duty, *pwm_map[dev].period_reg);
+	//Only for test remove when implement this function
+	(void)dev;
+	(void)duty;
+
 }
 
 
@@ -96,9 +121,12 @@ void pwm_hw_setDutyUnlock(PwmDev dev, uint16_t duty)
 void pwm_hw_enable(PwmDev dev)
 {
 	/*
-	 * Put here a code to enable 
+	 * Put here a code to enable
 	 * a select PWM channel
 	 */
+
+	//Only for test remove when implement this function
+	(void)dev;
 }
 
 /**
@@ -107,9 +135,12 @@ void pwm_hw_enable(PwmDev dev)
 void pwm_hw_disable(PwmDev dev)
 {
 	/*
-	 * Put here a code to disable 
+	 * Put here a code to disable
 	 * a select PWM channel
 	 */
+
+	//Only for test remove when implement this function
+	(void)dev;
 }
 
 
@@ -119,8 +150,11 @@ void pwm_hw_disable(PwmDev dev)
 void pwm_hw_init(void)
 {
 	/*
-	 * Put here a code to init 
+	 * Put here a code to init
 	 * a PWM hawdware
 	 */
 }
+
+
+
 
