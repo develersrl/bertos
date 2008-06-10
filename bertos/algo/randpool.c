@@ -66,10 +66,11 @@ static void randpool_push(EntropyPool *pool, void *_byte, size_t n_byte)
 	/*
 	 * Insert a bytes in entropy pool.
 	 */
-	for(int j = 0; j < n_byte; j++)
+	for(size_t j = 0; j < n_byte; j++)
 	{
 		pool->pool_entropy[i] = pool->pool_entropy[i] ^ byte[j];
-		i = (++i) % CONFIG_SIZE_ENTROPY_POOL;
+		i++;
+		i = i % CONFIG_SIZE_ENTROPY_POOL;
 	}
 
 	pool->pos_add  =  i; // Update a insert bytes.
@@ -92,7 +93,7 @@ static void randpool_stir(EntropyPool *pool)
 
 	for (int i = 0; i < (CONFIG_SIZE_ENTROPY_POOL / MD2_DIGEST_LEN); i++)
 	{
-		sprintf(tmp_buf, "%0x%0x%0x",pool->counter, i, pool->pos_add);
+		sprintf((char *)tmp_buf, "%0x%0x%0x", pool->counter, i, pool->pos_add);
 
 		/*
 		 * Hash with MD2 algorithm the entropy pool.
@@ -244,10 +245,6 @@ void randpool_get(EntropyPool *pool, void *_data, size_t n_byte)
 
 	pool->pos_get = i; //Current number of byte we get from pool.
 	pool->entropy -= n_byte; //Update a entropy.
-
-	/*If we get all entropy entropy is 0*/
-	if(pool->entropy < 0) 
-		pool->entropy = 0;
 
 }
 
