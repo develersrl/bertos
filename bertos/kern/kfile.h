@@ -45,8 +45,8 @@
  * \code
  * typedef struct KFileSerial
  * {
- * 	KFile fd;
- * 	Serial *ser;
+ *		KFile fd;
+ *		Serial *ser;
  * } KFileSerial;
  * \endcode
  *
@@ -55,8 +55,8 @@
  * \code
  * INLINE KFileSerial * KFILESERIAL(KFile *fd)
  * {
- * 	ASSERT(fd->_type == KFT_SERIAL);
- * 	return (KFileSerial *)fd;
+ *		ASSERT(fd->_type == KFT_SERIAL);
+ *		return (KFileSerial *)fd;
  * }
  * \endcode
  *
@@ -67,9 +67,9 @@
  * \code
  * static int ser_kfile_close(struct KFile *fd)
  * {
- * 	KFileSerial *fds = KFILESERIAL(fd);
- * 	ser_close(fds->ser);
- * 	return 0;
+ *		KFileSerial *fds = KFILESERIAL(fd);
+ *		ser_close(fds->ser);
+ *		return 0;
  * }
  * \endcode
  * KFILESERIAL macro helps to ensure that obj passed is really a Serial.
@@ -80,6 +80,7 @@
  * are demanded to specific driver implementation.
  *
  * \version $Id$
+ *
  * \author Bernardo Innocenti <bernie@develer.com>
  * \author Francesco Sacchi <batt@develer.com>
  * \author Daniele Basile <asterix@develer.com>
@@ -262,7 +263,7 @@ INLINE void kfile_clearerr(struct KFile *fd)
 /**
  * Kfile test function.
  */
-int kfile_testSetup(void);
+int kfile_testSetUp(void);
 int kfile_testRun(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size);
 int kfile_testTearDown(void);
 

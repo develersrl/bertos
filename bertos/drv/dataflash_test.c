@@ -109,9 +109,9 @@ static uint8_t save_buf[DATAFLASH_TEST_STR_LEN];
  * Setup all needed to test dataflash memory
  *
  */
-int dataflash_testSetup(void)
+int dataflash_testSetUp(void)
 {
-        kfile_testSetup();
+        kfile_testSetUp();
         LOG_INFO("KFILE setup..ok\n");
 
         LOG_INFO("Check if kernel is enable (if enable you should see the assert message.)\n");
@@ -213,7 +213,7 @@ int main(void)
                 proc_init();
         #endif
 
-        if (!dataflash_testSetup())
+        if (!dataflash_testSetUp())
         {
                 LOG_INFO("DATAFLASH setup..ok\n");
         }
@@ -223,7 +223,7 @@ int main(void)
                 return EOF;
         }
 
-	dataflash_testRun();
+		dataflash_testRun();
 
         for(;;)
         {

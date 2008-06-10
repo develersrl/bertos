@@ -106,7 +106,7 @@ static bool kfile_rwTest(KFile *f, uint8_t *buf, size_t size)
 /**
  * Setup all needed for kfile test
  */
-int kfile_testSetup(void)
+int kfile_testSetUp(void)
 {
         MOD_INIT(kfile_test);
         LOG_INFO("Mod init..ok\n");
@@ -123,7 +123,7 @@ int kfile_testSetup(void)
  */
 int kfile_testRun(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size)
 {
-        kfile_testSetup();
+        kfile_testSetUp();
 
 	/*
 	 * Part of test buf size that you would write.
@@ -134,8 +134,8 @@ int kfile_testRun(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size)
 
 
 	/* Fill test buffer */
- 	for (size_t i = 0; i < size; i++)
- 		test_buf[i] = (i & 0xff);
+	for (size_t i = 0; i < size; i++)
+		test_buf[i] = (i & 0xff);
 
 	/*
 	 * If necessary, user can save content,

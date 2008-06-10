@@ -190,7 +190,7 @@ bool dataflash_init(KFileDataflash *fd, KFile *ch, DataflashType type, dataflash
  *
  * (see drv/datafalsh_test.c for more detail)
  */
-int dataflash_testSetup(void);
+int dataflash_testSetUp(void);
 int dataflash_testRun(void);
 int dataflash_testTearDown(void);
 

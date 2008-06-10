@@ -119,7 +119,7 @@ static PwmTest pwm_test_cfg[PWM_CNT] =
  * Setup all needed to test PWM on AT91
  *
  */
-int pwm_testSetup(void)
+int pwm_testSetUp(void)
 {
 	LOG_INFO("Init pwm..");
 	pwm_init();
@@ -138,7 +138,7 @@ int pwm_testRun(void)
         int duty = 0;
         int delay = 0;
 
-        pwm_testSetup();
+        pwm_testSetUp();
 
         LOG_INFO("\n\n===== BeRTOS PWM test =====\n\n");
 

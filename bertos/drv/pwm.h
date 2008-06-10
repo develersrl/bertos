@@ -77,7 +77,7 @@ void pwm_init(void);
  * See pwm_test.c for implemntation of these functions.
  */
 int pwm_testRun(void);
-int pwm_testSetup(void);
+int pwm_testSetUp(void);
 int pwm_testTearDown(void);
 
 #endif /* DRV_PWM_H */
