@@ -33,7 +33,7 @@
  * \brief Phase control hardware-specific definitions
  *
  * \version $Id$
- * 
+ *
  * \author Francesco Sacchi <batt@develer.com>
  */
 
@@ -51,12 +51,18 @@
 INLINE void TRIAC_OFF(TriacDev i)
 {
 		/* Implement me! */
+
+		//Only for test remove when implement this function
+		(void)i;
 }
 
 
 INLINE void TRIAC_ON(TriacDev i)
 {
 		/* Implement me! */
+
+		//Only for test remove when implement this function
+		(void)i;
 }
 
 

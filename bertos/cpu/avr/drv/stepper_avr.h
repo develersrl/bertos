@@ -72,6 +72,9 @@ typedef struct TimerCounter
 INLINE void stepper_tc_irq_enable(struct TimerCounter *timer)
 {
 		/* put here code to enable timer irq */
+
+		//Only for test remove when implement this function
+		(void)timer;
 }
 
 
@@ -81,6 +84,9 @@ INLINE void stepper_tc_irq_enable(struct TimerCounter *timer)
 INLINE void  stepper_tc_irq_disable(struct TimerCounter *timer)
 {
 		/* put here code to disable timer irq */
+
+		//Only for test remove when implement this function
+		(void)timer;
 }
 
 /**
@@ -89,6 +95,10 @@ INLINE void  stepper_tc_irq_disable(struct TimerCounter *timer)
 INLINE void  stepper_tc_setDelay(struct TimerCounter *timer, stepper_time_t delay)
 {
 		/* put here code to set the delay for next irq */
+
+		//Only for test remove when implement this function
+		(void)timer;
+		(void)delay;
 }
 
 
@@ -98,6 +108,9 @@ INLINE void  stepper_tc_setDelay(struct TimerCounter *timer, stepper_time_t dela
 INLINE void  stepper_tc_resetTimer(struct TimerCounter *timer)
 {
 		/* put here code to reset the timer */
+
+		//Only for test remove when implement this function
+		(void)timer;
 }
 
 /**
@@ -106,6 +119,9 @@ INLINE void  stepper_tc_resetTimer(struct TimerCounter *timer)
 INLINE void FAST_FUNC stepper_tc_doPulse(struct TimerCounter *timer)
 {
 		/* put here code to generate a pulse */
+
+		//Only for test remove when implement this function
+		(void)timer;
 }
 
 /**
@@ -114,6 +130,9 @@ INLINE void FAST_FUNC stepper_tc_doPulse(struct TimerCounter *timer)
 INLINE void FAST_FUNC stepper_tc_skipPulse(struct TimerCounter *timer)
 {
 		/* put here code to skip a pulse */
+
+		//Only for test remove when implement this function
+		(void)timer;
 }
 
 void stepper_tc_setup(int index, stepper_isr_t callback, struct Stepper *motor);

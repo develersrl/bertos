@@ -48,31 +48,45 @@
 INLINE bool hw_home_sensor_read(int sensor)
 {
 		/* Implement me! */
-		
+
+		//Only for test remove when implement this function
+		(void)sensor;
 		return 0;
 }
 
 INLINE void hw_home_sensor_set_inverted(int sensor, bool inverted)
 {
 		/* Implement me! */
+
+		//Only for test remove when implement this function
+		(void)sensor;
+		(void)inverted;
 }
 
 INLINE bool hw_level_sensor_read(int sensor)
 {
 		/* Implement me! */
-		
+
+		//Only for test remove when implement this function
+		(void)sensor;
 		return 0;
 }
 
 INLINE void hw_level_sensor_set_inverted(int sensor, bool inverted)
 {
 		/* Implement me! */
+
+		//Only for test remove when implement this function
+		(void)sensor;
+		(void)inverted;
 }
 
 INLINE bool bld_hw_sensor_read(int sensor)
 {
 		/* Implement me! */
-		
+
+		//Only for test remove when implement this function
+		(void)sensor;
 		return 0;
 }
 
