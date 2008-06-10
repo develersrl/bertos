@@ -340,7 +340,7 @@ bool md2_test(void)
 	};
 
 
-	const uint8_t *result[] = {
+	const char *result[] = {
 		"\x83\x50\xe5\xa3\xe2\x4c\x15\x3d\xf2\x27\x5c\x9f\x80\x69\x27\x73",
 		"\xab\x4f\x49\x6b\xfb\x2a\x53\x0b\x21\x9f\xf3\x30\x31\xfe\x06\xb0",
 		"\x4e\x8d\xdf\xf3\x65\x02\x92\xab\x5a\x41\x08\xc3\xaa\x47\x94\x0b",
@@ -348,7 +348,7 @@ bool md2_test(void)
 	};
 
 
-	for (int i = 0; i < countof(test); i++)
+	for (size_t i = 0; i < countof(test); i++)
 	{
 		md2_init(&context);
 		md2_update(&context, test[i], strlen(test[i]));
