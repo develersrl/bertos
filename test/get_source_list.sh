@@ -47,10 +47,10 @@ if [ $# \< 2 ] ; then
 fi
 
 #Create a list of source file whitout a cpu specific source
-GEN_SRC=`find . \( -name '\.svn' -prune -o -path $CPU_DIR -prune -o -path $APP_DIR  -prune -o -path $OS_DIR -prune -o -path $EMUL_DIR -prune \) -o -name "*.${2}" -print | xargs`
+GEN_SRC=`find . \( -name \.svn -prune -o -path $CPU_DIR -prune -o -path $APP_DIR  -prune -o -path $OS_DIR -prune -o -path $EMUL_DIR -prune \) -o -name *.${2} -print | xargs`
 
 #Select c and asm sources for selected cpu target
-TRG_SRC=`find ${CPU_DIR}/${1} -name "\.svn" -prune -o -name "*.${2}" -print | xargs`
+TRG_SRC=`find ${CPU_DIR}/${1} -name \.svn -prune -o -name *.${2} -print | xargs`
 
 #Generate a list of all source for each cpu
 SRC_ALL=${GEN_SRC}" "${TRG_SRC}
