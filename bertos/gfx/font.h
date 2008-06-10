@@ -30,18 +30,19 @@
  *
  * -->
  *
+ * \brief Font 8x6 IBM-PC 8bit
+ *
  * \version $Id$
  *
  * \author Stefano Fedrigo <aleph@develer.com>
  *
- * \brief Font 8x6 IBM-PC 8bit
  */
 
 #ifndef GFX_FONT_H
 #define GFX_FONT_H
 
-#include <cfg/compiler.h> /* uint8_t */
-#include <mware/pgm.h> /* PROGMEM */
+#include <cfg/compiler.h>  /* uint8_t */
+#include <mware/pgm.h>     /* PROGMEM */
 
 typedef struct Font
 {
@@ -51,7 +52,7 @@ typedef struct Font
 	 * Data is an array of at most 256 glyphs packed together.
 	 * Raster format must be the same of the bitmap.
 	 */
-	const PROGMEM uint8_t *glyph;
+	const pgm_uint8_t *glyph;
 
 	uint8_t width;     /**< Pixel width of character cell. */
 	uint8_t height;    /**< Pixel height of character cell. */
@@ -60,8 +61,8 @@ typedef struct Font
 	uint8_t last;      /**< Last encoded character in glyph array (inclusive). */
 
 	/** Array of glyph offsets in bytes. NULL for fixed-width fonts. */
-	const PROGMEM uint16_t *offset;
-	const PROGMEM uint8_t *widths;
+	const pgm_uint16_t *offset;
+	const pgm_uint8_t  *widths;
 
 } Font;
 
