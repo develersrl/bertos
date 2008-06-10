@@ -96,8 +96,8 @@ static bool kfile_rwTest(KFile *f, uint8_t *buf, size_t size)
 	/*
 	 * Check test result
 	 */
- 	for (size_t i = 0; i < size; i++)
- 		if (buf[i] != (i & 0xff))
+	for (size_t i = 0; i < size; i++)
+		if (buf[i] != (i & 0xff))
 			return false;
 
 	return true;
