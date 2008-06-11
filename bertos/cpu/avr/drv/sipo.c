@@ -42,8 +42,10 @@
  *
  */
 
-#include <drv/ser.h>
 #include "sipo.h"
+#include "hw/hw_sipo.h"
+
+#include <drv/ser.h>
 
 Serial *sipo_port;
 
@@ -67,9 +69,13 @@ void sipo_putchar(uint8_t c)
 	for(int i = 0; i <= 7; i++)
 	{
 		if((c & BV(i)) == 0)
+		{
 			SET_SOUT_LOW;
+		}
 		else
+		{
 			SET_SOUT_HIGH;
+		}
 
 		CLOCK_PULSE;
 	}
