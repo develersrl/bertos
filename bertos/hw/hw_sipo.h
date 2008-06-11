@@ -44,19 +44,19 @@
 
 #warning TODO:This is an example implementation, you must implement it!
 
-#define LOAD_HIGH       /* Implement me! */   
-#define LOAD_LOW        /* Implement me! */     
-#define LOAD_INIT       /* Implement me! */   
-#define SET_SCK_OUT     /* Implement me! */   
-#define SET_SOUT_OUT    /* Implement me! */   
-#define CLOCK_HIGH      /* Implement me! */   
-#define CLOCK_LOW       /* Implement me! */   
-#define SET_SOUT_HIGH   /* Implement me! */   
-#define SET_SOUT_LOW    /* Implement me! */   
-#define CLOCK_PULSE     /* Implement me! */   
+#define LOAD_HIGH       /* Implement me! */
+#define LOAD_LOW        /* Implement me! */
+#define LOAD_INIT       /* Implement me! */
+#define SET_SCK_OUT     /* Implement me! */
+#define SET_SOUT_OUT    /* Implement me! */
+#define CLOCK_HIGH      /* Implement me! */
+#define CLOCK_LOW       /* Implement me! */
+#define SET_SOUT_HIGH   /* Implement me! */
+#define SET_SOUT_LOW    /* Implement me! */
+#define CLOCK_PULSE     /* Implement me! */
 
-#define OE_OUT        
-#define OE_LOW        
+#define OE_OUT
+#define OE_LOW
 
 
 #endif /* HW_SIPO_H */
