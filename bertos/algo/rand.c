@@ -37,7 +37,11 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-/* This would really belong to libc */
+#include "rand.h"
+
+/**
+ *  This would really belong to libc
+ */
 int rand(void)
 {
 	static unsigned long seed;
