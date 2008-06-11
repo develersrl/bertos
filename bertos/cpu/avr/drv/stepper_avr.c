@@ -51,14 +51,16 @@
 #warning TODO:This is an example, you must implement it!
 
 ///< Static array of timer counter struct for stepper.
-static struct TimerCounter stepper_timers[CONFIG_TC_STEPPER_MAX_NUM] =
-{
-	{ //Timer Counter settings for TIO0 output pin
-			/* fill with stepper timer channel settings */
-	}
+/*
+	static struct TimerCounter stepper_timers[CONFIG_TC_STEPPER_MAX_NUM] =
+	{
+		{ //Timer Counter settings for TIO0 output pin
+				// fill with stepper timer channel settings
+		}
 
-	/* Add here other stepper timer channel settings */
-};
+		// Add here other stepper timer channel settings
+	};
+*/
 
 /**
  * Timer couter setup.
@@ -69,6 +71,11 @@ static struct TimerCounter stepper_timers[CONFIG_TC_STEPPER_MAX_NUM] =
 void stepper_tc_setup(int index, stepper_isr_t callback, struct Stepper *motor)
 {
 	/* Put here the code to setup the stepper timer drive */
+
+	//Only for test remove when implement this function
+	(void)index;
+	(void)callback;
+	(void)motor;
 }
 
 /**
