@@ -55,10 +55,7 @@
 #include <gui/menubar.h>
 #endif
 
-// BEGIN project_grl LOCAL
 #include <drv/lcd_gfx.h>
-#include <gui/guiman.h>
-// END project_grl LOCAL
 
 #warning FIXME: Revise me!
 
@@ -267,17 +264,8 @@ void level_edit(struct LevelEdit *lev)
 					}
 				#endif
 
-// BEGIN project_grl LOCAL
-#if 1
-				//FIXME: must to this only when needed
-				lcd_blitBitmap(&lcd_bitmap);
-			}
-			while (!(keys = GuiMan_KbdPeek()));
-#else
 			}
 			while (!(keys = kbd_peek()));
-#endif
-// END project_grl LOCAL
 
 			if (keys & K_CANCEL)
 				break;

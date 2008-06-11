@@ -5728,9 +5728,13 @@ static const PROGMEM uint8_t font_10x20_glyphs[] = {
 0x0000, 0x0000, 
 };
 
+#warning TODO: Fill the structure with missing parameter (see font.h for more detail).
 /* Exported structure definition. */
+#if 0
 Font font_10x20 = {
   font_10x20_glyphs,
   10,
   20
 };
+#endif
+
