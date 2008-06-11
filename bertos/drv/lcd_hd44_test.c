@@ -38,10 +38,13 @@
  */
 
 #include "lcd_hd44.h"
-
 #include "hw/hw_lcd.h"
 
 #include <drv/timer.h>
+
+#warning TODO:Refactor this test to comply whit BeRTOS test policy.
+
+#ifdef _TEST
 
 void lcd_hw_test(void)
 {
@@ -75,7 +78,6 @@ void lcd_hw_test(void)
 }
 
 
-#ifdef _TEST
 
 #include <drv/timer.c>
 #include <drv/lcd_hd44.c>

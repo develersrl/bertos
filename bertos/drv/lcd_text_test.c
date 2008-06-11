@@ -38,7 +38,7 @@
  *
  */
 
-#warning FIXME:This test is incomplete, you must review!
+#warning TODO:This test is incomplete, you must review!
 
 #if 0
 void lcd_test(void)

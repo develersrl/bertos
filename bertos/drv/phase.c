@@ -50,8 +50,9 @@
 
 #include <math.h>
 
-#warning FIXME:Generalize this moduele for all target supported.
+#warning TODO:Generalize this moduele for all target supported.
 
+#if 0
 /** Array  of triacs */
 static Triac triacs[TRIAC_CNT];
 
@@ -191,3 +192,5 @@ void phase_init(void)
 	DB(phase_initialized = true;)
 	IRQ_RESTORE(flags);
 }
+#endif
+

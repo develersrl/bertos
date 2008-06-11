@@ -45,6 +45,8 @@
 
 #warning TODO:Refactor this test to comply whit BeRTOS test policy.
 
+#ifdef _TEST
+
 static void timer_test_constants(void)
 {
 	kprintf("TIMER_HW_HPTICKS_PER_SEC=%lu\n", TIMER_HW_HPTICKS_PER_SEC);
@@ -127,7 +129,6 @@ static void timer_test_poll(void)
 	}
 }
 
-#ifdef _TEST
 
 #include "timer.c"
 #include "mware/event.c"
