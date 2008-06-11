@@ -213,7 +213,7 @@ static void movePages(struct BattFsSuper *disk, pgcnt_t src, int offset)
 {
 	pgcnt_t dst = src + offset;
 	memmove(&disk->page_array[dst], &disk->page_array[src], (disk->page_count - MAX(dst, src)) * sizeof(pgcnt_t));
-	
+
 	if (offset < 0)
 	{
 		/* Fill empty space in array with sentinel */

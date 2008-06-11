@@ -33,6 +33,7 @@
  * \brief LM044L type LCD hardware module (impl.)
  *
  * \version $Id$
+ *
  * \author Bernardo Innocenti <bernie@develer.com>
  * \author Stefano Fedrigo <aleph@develer.com>
  */

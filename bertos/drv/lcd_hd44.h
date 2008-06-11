@@ -33,6 +33,7 @@
  * \brief Hitachi HD44780 and clones LCD module (interface)
  *
  * \version $Id$
+ *
  * \author Bernardo Innocenti <bernie@develer.com>
  * \author Stefano Fedrigo <aleph@develer.com>
  */

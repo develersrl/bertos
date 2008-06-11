@@ -50,8 +50,8 @@
 #include <cfg/compiler.h>
 
 #define PWM_MAX_DUTY              ((pwm_duty_t)0xFFFF)
-#define PWM_MAX_PERIOD            0xFFFF
-#define PWM_MAX_PERIOD_LOG2           16
+#define PWM_MAX_PERIOD                         0xFFFF
+#define PWM_MAX_PERIOD_LOG2                        16
 
 /**
  * PWM type define.
