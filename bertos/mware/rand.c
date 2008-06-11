@@ -38,7 +38,7 @@
  */
 
 /* This would really belong to libc */
-static int rand(void)
+int rand(void)
 {
 	static unsigned long seed;
 
