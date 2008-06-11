@@ -38,6 +38,7 @@
  */
 
 #include "blanker.h"
+#include "hw/hw_blanker.h"
 
 #include <drv/kbd.h>
 #include <drv/timer.h>
@@ -45,10 +46,6 @@
 /* Time without input events before starting blanker */
 #define BLK_BLANKTIMEOUT	(15 * 1000)	/* ms */
 
-// TODO: move to blanker_hw.h
-#include <drv/power.h>
-#define BLK_LCDON	power_LcdOn()
-#define BLK_LCDOFF	power_LcdOff()
 
 #warning FIXME:Revise me!
 
@@ -222,3 +219,4 @@ void blk_disable(void)
 		blk_enabled = false;
 	}
 }
+
