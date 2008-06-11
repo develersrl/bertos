@@ -351,7 +351,7 @@ static size_t dataflash_read(struct KFile *_fd, void *buf, size_t size)
 	uint8_t *data = (uint8_t *)buf;
 
 
-	ASSERT(fd->fd.seek_pos + size <= fd->fd.size);
+	ASSERT(fd->fd.seek_pos + size <= (kfile_off_t)fd->fd.size);
 	size = MIN((kfile_size_t)size, fd->fd.size - fd->fd.seek_pos);
 
 	LOG_INFO("Reading at pos[%lu]\n", fd->fd.seek_pos);
@@ -402,7 +402,7 @@ static size_t dataflash_write(struct KFile *_fd, const void *_buf, size_t size)
 
 	const uint8_t *data = (const uint8_t *) _buf;
 
-	ASSERT(fd->fd.seek_pos + size <= fd->fd.size);
+	ASSERT(fd->fd.seek_pos + size <= (kfile_off_t)fd->fd.size);
 	size = MIN((kfile_size_t)size, fd->fd.size - fd->fd.seek_pos);
 
 	LOG_INFO("Writing at pos[%lu]\n", fd->fd.seek_pos);
