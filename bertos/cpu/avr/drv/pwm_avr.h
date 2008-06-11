@@ -67,6 +67,7 @@ void pwm_hw_setFrequency(PwmDev dev, uint32_t freq);
 void pwm_hw_setDutyUnlock(PwmDev dev, uint16_t duty);
 void pwm_hw_disable(PwmDev dev);
 void pwm_hw_enable(PwmDev dev);
+void pwm_hw_setPolarity(PwmDev dev, bool pol);
 pwm_period_t pwm_hw_getPeriod(PwmDev dev);
 
 #endif /* DRV_ADC_AT91_H */

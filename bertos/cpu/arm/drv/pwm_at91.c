@@ -41,6 +41,12 @@
 #include "pwm_at91.h"
 #include "hw/pwm_map.h"
 #include "hw/hw_cpu.h"
+#include "cfg/cfg_pwm.h"
+
+// Define logging setting (for cfg/log.h module).
+#define LOG_LEVEL         PWM_LOG_LEVEL
+#define LOG_VERBOSITY     PWM_LOG_VERBOSITY
+#include <cfg/log.h>
 
 #include <cfg/macros.h>
 #include <cfg/debug.h>
@@ -116,7 +122,7 @@ void pwm_hw_setFrequency(PwmDev dev, uint32_t freq)
 	for(int i = 0; i <= PWM_HW_MAX_PRESCALER_STEP; i++)
 	{
 		period = CLOCK_FREQ / (BV(i) * freq);
-// 		TRACEMSG("period[%ld], prescale[%d]", period, i);
+// 		LOG_INFO("period[%ld], prescale[%d]\n", period, i);
 		if ((period < PWM_HW_MAX_PERIOD) && (period != 0))
 		{
 			//Clean previous channel prescaler, and set new
@@ -128,7 +134,7 @@ void pwm_hw_setFrequency(PwmDev dev, uint32_t freq)
 		}
 	}
 
- 	TRACEMSG("PWM ch[%d] period[%ld]", dev, period);
+ 	LOG_INFO("PWM ch[%d] period[%ld]\n", dev, period);
 }
 
 /**
@@ -159,8 +165,8 @@ void pwm_hw_setDutyUnlock(PwmDev dev, uint16_t duty)
          */
         if (pwm_map[dev].pol)
         {
-            duty = (uint16_t)*pwm_map[dev].period_reg - duty;
-//            TRACEMSG("Inverted duty[%d], pol[%d]", duty, pwm_map[dev].pol);
+                duty = (uint16_t)*pwm_map[dev].period_reg - duty;
+				LOG_INFO("Inverted duty[%d], pol[%d]\n", duty, pwm_map[dev].pol);
         }
 
 		PWM_PIO_PDR = pwm_map[dev].pwm_pin;
@@ -170,7 +176,7 @@ void pwm_hw_setDutyUnlock(PwmDev dev, uint16_t duty)
 
 	PWM_ENA = BV(dev);
 
-// 	TRACEMSG("PWM ch[%d] duty[%d], period[%ld]", dev, duty, *pwm_map[dev].period_reg);
+	LOG_INFO("PWM ch[%d] duty[%d], period[%ld]\n", dev, duty, *pwm_map[dev].period_reg);
 }
 
 
@@ -196,8 +202,8 @@ void pwm_hw_disable(PwmDev dev)
  */
 void pwm_hw_setPolarity(PwmDev dev, bool pol)
 {
-	pwm_map[dev].pol = pol;
-//    TRACEMSG("Set pol[%d]", pwm_map[dev].pol);
+        pwm_map[dev].pol = pol;
+		LOG_INFO("Set pol[%d]\n", pwm_map[dev].pol);
 }
 
 /**
