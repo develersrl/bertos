@@ -135,7 +135,7 @@ int pwm_testSetUp(void)
  */
 int pwm_testRun(void)
 {
-        int duty = 0;
+        pwm_duty_t duty = 0;
         int delay = 0;
 
         pwm_testSetUp();
@@ -187,7 +187,7 @@ int pwm_testRun(void)
                 }
 
                 //Reset duty cycle overflow
-                if (duty >= 0xFFFF)
+                if (duty >= (pwm_duty_t)0xFFFF)
                 {
                         duty = 0;
                         for (int i = 0; i < PWM_CNT; i++)
@@ -205,7 +205,7 @@ int pwm_testRun(void)
                 delay++;
         }
 
-        return 0;
+		return 0;
 }
 
 /**
