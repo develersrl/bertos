@@ -96,12 +96,12 @@
 #define LCD_SET_E       /* Implement me! */
 
 #if CONFIG_LCD_4BIT
-	#define LCD_WRITE_H(x)  /* Implement me! */
-	#define LCD_WRITE_L(x)  /* Implement me! */
+	#define LCD_WRITE_H(x)  ((void)x)/* Implement me! */
+	#define LCD_WRITE_L(x)  ((void)x)/* Implement me! */
 	#define LCD_READ_H      ( 0 /* Implement me! */ )
 	#define LCD_READ_L      ( 0 /* Implement me! */ )
 #else
-	#define LCD_WRITE(x)    /* Implement me! */
+	#define LCD_WRITE(x)    ((void)x)/* Implement me! */
 	#define LCD_READ        /* Implement me! */
 #endif
 /*@}*/
