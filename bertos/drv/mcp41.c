@@ -47,6 +47,7 @@
 
 #warning FIXME:This implementation is obsolete. Refactor with KFile interface.
 
+#if 0
 static Serial *spi_ser;
 
 /**
@@ -80,3 +81,5 @@ void mcp41_init(Serial *spi_port)
 
 	spi_ser = spi_port;
 }
+
+#endif
