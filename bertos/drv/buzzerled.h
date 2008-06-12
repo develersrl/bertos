@@ -43,8 +43,6 @@
 
 #include <cpu/attr.h>
 
-#warning FIXME:This drive is obsolete, you must refactor it.
-
 #if 0
 /** Include hw_buzzerled.h. We expect hw_buzzerled.h to define enum BLD_DEVICE, which must contain
  *  an enumarator for each device, plus a special symbol NUM_BLDS containing the
