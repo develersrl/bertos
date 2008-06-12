@@ -115,9 +115,9 @@
 	#else /* GCC and compatibles */
 
 		#if defined(__ARMEB__)
-  			#define CPU_BYTE_ORDER CPU_BIG_ENDIAN
-  		#elif defined(__ARMEL__)
-  			#define CPU_BYTE_ORDER CPU_LITTLE_ENDIAN
+			#define CPU_BYTE_ORDER CPU_BIG_ENDIAN
+		#elif defined(__ARMEL__)
+			#define CPU_BYTE_ORDER CPU_LITTLE_ENDIAN
 		#else
 			#error Unable to detect ARM endianness!
   		#endif
@@ -125,17 +125,17 @@
 		#define NOP            asm volatile ("mov r0,r0" ::)
 
 		/**
-	 	 * Initialization value for registers in stack frame.
-	 	 * The register index is not directly corrispondent to CPU
-	 	 * register numbers, but is related to how are pushed to
-	 	 * stack (\see asm_switch_context).
+		 * Initialization value for registers in stack frame.
+		 * The register index is not directly corrispondent to CPU
+		 * register numbers, but is related to how are pushed to
+		 * stack (\see asm_switch_context).
 		 * Index (CPU_SAVED_REGS_CNT - 1) is the CPSR register,
 		 * the initial value is set to:
 		 * - All flags (N, Z, C, V) set to 0.
 		 * - IRQ and FIQ enabled.
 		 * - ARM state.
 		 * - CPU in Supervisor Mode (SVC).
-	 	 */
+		 */
 		#define CPU_REG_INIT_VALUE(reg) (reg == (CPU_SAVED_REGS_CNT - 1) ? 0x13 : 0)
 
 		#if CONFIG_FAST_MEM
