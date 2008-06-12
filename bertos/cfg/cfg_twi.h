@@ -41,7 +41,7 @@
 #define CFG_TWI_H
 
 /// Comunication frequency
-#define CONFIG_TWI_FREQ  1000000
+#define CONFIG_TWI_FREQ  100000UL
 
 #endif /* CFG_TWI_H */
 
