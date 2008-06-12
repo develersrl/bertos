@@ -30,15 +30,19 @@
  *
  * -->
  *
+ * \brief BattFS: a filesystem for embedded platforms (implementation).
+ *
  * \version $Id:$
  *
  * \author Francesco Sacchi <batt@develer.com>
  *
- * \brief BattFS: a filesystem for embedded platforms (implementation).
  */
 
 #include "battfs.h"
 
+#warning TODO:Fix and complete this module.
+
+#if 0
 #include <cfg/debug.h>
 #include <cfg/macros.h> /* MIN, MAX */
 #include <mware/byteorder.h> /* cpu_to_xx */
@@ -320,7 +324,7 @@ static void findFreeStartNext(struct BattFsSuper *disk, mark_t minl, mark_t maxl
 			 * Upper interval is invalid.
 			 * Use lower values.
 			 */
-			
+
 			disk->free_start = minl;
 			disk->free_next = maxl;
 		}
@@ -396,7 +400,7 @@ static bool countDiskFilePages(struct BattFsSuper *disk, pgoff_t *filelen_table)
 		{
 			/* Increase free space */
 			disk->free_bytes += disk->page_size - BATTFS_HEADER_LEN;
-			
+
 			/* Check if page is marked free */
 			if (hdr.fcs_free == computeFcsFree(&hdr))
 			{
@@ -464,7 +468,7 @@ static bool fillPageArray(struct BattFsSuper *disk, pgoff_t *filelen_table)
 			else
 			{
 				BattFsPageHeader hdr_old;
-				
+
 				if (!battfs_readHeader(disk, disk->page_array[array_pos], &hdr_old))
 					return false;
 
@@ -507,7 +511,7 @@ static bool fillPageArray(struct BattFsSuper *disk, pgoff_t *filelen_table)
 				array_pos -= hdr.pgoff;
 				array_pos += filelen_table[hdr.inode];
 				movePages(disk, array_pos, -1);
-				
+
 				/* Decrease file page count */
 				filelen_table[hdr.inode]--;
 
@@ -587,7 +591,7 @@ bool battfs_init(struct BattFsSuper *disk)
 
 	/* Init list for opened files. */
 	LIST_INIT(&disk->file_opened_list);
-	return true;	
+	return true;
 }
 
 /**
@@ -664,18 +668,18 @@ static pgcnt_t *findFile(BattFsSuper *disk, inode_t inode)
 
 	while (first <= last)
 	{
-       		page = (first + last) / 2;
+		page = (first + last) / 2;
 
 		if (!battfs_readHeader(disk, disk->page_array[page], &hdr))
 			return NULL;
 
 		fcs = computeFcs(&hdr);
 		if (hdr.fcs == fcs && hdr.inode == inode)
-           		return (&disk->page_array[page]) - hdr.pgoff;
-       		else if (hdr.fcs == fcs && hdr.inode < inode)
-           		first = page + 1;
-       		else
-           		last = page - 1;
+			return (&disk->page_array[page]) - hdr.pgoff;
+		else if (hdr.fcs == fcs && hdr.inode < inode)
+			first = page + 1;
+		else
+			last = page - 1;
 	}
 
 	return NULL;
@@ -766,7 +770,7 @@ bool battfs_fileopen(BattFsSuper *disk, KFileBattFs *fd, inode_t inode, filemode
 	fd->fd.read = battfs_read;
 	fd->fd.reopen = kfile_genericReopen;
 	fd->fd.seek = kfile_genericSeek;
-	
+
 #warning TODO battfs_write, battfs_error, battfs_clearerr
 #if 0
 	fd->fd.write = battfs_write;
@@ -824,3 +828,5 @@ bool battfs_writeTestBlock(struct BattFsSuper *disk, pgcnt_t page, inode_t inode
 
 	return true;
 }
+
+#endif
