@@ -282,7 +282,7 @@ static size_t flash25_write(struct KFile *_fd, const void *_buf, size_t size)
 		total_write += wr_len;
 	}
 
-	kprintf("written %u bytes\n", total_write);
+	kprintf("written %lu bytes\n", total_write);
 	return total_write;
 }
 
@@ -330,7 +330,7 @@ void flash25_sectorErase(KFileFlash25 *fd, Flash25Sector sector)
 	 */
 	flash25_waitReady(fd);
 
-	DB(kprintf("Erased sector [%d] in %d ms\n", sector, ticks_to_ms(timer_clock() - start_time)));
+	DB(kprintf("Erased sector [%ld] in %d ms\n", sector, ticks_to_ms(timer_clock() - start_time)));
 
 }
 
@@ -364,7 +364,7 @@ void flash25_chipErase(KFileFlash25 *fd)
 	 */
 	flash25_waitReady(fd);
 
-	DB(kprintf("Erased all memory in %d ms\n", ticks_to_ms(timer_clock() - start_time)));
+	DB(kprintf("Erased all memory in %ld ms\n", ticks_to_ms(timer_clock() - start_time)));
 
 }
 

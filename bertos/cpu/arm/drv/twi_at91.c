@@ -181,7 +181,7 @@ bool twi_read(uint8_t id, twi_iaddr_t byte1, twi_iaddr_t byte2, twi_iaddr_t byte
 	/*
 	 * Start reception.
 	 * Kludge: if we want to receive only 1 byte, the stop but *must* be set here
- 	 * (thanks to crappy twi implementation again).
+	 * (thanks to crappy twi implementation again).
 	 */
 	if (size == 1)
 	{
@@ -250,10 +250,10 @@ void twi_init(void)
 	/*
 	 * Compute twi clock.
 	 * CLDIV = ((Tlow * 2^CKDIV) -3) * Tmck
-  	 * CHDIV = ((THigh * 2^CKDIV) -3) * Tmck
-  	 * Only CLDIV is computed since CLDIV = CHDIV (50% duty cycle)
+	 * CHDIV = ((THigh * 2^CKDIV) -3) * Tmck
+	 * Only CLDIV is computed since CLDIV = CHDIV (50% duty cycle)
 	 */
-  	uint16_t cldiv, ckdiv = 0;
+	uint16_t cldiv, ckdiv = 0;
 	while ((cldiv = ((CLOCK_FREQ / (2 * CONFIG_TWI_FREQ)) - 3) / (1 << ckdiv)) > 255)
 		ckdiv++;
 
@@ -265,3 +265,4 @@ void twi_init(void)
 
 	MOD_INIT(twi);
 }
+

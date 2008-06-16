@@ -41,10 +41,10 @@
 #define CFG_LCD_H
 
 /// Number bit for lcd bus
-#define CONFIG_LCD_4BIT           1
+#define CONFIG_LCD_4BIT            0
 
 /// TODO:
-#define CONFIG_LCD_ADDRESS_FAST   1
+#define CONFIG_LCD_ADDRESS_FAST    1
 
 /// LCD setting for 32122A (AVR implementation)
 #define CONFIG_LCD_SOFTINT_REFRESH 0
