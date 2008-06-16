@@ -41,7 +41,7 @@
 #ifndef DRV_PWM_AVR_H
 #define DRV_PWM_AVR_H
 
-#include "pwm_map.h"
+#include "hw/pwm_map.h"
 
 #include <cpu/types.h>
 
