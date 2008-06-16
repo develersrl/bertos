@@ -46,6 +46,8 @@
 
 #include <drv/timer.h>
 
+#warning FIXME: Revise and refactor this code.
+
 #if defined(LCD_READ_H) && defined(LCD_READ_L) && defined(LCD_WRITE_H) && defined(LCD_WRITE_L)
 	#define CONFIG_LCD_4BIT 1
 #elif defined(LCD_READ) && defined(LCD_WRITE)
