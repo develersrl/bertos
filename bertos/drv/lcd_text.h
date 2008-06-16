@@ -83,7 +83,7 @@
 #define LCD_NOCURSOR   BV(2)   /* Scrittura senza spostamento cursore */
 
 /** Special priority value for lcd_setLayerDepth(). */
-#define LAYER_HIDDEN   -128
+#define LAYER_HIDDEN   -127
 
 /* Compute LCD address from x/y coordinates */
 #define LCD_POS(x,y)  ((lcdpos_t)((uint8_t)(x) + (uint8_t)(y) * (uint8_t)LCD_COLS))
