@@ -59,6 +59,8 @@
 #include <stdbool.h>
 #include <inttypes.h>
 
+#warning TODO:Refactor this module. Split code to hw file.
+
 /* Configuration sanity checks */
 #if !defined(CONFIG_LCD_SOFTINT_REFRESH) || (CONFIG_LCD_SOFTINT_REFRESH != 0 && CONFIG_LCD_SOFTINT_REFRESH != 1)
 	#error CONFIG_LCD_SOFTINT_REFRESH must be defined to either 0 or 1
@@ -354,7 +356,6 @@ static inline uint8_t lcd_32122_read(uint8_t chip)
 	return data;
 }
 
-
 static inline void lcd_32122_write(uint8_t c, uint8_t chip)
 {
 	WAIT_LCD;
@@ -381,19 +382,6 @@ static inline void lcd_32122_write(uint8_t c, uint8_t chip)
 	//LCD_CLR_A0;
 	//LCD_DB_IN;
 }
-
-
-/**
- * Set LCD contrast PWM.
- */
-void lcd_32122_setPwm(int duty)
-{
-	ASSERT(duty >= LCD_MIN_PWM);
-	ASSERT(duty <= LCD_MAX_PWM);
-
-	OCR3C = duty;
-}
-
 
 static void lcd_32122_clear(void)
 {
@@ -435,16 +423,6 @@ static void lcd_32122_writeRaster(const uint8_t *raster)
 	}
 }
 
-/**
- * Update the LCD display with data from the provided bitmap.
- */
-void lcd_32122_blitBitmap(Bitmap *bm)
-{
-	MOD_CHECK(lcd);
-	lcd_32122_writeRaster(bm->raster);
-}
-
-
 #if CONFIG_LCD_SOFTINT_REFRESH
 
 static void lcd_32122_refreshSoftint(void)
@@ -454,6 +432,26 @@ static void lcd_32122_refreshSoftint(void)
 }
 
 #endif /* CONFIG_LCD_SOFTINT_REFRESH */
+
+/**
+ * Set LCD contrast PWM.
+ */
+void lcd_32122_setPwm(int duty)
+{
+	ASSERT(duty >= LCD_MIN_PWM);
+	ASSERT(duty <= LCD_MAX_PWM);
+
+	OCR3C = duty;
+}
+
+/**
+ * Update the LCD display with data from the provided bitmap.
+ */
+void lcd_32122_blitBitmap(Bitmap *bm)
+{
+	MOD_CHECK(lcd);
+	lcd_32122_writeRaster(bm->raster);
+}
 
 
 /**
@@ -508,7 +506,7 @@ void lcd_32122_init(void)
 	IRQ_RESTORE(flags);
 
 	lcd_32122_clear();
-	lcd_32122_setpwm(LCD_DEF_PWM);
+	lcd_32122_setPwm(LCD_DEF_PWM);
 
 	gfx_bitmapInit(&lcd_bitmap, lcd_raster, LCD_WIDTH, LCD_HEIGHT);
 	gfx_bitmapClear(&lcd_bitmap);
@@ -526,3 +524,4 @@ void lcd_32122_init(void)
 
 	MOD_INIT(lcd);
 }
+
