@@ -40,6 +40,9 @@
 
 #include "eeprom.h"
 
+#warning TODO:Test and complete this module for arm platform.
+
+#if 0
 #include "cfg/cfg_eeprom.h"  // CONFIG_EEPROM_VERIFY
 #include <cfg/macros.h>  // MIN()
 #include <cfg/debug.h>
@@ -341,3 +344,4 @@ void eeprom_test(void)
 }
 
 #endif // _DEBUG
+#endif
