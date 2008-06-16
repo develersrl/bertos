@@ -102,7 +102,7 @@
 	#define LCD_READ_L      ( 0 /* Implement me! */ )
 #else
 	#define LCD_WRITE(x)    ((void)x)/* Implement me! */
-	#define LCD_READ        /* Implement me! */
+	#define LCD_READ        (0 /* Implement me! */ )
 #endif
 /*@}*/
 
