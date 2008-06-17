@@ -52,8 +52,8 @@ fi
 
 #Get list of source for selected cpu target
 CSRC=`${TEST_SCRIPT_DIR}/get_source_list.sh $1 c`
-#ASRC=`${TEST_SCRIPT_DIR}/get_source_list.sh $1 s`
-ASRC=
+ASRC=`${TEST_SCRIPT_DIR}/get_source_list.sh $1 S`
+#ASRC=
 
 
 #Source to skip:
