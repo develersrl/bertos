@@ -32,7 +32,7 @@ at91sam7s_CSRC = \
 
 at91sam7s_CPPASRC = \
 	bertos/cpu/arm/hw/crtat91sam7_rom.S \
-	bertos/kern/switch_arm.S
+	bertos/cpu/arm/hw/switch_arm.S
 
 at91sam7s_CROSS = arm-elf-
 
