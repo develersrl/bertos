@@ -38,6 +38,7 @@
  * \brief Declare application version strings
  */
 
+
 #ifndef BERTOS_VERSTAG_H
 #define BERTOS_VERSTAG_H
 
@@ -50,12 +51,13 @@
 #define APP_AUTHOR "Develer"
 #define APP_COPYRIGHT "Copyright 2006 Develer (http://www.develer.com/)"
 
-#if (ARCH & ARCH_FOO)
+
+#if ARCH & ARCH_FOO
 	#define VERS_MAJOR 0
 	#define VERS_MINOR 1
 	#define VERS_REV   0
 	#define VERS_LETTER ""
-#elif (ARCH & ARCH_BAR)
+#elif ARCH & ARCH_BAR
 	#define VERS_MAJOR 0
 	#define VERS_MINOR 1
 	#define VERS_REV   0
