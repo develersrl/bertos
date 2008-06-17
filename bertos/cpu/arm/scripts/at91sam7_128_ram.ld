@@ -87,7 +87,7 @@ SECTIONS
 	_etext = .;
 	PROVIDE (__etext = .);
 
-	.data : AT (__etext)
+	.data : AT (_etext)
 	{
 		PROVIDE (__data_start = .);
 		*(.data .data.*)
