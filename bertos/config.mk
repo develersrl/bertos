@@ -15,8 +15,8 @@ DPROG ?= -V -c stk500 -P /dev/ttyS0
 
 # Set to 1 to build for embedded devices.
 # e.g. produce target.elf instead of target and target_nostrip
-EMBEDDED_TARGET = 1
-#EMBEDDED_TARGET = 0
+#EMBEDDED_TARGET = 1
+EMBEDDED_TARGET = 0
 
 OPTCFLAGS = -ffunction-sections -fdata-sections
 #OPTCFLAGS = -funsafe-loop-optimizations
