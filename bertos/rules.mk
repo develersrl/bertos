@@ -100,6 +100,7 @@ $(1)_CC      = $$($(1)_CROSS)$$(CC)
 $(1)_CXX     = $$($(1)_CROSS)$$(CXX)
 $(1)_AS      = $$($(1)_CROSS)$$(AS)
 $(1)_OBJCOPY = $$($(1)_CROSS)$$(OBJCOPY)
+$(1)_STRIP   = $$($(1)_CROSS)$$(STRIP)
 
 $(1)_COBJ    = $$(foreach file,$$($(1)_CSRC:%.c=%.o),$$(OBJDIR)/$(1)/$$(file))
 $(1)_CXXOBJ  = $$(foreach file,$$($(1)_CXXSRC:%.cpp=%.o),$$(OBJDIR)/$(1)/$$(file))
