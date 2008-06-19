@@ -132,14 +132,14 @@
 		#include <mware/pgm.h>
 		void kputs_P(const char *PROGMEM str);
 		void kprintf_P(const char *PROGMEM fmt, ...) FORMAT(__printf__, 1, 2);
-		int __assert_P(const char *PROGMEM cond, const char *PROGMEM file, int line);
+		int __bassert_P(const char *PROGMEM cond, const char *PROGMEM file, int line);
 		void __trace_P(const char *func);
 		void __tracemsg_P(const char *func, const char *PROGMEM fmt, ...);
 		int __invalid_ptr_P(void *p, const char *PROGMEM name, const char *PROGMEM file, int line);
 		int __check_wall_P(long *wall, int size, const char * PGM_ATTR name, const char * PGM_ATTR file, int line);
 		#define kputs(str)  kputs_P(PSTR(str))
 		#define kprintf(fmt, ...)  kprintf_P(PSTR(fmt) ,## __VA_ARGS__)
-		#define __assert(cond, file, line)  __assert_P(PSTR(cond), PSTR(file), (line))
+		#define __bassert(cond, file, line)  __bassert_P(PSTR(cond), PSTR(file), (line))
 		#define __trace(func)  __trace_P(func)
 		#define __tracemsg(func, fmt, ...)  __tracemsg_P(func, PSTR(fmt), ## __VA_ARGS__)
 		#define __invalid_ptr(p, name, file, line)  __invalid_ptr_P((p), PSTR(name), PSTR(file), (line))
@@ -147,7 +147,7 @@
 	#else /* !CPU_HARVARD */
 		void kputs(const char *str);
 		void kprintf(const char *fmt, ...) FORMAT(__printf__, 1, 2);
-		int __assert(const char *cond, const char *file, int line);
+		int __bassert(const char *cond, const char *file, int line);
 		void __trace(const char *func);
 		void __tracemsg(const char *func, const char *fmt, ...) FORMAT(__printf__, 2, 3);
 		int __invalid_ptr(void *p, const char *name, const char *file, int line);
@@ -155,10 +155,10 @@
 	#endif /* !CPU_HARVARD */
 
 	#if !CONFIG_KDEBUG_ASSERT_NO_TEXT
-		#define ASSERT(x)         ((void)(LIKELY(x) ? 0 : __assert(#x, THIS_FILE, __LINE__)))
-		#define ASSERT2(x, help)  ((void)(LIKELY(x) ? 0 : __assert(help " (" #x ")", THIS_FILE, __LINE__)))
+		#define ASSERT(x)         ((void)(LIKELY(x) ? 0 : __bassert(#x, THIS_FILE, __LINE__)))
+		#define ASSERT2(x, help)  ((void)(LIKELY(x) ? 0 : __bassert(help " (" #x ")", THIS_FILE, __LINE__)))
 	#else
-		#define ASSERT(x)         ((void)(LIKELY(x) ? 0 : __assert("", THIS_FILE, __LINE__)))
+		#define ASSERT(x)         ((void)(LIKELY(x) ? 0 : __bassert("", THIS_FILE, __LINE__)))
 		#define ASSERT2(x, help)  ((void)ASSERT(x))
 	#endif
 

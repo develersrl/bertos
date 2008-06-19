@@ -190,7 +190,7 @@ static void klocation(const char * PGM_ATTR file, int line)
 	PGM_FUNC(kputs)(PGM_STR(": "));
 }
 
-int PGM_FUNC(__assert)(const char * PGM_ATTR cond, const char * PGM_ATTR file, int line)
+int PGM_FUNC(__bassert)(const char * PGM_ATTR cond, const char * PGM_ATTR file, int line)
 {
 	klocation(file, line);
 	PGM_FUNC(kputs)(PGM_STR("Assertion failed: "));
