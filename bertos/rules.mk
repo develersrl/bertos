@@ -275,7 +275,7 @@ bumprev:
 		buildnr=`sed <"$(BUILDREV_H)" -n -e 's/#define VERS_BUILD \([0-9][0-9]*\)/\1/p'`; \
 	fi; \
 	buildnr=`expr $$buildnr + 1`; \
-	buildhost=`hostname | sed -n -e '1h;2,$$H;$${g;s/\n//g;p}'`; \
+	buildhost=`hostname | sed -n -e '1h;2,$$H;$${g;s/\n//g;p;}'`; \
 	echo "#define VERS_BUILD $$buildnr" >"$(BUILDREV_H)"; \
 	echo "#define VERS_HOST  \"$$buildhost\"" >>"$(BUILDREV_H)"; \
 	echo "Building revision $$buildnr"
