@@ -13,11 +13,6 @@
 -include pgm_config.mk
 DPROG ?= -V -c stk500 -P /dev/ttyS0
 
-# Set to 1 to build for embedded devices.
-# e.g. produce target.elf instead of target and target_nostrip
-#EMBEDDED_TARGET = 1
-EMBEDDED_TARGET = 0
-
 OPTCFLAGS = -ffunction-sections -fdata-sections
 #OPTCFLAGS = -funsafe-loop-optimizations
 
@@ -74,11 +69,9 @@ DEP_FLAGS = -MMD -MP
 LIST_FLAGS = -Wa,-anhlmsd=$(@:.o=.lst)
 
 # Linker flags for generating map files
-ifeq ($(EMBEDDED_TARGET), 1)
-MAP_FLAGS = -Wl,-Map=$(@:%.elf=%.map),--cref
-else
-MAP_FLAGS =
-endif
+# Only in embedded related projects generate map files
+MAP_FLAGS_EMB = -Wl,-Map=$(@:%.elf=%.map),--cref
+MAP_FLAGS_HOST =
 
 # Compiler warning flags for both C and C++
 WARNFLAGS = \
@@ -113,7 +106,7 @@ ASFLAGS	= $(DEBUGCFLAGS)
 #LDFLAGS = $(MAP_FLAGS)
 
 #bernie: does not complain for missing symbols!
-LDFLAGS = $(MAP_FLAGS) -Wl,--gc-sections
+LDFLAGS = -Wl,--gc-sections
 
 # Flags for avrdude
 AVRDUDEFLAGS = $(DPROG)

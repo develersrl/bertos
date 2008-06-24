@@ -11,6 +11,9 @@
 include bertos/fonts/fonts.mk
 include bertos/emul/emul.mk
 
+#Demo application is hosted
+demo_EMBEDDED_TGT = 0
+
 # Set to 1 for debug builds
 demo_DEBUG = 1
 

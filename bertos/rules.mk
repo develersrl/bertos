@@ -36,25 +36,16 @@ endif
 # Initialize $(top_srcdir) with current directory, unless it was already initialized
 top_srcdir ?= $(shell pwd)
 
-# Products
-TRG_ELF = $(TRG:%=$(OUTDIR)/%.elf)
-TRG_S19 = $(TRG:%=$(OUTDIR)/%.s19)
-TRG_HEX = $(TRG:%=$(OUTDIR)/%.hex)
-TRG_BIN = $(TRG:%=$(OUTDIR)/%.bin)
-TRG_ROM = $(TRG:%=$(OUTDIR)/%.rom)
-TRG_COF = $(TRG:%=$(OUTDIR)/%.cof)
-TRG_EXE = $(TRG:%=$(OUTDIR)/%)
-
+# Virtual Product: based on target products may be different.
+# e.g. Embedded target = hex, s19, bin
+#      Hosted = exe
+TRG_TGT = $(TRG:%=$(OUTDIR)/%.tgt)
 
 RECURSIVE_TARGETS = all-recursive install-recursive clean-recursive
 
 # The default target
 .PHONY: all
-ifeq ($(EMBEDDED_TARGET),1)
-all:: all-recursive $(TRG_S19) $(TRG_HEX) $(TRG_BIN)
-else
-all:: all-recursive $(TRG_EXE)
-endif
+all:: all-recursive $(TRG_TGT) 
 
 # Generate project documentation
 .PHONY: docs
@@ -75,6 +66,20 @@ check:
 	$Q ./run_tests.sh
 
 define build_target
+
+ifeq ($$($(1)_EMBEDDED_TGT),1)
+#use embedded specific map flags
+$(1)_MAP_FLAGS = $$(MAP_FLAGS_EMB)
+#In embedded we need s19, hex and bin
+$$(OUTDIR)/$(1).tgt : $$(OUTDIR)/$(1).s19 $$(OUTDIR)/$(1).hex $$(OUTDIR)/$(1).bin
+else
+#use hosted specific map flags
+$(1)_MAP_FLAGS = $$(MAP_FLAGS_HOST)
+#in hosted application we need only executable file.
+$$(OUTDIR)/$(1).tgt : $$(OUTDIR)/$(1)
+endif
+
+$(1)_LDFLAGS += $$($(1)_MAP_FLAGS)
 
 ifneq ($$(strip $$($(1)_MCU)),)
 # Define all project specific object files

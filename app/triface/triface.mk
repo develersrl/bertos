@@ -9,6 +9,8 @@
 #
 #
 
+# This is an embedded project
+triface_EMBEDDED_TGT = 1
 
 # Set to 1 for debug builds
 triface_DEBUG = 1
