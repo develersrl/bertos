@@ -44,7 +44,7 @@ triface_CSRC = \
 triface_PCSRC += bertos/mware/formatwr.c
 
 
-triface_CFLAGS = -O2 -D'ARCH=0' -fno-strict-aliasing -Iapp/triface -Ibertos/cpu/avr
+triface_CFLAGS = -O2 -D'ARCH=(ARCH_TRIFACE)' -fno-strict-aliasing -Iapp/triface -Ibertos/cpu/avr
 triface_LDFLAGS = -Wl
 
 triface_MCU = atmega64
@@ -54,5 +54,35 @@ triface_CROSS = avr-
 ifeq ($(triface_DEBUG),1)
 	triface_CFLAGS += -D_DEBUG
 	triface_PCSRC += bertos/drv/kdebug.c
+endif
+
+
+boot_EMBEDDED_TGT = 1
+# Set to 1 for debug builds
+boot_DEBUG = 1
+
+# Our target application
+TRG += boot
+
+boot_MCU = atmega64
+boot_CSRC = \
+	app/triface/boot/main.c \
+	bertos/mware/xmodem.c \
+	bertos/drv/ser.c \
+	bertos/cpu/avr/drv/ser_avr.c \
+	bertos/cpu/avr/drv/flash_avr.c \
+	bertos/drv/timer.c \
+	bertos/algos/crc.c
+
+boot_CROSS = avr-
+boot_CPPFLAGS = -D'ARCH=(ARCH_TRIFACE|ARCH_BOOT)' -Iapp/boot -Ibertos/cpu/avr
+boot_CFLAGS = -Os -mcall-prologues
+boot_LDSCRIPT = app/triface/boot/boot.ld
+boot_LDFLAGS = -Wl,--relax
+
+# Debug stuff
+ifeq ($(boot_DEBUG),1)
+	boot_CFLAGS += -D_DEBUG
+	boot_PCSRC += bertos/drv/kdebug.c bertos/mware/formatwr.c
 endif
 
