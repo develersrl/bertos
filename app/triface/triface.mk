@@ -67,15 +67,17 @@ TRG += boot
 boot_MCU = atmega64
 boot_CSRC = \
 	app/triface/boot/main.c \
-	bertos/mware/xmodem.c \
+	bertos/net/xmodem.c \
 	bertos/drv/ser.c \
 	bertos/cpu/avr/drv/ser_avr.c \
 	bertos/cpu/avr/drv/flash_avr.c \
 	bertos/drv/timer.c \
-	bertos/algos/crc.c
-
+	bertos/algo/crc.c \
+	bertos/mware/hex.c \
+    bertos/kern/kfile.c \
+    #
 boot_CROSS = avr-
-boot_CPPFLAGS = -D'ARCH=(ARCH_TRIFACE|ARCH_BOOT)' -Iapp/boot -Ibertos/cpu/avr
+boot_CPPFLAGS = -D'ARCH=(ARCH_TRIFACE|ARCH_BOOT)' -Iapp/triface/boot -Ibertos/cpu/avr
 boot_CFLAGS = -Os -mcall-prologues
 boot_LDSCRIPT = app/triface/boot/boot.ld
 boot_LDFLAGS = -Wl,--relax

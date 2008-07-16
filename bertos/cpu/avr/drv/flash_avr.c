@@ -44,10 +44,7 @@
 
 #include "flash_avr.h"
 
-#include <avr/io.h>
-#include <avr/boot.h>
-#include <avr/pgmspace.h>
-
+#include "cfg/cfg_flash_avr.h"
 #include <cfg/macros.h> // MIN()
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
@@ -57,10 +54,14 @@
 
 #include <kern/kfile.h>
 
+#include <avr/io.h>
+#include <avr/boot.h>
+#include <avr/pgmspace.h>
+
 #include <string.h>
 
 #warning FIXME:This module need to be refactor to kfile interface!
-#if 0
+#if 1
 
 /**
  * Definition of type for avr flash module.
@@ -222,7 +223,7 @@ static void flash_avr_open(struct KFile *fd)
 	memcpy_P(page_buf, (const char *)(curr_page * SPM_PAGESIZE), SPM_PAGESIZE);
 
 	fd->seek_pos = 0;
-	fd->size = (uint16_t)(FLASHEND - CONFIG_BOOT_SIZE + 1);
+	fd->size = (uint16_t)(FLASHEND - CONFIG_FLASH_AVR_BOOTSIZE + 1);
 	page_modified = false;
 
 	kprintf("Flash file opened\n");

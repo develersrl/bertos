@@ -26,67 +26,32 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
- * Copyright 2000 Bernardo Innocenti <bernie@codewiz.org>
+ * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2001,2002,2003 Bernardo Innocenti <bernie@codewiz.org>
  *
  * -->
  *
- * \brief Flash boot loader main.
- * This is a simple generic bootloader app.
- * It requires only a serial port to work.
- * Try to receive a file through XMODEM protocol
- * and flash it on program memory.
- * BOOT_INIT, BOOT_END are macros used to perform special operations
- * respectively at boot start and boot end and are CPU dependant.
- * The macro START_APP() jumps to main application start.
+ * \brief Set system configuration
  *
  * \version $Id$
- * \author Stefano Fedrigo <aleph@develer.com>
- * \author Francesco Sacchi <batt@develer.com>
- * \author Daniele Basile <asterix@develer.com>
+ *
+ * \author Bernardo Innocenti <bernie@develer.com>
+ *
  */
 
-#include <net/xmodem.h>
-#include <cfg/compiler.h>
-#include <cfg/debug.h>
-#include <cfg/macros.h> /* BV() */
 
-#include <drv/wdt.h>
-#include <drv/ser.h>
-#include <drv/timer.h>
-#include <drv/flash_avr.h>
+#ifndef CFG_ARCH_CONFIG_H
+#define CFG_ARCH_CONFIG_H
 
-#include "hw/hw_boot.h"
-#include "cfg/cfg_boot.h"
+#include <cfg/macros.h>
 
-#include <string.h>
+/**
+ * \name Architectures
+ * \{
+ */
+#define ARCH_TRIFACE     BV(0)
+#define ARCH_BOOT        BV(1)
+#define ARCH_EMUL        BV(2)
+/*\}*/
 
-int main(void)
-{
-	KFile fd;
-	KFileSerial ser;
-
-
-	// Set up flash programming functions.
-	flash_avr_init(&fd);
-
-	IRQ_ENABLE;
-
-	BOOT_INIT;
-
-	kdbg_init();
-	timer_init();
-	/* Open the main communication port */
-	ser_init(&ser, CONFIG_SER_HOSTPORT);
-	ser_setbaudrate(&ser, CONFIG_SER_HOSTPORTBAUDRATE);
-
-	xmodem_recv(&ser, &fd);
-	kfile_close(&fd);
-    kfile_close(&ser.fd);
-
-	IRQ_DISABLE;
-
-	BOOT_END;
-
-	START_APP();
-}
+#endif /* CFG_ARCH_CONFIG_H */

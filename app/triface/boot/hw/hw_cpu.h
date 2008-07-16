@@ -29,64 +29,28 @@
  * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000 Bernardo Innocenti <bernie@codewiz.org>
  *
- * -->
+ * --> Rights Reserved.
  *
- * \brief Flash boot loader main.
- * This is a simple generic bootloader app.
- * It requires only a serial port to work.
- * Try to receive a file through XMODEM protocol
- * and flash it on program memory.
- * BOOT_INIT, BOOT_END are macros used to perform special operations
- * respectively at boot start and boot end and are CPU dependant.
- * The macro START_APP() jumps to main application start.
+ * \brief Hardware-specific definitions
  *
  * \version $Id$
- * \author Stefano Fedrigo <aleph@develer.com>
- * \author Francesco Sacchi <batt@develer.com>
- * \author Daniele Basile <asterix@develer.com>
+ *
+ * \author Bernardo Innocenti <bernie@develer.com>
  */
 
-#include <net/xmodem.h>
-#include <cfg/compiler.h>
-#include <cfg/debug.h>
-#include <cfg/macros.h> /* BV() */
+#ifndef TRIFACE_HW_H
+#define TRIFACE_HW_H
 
-#include <drv/wdt.h>
-#include <drv/ser.h>
-#include <drv/timer.h>
-#include <drv/flash_avr.h>
-
-#include "hw/hw_boot.h"
-#include "cfg/cfg_boot.h"
-
-#include <string.h>
-
-int main(void)
-{
-	KFile fd;
-	KFileSerial ser;
+/// CPU Clock frequency (14.7456 MHz)
+#define CLOCK_FREQ     (14745600UL)
 
 
-	// Set up flash programming functions.
-	flash_avr_init(&fd);
+/* Timer IRQ strobe */
+//#if CONFIG_TIMER_STROBE
+//	#define TIMER_STROBE_ON    ATOMIC(PORTD |= BV(PD0))
+//	#define TIMER_STROBE_OFF   ATOMIC(PORTD &= ~BV(PD0))
+//	#define TIMER_STROBE_INIT  ATOMIC(PORTD &= ~BV(PD0); DDRD |= BV(PD0))
+//#endif /* CONFIG_TIMER_STROBE */
 
-	IRQ_ENABLE;
+#endif /* TRIFACE_HW_H */
 
-	BOOT_INIT;
-
-	kdbg_init();
-	timer_init();
-	/* Open the main communication port */
-	ser_init(&ser, CONFIG_SER_HOSTPORT);
-	ser_setbaudrate(&ser, CONFIG_SER_HOSTPORTBAUDRATE);
-
-	xmodem_recv(&ser, &fd);
-	kfile_close(&fd);
-    kfile_close(&ser.fd);
-
-	IRQ_DISABLE;
-
-	BOOT_END;
-
-	START_APP();
-}
