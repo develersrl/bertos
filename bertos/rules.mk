@@ -45,7 +45,7 @@ RECURSIVE_TARGETS = all-recursive install-recursive clean-recursive
 
 # The default target
 .PHONY: all
-all:: all-recursive $(TRG_TGT) 
+all:: all-recursive $(TRG_TGT)
 
 # Generate project documentation
 .PHONY: docs
@@ -156,7 +156,7 @@ $$($(1)_CPPAOBJ): $$(OBJDIR)/$(1)/%.o : %.S
 	$L "$(1): Assembling with CPP $$<"
 	@$$(MKDIR_P) $$(dir $$@)
 	$Q $$($(1)_CC) -c $$(CPPAFLAGS) $$($(1)_CPPAFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$< -o $$@
-	
+
 
 # Link: instructions to create elf output file from object files
 $$(OUTDIR)/$(1).elf $$(OUTDIR)/$(1)_nostrip: bumprev $$($(1)_OBJ) $$($(1)_LDSCRIPT)
@@ -168,7 +168,7 @@ $$(OUTDIR)/$(1).elf $$(OUTDIR)/$(1)_nostrip: bumprev $$($(1)_OBJ) $$($(1)_LDSCRI
 $$(OUTDIR)/$(1): $$(OUTDIR)/$(1)_nostrip
 	$L "$(1): Generating stripped executable $$@"
 	$Q $$($(1)_STRIP) -o $$@ $$^
- 
+
 # Compile and link (program-at-a-time)
 $$(OUTDIR)/$(1)_whole.elf: bumprev $$($(1)_SRC) $$($(1)_LDSCRIPT)
 	$L "$(1): Compiling and Linking whole program $$@"
@@ -247,6 +247,7 @@ $(foreach t,$(TRG),$(eval $(call build_target,$(t))))
 #	$(COFFCONVERT) -O coff-avr $< $@   # For use with AVRstudio 3
 
 #make instruction to delete created files
+cleanall: clean
 clean: clean-recursive
 	-$(RM_R) $(OBJDIR)
 	-$(RM_R) $(OUTDIR)
