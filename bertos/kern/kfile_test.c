@@ -123,7 +123,6 @@ int kfile_testSetUp(void)
  */
 int kfile_testRun(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size)
 {
-        kfile_testSetUp();
 
 	/*
 	 * Part of test buf size that you would write.
