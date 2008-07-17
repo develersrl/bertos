@@ -69,7 +69,7 @@ INLINE KFileFlashAvr * KFILEFLASHAVR(KFile *fd)
 }
 
 
-void flash_avr_init(struct KFile *fd);
+void flash_avr_init(struct KFileFlashAvr *fd);
 
 
 

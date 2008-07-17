@@ -187,7 +187,7 @@ static size_t flash_avr_write(struct KFile *fd, const void *_buf, size_t size)
 	size_t total_write = 0;
 
 
-	ASSERT(fd->seek_pos + size <= fd->size);
+	ASSERT(fd->seek_pos + (kfile_off_t)size <= (kfile_off_t)fd->size);
 	size = MIN((uint32_t)size, fd->size - fd->seek_pos);
 
 	kprintf("Writing at pos[%u]\n", fd->seek_pos);
@@ -216,14 +216,13 @@ static size_t flash_avr_write(struct KFile *fd, const void *_buf, size_t size)
  * \a name and \a mode are unused, cause flash memory is
  * threated like one file.
  */
-static void flash_avr_open(struct KFile *fd)
+static void flash_avr_open(struct KFileFlashAvr *fd)
 {
-	KFILEFLASHAVR(fd);
 	curr_page = 0;
 	memcpy_P(page_buf, (const char *)(curr_page * SPM_PAGESIZE), SPM_PAGESIZE);
 
-	fd->seek_pos = 0;
-	fd->size = (uint16_t)(FLASHEND - CONFIG_FLASH_AVR_BOOTSIZE + 1);
+	fd->fd.seek_pos = 0;
+	fd->fd.size = (uint16_t)(FLASHEND - CONFIG_FLASH_AVR_BOOTSIZE + 1);
 	page_modified = false;
 
 	kprintf("Flash file opened\n");
@@ -245,9 +244,9 @@ static int flash_avr_close(UNUSED_ARG(struct KFile *,fd))
  */
 static struct KFile *flash_avr_reopen(struct KFile *fd)
 {
-	KFILEFLASHAVR(fd);
+	KFileFlashAvr *_fd = KFILEFLASHAVR(fd);
 	flash_avr_close(fd);
-	flash_avr_open(fd);
+	flash_avr_open(_fd);
 	return fd;
 }
 
@@ -259,7 +258,7 @@ static struct KFile *flash_avr_reopen(struct KFile *fd)
 static size_t flash_avr_read(struct KFile *fd, void *buf, size_t size)
 {
 	KFILEFLASHAVR(fd);
-	ASSERT(fd->seek_pos + size <= fd->size);
+	ASSERT(fd->seek_pos + (kfile_off_t)size <= (kfile_off_t)fd->size);
 	size = MIN((uint32_t)size, fd->size - fd->seek_pos);
 
 	kprintf("Reading at pos[%u]\n", fd->seek_pos);
@@ -282,18 +281,18 @@ static size_t flash_avr_read(struct KFile *fd, void *buf, size_t size)
 /**
  * Init AVR flash read/write file.
  */
-void flash_avr_init(struct KFile *fd)
+void flash_avr_init(struct KFileFlashAvr *fd)
 {
 	memset(fd, 0, sizeof(*fd));
-	DB(fd->_type = KFT_FLASHAVR);
+	DB(fd->fd._type = KFT_FLASHAVR);
 
 	// Set up flash programming functions.
-	fd->reopen = flash_avr_reopen;
-	fd->close = flash_avr_close;
-	fd->read = flash_avr_read;
-	fd->write = flash_avr_write;
-	fd->seek = kfile_genericSeek;
-	fd->flush = flash_avr_kfileFlush;
+	fd->fd.reopen = flash_avr_reopen;
+	fd->fd.close = flash_avr_close;
+	fd->fd.read = flash_avr_read;
+	fd->fd.write = flash_avr_write;
+	fd->fd.seek = kfile_genericSeek;
+	fd->fd.flush = flash_avr_kfileFlush;
 
 	flash_avr_open(fd);
 }
