@@ -43,8 +43,36 @@
 #include <cfg/compiler.h>
 #include <kern/kfile.h>
 
+
+/**
+ * FlashAvr KFile context structure.
+ */
+typedef struct KFileFlashAvr
+{
+	KFile fd;                       ///< File descriptor.
+} KFileFlashAvr;
+
+
+
+/**
+ * ID for FlashAvr
+ */
+#define KFT_FLASHAVR MAKE_ID('F', 'L', 'A', 'V')
+
+/**
+ * Convert + ASSERT from generic KFile to KFileFlashAvr.
+ */
+INLINE KFileFlashAvr * KFILEFLASHAVR(KFile *fd)
+{
+	ASSERT(fd->_type == KFT_FLASHAVR);
+	return (KFileFlashAvr *)fd;
+}
+
+
+
 bool flash_avr_test(void);
 void flash_avr_init(struct KFile *fd);
+
 
 
 #endif /* DRV_FLASH_AVR_H */

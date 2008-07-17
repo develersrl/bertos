@@ -60,8 +60,9 @@
 
 #include <string.h>
 
-#warning FIXME:This module need to be refactor to kfile interface!
+
 #if 1
+
 
 /**
  * Definition of type for avr flash module.
@@ -150,7 +151,8 @@ static void flash_avr_flush(void)
  */
 static int flash_avr_kfileFlush(struct KFile * fd)
 {
-	KFILE_ASSERT_GENERIC(fd);
+
+	KFILEFLASHAVR(fd);
 	(void)fd;
 	flash_avr_flush();
 	return 0;
@@ -180,12 +182,13 @@ static void flash_avr_loadPage(avr_page_t page)
  */
 static size_t flash_avr_write(struct KFile *fd, const void *_buf, size_t size)
 {
-	KFILE_ASSERT_GENERIC(fd);
+	KFILEFLASHAVR(fd);
 	const uint8_t *buf =(const uint8_t *)_buf;
 
 	avr_page_t page;
 	avr_page_addr_t page_addr;
 	size_t total_write = 0;
+
 
 	ASSERT(fd->seek_pos + size <= fd->size);
 	size = MIN((uint32_t)size, fd->size - fd->seek_pos);
@@ -218,7 +221,7 @@ static size_t flash_avr_write(struct KFile *fd, const void *_buf, size_t size)
  */
 static void flash_avr_open(struct KFile *fd)
 {
-	KFILE_ASSERT_GENERIC(fd);
+	KFILEFLASHAVR(fd);
 	curr_page = 0;
 	memcpy_P(page_buf, (const char *)(curr_page * SPM_PAGESIZE), SPM_PAGESIZE);
 
@@ -234,7 +237,7 @@ static void flash_avr_open(struct KFile *fd)
  */
 static int flash_avr_close(UNUSED_ARG(struct KFile *,fd))
 {
-	KFILE_ASSERT_GENERIC(fd);
+	KFILEFLASHAVR(fd);
 	flash_avr_flush();
 	kprintf("Flash file closed\n");
 	return 0;
@@ -245,7 +248,7 @@ static int flash_avr_close(UNUSED_ARG(struct KFile *,fd))
  */
 static struct KFile *flash_avr_reopen(struct KFile *fd)
 {
-	KFILE_ASSERT_GENERIC(fd);
+	KFILEFLASHAVR(fd);
 	flash_avr_close(fd);
 	flash_avr_open(fd);
 	return fd;
@@ -258,7 +261,7 @@ static struct KFile *flash_avr_reopen(struct KFile *fd)
  */
 static size_t flash_avr_read(struct KFile *fd, void *buf, size_t size)
 {
-	KFILE_ASSERT_GENERIC(fd);
+	KFILEFLASHAVR(fd);
 	ASSERT(fd->seek_pos + size <= fd->size);
 	size = MIN((uint32_t)size, fd->size - fd->seek_pos);
 
@@ -285,7 +288,7 @@ static size_t flash_avr_read(struct KFile *fd, void *buf, size_t size)
 void flash_avr_init(struct KFile *fd)
 {
 	memset(fd, 0, sizeof(*fd));
-	DB(fd->_type = KFT_GENERIC);
+	DB(fd->_type = KFT_FLASHAVR);
 
 	// Set up flash programming functions.
 	fd->reopen = flash_avr_reopen;
