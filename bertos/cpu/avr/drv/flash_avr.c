@@ -61,8 +61,6 @@
 #include <string.h>
 
 
-#if 1
-
 
 /**
  * Definition of type for avr flash module.
@@ -149,11 +147,10 @@ static void flash_avr_flush(void)
  * Write current buffered page in flash memory (if modified).
  * This function erase flash memory page before writing.
  */
-static int flash_avr_kfileFlush(struct KFile * fd)
+static int flash_avr_kfileFlush(UNUSED_ARG(struct KFile *,fd))
 {
 
 	KFILEFLASHAVR(fd);
-	(void)fd;
 	flash_avr_flush();
 	return 0;
 }
@@ -300,5 +297,5 @@ void flash_avr_init(struct KFile *fd)
 
 	flash_avr_open(fd);
 }
-#endif
+
 
