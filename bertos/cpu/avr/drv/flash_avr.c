@@ -50,6 +50,11 @@
 #include <cfg/debug.h>
 #include <cpu/irq.h>
 
+ 	// Define logging setting (for cfg/log.h module).
+#define LOG_LEVEL         CONFIG_FLASH_AVR_LOG_LEVEL
+#define LOG_VERBOSITY     CONFIG_FLASH_AVR_LOG_VERBOSITY
+#include <cfg/log.h>
+
 #include <drv/wdt.h>
 
 #include <kern/kfile.h>
@@ -82,12 +87,13 @@ static void flash_avr_flush(KFileFlashAvr *fd)
 {
 	if (fd->page_dirty)
 	{
-		kprintf("Flushing page %d\n", fd->curr_page);
+
+		LOG_INFO("Flushing page %d\n", fd->curr_page);
 
 		// Wait while the SPM instruction is busy.
 		boot_spm_busy_wait();
 
-		kprintf("Filling temparary page buffer...");
+		LOG_INFO("Filling temparary page buffer...");
 
 		// Fill the temporary buffer of the AVR
 		for (avr_page_addr_t page_addr = 0; page_addr < SPM_PAGESIZE; page_addr += 2)
@@ -96,11 +102,11 @@ static void flash_avr_flush(KFileFlashAvr *fd)
 
 			ATOMIC(boot_page_fill(page_addr, word));
 		}
-		kprintf("Done.\n");
+		LOG_INFO("Done.\n");
 
 		wdt_reset();
 
-		kprintf("Erasing page, addr %u...", fd->curr_page * SPM_PAGESIZE);
+		LOG_INFO("Erasing page, addr %u...", fd->curr_page * SPM_PAGESIZE);
 
 		/* Page erase */
 		ATOMIC(boot_page_erase(fd->curr_page * SPM_PAGESIZE));
@@ -108,8 +114,8 @@ static void flash_avr_flush(KFileFlashAvr *fd)
 		/* Wait until the memory is erased. */
 		boot_spm_busy_wait();
 
-		kprintf("Done.\n");
-		kprintf("Writing page, addr %u...", fd->curr_page * SPM_PAGESIZE);
+		LOG_INFO("Done.\n");
+		LOG_INFO("Writing page, addr %u...", fd->curr_page * SPM_PAGESIZE);
 
 		/* Store buffer in flash page. */
 		ATOMIC(boot_page_write(fd->curr_page * SPM_PAGESIZE));
@@ -122,7 +128,7 @@ static void flash_avr_flush(KFileFlashAvr *fd)
 		ATOMIC(boot_rww_enable());
 
 		fd->page_dirty = false;
-		kprintf("Done.\n");
+		LOG_INFO("Done.\n");
 	}
 }
 
@@ -153,7 +159,7 @@ static void flash_avr_loadPage(KFileFlashAvr *fd, avr_page_t page)
 		// Load page
 		memcpy_P(fd->page_buf, (const char *)(page * SPM_PAGESIZE), SPM_PAGESIZE);
 		fd->curr_page = page;
-		kprintf("Loaded page %d\n", fd->curr_page);
+		LOG_INFO("Loaded page %d\n", fd->curr_page);
 	}
 }
 
@@ -175,7 +181,7 @@ static size_t flash_avr_write(struct KFile *_fd, const void *_buf, size_t size)
 	ASSERT(fd->fd.seek_pos + (kfile_off_t)size <= (kfile_off_t)fd->fd.size);
 	size = MIN((uint32_t)size, fd->fd.size - fd->fd.seek_pos);
 
-	kprintf("Writing at pos[%u]\n", fd->fd.seek_pos);
+	LOG_INFO("Writing at pos[%u]\n", fd->fd.seek_pos);
 	while (size)
 	{
 		page = fd->fd.seek_pos / SPM_PAGESIZE;
@@ -192,7 +198,7 @@ static size_t flash_avr_write(struct KFile *_fd, const void *_buf, size_t size)
 		size -= wr_len;
 		total_write += wr_len;
 	}
-	kprintf("written %u bytes\n", total_write);
+	LOG_INFO("written %u bytes\n", total_write);
 	return total_write;
 }
 
@@ -210,7 +216,7 @@ static void flash_avr_open(struct KFileFlashAvr *fd)
 	fd->fd.size = (uint16_t)(FLASHEND - CONFIG_FLASH_AVR_BOOTSIZE + 1);
 	fd->page_dirty = false;
 
-	kprintf("Flash file opened\n");
+	LOG_INFO("Flash file opened\n");
 }
 
 /**
@@ -220,7 +226,7 @@ static int flash_avr_close(struct KFile *_fd)
 {
 	KFileFlashAvr *fd = KFILEFLASHAVR(_fd);
 	flash_avr_flush(fd);
-	kprintf("Flash file closed\n");
+	LOG_INFO("Flash file closed\n");
 	return 0;
 }
 
@@ -246,7 +252,7 @@ static size_t flash_avr_read(struct KFile *_fd, void *buf, size_t size)
 	ASSERT(fd->fd.seek_pos + (kfile_off_t)size <= (kfile_off_t)fd->fd.size);
 	size = MIN((uint32_t)size, fd->fd.size - fd->fd.seek_pos);
 
-	kprintf("Reading at pos[%u]\n", fd->fd.seek_pos);
+	LOG_INFO("Reading at pos[%u]\n", fd->fd.seek_pos);
 	// Flush current buffered page (if modified).
 	flash_avr_flush(fd);
 
@@ -259,7 +265,7 @@ static size_t flash_avr_read(struct KFile *_fd, void *buf, size_t size)
 
 	memcpy_P(buf, pgm_addr, size);
 	fd->fd.seek_pos += size;
-	kprintf("Read %u bytes\n", size);
+	LOG_INFO("Read %u bytes\n", size);
 	return size;
 }
 
