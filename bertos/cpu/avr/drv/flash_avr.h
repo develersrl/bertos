@@ -42,6 +42,7 @@
 
 #include <cfg/compiler.h>
 #include <kern/kfile.h>
+#include <avr/io.h>
 
 
 /**
@@ -69,6 +70,13 @@ typedef struct KFileFlashAvr
 	* Flag for checking if current page is modified.
 	*/
 	bool page_dirty;
+
+	/**
+	* Temporary buffer cointaing data block to
+	* write on flash.
+	*/
+	uint8_t page_buf[SPM_PAGESIZE];
+
 
 } KFileFlashAvr;
 

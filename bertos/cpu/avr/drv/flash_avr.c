@@ -68,14 +68,6 @@
 typedef uint16_t avr_page_addr_t;
 
 
-/**
- * Temporary buffer cointaing data block to
- * write on flash.
- */
-static uint8_t page_buf[SPM_PAGESIZE];
-
-
-
 
 
 /*
@@ -100,7 +92,7 @@ static void flash_avr_flush(KFileFlashAvr *fd)
 		// Fill the temporary buffer of the AVR
 		for (avr_page_addr_t page_addr = 0; page_addr < SPM_PAGESIZE; page_addr += 2)
 		{
-			uint16_t word = ((uint16_t)page_buf[page_addr + 1] << 8) | page_buf[page_addr];
+			uint16_t word = ((uint16_t)fd->page_buf[page_addr + 1] << 8) | fd->page_buf[page_addr];
 
 			ATOMIC(boot_page_fill(page_addr, word));
 		}
@@ -159,7 +151,7 @@ static void flash_avr_loadPage(KFileFlashAvr *fd, avr_page_t page)
 	{
 		flash_avr_flush(fd);
 		// Load page
-		memcpy_P(page_buf, (const char *)(page * SPM_PAGESIZE), SPM_PAGESIZE);
+		memcpy_P(fd->page_buf, (const char *)(page * SPM_PAGESIZE), SPM_PAGESIZE);
 		fd->curr_page = page;
 		kprintf("Loaded page %d\n", fd->curr_page);
 	}
@@ -192,7 +184,7 @@ static size_t flash_avr_write(struct KFile *_fd, const void *_buf, size_t size)
 		flash_avr_loadPage(fd, page);
 
 		size_t wr_len = MIN(size, SPM_PAGESIZE - page_addr);
-		memcpy(page_buf + page_addr, buf, wr_len);
+		memcpy(fd->page_buf + page_addr, buf, wr_len);
 		fd->page_dirty = true;
 
 		buf += wr_len;
@@ -212,7 +204,7 @@ static size_t flash_avr_write(struct KFile *_fd, const void *_buf, size_t size)
 static void flash_avr_open(struct KFileFlashAvr *fd)
 {
 	fd->curr_page = 0;
-	memcpy_P(page_buf, (const char *)(fd->curr_page * SPM_PAGESIZE), SPM_PAGESIZE);
+	memcpy_P(fd->page_buf, (const char *)(fd->curr_page * SPM_PAGESIZE), SPM_PAGESIZE);
 
 	fd->fd.seek_pos = 0;
 	fd->fd.size = (uint16_t)(FLASHEND - CONFIG_FLASH_AVR_BOOTSIZE + 1);
