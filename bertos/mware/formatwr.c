@@ -899,13 +899,22 @@ FLOATING_CONVERSION:
 CONVERSION_LOOP:
 #if CONFIG_PRINTF > PRINTF_NOMODIFIERS
 				if (h_modifier)
-					u_val = (format_flag == 'd') ?
-						(short)va_arg(ap, int) : (unsigned short)va_arg(ap, int);
+				{
+					if (format_flag == 'd')
+						u_val = (short)va_arg(ap, int);
+					else
+						u_val = (unsigned short)va_arg(ap, int);
+				}
 				else if (l_modifier)
 					u_val = va_arg(ap, long);
 				else
-					u_val = (format_flag == 'd') ?
-						va_arg(ap,int) : va_arg(ap,unsigned int);
+				{
+					if (format_flag == 'd')
+						u_val = va_arg(ap, int);
+					else
+						u_val = va_arg(ap, unsigned int);
+				}
+
 #else /* CONFIG_PRINTF > PRINTF_NOMODIFIERS */
 				u_val = va_arg(ap,int);
 #endif /* CONFIG_PRINTF > PRINTF_NOMODIFIERS */
