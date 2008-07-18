@@ -50,9 +50,9 @@
  * To use logging system you should include this module in your drive and use
  * a LOG_ERROR, LOG_WARNING and LOG_INFO macros to set the level log of the message.
  * Then you should define a LOG_LEVEL and LOG_VERBOSE costant in your
- * \c cfg/cfg_\<your_module_name\>.h using the follow police:
+ * \c cfg/cfg_\<your_cfg_module_name\>.h using the follow policy:
  *
- * - in your file \c cfg/cfg_\<module_name\>.h, you define the logging
+ * - in your file \c cfg/cfg_\<cfg_module_name\>.h, you define the logging
  *   level and verbosity mode for your specific module:
  *
  * \code
@@ -64,27 +64,27 @@
  *	 * Use 1 to log the error and warning messages
  *	 * Use 2 to log all messages
  *	 *
- *	#define <module_name>_LOG_LEVEL      2
+ *	#define <cfg_module_name>_LOG_LEVEL      2
  *
  *	 **
  *	 * Set logging verbosity.
  *	 *
  *	 * If verbose is zero print short log messages.
  *	 *
- *	#define <module_name>_LOG_VERBOSE    1
+ *	#define <cfg_module_name>_LOG_VERBOSE    1
  *
  * \endcode
  *
  * - then, in the module that you use a logging macros you should define
  *   a LOG_LEVEL and LOG_VERBOSE using the previous value that you have define
- *   in cfg_<module_name>.h header. After this you should include the cfg/log.h
+ *   in cfg_<cfg_module_name>.h header. After this you should include the cfg/log.h
  *   module:
  *
  * \code
  *
  *	// Define logging setting (for cfg/log.h module).
- *	#define LOG_LEVEL       <module_name>_LOG_LEVEL
- *	#define LOG_VERBOSE     <module_name>_LOG_VERBOSE
+ *	#define LOG_LEVEL       <cfg_module_name>_LOG_LEVEL
+ *	#define LOG_VERBOSE     <cfg_module_name>_LOG_VERBOSE
  *	#include <cfg/log.h>
  *
  * \endcode
@@ -93,8 +93,8 @@
  * macros, the module use the default setting (see below).
  *
  * WARNING: when use the log.h module, and you want to set a your log level
- * make sure to include this module after a \c cfg_<module_name>.h, because the
- * LOG_LEVEL and LOG_VERBOSE macros must be define before to include log module,
+ * make sure to include this module after a \c cfg_<cfg_module_name>.h, because the
+ * LOG_LEVEL and LOG_VERBOSE macros must be defined before to include log module,
  * otherwise the log module use a default settings.
  *
  * \version $Id$
