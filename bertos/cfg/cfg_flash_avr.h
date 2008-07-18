@@ -44,6 +44,8 @@
  * Bootloader section size.
  * \note Remember to update this define when changing bootloader size fuses.
  */
-#define CONFIG_FLASH_AVR_BOOTSIZE 8192
+#define CONFIG_FLASH_AVR_BOOTSIZE         8192
+#define CONFIG_FLASH_AVR_LOG_LEVEL        LOG_LVL_ERR
+#define CONFIG_FLASH_AVR_LOG_VERBOSITY    LOG_SILENT
 
 #endif /* CFG_BOOT_H */
