@@ -63,12 +63,12 @@
 
 int main(void)
 {
-	KFile fd;
+	KFileFlashAvr flash;
 	KFileSerial ser;
 
 
 	// Set up flash programming functions.
-	flash_avr_init(&fd);
+	flash_avr_init(&flash);
 
 	IRQ_ENABLE;
 
@@ -76,12 +76,15 @@ int main(void)
 
 	kdbg_init();
 	timer_init();
+
+
 	/* Open the main communication port */
+
 	ser_init(&ser, CONFIG_SER_HOSTPORT);
 	ser_setbaudrate(&ser, CONFIG_SER_HOSTPORTBAUDRATE);
 
-	xmodem_recv(&ser, &fd);
-	kfile_close(&fd);
+	xmodem_recv(&ser, &flash.fd);
+	kfile_close(&flash.fd);
     kfile_close(&ser.fd);
 
 	IRQ_DISABLE;
@@ -89,4 +92,6 @@ int main(void)
 	BOOT_END;
 
 	START_APP();
+
 }
+
