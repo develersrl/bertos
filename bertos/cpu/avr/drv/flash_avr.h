@@ -45,11 +45,24 @@
 
 
 /**
+ * Definition of type for avr flash module.
+ */
+typedef uint16_t avr_page_t;
+
+
+/**
  * FlashAvr KFile context structure.
  */
 typedef struct KFileFlashAvr
 {
 	KFile fd;		///< File descriptor.
+
+	/**
+	* Current buffered page.
+	*/
+	avr_page_t curr_page;
+
+
 } KFileFlashAvr;
 
 

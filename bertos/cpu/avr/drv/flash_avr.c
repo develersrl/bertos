@@ -66,7 +66,7 @@
  * Definition of type for avr flash module.
  */
 typedef uint16_t avr_page_addr_t;
-typedef uint16_t avr_page_t;
+
 
 /**
  * Temporary buffer cointaing data block to
@@ -79,10 +79,7 @@ static uint8_t page_buf[SPM_PAGESIZE];
  */
 bool page_modified;
 
-/**
- * Current buffered page.
- */
-static avr_page_t curr_page = 0;
+
 
 /*
  * Private avr flush funtion.
@@ -92,11 +89,11 @@ static avr_page_t curr_page = 0;
  *
  * This function is only use internaly in this module.
  */
-static void flash_avr_flush(void)
+static void flash_avr_flush(KFileFlashAvr *fd)
 {
 	if (page_modified)
 	{
-		kprintf("Flushing page %d\n", curr_page);
+		kprintf("Flushing page %d\n", fd->curr_page);
 
 		// Wait while the SPM instruction is busy.
 		boot_spm_busy_wait();
@@ -114,19 +111,19 @@ static void flash_avr_flush(void)
 
 		wdt_reset();
 
-		kprintf("Erasing page, addr %u...", curr_page * SPM_PAGESIZE);
+		kprintf("Erasing page, addr %u...", fd->curr_page * SPM_PAGESIZE);
 
 		/* Page erase */
-		ATOMIC(boot_page_erase(curr_page * SPM_PAGESIZE));
+		ATOMIC(boot_page_erase(fd->curr_page * SPM_PAGESIZE));
 
 		/* Wait until the memory is erased. */
 		boot_spm_busy_wait();
 
 		kprintf("Done.\n");
-		kprintf("Writing page, addr %u...", curr_page * SPM_PAGESIZE);
+		kprintf("Writing page, addr %u...", fd->curr_page * SPM_PAGESIZE);
 
 		/* Store buffer in flash page. */
-		ATOMIC(boot_page_write(curr_page * SPM_PAGESIZE));
+		ATOMIC(boot_page_write(fd->curr_page * SPM_PAGESIZE));
 		boot_spm_busy_wait();  // Wait while the SPM instruction is busy.
 
 		/*
@@ -147,11 +144,10 @@ static void flash_avr_flush(void)
  * Write current buffered page in flash memory (if modified).
  * This function erase flash memory page before writing.
  */
-static int flash_avr_kfileFlush(UNUSED_ARG(struct KFile *,fd))
+static int flash_avr_kfileFlush(struct KFile *_fd)
 {
-
-	KFILEFLASHAVR(fd);
-	flash_avr_flush();
+	KFileFlashAvr *fd = KFILEFLASHAVR(_fd);
+	flash_avr_flush(fd);
 	return 0;
 }
 
@@ -160,15 +156,15 @@ static int flash_avr_kfileFlush(UNUSED_ARG(struct KFile *,fd))
  * Check current page and if \a page is different, load it in
  * temporary buffer.
  */
-static void flash_avr_loadPage(avr_page_t page)
+static void flash_avr_loadPage(KFileFlashAvr *fd, avr_page_t page)
 {
-	if (page != curr_page)
+	if (page != fd->curr_page)
 	{
-		flash_avr_flush();
+		flash_avr_flush(fd);
 		// Load page
 		memcpy_P(page_buf, (const char *)(page * SPM_PAGESIZE), SPM_PAGESIZE);
-		curr_page = page;
-		kprintf("Loaded page %d\n", curr_page);
+		fd->curr_page = page;
+		kprintf("Loaded page %d\n", fd->curr_page);
 	}
 }
 
@@ -177,9 +173,9 @@ static void flash_avr_loadPage(avr_page_t page)
  * Write \a size bytes from buffer \a _buf to file \a fd
  * \note Write operations are buffered.
  */
-static size_t flash_avr_write(struct KFile *fd, const void *_buf, size_t size)
+static size_t flash_avr_write(struct KFile *_fd, const void *_buf, size_t size)
 {
-	KFILEFLASHAVR(fd);
+	KFileFlashAvr *fd = KFILEFLASHAVR(_fd);
 	const uint8_t *buf =(const uint8_t *)_buf;
 
 	avr_page_t page;
@@ -187,23 +183,23 @@ static size_t flash_avr_write(struct KFile *fd, const void *_buf, size_t size)
 	size_t total_write = 0;
 
 
-	ASSERT(fd->seek_pos + (kfile_off_t)size <= (kfile_off_t)fd->size);
-	size = MIN((uint32_t)size, fd->size - fd->seek_pos);
+	ASSERT(fd->fd.seek_pos + (kfile_off_t)size <= (kfile_off_t)fd->fd.size);
+	size = MIN((uint32_t)size, fd->fd.size - fd->fd.seek_pos);
 
-	kprintf("Writing at pos[%u]\n", fd->seek_pos);
+	kprintf("Writing at pos[%u]\n", fd->fd.seek_pos);
 	while (size)
 	{
-		page = fd->seek_pos / SPM_PAGESIZE;
-		page_addr = fd->seek_pos % SPM_PAGESIZE;
+		page = fd->fd.seek_pos / SPM_PAGESIZE;
+		page_addr = fd->fd.seek_pos % SPM_PAGESIZE;
 
-		flash_avr_loadPage(page);
+		flash_avr_loadPage(fd, page);
 
 		size_t wr_len = MIN(size, SPM_PAGESIZE - page_addr);
 		memcpy(page_buf + page_addr, buf, wr_len);
 		page_modified = true;
 
 		buf += wr_len;
-		fd->seek_pos += wr_len;
+		fd->fd.seek_pos += wr_len;
 		size -= wr_len;
 		total_write += wr_len;
 	}
@@ -218,8 +214,8 @@ static size_t flash_avr_write(struct KFile *fd, const void *_buf, size_t size)
  */
 static void flash_avr_open(struct KFileFlashAvr *fd)
 {
-	curr_page = 0;
-	memcpy_P(page_buf, (const char *)(curr_page * SPM_PAGESIZE), SPM_PAGESIZE);
+	fd->curr_page = 0;
+	memcpy_P(page_buf, (const char *)(fd->curr_page * SPM_PAGESIZE), SPM_PAGESIZE);
 
 	fd->fd.seek_pos = 0;
 	fd->fd.size = (uint16_t)(FLASHEND - CONFIG_FLASH_AVR_BOOTSIZE + 1);
@@ -231,10 +227,10 @@ static void flash_avr_open(struct KFileFlashAvr *fd)
 /**
  * Close file \a fd
  */
-static int flash_avr_close(UNUSED_ARG(struct KFile *,fd))
+static int flash_avr_close(struct KFile *_fd)
 {
-	KFILEFLASHAVR(fd);
-	flash_avr_flush();
+	KFileFlashAvr *fd = KFILEFLASHAVR(_fd);
+	flash_avr_flush(fd);
 	kprintf("Flash file closed\n");
 	return 0;
 }
@@ -255,25 +251,25 @@ static struct KFile *flash_avr_reopen(struct KFile *fd)
  * Read from file \a fd \a size bytes and put it in buffer \a buf
  * \return the number of bytes read.
  */
-static size_t flash_avr_read(struct KFile *fd, void *buf, size_t size)
+static size_t flash_avr_read(struct KFile *_fd, void *buf, size_t size)
 {
-	KFILEFLASHAVR(fd);
-	ASSERT(fd->seek_pos + (kfile_off_t)size <= (kfile_off_t)fd->size);
-	size = MIN((uint32_t)size, fd->size - fd->seek_pos);
+	KFileFlashAvr *fd = KFILEFLASHAVR(_fd);
+	ASSERT(fd->fd.seek_pos + (kfile_off_t)size <= (kfile_off_t)fd->fd.size);
+	size = MIN((uint32_t)size, fd->fd.size - fd->fd.seek_pos);
 
-	kprintf("Reading at pos[%u]\n", fd->seek_pos);
+	kprintf("Reading at pos[%u]\n", fd->fd.seek_pos);
 	// Flush current buffered page (if modified).
-	flash_avr_flush();
+	flash_avr_flush(fd);
 
 	/*
 	 * AVR pointers are 16 bits wide, this hack is needed to avoid
 	 * compiler warning, cause fd->seek_pos is a 32bit offset.
 	 */
 	const uint8_t *pgm_addr = (const uint8_t *)0;
-	pgm_addr += fd->seek_pos;
+	pgm_addr += fd->fd.seek_pos;
 
 	memcpy_P(buf, pgm_addr, size);
-	fd->seek_pos += size;
+	fd->fd.seek_pos += size;
 	kprintf("Read %u bytes\n", size);
 	return size;
 }
@@ -293,6 +289,7 @@ void flash_avr_init(struct KFileFlashAvr *fd)
 	fd->fd.write = flash_avr_write;
 	fd->fd.seek = kfile_genericSeek;
 	fd->fd.flush = flash_avr_kfileFlush;
+	fd->curr_page = 0;
 
 	flash_avr_open(fd);
 }
