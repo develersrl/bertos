@@ -74,10 +74,7 @@ typedef uint16_t avr_page_addr_t;
  */
 static uint8_t page_buf[SPM_PAGESIZE];
 
-/**
- * Flag for checking if current page is modified.
- */
-bool page_modified;
+
 
 
 
@@ -91,7 +88,7 @@ bool page_modified;
  */
 static void flash_avr_flush(KFileFlashAvr *fd)
 {
-	if (page_modified)
+	if (fd->page_modified)
 	{
 		kprintf("Flushing page %d\n", fd->curr_page);
 
@@ -132,7 +129,7 @@ static void flash_avr_flush(KFileFlashAvr *fd)
 		*/
 		ATOMIC(boot_rww_enable());
 
-		page_modified = false;
+		fd->page_modified = false;
 		kprintf("Done.\n");
 	}
 }
@@ -196,7 +193,7 @@ static size_t flash_avr_write(struct KFile *_fd, const void *_buf, size_t size)
 
 		size_t wr_len = MIN(size, SPM_PAGESIZE - page_addr);
 		memcpy(page_buf + page_addr, buf, wr_len);
-		page_modified = true;
+		fd->page_modified = true;
 
 		buf += wr_len;
 		fd->fd.seek_pos += wr_len;
@@ -219,7 +216,7 @@ static void flash_avr_open(struct KFileFlashAvr *fd)
 
 	fd->fd.seek_pos = 0;
 	fd->fd.size = (uint16_t)(FLASHEND - CONFIG_FLASH_AVR_BOOTSIZE + 1);
-	page_modified = false;
+	fd->page_modified = false;
 
 	kprintf("Flash file opened\n");
 }

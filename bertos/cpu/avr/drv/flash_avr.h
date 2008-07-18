@@ -55,13 +55,20 @@ typedef uint16_t avr_page_t;
  */
 typedef struct KFileFlashAvr
 {
-	KFile fd;		///< File descriptor.
+	/**
+	* File descriptor.
+	*/
+	KFile fd;
 
 	/**
 	* Current buffered page.
 	*/
 	avr_page_t curr_page;
 
+	/**
+	* Flag for checking if current page is modified.
+	*/
+	bool page_modified;
 
 } KFileFlashAvr;
 
