@@ -162,15 +162,15 @@
  */
 #define LOG_ERR(str,...)            LOG_PRINT("ERR", str, ## __VA_ARGS__)
 
-#if (LOG_LEVEL <= LOG_LVL_INFO)
+#if (LOG_LEVEL == LOG_LVL_INFO)
 	#define LOG_WARN(str,...)       LOG_PRINT("WARN", str, ## __VA_ARGS__)
 	#define LOG_INFO(str,...)       LOG_PRINT("INFO", str, ## __VA_ARGS__)
 
-#elif (LOG_LEVEL <= LOG_LVL_WARN)
+#elif (LOG_LEVEL == LOG_LVL_WARN)
 	#define LOG_WARN(str,...)       LOG_PRINT("WARN", str, ## __VA_ARGS__)
 	#define LOG_INFO(str,...)       /* Nothing */
 
-#else /* LOG_LEVEL <= LOG_LVL_ERR */
+#else /* LOG_LEVEL == LOG_LVL_ERR */
 	#define LOG_WARN(str,...)       /* Nothing */
 	#define LOG_INFO(str,...)       /* Nothing */
 
