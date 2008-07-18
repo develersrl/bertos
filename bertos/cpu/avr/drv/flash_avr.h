@@ -49,7 +49,7 @@
  */
 typedef struct KFileFlashAvr
 {
-	KFile fd;                       ///< File descriptor.
+	KFile fd;		///< File descriptor.
 } KFileFlashAvr;
 
 
