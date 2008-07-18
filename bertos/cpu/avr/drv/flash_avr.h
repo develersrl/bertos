@@ -68,7 +68,7 @@ typedef struct KFileFlashAvr
 	/**
 	* Flag for checking if current page is modified.
 	*/
-	bool page_modified;
+	bool page_dirty;
 
 } KFileFlashAvr;
 
