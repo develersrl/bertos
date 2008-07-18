@@ -57,24 +57,24 @@ typedef uint16_t avr_page_t;
 typedef struct KFileFlashAvr
 {
 	/**
-	* File descriptor.
-	*/
+	 * File descriptor.
+	 */
 	KFile fd;
 
 	/**
-	* Current buffered page.
-	*/
+	 * Current buffered page.
+	 */
 	avr_page_t curr_page;
 
 	/**
-	* Flag for checking if current page is modified.
-	*/
+	 * Flag for checking if current page is modified.
+	 */
 	bool page_dirty;
 
 	/**
-	* Temporary buffer cointaing data block to
-	* write on flash.
-	*/
+	 * Temporary buffer cointaing data block to
+	 * write on flash.
+	 */
 	uint8_t page_buf[SPM_PAGESIZE];
 
 

@@ -70,7 +70,7 @@ typedef uint16_t avr_page_addr_t;
 
 
 
-/*
+/**
  * Private avr flush funtion.
  *
  * Write current buffered page in flash memory (if modified).
