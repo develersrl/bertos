@@ -84,10 +84,7 @@ int main(void)
 	ser_init(&tag_ser, TAG_SER_PORT);
 	ser_setbaudrate(&tag_ser, TAG_SER_BAUDRATE);
 
-	pkt.comm_ser = &fd_ser;
-	pkt.tag_ser = &tag_ser;
-
-	keytag_init(&pkt);
+	keytag_init(&pkt, &fd_ser.fd, &tag_ser.fd);
 
 	protocol_init(&fd_ser.fd);
 

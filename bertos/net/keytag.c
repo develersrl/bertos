@@ -58,17 +58,20 @@ static void keytag_clearPkt(struct TagPacket *pkt)
 	pkt->len = 0;
 }
 
-	void keytag_init(struct TagPacket *pkt)
-	{
-		keytag_clearPkt(pkt);
-	}
+void keytag_init(struct TagPacket *pkt, struct KFile *comm, struct KFile *tag)
+{
+	keytag_clearPkt(pkt);
+	pkt->host = comm;
+	pkt->tag = tag;
+
+}
 
 	void keytag_poll(struct TagPacket *pkt)
 {
 	int c;
 
 	/* Get all chars from buffer */
-	while ((c = kfile_getc(&pkt->tag_ser->fd)) != EOF)
+	while ((c = kfile_getc(pkt->tag)) != EOF)
 	{
 		/* Search for STX char in received chars */
 		if (c == TAG_STX)
@@ -86,7 +89,7 @@ static void keytag_clearPkt(struct TagPacket *pkt)
 			{
 				pkt->buf[TAG_MAX_PRINT_CHARS] = '\x0';
 				/* Write read TAG on communication serial */
-				kfile_printf(&pkt->comm_ser->fd, "tag %s", pkt->buf);
+				kfile_printf(pkt->host, "tag %s", pkt->buf);
 				pkt->sync = false;
 			}
 			else

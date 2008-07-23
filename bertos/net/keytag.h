@@ -69,14 +69,14 @@
  */
 typedef struct TagPacket
 {
-	KFileSerial *tag_ser;		// Tag serial
-	KFileSerial *comm_ser;        // Communication serial
-	bool sync;                  	// Status flag: true if we find an STX
-	uint16_t len;            	// Packet lenght
-	uint8_t buf[TAG_MAX_LEN]; 	// Reception buffer
+	KFile *tag;		            ///<Tag communication channel
+	KFile *host;                ///<Host communication channel
+	bool sync;                  ///< Status flag: true if we find an STX
+	uint16_t len;               ///< Packet lenght
+	uint8_t buf[TAG_MAX_LEN]; 	///< Reception buffer
 } TagPacket;
 
-void keytag_init(struct TagPacket *pkt);
+void keytag_init(struct TagPacket *pkt, struct KFile *comm, struct KFile *tag);
 void keytag_poll(struct TagPacket *pkt);
 
 #endif /* NET_TAG_H */
