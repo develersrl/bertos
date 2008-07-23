@@ -59,6 +59,7 @@
 
 
 static KFileSerial fd_ser;
+static KFileSerial tag_ser;
 
 int main(void)
 {
@@ -80,10 +81,12 @@ int main(void)
 	ser_init(&fd_ser, CONFIG_TRIFACE_PORT);
 	ser_setbaudrate(&fd_ser, CONFIG_TRIFACE_BAUDRATE);
 
-	ser_init(pkt.tag_ser, TAG_SER_PORT);
-	ser_setbaudrate(pkt.tag_ser, TAG_SER_BAUDRATE);
+	ser_init(&tag_ser, TAG_SER_PORT);
+	ser_setbaudrate(&tag_ser, TAG_SER_BAUDRATE);
 
 	pkt.comm_ser = &fd_ser;
+	pkt.tag_ser = &tag_ser;
+
 	keytag_init(&pkt);
 
 	protocol_init(&fd_ser.fd);
