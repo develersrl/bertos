@@ -59,7 +59,7 @@ endif
 
 boot_EMBEDDED_TGT = 1
 # Set to 1 for debug builds
-boot_DEBUG = 1
+boot_DEBUG = 0
 
 # Our target application
 TRG += boot
