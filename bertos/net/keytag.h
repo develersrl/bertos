@@ -56,8 +56,6 @@
  */
 #define TAG_MAX_LEN 14
 
-#define TAG_SER_PORT 0
-#define TAG_SER_BAUDRATE 9600
 
 /**
  * Max number of chars to print in the communication serial
@@ -69,11 +67,11 @@
  */
 typedef struct TagPacket
 {
-	KFile *tag;		            ///<Tag communication channel
-	KFile *host;                ///<Host communication channel
+	KFile *tag;                 ///< Tag communication channel
+	KFile *host;                ///< Host communication channel
 	bool sync;                  ///< Status flag: true if we find an STX
 	uint16_t len;               ///< Packet lenght
-	uint8_t buf[TAG_MAX_LEN]; 	///< Reception buffer
+	uint8_t buf[TAG_MAX_LEN];   ///< Reception buffer
 } TagPacket;
 
 void keytag_init(struct TagPacket *pkt, struct KFile *comm, struct KFile *tag);
