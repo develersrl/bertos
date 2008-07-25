@@ -46,6 +46,10 @@
 
 /// Baud-rate for the kdebug console
 #define CONFIG_TRIFACE_BAUDRATE  115200
+/// Triface serial tag port
+#define TAG_SER_PORT 0
+///Baud-rate for triface serial tag port
+#define TAG_SER_BAUDRATE 9600
 
 /// [bytes] Size of the outbound FIFO buffer for port 0.
 #define CONFIG_UART0_TXBUFSIZE  32
