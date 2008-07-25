@@ -63,10 +63,9 @@ void keytag_init(struct TagPacket *pkt, struct KFile *comm, struct KFile *tag)
 	keytag_clearPkt(pkt);
 	pkt->host = comm;
 	pkt->tag = tag;
-
 }
 
-	void keytag_poll(struct TagPacket *pkt)
+void keytag_poll(struct TagPacket *pkt)
 {
 	int c;
 
@@ -112,4 +111,11 @@ void keytag_init(struct TagPacket *pkt, struct KFile *comm, struct KFile *tag)
 			}
 		}
 	}
+	if (kfile_error(pkt->tag) != 0)
+	{
+		if (kfile_error(pkt->tag) != SERRF_RXTIMEOUT)
+			kprintf("Error %08x\n", kfile_error(pkt->tag));
+		kfile_clearerr(pkt->tag);
+	}
+
 }
