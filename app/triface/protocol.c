@@ -302,7 +302,14 @@ MAKE_CMD(reset, "", "",
 	(void)args;
 	wdt_init(7);
 	wdt_start();
+
+	/*We want to have an infinite loop that lock access on watchdog timer.
+	This piece of code it's equivalent to a while(true), but we have done this because
+	gcc generate a warning message that suggest to use "noreturn" parameter in function reset.*/
+	ASSERT(args);
+	while(args);
 	0;
+
 }), 0)
 
 /* Din */
