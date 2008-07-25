@@ -294,15 +294,6 @@ MAKE_CMD(rdout, "", "d",
 	0;
 }), 0)
 
-/* Doutx sperimentale.......  */
-MAKE_CMD(doutx, "d", "",
- ({
-	 sipo_putchar((uint8_t)args[1].l);
-	 
-	 //Store status of dout ports.
-	 reg_status_dout = (uint8_t)args[1].l;
-	 0;
- }), 0)
 
 /* Reset */
 MAKE_CMD(reset, "", "",
@@ -350,7 +341,6 @@ static void protocol_registerCmds(void)
 	//Set off all dout ports.
 	reg_status_dout = 0;
 	REGISTER_CMD(rdout);
-	REGISTER_CMD(doutx);
 	REGISTER_CMD(reset);
 	REGISTER_CMD(din);
 	REGISTER_CMD(ain);
