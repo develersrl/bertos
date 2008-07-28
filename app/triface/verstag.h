@@ -51,7 +51,7 @@
 #define APP_COPYRIGHT "Copyright 2006, 2007, 2008, Develer (http://www.develer.com/)"
 
 #define VERS_MAJOR 2
-#define VERS_MINOR 0
+#define VERS_MINOR 1
 #define VERS_REV   0
 #define VERS_LETTER ""
 

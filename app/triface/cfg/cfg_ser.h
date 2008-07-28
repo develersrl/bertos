@@ -94,11 +94,11 @@
 /// SPI clock phase: 0 = sample on first edge, 1 = sample on second clock edge (AVR only).
 #define CONFIG_SPI_CLOCK_PHASE	0
 
-/// Default transmit timeout (ms). Set to -1 to disable timeout support.
-#define CONFIG_SER_TXTIMEOUT    10
+/// Default transmit timeout (ms). Set to -1 for infinite timeout, 0 for null timeout
+#define CONFIG_SER_TXTIMEOUT    0
 
-/// Default receive timeout (ms). Set to -1 to disable timeout support.
-#define CONFIG_SER_RXTIMEOUT    10
+/// Default receive timeout (ms). Set to -1 for infinite timeout, 0 for null timeout
+#define CONFIG_SER_RXTIMEOUT    0
 
 /// Use RTS/CTS handshake
 #define CONFIG_SER_HWHANDSHAKE   0
