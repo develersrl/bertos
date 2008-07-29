@@ -113,8 +113,7 @@ void keytag_poll(struct TagPacket *pkt)
 	}
 	if (kfile_error(pkt->tag) != 0)
 	{
-		if (kfile_error(pkt->tag) != SERRF_RXTIMEOUT)
-			kprintf("Error %08x\n", kfile_error(pkt->tag));
+		kprintf("Error %08x\n", kfile_error(pkt->tag));
 		kfile_clearerr(pkt->tag);
 	}
 
