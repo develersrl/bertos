@@ -152,8 +152,8 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 
 #if (ARCH & ARCH_EMUL)
 	/* Ignore stack provided by caller and use the large enough default instead. */
-	stack_base = (cpustack_t *)LIST_HEAD(&StackFreeList);
-	REMOVE(LIST_HEAD(&StackFreeList));
+	stack_base = (cpustack_t *)list_remHead(&StackFreeList);
+
 	stacksize = CONFIG_PROC_DEFSTACKSIZE;
 #elif CONFIG_KERN_HEAP
 	/* Did the caller provide a stack for us? */
