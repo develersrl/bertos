@@ -73,6 +73,12 @@ $(1)_MAP_FLAGS = $$(MAP_FLAGS_EMB)
 #In embedded we need s19, hex and bin
 $$(OUTDIR)/$(1).tgt : $$(OUTDIR)/$(1).s19 $$(OUTDIR)/$(1).hex $$(OUTDIR)/$(1).bin
 else
+#On Darwin architecture the assembly doesn't link correctly if this flag is setted.
+ifeq ($(shell uname | grep -c "Darwin"),1)
+LIST_FLAGS = ""
+MAP_FLAGS = ""
+LDFLAGS = ""
+endif
 #use hosted specific map flags
 $(1)_MAP_FLAGS = $$(MAP_FLAGS_HOST)
 #in hosted application we need only executable file.

@@ -13,9 +13,20 @@
  * \author Bernardo Innocenti <bernie@develer.com>
  */
 
+
+
+#ifdef __APPLE__
+    //This workaround is necessary to compile under OS X assembler.
+    #define SWITCH_CONTEXT _asm_switch_context
+    #define SWITCH_VERSION _asm_switch_version
+#else
+    #define SWITCH_CONTEXT asm_switch_context
+    #define SWITCH_VERSION asm_switch_version
+#endif
+
 /* void asm_switch_context(void ** new_sp, void ** save_sp) */
-.globl asm_switch_context
-asm_switch_context:
+.globl SWITCH_CONTEXT
+SWITCH_CONTEXT:
 	pushl	%eax
 	pushl	%ebx
 	pushl	%ecx
@@ -37,8 +48,8 @@ asm_switch_context:
 	ret
 
 /* int asm_switch_version(void) */
-.globl asm_switch_version
-asm_switch_version:
+.globl SWITCH_VERSION
+SWITCH_VERSION:
 	mov	$1,%eax
 	ret
 
