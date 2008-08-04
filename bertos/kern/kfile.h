@@ -43,20 +43,20 @@
  * you have to declare your context structure:
  *
  * \code
- * typedef struct KFileSerial
+ * typedef struct SerialKFile
  * {
  *		KFile fd;
  *		Serial *ser;
- * } KFileSerial;
+ * } SerialKFile;
  * \endcode
  *
- * You should also supply a macro for casting KFile to KFileSerial:
+ * You should also supply a macro for casting KFile to SerialKFile:
  *
  * \code
- * INLINE KFileSerial * KFILESERIAL(KFile *fd)
+ * INLINE SerialKFile * SERIALKFILE(KFile *fd)
  * {
  *		ASSERT(fd->_type == KFT_SERIAL);
- *		return (KFileSerial *)fd;
+ *		return (SerialKFile *)fd;
  * }
  * \endcode
  *
@@ -67,12 +67,12 @@
  * \code
  * static int ser_kfile_close(struct KFile *fd)
  * {
- *		KFileSerial *fds = KFILESERIAL(fd);
+ *		SerialKFile *fds = SerialKFile(fd);
  *		ser_close(fds->ser);
  *		return 0;
  * }
  * \endcode
- * KFILESERIAL macro helps to ensure that obj passed is really a Serial.
+ * SerialKFile macro helps to ensure that obj passed is really a Serial.
  *
  * KFile interface do not supply the open function: this is deliberate,
  * because in embedded systems each device has its own init parameters.

@@ -46,7 +46,7 @@
 #include <io/arm.h>
 
 Timer leds_timer;
-KFileSerial ser_fd;
+SerialKFile ser_fd;
 
 static void leds_toggle(void)
 {

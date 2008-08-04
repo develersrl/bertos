@@ -95,7 +95,7 @@
 /*
  * Kfile structure to test a dataflash.
  */
-static KFileSerial spi_fd;
+static SerialKFile spi_fd;
 static KFileDataflash dflash_fd;
 
 /*

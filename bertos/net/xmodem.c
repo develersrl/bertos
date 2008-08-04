@@ -88,7 +88,7 @@
  *
  * \note This function allocates a large amount of stack (\see XM_BUFSIZE).
  */
-bool xmodem_recv(struct KFileSerial *port, KFile *fd)
+bool xmodem_recv(struct SerialKFile *port, KFile *fd)
 {
 	char block_buffer[XM_BUFSIZE]; /* Buffer to hold a block of data */
 	int c, i, blocksize;
@@ -308,7 +308,7 @@ bool xmodem_recv(struct KFileSerial *port, KFile *fd)
  * \note This function allocates a large amount of stack for
  *       the XModem transfer buffer (\see XM_BUFSIZE).
  */
-bool xmodem_send(struct KFileSerial *port, KFile *fd)
+bool xmodem_send(struct SerialKFile *port, KFile *fd)
 {
 	char block_buffer[XM_BUFSIZE]; /* Buffer to hold a block of data */
 	size_t size = -1;
