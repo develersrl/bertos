@@ -54,7 +54,7 @@ typedef uint16_t avr_page_t;
 /**
  * FlashAvr KFile context structure.
  */
-typedef struct KFileFlashAvr
+typedef struct FlashAvrKFile
 {
 	/**
 	 * File descriptor.
@@ -78,7 +78,7 @@ typedef struct KFileFlashAvr
 	uint8_t page_buf[SPM_PAGESIZE];
 
 
-} KFileFlashAvr;
+} FlashAvrKFile;
 
 
 
@@ -88,16 +88,16 @@ typedef struct KFileFlashAvr
 #define KFT_FLASHAVR MAKE_ID('F', 'L', 'A', 'V')
 
 /**
- * Convert + ASSERT from generic KFile to KFileFlashAvr.
+ * Convert + ASSERT from generic KFile to FlashAvrKFile.
  */
-INLINE KFileFlashAvr * KFILEFLASHAVR(KFile *fd)
+INLINE FlashAvrKFile * FLASHAVRKFILE(KFile *fd)
 {
 	ASSERT(fd->_type == KFT_FLASHAVR);
-	return (KFileFlashAvr *)fd;
+	return (FlashAvrKFile *)fd;
 }
 
 
-void flash_avr_init(struct KFileFlashAvr *fd);
+void flash_avr_init(struct FlashAvrKFile *fd);
 
 
 
