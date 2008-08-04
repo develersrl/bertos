@@ -247,7 +247,7 @@ typedef struct BattFsKFile
  * Macro used to cast a KFile to a BattFsKFile.
  * Also perform dynamic type check.
  */
-INLINE BattFsKFile * BattFsKFile(KFile *fd)
+INLINE BattFsKFile * BATTFSKFILE(KFile *fd)
 {
 	ASSERT(fd->_type == KFT_BATTFS);
 	return (BattFsKFile *)fd;

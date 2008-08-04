@@ -611,7 +611,7 @@ static int battfs_flush(struct KFile *fd)
  */
 static int battfs_fileclose(struct KFile *fd)
 {
-	BattFsKFile *fdb = BattFsKFile(fd);
+	BattFsKFile *fdb = BATTFSKFILE(fd);
 
 	battfs_flush(fd);
 	REMOVE(&fdb->link);
@@ -624,7 +624,7 @@ static int battfs_fileclose(struct KFile *fd)
  */
 static size_t battfs_read(struct KFile *fd, void *_buf, size_t size)
 {
-	BattFsKFile *fdb = BattFsKFile(fd);
+	BattFsKFile *fdb = BATTFSKFILE(fd);
 	uint8_t *buf = (uint8_t *)_buf;
 
 	size_t total_read = 0;
