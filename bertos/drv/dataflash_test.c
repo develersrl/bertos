@@ -96,7 +96,7 @@
  * Kfile structure to test a dataflash.
  */
 static SerialKFile spi_fd;
-static KFileDataflash dflash_fd;
+static DataFlashKFile dflash_fd;
 
 /*
  * Define tmp buffer to stora data for

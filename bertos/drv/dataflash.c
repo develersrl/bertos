@@ -106,7 +106,7 @@ STATIC_ASSERT(countof(mem_info) == DFT_CNT);
  * Macro that toggle CS of dataflash.
  * \note This is equivalent to fd->setCS(false) immediately followed by fd->setCS(true).
  */
-INLINE void CS_TOGGLE(KFileDataflash *fd)
+INLINE void CS_TOGGLE(DataFlashKFile *fd)
 {
 	fd->setCS(false);
 	fd->setCS(true);
@@ -117,7 +117,7 @@ INLINE void CS_TOGGLE(KFileDataflash *fd)
  * This function send only 4 byte: opcode, page address and
  * byte address.
  */
-static void send_cmd(KFileDataflash *fd, dataflash_page_t page_addr, dataflash_offset_t byte_addr, DataFlashOpcode opcode)
+static void send_cmd(DataFlashKFile *fd, dataflash_page_t page_addr, dataflash_offset_t byte_addr, DataFlashOpcode opcode)
 {
 
 	/*
@@ -166,7 +166,7 @@ static void send_cmd(KFileDataflash *fd, dataflash_page_t page_addr, dataflash_o
  * with one pulse reset long about 10usec.
  *
  */
-static void dataflash_reset(KFileDataflash *fd)
+static void dataflash_reset(DataFlashKFile *fd)
 {
 	fd->setCS(false);
 
@@ -183,7 +183,7 @@ static void dataflash_reset(KFileDataflash *fd)
 /**
  * Read status register of dataflah memory.
  */
-static uint8_t dataflash_stat(KFileDataflash *fd)
+static uint8_t dataflash_stat(DataFlashKFile *fd)
 {
 	/*
 	 * Make sure to toggle CS signal
@@ -200,7 +200,7 @@ static uint8_t dataflash_stat(KFileDataflash *fd)
  * return status register value.
  *
  */
-static uint8_t dataflash_cmd(KFileDataflash *fd, dataflash_page_t page_addr, dataflash_offset_t byte_addr, DataFlashOpcode opcode)
+static uint8_t dataflash_cmd(DataFlashKFile *fd, dataflash_page_t page_addr, dataflash_offset_t byte_addr, DataFlashOpcode opcode)
 {
 	uint8_t stat;
 
@@ -234,7 +234,7 @@ static uint8_t dataflash_cmd(KFileDataflash *fd, dataflash_page_t page_addr, dat
  * Read \a len bytes from main data flash memory or buffer data
  * flash memory, and put it in \a *block.
  */
-static void dataflash_readBlock(KFileDataflash *fd, dataflash_page_t page_addr, dataflash_offset_t byte_addr, DataFlashOpcode opcode, uint8_t *block, dataflash_size_t len)
+static void dataflash_readBlock(DataFlashKFile *fd, dataflash_page_t page_addr, dataflash_offset_t byte_addr, DataFlashOpcode opcode, uint8_t *block, dataflash_size_t len)
 {
 	send_cmd(fd, page_addr, byte_addr, opcode);
 
@@ -261,7 +261,7 @@ static void dataflash_readBlock(KFileDataflash *fd, dataflash_page_t page_addr, 
  * To perform a write in main memory you must first write in dataflash buffer
  * memory and then send a command to write the page in main memory.
  */
-static void dataflash_writeBlock(KFileDataflash *fd, dataflash_offset_t offset, DataFlashOpcode opcode, const uint8_t *block, dataflash_size_t len)
+static void dataflash_writeBlock(DataFlashKFile *fd, dataflash_offset_t offset, DataFlashOpcode opcode, const uint8_t *block, dataflash_size_t len)
 {
 	ASSERT(offset + len <= mem_info[fd->dev].page_size);
 
@@ -277,7 +277,7 @@ static void dataflash_writeBlock(KFileDataflash *fd, dataflash_offset_t offset, 
 /**
  * Load selct page from dataflash memory to buffer.
  */
-static void dataflash_loadPage(KFileDataflash *fd, dataflash_page_t page_addr)
+static void dataflash_loadPage(DataFlashKFile *fd, dataflash_page_t page_addr)
 {
 	dataflash_cmd(fd, page_addr, 0x00, DFO_MOV_MEM_TO_BUFF1);
 }
@@ -287,7 +287,7 @@ static void dataflash_loadPage(KFileDataflash *fd, dataflash_page_t page_addr)
  */
 static int dataflash_flush(KFile *_fd)
 {
-	KFileDataflash *fd = KFILEDATAFLASH(_fd);
+	DataFlashKFile *fd = DATAFLASHKFILE(_fd);
 	if (fd->page_dirty)
 	{
 		dataflash_cmd(fd, fd->current_page, 0x00, DFO_WRITE_BUFF1_TO_MEM_E);
@@ -316,7 +316,7 @@ static int dataflash_close(struct KFile *_fd)
  */
 static KFile *dataflash_reopen(KFile *_fd)
 {
-	KFileDataflash *fd = KFILEDATAFLASH(_fd);
+	DataFlashKFile *fd = DATAFLASHKFILE(_fd);
 	dataflash_close(_fd);
 
 	fd->current_page = 0;
@@ -344,7 +344,7 @@ static KFile *dataflash_reopen(KFile *_fd)
  */
 static size_t dataflash_read(struct KFile *_fd, void *buf, size_t size)
 {
-	KFileDataflash *fd = KFILEDATAFLASH(_fd);
+	DataFlashKFile *fd = DATAFLASHKFILE(_fd);
 
 	dataflash_offset_t byte_addr;
 	dataflash_page_t page_addr;
@@ -394,7 +394,7 @@ static size_t dataflash_read(struct KFile *_fd, void *buf, size_t size)
  */
 static size_t dataflash_write(struct KFile *_fd, const void *_buf, size_t size)
 {
-	KFileDataflash *fd = KFILEDATAFLASH(_fd);
+	DataFlashKFile *fd = DATAFLASHKFILE(_fd);
 
 	dataflash_offset_t offset;
 	dataflash_page_t new_page;
@@ -458,7 +458,7 @@ MOD_DEFINE(dataflash);
  * \return true if ok, false if memory density read from dataflash is not compliant with the
  * configured one.
  */
-bool dataflash_init(KFileDataflash *fd, KFile *ch, DataflashType dev, dataflash_setCS_t *setCS, dataflash_setReset_t *setReset)
+bool dataflash_init(DataFlashKFile *fd, KFile *ch, DataflashType dev, dataflash_setCS_t *setCS, dataflash_setReset_t *setReset)
 {
 	uint8_t stat;
 
