@@ -128,11 +128,20 @@ else
 $(1)_LD = $$($(1)_CROSS)$$(LD)
 endif
 
+# Sometimes $(CC) is actually set to a C++ compiler in disguise, and it
+# would whine if we passed it C-only flags.  Checking for the presence of
+# "++" in the name is a kludge that seems to work mostly.
+ifeq (++,$$(findstring ++,$$($(1)_CC)))
+	REAL_CFLAGS = $$(CXXFLAGS)
+else
+	REAL_CFLAGS = $$(CFLAGS)
+endif
+
 # Compile: instructions to create assembler and/or object files from C source
 $$($(1)_COBJ) : $$(OBJDIR)/$(1)/%.o : %.c
 	$L "$(1): Compiling $$< (C)"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$($(1)_CC) -c $$(CFLAGS) $$($(1)_CFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$< -o $$@
+	$Q $$($(1)_CC) -c $$(REAL_CFLAGS) $$($(1)_CFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$< -o $$@
 
 # Compile: instructions to create assembler and/or object files from C++ source
 $$($(1)_CXXOBJ) : $$(OBJDIR)/$(1)/%.o : %.cpp
