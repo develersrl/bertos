@@ -228,7 +228,7 @@ typedef uint32_t file_size_t; ///< Type for file sizes.
 /**
  * Describe a BattFs file usign a KFile.
  */
-typedef struct KFileBattFs
+typedef struct BattFsKFile
 {
 	KFile fd;           ///< KFile context
 	Node link;          ///< Link for inserting in opened file list
@@ -236,7 +236,7 @@ typedef struct KFileBattFs
 	BattFsSuper *disk;  ///< Disk context
 	filemode_t mode;    ///< File open mode
 	pgcnt_t *start;     ///< Pointer to page_array file start position.
-} KFileBattFs;
+} BattFsKFile;
 
 /**
  * Id for battfs file descriptors.
@@ -244,20 +244,20 @@ typedef struct KFileBattFs
 #define KFT_BATTFS MAKE_ID('B', 'T', 'F', 'S')
 
 /**
- * Macro used to cast a KFile to a KFileBattFs.
+ * Macro used to cast a KFile to a BattFsKFile.
  * Also perform dynamic type check.
  */
-INLINE KFileBattFs * KFILEBATTFS(KFile *fd)
+INLINE BattFsKFile * BattFsKFile(KFile *fd)
 {
 	ASSERT(fd->_type == KFT_BATTFS);
-	return (KFileBattFs *)fd;
+	return (BattFsKFile *)fd;
 }
 
 bool battfs_init(struct BattFsSuper *d);
 bool battfs_close(struct BattFsSuper *disk);
 
 bool battfs_fileExists(BattFsSuper *disk, inode_t inode);
-bool battfs_fileopen(BattFsSuper *disk, KFileBattFs *fd, inode_t inode, filemode_t mode);
+bool battfs_fileopen(BattFsSuper *disk, BattFsKFile *fd, inode_t inode, filemode_t mode);
 
 bool battfs_writeTestBlock(struct BattFsSuper *disk, pgcnt_t page, inode_t inode, seq_t seq, fill_t fill, pgoff_t pgoff, mark_t mark);
 

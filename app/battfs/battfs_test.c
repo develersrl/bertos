@@ -99,7 +99,7 @@ static bool disk_close(struct BattFsSuper *d)
 static void testCheck(BattFsSuper *disk, pgcnt_t *reference)
 {
 	ASSERT(battfs_init(disk));
-	
+
 	for (int i = 0; i < disk->page_count; i++)
 	{
 		if (disk->page_array[i] != reference[i])
@@ -351,8 +351,8 @@ static void test9(BattFsSuper *disk)
 
 static void test10(BattFsSuper *disk)
 {
-	KFileBattFs fd1;
-	KFileBattFs fd2;
+	BattFsKFile fd1;
+	BattFsKFile fd2;
 	kprintf("Test10: open file test, inode 0 and inode 4\n");
 
 	fp = fopen(test_filename, "w+");
@@ -416,7 +416,7 @@ static void test10(BattFsSuper *disk)
 
 static void test11(BattFsSuper *disk)
 {
-	KFileBattFs fd1;
+	BattFsKFile fd1;
 	uint8_t buf[16];
 
 	kprintf("Test11: read file test\n");
@@ -454,7 +454,7 @@ static void test11(BattFsSuper *disk)
 
 static void test12(BattFsSuper *disk)
 {
-	KFileBattFs fd1;
+	BattFsKFile fd1;
 
 	kprintf("Test12: read file test across page boundary and seek test\n");
 
