@@ -279,23 +279,20 @@ $(RECURSIVE_TARGETS):
 
 BUILDREV_H = buildrev.h
 
-ifeq ($(shell [ -e bertos/verstag.c ] && echo yes),yes)
 .PHONY: bumprev
 bumprev:
-	@buildnr=0; \
-	if [ -f $(BUILDREV_H) ]; then \
-		buildnr=`sed <"$(BUILDREV_H)" -n -e 's/#define VERS_BUILD \([0-9][0-9]*\)/\1/p'`; \
+	@if [ -e bertos/verstag.c ]; then \
+		buildnr=0; \
+		if [ -f $(BUILDREV_H) ]; then \
+			buildnr=`sed <"$(BUILDREV_H)" -n -e 's/#define VERS_BUILD \([0-9][0-9]*\)/\1/p'`; \
+		fi; \
+		buildnr=`expr $$buildnr + 1`; \
+		buildhost=`hostname | sed -n -e '1h;2,$$H;$${g;s/\n//g;p;}'`; \
+		echo "#define VERS_BUILD $$buildnr" >"$(BUILDREV_H)"; \
+		echo "#define VERS_HOST  \"$$buildhost\"" >>"$(BUILDREV_H)"; \
+		echo "Building revision $$buildnr"; \
 	fi; \
-	buildnr=`expr $$buildnr + 1`; \
-	buildhost=`hostname | sed -n -e '1h;2,$$H;$${g;s/\n//g;p;}'`; \
-	echo "#define VERS_BUILD $$buildnr" >"$(BUILDREV_H)"; \
-	echo "#define VERS_HOST  \"$$buildhost\"" >>"$(BUILDREV_H)"; \
-	echo "Building revision $$buildnr"
-else
-.PHONY: bumprev
-bumprev:
-
-endif
+	#
 
 # Include dependencies
 ifneq ($(strip $(OBJ)),)
