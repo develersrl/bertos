@@ -64,7 +64,7 @@
 /**
  * Wait until flash memory is ready.
  */
-static void flash25_waitReady(KFileFlash25 *fd)
+static void flash25_waitReady(Flash25KFile *fd)
 {
 	uint8_t stat;
 
@@ -89,7 +89,7 @@ static void flash25_waitReady(KFileFlash25 *fd)
 /**
  * Send a single command to serial flash memory.
  */
-static void flash25_sendCmd(KFileFlash25 *fd, Flash25Opcode cmd)
+static void flash25_sendCmd(Flash25KFile *fd, Flash25Opcode cmd)
 {
 	CS_ENABLE();
 
@@ -104,7 +104,7 @@ static void flash25_sendCmd(KFileFlash25 *fd, Flash25Opcode cmd)
  * try to read manufacturer id of serial memory,
  * then check if is equal to selected type.
  */
-static bool flash25_pin_init(KFileFlash25 *fd)
+static bool flash25_pin_init(Flash25KFile *fd)
 {
 	uint8_t device_id;
 	uint8_t manufacturer;
@@ -140,7 +140,7 @@ static bool flash25_pin_init(KFileFlash25 *fd)
  */
 static KFile * flash25_reopen(struct KFile *_fd)
 {
-	KFileFlash25 *fd = KFILEFLASH25(_fd);
+	Flash25KFile *fd = FLASH25KFILE(_fd);
 
 	fd->fd.seek_pos = 0;
 	fd->fd.size = FLASH25_MEM_SIZE;
@@ -176,7 +176,7 @@ static size_t flash25_read(struct KFile *_fd, void *buf, size_t size)
 {
 	uint8_t *data = (uint8_t *)buf;
 
-	KFileFlash25 *fd = KFILEFLASH25(_fd);
+	Flash25KFile *fd = FLASH25KFILE(_fd);
 
 	ASSERT(fd->fd.seek_pos + (kfile_size_t)size <= fd->fd.size);
 	size = MIN((kfile_size_t)size, fd->fd.size - fd->fd.seek_pos);
@@ -229,7 +229,7 @@ static size_t flash25_write(struct KFile *_fd, const void *_buf, size_t size)
 	flash25Size_t wr_len;
 	const uint8_t *data = (const uint8_t *) _buf;
 
-	KFileFlash25 *fd = KFILEFLASH25(_fd);
+	Flash25KFile *fd = FLASH25KFILE(_fd);
 
 	ASSERT(fd->fd.seek_pos + (kfile_size_t)size <= fd->fd.size);
 
@@ -294,7 +294,7 @@ static size_t flash25_write(struct KFile *_fd, const void *_buf, size_t size)
  * \note A sector size is FLASH25_SECTOR_SIZE.
  * This operation could take a while.
  */
-void flash25_sectorErase(KFileFlash25 *fd, Flash25Sector sector)
+void flash25_sectorErase(Flash25KFile *fd, Flash25Sector sector)
 {
 
 	/*
@@ -341,7 +341,7 @@ void flash25_sectorErase(KFileFlash25 *fd, Flash25Sector sector)
  *
  * \note This operation could take a while.
  */
-void flash25_chipErase(KFileFlash25 *fd)
+void flash25_chipErase(Flash25KFile *fd)
 {
 	/*
 	 * Erase all chip could take a while,
@@ -371,7 +371,7 @@ void flash25_chipErase(KFileFlash25 *fd)
 /**
  * Init data flash memory interface.
  */
-void flash25_init(KFileFlash25 *fd, KFile *ch)
+void flash25_init(Flash25KFile *fd, KFile *ch)
 {
 
 	ASSERT(fd);
