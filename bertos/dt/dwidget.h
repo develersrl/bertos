@@ -34,7 +34,7 @@
  * \brief Widget (interface).
  *
  * \version $Id$
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Francesco Sacchi <batt@develer.com>
  */
 

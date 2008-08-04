@@ -7,7 +7,7 @@
 #   GCC-AVR standard Makefile part 2
 #   Volker Oth 1/2000
 #
-# Author: Bernardo Innocenti <bernie@develer.com>
+# Author: Bernie Innocenti <bernie@codewiz.org>
 #
 
 # Remove all default pattern rules

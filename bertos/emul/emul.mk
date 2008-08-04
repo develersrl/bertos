@@ -1,8 +1,8 @@
 #
-# Copyright 2007 Bernardo Innocenti (http://www.codewiz.org/)
+# Copyright 2007 Bernie Innocenti (http://www.codewiz.org/)
 # All rights reserved.
 #
-# Author: Bernardo Innocenti <bernie@develer.com>
+# Author: Bernie Innocenti <bernie@codewiz.org>
 #
 # Qt configuration for devlib emulator demo.  Include it from
 # your app Makefile fragment

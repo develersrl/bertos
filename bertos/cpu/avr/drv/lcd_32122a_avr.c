@@ -27,7 +27,7 @@
  * the GNU General Public License.
  *
  * Copyright 2003, 2004, 2005, 2006 Develer S.r.l. (http://www.develer.com/)
- * Copyright 2001 Bernardo Innocenti <bernie@codewiz.org>
+ * Copyright 2001 Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
  *
@@ -35,7 +35,7 @@
  *
  * \version $Id$
  *
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  *
  */

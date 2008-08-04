@@ -27,13 +27,13 @@
  * the GNU General Public License.
  *
  * Copyright 2006 Develer S.r.l. (http://www.develer.com/)
- * Copyright 2000, 2001 Bernardo Innocenti <bernie@codewiz.org>
+ * Copyright 2000, 2001 Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
  *
  * \version $Id$
  *
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * \brief Main Qt window for embedded applications emulator (implementation)
  */
@@ -123,7 +123,7 @@ void EmulWin::about()
 		"BeRTOS Embedded Application Emulator",
 		"Version 0.1\n"
 		"Copyright 2006, 2008 Develer S.r.l. (http://www.develer.com/)\n"
-		"Copyright 2001, 2002, 2003, 2005 Bernardo Innocenti <bernie@codewiz.org>\n"
+		"Copyright 2001, 2002, 2003, 2005 Bernie Innocenti <bernie@codewiz.org>\n"
 		"All rights reserved."
 	);
 }

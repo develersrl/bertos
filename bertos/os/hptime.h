@@ -32,7 +32,7 @@
  *
  * \brief Portable abstraction for high-resolution time handling (interface)
  *
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  */
 #ifndef HPTIME_H
 #define HPTIME_H

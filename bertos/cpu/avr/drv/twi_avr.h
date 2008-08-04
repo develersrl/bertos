@@ -33,7 +33,7 @@
  * \version $Id$
  *
  * \author Stefano Fedrigo <aleph@develer.com>
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * \brief Driver for the AVR ATMega TWI (interface)
  */

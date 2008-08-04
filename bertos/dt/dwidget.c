@@ -36,7 +36,7 @@
  * Its proproperties are the position, the size and a context on which the widget is drawn.
  *
  * \version $Id$
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Francesco Sacchi <batt@ðeveler.com>
  */
 

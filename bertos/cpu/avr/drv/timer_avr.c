@@ -32,7 +32,7 @@
  *
  * \version $Id$
  *
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Francesco Sacchi <batt@develer.com>
  *
  * \brief Low-level timer module for AVR (implementation).

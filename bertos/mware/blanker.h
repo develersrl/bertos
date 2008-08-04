@@ -27,14 +27,14 @@
  * the GNU General Public License.
  *
  * Copyright 2006 Develer S.r.l. (http://www.develer.com/)
- * Copyright 2001 Bernardo Innocenti <bernie@codewiz.org>
+ * Copyright 2001 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
  * \brief Display Blanker (implementation).
  *
  * \version $Id$
  *
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  */
 #ifndef MWARE_BLANKER_H
 #define MWARE_BLANKER_H

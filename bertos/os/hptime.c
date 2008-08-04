@@ -33,7 +33,7 @@
  * \brief Portable abstraction for high-resolution time handling (implementation)
  *
  * \version $Id$
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
 #include "hptime.h"

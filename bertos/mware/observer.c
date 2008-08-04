@@ -33,7 +33,7 @@
  * \brief Simple notifier for the observer/subject pattern (implementation)
  *
  * \version $Id$
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
 #include "observer.h"

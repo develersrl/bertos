@@ -27,7 +27,7 @@
  * the GNU General Public License.
  *
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
- * Copyright 1999, 2000, 2001, 2003 Bernardo Innocenti <bernie@develer.com>
+ * Copyright 1999, 2000, 2001, 2003 Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
  *
@@ -38,7 +38,7 @@
  *  - \c CONFIG_CHART_TYPE_Y: type for the input dataset of Y-coordinates
  *
  * \version $Id$
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
 #ifndef GFX_CHARTS_H

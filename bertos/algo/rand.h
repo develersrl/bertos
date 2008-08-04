@@ -27,14 +27,14 @@
  * the GNU General Public License.
  *
  * Copyright 2006 Develer S.r.l. (http://www.develer.com/)
- * Copyright 1999 Bernardo Innocenti <bernie@develer.com>
+ * Copyright 1999 Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
  *
  * \brief Very simple rand() algorithm.
  *
  * \version $Id$
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
 int rand(void);

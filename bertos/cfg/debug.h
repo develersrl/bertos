@@ -37,7 +37,7 @@
  * diagnostic messages to a serial terminal or a JTAG debugger.
  *
  * \version $Id$
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
 #ifndef BERTOS_DEBUG_H

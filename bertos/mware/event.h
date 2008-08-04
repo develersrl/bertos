@@ -27,7 +27,7 @@
  * the GNU General Public License.
  *
  * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
- * Copyright 1999, 2001, 2003 Bernardo Innocenti <bernie@develer.com>
+ * Copyright 1999, 2001, 2003 Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
  *
@@ -38,7 +38,7 @@
  *
  * \version $Id$
  *
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
 #ifndef KERN_EVENT_H

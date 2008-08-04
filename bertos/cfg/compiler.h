@@ -27,14 +27,14 @@
  * the GNU General Public License.
  *
  * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
- * Copyright 2001, 2002, 2003 Bernardo Innocenti <bernie@codewiz.org>
+ * Copyright 2001, 2002, 2003 Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
  *
  * \brief Additional support macros for compiler independance
  *
  * \version $Id$
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
 #ifndef BERTOS_COMPILER_H

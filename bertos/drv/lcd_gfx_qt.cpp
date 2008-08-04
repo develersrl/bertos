@@ -32,7 +32,7 @@
  *
  * \version $Id$
  *
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * \brief Custom control for graphics LCD emulation (interface)
  */

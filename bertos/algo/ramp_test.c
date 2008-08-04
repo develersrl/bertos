@@ -10,7 +10,7 @@
  * \version $Id$
  *
  * \author Simone Zinanni <s.zinanni@develer.com>
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Giovanni Bajo <rasky@develer.com>
  * \author Daniele Basile <asterix@develer.com>
  *

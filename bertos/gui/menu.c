@@ -27,13 +27,13 @@
  * the GNU General Public License.
  *
  * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
- * Copyright 2000 Bernardo Innocenti <bernie@codewiz.org>
+ * Copyright 2000 Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
  *
  * \version $Id$
  *
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  *
  * \brief General pourpose menu handling functions

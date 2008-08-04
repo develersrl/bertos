@@ -4,7 +4,7 @@
 # modified by G Haerr from bdftobogl for 16 bit MWIMAGEBITS
 # modified on 2/10/00 by K Harris to accept any size input character
 # modified on 3/26/00 by G Haerr added ascent field, fixed $IMAGE_BITS
-# modified on 2/15/06 by <bernie@develer.com> for DevLib.
+# modified on 2/15/06 by <bernie@codewiz.org> for DevLib.
 # originally from BOGL - Ben's Own Graphics Library <pfaffben@debian.org>.
 #
 

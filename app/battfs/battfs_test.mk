@@ -5,7 +5,7 @@
 #
 # Makefile fragment for DevLib demo application.
 #
-# Author: Bernardo Innocenti <bernie@develer.com>
+# Author: Bernie Innocenti <bernie@codewiz.org>
 #
 
 # Set to 1 for debug builds

@@ -27,14 +27,14 @@
  * the GNU General Public License.
  *
  * Copyright 2003, 2004, 2005, 2006 Develer S.r.l. (http://www.develer.com/)
- * Copyright 2000 Bernardo Innocenti <bernie@develer.com>
+ * Copyright 2000 Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
  *
  * \brief Hardware independent timer driver (implementation)
  *
  * \version $Id$
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
 #include "timer.h"

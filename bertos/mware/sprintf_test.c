@@ -33,7 +33,7 @@
  * \brief sprintf() implementation based on _formatted_write()
  *
  * \version $Id$
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
 

@@ -27,13 +27,13 @@
  * the GNU General Public License.
  *
  * Copyright 2003, 2004, 2005, 2006 Develer S.r.l. (http://www.develer.com/)
- * Copyright 2001, 2002, 2003 by Bernardo Innocenti <bernie@codewiz.org>
+ * Copyright 2001, 2002, 2003 by Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
  *
  * \version $Id$
  *
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * \brief Declare application version strings
  */

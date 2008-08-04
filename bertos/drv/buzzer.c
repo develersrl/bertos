@@ -27,7 +27,7 @@
  * the GNU General Public License.
  *
  * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
- * Copyright 1999, 2003 Bernardo Innocenti <bernie@develer.com>
+ * Copyright 1999, 2003 Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
  *
@@ -36,7 +36,7 @@
  * \brief Buzzer driver (implementation)
  *
  * \version $Id$
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Francesco Sacchi <batt@develer.com>
  */
 

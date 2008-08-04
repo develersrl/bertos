@@ -33,7 +33,7 @@
  * \brief Poor man's hex arrays (implementation).
  *
  * \version $Id$
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
 

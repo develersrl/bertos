@@ -33,7 +33,7 @@
  * \brief Common and handy function macros
  *
  * \version $Id$
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Giovanni Bajo <rasky@develer.com>
  */
 #ifndef CFG_MACROS_H

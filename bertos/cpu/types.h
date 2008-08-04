@@ -34,7 +34,7 @@
  * \brief CPU-specific type definitions.
  *
  * \author Giovanni Bajo <rasky@develer.com>
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  * \author Francesco Sacchi <batt@develer.com>
  */

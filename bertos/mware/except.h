@@ -27,14 +27,14 @@
  * the GNU General Public License.
  *
  * Copyright 2006 Develer S.r.l. (http://www.develer.com/)
- * Copyright 1999 Bernardo Innocenti <bernie@develer.com>
+ * Copyright 1999 Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
  *
  * \brief C++-like structured exception handling for C programs
  *
  * \version $Id$
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  */
 #ifndef MWARE_EXCEPT_H
 #define MWARE_EXCEPT_H

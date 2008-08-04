@@ -32,7 +32,7 @@
  *
  * \version $Id: demo.c 18242 2007-10-08 17:35:23Z marco $
  *
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * \brief Windowing system test.
  */

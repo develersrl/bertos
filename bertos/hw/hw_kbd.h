@@ -27,7 +27,7 @@
  * the GNU General Public License.
  *
  * Copyright 2003, 2004, 2005, 2006, 2008 Develer S.r.l. (http://www.develer.com/)
- * Copyright 2000 Bernardo Innocenti
+ * Copyright 2000 Bernie Innocenti
  * All Rights Reserved.
  * -->
  *

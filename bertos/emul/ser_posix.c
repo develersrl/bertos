@@ -33,7 +33,7 @@
  * \brief Serial port emulator for hosted environments.
  *
  * \version $Id$
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
 #include "cfg/cfg_ser.h"

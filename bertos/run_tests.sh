@@ -3,7 +3,7 @@
 # Copyright 2005 Develer S.r.l. (http://www.develer.com/)
 # All rights reserved.
 #
-# Author: Bernardo Innocenti <bernie@develer.com>
+# Author: Bernie Innocenti <bernie@codewiz.org>
 #
 # $Id$
 #

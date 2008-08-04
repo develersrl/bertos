@@ -5,7 +5,7 @@
 #
 # Makefile fragment for DevLib at91sam7s application.
 #
-# Author: Bernardo Innocenti <bernie@develer.com>
+# Author: Bernie Innocenti <bernie@codewiz.org>
 #
 #
 

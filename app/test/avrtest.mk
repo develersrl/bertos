@@ -5,7 +5,7 @@
 #
 # Makefile fragment for DevLib avrtest application.
 #
-# Author: Bernardo Innocenti <bernie@develer.com>
+# Author: Bernie Innocenti <bernie@codewiz.org>
 #
 
 

@@ -59,7 +59,7 @@
  * \endcode
  *
  * \version $Id$
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  */
 #ifndef CFG_MODULE_H
 #define CFG_MODULE_H

@@ -27,14 +27,14 @@
  * the GNU General Public License.
  *
  * Copyright 2003, 2004, 2005, 2006, 2007 Develer S.r.l. (http://www.develer.com/)
- * Copyright 2000, 2001, 2002 Bernardo Innocenti <bernie@codewiz.org>
+ * Copyright 2000, 2001, 2002 Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
  *
  * \brief AVR debug support (implementation).
  *
  * \version $Id$
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  * \author Francesco Sacchi <batt@develer.com>
  */

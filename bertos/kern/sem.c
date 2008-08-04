@@ -27,7 +27,7 @@
  * the GNU General Public License.
  *
  * Copyright 2001, 2004 Develer S.r.l. (http://www.develer.com/)
- * Copyright 1999, 2000, 2001 Bernardo Innocenti <bernie@develer.com>
+ * Copyright 1999, 2000, 2001 Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
  *
@@ -35,7 +35,7 @@
  *
  * \version $Id$
  *
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
 #include "sem.h"

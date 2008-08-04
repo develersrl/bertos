@@ -27,14 +27,14 @@
  * the GNU General Public License.
  *
  * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
- * Copyright 1999 Bernardo Innocenti <bernie@develer.com>
+ * Copyright 1999 Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
  *
  * \brief printf-family routines for text output
  *
  * \version $Id$
- * \author Bernardo Innocenti <bernie@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
