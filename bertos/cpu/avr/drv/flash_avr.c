@@ -81,7 +81,7 @@ typedef uint16_t avr_page_addr_t;
  * Write current buffered page in flash memory (if modified).
  * This function erase flash memory page before writing.
  *
- * This function is only use internaly in this module.
+ * This function is only use internally in this module.
  */
 static void flash_avr_flush(KFileFlashAvr *fd)
 {
