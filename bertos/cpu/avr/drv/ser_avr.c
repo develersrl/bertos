@@ -304,7 +304,7 @@
 
 
 /* From the high-level serial driver */
-extern struct Serial ser_handles[SER_CNT];
+extern struct Serial *ser_handles[SER_CNT];
 
 /* TX and RX buffers */
 static unsigned char uart0_txbuffer[CONFIG_UART0_TXBUFSIZE];
@@ -338,20 +338,6 @@ struct AvrSerial
 	struct SerialHardware hw;
 	volatile bool sending;
 };
-
-
-/*
- * These are to trick GCC into *not* using absolute addressing mode
- * when accessing ser_handles, which is very expensive.
- *
- * Accessing through these pointers generates much shorter
- * (and hopefully faster) code.
- */
-struct Serial *ser_uart0 = &ser_handles[SER_UART0];
-#if AVR_HAS_UART1
-struct Serial *ser_uart1 = &ser_handles[SER_UART1];
-#endif
-struct Serial *ser_spi = &ser_handles[SER_SPI];
 
 
 
@@ -551,10 +537,10 @@ static void spi_starttx(struct SerialHardware *_hw)
 	IRQ_SAVE_DISABLE(flags);
 
 	/* Send data only if the SPI is not already transmitting */
-	if (!hw->sending && !fifo_isempty(&ser_spi->txfifo))
+	if (!hw->sending && !fifo_isempty(&ser_handles[SER_SPI]->txfifo))
 	{
 		hw->sending = true;
-		SPDR = fifo_pop(&ser_spi->txfifo);
+		SPDR = fifo_pop(&ser_handles[SER_SPI]->txfifo);
 	}
 
 	IRQ_RESTORE(flags);
@@ -692,7 +678,7 @@ SIGNAL(USART0_UDRE_vect)
 {
 	SER_STROBE_ON;
 
-	struct FIFOBuffer * const txfifo = &ser_uart0->txfifo;
+	struct FIFOBuffer * const txfifo = &ser_handles[SER_UART0]->txfifo;
 
 	if (fifo_isempty(txfifo))
 	{
@@ -740,7 +726,7 @@ SIGNAL(SIG_UART0_TRANS)
 {
 	SER_STROBE_ON;
 
-	struct FIFOBuffer * const txfifo = &ser_uart0->txfifo;
+	struct FIFOBuffer * const txfifo = &ser_handles[SER_UART0]->txfifo;
 	if (fifo_isempty(txfifo))
 	{
 		SER_UART0_BUS_TXOFF;
@@ -763,7 +749,7 @@ SIGNAL(USART1_UDRE_vect)
 {
 	SER_STROBE_ON;
 
-	struct FIFOBuffer * const txfifo = &ser_uart1->txfifo;
+	struct FIFOBuffer * const txfifo = &ser_handles[SER_UART1]->txfifo;
 
 	if (fifo_isempty(txfifo))
 	{
@@ -801,7 +787,7 @@ SIGNAL(SIG_UART1_TRANS)
 {
 	SER_STROBE_ON;
 
-	struct FIFOBuffer * const txfifo = &ser_uart1->txfifo;
+	struct FIFOBuffer * const txfifo = &ser_handles[SER_UART1]->txfifo;
 	if (fifo_isempty(txfifo))
 	{
 		SER_UART1_BUS_TXOFF;
@@ -841,17 +827,17 @@ SIGNAL(USART0_RX_vect)
 	//IRQ_ENABLE;
 
 	/* Should be read before UDR */
-	ser_uart0->status |= UCSR0A & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
+	ser_handles[SER_UART0]->status |= UCSR0A & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
 
 	/* To clear the RXC flag we must _always_ read the UDR even when we're
 	 * not going to accept the incoming data, otherwise a new interrupt
 	 * will occur once the handler terminates.
 	 */
 	char c = UDR0;
-	struct FIFOBuffer * const rxfifo = &ser_uart0->rxfifo;
+	struct FIFOBuffer * const rxfifo = &ser_handles[SER_UART0]->rxfifo;
 
 	if (fifo_isfull(rxfifo))
-		ser_uart0->status |= SERRF_RXFIFOOVERRUN;
+		ser_handles[SER_UART0]->status |= SERRF_RXFIFOOVERRUN;
 	else
 	{
 		fifo_push(rxfifo, c);
@@ -891,17 +877,17 @@ SIGNAL(USART1_RX_vect)
 	//IRQ_ENABLE;
 
 	/* Should be read before UDR */
-	ser_uart1->status |= UCSR1A & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
+	ser_handles[SER_UART1]->status |= UCSR1A & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
 
 	/* To avoid an IRQ storm, we must _always_ read the UDR even when we're
 	 * not going to accept the incoming data
 	 */
 	char c = UDR1;
-	struct FIFOBuffer * const rxfifo = &ser_uart1->rxfifo;
+	struct FIFOBuffer * const rxfifo = &ser_handles[SER_UART1]->rxfifo;
 	//ASSERT_VALID_FIFO(rxfifo);
 
 	if (UNLIKELY(fifo_isfull(rxfifo)))
-		ser_uart1->status |= SERRF_RXFIFOOVERRUN;
+		ser_handles[SER_UART1]->status |= SERRF_RXFIFOOVERRUN;
 	else
 	{
 		fifo_push(rxfifo, c);
@@ -928,17 +914,17 @@ SIGNAL(SIG_SPI)
 	SER_STROBE_ON;
 
 	/* Read incoming byte. */
-	if (!fifo_isfull(&ser_spi->rxfifo))
-		fifo_push(&ser_spi->rxfifo, SPDR);
+	if (!fifo_isfull(&ser_handles[SER_SPI]->rxfifo))
+		fifo_push(&ser_handles[SER_SPI]->rxfifo, SPDR);
 	/*
 	 * FIXME
 	else
-		ser_spi->status |= SERRF_RXFIFOOVERRUN;
+		ser_handles[SER_SPI]->status |= SERRF_RXFIFOOVERRUN;
 	*/
 
 	/* Send */
-	if (!fifo_isempty(&ser_spi->txfifo))
-		SPDR = fifo_pop(&ser_spi->txfifo);
+	if (!fifo_isempty(&ser_handles[SER_SPI]->txfifo))
+		SPDR = fifo_pop(&ser_handles[SER_SPI]->txfifo);
 	else
 		UARTDescs[SER_SPI].sending = false;
 

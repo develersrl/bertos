@@ -66,9 +66,9 @@
 
 
 /* fwd decl */
-struct SerialKFile;
+struct Serial;
 
-bool xmodem_recv(struct SerialKFile *port, KFile *fd);
-bool xmodem_send(struct SerialKFile *port, KFile *fd);
+bool xmodem_recv(struct Serial *port, KFile *fd);
+bool xmodem_send(struct Serial *port, KFile *fd);
 
 #endif /* MWARE_XMODEM_H */

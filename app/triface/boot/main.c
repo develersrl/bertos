@@ -64,7 +64,7 @@
 int main(void)
 {
 	FlashAvr flash;
-	SerialKFile ser;
+	Serial ser;
 
 
 	// Set up flash programming functions.

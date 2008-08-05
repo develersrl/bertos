@@ -44,6 +44,8 @@
 
 #include <cfg/compiler.h> /* size_t */
 
+
+
 struct SerialHardware;
 struct Serial;
 
@@ -67,5 +69,7 @@ struct SerialHardware
 };
 
 struct SerialHardware *ser_hw_getdesc(int unit);
+
+
 
 #endif /* DRV_SER_P_H */

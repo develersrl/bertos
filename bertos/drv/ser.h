@@ -120,6 +120,9 @@ extern const char * const serial_errors[8];
 /** Serial handle structure */
 typedef struct Serial
 {
+	/** Serial have a KFile struct implementation **/
+	KFile fd;
+
 	/** Physical port number */
 	unsigned int unit;
 
@@ -152,11 +155,6 @@ typedef struct Serial
 	struct SerialHardware* hw;
 } Serial;
 
-typedef struct SerialKFile
-{
-	KFile fd;
-	Serial *ser;
-} SerialKFile;
 
 /**
  * ID for serial.
@@ -164,26 +162,26 @@ typedef struct SerialKFile
 #define KFT_SERIAL MAKE_ID('S', 'E', 'R', 'L')
 
 
-INLINE SerialKFile * SERIALKFILE(KFile *fd)
+INLINE Serial * SERIALKFILE(KFile *fd)
 {
 	ASSERT(fd->_type == KFT_SERIAL);
-	return (SerialKFile *)fd;
+	return (Serial *)fd;
 }
 
 /* Function prototypes */
 //extern int ser_getchar_nowait(struct Serial *port);
 
-void ser_setbaudrate(struct SerialKFile *fd, unsigned long rate);
-void ser_setparity(struct SerialKFile *fd, int parity);
-void ser_settimeouts(struct SerialKFile *fd, mtime_t rxtimeout, mtime_t txtimeout);
-void ser_resync(struct SerialKFile *fd, mtime_t delay);
-int ser_getchar_nowait(struct SerialKFile *fd);
+void ser_setbaudrate(struct Serial *fd, unsigned long rate);
+void ser_setparity(struct Serial *fd, int parity);
+void ser_settimeouts(struct Serial *fd, mtime_t rxtimeout, mtime_t txtimeout);
+void ser_resync(struct Serial *fd, mtime_t delay);
+int ser_getchar_nowait(struct Serial *fd);
 
-void ser_purgeRx(struct SerialKFile *fd);
-void ser_purgeTx(struct SerialKFile *fd);
-void ser_purge(struct SerialKFile *fd);
-void ser_init(struct SerialKFile *fds, unsigned int unit);
-void spimaster_init(SerialKFile *fds, unsigned int unit);
+void ser_purgeRx(struct Serial *fd);
+void ser_purgeTx(struct Serial *fd);
+void ser_purge(struct Serial *fd);
+void ser_init(struct Serial *fds, unsigned int unit);
+void spimaster_init(Serial *fds, unsigned int unit);
 
 
 /**

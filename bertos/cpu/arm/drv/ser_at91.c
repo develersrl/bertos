@@ -220,7 +220,7 @@
 
 
 /* From the high-level serial driver */
-extern struct Serial ser_handles[SER_CNT];
+extern struct Serial *ser_handles[SER_CNT];
 
 /* TX and RX buffers */
 static unsigned char uart0_txbuffer[CONFIG_UART0_TXBUFSIZE];
@@ -259,17 +259,7 @@ struct ArmSerial
 };
 
 
-/*
- * These are to trick GCC into *not* using absolute addressing mode
- * when accessing ser_handles, which is very expensive.
- *
- * Accessing through these pointers generates much shorter
- * (and hopefully faster) code.
- */
-struct Serial *ser_uart0 = &ser_handles[SER_UART0];
-struct Serial *ser_uart1 = &ser_handles[SER_UART1];
 
-struct Serial *ser_spi0 = &ser_handles[SER_SPI0];
 #if CPU_ARM_AT91SAM7X128 || CPU_ARM_AT91SAM7X256
 struct Serial *ser_spi1 = &ser_handles[SER_SPI1];
 #endif
@@ -537,10 +527,10 @@ static void spi0_starttx(struct SerialHardware *_hw)
 	IRQ_SAVE_DISABLE(flags);
 
 	/* Send data only if the SPI is not already transmitting */
-	if (!hw->sending && !fifo_isempty(&ser_spi0->txfifo))
+	if (!hw->sending && !fifo_isempty(&ser_handles[SER_SPI0]->txfifo))
 	{
 		hw->sending = true;
-		SPI0_TDR = fifo_pop(&ser_spi0->txfifo);
+		SPI0_TDR = fifo_pop(&ser_handles[SER_SPI0]->txfifo);
 	}
 
 	IRQ_RESTORE(flags);
@@ -766,7 +756,7 @@ static void uart0_irq_tx(void)
 {
 	SER_STROBE_ON;
 
-	struct FIFOBuffer * const txfifo = &ser_uart0->txfifo;
+	struct FIFOBuffer * const txfifo = &ser_handles[SER_UART0]->txfifo;
 
 	if (fifo_isempty(txfifo))
 	{
@@ -794,14 +784,14 @@ static void uart0_irq_rx(void)
 	SER_STROBE_ON;
 
 	/* Should be read before US_CRS */
-	ser_uart0->status |= US0_CSR & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
+	ser_handles[SER_UART0]->status |= US0_CSR & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
 	US0_CR = BV(US_RSTSTA);
 
 	char c = US0_RHR;
-	struct FIFOBuffer * const rxfifo = &ser_uart0->rxfifo;
+	struct FIFOBuffer * const rxfifo = &ser_handles[SER_UART0]->rxfifo;
 
 	if (fifo_isfull(rxfifo))
-		ser_uart0->status |= SERRF_RXFIFOOVERRUN;
+		ser_handles[SER_UART0]->status |= SERRF_RXFIFOOVERRUN;
 	else
 		fifo_push(rxfifo, c);
 
@@ -831,7 +821,7 @@ static void uart1_irq_tx(void)
 {
 	SER_STROBE_ON;
 
-	struct FIFOBuffer * const txfifo = &ser_uart1->txfifo;
+	struct FIFOBuffer * const txfifo = &ser_handles[SER_UART1]->txfifo;
 
 	if (fifo_isempty(txfifo))
 	{
@@ -859,14 +849,14 @@ static void uart1_irq_rx(void)
 	SER_STROBE_ON;
 
 	/* Should be read before US_CRS */
-	ser_uart1->status |= US1_CSR & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
+	ser_handles[SER_UART1]->status |= US1_CSR & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
 	US1_CR = BV(US_RSTSTA);
 
 	char c = US1_RHR;
-	struct FIFOBuffer * const rxfifo = &ser_uart1->rxfifo;
+	struct FIFOBuffer * const rxfifo = &ser_handles[SER_UART1]->rxfifo;
 
 	if (fifo_isfull(rxfifo))
-		ser_uart1->status |= SERRF_RXFIFOOVERRUN;
+		ser_handles[SER_UART1]->status |= SERRF_RXFIFOOVERRUN;
 	else
 		fifo_push(rxfifo, c);
 
@@ -899,17 +889,17 @@ static void spi0_irq_handler(void)
 
 	char c = SPI0_RDR;
 	/* Read incoming byte. */
-	if (!fifo_isfull(&ser_spi0->rxfifo))
-		fifo_push(&ser_spi0->rxfifo, c);
+	if (!fifo_isfull(&ser_handles[SER_SPI0]->rxfifo))
+		fifo_push(&ser_handles[SER_SPI0]->rxfifo, c);
 	/*
 	 * FIXME
 	else
-		ser_spi0->status |= SERRF_RXFIFOOVERRUN;
+		ser_handles[SER_SPI0]->status |= SERRF_RXFIFOOVERRUN;
 	*/
 
 	/* Send */
-	if (!fifo_isempty(&ser_spi0->txfifo))
-		SPI0_TDR = fifo_pop(&ser_spi0->txfifo);
+	if (!fifo_isempty(&ser_handles[SER_SPI0]->txfifo))
+		SPI0_TDR = fifo_pop(&ser_handles[SER_SPI0]->txfifo);
 	else
 		UARTDescs[SER_SPI0].sending = false;
 

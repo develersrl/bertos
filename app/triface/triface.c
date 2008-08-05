@@ -58,8 +58,8 @@
 
 
 
-static SerialKFile fd_ser;
-static SerialKFile tag_ser;
+static Serial fd_ser;
+static Serial tag_ser;
 
 int main(void)
 {
