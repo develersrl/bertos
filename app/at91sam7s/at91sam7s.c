@@ -46,7 +46,7 @@
 #include <io/arm.h>
 
 Timer leds_timer;
-SerialKFile ser_fd;
+Serial ser_fd;
 
 static void leds_toggle(void)
 {
@@ -74,7 +74,6 @@ int main(void)
 {
 	char msg[]="BeRTOS, be fast be beatiful be realtime";
 	kdbg_init();
-	sysirq_init();
 	timer_init();
 
 	proc_init();
