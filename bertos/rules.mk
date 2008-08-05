@@ -87,22 +87,26 @@ endif
 
 $(1)_LDFLAGS += $$($(1)_MAP_FLAGS)
 
+# In embedded systems the target CPU is needed,
+# but there are different options on how pass
+# it to the compiler.
 ifneq ($$(strip $$($(1)_MCU)),)
-# Define all project specific object files
-$(1)_CFLAGS    += -mmcu=$$($(1)_MCU)
-$(1)_CXXFLAGS  += -mmcu=$$($(1)_MCU)
-$(1)_ASFLAGS   += -mmcu=$$($(1)_MCU)
-$(1)_CPPAFLAGS += -mmcu=$$($(1)_MCU)
-$(1)_LDFLAGS   += -mmcu=$$($(1)_MCU)
+$(1)_MCPU = -mmcu=$$($(1)_MCU)
 endif
 ifneq ($$(strip $$($(1)_CPU)),)
-# Define all project specific object files
-$(1)_CFLAGS    += -mcpu=$$($(1)_CPU)
-$(1)_CXXFLAGS  += -mcpu=$$($(1)_CPU)
-$(1)_ASFLAGS   += -mcpu=$$($(1)_CPU)
-$(1)_CPPAFLAGS += -mcpu=$$($(1)_CPU)
-$(1)_LDFLAGS   += -mcpu=$$($(1)_CPU)
+$(1)_MCPU = -mcpu=$$($(1)_CPU)
 endif
+
+# If a CPU is specified add to 
+# project specific flags.
+ifneq ($$($(1)_MCPU),)
+$(1)_CFLAGS    += $$($(1)_MCPU)
+$(1)_CXXFLAGS  += $$($(1)_MCPU)
+$(1)_ASFLAGS   += $$($(1)_MCPU)
+$(1)_CPPAFLAGS += $$($(1)_MCPU)
+$(1)_LDFLAGS   += $$($(1)_MCPU)
+endif
+
 ifneq ($$(strip $$($(1)_LDSCRIPT)),)
 $(1)_LDFLAGS += -Wl,-T$$($(1)_LDSCRIPT)
 endif
