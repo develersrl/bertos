@@ -111,6 +111,28 @@ ifneq ($$(strip $$($(1)_LDSCRIPT)),)
 $(1)_LDFLAGS += -Wl,-T$$($(1)_LDSCRIPT)
 endif
 
+# Debug stuff
+ifeq ($$($(1)_DEBUG),1)
+	# AVR is an harvard processor
+	# and needs debug module
+	# to be compiled in program memory
+	ifeq ($$(findstring avr, $$($(1)_CROSS)),avr)
+		$(1)_DEBUGSRC = $(1)_PCSRC
+	else
+		$(1)_DEBUGSRC = $(1)_CSRC
+	endif
+	
+	$$($(1)_DEBUGSRC) += bertos/drv/kdebug.c
+
+	# Also add formatwr.c (printf) if not already present
+	ifneq ($$(findstring formatwr.c, $$($$($(1)_DEBUGSRC))),formatwr.c)
+		$$($(1)_DEBUGSRC) += bertos/mware/formatwr.c
+	endif
+
+	$(1)_CFLAGS += -D_DEBUG	
+	$(1)_CXXFLAGS += -D_DEBUG
+endif
+
 $(1)_CC      = $$($(1)_CROSS)$$(CC)
 $(1)_CXX     = $$($(1)_CROSS)$$(CXX)
 $(1)_AS      = $$($(1)_CROSS)$$(AS)

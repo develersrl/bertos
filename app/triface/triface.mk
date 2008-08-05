@@ -47,12 +47,6 @@ triface_LDFLAGS = -Wl
 triface_MCU = atmega64
 triface_CROSS = avr-
 
-# Debug stuff
-ifeq ($(triface_DEBUG),1)
-	triface_CFLAGS += -D_DEBUG
-	triface_PCSRC += bertos/drv/kdebug.c
-endif
-
 # Set to 1 for debug builds
 boot_DEBUG = 0
 
@@ -69,17 +63,10 @@ boot_CSRC = \
 	bertos/drv/timer.c \
 	bertos/algo/crc.c \
 	bertos/mware/hex.c \
-    bertos/kern/kfile.c \
-    #
+	bertos/kern/kfile.c \
+	#
 boot_CROSS = avr-
 boot_CPPFLAGS = -D'ARCH=(ARCH_TRIFACE|ARCH_BOOT)' -Iapp/triface/boot -Ibertos/cpu/avr
 boot_CFLAGS = -Os -mcall-prologues
 boot_LDSCRIPT = app/triface/boot/boot.ld
 boot_LDFLAGS = -Wl,--relax
-
-# Debug stuff
-ifeq ($(boot_DEBUG),1)
-	boot_CFLAGS += -D_DEBUG
-	boot_PCSRC += bertos/drv/kdebug.c bertos/mware/formatwr.c
-endif
-

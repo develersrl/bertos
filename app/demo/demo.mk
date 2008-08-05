@@ -76,11 +76,7 @@ demo_CXXFLAGS = -D_QT=4 -D'ARCH=ARCH_EMUL' -Iapp/demo $(EMUL_CFLAGS)
 demo_LDFLAGS = $(EMUL_LDFLAGS)
 
 # Debug stuff
-ifeq ($(demo_DEBUG),1)
-	demo_CFLAGS += -D_DEBUG
-	demo_CXXFLAGS += -D_DEBUG
-	demo_CSRC += bertos/drv/kdebug.c
-else
+ifeq ($(demo_DEBUG),0)
 	demo_CFLAGS += -Os
 	demo_CXXFLAGS += -Os
 endif

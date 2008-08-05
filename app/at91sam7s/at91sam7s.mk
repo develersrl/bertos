@@ -42,9 +42,3 @@ at91sam7s_LDFLAGS = -nostartfiles -T bertos/cpu/arm/scripts/at91sam7_256_ram.ld 
 
 at91sam7s_CPU = arm7tdmi
 
-# Debug stuff
-ifeq ($(at91sam7s_DEBUG),1)
-	at91sam7s_CFLAGS += -D_DEBUG
-	at91sam7s_CSRC += bertos/drv/kdebug.c
-endif
-
