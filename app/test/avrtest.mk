@@ -30,10 +30,3 @@ avrtest_PCSRC += bertos/mware/formatwr.c
 avrtest_CROSS = avr-
 avrtest_CPPFLAGS = -D'ARCH=1' -Iapp/test -Ibertos/cpu/avr 
 avrtest_CFLAGS = -Os -mcall-prologues -fno-strict-aliasing
-
-# Debug stuff
-ifeq ($(avrtest_DEBUG),1)
-	avrtest_CFLAGS += -D_DEBUG
-	avrtest_PCSRC += bertos/drv/kdebug.c
-endif
-

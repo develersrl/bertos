@@ -30,8 +30,3 @@ armtest_LDFLAGS = -nostartfiles -T bertos/cpu/arm/scripts/at91sam7_256_rom.ld -W
 
 armtest_CPU = arm7tdmi
 
-# Debug stuff
-ifeq ($(armtest_DEBUG),1)
-	armtest_CFLAGS += -D_DEBUG
-endif
-
