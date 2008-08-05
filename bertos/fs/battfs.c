@@ -611,7 +611,7 @@ static int battfs_flush(struct KFile *fd)
  */
 static int battfs_fileclose(struct KFile *fd)
 {
-	BattFsKFile *fdb = BATTFSKFILE(fd);
+	BattFS *fdb = BATTFSKFILE(fd);
 
 	battfs_flush(fd);
 	REMOVE(&fdb->link);
@@ -624,7 +624,7 @@ static int battfs_fileclose(struct KFile *fd)
  */
 static size_t battfs_read(struct KFile *fd, void *_buf, size_t size)
 {
-	BattFsKFile *fdb = BATTFSKFILE(fd);
+	BattFS *fdb = BATTFSKFILE(fd);
 	uint8_t *buf = (uint8_t *)_buf;
 
 	size_t total_read = 0;
@@ -719,7 +719,7 @@ static bool countFileSize(BattFsSuper *disk, pgcnt_t *start, inode_t inode, file
  * File context is stored in \a fd.
  * \return true if ok, false otherwise.
  */
-bool battfs_fileopen(BattFsSuper *disk, BattFsKFile *fd, inode_t inode, filemode_t mode)
+bool battfs_fileopen(BattFsSuper *disk, BattFS *fd, inode_t inode, filemode_t mode)
 {
 	Node *n;
 
@@ -754,7 +754,7 @@ bool battfs_fileopen(BattFsSuper *disk, BattFsKFile *fd, inode_t inode, filemode
 	/* Insert file handle in list, ordered by inode, ascending. */
 	FOREACH_NODE(n, &disk->file_opened_list)
 	{
-		BattFsKFile *file = containerof(n, BattFsKFile, link);
+		BattFS *file = containerof(n, BattFS, link);
 		if (file->inode >= inode)
 			break;
 	}
@@ -794,7 +794,7 @@ bool battfs_close(struct BattFsSuper *disk)
 	/* Close all open files */
 	FOREACH_NODE(n, &disk->file_opened_list)
 	{
-		BattFsKFile *file = containerof(n, BattFsKFile, link);
+		BattFS *file = containerof(n, BattFS, link);
 		res += battfs_fileclose(&file->fd);
 	}
 

@@ -351,8 +351,8 @@ static void test9(BattFsSuper *disk)
 
 static void test10(BattFsSuper *disk)
 {
-	BattFsKFile fd1;
-	BattFsKFile fd2;
+	BattFS fd1;
+	BattFS fd2;
 	kprintf("Test10: open file test, inode 0 and inode 4\n");
 
 	fp = fopen(test_filename, "w+");
@@ -416,7 +416,7 @@ static void test10(BattFsSuper *disk)
 
 static void test11(BattFsSuper *disk)
 {
-	BattFsKFile fd1;
+	BattFS fd1;
 	uint8_t buf[16];
 
 	kprintf("Test11: read file test\n");
@@ -454,7 +454,7 @@ static void test11(BattFsSuper *disk)
 
 static void test12(BattFsSuper *disk)
 {
-	BattFsKFile fd1;
+	BattFS fd1;
 
 	kprintf("Test12: read file test across page boundary and seek test\n");
 
