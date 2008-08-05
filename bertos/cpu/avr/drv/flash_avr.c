@@ -83,7 +83,7 @@ typedef uint16_t avr_page_addr_t;
  *
  * This function is only use internally in this module.
  */
-static void flash_avr_flush(FlashAvrKFile *fd)
+static void flash_avr_flush(FlashAvr *fd)
 {
 	if (fd->page_dirty)
 	{
@@ -141,7 +141,7 @@ static void flash_avr_flush(FlashAvrKFile *fd)
  */
 static int flash_avr_kfileFlush(struct KFile *_fd)
 {
-	FlashAvrKFile *fd = FLASHAVRKFILE(_fd);
+	FlashAvr *fd = FLASHAVRKFILE(_fd);
 	flash_avr_flush(fd);
 	return 0;
 }
@@ -151,7 +151,7 @@ static int flash_avr_kfileFlush(struct KFile *_fd)
  * Check current page and if \a page is different, load it in
  * temporary buffer.
  */
-static void flash_avr_loadPage(FlashAvrKFile *fd, avr_page_t page)
+static void flash_avr_loadPage(FlashAvr *fd, avr_page_t page)
 {
 	if (page != fd->curr_page)
 	{
@@ -170,7 +170,7 @@ static void flash_avr_loadPage(FlashAvrKFile *fd, avr_page_t page)
  */
 static size_t flash_avr_write(struct KFile *_fd, const void *_buf, size_t size)
 {
-	FlashAvrKFile *fd = FLASHAVRKFILE(_fd);
+	FlashAvr *fd = FLASHAVRKFILE(_fd);
 	const uint8_t *buf =(const uint8_t *)_buf;
 
 	avr_page_t page;
@@ -207,7 +207,7 @@ static size_t flash_avr_write(struct KFile *_fd, const void *_buf, size_t size)
  * \a name and \a mode are unused, cause flash memory is
  * threated like one file.
  */
-static void flash_avr_open(struct FlashAvrKFile *fd)
+static void flash_avr_open(struct FlashAvr *fd)
 {
 	fd->curr_page = 0;
 	memcpy_P(fd->page_buf, (const char *)(fd->curr_page * SPM_PAGESIZE), SPM_PAGESIZE);
@@ -224,7 +224,7 @@ static void flash_avr_open(struct FlashAvrKFile *fd)
  */
 static int flash_avr_close(struct KFile *_fd)
 {
-	FlashAvrKFile *fd = FLASHAVRKFILE(_fd);
+	FlashAvr *fd = FLASHAVRKFILE(_fd);
 	flash_avr_flush(fd);
 	LOG_INFO("Flash file closed\n");
 	return 0;
@@ -235,7 +235,7 @@ static int flash_avr_close(struct KFile *_fd)
  */
 static struct KFile *flash_avr_reopen(struct KFile *fd)
 {
-	FlashAvrKFile *_fd = FLASHAVRKFILE(fd);
+	FlashAvr *_fd = FLASHAVRKFILE(fd);
 	flash_avr_close(fd);
 	flash_avr_open(_fd);
 	return fd;
@@ -248,7 +248,7 @@ static struct KFile *flash_avr_reopen(struct KFile *fd)
  */
 static size_t flash_avr_read(struct KFile *_fd, void *buf, size_t size)
 {
-	FlashAvrKFile *fd = FLASHAVRKFILE(_fd);
+	FlashAvr *fd = FLASHAVRKFILE(_fd);
 	ASSERT(fd->fd.seek_pos + (kfile_off_t)size <= (kfile_off_t)fd->fd.size);
 	size = MIN((uint32_t)size, fd->fd.size - fd->fd.seek_pos);
 
@@ -272,7 +272,7 @@ static size_t flash_avr_read(struct KFile *_fd, void *buf, size_t size)
 /**
  * Init AVR flash read/write file.
  */
-void flash_avr_init(struct FlashAvrKFile *fd)
+void flash_avr_init(struct FlashAvr *fd)
 {
 	memset(fd, 0, sizeof(*fd));
 	DB(fd->fd._type = KFT_FLASHAVR);

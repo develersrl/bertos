@@ -63,7 +63,7 @@
 
 int main(void)
 {
-	FlashAvrKFile flash;
+	FlashAvr flash;
 	SerialKFile ser;
 
 
