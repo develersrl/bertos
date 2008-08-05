@@ -9,9 +9,6 @@
 #
 #
 
-# This is an embedded project
-triface_EMBEDDED_TGT = 1
-
 # Set to 1 for debug builds
 triface_DEBUG = 1
 
@@ -56,8 +53,6 @@ ifeq ($(triface_DEBUG),1)
 	triface_PCSRC += bertos/drv/kdebug.c
 endif
 
-
-boot_EMBEDDED_TGT = 1
 # Set to 1 for debug builds
 boot_DEBUG = 0
 

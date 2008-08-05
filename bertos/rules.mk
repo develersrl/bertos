@@ -67,7 +67,7 @@ check:
 
 define build_target
 
-ifeq ($$($(1)_EMBEDDED_TGT),1)
+ifneq ($$($(1)_CROSS),)
 #use embedded specific map flags
 $(1)_MAP_FLAGS = $$(MAP_FLAGS_EMB)
 #In embedded we need s19, hex and bin

@@ -12,9 +12,6 @@
 # Set to 1 for debug builds
 at91sam7s_DEBUG = 1
 
-#This is an embedded project
-at91sam7s_EMBEDDED_TGT = 1
-
 # Our target application
 TRG += at91sam7s
 
