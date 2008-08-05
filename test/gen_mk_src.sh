@@ -55,12 +55,10 @@ CSRC=`${TEST_SCRIPT_DIR}/get_source_list.sh $1 c`
 ASRC=`${TEST_SCRIPT_DIR}/get_source_list.sh $1 S`
 #ASRC=
 
+#kdebug  must added to skip list because it is compiled two times and the linker fail.
 CSRC=`echo $CSRC | sed -e "s/${BERTOS_DIR_RE}\\/drv\\/kdebug\\.c//g"`
 
 #Source to skip:
-if [ $1 = 'avr' ] ; then
-	`echo`
-fi
 
 if [ $1 = 'arm' ] ; then
 	for i in $ARM_DRV_C_EXCLUDE_LIST ;
