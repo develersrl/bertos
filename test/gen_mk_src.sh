@@ -55,11 +55,11 @@ CSRC=`${TEST_SCRIPT_DIR}/get_source_list.sh $1 c`
 ASRC=`${TEST_SCRIPT_DIR}/get_source_list.sh $1 S`
 #ASRC=
 
+CSRC=`echo $CSRC | sed -e "s/${BERTOS_DIR_RE}\\/drv\\/kdebug\\.c//g"`
 
 #Source to skip:
 if [ $1 = 'avr' ] ; then
-	CSRC=`echo $CSRC | sed -e "s/${BERTOS_DIR_RE}\\/drv\\/kdebug\\.c//g"`
-	CSRC=`echo $CSRC | sed -e "s/${BERTOS_DIR_RE}\\/mware\\/formatwr\\.c//g"`
+	`echo`
 fi
 
 if [ $1 = 'arm' ] ; then
