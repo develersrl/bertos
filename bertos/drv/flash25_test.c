@@ -53,7 +53,7 @@
 
 bool flash25_test(KFile *channel)
 {
-	Flash25KFile fd;
+	Flash25 fd;
 	uint8_t test_buf[256];
 
 	/*

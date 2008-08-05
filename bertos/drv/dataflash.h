@@ -81,7 +81,7 @@ typedef enum DataflashType
 /**
  * Dataflash KFile context structure.
  */
-typedef struct DataFlashKFile
+typedef struct DataFlash
 {
 	KFile fd;                       ///< File descriptor.
 	KFile *channel;                 ///< Dataflash comm channel (usually SPI).
@@ -90,7 +90,7 @@ typedef struct DataFlashKFile
 	bool page_dirty;                ///< True if current_page is dirty (needs to be flushed).
 	dataflash_setReset_t *setReset; ///< Callback used to set reset pin of dataflash.
 	dataflash_setCS_t *setCS;       ///< Callback used to set CS pin of dataflash.
-} DataFlashKFile;
+} DataFlash;
 
 /**
  * ID for dataflash.
@@ -98,12 +98,12 @@ typedef struct DataFlashKFile
 #define KFT_DATAFLASH MAKE_ID('D', 'F', 'L', 'H')
 
 /**
- * Convert + ASSERT from generic KFile to DataFlashKFile.
+ * Convert + ASSERT from generic KFile to DataFlash.
  */
-INLINE DataFlashKFile * DATAFLASHKFILE(KFile *fd)
+INLINE DataFlash * DATAFLASHKFILE(KFile *fd)
 {
 	ASSERT(fd->_type == KFT_DATAFLASH);
-	return (DataFlashKFile *)fd;
+	return (DataFlash *)fd;
 }
 
 #define RESET_PULSE_WIDTH     10 ///< Width of reset pulse in usec.
@@ -181,7 +181,7 @@ typedef struct DataflashInfo
 } DataflashInfo;
 
 
-bool dataflash_init(DataFlashKFile *fd, KFile *ch, DataflashType type, dataflash_setCS_t *setCS, dataflash_setReset_t *setReset);
+bool dataflash_init(DataFlash *fd, KFile *ch, DataflashType type, dataflash_setCS_t *setCS, dataflash_setReset_t *setReset);
 
 /**
  * To test data falsh drive you could use
