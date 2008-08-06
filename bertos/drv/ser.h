@@ -162,7 +162,7 @@ typedef struct Serial
 #define KFT_SERIAL MAKE_ID('S', 'E', 'R', 'L')
 
 
-INLINE Serial * SERIALKFILE(KFile *fd)
+INLINE Serial * SERIAL(KFile *fd)
 {
 	ASSERT(fd->_type == KFT_SERIAL);
 	return (Serial *)fd;

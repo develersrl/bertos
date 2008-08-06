@@ -210,7 +210,7 @@ int ser_getchar_nowait(struct Serial *fd)
  */
 static size_t ser_read(struct KFile *fd, void *_buf, size_t size)
 {
-	Serial *fds = SERIALKFILE(fd);
+	Serial *fds = SERIAL(fd);
 
 	size_t i = 0;
 	char *buf = (char *)_buf;
@@ -235,7 +235,7 @@ static size_t ser_read(struct KFile *fd, void *_buf, size_t size)
  */
 static size_t ser_write(struct KFile *fd, const void *_buf, size_t size)
 {
-	Serial *fds = SERIALKFILE(fd);
+	Serial *fds = SERIAL(fd);
 	const char *buf = (const char *)_buf;
 	size_t i = 0;
 
@@ -298,13 +298,13 @@ void ser_setparity(struct Serial *fd, int parity)
 
 static int ser_error(struct KFile *fd)
 {
-	Serial *fds = SERIALKFILE(fd);
+	Serial *fds = SERIAL(fd);
 	return ser_getstatus(fds);
 }
 
 static void ser_clearerr(struct KFile *fd)
 {
-	Serial *fds = SERIALKFILE(fd);
+	Serial *fds = SERIAL(fd);
 	ser_setstatus(fds, 0);
 }
 
@@ -346,7 +346,7 @@ void ser_purgeTx(struct Serial *fd)
  */
 static int ser_flush(struct KFile *fd)
 {
-	Serial *fds = SERIALKFILE(fd);
+	Serial *fds = SERIAL(fd);
 
 	/*
 	 * Wait until the FIFO becomes empty, and then until the byte currently in
@@ -411,7 +411,7 @@ static struct Serial *ser_open(struct Serial *fd, unsigned int unit)
  */
 static int ser_close(struct KFile *fd)
 {
-	Serial *fds = SERIALKFILE(fd);
+	Serial *fds = SERIAL(fd);
 	Serial *port = fds;
 
 	ASSERT(port->is_open);
@@ -436,7 +436,7 @@ static int ser_close(struct KFile *fd)
  */
 static struct KFile *ser_reopen(struct KFile *fd)
 {
-	Serial *fds = SERIALKFILE(fd);
+	Serial *fds = SERIAL(fd);
 
 	ser_close(fd);
 	ser_open(fds, fds->unit);
@@ -469,7 +469,7 @@ void ser_init(struct Serial *fds, unsigned int unit)
  */
 static size_t spimaster_read(struct KFile *fd, void *_buf, size_t size)
 {
-	Serial *fd_spi = SERIALKFILE(fd);
+	Serial *fd_spi = SERIAL(fd);
 
 	ser_flush(&fd_spi->fd);
 	ser_purgeRx(fd_spi);
@@ -500,7 +500,7 @@ static size_t spimaster_read(struct KFile *fd, void *_buf, size_t size)
  */
 static size_t spimaster_write(struct KFile *fd, const void *buf, size_t size)
 {
-	Serial *fd_spi = SERIALKFILE(fd);
+	Serial *fd_spi = SERIAL(fd);
 
 	ser_purgeRx(fd_spi);
 
