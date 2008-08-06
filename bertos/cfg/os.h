@@ -109,9 +109,9 @@
 
 	#define IRQ_ENABLED() \
 	({ \
-		sigset_t sigs; \
-		sigprocmask(SIG_SETMASK, NULL, &sigs); \
-		sigismember(&sigs, SIGALRM) ? false : true; \
+		sigset_t sigs__; \
+		sigprocmask(SIG_SETMASK, NULL, &sigs__); \
+		sigismember(&sigs__, SIGALRM) ? false : true; \
 	 })
 
 #else
