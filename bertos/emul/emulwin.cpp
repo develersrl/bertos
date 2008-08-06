@@ -62,7 +62,6 @@ EmulWin::EmulWin(Emulator *e)
 {
 	setWindowTitle(tr("BeRTOS Emul Demo"));
 	setAttribute(Qt::WA_DeleteOnClose);
-	setFixedSize(280,240);
 
 	// Create the menu bar
 	QMenu *file_menu = menuBar()->addMenu(tr("&File"));

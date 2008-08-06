@@ -85,6 +85,10 @@ QSize EmulLCD::sizeHint() const
 		HEIGHT + frame_width * 2);
 }
 
+QSize EmulLCD::minimumSizeHint() const
+{
+	return sizeHint();
+}
 
 void EmulLCD::paintEvent(QPaintEvent * /*event*/)
 {

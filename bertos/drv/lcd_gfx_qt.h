@@ -84,6 +84,7 @@ public:
 protected:
 	virtual QSizePolicy sizePolicy() const;
 	virtual QSize sizeHint() const;
+	virtual QSize minimumSizeHint() const;
 	virtual void paintEvent(QPaintEvent *event);
 
 // Operations
@@ -99,7 +100,7 @@ protected:
 	QColor fg_color, bg_color;
 
 	/// Pixel storage
-	unsigned char raster[(WIDTH * HEIGHT) / 8];
+	unsigned char raster[(WIDTH + 7 / 8) * HEIGHT];
 };
 
 #endif // DRV_LCD_GFX_QT_H
