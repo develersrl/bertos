@@ -65,6 +65,9 @@ typedef struct Process
 
 #if CONFIG_KERN_HEAP
 	uint16_t     flags;       /**< Flags */
+#endif
+
+#if CONFIG_KERN_HEAP | CONFIG_KERN_MONITOR | (ARCH & ARCH_EMUL)
 	cpustack_t  *stack_base;  /**< Base of process stack */
 	size_t       stack_size;  /**< Size of process stack */
 #endif
@@ -74,8 +77,6 @@ typedef struct Process
 	{
 		Node        link;
 		const char *name;
-		cpustack_t *stack_base;
-		size_t      stack_size;
 	} monitor;
 #endif
 
@@ -108,13 +109,13 @@ void proc_schedule(void);
 	void monitor_init(void);
 
 	/** Register a process into the monitor */
-	void monitor_add(Process *proc, const char *name, cpustack_t *stack, size_t stacksize);
+	void monitor_add(Process *proc, const char *name);
 
 	/** Unregister a process from the monitor */
 	void monitor_remove(Process *proc);
 
 	/** Rename a process */
-	void monitor_rename(Process *proc, const char* name);
+	void monitor_rename(Process *proc, const char *name);
 #endif /* CONFIG_KERN_MONITOR */
 
 #endif /* KERN_PROC_P_H */

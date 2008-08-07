@@ -59,11 +59,9 @@ void monitor_init(void)
 }
 
 
-void monitor_add(Process* proc, const char* name, cpustack_t* stack_base, size_t stack_size)
+void monitor_add(Process *proc, const char *name)
 {
 	proc->monitor.name = name;
-	proc->monitor.stack_base = stack_base;
-	proc->monitor.stack_size = stack_size;
 
 	ADDTAIL(&MonitorProcs, &proc->monitor.link);
 }
@@ -74,7 +72,7 @@ void monitor_remove(Process* proc)
 	REMOVE(&proc->monitor.link);
 }
 
-void monitor_rename(Process *proc, const char* name)
+void monitor_rename(Process *proc, const char *name)
 {
 	proc->monitor.name = name;
 }
@@ -83,7 +81,7 @@ void monitor_rename(Process *proc, const char* name)
 #define MONITOR_NODE_TO_PROCESS(node) \
 	(struct Process *)((intptr_t)(node) - offsetof(struct Process, monitor.link))
 
-size_t monitor_checkStack(cpustack_t* stack_base, size_t stack_size)
+size_t monitor_checkStack(cpustack_t *stack_base, size_t stack_size)
 {
 	cpustack_t* beg;
 	cpustack_t* cur;
@@ -137,9 +135,9 @@ void monitor_report(void)
 		 p->monitor.link.succ;
 		 p = MONITOR_NODE_TO_PROCESS(p->monitor.link.succ))
 	{
-		size_t free = monitor_checkStack(p->monitor.stack_base, p->monitor.stack_size);
+		size_t free = monitor_checkStack(p->stack_base, p->stack_size);
 		kprintf("%-24s%-8p%-8p%-8lu%-8lu\n",
-			p->monitor.name, p, p->monitor.stack_base, p->monitor.stack_size, free);
+			p->monitor.name, p, p->stack_base, p->stack_size, free);
 	}
 }
 
@@ -154,7 +152,7 @@ static void NORETURN monitor(void)
 			p->monitor.link.succ;
 			p = MONITOR_NODE_TO_PROCESS(p->monitor.link.succ))
 		{
-			size_t free = monitor_checkStack(p->monitor.stack_base, p->monitor.stack_size);
+			size_t free = monitor_checkStack(p->stack_base, p->stack_size);
 
 			if (free < 0x20)
 				kprintf("MONITOR: WARNING: Free stack for process '%s' is only %u chars\n",

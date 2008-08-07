@@ -199,11 +199,13 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 	proc_init_struct(proc);
 	proc->user_data = data;
 
-#if CONFIG_KERN_HEAP
+#if CONFIG_KERN_HEAP | CONFIG_KERN_MONITOR | (ARCH & ARCH_EMUL)
 	proc->stack_base = stack_base;
 	proc->stack_size = stack_size;
+	#if CONFIG_KERN_HEAP
 	if (free_stack)
 		proc->flags |= PF_FREESTACK;
+	#endif
 #endif
 
 	/* Initialize process stack frame */
@@ -218,7 +220,7 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 	ATOMIC(SCHED_ENQUEUE(proc));
 
 #if CONFIG_KERN_MONITOR
-	monitor_add(proc, name, stack_base, stack_size);
+	monitor_add(proc, name);
 #endif
 
 	return proc;
