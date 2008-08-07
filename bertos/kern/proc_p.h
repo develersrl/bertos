@@ -98,7 +98,11 @@ extern REGISTER Process	*CurrentProcess;
 extern REGISTER List     ProcReadyList;
 
 
-/** Enqueue a task in the ready list. */
+/**
+ * Enqueue a task in the ready list.
+ *
+ * \note This is *NOT* protected against 
+ */
 #define SCHED_ENQUEUE(proc)  ADDTAIL(&ProcReadyList, &(proc)->link)
 
 /** Schedule to another process *without* adding the current to the ready list. */

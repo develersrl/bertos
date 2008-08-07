@@ -45,9 +45,9 @@
 /**
  * Proc scheduling test subthread 1
  */
-static void NORETURN proc_test_thread1(void)
+static void proc_test_thread1(void)
 {
-	for (;;)
+	for (int i = 0; i < 30; ++i)
 	{
 		kputs(">task 1\n");
 		timer_delay(50);
@@ -58,9 +58,9 @@ static void NORETURN proc_test_thread1(void)
 /**
  * Proc scheduling test subthread 2
  */
-static void NORETURN proc_test_thread2(void)
+static void proc_test_thread2(void)
 {
-	for (;;)
+	for (int i = 0; i < 30; ++i)
 	{
 		kputs(">task 2\n");
 		timer_delay(75);
@@ -72,9 +72,9 @@ static cpustack_t proc_test_stack1[CONFIG_PROC_DEFSTACKSIZE / sizeof(cpustack_t)
 static cpustack_t proc_test_stack2[CONFIG_PROC_DEFSTACKSIZE / sizeof(cpustack_t)];
 
 /**
- * Proc scheduling test
+ * Process scheduling test
  */
-void NORETURN proc_test(void)
+void proc_test(void)
 {
 	proc_new(proc_test_thread1, NULL, sizeof(proc_test_stack1), proc_test_stack1);
 	proc_new(proc_test_thread2, NULL, sizeof(proc_test_stack2), proc_test_stack2);
@@ -87,12 +87,10 @@ void NORETURN proc_test(void)
 //	#warning FIXME
 	kdump(proc_test_stack2+sizeof(proc_test_stack1)-64, 64);
 
-	for (;;)
+	for (int i = 0; i < 30; ++i)
 	{
 		kputs(">main task\n");
 		timer_delay(93);
 		proc_switch();
 	}
-
-	ASSERT(false);
 }

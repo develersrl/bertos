@@ -49,6 +49,7 @@
 #include <cfg/debug.h>
 
 
+/* Access to this list must be protected against the scheduler */
 static List MonitorProcs;
 
 
@@ -62,23 +63,19 @@ void monitor_add(Process *proc, const char *name)
 {
 	proc->monitor.name = name;
 
-	ADDTAIL(&MonitorProcs, &proc->monitor.link);
+	PROC_ATOMIC(ADDTAIL(&MonitorProcs, &proc->monitor.link));
 }
 
 
 void monitor_remove(Process *proc)
 {
-	REMOVE(&proc->monitor.link);
+	PROC_ATOMIC(REMOVE(&proc->monitor.link));
 }
 
 void monitor_rename(Process *proc, const char *name)
 {
 	proc->monitor.name = name;
 }
-
-/* TODO: use containerof() */
-#define MONITOR_NODE_TO_PROCESS(node) \
-	(struct Process *)((intptr_t)(node) - offsetof(struct Process, monitor.link))
 
 size_t monitor_checkStack(cpustack_t *stack_base, size_t stack_size)
 {
@@ -116,49 +113,47 @@ size_t monitor_checkStack(cpustack_t *stack_base, size_t stack_size)
 
 void monitor_report(void)
 {
-	struct Process* p;
+	Node *node;
 	int i;
 
-	if (LIST_EMPTY(&MonitorProcs))
-	{
-		kputs("No stacks registered in the monitor\n");
-		return;
-	}
-
 	kprintf("%-24s%-8s%-8s%-8s%-8s\n", "Process name", "TCB", "SPbase", "SPsize", "SPfree");
-	for (i=0;i<56;i++)
+	for (i = 0; i<56; i++)
 		kputchar('-');
 	kputchar('\n');
 
-	for (p = MONITOR_NODE_TO_PROCESS(LIST_HEAD(&MonitorProcs));
-		 p->monitor.link.succ;
-		 p = MONITOR_NODE_TO_PROCESS(p->monitor.link.succ))
+	proc_forbid();
+	FOREACH_NODE(node, &MonitorProcs)
 	{
+		Process *p = containerof(node, Process, monitor.link);
 		size_t free = monitor_checkStack(p->stack_base, p->stack_size);
 		kprintf("%-24s%-8p%-8p%-8lu%-8lu\n",
 			p->monitor.name, p, p->stack_base, p->stack_size, free);
 	}
+	proc_permit();
 }
 
 
 static void NORETURN monitor(void)
 {
-	struct Process *p;
+	Process *p;
+	Node *node;
 
-	while (1)
+	for (;;)
 	{
-		for (p = MONITOR_NODE_TO_PROCESS(LIST_HEAD(&MonitorProcs));
-			p->monitor.link.succ;
-			p = MONITOR_NODE_TO_PROCESS(p->monitor.link.succ))
+		proc_forbid();
+		FOREACH_NODE(node, &MonitorProcs)
 		{
+			Process *p = containerof(node, Process, monitor.link);
 			size_t free = monitor_checkStack(p->stack_base, p->stack_size);
 
 			if (free < 0x20)
-				kprintf("MONITOR: WARNING: Free stack for process '%s' is only %u chars\n",
+				kprintf("MONITOR: Free stack of process '%s' is only %u chars\n",
 						p->monitor.name, (unsigned int)free);
-
-			timer_delay(500);
 		}
+		proc_permit();
+
+		/* Give some rest to the system */
+		timer_delay(500);
 	}
 }
 
