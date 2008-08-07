@@ -73,3 +73,5 @@ INLINE hptime_t timer_hw_hpread(void)
 {
 	return hptime_get();
 }
+
+#define timer_hw_triggered() (true)
