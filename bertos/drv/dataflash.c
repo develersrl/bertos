@@ -287,7 +287,7 @@ static void dataflash_loadPage(DataFlash *fd, dataflash_page_t page_addr)
  */
 static int dataflash_flush(KFile *_fd)
 {
-	DataFlash *fd = DATAFLASH(_fd);
+	DataFlash *fd = DATAFLASH_CAST(_fd);
 	if (fd->page_dirty)
 	{
 		dataflash_cmd(fd, fd->current_page, 0x00, DFO_WRITE_BUFF1_TO_MEM_E);
@@ -316,7 +316,7 @@ static int dataflash_close(struct KFile *_fd)
  */
 static KFile *dataflash_reopen(KFile *_fd)
 {
-	DataFlash *fd = DATAFLASH(_fd);
+	DataFlash *fd = DATAFLASH_CAST(_fd);
 	dataflash_close(_fd);
 
 	fd->current_page = 0;
@@ -344,7 +344,7 @@ static KFile *dataflash_reopen(KFile *_fd)
  */
 static size_t dataflash_read(struct KFile *_fd, void *buf, size_t size)
 {
-	DataFlash *fd = DATAFLASH(_fd);
+	DataFlash *fd = DATAFLASH_CAST(_fd);
 
 	dataflash_offset_t byte_addr;
 	dataflash_page_t page_addr;
@@ -394,7 +394,7 @@ static size_t dataflash_read(struct KFile *_fd, void *buf, size_t size)
  */
 static size_t dataflash_write(struct KFile *_fd, const void *_buf, size_t size)
 {
-	DataFlash *fd = DATAFLASH(_fd);
+	DataFlash *fd = DATAFLASH_CAST(_fd);
 
 	dataflash_offset_t offset;
 	dataflash_page_t new_page;

@@ -100,7 +100,7 @@ typedef struct DataFlash
 /**
  * Convert + ASSERT from generic KFile to DataFlash.
  */
-INLINE DataFlash * DATAFLASH(KFile *fd)
+INLINE DataFlash * DATAFLASH_CAST(KFile *fd)
 {
 	ASSERT(fd->_type == KFT_DATAFLASH);
 	return (DataFlash *)fd;
