@@ -26,14 +26,13 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2004, 2008 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
  * \brief Monitor to check for stack overflows
  *
  * \version $Id$
- *
  * \author Giovanni Bajo <rasky@develer.com>
  */
 
@@ -67,7 +66,7 @@ void monitor_add(Process *proc, const char *name)
 }
 
 
-void monitor_remove(Process* proc)
+void monitor_remove(Process *proc)
 {
 	REMOVE(&proc->monitor.link);
 }
@@ -83,9 +82,9 @@ void monitor_rename(Process *proc, const char *name)
 
 size_t monitor_checkStack(cpustack_t *stack_base, size_t stack_size)
 {
-	cpustack_t* beg;
-	cpustack_t* cur;
-	cpustack_t* end;
+	cpustack_t *beg;
+	cpustack_t *cur;
+	cpustack_t *end;
 	size_t sp_free;
 
 	beg = stack_base;
