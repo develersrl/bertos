@@ -145,7 +145,7 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 {
 	Process *proc;
 	size_t i;
-	size_t proc_size_words = ROUND2(sizeof(Process), sizeof(cpustack_t)) / sizeof(cpustack_t);
+	const size_t PROC_SIZE_WORDS = ROUND2(sizeof(Process), sizeof(cpustack_t)) / sizeof(cpustack_t);
 #if CONFIG_KERN_HEAP
 	bool free_stack = false;
 #endif
@@ -184,13 +184,13 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 	if (CPU_STACK_GROWS_UPWARD)
 	{
 		proc = (Process*)stack_base;
-		proc->stack = stack_base + proc_size_words;
+		proc->stack = stack_base + PROC_SIZE_WORDS;
 		if (CPU_SP_ON_EMPTY_SLOT)
 			proc->stack++;
 	}
 	else
 	{
-		proc = (Process*)(stack_base + stack_size / sizeof(cpustack_t) - proc_size_words);
+		proc = (Process*)(stack_base + stack_size / sizeof(cpustack_t) - PROC_SIZE_WORDS);
 		proc->stack = (cpustack_t*)proc;
 		if (CPU_SP_ON_EMPTY_SLOT)
 			proc->stack--;
