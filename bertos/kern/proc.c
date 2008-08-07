@@ -141,7 +141,7 @@ void proc_init(void)
  * \return Process structure of new created process
  *         if successful, NULL otherwise.
  */
-struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(void), iptr_t data, size_t stacksize, cpustack_t *stack_base)
+struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(void), iptr_t data, size_t stack_size, cpustack_t *stack_base)
 {
 	Process *proc;
 	size_t i;
@@ -154,17 +154,17 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 	/* Ignore stack provided by caller and use the large enough default instead. */
 	stack_base = (cpustack_t *)list_remHead(&StackFreeList);
 
-	stacksize = CONFIG_PROC_DEFSTACKSIZE;
+	stack_size = CONFIG_PROC_DEFSTACKSIZE;
 #elif CONFIG_KERN_HEAP
 	/* Did the caller provide a stack for us? */
 	if (!stack_base)
 	{
 		/* Did the caller specify the desired stack size? */
-		if (!stacksize)
-			stacksize = CONFIG_PROC_DEFSTACKSIZE + sizeof(Process);
+		if (!stack_size)
+			stack_size = CONFIG_PROC_DEFSTACKSIZE + sizeof(Process);
 
 		/* Allocate stack dinamically */
-		if (!(stack_base = heap_alloc(stacksize)))
+		if (!(stack_base = heap_alloc(stack_size)))
 			return NULL;
 
 		free_stack = true;
@@ -172,12 +172,12 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 #else
 	/* Stack must have been provided by the user */
 	ASSERT(stack_base);
-	ASSERT(stacksize);
+	ASSERT(stack_size);
 #endif
 
 #if CONFIG_KERN_MONITOR
 	/* Fill-in the stack with a special marker to help debugging */
-	memset(stack_base, CONFIG_KERN_STACKFILLCODE, stacksize / sizeof(cpustack_t));
+	memset(stack_base, CONFIG_KERN_STACKFILLCODE, stack_size / sizeof(cpustack_t));
 #endif
 
 	/* Initialize the process control block */
@@ -190,7 +190,7 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 	}
 	else
 	{
-		proc = (Process*)(stack_base + stacksize / sizeof(cpustack_t) - proc_size_words);
+		proc = (Process*)(stack_base + stack_size / sizeof(cpustack_t) - proc_size_words);
 		proc->stack = (cpustack_t*)proc;
 		if (CPU_SP_ON_EMPTY_SLOT)
 			proc->stack--;
@@ -218,7 +218,7 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 	ATOMIC(SCHED_ENQUEUE(proc));
 
 #if CONFIG_KERN_MONITOR
-	monitor_add(proc, name, stack_base, stacksize);
+	monitor_add(proc, name, stack_base, stack_size);
 #endif
 
 	return proc;
