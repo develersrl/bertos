@@ -141,7 +141,7 @@ static void flash_avr_flush(FlashAvr *fd)
  */
 static int flash_avr_kfileFlush(struct KFile *_fd)
 {
-	FlashAvr *fd = FLASHAVRKFILE(_fd);
+	FlashAvr *fd = FLASHAVR_CAST(_fd);
 	flash_avr_flush(fd);
 	return 0;
 }
@@ -170,7 +170,7 @@ static void flash_avr_loadPage(FlashAvr *fd, avr_page_t page)
  */
 static size_t flash_avr_write(struct KFile *_fd, const void *_buf, size_t size)
 {
-	FlashAvr *fd = FLASHAVRKFILE(_fd);
+	FlashAvr *fd = FLASHAVR_CAST(_fd);
 	const uint8_t *buf =(const uint8_t *)_buf;
 
 	avr_page_t page;
@@ -224,7 +224,7 @@ static void flash_avr_open(struct FlashAvr *fd)
  */
 static int flash_avr_close(struct KFile *_fd)
 {
-	FlashAvr *fd = FLASHAVRKFILE(_fd);
+	FlashAvr *fd = FLASHAVR_CAST(_fd);
 	flash_avr_flush(fd);
 	LOG_INFO("Flash file closed\n");
 	return 0;
@@ -235,7 +235,7 @@ static int flash_avr_close(struct KFile *_fd)
  */
 static struct KFile *flash_avr_reopen(struct KFile *fd)
 {
-	FlashAvr *_fd = FLASHAVRKFILE(fd);
+	FlashAvr *_fd = FLASHAVR_CAST(fd);
 	flash_avr_close(fd);
 	flash_avr_open(_fd);
 	return fd;
@@ -248,7 +248,7 @@ static struct KFile *flash_avr_reopen(struct KFile *fd)
  */
 static size_t flash_avr_read(struct KFile *_fd, void *buf, size_t size)
 {
-	FlashAvr *fd = FLASHAVRKFILE(_fd);
+	FlashAvr *fd = FLASHAVR_CAST(_fd);
 	ASSERT(fd->fd.seek_pos + (kfile_off_t)size <= (kfile_off_t)fd->fd.size);
 	size = MIN((uint32_t)size, fd->fd.size - fd->fd.seek_pos);
 

@@ -90,7 +90,7 @@ typedef struct FlashAvr
 /**
  * Convert + ASSERT from generic KFile to FlashAvr.
  */
-INLINE FlashAvr * FLASHAVRKFILE(KFile *fd)
+INLINE FlashAvr * FLASHAVR_CAST(KFile *fd)
 {
 	ASSERT(fd->_type == KFT_FLASHAVR);
 	return (FlashAvr *)fd;
