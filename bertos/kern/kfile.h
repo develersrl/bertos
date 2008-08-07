@@ -47,16 +47,16 @@
  * {
  *		KFile fd;
  *		Serial *ser;
- * } SerialKFile;
+ * } Serial;
  * \endcode
  *
  * You should also supply a macro for casting KFile to SerialKFile:
  *
  * \code
- * INLINE SerialKFile * SERIALKFILE(KFile *fd)
+ * INLINE Serial * SERIAL_CAST(KFile *fd)
  * {
  *		ASSERT(fd->_type == KFT_SERIAL);
- *		return (SerialKFile *)fd;
+ *		return (Serial *)fd;
  * }
  * \endcode
  *
