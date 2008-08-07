@@ -67,59 +67,5 @@
 
 #define CONFIG_KERN_QUANTUM     50    /**< Time sharing quantum in timer ticks. */
 
-#if (ARCH & ARCH_EMUL)
-	/* We need a large stack because system libraries are bloated */
-	#define CONFIG_PROC_DEFSTACKSIZE  65536
-#else
-	/**
-	 * Default stack size for each thread, in bytes.
-	 *
-	 * The goal here is to allow a minimal task to save all of its
-	 * registers twice, plus push a maximum of 32 variables on the
-	 * stack.
-	 *
-	 * The actual size computed by the default formula is:
-	 *   AVR:    102
-	 *   i386:   156
-	 *   ARM:    164
-	 *   x86_64: 184
-	 *
-	 * Note that on most 16bit architectures, interrupts will also
-	 * run on the stack of the currently running process.  Nested
-	 * interrupts will greatly increases the amount of stack space
-	 * required per process.  Use irqmanager to minimize stack
-	 * usage.
-	 */
-	#define CONFIG_PROC_DEFSTACKSIZE  \
-	    (CPU_SAVED_REGS_CNT * 2 * sizeof(cpustack_t) \
-	    + 32 * sizeof(int))
-#endif
-
-/* OBSOLETE */
-#define CONFIG_KERN_DEFSTACKSIZE CONFIG_PROC_DEFSTACKSIZE
-
-/* Memory fill codes to help debugging */
-#if CONFIG_KERN_MONITOR
-	#include <cpu/types.h>
-	#if (SIZEOF_CPUSTACK_T == 1)
-		/* 8bit cpustack_t */
-		#define CONFIG_KERN_STACKFILLCODE  0xA5
-		#define CONFIG_KERN_MEMFILLCODE    0xDB
-	#elif (SIZEOF_CPUSTACK_T == 2)
-		/* 16bit cpustack_t */
-		#define CONFIG_KERN_STACKFILLCODE  0xA5A5
-		#define CONFIG_KERN_MEMFILLCODE    0xDBDB
-	#elif (SIZEOF_CPUSTACK_T == 4)
-		/* 16bit cpustack_t */
-		#define CONFIG_KERN_STACKFILLCODE  0xA5A5A5A5UL
-		#define CONFIG_KERN_MEMFILLCODE    0xDBDBDBDBUL
-	#elif (SIZEOF_CPUSTACK_T == 8)
-		/* 16bit cpustack_t */
-		#define CONFIG_KERN_STACKFILLCODE  0xA5A5A5A5A5A5A5A5UL
-		#define CONFIG_KERN_MEMFILLCODE    0xDBDBDBDBDBDBDBDBUL
-	#else
-		#error No cpustack_t size supported!
-	#endif
-#endif
 
 #endif /*  CFG_KERN_H */
