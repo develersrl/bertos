@@ -71,7 +71,7 @@ typedef struct Flash25
 /**
  * Convert + ASSERT from generic KFile to Flash25.
  */
-INLINE Flash25 * FLASH25KFILE(KFile *fd)
+INLINE Flash25 * FLASH25_CAST(KFile *fd)
 {
 	ASSERT(fd->_type == KFT_FLASH25);
 	return (Flash25 *)fd;

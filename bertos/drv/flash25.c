@@ -140,7 +140,7 @@ static bool flash25_pin_init(Flash25 *fd)
  */
 static KFile * flash25_reopen(struct KFile *_fd)
 {
-	Flash25 *fd = FLASH25KFILE(_fd);
+	Flash25 *fd = FLASH25_CAST(_fd);
 
 	fd->fd.seek_pos = 0;
 	fd->fd.size = FLASH25_MEM_SIZE;
@@ -176,7 +176,7 @@ static size_t flash25_read(struct KFile *_fd, void *buf, size_t size)
 {
 	uint8_t *data = (uint8_t *)buf;
 
-	Flash25 *fd = FLASH25KFILE(_fd);
+	Flash25 *fd = FLASH25_CAST(_fd);
 
 	ASSERT(fd->fd.seek_pos + (kfile_size_t)size <= fd->fd.size);
 	size = MIN((kfile_size_t)size, fd->fd.size - fd->fd.seek_pos);
@@ -229,7 +229,7 @@ static size_t flash25_write(struct KFile *_fd, const void *_buf, size_t size)
 	flash25Size_t wr_len;
 	const uint8_t *data = (const uint8_t *) _buf;
 
-	Flash25 *fd = FLASH25KFILE(_fd);
+	Flash25 *fd = FLASH25_CAST(_fd);
 
 	ASSERT(fd->fd.seek_pos + (kfile_size_t)size <= fd->fd.size);
 
