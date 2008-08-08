@@ -26,35 +26,15 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2006 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2006, 2008 Develer S.r.l. (http://www.develer.com/)
  * All Rights Reserved.
  * -->
  *
  * \version $Id$
- *
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * \brief Custom control for graphics LCD emulation (interface)
  */
-
-/*#*
- *#* $Log$
- *#* Revision 1.5  2006/05/28 12:17:57  bernie
- *#* Drop almost all the Qt3 cruft.
- *#*
- *#* Revision 1.4  2006/02/20 02:00:40  bernie
- *#* Port to Qt 4.1.
- *#*
- *#* Revision 1.3  2006/02/15 09:13:16  bernie
- *#* Switch to BITMAP_FMT_PLANAR_V_LSB.
- *#*
- *#* Revision 1.2  2006/02/10 12:33:51  bernie
- *#* Make emulator display a bit larger.
- *#*
- *#* Revision 1.1  2006/01/16 03:51:35  bernie
- *#* Add LCD Qt emulator.
- *#*
- *#*/
 
 #ifndef DRV_LCD_GFX_QT_H
 #define DRV_LCD_GFX_QT_H
@@ -77,7 +57,7 @@ public:
 	enum { WIDTH = 128, HEIGHT = 64 };
 
 // Construction
-	EmulLCD(QWidget *parent = 0, const char *name = 0);
+	EmulLCD(QWidget *parent = 0);
 	virtual ~EmulLCD();
 
 // Base class overrides
@@ -96,8 +76,9 @@ protected:
 	/// Frame thickness
 	int frame_width;
 
-	/// LCD colors
-	QColor fg_color, bg_color;
+	/// Brushes for painting the LCD
+	QColor fg_color;
+	QBrush bg_brush;
 
 	/// Pixel storage
 	unsigned char raster[(WIDTH + 7 / 8) * HEIGHT];

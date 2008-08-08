@@ -26,15 +26,14 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2006 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2006, 2008 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
  * \version $Id$
- *
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
- * \brief Custom control for graphics LCD emulation (interface)
+ * \brief Custom control for graphics LCD emulation (implementation)
  */
 
 #include "lcd_gfx_qt.h"
@@ -52,11 +51,14 @@
 #define LCD_BG_COLOR 0xBB, 0xCC, 0xBB
 
 
-EmulLCD::EmulLCD(QWidget *parent, const char *name) :
-	QFrame(parent, name, Qt::WRepaintNoErase | Qt::WResizeNoErase),
+EmulLCD::EmulLCD(QWidget *parent) :
+	QFrame(parent),
 	fg_color(LCD_FG_COLOR),
-	bg_color(LCD_BG_COLOR)
+	bg_brush(QColor(LCD_BG_COLOR))
 {
+	// Optimized rendering: we repaint everything anyway
+	setAttribute(Qt::WA_NoSystemBackground);
+
 	// initialize bitmap
 	memset(raster, 0xAA, sizeof(raster));
 
@@ -74,7 +76,7 @@ EmulLCD::~EmulLCD()
 
 QSizePolicy EmulLCD::sizePolicy() const
 {
-	return QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, false);
+	return QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::Frame);
 }
 
 
@@ -93,12 +95,12 @@ QSize EmulLCD::minimumSizeHint() const
 void EmulLCD::paintEvent(QPaintEvent * /*event*/)
 {
 	QPainter p(this);
-	QImage img(raster, WIDTH, HEIGHT, 1, NULL, 0, QImage::BigEndian);
+	QImage img(raster, WIDTH, HEIGHT, QImage::Format_Mono);
 
 	p.setBackgroundMode(Qt::OpaqueMode);
+	p.setBackground(bg_brush);
 	p.setPen(fg_color);
-	p.setBackgroundColor(bg_color);
-	p.drawImage(frame_width, frame_width, img);
+	p.drawImage(QPoint(frame_width, frame_width), img);
 }
 
 void EmulLCD::writeRaster(uint8_t *new_raster)

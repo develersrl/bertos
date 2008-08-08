@@ -205,8 +205,7 @@ int EmulKbd::readCols(void)
 	EmulKey *key;
 	int cols = 0;
 
-	// FIXME: QLayoutIterator is obsolete in Qt4
-	for(QLayoutIterator it(layout->iterator()); (item = it.current()); ++it)
+	for (int i = 0; (item = layout->itemAt(i)); ++i)
 	{
 		key = static_cast<EmulKey *>(item->widget());
 		if (key->row == active_row)
