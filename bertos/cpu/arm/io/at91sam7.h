@@ -272,7 +272,7 @@
 	#define TIO_PIO_ABSR    PIOA_BSR
 
 #else
-	#error No Timer Counter names of pins  efinition for selected ARM CPU
+	#error No Timer Counter names of pins definition for selected ARM CPU
 
 #endif
 /*\}*/
