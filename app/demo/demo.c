@@ -224,7 +224,6 @@ void win_demo(Bitmap *bm)
 void proc_demo(void)
 {
 	extern void proc_test(void);
-// FIXME: proc_test() cause segmentation fault. 
 	proc_test();
 }
 
