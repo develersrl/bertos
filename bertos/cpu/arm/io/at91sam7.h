@@ -272,7 +272,7 @@
 	#define TIO_PIO_ABSR    PIOA_BSR
 
 #else
-	#error No Timer Counter pins' names definition for selected ARM CPU
+	#error No Timer Counter names of pins  efinition for selected ARM CPU
 
 #endif
 /*\}*/
@@ -307,7 +307,7 @@
 	#define PWM_PIO_ABSR    PIOA_BSR
 
 #else
-	#error No PWM pins' names definition for selected ARM CPU
+	#error No PWM names of pins definition for selected ARM CPU
 
 #endif
 /*\}*/
@@ -325,7 +325,7 @@
 	#define TWCK 4    //PA4
 
 #else
-	#error No TWI pins' names definition for selected ARM CPU
+	#error No TWI names of pins definition for selected ARM CPU
 #endif
 
 /**
@@ -347,7 +347,7 @@
 	#define AD3     16 // PA20
 
 #else
-	#error No ADC pins' names definition for selected ARM CPU
+	#error No ADC names of pins definition for selected ARM CPU
 
 #endif
 /*\}*/
