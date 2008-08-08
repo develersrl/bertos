@@ -54,11 +54,7 @@
 	#include <cfg/os.h>
 
 	#if OS_QT
-		#if _QT < 4
-			#include <qapplication.h>
-		#else
 			#include <QtGui/QApplication>
-		#endif
 	#elif OS_POSIX
 		#include <sys/select.h>
 	#elif CPU_AVR
