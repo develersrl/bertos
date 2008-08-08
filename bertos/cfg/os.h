@@ -41,8 +41,8 @@
 #define DEVLIB_OS_H
 
 /** Macro to include OS-specific versions of the headers. */
-#define OS_HEADER(module)  PP_STRINGIZE(PP_CAT3(module, _, OS_ID).h)
-#define OS_CSOURCE(module) PP_STRINGIZE(PP_CAT3(module, _, OS_ID).c)
+#define OS_HEADER(module)  PP_STRINGIZE(emul/PP_CAT3(module, _, OS_ID).h)
+#define OS_CSOURCE(module) PP_STRINGIZE(emul/PP_CAT3(module, _, OS_ID).c)
 
 /*
  * OS autodetection (Some systems trigger multiple OS definitions)
@@ -135,7 +135,7 @@
  * We want Qt and other frameworks to look like OSes because you would
  * tipically want their portable abstractions if you're using one of these.
  */
-#if defined(_QT)
+#if defined(_QT) || (defined(ARCH_QT) && (ARCH & ARCH_QT))
 	#define OS_QT 1
 	#undef  OS_ID
 	#define OS_ID qt
