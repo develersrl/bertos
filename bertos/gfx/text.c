@@ -31,108 +31,12 @@
  *
  * -->
  *
- * \brief Text graphic routines
- *
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
+ *
+ * \brief Text graphic routines
  */
-
-/*#*
- *#* $Log$
- *#* Revision 1.13  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.12  2006/05/25 23:35:22  bernie
- *#* Implement correct and faster clipping for algo text.
- *#*
- *#* Revision 1.11  2006/05/15 07:21:06  bernie
- *#* Doxygen fix.
- *#*
- *#* Revision 1.10  2006/04/27 05:39:23  bernie
- *#* Enhance text rendering to arbitrary x,y coords.
- *#*
- *#* Revision 1.9  2006/04/11 00:08:24  bernie
- *#* text_offset(): New function, but I'm not quite confident with the design.
- *#*
- *#* Revision 1.8  2006/03/22 09:50:37  bernie
- *#* Use the same format for fonts and rasters.
- *#*
- *#* Revision 1.7  2006/03/20 17:51:55  bernie
- *#* Cleanups.
- *#*
- *#* Revision 1.6  2006/03/13 02:05:54  bernie
- *#* Mark slow paths as UNLIKELY.
- *#*
- *#* Revision 1.5  2006/03/07 22:18:04  bernie
- *#* Correctly compute text width for prop fonts; Make styles a per-bitmap attribute.
- *#*
- *#* Revision 1.4  2006/02/15 09:10:15  bernie
- *#* Implement prop fonts; Fix algo styles.
- *#*
- *#* Revision 1.3  2006/02/10 12:31:55  bernie
- *#* Add multiple font support in bitmaps.
- *#*
- *#* Revision 1.2  2005/11/04 18:17:45  bernie
- *#* Fix header guards and includes for new location of gfx module.
- *#*
- *#* Revision 1.1  2005/11/04 18:11:35  bernie
- *#* Move graphics stuff from mware/ to gfx/.
- *#*
- *#* Revision 1.13  2005/11/04 16:20:02  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.12  2005/04/11 19:10:28  bernie
- *#* Include top-level headers from cfg/ subdir.
- *#*
- *#* Revision 1.11  2005/01/20 18:46:31  aleph
- *#* Fix progmem includes.
- *#*
- *#* Revision 1.10  2005/01/08 09:20:12  bernie
- *#* Really make it work on both architectures.
- *#*
- *#* Revision 1.9  2004/12/31 16:44:29  bernie
- *#* Sanitize for non-Harvard processors.
- *#*
- *#* Revision 1.8  2004/11/16 21:16:28  bernie
- *#* Update to new naming scheme in mware/gfx.c.
- *#*
- *#* Revision 1.7  2004/09/20 03:28:28  bernie
- *#* Fix header.
- *#*
- *#* Revision 1.6  2004/09/14 20:57:15  bernie
- *#* Use debug.h instead of kdebug.h.
- *#*
- *#* Revision 1.5  2004/09/06 21:51:26  bernie
- *#* Extend interface to allow any algorithmic style.
- *#*
- *#* Revision 1.2  2004/06/03 11:27:09  bernie
- *#* Add dual-license information.
- *#*
- *#* Revision 1.1  2004/05/23 15:43:16  bernie
- *#* Import mware modules.
- *#*
- *#* Revision 1.17  2004/05/15 16:57:01  aleph
- *#* Fixes for non-DEBUG build
- *#*
- *#* Revision 1.16  2004/04/03 20:42:49  aleph
- *#* Add text_clear()
- *#*
- *#* Revision 1.15  2004/03/24 15:03:45  bernie
- *#* Use explicit include paths; clean Doxygen comments
- *#*
- *#* Revision 1.14  2004/03/19 16:52:28  bernie
- *#* Move printf() like functions from text.c to text_format.c and add PROGMEM versions.
- *#*
- *#* Revision 1.13  2004/03/17 18:23:32  bernie
- *#* Oops.
- *#*
- *#* Revision 1.12  2004/03/17 18:03:22  bernie
- *#* Make diagnostic message shorter
- *#*
- *#* Revision 1.11  2004/03/13 22:52:54  aleph
- *#* documentation fixes
- *#*/
 
 #include <gfx/gfx.h>
 #include <gfx/font.h>

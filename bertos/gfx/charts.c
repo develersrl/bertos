@@ -31,6 +31,9 @@
  *
  * -->
  *
+ * \version $Id$
+ * \author Bernie Innocenti <bernie@codewiz.org>
+ *
  * \brief Simple charts on top of mware/gfx routines (implementation).
  *
  * Sample usage:
@@ -44,41 +47,7 @@
  *
  *	print_bitmap(bm);
  * \endcode
- *
- * \version $Id$
- * \author Bernie Innocenti <bernie@codewiz.org>
  */
-
-/*#*
- *#* $Log$
- *#* Revision 1.4  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.3  2005/11/27 23:33:29  bernie
- *#* Reorder includes.
- *#*
- *#* Revision 1.2  2005/11/04 18:17:45  bernie
- *#* Fix header guards and includes for new location of gfx module.
- *#*
- *#* Revision 1.1  2005/11/04 18:11:35  bernie
- *#* Move graphics stuff from mware/ to gfx/.
- *#*
- *#* Revision 1.7  2005/11/04 16:20:02  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.6  2004/11/16 21:04:23  bernie
- *#* Update to new naming scheme in mware/gfx.c.
- *#*
- *#* Revision 1.5  2004/09/14 20:56:39  bernie
- *#* Make more generic and adapt to new gfx functions.
- *#*
- *#* Revision 1.3  2004/08/11 19:39:12  bernie
- *#* Use chart_x_t and chart_y_t for the input dataset.
- *#*
- *#* Revision 1.1  2004/08/04 03:16:30  bernie
- *#* Import simple chart drawing code.
- *#*
- *#*/
 
 #include "charts.h"
 #include <gfx/gfx.h>

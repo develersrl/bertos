@@ -31,82 +31,12 @@
  *
  * -->
  *
- * \brief printf-family routines for text output
- *
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
+ *
+ * \brief printf-family routines for text output
  */
-
-/*#*
- *#* $Log$
- *#* Revision 1.10  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.9  2006/04/27 05:39:24  bernie
- *#* Enhance text rendering to arbitrary x,y coords.
- *#*
- *#* Revision 1.8  2006/03/22 09:50:11  bernie
- *#* Don't use C99 stuff.
- *#*
- *#* Revision 1.7  2006/03/20 17:51:55  bernie
- *#* Cleanups.
- *#*
- *#* Revision 1.6  2006/03/13 02:05:54  bernie
- *#* Mark slow paths as UNLIKELY.
- *#*
- *#* Revision 1.5  2006/03/07 22:18:04  bernie
- *#* Correctly compute text width for prop fonts; Make styles a per-bitmap attribute.
- *#*
- *#* Revision 1.4  2006/02/10 12:31:33  bernie
- *#* Add multiple font support in bitmaps.
- *#*
- *#* Revision 1.3  2005/11/27 23:31:58  bernie
- *#* Reorder includes.
- *#*
- *#* Revision 1.2  2005/11/04 18:17:45  bernie
- *#* Fix header guards and includes for new location of gfx module.
- *#*
- *#* Revision 1.1  2005/11/04 18:11:35  bernie
- *#* Move graphics stuff from mware/ to gfx/.
- *#*
- *#* Revision 1.10  2005/11/04 16:20:02  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.9  2004/12/31 17:47:45  bernie
- *#* Rename UNUSED() to UNUSED_ARG().
- *#*
- *#* Revision 1.8  2004/11/16 21:16:56  bernie
- *#* Update to new naming scheme in mware/gfx.c.
- *#*
- *#* Revision 1.7  2004/10/03 19:05:04  bernie
- *#* text_widthf(), text_vwidthf(): New functions.
- *#*
- *#* Revision 1.6  2004/09/14 20:59:04  bernie
- *#* text_xprintf(): Support all styles; Pixel-wise text centering.
- *#*
- *#* Revision 1.5  2004/08/25 14:12:09  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.4  2004/08/05 18:46:44  bernie
- *#* Documentation improvements.
- *#*
- *#* Revision 1.3  2004/08/03 15:57:18  aleph
- *#* Add include to fix warning for vsprintf()
- *#*
- *#* Revision 1.2  2004/06/03 11:27:09  bernie
- *#* Add dual-license information.
- *#*
- *#* Revision 1.1  2004/05/23 15:43:16  bernie
- *#* Import mware modules.
- *#*
- *#* Revision 1.2  2004/03/26 18:50:50  bernie
- *#* Move _PROGMEM stuff to compiler.h
- *#*
- *#* Revision 1.1  2004/03/19 16:52:28  bernie
- *#* Move printf() like functions from text.c to text_format.c and add PROGMEM versions.
- *#*
- *#*/
 
 #include "text.h"
 

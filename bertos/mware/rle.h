@@ -31,27 +31,11 @@
  *
  * -->
  *
- * \brief General-purpose run-length {en,de}coding algorithm (interface)
- *
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
+ *
+ * \brief General-purpose run-length {en,de}coding algorithm (interface)
  */
-
-/*#*
- *#* $Log$
- *#* Revision 1.4  2006/07/19 12:56:28  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.3  2005/11/04 16:20:02  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.2  2004/08/25 14:12:09  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.1  2004/08/04 02:35:54  bernie
- *#* Import simple RLE algorithm.
- *#*
- *#*/
 #ifndef RLE_H
 #define RLE_H
 
