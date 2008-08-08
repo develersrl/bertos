@@ -71,8 +71,8 @@ bertos/emul/timer_qt_moc.cpp: bertos/emul/timer_qt.c
 	$(QT_MOC) -o $@ $<
 
 
-demo_CFLAGS = -D_QT=4 -D'ARCH=ARCH_EMUL' -Iapp/demo -Ibertos/emul $(EMUL_CFLAGS)
-demo_CXXFLAGS = -D_QT=4 -D'ARCH=ARCH_EMUL' -Iapp/demo $(EMUL_CFLAGS)
+demo_CFLAGS = -Iapp/demo $(EMUL_CFLAGS)
+demo_CXXFLAGS = -Iapp/demo $(EMUL_CFLAGS)
 demo_LDFLAGS = $(EMUL_LDFLAGS)
 
 # Debug stuff
@@ -80,4 +80,3 @@ ifeq ($(demo_DEBUG),0)
 	demo_CFLAGS += -Os
 	demo_CXXFLAGS += -Os
 endif
-
