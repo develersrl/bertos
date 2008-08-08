@@ -43,6 +43,8 @@
 
 #include <mware/event.h>
 
+#include <cfg/debug.h>
+
 #warning TODO:Refactor this test to comply whit BeRTOS test policy.
 
 #ifdef _TEST
@@ -130,10 +132,6 @@ static void timer_test_poll(void)
 }
 
 
-#include "timer.c"
-#include "mware/event.c"
-#include "os/hptime.c"
-
 int main(void)
 {
 	wdt_init(7);
@@ -144,5 +142,13 @@ int main(void)
 	timer_test_poll();
 	return 0;
 }
+
+#include "timer.c"
+#include "drv/kdebug.c"
+#include "mware/event.c"
+#include "mware/formatwr.c"
+#include "mware/hex.c"
+#include "os/hptime.c"
+
 #endif
 
