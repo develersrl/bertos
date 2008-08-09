@@ -60,7 +60,10 @@ struct Process *proc_new_with_name(const char* name, void (*entry)(void), iptr_t
 
 void proc_exit(void);
 void proc_switch(void);
-void proc_test(void);
+int proc_testSetup(void);
+int proc_testRun(void);
+int proc_testTearDown(void);
+
 struct Process *proc_current(void);
 iptr_t proc_current_user_data(void);
 void proc_rename(struct Process *proc, const char* name);

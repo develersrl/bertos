@@ -39,8 +39,7 @@
 
 #include <kern/proc.h>
 #include <drv/timer.h>
-
-#warning FIXME: Review this test and refactor for all target.
+#include <cfg/test.h>
 
 /**
  * Proc scheduling test subthread 1
@@ -71,21 +70,35 @@ static void proc_test_thread2(void)
 static cpustack_t proc_test_stack1[CONFIG_PROC_DEFSTACKSIZE / sizeof(cpustack_t)];
 static cpustack_t proc_test_stack2[CONFIG_PROC_DEFSTACKSIZE / sizeof(cpustack_t)];
 
+
+int proc_testSetup(void)
+{
+	kdbg_init();
+	proc_init();
+	IRQ_ENABLE;
+	timer_init();
+	return 0;
+}
+
+int proc_testTearDown(void)
+{
+	return 0;
+}
+
 /**
  * Process scheduling test
  */
-void proc_test(void)
+int proc_testRun(void)
 {
 	proc_new(proc_test_thread1, NULL, sizeof(proc_test_stack1), proc_test_stack1);
 	proc_new(proc_test_thread2, NULL, sizeof(proc_test_stack2), proc_test_stack2);
 	kputs("Created tasks\n");
 
 	kputs("stack1:\n");
-//	#warning FIXME
-	kdump(proc_test_stack1+sizeof(proc_test_stack1)-64, 64);
+	kdump(proc_test_stack1 + sizeof(proc_test_stack1) - 64, 64);
+	
 	kputs("stack2:\n");
-//	#warning FIXME
-	kdump(proc_test_stack2+sizeof(proc_test_stack1)-64, 64);
+	kdump(proc_test_stack2 + sizeof(proc_test_stack2) - 64, 64);
 
 	for (int i = 0; i < 30; ++i)
 	{
@@ -93,4 +106,22 @@ void proc_test(void)
 		timer_delay(93);
 		proc_switch();
 	}
+	return 0;
 }
+#warning Fix test to comply to new policy.
+#if 0
+/*
+ * FIXME: to be compiled as a single file 
+ * the kernel module needs the assembly switch function
+ * and the idle() that lay in a emulator cpp file.
+ * How can we fix this?
+ */
+#include TEST_ONLY(drv/kdebug.c)
+#include TEST_ONLY(kern/proc.c)
+#include TEST_ONLY(drv/timer.c)
+#include TEST_ONLY(mware/formatwr.c)
+#include TEST_ONLY(mware/hex.c)
+#include TEST_ONLY(os/hptime.c)
+
+TEST_MAIN(proc);
+#endif
