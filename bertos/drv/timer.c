@@ -163,7 +163,9 @@ void timer_add(Timer *timer)
 
 
 /**
- * Remove a timer from the timer queue before it has expired.
+ * Remove a timer from the timers queue before it has expired.
+ * \note Attempting to remove a timer already expired cause
+ *       undefined behaviour.
  */
 Timer *timer_abort(Timer *timer)
 {
