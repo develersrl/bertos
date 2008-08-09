@@ -41,6 +41,7 @@ demo_CSRC = \
 	bertos/icons/logo.c \
 	bertos/drv/kbd.c \
 	bertos/drv/timer.c \
+	bertos/drv/timer_test.c \
 	bertos/drv/buzzer.c \
 	bertos/drv/ser.c \
 	bertos/emul/ser_posix.c \

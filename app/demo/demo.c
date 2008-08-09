@@ -223,8 +223,13 @@ void win_demo(Bitmap *bm)
 
 void proc_demo(void)
 {
-	extern void proc_test(void);
-	proc_test();
+	proc_testRun();
+}
+
+void timer_demo(void)
+{
+	timer_testRun();
+	timer_testTearDown();
 }
 
 
@@ -277,6 +282,7 @@ static struct MenuItem main_items[] =
 	{ (const_iptr_t)"Bounce!",     0, (MenuHook)bouncing_logo,(iptr_t)&lcd_bitmap    },
 	{ (const_iptr_t)"Hello World", 0, (MenuHook)hello_world,  (iptr_t)&lcd_bitmap    },
 	{ (const_iptr_t)"Scheduling",  0, (MenuHook)proc_demo,    (iptr_t)&lcd_bitmap    },
+	{ (const_iptr_t)"Timer Test",  0, (MenuHook)timer_demo,   (iptr_t)&lcd_bitmap    },
 	{ (const_iptr_t)"Menu MX",     0, (MenuHook)menu_handle,  (iptr_t)&mx_menu       },
 	{ (const_iptr_t)"Display",     0, (MenuHook)menu_handle,  (iptr_t)&display_menu  },
 	{ (const_iptr_t)"Settings",    0, (MenuHook)menu_handle,  (iptr_t)&settings_menu },
