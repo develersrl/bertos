@@ -8,7 +8,6 @@
 # $Id$
 #
 
-
 VERBOSE=1
 
 CC=gcc
@@ -17,7 +16,7 @@ CFLAGS="-W -Wall -Wextra -I. -Iemul -std=gnu99 -fno-builtin -D_DEBUG -D_TEST -DA
 CXX=g++
 CXXFLAGS="$CFLAGS"
 
-TESTS=${TESTS:-`find . -name "*_test.*"`}
+TESTS=${TESTS:-`find . -name "*_test.c*"`}
 
 for test in $TESTS; do
 	[ $VERBOSE -gt 0 ] && echo "Running $test..."
