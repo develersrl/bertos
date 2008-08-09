@@ -185,6 +185,9 @@ INLINE void timer_delay(mtime_t delay)
 {
 	timer_delayTicks(ms_to_ticks(delay));
 }
+int timer_testSetup(void);
+int timer_testRun(void);
+int timer_testTearDown(void);
 
 #if !defined(CONFIG_TIMER_DISABLE_UDELAY)
 void timer_busyWait(hptime_t delay);
@@ -219,8 +222,8 @@ typedef struct Timer
 #define TIMER_MAGIC_ACTIVE    0xABBA
 #define TIMER_MAGIC_INACTIVE  0xBAAB
 
-extern void timer_add(Timer *timer);
-extern Timer *timer_abort(Timer *timer);
+void timer_add(Timer *timer);
+Timer *timer_abort(Timer *timer);
 
 /** Set the timer so that it calls an user hook when it expires */
 INLINE void timer_set_event_softint(Timer *timer, Hook func, iptr_t user_data)

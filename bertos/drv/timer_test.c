@@ -45,10 +45,6 @@
 
 #include <cfg/debug.h>
 
-#warning TODO:Refactor this test to comply whit BeRTOS test policy.
-
-#ifdef _TEST
-
 static void timer_test_constants(void)
 {
 	kprintf("TIMER_HW_HPTICKS_PER_SEC=%lu\n", TIMER_HW_HPTICKS_PER_SEC);
@@ -97,10 +93,11 @@ static void timer_test_hook(iptr_t _timer)
 	timer_add(timer);
 }
 
+static Timer test_timers[5];
+static const mtime_t test_delays[5] = { 170, 50, 310, 1500, 310 };
+
 static void timer_test_async(void)
 {
-	static Timer test_timers[5];
-	static const mtime_t test_delays[5] = { 170, 50, 310, 1500, 310 };
 	size_t i;
 
 	for (i = 0; i < countof(test_timers); ++i)
@@ -131,11 +128,17 @@ static void timer_test_poll(void)
 	}
 }
 
-
-int main(void)
+int timer_testSetup(void)
 {
+	IRQ_ENABLE;
 	wdt_init(7);
 	timer_init();
+	kdbg_init();
+	return 0;
+}
+
+int timer_testRun(void)
+{
 	timer_test_constants();
 	timer_test_delay();
 	timer_test_async();
@@ -143,12 +146,20 @@ int main(void)
 	return 0;
 }
 
-#include "timer.c"
-#include "drv/kdebug.c"
-#include "mware/event.c"
-#include "mware/formatwr.c"
-#include "mware/hex.c"
-#include "os/hptime.c"
+int timer_testTearDown(void)
+{
+	unsigned i;
+	for (i = 0; i < countof(test_timers); ++i)
+		timer_abort(&test_timers[i]);
+	return 0;
+}
 
-#endif
+#include TEST_ONLY(drv/timer.c)
+#include TEST_ONLY(drv/kdebug.c)
+#include TEST_ONLY(mware/event.c)
+#include TEST_ONLY(mware/formatwr.c)
+#include TEST_ONLY(mware/hex.c)
+#include TEST_ONLY(os/hptime.c)
+
+TEST_MAIN(timer);
 
