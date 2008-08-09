@@ -143,7 +143,7 @@ static void NORETURN monitor(void)
 		proc_forbid();
 		FOREACH_NODE(node, &MonitorProcs)
 		{
-			Process *p = containerof(node, Process, monitor.link);
+			p = containerof(node, Process, monitor.link);
 			size_t free = monitor_checkStack(p->stack_base, p->stack_size);
 
 			if (free < 0x20)
