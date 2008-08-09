@@ -35,10 +35,67 @@
  * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
+ * \author Francesco Sacchi <batt@develer.com>
+ * 
+ * When you want to test a module that is emulable on hosted
+ * platforms, these macros come in handy.
+ * Your module_test should supply three basic functions:
+ * 
+ * int module_testSetup(void)
+ * int module_testRun(void)
+ * int module_testTearDown(void)
+ * 
+ * All of these should return 0 if ok or a value != 0 on errors.
+ * 
+ * Then, at the end of your module_test you can write:
+ * #include TEST_ONLY(whatuneed.h)
+ * #include TEST_ONLY(whatuneed.c)
+ * #include TEST_ONLY(...)
+ * 
+ * TEST_MAIN(module);
+ * 
+ * The macro TEST_ONLY expand to nothing in non-TEST mode or to
+ * the specified filename if _TEST is defined.
+ * Including directly into your module the file.c you need to
+ * run the test allows you to build and run the test compiling
+ * only one file.
+ * 
+ * To achieve this you also need a main() that is supplied by
+ * the TEST_MAIN macro.
+ * This will expand to a full main that calls, in sequence:
+ * Setup, Run and TearDown of your module.
  */
 
 #ifndef CFG_TEST_H
 #define CFG_TEST_H
+
+#ifdef _TEST
+
+	/**
+	 * Macro used to generate a main() for a test to be compiled
+	 * on hosted platform.
+	 */
+	#define TEST_MAIN(module) \
+	int main(void) \
+	{ \
+		if (module##_testSetup() != 0) \
+			return 1; \
+		if (module##_testRun() != 0) \
+			return 2; \
+		if (module##_testTearDown() != 0) \
+			return 3; \
+		return 0; \
+	}
+
+	/** This macro will include the specified file only in test-mode */
+	#define TEST_ONLY(file) PP_STRINGIZE(file)
+	
+#else /* !_TEST */
+
+	#define TEST_MAIN(module)  /* nothing */
+	#define TEST_ONLY(file)    <cfg/nothing.h>
+
+#endif /* _TEST */
 
 /**
  * Silent an assert in a test.
