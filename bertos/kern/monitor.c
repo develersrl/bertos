@@ -45,6 +45,7 @@
 #include <mware/list.h>
 #include <drv/timer.h>
 #include <kern/proc.h>
+#include <cpu/frame.h> /* CPU_STACK_GROWS_UPWARD */
 #include <cfg/macros.h>
 #include <cfg/debug.h>
 

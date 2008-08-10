@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2004, 2005, 2006, 2007 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2004, 2005, 2006, 2007, 2008 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2004 Giovanni Bajo
  *
  * -->
@@ -44,8 +44,6 @@
 #include "detect.h"
 
 #include "cfg/cfg_attr.h"      /* CONFIG_FAST_MEM */
-#include "cfg/cfg_arch.h"      /* ARCH_EMUL */
-#include <cfg/compiler.h>      /* for uintXX_t */
 
 
 /**
@@ -69,10 +67,8 @@
 
 	#define CPU_REG_BITS            16
 	#define CPU_REGS_CNT            16
-	#define CPU_STACK_GROWS_UPWARD  0
-	#define CPU_SP_ON_EMPTY_SLOT	0
 	#define CPU_BYTE_ORDER          CPU_LITTLE_ENDIAN
-	#define CPU_HARVARD		0
+	#define CPU_HARVARD             0
 
 	/// Valid pointers should be >= than this value (used for debug)
 	#define CPU_RAM_START		0x100
@@ -82,11 +78,8 @@
 	#define NOP                     asm volatile ("nop")
 
 	#define CPU_REGS_CNT            7
-	#define CPU_SAVED_REGS_CNT      7
-	#define CPU_STACK_GROWS_UPWARD  0
-	#define CPU_SP_ON_EMPTY_SLOT	0
 	#define CPU_BYTE_ORDER          CPU_LITTLE_ENDIAN
-	#define CPU_HARVARD		0
+	#define CPU_HARVARD             0
 
 	#if CPU_X86_64
 		#define CPU_REG_BITS    64
@@ -104,12 +97,8 @@
 
 #elif CPU_ARM
 
-	/* Register counts include SREG too */
 	#define CPU_REG_BITS           32
 	#define CPU_REGS_CNT           16
-	#define CPU_SAVED_REGS_CNT     9
-	#define CPU_STACK_GROWS_UPWARD 0
-	#define CPU_SP_ON_EMPTY_SLOT   0
 	#define CPU_HARVARD            0
 
 	/// Valid pointers should be >= than this value (used for debug)
@@ -132,20 +121,6 @@
   		#endif
 
 		#define NOP            asm volatile ("mov r0,r0" ::)
-
-		/**
-		 * Initialization value for registers in stack frame.
-		 * The register index is not directly corrispondent to CPU
-		 * register numbers, but is related to how are pushed to
-		 * stack (\see asm_switch_context).
-		 * Index (CPU_SAVED_REGS_CNT - 1) is the CPSR register,
-		 * the initial value is set to:
-		 * - All flags (N, Z, C, V) set to 0.
-		 * - IRQ and FIQ enabled.
-		 * - ARM state.
-		 * - CPU in Supervisor Mode (SVC).
-		 */
-		#define CPU_REG_INIT_VALUE(reg) (reg == (CPU_SAVED_REGS_CNT - 1) ? 0x13 : 0)
 
 		#if CONFIG_FAST_MEM
 			/**
@@ -178,14 +153,11 @@
 	#endif /* !__IAR_SYSTEMS_ICC_ */
 
 #elif CPU_PPC
-	#define NOP                 asm volatile ("nop" ::)
 
-	/* Register counts include SREG too */
+	#define NOP                    asm volatile ("nop" ::)
+
 	#define CPU_REG_BITS           (CPU_PPC32 ? 32 : 64)
 	#define CPU_REGS_CNT           FIXME
-	#define CPU_SAVED_REGS_CNT     1  // FIXME
-	#define CPU_STACK_GROWS_UPWARD 0  //FIXME
-	#define CPU_SP_ON_EMPTY_SLOT   0  //FIXME
 	#define CPU_BYTE_ORDER         (__BIG_ENDIAN__ ? CPU_BIG_ENDIAN : CPU_LITTLE_ENDIAN)
 	#define CPU_HARVARD            0
 
@@ -198,9 +170,6 @@
 
 	#define CPU_REG_BITS            16
 	#define CPU_REGS_CNT            FIXME
-	#define CPU_SAVED_REGS_CNT      8
-	#define CPU_STACK_GROWS_UPWARD  1
-	#define CPU_SP_ON_EMPTY_SLOT	0
 	#define CPU_BYTE_ORDER          CPU_BIG_ENDIAN
 	#define CPU_HARVARD		1
 
@@ -216,24 +185,12 @@
 
 #elif CPU_AVR
 
-	#define NOP           asm volatile ("nop" ::)
+	#define NOP                     asm volatile ("nop" ::)
 
-	/* Register counts include SREG too */
 	#define CPU_REG_BITS            8
-	#define CPU_REGS_CNT           33
-	#define CPU_SAVED_REGS_CNT     19
-	#define CPU_STACK_GROWS_UPWARD  0
-	#define CPU_SP_ON_EMPTY_SLOT    1
+	#define CPU_REGS_CNT           33 /* Includes SREG */
 	#define CPU_BYTE_ORDER          CPU_LITTLE_ENDIAN
 	#define CPU_HARVARD             1
-
-	/**
-	 * Initialization value for registers in stack frame.
-	 * The register index is not directly corrispondent to CPU
-	 * register numbers. Index 0 is the SREG register: the initial
-	 * value is all 0 but the interrupt bit (bit 7).
-	 */
-	#define CPU_REG_INIT_VALUE(reg) (reg == 0 ? 0x80 : 0)
 
 	/// Valid pointers should be >= than this value (used for debug)
 	#define CPU_RAM_START		0x100
@@ -242,149 +199,14 @@
 	#error No CPU_... defined.
 #endif
 
-/// Default for macro not defined in the right arch section
-#ifndef CPU_REG_INIT_VALUE
-	#define CPU_REG_INIT_VALUE(reg)     0
-#endif
-
-#ifndef CPU_STACK_GROWS_UPWARD
-	#error CPU_STACK_GROWS_UPWARD should have been defined to either 0 or 1
-#endif
-
-#ifndef CPU_SP_ON_EMPTY_SLOT
-	#error CPU_SP_ON_EMPTY_SLOT should have been defined to either 0 or 1
-#endif
-
 #ifndef FAST_FUNC
-	/**
-	 * Function attribute for use with performance critical code.
-	 */
+	/// Function attribute for use with performance critical code.
 	#define FAST_FUNC /* */
 #endif
 
 #ifndef FAST_RODATA
-	/**
-	 * Data attribute to move constant data to fast memory storage.
-	 */
+	/// Data attribute to move constant data to fast memory storage.
 	#define FAST_RODATA /* */
 #endif
-
-/*
- * Support stack handling peculiarities of a few CPUs.
- *
- * Most processors let their stack grow downward and
- * keep SP pointing at the last pushed value.
- */
-#if !CPU_STACK_GROWS_UPWARD
-	#if !CPU_SP_ON_EMPTY_SLOT
-		/* Most microprocessors (x86, m68k...) */
-		#define CPU_PUSH_WORD(sp, data) \
-			do { *--(sp) = (data); } while (0)
-		#define CPU_POP_WORD(sp) \
-			(*(sp)++)
-	#else
-		/* AVR insanity */
-		#define CPU_PUSH_WORD(sp, data) \
-			do { *(sp)-- = (data); } while (0)
-		#define CPU_POP_WORD(sp) \
-			(*++(sp))
-	#endif
-
-#else /* CPU_STACK_GROWS_UPWARD */
-
-	#if !CPU_SP_ON_EMPTY_SLOT
-		/* DSP56K and other weirdos */
-		#define CPU_PUSH_WORD(sp, data) \
-			do { *++(sp) = (cpustack_t)(data); } while (0)
-		#define CPU_POP_WORD(sp) \
-			(*(sp)--)
-	#else
-		#error I bet you cannot find a CPU like this
-	#endif
-#endif
-
-
-#if CPU_DSP56K
-	/*
-	 * DSP56k pushes both PC and SR to the stack in the JSR instruction, but
-	 * RTS discards SR while returning (it does not restore it). So we push
-	 * 0 to fake the same context.
-	 */
-	#define CPU_PUSH_CALL_FRMAE(sp, func) \
-		do { \
-			CPU_PUSH_WORD((sp), (func)); \
-			CPU_PUSH_WORD((sp), 0x100); \
-		} while (0);
-
-#elif CPU_AVR
-	/*
-	 * On AVR, addresses are pushed into the stack as little-endian, while
-	 * memory accesses are big-endian (actually, it's a 8-bit CPU, so there is
-	 * no natural endianess).
-	 */
-	#define CPU_PUSH_CALL_FRAME(sp, func) \
-		do { \
-			uint16_t funcaddr = (uint16_t)(func); \
-			CPU_PUSH_WORD((sp), funcaddr); \
-			CPU_PUSH_WORD((sp), funcaddr>>8); \
-		} while (0)
-
-	/*
-	 * If the kernel is in idle-spinning, the processor executes:
-	 *
-	 * IRQ_ENABLE;
-	 * CPU_IDLE;
-	 * IRQ_DISABLE;
-	 *
-	 * IRQ_ENABLE is translated in asm as "sei" and IRQ_DISABLE as "cli".
-	 * We could define CPU_IDLE to expand to none, so the resulting
-	 * asm code would be:
-	 *
-	 * sei;
-	 * cli;
-	 *
-	 * But Atmel datasheet states:
-	 * "When using the SEI instruction to enable interrupts,
-	 * the instruction following SEI will be executed *before*
-	 * any pending interrupts", so "cli" is executed before any
-	 * pending interrupt with the result that IRQs will *NOT*
-	 * be enabled!
-	 * To ensure that IRQ will run a NOP is required.
-	 */
-	#define CPU_IDLE NOP
-
-#elif CPU_PPC
-
-	#define CPU_PUSH_CALL_FRAME(sp, func) \
-		do { \
-			CPU_PUSH_WORD((sp), (cpustack_t)(func)); /* LR -> 8(SP) */ \
-			CPU_PUSH_WORD((sp), 0);                  /* CR -> 4(SP) */ \
-		} while (0)
-
-#else
-	#define CPU_PUSH_CALL_FRAME(sp, func) \
-		CPU_PUSH_WORD((sp), (cpustack_t)(func))
-#endif
-
-/**
- * \def CPU_IDLE
- *
- * \brief Invoked by the scheduler to stop the CPU when idle.
- *
- * This hook can be redefined to put the CPU in low-power mode, or to
- * profile system load with an external strobe, or to save CPU cycles
- * in hosted environments such as emulators.
- */
-#ifndef CPU_IDLE
-	#if defined(ARCH_EMUL) && (ARCH & ARCH_EMUL)
-		/* This emulator hook should yield the CPU to the host.  */
-		EXTERN_C_BEGIN
-		void emul_idle(void);
-		EXTERN_C_END
-		#define CPU_IDLE emul_idle()
-	#else /* !ARCH_EMUL */
-		#define CPU_IDLE do { /* nothing */ } while (0)
-	#endif /* !ARCH_EMUL */
-#endif /* !CPU_IDLE */
 
 #endif /* CPU_ATTR_H */

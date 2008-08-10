@@ -54,6 +54,7 @@
 #include <cpu/irq.h>
 #include <cpu/types.h>
 #include <cpu/attr.h>
+#include <cpu/frame.h>
 
 #include <mware/event.h>
 
