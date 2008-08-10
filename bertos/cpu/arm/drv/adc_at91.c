@@ -30,7 +30,6 @@
  *
  * -->
  *
- *
  * \brief ADC hardware-specific implementation
  *
  * This ADC module should be use both whit kernel or none.
@@ -42,7 +41,6 @@
  *
  *
  * \version $Id$
- *
  * \author Daniele Basile <asterix@develer.com>
  */
 
@@ -54,9 +52,9 @@
 #include <cfg/macros.h>
 #include <cfg/compiler.h>
 
-// Define logging setting (for cfg/log.h module).
+// Define log settings for cfg/log.h.
 #define LOG_LEVEL         ADC_LOG_LEVEL
-#define LOG_VERBOSITY     ADC_LOG_VERBOSITY
+#define LOG_FORMAT        ADC_LOG_FORMAT
 #include <cfg/log.h>
 
 #include <drv/adc.h>
