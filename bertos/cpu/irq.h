@@ -62,7 +62,6 @@
 
 #elif CPU_ARM
 
-
 	#ifdef __IAR_SYSTEMS_ICC__
 
 		#include <inarm.h>
@@ -154,11 +153,16 @@
 	#endif /* !__IAR_SYSTEMS_ICC_ */
 
 #elif CPU_PPC
-	#define IRQ_DISABLE         FIXME
-	#define IRQ_ENABLE          FIXME
-	#define IRQ_SAVE_DISABLE(x) FIXME
-	#define IRQ_RESTORE(x)      FIXME
-	#define IRQ_ENABLED()       FIXME
+
+	/* Get IRQ_* definitions from the hosting environment. */
+	#include <cfg/os.h>
+	#if OS_EMBEDDED
+		#define IRQ_DISABLE         FIXME
+		#define IRQ_ENABLE          FIXME
+		#define IRQ_SAVE_DISABLE(x) FIXME
+		#define IRQ_RESTORE(x)      FIXME
+		#define IRQ_ENABLED()       FIXME
+	#endif /* OS_EMBEDDED */
 
 #elif CPU_DSP56K
 

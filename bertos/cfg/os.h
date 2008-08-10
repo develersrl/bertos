@@ -53,10 +53,10 @@
 
 	// FIXME: Maybe disable Win32 exceptions?
 	typedef int cpuflags_t;
-	#define IRQ_DISABLE                /* FIXME */
-	#define IRQ_ENABLE                 /* FIXME */
-	#define IRQ_SAVE_DISABLE(old_sigs) /* FIXME */
-	#define IRQ_RESTORE(old_sigs)      /* FIXME */
+	#define IRQ_DISABLE                FIXME
+	#define IRQ_ENABLE                 FIXME
+	#define IRQ_SAVE_DISABLE(old_sigs) FIXME
+	#define IRQ_RESTORE(old_sigs)      FIXME
 
 #else
 	#define OS_WIN32  0
