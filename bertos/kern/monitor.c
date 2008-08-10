@@ -116,8 +116,8 @@ void monitor_report(void)
 	Node *node;
 	int i;
 
-	kprintf("%-24s%-8s%-8s%-8s%-8s\n", "Process name", "TCB", "SPbase", "SPsize", "SPfree");
-	for (i = 0; i<56; i++)
+	kprintf("%-8s%-8s%-8s%-8s %s\n", "TCB", "SPbase", "SPsize", "SPfree", "Name");
+	for (i = 0; i < 56; i++)
 		kputchar('-');
 	kputchar('\n');
 
@@ -126,8 +126,8 @@ void monitor_report(void)
 	{
 		Process *p = containerof(node, Process, monitor.link);
 		size_t free = monitor_checkStack(p->stack_base, p->stack_size);
-		kprintf("%-24s%-8p%-8p%-8lu%-8lu\n",
-			p->monitor.name, p, p->stack_base, p->stack_size, free);
+		kprintf("%-8p%-8p%-8lu%-8lu %s\n",
+			p, p->stack_base, p->stack_size, free, p->monitor.name);
 	}
 	proc_permit();
 }
@@ -135,7 +135,6 @@ void monitor_report(void)
 
 static void NORETURN monitor(void)
 {
-	Process *p;
 	Node *node;
 
 	for (;;)
@@ -143,7 +142,7 @@ static void NORETURN monitor(void)
 		proc_forbid();
 		FOREACH_NODE(node, &MonitorProcs)
 		{
-			p = containerof(node, Process, monitor.link);
+			Process *p = containerof(node, Process, monitor.link);
 			size_t free = monitor_checkStack(p->stack_base, p->stack_size);
 
 			if (free < 0x20)
