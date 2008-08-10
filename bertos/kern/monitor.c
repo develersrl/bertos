@@ -126,7 +126,7 @@ void monitor_report(void)
 	{
 		Process *p = containerof(node, Process, monitor.link);
 		size_t free = monitor_checkStack(p->stack_base, p->stack_size);
-		kprintf("%-8p%-8p%-8lu%-8lu %s\n",
+		kprintf("%-8p%-8p%-8zu%-8zu %s\n",
 			p, p->stack_base, p->stack_size, free, p->monitor.name);
 	}
 	proc_permit();
