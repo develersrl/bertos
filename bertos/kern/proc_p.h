@@ -94,14 +94,24 @@ typedef struct Process
 /** Track running processes. */
 extern REGISTER Process	*CurrentProcess;
 
-/** Track ready processes. */
+/**
+ * Track ready processes.
+ *
+ * Access to this list must be protected with a proc_forbid() / proc_premit()
+ * pair, or with SCHED_ATOMIC()
+ */
 extern REGISTER List     ProcReadyList;
 
 
 /**
  * Enqueue a task in the ready list.
  *
- * \note This is *NOT* protected against 
+ * Always use this macro to instert a process in the ready list, as its
+ * might vary to implement a different scheduling algorithms.
+ *
+ * \note This macro is *NOT* protected against the scheduler.  Access to
+ *       this list must be protected with a proc_forbid() / proc_premit()
+ *       pair, or with SCHED_ATOMIC()
  */
 #define SCHED_ENQUEUE(proc)  ADDTAIL(&ProcReadyList, &(proc)->link)
 
