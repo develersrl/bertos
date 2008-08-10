@@ -42,7 +42,7 @@
 #define MWARE_LIST_H
 
 #include <cfg/compiler.h> /* INLINE */
-#include <cfg/debug.h> /* ASSERT() */
+#include <cfg/debug.h> /* ASSERT_VALID_PTR() */
 
 /**
  * This structure represents a node for bidirectional lists.
@@ -214,8 +214,8 @@ typedef struct _PriNode
 /** Add node to list head. */
 #define ADDHEAD(l,n) \
 	do { \
-		ASSERT(l); \
-		ASSERT(n); \
+		ASSERT_VALID_PTR(l); \
+		ASSERT_VALID_PTR(n); \
 		(n)->succ = (l)->head.succ; \
 		(n)->pred = (l)->head.succ->pred; \
 		(n)->succ->pred = (n); \
@@ -225,8 +225,8 @@ typedef struct _PriNode
 /** Add node to list tail. */
 #define ADDTAIL(l,n) \
 	do { \
-		ASSERT(l); \
-		ASSERT(n); \
+		ASSERT_VALID_PTR(l); \
+		ASSERT_VALID_PTR(n); \
 		(n)->succ = &(l)->tail; \
 		(n)->pred = (l)->tail.pred; \
 		(n)->pred->succ = (n); \
@@ -241,6 +241,8 @@ typedef struct _PriNode
  */
 #define INSERT_BEFORE(n,ln) \
 	do { \
+		ASSERT_VALID_PTR(n); \
+		ASSERT_VALID_PTR(ln); \
 		(n)->succ = (ln); \
 		(n)->pred = (ln)->pred; \
 		(ln)->pred->succ = (n); \
@@ -255,6 +257,7 @@ typedef struct _PriNode
  */
 #define REMOVE(n) \
 	do { \
+		ASSERT_VALID_PTR(n); \
 		(n)->pred->succ = (n)->succ; \
 		(n)->succ->pred = (n)->pred; \
 		INVALIDATE_NODE(n); \
@@ -273,6 +276,8 @@ typedef struct _PriNode
 #define LIST_ENQUEUE(list, node) \
 	do { \
 		PriNode *ln; \
+		ASSERT_VALID_PTR(list); \
+		ASSERT_VALID_PTR(node); \
 		FOREACH_NODE(ln, (list)) \
 			if (ln->pri < (node)->pri) \
 				break; \
@@ -288,6 +293,8 @@ typedef struct _PriNode
 INLINE Node *list_remHead(List *l)
 {
 	Node *n;
+
+	ASSERT_VALID_PTR(l);
 
 	if (LIST_EMPTY(l))
 		return (Node *)0;
@@ -309,8 +316,10 @@ INLINE Node *list_remTail(List *l)
 {
 	Node *n;
 
+	ASSERT_VALID_PTR(l);
+
 	if (LIST_EMPTY(l))
-		return (Node *)0;
+		return NULL;
 
 	n = l->tail.pred; /* Get last node. */
 	l->tail.pred = n->pred; /* Link list tail to second last node. */
