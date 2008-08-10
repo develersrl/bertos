@@ -35,11 +35,9 @@
  *        Context switching is only done cooperatively.
  *
  * \version $Id$
- *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  */
-
 
 #include "proc_p.h"
 #include "proc.h"
@@ -47,7 +45,11 @@
 #include "cfg/cfg_arch.h"  /* ARCH_EMUL */
 #include <cfg/debug.h>
 #include <cfg/module.h>
-#include <cfg/macros.h>       /* ABS() */
+
+// Log settings for cfg/log.h.
+#define LOG_LEVEL   KERN_LOG_LEVEL
+#define LOG_FORMAT  KERN_LOG_FORMAT
+#include <cfg/log.h>
 
 #include <cpu/irq.h>
 #include <cpu/types.h>
@@ -60,32 +62,41 @@
 /**
  * CPU dependent context switching routines.
  *
- * \note This function *MUST* preserve also the status of the interrupts.
+ * Saving and restoring the context on the stack is done by a CPU-dependent
+ * support routine which usually needs to be written in assembly.
  */
 EXTERN_C void asm_switch_context(cpustack_t **new_sp, cpustack_t **save_sp);
 
 /*
- * The scheduer tracks ready and waiting processes
- * by enqueuing them in these lists. A pointer to the currently
- * running process is stored in the CurrentProcess pointer.
+ * The scheduer tracks ready processes by enqueuing them in the
+ * ready list.
  *
- * NOTE: these variables are protected by DI/EI locking
+ * \note Access to the list must occur while interrupts are disabled.
+ */
+REGISTER List ProcReadyList;
+
+/*
+ * Holds a pointer to the TCB of the currently running process.
+ *
+ * \note User applications should use proc_current() to retrieve this value.
  */
 REGISTER Process *CurrentProcess;
-REGISTER List     ProcReadyList;
-
 
 #if CONFIG_KERN_PREEMPTIVE
 /*
- * The time sharing scheduler forces a task switch when
- * the current process has consumed its quantum.
+ * The time sharing scheduler forces a task switch when the current
+ * process has exhausted its quantum.
  */
 uint16_t Quantum;
 #endif
 
 
-/* In Win32 we must emulate stack on the real process stack */
 #if (ARCH & ARCH_EMUL)
+/*
+ * In hosted environments, we must emulate the stack on the real process stack.
+ *
+ * Access to this list must be protected by PROC_ATOMIC().
+ */
 extern List StackFreeList;
 #endif
 
@@ -117,16 +128,18 @@ void proc_init(void)
 {
 	LIST_INIT(&ProcReadyList);
 
-#if CONFIG_KERN_MONITOR
-	monitor_init();
-#endif
-
-	/* We "promote" the current context into a real process. The only thing we have
+	/*
+	 * We "promote" the current context into a real process. The only thing we have
 	 * to do is create a PCB and make it current. We don't need to setup the stack
 	 * pointer because it will be written the first time we switch to another process.
 	 */
 	proc_init_struct(&MainProcess);
 	CurrentProcess = &MainProcess;
+
+#if CONFIG_KERN_MONITOR
+	monitor_init();
+	monitor_add(CurrentProcess, "main");
+#endif
 
 	MOD_INIT(proc);
 }
@@ -146,10 +159,11 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 #if CONFIG_KERN_HEAP
 	bool free_stack = false;
 #endif
+	TRACEMSG("name=%s", name);
 
 #if (ARCH & ARCH_EMUL)
 	/* Ignore stack provided by caller and use the large enough default instead. */
-	stack_base = (cpustack_t *)list_remHead(&StackFreeList);
+	PROC_ATOMIC(stack_base = (cpustack_t *)list_remHead(&StackFreeList));
 
 	stack_size = CONFIG_PROC_DEFSTACKSIZE;
 #elif CONFIG_KERN_HEAP
@@ -168,12 +182,13 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 	}
 #else
 	/* Stack must have been provided by the user */
-	ASSERT(stack_base);
+	ASSERT_VALID_PTR(stack_base);
 	ASSERT(stack_size);
 #endif
 
 #if CONFIG_KERN_MONITOR
 	/* Fill-in the stack with a special marker to help debugging */
+#warning size incorrect
 	memset(stack_base, CONFIG_KERN_STACKFILLCODE, stack_size / sizeof(cpustack_t));
 #endif
 
@@ -215,6 +230,7 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 
 	/* Add to ready list */
 	ATOMIC(SCHED_ENQUEUE(proc));
+	ATOMIC(LIST_ASSERT_VALID(&ProcReadyList));
 
 #if CONFIG_KERN_MONITOR
 	monitor_add(proc, name);
@@ -237,23 +253,18 @@ void proc_rename(struct Process *proc, const char *name)
 /**
  * System scheduler: pass CPU control to the next process in
  * the ready queue.
- *
- * Saving and restoring the context on the stack is done
- * by a CPU-dependent support routine which must usually be
- * written in assembly.
  */
 void proc_schedule(void)
 {
 	struct Process *old_process;
 	cpuflags_t flags;
 
+	ATOMIC(LIST_ASSERT_VALID(&ProcReadyList));
+	ASSERT_USER_CONTEXT();
+	ASSERT_IRQ_ENABLED();
+
 	/* Remember old process to save its context later */
 	old_process = CurrentProcess;
-
-#ifdef IRQ_RUNNING
-	/* Scheduling in interrupts is a nono. */
-	ASSERT(!IRQ_RUNNING());
-#endif
 
 	/* Poll on the ready queue for the first ready process */
 	IRQ_SAVE_DISABLE(flags);
@@ -289,10 +300,16 @@ void proc_schedule(void)
 	{
 		cpustack_t *dummy;
 
-#if CONFIG_KERN_PREEMPTIVE
-		/* Reset quantum for this process */
-		Quantum = CONFIG_KERN_QUANTUM;
-#endif
+		#if CONFIG_KERN_MONITOR
+			LOG_INFO("Switch from %p(%s) to %p(%s)\n",
+				old_process,    old_process ? old_process->monitor.name : "NONE",
+				CurrentProcess, CurrentProcess->monitor.name);
+		#endif
+
+		#if CONFIG_KERN_PREEMPTIVE
+			/* Reset quantum for this process */
+			Quantum = CONFIG_KERN_QUANTUM;
+		#endif
 
 		/* Save context of old process and switch to new process. If there is no
 		 * old process, we save the old stack pointer into a dummy variable that
@@ -313,6 +330,8 @@ void proc_schedule(void)
  */
 void proc_exit(void)
 {
+	TRACE;
+
 #if CONFIG_KERN_MONITOR
 	monitor_remove(CurrentProcess);
 #endif
@@ -333,8 +352,8 @@ void proc_exit(void)
 #if (ARCH & ARCH_EMUL)
 #warning This is wrong
 	/* Reinsert process stack in free list */
-	ADDHEAD(&StackFreeList, (Node *)(CurrentProcess->stack
-		- (CONFIG_PROC_DEFSTACKSIZE / sizeof(cpustack_t))));
+	PROC_ATOMIC(ADDHEAD(&StackFreeList, (Node *)(CurrentProcess->stack
+		- (CONFIG_PROC_DEFSTACKSIZE / sizeof(cpustack_t)))));
 
 	/*
 	 * NOTE: At this point the first two words of what used
@@ -354,11 +373,7 @@ void proc_exit(void)
  */
 void proc_switch(void)
 {
-	cpuflags_t flags;
-
-	IRQ_SAVE_DISABLE(flags);
-	SCHED_ENQUEUE(CurrentProcess);
-	IRQ_RESTORE(flags);
+	ATOMIC(SCHED_ENQUEUE(CurrentProcess));
 
 	proc_schedule();
 }

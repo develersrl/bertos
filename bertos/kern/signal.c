@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2004, 2008 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999, 2000, 2001 Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
@@ -137,18 +137,45 @@ sigmask_t sig_wait(sigmask_t sigs)
 	sigmask_t result;
 	cpuflags_t flags;
 
+	/*
+	 * This is subtle: there's a race condition where a concurrent
+	 * process or an interrupt calls sig_signal() to set a bit in
+	 * out sig_recv just after we have checked for it, but before
+	 * we've set sig_wait to tell them we want to be awaken.
+	 *
+	 * In this case, we'd deadlock with the signal bit already
+	 * set and the process never being reinserted into the ready
+	 * list.
+	 */
 	IRQ_SAVE_DISABLE(flags);
 
 	/* Loop until we get at least one of the signals */
 	while (!(result = CurrentProcess->sig_recv & sigs))
 	{
-		/* go to sleep and proc_schedule() another process */
+		/*
+		 * Tell "them" that we want to be awaken when any of these
+		 * signals arrives.
+		 */
 		CurrentProcess->sig_wait = sigs;
-		proc_schedule();
 
-		/* When we come back here, a signal must be arrived */
+		/*
+		 * Go to sleep and proc_schedule() another process.
+		 *
+		 * We re-enable IRQs because proc_schedule() does not
+		 * guarantee to save and restore the interrupt mask.
+		 */
+		IRQ_RESTORE(flags);
+		proc_schedule();
+		IRQ_SAVE_DISABLE(flags);
+
+		/*
+		 * When we come back here, the wait mask must have been
+		 * cleared by someone through sig_signal(), and at least
+		 * one of the signals we were expecting must have been
+		 * delivered to us.
+		 */
 		ASSERT(!CurrentProcess->sig_wait);
-		ASSERT(CurrentProcess->sig_recv);
+		ASSERT(CurrentProcess->sig_recv & sigs);
 	}
 
 	/* Signals found: clear them and return */
@@ -198,6 +225,8 @@ sigmask_t sig_waitTimeout(sigmask_t sigs, ticks_t timeout)
 void sig_signal(Process *proc, sigmask_t sigs)
 {
 	cpuflags_t flags;
+
+	/* See comment in sig_wait() for why this protection is necessary */
 	IRQ_SAVE_DISABLE(flags);
 
 	/* Set the signals */
@@ -215,4 +244,3 @@ void sig_signal(Process *proc, sigmask_t sigs)
 }
 
 #endif /* CONFIG_KERN_SIGNALS */
-
