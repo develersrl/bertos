@@ -27,14 +27,12 @@
  * the GNU General Public License.
  *
  * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
  * -->
  *
- * \brief Configuration file for flash_avr module.
- *
  * \version $Id$
- *
  * \author Manuele Fanelli <qwert@develer.com>
+ *
+ * \brief Configuration file for flash_avr module.
  */
 
 #ifndef CFG_FLASH_AVR_H
@@ -46,6 +44,6 @@
  */
 #define CONFIG_FLASH_AVR_BOOTSIZE         8192
 #define CONFIG_FLASH_AVR_LOG_LEVEL        LOG_LVL_ERR
-#define CONFIG_FLASH_AVR_LOG_VERBOSITY    LOG_SILENT
+#define CONFIG_FLASH_AVR_LOG_FORMAT       LOG_FMT_SILENT
 
 #endif /* CFG_BOOT_H */

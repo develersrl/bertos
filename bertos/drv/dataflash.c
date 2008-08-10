@@ -30,7 +30,7 @@
  *
  * -->
  *
- *  \brief Function library for dataflash AT45DB family (implementation).
+ * \brief Function library for dataflash AT45DB family (implementation).
  *
  *
  * \version $Id: dataflash.c 21658 2008-06-05 16:42:54Z asterix $
@@ -46,8 +46,8 @@
 #include <cfg/module.h>
 
 // Define logging setting (for cfg/log.h module).
-#define LOG_LEVEL         DATAFLASH_LOG_LEVEL
-#define LOG_VERBOSITY     DATAFLASH_LOG_VERBOSITY
+#define LOG_LEVEL   DATAFLASH_LOG_LEVEL
+#define LOG_FORMAT  DATAFLASH_LOG_FORMAT
 #include <cfg/log.h>
 
 #include <drv/timer.h>

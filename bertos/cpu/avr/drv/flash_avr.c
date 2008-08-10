@@ -50,9 +50,9 @@
 #include <cfg/debug.h>
 #include <cpu/irq.h>
 
- 	// Define logging setting (for cfg/log.h module).
-#define LOG_LEVEL         CONFIG_FLASH_AVR_LOG_LEVEL
-#define LOG_VERBOSITY     CONFIG_FLASH_AVR_LOG_VERBOSITY
+// Define log settings for cfg/log.h
+#define LOG_LEVEL    CONFIG_FLASH_AVR_LOG_LEVEL
+#define LOG_FORMAT   CONFIG_FLASH_AVR_LOG_FORMAT
 #include <cfg/log.h>
 
 #include <drv/wdt.h>
@@ -64,7 +64,6 @@
 #include <avr/pgmspace.h>
 
 #include <string.h>
-
 
 
 /**

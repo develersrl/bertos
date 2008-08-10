@@ -55,7 +55,6 @@
  * and so the delay is do with a for cycle.
  *
  * \version $Id$
- *
  * \author Daniele Basile <asterix@develer.com>
  */
 
@@ -66,7 +65,7 @@
 
 // Define logging setting (for cfg/log.h module).
 #define LOG_LEVEL         PWM_LOG_LEVEL
-#define LOG_VERBOSITY     PWM_LOG_VERBOSITY
+#define LOG_FORMAT        PWM_LOG_FORMAT
 #include <cfg/log.h>   // for logging system
 
 #include <cpu/types.h>

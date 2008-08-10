@@ -33,30 +33,16 @@
  * \brief Configuration file for data flash memory module.
  *
  * \version $Id$
- *
  * \author Daniele Basile <asterix@develer.com>
  */
 
 #ifndef CFG_DATAFLASH_H
 #define CFG_DATAFLASH_H
 
-/**
- * Logging level definition.
- *
- * Use 0 to log only the error messages
- * Use 1 to log the error and warning messages
- * Use 2 to log all messages
- */
-#define DATAFLASH_LOG_LEVEL      2
+/// Module logging level definition.
+#define DATAFLASH_LOG_LEVEL      LOG_LVL_INFO
 
-/**
- * Set logging verbosity.
- *
- * If verbosity is zero print short log messages.
- */
-#define DATAFLASH_LOG_VERBOSITY    0
-
+/// Module logging format.
+#define DATAFLASH_LOG_FORMAT     LOG_FMT_TERSE
 
 #endif /* CFG_DATAFLASH_H */
-
-

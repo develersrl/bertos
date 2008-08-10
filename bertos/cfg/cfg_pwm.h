@@ -27,36 +27,21 @@
  * the GNU General Public License.
  *
  * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
  * -->
  *
  * \brief Configuration file for PWM module.
  *
  * \version $Id$
- *
  * \author Daniele Basile <asterix@develer.com>
  */
 
 #ifndef CFG_PWM_H
 #define CFG_PWM_H
 
-/**
- * Logging level definition.
- *
- * Use 0 to log only the error messages
- * Use 1 to log the error and warning messages
- * Use 2 to log all messages
- */
-#define PWM_LOG_LEVEL      2
+/// Module logging level.
+#define PWM_LOG_LEVEL      LOG_LVL_INFO
 
-/**
- * Set logging verbosity.
- *
- * If verbosity is zero print short log messages.
- */
-#define PWM_LOG_VERBOSITY    1
-
+/// Module logging format.
+#define PWM_LOG_FORMAT     LOG_FMT_VERBOSE
 
 #endif /* CFG_PWM_H */
-
-

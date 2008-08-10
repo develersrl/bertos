@@ -45,7 +45,6 @@
  *
  *
  * \version $Id$
- *
  * \author Daniele Basile <asterix@develer.com>
  */
 
@@ -58,8 +57,8 @@
 #include <cfg/module.h>
 
 // Define logging setting (for cfg/log.h module).
-#define LOG_LEVEL         DATAFLASH_LOG_LEVEL
-#define LOG_VERBOSITY     DATAFLASH_LOG_VERBOSITY
+#define LOG_LEVEL      DATAFLASH_LOG_LEVEL
+#define LOG_FORMAT     DATAFLASH_LOG_FORMAT
 #include <cfg/log.h>   // for logging system
 
 #include <drv/timer.h>

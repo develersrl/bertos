@@ -34,7 +34,6 @@
  * \brief PWM hardware-specific implementation
  *
  * \version $Id$
- *
  * \author Daniele Basile <asterix@develer.com>
  */
 
@@ -45,7 +44,7 @@
 
 // Define logging setting (for cfg/log.h module).
 #define LOG_LEVEL         PWM_LOG_LEVEL
-#define LOG_VERBOSITY     PWM_LOG_VERBOSITY
+#define LOG_FORMAT        PWM_LOG_FORMAT
 #include <cfg/log.h>
 
 #include <cfg/macros.h>

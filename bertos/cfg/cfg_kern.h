@@ -67,5 +67,6 @@
 
 #define CONFIG_KERN_QUANTUM     50    /**< Time sharing quantum in timer ticks. */
 
+#define CONFIG_KERN_LOGLEVEL    LOG_LVL_ERR
 
 #endif /*  CFG_KERN_H */

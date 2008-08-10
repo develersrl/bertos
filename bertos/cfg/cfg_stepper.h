@@ -27,35 +27,23 @@
  * the GNU General Public License.
  *
  * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ *
  * -->
  *
  * \brief Configuration file for stepper motor module.
  *
  * \version $Id$
- *
  * \author Daniele Basile <asterix@develer.com>
  */
 
 #ifndef CFG_STEPPER_H
 #define CFG_STEPPER_H
 
-/**
- * Logging level definition.
- *
- * Use 0 to log only the error messages
- * Use 1 to log the error and warning messages
- * Use 2 to log all messages
- */
-#define STEPPER_LOG_LEVEL           2
+/// Module logging level.
+#define STEPPER_LOG_LEVEL           LOG_LVL_INFO
 
-/**
- * Set logging verbosity.
- *
- * If verbosity is zero print short log messages.
- */
-#define STEPPER_LOG_VERBOSITY        0
-
+/// Module logging format.
+#define STEPPER_LOG_FORMAT          LOG_FMT_TERSE
 
 /// Max number of the stepper motor.
 #define CONFIG_NUM_STEPPER_MOTORS    6
@@ -64,4 +52,3 @@
 #define CONFIG_TC_STEPPER_MAX_NUM    6
 
 #endif /* CFG_STEPPER_H */
-

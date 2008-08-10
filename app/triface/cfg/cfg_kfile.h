@@ -27,38 +27,25 @@
  * the GNU General Public License.
  *
  * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ *
  * -->
  *
  * \brief Configuration file for KFile interface module.
  *
  * \version $Id$
- *
  * \author Daniele Basile <asterix@develer.com>
  */
 
 #ifndef CFG_KFILE_H
 #define CFG_KFILE_H
 
-/**
- * Logging level definition.
- *
- * Use 0 to log only the error messages
- * Use 1 to log the error and warning messages
- * Use 2 to log all messages
- */
-#define KFILE_LOG_LEVEL        2
+/// Module logging level definition.
+#define KFILE_LOG_LEVEL        LOG_LVL_INFO
 
-/**
- * Set logging verbosity.
- *
- * If verbosity is zero print short log messages.
- */
-#define KFILE_LOG_VERBOSITY    0
+/// Module logging format.
+#define KFILE_LOG_FORMAT       LOG_FMT_TERSE
 
 /// Enable the gets function with echo.
 #define CONFIG_KFILE_GETS      1
 
 #endif /* CFG_KFILE_H */
-
-

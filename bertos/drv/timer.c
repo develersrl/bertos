@@ -341,3 +341,19 @@ void timer_init(void)
 
 	MOD_INIT(timer);
 }
+
+
+#if (ARCH & ARCH_EMUL)
+/**
+ * Stop timer (only used by emulator)
+ */
+void timer_cleanup(void)
+{
+	MOD_CLEANUP(timer);
+
+	timer_hw_cleanup();
+
+	// Hmmm... apparently, the demo app does not cleanup properly
+	//ASSERT(LIST_EMPTY(&timers_queue));
+}
+#endif /* ARCH_EMUL */
