@@ -28,13 +28,11 @@
  *
  * Copyright 2001,2004 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999,2000,2001 Bernie Innocenti <bernie@codewiz.org>
- *
  * -->
  *
  * \brief Kernel configuration parameters
  *
  * \version $Id$
- *
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
@@ -65,6 +63,13 @@
 /* EXPERIMENTAL */
 #define CONFIG_KERN_PREEMPTIVE  (0    && CONFIG_KERN_SCHED && CONFIG_KERN_TIMER)
 
-#define CONFIG_KERN_QUANTUM     50    /**< Time sharing quantum in timer ticks. */
+/// Time sharing quantum in timer ticks.
+#define CONFIG_KERN_QUANTUM     50
+
+/// Module logging level.
+#define KERN_LOG_LEVEL      LOG_LVL_INFO
+
+/// Module logging format.
+#define KERN_LOG_FORMAT     LOG_FMT_VERBOSE
 
 #endif /*  CFG_KERN_H */
