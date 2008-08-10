@@ -26,9 +26,8 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2004, 2008 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999, 2000, 2001 Bernie Innocenti <bernie@codewiz.org>
- * This file is part of DevLib - See devlib/README for information.
  * -->
  *
  * \version $Id$
@@ -37,11 +36,7 @@
  * \brief i386 context switch
  */
 
-/* I know it's ugly... */
-/* .intel_syntax */
-
-/* void AsmSwitchContext(void **new_sp, void **save_sp) */
-/*                       %rdi           %rsi            */
+/* void asm_switch_context(void **new_sp [%rdi], void **save_sp [%rsi]) */
 .globl asm_switch_context
 asm_switch_context:
 	pushq	%rax
@@ -61,10 +56,3 @@ asm_switch_context:
 	popq	%rbx
 	popq	%rax
 	ret
-
-/* int asm_switch_version(void) */
-.globl asm_switch_version
-asm_switch_version:
-	mov	$1,%rax
-	ret
-

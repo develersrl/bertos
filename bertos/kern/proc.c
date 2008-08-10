@@ -63,7 +63,6 @@
  * \note This function *MUST* preserve also the status of the interrupts.
  */
 EXTERN_C void asm_switch_context(cpustack_t **new_sp, cpustack_t **save_sp);
-EXTERN_C int asm_switch_version(void);
 
 /*
  * The scheduer tracks ready and waiting processes
@@ -129,8 +128,6 @@ void proc_init(void)
 	proc_init_struct(&MainProcess);
 	CurrentProcess = &MainProcess;
 
-	/* Make sure the assembly routine is up-to-date with us */
-	ASSERT(asm_switch_version() == 1);
 	MOD_INIT(proc);
 }
 

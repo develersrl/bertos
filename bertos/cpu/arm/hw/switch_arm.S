@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2007 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2007, 2008 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
@@ -38,14 +38,7 @@
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-
-/*
- * NOTE: At each change of this function affecting proc.c
- * (i.e. arguments, data stored in the stack) bump up version
- * number in asm_switch_version().
- */
-
-/* void asm_switch_context(void **new_sp, void **save_sp) */
+/* void asm_switch_context(void **new_sp [r0], void **save_sp [r1]) */
 .globl asm_switch_context
 asm_switch_context:
 	mrs	r2, cpsr               /* Save status. */
@@ -57,11 +50,4 @@ asm_switch_context:
 	ldmfd	sp!, {r2, r4-r11, lr}  /* Load new registers. */
 	msr	cpsr, r2               /* restore flags reg. */
 
-	mov	pc, lr
-
-
-/* int asm_switch_version(void) */
-.globl asm_switch_version
-asm_switch_version:
-	mov	r0, #1
 	mov	pc, lr

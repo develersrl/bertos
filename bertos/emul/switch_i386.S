@@ -26,9 +26,8 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2004, 2008 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999, 2000, 2001 Bernie Innocenti <bernie@codewiz.org>
- * This file is part of DevLib - See devlib/README for information.
  * -->
  *
  * \version $Id$
@@ -37,18 +36,14 @@
  * \brief i386 context switch
  */
 
-
-
 #ifdef __APPLE__
-    //This workaround is necessary to compile under OS X assembler.
+    // This workaround is necessary to compile under OS X assembler.
     #define SWITCH_CONTEXT _asm_switch_context
-    #define SWITCH_VERSION _asm_switch_version
 #else
     #define SWITCH_CONTEXT asm_switch_context
-    #define SWITCH_VERSION asm_switch_version
 #endif
 
-/* void asm_switch_context(void ** new_sp, void ** save_sp) */
+/* void asm_switch_context(void ** new_sp [sp+4], void ** save_sp [sp+8]) */
 .globl SWITCH_CONTEXT
 SWITCH_CONTEXT:
 	pushl	%eax
@@ -70,10 +65,3 @@ SWITCH_CONTEXT:
 	popl	%ebx
 	popl	%eax
 	ret
-
-/* int asm_switch_version(void) */
-.globl SWITCH_VERSION
-SWITCH_VERSION:
-	mov	$1,%eax
-	ret
-

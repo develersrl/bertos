@@ -26,44 +26,16 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
- *
+ * Copyright 2004, 2008 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
  * \version $Id$
- *
  * \author Giovanni Bajo <rasky@develer.com>
  *
  * \brief DSP5680x task switching support
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.7  2006/07/19 12:56:27  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.6  2006/02/24 01:17:05  bernie
- *#* Update for new emulator.
- *#*
- *#* Revision 1.5  2005/11/04 16:20:02  bernie
- *#* Fix reference to README.devlib in header.
- *#*
- *#* Revision 1.4  2004/08/25 14:12:09  rasky
- *#* Aggiornato il comment block dei log RCS
- *#*
- *#* Revision 1.3  2004/07/30 14:24:16  rasky
- *#* Task switching con salvataggio perfetto stato di interrupt (SR)
- *#* Kernel monitor per dump informazioni su stack dei processi
- *#*
- *#* Revision 1.2  2004/06/03 11:27:09  bernie
- *#* Add dual-license information.
- *#*
- *#* Revision 1.1  2004/05/23 17:27:00  bernie
- *#* Import kern/ subdirectory.
- *#*
- *#*/
-
-void asm_switch_context(void ** new_sp/*R2*/, void ** save_sp/*R3*/);
+void asm_switch_context(void ** new_sp /* R2 */, void ** save_sp /* R3 */);
 asm void asm_switch_context(void ** new_sp, void ** save_sp)
 {
 	lea   (SP)+
@@ -126,10 +98,4 @@ asm void asm_switch_context(void ** new_sp, void ** save_sp)
 	; SR is already pushed on the stack (normal call context). Use RTI to restore
 	; it, so that interrupt status is preserved across the tasks.
 	rti
-}
-
-int asm_switch_version(void);
-int asm_switch_version(void)
-{
-	return 1;
 }
