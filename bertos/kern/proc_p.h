@@ -110,8 +110,7 @@ extern REGISTER List     ProcReadyList;
  * might vary to implement a different scheduling algorithms.
  *
  * \note This macro is *NOT* protected against the scheduler.  Access to
- *       this list must be protected with a proc_forbid() / proc_premit()
- *       pair, or with SCHED_ATOMIC()
+ *       this list must be performed with interrupts disabled.
  */
 #define SCHED_ENQUEUE(proc)  ADDTAIL(&ProcReadyList, &(proc)->link)
 
