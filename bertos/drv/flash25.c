@@ -56,7 +56,9 @@
 #include <kern/kfile.h>
 
 #if CONFIG_KERNEL
-#include <kern/proc.h>
+	#include <kern/proc.h>
+#else
+	#define proc_yield() do {} while(0)
 #endif
 
 #warning FIXME:This file was change, but is untest!
@@ -79,10 +81,8 @@ static void flash25_waitReady(Flash25 *fd)
 
 		if (!(stat & RDY_BIT))
 			break;
-		#if CONFIG_KERNEL
 		else
-			proc_switch();
-		#endif
+			proc_yield();
 	}
 }
 

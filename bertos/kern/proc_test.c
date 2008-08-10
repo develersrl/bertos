@@ -50,7 +50,7 @@ static void proc_test1(void)
 	{
 		kputs("> test1\n");
 		timer_delay(50);
-		proc_switch();
+		proc_yield();
 	}
 }
 
@@ -63,7 +63,6 @@ static void proc_test2(void)
 	{
 		kputs("> test2\n");
 		timer_delay(75);
-		proc_switch();
 	}
 }
 
@@ -104,7 +103,7 @@ int proc_testRun(void)
 	{
 		kputs("> main\n");
 		timer_delay(93);
-		proc_switch();
+		proc_yield();
 	}
 	return 0;
 }

@@ -59,7 +59,9 @@ struct Process *proc_new_with_name(const char* name, void (*entry)(void), iptr_t
 #endif
 
 void proc_exit(void);
-void proc_switch(void);
+void proc_yield(void);
+#define proc_switch proc_yield /* OBSOLETE */
+
 int proc_testSetup(void);
 int proc_testRun(void);
 int proc_testTearDown(void);
@@ -116,9 +118,6 @@ void proc_rename(struct Process *proc, const char* name);
 		    + 32 * sizeof(int))
 	#endif
 #endif
-
-/* OBSOLETE */
-#define CONFIG_KERN_DEFSTACKSIZE CONFIG_PROC_DEFSTACKSIZE
 
 /* Memory fill codes to help debugging */
 #if CONFIG_KERN_MONITOR

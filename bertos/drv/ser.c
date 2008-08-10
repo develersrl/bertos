@@ -28,7 +28,6 @@
  *
  * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000 Bernie Innocenti <bernie@codewiz.org>
- *
  * -->
  *
  * \brief Buffered serial I/O driver
@@ -79,8 +78,10 @@
 	#error CONFIG_SER_DEFBAUDRATE missing in config.h
 #endif
 
-#if CONFIG_KERNEL
+#if CONFIG_KERNEL && CONFIG_KERN_SCHED
 	#include <kern/proc.h>
+#else
+	#define proc_yield() do {} while(0)
 #endif
 
 #if CONFIG_SER_TXTIMEOUT != -1 || CONFIG_SER_RXTIMEOUT != -1
@@ -113,11 +114,10 @@ static int ser_putchar(int c, struct Serial *port)
 		/* Wait while buffer is full... */
 		do
 		{
-			wdt_reset();
-#if CONFIG_KERNEL && CONFIG_KERN_SCHED
 			/* Give up timeslice to other processes. */
-			proc_switch();
-#endif
+			proc_yield();
+			wdt_reset();
+
 #if CONFIG_SER_TXTIMEOUT != -1
 			if (timer_clock() - start_time >= port->txtimeout)
 			{
@@ -158,14 +158,14 @@ static int ser_getchar(struct Serial *port)
 
 		ticks_t start_time = timer_clock();
 #endif
+
 		/* Wait while buffer is empty */
 		do
 		{
-			wdt_reset();
-#if CONFIG_KERNEL && CONFIG_KERN_SCHED
 			/* Give up timeslice to other processes. */
-			proc_switch();
-#endif
+			proc_yield();
+			wdt_reset();
+
 #if CONFIG_SER_RXTIMEOUT != -1
 			if (timer_clock() - start_time >= port->rxtimeout)
 			{
@@ -355,10 +355,8 @@ static int ser_flush(struct KFile *fd)
 	while (!fifo_isempty(&fds->txfifo)
 	       || fds->hw->table->txSending(fds->hw))
 	{
-		#if CONFIG_KERNEL && CONFIG_KERN_SCHED
 			/* Give up timeslice to other processes. */
-			proc_switch();
-		#endif
+			proc_yield();
 			wdt_reset();
 	}
 	return 0;

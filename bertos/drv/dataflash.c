@@ -55,7 +55,9 @@
 #include <kern/kfile.h>
 
 #if CONFIG_KERNEL
-#include <kern/proc.h>
+	#include <kern/proc.h>
+#else
+	#define proc_yield() do {} while(0)
 #endif
 
 #include <string.h>
@@ -213,11 +215,7 @@ static uint8_t dataflash_cmd(DataFlash *fd, dataflash_page_t page_addr, dataflas
 	 * is high.
 	 */
 	while (!(dataflash_stat(fd) & BUSY_BIT))
-	{
-		#if CONFIG_KERNEL
-		proc_switch();
-		#endif
-	}
+		proc_yield();
 
 	stat = dataflash_stat(fd);
 

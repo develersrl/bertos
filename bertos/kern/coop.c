@@ -133,7 +133,7 @@ void proc_schedule(void)
 /**
  * Co-operative context switch
  */
-void proc_switch(void)
+void proc_yield(void)
 {
 	ATOMIC(SCHED_ENQUEUE(CurrentProcess));
 
