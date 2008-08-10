@@ -318,7 +318,7 @@
 
 #elif CPU_AVR
 	/*
-	 * In AVR, the addresses are pushed into the stack as little-endian, while
+	 * On AVR, addresses are pushed into the stack as little-endian, while
 	 * memory accesses are big-endian (actually, it's a 8-bit CPU, so there is
 	 * no natural endianess).
 	 */
