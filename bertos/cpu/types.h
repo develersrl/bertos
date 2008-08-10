@@ -54,7 +54,7 @@
 
 #elif CPU_X86
 
-	/* Get IRQ_* definitions from the hosting environment. */
+	/* Get cpuflags_t definition from the hosting environment. */
 	#include <cfg/os.h>
 	#if OS_EMBEDDED
 		typedef uint32_t cpuflags_t; // FIXME
@@ -76,7 +76,12 @@
 
 #elif CPU_PPC
 
-	typedef uint32_t cpuflags_t; // FIXME
+	/* Get cpuflags_t definition from the hosting environment. */
+	#include <cfg/os.h>
+	#if OS_EMBEDDED
+		typedef uint32_t cpuflags_t; // FIXME
+	#endif
+
 	typedef uint32_t cpustack_t; // FIXME
 	#define SIZEOF_CPUSTACK_T 4
 
