@@ -67,7 +67,7 @@
 #define CONFIG_KERN_QUANTUM     50
 
 /// Module logging level.
-#define KERN_LOG_LEVEL      LOG_LVL_INFO
+#define KERN_LOG_LEVEL      LOG_LVL_ERR
 
 /// Module logging format.
 #define KERN_LOG_FORMAT     LOG_FMT_VERBOSE
