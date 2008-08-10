@@ -232,6 +232,27 @@
 	#define IRQ_EXIT() /* NOP */
 #endif
 
+#ifdef IRQ_RUNNING
+	/// Ensure callee is running within an interrupt
+	#define ASSERT_IRQ_CONTEXT()  ASSERT(IRQ_RUNNING())
+
+	/// Ensure callee is not running within an interrupt
+	#define ASSERT_USER_CONTEXT() ASSERT(!IRQ_RUNNING())
+#else
+	#define ASSERT_USER_CONTEXT()  do {} while(0)
+	#define ASSERT_IRQ_CONTEXT()   do {} while(0)
+#endif
+
+#ifdef IRQ_ENABLED
+	/// Ensure interrupts are enabled
+	#define ASSERT_IRQ_ENABLED()  ASSERT(IRQ_ENABLED())
+
+	/// Ensure interrupts are not enabled
+	#define ASSERT_IRQ_DISABLED() ASSERT(IRQ_ENABLED())
+#else
+	#define ASSERT_IRQ_ENABLED() do {} while(0)
+	#define ASSERT_IRQ_DISABLED() do {} while(0)
+#endif
 
 /**
  * Execute \a CODE atomically with respect to interrupts.
