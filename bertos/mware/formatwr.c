@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2005, 2008 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
@@ -43,10 +43,10 @@
  * controlled by giving a -D option a compilation time:
  *
  * \code
- *  -D CONFIG_PRINTF=PRINTF_FULL         Full ANSI printf formatter
+ *  -D CONFIG_PRINTF=PRINTF_FULL         Full ANSI printf formatter, with some C99 extensions
  *  -D CONFIG_PRINTF=PRINTF_NOFLOAT      Exclude support for floats
  *  -D CONFIG_PRINTF=PRINTF_REDUCED      Simplified formatter (see below)
- *  -D CONFIG_PRINTF=PRINTF_NOMODIFIERS  Exclude 'l' and 'h' modifiers in reduced version
+ *  -D CONFIG_PRINTF=PRINTF_NOMODIFIERS  Exclude 'l', 'z' and 'h' modifiers in reduced version
  *  -D CONFIG_PRINTF=PRINTF_DISABLED     No formatter at all
  * \endcode
  *
@@ -836,13 +836,16 @@ FLOATING_CONVERSION:
 		}
 
 #if CONFIG_PRINTF > PRINTF_NOMODIFIERS
-		/*=================================*/
-		/* Optional 'l' or 'h' modifiers ? */
-		/*=================================*/
+		/*
+		 * Optional 'l', 'z' or 'h' modifiers?
+		 */
 		l_modifier = h_modifier = false;
 		switch (PGM_READ_CHAR(format))
 		{
 			case 'l':
+			case 'z':
+				/* for the 'z' modifier, we make this assmumption */
+				STATIC_ASSERT(sizeof(size_t) == sizeof(long));
 				l_modifier = true;
 				format++;
 				break;
