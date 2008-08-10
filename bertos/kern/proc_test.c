@@ -41,7 +41,7 @@
 #include <drv/timer.h>
 #include <cfg/test.h>
 
-/**
+/*
  * Proc scheduling test subthread 1
  */
 static void proc_test_thread1(void)
@@ -54,7 +54,7 @@ static void proc_test_thread1(void)
 	}
 }
 
-/**
+/*
  * Proc scheduling test subthread 2
  */
 static void proc_test_thread2(void)
@@ -96,7 +96,7 @@ int proc_testRun(void)
 
 	kputs("stack1:\n");
 	kdump(proc_test_stack1 + sizeof(proc_test_stack1) - 64, 64);
-	
+
 	kputs("stack2:\n");
 	kdump(proc_test_stack2 + sizeof(proc_test_stack2) - 64, 64);
 
