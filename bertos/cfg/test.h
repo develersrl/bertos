@@ -36,30 +36,30 @@
  *
  * \author Daniele Basile <asterix@develer.com>
  * \author Francesco Sacchi <batt@develer.com>
- * 
+ *
  * When you want to test a module that is emulable on hosted
  * platforms, these macros come in handy.
  * Your module_test should supply three basic functions:
- * 
+ *
  * int module_testSetup(void)
  * int module_testRun(void)
  * int module_testTearDown(void)
- * 
+ *
  * All of these should return 0 if ok or a value != 0 on errors.
- * 
+ *
  * Then, at the end of your module_test you can write:
  * #include TEST_ONLY(whatuneed.h)
  * #include TEST_ONLY(whatuneed.c)
  * #include TEST_ONLY(...)
- * 
+ *
  * TEST_MAIN(module);
- * 
+ *
  * The macro TEST_ONLY expand to nothing in non-TEST mode or to
  * the specified filename if _TEST is defined.
  * Including directly into your module the file.c you need to
  * run the test allows you to build and run the test compiling
  * only one file.
- * 
+ *
  * To achieve this you also need a main() that is supplied by
  * the TEST_MAIN macro.
  * This will expand to a full main that calls, in sequence:
@@ -89,7 +89,7 @@
 
 	/** This macro will include the specified file only in test-mode */
 	#define TEST_ONLY(file) PP_STRINGIZE(file)
-	
+
 #else /* !_TEST */
 
 	#define TEST_MAIN(module)  /* nothing */
@@ -99,6 +99,7 @@
 
 /**
  * Silent an assert in a test.
+ *
  * This is useful when we run a test and we want to test
  * an error condition. We know that an assert will fail but
  * this is not really an error. To ignore that we mark it
@@ -110,6 +111,5 @@
  * In this way you can trap only the selected assert message.
  */
 #define SILENT_ASSERT(str) kputs("SILENT_ASSERT:$"str"$\n")
-
 
 #endif /* CFG_TEST_H */
