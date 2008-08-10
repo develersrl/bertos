@@ -31,12 +31,12 @@
  * -->
  *
  * \brief Test suite for virtual KFile I/O interface.
+ *
  * This module implements a test for some generic I/O interfaces for kfile.
  *
  * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  * \author Daniele Basile <asterix@develer.com>
- *
  */
 
 
@@ -47,14 +47,13 @@
 #include <cfg/module.h>
 
 // Define logging setting (for cfg/log.h module).
-#define LOG_LEVEL         KFILE_LOG_LEVEL
-#define LOG_VERBOSITY     KFILE_LOG_VERBOSITY
+#define LOG_LEVEL   KFILE_LOG_LEVEL
+#define LOG_FORMAT  KFILE_LOG_FORMAT
 #include <cfg/log.h>
 
 #include <mware/formatwr.h>
 
 #include <string.h>
-
 
 
 MOD_DEFINE(kfile_test);
