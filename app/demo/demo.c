@@ -302,6 +302,7 @@ int main(int argc, char *argv[])
 
 	menu_handle(&main_menu);
 
+	timer_cleanup();
 	emul_cleanup();
 	return 0;
 }

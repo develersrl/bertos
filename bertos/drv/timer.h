@@ -178,13 +178,15 @@ INLINE utime_t hptime_to_us(hptime_t hpticks)
 #endif /* TIMER_HW_HPTICKS_PER_SEC < 100000UL */
 }
 
-
-void timer_init(void);
 void timer_delayTicks(ticks_t delay);
 INLINE void timer_delay(mtime_t delay)
 {
 	timer_delayTicks(ms_to_ticks(delay));
 }
+
+void timer_init(void);
+void timer_cleanup(void);
+
 int timer_testSetup(void);
 int timer_testRun(void);
 int timer_testTearDown(void);

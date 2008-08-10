@@ -88,10 +88,21 @@ public:
 		system_time.start();
 
 		// Activate timer interrupt
-		timer.connect(&timer, SIGNAL(timeout()), this, SLOT(timerInterrupt()));
+		connect(&timer, SIGNAL(timeout()), SLOT(timerInterrupt()));
 		timer.start(1000 / TIMER_TICKS_PER_SEC);
 
 		initialized = true;
+	}
+
+	void cleanup()
+	{
+		// Timer cleaned twice?
+		ASSERT(initialized);
+
+		timer.stop();
+		timer.disconnect();
+
+		initialized = false;
 	}
 
 	/// Return current time in high-precision format.
@@ -116,8 +127,12 @@ public slots:
 /// HW dependent timer initialization.
 static void timer_hw_init(void)
 {
-	// Kick EmulTimer initialization
 	EmulTimer::instance().init();
+}
+
+static void timer_hw_cleanup(void)
+{
+	EmulTimer::instance().cleanup();
 }
 
 INLINE hptime_t timer_hw_hpread(void)
