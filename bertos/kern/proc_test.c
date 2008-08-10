@@ -44,11 +44,11 @@
 /*
  * Proc scheduling test subthread 1
  */
-static void proc_test_thread1(void)
+static void proc_test1(void)
 {
 	for (int i = 0; i < 30; ++i)
 	{
-		kputs(">task 1\n");
+		kputs("> test1\n");
 		timer_delay(50);
 		proc_switch();
 	}
@@ -57,18 +57,18 @@ static void proc_test_thread1(void)
 /*
  * Proc scheduling test subthread 2
  */
-static void proc_test_thread2(void)
+static void proc_test2(void)
 {
 	for (int i = 0; i < 30; ++i)
 	{
-		kputs(">task 2\n");
+		kputs("> test2\n");
 		timer_delay(75);
 		proc_switch();
 	}
 }
 
-static cpustack_t proc_test_stack1[CONFIG_PROC_DEFSTACKSIZE / sizeof(cpustack_t)];
-static cpustack_t proc_test_stack2[CONFIG_PROC_DEFSTACKSIZE / sizeof(cpustack_t)];
+static cpustack_t proc_test1_stack[CONFIG_PROC_DEFSTACKSIZE / sizeof(cpustack_t)];
+static cpustack_t proc_test2_stack[CONFIG_PROC_DEFSTACKSIZE / sizeof(cpustack_t)];
 
 
 int proc_testSetup(void)
@@ -90,19 +90,19 @@ int proc_testTearDown(void)
  */
 int proc_testRun(void)
 {
-	proc_new(proc_test_thread1, NULL, sizeof(proc_test_stack1), proc_test_stack1);
-	proc_new(proc_test_thread2, NULL, sizeof(proc_test_stack2), proc_test_stack2);
-	kputs("Created tasks\n");
+	proc_new(proc_test1, NULL, sizeof(proc_test1_stack), proc_test1_stack);
+	proc_new(proc_test2, NULL, sizeof(proc_test2_stack), proc_test2_stack);
+	kputs("Processes created\n");
 
-	kputs("stack1:\n");
-	kdump(proc_test_stack1 + sizeof(proc_test_stack1) - 64, 64);
+	//kputs("stack1:\n");
+	//kdump(proc_test_stack1 + sizeof(proc_test_stack1) - 64, 64);
 
-	kputs("stack2:\n");
-	kdump(proc_test_stack2 + sizeof(proc_test_stack2) - 64, 64);
+	//kputs("stack2:\n");
+	//kdump(proc_test_stack2 + sizeof(proc_test_stack2) - 64, 64);
 
 	for (int i = 0; i < 30; ++i)
 	{
-		kputs(">main task\n");
+		kputs("> main\n");
 		timer_delay(93);
 		proc_switch();
 	}
