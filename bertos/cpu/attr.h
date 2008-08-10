@@ -310,7 +310,7 @@
 	 * RTS discards SR while returning (it does not restore it). So we push
 	 * 0 to fake the same context.
 	 */
-	#define CPU_PUSH_CALL_CONTEXT(sp, func) \
+	#define CPU_PUSH_CALL_FRMAE(sp, func) \
 		do { \
 			CPU_PUSH_WORD((sp), (func)); \
 			CPU_PUSH_WORD((sp), 0x100); \
@@ -322,7 +322,7 @@
 	 * memory accesses are big-endian (actually, it's a 8-bit CPU, so there is
 	 * no natural endianess).
 	 */
-	#define CPU_PUSH_CALL_CONTEXT(sp, func) \
+	#define CPU_PUSH_CALL_FRAME(sp, func) \
 		do { \
 			uint16_t funcaddr = (uint16_t)(func); \
 			CPU_PUSH_WORD((sp), funcaddr); \
@@ -355,14 +355,14 @@
 
 #elif CPU_PPC
 
-	#define CPU_PUSH_CALL_CONTEXT(sp, func) \
+	#define CPU_PUSH_CALL_FRAME(sp, func) \
 		do { \
 			CPU_PUSH_WORD((sp), (cpustack_t)(func)); /* LR -> 8(SP) */ \
 			CPU_PUSH_WORD((sp), 0);                  /* CR -> 4(SP) */ \
 		} while (0)
 
 #else
-	#define CPU_PUSH_CALL_CONTEXT(sp, func) \
+	#define CPU_PUSH_CALL_FRAME(sp, func) \
 		CPU_PUSH_WORD((sp), (cpustack_t)(func))
 #endif
 

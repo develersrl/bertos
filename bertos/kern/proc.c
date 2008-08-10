@@ -221,8 +221,8 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 #endif
 
 	/* Initialize process stack frame */
-	CPU_PUSH_CALL_CONTEXT(proc->stack, proc_exit);
-	CPU_PUSH_CALL_CONTEXT(proc->stack, entry);
+	CPU_PUSH_CALL_FRAME(proc->stack, proc_exit);
+	CPU_PUSH_CALL_FRAME(proc->stack, entry);
 
 	/* Push a clean set of CPU registers for asm_switch_context() */
 	for (i = 0; i < CPU_SAVED_REGS_CNT; i++)
