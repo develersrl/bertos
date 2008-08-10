@@ -74,6 +74,9 @@
 	#define CPU_BYTE_ORDER          CPU_LITTLE_ENDIAN
 	#define CPU_HARVARD		0
 
+	/// Valid pointers should be >= than this value (used for debug)
+	#define CPU_RAM_START		0x100
+
 #elif CPU_X86
 
 	#define NOP                     asm volatile ("nop")
@@ -96,6 +99,9 @@
 		#define CPU_REG_BITS    32
 	#endif
 
+	/// Valid pointers should be >= than this value (used for debug)
+	#define CPU_RAM_START		0x1000
+
 #elif CPU_ARM
 
 	/* Register counts include SREG too */
@@ -105,6 +111,9 @@
 	#define CPU_STACK_GROWS_UPWARD 0
 	#define CPU_SP_ON_EMPTY_SLOT   0
 	#define CPU_HARVARD            0
+
+	/// Valid pointers should be >= than this value (used for debug)
+	#define CPU_RAM_START		0x200
 
 	#ifdef __IAR_SYSTEMS_ICC__
 		#warning Check CPU_BYTE_ORDER
@@ -174,11 +183,14 @@
 	/* Register counts include SREG too */
 	#define CPU_REG_BITS           (CPU_PPC32 ? 32 : 64)
 	#define CPU_REGS_CNT           FIXME
-	#define CPU_SAVED_REGS_CNT     FIXME
+	#define CPU_SAVED_REGS_CNT     1  // FIXME
 	#define CPU_STACK_GROWS_UPWARD 0  //FIXME
 	#define CPU_SP_ON_EMPTY_SLOT   0  //FIXME
 	#define CPU_BYTE_ORDER         (__BIG_ENDIAN__ ? CPU_BIG_ENDIAN : CPU_LITTLE_ENDIAN)
 	#define CPU_HARVARD            0
+
+	/// Valid pointers should be >= than this value (used for debug)
+	#define CPU_RAM_START		0x1000
 
 #elif CPU_DSP56K
 
@@ -198,6 +210,9 @@
 	#define SIZEOF_INT          1
 	#define SIZEOF_LONG         2
 	#define SIZEOF_PTR          1
+
+	/// Valid pointers should be >= than this value (used for debug)
+	#define CPU_RAM_START		0x200
 
 #elif CPU_AVR
 
@@ -219,6 +234,9 @@
 	 * value is all 0 but the interrupt bit (bit 7).
 	 */
 	#define CPU_REG_INIT_VALUE(reg) (reg == 0 ? 0x80 : 0)
+
+	/// Valid pointers should be >= than this value (used for debug)
+	#define CPU_RAM_START		0x100
 
 #else
 	#error No CPU_... defined.

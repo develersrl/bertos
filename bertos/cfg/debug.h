@@ -169,14 +169,16 @@
 	 * memory regions.  This helps catching pointers taken from
 	 * struct/class memebers when the struct pointer was NULL.
 	 */
-	#define ASSERT_VALID_PTR(p)         ((void)(LIKELY((p) >= 0x200) ? 0 : __invalid_ptr(p, #p, THIS_FILE, __LINE__)))
+	#define ASSERT_VALID_PTR(p) ((void)(LIKELY((p) >= (void *)CPU_RAM_START) \
+		? 0 : __invalid_ptr(p, #p, THIS_FILE, __LINE__)))
 
 	/**
 	 * Check that the given pointer is not pointing to invalid memory.
 	 *
 	 * \see ASSERT_VALID_PTR()
 	 */
-	#define ASSERT_VALID_PTR_OR_NULL(p) ((void)(LIKELY((p == NULL) || ((p) >= 0x200)) ? 0 : __invalid_ptr((p), #p, THIS_FILE, __LINE__)))
+	#define ASSERT_VALID_PTR_OR_NULL(p) ((void)(LIKELY((p == NULL) || ((p) >= (void *)CPU_RAM_START)) \
+		? 0 : __invalid_ptr((p), #p, THIS_FILE, __LINE__)))
 
 	#if !CONFIG_KDEBUG_DISABLE_TRACE
 		#define TRACE  __trace(__func__)
