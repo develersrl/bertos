@@ -131,6 +131,9 @@
 	#define OS_DARWIN 0
 #endif
 
+
+#include <cfg/cfg_arch.h> /* For ARCH_QT */
+
 /*
  * We want Qt and other frameworks to look like OSes because you would
  * tipically want their portable abstractions if you're using one of these.
