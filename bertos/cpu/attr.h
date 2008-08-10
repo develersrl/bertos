@@ -353,6 +353,14 @@
 	 */
 	#define CPU_IDLE NOP
 
+#elif CPU_PPC
+
+	#define CPU_PUSH_CALL_CONTEXT(sp, func) \
+		do { \
+			CPU_PUSH_WORD((sp), (cpustack_t)(func)); /* LR -> 8(SP) */ \
+			CPU_PUSH_WORD((sp), 0);                  /* CR -> 4(SP) */ \
+		} while (0)
+
 #else
 	#define CPU_PUSH_CALL_CONTEXT(sp, func) \
 		CPU_PUSH_WORD((sp), (cpustack_t)(func))
