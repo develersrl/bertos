@@ -117,6 +117,7 @@ int proc_testRun(void)
  * How can we fix this?
  */
 #include TEST_ONLY(drv/kdebug.c)
+#include TEST_ONLY(kern/coop.c)
 #include TEST_ONLY(kern/proc.c)
 #include TEST_ONLY(drv/timer.c)
 #include TEST_ONLY(mware/formatwr.c)

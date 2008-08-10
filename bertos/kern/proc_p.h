@@ -34,7 +34,6 @@
  * \brief Internal scheduler structures and definitions for processes.
  *
  * \version $Id$
- *
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
@@ -132,4 +131,3 @@ void proc_schedule(void);
 #endif /* CONFIG_KERN_MONITOR */
 
 #endif /* KERN_PROC_P_H */
-

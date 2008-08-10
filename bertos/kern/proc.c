@@ -43,30 +43,14 @@
 #include "proc.h"
 
 #include "cfg/cfg_arch.h"  /* ARCH_EMUL */
-#include <cfg/debug.h>
 #include <cfg/module.h>
-
-// Log settings for cfg/log.h.
-#define LOG_LEVEL   KERN_LOG_LEVEL
-#define LOG_FORMAT  KERN_LOG_FORMAT
-#include <cfg/log.h>
 
 #include <cpu/irq.h>
 #include <cpu/types.h>
 #include <cpu/attr.h>
 #include <cpu/frame.h>
 
-#include <mware/event.h>
-
 #include <string.h>           /* memset() */
-
-/**
- * CPU dependent context switching routines.
- *
- * Saving and restoring the context on the stack is done by a CPU-dependent
- * support routine which usually needs to be written in assembly.
- */
-EXTERN_C void asm_switch_context(cpustack_t **new_sp, cpustack_t **save_sp);
 
 /*
  * The scheduer tracks ready processes by enqueuing them in the
@@ -82,15 +66,6 @@ REGISTER List ProcReadyList;
  * \note User applications should use proc_current() to retrieve this value.
  */
 REGISTER Process *CurrentProcess;
-
-#if CONFIG_KERN_PREEMPTIVE
-/*
- * The time sharing scheduler forces a task switch when the current
- * process has exhausted its quantum.
- */
-uint16_t Quantum;
-#endif
-
 
 #if (ARCH & ARCH_EMUL)
 /*
@@ -252,81 +227,6 @@ void proc_rename(struct Process *proc, const char *name)
 
 
 /**
- * System scheduler: pass CPU control to the next process in
- * the ready queue.
- */
-void proc_schedule(void)
-{
-	struct Process *old_process;
-	cpuflags_t flags;
-
-	ATOMIC(LIST_ASSERT_VALID(&ProcReadyList));
-	ASSERT_USER_CONTEXT();
-	ASSERT_IRQ_ENABLED();
-
-	/* Remember old process to save its context later */
-	old_process = CurrentProcess;
-
-	/* Poll on the ready queue for the first ready process */
-	IRQ_SAVE_DISABLE(flags);
-	while (!(CurrentProcess = (struct Process *)list_remHead(&ProcReadyList)))
-	{
-		/*
-		 * Make sure we physically reenable interrupts here, no matter what
-		 * the current task status is. This is important because if we
-		 * are idle-spinning, we must allow interrupts, otherwise no
-		 * process will ever wake up.
-		 *
-		 * During idle-spinning, an interrupt can occur and it may
-		 * modify \p ProcReadyList. To ensure that compiler reload this
-		 * variable every while cycle we call CPU_MEMORY_BARRIER.
-		 * The memory barrier ensure that all variables used in this context
-		 * are reloaded.
-		 * \todo If there was a way to write sig_wait() so that it does not
-		 * disable interrupts while waiting, there would not be any
-		 * reason to do this.
-		 */
-		IRQ_ENABLE;
-		CPU_IDLE;
-		MEMORY_BARRIER;
-		IRQ_DISABLE;
-	}
-	IRQ_RESTORE(flags);
-
-	/*
-	 * Optimization: don't switch contexts when the active
-	 * process has not changed.
-	 */
-	if (CurrentProcess != old_process)
-	{
-		cpustack_t *dummy;
-
-		#if CONFIG_KERN_MONITOR
-			LOG_INFO("Switch from %p(%s) to %p(%s)\n",
-				old_process,    old_process ? old_process->monitor.name : "NONE",
-				CurrentProcess, CurrentProcess->monitor.name);
-		#endif
-
-		#if CONFIG_KERN_PREEMPTIVE
-			/* Reset quantum for this process */
-			Quantum = CONFIG_KERN_QUANTUM;
-		#endif
-
-		/* Save context of old process and switch to new process. If there is no
-		 * old process, we save the old stack pointer into a dummy variable that
-		 * we ignore. In fact, this happens only when the old process has just
-		 * exited.
-		 * TODO: Instead of physically clearing the process at exit time, a zombie
-		 * list should be created.
-		 */
-		asm_switch_context(&CurrentProcess->stack, old_process ? &old_process->stack : &dummy);
-	}
-
-	/* This RET resumes the execution on the new process */
-}
-
-
-/**
  * Terminate the current process
  */
 void proc_exit(void)
@@ -370,17 +270,6 @@ void proc_exit(void)
 
 
 /**
- * Co-operative context switch
- */
-void proc_switch(void)
-{
-	ATOMIC(SCHED_ENQUEUE(CurrentProcess));
-
-	proc_schedule();
-}
-
-
-/**
  * Get the pointer to the current process
  */
 struct Process *proc_current(void)
@@ -395,39 +284,3 @@ iptr_t proc_current_user_data(void)
 {
 	return CurrentProcess->user_data;
 }
-
-
-#if CONFIG_KERN_PREEMPTIVE
-
-/**
- * Disable preemptive task switching.
- *
- * The scheduler maintains a per-process nesting counter.  Task switching is
- * effectively re-enabled only when the number of calls to proc_permit()
- * matches the number of calls to proc_forbid().
- *
- * Calling functions that could sleep while task switching is disabled
- * is dangerous, although supported.  Preemptive task switching is
- * resumed while the process is sleeping and disabled again as soon as
- * it wakes up again.
- *
- * \sa proc_permit()
- */
-void proc_forbid(void)
-{
-	/* No need to protect against interrupts here. */
-	++CurrentProcess->forbid_cnt;
-}
-
-/**
- * Re-enable preemptive task switching.
- *
- * \sa proc_forbid()
- */
-void proc_permit(void)
-{
-	/* No need to protect against interrupts here. */
-	--CurrentProcess->forbid_cnt;
-}
-
-#endif /* CONFIG_KERN_PREEMPTIVE */
