@@ -160,7 +160,7 @@
 	 * RTS discards SR while returning (it does not restore it). So we push
 	 * 0 to fake the same context.
 	 */
-	#define CPU_PUSH_CALL_FRMAE(sp, func) \
+	#define CPU_PUSH_CALL_FRAME(sp, func) \
 		do { \
 			CPU_PUSH_WORD((sp), (func)); \
 			CPU_PUSH_WORD((sp), 0x100); \
