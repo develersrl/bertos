@@ -27,11 +27,9 @@
  * the GNU General Public License.
  *
  * Copyright 2007 Develer S.r.l. (http://www.develer.com/)
- *
  * -->
  *
  * \brief Function library for dataflash AT45DB family (implementation).
- *
  *
  * \version $Id: dataflash.c 21658 2008-06-05 16:42:54Z asterix $
  * \author Daniele Basile <asterix@develer.com>
@@ -54,11 +52,7 @@
 
 #include <kern/kfile.h>
 
-#if CONFIG_KERNEL
-	#include <kern/proc.h>
-#else
-	#define proc_yield() do {} while(0)
-#endif
+#include <cpu/power.h> /* cpu_relax() */
 
 #include <string.h>
 
@@ -215,7 +209,7 @@ static uint8_t dataflash_cmd(DataFlash *fd, dataflash_page_t page_addr, dataflas
 	 * is high.
 	 */
 	while (!(dataflash_stat(fd) & BUSY_BIT))
-		proc_yield();
+		cpu_relax();
 
 	stat = dataflash_stat(fd);
 

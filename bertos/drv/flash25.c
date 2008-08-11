@@ -27,10 +27,9 @@
  * the GNU General Public License.
  *
  * Copyright 2007 Develer S.r.l. (http://www.develer.com/)
- *
  * -->
  *
- *  \brief Function library for serial Flash memory.
+ * \brief Function library for serial Flash memory.
  *
  * Module provide a kfile interface, that ensure an abstraction
  * from comunication channel and give a standard interface.
@@ -55,11 +54,7 @@
 
 #include <kern/kfile.h>
 
-#if CONFIG_KERNEL
-	#include <kern/proc.h>
-#else
-	#define proc_yield() do {} while(0)
-#endif
+#include <cpu/relax.h> /* cpu_relax() */
 
 #warning FIXME:This file was change, but is untest!
 
@@ -81,8 +76,8 @@ static void flash25_waitReady(Flash25 *fd)
 
 		if (!(stat & RDY_BIT))
 			break;
-		else
-			proc_yield();
+
+		cpu_relax();
 	}
 }
 

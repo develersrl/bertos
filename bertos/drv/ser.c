@@ -60,7 +60,9 @@
 
 #include <mware/formatwr.h>
 
-#include <string.h> /* memset */
+#include <cpu/power.h> /* cpu_relax() */
+
+#include <string.h> /* memset() */
 
 /*
  * Sanity check for config parameters required by this module.
@@ -76,16 +78,6 @@
 #endif
 #if !defined(CONFIG_SER_DEFBAUDRATE)
 	#error CONFIG_SER_DEFBAUDRATE missing in config.h
-#endif
-
-#if CONFIG_KERNEL && CONFIG_KERN_SCHED
-	#include <kern/proc.h>
-#else
-	#define proc_yield() do {} while(0)
-#endif
-
-#if CONFIG_SER_TXTIMEOUT != -1 || CONFIG_SER_RXTIMEOUT != -1
-	#include <drv/timer.h>
 #endif
 
 
@@ -114,9 +106,7 @@ static int ser_putchar(int c, struct Serial *port)
 		/* Wait while buffer is full... */
 		do
 		{
-			/* Give up timeslice to other processes. */
-			proc_yield();
-			wdt_reset();
+			cpu_relax();
 
 #if CONFIG_SER_TXTIMEOUT != -1
 			if (timer_clock() - start_time >= port->txtimeout)
@@ -162,9 +152,7 @@ static int ser_getchar(struct Serial *port)
 		/* Wait while buffer is empty */
 		do
 		{
-			/* Give up timeslice to other processes. */
-			proc_yield();
-			wdt_reset();
+			cpu_relax();
 
 #if CONFIG_SER_RXTIMEOUT != -1
 			if (timer_clock() - start_time >= port->rxtimeout)
@@ -354,11 +342,7 @@ static int ser_flush(struct KFile *fd)
 	 */
 	while (!fifo_isempty(&fds->txfifo)
 	       || fds->hw->table->txSending(fds->hw))
-	{
-			/* Give up timeslice to other processes. */
-			proc_yield();
-			wdt_reset();
-	}
+		cpu_relax();
 	return 0;
 }
 
