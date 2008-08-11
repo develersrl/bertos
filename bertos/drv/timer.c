@@ -184,11 +184,8 @@ Timer *timer_abort(Timer *timer)
  */
 void timer_delayTicks(ticks_t delay)
 {
-#if defined(IRQ_ENABLED) && (!(ARCH & ARCH_EMUL))
 	/* We shouldn't sleep with interrupts disabled */
-	ASSERT(IRQ_ENABLED());
-#endif
-
+	ASSERT_IRQ_ENABLED();
 
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 	Timer t;
