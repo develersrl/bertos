@@ -48,11 +48,13 @@
  * All of these should return 0 if ok or a value != 0 on errors.
  *
  * Then, at the end of your module_test you can write:
+ * \code
  * #include TEST_ONLY(whatuneed.h)
  * #include TEST_ONLY(whatuneed.c)
  * #include TEST_ONLY(...)
  *
  * TEST_MAIN(module);
+ * \endcode
  *
  * The macro TEST_ONLY expand to nothing in non-TEST mode or to
  * the specified filename if _TEST is defined.

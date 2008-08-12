@@ -30,9 +30,21 @@
  * All Rights Reserved.
  * -->
  *
- * \brief Empty file used to #include <nothing> in macro expansion.
+ * \brief Empty file used to include "nothing" in macro expansion.
+ *
+ * If you want to conditionally include some file you can use this module 
+ * as a dummy header:
+ *
+ * \code
+ * #if COND
+ * 	#define MYHEADER <realheader.h>
+ * #else
+ * 	#define MYHEADER <cfg/nothing.h>
+ * #endif
+ * \endcode
  *
  * \version $Id$
  *
  * \author Francesco Sacchi <batt@develer.com>
  */
+
