@@ -66,7 +66,7 @@ FORMAT = srec
 DEP_FLAGS = -MMD -MP
 
 # Compiler flags for generating source listings
-LIST_FLAGS = -Wa,-anhlmsd=$(@:.o=.lst)
+LIST_FLAGS = -Wa,-anhlmsd=$(@:.o=.lst) -dp
 
 # Linker flags for generating map files
 # Only in embedded related projects generate map files
