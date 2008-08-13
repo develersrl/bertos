@@ -28,12 +28,7 @@
  *
  * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2001, 2008 Bernie Innocenti <bernie@codewiz.org>
- *
  * -->
- *
- * \version $Id: fifobuf.h 1532 2008-08-04 07:21:26Z bernie $
- *
- * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * \brief General pourpose FIFO buffer implemented with a ring buffer
  *
@@ -64,6 +59,9 @@
  * The buffer is also FULL when \c tail points to the last buffer
  * location and head points to the first one:
  *		\code head == begin && tail == end \endcode
+ *
+ * \version $Id: fifobuf.h 1532 2008-08-04 07:21:26Z bernie $
+ * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
 #ifndef MWARE_FIFO_H
