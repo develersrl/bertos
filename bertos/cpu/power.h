@@ -52,7 +52,7 @@
  * Let the CPU rest in tight busy loops
  *
  * User code that sits in a busy loop should call cpu_relax() every
- * once in a while to perform system-depndent idle processing.
+ * once in a while to perform system-dependent idle processing.
  *
  * Depending on the system configuration, this might perform different
  * actions:
@@ -61,6 +61,8 @@
  *  - reset the watchdog timer to avoid it from triggering
  *  - scale the CPU speed down to save power (unimplemented)
  *  - let the event loop of the emulator process a few events
+ *
+ * \see proc_yield() cpu_pause()
  */
 INLINE void cpu_relax(void)
 {
@@ -90,10 +92,12 @@ INLINE void cpu_relax(void)
  *     IRQ_ENABLE();
  * \endcode
  *
- * \note Some implementations of cpu_pause() may return before any interrupt has occurred
- *       Caller code should be written taking this into account.
+ * \note Some implementations of cpu_pause() may return before any interrupt
+ *       has occurred.  Calling code should take this possibility into account.
  *
  * \note This function is currently unimplemented
+ *
+ * \see cpu_relax() cpu_yield()
  */
 INLINE void cpu_pause(void)
 {
