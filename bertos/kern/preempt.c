@@ -41,6 +41,10 @@
 #include "proc_p.h"
 #include "proc.h"
 
+#include <cpu/frame.h> // CPU_IDLE
+
+#include <unistd.h> // XXX alarm()
+
 
 /*
  * The time sharing scheduler forces a task switch when the current
@@ -77,4 +81,106 @@ void proc_permit(void)
 {
 	/* No need to protect against interrupts here. */
 	--CurrentProcess->forbid_cnt;
+}
+
+static void (*irq_handlers[100])(void); // FIXME
+
+
+void proc_preempt(void)
+{
+	TRACE;
+
+	ATOMIC(LIST_ASSERT_VALID(&ProcReadyList));
+
+	IRQ_DISABLE;
+	/* Poll on the ready queue for the first ready process */
+	while (!(CurrentProcess = (struct Process *)list_remHead(&ProcReadyList)))
+	{
+		/*
+		 * Make sure we physically reenable interrupts here, no matter what
+		 * the current task status is. This is important because if we
+		 * are idle-spinning, we must allow interrupts, otherwise no
+		 * process will ever wake up.
+		 *
+		 * During idle-spinning, an interrupt can occur and it may
+		 * modify \p ProcReadyList. To ensure that compiler reload this
+		 * variable every while cycle we call CPU_MEMORY_BARRIER.
+		 * The memory barrier ensure that all variables used in this context
+		 * are reloaded.
+		 */
+		IRQ_ENABLE;
+		CPU_IDLE;
+		MEMORY_BARRIER;
+		IRQ_DISABLE;
+	}
+	IRQ_ENABLE;
+}
+
+void proc_preempt_timer(void)
+{
+	// TODO: check Quantum
+
+	alarm(1);
+	ATOMIC(SCHED_ENQUEUE(CurrentProcess));
+	proc_schedule();
+}
+
+void proc_schedule(void)
+{
+	kill(0, SIGUSR1);
+}
+
+void proc_yield(void)
+{
+	ATOMIC(SCHED_ENQUEUE(CurrentProcess));
+
+	proc_schedule();
+}
+
+/* signal handler */
+void irq_entry(int signum)
+{
+	Process *old_process;
+
+	TRACEMSG("storing %p:%s", CurrentProcess, CurrentProcess->monitor.name);
+	CurrentProcess->leaving = false;
+	getcontext(&CurrentProcess->context);
+	/* We get here in two ways: directly, and after setcontext() below */
+
+	if (CurrentProcess->leaving)
+	{
+		TRACEMSG("leaving to %p:%s", CurrentProcess, CurrentProcess->monitor.name);
+		return;
+	}
+
+	old_process = CurrentProcess;
+
+	irq_handlers[signum]();
+
+	if (old_process != CurrentProcess)
+	{
+		TRACEMSG("launching %p:%s", CurrentProcess, CurrentProcess->monitor.name);
+		CurrentProcess->leaving = true;
+		setcontext(&CurrentProcess->context);
+		/* not reached */
+	}
+
+	TRACEMSG("keeping %p:%s", CurrentProcess, CurrentProcess->monitor.name);
+}
+
+void preempt_init(void)
+{
+	struct sigaction act;
+	act.sa_handler = irq_entry;
+	sigemptyset(&act.sa_mask);
+	sigaddset(&act.sa_mask, SIGUSR1);
+	sigaddset(&act.sa_mask, SIGALRM);
+	act.sa_flags = SA_RESTART; /* | SA_SIGINFO; */
+
+	irq_handlers[SIGUSR1] = proc_preempt;
+	irq_handlers[SIGALRM] = proc_preempt_timer;
+	sigaction(SIGUSR1, &act, NULL);
+	sigaction(SIGALRM, &act, NULL);
+
+	alarm(1);
 }

@@ -26,9 +26,8 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2001,2004 Develer S.r.l. (http://www.develer.com/)
- * Copyright 1999,2000,2001 Bernie Innocenti <bernie@codewiz.org>
- *
+ * Copyright 2001, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 1999, 2000, 2001, 2008 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
  * \brief Simple realtime multitasking scheduler.
@@ -43,6 +42,7 @@
 #include "proc.h"
 
 #include "cfg/cfg_arch.h"  /* ARCH_EMUL */
+#include "cfg/cfg_kern.h"
 #include <cfg/module.h>
 
 #include <cpu/irq.h>
@@ -51,6 +51,10 @@
 #include <cpu/frame.h>
 
 #include <string.h>           /* memset() */
+
+#if CONFIG_KERN_PREEMPT
+#include "preempt.h"
+#endif
 
 /*
  * The scheduer tracks ready processes by enqueuing them in the
@@ -117,6 +121,10 @@ void proc_init(void)
 	monitor_add(CurrentProcess, "main");
 #endif
 
+#if CONFIG_KERN_PREEMPTIVE
+	preempt_init();
+#endif
+
 	MOD_INIT(proc);
 }
 
@@ -164,8 +172,7 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 
 #if CONFIG_KERN_MONITOR
 	/* Fill-in the stack with a special marker to help debugging */
-#warning size incorrect
-	memset(stack_base, CONFIG_KERN_STACKFILLCODE, stack_size / sizeof(cpustack_t));
+	memset(stack_base, CONFIG_KERN_STACKFILLCODE, stack_size);
 #endif
 
 	/* Initialize the process control block */

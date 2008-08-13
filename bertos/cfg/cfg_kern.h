@@ -42,12 +42,12 @@
 #include "cfg/cfg_arch.h"  /* ARCH_EMUL */
 
 /**
- * Multithreading kernel.
+ * Enable the multithreading kernel.
  */
 #define CONFIG_KERNEL 0
 
 /**
- * \name Modules activation
+ * \name Optional kernel features
  *
  * \{
  */
@@ -61,7 +61,10 @@
 /*\}*/
 
 /* EXPERIMENTAL */
-#define CONFIG_KERN_PREEMPTIVE  (0    && CONFIG_KERN_SCHED && CONFIG_KERN_TIMER)
+#define CONFIG_KERN_PREEMPT     (0    && CONFIG_KERN_SCHED && CONFIG_KERN_TIMER)
+
+/* OBSOLETE */
+#define CONFIG_KERN_PREEMPTIVE CONFIG_KERN_PREEMPT
 
 /// Time sharing quantum in timer ticks.
 #define CONFIG_KERN_QUANTUM     50

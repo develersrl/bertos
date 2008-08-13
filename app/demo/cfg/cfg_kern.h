@@ -26,8 +26,8 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2001,2004 Develer S.r.l. (http://www.develer.com/)
- * Copyright 1999,2000,2001 Bernie Innocenti <bernie@codewiz.org>
+ * Copyright 2001, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 1999, 2000, 2001, 2008 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
  * \brief Kernel configuration parameters
@@ -42,12 +42,12 @@
 #include "cfg/cfg_arch.h"  /* ARCH_EMUL */
 
 /**
- * Multithreading kernel.
+ * Enable the multithreading kernel.
  */
 #define CONFIG_KERNEL 1
 
 /**
- * \name Modules activation
+ * \name Optional kernel features
  *
  * \{
  */
@@ -61,7 +61,10 @@
 /*\}*/
 
 /* EXPERIMENTAL */
-#define CONFIG_KERN_PREEMPTIVE  (0    && CONFIG_KERN_SCHED && CONFIG_KERN_TIMER)
+#define CONFIG_KERN_PREEMPT     (1    && CONFIG_KERN_SCHED && CONFIG_KERN_TIMER)
+
+/* OBSOLETE */
+#define CONFIG_KERN_PREEMPTIVE CONFIG_KERN_PREEMPT
 
 /// Time sharing quantum in timer ticks.
 #define CONFIG_KERN_QUANTUM     50

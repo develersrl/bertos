@@ -47,6 +47,10 @@
 
 #include <struct/list.h>
 
+#if CONFIG_KERN_PREEMPTIVE
+	#include <ucontext.h> // XXX
+#endif
+
 typedef struct Process
 {
 	Node         link;        /**< Link Process into scheduler lists */
@@ -60,6 +64,8 @@ typedef struct Process
 
 #if CONFIG_KERN_PREEMPTIVE
 	int          forbid_cnt;  /**< Nesting count for proc_forbid()/proc_permit(). */
+	bool         leaving;     /**< XXX: maybe global? */
+	ucontext_t   context;
 #endif
 
 #if CONFIG_KERN_HEAP

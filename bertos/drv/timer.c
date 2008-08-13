@@ -74,9 +74,6 @@
 #endif
 
 #if CONFIG_KERNEL
-	#if CONFIG_KERN_PREEMPTIVE
-		#include <hw/switch.h>
-	#endif
 	#if CONFIG_KERN_SIGNALS
 		#include <kern/signal.h> /* sig_wait(), sig_check() */
 		#include <kern/proc.h>   /* proc_current() */
