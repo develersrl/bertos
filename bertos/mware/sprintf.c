@@ -37,7 +37,7 @@
  */
 
 #include <mware/formatwr.h>
-#include <mware/pgm.h>
+#include <cpu/pgm.h>
 #include <cfg/compiler.h>
 
 #include <stdio.h>

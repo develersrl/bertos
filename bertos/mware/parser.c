@@ -60,7 +60,7 @@
 #include "cfg/cfg_parser.h"
 
 #include <drv/ser.h>
-#include <mware/hashtable.h>
+#include <struct/hashtable.h>
 
 #include <stdlib.h> // atol(), NULL
 #include <string.h> // strchr(), strcmp()

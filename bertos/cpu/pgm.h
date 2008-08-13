@@ -43,7 +43,7 @@
  * \note This module contains code ripped out from avr-libc,
  *       which is distributed under a 3-clause BSD license.
  *
- * \version $Id:$
+ * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 #ifndef MWARE_PGM_H

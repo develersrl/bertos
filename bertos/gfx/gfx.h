@@ -182,7 +182,7 @@ void gfx_lineTo     (Bitmap *bm, coord_t x,  coord_t y);
 void gfx_setClipRect(Bitmap *bm, coord_t xmin, coord_t ymin, coord_t xmax, coord_t ymax);
 
 #if CPU_HARVARD
-	#include <mware/pgm.h>
+	#include <cpu/pgm.h>
 	void gfx_blit_P(Bitmap *bm, const pgm_uint8_t *raster);
 #endif
 

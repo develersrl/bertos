@@ -46,7 +46,7 @@
 
 #include <gui/levelbar.h>
 
-#include <mware/pgm.h>
+#include <cpu/pgm.h>
 
 #include <gfx/text.h>
 #include <gfx/font.h>

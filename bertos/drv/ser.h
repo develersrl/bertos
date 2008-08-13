@@ -41,7 +41,7 @@
 #define DRV_SER_H
 
 #include <kern/kfile.h>
-#include <mware/fifobuf.h>
+#include <struct/fifobuf.h>
 #include <cfg/compiler.h>
 
 #if OS_HOSTED

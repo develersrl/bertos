@@ -46,7 +46,7 @@
 #include <drv/timer.h> // timer_delay()
 
 #include <mware/formatwr.h> // _formatted_write()
-#include <mware/list.h> // LIST_EMPTY()
+#include <struct/list.h> // LIST_EMPTY()
 
 #include <string.h> // strlen()
 

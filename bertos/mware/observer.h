@@ -38,7 +38,7 @@
 #ifndef MWARE_OBSERVER_H
 #define MWARE_OBSERVER_H
 
-#include <mware/list.h>
+#include <struct/list.h>
 
 /**
  *

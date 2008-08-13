@@ -64,7 +64,7 @@
 
 #include <drv/timer.h>
 
-#include <mware/byteorder.h>
+#include <cpu/byteorder.h>
 
 #include <string.h>
 

@@ -45,7 +45,7 @@
 #if 0
 #include <cfg/debug.h>
 #include <cfg/macros.h> /* MIN, MAX */
-#include <mware/byteorder.h> /* cpu_to_xx */
+#include <cpu/byteorder.h> /* cpu_to_xx */
 
 
 #include <string.h> /* memset, memmove */

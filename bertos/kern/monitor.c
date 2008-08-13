@@ -42,7 +42,7 @@
 #if CONFIG_KERN_MONITOR
 
 #include "proc_p.h"
-#include <mware/list.h>
+#include <struct/list.h>
 #include <drv/timer.h>
 #include <kern/proc.h>
 #include <cpu/frame.h> /* CPU_STACK_GROWS_UPWARD */

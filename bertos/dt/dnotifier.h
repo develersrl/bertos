@@ -42,7 +42,7 @@
 #include <cfg/debug.h>
 
 #include <dt/dtag.h>
-#include <mware/list.h>
+#include <struct/list.h>
 
 //Fwd declaretion.
 struct DNotifier;

@@ -42,7 +42,7 @@
 #define GFX_FONT_H
 
 #include <cfg/compiler.h>  /* uint8_t */
-#include <mware/pgm.h>     /* PROGMEM */
+#include <cpu/pgm.h>     /* PROGMEM */
 
 typedef struct Font
 {

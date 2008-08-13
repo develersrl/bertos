@@ -39,7 +39,7 @@
  * to md2_perm function you must chanche CONFIG_MD2_STD_PERM defined in
  * appconfig.h.
  * If you need to store array in program memory you must define
- * a macro _PROGMEM (for more info see mware/pgm.h).
+ * a macro _PROGMEM (for more info see cpu/pgm.h).
  *
  *
  * \version $Id$
@@ -92,7 +92,7 @@
 #include <cfg/compiler.h>
 #include <cfg/debug.h>        //ASSERT()
 #include <cfg/macros.h>       //MIN(), countof(), ROTR();
-#include <mware/pgm.h>
+#include <cpu/pgm.h>
 
 
 #if CONFIG_MD2_STD_PERM

@@ -52,7 +52,7 @@
 #include <drv/ser.h>
 #include <drv/ser_p.h>
 
-#include <mware/fifobuf.h>
+#include <struct/fifobuf.h>
 
 
 #define SERIRQ_PRIORITY 4 ///< default priority for serial irqs.

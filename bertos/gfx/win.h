@@ -59,7 +59,7 @@
 #ifndef GFX_WIN_H
 #define GFX_WIN_H
 
-#include <mware/list.h> /* Node, List */
+#include <struct/list.h> /* Node, List */
 #include <gfx/gfx.h>    /* coord_t */
 
 

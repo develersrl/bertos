@@ -71,7 +71,7 @@
 
 #include <cfg/macros.h>
 #include <cfg/compiler.h>
-#include <mware/list.h>
+#include <struct/list.h>
 
 #include <stdarg.h> // vprintf()
 

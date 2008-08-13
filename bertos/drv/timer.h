@@ -63,7 +63,7 @@
 #include <cfg/debug.h>
 #include <cfg/compiler.h>
 
-#include <mware/list.h>
+#include <struct/list.h>
 
 
 extern volatile ticks_t _clock;

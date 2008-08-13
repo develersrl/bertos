@@ -44,7 +44,7 @@
 #include <drv/ser.h>
 #include <drv/ser_p.h>
 
-#include <mware/fifobuf.h>
+#include <struct/fifobuf.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>

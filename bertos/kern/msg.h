@@ -180,7 +180,7 @@
 #define KERN_MSG_H
 
 #include <mware/event.h>
-#include <mware/list.h>
+#include <struct/list.h>
 #include <kern/proc.h>
 
 typedef struct MsgPort

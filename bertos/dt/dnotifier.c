@@ -42,7 +42,7 @@
 
 #include <dt/dtag.h>
 #include <dt/dnotifier.h>
-#include <mware/list.h>
+#include <struct/list.h>
 
 /**
  * Default update used to notify target: notify all trasparently all

@@ -82,7 +82,7 @@
 #include "cfg/cfg_formatwr.h"  /* CONFIG_ macros */
 #include <cfg/debug.h>         /* ASSERT */
 
-#include <mware/pgm.h>
+#include <cpu/pgm.h>
 #include <mware/hex.h>
 
 #ifndef CONFIG_PRINTF_N_FORMATTER

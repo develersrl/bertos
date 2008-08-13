@@ -129,7 +129,7 @@
 	void __init_wall(long *wall, int size);
 
 	#if CPU_HARVARD
-		#include <mware/pgm.h>
+		#include <cpu/pgm.h>
 		void kputs_P(const char *PROGMEM str);
 		void kprintf_P(const char *PROGMEM fmt, ...) FORMAT(__printf__, 1, 2);
 		int __bassert_P(const char *PROGMEM cond, const char *PROGMEM file, int line);

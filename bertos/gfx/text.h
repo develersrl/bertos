@@ -106,7 +106,7 @@ int text_widthf(struct Bitmap *bm, const char * fmt, ...) FORMAT(__printf__, 2, 
 
 /* Text formatting functions for program-memory strings (mware/text_format.c) */
 #if CPU_HARVARD
-#include <mware/pgm.h>
+#include <cpu/pgm.h>
 int text_puts_P(const char * PROGMEM str, struct Bitmap *bm);
 int text_vprintf_P(struct Bitmap *bm, const char * PROGMEM fmt, va_list ap);
 int text_printf_P(struct Bitmap *bm, const char * PROGMEM fmt, ...) FORMAT(__printf__, 2, 3);

@@ -45,7 +45,7 @@
 
 #include <cpu/types.h>        /* for cpu_stack_t */
 
-#include <mware/list.h>
+#include <struct/list.h>
 
 typedef struct Process
 {

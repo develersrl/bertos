@@ -78,7 +78,7 @@
  *#*/
 
 #include "tea.h"
-#include <mware/byteorder.h>
+#include <cpu/byteorder.h>
 
 static uint32_t tea_func(uint32_t *in, uint32_t *sum, uint32_t *k)
 {

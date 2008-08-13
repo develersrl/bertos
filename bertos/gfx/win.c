@@ -66,7 +66,7 @@
  *#*/
 
 #include "win.h"
-#include <mware/list.h>
+#include <struct/list.h>
 
 /**
  * Map the contents of all child-windows into the bitmap of \a w.

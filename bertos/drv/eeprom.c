@@ -52,7 +52,7 @@
 
 #include <drv/wdt.h>
 
-#include <mware/byteorder.h> // cpu_to_be16()
+#include <cpu/byteorder.h> // cpu_to_be16()
 
 #include <string.h>  // memset()
 

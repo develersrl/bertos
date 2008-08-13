@@ -68,7 +68,7 @@ _formatted_write(
 	va_list ap);
 
 #if CPU_HARVARD
-	#include <mware/pgm.h>
+	#include <cpu/pgm.h>
 	int _formatted_write_P(
 		const char * PROGMEM format,
 		void put_char_func(char c, void *user_data),

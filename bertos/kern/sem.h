@@ -44,7 +44,7 @@
 #define KERN_SEM_H
 
 #include <cfg/compiler.h>
-#include <mware/list.h>
+#include <struct/list.h>
 
 /* Fwd decl */
 struct Process;

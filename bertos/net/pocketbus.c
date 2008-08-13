@@ -83,7 +83,7 @@
 
 #include <kern/kfile.h>
 
-#include <mware/byteorder.h>
+#include <cpu/byteorder.h>
 
 #include <string.h>
 

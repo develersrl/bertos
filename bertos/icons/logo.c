@@ -1,7 +1,7 @@
 
 #include "logo.h"
 #include <cfg/compiler.h>
-#include <mware/pgm.h>
+#include <cpu/pgm.h>
 
 /**
  * BeRTOS logo

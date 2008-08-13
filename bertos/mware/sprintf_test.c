@@ -41,7 +41,7 @@
 #include <cfg/test.h>
 #include <cfg/debug.h>
 
-#include <mware/pgm.h>
+#include <cpu/pgm.h>
 
 #include <stdio.h>
 

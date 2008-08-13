@@ -47,7 +47,7 @@
 #include "cfg/cfg_kbd.h" // CONFIG_KBD_OBSERVER
 #include <cfg/compiler.h>
 
-#include <mware/list.h>
+#include <struct/list.h>
 
 /**
  * \name Keyboard polling modes.

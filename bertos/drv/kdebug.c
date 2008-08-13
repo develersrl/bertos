@@ -48,7 +48,7 @@
 #include <cpu/types.h>
 
 #include <mware/formatwr.h> /* for _formatted_write() */
-#include <mware/pgm.h>
+#include <cpu/pgm.h>
 
 #ifdef _DEBUG
 

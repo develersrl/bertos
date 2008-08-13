@@ -51,7 +51,7 @@
 #include <drv/ser_p.h>
 #include <drv/timer.h>
 
-#include <mware/fifobuf.h>
+#include <struct/fifobuf.h>
 
 #include <avr/io.h>
 
