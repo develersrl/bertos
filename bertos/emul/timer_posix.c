@@ -26,14 +26,12 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2005,2008 Develer S.r.l. (http://www.develer.com/)
- *
+ * Copyright 2005, 2008 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
  * \version $Id$
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
- *
  * \brief Low-level timer module for Qt emulator (implementation).
  */
 #include <cfg/compiler.h> // hptime.t
@@ -61,10 +59,20 @@ static void timer_hw_init(void)
 	sigaction(SIGALRM, &sa, NULL);
 
 	// Setup POSIX realtime timer to interrupt every 1/TIMER_TICKS_PER_SEC.
-	static struct itimerval itv =
+	static const struct itimerval itv =
 	{
 		{ 0, 1000000 / TIMER_TICKS_PER_SEC }, /* it_interval */
 		{ 0, 1000000 / TIMER_TICKS_PER_SEC }  /* it_value */
+	};
+	setitimer(ITIMER_REAL, &itv, NULL);
+}
+
+static void timer_hw_cleanup(void)
+{
+	static const struct itimerval itv =
+	{
+		{ 0, 0 }, /* it_interval */
+		{ 0, 0 }  /* it_value */
 	};
 	setitimer(ITIMER_REAL, &itv, NULL);
 }

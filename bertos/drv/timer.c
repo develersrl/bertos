@@ -27,8 +27,7 @@
  * the GNU General Public License.
  *
  * Copyright 2003, 2004, 2005, 2006 Develer S.r.l. (http://www.develer.com/)
- * Copyright 2000 Bernie Innocenti <bernie@codewiz.org>
- *
+ * Copyright 2000, 2008 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
  * \brief Hardware independent timer driver (implementation)

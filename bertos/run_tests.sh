@@ -11,7 +11,7 @@
 VERBOSE=1
 
 CC=gcc
-CFLAGS="-W -Wall -Wextra -I. -Iemul -std=gnu99 -fno-builtin -D_DEBUG -D_TEST -DARCH=ARCH_EMUL"
+CFLAGS="-W -Wall -Wextra -Ibertos -Ibertos/emul -std=gnu99 -fno-builtin -D_DEBUG -D_TEST -DARCH=ARCH_EMUL"
 
 CXX=g++
 CXXFLAGS="$CFLAGS"
@@ -22,14 +22,14 @@ for test in $TESTS; do
 	[ $VERBOSE -gt 0 ] && echo "Running $test..."
 	case "$test" in
 	*.cpp)
-		$CXX $CXXFLAGS $test -o test || exit 1
-		./test || exit 1
-		rm -f test
+		$CXX $CXXFLAGS $test -o images/testcase || exit 1
+		./testcase || echo "FAILED: $test"
+		rm -f testcase
 	;;
 	*.c)
-		$CC $CFLAGS $test -o test || exit 1
-		./test || exit 1
-		rm -f test
+		$CC $CFLAGS $test -o testcase || exit 1
+		./testcase || echo "FAILED: $test"
+		rm -f testcase
 	;;
 	esac
 done
