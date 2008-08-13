@@ -26,8 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2005 ,2006, 2007 Develer S.r.l. (http://www.develer.com/)
- *
+ * Copyright 2005, 2006, 2007, 2008 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
  * \brief Support for reading program memory on Harvard architectures.
@@ -43,6 +42,9 @@
  *
  * \note This module contains code ripped out from avr-libc,
  *       which is distributed under a 3-clause BSD license.
+ *
+ * \version $Id:$
+ * \author Bernie Innocenti <bernie@codewiz.org>
  */
 #ifndef MWARE_PGM_H
 #define MWARE_PGM_H

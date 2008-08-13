@@ -27,13 +27,11 @@
  * the GNU General Public License.
  *
  * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
- *
  * -->
  *
  * \brief Functions to convert integers to/from host byte-order.
  *
  * \version $Id$
- *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  */
