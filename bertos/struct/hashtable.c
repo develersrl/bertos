@@ -26,9 +26,8 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2004, 2008 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2004 Giovanni Bajo
- * All Rights Reserved.
  * -->
  *
  * \brief Portable hash table implementation
@@ -80,22 +79,8 @@
  *    </ul>
  *
  * \version $Id$
- *
  * \author Giovanni Bajo <rasky@develer.com>
  */
-
-/*#*
- *#* $Log$
- *#* Revision 1.8  2007/02/06 16:05:01  asterix
- *#* Replaced ROTATE_* with ROT* defined in macros.h
- *#*
- *#* Revision 1.7  2006/07/19 12:56:27  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.6  2006/06/01 12:27:39  marco
- *#* Added utilities for protocols
- *#*
- *#*/
 
 #include "hashtable.h"
 #include <cfg/debug.h>
@@ -103,7 +88,6 @@
 #include <cfg/macros.h> //ROTL(), ROTR();
 
 #include <string.h>
-
 
 
 typedef const void** HashNodePtr;
