@@ -844,7 +844,7 @@ FLOATING_CONVERSION:
 		{
 			case 'l':
 			case 'z':
-				/* for the 'z' modifier, we make this assmumption */
+				/* for the 'z' modifier, we make this assumption */
 				STATIC_ASSERT(sizeof(size_t) == sizeof(long));
 				l_modifier = true;
 				format++;

@@ -66,7 +66,8 @@ The modules are sorted in subdirectories by their category:
   - bertos/hw/	    : hardware-specific declarations;
   - bertos/icons/   : conversion tool from image TXT format to LCD bitmap;
   - bertos/kern/    : multitasking kernel;
-  - bertos/mware/   : algorithms, containers and other standalone code;
+  - bertos/mware/   : algorithms, other standalone code;
+  - bertos/struct/  : containers and other data structures;
   - bertos/os/	    : OS-abstraction layers for hosted environments;
   - doc/            : documentation;
 
