@@ -27,15 +27,13 @@
  * the GNU General Public License.
  *
  * Copyright 2006 Develer S.r.l. (http://www.develer.com/)
- * Copyright 2000, 2001 Bernie Innocenti <bernie@codewiz.org>
- *
+ * Copyright 2000, 2001, 2008 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
- * \version $Id$
- *
- * \author Bernie Innocenti <bernie@codewiz.org>
- *
  * \brief Qt-based emulator framework for embedded applications (implementation)
+ *
+ * \version $Id$
+ * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
 #include "emul.h"
@@ -45,18 +43,15 @@
 
 #include <cfg/module.h>
 
-
-
-#include <cstdlib> // std::exit()
-
 #include <QtGui/qapplication.h>
+#include <cstdlib> // std::exit()
 
 
 /// The global emulator instance.
 Emulator *emul;
 
 #if CONFIG_KERNEL
-	#include <mware/list.h>
+	#include <struct/list.h>
 
 	/// List of process stacks
 	List StackFreeList;
