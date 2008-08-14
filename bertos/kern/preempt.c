@@ -182,5 +182,5 @@ void preempt_init(void)
 	sigaction(SIGUSR1, &act, NULL);
 	sigaction(SIGALRM, &act, NULL);
 
-	alarm(1);
+	alarm(1);  // FIXME
 }

@@ -203,6 +203,15 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 	#endif
 #endif
 
+#if CONFIG_KERN_PREEMPT
+	// FIXME: proc_exit
+	getcontext(&proc->context);
+	proc->context.uc_stack.ss_sp = stack_base;
+	proc->context.uc_stack.ss_size = stack_size;
+	proc->context.uc_link = NULL;
+	makecontext(&proc->context, entry, 0);
+
+#else // !CONFIG_KERN_PREEMPT
 	/* Initialize process stack frame */
 	CPU_PUSH_CALL_FRAME(proc->stack, proc_exit);
 	CPU_PUSH_CALL_FRAME(proc->stack, entry);
@@ -214,6 +223,7 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 	/* Add to ready list */
 	ATOMIC(SCHED_ENQUEUE(proc));
 	ATOMIC(LIST_ASSERT_VALID(&ProcReadyList));
+#endif // CONFIG_KERN_PREEMPT
 
 #if CONFIG_KERN_MONITOR
 	monitor_add(proc, name);
