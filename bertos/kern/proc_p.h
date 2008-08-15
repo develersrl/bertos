@@ -122,6 +122,11 @@ extern REGISTER List     ProcReadyList;
 /** Schedule to another process *without* adding the current to the ready list. */
 void proc_schedule(void);
 
+#if CONFIG_KERN_PREEMPT
+void proc_entry(void (*user_entry)(void));
+void preempt_init(void);
+#endif
+
 #if CONFIG_KERN_MONITOR
 	/** Initialize the monitor */
 	void monitor_init(void);

@@ -19,6 +19,7 @@ TRG += demo
 
 # FIXME: we want to use g++ for C source too
 CC = g++
+CXX = g++
 
 demo_CXXSRC = \
 	bertos/emul/emul.cpp \

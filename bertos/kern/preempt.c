@@ -92,10 +92,12 @@ void proc_preempt(void)
 
 	ATOMIC(LIST_ASSERT_VALID(&ProcReadyList));
 
+	TRACEMSG("hello1");
 	IRQ_DISABLE;
 	/* Poll on the ready queue for the first ready process */
 	while (!(CurrentProcess = (struct Process *)list_remHead(&ProcReadyList)))
 	{
+	TRACEMSG("hello2");
 		/*
 		 * Make sure we physically reenable interrupts here, no matter what
 		 * the current task status is. This is important because if we
@@ -109,11 +111,13 @@ void proc_preempt(void)
 		 * are reloaded.
 		 */
 		IRQ_ENABLE;
-		CPU_IDLE;
+		//FIXME: calls Qt stuff from sighandler! CPU_IDLE;
 		MEMORY_BARRIER;
 		IRQ_DISABLE;
+	TRACEMSG("hello3");
 	}
 	IRQ_ENABLE;
+	TRACEMSG("hello4");
 }
 
 void proc_preempt_timer(void)
@@ -121,12 +125,20 @@ void proc_preempt_timer(void)
 	// TODO: check Quantum
 
 	alarm(1);
-	ATOMIC(SCHED_ENQUEUE(CurrentProcess));
-	proc_schedule();
+
+	if (CurrentProcess)
+	{
+		TRACEMSG("preempting %p:%s", CurrentProcess, CurrentProcess->monitor.name);
+		ATOMIC(SCHED_ENQUEUE(CurrentProcess));
+		proc_schedule();
+	}
 }
 
 void proc_schedule(void)
 {
+	TRACE;
+
+	// Will invoke proc_preempt() in interrupt context
 	kill(0, SIGUSR1);
 }
 
@@ -137,21 +149,27 @@ void proc_yield(void)
 	proc_schedule();
 }
 
+void proc_entry(void (*user_entry)(void))
+{
+	user_entry();
+	proc_exit();
+}
+
 /* signal handler */
 void irq_entry(int signum)
 {
 	Process *old_process;
 
-	TRACEMSG("storing %p:%s", CurrentProcess, CurrentProcess->monitor.name);
-	CurrentProcess->leaving = false;
-	getcontext(&CurrentProcess->context);
+//	TRACEMSG("storing %p:%s", CurrentProcess, CurrentProcess->monitor.name);
+//	CurrentProcess->leaving = false;
+//	getcontext(&CurrentProcess->context);
 	/* We get here in two ways: directly, and after setcontext() below */
 
-	if (CurrentProcess->leaving)
-	{
-		TRACEMSG("leaving to %p:%s", CurrentProcess, CurrentProcess->monitor.name);
-		return;
-	}
+//	if (CurrentProcess->leaving)
+//	{
+//		TRACEMSG("leaving to %p:%s", CurrentProcess, CurrentProcess->monitor.name);
+//		return;
+//	}
 
 	old_process = CurrentProcess;
 
@@ -159,9 +177,13 @@ void irq_entry(int signum)
 
 	if (old_process != CurrentProcess)
 	{
-		TRACEMSG("launching %p:%s", CurrentProcess, CurrentProcess->monitor.name);
-		CurrentProcess->leaving = true;
-		setcontext(&CurrentProcess->context);
+		TRACEMSG("switching from %p:%s to %p:%s",
+			old_process, old_process->monitor.name,
+			CurrentProcess, CurrentProcess->monitor.name);
+		swapcontext(&old_process->context, &CurrentProcess->context);
+//		TRACEMSG("launching %p:%s", CurrentProcess, CurrentProcess->monitor.name);
+//		CurrentProcess->leaving = true;
+//		setcontext(&CurrentProcess->context);
 		/* not reached */
 	}
 

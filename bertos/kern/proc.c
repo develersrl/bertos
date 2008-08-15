@@ -52,9 +52,6 @@
 
 #include <string.h>           /* memset() */
 
-#if CONFIG_KERN_PREEMPT
-#include "preempt.h"
-#endif
 
 /*
  * The scheduer tracks ready processes by enqueuing them in the
@@ -209,7 +206,7 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 	proc->context.uc_stack.ss_sp = stack_base;
 	proc->context.uc_stack.ss_size = stack_size;
 	proc->context.uc_link = NULL;
-	makecontext(&proc->context, entry, 0);
+	makecontext(&proc->context, (void (*)(void))proc_entry, 1, entry);
 
 #else // !CONFIG_KERN_PREEMPT
 	/* Initialize process stack frame */
@@ -248,7 +245,7 @@ void proc_rename(struct Process *proc, const char *name)
  */
 void proc_exit(void)
 {
-	TRACE;
+	TRACEMSG("%p:%s", CurrentProcess, CurrentProcess->monitor.name);
 
 #if CONFIG_KERN_MONITOR
 	monitor_remove(CurrentProcess);
