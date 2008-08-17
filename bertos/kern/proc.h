@@ -70,7 +70,7 @@ struct Process *proc_current(void);
 iptr_t proc_current_user_data(void);
 void proc_rename(struct Process *proc, const char* name);
 
-#if CONFIG_KERN_PREEMPTIVE
+#if CONFIG_KERN_PREEMPT
 	void proc_forbid(void);
 	void proc_permit(void);
 #else

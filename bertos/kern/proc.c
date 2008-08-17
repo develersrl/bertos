@@ -90,7 +90,7 @@ static void proc_init_struct(Process *proc)
 	proc->sig_recv = 0;
 #endif
 
-#if CONFIG_KERN_PREEMPTIVE
+#if CONFIG_KERN_PREEMPT
 	proc->forbid_cnt = 0;
 #endif
 
@@ -118,7 +118,7 @@ void proc_init(void)
 	monitor_add(CurrentProcess, "main");
 #endif
 
-#if CONFIG_KERN_PREEMPTIVE
+#if CONFIG_KERN_PREEMPT
 	preempt_init();
 #endif
 

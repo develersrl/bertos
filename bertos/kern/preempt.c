@@ -26,8 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2001, 2004 Develer S.r.l. (http://www.develer.com/)
- * Copyright 1999, 2000, 2001, 2008 Bernie Innocenti <bernie@codewiz.org>
+ * Copyright 2008 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
  * \brief Simple realtime multitasking scheduler.
@@ -35,15 +34,13 @@
  *
  * \version $Id: proc.c 1616 2008-08-10 19:41:26Z bernie $
  * \author Bernie Innocenti <bernie@codewiz.org>
- * \author Stefano Fedrigo <aleph@develer.com>
  */
 
 #include "proc_p.h"
 #include "proc.h"
 
 #include <cpu/frame.h> // CPU_IDLE
-
-#include <unistd.h> // XXX alarm()
+#include <drv/timer.h>
 
 
 /*
@@ -51,6 +48,8 @@
  * process has exhausted its quantum.
  */
 uint16_t Quantum;
+
+Timer preempt_timer;
 
 /**
  * Disable preemptive task switching.
@@ -97,7 +96,7 @@ void proc_preempt(void)
 	/* Poll on the ready queue for the first ready process */
 	while (!(CurrentProcess = (struct Process *)list_remHead(&ProcReadyList)))
 	{
-	TRACEMSG("hello2");
+	//TRACEMSG("hello2");
 		/*
 		 * Make sure we physically reenable interrupts here, no matter what
 		 * the current task status is. This is important because if we
@@ -114,24 +113,26 @@ void proc_preempt(void)
 		//FIXME: calls Qt stuff from sighandler! CPU_IDLE;
 		MEMORY_BARRIER;
 		IRQ_DISABLE;
-	TRACEMSG("hello3");
+	//TRACEMSG("hello3");
 	}
 	IRQ_ENABLE;
 	TRACEMSG("hello4");
 }
 
-void proc_preempt_timer(void)
+void proc_preempt_timer(UNUSED_ARG(void *, param))
 {
-	// TODO: check Quantum
-
-	alarm(1);
-
+	IRQ_DISABLE;
 	if (CurrentProcess)
 	{
 		TRACEMSG("preempting %p:%s", CurrentProcess, CurrentProcess->monitor.name);
-		ATOMIC(SCHED_ENQUEUE(CurrentProcess));
-		proc_schedule();
+		SCHED_ENQUEUE(CurrentProcess);
+		IRQ_ENABLE;
+		proc_preempt();
 	}
+	IRQ_ENABLE;
+
+	timer_setDelay(&preempt_timer, CONFIG_KERN_QUANTUM);
+	timer_add(&preempt_timer);
 }
 
 void proc_schedule(void)
@@ -158,51 +159,60 @@ void proc_entry(void (*user_entry)(void))
 /* signal handler */
 void irq_entry(int signum)
 {
-	Process *old_process;
-
-//	TRACEMSG("storing %p:%s", CurrentProcess, CurrentProcess->monitor.name);
-//	CurrentProcess->leaving = false;
-//	getcontext(&CurrentProcess->context);
-	/* We get here in two ways: directly, and after setcontext() below */
-
-//	if (CurrentProcess->leaving)
-//	{
-//		TRACEMSG("leaving to %p:%s", CurrentProcess, CurrentProcess->monitor.name);
-//		return;
-//	}
-
-	old_process = CurrentProcess;
+	Process * const old_process = CurrentProcess;
 
 	irq_handlers[signum]();
 
-	if (old_process != CurrentProcess)
+	if (!CurrentProcess)
 	{
-		TRACEMSG("switching from %p:%s to %p:%s",
-			old_process, old_process->monitor.name,
-			CurrentProcess, CurrentProcess->monitor.name);
-		swapcontext(&old_process->context, &CurrentProcess->context);
-//		TRACEMSG("launching %p:%s", CurrentProcess, CurrentProcess->monitor.name);
-//		CurrentProcess->leaving = true;
-//		setcontext(&CurrentProcess->context);
-		/* not reached */
+		TRACEMSG("no runnable processes!");
+		IRQ_ENABLE;
+		pause();
 	}
+	else
+	{
+		if (old_process != CurrentProcess)
+		{
+			TRACEMSG("switching from %p:%s to %p:%s",
+				old_process, old_process ? old_process->monitor.name : "-",
+				CurrentProcess, CurrentProcess->monitor.name);
 
-	TRACEMSG("keeping %p:%s", CurrentProcess, CurrentProcess->monitor.name);
+			if (old_process)
+				swapcontext(&old_process->context, &CurrentProcess->context);
+			else
+				setcontext(&CurrentProcess->context);
+
+			/* not reached */
+		}
+		TRACEMSG("keeping %p:%s", CurrentProcess, CurrentProcess->monitor.name);
+	}
 }
 
-void preempt_init(void)
+void irq_register(int irq, void (*callback)(void))
+{
+	irq_handlers[irq] = callback;
+}
+
+void irq_init(void)
 {
 	struct sigaction act;
 	act.sa_handler = irq_entry;
 	sigemptyset(&act.sa_mask);
-	sigaddset(&act.sa_mask, SIGUSR1);
-	sigaddset(&act.sa_mask, SIGALRM);
+	//sigaddset(&act.sa_mask, irq);
 	act.sa_flags = SA_RESTART; /* | SA_SIGINFO; */
 
-	irq_handlers[SIGUSR1] = proc_preempt;
-	irq_handlers[SIGALRM] = proc_preempt_timer;
 	sigaction(SIGUSR1, &act, NULL);
-	sigaction(SIGALRM, &act, NULL);
+	#if !(ARCH & ARCH_QT)
+		sigaction(SIGALRM, &act, NULL);
+	#endif
+}
 
-	alarm(1);  // FIXME
+void preempt_init(void)
+{
+	irq_init(); // FIXME: move before
+	irq_register(SIGUSR1, proc_preempt);
+
+	timer_setSoftInt(&preempt_timer, proc_preempt_timer, NULL);
+	timer_setDelay(&preempt_timer, CONFIG_KERN_QUANTUM);
+	timer_add(&preempt_timer);
 }

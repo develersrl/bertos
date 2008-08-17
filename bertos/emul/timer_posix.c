@@ -48,6 +48,9 @@ void timer_isr(int);
 /// HW dependent timer initialization.
 static void timer_hw_init(void)
 {
+#if CONFIG_KERN_IRQ
+	irq_register(SIGALRM, timer_isr);
+#else // ! CONFIG_KERN_IRQ
 	struct sigaction sa;
 	memset(&sa, 0, sizeof(sa));
 
@@ -57,6 +60,7 @@ static void timer_hw_init(void)
 	sigaddset(&sa.sa_mask, SIGALRM);
 	sa.sa_flags = SA_RESTART;
 	sigaction(SIGALRM, &sa, NULL);
+#endif // CONFIG_KERN_IRQ
 
 	// Setup POSIX realtime timer to interrupt every 1/TIMER_TICKS_PER_SEC.
 	static const struct itimerval itv =

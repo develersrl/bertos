@@ -55,19 +55,19 @@
 #define CONFIG_KERN_SCHED       (0)
 #define CONFIG_KERN_SIGNALS     (0    && CONFIG_KERN_SCHED)
 #define CONFIG_KERN_TIMER       (0)
+#define CONFIG_KERN_IRQ         (0)
 #define CONFIG_KERN_HEAP        (0)
 #define CONFIG_KERN_SEMAPHORES  (0    && CONFIG_KERN_SIGNALS)
 #define CONFIG_KERN_MONITOR     (0    && CONFIG_KERN_SCHED)
-/*\}*/
+#define CONFIG_KERN_PREEMPT     (0    && CONFIG_KERN_SCHED && CONFIG_KERN_TIMER && CONFIG_KERN_IRQ)
 
 /* EXPERIMENTAL */
-#define CONFIG_KERN_PREEMPT     (0    && CONFIG_KERN_SCHED && CONFIG_KERN_TIMER)
 
 /* OBSOLETE */
 #define CONFIG_KERN_PREEMPTIVE CONFIG_KERN_PREEMPT
 
-/// Time sharing quantum in timer ticks.
-#define CONFIG_KERN_QUANTUM     50
+/// [ms] Time sharing quantum (a prime number prevents interference effects)
+#define CONFIG_KERN_QUANTUM     47
 
 /// Module logging level.
 #define KERN_LOG_LEVEL      LOG_LVL_ERR

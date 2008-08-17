@@ -42,6 +42,10 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QTimer>
 
+#if CONFIG_KERN_IRQ
+#include <kern/irq.h>
+#endif
+
 
 // The user interrupt server routine
 void timer_isr(void);
@@ -87,6 +91,10 @@ public:
 		// Record initial time
 		system_time.start();
 
+		#if CONFIG_KERN_IRQ
+			irq_register(SIGALRM, timer_isr);
+		#endif
+
 		// Activate timer interrupt
 		connect(&timer, SIGNAL(timeout()), SLOT(timerInterrupt()));
 		timer.start(1000 / TIMER_TICKS_PER_SEC);
@@ -116,7 +124,11 @@ public slots:
 	void timerInterrupt(void)
 	{
 		// Just call user interrupt server, timer restarts automatically.
-		timer_isr();
+		#if CONFIG_KERN_IRQ
+			irq_entry(SIGALRM);
+		#else
+			timer_isr();
+		#endif
 	}
 
 };
