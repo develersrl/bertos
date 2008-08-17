@@ -27,16 +27,13 @@
  * the GNU General Public License.
  *
  * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
- * Copyright 2000 Bernie Innocenti <bernie@codewiz.org>
- *
+ * Copyright 2000, 2008 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
  * \brief Hardware independent timer driver (interface)
  *
  * \version $Id$
- *
  * \author Bernie Innocenti <bernie@codewiz.org>
- *
  */
 
 #ifndef DRV_TIMER_H
@@ -92,12 +89,18 @@ extern volatile ticks_t _clock;
  * The following code is safe:
  *
  * \code
+ *   drop_teabag();
  *   ticks_t tea_start_time = timer_clock();
  *
- *   boil_water();
- *
- *   if (timer_clock() - tea_start_time > TEAPOT_DELAY)
- *       printf("Your tea, Sir.\n");
+ *   for (;;)
+ *   {
+ *       if (timer_clock() - tea_start_time > TEAPOT_DELAY)
+ *       {
+ *           printf("Your tea, Sir.\n");
+ *           break;
+ *       }
+ *       patience();
+ *   }
  * \endcode
  *
  * \note This function must disable interrupts on 8/16bit CPUs because the
@@ -229,8 +232,8 @@ INLINE void timer_udelay(utime_t delay)
 typedef struct Timer
 {
 	Node    link;     /**< Link into timers queue */
-	ticks_t _delay;   /**< Timer delay in ms */
-	ticks_t tick;     /**< Timer will expire at this tick */
+	ticks_t _delay;   /**< [ticks] Timer delay */
+	ticks_t tick;     /**< [ticks] When this timer will expire */
 	Event   expire;   /**< Event to execute when the timer expires */
 	DB(uint16_t magic;)
 } Timer;
@@ -243,13 +246,13 @@ void timer_add(Timer *timer);
 Timer *timer_abort(Timer *timer);
 
 /** Set the timer so that it calls an user hook when it expires */
-INLINE void timer_setSoftInt(Timer *timer, Hook func, iptr_t user_data)
+INLINE void timer_setSoftint(Timer *timer, Hook func, iptr_t user_data)
 {
 	event_initSoftInt(&timer->expire, func, user_data);
 }
 
 // OBSOLETE
-#define  timer_set_event_softint timer_setSoftInt
+#define  timer_set_event_softint timer_setSoftint
 
 /** Set the timer delay (the time before the event will be triggered) */
 INLINE void timer_setDelay(Timer *timer, ticks_t delay)
@@ -262,12 +265,13 @@ INLINE void timer_setDelay(Timer *timer, ticks_t delay)
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 
 /** Set the timer so that it sends a signal when it expires */
-INLINE void timer_set_event_signal(Timer *timer, struct Process *proc, sigmask_t sigs)
+INLINE void timer_setSignal(Timer *timer, struct Process *proc, sigmask_t sigs)
 {
 	event_initSignal(&timer->expire, proc, sigs);
 }
 
-#endif /* CONFIG_KERN_SIGNALS */
+#define timer_set_event_signal timer_setSignal
 
+#endif /* CONFIG_KERN_SIGNALS */
 
 #endif /* DRV_TIMER_H */
