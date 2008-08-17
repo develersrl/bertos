@@ -65,6 +65,21 @@
 
 #include <struct/list.h>
 
+/*
+ * Sanity check for config parameters required by this module.
+ */
+#if !defined(CONFIG_TIMER_EVENTS) || ((CONFIG_TIMER_EVENTS != 0) && CONFIG_TIMER_EVENTS != 1)
+	#error CONFIG_TIMER_EVENTS must be set to either 0 or 1 in cfg_timer.h
+#endif
+#if !defined(CONFIG_TIMER_UDELAY) || ((CONFIG_TIMER_UDELAY != 0) && CONFIG_TIMER_EVENTS != 1)
+	#error CONFIG_TIMER_UDELAY must be set to either 0 or 1 in cfg_timer.h
+#endif
+#if defined(CONFIG_TIMER_DISABLE_UDELAY)
+	#error Obosolete config option CONFIG_TIMER_DISABLE_UDELAY.  Use CONFIG_TIMER_UDELAY
+#endif
+#if defined(CONFIG_TIMER_DISABLE_EVENTS)
+	#error Obosolete config option CONFIG_TIMER_DISABLE_EVENTS.  Use CONFIG_TIMER_EVENTS
+#endif
 
 extern volatile ticks_t _clock;
 
@@ -191,7 +206,7 @@ int timer_testSetup(void);
 int timer_testRun(void);
 int timer_testTearDown(void);
 
-#if !defined(CONFIG_TIMER_DISABLE_UDELAY)
+#if CONFIG_TIMER_UDELAY
 void timer_busyWait(hptime_t delay);
 void timer_delayHp(hptime_t delay);
 INLINE void timer_udelay(utime_t delay)
@@ -200,7 +215,7 @@ INLINE void timer_udelay(utime_t delay)
 }
 #endif
 
-#ifndef CONFIG_TIMER_DISABLE_EVENTS
+#if CONFIG_TIMER_EVENTS
 
 #include <mware/event.h>
 
@@ -242,7 +257,7 @@ INLINE void timer_setDelay(Timer *timer, ticks_t delay)
 	timer->_delay = delay;
 }
 
-#endif /* CONFIG_TIMER_DISABLE_EVENTS */
+#endif /* CONFIG_TIMER_EVENTS */
 
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 

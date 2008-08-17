@@ -68,16 +68,16 @@
  * Sanity check for config parameters required by this module.
  */
 #if !defined(CONFIG_KERNEL) || ((CONFIG_KERNEL != 0) && CONFIG_KERNEL != 1)
-	#error CONFIG_KERNEL must be set to either 0 or 1 in config.h
+	#error CONFIG_KERNEL must be set to either 0 or 1 in cfg_kern.h
 #endif
 #if !defined(CONFIG_SER_RXTIMEOUT)
-	#error CONFIG_SER_TXTIMEOUT missing in config.h
+	#error CONFIG_SER_TXTIMEOUT missing in cfg_ser.h
 #endif
 #if !defined(CONFIG_SER_RXTIMEOUT)
-	#error CONFIG_SER_RXTIMEOUT missing in config.h
+	#error CONFIG_SER_RXTIMEOUT missing in cfg_ser.h
 #endif
 #if !defined(CONFIG_SER_DEFBAUDRATE)
-	#error CONFIG_SER_DEFBAUDRATE missing in config.h
+	#error CONFIG_SER_DEFBAUDRATE missing in cfg_ser.h
 #endif
 
 
