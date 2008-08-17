@@ -228,10 +228,13 @@ void timer_add(Timer *timer);
 Timer *timer_abort(Timer *timer);
 
 /** Set the timer so that it calls an user hook when it expires */
-INLINE void timer_set_event_softint(Timer *timer, Hook func, iptr_t user_data)
+INLINE void timer_setSoftInt(Timer *timer, Hook func, iptr_t user_data)
 {
 	event_initSoftInt(&timer->expire, func, user_data);
 }
+
+// OBSOLETE
+#define  timer_set_event_softint timer_setSoftInt
 
 /** Set the timer delay (the time before the event will be triggered) */
 INLINE void timer_setDelay(Timer *timer, ticks_t delay)
