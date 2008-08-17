@@ -18,8 +18,8 @@ demo_DEBUG = 1
 TRG += demo
 
 # FIXME: we want to use g++ for C source too
-CC = g++-4.1
-CXX = g++-4.1
+CC = g++-4.3
+CXX = g++-4.3
 
 demo_CXXSRC = \
 	bertos/emul/emul.cpp \
@@ -52,9 +52,10 @@ demo_CSRC = \
 	bertos/mware/observer.c \
 	bertos/mware/resource.c \
 	bertos/mware/sprintf.c \
+	bertos/kern/irq.c \
+	bertos/kern/preempt.c \
 	bertos/kern/proc.c \
 	bertos/kern/proc_test.c \
-	bertos/kern/preempt.c \
 	bertos/kern/sem.c \
 	bertos/kern/signal.c \
 	bertos/kern/monitor.c \

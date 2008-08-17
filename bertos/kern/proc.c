@@ -135,7 +135,6 @@ void proc_init(void)
 struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(void), iptr_t data, size_t stack_size, cpustack_t *stack_base)
 {
 	Process *proc;
-	size_t i;
 	const size_t PROC_SIZE_WORDS = ROUND2(sizeof(Process), sizeof(cpustack_t)) / sizeof(cpustack_t);
 #if CONFIG_KERN_HEAP
 	bool free_stack = false;
@@ -200,31 +199,35 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 	#endif
 #endif
 
-#if CONFIG_KERN_PREEMPT
-	// FIXME: proc_exit
-	getcontext(&proc->context);
-	proc->context.uc_stack.ss_sp = stack_base;
-	proc->context.uc_stack.ss_size = stack_size;
-	proc->context.uc_link = NULL;
-	makecontext(&proc->context, (void (*)(void))proc_entry, 1, entry);
+	#if CONFIG_KERN_PREEMPT
+		// FIXME: proc_exit
+		getcontext(&proc->context);
+		proc->context.uc_stack.ss_sp = stack_base;
+		proc->context.uc_stack.ss_size = stack_size;
+		proc->context.uc_link = NULL;
+		makecontext(&proc->context, (void (*)(void))proc_entry, 1, entry);
 
-#else // !CONFIG_KERN_PREEMPT
-	/* Initialize process stack frame */
-	CPU_PUSH_CALL_FRAME(proc->stack, proc_exit);
-	CPU_PUSH_CALL_FRAME(proc->stack, entry);
+	#else // !CONFIG_KERN_PREEMPT
+	{
+		size_t i;
 
-	/* Push a clean set of CPU registers for asm_switch_context() */
-	for (i = 0; i < CPU_SAVED_REGS_CNT; i++)
-		CPU_PUSH_WORD(proc->stack, CPU_REG_INIT_VALUE(i));
+		/* Initialize process stack frame */
+		CPU_PUSH_CALL_FRAME(proc->stack, proc_exit);
+		CPU_PUSH_CALL_FRAME(proc->stack, entry);
 
-	/* Add to ready list */
-	ATOMIC(SCHED_ENQUEUE(proc));
-	ATOMIC(LIST_ASSERT_VALID(&ProcReadyList));
-#endif // CONFIG_KERN_PREEMPT
+		/* Push a clean set of CPU registers for asm_switch_context() */
+		for (i = 0; i < CPU_SAVED_REGS_CNT; i++)
+			CPU_PUSH_WORD(proc->stack, CPU_REG_INIT_VALUE(i));
 
-#if CONFIG_KERN_MONITOR
-	monitor_add(proc, name);
-#endif
+		/* Add to ready list */
+		ATOMIC(SCHED_ENQUEUE(proc));
+		ATOMIC(LIST_ASSERT_VALID(&ProcReadyList));
+	}
+	#endif // CONFIG_KERN_PREEMPT
+
+	#if CONFIG_KERN_MONITOR
+		monitor_add(proc, name);
+	#endif
 
 	return proc;
 }

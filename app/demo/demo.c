@@ -26,21 +26,20 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2006 Develer S.r.l. (http://www.develer.com/)
- *
+ * Copyright 2006, 2008 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
+ * \brief Multifunction system test for BeRTOS modules.
+ *
  * \version $Id: demo.c 18242 2007-10-08 17:35:23Z marco $
- *
  * \author Bernie Innocenti <bernie@codewiz.org>
- *
- * \brief Windowing system test.
  */
 
 #include <cfg/macros.h>
 
 #include <emul/emul.h>
 
+#include <kern/irq.h>
 #include <kern/proc.h>
 #include <kern/msg.h>
 
@@ -294,6 +293,7 @@ static struct Menu main_menu = { main_items, "Main Menu", MF_STICKY, &lcd_bitmap
 int main(int argc, char *argv[])
 {
 	emul_init(&argc, argv);
+	irq_init();
 	timer_init();
 	buz_init();
 	kbd_init();

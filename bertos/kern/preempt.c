@@ -39,8 +39,10 @@
 #include "proc_p.h"
 #include "proc.h"
 
+#include <kern/irq.h>
 #include <cpu/frame.h> // CPU_IDLE
 #include <drv/timer.h>
+#include <cfg/module.h>
 
 
 /*
@@ -81,8 +83,6 @@ void proc_permit(void)
 	/* No need to protect against interrupts here. */
 	--CurrentProcess->forbid_cnt;
 }
-
-static void (*irq_handlers[100])(void); // FIXME
 
 
 void proc_preempt(void)
@@ -156,63 +156,14 @@ void proc_entry(void (*user_entry)(void))
 	proc_exit();
 }
 
-/* signal handler */
-void irq_entry(int signum)
-{
-	Process * const old_process = CurrentProcess;
-
-	irq_handlers[signum]();
-
-	if (!CurrentProcess)
-	{
-		TRACEMSG("no runnable processes!");
-		IRQ_ENABLE;
-		pause();
-	}
-	else
-	{
-		if (old_process != CurrentProcess)
-		{
-			TRACEMSG("switching from %p:%s to %p:%s",
-				old_process, old_process ? old_process->monitor.name : "-",
-				CurrentProcess, CurrentProcess->monitor.name);
-
-			if (old_process)
-				swapcontext(&old_process->context, &CurrentProcess->context);
-			else
-				setcontext(&CurrentProcess->context);
-
-			/* not reached */
-		}
-		TRACEMSG("keeping %p:%s", CurrentProcess, CurrentProcess->monitor.name);
-	}
-}
-
-void irq_register(int irq, void (*callback)(void))
-{
-	irq_handlers[irq] = callback;
-}
-
-void irq_init(void)
-{
-	struct sigaction act;
-	act.sa_handler = irq_entry;
-	sigemptyset(&act.sa_mask);
-	//sigaddset(&act.sa_mask, irq);
-	act.sa_flags = SA_RESTART; /* | SA_SIGINFO; */
-
-	sigaction(SIGUSR1, &act, NULL);
-	#if !(ARCH & ARCH_QT)
-		sigaction(SIGALRM, &act, NULL);
-	#endif
-}
-
 void preempt_init(void)
 {
-	irq_init(); // FIXME: move before
+	MOD_CHECK(irq);
+	MOD_CHECK(timer);
+
 	irq_register(SIGUSR1, proc_preempt);
 
-	timer_setSoftInt(&preempt_timer, proc_preempt_timer, NULL);
+	timer_setSoftint(&preempt_timer, proc_preempt_timer, NULL);
 	timer_setDelay(&preempt_timer, CONFIG_KERN_QUANTUM);
 	timer_add(&preempt_timer);
 }

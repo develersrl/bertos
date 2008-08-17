@@ -26,15 +26,13 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2001,2004 Develer S.r.l. (http://www.develer.com/)
- * Copyright 1999,2000,2001 Bernie Innocenti <bernie@codewiz.org>
- *
+ * Copyright 2001, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 1999, 2000, 2001, 2008 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
  * \brief Process scheduler (public interface).
  *
  * \version $Id$
- *
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 #ifndef KERN_PROC_H
@@ -142,5 +140,5 @@ void proc_rename(struct Process *proc, const char* name);
 		#error No cpustack_t size supported!
 	#endif
 #endif
-#endif /* KERN_PROC_H */
 
+#endif /* KERN_PROC_H */
