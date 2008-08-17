@@ -26,19 +26,19 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2007 Develer S.r.l. (http://www.develer.com/)
- *
+ * Copyright 2007, 2008 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
+ * \brief BattFS Test.
+ *
  * \version $Id: demo.c 18242 2007-10-08 17:35:23Z marco $
- *
  * \author Francesco Sacchi <batt@develer.com>
- *
- * \brief BattFs Test.
  */
 
-#include <cfg/debug.h>
 #include <fs/battfs.h>
+
+#include <cfg/debug.h>
+#include <cfg/test.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -404,7 +404,7 @@ static void test10(BattFsSuper *disk)
 	ASSERT(fd2.inode == INODE2);
 	ASSERT(fd2.start == &disk->page_array[2]);
 	ASSERT(fd2.disk == disk);
- 	ASSERT(LIST_HEAD(&disk->file_opened_list)->succ == &fd2.link);
+	ASSERT(LIST_HEAD(&disk->file_opened_list)->succ == &fd2.link);
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
 	ASSERT(kfile_close(&fd2.fd) == 0);
@@ -480,30 +480,30 @@ static void test12(BattFsSuper *disk)
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
 
 	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
-	ASSERT(fd1.fd.seek_pos == sizeof(buf));
+	ASSERT(fd1.fd.seek_pos == (kfile_off_t)sizeof(buf));
 	for (size_t i = 0; i < sizeof(buf); i++)
 		ASSERT(buf[i] == 0);
 
 	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
-	ASSERT(fd1.fd.seek_pos == sizeof(buf) * 2);
+	ASSERT(fd1.fd.seek_pos == (kfile_off_t)sizeof(buf) * 2);
 	for (size_t i = 0; i < sizeof(buf); i++)
 		ASSERT(buf[i] == 0);
 
 	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
-	ASSERT(fd1.fd.seek_pos == sizeof(buf) * 3);
+	ASSERT(fd1.fd.seek_pos == (kfile_off_t)sizeof(buf) * 3);
 	for (size_t i = 0; i < sizeof(buf); i++)
 		ASSERT(buf[i] == 0);
 
 	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == 86);
-	ASSERT(fd1.fd.seek_pos == fd1.fd.size);
+	ASSERT(fd1.fd.seek_pos == (kfile_off_t)fd1.fd.size);
 	for (size_t i = 0; i < 86; i++)
 		ASSERT(buf[i] == 0);
 
 	ASSERT(kfile_seek(&fd1.fd, 0, KSM_SEEK_SET) == 0);
 	ASSERT(fd1.fd.seek_pos == 0);
 
-	ASSERT(kfile_seek(&fd1.fd, 0, KSM_SEEK_END) == fd1.fd.size);
-	ASSERT(fd1.fd.seek_pos = fd1.fd.size);
+	ASSERT(kfile_seek(&fd1.fd, 0, KSM_SEEK_END) == (kfile_off_t)fd1.fd.size);
+	ASSERT(fd1.fd.seek_pos = (kfile_off_t)fd1.fd.size);
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
 	ASSERT(battfs_close(disk));
@@ -512,10 +512,7 @@ static void test12(BattFsSuper *disk)
 }
 
 
-
-
-
-int main(void)
+int battfs_testRun(void)
 {
 	BattFsSuper disk;
 
@@ -536,7 +533,33 @@ int main(void)
 	test10(&disk);
 	test11(&disk);
 	test12(&disk);
-	kprintf("All test passed!\n");
+	kprintf("All tests passed!\n");
 
 	return 0;
 }
+
+#ifdef _TEST
+
+int battfs_testSetup(void)
+{
+	return 0;
+}
+
+int battfs_testTearDown(void)
+{
+	return 0;
+}
+
+TEST_MAIN(battfs)
+
+#include "fs/battfs.c"
+#include "drv/kdebug.c"
+#include "mware/formatwr.c"
+#include "mware/hex.c"
+
+#else
+int main(void)
+{
+	return battfs_testRun();
+}
+#endif // _TEST
