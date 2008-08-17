@@ -46,4 +46,10 @@
 /// Debug timer interrupt using a strobe pin.
 #define CONFIG_TIMER_STROBE  0
 
+/// Enable asynchronous timers
+#define CONFIG_TIMER_EVENTS  1
+
+/// Support hi-res timer_usleep()
+#define CONFIG_TIMER_UDELAY  1
+
 #endif /* CFG_TIMER_H */
