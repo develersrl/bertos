@@ -32,25 +32,30 @@
  * -->
  *
  * \brief Virtual KFile I/O interface.
- * KFile is a generic interface for file I/O.
- * It uses an object-oriented model to supply
- * a generic interface for drivers to communicate.
+ *
+ * KFile is a simple, generic interface for file I/O.  It uses an
+ * object-oriented model to supply a device-neutral interface to
+ * communicate with drivers.
+ *
  * This module contains only definitions, the instance structure
- * and an API.
- * Each KFile user should implement at least some methods.
- * E.G.
- * If you have a serial driver and want to comply to KFile interface,
- * you have to declare your context structure:
+ * and the common API.
+ * Each KFile subclass can override one or more methods of the interface,
+ * and can extend the base KFile structure with its own private data.
+ * For instance, a serial driver might implement the KFile interface by
+ * declaring a context structure like this:
  *
  * \code
- * typedef struct SerialKFile
+ * typedef struct Serial
  * {
- *		KFile fd;
- *		Serial *ser;
+ *      // base class instance
+ *      KFile fd;
+ *
+ *      // private instance data
+ *      FIFOBuffer txfifo, rxfifo;
  * } Serial;
  * \endcode
  *
- * You should also supply a macro for casting KFile to SerialKFile:
+ * You should also supply a macro for casting KFile to Serial:
  *
  * \code
  * INLINE Serial * SERIAL_CAST(KFile *fd)
@@ -60,27 +65,30 @@
  * }
  * \endcode
  *
- * Then you can implement as much interface functions as you like
- * and leave the others to NULL.
- * ser_close implementation example:
+ * Then you can implement as many interface functions as needed
+ * and leave the rest to NULL.
+ *
+ * Example implementation of the close KFile method for Serial:
  *
  * \code
  * static int ser_kfile_close(struct KFile *fd)
  * {
- *		SerialKFile *fds = SerialKFile(fd);
- *		ser_close(fds->ser);
+ *		Serial *fds = SERIAL_CAST(fd);
+ *      // [driver specific code here]
  *		return 0;
  * }
  * \endcode
- * SerialKFile macro helps to ensure that obj passed is really a Serial.
  *
- * KFile interface do not supply the open function: this is deliberate,
+ * The SERIAL_CAST() macro helps ensure that the passed object is
+ * really of type Serial.
+ *
+ * The KFile interface does not supply an open function: this is deliberate,
  * because in embedded systems each device has its own init parameters.
- * For the same reason specific file settings (like baudrate for Serial, for example)
- * are demanded to specific driver implementation.
+ * For the same reason, specific device settings like, for example,
+ * the baudrate, are not part of interface and should be handled by the
+ * driver-specific API.
  *
  * \version $Id$
- *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Francesco Sacchi <batt@develer.com>
  * \author Daniele Basile <asterix@develer.com>
@@ -96,8 +104,8 @@
 /* fwd decl */
 struct KFile;
 
-typedef int32_t kfile_off_t;    ///< KFile offset type, used by kfile_seek function.
-typedef uint32_t kfile_size_t;   ///< KFile size type, used in kfile struct.
+typedef int32_t kfile_off_t;     ///< KFile offset type, used by kfile_seek().
+typedef uint32_t kfile_size_t;   ///< KFile size type, used in struct KFile.
 
 /**
  * Costants for repositioning read/write file offset.
