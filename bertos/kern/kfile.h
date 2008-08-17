@@ -178,7 +178,9 @@ typedef void (*ClearErrFunc_t) (struct KFile *fd);
 /**
  * Context data for callback functions which operate on
  * pseudo files.
- * \note If you change interface, remember to add corresponding access function.
+ *
+ * \note Remember to add the corresponding accessor functions
+ *       when extending this interface.
  */
 typedef struct KFile
 {
@@ -190,11 +192,11 @@ typedef struct KFile
 	FlushFunc_t    flush;
 	ErrorFunc_t    error;
 	ClearErrFunc_t clearerr;
-	DB(id_t _type); ///< Used to keep trace, at runtime, of obj type.
+	DB(id_t _type); ///< Used to keep track, at runtime, of the class type.
 
 	/* NOTE: these must _NOT_ be size_t on 16bit CPUs! */
 	kfile_off_t  seek_pos;
-	kfile_size_t size;
+	kfile_size_t size; // FIXME: should be kfile_off_t
 } KFile;
 
 /**
