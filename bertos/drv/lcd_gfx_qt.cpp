@@ -65,6 +65,16 @@ EmulLCD::EmulLCD(QWidget *parent) :
 	// set widget frame
 	setFrameStyle(QFrame::Panel | QFrame::Sunken);
 	frame_width = frameWidth();
+
+	setMinimumSize(WIDTH + frame_width * 2, HEIGHT + frame_width * 2);
+
+	#if CONFIG_EMULLCD_SCALE
+		QSizePolicy pol = QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred, QSizePolicy::Frame);
+		pol.setHeightForWidth(true);
+	#else
+		QSizePolicy pol = QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::Frame);
+	#endif
+	setSizePolicy(pol);
 }
 
 
@@ -73,33 +83,38 @@ EmulLCD::~EmulLCD()
 	// nop
 }
 
-
-QSizePolicy EmulLCD::sizePolicy() const
+#if CONFIG_EMULLCD_SCALE
+int EmulLCD::heightForWidth(int w) const
 {
-	return QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::Frame);
-}
+		int h;
 
+		w -= frame_width * 2;
+		h = (w * HEIGHT + WIDTH/2) / WIDTH;
+		h += frame_width * 2;
 
-QSize EmulLCD::sizeHint() const
-{
-	return QSize(
-		WIDTH + frame_width * 2,
-		HEIGHT + frame_width * 2);
+		return h;
 }
-
-QSize EmulLCD::minimumSizeHint() const
-{
-	return sizeHint();
-}
+#endif // CONFIG_EMULLCD_SCALE
 
 void EmulLCD::paintEvent(QPaintEvent * /*event*/)
 {
 	QPainter p(this);
 	QImage img(raster, WIDTH, HEIGHT, QImage::Format_Mono);
 
+	#if CONFIG_EMULLCD_SCALE
+		int w = width() - frame_width * 2;
+		int h = height() - frame_width * 2;
+		if ((w != WIDTH) || (h != HEIGHT))
+		{
+			p.scale((qreal)w / WIDTH, (qreal)h / HEIGHT);
+			//p.setRenderHint(QPainter::SmoothPixmapTransform);
+		}
+	#endif // CONFIG_EMULLCD_SCALE
+
 	p.setBackgroundMode(Qt::OpaqueMode);
 	p.setBackground(bg_brush);
 	p.setPen(fg_color);
+
 	p.drawImage(QPoint(frame_width, frame_width), img);
 }
 
@@ -107,12 +122,16 @@ void EmulLCD::writeRaster(uint8_t *new_raster)
 {
 #if CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_H_MSB
 
-	/* Straight copy */
-	memcpy(raster, new_raster, sizeof(raster));
+	// Straight copy
+	//memcpy(raster, new_raster, sizeof(raster));
+
+	// Inverting copy
+	for (int i = 0; i < (int)sizeof(raster); ++i)
+		raster[i] = ~new_raster[i];
 
 #elif CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_V_LSB
 
-	/* Rotation */
+	// Rotation + inversion
 	for (int y = 0; y < HEIGHT; ++y)
 	{
 		for (int xbyte = 0; xbyte < WIDTH/8; ++xbyte)
@@ -120,12 +139,11 @@ void EmulLCD::writeRaster(uint8_t *new_raster)
 			uint8_t v = 0;
 			for (int xbit = 0; xbit < 8; ++xbit)
 				v |= (new_raster[(xbyte * 8 + xbit) + (y / 8) * WIDTH] & (1 << (y%8)) )
-					? 0 : (1 << (7 - xbit));
+					? (1 << (7 - xbit)) : 0;
 
 			raster[y * ((WIDTH + 7) / 8) + xbyte] = v;
 		}
 	}
-
 #else
 	#error Unsupported bitmap format
 #endif

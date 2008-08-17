@@ -47,6 +47,7 @@ class QSizePolicy;
 class QPaintEvent;
 class QResizeEvent;
 
+#define CONFIG_EMULLCD_SCALE 1
 
 class EmulLCD : public QFrame
 {
@@ -62,10 +63,11 @@ public:
 
 // Base class overrides
 protected:
-	virtual QSizePolicy sizePolicy() const;
-	virtual QSize sizeHint() const;
-	virtual QSize minimumSizeHint() const;
 	virtual void paintEvent(QPaintEvent *event);
+
+	#if CONFIG_EMULLCD_SCALE
+		virtual int heightForWidth(int w) const;
+	#endif
 
 // Operations
 public:

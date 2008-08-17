@@ -88,9 +88,9 @@ EmulWin::EmulWin(Emulator *e)
 		// LCD
 		QHBoxLayout *lay_lcd = new QHBoxLayout();
 		box_right->addLayout(lay_lcd);
-			lay_lcd->addStretch();
-			lay_lcd->addWidget(e->emulLCD = new EmulLCD(central));
-			lay_lcd->addStretch();
+			lay_lcd->addStretch(1);
+			lay_lcd->addWidget(e->emulLCD = new EmulLCD(central), 8);
+			lay_lcd->addStretch(1);
 
 		// Keyboard
 		box_right->addWidget(e->emulKbd = new EmulKbd(central));
