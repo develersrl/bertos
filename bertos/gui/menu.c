@@ -168,9 +168,7 @@ static void menu_defaultRenderHook(struct Bitmap *bm, int ypos, bool selected, c
 		}
 	}
 
-#warning FIXME:REVISE this code!
-#if 0
-//#if CPU_HARVARD
+#if CPU_HARVARD
 	((item->flags & MIF_RAMLABEL) ? text_xyprintf : text_xyprintf_P)
 #else
 	text_xyprintf
