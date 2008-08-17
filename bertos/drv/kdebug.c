@@ -58,9 +58,10 @@
 
 
 #if OS_HOSTED
-	#include <stdio.h>
+	#include <unistd.h> // write()
+
 	#define KDBG_WAIT_READY()      do { /*nop*/ } while(0)
-	#define KDBG_WRITE_CHAR(c)     do { char __c = (c); write(2, &__c, sizeof(__c)); } while(0)
+	#define KDBG_WRITE_CHAR(c)     do { char __c = (c); write(STDERR_FILENO, &__c, sizeof(__c)); } while(0)
 	#define KDBG_MASK_IRQ(old)     do { (void)(old); } while(0)
 	#define KDBG_RESTORE_IRQ(old)  do { /*nop*/ } while(0)
 	typedef char kdbg_irqsave_t; /* unused */
