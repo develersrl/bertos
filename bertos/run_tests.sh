@@ -16,21 +16,28 @@ CFLAGS="-W -Wall -Wextra -Ibertos -Ibertos/emul -std=gnu99 -fno-builtin -D_DEBUG
 CXX=g++
 CXXFLAGS="$CFLAGS"
 
-TESTS=${TESTS:-`find . -name "*_test.c*"`}
+TESTS=${TESTS:-`find . \
+	\( -name .svn -prune -o -name .git -prune -o -name .hg  -prune \) \
+	-o -name "*_test.c*" -print` }
 
-for test in $TESTS; do
-	[ $VERBOSE -gt 0 ] && echo "Running $test..."
-	case "$test" in
-	*.cpp)
-		$CXX $CXXFLAGS $test -o images/testcase || exit 1
-		./testcase || echo "FAILED: $test"
-		rm -f testcase
-	;;
-	*.c)
-		$CC $CFLAGS $test -o testcase || exit 1
-		./testcase || echo "FAILED: $test"
-		rm -f testcase
-	;;
+TESTOUT="testout"
+
+mkdir -p "$TESTOUT"
+
+for src in $TESTS; do
+	name="`basename $src | sed -e 's/\.cpp$//' -e 's/\.c$//'`"
+	exe="./$TESTOUT/$name"
+
+	case "$src" in
+	*.cpp) BUILDCMD="$CXX $CXXFLAGS $src -o $exe" ;;
+	*.c)   BUILDCMD="$CC  $CXXFLAGS $src -o $exe" ;;
 	esac
+
+	[ $VERBOSE -gt 0 ] && echo "Building $name..."
+	$BUILDCMD 2>&1 | tee $name.build || echo "FAILED [BUILD]: $name"
+
+	[ $VERBOSE -gt 0 ] && echo "Running $name..."
+	$exe 2>&1 | tee $name.out || echo "FAILED [RUN]: $name"
+	#rm -f "$exe"
 done
 
