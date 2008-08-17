@@ -47,29 +47,29 @@
 
 static void timer_test_constants(void)
 {
-	kprintf("TIMER_HW_HPTICKS_PER_SEC=%lu\n", TIMER_HW_HPTICKS_PER_SEC);
+	kprintf("TIMER_HW_HPTICKS_PER_SEC=%lu\n", (unsigned long)TIMER_HW_HPTICKS_PER_SEC);
 	#ifdef TIMER_PRESCALER
-		kprintf("TIMER_PRESCALER=%d\n", TIMER_PRESCALER);
+		kprintf("TIMER_PRESCALER    = %lu\n", (unsigned long)TIMER_PRESCALER);
 	#endif
 	#ifdef TIMER1_OVF_COUNT
-		kprintf("TIMER1_OVF_COUNT=%d\n", (int)TIMER1_OVF_COUNT);
+		kprintf("TIMER1_OVF_COUNT   = %lu\n", (unsigned long)TIMER1_OVF_COUNT);
 	#endif
-	kprintf("TIMER_TICKS_PER_SEC=%d\n", (int)TIMER_TICKS_PER_SEC);
+	kprintf("TIMER_TICKS_PER_SEC= %lu\n",  (unsigned long)TIMER_TICKS_PER_SEC);
 	kprintf("\n");
-	kprintf("ms_to_ticks(100)=%lu\n", ms_to_ticks(100));
-	kprintf("ms_to_ticks(10000)=%lu\n", ms_to_ticks(10000));
-	kprintf("us_to_ticks(100)=%lu\n", us_to_ticks(100));
-	kprintf("us_to_ticks(10000)=%lu\n", us_to_ticks(10000));
+	kprintf("ms_to_ticks(100)   = %lu\n",   (unsigned long)ms_to_ticks(100));
+	kprintf("ms_to_ticks(10000) = %lu\n",   (unsigned long)ms_to_ticks(10000));
+	kprintf("us_to_ticks(100)   = %lu\n",   (unsigned long)us_to_ticks(100));
+	kprintf("us_to_ticks(10000) = %lu\n",   (unsigned long)us_to_ticks(10000));
 	kprintf("\n");
-	kprintf("ticks_to_ms(100)=%lu\n", ticks_to_ms(100));
-	kprintf("ticks_to_ms(10000)=%lu\n", ticks_to_ms(10000));
-	kprintf("ticks_to_us(100)=%lu\n", ticks_to_us(100));
-	kprintf("ticks_to_us(10000)=%lu\n", ticks_to_us(10000));
+	kprintf("ticks_to_ms(100)   = %lu\n",   (unsigned long)ticks_to_ms(100));
+	kprintf("ticks_to_ms(10000) = %lu\n",   (unsigned long)ticks_to_ms(10000));
+	kprintf("ticks_to_us(100)   = %lu\n",   (unsigned long)ticks_to_us(100));
+	kprintf("ticks_to_us(10000) = %lu\n",   (unsigned long)ticks_to_us(10000));
 	kprintf("\n");
-	kprintf("hptime_to_us(100)=%ld\n", hptime_to_us(100));
-	kprintf("hptime_to_us(10000)=%lu\n", hptime_to_us(10000));
-	kprintf("us_to_hptime(100)=%lu\n", us_to_hptime(100));
-	kprintf("us_to_hptime(10000)=%lu\n", us_to_hptime(10000));
+	kprintf("hptime_to_us(100)  = %lu\n",   (unsigned long)hptime_to_us(100));
+	kprintf("hptime_to_us(10000)= %lu\n",   (unsigned long)hptime_to_us(10000));
+	kprintf("us_to_hptime(100)  = %lu\n",   (unsigned long)us_to_hptime(100));
+	kprintf("us_to_hptime(10000)= %lu\n",   (unsigned long)us_to_hptime(10000));
 }
 
 static void timer_test_delay(void)
@@ -89,7 +89,7 @@ static void timer_test_hook(iptr_t _timer)
 {
 	Timer *timer = (Timer *)(void *)_timer;
 
-	kprintf("Timer %ld expired\n", ticks_to_ms(timer->_delay));
+	kprintf("Timer %lu expired\n", (unsigned long)ticks_to_ms(timer->_delay));
 	timer_add(timer);
 }
 
@@ -104,7 +104,7 @@ static void timer_test_async(void)
 	{
 		Timer *timer = &test_timers[i];
 		timer_setDelay(timer, ms_to_ticks(test_delays[i]));
-		timer_set_event_softint(timer, timer_test_hook, (iptr_t)timer);
+		timer_setSoftint(timer, timer_test_hook, (iptr_t)timer);
 		timer_add(timer);
 	}
 }
@@ -122,7 +122,7 @@ static void timer_test_poll(void)
 		{
 			++secs;
 			start_time += 1000;
-			kprintf("seconds = %d, ticks=%ld\n", secs, now);
+			kprintf("seconds = %d, ticks=%lu\n", secs, (unsigned long)now);
 		}
 		wdt_reset();
 	}

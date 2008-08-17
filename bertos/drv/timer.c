@@ -187,7 +187,7 @@ void timer_delayTicks(ticks_t delay)
 	Timer t;
 
 	ASSERT(!sig_check(SIG_SINGLE));
-	timer_set_event_signal(&t, proc_current(), SIG_SINGLE);
+	timer_setSignal(&t, proc_current(), SIG_SINGLE);
 	timer_setDelay(&t, delay);
 	timer_add(&t);
 	sig_wait(SIG_SINGLE);

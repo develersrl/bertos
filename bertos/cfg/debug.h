@@ -168,16 +168,23 @@
 	 * The assumption here is that valid pointers never point to low
 	 * memory regions.  This helps catching pointers taken from
 	 * struct/class memebers when the struct pointer was NULL.
+	 *
+	 * \see ASSERT_VALID_PTR_OR_NULL()
 	 */
-	#define ASSERT_VALID_PTR(p) ((void)(LIKELY((p) >= (void *)CPU_RAM_START) \
+	#define ASSERT_VALID_PTR(p) ((void)(LIKELY((void *)(p) >= (void *)CPU_RAM_START) \
 		? 0 : __invalid_ptr(p, #p, THIS_FILE, __LINE__)))
 
 	/**
 	 * Check that the given pointer is not pointing to invalid memory.
 	 *
+	 * \note The check for invalid memory is architecture specific and
+	 *       conservative.  The current implementation only checks against
+	 *       a lower bound.
+	 *
 	 * \see ASSERT_VALID_PTR()
 	 */
-	#define ASSERT_VALID_PTR_OR_NULL(p) ((void)(LIKELY((p == NULL) || ((p) >= (void *)CPU_RAM_START)) \
+	#define ASSERT_VALID_PTR_OR_NULL(p) ((void)(LIKELY((p == NULL) \
+		|| ((void *)(p) >= (void *)CPU_RAM_START)) \
 		? 0 : __invalid_ptr((p), #p, THIS_FILE, __LINE__)))
 
 	#if !CONFIG_KDEBUG_DISABLE_TRACE
