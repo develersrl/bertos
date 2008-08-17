@@ -28,7 +28,6 @@
  *
  * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999, 2001, 2003 Bernie Innocenti <bernie@codewiz.org>
- *
  * -->
  *
  * \brief Events handling
@@ -37,7 +36,6 @@
  * a user defined action calling a hook function.
  *
  * \version $Id$
- *
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
@@ -98,11 +96,11 @@ INLINE Event event_createNone(void)
 }
 
 /** Initialize the event \a e with a software interrupt (call function \a f, with parameter \a u) */
-#define event_initSoftInt(e,f,u) \
+#define event_initSoftint(e,f,u) \
 	((e)->action = event_hook_softint,(e)->Ev.Int.func = (f), (e)->Ev.Int.user_data = (u))
 
-/** Same as event_initSoftInt(), but returns the initialized event */
-INLINE Event event_createSoftInt(Hook func, void *user_data)
+/** Same as event_initSoftint(), but returns the initialized event */
+INLINE Event event_createSoftint(Hook func, void *user_data)
 {
 	Event e;
 	e.action = event_hook_softint;
@@ -111,6 +109,9 @@ INLINE Event event_createSoftInt(Hook func, void *user_data)
 	return e;
 }
 
+// OBSOLETE names
+#define event_createSoftInt event_createSoftint
+#define event_initSoftInt event_initSoftint
 
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 
