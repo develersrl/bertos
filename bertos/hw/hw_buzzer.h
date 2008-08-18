@@ -43,7 +43,7 @@
 
 #warning TODO:This is an example implementation, you must implement it!
 
-#define BUZZER_BIT      1 
+#define BUZZER_BIT      1
 #define IS_BUZZER_ON    0
 #define BUZZER_HW_INIT  do { /* Implement me! */ } while (0)
 #define BUZZER_ON       do { /* Implement me! */ } while (0)
