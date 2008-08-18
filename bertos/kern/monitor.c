@@ -83,28 +83,27 @@ size_t monitor_checkStack(cpustack_t *stack_base, size_t stack_size)
 	cpustack_t *beg;
 	cpustack_t *cur;
 	cpustack_t *end;
+	int inc;
 	size_t sp_free;
 
+
 	beg = stack_base;
-	end = stack_base + stack_size / sizeof(cpustack_t) - 1;
+	end = stack_base + stack_size / sizeof(cpustack_t);
+	inc = +1;
 
 	if (CPU_STACK_GROWS_UPWARD)
 	{
-		cur = beg;
-		beg = end;
-		end = cur;
+		SWAP(beg, end);
+		inc = -1;
 	}
 
 	cur = beg;
-	while (cur != end)
+	while (beg != end)
 	{
 		if (*cur != CONFIG_KERN_STACKFILLCODE)
 			break;
 
-		if (CPU_STACK_GROWS_UPWARD)
-			cur--;
-		else
-			cur++;
+		cur += inc;
 	}
 
 	sp_free = ABS(cur - beg) * sizeof(cpustack_t);
