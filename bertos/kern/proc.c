@@ -218,12 +218,12 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 		/* Push a clean set of CPU registers for asm_switch_context() */
 		for (i = 0; i < CPU_SAVED_REGS_CNT; i++)
 			CPU_PUSH_WORD(proc->stack, CPU_REG_INIT_VALUE(i));
-
-		/* Add to ready list */
-		ATOMIC(SCHED_ENQUEUE(proc));
-		ATOMIC(LIST_ASSERT_VALID(&ProcReadyList));
 	}
 	#endif // CONFIG_KERN_PREEMPT
+
+	/* Add to ready list */
+	ATOMIC(SCHED_ENQUEUE(proc));
+	ATOMIC(LIST_ASSERT_VALID(&ProcReadyList));
 
 	#if CONFIG_KERN_MONITOR
 		monitor_add(proc, name);
