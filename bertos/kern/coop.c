@@ -27,11 +27,10 @@
  * the GNU General Public License.
  *
  * Copyright 2001, 2004, 2008 Develer S.r.l. (http://www.develer.com/)
- * Copyright 1999, 2000, 2001 Bernie Innocenti <bernie@codewiz.org>
+ * Copyright 1999, 2000, 2001, 2008 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
- * \brief Simple realtime multitasking scheduler.
- *        Context switching is only done cooperatively.
+ * \brief Simple cooperative multitasking scheduler.
  *
  * \version $Id: proc.c 1616 2008-08-10 19:41:26Z bernie $
  * \author Bernie Innocenti <bernie@codewiz.org>
