@@ -57,29 +57,22 @@ void irq_entry(int signum)
 	irq_handlers[signum]();
 
 #if CONFIG_KERN_PREEMPT
-	if (!CurrentProcess)
-	{
-		TRACEMSG("no runnable processes!");
-		IRQ_ENABLE;
-		pause();
-	}
-	else
-	{
-		if (old_process != CurrentProcess)
-		{
-			TRACEMSG("switching from %p:%s to %p:%s",
-				old_process, old_process ? old_process->monitor.name : "-",
-				CurrentProcess, CurrentProcess->monitor.name);
+	ASSERT2(CurrentProcess, "no idle proc?");
 
-			if (old_process)
-				swapcontext(&old_process->context, &CurrentProcess->context);
-			else
-				setcontext(&CurrentProcess->context);
+	if (old_process != CurrentProcess)
+	{
+		TRACEMSG("switching from %p:%s to %p:%s",
+			old_process, old_process ? old_process->monitor.name : "---",
+			CurrentProcess, CurrentProcess->monitor.name);
 
-			// not reached
-		}
-		TRACEMSG("keeping %p:%s", CurrentProcess, CurrentProcess->monitor.name);
+		if (old_process)
+			swapcontext(&old_process->context, &CurrentProcess->context);
+		else
+			setcontext(&CurrentProcess->context);
+
+		// not reached
 	}
+	//TRACEMSG("keeping %p:%s", CurrentProcess, CurrentProcess->monitor.name);
 #endif // CONFIG_KERN_PREEMPT
 }
 
@@ -97,9 +90,7 @@ void irq_init(void)
 	act.sa_flags = SA_RESTART; // | SA_SIGINFO;
 
 	sigaction(SIGUSR1, &act, NULL);
-	#if !(ARCH & ARCH_QT)
-		sigaction(SIGALRM, &act, NULL);
-	#endif
+	sigaction(SIGALRM, &act, NULL);
 
 	MOD_INIT(irq);
 }

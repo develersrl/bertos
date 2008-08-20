@@ -28,7 +28,6 @@
  *
  * Copyright 2004, 2008 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999, 2000, 2001 Bernie Innocenti <bernie@codewiz.org>
- *
  * -->
  *
  * \brief IPC signals implementation.
@@ -96,7 +95,6 @@
  *    timer_delayTickes().
  *
  * \version $Id$
- *
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
@@ -106,7 +104,7 @@
 #include <drv/timer.h>
 #include <kern/proc.h>
 #include <kern/proc_p.h>
- 
+
 
 #if CONFIG_KERN_SIGNALS
 

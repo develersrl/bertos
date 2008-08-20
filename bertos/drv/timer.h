@@ -51,7 +51,8 @@
  * Try the CPU specific one for bare-metal environments.
  */
 #if OS_HOSTED
-	#include OS_HEADER(timer)
+	//#include OS_HEADER(timer)
+	#include <emul/timer_posix.h>
 #else
 	#include CPU_HEADER(timer)
 #endif

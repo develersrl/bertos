@@ -29,8 +29,7 @@
  * Copyright 2008 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
- * \brief Simple realtime multitasking scheduler.
- *        Context switching is only done cooperatively.
+ * \brief Simple preemptive multitasking scheduler.
  *
  * \version $Id: proc.c 1616 2008-08-10 19:41:26Z bernie $
  * \author Bernie Innocenti <bernie@codewiz.org>
@@ -40,16 +39,12 @@
 #include "proc.h"
 
 #include <kern/irq.h>
+#include <kern/monitor.h>
 #include <cpu/frame.h> // CPU_IDLE
 #include <drv/timer.h>
 #include <cfg/module.h>
 
 
-/*
- * The time sharing scheduler forces a task switch when the current
- * process has exhausted its quantum.
- */
-uint16_t Quantum;
 
 Timer preempt_timer;
 
@@ -87,48 +82,31 @@ void proc_permit(void)
 
 void proc_preempt(void)
 {
-	TRACE;
-
-	ATOMIC(LIST_ASSERT_VALID(&ProcReadyList));
-
-	TRACEMSG("hello1");
 	IRQ_DISABLE;
-	/* Poll on the ready queue for the first ready process */
-	while (!(CurrentProcess = (struct Process *)list_remHead(&ProcReadyList)))
-	{
-	//TRACEMSG("hello2");
-		/*
-		 * Make sure we physically reenable interrupts here, no matter what
-		 * the current task status is. This is important because if we
-		 * are idle-spinning, we must allow interrupts, otherwise no
-		 * process will ever wake up.
-		 *
-		 * During idle-spinning, an interrupt can occur and it may
-		 * modify \p ProcReadyList. To ensure that compiler reload this
-		 * variable every while cycle we call CPU_MEMORY_BARRIER.
-		 * The memory barrier ensure that all variables used in this context
-		 * are reloaded.
-		 */
-		IRQ_ENABLE;
-		//FIXME: calls Qt stuff from sighandler! CPU_IDLE;
-		MEMORY_BARRIER;
-		IRQ_DISABLE;
-	//TRACEMSG("hello3");
-	}
+
+	LIST_ASSERT_VALID(&ProcReadyList);
+	CurrentProcess = (struct Process *)list_remHead(&ProcReadyList);
+	LIST_ASSERT_VALID(&ProcReadyList);
+	ASSERT2(CurrentProcess, "no idle proc?");
+
 	IRQ_ENABLE;
-	TRACEMSG("hello4");
+
+	TRACEMSG("new proc: %p:%s", CurrentProcess, CurrentProcess ? CurrentProcess->monitor.name : "---");
+	monitor_report();
 }
 
 void proc_preempt_timer(UNUSED_ARG(void *, param))
 {
 	IRQ_DISABLE;
-	if (CurrentProcess)
+/*
+	if (!CurrentProcess->forbid_cnt)
 	{
 		TRACEMSG("preempting %p:%s", CurrentProcess, CurrentProcess->monitor.name);
+		LIST_ASSERT_VALID(&ProcReadyList);
 		SCHED_ENQUEUE(CurrentProcess);
-		IRQ_ENABLE;
 		proc_preempt();
 	}
+*/
 	IRQ_ENABLE;
 
 	timer_setDelay(&preempt_timer, CONFIG_KERN_QUANTUM);
@@ -145,15 +123,43 @@ void proc_schedule(void)
 
 void proc_yield(void)
 {
-	ATOMIC(SCHED_ENQUEUE(CurrentProcess));
+	TRACE;
 
+	ASSERT_IRQ_ENABLED();
+	IRQ_DISABLE;
+	SCHED_ENQUEUE(CurrentProcess);
+	LIST_ASSERT_VALID(&ProcReadyList);
 	proc_schedule();
+	IRQ_ENABLE;
 }
 
 void proc_entry(void (*user_entry)(void))
 {
 	user_entry();
 	proc_exit();
+}
+
+
+static cpustack_t idle_stack[CONFIG_PROC_DEFSTACKSIZE / sizeof(cpustack_t)];
+
+/*
+ * The idle process
+ *
+ * This process never dies and never sleeps.  It's also quite apathic
+ * and a bit antisocial.
+ *
+ * Having an idle process costs some stack space, but simplifies the
+ * interrupt-driven preemption logic because there is always a user
+ * context to which we can return.
+ */
+static NORETURN void idle(void)
+{
+	for (;;)
+	{
+		TRACE;
+		monitor_report();
+		proc_yield(); // FIXME: CPU_IDLE
+	}
 }
 
 void preempt_init(void)
@@ -166,4 +172,6 @@ void preempt_init(void)
 	timer_setSoftint(&preempt_timer, proc_preempt_timer, NULL);
 	timer_setDelay(&preempt_timer, CONFIG_KERN_QUANTUM);
 	timer_add(&preempt_timer);
+
+	proc_new(idle, NULL, sizeof(idle_stack), idle_stack);
 }

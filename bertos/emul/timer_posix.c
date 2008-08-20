@@ -29,17 +29,20 @@
  * Copyright 2005, 2008 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \version $Id$
- *
- * \author Bernie Innocenti <bernie@codewiz.org>
  * \brief Low-level timer module for Qt emulator (implementation).
+ *
+ * \version $Id$
+ * \author Bernie Innocenti <bernie@codewiz.org>
  */
-#include <cfg/compiler.h> // hptime.t
+//#include <cfg/compiler.h> // hptime.t
 #include <os/hptime.h>
+#include <kern/irq.h>     // irq_register()
 
+#if !CONFIG_KERN_IRQ
 #include <signal.h>       // sigaction()
-#include <sys/time.h>     // setitimer()
 #include <string.h>       // memset()
+#endif
+#include <sys/time.h>     // setitimer()
 
 
 // Forward declaration for the user interrupt server routine.
@@ -48,19 +51,19 @@ void timer_isr(int);
 /// HW dependent timer initialization.
 static void timer_hw_init(void)
 {
-#if CONFIG_KERN_IRQ
-	irq_register(SIGALRM, timer_isr);
-#else // ! CONFIG_KERN_IRQ
-	struct sigaction sa;
-	memset(&sa, 0, sizeof(sa));
+	#if CONFIG_KERN_IRQ
+		irq_register(SIGALRM, (void (*)(void))timer_isr);
+	#else // ! CONFIG_KERN_IRQ
+		struct sigaction sa;
+		memset(&sa, 0, sizeof(sa));
 
-	// Setup interrupt callback
-	sa.sa_handler = timer_isr;
-	sigemptyset(&sa.sa_mask);
-	sigaddset(&sa.sa_mask, SIGALRM);
-	sa.sa_flags = SA_RESTART;
-	sigaction(SIGALRM, &sa, NULL);
-#endif // CONFIG_KERN_IRQ
+		// Setup interrupt callback
+		sa.sa_handler = timer_isr;
+		sigemptyset(&sa.sa_mask);
+		sigaddset(&sa.sa_mask, SIGALRM);
+		sa.sa_flags = SA_RESTART;
+		sigaction(SIGALRM, &sa, NULL);
+	#endif // CONFIG_KERN_IRQ
 
 	// Setup POSIX realtime timer to interrupt every 1/TIMER_TICKS_PER_SEC.
 	static const struct itimerval itv =
