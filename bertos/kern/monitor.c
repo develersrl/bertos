@@ -98,7 +98,7 @@ size_t monitor_checkStack(cpustack_t *stack_base, size_t stack_size)
 	}
 
 	cur = beg;
-	while (beg != end)
+	while (cur != end)
 	{
 		if (*cur != CONFIG_KERN_STACKFILLCODE)
 			break;
