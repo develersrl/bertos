@@ -245,14 +245,18 @@
 
 #ifdef IRQ_ENABLED
 	/// Ensure interrupts are enabled
-	#define ASSERT_IRQ_ENABLED()  ASSERT(IRQ_ENABLED())
+	#define IRQ_ASSERT_ENABLED()  ASSERT(IRQ_ENABLED())
 
 	/// Ensure interrupts are not enabled
-	#define ASSERT_IRQ_DISABLED() ASSERT(IRQ_ENABLED())
+	#define IRQ_ASSERT_DISABLED() ASSERT(!IRQ_ENABLED())
 #else
-	#define ASSERT_IRQ_ENABLED() do {} while(0)
-	#define ASSERT_IRQ_DISABLED() do {} while(0)
+	#define IRQ_ASSERT_ENABLED() do {} while(0)
+	#define IRQ_ASSERT_DISABLED() do {} while(0)
 #endif
+
+// OBSOLETE names
+#define ASSERT_IRQ_ENABLED()  IRQ_ASSERT_ENABLED()
+#define ASSERT_IRQ_DISABLED() IRQ_ASSERT_DISABLED()
 
 /**
  * Execute \a CODE atomically with respect to interrupts.
