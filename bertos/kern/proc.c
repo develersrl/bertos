@@ -90,10 +90,6 @@ static void proc_init_struct(Process *proc)
 	proc->sig_recv = 0;
 #endif
 
-#if CONFIG_KERN_PREEMPT
-	proc->forbid_cnt = 0;
-#endif
-
 #if CONFIG_KERN_HEAP
 	proc->flags = 0;
 #endif
@@ -223,7 +219,6 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 
 	/* Add to ready list */
 	ATOMIC(SCHED_ENQUEUE(proc));
-	ATOMIC(LIST_ASSERT_VALID(&ProcReadyList));
 
 	#if CONFIG_KERN_MONITOR
 		monitor_add(proc, name);
@@ -232,7 +227,28 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 	return proc;
 }
 
-/** Rename a process */
+/**
+ * Return the name of the specified process.
+ *
+ * NULL is a legal argument and will return the name "<NULL>".
+ */
+const char *proc_name(struct Process *proc)
+{
+	#if CONFIG_KERN_MONITOR
+		return proc ? proc->monitor.name : "<NULL>";
+	#else
+		(void)proc;
+		return "---";
+	#endif
+}
+
+/// Return the name of the currently running process
+const char *proc_currentName(void)
+{
+	return proc_name(proc_current());
+}
+
+/// Rename a process
 void proc_rename(struct Process *proc, const char *name)
 {
 #if CONFIG_KERN_MONITOR
@@ -242,13 +258,12 @@ void proc_rename(struct Process *proc, const char *name)
 #endif
 }
 
-
 /**
  * Terminate the current process
  */
 void proc_exit(void)
 {
-	TRACEMSG("%p:%s", CurrentProcess, CurrentProcess->monitor.name);
+	TRACEMSG("%p:%s", CurrentProcess, proc_currentName());
 
 #if CONFIG_KERN_MONITOR
 	monitor_remove(CurrentProcess);
@@ -297,7 +312,7 @@ struct Process *proc_current(void)
 /**
  * Get the pointer to the user data of the current process
  */
-iptr_t proc_current_user_data(void)
+iptr_t proc_currentUserData(void)
 {
 	return CurrentProcess->user_data;
 }

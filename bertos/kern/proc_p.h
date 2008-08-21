@@ -62,12 +62,6 @@ typedef struct Process
 	sigmask_t    sig_recv;    /**< Received signals */
 #endif
 
-#if CONFIG_KERN_PREEMPTIVE
-	int          forbid_cnt;  /**< Nesting count for proc_forbid()/proc_permit(). */
-	bool         leaving;     /**< XXX: maybe global? */
-	ucontext_t   context;
-#endif
-
 #if CONFIG_KERN_HEAP
 	uint16_t     flags;       /**< Flags */
 #endif
@@ -75,6 +69,10 @@ typedef struct Process
 #if CONFIG_KERN_HEAP | CONFIG_KERN_MONITOR | (ARCH & ARCH_EMUL)
 	cpustack_t  *stack_base;  /**< Base of process stack */
 	size_t       stack_size;  /**< Size of process stack */
+#endif
+
+#if CONFIG_KERN_PREEMPTIVE
+	ucontext_t   context;
 #endif
 
 #if CONFIG_KERN_MONITOR
@@ -117,7 +115,10 @@ extern REGISTER List     ProcReadyList;
  * \note This macro is *NOT* protected against the scheduler.  Access to
  *       this list must be performed with interrupts disabled.
  */
-#define SCHED_ENQUEUE(proc)  ADDTAIL(&ProcReadyList, &(proc)->link)
+#define SCHED_ENQUEUE(proc)  do { \
+		LIST_ASSERT_VALID(&ProcReadyList); \
+		ADDTAIL(&ProcReadyList, &(proc)->link); \
+	} while (0)
 
 /** Schedule to another process *without* adding the current to the ready list. */
 void proc_schedule(void);

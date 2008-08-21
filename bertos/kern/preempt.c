@@ -41,43 +41,14 @@
 #include <kern/irq.h>
 #include <kern/monitor.h>
 #include <cpu/frame.h> // CPU_IDLE
+#include <cpu/irq.h>   // IRQ_DISABLE()...
 #include <drv/timer.h>
 #include <cfg/module.h>
 
 
+int preempt_forbid_cnt;
 
 Timer preempt_timer;
-
-/**
- * Disable preemptive task switching.
- *
- * The scheduler maintains a per-process nesting counter.  Task switching is
- * effectively re-enabled only when the number of calls to proc_permit()
- * matches the number of calls to proc_forbid().
- *
- * Calling functions that could sleep while task switching is disabled
- * is dangerous, although supported.  Preemptive task switching is
- * resumed while the process is sleeping and disabled again as soon as
- * it wakes up again.
- *
- * \sa proc_permit()
- */
-void proc_forbid(void)
-{
-	/* No need to protect against interrupts here. */
-	++CurrentProcess->forbid_cnt;
-}
-
-/**
- * Re-enable preemptive task switching.
- *
- * \sa proc_forbid()
- */
-void proc_permit(void)
-{
-	/* No need to protect against interrupts here. */
-	--CurrentProcess->forbid_cnt;
-}
 
 
 void proc_preempt(void)
@@ -97,12 +68,15 @@ void proc_preempt(void)
 
 void proc_preempt_timer(UNUSED_ARG(void *, param))
 {
+	/* Abort if task preemption is disabled */
+	if (preempt_forbid_cnt)
+		return;
+
 	IRQ_DISABLE;
 /*
 	if (!CurrentProcess->forbid_cnt)
 	{
 		TRACEMSG("preempting %p:%s", CurrentProcess, CurrentProcess->monitor.name);
-		LIST_ASSERT_VALID(&ProcReadyList);
 		SCHED_ENQUEUE(CurrentProcess);
 		proc_preempt();
 	}
@@ -115,7 +89,13 @@ void proc_preempt_timer(UNUSED_ARG(void *, param))
 
 void proc_schedule(void)
 {
-	TRACE;
+	ATOMIC(LIST_ASSERT_VALID(&ProcReadyList));
+	TRACEMSG("%p:%s", CurrentProcess, proc_currentName());
+	ATOMIC(LIST_ASSERT_VALID(&ProcReadyList));
+
+	/* Sleeping with IRQs disabled or preemption forbidden is illegal */
+	ASSERT_IRQ_ENABLED();
+	ASSERT(preempt_forbid_cnt == 0);
 
 	// Will invoke proc_preempt() in interrupt context
 	kill(0, SIGUSR1);
@@ -123,14 +103,13 @@ void proc_schedule(void)
 
 void proc_yield(void)
 {
-	TRACE;
+	TRACEMSG("%p:%s", CurrentProcess, proc_currentName());
 
-	ASSERT_IRQ_ENABLED();
 	IRQ_DISABLE;
 	SCHED_ENQUEUE(CurrentProcess);
-	LIST_ASSERT_VALID(&ProcReadyList);
-	proc_schedule();
 	IRQ_ENABLE;
+
+	proc_schedule();
 }
 
 void proc_entry(void (*user_entry)(void))
@@ -142,10 +121,11 @@ void proc_entry(void (*user_entry)(void))
 
 static cpustack_t idle_stack[CONFIG_PROC_DEFSTACKSIZE / sizeof(cpustack_t)];
 
-/*
+// FIXME: move this to kern/idle.c
+/**
  * The idle process
  *
- * This process never dies and never sleeps.  It's also quite apathic
+ * This process never dies and never sleeps.  It's also quite lazy, apathic
  * and a bit antisocial.
  *
  * Having an idle process costs some stack space, but simplifies the
@@ -157,7 +137,7 @@ static NORETURN void idle(void)
 	for (;;)
 	{
 		TRACE;
-		monitor_report();
+		//monitor_report();
 		proc_yield(); // FIXME: CPU_IDLE
 	}
 }

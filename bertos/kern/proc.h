@@ -41,9 +41,16 @@
 #include "cfg/cfg_kern.h"
 #include <cfg/compiler.h>
 
-#include <cpu/irq.h>
+#if CONFIG_KERN_PREEMPT
+	#include <cfg/debug.h> // ASSERT()
+#endif
 
-/* Fwd decl */
+#include <cpu/types.h> // cpustack_t
+
+/*
+ * Forward declaration. The definition of struct Process is private to the
+ * scheduler and hidden in proc_p.h.
+ */
 struct Process;
 
 /* Task scheduling services */
@@ -65,16 +72,72 @@ int proc_testRun(void);
 int proc_testTearDown(void);
 
 struct Process *proc_current(void);
-iptr_t proc_current_user_data(void);
-void proc_rename(struct Process *proc, const char* name);
+iptr_t proc_currentUserData(void);
+void proc_rename(struct Process *proc, const char *name);
+const char *proc_name(struct Process *proc);
+const char *proc_currentName(void);
 
-#if CONFIG_KERN_PREEMPT
-	void proc_forbid(void);
-	void proc_permit(void);
-#else
-	INLINE void proc_forbid(void) { /* nop */ }
-	INLINE void proc_permit(void) { /* nop */ }
-#endif
+/**
+ * Disable preemptive task switching.
+ *
+ * The scheduler maintains a global nesting counter.  Task switching is
+ * effectively re-enabled only when the number of calls to proc_permit()
+ * matches the number of calls to proc_forbid().
+ *
+ * \note Calling functions that could sleep while task switching is disabled
+ * is dangerous and unsupported.
+ *
+ * \note proc_permit() expands inline to 1-2 asm instructions, so it's a
+ * very efficient locking primitive in simple but performance-critical
+ * situations.  In all other cases, semaphores offer a more flexible and
+ * fine-grained locking primitive.
+ *
+ * \sa proc_permit()
+ */
+INLINE void proc_forbid(void)
+{
+	#if CONFIG_KERN_PREEMPT
+		// No need to protect against interrupts here.
+		extern int preempt_forbid_cnt;
+		++preempt_forbid_cnt;
+
+		/*
+		 * Make sure preempt_forbid_cnt is flushed to memory so the
+		 * preemption softirq will see the correct value from now on.
+		 */
+		MEMORY_BARRIER;
+	#endif
+}
+
+/**
+ * Re-enable preemptive task switching.
+ *
+ * \sa proc_forbid()
+ */
+INLINE void proc_permit(void)
+{
+	#if CONFIG_KERN_PREEMPT
+
+		/*
+		 * This is to ensure any global state changed by the process gets
+		 * flushed to memory before task switching is re-enabled.
+		 */
+		MEMORY_BARRIER;
+
+		/* No need to protect against interrupts here. */
+		extern int preempt_forbid_cnt;
+		--preempt_forbid_cnt;
+		ASSERT(preempt_forbid_cnt >= 0);
+
+		/*
+		 * This ensures preempt_forbid_cnt is flushed to memory immediately
+		 * so the preemption interrupt sees the correct value.
+		 */
+		MEMORY_BARRIER;
+
+	#endif
+}
+
 
 /**
  * Execute a block of \a CODE atomically with respect to task scheduling.
