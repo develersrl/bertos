@@ -1,10 +1,10 @@
 #
-# $Id: demo.mk 18234 2007-10-08 13:39:48Z rasky $
 # Copyright 2003, 2004, 2005, 2006 Develer S.r.l. (http://www.develer.com/)
-# All rights reserved.
+# Copyright 2008 Bernie Innocenti <bernie@codewiz.org>
 #
 # Makefile fragment for DevLib demo application.
 #
+# Version: $Id: demo.mk 18234 2007-10-08 13:39:48Z rasky $
 # Author: Bernie Innocenti <bernie@codewiz.org>
 #
 
@@ -52,6 +52,7 @@ demo_CSRC = \
 	bertos/mware/observer.c \
 	bertos/mware/resource.c \
 	bertos/mware/sprintf.c \
+	bertos/kern/idle.c \
 	bertos/kern/irq.c \
 	bertos/kern/preempt.c \
 	bertos/kern/proc.c \

@@ -51,6 +51,10 @@ int preempt_forbid_cnt;
 Timer preempt_timer;
 
 
+// fwd decl from idle.c
+void idle_init(void);
+
+
 void proc_preempt(void)
 {
 	IRQ_DISABLE;
@@ -118,30 +122,6 @@ void proc_entry(void (*user_entry)(void))
 	proc_exit();
 }
 
-
-static cpustack_t idle_stack[CONFIG_PROC_DEFSTACKSIZE / sizeof(cpustack_t)];
-
-// FIXME: move this to kern/idle.c
-/**
- * The idle process
- *
- * This process never dies and never sleeps.  It's also quite lazy, apathic
- * and a bit antisocial.
- *
- * Having an idle process costs some stack space, but simplifies the
- * interrupt-driven preemption logic because there is always a user
- * context to which we can return.
- */
-static NORETURN void idle(void)
-{
-	for (;;)
-	{
-		TRACE;
-		//monitor_report();
-		proc_yield(); // FIXME: CPU_IDLE
-	}
-}
-
 void preempt_init(void)
 {
 	MOD_CHECK(irq);
@@ -153,5 +133,5 @@ void preempt_init(void)
 	timer_setDelay(&preempt_timer, CONFIG_KERN_QUANTUM);
 	timer_add(&preempt_timer);
 
-	proc_new(idle, NULL, sizeof(idle_stack), idle_stack);
+	idle_init();
 }
