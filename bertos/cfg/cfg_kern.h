@@ -44,7 +44,8 @@
 /**
  * Enable the multithreading kernel.
  */
-#define CONFIG_KERNEL 0
+#define CONFIG_KERN 0
+#define CONFIG_KERNEL CONFIG_KERN // OBSOLETE
 
 /**
  * \name Optional kernel features

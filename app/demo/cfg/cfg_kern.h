@@ -44,7 +44,8 @@
 /**
  * Enable the multithreading kernel.
  */
-#define CONFIG_KERNEL 1
+#define CONFIG_KERN  1
+#define CONFIG_KERNEL CONFIG_KERN // OBSOLETE
 
 /**
  * \name Optional kernel features
@@ -65,7 +66,7 @@
 /* OBSOLETE */
 #define CONFIG_KERN_PREEMPTIVE CONFIG_KERN_PREEMPT
 
-/// Time sharing quantum in timer ticks.
+/// [ms] Time sharing quantum (a prime number prevents interference effects)
 #define CONFIG_KERN_QUANTUM     50
 
 /// Module logging level.
