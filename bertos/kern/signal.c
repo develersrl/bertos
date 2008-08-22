@@ -92,7 +92,7 @@
  *  - Do not sleep between starting the asynchronous task that will fire
  *    SIG_SINGLE, and the call to  sig_wait().
  *  - Do not call system functions that may implicitly sleep, such as
- *    timer_delayTickes().
+ *    timer_delayTicks().
  *
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
@@ -100,8 +100,9 @@
 
 #include "signal.h"
 
+#include <cfg/cfg_timer.h>
 #include <cfg/debug.h>
-#include <drv/timer.h>
+#include <cpu/irq.h>
 #include <kern/proc.h>
 #include <kern/proc_p.h>
 
@@ -110,6 +111,7 @@
 
 /**
  * Check if any of the signals in \a sigs has occurred and clear them.
+ *
  * \return the signals that have occurred.
  */
 sigmask_t sig_check(sigmask_t sigs)
@@ -134,17 +136,22 @@ sigmask_t sig_wait(sigmask_t sigs)
 {
 	sigmask_t result;
 	cpuflags_t flags;
+	extern int preempt_forbid_cnt;
+
+	/* Sleeping with IRQs disabled or preemption forbidden is illegal */
+	IRQ_ASSERT_ENABLED();
+	ASSERT(preempt_forbid_cnt == 0);
 
 	/*
 	 * This is subtle: there's a race condition where a concurrent
-	 * process or an interrupt calls sig_signal() to set a bit in
-	 * out sig_recv just after we have checked for it, but before
-	 * we've set sig_wait to tell them we want to be awaken.
+	 * process or an interrupt may call sig_signal() to set a bit in
+	 * Process.sig_recv just after we have checked for it, but before
+	 * we've set Process.sig_wait to let them know we want to be awaken.
 	 *
-	 * In this case, we'd deadlock with the signal bit already
-	 * set and the process never being reinserted into the ready
-	 * list.
+	 * In this case, we'd deadlock with the signal bit already set
+	 * and the process never being reinserted into the ready list.
 	 */
+	// FIXME: just use IRQ_DISABLE() here
 	IRQ_SAVE_DISABLE(flags);
 
 	/* Loop until we get at least one of the signals */
@@ -183,6 +190,9 @@ sigmask_t sig_wait(sigmask_t sigs)
 	return result;
 }
 
+#if CONFIG_TIMER_EVENTS
+
+#include <drv/timer.h>
 /**
  * Sleep until any of the signals in \a sigs or \a timeout ticks elapse.
  * If the timeout elapse a SIG_TIMEOUT is added to the received signal(s).
@@ -212,6 +222,8 @@ sigmask_t sig_waitTimeout(sigmask_t sigs, ticks_t timeout)
 	IRQ_RESTORE(flags);
 	return res;
 }
+
+#endif // CONFIG_TIMER_EVENTS
 
 
 /**
