@@ -58,6 +58,9 @@
 
 /**
  * Draw a pentacle in the provided bitmap.
+ *
+ * This is invoked by the keyboard polling routine, as a poor man's surrogate
+ * of true task switching.
  */
 void schedule(void)
 {
