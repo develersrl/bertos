@@ -60,6 +60,10 @@
 		#define IRQ_RESTORE(x)          FIXME
 	#endif /* OS_EMBEDDED */
 
+	#ifdef __GNUC__
+		#define BREAKPOINT  asm volatile ("int 3" ::)
+	#endif
+
 #elif CPU_ARM
 
 	#ifdef __IAR_SYSTEMS_ICC__
@@ -163,6 +167,10 @@
 		#define IRQ_RESTORE(x)      FIXME
 		#define IRQ_ENABLED()       FIXME
 	#endif /* OS_EMBEDDED */
+
+	#ifdef __GNUC__
+		#define BREAKPOINT  asm volatile ("twge 2,2" ::)
+	#endif
 
 #elif CPU_DSP56K
 
