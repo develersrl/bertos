@@ -116,7 +116,7 @@ void monitor_report(void)
 	Node *node;
 	int i;
 
-	kprintf("%-8s%-8s%-8s%-8s %s\n", "TCB", "SPbase", "SPsize", "SPfree", "Name");
+	kprintf("%-9s%-9s%-9s%-9s%s\n", "TCB", "SPbase", "SPsize", "SPfree", "Name");
 	for (i = 0; i < 56; i++)
 		kputchar('-');
 	kputchar('\n');
@@ -126,7 +126,7 @@ void monitor_report(void)
 	{
 		Process *p = containerof(node, Process, monitor.link);
 		size_t free = monitor_checkStack(p->stack_base, p->stack_size);
-		kprintf("%-8p%-8p%-8zu%-8zu %s\n",
+		kprintf("%-9p%-9p%-9zu%-9zu%s\n",
 			p, p->stack_base, p->stack_size, free, p->monitor.name);
 	}
 	proc_permit();
