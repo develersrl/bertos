@@ -149,11 +149,11 @@ INLINE void proc_permit(void)
 		proc_permit(); \
 	} while(0)
 
-#ifndef CONFIG_PROC_DEFSTACKSIZE
+#ifndef CONFIG_KERN_MINSTACKSIZE
 
 	#if (ARCH & ARCH_EMUL)
 		/* We need a large stack because system libraries are bloated */
-		#define CONFIG_PROC_DEFSTACKSIZE  65536
+		#define CONFIG_KERN_MINSTACKSIZE  65536
 	#else
 		/**
 		 * Default stack size for each thread, in bytes.
@@ -174,11 +174,13 @@ INLINE void proc_permit(void)
 		 * required per process.  Use irqmanager to minimize stack
 		 * usage.
 		 */
-		#define CONFIG_PROC_DEFSTACKSIZE  \
+		#define CONFIG_KERN_MINSTACKSIZE  \
 		    (CPU_SAVED_REGS_CNT * 2 * sizeof(cpustack_t) \
 		    + 32 * sizeof(int))
 	#endif
 #endif
+
+#define CONFIG_PROC_DEFSTACKSIZE CONFIG_KERN_MINSTACKSIZE // OBSOLETE
 
 /* Memory fill codes to help debugging */
 #if CONFIG_KERN_MONITOR
