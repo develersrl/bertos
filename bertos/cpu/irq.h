@@ -60,9 +60,6 @@
 		#define IRQ_RESTORE(x)          FIXME
 	#endif /* OS_EMBEDDED */
 
-	#ifdef __GNUC__
-		#define BREAKPOINT  asm volatile ("int 3" ::)
-	#endif
 
 #elif CPU_ARM
 
@@ -95,8 +92,6 @@
 
 		#define IRQ_ENABLED() \
 			((bool)(get_CPSR() & 0xb0))
-
-		#define BREAKPOINT  /* asm("bkpt 0") DOES NOT WORK */
 
 	#else /* !__IAR_SYSTEMS_ICC__ */
 
@@ -168,13 +163,8 @@
 		#define IRQ_ENABLED()       FIXME
 	#endif /* OS_EMBEDDED */
 
-	#ifdef __GNUC__
-		#define BREAKPOINT  asm volatile ("twge 2,2" ::)
-	#endif
-
 #elif CPU_DSP56K
 
-	#define BREAKPOINT              asm(debug)
 	#define IRQ_DISABLE             do { asm(bfset #0x0200,SR); asm(nop); } while (0)
 	#define IRQ_ENABLE              do { asm(bfclr #0x0200,SR); asm(nop); } while (0)
 
@@ -279,10 +269,6 @@
 		IRQ_RESTORE(__flags); \
 	} while (0)
 
-
-#ifndef BREAKPOINT
-#define BREAKPOINT /* nop */
-#endif
 
 
 #endif /* CPU_IRQ_H */

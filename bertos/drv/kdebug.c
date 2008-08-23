@@ -28,7 +28,6 @@
  *
  * Copyright 2003, 2004, 2005, 2006, 2007 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000, 2001, 2002 Bernie Innocenti <bernie@codewiz.org>
- *
  * -->
  *
  * \brief General pourpose debug support for embedded systems (implementation).
@@ -43,7 +42,6 @@
 #include <cfg/debug.h>
 #include <cfg/os.h>
 
-#include <cpu/irq.h>
 #include <cpu/attr.h>
 #include <cpu/types.h>
 

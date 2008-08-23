@@ -28,7 +28,6 @@
  *
  * Copyright 2004, 2005, 2006, 2007, 2008 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2004 Giovanni Bajo
- *
  * -->
  *
  * \brief CPU-specific attributes.
@@ -75,8 +74,6 @@
 
 #elif CPU_X86
 
-	#define NOP                     asm volatile ("nop")
-
 	#define CPU_REGS_CNT            7
 	#define CPU_BYTE_ORDER          CPU_LITTLE_ENDIAN
 	#define CPU_HARVARD             0
@@ -93,7 +90,12 @@
 	#endif
 
 	/// Valid pointers should be >= than this value (used for debug)
-	#define CPU_RAM_START		0x1000
+	#define CPU_RAM_START      0x1000
+
+	#ifdef __GNUC__
+		#define NOP         asm volatile ("nop")
+		#define BREAKPOINT  asm volatile ("int 3" ::)
+	#endif
 
 #elif CPU_ARM
 
@@ -121,6 +123,7 @@
   		#endif
 
 		#define NOP            asm volatile ("mov r0,r0" ::)
+		#define BREAKPOINT  /* asm("bkpt 0") DOES NOT WORK */
 
 		#if CONFIG_FAST_MEM
 			/**
@@ -154,19 +157,20 @@
 
 #elif CPU_PPC
 
-	#define NOP                    asm volatile ("nop" ::)
-
 	#define CPU_REG_BITS           (CPU_PPC32 ? 32 : 64)
 	#define CPU_REGS_CNT           FIXME
 	#define CPU_BYTE_ORDER         (__BIG_ENDIAN__ ? CPU_BIG_ENDIAN : CPU_LITTLE_ENDIAN)
 	#define CPU_HARVARD            0
 
 	/// Valid pointers should be >= than this value (used for debug)
-	#define CPU_RAM_START		0x1000
+	#define CPU_RAM_START          0x1000
+
+	#ifdef __GNUC__
+	    #define NOP         asm volatile ("nop" ::)
+		#define BREAKPOINT  asm volatile ("twge 2,2" ::)
+	#endif
 
 #elif CPU_DSP56K
-
-	#define NOP                     asm(nop)
 
 	#define CPU_REG_BITS            16
 	#define CPU_REGS_CNT            FIXME
@@ -181,7 +185,10 @@
 	#define SIZEOF_PTR          1
 
 	/// Valid pointers should be >= than this value (used for debug)
-	#define CPU_RAM_START		0x200
+	#define CPU_RAM_START       0x200
+
+	#define NOP                     asm(nop)
+	#define BREAKPOINT              asm(debug)
 
 #elif CPU_AVR
 
@@ -193,10 +200,14 @@
 	#define CPU_HARVARD             1
 
 	/// Valid pointers should be >= than this value (used for debug)
-	#define CPU_RAM_START		0x100
+	#define CPU_RAM_START       0x100
 
 #else
 	#error No CPU_... defined.
+#endif
+
+#ifndef BREAKPOINT
+#define BREAKPOINT /* nop */
 #endif
 
 #ifndef FAST_FUNC
