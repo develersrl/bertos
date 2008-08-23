@@ -141,14 +141,14 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 	/* Ignore stack provided by caller and use the large enough default instead. */
 	PROC_ATOMIC(stack_base = (cpustack_t *)list_remHead(&StackFreeList));
 
-	stack_size = CONFIG_PROC_DEFSTACKSIZE;
+	stack_size = CONFIG_KERN_MINSTACKSIZE;
 #elif CONFIG_KERN_HEAP
 	/* Did the caller provide a stack for us? */
 	if (!stack_base)
 	{
 		/* Did the caller specify the desired stack size? */
 		if (!stack_size)
-			stack_size = CONFIG_PROC_DEFSTACKSIZE + sizeof(Process);
+			stack_size = CONFIG_KERN_MINSTACKSIZE;
 
 		/* Allocate stack dinamically */
 		if (!(stack_base = heap_alloc(stack_size)))
@@ -156,11 +156,14 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 
 		free_stack = true;
 	}
-#else
+
+#else // !ARCH_EMUL && !CONFIG_KERN_HEAP
+
 	/* Stack must have been provided by the user */
 	ASSERT_VALID_PTR(stack_base);
 	ASSERT(stack_size);
-#endif
+
+#endif // !ARCH_EMUL && !CONFIG_KERN_HEAP
 
 #if CONFIG_KERN_MONITOR
 	/* Fill-in the stack with a special marker to help debugging */
@@ -170,15 +173,15 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 	/* Initialize the process control block */
 	if (CPU_STACK_GROWS_UPWARD)
 	{
-		proc = (Process*)stack_base;
+		proc = (Process *)stack_base;
 		proc->stack = stack_base + PROC_SIZE_WORDS;
 		if (CPU_SP_ON_EMPTY_SLOT)
 			proc->stack++;
 	}
 	else
 	{
-		proc = (Process*)(stack_base + stack_size / sizeof(cpustack_t) - PROC_SIZE_WORDS);
-		proc->stack = (cpustack_t*)proc;
+		proc = (Process *)(stack_base + stack_size / sizeof(cpustack_t) - PROC_SIZE_WORDS);
+		proc->stack = (cpustack_t *)proc;
 		if (CPU_SP_ON_EMPTY_SLOT)
 			proc->stack--;
 	}
@@ -196,10 +199,10 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 #endif
 
 	#if CONFIG_KERN_PREEMPT
-		// FIXME: proc_exit
+
 		getcontext(&proc->context);
-		proc->context.uc_stack.ss_sp = stack_base;
-		proc->context.uc_stack.ss_size = stack_size;
+		proc->context.uc_stack.ss_sp = proc->stack;
+		proc->context.uc_stack.ss_size = stack_size - PROC_SIZE_WORDS - 1;
 		proc->context.uc_link = NULL;
 		makecontext(&proc->context, (void (*)(void))proc_entry, 1, entry);
 
@@ -217,12 +220,12 @@ struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(voi
 	}
 	#endif // CONFIG_KERN_PREEMPT
 
-	/* Add to ready list */
-	ATOMIC(SCHED_ENQUEUE(proc));
-
 	#if CONFIG_KERN_MONITOR
 		monitor_add(proc, name);
 	#endif
+
+	/* Add to ready list */
+	ATOMIC(SCHED_ENQUEUE(proc));
 
 	return proc;
 }
