@@ -286,10 +286,8 @@ void proc_exit(void)
 #endif
 
 #if (ARCH & ARCH_EMUL)
-#warning This is wrong
 	/* Reinsert process stack in free list */
-	PROC_ATOMIC(ADDHEAD(&StackFreeList, (Node *)(CurrentProcess->stack
-		- (CONFIG_PROC_DEFSTACKSIZE / sizeof(cpustack_t)))));
+	PROC_ATOMIC(ADDHEAD(&StackFreeList, (Node *)CurrentProcess->stack_base));
 
 	/*
 	 * NOTE: At this point the first two words of what used
