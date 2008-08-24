@@ -48,7 +48,7 @@
 
 int preempt_forbid_cnt;
 
-Timer preempt_timer;
+static Timer preempt_timer;
 
 
 // fwd decl from idle.c
@@ -59,33 +59,28 @@ void proc_preempt(void)
 {
 	IRQ_DISABLE;
 
+	ASSERT(preempt_forbid_cnt == 0);
 	LIST_ASSERT_VALID(&ProcReadyList);
 	CurrentProcess = (struct Process *)list_remHead(&ProcReadyList);
-	LIST_ASSERT_VALID(&ProcReadyList);
 	ASSERT2(CurrentProcess, "no idle proc?");
 
 	IRQ_ENABLE;
 
-	TRACEMSG("new proc: %p:%s", CurrentProcess, CurrentProcess ? CurrentProcess->monitor.name : "---");
-	monitor_report();
+	TRACEMSG("launching %p:%s", CurrentProcess, proc_currentName());
 }
 
 void proc_preempt_timer(UNUSED_ARG(void *, param))
 {
-	/* Abort if task preemption is disabled */
-	if (preempt_forbid_cnt)
-		return;
-
-	IRQ_DISABLE;
-/*
-	if (!CurrentProcess->forbid_cnt)
+	if (!preempt_forbid_cnt)
 	{
-		TRACEMSG("preempting %p:%s", CurrentProcess, CurrentProcess->monitor.name);
+		IRQ_DISABLE;
+		TRACEMSG("preempting %p:%s", CurrentProcess, proc_currentName());
+#if 0
 		SCHED_ENQUEUE(CurrentProcess);
 		proc_preempt();
+#endif
+		IRQ_ENABLE;
 	}
-*/
-	IRQ_ENABLE;
 
 	timer_setDelay(&preempt_timer, CONFIG_KERN_QUANTUM);
 	timer_add(&preempt_timer);
