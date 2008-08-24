@@ -80,7 +80,7 @@
 
 	#define CPU_SAVED_REGS_CNT     1
 	#define CPU_STACK_GROWS_UPWARD 0
-	#define CPU_SP_ON_EMPTY_SLOT   0
+	#define CPU_SP_ON_EMPTY_SLOT   1
 
 #elif CPU_DSP56K
 

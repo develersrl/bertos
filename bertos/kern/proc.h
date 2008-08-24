@@ -77,6 +77,10 @@ void proc_rename(struct Process *proc, const char *name);
 const char *proc_name(struct Process *proc);
 const char *proc_currentName(void);
 
+#if CONFIG_KERN_PRI
+void proc_setPri(struct Process *proc, int pri);
+#endif
+
 /**
  * Disable preemptive task switching.
  *

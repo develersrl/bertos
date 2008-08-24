@@ -39,7 +39,7 @@
 #ifndef CFG_KERN_H
 #define CFG_KERN_H
 
-#include "cfg/cfg_arch.h"  /* ARCH_EMUL */
+#include "cfg/cfg_timer.h" // CONFIG_TIMER_EVENTS
 
 /**
  * Enable the multithreading kernel.
@@ -49,25 +49,25 @@
 
 /**
  * \name Optional kernel features
- *
  * \{
  */
 /*      Module/option          Active    Dependencies */
 #define CONFIG_KERN_SCHED       (1)
 #define CONFIG_KERN_SIGNALS     (1    && CONFIG_KERN_SCHED)
-#define CONFIG_KERN_TIMER       (1)
 #define CONFIG_KERN_IRQ         (1)
 #define CONFIG_KERN_HEAP        (0)
 #define CONFIG_KERN_SEMAPHORES  (0    && CONFIG_KERN_SIGNALS)
 #define CONFIG_KERN_MONITOR     (1    && CONFIG_KERN_SCHED)
-#define CONFIG_KERN_PREEMPT     (1    && CONFIG_KERN_SCHED && CONFIG_KERN_TIMER && CONFIG_KERN_IRQ)
+#define CONFIG_KERN_PREEMPT     (1    && CONFIG_KERN_SCHED && CONFIG_TIMER_EVENTS && CONFIG_KERN_IRQ)
+#define CONFIG_KERN_PRI         (1    && CONFIG_KERN_PREEMPT)
 /*\}*/
+
 
 /* OBSOLETE */
 #define CONFIG_KERN_PREEMPTIVE CONFIG_KERN_PREEMPT
 
 /// [ms] Time sharing quantum (a prime number prevents interference effects)
-#define CONFIG_KERN_QUANTUM     50
+#define CONFIG_KERN_QUANTUM     47
 
 /// Module logging level.
 #define KERN_LOG_LEVEL      LOG_LVL_ERR

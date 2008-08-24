@@ -66,5 +66,6 @@ static NORETURN void idle(void)
 
 void idle_init(void)
 {
-	proc_new(idle, NULL, sizeof(idle_stack), idle_stack);
+	Process *idle_proc = proc_new(idle, NULL, sizeof(idle_stack), idle_stack);
+	proc_setPri(idle_proc, (int)~0);
 }

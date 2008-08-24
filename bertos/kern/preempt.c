@@ -74,11 +74,22 @@ void proc_preempt_timer(UNUSED_ARG(void *, param))
 	if (!preempt_forbid_cnt)
 	{
 		IRQ_DISABLE;
+
+		#if CONFIG_KERN_PRI
+			Process *rival = (Process *)LIST_HEAD(&ProcReadyList);
+			if (rival && rival->link.pri >= CurrentProcess->link.pri)
+			{
+		#endif
+
 		TRACEMSG("preempting %p:%s", CurrentProcess, proc_currentName());
 #if 0
 		SCHED_ENQUEUE(CurrentProcess);
 		proc_preempt();
 #endif
+		#if CONFIG_KERN_PRI
+			}
+		#endif
+
 		IRQ_ENABLE;
 	}
 

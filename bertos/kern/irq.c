@@ -38,6 +38,7 @@
 
 #include <cfg/module.h>
 #include <kern/proc_p.h>
+#include <kern/proc.h>
 
 #include <cfg/cfg_kern.h>
 
@@ -61,18 +62,20 @@ void irq_entry(int signum)
 
 	if (old_process != CurrentProcess)
 	{
+		IRQ_DISABLE;
+
 		TRACEMSG("switching from %p:%s to %p:%s",
 			old_process, old_process ? old_process->monitor.name : "---",
-			CurrentProcess, CurrentProcess->monitor.name);
+			CurrentProcess, proc_currentName());
 
 		if (old_process)
 			swapcontext(&old_process->context, &CurrentProcess->context);
 		else
 			setcontext(&CurrentProcess->context);
 
-		// not reached
+		IRQ_ENABLE;
 	}
-	//TRACEMSG("keeping %p:%s", CurrentProcess, CurrentProcess->monitor.name);
+	TRACEMSG("resuming %p:%s", CurrentProcess, CurrentProcess->monitor.name);
 #endif // CONFIG_KERN_PREEMPT
 }
 

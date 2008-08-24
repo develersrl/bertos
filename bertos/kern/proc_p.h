@@ -53,7 +53,11 @@
 
 typedef struct Process
 {
+#if CONFIG_KERN_PRI
+	PriNode      link;        /**< Link Process into scheduler lists */
+#else
 	Node         link;        /**< Link Process into scheduler lists */
+#endif
 	cpustack_t  *stack;       /**< Per-process SP */
 	iptr_t       user_data;   /**< Custom data passed to the process */
 
@@ -105,20 +109,29 @@ extern REGISTER Process	*CurrentProcess;
  */
 extern REGISTER List     ProcReadyList;
 
+#if CONFIG_KERN_PRI
+	/**
+	 * Enqueue a task in the ready list.
+	 *
+	 * Always use this macro to instert a process in the ready list, as its
+	 * might vary to implement a different scheduling algorithms.
+	 *
+	 * \note This macro is *NOT* protected against the scheduler.  Access to
+	 *       this list must be performed with interrupts disabled.
+	 */
+	#define SCHED_ENQUEUE(proc)  do { \
+			LIST_ASSERT_VALID(&ProcReadyList); \
+			LIST_ENQUEUE(&ProcReadyList, &(proc)->link); \
+		} while (0)
 
-/**
- * Enqueue a task in the ready list.
- *
- * Always use this macro to instert a process in the ready list, as its
- * might vary to implement a different scheduling algorithms.
- *
- * \note This macro is *NOT* protected against the scheduler.  Access to
- *       this list must be performed with interrupts disabled.
- */
-#define SCHED_ENQUEUE(proc)  do { \
-		LIST_ASSERT_VALID(&ProcReadyList); \
-		ADDTAIL(&ProcReadyList, &(proc)->link); \
-	} while (0)
+#else // !CONFIG_KERN_PRI
+
+	#define SCHED_ENQUEUE(proc)  do { \
+			LIST_ASSERT_VALID(&ProcReadyList); \
+			ADDTAIL(&ProcReadyList, &(proc)->link); \
+		} while (0)
+
+#endif // !CONFIG_KERN_PRI
 
 /** Schedule to another process *without* adding the current to the ready list. */
 void proc_schedule(void);

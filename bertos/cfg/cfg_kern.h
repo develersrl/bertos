@@ -49,20 +49,24 @@
 
 /**
  * \name Optional kernel features
- *
  * \{
  */
 /*      Module/option          Active    Dependencies */
 #define CONFIG_KERN_SCHED       (0)
 #define CONFIG_KERN_SIGNALS     (0    && CONFIG_KERN_SCHED)
-#define CONFIG_KERN_TIMER       (0)
 #define CONFIG_KERN_IRQ         (0)
 #define CONFIG_KERN_HEAP        (0)
 #define CONFIG_KERN_SEMAPHORES  (0    && CONFIG_KERN_SIGNALS)
 #define CONFIG_KERN_MONITOR     (0    && CONFIG_KERN_SCHED)
-#define CONFIG_KERN_PREEMPT     (0    && CONFIG_KERN_SCHED && CONFIG_KERN_TIMER && CONFIG_KERN_IRQ)
+#define CONFIG_KERN_PREEMPT     (0    && CONFIG_KERN_SCHED && CONFIG_TIMER_EVENTS && CONFIG_KERN_IRQ)
+#define CONFIG_KERN_PRI         (0    && CINFIG_KERN_PREEMPT)
+/*\}*/
 
-/* EXPERIMENTAL */
+// FIXME: move somewhere
+#define CONFIG_DEPEND(FEATURE, DEPENDENCIES)  STATIC_ASSERT(!(FEATURE) || !!(DEPS))
+
+CONFIG_DEPEND(CONFIG_KERN_PRI, CONFIG_KERN_PREEMPT);
+
 
 /* OBSOLETE */
 #define CONFIG_KERN_PREEMPTIVE CONFIG_KERN_PREEMPT

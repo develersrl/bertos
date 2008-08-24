@@ -52,6 +52,11 @@
 
 #include <string.h>           /* memset() */
 
+// FIXME: move somewhere
+#define CONFIG_DEPEND(FEATURE, DEPS)  STATIC_ASSERT(!(FEATURE) || !!(DEPS))
+
+CONFIG_DEPEND(CONFIG_KERN_PRI, CONFIG_KERN_PREEMPT);
+
 
 /*
  * The scheduer tracks ready processes by enqueuing them in the
@@ -92,6 +97,10 @@ static void proc_init_struct(Process *proc)
 
 #if CONFIG_KERN_HEAP
 	proc->flags = 0;
+#endif
+
+#if CONFIG_KERN_PRI
+	proc->link.pri = 0;
 #endif
 }
 
@@ -259,6 +268,40 @@ void proc_rename(struct Process *proc, const char *name)
 #else
 	(void)proc; (void)name;
 #endif
+}
+
+/**
+ * Change the scheduling priority of a process.
+ *
+ * Process piorities are signed ints, whereas a larger integer value means
+ * higher scheduling priority.  The default priority for new processes is 0.
+ * The idle process runs with the lowest possible priority: INT_MIN.
+ *
+ * A process with a higher priority always preempts lower priority processes.
+ * Processes of equal priority share the CPU time according to a simple
+ * round-robin policy.
+ *
+ * As a general rule to maximize responsiveness, compute-bound processes
+ * should be assigned negative priorities and tight, interactive processes
+ * should be assigned positive priorities.
+ *
+ * To avoid interfering with system background activities such as input
+ * processing, application processes should remain within the range -10
+ * and +10.
+ */
+void proc_setPri(struct Process *proc, int pri)
+{
+		if (proc->link.pri == pri)
+			return;
+
+		proc->link.pri = pri;
+
+		if (proc != CurrentProcess)
+		{
+				//proc_forbid();
+				//TODO: re-enqueue process
+				//pric_permit();
+		}
 }
 
 /**
