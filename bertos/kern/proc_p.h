@@ -47,7 +47,7 @@
 
 #include <struct/list.h>
 
-#if CONFIG_KERN_PREEMPTIVE
+#if CONFIG_KERN_PREEMPT
 	#include <ucontext.h> // XXX
 #endif
 
@@ -75,7 +75,7 @@ typedef struct Process
 	size_t       stack_size;  /**< Size of process stack */
 #endif
 
-#if CONFIG_KERN_PREEMPTIVE
+#if CONFIG_KERN_PREEMPT
 	ucontext_t   context;
 #endif
 
