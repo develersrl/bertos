@@ -82,6 +82,7 @@ static void timer_hw_cleanup(void)
 		{ 0, 0 }  /* it_value */
 	};
 	setitimer(ITIMER_REAL, &itv, NULL);
+	signal(SIGALRM, SIG_DFL);
 }
 
 INLINE hptime_t timer_hw_hpread(void)
