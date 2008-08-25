@@ -276,7 +276,7 @@ $(foreach t,$(TRG),$(eval $(call build_target,$(t))))
 # NOTE: moc totally sucks and can generate empty files for some error conditions,
 #       leading to puzzling linker errors.  Kill 'em and abort build.
 %_moc.cpp: %.h
-	$(MOC) -o $@ $<
+	$(QT_MOC) -o $@ $<
 	if [ ! -s $< ]; then \
 		rm -f $@; \
 		exit 1; \
