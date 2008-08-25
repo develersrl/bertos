@@ -26,18 +26,18 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
  *
  * \brief Test kernel process.
  *
  * \version $Id$
- *
  * \author Daniele Basile <asterix@develer.com>
  */
 
 #include <kern/proc.h>
+#include <kern/irq.h>
 #include <drv/timer.h>
 #include <cfg/test.h>
 
@@ -70,20 +70,6 @@ static cpustack_t proc_test1_stack[CONFIG_PROC_DEFSTACKSIZE / sizeof(cpustack_t)
 static cpustack_t proc_test2_stack[CONFIG_PROC_DEFSTACKSIZE / sizeof(cpustack_t)];
 
 
-int proc_testSetup(void)
-{
-	kdbg_init();
-	proc_init();
-	IRQ_ENABLE;
-	timer_init();
-	return 0;
-}
-
-int proc_testTearDown(void)
-{
-	return 0;
-}
-
 /**
  * Process scheduling test
  */
@@ -93,12 +79,6 @@ int proc_testRun(void)
 	proc_new(proc_test2, NULL, sizeof(proc_test2_stack), proc_test2_stack);
 	kputs("Processes created\n");
 
-	//kputs("stack1:\n");
-	//kdump(proc_test_stack1 + sizeof(proc_test_stack1) - 64, 64);
-
-	//kputs("stack2:\n");
-	//kdump(proc_test_stack2 + sizeof(proc_test_stack2) - 64, 64);
-
 	for (int i = 0; i < 30; ++i)
 	{
 		kputs("> main\n");
@@ -107,21 +87,46 @@ int proc_testRun(void)
 	}
 	return 0;
 }
-#warning Fix test to comply to new policy.
-#if 0
-/*
- * FIXME: to be compiled as a single file 
- * the kernel module needs the assembly switch function
- * and the idle() that lay in a emulator cpp file.
- * How can we fix this?
- */
-#include TEST_ONLY(drv/kdebug.c)
-#include TEST_ONLY(kern/coop.c)
-#include TEST_ONLY(kern/proc.c)
-#include TEST_ONLY(drv/timer.c)
-#include TEST_ONLY(mware/formatwr.c)
-#include TEST_ONLY(mware/hex.c)
-#include TEST_ONLY(os/hptime.c)
+
+#ifdef _TEST
+
+int proc_testSetup(void)
+{
+	kdbg_init();
+
+	#if CONFIG_KERN_PREEMPT
+		irq_init();
+	#endif
+
+	timer_init();
+
+	proc_init();
+	return 0;
+}
+
+int proc_testTearDown(void)
+{
+	return 0;
+}
+
+#include <drv/kdebug.c>
+#include <drv/timer.c>
+#include <kern/idle.c>
+#include <kern/monitor.c>
+#include <kern/signal.c>
+#if CONFIG_KERN_PREEMPT
+	#include <kern/preempt.c>
+	#include <kern/irq.c>
+#else
+	#include <kern/coop.c>
+	// FIXME: we need to link with the switch asm code too!
+#endif
+#include <kern/proc.c>
+#include <mware/formatwr.c>
+#include <mware/hex.c>
+#include <mware/event.c>
+#include <os/hptime.c>
 
 TEST_MAIN(proc);
-#endif
+
+#endif // _TEST
