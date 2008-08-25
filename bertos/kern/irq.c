@@ -53,7 +53,9 @@ static void (*irq_handlers[100])(void);
 /* signal handler */
 void irq_entry(int signum)
 {
+#if CONFIG_KERN_PREEMPT
 	Process * const old_process = CurrentProcess;
+#endif
 
 	irq_handlers[signum]();
 
@@ -87,6 +89,7 @@ void irq_register(int irq, void (*callback)(void))
 void irq_init(void)
 {
 	struct sigaction act;
+
 	act.sa_handler = irq_entry;
 	sigemptyset(&act.sa_mask);
 	//sigaddset(&act.sa_mask, irq);
