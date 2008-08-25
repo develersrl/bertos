@@ -325,11 +325,15 @@ MOD_DEFINE(timer)
  */
 void timer_init(void)
 {
-	TIMER_STROBE_INIT;
+	#if CONFIG_KERN_IRQ
+		MOD_CHECK(irq);
+	#endif
 
-#if CONFIG_TIMER_EVENTS
-	LIST_INIT(&timers_queue);
-#endif
+	#if CONFIG_TIMER_EVENTS
+		LIST_INIT(&timers_queue);
+	#endif
+
+	TIMER_STROBE_INIT;
 
 	_clock = 0;
 
