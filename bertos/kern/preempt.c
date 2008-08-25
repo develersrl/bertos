@@ -101,7 +101,7 @@ void proc_preempt(UNUSED_ARG(void *, param)
 
 		TRACEMSG("preempting %p:%s", CurrentProcess, proc_currentName());
 
-// FIXME: this still break havocs, probably because of some reentrancy issue
+// FIXME: this still breaks havoc, probably because of some reentrancy issue
 #if 0
 		SCHED_ENQUEUE(CurrentProcess);
 		proc_schedule();
@@ -127,7 +127,7 @@ void proc_switch(void)
 	IRQ_ASSERT_ENABLED();
 	ASSERT(preempt_forbid_cnt == 0);
 
-	// Will invoke proc_preempt() in interrupt context
+	// Will invoke proc_switch() in interrupt context
 	kill(0, SIGUSR1);
 }
 
@@ -153,7 +153,7 @@ void preempt_init(void)
 	MOD_CHECK(irq);
 	MOD_CHECK(timer);
 
-	irq_register(SIGUSR1, proc_preempt);
+	irq_register(SIGUSR1, proc_schedule);
 
 	timer_setSoftint(&preempt_timer, proc_preempt_timer, NULL);
 	timer_setDelay(&preempt_timer, CONFIG_KERN_QUANTUM);
