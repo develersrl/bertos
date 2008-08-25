@@ -94,7 +94,7 @@
 
 	#ifdef __GNUC__
 		#define NOP         asm volatile ("nop")
-		#define BREAKPOINT  asm volatile ("int 3" ::)
+		#define BREAKPOINT  asm volatile ("int3" ::)
 	#endif
 
 #elif CPU_ARM
