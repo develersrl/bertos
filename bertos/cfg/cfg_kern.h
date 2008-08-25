@@ -26,8 +26,8 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2001,2004 Develer S.r.l. (http://www.develer.com/)
- * Copyright 1999,2000,2001 Bernie Innocenti <bernie@codewiz.org>
+ * Copyright 2001, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 1999, 2000, 2001, 2008 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
  * \brief Kernel configuration parameters
@@ -39,37 +39,24 @@
 #ifndef CFG_KERN_H
 #define CFG_KERN_H
 
-#include "cfg/cfg_arch.h"  /* ARCH_EMUL */
-
 /**
  * Enable the multithreading kernel.
  */
-#define CONFIG_KERN 0
-#define CONFIG_KERNEL CONFIG_KERN // OBSOLETE
+#define CONFIG_KERN  1
 
 /**
  * \name Optional kernel features
  * \{
  */
-/*      Module/option          Active    Dependencies */
-#define CONFIG_KERN_SCHED       (0)
-#define CONFIG_KERN_SIGNALS     (0    && CONFIG_KERN_SCHED)
-#define CONFIG_KERN_IRQ         (0)
-#define CONFIG_KERN_HEAP        (0)
-#define CONFIG_KERN_SEMAPHORES  (0    && CONFIG_KERN_SIGNALS)
-#define CONFIG_KERN_MONITOR     (0    && CONFIG_KERN_SCHED)
-#define CONFIG_KERN_PREEMPT     (0    && CONFIG_KERN_SCHED && CONFIG_TIMER_EVENTS && CONFIG_KERN_IRQ)
-#define CONFIG_KERN_PRI         (0    && CINFIG_KERN_PREEMPT)
+#define CONFIG_KERN_SCHED       1  ///< Process schedling
+#define CONFIG_KERN_SIGNALS     1  ///< Inter-process signals
+#define CONFIG_KERN_IRQ         1  ///< Interrupt supervisor
+#define CONFIG_KERN_HEAP        0  ///< Dynamic memory allocation
+#define CONFIG_KERN_SEMAPHORES  0  ///< Re-entrant mutual exclusion primitives
+#define CONFIG_KERN_MONITOR     1  ///< Process monitor
+#define CONFIG_KERN_PREEMPT     1  ///< Preemptive process scheduling
+#define CONFIG_KERN_PRI         1  ///< Priority-based scheduling policy
 /*\}*/
-
-// FIXME: move somewhere
-#define CONFIG_DEPEND(FEATURE, DEPENDENCIES)  STATIC_ASSERT(!(FEATURE) || !!(DEPS))
-
-CONFIG_DEPEND(CONFIG_KERN_PRI, CONFIG_KERN_PREEMPT);
-
-
-/* OBSOLETE */
-#define CONFIG_KERN_PREEMPTIVE CONFIG_KERN_PREEMPT
 
 /// [ms] Time sharing quantum (a prime number prevents interference effects)
 #define CONFIG_KERN_QUANTUM     47
@@ -79,5 +66,8 @@ CONFIG_DEPEND(CONFIG_KERN_PRI, CONFIG_KERN_PREEMPT);
 
 /// Module logging format.
 #define KERN_LOG_FORMAT     LOG_FMT_VERBOSE
+
+#define CONFIG_KERN_PREEMPTIVE CONFIG_KERN_PREEMPT // OBSOLETE
+#define CONFIG_KERNEL CONFIG_KERN // OBSOLETE
 
 #endif /*  CFG_KERN_H */
