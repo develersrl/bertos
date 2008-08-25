@@ -50,17 +50,6 @@
 /// The global emulator instance.
 Emulator *emul;
 
-#if CONFIG_KERNEL
-	#include <struct/list.h>
-
-	/// List of process stacks
-	List StackFreeList;
-
-	// HACK: Reserve 64KB of stack space for kernel processes
-	const int NPROC = 8;
-	int stacks[NPROC][(64 * 1024) / sizeof(int)];
-#endif
-
 Emulator::Emulator(int &argc, char **argv) :
 	emulApp(new QApplication(argc, argv)),
 	emulWin(new EmulWin(this))
@@ -94,12 +83,6 @@ extern "C" void emul_init(int *argc, char *argv[])
 {
 	// setup global emulator pointer
 	emul = new Emulator(*argc, argv);
-
-#if CONFIG_KERNEL
-	LIST_INIT(&StackFreeList);
-	for (int i = 0; i < NPROC; i++)
-		ADDTAIL(&StackFreeList, (Node *)stacks[i]);
-#endif
 
 	MOD_INIT(emul);
 }

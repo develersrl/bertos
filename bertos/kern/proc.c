@@ -44,6 +44,7 @@
 #include "cfg/cfg_arch.h"  /* ARCH_EMUL */
 #include "cfg/cfg_kern.h"
 #include <cfg/module.h>
+#include <cfg/depend.h>    // CONFIG_DEPEND()
 
 #include <cpu/irq.h>
 #include <cpu/types.h>
@@ -52,10 +53,10 @@
 
 #include <string.h>           /* memset() */
 
-// FIXME: move somewhere
-#define CONFIG_DEPEND(FEATURE, DEPS)  STATIC_ASSERT(!(FEATURE) || !!(DEPS))
-
-CONFIG_DEPEND(CONFIG_KERN_PRI, CONFIG_KERN_PREEMPT);
+// Check config dependencies
+CONFIG_DEPEND(CONFIG_KERN_SIGNALS,    CONFIG_KERN_SCHED);
+CONFIG_DEPEND(CONFIG_KERN_SEMAPHORES, CONFIG_KERN_SIGNALS);
+CONFIG_DEPEND(CONFIG_KERN_MONITOR,    CONFIG_KERN_SCHED);
 
 
 /*
@@ -75,11 +76,16 @@ REGISTER Process *CurrentProcess;
 
 #if (ARCH & ARCH_EMUL)
 /*
- * In hosted environments, we must emulate the stack on the real process stack.
+ * In some hosted environments, we must emulate the stack on the real
+ * process stack to satisfy consistency checks in system libraries and
+ * because some ABIs place trampolines on the stack.
  *
  * Access to this list must be protected by PROC_ATOMIC().
  */
-extern List StackFreeList;
+List StackFreeList;
+
+#define NPROC 8
+cpustack_t proc_stacks[NPROC][(64 * 1024) / sizeof(cpustack_t)];
 #endif
 
 /** The main process (the one that executes main()). */
@@ -110,6 +116,12 @@ void proc_init(void)
 {
 	LIST_INIT(&ProcReadyList);
 
+#if ARCH & ARCH_EMUL
+	LIST_INIT(&StackFreeList);
+	for (int i = 0; i < NPROC; i++)
+		ADDTAIL(&StackFreeList, (Node *)proc_stacks[i]);
+#endif
+
 	/*
 	 * We "promote" the current context into a real process. The only thing we have
 	 * to do is create a PCB and make it current. We don't need to setup the stack
@@ -129,7 +141,6 @@ void proc_init(void)
 
 	MOD_INIT(proc);
 }
-
 
 /**
  * Create a new process, starting at the provided entry point.
@@ -270,6 +281,8 @@ void proc_rename(struct Process *proc, const char *name)
 #endif
 }
 
+
+#if CONFIG_KERN_PRI
 /**
  * Change the scheduling priority of a process.
  *
@@ -303,6 +316,7 @@ void proc_setPri(struct Process *proc, int pri)
 				//pric_permit();
 		}
 }
+#endif // CONFIG_KERN_PRI
 
 /**
  * Terminate the current process
