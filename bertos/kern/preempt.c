@@ -31,6 +31,15 @@
  *
  * \brief Simple preemptive multitasking scheduler.
  *
+ * All voluntary and preemptive context switching happens on exit from
+ * a common interrupt (signal) dispatcher.  Preemption on quantum timeout
+ * is regulated by a soft-timer.  Other kinds of preemption could happen
+ * if an interrupt sends a signal to a higher priority process (but this
+ * is still unimplemented).
+ *
+ * In the POSIX implementaiton, context switching is done by the portable
+ * SVR4 swapcontext() facility.
+ *
  * \version $Id: proc.c 1616 2008-08-10 19:41:26Z bernie $
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
@@ -52,7 +61,6 @@
 
 // Check config dependencies
 CONFIG_DEPEND(CONFIG_KERN_PREEMPT,    CONFIG_KERN_SCHED && CONFIG_TIMER_EVENTS && CONFIG_KERN_IRQ);
-CONFIG_DEPEND(CONFIG_KERN_PRI,        CONFIG_KERN_PREEMPT);
 
 MOD_DEFINE(preempt)
 
@@ -92,6 +100,8 @@ void proc_preempt_timer(UNUSED_ARG(void *, param))
 		#endif
 
 		TRACEMSG("preempting %p:%s", CurrentProcess, proc_currentName());
+
+// FIXME: this still break havocs, probably because of some reentrancy issue
 #if 0
 		SCHED_ENQUEUE(CurrentProcess);
 		proc_preempt();
@@ -114,7 +124,7 @@ void proc_schedule(void)
 	ATOMIC(LIST_ASSERT_VALID(&ProcReadyList));
 
 	/* Sleeping with IRQs disabled or preemption forbidden is illegal */
-	ASSERT_IRQ_ENABLED();
+	IRQ_ASSERT_ENABLED();
 	ASSERT(preempt_forbid_cnt == 0);
 
 	// Will invoke proc_preempt() in interrupt context
