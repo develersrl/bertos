@@ -105,7 +105,6 @@
 struct KFile;
 
 typedef int32_t kfile_off_t;     ///< KFile offset type, used by kfile_seek().
-typedef uint32_t kfile_size_t;   ///< KFile size type, used in struct KFile.
 
 /**
  * Costants for repositioning read/write file offset.
@@ -195,8 +194,8 @@ typedef struct KFile
 	DB(id_t _type); ///< Used to keep track, at runtime, of the class type.
 
 	/* NOTE: these must _NOT_ be size_t on 16bit CPUs! */
-	kfile_off_t  seek_pos;
-	kfile_size_t size; // FIXME: should be kfile_off_t
+	kfile_off_t    seek_pos;
+	kfile_off_t    size;
 } KFile;
 
 /**
