@@ -91,6 +91,10 @@ extern "C" void emul_cleanup()
 {
 	MOD_CLEANUP(emul);
 
+	// Timer must be made inactive before we destroy the emulator
+	extern bool timer_initialized;
+	ASSERT(!timer_initialized);
+
 	delete emul;
 	emul = NULL;
 }
