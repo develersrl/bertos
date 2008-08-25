@@ -35,6 +35,10 @@
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
+#include <cfg/cfg_kern.h>
+
+#if CONFIG_KERN_PREEMPT
+
 #include "proc_p.h"
 #include "proc.h"
 
@@ -44,7 +48,13 @@
 #include <cpu/irq.h>   // IRQ_DISABLE()...
 #include <drv/timer.h>
 #include <cfg/module.h>
+#include <cfg/depend.h>    // CONFIG_DEPEND()
 
+// Check config dependencies
+CONFIG_DEPEND(CONFIG_KERN_PREEMPT,    CONFIG_KERN_SCHED && CONFIG_TIMER_EVENTS && CONFIG_KERN_IRQ);
+CONFIG_DEPEND(CONFIG_KERN_PRI,        CONFIG_KERN_PREEMPT);
+
+MOD_DEFINE(preempt)
 
 int preempt_forbid_cnt;
 
@@ -140,4 +150,8 @@ void preempt_init(void)
 	timer_add(&preempt_timer);
 
 	idle_init();
+
+	MOD_INIT(preempt);
 }
+
+#endif // CONFIG_KERN_PREEMPT
