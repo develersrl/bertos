@@ -78,7 +78,11 @@ const char *proc_name(struct Process *proc);
 const char *proc_currentName(void);
 
 #if CONFIG_KERN_PRI
-void proc_setPri(struct Process *proc, int pri);
+	void proc_setPri(struct Process *proc, int pri);
+#else
+	INLINE void proc_setPri(UNUSED_ARG(struct Process *,proc), UNUSED_ARG(int, pri))
+	{
+	}
 #endif
 
 /**
