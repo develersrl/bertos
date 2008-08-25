@@ -63,8 +63,8 @@
 /*
  * Sanity check for config parameters required by this module.
  */
-#if !defined(CONFIG_KERNEL) || ((CONFIG_KERNEL != 0) && CONFIG_KERNEL != 1)
-	#error CONFIG_KERNEL must be set to either 0 or 1 in config.h
+#if !defined(CONFIG_KERN) || ((CONFIG_KERN != 0) && CONFIG_KERN != 1)
+	#error CONFIG_KERN must be set to either 0 or 1 in config.h
 #endif
 #if !defined(CONFIG_WATCHDOG) || ((CONFIG_WATCHDOG != 0) && CONFIG_WATCHDOG != 1)
 	#error CONFIG_WATCHDOG must be set to either 0 or 1 in config.h
@@ -74,12 +74,10 @@
 	#include <drv/wdt.h>
 #endif
 
-#if CONFIG_KERNEL
-	#if CONFIG_KERN_SIGNALS
-		#include <kern/signal.h> /* sig_wait(), sig_check() */
-		#include <kern/proc.h>   /* proc_current() */
-		#include <cfg/macros.h>  /* BV() */
-	#endif
+#if defined (CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
+	#include <kern/signal.h> /* sig_wait(), sig_check() */
+	#include <kern/proc.h>   /* proc_current() */
+	#include <cfg/macros.h>  /* BV() */
 #endif
 
 
@@ -182,7 +180,7 @@ Timer *timer_abort(Timer *timer)
 void timer_delayTicks(ticks_t delay)
 {
 	/* We shouldn't sleep with interrupts disabled */
-	ASSERT_IRQ_ENABLED();
+	IRQ_ASSERT_ENABLED();
 
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 	Timer t;

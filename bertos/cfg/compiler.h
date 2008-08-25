@@ -283,7 +283,6 @@
 #ifndef UNUSED_ARG
 #define UNUSED_ARG(type,arg)   type arg
 #endif
-#define UNUSED                 UNUSED_ARG /* OBSOLETE */
 #ifndef UNUSED_VAR
 #define UNUSED_VAR(type,name)  type name
 #endif

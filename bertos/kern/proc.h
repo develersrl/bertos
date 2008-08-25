@@ -65,7 +65,6 @@ struct Process *proc_new_with_name(const char* name, void (*entry)(void), iptr_t
 
 void proc_exit(void);
 void proc_yield(void);
-#define proc_switch proc_yield /* OBSOLETE */
 
 int proc_testSetup(void);
 int proc_testRun(void);
@@ -187,8 +186,6 @@ INLINE void proc_permit(void)
 		    + 32 * sizeof(int))
 	#endif
 #endif
-
-#define CONFIG_PROC_DEFSTACKSIZE CONFIG_KERN_MINSTACKSIZE // OBSOLETE
 
 /* Memory fill codes to help debugging */
 #if CONFIG_KERN_MONITOR

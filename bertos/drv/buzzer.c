@@ -155,7 +155,7 @@ void buz_init(void)
 	BUZZER_HW_INIT;
 
 	/* Init software interrupt. */
-	timer_set_event_softint(&buz_timer, (Hook)buz_softint, 0);
+	timer_setSoftint(&buz_timer, (Hook)buz_softint, 0);
 
 	MOD_INIT(buzzer);
 }

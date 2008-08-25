@@ -40,7 +40,7 @@
 #include <cfg/module.h>
 
 
-static cpustack_t idle_stack[CONFIG_PROC_DEFSTACKSIZE / sizeof(cpustack_t)];
+static cpustack_t idle_stack[CONFIG_KERN_MINSTACKSIZE / sizeof(cpustack_t)];
 
 /**
  * The idle process

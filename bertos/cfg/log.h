@@ -132,9 +132,6 @@
 #define LOG_FMT_TERSE     0
 /* \} */
 
-#define LOG_SILENT    LOG_FMT_TERSE   /* OBSOLETE */
-#define LOG_VERBOSE   LOG_FMT_VERBOSE /* OBSOLETE */
-
 #if LOG_FORMAT == LOG_FMT_VERBOSE
 	#define LOG_PRINT(str_level, str,...)    kprintf("%s():%d:%s: " str, __func__, __LINE__, str_level, ## __VA_ARGS__)
 #elif LOG_FORMAT == LOG_FMT_TERSE

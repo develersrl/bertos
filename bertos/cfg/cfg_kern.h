@@ -67,7 +67,4 @@
 /// Module logging format.
 #define KERN_LOG_FORMAT     LOG_FMT_VERBOSE
 
-#define CONFIG_KERN_PREEMPTIVE CONFIG_KERN_PREEMPT // OBSOLETE
-#define CONFIG_KERNEL CONFIG_KERN // OBSOLETE
-
 #endif /*  CFG_KERN_H */

@@ -40,7 +40,7 @@
 #include <cfg/cfg_kern.h>
 #include <cfg/cfg_wdt.h>
 
-#if CONFIG_KERNEL
+#if CONFIG_KERN
 	#include <kern/proc.h>
 #endif
 
@@ -66,7 +66,7 @@
  */
 INLINE void cpu_relax(void)
 {
-#if CONFIG_KERNEL
+#if CONFIG_KERN
 	proc_yield();
 #endif
 

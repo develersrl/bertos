@@ -148,10 +148,10 @@ void proc_init(void)
  * \return Process structure of new created process
  *         if successful, NULL otherwise.
  */
-struct Process *proc_new_with_name(UNUSED(const char *, name), void (*entry)(void), iptr_t data, size_t stack_size, cpustack_t *stack_base)
+struct Process *proc_new_with_name(UNUSED_ARG(const char *, name), void (*entry)(void), iptr_t data, size_t stack_size, cpustack_t *stack_base)
 {
 	Process *proc;
-	const size_t PROC_SIZE_WORDS = ROUND2(sizeof(Process), sizeof(cpustack_t)) / sizeof(cpustack_t);
+	const size_t PROC_SIZE_WORDS = ROUND_UP2(sizeof(Process), sizeof(cpustack_t)) / sizeof(cpustack_t);
 #if CONFIG_KERN_HEAP
 	bool free_stack = false;
 #endif

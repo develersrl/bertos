@@ -166,9 +166,6 @@
 /** Round up \a x to an even multiple of the 2's power \a pad. */
 #define ROUND_UP2(x, pad) (((x) + ((pad) - 1)) & ~((pad) - 1))
 
-/* OBSOLETE */
-#define ROUND2 ROUND_UP2
-
 /**
  * \name Integer round macros.
  *

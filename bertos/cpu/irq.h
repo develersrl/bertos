@@ -252,10 +252,6 @@
 	#define IRQ_ASSERT_DISABLED() do {} while(0)
 #endif
 
-// OBSOLETE names
-#define ASSERT_IRQ_ENABLED()  IRQ_ASSERT_ENABLED()
-#define ASSERT_IRQ_DISABLED() IRQ_ASSERT_DISABLED()
-
 /**
  * Execute \a CODE atomically with respect to interrupts.
  *
@@ -268,7 +264,5 @@
 		CODE; \
 		IRQ_RESTORE(__flags); \
 	} while (0)
-
-
 
 #endif /* CPU_IRQ_H */
