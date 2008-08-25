@@ -45,7 +45,7 @@
 #include <cfg/compiler.h>
 #include "cfg/cfg_kern.h"
 
-#if CONFIG_KERNEL
+#if CONFIG_KERN
 	#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 		#include <kern/signal.h>
 	#endif
@@ -108,10 +108,6 @@ INLINE Event event_createSoftint(Hook func, void *user_data)
 	e.Ev.Int.user_data = user_data;
 	return e;
 }
-
-// OBSOLETE names
-#define event_createSoftInt event_createSoftint
-#define event_initSoftInt event_initSoftint
 
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 
