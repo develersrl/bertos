@@ -133,8 +133,8 @@ extern REGISTER List     ProcReadyList;
 
 #endif // !CONFIG_KERN_PRI
 
-/** Schedule to another process *without* adding the current to the ready list. */
-void proc_schedule(void);
+/// Schedule another process *without* adding the current one to the ready list.
+void proc_switch(void);
 
 #if CONFIG_KERN_PREEMPT
 void proc_entry(void (*user_entry)(void));

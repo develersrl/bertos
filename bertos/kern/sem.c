@@ -128,7 +128,7 @@ void sem_obtain(struct Semaphore *s)
 		 * be locked for us.
 		 */
 		proc_permit();
-		proc_schedule();
+		proc_switch();
 	}
 	else
 	{

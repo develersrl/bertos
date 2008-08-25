@@ -164,13 +164,13 @@ sigmask_t sig_wait(sigmask_t sigs)
 		CurrentProcess->sig_wait = sigs;
 
 		/*
-		 * Go to sleep and proc_schedule() another process.
+		 * Go to sleep and proc_switch() to another process.
 		 *
-		 * We re-enable IRQs because proc_schedule() does not
+		 * We re-enable IRQs because proc_switch() does not
 		 * guarantee to save and restore the interrupt mask.
 		 */
 		IRQ_RESTORE(flags);
-		proc_schedule();
+		proc_switch();
 		IRQ_SAVE_DISABLE(flags);
 
 		/*
