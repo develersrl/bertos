@@ -30,8 +30,7 @@
  * Copyright 1999, 2000, 2001, 2008 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
- * \brief Simple realtime multitasking scheduler.
- *        Context switching is only done cooperatively.
+ * \brief Simple cooperative multitasking scheduler.
  *
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
@@ -354,7 +353,7 @@ void proc_exit(void)
 #endif /* ARCH_EMUL */
 
 	CurrentProcess = NULL;
-	proc_schedule();
+	proc_switch();
 	/* not reached */
 }
 

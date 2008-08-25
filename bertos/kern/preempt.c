@@ -73,7 +73,7 @@ static Timer preempt_timer;
 void idle_init(void);
 
 
-void proc_preempt(void)
+void proc_schedule(void)
 {
 	IRQ_DISABLE;
 
@@ -87,7 +87,7 @@ void proc_preempt(void)
 	TRACEMSG("launching %p:%s", CurrentProcess, proc_currentName());
 }
 
-void proc_preempt_timer(UNUSED_ARG(void *, param))
+void proc_preempt(UNUSED_ARG(void *, param)
 {
 	if (!preempt_forbid_cnt)
 	{
@@ -104,7 +104,7 @@ void proc_preempt_timer(UNUSED_ARG(void *, param))
 // FIXME: this still break havocs, probably because of some reentrancy issue
 #if 0
 		SCHED_ENQUEUE(CurrentProcess);
-		proc_preempt();
+		proc_schedule();
 #endif
 		#if CONFIG_KERN_PRI
 			}
@@ -117,7 +117,7 @@ void proc_preempt_timer(UNUSED_ARG(void *, param))
 	timer_add(&preempt_timer);
 }
 
-void proc_schedule(void)
+void proc_switch(void)
 {
 	ATOMIC(LIST_ASSERT_VALID(&ProcReadyList));
 	TRACEMSG("%p:%s", CurrentProcess, proc_currentName());
@@ -139,7 +139,7 @@ void proc_yield(void)
 	SCHED_ENQUEUE(CurrentProcess);
 	IRQ_ENABLE;
 
-	proc_schedule();
+	proc_switch();
 }
 
 void proc_entry(void (*user_entry)(void))

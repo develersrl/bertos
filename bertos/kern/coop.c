@@ -63,17 +63,13 @@ EXTERN_C void asm_switch_context(cpustack_t **new_sp, cpustack_t **save_sp);
  * System scheduler: pass CPU control to the next process in
  * the ready queue.
  */
-void proc_schedule(void)
+static void proc_schedule(void)
 {
-	struct Process *old_process;
 	cpuflags_t flags;
 
 	ATOMIC(LIST_ASSERT_VALID(&ProcReadyList));
 	ASSERT_USER_CONTEXT();
 	ASSERT_IRQ_ENABLED();
-
-	/* Remember old process to save its context later */
-	old_process = CurrentProcess;
 
 	/* Poll on the ready queue for the first ready process */
 	IRQ_SAVE_DISABLE(flags);
@@ -100,6 +96,14 @@ void proc_schedule(void)
 		IRQ_DISABLE;
 	}
 	IRQ_RESTORE(flags);
+}
+
+void proc_switch(void)
+{
+	/* Remember old process to save its context later */
+	const Process *old_process = CurrentProcess;
+
+	proc_schedule();
 
 	/*
 	 * Optimization: don't switch contexts when the active
@@ -111,8 +115,8 @@ void proc_schedule(void)
 
 		#if CONFIG_KERN_MONITOR
 			LOG_INFO("Switch from %p(%s) to %p(%s)\n",
-				old_process,    old_process ? old_process->monitor.name : "NONE",
-				CurrentProcess, CurrentProcess->monitor.name);
+				old_process,    proc_name(old_process),
+				CurrentProcess, proc_currentName());
 		#endif
 
 		/* Save context of old process and switch to new process. If there is no
@@ -135,6 +139,5 @@ void proc_schedule(void)
 void proc_yield(void)
 {
 	ATOMIC(SCHED_ENQUEUE(CurrentProcess));
-
-	proc_schedule();
+	proc_switch();
 }
