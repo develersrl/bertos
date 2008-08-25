@@ -18,8 +18,8 @@ demo_DEBUG = 1
 TRG += demo
 
 # FIXME: we want to use g++ for C source too
-CC = g++-4.3
-CXX = g++-4.3
+CC = g++
+CXX = g++
 
 demo_CXXSRC = \
 	bertos/emul/emul.cpp \
