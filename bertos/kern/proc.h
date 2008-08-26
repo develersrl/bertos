@@ -46,6 +46,7 @@
 #endif
 
 #include <cpu/types.h> // cpustack_t
+#include <cpu/frame.h> // CPU_SAVED_REGS_CNT
 
 /*
  * Forward declaration. The definition of struct Process is private to the
