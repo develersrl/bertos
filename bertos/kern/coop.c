@@ -69,7 +69,7 @@ static void proc_schedule(void)
 
 	ATOMIC(LIST_ASSERT_VALID(&ProcReadyList));
 	ASSERT_USER_CONTEXT();
-	ASSERT_IRQ_ENABLED();
+	IRQ_ASSERT_ENABLED();
 
 	/* Poll on the ready queue for the first ready process */
 	IRQ_SAVE_DISABLE(flags);
