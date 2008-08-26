@@ -136,11 +136,13 @@ sigmask_t sig_wait(sigmask_t sigs)
 {
 	sigmask_t result;
 	cpuflags_t flags;
-	extern int preempt_forbid_cnt;
 
 	/* Sleeping with IRQs disabled or preemption forbidden is illegal */
 	IRQ_ASSERT_ENABLED();
+
+	#if CONFIG_KERN_PREEMPT
 	ASSERT(preempt_forbid_cnt == 0);
+	#endif
 
 	/*
 	 * This is subtle: there's a race condition where a concurrent

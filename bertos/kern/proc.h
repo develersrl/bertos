@@ -146,6 +146,7 @@ INLINE void proc_permit(void)
 	#endif
 }
 
+extern int preempt_forbid_cnt;
 
 /**
  * Execute a block of \a CODE atomically with respect to task scheduling.
