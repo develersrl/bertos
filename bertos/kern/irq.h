@@ -39,6 +39,6 @@
 
 void irq_entry(int irq);
 void irq_register(int irq, void (*handler)(void));
-void irq_init();
+void irq_init(void);
 
 #endif // KERN_IRQ_H
