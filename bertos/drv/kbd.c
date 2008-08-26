@@ -154,7 +154,7 @@ static void kbd_softint(UNUSED_ARG(iptr_t, arg))
 	timer_add(&kbd_timer);
 }
 
-#else 
+#else
 	#error "Define keyboard poll method"
 
 #endif /* CONFIG_KBD_POLL */
@@ -473,7 +473,7 @@ void kbd_init(void)
 	MOD_CHECK(timer);
 
 	/* Add kbd handler to soft timers list */
-	event_initSoftInt(&kbd_timer.expire, kbd_softint, NULL);
+	event_initSoftint(&kbd_timer.expire, kbd_softint, NULL);
 	timer_setDelay(&kbd_timer, ms_to_ticks(KBD_CHECK_INTERVAL));
 	timer_add(&kbd_timer);
 
