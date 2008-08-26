@@ -102,14 +102,14 @@ int main(void)
 	/* turn first led on */
 	PIOA_CODR  = 0x00000001;
 
- 	timer_set_event_softint(&leds_timer, (Hook)leds_toggle, 0);
+ 	timer_setSoftint(&leds_timer, (Hook)leds_toggle, 0);
  	timer_setDelay(&leds_timer, ms_to_ticks(100));
  	timer_add(&leds_timer);
 
 	// Main loop
 	for(;;)
 	{
-		proc_test();
+		proc_testRun();
 		kfile_printf(&ser_fd.fd, "From serial 0: %s\r\n", msg);
 	}
 	return 0;
