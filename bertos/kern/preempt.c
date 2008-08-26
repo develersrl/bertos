@@ -87,7 +87,7 @@ void proc_schedule(void)
 	TRACEMSG("launching %p:%s", CurrentProcess, proc_currentName());
 }
 
-void proc_preempt(UNUSED_ARG(void *, param)
+void proc_preempt(UNUSED_ARG(void *, param))
 {
 	if (!preempt_forbid_cnt)
 	{
@@ -155,7 +155,7 @@ void preempt_init(void)
 
 	irq_register(SIGUSR1, proc_schedule);
 
-	timer_setSoftint(&preempt_timer, proc_preempt_timer, NULL);
+	timer_setSoftint(&preempt_timer, proc_preempt, NULL);
 	timer_setDelay(&preempt_timer, CONFIG_KERN_QUANTUM);
 	timer_add(&preempt_timer);
 
