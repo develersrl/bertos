@@ -174,7 +174,7 @@ int kfile_gets_echo(struct KFile *fd, char *buf, int size, bool echo)
  */
 kfile_off_t kfile_genericSeek(struct KFile *fd, kfile_off_t offset, KSeekMode whence)
 {
-	uint32_t seek_pos;
+	kfile_off_t seek_pos;
 
 	switch (whence)
 	{
