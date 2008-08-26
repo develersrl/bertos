@@ -85,6 +85,9 @@ const char *proc_currentName(void);
 	}
 #endif
 
+/** Global preemption disable nesting counter. */
+extern int preempt_forbid_cnt;
+
 /**
  * Disable preemptive task switching.
  *
@@ -106,7 +109,6 @@ INLINE void proc_forbid(void)
 {
 	#if CONFIG_KERN_PREEMPT
 		// No need to protect against interrupts here.
-		extern int preempt_forbid_cnt;
 		++preempt_forbid_cnt;
 
 		/*
@@ -133,7 +135,6 @@ INLINE void proc_permit(void)
 		MEMORY_BARRIER;
 
 		/* No need to protect against interrupts here. */
-		extern int preempt_forbid_cnt;
 		--preempt_forbid_cnt;
 		ASSERT(preempt_forbid_cnt >= 0);
 
@@ -145,8 +146,6 @@ INLINE void proc_permit(void)
 
 	#endif
 }
-
-extern int preempt_forbid_cnt;
 
 /**
  * Execute a block of \a CODE atomically with respect to task scheduling.
