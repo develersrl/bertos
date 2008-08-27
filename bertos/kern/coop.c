@@ -101,7 +101,7 @@ static void proc_schedule(void)
 void proc_switch(void)
 {
 	/* Remember old process to save its context later */
-	const Process *old_process = CurrentProcess;
+	Process * const old_process = CurrentProcess;
 
 	proc_schedule();
 
