@@ -37,6 +37,7 @@
 
 #include "adc_avr.h"
 
+#include <cpu/irq.h> // IRQ_ASSERT_ENABLED()
 #include "cfg/cfg_adc.h"
 #include "cfg/cfg_kern.h"
 #include <cfg/macros.h>
@@ -106,7 +107,7 @@ INLINE uint16_t adc_hw_read(void)
 
 	#if CONFIG_KERN
 		// Ensure IRQs enabled.
-		ASSERT(IRQ_ENABLED());
+		IRQ_ASSERT_ENABLED();
 		adc_process = proc_current();
 		sig_wait(SIG_ADC_COMPLETE);
 	#else
