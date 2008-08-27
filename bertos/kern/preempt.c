@@ -50,6 +50,7 @@
 
 #include "proc_p.h"
 #include "proc.h"
+#include "idle.h"
 
 #include <kern/irq.h>
 #include <kern/monitor.h>
@@ -67,10 +68,6 @@ MOD_DEFINE(preempt)
 int preempt_forbid_cnt;
 
 static Timer preempt_timer;
-
-
-// fwd decl from idle.c
-void idle_init(void);
 
 
 void proc_schedule(void)

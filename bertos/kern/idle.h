@@ -31,42 +31,11 @@
  *
  * \brief Idle loop for preemptive scheduling
  *
- * \version $Id: proc.c 1616 2008-08-10 19:41:26Z bernie $
+ * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
+#ifndef KERN_IDLE_H
+#define KERN_IDLE_H
 
-#include "idle.h"
-#include "proc.h"
-
-#include <cfg/module.h>
-
-
-static cpustack_t idle_stack[CONFIG_KERN_MINSTACKSIZE / sizeof(cpustack_t)];
-
-/**
- * The idle process
- *
- * This process never dies and never sleeps.  It's also quite lazy, apathic
- * and sometimes even a little antisocial.
- *
- * Having an idle process costs us some stack space, but simplifies the
- * interrupt-driven preemption logic because there is always a user
- * context to which we can return.
- *
- * The idle process is not required for cooperative task switching.
- */
-static NORETURN void idle(void)
-{
-	for (;;)
-	{
-		TRACE;
-		//monitor_report();
-		proc_yield(); // FIXME: CPU_IDLE
-	}
-}
-
-void idle_init(void)
-{
-	struct Process *idle_proc = proc_new(idle, NULL, sizeof(idle_stack), idle_stack);
-	proc_setPri(idle_proc, (int)~0);
-}
+void idle_init(void);
+#endif /* KERN_IDLE_H */
