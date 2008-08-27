@@ -33,6 +33,10 @@
  *
  * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
+ *
+ * This module is automatically included so no need to include 
+ * in test list.
+ * notest: avr
  */
 
 #include "adc_avr.h"
