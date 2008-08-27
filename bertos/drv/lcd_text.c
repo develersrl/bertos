@@ -54,15 +54,15 @@
 /** Maximum number of layers. */
 #define LCD_LAYERS 6
 
-#if CONFIG_KERNEL
+#if CONFIG_KERN
 	/** Semaphore to arbitrate access to the display. */
 	static struct Semaphore lcd_semaphore;
 	#define LOCK_LCD	sem_obtain(&lcd_semaphore)
 	#define UNLOCK_LCD	sem_release(&lcd_semaphore)
-#else /* !CONFIG_KERNEL */
+#else /* !CONFIG_KERN */
 	#define LOCK_LCD	do {} while (0)
 	#define UNLOCK_LCD	do {} while (0)
-#endif /* !CONFIG_KERNEL */
+#endif /* !CONFIG_KERN */
 
 DECLARE_LIST_TYPE(Layer);
 
@@ -91,7 +91,7 @@ void lcd_setAddr(Layer *layer, lcdpos_t addr)
 	layer->addr = addr;
 }
 
-#if CONFIG_KERNEL
+#if CONFIG_KERN
 
 void lcd_lock(void)
 {
@@ -104,7 +104,7 @@ void lcd_unlock(void)
 	UNLOCK_LCD;
 }
 
-#endif /* CONFIG_KERNEL */
+#endif /* CONFIG_KERN */
 
 
 /**

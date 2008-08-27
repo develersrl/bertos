@@ -51,7 +51,7 @@
 #define ADC_AVR_AVCC   1
 #define ADC_AVR_INT256 2
 
-#if CONFIG_KERNEL
+#if CONFIG_KERN
 	#include <cfg/module.h>
 	#include <kern/proc.h>
 	#include <kern/signal.h>
@@ -75,7 +75,7 @@
 	{
 		sig_signal(adc_process, SIG_ADC_COMPLETE);
 	}
-#endif /* CONFIG_KERNEL */
+#endif /* CONFIG_KERN */
 
 /**
  * Select mux channel \a ch.
@@ -104,7 +104,7 @@ INLINE uint16_t adc_hw_read(void)
 	// Start convertion
 	ADCSRA |= BV(ADSC);
 
-	#if CONFIG_KERNEL
+	#if CONFIG_KERN
 		// Ensure IRQs enabled.
 		ASSERT(IRQ_ENABLED());
 		adc_process = proc_current();
@@ -143,11 +143,11 @@ INLINE void adc_hw_init(void)
 
 	/* Disable Auto trigger source: ADC in Free running mode. */
 	ADCSRB = 0;
-	
+
 	/* Enable ADC, disable autotrigger mode. */
 	ADCSRA = BV(ADEN);
 
-	#if CONFIG_KERNEL
+	#if CONFIG_KERN
 		MOD_CHECK(proc);
 		ADCSRA |= BV(ADIE);
 	#endif

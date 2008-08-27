@@ -61,7 +61,7 @@
 
 #include <io/arm.h>
 
-#if CONFIG_KERNEL
+#if CONFIG_KERN
 	#include <cfg/module.h>
 	#include <kern/proc.h>
 	#include <kern/signal.h>
@@ -104,7 +104,7 @@
 		ADC_IER = BV(ADC_DRDY);
 	}
 
-#endif /* CONFIG_KERNEL */
+#endif /* CONFIG_KERN */
 
 
 /**
@@ -129,14 +129,14 @@ INLINE uint16_t adc_hw_read(void)
 {
 	ASSERT(!(ADC_SR & ADC_EOC_MASK));
 
-	#if CONFIG_KERNEL
+	#if CONFIG_KERN
 		adc_process = proc_current();
 	#endif
 
 	// Start convertion
 	ADC_CR = BV(ADC_START);
 
-	#if CONFIG_KERNEL
+	#if CONFIG_KERN
 		// Ensure IRQs enabled.
 		ASSERT(IRQ_ENABLED());
 		sig_wait(SIG_ADC_COMPLETE);
@@ -193,7 +193,7 @@ INLINE void adc_hw_init(void)
 	ADC_MR |= ((ADC_COMPUTED_SHTIME << ADC_SHTIME_SHIFT) & ADC_SHTIME_MASK);
 	LOG_INFO("shtime[%ld]\n", (ADC_COMPUTED_SHTIME << ADC_SHTIME_SHIFT) & ADC_SHTIME_MASK);
 
-	#if CONFIG_KERNEL
+	#if CONFIG_KERN
 		//Register and enable irq for adc.
 		adc_enable_irq();
 	#endif

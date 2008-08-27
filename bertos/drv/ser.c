@@ -69,7 +69,7 @@
  * Sanity check for config parameters required by this module.
  */
 #if !defined(CONFIG_KERN) || ((CONFIG_KERN != 0) && CONFIG_KERN != 1)
-	#error CONFIG_KERNEL must be set to either 0 or 1 in cfg_kern.h
+	#error CONFIG_KERN must be set to either 0 or 1 in cfg_kern.h
 #endif
 #if !defined(CONFIG_SER_RXTIMEOUT)
 	#error CONFIG_SER_TXTIMEOUT missing in cfg_ser.h

@@ -114,8 +114,8 @@ int dataflash_testSetUp(void)
         LOG_INFO("KFILE setup..ok\n");
 
         LOG_INFO("Check if kernel is enable (if enable you should see the assert message.)\n");
-        SILENT_ASSERT("bertos/drv/dataflash_test.c:119: Assertion failed: !CONFIG_KERNEL");
-        ASSERT(!CONFIG_KERNEL);
+        SILENT_ASSERT("bertos/drv/dataflash_test.c:119: Assertion failed: !CONFIG_KERN");
+        ASSERT(!CONFIG_KERN);
 
         /*
          * This test use a kfile_test module,
@@ -208,7 +208,7 @@ int main(void)
         IRQ_ENABLE;
 	kdbg_init();
 
-	#if CONFIG_KERNEL
+	#if CONFIG_KERN
                 proc_init();
         #endif
 

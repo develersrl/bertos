@@ -151,7 +151,7 @@
  *
  * \sa config_kern.h
  */
-#define CONFIG_KERNEL 0
+#define CONFIG_KERN 0
 
 /**
  * \name Serial driver parameters
@@ -225,7 +225,7 @@
 #define CONFIG_ADC_STROBE  0
 
 /// Enable watchdog timer.
-#define CONFIG_WATCHDOG 0 
+#define CONFIG_WATCHDOG 0
 
 /// EEPROM type for drv/eeprom.c
 #define CONFIG_EEPROM_TYPE EEPROM_24XX256
@@ -272,7 +272,7 @@
 #define CONFIG_MD2_BLOCK_LEN 16
 
 /// Use standard permutation in MD2 algorithm.
-#define CONFIG_MD2_STD_PERM 0 
+#define CONFIG_MD2_STD_PERM 0
 
 /// Define a size, in byte, of entropy pool.
 #define CONFIG_SIZE_ENTROPY_POOL 256
