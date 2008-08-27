@@ -55,6 +55,7 @@
 #define LCD_LAYERS 6
 
 #if CONFIG_KERN
+	#include <kern/sem.h>
 	/** Semaphore to arbitrate access to the display. */
 	static struct Semaphore lcd_semaphore;
 	#define LOCK_LCD	sem_obtain(&lcd_semaphore)
