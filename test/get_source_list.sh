@@ -62,8 +62,8 @@ NOTEST="notest:"
 for src in $SRC_ALL ;
 do
 	grep "$NOTEST\s*$CPU_TARGET" $src 2>&1 > /dev/null
-	if [ $? = 0 ] ; then
-		EXCLUDE_LIST+=$src
+	if [ $? -eq 0 ] ; then
+		EXCLUDE_LIST="$EXCLUDE_LIST $src"
 	fi	
 done
 
