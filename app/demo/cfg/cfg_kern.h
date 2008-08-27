@@ -39,32 +39,24 @@
 #ifndef CFG_KERN_H
 #define CFG_KERN_H
 
-#include "cfg/cfg_timer.h" // CONFIG_TIMER_EVENTS
-
 /**
  * Enable the multithreading kernel.
  */
 #define CONFIG_KERN  1
-#define CONFIG_KERNEL CONFIG_KERN // OBSOLETE
 
 /**
  * \name Optional kernel features
  * \{
  */
-/*      Module/option          Active    Dependencies */
-#define CONFIG_KERN_SCHED       (1)
-#define CONFIG_KERN_SIGNALS     (1    && CONFIG_KERN_SCHED)
-#define CONFIG_KERN_IRQ         (1)
-#define CONFIG_KERN_HEAP        (0)
-#define CONFIG_KERN_SEMAPHORES  (0    && CONFIG_KERN_SIGNALS)
-#define CONFIG_KERN_MONITOR     (1    && CONFIG_KERN_SCHED)
-#define CONFIG_KERN_PREEMPT     (1    && CONFIG_KERN_SCHED && CONFIG_TIMER_EVENTS && CONFIG_KERN_IRQ)
-#define CONFIG_KERN_PRI         (1    && CONFIG_KERN_PREEMPT)
+#define CONFIG_KERN_SCHED       1  ///< Process schedling
+#define CONFIG_KERN_SIGNALS     1  ///< Inter-process signals
+#define CONFIG_KERN_IRQ         1  ///< Interrupt supervisor
+#define CONFIG_KERN_HEAP        0  ///< Dynamic memory allocation
+#define CONFIG_KERN_SEMAPHORES  0  ///< Re-entrant mutual exclusion primitives
+#define CONFIG_KERN_MONITOR     1  ///< Process monitor
+#define CONFIG_KERN_PREEMPT     1  ///< Preemptive process scheduling
+#define CONFIG_KERN_PRI         1  ///< Priority-based scheduling policy
 /*\}*/
-
-
-/* OBSOLETE */
-#define CONFIG_KERN_PREEMPTIVE CONFIG_KERN_PREEMPT
 
 /// [ms] Time sharing quantum (a prime number prevents interference effects)
 #define CONFIG_KERN_QUANTUM     47
