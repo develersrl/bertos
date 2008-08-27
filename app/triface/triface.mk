@@ -30,7 +30,7 @@ triface_CSRC = \
 	bertos/cpu/avr/drv/sipo.c \
 	bertos/mware/formatwr.c \
 	bertos/mware/hex.c \
-	bertos/mware/hashtable.c \
+	bertos/struct/hashtable.c \
 	bertos/mware/readline.c \
 	bertos/mware/parser.c \
 	bertos/mware/event.c \
