@@ -73,7 +73,7 @@ void *heap_allocmem(struct Heap* h, size_t size)
 	MemChunk *chunk, *prev;
 
 	/* Round size up to the allocation granularity */
-	size = ROUND2(size, sizeof(MemChunk));
+	size = ROUND_UP2(size, sizeof(MemChunk));
 
 	/* Handle allocations of 0 bytes */
 	if (!size)
@@ -123,7 +123,7 @@ void heap_freemem(struct Heap* h, void *mem, size_t size)
 #endif
 
 	/* Round size up to the allocation granularity */
-	size = ROUND2(size, sizeof(MemChunk));
+	size = ROUND_UP2(size, sizeof(MemChunk));
 
 	/* Handle allocations of 0 bytes */
 	if (!size)
