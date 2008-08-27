@@ -54,7 +54,7 @@
 
 #include <kern/kfile.h>
 
-#include <cpu/relax.h> /* cpu_relax() */
+#include <cpu/power.h> /* cpu_relax() */
 
 #warning FIXME:This file was change, but is untest!
 
