@@ -259,6 +259,6 @@ void thermo_init(void)
 	MOD_INIT(thermo);
 
 	timer_setDelay(&thermo_timer, ms_to_ticks(THERMO_INTERVAL_MS));
-	timer_set_event_softint(&thermo_timer, (Hook)thermo_softint, 0);
+	timer_setSoftint(&thermo_timer, (Hook)thermo_softint, 0);
 	timer_add(&thermo_timer);
 }
