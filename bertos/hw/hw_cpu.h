@@ -43,7 +43,7 @@
 #warning TODO:This is an example implementation, you must implement it!
 
 /// CPU Clock frequency 
-#define CLOCK_FREQ     (48023000L/* Implement me! */)
+#define CLOCK_FREQ     (12288000UL/* Implement me! */)
 
 
 /* Timer IRQ strobe */
