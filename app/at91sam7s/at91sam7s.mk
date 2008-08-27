@@ -26,6 +26,7 @@ at91sam7s_CSRC = \
 	bertos/mware/hex.c \
 	bertos/kern/kfile.c \
 	bertos/kern/proc.c \
+	bertos/kern/coop.c \
 	bertos/kern/proc_test.c \
 	bertos/kern/monitor.c \
 	bertos/kern/signal.c
@@ -34,7 +35,7 @@ at91sam7s_CPPASRC = \
 	bertos/cpu/arm/hw/crtat91sam7_rom.S \
 	bertos/cpu/arm/hw/switch_arm.S
 
-at91sam7s_CROSS = arm-elf-
+at91sam7s_CROSS = arm-none-eabi-
 
 at91sam7s_CPPAFLAGS = -O0 -g -gdwarf-2 -g -gen-debug
 at91sam7s_CPPFLAGS = -O0 -D'ARCH=0' -D__ARM_AT91SAM7S256__ -g3 -gdwarf-2 -fverbose-asm -Iapp/at91sam7s/hw -Iapp/at91sam7s -Ibertos/cpu/arm
