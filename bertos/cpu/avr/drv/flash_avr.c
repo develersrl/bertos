@@ -178,7 +178,7 @@ static size_t flash_avr_write(struct KFile *_fd, const void *_buf, size_t size)
 
 
 	ASSERT(fd->fd.seek_pos + (kfile_off_t)size <= (kfile_off_t)fd->fd.size);
-	size = MIN((uint32_t)size, fd->fd.size - fd->fd.seek_pos);
+	size = MIN((kfile_off_t)size, fd->fd.size - fd->fd.seek_pos);
 
 	LOG_INFO("Writing at pos[%u]\n", fd->fd.seek_pos);
 	while (size)
@@ -249,7 +249,7 @@ static size_t flash_avr_read(struct KFile *_fd, void *buf, size_t size)
 {
 	FlashAvr *fd = FLASHAVR_CAST(_fd);
 	ASSERT(fd->fd.seek_pos + (kfile_off_t)size <= (kfile_off_t)fd->fd.size);
-	size = MIN((uint32_t)size, fd->fd.size - fd->fd.seek_pos);
+	size = MIN((kfile_off_t)size, fd->fd.size - fd->fd.seek_pos);
 
 	LOG_INFO("Reading at pos[%u]\n", fd->fd.seek_pos);
 	// Flush current buffered page (if modified).
