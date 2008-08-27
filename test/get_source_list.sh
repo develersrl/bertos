@@ -45,16 +45,34 @@ if [ $# \< 2 ] ; then
 
 	exit 1
 fi
-
+CPU_TARGET=$1
 #Create a list of source file whitout a cpu specific source
 GEN_SRC=`find . \( -name \.svn -prune -o -path $CPU_DIR -prune -o -path $APP_DIR  -prune -o -path $OS_DIR -prune -o -path $EMUL_DIR -prune \) -o -name *.${2} -print | xargs`
 
 #Select c and asm sources for selected cpu target
-TRG_SRC=`find ${CPU_DIR}/${1} -name \.svn -prune -o -name *.${2} -print | xargs`
+TRG_SRC=`find ${CPU_DIR}/$CPU_TARGET -name \.svn -prune -o -name *.${2} -print | xargs`
 
 #Generate a list of all source for each cpu
 SRC_ALL=${GEN_SRC}" "${TRG_SRC}
 
+# Find the files that contain the string
+# NOTEST <cpu target> and put it in a list
+
+NOTEST="notest:"
+for src in $SRC_ALL ;
+do
+	grep "$NOTEST\s*$CPU_TARGET" $src 2>&1 > /dev/null
+	if [ $? = 0 ] ; then
+		EXCLUDE_LIST+=$src
+	fi	
+done
+
+# Remove the exclude list files from the sources to be
+# compiled
+for src in $EXCLUDE_LIST ;
+do
+	SRC_ALL=`echo $SRC_ALL | sed -e "s;$src;;g"`
+done
 
 printf "${SRC_ALL}"
 

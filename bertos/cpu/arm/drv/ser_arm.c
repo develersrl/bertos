@@ -36,6 +36,10 @@
  *
  * \author Daniele Basile <asterix@develer.com>
  *
+ * This module is automatically included so no need to include 
+ * in test list.
+ * notest: arm
+ *
  */
 
 #include <cpu/detect.h>

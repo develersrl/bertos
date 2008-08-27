@@ -39,10 +39,6 @@ TEST_SCRIPT_DIR="test"
 #Test directory, where are the test makefile
 TEST_APP_DIR="app/test/"
 
-#Dir list for ARM, write with escape char for sed regrepx
-ARM_DRV="${BERTOS_DIR_RE}\\/cpu\\/arm\\/drv"
-ARM_DRV_C_EXCLUDE_LIST="ser_arm pwm_arm twi_arm stepper_arm"
-
 if [ $# \< 1 ] ; then
 	printf "You must specify a cpu target!\n\n"
 	printf "EXAMPLE:\n $0 <cpu target>\n\n"
@@ -57,17 +53,6 @@ ASRC=`${TEST_SCRIPT_DIR}/get_source_list.sh $1 S`
 
 #kdebug  must added to skip list because it is compiled two times and the linker fail.
 CSRC=`echo $CSRC | sed -e "s/${BERTOS_DIR_RE}\\/drv\\/kdebug\\.c//g"`
-
-#Source to skip:
-
-if [ $1 = 'arm' ] ; then
-	for i in $ARM_DRV_C_EXCLUDE_LIST ;
-		do
-			CSRC=`echo $CSRC | sed -e "s/${ARM_DRV}\\/$i\\.c//g"`
-		done
-fi
-
-
 
 printf "#This makefile was generate automatically.\n\n" > ${TEST_APP_DIR}/$1_src.mk
 printf "${1}_CSRC = $CSRC\n\n" >> ${TEST_APP_DIR}/$1_src.mk

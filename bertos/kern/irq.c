@@ -33,6 +33,10 @@
  *
  * \version $Id: proc.h 1646 2008-08-17 13:49:48Z bernie $
  * \author Bernie Innocenti <bernie@codewiz.org>
+ *
+ * Still in development, disable nightly test for now
+ * notest: avr
+ * notest: arm
  */
 #include "irq.h"
 
