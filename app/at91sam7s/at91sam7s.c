@@ -106,10 +106,10 @@ int main(void)
  	timer_setDelay(&leds_timer, ms_to_ticks(100));
  	timer_add(&leds_timer);
 
+	ASSERT(proc_testRun() == 0);
 	// Main loop
 	for(;;)
 	{
-		proc_testRun();
 		kfile_printf(&ser_fd.fd, "From serial 0: %s\r\n", msg);
 	}
 	return 0;
