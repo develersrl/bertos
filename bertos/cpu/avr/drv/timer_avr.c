@@ -36,6 +36,10 @@
  * \author Francesco Sacchi <batt@develer.com>
  *
  * \brief Low-level timer module for AVR (implementation).
+ *
+ * This module is automatically included so no need to include 
+ * in test list.
+ * notest: avr
  */
 
 #include <drv/timer_avr.h>
