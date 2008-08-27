@@ -50,6 +50,10 @@
 #include <cpu/attr.h>
 #include <cpu/frame.h>
 
+#if CONFIG_KERN_HEAP
+	#include <struct/heap.h>
+#endif
+
 #include <string.h>           /* memset() */
 
 // Check config dependencies
