@@ -110,6 +110,8 @@ int text_widthf(struct Bitmap *bm, const char * fmt, ...) FORMAT(__printf__, 2, 
 int text_puts_P(const char * PROGMEM str, struct Bitmap *bm);
 int text_vprintf_P(struct Bitmap *bm, const char * PROGMEM fmt, va_list ap);
 int text_printf_P(struct Bitmap *bm, const char * PROGMEM fmt, ...) FORMAT(__printf__, 2, 3);
+int text_xyvprintf_P(struct Bitmap *bm, coord_t x, coord_t y, uint16_t mode, const char *fmt, va_list ap);
+int text_xyprintf_P(struct Bitmap *bm, coord_t x, coord_t col, uint16_t mode, const char *fmt, ...) FORMAT(__printf__, 5, 6);
 int text_xprintf_P(struct Bitmap *bm, uint8_t row, uint8_t col, uint16_t mode, const char * PROGMEM fmt, ...) FORMAT(__printf__, 5, 6);
 int text_vwidthf_P(struct Bitmap *bm, const char * PROGMEM fmt, va_list ap);
 int text_widthf_P(struct Bitmap *bm, const char * PROGMEM fmt, ...);
