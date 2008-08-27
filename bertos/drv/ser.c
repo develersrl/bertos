@@ -52,6 +52,7 @@
 
 #include "ser.h"
 #include "wdt.h"
+#include "timer.h"
 #include "ser_p.h"
 
 #include "cfg/cfg_ser.h"
