@@ -25,7 +25,7 @@ armtest_CPPASRC = $(arm_ASRC)
 armtest_CROSS = arm-elf-
 
 armtest_CPPAFLAGS = -O0 -g -gdwarf-2 -g -gen-debug
-armtest_CPPFLAGS = -O0 -D'ARCH=0xFFFFFF' -D__ARM_AT91SAM7S256__ -g3 -gdwarf-2 -fverbose-asm -Iapp/test -Ibertos/cpu/arm
+armtest_CPPFLAGS = -O0 -D'ARCH=ARCH_NIGHTTEST' -D__ARM_AT91SAM7S256__ -g3 -gdwarf-2 -fverbose-asm -Iapp/test -Ibertos/cpu/arm
 armtest_LDFLAGS = -nostartfiles -T bertos/cpu/arm/scripts/at91sam7_256_rom.ld -Wl,--no-warn-mismatch
 
 armtest_CPU = arm7tdmi
