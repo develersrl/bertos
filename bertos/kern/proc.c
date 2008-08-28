@@ -40,8 +40,9 @@
 #include "proc_p.h"
 #include "proc.h"
 
-#include "cfg/cfg_arch.h"  /* ARCH_EMUL */
+#include "cfg/cfg_arch.h"  // ARCH_EMUL
 #include "cfg/cfg_kern.h"
+#include <cfg/macros.h>    // ROUND_UP2
 #include <cfg/module.h>
 #include <cfg/depend.h>    // CONFIG_DEPEND()
 
