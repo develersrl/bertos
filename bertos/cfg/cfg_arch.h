@@ -43,16 +43,16 @@
 #ifndef CFG_ARCH_CONFIG_H
 #define CFG_ARCH_CONFIG_H
 
-#include <cfg/macros.h>
-
 /**
  * \name Architectures
  * \{
  */
-#define ARCH_FOO     BV(0)
-#define ARCH_BAR     BV(1)
-#define ARCH_EMUL    BV(2)
-#define ARCH_QT      BV(3)
+#define ARCH_FOO       (1<<0)
+#define ARCH_BAR       (1<<1)
+#define ARCH_EMUL      (1<<2)
+#define ARCH_QT        (1<<3)
+#define ARCH_UNITTEST  (1<<4)
+#define ARCH_NIGHTTEST (1<<5)
 /*\}*/
 
 #endif /* CFG_ARCH_CONFIG_H */
