@@ -7,7 +7,7 @@
 # Qt configuration for BeRTOS emulator.  Include it from
 # your app Makefile fragment
 
-EMUL_CFLAGS = -D'ARCH=ARCH_EMUL|ARCH_QT' \
+EMUL_CFLAGS = -D'ARCH=(ARCH_EMUL|ARCH_QT)' \
 	$(shell pkg-config QtCore QtGui --cflags) -DQT_CLEAN_NAMESPACE
 EMUL_LDFLAGS = $(shell pkg-config QtCore QtGui --libs)
 QT_MOC = $(shell pkg-config QtCore --variable=moc_location)
