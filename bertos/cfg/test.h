@@ -71,7 +71,11 @@
 #ifndef CFG_TEST_H
 #define CFG_TEST_H
 
-#if (ARCH & ARCH_UNITTEST)
+#include "cfg/cfg_arch.h"
+
+#if defined(ARCH_UNITTEST) && (ARCH & ARCH_UNITTEST)
+
+	#define UNIT_TEST 1
 
 	/**
 	 * Macro used to generate a main() for a test to be compiled
@@ -93,6 +97,7 @@
 	#define TEST_ONLY(file) PP_STRINGIZE(file)
 
 #else /* !_TEST */
+	#define UNIT_TEST 0
 
 	#define TEST_MAIN(module)  /* nothing */
 	#define TEST_ONLY(file)    <cfg/nothing.h>

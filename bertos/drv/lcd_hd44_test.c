@@ -40,11 +40,12 @@
 #include "lcd_hd44.h"
 #include "hw/hw_lcd.h"
 
+#include <cfg/test.h>
 #include <drv/timer.h>
 
 #warning TODO:Refactor this test to comply whit BeRTOS test policy.
 
-#if (ARCH & ARCH_UNITTEST)
+#if UNIT_TEST
 
 void lcd_hw_test(void)
 {
