@@ -49,7 +49,7 @@
 
 #warning FIXME:Review and refactor this test..
 
-#ifdef _TEST
+#if (ARCH & ARCH_UNITTEST)
 #include "sprintf.c"
 #include "formatwr.c"
 #include "hex.c"

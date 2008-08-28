@@ -71,7 +71,7 @@
 #ifndef CFG_TEST_H
 #define CFG_TEST_H
 
-#ifdef _TEST
+#if (ARCH & ARCH_UNITTEST)
 
 	/**
 	 * Macro used to generate a main() for a test to be compiled

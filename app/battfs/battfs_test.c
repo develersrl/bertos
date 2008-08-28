@@ -538,7 +538,7 @@ int battfs_testRun(void)
 	return 0;
 }
 
-#ifdef _TEST
+#if (ARCH & ARCH_UNITTEST)
 
 int battfs_testSetup(void)
 {

@@ -44,7 +44,7 @@
 
 #warning TODO:Refactor this test to comply whit BeRTOS test policy.
 
-#ifdef _TEST
+#if (ARCH & ARCH_UNITTEST)
 
 void lcd_hw_test(void)
 {
