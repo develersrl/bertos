@@ -74,7 +74,6 @@
 #include "cfg/cfg_arch.h"
 
 #if defined(ARCH_UNITTEST) && (ARCH & ARCH_UNITTEST)
-
 	#define UNIT_TEST 1
 
 	/**
