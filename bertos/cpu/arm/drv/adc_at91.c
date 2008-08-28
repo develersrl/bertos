@@ -47,6 +47,8 @@
 
 #include "adc_at91.h"
 
+#include <cpu/irq.h>
+
 #include "cfg/cfg_adc.h"
 #include "cfg/cfg_kern.h"
 #include <cfg/macros.h>
@@ -138,7 +140,7 @@ INLINE uint16_t adc_hw_read(void)
 
 	#if CONFIG_KERN
 		// Ensure IRQs enabled.
-		ASSERT(IRQ_ENABLED());
+		IRQ_ASSERT_ENABLED();
 		sig_wait(SIG_ADC_COMPLETE);
 	#else
 		//Wait in polling until is done
