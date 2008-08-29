@@ -109,55 +109,55 @@
 
 static bool ramp_test_single(uint32_t minFreq, uint32_t maxFreq, uint32_t length)
 {
-    struct Ramp r;
-    uint16_t cur, old;
-    uint32_t clock;
-    uint32_t oldclock;
+	struct Ramp r;
+	uint16_t cur, old;
+	uint32_t clock;
+	uint32_t oldclock;
 
-    ramp_setup(&r, length, minFreq, maxFreq);
+	ramp_setup(&r, length, minFreq, maxFreq);
 
-    cur = old = r.clocksMaxWL;
-    clock = 0;
-    oldclock = 0;
+	cur = old = r.clocksMaxWL;
+	clock = 0;
+	oldclock = 0;
 
-    kprintf("testing ramp: (length=%lu, min=%lu, max=%lu)\n", (unsigned long)length, (unsigned long)minFreq, (unsigned long)maxFreq);
-    kprintf("              [length=%lu, max=%04x, min=%04x]\n", (unsigned long)r.clocksRamp, r.clocksMaxWL, r.clocksMinWL);
+	kprintf("testing ramp: (length=%lu, min=%lu, max=%lu)\n", (unsigned long)length, (unsigned long)minFreq, (unsigned long)maxFreq);
+	kprintf("              [length=%lu, max=%04x, min=%04x]\n", (unsigned long)r.clocksRamp, r.clocksMaxWL, r.clocksMinWL);
 
 	int i = 0;
-    int nonbyte = 0;
+	int nonbyte = 0;
 
-    while (clock + cur < r.clocksRamp)
-    {
-        oldclock = clock;
-        old = cur;
+	while (clock + cur < r.clocksRamp)
+	{
+		oldclock = clock;
+		old = cur;
 
-        clock += cur;
-        cur = ramp_evaluate(&r, clock);
+		clock += cur;
+		cur = ramp_evaluate(&r, clock);
 
-        if (old < cur)
-        {
-            uint16_t t1 = FIX_MULT32(oldclock >> RAMP_CLOCK_SHIFT_PRECISION, r.precalc.inv_total_time);
-            uint16_t t2 = FIX_MULT32(clock >> RAMP_CLOCK_SHIFT_PRECISION,    r.precalc.inv_total_time);
-            uint16_t denom1 = FIX_MULT32((uint16_t)((~t1) + 1), r.precalc.max_div_min) + t1;
-            uint16_t denom2 = FIX_MULT32((uint16_t)((~t2) + 1), r.precalc.max_div_min) + t2;
+		if (old < cur)
+		{
+			uint16_t t1 = FIX_MULT32(oldclock >> RAMP_CLOCK_SHIFT_PRECISION, r.precalc.inv_total_time);
+			uint16_t t2 = FIX_MULT32(clock >> RAMP_CLOCK_SHIFT_PRECISION,    r.precalc.inv_total_time);
+			uint16_t denom1 = FIX_MULT32((uint16_t)((~t1) + 1), r.precalc.max_div_min) + t1;
+			uint16_t denom2 = FIX_MULT32((uint16_t)((~t2) + 1), r.precalc.max_div_min) + t2;
 
-            kprintf("    Failed: %04x @ %lu   -->   %04x @ %lu\n", old, (unsigned long)oldclock, cur, (unsigned long)clock);
-            kprintf("    T:     %04x -> %04x\n", t1, t2);
-            kprintf("    DENOM: %04x -> %04x\n", denom1, denom2);
+			kprintf("    Failed: %04x @ %lu   -->   %04x @ %lu\n", old, (unsigned long)oldclock, cur, (unsigned long)clock);
+			kprintf("    T:     %04x -> %04x\n", t1, t2);
+			kprintf("    DENOM: %04x -> %04x\n", denom1, denom2);
 
-            cur = ramp_evaluate(&r, clock);
-            return false;
-        }
+			cur = ramp_evaluate(&r, clock);
+			return false;
+		}
 		i++;
 		if ((old-cur) >= 256)
 			nonbyte++;
-    }
+	}
 
 
 
-    kprintf("Test finished: %04x @ %lu [min=%04x, totlen=%lu, numsteps:%d, nonbyte:%d]\n", cur, (unsigned long)clock, r.clocksMinWL, (unsigned long)r.clocksRamp, i, nonbyte);
+	kprintf("Test finished: %04x @ %lu [min=%04x, totlen=%lu, numsteps:%d, nonbyte:%d]\n", cur, (unsigned long)clock, r.clocksMinWL, (unsigned long)r.clocksRamp, i, nonbyte);
 
-    return true;
+	return true;
 }
 
 int ramp_testSetup(void)
