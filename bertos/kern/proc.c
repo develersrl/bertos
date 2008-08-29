@@ -190,8 +190,13 @@ struct Process *proc_new_with_name(UNUSED_ARG(const char *, name), void (*entry)
 #endif // !ARCH_EMUL && !CONFIG_KERN_HEAP
 
 #if CONFIG_KERN_MONITOR
-	/* Fill-in the stack with a special marker to help debugging */
-	memset(stack_base, CONFIG_KERN_STACKFILLCODE, stack_size);
+	/*
+	 * Fill-in the stack with a special marker to help debugging.
+	 * On 64bit platforms, CONFIG_KERN_STACKFILLCODE is larger
+	 * than an int, so the (int) cast is required to silence the
+	 * warning for truncating its size.
+	 */
+	memset(stack_base, (int)CONFIG_KERN_STACKFILLCODE, stack_size);
 #endif
 
 	/* Initialize the process control block */
