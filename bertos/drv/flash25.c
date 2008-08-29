@@ -325,8 +325,7 @@ void flash25_sectorErase(Flash25 *fd, Flash25Sector sector)
 	 */
 	flash25_waitReady(fd);
 
-	DB(kprintf("Erased sector [%ld] in %d ms\n", sector, ticks_to_ms(timer_clock() - start_time)));
-
+	DB(kprintf("Erased sector [%ld] in %ld ms\n", (unsigned long)sector, (unsigned long)ticks_to_ms(timer_clock() - start_time)));
 }
 
 /**
