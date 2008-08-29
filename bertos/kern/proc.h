@@ -108,7 +108,7 @@ const char *proc_currentName(void);
 INLINE void proc_forbid(void)
 {
 	#if CONFIG_KERN_PREEMPT
-		extern int _preempt_forbid_cnt;
+		extern cpuatomic_t _preempt_forbid_cnt;
 		/*
 		 * We don't need to protect the counter against other processes.
 		 * The reason why is a bit subtle.
@@ -156,7 +156,7 @@ INLINE void proc_permit(void)
 		 * flushed to memory before task switching is re-enabled.
 		 */
 		MEMORY_BARRIER;
-		extern int _preempt_forbid_cnt;
+		extern cpuatomic_t _preempt_forbid_cnt;
 		/* No need to protect against interrupts here. */
 		ASSERT(_preempt_forbid_cnt != 0);
 		--_preempt_forbid_cnt;
@@ -178,7 +178,7 @@ INLINE void proc_permit(void)
 INLINE bool proc_allowed(void)
 {
 	#if CONFIG_KERN_PREEMPT
-		extern int _preempt_forbid_cnt;
+		extern cpuatomic_t _preempt_forbid_cnt;
 		return (_preempt_forbid_cnt == 0);
 	#else
 		return true;
