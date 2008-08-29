@@ -65,7 +65,8 @@ CONFIG_DEPEND(CONFIG_KERN_PREEMPT,    CONFIG_KERN_SCHED && CONFIG_TIMER_EVENTS &
 
 MOD_DEFINE(preempt)
 
-int preempt_forbid_cnt;
+/** Global preemption disabling nesting counter */
+int _preempt_forbid_cnt;
 
 static Timer preempt_timer;
 
@@ -74,7 +75,7 @@ void proc_schedule(void)
 {
 	IRQ_DISABLE;
 
-	ASSERT(preempt_forbid_cnt == 0);
+	ASSERT(proc_allowed());
 	LIST_ASSERT_VALID(&ProcReadyList);
 	CurrentProcess = (struct Process *)list_remHead(&ProcReadyList);
 	ASSERT2(CurrentProcess, "no idle proc?");
@@ -86,7 +87,7 @@ void proc_schedule(void)
 
 void proc_preempt(UNUSED_ARG(void *, param))
 {
-	if (!preempt_forbid_cnt)
+	if (proc_allowed())
 	{
 		IRQ_DISABLE;
 
@@ -122,7 +123,7 @@ void proc_switch(void)
 
 	/* Sleeping with IRQs disabled or preemption forbidden is illegal */
 	IRQ_ASSERT_ENABLED();
-	ASSERT(preempt_forbid_cnt == 0);
+	ASSERT(proc_allowed());
 
 	// Will invoke proc_switch() in interrupt context
 	kill(0, SIGUSR1);

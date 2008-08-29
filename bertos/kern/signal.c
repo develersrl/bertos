@@ -139,10 +139,7 @@ sigmask_t sig_wait(sigmask_t sigs)
 
 	/* Sleeping with IRQs disabled or preemption forbidden is illegal */
 	IRQ_ASSERT_ENABLED();
-
-	#if CONFIG_KERN_PREEMPT
-	ASSERT(preempt_forbid_cnt == 0);
-	#endif
+	ASSERT(proc_allowed());
 
 	/*
 	 * This is subtle: there's a race condition where a concurrent

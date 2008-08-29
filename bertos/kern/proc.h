@@ -85,9 +85,6 @@ const char *proc_currentName(void);
 	}
 #endif
 
-/** Global preemption disable nesting counter. */
-extern int preempt_forbid_cnt;
-
 /**
  * Disable preemptive task switching.
  *
@@ -108,11 +105,12 @@ extern int preempt_forbid_cnt;
 INLINE void proc_forbid(void)
 {
 	#if CONFIG_KERN_PREEMPT
+		extern int _preempt_forbid_cnt;
 		// No need to protect against interrupts here.
-		++preempt_forbid_cnt;
+		++_preempt_forbid_cnt;
 
 		/*
-		 * Make sure preempt_forbid_cnt is flushed to memory so the
+		 * Make sure _preempt_forbid_cnt is flushed to memory so the
 		 * preemption softirq will see the correct value from now on.
 		 */
 		MEMORY_BARRIER;
@@ -133,17 +131,32 @@ INLINE void proc_permit(void)
 		 * flushed to memory before task switching is re-enabled.
 		 */
 		MEMORY_BARRIER;
-
+		extern int _preempt_forbid_cnt;
 		/* No need to protect against interrupts here. */
-		--preempt_forbid_cnt;
-		ASSERT(preempt_forbid_cnt >= 0);
+		--_preempt_forbid_cnt;
+		ASSERT(_preempt_forbid_cnt >= 0);
 
 		/*
-		 * This ensures preempt_forbid_cnt is flushed to memory immediately
+		 * This ensures _preempt_forbid_cnt is flushed to memory immediately
 		 * so the preemption interrupt sees the correct value.
 		 */
 		MEMORY_BARRIER;
 
+	#endif
+}
+
+/**
+ * \return true if preemptive task switching is allowed.
+ * \note This accessor is needed because _preempt_forbid_cnt
+ *       must be absoultely private.
+ */
+INLINE bool proc_allowed(void)
+{
+	#if CONFIG_KERN_PREEMPT
+		extern int _preempt_forbid_cnt;
+		return (_preempt_forbid_cnt == 0);
+	#else
+		return true;
 	#endif
 }
 
