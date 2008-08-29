@@ -1,7 +1,7 @@
 #Makefile for BeRTOS test.
 #This makefile was generated automatically.
 
-V:= 1
+V:= 0
 default: all
 
 include bertos/config.mk
