@@ -95,6 +95,9 @@ const char *proc_currentName(void);
  * \note Calling functions that could sleep while task switching is disabled
  * is dangerous and unsupported.
  *
+ * \note calling proc_forbid() from within an interrupt is illegal and
+ * meaningless.
+ *
  * \note proc_permit() expands inline to 1-2 asm instructions, so it's a
  * very efficient locking primitive in simple but performance-critical
  * situations.  In all other cases, semaphores offer a more flexible and
@@ -106,7 +109,29 @@ INLINE void proc_forbid(void)
 {
 	#if CONFIG_KERN_PREEMPT
 		extern int _preempt_forbid_cnt;
-		// No need to protect against interrupts here.
+		/*
+		 * We don't need to protect the counter against other processes.
+		 * The reason why is a bit subtle.
+		 *
+		 * If a process gets here, preempt_forbid_cnt can be either 0,
+		 * or != 0.  In the latter case, preemption is already disabled
+		 * and no concurrency issues can occur.
+		 *
+		 * In the former case, we could be preempted just after reading the
+		 * value 0 from memory, and a concurrent process might, in fact,
+		 * bump the value of preempt_forbid_cnt under our nose!
+		 *
+		 * BUT: if this ever happens, then we won't get another chance to
+		 * run until the other process calls proc_permit() to re-enable
+		 * preemption.  At this point, the value of preempt_forbid_cnt
+		 * must be back to 0, and thus what we had originally read from
+		 * memory happens to be valid.
+		 *
+		 * No matter how hard you think about it, and how complicated you
+		 * make your scenario, the above holds true as long as
+		 * "preempt_forbid_cnt != 0" means that no task switching is
+		 * possible.
+		 */
 		++_preempt_forbid_cnt;
 
 		/*
@@ -133,8 +158,8 @@ INLINE void proc_permit(void)
 		MEMORY_BARRIER;
 		extern int _preempt_forbid_cnt;
 		/* No need to protect against interrupts here. */
+		ASSERT(_preempt_forbid_cnt != 0);
 		--_preempt_forbid_cnt;
-		ASSERT(_preempt_forbid_cnt >= 0);
 
 		/*
 		 * This ensures _preempt_forbid_cnt is flushed to memory immediately
