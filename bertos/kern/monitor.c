@@ -78,17 +78,17 @@ void monitor_rename(Process *proc, const char *name)
 	proc->monitor.name = name;
 }
 
-size_t monitor_checkStack(cpustack_t *stack_base, size_t stack_size)
+size_t monitor_checkStack(cpu_stack_t *stack_base, size_t stack_size)
 {
-	cpustack_t *beg;
-	cpustack_t *cur;
-	cpustack_t *end;
+	cpu_stack_t *beg;
+	cpu_stack_t *cur;
+	cpu_stack_t *end;
 	int inc;
 	size_t sp_free;
 
 
 	beg = stack_base;
-	end = stack_base + stack_size / sizeof(cpustack_t);
+	end = stack_base + stack_size / sizeof(cpu_stack_t);
 	inc = +1;
 
 	if (CPU_STACK_GROWS_UPWARD)
@@ -106,7 +106,7 @@ size_t monitor_checkStack(cpustack_t *stack_base, size_t stack_size)
 		cur += inc;
 	}
 
-	sp_free = ABS(cur - beg) * sizeof(cpustack_t);
+	sp_free = ABS(cur - beg) * sizeof(cpu_stack_t);
 	return sp_free;
 }
 
@@ -157,7 +157,7 @@ static void NORETURN monitor(void)
 }
 
 
-void monitor_start(size_t stacksize, cpustack_t *stack)
+void monitor_start(size_t stacksize, cpu_stack_t *stack)
 {
 	proc_new(monitor, NULL, stacksize, stack);
 }

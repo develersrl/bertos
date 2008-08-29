@@ -523,7 +523,7 @@ static void spi0_starttx(struct SerialHardware *_hw)
 {
 	struct ArmSerial *hw = (struct ArmSerial *)_hw;
 
-	cpuflags_t flags;
+	cpu_flags_t flags;
 	IRQ_SAVE_DISABLE(flags);
 
 	/* Send data only if the SPI is not already transmitting */
@@ -607,7 +607,7 @@ static void spi1_starttx(struct SerialHardware *_hw)
 {
 	struct ArmSerial *hw = (struct ArmSerial *)_hw;
 
-	cpuflags_t flags;
+	cpu_flags_t flags;
 	IRQ_SAVE_DISABLE(flags);
 
 	/* Send data only if the SPI is not already transmitting */

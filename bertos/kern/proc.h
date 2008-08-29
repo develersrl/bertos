@@ -45,7 +45,7 @@
 	#include <cfg/debug.h> // ASSERT()
 #endif
 
-#include <cpu/types.h> // cpustack_t
+#include <cpu/types.h> // cpu_stack_t
 #include <cpu/frame.h> // CPU_SAVED_REGS_CNT
 
 /*
@@ -56,7 +56,7 @@ struct Process;
 
 /* Task scheduling services */
 void proc_init(void);
-struct Process *proc_new_with_name(const char* name, void (*entry)(void), iptr_t data, size_t stacksize, cpustack_t *stack);
+struct Process *proc_new_with_name(const char* name, void (*entry)(void), iptr_t data, size_t stacksize, cpu_stack_t *stack);
 
 #if !CONFIG_KERN_MONITOR
 	#define proc_new(entry,data,size,stack) proc_new_with_name(NULL,(entry),(data),(size),(stack))
@@ -108,7 +108,7 @@ const char *proc_currentName(void);
 INLINE void proc_forbid(void)
 {
 	#if CONFIG_KERN_PREEMPT
-		extern cpuatomic_t _preempt_forbid_cnt;
+		extern cpu_atomic_t _preempt_forbid_cnt;
 		/*
 		 * We don't need to protect the counter against other processes.
 		 * The reason why is a bit subtle.
@@ -156,7 +156,7 @@ INLINE void proc_permit(void)
 		 * flushed to memory before task switching is re-enabled.
 		 */
 		MEMORY_BARRIER;
-		extern cpuatomic_t _preempt_forbid_cnt;
+		extern cpu_atomic_t _preempt_forbid_cnt;
 		/* No need to protect against interrupts here. */
 		ASSERT(_preempt_forbid_cnt != 0);
 		--_preempt_forbid_cnt;
@@ -178,7 +178,7 @@ INLINE void proc_permit(void)
 INLINE bool proc_allowed(void)
 {
 	#if CONFIG_KERN_PREEMPT
-		extern cpuatomic_t _preempt_forbid_cnt;
+		extern cpu_atomic_t _preempt_forbid_cnt;
 		return (_preempt_forbid_cnt == 0);
 	#else
 		return true;
@@ -221,7 +221,7 @@ INLINE bool proc_allowed(void)
 		 * usage.
 		 */
 		#define CONFIG_KERN_MINSTACKSIZE  \
-		    (CPU_SAVED_REGS_CNT * 2 * sizeof(cpustack_t) \
+		    (CPU_SAVED_REGS_CNT * 2 * sizeof(cpu_stack_t) \
 		    + 32 * sizeof(int))
 	#endif
 #endif
@@ -230,23 +230,23 @@ INLINE bool proc_allowed(void)
 #if CONFIG_KERN_MONITOR
 	#include <cpu/types.h>
 	#if (SIZEOF_CPUSTACK_T == 1)
-		/* 8bit cpustack_t */
+		/* 8bit cpu_stack_t */
 		#define CONFIG_KERN_STACKFILLCODE  0xA5
 		#define CONFIG_KERN_MEMFILLCODE    0xDB
 	#elif (SIZEOF_CPUSTACK_T == 2)
-		/* 16bit cpustack_t */
+		/* 16bit cpu_stack_t */
 		#define CONFIG_KERN_STACKFILLCODE  0xA5A5
 		#define CONFIG_KERN_MEMFILLCODE    0xDBDB
 	#elif (SIZEOF_CPUSTACK_T == 4)
-		/* 32bit cpustack_t */
+		/* 32bit cpu_stack_t */
 		#define CONFIG_KERN_STACKFILLCODE  0xA5A5A5A5UL
 		#define CONFIG_KERN_MEMFILLCODE    0xDBDBDBDBUL
 	#elif (SIZEOF_CPUSTACK_T == 8)
-		/* 64bit cpustack_t */
+		/* 64bit cpu_stack_t */
 		#define CONFIG_KERN_STACKFILLCODE  0xA5A5A5A5A5A5A5A5ULL
 		#define CONFIG_KERN_MEMFILLCODE    0xDBDBDBDBDBDBDBDBULL
 	#else
-		#error No cpustack_t size supported!
+		#error No cpu_stack_t size supported!
 	#endif
 #endif
 

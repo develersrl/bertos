@@ -150,7 +150,7 @@ void stepper_timer_test_brute(void)
 	TC2_RA = 0;
 	TC2_RB = 0;
 
-	cpuflags_t flags;
+	cpu_flags_t flags;
 	IRQ_SAVE_DISABLE(flags);
 
 	/* Set the vector. */

@@ -103,7 +103,7 @@ DEFINE_ZEROCROSS_ISR()
  */
 void phase_setDuty(TriacDev dev, triac_duty_t duty)
 {
-	cpuflags_t flags;
+	cpu_flags_t flags;
 	IRQ_SAVE_DISABLE(flags);
 
 	phase_setDutyUnlock(dev,duty);
@@ -173,7 +173,7 @@ static void phase_softint(void *_dev)
  */
 void phase_init(void)
 {
-	cpuflags_t flags;
+	cpu_flags_t flags;
 	TriacDev dev;
 
 	/* Init timers and ensure that all triac are off */

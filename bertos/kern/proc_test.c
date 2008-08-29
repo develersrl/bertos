@@ -66,8 +66,8 @@ static void proc_test2(void)
 	}
 }
 
-static cpustack_t proc_test1_stack[CONFIG_KERN_MINSTACKSIZE / sizeof(cpustack_t)];
-static cpustack_t proc_test2_stack[CONFIG_KERN_MINSTACKSIZE / sizeof(cpustack_t)];
+static cpu_stack_t proc_test1_stack[CONFIG_KERN_MINSTACKSIZE / sizeof(cpu_stack_t)];
+static cpu_stack_t proc_test2_stack[CONFIG_KERN_MINSTACKSIZE / sizeof(cpu_stack_t)];
 
 
 /**

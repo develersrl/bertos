@@ -145,7 +145,7 @@
 	#if !CPU_SP_ON_EMPTY_SLOT
 		/* DSP56K and other weirdos */
 		#define CPU_PUSH_WORD(sp, data) \
-			do { *++(sp) = (cpustack_t)(data); } while (0)
+			do { *++(sp) = (cpu_stack_t)(data); } while (0)
 		#define CPU_POP_WORD(sp) \
 			(*(sp)--)
 	#else
@@ -207,13 +207,13 @@
 
 	#define CPU_PUSH_CALL_FRAME(sp, func) \
 		do { \
-			CPU_PUSH_WORD((sp), (cpustack_t)(func)); /* LR -> 8(SP) */ \
+			CPU_PUSH_WORD((sp), (cpu_stack_t)(func)); /* LR -> 8(SP) */ \
 			CPU_PUSH_WORD((sp), 0);                  /* CR -> 4(SP) */ \
 		} while (0)
 
 #else
 	#define CPU_PUSH_CALL_FRAME(sp, func) \
-		CPU_PUSH_WORD((sp), (cpustack_t)(func))
+		CPU_PUSH_WORD((sp), (cpu_stack_t)(func))
 #endif
 
 /**

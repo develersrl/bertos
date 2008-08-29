@@ -69,8 +69,8 @@
 
 		#if __CPU_MODE__ == 1 /* Thumb */
 			/* Use stubs */
-			extern cpuflags_t get_CPSR(void);
-			extern void set_CPSR(cpuflags_t flags);
+			extern cpu_flags_t get_CPSR(void);
+			extern void set_CPSR(cpu_flags_t flags);
 		#else
 			#define get_CPSR __get_CPSR
 			#define set_CPSR __set_CPSR
@@ -138,7 +138,7 @@
 
 		#define CPU_READ_FLAGS() \
 		({ \
-			cpuflags_t sreg; \
+			cpu_flags_t sreg; \
 			asm volatile ( \
 				"mrs %0, cpsr\n\t" \
 				: "=r" (sreg) \
@@ -259,7 +259,7 @@
  */
 #define ATOMIC(CODE) \
 	do { \
-		cpuflags_t __flags; \
+		cpu_flags_t __flags; \
 		IRQ_SAVE_DISABLE(__flags); \
 		CODE; \
 		IRQ_RESTORE(__flags); \

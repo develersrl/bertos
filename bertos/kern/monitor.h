@@ -56,7 +56,7 @@
  * \note The stack is provided by the caller so that there is no wasted space if the monitor
  * is not used.
  */
-void monitor_start(size_t stacksize, cpustack_t *stack);
+void monitor_start(size_t stacksize, cpu_stack_t *stack);
 
 
 /**
@@ -67,7 +67,7 @@ void monitor_start(size_t stacksize, cpustack_t *stack);
  * \note For this function to work, the stack must have been filled at startup with
  * CONFIG_KERN_STACKFILLCODE.
  */
-size_t monitor_checkStack(cpustack_t *stack_base, size_t stack_size);
+size_t monitor_checkStack(cpu_stack_t *stack_base, size_t stack_size);
 
 
 /** Print a report of the stack status through kdebug */

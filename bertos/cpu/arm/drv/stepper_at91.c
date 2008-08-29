@@ -362,7 +362,7 @@ void stepper_tc_setup(int index, stepper_isr_t callback, struct Stepper *motor)
 	*motor->timer->comp_c_reg = 0;
 
 	//Register interrupt vector
-	cpuflags_t flags;
+	cpu_flags_t flags;
 	IRQ_SAVE_DISABLE(flags);
 
 	/*

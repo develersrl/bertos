@@ -92,7 +92,7 @@ static void buz_softint(void)
  */
 void buz_beep(mtime_t time)
 {
-	cpuflags_t flags;
+	cpu_flags_t flags;
 	IRQ_SAVE_DISABLE(flags);
 
 	/* Remove the software interrupt if it was already queued */
@@ -127,7 +127,7 @@ void buz_repeat_start(mtime_t duration, mtime_t interval)
  */
 void buz_repeat_stop(void)
 {
-	cpuflags_t flags;
+	cpu_flags_t flags;
 	IRQ_SAVE_DISABLE(flags);
 
 	/* Remove the software interrupt if it was already queued */

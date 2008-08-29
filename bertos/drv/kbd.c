@@ -236,7 +236,7 @@ void kbd_addHandler(struct KbdHandler *handler)
 	KbdHandler *node;
 	List *list;
 
-	cpuflags_t flags;
+	cpu_flags_t flags;
 	IRQ_SAVE_DISABLE(flags);
 
 	/* Choose between raw and coocked handlers list */

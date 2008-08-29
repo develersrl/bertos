@@ -58,7 +58,7 @@ typedef struct Process
 #else
 	Node         link;        /**< Link Process into scheduler lists */
 #endif
-	cpustack_t  *stack;       /**< Per-process SP */
+	cpu_stack_t  *stack;       /**< Per-process SP */
 	iptr_t       user_data;   /**< Custom data passed to the process */
 
 #if CONFIG_KERN_SIGNALS
@@ -71,7 +71,7 @@ typedef struct Process
 #endif
 
 #if CONFIG_KERN_HEAP | CONFIG_KERN_MONITOR | (ARCH & ARCH_EMUL)
-	cpustack_t  *stack_base;  /**< Base of process stack */
+	cpu_stack_t  *stack_base;  /**< Base of process stack */
 	size_t       stack_size;  /**< Size of process stack */
 #endif
 

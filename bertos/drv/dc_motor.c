@@ -65,7 +65,7 @@
 static DCMotor dcm_all[CONFIG_NUM_DC_MOTOR];
 
 /// Stack process for DC motor poll.
-static cpustack_t dc_motor_poll_stack[200];
+static cpu_stack_t dc_motor_poll_stack[200];
 
 ///< Sample period for all DC motor.
 static mtime_t sample_period;

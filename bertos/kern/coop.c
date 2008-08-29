@@ -56,7 +56,7 @@
  * Saving and restoring the context on the stack is done by a CPU-dependent
  * support routine which usually needs to be written in assembly.
  */
-EXTERN_C void asm_switch_context(cpustack_t **new_sp, cpustack_t **save_sp);
+EXTERN_C void asm_switch_context(cpu_stack_t **new_sp, cpu_stack_t **save_sp);
 
 
 /**
@@ -65,7 +65,7 @@ EXTERN_C void asm_switch_context(cpustack_t **new_sp, cpustack_t **save_sp);
  */
 static void proc_schedule(void)
 {
-	cpuflags_t flags;
+	cpu_flags_t flags;
 
 	ATOMIC(LIST_ASSERT_VALID(&ProcReadyList));
 	ASSERT_USER_CONTEXT();
@@ -111,7 +111,7 @@ void proc_switch(void)
 	 */
 	if (CurrentProcess != old_process)
 	{
-		cpustack_t *dummy;
+		cpu_stack_t *dummy;
 
 		#if CONFIG_KERN_MONITOR
 			LOG_INFO("Switch from %p(%s) to %p(%s)\n",

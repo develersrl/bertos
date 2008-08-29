@@ -119,7 +119,7 @@ MOD_DEFINE(sysirq);
  */
 void sysirq_init(void)
 {
-	cpuflags_t flags;
+	cpu_flags_t flags;
 	IRQ_SAVE_DISABLE(flags);
 
 	/* Disable all system interrupts */

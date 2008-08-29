@@ -65,7 +65,7 @@
 	{
 		sysirq_init();
 
-		cpuflags_t flags;
+		cpu_flags_t flags;
 
 		MOD_CHECK(sysirq);
 

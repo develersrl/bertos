@@ -89,7 +89,7 @@ REGISTER Process *CurrentProcess;
 List StackFreeList;
 
 #define NPROC 8
-cpustack_t proc_stacks[NPROC][(64 * 1024) / sizeof(cpustack_t)];
+cpu_stack_t proc_stacks[NPROC][(64 * 1024) / sizeof(cpu_stack_t)];
 #endif
 
 /** The main process (the one that executes main()). */
@@ -152,10 +152,10 @@ void proc_init(void)
  * \return Process structure of new created process
  *         if successful, NULL otherwise.
  */
-struct Process *proc_new_with_name(UNUSED_ARG(const char *, name), void (*entry)(void), iptr_t data, size_t stack_size, cpustack_t *stack_base)
+struct Process *proc_new_with_name(UNUSED_ARG(const char *, name), void (*entry)(void), iptr_t data, size_t stack_size, cpu_stack_t *stack_base)
 {
 	Process *proc;
-	const size_t PROC_SIZE_WORDS = ROUND_UP2(sizeof(Process), sizeof(cpustack_t)) / sizeof(cpustack_t);
+	const size_t PROC_SIZE_WORDS = ROUND_UP2(sizeof(Process), sizeof(cpu_stack_t)) / sizeof(cpu_stack_t);
 #if CONFIG_KERN_HEAP
 	bool free_stack = false;
 #endif
@@ -163,7 +163,7 @@ struct Process *proc_new_with_name(UNUSED_ARG(const char *, name), void (*entry)
 
 #if (ARCH & ARCH_EMUL)
 	/* Ignore stack provided by caller and use the large enough default instead. */
-	PROC_ATOMIC(stack_base = (cpustack_t *)list_remHead(&StackFreeList));
+	PROC_ATOMIC(stack_base = (cpu_stack_t *)list_remHead(&StackFreeList));
 
 	stack_size = CONFIG_KERN_MINSTACKSIZE;
 #elif CONFIG_KERN_HEAP
@@ -209,8 +209,8 @@ struct Process *proc_new_with_name(UNUSED_ARG(const char *, name), void (*entry)
 	}
 	else
 	{
-		proc = (Process *)(stack_base + stack_size / sizeof(cpustack_t) - PROC_SIZE_WORDS);
-		proc->stack = (cpustack_t *)proc;
+		proc = (Process *)(stack_base + stack_size / sizeof(cpu_stack_t) - PROC_SIZE_WORDS);
+		proc->stack = (cpu_stack_t *)proc;
 		if (CPU_SP_ON_EMPTY_SLOT)
 			proc->stack--;
 	}

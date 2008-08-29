@@ -164,7 +164,7 @@
 	#define KDBG_WRITE_CHAR(c)     _kdebug_bitbang_putchar((c))
 	#define KDBG_MASK_IRQ(old)     do { IRQ_SAVE_DISABLE((old)); } while(0)
 	#define KDBG_RESTORE_IRQ(old)  do { IRQ_RESTORE((old)); } while(0)
-	typedef cpuflags_t kdbg_irqsave_t;
+	typedef cpu_flags_t kdbg_irqsave_t;
 
 	#define KDBG_DELAY (((CLOCK_FREQ + CONFIG_KDEBUG_BAUDRATE / 2) / CONFIG_KDEBUG_BAUDRATE) + 7) / 14
 

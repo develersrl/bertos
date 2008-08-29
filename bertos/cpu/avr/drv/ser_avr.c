@@ -533,7 +533,7 @@ static void spi_starttx(struct SerialHardware *_hw)
 {
 	struct AvrSerial *hw = (struct AvrSerial *)_hw;
 
-	cpuflags_t flags;
+	cpu_flags_t flags;
 	IRQ_SAVE_DISABLE(flags);
 
 	/* Send data only if the SPI is not already transmitting */

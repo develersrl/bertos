@@ -117,7 +117,7 @@
 sigmask_t sig_check(sigmask_t sigs)
 {
 	sigmask_t result;
-	cpuflags_t flags;
+	cpu_flags_t flags;
 
 	IRQ_SAVE_DISABLE(flags);
 	result = CurrentProcess->sig_recv & sigs;
@@ -135,7 +135,7 @@ sigmask_t sig_check(sigmask_t sigs)
 sigmask_t sig_wait(sigmask_t sigs)
 {
 	sigmask_t result;
-	cpuflags_t flags;
+	cpu_flags_t flags;
 
 	/* Sleeping with IRQs disabled or preemption forbidden is illegal */
 	IRQ_ASSERT_ENABLED();
@@ -202,7 +202,7 @@ sigmask_t sig_waitTimeout(sigmask_t sigs, ticks_t timeout)
 {
 	Timer t;
 	sigmask_t res;
-	cpuflags_t flags;
+	cpu_flags_t flags;
 
 	ASSERT(!sig_check(SIG_TIMEOUT));
 	ASSERT(!(sigs & SIG_TIMEOUT));
@@ -233,7 +233,7 @@ sigmask_t sig_waitTimeout(sigmask_t sigs, ticks_t timeout)
  */
 void sig_signal(Process *proc, sigmask_t sigs)
 {
-	cpuflags_t flags;
+	cpu_flags_t flags;
 
 	/* See comment in sig_wait() for why this protection is necessary */
 	IRQ_SAVE_DISABLE(flags);

@@ -66,7 +66,7 @@ CONFIG_DEPEND(CONFIG_KERN_PREEMPT,    CONFIG_KERN_SCHED && CONFIG_TIMER_EVENTS &
 MOD_DEFINE(preempt)
 
 /// Global preemption disabling nesting counter
-cpuatomic_t _preempt_forbid_cnt;
+cpu_atomic_t _preempt_forbid_cnt;
 
 static Timer preempt_timer;
 

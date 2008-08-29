@@ -47,7 +47,7 @@
 	#define OS_ID     win32
 
 	// FIXME: Maybe disable Win32 exceptions?
-	typedef int cpuflags_t;
+	typedef int cpu_flags_t;
 	#define IRQ_DISABLE                FIXME
 	#define IRQ_ENABLE                 FIXME
 	#define IRQ_SAVE_DISABLE(old_sigs) FIXME
@@ -66,7 +66,7 @@
 	 * The POSIX moral equivalent of disabling IRQs is disabling signals.
 	 */
 	#include <signal.h>
-	typedef sigset_t cpuflags_t;
+	typedef sigset_t cpu_flags_t;
 
 	#define SET_ALL_SIGNALS(sigs) \
 	do { \

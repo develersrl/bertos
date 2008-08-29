@@ -63,7 +63,7 @@ void observer_Unsubscribe(UNUSED_ARG(Subject *,subject), Observer *observer)
 void observer_notify(Subject *subject, int event_id, void *param)
 {
 	Observer *observer;
-	cpuflags_t irqstate;
+	cpu_flags_t irqstate;
 	IRQ_SAVE_DISABLE(irqstate);
 
 	/*

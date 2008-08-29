@@ -91,7 +91,7 @@ void pwm_enable(PwmDev dev, bool state)
  */
 void pwm_init(void)
 {
-	cpuflags_t flags;
+	cpu_flags_t flags;
 	PwmDev dev;
 
 	IRQ_SAVE_DISABLE(flags);

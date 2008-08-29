@@ -120,7 +120,7 @@ REGISTER static List timers_queue;
 void timer_add(Timer *timer)
 {
 	Timer *node;
-	cpuflags_t flags;
+	cpu_flags_t flags;
 
 
 	/* Inserting timers twice causes mayhem. */

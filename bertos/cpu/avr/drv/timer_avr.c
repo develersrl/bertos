@@ -93,7 +93,7 @@
 
 	static void timer_hw_init(void)
 	{
-		cpuflags_t flags;
+		cpu_flags_t flags;
 		IRQ_SAVE_DISABLE(flags);
 
 		/* Reset Timer flags */
@@ -127,7 +127,7 @@
 
 	static void timer_hw_init(void)
 	{
-		cpuflags_t flags;
+		cpu_flags_t flags;
 		IRQ_SAVE_DISABLE(flags);
 
 		/* Reset Timer overflow flag */
@@ -165,7 +165,7 @@
 #elif (CONFIG_TIMER == TIMER_ON_OUTPUT_COMPARE2)
 	static void timer_hw_init(void)
 	{
-		cpuflags_t flags;
+		cpu_flags_t flags;
 		IRQ_SAVE_DISABLE(flags);
 
 		/* Reset Timer flags */
@@ -207,7 +207,7 @@
 
 	static void timer_hw_init(void)
 	{
-		cpuflags_t flags;
+		cpu_flags_t flags;
 		IRQ_SAVE_DISABLE(flags);
 
 		/* Reset Timer overflow flag */

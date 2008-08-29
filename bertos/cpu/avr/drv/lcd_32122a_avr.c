@@ -465,7 +465,7 @@ void lcd_32122_init(void)
 	MOD_CHECK(timer);
 
 	// FIXME: interrupts are already disabled when we get here?!?
-	cpuflags_t flags;
+	cpu_flags_t flags;
 	IRQ_SAVE_DISABLE(flags);
 
 	PORTB |= BV(LCD_PB_A0);
