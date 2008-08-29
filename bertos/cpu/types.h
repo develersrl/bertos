@@ -49,6 +49,7 @@
 
 	typedef uint16_t cpuflags_t; // FIXME
 	typedef unsigned int cpustack_t;
+	typedef unsigned int cpuatomic_t;
 	#warning Verify following constant
 	#define SIZEOF_CPUSTACK_T 2
 
@@ -59,6 +60,8 @@
 	#if OS_EMBEDDED
 		typedef uint32_t cpuflags_t; // FIXME
 	#endif /* OS_EMBEDDED */
+
+	typedef uint32_t cpuatomic_t;
 
 	#if CPU_X86_64
 		typedef uint64_t cpustack_t;
@@ -71,6 +74,7 @@
 #elif CPU_ARM
 
 	typedef uint32_t cpuflags_t;
+	typedef uint32_t cpuatomic_t;
 	typedef uint32_t cpustack_t;
 	#define SIZEOF_CPUSTACK_T 4
 
@@ -79,15 +83,17 @@
 	/* Get cpuflags_t definition from the hosting environment. */
 	#include <cfg/os.h>
 	#if OS_EMBEDDED
-		typedef uint32_t cpuflags_t; // FIXME
+		typedef uint32_t cpuflags_t;
 	#endif
 
-	typedef uint32_t cpustack_t; // FIXME
+	typedef uint32_t cpuatomic_t;
+	typedef uint32_t cpustack_t;
 	#define SIZEOF_CPUSTACK_T 4
 
 #elif CPU_DSP56K
 
 	typedef uint16_t cpuflags_t;
+	typedef uint16_t cpuatomic_t;
 	typedef unsigned int cpustack_t;
 	#warning Verify following costant
 	#define SIZEOF_CPUSTACK_T 2
@@ -95,6 +101,7 @@
 #elif CPU_AVR
 
 	typedef uint8_t cpuflags_t;
+	typedef uint8_t cpuatomic_t;
 	typedef uint8_t cpustack_t;
 	#define SIZEOF_CPUSTACK_T 1
 
