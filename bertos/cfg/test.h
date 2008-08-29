@@ -75,33 +75,25 @@
 
 #if defined(ARCH_UNITTEST) && (ARCH & ARCH_UNITTEST)
 	#define UNIT_TEST 1
-
-	/**
-	 * Macro used to generate a main() for a test to be compiled
-	 * on hosted platform.
-	 */
-	#define TEST_MAIN(module) \
-	int main(void) \
-	{ \
-		if (module##_testSetup() != 0) \
-			return 1; \
-		if (module##_testRun() != 0) \
-			return 2; \
-		if (module##_testTearDown() != 0) \
-			return 3; \
-		return 0; \
-	}
-
-	/** This macro will include the specified file only in test-mode */
-	#define TEST_ONLY(file) PP_STRINGIZE(file)
-
-#else /* !_TEST */
+#else /* !TEST */
 	#define UNIT_TEST 0
+#endif /* TEST */
 
-	#define TEST_MAIN(module)  /* nothing */
-	#define TEST_ONLY(file)    <cfg/nothing.h>
-
-#endif /* _TEST */
+/**
+ * Macro used to generate a main() for a test to be compiled
+ * on hosted platform.
+ */
+#define TEST_MAIN(module) \
+int main(void) \
+{ \
+	if (module##_testSetup() != 0) \
+		return 1; \
+	if (module##_testRun() != 0) \
+		return 2; \
+	if (module##_testTearDown() != 0) \
+		return 3; \
+	return 0; \
+}
 
 /**
  * Silent an assert in a test.
