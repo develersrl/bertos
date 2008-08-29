@@ -69,7 +69,7 @@
 	#define TIMER_HW_CNT         (CLOCK_FREQ / (16 * TIMER_TICKS_PER_SEC) - 1)
 
 	/** Frequency of the hardware high-precision timer. */
-	#define TIMER_HW_HPTICKS_PER_SEC ((hptime_t)(CLOCK_FREQ / 16))
+	#define TIMER_HW_HPTICKS_PER_SEC (CLOCK_FREQ / 16)
 
 	/// Type of time expressed in ticks of the hardware high-precision timer
 	typedef uint32_t hptime_t;
