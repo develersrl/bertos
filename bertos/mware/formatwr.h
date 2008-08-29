@@ -76,5 +76,9 @@ _formatted_write(
 		va_list ap);
 #endif /* CPU_HARVARD */
 
+int sprintf_testSetup(void);
+int sprintf_testRun(void);
+int sprintf_testTearDown(void);
+
 #endif /* MWARE_FORMATWR_H */
 

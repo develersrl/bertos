@@ -36,7 +36,7 @@
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
-
+#include "formatwr.h"
 #include <cfg/compiler.h>
 #include <cfg/test.h>
 #include <cfg/debug.h>
@@ -47,28 +47,31 @@
 
 #include <string.h> /* strcmp() */
 
-#warning FIXME:Review and refactor this test..
 
-#if UNIT_TEST
-#include "sprintf.c"
-#include "formatwr.c"
-#include "hex.c"
+int sprintf_testSetup(void)
+{
+	kdbg_init();
+	return 0;
+}
 
-int main(void)
+int sprintf_testRun(void)
 {
 	char buf[256];
 	static const char test_string[] = "Hello, world!\n";
 	static const pgm_char test_string_pgm[] = "Hello, world!\n";
 
 	snprintf(buf, sizeof buf, "%s", test_string);
-	assert(strcmp(buf, test_string) == 0);
+	if (strcmp(buf, test_string) != 0)
+		return 1;
 
 	snprintf(buf, sizeof buf, "%S", test_string_pgm);
-	assert(strcmp(buf, test_string_pgm) == 0);
+	if (strcmp(buf, test_string_pgm) != 0)
+		return 2;
 
-#define TEST(FMT, VALUE, EXPECT) do { \
+	#define TEST(FMT, VALUE, EXPECT) do { \
 		snprintf(buf, sizeof buf, FMT, VALUE); \
-		assert(strcmp(buf, EXPECT) == 0); \
+		if (strcmp(buf, EXPECT) != 0) \
+			return -1; \
 	} while (0)
 
 	TEST("%d",       12345,        "12345");
@@ -92,13 +95,26 @@ int main(void)
 	 * Stress tests.
 	 */
 	snprintf(buf, sizeof buf, "%s", NULL);
-	assert(strcmp(buf, "<NULL>") == 0);
+	if (strcmp(buf, "<NULL>") != 0)
+		return 3;
 	snprintf(buf, sizeof buf, "%k");
-	assert(strcmp(buf, "???") == 0);
+	if (strcmp(buf, "???") != 0)
+		return 4;
 	sprintf(NULL, test_string); /* must not crash */
 
 	return 0;
 }
 
-#endif /* _TEST */
+int sprintf_testTearDown(void)
+{
+	return 0;
+}
+
+#if UNIT_TEST
+	#include <drv/kdebug.c>
+	#include "sprintf.c"
+	#include "formatwr.c"
+	#include "hex.c"
+	TEST_MAIN(sprintf);
+#endif /* UNIT_TEST */
 
