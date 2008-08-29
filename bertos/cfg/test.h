@@ -49,15 +49,15 @@
  *
  * Then, at the end of your module_test you can write:
  * \code
- * #include TEST_ONLY(whatuneed.h)
- * #include TEST_ONLY(whatuneed.c)
- * #include TEST_ONLY(...)
+ * #if UNIT_TEST
+ * 	#include <whatuneed.h>
+ * 	#include <whatuneed.c>
+ * 	#include <...>
  *
- * TEST_MAIN(module);
+ * 	TEST_MAIN(module);
+ * #endif
  * \endcode
  *
- * The macro TEST_ONLY expand to nothing in non-TEST mode or to
- * the specified filename if _TEST is defined.
  * Including directly into your module the file.c you need to
  * run the test allows you to build and run the test compiling
  * only one file.
