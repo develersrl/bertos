@@ -197,7 +197,9 @@ void ramp_default(struct Ramp *ramp);
 
 
 /** Self test */
-void ramp_test(void);
+int ramp_testSetup(void);
+int ramp_testRun(void);
+int ramp_testTearDown(void);
 
 #endif /* ALGO_RAMP_H */
 

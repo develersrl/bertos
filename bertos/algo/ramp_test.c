@@ -104,8 +104,8 @@
 
 #include "ramp.h"
 #include <cfg/debug.h>
+#include <cfg/test.h>
 
-#warning FIXME:Review and refactor this test..
 
 static bool ramp_test_single(uint32_t minFreq, uint32_t maxFreq, uint32_t length)
 {
@@ -120,8 +120,8 @@ static bool ramp_test_single(uint32_t minFreq, uint32_t maxFreq, uint32_t length
     clock = 0;
     oldclock = 0;
 
-    kprintf("testing ramp: (length=%lu, min=%lu, max=%lu)\n", length, minFreq, maxFreq);
-    kprintf("              [length=%lu, max=%04x, min=%04x]\n", r.clocksRamp, r.clocksMaxWL, r.clocksMinWL);
+    kprintf("testing ramp: (length=%lu, min=%lu, max=%lu)\n", (unsigned long)length, (unsigned long)minFreq, (unsigned long)maxFreq);
+    kprintf("              [length=%lu, max=%04x, min=%04x]\n", (unsigned long)r.clocksRamp, r.clocksMaxWL, r.clocksMinWL);
 
 	int i = 0;
     int nonbyte = 0;
@@ -141,7 +141,7 @@ static bool ramp_test_single(uint32_t minFreq, uint32_t maxFreq, uint32_t length
             uint16_t denom1 = FIX_MULT32((uint16_t)((~t1) + 1), r.precalc.max_div_min) + t1;
             uint16_t denom2 = FIX_MULT32((uint16_t)((~t2) + 1), r.precalc.max_div_min) + t2;
 
-            kprintf("    Failed: %04x @ %lu   -->   %04x @ %lu\n", old, oldclock, cur, clock);
+            kprintf("    Failed: %04x @ %lu   -->   %04x @ %lu\n", old, (unsigned long)oldclock, cur, (unsigned long)clock);
             kprintf("    T:     %04x -> %04x\n", t1, t2);
             kprintf("    DENOM: %04x -> %04x\n", denom1, denom2);
 
@@ -155,23 +155,41 @@ static bool ramp_test_single(uint32_t minFreq, uint32_t maxFreq, uint32_t length
 
 
 
-    kprintf("Test finished: %04x @ %lu [min=%04x, totlen=%lu, numsteps:%d, nonbyte:%d]\n", cur, clock, r.clocksMinWL, r.clocksRamp, i, nonbyte);
+    kprintf("Test finished: %04x @ %lu [min=%04x, totlen=%lu, numsteps:%d, nonbyte:%d]\n", cur, (unsigned long)clock, r.clocksMinWL, (unsigned long)r.clocksRamp, i, nonbyte);
 
     return true;
 }
 
-
-void ramp_test(void)
+int ramp_testSetup(void)
 {
-    bool ok = true;
-
-    ok = ramp_test_single(200,  5000, 3000000) && ok;
-    ok = ramp_test_single(1000, 2000, 1000000) && ok;
-
-    if (ok)
-        kputs("Ramp test succeeded!\n");
-	else
-        kputs("Ramp test fail!\n");
+	kdbg_init();
+	return 0;
 }
 
+int ramp_testTearDown(void)
+{
+	return 0;
+}
+
+int ramp_testRun(void)
+{
+	#define TEST_RAMP(min, max, len) do { \
+		if (!ramp_test_single(min, max, len)) \
+			return -1; \
+	} while(0)
+
+	TEST_RAMP(200,  5000, 3000000);
+	TEST_RAMP(1000, 2000, 1000000);
+
+	return 0;
+}
+
+#if UNIT_TEST
+	#include "ramp.c"
+	#include <drv/kdebug.c>
+	#include <mware/formatwr.c>
+	#include <mware/hex.c>
+
+	TEST_MAIN(ramp);
+#endif
 
