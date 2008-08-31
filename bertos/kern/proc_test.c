@@ -38,6 +38,8 @@
 
 #include <kern/proc.h>
 #include <kern/irq.h>
+#include <kern/monitor.h>
+
 #include <drv/timer.h>
 #include <cfg/test.h>
 
@@ -83,6 +85,7 @@ int proc_testRun(void)
 	{
 		kputs("> main\n");
 		timer_delay(93);
+		monitor_report();
 		proc_yield();
 	}
 	return 0;
