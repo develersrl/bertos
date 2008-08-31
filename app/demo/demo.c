@@ -41,6 +41,7 @@
 
 #include <kern/irq.h>
 #include <kern/proc.h>
+#include <kern/monitor.h>
 #include <kern/msg.h>
 
 #include <drv/timer.h>
@@ -293,6 +294,8 @@ static struct MenuItem main_items[] =
 static struct Menu main_menu = { main_items, "Main Menu", MF_STICKY, &lcd_bitmap, 0 };
 
 
+static cpu_stack_t monitor_stack[CONFIG_KERN_MINSTACKSIZE / sizeof(cpu_stack_t)];
+
 int main(int argc, char *argv[])
 {
 	emul_init(&argc, argv);
@@ -302,6 +305,7 @@ int main(int argc, char *argv[])
 	kbd_init();
 	lcd_init();
 	proc_init();
+	monitor_start(sizeof(monitor_stack), monitor_stack);
 
 	menu_handle(&main_menu);
 
