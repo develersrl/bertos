@@ -52,8 +52,8 @@
  * \author Giovanni Bajo <rasky@develer.com>
  */
 
-#ifndef MWARE_HASHTABLE_H
-#define MWARE_HASHTABLE_H
+#ifndef STRUCT_HASHTABLE_H
+#define STRUCT_HASHTABLE_H
 
 #include <cfg/compiler.h>
 #include <cfg/macros.h>
@@ -268,4 +268,4 @@ INLINE HashIterator ht_iter_next(HashIterator h)
 	return h;
 }
 
-#endif /* MWARE_HASHTABLE_H */
+#endif /* STRUCT_HASHTABLE_H */

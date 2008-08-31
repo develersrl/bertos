@@ -35,8 +35,8 @@
  * \author Giovanni Bajo <rasky@develer.com>
  */
 
-#ifndef MWARE_POOL_H
-#define MWARE_POOL_H
+#ifndef STRUCT_POOL_H
+#define STRUCT_POOL_H
 
 #include <cfg/macros.h>
 #include <struct/list.h>
@@ -71,4 +71,4 @@
 #define pool_free(name, elem)          ADDHEAD(name, (Node*)elem)
 #define pool_empty(name)               ISLISTEMPTY(name)
 
-#endif /* MWARE_POOL_H */
+#endif /* STRUCT_POOL_H */

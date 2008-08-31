@@ -40,8 +40,8 @@
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
-#ifndef MWARE_HEAP_H
-#define MWARE_HEAP_H
+#ifndef STRUCT_HEAP_H
+#define STRUCT_HEAP_H
 
 #include "cfg/cfg_heap.h"
 #include <cfg/compiler.h>
@@ -86,4 +86,4 @@ void heap_free(struct Heap* heap, void * mem);
 
 #endif
 
-#endif /* MWARE_HEAP_H */
+#endif /* STRUCT_HEAP_H */

@@ -64,8 +64,8 @@
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
-#ifndef MWARE_FIFO_H
-#define MWARE_FIFO_H
+#ifndef STRUCT_FIFO_H
+#define STRUCT_FIFO_H
 
 #include <cpu/types.h>
 #include <cpu/irq.h>
@@ -355,5 +355,4 @@ void fifo_pushblock(FIFOBuffer *fb, unsigned char *block, size_t len)
 }
 #endif
 
-#endif /* MWARE_FIFO_H */
-
+#endif /* STRUCT_FIFO_H */

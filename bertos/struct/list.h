@@ -36,8 +36,8 @@
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
-#ifndef MWARE_LIST_H
-#define MWARE_LIST_H
+#ifndef STRUCT_LIST_H
+#define STRUCT_LIST_H
 
 #include <cfg/compiler.h> /* INLINE */
 #include <cfg/debug.h> /* ASSERT_VALID_PTR() */
@@ -327,4 +327,4 @@ INLINE Node *list_remTail(List *l)
 	return n;
 }
 
-#endif /* MWARE_LIST_H */
+#endif /* STRUCT_LIST_H */
