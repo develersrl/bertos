@@ -38,8 +38,8 @@
  */
 
 
-#ifndef MWARE_XMODEM_H
-#define MWARE_XMODEM_H
+#ifndef NET_XMODEM_H
+#define NET_XMODEM_H
 
 #include <cfg/compiler.h>
 #include <kern/kfile.h>
@@ -71,4 +71,4 @@ struct Serial;
 bool xmodem_recv(struct Serial *port, KFile *fd);
 bool xmodem_send(struct Serial *port, KFile *fd);
 
-#endif /* MWARE_XMODEM_H */
+#endif /* NET_XMODEM_H */
