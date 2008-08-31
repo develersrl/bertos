@@ -156,10 +156,10 @@ static void NORETURN monitor(void)
 	}
 }
 
-
 void monitor_start(size_t stacksize, cpu_stack_t *stack)
 {
-	proc_new(monitor, NULL, stacksize, stack);
+	struct Process *p = proc_new(monitor, NULL, stacksize, stack);
+	proc_setPri(p, -10);
 }
 
 #endif /* CONFIG_KERN_MONITOR */
