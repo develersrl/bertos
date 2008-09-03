@@ -104,7 +104,7 @@ typedef struct _PriNode
  *        ADDHEAD(&foo_list, &foo1);
  *        INSERT_BEFORE(&foo_list, &foo2);
  *        FOREACH_NODE(fp, &foo_list)
- *		fp->a = 10;
+ *            fp->a = 10;
  *    }
  *
  * \endcode
@@ -203,17 +203,29 @@ typedef struct _PriNode
 			ASSERT(n == &(l)->tail); \
 		} while (0)
 
+	/// Checks that a node isn't part of a given list
+	#define LIST_ASSERT_NOT_CONTAINS(list,node) \
+		do { \
+			Node *ln; \
+			ASSERT_VALID_PTR(list); \
+			ASSERT_VALID_PTR(node); \
+			FOREACH_NODE(ln, list) \
+				ASSERT(ln != (Node *)(node)); \
+		} while (0)
+
 	#define INVALIDATE_NODE(n) ((n)->succ = (n)->pred = NULL)
 #else
 	#define LIST_ASSERT_VALID(l) do {} while (0)
 	#define INVALIDATE_NODE(n) do {} while (0)
 #endif
 
+/** Tell whether a list is empty. */
+#define LIST_EMPTY(l)  ( (void *)((l)->head.succ) == (void *)(&(l)->tail) )
+
 /** Add node to list head. */
 #define ADDHEAD(l,n) \
 	do { \
-		ASSERT_VALID_PTR(l); \
-		ASSERT_VALID_PTR(n); \
+		LIST_ASSERT_NOT_CONTAINS((l),(n)); \
 		(n)->succ = (l)->head.succ; \
 		(n)->pred = (l)->head.succ->pred; \
 		(n)->succ->pred = (n); \
@@ -223,8 +235,7 @@ typedef struct _PriNode
 /** Add node to list tail. */
 #define ADDTAIL(l,n) \
 	do { \
-		ASSERT_VALID_PTR(l); \
-		ASSERT_VALID_PTR(n); \
+		LIST_ASSERT_NOT_CONTAINS((l),(n)); \
 		(n)->succ = &(l)->tail; \
 		(n)->pred = (l)->tail.pred; \
 		(n)->pred->succ = (n); \
@@ -261,9 +272,6 @@ typedef struct _PriNode
 		INVALIDATE_NODE(n); \
 	} while (0)
 
-/** Tell whether a list is empty. */
-#define LIST_EMPTY(l)  ( (void *)((l)->head.succ) == (void *)(&(l)->tail) )
-
 /**
  * Insert a priority node in a priority queue.
  *
@@ -274,8 +282,7 @@ typedef struct _PriNode
 #define LIST_ENQUEUE(list, node) \
 	do { \
 		PriNode *ln; \
-		ASSERT_VALID_PTR(list); \
-		ASSERT_VALID_PTR(node); \
+		LIST_ASSERT_NOT_CONTAINS((list),(node)); \
 		FOREACH_NODE(ln, (list)) \
 			if (ln->pri < (node)->pri) \
 				break; \
