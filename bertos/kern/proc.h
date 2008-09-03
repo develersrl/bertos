@@ -54,9 +54,8 @@
  */
 struct Process;
 
-/* Task scheduling services */
 void proc_init(void);
-struct Process *proc_new_with_name(const char* name, void (*entry)(void), iptr_t data, size_t stacksize, cpu_stack_t *stack);
+struct Process *proc_new_with_name(const char *name, void (*entry)(void), iptr_t data, size_t stacksize, cpu_stack_t *stack);
 
 #if !CONFIG_KERN_MONITOR
 	#define proc_new(entry,data,size,stack) proc_new_with_name(NULL,(entry),(data),(size),(stack))
@@ -66,16 +65,27 @@ struct Process *proc_new_with_name(const char* name, void (*entry)(void), iptr_t
 
 void proc_exit(void);
 void proc_yield(void);
+void proc_rename(struct Process *proc, const char *name);
+const char *proc_name(struct Process *proc);
+const char *proc_currentName(void);
+iptr_t proc_currentUserData(void);
 
 int proc_testSetup(void);
 int proc_testRun(void);
 int proc_testTearDown(void);
 
-struct Process *proc_current(void);
-iptr_t proc_currentUserData(void);
-void proc_rename(struct Process *proc, const char *name);
-const char *proc_name(struct Process *proc);
-const char *proc_currentName(void);
+/**
+ * Return the context structure of the currently running process.
+ *
+ * The details of the Process structure are private to the scheduler.
+ * The address returned by this function is an opaque pointer that can
+ * be passed as an argument to other process-related functions.
+ */
+INLINE struct Process *proc_current(void)
+{
+	extern struct Process *CurrentProcess;
+	return CurrentProcess;
+}
 
 #if CONFIG_KERN_PRI
 	void proc_setPri(struct Process *proc, int pri);
