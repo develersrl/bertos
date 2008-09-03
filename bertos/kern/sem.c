@@ -28,17 +28,16 @@
  *
  * Copyright 2001, 2004 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999, 2000, 2001 Bernie Innocenti <bernie@codewiz.org>
- *
  * -->
  *
  * \brief Semaphore based synchronization services.
  *
  * \version $Id$
- *
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
 #include "sem.h"
+#include <cpu/irq.h> // ASSERT_IRQ_DISABLED()
 #include <kern/proc.h>
 #include <kern/proc_p.h>
 #include <kern/signal.h>
@@ -178,7 +177,7 @@ void sem_release(struct Semaphore *s)
 		{
 			s->nest_count = 1;
 			s->owner = proc;
-			SCHED_ENQUEUE(proc);
+			ATOMIC(SCHED_ENQUEUE(proc));
 		}
 	}
 

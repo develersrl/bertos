@@ -104,34 +104,31 @@ extern REGISTER Process	*CurrentProcess;
 /**
  * Track ready processes.
  *
- * Access to this list must be protected with a proc_forbid() / proc_premit()
- * pair, or with SCHED_ATOMIC()
+ * Access to this list must be performed with interrupts disabled
  */
 extern REGISTER List     ProcReadyList;
 
 #if CONFIG_KERN_PRI
-	/**
-	 * Enqueue a task in the ready list.
-	 *
-	 * Always use this macro to instert a process in the ready list, as its
-	 * might vary to implement a different scheduling algorithms.
-	 *
-	 * \note This macro is *NOT* protected against the scheduler.  Access to
-	 *       this list must be performed with interrupts disabled.
-	 */
-	#define SCHED_ENQUEUE(proc)  do { \
-			LIST_ASSERT_VALID(&ProcReadyList); \
-			LIST_ENQUEUE(&ProcReadyList, &(proc)->link); \
-		} while (0)
+	#define SCHED_ENQUEUE_INTERNAL(proc) LIST_ENQUEUE(&ProcReadyList, &(proc)->link)
+#else
+	#define SCHED_ENQUEUE_INTERNAL(proc) ADDTAIL(&ProcReadyList, &(proc)->link)
+#endif
 
-#else // !CONFIG_KERN_PRI
+/**
+ * Enqueue a process in the ready list.
+ *
+ * Always use this macro to instert a process in the ready list, as its
+ * might vary to implement a different scheduling algorithms.
+ *
+ * \note Access to the scheduler ready list must be performed with
+ *       interrupts disabled.
+ */
+#define SCHED_ENQUEUE(proc)  do { \
+		IRQ_ASSERT_DISABLED(); \
+		LIST_ASSERT_VALID(&ProcReadyList); \
+		SCHED_ENQUEUE_INTERNAL(proc); \
+	} while (0)
 
-	#define SCHED_ENQUEUE(proc)  do { \
-			LIST_ASSERT_VALID(&ProcReadyList); \
-			ADDTAIL(&ProcReadyList, &(proc)->link); \
-		} while (0)
-
-#endif // !CONFIG_KERN_PRI
 
 /// Schedule another process *without* adding the current one to the ready list.
 void proc_switch(void);
