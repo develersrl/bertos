@@ -54,7 +54,7 @@
 #define CONFIG_KERN_HEAP        0  ///< Dynamic memory allocation
 #define CONFIG_KERN_SEMAPHORES  1  ///< Re-entrant mutual exclusion primitives
 #define CONFIG_KERN_MONITOR     1  ///< Process monitor
-#define CONFIG_KERN_PREEMPT     0  ///< Preemptive process scheduling
+#define CONFIG_KERN_PREEMPT     1  ///< Preemptive process scheduling
 #define CONFIG_KERN_PRI         1  ///< Priority-based scheduling policy
 /*\}*/
 

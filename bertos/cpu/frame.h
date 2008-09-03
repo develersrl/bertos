@@ -226,7 +226,7 @@
  * in hosted environments such as emulators.
  */
 #ifndef CPU_IDLE
-	#if defined(ARCH_EMUL) && (ARCH & ARCH_EMUL)
+	#if defined(ARCH_QT) && (ARCH & ARCH_QT)
 		/* This emulator hook should yield the CPU to the host.  */
 		EXTERN_C_BEGIN
 		void emul_idle(void);
