@@ -369,14 +369,6 @@ void proc_exit(void)
 
 
 /**
- * Get the pointer to the current process
- */
-struct Process *proc_current(void)
-{
-	return CurrentProcess;
-}
-
-/**
  * Get the pointer to the user data of the current process
  */
 iptr_t proc_currentUserData(void)
