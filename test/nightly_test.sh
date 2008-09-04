@@ -34,6 +34,13 @@
 MAKEFILE_TEST_DIR="."
 TEST_DIR="test"
 
+#Copy BeRTOS sources
+cp -a bertos/ bertos.saved/
+
+#Strip away TODOs and FIXME
+find bertos/ -name "*.[ch]"|xargs perl -p -i -e "s/^\s*#warning\s*(TODO|FIXME).*//g;"
+
+
 #Cpu target that we want to test
 TRG="avr arm"
 
@@ -45,3 +52,7 @@ done
 #Clean and launch make on all
 make -f ${MAKEFILE_TEST_DIR}/Makefile.test clean
 make -f ${MAKEFILE_TEST_DIR}/Makefile.test
+
+#Restore original sources
+rm -rf bertos/
+mv bertos.saved/ bertos/

@@ -32,6 +32,7 @@
 
 #Directories
 BERTOS_DIR="./bertos"
+COPY_DIR="./bertos.saved"
 CPU_DIR="${BERTOS_DIR}/cpu"
 
 #Directory to exclude
@@ -46,8 +47,8 @@ if [ $# \< 2 ] ; then
 	exit 1
 fi
 CPU_TARGET=$1
-#Create a list of source file whitout a cpu specific source
-GEN_SRC=`find . \( -name \.svn -prune -o -path $CPU_DIR -prune -o -path $APP_DIR  -prune -o -path $OS_DIR -prune -o -path $EMUL_DIR -prune \) -o -name *.${2} -print | xargs`
+#Create a list of source file without a cpu specific source
+GEN_SRC=`find . \( -name \.svn -prune -o -path $COPY_DIR -prune -o -path $CPU_DIR -prune -o -path $APP_DIR  -prune -o -path $OS_DIR -prune -o -path $EMUL_DIR -prune \) -o -name *.${2} -print | xargs`
 
 #Select c and asm sources for selected cpu target
 TRG_SRC=`find ${CPU_DIR}/$CPU_TARGET -name \.svn -prune -o -name *.${2} -print | xargs`
