@@ -94,12 +94,17 @@
 		#endif
 
 	/* #elif Add other ARM families here */
+	#elif defined (__ARM_LM3S1968__)
+		#define CPU_ARM_LM3S		1
+		#define CPU_ARM_LM3S1968	1
+
+
 	#else
 		#define CPU_ARM_AT91         0
 	#endif
 
 
-	#if CPU_ARM_AT91 + 0 /* Add other ARM families here */ != 1
+	#if CPU_ARM_AT91 + CPU_ARM_LM3S + 0 /* Add other ARM families here */ != 1
 		#error ARM CPU configuration error
 	#endif
 #else
