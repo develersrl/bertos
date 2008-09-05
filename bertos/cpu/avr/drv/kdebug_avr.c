@@ -63,7 +63,7 @@
 	 */
 	#ifndef KDBG_UART0_BUS_INIT
 	#define KDBG_UART0_BUS_INIT  do { \
-			UCSR0B = BV(TXEN0); \
+			UCR = BV(TXEN0); \
 		} while (0)
 	#endif
 	#ifndef KDBG_UART0_BUS_RX
@@ -77,9 +77,14 @@
 		#define UCR UCSR0B
 		#define UDR UDR0
 		#define USR UCSR0A
-	#elif CPU_AVR_ATMEGA8
-		#define UCR UCSRB
-		#define USR UCSRA
+	#elif CPU_AVR_ATMEGA8 || CPU_AVR_ATMEGA32
+		#define UCR    UCSRB
+		#define USR    UCSRA
+		#define TXEN0  TXEN
+		#define UDRE0  UDRE
+		#define TXC0   TXC
+		#define TXCIE0 TXCIE
+		#define UDRIE0 UDRIE
 	#else
 		#error Unknown CPU
 	#endif
@@ -244,9 +249,10 @@ INLINE void kdbg_hw_init(void)
 			UBRR0H = (uint8_t)(period>>8);
 			UBRR0L = (uint8_t)period;
 			KDBG_UART0_BUS_INIT;
-		#elif CPU_AVR_ATMEGA8
+		#elif CPU_AVR_ATMEGA8 || CPU_AVR_ATMEGA32
 			UBRRH = (uint8_t)(period>>8);
 			UBRRL = (uint8_t)period;
+			KDBG_UART0_BUS_INIT;
 		#elif CPU_AVR_ATMEGA103
 			UBRR = (uint8_t)period;
 			KDBG_UART0_BUS_INIT;
