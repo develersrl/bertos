@@ -63,6 +63,7 @@ bool twi_start_r(uint8_t id);
 void twi_stop(void);
 bool twi_put(const uint8_t data);
 bool twi_send(const void *_buf, size_t count);
+int twi_get(bool ack);
 bool twi_recv(void *_buf, size_t count);
 void twi_init(void);
 
