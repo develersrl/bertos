@@ -87,6 +87,14 @@
 	#define BIT_OCIE2A OCIE2
 #endif
 
+#if CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA103
+    /* These ATMega have different prescaler options. */
+    #define TIMER0_PRESCALER_64 BV(CS02)
+    #define TIMER2_PRESCALER_64 (BV(CS21) | BV(CS20))
+#else
+    #define TIMER0_PRESCALER_64 (BV(CS01) | BV(CS00))
+    #define TIMER2_PRESCALER_64 BV(CS22)
+#endif
 
 /** HW dependent timer initialization  */
 #if (CONFIG_TIMER == TIMER_ON_OUTPUT_COMPARE0)
@@ -103,7 +111,7 @@
 		ASSR = 0x00;                  /* Internal system clock */
 		TCCR0 = BV(WGM01)             /* Clear on Compare match */
 			#if TIMER_PRESCALER == 64
-				| BV(CS02)
+				| TIMER0_PRESCALER_64
 			#else
 				#error Unsupported value of TIMER_PRESCALER
 			#endif
@@ -177,12 +185,7 @@
 
 		REG_TCCR2A = BV(WGM21);
 		#if TIMER_PRESCALER == 64
-		#if CPU_AVR_ATMEGA1281 || CPU_AVR_ATMEGA168
-			// ATMega1281 & ATMega168 have undocumented differences in timer2 prescaler!
-			REG_TCCR2B |= BV(CS22);
-		#else
-			REG_TCCR2B |= BV(CS21) | BV(CS20);
-		#endif
+			REG_TCCR2B |= TIMER2_PRESCALER_64;
 		#else
 			#error Unsupported value of TIMER_PRESCALER
 		#endif
