@@ -43,6 +43,14 @@
 /// Comunication frequency
 #define CONFIG_TWI_FREQ  100000UL
 
+/**
+  * TWI start timeout.
+  * For how many milliseconds the twi_start
+  * should try to get an ACK before returning error.
+  *
+  */
+#define CONFIG_TWI_START_TIMEOUT 100
+
 #endif /* CFG_TWI_H */
 
 
