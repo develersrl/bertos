@@ -177,10 +177,11 @@ keymask_t kbd_peek(void)
 {
 	keymask_t key = 0;
 
-// FIXME: make it optional
+#if CONFIG_KBD_SCHED
 	/* Let other tasks run for a while */
 	extern void schedule(void);
 	schedule();
+#endif
 
 	/* Extract an event from the keyboard buffer */
 	IRQ_DISABLE;

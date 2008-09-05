@@ -52,5 +52,8 @@
 /// Enable long pression handler for keys
 #define CONFIG_KBD_LONGPRESS  0
 
+/// Enable calling poor man's scheduler to be called inside kbd_peek
+#define CONFIG_KBD_SCHED 0
+
 #endif /* CFG_KBD_H */
 
