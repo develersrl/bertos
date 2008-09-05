@@ -42,26 +42,52 @@
 #ifndef DRV_EEPROM_H
 #define DRV_EEPROM_H
 
-#include "cfg/cfg_eeprom.h"
 #include <cfg/compiler.h>
+#include <kern/kfile.h>
+
 
 /**
- * \name Values for CONFIG_EEPROM_TYPE
- * \{
+ * Values for Eeprom types.
  */
-#define EEPROM_24XX16 1
-#define EEPROM_24XX256 2
-/*\}*/
+typedef enum EepromType
+{
+	EEPROM_24XX16,
+	EEPROM_24XX256,
+	EEPROM_24XX512,
+	EEPROM_CNT,
+} EepromType;
 
-#if CONFIG_EEPROM_TYPE == EEPROM_24XX16
-	#define EEPROM_BLKSIZE   0x10 ///< Eeprom block size (16byte)
-	#define EEPROM_SIZE     0x800 ///< Eeprom total size (2kB)
-#elif CONFIG_EEPROM_TYPE == EEPROM_24XX256
-	#define EEPROM_BLKSIZE   0x40 ///< Eeprom block size (64byte)
-	#define EEPROM_SIZE    0x8000 ///< Eeprom total size (32kB)
-#else
-	#error Unsupported EEPROM type.
-#endif
+/**
+ * On the same I2C bus can live more than one EEPROM
+ * device. Each device can be addressed by one or more
+ * pins.
+ */
+typedef uint8_t e2dev_addr_t;
+
+/**
+ * Describe an EEPROM context, used by the driver to
+ * access the single device.
+ */
+typedef struct Eeprom
+{
+	KFile fd;          ///< File descriptor.
+	EepromType type;   ///< EEPROM type
+	e2dev_addr_t addr; ///< Device address.
+} Eeprom;
+
+/**
+ * ID for eeproms.
+ */
+#define KFT_EEPROM MAKE_ID('E', 'E', 'P', 'R')
+
+/**
+ * Convert + ASSERT from generic KFile to Eeprom.
+ */
+INLINE Eeprom * EEPROM(KFile *fd)
+{
+	ASSERT(fd->_type == KFT_EEPROM);
+	return (Eeprom *)fd;
+}
 
 /// Type for EEPROM addresses
 typedef uint16_t e2addr_t;
@@ -77,13 +103,29 @@ typedef uint16_t e2addr_t;
  */
 #define e2addr(type, field) ((e2addr_t)&(((type *)0)->field))
 
+/**
+ * Type for EEPROM block size.
+ */
+typedef uint16_t e2blk_size_t;
 
-bool eeprom_write(e2addr_t addr, const void *buf, size_t count);
-bool eeprom_read(e2addr_t addr, void *buf, size_t count);
-bool eeprom_write_char(e2addr_t addr, char c);
-int eeprom_read_char(e2addr_t addr);
-void eeprom_erase(e2addr_t addr, size_t count);
-void eeprom_init(void);
-void eeprom_test(void);
+/**
+ * Type for accessing EEPROM whole size.
+ */
+typedef uint32_t e2_size_t;
+
+/**
+ * Descrive all EEPROM informations
+ * needed by the driver.
+ */
+typedef struct EepromInfo
+{
+	bool has_dev_addr;     ///< true if memory is device addressable (its A0, A1, A2 pin are used by memory).
+	e2blk_size_t blk_size; ///< block size
+	e2_size_t e2_size;     ///< eeprom size
+} EepromInfo;
+
+bool eeprom_erase(Eeprom *fd, e2addr_t addr, e2_size_t count);
+bool eeprom_verify(Eeprom *fd, const void *buf, size_t count);
+void eeprom_init(Eeprom *fd, EepromType, e2dev_addr_t, bool verify);
 
 #endif /* DRV_EEPROM_H */
