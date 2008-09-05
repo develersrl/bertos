@@ -41,8 +41,8 @@
 #include "eeprom.h"
 
 #warning TODO:Test and complete this module for arm platform.
+#if !CPU_ARM
 
-#if 0
 #include <cfg/macros.h>  // MIN()
 #include <cfg/debug.h>
 #include <cfg/module.h>  // MOD_CHECK()
@@ -114,7 +114,7 @@ static size_t eeprom_writeRaw(struct KFile *_fd, const void *buf, size_t size)
 
 	/* clamp size to memory limit (otherwise may roll back) */
 	ASSERT(_fd->seek_pos + size <= (kfile_off_t)_fd->size);
-	size = MIN((kfile_size_t)size, _fd->size - _fd->seek_pos);
+	size = MIN((kfile_off_t)size, _fd->size - _fd->seek_pos);
 
 	if (mem_info[fd->type].has_dev_addr)
 	{
@@ -214,7 +214,7 @@ static size_t eeprom_read(struct KFile *_fd, void *_buf, size_t size)
 
 	/* clamp size to memory limit (otherwise may roll back) */
 	ASSERT(_fd->seek_pos + size <= (kfile_off_t)_fd->size);
-	size = MIN((kfile_size_t)size, _fd->size - _fd->seek_pos);
+	size = MIN((kfile_off_t)size, _fd->size - _fd->seek_pos);
 
 	e2dev_addr_t dev_addr;
 	if (mem_info[fd->type].has_dev_addr)
@@ -388,3 +388,5 @@ void eeprom_init(Eeprom *fd, EepromType type, e2dev_addr_t addr, bool verify)
 
 	fd->fd.seek = kfile_genericSeek;
 }
+
+#endif
