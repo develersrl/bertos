@@ -45,9 +45,11 @@
 #include "cfg/cfg_twi.h"
 #include <cfg/debug.h>
 #include <cfg/macros.h> // BV()
+#include <cfg/module.h>
 
 #include <cpu/detect.h>
 #include <cpu/irq.h>
+#include <drv/timer.h>
 
 #include <compat/twi.h>
 
@@ -91,6 +93,7 @@ bool twi_start_w(uint8_t id)
 	 * control byte with a NACK.  In this case, we must
 	 * keep trying until the eeprom responds with an ACK.
 	 */
+	ticks_t start = timer_clock();
 	while (twi_start())
 	{
 		TWDR = id & ~READ_BIT;
@@ -102,6 +105,11 @@ bool twi_start_w(uint8_t id)
 		else if (TW_STATUS != TW_MT_SLA_NACK)
 		{
 			kprintf("!TW_MT_SLA_(N)ACK: %x\n", TWSR);
+			break;
+		}
+		else if (timer_clock() - start > ms_to_ticks(CONFIG_TWI_START_TIMEOUT))
+		{
+			kprintf("Timeout on TWI_MT_START\n");
 			break;
 		}
 	}
@@ -163,6 +171,40 @@ bool twi_put(const uint8_t data)
 	return true;
 }
 
+/**
+ * Get 1 byte from slave in master transmitter mode
+ * to the selected slave device through the TWI bus.
+ * If \a ack is true issue a ACK after getting the byte,
+ * otherwise a NACK is issued.
+ *
+ * \return the byte read if ok, EOF on errors.
+ */
+int twi_get(bool ack)
+{
+	TWCR = BV(TWINT) | BV(TWEN) | (ack ? BV(TWEA) : 0);
+	WAIT_TWI_READY;
+
+	if (ack)
+	{
+		if (TW_STATUS != TW_MR_DATA_ACK)
+		{
+			kprintf("!TW_MR_DATA_ACK: %x\n", TWSR);
+			return EOF;
+		}
+	}
+	else
+	{
+		if (TW_STATUS != TW_MR_DATA_NACK)
+		{
+			kprintf("!TW_MR_DATA_NACK: %x\n", TWSR);
+			return EOF;
+		}
+	}
+
+	/* avoid sign extension */
+	return (int)(uint8_t)TWDR;
+}
+
 
 /**
  * Send a sequence of bytes in master transmitter mode
@@ -190,6 +232,9 @@ bool twi_send(const void *_buf, size_t count)
  *
  * Received data is placed in \c buf.
  *
+ * \note a NACK is automatically given on the last received
+ *         byte.
+ *
  * \return true on success, false on error
  */
 bool twi_recv(void *_buf, size_t count)
@@ -202,31 +247,23 @@ bool twi_recv(void *_buf, size_t count)
 	 */
 	while (count--)
 	{
-		TWCR = BV(TWINT) | BV(TWEN) | (count ? BV(TWEA) : 0);
-		WAIT_TWI_READY;
+		/*
+		 * The last byte read does not has an ACK
+		 * to stop communication.
+		 */
+		int c = twi_get(count);
 
-		if (count)
-		{
-			if (TW_STATUS != TW_MR_DATA_ACK)
-			{
-				kprintf("!TW_MR_DATA_ACK: %x\n", TWSR);
-				return false;
-			}
-		}
+		if (c == EOF)
+			return false;
 		else
-		{
-			if (TW_STATUS != TW_MR_DATA_NACK)
-			{
-				kprintf("!TW_MR_DATA_NACK: %x\n", TWSR);
-				return false;
-			}
-		}
-		*buf++ = TWDR;
+			*buf++ = c;
 	}
 
 	return true;
 }
 
+
+MOD_DEFINE(twi);
 
 /**
  * Initialize TWI module.
@@ -247,6 +284,9 @@ void twi_init(void)
 #elif CPU_AVR_ATMEGA8
 		PORTC |= BV(PC4) | BV(PC5);
 		DDRC  |= BV(PC4) | BV(PC5);
+#elif CPU_AVR_ATMEGA32
+		PORTC |= BV(PC1) | BV(PC0);
+		DDRC  |= BV(PC1) | BV(PC0);
 #else
 		#error Unsupported architecture
 #endif
@@ -265,4 +305,5 @@ void twi_init(void)
 		TWSR = 0;
 		TWCR = BV(TWEN);
 	);
+	MOD_INIT(twi);
 }
