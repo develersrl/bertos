@@ -64,6 +64,6 @@ void adc_init(void);
  * \note \a y1, \a y2 can be negative, and put in ascending or descending order as well.
  * \note \a data and \a y2 are evaluated only once, \a y1 twice.
  */
-#define ADC_RANGECONV(data, y1, y2) ((((data) * ((y2) - (y1))) / ((1 << ADC_BITS) - 1)) + (y1))
+#define ADC_RANGECONV(data, y1, y2) (((((int32_t)(data)) * ((y2) - (y1))) / ((1 << ADC_BITS) - 1)) + (y1))
 
 #endif /* DRV_ADC_H */
