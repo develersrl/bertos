@@ -218,4 +218,13 @@ struct KFile * kfile_genericReopen(struct KFile *fd)
 	return fd;
 }
 
+/**
+ * Close file \a fd.
+ * This is a generic implementation that only return 0.
+ */
+int kfile_genericClose(UNUSED_ARG(struct KFile *, fd))
+{
+	return 0;
+};
+
 
