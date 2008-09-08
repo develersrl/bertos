@@ -61,7 +61,7 @@ typedef struct Ft245rl
 /**
  * Convert + ASSERT from generic KFile to KFileFt245rl.
  */
-INLINE Ft245rl * FT245RL(KFile *fd)
+INLINE Ft245rl * FT245RL_CAST(KFile *fd)
 {
 	ASSERT(fd->_type == KFT_FT245RL);
 	return (Ft245rl *)fd;

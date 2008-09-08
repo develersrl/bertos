@@ -59,7 +59,7 @@ MOD_DEFINE(ft245rl);
  */
 static size_t ft245rl_read(struct KFile *_fd, void *_buf, size_t size)
 {
-	Ft245rl *fd = FT245RL(_fd);
+	Ft245rl *fd = FT245RL_CAST(_fd);
 	(void)fd; //unused
 	uint8_t *buf = (uint8_t *)_buf;
 	size_t total_read = 0;
@@ -81,7 +81,7 @@ static size_t ft245rl_read(struct KFile *_fd, void *_buf, size_t size)
  */
 static size_t ft245rl_write(struct KFile *_fd, const void *_buf, size_t size)
 {
-	Ft245rl *fd = FT245RL(_fd);
+	Ft245rl *fd = FT245RL_CAST(_fd);
 	(void)fd; //unused
 	const uint8_t *buf = (const uint8_t *)_buf;
 	size_t total_write = 0;

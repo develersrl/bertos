@@ -102,7 +102,7 @@ STATIC_ASSERT(countof(mem_info) == EEPROM_CNT);
  */
 static size_t eeprom_writeRaw(struct KFile *_fd, const void *buf, size_t size)
 {
-	Eeprom *fd = EEPROM(_fd);
+	Eeprom *fd = EEPROM_CAST(_fd);
 	e2dev_addr_t dev_addr;
 	uint8_t addr_buf[2];
 	uint8_t addr_len;
@@ -175,7 +175,7 @@ static size_t eeprom_writeRaw(struct KFile *_fd, const void *buf, size_t size)
  */
 static size_t eeprom_writeVerify(struct KFile *_fd, const void *_buf, size_t size)
 {
-	Eeprom *fd = EEPROM(_fd);
+	Eeprom *fd = EEPROM_CAST(_fd);
 	int retries = 5;
 	size_t wr_len;
 
@@ -204,7 +204,7 @@ static size_t eeprom_writeVerify(struct KFile *_fd, const void *_buf, size_t siz
  */
 static size_t eeprom_read(struct KFile *_fd, void *_buf, size_t size)
 {
-	Eeprom *fd = EEPROM(_fd);
+	Eeprom *fd = EEPROM_CAST(_fd);
 	uint8_t addr_buf[2];
 	uint8_t addr_len;
 	size_t rd_len = 0;

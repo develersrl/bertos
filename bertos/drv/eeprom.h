@@ -83,7 +83,7 @@ typedef struct Eeprom
 /**
  * Convert + ASSERT from generic KFile to Eeprom.
  */
-INLINE Eeprom * EEPROM(KFile *fd)
+INLINE Eeprom * EEPROM_CAST(KFile *fd)
 {
 	ASSERT(fd->_type == KFT_EEPROM);
 	return (Eeprom *)fd;
