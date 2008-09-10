@@ -243,7 +243,7 @@ static size_t eeprom_read(struct KFile *_fd, void *_buf, size_t size)
 	while (size--)
 	{
 		/*
-		 * The last byte read does not has an ACK
+		 * The last byte read does not have an ACK
 		 * to stop communication.
 		 */
 		int c = twi_get(size);
