@@ -31,7 +31,7 @@
  *
  * \brief BattFS Test.
  *
- * \version $Id: demo.c 18242 2007-10-08 17:35:23Z marco $
+ * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  */
 
@@ -47,6 +47,8 @@
 #define FILE_SIZE 32768
 #define PAGE_SIZE 128
 #define PAGE_COUNT FILE_SIZE / PAGE_SIZE
+
+#if UNIT_TEST
 
 FILE *fp;
 const char test_filename[]="battfs_disk.bin";
@@ -538,8 +540,6 @@ int battfs_testRun(void)
 	return 0;
 }
 
-#if UNIT_TEST
-
 int battfs_testSetup(void)
 {
 	return 0;
@@ -552,14 +552,10 @@ int battfs_testTearDown(void)
 
 TEST_MAIN(battfs)
 
-#include "fs/battfs.c"
-#include "drv/kdebug.c"
-#include "mware/formatwr.c"
-#include "mware/hex.c"
+#include <fs/battfs.c>
+#include <kern/kfile.c>
+#include <drv/kdebug.c>
+#include <mware/formatwr.c>
+#include <mware/hex.c>
 
-#else
-int main(void)
-{
-	return battfs_testRun();
-}
 #endif // _TEST

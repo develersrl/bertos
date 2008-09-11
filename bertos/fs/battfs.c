@@ -40,9 +40,6 @@
 
 #include "battfs.h"
 
-#warning TODO:Fix and complete this module.
-
-#if 0
 #include <cfg/debug.h>
 #include <cfg/macros.h> /* MIN, MAX */
 #include <cpu/byteorder.h> /* cpu_to_xx */
@@ -828,5 +825,3 @@ bool battfs_writeTestBlock(struct BattFsSuper *disk, pgcnt_t page, inode_t inode
 
 	return true;
 }
-
-#endif
