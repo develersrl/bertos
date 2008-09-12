@@ -143,7 +143,6 @@ static fcs_t computeFcsFree(struct BattFsPageHeader *hdr)
 /**
  * Read header of page \a page.
  * \return true on success, false otherwise.
- * \note \a hdr is dirtyed even on errors.
  */
 static bool battfs_readHeader(struct BattFsSuper *disk, pgcnt_t page, struct BattFsPageHeader *hdr)
 {
@@ -169,7 +168,6 @@ static bool battfs_readHeader(struct BattFsSuper *disk, pgcnt_t page, struct Bat
 /**
  * Write header of page \a page.
  * \return true on success, false otherwise.
- * \note \a hdr is dirtyed even on errors.
  */
 static bool battfs_writeHeader(struct BattFsSuper *disk, pgcnt_t page, struct BattFsPageHeader *hdr)
 {
@@ -380,6 +378,9 @@ static bool countDiskFilePages(struct BattFsSuper *disk, pgoff_t *filelen_table)
 		if (!battfs_readHeader(disk, page, &hdr))
 			return false;
 
+		/* Increase free space */
+		disk->free_bytes += disk->page_size - BATTFS_HEADER_LEN;
+
 		/* Check header FCS */
 		if (hdr.fcs == computeFcs(&hdr))
 		{
@@ -391,13 +392,10 @@ static bool countDiskFilePages(struct BattFsSuper *disk, pgoff_t *filelen_table)
 			filelen_table[hdr.inode]++;
 
 			/* Keep trace of free space */
-			disk->free_bytes += disk->page_size - BATTFS_HEADER_LEN - hdr.fill;
+			disk->free_bytes -= hdr.fill;
 		}
 		else
 		{
-			/* Increase free space */
-			disk->free_bytes += disk->page_size - BATTFS_HEADER_LEN;
-
 			/* Check if page is marked free */
 			if (hdr.fcs_free == computeFcsFree(&hdr))
 			{
