@@ -54,7 +54,7 @@
  */
 INLINE void battfs_to_disk(struct BattFsPageHeader *hdr, uint8_t *buf)
 {
-	STATIC_ASSERT(BATTFS_HEADER_LEN == 12);
+	STATIC_ASSERT(BATTFS_HEADER_LEN == 10);
 	buf[0] = hdr->inode;
 
 	buf[1] = hdr->fill;
@@ -64,33 +64,25 @@ INLINE void battfs_to_disk(struct BattFsPageHeader *hdr, uint8_t *buf)
 	buf[4] = hdr->pgoff >> 8;
 
 	/*
-	 * Mark is at least 1 bit longer than page address.
+	 * Sequence number is at least 1 bit longer than page address.
 	 * Needed to take care of wraparonds.
 	 */
-	buf[5] = hdr->mark;
-	buf[6] = hdr->mark >> 8;
+	buf[5] = hdr->seq;
+	buf[6] = hdr->seq >> 8;
 
 	/*
-	 * First bit used by mark, last 2 bits used by seq.
-	 * Since only 2 pages with the same inode and pgoff
-	 * can exist at the same time, 2 bit for seq are enough.
+	 * First bit used by seq.
 	 * Unused bits are set to 1.
 	 */
-	buf[7] = ((hdr->mark >> 16) & 0x01) | (hdr->seq << 6) | ~(BV(7) | BV(6) | BV(0));
-
-	/*
-	 * This field must be the before the last one!
-	 */
-	buf[8] = hdr->fcs_free;
-	buf[9] = hdr->fcs_free >> 8;
+	buf[7] = (hdr->seq >> 16) ? 0xFF : 0xFE;
 
 	/*
 	 * This field must be the last one!
 	 * This is needed because if the page is only partially
 	 * written, we can use this to detect it.
 	 */
-	buf[10] = hdr->fcs;
-	buf[11] = hdr->fcs >> 8;
+	buf[8] = hdr->fcs;
+	buf[9] = hdr->fcs >> 8;
 }
 
 /**
@@ -99,14 +91,12 @@ INLINE void battfs_to_disk(struct BattFsPageHeader *hdr, uint8_t *buf)
  */
 INLINE void disk_to_battfs(uint8_t *buf, struct BattFsPageHeader *hdr)
 {
-	STATIC_ASSERT(BATTFS_HEADER_LEN == 12);
+	STATIC_ASSERT(BATTFS_HEADER_LEN == 10);
 	hdr->inode = buf[0];
 	hdr->fill = buf[2] << 8 | buf[1];
 	hdr->pgoff = buf[4] << 8 | buf[3];
-	hdr->mark = (mark_t)(buf[7] & 0x01) << 16 | buf[6] << 8 | buf[5];
-	hdr->seq = buf[7] >> 6;
-	hdr->fcs_free = buf[9] << 8 | buf[8];
-	hdr->fcs = buf[11] << 8 | buf[10];
+	hdr->seq = (seq_t)(buf[7] & 0x01) << 16 | buf[6] << 8 | buf[5];
+	hdr->fcs = buf[9] << 8 | buf[8];
 }
 
 /**
@@ -121,21 +111,6 @@ static fcs_t computeFcs(struct BattFsPageHeader *hdr)
 	rotating_init(&cks);
 	/* fcs is at the end of whole header */
 	rotating_update(buf, BATTFS_HEADER_LEN - sizeof(fcs_t), &cks);
-	return cks;
-}
-
-/**
- * Compute the fcs of the header marked as free.
- */
-static fcs_t computeFcsFree(struct BattFsPageHeader *hdr)
-{
-	uint8_t buf[BATTFS_HEADER_LEN];
-	fcs_t cks;
-
-	battfs_to_disk(hdr, buf);
-	rotating_init(&cks);
-	/* fcs_free is just before fcs of whole header */
-	rotating_update(buf, BATTFS_HEADER_LEN - 2 * sizeof(fcs_t), &cks);
 	return cks;
 }
 
@@ -221,21 +196,17 @@ static void movePages(struct BattFsSuper *disk, pgcnt_t src, int offset)
 	}
 }
 
+#if 0
+
 /**
- * Insert \a page into page allocation array of \a disk,
- * using  \a mark to compute position.
+ * Insert \a page at the bottom of page allocation array of \a disk.
  */
-static void insertFreePage(struct BattFsSuper *disk, mark_t mark, pgcnt_t page)
+static void insertFreePage(struct BattFsSuper *disk, pgcnt_t page)
 {
-	ASSERT(mark - disk->free_start < disk->free_next - disk->free_start);
-
-	pgcnt_t free_pos = disk->page_count - disk->free_next + mark;
-	ASSERT(free_pos < disk->page_count);
-
-	TRACEMSG("mark:%u, page:%u, free_start:%u, free_next:%u, free_pos:%u\n",
-		mark, page, disk->free_start, disk->free_next, free_pos);
-
+	pgcnt_t free_pos = disk->page_count - 1;
 	ASSERT(disk->page_array[free_pos] == PAGE_UNSET_SENTINEL);
+	ASSERT(page <= free_pos);
+
 	disk->page_array[free_pos] = page;
 }
 
@@ -350,6 +321,7 @@ static void findFreeStartNext(struct BattFsSuper *disk, mark_t minl, mark_t maxl
 	TRACEMSG("Free markers:\n minl %u\n maxl %u\n minh %u\n maxh %u\n free_start %u\n free_next %u\n",
 		minl, maxl, minh, maxh, disk->free_start, disk->free_next);
 }
+#endif
 
 /**
  * Count number of pages per file on \a disk.
@@ -363,14 +335,7 @@ static void findFreeStartNext(struct BattFsSuper *disk, mark_t minl, mark_t maxl
 static bool countDiskFilePages(struct BattFsSuper *disk, pgoff_t *filelen_table)
 {
 	BattFsPageHeader hdr;
-	mark_t minl, maxl, minh, maxh;
-
-	/* Initialize min and max counters to keep trace od free blocks */
-	minl = MAX_PAGE_ADDR;
-	maxl = 0;
-	minh = MAX_PAGE_ADDR | MARK_HALF_SIZE;
-	maxh = 0 | MARK_HALF_SIZE;
-
+	disk->free_page_start = 0;
 
 	/* Count the number of disk page per file */
 	for (pgcnt_t page = 0; page < disk->page_count; page++)
@@ -384,8 +349,6 @@ static bool countDiskFilePages(struct BattFsSuper *disk, pgoff_t *filelen_table)
 		/* Check header FCS */
 		if (hdr.fcs == computeFcs(&hdr))
 		{
-			ASSERT(hdr.mark == MARK_PAGE_VALID);
-			ASSERT(hdr.fcs_free == FCS_FREE_VALID);
 			ASSERT(hdr.fill <= disk->page_size - BATTFS_HEADER_LEN);
 
 			/* Page is valid and is owned by a file */
@@ -393,32 +356,10 @@ static bool countDiskFilePages(struct BattFsSuper *disk, pgoff_t *filelen_table)
 
 			/* Keep trace of free space */
 			disk->free_bytes -= hdr.fill;
-		}
-		else
-		{
-			/* Check if page is marked free */
-			if (hdr.fcs_free == computeFcsFree(&hdr))
-			{
-				/*
-				 * This page is a valid and marked free page.
-				 * Update min and max free page markers.
-				 */
-				if (hdr.mark < MARK_HALF_SIZE)
-				{
-					minl = MIN(minl, hdr.mark);
-					maxl = MAX(maxl, hdr.mark);
-				}
-				else
-				{
-					minh = MIN(minh, hdr.mark);
-					maxh = MAX(maxh, hdr.mark);
-				}
-			}
-			else
-				TRACEMSG("page [%d] invalid, keeping as free\n", page);
+			disk->free_page_start++;
 		}
 	}
-	findFreeStartNext(disk, minl, maxl, minh, maxh);
+
 	return true;
 }
 
@@ -440,6 +381,7 @@ static bool countDiskFilePages(struct BattFsSuper *disk, pgoff_t *filelen_table)
 static bool fillPageArray(struct BattFsSuper *disk, pgoff_t *filelen_table)
 {
 	BattFsPageHeader hdr;
+	pgcnt_t curr_free_page = disk->free_page_start;
 	/* Fill page allocation array */
 	for (pgcnt_t page = 0; page < disk->page_count; page++)
 	{
@@ -449,86 +391,245 @@ static bool fillPageArray(struct BattFsSuper *disk, pgoff_t *filelen_table)
 		/* Check header FCS */
 		if (hdr.fcs == computeFcs(&hdr))
 		{
-			/* Page is valid and is owned by a file */
-			ASSERT(hdr.mark == MARK_PAGE_VALID);
-			ASSERT(hdr.fcs_free == FCS_FREE_VALID);
-
 			/* Compute array position */
-			pgcnt_t array_pos = countPages(filelen_table, hdr.inode);
-			array_pos += hdr.pgoff;
+			pgcnt_t array_pos_start = countPages(filelen_table, hdr.inode);
+			pgcnt_t array_pos = array_pos_start + hdr.pgoff;
 
-			/* Check if position is already used by another page of the same file */
-			if (LIKELY(disk->page_array[array_pos] == PAGE_UNSET_SENTINEL))
-				disk->page_array[array_pos] = page;
-			else
+			/* Find the first free position */
+			while (disk->page_array[array_pos] != PAGE_UNSET_SENTINEL)
 			{
-				BattFsPageHeader hdr_old;
-
-				if (!battfs_readHeader(disk, disk->page_array[array_pos], &hdr_old))
-					return false;
-
-				/* Check header FCS */
-				ASSERT(hdr_old.fcs == computeFcs(&hdr_old));
-
-				/* Only the very same page with a different seq number can be here */
-				ASSERT(hdr.inode == hdr_old.inode);
-				ASSERT(hdr.pgoff == hdr_old.pgoff);
-				ASSERT(hdr.mark == hdr_old.mark);
-				ASSERT(hdr.fcs_free == hdr_old.fcs_free);
-				ASSERT(hdr.seq != hdr_old.seq);
-
-				pgcnt_t new_page, old_page;
-				fill_t old_fill;
-
-				/* Fancy check to handle seq wraparound (2 bits only) */
-				if (((hdr.seq - hdr_old.seq) & 0x03) < 2)
-				{
-					/* Current header is newer than the previuos one */
-					old_page = disk->page_array[array_pos];
-					new_page = page;
-					old_fill = hdr_old.fill;
-				}
-				else
-				{
-					/* Previous header is newer than the current one */
-					old_page = page;
-					new_page = disk->page_array[array_pos];
-					old_fill = hdr.fill;
-				}
-
-				/* Set new page */
-				disk->page_array[array_pos] = new_page;
-
-				/* Add free space */
-				disk->free_bytes += old_fill;
-
-				/* Shift all array one position to the left, overwriting duplicate page */
-				array_pos -= hdr.pgoff;
-				array_pos += filelen_table[hdr.inode];
-				movePages(disk, array_pos, -1);
-
-				/* Decrease file page count */
-				filelen_table[hdr.inode]--;
-
-				/* Add old page to free pages pool */
-				if (!battfs_markFree(disk, &hdr, old_page))
-					return false;
-
-				insertFreePage(disk, hdr.mark, old_page);
+				ASSERT(array_pos < array_pos_start + filelen_table[hdr.inode + 1]);
+				array_pos++;
 			}
+
+			disk->page_array[array_pos] = page;
 		}
 		else
 		{
-			/* Check if page is free */
-			if (hdr.fcs_free != computeFcsFree(&hdr))
-				/* Page is not a valid marked page, insert at list beginning */
-				hdr.mark = --disk->free_start;
-
-			insertFreePage(disk, hdr.mark, page);
+			/* Invalid page, keep as free */
+			ASSERT(disk->page_array[curr_free_page] == PAGE_UNSET_SENTINEL);
+			LOG_INFO("Page %d invalid, keeping as free\n", page);
+			disk->page_array[curr_free_page++] = page;
 		}
 	}
 	return true;
 }
+
+/**
+ * Find the latest version of a page, starting from the
+ * page supplied by \a page_array.
+ * The pages are read from the disk until a different
+ * inode or page offset is found.
+ * The lastest version of the page is moved in the first
+ * position of \a page_array.
+ * \return the number of old versions of the page or PAGE_ERROR
+ *         on disk read errors.
+ */
+static pgcnt_t findLastVersion(pgcnt_t *page_array)
+{
+	pgcnt_t *array_start = page_array;
+	BattFsPageHeader hdr;
+	if (!battfs_readHeader(disk, *page_array++, &hdr))
+		return PAGE_ERROR;
+
+	/* Free space: early bailout */
+	if (hdr.fcs != computeFcs(&hdr))
+		return 0;
+
+	/*
+	 * If the first page is valid,
+	 * inode and pg_off in the array are taken
+	 * as the current page markers.
+	 */
+	inode_t curr_inode = hdr.inode;
+	pgoff_t curr_pgoff = hdr.pgoff;
+
+	/* Temps used to find the sequence number range */
+	seq_t minl = HALF_SEQ - 1;
+	seq_t maxl = 0;
+	seq_t minh = FULL_SEQ;
+	seq_t maxh = HALF_SEQ;
+	pgcnt_t lpos = 0, hpos = 0, dup_cnt = 0;
+
+	/*
+	 * Find min and max values for the two
+	 * half of seq_num range.
+	 * With this we can find seqnum wraparounds.
+	 * seq_t is a type that has at least 1 bit more than
+	 * pgaddr_t. So all version of a page blocks can be numbered using
+	 * at most half numbers of a seq_t type.
+	 * The sequence number algorithm increments by 1 the previous seq_num
+	 * every time a page is rewritten. So the sequence is
+	 * guaranteed to be countiguous.
+	 * Only wrap arounds may happen, but due to half size sequence limitation,
+	 * there are only 4 possible situations:
+	 *
+	 * \verbatim
+	 *    |------lower half------|-------upper half-------|
+	 *
+	 * 1) |------minl*****maxl---|------------------------|
+	 * 2) |------minl********maxl|minh******maxh----------|
+	 * 3) |----------------------|----minh*******maxh-----|
+	 * 4) |minl******maxl--------|------------minh****maxh|
+	 * \endverbatim
+	 *
+	 * Situations 1 and 3 are easy to detect, while 2 and 4 require more care.
+	 */
+	do
+	{
+		if (hdr.seq < SEQ_HALF_SIZE)
+		{
+			minl = MIN(minl, hdr.seq);
+			if (hdr.seq > maxl)
+			{
+				maxl = hdr.seq;
+				lpos = dup_cnt;
+			}
+		}
+		else
+		{
+			minh = MIN(minh, hdr.seq);
+			if (hdr.seq > maxh)
+			{
+				maxh = hdr.seq;
+				hpos = dup_cnt;
+			}
+		}
+
+		if (!battfs_readHeader(disk, *page_array++, &hdr))
+			return PAGE_ERROR;
+		dup_cnt++;
+	}
+	while (curr_inode == hdr.inode && curr_pgoff == hdr.pgoff && hdr.fcs == computeFcs(&hdr))
+
+
+	/* Return early if there is only one version of the current page */
+	if (dup_cnt == 1)
+		return 0;
+
+	/* Find the position in the array of the last version of the page */
+	pgcnt_t last_ver = hpos;
+	if (maxl >= minl)
+	{
+		/* Valid interval found in lower half */
+		if (maxh >= minh)
+		{
+			/* Valid interval also found in upper half */
+			if (maxl != minh - 1)
+			{
+				/* Interval starts in upper half and ends in lower */
+				ASSERT(minl == 0);
+				ASSERT(maxh == FULL_SEQ);
+
+				last_ver = lpos;
+			}
+		}
+		else
+			/*
+			 * Upper interval is invalid.
+			 * Use lower values.
+			 */
+			last_ver = lpos;
+	}
+
+	/* Put last page version at array start position */
+	SWAP(array_start[0], array_start[last_ver]);
+
+	return dup_cnt - 1;
+}
+
+/**
+ * Collect old pages, removing empty spaces from \a pg_array, for a maximum len of \a pg_len.
+ * Once the collect task is completed, copy \a old_cnt pages from \a old_pages at the
+ * end of free space in pg_array.
+ */
+void collectOldPages(pgcnt_t *pg_array, pgcnt_t pg_len, pgcnt_t *old_pages, pgcnt_t old_cnt)
+{
+	bool copy = false;
+	pgcnt_t gap = 0;
+
+	for (pgcnt_t curr_page = 0; curr_page < pg_len; pg_len++)
+	{
+		if (!copy)
+		{
+			if (pg_array[curr_page] == PAGE_UNSET_SENTINEL)
+				gap++;
+			else
+			{
+				pg_array[curr_page - gap] = pg_array[curr_page];
+				copy = true;
+			}
+		}
+		else
+		{
+			if (pg_array[curr_page] != PAGE_UNSET_SENTINEL)
+				pg_array[curr_page - gap] = pg_array[curr_page];
+			else
+			{
+				gap++;
+				copy = false;
+			}
+		}
+	}
+	ASSERT(gap == old_cnt);
+	pg_array += pg_len - old_cnt;
+
+	memcpy(pg_array, old_pages, old_cnt * sizeof(pgcnt_t));
+}
+
+/**
+ * This function scan the page array of \a disk looking for
+ * old versions of the same page.
+ *
+ * Only the last version is kept as valid, the old ones are inserted
+ * in the free blocks heap.
+ * \return true if ok, false on disk read errors.
+ * \note The whole disk is scanned once.
+ */
+static bool dropOldPages(struct BattFsSuper *disk)
+{
+	#define OLD_PAGE_BUFLEN 64
+	pgcnt_t old_pages[OLD_PAGE_BUFLEN];
+	pgcnt_t old_cnt = 0;
+
+	pgcnt_t *curr_page = disk->page_array;
+	pgcnt_t *collect_start = disk->page_array;
+	pgcnt_t collect_len = disk->page_count;
+	pgcnt_t dup_pages;
+
+	do
+	{
+		dup_pages = findLastVersion(curr_page);
+		if (dup_pages == PAGE_ERROR)
+			return false;
+		/* The first page is the last version */
+		curr_page++;
+		while (dup_pages--)
+		{
+			if (old_cnt >= OLD_PAGE_BUFLEN)
+			{
+				collectOldPages(collect_start, collect_len, old_pages, old_cnt);
+				collect_len -= old_cnt;
+				disk->free_bytes += old_cnt * (disk->page_size - BATTFS_HEADER_LEN);
+				disk->free_page_start -= old_cnt;
+				curr_page -= old_cnt;
+				collect_start = curr_page;
+				old_cnt = 0;
+			}
+
+			old_pages[old_cnt++] = *curr_page;
+			*curr_page++ = PAGE_UNSET_SENTINEL;
+		}
+	}
+	while (curr_page < disk->page_array + disk->free_page_start);
+
+	collectOldPages(collect_start, collect_len, old_pages, old_cnt);
+	disk->free_bytes += old_cnt * (disk->page_size - BATTFS_HEADER_LEN);
+	disk->free_page_start -= old_cnt;
+
+	return true;
+}
+
 
 /**
  * Initialize and mount disk described by
@@ -581,6 +682,12 @@ bool battfs_init(struct BattFsSuper *disk)
 	if (!fillPageArray(disk, filelen_table))
 	{
 		TRACEMSG("error filling page array\n");
+		return false;
+	}
+
+	if (!dropOldPages(disk))
+	{
+		LOG_ERR("error dropping old pages\n");
 		return false;
 	}
 
