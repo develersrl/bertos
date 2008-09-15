@@ -44,6 +44,8 @@
 #include <cfg/macros.h> /* MIN, MAX */
 #include <cpu/byteorder.h> /* cpu_to_xx */
 
+#define LOG_LEVEL       LOG_LVL_INFO
+#define LOG_FORMAT      LOG_FMT_VERBOSE
 #include <cfg/log.h>
 
 #include <string.h> /* memset, memmove */
@@ -131,7 +133,7 @@ static bool battfs_readHeader(struct BattFsSuper *disk, pgcnt_t page, struct Bat
 	if (disk->read(disk, page, disk->page_size - BATTFS_HEADER_LEN, buf, BATTFS_HEADER_LEN)
 	    != BATTFS_HEADER_LEN)
 	{
-		TRACEMSG("Error: page[%d]\n", page);
+		LOG_ERR("Error: page[%d]\n", page);
 		return false;
 	}
 
@@ -160,7 +162,7 @@ static bool battfs_writeHeader(struct BattFsSuper *disk, pgcnt_t page, struct Ba
 	if (disk->write(disk, page, disk->page_size - BATTFS_HEADER_LEN, buf, BATTFS_HEADER_LEN)
 	    != BATTFS_HEADER_LEN)
 	{
-		TRACEMSG("Error: page[%d]\n", page);
+		LOG_ERR("Error: page[%d]\n", page);
 		return false;
 	}
 	return true;
@@ -196,133 +198,6 @@ static void movePages(struct BattFsSuper *disk, pgcnt_t src, int offset)
 			disk->page_array[page] = PAGE_UNSET_SENTINEL;
 	}
 }
-
-#if 0
-
-/**
- * Insert \a page at the bottom of page allocation array of \a disk.
- */
-static void insertFreePage(struct BattFsSuper *disk, pgcnt_t page)
-{
-	pgcnt_t free_pos = disk->page_count - 1;
-	ASSERT(disk->page_array[free_pos] == PAGE_UNSET_SENTINEL);
-	ASSERT(page <= free_pos);
-
-	disk->page_array[free_pos] = page;
-}
-
-/**
- * Mark \a page of \a disk as free.
- * \note free_next of \a disk is used as \a page free marker
- * and is increased by 1.
- */
-static bool battfs_markFree(struct BattFsSuper *disk, struct BattFsPageHeader *hdr, pgcnt_t page)
-{
-	uint8_t buf[BATTFS_HEADER_LEN];
-
-	hdr->mark = disk->free_next;
-	hdr->fcs_free = computeFcsFree(hdr);
-	battfs_to_disk(hdr, buf);
-
-	if (!disk->write(disk, page, disk->page_size - BATTFS_HEADER_LEN, buf, BATTFS_HEADER_LEN))
-	{
-		TRACEMSG("error marking page [%d]\n", page);
-		return false;
-	}
-	else
-	{
-		disk->free_next++;
-		return true;
-	}
-}
-
-/**
- * Determine free_start and free_next blocks for \a disk
- * using \a minl, \a maxl, \a minh, \a maxh.
- *
- * Mark_t is a type that has at least 1 bit more than
- * pgaddr_t. So all free blocks can be numbered using
- * at most half numbers of a mark_t type.
- * The free blocks algorithm increments by 1 the disk->free_next
- * every time a page becomes free. So the free block sequence is
- * guaranteed to be countiguous.
- * Only wrap arounds may happen, but due to half size sequence limitation,
- * there are only 4 possible situations:
- *
- * \verbatim
- *    |------lower half------|-------upper half-------|
- *
- * 1) |------minl*****maxl---|------------------------|
- * 2) |------minl********maxl|minh******maxh----------|
- * 3) |----------------------|----minh*******maxh-----|
- * 4) |minl******maxl--------|------------minh****maxh|
- * \endverbatim
- *
- * Situations 1 and 3 are easy to detect, while 2 and 4 require more care.
- */
-static void findFreeStartNext(struct BattFsSuper *disk, mark_t minl, mark_t maxl, mark_t minh, mark_t maxh)
-{
-	/* Determine free_start & free_next */
-	if (maxl >= minl)
-	{
-		/* Valid interval found in lower half */
-		if (maxh >= minh)
-		{
-			/* Valid interval also found in upper half */
-			if (maxl == minh - 1)
-			{
-				/* Interval starts in lower half and ends in upper */
-				disk->free_start = minl;
-				disk->free_next = maxh;
-			}
-			else
-			{
-				/* Interval starts in upper half and ends in lower */
-				ASSERT(minl == 0);
-				ASSERT(maxh == (MAX_PAGE_ADDR | MARK_HALF_SIZE));
-
-				disk->free_start = minh;
-				disk->free_next = maxl;
-			}
-		}
-		else
-		{
-			/*
-			 * Upper interval is invalid.
-			 * Use lower values.
-			 */
-
-			disk->free_start = minl;
-			disk->free_next = maxl;
-		}
-	}
-	else if (maxh >= minh)
-	{
-		/*
-		 * Lower interval is invalid.
-		 * Use upper values.
-		 */
-		disk->free_start = minh;
-		disk->free_next = maxh;
-	}
-	else
-	{
-		/*
-		 * No valid interval found.
-		 * Hopefully the disk is brand new (or full).
-		 */
-		TRACEMSG("No valid marked free block found, new disk or disk full\n");
-		disk->free_start = 0;
-		disk->free_next = -1; //to be increased later
-	}
-
-	/* free_next should contain the first usable address */
-	disk->free_next++;
-
-	TRACEMSG("Free markers:\n minl %u\n maxl %u\n minh %u\n maxh %u\n free_start %u\n free_next %u\n",
-		minl, maxl, minh, maxh, disk->free_start, disk->free_next);
-}
-#endif
 
 /**
  * Count number of pages per file on \a disk.
@@ -360,6 +235,7 @@ static bool countDiskFilePages(struct BattFsSuper *disk, pgoff_t *filelen_table)
 			disk->free_page_start++;
 		}
 	}
+	LOG_INFO("free_bytes:%d, free_page_start:%d\n", disk->free_bytes, disk->free_page_start);
 
 	return true;
 }
@@ -399,7 +275,7 @@ static bool fillPageArray(struct BattFsSuper *disk, pgoff_t *filelen_table)
 			/* Find the first free position */
 			while (disk->page_array[array_pos] != PAGE_UNSET_SENTINEL)
 			{
-				ASSERT(array_pos < array_pos_start + filelen_table[hdr.inode + 1]);
+				ASSERT(array_pos < array_pos_start + filelen_table[hdr.inode] + filelen_table[hdr.inode + 1]);
 				array_pos++;
 			}
 
@@ -549,7 +425,7 @@ void collectOldPages(pgcnt_t *pg_array, pgcnt_t pg_len, pgcnt_t *old_pages, pgcn
 	bool copy = false;
 	pgcnt_t gap = 0;
 
-	for (pgcnt_t curr_page = 0; curr_page < pg_len; pg_len++)
+	for (pgcnt_t curr_page = 0; curr_page < pg_len; curr_page++)
 	{
 		if (!copy)
 		{
@@ -647,7 +523,7 @@ bool battfs_init(struct BattFsSuper *disk)
 	/* Init disk device */
 	if (!disk->open(disk))
 	{
-		TRACEMSG("open error\n");
+		LOG_ERR("open error\n");
 		return false;
 	}
 
@@ -669,7 +545,7 @@ bool battfs_init(struct BattFsSuper *disk)
 	/* Count pages per file */
 	if (!countDiskFilePages(disk, filelen_table))
 	{
-		TRACEMSG("error counting file pages\n");
+		LOG_ERR("error counting file pages\n");
 		return false;
 	}
 
@@ -682,7 +558,7 @@ bool battfs_init(struct BattFsSuper *disk)
 	/* Fill page allocation array using filelen_table */
 	if (!fillPageArray(disk, filelen_table))
 	{
-		TRACEMSG("error filling page array\n");
+		LOG_ERR("error filling page array\n");
 		return false;
 	}
 
@@ -915,7 +791,7 @@ bool battfs_writeTestBlock(struct BattFsSuper *disk, pgcnt_t page, inode_t inode
 
 	if (!battfs_writeHeader(disk, page, &hdr))
 	{
-		TRACEMSG("error writing hdr\n");
+		LOG_ERR("error writing hdr\n");
 		return false;
 	}
 
