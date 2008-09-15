@@ -156,7 +156,7 @@ static void test2(BattFsSuper *disk)
 
 	for (int i = 0; i < PAGE_COUNT; i++)
 	{
-		battfs_writeTestBlock(disk, i, 0, 0, 0, i, MARK_PAGE_VALID);
+		battfs_writeTestBlock(disk, i, 0, 0, 0, i);
 		ref[i] = i;
 	}
 	fclose(fp);
@@ -176,7 +176,7 @@ static void test3(BattFsSuper *disk)
 
 	for (int i = 0; i < PAGE_COUNT / 2; i++)
 	{
-		battfs_writeTestBlock(disk, i, 0, 0, 0, i, MARK_PAGE_VALID);
+		battfs_writeTestBlock(disk, i, 0, 0, 0, i);
 		ref[i] = i;
 	}
 	fseek(fp, FILE_SIZE / 2, SEEK_SET);
@@ -204,12 +204,12 @@ static void test4(BattFsSuper *disk)
 
 	for (int i = 0; i < PAGE_COUNT / 2; i++)
 	{
-		battfs_writeTestBlock(disk, i, 0, 0, 0, i, MARK_PAGE_VALID);
+		battfs_writeTestBlock(disk, i, 0, 0, 0, i);
 		ref[i] = i;
 	}
 	for (int i = PAGE_COUNT / 2; i < PAGE_COUNT; i++)
 	{
-		battfs_writeTestBlock(disk, i, 0, 0, 0, i, i);
+		battfs_writeTestBlock(disk, i, 0, 0, 0, i);
 		ref[i] = i;
 	}
 	fclose(fp);
@@ -232,12 +232,12 @@ static void test5(BattFsSuper *disk)
 
 	for (int i = 0; i < PAGE_COUNT / 3; i++)
 	{
-		battfs_writeTestBlock(disk, i, 0, 0, 0, i, MARK_PAGE_VALID);
+		battfs_writeTestBlock(disk, i, 0, 0, 0, i);
 		ref[i] = i;
 	}
 	for (int i = PAGE_COUNT / 3; i < 2 * (PAGE_COUNT / 3); i++)
 	{
-		battfs_writeTestBlock(disk, i, 0, 0, 0, i, i);
+		battfs_writeTestBlock(disk, i, 0, 0, 0, i);
 		ref[i + PAGE_COUNT / 3 + 1] = i;
 	}
 	fclose(fp);
@@ -257,10 +257,10 @@ static void test6(BattFsSuper *disk)
 
 	fp = fopen(test_filename, "w+");
 
-	battfs_writeTestBlock(disk, 0, 0, 0, 0, 0, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 1, 0, 0, 0, 1, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 2, 0, 1, 0, 1, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 3, 0, 0, 0, 0, 123);
+	battfs_writeTestBlock(disk, 0, 0, 0, 0, 0);
+	battfs_writeTestBlock(disk, 1, 0, 0, 0, 1);
+	battfs_writeTestBlock(disk, 2, 0, 1, 0, 1);
+	battfs_writeTestBlock(disk, 3, 0, 0, 0, 0);
 
 	fclose(fp);
 	ref[0] = 0;
@@ -280,10 +280,10 @@ static void test7(BattFsSuper *disk)
 
 	fp = fopen(test_filename, "w+");
 
-	battfs_writeTestBlock(disk, 0, 0, 0, 0, 0, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 1, 0, 1, 0, 1, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 2, 0, 0, 0, 1, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 3, 0, 0, 0, 0, 123);
+	battfs_writeTestBlock(disk, 0, 0, 0, 0, 0);
+	battfs_writeTestBlock(disk, 1, 0, 1, 0, 1);
+	battfs_writeTestBlock(disk, 2, 0, 0, 0, 1);
+	battfs_writeTestBlock(disk, 3, 0, 0, 0, 0);
 
 	fclose(fp);
 	ref[0] = 0;
@@ -303,10 +303,10 @@ static void test8(BattFsSuper *disk)
 
 	fp = fopen(test_filename, "w+");
 
-	battfs_writeTestBlock(disk, 0, 0, 0, 0, 0, 1235);
-	battfs_writeTestBlock(disk, 1, 0, 0, 0, 0, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 2, 0, 1, 0, 1, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 3, 0, 0, 0, 1, MARK_PAGE_VALID);
+	battfs_writeTestBlock(disk, 0, 0, 0, 0, 0);
+	battfs_writeTestBlock(disk, 1, 0, 0, 0, 0);
+	battfs_writeTestBlock(disk, 2, 0, 1, 0, 1);
+	battfs_writeTestBlock(disk, 3, 0, 0, 0, 1);
 
 
 	fclose(fp);
@@ -327,14 +327,14 @@ static void test9(BattFsSuper *disk)
 
 	fp = fopen(test_filename, "w+");
 
-	battfs_writeTestBlock(disk, 0, 0, 0, 0, 0, 1235);
-	battfs_writeTestBlock(disk, 1, 0, 0, 0, 0, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 2, 0, 3, 0, 1, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 3, 0, 0, 0, 1, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 4, 0, 0, 0, 0, 1236);
-	battfs_writeTestBlock(disk, 5, 4, 0, 0, 0, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 6, 4, 1, 0, 1, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 7, 4, 0, 0, 1, MARK_PAGE_VALID);
+	battfs_writeTestBlock(disk, 0, 0, 0, 0, 0);
+	battfs_writeTestBlock(disk, 1, 0, 0, 0, 0);
+	battfs_writeTestBlock(disk, 2, 0, 3, 0, 1);
+	battfs_writeTestBlock(disk, 3, 0, 0, 0, 1);
+	battfs_writeTestBlock(disk, 4, 0, 0, 0, 0);
+	battfs_writeTestBlock(disk, 5, 4, 0, 0, 0);
+	battfs_writeTestBlock(disk, 6, 4, 1, 0, 1);
+	battfs_writeTestBlock(disk, 7, 4, 0, 0, 1);
 
 
 	fclose(fp);
@@ -353,26 +353,26 @@ static void test9(BattFsSuper *disk)
 
 static void test10(BattFsSuper *disk)
 {
-	BattFS fd1;
-	BattFS fd2;
+	BattFs fd1;
+	BattFs fd2;
 	kprintf("Test10: open file test, inode 0 and inode 4\n");
 
 	fp = fopen(test_filename, "w+");
 
-	unsigned int PAGE_FILL = 116;
+	int PAGE_FILL = 116;
 	unsigned int INODE = 0;
 	unsigned int INODE2 = 4;
 	unsigned int INEXISTENT_INODE = 123;
 	unsigned int MODE = 0;
 
-	battfs_writeTestBlock(disk, 0, 123, 0, PAGE_FILL, 0, 1235);
-	battfs_writeTestBlock(disk, 1, INODE, 0, PAGE_FILL, 0, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 2, INODE, 3, PAGE_FILL, 1, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 3, INODE, 0, PAGE_FILL, 1, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 4, INODE2, 0, PAGE_FILL, 0, 1236);
-	battfs_writeTestBlock(disk, 5, INODE2, 0, PAGE_FILL, 0, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 6, INODE2, 1, PAGE_FILL, 1, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 7, INODE2, 0, PAGE_FILL, 1, MARK_PAGE_VALID);
+	battfs_writeTestBlock(disk, 0, 123, 0, PAGE_FILL, 0);
+	battfs_writeTestBlock(disk, 1, INODE, 0, PAGE_FILL, 0);
+	battfs_writeTestBlock(disk, 2, INODE, 3, PAGE_FILL, 1);
+	battfs_writeTestBlock(disk, 3, INODE, 0, PAGE_FILL, 1);
+	battfs_writeTestBlock(disk, 4, INODE2, 0, PAGE_FILL, 0);
+	battfs_writeTestBlock(disk, 5, INODE2, 0, PAGE_FILL, 0);
+	battfs_writeTestBlock(disk, 6, INODE2, 1, PAGE_FILL, 1);
+	battfs_writeTestBlock(disk, 7, INODE2, 0, PAGE_FILL, 1);
 
 	fclose(fp);
 
@@ -418,7 +418,7 @@ static void test10(BattFsSuper *disk)
 
 static void test11(BattFsSuper *disk)
 {
-	BattFS fd1;
+	BattFs fd1;
 	uint8_t buf[16];
 
 	kprintf("Test11: read file test\n");
@@ -430,14 +430,14 @@ static void test11(BattFsSuper *disk)
 	unsigned int INODE2 = 4;
 	unsigned int MODE = 0;
 
-	battfs_writeTestBlock(disk, 0, 123, 0, PAGE_FILL, 0, 1235);
-	battfs_writeTestBlock(disk, 1, INODE, 0, PAGE_FILL, 0, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 2, INODE, 3, PAGE_FILL, 1, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 3, INODE, 0, PAGE_FILL, 1, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 4, INODE2, 0, PAGE_FILL, 0, 1236);
-	battfs_writeTestBlock(disk, 5, INODE2, 0, PAGE_FILL, 0, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 6, INODE2, 1, PAGE_FILL, 1, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 7, INODE2, 0, PAGE_FILL, 1, MARK_PAGE_VALID);
+	battfs_writeTestBlock(disk, 0, 123, 0, PAGE_FILL, 0);
+	battfs_writeTestBlock(disk, 1, INODE, 0, PAGE_FILL, 0);
+	battfs_writeTestBlock(disk, 2, INODE, 3, PAGE_FILL, 1);
+	battfs_writeTestBlock(disk, 3, INODE, 0, PAGE_FILL, 1);
+	battfs_writeTestBlock(disk, 4, INODE2, 0, PAGE_FILL, 0);
+	battfs_writeTestBlock(disk, 5, INODE2, 0, PAGE_FILL, 0);
+	battfs_writeTestBlock(disk, 6, INODE2, 1, PAGE_FILL, 1);
+	battfs_writeTestBlock(disk, 7, INODE2, 0, PAGE_FILL, 1);
 
 	fclose(fp);
 
@@ -456,7 +456,7 @@ static void test11(BattFsSuper *disk)
 
 static void test12(BattFsSuper *disk)
 {
-	BattFS fd1;
+	BattFs fd1;
 
 	kprintf("Test12: read file test across page boundary and seek test\n");
 
@@ -467,14 +467,14 @@ static void test12(BattFsSuper *disk)
 	unsigned int MODE = 0;
 	uint8_t buf[PAGE_FILL + 10];
 
-	battfs_writeTestBlock(disk, 0, 123, 0, PAGE_FILL, 0, 1235);
-	battfs_writeTestBlock(disk, 1, INODE, 0, PAGE_FILL, 0, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 2, INODE, 3, PAGE_FILL, 1, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 3, INODE, 0, PAGE_FILL, 1, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 4, INODE, 0, PAGE_FILL, 0, 1236);
-	battfs_writeTestBlock(disk, 5, INODE, 0, PAGE_FILL, 2, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 6, INODE, 1, PAGE_FILL, 3, MARK_PAGE_VALID);
-	battfs_writeTestBlock(disk, 7, INODE, 0, PAGE_FILL, 3, MARK_PAGE_VALID);
+	battfs_writeTestBlock(disk, 0, 123, 0, PAGE_FILL, 0);
+	battfs_writeTestBlock(disk, 1, INODE, 0, PAGE_FILL, 0);
+	battfs_writeTestBlock(disk, 2, INODE, 3, PAGE_FILL, 1);
+	battfs_writeTestBlock(disk, 3, INODE, 0, PAGE_FILL, 1);
+	battfs_writeTestBlock(disk, 4, INODE, 0, PAGE_FILL, 0);
+	battfs_writeTestBlock(disk, 5, INODE, 0, PAGE_FILL, 2);
+	battfs_writeTestBlock(disk, 6, INODE, 1, PAGE_FILL, 3);
+	battfs_writeTestBlock(disk, 7, INODE, 0, PAGE_FILL, 3);
 
 	fclose(fp);
 

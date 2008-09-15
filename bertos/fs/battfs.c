@@ -44,6 +44,7 @@
 #include <cfg/macros.h> /* MIN, MAX */
 #include <cpu/byteorder.h> /* cpu_to_xx */
 
+#include <cfg/log.h>
 
 #include <string.h> /* memset, memmove */
 
@@ -425,7 +426,7 @@ static bool fillPageArray(struct BattFsSuper *disk, pgoff_t *filelen_table)
  * \return the number of old versions of the page or PAGE_ERROR
  *         on disk read errors.
  */
-static pgcnt_t findLastVersion(pgcnt_t *page_array)
+static pgcnt_t findLastVersion(struct BattFsSuper *disk, pgcnt_t *page_array)
 {
 	pgcnt_t *array_start = page_array;
 	BattFsPageHeader hdr;
@@ -447,8 +448,8 @@ static pgcnt_t findLastVersion(pgcnt_t *page_array)
 	/* Temps used to find the sequence number range */
 	seq_t minl = HALF_SEQ - 1;
 	seq_t maxl = 0;
-	seq_t minh = FULL_SEQ;
-	seq_t maxh = HALF_SEQ;
+	seq_t minh = MAX_SEQ;
+	seq_t maxh = MAX_SEQ;
 	pgcnt_t lpos = 0, hpos = 0, dup_cnt = 0;
 
 	/*
@@ -477,7 +478,7 @@ static pgcnt_t findLastVersion(pgcnt_t *page_array)
 	 */
 	do
 	{
-		if (hdr.seq < SEQ_HALF_SIZE)
+		if (hdr.seq < HALF_SEQ)
 		{
 			minl = MIN(minl, hdr.seq);
 			if (hdr.seq > maxl)
@@ -500,7 +501,7 @@ static pgcnt_t findLastVersion(pgcnt_t *page_array)
 			return PAGE_ERROR;
 		dup_cnt++;
 	}
-	while (curr_inode == hdr.inode && curr_pgoff == hdr.pgoff && hdr.fcs == computeFcs(&hdr))
+	while (curr_inode == hdr.inode && curr_pgoff == hdr.pgoff && hdr.fcs == computeFcs(&hdr));
 
 
 	/* Return early if there is only one version of the current page */
@@ -519,7 +520,7 @@ static pgcnt_t findLastVersion(pgcnt_t *page_array)
 			{
 				/* Interval starts in upper half and ends in lower */
 				ASSERT(minl == 0);
-				ASSERT(maxh == FULL_SEQ);
+				ASSERT(maxh == MAX_SEQ);
 
 				last_ver = lpos;
 			}
@@ -599,7 +600,7 @@ static bool dropOldPages(struct BattFsSuper *disk)
 
 	do
 	{
-		dup_pages = findLastVersion(curr_page);
+		dup_pages = findLastVersion(disk, curr_page);
 		if (dup_pages == PAGE_ERROR)
 			return false;
 		/* The first page is the last version */
@@ -713,7 +714,7 @@ static int battfs_flush(struct KFile *fd)
  */
 static int battfs_fileclose(struct KFile *fd)
 {
-	BattFS *fdb = BATTFSKFILE(fd);
+	BattFs *fdb = BATTFS_CAST(fd);
 
 	battfs_flush(fd);
 	REMOVE(&fdb->link);
@@ -726,7 +727,7 @@ static int battfs_fileclose(struct KFile *fd)
  */
 static size_t battfs_read(struct KFile *fd, void *_buf, size_t size)
 {
-	BattFS *fdb = BATTFSKFILE(fd);
+	BattFs *fdb = BATTFS_CAST(fd);
 	uint8_t *buf = (uint8_t *)_buf;
 
 	size_t total_read = 0;
@@ -821,7 +822,7 @@ static bool countFileSize(BattFsSuper *disk, pgcnt_t *start, inode_t inode, file
  * File context is stored in \a fd.
  * \return true if ok, false otherwise.
  */
-bool battfs_fileopen(BattFsSuper *disk, BattFS *fd, inode_t inode, filemode_t mode)
+bool battfs_fileopen(BattFsSuper *disk, BattFs *fd, inode_t inode, filemode_t mode)
 {
 	Node *n;
 
@@ -840,8 +841,6 @@ bool battfs_fileopen(BattFsSuper *disk, BattFS *fd, inode_t inode, filemode_t mo
 		hdr.seq = 0;
 		hdr.fill = 0;
 		hdr.pgoff = 0;
-		hdr.mark = MARK_PAGE_VALID;
-		hdr.fcs_free = FCS_FREE_VALID;
 		hdr.fcs = computeFcs(&hdr);
 		#warning TODO: get a free block and write on disk!
 	}
@@ -856,7 +855,7 @@ bool battfs_fileopen(BattFsSuper *disk, BattFS *fd, inode_t inode, filemode_t mo
 	/* Insert file handle in list, ordered by inode, ascending. */
 	FOREACH_NODE(n, &disk->file_opened_list)
 	{
-		BattFS *file = containerof(n, BattFS, link);
+		BattFs *file = containerof(n, BattFs, link);
 		if (file->inode >= inode)
 			break;
 	}
@@ -896,7 +895,7 @@ bool battfs_close(struct BattFsSuper *disk)
 	/* Close all open files */
 	FOREACH_NODE(n, &disk->file_opened_list)
 	{
-		BattFS *file = containerof(n, BattFS, link);
+		BattFs *file = containerof(n, BattFs, link);
 		res += battfs_fileclose(&file->fd);
 	}
 
@@ -904,23 +903,15 @@ bool battfs_close(struct BattFsSuper *disk)
 	return disk->close(disk) && (res == 0);
 }
 
-
-bool battfs_writeTestBlock(struct BattFsSuper *disk, pgcnt_t page, inode_t inode, seq_t seq, fill_t fill, pgoff_t pgoff, mark_t mark)
+bool battfs_writeTestBlock(struct BattFsSuper *disk, pgcnt_t page, inode_t inode, seq_t seq, fill_t fill, pgoff_t pgoff)
 {
 	BattFsPageHeader hdr;
 
 	hdr.inode = inode;
-	hdr.seq = seq;
 	hdr.fill = fill;
 	hdr.pgoff = pgoff;
-	hdr.mark = MARK_PAGE_VALID;
-	hdr.fcs_free = FCS_FREE_VALID;
+	hdr.seq = seq;
 	hdr.fcs = computeFcs(&hdr);
-	if (mark != MARK_PAGE_VALID)
-	{
-		hdr.mark = mark;
-		hdr.fcs_free = computeFcsFree(&hdr);
-	}
 
 	if (!battfs_writeHeader(disk, page, &hdr))
 	{

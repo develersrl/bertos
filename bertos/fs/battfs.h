@@ -52,7 +52,7 @@ typedef fill_t   pgaddr_t;  ///< Type for addressing space inside a page
 typedef uint16_t pgcnt_t;   ///< Type for counting pages on disk
 typedef pgcnt_t  pgoff_t;   ///< Type for counting pages inside a file
 typedef uint8_t  inode_t;   ///< Type for file inodes
-typedef uint8_t  seq_t;     ///< Type for page seq number
+typedef uint32_t  seq_t;     ///< Type for page seq number
 typedef rotating_t fcs_t;   ///< Type for header FCS.
 
 /**
@@ -197,7 +197,7 @@ typedef struct BattFsSuper
 } BattFsSuper;
 
 typedef uint8_t filemode_t; ///< Type for file open modes.
-typedef uint32_t file_size_t; ///< Type for file sizes.
+typedef int32_t file_size_t; ///< Type for file sizes.
 
 /**
  * Modes for battfs_fileopen.
@@ -242,6 +242,5 @@ bool battfs_close(struct BattFsSuper *disk);
 
 bool battfs_fileExists(BattFsSuper *disk, inode_t inode);
 bool battfs_fileopen(BattFsSuper *disk, BattFs *fd, inode_t inode, filemode_t mode);
-
-bool battfs_writeTestBlock(struct BattFsSuper *disk, pgcnt_t page, inode_t inode, seq_t seq, fill_t fill, pgoff_t pgoff, seq_t seq);
+bool battfs_writeTestBlock(struct BattFsSuper *disk, pgcnt_t page, inode_t inode, seq_t seq, fill_t fill, pgoff_t pgoff);
 #endif /* FS_BATTFS_H */
