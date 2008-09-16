@@ -258,7 +258,7 @@ static void test6(BattFsSuper *disk)
 
 
 	fp = fopen(test_filename, "w+");
-
+	// page, inode, seq, fill, pgoff
 	battfs_writeTestBlock(disk, 0, 0, 0, 0, 0);
 	battfs_writeTestBlock(disk, 1, 0, 0, 0, 1);
 	battfs_writeTestBlock(disk, 2, 0, 1, 0, 1);
@@ -268,8 +268,8 @@ static void test6(BattFsSuper *disk)
 	fclose(fp);
 	ref[0] = 0;
 	ref[1] = 2;
-	ref[2] = 3;
-	ref[3] = 1;
+	ref[2] = 1;
+	ref[3] = 3;
 
 	testCheck(disk, ref);
 	kprintf("Test6: passed\n");
@@ -282,17 +282,17 @@ static void test7(BattFsSuper *disk)
 
 
 	fp = fopen(test_filename, "w+");
-
+	// page, inode, seq, fill, pgoff
 	battfs_writeTestBlock(disk, 0, 0, 0, 0, 0);
 	battfs_writeTestBlock(disk, 1, 0, 1, 0, 1);
 	battfs_writeTestBlock(disk, 2, 0, 0, 0, 1);
-	battfs_writeTestBlock(disk, 3, 0, 0, 0, 0);
+	disk->erase(disk, 3);
 
 	fclose(fp);
 	ref[0] = 0;
 	ref[1] = 1;
-	ref[2] = 3;
-	ref[3] = 2;
+	ref[2] = 2;
+	ref[3] = 3;
 
 	testCheck(disk, ref);
 	kprintf("Test7: passed\n");
@@ -306,7 +306,8 @@ static void test8(BattFsSuper *disk)
 
 	fp = fopen(test_filename, "w+");
 
-	battfs_writeTestBlock(disk, 0, 0, 0, 0, 0);
+	// page, inode, seq, fill, pgoff
+	disk->erase(disk, 0);
 	battfs_writeTestBlock(disk, 1, 0, 0, 0, 0);
 	battfs_writeTestBlock(disk, 2, 0, 1, 0, 1);
 	battfs_writeTestBlock(disk, 3, 0, 0, 0, 1);
@@ -330,11 +331,12 @@ static void test9(BattFsSuper *disk)
 
 	fp = fopen(test_filename, "w+");
 
-	battfs_writeTestBlock(disk, 0, 0, 0, 0, 0);
+	// page, inode, seq, fill, pgoff
+	disk->erase(disk, 0);
 	battfs_writeTestBlock(disk, 1, 0, 0, 0, 0);
 	battfs_writeTestBlock(disk, 2, 0, 3, 0, 1);
 	battfs_writeTestBlock(disk, 3, 0, 0, 0, 1);
-	battfs_writeTestBlock(disk, 4, 0, 0, 0, 0);
+	disk->erase(disk, 4);
 	battfs_writeTestBlock(disk, 5, 4, 0, 0, 0);
 	battfs_writeTestBlock(disk, 6, 4, 1, 0, 1);
 	battfs_writeTestBlock(disk, 7, 4, 0, 0, 1);
@@ -342,12 +344,12 @@ static void test9(BattFsSuper *disk)
 
 	fclose(fp);
 	ref[0] = 1;
-	ref[1] = 3;
+	ref[1] = 2;
 	ref[2] = 5;
 	ref[3] = 6;
 	ref[4] = 0;
-	ref[5] = 4;
-	ref[6] = 2;
+	ref[5] = 3;
+	ref[6] = 4;
 	ref[7] = 7;
 
 	testCheck(disk, ref);
@@ -362,17 +364,18 @@ static void test10(BattFsSuper *disk)
 
 	fp = fopen(test_filename, "w+");
 
-	int PAGE_FILL = 116;
+	int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
 	unsigned int INODE = 0;
 	unsigned int INODE2 = 4;
 	unsigned int INEXISTENT_INODE = 123;
 	unsigned int MODE = 0;
 
-	battfs_writeTestBlock(disk, 0, 123, 0, PAGE_FILL, 0);
+	// page, inode, seq, fill, pgoff
+	disk->erase(disk, 0);
 	battfs_writeTestBlock(disk, 1, INODE, 0, PAGE_FILL, 0);
 	battfs_writeTestBlock(disk, 2, INODE, 3, PAGE_FILL, 1);
 	battfs_writeTestBlock(disk, 3, INODE, 0, PAGE_FILL, 1);
-	battfs_writeTestBlock(disk, 4, INODE2, 0, PAGE_FILL, 0);
+	disk->erase(disk, 4);
 	battfs_writeTestBlock(disk, 5, INODE2, 0, PAGE_FILL, 0);
 	battfs_writeTestBlock(disk, 6, INODE2, 1, PAGE_FILL, 1);
 	battfs_writeTestBlock(disk, 7, INODE2, 0, PAGE_FILL, 1);
@@ -428,16 +431,16 @@ static void test11(BattFsSuper *disk)
 
 	fp = fopen(test_filename, "w+");
 
-	unsigned int PAGE_FILL = 116;
+	unsigned int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
 	unsigned int INODE = 0;
 	unsigned int INODE2 = 4;
 	unsigned int MODE = 0;
 
-	battfs_writeTestBlock(disk, 0, 123, 0, PAGE_FILL, 0);
+	disk->erase(disk, 0);
 	battfs_writeTestBlock(disk, 1, INODE, 0, PAGE_FILL, 0);
 	battfs_writeTestBlock(disk, 2, INODE, 3, PAGE_FILL, 1);
 	battfs_writeTestBlock(disk, 3, INODE, 0, PAGE_FILL, 1);
-	battfs_writeTestBlock(disk, 4, INODE2, 0, PAGE_FILL, 0);
+	disk->erase(disk, 4);
 	battfs_writeTestBlock(disk, 5, INODE2, 0, PAGE_FILL, 0);
 	battfs_writeTestBlock(disk, 6, INODE2, 1, PAGE_FILL, 1);
 	battfs_writeTestBlock(disk, 7, INODE2, 0, PAGE_FILL, 1);
@@ -465,16 +468,16 @@ static void test12(BattFsSuper *disk)
 
 	fp = fopen(test_filename, "w+");
 
-	const unsigned int PAGE_FILL = 116;
+	const unsigned int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
 	unsigned int INODE = 0;
 	unsigned int MODE = 0;
-	uint8_t buf[PAGE_FILL + 10];
+	uint8_t buf[PAGE_FILL + BATTFS_HEADER_LEN / 2];
 
-	battfs_writeTestBlock(disk, 0, 123, 0, PAGE_FILL, 0);
+	disk->erase(disk, 0);
 	battfs_writeTestBlock(disk, 1, INODE, 0, PAGE_FILL, 0);
 	battfs_writeTestBlock(disk, 2, INODE, 3, PAGE_FILL, 1);
 	battfs_writeTestBlock(disk, 3, INODE, 0, PAGE_FILL, 1);
-	battfs_writeTestBlock(disk, 4, INODE, 0, PAGE_FILL, 0);
+	disk->erase(disk, 4);
 	battfs_writeTestBlock(disk, 5, INODE, 0, PAGE_FILL, 2);
 	battfs_writeTestBlock(disk, 6, INODE, 1, PAGE_FILL, 3);
 	battfs_writeTestBlock(disk, 7, INODE, 0, PAGE_FILL, 3);
@@ -499,9 +502,9 @@ static void test12(BattFsSuper *disk)
 	for (size_t i = 0; i < sizeof(buf); i++)
 		ASSERT(buf[i] == 0);
 
-	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == 86);
+	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == PAGE_FILL * 4 - sizeof(buf) * 3);
 	ASSERT(fd1.fd.seek_pos == (kfile_off_t)fd1.fd.size);
-	for (size_t i = 0; i < 86; i++)
+	for (size_t i = 0; i < PAGE_FILL * 4 - sizeof(buf) * 3; i++)
 		ASSERT(buf[i] == 0);
 
 	ASSERT(kfile_seek(&fd1.fd, 0, KSM_SEEK_SET) == 0);
