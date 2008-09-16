@@ -52,14 +52,9 @@ typedef fill_t   pgaddr_t;  ///< Type for addressing space inside a page
 typedef uint16_t pgcnt_t;   ///< Type for counting pages on disk
 typedef pgcnt_t  pgoff_t;   ///< Type for counting pages inside a file
 typedef uint8_t  inode_t;   ///< Type for file inodes
-typedef uint32_t  seq_t;     ///< Type for page seq number
+typedef uint64_t  seq_t;    ///< Type for page seq number, at least 40bits wide.
 typedef rotating_t fcs_t;   ///< Type for header FCS.
 
-/**
- * Size required for free block allocation is at least 1 bit more
- * than page addressing.
- */
-STATIC_ASSERT(sizeof(seq_t) > sizeof(pgcnt_t));
 
 /**
  * BattFS page header, used to represent a page
@@ -73,7 +68,16 @@ typedef struct BattFsPageHeader
 	inode_t  inode; ///< File inode (file identifier).
 	fill_t   fill;  ///< Filled bytes in page.
 	pgoff_t  pgoff; ///< Page offset inside file.
-	seq_t    seq;   ///< Page sequence number.
+
+	/**
+	 * Page sequence number.
+	 * Every time a page is rewritten the seq number is
+	 * increased by 1. seq_t is wide enough to not to perform
+	 * a wrap around before the memory death.
+	 * So it can be kept as it would be
+	 * monotonically increasing for our needs.
+	 */
+	seq_t    seq;
 
 	/**
 	 * FCS (Frame Check Sequence) of the page header.
@@ -86,18 +90,7 @@ typedef struct BattFsPageHeader
  * \see battfs_to_disk
  * \see disk_to_battfs
  */
-#define BATTFS_HEADER_LEN 10
-
-/**
- * Half-size of page sequence numer.
- */
-#define HALF_SEQ (1 << (CPU_BITS_PER_CHAR * sizeof(pgcnt_t)))
-
-/**
- * Max sequence number.
- */
-#define MAX_SEQ ((1 << (CPU_BITS_PER_CHAR * sizeof(pgcnt_t) + 1)) - 1)
-
+#define BATTFS_HEADER_LEN 12
 
 /**
  * Maximum page address.
@@ -116,9 +109,6 @@ struct BattFsSuper;
  * Sentinel used to keep trace of unset pages in disk->page_array.
  */
 #define PAGE_UNSET_SENTINEL ((1 << (CPU_BITS_PER_CHAR * sizeof(pgcnt_t))) - 1)
-
-/** Also used as an error marker sometimes */
-#define PAGE_ERROR PAGE_UNSET_SENTINEL
 
 /**
  * Type interface for disk init function.
@@ -196,7 +186,7 @@ typedef struct BattFsSuper
 	/* TODO add other fields. */
 } BattFsSuper;
 
-typedef uint8_t filemode_t; ///< Type for file open modes.
+typedef uint8_t filemode_t;  ///< Type for file open modes.
 typedef int32_t file_size_t; ///< Type for file sizes.
 
 /**

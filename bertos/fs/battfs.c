@@ -57,7 +57,7 @@
  */
 INLINE void battfs_to_disk(struct BattFsPageHeader *hdr, uint8_t *buf)
 {
-	STATIC_ASSERT(BATTFS_HEADER_LEN == 10);
+	STATIC_ASSERT(BATTFS_HEADER_LEN == 12);
 	buf[0] = hdr->inode;
 
 	buf[1] = hdr->fill;
@@ -67,25 +67,22 @@ INLINE void battfs_to_disk(struct BattFsPageHeader *hdr, uint8_t *buf)
 	buf[4] = hdr->pgoff >> 8;
 
 	/*
-	 * Sequence number is at least 1 bit longer than page address.
-	 * Needed to take care of wraparonds.
+	 * Sequence number is 40 bits long.
+	 * No need to take care of wraparonds: the memory will die first!
 	 */
 	buf[5] = hdr->seq;
 	buf[6] = hdr->seq >> 8;
-
-	/*
-	 * First bit used by seq.
-	 * Unused bits are set to 1.
-	 */
-	buf[7] = (hdr->seq >> 16) ? 0xFF : 0xFE;
+	buf[7] = hdr->seq >> 16;
+	buf[8] = hdr->seq >> 24;
+	buf[9] = hdr->seq >> 32;
 
 	/*
 	 * This field must be the last one!
 	 * This is needed because if the page is only partially
 	 * written, we can use this to detect it.
 	 */
-	buf[8] = hdr->fcs;
-	buf[9] = hdr->fcs >> 8;
+	buf[10] = hdr->fcs;
+	buf[11] = hdr->fcs >> 8;
 }
 
 /**
@@ -94,12 +91,12 @@ INLINE void battfs_to_disk(struct BattFsPageHeader *hdr, uint8_t *buf)
  */
 INLINE void disk_to_battfs(uint8_t *buf, struct BattFsPageHeader *hdr)
 {
-	STATIC_ASSERT(BATTFS_HEADER_LEN == 10);
+	STATIC_ASSERT(BATTFS_HEADER_LEN == 12);
 	hdr->inode = buf[0];
 	hdr->fill = buf[2] << 8 | buf[1];
 	hdr->pgoff = buf[4] << 8 | buf[3];
-	hdr->seq = (seq_t)(buf[7] & 0x01) << 16 | buf[6] << 8 | buf[5];
-	hdr->fcs = buf[9] << 8 | buf[8];
+	hdr->seq = (seq_t)buf[9] << 32 | (seq_t)buf[8] << 24 | (seq_t)buf[7] << 16 | buf[6] << 8 | buf[5];
+	hdr->fcs = buf[11] << 8 | buf[10];
 }
 
 /**
@@ -269,17 +266,71 @@ static bool fillPageArray(struct BattFsSuper *disk, pgoff_t *filelen_table)
 		if (hdr.fcs == computeFcs(&hdr))
 		{
 			/* Compute array position */
-			pgcnt_t array_pos_start = countPages(filelen_table, hdr.inode);
-			pgcnt_t array_pos = array_pos_start + hdr.pgoff;
+			pgcnt_t array_pos = countPages(filelen_table, hdr.inode);
+			array_pos += hdr.pgoff;
 
-			/* Find the first free position */
-			while (disk->page_array[array_pos] != PAGE_UNSET_SENTINEL)
+
+			/* Check if position is already used by another page of the same file */
+			if (disk->page_array[array_pos] == PAGE_UNSET_SENTINEL)
+				disk->page_array[array_pos] = page;
+			else
 			{
-				ASSERT(array_pos < array_pos_start + filelen_table[hdr.inode] + filelen_table[hdr.inode + 1]);
-				array_pos++;
-			}
+				BattFsPageHeader hdr_prv;
 
-			disk->page_array[array_pos] = page;
+				if (!battfs_readHeader(disk, disk->page_array[array_pos], &hdr_prv))
+					return false;
+
+				/* Check header FCS */
+				ASSERT(hdr_prv.fcs == computeFcs(&hdr_prv));
+
+				/* Only the very same page with a different seq number can be here */
+				ASSERT(hdr.inode == hdr_prv.inode);
+				ASSERT(hdr.pgoff == hdr_prv.pgoff);
+				ASSERT(hdr.seq != hdr_prv.seq);
+
+				pgcnt_t new_page, old_page;
+				fill_t old_fill;
+
+				/*
+				 * Sequence number comparison: since
+				 * seq is 40 bits wide, it wraps once
+				 * every 1.1E12 times.
+				 * The memory will not live enough to
+				 * see a wraparound, so we can use a simple
+				 * compare here.
+				 */
+				if (hdr.seq > hdr_prv.seq)
+				{
+					/* Current header is newer than the previuos one */
+					old_page = disk->page_array[array_pos];
+					new_page = page;
+					old_fill = hdr_prv.fill;
+				}
+				else
+				{
+					/* Previous header is newer than the current one */
+					old_page = page;
+					new_page = disk->page_array[array_pos];
+					old_fill = hdr.fill;
+				}
+
+				/* Set new page */
+				disk->page_array[array_pos] = new_page;
+				/* Add free space */
+				disk->free_bytes += old_fill;
+				/* Shift all array one position to the left, overwriting duplicate page */
+				array_pos -= hdr.pgoff;
+				array_pos += filelen_table[hdr.inode];
+				movePages(disk, array_pos, -1);
+				/* Move back all indexes */
+				filelen_table[hdr.inode]--;
+				disk->free_page_start--;
+				curr_free_page--;
+				/* Set old page as free */
+				ASSERT(disk->page_array[curr_free_page] == PAGE_UNSET_SENTINEL);
+				disk->page_array[curr_free_page++] = old_page;
+
+			}
 		}
 		else
 		{
@@ -292,6 +343,7 @@ static bool fillPageArray(struct BattFsSuper *disk, pgoff_t *filelen_table)
 	return true;
 }
 
+#if 0
 /**
  * Find the latest version of a page, starting from the
  * page supplied by \a page_array.
@@ -506,7 +558,7 @@ static bool dropOldPages(struct BattFsSuper *disk)
 
 	return true;
 }
-
+#endif
 
 /**
  * Initialize and mount disk described by
@@ -559,12 +611,6 @@ bool battfs_init(struct BattFsSuper *disk)
 	if (!fillPageArray(disk, filelen_table))
 	{
 		LOG_ERR("error filling page array\n");
-		return false;
-	}
-
-	if (!dropOldPages(disk))
-	{
-		LOG_ERR("error dropping old pages\n");
 		return false;
 	}
 
