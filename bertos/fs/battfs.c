@@ -246,11 +246,10 @@ static bool countDiskFilePages(struct BattFsSuper *disk, pgoff_t *filelen_table)
  * inside file.
  * e.g. : at page array[0] you will find page address of the first page
  * of the first file (if present).
- * Free blocks are allocated after the last file, starting from invalid ones
- * and continuing with the marked free ones.
+ * Free blocks are allocated after the last file.
  *
  * \return true if ok, false on disk read errors.
- * \note The whole disk is scanned once.
+ * \note The whole disk is scanned at max twice.
  */
 static bool fillPageArray(struct BattFsSuper *disk, pgoff_t *filelen_table)
 {
@@ -608,6 +607,7 @@ bool battfs_close(struct BattFsSuper *disk)
 	return disk->close(disk) && (res == 0);
 }
 
+#if UNIT_TEST
 bool battfs_writeTestBlock(struct BattFsSuper *disk, pgcnt_t page, inode_t inode, seq_t seq, fill_t fill, pgoff_t pgoff)
 {
 	BattFsPageHeader hdr;
@@ -626,3 +626,4 @@ bool battfs_writeTestBlock(struct BattFsSuper *disk, pgcnt_t page, inode_t inode
 
 	return true;
 }
+#endif
