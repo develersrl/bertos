@@ -156,8 +156,8 @@ static bool battfs_writeHeader(struct BattFsSuper *disk, pgcnt_t page, struct Ba
 	 * Header is actually a footer, and so
 	 * resides at page end.
 	 */
-	if (disk->write(disk, page, disk->page_size - BATTFS_HEADER_LEN, buf, BATTFS_HEADER_LEN)
-	    != BATTFS_HEADER_LEN)
+	if (!(disk->bufferWrite(disk, disk->page_size - BATTFS_HEADER_LEN, buf, BATTFS_HEADER_LEN)
+	    == BATTFS_HEADER_LEN && disk->save(disk, page)))
 	{
 		LOG_ERR("Error: page[%d]\n", page);
 		return false;
@@ -363,7 +363,9 @@ bool battfs_init(struct BattFsSuper *disk)
 
 	/* Disk open must set all of these */
 	ASSERT(disk->read);
-	ASSERT(disk->write);
+	ASSERT(disk->load);
+	ASSERT(disk->bufferWrite);
+	ASSERT(disk->save);
 	ASSERT(disk->erase);
 	ASSERT(disk->close);
 	ASSERT(disk->page_size);

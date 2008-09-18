@@ -124,13 +124,33 @@ typedef bool (*disk_open_t) (struct BattFsSuper *d);
  */
 typedef size_t (*disk_page_read_t) (struct BattFsSuper *d, pgcnt_t page, pgaddr_t addr, void *buf, size_t);
 
+
 /**
- * Type interface for disk page write function.
- * \a page is the page address, \a addr the address inside the page,
+ * Type interface for disk page load function.
+ * The disk should supply a buffer used for loading/saving pages.
+ * This has to be done by the disk driver because it knows memory details
+ * (e.g. some memories can have the buffer inside the memory itself).
+ * \a page is the page to be loaded from the disk in the buffer.
+ * \return true if ok, false on errors.
+ */
+typedef bool (*disk_page_load_t) (struct BattFsSuper *d, pgcnt_t page);
+
+/**
+ * Type interface for disk pagebuffer write function.
+ * \a addr is the address inside the current loaded page,
  * \a size the lenght to be written.
  * \return the number of bytes written.
  */
-typedef size_t	(*disk_page_write_t) (struct BattFsSuper *d, pgcnt_t page, pgaddr_t addr, const void *buf, size_t);
+typedef size_t	(*disk_buffer_write_t) (struct BattFsSuper *d, pgaddr_t addr, const void *buf, size_t);
+
+/**
+ * Type interface for disk page save function.
+ * The disk should supply a buffer used for loading/saving pages.
+ * For details \see disk_page_load_t.
+ * \a page is the page where the buffer will be written.
+ * \return true if ok, false on errors.
+ */
+typedef bool (*disk_page_save_t) (struct BattFsSuper *d, pgcnt_t page);
 
 /**
  * Type interface for disk page erase function.
@@ -157,7 +177,9 @@ typedef struct BattFsSuper
 {
 	disk_open_t open;        ///< Disk init.
 	disk_page_read_t  read;  ///< Page read.
-	disk_page_write_t write; ///< Page write.
+	disk_page_load_t  load;  ///< Page load.
+	disk_buffer_write_t bufferWrite; ///< Buffer write.
+	disk_page_save_t  save;  ///< Page save.
 	disk_page_erase_t erase; ///< Page erase.
 	disk_close_t close;      ///< Disk deinit.
 
