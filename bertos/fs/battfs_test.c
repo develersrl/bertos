@@ -69,14 +69,14 @@ static bool disk_open(struct BattFsSuper *d)
 
 static size_t disk_page_read(struct BattFsSuper *d, pgcnt_t page, pgaddr_t addr, void *buf, size_t size)
 {
-	//TRACEMSG("page:%d, addr:%d, size:%d\n", page, addr, size);
+	TRACEMSG("page:%d, addr:%d, size:%d", page, addr, size);
 	fseek(fp, page * d->page_size + addr, SEEK_SET);
 	return fread(buf, 1, size, fp);
 }
 
 static size_t disk_buffer_write(struct BattFsSuper *d, pgaddr_t addr, const void *buf, size_t size)
 {
-	//TRACEMSG("page:%d, addr:%d, size:%d\n", page, addr, size);
+	TRACEMSG("addr:%d, size:%d", addr, size);
 	ASSERT(addr + size <= d->page_size);
 	memcpy(&page_buffer[addr], buf, size);
 
@@ -85,12 +85,14 @@ static size_t disk_buffer_write(struct BattFsSuper *d, pgaddr_t addr, const void
 
 static bool disk_page_load(struct BattFsSuper *d, pgcnt_t page)
 {
+	TRACEMSG("page:%d", page);
 	fseek(fp, page * d->page_size, SEEK_SET);
 	return fread(page_buffer, 1, d->page_size, fp) == d->page_size;
 }
 
 static bool disk_page_save(struct BattFsSuper *d, pgcnt_t page)
 {
+	TRACEMSG("page:%d", page);
 	fseek(fp, page * d->page_size, SEEK_SET);
 	return fwrite(page_buffer, 1, d->page_size, fp) == d->page_size;
 }
@@ -467,7 +469,7 @@ static void test11(BattFsSuper *disk)
 	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
 	ASSERT(fd1.fd.seek_pos == sizeof(buf));
 	for (size_t i = 0; i < sizeof(buf); i++)
-		ASSERT(buf[i] == 0);
+		ASSERT(buf[i] == 0xff);
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
 	ASSERT(battfs_close(disk));
@@ -505,22 +507,22 @@ static void test12(BattFsSuper *disk)
 	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
 	ASSERT(fd1.fd.seek_pos == (kfile_off_t)sizeof(buf));
 	for (size_t i = 0; i < sizeof(buf); i++)
-		ASSERT(buf[i] == 0);
+		ASSERT(buf[i] == 0xff);
 
 	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
 	ASSERT(fd1.fd.seek_pos == (kfile_off_t)sizeof(buf) * 2);
 	for (size_t i = 0; i < sizeof(buf); i++)
-		ASSERT(buf[i] == 0);
+		ASSERT(buf[i] == 0xff);
 
 	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
 	ASSERT(fd1.fd.seek_pos == (kfile_off_t)sizeof(buf) * 3);
 	for (size_t i = 0; i < sizeof(buf); i++)
-		ASSERT(buf[i] == 0);
+		ASSERT(buf[i] == 0xff);
 
 	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == PAGE_FILL * 4 - sizeof(buf) * 3);
 	ASSERT(fd1.fd.seek_pos == (kfile_off_t)fd1.fd.size);
 	for (size_t i = 0; i < PAGE_FILL * 4 - sizeof(buf) * 3; i++)
-		ASSERT(buf[i] == 0);
+		ASSERT(buf[i] == 0xff);
 
 	ASSERT(kfile_seek(&fd1.fd, 0, KSM_SEEK_SET) == 0);
 	ASSERT(fd1.fd.seek_pos == 0);
