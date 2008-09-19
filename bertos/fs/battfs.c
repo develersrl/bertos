@@ -586,10 +586,10 @@ static size_t battfs_read(struct KFile *fd, void *_buf, size_t size)
 static pgcnt_t *findFile(BattFsSuper *disk, inode_t inode)
 {
 	BattFsPageHeader hdr;
-	pgcnt_t first = 0, page, last = disk->page_count -1;
+	pgcnt_t first = 0, page, last = disk->free_page_start;
 	fcs_t fcs;
 
-	while (first <= last)
+	while (first < last)
 	{
 		page = (first + last) / 2;
 
