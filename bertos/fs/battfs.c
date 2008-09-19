@@ -374,7 +374,7 @@ static bool battfs_loadPage(struct BattFsSuper *disk, pgcnt_t new_page)
 		return false;
 
 	if (!disk->load(disk, new_page))
-			return false;
+		return false;
 	disk->curr_page = new_page;
 	return true;
 }
