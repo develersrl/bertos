@@ -352,6 +352,9 @@ static bool battfs_flushBuffer(struct BattFsSuper *disk)
 	if (disk->cache_dirty)
 	{
 		LOG_INFO("Flushing to disk page %d\n", disk->curr_page);
+		if (!disk->erase(disk, disk->curr_page))
+			return false;
+
 		if (!disk->save(disk, disk->curr_page))
 			return false;
 		disk->cache_dirty = false;
