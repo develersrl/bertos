@@ -44,7 +44,7 @@
 #include <cfg/macros.h> /* MIN, MAX */
 #include <cpu/byteorder.h> /* cpu_to_xx */
 
-#define LOG_LEVEL       LOG_LVL_WARNING
+#define LOG_LEVEL       LOG_LVL_INFO
 #define LOG_FORMAT      LOG_FMT_VERBOSE
 #include <cfg/log.h>
 
@@ -351,7 +351,7 @@ static bool battfs_flushBuffer(struct BattFsSuper *disk)
 {
 	if (disk->cache_dirty)
 	{
-		TRACE;
+		LOG_INFO("Flushing to disk page %d\n", disk->curr_page);
 		if (!disk->save(disk, disk->curr_page))
 			return false;
 		disk->cache_dirty = false;
@@ -367,14 +367,16 @@ static bool battfs_flushBuffer(struct BattFsSuper *disk)
  */
 static bool battfs_loadPage(struct BattFsSuper *disk, pgcnt_t new_page)
 {
+	LOG_INFO("Loading page %d\n", new_page);
 	if (disk->curr_page == new_page)
 		return true;
 
-	if (battfs_flushBuffer(disk))
+	if (!battfs_flushBuffer(disk))
 		return false;
 
 	if (!disk->load(disk, new_page))
 		return false;
+
 	disk->curr_page = new_page;
 	return true;
 }
