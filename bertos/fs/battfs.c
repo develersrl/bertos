@@ -408,6 +408,7 @@ bool battfs_init(struct BattFsSuper *disk)
 	ASSERT(disk->read);
 	ASSERT(disk->load);
 	ASSERT(disk->bufferWrite);
+	ASSERT(disk->bufferRead);
 	ASSERT(disk->save);
 	ASSERT(disk->erase);
 	ASSERT(disk->close);
@@ -564,12 +565,16 @@ static size_t battfs_read(struct KFile *fd, void *_buf, size_t size)
 		addr_offset = fd->seek_pos % (fdb->disk->page_size - BATTFS_HEADER_LEN);
 		read_len = MIN(size, (size_t)(fdb->disk->page_size - BATTFS_HEADER_LEN - addr_offset));
 
-		/* Flush current page if needed */
+		/* Try to read from cache */
 		if (fdb->start[pg_offset] == fdb->disk->curr_page)
-			battfs_flushBuffer(fdb->disk);
-
+		{
+			if (fdb->disk->bufferRead(fdb->disk, addr_offset, buf, read_len) != read_len)
+			{
+				#warning TODO set error?
+			}
+		}
 		/* Read from disk */
-		if (fdb->disk->read(fdb->disk, fdb->start[pg_offset], addr_offset, buf, read_len) != read_len)
+		else if (fdb->disk->read(fdb->disk, fdb->start[pg_offset], addr_offset, buf, read_len) != read_len)
 		{
 			#warning TODO set error?
 		}

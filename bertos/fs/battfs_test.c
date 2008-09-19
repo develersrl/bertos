@@ -83,6 +83,15 @@ static size_t disk_buffer_write(struct BattFsSuper *d, pgaddr_t addr, const void
 	return size;
 }
 
+static size_t disk_buffer_read(struct BattFsSuper *d, pgaddr_t addr, void *buf, size_t size)
+{
+	TRACEMSG("addr:%d, size:%d", addr, size);
+	ASSERT(addr + size <= d->page_size);
+	memcpy(buf, &page_buffer[addr], size);
+
+	return size;
+}
+
 static bool disk_page_load(struct BattFsSuper *d, pgcnt_t page)
 {
 	TRACEMSG("page:%d", page);
@@ -661,6 +670,7 @@ int battfs_testRun(void)
 	disk.read = disk_page_read;
 	disk.load = disk_page_load;
 	disk.bufferWrite = disk_buffer_write;
+	disk.bufferRead = disk_buffer_read;
 	disk.save = disk_page_save;
 	disk.erase = disk_page_erase;
 	disk.close = disk_close;

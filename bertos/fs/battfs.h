@@ -144,6 +144,14 @@ typedef bool (*disk_page_load_t) (struct BattFsSuper *d, pgcnt_t page);
 typedef size_t	(*disk_buffer_write_t) (struct BattFsSuper *d, pgaddr_t addr, const void *buf, size_t);
 
 /**
+ * Type interface for disk pagebuffer read function.
+ * \a addr is the address inside the current loaded page,
+ * \a size the lenght to be read.
+ * \return the number of bytes read.
+ */
+typedef size_t	(*disk_buffer_read_t) (struct BattFsSuper *d, pgaddr_t addr, void *buf, size_t);
+
+/**
  * Type interface for disk page save function.
  * The disk should supply a buffer used for loading/saving pages.
  * For details \see disk_page_load_t.
@@ -179,6 +187,7 @@ typedef struct BattFsSuper
 	disk_page_read_t  read;  ///< Page read.
 	disk_page_load_t  load;  ///< Page load.
 	disk_buffer_write_t bufferWrite; ///< Buffer write.
+	disk_buffer_read_t bufferRead; ///< Buffer read.
 	disk_page_save_t  save;  ///< Page save.
 	disk_page_erase_t erase; ///< Page erase.
 	disk_close_t close;      ///< Disk deinit.
