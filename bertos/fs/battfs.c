@@ -621,19 +621,19 @@ bool battfs_fileExists(BattFsSuper *disk, inode_t inode)
  * in disk->page_array. Size is written in \a size.
  * \return true if all s ok, false on disk read errors.
  */
-static bool countFileSize(BattFsSuper *disk, pgcnt_t *start, inode_t inode, file_size_t *size)
+static file_size_t countFileSize(BattFsSuper *disk, pgcnt_t *start, inode_t inode)
 {
-	*size = 0;
+	file_size_t size = 0;
 	BattFsPageHeader hdr;
 
 	for (;;)
 	{
 		if (!battfs_readHeader(disk, *start++, &hdr))
-			return false;
+			return EOF;
 		if (hdr.fcs == computeFcs(&hdr) && hdr.inode == inode)
-			*size += hdr.fill;
+			size += hdr.fill;
 		else
-			return true;
+			return size;
 	}
 }
 
@@ -666,7 +666,7 @@ bool battfs_fileopen(BattFsSuper *disk, BattFs *fd, inode_t inode, filemode_t mo
 	}
 
 	/* Fill file size */
-	if (!countFileSize(disk, fd->start, inode, &fd->fd.size))
+	if ((fd->fd.size = countFileSize(disk, fd->start, inode)) == EOF)
 		return false;
 
 	/* Reset seek position */
