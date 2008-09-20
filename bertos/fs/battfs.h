@@ -244,6 +244,7 @@ typedef struct BattFs
 	BattFsSuper *disk;  ///< Disk context
 	filemode_t mode;    ///< File open mode
 	pgcnt_t *start;     ///< Pointer to page_array file start position.
+	pgcnt_t max_off;    ///< Max page offset allocated for the file.
 } BattFs;
 
 /**
