@@ -203,8 +203,9 @@ typedef struct BattFsSuper
 	 * the entire disk in memory.
 	 */
 	pgcnt_t *page_array;
-	pgcnt_t curr_page;
-	bool cache_dirty;
+	struct BattFsPageHeader curr_hdr; ///< Current page header (cached)-
+	pgcnt_t curr_page;  ///< Current page loaded in disk buffer.
+	bool cache_dirty;   ///< True if current cache is dirty (nneds to be flushed).
 
 	/**
 	 * Lowest address, in page array, for free pages.
