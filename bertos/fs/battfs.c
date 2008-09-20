@@ -720,7 +720,7 @@ bool battfs_fileopen(BattFsSuper *disk, BattFs *fd, inode_t inode, filemode_t mo
 	{
 		if (!(mode & BATTFS_CREATE))
 			return false;
-
+		/* Create the file */
 		if (!(getNewPage(disk, start_pos, inode, 0)))
 			return false;
 	}
