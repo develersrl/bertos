@@ -662,6 +662,31 @@ static void test14(BattFsSuper *disk)
 	kprintf("Test14: passed\n");
 }
 
+static void test15(BattFsSuper *disk)
+{
+	kprintf("Test15: file creation on new disk\n");
+
+	FILE *fpt = fopen(test_filename, "w+");
+
+	for (int i = 0; i < FILE_SIZE; i++)
+		fputc(0xff, fpt);
+	fclose(fpt);
+
+	BattFs fd1;
+	unsigned int INODE = 0;
+	unsigned int MODE = BATTFS_CREATE;
+
+	ASSERT(battfs_init(disk));
+	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
+	for (int i = 0; i < FILE_SIZE / 2; i++)
+		ASSERT(kfile_putc(i, &fd1.fd) != EOF);
+
+	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(battfs_close(disk));
+
+	kprintf("Test15: passed\n");
+}
+
 int battfs_testRun(void)
 {
 	BattFsSuper disk;
@@ -688,6 +713,7 @@ int battfs_testRun(void)
 	test12(&disk);
 	test13(&disk);
 	test14(&disk);
+	test15(&disk);
 	kprintf("All tests passed!\n");
 
 	return 0;
