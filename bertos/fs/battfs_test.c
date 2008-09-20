@@ -69,14 +69,14 @@ static bool disk_open(struct BattFsSuper *d)
 
 static size_t disk_page_read(struct BattFsSuper *d, pgcnt_t page, pgaddr_t addr, void *buf, size_t size)
 {
-	TRACEMSG("page:%d, addr:%d, size:%d", page, addr, size);
+	//TRACEMSG("page:%d, addr:%d, size:%d", page, addr, size);
 	fseek(fp, page * d->page_size + addr, SEEK_SET);
 	return fread(buf, 1, size, fp);
 }
 
 static size_t disk_buffer_write(struct BattFsSuper *d, pgaddr_t addr, const void *buf, size_t size)
 {
-	TRACEMSG("addr:%d, size:%d", addr, size);
+	//TRACEMSG("addr:%d, size:%d", addr, size);
 	ASSERT(addr + size <= d->page_size);
 	memcpy(&page_buffer[addr], buf, size);
 
@@ -85,7 +85,7 @@ static size_t disk_buffer_write(struct BattFsSuper *d, pgaddr_t addr, const void
 
 static size_t disk_buffer_read(struct BattFsSuper *d, pgaddr_t addr, void *buf, size_t size)
 {
-	TRACEMSG("addr:%d, size:%d", addr, size);
+	//TRACEMSG("addr:%d, size:%d", addr, size);
 	ASSERT(addr + size <= d->page_size);
 	memcpy(buf, &page_buffer[addr], size);
 
@@ -94,21 +94,21 @@ static size_t disk_buffer_read(struct BattFsSuper *d, pgaddr_t addr, void *buf, 
 
 static bool disk_page_load(struct BattFsSuper *d, pgcnt_t page)
 {
-	TRACEMSG("page:%d", page);
+	//TRACEMSG("page:%d", page);
 	fseek(fp, page * d->page_size, SEEK_SET);
 	return fread(page_buffer, 1, d->page_size, fp) == d->page_size;
 }
 
 static bool disk_page_save(struct BattFsSuper *d, pgcnt_t page)
 {
-	TRACEMSG("page:%d", page);
+	//TRACEMSG("page:%d", page);
 	fseek(fp, page * d->page_size, SEEK_SET);
 	return fwrite(page_buffer, 1, d->page_size, fp) == d->page_size;
 }
 
 static bool disk_page_erase(struct BattFsSuper *d, pgcnt_t page)
 {
-	TRACEMSG("page:%d", page);
+	//TRACEMSG("page:%d", page);
 	fseek(fp, page * d->page_size, SEEK_SET);
 
 	for (int i = 0; i < d->page_size; i++)
