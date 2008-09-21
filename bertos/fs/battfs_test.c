@@ -681,10 +681,82 @@ static void test15(BattFsSuper *disk)
 	for (int i = 0; i < FILE_SIZE / 2; i++)
 		ASSERT(kfile_putc(i, &fd1.fd) != EOF);
 
+	ASSERT(fd1.fd.seek_pos == FILE_SIZE / 2);
+	ASSERT(fd1.fd.size == FILE_SIZE / 2);
 	ASSERT(kfile_close(&fd1.fd) == 0);
 	ASSERT(battfs_close(disk));
 
+	ASSERT(battfs_init(disk));
+	ASSERT(battfs_fileopen(disk, &fd1, INODE, 0));
+	ASSERT(fd1.fd.size == FILE_SIZE / 2);
+	ASSERT(fd1.fd.seek_pos == 0);
+
+	uint8_t buf[FILE_SIZE / 2];
+	memset(buf, 0, sizeof(buf));
+	ASSERT(kfile_read(&fd1.fd, buf, FILE_SIZE / 2) == FILE_SIZE / 2);
+
+	for (int i = 0; i < FILE_SIZE / 2; i++)
+		ASSERT(buf[i] == (i & 0xff));
+
+	ASSERT(fd1.fd.seek_pos == FILE_SIZE / 2);
+	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(battfs_close(disk));
+
+
 	kprintf("Test15: passed\n");
+}
+
+static void test16(BattFsSuper *disk)
+{
+	kprintf("Test16: multiple write on file\n");
+
+	FILE *fpt = fopen(test_filename, "w+");
+
+	for (int i = 0; i < FILE_SIZE; i++)
+		fputc(0xff, fpt);
+	fclose(fpt);
+
+	BattFs fd1;
+	unsigned int INODE = 0;
+	unsigned int MODE = BATTFS_CREATE;
+	uint8_t buf[1000];
+
+	ASSERT(battfs_init(disk));
+	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
+
+	int j;
+	for (j = 1; j < 1013; j++)
+	{
+		for (int i = 0; i < sizeof(buf); i++)
+			buf[i] = j+i;
+
+		ASSERT(kfile_write(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
+		ASSERT(fd1.fd.seek_pos == sizeof(buf));
+		ASSERT(fd1.fd.size == sizeof(buf));
+		ASSERT(kfile_seek(&fd1.fd, 0, KSM_SEEK_SET) == 0);
+		memset(buf, 0, sizeof(buf));
+		ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
+		ASSERT(fd1.fd.seek_pos == sizeof(buf));
+		for (int i = 0; i < sizeof(buf); i++)
+			ASSERT(buf[i] == ((j+i) & 0xff));
+		ASSERT(kfile_seek(&fd1.fd, 0, KSM_SEEK_SET) == 0);
+		ASSERT(disk->free_bytes == disk->disk_size - sizeof(buf));
+	}
+	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(battfs_close(disk));
+
+	ASSERT(battfs_init(disk));
+	ASSERT(disk->free_bytes == disk->disk_size - sizeof(buf));
+	ASSERT(battfs_fileopen(disk, &fd1, INODE, 0));
+	ASSERT(fd1.fd.size == sizeof(buf));
+	memset(buf, 0, sizeof(buf));
+	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
+	for (int i = 0; i < sizeof(buf); i++)
+			ASSERT(buf[i] == ((j-1+i) & 0xff));
+	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(battfs_close(disk));
+
+	kprintf("Test16: passed\n");
 }
 
 int battfs_testRun(void)
@@ -714,6 +786,7 @@ int battfs_testRun(void)
 	test13(&disk);
 	test14(&disk);
 	test15(&disk);
+	test16(&disk);
 	kprintf("All tests passed!\n");
 
 	return 0;
