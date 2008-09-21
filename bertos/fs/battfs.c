@@ -145,7 +145,7 @@ static bool readHdr(struct BattFsSuper *disk, pgcnt_t page, struct BattFsPageHea
 	if (diskRead(disk, page, disk->page_size - BATTFS_HEADER_LEN, buf, BATTFS_HEADER_LEN)
 	    != BATTFS_HEADER_LEN)
 	{
-		LOG_ERR("Error: page[%d]\n", page);
+		LOG_ERR("page[%d]\n", page);
 		return false;
 	}
 
@@ -176,7 +176,7 @@ static bool setBufferHdr(struct BattFsSuper *disk, struct BattFsPageHeader *hdr)
 	if (disk->bufferWrite(disk, disk->page_size - BATTFS_HEADER_LEN, buf, BATTFS_HEADER_LEN)
 	    != BATTFS_HEADER_LEN)
 	{
-		LOG_ERR("Error writing to buffer\n");
+		LOG_ERR("writing to buffer\n");
 		return false;
 	}
 	return true;
@@ -454,7 +454,7 @@ bool battfs_init(struct BattFsSuper *disk)
 	/* Count pages per file */
 	if (!countDiskFilePages(disk, filelen_table))
 	{
-		LOG_ERR("error counting file pages\n");
+		LOG_ERR("counting file pages\n");
 		return false;
 	}
 
@@ -467,7 +467,7 @@ bool battfs_init(struct BattFsSuper *disk)
 	/* Fill page allocation array using filelen_table */
 	if (!fillPageArray(disk, filelen_table))
 	{
-		LOG_ERR("error filling page array\n");
+		LOG_ERR("filling page array\n");
 		return false;
 	}
 	#warning TODO: shuffle free blocks
