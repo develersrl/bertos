@@ -535,7 +535,19 @@ static bool getNewPage(struct BattFsSuper *disk, pgcnt_t new_pos, inode_t inode,
 	LOG_INFO("Getting new page %d, pos %d\n", disk->page_array[disk->free_page_start], new_pos);
 	disk->curr_page = disk->page_array[disk->free_page_start++];
 	memmove(&disk->page_array[new_pos + 1], &disk->page_array[new_pos], (disk->free_page_start - new_pos - 1) * sizeof(pgcnt_t));
-	#warning TODO: move other files!
+
+	Node *n;
+	/* Move following file start point one position ahead. */
+	FOREACH_NODE(n, &disk->file_opened_list)
+	{
+		BattFs *file = containerof(n, BattFs, link);
+		if (file->inode > inode)
+		{
+			LOG_INFO("Move file %d start pos\n", file->inode);
+			file->start++;
+		}
+	}
+
 	disk->page_array[new_pos] = disk->curr_page;
 	disk->cache_dirty = true;
 
@@ -543,6 +555,7 @@ static bool getNewPage(struct BattFsSuper *disk, pgcnt_t new_pos, inode_t inode,
 	disk->curr_hdr.pgoff =  pgoff;
 	disk->curr_hdr.fill = 0;
 	disk->curr_hdr.seq = 0;
+	setBufferHdr(disk, &disk->curr_hdr);
 	return true;
 }
 
@@ -571,7 +584,8 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 		/* Handle write outside EOF */
 		if (pg_offset > fdb->max_off)
 		{
-			if (!getNewPage(fdb->disk, (fdb->disk->page_array - fdb->start) + pg_offset, fdb->inode, pg_offset))
+			LOG_INFO("New page needed, pg_offset %d, pos %d\n", pg_offset, (fdb->start - fdb->disk->page_array) + pg_offset);
+			if (!getNewPage(fdb->disk, (fdb->start - fdb->disk->page_array) + pg_offset, fdb->inode, pg_offset))
 				return total_write;
 			fdb->max_off = pg_offset;
 		}
@@ -598,7 +612,7 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 		}
 
 
-		LOG_INFO("writing to buffer for page %d, offset %d, size %d\n", fdb->disk->curr_page, addr_offset, wr_len);
+		//LOG_INFO("writing to buffer for page %d, offset %d, size %d\n", fdb->disk->curr_page, addr_offset, wr_len);
 		if (fdb->disk->bufferWrite(fdb->disk, addr_offset, buf, wr_len) != wr_len)
 		{
 			#warning TODO set error?
@@ -613,7 +627,7 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 		fdb->disk->free_bytes -= fill_delta;
 		fdb->disk->curr_hdr.fill += fill_delta;
 		fd->size += fill_delta;
-		LOG_INFO("free_bytes %d, seek_pos %d, size %d, curr_hdr.fill %d\n", fdb->disk->free_bytes, fd->seek_pos, fd->size, fdb->disk->curr_hdr.fill);
+		//LOG_INFO("free_bytes %d, seek_pos %d, size %d, curr_hdr.fill %d\n", fdb->disk->free_bytes, fd->seek_pos, fd->size, fdb->disk->curr_hdr.fill);
 	}
 	return total_write;
 }
@@ -647,6 +661,12 @@ static size_t battfs_read(struct KFile *fd, void *_buf, size_t size)
 			#warning TODO set error?
 		}
 
+		#if _DEBUG
+			BattFsPageHeader hdr;
+			readHdr(fdb->disk, fdb->start[pg_offset], &hdr);
+			ASSERT(hdr.inode == fdb->inode);
+		#endif
+
 		size -= read_len;
 		fd->seek_pos += read_len;
 		total_read += read_len;
@@ -677,11 +697,12 @@ static bool findFile(BattFsSuper *disk, inode_t inode, pgcnt_t *last)
 		LOG_INFO("first %d, last %d, page %d\n", first, *last, page);
 		if (!readHdr(disk, disk->page_array[page], &hdr))
 			return false;
-
+		LOG_INFO("inode read: %d\n", hdr.inode);
 		fcs = computeFcs(&hdr);
 		if (hdr.fcs == fcs && hdr.inode == inode)
 		{
 			*last = page - hdr.pgoff;
+			LOG_INFO("Found: %d\n", *last);
 			return true;
 		}
 		else if (hdr.fcs == fcs && hdr.inode < inode)
@@ -689,7 +710,7 @@ static bool findFile(BattFsSuper *disk, inode_t inode, pgcnt_t *last)
 		else
 			*last = page - 1;
 	}
-
+	LOG_INFO("Not found: last %d\n", *last);
 	return false;
 }
 
