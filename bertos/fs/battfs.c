@@ -44,12 +44,25 @@
 #include <cfg/macros.h> /* MIN, MAX */
 #include <cpu/byteorder.h> /* cpu_to_xx */
 
-#define LOG_LEVEL       LOG_LVL_INFO
+#define LOG_LEVEL       LOG_LVL_WARN
 #define LOG_FORMAT      LOG_FMT_VERBOSE
 #include <cfg/log.h>
 
 #include <string.h> /* memset, memmove */
 
+#ifdef _DEBUG
+static void dumpPageArray(struct BattFsSuper *disk)
+{
+	kprintf("Page array dump:");
+	for (pgcnt_t i = 0; i < disk->page_count; i++)
+	{
+		if (!(i % 16))
+			kputchar('\n');
+		kprintf("%04d ", disk->page_array[i]);
+	}
+	kputchar('\n');
+}
+#endif
 
 /**
  * Convert from memory representation to disk structure.
@@ -203,7 +216,7 @@ static pgcnt_t countPages(pgoff_t *filelen_table, inode_t inode)
 static void movePages(struct BattFsSuper *disk, pgcnt_t src, int offset)
 {
 	pgcnt_t dst = src + offset;
-	LOG_INFO("src %d, offset %d, size %d\n", src, offset, (disk->page_count - MAX(dst, src)) * sizeof(pgcnt_t));
+	LOG_INFO("src %d, offset %d, size %ld\n", src, offset, (disk->page_count - MAX(dst, src)) * sizeof(pgcnt_t));
 	memmove(&disk->page_array[dst], &disk->page_array[src], (disk->page_count - MAX(dst, src)) * sizeof(pgcnt_t));
 
 	if (offset < 0)
@@ -595,7 +608,7 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 		fdb->disk->free_bytes -= fill_delta;
 		fdb->disk->curr_hdr.fill += fill_delta;
 		fd->size += fill_delta;
-		LOG_INFO("free_bytes %ld, seek_pos %ld, size %ld, curr_hdr.fill %ld\n", fdb->disk->free_bytes, fd->seek_pos, fd->size, fdb->disk->curr_hdr.fill);
+		LOG_INFO("free_bytes %d, seek_pos %d, size %d, curr_hdr.fill %d\n", fdb->disk->free_bytes, fd->seek_pos, fd->size, fdb->disk->curr_hdr.fill);
 	}
 	return total_write;
 }
@@ -641,7 +654,7 @@ static size_t battfs_read(struct KFile *fd, void *_buf, size_t size)
 /**
  * Search file \a inode in \a disk using a binary search.
  * \a last is filled with array offset of file start
- * in disk->page_array if filse is found, otherwise
+ * in disk->page_array if file is found, otherwise
  * \a last is filled with the correct insert position
  * for creating a file with the given \a inode.
  * \return true if file is found, false otherwisr.
@@ -656,7 +669,7 @@ static bool findFile(BattFsSuper *disk, inode_t inode, pgcnt_t *last)
 	while (first < *last)
 	{
 		page = (first + *last) / 2;
-
+		LOG_INFO("first %d, last %d, page %d\n", first, *last, page);
 		if (!readHdr(disk, disk->page_array[page], &hdr))
 			return false;
 
@@ -694,15 +707,16 @@ static file_size_t countFileSize(BattFsSuper *disk, pgcnt_t *start, inode_t inod
 	file_size_t size = 0;
 	BattFsPageHeader hdr;
 
-	for (;;)
+	while (start < &disk->page_array[disk->free_page_start])
 	{
 		if (!readHdr(disk, *start++, &hdr))
 			return EOF;
 		if (hdr.fcs == computeFcs(&hdr) && hdr.inode == inode)
 			size += hdr.fill;
 		else
-			return size;
+			break;
 	}
+	return size;
 }
 
 /**
@@ -720,6 +734,7 @@ bool battfs_fileopen(BattFsSuper *disk, BattFs *fd, inode_t inode, filemode_t mo
 	pgcnt_t start_pos;
 	if (!findFile(disk, inode, &start_pos))
 	{
+		LOG_INFO("file %d not found\n", inode);
 		if (!(mode & BATTFS_CREATE))
 			return false;
 		/* Create the file */
@@ -727,6 +742,7 @@ bool battfs_fileopen(BattFsSuper *disk, BattFs *fd, inode_t inode, filemode_t mo
 			return false;
 	}
 	fd->start = &disk->page_array[start_pos];
+	LOG_INFO("Start pos %d\n", start_pos);
 
 	/* Fill file size */
 	if ((fd->fd.size = countFileSize(disk, fd->start, inode)) == EOF)
@@ -788,6 +804,7 @@ bool battfs_close(struct BattFsSuper *disk)
 }
 
 #if UNIT_TEST
+
 bool battfs_writeTestBlock(struct BattFsSuper *disk, pgcnt_t page, inode_t inode, seq_t seq, fill_t fill, pgoff_t pgoff)
 {
 	BattFsPageHeader hdr;
