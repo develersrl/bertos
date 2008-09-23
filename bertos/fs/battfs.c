@@ -412,10 +412,10 @@ static bool flushBuffer(struct BattFsSuper *disk)
 /**
  * Load \a new_page from \a disk in disk page buffer.
  * If a previuos page is still dirty in the buffer, will be
- * flushed first.
+ * flushed first. The new page header loaded will be put in \a new_hdr.
  * \return true if ok, false on errors.
  */
-static bool loadPage(struct BattFsSuper *disk, pgcnt_t new_page)
+static bool loadPage(struct BattFsSuper *disk, pgcnt_t new_page, BattFsPageHeader *new_hdr)
 {
 	if (disk->curr_page == new_page)
 		return true;
@@ -423,7 +423,8 @@ static bool loadPage(struct BattFsSuper *disk, pgcnt_t new_page)
 	LOG_INFO("Loading page %d\n", new_page);
 
 	if (!(flushBuffer(disk)
-		&& disk->load(disk, new_page)))
+		&& disk->load(disk, new_page)
+		&& getBufferHdr(disk, new_hdr)))
 		return false;
 
 	disk->curr_page = new_page;
@@ -533,7 +534,7 @@ static int battfs_fileclose(struct KFile *fd)
 }
 
 
-static bool getNewPage(struct BattFsSuper *disk, pgcnt_t new_pos, inode_t inode, pgoff_t pgoff)
+static bool getNewPage(struct BattFsSuper *disk, pgcnt_t new_pos, inode_t inode, pgoff_t pgoff, BattFsPageHeader *new_hdr)
 {
 	if (disk->free_page_start >= disk->page_count)
 	{
@@ -561,12 +562,11 @@ static bool getNewPage(struct BattFsSuper *disk, pgcnt_t new_pos, inode_t inode,
 	disk->page_array[new_pos] = disk->curr_page;
 	disk->cache_dirty = true;
 
-	BattFsPageHeader hdr;
-	hdr.inode = inode;
-	hdr.pgoff =  pgoff;
-	hdr.fill = 0;
-	hdr.seq = 0;
-	if (!setBufferHdr(disk, &hdr))
+	new_hdr->inode = inode;
+	new_hdr->pgoff =  pgoff;
+	new_hdr->fill = 0;
+	new_hdr->seq = 0;
+	if (!setBufferHdr(disk, new_hdr))
 		return false;
 	else
 		return true;
@@ -602,8 +602,7 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 		if (pg_offset > fdb->max_off)
 		{
 			LOG_INFO("New page needed, pg_offset %d, pos %d\n", pg_offset, (fdb->start - fdb->disk->page_array) + pg_offset);
-			if (!(getNewPage(fdb->disk, (fdb->start - fdb->disk->page_array) + pg_offset, fdb->inode, pg_offset)
-				&& getBufferHdr(fdb->disk, &curr_hdr)))
+			if (!getNewPage(fdb->disk, (fdb->start - fdb->disk->page_array) + pg_offset, fdb->inode, pg_offset, &curr_hdr))
 				return total_write;
 			fdb->max_off = pg_offset;
 		}
@@ -611,8 +610,7 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 		else if (fdb->start[pg_offset] != fdb->disk->curr_page)
 		{
 			LOG_INFO("Re-writing page %d to %d\n", fdb->start[pg_offset], fdb->disk->page_array[fdb->disk->free_page_start]);
-			if (!(loadPage(fdb->disk, fdb->start[pg_offset])
-				&& getBufferHdr(fdb->disk, &curr_hdr)))
+			if (!loadPage(fdb->disk, fdb->start[pg_offset], &curr_hdr))
 			{
 				#warning TODO set error?
 				return total_write;
@@ -787,7 +785,8 @@ bool battfs_fileopen(BattFsSuper *disk, BattFs *fd, inode_t inode, filemode_t mo
 		if (!(mode & BATTFS_CREATE))
 			return false;
 		/* Create the file */
-		if (!(getNewPage(disk, start_pos, inode, 0)))
+		BattFsPageHeader hdr;
+		if (!(getNewPage(disk, start_pos, inode, 0, &hdr)))
 			return false;
 	}
 	fd->start = &disk->page_array[start_pos];
