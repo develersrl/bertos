@@ -195,6 +195,22 @@ static bool setBufferHdr(struct BattFsSuper *disk, struct BattFsPageHeader *hdr)
 	return true;
 }
 
+static bool getBufferHdr(struct BattFsSuper *disk, struct BattFsPageHeader *hdr)
+{
+	uint8_t buf[BATTFS_HEADER_LEN];
+
+	if (disk->bufferRead(disk, disk->page_size - BATTFS_HEADER_LEN, buf, BATTFS_HEADER_LEN)
+	    != BATTFS_HEADER_LEN)
+	{
+		LOG_ERR("reading from buffer\n");
+		return false;
+	}
+
+	disk_to_battfs(buf, hdr);
+
+	return true;
+}
+
 /**
  * Count the number of pages from
  * inode 0 to \a inode in \a filelen_table.
@@ -384,8 +400,7 @@ static bool flushBuffer(struct BattFsSuper *disk)
 	{
 		LOG_INFO("Flushing to disk page %d\n", disk->curr_page);
 
-		if (!(setBufferHdr(disk, &disk->curr_hdr)
-			&& disk->erase(disk, disk->curr_page)
+		if (!(disk->erase(disk, disk->curr_page)
 			&& disk->save(disk, disk->curr_page)))
 			return false;
 
@@ -412,10 +427,6 @@ static bool loadPage(struct BattFsSuper *disk, pgcnt_t new_page)
 		return false;
 
 	disk->curr_page = new_page;
-
-	/* Load current header */
-	if (!readHdr(disk, disk->curr_page, &disk->curr_hdr))
-		return false;
 
 	return true;
 }
@@ -462,7 +473,6 @@ bool battfs_init(struct BattFsSuper *disk)
 	disk->cache_dirty = false;
 	disk->curr_page = 0;
 	disk->load(disk, disk->curr_page);
-	readHdr(disk, disk->curr_page, &disk->curr_hdr);
 
 	/* Count pages per file */
 	if (!countDiskFilePages(disk, filelen_table))
@@ -551,12 +561,15 @@ static bool getNewPage(struct BattFsSuper *disk, pgcnt_t new_pos, inode_t inode,
 	disk->page_array[new_pos] = disk->curr_page;
 	disk->cache_dirty = true;
 
-	disk->curr_hdr.inode = inode;
-	disk->curr_hdr.pgoff =  pgoff;
-	disk->curr_hdr.fill = 0;
-	disk->curr_hdr.seq = 0;
-	setBufferHdr(disk, &disk->curr_hdr);
-	return true;
+	BattFsPageHeader hdr;
+	hdr.inode = inode;
+	hdr.pgoff =  pgoff;
+	hdr.fill = 0;
+	hdr.seq = 0;
+	if (!setBufferHdr(disk, &hdr))
+		return false;
+	else
+		return true;
 }
 
 /**
@@ -573,6 +586,10 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 	pgaddr_t addr_offset;
 	pgaddr_t wr_len;
 
+	BattFsPageHeader curr_hdr;
+	if (!getBufferHdr(fdb->disk, &curr_hdr))
+		return total_write;
+
 	#warning TODO seek_pos > size?
 
 	while (size)
@@ -585,7 +602,8 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 		if (pg_offset > fdb->max_off)
 		{
 			LOG_INFO("New page needed, pg_offset %d, pos %d\n", pg_offset, (fdb->start - fdb->disk->page_array) + pg_offset);
-			if (!getNewPage(fdb->disk, (fdb->start - fdb->disk->page_array) + pg_offset, fdb->inode, pg_offset))
+			if (!(getNewPage(fdb->disk, (fdb->start - fdb->disk->page_array) + pg_offset, fdb->inode, pg_offset)
+				&& getBufferHdr(fdb->disk, &curr_hdr)))
 				return total_write;
 			fdb->max_off = pg_offset;
 		}
@@ -593,7 +611,8 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 		else if (fdb->start[pg_offset] != fdb->disk->curr_page)
 		{
 			LOG_INFO("Re-writing page %d to %d\n", fdb->start[pg_offset], fdb->disk->page_array[fdb->disk->free_page_start]);
-			if (!loadPage(fdb->disk, fdb->start[pg_offset]))
+			if (!(loadPage(fdb->disk, fdb->start[pg_offset])
+				&& getBufferHdr(fdb->disk, &curr_hdr)))
 			{
 				#warning TODO set error?
 				return total_write;
@@ -608,7 +627,7 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 			fdb->disk->page_array[fdb->disk->page_count - 1] = fdb->start[pg_offset];
 			/* Assign new page */
 			fdb->start[pg_offset] = fdb->disk->curr_page;
-			fdb->disk->curr_hdr.seq++;
+			curr_hdr.seq++;
 		}
 
 
@@ -623,11 +642,15 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 		fd->seek_pos += wr_len;
 		total_write += wr_len;
 		buf += wr_len;
-		fill_t fill_delta = MAX((int32_t)(addr_offset + wr_len) - fdb->disk->curr_hdr.fill, (int32_t)0);
+		fill_t fill_delta = MAX((int32_t)(addr_offset + wr_len) - curr_hdr.fill, (int32_t)0);
 		fdb->disk->free_bytes -= fill_delta;
-		fdb->disk->curr_hdr.fill += fill_delta;
 		fd->size += fill_delta;
-		//LOG_INFO("free_bytes %d, seek_pos %d, size %d, curr_hdr.fill %d\n", fdb->disk->free_bytes, fd->seek_pos, fd->size, fdb->disk->curr_hdr.fill);
+		curr_hdr.fill += fill_delta;
+
+		if (!setBufferHdr(fdb->disk, &curr_hdr))
+			return total_write;
+
+		//LOG_INFO("free_bytes %d, seek_pos %d, size %d, curr_hdr.fill %d\n", fdb->disk->free_bytes, fd->seek_pos, fd->size, curr_hdr.fill);
 	}
 	return total_write;
 }
