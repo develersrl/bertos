@@ -44,16 +44,16 @@
 #include <cfg/macros.h> /* MIN, MAX */
 #include <cpu/byteorder.h> /* cpu_to_xx */
 
-#define LOG_LEVEL       LOG_LVL_WARN
+#define LOG_LEVEL       LOG_LVL_INFO
 #define LOG_FORMAT      LOG_FMT_VERBOSE
 #include <cfg/log.h>
 
 #include <string.h> /* memset, memmove */
 
-#ifdef _DEBUG
+#if LOG_LEVEL >= LOG_LVL_INFO
 static void dumpPageArray(struct BattFsSuper *disk)
 {
-	kprintf("Page array dump:");
+	kprintf("Page array dump, free_page_start %d:", disk->free_page_start);
 	for (pgcnt_t i = 0; i < disk->page_count; i++)
 	{
 		if (!(i % 16))
@@ -483,8 +483,13 @@ bool battfs_init(struct BattFsSuper *disk)
 		LOG_ERR("filling page array\n");
 		return false;
 	}
+	#if LOG_LEVEL > LOG_LVL_INFO
+		dumpPageArray(disk)
+	#endif
 	#warning TODO: shuffle free blocks
-
+	//#if LOG_LEVEL > LOG_LVL_INFO
+	//	dumpPageArray(disk)
+	//#endif
 	/* Init list for opened files. */
 	LIST_INIT(&disk->file_opened_list);
 	return true;
