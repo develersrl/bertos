@@ -756,7 +756,52 @@ static void test16(BattFsSuper *disk)
 	ASSERT(kfile_close(&fd1.fd) == 0);
 	ASSERT(battfs_close(disk));
 
+
 	kprintf("Test16: passed\n");
+}
+
+static void test17(BattFsSuper *disk)
+{
+	kprintf("Test17: increasing dimension of a file with multiple open files.\n");
+
+	FILE *fpt = fopen(test_filename, "w+");
+
+	for (int i = 0; i < FILE_SIZE / 10; i++)
+		fputc(0xff, fpt);
+	fclose(fpt);
+
+	BattFs fd1,fd2;
+	unsigned int INODE1 = 1, INODE2 = 2;
+	unsigned int MODE = BATTFS_CREATE;
+	uint8_t buf[1000];
+
+	ASSERT(battfs_init(disk));
+	ASSERT(battfs_fileopen(disk, &fd1, INODE1, MODE));
+	ASSERT(battfs_fileopen(disk, &fd2, INODE2, MODE));
+	for (int i = 0; i < sizeof(buf); i++)
+		ASSERT(kfile_putc(i, &fd2.fd) != EOF);
+	ASSERT(kfile_seek(&fd2.fd, 0, KSM_SEEK_SET) == 0);
+	memset(buf, 0, sizeof(buf));
+	ASSERT(kfile_read(&fd2.fd, buf, sizeof(buf)) == sizeof(buf));
+
+	for (int i = 0; i < sizeof(buf); i++)
+		ASSERT(buf[i] == (i & 0xff));
+	ASSERT(kfile_seek(&fd2.fd, 0, KSM_SEEK_SET) == 0);
+
+	for (int i = 0; i < sizeof(buf); i++)
+		ASSERT(kfile_putc(i, &fd1.fd) != EOF);
+
+	memset(buf, 0, sizeof(buf));
+	ASSERT(kfile_read(&fd2.fd, buf, sizeof(buf)) == sizeof(buf));
+
+	for (int i = 0; i < sizeof(buf); i++)
+		ASSERT(buf[i] == (i & 0xff));
+
+	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(kfile_close(&fd2.fd) == 0);
+	ASSERT(battfs_close(disk));
+
+	kprintf("Test17: passed\n");
 }
 
 int battfs_testRun(void)
@@ -771,6 +816,7 @@ int battfs_testRun(void)
 	disk.save = disk_page_save;
 	disk.erase = disk_page_erase;
 	disk.close = disk_close;
+
 	test1(&disk);
 	test2(&disk);
 	test3(&disk);
@@ -787,6 +833,7 @@ int battfs_testRun(void)
 	test14(&disk);
 	test15(&disk);
 	test16(&disk);
+	test17(&disk);
 	kprintf("All tests passed!\n");
 
 	return 0;
