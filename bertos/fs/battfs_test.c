@@ -440,7 +440,7 @@ static void readAcross(BattFsSuper *disk)
 
 	const unsigned int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
 	inode_t INODE = 0;
-	inode_t MODE = 0;
+	unsigned int MODE = 0;
 	uint8_t buf[PAGE_FILL + BATTFS_HEADER_LEN / 2];
 
 	disk->erase(disk, 0);
@@ -546,7 +546,7 @@ static void writeAcross(BattFsSuper *disk)
 
 	const unsigned int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
 	inode_t INODE = 0;
-	inode_t MODE = 0;
+	unsigned int MODE = 0;
 	uint8_t buf[PAGE_FILL + BATTFS_HEADER_LEN / 2];
 
 	disk->erase(disk, 0);
@@ -618,7 +618,7 @@ static void createFile(BattFsSuper *disk)
 
 	BattFs fd1;
 	inode_t INODE = 0;
-	inode_t MODE = BATTFS_CREATE;
+	unsigned int MODE = BATTFS_CREATE;
 
 	ASSERT(battfs_init(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
@@ -662,7 +662,7 @@ static void multipleWrite(BattFsSuper *disk)
 
 	BattFs fd1;
 	inode_t INODE = 0;
-	inode_t MODE = BATTFS_CREATE;
+	unsigned int MODE = BATTFS_CREATE;
 	uint8_t buf[1000];
 
 	ASSERT(battfs_init(disk));
@@ -716,7 +716,7 @@ static void increaseFile(BattFsSuper *disk)
 
 	BattFs fd1,fd2;
 	inode_t INODE1 = 1, INODE2 = 2;
-	inode_t MODE = BATTFS_CREATE;
+	unsigned int MODE = BATTFS_CREATE;
 	uint8_t buf[1000];
 
 	ASSERT(battfs_init(disk));
