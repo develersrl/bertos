@@ -155,10 +155,10 @@ static void testCheck(BattFsSuper *disk, pgcnt_t *reference)
 	battfs_close(disk);
 }
 
-static void test1(BattFsSuper *disk)
+static void diskNew(BattFsSuper *disk)
 {
 	pgcnt_t ref[PAGE_COUNT];
-	kprintf("Test1: disk new\n");
+	TRACEMSG("1: disk new\n");
 
 	FILE *fpt = fopen(test_filename, "w+");
 
@@ -169,13 +169,13 @@ static void test1(BattFsSuper *disk)
 		ref[i] = i;
 
 	testCheck(disk, ref);
-	kprintf("Test1: passed\n");
+	TRACEMSG("1: passed\n");
 }
 
-static void test2(BattFsSuper *disk)
+static void disk1File(BattFsSuper *disk)
 {
 	pgcnt_t ref[PAGE_COUNT];
-	kprintf("Test2: disk full with 1 contiguos file\n");
+	TRACEMSG("2: disk full with 1 contiguos file\n");
 
 
 	fp = fopen(test_filename, "w+");
@@ -188,14 +188,14 @@ static void test2(BattFsSuper *disk)
 	fclose(fp);
 
 	testCheck(disk, ref);
-	kprintf("Test2: passed\n");
+	TRACEMSG("2: passed\n");
 }
 
 
-static void test3(BattFsSuper *disk)
+static void diskHalfFile(BattFsSuper *disk)
 {
 	pgcnt_t ref[PAGE_COUNT];
-	kprintf("Test3: disk half full with 1 contiguos file, rest unformatted\n");
+	TRACEMSG("3: disk half full with 1 contiguos file, rest unformatted\n");
 
 
 	fp = fopen(test_filename, "w+");
@@ -217,70 +217,14 @@ static void test3(BattFsSuper *disk)
 
 
 	testCheck(disk, ref);
-	kprintf("Test3: passed\n");
+	TRACEMSG("3: passed\n");
 }
 
-#if 0
-static void test4(BattFsSuper *disk)
-{
-	pgcnt_t ref[PAGE_COUNT];
-	kprintf("Test4: disk half full with 1 contiguos file, rest marked free\n");
 
-
-	fp = fopen(test_filename, "w+");
-
-	for (int i = 0; i < PAGE_COUNT / 2; i++)
-	{
-		battfs_writeTestBlock(disk, i, 0, 0, 0, i);
-		ref[i] = i;
-	}
-	for (int i = PAGE_COUNT / 2; i < PAGE_COUNT; i++)
-	{
-		battfs_writeTestBlock(disk, i, 0, 0, 0, i);
-		ref[i] = i;
-	}
-	fclose(fp);
-
-
-	testCheck(disk, ref);
-	kprintf("Test4: passed\n");
-}
-
-static void test5(BattFsSuper *disk)
-{
-	pgcnt_t ref[PAGE_COUNT];
-	kprintf("Test5: disk 1/3 full with 1 contiguos file, 1/3 marked free, rest unformatted\n");
-
-
-	fp = fopen(test_filename, "w+");
-
-	for (int i = 0; i < FILE_SIZE; i++)
-		fputc(0xff, fp);
-
-	for (int i = 0; i < PAGE_COUNT / 3; i++)
-	{
-		battfs_writeTestBlock(disk, i, 0, 0, 0, i);
-		ref[i] = i;
-	}
-	for (int i = PAGE_COUNT / 3; i < 2 * (PAGE_COUNT / 3); i++)
-	{
-		battfs_writeTestBlock(disk, i, 0, 0, 0, i);
-		ref[i + PAGE_COUNT / 3 + 1] = i;
-	}
-	fclose(fp);
-
-	for (int i = PAGE_COUNT / 3; i < 2 * (PAGE_COUNT / 3) + 1; i++)
-		ref[i] = PAGE_COUNT + PAGE_COUNT / 3 - i - 1;
-
-	testCheck(disk, ref);
-	kprintf("Test5: passed\n");
-}
-#endif
-
-static void test6(BattFsSuper *disk)
+static void oldSeq1(BattFsSuper *disk)
 {
 	pgcnt_t ref[4];
-	kprintf("Test6: 1 file with 1 old seq num, 1 free block\n");
+	TRACEMSG("6: 1 file with 1 old seq num, 1 free block\n");
 
 
 	fp = fopen(test_filename, "w+");
@@ -298,13 +242,13 @@ static void test6(BattFsSuper *disk)
 	ref[3] = 3;
 
 	testCheck(disk, ref);
-	kprintf("Test6: passed\n");
+	TRACEMSG("6: passed\n");
 }
 
-static void test7(BattFsSuper *disk)
+static void oldSeq2(BattFsSuper *disk)
 {
 	pgcnt_t ref[4];
-	kprintf("Test7: 1 file with 1 old seq num, 1 free block\n");
+	TRACEMSG("7: 1 file with 1 old seq num, 1 free block\n");
 
 
 	fp = fopen(test_filename, "w+");
@@ -321,13 +265,13 @@ static void test7(BattFsSuper *disk)
 	ref[3] = 3;
 
 	testCheck(disk, ref);
-	kprintf("Test7: passed\n");
+	TRACEMSG("7: passed\n");
 }
 
-static void test8(BattFsSuper *disk)
+static void oldSeq3(BattFsSuper *disk)
 {
 	pgcnt_t ref[4];
-	kprintf("Test8: 1 file with 1 old seq num, 1 free block\n");
+	TRACEMSG("8: 1 file with 1 old seq num, 1 free block\n");
 
 
 	fp = fopen(test_filename, "w+");
@@ -346,13 +290,13 @@ static void test8(BattFsSuper *disk)
 	ref[3] = 3;
 
 	testCheck(disk, ref);
-	kprintf("Test8: passed\n");
+	TRACEMSG("8: passed\n");
 }
 
-static void test9(BattFsSuper *disk)
+static void oldSeq2File(BattFsSuper *disk)
 {
 	pgcnt_t ref[8];
-	kprintf("Test9: 2 file with old seq num, 2 free block\n");
+	TRACEMSG("9: 2 file with old seq num, 2 free block\n");
 
 
 	fp = fopen(test_filename, "w+");
@@ -379,14 +323,14 @@ static void test9(BattFsSuper *disk)
 	ref[7] = 7;
 
 	testCheck(disk, ref);
-	kprintf("Test9: passed\n");
+	TRACEMSG("9: passed\n");
 }
 
-static void test10(BattFsSuper *disk)
+static void openFile(BattFsSuper *disk)
 {
 	BattFs fd1;
 	BattFs fd2;
-	kprintf("Test10: open file test, inode 0 and inode 4\n");
+	TRACEMSG("10: open file test, inode 0 and inode 4\n");
 
 	fp = fopen(test_filename, "w+");
 
@@ -445,15 +389,15 @@ static void test10(BattFsSuper *disk)
 	ASSERT(LIST_EMPTY(&disk->file_opened_list));
 	ASSERT(battfs_close(disk));
 
-	kprintf("Test10: passed\n");
+	TRACEMSG("10: passed\n");
 }
 
-static void test11(BattFsSuper *disk)
+static void readFile(BattFsSuper *disk)
 {
 	BattFs fd1;
 	uint8_t buf[16];
 
-	kprintf("Test11: read file test\n");
+	TRACEMSG("11: read file test\n");
 
 	fp = fopen(test_filename, "w+");
 
@@ -483,14 +427,14 @@ static void test11(BattFsSuper *disk)
 	ASSERT(kfile_close(&fd1.fd) == 0);
 	ASSERT(battfs_close(disk));
 
-	kprintf("Test11: passed\n");
+	TRACEMSG("11: passed\n");
 }
 
-static void test12(BattFsSuper *disk)
+static void readAcross(BattFsSuper *disk)
 {
 	BattFs fd1;
 
-	kprintf("Test12: read file test across page boundary and seek test\n");
+	TRACEMSG("12: read file test across page boundary and seek test\n");
 
 	fp = fopen(test_filename, "w+");
 
@@ -542,16 +486,16 @@ static void test12(BattFsSuper *disk)
 	ASSERT(kfile_close(&fd1.fd) == 0);
 	ASSERT(battfs_close(disk));
 
-	kprintf("Test12: passed\n");
+	TRACEMSG("12: passed\n");
 }
 
 
-static void test13(BattFsSuper *disk)
+static void writeFile(BattFsSuper *disk)
 {
 	BattFs fd1;
 	uint8_t buf[PAGE_SIZE - BATTFS_HEADER_LEN];
 
-	kprintf("Test13: write file test\n");
+	TRACEMSG("13: write file test\n");
 
 	fp = fopen(test_filename, "w+");
 
@@ -589,14 +533,14 @@ static void test13(BattFsSuper *disk)
 	ASSERT(kfile_close(&fd1.fd) == 0);
 	ASSERT(battfs_close(disk));
 
-	kprintf("Test13: passed\n");
+	TRACEMSG("13: passed\n");
 }
 
-static void test14(BattFsSuper *disk)
+static void writeAcross(BattFsSuper *disk)
 {
 	BattFs fd1;
 
-	kprintf("Test14: write file test across page boundary and seek test\n");
+	TRACEMSG("14: write file test across page boundary and seek test\n");
 
 	fp = fopen(test_filename, "w+");
 
@@ -659,12 +603,12 @@ static void test14(BattFsSuper *disk)
 	ASSERT(kfile_close(&fd1.fd) == 0);
 	ASSERT(battfs_close(disk));
 
-	kprintf("Test14: passed\n");
+	TRACEMSG("14: passed\n");
 }
 
-static void test15(BattFsSuper *disk)
+static void createFile(BattFsSuper *disk)
 {
-	kprintf("Test15: file creation on new disk\n");
+	TRACEMSG("15: file creation on new disk\n");
 
 	FILE *fpt = fopen(test_filename, "w+");
 
@@ -703,12 +647,12 @@ static void test15(BattFsSuper *disk)
 	ASSERT(battfs_close(disk));
 
 
-	kprintf("Test15: passed\n");
+	TRACEMSG("15: passed\n");
 }
 
-static void test16(BattFsSuper *disk)
+static void multipleWrite(BattFsSuper *disk)
 {
-	kprintf("Test16: multiple write on file\n");
+	TRACEMSG("16: multiple write on file\n");
 
 	FILE *fpt = fopen(test_filename, "w+");
 
@@ -757,12 +701,12 @@ static void test16(BattFsSuper *disk)
 	ASSERT(battfs_close(disk));
 
 
-	kprintf("Test16: passed\n");
+	TRACEMSG("16: passed\n");
 }
 
-static void test17(BattFsSuper *disk)
+static void increaseFile(BattFsSuper *disk)
 {
-	kprintf("Test17: increasing dimension of a file with multiple open files.\n");
+	TRACEMSG("17: increasing dimension of a file with multiple open files.\n");
 
 	FILE *fpt = fopen(test_filename, "w+");
 
@@ -801,7 +745,7 @@ static void test17(BattFsSuper *disk)
 	ASSERT(kfile_close(&fd2.fd) == 0);
 	ASSERT(battfs_close(disk));
 
-	kprintf("Test17: passed\n");
+	TRACEMSG("17: passed\n");
 }
 
 int battfs_testRun(void)
@@ -817,23 +761,22 @@ int battfs_testRun(void)
 	disk.erase = disk_page_erase;
 	disk.close = disk_close;
 
-	test1(&disk);
-	test2(&disk);
-	test3(&disk);
-	//test4(&disk);
-	//test5(&disk);
-	test6(&disk);
-	test7(&disk);
-	test8(&disk);
-	test9(&disk);
-	test10(&disk);
-	test11(&disk);
-	test12(&disk);
-	test13(&disk);
-	test14(&disk);
-	test15(&disk);
-	test16(&disk);
-	test17(&disk);
+	diskNew(&disk);
+	disk1File(&disk);
+	diskHalfFile(&disk);
+	oldSeq1(&disk);
+	oldSeq2(&disk);
+	oldSeq3(&disk);
+	oldSeq2File(&disk);
+	openFile(&disk);
+	readFile(&disk);
+	readAcross(&disk);
+	writeFile(&disk);
+	writeAcross(&disk);
+	createFile(&disk);
+	multipleWrite(&disk);
+	increaseFile(&disk);
+
 	kprintf("All tests passed!\n");
 
 	return 0;
