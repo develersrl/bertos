@@ -748,6 +748,44 @@ static void increaseFile(BattFsSuper *disk)
 	TRACEMSG("17: passed\n");
 }
 
+static void readEOF(BattFsSuper *disk)
+{
+	BattFs fd1;
+	uint8_t buf[16];
+
+	TRACEMSG("18: reading over EOF test\n");
+
+	fp = fopen(test_filename, "w+");
+
+	unsigned int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
+	inode_t INODE = 0;
+	inode_t INODE2 = 4;
+	unsigned int MODE = 0;
+
+	disk->erase(disk, 0);
+	battfs_writeTestBlock(disk, 1, INODE, 0, PAGE_FILL, 0);
+	battfs_writeTestBlock(disk, 2, INODE, 3, PAGE_FILL, 1);
+	battfs_writeTestBlock(disk, 3, INODE, 0, PAGE_FILL, 1);
+	disk->erase(disk, 4);
+	battfs_writeTestBlock(disk, 5, INODE2, 0, PAGE_FILL, 0);
+	battfs_writeTestBlock(disk, 6, INODE2, 1, PAGE_FILL, 1);
+	battfs_writeTestBlock(disk, 7, INODE2, 0, PAGE_FILL, 1);
+
+	fclose(fp);
+
+	ASSERT(battfs_init(disk));
+	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
+	ASSERT(kfile_seek(&fd1.fd, fd1.fd.size + 10, SEEK_SET) == fd1.fd.size + 10);
+	ASSERT(fd1.fd.seek_pos == fd1.fd.size + 10);
+	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == 0);
+
+	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(battfs_close(disk));
+
+	TRACEMSG("18: passed\n");
+}
+
+
 int battfs_testRun(void)
 {
 	BattFsSuper disk;
@@ -776,6 +814,7 @@ int battfs_testRun(void)
 	createFile(&disk);
 	multipleWrite(&disk);
 	increaseFile(&disk);
+	readEOF(&disk);
 
 	kprintf("All tests passed!\n");
 
