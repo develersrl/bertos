@@ -566,10 +566,7 @@ static bool getNewPage(struct BattFsSuper *disk, pgcnt_t new_pos, inode_t inode,
 	new_hdr->pgoff =  pgoff;
 	new_hdr->fill = 0;
 	new_hdr->seq = 0;
-	if (!setBufferHdr(disk, new_hdr))
-		return false;
-	else
-		return true;
+	return setBufferHdr(disk, new_hdr);
 }
 
 /**
