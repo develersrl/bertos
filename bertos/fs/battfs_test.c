@@ -391,9 +391,9 @@ static void test10(BattFsSuper *disk)
 	fp = fopen(test_filename, "w+");
 
 	int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
-	unsigned int INODE = 0;
-	unsigned int INODE2 = 4;
-	unsigned int INEXISTENT_INODE = 123;
+	inode_t INODE = 0;
+	inode_t INODE2 = 4;
+	inode_t INEXISTENT_INODE = 123;
 	unsigned int MODE = 0;
 
 	// page, inode, seq, fill, pgoff
@@ -458,8 +458,8 @@ static void test11(BattFsSuper *disk)
 	fp = fopen(test_filename, "w+");
 
 	unsigned int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
-	unsigned int INODE = 0;
-	unsigned int INODE2 = 4;
+	inode_t INODE = 0;
+	inode_t INODE2 = 4;
 	unsigned int MODE = 0;
 
 	disk->erase(disk, 0);
@@ -495,8 +495,8 @@ static void test12(BattFsSuper *disk)
 	fp = fopen(test_filename, "w+");
 
 	const unsigned int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
-	unsigned int INODE = 0;
-	unsigned int MODE = 0;
+	inode_t INODE = 0;
+	inode_t MODE = 0;
 	uint8_t buf[PAGE_FILL + BATTFS_HEADER_LEN / 2];
 
 	disk->erase(disk, 0);
@@ -556,8 +556,8 @@ static void test13(BattFsSuper *disk)
 	fp = fopen(test_filename, "w+");
 
 	unsigned int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
-	unsigned int INODE = 0;
-	unsigned int INODE2 = 4;
+	inode_t INODE = 0;
+	inode_t INODE2 = 4;
 	unsigned int MODE = 0;
 
 	disk->erase(disk, 0);
@@ -601,8 +601,8 @@ static void test14(BattFsSuper *disk)
 	fp = fopen(test_filename, "w+");
 
 	const unsigned int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
-	unsigned int INODE = 0;
-	unsigned int MODE = 0;
+	inode_t INODE = 0;
+	inode_t MODE = 0;
 	uint8_t buf[PAGE_FILL + BATTFS_HEADER_LEN / 2];
 
 	disk->erase(disk, 0);
@@ -673,8 +673,8 @@ static void test15(BattFsSuper *disk)
 	fclose(fpt);
 
 	BattFs fd1;
-	unsigned int INODE = 0;
-	unsigned int MODE = BATTFS_CREATE;
+	inode_t INODE = 0;
+	inode_t MODE = BATTFS_CREATE;
 
 	ASSERT(battfs_init(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
@@ -717,8 +717,8 @@ static void test16(BattFsSuper *disk)
 	fclose(fpt);
 
 	BattFs fd1;
-	unsigned int INODE = 0;
-	unsigned int MODE = BATTFS_CREATE;
+	inode_t INODE = 0;
+	inode_t MODE = BATTFS_CREATE;
 	uint8_t buf[1000];
 
 	ASSERT(battfs_init(disk));
@@ -771,8 +771,8 @@ static void test17(BattFsSuper *disk)
 	fclose(fpt);
 
 	BattFs fd1,fd2;
-	unsigned int INODE1 = 1, INODE2 = 2;
-	unsigned int MODE = BATTFS_CREATE;
+	inode_t INODE1 = 1, INODE2 = 2;
+	inode_t MODE = BATTFS_CREATE;
 	uint8_t buf[1000];
 
 	ASSERT(battfs_init(disk));
