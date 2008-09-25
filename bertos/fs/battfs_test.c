@@ -152,6 +152,7 @@ static void testCheck(BattFsSuper *disk, pgcnt_t *reference)
 			exit(2);
 		}
 	}
+	ASSERT(battfs_fsck(disk));
 	battfs_close(disk);
 }
 
@@ -182,7 +183,7 @@ static void disk1File(BattFsSuper *disk)
 
 	for (int i = 0; i < PAGE_COUNT; i++)
 	{
-		battfs_writeTestBlock(disk, i, 0, 0, 0, i);
+		battfs_writeTestBlock(disk, i, 0, 0, disk->data_size, i);
 		ref[i] = i;
 	}
 	fclose(fp);
@@ -202,7 +203,7 @@ static void diskHalfFile(BattFsSuper *disk)
 
 	for (int i = 0; i < PAGE_COUNT / 2; i++)
 	{
-		battfs_writeTestBlock(disk, i, 0, 0, 0, i);
+		battfs_writeTestBlock(disk, i, 0, 0, disk->data_size, i);
 		ref[i] = i;
 	}
 	fseek(fp, FILE_SIZE / 2, SEEK_SET);
@@ -229,9 +230,9 @@ static void oldSeq1(BattFsSuper *disk)
 
 	fp = fopen(test_filename, "w+");
 	// page, inode, seq, fill, pgoff
-	battfs_writeTestBlock(disk, 0, 0, 0, 0, 0);
-	battfs_writeTestBlock(disk, 1, 0, 0, 0, 1);
-	battfs_writeTestBlock(disk, 2, 0, 1, 0, 1);
+	battfs_writeTestBlock(disk, 0, 0, 0, disk->data_size, 0);
+	battfs_writeTestBlock(disk, 1, 0, 0, disk->data_size, 1);
+	battfs_writeTestBlock(disk, 2, 0, 1, disk->data_size, 1);
 	disk->erase(disk, 3);
 
 
@@ -253,9 +254,9 @@ static void oldSeq2(BattFsSuper *disk)
 
 	fp = fopen(test_filename, "w+");
 	// page, inode, seq, fill, pgoff
-	battfs_writeTestBlock(disk, 0, 0, 0, 0, 0);
-	battfs_writeTestBlock(disk, 1, 0, 1, 0, 1);
-	battfs_writeTestBlock(disk, 2, 0, 0, 0, 1);
+	battfs_writeTestBlock(disk, 0, 0, 0, disk->data_size, 0);
+	battfs_writeTestBlock(disk, 1, 0, 1, disk->data_size, 1);
+	battfs_writeTestBlock(disk, 2, 0, 0, disk->data_size, 1);
 	disk->erase(disk, 3);
 
 	fclose(fp);
@@ -278,9 +279,9 @@ static void oldSeq3(BattFsSuper *disk)
 
 	// page, inode, seq, fill, pgoff
 	disk->erase(disk, 0);
-	battfs_writeTestBlock(disk, 1, 0, 0, 0, 0);
-	battfs_writeTestBlock(disk, 2, 0, 1, 0, 1);
-	battfs_writeTestBlock(disk, 3, 0, 0, 0, 1);
+	battfs_writeTestBlock(disk, 1, 0, 0, disk->data_size, 0);
+	battfs_writeTestBlock(disk, 2, 0, 1, disk->data_size, 1);
+	battfs_writeTestBlock(disk, 3, 0, 0, disk->data_size, 1);
 
 
 	fclose(fp);
@@ -303,13 +304,13 @@ static void oldSeq2File(BattFsSuper *disk)
 
 	// page, inode, seq, fill, pgoff
 	disk->erase(disk, 0);
-	battfs_writeTestBlock(disk, 1, 0, 0, 0, 0);
-	battfs_writeTestBlock(disk, 2, 0, 3, 0, 1);
-	battfs_writeTestBlock(disk, 3, 0, 0, 0, 1);
+	battfs_writeTestBlock(disk, 1, 0, 0, disk->data_size, 0);
+	battfs_writeTestBlock(disk, 2, 0, 3, disk->data_size, 1);
+	battfs_writeTestBlock(disk, 3, 0, 0, disk->data_size, 1);
 	disk->erase(disk, 4);
-	battfs_writeTestBlock(disk, 5, 4, 0, 0, 0);
-	battfs_writeTestBlock(disk, 6, 4, 1, 0, 1);
-	battfs_writeTestBlock(disk, 7, 4, 0, 0, 1);
+	battfs_writeTestBlock(disk, 5, 4, 0, disk->data_size, 0);
+	battfs_writeTestBlock(disk, 6, 4, 1, disk->data_size, 1);
+	battfs_writeTestBlock(disk, 7, 4, 0, disk->data_size, 1);
 
 
 	fclose(fp);
@@ -387,6 +388,7 @@ static void openFile(BattFsSuper *disk)
 	ASSERT(kfile_close(&fd1.fd) == 0);
 	ASSERT(kfile_close(&fd2.fd) == 0);
 	ASSERT(LIST_EMPTY(&disk->file_opened_list));
+	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_close(disk));
 
 	TRACEMSG("10: passed\n");
@@ -425,6 +427,7 @@ static void readFile(BattFsSuper *disk)
 		ASSERT(buf[i] == 0xff);
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_close(disk));
 
 	TRACEMSG("11: passed\n");
@@ -484,6 +487,7 @@ static void readAcross(BattFsSuper *disk)
 	ASSERT(fd1.fd.seek_pos = (kfile_off_t)fd1.fd.size);
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_close(disk));
 
 	TRACEMSG("12: passed\n");
@@ -531,6 +535,7 @@ static void writeFile(BattFsSuper *disk)
 		ASSERT(buf[i] == i);
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_close(disk));
 
 	TRACEMSG("13: passed\n");
@@ -601,6 +606,7 @@ static void writeAcross(BattFsSuper *disk)
 	ASSERT(fd1.fd.seek_pos == (kfile_off_t)sizeof(buf) * 3);
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_close(disk));
 
 	TRACEMSG("14: passed\n");
@@ -628,6 +634,7 @@ static void createFile(BattFsSuper *disk)
 	ASSERT(fd1.fd.seek_pos == FILE_SIZE / 2);
 	ASSERT(fd1.fd.size == FILE_SIZE / 2);
 	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_close(disk));
 
 	ASSERT(battfs_init(disk));
@@ -644,6 +651,7 @@ static void createFile(BattFsSuper *disk)
 
 	ASSERT(fd1.fd.seek_pos == FILE_SIZE / 2);
 	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_close(disk));
 
 
@@ -687,6 +695,7 @@ static void multipleWrite(BattFsSuper *disk)
 		ASSERT(disk->free_bytes == disk->disk_size - sizeof(buf));
 	}
 	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_close(disk));
 
 	ASSERT(battfs_init(disk));
@@ -698,6 +707,7 @@ static void multipleWrite(BattFsSuper *disk)
 	for (unsigned i = 0; i < sizeof(buf); i++)
 			ASSERT(buf[i] == ((j-1+i) & 0xff));
 	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_close(disk));
 
 
@@ -743,6 +753,7 @@ static void increaseFile(BattFsSuper *disk)
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
 	ASSERT(kfile_close(&fd2.fd) == 0);
+	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_close(disk));
 
 	TRACEMSG("17: passed\n");
@@ -780,6 +791,7 @@ static void readEOF(BattFsSuper *disk)
 	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == 0);
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_close(disk));
 
 	TRACEMSG("18: passed\n");
@@ -858,6 +870,7 @@ static void writeEOF(BattFsSuper *disk)
 		ASSERT(buf[i] == (i & 0xff));
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_close(disk));
 
 	TRACEMSG("19: passed\n");

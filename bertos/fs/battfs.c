@@ -508,9 +508,62 @@ bool battfs_init(struct BattFsSuper *disk)
 	return true;
 }
 
-bool batts_fsck(struct BattFsSuper *disk)
+/**
+ * Check the filesystem.
+ * \return true if ok, false on errors.
+ */
+bool battfs_fsck(struct BattFsSuper *disk)
 {
+	#define FSCHECK(cond) do { if(!(cond)) { LOG_ERR("\"" #cond "\"\n"); goto fsck_err; } } while (0)
 
+	FSCHECK(disk->free_page_start <= disk->page_count);
+	FSCHECK(disk->data_size < disk->page_size);
+	FSCHECK(disk->free_bytes <= disk->disk_size);
+
+	disk_size_t free_bytes = 0;
+	BattFsPageHeader hdr, prev_hdr;
+	inode_t files = 0;
+	pgcnt_t page_used = 0;
+
+	bool start = true;
+
+	for (pgcnt_t page = 0; page < disk->page_count; page++)
+	{
+		FSCHECK(readHdr(disk, disk->page_array[page], &hdr));
+		free_bytes += disk->data_size;
+
+		if (page < disk->free_page_start)
+		{
+			FSCHECK(computeFcs(&hdr) == hdr.fcs);
+			page_used++;
+			free_bytes -= hdr.fill;
+			if (hdr.inode != prev_hdr.inode || start)
+			{
+				if (LIKELY(!start))
+					FSCHECK(hdr.inode > prev_hdr.inode);
+				else
+					start = false;
+
+				FSCHECK(hdr.pgoff == 0);
+				files++;
+			}
+			else
+			{
+				FSCHECK(hdr.fill != 0);
+				FSCHECK(prev_hdr.fill == disk->data_size);
+				FSCHECK(hdr.pgoff == prev_hdr.pgoff + 1);
+			}
+			prev_hdr = hdr;
+		}
+	}
+
+	FSCHECK(page_used == disk->free_page_start);
+	FSCHECK(free_bytes == disk->free_bytes);
+	FSCHECK(files < BATTFS_MAX_FILES);
+	return true;
+
+	fsck_err:
+		return false;
 }
 
 /**
