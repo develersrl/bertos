@@ -671,7 +671,7 @@ static void multipleWrite(BattFsSuper *disk)
 	int j;
 	for (j = 1; j < 1013; j++)
 	{
-		for (int i = 0; i < sizeof(buf); i++)
+		for (unsigned i = 0; i < sizeof(buf); i++)
 			buf[i] = j+i;
 
 		ASSERT(kfile_write(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
@@ -681,7 +681,7 @@ static void multipleWrite(BattFsSuper *disk)
 		memset(buf, 0, sizeof(buf));
 		ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
 		ASSERT(fd1.fd.seek_pos == sizeof(buf));
-		for (int i = 0; i < sizeof(buf); i++)
+		for (unsigned i = 0; i < sizeof(buf); i++)
 			ASSERT(buf[i] == ((j+i) & 0xff));
 		ASSERT(kfile_seek(&fd1.fd, 0, KSM_SEEK_SET) == 0);
 		ASSERT(disk->free_bytes == disk->disk_size - sizeof(buf));
@@ -695,7 +695,7 @@ static void multipleWrite(BattFsSuper *disk)
 	ASSERT(fd1.fd.size == sizeof(buf));
 	memset(buf, 0, sizeof(buf));
 	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
-	for (int i = 0; i < sizeof(buf); i++)
+	for (unsigned i = 0; i < sizeof(buf); i++)
 			ASSERT(buf[i] == ((j-1+i) & 0xff));
 	ASSERT(kfile_close(&fd1.fd) == 0);
 	ASSERT(battfs_close(disk));
@@ -722,23 +722,23 @@ static void increaseFile(BattFsSuper *disk)
 	ASSERT(battfs_init(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE1, MODE));
 	ASSERT(battfs_fileopen(disk, &fd2, INODE2, MODE));
-	for (int i = 0; i < sizeof(buf); i++)
+	for (unsigned i = 0; i < sizeof(buf); i++)
 		ASSERT(kfile_putc(i, &fd2.fd) != EOF);
 	ASSERT(kfile_seek(&fd2.fd, 0, KSM_SEEK_SET) == 0);
 	memset(buf, 0, sizeof(buf));
 	ASSERT(kfile_read(&fd2.fd, buf, sizeof(buf)) == sizeof(buf));
 
-	for (int i = 0; i < sizeof(buf); i++)
+	for (unsigned i = 0; i < sizeof(buf); i++)
 		ASSERT(buf[i] == (i & 0xff));
 	ASSERT(kfile_seek(&fd2.fd, 0, KSM_SEEK_SET) == 0);
 
-	for (int i = 0; i < sizeof(buf); i++)
+	for (unsigned i = 0; i < sizeof(buf); i++)
 		ASSERT(kfile_putc(i, &fd1.fd) != EOF);
 
 	memset(buf, 0, sizeof(buf));
 	ASSERT(kfile_read(&fd2.fd, buf, sizeof(buf)) == sizeof(buf));
 
-	for (int i = 0; i < sizeof(buf); i++)
+	for (unsigned i = 0; i < sizeof(buf); i++)
 		ASSERT(buf[i] == (i & 0xff));
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
@@ -825,7 +825,7 @@ static void writeEOF(BattFsSuper *disk)
 		ASSERT(buf[i] == (i & 0xff));
 
 	ASSERT(kfile_seek(&fd1.fd, sizeof(buf), KSM_SEEK_END) == sizeof(buf) + 4);
-	for (int i = 0; i < sizeof(buf); i++)
+	for (unsigned i = 0; i < sizeof(buf); i++)
 		buf[i] = i;
 	ASSERT(kfile_write(&fd1.fd, buf, sizeof(buf)));
 	ASSERT(fd1.fd.seek_pos == sizeof(buf) * 2 + 4);
@@ -849,12 +849,12 @@ static void writeEOF(BattFsSuper *disk)
 	memset(buf, 0, 4);
 	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
 	ASSERT(fd1.fd.seek_pos == sizeof(buf) + 4);
-	for (int i = 0; i < sizeof(buf); i++)
+	for (unsigned i = 0; i < sizeof(buf); i++)
 		ASSERT(buf[i] == 0);
 
 	memset(buf, 0, sizeof(buf));
 	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
-	for (int i = 0; i < sizeof(buf); i++)
+	for (unsigned i = 0; i < sizeof(buf); i++)
 		ASSERT(buf[i] == (i & 0xff));
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
