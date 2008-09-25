@@ -514,7 +514,7 @@ bool battfs_init(struct BattFsSuper *disk)
  */
 bool battfs_fsck(struct BattFsSuper *disk)
 {
-	#define FSCHECK(cond) do { if(!(cond)) { LOG_ERR("\"" #cond "\"\n"); return false } } while (0)
+	#define FSCHECK(cond) do { if(!(cond)) { LOG_ERR("\"" #cond "\"\n"); return false; } } while (0)
 
 	FSCHECK(disk->free_page_start <= disk->page_count);
 	FSCHECK(disk->data_size < disk->page_size);
@@ -559,7 +559,7 @@ bool battfs_fsck(struct BattFsSuper *disk)
 
 	FSCHECK(page_used == disk->free_page_start);
 	FSCHECK(free_bytes == disk->free_bytes);
-	FSCHECK(files < BATTFS_MAX_FILES);
+
 	return true;
 }
 
