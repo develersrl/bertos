@@ -508,6 +508,11 @@ bool battfs_init(struct BattFsSuper *disk)
 	return true;
 }
 
+bool batts_fsck(struct BattFsSuper *disk)
+{
+
+}
+
 /**
  * Flush file \a fd.
  * \return 0 if ok, EOF on errors.
@@ -613,36 +618,40 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 			fdb->disk->cache_dirty = true;
 		}
 		setBufferHdr(fdb->disk, &curr_hdr);
-		flushBuffer(fdb->disk);
-
-		/* Fill page buffer with 0 to avoid filling unused pages with garbage */
-		for (pgaddr_t off = 0; off < fdb->disk->data_size; off++)
-		{
-			if (fdb->disk->bufferWrite(fdb->disk, off, &dummy, 1) != 1)
-			{
-				#warning TODO set error?
-			}
-		}
 
 		/* Allocate the missing pages first. */
 		pgoff_t missing_pages = fd->seek_pos / fdb->disk->data_size - fdb->max_off;
-		LOG_INFO("missing pages: %d\n", missing_pages);
 
-		while (missing_pages--)
+		if (missing_pages)
 		{
-			zero_bytes = MIN((kfile_off_t)fdb->disk->data_size, fd->seek_pos - fd->size);
-			/* Get the new page needed */
-			if (!getNewPage(fdb->disk, (fdb->start - fdb->disk->page_array) + fdb->max_off + 1, fdb->inode, fdb->max_off + 1, &curr_hdr))
-				return total_write;
+			LOG_INFO("missing pages: %d\n", missing_pages);
+			flushBuffer(fdb->disk);
 
-			/* Update size and free space left */
-			fd->size += zero_bytes;
-			fdb->disk->free_bytes -= zero_bytes;
+			/* Fill page buffer with 0 to avoid filling unused pages with garbage */
+			for (pgaddr_t off = 0; off < fdb->disk->data_size; off++)
+			{
+				if (fdb->disk->bufferWrite(fdb->disk, off, &dummy, 1) != 1)
+				{
+					#warning TODO set error?
+				}
+			}
 
-			curr_hdr.fill = zero_bytes;
-			setBufferHdr(fdb->disk, &curr_hdr);
+			while (missing_pages--)
+			{
+				zero_bytes = MIN((kfile_off_t)fdb->disk->data_size, fd->seek_pos - fd->size);
+				/* Get the new page needed */
+				if (!getNewPage(fdb->disk, (fdb->start - fdb->disk->page_array) + fdb->max_off + 1, fdb->inode, fdb->max_off + 1, &curr_hdr))
+					return total_write;
 
-			fdb->max_off++;
+				/* Update size and free space left */
+				fd->size += zero_bytes;
+				fdb->disk->free_bytes -= zero_bytes;
+
+				curr_hdr.fill = zero_bytes;
+				setBufferHdr(fdb->disk, &curr_hdr);
+
+				fdb->max_off++;
+			}
 		}
 	}
 	else if (!getBufferHdr(fdb->disk, &curr_hdr))
