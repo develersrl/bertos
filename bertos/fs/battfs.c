@@ -418,7 +418,7 @@ static bool flushBuffer(struct BattFsSuper *disk)
 static bool loadPage(struct BattFsSuper *disk, pgcnt_t new_page, BattFsPageHeader *new_hdr)
 {
 	if (disk->curr_page == new_page)
-		return true;
+		return getBufferHdr(disk, new_hdr);
 
 	LOG_INFO("Loading page %d\n", new_page);
 
@@ -494,12 +494,12 @@ bool battfs_init(struct BattFsSuper *disk)
 		LOG_ERR("filling page array\n");
 		return false;
 	}
-	#if LOG_LEVEL > LOG_LVL_INFO
-		dumpPageArray(disk)
+	#if LOG_LEVEL >= LOG_LVL_INFO
+		dumpPageArray(disk);
 	#endif
 	#warning TODO: shuffle free blocks
 	//#if LOG_LEVEL > LOG_LVL_INFO
-	//	dumpPageArray(disk)
+	//	dumpPageArray(disk);
 	//#endif
 	/* Init list for opened files. */
 	LIST_INIT(&disk->file_opened_list);
@@ -582,12 +582,59 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 	pgoff_t pg_offset;
 	pgaddr_t addr_offset;
 	pgaddr_t wr_len;
-
 	BattFsPageHeader curr_hdr;
-	if (!getBufferHdr(fdb->disk, &curr_hdr))
+
+	if (fd->seek_pos < 0)
 		return total_write;
 
-	#warning TODO seek_pos > size?
+	if ((fd->seek_pos / (fdb->disk->page_size - BATTFS_HEADER_LEN)) > fdb->max_off)
+	{
+		/*
+		 * Handle writing when seek pos if far over EOF,
+		 * We need to allocate the missing pages first.
+		 */
+		pgoff_t missing_pages = fd->seek_pos / (fdb->disk->page_size - BATTFS_HEADER_LEN) - fdb->max_off;
+
+		LOG_INFO("missing pages: %d\n", missing_pages);
+		if (!loadPage(fdb->disk, fdb->start[fdb->max_off], &curr_hdr))
+		{
+				#warning TODO set error?
+				return total_write;
+		}
+
+		uint8_t dummy = 0xff;
+		/* Add missing pages to reach current seek_pos */
+		while (missing_pages--)
+		{
+			/* Update size and free space left */
+			fd->size += (fdb->disk->page_size - BATTFS_HEADER_LEN) - curr_hdr.fill;
+			fdb->disk->free_bytes -= (fdb->disk->page_size - BATTFS_HEADER_LEN) - curr_hdr.fill;
+
+			/* Fill empty space with 0xFF */
+			for (addr_offset = curr_hdr.fill; addr_offset < (fdb->disk->page_size - BATTFS_HEADER_LEN); addr_offset++)
+			{
+				if (fdb->disk->bufferWrite(fdb->disk, addr_offset, &dummy, 1) != 1)
+				{
+					#warning TODO set error?
+				}
+			}
+			curr_hdr.fill = (fdb->disk->page_size - BATTFS_HEADER_LEN);
+			setBufferHdr(fdb->disk, &curr_hdr);
+
+			/* Get the new page needed */
+			if (!getNewPage(fdb->disk, (fdb->start - fdb->disk->page_array) + fdb->max_off + 1, fdb->inode, fdb->max_off + 1, &curr_hdr))
+				return total_write;
+
+			fdb->max_off++;
+		}
+		/* Fix sizes for the last new page (could be only partially full) */
+		curr_hdr.fill = fd->seek_pos % (fdb->disk->page_size - BATTFS_HEADER_LEN);
+		setBufferHdr(fdb->disk, &curr_hdr);
+		fd->size += curr_hdr.fill;
+		fdb->disk->free_bytes -= curr_hdr.fill;
+	}
+	else if (!getBufferHdr(fdb->disk, &curr_hdr))
+		return total_write;
 
 	while (size)
 	{
@@ -665,6 +712,9 @@ static size_t battfs_read(struct KFile *fd, void *_buf, size_t size)
 	pgaddr_t addr_offset;
 	pgaddr_t read_len;
 
+	if (fd->seek_pos < 0)
+		return total_read;
+
 	size = MIN((kfile_off_t)size, MAX(fd->size - fd->seek_pos, 0));
 
 	while (size)
@@ -673,6 +723,7 @@ static size_t battfs_read(struct KFile *fd, void *_buf, size_t size)
 		addr_offset = fd->seek_pos % (fdb->disk->page_size - BATTFS_HEADER_LEN);
 		read_len = MIN(size, (size_t)(fdb->disk->page_size - BATTFS_HEADER_LEN - addr_offset));
 
+		//LOG_INFO("reading from page %d, offset %d, size %d\n", fdb->start[pg_offset], addr_offset, read_len);
 		/* Read from disk */
 		if (diskRead(fdb->disk, fdb->start[pg_offset], addr_offset, buf, read_len) != read_len)
 		{
