@@ -127,6 +127,7 @@ static bool disk_close(struct BattFsSuper *d)
 static void testCheck(BattFsSuper *disk, pgcnt_t *reference)
 {
 	ASSERT(battfs_init(disk));
+	ASSERT(battfs_fsck(disk));
 
 	for (int i = 0; i < disk->page_count; i++)
 	{
@@ -354,6 +355,7 @@ static void openFile(BattFsSuper *disk)
 	fclose(fp);
 
 	ASSERT(battfs_init(disk));
+	ASSERT(battfs_fsck(disk));
 	ASSERT(!battfs_fileExists(disk, INEXISTENT_INODE));
 
 	ASSERT(battfs_fileExists(disk, INODE));
@@ -420,6 +422,7 @@ static void readFile(BattFsSuper *disk)
 	fclose(fp);
 
 	ASSERT(battfs_init(disk));
+	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
 	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
 	ASSERT(fd1.fd.seek_pos == sizeof(buf));
@@ -458,6 +461,7 @@ static void readAcross(BattFsSuper *disk)
 	fclose(fp);
 
 	ASSERT(battfs_init(disk));
+	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
 
 	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
@@ -523,6 +527,7 @@ static void writeFile(BattFsSuper *disk)
 		buf[i] = i;
 
 	ASSERT(battfs_init(disk));
+	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
 	ASSERT(kfile_write(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
 	ASSERT(fd1.fd.seek_pos == sizeof(buf));
@@ -566,6 +571,7 @@ static void writeAcross(BattFsSuper *disk)
 	fclose(fp);
 
 	ASSERT(battfs_init(disk));
+	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
 
 	uint8_t val = 0;
@@ -627,6 +633,7 @@ static void createFile(BattFsSuper *disk)
 	unsigned int MODE = BATTFS_CREATE;
 
 	ASSERT(battfs_init(disk));
+	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
 	for (int i = 0; i < FILE_SIZE / 2; i++)
 		ASSERT(kfile_putc(i, &fd1.fd) != EOF);
@@ -638,6 +645,7 @@ static void createFile(BattFsSuper *disk)
 	ASSERT(battfs_close(disk));
 
 	ASSERT(battfs_init(disk));
+	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, 0));
 	ASSERT(fd1.fd.size == FILE_SIZE / 2);
 	ASSERT(fd1.fd.seek_pos == 0);
@@ -674,6 +682,7 @@ static void multipleWrite(BattFsSuper *disk)
 	uint8_t buf[1000];
 
 	ASSERT(battfs_init(disk));
+	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
 
 	int j;
@@ -699,6 +708,7 @@ static void multipleWrite(BattFsSuper *disk)
 	ASSERT(battfs_close(disk));
 
 	ASSERT(battfs_init(disk));
+	ASSERT(battfs_fsck(disk));
 	ASSERT(disk->free_bytes == disk->disk_size - sizeof(buf));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, 0));
 	ASSERT(fd1.fd.size == sizeof(buf));
@@ -730,6 +740,7 @@ static void increaseFile(BattFsSuper *disk)
 	uint8_t buf[1000];
 
 	ASSERT(battfs_init(disk));
+	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE1, MODE));
 	ASSERT(battfs_fileopen(disk, &fd2, INODE2, MODE));
 	for (unsigned i = 0; i < sizeof(buf); i++)
@@ -785,6 +796,7 @@ static void readEOF(BattFsSuper *disk)
 	fclose(fp);
 
 	ASSERT(battfs_init(disk));
+	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
 	ASSERT(kfile_seek(&fd1.fd, fd1.fd.size + 10, SEEK_SET) == fd1.fd.size + 10);
 	ASSERT(fd1.fd.seek_pos == fd1.fd.size + 10);
@@ -816,6 +828,7 @@ static void writeEOF(BattFsSuper *disk)
 		buf[i] = i;
 
 	ASSERT(battfs_init(disk));
+	ASSERT(battfs_fsck(disk));
 	disk_size_t prev_free = disk->free_bytes;
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
 	ASSERT(fd1.fd.size == 0);
