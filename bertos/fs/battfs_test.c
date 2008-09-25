@@ -817,7 +817,7 @@ static void writeEOF(BattFsSuper *disk)
 	memset(buf, 0, 2);
 	ASSERT(kfile_read(&fd1.fd, buf, 2) == 2);
 	for (int i = 0; i < 2; i++)
-		ASSERT(buf[i] == 0xff);
+		ASSERT(buf[i] == 0);
 
 	memset(buf, 0, 2);
 	ASSERT(kfile_read(&fd1.fd, buf, 2) == 2);
@@ -838,7 +838,7 @@ static void writeEOF(BattFsSuper *disk)
 	ASSERT(kfile_read(&fd1.fd, buf, 2) == 2);
 	ASSERT(fd1.fd.seek_pos == 2);
 	for (int i = 0; i < 2; i++)
-		ASSERT(buf[i] == 0xff);
+		ASSERT(buf[i] == 0);
 
 	memset(buf, 0, 2);
 	ASSERT(kfile_read(&fd1.fd, buf, 2) == 2);
@@ -850,7 +850,7 @@ static void writeEOF(BattFsSuper *disk)
 	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
 	ASSERT(fd1.fd.seek_pos == sizeof(buf) + 4);
 	for (int i = 0; i < sizeof(buf); i++)
-		ASSERT(buf[i] == 0xff);
+		ASSERT(buf[i] == 0);
 
 	memset(buf, 0, sizeof(buf));
 	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
