@@ -192,7 +192,8 @@ typedef struct BattFsSuper
 	disk_page_erase_t erase; ///< Page erase.
 	disk_close_t close;      ///< Disk deinit.
 
-	pgaddr_t page_size;      ///< Size of a disk page, in bytes.
+	pgaddr_t page_size;      ///< Size of a memory page, in bytes. Used by disk low level driver.
+	pgaddr_t data_size;      ///< Size of space usable for data in a disk page, in bytes. The rest is used by the page header.
 	pgcnt_t page_count;      ///< Number of pages on disk.
 
 	/**

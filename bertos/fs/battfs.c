@@ -155,7 +155,7 @@ static bool readHdr(struct BattFsSuper *disk, pgcnt_t page, struct BattFsPageHea
 	 * Header is actually a footer, and so
 	 * resides at page end.
 	 */
-	if (diskRead(disk, page, disk->page_size - BATTFS_HEADER_LEN, buf, BATTFS_HEADER_LEN)
+	if (diskRead(disk, page, disk->data_size, buf, BATTFS_HEADER_LEN)
 	    != BATTFS_HEADER_LEN)
 	{
 		LOG_ERR("page[%d]\n", page);
@@ -186,7 +186,7 @@ static bool setBufferHdr(struct BattFsSuper *disk, struct BattFsPageHeader *hdr)
 	 * Header is actually a footer, and so
 	 * resides at page end.
 	 */
-	if (disk->bufferWrite(disk, disk->page_size - BATTFS_HEADER_LEN, buf, BATTFS_HEADER_LEN)
+	if (disk->bufferWrite(disk, disk->data_size, buf, BATTFS_HEADER_LEN)
 	    != BATTFS_HEADER_LEN)
 	{
 		LOG_ERR("writing to buffer\n");
@@ -199,7 +199,7 @@ static bool getBufferHdr(struct BattFsSuper *disk, struct BattFsPageHeader *hdr)
 {
 	uint8_t buf[BATTFS_HEADER_LEN];
 
-	if (disk->bufferRead(disk, disk->page_size - BATTFS_HEADER_LEN, buf, BATTFS_HEADER_LEN)
+	if (disk->bufferRead(disk, disk->data_size, buf, BATTFS_HEADER_LEN)
 	    != BATTFS_HEADER_LEN)
 	{
 		LOG_ERR("reading from buffer\n");
@@ -264,12 +264,12 @@ static bool countDiskFilePages(struct BattFsSuper *disk, pgoff_t *filelen_table)
 			return false;
 
 		/* Increase free space */
-		disk->free_bytes += disk->page_size - BATTFS_HEADER_LEN;
+		disk->free_bytes += disk->data_size;
 
 		/* Check header FCS */
 		if (hdr.fcs == computeFcs(&hdr))
 		{
-			ASSERT(hdr.fill <= disk->page_size - BATTFS_HEADER_LEN);
+			ASSERT(hdr.fill <= disk->data_size);
 
 			/* Page is valid and is owned by a file */
 			filelen_table[hdr.inode]++;
@@ -460,7 +460,9 @@ bool battfs_init(struct BattFsSuper *disk)
 	ASSERT(disk->save);
 	ASSERT(disk->erase);
 	ASSERT(disk->close);
-	ASSERT(disk->page_size);
+	ASSERT(disk->page_size > BATTFS_HEADER_LEN);
+	/* Fill page_size with the usable space */
+	disk->data_size = disk->page_size - BATTFS_HEADER_LEN;
 	ASSERT(disk->page_count);
 	ASSERT(disk->page_count < PAGE_UNSET_SENTINEL - 1);
 	ASSERT(disk->page_array);
@@ -468,7 +470,7 @@ bool battfs_init(struct BattFsSuper *disk)
 	memset(filelen_table, 0, BATTFS_MAX_FILES * sizeof(pgoff_t));
 
 	disk->free_bytes = 0;
-	disk->disk_size = (disk_size_t)(disk->page_size - BATTFS_HEADER_LEN) * disk->page_count;
+	disk->disk_size = (disk_size_t)disk->data_size * disk->page_count;
 
 	/* Initialize page buffer cache */
 	disk->cache_dirty = false;
@@ -587,13 +589,13 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 	if (fd->seek_pos < 0)
 		return total_write;
 
-	if ((fd->seek_pos / (fdb->disk->page_size - BATTFS_HEADER_LEN)) > fdb->max_off)
+	if ((fd->seek_pos / fdb->disk->data_size) > fdb->max_off)
 	{
 		/*
 		 * Handle writing when seek pos if far over EOF,
 		 * We need to allocate the missing pages first.
 		 */
-		pgoff_t missing_pages = fd->seek_pos / (fdb->disk->page_size - BATTFS_HEADER_LEN) - fdb->max_off;
+		pgoff_t missing_pages = fd->seek_pos / fdb->disk->data_size - fdb->max_off;
 
 		LOG_INFO("missing pages: %d\n", missing_pages);
 		if (!loadPage(fdb->disk, fdb->start[fdb->max_off], &curr_hdr))
@@ -607,18 +609,18 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 		while (missing_pages--)
 		{
 			/* Update size and free space left */
-			fd->size += (fdb->disk->page_size - BATTFS_HEADER_LEN) - curr_hdr.fill;
-			fdb->disk->free_bytes -= (fdb->disk->page_size - BATTFS_HEADER_LEN) - curr_hdr.fill;
+			fd->size += fdb->disk->data_size - curr_hdr.fill;
+			fdb->disk->free_bytes -= fdb->disk->data_size - curr_hdr.fill;
 
 			/* Fill empty space with 0xFF */
-			for (addr_offset = curr_hdr.fill; addr_offset < (fdb->disk->page_size - BATTFS_HEADER_LEN); addr_offset++)
+			for (addr_offset = curr_hdr.fill; addr_offset < fdb->disk->data_size; addr_offset++)
 			{
 				if (fdb->disk->bufferWrite(fdb->disk, addr_offset, &dummy, 1) != 1)
 				{
 					#warning TODO set error?
 				}
 			}
-			curr_hdr.fill = (fdb->disk->page_size - BATTFS_HEADER_LEN);
+			curr_hdr.fill = fdb->disk->data_size;
 			setBufferHdr(fdb->disk, &curr_hdr);
 
 			/* Get the new page needed */
@@ -628,7 +630,7 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 			fdb->max_off++;
 		}
 		/* Fix sizes for the last new page (could be only partially full) */
-		curr_hdr.fill = fd->seek_pos % (fdb->disk->page_size - BATTFS_HEADER_LEN);
+		curr_hdr.fill = fd->seek_pos % fdb->disk->data_size;
 		setBufferHdr(fdb->disk, &curr_hdr);
 		fd->size += curr_hdr.fill;
 		fdb->disk->free_bytes -= curr_hdr.fill;
@@ -638,9 +640,9 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 
 	while (size)
 	{
-		pg_offset = fd->seek_pos / (fdb->disk->page_size - BATTFS_HEADER_LEN);
-		addr_offset = fd->seek_pos % (fdb->disk->page_size - BATTFS_HEADER_LEN);
-		wr_len = MIN(size, (size_t)(fdb->disk->page_size - BATTFS_HEADER_LEN - addr_offset));
+		pg_offset = fd->seek_pos / fdb->disk->data_size;
+		addr_offset = fd->seek_pos % fdb->disk->data_size;
+		wr_len = MIN(size, (size_t)(fdb->disk->data_size - addr_offset));
 
 		/* Handle write outside EOF */
 		if (pg_offset > fdb->max_off)
@@ -719,9 +721,9 @@ static size_t battfs_read(struct KFile *fd, void *_buf, size_t size)
 
 	while (size)
 	{
-		pg_offset = fd->seek_pos / (fdb->disk->page_size - BATTFS_HEADER_LEN);
-		addr_offset = fd->seek_pos % (fdb->disk->page_size - BATTFS_HEADER_LEN);
-		read_len = MIN(size, (size_t)(fdb->disk->page_size - BATTFS_HEADER_LEN - addr_offset));
+		pg_offset = fd->seek_pos / fdb->disk->data_size;
+		addr_offset = fd->seek_pos % fdb->disk->data_size;
+		read_len = MIN(size, (size_t)(fdb->disk->data_size - addr_offset));
 
 		//LOG_INFO("reading from page %d, offset %d, size %d\n", fdb->start[pg_offset], addr_offset, read_len);
 		/* Read from disk */
@@ -843,7 +845,7 @@ bool battfs_fileopen(BattFsSuper *disk, BattFs *fd, inode_t inode, filemode_t mo
 	/* Fill file size */
 	if ((fd->fd.size = countFileSize(disk, fd->start, inode)) == EOF)
 		return false;
-	fd->max_off = fd->fd.size / (disk->page_size - BATTFS_HEADER_LEN);
+	fd->max_off = fd->fd.size / disk->data_size;
 
 	/* Reset seek position */
 	fd->fd.seek_pos = 0;
