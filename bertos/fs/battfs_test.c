@@ -912,8 +912,8 @@ static void endOfSpace(BattFsSuper *disk)
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
 	ASSERT(kfile_write(&fd1.fd, buf, sizeof(buf)) == PAGE_FILL * 4);
-	ASSERT(fd1.fd.size == PAGE_FILL * 4);
-	ASSERT(fd1.fd.seek_pos == PAGE_FILL * 4);
+	ASSERT(fd1.fd.size == (kfile_off_t)(PAGE_FILL * 4));
+	ASSERT(fd1.fd.seek_pos == (kfile_off_t)(PAGE_FILL * 4));
 	ASSERT(disk->free_bytes == 0);
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
@@ -936,7 +936,6 @@ static void multipleFilesRW(BattFsSuper *disk)
 
 	#define N_FILES 10
 	BattFs fd[N_FILES];
-	inode_t INODE = 0;
 	unsigned int MODE = BATTFS_CREATE;
 	uint32_t buf[FILE_SIZE / (4 * N_FILES * sizeof(uint32_t))];
 
@@ -950,7 +949,7 @@ static void multipleFilesRW(BattFsSuper *disk)
 		for (uint32_t j = 0; j < countof(buf); j++)
 			buf[j] = j+i;
 
-		ASSERT(kfile_write(&fd[i], buf, sizeof(buf)) == sizeof(buf));
+		ASSERT(kfile_write(&fd[i].fd, buf, sizeof(buf)) == sizeof(buf));
 		ASSERT(fd[i].fd.size == sizeof(buf));
 		ASSERT(fd[i].fd.seek_pos == sizeof(buf));
 		ASSERT(kfile_seek(&fd[i].fd, 0, SEEK_SET) == 0);
@@ -959,7 +958,7 @@ static void multipleFilesRW(BattFsSuper *disk)
 	for (inode_t i = 0; i < N_FILES; i++)
 	{
 		memset(buf, 0, sizeof(buf));
-		ASSERT(kfile_read(&fd[i], buf, sizeof(buf)) == sizeof(buf));
+		ASSERT(kfile_read(&fd[i].fd, buf, sizeof(buf)) == sizeof(buf));
 
 		for (uint32_t j = 0; j < countof(buf); j++)
 			ASSERT(buf[j] == j+i);
@@ -984,7 +983,7 @@ static void multipleFilesRW(BattFsSuper *disk)
 	for (inode_t i = 0; i < N_FILES; i++)
 	{
 		memset(buf, 0, sizeof(buf));
-		ASSERT(kfile_read(&fd[i], buf, sizeof(buf)) == sizeof(buf));
+		ASSERT(kfile_read(&fd[i].fd, buf, sizeof(buf)) == sizeof(buf));
 
 		for (uint32_t j = 0; j < countof(buf); j++)
 			ASSERT(buf[j] == j+i);
