@@ -620,7 +620,7 @@ static bool getNewPage(struct BattFsSuper *disk, pgcnt_t new_pos, inode_t inode,
 	disk->cache_dirty = true;
 
 	new_hdr->inode = inode;
-	new_hdr->pgoff =  pgoff;
+	new_hdr->pgoff = pgoff;
 	new_hdr->fill = 0;
 	new_hdr->seq = 0;
 	return setBufferHdr(disk, new_hdr);
@@ -717,7 +717,7 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 		/* Handle write outside EOF */
 		if (pg_offset > fdb->max_off)
 		{
-			LOG_INFO("New page needed, pg_offset %d, pos %d\n", pg_offset, (fdb->start - disk->page_array) + pg_offset);
+			LOG_INFO("New page needed, pg_offset %d, pos %d\n", pg_offset, (int)((fdb->start - disk->page_array) + pg_offset));
 			if (!getNewPage(disk, (fdb->start - disk->page_array) + pg_offset, fdb->inode, pg_offset, &curr_hdr))
 				return total_write;
 			fdb->max_off = pg_offset;
