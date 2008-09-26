@@ -232,7 +232,7 @@ static pgcnt_t countPages(pgoff_t *filelen_table, inode_t inode)
 static void movePages(struct BattFsSuper *disk, pgcnt_t src, int offset)
 {
 	pgcnt_t dst = src + offset;
-	LOG_INFO("src %d, offset %d, size %ld\n", src, offset, (disk->page_count - MAX(dst, src)) * sizeof(pgcnt_t));
+	LOG_INFO("src %d, offset %d, size %d\n", src, offset, (unsigned int)((disk->page_count - MAX(dst, src)) * sizeof(pgcnt_t)));
 	memmove(&disk->page_array[dst], &disk->page_array[src], (disk->page_count - MAX(dst, src)) * sizeof(pgcnt_t));
 
 	if (offset < 0)
