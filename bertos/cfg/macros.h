@@ -127,6 +127,19 @@
 #endif /* COMPILER_TYPEOF */
 
 /**
+ * Shuffle the content of \a array that counts \a len elements.
+ */
+#define SHUFFLE(array, len) \
+	do { \
+		int i, j; \
+		for (i = (len) - 1; i > 0; i--) \
+		{ \
+			j = ((i + 1) * (rand() / (RAND_MAX + 1.0))); \
+			SWAP((array)[i], (array)[j]); \
+		} \
+	} while (0)
+
+/**
  * Macro to swap \a a with \a b, with explicit type \a T for dumb C89 compilers.
  *
  * \note Arguments are evaluated multiple times.
