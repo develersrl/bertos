@@ -438,7 +438,7 @@ static bool loadPage(struct BattFsSuper *disk, pgcnt_t new_page, BattFsPageHeade
  * \a disk.
  * \return false on errors, true otherwise.
  */
-bool battfs_init(struct BattFsSuper *disk)
+bool battfs_mount(struct BattFsSuper *disk)
 {
 	pgoff_t filelen_table[BATTFS_MAX_FILES];
 
@@ -958,9 +958,9 @@ bool battfs_fileopen(BattFsSuper *disk, BattFs *fd, inode_t inode, filemode_t mo
 }
 
 /**
- * Close \a disk.
+ * Umount \a disk.
  */
-bool battfs_close(struct BattFsSuper *disk)
+bool battfs_umount(struct BattFsSuper *disk)
 {
 	Node *n;
 	int res = 0;

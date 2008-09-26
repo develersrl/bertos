@@ -267,9 +267,9 @@ INLINE BattFs * BATTFS_CAST(KFile *fd)
 	return (BattFs *)fd;
 }
 
-bool battfs_init(struct BattFsSuper *d);
+bool battfs_mount(struct BattFsSuper *d);
 bool battfs_fsck(struct BattFsSuper *disk);
-bool battfs_close(struct BattFsSuper *disk);
+bool battfs_umount(struct BattFsSuper *disk);
 
 bool battfs_fileExists(BattFsSuper *disk, inode_t inode);
 bool battfs_fileopen(BattFsSuper *disk, BattFs *fd, inode_t inode, filemode_t mode);

@@ -126,7 +126,7 @@ static bool disk_close(struct BattFsSuper *d)
 
 static void testCheck(BattFsSuper *disk, pgcnt_t *reference)
 {
-	ASSERT(battfs_init(disk));
+	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 
 	for (int i = 0; i < disk->page_count; i++)
@@ -149,12 +149,12 @@ static void testCheck(BattFsSuper *disk, pgcnt_t *reference)
 				kprintf("%04d ", reference[i]);
 			}
 			kputchar('\n');
-			battfs_close(disk);
+			battfs_umount(disk);
 			exit(2);
 		}
 	}
 	ASSERT(battfs_fsck(disk));
-	battfs_close(disk);
+	battfs_umount(disk);
 }
 
 static void diskNew(BattFsSuper *disk)
@@ -354,7 +354,7 @@ static void openFile(BattFsSuper *disk)
 
 	fclose(fp);
 
-	ASSERT(battfs_init(disk));
+	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	ASSERT(!battfs_fileExists(disk, INEXISTENT_INODE));
 
@@ -391,7 +391,7 @@ static void openFile(BattFsSuper *disk)
 	ASSERT(kfile_close(&fd2.fd) == 0);
 	ASSERT(LIST_EMPTY(&disk->file_opened_list));
 	ASSERT(battfs_fsck(disk));
-	ASSERT(battfs_close(disk));
+	ASSERT(battfs_umount(disk));
 
 	TRACEMSG("10: passed\n");
 }
@@ -421,7 +421,7 @@ static void readFile(BattFsSuper *disk)
 
 	fclose(fp);
 
-	ASSERT(battfs_init(disk));
+	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
 	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
@@ -431,7 +431,7 @@ static void readFile(BattFsSuper *disk)
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
 	ASSERT(battfs_fsck(disk));
-	ASSERT(battfs_close(disk));
+	ASSERT(battfs_umount(disk));
 
 	TRACEMSG("11: passed\n");
 }
@@ -460,7 +460,7 @@ static void readAcross(BattFsSuper *disk)
 
 	fclose(fp);
 
-	ASSERT(battfs_init(disk));
+	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
 
@@ -492,7 +492,7 @@ static void readAcross(BattFsSuper *disk)
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
 	ASSERT(battfs_fsck(disk));
-	ASSERT(battfs_close(disk));
+	ASSERT(battfs_umount(disk));
 
 	TRACEMSG("12: passed\n");
 }
@@ -526,7 +526,7 @@ static void writeFile(BattFsSuper *disk)
 	for (size_t i = 0; i < sizeof(buf); i++)
 		buf[i] = i;
 
-	ASSERT(battfs_init(disk));
+	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
 	ASSERT(kfile_write(&fd1.fd, buf, sizeof(buf)) == sizeof(buf));
@@ -541,7 +541,7 @@ static void writeFile(BattFsSuper *disk)
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
 	ASSERT(battfs_fsck(disk));
-	ASSERT(battfs_close(disk));
+	ASSERT(battfs_umount(disk));
 
 	TRACEMSG("13: passed\n");
 }
@@ -570,7 +570,7 @@ static void writeAcross(BattFsSuper *disk)
 
 	fclose(fp);
 
-	ASSERT(battfs_init(disk));
+	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
 
@@ -613,7 +613,7 @@ static void writeAcross(BattFsSuper *disk)
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
 	ASSERT(battfs_fsck(disk));
-	ASSERT(battfs_close(disk));
+	ASSERT(battfs_umount(disk));
 
 	TRACEMSG("14: passed\n");
 }
@@ -632,7 +632,7 @@ static void createFile(BattFsSuper *disk)
 	inode_t INODE = 0;
 	unsigned int MODE = BATTFS_CREATE;
 
-	ASSERT(battfs_init(disk));
+	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
 	for (int i = 0; i < FILE_SIZE / 2; i++)
@@ -642,9 +642,9 @@ static void createFile(BattFsSuper *disk)
 	ASSERT(fd1.fd.size == FILE_SIZE / 2);
 	ASSERT(kfile_close(&fd1.fd) == 0);
 	ASSERT(battfs_fsck(disk));
-	ASSERT(battfs_close(disk));
+	ASSERT(battfs_umount(disk));
 
-	ASSERT(battfs_init(disk));
+	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, 0));
 	ASSERT(fd1.fd.size == FILE_SIZE / 2);
@@ -660,7 +660,7 @@ static void createFile(BattFsSuper *disk)
 	ASSERT(fd1.fd.seek_pos == FILE_SIZE / 2);
 	ASSERT(kfile_close(&fd1.fd) == 0);
 	ASSERT(battfs_fsck(disk));
-	ASSERT(battfs_close(disk));
+	ASSERT(battfs_umount(disk));
 
 
 	TRACEMSG("15: passed\n");
@@ -681,7 +681,7 @@ static void multipleWrite(BattFsSuper *disk)
 	unsigned int MODE = BATTFS_CREATE;
 	uint8_t buf[1000];
 
-	ASSERT(battfs_init(disk));
+	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
 
@@ -705,9 +705,9 @@ static void multipleWrite(BattFsSuper *disk)
 	}
 	ASSERT(kfile_close(&fd1.fd) == 0);
 	ASSERT(battfs_fsck(disk));
-	ASSERT(battfs_close(disk));
+	ASSERT(battfs_umount(disk));
 
-	ASSERT(battfs_init(disk));
+	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	ASSERT(disk->free_bytes == disk->disk_size - sizeof(buf));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, 0));
@@ -718,7 +718,7 @@ static void multipleWrite(BattFsSuper *disk)
 			ASSERT(buf[i] == ((j-1+i) & 0xff));
 	ASSERT(kfile_close(&fd1.fd) == 0);
 	ASSERT(battfs_fsck(disk));
-	ASSERT(battfs_close(disk));
+	ASSERT(battfs_umount(disk));
 
 
 	TRACEMSG("16: passed\n");
@@ -739,7 +739,7 @@ static void increaseFile(BattFsSuper *disk)
 	unsigned int MODE = BATTFS_CREATE;
 	uint8_t buf[1000];
 
-	ASSERT(battfs_init(disk));
+	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE1, MODE));
 	ASSERT(battfs_fileopen(disk, &fd2, INODE2, MODE));
@@ -765,7 +765,7 @@ static void increaseFile(BattFsSuper *disk)
 	ASSERT(kfile_close(&fd1.fd) == 0);
 	ASSERT(kfile_close(&fd2.fd) == 0);
 	ASSERT(battfs_fsck(disk));
-	ASSERT(battfs_close(disk));
+	ASSERT(battfs_umount(disk));
 
 	TRACEMSG("17: passed\n");
 }
@@ -795,7 +795,7 @@ static void readEOF(BattFsSuper *disk)
 
 	fclose(fp);
 
-	ASSERT(battfs_init(disk));
+	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
 	ASSERT(kfile_seek(&fd1.fd, fd1.fd.size + 10, SEEK_SET) == fd1.fd.size + 10);
@@ -804,7 +804,7 @@ static void readEOF(BattFsSuper *disk)
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
 	ASSERT(battfs_fsck(disk));
-	ASSERT(battfs_close(disk));
+	ASSERT(battfs_umount(disk));
 
 	TRACEMSG("18: passed\n");
 }
@@ -827,7 +827,7 @@ static void writeEOF(BattFsSuper *disk)
 	for (int i = 0; i < 2; i++)
 		buf[i] = i;
 
-	ASSERT(battfs_init(disk));
+	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	disk_size_t prev_free = disk->free_bytes;
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
@@ -884,7 +884,7 @@ static void writeEOF(BattFsSuper *disk)
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
 	ASSERT(battfs_fsck(disk));
-	ASSERT(battfs_close(disk));
+	ASSERT(battfs_umount(disk));
 
 	TRACEMSG("19: passed\n");
 
@@ -908,7 +908,7 @@ static void endOfSpace(BattFsSuper *disk)
 	disk->erase(disk, 3);
 	fclose(fp);
 
-	ASSERT(battfs_init(disk));
+	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
 	ASSERT(kfile_write(&fd1.fd, buf, sizeof(buf)) == PAGE_FILL * 4);
@@ -918,7 +918,7 @@ static void endOfSpace(BattFsSuper *disk)
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
 	ASSERT(battfs_fsck(disk));
-	ASSERT(battfs_close(disk));
+	ASSERT(battfs_umount(disk));
 
 	TRACEMSG("20: passed\n");
 }
@@ -939,7 +939,7 @@ static void multipleFilesRW(BattFsSuper *disk)
 	unsigned int MODE = BATTFS_CREATE;
 	uint32_t buf[FILE_SIZE / (4 * N_FILES * sizeof(uint32_t))];
 
-	ASSERT(battfs_init(disk));
+	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	for (inode_t i = 0; i < N_FILES; i++)
 		ASSERT(battfs_fileopen(disk, &fd[i], i, MODE));
@@ -972,9 +972,9 @@ static void multipleFilesRW(BattFsSuper *disk)
 		ASSERT(kfile_close(&fd[i].fd) == 0);
 
 	ASSERT(battfs_fsck(disk));
-	ASSERT(battfs_close(disk));
+	ASSERT(battfs_umount(disk));
 
-	ASSERT(battfs_init(disk));
+	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 
 	for (inode_t i = 0; i < N_FILES; i++)
@@ -996,7 +996,7 @@ static void multipleFilesRW(BattFsSuper *disk)
 	for (inode_t i = 0; i < N_FILES; i++)
 		ASSERT(kfile_close(&fd[i].fd) == 0);
 
-	ASSERT(battfs_close(disk));
+	ASSERT(battfs_umount(disk));
 	TRACEMSG("21: passed\n");
 }
 
