@@ -633,6 +633,7 @@ static bool getNewPage(struct BattFsSuper *disk, pgcnt_t new_pos, inode_t inode,
 static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 {
 	BattFs *fdb = BATTFS_CAST(fd);
+	BattFsSuper *disk = fdb->disk;
 	const uint8_t *buf = (const uint8_t *)_buf;
 
 	size_t total_write = 0;
@@ -647,40 +648,40 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 	if (fd->seek_pos > fd->size)
 	{
 		/* Handle writing when seek pos if far over EOF */
-		if (!loadPage(fdb->disk, fdb->start[fdb->max_off], &curr_hdr))
+		if (!loadPage(disk, fdb->start[fdb->max_off], &curr_hdr))
 		{
-				#warning TODO set error?
-				return total_write;
+			#warning TODO set error?
+			return total_write;
 		}
 
 		/* Fill unused space of first page with 0s */
 		uint8_t dummy = 0;
-		pgaddr_t zero_bytes = MIN(fd->seek_pos - fd->size, fdb->disk->data_size - curr_hdr.fill);
+		pgaddr_t zero_bytes = MIN(fd->seek_pos - fd->size, disk->data_size - curr_hdr.fill);
 		while (zero_bytes--)
 		{
-			if (fdb->disk->bufferWrite(fdb->disk, curr_hdr.fill, &dummy, 1) != 1)
+			if (disk->bufferWrite(disk, curr_hdr.fill, &dummy, 1) != 1)
 			{
 				#warning TODO set error?
 			}
 			curr_hdr.fill++;
 			fd->size++;
-			fdb->disk->free_bytes--;
-			fdb->disk->cache_dirty = true;
+			disk->free_bytes--;
+			disk->cache_dirty = true;
 		}
-		setBufferHdr(fdb->disk, &curr_hdr);
+		setBufferHdr(disk, &curr_hdr);
 
 		/* Allocate the missing pages first. */
-		pgoff_t missing_pages = fd->seek_pos / fdb->disk->data_size - fdb->max_off;
+		pgoff_t missing_pages = fd->seek_pos / disk->data_size - fdb->max_off;
 
 		if (missing_pages)
 		{
 			LOG_INFO("missing pages: %d\n", missing_pages);
-			flushBuffer(fdb->disk);
+			flushBuffer(disk);
 
 			/* Fill page buffer with 0 to avoid filling unused pages with garbage */
-			for (pgaddr_t off = 0; off < fdb->disk->data_size; off++)
+			for (pgaddr_t off = 0; off < disk->data_size; off++)
 			{
-				if (fdb->disk->bufferWrite(fdb->disk, off, &dummy, 1) != 1)
+				if (disk->bufferWrite(disk, off, &dummy, 1) != 1)
 				{
 					#warning TODO set error?
 				}
@@ -688,86 +689,86 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 
 			while (missing_pages--)
 			{
-				zero_bytes = MIN((kfile_off_t)fdb->disk->data_size, fd->seek_pos - fd->size);
+				zero_bytes = MIN((kfile_off_t)disk->data_size, fd->seek_pos - fd->size);
 				/* Get the new page needed */
-				if (!getNewPage(fdb->disk, (fdb->start - fdb->disk->page_array) + fdb->max_off + 1, fdb->inode, fdb->max_off + 1, &curr_hdr))
+				if (!getNewPage(disk, (fdb->start - disk->page_array) + fdb->max_off + 1, fdb->inode, fdb->max_off + 1, &curr_hdr))
 					return total_write;
 
 				/* Update size and free space left */
 				fd->size += zero_bytes;
-				fdb->disk->free_bytes -= zero_bytes;
+				disk->free_bytes -= zero_bytes;
 
 				curr_hdr.fill = zero_bytes;
-				setBufferHdr(fdb->disk, &curr_hdr);
+				setBufferHdr(disk, &curr_hdr);
 
 				fdb->max_off++;
 			}
 		}
 	}
-	else if (!getBufferHdr(fdb->disk, &curr_hdr))
+	else if (!getBufferHdr(disk, &curr_hdr))
 		return total_write;
 
 	while (size)
 	{
-		pg_offset = fd->seek_pos / fdb->disk->data_size;
-		addr_offset = fd->seek_pos % fdb->disk->data_size;
-		wr_len = MIN(size, (size_t)(fdb->disk->data_size - addr_offset));
+		pg_offset = fd->seek_pos / disk->data_size;
+		addr_offset = fd->seek_pos % disk->data_size;
+		wr_len = MIN(size, (size_t)(disk->data_size - addr_offset));
 
 		/* Handle write outside EOF */
 		if (pg_offset > fdb->max_off)
 		{
-			LOG_INFO("New page needed, pg_offset %d, pos %d\n", pg_offset, (fdb->start - fdb->disk->page_array) + pg_offset);
-			if (!getNewPage(fdb->disk, (fdb->start - fdb->disk->page_array) + pg_offset, fdb->inode, pg_offset, &curr_hdr))
+			LOG_INFO("New page needed, pg_offset %d, pos %d\n", pg_offset, (fdb->start - disk->page_array) + pg_offset);
+			if (!getNewPage(disk, (fdb->start - disk->page_array) + pg_offset, fdb->inode, pg_offset, &curr_hdr))
 				return total_write;
 			fdb->max_off = pg_offset;
 		}
 		/* Handle cache load of a new page*/
-		else if (fdb->start[pg_offset] != fdb->disk->curr_page)
+		else if (fdb->start[pg_offset] != disk->curr_page)
 		{
-			if (SPACE_OVER(fdb->disk))
+			if (SPACE_OVER(disk))
 			{
 				LOG_ERR("No disk space available!\n");
 				return total_write;
 			}
-			LOG_INFO("Re-writing page %d to %d\n", fdb->start[pg_offset], fdb->disk->page_array[fdb->disk->free_page_start]);
-			if (!loadPage(fdb->disk, fdb->start[pg_offset], &curr_hdr))
+			LOG_INFO("Re-writing page %d to %d\n", fdb->start[pg_offset], disk->page_array[disk->free_page_start]);
+			if (!loadPage(disk, fdb->start[pg_offset], &curr_hdr))
 			{
 				#warning TODO set error?
 				return total_write;
 			}
 
 			/* Get a free page */
-			fdb->disk->curr_page = fdb->disk->page_array[fdb->disk->free_page_start];
-			movePages(fdb->disk, fdb->disk->free_page_start + 1, -1);
+			disk->curr_page = disk->page_array[disk->free_page_start];
+			movePages(disk, disk->free_page_start + 1, -1);
 
 			/* Insert previous page in free blocks list */
 			LOG_INFO("Setting page %d as free\n", fdb->start[pg_offset]);
-			fdb->disk->page_array[fdb->disk->page_count - 1] = fdb->start[pg_offset];
+			disk->page_array[disk->page_count - 1] = fdb->start[pg_offset];
 			/* Assign new page */
-			fdb->start[pg_offset] = fdb->disk->curr_page;
+			fdb->start[pg_offset] = disk->curr_page;
 			curr_hdr.seq++;
 		}
 
-		//LOG_INFO("writing to buffer for page %d, offset %d, size %d\n", fdb->disk->curr_page, addr_offset, wr_len);
-		if (fdb->disk->bufferWrite(fdb->disk, addr_offset, buf, wr_len) != wr_len)
+		//LOG_INFO("writing to buffer for page %d, offset %d, size %d\n", disk->curr_page, addr_offset, wr_len);
+		if (disk->bufferWrite(disk, addr_offset, buf, wr_len) != wr_len)
 		{
 			#warning TODO set error?
 		}
-		fdb->disk->cache_dirty = true;
+		disk->cache_dirty = true;
 
 		size -= wr_len;
 		fd->seek_pos += wr_len;
 		total_write += wr_len;
 		buf += wr_len;
 		fill_t fill_delta = MAX((int32_t)(addr_offset + wr_len) - curr_hdr.fill, (int32_t)0);
-		fdb->disk->free_bytes -= fill_delta;
+		disk->free_bytes -= fill_delta;
 		fd->size += fill_delta;
 		curr_hdr.fill += fill_delta;
 
-		if (!setBufferHdr(fdb->disk, &curr_hdr))
+		if (!setBufferHdr(disk, &curr_hdr))
 			return total_write;
 
-		//LOG_INFO("free_bytes %d, seek_pos %d, size %d, curr_hdr.fill %d\n", fdb->disk->free_bytes, fd->seek_pos, fd->size, curr_hdr.fill);
+		//LOG_INFO("free_bytes %d, seek_pos %d, size %d, curr_hdr.fill %d\n", disk->free_bytes, fd->seek_pos, fd->size, curr_hdr.fill);
 	}
 	return total_write;
 }
@@ -780,6 +781,7 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 static size_t battfs_read(struct KFile *fd, void *_buf, size_t size)
 {
 	BattFs *fdb = BATTFS_CAST(fd);
+	BattFsSuper *disk = fdb->disk;
 	uint8_t *buf = (uint8_t *)_buf;
 
 	size_t total_read = 0;
@@ -794,20 +796,20 @@ static size_t battfs_read(struct KFile *fd, void *_buf, size_t size)
 
 	while (size)
 	{
-		pg_offset = fd->seek_pos / fdb->disk->data_size;
-		addr_offset = fd->seek_pos % fdb->disk->data_size;
-		read_len = MIN(size, (size_t)(fdb->disk->data_size - addr_offset));
+		pg_offset = fd->seek_pos / disk->data_size;
+		addr_offset = fd->seek_pos % disk->data_size;
+		read_len = MIN(size, (size_t)(disk->data_size - addr_offset));
 
 		//LOG_INFO("reading from page %d, offset %d, size %d\n", fdb->start[pg_offset], addr_offset, read_len);
 		/* Read from disk */
-		if (diskRead(fdb->disk, fdb->start[pg_offset], addr_offset, buf, read_len) != read_len)
+		if (diskRead(disk, fdb->start[pg_offset], addr_offset, buf, read_len) != read_len)
 		{
 			#warning TODO set error?
 		}
 
 		#if _DEBUG
 			BattFsPageHeader hdr;
-			readHdr(fdb->disk, fdb->start[pg_offset], &hdr);
+			readHdr(disk, fdb->start[pg_offset], &hdr);
 			ASSERT(hdr.inode == fdb->inode);
 		#endif
 
