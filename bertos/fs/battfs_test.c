@@ -890,11 +890,124 @@ static void writeEOF(BattFsSuper *disk)
 
 }
 
+static void endOfSpace(BattFsSuper *disk)
+{
+	TRACEMSG("20: what happens when disk space is over?\n");
+	BattFs fd1;
+	uint8_t buf[(PAGE_SIZE - BATTFS_HEADER_LEN) * 5];
+
+	fp = fopen(test_filename, "w+");
+
+	unsigned int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
+	inode_t INODE = 0;
+	unsigned int MODE = BATTFS_CREATE;
+
+	disk->erase(disk, 0);
+	disk->erase(disk, 1);
+	disk->erase(disk, 2);
+	disk->erase(disk, 3);
+	fclose(fp);
+
+	ASSERT(battfs_init(disk));
+	ASSERT(battfs_fsck(disk));
+	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
+	ASSERT(kfile_write(&fd1.fd, buf, sizeof(buf)) == PAGE_FILL * 4);
+	ASSERT(fd1.fd.size == PAGE_FILL * 4);
+	ASSERT(fd1.fd.seek_pos == PAGE_FILL * 4);
+	ASSERT(disk->free_bytes == 0);
+
+	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(battfs_fsck(disk));
+	ASSERT(battfs_close(disk));
+
+	TRACEMSG("20: passed\n");
+}
+
+
+static void multipleFilesRW(BattFsSuper *disk)
+{
+	TRACEMSG("21: multiple files read/write test\n");
+
+	FILE *fpt = fopen(test_filename, "w+");
+
+	for (int i = 0; i < FILE_SIZE; i++)
+		fputc(0xff, fpt);
+	fclose(fpt);
+
+	#define N_FILES 10
+	BattFs fd[N_FILES];
+	inode_t INODE = 0;
+	unsigned int MODE = BATTFS_CREATE;
+	uint32_t buf[FILE_SIZE / (4 * N_FILES * sizeof(uint32_t))];
+
+	ASSERT(battfs_init(disk));
+	ASSERT(battfs_fsck(disk));
+	for (inode_t i = 0; i < N_FILES; i++)
+		ASSERT(battfs_fileopen(disk, &fd[i], i, MODE));
+
+	for (int i = N_FILES - 1; i >= 0; i--)
+	{
+		for (uint32_t j = 0; j < countof(buf); j++)
+			buf[j] = j+i;
+
+		ASSERT(kfile_write(&fd[i], buf, sizeof(buf)) == sizeof(buf));
+		ASSERT(fd[i].fd.size == sizeof(buf));
+		ASSERT(fd[i].fd.seek_pos == sizeof(buf));
+		ASSERT(kfile_seek(&fd[i].fd, 0, SEEK_SET) == 0);
+	}
+
+	for (inode_t i = 0; i < N_FILES; i++)
+	{
+		memset(buf, 0, sizeof(buf));
+		ASSERT(kfile_read(&fd[i], buf, sizeof(buf)) == sizeof(buf));
+
+
+		for (uint32_t j = 0; j < countof(buf); j++)
+			ASSERT(buf[j] == j+i);
+
+		ASSERT(fd[i].fd.size == sizeof(buf));
+		ASSERT(fd[i].fd.seek_pos == sizeof(buf));
+		ASSERT(kfile_seek(&fd[i].fd, 0, SEEK_SET) == 0);
+	}
+
+	for (inode_t i = 0; i < N_FILES; i++)
+		ASSERT(kfile_close(&fd[i].fd) == 0);
+
+	ASSERT(battfs_fsck(disk));
+	ASSERT(battfs_close(disk));
+
+	ASSERT(battfs_init(disk));
+	ASSERT(battfs_fsck(disk));
+
+	for (inode_t i = 0; i < N_FILES; i++)
+		ASSERT(battfs_fileopen(disk, &fd[i], i, 0));
+
+	for (inode_t i = 0; i < N_FILES; i++)
+	{
+		memset(buf, 0, sizeof(buf));
+		ASSERT(kfile_read(&fd[i], buf, sizeof(buf)) == sizeof(buf));
+
+		for (uint32_t j = 0; j < countof(buf); j++)
+			ASSERT(buf[j] == j+i);
+
+		ASSERT(fd[i].fd.size == sizeof(buf));
+		ASSERT(fd[i].fd.seek_pos == sizeof(buf));
+		ASSERT(kfile_seek(&fd[i].fd, 0, SEEK_SET) == 0);
+	}
+
+	for (inode_t i = 0; i < N_FILES; i++)
+		ASSERT(kfile_close(&fd[i].fd) == 0);
+
+	ASSERT(battfs_close(disk));
+	TRACEMSG("21: passed\n");
+}
+
 
 int battfs_testRun(void)
 {
 	BattFsSuper disk;
 
+	disk.page_size = PAGE_SIZE;
 	disk.open = disk_open;
 	disk.read = disk_page_read;
 	disk.load = disk_page_load;
@@ -921,6 +1034,8 @@ int battfs_testRun(void)
 	increaseFile(&disk);
 	readEOF(&disk);
 	writeEOF(&disk);
+	endOfSpace(&disk);
+	multipleFilesRW(&disk);
 
 	kprintf("All tests passed!\n");
 

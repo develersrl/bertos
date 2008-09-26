@@ -220,6 +220,11 @@ typedef struct BattFsSuper
 	/* TODO add other fields. */
 } BattFsSuper;
 
+/**
+ * True if space on \a disk is over.
+ */
+#define SPACE_OVER(disk) ((disk)->free_page_start >= (disk)->page_count)
+
 typedef uint8_t filemode_t;  ///< Type for file open modes.
 typedef int32_t file_size_t; ///< Type for file sizes.
 

@@ -593,10 +593,10 @@ static int battfs_fileclose(struct KFile *fd)
 
 static bool getNewPage(struct BattFsSuper *disk, pgcnt_t new_pos, inode_t inode, pgoff_t pgoff, BattFsPageHeader *new_hdr)
 {
-	if (disk->free_page_start >= disk->page_count)
+	if (SPACE_OVER(disk))
 	{
 		#warning TODO space over!
-		LOG_INFO("No disk space available\n");
+		LOG_ERR("No disk space available!\n");
 		return false;
 	}
 	flushBuffer(disk);
@@ -724,6 +724,11 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 		/* Handle cache load of a new page*/
 		else if (fdb->start[pg_offset] != fdb->disk->curr_page)
 		{
+			if (SPACE_OVER(fdb->disk))
+			{
+				LOG_ERR("No disk space available!\n");
+				return total_write;
+			}
 			LOG_INFO("Re-writing page %d to %d\n", fdb->start[pg_offset], fdb->disk->page_array[fdb->disk->free_page_start]);
 			if (!loadPage(fdb->disk, fdb->start[pg_offset], &curr_hdr))
 			{
@@ -742,7 +747,6 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 			fdb->start[pg_offset] = fdb->disk->curr_page;
 			curr_hdr.seq++;
 		}
-
 
 		//LOG_INFO("writing to buffer for page %d, offset %d, size %d\n", fdb->disk->curr_page, addr_offset, wr_len);
 		if (fdb->disk->bufferWrite(fdb->disk, addr_offset, buf, wr_len) != wr_len)
