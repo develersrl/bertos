@@ -961,7 +961,6 @@ static void multipleFilesRW(BattFsSuper *disk)
 		memset(buf, 0, sizeof(buf));
 		ASSERT(kfile_read(&fd[i], buf, sizeof(buf)) == sizeof(buf));
 
-
 		for (uint32_t j = 0; j < countof(buf); j++)
 			ASSERT(buf[j] == j+i);
 
