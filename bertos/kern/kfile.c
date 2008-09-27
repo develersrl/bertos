@@ -42,6 +42,7 @@
 
 #include "cfg/cfg_kfile.h"
 #include <cfg/debug.h>
+#include <cfg/log.h>
 
 #include <mware/formatwr.h>
 
