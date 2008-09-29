@@ -239,6 +239,21 @@ typedef int32_t file_size_t; ///< Type for file sizes.
 
 
 /**
+ * File errors.
+ * \{
+ */
+#define BATTFS_NEGATIVE_SEEK_ERR   BV(0)
+#define BATTFS_DISK_READ_ERR       BV(1)
+#define BATTFS_DISK_LOADPAGE_ERR   BV(2)
+#define BATTFS_DISK_BUFFERWR_ERR   BV(3)
+#define BATTFS_DISK_GETNEWPAGE_ERR BV(4)
+#define BATTFS_DISK_BUFFERRD_ERR   BV(6)
+#define BATTFS_DISK_SPACEOVER_ERR  BV(7)
+#define BATTFS_DISK_FLUSHBUF_ERR   BV(8)
+#define BATTFS_FILE_NOT_FOUND_ERR  BV(9)
+/*/}*/
+
+/**
  * Describe a BattFs file usign a KFile.
  */
 typedef struct BattFs
@@ -250,6 +265,7 @@ typedef struct BattFs
 	filemode_t mode;    ///< File open mode
 	pgcnt_t *start;     ///< Pointer to page_array file start position.
 	pgcnt_t max_off;    ///< Max page offset allocated for the file.
+	int errors;         ///< File status/errors
 } BattFs;
 
 /**

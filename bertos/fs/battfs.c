@@ -574,7 +574,10 @@ static int battfs_flush(struct KFile *fd)
 	if (flushBuffer(fdb->disk))
 		return 0;
 	else
+	{
+		fdb->errors |= BATTFS_DISK_FLUSHBUF_ERR;
 		return EOF;
+	}
 }
 
 /**
@@ -585,9 +588,13 @@ static int battfs_fileclose(struct KFile *fd)
 {
 	BattFs *fdb = BATTFS_CAST(fd);
 
-	battfs_flush(fd);
-	REMOVE(&fdb->link);
-	return 0;
+	if (battfs_flush(fd) == 0)
+	{
+		REMOVE(&fdb->link);
+		return 0;
+	}
+	else
+		return EOF;
 }
 
 
@@ -595,7 +602,6 @@ static bool getNewPage(struct BattFsSuper *disk, pgcnt_t new_pos, inode_t inode,
 {
 	if (SPACE_OVER(disk))
 	{
-		#warning TODO space over!
 		LOG_ERR("No disk space available!\n");
 		return false;
 	}
@@ -643,14 +649,17 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 	BattFsPageHeader curr_hdr;
 
 	if (fd->seek_pos < 0)
+	{
+		fdb->errors |= BATTFS_NEGATIVE_SEEK_ERR;
 		return total_write;
+	}
 
 	if (fd->seek_pos > fd->size)
 	{
 		/* Handle writing when seek pos if far over EOF */
 		if (!loadPage(disk, fdb->start[fdb->max_off], &curr_hdr))
 		{
-			#warning TODO set error?
+			fdb->errors |= BATTFS_DISK_LOADPAGE_ERR;
 			return total_write;
 		}
 
@@ -661,7 +670,8 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 		{
 			if (disk->bufferWrite(disk, curr_hdr.fill, &dummy, 1) != 1)
 			{
-				#warning TODO set error?
+				fdb->errors |= BATTFS_DISK_BUFFERWR_ERR;
+				return total_write;
 			}
 			curr_hdr.fill++;
 			fd->size++;
@@ -683,7 +693,8 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 			{
 				if (disk->bufferWrite(disk, off, &dummy, 1) != 1)
 				{
-					#warning TODO set error?
+					fdb->errors |= BATTFS_DISK_BUFFERWR_ERR;
+					return total_write;
 				}
 			}
 
@@ -692,7 +703,10 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 				zero_bytes = MIN((kfile_off_t)disk->data_size, fd->seek_pos - fd->size);
 				/* Get the new page needed */
 				if (!getNewPage(disk, (fdb->start - disk->page_array) + fdb->max_off + 1, fdb->inode, fdb->max_off + 1, &curr_hdr))
+				{
+					fdb->errors |= BATTFS_DISK_GETNEWPAGE_ERR;
 					return total_write;
+				}
 
 				/* Update size and free space left */
 				fd->size += zero_bytes;
@@ -706,7 +720,10 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 		}
 	}
 	else if (!getBufferHdr(disk, &curr_hdr))
+	{
+		fdb->errors |=  BATTFS_DISK_BUFFERRD_ERR;
 		return total_write;
+	}
 
 	while (size)
 	{
@@ -719,7 +736,11 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 		{
 			LOG_INFO("New page needed, pg_offset %d, pos %d\n", pg_offset, (int)((fdb->start - disk->page_array) + pg_offset));
 			if (!getNewPage(disk, (fdb->start - disk->page_array) + pg_offset, fdb->inode, pg_offset, &curr_hdr))
+			{
+				fdb->errors |= BATTFS_DISK_GETNEWPAGE_ERR;
 				return total_write;
+			}
+
 			fdb->max_off = pg_offset;
 		}
 		/* Handle cache load of a new page*/
@@ -728,12 +749,13 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 			if (SPACE_OVER(disk))
 			{
 				LOG_ERR("No disk space available!\n");
+				fdb->errors |= BATTFS_DISK_SPACEOVER_ERR;
 				return total_write;
 			}
 			LOG_INFO("Re-writing page %d to %d\n", fdb->start[pg_offset], disk->page_array[disk->free_page_start]);
 			if (!loadPage(disk, fdb->start[pg_offset], &curr_hdr))
 			{
-				#warning TODO set error?
+				fdb->errors |= BATTFS_DISK_LOADPAGE_ERR;
 				return total_write;
 			}
 
@@ -752,7 +774,8 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 		//LOG_INFO("writing to buffer for page %d, offset %d, size %d\n", disk->curr_page, addr_offset, wr_len);
 		if (disk->bufferWrite(disk, addr_offset, buf, wr_len) != wr_len)
 		{
-			#warning TODO set error?
+			fdb->errors |= BATTFS_DISK_BUFFERWR_ERR;
+			return total_write;
 		}
 		disk->cache_dirty = true;
 
@@ -766,7 +789,10 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 		curr_hdr.fill += fill_delta;
 
 		if (!setBufferHdr(disk, &curr_hdr))
+		{
+			fdb->errors |= BATTFS_DISK_BUFFERWR_ERR;
 			return total_write;
+		}
 
 		//LOG_INFO("free_bytes %d, seek_pos %d, size %d, curr_hdr.fill %d\n", disk->free_bytes, fd->seek_pos, fd->size, curr_hdr.fill);
 	}
@@ -790,7 +816,10 @@ static size_t battfs_read(struct KFile *fd, void *_buf, size_t size)
 	pgaddr_t read_len;
 
 	if (fd->seek_pos < 0)
+	{
+		fdb->errors |= BATTFS_NEGATIVE_SEEK_ERR;
 		return total_read;
+	}
 
 	size = MIN((kfile_off_t)size, MAX(fd->size - fd->seek_pos, 0));
 
@@ -804,7 +833,8 @@ static size_t battfs_read(struct KFile *fd, void *_buf, size_t size)
 		/* Read from disk */
 		if (diskRead(disk, fdb->start[pg_offset], addr_offset, buf, read_len) != read_len)
 		{
-			#warning TODO set error?
+			fdb->errors |= BATTFS_DISK_READ_ERR;
+			return total_read;
 		}
 
 		#if _DEBUG
@@ -891,6 +921,19 @@ static file_size_t countFileSize(BattFsSuper *disk, pgcnt_t *start, inode_t inod
 	return size;
 }
 
+static int battfs_error(struct KFile *fd)
+{
+	BattFs *fdb = BATTFS_CAST(fd);
+	return fdb->errors;
+}
+
+
+static void battfs_clearerr(struct KFile *fd)
+{
+	BattFs *fdb = BATTFS_CAST(fd);
+	fdb->errors = 0;
+}
+
 /**
  * Open file \a inode from \a disk in \a mode.
  * File context is stored in \a fd.
@@ -908,18 +951,27 @@ bool battfs_fileopen(BattFsSuper *disk, BattFs *fd, inode_t inode, filemode_t mo
 	{
 		LOG_INFO("file %d not found\n", inode);
 		if (!(mode & BATTFS_CREATE))
+		{
+			fd->errors |= BATTFS_FILE_NOT_FOUND_ERR;
 			return false;
+		}
 		/* Create the file */
 		BattFsPageHeader hdr;
 		if (!(getNewPage(disk, start_pos, inode, 0, &hdr)))
+		{
+			fd->errors |= BATTFS_DISK_GETNEWPAGE_ERR;
 			return false;
+		}
 	}
 	fd->start = &disk->page_array[start_pos];
 	LOG_INFO("Start pos %d\n", start_pos);
 
 	/* Fill file size */
 	if ((fd->fd.size = countFileSize(disk, fd->start, inode)) == EOF)
+	{
+		fd->errors |= BATTFS_DISK_READ_ERR;
 		return false;
+	}
 	fd->max_off = fd->fd.size / disk->data_size;
 
 	/* Reset seek position */
@@ -946,16 +998,14 @@ bool battfs_fileopen(BattFsSuper *disk, BattFs *fd, inode_t inode, filemode_t mo
 	fd->fd.seek = kfile_genericSeek;
 	fd->fd.write = battfs_write;
 
-#warning TODO battfs_error, battfs_clearerr
-#if 0
 	fd->fd.error = battfs_error;
 	fd->fd.clearerr = battfs_clearerr;
-#endif
 
 	DB(fd->fd._type = KFT_BATTFS);
 
 	return true;
 }
+
 
 /**
  * Umount \a disk.
