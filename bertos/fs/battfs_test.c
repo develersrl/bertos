@@ -388,7 +388,9 @@ static void openFile(BattFsSuper *disk)
 	ASSERT(LIST_HEAD(&disk->file_opened_list)->succ == &fd2.link);
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(kfile_error(&fd1.fd) == 0);
 	ASSERT(kfile_close(&fd2.fd) == 0);
+	ASSERT(kfile_error(&fd2.fd) == 0);
 	ASSERT(LIST_EMPTY(&disk->file_opened_list));
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_umount(disk));
@@ -430,6 +432,7 @@ static void readFile(BattFsSuper *disk)
 		ASSERT(buf[i] == 0xff);
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(kfile_error(&fd1.fd) == 0);
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_umount(disk));
 
@@ -491,6 +494,7 @@ static void readAcross(BattFsSuper *disk)
 	ASSERT(fd1.fd.seek_pos = (kfile_off_t)fd1.fd.size);
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(kfile_error(&fd1.fd) == 0);
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_umount(disk));
 
@@ -540,6 +544,7 @@ static void writeFile(BattFsSuper *disk)
 		ASSERT(buf[i] == i);
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(kfile_error(&fd1.fd) == 0);
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_umount(disk));
 
@@ -612,6 +617,7 @@ static void writeAcross(BattFsSuper *disk)
 	ASSERT(fd1.fd.seek_pos == (kfile_off_t)sizeof(buf) * 3);
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(kfile_error(&fd1.fd) == 0);
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_umount(disk));
 
@@ -641,6 +647,7 @@ static void createFile(BattFsSuper *disk)
 	ASSERT(fd1.fd.seek_pos == FILE_SIZE / 2);
 	ASSERT(fd1.fd.size == FILE_SIZE / 2);
 	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(kfile_error(&fd1.fd) == 0);
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_umount(disk));
 
@@ -659,6 +666,7 @@ static void createFile(BattFsSuper *disk)
 
 	ASSERT(fd1.fd.seek_pos == FILE_SIZE / 2);
 	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(kfile_error(&fd1.fd) == 0);
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_umount(disk));
 
@@ -704,6 +712,7 @@ static void multipleWrite(BattFsSuper *disk)
 		ASSERT(disk->free_bytes == disk->disk_size - sizeof(buf));
 	}
 	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(kfile_error(&fd1.fd) == 0);
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_umount(disk));
 
@@ -717,6 +726,7 @@ static void multipleWrite(BattFsSuper *disk)
 	for (unsigned i = 0; i < sizeof(buf); i++)
 			ASSERT(buf[i] == ((j-1+i) & 0xff));
 	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(kfile_error(&fd1.fd) == 0);
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_umount(disk));
 
@@ -763,7 +773,9 @@ static void increaseFile(BattFsSuper *disk)
 		ASSERT(buf[i] == (i & 0xff));
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(kfile_error(&fd1.fd) == 0);
 	ASSERT(kfile_close(&fd2.fd) == 0);
+	ASSERT(kfile_error(&fd2.fd) == 0);
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_umount(disk));
 
@@ -803,6 +815,7 @@ static void readEOF(BattFsSuper *disk)
 	ASSERT(kfile_read(&fd1.fd, buf, sizeof(buf)) == 0);
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(kfile_error(&fd1.fd) == 0);
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_umount(disk));
 
@@ -883,6 +896,7 @@ static void writeEOF(BattFsSuper *disk)
 		ASSERT(buf[i] == (i & 0xff));
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(kfile_error(&fd1.fd) == 0);
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_umount(disk));
 
@@ -917,6 +931,7 @@ static void endOfSpace(BattFsSuper *disk)
 	ASSERT(disk->free_bytes == 0);
 
 	ASSERT(kfile_close(&fd1.fd) == 0);
+	ASSERT(kfile_error(&fd1.fd) == BATTFS_DISK_GETNEWPAGE_ERR);
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_umount(disk));
 
@@ -969,7 +984,10 @@ static void multipleFilesRW(BattFsSuper *disk)
 	}
 
 	for (inode_t i = 0; i < N_FILES; i++)
+	{
 		ASSERT(kfile_close(&fd[i].fd) == 0);
+		ASSERT(kfile_error(&fd[i].fd) == 0);
+	}
 
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_umount(disk));
@@ -994,7 +1012,10 @@ static void multipleFilesRW(BattFsSuper *disk)
 	}
 
 	for (inode_t i = 0; i < N_FILES; i++)
+	{
 		ASSERT(kfile_close(&fd[i].fd) == 0);
+		ASSERT(kfile_error(&fd[i].fd) == 0);
+	}
 
 	ASSERT(battfs_umount(disk));
 	TRACEMSG("21: passed\n");
