@@ -242,15 +242,15 @@ typedef int32_t file_size_t; ///< Type for file sizes.
  * File errors.
  * \{
  */
-#define BATTFS_NEGATIVE_SEEK_ERR   BV(0)
-#define BATTFS_DISK_READ_ERR       BV(1)
-#define BATTFS_DISK_LOADPAGE_ERR   BV(2)
-#define BATTFS_DISK_BUFFERWR_ERR   BV(3)
-#define BATTFS_DISK_GETNEWPAGE_ERR BV(4)
-#define BATTFS_DISK_BUFFERRD_ERR   BV(6)
-#define BATTFS_DISK_SPACEOVER_ERR  BV(7)
-#define BATTFS_DISK_FLUSHBUF_ERR   BV(8)
-#define BATTFS_FILE_NOT_FOUND_ERR  BV(9)
+#define BATTFS_NEGATIVE_SEEK_ERR   BV(0) ///< Trying to read/write before file start.
+#define BATTFS_DISK_READ_ERR       BV(1) ///< Error reading from disk driver.
+#define BATTFS_DISK_LOADPAGE_ERR   BV(2) ///< Error loading a disk page in the buffer.
+#define BATTFS_DISK_BUFFERWR_ERR   BV(3) ///< Error writing in the disk page buffer.
+#define BATTFS_DISK_GETNEWPAGE_ERR BV(4) ///< Error getting a free page.
+#define BATTFS_DISK_BUFFERRD_ERR   BV(6) ///< Error reading from the disk page buffer.
+#define BATTFS_DISK_SPACEOVER_ERR  BV(7) ///< No more disk space available.
+#define BATTFS_DISK_FLUSHBUF_ERR   BV(8) ///< Error flushing (writing) the current page to disk.
+#define BATTFS_FILE_NOT_FOUND_ERR  BV(9) ///< File not found on disk.
 /*/}*/
 
 /**
