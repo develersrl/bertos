@@ -85,6 +85,14 @@
 		#define CPU_ARM_AT91SAM7X256 0
 	#endif
 
+	#if defined (__ARM_LM3S1968__)
+		#define CPU_ARM_LM3S        1
+		#define CPU_ARM_LM3S1968    1
+	#else
+		#define CPU_ARM_LM3S1968    0
+	#endif
+
+
 
 	#if defined(CPU_ARM_AT91)
 		#if CPU_ARM_AT91SAM7S32 + CPU_ARM_AT91SAM7S64 \
@@ -92,15 +100,17 @@
 		+ CPU_ARM_AT91SAM7X128 + CPU_ARM_AT91SAM7X256 != 1
 			#error ARM CPU configuration error
 		#endif
+		#define CPU_ARM_LM3S        0
 
+	#elif defined (CPU_ARM_LM3S)
+		#if CPU_ARM_LM3S1968 + 0 != 1
+			#error Luminary ARM CPU configuration error
+		#endif
+		#define CPU_ARM_AT91        0
 	/* #elif Add other ARM families here */
-	#elif defined (__ARM_LM3S1968__)
-		#define CPU_ARM_LM3S		1
-		#define CPU_ARM_LM3S1968	1
-
-
 	#else
-		#define CPU_ARM_AT91         0
+		#define CPU_ARM_AT91        0
+		#define CPU_ARM_LM3S        0
 	#endif
 
 
@@ -112,6 +122,7 @@
 
 	/* ARM Families */
 	#define CPU_ARM_AT91            0
+	#define CPU_ARM_LM3S            0
 
 	/* ARM CPUs */
 	#define CPU_ARM_AT91SAM7S32     0
@@ -120,6 +131,8 @@
 	#define CPU_ARM_AT91SAM7S256    0
 	#define CPU_ARM_AT91SAM7X128    0
 	#define CPU_ARM_AT91SAM7X256    0
+
+	#define CPU_ARM_LM3S1968        0
 #endif
 
 #if (defined(__IAR_SYSTEMS_ICC__) || defined(__IAR_SYSTEMS_ICC)) \
