@@ -41,6 +41,12 @@
 #include "hw/hw_cpu.h"  /* CLOCK_FREQ */
 
 #include "cfg/cfg_i2c.h"
+
+#define LOG_LEVEL  I2C_LOG_LEVEL
+#define LOG_FORMAT I2C_LOG_FORMAT
+
+#include <cfg/log.h>
+
 #include <cfg/debug.h>
 #include <cfg/macros.h> // BV()
 #include <cfg/module.h>
@@ -69,7 +75,7 @@ static bool i2c_start(void)
 	if (TW_STATUS == TW_START || TW_STATUS == TW_REP_START)
 		return true;
 
-	kprintf("!TW_(REP)START: %x\n", TWSR);
+	LOG_ERR("!TW_(REP)START: %x\n", TWSR);
 	return false;
 }
 
@@ -100,12 +106,12 @@ bool i2c_start_w(uint8_t id)
 			return true;
 		else if (TW_STATUS != TW_MT_SLA_NACK)
 		{
-			kprintf("!TW_MT_SLA_(N)ACK: %x\n", TWSR);
+			LOG_ERR("!TW_MT_SLA_(N)ACK: %x\n", TWSR);
 			break;
 		}
 		else if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT))
 		{
-			kprintf("Timeout on TWI_MT_START\n");
+			LOG_ERR("Timeout on TWI_MT_START\n");
 			break;
 		}
 	}
@@ -132,7 +138,7 @@ bool i2c_start_r(uint8_t id)
 		if (TW_STATUS == TW_MR_SLA_ACK)
 			return true;
 
-		kprintf("!TW_MR_SLA_ACK: %x\n", TWSR);
+		LOG_ERR("!TW_MR_SLA_ACK: %x\n", TWSR);
 	}
 
 	return false;
@@ -161,7 +167,7 @@ bool i2c_put(const uint8_t data)
 	WAIT_TWI_READY;
 	if (TW_STATUS != TW_MT_DATA_ACK)
 	{
-		kprintf("!TW_MT_DATA_ACK: %x\n", TWSR);
+		LOG_ERR("!TW_MT_DATA_ACK: %x\n", TWSR);
 		return false;
 	}
 	return true;
@@ -184,7 +190,7 @@ int i2c_get(bool ack)
 	{
 		if (TW_STATUS != TW_MR_DATA_ACK)
 		{
-			kprintf("!TW_MR_DATA_ACK: %x\n", TWSR);
+			LOG_ERR("!TW_MR_DATA_ACK: %x\n", TWSR);
 			return EOF;
 		}
 	}
@@ -192,7 +198,7 @@ int i2c_get(bool ack)
 	{
 		if (TW_STATUS != TW_MR_DATA_NACK)
 		{
-			kprintf("!TW_MR_DATA_NACK: %x\n", TWSR);
+			LOG_ERR("!TW_MR_DATA_NACK: %x\n", TWSR);
 			return EOF;
 		}
 	}
