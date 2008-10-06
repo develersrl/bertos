@@ -144,3 +144,16 @@ int i2c_get(bool ack)
 	return (int)(uint8_t)data;
 }
 
+MOD_DEFINE(i2c);
+
+/**
+ * Initialize i2c module.
+ */
+void i2c_init(void)
+{
+	I2C_BITBANG_HW_INIT;
+	SDA_HI;
+	SCL_HI;
+	MOD_INIT(i2c);
+}
+
