@@ -38,11 +38,11 @@
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
-#include "twi_avr.h"
+#include "i2c_avr.h"
 
 #include "hw/hw_cpu.h"  /* CLOCK_FREQ */
 
-#include "cfg/cfg_twi.h"
+#include "cfg/cfg_i2c.h"
 #include <cfg/debug.h>
 #include <cfg/macros.h> // BV()
 #include <cfg/module.h>
@@ -65,7 +65,7 @@
  *
  * \return true on success, false otherwise.
  */
-static bool twi_start(void)
+static bool i2c_start(void)
 {
 	TWCR = BV(TWINT) | BV(TWSTA) | BV(TWEN);
 	WAIT_TWI_READY;
@@ -85,7 +85,7 @@ static bool twi_start(void)
  *
  * \return true on success, false otherwise.
  */
-bool twi_start_w(uint8_t id)
+bool i2c_start_w(uint8_t id)
 {
 	/*
 	 * Loop on the select write sequence: when the eeprom is busy
@@ -94,7 +94,7 @@ bool twi_start_w(uint8_t id)
 	 * keep trying until the eeprom responds with an ACK.
 	 */
 	ticks_t start = timer_clock();
-	while (twi_start())
+	while (i2c_start())
 	{
 		TWDR = id & ~READ_BIT;
 		TWCR = BV(TWINT) | BV(TWEN);
@@ -125,9 +125,9 @@ bool twi_start_w(uint8_t id)
  *
  * \return true on success, false otherwise.
  */
-bool twi_start_r(uint8_t id)
+bool i2c_start_r(uint8_t id)
 {
-	if (twi_start())
+	if (i2c_start())
 	{
 		TWDR = id | READ_BIT;
 		TWCR = BV(TWINT) | BV(TWEN);
@@ -146,7 +146,7 @@ bool twi_start_r(uint8_t id)
 /**
  * Send STOP condition.
  */
-void twi_stop(void)
+void i2c_stop(void)
 {
         TWCR = BV(TWINT) | BV(TWEN) | BV(TWSTO);
 }
@@ -158,7 +158,7 @@ void twi_stop(void)
  *
  * \return true on success, false on error.
  */
-bool twi_put(const uint8_t data)
+bool i2c_put(const uint8_t data)
 {
 	TWDR = data;
 	TWCR = BV(TWINT) | BV(TWEN);
@@ -179,7 +179,7 @@ bool twi_put(const uint8_t data)
  *
  * \return the byte read if ok, EOF on errors.
  */
-int twi_get(bool ack)
+int i2c_get(bool ack)
 {
 	TWCR = BV(TWINT) | BV(TWEN) | (ack ? BV(TWEA) : 0);
 	WAIT_TWI_READY;
@@ -212,13 +212,13 @@ int twi_get(bool ack)
  *
  * \return true on success, false on error.
  */
-bool twi_send(const void *_buf, size_t count)
+bool i2c_send(const void *_buf, size_t count)
 {
 	const uint8_t *buf = (const uint8_t *)_buf;
 
 	while (count--)
 	{
-		if (!twi_put(*buf++))
+		if (!i2c_put(*buf++))
 			return false;
 	}
 	return true;
@@ -237,7 +237,7 @@ bool twi_send(const void *_buf, size_t count)
  *
  * \return true on success, false on error
  */
-bool twi_recv(void *_buf, size_t count)
+bool i2c_recv(void *_buf, size_t count)
 {
 	uint8_t *buf = (uint8_t *)_buf;
 
@@ -251,7 +251,7 @@ bool twi_recv(void *_buf, size_t count)
 		 * The last byte read does not has an ACK
 		 * to stop communication.
 		 */
-		int c = twi_get(count);
+		int c = i2c_get(count);
 
 		if (c == EOF)
 			return false;
@@ -263,12 +263,12 @@ bool twi_recv(void *_buf, size_t count)
 }
 
 
-MOD_DEFINE(twi);
+MOD_DEFINE(i2c);
 
 /**
  * Initialize TWI module.
  */
-void twi_init(void)
+void i2c_init(void)
 {
 	ATOMIC(
 		/*
@@ -305,5 +305,5 @@ void twi_init(void)
 		TWSR = 0;
 		TWCR = BV(TWEN);
 	);
-	MOD_INIT(twi);
+	MOD_INIT(i2c);
 }

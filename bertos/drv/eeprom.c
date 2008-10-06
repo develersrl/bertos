@@ -48,7 +48,7 @@
 #include <cfg/module.h>  // MOD_CHECK()
 
 #include <cpu/attr.h>
-#include CPU_HEADER(twi)
+#include <drv/i2c.h>
 
 #include <drv/wdt.h>
 
@@ -147,15 +147,15 @@ static size_t eeprom_writeRaw(struct KFile *_fd, const void *buf, size_t size)
 		}
 
 
-		if (!(twi_start_w(EEPROM_ADDR(dev_addr))
-			&& twi_send(addr_buf, addr_len)
-			&& twi_send(buf, count)))
+		if (!(i2c_start_w(EEPROM_ADDR(dev_addr))
+			&& i2c_send(addr_buf, addr_len)
+			&& i2c_send(buf, count)))
 		{
-			twi_stop();
+			i2c_stop();
 			return wr_len;
 		}
 
-		twi_stop();
+		i2c_stop();
 
 		/* Update count and addr for next operation */
 		size -= count;
@@ -232,11 +232,11 @@ static size_t eeprom_read(struct KFile *_fd, void *_buf, size_t size)
 	}
 
 
-	if (!(twi_start_w(EEPROM_ADDR(dev_addr))
-	   && twi_send(addr_buf, addr_len)
-	   && twi_start_r(EEPROM_ADDR(dev_addr))))
+	if (!(i2c_start_w(EEPROM_ADDR(dev_addr))
+	   && i2c_send(addr_buf, addr_len)
+	   && i2c_start_r(EEPROM_ADDR(dev_addr))))
 	{
-		twi_stop();
+		i2c_stop();
 		return 0;
 	}
 
@@ -246,7 +246,7 @@ static size_t eeprom_read(struct KFile *_fd, void *_buf, size_t size)
 		 * The last byte read does not have an ACK
 		 * to stop communication.
 		 */
-		int c = twi_get(size);
+		int c = i2c_get(size);
 
 		if (c == EOF)
 			break;
@@ -368,7 +368,7 @@ bool eeprom_erase(Eeprom *fd, e2addr_t addr, e2_size_t count)
  */
 void eeprom_init(Eeprom *fd, EepromType type, e2dev_addr_t addr, bool verify)
 {
-	MOD_CHECK(twi);
+	MOD_CHECK(i2c);
 	ASSERT(type < EEPROM_CNT);
 
 	memset(fd, 0, sizeof(*fd));
