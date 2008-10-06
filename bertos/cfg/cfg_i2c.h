@@ -50,6 +50,12 @@
  */
 #define CONFIG_I2C_START_TIMEOUT 100
 
+/// Module logging level definition.
+#define I2C_LOG_LEVEL      LOG_LVL_INFO
+
+/// Module logging format.
+#define I2C_LOG_FORMAT     LOG_FMT_TERSET
+
 #endif /* CFG_I2C_H */
 
 
