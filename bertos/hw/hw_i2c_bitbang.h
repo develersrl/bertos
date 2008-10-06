@@ -58,4 +58,9 @@
  */
 #define I2C_BITBANG_HW_INIT /* Implement me! */
 
+/**
+ * Half bit delay routine used to generate the correct timings.
+ */
+#define I2C_HALFBIT_DELAY() /* Implement me! */
+
 #endif /* HW_I2C_BITBANG_H */
