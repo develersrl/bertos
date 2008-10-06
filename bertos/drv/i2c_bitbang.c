@@ -37,47 +37,55 @@
  */
 
 #include "i2c.h"
-#include "timer.h"
-#include "hw/hw_i2c_bitbang.h"
+#include "cfg/cfg_i2c.h"
 
-#define I2C_PERIOD DIV_ROUND(500000UL / CONFIG_I2C_FREQ)
+#define LOG_LEVEL  I2C_LOG_LEVEL
+#define LOG_FORMAT I2C_LOG_FORMAT
+
+#include <cfg/log.h>
+#include <cfg/module.h>
+
+#include "hw/hw_i2c_bitbang.h"
 
 INLINE bool i2c_start(void)
 {
 	SDA_HI;
 	SCL_HI;
-	timer_udelay(I2C_PERIOD);
-	SDA_LOW;
-	timer_udelay(I2C_PERIOD);
-	return !SDA;
+	I2C_HALFBIT_DELAY();
+	SDA_LO;
+	I2C_HALFBIT_DELAY();
+	return !SDA_IN;
 }
 
 void i2c_stop(void)
 {
+	SDA_LO;
 	SCL_HI;
-	timer_udelay(I2C_PERIOD);
+	I2C_HALFBIT_DELAY();
 	SDA_HI;
 }
 
 bool i2c_put(uint8_t _data)
 {
+	/* Add ACK bit */
 	uint16_t data = (_data << 1) | 1;
-	for (uint16_t i = 0x100; i >= 0; i >>= 1)
+
+	for (uint16_t i = 0x100; i != 0; i >>= 1)
 	{
 		SCL_LO;
-		timer_udelay(I2C_PERIOD);
 		if (data & i)
 			SDA_HI;
 		else
 			SDA_LO;
+		I2C_HALFBIT_DELAY();
+
 		SCL_HI;
-		timer_udelay(I2C_PERIOD);
-		ASSERT(SDA == (data & i));
+		I2C_HALFBIT_DELAY();
 	}
-	bool ack = !SDA;
-	ASSERT(ack);
+
+	bool ack = !SDA_IN;
 	SCL_LO;
-	timer_udelay(I2C_PERIOD);
+	I2C_HALFBIT_DELAY();
 	return ack;
 }
 
@@ -95,11 +103,12 @@ bool i2c_start_w(uint8_t id)
 	{
 		if (i2c_put(id))
 			return true;
-		else if (timer_clock() - start > ms_to_ticks(CONFIG_TWI_START_TIMEOUT))
+		else if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT))
 		{
 			LOG_ERR("Timeout on I2C start write\n");
 			break;
 		}
+		//LOG_INFO("Rep start\n");
 	}
 
 	return false;
@@ -122,24 +131,30 @@ bool i2c_start_r(uint8_t id)
 int i2c_get(bool ack)
 {
 	uint8_t data = 0;
-	for (uint8_t i = 0x80; i >= 0; i >>= 1)
+	for (uint8_t i = 0x80; i != 0; i >>= 1)
 	{
 		SCL_LO;
-		timer_udelay(I2C_PERIOD);
+		I2C_HALFBIT_DELAY();
 		SCL_HI;
-		timer_udelay(I2C_PERIOD);
-		if (SDA)
+		if (SDA_IN)
 			data |= i;
+		else
+			data &= ~i;
+
+		I2C_HALFBIT_DELAY();
 	}
 	SCL_LO;
-	timer_udelay(I2C_PERIOD);
 
 	if (ack)
 		SDA_LO;
 	else
 		SDA_HI;
 
+	I2C_HALFBIT_DELAY();
 	SCL_HI;
+	I2C_HALFBIT_DELAY();
+	SCL_LO;
+	SDA_HI;
 	/* avoid sign extension */
 	return (int)(uint8_t)data;
 }
