@@ -40,7 +40,7 @@
 
 #include <cfg/compiler.h>
 
-#define READ_BIT BV(0)
+#define I2C_READBIT BV(0)
 
 void i2c_init(void);
 bool i2c_start_w(uint8_t id);

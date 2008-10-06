@@ -92,7 +92,7 @@ bool i2c_start_w(uint8_t id)
 	ticks_t start = timer_clock();
 	while (i2c_start())
 	{
-		TWDR = id & ~READ_BIT;
+		TWDR = id & ~I2C_READBIT;
 		TWCR = BV(TWINT) | BV(TWEN);
 		WAIT_TWI_READY;
 
@@ -125,7 +125,7 @@ bool i2c_start_r(uint8_t id)
 {
 	if (i2c_start())
 	{
-		TWDR = id | READ_BIT;
+		TWDR = id | I2C_READBIT;
 		TWCR = BV(TWINT) | BV(TWEN);
 		WAIT_TWI_READY;
 
