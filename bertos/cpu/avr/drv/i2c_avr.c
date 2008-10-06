@@ -38,8 +38,6 @@
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
-#include "i2c_avr.h"
-
 #include "hw/hw_cpu.h"  /* CLOCK_FREQ */
 
 #include "cfg/cfg_i2c.h"
@@ -50,15 +48,13 @@
 #include <cpu/detect.h>
 #include <cpu/irq.h>
 #include <drv/timer.h>
+#include <drv/i2c.h>
 
 #include <compat/twi.h>
 
 
 /* Wait for TWINT flag set: bus is ready */
 #define WAIT_TWI_READY  do {} while (!(TWCR & BV(TWINT)))
-
-#define READ_BIT BV(0)
-
 
 /**
  * Send START condition on the bus.
@@ -205,64 +201,6 @@ int i2c_get(bool ack)
 	return (int)(uint8_t)TWDR;
 }
 
-
-/**
- * Send a sequence of bytes in master transmitter mode
- * to the selected slave device through the TWI bus.
- *
- * \return true on success, false on error.
- */
-bool i2c_send(const void *_buf, size_t count)
-{
-	const uint8_t *buf = (const uint8_t *)_buf;
-
-	while (count--)
-	{
-		if (!i2c_put(*buf++))
-			return false;
-	}
-	return true;
-}
-
-
-/**
- * Receive a sequence of one or more bytes from the
- * selected slave device in master receive mode through
- * the TWI bus.
- *
- * Received data is placed in \c buf.
- *
- * \note a NACK is automatically given on the last received
- *         byte.
- *
- * \return true on success, false on error
- */
-bool i2c_recv(void *_buf, size_t count)
-{
-	uint8_t *buf = (uint8_t *)_buf;
-
-	/*
-	 * When reading the last byte the TWEA bit is not
-	 * set, and the eeprom should answer with NACK
-	 */
-	while (count--)
-	{
-		/*
-		 * The last byte read does not has an ACK
-		 * to stop communication.
-		 */
-		int c = i2c_get(count);
-
-		if (c == EOF)
-			return false;
-		else
-			*buf++ = c;
-	}
-
-	return true;
-}
-
-
 MOD_DEFINE(i2c);
 
 /**
@@ -295,13 +233,13 @@ void i2c_init(void)
 		 * Set speed:
 		 * F = CLOCK_FREQ / (16 + 2*TWBR * 4^TWPS)
 		 */
-		#ifndef CONFIG_TWI_FREQ
-			#warning Using default value of 300000L for CONFIG_TWI_FREQ
-			#define CONFIG_TWI_FREQ  300000L /* ~300 kHz */
+		#ifndef CONFIG_I2C_FREQ
+			#warning Using default value of 300000L for CONFIG_I2C_FREQ
+			#define CONFIG_I2C_FREQ  300000L /* ~300 kHz */
 		#endif
 		#define TWI_PRESC 1       /* 4 ^ TWPS */
 
-		TWBR = (CLOCK_FREQ / (2 * CONFIG_TWI_FREQ * TWI_PRESC)) - (8 / TWI_PRESC);
+		TWBR = (CLOCK_FREQ / (2 * CONFIG_I2C_FREQ * TWI_PRESC)) - (8 / TWI_PRESC);
 		TWSR = 0;
 		TWCR = BV(TWEN);
 	);

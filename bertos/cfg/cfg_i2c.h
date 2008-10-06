@@ -43,6 +43,13 @@
 /// Comunication frequency
 #define CONFIG_I2C_FREQ  100000UL
 
+/**
+ * I2C start timeout: for how many milliseconds
+ * the twi_start should try to get an ACK before
+ * returning error.
+ */
+#define CONFIG_I2C_START_TIMEOUT 100
+
 #endif /* CFG_I2C_H */
 
 
