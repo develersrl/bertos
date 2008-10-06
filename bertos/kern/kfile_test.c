@@ -90,6 +90,7 @@ static bool kfile_rwTest(KFile *f, uint8_t *buf, size_t size)
 	 */
 	if (kfile_read(f, buf, size) != size)
 		return false;
+
 	kfile_seek(f, -(kfile_off_t)size, KSM_SEEK_CUR);
 
 	/*
@@ -98,7 +99,6 @@ static bool kfile_rwTest(KFile *f, uint8_t *buf, size_t size)
 	for (size_t i = 0; i < size; i++)
 		if (buf[i] != (i & 0xff))
 			return false;
-
 	return true;
 }
 
@@ -142,11 +142,11 @@ int kfile_testRun(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size)
 	if (save_buf)
 	{
 		kfile_read(fd, save_buf, size);
-		LOG_INFO("Saved content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + size);
+		LOG_INFO("Saved content..form [%ld] to [%ld]\n", fd->seek_pos, fd->seek_pos + size);
 	}
 
 	/* TEST 1 BEGIN. */
-	LOG_INFO("Test 1: write from pos 0 to [%lu]\n", size);
+	LOG_INFO("Test 1: write from pos 0 to [%ld]\n", (long)size);
 
 	/*
 	 * Seek to addr 0.
@@ -266,7 +266,7 @@ int kfile_testRun(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size)
 
 kfile_test_end:
 	kfile_close(fd);
-	LOG_ERR("One kfile_test fail!\n");
+	LOG_ERR("One kfile_test failed!\n");
 	return EOF;
 }
 
