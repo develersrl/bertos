@@ -43,7 +43,11 @@
 #define LOG_FORMAT I2C_LOG_FORMAT
 
 #include <cfg/log.h>
+#include <cfg/macros.h>
 #include <cfg/module.h>
+
+#include <drv/timer.h>
+#include <cpu/irq.h>
 
 #include "hw/hw_i2c_bitbang.h"
 
@@ -54,6 +58,7 @@ INLINE bool i2c_start(void)
 	I2C_HALFBIT_DELAY();
 	SDA_LO;
 	I2C_HALFBIT_DELAY();
+	ASSERT(!SDA_IN);
 	return !SDA_IN;
 }
 
@@ -166,6 +171,7 @@ MOD_DEFINE(i2c);
  */
 void i2c_init(void)
 {
+	MOD_CHECK(timer);
 	I2C_BITBANG_HW_INIT;
 	SDA_HI;
 	SCL_HI;
