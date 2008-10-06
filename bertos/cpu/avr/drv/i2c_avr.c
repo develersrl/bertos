@@ -107,7 +107,7 @@ bool i2c_start_w(uint8_t id)
 			kprintf("!TW_MT_SLA_(N)ACK: %x\n", TWSR);
 			break;
 		}
-		else if (timer_clock() - start > ms_to_ticks(CONFIG_TWI_START_TIMEOUT))
+		else if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT))
 		{
 			kprintf("Timeout on TWI_MT_START\n");
 			break;

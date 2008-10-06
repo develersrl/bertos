@@ -30,27 +30,19 @@
  * All Rights Reserved.
  * -->
  *
- * \brief Configuration file for TWI module.
+ * \brief Configuration file for I2C module.
  *
  * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef CFG_TWI_H
-#define CFG_TWI_H
+#ifndef CFG_I2C_H
+#define CFG_I2C_H
 
 /// Comunication frequency
-#define CONFIG_TWI_FREQ  100000UL
+#define CONFIG_I2C_FREQ  100000UL
 
-/**
-  * TWI start timeout.
-  * For how many milliseconds the twi_start
-  * should try to get an ACK before returning error.
-  *
-  */
-#define CONFIG_TWI_START_TIMEOUT 100
-
-#endif /* CFG_TWI_H */
+#endif /* CFG_I2C_H */
 
 
