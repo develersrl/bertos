@@ -332,7 +332,7 @@
  * ADC pins definition.
  *\{
  */
-#if CPU_ARM_AT91SAM7X256
+#if CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128
 	#define ADTRG   18 // PB18
 	#define AD0     23 // PB27
 	#define AD1     24 // PB28
