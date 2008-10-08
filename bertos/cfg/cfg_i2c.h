@@ -54,7 +54,7 @@
 #define I2C_LOG_LEVEL      LOG_LVL_INFO
 
 /// Module logging format.
-#define I2C_LOG_FORMAT     LOG_FMT_TERSET
+#define I2C_LOG_FORMAT     LOG_FMT_TERSE
 
 #endif /* CFG_I2C_H */
 
