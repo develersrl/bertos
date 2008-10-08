@@ -111,7 +111,7 @@
  * also which print function are linked.
  * If you choose a low level of log you link all log function (error, warning and info),
  * but if choose a hight level you link only that have the priority egual or hight.
- * The priority level go from error (most hight) to info (most low) (see cfg/debug.h
+ * The priority level go from error (highest) to info (lowest) (see cfg/debug.h
  * for more detail).
  * \{
  */
