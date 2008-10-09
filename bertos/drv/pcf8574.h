@@ -51,6 +51,7 @@ typedef struct Pcf8574
 	pcf8574_addr addr;
 } Pcf8574;
 
+#define PCF8574ID 0x40 ///< I2C address
 
 int pcf8574_get(Pcf8574 *pcf);
 bool pcf8574_put(Pcf8574 *pcf, uint8_t data);
