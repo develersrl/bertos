@@ -68,7 +68,9 @@ int pcf8574_get(Pcf8574 *pcf)
  */
 bool pcf8574_put(Pcf8574 *pcf, uint8_t data)
 {
-	return 	i2c_start_w(PCF8574ID | ((pcf->addr << 1) & 0xF7)) && i2c_put(data) && i2c_stop();
+	bool res = i2c_start_w(PCF8574ID | ((pcf->addr << 1) & 0xF7)) && i2c_put(data);
+	i2c_stop();
+	return res;
 }
 
 /**
