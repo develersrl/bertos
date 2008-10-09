@@ -45,6 +45,7 @@
  */
 
 #include "pcf8574.h"
+#include <cfg/module.h>
 #include <drv/i2c.h>
 
 /**
