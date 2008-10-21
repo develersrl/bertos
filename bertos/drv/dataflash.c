@@ -129,7 +129,7 @@ static void send_cmd(DataFlash *fd, dataflash_page_t page_addr, dataflash_offset
 	 * page address, in last byte we write a byte page address.
 	 * (see datasheet for more detail).
 	 *
-	 * \note Generaly a defaul memory page size is more than 256 byte.
+	 * \note Generally a default memory page size is more than 256 byte.
 	 *  In this case we need for addressing a byte in one page more than
 	 *  8 bit, so we put in fourth byte low part of address byte, and
 	 *  hight part of address byte in third byte togheter low par of page
@@ -226,8 +226,9 @@ static uint8_t dataflash_cmd(DataFlash *fd, dataflash_page_t page_addr, dataflas
  * Read \a len bytes from main data flash memory or buffer data
  * flash memory, and put it in \a *block.
  */
-static void dataflash_readBlock(DataFlash *fd, dataflash_page_t page_addr, dataflash_offset_t byte_addr, DataFlashOpcode opcode, uint8_t *block, dataflash_size_t len)
+static void dataflash_readBlock(DataFlash *fd, dataflash_page_t page_addr, dataflash_offset_t byte_addr, uint8_t *block, dataflash_size_t len)
 {
+	DataFlashOpcode opcode = mem_info[fd->dev].read_cmd;
 	send_cmd(fd, page_addr, byte_addr, opcode);
 
 	if (opcode == DFO_READ_FLASH_MEM_BYTE_B)
@@ -253,11 +254,11 @@ static void dataflash_readBlock(DataFlash *fd, dataflash_page_t page_addr, dataf
  * To perform a write in main memory you must first write in dataflash buffer
  * memory and then send a command to write the page in main memory.
  */
-static void dataflash_writeBlock(DataFlash *fd, dataflash_offset_t offset, DataFlashOpcode opcode, const uint8_t *block, dataflash_size_t len)
+static void dataflash_writeBlock(DataFlash *fd, dataflash_offset_t offset, const uint8_t *block, dataflash_size_t len)
 {
 	ASSERT(offset + len <= mem_info[fd->dev].page_size);
 
-	send_cmd(fd, 0x00, offset, opcode);
+	send_cmd(fd, 0x00, offset, DFO_WRITE_BUFF1);
 
 	kfile_write(fd->channel, block, len); //Write len bytes.
 	kfile_flush(fd->channel); // Flush channel
@@ -267,11 +268,69 @@ static void dataflash_writeBlock(DataFlash *fd, dataflash_offset_t offset, DataF
 
 
 /**
- * Load selct page from dataflash memory to buffer.
+ * Load selected page from dataflash memory to buffer.
  */
 static void dataflash_loadPage(DataFlash *fd, dataflash_page_t page_addr)
 {
 	dataflash_cmd(fd, page_addr, 0x00, DFO_MOV_MEM_TO_BUFF1);
+}
+
+static size_t dataflash_disk_page_read(struct BattFsSuper *d, pgcnt_t page, pgaddr_t addr, void *buf, size_t len)
+{
+	DataFlash *fd = DATAFLASH_CAST((KFile *)d->disk_ctx);
+	dataflash_readBlock(fd, page, addr, buf, len);
+	return len;
+}
+
+static bool dataflash_disk_page_load(struct BattFsSuper *d, pgcnt_t page)
+{
+	DataFlash *fd = DATAFLASH_CAST((KFile *)d->disk_ctx);
+	dataflash_loadPage(fd, page);
+	return true;
+}
+
+static size_t dataflash_disk_buffer_write(struct BattFsSuper *d, pgaddr_t addr, const void *buf, size_t len)
+{
+	DataFlash *fd = DATAFLASH_CAST((KFile *)d->disk_ctx);
+	dataflash_writeBlock(fd, addr, buf, len);
+	return true;
+}
+
+static size_t dataflash_disk_buffer_read(struct BattFsSuper *d, pgaddr_t addr, void *buf, size_t len)
+{
+	DataFlash *fd = DATAFLASH_CAST((KFile *)d->disk_ctx);
+	ASSERT(addr + len <= mem_info[fd->dev].page_size);
+
+	CS_TOGGLE(fd);
+
+	kfile_putc(DFO_READ_BUFF1, fd->channel);
+
+	uint32_t byte_addr = addr;
+
+	kfile_putc((byte_addr >> 16) & 0xff, fd->channel);
+	kfile_putc((byte_addr >> 8) & 0xff, fd->channel);
+	kfile_putc((byte_addr & 0xff, fd->channel);
+
+	/* Send additional don't care byte to start read operation */
+	kfile_putc(0, fd->channel);
+
+	kfile_read(fd->channel, buf, len); //Read len bytes ad put in buffer.
+	kfile_flush(fd->channel); // Flush channel
+	fd->setCS(false);
+}
+
+static bool dataflash_disk_page_save(struct BattFsSuper *d, pgcnt_t page)
+{
+	DataFlash *fd = DATAFLASH_CAST((KFile *)d->disk_ctx);
+	dataflash_cmd(fd, page, 0x00, DFO_WRITE_BUFF1_TO_MEM);
+	return true;
+}
+
+static bool dataflash_disk_page_erase(struct BattFsSuper *d, pgcnt_t page)
+{
+	DataFlash *fd = DATAFLASH_CAST((KFile *)d->disk_ctx);
+	dataflash_cmd(fd, page, 0x00, DFO_ERASE_PAGE);
+	return true;
 }
 
 /**
@@ -365,7 +424,7 @@ static size_t dataflash_read(struct KFile *_fd, void *buf, size_t size)
 	/*
 	 * Read byte in main page data flash memory.
 	 */
-	dataflash_readBlock(fd, page_addr, byte_addr, mem_info[fd->dev].read_cmd, data, size);
+	dataflash_readBlock(fd, page_addr, byte_addr, data, size);
 
 	fd->fd.seek_pos += size;
 	LOG_INFO("Read %ld bytes\n", size);
@@ -426,7 +485,7 @@ static size_t dataflash_write(struct KFile *_fd, const void *_buf, size_t size)
 		* Write byte in current page, and set true
 		* page_dirty flag.
 		*/
-		dataflash_writeBlock(fd, offset, DFO_WRITE_BUFF1, data, wr_len);
+		dataflash_writeBlock(fd, offset, data, wr_len);
 		fd->page_dirty = true;
 
 		data += wr_len;
