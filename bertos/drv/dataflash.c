@@ -50,6 +50,8 @@
 
 #include <drv/timer.h>
 
+#include <fs/battfs.h>
+
 #include <kern/kfile.h>
 
 #include <cpu/power.h> /* cpu_relax() */
@@ -309,7 +311,7 @@ static size_t dataflash_disk_buffer_read(struct BattFsSuper *d, pgaddr_t addr, v
 
 	kfile_putc((byte_addr >> 16) & 0xff, fd->channel);
 	kfile_putc((byte_addr >> 8) & 0xff, fd->channel);
-	kfile_putc((byte_addr & 0xff, fd->channel);
+	kfile_putc(byte_addr & 0xff, fd->channel);
 
 	/* Send additional don't care byte to start read operation */
 	kfile_putc(0, fd->channel);
@@ -317,6 +319,7 @@ static size_t dataflash_disk_buffer_read(struct BattFsSuper *d, pgaddr_t addr, v
 	kfile_read(fd->channel, buf, len); //Read len bytes ad put in buffer.
 	kfile_flush(fd->channel); // Flush channel
 	fd->setCS(false);
+	return len;
 }
 
 static bool dataflash_disk_page_save(struct BattFsSuper *d, pgcnt_t page)
@@ -402,7 +405,7 @@ static size_t dataflash_read(struct KFile *_fd, void *buf, size_t size)
 	uint8_t *data = (uint8_t *)buf;
 
 
-	ASSERT(fd->fd.seek_pos + size <= (kfile_off_t)fd->fd.size);
+	ASSERT(fd->fd.seek_pos + (kfile_off_t)size <= fd->fd.size);
 	size = MIN((kfile_off_t)size, fd->fd.size - fd->fd.seek_pos);
 
 	LOG_INFO("Reading at pos[%lu]\n", fd->fd.seek_pos);
@@ -427,7 +430,7 @@ static size_t dataflash_read(struct KFile *_fd, void *buf, size_t size)
 	dataflash_readBlock(fd, page_addr, byte_addr, data, size);
 
 	fd->fd.seek_pos += size;
-	LOG_INFO("Read %ld bytes\n", size);
+	LOG_INFO("Read %ld bytes\n", (long int)size);
 
 	return size;
 }
@@ -453,7 +456,7 @@ static size_t dataflash_write(struct KFile *_fd, const void *_buf, size_t size)
 
 	const uint8_t *data = (const uint8_t *) _buf;
 
-	ASSERT(fd->fd.seek_pos + size <= (kfile_off_t)fd->fd.size);
+	ASSERT(fd->fd.seek_pos + (kfile_off_t)size <= fd->fd.size);
 	size = MIN((kfile_off_t)size, fd->fd.size - fd->fd.seek_pos);
 
 	LOG_INFO("Writing at pos[%lu]\n", fd->fd.seek_pos);
@@ -494,7 +497,7 @@ static size_t dataflash_write(struct KFile *_fd, const void *_buf, size_t size)
 		total_write += wr_len;
 	}
 
-	LOG_INFO("written %lu bytes\n", total_write);
+	LOG_INFO("written %lu bytes\n", (long unsigned)total_write);
 	return total_write;
 }
 
