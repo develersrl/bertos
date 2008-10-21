@@ -32,7 +32,7 @@ arm7_9 dcc_downloads enable
 sleep 10
 poll
 flash probe 0
-flash write 0 ../../../images/at91sam7.bin 0x0
+flash write 0 ../../../../images/usbint.bin 0x0
 reset run
 sleep 10
 #shutdown
