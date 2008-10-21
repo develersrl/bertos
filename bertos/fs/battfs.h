@@ -183,6 +183,7 @@ typedef uint32_t disk_size_t; ///< Type for disk sizes.
  */
 typedef struct BattFsSuper
 {
+	void *disk_ctx;          ///< Disk context used by disk access functions.
 	disk_open_t open;        ///< Disk init.
 	disk_page_read_t  read;  ///< Page read.
 	disk_page_load_t  load;  ///< Page load.
