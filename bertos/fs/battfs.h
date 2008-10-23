@@ -111,12 +111,6 @@ struct BattFsSuper;
 #define PAGE_UNSET_SENTINEL ((1 << (CPU_BITS_PER_CHAR * sizeof(pgcnt_t))) - 1)
 
 /**
- * Type interface for disk init function.
- * \return true if all is ok, false otherwise.
- */
-typedef bool (*disk_open_t) (struct BattFsSuper *d);
-
-/**
  * Type interface for disk page read function.
  * \a page is the page address, \a addr the address inside the page,
  * \a size the lenght to be read.
@@ -184,7 +178,6 @@ typedef uint32_t disk_size_t; ///< Type for disk sizes.
 typedef struct BattFsSuper
 {
 	void *disk_ctx;          ///< Disk context used by disk access functions.
-	disk_open_t open;        ///< Disk init.
 	disk_page_read_t  read;  ///< Page read.
 	disk_page_load_t  load;  ///< Page load.
 	disk_buffer_write_t bufferWrite; ///< Buffer write.

@@ -442,16 +442,6 @@ bool battfs_mount(struct BattFsSuper *disk)
 {
 	pgoff_t filelen_table[BATTFS_MAX_FILES];
 
-	/* Sanity check */
-	ASSERT(disk->open);
-
-	/* Init disk device */
-	if (!disk->open(disk))
-	{
-		LOG_ERR("open error\n");
-		return false;
-	}
-
 	/* Disk open must set all of these */
 	ASSERT(disk->read);
 	ASSERT(disk->load);

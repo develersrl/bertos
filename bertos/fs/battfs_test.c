@@ -50,26 +50,14 @@
 
 #if UNIT_TEST
 
-FILE *fp;
 const char test_filename[]="battfs_disk.bin";
 
 static uint8_t page_buffer[PAGE_SIZE];
 
-static bool disk_open(struct BattFsSuper *d)
-{
-	fp = fopen(test_filename, "r+b");
-	ASSERT(fp);
-	fseek(fp, 0, SEEK_END);
-	d->page_size = PAGE_SIZE;
-	d->page_count = ftell(fp) / d->page_size;
-	d->page_array = malloc(d->page_count * sizeof(pgcnt_t));
-	//TRACEMSG("page_size:%d, page_count:%d\n", d->page_size, d->page_count);
-	return (fp && d->page_array);
-}
-
 static size_t disk_page_read(struct BattFsSuper *d, pgcnt_t page, pgaddr_t addr, void *buf, size_t size)
 {
 	//TRACEMSG("page:%d, addr:%d, size:%d", page, addr, size);
+	FILE *fp = (FILE *)d->disk_ctx;
 	fseek(fp, page * d->page_size + addr, SEEK_SET);
 	return fread(buf, 1, size, fp);
 }
@@ -94,6 +82,7 @@ static size_t disk_buffer_read(struct BattFsSuper *d, pgaddr_t addr, void *buf, 
 
 static bool disk_page_load(struct BattFsSuper *d, pgcnt_t page)
 {
+	FILE *fp = (FILE *)d->disk_ctx;
 	//TRACEMSG("page:%d", page);
 	fseek(fp, page * d->page_size, SEEK_SET);
 	return fread(page_buffer, 1, d->page_size, fp) == d->page_size;
@@ -101,6 +90,7 @@ static bool disk_page_load(struct BattFsSuper *d, pgcnt_t page)
 
 static bool disk_page_save(struct BattFsSuper *d, pgcnt_t page)
 {
+	FILE *fp = (FILE *)d->disk_ctx;
 	//TRACEMSG("page:%d", page);
 	fseek(fp, page * d->page_size, SEEK_SET);
 	return fwrite(page_buffer, 1, d->page_size, fp) == d->page_size;
@@ -108,6 +98,7 @@ static bool disk_page_save(struct BattFsSuper *d, pgcnt_t page)
 
 static bool disk_page_erase(struct BattFsSuper *d, pgcnt_t page)
 {
+	FILE *fp = (FILE *)d->disk_ctx;
 	//TRACEMSG("page:%d", page);
 	fseek(fp, page * d->page_size, SEEK_SET);
 
@@ -119,13 +110,37 @@ static bool disk_page_erase(struct BattFsSuper *d, pgcnt_t page)
 
 static bool disk_close(struct BattFsSuper *d)
 {
+	FILE *fp = (FILE *)d->disk_ctx;
 	//TRACE;
 	free(d->page_array);
 	return (fclose(fp) != EOF);
 }
 
+static bool disk_open(struct BattFsSuper *d)
+{
+	d->page_size = PAGE_SIZE;
+	d->read = disk_page_read;
+	d->load = disk_page_load;
+	d->bufferWrite = disk_buffer_write;
+	d->bufferRead = disk_buffer_read;
+	d->save = disk_page_save;
+	d->erase = disk_page_erase;
+	d->close = disk_close;
+
+	FILE *fp = fopen(test_filename, "r+b");
+	ASSERT(fp);
+	d->disk_ctx = fp;
+	fseek(fp, 0, SEEK_END);
+	d->page_size = PAGE_SIZE;
+	d->page_count = ftell(fp) / d->page_size;
+	d->page_array = malloc(d->page_count * sizeof(pgcnt_t));
+	//TRACEMSG("page_size:%d, page_count:%d\n", d->page_size, d->page_count);
+	return (fp && d->page_array);
+}
+
 static void testCheck(BattFsSuper *disk, pgcnt_t *reference)
 {
+	ASSERT(disk_open(disk));
 	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 
@@ -180,7 +195,7 @@ static void disk1File(BattFsSuper *disk)
 	TRACEMSG("2: disk full with 1 contiguos file\n");
 
 
-	fp = fopen(test_filename, "w+");
+	FILE *fp = fopen(test_filename, "w+");
 
 	for (int i = 0; i < PAGE_COUNT; i++)
 	{
@@ -200,7 +215,7 @@ static void diskHalfFile(BattFsSuper *disk)
 	TRACEMSG("3: disk half full with 1 contiguos file, rest unformatted\n");
 
 
-	fp = fopen(test_filename, "w+");
+	FILE *fp = fopen(test_filename, "w+");
 
 	for (int i = 0; i < PAGE_COUNT / 2; i++)
 	{
@@ -229,7 +244,7 @@ static void oldSeq1(BattFsSuper *disk)
 	TRACEMSG("6: 1 file with 1 old seq num, 1 free block\n");
 
 
-	fp = fopen(test_filename, "w+");
+	FILE *fp = fopen(test_filename, "w+");
 	// page, inode, seq, fill, pgoff
 	battfs_writeTestBlock(disk, 0, 0, 0, disk->data_size, 0);
 	battfs_writeTestBlock(disk, 1, 0, 0, disk->data_size, 1);
@@ -253,7 +268,7 @@ static void oldSeq2(BattFsSuper *disk)
 	TRACEMSG("7: 1 file with 1 old seq num, 1 free block\n");
 
 
-	fp = fopen(test_filename, "w+");
+	FILE *fp = fopen(test_filename, "w+");
 	// page, inode, seq, fill, pgoff
 	battfs_writeTestBlock(disk, 0, 0, 0, disk->data_size, 0);
 	battfs_writeTestBlock(disk, 1, 0, 1, disk->data_size, 1);
@@ -276,7 +291,7 @@ static void oldSeq3(BattFsSuper *disk)
 	TRACEMSG("8: 1 file with 1 old seq num, 1 free block\n");
 
 
-	fp = fopen(test_filename, "w+");
+	FILE *fp = fopen(test_filename, "w+");
 
 	// page, inode, seq, fill, pgoff
 	disk->erase(disk, 0);
@@ -301,7 +316,7 @@ static void oldSeq2File(BattFsSuper *disk)
 	TRACEMSG("9: 2 file with old seq num, 2 free block\n");
 
 
-	fp = fopen(test_filename, "w+");
+	FILE *fp = fopen(test_filename, "w+");
 
 	// page, inode, seq, fill, pgoff
 	disk->erase(disk, 0);
@@ -334,7 +349,7 @@ static void openFile(BattFsSuper *disk)
 	BattFs fd2;
 	TRACEMSG("10: open file test, inode 0 and inode 4\n");
 
-	fp = fopen(test_filename, "w+");
+	FILE *fp = fopen(test_filename, "w+");
 
 	int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
 	inode_t INODE = 0;
@@ -354,6 +369,7 @@ static void openFile(BattFsSuper *disk)
 
 	fclose(fp);
 
+	ASSERT(disk_open(disk));
 	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	ASSERT(!battfs_fileExists(disk, INEXISTENT_INODE));
@@ -405,7 +421,7 @@ static void readFile(BattFsSuper *disk)
 
 	TRACEMSG("11: read file test\n");
 
-	fp = fopen(test_filename, "w+");
+	FILE *fp = fopen(test_filename, "w+");
 
 	unsigned int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
 	inode_t INODE = 0;
@@ -423,6 +439,7 @@ static void readFile(BattFsSuper *disk)
 
 	fclose(fp);
 
+	ASSERT(disk_open(disk));
 	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
@@ -445,7 +462,7 @@ static void readAcross(BattFsSuper *disk)
 
 	TRACEMSG("12: read file test across page boundary and seek test\n");
 
-	fp = fopen(test_filename, "w+");
+	FILE *fp = fopen(test_filename, "w+");
 
 	const unsigned int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
 	inode_t INODE = 0;
@@ -463,6 +480,7 @@ static void readAcross(BattFsSuper *disk)
 
 	fclose(fp);
 
+	ASSERT(disk_open(disk));
 	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
@@ -509,7 +527,7 @@ static void writeFile(BattFsSuper *disk)
 
 	TRACEMSG("13: write file test\n");
 
-	fp = fopen(test_filename, "w+");
+	FILE *fp = fopen(test_filename, "w+");
 
 	unsigned int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
 	inode_t INODE = 0;
@@ -530,6 +548,7 @@ static void writeFile(BattFsSuper *disk)
 	for (size_t i = 0; i < sizeof(buf); i++)
 		buf[i] = i;
 
+	ASSERT(disk_open(disk));
 	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
@@ -557,7 +576,7 @@ static void writeAcross(BattFsSuper *disk)
 
 	TRACEMSG("14: write file test across page boundary and seek test\n");
 
-	fp = fopen(test_filename, "w+");
+	FILE *fp = fopen(test_filename, "w+");
 
 	const unsigned int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
 	inode_t INODE = 0;
@@ -575,6 +594,7 @@ static void writeAcross(BattFsSuper *disk)
 
 	fclose(fp);
 
+	ASSERT(disk_open(disk));
 	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
@@ -638,6 +658,7 @@ static void createFile(BattFsSuper *disk)
 	inode_t INODE = 0;
 	unsigned int MODE = BATTFS_CREATE;
 
+	ASSERT(disk_open(disk));
 	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
@@ -651,6 +672,7 @@ static void createFile(BattFsSuper *disk)
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_umount(disk));
 
+	ASSERT(disk_open(disk));
 	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, 0));
@@ -689,6 +711,7 @@ static void multipleWrite(BattFsSuper *disk)
 	unsigned int MODE = BATTFS_CREATE;
 	uint8_t buf[1000];
 
+	ASSERT(disk_open(disk));
 	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
@@ -716,6 +739,7 @@ static void multipleWrite(BattFsSuper *disk)
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_umount(disk));
 
+	ASSERT(disk_open(disk));
 	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	ASSERT(disk->free_bytes == disk->disk_size - sizeof(buf));
@@ -749,6 +773,7 @@ static void increaseFile(BattFsSuper *disk)
 	unsigned int MODE = BATTFS_CREATE;
 	uint8_t buf[1000];
 
+	ASSERT(disk_open(disk));
 	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE1, MODE));
@@ -789,7 +814,7 @@ static void readEOF(BattFsSuper *disk)
 
 	TRACEMSG("18: reading over EOF test\n");
 
-	fp = fopen(test_filename, "w+");
+	FILE *fp = fopen(test_filename, "w+");
 
 	unsigned int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
 	inode_t INODE = 0;
@@ -807,6 +832,7 @@ static void readEOF(BattFsSuper *disk)
 
 	fclose(fp);
 
+	ASSERT(disk_open(disk));
 	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
@@ -840,6 +866,7 @@ static void writeEOF(BattFsSuper *disk)
 	for (int i = 0; i < 2; i++)
 		buf[i] = i;
 
+	ASSERT(disk_open(disk));
 	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	disk_size_t prev_free = disk->free_bytes;
@@ -910,7 +937,7 @@ static void endOfSpace(BattFsSuper *disk)
 	BattFs fd1;
 	uint8_t buf[(PAGE_SIZE - BATTFS_HEADER_LEN) * 5];
 
-	fp = fopen(test_filename, "w+");
+	FILE *fp = fopen(test_filename, "w+");
 
 	unsigned int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
 	inode_t INODE = 0;
@@ -922,6 +949,7 @@ static void endOfSpace(BattFsSuper *disk)
 	disk->erase(disk, 3);
 	fclose(fp);
 
+	ASSERT(disk_open(disk));
 	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_fileopen(disk, &fd1, INODE, MODE));
@@ -954,6 +982,7 @@ static void multipleFilesRW(BattFsSuper *disk)
 	unsigned int MODE = BATTFS_CREATE;
 	uint32_t buf[FILE_SIZE / (4 * N_FILES * sizeof(uint32_t))];
 
+	ASSERT(disk_open(disk));
 	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	for (inode_t i = 0; i < N_FILES; i++)
@@ -992,6 +1021,7 @@ static void multipleFilesRW(BattFsSuper *disk)
 	ASSERT(battfs_fsck(disk));
 	ASSERT(battfs_umount(disk));
 
+	ASSERT(disk_open(disk));
 	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 
@@ -1025,16 +1055,6 @@ static void multipleFilesRW(BattFsSuper *disk)
 int battfs_testRun(void)
 {
 	BattFsSuper disk;
-
-	disk.page_size = PAGE_SIZE;
-	disk.open = disk_open;
-	disk.read = disk_page_read;
-	disk.load = disk_page_load;
-	disk.bufferWrite = disk_buffer_write;
-	disk.bufferRead = disk_buffer_read;
-	disk.save = disk_page_save;
-	disk.erase = disk_page_erase;
-	disk.close = disk_close;
 
 	diskNew(&disk);
 	disk1File(&disk);
