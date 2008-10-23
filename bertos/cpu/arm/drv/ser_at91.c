@@ -258,12 +258,6 @@ struct ArmSerial
 	volatile bool sending;
 };
 
-
-
-#if CPU_ARM_AT91SAM7X128 || CPU_ARM_AT91SAM7X256
-struct Serial *ser_spi1 = &ser_handles[SER_SPI1];
-#endif
-
 static void uart0_irq_dispatcher(void);
 static void uart1_irq_dispatcher(void);
 static void spi0_irq_handler(void);
@@ -611,10 +605,10 @@ static void spi1_starttx(struct SerialHardware *_hw)
 	IRQ_SAVE_DISABLE(flags);
 
 	/* Send data only if the SPI is not already transmitting */
-	if (!hw->sending && !fifo_isempty(&ser_spi1->txfifo))
+	if (!hw->sending && !fifo_isempty(&ser_handles[SER_SPI1]->txfifo))
 	{
 		hw->sending = true;
-		SPI1_TDR = fifo_pop(&ser_spi1->txfifo);
+		SPI1_TDR = fifo_pop(&ser_handles[SER_SPI1]->txfifo);
 	}
 
 	IRQ_RESTORE(flags);
@@ -920,17 +914,17 @@ static void spi1_irq_handler(void)
 
 	char c = SPI1_RDR;
 	/* Read incoming byte. */
-	if (!fifo_isfull(&ser_spi1->rxfifo))
-		fifo_push(&ser_spi1->rxfifo, c);
+	if (!fifo_isfull(&ser_handles[SER_SPI1]->rxfifo))
+		fifo_push(&ser_handles[SER_SPI1]->rxfifo, c);
 	/*
 	 * FIXME
 	else
-		ser_spi1->status |= SERRF_RXFIFOOVERRUN;
+		ser_handles[SER_SPI1]->status |= SERRF_RXFIFOOVERRUN;
 	*/
 
 	/* Send */
-	if (!fifo_isempty(&ser_spi1->txfifo))
-		SPI1_TDR = fifo_pop(&ser_spi1->txfifo);
+	if (!fifo_isempty(&ser_handles[SER_SPI1]->txfifo))
+		SPI1_TDR = fifo_pop(&ser_handles[SER_SPI1]->txfifo);
 	else
 		UARTDescs[SER_SPI1].sending = false;
 
