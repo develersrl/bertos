@@ -118,7 +118,6 @@ static bool disk_close(struct BattFsSuper *d)
 
 static bool disk_open(struct BattFsSuper *d)
 {
-	d->page_size = PAGE_SIZE;
 	d->read = disk_page_read;
 	d->load = disk_page_load;
 	d->bufferWrite = disk_buffer_write;
