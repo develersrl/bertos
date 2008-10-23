@@ -79,7 +79,7 @@
 #define DATAFLASH_MEM_MODEL            DFT_AT45DB642D
 
 // Function to set CS, this is typically implement in hw/hw_dataflash.{c, h}
-#define DATAFLASH_FUNC_CS_SET     &dataflash_hw_setCS
+#define DATAFLASH_FUNC_CS_SET      dataflash_hw_setCS
 
 // Function to reset memery, this is typically implement in hw/hw_dataflash.{c, h}
 #define DATAFLASH_FUNC_RESET                     NULL
@@ -205,28 +205,27 @@ int dataflash_testTearDown(void)
 #if 0
 int main(void)
 {
-        IRQ_ENABLE;
+	IRQ_ENABLE;
 	kdbg_init();
 
 	#if CONFIG_KERN
-                proc_init();
-        #endif
+	proc_init();
+    #endif
 
-        if (!dataflash_testSetUp())
-        {
-                LOG_INFO("DATAFLASH setup..ok\n");
-        }
-        else
-        {
-                LOG_ERR("DATAFLASH setup..fail!\n");
-                return EOF;
-        }
+	if (!dataflash_testSetUp())
+	{
+			LOG_INFO("DATAFLASH setup..ok\n");
+	}
+	else
+	{
+			LOG_ERR("DATAFLASH setup..fail!\n");
+			return EOF;
+	}
 
-		dataflash_testRun();
+	dataflash_testRun();
 
-        for(;;)
-        {
-        }
-
+	for(;;)
+	{
+	}
 }
 #endif
