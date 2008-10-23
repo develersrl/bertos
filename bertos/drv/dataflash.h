@@ -44,6 +44,7 @@
 #include <cfg/compiler.h>
 
 #include <kern/kfile.h>
+#include <fs/battfs.h>
 
 /**
  * Type definitions for dflash memory.
@@ -182,6 +183,7 @@ typedef struct DataflashInfo
 
 
 bool dataflash_init(DataFlash *fd, KFile *ch, DataflashType type, dataflash_setCS_t *setCS, dataflash_setReset_t *setReset);
+bool dataflash_diskInit(struct BattFsSuper *d, DataFlash *fd, pgcnt_t *page_array);
 
 /**
  * To test data falsh drive you could use

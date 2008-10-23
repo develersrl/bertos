@@ -277,6 +277,8 @@ static void dataflash_loadPage(DataFlash *fd, dataflash_page_t page_addr)
 	dataflash_cmd(fd, page_addr, 0x00, DFO_MOV_MEM_TO_BUFF1);
 }
 
+/* Battfs disk interface section */
+
 static size_t dataflash_disk_page_read(struct BattFsSuper *d, pgcnt_t page, pgaddr_t addr, void *buf, size_t len)
 {
 	DataFlash *fd = DATAFLASH_CAST((KFile *)d->disk_ctx);
@@ -336,6 +338,35 @@ static bool dataflash_disk_page_erase(struct BattFsSuper *d, pgcnt_t page)
 	return true;
 }
 
+static int dataflash_close(struct KFile *_fd);
+
+static bool dataflash_disk_close(struct BattFsSuper *d)
+{
+	DataFlash *fd = DATAFLASH_CAST((KFile *)d->disk_ctx);
+	return dataflash_close(&fd->fd) == 0;
+}
+
+bool dataflash_diskInit(struct BattFsSuper *d, DataFlash *fd, pgcnt_t *page_array)
+{
+	ASSERT(d);
+	ASSERT(fd);
+	d->read = dataflash_disk_page_read;
+	d->load = dataflash_disk_page_load;
+	d->bufferWrite = dataflash_disk_buffer_write;
+	d->bufferRead = dataflash_disk_buffer_read;
+	d->save = dataflash_disk_page_save;
+	d->erase = dataflash_disk_page_erase;
+	d->close = dataflash_disk_close;
+	d->disk_ctx = fd;
+	d->page_size = mem_info[fd->dev].page_size;
+	d->page_count = mem_info[fd->dev].page_cnt;
+	ASSERT(page_array);
+	d->page_array = page_array;
+	return d->page_array && fd;
+}
+
+/* Kfile interface section */
+
 /**
  * Flush select page (stored in buffer) in data flash main memory page.
  */
@@ -353,7 +384,6 @@ static int dataflash_flush(KFile *_fd)
 	return 0;
 }
 
-/* Kfile interface section */
 
 /**
  * Close file \a fd.
