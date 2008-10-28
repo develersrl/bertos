@@ -35,10 +35,10 @@ MAKEFILE_TEST_DIR="."
 TEST_DIR="test"
 
 #Copy BeRTOS sources
-cp -a bertos/ bertos.saved/
+cp -R bertos/ bertos.saved/ || exit 1
 
 #Strip away TODOs and FIXME
-find bertos/ -name "*.[ch]"|xargs perl -p -i -e "s/^\s*#warning\s*(TODO|FIXME).*//g;"
+find bertos/ -name "*.[ch]" | xargs perl -p -i -e 's/^\s*#warning\s*(TODO|FIXME).*//g;'
 
 
 #Cpu target that we want to test
