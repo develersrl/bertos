@@ -33,12 +33,15 @@
 #Makefile test directory
 MAKEFILE_TEST_DIR="."
 TEST_DIR="test"
+BERTOS_DIR="bertos/"
+BERTOS_DIR_BAK="bertos.saved"
 
 #Copy BeRTOS sources
-cp -R bertos/ bertos.saved/ || exit 1
+printf "Starting nightlytest..\n"
+cp -R $BERTOS_DIR $BERTOS_DIR_BAK || exit 1
 
 #Strip away TODOs and FIXME
-find bertos/ -name "*.[ch]" | xargs perl -p -i -e 's/^\s*#warning\s*(TODO|FIXME).*//g;'
+find $BERTOS_DIR -name "*.[ch]" | xargs perl -p -i -e 's/^\s*#warning\s*(TODO|FIXME).*//g;'
 
 
 #Cpu target that we want to test
@@ -46,7 +49,7 @@ TRG="avr arm"
 
 for i in $TRG ;
 do
-		${TEST_DIR}/gen_mk_src.sh $i
+	${TEST_DIR}/gen_mk_src.sh $i
 done
 
 #Clean and launch make on all
@@ -54,5 +57,14 @@ make -f ${MAKEFILE_TEST_DIR}/Makefile.test clean
 make -f ${MAKEFILE_TEST_DIR}/Makefile.test
 
 #Restore original sources
-rm -rf bertos/
-mv bertos.saved/ bertos/
+if [ -d $BERTOS_DIR_BAK ] ; then
+	printf "Exiting from nightly..\n"
+	rm -rf $BERTOS_DIR
+	mv $BERTOS_DIR_BAK $BERTOS_DIR
+else
+	printf "Unable to restore backup copy\n"
+	exit 1
+fi
+
+
+
