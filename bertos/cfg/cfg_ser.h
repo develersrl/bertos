@@ -50,7 +50,7 @@
 #define CONFIG_SER_BAUDRATE  115200
 
 /// Spi settings
-#define CONFIG_SPI_PORT      SER_SPI0
+#define CONFIG_SPI_PORT      0
 #define CONFIG_SPI_BAUDRATE  5000000UL
 
 
