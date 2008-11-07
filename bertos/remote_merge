@@ -5,6 +5,7 @@ if [ $# -lt 2 ] ; then
 	printf "\nMerge remote url commits into local BeRTOS svn repository.\n"
 	printf "Usage: $0 <REMOTE_URL> <REMOTE_START_REV> [<REMOTE_END_REV>]\n"
 	printf "If remote end revision is not supplied HEAD will be used.\n"
+	exit 1
 fi
 
 
@@ -14,6 +15,13 @@ if [ z"$3" = z ] ; then
 	END_REV=HEAD
 else
 	END_REV="$3"
+fi
+
+#Check for local uncommitted modifications
+STATUS=`svn status -q`
+if [[ z"$STATUS" != z && "${STATUS:0:1}" != $'\n' ]] ; then
+	printf "Project has local modifications, it must be clean\n"
+	exit 1
 fi
 
 #Get list of revisions to merge.
