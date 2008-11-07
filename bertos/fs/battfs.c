@@ -875,7 +875,7 @@ static bool findFile(BattFsSuper *disk, inode_t inode, pgcnt_t *last)
 		else if (hdr.fcs == fcs && hdr.inode < inode)
 			first = page + 1;
 		else
-			*last = page + 1;
+			*last = page;
 	}
 	LOG_INFO("Not found: last %d\n", *last);
 	return false;
