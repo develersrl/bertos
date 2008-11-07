@@ -20,9 +20,9 @@ triface_lfuse = 0xff
 triface_efuse = 0xff
 triface_lock = 0x2f
 triface_CSRC = \
-	app/triface/triface.c \
-	app/triface/protocol.c \
-	app/triface/hw/hw_adc.c \
+	examples/triface/triface.c \
+	examples/triface/protocol.c \
+	examples/triface/hw/hw_adc.c \
 	bertos/drv/timer.c \
 	bertos/drv/ser.c \
 	bertos/drv/buzzer.c \
@@ -41,7 +41,7 @@ triface_CSRC = \
 triface_PCSRC += bertos/mware/formatwr.c
 
 
-triface_CFLAGS = -O2 -D'ARCH=(ARCH_TRIFACE)' -fno-strict-aliasing -Iapp/triface -Ibertos/cpu/avr
+triface_CFLAGS = -O2 -D'ARCH=(ARCH_TRIFACE)' -fno-strict-aliasing -Iexamples/triface -Ibertos/cpu/avr
 triface_LDFLAGS = -Wl
 
 triface_MCU = atmega64
@@ -55,7 +55,7 @@ TRG += boot
 
 boot_MCU = atmega64
 boot_CSRC = \
-	app/triface/boot/main.c \
+	examples/triface/boot/main.c \
 	bertos/net/xmodem.c \
 	bertos/drv/ser.c \
 	bertos/cpu/avr/drv/ser_avr.c \
@@ -66,7 +66,7 @@ boot_CSRC = \
 	bertos/kern/kfile.c \
 	#
 boot_CROSS = avr-
-boot_CPPFLAGS = -D'ARCH=(ARCH_TRIFACE|ARCH_BOOT)' -Iapp/triface/boot -Ibertos/cpu/avr
+boot_CPPFLAGS = -D'ARCH=(ARCH_TRIFACE|ARCH_BOOT)' -Iexamples/triface/boot -Ibertos/cpu/avr
 boot_CFLAGS = -Os -mcall-prologues
-boot_LDSCRIPT = app/triface/boot/boot.ld
+boot_LDSCRIPT = examples/triface/boot/boot.ld
 boot_LDFLAGS = -Wl,--relax

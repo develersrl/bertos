@@ -21,13 +21,13 @@ randpool_demo_DEBUG = 0
 TRG += randpool_demo
 
 randpool_demo_CSRC = \
-	app/randpool/randpool_demo.c \
+	examples/randpool/randpool_demo.c \
 	algos/randpool.c \
 	algos/md2.c \
 	drv/timer.c \
 	os/hptime.c 
 
-randpool_demo_CFLAGS = -O0 -D'ARCH=0' -Iapp/randpool/ -Iapp/randpool/hw
+randpool_demo_CFLAGS = -O0 -D'ARCH=0' -Iexamples/randpool/ -Iexamples/randpool/hw
 
 # Debug stuff
 ifeq ($(randpool_demo_DEBUG),1)

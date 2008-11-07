@@ -5,6 +5,6 @@ V:= 0
 default: all
 
 include bertos/config.mk
-include ./app/test/avrtest.mk
-include ./app/test/armtest.mk
+include ./examples/test/avrtest.mk
+include ./examples/test/armtest.mk
 include bertos/rules.mk

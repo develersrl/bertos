@@ -28,7 +28,7 @@ demo_CXXSRC = \
 	bertos/drv/lcd_gfx_qt.cpp
 
 demo_CSRC = \
-	app/demo/demo.c \
+	examples/demo/demo.c \
 	bertos/os/hptime.c \
 	bertos/gfx/bitmap.c \
 	bertos/gfx/line.c \
@@ -76,8 +76,8 @@ bertos/emul/timer_qt_moc.cpp: bertos/emul/timer_qt.c
 	$(QT_MOC) -o $@ $<
 
 
-demo_CFLAGS = -Iapp/demo $(EMUL_CFLAGS)
-demo_CXXFLAGS = -Iapp/demo $(EMUL_CFLAGS)
+demo_CFLAGS = -Iexamples/demo $(EMUL_CFLAGS)
+demo_CXXFLAGS = -Iexamples/demo $(EMUL_CFLAGS)
 demo_LDFLAGS = $(EMUL_LDFLAGS)
 
 # Debug stuff

@@ -19,14 +19,14 @@ TRG += avrtest
 avrtest_MCU = atmega64
 
 #include avr c and asm sources
-include app/test/avr_src.mk
+include examples/test/avr_src.mk
 
-avrtest_CSRC = $(avr_CSRC) app/test/empty_main.c
+avrtest_CSRC = $(avr_CSRC) examples/test/empty_main.c
 
 avrtest_CPPASRC = $(avr_ASRC)
 
 avrtest_PCSRC += bertos/mware/formatwr.c
 
 avrtest_CROSS = avr-
-avrtest_CPPFLAGS = -D'ARCH=ARCH_NIGHTTEST' -Iapp/test -Ibertos/cpu/avr 
+avrtest_CPPFLAGS = -D'ARCH=ARCH_NIGHTTEST' -Iexamples/test -Ibertos/cpu/avr 
 avrtest_CFLAGS = -Os -mcall-prologues -fno-strict-aliasing
