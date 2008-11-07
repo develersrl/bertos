@@ -39,14 +39,14 @@
  */
 
 #include "battfs.h"
-
+#include "cfg/cfg_battfs.h"
 #include <cfg/debug.h>
 #include <cfg/macros.h> /* MIN, MAX */
 #include <cfg/test.h>
 #include <cpu/byteorder.h> /* cpu_to_xx */
 
-#define LOG_LEVEL       LOG_LVL_INFO
-#define LOG_FORMAT      LOG_FMT_VERBOSE
+#define LOG_LEVEL       BATTFS_LOG_LEVEL
+#define LOG_FORMAT      BATTFS_LOG_FORMAT
 #include <cfg/log.h>
 
 #include <string.h> /* memset, memmove */
@@ -490,10 +490,14 @@ bool battfs_mount(struct BattFsSuper *disk)
 	#if LOG_LEVEL >= LOG_LVL_INFO
 		dumpPageArray(disk);
 	#endif
-	#warning TODO: shuffle free blocks
-	//#if LOG_LEVEL > LOG_LVL_INFO
-	//	dumpPageArray(disk);
-	//#endif
+	#if CONFIG_BATTFS_SHUFFLE_FREE_PAGES
+		SHUFFLE(&disk->page_array[disk->free_page_start], disk->page_count - disk->free_page_start);
+
+		LOG_INFO("Page array after shuffle:\n");
+		#if LOG_LEVEL >= LOG_LVL_INFO
+			dumpPageArray(disk);
+		#endif
+	#endif
 	/* Init list for opened files. */
 	LIST_INIT(&disk->file_opened_list);
 	return true;
