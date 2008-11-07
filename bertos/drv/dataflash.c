@@ -297,7 +297,7 @@ static size_t dataflash_disk_buffer_write(struct BattFsSuper *d, pgaddr_t addr, 
 {
 	DataFlash *fd = DATAFLASH_CAST((KFile *)d->disk_ctx);
 	dataflash_writeBlock(fd, addr, buf, len);
-	return true;
+	return len;
 }
 
 static size_t dataflash_disk_buffer_read(struct BattFsSuper *d, pgaddr_t addr, void *buf, size_t len)
