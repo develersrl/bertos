@@ -232,7 +232,7 @@ INLINE bool proc_allowed(void)
 		 */
 		#define CONFIG_KERN_MINSTACKSIZE  \
 		    (CPU_SAVED_REGS_CNT * 2 * sizeof(cpu_stack_t) \
-		    + 32 * sizeof(int))
+		    + 48 * sizeof(int))
 	#endif
 #endif
 
