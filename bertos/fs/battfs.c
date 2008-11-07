@@ -42,6 +42,7 @@
 
 #include <cfg/debug.h>
 #include <cfg/macros.h> /* MIN, MAX */
+#include <cfg/test.h>
 #include <cpu/byteorder.h> /* cpu_to_xx */
 
 #define LOG_LEVEL       LOG_LVL_INFO
@@ -279,7 +280,7 @@ static bool countDiskFilePages(struct BattFsSuper *disk, pgoff_t *filelen_table)
 			disk->free_page_start++;
 		}
 	}
-	LOG_INFO("free_bytes:%d, free_page_start:%d\n", disk->free_bytes, disk->free_page_start);
+	LOG_INFO("free_bytes:%ld, free_page_start:%d\n", (long)disk->free_bytes, disk->free_page_start);
 
 	return true;
 }
@@ -382,7 +383,7 @@ static bool fillPageArray(struct BattFsSuper *disk, pgoff_t *filelen_table)
 		{
 			/* Invalid page, keep as free */
 			ASSERT(disk->page_array[curr_free_page] == PAGE_UNSET_SENTINEL);
-			LOG_INFO("Page %d invalid, keeping as free\n", page);
+			//LOG_INFO("Page %d invalid, keeping as free\n", page);
 			disk->page_array[curr_free_page++] = page;
 		}
 	}
@@ -655,7 +656,7 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 
 		/* Fill unused space of first page with 0s */
 		uint8_t dummy = 0;
-		pgaddr_t zero_bytes = MIN(fd->seek_pos - fd->size, disk->data_size - curr_hdr.fill);
+		pgaddr_t zero_bytes = MIN(fd->seek_pos - fd->size, (kfile_off_t)(disk->data_size - curr_hdr.fill));
 		while (zero_bytes--)
 		{
 			if (disk->bufferWrite(disk, curr_hdr.fill, &dummy, 1) != 1)
@@ -811,7 +812,7 @@ static size_t battfs_read(struct KFile *fd, void *_buf, size_t size)
 		return total_read;
 	}
 
-	size = MIN((kfile_off_t)size, MAX(fd->size - fd->seek_pos, 0));
+	size = MIN((kfile_off_t)size, MAX(fd->size - fd->seek_pos, (kfile_off_t)0));
 
 	while (size)
 	{
@@ -874,7 +875,7 @@ static bool findFile(BattFsSuper *disk, inode_t inode, pgcnt_t *last)
 		else if (hdr.fcs == fcs && hdr.inode < inode)
 			first = page + 1;
 		else
-			*last = page - 1;
+			*last = page + 1;
 	}
 	LOG_INFO("Not found: last %d\n", *last);
 	return false;
