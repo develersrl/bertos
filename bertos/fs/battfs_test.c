@@ -1051,6 +1051,61 @@ static void multipleFilesRW(BattFsSuper *disk)
 }
 
 
+static void openAllFiles(BattFsSuper *disk)
+{
+	TRACEMSG("22: try to open a lot of files\n");
+
+	FILE *fpt = fopen(test_filename, "w+");
+
+	for (int i = 0; i < FILE_SIZE; i++)
+		fputc(0xff, fpt);
+	fclose(fpt);
+
+	BattFs fd[BATTFS_MAX_FILES];
+	unsigned int MODE = BATTFS_CREATE;
+
+	ASSERT(disk_open(disk));
+	ASSERT(battfs_mount(disk));
+	ASSERT(battfs_fsck(disk));
+	for (unsigned i = 0; i < countof(fd); i++)
+	{
+		kprintf("apertura %d\n", i);
+		ASSERT(battfs_fileopen(disk, &fd[i], i, MODE));
+	}
+
+	ASSERT(battfs_fsck(disk));
+
+	for (unsigned i = 0; i < countof(fd); i++)
+	{
+		ASSERT(kfile_close(&fd[i].fd) == 0);
+		ASSERT(kfile_error(&fd[i].fd) == 0);
+	}
+
+	ASSERT(battfs_fsck(disk));
+	ASSERT(battfs_umount(disk));
+
+	ASSERT(disk_open(disk));
+	ASSERT(battfs_mount(disk));
+	ASSERT(battfs_fsck(disk));
+
+
+	for (unsigned i = 0; i < countof(fd); i++)
+		ASSERT(battfs_fileopen(disk, &fd[i], i, MODE));
+
+	ASSERT(battfs_fsck(disk));
+
+	for (unsigned i = 0; i < countof(fd); i++)
+	{
+		ASSERT(kfile_close(&fd[i].fd) == 0);
+		ASSERT(kfile_error(&fd[i].fd) == 0);
+	}
+
+	ASSERT(battfs_fsck(disk));
+	ASSERT(battfs_umount(disk));
+	TRACEMSG("22: passed\n");
+}
+
+
 int battfs_testRun(void)
 {
 	BattFsSuper disk;
@@ -1074,6 +1129,7 @@ int battfs_testRun(void)
 	writeEOF(&disk);
 	endOfSpace(&disk);
 	multipleFilesRW(&disk);
+	openAllFiles(&disk);
 
 	kprintf("All tests passed!\n");
 
