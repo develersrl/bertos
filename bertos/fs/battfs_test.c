@@ -167,8 +167,9 @@ static void testCheck(BattFsSuper *disk, pgcnt_t *reference)
 			exit(2);
 		}
 	}
+
 	ASSERT(battfs_fsck(disk));
-	battfs_umount(disk);
+	ASSERT(battfs_umount(disk));
 }
 
 static void diskNew(BattFsSuper *disk)
