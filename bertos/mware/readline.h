@@ -53,7 +53,7 @@
 
 #include <string.h>
 
-#define HISTORY_SIZE       1024
+#define HISTORY_SIZE 32
 
 typedef int (*getc_hook)(void* user_data);
 typedef void (*putc_hook)(char ch, void* user_data);
