@@ -42,7 +42,7 @@
  * aim at fast performances (line editing does not require to be blazingly fast).
  *
  * \li The first character in the history is always \c \\0, and it is used as a guard. By 'wasting' it
- * in this way, the code actually gets much simpler in that we remove many checks when moving 
+ * in this way, the code actually gets much simpler in that we remove many checks when moving
  * backward (\c i>0 and similar).
  *
  * \li While editing, the current index points to the position of the buffer which contains the
@@ -399,9 +399,6 @@ const char* rl_readline(struct RLContext* ctx)
 
 		if (c == '\r' || c == '\n')
 		{
-			if (ctx->prompt)
-				rl_puts(ctx, ctx->prompt);
-
 			// Terminate line
 			insert_chars(ctx, &ctx->line_pos, NULL, 0);
 			rl_puts(ctx, "\r\n");
