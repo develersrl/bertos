@@ -1069,10 +1069,7 @@ static void openAllFiles(BattFsSuper *disk)
 	ASSERT(battfs_mount(disk));
 	ASSERT(battfs_fsck(disk));
 	for (unsigned i = 0; i < countof(fd); i++)
-	{
-		kprintf("apertura %d\n", i);
 		ASSERT(battfs_fileopen(disk, &fd[i], i, MODE));
-	}
 
 	ASSERT(battfs_fsck(disk));
 
