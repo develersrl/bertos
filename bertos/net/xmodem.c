@@ -69,9 +69,6 @@
 #define XM_CAN  0x18  /**< CANcel transmission */
 /*\}*/
 
-#define XM_MAXRETRIES     15  /**< Max retries before giving up */
-#define XM_MAXCRCRETRIES   7  /**< Max retries before switching to BCC */
-
 #if CONFIG_XMODEM_1KCRC == 1
 	#define XM_BUFSIZE       1024  /**< 1024 bytes of block buffer */
 #else
@@ -129,7 +126,7 @@ bool xmodem_recv(struct Serial *port, KFile *fd)
 			ser_resync(port, 200);
 			retries++;
 
-			if (retries >= XM_MAXRETRIES)
+			if (retries >= CONFIG_XMODEM_MAXRETRIES)
 			{
 				kfile_putc(XM_CAN, &port->fd);
 				kfile_putc(XM_CAN, &port->fd);
@@ -140,7 +137,7 @@ bool xmodem_recv(struct Serial *port, KFile *fd)
 			/* Transmission start? */
 			if (blocknr == 0)
 			{
-				if (retries < XM_MAXCRCRETRIES)
+				if (retries < CONFIG_XMODEM_MAXCRCRETRIES)
 				{
 					XMODEM_PROGRESS("Request Tx (CRC)\n");
 					kfile_putc(XM_C, &port->fd);
@@ -273,7 +270,7 @@ bool xmodem_recv(struct Serial *port, KFile *fd)
 				else
 				{
 					/* User callback failed: abort transfer immediately */
-					retries = XM_MAXRETRIES;
+					retries = CONFIG_XMODEM_MAXRETRIES;
 					purge = true;
 				}
 			}
@@ -374,7 +371,7 @@ bool xmodem_send(struct Serial *port, KFile *fd)
 				kfile_clearerr(&port->fd);
 				retries++;
 				XMODEM_PROGRESS("Retries %d\n", retries);
-				if (retries <= XM_MAXRETRIES)
+				if (retries <= CONFIG_XMODEM_MAXRETRIES)
 					break;
 				/* falling through! */
 
