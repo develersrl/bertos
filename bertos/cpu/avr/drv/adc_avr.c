@@ -34,7 +34,7 @@
  * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  *
- * This module is automatically included so no need to include 
+ * This module is automatically included so no need to include
  * in test list.
  * notest: avr
  */
@@ -146,8 +146,10 @@ INLINE void adc_hw_init(void)
 		#error Unsupported ADC ref value.
 	#endif
 
+	#if defined(ADCSRB)
 	/* Disable Auto trigger source: ADC in Free running mode. */
 	ADCSRB = 0;
+	#endif
 
 	/* Enable ADC, disable autotrigger mode. */
 	ADCSRA = BV(ADEN);
