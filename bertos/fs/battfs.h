@@ -108,7 +108,7 @@ struct BattFsSuper;
 /**
  * Sentinel used to keep trace of unset pages in disk->page_array.
  */
-#define PAGE_UNSET_SENTINEL ((1 << (CPU_BITS_PER_CHAR * sizeof(pgcnt_t))) - 1)
+#define PAGE_UNSET_SENTINEL ((pgcnt_t)((1L << (CPU_BITS_PER_CHAR * sizeof(pgcnt_t))) - 1))
 
 /**
  * Type interface for disk page read function.
