@@ -39,7 +39,7 @@
 
 #include "twi_at91.h"
 
-#include "cfg/cfg_twi.h"
+#include "cfg/cfg_i2c.h"
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
 #include <cfg/macros.h>
@@ -254,7 +254,7 @@ void twi_init(void)
 	 * Only CLDIV is computed since CLDIV = CHDIV (50% duty cycle)
 	 */
 	uint16_t cldiv, ckdiv = 0;
-	while ((cldiv = ((CLOCK_FREQ / (2 * CONFIG_TWI_FREQ)) - 3) / (1 << ckdiv)) > 255)
+	while ((cldiv = ((CLOCK_FREQ / (2 * CONFIG_I2C_FREQ)) - 3) / (1 << ckdiv)) > 255)
 		ckdiv++;
 
 	/* Atmel errata states that ckdiv *must* be less than 5 for unknown reason */
