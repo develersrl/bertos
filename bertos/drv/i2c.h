@@ -45,26 +45,48 @@
 
 /**
  * I2C Backends.
+ * Sometimes your cpu does not have a builtin
+ * i2c driver or you don't want, for some reason, to
+ * use that.
+ * You can choose, at compile time, which backend to use.
  * \{
  */
 #define I2C_BACKEND_BUILTIN 0 ///< Uses cpu builtin i2c driver
 #define I2C_BACKEND_BITBANG 1 ///< Uses emulated bitbang driver
 /*\}*/
 
+
+/**
+ * I2c builtin prototypes.
+ * Do NOT use these function directly, instead,
+ * you can call the ones named without "_builtin_"
+ * and specify in cfg_i2c.h ( \see CONFIG_I2C_BACKEND)
+ * that you want the builtin backend.
+ * \{
+ */
 void i2c_builtin_init(void);
 bool i2c_builtin_start_w(uint8_t id);
 bool i2c_builtin_start_r(uint8_t id);
 void i2c_builtin_stop(void);
 bool i2c_builtin_put(uint8_t _data);
 int i2c_builtin_get(bool ack);
+/*\}*/
 
+/**
+ * I2c bitbang prototypes.
+ * Same thing here: do NOT use these function directly, instead,
+ * you can call the ones named without "_bitbang_"
+ * and specify in cfg_i2c.h ( \see CONFIG_I2C_BACKEND)
+ * that you want the bitbang backend.
+ * \{
+ */
 void i2c_bitbang_init(void);
 bool i2c_bitbang_start_w(uint8_t id);
 bool i2c_bitbang_start_r(uint8_t id);
 void i2c_bitbang_stop(void);
 bool i2c_bitbang_put(uint8_t _data);
 int i2c_bitbang_get(bool ack);
-
+/*\}*/
 
 #if CONFIG_I2C_BACKEND == I2C_BACKEND_BUILTIN
 	#define i2c_init    i2c_builtin_init

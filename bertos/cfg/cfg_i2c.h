@@ -54,6 +54,7 @@
  * I2C driver can have 2 backends:
  * I2C_BACKEND_BUILTIN: Use (if present) the builtin i2c hardware.
  * I2C_BACKEND_BITBANG: Use the emulated bitbang driver.
+ * \see drv/i2c.h for more information.
  */
 #define CONFIG_I2C_BACKEND I2C_BACKEND_BUILTIN
 
