@@ -522,6 +522,9 @@ bool battfs_fsck(struct BattFsSuper *disk)
 
 	bool start = true;
 
+	/* Uneeded, the first time will be overwritten but useful to silence
+	 * the warning for uninitialized value */
+	FSCHECK(readHdr(disk, 0, &prev_hdr));
 	for (pgcnt_t page = 0; page < disk->page_count; page++)
 	{
 		FSCHECK(readHdr(disk, disk->page_array[page], &hdr));
