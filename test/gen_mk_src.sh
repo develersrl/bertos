@@ -37,7 +37,7 @@ BERTOS_DIR_RE="\\.\\/bertos"
 TEST_SCRIPT_DIR="test"
 
 #Test directory, where are the test makefile
-TEST_APP_DIR="app/test/"
+TEST_APP_DIR="examples/test/"
 
 if [ $# \< 1 ] ; then
 	printf "You must specify a cpu target!\n\n"

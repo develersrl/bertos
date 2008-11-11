@@ -38,7 +38,7 @@ CPU_DIR="${BERTOS_DIR}/cpu"
 #Directory to exclude
 OS_DIR="${BERTOS_DIR}/os"
 EMUL_DIR="${BERTOS_DIR}/emul"
-APP_DIR="./app"
+APP_DIR="./examples"
 
 if [ $# \< 2 ] ; then
 	printf "You must specify a cpu target, and source file type!\n"
