@@ -44,10 +44,10 @@
 
 #warning TODO:This is an example implementation, you must implement it!
 
-#define SDA_HI  /* Implement me:Set SDA High by setting SDA pin as input */
-#define SDA_LO  /* Implement me:Set SDA Low by setting SDA pin as open collector output */
-#define SCL_HI  /* Implement me:Set SCL High by setting SCL pin as input */
-#define SCL_LO  /* Implement me:Set SCL Low by setting SCL pin as open collector output */
+#define SDA_HI  do { /* Implement me:Set SDA High by setting SDA pin as input */ } while (0)
+#define SDA_LO  do { /* Implement me:Set SDA Low by setting SDA pin as open collector output */ } while (0)
+#define SCL_HI  do { /* Implement me:Set SCL High by setting SCL pin as input */ } while (0)
+#define SCL_LO  do { /* Implement me:Set SCL Low by setting SCL pin as open collector output */ } while (0)
 
 
 #define SCL_IN       (true) /* Implement me: read SDA pin state */
@@ -56,11 +56,11 @@
 /**
  * This macro should set SDA and SCL lines as input.
  */
-#define I2C_BITBANG_HW_INIT /* Implement me! */
+#define I2C_BITBANG_HW_INIT do { /* Implement me! */ } while (0)
 
 /**
  * Half bit delay routine used to generate the correct timings.
  */
-#define I2C_HALFBIT_DELAY() /* Implement me! */
+#define I2C_HALFBIT_DELAY() do { /* Implement me! */ } while (0)
 
 #endif /* HW_I2C_BITBANG_H */
