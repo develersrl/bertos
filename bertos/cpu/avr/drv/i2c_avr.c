@@ -67,7 +67,7 @@
  *
  * \return true on success, false otherwise.
  */
-static bool i2c_start(void)
+static bool i2c_builtin_start(void)
 {
 	TWCR = BV(TWINT) | BV(TWSTA) | BV(TWEN);
 	WAIT_TWI_READY;
@@ -87,7 +87,7 @@ static bool i2c_start(void)
  *
  * \return true on success, false otherwise.
  */
-bool i2c_start_w(uint8_t id)
+bool i2c_builtin_start_w(uint8_t id)
 {
 	/*
 	 * Loop on the select write sequence: when the eeprom is busy
@@ -96,7 +96,7 @@ bool i2c_start_w(uint8_t id)
 	 * keep trying until the eeprom responds with an ACK.
 	 */
 	ticks_t start = timer_clock();
-	while (i2c_start())
+	while (i2c_builtin_start())
 	{
 		TWDR = id & ~I2C_READBIT;
 		TWCR = BV(TWINT) | BV(TWEN);
@@ -127,9 +127,9 @@ bool i2c_start_w(uint8_t id)
  *
  * \return true on success, false otherwise.
  */
-bool i2c_start_r(uint8_t id)
+bool i2c_builtin_start_r(uint8_t id)
 {
-	if (i2c_start())
+	if (i2c_builtin_start())
 	{
 		TWDR = id | I2C_READBIT;
 		TWCR = BV(TWINT) | BV(TWEN);
@@ -148,7 +148,7 @@ bool i2c_start_r(uint8_t id)
 /**
  * Send STOP condition.
  */
-void i2c_stop(void)
+void i2c_builtin_stop(void)
 {
         TWCR = BV(TWINT) | BV(TWEN) | BV(TWSTO);
 }
@@ -160,7 +160,7 @@ void i2c_stop(void)
  *
  * \return true on success, false on error.
  */
-bool i2c_put(const uint8_t data)
+bool i2c_builtin_put(const uint8_t data)
 {
 	TWDR = data;
 	TWCR = BV(TWINT) | BV(TWEN);
@@ -181,7 +181,7 @@ bool i2c_put(const uint8_t data)
  *
  * \return the byte read if ok, EOF on errors.
  */
-int i2c_get(bool ack)
+int i2c_builtin_get(bool ack)
 {
 	TWCR = BV(TWINT) | BV(TWEN) | (ack ? BV(TWEA) : 0);
 	WAIT_TWI_READY;
@@ -212,7 +212,7 @@ MOD_DEFINE(i2c);
 /**
  * Initialize TWI module.
  */
-void i2c_init(void)
+void i2c_builtin_init(void)
 {
 	ATOMIC(
 		/*

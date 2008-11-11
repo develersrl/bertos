@@ -51,7 +51,7 @@
 
 #include "hw/hw_i2c_bitbang.h"
 
-INLINE bool i2c_start(void)
+INLINE bool i2c_bitbang_start(void)
 {
 	SDA_HI;
 	SCL_HI;
@@ -62,7 +62,7 @@ INLINE bool i2c_start(void)
 	return !SDA_IN;
 }
 
-void i2c_stop(void)
+void i2c_bitbang_stop(void)
 {
 	SDA_LO;
 	SCL_HI;
@@ -70,7 +70,7 @@ void i2c_stop(void)
 	SDA_HI;
 }
 
-bool i2c_put(uint8_t _data)
+bool i2c_bitbang_put(uint8_t _data)
 {
 	/* Add ACK bit */
 	uint16_t data = (_data << 1) | 1;
@@ -94,7 +94,7 @@ bool i2c_put(uint8_t _data)
 	return ack;
 }
 
-bool i2c_start_w(uint8_t id)
+bool i2c_bitbang_start_w(uint8_t id)
 {
 	id &= ~I2C_READBIT;
 	/*
@@ -104,9 +104,9 @@ bool i2c_start_w(uint8_t id)
 	 * keep trying until the deveice responds with an ACK.
 	 */
 	ticks_t start = timer_clock();
-	while (i2c_start())
+	while (i2c_bitbang_start())
 	{
-		if (i2c_put(id))
+		if (i2c_bitbang_put(id))
 			return true;
 		else if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT))
 		{
@@ -119,12 +119,12 @@ bool i2c_start_w(uint8_t id)
 	return false;
 }
 
-bool i2c_start_r(uint8_t id)
+bool i2c_bitbang_start_r(uint8_t id)
 {
 	id |= I2C_READBIT;
-	if (i2c_start())
+	if (i2c_bitbang_start())
 	{
-		if (i2c_put(id))
+		if (i2c_bitbang_put(id))
 			return true;
 
 		LOG_ERR("NACK on I2c start read\n");
@@ -133,7 +133,7 @@ bool i2c_start_r(uint8_t id)
 	return false;
 }
 
-int i2c_get(bool ack)
+int i2c_bitbang_get(bool ack)
 {
 	uint8_t data = 0;
 	for (uint8_t i = 0x80; i != 0; i >>= 1)
@@ -169,7 +169,7 @@ MOD_DEFINE(i2c);
 /**
  * Initialize i2c module.
  */
-void i2c_init(void)
+void i2c_bitbang_init(void)
 {
 	MOD_CHECK(timer);
 	I2C_BITBANG_HW_INIT;

@@ -38,16 +38,52 @@
 #ifndef DRV_I2C_H
 #define DRV_I2C_H
 
+#include "cfg/cfg_i2c.h"
 #include <cfg/compiler.h>
 
 #define I2C_READBIT BV(0)
 
-void i2c_init(void);
-bool i2c_start_w(uint8_t id);
-bool i2c_start_r(uint8_t id);
-void i2c_stop(void);
-bool i2c_put(uint8_t _data);
-int i2c_get(bool ack);
+/**
+ * I2C Backends.
+ * \{
+ */
+#define I2C_BACKEND_BUILTIN 0 ///< Uses cpu builtin i2c driver
+#define I2C_BACKEND_BITBANG 1 ///< Uses emulated bitbang driver
+/*\}*/
+
+void i2c_builtin_init(void);
+bool i2c_builtin_start_w(uint8_t id);
+bool i2c_builtin_start_r(uint8_t id);
+void i2c_builtin_stop(void);
+bool i2c_builtin_put(uint8_t _data);
+int i2c_builtin_get(bool ack);
+
+void i2c_bitbang_init(void);
+bool i2c_bitbang_start_w(uint8_t id);
+bool i2c_bitbang_start_r(uint8_t id);
+void i2c_bitbang_stop(void);
+bool i2c_bitbang_put(uint8_t _data);
+int i2c_bitbang_get(bool ack);
+
+
+#if CONFIG_I2C_BACKEND == I2C_BACKEND_BUILTIN
+	#define i2c_init    i2c_builtin_init
+	#define i2c_start_w i2c_builtin_start_w
+	#define i2c_start_r i2c_builtin_start_r
+	#define i2c_stop    i2c_builtin_stop
+	#define i2c_put     i2c_builtin_put
+	#define i2c_get     i2c_builtin_get
+#elif CONFIG_I2C_BACKEND == I2C_BACKEND_BITBANG
+	#define i2c_init    i2c_bitbang_init
+	#define i2c_start_w i2c_bitbang_start_w
+	#define i2c_start_r i2c_bitbang_start_r
+	#define i2c_stop    i2c_bitbang_stop
+	#define i2c_put     i2c_bitbang_put
+	#define i2c_get     i2c_bitbang_get
+#else
+	#error Unsupported i2c backend.
+#endif
+
 bool i2c_send(const void *_buf, size_t count);
 bool i2c_recv(void *_buf, size_t count);
 

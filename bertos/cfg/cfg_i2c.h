@@ -50,6 +50,13 @@
  */
 #define CONFIG_I2C_START_TIMEOUT 100
 
+/**
+ * I2C driver can have 2 backends:
+ * I2C_BACKEND_BUILTIN: Use (if present) the builtin i2c hardware.
+ * I2C_BACKEND_BITBANG: Use the emulated bitbang driver.
+ */
+#define CONFIG_I2C_BACKEND I2C_BACKEND_BUILTIN
+
 /// Module logging level definition.
 #define I2C_LOG_LEVEL      LOG_LVL_INFO
 
