@@ -299,7 +299,10 @@ static cpu_stack_t monitor_stack[CONFIG_KERN_MINSTACKSIZE / sizeof(cpu_stack_t)]
 int main(int argc, char *argv[])
 {
 	emul_init(&argc, argv);
-	irq_init();
+
+	#if CONFIG_KERN_PREEMPT
+		irq_init();
+	#endif
 	timer_init();
 	buz_init();
 	kbd_init();
