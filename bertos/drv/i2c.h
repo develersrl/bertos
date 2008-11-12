@@ -48,7 +48,7 @@
  * Sometimes your cpu does not have a builtin
  * i2c driver or you don't want, for some reason, to
  * use that.
- * You can choose, at compile time, which backend to use.
+ * With this you can choose, at compile time, which backend to use.
  * \{
  */
 #define I2C_BACKEND_BUILTIN 0 ///< Uses cpu builtin i2c driver
