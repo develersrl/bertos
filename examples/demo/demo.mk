@@ -54,7 +54,7 @@ demo_CSRC = \
 	bertos/mware/sprintf.c \
 	bertos/kern/idle.c \
 	bertos/kern/irq.c \
-	bertos/kern/preempt.c \
+	bertos/kern/coop.c \
 	bertos/kern/proc.c \
 	bertos/kern/proc_test.c \
 	bertos/kern/sem.c \
@@ -66,7 +66,7 @@ demo_CPPASRC = \
 	bertos/emul/switch.S
 
 # FIXME: maybe this junk should go in emul/emul.mk?
-$(OBJDIR)/demo/bertos/emul/emulwin.o: bertos/emul/emulwin_moc.cpp 
+$(OBJDIR)/demo/bertos/emul/emulwin.o: bertos/emul/emulwin_moc.cpp
 $(OBJDIR)/demo/bertos/drv/lcd_gfx_qt.o: bertos/drv/lcd_gfx_qt_moc.cpp
 $(OBJDIR)/demo/bertos/drv/timer.o: bertos/emul/timer_qt_moc.cpp
 $(OBJDIR)/demo/bertos/emul/emulkbd.o: bertos/emul/emulkbd_moc.cpp
@@ -76,8 +76,8 @@ bertos/emul/timer_qt_moc.cpp: bertos/emul/timer_qt.c
 	$(QT_MOC) -o $@ $<
 
 
-demo_CFLAGS = -Iexamples/demo $(EMUL_CFLAGS)
-demo_CXXFLAGS = -Iexamples/demo $(EMUL_CFLAGS)
+demo_CFLAGS = -O0 -g3 -ggdb -Iexamples/demo $(EMUL_CFLAGS)
+demo_CXXFLAGS = -O0 -g3 -ggdb -Iexamples/demo $(EMUL_CFLAGS)
 demo_LDFLAGS = $(EMUL_LDFLAGS)
 
 # Debug stuff
