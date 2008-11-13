@@ -73,7 +73,7 @@
 	#define KDBG_UART0_BUS_TX    do {} while (0)
 	#endif
 
-	#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA168
+	#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281 || CPU_AVR_ATMEGA168
 		#define UCR UCSR0B
 		#define UDR UDR0
 		#define USR UCSR0A
@@ -232,7 +232,7 @@ INLINE void kdbg_hw_init(void)
 		/* Compute the baud rate */
 		uint16_t period = DIV_ROUND(CLOCK_FREQ / 16UL, CONFIG_KDEBUG_BAUDRATE) - 1;
 
-		#if (CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128)
+		#if (CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281)
 			#if CONFIG_KDEBUG_PORT == 0
 				UBRR0H = (uint8_t)(period>>8);
 				UBRR0L = (uint8_t)period;
