@@ -89,7 +89,7 @@
 INLINE void adc_hw_select_ch(uint8_t ch)
 {
 	/* Set to 0 all mux registers */
-	ADMUX &= ~(BV(MUX3) | BV(MUX3) | BV(MUX2) | BV(MUX1) | BV(MUX0));
+	ADMUX &= ~(BV(MUX4) | BV(MUX3) | BV(MUX2) | BV(MUX1) | BV(MUX0));
 
 	/* Select channel, only first 8 channel modes are supported for now */
 	ADMUX |= (ch & 0x07);
