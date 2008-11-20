@@ -68,21 +68,21 @@ check:
 define build_target
 
 ifneq ($$($(1)_CROSS),)
-#use embedded specific map flags
-$(1)_MAP_FLAGS = $$(MAP_FLAGS_EMB)
-#In embedded we need s19, hex and bin
-$$(OUTDIR)/$(1).tgt : $$(OUTDIR)/$(1).s19 $$(OUTDIR)/$(1).hex $$(OUTDIR)/$(1).bin
+        #use embedded specific map flags
+        $(1)_MAP_FLAGS = $$(MAP_FLAGS_EMB)
+        #In embedded we need s19, hex and bin
+        $$(OUTDIR)/$(1).tgt : $$(OUTDIR)/$(1).s19 $$(OUTDIR)/$(1).hex $$(OUTDIR)/$(1).bin
 else
-#On Darwin architecture the assembly doesn't link correctly if this flag is set.
-ifeq ($(shell uname | grep -c "Darwin"),1)
-LIST_FLAGS := ""
-MAP_FLAGS := ""
-LDFLAGS := ""
-endif
-#use hosted specific map flags
-$(1)_MAP_FLAGS = $$(MAP_FLAGS_HOST)
-#in hosted application we need only executable file.
-$$(OUTDIR)/$(1).tgt : $$(OUTDIR)/$(1)
+        #On Darwin architecture the assembly doesn't link correctly if this flag is set.
+        ifeq ($(shell uname | grep -c "Darwin"),1)
+                LIST_FLAGS := ""
+                MAP_FLAGS := ""
+                LDFLAGS := ""
+        endif
+        #use hosted specific map flags
+        $(1)_MAP_FLAGS = $$(MAP_FLAGS_HOST)
+        #in hosted application we need only executable file.
+        $$(OUTDIR)/$(1).tgt : $$(OUTDIR)/$(1)
 endif
 
 $(1)_LDFLAGS += $$($(1)_MAP_FLAGS)
@@ -91,46 +91,46 @@ $(1)_LDFLAGS += $$($(1)_MAP_FLAGS)
 # but there are different options on how pass
 # it to the compiler.
 ifneq ($$(strip $$($(1)_MCU)),)
-$(1)_MCPU = -mmcu=$$($(1)_MCU)
+        $(1)_MCPU = -mmcu=$$($(1)_MCU)
 endif
 ifneq ($$(strip $$($(1)_CPU)),)
-$(1)_MCPU = -mcpu=$$($(1)_CPU)
+        $(1)_MCPU = -mcpu=$$($(1)_CPU)
 endif
 
 # If a CPU is specified add to 
 # project specific flags.
 ifneq ($$($(1)_MCPU),)
-$(1)_CFLAGS    += $$($(1)_MCPU)
-$(1)_CXXFLAGS  += $$($(1)_MCPU)
-$(1)_ASFLAGS   += $$($(1)_MCPU)
-$(1)_CPPAFLAGS += $$($(1)_MCPU)
-$(1)_LDFLAGS   += $$($(1)_MCPU)
+        $(1)_CFLAGS    += $$($(1)_MCPU)
+        $(1)_CXXFLAGS  += $$($(1)_MCPU)
+        $(1)_ASFLAGS   += $$($(1)_MCPU)
+        $(1)_CPPAFLAGS += $$($(1)_MCPU)
+        $(1)_LDFLAGS   += $$($(1)_MCPU)
 endif
 
 ifneq ($$(strip $$($(1)_LDSCRIPT)),)
-$(1)_LDFLAGS += -Wl,-T$$($(1)_LDSCRIPT)
+        $(1)_LDFLAGS += -Wl,-T$$($(1)_LDSCRIPT)
 endif
 
 # Debug stuff
 ifeq ($$($(1)_DEBUG),1)
-	# AVR is an harvard processor
-	# and needs debug module
-	# to be compiled in program memory
-	ifeq ($$(findstring avr, $$($(1)_CROSS)),avr)
-		$(1)_DEBUGSRC = $(1)_PCSRC
-	else
-		$(1)_DEBUGSRC = $(1)_CSRC
-	endif
-	
-	$$($(1)_DEBUGSRC) += bertos/drv/kdebug.c
+        # AVR is an harvard processor
+        # and needs debug module
+        # to be compiled in program memory
+        ifeq ($$(findstring avr, $$($(1)_CROSS)),avr)
+                $(1)_DEBUGSRC = $(1)_PCSRC
+        else
+                $(1)_DEBUGSRC = $(1)_CSRC
+        endif
 
-	# Also add formatwr.c (printf) if not already present
-	ifneq ($$(findstring formatwr.c, $$($$($(1)_DEBUGSRC))),formatwr.c)
-		$$($(1)_DEBUGSRC) += bertos/mware/formatwr.c
-	endif
+        $$($(1)_DEBUGSRC) += bertos/drv/kdebug.c
 
-	$(1)_CFLAGS += -D_DEBUG	
-	$(1)_CXXFLAGS += -D_DEBUG
+        # Also add formatwr.c (printf) if not already present
+        ifneq ($$(findstring formatwr.c, $$($$($(1)_DEBUGSRC))),formatwr.c)
+                $$($(1)_DEBUGSRC) += bertos/mware/formatwr.c
+        endif
+
+        $(1)_CFLAGS += -D_DEBUG	
+        $(1)_CXXFLAGS += -D_DEBUG
 endif
 
 $(1)_CC      = $$($(1)_CROSS)$$(CC)
@@ -158,9 +158,9 @@ endif
 # would whine if we passed it C-only flags.  Checking for the presence of
 # "++" in the name is a kludge that seems to work mostly.
 ifeq (++,$$(findstring ++,$$($(1)_CC)))
-	REAL_CFLAGS = $$(CXXFLAGS)
+        REAL_CFLAGS = $$(CXXFLAGS)
 else
-	REAL_CFLAGS = $$(CFLAGS)
+        REAL_CFLAGS = $$(CFLAGS)
 endif
 
 # Compile: instructions to create assembler and/or object files from C source
