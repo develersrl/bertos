@@ -64,7 +64,7 @@ tags:
 .PHONY: check
 check:
 	$L "Running testsuite"
-	$Q bertos/run_tests.sh
+	$Q test/run_tests.sh
 
 define build_target
 
