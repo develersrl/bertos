@@ -39,6 +39,7 @@ top_srcdir ?= $(shell pwd)
 # Virtual Product: based on target products may be different.
 # e.g. Embedded target = hex, s19, bin
 #      Hosted = exe
+#      Library = lib.a
 TRG_TGT = $(TRG:%=$(OUTDIR)/%.tgt)
 
 RECURSIVE_TARGETS = all-recursive install-recursive clean-recursive
@@ -73,7 +74,7 @@ ifneq ($$($(1)_CROSS),)
         #In embedded we need s19, hex and bin
         $$(OUTDIR)/$(1).tgt : $$(OUTDIR)/$(1).s19 $$(OUTDIR)/$(1).hex $$(OUTDIR)/$(1).bin
 else
-        #On Darwin architecture the assembly doesn't link correctly if this flag is set.
+        #On Darwin architecture the assembly doesn't link correctly if these flags are set.
         ifeq ($(shell uname | grep -c "Darwin"),1)
                 LIST_FLAGS := ""
                 MAP_FLAGS := ""
@@ -81,8 +82,14 @@ else
         endif
         #use hosted specific map flags
         $(1)_MAP_FLAGS = $$(MAP_FLAGS_HOST)
-        #in hosted application we need only executable file.
-        $$(OUTDIR)/$(1).tgt : $$(OUTDIR)/$(1)
+
+        #Handle library creation
+        ifeq ($$($(1)_MAKELIB),1)
+                $$(OUTDIR)/$(1).tgt : $$(OUTDIR)/$(1).a
+        else
+                #Otherwise in  hosted application we need only executable file.
+                $$(OUTDIR)/$(1).tgt : $$(OUTDIR)/$(1)
+        endif
 endif
 
 $(1)_LDFLAGS += $$($(1)_MAP_FLAGS)
@@ -136,6 +143,7 @@ endif
 $(1)_CC      = $$($(1)_CROSS)$$(CC)
 $(1)_CXX     = $$($(1)_CROSS)$$(CXX)
 $(1)_AS      = $$($(1)_CROSS)$$(AS)
+$(1)_AR      = $$($(1)_CROSS)$$(AR)
 $(1)_OBJCOPY = $$($(1)_CROSS)$$(OBJCOPY)
 $(1)_STRIP   = $$($(1)_CROSS)$$(STRIP)
 
@@ -204,6 +212,13 @@ $$(OUTDIR)/$(1).elf $$(OUTDIR)/$(1)_nostrip: bumprev $$($(1)_OBJ) $$($(1)_LDSCRI
 	$L "$(1): Linking $$@"
 	@$$(MKDIR_P) $$(dir $$@)
 	$Q $$($(1)_LD) $$($(1)_OBJ) $$(LIB) $$(LDFLAGS) $$($(1)_LDFLAGS) -o $$@
+
+
+# Instructions to create a static library from object files
+$$(OUTDIR)/$(1).a: bumprev $$($(1)_OBJ)
+	$L "$(1): Creating static library $$@"
+	@$$(MKDIR_P) $$(dir $$@)
+	$Q $$($(1)_AR) $$(ARFLAGS) $$($(1)_ARFLAGS) $$@ $$($(1)_OBJ)
 
 # Strip debug info
 $$(OUTDIR)/$(1): $$(OUTDIR)/$(1)_nostrip

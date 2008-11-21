@@ -28,6 +28,7 @@ DEBUGCFLAGS = -ggdb
 #CROSS   = avr-
 CC      = gcc
 CXX     = g++
+AR      = ar
 AS      = $(CC) -x assembler-with-cpp
 LD      = $(CC)
 LDXX	= $(CXX)
@@ -112,3 +113,6 @@ AVRDUDEFLAGS = $(DPROG)
 
 # additional libs
 LIB = -lm
+
+# Archiver flags
+ARFLAGS = rcs
