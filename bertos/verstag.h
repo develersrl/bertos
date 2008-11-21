@@ -62,7 +62,7 @@
 	#define VERS_MINOR 1
 	#define VERS_REV   0
 	#define VERS_LETTER ""
-#elif ((ARCH & ARCH_NIGHTTEST) || (ARCH & ARCH_UNITTEST))
+#elif ARCH & ARCH_NIGHTTEST
 	#define VERS_MAJOR 0
 	#define VERS_MINOR 1
 	#define VERS_REV   0
