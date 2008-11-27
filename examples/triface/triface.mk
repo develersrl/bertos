@@ -14,11 +14,24 @@ triface_DEBUG = 1
 
 # Our target application
 TRG += triface
+CPU = atmega1281
 
+triface_CROSS = avr-
+
+ifeq ($(CPU), atmega1281)
+triface_hfuse = 0x98
+triface_lfuse = 0x3d
+triface_efuse = 0x7f
+triface_lock = 0xff
+else
 triface_hfuse = 0x88
 triface_lfuse = 0xff
 triface_efuse = 0xff
 triface_lock = 0x2f
+endif
+
+triface_MCU = $(CPU)
+
 triface_CSRC = \
 	examples/triface/triface.c \
 	examples/triface/protocol.c \
@@ -44,8 +57,6 @@ triface_PCSRC += bertos/mware/formatwr.c
 triface_CFLAGS = -O2 -D'ARCH=(ARCH_TRIFACE)' -fno-strict-aliasing -Iexamples/triface -Ibertos/cpu/avr
 triface_LDFLAGS = -Wl
 
-triface_MCU = atmega64
-triface_CROSS = avr-
 
 # Set to 1 for debug builds
 boot_DEBUG = 0
@@ -53,7 +64,7 @@ boot_DEBUG = 0
 # Our target application
 TRG += boot
 
-boot_MCU = atmega64
+boot_MCU = $(CPU)
 boot_CSRC = \
 	examples/triface/boot/main.c \
 	bertos/net/xmodem.c \
