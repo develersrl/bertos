@@ -37,7 +37,7 @@
  *
  * \brief Low-level timer module for AVR (implementation).
  *
- * This module is automatically included so no need to include 
+ * This module is automatically included so no need to include
  * in test list.
  * notest: avr
  */
@@ -58,9 +58,13 @@
 	#define REG_TIMSK0 TIMSK0
 	#define REG_TIMSK2 TIMSK2
 
+	#define REG_TCCR0A TCCR0A
+	#define REG_TCCR0B TCCR0B
+
 	#define REG_TCCR2A TCCR2A
 	#define REG_TCCR2B TCCR2B
 
+	#define REG_OCR0A  OCR0A
 	#define REG_OCR2A  OCR2A
 
 	#define BIT_OCF0A  OCF0A
@@ -75,9 +79,13 @@
 	#define REG_TIMSK0 TIMSK
 	#define REG_TIMSK2 TIMSK
 
+	#define REG_TCCR2A TCCR0
+	#define REG_TCCR2B TCCR0
+
 	#define REG_TCCR2A TCCR2
 	#define REG_TCCR2B TCCR2
 
+	#define REG_OCR0A  OCR0
 	#define REG_OCR2A  OCR2
 
 	#define BIT_OCF0A  OCF0
@@ -109,19 +117,23 @@
 
 		/* Setup Timer/Counter interrupt */
 		ASSR = 0x00;                  /* Internal system clock */
-		TCCR0 = BV(WGM01)             /* Clear on Compare match */
+
+		REG_TCCR0A = 0;	// TCCR2 reg could be separate or a unique register with both A & B values, this is needed to
+		REG_TCCR0B = 0;
+
+		REG_TCCR0A = BV(WGM01);             /* Clear on Compare match */
 			#if TIMER_PRESCALER == 64
-				| TIMER0_PRESCALER_64
+			REG_TCCR0B |= TIMER0_PRESCALER_64;
 			#else
 				#error Unsupported value of TIMER_PRESCALER
 			#endif
 		;
 		TCNT0 = 0x00;                 /* Initialization of Timer/Counter */
-		OCR0 = OCR_DIVISOR;           /* Timer/Counter Output Compare Register */
+		REG_OCR0A = OCR_DIVISOR;           /* Timer/Counter Output Compare Register */
 
 		/* Enable timer interrupts: Timer/Counter2 Output Compare (OCIE2) */
 		REG_TIMSK0 &= ~BV(TOIE0);
-		REG_TIMSK0 |= BV(OCIE0);
+		REG_TIMSK0 |= BV(OCIE0A);
 
 		IRQ_RESTORE(flags);
 	}
@@ -139,7 +151,7 @@
 		IRQ_SAVE_DISABLE(flags);
 
 		/* Reset Timer overflow flag */
-		TIFR |= BV(TOV1);
+		REG_TIFR0 |= BV(TOV1);
 
 		/* Fast PWM mode, 9 bit, 24 kHz, no prescaling. */
 		#if (TIMER_PRESCALER == 1) && (TIMER_HW_BITS == 9)
@@ -160,7 +172,7 @@
 		TCNT1 = 0x00;         /* initialization of Timer/Counter */
 
 		/* Enable timer interrupt: Timer/Counter1 Overflow */
-		TIMSK |= BV(TOIE1);
+		REG_TIMSK0 |= BV(TOIE1);
 
 		IRQ_RESTORE(flags);
 	}
