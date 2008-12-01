@@ -50,7 +50,7 @@
 	#error CONFIG_WATCHDOG must be defined to either 0 or 1
 #endif
 
-#if OS_HOSTED || !CONFIG_WATCHDOG
+#if OS_HOSTED
 	#include <cpu/detect.h>
 	#include <cfg/os.h>
 
@@ -61,7 +61,10 @@
 	#else
 		#error unknown CPU
 	#endif
+#elif CONFIG_WATCHDOG
+	#include CPU_HEADER(wdt)
 #endif /* CONFIG_WATCHDOG */
+
 
 
 #if OS_HOSTED || !CONFIG_WATCHDOG
