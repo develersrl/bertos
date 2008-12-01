@@ -41,15 +41,16 @@
 #define DRV_WDT_H
 
 #include "cfg/cfg_wdt.h"
-#include <cfg/compiler.h> // INLINE
 #include "cfg/cfg_arch.h"
+
+#include <cfg/compiler.h> // INLINE
 
 /* Configury sanity check */
 #if !defined(CONFIG_WATCHDOG) || (CONFIG_WATCHDOG != 0 && CONFIG_WATCHDOG != 1)
 	#error CONFIG_WATCHDOG must be defined to either 0 or 1
 #endif
 
-#if CONFIG_WATCHDOG
+#if OS_HOSTED || !CONFIG_WATCHDOG
 	#include <cpu/detect.h>
 	#include <cfg/os.h>
 
@@ -57,106 +58,80 @@
 			#include <QtGui/QApplication>
 	#elif OS_POSIX
 		#include <sys/select.h>
-	#elif CPU_AVR
-		#include <avr/io.h>
-		#include <cfg/macros.h> // BV()
-		#if CPU_AVR_ATMEGA1281  // Name is different in atmega1281
-			#define WDTCR WDTCSR
+	#else
+		#error unknown CPU
+	#endif
+#endif /* CONFIG_WATCHDOG */
+
+
+#if OS_HOSTED || !CONFIG_WATCHDOG
+	/**
+	 * Reset the watchdog timer.
+	 */
+	INLINE void wdt_reset(void)
+	{
+	#if CONFIG_WATCHDOG
+		#if OS_QT
+			// Let Qt handle events
+			ASSERT(qApp);
+			qApp->processEvents();
+		#elif OS_POSIX
+			static struct timeval tv = { 0, 0 };
+			select(0, NULL, NULL, NULL, &tv);
 		#endif
-	#elif defined(ARCH_FREERTOS) && (ARCH & ARCH_FREERTOS)
-		#include <task.h> /* taskYIELD() */
-	#else
-		#error unknown CPU
-	#endif
-#endif /* CONFIG_WATCHDOG */
+	#endif /* CONFIG_WATCHDOG */
+	}
 
-/**
- * Reset the watchdog timer.
- */
-INLINE void wdt_reset(void)
-{
-#if CONFIG_WATCHDOG
-	#if OS_QT
-		// Let Qt handle events
-		ASSERT(qApp);
-		qApp->processEvents();
-	#elif OS_POSIX
-		static struct timeval tv = { 0, 0 };
-		select(0, NULL, NULL, NULL, &tv);
-	#elif defined(ARCH_FREERTOS) && (ARCH & ARCH_FREERTOS)
-		vTaskDelay(1);
-	#elif CPU_AVR
-		__asm__ __volatile__ ("wdr");
-	#else
-		#error unknown CPU
-	#endif
-#endif /* CONFIG_WATCHDOG */
-}
-
-/**
- * Set watchdog timer timeout.
- *
- * \param timeout  0: 16.3ms, 7: 2.1s
- */
-INLINE void wdt_init(uint8_t timeout)
-{
-#if CONFIG_WATCHDOG
-	#if OS_QT
-		// Create a dummy QApplication object
-		if (!qApp)
-		{
-			int argc;
-			new QApplication(argc, (char **)NULL);
-		}
+	/**
+	 * Set watchdog timer timeout.
+	 *
+	 * \param timeout  0: 16.3ms, 7: 2.1s
+	 */
+	INLINE void wdt_init(uint8_t timeout)
+	{
+	#if CONFIG_WATCHDOG
+		#if OS_QT
+			// Create a dummy QApplication object
+			if (!qApp)
+			{
+				int argc;
+				new QApplication(argc, (char **)NULL);
+			}
+			(void)timeout;
+		#elif OS_POSIX
+			(void)timeout; // NOP
+		#else
+			#error unknown CPU
+		#endif
+	#endif /* CONFIG_WATCHDOG */
 		(void)timeout;
-	#elif OS_POSIX
-		(void)timeout; // NOP
-	#elif defined(ARCH_FREERTOS) && (ARCH & ARCH_FREERTOS)
-		/* nop */
-	#elif CPU_AVR
-		WDTCR |= BV(WDCE) | BV(WDE);
-		WDTCR = timeout;
-	#else
-		#error unknown CPU
-	#endif
-#else
-	(void)timeout;
-#endif /* CONFIG_WATCHDOG */
-}
+	}
 
-INLINE void wdt_start(void)
-{
+	INLINE void wdt_start(void)
+	{
 #if CONFIG_WATCHDOG
-	#if OS_QT
-		// NOP
-	#elif OS_POSIX
-		// NOP
-	#elif defined(ARCH_FREERTOS) && (ARCH & ARCH_FREERTOS)
-		/* nop */
-	#elif CPU_AVR
-		WDTCR |= BV(WDE);
-	#else
-		#error unknown CPU
-	#endif
+		#if OS_QT
+			// NOP
+		#elif OS_POSIX
+			// NOP
+		#else
+			#error unknown CPU
+		#endif
 #endif /* CONFIG_WATCHDOG */
-}
+	}
 
-INLINE void wdt_stop(void)
-{
+	INLINE void wdt_stop(void)
+	{
 #if CONFIG_WATCHDOG
-	#if OS_QT
-		// NOP
-	#elif OS_POSIX
-		// NOP
-	#elif defined(ARCH_FREERTOS) && (ARCH & ARCH_FREERTOS)
-		/* nop */
-	#elif CPU_AVR
-		WDTCR |= BV(WDCE) | BV(WDE);
-		WDTCR &= ~BV(WDE);
-	#else
-		#error unknown CPU
-	#endif
+		#if OS_QT
+			// NOP
+		#elif OS_POSIX
+			// NOP
+		#else
+			#error unknown CPU
+		#endif
 #endif /* CONFIG_WATCHDOG */
-}
+	}
+#endif /* OS_HOSTED || !CONFIG_WATCHDOG */
 
 #endif /* DRV_WDT_H */
