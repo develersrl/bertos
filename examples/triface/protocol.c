@@ -300,8 +300,9 @@ MAKE_CMD(reset, "", "",
 ({
 	//Silence "args not used" warning.
 	(void)args;
-	wdt_init(7);
-	wdt_start();
+	wdt_init();
+	wdt_setTimeout(7);
+	wdt_enable(true);
 
 	/*We want to have an infinite loop that lock access on watchdog timer.
 	This piece of code it's equivalent to a while(true), but we have done this because
