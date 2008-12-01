@@ -44,6 +44,7 @@
 #define HW_BOOT_H
 
 #include <avr/io.h>
+#include <cfg/compiler.h>
 
 /* Set up function pointer to RESET vector */
 void (*rom_start)(void) NORETURN = 0x0000;
