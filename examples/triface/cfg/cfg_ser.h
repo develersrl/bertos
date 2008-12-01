@@ -46,8 +46,10 @@
 
 /// Baud-rate for the kdebug console
 #define CONFIG_TRIFACE_BAUDRATE  115200
+
 /// Triface serial tag port
 #define TAG_SER_PORT 0
+
 ///Baud-rate for triface serial tag port
 #define TAG_SER_BAUDRATE 9600
 
