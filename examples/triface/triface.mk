@@ -15,6 +15,7 @@ triface_DEBUG = 1
 # Our target application
 TRG += triface
 CPU = atmega1281
+BOOT_ADDR_START = 0x1E000
 
 triface_CROSS = avr-
 
@@ -22,7 +23,7 @@ ifeq ($(CPU), atmega1281)
 triface_hfuse = 0x98
 triface_lfuse = 0x3d
 triface_efuse = 0x7f
-triface_lock = 0xff
+triface_lock = 0x2f
 else
 triface_hfuse = 0x88
 triface_lfuse = 0xff
@@ -79,5 +80,6 @@ boot_CSRC = \
 boot_CROSS = avr-
 boot_CPPFLAGS = -D'ARCH=(ARCH_TRIFACE|ARCH_BOOT)' -Iexamples/triface/boot -Ibertos/cpu/avr
 boot_CFLAGS = -Os -mcall-prologues
-boot_LDSCRIPT = examples/triface/boot/boot.ld
-boot_LDFLAGS = -Wl,--relax
+boot_LDFLAGS = -Wl,--relax -Wl,--section-start=.text=$(BOOT_ADDR_START)
+
+
