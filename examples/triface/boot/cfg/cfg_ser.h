@@ -35,59 +35,59 @@
  * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
- */ 
+ */
 
 #ifndef CFG_SER_H
 #define CFG_SER_H
 
 
 /// Kdebug console on debug unit
-#define CONFIG_TRIFACE_PORT      0
+#define CONFIG_BOOT_PORT      1
 
 /// Baud-rate for the kdebug console
-#define CONFIG_TRIFACE_BAUDRATE  115200
+#define CONFIG_BOOT_BAUDRATE  115200
 
-/// [bytes] Size of the outbound FIFO buffer for port 0. 
+/// [bytes] Size of the outbound FIFO buffer for port 0.
 #define CONFIG_UART0_TXBUFSIZE  32
 
-/// [bytes] Size of the inbound FIFO buffer for port 0. 
+/// [bytes] Size of the inbound FIFO buffer for port 0.
 #define CONFIG_UART0_RXBUFSIZE  64
 
-/// [bytes] Size of the outbound FIFO buffer for port 1. 
+/// [bytes] Size of the outbound FIFO buffer for port 1.
 #define CONFIG_UART1_TXBUFSIZE  32
 
-/// [bytes] Size of the inbound FIFO buffer for port 1. 
+/// [bytes] Size of the inbound FIFO buffer for port 1.
 #define CONFIG_UART1_RXBUFSIZE  64
 
 
-/// [bytes] Size of the outbound FIFO buffer for SPI port (AVR only) 
+/// [bytes] Size of the outbound FIFO buffer for SPI port (AVR only)
 #define CONFIG_SPI_TXBUFSIZE    32
 
-/// [bytes] Size of the inbound FIFO buffer for SPI port (AVR only) 
+/// [bytes] Size of the inbound FIFO buffer for SPI port (AVR only)
 #define CONFIG_SPI_RXBUFSIZE    32
 
-/// [bytes] Size of the outbound FIFO buffer for SPI port 0. 
+/// [bytes] Size of the outbound FIFO buffer for SPI port 0.
 #define CONFIG_SPI0_TXBUFSIZE	32
 
-/// [bytes] Size of the inbound FIFO buffer for SPI port 0. 
+/// [bytes] Size of the inbound FIFO buffer for SPI port 0.
 #define CONFIG_SPI0_RXBUFSIZE	32
 
-/// [bytes] Size of the outbound FIFO buffer for SPI port 1. 
+/// [bytes] Size of the outbound FIFO buffer for SPI port 1.
 #define CONFIG_SPI1_TXBUFSIZE	32
 
-/// [bytes] Size of the inbound FIFO buffer for SPI port 1. 
+/// [bytes] Size of the inbound FIFO buffer for SPI port 1.
 #define CONFIG_SPI1_RXBUFSIZE	32
 
-/// SPI data order (AVR only). 
+/// SPI data order (AVR only).
 #define CONFIG_SPI_DATA_ORDER	SER_MSB_FIRST
 
-/// SPI clock division factor (AVR only). 
+/// SPI clock division factor (AVR only).
 #define CONFIG_SPI_CLOCK_DIV	16
 
-/// SPI clock polarity: 0 = normal low, 1 = normal high (AVR only). 
+/// SPI clock polarity: 0 = normal low, 1 = normal high (AVR only).
 #define CONFIG_SPI_CLOCK_POL	0
 
-/// SPI clock phase: 0 = sample on first edge, 1 = sample on second clock edge (AVR only). 
+/// SPI clock phase: 0 = sample on first edge, 1 = sample on second clock edge (AVR only).
 #define CONFIG_SPI_CLOCK_PHASE	0
 
 /// Default transmit timeout (ms). Set to -1 to disable timeout support.
@@ -96,13 +96,13 @@
 /// Default receive timeout (ms). Set to -1 to disable timeout support.
 #define CONFIG_SER_RXTIMEOUT    100
 
-/// Use RTS/CTS handshake 
+/// Use RTS/CTS handshake
 #define CONFIG_SER_HWHANDSHAKE   0
 
 /// Default baud rate (set to 0 to disable).
 #define CONFIG_SER_DEFBAUDRATE   0
 
-/// Enable second serial port in emulator. 
+/// Enable second serial port in emulator.
 #define CONFIG_EMUL_UART1        0
 
 /**

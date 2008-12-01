@@ -46,18 +46,18 @@
  * \author Daniele Basile <asterix@develer.com>
  */
 
+#include "hw/hw_boot.h"
+#include "cfg/cfg_ser.h"
+
 #include <net/xmodem.h>
+
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
 #include <cfg/macros.h> /* BV() */
 
-#include <drv/wdt.h>
 #include <drv/ser.h>
 #include <drv/timer.h>
 #include <drv/flash_avr.h>
-
-#include "hw/hw_boot.h"
-#include "cfg/cfg_boot.h"
 
 #include <string.h>
 
@@ -77,11 +77,10 @@ int main(void)
 	kdbg_init();
 	timer_init();
 
-
 	/* Open the main communication port */
 
-	ser_init(&ser, CONFIG_SER_HOSTPORT);
-	ser_setbaudrate(&ser, CONFIG_SER_HOSTPORTBAUDRATE);
+	ser_init(&ser, CONFIG_BOOT_PORT);
+	ser_setbaudrate(&ser, CONFIG_BOOT_BAUDRATE);
 
 	xmodem_recv(&ser, &flash.fd);
 	kfile_close(&flash.fd);
