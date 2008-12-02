@@ -41,7 +41,7 @@
 #define CFG_WDT_H
 
 /// Enable watchdog timer.
-#define CONFIG_WATCHDOG      1
+#define CONFIG_WATCHDOG 1
 
 #endif /* CFG_WDT_H */
 
