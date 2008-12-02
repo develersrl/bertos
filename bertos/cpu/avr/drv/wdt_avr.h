@@ -32,6 +32,10 @@
  *
  * \brief Watchdog interface for AVR architecture.
  *
+ * \note The AVR LibC already provvide the api to manange
+ * the watchdog on AVR architecture. In LibC also define several
+ * macro to set the timeout value (see documentation for more detail).
+ *
  * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
@@ -46,54 +50,48 @@
 #include <cfg/compiler.h> // INLINE
 
 #include <avr/io.h>
-
-#if CPU_AVR_ATMEGA1281
-	#define WDT_CRTL_REG WDTCSR
-#else
-	#define WDT_CRTL_REG WDTCR
-#endif
+#include <avr/wdt.h>
 
 /**
  * Reset the watchdog timer.
+ *
+ * This functions is already definded to avr libc,
+ * we use it.
  */
-INLINE void wdt_reset(void)
-{
-	__asm__ __volatile__ ("wdr");
-}
+// void wdt_reset(void)
 
-INLINE void wdt_enable(bool flag)
+/**
+ * Start the watchdog timer that fire at the select
+ * timeout.
+ *
+ * \param timeout, you can use the macro that are defineded in
+ * avr/wdt.h.
+ *
+ * (from avr libc documentation)
+ * WDTO_15MS
+ * WDTO_30MS
+ * WDTO_60MS
+ * WDTO_120MS
+ * WDTO_250MS
+ * WDTO_500MS
+ * WDTO_1S
+ * WDTO_2S
+ * WDTO_4S
+ * WDTO_8S
+ */
+INLINE void wdt_start(uint32_t _timeout)
 {
-	IRQ_DISABLE;
-	if (flag)
-	{
-		WDT_CRTL_REG |= BV(WDE);
-	}
-	else
-	{
-		WDT_CRTL_REG |= BV(WDCE) | BV(WDE);
-		WDT_CRTL_REG &= ~BV(WDE);
-	}
-	IRQ_ENABLE;
+	uint8_t timeout = _timeout;
+
+	wdt_enable(timeout);
 }
 
 /**
- * Set watchdog timeout.
+ * Stop watchdog timer.
  */
-INLINE void wdt_setTimeout(uint32_t timeout)
+INLINE void wdt_stop(void)
 {
-	IRQ_DISABLE;
-	wdt_reset();
-	WDT_CRTL_REG |= BV(WDCE) | BV(WDE);
-	WDT_CRTL_REG = timeout;
-	IRQ_ENABLE;
-}
-
-/**
- * Init watchdog timer.
- */
-INLINE void wdt_init(void)
-{
-	WDT_CRTL_REG |= BV(WDCE) | BV(WDE);
+	wdt_disable();
 }
 
 

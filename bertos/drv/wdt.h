@@ -66,8 +66,8 @@
 #endif /* CONFIG_WATCHDOG */
 
 
-
 #if OS_HOSTED || !CONFIG_WATCHDOG
+
 	/**
 	 * Reset the watchdog timer.
 	 */
@@ -86,11 +86,13 @@
 	}
 
 	/**
-	 * Set watchdog timer timeout.
+	 * Start the watchdog timer that fire at the select
+	 * timeout.
 	 *
-	 * \param timeout  0: 16.3ms, 7: 2.1s
+	 * \param timeout, this value is target dependant.
+	 * See the target documentation for more detail.
 	 */
-	INLINE void wdt_init(uint8_t timeout)
+	INLINE void wdt_start(uint32_t timeout)
 	{
 	#if CONFIG_WATCHDOG
 		#if OS_QT
@@ -103,29 +105,14 @@
 			(void)timeout;
 		#elif OS_POSIX
 			(void)timeout; // NOP
-		#else
-			#error unknown CPU
 		#endif
 	#endif /* CONFIG_WATCHDOG */
-		(void)timeout;
-	}
-
-	INLINE void wdt_start(void)
-	{
-#if CONFIG_WATCHDOG
-		#if OS_QT
-			// NOP
-		#elif OS_POSIX
-			// NOP
-		#else
-			#error unknown CPU
-		#endif
-#endif /* CONFIG_WATCHDOG */
+		(void)timeout; // NOP
 	}
 
 	INLINE void wdt_stop(void)
 	{
-#if CONFIG_WATCHDOG
+	#if CONFIG_WATCHDOG
 		#if OS_QT
 			// NOP
 		#elif OS_POSIX
@@ -133,7 +120,7 @@
 		#else
 			#error unknown CPU
 		#endif
-#endif /* CONFIG_WATCHDOG */
+	#endif /* CONFIG_WATCHDOG */
 	}
 #endif /* OS_HOSTED || !CONFIG_WATCHDOG */
 
