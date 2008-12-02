@@ -79,8 +79,8 @@
 	#define REG_TIMSK0 TIMSK
 	#define REG_TIMSK2 TIMSK
 
-	#define REG_TCCR2A TCCR0
-	#define REG_TCCR2B TCCR0
+	#define REG_TCCR0A TCCR0
+	#define REG_TCCR0B TCCR0
 
 	#define REG_TCCR2A TCCR2
 	#define REG_TCCR2B TCCR2
@@ -133,7 +133,7 @@
 
 		/* Enable timer interrupts: Timer/Counter2 Output Compare (OCIE2) */
 		REG_TIMSK0 &= ~BV(TOIE0);
-		REG_TIMSK0 |= BV(OCIE0A);
+		REG_TIMSK0 |= BV(BIT_OCIE0A);
 
 		IRQ_RESTORE(flags);
 	}
