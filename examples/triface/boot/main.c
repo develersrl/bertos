@@ -61,6 +61,32 @@
 
 #include <string.h>
 
+#include <avr/wdt.h>
+
+/*
+ * Watchdog disable.
+ *
+ * This function disable the watchdog timer, after a reset.
+ * We should do it after the software reset (do with watchdog),
+ * because in new AVR core do not reset the watchdog after
+ * a cpu reset, so the watchdog timer remain enable resetting
+ * every timeout time the cpu. This is necessary only with new
+ * AVR core, for the other core this no have effect.
+ *
+ * \{
+ */
+// Function prototype of watchdog reset.
+void wdt_init(void) __attribute__((naked)) __attribute__((section(".init3")));
+// Function implementation of watchdog reset.
+void wdt_init(void)
+{
+    MCUSR = 0;
+    wdt_disable();
+
+    return;
+}
+/* \} */
+
 int main(void)
 {
 	FlashAvr flash;
