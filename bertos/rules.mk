@@ -62,7 +62,7 @@ tags:
 
 # Run testsuite
 .PHONY: check
-check:
+check: $(OUTDIR)/libunittest.a
 	$L "Running testsuite"
 	$Q test/run_tests.sh
 
@@ -284,8 +284,8 @@ $$(OUTDIR)/$(1).rom: $$(OUTDIR)/$(1).elf
 
 endef
 
-# Generate build rules for all targets
-$(foreach t,$(TRG),$(eval $(call build_target,$(t))))
+# Generate build rules for all targets and libunittest
+$(foreach t,$(TRG) libunittest,$(eval $(call build_target,$(t))))
 
 # Generate Qt's moc files from headers
 # NOTE: moc totally sucks and can generate empty files for some error conditions,
