@@ -51,7 +51,7 @@
 #include <drv/timer.h>
 #include <drv/ser.h>
 #include <drv/sipo.h>
-#include <drv/wdt.h>
+#include <avr/wdt.h>
 #include <drv/buzzer.h>
 
 #include <mware/readline.h>
@@ -300,9 +300,7 @@ MAKE_CMD(reset, "", "",
 ({
 	//Silence "args not used" warning.
 	(void)args;
-	wdt_init();
-	wdt_setTimeout(7);
-	wdt_enable(true);
+	wdt_enable(WDTO_2S);
 
 	/*We want to have an infinite loop that lock access on watchdog timer.
 	This piece of code it's equivalent to a while(true), but we have done this because
