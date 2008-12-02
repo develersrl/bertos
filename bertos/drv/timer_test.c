@@ -131,7 +131,7 @@ static void timer_test_poll(void)
 int timer_testSetup(void)
 {
 	IRQ_ENABLE;
-	wdt_init(7);
+	wdt_start(7);
 	timer_init();
 	kdbg_init();
 	return 0;
