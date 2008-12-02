@@ -28,6 +28,9 @@ TESTS=${TESTS:-`find . \
 
 TESTOUT="testout"
 
+#Unit test static library
+TESTLIB="images/libunittest.a"
+
 buildout='/dev/null'
 runout='/dev/null'
 [ "$VERBOSE" -ge 2 ] && buildout='/dev/stdout'
@@ -45,8 +48,8 @@ for src in $TESTS; do
 	exe="./$TESTOUT/$name"
 
 	case "$src" in
-	*.cpp) BUILDCMD="$CXX $CXXFLAGS $src -o $exe" ;;
-	*.c)   BUILDCMD="$CC  $CXXFLAGS $src -o $exe" ;;
+	*.cpp) BUILDCMD="$CXX $CXXFLAGS $src $TESTLIB -o $exe" ;;
+	*.c)   BUILDCMD="$CC  $CFLAGS $src $TESTLIB -o $exe" ;;
 	esac
 
 	[ $VERBOSE -gt 0 ] && echo "Building $name..."
