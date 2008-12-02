@@ -154,14 +154,5 @@ int timer_testTearDown(void)
 	return 0;
 }
 
-#if UNIT_TEST
-	#include <drv/timer.c>
-	#include <drv/kdebug.c>
-	#include <mware/event.c>
-	#include <mware/formatwr.c>
-	#include <mware/hex.c>
-	#include <os/hptime.c>
-
-	TEST_MAIN(timer);
-#endif
+TEST_MAIN(timer);
 

@@ -184,12 +184,4 @@ int ramp_testRun(void)
 	return 0;
 }
 
-#if UNIT_TEST
-	#include "ramp.c"
-	#include <drv/kdebug.c>
-	#include <mware/formatwr.c>
-	#include <mware/hex.c>
-
-	TEST_MAIN(ramp);
-#endif
-
+TEST_MAIN(ramp);

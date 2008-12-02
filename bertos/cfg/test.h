@@ -75,25 +75,28 @@
 
 #if defined(ARCH_UNITTEST) && (ARCH & ARCH_UNITTEST)
 	#define UNIT_TEST 1
+
+	/**
+	 * Macro used to generate a main() for a test to be compiled
+	 * on hosted platform.
+	 */
+	#define TEST_MAIN(module) \
+	int main(void) \
+	{ \
+		if (module##_testSetup() != 0) \
+			return 1; \
+		if (module##_testRun() != 0) \
+			return 2; \
+		if (module##_testTearDown() != 0) \
+			return 3; \
+		return 0; \
+	}
 #else /* !TEST */
 	#define UNIT_TEST 0
+
+	#define TEST_MAIN(module) /* nothing */
 #endif /* TEST */
 
-/**
- * Macro used to generate a main() for a test to be compiled
- * on hosted platform.
- */
-#define TEST_MAIN(module) \
-int main(void) \
-{ \
-	if (module##_testSetup() != 0) \
-		return 1; \
-	if (module##_testRun() != 0) \
-		return 2; \
-	if (module##_testTearDown() != 0) \
-		return 3; \
-	return 0; \
-}
 
 /**
  * Silent an assert in a test.

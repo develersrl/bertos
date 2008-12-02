@@ -1144,12 +1144,6 @@ int battfs_testTearDown(void)
 	return 0;
 }
 
-TEST_MAIN(battfs)
-
-#include <fs/battfs.c>
-#include <kern/kfile.c>
-#include <drv/kdebug.c>
-#include <mware/formatwr.c>
-#include <mware/hex.c>
+TEST_MAIN(battfs);
 
 #endif // _TEST

@@ -91,7 +91,6 @@ int proc_testRun(void)
 	return 0;
 }
 
-#if UNIT_TEST
 
 int proc_testSetup(void)
 {
@@ -112,24 +111,4 @@ int proc_testTearDown(void)
 	return 0;
 }
 
-#include <drv/kdebug.c>
-#include <drv/timer.c>
-#include <kern/idle.c>
-#include <kern/monitor.c>
-#include <kern/signal.c>
-#if CONFIG_KERN_PREEMPT
-	#include <kern/preempt.c>
-	#include <kern/irq.c>
-#else
-	#include <kern/coop.c>
-	// FIXME: we need to link with the switch asm code too!
-#endif
-#include <kern/proc.c>
-#include <mware/formatwr.c>
-#include <mware/hex.c>
-#include <mware/event.c>
-#include <os/hptime.c>
-
 TEST_MAIN(proc);
-
-#endif // _TEST
