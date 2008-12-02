@@ -64,7 +64,7 @@ int sprintf_testRun(void)
 	if (strcmp(buf, test_string) != 0)
 		return 1;
 
-	snprintf(buf, sizeof buf, "%S", test_string_pgm);
+	snprintf(buf, sizeof buf, "%S", (wchar_t *)test_string_pgm);
 	if (strcmp(buf, test_string_pgm) != 0)
 		return 2;
 
@@ -94,7 +94,7 @@ int sprintf_testRun(void)
 	/*
 	 * Stress tests.
 	 */
-	snprintf(buf, sizeof buf, "%s", NULL);
+	snprintf(buf, sizeof buf, "%s", (char *)(NULL));
 	if (strcmp(buf, "<NULL>") != 0)
 		return 3;
 	snprintf(buf, sizeof buf, "%k");
@@ -111,10 +111,6 @@ int sprintf_testTearDown(void)
 }
 
 #if UNIT_TEST
-	#include <drv/kdebug.c>
-	#include "sprintf.c"
-	#include "formatwr.c"
-	#include "hex.c"
 	TEST_MAIN(sprintf);
 #endif /* UNIT_TEST */
 
