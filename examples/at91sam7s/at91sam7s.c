@@ -37,12 +37,15 @@
  * \brief AT91SAM7S-EK porting test.
  */
 
+#include "cfg/cfg_ser.h"
 #include <cfg/macros.h>
+
+#include <kern/proc.h>
+
 #include <drv/timer.h>
 #include <drv/sysirq_at91.h>
-#include <kern/proc.h>
 #include <drv/ser.h>
-#include <cfg/macros.h>
+
 #include <io/arm.h>
 
 Timer leds_timer;
@@ -102,9 +105,9 @@ int main(void)
 	/* turn first led on */
 	PIOA_CODR  = 0x00000001;
 
- 	timer_setSoftint(&leds_timer, (Hook)leds_toggle, 0);
- 	timer_setDelay(&leds_timer, ms_to_ticks(100));
- 	timer_add(&leds_timer);
+	timer_setSoftint(&leds_timer, (Hook)leds_toggle, 0);
+	timer_setDelay(&leds_timer, ms_to_ticks(100));
+	timer_add(&leds_timer);
 
 	ASSERT(proc_testRun() == 0);
 	// Main loop
