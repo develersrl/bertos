@@ -140,12 +140,12 @@ ifeq ($$($(1)_DEBUG),1)
         $(1)_CXXFLAGS += -D_DEBUG
 endif
 
-$(1)_CC      = $$($(1)_CROSS)$$(CC)
-$(1)_CXX     = $$($(1)_CROSS)$$(CXX)
-$(1)_AS      = $$($(1)_CROSS)$$(AS)
-$(1)_AR      = $$($(1)_CROSS)$$(AR)
-$(1)_OBJCOPY = $$($(1)_CROSS)$$(OBJCOPY)
-$(1)_STRIP   = $$($(1)_CROSS)$$(STRIP)
+$(1)_CC      ?= $$($(1)_CROSS)$$(CC)
+$(1)_CXX     ?= $$($(1)_CROSS)$$(CXX)
+$(1)_AS      ?= $$($(1)_CROSS)$$(AS)
+$(1)_AR      ?= $$($(1)_CROSS)$$(AR)
+$(1)_OBJCOPY ?= $$($(1)_CROSS)$$(OBJCOPY)
+$(1)_STRIP   ?= $$($(1)_CROSS)$$(STRIP)
 
 $(1)_COBJ    = $$(foreach file,$$($(1)_CSRC:%.c=%.o),$$(OBJDIR)/$(1)/$$(file))
 $(1)_CXXOBJ  = $$(foreach file,$$($(1)_CXXSRC:%.cpp=%.o),$$(OBJDIR)/$(1)/$$(file))
@@ -166,16 +166,16 @@ endif
 # would whine if we passed it C-only flags.  Checking for the presence of
 # "++" in the name is a kludge that seems to work mostly.
 ifeq (++,$$(findstring ++,$$($(1)_CC)))
-        REAL_CFLAGS = $$(CXXFLAGS)
+        $(1)_REAL_CFLAGS = $$(CXXFLAGS)
 else
-        REAL_CFLAGS = $$(CFLAGS)
+	$(1)_REAL_CFLAGS = $$(CFLAGS)
 endif
 
 # Compile: instructions to create assembler and/or object files from C source
 $$($(1)_COBJ) : $$(OBJDIR)/$(1)/%.o : %.c
 	$L "$(1): Compiling $$< (C)"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$($(1)_CC) -c $$(REAL_CFLAGS) $$($(1)_CFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$< -o $$@
+	$Q $$($(1)_CC) -c $$($(1)_REAL_CFLAGS) $$($(1)_CFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$< -o $$@
 
 # Compile: instructions to create assembler and/or object files from C++ source
 $$($(1)_CXXOBJ) : $$(OBJDIR)/$(1)/%.o : %.cpp
