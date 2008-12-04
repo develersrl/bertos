@@ -35,14 +35,26 @@ MAKEFILE_TEST_DIR="."
 TEST_DIR="test"
 BERTOS_DIR="bertos/"
 BERTOS_DIR_BAK="bertos.saved"
+OPTS=1
+if [ $# = 1 ] ; then
+	if [ $1 = "-h" ] ; then
+		printf "Nightly test help.\n"
+		printf "\t--no-silent disable the silent of the TODO/FIXME warning message.\n"
+		exit 1
+	elif [ $1 = "--no-silent" ] ; then
+		OPTS=0
+	fi
+fi
 
+if [ $OPTS = 1 ] ; then
 #Copy BeRTOS sources
 printf "Starting nightlytest..\n"
-cp -R $BERTOS_DIR $BERTOS_DIR_BAK || exit 1
+	printf "Silent mode enable, removing the TODO/FIXME message warning.\n"
+	cp -R $BERTOS_DIR $BERTOS_DIR_BAK || exit 1
 
-#Strip away TODOs and FIXME
-find $BERTOS_DIR -name "*.[ch]" | xargs perl -p -i -e 's/^\s*#warning\s*(TODO|FIXME).*//g;'
-
+	#Strip away TODOs and FIXME
+	find $BERTOS_DIR -name "*.[ch]" | xargs perl -p -i -e 's/^\s*#warning\s*(TODO|FIXME).*//g;'
+fi
 
 #Cpu target that we want to test
 TRG="avr arm"
@@ -56,15 +68,19 @@ done
 make -f ${MAKEFILE_TEST_DIR}/Makefile.test clean
 make -f ${MAKEFILE_TEST_DIR}/Makefile.test
 
-#Restore original sources
-if [ -d $BERTOS_DIR_BAK ] ; then
-	printf "Exiting from nightly..\n"
-	rm -rf $BERTOS_DIR
-	mv $BERTOS_DIR_BAK $BERTOS_DIR
-else
-	printf "Unable to restore backup copy\n"
-	exit 1
+
+if [ $OPTS = 1 ] ; then
+	#Restore original sources
+	if [ -d $BERTOS_DIR_BAK ] ; then
+		printf "Exiting from nightly..\n"
+		rm -rf $BERTOS_DIR
+		mv $BERTOS_DIR_BAK $BERTOS_DIR
+	else
+		printf "Unable to restore backup copy\n"
+		exit 1
+	fi
 fi
 
+printf "Nightly test done.\n\n"
 
 
