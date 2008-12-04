@@ -64,11 +64,7 @@
 #define XMODEM_PROGRESS(msg, ...) kprintf(msg, ## __VA_ARGS__)
 #endif
 
-
-/* fwd decl */
-struct Serial;
-
-bool xmodem_recv(struct Serial *port, KFile *fd);
-bool xmodem_send(struct Serial *port, KFile *fd);
+bool xmodem_recv(KFile *ch, KFile *fd);
+bool xmodem_send(KFile *ch, KFile *fd);
 
 #endif /* NET_XMODEM_H */
