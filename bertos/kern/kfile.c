@@ -44,6 +44,7 @@
 #include <cfg/debug.h>
 #include <cfg/log.h>
 
+#include <drv/timer.h>
 #include <mware/formatwr.h>
 
 #include <string.h>
@@ -226,5 +227,32 @@ int kfile_genericClose(UNUSED_ARG(struct KFile *, fd))
 {
 	return 0;
 };
+
+
+/**
+ * Discard input to resynchronize with remote end.
+ *
+ * Discard incoming data until the kfile_getc stops receiving
+ * characters for at least \a delay milliseconds.
+ *
+ * \note If the timeout occur, we reset the error before to
+ * quit.
+ */
+void kfile_resync(KFile *fd, mtime_t delay)
+{
+	ticks_t start_time = timer_clock();
+	for(;;)
+	{
+		if(kfile_getc(fd) != EOF)
+			start_time = timer_clock();
+
+		if ((timer_clock() - start_time) > ms_to_ticks(delay))
+		{
+			kfile_clearerr(fd);
+			break;
+		}
+
+	}
+}
 
 
