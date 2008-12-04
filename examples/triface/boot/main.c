@@ -108,9 +108,10 @@ int main(void)
 	ser_init(&ser, CONFIG_BOOT_PORT);
 	ser_setbaudrate(&ser, CONFIG_BOOT_BAUDRATE);
 
-	xmodem_recv(&ser, &flash.fd);
+	xmodem_recv(&ser.fd, &flash.fd);
+
 	kfile_close(&flash.fd);
-    kfile_close(&ser.fd);
+	kfile_close(&ser.fd);
 
 	IRQ_DISABLE;
 
