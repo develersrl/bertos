@@ -66,12 +66,12 @@
 /*
  * Watchdog disable.
  *
- * This function disable the watchdog timer, after a reset.
- * We should do it after the software reset (do with watchdog),
- * because in new AVR core do not reset the watchdog after
- * a cpu reset, so the watchdog timer remain enable resetting
- * every timeout time the cpu. This is necessary only with new
- * AVR core, for the other core this no have effect.
+ * This function disable the watchdog timer early after a reset.
+ * We must do it very soon because new AVR cores do not disable
+ * the watchdog timer after a cpu reset. In this way the watchdog
+ * timer is still enabled, continuously resetting the cpu. This is
+ * necessary only with new AVR cores, for other cores this code has
+ * no effect.
  *
  * \{
  */

@@ -32,9 +32,9 @@
  *
  * \brief Watchdog interface for AVR architecture.
  *
- * \note The AVR LibC already provvide the api to manange
- * the watchdog on AVR architecture. In LibC also define several
- * macro to set the timeout value (see documentation for more detail).
+ * \note The avr-libc already provide an api to manage the watchdog on AVR architecture.
+ * In avr-libc are also available several constants used to set the timeout value
+ * (see documentation for more detail).
  *
  * \version $Id$
  *
@@ -55,8 +55,7 @@
 /**
  * Reset the watchdog timer.
  *
- * This functions is already definded to avr libc,
- * we use it.
+ * This functions is already defind in avr-libc.
  */
 // void wdt_reset(void)
 

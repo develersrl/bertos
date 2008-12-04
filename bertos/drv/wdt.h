@@ -90,7 +90,7 @@
 	 * timeout.
 	 *
 	 * \param timeout, this value is target dependant.
-	 * See the target documentation for more detail.
+	 * See the target documentation for more details.
 	 */
 	INLINE void wdt_start(uint32_t timeout)
 	{
