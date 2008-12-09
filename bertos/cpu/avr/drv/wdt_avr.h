@@ -63,7 +63,7 @@
  * Start the watchdog timer that fire at the select
  * timeout.
  *
- * \param timeout, you can use the macro that are defineded in
+ * \param _timeout you can use the macro that are defineded in
  * avr/wdt.h.
  *
  * (from avr libc documentation)
