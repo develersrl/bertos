@@ -20,7 +20,7 @@ class BVersionPage(BWizardPage):
         self.setTitle(self.tr("Select the beRTOS version needed"))
     
     def _connectSignals(self):
-        self.connect(self.pageContent.updateButton, SIGNAL("clicked()"), self.updateClicked))
+        self.connect(self.pageContent.updateButton, SIGNAL("clicked()"), self.updateClicked)
     
     def _setupUi(self):
         self.pageContent.updateProgressBar.setVisible(False)
