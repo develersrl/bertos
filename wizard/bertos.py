@@ -13,6 +13,7 @@ import sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import BStartPage
+import BVersionPage
 
 def main():
     app = QApplication(sys.argv)
@@ -20,6 +21,7 @@ def main():
     wizard = QWizard()
     wizard.setWindowTitle("Welcome in beRTOS configuration wizard")
     wizard.addPage(startPage)
+    wizard.addPage(BVersionPage.BVersionPage())
     wizard.show()
     sys.exit(app.exec_())
 
