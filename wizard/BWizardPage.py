@@ -17,7 +17,6 @@ class BWizardPage(QWizardPage):
     
     def __init__(self, wizardGui, parent = None):
         QWizardPage.__init__(self, parent)
-        uic.loadUiType("start.ui")
         self.pageContent = uic.loadUi(wizardGui, None)
         layout = QVBoxLayout()
         layout.addWidget(self.pageContent)
