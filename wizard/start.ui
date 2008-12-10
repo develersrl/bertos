@@ -21,7 +21,7 @@
   <widget class="QWidget" name="" >
    <property name="geometry" >
     <rect>
-     <x>210</x>
+     <x>150</x>
      <y>140</y>
      <width>361</width>
      <height>171</height>
@@ -38,19 +38,42 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="minimumSize" >
+         <size>
+          <width>64</width>
+          <height>64</height>
+         </size>
+        </property>
         <property name="text" >
          <string/>
+        </property>
+        <property name="icon" >
+         <iconset resource="bertos.qrc" >
+          <normaloff>:/images/images/new.png</normaloff>:/images/images/new.png</iconset>
+        </property>
+        <property name="iconSize" >
+         <size>
+          <width>64</width>
+          <height>64</height>
+         </size>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="newDescription" >
         <property name="text" >
-         <string>New project</string>
+         <string>Create a new bertos project</string>
         </property>
        </widget>
       </item>
      </layout>
+    </item>
+    <item>
+     <widget class="Line" name="line" >
+      <property name="orientation" >
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2" >
@@ -62,15 +85,31 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="minimumSize" >
+         <size>
+          <width>64</width>
+          <height>64</height>
+         </size>
+        </property>
         <property name="text" >
          <string/>
+        </property>
+        <property name="icon" >
+         <iconset resource="bertos.qrc" >
+          <normaloff>:/images/images/open.png</normaloff>:/images/images/open.png</iconset>
+        </property>
+        <property name="iconSize" >
+         <size>
+          <width>64</width>
+          <height>64</height>
+         </size>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="editDescription" >
         <property name="text" >
-         <string>Edit Project</string>
+         <string>Edit an existent bertos project</string>
         </property>
        </widget>
       </item>
@@ -79,6 +118,8 @@
    </layout>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="bertos.qrc" />
+ </resources>
  <connections/>
 </ui>
