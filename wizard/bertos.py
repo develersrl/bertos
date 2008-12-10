@@ -10,11 +10,18 @@
 #
 
 import sys
-import os
-
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+import BStartPage
 
 def main():
-    pass
+    app = QApplication(sys.argv)
+    startPage = BStartPage.BStartPage()
+    wizard = QWizard()
+    wizard.setWindowTitle("Welcome in beRTOS configuration wizard")
+    wizard.addPage(startPage)
+    wizard.show()
+    sys.exit(app.exec_())
 
 
 if __name__ == '__main__':
