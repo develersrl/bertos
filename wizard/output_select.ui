@@ -1,0 +1,71 @@
+<ui version="4.0" >
+ <class>Form</class>
+ <widget class="QWidget" name="Form" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>640</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="sizePolicy" >
+   <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <widget class="QWidget" name="" >
+   <property name="geometry" >
+    <rect>
+     <x>280</x>
+     <y>100</y>
+     <width>125</width>
+     <height>160</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout" >
+    <item>
+     <widget class="QPushButton" name="makefileButton" >
+      <property name="text" >
+       <string>Makefile</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="eclipseButton" >
+      <property name="text" >
+       <string>Eclipse</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="xcodeButton" >
+      <property name="text" >
+       <string>XCode</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="vstudioButton" >
+      <property name="text" >
+       <string>Visual Studio</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="netbeansButton" >
+      <property name="text" >
+       <string>NetBeans</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
