@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>640</width>
-    <height>480</height>
+    <width>149</width>
+    <height>184</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -18,53 +18,47 @@
   <property name="windowTitle" >
    <string>Form</string>
   </property>
-  <widget class="QWidget" name="" >
-   <property name="geometry" >
-    <rect>
-     <x>280</x>
-     <y>100</y>
-     <width>125</width>
-     <height>160</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout" >
-    <item>
-     <widget class="QPushButton" name="makefileButton" >
-      <property name="text" >
-       <string>Makefile</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="eclipseButton" >
-      <property name="text" >
-       <string>Eclipse</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="xcodeButton" >
-      <property name="text" >
-       <string>XCode</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="vstudioButton" >
-      <property name="text" >
-       <string>Visual Studio</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="netbeansButton" >
-      <property name="text" >
-       <string>NetBeans</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
+  <layout class="QVBoxLayout" name="verticalLayout_2" >
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout" >
+     <item>
+      <widget class="QPushButton" name="makefileButton" >
+       <property name="text" >
+        <string>Makefile</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="eclipseButton" >
+       <property name="text" >
+        <string>Eclipse</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="xcodeButton" >
+       <property name="text" >
+        <string>XCode</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="vstudioButton" >
+       <property name="text" >
+        <string>Visual Studio</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="netbeansButton" >
+       <property name="text" >
+        <string>NetBeans</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>

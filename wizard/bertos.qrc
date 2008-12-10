@@ -1,6 +1,6 @@
 <RCC>
   <qresource prefix="images" >
-    <file>images/new.png</file>
-    <file>images/open.png</file>
+    <file>images/filenew.png</file>
+    <file>images/fileopen.png</file>
   </qresource>
 </RCC>
