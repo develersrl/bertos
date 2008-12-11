@@ -17,6 +17,9 @@ class BWizardPage(QWizardPage):
     
     def __init__(self, wizardGui, parent = None):
         QWizardPage.__init__(self, parent)
+        # TODO: see why this function call is needed for display the
+        # applications icons...
+        uic.loadUiType(wizardGui)
         self.pageContent = uic.loadUi(wizardGui, None)
         layout = QVBoxLayout()
         layout.addWidget(self.pageContent)
