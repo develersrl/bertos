@@ -5,16 +5,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>355</width>
+    <width>358</width>
     <height>311</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2" >
+  <layout class="QVBoxLayout" name="verticalLayout_4" >
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout" >
+    <layout class="QVBoxLayout" name="verticalLayout_3" >
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout" >
        <item>
@@ -48,16 +48,27 @@
           <bool>true</bool>
          </property>
          <property name="checked" >
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="newDescription" >
-         <property name="text" >
-          <string>Create a new bertos project</string>
-         </property>
-        </widget>
+        <layout class="QVBoxLayout" name="verticalLayout" >
+         <item>
+          <widget class="QLabel" name="newAction" >
+           <property name="text" >
+            <string>Create a new bertos project</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="newDescription" >
+           <property name="text" >
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
@@ -103,11 +114,22 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="editDescription" >
-         <property name="text" >
-          <string>Edit an existent bertos project</string>
-         </property>
-        </widget>
+        <layout class="QVBoxLayout" name="verticalLayout_2" >
+         <item>
+          <widget class="QLabel" name="editAction" >
+           <property name="text" >
+            <string>Edit an existent bertos project</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="editDescription" >
+           <property name="text" >
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>

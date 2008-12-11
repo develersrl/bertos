@@ -10,6 +10,7 @@
 #
 
 from BWizardPage import *
+from libbertos import *
 
 class BStartPage(BWizardPage):
     
@@ -17,15 +18,33 @@ class BStartPage(BWizardPage):
         BWizardPage.__init__(self, "start.ui")
         self._connectSignals()
         self.setTitle(self.tr("Create or edit a beRTOS project"))
+        self._initializeButtons()
+        self._setupUi()
         
     def _connectSignals(self):
-        self.connect(self.pageContent.newButton, SIGNAL("clicked()"), lambda: self.mutualExclusion("new"))
-        self.connect(self.pageContent.editButton, SIGNAL("clicked()"), lambda: self.mutualExclusion("edit"))
-        
-    def mutualExclusion(self, button):
-        if(button == "new"):
-            self.pageContent.newButton.setChecked(True)
-            self.pageContent.editButton.setChecked(False)
-        elif(button == "edit"):
-            self.pageContent.newButton.setChecked(False)
-            self.pageContent.editButton.setChecked(True)
+        self.connect(self.pageContent.newButton, SIGNAL("clicked()"), self.newProject)
+        self.connect(self.pageContent.editButton, SIGNAL("clicked()"), self.editProject)
+    
+    def _initializeButtons(self):
+        self.buttonGroup = QButtonGroup()
+        self.buttonGroup.addButton(self.pageContent.newButton)
+        self.buttonGroup.addButton(self.pageContent.editButton)
+        self.buttonGroup.setExclusive(True)
+
+    def _setupUi(self):
+        self.pageContent.newDescription.setVisible(False)
+        self.pageContent.editDescription.setVisible(False)
+    
+    def newProject(self):
+        filename = QFileDialog.getSaveFileName(self, self.tr("Destination directory"), "", "", "", QFileDialog.ShowDirsOnly)
+        if not filename.isEmpty():
+            self.pageContent.newDescription.setText("(\"" + filename + "\")")
+            self.pageContent.newDescription.setVisible(True)
+            # TODO: It's better to create it at the end of the wizard...
+            createBertosProject(filename)
+        else:
+            self.pageContent.newDescription.setText("")
+            self.pageContent.newDescription.setVisible(False)
+    
+    def editProject(self):
+        pass
