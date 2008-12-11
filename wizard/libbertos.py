@@ -21,4 +21,14 @@ def bertosVersion(directory):
     qfile = QFile(version_file)
     qfile.open(QIODevice.ReadOnly)
     file = QTextStream(qfile)
-    return file.readLine()
+    version = file.readLine()
+    qfile.close()
+    return version
+
+def createBertosProject(directory):
+    bertos_directory = directory
+    QDir().mkdir(directory)
+    bertos_project = directory + QDir.separator() + "project.bertos"
+    qfile = QFile(bertos_project)
+    qfile.open(QIODevice.WriteOnly)
+    qfile.close()
