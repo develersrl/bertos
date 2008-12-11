@@ -51,6 +51,8 @@ TOOLCHAIN = "arm"
 # If we use the GCC compiler we should pass some flags. 
 CORE_CPU = "arm7tdmi"
 
+C_FLAGS = []
+
 CPPA_FLAGS = []
 
 CPP_FLAGS = [ "-D__ARM_AT91SAM7X256__"
@@ -62,6 +64,8 @@ LD_FLAGS = [ "-nostartfiles",
 
 CPPA_SRC = [ BERTOS_HW_DIR + "crtat91sam7_rom.S",
 	     BERTOS_HW_DIR + "switch_arm.S" ]
+
+PC_SRC = []
 
 # For this cpu BeRTOS support these driver: 
 SUPPORTED_DRV = [adc, kdebug, pwm, ser, stepper, timer, twi]
