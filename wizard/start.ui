@@ -36,7 +36,7 @@
          </property>
          <property name="icon" >
           <iconset resource="bertos.qrc" >
-           <normaloff>:/images/images/filenew.png</normaloff>:/images/images/filenew.png</iconset>
+           <normaloff>:/images/filenew.png</normaloff>:/images/filenew.png</iconset>
          </property>
          <property name="iconSize" >
           <size>
@@ -89,7 +89,7 @@
          </property>
          <property name="icon" >
           <iconset resource="bertos.qrc" >
-           <normaloff>:/images/images/fileopen.png</normaloff>:/images/images/fileopen.png</iconset>
+           <normaloff>:/images/fileopen.png</normaloff>:/images/fileopen.png</iconset>
          </property>
          <property name="iconSize" >
           <size>
