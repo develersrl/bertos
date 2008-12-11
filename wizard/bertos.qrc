@@ -2,5 +2,9 @@
   <qresource>
     <file>images/filenew.png</file>
     <file>images/fileopen.png</file>
+	<file>images/listremove.png</file>
+	<file>images/listadd.png</file>
+	<file>images/ok.png</file>
+	<file>images/warning.png</file>
   </qresource>
 </RCC>
