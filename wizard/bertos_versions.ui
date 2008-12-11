@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>441</width>
-    <height>376</height>
+    <width>445</width>
+    <height>371</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -18,56 +18,100 @@
   <property name="windowTitle" >
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" >
+  <layout class="QVBoxLayout" name="verticalLayout_2" >
    <item>
-    <widget class="QListWidget" name="versionList" />
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" >
+    <layout class="QVBoxLayout" name="verticalLayout" >
      <item>
-      <widget class="QLabel" name="statusLabel" >
-       <property name="minimumSize" >
-        <size>
-         <width>100</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text" >
-        <string/>
-       </property>
-      </widget>
+      <widget class="QListWidget" name="versionList" />
      </item>
      <item>
-      <widget class="QProgressBar" name="updateProgressBar" >
-       <property name="value" >
-        <number>24</number>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_2" >
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0" >
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="updateButton" >
-       <property name="text" >
-        <string>Check for updates</string>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout" >
+       <item>
+        <widget class="QToolButton" name="addButton" >
+         <property name="minimumSize" >
+          <size>
+           <width>25</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="maximumSize" >
+          <size>
+           <width>25</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="text" >
+          <string>+</string>
+         </property>
+         <property name="icon" >
+          <iconset resource="bertos.qrc" >
+           <normaloff>:/images/listadd.png</normaloff>:/images/listadd.png</iconset>
+         </property>
+         <property name="iconSize" >
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="removeButton" >
+         <property name="minimumSize" >
+          <size>
+           <width>25</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="maximumSize" >
+          <size>
+           <width>25</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="text" >
+          <string>-</string>
+         </property>
+         <property name="icon" >
+          <iconset resource="bertos.qrc" >
+           <normaloff>:/images/listremove.png</normaloff>:/images/listremove.png</iconset>
+         </property>
+         <property name="iconSize" >
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer" >
+         <property name="orientation" >
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0" >
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="updateButton" >
+         <property name="text" >
+          <string>Update</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="bertos.qrc" />
+ </resources>
  <connections/>
 </ui>
