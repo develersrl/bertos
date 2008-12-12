@@ -10,7 +10,7 @@
 #
 
 from BWizardPage import *
-from libbertos import *
+import bertos_utils
 
 class BStartPage(BWizardPage):
     
@@ -41,7 +41,7 @@ class BStartPage(BWizardPage):
             self.pageContent.newDescription.setText("(\"" + filename + "\")")
             self.pageContent.newDescription.setVisible(True)
             # TODO: It's better to create it at the end of the wizard...
-            createBertosProject(filename)
+            bertos_utils.createBertosProject(filename)
         else:
             self.pageContent.newDescription.setText("")
             self.pageContent.newDescription.setVisible(False)

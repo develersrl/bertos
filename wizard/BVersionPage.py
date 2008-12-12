@@ -11,7 +11,7 @@
 
 from PyQt4.QtGui import *
 from BWizardPage import *
-from libbertos import *
+import bertos_utils
 
 class BVersionPage(BWizardPage):
     
@@ -33,8 +33,8 @@ class BVersionPage(BWizardPage):
     
     def addVersion(self):
         directory = QFileDialog.getExistingDirectory(self, self.tr("Choose a directory"), QString(), QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks)
-        if isBertosDir(directory):
-            version = bertosVersion(directory)
+        if bertos_utils.isBertosDir(directory):
+            version = bertos_utils.bertosVersion(directory)
             self.pageContent.versionList.addItem(QListWidgetItem(QIcon(":/images/ok.png"), version + " (\"" + directory + "\")"))
         elif not directory.isEmpty():
             version = "UNCHECKED"
