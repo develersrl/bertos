@@ -24,7 +24,7 @@ class BVersionPage(BWizardPage):
     def _connectSignals(self):
         self.connect(self.pageContent.versionList, SIGNAL("itemClicked(QListWidgetItem *)"), self.itemClicked)
         self.connect(self.pageContent.addButton, SIGNAL("clicked()"), self.addVersion)
-        self.connect(self.pageContent.addButton, SIGNAL("clicked()"), self.removeVersion)
+        self.connect(self.pageContent.removeButton, SIGNAL("clicked()"), self.removeVersion)
         # Fake signal connection for the update button
         self.connect(self.pageContent.updateButton, SIGNAL("clicked()"), self.updateClicked)
     
@@ -35,13 +35,13 @@ class BVersionPage(BWizardPage):
         directory = QFileDialog.getExistingDirectory(self, self.tr("Choose a directory"), QString(), QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks)
         if isBertosDir(directory):
             version = bertosVersion(directory)
-            self.pageContent.versionList.addItem(QListWidgetItem(QIcon(":/images/ok.png"), version))
-        else:
+            self.pageContent.versionList.addItem(QListWidgetItem(QIcon(":/images/ok.png"), version + " (\"" + directory + "\")"))
+        elif not directory.isEmpty():
             version = "UNCHECKED"
-            self.pageContent.versionList.addItem(QListWidgetItem(QIcon(":/images/warning.png"), version))
+            self.pageContent.versionList.addItem(QListWidgetItem(QIcon(":/images/warning.png"), version + " (\"" + directory + "\")"))
     
     def removeVersion(self):
-        pass
+        self.pageContent.versionList.takeItem(self.pageContent.versionList.currentRow())
     
     def updateClicked(self):
         print "fake update checking"
