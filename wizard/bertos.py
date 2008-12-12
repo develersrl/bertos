@@ -17,6 +17,7 @@ import BVersionPage
 
 def main():
     app = QApplication(sys.argv)
+    QResource.registerResource("bertos.rcc")
     startPage = BStartPage.BStartPage()
     wizard = QWizard()
     wizard.setWindowTitle("Welcome in beRTOS configuration wizard")
