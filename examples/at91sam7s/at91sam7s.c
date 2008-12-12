@@ -50,21 +50,35 @@
 
 Timer leds_timer;
 Serial ser_fd;
+int roll = 0;
 
 static void leds_toggle(void)
 {
 	uint8_t a = (~PIOA_ODSR & 0x0f);
 
-	if (a)
+	if (roll == 1)
 	{
+		if(a == 4)
+			roll = 2;
+
 		PIOA_SODR = a;
 		PIOA_CODR = a << 1;
+
+	}
+	else if (roll == 2)
+	{
+		if(a == 2)
+			roll = 1;
+
+		PIOA_SODR = a;
+		PIOA_CODR = a >> 1;	
 	}
 	else
 	{
 		PIOA_SODR  =  0x0f;
 		/* turn first led on */
 		PIOA_CODR  = 0x00000001;
+		roll = 1;
 	}
 
 	/* Wait for interval time */
