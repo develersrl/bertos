@@ -1,0 +1,105 @@
+#
+#-*- coding: utf-8 -*-
+#
+# \file
+# <!--
+# This file is part of BeRTOS.
+#
+# Bertos is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
+# As a special exception, you may use this file as part of a free software
+# library without restriction.  Specifically, if other files instantiate
+# templates or use macros or inline functions from this file, or you compile
+# this file and link it with other files to produce an executable, this
+# file does not by itself cause the resulting executable to be covered by
+# the GNU General Public License.  This exception does not however
+# invalidate any other reasons why the executable file might be covered by
+# the GNU General Public License.
+#
+# Copyright 2008 Develer S.r.l. (http://www.develer.com/)
+#
+# -->
+# 
+# General CPU info denfinition.
+# 
+# This file contain all info for the BeRTOS wizard.
+#
+# \author Daniele Basile <asterix@develer.com>
+#
+#
+
+# List of the BeRTOS's supported cpu.
+SUPPORTED_CPU_CORE = [ "arm", "avr" ]
+
+# Where are locate the bertos directories
+BERTOS_CPU_DIR = "bertos/cpu/"
+
+BERTOS_SCRIPT_DIR = { "arm": BERTOS_CPU_DIR + "arm/script/",
+		      "avr": BERTOS_CPU_DIR + "avr/script/" }
+
+BERTOS_HW_DIR = { "arm": BERTOS_CPU_DIR + "arm/hw/",
+		  "avr": BERTOS_CPU_DIR + "avr/hw/" }
+
+BERTOS_DRV_DIR = { "arm": BERTOS_CPU_DIR + "arm/drv/",
+		   "avr": BERTOS_CPU_DIR + "avr/drv/" }
+
+# Common GCC flags.
+COM_C_FLAGS = { "arm": None,
+	        "avr": [ "-O0", "-fno-strict-aliasing"] }
+
+COM_CPPA_FLAGS = { "arm": [ "-O0", "-g -gdwarf-2", "-g -gen-debug" ],
+	           "avr": None }
+
+COM_CPP_FLAGS = { "arm": [ "-O0", "-g3 -gdwarf-2", "-fverbose-asm" ]
+	          "avr": None }
+
+COM_LD_FLAGS = { "arm": None,
+	         "avr": None }
+
+COM_CPPA_SRC = { "arm": None,
+	         "avr": None }
+
+COM_PC_SRC = { "arm": None,
+	       "avr": None }
+
+
+# If you want to use, one o more, of these modules in your project you should compile in 
+# different way.
+PC_SRC = { "arm": None,
+           "avr": [ "kdebug",
+	            "formartwr",
+		    "sprintf",
+		    "text_format",
+		    "text" ] }
+
+COM_SUPPORTED_DRV = { "arm": [ "adc",
+                               "kdebug",
+	                       "pwm",
+			       "ser", 
+			       "stepper",
+			       "timer", 
+			       "twi" ]
+		      "avr": [ "adc",
+			       "flash",
+			       "flash",
+			       "pwm",
+			       "ser",
+			       "sipo",
+			       "timer",
+			       "wdt",
+			       "ic2",
+			       "kdebug",
+			       "lcd_32122a"] }
+	       
