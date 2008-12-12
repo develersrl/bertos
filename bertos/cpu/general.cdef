@@ -93,7 +93,6 @@ COM_SUPPORTED_DRV = { "arm": [ "adc",
 			       "twi" ]
 		      "avr": [ "adc",
 			       "flash",
-			       "flash",
 			       "pwm",
 			       "ser",
 			       "sipo",
@@ -101,5 +100,5 @@ COM_SUPPORTED_DRV = { "arm": [ "adc",
 			       "wdt",
 			       "ic2",
 			       "kdebug",
-			       "lcd_32122a"] }
+			       "lcd_32122a" ] }
 	       
