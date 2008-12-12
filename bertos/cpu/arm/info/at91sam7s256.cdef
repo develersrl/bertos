@@ -40,11 +40,6 @@
 #
 #
 
-# Where are locate the bertos directories
-BERTOS_CPU_DIR = "bertos/cpu/"
-BERTOS_SCRIPT_DIR = BERTOS_CPU_DIR + "arm/script/"
-BERTOS_HW_DIR = BERTOS_CPU_DIR + "arm/hw/"
-
 # Type of the toolchain we should use to compile the source for this CPU.
 TOOLCHAIN = "arm"
 
@@ -55,8 +50,7 @@ C_FLAGS = []
 
 CPPA_FLAGS = []
 
-CPP_FLAGS = [ "-D__ARM_AT91SAM7S256__"
-	      "-fverbose-asm"]
+CPP_FLAGS = []
 
 LD_FLAGS = [ "-nostartfiles",
 	     "-T " + BERTOS_SCRIPT_DIR + " at91sam7_256_rom.ld" 
@@ -68,5 +62,5 @@ CPPA_SRC = [ BERTOS_HW_DIR + "crtat91sam7_rom.S",
 PC_SRC = []
 
 # For this cpu BeRTOS support these driver: 
-SUPPORTED_DRV = [adc, kdebug, pwm, ser, stepper, timer, twi]
+SUPPORTED_DRV = []
 
