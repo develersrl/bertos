@@ -9,26 +9,16 @@
 # Author: Lorenzo Berni <duplo@develer.com>
 #
 
-from PyQt4.QtCore import *
+import os
 
 def isBertosDir(directory):
-    version_file = directory + QDir.separator() + "VERSION"
-    qfile = QFile(version_file)
-    return qfile.exists()
+   return os.path.exists(directory + "/VERSION")
 
 def bertosVersion(directory):
-    version_file = directory + QDir.separator() + "VERSION"
-    qfile = QFile(version_file)
-    qfile.open(QIODevice.ReadOnly)
-    file = QTextStream(qfile)
-    version = file.readLine()
-    qfile.close()
-    return version
+   return open(directory + "/VERSION").readline().strip()
 
 def createBertosProject(directory):
-    bertos_directory = directory
-    QDir().mkdir(directory)
-    bertos_project = directory + QDir.separator() + "project.bertos"
-    qfile = QFile(bertos_project)
-    qfile.open(QIODevice.WriteOnly)
-    qfile.close()
+    if not os.path.isdir(directory):
+        os.mkdir(directory)
+    open(directory + "/project.bertos", "w")
+    
