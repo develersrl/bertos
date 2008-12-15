@@ -17,6 +17,7 @@ import BVersionPage
 
 def main():
     app = QApplication(sys.argv)
+    app.settings = QSettings("Develer", "Bertos Configurator")
     QResource.registerResource("bertos.rcc")
     startPage = BStartPage.BStartPage()
     wizard = QWizard()
