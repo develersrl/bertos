@@ -21,3 +21,9 @@ class BWizardPage(QWizardPage):
         layout = QVBoxLayout()
         layout.addWidget(self.pageContent)
         self.setLayout(layout)
+    
+    def _settingsStore(self, key, value):
+        QApplication.instance().settings.setValue(QString(key), QVariant(value))
+    
+    def _settingsRetrieve(self, key):
+        return QApplication.instance().settings.value(QString(key), QVariant())
