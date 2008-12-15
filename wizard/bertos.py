@@ -21,7 +21,7 @@ def main():
     QResource.registerResource("bertos.rcc")
     startPage = BStartPage.BStartPage()
     wizard = QWizard()
-    wizard.setWindowTitle("Welcome in beRTOS configuration wizard")
+    wizard.setWindowTitle("Welcome in BeRTOS configuration wizard")
     wizard.addPage(startPage)
     wizard.addPage(BVersionPage.BVersionPage())
     wizard.show()

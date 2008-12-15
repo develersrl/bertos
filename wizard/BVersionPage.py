@@ -20,7 +20,7 @@ class BVersionPage(BWizardPage):
         self._connectSignals()
         self._fillVersionList()
         self._setupUi()
-        self.setTitle(self.tr("Select the beRTOS version needed"))
+        self.setTitle(self.tr("Select the BeRTOS version needed"))
     
     def _connectSignals(self):
         self.connect(self.pageContent.versionList, SIGNAL("itemClicked(QListWidgetItem *)"), self.itemClicked)

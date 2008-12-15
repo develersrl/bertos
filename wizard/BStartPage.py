@@ -17,7 +17,7 @@ class BStartPage(BWizardPage):
     def __init__(self):
         BWizardPage.__init__(self, "start.ui")
         self._connectSignals()
-        self.setTitle(self.tr("Create or edit a beRTOS project"))
+        self.setTitle(self.tr("Create or edit a BeRTOS project"))
         self._initializeButtons()
         self._setupUi()
         
