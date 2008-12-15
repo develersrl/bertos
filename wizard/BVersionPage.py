@@ -18,6 +18,7 @@ class BVersionPage(BWizardPage):
     def __init__(self):
         BWizardPage.__init__(self, "bertos_versions.ui")
         self._connectSignals()
+        self._fillVersionList()
         self._setupUi()
         self.setTitle(self.tr("Select the beRTOS version needed"))
     
@@ -31,17 +32,42 @@ class BVersionPage(BWizardPage):
     def _setupUi(self):
         pass
     
-    def addVersion(self):
-        directory = QFileDialog.getExistingDirectory(self, self.tr("Choose a directory"), QString(), QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks)
+    def _storeVersion(self, directory):
+        versions = self._settingsRetrieve("versions").toList()
+        versions = set([x.toString() for x in versions] + [directory])
+        self._settingsStore("versions", list(versions))
+    
+    def _deleteVersion(self, directory):
+        versions = self._settingsRetrieve(QString("versions")).toList()
+        versions = [x.toString() for x in versions]
+        versions.remove(directory)
+        self._settingsStore("versions", versions)
+        
+    def _insertListElement(self, directory):
         if bertos_utils.isBertosDir(directory):
-            version = bertos_utils.bertosVersion(directory)
-            self.pageContent.versionList.addItem(QListWidgetItem(QIcon(":/images/ok.png"), version + " (\"" + directory + "\")"))
+            item = QListWidgetItem(QIcon(":/images/ok.png"), bertos_utils.bertosVersion(directory) + " (\"" + directory + "\")")
+            item.setData(Qt.UserRole, QVariant(directory))
+            self.pageContent.versionList.addItem(item)
         elif not directory.isEmpty():
-            version = "UNCHECKED"
-            self.pageContent.versionList.addItem(QListWidgetItem(QIcon(":/images/warning.png"), version + " (\"" + directory + "\")"))
+            item = QListWidgetItem(QIcon(":/images/warning.png"), "UNKNOWN" + " (\"" + directory + "\")")
+            item.setData(Qt.UserRole, QVariant(directory))
+            self.pageContent.versionList.addItem(item)
+    
+    def _fillVersionList(self):
+        versions = self._settingsRetrieve("versions").toList()
+        for directory in versions:
+            self._insertListElement(directory.toString())
+
+    def addVersion(self):
+        directory = QFileDialog.getExistingDirectory(self, self.tr("Choose a directory"), "", QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks)
+        if not directory.isEmpty():
+            self._storeVersion(directory)
+            self.pageContent.versionList.clear()
+            self._fillVersionList()
     
     def removeVersion(self):
-        self.pageContent.versionList.takeItem(self.pageContent.versionList.currentRow())
+        item = self.pageContent.versionList.takeItem(self.pageContent.versionList.currentRow())
+        self._deleteVersion(item.data(Qt.UserRole).toString())
     
     def updateClicked(self):
         print "fake update checking"
