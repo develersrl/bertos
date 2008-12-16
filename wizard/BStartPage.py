@@ -35,6 +35,9 @@ class BStartPage(BWizardPage):
         self.pageContent.newDescription.setVisible(False)
         self.pageContent.editDescription.setVisible(False)
     
+    def isComplete(self):
+        return self.pageContent.newButton.isChecked() or self.pageContent.editButton.isChecked()
+    
     def newProject(self):
         filename = QFileDialog.getSaveFileName(self, self.tr("Destination directory"), "", "", "", QFileDialog.ShowDirsOnly)
         if not filename.isEmpty():
@@ -42,9 +45,11 @@ class BStartPage(BWizardPage):
             self.pageContent.newDescription.setVisible(True)
             # TODO: It's better to create it at the end of the wizard...
             bertos_utils.createBertosProject(filename)
+            self.emit(SIGNAL("completeChanged()"))
         else:
             self.pageContent.newDescription.setText("")
             self.pageContent.newDescription.setVisible(False)
+            self.pageContent.newButton.setChecked(False)
     
     def editProject(self):
-        pass
+        self.pageContent.newButton.setChecked(False)
