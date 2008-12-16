@@ -32,7 +32,7 @@
 #
 # -->
 #
-# Cpu info of the ATMega103.
+# General CPU info denfinition AVR family.
 #
 # This file contain all info for the BeRTOS wizard.
 #
@@ -41,8 +41,37 @@
 #
 
 # Import the common settings for the path.
-include("avr.common")
+include("path.common")
 
-# If we use the GCC compiler we should pass some flags.
-CORE_CPU += "atmega103"
+# Type of the toolchain we should use to compile the source for this CPU.
+TOOLCHAIN = "avr"
 
+# Where are locate the bertos directories
+SCRIPT_DIR = CPU_DIR + "avr/script/"
+HW_DIR = CPU_DIR + "avr/hw/"
+DRV_DIR = CPU_DIR + "avr/drv/"
+
+
+# Common GCC flags.
+C_FLAGS = [ "-O0", "-fno-strict-aliasing"]
+
+
+# If you want to use, one o more, of these modules in your project you should compile in
+# different way.
+PC_SRC = [ "kdebug",
+	    "formartwr",
+	    "sprintf",
+	    "text_format",
+	    "text" ]
+
+SUPPORTED_DRV = [ "adc",
+	          "flash",
+	          "pwm",
+	          "ser",
+	          "sipo",
+	          "timer",
+	          "wdt",
+	          "ic2",
+	          "kdebug",
+	          "lcd_32122a" ]
+	

@@ -31,35 +31,18 @@
 # Copyright 2008 Develer S.r.l. (http://www.develer.com/)
 #
 # -->
-# 
+#
 # Cpu info of the ATMega168.
-# 
+#
 # This file contain all info for the BeRTOS wizard.
 #
 # \author Daniele Basile <asterix@develer.com>
 #
 #
 
-# Type of the toolchain we should use to compile the source for this CPU.
-TOOLCHAIN = "avr"
+# Import the common settings for the path.
+include("avr.common")
 
-# If we use the GCC compiler we should pass some flags. 
-CORE_CPU = "atmega168"
-
-C_FLAGS = []
-
-CPPA_FLAGS = []
-
-CPP_FLAGS = []
-
-LD_FLAGS = []
-
-CPPA_SRC = []
-
-# If you want to use, one o more, of these modules in your project you should compile in 
-# different way.
-PC_SRC = []
-
-# For this cpu BeRTOS support these driver: 
-SUPPORTED_DRV = []
+# If we use the GCC compiler we should pass some flags.
+CORE_CPU += "atmega168"
 
