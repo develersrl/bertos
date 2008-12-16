@@ -58,20 +58,25 @@ class BVersionPage(BWizardPage):
         for directory in versions:
             self._insertListElement(directory.toString())
 
+    def isComplete(self):
+        return self.pageContent.versionList.currentRow() != -1
+    
     def addVersion(self):
         directory = QFileDialog.getExistingDirectory(self, self.tr("Choose a directory"), "", QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks)
         if not directory.isEmpty():
             self._storeVersion(directory)
             self.pageContent.versionList.clear()
             self._fillVersionList()
+            self.emit(SIGNAL("completeChanged()"))
     
     def removeVersion(self):
         item = self.pageContent.versionList.takeItem(self.pageContent.versionList.currentRow())
         self._deleteVersion(item.data(Qt.UserRole).toString())
+        self.emit(SIGNAL("completeChanged()"))
     
     def updateClicked(self):
         print "fake update checking"
     
     def itemClicked(self, item):
-        print "clicked", repr(item)
+        self.emit(SIGNAL("completeChanged()"))
     
