@@ -31,36 +31,19 @@
 # Copyright 2008 Develer S.r.l. (http://www.develer.com/)
 #
 # -->
-# 
+#
 # Cpu info of the AT91SAM7X128.
-# 
+#
 # This file contain all info for the BeRTOS wizard.
 #
 # \author Daniele Basile <asterix@develer.com>
 #
 #
 
-# Type of the toolchain we should use to compile the source for this CPU.
-TOOLCHAIN = "arm"
+# Import the common settings for the AT91SAM7 family.
+include("at91sam7.common")
 
-# If we use the GCC compiler we should pass some flags. 
-CORE_CPU = "arm7tdmi"
-
-C_FLAGS = []
-
-CPPA_FLAGS = []
-
-CPP_FLAGS = []
-
-LD_FLAGS = [ "-nostartfiles",
-	     "-T " + BERTOS_SCRIPT_DIR + " at91sam7_128_rom.ld" 
-	     "-Wl,--no-warn-mismatch" ]
-
-CPPA_SRC = [ BERTOS_HW_DIR + "crtat91sam7_rom.S",
-	     BERTOS_HW_DIR + "switch_arm.S" ]
-
-PC_SRC = []
-
-# For this cpu BeRTOS support these driver: 
-SUPPORTED_DRV = []
+# GCC flags for this cpu.
+CPP_FLAGS += [ "-D__ARM_AT91SAM7X128__" ]
+LD_FLAGS += [ "-T " + SCRIPT_DIR + " at91sam7_128_rom.ld" ]
 
