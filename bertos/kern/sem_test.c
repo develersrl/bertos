@@ -76,12 +76,6 @@
 //Process 8
 #define INC_PROC_T8                    19
 #define DELAY_PROC_T8   INC_PROC_T3*DELAY
-//Process 9
-#define INC_PROC_T9                    23
-#define DELAY_PROC_T9   INC_PROC_T3*DELAY
-//Process 10
-#define INC_PROC_T10                   29
-#define DELAY_PROC_T10  INC_PROC_T3*DELAY
 
 Semaphore sem;
 unsigned int global_count = 0;
@@ -121,10 +115,7 @@ PROC_TEST(5)
 PROC_TEST(6)
 PROC_TEST(7)
 PROC_TEST(8)
-/*
-PROC_TEST(9)
-PROC_TEST(10)
-*/
+
 // Define process stacks for test.
 PROC_TEST_STACK(1)
 PROC_TEST_STACK(2)
@@ -134,10 +125,7 @@ PROC_TEST_STACK(5)
 PROC_TEST_STACK(6)
 PROC_TEST_STACK(7)
 PROC_TEST_STACK(8)
-/*
-PROC_TEST_STACK(9)
-PROC_TEST_STACK(10)
-*/
+
 /**
  * Run semaphore test
  */
@@ -156,10 +144,6 @@ int sem_testRun(void)
 	PROC_TEST_INIT(6)
 	PROC_TEST_INIT(7)
 	PROC_TEST_INIT(8)
-	/*
-	PROC_TEST_INIT(9)
-	PROC_TEST_INIT(10)
-	 */
 	kputs("> Main: Processes created\n");
 	
 	/*
