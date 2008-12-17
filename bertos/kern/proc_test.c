@@ -86,7 +86,6 @@ int proc_testRun(void)
 		kputs("> main\n");
 		timer_delay(93);
 		monitor_report();
-		proc_yield();
 	}
 	return 0;
 }
