@@ -16,13 +16,16 @@ from PyQt4.QtGui import *
 
 import BStartPage
 
+import BFolderPage
 import BVersionPage
 
 def newProject():
-    QApplication.instance().wizard = QWizard()
-    QApplication.instance().wizard.setWindowTitle("Create a BeRTOS project")
-    QApplication.instance().wizard.addPage(BVersionPage.BVersionPage())
-    QApplication.instance().wizard.show()
+    wizard = QWizard()
+    wizard.setWindowTitle("Create a BeRTOS project")
+    wizard.addPage(BFolderPage.BFolderPage())
+    wizard.addPage(BVersionPage.BVersionPage())
+    wizard.show()
+    wizard.exec_()
     
 def editProject():
     print "editProject"
