@@ -102,6 +102,7 @@
 
 #include <cfg/cfg_timer.h>
 #include <cfg/debug.h>
+
 #include <cpu/irq.h>
 #include <kern/proc.h>
 #include <kern/proc_p.h>

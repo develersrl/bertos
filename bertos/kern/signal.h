@@ -38,12 +38,10 @@
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
-
 #ifndef KERN_SIGNAL_H
 #define KERN_SIGNAL_H
 
 #include <cfg/compiler.h>
-
 
 /* Fwd decl */
 struct Process;
