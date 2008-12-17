@@ -34,6 +34,18 @@
  *
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
+ *
+ * $test$: cp bertos/cfg/cfg_kern.h $cfgdir/
+ * $test$: echo  "#undef CONFIG_KERN" >> $cfgdir/cfg_kern.h
+ * $test$: echo "#define CONFIG_KERN 0" >> $cfgdir/cfg_kern.h
+ * $test$: echo  "#undef CONFIG_KERN_SCHED" >> $cfgdir/cfg_kern.h
+ * $test$: echo "#define CONFIG_KERN_SCHED 0" >> $cfgdir/cfg_kern.h
+ * $test$: echo  "#undef CONFIG_KERN_SIGNALS" >> $cfgdir/cfg_kern.h
+ * $test$: echo "#define CONFIG_KERN_SIGNALS 0" >> $cfgdir/cfg_kern.h
+ * $test$: echo  "#undef CONFIG_KERN_SEMAPHORES" >> $cfgdir/cfg_kern.h
+ * $test$: echo "#define CONFIG_KERN_SEMAPHORES 0" >> $cfgdir/cfg_kern.h
+ * $test$: echo  "#undef CONFIG_KERN_MONITOR" >> $cfgdir/cfg_kern.h
+ * $test$: echo "#define CONFIG_KERN_MONITOR 0" >> $cfgdir/cfg_kern.h
  */
 
 #include <cfg/test.h>
