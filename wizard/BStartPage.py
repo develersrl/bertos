@@ -39,9 +39,9 @@ class BStartPage(QWidget):
         self.buttonGroup.setExclusive(True)
         
     def newProject(self):
-        self.emit(SIGNAL("newProject"))
         self.close()
+        self.emit(SIGNAL("newProject"))
     
     def editProject(self):
-        self.emit(SIGNAL("editProject"))
         self.close()
+        self.emit(SIGNAL("editProject"))
