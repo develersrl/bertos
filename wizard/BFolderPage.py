@@ -18,3 +18,11 @@ class BFolderPage(BWizardPage):
     def __init__(self):
         BWizardPage.__init__(self, "dir_select.ui")
         self.setTitle(self.tr("Select the BeRTOS version needed"))
+        self._folder = ""
+        self._connectSignals()
+    
+    def _connectSignals(self):
+        self.connect(self.pageContent.nameEdit, SIGNAL("textChanged(con QString)"), self._nameChanged)
+    
+    def _nameChanged(self, name):
+        print "name changed"
