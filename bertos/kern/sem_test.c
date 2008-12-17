@@ -29,37 +29,151 @@
  * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \brief Semaphore based synchronization services.
+ * \brief Semaphore test.
  *
  * \version $Id$
+ * 
  * \author Daniele Basile <asterix@develer.com>
+ * \author Stefano Fedrigo <aleph@develer.com> 
  * 
  */
 
-#include "sem.h"
-
 #include <cfg/test.h>
 
+#include <kern/sem.h>
+#include <kern/proc.h>
+#include <kern/irq.h>
+
+#include <drv/timer.h>
+
+// Global settings for the test.
+#define MAX_GLOBAL_COUNT               10
+#define TEST_TIME_OUT_MS             1000
+#define DELAY                          10
+#define INC_PROC_T1                     1
+#define DELAY_PROC_T1   INC_PROC_T1*DELAY
+#define INC_PROC_T2                     3
+#define DELAY_PROC_T2   INC_PROC_T2*DELAY
+
 Semaphore sem;
+unsigned int global_count = 0;
+
+/*
+ * Proc scheduling test subthread 1
+ */
+static void proc_test1(void)
+{
+	unsigned int local_count = 0;
+	
+	for (int i = 0; i < INC_PROC_T1; ++i)
+	{
+		kputs("> test1\n");
+		sem_obtain(&sem);
+		kputs("> test1: Obtain semaphore.\n");
+		local_count = global_count;
+		kprintf("> test1: Read global count [%d]\n", local_count);
+		timer_delay(DELAY_PROC_T1);
+		local_count += INC_PROC_T1;
+		global_count = local_count;
+		kprintf("> test1: Update count g[%d] l[%d]\n", global_count, local_count);
+		sem_release(&sem);
+		kputs("> test1: Relase semaphore.\n");
+	}
+}
+
+/*
+ * Proc scheduling test subthread 2
+ */
+static void proc_test2(void)
+{
+	unsigned int local_count = 0;
+	
+	for (int i = 0; i < INC_PROC_T2; ++i)
+	{
+		kputs("> test2\n");
+		sem_obtain(&sem);
+		kputs("> test2: Obtain semaphore.\n");
+		local_count = global_count;
+		kprintf("> test2: Read global count [%d]\n", local_count);
+		timer_delay(DELAY_PROC_T2);
+		local_count += INC_PROC_T2;
+		global_count = local_count;
+		kprintf("> test2: Update count g[%d] l[%d]\n", global_count, local_count);
+		sem_release(&sem);
+		kputs("> test2: Relase semaphore.\n");
+	}
+}
+
+// Define process stacks for test.
+static cpu_stack_t proc_test1_stack[CONFIG_KERN_MINSTACKSIZE / sizeof(cpu_stack_t)];
+static cpu_stack_t proc_test2_stack[CONFIG_KERN_MINSTACKSIZE / sizeof(cpu_stack_t)];
+
 
 /**
  * Run semaphore test
  */
 int sem_testRun(void)
 {
-	return 0;
+	ticks_t start_time = timer_clock();
+
+	kprintf("Run semaphore test..\n");
+	
+	proc_new(proc_test1, NULL, sizeof(proc_test1_stack), proc_test1_stack);
+	proc_new(proc_test2, NULL, sizeof(proc_test2_stack), proc_test2_stack);
+	kputs("> Main: Processes created\n");
+	
+	/*
+	 * Wait until all process finishing, if some going wrong we return 
+	 * error after time_out_ms ms.
+	 */ 
+	while((timer_clock() - start_time) < ms_to_ticks(TEST_TIME_OUT_MS))
+	{
+		if (sem_attempt(&sem))
+		{
+			kputs("> Main: Check if test is finish..\n");
+			if(global_count == MAX_GLOBAL_COUNT)
+			{
+				kputs("> Main: Test Finished..Ok!\n");
+				return 0;
+			}
+			sem_release(&sem);
+			kputs("> Main: Test is still running..\n");
+		}
+		proc_yield();
+	}
+	
+	kputs("Semaphore Test fail..\n");
+	return -1;
 }
 
 int sem_testSetup(void)
 {
 	kdbg_init();
+
+	kprintf("Init Semaphore..");
 	sem_init(&sem);
+	kprintf("Done.\n");
+	
+	#if CONFIG_KERN_PREEMPT
+		kprintf("Init Interrupt (preempt mode)..");
+		irq_init();
+		kprintf("Done.\n");
+	#endif
+
+	kprintf("Init Timer..");
+	timer_init();
+	kprintf("Done.\n");
+	
+	kprintf("Init Process..");
+	proc_init();
+	kprintf("Done.\n");
+	
 	return 0;
 }
 
 int sem_testTearDown(void)
 {
-	sem_release(&sem);
+	kputs("TearDown Semaphore test.\n");
 	return 0;
 }
 
