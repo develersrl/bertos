@@ -17,6 +17,5 @@ include bertos/config.mk
 include examples/demo/demo.mk
 #include examples/at91sam7s/at91sam7s.mk
 #include examples/triface/triface.mk
-include test/libunittest.mk
 
 include bertos/rules.mk
