@@ -25,7 +25,8 @@ class BFolderPage(BWizardPage):
 
     def _initializeAttributes(self):
         self._projectName = ""
-        self._destinationFolder = ""
+        self._destinationFolder = os.path.expanduser("~")
+        self.pageContent.directoryEdit.setText(self._destinationFolder)
     
     def _connectSignals(self):
         self.connect(self.pageContent.nameEdit, SIGNAL("textChanged(const QString)"), self._nameChanged)
