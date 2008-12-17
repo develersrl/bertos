@@ -42,4 +42,6 @@ with open(sys.argv[1]) as f:
 		idx = line.find(TOKEN)
 		if idx != -1:
 			cmd = line[idx + len(TOKEN):].strip()
-			os.system(cmd)
+			if os.system(cmd) != 0:
+				sys.exit(1)
+	sys.exit(0)
