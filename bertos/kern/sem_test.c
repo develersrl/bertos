@@ -47,68 +47,97 @@
 #include <drv/timer.h>
 
 // Global settings for the test.
-#define MAX_GLOBAL_COUNT               10
-#define TEST_TIME_OUT_MS             1000
+#define MAX_GLOBAL_COUNT             1024
+#define TEST_TIME_OUT_MS             4000
 #define DELAY                          10
+
+// Settings for the test process.
+//Process 1
 #define INC_PROC_T1                     1
 #define DELAY_PROC_T1   INC_PROC_T1*DELAY
+//Process 2
 #define INC_PROC_T2                     3
 #define DELAY_PROC_T2   INC_PROC_T2*DELAY
+//Process 3
+#define INC_PROC_T3                     5
+#define DELAY_PROC_T3   INC_PROC_T3*DELAY
+//Process 4
+#define INC_PROC_T4                     7
+#define DELAY_PROC_T4   INC_PROC_T3*DELAY
+//Process 5
+#define INC_PROC_T5                    11
+#define DELAY_PROC_T5   INC_PROC_T3*DELAY
+//Process 6
+#define INC_PROC_T6                    13
+#define DELAY_PROC_T6   INC_PROC_T3*DELAY
+//Process 7
+#define INC_PROC_T7                    17
+#define DELAY_PROC_T7   INC_PROC_T3*DELAY
+//Process 8
+#define INC_PROC_T8                    19
+#define DELAY_PROC_T8   INC_PROC_T3*DELAY
+//Process 9
+#define INC_PROC_T9                    23
+#define DELAY_PROC_T9   INC_PROC_T3*DELAY
+//Process 10
+#define INC_PROC_T10                   29
+#define DELAY_PROC_T10  INC_PROC_T3*DELAY
 
 Semaphore sem;
 unsigned int global_count = 0;
 
 /*
- * Proc scheduling test subthread 1
- */
-static void proc_test1(void)
-{
-	unsigned int local_count = 0;
-	
-	for (int i = 0; i < INC_PROC_T1; ++i)
-	{
-		kputs("> test1\n");
-		sem_obtain(&sem);
-		kputs("> test1: Obtain semaphore.\n");
-		local_count = global_count;
-		kprintf("> test1: Read global count [%d]\n", local_count);
-		timer_delay(DELAY_PROC_T1);
-		local_count += INC_PROC_T1;
-		global_count = local_count;
-		kprintf("> test1: Update count g[%d] l[%d]\n", global_count, local_count);
-		sem_release(&sem);
-		kputs("> test1: Relase semaphore.\n");
-	}
-}
+ * These macro generate the code that needed to create the
+ * test process function and all it needed. 
+ */ 
+#define PROC_TEST(num) static void proc_test##num(void) \
+{ \
+	unsigned int local_count = 0; \
+	\
+	for (int i = 0; i < INC_PROC_T##num; ++i) \
+	{ \
+		sem_obtain(&sem); \
+		kprintf("> test%d: Obtain semaphore.\n", num); \
+		local_count = global_count; \
+		kprintf("> test%d: Read global count [%d]\n", num, local_count); \
+		timer_delay(DELAY_PROC_T##num); \
+		local_count += INC_PROC_T##num; \
+		global_count = local_count; \
+		kprintf("> test%d: Update count g[%d] l[%d]\n", num, global_count, local_count); \
+		sem_release(&sem); \
+		kprintf("> test%d: Relase semaphore.\n", num); \
+	} \
+} \
 
+#define PROC_TEST_STACK(num)  static cpu_stack_t proc_test##num##_stack[CONFIG_KERN_MINSTACKSIZE / sizeof(cpu_stack_t)];
+#define PROC_TEST_INIT(num)   proc_new(proc_test##num, NULL, sizeof(proc_test##num##_stack), proc_test##num##_stack);
+
+// Define process
+PROC_TEST(1)
+PROC_TEST(2)
+PROC_TEST(3)
+PROC_TEST(4)
+PROC_TEST(5)
+PROC_TEST(6)
+PROC_TEST(7)
+PROC_TEST(8)
 /*
- * Proc scheduling test subthread 2
- */
-static void proc_test2(void)
-{
-	unsigned int local_count = 0;
-	
-	for (int i = 0; i < INC_PROC_T2; ++i)
-	{
-		kputs("> test2\n");
-		sem_obtain(&sem);
-		kputs("> test2: Obtain semaphore.\n");
-		local_count = global_count;
-		kprintf("> test2: Read global count [%d]\n", local_count);
-		timer_delay(DELAY_PROC_T2);
-		local_count += INC_PROC_T2;
-		global_count = local_count;
-		kprintf("> test2: Update count g[%d] l[%d]\n", global_count, local_count);
-		sem_release(&sem);
-		kputs("> test2: Relase semaphore.\n");
-	}
-}
-
+PROC_TEST(9)
+PROC_TEST(10)
+*/
 // Define process stacks for test.
-static cpu_stack_t proc_test1_stack[CONFIG_KERN_MINSTACKSIZE / sizeof(cpu_stack_t)];
-static cpu_stack_t proc_test2_stack[CONFIG_KERN_MINSTACKSIZE / sizeof(cpu_stack_t)];
-
-
+PROC_TEST_STACK(1)
+PROC_TEST_STACK(2)
+PROC_TEST_STACK(3)
+PROC_TEST_STACK(4)
+PROC_TEST_STACK(5)
+PROC_TEST_STACK(6)
+PROC_TEST_STACK(7)
+PROC_TEST_STACK(8)
+/*
+PROC_TEST_STACK(9)
+PROC_TEST_STACK(10)
+*/
 /**
  * Run semaphore test
  */
@@ -118,8 +147,19 @@ int sem_testRun(void)
 
 	kprintf("Run semaphore test..\n");
 	
-	proc_new(proc_test1, NULL, sizeof(proc_test1_stack), proc_test1_stack);
-	proc_new(proc_test2, NULL, sizeof(proc_test2_stack), proc_test2_stack);
+	//Init the process tests
+	PROC_TEST_INIT(1)
+	PROC_TEST_INIT(2)
+	PROC_TEST_INIT(3)
+	PROC_TEST_INIT(4)
+	PROC_TEST_INIT(5)
+	PROC_TEST_INIT(6)
+	PROC_TEST_INIT(7)
+	PROC_TEST_INIT(8)
+	/*
+	PROC_TEST_INIT(9)
+	PROC_TEST_INIT(10)
+	 */
 	kputs("> Main: Processes created\n");
 	
 	/*
