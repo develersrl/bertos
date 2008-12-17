@@ -27,3 +27,9 @@ class BWizardPage(QWizardPage):
     
     def _settingsRetrieve(self, key):
         return QApplication.instance().settings.value(QString(key), QVariant())
+    
+    def _projectInfoStore(self, key, value):
+        QApplication.instance().project.setInfo(key, value)
+    
+    def _projectInfoRetrieve(self, key):
+        return QApplication.instance().project.setInfo(key)

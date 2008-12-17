@@ -14,10 +14,6 @@ class BProject(object):
     def __init__(self):
         pass
     
-    def openProject(self, path):
-        # Fill the BProject fields, opening an existing project
-        pass
-    
     def setProjectPath(self, path):
         self.projectPath = path
     
