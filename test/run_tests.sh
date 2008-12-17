@@ -27,9 +27,7 @@ TESTS=${TESTS:-`find . \
 	-o -name "*_test.c*" -print` }
 
 TESTOUT="testout"
-
-#Unit test static library
-TESTLIB="images/libunittest.a"
+SRC_LIST="bertos/algo/ramp.c bertos/drv/kdebug.c bertos/drv/timer.c bertos/fs/battfs.c bertos/kern/coop.c bertos/kern/idle.c bertos/kern/kfile.c bertos/kern/monitor.c bertos/kern/proc.c bertos/kern/signal.c bertos/kern/sem.c bertos/mware/event.c bertos/mware/formatwr.c bertos/mware/hex.c bertos/mware/sprintf.c bertos/os/hptime.c bertos/emul/switch.S"
 
 buildout='/dev/null'
 runout='/dev/null'
@@ -45,22 +43,30 @@ mkdir -p "$TESTOUT"
 
 for src in $TESTS; do
 	name="`basename $src | sed -e 's/\.cpp$//' -e 's/\.c$//'`"
-	exe="./$TESTOUT/$name"
+	testdir="./$TESTOUT/$name"
+	cfgdir="$testdir/cfg"
+	mkdir -p "$cfgdir"
+	exe="$testdir/$name"
 
-	case "$src" in
-	*.cpp) BUILDCMD="$CXX $CXXFLAGS $src $TESTLIB -o $exe" ;;
-	*.c)   BUILDCMD="$CC  $CFLAGS $src $TESTLIB -o $exe" ;;
-	esac
+	PREPARECMD="test/parsetest.py $src"
+	BUILDCMD="$CC -I$testdir $CFLAGS $src $SRC_LIST -o $exe"
+	export testdir name cfgdir
 
-	[ $VERBOSE -gt 0 ] && echo "Building $name..."
-	[ $VERBOSE -gt 4 ] && echo " $BUILDCMD"
-	if $BUILDCMD 2>&1 | tee >$buildout $TESTOUT/$name.build; then
-		[ $VERBOSE -gt 0 ] && echo "Running $name..."
-		if ! $exe 2>&1 | tee >$runout $TESTOUT/$name.out; then
-			echo "FAILED [RUN]: $name"
+	[ $VERBOSE -gt 0 ] && echo "Preparing $name..."
+	[ $VERBOSE -gt 4 ] && echo " $PREPARECMD"
+	if $PREPARECMD 2>&1 | tee >$buildout $testdir/$name.prep; then
+		[ $VERBOSE -gt 0 ] && echo "Building $name..."
+		[ $VERBOSE -gt 4 ] && echo " $BUILDCMD"
+		if $BUILDCMD 2>&1 | tee >$buildout $testdir/$name.build; then
+			[ $VERBOSE -gt 0 ] && echo "Running $name..."
+			if ! $exe 2>&1 | tee >$runout $testdir/$name.out; then
+				echo "FAILED [RUN]: $name"
+			fi
+		else
+			echo "FAILED [BUILD]: $name"
 		fi
 	else
-		echo "FAILED [BUILD]: $name"
+		echo "FAILED [PREPARING]: $name"
 	fi
 done
 
