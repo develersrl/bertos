@@ -52,7 +52,6 @@ static void proc_test1(void)
 	{
 		kputs("> test1\n");
 		timer_delay(50);
-		proc_yield();
 	}
 }
 
