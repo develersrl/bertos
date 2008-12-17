@@ -14,16 +14,20 @@ import sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+import BProject
+
 import BStartPage
 
 import BFolderPage
 import BVersionPage
+import BCpuPage
 
 def newProject():
     wizard = QWizard()
     wizard.setWindowTitle("Create a BeRTOS project")
     wizard.addPage(BFolderPage.BFolderPage())
     wizard.addPage(BVersionPage.BVersionPage())
+    wizard.addPage(BCpuPage.BCpuPage())
     wizard.show()
     wizard.exec_()
     
@@ -39,6 +43,7 @@ def showStartPage():
 def main():
     app = QApplication(sys.argv)
     app.settings = QSettings("Develer", "Bertos Configurator")
+    app.project = BProject.BProject()
     QResource.registerResource("bertos.rcc")
     showStartPage()
     sys.exit(app.exec_())
