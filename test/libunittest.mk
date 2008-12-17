@@ -22,6 +22,7 @@ libunittest_CSRC = \
 	bertos/kern/monitor.c \
 	bertos/kern/proc.c \
 	bertos/kern/signal.c \
+	bertos/kern/sem.c \
 	bertos/mware/event.c \
 	bertos/mware/formatwr.c \
 	bertos/mware/hex.c \
