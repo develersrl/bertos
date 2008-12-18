@@ -147,14 +147,14 @@ int sem_testRun(void)
 	kputs("> Main: Processes created\n");
 	
 	/*
-	 * Wait until all process finishing, if some going wrong we return 
-	 * error after time_out_ms ms.
+	 * Wait until all processes exit, if something goes wrong we return an 
+	 * error after timeout_ms.
 	 */ 
 	while((timer_clock() - start_time) < ms_to_ticks(TEST_TIME_OUT_MS))
 	{
 		if (sem_attempt(&sem))
 		{
-			kputs("> Main: Check if test is finish..\n");
+			kputs("> Main: Check if test has finished..\n");
 			if(global_count == MAX_GLOBAL_COUNT)
 			{
 				kputs("> Main: Test Finished..Ok!\n");
