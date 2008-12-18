@@ -55,4 +55,8 @@ class BFolderPage(BWizardPage):
         self.pageContent.directoryEdit.setText(directory)
     
     def isComplete(self):
-        return self.pageContent.projectPath.text() != "None"
+        if self.pageContent.projectPath.text() != "None":
+            self._projectInfoStore("PROJECT_PATH", self.pageContent.projectPath.text())
+            return True
+        else:
+            return False
