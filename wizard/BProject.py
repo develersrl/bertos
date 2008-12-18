@@ -12,12 +12,10 @@
 class BProject(object):
     
     def __init__(self):
-        pass
+        self.infos = {}
     
-    def setProjectPath(self, path):
-        self.projectPath = path
+    def setInfo(self, key, value):
+        self.infos[key] = value
     
-    def setSourcePath(self, path):
-        self.sourcePath = path
-    
-    
+    def info(self, key):
+        return self.infos[key]
