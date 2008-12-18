@@ -32,4 +32,4 @@ class BWizardPage(QWizardPage):
         QApplication.instance().project.setInfo(key, value)
     
     def _projectInfoRetrieve(self, key):
-        return QApplication.instance().project.setInfo(key)
+        return QApplication.instance().project.info(key)
