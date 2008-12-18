@@ -65,6 +65,9 @@ int count = 0;
 sigmask_t sig_to_master;
 sigmask_t sig_to_slave;
 
+/*
+ * These macros generate the code needed to create the test process functions.
+ */ 
 #define PROC_TEST_SLAVE(index, signal) static void proc_test##index(void) \
 { \
 	for(;;) \
@@ -88,6 +91,7 @@ sigmask_t sig_to_slave;
 #define PROC_TEST_SLAVE_STACK(index) static cpu_stack_t proc_test##index##_stack[CONFIG_KERN_MINSTACKSIZE / sizeof(cpu_stack_t)];
 #define PROC_TEST_SLAVE_INIT(index, master_process) proc_new(proc_test##index, master_process, sizeof(proc_test##index##_stack), proc_test##index##_stack)
 
+// Generate the code for signal test.
 PROC_TEST_SLAVE(0, SIG_USER0)
 PROC_TEST_SLAVE(1, SIG_USER1)
 PROC_TEST_SLAVE(2, SIG_USER2)
