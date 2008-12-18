@@ -33,3 +33,6 @@ class BWizardPage(QWizardPage):
     
     def _projectInfoRetrieve(self, key):
         return QApplication.instance().project.info(key)
+    
+    def reloadData(self):
+        pass
