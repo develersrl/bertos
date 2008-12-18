@@ -103,6 +103,7 @@ static void proc_init_struct(Process *proc)
 
 #if CONFIG_KERN_SIGNALS
 	proc->sig_recv = 0;
+	proc->sig_wait = 0;
 #endif
 
 #if CONFIG_KERN_HEAP
@@ -112,6 +113,7 @@ static void proc_init_struct(Process *proc)
 #if CONFIG_KERN_PRI
 	proc->link.pri = 0;
 #endif
+
 }
 
 MOD_DEFINE(proc);
