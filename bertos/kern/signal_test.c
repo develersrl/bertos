@@ -47,35 +47,126 @@
 
 #include <drv/timer.h>
 
+// Set mask with all signal that we want to test.
+int test_signal[] = {
+	SIG_USER0,
+	SIG_USER1,
+	SIG_USER2,
+	SIG_USER3,
+	SIG_TIMEOUT,
+	SIG_SYSTEM5,
+	SIG_SYSTEM6,
+	SIG_SINGLE	
+};
 
-/*
- * These macro generate the code that needed to create the
- * test process function and all it needed. 
- */ 
-#define PROC_TEST(num) static void proc_test##num(void) \
+// Current signal to send
+int count = 0;
+
+sigmask_t sig_to_master;
+sigmask_t sig_to_slave;
+
+#define PROC_TEST_SLAVE(index, signal) static void proc_test##index(void) \
 { \
-	for (int i = 0; i < INC_PROC_T##num; ++i) \
+	for(;;) \
 	{ \
+		kprintf("> Slave [%d]: Wait signal [%d]\n", index, signal); \
+		sig_wait(signal); \
+		kprintf("> Slave [%d]: send signal [%d]\n", index, signal); \
+		sig_signal(proc_currentUserData(), signal); \
 	} \
 } \
 
-#define PROC_TEST_STACK(num)  static cpu_stack_t proc_test##num##_stack[CONFIG_KERN_MINSTACKSIZE / sizeof(cpu_stack_t)];
-#define PROC_TEST_INIT(num)   proc_new(proc_test##num, NULL, sizeof(proc_test##num##_stack), proc_test##num##_stack);
+#define MAIN_CHECK_SIGNAL(index, slave) \
+	do { \
+		kprintf("> Main: send signal [%d]\n", test_signal[index]); \
+		sig_signal(slave, test_signal[index]); \
+		kprintf("> Main: wait signal [%d]\n", test_signal[index]); \
+		sig_wait(test_signal[index]); \
+		count++; \
+	} while(0) \
+
+#define PROC_TEST_SLAVE_STACK(index) static cpu_stack_t proc_test##index##_stack[CONFIG_KERN_MINSTACKSIZE / sizeof(cpu_stack_t)];
+#define PROC_TEST_SLAVE_INIT(index, master_process) proc_new(proc_test##index, master_process, sizeof(proc_test##index##_stack), proc_test##index##_stack)
+
+PROC_TEST_SLAVE(0, SIG_USER0)
+PROC_TEST_SLAVE(1, SIG_USER1)
+PROC_TEST_SLAVE(2, SIG_USER2)
+PROC_TEST_SLAVE(3, SIG_USER3)
+PROC_TEST_SLAVE(4, SIG_TIMEOUT)
+PROC_TEST_SLAVE(5, SIG_SYSTEM5)
+PROC_TEST_SLAVE(6, SIG_SYSTEM6)
+PROC_TEST_SLAVE(7, SIG_SINGLE)
+
+PROC_TEST_SLAVE_STACK(0)
+PROC_TEST_SLAVE_STACK(1)
+PROC_TEST_SLAVE_STACK(2)
+PROC_TEST_SLAVE_STACK(3)
+PROC_TEST_SLAVE_STACK(4)
+PROC_TEST_SLAVE_STACK(5)
+PROC_TEST_SLAVE_STACK(6)
+PROC_TEST_SLAVE_STACK(7)
 
 /**
  * Run signal test
  */
 int signal_testRun(void)
 {
+	struct Process *main_process = proc_current();
+	struct Process *slave_0;
+	struct Process *slave_1;
+	struct Process *slave_2;
+	struct Process *slave_3;
+	struct Process *slave_4;
+	struct Process *slave_5;
+	struct Process *slave_6;
+	struct Process *slave_7;
+
 	kprintf("Run Signal test..\n");
-	return 0;
+	slave_0 = PROC_TEST_SLAVE_INIT(0, main_process);
+	slave_1 = PROC_TEST_SLAVE_INIT(1, main_process);
+	slave_2 = PROC_TEST_SLAVE_INIT(2, main_process);
+	slave_3 = PROC_TEST_SLAVE_INIT(3, main_process);
+	slave_4 = PROC_TEST_SLAVE_INIT(4, main_process);
+	slave_5 = PROC_TEST_SLAVE_INIT(5, main_process);
+	slave_6 = PROC_TEST_SLAVE_INIT(6, main_process);
+	slave_7 = PROC_TEST_SLAVE_INIT(7, main_process);
+
+	MAIN_CHECK_SIGNAL(0, slave_0);
+	MAIN_CHECK_SIGNAL(1, slave_1);
+	MAIN_CHECK_SIGNAL(2, slave_2);
+	MAIN_CHECK_SIGNAL(3, slave_3);
+	MAIN_CHECK_SIGNAL(4, slave_4);
+	MAIN_CHECK_SIGNAL(5, slave_5);
+	MAIN_CHECK_SIGNAL(6, slave_6);
+	MAIN_CHECK_SIGNAL(7, slave_7);
+	
+	if(count == countof(test_signal))
+	{
+		kprintf("Signal test finished..ok!\n");
+		return 0;
+	}
+	
+	kprintf("Signal test finished..fail!\n");
+	return -1;
 }
 
 int signal_testSetup(void)
 {
 	kdbg_init();
 
-	kprintf("Init Singal..\n");
+	#if CONFIG_KERN_PREEMPT
+		kprintf("Init Interrupt (preempt mode)..");
+		irq_init();
+		kprintf("Done.\n");
+	#endif
+
+	kprintf("Init Timer..");
+	timer_init();
+	kprintf("Done.\n");
+	
+	kprintf("Init Process..");
+	proc_init();
+	kprintf("Done.\n");
 	return 0;
 }
 
