@@ -41,11 +41,12 @@
 
 #include "adc_avr.h"
 
-#include <cpu/irq.h> // IRQ_ASSERT_ENABLED()
 #include "cfg/cfg_adc.h"
 #include "cfg/cfg_kern.h"
 #include <cfg/macros.h>
 #include <cfg/compiler.h>
+
+#include <cpu/irq.h> // IRQ_ASSERT_ENABLED()
 
 #include <drv/adc.h>
 
