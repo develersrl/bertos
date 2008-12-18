@@ -38,6 +38,7 @@
  * 
  */
 
+#include <cfg/debug.h>
 #include <cfg/test.h>
 
 #include <kern/sem.h>
