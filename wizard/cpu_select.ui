@@ -20,7 +20,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" >
    <item>
-    <widget class="QListView" name="cpuList" />
+    <widget class="QListWidget" name="cpuList" />
    </item>
   </layout>
  </widget>
