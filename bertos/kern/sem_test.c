@@ -49,8 +49,8 @@
 
 // Global settings for the test.
 #define MAX_GLOBAL_COUNT             1024
-#define TEST_TIME_OUT_MS             4000
-#define DELAY                          10
+#define TEST_TIME_OUT_MS             6000
+#define DELAY                          5
 
 // Settings for the test process.
 //Process 1
@@ -64,26 +64,25 @@
 #define DELAY_PROC_T3   INC_PROC_T3*DELAY
 //Process 4
 #define INC_PROC_T4                     7
-#define DELAY_PROC_T4   INC_PROC_T3*DELAY
+#define DELAY_PROC_T4   INC_PROC_T4*DELAY
 //Process 5
 #define INC_PROC_T5                    11
-#define DELAY_PROC_T5   INC_PROC_T3*DELAY
+#define DELAY_PROC_T5   INC_PROC_T5*DELAY
 //Process 6
 #define INC_PROC_T6                    13
-#define DELAY_PROC_T6   INC_PROC_T3*DELAY
+#define DELAY_PROC_T6   INC_PROC_T6*DELAY
 //Process 7
 #define INC_PROC_T7                    17
-#define DELAY_PROC_T7   INC_PROC_T3*DELAY
+#define DELAY_PROC_T7   INC_PROC_T7*DELAY
 //Process 8
 #define INC_PROC_T8                    19
-#define DELAY_PROC_T8   INC_PROC_T3*DELAY
+#define DELAY_PROC_T8   INC_PROC_T8*DELAY
 
 Semaphore sem;
 unsigned int global_count = 0;
 
 /*
- * These macro generate the code that needed to create the
- * test process function and all it needed. 
+ * These macros generate the code needed to create the test process functions.
  */ 
 #define PROC_TEST(num) static void proc_test##num(void) \
 { \
