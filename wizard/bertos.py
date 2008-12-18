@@ -17,17 +17,10 @@ from PyQt4.QtGui import *
 import BProject
 
 import BStartPage
-
-import BFolderPage
-import BVersionPage
-import BCpuPage
+import BWizard
 
 def newProject():
-    wizard = QWizard()
-    wizard.setWindowTitle("Create a BeRTOS project")
-    wizard.addPage(BFolderPage.BFolderPage())
-    wizard.addPage(BVersionPage.BVersionPage())
-    wizard.addPage(BCpuPage.BCpuPage())
+    wizard = BWizard.BWizard()
     wizard.show()
     wizard.exec_()
     
