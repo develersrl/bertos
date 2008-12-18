@@ -59,7 +59,11 @@ class BVersionPage(BWizardPage):
             self._insertListElement(directory.toString())
 
     def isComplete(self):
-        return self.pageContent.versionList.currentRow() != -1
+        if self.pageContent.versionList.currentRow() != -1:
+            self._projectInfoStore("SOURCES_PATH", self.pageContent.versionList.currentItem().data(Qt.UserRole).toString())
+            return True
+        else:
+            return False
     
     def addVersion(self):
         directory = QFileDialog.getExistingDirectory(self, self.tr("Choose a directory"), "", QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks)
