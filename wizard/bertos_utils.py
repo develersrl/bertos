@@ -29,5 +29,5 @@ def findDefinitions(ftype, path):
     for element in l:
         for filename in element[2]:
             if fnmatch.fnmatch(filename, "*." + ftype):
-                defintions[filename] = element[0]
+                definitions[filename] = element[0]
     return definitions
