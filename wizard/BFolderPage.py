@@ -42,7 +42,7 @@ class BFolderPage(BWizardPage):
         self._setProjectPath()
     
     def _setProjectPath(self):
-        if self._destinationFolder <> "" and self._projectName <> "":
+        if self._destinationFolder != "" and self._projectName <> "":
             if not self._destinationFolder.endswith(os.sep):
                 self._destinationFolder += os.sep
             self.pageContent.projectPath.setText(self._destinationFolder + self._projectName + "/")
