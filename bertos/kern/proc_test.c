@@ -45,8 +45,6 @@
 
 
 // Global settings for the test.
-#define MAX_GLOBAL_COUNT             1024
-#define TEST_TIME_OUT_MS             6000
 #define DELAY                           5
 
 // Settings for the test process.
