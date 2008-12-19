@@ -20,9 +20,9 @@ class BCpuPage(BWizardPage):
         self.setTitle(self.tr("Select the CPU"))
     
     def _populateCpuList(self):
-        cpus = bertos_utils.findDefinitions("cdef", self._projectInfoRetrieve("SOURCES_PATH"))
-        for cpu in cpus.keys():
-            self.pageContent.cpuList.addItem(QListWidgetItem(cpu))
+        infos = bertos_utils.loadCpuInfos(self._projectInfoRetrieve("SOURCES_PATH"))
+        for cpu in infos:
+            self.pageContent.cpuList.addItem(QListWidgetItem(cpu["CORE_CPU"]))
     
     def reloadData(self):
         self._populateCpuList()

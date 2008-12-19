@@ -36,7 +36,7 @@ def loadCpuInfos(path):
         D = {}
         def include(filename, dict = D, directory=definition[1]):
             execfile(directory + "/" + filename, {}, D)
-        d["include"] = include
+        D["include"] = include
         include(definition[0], D)
         cpuInfos.append(D)
     return cpuInfos
