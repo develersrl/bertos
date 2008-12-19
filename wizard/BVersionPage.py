@@ -23,14 +23,14 @@ class BVersionPage(BWizardPage):
         self.setTitle(self.tr("Select the BeRTOS version needed"))
     
     def _connectSignals(self):
-        self.connect(self.pageContent.versionList, SIGNAL("itemClicked(QListWidgetItem *)"), self.itemClicked)
+        self.connect(self.pageContent.versionList, SIGNAL("itemSelectionChanged()"), self.rowChanged)
         self.connect(self.pageContent.addButton, SIGNAL("clicked()"), self.addVersion)
         self.connect(self.pageContent.removeButton, SIGNAL("clicked()"), self.removeVersion)
         # Fake signal connection for the update button
         self.connect(self.pageContent.updateButton, SIGNAL("clicked()"), self.updateClicked)
     
     def _setupUi(self):
-        pass
+        self.pageContent.versionList.setCurrentRow(-1)
     
     def _storeVersion(self, directory):
         versions = self._settingsRetrieve("versions").toList()
@@ -81,6 +81,6 @@ class BVersionPage(BWizardPage):
     def updateClicked(self):
         print "fake update checking"
     
-    def itemClicked(self, item):
+    def rowChanged(self):
         self.emit(SIGNAL("completeChanged()"))
     
