@@ -60,7 +60,7 @@ class BVersionPage(BWizardPage):
 
     def isComplete(self):
         if self.pageContent.versionList.currentRow() != -1:
-            self._projectInfoStore("SOURCES_PATH", str(self.pageContent.versionList.currentItem().data(Qt.UserRole).toString()))
+            self._projectInfoStore("SOURCES_PATH", unicode(self.pageContent.versionList.currentItem().data(Qt.UserRole).toString()))
             return True
         else:
             return False
