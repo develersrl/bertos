@@ -12,6 +12,8 @@
 import os
 import fnmatch
 
+import const
+
 def isBertosDir(directory):
    return os.path.exists(directory + "/VERSION")
 
@@ -32,8 +34,9 @@ def findDefinitions(ftype, path):
 
 def loadCpuInfos(path):
     cpuInfos = []
-    for definition in findDefinitions("cdef", path):
+    for definition in findDefinitions(const.CPU_DEFINITION, path):
         D = {}
+        D.update(const.CPU_DEF)
         def include(filename, dict = D, directory=definition[1]):
             execfile(directory + "/" + filename, {}, D)
         D["include"] = include
