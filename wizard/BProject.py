@@ -18,4 +18,6 @@ class BProject(object):
         self.infos[key] = value
     
     def info(self, key):
-        return self.infos[key]
+        if key in self.infos.keys():
+            return self.infos[key]
+        return None
