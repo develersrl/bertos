@@ -45,5 +45,5 @@
 include("avr.common")
 
 # If we use the GCC compiler we should pass some flags.
-CORE_CPU += "atmega1281"
+CORE_CPU = "atmega1281"
 
