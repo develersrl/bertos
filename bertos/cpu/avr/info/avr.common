@@ -43,6 +43,10 @@
 # Import the common settings for the path.
 include("../../path.common")
 
+# Short description of the cpu.
+CPU_DESC = [ "ATMEL AVR Microcontroller ",
+	     "8-bit RISC Architecture"]
+
 # Type of the toolchain we should use to compile the source for this CPU.
 TOOLCHAIN = "avr"
 

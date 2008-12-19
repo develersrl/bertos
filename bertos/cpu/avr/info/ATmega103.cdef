@@ -43,6 +43,11 @@
 # Import the common settings for the path.
 include("avr.common")
 
+# Short description of the cpu.
+CPU_DESC += [ "128 Kbyte in-System Programmable Flash",
+	      "4 Kbytes internal SRAM memory",
+	      "4 Kbytes EEPROM memory" ]
+
 # If we use the GCC compiler we should pass some flags.
 CORE_CPU = "atmega103"
 
