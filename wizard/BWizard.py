@@ -20,7 +20,7 @@ class BWizard(QWizard):
     
     def __init__(self):
         QWizard.__init__(self)
-        self.setWindowTitle("Create a BeRTOS project")
+        self.setWindowTitle(self.tr("Create a BeRTOS project"))
         self._addPages()
         self._connectSignals()
     

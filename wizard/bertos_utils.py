@@ -24,10 +24,19 @@ def createBertosProject(directory):
     open(directory + "/project.bertos", "w")
 
 def findDefinitions(ftype, path):
-    l = os.walk(path)
-    definitions = {}
-    for element in l:
+    L = os.walk(path)
+    for element in L:
         for filename in element[2]:
             if fnmatch.fnmatch(filename, "*." + ftype):
-                definitions[filename] = element[0]
-    return definitions
+                yield (filename, element[0])
+
+def loadCpuInfos(path):
+    cpuInfos = []
+    for definition in findDefinitions("cdef", path):
+        D = {}
+        def include(filename, dict = D, directory=definition[1]):
+            execfile(directory + "/" + filename, {}, D)
+        d["include"] = include
+        include(definition[0], D)
+        cpuInfos.append(D)
+    return cpuInfos
