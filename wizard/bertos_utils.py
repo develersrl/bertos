@@ -38,5 +38,6 @@ def loadCpuInfos(path):
             execfile(directory + "/" + filename, {}, D)
         D["include"] = include
         include(definition[0], D)
+        D["CPU_NAME"] = definition[0].split(".")[0]
         cpuInfos.append(D)
     return cpuInfos
