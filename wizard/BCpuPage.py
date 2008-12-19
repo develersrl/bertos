@@ -28,13 +28,21 @@ class BCpuPage(BWizardPage):
     
     def _connectSignals(self):
         self.connect(self.pageContent.cpuList, SIGNAL("itemSelectionChanged()"), self.rowChanged)
+    
+    def _selectItem(self, cpu):
+        elements = self.pageContent.cpuList.findItems(cpu, Qt.MatchCaseSensitive)
+        if len(elements) == 1:
+            self.pageContent.cpuList.setCurrentItem(elements[0])
 
     def reloadData(self):
         self._populateCpuList()
+        cpuName = self._projectInfoRetrieve("CPU_NAME")
+        if not cpuName is None:
+            self._selectItem(cpuName)
     
     def isComplete(self):
         if self.pageContent.cpuList.currentRow() != -1:
-            self._projectInfoStore("CPU_NAME", self.pageContent.cpuList.currentItem())
+            self._projectInfoStore("CPU_NAME", self.pageContent.cpuList.currentItem().text())
             return True
         else:
             return False
