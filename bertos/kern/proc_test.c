@@ -88,8 +88,6 @@ unsigned int t8_count = 0;
  */
 #define PROC_TEST(num) static void proc_test##num(void) \
 { \
-	unsigned int local_count = 0; \
-	\
 	for (int i = 0; i < INC_PROC_T##num; ++i) \
 	{ \
 		t##num##_count++; \
