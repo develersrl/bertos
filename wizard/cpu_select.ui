@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>280</width>
-    <height>216</height>
+    <width>406</width>
+    <height>243</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -21,6 +21,13 @@
   <layout class="QVBoxLayout" name="verticalLayout" >
    <item>
     <widget class="QListWidget" name="cpuList" />
+   </item>
+   <item>
+    <widget class="QLabel" name="descriptionLabel" >
+     <property name="text" >
+      <string/>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
