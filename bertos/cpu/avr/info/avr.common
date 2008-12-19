@@ -41,7 +41,7 @@
 #
 
 # Import the common settings for the path.
-include("path.common")
+include("../../path.common")
 
 # Type of the toolchain we should use to compile the source for this CPU.
 TOOLCHAIN = "avr"
