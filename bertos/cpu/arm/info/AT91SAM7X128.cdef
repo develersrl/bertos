@@ -43,6 +43,10 @@
 # Import the common settings for the AT91SAM7 family.
 include("at91sam7.common")
 
+# Short description of the cpu.
+CPU_DESC += [ "128 Kbytes internal flash memory",
+	      "32 Kbytes internal SRAM memory" ]
+
 # GCC flags for this cpu.
 CPP_FLAGS += [ "-D__ARM_AT91SAM7X128__" ]
 LD_FLAGS += [ "-T " + SCRIPT_DIR + " at91sam7_128_rom.ld" ]

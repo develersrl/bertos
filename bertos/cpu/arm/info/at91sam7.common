@@ -43,6 +43,10 @@
 # Import the common settings for the path.
 include("../../path.common")
 
+CPU_DESC = ["ATMEL AT91 ARM",
+	  "ARMTDMI ARM Thumb Processor",
+	  "32-bit RISC Architecture"]
+
 # Type of the toolchain we should use to compile the source for this CPU.
 TOOLCHAIN = "arm"
 
@@ -69,4 +73,4 @@ SUPPORTED_DRV = [ "adc",
 		  "stepper",
 		  "timer",
 		  "twi" ]
-	       
+	
