@@ -9,6 +9,7 @@
 # Author: Lorenzo Berni <duplo@develer.com>
 #
 
+import os
 import sys
 from distutils.dep_util import newer
 
