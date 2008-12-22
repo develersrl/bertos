@@ -26,6 +26,14 @@ def createBertosProject(directory):
         os.mkdir(directory)
     open(directory + "/project.bertos", "w")
 
+def getSystemPath():
+    path = os.environ["PATH"]
+    if os.name == "nt":
+        path = path.split(";")
+    else:
+        path = path.split(":")
+    return path
+
 def findToolchains(pathList):
     toolchains = []
     for element in pathList:
