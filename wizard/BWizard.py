@@ -15,6 +15,7 @@ from PyQt4.QtGui import *
 import BFolderPage
 import BVersionPage
 import BCpuPage
+import BToolchainPage
 
 class BWizard(QWizard):
     
@@ -28,6 +29,7 @@ class BWizard(QWizard):
         self.addPage(BFolderPage.BFolderPage())
         self.addPage(BVersionPage.BVersionPage())
         self.addPage(BCpuPage.BCpuPage())
+        self.addPage(BToolchainPage.BToolchainPage())
     
     def _connectSignals(self):
         self.connect(self, SIGNAL("currentIdChanged(int)"), self._pageChanged)
