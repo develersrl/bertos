@@ -23,6 +23,7 @@ class BCpuPage(BWizardPage):
     
     def _populateCpuList(self):
         self.pageContent.cpuList.clear()
+        self.pageContent.cpuList.setCurrentItem(None)
         infos = bertos_utils.loadCpuInfos(self._projectInfoRetrieve("SOURCES_PATH"))
         for cpu in infos:
             item = QListWidgetItem(cpu["CPU_NAME"])
@@ -41,12 +42,15 @@ class BCpuPage(BWizardPage):
     
     def _setupUi(self):
         self.pageContent.descriptionLabel.setVisible(False)
+        self.pageContent.descriptionLabel.setText("")
     
     def reloadData(self):
         self._populateCpuList()
         cpuName = self._projectInfoRetrieve("CPU_NAME")
+        self._setupUi()
         if not cpuName is None:
             self._selectItem(cpuName)
+        self.emit(SIGNAL("completeChanged()"))
     
     def isComplete(self):
         if self.pageContent.cpuList.currentRow() != -1:
