@@ -1,0 +1,351 @@
+<ui version="4.0" >
+ <class>Form</class>
+ <widget class="QWidget" name="Form" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>428</width>
+    <height>367</height>
+   </rect>
+  </property>
+  <property name="sizePolicy" >
+   <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_5" >
+   <item>
+    <widget class="QStackedWidget" name="pageSelector" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="currentIndex" >
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="page" >
+      <layout class="QVBoxLayout" name="verticalLayout_6" >
+       <item>
+        <widget class="QListWidget" name="toolchainList" />
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout" >
+         <item>
+          <widget class="QToolButton" name="addButton" >
+           <property name="minimumSize" >
+            <size>
+             <width>26</width>
+             <height>26</height>
+            </size>
+           </property>
+           <property name="maximumSize" >
+            <size>
+             <width>26</width>
+             <height>26</height>
+            </size>
+           </property>
+           <property name="text" >
+            <string/>
+           </property>
+           <property name="icon" >
+            <iconset resource="bertos.qrc" >
+             <normaloff>:/images/listadd.png</normaloff>:/images/listadd.png</iconset>
+           </property>
+           <property name="iconSize" >
+            <size>
+             <width>16</width>
+             <height>16</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="removeButton" >
+           <property name="minimumSize" >
+            <size>
+             <width>26</width>
+             <height>26</height>
+            </size>
+           </property>
+           <property name="maximumSize" >
+            <size>
+             <width>26</width>
+             <height>26</height>
+            </size>
+           </property>
+           <property name="text" >
+            <string/>
+           </property>
+           <property name="icon" >
+            <iconset resource="bertos.qrc" >
+             <normaloff>:/images/listremove.png</normaloff>:/images/listremove.png</iconset>
+           </property>
+           <property name="iconSize" >
+            <size>
+             <width>16</width>
+             <height>16</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="checkButton" >
+           <property name="minimumSize" >
+            <size>
+             <width>26</width>
+             <height>26</height>
+            </size>
+           </property>
+           <property name="maximumSize" >
+            <size>
+             <width>26</width>
+             <height>26</height>
+            </size>
+           </property>
+           <property name="text" >
+            <string/>
+           </property>
+           <property name="icon" >
+            <iconset resource="bertos.qrc" >
+             <normaloff>:/images/ok.png</normaloff>:/images/ok.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer" >
+           <property name="orientation" >
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0" >
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QToolButton" name="searchButton" >
+           <property name="minimumSize" >
+            <size>
+             <width>26</width>
+             <height>26</height>
+            </size>
+           </property>
+           <property name="maximumSize" >
+            <size>
+             <width>16777215</width>
+             <height>26</height>
+            </size>
+           </property>
+           <property name="text" >
+            <string>Search</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_2" >
+      <layout class="QVBoxLayout" name="verticalLayout_2" >
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_5" >
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout" >
+           <item>
+            <widget class="QCheckBox" name="pathBox" >
+             <property name="sizePolicy" >
+              <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text" >
+              <string>Search in PATH</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="customDirBox" >
+             <property name="text" >
+              <string>Search in custom directories</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_4" >
+           <item>
+            <spacer name="horizontalSpacer_4" >
+             <property name="orientation" >
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0" >
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QToolButton" name="cancelButton" >
+             <property name="minimumSize" >
+              <size>
+               <width>0</width>
+               <height>26</height>
+              </size>
+             </property>
+             <property name="maximumSize" >
+              <size>
+               <width>16777215</width>
+               <height>26</height>
+              </size>
+             </property>
+             <property name="text" >
+              <string>Cancel</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="doSearchButton" >
+             <property name="minimumSize" >
+              <size>
+               <width>0</width>
+               <height>26</height>
+              </size>
+             </property>
+             <property name="maximumSize" >
+              <size>
+               <width>16777215</width>
+               <height>26</height>
+              </size>
+             </property>
+             <property name="text" >
+              <string>Search</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3" >
+         <item>
+          <spacer name="horizontalSpacer_3" >
+           <property name="orientation" >
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType" >
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0" >
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox" >
+           <property name="title" >
+            <string/>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_4" >
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_3" >
+              <item>
+               <widget class="QListWidget" name="customDirList" />
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_2" >
+                <item>
+                 <widget class="QToolButton" name="addDirButton" >
+                  <property name="minimumSize" >
+                   <size>
+                    <width>26</width>
+                    <height>26</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize" >
+                   <size>
+                    <width>26</width>
+                    <height>26</height>
+                   </size>
+                  </property>
+                  <property name="text" >
+                   <string/>
+                  </property>
+                  <property name="icon" >
+                   <iconset resource="bertos.qrc" >
+                    <normaloff>:/images/listadd.png</normaloff>:/images/listadd.png</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="removeDirButton" >
+                  <property name="minimumSize" >
+                   <size>
+                    <width>26</width>
+                    <height>26</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize" >
+                   <size>
+                    <width>26</width>
+                    <height>26</height>
+                   </size>
+                  </property>
+                  <property name="text" >
+                   <string/>
+                  </property>
+                  <property name="icon" >
+                   <iconset resource="bertos.qrc" >
+                    <normaloff>:/images/listremove.png</normaloff>:/images/listremove.png</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_2" >
+                  <property name="orientation" >
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0" >
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="bertos.qrc" />
+ </resources>
+ <connections/>
+</ui>
