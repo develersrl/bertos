@@ -30,14 +30,14 @@
         <widget class="QToolButton" name="addButton" >
          <property name="minimumSize" >
           <size>
-           <width>25</width>
-           <height>24</height>
+           <width>26</width>
+           <height>26</height>
           </size>
          </property>
          <property name="maximumSize" >
           <size>
-           <width>25</width>
-           <height>24</height>
+           <width>26</width>
+           <height>26</height>
           </size>
          </property>
          <property name="text" >
@@ -49,8 +49,8 @@
          </property>
          <property name="iconSize" >
           <size>
-           <width>24</width>
-           <height>24</height>
+           <width>16</width>
+           <height>16</height>
           </size>
          </property>
         </widget>
@@ -59,14 +59,14 @@
         <widget class="QToolButton" name="removeButton" >
          <property name="minimumSize" >
           <size>
-           <width>25</width>
-           <height>24</height>
+           <width>26</width>
+           <height>26</height>
           </size>
          </property>
          <property name="maximumSize" >
           <size>
-           <width>25</width>
-           <height>24</height>
+           <width>26</width>
+           <height>26</height>
           </size>
          </property>
          <property name="text" >
@@ -78,8 +78,8 @@
          </property>
          <property name="iconSize" >
           <size>
-           <width>24</width>
-           <height>24</height>
+           <width>16</width>
+           <height>16</height>
           </size>
          </property>
         </widget>
@@ -98,7 +98,19 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="updateButton" >
+        <widget class="QToolButton" name="updateButton" >
+         <property name="minimumSize" >
+          <size>
+           <width>0</width>
+           <height>26</height>
+          </size>
+         </property>
+         <property name="maximumSize" >
+          <size>
+           <width>16777215</width>
+           <height>26</height>
+          </size>
+         </property>
          <property name="text" >
           <string>Update</string>
          </property>
