@@ -25,3 +25,5 @@ CPU_DEF = {
 }
 
 CPU_DEFINITION = "*.cdef"
+
+GCC_NAME = "*gcc*"

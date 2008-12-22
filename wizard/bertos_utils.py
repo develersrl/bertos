@@ -11,6 +11,7 @@
 
 import os
 import fnmatch
+import glob
 
 import const
 
@@ -24,6 +25,12 @@ def createBertosProject(directory):
     if not os.path.isdir(directory):
         os.mkdir(directory)
     open(directory + "/project.bertos", "w")
+
+def findToolchains(pathList):
+    toolchains = []
+    for element in pathList:
+        toolchains += glob.glob(element+ "/" + const.GCC_NAME)
+    return toolchains
 
 def findDefinitions(ftype, path):
     L = os.walk(path)
