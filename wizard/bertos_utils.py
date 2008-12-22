@@ -29,7 +29,7 @@ def findDefinitions(ftype, path):
     L = os.walk(path)
     for element in L:
         for filename in element[2]:
-            if fnmatch.fnmatch(filename, "*." + ftype):
+            if fnmatch.fnmatch(filename, ftype):
                 yield (filename, element[0])
 
 def loadCpuInfos(path):

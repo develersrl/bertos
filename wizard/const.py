@@ -24,4 +24,4 @@ CPU_DEF = {
     "CPU_DESC" : []
 }
 
-CPU_DEFINITION = "cdef"
+CPU_DEFINITION = "*.cdef"
