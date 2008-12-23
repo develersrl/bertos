@@ -18,6 +18,7 @@ class BToolchainPage(BWizardPage):
         BWizardPage.__init__(self, "toolchain_select.ui")
         self.setTitle(self.tr("Select toolchain"))
         self._setupUi()
+        self._populateToolchainList()
         self._populateDirList()
         self._connectSignals()
     
@@ -44,6 +45,13 @@ class BToolchainPage(BWizardPage):
         else:
             self.pageContent.doSearchButton.setEnabled(False)
     
+    def _populateToolchainList(self):
+        toolchains = self._settingsRetrieve("toolchains").toList()
+        for element in toolchains:
+            item = QListWidgetItem(element.toString())
+            item.setData(Qt.UserRole, element)
+            self.pageContent.toolchainList.addItem(item)
+    
     def _populateDirList(self):
         search_dir_list = self._settingsRetrieve("search_dir_list").toList()
         for element in search_dir_list:
@@ -64,6 +72,9 @@ class BToolchainPage(BWizardPage):
     def _clearList(self):
         self.pageContent.toolchainList.clear()
     
+    def _selectionChanged(self):
+        self.emit(SIGNAL("completeChanged()"))
+    
     def _connectSignals(self):
         self.connect(self.pageContent.pathBox, SIGNAL("clicked()"), self._updateUi)
         self.connect(self.pageContent.customDirBox, SIGNAL("clicked()"), self._updateUi)
@@ -72,6 +83,9 @@ class BToolchainPage(BWizardPage):
         self.connect(self.pageContent.doSearchButton, SIGNAL("clicked()"), self.doSearch)
         self.connect(self.pageContent.addDirButton, SIGNAL("clicked()"), self.addDir)
         self.connect(self.pageContent.removeDirButton, SIGNAL("clicked()"), self.removeDir)
+        self.connect(self.pageContent.toolchainList, SIGNAL("itemSelectionChanged()"), self._selectionChanged)
+        self.connect(self.pageContent.addButton, SIGNAL("clicked()"), self.addToolchain)
+        self.connect(self.pageContent.removeButton, SIGNAL("clicked()"), self.removeToolchain)
     
     def toSearchSubpage(self):
         self.pageContent.pageSelector.setCurrentIndex(1)
@@ -87,10 +101,35 @@ class BToolchainPage(BWizardPage):
             for element in range(self.pageContent.customDirList.count()):
                 path += [unicode(self.pageContent.customDirList.item(element).data(Qt.UserRole).toString())]
         toolchains = bertos_utils.findToolchains(path)
+        toolchains_stored = self._settingsRetrieve("toolchains").toList()
+        toolchains += [unicode(toolchain.toString()) for toolchain in toolchains_stored]
+        toolchains = set(toolchains)
+        toolchains = list(toolchains)
         self._clearList()
         for toolchain in toolchains:
-            self.pageContent.toolchainList.addItem(QListWidgetItem(toolchain))
+            item = QListWidgetItem(toolchain)
+            item.setData(Qt.UserRole, QVariant(toolchain))
+            self.pageContent.toolchainList.addItem(item)
+        self._settingsStore("toolchains", toolchains)
         self.toSelectionSubpage()
+    
+    def addToolchain(self):
+        sel_toolchain = QFileDialog.getOpenFileName(self, self.tr("Choose the toolchain"), "")
+        item = QListWidgetItem(sel_toolchain)
+        item.setData(Qt.UserRole, QVariant(sel_toolchain))
+        self.pageContent.toolchainList.addItem(item)
+        toolchains = self._settingsRetrieve("toolchains").toList()
+        toolchains = set([toolchain.toString() for toolchain in toolchains] + [sel_toolchain])
+        self._settingsStore("toolchains", list(toolchains))
+    
+    def removeToolchain(self):
+        if self.pageContent.toolchainList.currentRow() != -1:
+            item = self.pageContent.toolchainList.takeItem(self.pageContent.toolchainList.currentRow())
+            item = item.data(Qt.UserRole).toString()
+            toolchains = self._settingsRetrieve("toolchains").toList()
+            toolchains = [toolchain.toString() for toolchain in toolchains]
+            toolchains.remove(unicode(item))
+            self._settingsStore("toolchains", toolchains)
     
     def addDir(self):
         directory = QFileDialog.getExistingDirectory(self, self.tr("Open Directory"), "", QFileDialog.ShowDirsOnly)
@@ -103,8 +142,16 @@ class BToolchainPage(BWizardPage):
             self._settingsStore("search_dir_list", list(search_dir_list))
     
     def removeDir(self):
-        item = self.pageContent.customDirList.takeItem(self.pageContent.customDirList.currentRow())
-        search_dir_list = self._settingsRetrieve("search_dir_list").toList()
-        search_dir_list = set([d.toString() for d in search_dir_list])
-        search_dir_list.remove(item.data(Qt.UserRole).toString())
-        self._settingsStore("search_dir_list", list(search_dir_list))
+        if self.pageContent.customDirList.currentRow() != -1:
+            item = self.pageContent.customDirList.takeItem(self.pageContent.customDirList.currentRow())
+            search_dir_list = self._settingsRetrieve("search_dir_list").toList()
+            search_dir_list = set([d.toString() for d in search_dir_list])
+            search_dir_list.remove(item.data(Qt.UserRole).toString())
+            self._settingsStore("search_dir_list", list(search_dir_list))
+    
+    def isComplete(self):
+        if self.pageContent.toolchainList.currentRow() != -1:
+            self._projectInfoStore("TOOLCHAIN", self.pageContent.toolchainList.item(self.pageContent.toolchainList.currentRow()).data(Qt.UserRole).toString())
+            return True
+        else:
+            return False
