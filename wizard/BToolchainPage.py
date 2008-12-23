@@ -115,12 +115,13 @@ class BToolchainPage(BWizardPage):
     
     def addToolchain(self):
         sel_toolchain = QFileDialog.getOpenFileName(self, self.tr("Choose the toolchain"), "")
-        item = QListWidgetItem(sel_toolchain)
-        item.setData(Qt.UserRole, QVariant(sel_toolchain))
-        self.pageContent.toolchainList.addItem(item)
-        toolchains = self._settingsRetrieve("toolchains").toList()
-        toolchains = set([toolchain.toString() for toolchain in toolchains] + [sel_toolchain])
-        self._settingsStore("toolchains", list(toolchains))
+        if not sel_toolchain.isEmpty():
+            item = QListWidgetItem(sel_toolchain)
+            item.setData(Qt.UserRole, QVariant(sel_toolchain))
+            self.pageContent.toolchainList.addItem(item)
+            toolchains = self._settingsRetrieve("toolchains").toList()
+            toolchains = set([toolchain.toString() for toolchain in toolchains] + [sel_toolchain])
+            self._settingsStore("toolchains", list(toolchains))
     
     def removeToolchain(self):
         if self.pageContent.toolchainList.currentRow() != -1:
