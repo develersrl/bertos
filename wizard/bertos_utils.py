@@ -12,6 +12,7 @@
 import os
 import fnmatch
 import glob
+import re
 
 import const
 
@@ -39,6 +40,18 @@ def findToolchains(pathList):
     for element in pathList:
         toolchains += glob.glob(element+ "/" + const.GCC_NAME)
     return toolchains
+
+def getToolchainInfo(output):
+    info = {}
+    expr = re.compile("Target: .*")
+    info["target"] = expr.findall(output)[0].split("Target: ")[1]
+    expr = re.compile("gcc version .*")
+    info["version"] = expr.findall(output)[0].split("gcc version ")[1]
+    expr = re.compile("Configured with: .*")
+    info["configured"] = expr.findall(output)[0].split("Configured with: ")[1]
+    expr = re.compile("Thread model: .*")
+    info["thread"] = expr.findall(output)[0].split("Thread model: ")[1]
+    return info
 
 def findDefinitions(ftype, path):
     L = os.walk(path)
