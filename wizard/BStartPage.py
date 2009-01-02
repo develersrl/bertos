@@ -13,7 +13,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import PyQt4.uic as uic
 
-class BStartPage(QWidget):
+class BStartPage(QDialog):
     
     def __init__(self):
         QDialog.__init__(self)
