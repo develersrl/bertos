@@ -47,7 +47,6 @@ class BToolchainPage(BWizardPage):
     def _search(self):
         pass
         
-    
     def _connectSignals(self):
         self.connect(self.pageContent.toolchainList, SIGNAL("itemSelectionChanged()"), self._selectionChanged)
         self.connect(self.pageContent.addButton, SIGNAL("clicked()"), self.addToolchain)
