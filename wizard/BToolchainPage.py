@@ -18,6 +18,7 @@ class BToolchainPage(BWizardPage):
     def __init__(self):
         BWizardPage.__init__(self, "toolchain_select.ui")
         self.setTitle(self.tr("Select toolchain"))
+        self._validationProcess = None
         self._populateToolchainList()
         self._connectSignals()
     
@@ -45,13 +46,19 @@ class BToolchainPage(BWizardPage):
         self.emit(SIGNAL("completeChanged()"))
     
     def _search(self):
-        pass
+        dirList = [unicode(element.toString()) for element in self._settingsRetrieve("search_dir_list").toList()]
+        dirList += [element for element in bertos_utils.getSystemPath()]
+        toolchainList = bertos_utils.findToolchains(dirList)
+        for element in toolchainList:
+            self.pageContent.toolchainList.addItem(QListWidgetItem(element))
+        self._settingsStore("toolchains", toolchainList)
         
     def _connectSignals(self):
         self.connect(self.pageContent.toolchainList, SIGNAL("itemSelectionChanged()"), self._selectionChanged)
         self.connect(self.pageContent.addButton, SIGNAL("clicked()"), self.addToolchain)
         self.connect(self.pageContent.removeButton, SIGNAL("clicked()"), self.removeToolchain)
         self.connect(self.pageContent.searchButton, SIGNAL("clicked()"), self.searchToolchain)
+        self.connect(self.pageContent.checkButton, SIGNAL("clicked()"), self.validateToolchains)
     
     def addToolchain(self):
         sel_toolchain = QFileDialog.getOpenFileName(self, self.tr("Choose the toolchain"), "")
@@ -76,6 +83,24 @@ class BToolchainPage(BWizardPage):
         search = BToolchainSearch.BToolchainSearch()
         self.connect(search, SIGNAL("accepted()"), self._search)
         search.exec_()
+    
+    def validateToolchains(self):
+        print "validating toolchains"
+        print self.pageContent.toolchainList.count()
+        for i in range(self.pageContent.toolchainList.count()):
+            filename = self.pageContent.toolchainList.item(i).text()
+            print i, filename
+            self._validationProcess = QProcess()
+            self._validationProcess.start(filename, ["-v"])
+            self._validationProcess.waitForStarted(5)
+            if not self._validationProcess.waitForFinished(5):
+                self._validationProcess.kill()
+                print "process killed"
+            else:
+                print self._validationProcess.readAllStandardError()
+    
+    def _getToolchainInfo():
+        print self._validationProcess.readAllStandardOutput()
     
     def isComplete(self):
         if self.pageContent.toolchainList.currentRow() != -1:
