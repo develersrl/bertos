@@ -47,11 +47,17 @@ class BToolchainPage(BWizardPage):
     
     def _search(self):
         dirList = [unicode(element.toString()) for element in self._settingsRetrieve("search_dir_list").toList()]
-        dirList += [element for element in bertos_utils.getSystemPath()]
+        if(self._settingsRetrieve("path_search").toBool()):
+            dirList += [element for element in bertos_utils.getSystemPath()]
         toolchainList = bertos_utils.findToolchains(dirList)
+        storedToolchainList = self._settingsRetrieve("toolchains").toList()
+        storedToolchainList = set([unicode(toolchain.toString()) for toolchain in storedToolchainList])
+        toolchainList =set(toolchainList) - set(storedToolchainList)
         for element in toolchainList:
-            self.pageContent.toolchainList.addItem(QListWidgetItem(element))
-        self._settingsStore("toolchains", toolchainList)
+            item = QListWidgetItem(element)
+            item.setData(Qt.UserRole, QVariant(element))
+            self.pageContent.toolchainList.addItem(item)
+        self._settingsStore("toolchains", list(toolchainList.union(storedToolchainList)))
         
     def _connectSignals(self):
         self.connect(self.pageContent.toolchainList, SIGNAL("itemSelectionChanged()"), self._selectionChanged)
@@ -59,6 +65,16 @@ class BToolchainPage(BWizardPage):
         self.connect(self.pageContent.removeButton, SIGNAL("clicked()"), self.removeToolchain)
         self.connect(self.pageContent.searchButton, SIGNAL("clicked()"), self.searchToolchain)
         self.connect(self.pageContent.checkButton, SIGNAL("clicked()"), self.validateToolchains)
+    
+    def _validItem(self, index, infos):
+        item = self.pageContent.toolchainList.item(index)
+        item.setIcon(QIcon(":/images/ok.png"))
+        item.setToolTip("Version: " + infos["version"] + "<br>Target: " + infos["target"] +
+            "<br>Thread model: " + infos["thread"])
+    
+    def _invalidItem(self, index):
+        item = self.pageContent.toolchainList.item(index)
+        item.setIcon(QIcon(":/images/warning.png"))
     
     def addToolchain(self):
         sel_toolchain = QFileDialog.getOpenFileName(self, self.tr("Choose the toolchain"), "")
@@ -75,7 +91,8 @@ class BToolchainPage(BWizardPage):
             item = self.pageContent.toolchainList.takeItem(self.pageContent.toolchainList.currentRow())
             item = item.data(Qt.UserRole).toString()
             toolchains = self._settingsRetrieve("toolchains").toList()
-            toolchains = [toolchain.toString() for toolchain in toolchains]
+            toolchains = [unicode(toolchain.toString()) for toolchain in toolchains]
+            print unicode(item), type(unicode(item))
             toolchains.remove(unicode(item))
             self._settingsStore("toolchains", toolchains)
     
@@ -85,22 +102,21 @@ class BToolchainPage(BWizardPage):
         search.exec_()
     
     def validateToolchains(self):
-        print "validating toolchains"
-        print self.pageContent.toolchainList.count()
         for i in range(self.pageContent.toolchainList.count()):
             filename = self.pageContent.toolchainList.item(i).text()
-            print i, filename
             self._validationProcess = QProcess()
             self._validationProcess.start(filename, ["-v"])
-            self._validationProcess.waitForStarted(5)
-            if not self._validationProcess.waitForFinished(5):
-                self._validationProcess.kill()
-                print "process killed"
+            self._validationProcess.waitForStarted(10)
+            if self._validationProcess.waitForFinished(10):
+                description = str(self._validationProcess.readAllStandardError())
+                infos = bertos_utils.getToolchainInfo(description)
+                if len(infos.keys()) == 4:
+                    self._validItem(i, infos)
+                else:
+                    self._invalidItem(i)
             else:
-                print self._validationProcess.readAllStandardError()
-    
-    def _getToolchainInfo():
-        print self._validationProcess.readAllStandardOutput()
+                self._validationProcess.kill()
+                self._invalidItem(i)
     
     def isComplete(self):
         if self.pageContent.toolchainList.currentRow() != -1:
