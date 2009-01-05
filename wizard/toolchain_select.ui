@@ -103,6 +103,9 @@
          <height>26</height>
         </size>
        </property>
+       <property name="toolTip" >
+        <string>Validate all the toolchains</string>
+       </property>
        <property name="text" >
         <string/>
        </property>
