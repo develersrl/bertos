@@ -92,7 +92,6 @@ class BToolchainPage(BWizardPage):
             item = item.data(Qt.UserRole).toString()
             toolchains = self._settingsRetrieve("toolchains").toList()
             toolchains = [unicode(toolchain.toString()) for toolchain in toolchains]
-            print unicode(item), type(unicode(item))
             toolchains.remove(unicode(item))
             self._settingsStore("toolchains", toolchains)
     
