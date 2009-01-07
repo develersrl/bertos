@@ -9,6 +9,8 @@
 # Author: Lorenzo Berni <duplo@develer.com>
 #
 
+import os
+
 from BWizardPage import *
 import BToolchainSearch
 import bertos_utils
@@ -68,13 +70,17 @@ class BToolchainPage(BWizardPage):
     
     def _validItem(self, index, infos):
         item = self.pageContent.toolchainList.item(index)
-        item.setIcon(QIcon(":/images/ok.png"))
+        needed = self._projectInfoRetrieve("CPU_INFOS")
+        if infos["target"].find(unicode(needed[QString("TOOLCHAIN")])) != -1:
+            item.setIcon(QIcon(":/images/ok.png"))
+        else:
+            item.setIcon(QIcon(":/images/warning.png"))
         item.setToolTip("Version: " + infos["version"] + "<br>Target: " + infos["target"] +
             "<br>Thread model: " + infos["thread"])
     
     def _invalidItem(self, index):
         item = self.pageContent.toolchainList.item(index)
-        item.setIcon(QIcon(":/images/warning.png"))
+        item.setIcon(QIcon(":/images/error.png"))
     
     def addToolchain(self):
         sel_toolchain = QFileDialog.getOpenFileName(self, self.tr("Choose the toolchain"), "")
@@ -106,7 +112,7 @@ class BToolchainPage(BWizardPage):
             self._validationProcess = QProcess()
             self._validationProcess.start(filename, ["-v"])
             self._validationProcess.waitForStarted(10)
-            if self._validationProcess.waitForFinished(10):
+            if self._validationProcess.waitForFinished(20):
                 description = str(self._validationProcess.readAllStandardError())
                 infos = bertos_utils.getToolchainInfo(description)
                 if len(infos.keys()) == 4:

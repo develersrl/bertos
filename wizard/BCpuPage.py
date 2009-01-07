@@ -29,7 +29,7 @@ class BCpuPage(BWizardPage):
             item = QListWidgetItem(cpu["CPU_NAME"])
             # The CPU_DESC field in the cpu definition is a list of string, so we need to 
             # store it as a QStringList in a QVariant
-            item.setData(Qt.UserRole, QVariant(QStringList(cpu["CPU_DESC"])))
+            item.setData(Qt.UserRole, QVariant(cpu))
             self.pageContent.cpuList.addItem(item)
     
     def _connectSignals(self):
@@ -54,15 +54,17 @@ class BCpuPage(BWizardPage):
     
     def isComplete(self):
         if self.pageContent.cpuList.currentRow() != -1:
-            self._projectInfoStore("CPU_NAME", self.pageContent.cpuList.currentItem().text())
+            self._projectInfoStore("CPU_INFOS", self.pageContent.cpuList.currentItem().data(Qt.UserRole).toMap())
             return True
         else:
             return False
         
     def rowChanged(self):
-        description = self.pageContent.cpuList.currentItem().data(Qt.UserRole).toStringList()
+        description = self.pageContent.cpuList.currentItem().data(Qt.UserRole).toMap()
+        # I don't like to use QString as key in the dict, but the QVariant.toMap() return a dict<QString,QVariant>
+        description =  description[QString("CPU_DESC")].toStringList()
         # We need to convert the list of QString in a list of unicode
-        description =  [unicode(line) for line in description]
+        description = [unicode(line) for line in description]
         self.pageContent.descriptionLabel.setText("<br>".join(description))
         self.pageContent.descriptionLabel.setVisible(True)
         self.emit(SIGNAL("completeChanged()"))

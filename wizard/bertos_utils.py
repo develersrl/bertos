@@ -71,12 +71,16 @@ def findDefinitions(ftype, path):
 def loadCpuInfos(path):
     cpuInfos = []
     for definition in findDefinitions(const.CPU_DEFINITION, path):
-        D = {}
-        D.update(const.CPU_DEF)
-        def include(filename, dict = D, directory=definition[1]):
-            execfile(directory + "/" + filename, {}, D)
-        D["include"] = include
-        include(definition[0], D)
-        D["CPU_NAME"] = definition[0].split(".")[0]
-        cpuInfos.append(D)
+        cpuInfos.append(getInfos(definition))
     return cpuInfos
+
+def getInfos(definition):
+    D = {}
+    D.update(const.CPU_DEF)
+    def include(filename, dict = D, directory=definition[1]):
+        execfile(directory + "/" + filename, {}, D)
+    D["include"] = include
+    include(definition[0], D)
+    D["CPU_NAME"] = definition[0].split(".")[0]
+    D["DEFINITION_PATH"] = definition[1] + "/" + definition[0]
+    return D
