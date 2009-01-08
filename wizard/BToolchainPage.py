@@ -36,7 +36,7 @@ class BToolchainPage(BWizardPage):
             self.pageContent.doSearchButton.setEnabled(False)
     
     def _populateToolchainList(self):
-        toolchains = qvariant_converter.getStringList(self._settingsRetrieve("toolchains"))
+        toolchains = self.toolchains()
         for element in toolchains:
             item = QListWidgetItem(element)
             item.setData(Qt.UserRole, QVariant(element))
@@ -49,17 +49,17 @@ class BToolchainPage(BWizardPage):
         self.emit(SIGNAL("completeChanged()"))
     
     def _search(self):
-        dirList = qvariant_converter.getStringList(self._settingsRetrieve("search_dir_list"))
-        if(qvariant_converter.getBool(self._settingsRetrieve("path_search"))):
+        dirList = self.searchDirList()
+        if(self.pathSearch()):
             dirList += [element for element in bertos_utils.getSystemPath()]
         toolchainList = bertos_utils.findToolchains(dirList)
-        storedToolchainList = qvariant_converter.getStringList(self._settingsRetrieve("toolchains"))
+        storedToolchainList = self.toolchains()
         toolchainList = set(toolchainList) - set(storedToolchainList)
         for element in toolchainList:
             item = QListWidgetItem(element)
             item.setData(Qt.UserRole, QVariant(element))
             self.pageContent.toolchainList.addItem(item)
-        self._settingsStore("toolchains", list(toolchainList.union(storedToolchainList)))
+        self.setToolchains(list(toolchainList.union(storedToolchainList)))
         
     def _connectSignals(self):
         self.connect(self.pageContent.toolchainList, SIGNAL("itemSelectionChanged()"), self._selectionChanged)
@@ -87,17 +87,17 @@ class BToolchainPage(BWizardPage):
             item = QListWidgetItem(sel_toolchain)
             item.setData(Qt.UserRole, QVariant(sel_toolchain))
             self.pageContent.toolchainList.addItem(item)
-            toolchains = qvariant_convert.getStringList(self._settingsRetrieve("toolchains"))
+            toolchains = self.toolchains()
             toolchains = set(toolchains + [sel_toolchain])
-            self._settingsStore("toolchains", list(toolchains))
+            self.setToolchains(list(toolchains))
     
     def removeToolchain(self):
         if self.pageContent.toolchainList.currentRow() != -1:
             item = self.pageContent.toolchainList.takeItem(self.pageContent.toolchainList.currentRow())
             toolchain = qvariant_converter.getString(item.data(Qt.UserRole))
-            toolchains = qvariant_converter.getStringList(self._settingsRetrieve("toolchains"))
+            toolchains = self.toolchains()
             toolchains.remove(toolchain)
-            self._settingsStore("toolchains", toolchains)
+            self.setToolchains(toolchains)
     
     def searchToolchain(self):
         search = BToolchainSearch.BToolchainSearch()

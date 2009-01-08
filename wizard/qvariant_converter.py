@@ -34,7 +34,7 @@ def getStringDict(qvariant):
 def convertStringDict(string_dict):
     result_dict = {}
     for key, value in string_dict.items():
-        result_dict[QString(key)] = QVariant(value)
+        result_dict[QString(key)] = QString(value)
     return QVariant(result_dict)
 
 def getBool(qvariant):
@@ -53,4 +53,4 @@ def convertDict(dict_str_variant):
     result_dict = {}
     for key, value in dict_str_variant.items():
         result_dict[QString(key)] = QVariant(value)
-    return result_dict
+    return QVariant(result_dict)

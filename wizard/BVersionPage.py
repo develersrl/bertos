@@ -34,14 +34,14 @@ class BVersionPage(BWizardPage):
         self.pageContent.versionList.setCurrentRow(-1)
     
     def _storeVersion(self, directory):
-        versions = qvariant_converter.getStringList(self._settingsRetrieve("versions"))
+        versions = self.versions()
         versions = set(versions + [directory])
-        self._settingsStore("versions", list(versions))
+        self.setVersions(list(versions))
     
     def _deleteVersion(self, directory):
-        versions = qvariant_converter.getStringList(self._settingsRetrieve("versions"))
+        versions = self.versions()
         versions.remove(directory)
-        self._settingsStore("versions", versions)
+        self.setVersions(versions)
         
     def _insertListElement(self, directory):
         if bertos_utils.isBertosDir(directory):
@@ -54,7 +54,7 @@ class BVersionPage(BWizardPage):
             self.pageContent.versionList.addItem(item)
     
     def _fillVersionList(self):
-        versions = qvariant_converter.getStringList(self._settingsRetrieve("versions"))
+        versions = self.versions()
         for directory in versions:
             self._insertListElement(directory)
 
