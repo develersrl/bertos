@@ -31,9 +31,9 @@
  * -->
  *
  * \brief Signals test.
- * 
+ *
  * \version $Id$
- * 
+ *
  * \author Daniele Basile <asterix@develer.com>
  */
 
@@ -56,7 +56,7 @@ int test_signal[] = {
 	SIG_TIMEOUT,
 	SIG_SYSTEM5,
 	SIG_SYSTEM6,
-	SIG_SINGLE	
+	SIG_SINGLE
 };
 
 // Current signal to send
@@ -67,7 +67,7 @@ sigmask_t sig_to_slave;
 
 /*
  * These macros generate the code needed to create the test process functions.
- */ 
+ */
 #define PROC_TEST_SLAVE(index, signal) static void proc_test##index(void) \
 { \
 	for(;;) \
@@ -143,13 +143,13 @@ int signal_testRun(void)
 	MAIN_CHECK_SIGNAL(5, slave_5);
 	MAIN_CHECK_SIGNAL(6, slave_6);
 	MAIN_CHECK_SIGNAL(7, slave_7);
-	
+
 	if(count == countof(test_signal))
 	{
 		kprintf("Signal test finished..ok!\n");
 		return 0;
 	}
-	
+
 	kprintf("Signal test finished..fail!\n");
 	return -1;
 }
@@ -167,7 +167,7 @@ int signal_testSetup(void)
 	kprintf("Init Timer..");
 	timer_init();
 	kprintf("Done.\n");
-	
+
 	kprintf("Init Process..");
 	proc_init();
 	kprintf("Done.\n");

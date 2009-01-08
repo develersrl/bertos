@@ -32,10 +32,10 @@
  * \brief Semaphore test.
  *
  * \version $Id$
- * 
+ *
  * \author Daniele Basile <asterix@develer.com>
- * \author Stefano Fedrigo <aleph@develer.com> 
- * 
+ * \author Stefano Fedrigo <aleph@develer.com>
+ *
  */
 
 #include <cfg/debug.h>
@@ -83,7 +83,7 @@ unsigned int global_count = 0;
 
 /*
  * These macros generate the code needed to create the test process functions.
- */ 
+ */
 #define PROC_TEST(num) static void proc_test##num(void) \
 { \
 	unsigned int local_count = 0; \
@@ -134,7 +134,7 @@ int sem_testRun(void)
 	ticks_t start_time = timer_clock();
 
 	kprintf("Run semaphore test..\n");
-	
+
 	//Init the process tests
 	PROC_TEST_INIT(1)
 	PROC_TEST_INIT(2)
@@ -145,11 +145,11 @@ int sem_testRun(void)
 	PROC_TEST_INIT(7)
 	PROC_TEST_INIT(8)
 	kputs("> Main: Processes created\n");
-	
+
 	/*
-	 * Wait until all processes exit, if something goes wrong we return an 
+	 * Wait until all processes exit, if something goes wrong we return an
 	 * error after timeout_ms.
-	 */ 
+	 */
 	while((timer_clock() - start_time) < ms_to_ticks(TEST_TIME_OUT_MS))
 	{
 		if (sem_attempt(&sem))
@@ -165,7 +165,7 @@ int sem_testRun(void)
 		}
 		proc_yield();
 	}
-	
+
 	kputs("Semaphore Test fail..\n");
 	return -1;
 }
@@ -177,7 +177,7 @@ int sem_testSetup(void)
 	kprintf("Init Semaphore..");
 	sem_init(&sem);
 	kprintf("Done.\n");
-	
+
 	#if CONFIG_KERN_PREEMPT
 		kprintf("Init Interrupt (preempt mode)..");
 		irq_init();
@@ -187,11 +187,11 @@ int sem_testSetup(void)
 	kprintf("Init Timer..");
 	timer_init();
 	kprintf("Done.\n");
-	
+
 	kprintf("Init Process..");
 	proc_init();
 	kprintf("Done.\n");
-	
+
 	return 0;
 }
 
