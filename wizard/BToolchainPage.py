@@ -71,12 +71,11 @@ class BToolchainPage(BWizardPage):
     def _validItem(self, index, infos):
         item = self.pageContent.toolchainList.item(index)
         needed = self._projectInfoRetrieve("CPU_INFOS")
-        if infos["target"].find(unicode(needed[QString("TOOLCHAIN")])) != -1:
+        if infos["target"].find(unicode(needed[QString("TOOLCHAIN")].toString())) != -1:
             item.setIcon(QIcon(":/images/ok.png"))
         else:
             item.setIcon(QIcon(":/images/warning.png"))
-        item.setToolTip("Version: " + infos["version"] + "<br>Target: " + infos["target"] +
-            "<br>Thread model: " + infos["thread"])
+        item.setText(infos["version"] + " " + infos["target"])
     
     def _invalidItem(self, index):
         item = self.pageContent.toolchainList.item(index)
@@ -108,11 +107,11 @@ class BToolchainPage(BWizardPage):
     
     def validateToolchains(self):
         for i in range(self.pageContent.toolchainList.count()):
-            filename = self.pageContent.toolchainList.item(i).text()
+            filename = unicode(self.pageContent.toolchainList.item(i).data(Qt.UserRole).toString())
             self._validationProcess = QProcess()
             self._validationProcess.start(filename, ["-v"])
-            self._validationProcess.waitForStarted(10)
-            if self._validationProcess.waitForFinished(20):
+            self._validationProcess.waitForStarted(1000)
+            if self._validationProcess.waitForFinished(200):
                 description = str(self._validationProcess.readAllStandardError())
                 infos = bertos_utils.getToolchainInfo(description)
                 if len(infos.keys()) == 4:
