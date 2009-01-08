@@ -190,7 +190,7 @@
 	/**
 	 * Putchar for BITBANG serial debug console.
 	 * Sometimes, we can't permit to use a whole serial for debugging purpose.
-	 * Since debug console is in output only it is usefull to use a single generic I/O pin for debug.
+	 * Since debug console is in output only it is useful to use a single generic I/O pin for debug.
 	 * This is achieved by this simple function, that shift out the data like a UART, but
 	 * in software :)
 	 * The only requirement is that SER_BITBANG_* macros will be defined somewhere (usually hw_ser.h)
