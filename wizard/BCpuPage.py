@@ -12,6 +12,7 @@
 
 from BWizardPage import *
 import bertos_utils
+import qvariant_converter
 
 class BCpuPage(BWizardPage):
     
@@ -54,17 +55,14 @@ class BCpuPage(BWizardPage):
     
     def isComplete(self):
         if self.pageContent.cpuList.currentRow() != -1:
-            self._projectInfoStore("CPU_INFOS", self.pageContent.cpuList.currentItem().data(Qt.UserRole).toMap())
+            self._projectInfoStore("CPU_INFOS", qvariant_converter.getStringDict(self.pageContent.cpuList.currentItem().data(Qt.UserRole)))
             return True
         else:
             return False
         
     def rowChanged(self):
-        description = self.pageContent.cpuList.currentItem().data(Qt.UserRole).toMap()
-        # I don't like to use QString as key in the dict, but the QVariant.toMap() return a dict<QString,QVariant>
-        description =  description[QString("CPU_DESC")].toStringList()
-        # We need to convert the list of QString in a list of unicode
-        description = [unicode(line) for line in description]
+        description = qvariant_converter.getDict(self.pageContent.cpuList.currentItem().data(Qt.UserRole))["CPU_DESC"]
+        description = qvariant_converter.getStringList(description)
         self.pageContent.descriptionLabel.setText("<br>".join(description))
         self.pageContent.descriptionLabel.setVisible(True)
         self.emit(SIGNAL("completeChanged()"))

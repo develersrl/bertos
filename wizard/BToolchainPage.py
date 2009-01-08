@@ -14,6 +14,7 @@ import os
 from BWizardPage import *
 import BToolchainSearch
 import bertos_utils
+import qvariant_converter
 
 class BToolchainPage(BWizardPage):
     
@@ -35,10 +36,10 @@ class BToolchainPage(BWizardPage):
             self.pageContent.doSearchButton.setEnabled(False)
     
     def _populateToolchainList(self):
-        toolchains = self._settingsRetrieve("toolchains").toList()
+        toolchains = qvariant_converter.getStringList(self._settingsRetrieve("toolchains"))
         for element in toolchains:
-            item = QListWidgetItem(element.toString())
-            item.setData(Qt.UserRole, element)
+            item = QListWidgetItem(element)
+            item.setData(Qt.UserRole, QVariant(element))
             self.pageContent.toolchainList.addItem(item)
             
     def _clearList(self):
@@ -48,13 +49,12 @@ class BToolchainPage(BWizardPage):
         self.emit(SIGNAL("completeChanged()"))
     
     def _search(self):
-        dirList = [unicode(element.toString()) for element in self._settingsRetrieve("search_dir_list").toList()]
-        if(self._settingsRetrieve("path_search").toBool()):
+        dirList = qvariant_converter.getStringList(self._settingsRetrieve("search_dir_list"))
+        if(qvariant_converter.getBool(self._settingsRetrieve("path_search"))):
             dirList += [element for element in bertos_utils.getSystemPath()]
         toolchainList = bertos_utils.findToolchains(dirList)
-        storedToolchainList = self._settingsRetrieve("toolchains").toList()
-        storedToolchainList = set([unicode(toolchain.toString()) for toolchain in storedToolchainList])
-        toolchainList =set(toolchainList) - set(storedToolchainList)
+        storedToolchainList = qvariant_converter.getStringList(self._settingsRetrieve("toolchains"))
+        toolchainList = set(toolchainList) - set(storedToolchainList)
         for element in toolchainList:
             item = QListWidgetItem(element)
             item.setData(Qt.UserRole, QVariant(element))
@@ -71,7 +71,7 @@ class BToolchainPage(BWizardPage):
     def _validItem(self, index, infos):
         item = self.pageContent.toolchainList.item(index)
         needed = self._projectInfoRetrieve("CPU_INFOS")
-        if infos["target"].find(unicode(needed[QString("TOOLCHAIN")].toString())) != -1:
+        if infos["target"].find(needed["TOOLCHAIN"]) != -1:
             item.setIcon(QIcon(":/images/ok.png"))
         else:
             item.setIcon(QIcon(":/images/warning.png"))
@@ -87,17 +87,16 @@ class BToolchainPage(BWizardPage):
             item = QListWidgetItem(sel_toolchain)
             item.setData(Qt.UserRole, QVariant(sel_toolchain))
             self.pageContent.toolchainList.addItem(item)
-            toolchains = self._settingsRetrieve("toolchains").toList()
-            toolchains = set([toolchain.toString() for toolchain in toolchains] + [sel_toolchain])
+            toolchains = qvariant_convert.getStringList(self._settingsRetrieve("toolchains"))
+            toolchains = set(toolchains + [sel_toolchain])
             self._settingsStore("toolchains", list(toolchains))
     
     def removeToolchain(self):
         if self.pageContent.toolchainList.currentRow() != -1:
             item = self.pageContent.toolchainList.takeItem(self.pageContent.toolchainList.currentRow())
-            item = item.data(Qt.UserRole).toString()
-            toolchains = self._settingsRetrieve("toolchains").toList()
-            toolchains = [unicode(toolchain.toString()) for toolchain in toolchains]
-            toolchains.remove(unicode(item))
+            toolchain = qvariant_converter.getString(item.data(Qt.UserRole))
+            toolchains = qvariant_converter.getStringList(self._settingsRetrieve("toolchains"))
+            toolchains.remove(toolchain)
             self._settingsStore("toolchains", toolchains)
     
     def searchToolchain(self):
@@ -107,7 +106,7 @@ class BToolchainPage(BWizardPage):
     
     def validateToolchains(self):
         for i in range(self.pageContent.toolchainList.count()):
-            filename = unicode(self.pageContent.toolchainList.item(i).data(Qt.UserRole).toString())
+            filename = qvariant_converter.getString(self.pageContent.toolchainList.item(i).data(Qt.UserRole))
             self._validationProcess = QProcess()
             self._validationProcess.start(filename, ["-v"])
             self._validationProcess.waitForStarted(1000)
@@ -124,7 +123,8 @@ class BToolchainPage(BWizardPage):
     
     def isComplete(self):
         if self.pageContent.toolchainList.currentRow() != -1:
-            self._projectInfoStore("TOOLCHAIN", self.pageContent.toolchainList.item(self.pageContent.toolchainList.currentRow()).data(Qt.UserRole).toString())
+            self._projectInfoStore("TOOLCHAIN", 
+                qvariant_converter.getString(self.pageContent.toolchainList.item(self.pageContent.toolchainList.currentRow()).data(Qt.UserRole)))
             return True
         else:
             return False

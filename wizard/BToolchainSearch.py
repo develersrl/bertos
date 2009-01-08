@@ -13,6 +13,8 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import PyQt4.uic as uic
 
+import qvariant_converter
+
 class BToolchainSearch(QDialog):
     
     def __init__(self):
@@ -42,13 +44,13 @@ class BToolchainSearch(QDialog):
         self.content.searchButton.setEnabled(self.content.pathBox.isChecked() or self.content.customDirList.count() != 0)
     
     def _populateDirList(self):
-        search_dir_list = QApplication.instance().settings.value(QString("search_dir_list")).toList()
+        search_dir_list = qvariant_converter.getStringList(QApplication.instance().settings.value("search_dir_list"))
         for element in search_dir_list:
-            item = QListWidgetItem(unicode(element.toString()))
+            item = QListWidgetItem(element)
             self.content.customDirList.addItem(item)
     
     def _setPathSearch(self):
-        pathSearch = QApplication.instance().settings.value(QString("path_search")).toBool()
+        pathSearch = qvariant_converter.getBool(QApplication.instance().settings.value(QString("path_search")))
         self.content.pathBox.setChecked(pathSearch)
     
     def _stateChanged(self, state):
@@ -58,18 +60,19 @@ class BToolchainSearch(QDialog):
     def _addDir(self):
         directory = QFileDialog.getExistingDirectory(self, self.tr("Open Directory"), "", QFileDialog.ShowDirsOnly)
         if not directory.isEmpty():
+            directory = unicode(directory)
             item = QListWidgetItem(directory)
             self.content.customDirList.addItem(item)
-            search_dir_list = QApplication.instance().settings.value(QString("search_dir_list")).toList()
-            search_dir_list = set([d.toString() for d in search_dir_list] + [directory])
+            search_dir_list = qvariant_conveter.getStringList(QApplication.instance().settings.value("search_dir_list"))
+            search_dir_list = set(search_dir_list + [directory])
             QApplication.instance().settings.setValue(QString("search_dir_list"), QVariant(list(search_dir_list)))
             self._setSearchButton()
     
     def _removeDir(self):
         if self.content.customDirList.currentRow() != -1:
             item = self.content.customDirList.takeItem(self.content.customDirList.currentRow())
-            search_dir_list = QApplication.instance().settings.value(QString("search_dir_list")).toList()
-            search_dir_list = set([d.toString() for d in search_dir_list])
+            search_dir_list = qvariant_converter.getStringList(QApplication.instance().settings.value(QString("search_dir_list")))
+            search_dir_list = set(search_dir_list)
             search_dir_list.remove(item.text())
             QApplication.instance().settings.setValue(QString("search_dir_list"), QVariant(list(search_dir_list)))
             self._setSearchButton()

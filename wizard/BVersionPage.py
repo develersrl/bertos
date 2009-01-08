@@ -12,6 +12,7 @@
 from PyQt4.QtGui import *
 from BWizardPage import *
 import bertos_utils
+import qvariant_converter
 
 class BVersionPage(BWizardPage):
     
@@ -33,13 +34,12 @@ class BVersionPage(BWizardPage):
         self.pageContent.versionList.setCurrentRow(-1)
     
     def _storeVersion(self, directory):
-        versions = self._settingsRetrieve("versions").toList()
-        versions = set([x.toString() for x in versions] + [directory])
+        versions = qvariant_converter.getStringList(self._settingsRetrieve("versions"))
+        versions = set(versions + [directory])
         self._settingsStore("versions", list(versions))
     
     def _deleteVersion(self, directory):
-        versions = self._settingsRetrieve(QString("versions")).toList()
-        versions = [x.toString() for x in versions]
+        versions = qvariant_converter.getStringList(self._settingsRetrieve("versions"))
         versions.remove(directory)
         self._settingsStore("versions", versions)
         
@@ -48,19 +48,19 @@ class BVersionPage(BWizardPage):
             item = QListWidgetItem(QIcon(":/images/ok.png"), bertos_utils.bertosVersion(directory) + " (\"" + directory + "\")")
             item.setData(Qt.UserRole, QVariant(directory))
             self.pageContent.versionList.addItem(item)
-        elif not directory.isEmpty():
+        elif len(directory) > 0:
             item = QListWidgetItem(QIcon(":/images/warning.png"), "UNKNOWN" + " (\"" + directory + "\")")
             item.setData(Qt.UserRole, QVariant(directory))
             self.pageContent.versionList.addItem(item)
     
     def _fillVersionList(self):
-        versions = self._settingsRetrieve("versions").toList()
+        versions = qvariant_converter.getStringList(self._settingsRetrieve("versions"))
         for directory in versions:
-            self._insertListElement(directory.toString())
+            self._insertListElement(directory)
 
     def isComplete(self):
         if self.pageContent.versionList.currentRow() != -1:
-            self._projectInfoStore("SOURCES_PATH", unicode(self.pageContent.versionList.currentItem().data(Qt.UserRole).toString()))
+            self._projectInfoStore("SOURCES_PATH", qvariant_converter.getString(self.pageContent.versionList.currentItem().data(Qt.UserRole)))
             return True
         else:
             return False
@@ -68,14 +68,14 @@ class BVersionPage(BWizardPage):
     def addVersion(self):
         directory = QFileDialog.getExistingDirectory(self, self.tr("Choose a directory"), "", QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks)
         if not directory.isEmpty():
-            self._storeVersion(directory)
+            self._storeVersion(unicode(directory))
             self.pageContent.versionList.clear()
             self._fillVersionList()
             self.emit(SIGNAL("completeChanged()"))
     
     def removeVersion(self):
         item = self.pageContent.versionList.takeItem(self.pageContent.versionList.currentRow())
-        self._deleteVersion(item.data(Qt.UserRole).toString())
+        self._deleteVersion(qvariant_converter.getString(item.data(Qt.UserRole)))
         self.emit(SIGNAL("completeChanged()"))
     
     def updateClicked(self):
