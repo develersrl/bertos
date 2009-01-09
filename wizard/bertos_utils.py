@@ -47,10 +47,16 @@ def getToolchainInfo(output):
     target = expr.findall(output)
     if len(target) == 1:
         info["target"] = target[0].split("Target: ")[1]
-    expr = re.compile("gcc version .*")
+    expr = re.compile("gcc version [0-9,.]*")
     version = expr.findall(output)
     if len(version) == 1:
         info["version"] = version[0].split("gcc version ")[1]
+    expr = re.compile("gcc version [0-9,.]* \(.*\)")
+    build = expr.findall(output)
+    if len(build) == 1:
+        build = build[0].split("gcc version ")[1]
+        build = build[build.find("(") + 1 : build.find(")")]
+        info["build"] = build
     expr = re.compile("Configured with: .*")
     configured = expr.findall(output)
     if len(configured) == 1:
