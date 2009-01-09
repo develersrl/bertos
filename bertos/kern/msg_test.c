@@ -48,71 +48,191 @@
 
 #include <drv/timer.h>
 
+// Global settings for the test.
+#define MAX_GLOBAL_COUNT            11040
+#define TEST_TIME_OUT_MS               10
+#define DELAY                           5
 
-// Our message port.
-static MsgPort test_port;
+// Settings for the test message.
+//Process 0
+#define INC_PROC_T0                     1
+#define DELAY_PROC_T0   INC_PROC_T0*DELAY
+//Process 1
+#define INC_PROC_T1                     3
+#define DELAY_PROC_T1   INC_PROC_T1*DELAY
+//Process 2
+#define INC_PROC_T2                     5
+#define DELAY_PROC_T2   INC_PROC_T2*DELAY
+//Process 3
+#define INC_PROC_T3                     7
+#define DELAY_PROC_T3   INC_PROC_T3*DELAY
+//Process 4
+#define INC_PROC_T4                    11
+#define DELAY_PROC_T4   INC_PROC_T4*DELAY
+//Process 5
+#define INC_PROC_T5                    13
+#define DELAY_PROC_T5   INC_PROC_T5*DELAY
 
-// A test message with two parameters and a result.
+/*
+ * These macros generate the code needed to create the test process functions.
+ */
+#define RECV_PROC(num, sig) static void receiver_proc##num(void) \
+    { \
+        TestMsg *rec_msg; \
+		for (;;) \
+        { \
+            sig_wait(sig); \
+            kprintf("Proc[%d]..get message\n", num); \
+            rec_msg = containerof(msg_get(&test_port##num), TestMsg, msg); \
+			timer_delay(rec_msg->delay); \
+            rec_msg->result += rec_msg->val;  \
+            kprintf("Proc[%d]..process message val[%d],delay[%d],res[%d]\n", num, rec_msg->val, rec_msg->delay, rec_msg->result); \
+            msg_reply(&rec_msg->msg); \
+            kprintf("Proc[%d] reply\n", num); \
+        } \
+    }
+
+#define SEND_MSG(num) \
+	do { \
+		kprintf("Main send message to proc[%d]\n", num); \
+		msg##num.msg.replyPort = &test_portMain; \
+		msg_put(&test_port##num, &msg##num.msg); \
+	} while(0)
+
+#define RECV_STACK(num) static cpu_stack_t receiver_stack##num[CONFIG_KERN_MINSTACKSIZE / sizeof(cpu_stack_t)]
+#define RECV_INIT_PROC(num) proc_new(receiver_proc##num, NULL, sizeof(receiver_stack##num), receiver_stack##num)
+#define RECV_INIT_MSG(num, proc,sig) msg_initPort(&test_port##num, event_createSignal(proc, sig))
+
+// A test message with the parameters and a result.
 typedef struct
 {
 	Msg msg;
 
-	int x, y;
+	int val;
+	int delay;
 	int result;
 } TestMsg;
 
+// Global count to check if the test is going ok.
+static int count = 0;
 
-// Receive messages and do something boring with them.
-static void receiver_proc(void)
+// Our message port.
+static MsgPort test_port0;
+static MsgPort test_port1;
+static MsgPort test_port2;
+static MsgPort test_port3;
+static MsgPort test_port4;
+static MsgPort test_port5;
+
+/*
+ * Generate the process to test message.
+ */
+RECV_PROC(0, SIG_USER0)
+RECV_PROC(1, SIG_USER1)
+RECV_PROC(2, SIG_USER2)
+RECV_PROC(3, SIG_USER3)
+RECV_PROC(4, SIG_SYSTEM5)
+RECV_PROC(5, SIG_SYSTEM6)
+/*
+ * These signal are already use from
+ * main process and the sig_waitWithTimeout functions, so we don't
+ * use it.
+ *
+ * RECV_PROC(6, SIG_SINGLE)
+ * RECV_PROC(7, SIG_TIMEOUT)
+ */
+
+RECV_STACK(0);
+RECV_STACK(1);
+RECV_STACK(2);
+RECV_STACK(3);
+RECV_STACK(4);
+RECV_STACK(5);
+
+/*
+ * Help function to fill the message to send
+ */
+static void fill_msg(TestMsg *msg, int val, int delay, int res)
 {
-	TestMsg *rec_msg;
-	for (;;)
-	{
-	    kprintf("Proc[%d]..\n", 1);
-		sig_wait(SIG_SINGLE);
-	    kprintf("Proc[%d] get message\n", 1);
-        rec_msg = containerof(msg_get(&test_port), TestMsg, msg);
-        // Do something with the message
-        rec_msg->result = rec_msg->x + rec_msg->y;
-	    kprintf("Proc[%d] process message x[%d],y[%d],res[%d]\n", 1, rec_msg->x, rec_msg->y, rec_msg->result);
-        msg_reply(&rec_msg->msg);
-	    kprintf("Proc[%d] reply\n", 1);
-	}
+	msg->val = val;
+	msg->delay = delay;
+	msg->result = res;
 }
-
-static cpu_stack_t receiver_stack[CONFIG_KERN_MINSTACKSIZE / sizeof(cpu_stack_t)];
 
 /**
  * Run signal test
  */
 int msg_testRun(void)
 {
+	MsgPort test_portMain;
+	TestMsg msg0;
+	TestMsg msg1;
+	TestMsg msg2;
+	TestMsg msg3;
+	TestMsg msg4;
+	TestMsg msg5;
+	TestMsg *reply;
+	ticks_t start_time = timer_clock();
+
+	// Allocate and start the test process
+    struct Process *recv0 = RECV_INIT_PROC(0);
+    struct Process *recv1 = RECV_INIT_PROC(1);
+    struct Process *recv2 = RECV_INIT_PROC(2);
+    struct Process *recv3 = RECV_INIT_PROC(3);
+    struct Process *recv4 = RECV_INIT_PROC(4);
+    struct Process *recv5 = RECV_INIT_PROC(5);
+
 	kprintf("Run Message test..\n");
 
-	MsgPort test_reply_port;
-	TestMsg msg1;
-	TestMsg *reply;
-
-    struct Process *recv = proc_new(receiver_proc, NULL, sizeof(receiver_stack), receiver_stack);
-	msg_initPort(&test_port, event_createSignal(recv, SIG_SINGLE));
-	msg_initPort(&test_reply_port, event_createSignal(proc_current(), SIG_SINGLE));
+	// Init port and message
+    RECV_INIT_MSG(Main, proc_current(), SIG_SINGLE);
+    RECV_INIT_MSG(0, recv0, SIG_USER0);
+    RECV_INIT_MSG(1, recv1, SIG_USER1);
+    RECV_INIT_MSG(2, recv2, SIG_USER2);
+    RECV_INIT_MSG(3, recv3, SIG_USER3);
+    RECV_INIT_MSG(4, recv4, SIG_SYSTEM5);
+    RECV_INIT_MSG(5, recv5, SIG_SYSTEM6);
 
 	// Fill-in first message and send it out.
-	msg1.x = 3;
-	msg1.y = 2;
-	kprintf("invio il msg..\n");
-	msg1.msg.replyPort = &test_reply_port;
-	msg_put(&test_port, &msg1.msg);
+	fill_msg(&msg0, INC_PROC_T0, DELAY_PROC_T0, 0);
+	fill_msg(&msg1, INC_PROC_T1, DELAY_PROC_T1, 0);
+	fill_msg(&msg2, INC_PROC_T2, DELAY_PROC_T2, 0);
+	fill_msg(&msg3, INC_PROC_T3, DELAY_PROC_T3, 0);
+	fill_msg(&msg4, INC_PROC_T4, DELAY_PROC_T4, 0);
+	fill_msg(&msg5, INC_PROC_T5, DELAY_PROC_T5, 0);
 
-	// Wait for a reply...
-	kprintf("prima sig wait..\n");
-	sig_wait(SIG_SINGLE);
-	kprintf("dopo sig wait..\n");
-    reply = containerof(msg_get(&test_reply_port), TestMsg, msg);
-	ASSERT(reply != NULL);
-	ASSERT(reply->result == 5);
 
-	return 0;
+	// Send and wait the message
+	for (int i = 0; i < 23; ++i)
+    {
+		SEND_MSG(0);
+		SEND_MSG(1);
+		SEND_MSG(2);
+		SEND_MSG(3);
+		SEND_MSG(4);
+		SEND_MSG(5);
+		while(1)
+		{
+			if(sig_waitTimeout(SIG_SINGLE, TEST_TIME_OUT_MS) && SIG_SINGLE)
+			{
+				// Wait for a reply...
+				reply = containerof(msg_get(&test_portMain), TestMsg, msg);
+				if(reply == NULL)
+					break;
+				count += reply->result;
+				kprintf("Main recv[%d] count[%d]\n", reply->result, count);
+			}
+		}
+    }
+
+	if(count == MAX_GLOBAL_COUNT)
+	{
+		kprintf("Message test finished..ok!\n");
+		return 0;
+	}
+
+	kprintf("Message test finished..fail!\n");
+	return -1;
 }
 
 int msg_testSetup(void)
