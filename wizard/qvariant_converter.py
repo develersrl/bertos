@@ -23,7 +23,7 @@ def getStringList(qvariant):
     return string_list
 
 def convertStringList(string_list):
-    return QVariant(string_list)
+    return QVariant(QStringList(string_list))
 
 def getStringDict(qvariant):
     dict_str_str = {}
