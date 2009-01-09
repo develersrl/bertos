@@ -58,8 +58,11 @@
 
 MOD_DEFINE(kfile_test);
 
+// Size of the "virtual" disk that
+// we want to test.
 #define BUF_TEST_LEN     3209
 
+// Buffer for test
 typedef uint8_t fake_t;
 fake_t test_buf[BUF_TEST_LEN];
 fake_t test_buf_save[BUF_TEST_LEN];
@@ -67,6 +70,9 @@ fake_t test_disk[BUF_TEST_LEN];
 
 KFile fd;
 
+/*
+ * Beckend to use kfile structure on pc.
+ */
 static int fake_close(KFile *fd)
 {
 	(void)fd;
@@ -125,6 +131,9 @@ void fake_kfileInit(void)
 
 }
 
+/*
+ * Help function to init disk and the buffers.
+ */
 static void init_testBuf(void)
 {
 	#include <stdlib.h>
@@ -352,6 +361,7 @@ int kfile_testSetup(void)
         MOD_INIT(kfile_test);
         LOG_INFO("Mod init..ok\n");
 
+		// Init our backend and the buffers
 		fake_kfileInit();
 		init_testBuf();
 
@@ -373,3 +383,4 @@ int kfile_testTearDown(void)
 }
 
 TEST_MAIN(kfile);
+
