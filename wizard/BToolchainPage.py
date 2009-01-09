@@ -39,7 +39,7 @@ class BToolchainPage(BWizardPage):
         toolchains = self.toolchains()
         for element in toolchains:
             item = QListWidgetItem(element)
-            item.setData(Qt.UserRole, QVariant(element))
+            item.setData(Qt.UserRole, qvariant_converter.convertString(element))
             self.pageContent.toolchainList.addItem(item)
             
     def _clearList(self):
@@ -57,7 +57,7 @@ class BToolchainPage(BWizardPage):
         toolchainList = set(toolchainList) - set(storedToolchainList)
         for element in toolchainList:
             item = QListWidgetItem(element)
-            item.setData(Qt.UserRole, QVariant(element))
+            item.setData(Qt.UserRole, qvariant_converter.convertString(element))
             self.pageContent.toolchainList.addItem(item)
         self.setToolchains(list(toolchainList.union(storedToolchainList)))
         
@@ -85,7 +85,7 @@ class BToolchainPage(BWizardPage):
         sel_toolchain = QFileDialog.getOpenFileName(self, self.tr("Choose the toolchain"), "")
         if not sel_toolchain.isEmpty():
             item = QListWidgetItem(sel_toolchain)
-            item.setData(Qt.UserRole, QVariant(sel_toolchain))
+            item.setData(Qt.UserRole, qvariant_converter.convertString(sel_toolchain))
             self.pageContent.toolchainList.addItem(item)
             toolchains = self.toolchains()
             toolchains = set(toolchains + [sel_toolchain])

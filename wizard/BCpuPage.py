@@ -28,9 +28,7 @@ class BCpuPage(BWizardPage):
         infos = bertos_utils.loadCpuInfos(self._projectInfoRetrieve("SOURCES_PATH"))
         for cpu in infos:
             item = QListWidgetItem(cpu["CPU_NAME"])
-            # The CPU_DESC field in the cpu definition is a list of string, so we need to 
-            # store it as a QStringList in a QVariant
-            item.setData(Qt.UserRole, QVariant(cpu))
+            item.setData(Qt.UserRole, qvariant_converter.convertDict(cpu))
             self.pageContent.cpuList.addItem(item)
     
     def _connectSignals(self):

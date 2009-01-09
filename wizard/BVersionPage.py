@@ -46,11 +46,11 @@ class BVersionPage(BWizardPage):
     def _insertListElement(self, directory):
         if bertos_utils.isBertosDir(directory):
             item = QListWidgetItem(QIcon(":/images/ok.png"), bertos_utils.bertosVersion(directory) + " (\"" + directory + "\")")
-            item.setData(Qt.UserRole, QVariant(directory))
+            item.setData(Qt.UserRole, qvariant_converter.convertString(directory))
             self.pageContent.versionList.addItem(item)
         elif len(directory) > 0:
             item = QListWidgetItem(QIcon(":/images/warning.png"), "UNKNOWN" + " (\"" + directory + "\")")
-            item.setData(Qt.UserRole, QVariant(directory))
+            item.setData(Qt.UserRole, qvariant_converter.convertString(directory))
             self.pageContent.versionList.addItem(item)
     
     def _fillVersionList(self):
