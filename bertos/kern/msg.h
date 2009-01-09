@@ -106,6 +106,8 @@
  *	} TestMsg;
  *
  *
+ *  static cpu_stack_t sender_stack[CONFIG_KERN_MINSTACKSIZE / sizeof(cpu_stack_t)];
+ *
  *	// A process that sends two messages and waits for replies.
  *	static void sender_proc(void)
  *	{
@@ -114,30 +116,30 @@
  *		TestMsg msg2;
  *		Msg *reply;
  *
- *		msg_initPort(&reply_port,
- *			event_createSignal(proc_current(), SIGF_SINGLE);
+ *		msg_initPort(&test_reply_port,
+ *			event_createSignal(proc_current(), SIG_SINGLE);
  *
  *		// Fill-in first message and send it out.
  *		msg1.x = 3;
  *		msg1.y = 2;
  *		msg1.msg.replyPort = &test_reply_port;
- *		msg_put(&test_port, &msg1);
+ *		msg_put(&test_port, &msg1.msg);
  *
  *		// Fill-in second message and send it out too.
  *		msg2.x = 5;
  *		msg2.y = 4;
  *		msg2.msg.replyPort = &test_reply_port;
- *		msg_put(&test_port, &msg1);
+ *		msg_put(&test_port, &msg2.msg);
  *
  *		// Wait for a reply...
  *		sig_wait(SIG_SINGLE);
  *
- *		reply = (TestMsg *)msg_get(&test_reply_port);
+        reply = containerof(msg_get(&test_reply_port), TestMsg, msg);
  *		ASSERT(reply != NULL);
  *		ASSERT(reply->result == 5);
  *
  *		// Get reply to second message.
- *		while (!(reply = (TestMsg *)msg_get(&test_reply_port))
+ *		while (!(reply = containerof(msg_get(&test_reply_port), TestMsg, msg)))
  *		{
  *			// Not yet, be patient and wait some more.
  *			sig_wait(SIG_SINGLE);
@@ -151,23 +153,22 @@
  *	static void receiver_proc(void)
  *	{
  *		msg_initPort(&test_port,
- *			event_createSignal(proc_current(), SIGF_EXAMPLE);
+ *			event_createSignal(proc_current(), SIG_EXAMPLE);
  *
- *		proc_new(sender_proc, (iptr_t)&test_port,
- *			sender_stack, sizeof(sender_stack);
+ *		proc_new(sender_proc, NULL,sizeof(sender_stack), sender_stack);
  *
  *		for (;;)
  *		{
- *			sigmask_t sigs = sig_wait(SIGF_EXAMPLE | more_signals);
+ *			sigmask_t sigs = sig_wait(SIG_EXAMPLE | more_signals);
  *
- *			if (sigs & SIGF_EXAMPLE)
+ *			if (sigs & SIG_EXAMPLE)
  *			{
  *				TestMsg *emsg;
- *				while (emsg = (TestMsg *)msg_get(&test_port)
+ *				while((emsg = containerof(msg_get(&test_port), TestMsg, msg)))
  *				{
  *					// Do something with the message
  *					emsg->result = emsg->x + emsg->y;
- *					msg_reply((Msg *)msg);
+ *					msg_reply(emsg->msg);
  *				}
  *			}
  *		}
