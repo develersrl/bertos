@@ -275,8 +275,8 @@ INLINE void kfile_clearerr(struct KFile *fd)
 /**
  * Kfile test function.
  */
-int kfile_testSetUp(void);
-int kfile_testRun(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size);
+int kfile_testSetup(void);
+int kfile_testRunGeneric(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size);
 int kfile_testTearDown(void);
 
 #endif /* KERN_KFILE_H */
