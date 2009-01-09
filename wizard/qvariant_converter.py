@@ -52,5 +52,5 @@ def getDict(qvariant):
 def convertDict(dict_str_variant):
     result_dict = {}
     for key, value in dict_str_variant.items():
-        result_dict[QString(key)] = QVariant(value)
+        result_dict[QString(key)] = value
     return QVariant(result_dict)
