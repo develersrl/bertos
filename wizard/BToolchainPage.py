@@ -75,7 +75,7 @@ class BToolchainPage(BWizardPage):
             item.setIcon(QIcon(":/images/ok.png"))
         else:
             item.setIcon(QIcon(":/images/warning.png"))
-        item.setText(infos["version"] + " " + infos["target"])
+        item.setText("GCC " + infos["version"] + " " + infos["target"])
     
     def _invalidItem(self, index):
         item = self.pageContent.toolchainList.item(index)
@@ -113,7 +113,7 @@ class BToolchainPage(BWizardPage):
             if self._validationProcess.waitForFinished(200):
                 description = str(self._validationProcess.readAllStandardError())
                 infos = bertos_utils.getToolchainInfo(description)
-                if len(infos.keys()) == 4:
+                if len(infos.keys()) >= 4:
                     self._validItem(i, infos)
                 else:
                     self._invalidItem(i)
