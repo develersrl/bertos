@@ -22,7 +22,7 @@ class BToolchainPage(BWizardPage):
         BWizardPage.__init__(self, "toolchain_select.ui")
         self.setTitle(self.tr("Select toolchain"))
         self._validationProcess = None
-        self._populateToolchainList()
+        #self._populateToolchainList()
         self._connectSignals()
     
     def _updateUi(self):
@@ -37,11 +37,13 @@ class BToolchainPage(BWizardPage):
     
     def _populateToolchainList(self):
         toolchains = self.toolchains()
-        for element in toolchains:
-            item = QListWidgetItem(element)
-            item.setData(Qt.UserRole, qvariant_converter.convertString(element))
+        for key, value in toolchains.items():
+            item = QListWidgetItem(key)
+            item.setData(Qt.UserRole, qvariant_converter.convertString(key))
             self.pageContent.toolchainList.addItem(item)
-            
+            if value:
+                self.validateToolchain(self.pageContent.toolchainList.row(item))
+
     def _clearList(self):
         self.pageContent.toolchainList.clear()
     
@@ -53,20 +55,21 @@ class BToolchainPage(BWizardPage):
         if(self.pathSearch()):
             dirList += [element for element in bertos_utils.getSystemPath()]
         toolchainList = bertos_utils.findToolchains(dirList)
-        storedToolchainList = self.toolchains()
-        toolchainList = set(toolchainList) - set(storedToolchainList)
+        storedToolchains = self.toolchains()
         for element in toolchainList:
-            item = QListWidgetItem(element)
-            item.setData(Qt.UserRole, qvariant_converter.convertString(element))
-            self.pageContent.toolchainList.addItem(item)
-        self.setToolchains(list(toolchainList.union(storedToolchainList)))
+            if not element in storedToolchains.keys():
+                item = QListWidgetItem(element)
+                item.setData(Qt.UserRole, qvariant_converter.convertString(element))
+                self.pageContent.toolchainList.addItem(item)
+                storedToolchains[element] = False
+        self.setToolchains(storedToolchains)
         
     def _connectSignals(self):
         self.connect(self.pageContent.toolchainList, SIGNAL("itemSelectionChanged()"), self._selectionChanged)
         self.connect(self.pageContent.addButton, SIGNAL("clicked()"), self.addToolchain)
         self.connect(self.pageContent.removeButton, SIGNAL("clicked()"), self.removeToolchain)
         self.connect(self.pageContent.searchButton, SIGNAL("clicked()"), self.searchToolchain)
-        self.connect(self.pageContent.checkButton, SIGNAL("clicked()"), self.validateToolchains)
+        self.connect(self.pageContent.checkButton, SIGNAL("clicked()"), self.validateAllToolchains)
     
     def _validItem(self, index, infos):
         item = self.pageContent.toolchainList.item(index)
@@ -75,7 +78,7 @@ class BToolchainPage(BWizardPage):
             item.setIcon(QIcon(":/images/ok.png"))
         else:
             item.setIcon(QIcon(":/images/warning.png"))
-        item.setText("GCC " + infos["version"] + " " + infos["target"])
+        item.setText("GCC " + infos["version"] + " - " + infos["target"])
     
     def _invalidItem(self, index):
         item = self.pageContent.toolchainList.item(index)
@@ -88,15 +91,15 @@ class BToolchainPage(BWizardPage):
             item.setData(Qt.UserRole, qvariant_converter.convertString(sel_toolchain))
             self.pageContent.toolchainList.addItem(item)
             toolchains = self.toolchains()
-            toolchains = set(toolchains + [sel_toolchain])
-            self.setToolchains(list(toolchains))
+            toolchains[sel_toolchain] = False
+            self.setToolchains(toolchains)
     
     def removeToolchain(self):
         if self.pageContent.toolchainList.currentRow() != -1:
             item = self.pageContent.toolchainList.takeItem(self.pageContent.toolchainList.currentRow())
             toolchain = qvariant_converter.getString(item.data(Qt.UserRole))
             toolchains = self.toolchains()
-            toolchains.remove(toolchain)
+            del toolchains[toolchain]
             self.setToolchains(toolchains)
     
     def searchToolchain(self):
@@ -104,22 +107,28 @@ class BToolchainPage(BWizardPage):
         self.connect(search, SIGNAL("accepted()"), self._search)
         search.exec_()
     
-    def validateToolchains(self):
+    def validateAllToolchains(self):
         for i in range(self.pageContent.toolchainList.count()):
-            filename = qvariant_converter.getString(self.pageContent.toolchainList.item(i).data(Qt.UserRole))
-            self._validationProcess = QProcess()
-            self._validationProcess.start(filename, ["-v"])
-            self._validationProcess.waitForStarted(1000)
-            if self._validationProcess.waitForFinished(200):
-                description = str(self._validationProcess.readAllStandardError())
-                infos = bertos_utils.getToolchainInfo(description)
-                if len(infos.keys()) >= 4:
-                    self._validItem(i, infos)
-                else:
-                    self._invalidItem(i)
+            self.validateToolchain(i)
+    
+    def validateToolchain(self, i):
+        filename = qvariant_converter.getString(self.pageContent.toolchainList.item(i).data(Qt.UserRole))
+        self._validationProcess = QProcess()
+        self._validationProcess.start(filename, ["-v"])
+        self._validationProcess.waitForStarted(1000)
+        if self._validationProcess.waitForFinished(200):
+            description = str(self._validationProcess.readAllStandardError())
+            infos = bertos_utils.getToolchainInfo(description)
+            if len(infos.keys()) >= 4:
+                self._validItem(i, infos)
             else:
-                self._validationProcess.kill()
                 self._invalidItem(i)
+        else:
+            self._validationProcess.kill()
+            self._invalidItem(i)
+        toolchains = self.toolchains()
+        toolchains[filename] = True
+        self.setToolchains(toolchains)
     
     def isComplete(self):
         if self.pageContent.toolchainList.currentRow() != -1:
@@ -128,3 +137,7 @@ class BToolchainPage(BWizardPage):
             return True
         else:
             return False
+    
+    def reloadData(self):
+        self._clearList()
+        self._populateToolchainList()

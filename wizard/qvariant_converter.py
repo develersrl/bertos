@@ -43,6 +43,18 @@ def getBool(qvariant):
 def convertBool(boolean):
     return QVariant(boolean)
 
+def getBoolDict(qvariant):
+    dict_str_bool = {}
+    for key, value in qvariant.toMap().items():
+        dict_str_bool[unicode(key)] = value.toBool()
+    return dict_str_bool
+
+def convertBoolDict(dict_str_bool):
+    result_dict = {}
+    for key, value in dict_str_bool.items():
+        result_dict[QString(key)] = value
+    return QVariant(result_dict)
+
 def getDict(qvariant):
     dict_str_variant = {}
     for key, value in qvariant.toMap().items():

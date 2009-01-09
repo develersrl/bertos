@@ -55,10 +55,10 @@ class BWizardPage(QWizardPage):
         self._settingsStore("path_search", qvariant_converter.convertBool(path_search))
     
     def toolchains(self):
-        return qvariant_converter.getStringList(self._settingsRetrieve("toolchains"))
+        return qvariant_converter.getBoolDict(self._settingsRetrieve("toolchains"))
 
     def setToolchains(self, toolchains):
-        self._settingsStore("toolchains", qvariant_converter.convertStringList(toolchains))
+        self._settingsStore("toolchains", qvariant_converter.convertBoolDict(toolchains))
     
     def reloadData(self):
         pass

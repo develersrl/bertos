@@ -38,7 +38,9 @@ def getSystemPath():
 def findToolchains(pathList):
     toolchains = []
     for element in pathList:
-        toolchains += glob.glob(element+ "/" + const.GCC_NAME)
+        for toolchain in glob.glob(element+ "/" + const.GCC_NAME):
+            if not os.path.islink(toolchain):
+                toolchains.append(toolchain)
     return toolchains
 
 def getToolchainInfo(output):
