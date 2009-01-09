@@ -44,6 +44,7 @@
 
 #include "cfg/cfg_kfile.h"
 #include <cfg/debug.h>
+#include <cfg/test.h>
 #include <cfg/module.h>
 
 // Define logging setting (for cfg/log.h module).
@@ -55,9 +56,90 @@
 
 #include <string.h>
 
-
 MOD_DEFINE(kfile_test);
 
+#define BUF_TEST_LEN     3209
+
+typedef uint8_t fake_t;
+fake_t test_buf[BUF_TEST_LEN];
+fake_t test_buf_save[BUF_TEST_LEN];
+fake_t test_disk[BUF_TEST_LEN];
+
+KFile fd;
+
+static int fake_close(KFile *fd)
+{
+	(void)fd;
+	return 0;
+}
+
+static size_t fake_read(KFile *fd, void *buf, size_t size)
+{
+	fake_t *dest = (fake_t *)buf;
+	size_t rd_len;
+
+	rd_len = MIN((kfile_off_t)size, fd->size - fd->seek_pos);
+
+	memcpy(dest, test_disk, size);
+	fd->seek_pos += rd_len;
+
+	LOG_INFO("Read: real[%ld] expected[%ld]\n", rd_len, size);
+
+	return rd_len;
+}
+
+static size_t fake_write(KFile *fd, const void *buf, size_t size)
+{
+	fake_t *src = (fake_t *)buf;
+	size_t wr_len;
+
+	wr_len = MIN((kfile_off_t)size, fd->size - fd->seek_pos);
+
+	memcpy(test_disk, src, wr_len);
+	fd->seek_pos += wr_len;
+
+	LOG_INFO("Write: real[%ld] expected[%ld]\n", wr_len, size);
+
+	return wr_len;
+}
+
+int fake_flush(KFile *fd)
+{
+	(void)fd;
+
+	return 0;
+}
+
+void fake_kfileInit(void)
+{
+	// Setup data flash programming functions.
+	fd.reopen = kfile_genericReopen;
+	fd.close = fake_close;
+	fd.read = fake_read;
+	fd.write = fake_write;
+	fd.seek = kfile_genericSeek;
+	fd.flush = fake_flush;
+
+	fd.seek_pos = 0;
+	fd.size = BUF_TEST_LEN;
+
+}
+
+static void init_testBuf(void)
+{
+	#include <stdlib.h>
+
+	kprintf("Init fake buffer..\n");
+	for (int i = 0; i < BUF_TEST_LEN; i++)
+	{
+		test_disk[i] = random();
+		kprintf("%d ", test_disk[i]);
+	}
+	kprintf("\nend\n");
+
+	memset(test_buf, 0, sizeof(test_buf));
+	memset(test_buf_save, 0, sizeof(test_buf_save));
+}
 
 /**
  * KFile read/write subtest.
@@ -99,20 +181,9 @@ static bool kfile_rwTest(KFile *f, uint8_t *buf, size_t size)
 	for (size_t i = 0; i < size; i++)
 		if (buf[i] != (i & 0xff))
 			return false;
+
 	return true;
 }
-
-/**
- * Setup all needed for kfile test
- */
-int kfile_testSetUp(void)
-{
-        MOD_INIT(kfile_test);
-        LOG_INFO("Mod init..ok\n");
-
-        return 0;
-}
-
 
 /**
  * KFile read/write test.
@@ -120,7 +191,7 @@ int kfile_testSetUp(void)
  * on \a fd handler.
  * \a save_buf can be NULL or a buffer where to save previous file content.
  */
-int kfile_testRun(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size)
+int kfile_testRunGeneric(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size)
 {
 
 	/*
@@ -141,8 +212,8 @@ int kfile_testRun(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size)
 	 */
 	if (save_buf)
 	{
+		LOG_INFO("Saved content..form [%d] to [%ld]\n", fd->seek_pos, fd->seek_pos + size);
 		kfile_read(fd, save_buf, size);
-		LOG_INFO("Saved content..form [%ld] to [%ld]\n", fd->seek_pos, fd->seek_pos + size);
 	}
 
 	/* TEST 1 BEGIN. */
@@ -172,12 +243,12 @@ int kfile_testRun(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size)
 		if (kfile_write(fd, save_buf, size) != size)
 			goto kfile_test_end;
 
-		LOG_INFO("Restore content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + size);
+		LOG_INFO("Restore content..form [%d] to [%ld]\n", fd->seek_pos, fd->seek_pos + size);
 	}
 	/* TEST 1 END. */
 
 	/* TEST 2 BEGIN. */
-	LOG_INFO("Test 2: write from pos [%lu] to [%lu]\n", fd->size/2 , fd->size/2 + size);
+	LOG_INFO("Test 2: write from pos [%d] to [%ld]\n", fd->size/2 , fd->size/2 + size);
 
 	/*
 	 * Go to half test size.
@@ -192,7 +263,7 @@ int kfile_testRun(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size)
 	{
 		kfile_read(fd, save_buf, size);
 		kfile_seek(fd, -(kfile_off_t)size, KSM_SEEK_CUR);
-		LOG_INFO("Saved content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + size);
+		LOG_INFO("Saved content..form [%d] to [%ld]\n", fd->seek_pos, fd->seek_pos + size);
 	}
 
 	/*
@@ -213,13 +284,13 @@ int kfile_testRun(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size)
 		if (kfile_write(fd, save_buf, size) != size)
 			goto kfile_test_end;
 
-		LOG_INFO("Restore content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + size);
+		LOG_INFO("Restore content..form [%d] to [%ld]\n", fd->seek_pos, fd->seek_pos + size);
 	}
 
 	/* TEST 2 END. */
 
 	/* TEST 3 BEGIN. */
-	LOG_INFO("Test 3: write outside of fd->size limit [%lu]\n", fd->size);
+	LOG_INFO("Test 3: write outside of fd->size limit [%d]\n", fd->size);
 	LOG_INFO("This test should FAIL!, you must see an assertion fail message.\n");
 
 	/*
@@ -235,7 +306,7 @@ int kfile_testRun(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size)
 	{
 		kfile_read(fd, save_buf, len);
 		kfile_seek(fd, -len, KSM_SEEK_CUR);
-		LOG_INFO("Saved content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + len);
+		LOG_INFO("Saved content..form [%d] to [%d]\n", fd->seek_pos, fd->seek_pos + len);
 	}
 
 	/*
@@ -256,7 +327,7 @@ int kfile_testRun(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size)
 		if ((kfile_off_t)kfile_write(fd, save_buf, len) != len)
 			goto kfile_test_end;
 
-		LOG_INFO("Restore content..form [%lu] to [%lu]\n", fd->seek_pos, fd->seek_pos + len);
+		LOG_INFO("Restore content..form [%d] to [%d]\n", fd->seek_pos, fd->seek_pos + len);
 	}
 
 	/* TEST 3 END. */
@@ -270,12 +341,35 @@ kfile_test_end:
 	return EOF;
 }
 
+
+
+
+/**
+ * Setup all needed for kfile test
+ */
+int kfile_testSetup(void)
+{
+        MOD_INIT(kfile_test);
+        LOG_INFO("Mod init..ok\n");
+
+		fake_kfileInit();
+		init_testBuf();
+
+        return 0;
+}
+
+int kfile_testRun(void)
+{
+	return kfile_testRunGeneric(&fd, test_buf, test_buf_save, BUF_TEST_LEN);
+}
+
 /**
  * End a dataflash Test.
  * (Unused)
  */
 int kfile_testTearDown(void)
 {
-	/*    */
 	return 0;
 }
+
+TEST_MAIN(kfile);
