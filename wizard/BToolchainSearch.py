@@ -13,7 +13,10 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import PyQt4.uic as uic
 
-import qvariant_converter
+if PYQT_VERSION_STR > "4.4.3":
+    import qvariant_converter_new as qvariant_converter
+else:
+    import qvariant_converter_old as qvariant_converter
 
 class BToolchainSearch(QDialog):
     

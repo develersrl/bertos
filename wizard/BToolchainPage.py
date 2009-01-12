@@ -14,7 +14,10 @@ import os
 from BWizardPage import *
 import BToolchainSearch
 import bertos_utils
-import qvariant_converter
+if PYQT_VERSION_STR > "4.4.3":
+    import qvariant_converter_new as qvariant_converter
+else:
+    import qvariant_converter_old as qvariant_converter
 
 class BToolchainPage(BWizardPage):
     
