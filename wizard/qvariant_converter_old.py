@@ -9,11 +9,18 @@
 # Author: Lorenzo Berni <duplo@develer.com>
 #
 
+"""
+Awful module for the conversion from python types to qvariant, for make the wizard compatible with older version of pyqt (<= 4.4.3)
+"""
+
 from PyQt4.QtCore import *
 import pickle
 
 def getString(qvariant):
-    string = unicode(qvariant.toString())
+    if type(qvariant) == str or type(qvariant) == unicode:
+        string = qvariant
+    else:
+        string = unicode(qvariant.toString())
     return string
 
 def convertString(string):
