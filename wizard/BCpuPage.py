@@ -56,7 +56,7 @@ class BCpuPage(BWizardPage):
     
     def isComplete(self):
         if self.pageContent.cpuList.currentRow() != -1:
-            self._projectInfoStore("CPU_INFOS", qvariant_converter.getStringDict(self.pageContent.cpuList.currentItem().data(Qt.UserRole)))
+            self._projectInfoStore("CPU_INFOS", qvariant_converter.getDict(self.pageContent.cpuList.currentItem().data(Qt.UserRole)))
             return True
         else:
             return False
