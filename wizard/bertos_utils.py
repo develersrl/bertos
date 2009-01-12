@@ -91,4 +91,5 @@ def getInfos(definition):
     include(definition[0], D)
     D["CPU_NAME"] = definition[0].split(".")[0]
     D["DEFINITION_PATH"] = definition[1] + "/" + definition[0]
+    del D["include"]
     return D

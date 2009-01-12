@@ -10,6 +10,7 @@
 #
 
 from PyQt4.QtCore import *
+import pickle
 
 def getString(qvariant):
     string = unicode(qvariant.toString())
@@ -20,8 +21,11 @@ def convertString(string):
 
 def getStringList(qvariant):
     string_list = []
-    for element in qvariant.toStringList():
-        string_list.append(unicode(element))
+    if type(qvariant) == list:
+        string_list = qvariant
+    else:
+        for element in qvariant.toStringList():
+            string_list.append(unicode(element))
     return string_list
 
 def convertStringList(string_list):
@@ -31,19 +35,15 @@ def convertStringList(string_list):
     return QVariant(QStringList(result))
 
 def getStringDict(qvariant):
-    dict_str_str = {}
-    qvariant_item = qvariant.toPyObject()
-    if qvariant_item == NotImplemented:
-        qvariant_item = {}
-    for key, value in qvariant_item.items():
-        dict_str_str[unicode(key)] = unicode(value.toString())
-    return dict_str_str
+    if len(a) == 0:
+        dict_str_bool = {}
+    else:
+        dict_str_bool = pickle.loads(a)
+    return dict_str_bool
 
 def convertStringDict(string_dict):
-    result = {}
-    for key, value in string_dict.items():
-        result[QString(key)] = QVariant(QString(value))
-    return QVariant(result)
+    a = pickle.dumps(dict_str_str)
+    return QVariant(QByteArray(a))
 
 def getBool(qvariant):
     return qvariant.toBool()
@@ -52,36 +52,25 @@ def convertBool(boolean):
     return QVariant(boolean)
 
 def getBoolDict(qvariant):
-    dict_str_bool = {}
-    qvariant_item = qvariant.toPyObject()
-    if qvariant_item == NotImplemented:
-        qvariant_item = {}
-    for key, value in qvariant_item.items():
-        dict_str_bool[unicode(key)] = value.toBool()
+    a = str(qvariant.toByteArray())
+    if len(a) == 0:
+        dict_str_bool = {}
+    else:
+        dict_str_bool = pickle.loads(a)
     return dict_str_bool
 
 def convertBoolDict(dict_str_bool):
-    result = {}
-    for key, value in dict_str_bool:
-        result[QString(key)] = QVariant(value)
-    return QVariant(result)
+    a = pickle.dumps(dict_str_bool)
+    return QVariant(QByteArray(a))
 
 def getDict(qvariant):
-    dict_str_variant = {}
-    qvariant_item = qvariant.toPyObject()
-    if qvariant_item == NotImplemented:
-        qvariant_item = {}
-    for key, value in qvariant_item.items():
-        dict_str_variant[unicode(key)] = value
-    return dict_str_variant
+    a = str(qvariant.toByteArray())
+    if len(a) == 0:
+        dict_str_bool = {}
+    else:
+        dict_str_bool = pickle.loads(a)
+    return dict_str_bool
 
 def convertDict(dict_str_variant):
-    result = {}
-    for key, value in dict_str_variant.items():
-        if type(value) == str or type(value) == unicode:
-            result[QString(key)] = QVariant(QString(value))
-        elif type(value) == list:
-            result[QString(key)] = QVariant(QStringList(value))
-        elif type(value) == dict:
-            result[QString(key)] = QVariant(convertDict(value))
-    return QVariant(result)
+    a = pickle.dumps(dict_str_variant)
+    return QVariant(QByteArray(a))
