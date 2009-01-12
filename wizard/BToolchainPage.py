@@ -77,7 +77,7 @@ class BToolchainPage(BWizardPage):
     def _validItem(self, index, infos):
         item = self.pageContent.toolchainList.item(index)
         needed = self._projectInfoRetrieve("CPU_INFOS")
-        if infos["target"].find(needed["TOOLCHAIN"]) != -1:
+        if infos["target"].find(qvariant_converter.getString(needed["TOOLCHAIN"])) != -1:
             item.setIcon(QIcon(":/images/ok.png"))
         else:
             item.setIcon(QIcon(":/images/warning.png"))
