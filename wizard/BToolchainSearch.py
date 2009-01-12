@@ -68,7 +68,7 @@ class BToolchainSearch(QDialog):
             self.content.customDirList.addItem(item)
             search_dir_list = qvariant_converter.getStringList(QApplication.instance().settings.value("search_dir_list"))
             search_dir_list = set(search_dir_list + [directory])
-            QApplication.instance().settings.setValue(QString("search_dir_list"), convertStringList(list(search_dir_list)))
+            QApplication.instance().settings.setValue(QString("search_dir_list"), qvariant_converter.convertStringList(list(search_dir_list)))
             self._setSearchButton()
     
     def _removeDir(self):
