@@ -73,6 +73,7 @@ class BToolchainPage(BWizardPage):
     
     def _validItem(self, index, infos):
         item = self.pageContent.toolchainList.item(index)
+        item.setToolTip(qvariant_converter.getString(self.pageContent.toolchainList.item(index).data(Qt.UserRole)))
         needed = self._projectInfoRetrieve("CPU_INFOS")
         if infos["target"].find(qvariant_converter.getString(needed["TOOLCHAIN"])) != -1:
             item.setIcon(QIcon(":/images/ok.png"))
