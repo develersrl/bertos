@@ -51,8 +51,9 @@ class BFolderPage(BWizardPage):
         self.emit(SIGNAL("completeChanged()"))
     
     def _selectDirectory(self):
-        directory = QFileDialog.getExistingDirectory(self, self.tr("Open Directory"), "", QFileDialog.ShowDirsOnly)
-        self.pageContent.directoryEdit.setText(directory)
+        directory = unicode(QFileDialog.getExistingDirectory(self, self.tr("Open Directory"), "", QFileDialog.ShowDirsOnly))
+        if len(directory) == "":
+            self.pageContent.directoryEdit.setText(directory)
     
     def isComplete(self):
         if self.pageContent.projectPath.text() != "None":
