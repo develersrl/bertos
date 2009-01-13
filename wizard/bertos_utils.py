@@ -41,7 +41,7 @@ def findToolchains(pathList):
         for toolchain in glob.glob(element+ "/" + const.GCC_NAME):
             if not os.path.islink(toolchain):
                 toolchains.append(toolchain)
-    return toolchains
+    return list(set(toolchains))
 
 def getToolchainInfo(output):
     info = {}
