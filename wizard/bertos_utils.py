@@ -13,6 +13,7 @@ import os
 import fnmatch
 import glob
 import re
+import collections
 
 import const
 
@@ -44,7 +45,7 @@ def findToolchains(pathList):
     return list(set(toolchains))
 
 def getToolchainInfo(output):
-    info = {}
+    info = collections.defaultdict(unicode)
     expr = re.compile("Target: .*")
     target = expr.findall(output)
     if len(target) == 1:
