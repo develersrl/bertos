@@ -34,7 +34,7 @@ class BToolchainPage(BWizardPage):
         toolchains = self.toolchains()
         for key, value in toolchains.items():
             item = QListWidgetItem(key)
-            item.setData(Qt.UserRole, qvariant_converter.convertDict({"path": key}))
+            item.setData(Qt.UserRole, qvariant_converter.convertStringDict({"path": key}))
             self.pageContent.toolchainList.addItem(item)
             if value:
                 self.validateToolchain(self.pageContent.toolchainList.row(item))
@@ -45,7 +45,7 @@ class BToolchainPage(BWizardPage):
     def _selectionChanged(self):
         infos = collections.defaultdict(lambda: unicode("not defined"))
         infos.update(qvariant_converter.getStringDict(self.pageContent.toolchainList.currentItem().data(Qt.UserRole)))
-        self.pageContent.infoLabel.setText("GCC " + infos["version"] + " (" + infos["build"] + ")\nTarget: " + infos["target"] + "\nThread model: " + infos["thread"])
+        self.pageContent.infoLabel.setText("GCC " + infos["version"] + " (" + infos["build"] + ")\nTarget: " + infos["target"] + "\nPath: " + infos["path"])
         self.pageContent.infoLabel.setVisible(True)
         self.emit(SIGNAL("completeChanged()"))
     
@@ -58,7 +58,7 @@ class BToolchainPage(BWizardPage):
         for element in toolchainList:
             if not element in storedToolchains.keys():
                 item = QListWidgetItem(element)
-                item.setData(Qt.UserRole, qvariant_converter.convertDict({"path": element}))
+                item.setData(Qt.UserRole, qvariant_converter.convertStringDict({"path": element}))
                 self.pageContent.toolchainList.addItem(item)
                 storedToolchains[element] = False
         self.setToolchains(storedToolchains)
@@ -72,9 +72,9 @@ class BToolchainPage(BWizardPage):
     
     def _validItem(self, index, infos):
         item = self.pageContent.toolchainList.item(index)
-        newData = qvariant_converter.getDict(self.pageContent.toolchainList.item(index).data(Qt.UserRole))
+        newData = qvariant_converter.getStringDict(self.pageContent.toolchainList.item(index).data(Qt.UserRole))
         newData.update(infos)
-        item.setData(Qt.UserRole, qvariant_converter.convertDict(newData))
+        item.setData(Qt.UserRole, qvariant_converter.convertStringDict(newData))
         needed = self._projectInfoRetrieve("CPU_INFOS")
         if infos["target"].find(qvariant_converter.getString(needed["TOOLCHAIN"])) != -1:
             item.setIcon(QIcon(":/images/ok.png"))
@@ -99,7 +99,7 @@ class BToolchainPage(BWizardPage):
     def removeToolchain(self):
         if self.pageContent.toolchainList.currentRow() != -1:
             item = self.pageContent.toolchainList.takeItem(self.pageContent.toolchainList.currentRow())
-            toolchain = qvariant_converter.getString(qvariant_converter.getDict(item.data(Qt.UserRole))["path"])
+            toolchain = qvariant_converter.getString(qvariant_converter.getStringDict(item.data(Qt.UserRole))["path"])
             toolchains = self.toolchains()
             del toolchains[toolchain]
             self.setToolchains(toolchains)
@@ -114,7 +114,7 @@ class BToolchainPage(BWizardPage):
             self.validateToolchain(i)
     
     def validateToolchain(self, i):
-        filename = qvariant_converter.getString(qvariant_converter.getDict(self.pageContent.toolchainList.item(i).data(Qt.UserRole))["path"])
+        filename = qvariant_converter.getStringDict(self.pageContent.toolchainList.item(i).data(Qt.UserRole))["path"]
         self._validationProcess = QProcess()
         self._validationProcess.start(filename, ["-v"])
         self._validationProcess.waitForStarted(1000)
@@ -135,8 +135,7 @@ class BToolchainPage(BWizardPage):
     def isComplete(self):
         if self.pageContent.toolchainList.currentRow() != -1:
             self._projectInfoStore("TOOLCHAIN", 
-                qvariant_converter.getString(
-                qvariant_converter.getDict(self.pageContent.toolchainList.currentItem().data(Qt.UserRole))["path"]))
+                qvariant_converter.getStringDict(self.pageContent.toolchainList.currentItem().data(Qt.UserRole))["path"])
             return True
         else:
             return False
