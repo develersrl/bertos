@@ -10,6 +10,7 @@
 #
 
 import os
+import collections
 
 from BWizardPage import *
 import BToolchainSearch
@@ -42,7 +43,8 @@ class BToolchainPage(BWizardPage):
         self.pageContent.toolchainList.clear()
     
     def _selectionChanged(self):
-        infos = qvariant_converter.getStringDict(self.pageContent.toolchainList.currentItem().data(Qt.UserRole))
+        infos = collections.defaultdict(lambda: unicode("not defined"))
+        infos.update(qvariant_converter.getStringDict(self.pageContent.toolchainList.currentItem().data(Qt.UserRole)))
         self.pageContent.infoLabel.setText("GCC " + infos["version"] + " (" + infos["build"] + ")\nTarget: " + infos["target"] + "\nThread model: " + infos["thread"])
         self.pageContent.infoLabel.setVisible(True)
         self.emit(SIGNAL("completeChanged()"))
