@@ -42,11 +42,12 @@ def convertStringList(string_list):
     return QVariant(QStringList(result))
 
 def getStringDict(qvariant):
+    a = str(qvariant.toByteArray())
     if len(a) == 0:
-        dict_str_bool = {}
+        dict_str_str = {}
     else:
-        dict_str_bool = pickle.loads(a)
-    return dict_str_bool
+        dict_str_str = pickle.loads(a)
+    return dict_str_str
 
 def convertStringDict(string_dict):
     a = pickle.dumps(dict_str_str)
