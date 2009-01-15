@@ -53,10 +53,18 @@
 
 #if CPU_AVR_ATMEGA1281 || CPU_AVR_ATMEGA168
 	#define REG_TIFR0 TIFR0
+	#define REG_TIFR1 TIFR1
 	#define REG_TIFR2 TIFR2
+	#if CPU_AVR_ATMEGA1281
+		#define REG_TIFR3 TIFR3
+	#endif
 
 	#define REG_TIMSK0 TIMSK0
+	#define REG_TIMSK1 TIMSK1
 	#define REG_TIMSK2 TIMSK2
+	#if CPU_AVR_ATMEGA1281
+		#define REG_TIMSK3 TIMSK3
+	#endif
 
 	#define REG_TCCR0A TCCR0A
 	#define REG_TCCR0B TCCR0B
@@ -74,10 +82,13 @@
 	#define BIT_OCIE2A OCIE2A
 #else
 	#define REG_TIFR0 TIFR
+	#define REG_TIFR1 TIFR
 	#define REG_TIFR2 TIFR
 
 	#define REG_TIMSK0 TIMSK
+	#define REG_TIMSK1 TIMSK
 	#define REG_TIMSK2 TIMSK
+	#define REG_TIMSK3 ETIMSK
 
 	#define REG_TCCR0A TCCR0
 	#define REG_TCCR0B TCCR0
@@ -151,7 +162,7 @@
 		IRQ_SAVE_DISABLE(flags);
 
 		/* Reset Timer overflow flag */
-		REG_TIFR0 |= BV(TOV1);
+		REG_TIFR1 |= BV(TOV1);
 
 		/* Fast PWM mode, 9 bit, 24 kHz, no prescaling. */
 		#if (TIMER_PRESCALER == 1) && (TIMER_HW_BITS == 9)
@@ -172,7 +183,7 @@
 		TCNT1 = 0x00;         /* initialization of Timer/Counter */
 
 		/* Enable timer interrupt: Timer/Counter1 Overflow */
-		REG_TIMSK0 |= BV(TOIE1);
+		REG_TIMSK1 |= BV(TOIE1);
 
 		IRQ_RESTORE(flags);
 	}
@@ -226,7 +237,7 @@
 		IRQ_SAVE_DISABLE(flags);
 
 		/* Reset Timer overflow flag */
-		TIFR |= BV(TOV3);
+		REG_TIFR3 |= BV(TOV3);
 
 		/* Fast PWM mode, 9 bit, 24 kHz, no prescaling. */
 		#if (TIMER_PRESCALER == 1) && (TIMER_HW_BITS == 9)
@@ -244,11 +255,11 @@
 			#error Unsupported value of TIMER_PRESCALER or TIMER_HW_BITS
 		#endif
 
-		TCNT3 = 0x00;         /* initialization of Timer/Counter */
+		/* initialization of Timer/Counter */
+		TCNT3 = 0x00;
 
 		/* Enable timer interrupt: Timer/Counter3 Overflow */
-		/* ATTENTION! TOIE3 is only on ETIMSK, not TIMSK */
-		ETIMSK |= BV(TOIE3);
+		REG_TIMSK3 = |= BV(TOIE3);
 
 		IRQ_RESTORE(flags);
 	}
