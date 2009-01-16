@@ -49,7 +49,7 @@ def getStringDict(qvariant):
         dict_str_str = pickle.loads(a)
     return dict_str_str
 
-def convertStringDict(string_dict):
+def convertStringDict(dict_str_str):
     a = pickle.dumps(dict_str_str)
     return QVariant(QByteArray(a))
 
