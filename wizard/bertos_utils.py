@@ -93,3 +93,11 @@ def getInfos(definition):
     D["DEFINITION_PATH"] = definition[1] + "/" + definition[0]
     del D["include"]
     return D
+
+def getDefinitionBlocks(text):
+    block = []
+    block_tmp = re.findall("^/\*+\s*(.*?)\s*?\*/\s*#define\s+(\w+[\s\w]*?)\s*$", text, re.DOTALL | re.MULTILINE)
+    for comment, define in block_tmp:
+        block.append((" ".join(re.findall("^\s*\*?\s*(.*?)\s*?$", comment, re.MULTILINE)), define))
+    block += re.findall("/{3}<?\s*(.*)\s*#define\s+(.*)\s*?$", text, re.MULTILINE)
+    return block
