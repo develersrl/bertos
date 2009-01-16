@@ -783,7 +783,7 @@ SIGNAL(USART1_UDRE_vect)
  *
  * \sa port 0 TX complete handler.
  */
-SIGNAL(SIG_UART1_TRANS)
+SIGNAL(USART1_TX_vect)
 {
 	SER_STROBE_ON;
 
