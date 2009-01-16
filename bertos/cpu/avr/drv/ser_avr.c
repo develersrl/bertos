@@ -664,7 +664,7 @@ struct SerialHardware *ser_hw_getdesc(int unit)
 SIGNAL(SIG_CTS)
 {
 	// Re-enable UDR empty interrupt and TX, then disable CTS interrupt
-	UCSR0B = BV(RXCIE) | BV(UDRIE) | BV(RXEN) | BV(TXEN);
+	UCSR0B = BV(BIT_RXCIE0) | BV(BIT_UDRIE0) | BV(BIT_RXEN0) | BV(BIT_TXEN0);
 	EIMSK &= ~EIMSKF_CTS;
 }
 
@@ -692,7 +692,7 @@ SIGNAL(USART0_UDRE_vect)
 	{
 		// Disable rx interrupt and tx, enable CTS interrupt
 		// UNTESTED
-		UCSR0B = BV(RXCIE) | BV(RXEN) | BV(TXEN);
+		UCSR0B = BV(BIT_RXCIE0) | BV(BIT_RXEN0) | BV(BIT_TXEN0);
 		EIFR |= EIMSKF_CTS;
 		EIMSK |= EIMSKF_CTS;
 	}
@@ -733,7 +733,7 @@ SIGNAL(SIG_UART0_TRANS)
 		UARTDescs[SER_UART0].sending = false;
 	}
 	else
-		UCSR0B = BV(RXCIE) | BV(UDRIE) | BV(RXEN) | BV(TXEN);
+		UCSR0B = BV(BIT_RXCIE0) | BV(BIT_UDRIE0) | BV(BIT_RXEN0) | BV(BIT_TXEN0);
 
 	SER_STROBE_OFF;
 }
@@ -763,7 +763,7 @@ SIGNAL(USART1_UDRE_vect)
 	{
 		// Disable rx interrupt and tx, enable CTS interrupt
 		// UNTESTED
-		UCSR1B = BV(RXCIE) | BV(RXEN) | BV(TXEN);
+		UCSR1B = BV(BIT_RXCIE1) | BV(BIT_RXEN1) | BV(BIT_TXEN1);
 		EIFR |= EIMSKF_CTS;
 		EIMSK |= EIMSKF_CTS;
 	}
@@ -794,7 +794,7 @@ SIGNAL(SIG_UART1_TRANS)
 		UARTDescs[SER_UART1].sending = false;
 	}
 	else
-		UCSR1B = BV(RXCIE) | BV(UDRIE) | BV(RXEN) | BV(TXEN);
+		UCSR1B = BV(BIT_RXCIE1) | BV(BIT_UDRIE1) | BV(BIT_RXEN1) | BV(BIT_TXEN1);
 
 	SER_STROBE_OFF;
 }
