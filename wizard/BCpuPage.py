@@ -40,6 +40,7 @@ class BCpuPage(BWizardPage):
             self.pageContent.cpuList.setCurrentItem(elements[0])
     
     def _setupUi(self):
+        self.pageContent.cpuList.setSortingEnabled(True)
         self.pageContent.descriptionLabel.setVisible(False)
         self.pageContent.descriptionLabel.setText("")
     
