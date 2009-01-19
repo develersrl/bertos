@@ -96,8 +96,8 @@ def getInfos(definition):
 
 def getDefinitionBlocks(text):
     block = []
-    block_tmp = re.findall("^/\*+\s*(.*?)\s*?\*/\s*#define\s+(\w+[\s\w]*?)\s*$", text, re.DOTALL | re.MULTILINE)
+    block_tmp = re.findall(r"/\*{2}\s*([^*]*\*(?:[^/*][^*]*\*+)*)/\s*#define\s+(.*?)\s*?$", text, re.MULTILINE)
     for comment, define in block_tmp:
-        block.append((" ".join(re.findall("^\s*\*?\s*(.*?)\s*?$", comment, re.MULTILINE)), define))
-    block += re.findall("/{3}<?\s*(.*)\s*#define\s+(.*)\s*?$", text, re.MULTILINE)
+        block.append((" ".join(re.findall(r"^\s*\*?\s*(.*?)\s*?$", comment, re.MULTILINE)), define))
+    block += re.findall(r"/{3}<?\s*(.*)\s*#define\s+(.*)\s*?$", text, re.MULTILINE)
     return block
