@@ -103,11 +103,16 @@ def getDefinitionBlocks(text):
     block += [(comment, define) for define, comment in re.findall(r"#define\s*(.*?)\s*/{3}<\s*(.+?)\s*?(?:/{2,3}[^<].*?)?$", text, re.MULTILINE)]
     return block
 
+def formatModuleNameValue(text):
+    block = re.findall("\s*([^\s]+)\s*(.+?)\s*$", text, re.MULTILINE)
+    return block[0]
+
 def loadModuleInfos(path):
     moduleInfos = {}
     for definition in findDefinitions(const.MODULE_CONFIGURATION, path):
         moduleName = definition[0].replace("cfg_", "").replace(".h", "")
         moduleInfos[moduleName] = []
-        for element in getDefinitionBlocks(open(definition[1] + "/" + definition[0], "r").read()):
-            moduleInfos[moduleName].append(element)
+        for description, define in getDefinitionBlocks(open(definition[1] + "/" + definition[0], "r").read()):
+            name, value = formatModuleNameValue(define)
+            moduleInfos[moduleName].append((name, value, description))
     return moduleInfos
