@@ -96,11 +96,11 @@ def getInfos(definition):
 
 def getDefinitionBlocks(text):
     block = []
-    block_tmp = re.findall(r"/\*{2}\s*([^*]*\*(?:[^/*][^*]*\*+)*)/\s*#define\s+([^/]*?/[^/]*?)\s*?(?!/{3}<.*?)$", text, re.MULTILINE)
+    block_tmp = re.findall(r"/\*{2}\s*([^*]*\*(?:[^/*][^*]*\*+)*)/\s*#define\s+((?:[^/]*?/?)+)\s*?(?:/{2,3}[^<].*?)?$", text, re.MULTILINE)
     for comment, define in block_tmp:
-        block.append((" ".join(re.findall(r"^\s*\*?\s*(.*?)\s*?$", comment, re.MULTILINE)), define))
-    block += re.findall(r"/{3}<?\s*(.*)\s*#define\s+([^/]*?/[^/]*?)\s*?$", text, re.MULTILINE)
-    block += [(comment, define) for define, comment in re.findall(r"#define\s*(.*?)\s*/{3}<\s*(.*?)\s*?$", text, re.MULTILINE)]
+        block.append((" ".join(re.findall(r"^\s*\*?\s*(.*?)\s*?(?:/{2}.*?)?$", comment, re.MULTILINE)).strip(), define))
+    block += re.findall(r"/{3}\s*([^<].*?)\s*#define\s+((?:[^/]*?/?)+)\s*?(?:/{2,3}[^<].*?)?$", text, re.MULTILINE)
+    block += [(comment, define) for define, comment in re.findall(r"#define\s*(.*?)\s*/{3}<\s*(.+?)\s*?(?:/{2,3}[^<].*?)?$", text, re.MULTILINE)]
     return block
 
 def loadModuleInfos(path):
