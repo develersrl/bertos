@@ -114,19 +114,6 @@ def formatModuleNameValue(text):
     block = re.findall("\s*([^\s]+)\s*(.+?)\s*$", text, re.MULTILINE)
     return block[0]
 
-def getDescriptionInformations(text):
-    """
-    Take the doxygen comment and strip the wizard informations, returning the tuple
-    (comment, wizard_informations)
-    """
-    informations = {}
-    index = text.find("$WIZARD")
-    if index != -1:
-        exec(text[index + 1:])
-        informations.update(WIZARD)
-    return text[:index].strip(), informations
-        
-
 def loadModuleInfos(path):
     """
     Return the module configurations found in the given path as a dict with the name as key
@@ -137,11 +124,9 @@ def loadModuleInfos(path):
     for definition in findDefinitions(const.MODULE_CONFIGURATION, path):
         moduleName = definition[0].replace("cfg_", "").replace(".h", "")
         moduleInfos[moduleName] = {}
-        for comment, define in getDefinitionBlocks(open(definition[1] + "/" + definition[0], "r").read()):
+        for description, define in getDefinitionBlocks(open(definition[1] + "/" + definition[0], "r").read()):
             name, value = formatModuleNameValue(define)
-            description, informations = getDescriptionInformations(comment)
             moduleInfos[moduleName][name] = {}
             moduleInfos[moduleName][name]["value"] = value
             moduleInfos[moduleName][name]["description"] = description
-            moduleInfos[moduleName][name]["informations"] = informations
     return moduleInfos
