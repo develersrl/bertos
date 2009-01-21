@@ -117,13 +117,16 @@ def formatModuleNameValue(text):
 def loadModuleInfos(path):
     """
     Return the module configurations found in the given path as a dict with the name as key
-    and a list of tuple as value. The tuple have the format (name, value, description).
+    and a dict as value. The value dict has the parameter name as key and has "value" and "description"
+    fields.
     """
     moduleInfos = {}
     for definition in findDefinitions(const.MODULE_CONFIGURATION, path):
         moduleName = definition[0].replace("cfg_", "").replace(".h", "")
-        moduleInfos[moduleName] = []
+        moduleInfos[moduleName] = {}
         for description, define in getDefinitionBlocks(open(definition[1] + "/" + definition[0], "r").read()):
             name, value = formatModuleNameValue(define)
-            moduleInfos[moduleName].append((name, value, description))
+            moduleInfos[moduleName][name] = {}
+            moduleInfos[moduleName][name]["value"] = value
+            moduleInfos[moduleName][name]["description"] = description
     return moduleInfos

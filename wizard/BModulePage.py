@@ -45,12 +45,12 @@ class BModulePage(BWizardPage):
         for key, value in moduleInfos.items():
             self.pageContent.moduleList.addItem(QListWidgetItem(key))
     
-    def _fillParameterTable(self, value):
+    def _fillParameterTable(self, parameters):
         self.pageContent.propertyTable.clear()
-        self.pageContent.propertyTable.setRowCount(len(value))
-        for index, element in enumerate(value):
-            self.pageContent.propertyTable.setItem(index, 0, QTableWidgetItem(element[0]))
-            self.pageContent.propertyTable.setItem(index, 1, QTableWidgetItem(element[1]))
+        self.pageContent.propertyTable.setRowCount(len(parameters))
+        for index, key in enumerate(parameters):
+            self.pageContent.propertyTable.setItem(index, 0, QTableWidgetItem(key))
+            self.pageContent.propertyTable.setItem(index, 1, QTableWidgetItem(parameters[key]["value"]))
     
     def moduleItemClicked(self):
         module = unicode(self.pageContent.moduleList.currentItem().text())
