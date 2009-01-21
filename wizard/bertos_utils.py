@@ -119,12 +119,13 @@ def getDescriptionInformations(text):
     Take the doxygen comment and strip the wizard informations, returning the tuple 
     (comment, wizard_informations) 
     """ 
-    informations = {} 
     index = text.find("$WIZARD") 
     if index != -1: 
         exec(text[index + 1:]) 
-	    informations.update(WIZARD) 
-    return text[:index].strip(), informations
+        informations = WIZARD 
+        return text[:index].strip(), informations
+    else:
+        return text.strip(), {}
 
 def loadModuleInfos(path):
     """
