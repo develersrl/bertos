@@ -31,7 +31,6 @@ class BModulePage(BWizardPage):
         self.pageContent.moduleList.setSortingEnabled(True)
         self.pageContent.propertyTable.horizontalHeader().setResizeMode(QHeaderView.Stretch)
         self.pageContent.propertyTable.horizontalHeader().setVisible(False)
-        #self.pageContent.propertyTable.verticalHeader().setResizeMode(QHeaderView.Stretch)
         self.pageContent.propertyTable.verticalHeader().setVisible(False)
         self.pageContent.propertyTable.setColumnCount(2)
         self.pageContent.propertyTable.setRowCount(0)
