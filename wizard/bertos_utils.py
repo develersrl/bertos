@@ -95,6 +95,9 @@ def getInfos(definition):
     return D
 
 def getDefinitionBlocks(text):
+    """
+    Take a text and return a list of tuple (description, name-value).
+    """
     block = []
     block_tmp = re.findall(r"/\*{2}\s*([^*]*\*(?:[^/*][^*]*\*+)*)/\s*#define\s+((?:[^/]*?/?)+)\s*?(?:/{2,3}[^<].*?)?$", text, re.MULTILINE)
     for comment, define in block_tmp:
@@ -104,10 +107,18 @@ def getDefinitionBlocks(text):
     return block
 
 def formatModuleNameValue(text):
+    """
+    Take the given string and return a tuple with the name of the parameter in the first position
+    and the value in the second.
+    """
     block = re.findall("\s*([^\s]+)\s*(.+?)\s*$", text, re.MULTILINE)
     return block[0]
 
 def loadModuleInfos(path):
+    """
+    Return the module configurations found in the given path as a dict with the name as key
+    and a list of tuple as value. The tuple have the format (name, value, description).
+    """
     moduleInfos = {}
     for definition in findDefinitions(const.MODULE_CONFIGURATION, path):
         moduleName = definition[0].replace("cfg_", "").replace(".h", "")
