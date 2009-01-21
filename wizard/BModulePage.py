@@ -29,7 +29,7 @@ class BModulePage(BWizardPage):
     
     def _setupUi(self):
         self.pageContent.moduleList.setSortingEnabled(True)
-        self.pageContent.propertyTable.horizontalHeader().setResizeMode(QHeaderView.Stretch)
+        self.pageContent.propertyTable.horizontalHeader().setResizeMode(QHeaderView.ResizeToContents)
         self.pageContent.propertyTable.horizontalHeader().setVisible(False)
         self.pageContent.propertyTable.verticalHeader().setVisible(False)
         self.pageContent.propertyTable.setColumnCount(2)
