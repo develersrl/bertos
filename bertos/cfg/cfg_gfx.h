@@ -52,18 +52,18 @@
 /// Select bitmap pixel format.
 #define CONFIG_BITMAP_FMT  BITMAP_FMT_PLANAR_V_LSB
 
-/**
- * \name Type for the chart dataset
- * \{
- */
-#define CONFIG_CHART_TYPE_X uint8_t
-#define CONFIG_CHART_TYPE_Y uint8_t
-/*\}*/
+
+#define CONFIG_CHART_TYPE_X uint8_t ///< Type for the chart dataset
+#define CONFIG_CHART_TYPE_Y uint8_t ///< Type for the chart dataset
 
 
 /// Enable button bar behind menus
 #define CONFIG_MENU_MENUBAR        0
+
+/// Level Edit Timeout
 #define CONFIG_LEVELEDIT_TIMEOUT   0
+
+/// Menu timeout
 #define CONFIG_MENU_TIMEOUT        0
 
 /// Enable smooth scrolling in menus
