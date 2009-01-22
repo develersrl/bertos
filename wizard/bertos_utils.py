@@ -106,7 +106,7 @@ def getDefinitionBlocks(text):
     block += [(comment, define) for define, comment in re.findall(r"#define\s*(.*?)\s*/{3}<\s*(.+?)\s*?(?:/{2,3}[^<].*?)?$", text, re.MULTILINE)]
     return block
 
-def formatModuleNameValue(text):
+def formatParamNameValue(text):
     """
     Take the given string and return a tuple with the name of the parameter in the first position
     and the value in the second.
@@ -127,21 +127,60 @@ def getDescriptionInformations(text):
     else:
         return text.strip(), {}
 
+def loadConfigurationInfos(path):
+    """
+    Return the module configurations found in the given file as a dict with the
+    parameter name as key and a dict containig the fields above as value:
+        "value": the value of the parameter
+        "description": the description of the parameter
+        "informations": a dict containig optional informations:
+            "type": "int" | "boolean" | "enum"
+            "min": the minimum value for integer parameters
+            "max": the maximum value for integer parameters
+            "long": boolean indicating if the num is a long
+            "value_list": the name of the enum for enum parameters
+    """
+    configurationInfos = {}
+    for comment, define in getDefinitionBlocks(open(path, "r").read()):
+        name, value = formatParamNameValue(define)
+        description, informations = getDescriptionInformations(comment)
+        configurationInfos[name] = {}
+        configurationInfos[name]["value"] = value
+        configurationInfos[name]["informations"] = informations
+        configurationInfos[name]["description"] = description
+    return configurationInfos
+
 def loadModuleInfos(path):
     """
-    Return the module configurations found in the given path as a dict with the name as key
-    and a dict as value. The value dict has the parameter name as key and has "value" and "description"
-    fields.
+    Return the module infos found in the given file as a dict with the module
+    name as key and a dict containig the fields above as value or an empty dict
+    if the given file is not a BeRTOS module:
+        "depends": a list of modules needed by this module
+        "configuration": the cfg_*.h with the module configurations
     """
     moduleInfos = {}
-    for definition in findDefinitions(const.MODULE_CONFIGURATION, path):
-        moduleName = definition[0].replace("cfg_", "").replace(".h", "")
-        moduleInfos[moduleName] = {}
-        for comment, define in getDefinitionBlocks(open(definition[1] + "/" + definition[0], "r").read()):
-            name, value = formatModuleNameValue(define)
-            description, informations = getDescriptionInformations(comment)
-            moduleInfos[moduleName][name] = {}
-            moduleInfos[moduleName][name]["value"] = value
-            moduleInfos[moduleName][name]["informations"] = informations
-            moduleInfos[moduleName][name]["description"] = description
-    return moduleInfos
+    string = open(path, "r").read()
+    commentList = re.findall(r"/\*{2}\s*([^*]*\*(?:[^/*][^*]*\*+)*)/", string)
+    commentList = [" ".join(re.findall(r"^\s*\*?\s*(.*?)\s*?(?:/{2}.*?)?$", comment, re.MULTILINE)).strip() for comment in commentList]
+    for comment in commentList:
+        index = comment.find("$WIZARD_MODULE")
+        if index != -1:
+            exec(comment[index + 1:])
+            moduleInfos[WIZARD_MODULE["name"]] = {"depends": WIZARD_MODULE["depends"], "configuration": WIZARD_MODULE["configuration"]}
+            return moduleInfos
+    return {}
+
+def loadDefineLists(path):
+    """
+    Return a dict with the name of the list as key and a list of string as value
+    """
+    string = open(path, "r").read()
+    commentList = re.findall(r"/\*{2}\s*([^*]*\*(?:[^/*][^*]*\*+)*)/", string)
+    commentList = [" ".join(re.findall(r"^\s*\*?\s*(.*?)\s*?(?:/{2}.*?)?$", comment, re.MULTILINE)).strip() for comment in commentList]
+    listDict = {}
+    for comment in commentList:
+        index = comment.find("$WIZARD_LIST")
+        if index != -1:
+            exec(comment[index + 1:])
+            listDict.update(WIZARD_LIST)
+    return listDict
