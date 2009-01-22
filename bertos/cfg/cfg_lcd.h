@@ -46,9 +46,8 @@
 /// TODO:
 #define CONFIG_LCD_ADDRESS_FAST    1
 
-/// LCD setting for 32122A (AVR implementation)
-#define CONFIG_LCD_SOFTINT_REFRESH 0
-#define CONFIG_LCD_WAIT            1
+#define CONFIG_LCD_SOFTINT_REFRESH 0    ///< LCD setting for 32122A (AVR implementation)
+#define CONFIG_LCD_WAIT            1    ///< LCD setting for 32122A (AVR implementation)
 
 
 #endif /* CFG_LCD_H */
