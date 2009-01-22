@@ -43,16 +43,11 @@
 #ifndef CFG_ARCH_CONFIG_H
 #define CFG_ARCH_CONFIG_H
 
-/**
- * \name Architectures
- * \{
- */
-#define ARCH_FOO       (1<<0)
-#define ARCH_BAR       (1<<1)
-#define ARCH_EMUL      (1<<2)
-#define ARCH_QT        (1<<3)
-#define ARCH_UNITTEST  (1<<4)
-#define ARCH_NIGHTTEST (1<<5)
-/*\}*/
+#define ARCH_FOO       (1<<0) ///< FOO architecture
+#define ARCH_BAR       (1<<1) ///< BAR architecture
+#define ARCH_EMUL      (1<<2) ///< EMUL architecture
+#define ARCH_QT        (1<<3) ///< QT architecture
+#define ARCH_UNITTEST  (1<<4) ///< UNITTEST architecture
+#define ARCH_NIGHTTEST (1<<5) ///< NIGHTTEST architecture
 
 #endif /* CFG_ARCH_CONFIG_H */
