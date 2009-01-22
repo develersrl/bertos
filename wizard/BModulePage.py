@@ -25,7 +25,17 @@ class BModulePage(BWizardPage):
         self._connectSignals()
     
     def reloadData(self):
-        pass
+        self._loadModuleData()
+    
+    def _loadModuleData(self):
+        modules = bertos_utils.loadModuleInfosDict(self._projectInfoRetrieve("SOURCES_PATH"))
+        lists = bertos_utils.loadDefineListsDict(self._projectInfoRetrieve("SOURCES_PATH"))
+        configurations = {}
+        for module, informations in modules.items():
+            configurations.update(bertos_utils.loadConfigurationInfos(self._projectInfoRetrieve("SOURCES_PATH") + "/" + informations["configuration"]))
+        print "modules", modules
+        print "lists", lists
+        print "configurations", configurations
     
     def _setupUi(self):
         self.pageContent.moduleList.setSortingEnabled(True)
