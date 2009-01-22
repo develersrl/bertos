@@ -43,7 +43,11 @@
  * \note Remember to update this define when changing bootloader size fuses.
  */
 #define CONFIG_FLASH_AVR_BOOTSIZE         8192
+
+/// Bootloader log level
 #define CONFIG_FLASH_AVR_LOG_LEVEL        LOG_LVL_ERR
+
+/// Bootoloader log format
 #define CONFIG_FLASH_AVR_LOG_FORMAT       LOG_FMT_TERSE
 
 #endif /* CFG_BOOT_H */
