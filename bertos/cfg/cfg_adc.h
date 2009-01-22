@@ -45,22 +45,15 @@
 /// Module logging format.
 #define ADC_LOG_FORMAT     LOG_FMT_VERBOSE
 
-/**
- * ADC timing setting parameter
- *
- * - CONFIG_ADC_CLOCK is frequency clock for ADC conversion.
- * - CONFIG_ADC_STARTUP_TIME  minimum time for startup a conversion in micro second.
- * - CONFIG_ADC_SHTIME minimum time for sample and hold in nano second.
- * \{
- */
-#define CONFIG_ADC_CLOCK          4800000UL
-#define CONFIG_ADC_STARTUP_TIME        20
-#define CONFIG_ADC_SHTIME             834
-/* \ * } */
 
-/// ADC setting for AVR target
-#define CONFIG_ADC_AVR_REF      1
-#define CONFIG_ADC_AVR_DIVISOR  2
+#define CONFIG_ADC_CLOCK        4800000UL   ///< Frequency clock for ADC conversion.
+#define CONFIG_ADC_STARTUP_TIME 20          ///< Minimum time for startup a conversion in micro second.
+#define CONFIG_ADC_SHTIME       834         ///< Minimum time for sample and hold in nano second
+
+
+#define CONFIG_ADC_AVR_REF      1   ///< ADC setting for AVR target
+#define CONFIG_ADC_AVR_DIVISOR  2   ///< ADC setting for AVR target
+
 
 /// Enable ADS strobe.
 #define CONFIG_ADC_STROBE  0
