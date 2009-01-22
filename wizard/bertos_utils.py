@@ -170,6 +170,12 @@ def loadModuleInfos(path):
             return moduleInfos
     return {}
 
+def loadModuleInfosDict(path):
+    moduleInfosDict = {}
+    for filename, path in findDefinitions("*.h", path):
+        moduleInfosDict.update(loadModuleInfos(path + "/" + filename))
+    return moduleInfosDict
+
 def loadDefineLists(path):
     """
     Return a dict with the name of the list as key and a list of string as value
@@ -184,3 +190,9 @@ def loadDefineLists(path):
             exec(comment[index + 1:])
             listDict.update(WIZARD_LIST)
     return listDict
+
+def loadDefineListsDict(path):
+    defineListsDict = {}
+    for filename, path in findDefinitions("*.h", path):
+        defineListsDict.update(loadDefineLists(path + "/" + filename))
+    return defineListsDict
