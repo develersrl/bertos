@@ -45,12 +45,15 @@
  * spi port.
  * Edit these define for your project.
  */
-/// Serial settings
+ 
+/// Serial port settings
 #define CONFIG_SER_PORT      0
+/// Serial port baudrate
 #define CONFIG_SER_BAUDRATE  115200
 
-/// Spi settings
+/// Spi port settings
 #define CONFIG_SPI_PORT      0
+/// Spi port baudrate
 #define CONFIG_SPI_BAUDRATE  5000000UL
 
 
