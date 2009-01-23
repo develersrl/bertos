@@ -171,6 +171,9 @@ def loadModuleInfos(path):
     return {}
 
 def loadModuleInfosDict(path):
+    """
+    Return the dict containig all the modules
+    """
     moduleInfosDict = {}
     for filename, path in findDefinitions("*.h", path):
         moduleInfosDict.update(loadModuleInfos(path + "/" + filename))
@@ -192,6 +195,9 @@ def loadDefineLists(path):
     return listDict
 
 def loadDefineListsDict(path):
+    """
+    Return the dict containing all the define lists
+    """
     defineListsDict = {}
     for filename, path in findDefinitions("*.h", path):
         defineListsDict.update(loadDefineLists(path + "/" + filename))
