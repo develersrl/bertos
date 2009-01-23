@@ -59,40 +59,65 @@ class BModulePage(BWizardPage):
         configurations = self._projectInfoRetrieve("CONFIGURATIONS")[configuration]
         self.pageContent.propertyTable.clear()
         self.pageContent.propertyTable.setRowCount(len(configurations))
-        for index, parameter in enumerate(configurations):
-            self.pageContent.propertyTable.setItem(index, 0, QTableWidgetItem(parameter))
-            if "type" in configurations[parameter]["informations"].keys() and configurations[parameter]["informations"]["type"] == "boolean":
-                ## boolean parameter
+        for index, property in enumerate(configurations):
+            item = QTableWidgetItem(property)
+            item.setData(Qt.UserRole, qvariant_converter.convertString(property))
+            self.pageContent.propertyTable.setItem(index, 0, item)
+            if "type" in configurations[property]["informations"].keys() and configurations[property]["informations"]["type"] == "boolean":
+                ## boolean property
                 checkBox = QCheckBox()
                 self.pageContent.propertyTable.setCellWidget(index, 1, checkBox)
-                if configurations[parameter]["value"] == "1":
+                if configurations[property]["value"] == "1":
                     checkBox.setChecked(True)
                 else:
                     checkBox.setChecked(False)
-            elif "type" in configurations[parameter]["informations"].keys() and configurations[parameter]["informations"]["type"] == "enum":
-                ## enum parameter
+            elif "type" in configurations[property]["informations"].keys() and configurations[property]["informations"]["type"] == "enum":
+                ## enum property
                 comboBox = QComboBox()
                 self.pageContent.propertyTable.setCellWidget(index, 1, comboBox)
-                enum = self._projectInfoRetrieve("LISTS")[configurations[parameter]["informations"]["value_list"]]
+                enum = self._projectInfoRetrieve("LISTS")[configurations[property]["informations"]["value_list"]]
                 for element in enum:
                     comboBox.addItem(element)
             else:
-                ## int, long or undefined type parameter
+                ## int, long or undefined type property
                 spinBox = QSpinBox()
                 self.pageContent.propertyTable.setCellWidget(index, 1, spinBox)
-                if "min" in configurations[parameter]["informations"].keys():
-                    minimum = int(configurations[parameter]["informations"]["min"])
+                if "min" in configurations[property]["informations"].keys():
+                    minimum = int(configurations[property]["informations"]["min"])
                 else:
                     minimum = -32768
                 spinBox.setMinimum(minimum)
-                if "max" in configurations[parameter]["informations"].keys():
-                    maximum = int(configurations[parameter]["infomations"]["max"])
+                if "max" in configurations[property]["informations"].keys():
+                    maximum = int(configurations[property]["infomations"]["max"])
                 else:
                     maximum = 32767
                 spinBox.setMaximum(maximum)
-                if "long" in configurations[parameter]["informations"].keys() and configurations[parameter]["informations"]["long"] == "True":
+                if "long" in configurations[property]["informations"].keys() and configurations[property]["informations"]["long"] == "True":
                     spinBox.setSuffix("L")
-                spinBox.setValue(int(configurations[parameter]["value"].replace("L", "")))
+                spinBox.setValue(int(configurations[property]["value"].replace("L", "")))
+    
+    def _currentModule(self):
+        return unicode(self.pageContent.moduleTable.item(self.pageContent.moduleTable.currentRow(), 1).text())
+    
+    def _currentModuleConfigurations(self):
+        return self._projectInfoRetrieve("MODULES")[self._currentModule()]["configuration"]
+    
+    def _currentProperty(self):
+        return qvariant_converter.getString(self.pageContent.propertyTable.item(self.pageContent.propertyTable.currentRow(), 0).data(Qt.UserRole))
+    
+    def _currentPropertyItem(self):
+        return self.pageContent.propertyTable.item(self.pageContent.propertyTable.currentRow(), 0)
+    
+    def _resetPropertyDescription(self):
+        for index in range(self.pageContent.propertyTable.rowCount()):
+            propertyName = qvariant_converter.getString(self.pageContent.propertyTable.item(index, 0).data(Qt.UserRole))
+            self.pageContent.propertyTable.item(index, 0).setText(propertyName)
+    
+    def _showPropertyDescription(self):
+        self._resetPropertyDescription()
+        description = self._projectInfoRetrieve("CONFIGURATIONS")[self._currentModuleConfigurations()][self._currentProperty()]["description"]
+        name = self._currentProperty()
+        self._currentPropertyItem().setText(name + "\n" + description)
     
     def _setupUi(self):
         self.pageContent.moduleTable.horizontalHeader().setResizeMode(QHeaderView.ResizeToContents)
@@ -111,3 +136,4 @@ class BModulePage(BWizardPage):
     
     def _connectSignals(self):
         self.connect(self.pageContent.moduleTable, SIGNAL("itemSelectionChanged()"), self._fillPropertyTable)
+        self.connect(self.pageContent.propertyTable, SIGNAL("itemSelectionChanged()"), self._showPropertyDescription)
