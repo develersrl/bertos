@@ -157,6 +157,9 @@ def loadModuleInfos(path):
     if the given file is not a BeRTOS module:
         "depends": a list of modules needed by this module
         "configuration": the cfg_*.h with the module configurations
+        "description": a string containing the brief description of doxygen
+        "enabled": contains False but the wizard will change if the user select
+        the module
     """
     moduleInfos = {}
     string = open(path, "r").read()
@@ -166,7 +169,10 @@ def loadModuleInfos(path):
         index = comment.find("$WIZARD_MODULE")
         if index != -1:
             exec(comment[index + 1:])
-            moduleInfos[WIZARD_MODULE["name"]] = {"depends": WIZARD_MODULE["depends"], "configuration": WIZARD_MODULE["configuration"]}
+            moduleInfos[WIZARD_MODULE["name"]] = {"depends": WIZARD_MODULE["depends"],
+                                                    "configuration": WIZARD_MODULE["configuration"],
+                                                    "description": "",
+                                                    "enabled": False}
             return moduleInfos
     return {}
 
