@@ -152,34 +152,26 @@ class BModulePage(BWizardPage):
         modules[selectedModule]["enabled"] = True
         self._projectInfoStore("MODULES", modules)
         depends = self._projectInfoRetrieve("MODULES")[selectedModule]["depends"]
-        unsatisfied = []
-        for element in depends:
-            if not self._projectInfoRetrieve("MODULES")[element]["enabled"]:
-                unsatisfied.append(element)
+        unsatisfied = self.selectDependencyCheck(selectedModule)
         if len(unsatisfied) > 0:
             self._selectionDependencyFail(selectedModule, unsatisfied)
     
     def _selectionDependencyFail(self, selectedModule, unsatisfiedModules):
-        messageString = "The module " + selectedModule + " need the following modules:\n" + \
+        messageString = "The module " + selectedModule + " needs the following modules:\n" + \
                         ", ".join(unsatisfiedModules) + ".\nDo you want to resolve autmatically the prolem?"
         messageBox = QMessageBox()
         messageBox.setIcon(QMessageBox.Warning)
         messageBox.setText(self.tr("Dependency fail"))
         messageBox.setInformativeText(self.tr(messageString))
-        resolveButton = QPushButton("Resolve")
-        nothingButton = QPushButton("Do nothing")
-        messageBox.addButton(resolveButton, QMessageBox.YesRole)
-        messageBox.addButton(nothingButton, QMessageBox.NoRole)
+        messageBox.addButton(QMessageBox.Yes)
+        messageBox.addButton(QMessageBox.No)
         messageBox.exec_()
     
     def _moduleUnselected(self, unselectedModule):
         modules = self._projectInfoRetrieve("MODULES")
         modules[unselectedModule]["enabled"] = False
         self._projectInfoStore("MODULES", modules)
-        unsatisfied = []
-        for module, infos in self._projectInfoRetrieve("MODULES").items():
-            if unselectedModule in infos["depends"] and infos["enabled"]:
-                unsatisfied.append(module)
+        unsatisfied = self.unselectDependencyCheck(unselectedModule)
         if len(unsatisfied) > 0:
             self._unselectionDependencyFail(unselectedModule, unsatisfied)
     
@@ -190,8 +182,24 @@ class BModulePage(BWizardPage):
         messageBox.setIcon(QMessageBox.Warning)
         messageBox.setText(self.tr("Dependency fail"))
         messageBox.setInformativeText(self.tr(messageString))
-        resolveButton = QPushButton("Resolve")
-        nothingButton = QPushButton("Do nothing")
-        messageBox.addButton(resolveButton, QMessageBox.YesRole)
-        messageBox.addButton(nothingButton, QMessageBox.NoRole)
+        messageBox.addButton(QMessageBox.Yes)
+        messageBox.addButton(QMessageBox.No)
         messageBox.exec_()
+    
+    def selectDependencyCheck(self, module):
+        unsatisfied = []
+        modules = self._projectInfoRetrieve("MODULES")
+        for dependency in modules[module]["depends"]:
+            if not modules[dependency]["enabled"]:
+                unsatisfied.append(dependency)
+                unsatisfied += self.selectDependencyCheck(dependency)
+        return unsatisfied
+    
+    def unselectDependencyCheck(self, dependency):
+        unsatisfied = []
+        modules = self._projectInfoRetrieve("MODULES")
+        for module, informations in modules.items():
+            if dependency in informations["depends"] and informations["enabled"]:
+                unsatisfied.append(module)
+                unsatisfied += self.unselectDependencyCheck(module)
+        return unsatisfied
