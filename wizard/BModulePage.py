@@ -169,19 +169,21 @@ class BModulePage(BWizardPage):
                                 QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
     
     def selectDependencyCheck(self, module):
-        unsatisfied = []
+        unsatisfied = set()
         modules = self._projectInfoRetrieve("MODULES")
         for dependency in modules[module]["depends"]:
             if not modules[dependency]["enabled"]:
-                unsatisfied.append(dependency)
-                unsatisfied += self.selectDependencyCheck(dependency)
+                unsatisfied |= set([dependency])
+                if dependency not in unsatisfied:
+                    unsatisfied |= self.selectDependencyCheck(dependency)
         return unsatisfied
     
     def unselectDependencyCheck(self, dependency):
-        unsatisfied = []
+        unsatisfied = set()
         modules = self._projectInfoRetrieve("MODULES")
         for module, informations in modules.items():
             if dependency in informations["depends"] and informations["enabled"]:
-                unsatisfied.append(module)
-                unsatisfied += self.unselectDependencyCheck(module)
+                unsatisfied |= set([module])
+                if dependency not in unsatisfied:
+                    unsatisfied |= self.unselectDependencyCheck(module)
         return unsatisfied
