@@ -156,6 +156,14 @@ class BModulePage(BWizardPage):
         if len(unsatisfied) > 0:
             self._selectionDependencyFail(selectedModule, unsatisfied)
     
+    def _moduleUnselected(self, unselectedModule):
+        modules = self._projectInfoRetrieve("MODULES")
+        modules[unselectedModule]["enabled"] = False
+        self._projectInfoStore("MODULES", modules)
+        unsatisfied = self.unselectDependencyCheck(unselectedModule)
+        if len(unsatisfied) > 0:
+            self._unselectionDependencyFail(unselectedModule, unsatisfied)
+    
     def _selectionDependencyFail(self, selectedModule, unsatisfiedModules):
         messageString = "The module " + selectedModule + " needs the following modules:\n" + \
                         ", ".join(unsatisfiedModules) + ".\nDo you want to resolve autmatically the prolem?"
@@ -166,15 +174,7 @@ class BModulePage(BWizardPage):
         messageBox.addButton(QMessageBox.Yes)
         messageBox.addButton(QMessageBox.No)
         messageBox.exec_()
-    
-    def _moduleUnselected(self, unselectedModule):
-        modules = self._projectInfoRetrieve("MODULES")
-        modules[unselectedModule]["enabled"] = False
-        self._projectInfoStore("MODULES", modules)
-        unsatisfied = self.unselectDependencyCheck(unselectedModule)
-        if len(unsatisfied) > 0:
-            self._unselectionDependencyFail(unselectedModule, unsatisfied)
-    
+
     def _unselectionDependencyFail(self, unselectedModule, unsatisfiedModules):
         messageString = "The module " + unselectedModule + " is needed by the following modules:\n" + \
                         ", ".join(unsatisfiedModules) + ".\nDo you want to resolve autmatically the prolem?"
