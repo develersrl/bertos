@@ -154,7 +154,9 @@ class BModulePage(BWizardPage):
         depends = self._projectInfoRetrieve("MODULES")[selectedModule]["depends"]
         unsatisfied = self.selectDependencyCheck(selectedModule)
         if len(unsatisfied) > 0:
-            self._selectionDependencyFail(selectedModule, unsatisfied)
+            QMessageBox.warning(self, self.tr("Dependency error"),
+                                self.tr("The module %1 needs the following modules:\n%2.\n\nDo you want to resolve automatically the problem?").arg(selectedModule).arg(", ".join(unsatisfied)),
+                                QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
     
     def _moduleUnselected(self, unselectedModule):
         modules = self._projectInfoRetrieve("MODULES")
@@ -162,29 +164,9 @@ class BModulePage(BWizardPage):
         self._projectInfoStore("MODULES", modules)
         unsatisfied = self.unselectDependencyCheck(unselectedModule)
         if len(unsatisfied) > 0:
-            self._unselectionDependencyFail(unselectedModule, unsatisfied)
-    
-    def _selectionDependencyFail(self, selectedModule, unsatisfiedModules):
-        messageString = "The module " + selectedModule + " needs the following modules:\n" + \
-                        ", ".join(unsatisfiedModules) + ".\nDo you want to resolve autmatically the prolem?"
-        messageBox = QMessageBox()
-        messageBox.setIcon(QMessageBox.Warning)
-        messageBox.setText(self.tr("Dependency fail"))
-        messageBox.setInformativeText(self.tr(messageString))
-        messageBox.addButton(QMessageBox.Yes)
-        messageBox.addButton(QMessageBox.No)
-        messageBox.exec_()
-
-    def _unselectionDependencyFail(self, unselectedModule, unsatisfiedModules):
-        messageString = "The module " + unselectedModule + " is needed by the following modules:\n" + \
-                        ", ".join(unsatisfiedModules) + ".\nDo you want to resolve autmatically the prolem?"
-        messageBox = QMessageBox()
-        messageBox.setIcon(QMessageBox.Warning)
-        messageBox.setText(self.tr("Dependency fail"))
-        messageBox.setInformativeText(self.tr(messageString))
-        messageBox.addButton(QMessageBox.Yes)
-        messageBox.addButton(QMessageBox.No)
-        messageBox.exec_()
+            QMessageBox.warning(self, self.tr("Dependency error"),
+                                self.tr("The module %1 is needed by the following modules:\n%2.\n\nDo you want to resolve automatically the problem?").arg(unselectedModule).arg(", ".join(unsatisfied)),
+                                QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
     
     def selectDependencyCheck(self, module):
         unsatisfied = []
