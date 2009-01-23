@@ -32,6 +32,7 @@ class BModulePage(BWizardPage):
     def _setupButtonGroup(self):
         self._buttonGroup = QButtonGroup()
         self._buttonGroup.setExclusive(False)
+        self.connect(self._buttonGroup, SIGNAL("buttonClicked(int)"), self._moduleSelectionChanged)
     
     def _loadModuleData(self):
         modules = bertos_utils.loadModuleInfosDict(self._projectInfoRetrieve("SOURCES_PATH"))
@@ -52,9 +53,10 @@ class BModulePage(BWizardPage):
             checkBox = QCheckBox()
             self._buttonGroup.addButton(checkBox, index)
             self.pageContent.moduleTable.setCellWidget(index, 0, checkBox)
+            checkBox.setChecked(modules[module]["enabled"])
     
     def _fillPropertyTable(self):
-        module = unicode(self.pageContent.moduleTable.item(self.pageContent.moduleTable.currentRow(), 1).text())
+        module = self._currentModule()
         configuration = self._projectInfoRetrieve("MODULES")[module]["configuration"]
         configurations = self._projectInfoRetrieve("CONFIGURATIONS")[configuration]
         self.pageContent.propertyTable.clear()
@@ -88,7 +90,7 @@ class BModulePage(BWizardPage):
                     minimum = -32768
                 spinBox.setMinimum(minimum)
                 if "max" in configurations[property]["informations"].keys():
-                    maximum = int(configurations[property]["infomations"]["max"])
+                    maximum = int(configurations[property]["informations"]["max"])
                 else:
                     maximum = 32767
                 spinBox.setMaximum(maximum)
@@ -137,3 +139,59 @@ class BModulePage(BWizardPage):
     def _connectSignals(self):
         self.connect(self.pageContent.moduleTable, SIGNAL("itemSelectionChanged()"), self._fillPropertyTable)
         self.connect(self.pageContent.propertyTable, SIGNAL("itemSelectionChanged()"), self._showPropertyDescription)
+
+    def _moduleSelectionChanged(self, index):
+        module = unicode(self.pageContent.moduleTable.item(index, 1).text())
+        if self._buttonGroup.button(index).isChecked():
+            self._moduleSelected(module)
+        else:
+            self._moduleUnselected(module)
+    
+    def _moduleSelected(self, selectedModule):
+        modules = self._projectInfoRetrieve("MODULES")
+        modules[selectedModule]["enabled"] = True
+        self._projectInfoStore("MODULES", modules)
+        depends = self._projectInfoRetrieve("MODULES")[selectedModule]["depends"]
+        unsatisfied = []
+        for element in depends:
+            if not self._projectInfoRetrieve("MODULES")[element]["enabled"]:
+                unsatisfied.append(element)
+        if len(unsatisfied) > 0:
+            self._selectionDependencyFail(selectedModule, unsatisfied)
+    
+    def _selectionDependencyFail(self, selectedModule, unsatisfiedModules):
+        messageString = "The module " + selectedModule + " need the following modules:\n" + \
+                        ", ".join(unsatisfiedModules) + ".\nDo you want to resolve autmatically the prolem?"
+        messageBox = QMessageBox()
+        messageBox.setIcon(QMessageBox.Warning)
+        messageBox.setText(self.tr("Dependency fail"))
+        messageBox.setInformativeText(self.tr(messageString))
+        resolveButton = QPushButton("Resolve")
+        nothingButton = QPushButton("Do nothing")
+        messageBox.addButton(resolveButton, QMessageBox.YesRole)
+        messageBox.addButton(nothingButton, QMessageBox.NoRole)
+        messageBox.exec_()
+    
+    def _moduleUnselected(self, unselectedModule):
+        modules = self._projectInfoRetrieve("MODULES")
+        modules[unselectedModule]["enabled"] = False
+        self._projectInfoStore("MODULES", modules)
+        unsatisfied = []
+        for module, infos in self._projectInfoRetrieve("MODULES").items():
+            if unselectedModule in infos["depends"] and infos["enabled"]:
+                unsatisfied.append(module)
+        if len(unsatisfied) > 0:
+            self._unselectionDependencyFail(unselectedModule, unsatisfied)
+    
+    def _unselectionDependencyFail(self, unselectedModule, unsatisfiedModules):
+        messageString = "The module " + unselectedModule + " is needed by the following modules:\n" + \
+                        ", ".join(unsatisfiedModules) + ".\nDo you want to resolve autmatically the prolem?"
+        messageBox = QMessageBox()
+        messageBox.setIcon(QMessageBox.Warning)
+        messageBox.setText(self.tr("Dependency fail"))
+        messageBox.setInformativeText(self.tr(messageString))
+        resolveButton = QPushButton("Resolve")
+        nothingButton = QPushButton("Do nothing")
+        messageBox.addButton(resolveButton, QMessageBox.YesRole)
+        messageBox.addButton(nothingButton, QMessageBox.NoRole)
+        messageBox.exec_()
