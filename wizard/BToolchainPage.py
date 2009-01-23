@@ -99,7 +99,7 @@ class BToolchainPage(BWizardPage):
     def removeToolchain(self):
         if self.pageContent.toolchainList.currentRow() != -1:
             item = self.pageContent.toolchainList.takeItem(self.pageContent.toolchainList.currentRow())
-            toolchain = qvariant_converter.getString(qvariant_converter.getStringDict(item.data(Qt.UserRole))["path"])
+            toolchain = qvariant_converter.getStringDict(item.data(Qt.UserRole))["path"]
             toolchains = self.toolchains()
             del toolchains[toolchain]
             self.setToolchains(toolchains)
