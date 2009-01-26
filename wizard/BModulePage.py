@@ -154,9 +154,9 @@ class BModulePage(BWizardPage):
         depends = self._projectInfoRetrieve("MODULES")[selectedModule]["depends"]
         unsatisfied = self.selectDependencyCheck(selectedModule)
         if len(unsatisfied) > 0:
-            QMessageBox.warning(self, self.tr("Dependency error"),
-                                self.tr("The module %1 needs the following modules:\n%2.\n\nDo you want to resolve automatically the problem?").arg(selectedModule).arg(", ".join(unsatisfied)),
-                                QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            message = self.tr("The module %1 needs the following modules:\n%2.\n\nDo you want to resolve automatically the problem?")
+            message = message.arg(selectedModule).arg(", ".join(unsatisfied))
+            QMessageBox.warning(self, self.tr("Dependency error"), message, QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
     
     def _moduleUnselected(self, unselectedModule):
         modules = self._projectInfoRetrieve("MODULES")
@@ -164,9 +164,9 @@ class BModulePage(BWizardPage):
         self._projectInfoStore("MODULES", modules)
         unsatisfied = self.unselectDependencyCheck(unselectedModule)
         if len(unsatisfied) > 0:
-            QMessageBox.warning(self, self.tr("Dependency error"),
-                                self.tr("The module %1 is needed by the following modules:\n%2.\n\nDo you want to resolve automatically the problem?").arg(unselectedModule).arg(", ".join(unsatisfied)),
-                                QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            message = self.tr("The module %1 is needed by the following modules:\n%2.\n\nDo you want to resolve automatically the problem?")
+            message = message.arg(unselectedModule).arg(", ".join(unsatisfied))
+            QMessageBox.warning(self, self.tr("Dependency error"), message, QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
     
     def selectDependencyCheck(self, module):
         unsatisfied = set()
