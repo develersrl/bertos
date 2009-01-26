@@ -156,7 +156,14 @@ class BModulePage(BWizardPage):
         if len(unsatisfied) > 0:
             message = self.tr("The module %1 needs the following modules:\n%2.\n\nDo you want to resolve automatically the problem?")
             message = message.arg(selectedModule).arg(", ".join(unsatisfied))
-            QMessageBox.warning(self, self.tr("Dependency error"), message, QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            choice = QMessageBox.warning(self, self.tr("Dependency error"), message, QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            if choice == QMessageBox.Yes:
+                for module in unsatisfied:
+                    modules = self._projectInfoRetrieve("MODULES")
+                    modules[module]["enabled"] = True
+                for index in range(self.pageContent.moduleTable.rowCount()):
+                    if unicode(self.pageContent.moduleTable.item(index, 1).text()) in unsatisfied:
+                        self._buttonGroup.button(index).setChecked(True)
     
     def _moduleUnselected(self, unselectedModule):
         modules = self._projectInfoRetrieve("MODULES")
@@ -166,7 +173,15 @@ class BModulePage(BWizardPage):
         if len(unsatisfied) > 0:
             message = self.tr("The module %1 is needed by the following modules:\n%2.\n\nDo you want to resolve automatically the problem?")
             message = message.arg(unselectedModule).arg(", ".join(unsatisfied))
-            QMessageBox.warning(self, self.tr("Dependency error"), message, QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            choice = QMessageBox.warning(self, self.tr("Dependency error"), message, QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            if choice == QMessageBox.Yes:
+                for module in unsatisfied:
+                    modules = self._projectInfoRetrieve("MODULES")
+                    modules[module]["enabled"] = False
+                for index in range(self.pageContent.moduleTable.rowCount()):
+                    if unicode(self.pageContent.moduleTable.item(index, 1).text()) in unsatisfied:
+                        self._buttonGroup.button(index).setChecked(False)
+    
     
     def selectDependencyCheck(self, module):
         unsatisfied = set()
