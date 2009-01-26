@@ -56,6 +56,7 @@ class BModulePage(BWizardPage):
             checkBox.setChecked(modules[module]["enabled"])
     
     def _fillPropertyTable(self):
+        self.savePage()
         module = self._currentModule()
         configuration = self._projectInfoRetrieve("MODULES")[module]["configuration"]
         configurations = self._projectInfoRetrieve("CONFIGURATIONS")[configuration]
@@ -202,3 +203,7 @@ class BModulePage(BWizardPage):
                 if dependency not in unsatisfied:
                     unsatisfied |= self.unselectDependencyCheck(module)
         return unsatisfied
+    
+    def savePage(self):
+        for index in range(self.pageContent.propertyTable.rowCount()):
+            print qvariant_converter.getString(self.pageContent.propertyTable.item(index, 0).data(Qt.UserRole))
