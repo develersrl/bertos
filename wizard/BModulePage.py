@@ -118,9 +118,11 @@ class BModulePage(BWizardPage):
     
     def _showPropertyDescription(self):
         self._resetPropertyDescription()
-        description = self._projectInfoRetrieve("CONFIGURATIONS")[self._currentModuleConfigurations()][self._currentProperty()]["description"]
-        name = self._currentProperty()
-        self._currentPropertyItem().setText(name + "\n" + description)
+        configurations = self._projectInfoRetrieve("CONFIGURATIONS")[self._currentModuleConfigurations()]
+        if self._currentProperty() in configurations.keys():
+            description = configurations[self._currentProperty()]["description"]
+            name = self._currentProperty()
+            self._currentPropertyItem().setText(name + "\n" + description)
     
     def _setupUi(self):
         self.pageContent.moduleTable.horizontalHeader().setResizeMode(QHeaderView.ResizeToContents)
