@@ -56,7 +56,6 @@ class BModulePage(BWizardPage):
             checkBox.setChecked(modules[module]["enabled"])
     
     def _fillPropertyTable(self):
-        self.savePage()
         module = self._currentModule()
         configuration = self._projectInfoRetrieve("MODULES")[module]["configuration"]
         configurations = self._projectInfoRetrieve("CONFIGURATIONS")[configuration]
@@ -79,8 +78,10 @@ class BModulePage(BWizardPage):
                 comboBox = QComboBox()
                 self.pageContent.propertyTable.setCellWidget(index, 1, comboBox)
                 enum = self._projectInfoRetrieve("LISTS")[configurations[property]["informations"]["value_list"]]
-                for element in enum:
+                for index, element in enumerate(enum):
                     comboBox.addItem(element)
+                    if element == configurations[property]["value"]:
+                        comboBox.setCurrentIndex(index)
             else:
                 ## int, long or undefined type property
                 spinBox = QSpinBox()
@@ -99,17 +100,43 @@ class BModulePage(BWizardPage):
                     spinBox.setSuffix("L")
                 spinBox.setValue(int(configurations[property]["value"].replace("L", "")))
     
+    def _savePage(self, previousRow, previousColumn):
+        module = self._module(previousRow)
+        moduleConfigurations = self._projectInfoRetrieve("CONFIGURATIONS")[self._configurations(module)]
+        for index in range(self.pageContent.propertyTable.rowCount()):
+            parameter = qvariant_converter.getString(self.pageContent.propertyTable.item(index, 0).data(Qt.UserRole))
+            if "type" not in moduleConfigurations[parameter]["informations"].keys() or moduleConfigurations[parameter]["informations"]["type"] == "int":
+                moduleConfigurations[parameter]["value"] = str(self.pageContent.propertyTable.cellWidget(index, 1).value())
+            elif moduleConfigurations[parameter]["informations"]["type"] == "enum":
+                moduleConfigurations[parameter]["value"] = unicode(self.pageContent.propertyTable.cellWidget(index, 1).currentText())
+            elif moduleConfigurations[parameter]["informations"]["type"] == "boolean":
+                if self.pageContent.propertyTable.cellWidget(index, 1).isChecked():
+                    moduleConfigurations[parameter]["value"] = "1"
+                else:
+                    moduleConfigurations[parameter]["value"] = "0"
+    
+    def _pageChanged(self, row, column, previousRow, previousColumn):
+        if previousRow != -1 and previousColumn != -1:
+            self._savePage(previousRow, previousColumn)
+        self._fillPropertyTable()
+    
     def _currentModule(self):
         return unicode(self.pageContent.moduleTable.item(self.pageContent.moduleTable.currentRow(), 1).text())
     
     def _currentModuleConfigurations(self):
-        return self._projectInfoRetrieve("MODULES")[self._currentModule()]["configuration"]
+        return self._configurations(self._currentModule())["configurations"]
     
     def _currentProperty(self):
         return qvariant_converter.getString(self.pageContent.propertyTable.item(self.pageContent.propertyTable.currentRow(), 0).data(Qt.UserRole))
     
     def _currentPropertyItem(self):
         return self.pageContent.propertyTable.item(self.pageContent.propertyTable.currentRow(), 0)
+    
+    def _module(self, row):
+        return unicode(self.pageContent.moduleTable.item(row, 1).text())
+    
+    def _configurations(self, module):
+        return self._projectInfoRetrieve("MODULES")[module]["configuration"]
     
     def _resetPropertyDescription(self):
         for index in range(self.pageContent.propertyTable.rowCount()):
@@ -140,7 +167,7 @@ class BModulePage(BWizardPage):
         self.pageContent.propertyTable.setRowCount(0)
     
     def _connectSignals(self):
-        self.connect(self.pageContent.moduleTable, SIGNAL("itemSelectionChanged()"), self._fillPropertyTable)
+        self.connect(self.pageContent.moduleTable, SIGNAL("currentCellChanged(int, int, int, int)"), self._pageChanged)
         self.connect(self.pageContent.propertyTable, SIGNAL("itemSelectionChanged()"), self._showPropertyDescription)
 
     def _moduleSelectionChanged(self, index):
@@ -205,7 +232,3 @@ class BModulePage(BWizardPage):
                 if dependency not in unsatisfied:
                     unsatisfied |= self.unselectDependencyCheck(module)
         return unsatisfied
-    
-    def savePage(self):
-        for index in range(self.pageContent.propertyTable.rowCount()):
-            print qvariant_converter.getString(self.pageContent.propertyTable.item(index, 0).data(Qt.UserRole))
