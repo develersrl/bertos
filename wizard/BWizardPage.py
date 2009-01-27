@@ -62,3 +62,6 @@ class BWizardPage(QWizardPage):
     
     def reloadData(self):
         pass
+    
+    def saveData(self):
+        pass

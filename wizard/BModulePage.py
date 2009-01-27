@@ -100,7 +100,7 @@ class BModulePage(BWizardPage):
                     spinBox.setSuffix("L")
                 spinBox.setValue(int(configurations[property]["value"].replace("L", "")))
     
-    def _savePage(self, previousRow, previousColumn):
+    def _saveData(self, previousRow, previousColumn):
         module = self._module(previousRow)
         moduleConfigurations = self._configurations(module)
         for index in range(self.pageContent.propertyTable.rowCount()):
@@ -117,7 +117,7 @@ class BModulePage(BWizardPage):
     
     def _pageChanged(self, row, column, previousRow, previousColumn):
         if previousRow != -1 and previousColumn != -1:
-            self._savePage(previousRow, previousColumn)
+            self._saveData(previousRow, previousColumn)
         self._fillPropertyTable()
     
     def _currentModule(self):
