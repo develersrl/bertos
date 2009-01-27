@@ -13,6 +13,7 @@ import os
 import fnmatch
 import glob
 import re
+import shutil
 
 import const
 
@@ -22,10 +23,15 @@ def isBertosDir(directory):
 def bertosVersion(directory):
    return open(directory + "/VERSION").readline().strip()
 
-def createBertosProject(directory):
+def createBertosProject(directory, sources_dir, projectInfos):
     if not os.path.isdir(directory):
         os.mkdir(directory)
-    open(directory + "/project.bertos", "w")
+    f = open(directory + "/project.bertos", "w")
+    f.write(repr(projectInfos))
+    f.close()
+    shutil.rmtree(directory + "/bertos", True)
+    shutil.copytree(sources_dir + "/bertos", directory + "/bertos")
+    shutil.copy(sources_dir + "/Makefile", directory + "/Makefile")
 
 def getSystemPath():
     path = os.environ["PATH"]

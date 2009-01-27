@@ -21,3 +21,6 @@ class BProject(object):
         if key in self.infos.keys():
             return self.infos[key]
         return None
+    
+    def __repr__(self):
+        return repr(self.infos())
