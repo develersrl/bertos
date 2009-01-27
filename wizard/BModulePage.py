@@ -102,7 +102,7 @@ class BModulePage(BWizardPage):
     
     def _savePage(self, previousRow, previousColumn):
         module = self._module(previousRow)
-        moduleConfigurations = self._projectInfoRetrieve("CONFIGURATIONS")[self._configurations(module)]
+        moduleConfigurations = self._configurations(module)
         for index in range(self.pageContent.propertyTable.rowCount()):
             parameter = qvariant_converter.getString(self.pageContent.propertyTable.item(index, 0).data(Qt.UserRole))
             if "type" not in moduleConfigurations[parameter]["informations"].keys() or moduleConfigurations[parameter]["informations"]["type"] == "int":
@@ -124,7 +124,7 @@ class BModulePage(BWizardPage):
         return unicode(self.pageContent.moduleTable.item(self.pageContent.moduleTable.currentRow(), 1).text())
     
     def _currentModuleConfigurations(self):
-        return self._configurations(self._currentModule())["configurations"]
+        return self._configurations(self._currentModule())
     
     def _currentProperty(self):
         return qvariant_converter.getString(self.pageContent.propertyTable.item(self.pageContent.propertyTable.currentRow(), 0).data(Qt.UserRole))
@@ -136,7 +136,8 @@ class BModulePage(BWizardPage):
         return unicode(self.pageContent.moduleTable.item(row, 1).text())
     
     def _configurations(self, module):
-        return self._projectInfoRetrieve("MODULES")[module]["configuration"]
+        configuration = self._projectInfoRetrieve("MODULES")[module]["configuration"]
+        return self._projectInfoRetrieve("CONFIGURATIONS")[configuration]
     
     def _resetPropertyDescription(self):
         for index in range(self.pageContent.propertyTable.rowCount()):
@@ -145,7 +146,7 @@ class BModulePage(BWizardPage):
     
     def _showPropertyDescription(self):
         self._resetPropertyDescription()
-        configurations = self._projectInfoRetrieve("CONFIGURATIONS")[self._currentModuleConfigurations()]
+        configurations = self._currentModuleConfigurations()
         if self._currentProperty() in configurations.keys():
             description = configurations[self._currentProperty()]["description"]
             name = self._currentProperty()
