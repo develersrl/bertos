@@ -9,6 +9,8 @@
 # Author: Lorenzo Berni <duplo@develer.com>
 #
 
+import copy
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
@@ -47,3 +49,6 @@ class BWizard(QWizard):
         page = self.page(pageId)
         if page is not None:
             page.reloadData()
+    
+    def _project(self):
+        return copy.deepcopy(QApplication.instance().project)

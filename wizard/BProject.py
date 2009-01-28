@@ -23,4 +23,4 @@ class BProject(object):
         return None
     
     def __repr__(self):
-        return repr(self.infos())
+        return repr(self.infos)
