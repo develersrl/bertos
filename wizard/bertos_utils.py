@@ -23,7 +23,9 @@ def isBertosDir(directory):
 def bertosVersion(directory):
    return open(directory + "/VERSION").readline().strip()
 
-def createBertosProject(directory, sourcesDir, projectInfos):
+def createBertosProject(projectInfos):
+    directory = projectInfos.info("PROJECT_PATH")
+    sourcesDir = projectInfos.info("SOURCES_PATH")
     if not os.path.isdir(directory):
         os.mkdir(directory)
     f = open(directory + "/project.bertos", "w")
@@ -42,6 +44,20 @@ def createBertosProject(directory, sourcesDir, projectInfos):
     prjdir = directory + "/" + os.path.basename(directory)
     shutil.rmtree(prjdir, True)
     os.mkdir(prjdir)
+    ## Destination configurations files
+    cfgdir = prjdir + "/cfg"
+    shutil.rmtree(cfgdir, True)
+    os.mkdir(cfgdir)
+    for key, value in projectInfos.info("CONFIGURATIONS").items():
+        string = open(sourcesDir + "/" + key, "r").read()
+        for parameter, infos in value.items():
+            value = infos["value"]
+            if "long" in infos["informations"].keys() and infos["informations"]["long"]:
+                value += "L"
+            string = sub(string, parameter, value)
+        f = open(cfgdir + "/" + os.path.basename(key), "w")
+        f.write(string)
+        f.close()
 
 def getSystemPath():
     path = os.environ["PATH"]
