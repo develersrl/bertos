@@ -50,5 +50,5 @@ class BWizard(QWizard):
         if page is not None:
             page.reloadData()
     
-    def _project(self):
+    def project(self):
         return copy.deepcopy(QApplication.instance().project)
