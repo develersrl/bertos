@@ -23,7 +23,7 @@ def isBertosDir(directory):
 def bertosVersion(directory):
    return open(directory + "/VERSION").readline().strip()
 
-def createBertosProject(directory, sources_dir, projectInfos):
+def createBertosProject(directory, sourcesDir, projectInfos):
     if not os.path.isdir(directory):
         os.mkdir(directory)
     f = open(directory + "/project.bertos", "w")
@@ -32,12 +32,12 @@ def createBertosProject(directory, sources_dir, projectInfos):
     ## Destination source dir
     srcdir = directory + "/bertos"
     shutil.rmtree(srcdir, True)
-    shutil.copytree(sources_dir + "/bertos", srcdir)
+    shutil.copytree(sourcesDir + "/bertos", srcdir)
     ## Destination makefile
     makefile = directory + "/Makefile"
     if os.path.exists(makefile):
         os.remove(makefile)
-    shutil.copy(sources_dir + "/Makefile", makefile)
+    shutil.copy(sourcesDir + "/Makefile", makefile)
     ## Destination project dir
     prjdir = directory + "/" + os.path.basename(directory)
     shutil.rmtree(prjdir, True)
