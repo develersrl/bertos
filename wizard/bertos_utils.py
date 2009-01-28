@@ -29,9 +29,19 @@ def createBertosProject(directory, sources_dir, projectInfos):
     f = open(directory + "/project.bertos", "w")
     f.write(repr(projectInfos))
     f.close()
-    shutil.rmtree(directory + "/bertos", True)
-    shutil.copytree(sources_dir + "/bertos", directory + "/bertos")
-    shutil.copy(sources_dir + "/Makefile", directory + "/Makefile")
+    ## Destination source dir
+    srcdir = directory + "/bertos"
+    shutil.rmtree(srcdir, True)
+    shutil.copytree(sources_dir + "/bertos", srcdir)
+    ## Destination makefile
+    makefile = directory + "/Makefile"
+    if os.path.exists(makefile):
+        os.remove(makefile)
+    shutil.copy(sources_dir + "/Makefile", makefile)
+    ## Destination project dir
+    prjdir = directory + "/" + os.path.basename(directory)
+    shutil.rmtree(prjdir, True)
+    os.mkdir(prjdir)
 
 def getSystemPath():
     path = os.environ["PATH"]
@@ -214,3 +224,9 @@ def loadDefineListsDict(path):
     for filename, path in findDefinitions("*.h", path):
         defineListsDict.update(loadDefineLists(path + "/" + filename))
     return defineListsDict
+
+def sub(string, parameter, value):
+    """
+    Substitute the given value at the given parameter define in the given string
+    """
+    return re.sub(r"(?P<define>#define\s+" + parameter + r"\s+)([^\s]+)", r"\g<define>" + value, string)
