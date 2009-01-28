@@ -45,7 +45,7 @@ class BFolderPage(BWizardPage):
         if self._destinationFolder != "" and self._projectName <> "":
             if not self._destinationFolder.endswith(os.sep):
                 self._destinationFolder += os.sep
-            self.pageContent.projectPath.setText(self._destinationFolder + self._projectName + "/")
+            self.pageContent.projectPath.setText(self._destinationFolder + self._projectName)
         else:
             self.pageContent.projectPath.setText("None")
         self.emit(SIGNAL("completeChanged()"))
@@ -57,7 +57,7 @@ class BFolderPage(BWizardPage):
     
     def isComplete(self):
         if self.pageContent.projectPath.text() != "None":
-            self._projectInfoStore("PROJECT_PATH", self.pageContent.projectPath.text())
+            self._projectInfoStore("PROJECT_PATH", unicode(self.pageContent.projectPath.text()))
             return True
         else:
             return False
