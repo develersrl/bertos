@@ -21,3 +21,24 @@ class BOutputPage(BWizardPage):
     def __init__(self):
         BWizardPage.__init__(self, "output_select.ui")
         self.setTitle(self.tr("Choose the project output"))
+        self._setupButtonGroup()
+        self._connectSignals()
+    
+    def _connectSignals(self):
+        self.connect(self._buttonGroup, SIGNAL("buttonClicked(int)"), self._buttonClicked)
+    
+    def _setupButtonGroup(self):
+        self._buttonGroup = QButtonGroup()
+        self._buttonGroup.addButton(self.pageContent.bbsButton)
+        self._buttonGroup.addButton(self.pageContent.eclipseButton)
+        self._buttonGroup.addButton(self.pageContent.codeliteButton)
+        self._buttonGroup.addButton(self.pageContent.xcodeButton)
+    
+    def _buttonClicked(self):
+        self.emit(SIGNAL("completeChanged()"))
+    
+    def isComplete(self):
+        for button in self._buttonGroup.buttons():
+            if button.isChecked():
+                return True
+        return False
