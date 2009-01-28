@@ -40,5 +40,13 @@ class BOutputPage(BWizardPage):
     def isComplete(self):
         for button in self._buttonGroup.buttons():
             if button.isChecked():
+                if button is self.pageContent.bbsButton:
+                    self._projectInfoStore("OUTPUT", "makefile")
+                elif button is self.pageContent.eclipseButton:
+                    self._projectInfoStore("OUTPUT", "eclipse")
+                elif button is self.pageContent.codeliteButton:
+                    self._projectInfoStore("OUTPUT", "codelite")
+                elif button is self.pageContent.xcodeButton:
+                    self._projectInfoStore("OUTPUT", "xcode")
                 return True
         return False
