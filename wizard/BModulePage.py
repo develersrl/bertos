@@ -22,6 +22,7 @@ class BModulePage(BWizardPage):
         BWizardPage.__init__(self, "module_select.ui")
         self.setTitle(self.tr("Configure the BeRTOS modules"))
         self._setupUi()
+        self._controlGroup = QControlGroup()
         self._connectSignals()
     
     def reloadData(self):
@@ -57,6 +58,7 @@ class BModulePage(BWizardPage):
     
     def _fillPropertyTable(self):
         module = self._currentModule()
+        self._controlGroup.clear()
         configuration = self._projectInfoRetrieve("MODULES")[module]["configuration"]
         configurations = self._projectInfoRetrieve("CONFIGURATIONS")[configuration]
         self.pageContent.propertyTable.clear()
@@ -73,15 +75,17 @@ class BModulePage(BWizardPage):
                     checkBox.setChecked(True)
                 else:
                     checkBox.setChecked(False)
+                self._controlGroup.addControl(index, checkBox)
             elif "type" in configurations[property]["informations"].keys() and configurations[property]["informations"]["type"] == "enum":
                 ## enum property
                 comboBox = QComboBox()
                 self.pageContent.propertyTable.setCellWidget(index, 1, comboBox)
                 enum = self._projectInfoRetrieve("LISTS")[configurations[property]["informations"]["value_list"]]
-                for index, element in enumerate(enum):
+                for i, element in enumerate(enum):
                     comboBox.addItem(element)
                     if element == configurations[property]["value"]:
-                        comboBox.setCurrentIndex(index)
+                        comboBox.setCurrentIndex(i)
+                self._controlGroup.addControl(index, comboBox)
             else:
                 ## int, long or undefined type property
                 spinBox = QSpinBox()
@@ -99,26 +103,7 @@ class BModulePage(BWizardPage):
                 if "long" in configurations[property]["informations"].keys() and configurations[property]["informations"]["long"] == "True":
                     spinBox.setSuffix("L")
                 spinBox.setValue(int(configurations[property]["value"].replace("L", "")))
-    
-    def _saveData(self, previousRow, previousColumn):
-        module = self._module(previousRow)
-        moduleConfigurations = self._configurations(module)
-        for index in range(self.pageContent.propertyTable.rowCount()):
-            parameter = qvariant_converter.getString(self.pageContent.propertyTable.item(index, 0).data(Qt.UserRole))
-            if "type" not in moduleConfigurations[parameter]["informations"].keys() or moduleConfigurations[parameter]["informations"]["type"] == "int":
-                moduleConfigurations[parameter]["value"] = str(self.pageContent.propertyTable.cellWidget(index, 1).value())
-            elif moduleConfigurations[parameter]["informations"]["type"] == "enum":
-                moduleConfigurations[parameter]["value"] = unicode(self.pageContent.propertyTable.cellWidget(index, 1).currentText())
-            elif moduleConfigurations[parameter]["informations"]["type"] == "boolean":
-                if self.pageContent.propertyTable.cellWidget(index, 1).isChecked():
-                    moduleConfigurations[parameter]["value"] = "1"
-                else:
-                    moduleConfigurations[parameter]["value"] = "0"
-    
-    def _pageChanged(self, row, column, previousRow, previousColumn):
-        if previousRow != -1 and previousColumn != -1:
-            self._saveData(previousRow, previousColumn)
-        self._fillPropertyTable()
+                self._controlGroup.addControl(index, spinBox)
     
     def _currentModule(self):
         return unicode(self.pageContent.moduleTable.item(self.pageContent.moduleTable.currentRow(), 1).text())
@@ -168,9 +153,25 @@ class BModulePage(BWizardPage):
         self.pageContent.propertyTable.setRowCount(0)
     
     def _connectSignals(self):
-        self.connect(self.pageContent.moduleTable, SIGNAL("currentCellChanged(int, int, int, int)"), self._pageChanged)
+        self.connect(self.pageContent.moduleTable, SIGNAL("itemSelectionChanged()"), self._fillPropertyTable)
         self.connect(self.pageContent.propertyTable, SIGNAL("itemSelectionChanged()"), self._showPropertyDescription)
-
+        self.connect(self._controlGroup, SIGNAL("stateChanged"), self._saveValue)
+    
+    def _saveValue(self, index):
+        property = qvariant_converter.getString(self.pageContent.propertyTable.item(index, 0).data(Qt.UserRole))
+        configuration = self._projectInfoRetrieve("MODULES")[self._currentModule()]["configuration"]
+        configurations = self._projectInfoRetrieve("CONFIGURATIONS")
+        if "type" not in configurations[configuration][property]["informations"].keys() or configurations[configuration][property]["informations"]["type"] == "int":
+            configurations[configuration][property]["value"] = str(self.pageContent.propertyTable.cellWidget(index, 1).value())
+        elif configurations[configuration][property]["informations"]["type"] == "enum":
+            configurations[configuration][property]["value"] = unicode(self.pageContent.propertyTable.cellWidget(index, 1).currentText())
+        elif configurations[configuration][property]["informations"]["type"] == "boolean":
+            if self.pageContent.propertyTable.cellWidget(index, 1).isChecked():
+                configurations[configuration][property]["value"] = "1"
+            else:
+                configurations[configuration][property]["value"] = "0"
+        self._projectInfoStore("CONFIGURATIONS", configurations)
+    
     def _moduleSelectionChanged(self, index):
         module = unicode(self.pageContent.moduleTable.item(index, 1).text())
         if self._buttonGroup.button(index).isChecked():
@@ -233,3 +234,23 @@ class BModulePage(BWizardPage):
                 if dependency not in unsatisfied:
                     unsatisfied |= self.unselectDependencyCheck(module)
         return unsatisfied
+
+class QControlGroup(QObject):
+    def __init__(self):
+        QObject.__init__(self)
+        self._controls = {}
+    
+    def addControl(self, id, control):
+        self._controls[id] = control
+        if type(control) == QCheckBox:
+            self.connect(control, SIGNAL("stateChanged(int)"), lambda: self._stateChanged(id))
+        elif type(control) == QSpinBox:
+            self.connect(control, SIGNAL("valueChanged(int)"), lambda: self._stateChanged(id))
+        elif type(control) == QComboBox:
+            self.connect(control, SIGNAL("currentIndexChanged(int)"), lambda: self._stateChanged(id))
+    
+    def clear(self):
+        self._controls = {}
+    
+    def _stateChanged(self, id):
+        self.emit(SIGNAL("stateChanged"), id)
