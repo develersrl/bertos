@@ -58,6 +58,22 @@ def createBertosProject(projectInfos):
         f = open(cfgdir + "/" + os.path.basename(key), "w")
         f.write(string)
         f.close()
+    ## Destinatio mk file
+    makefile = open(sourcesDir + "/" + "template.mk", "r").read()
+    makefile = mkGenerator(projectInfos, makefile)
+    open(prjdir + "/" + "template.km", "w").write(makefile)
+
+def mkGenerator(projectInfos, makefile):
+    mkData = {}
+    mkData["pname"] = os.path.basename(projectInfos.info("PROJECT_PATH"))
+    mkData["cpuname"] = projectInfos.info("CPU_INFOS")["CPU_NAME"]
+    mkData["cflags"] = " ".join(projectInfos.info("CPU_INFOS")["C_FLAGS"])
+    mkData["ldflags"] = " ".join(projectInfos.info("CPU_INFOS")["LD_FLAGS"])
+    for key in mkData:
+        print key, mkData[key]
+        while makefile.find(key) != -1:
+            makefile = makefile.replace(key, mkData[key])
+    return makefile
 
 def getSystemPath():
     path = os.environ["PATH"]
