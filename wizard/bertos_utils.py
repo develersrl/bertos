@@ -64,6 +64,9 @@ def createBertosProject(projectInfos):
     open(prjdir + "/" + "template.km", "w").write(makefile)
 
 def mkGenerator(projectInfos, makefile):
+    """
+    Generates the mk file for the current project.
+    """
     mkData = {}
     mkData["pname"] = os.path.basename(projectInfos.info("PROJECT_PATH"))
     mkData["cpuname"] = projectInfos.info("CPU_INFOS")["CPU_NAME"]
