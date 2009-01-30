@@ -14,6 +14,8 @@ from BWizardPage import *
 import bertos_utils
 import qvariant_converter
 
+from const import *
+
 class BCpuPage(BWizardPage):
     
     def __init__(self):
@@ -54,7 +56,13 @@ class BCpuPage(BWizardPage):
     
     def isComplete(self):
         if self.pageContent.cpuList.currentRow() != -1:
-            self._projectInfoStore("CPU_INFOS", qvariant_converter.getDict(self.pageContent.cpuList.currentItem().data(Qt.UserRole)))
+            infos = qvariant_converter.getDict(self.pageContent.cpuList.currentItem().data(Qt.UserRole))
+            for key, value in infos.items():
+                if type(CPU_DEF[key]) == list:
+                    infos[key] = qvariant_converter.getStringList(value)
+                if type(CPU_DEF[key]) == str or type(CPU_DEF) == unicode:
+                    infos[key] = qvariant_converter.getString(value)
+            self._projectInfoStore("CPU_INFOS", infos)
             return True
         else:
             return False
