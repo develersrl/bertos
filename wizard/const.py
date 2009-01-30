@@ -10,11 +10,15 @@
 #
 
 CPU_DEF = {
-    "TOOLCHAIN": [],
+    "CPU_NAME": "",
+    "CPU_DIR": "",
+    "DEFINITION_PATH": "",
+    "TOOLCHAIN": "",
     "CORE_CPU": "",
     "SCRIPT_DIR": "",
     "HW_DIR": "",
     "DRV_DIR": "",
+    "C_FLAGS": [],
     "CPPA_FLAGS" : [],
     "CPP_FLAGS" : [],
     "LD_FLAGS" : [],
