@@ -14,10 +14,12 @@ from BWizardPage import *
 import bertos_utils
 import qvariant_converter
 
+from const import *
+
 class BVersionPage(BWizardPage):
     
     def __init__(self):
-        BWizardPage.__init__(self, "bertos_versions.ui")
+        BWizardPage.__init__(self, UI_LOCATION + "/bertos_versions.ui")
         self._connectSignals()
         self._fillVersionList()
         self._setupUi()

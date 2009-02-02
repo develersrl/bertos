@@ -15,10 +15,12 @@ from PyQt4.QtGui import *
 from BWizardPage import *
 import bertos_utils
 
+from const import *
+
 class BFolderPage(BWizardPage):
     
     def __init__(self):
-        BWizardPage.__init__(self, "dir_select.ui")
+        BWizardPage.__init__(self, UI_LOCATION + "/dir_select.ui")
         self.setTitle(self.tr("Select the project name"))
         self._initializeAttributes()
         self._connectSignals()

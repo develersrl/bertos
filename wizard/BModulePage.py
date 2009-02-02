@@ -15,11 +15,12 @@ from PyQt4.QtGui import *
 from BWizardPage import *
 import bertos_utils
 
+from const import *
 
 class BModulePage(BWizardPage):
     
     def __init__(self):
-        BWizardPage.__init__(self, "module_select.ui")
+        BWizardPage.__init__(self, UI_LOCATION + "/module_select.ui")
         self.setTitle(self.tr("Configure the BeRTOS modules"))
         self._setupUi()
         self._controlGroup = QControlGroup()

@@ -13,6 +13,8 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import PyQt4.uic as uic
 
+from const import *
+
 class BStartPage(QDialog):
     
     def __init__(self):
@@ -23,7 +25,7 @@ class BStartPage(QDialog):
         self._initializeButtons()
     
     def _setupUi(self):
-        self.content = uic.loadUi("start.ui", None)
+        self.content = uic.loadUi(UI_LOCATION + "/start.ui", None)
         layout = QVBoxLayout()
         layout.addWidget(self.content)
         self.setLayout(layout)

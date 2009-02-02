@@ -15,6 +15,8 @@ import PyQt4.uic as uic
 
 import qvariant_converter
 
+from const import *
+
 class BToolchainSearch(QDialog):
     
     def __init__(self):
@@ -24,7 +26,7 @@ class BToolchainSearch(QDialog):
         self.setWindowTitle(self.tr("Toolchain search page"))
     
     def _setupUi(self):
-        self.content = uic.loadUi("toolchain_search.ui", None)
+        self.content = uic.loadUi(UI_LOCATION + "/toolchain_search.ui", None)
         layout = QVBoxLayout()
         layout.addWidget(self.content)
         self.setLayout(layout)

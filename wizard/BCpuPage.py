@@ -19,7 +19,7 @@ from const import *
 class BCpuPage(BWizardPage):
     
     def __init__(self):
-        BWizardPage.__init__(self, "cpu_select.ui")
+        BWizardPage.__init__(self, UI_LOCATION + "/cpu_select.ui")
         self.setTitle(self.tr("Select the CPU"))
         self._connectSignals()
         self._setupUi()

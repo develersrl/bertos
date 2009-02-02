@@ -15,11 +15,12 @@ from PyQt4.QtGui import *
 from BWizardPage import *
 import bertos_utils
 
+from const import *
 
 class BOutputPage(BWizardPage):
     
     def __init__(self):
-        BWizardPage.__init__(self, "output_select.ui")
+        BWizardPage.__init__(self, UI_LOCATION + "/output_select.ui")
         self.setTitle(self.tr("Choose the project output"))
         self._setupButtonGroup()
         self._connectSignals()

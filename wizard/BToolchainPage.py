@@ -17,10 +17,12 @@ import BToolchainSearch
 import bertos_utils
 import qvariant_converter
 
+from const import *
+
 class BToolchainPage(BWizardPage):
     
     def __init__(self):
-        BWizardPage.__init__(self, "toolchain_select.ui")
+        BWizardPage.__init__(self, UI_LOCATION + "/toolchain_select.ui")
         self.setTitle(self.tr("Select toolchain"))
         self._validationProcess = None
         self._updateUi()
