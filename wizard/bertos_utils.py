@@ -40,7 +40,7 @@ def createBertosProject(projectInfos):
     if os.path.exists(makefile):
         os.remove(makefile)
     makefile = open("mktemplates/Makefile").read()
-    makefile = makefileGenerator(makefile)
+    makefile = makefileGenerator(projectInfos, makefile)
     open(directory + "/Makefile", "w").write(makefile)
     ## Destination project dir
     prjdir = directory + "/" + os.path.basename(directory)
