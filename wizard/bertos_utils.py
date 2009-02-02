@@ -39,7 +39,9 @@ def createBertosProject(projectInfos):
     makefile = directory + "/Makefile"
     if os.path.exists(makefile):
         os.remove(makefile)
-    shutil.copy(sourcesDir + "/Makefile", makefile)
+    makefile = open("mktemplates/Makefile").read()
+    makefile = makefileGenerator(makefile)
+    open(directory + "/Makefile", "w").write(makefile)
     ## Destination project dir
     prjdir = directory + "/" + os.path.basename(directory)
     shutil.rmtree(prjdir, True)
@@ -61,7 +63,7 @@ def createBertosProject(projectInfos):
     ## Destinatio mk file
     makefile = open("mktemplates/template.mk", "r").read()
     makefile = mkGenerator(projectInfos, makefile)
-    open(prjdir + "/" + "template.mk", "w").write(makefile)
+    open(prjdir + "/" + "project.mk", "w").write(makefile)
 
 def mkGenerator(projectInfos, makefile):
     """
@@ -75,6 +77,15 @@ def mkGenerator(projectInfos, makefile):
     for key in mkData:
         while makefile.find(key) != -1:
             makefile = makefile.replace(key, mkData[key])
+    return makefile
+
+def makefileGenerator(projectInfos, makefile):
+    """
+    Generate the Makefile for the current project.
+    """
+    # TODO: write a general function that works for both the mk file and the Makefile
+    while makefile.find("project_name") != -1:
+        makefile = makefile.replace("project_name", os.path.basename(projectInfos.info("PROJECT_PATH")))
     return makefile
 
 def getSystemPath():
