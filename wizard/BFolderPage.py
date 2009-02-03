@@ -67,7 +67,7 @@ class BFolderPage(BWizardPage):
     
     def _selectDirectory(self):
         directory = unicode(QFileDialog.getExistingDirectory(self, self.tr("Open Directory"), "", QFileDialog.ShowDirsOnly))
-        if len(directory) == "":
+        if len(directory) > 0:
             self.pageContent.directoryEdit.setText(directory)
     
     def isComplete(self):
