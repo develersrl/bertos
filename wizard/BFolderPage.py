@@ -23,8 +23,12 @@ class BFolderPage(BWizardPage):
         BWizardPage.__init__(self, UI_LOCATION + "/dir_select.ui")
         self.setTitle(self.tr("Select the project name"))
         self._initializeAttributes()
+        self._setupUi()
         self._connectSignals()
 
+    def _setupUi(self):
+        self.pageContent.warningLabel.setVisible(False)
+    
     def _initializeAttributes(self):
         self._projectName = ""
         self._destinationFolder = os.path.expanduser("~")
@@ -48,8 +52,16 @@ class BFolderPage(BWizardPage):
             if not self._destinationFolder.endswith(os.sep):
                 self._destinationFolder += os.sep
             self.pageContent.projectPath.setText(self._destinationFolder + self._projectName)
+            if os.path.exists(self._destinationFolder + self._projectName):
+                self.pageContent.warningLabel.setVisible(True)
+                self.pageContent.warningLabel.setText(self.tr("<font color='#FF0000'>Warning: the selected directory exists, it will be destroyed with all contained subdirectories and files...</font>"))
+            else:
+                self.pageContent.warningLabel.setVisible(False)
+                self.pageContent.warningLabel.setText("")
         else:
             self.pageContent.projectPath.setText("None")
+            self.pageContent.warningLabel.setVisible(False)
+            self.pageContent.warningLabel.setText("")
         self.emit(SIGNAL("completeChanged()"))
     
     def _selectDirectory(self):

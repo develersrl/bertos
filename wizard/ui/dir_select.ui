@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>369</width>
-    <height>119</height>
+    <width>381</width>
+    <height>146</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -90,7 +90,7 @@
             <string/>
            </property>
            <property name="icon" >
-            <iconset resource="bertos.qrc" >
+            <iconset resource="../bertos.qrc" >
              <normaloff>:/images/folderopen.png</normaloff>:/images/folderopen.png</iconset>
            </property>
            <property name="iconSize" >
@@ -131,10 +131,17 @@
      </item>
     </layout>
    </item>
+   <item>
+    <widget class="QLabel" name="warningLabel" >
+     <property name="text" >
+      <string/>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources>
-  <include location="bertos.qrc" />
+  <include location="../bertos.qrc" />
  </resources>
  <connections/>
 </ui>
