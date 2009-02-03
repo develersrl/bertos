@@ -63,7 +63,7 @@ def createBertosProject(projectInfos):
     ## Destinatio mk file
     makefile = open("mktemplates/template.mk", "r").read()
     makefile = mkGenerator(projectInfos, makefile)
-    open(prjdir + "/" + "project.mk", "w").write(makefile)
+    open(prjdir + "/" + os.path.basename(prjdir) + ".mk", "w").write(makefile)
 
 def mkGenerator(projectInfos, makefile):
     """
