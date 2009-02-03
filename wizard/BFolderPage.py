@@ -54,7 +54,8 @@ class BFolderPage(BWizardPage):
             self.pageContent.projectPath.setText(self._destinationFolder + self._projectName)
             if os.path.exists(self._destinationFolder + self._projectName):
                 self.pageContent.warningLabel.setVisible(True)
-                self.pageContent.warningLabel.setText(self.tr("<font color='#FF0000'>Warning: the selected directory exists, it will be destroyed with all contained subdirectories and files...</font>"))
+                self.pageContent.warningLabel.setText(self.tr("<font color='#FF0000'>Warning: the selected directory exists, \
+                    it will be destroyed with all contained subdirectories and files...</font>"))
             else:
                 self.pageContent.warningLabel.setVisible(False)
                 self.pageContent.warningLabel.setText("")
