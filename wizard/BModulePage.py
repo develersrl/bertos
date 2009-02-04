@@ -37,18 +37,32 @@ class BModulePage(BWizardPage):
         self.connect(self._buttonGroup, SIGNAL("buttonClicked(int)"), self._moduleSelectionChanged)
     
     def _loadModuleData(self):
-        modules = bertos_utils.loadModuleInfosDict(self._projectInfoRetrieve("SOURCES_PATH"))
-        lists = bertos_utils.loadDefineListsDict(self._projectInfoRetrieve("SOURCES_PATH"))
+        try:
+            modules = bertos_utils.loadModuleInfosDict(self._projectInfoRetrieve("SOURCES_PATH"))
+        except SyntaxError:
+            self._exceptionOccurred(self.tr("Wrong syntax in module definitions"))
+            return
+        try:
+            lists = bertos_utils.loadDefineListsDict(self._projectInfoRetrieve("SOURCES_PATH"))
+        except SyntaxError:
+            self._exceptionOccurred(self.tr("Wrong syntax in enum definitions"))
+            return
         configurations = {}
         for module, informations in modules.items():
-            configurations[informations["configuration"]] = bertos_utils.loadConfigurationInfos(self._projectInfoRetrieve("SOURCES_PATH") +
-                                                                                                "/" + informations["configuration"])
+            try:
+                configurations[informations["configuration"]] = bertos_utils.loadConfigurationInfos(self._projectInfoRetrieve("SOURCES_PATH") +
+                                                                                                    "/" + informations["configuration"])
+            except SyntaxError:
+                self._exceptionOccurred(self.tr("Wrong syntax in %1 configuration file").arg(informations["configuration"]))
+                return
         self._projectInfoStore("MODULES", modules)
         self._projectInfoStore("LISTS", lists)
         self._projectInfoStore("CONFIGURATIONS", configurations)
     
     def _fillModuleTable(self):
         modules = self._projectInfoRetrieve("MODULES")
+        if modules is None:
+            return
         self.pageContent.moduleTable.setRowCount(len(modules))
         for index, module in enumerate(modules):
             self.pageContent.moduleTable.setItem(index, 1, QTableWidgetItem(module))
