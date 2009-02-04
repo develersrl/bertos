@@ -20,6 +20,7 @@ import BCpuPage
 import BToolchainPage
 import BModulePage
 import BOutputPage
+import BCreationPage
 
 class BWizard(QWizard):
     
@@ -38,6 +39,7 @@ class BWizard(QWizard):
         self.addPage(BToolchainPage.BToolchainPage())
         self.addPage(BModulePage.BModulePage())
         self.addPage(BOutputPage.BOutputPage())
+        self.addPage(BCreationPage.BCreationPage())
     
     def _connectSignals(self):
         self.connect(self, SIGNAL("currentIdChanged(int)"), self._pageChanged)
