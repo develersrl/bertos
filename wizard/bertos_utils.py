@@ -16,6 +16,7 @@ import re
 import shutil
 
 import const
+import DefineException
 
 def isBertosDir(directory):
    return os.path.exists(directory + "/VERSION")
@@ -201,15 +202,18 @@ def loadConfigurationInfos(path):
             "long": boolean indicating if the num is a long
             "value_list": the name of the enum for enum parameters
     """
-    configurationInfos = {}
-    for comment, define in getDefinitionBlocks(open(path, "r").read()):
-        name, value = formatParamNameValue(define)
-        description, informations = getDescriptionInformations(comment)
-        configurationInfos[name] = {}
-        configurationInfos[name]["value"] = value
-        configurationInfos[name]["informations"] = informations
-        configurationInfos[name]["description"] = description
-    return configurationInfos
+    try:
+        configurationInfos = {}
+        for comment, define in getDefinitionBlocks(open(path, "r").read()):
+            name, value = formatParamNameValue(define)
+            description, informations = getDescriptionInformations(comment)
+            configurationInfos[name] = {}
+            configurationInfos[name]["value"] = value
+            configurationInfos[name]["informations"] = informations
+            configurationInfos[name]["description"] = description
+        return configurationInfos
+    except SyntaxError:
+        raise DefineException.ConfigurationDefineException(path)
 
 def loadModuleInfos(path):
     """
@@ -222,20 +226,23 @@ def loadModuleInfos(path):
         "enabled": contains False but the wizard will change if the user select
         the module
     """
-    moduleInfos = {}
-    string = open(path, "r").read()
-    commentList = re.findall(r"/\*{2}\s*([^*]*\*(?:[^/*][^*]*\*+)*)/", string)
-    commentList = [" ".join(re.findall(r"^\s*\*?\s*(.*?)\s*?(?:/{2}.*?)?$", comment, re.MULTILINE)).strip() for comment in commentList]
-    for comment in commentList:
-        index = comment.find("$WIZARD_MODULE")
-        if index != -1:
-            exec(comment[index + 1:])
-            moduleInfos[WIZARD_MODULE["name"]] = {"depends": WIZARD_MODULE["depends"],
-                                                    "configuration": WIZARD_MODULE["configuration"],
-                                                    "description": "",
-                                                    "enabled": False}
-            return moduleInfos
-    return {}
+    try:
+        moduleInfos = {}
+        string = open(path, "r").read()
+        commentList = re.findall(r"/\*{2}\s*([^*]*\*(?:[^/*][^*]*\*+)*)/", string)
+        commentList = [" ".join(re.findall(r"^\s*\*?\s*(.*?)\s*?(?:/{2}.*?)?$", comment, re.MULTILINE)).strip() for comment in commentList]
+        for comment in commentList:
+            index = comment.find("$WIZARD_MODULE")
+            if index != -1:
+                exec(comment[index + 1:])
+                moduleInfos[WIZARD_MODULE["name"]] = {"depends": WIZARD_MODULE["depends"],
+                                                        "configuration": WIZARD_MODULE["configuration"],
+                                                        "description": "",
+                                                        "enabled": False}
+                return moduleInfos
+        return {}
+    except SyntaxError:
+        raise DefineException.ModuleDefineException(path)
 
 def loadModuleInfosDict(path):
     """
@@ -250,16 +257,19 @@ def loadDefineLists(path):
     """
     Return a dict with the name of the list as key and a list of string as value
     """
-    string = open(path, "r").read()
-    commentList = re.findall(r"/\*{2}\s*([^*]*\*(?:[^/*][^*]*\*+)*)/", string)
-    commentList = [" ".join(re.findall(r"^\s*\*?\s*(.*?)\s*?(?:/{2}.*?)?$", comment, re.MULTILINE)).strip() for comment in commentList]
-    listDict = {}
-    for comment in commentList:
-        index = comment.find("$WIZARD_LIST")
-        if index != -1:
-            exec(comment[index + 1:])
-            listDict.update(WIZARD_LIST)
-    return listDict
+    try:
+        string = open(path, "r").read()
+        commentList = re.findall(r"/\*{2}\s*([^*]*\*(?:[^/*][^*]*\*+)*)/", string)
+        commentList = [" ".join(re.findall(r"^\s*\*?\s*(.*?)\s*?(?:/{2}.*?)?$", comment, re.MULTILINE)).strip() for comment in commentList]
+        listDict = {}
+        for comment in commentList:
+            index = comment.find("$WIZARD_LIST")
+            if index != -1:
+                exec(comment[index + 1:])
+                listDict.update(WIZARD_LIST)
+        return listDict
+    except SyntaxError:
+        raise DefineException.EnumDefineException(path)
 
 def loadDefineListsDict(path):
     """

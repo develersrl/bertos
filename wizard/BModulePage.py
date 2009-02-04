@@ -15,6 +15,7 @@ from PyQt4.QtGui import *
 from BWizardPage import *
 import bertos_utils
 
+from DefineException import *
 from const import *
 
 class BModulePage(BWizardPage):
@@ -39,25 +40,21 @@ class BModulePage(BWizardPage):
     def _loadModuleData(self):
         try:
             modules = bertos_utils.loadModuleInfosDict(self._projectInfoRetrieve("SOURCES_PATH"))
-        except SyntaxError:
-            self._exceptionOccurred(self.tr("Wrong syntax in module definitions"))
-            return
-        try:
             lists = bertos_utils.loadDefineListsDict(self._projectInfoRetrieve("SOURCES_PATH"))
-        except SyntaxError:
-            self._exceptionOccurred(self.tr("Wrong syntax in enum definitions"))
-            return
-        configurations = {}
-        for module, informations in modules.items():
-            try:
+            configurations = {}
+            for module, informations in modules.items():
                 configurations[informations["configuration"]] = bertos_utils.loadConfigurationInfos(self._projectInfoRetrieve("SOURCES_PATH") +
                                                                                                     "/" + informations["configuration"])
-            except SyntaxError:
-                self._exceptionOccurred(self.tr("Wrong syntax in %1 configuration file").arg(informations["configuration"]))
-                return
-        self._projectInfoStore("MODULES", modules)
-        self._projectInfoStore("LISTS", lists)
-        self._projectInfoStore("CONFIGURATIONS", configurations)
+        except ModuleDefineException, e:
+            self._exceptionOccurred(self.tr("Error parsing module information in file %1").arg(e.parameter))
+        except EnumDefineException, e:
+            self._exceptionOccurred(self.tr("Error parsing enum informations in file %1").arg(e.parameter))
+        except ConfigurationDefineException, e:
+            self._exceptionOccurred(self.tr("Error parsing configuration informations in file %1").arg(e.parameter))
+        else:
+            self._projectInfoStore("MODULES", modules)
+            self._projectInfoStore("LISTS", lists)
+            self._projectInfoStore("CONFIGURATIONS", configurations)
     
     def _fillModuleTable(self):
         modules = self._projectInfoRetrieve("MODULES")
