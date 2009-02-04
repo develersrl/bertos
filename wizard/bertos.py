@@ -26,12 +26,7 @@ import bertos_utils
 def newProject():
     wizard = BWizard.BWizard()
     wizard.show()
-    if wizard.exec_():
-        prj = wizard.project()
-        output = prj.info("OUTPUT")
-        if output == "makefile":
-            ## Now only supports the BeRTOS build system
-            bertos_utils.createBertosProject(prj)
+    wizard.exec_()
     
 def editProject():
     print "editProject"

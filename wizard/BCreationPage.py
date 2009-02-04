@@ -23,12 +23,15 @@ class BCreationPage(BWizardPage):
         self.setTitle(self.tr("Create the BeRTOS project"))
         self._setupUi()
         self._connectSignals()
+        self._completed = False
+    
+    def reloadData(self):
+        self._completed = False
+        self._setupUi()
     
     def _setupUi(self):
         self._confirmGroup = QWidgetGroup(self.pageContent.summaryTree,
                                             self.pageContent.createButton)
-        self._workingGroup = QWidgetGroup(self.pageContent.spinnerLabel)
-        self._workingGroup.setVisible(False)
         self._finalGroup = QWidgetGroup(self.pageContent.iconLabel,
                                             self.pageContent.textLabel)
         self._finalGroup.setVisible(False)
@@ -38,19 +41,13 @@ class BCreationPage(BWizardPage):
     
     def _createProject(self):
         self._confirmGroup.setVisible(False)
-        #self._workingGroup.setVisible(True)
-        #self._movie = QMovie("images/load_spinner.gif")
-        #print self._movie.isValid()
-        #self.pageContent.spinnerLabel.setMovie(self._movie)
-        #self._movie.start()
         bertos_utils.createBertosProject(self.wizard().project())
-        #del self._movie
-        #self._workingGroup.setVisible(False)
         self._finalGroup.setVisible(True)
+        self._completed = True
         self.emit(SIGNAL("completeChanged()"))
     
     def isComplete(self):
-        return self._finalGroup.isVisible()
+        return self._completed
 
 class QWidgetGroup(QObject):
     """
