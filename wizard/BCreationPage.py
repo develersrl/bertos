@@ -40,10 +40,12 @@ class BCreationPage(BWizardPage):
         self.connect(self.pageContent.createButton, SIGNAL("clicked(bool)"), self._createProject)
     
     def _createProject(self):
+        QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
         self._confirmGroup.setVisible(False)
         bertos_utils.createBertosProject(self.wizard().project())
         self._finalGroup.setVisible(True)
         self._completed = True
+        QApplication.restoreOverrideCursor()
         self.emit(SIGNAL("completeChanged()"))
     
     def isComplete(self):
