@@ -24,6 +24,9 @@ class BWizardPage(QWizardPage):
         layout.addWidget(self.pageContent)
         self.setLayout(layout)
     
+    def _exceptionOccurred(self, message):
+        QMessageBox.critical(self, self.tr("Error occurred"), message, QMessageBox.Ok, QMessageBox.NoButton)
+    
     def _settingsStore(self, key, value):
         QApplication.instance().settings.setValue(QString(key), value)
     
