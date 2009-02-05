@@ -39,16 +39,16 @@
 #ifndef CFG_STEPPER_H
 #define CFG_STEPPER_H
 
-/// Module logging level.
+/// Module logging level. $WIZARD = { "type" : "enum", "value_list" : "log_level" }
 #define STEPPER_LOG_LEVEL           LOG_LVL_INFO
 
-/// Module logging format.
+/// Module logging format. $WIZARD = { "type" : "enum", "value_list" : "log_format" }
 #define STEPPER_LOG_FORMAT          LOG_FMT_TERSE
 
-/// Max number of the stepper motor.
+/// Max number of the stepper motor. $WIZARD = { "type" : "int", "min" : "0" }
 #define CONFIG_NUM_STEPPER_MOTORS    6
 
-/// Max number of the timer usable on target to drive stepper motor.
+/// Max number of the timer usable on target to drive stepper motor. $WIZARD = { "type" : "int", "min" : "0" }
 #define CONFIG_TC_STEPPER_MAX_NUM    6
 
 #endif /* CFG_STEPPER_H */

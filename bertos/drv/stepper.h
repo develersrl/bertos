@@ -15,6 +15,11 @@
  * \author Simone Zinanni <s.zinanni@develer.com>
  * \author Daniele Basile <asterix@develer.com>
  *
+ * $WIZARD_MODULE = {
+ * "name" : "stepper",
+ * "depends" : ["timer", "ramp"],
+ * "configuration" : "bertos/cfg/cfg_stepper.h"
+ * }
  */
 
 #ifndef DRV_STEPPER_H
