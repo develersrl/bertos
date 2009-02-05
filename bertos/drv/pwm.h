@@ -36,6 +36,12 @@
  * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  * \author Daniele Basile <asterix@develer.com>
+ *
+ * $WIZARD_MODULE = {
+ * "name" : "pwm",
+ * "depends" : [],
+ * "configuration" : "bertos/cfg/cfg_pwm.h"
+ * }
  */
 
 #ifndef DRV_PWM_H

@@ -38,10 +38,18 @@
 #ifndef CFG_PWM_H
 #define CFG_PWM_H
 
-/// Module logging level.
+/**
+ * Module logging level.
+ *
+ * $WIZARD = { "type" : "enum", "value_list" : "log_level" }
+ */
 #define PWM_LOG_LEVEL      LOG_LVL_INFO
 
-/// Module logging format.
+/**
+ * Module logging format.
+ *
+ * $WIZARD = { "type" : "enum", "value_list" : "log_format" }
+ */
 #define PWM_LOG_FORMAT     LOG_FMT_VERBOSE
 
 #endif /* CFG_PWM_H */
