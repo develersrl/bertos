@@ -102,24 +102,28 @@ class BModulePage(BWizardPage):
                 ## int, long or undefined type property
                 spinBox = QSpinBox()
                 self.pageContent.propertyTable.setCellWidget(index, 1, spinBox)
+                if bertos_utils.isInt(configurations[property]):
+                    minimum = -32768
+                    maximmum = 32767
+                    suff = ""
+                elif bertos_utils.isLong(configurations[property]):
+                    minimum = -2147483648
+                    maximum = 2147483647
+                    suff = "L"
+                elif bertos_utils.isUnsigned(configurations[property]):
+                    minimum = 0
+                    maximum = 65535
+                    suff = "U"
+                elif bertos_utils.isUnsignedLong(configurations[property]):
+                    minimum = 0
+                    maximum = 4294967295
+                    suff = "UL"
                 if "min" in configurations[property]["informations"].keys():
                     minimum = int(configurations[property]["informations"]["min"])
-                else:
-                    minimum = -32768
-                spinBox.setMinimum(minimum)
                 if "max" in configurations[property]["informations"].keys():
                     maximum = int(configurations[property]["informations"]["max"])
-                else:
-                    maximum = 32767
-                spinBox.setMaximum(maximum)
-                if "unsigned" in configurations[property]["informations"].keys() and configurations[property]["informations"]["unsigned"]:
-                    suff = str(spinBox.suffix())
-                    suff += "U"
-                    spinBox.setSuffix(suff)
-                if "long" in configurations[property]["informations"].keys() and configurations[property]["informations"]["long"]:
-                    suff = str(spinBox.suffix())
-                    suff += "L"
-                    spinBox.setSuffix(suff)
+                spinBox.setRange(minimum, maximum)
+                spinBox.setSuffix(suff)
                 spinBox.setValue(int(configurations[property]["value"].replace("L", "").replace("U", "")))
                 self._controlGroup.addControl(index, spinBox)
     

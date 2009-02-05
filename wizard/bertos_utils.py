@@ -287,3 +287,39 @@ def sub(string, parameter, value):
     Substitute the given value at the given parameter define in the given string
     """
     return re.sub(r"(?P<define>#define\s+" + parameter + r"\s+)([^\s]+)", r"\g<define>" + value, string)
+
+def isInt(value):
+    """
+    Return True if the value is a simple int.
+    """
+    if "long" not in value["informations"].keys() and "unsigned" not in value["informations"].keys():
+        return True
+    else:
+        return False
+
+def isLong(value):
+    """
+    Return True if the value is a long.
+    """
+    if "long" not in value["informations"].keys() and value["informations"]["long"] and "unsigned" not in value["informations"].key():
+        return True
+    else:
+        return False
+
+def isUnsigned(value):
+    """
+    Return True if the value is an unsigned.
+    """
+    if "unsigned" not in value["informations"].keys() and value["informations"]["unsigned"] and "long" not in value["informations"].key():
+        return True
+    else:
+        return False
+
+def isUnsignedLong(value):
+    """
+    Return True if the value is an unsigned long.
+    """
+    if "unsigned" in value["informations"].keys() and "long" in value["informations"].keys() and value["informations"]["unsigned"] and value["informations"]["long"]:
+        return True
+    else:
+        return False
