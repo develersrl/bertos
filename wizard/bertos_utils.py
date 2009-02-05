@@ -55,6 +55,8 @@ def createBertosProject(projectInfos):
         string = open(sourcesDir + "/" + key, "r").read()
         for parameter, infos in value.items():
             value = infos["value"]
+            if "unsigned" in infos["informations"].keys() and infos["informations"]["unsigned"]:
+                value += "U"
             if "long" in infos["informations"].keys() and infos["informations"]["long"]:
                 value += "L"
             string = sub(string, parameter, value)

@@ -112,9 +112,15 @@ class BModulePage(BWizardPage):
                 else:
                     maximum = 32767
                 spinBox.setMaximum(maximum)
-                if "long" in configurations[property]["informations"].keys() and configurations[property]["informations"]["long"] == "True":
-                    spinBox.setSuffix("L")
-                spinBox.setValue(int(configurations[property]["value"].replace("L", "")))
+                if "unsigned" in configurations[property]["informations"].keys() and configurations[property]["informations"]["unsigned"]:
+                    suff = str(spinBox.suffix())
+                    suff += "U"
+                    spinBox.setSuffix(suff)
+                if "long" in configurations[property]["informations"].keys() and configurations[property]["informations"]["long"]:
+                    suff = str(spinBox.suffix())
+                    suff += "L"
+                    spinBox.setSuffix(suff)
+                spinBox.setValue(int(configurations[property]["value"].replace("L", "").replace("U", "")))
                 self._controlGroup.addControl(index, spinBox)
     
     def _currentModule(self):
