@@ -39,10 +39,16 @@
 #ifndef CFG_DATAFLASH_H
 #define CFG_DATAFLASH_H
 
-/// Module logging level definition.
+/**
+ * Module logging level.
+ * $WIZARD = { "type" : "enum", "value_list" : "log_level" }
+ */
 #define DATAFLASH_LOG_LEVEL      LOG_LVL_INFO
 
-/// Module logging format.
+/**
+ * Module logging format.
+ * $WIZARD = { "type" : "enum", "value_list" : "log_format" }
+ */
 #define DATAFLASH_LOG_FORMAT     LOG_FMT_TERSE
 
 #endif /* CFG_DATAFLASH_H */

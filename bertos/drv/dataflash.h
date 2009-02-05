@@ -35,6 +35,12 @@
  * \version $Id: dataflash.h 21658 2008-06-05 16:42:54Z asterix $
  *
  * \author Daniele Basile <asterix@develer.com>
+ *
+ * $WIZARD_MODULE = {
+ * "name" : "dataflash",
+ * "depends" : [kfile],
+ * "configuration" : "bertos/cfg/cfg_dataflash.h"
+ * }
  */
 
 
