@@ -100,15 +100,19 @@ class BModulePage(BWizardPage):
                 self._controlGroup.addControl(index, comboBox)
             else:
                 ## int, long or undefined type property
-                spinBox = QSpinBox()
+                spinBox = None
+                if bertos_utils.isLong(configurations[property]) or bertos_utils.isUnsignedLong(configurations[property]):
+                    spinBox = QDoubleSpinBox()
+                    spinBox.setDecimals(0)
+                else:
+                    spinBox = QSpinBox()
                 self.pageContent.propertyTable.setCellWidget(index, 1, spinBox)
-                if bertos_utils.isInt(configurations[property]):
-                    minimum = -32768
-                    maximmum = 32767
-                    suff = ""
-                elif bertos_utils.isLong(configurations[property]):
-                    minimum = -2147483648L
-                    maximum = 2147483647L
+                minimum = -32768
+                maximum = 32767
+                suff = ""
+                if bertos_utils.isLong(configurations[property]):
+                    minimum = -2147483648
+                    maximum = 2147483647
                     suff = "L"
                 elif bertos_utils.isUnsigned(configurations[property]):
                     minimum = 0
@@ -116,7 +120,7 @@ class BModulePage(BWizardPage):
                     suff = "U"
                 elif bertos_utils.isUnsignedLong(configurations[property]):
                     minimum = 0
-                    maximum = 4294967295L
+                    maximum = 4294967295
                     suff = "UL"
                 if "min" in configurations[property]["informations"].keys():
                     minimum = int(configurations[property]["informations"]["min"])
