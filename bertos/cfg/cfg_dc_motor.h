@@ -43,7 +43,7 @@
 /**
  * Number of the DC motors to mange.
  *
- * $WIZARD = { "type" : "enum" }
+ * $WIZARD = { "type" : "int", "min": "0" }
  */
 #define CONFIG_NUM_DC_MOTOR       1
 
