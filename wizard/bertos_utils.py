@@ -212,6 +212,12 @@ def loadConfigurationInfos(path):
             configurationInfos[name] = {}
             configurationInfos[name]["value"] = value
             configurationInfos[name]["informations"] = informations
+            if configurationInfos[name]["informations"]["type"] == "int" and configurationInfos[name]["value"].find("L") != -1:
+                configurationInfos[name]["informations"]["long"] = True
+                configurationInfos[name]["value"] = configurationInfos[name]["value"].replace("L", "")
+            if configurationInfos[name]["informations"]["type"] == "int" and configurationInfos[name]["value"].find("U") != -1:
+                configurationInfos[name]["informations"]["unsigned"] = True
+                configurationInfos[name]["value"] = configurationInfos[name]["value"].replace("U", "")
             configurationInfos[name]["description"] = description
         return configurationInfos
     except SyntaxError:
@@ -301,7 +307,7 @@ def isLong(value):
     """
     Return True if the value is a long.
     """
-    if "long" not in value["informations"].keys() and value["informations"]["long"] and "unsigned" not in value["informations"].key():
+    if "long" in value["informations"].keys() and value["informations"]["long"] and "unsigned" not in value["informations"].keys():
         return True
     else:
         return False
@@ -310,7 +316,7 @@ def isUnsigned(value):
     """
     Return True if the value is an unsigned.
     """
-    if "unsigned" not in value["informations"].keys() and value["informations"]["unsigned"] and "long" not in value["informations"].key():
+    if "unsigned" in value["informations"].keys() and value["informations"]["unsigned"] and "long" not in value["informations"].keys():
         return True
     else:
         return False
