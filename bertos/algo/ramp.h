@@ -44,6 +44,11 @@
  * for DSP56000 (but a portable C version of it can be easily written, see the
  * comments in the code).
  *
+ * $WIZARD_MODULE = {
+ * "name" : "ramp",
+ * "depends" : [],
+ * "configuration" : "bertos/cfg/cfg_ramp.h"
+ * }
  */
 
 #ifndef ALGO_RAMP_H
@@ -51,48 +56,9 @@
 
 #include "hw/hw_stepper.h"
 
+#include "cfg/cfg_ramp.h"
+
 #include <cfg/compiler.h>
-
-/**
- * Define whether the ramp will use floating point calculation within ramp_evaluate().
- * Otherwise, a less precise fixed point version will be used, which is faster on
- * platforms which do no support floating point operations.
- *
- * \note Floating point operations will be always done within ramp_compute() to
- * precalculate values, so there has to be at least a floating point emulation support.
- */
-#define RAMP_USE_FLOATING_POINT   0
-
-
-#if !RAMP_USE_FLOATING_POINT
-
-	/**
-	 * Number of least-significant bits which are stripped away during ramp evaluation.
-	 * This setting allows to specify larger ramps at the price of less precision.
-	 *
-	 * The maximum ramp size allowed is 2^(24 + RAMP_CLOCK_SHIFT_PRECISION), in clocks.
-	 * For instance, using RAMP_CLOCK_SHIFT_PRECISION 1, and a 8x prescaler, the maximum
-	 * length of a ramp is about 6.7 secs. Raising RAMP_CLOCK_SHIFT_PRECISION to 2
-	 * brings the maximum length to 13.4 secs, at the price of less precision.
-	 *
-	 * ramp_compute() will check that the length is below the maximum allowed through
-	 * a runtime assertion.
-	 *
-	 * \note This macro is used only for the fixed-point version of the ramp.
-	 */
-	#define RAMP_CLOCK_SHIFT_PRECISION 2
-#endif
-
-
-///< Negative pulse width for ramp
-#define RAMP_PULSE_WIDTH    50
-
-///< Default ramp
-#define RAMP_DEF_TIME       6000000 ///< microsecs
-#define RAMP_DEF_MAXFREQ       5000 ///< Hz
-#define RAMP_DEF_MINFREQ        200 ///< Hz
-#define RAMP_DEF_POWERRUN        10 ///< 10 deciampere (1 ampere)
-#define RAMP_DEF_POWERIDLE        1 ///< 1 deciampere
 
 
 /**
