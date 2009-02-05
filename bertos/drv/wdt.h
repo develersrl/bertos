@@ -35,13 +35,17 @@
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * \brief Watchdog interface
+ * $WIZARD_MODULE = {
+ * "name" : "wdt",
+ * "depends" : [],
+ * "configuration" : "bertos/cfg/cfg_wdt.h"
+ * }
  */
 
 #ifndef DRV_WDT_H
 #define DRV_WDT_H
 
 #include "cfg/cfg_wdt.h"
-#include "cfg/cfg_arch.h"
 
 #include <cfg/compiler.h> // INLINE
 
