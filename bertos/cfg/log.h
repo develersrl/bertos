@@ -113,24 +113,28 @@
  * but if choose a hight level you link only that have the priority egual or hight.
  * The priority level go from error (highest) to info (lowest) (see cfg/debug.h
  * for more detail).
- * \{
+ *
+ * $WIZARD_LIST = {
+ * "log_level" : ["LOG_LVL_NONE", "LOG_LVL_ERR", "LOG_LVL_WARN", "LOG_LVL_INFO"]
+ * }
  */
 #define LOG_LVL_NONE      0
 #define LOG_LVL_ERR       1
 #define LOG_LVL_WARN      2
 #define LOG_LVL_INFO      3
-/* \} */
 
 /**
  * \name Logging format
  *
  * There are two logging format: terse and verbose.  The latter prepends
  * function names and line number information to each log entry.
- * \{
+ *
+ * $WIZARD_LIST = {
+ * "log_format" : ["LOG_FMT_VERBOSE", "LOG_FMT_TERSE"]
+ * }
  */
 #define LOG_FMT_VERBOSE   1
 #define LOG_FMT_TERSE     0
-/* \} */
 
 #if LOG_FORMAT == LOG_FMT_VERBOSE
 	#define LOG_PRINT(str_level, str,...)    kprintf("%s():%d:%s: " str, __func__, __LINE__, str_level, ## __VA_ARGS__)
