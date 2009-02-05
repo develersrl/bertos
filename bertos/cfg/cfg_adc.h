@@ -41,12 +41,14 @@
 
 /**
  * Module logging level.
+ *
  * $WIZARD = { "type" : "enum", "value_list" : "log_level" }
  */
 #define ADC_LOG_LEVEL      LOG_LVL_INFO
 
 /**
  * Module logging format.
+ *
  * $WIZARD = { "type" : "enum", "value_list" : "log_format" }
  */
 #define ADC_LOG_FORMAT     LOG_FMT_VERBOSE
@@ -54,9 +56,7 @@
 /**
  * Frequency clock for ADC conversion.
  *
- * $WIZARD = {
- * "type" : "int"
- * }
+ * $WIZARD = { "type" : "int" }
  */
 #define CONFIG_ADC_CLOCK        4800000UL
 
