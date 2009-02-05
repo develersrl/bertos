@@ -79,7 +79,7 @@
  /*
   * Default ramp
   */
-#define RAMP_DEF_TIME     6000000UL ///< microsecs.                $WIZARD = { "type" : "int",  "long" : True, "unsigned" : True }
+#define RAMP_DEF_TIME     6000000UL ///< microsecs.                $WIZARD = { "type" : "int" }
 #define RAMP_DEF_MAXFREQ       5000 ///< Hz.                       $WIZARD = { "type" : "int", "min" : "0" }
 #define RAMP_DEF_MINFREQ        200 ///< Hz.                       $WIZARD = { "type" : "int", "min" : "0" }
 #define RAMP_DEF_POWERRUN        10 ///< 10 deciampere (1 ampere). $WIZARD = { "type" : "int", "min" : "0" }

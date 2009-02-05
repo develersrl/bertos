@@ -55,9 +55,7 @@
  * Frequency clock for ADC conversion.
  *
  * $WIZARD = {
- * "type" : "int",
- * "long" : True,
- * "unsigned" : True
+ * "type" : "int"
  * }
  */
 #define CONFIG_ADC_CLOCK        4800000UL
