@@ -38,7 +38,7 @@
  *
  * $WIZARD_MODULE = {
  * "name" : "dc_motor",
- * "depends" : [pwm, pid_control],
+ * "depends" : ["pwm", "pid_control"],
  * "configuration" : "bertos/cfg/cfg_dc_motor.h"
  * }
  */

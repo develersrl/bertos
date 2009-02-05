@@ -38,7 +38,7 @@
  *
  * $WIZARD_MODULE = {
  * "name" : "pid_controll",
- * "depends" : [timer],
+ * "depends" : ["timer"],
  * "configuration" : ""
  * }
  */

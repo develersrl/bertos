@@ -38,7 +38,7 @@
  *
  * $WIZARD_MODULE = {
  * "name" : "dataflash",
- * "depends" : [kfile],
+ * "depends" : ["kfile"],
  * "configuration" : "bertos/cfg/cfg_dataflash.h"
  * }
  */
