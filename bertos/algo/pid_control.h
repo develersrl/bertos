@@ -35,6 +35,12 @@
  * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
+ *
+ * $WIZARD_MODULE = {
+ * "name" : "pid_controll",
+ * "depends" : [timer],
+ * "configuration" : ""
+ * }
  */
 
 #ifndef ALGO_PID_CONTROL_H
