@@ -107,8 +107,8 @@ class BModulePage(BWizardPage):
                     maximmum = 32767
                     suff = ""
                 elif bertos_utils.isLong(configurations[property]):
-                    minimum = -2147483648
-                    maximum = 2147483647
+                    minimum = -2147483648L
+                    maximum = 2147483647L
                     suff = "L"
                 elif bertos_utils.isUnsigned(configurations[property]):
                     minimum = 0
@@ -116,7 +116,7 @@ class BModulePage(BWizardPage):
                     suff = "U"
                 elif bertos_utils.isUnsignedLong(configurations[property]):
                     minimum = 0
-                    maximum = 4294967295
+                    maximum = 4294967295L
                     suff = "UL"
                 if "min" in configurations[property]["informations"].keys():
                     minimum = int(configurations[property]["informations"]["min"])
