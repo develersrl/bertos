@@ -40,16 +40,21 @@
 #ifndef CFG_TIMER_H
 #define CFG_TIMER_H
 
-/// Hardware timer selection for drv/timer.c
+/**
+ *
+ * $WIZARD_LIST = { "timer_select" : ["TIMER_DEFAULT"] }
+ */
+
+/// Hardware timer selection for drv/timer.c. $WIZARD = { "type" : "enum", "value_list" : "timer_select" }
 #define CONFIG_TIMER TIMER_DEFAULT
 
-/// Debug timer interrupt using a strobe pin.
+/// Debug timer interrupt using a strobe pin. $WIZARD = { "type" : "boolean" }
 #define CONFIG_TIMER_STROBE  0
 
-/// Enable asynchronous timers
+/// Enable asynchronous timers. $WIZARD = { "type" : "boolean" }
 #define CONFIG_TIMER_EVENTS  1
 
-/// Support hi-res timer_usleep()
+/// Support hi-res timer_usleep(). $WIZARD = { "type" : "boolean" }
 #define CONFIG_TIMER_UDELAY  1
 
 #endif /* CFG_TIMER_H */
