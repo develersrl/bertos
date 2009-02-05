@@ -35,6 +35,12 @@
  * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
+ *
+ * $WIZARD_MODULE = {
+ * "name" : "dc_motor",
+ * "depends" : [pwm, pid_control],
+ * "configuration" : "bertos/cfg/cfg_dc_motor.h"
+ * }
  */
 
 #ifndef DRV_DC_MOTOR_H

@@ -40,7 +40,11 @@
 #ifndef CFG_DC_MOTOR_H
 #define CFG_DC_MOTOR_H
 
-//DC motor configuration
+/**
+ * Number of the DC motors to mange.
+ *
+ * $WIZARD = { "type" : "enum" }
+ */
 #define CONFIG_NUM_DC_MOTOR       1
 
 #endif /* CFG_DC_MOTOR_H */
