@@ -285,5 +285,4 @@ class QControlGroup(QObject):
         self._controls = {}
     
     def _stateChanged(self, id):
-        print id
         self.emit(SIGNAL("stateChanged"), id)
