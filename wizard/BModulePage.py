@@ -43,8 +43,9 @@ class BModulePage(BWizardPage):
             lists = bertos_utils.loadDefineListsDict(self._projectInfoRetrieve("SOURCES_PATH"))
             configurations = {}
             for module, informations in modules.items():
-                configurations[informations["configuration"]] = bertos_utils.loadConfigurationInfos(self._projectInfoRetrieve("SOURCES_PATH") +
-                                                                                                    "/" + informations["configuration"])
+                if len(informations["configuration"]) > 0:
+                    configurations[informations["configuration"]] = bertos_utils.loadConfigurationInfos(self._projectInfoRetrieve("SOURCES_PATH") +
+                                                                                                        "/" + informations["configuration"])
         except ModuleDefineException, e:
             self._exceptionOccurred(self.tr("Error parsing module information in file %1").arg(e.parameter))
         except EnumDefineException, e:
@@ -72,8 +73,11 @@ class BModulePage(BWizardPage):
         module = self._currentModule()
         self._controlGroup.clear()
         configuration = self._projectInfoRetrieve("MODULES")[module]["configuration"]
-        configurations = self._projectInfoRetrieve("CONFIGURATIONS")[configuration]
         self.pageContent.propertyTable.clear()
+        if len(configuration) == 0:
+            self.pageContent.propertyTable.setRowCount(0)
+            return
+        configurations = self._projectInfoRetrieve("CONFIGURATIONS")[configuration]
         self.pageContent.propertyTable.setRowCount(len(configurations))
         for index, property in enumerate(configurations):
             item = QTableWidgetItem(property)
@@ -188,7 +192,7 @@ class BModulePage(BWizardPage):
         configuration = self._projectInfoRetrieve("MODULES")[self._currentModule()]["configuration"]
         configurations = self._projectInfoRetrieve("CONFIGURATIONS")
         if "type" not in configurations[configuration][property]["informations"].keys() or configurations[configuration][property]["informations"]["type"] == "int":
-            configurations[configuration][property]["value"] = str(self.pageContent.propertyTable.cellWidget(index, 1).value())
+            configurations[configuration][property]["value"] = str(int(self.pageContent.propertyTable.cellWidget(index, 1).value()))
         elif configurations[configuration][property]["informations"]["type"] == "enum":
             configurations[configuration][property]["value"] = unicode(self.pageContent.propertyTable.cellWidget(index, 1).currentText())
         elif configurations[configuration][property]["informations"]["type"] == "boolean":
@@ -274,9 +278,12 @@ class QControlGroup(QObject):
             self.connect(control, SIGNAL("valueChanged(int)"), lambda: self._stateChanged(id))
         elif type(control) == QComboBox:
             self.connect(control, SIGNAL("currentIndexChanged(int)"), lambda: self._stateChanged(id))
+        elif type(control) == QDoubleSpinBox:
+            self.connect(control, SIGNAL("valueChanged(double)"), lambda: self._stateChanged(id))
     
     def clear(self):
         self._controls = {}
     
     def _stateChanged(self, id):
+        print id
         self.emit(SIGNAL("stateChanged"), id)
