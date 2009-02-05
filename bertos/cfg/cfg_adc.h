@@ -39,23 +39,61 @@
 #ifndef CFG_ADC_H
 #define CFG_ADC_H
 
-/// Module logging level.
+/**
+ * Module logging level.
+ * $WIZARD = { "type" : "enum", "value_list" : "log_level" }
+ */
 #define ADC_LOG_LEVEL      LOG_LVL_INFO
 
-/// Module logging format.
+/**
+ * Module logging format.
+ * $WIZARD = { "type" : "enum", "value_list" : "log_format" }
+ */
 #define ADC_LOG_FORMAT     LOG_FMT_VERBOSE
 
+/**
+ * Frequency clock for ADC conversion.
+ *
+ * $WIZARD = {
+ * "type" : "int",
+ * "long" : True,
+ * "unsigned" : True
+ * }
+ */
+#define CONFIG_ADC_CLOCK        4800000UL
 
-#define CONFIG_ADC_CLOCK        4800000UL   ///< Frequency clock for ADC conversion.
-#define CONFIG_ADC_STARTUP_TIME 20          ///< Minimum time for startup a conversion in micro second.
-#define CONFIG_ADC_SHTIME       834         ///< Minimum time for sample and hold in nano second
+/**
+ * Minimum time for startup a conversion in micro second.
+ *
+ * $WIZARD = { "type" : "int" }
+ */
+#define CONFIG_ADC_STARTUP_TIME 20
 
+/**
+ * Minimum time for sample and hold in nano second.
+ *
+ * $WIZARD = { "type" : "int" }
+ */
+#define CONFIG_ADC_SHTIME       834
 
-#define CONFIG_ADC_AVR_REF      1   ///< ADC setting for AVR target
-#define CONFIG_ADC_AVR_DIVISOR  2   ///< ADC setting for AVR target
+/**
+ * ADC setting for AVR target.
+ *
+ * $WIZARD = {"type" : "int" }
+ */
+#define CONFIG_ADC_AVR_REF      1
+/*
+ * ADC setting for AVR target.
+ *
+ * $WIZARD = {"type" : "int" }
+ */
+#define CONFIG_ADC_AVR_DIVISOR  2
 
-
-/// Enable ADS strobe.
+/**
+ * Enable ADS strobe.
+ *
+ * $WIZARD = {"type" : "boolean" }
+ */
 #define CONFIG_ADC_STROBE  0
 
 #endif /* CFG_ADC_H */
