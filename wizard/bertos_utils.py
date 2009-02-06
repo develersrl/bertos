@@ -212,10 +212,14 @@ def loadConfigurationInfos(path):
             configurationInfos[name] = {}
             configurationInfos[name]["value"] = value
             configurationInfos[name]["informations"] = informations
-            if configurationInfos[name]["informations"]["type"] == "int" and configurationInfos[name]["value"].find("L") != -1:
+            if ("type" in configurationInfos[name]["informations"].keys() and
+                    configurationInfos[name]["informations"]["type"] == "int" and
+                    configurationInfos[name]["value"].find("L") != -1):
                 configurationInfos[name]["informations"]["long"] = True
                 configurationInfos[name]["value"] = configurationInfos[name]["value"].replace("L", "")
-            if configurationInfos[name]["informations"]["type"] == "int" and configurationInfos[name]["value"].find("U") != -1:
+            if ("type" in configurationInfos[name]["informations"].keys() and
+                    configurationInfos[name]["informations"]["type"] == "int" and
+                    configurationInfos[name]["value"].find("U") != -1):
                 configurationInfos[name]["informations"]["unsigned"] = True
                 configurationInfos[name]["value"] = configurationInfos[name]["value"].replace("U", "")
             configurationInfos[name]["description"] = description
