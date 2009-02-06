@@ -30,7 +30,7 @@
  * -->
  *
  *
- * \brief Proportional, integral, derivative controller (PID controller) (interface)
+ * \brief Proportional, integral, derivative controller (PID controller).
  *
  * \version $Id$
  *

@@ -1,4 +1,3 @@
-
 /**
  * \file
  * <!--
@@ -6,13 +5,7 @@
  * All Rights Reserved.
  * -->
  *
- * \brief Compute, save and load ramps for stepper motors (interace)
- *
- * \version $Id$
- *
- * \author Simone Zinanni <s.zinanni@develer.com>
- * \author Giovanni Bajo <rasky@develer.com>
- * \author Daniele Basile <asterix@develer.com>
+ * \brief Compute, save and load ramps for stepper motors.
  *
  * The acceleration ramp is used to properly accelerate a stepper motor. The main
  * entry point is the function ramp_evaluate(), which must be called at every step
@@ -43,6 +36,12 @@
  * of the ramp evaluation are provided. The fixed point is hand-optimized assembly
  * for DSP56000 (but a portable C version of it can be easily written, see the
  * comments in the code).
+ *
+ * \version $Id$
+ *
+ * \author Simone Zinanni <s.zinanni@develer.com>
+ * \author Giovanni Bajo <rasky@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
  *
  * $WIZARD_MODULE = {
  * "name" : "ramp",
