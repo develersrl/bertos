@@ -32,11 +32,6 @@
  *
  * \brief Thermo-control driver.
  *
- * \version $Id$
- *
- * \author Giovanni Bajo <rasky@develer.com>
- * \author Francesco Sacchi <batt@develer.com>
- *
  * This module implements multiple thermo controls, which is the logic needed to try
  * keeping the temperature of a device constant. For this module, a "device" is a black box
  * whose temperature can be measured, and which has a mean to make it hotter or colder.
@@ -46,6 +41,11 @@
  * This module relies on a low-level driver to communicate with the device (implementation
  * of the black box). This low-level driver also controls the units in which the temperature
  * is expressed: thermo control treats it just as a number.
+ *
+ * \version $Id$
+ *
+ * \author Giovanni Bajo <rasky@develer.com>
+ * \author Francesco Sacchi <batt@develer.com>
  *
  * $WIZARD_MODULE = {
  * "name" : "thermo",

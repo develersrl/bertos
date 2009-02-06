@@ -32,7 +32,7 @@
  *
  * \version $Id$
  *
- * \brief ADC driver (interface)
+ * \brief Analog to Digital Converter driver (ADC).
  *
  * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
