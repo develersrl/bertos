@@ -47,9 +47,9 @@
 #define ADC_LOG_LEVEL      LOG_LVL_INFO
 
 /**
- * Module logging format.
+ * module logging format.
  *
- * $WIZARD = { "type" : "enum", "value_list" : "log_format" }
+ * $wizard = { "type" : "enum", "value_list" : "log_format" }
  */
 #define ADC_LOG_FORMAT     LOG_FMT_VERBOSE
 
