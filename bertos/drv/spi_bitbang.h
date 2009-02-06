@@ -37,6 +37,12 @@
  *
  * \author Francesco Sacchi <batt@develer.com>
  * \author Daniele Basile <asterix@develer.com>
+ *
+ * $WIZARD_MODULE = {
+ * "name" : "spi_bitbang",
+ * "depends" : [],
+ * "configuration" : "bertos/cfg/cfg_spi_bitbang.h"
+ * }
  */
 
 
@@ -49,11 +55,13 @@
 
 /**
  * Define send and receive order bit.
- * \{
+ *
+ * $WIZARD_LIST = {
+ * "ordet_bit_list" : ["SPI_LSB_FIRST", "SPI_MSB_FIRST"]
+ * }
  */
 #define SPI_LSB_FIRST 1
 #define SPI_MSB_FIRST 2
-/* \} */
 
 #if CONFIG_SPI_DATAORDER == SPI_LSB_FIRST
 	#define  SPI_DATAORDER_START    1

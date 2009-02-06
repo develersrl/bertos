@@ -40,8 +40,15 @@
 #ifndef CFG_SPI_BITBANG_H
 #define CFG_SPI_BITBANG_H
 
-/// Set data order for emulated SPI
-#define CONFIG_SPI_DATAORDER      1
+/**
+ * Set data order for emulated SPI.
+ *
+ * $WIZARD = {
+ * "type" : "enum",
+ * "value_list" : "ordet_bit_list"
+ * }
+ */
+#define CONFIG_SPI_DATAORDER  SPI_LSB_FIRST
 
 #endif /* CFG_SPI_BITBANG_H */
 
