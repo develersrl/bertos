@@ -164,7 +164,6 @@ class BModulePage(BWizardPage):
     
     def _resetPropertyDescription(self):
         for index in range(self.pageContent.propertyTable.rowCount()):
-            print index
             propertyName = qvariant_converter.getString(self.pageContent.propertyTable.item(index, 0).data(Qt.UserRole))
             self.pageContent.propertyTable.item(index, 0).setText(propertyName)
     
