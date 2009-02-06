@@ -205,13 +205,6 @@
 	/** Enable second serial port in emulator. */
 	#define CONFIG_EMUL_UART1        0
 
-	/**
-	 * Transmit always something on serial port 0 TX
-	 * to avoid interference when sending burst of data,
-	 * using AVR multiprocessor serial mode
-	 */
-	#define CONFIG_SER_TXFILL        0
-
 	#define CONFIG_SER_STROBE        0
 /*\}*/
 
