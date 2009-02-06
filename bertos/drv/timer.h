@@ -30,7 +30,7 @@
  * Copyright 2000, 2008 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
- * \brief Hardware independent timer driver (interface)
+ * \brief Hardware independent timer driver.
  *
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>

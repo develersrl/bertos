@@ -31,7 +31,7 @@
  *
  * \version $Id$
  *
- * \brief PWM driver (interface)
+ * \brief Pulse Width Modulation (PWM) driver.
  *
  * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>

@@ -30,7 +30,7 @@
  *
  * -->
  *
- * \brief Function library for dataflash AT45DB family (interface).
+ * \brief Function library for dataflash AT45DB family.
  *
  * \version $Id: dataflash.h 21658 2008-06-05 16:42:54Z asterix $
  *
