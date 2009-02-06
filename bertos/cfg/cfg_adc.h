@@ -49,7 +49,7 @@
 /**
  * module logging format.
  *
- * $wizard = { "type" : "enum", "value_list" : "log_format" }
+ * $WIZARD = { "type" : "enum", "value_list" : "log_format" }
  */
 #define ADC_LOG_FORMAT     LOG_FMT_VERBOSE
 
