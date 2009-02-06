@@ -30,19 +30,25 @@
  * All Rights Reserved.
  * -->
  *
- * \brief Driver for the 24xx16 and 24xx256 I2C EEPROMS (interface)
+ * \brief Driver for the 24xx16 and 24xx256 I2C EEPROMS.
  *
  * \version $Id$
  *
  * \author Stefano Fedrigo <aleph@develer.com>
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
+ * $WIZARD_MODULE = {
+ * "name" : "eeprom",
+ * "depends" : ["kfile"],
+ * "configuration" : ""
+ * }
  */
 
 #ifndef DRV_EEPROM_H
 #define DRV_EEPROM_H
 
 #include <cfg/compiler.h>
+
 #include <kern/kfile.h>
 
 
