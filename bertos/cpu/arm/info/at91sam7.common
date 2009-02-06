@@ -43,6 +43,7 @@
 # Import the common settings for the path.
 include("../../path.common")
 
+# Short description of the cpu.
 CPU_DESC = ["ATMEL AT91 ARM",
 	  "ARMTDMI ARM Thumb Processor",
 	  "32-bit RISC Architecture"]
