@@ -35,6 +35,7 @@
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * \brief Watchdog interface
+ *
  * $WIZARD_MODULE = {
  * "name" : "wdt",
  * "depends" : [],

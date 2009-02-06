@@ -37,7 +37,7 @@
  * \author Daniele Basile <asterix@develer.com>
  *
  * $WIZARD_MODULE = {
- * "name" : "pid_controll",
+ * "name" : "pid_control",
  * "depends" : ["timer"],
  * "configuration" : ""
  * }
