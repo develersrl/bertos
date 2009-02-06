@@ -37,5 +37,9 @@
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
+#ifndef RAND_H
+#define RAND_H
+
 int rand(void);
 
+#endif
