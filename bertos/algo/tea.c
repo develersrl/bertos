@@ -64,19 +64,6 @@
  * 1/2 ~ 0.618034 multiplied by 2^32).
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.2  2007/09/19 16:23:27  batt
- *#* Fix doxygen warnings.
- *#*
- *#* Revision 1.1  2007/06/07 09:13:40  batt
- *#* Add TEA enc/decryption algorithm.
- *#*
- *#* Revision 1.1  2007/01/10 17:30:10  batt
- *#* Add cryptographic routines.
- *#*
- *#*/
-
 #include "tea.h"
 #include <cpu/byteorder.h>
 
