@@ -35,7 +35,7 @@
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
- * \brief Buzzer driver
+ * \brief Buzzer driver.
  *
  * $WIZARD = {
  * "name" : "buzzer"
