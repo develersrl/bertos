@@ -41,6 +41,12 @@
  *
  * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
+ *
+ * $WIZARD_MODULE = {
+ * "name" : "md2",
+ * "depends" : [],
+ * "configuration" : "bertos/cfg/cfg_md2.h"
+ * }
  */
 
 #ifndef ALGO_MD2_H
@@ -49,7 +55,7 @@
 #include "cfg/cfg_md2.h"
 #include <cfg/compiler.h>
 
-#define NUM_COMPUTE_ROUNDS 18                        ///< Number of compute rounds.
+#define NUM_COMPUTE_ROUNDS 18                           ///< Number of compute rounds.
 #define COMPUTE_ARRAY_LEN  CONFIG_MD2_BLOCK_LEN * 3     ///< Lenght of compute array.
 #define MD2_DIGEST_LEN CONFIG_MD2_BLOCK_LEN
 /**

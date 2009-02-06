@@ -31,10 +31,16 @@
  *
  * -->
  *
+ * \brief General-purpose run-length {en,de}coding algorithm.
+ *
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
- * \brief General-purpose run-length {en,de}coding algorithm (interface)
+ * $WIZARD_MODULE = {
+ * "name" : "rle",
+ * "depends" : [],
+ * "configuration" : ""
+ * }
  */
 #ifndef RLE_H
 #define RLE_H

@@ -30,13 +30,19 @@
  *
  * -->
  *
- * \brief TEA Tiny Encription Algorith functions (interface).
+ * \brief TEA Tiny Encription Algorith functions.
+ *
+ * Documentation for TEA is available at
+ * http://www.cl.cam.ac.uk/ftp/users/djw3/tea.ps.
  *
  * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  *
- * Documentation for TEA is available at
- * http://www.cl.cam.ac.uk/ftp/users/djw3/tea.ps.
+ * $WIZARD_MODULE = {
+ * "name" : "tea",
+ * "depends" : [],
+ * "configuration" : ""
+ * }
  */
 
 #ifndef ALGO_TEA_H

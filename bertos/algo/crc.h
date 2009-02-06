@@ -31,7 +31,7 @@
  *
  * -->
  *
- * \brief XModem-CRC16 algorithm (interface)
+ * \brief Cyclic Redundancy Check 16 (CRC).
  *
  * \note This algorithm is incompatible with the CCITT-CRC16.
  *
@@ -45,6 +45,12 @@
  *
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
+ *
+ * $WIZARD_MODULE = {
+ * "name" : "crc16",
+ * "depends" : [],
+ * "configuration" : ""
+ * }
  */
 
 #ifndef ALGO_CRC_H
