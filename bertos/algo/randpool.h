@@ -30,11 +30,17 @@
  *
  * -->
  *
- * \brief API function for to manage entropy pool.
+ * \brief Collection of functions to manage entropy pool.
  *
  *
  * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
+ *
+ * $WIZARD_MODULE = {
+ * "name" : "randpool",
+ * "depends" : ["timer"],
+ * "configuration" : "bertos/cfg/cfg_randpool.h"
+ * }
  */
 
 #ifndef ALGO_RANDPOOL_H

@@ -41,10 +41,10 @@
 #define CFG_RANDPOOL_H
 
 
-/// Define a size, in byte, of entropy pool.
+/// Define a size, in byte, of entropy pool. $WIZARD = { "type" : "int", "min" : "0" }
 #define CONFIG_SIZE_ENTROPY_POOL   64
 
-/// Turn on or off timer support in Randpool.
+/// Turn on or off timer support in Randpool. $WIZARD = { "type" : "boolean" }
 #define CONFIG_RANDPOOL_TIMER       1
 
 #endif /* CFG_RANDPOOL_H */
