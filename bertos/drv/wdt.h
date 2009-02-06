@@ -34,7 +34,7 @@
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
- * \brief Watchdog interface
+ * \brief Watchdog module, supplies a simple API to manage wdt on supported target.
  *
  * $WIZARD_MODULE = {
  * "name" : "wdt",
