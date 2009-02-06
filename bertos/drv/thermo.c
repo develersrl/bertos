@@ -41,6 +41,8 @@
 #include "hw/thermo_map.h"
 #include "hw/hw_thermo.h"
 
+#include "cfg/cfg_thermo.h"
+
 #include <cfg/module.h>
 #include <cfg/macros.h>
 #include <cfg/debug.h>
@@ -51,11 +53,6 @@
 
 
 
-/** Interval at which thermo control is performed. */
-#define THERMO_INTERVAL_MS      100
-
-/** Number of different samples we interpolate over to get the hifi temperature. */
-#define THERMO_HIFI_NUM_SAMPLES 10
 
 /** Timer for thermo-regulation. */
 static Timer thermo_timer;

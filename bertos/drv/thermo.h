@@ -26,11 +26,11 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2004, 2005 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2004, 2005, 2009 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
- * \brief Thermo-control driver
+ * \brief Thermo-control driver.
  *
  * \version $Id$
  *
@@ -47,6 +47,11 @@
  * of the black box). This low-level driver also controls the units in which the temperature
  * is expressed: thermo control treats it just as a number.
  *
+ * $WIZARD_MODULE = {
+ * "name" : "thermo",
+ * "depends" : ["timer", "ntc"],
+ * "configuration" : "bertos/cfg/cfg_thermo.h"
+ * }
  */
 
 #ifndef DRV_THERMO_H
