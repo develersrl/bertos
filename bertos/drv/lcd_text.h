@@ -37,33 +37,6 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.3  2006/07/19 12:56:26  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.2  2006/02/23 10:59:14  bernie
- *#* Documentation fixes.
- *#*
- *#* Revision 1.1  2005/11/04 18:00:42  bernie
- *#* Import into DevLib.
- *#*
- *#* Revision 1.5  2005/06/14 14:43:43  bernie
- *#* Add DevLib headers.
- *#*
- *#* Revision 1.4  2005/06/06 17:41:57  batt
- *#* Add lcd_layerSet function.
- *#*
- *#* Revision 1.3  2005/06/01 10:36:23  batt
- *#* Layer: Rename member variables and Doxygenize.
- *#*
- *#* Revision 1.2  2005/05/26 08:31:23  batt
- *#* Add layer hiding/showing.
- *#*
- *#* Revision 1.1  2005/05/24 09:17:58  batt
- *#* Move drivers to top-level.
- *#*/
-
 #ifndef DRV_LCD_H
 #define DRV_LCD_H
 

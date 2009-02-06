@@ -38,13 +38,6 @@
  * \brief Custom Qt widget for emulating a graphics LCD display (implementation)
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.1  2006/01/16 03:51:35  bernie
- *#* Add LCD Qt emulator.
- *#*
- *#*/
-
 #ifndef EMULLCD_H
 #define EMULLCD_H
 
