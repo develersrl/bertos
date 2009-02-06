@@ -50,11 +50,11 @@
  * Then, at the end of your module_test you can write:
  * \code
  * #if UNIT_TEST
- * 	#include <whatuneed.h>
- * 	#include <whatuneed.c>
- * 	#include <...>
+ *	#include <whatuneed.h>
+ *	#include <whatuneed.c>
+ *	#include <...>
  *
- * 	TEST_MAIN(module);
+ *	TEST_MAIN(module);
  * #endif
  * \endcode
  *
