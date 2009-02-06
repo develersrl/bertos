@@ -26,62 +26,23 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
+ *
  * -->
  *
- * \version $Id$
- *
- * \brief Phase control driver, to manage triac swicth.
+ * \brief Configuration file for phase module.
  *
  * \version $Id$
- * \author Francesco Sacchi <batt@develer.com>
- *
- * $WIZARD_MODULE = {
- * "name" : "phase",
- * "depends" : ["timer"],
- * "configuration" : "bertos/cfg/cfg_phase.h"
- * }
+ * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef DRV_PHASE_H
-#define DRV_PHASE_H
+#ifndef CFG_PHASE_H
+#define CFG_PHASE_H
 
-#include "hw/phase_map.h"
+/// Max value of the duty cycle on triac. $WIZARD = { "type" : "int" }
+#define TRIAC_MAX_DUTY  100
 
-#include "cfg/cfg_phase.h"
+/// Max value of the triac power. $WIZARD = { "type" : "int" }
+#define TRIAC_MAX_POWER 100
 
-#include <drv/timer.h>
-
-#define TRIAC_POWER_K   TRIAC_MAX_DUTY * (1 / sqrt(2 * TRIAC_MAX_POWER))
-
-/**
- * \name Types for duty and power.
- * \{
- */
-typedef uint16_t triac_duty_t;
-typedef uint16_t triac_power_t;
-/* \} */
-
-
-DB(extern bool phase_initialized;)
-
-/**
- * \name Type for triac control.
- * \{
- */
-typedef struct Triac
-{
-	Timer  timer;      /**< Timer for phase control. */
-	triac_duty_t duty; /**< Duty cycle of the channel. */
-	bool   running;    /**< True when the timer is active. */
-} Triac;
-/* \} */
-
-void phase_setDutyUnlock(TriacDev dev, triac_duty_t duty);
-void phase_setDuty(TriacDev dev, triac_duty_t duty);
-void phase_setPower(TriacDev dev, triac_power_t power);
-
-void phase_init(void);
-
-
-#endif /* DRV_PHASE_H */
+#endif /* CFG_PHASE_H */
