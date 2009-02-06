@@ -73,10 +73,13 @@ class BModulePage(BWizardPage):
         module = self._currentModule()
         self._controlGroup.clear()
         configuration = self._projectInfoRetrieve("MODULES")[module]["configuration"]
+        moduleDescription = self._projectInfoRetrieve("MODULES")[module]["description"]
+        self.pageContent.moduleLabel.setText(moduleDescription)
+        self.pageContent.moduleLabel.setVisible(True)
         self.pageContent.propertyTable.clear()
         if len(configuration) > 0:
             configurations = self._projectInfoRetrieve("CONFIGURATIONS")[configuration]
-            self.pageContent.propertyTable.setRowCount(len(configurations))
+            self.pageContent.propertyTable.setRowCount(len(configurations) + 1)
             for index, property in enumerate(configurations):
                 item = QTableWidgetItem(property)
                 item.setData(Qt.UserRole, qvariant_converter.convertString(property))
@@ -181,6 +184,7 @@ class BModulePage(BWizardPage):
         self.pageContent.propertyTable.verticalHeader().setVisible(False)
         self.pageContent.propertyTable.setColumnCount(2)
         self.pageContent.propertyTable.setRowCount(0)
+        self.pageContent.moduleLabel.setVisible(False)
     
     def _connectSignals(self):
         self.connect(self.pageContent.moduleTable, SIGNAL("itemSelectionChanged()"), self._fillPropertyTable)

@@ -247,6 +247,11 @@ def loadModuleInfos(path):
                                                         "configuration": WIZARD_MODULE["configuration"],
                                                         "description": "",
                                                         "enabled": False}
+                index = comment.find("\\brief")
+                if index != -1:
+                    description = comment[index + 7:]
+                    description = description[:description.find(" * ")]
+                    moduleInfos[WIZARD_MODULE["name"]]["description"] = description
                 return moduleInfos
         return {}
     except SyntaxError:
