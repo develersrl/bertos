@@ -34,6 +34,12 @@
  *
  * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
+ *
+ * $WIZARD_MODULE = {
+ * "name" : "i2c",
+ * "depends" : [],
+ * "configuration" : "bertos/cfg/cfg_i2c.h"
+ * }
  */
 #ifndef DRV_I2C_H
 #define DRV_I2C_H
@@ -49,11 +55,13 @@
  * i2c driver or you don't want, for some reason, to
  * use that.
  * With this you can choose, at compile time, which backend to use.
- * \{
+ *
+ * $WIZARD_LIST = {
+ * "i2c_backend" : ["I2C_BACKEND_BUILTIN", "I2C_BACKEND_BITBANG"]
+ * }
  */
 #define I2C_BACKEND_BUILTIN 0 ///< Uses cpu builtin i2c driver
 #define I2C_BACKEND_BITBANG 1 ///< Uses emulated bitbang driver
-/*\}*/
 
 
 /**
