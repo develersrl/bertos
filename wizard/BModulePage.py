@@ -79,7 +79,7 @@ class BModulePage(BWizardPage):
         self.pageContent.propertyTable.clear()
         if len(configuration) > 0:
             configurations = self._projectInfoRetrieve("CONFIGURATIONS")[configuration]
-            self.pageContent.propertyTable.setRowCount(len(configurations) + 1)
+            self.pageContent.propertyTable.setRowCount(len(configurations))
             for index, property in enumerate(configurations):
                 item = QTableWidgetItem(property)
                 item.setData(Qt.UserRole, qvariant_converter.convertString(property))
@@ -159,6 +159,7 @@ class BModulePage(BWizardPage):
     
     def _resetPropertyDescription(self):
         for index in range(self.pageContent.propertyTable.rowCount()):
+            print index
             propertyName = qvariant_converter.getString(self.pageContent.propertyTable.item(index, 0).data(Qt.UserRole))
             self.pageContent.propertyTable.item(index, 0).setText(propertyName)
     
