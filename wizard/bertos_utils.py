@@ -299,38 +299,38 @@ def sub(string, parameter, value):
     """
     return re.sub(r"(?P<define>#define\s+" + parameter + r"\s+)([^\s]+)", r"\g<define>" + value, string)
 
-def isInt(value):
+def isInt(informations):
     """
     Return True if the value is a simple int.
     """
-    if "long" not in value["informations"].keys() and "unsigned" not in value["informations"].keys():
+    if ("long" not in informatios.keys() or not informations["long"]) and ("unsigned" not in informations.keys() or informations["unsigned"]):
         return True
     else:
         return False
 
-def isLong(value):
+def isLong(informations):
     """
     Return True if the value is a long.
     """
-    if "long" in value["informations"].keys() and value["informations"]["long"] and "unsigned" not in value["informations"].keys():
+    if "long" in informations.keys() and informations["long"] and "unsigned" not in informations.keys():
         return True
     else:
         return False
 
-def isUnsigned(value):
+def isUnsigned(informations):
     """
     Return True if the value is an unsigned.
     """
-    if "unsigned" in value["informations"].keys() and value["informations"]["unsigned"] and "long" not in value["informations"].keys():
+    if "unsigned" in informations.keys() and informations["unsigned"] and "long" not in informations.keys():
         return True
     else:
         return False
 
-def isUnsignedLong(value):
+def isUnsignedLong(informations):
     """
     Return True if the value is an unsigned long.
     """
-    if "unsigned" in value["informations"].keys() and "long" in value["informations"].keys() and value["informations"]["unsigned"] and value["informations"]["long"]:
+    if "unsigned" in informations.keys() and "long" in informations.keys() and informations["unsigned"] and informations["long"]:
         return True
     else:
         return False

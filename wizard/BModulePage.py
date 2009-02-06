@@ -86,58 +86,71 @@ class BModulePage(BWizardPage):
                     item.setData(Qt.UserRole, qvariant_converter.convertString(property))
                     self.pageContent.propertyTable.setItem(index, 0, item)
                     if "type" in configurations[property]["informations"].keys() and configurations[property]["informations"]["type"] == "boolean":
-                        ## boolean property
-                        checkBox = QCheckBox()
-                        self.pageContent.propertyTable.setCellWidget(index, 1, checkBox)
-                        if configurations[property]["value"] == "1":
-                            checkBox.setChecked(True)
-                        else:
-                            checkBox.setChecked(False)
-                        self._controlGroup.addControl(index, checkBox)
+                        self._insertCheckBox(index, configurations[property]["value"])
                     elif "type" in configurations[property]["informations"].keys() and configurations[property]["informations"]["type"] == "enum":
-                        ## enum property
-                        comboBox = QComboBox()
-                        self.pageContent.propertyTable.setCellWidget(index, 1, comboBox)
-                        enum = self._projectInfoRetrieve("LISTS")[configurations[property]["informations"]["value_list"]]
-                        for i, element in enumerate(enum):
-                            comboBox.addItem(element)
-                            if element == configurations[property]["value"]:
-                                comboBox.setCurrentIndex(i)
-                        self._controlGroup.addControl(index, comboBox)
+                        self._insertComboBox(index, configurations[property]["value"], configurations[property]["informations"]["value_list"])
+                    elif "type" in configurations[property]["informations"] and configurations[property]["informations"]["type"] == "int":
+                        self._insertSpinBox(index, configurations[property]["value"], configurations[property]["informations"])
                     else:
-                        ## int, long or undefined type property
-                        spinBox = None
-                        if bertos_utils.isLong(configurations[property]) or bertos_utils.isUnsignedLong(configurations[property]):
-                            spinBox = QDoubleSpinBox()
-                            spinBox.setDecimals(0)
-                        else:
-                            spinBox = QSpinBox()
-                        self.pageContent.propertyTable.setCellWidget(index, 1, spinBox)
-                        minimum = -32768
-                        maximum = 32767
-                        suff = ""
-                        if bertos_utils.isLong(configurations[property]):
-                            minimum = -2147483648
-                            maximum = 2147483647
-                            suff = "L"
-                        elif bertos_utils.isUnsigned(configurations[property]):
-                            minimum = 0
-                            maximum = 65535
-                            suff = "U"
-                        elif bertos_utils.isUnsignedLong(configurations[property]):
-                            minimum = 0
-                            maximum = 4294967295
-                            suff = "UL"
-                        if "min" in configurations[property]["informations"].keys():
-                            minimum = int(configurations[property]["informations"]["min"])
-                        if "max" in configurations[property]["informations"].keys():
-                            maximum = int(configurations[property]["informations"]["max"])
-                        spinBox.setRange(minimum, maximum)
-                        spinBox.setSuffix(suff)
-                        spinBox.setValue(int(configurations[property]["value"].replace("L", "").replace("U", "")))
-                        self._controlGroup.addControl(index, spinBox)
+                        # Not defined type, rendered as a text field
+                        self.pageContent.propertyTable.setItem(index, 1, QTableWidgetItem(property))
             else:
                 self.pageContent.propertyTable.setRowCount(0)
+    
+    def _insertCheckBox(self, index, value):
+        ## boolean property
+        checkBox = QCheckBox()
+        self.pageContent.propertyTable.setCellWidget(index, 1, checkBox)
+        if value == "1":
+            checkBox.setChecked(True)
+        else:
+            checkBox.setChecked(False)
+        self._controlGroup.addControl(index, checkBox)
+    
+    def _insertComboBox(self, index, value, value_list):
+        ## enum property
+        comboBox = QComboBox()
+        self.pageContent.propertyTable.setCellWidget(index, 1, comboBox)
+        enum = self._projectInfoRetrieve("LISTS")[value_list]
+        for i, element in enumerate(enum):
+            comboBox.addItem(element)
+            if element == value:
+                comboBox.setCurrentIndex(i)
+        self._controlGroup.addControl(index, comboBox)
+    
+    def _insertSpinBox(self, index, value, informations):
+        ## int, long or undefined type property
+        spinBox = None
+        if bertos_utils.isLong(informations) or bertos_utils.isUnsignedLong(informations):
+            spinBox = QDoubleSpinBox()
+            spinBox.setDecimals(0)
+        else:
+            spinBox = QSpinBox()
+        self.pageContent.propertyTable.setCellWidget(index, 1, spinBox)
+        minimum = -32768
+        maximum = 32767
+        suff = ""
+        if bertos_utils.isLong(informations):
+            minimum = -2147483648
+            maximum = 2147483647
+            suff = "L"
+        elif bertos_utils.isUnsigned(informations):
+            minimum = 0
+            maximum = 65535
+            suff = "U"
+        elif bertos_utils.isUnsignedLong(informations):
+            minimum = 0
+            maximum = 4294967295
+            suff = "UL"
+        if "min" in informations.keys():
+            minimum = int(informations["min"])
+        if "max" in informations.keys():
+            maximum = int(informations["max"])
+        spinBox.setRange(minimum, maximum)
+        spinBox.setSuffix(suff)
+        spinBox.setValue(int(value.replace("L", "").replace("U", "")))
+        self._controlGroup.addControl(index, spinBox)
+        
     
     def _currentModule(self):
         currentModule = self.pageContent.moduleTable.item(self.pageContent.moduleTable.currentRow(), 1)
