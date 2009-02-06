@@ -40,6 +40,13 @@
 #ifndef CFG_FLASH25_H
 #define CFG_FLASH25_H
 
+/**
+ *
+ * $WIZARD = {
+ * "type" : "enum",
+ * "value_list" : "flash25_list"
+ * }
+ */
 /// Eeprom memory type.
 #define CONFIG_FLASH25 FLASH25_AT25F2048
 

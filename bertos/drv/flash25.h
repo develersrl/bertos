@@ -35,14 +35,20 @@
  *
  * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
+ *
+ * $wizard_module = {
+ * "name" : "flash25",
+ * "depends" : ["kfile"],
+ * "configuration" : "bertos/cfg/cfg_flash25.h"
+ * }
  */
 
 
 #ifndef DRV_FLASH25_H
 #define DRV_FLASH25_H
 
-#include <cfg/compiler.h>
 #include "cfg/cfg_flash25.h"
+#include <cfg/compiler.h>
 
 #include <kern/kfile.h>
 
@@ -83,7 +89,10 @@ INLINE Flash25 * FLASH25_CAST(KFile *fd)
  * \note Below are defined valid serial flash memory support to
  * this drive. Every time we call flash25_init() function we check
  * if memory defined are right (see flash25.c form more detail).
- * \{
+ *
+ * $WIZARD_LIST = {
+ * "flash25_list" : ["FLASH25_AT25F2048"]
+ * }
  */
 #define FLASH25_AT25F2048         1
 
@@ -100,7 +109,6 @@ INLINE Flash25 * FLASH25_CAST(KFile *fd)
 #endif
 
 #define RDY_BIT     0x1 // Statuts of write cycle
-/* \} */
 
 /**
  * Serial flash opcode commands.
