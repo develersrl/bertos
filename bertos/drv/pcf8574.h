@@ -37,7 +37,7 @@
  *
  * $WIZARD_MODULE = {
  * "name" : "pcf8574",
- * "depends" : [],
+ * "depends" : ["i2c"],
  * "configuration" : ""
  * }
  */
