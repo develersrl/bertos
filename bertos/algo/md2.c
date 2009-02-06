@@ -46,46 +46,6 @@
  * \author Daniele Basile <asterix@develer.com>
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.17  2007/06/07 16:06:39  batt
- *#* Fix some doxygen errors.
- *#*
- *#* Revision 1.16  2007/02/15 13:29:49  asterix
- *#* Add MD2_DIGEST_LEN macro.
- *#*
- *#* Revision 1.15  2007/02/06 15:53:34  asterix
- *#* Add ROTR macro in m2d_perm, add comments, typos.
- *#*
- *#* Revision 1.13  2007/02/05 18:44:42  asterix
- *#* Add md2_perm function.
- *#*
- *#* Revision 1.12  2007/02/05 16:52:44  asterix
- *#* Add define for harvard architecture.
- *#*
- *#* Revision 1.11  2007/02/02 18:15:31  asterix
- *#* Add function MD2_test. Fix bug in md2_update function.
- *#*
- *#* Revision 1.9  2007/02/02 13:10:01  asterix
- *#* Fix some bugs in md2_pad and md2_update fuction.
- *#*
- *#* Revision 1.8  2007/02/01 14:45:56  asterix
- *#* Rewrite md2_update function and fix some bug.
- *#*
- *#* Revision 1.7  2007/01/31 18:04:15  asterix
- *#* Write md2_end function
- *#*
- *#* Revision 1.4  2007/01/31 13:51:57  asterix
- *#* Write md2_compute function.
- *#*
- *#* Revision 1.2  2007/01/30 17:31:44  asterix
- *#* Add function prototypes.
- *#*
- *#* Revision 1.1  2007/01/30 15:53:26  batt
- *#* Add first md2 skel.
- *#*
- *#*/
-
 #include "md2.h"
 
 #include <string.h>           //memset(), memcpy();
