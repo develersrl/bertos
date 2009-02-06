@@ -35,6 +35,12 @@
  *
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
+ *
+ * $WIZARD_MODULE = {
+ * "name" : "ser",
+ * "depends" : ["kfile", "timer"],
+ * "configuration" : "bertos/cfg/cfg_ser.h"
+ * }
  */
 
 #ifndef DRV_SER_H
@@ -92,11 +98,13 @@
 
 /**
  * \name LSB or MSB first data order for SPI driver.
- * \{
+ *
+ * $WIZARD_LIST = {
+ * "ser_order_bit" : ["SER_MSB_FIRST", "SER_LSB_FIRST"]
+ * }
  */
 #define SER_MSB_FIRST 0
 #define SER_LSB_FIRST 1
-/*\}*/
 
 /**
  * \name Parity settings for ser_setparity().

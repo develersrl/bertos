@@ -61,6 +61,26 @@ typedef uint8_t serstatus_t;
 
 
 /**
+ * SPI clock polarity.
+ *
+ * $WIZARD_LIST = {
+ * "ser_spi_pol" : ["SPI_NORMAL_LOW", "SPI_NORMAL_HIGH"]
+ * }
+ */
+#define SPI_NORMAL_LOW      0
+#define SPI_NORMAL_HIGH     1
+
+/**
+ * SPI clock phase.
+ *
+ * $WIZARD_LIST = {
+ * "ser_spi_phase": ["SPI_SAMPLE_ON_FIRST_EDGE", "SPI_SAMPLE_ON_SECOND_EDGE"]
+ * }
+ */
+#define SPI_SAMPLE_ON_FIRST_EDGE    0
+#define SPI_SAMPLE_ON_SECOND_EDGE   1
+
+/**
  * \name Serial hw numbers
  *
  * \{
