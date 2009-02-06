@@ -30,7 +30,7 @@
  * All Rights Reserved.
  * -->
  *
- * \brief Driver for NTC (reads a temperature through an ADC)
+ * \brief Driver for NTC sensors (reads a temperature through an ADC)
  *
  * \version $Id$
  *
