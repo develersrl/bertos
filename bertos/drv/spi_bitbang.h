@@ -31,7 +31,7 @@
  *
  * -->
  *
- * \brief Emulated SPI Master for DSP firmware download (interface)
+ * \brief Emulated SPI driver.
  *
  * \version $Id: spi.h 15321 2007-03-21 14:45:12Z asterix $
  *

@@ -30,7 +30,7 @@
  *
  * -->
  *
- * \brief I2C generic driver functions (interface).
+ * \brief I2C generic driver functions.
  *
  * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
