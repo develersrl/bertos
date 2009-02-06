@@ -41,6 +41,8 @@
 #ifndef DRV_TC520_H
 #define DRV_TC520_H
 
+#warning FIXME: This drive is obsolete, you should refactor it.
+
 #include <drv/ser.h>
 #include <cfg/compiler.h>
 
