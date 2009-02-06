@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2007 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2009 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
@@ -35,6 +35,12 @@
  *
  * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
+ *
+ * $WIZARD_MODULE = {
+ * "name" : "ft245rl",
+ * "depends" : ["kfile", "timer"],
+ * "configuration" : ""
+ * }
  */
 
 
