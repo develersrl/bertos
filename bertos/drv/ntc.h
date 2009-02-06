@@ -36,13 +36,19 @@
  *
  * \author Giovanni Bajo <rasky@develer.com>
  * \author Francesco Sacchi <batt@develer.com>
+ *
+ * $WIZARD_MODULE = {
+ * "name" : "ntc",
+ * "depends" : ["adc"],
+ * "configuration" : ""
+ * }
  */
 
 #ifndef DRV_NTC_H
 #define DRV_NTC_H
 
 #include "hw/ntc_map.h"
-#include <cfg/debug.h>
+
 #include <cfg/compiler.h>
 
 #define NTC_OPEN_CIRCUIT  -32768

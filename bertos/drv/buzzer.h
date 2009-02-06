@@ -36,6 +36,12 @@
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * \brief Buzzer driver
+ *
+ * $WIZARD = {
+ * "name" : "buzzer"
+ * "depends" : [],
+ * "configuration" : ""
+ * }
  */
 
 #ifndef DRV_BUZZER_H
@@ -43,9 +49,9 @@
 
 #include <cfg/compiler.h>
 
-extern void buz_init(void);
-extern void buz_beep(mtime_t time);
-extern void buz_repeat_start(mtime_t duration, mtime_t interval);
-extern void buz_repeat_stop(void);
+void buz_init(void);
+void buz_beep(mtime_t time);
+void buz_repeat_start(mtime_t duration, mtime_t interval);
+void buz_repeat_stop(void);
 
 #endif /* DRV_BUZZER_H */

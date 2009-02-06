@@ -30,10 +30,16 @@
  *
  * -->
  *
- * \brief PCF8574 i2c port expander driver (interface).
+ * \brief PCF8574 i2c port expander driver.
  *
  * \version $Id: ft245rl.c 22301 2008-09-09 16:53:17Z batt $
  * \author Francesco Sacchi <batt@develer.com>
+ *
+ * $WIZARD_MODULE = {
+ * "name" : "pcf8574",
+ * "depends" : [],
+ * "configuration" : ""
+ * }
  */
 
 #ifndef DRV_PCF8574_H
