@@ -30,11 +30,18 @@
  * Copyright 1999, 2000, 2001, 2008 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
- * \brief Process scheduler (public interface).
+ * \brief Bertos Kernel core (Process scheduler).
  *
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
+ *
+ * $WIZARD_MODULE = {
+ * "name" : "kernel",
+ * "depends" : [],
+ * "configuration" : "bertos/cfg/cfg_kern.h"
+ * }
  */
+
 #ifndef KERN_PROC_H
 #define KERN_PROC_H
 

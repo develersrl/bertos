@@ -41,25 +41,39 @@
 
 /**
  * Enable the multithreading kernel.
+ *
+ * $WIZARD = { "type" : "boolean" }
  */
 #define CONFIG_KERN  1
 
-#define CONFIG_KERN_SCHED       1  ///< Process schedling
-#define CONFIG_KERN_SIGNALS     1  ///< Inter-process signals
-#define CONFIG_KERN_IRQ         0  ///< Interrupt supervisor
-#define CONFIG_KERN_HEAP        0  ///< Dynamic memory allocation
-#define CONFIG_KERN_SEMAPHORES  1  ///< Re-entrant mutual exclusion primitives
-#define CONFIG_KERN_MONITOR     1  ///< Process monitor
-#define CONFIG_KERN_PREEMPT     0  ///< Preemptive process scheduling
-#define CONFIG_KERN_PRI         0  ///< Priority-based scheduling policy
+#define CONFIG_KERN_SCHED       1  ///< Process schedling.                       $WIZARD = { "type" : "boolean" }
+#define CONFIG_KERN_SIGNALS     1  ///< Inter-process signals.                   $WIZARD = { "type" : "boolean" }
+#define CONFIG_KERN_IRQ         0  ///< Interrupt supervisor.                    $WIZARD = { "type" : "boolean" }
+#define CONFIG_KERN_HEAP        0  ///< Dynamic memory allocation.               $WIZARD = { "type" : "boolean" }
+#define CONFIG_KERN_SEMAPHORES  1  ///< Re-entrant mutual exclusion primitives.  $WIZARD = { "type" : "boolean" }
+#define CONFIG_KERN_MONITOR     1  ///< Process monitor.                         $WIZARD = { "type" : "boolean" }
+#define CONFIG_KERN_PREEMPT     0  ///< Preemptive process scheduling.           $WIZARD = { "type" : "boolean" }
+#define CONFIG_KERN_PRI         0  ///< Priority-based scheduling policy.        $WIZARD = { "type" : "boolean" }
 
-/// [ms] Time sharing quantum (a prime number prevents interference effects)
+/**
+ * [ms] Time sharing quantum (a prime number prevents interference effects)
+ *
+ * $WIZARD = { "type" : "int", "min" : "0" }
+ */
 #define CONFIG_KERN_QUANTUM     47
 
-/// Module logging level.
+/**
+ * Module logging level.
+ *
+ * $WIZARD = { "type" : "enum", "value_list" : "log_level" }
+ */
 #define KERN_LOG_LEVEL      LOG_LVL_ERR
 
-/// Module logging format.
+/**
+ * Module logging level.
+ *
+ * $WIZARD = { "type" : "enum", "value_list" : "log_level" }
+ */
 #define KERN_LOG_FORMAT     LOG_FMT_VERBOSE
 
 #endif /*  CFG_KERN_H */
