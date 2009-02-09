@@ -98,7 +98,7 @@ void pocketbus_putchar(struct PocketBusCtx *ctx, uint8_t c)
 	/* Escape characters with special meaning */
 	if (c == POCKETBUS_ESC || c == POCKETBUS_STX || c == POCKETBUS_ETX)
 		kfile_putc(POCKETBUS_ESC, ctx->fd);
-	
+
 	kfile_putc(c, ctx->fd);
 }
 
@@ -115,7 +115,7 @@ void pocketbus_begin(struct PocketBusCtx *ctx, pocketbus_addr_t addr)
 
 	/* Send STX */
 	kfile_putc(POCKETBUS_STX, ctx->fd);
-	
+
 	/* Send header */
 	pocketbus_write(ctx, &hdr, sizeof(hdr));
 }

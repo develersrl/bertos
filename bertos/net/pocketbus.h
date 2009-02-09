@@ -33,7 +33,13 @@
  *
  * \author Francesco Sacchi <batt@develer.com>
  *
- * \brief pocketBus protocol interface.
+ * \brief Basical functions to use pocketBus protocol.
+ *
+ * $WIZARD_MODULE = {
+ * "name" : "pocketbus",
+ * "depends" : ["rotating_hash", "kfile"],
+ * "configuration" : "bertos/cfg/cfg_pocketbus.h"
+ * }
  */
 
 #ifndef NET_POCKETBUS_H
@@ -76,7 +82,7 @@ typedef uint16_t pocketbus_addr_t;
  */
 typedef struct PocketBusHdr
 {
-	#define POCKETBUS_VER 1 
+	#define POCKETBUS_VER 1
 	uint8_t ver;   ///< packet version
 	pocketbus_addr_t addr; ///< slave address
 } PocketBusHdr;
@@ -102,7 +108,7 @@ typedef struct PocketMsg
 {
 	struct PocketBusCtx *ctx; ///< pocketBus message context
 	pocketbus_addr_t addr;    ///< address for received packet
-	pocketbus_len_t len;      ///< payload length 
+	pocketbus_len_t len;      ///< payload length
 	const uint8_t *payload;   ///< payload data
 } PocketMsg;
 

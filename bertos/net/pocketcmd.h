@@ -29,12 +29,17 @@
  * Copyright 2007 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \brief pocketBus protocol command layer interface.
+ * \brief PocketBus command abstraction layer.
  *
  * \version $Id: pocketcmd.h 20030 2007-12-04 16:16:09Z batt $
  *
  * \author Francesco Sacchi <batt@develer.com>
  *
+ * $WIZARD_MODULE = {
+ * "name" : "pocketcmd",
+ * "depends" : ["timer", "pocketbus"],
+ * "configuration" : ""
+ * }
  */
 
 #ifndef NET_POCKETCMD_H
