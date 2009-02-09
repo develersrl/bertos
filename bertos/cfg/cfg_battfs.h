@@ -39,10 +39,19 @@
 #ifndef CFG_BATTFS_H
 #define CFG_BATTFS_H
 
-/// Module logging level.
+
+/**
+ * Module logging level.
+ *
+ * $WIZARD = { "type" : "enum", "value_list" : "log_level" }
+ */
 #define BATTFS_LOG_LEVEL      LOG_LVL_INFO
 
-/// Module logging format.
+/**
+ * module logging format.
+ *
+ * $wizard = { "type" : "enum", "value_list" : "log_format" }
+ */
 #define BATTFS_LOG_FORMAT     LOG_FMT_VERBOSE
 
 /**
