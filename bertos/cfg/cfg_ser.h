@@ -49,7 +49,7 @@
 /// Serial port settings. $WIZARD = { "type" : "int" }
 #define CONFIG_SER_PORT      0
 /// Serial port baudrate. $WIZARD = { "type" : "int" }
-#define CONFIG_SER_BAUDRATE  115200
+#define CONFIG_SER_BAUDRATE  115200UL
 
 /// Spi port settings. $WIZARD = { "type" : "int" }
 #define CONFIG_SPI_PORT      0
