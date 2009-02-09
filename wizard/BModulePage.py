@@ -173,7 +173,10 @@ class BModulePage(BWizardPage):
     
     def _configurations(self, module):
         configuration = self._projectInfoRetrieve("MODULES")[module]["configuration"]
-        return self._projectInfoRetrieve("CONFIGURATIONS")[configuration]
+        if len(configuration) > 0:
+            return self._projectInfoRetrieve("CONFIGURATIONS")[configuration]
+        else:
+            return {}
     
     def _resetPropertyDescription(self):
         for index in range(self.pageContent.propertyTable.rowCount()):
