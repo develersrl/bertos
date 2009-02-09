@@ -59,7 +59,7 @@ static Timer thermo_timer;
 
 typedef struct ThermoControlDev
 {
-	deg_t          hifi_samples[THERMO_HIFI_NUM_SAMPLES];
+	deg_t          hifi_samples[CONFIG_THERMO_HIFI_NUM_SAMPLES];
 	deg_t          cur_hifi_sample;
 	deg_t          target;
 	thermostatus_t status;
@@ -92,7 +92,7 @@ static void thermo_do(ThermoDev index)
 
 	// Store the sample into the hifi FIFO buffer for later interpolation
 	dev->hifi_samples[dev->cur_hifi_sample] = cur_temp;
-	if (++dev->cur_hifi_sample == THERMO_HIFI_NUM_SAMPLES)
+	if (++dev->cur_hifi_sample == CONFIG_THERMO_HIFI_NUM_SAMPLES)
 		dev->cur_hifi_sample = 0;
 
 	cur_temp = thermo_readTemperature(index);
@@ -194,7 +194,7 @@ void thermo_start(ThermoDev dev)
 
 	/* Initialize the hifi FIFO with a constant value (the current temperature) */
 	temp = thermo_hw_read(dev);
-	for (i = 0; i < THERMO_HIFI_NUM_SAMPLES; ++i)
+	for (i = 0; i < CONFIG_THERMO_HIFI_NUM_SAMPLES; ++i)
 		devs[dev].hifi_samples[i] = temp;
 	devs[dev].cur_hifi_sample = 0;
 
@@ -234,10 +234,10 @@ deg_t thermo_readTemperature(ThermoDev dev)
 
 	MOD_CHECK(thermo);
 
-	for (i = 0; i < THERMO_HIFI_NUM_SAMPLES; i++)
+	for (i = 0; i < CONFIG_THERMO_HIFI_NUM_SAMPLES; i++)
 		accum += devs[dev].hifi_samples[i];
 
-	return (deg_t)(accum / THERMO_HIFI_NUM_SAMPLES);
+	return (deg_t)(accum / CONFIG_THERMO_HIFI_NUM_SAMPLES);
 }
 
 MOD_DEFINE(thermo)
@@ -255,7 +255,7 @@ void thermo_init(void)
 
 	MOD_INIT(thermo);
 
-	timer_setDelay(&thermo_timer, ms_to_ticks(THERMO_INTERVAL_MS));
+	timer_setDelay(&thermo_timer, ms_to_ticks(CONFIG_THERMO_INTERVAL_MS));
 	timer_setSoftint(&thermo_timer, (Hook)thermo_softint, 0);
 	timer_add(&thermo_timer);
 }
