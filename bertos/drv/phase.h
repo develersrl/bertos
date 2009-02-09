@@ -52,7 +52,7 @@
 
 #include <drv/timer.h>
 
-#define TRIAC_POWER_K   TRIAC_MAX_DUTY * (1 / sqrt(2 * TRIAC_MAX_POWER))
+#define TRIAC_POWER_K   CONFIG_TRIAC_MAX_DUTY * (1 / sqrt(2 * CONFIG_TRIAC_MAX_POWER))
 
 /**
  * \name Types for duty and power.
