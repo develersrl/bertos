@@ -225,7 +225,7 @@ def loadConfigurationInfos(path):
             configurationInfos[name]["description"] = description
         return configurationInfos
     except SyntaxError:
-        raise DefineException.ConfigurationDefineException(path)
+        raise DefineException.ConfigurationDefineException(path, name)
 
 def loadModuleInfos(path):
     """

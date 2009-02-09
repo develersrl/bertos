@@ -47,11 +47,11 @@ class BModulePage(BWizardPage):
                     configurations[informations["configuration"]] = bertos_utils.loadConfigurationInfos(self._projectInfoRetrieve("SOURCES_PATH") +
                                                                                                         "/" + informations["configuration"])
         except ModuleDefineException, e:
-            self._exceptionOccurred(self.tr("Error parsing module information in file %1").arg(e.parameter))
+            self._exceptionOccurred(self.tr("Error parsing module information in file %1").arg(e.path))
         except EnumDefineException, e:
-            self._exceptionOccurred(self.tr("Error parsing enum informations in file %1").arg(e.parameter))
+            self._exceptionOccurred(self.tr("Error parsing enum informations in file %1").arg(e.path))
         except ConfigurationDefineException, e:
-            self._exceptionOccurred(self.tr("Error parsing configuration informations in file %1").arg(e.parameter))
+            self._exceptionOccurred(self.tr("Error parsing configuration informations in file %1, reading parameter %2").arg(e.path).arg(e.name))
         else:
             self._projectInfoStore("MODULES", modules)
             self._projectInfoStore("LISTS", lists)
