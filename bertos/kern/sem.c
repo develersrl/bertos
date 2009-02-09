@@ -37,11 +37,13 @@
  */
 
 #include "sem.h"
+#include <cfg/debug.h>
+
 #include <cpu/irq.h> // ASSERT_IRQ_DISABLED()
+
 #include <kern/proc.h>
 #include <kern/proc_p.h>
 #include <kern/signal.h>
-#include <cfg/debug.h>
 
 INLINE void sem_verify(struct Semaphore *s)
 {
@@ -51,7 +53,6 @@ INLINE void sem_verify(struct Semaphore *s)
 	ASSERT(s->nest_count >= 0);
 	ASSERT(s->nest_count < 128);   // heuristic max
 }
-
 
 /**
  * \brief Initialize a Semaphore structure.

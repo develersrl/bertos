@@ -42,17 +42,19 @@
 #if CONFIG_KERN_MONITOR
 
 #include "proc_p.h"
-#include <struct/list.h>
-#include <drv/timer.h>
-#include <kern/proc.h>
-#include <cpu/frame.h> /* CPU_STACK_GROWS_UPWARD */
 #include <cfg/macros.h>
 #include <cfg/debug.h>
 
+#include <struct/list.h>
+
+#include <drv/timer.h>
+
+#include <kern/proc.h>
+
+#include <cpu/frame.h> /* CPU_STACK_GROWS_UPWARD */
 
 /* Access to this list must be protected against the scheduler */
 static List MonitorProcs;
-
 
 void monitor_init(void)
 {
