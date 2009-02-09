@@ -30,11 +30,17 @@
  * Copyright 1999, 2001 Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
- * \brief X-Modem serial transmission protocol (interface)
+ * \brief X-Modem serial transmission protocol.
  *
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Francesco Sacchi <batt@develer.com>
+ *
+ * $WIZARD_MODULE = {
+ * "name" : "xmodem",
+ * "depends" : ["kfile"],
+ * "configuration" : "bertos/cfg/cfg_xmodem.h"
+ * }
  */
 
 
