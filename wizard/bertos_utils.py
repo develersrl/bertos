@@ -133,16 +133,21 @@ def getToolchainInfo(output):
         info["thread"] = thread[0].split("Thread model: ")[1]
     return info
 
-def findDefinitions(ftype, path):
-    L = os.walk(path)
+def findDefinitions(ftype, project):
+    L = project.info("FILE_LIST")
+    if L is None:
+        L = [f for f in os.walk(project.info("SOURCES_PATH"))]
+        project.setInfo("FILE_LIST", L)
+    definitions = []
     for element in L:
         for filename in element[2]:
             if fnmatch.fnmatch(filename, ftype):
-                yield (filename, element[0])
+                definitions.append((filename, element[0]))
+    return definitions
 
-def loadCpuInfos(path):
+def loadCpuInfos(project):
     cpuInfos = []
-    for definition in findDefinitions(const.CPU_DEFINITION, path):
+    for definition in findDefinitions(const.CPU_DEFINITION, project):
         cpuInfos.append(getInfos(definition))
     return cpuInfos
 
@@ -261,12 +266,12 @@ def loadModuleInfos(path):
     except SyntaxError:
         raise DefineException.ModuleDefineException(path)
 
-def loadModuleInfosDict(path):
+def loadModuleInfosDict(project):
     """
     Return the dict containig all the modules
     """
     moduleInfosDict = {}
-    for filename, path in findDefinitions("*.h", path):
+    for filename, path in findDefinitions("*.h", project):
         moduleInfosDict.update(loadModuleInfos(path + "/" + filename))
     return moduleInfosDict
 
@@ -288,12 +293,12 @@ def loadDefineLists(path):
     except SyntaxError:
         raise DefineException.EnumDefineException(path)
 
-def loadDefineListsDict(path):
+def loadDefineListsDict(project):
     """
     Return the dict containing all the define lists
     """
     defineListsDict = {}
-    for filename, path in findDefinitions("*.h", path):
+    for filename, path in findDefinitions("*.h", project):
         defineListsDict.update(loadDefineLists(path + "/" + filename))
     return defineListsDict
 

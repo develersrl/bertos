@@ -27,7 +27,7 @@ class BCpuPage(BWizardPage):
     def _populateCpuList(self):
         self.pageContent.cpuList.clear()
         self.pageContent.cpuList.setCurrentItem(None)
-        infos = bertos_utils.loadCpuInfos(self._projectInfoRetrieve("SOURCES_PATH"))
+        infos = bertos_utils.loadCpuInfos(self._project())
         for cpu in infos:
             item = QListWidgetItem(cpu["CPU_NAME"])
             item.setData(Qt.UserRole, qvariant_converter.convertDict(cpu))

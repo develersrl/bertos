@@ -39,8 +39,8 @@ class BModulePage(BWizardPage):
     
     def _loadModuleData(self):
         try:
-            modules = bertos_utils.loadModuleInfosDict(self._projectInfoRetrieve("SOURCES_PATH"))
-            lists = bertos_utils.loadDefineListsDict(self._projectInfoRetrieve("SOURCES_PATH"))
+            modules = bertos_utils.loadModuleInfosDict(self._project())
+            lists = bertos_utils.loadDefineListsDict(self._project())
             configurations = {}
             for module, informations in modules.items():
                 if len(informations["configuration"]) > 0:
