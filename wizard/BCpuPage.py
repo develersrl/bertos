@@ -47,6 +47,7 @@ class BCpuPage(BWizardPage):
         self.pageContent.descriptionLabel.setText("")
     
     def reloadData(self):
+        bertos_utils.loadSourceTree(self._project())
         self._populateCpuList()
         cpuName = self._projectInfoRetrieve("CPU_NAME")
         self._setupUi()

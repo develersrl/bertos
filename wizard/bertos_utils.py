@@ -133,11 +133,12 @@ def getToolchainInfo(output):
         info["thread"] = thread[0].split("Thread model: ")[1]
     return info
 
+def loadSourceTree(project):
+    fileList = [f for f in os.walk(project.info("SOURCES_PATH"))]
+    project.setInfo("FILE_LIST", fileList)
+
 def findDefinitions(ftype, project):
     L = project.info("FILE_LIST")
-    if L is None:
-        L = [f for f in os.walk(project.info("SOURCES_PATH"))]
-        project.setInfo("FILE_LIST", L)
     definitions = []
     for element in L:
         for filename in element[2]:
