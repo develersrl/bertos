@@ -234,6 +234,9 @@ def loadConfigurationInfos(path):
         raise DefineException.ConfigurationDefineException(path, name)
 
 def loadConfigurationInfosDict(project):
+    """
+    Store in the project the configuration infos as a dict.
+    """
     modules = project.info("MODULES")
     configurations = {}
     for module, informations in modules.items():
@@ -278,7 +281,7 @@ def loadModuleInfos(path):
 
 def loadModuleInfosDict(project):
     """
-    Return the dict containig all the modules
+    Store in the project the dict containig all the modules
     """
     moduleInfosDict = {}
     for filename, path in findDefinitions("*.h", project):
@@ -305,7 +308,7 @@ def loadDefineLists(path):
 
 def loadDefineListsDict(project):
     """
-    Return the dict containing all the define lists
+    Store in the project the dict containing all the define lists
     """
     defineListsDict = {}
     for filename, path in findDefinitions("*.h", project):
