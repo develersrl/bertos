@@ -38,6 +38,9 @@ class BWizardPage(QWizardPage):
     
     def _projectInfoRetrieve(self, key):
         return QApplication.instance().project.info(key)
+    
+    def _project(self):
+        return QApplication.instance().project
 
     def versions(self):
         return qvariant_converter.getStringList(self._settingsRetrieve("versions"))
