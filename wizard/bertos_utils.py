@@ -233,6 +233,15 @@ def loadConfigurationInfos(path):
     except SyntaxError:
         raise DefineException.ConfigurationDefineException(path, name)
 
+def loadConfigurationInfosDict(project):
+    modules = project.info("MODULES")
+    configurations = {}
+    for module, informations in modules.items():
+        if len(informations["configuration"]) > 0:
+            configurations[informations["configuration"]] = loadConfigurationInfos(project.info("SOURCES_PATH") +
+                                                                                    "/" + informations["configuration"])
+    project.setInfo("CONFIGURATIONS", configurations)
+
 def loadModuleInfos(path):
     """
     Return the module infos found in the given file as a dict with the module
@@ -274,7 +283,7 @@ def loadModuleInfosDict(project):
     moduleInfosDict = {}
     for filename, path in findDefinitions("*.h", project):
         moduleInfosDict.update(loadModuleInfos(path + "/" + filename))
-    return moduleInfosDict
+    project.setInfo("MODULES", moduleInfosDict)
 
 def loadDefineLists(path):
     """
@@ -301,7 +310,10 @@ def loadDefineListsDict(project):
     defineListsDict = {}
     for filename, path in findDefinitions("*.h", project):
         defineListsDict.update(loadDefineLists(path + "/" + filename))
-    return defineListsDict
+    lists = project.info("LISTS")
+    if lists is not None:
+        defineListsDict.update(lists)
+    project.setInfo("LISTS", defineListsDict)
 
 def sub(string, parameter, value):
     """

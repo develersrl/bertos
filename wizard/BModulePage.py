@@ -39,23 +39,15 @@ class BModulePage(BWizardPage):
     
     def _loadModuleData(self):
         try:
-            modules = bertos_utils.loadModuleInfosDict(self._project())
-            lists = bertos_utils.loadDefineListsDict(self._project())
-            configurations = {}
-            for module, informations in modules.items():
-                if len(informations["configuration"]) > 0:
-                    configurations[informations["configuration"]] = bertos_utils.loadConfigurationInfos(self._projectInfoRetrieve("SOURCES_PATH") +
-                                                                                                        "/" + informations["configuration"])
+            bertos_utils.loadModuleInfosDict(self._project())
+            bertos_utils.loadDefineListsDict(self._project())
+            bertos_utils.loadConfigurationInfosDict(self._project())
         except ModuleDefineException, e:
             self._exceptionOccurred(self.tr("Error parsing module information in file %1").arg(e.path))
         except EnumDefineException, e:
             self._exceptionOccurred(self.tr("Error parsing enum informations in file %1").arg(e.path))
         except ConfigurationDefineException, e:
             self._exceptionOccurred(self.tr("Error parsing configuration informations in file %1, reading parameter %2").arg(e.path).arg(e.name))
-        else:
-            self._projectInfoStore("MODULES", modules)
-            self._projectInfoStore("LISTS", lists)
-            self._projectInfoStore("CONFIGURATIONS", configurations)
     
     def _fillModuleTable(self):
         modules = self._projectInfoRetrieve("MODULES")
