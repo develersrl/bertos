@@ -165,6 +165,11 @@ def getInfos(definition):
     return D
 
 def loadModuleData(project):
+    """
+    Loads all the module data, like module definition, list definition, and module configurations
+    int the given BProject, using the SOURCES_PATH information from this as the base for find the
+    header files.
+    """
     moduleInfosDict = {}
     listInfosDict = {}
     configurationsInfoDict = {}
@@ -250,28 +255,28 @@ def loadConfigurationInfos(path):
     except SyntaxError:
         raise DefineException.ConfigurationDefineException(path, name)
 
-def loadConfigurationInfosDict(project):
+def loadDefineLists(path):
     """
-    Store in the project the configuration infos as a dict.
+    Return a dict with the name of the list as key and a list of string as value
     """
-    modules = project.info("MODULES")
-    configurations = {}
-    for module, informations in modules.items():
-        if len(informations["configuration"]) > 0:
-            configurations[informations["configuration"]] = loadConfigurationInfos(project.info("SOURCES_PATH") +
-                                                                                    "/" + informations["configuration"])
-    project.setInfo("CONFIGURATIONS", configurations)
+    try:
+        string = open(path, "r").read()
+        commentList = re.findall(r"/\*{2}\s*([^*]*\*(?:[^/*][^*]*\*+)*)/", string)
+        commentList = [" ".join(re.findall(r"^\s*\*?\s*(.*?)\s*?(?:/{2}.*?)?$", comment, re.MULTILINE)).strip() for comment in commentList]
+        listDict = {}
+        for comment in commentList:
+            index = comment.find("$WIZARD_LIST")
+            if index != -1:
+                exec(comment[index + 1:])
+                listDict.update(WIZARD_LIST)
+        return listDict
+    except SyntaxError:
+        raise DefineException.EnumDefineException(path)
 
 def loadModuleInfos(path):
     """
-    Return the module infos found in the given file as a dict with the module
-    name as key and a dict containig the fields above as value or an empty dict
-    if the given file is not a BeRTOS module:
-        "depends": a list of modules needed by this module
-        "configuration": the cfg_*.h with the module configurations
-        "description": a string containing the brief description of doxygen
-        "enabled": contains False but the wizard will change if the user select
-        the module
+    Returns the module infos and the lists infos founded in the file located in the path,
+    and the configurations infos for the module defined in this file.
     """
     try:
         moduleInfos = {}
@@ -303,45 +308,6 @@ def loadModuleInfos(path):
         return moduleInfos, listInfos, configurationsInfos
     except SyntaxError:
         raise DefineException.ModuleDefineException(path)
-
-def loadModuleInfosDict(project):
-    """
-    Store in the project the dict containig all the modules
-    """
-    moduleInfosDict = {}
-    for filename, path in findDefinitions("*.h", project):
-        moduleInfosDict.update(loadModuleInfos(path + "/" + filename))
-    project.setInfo("MODULES", moduleInfosDict)
-
-def loadDefineLists(path):
-    """
-    Return a dict with the name of the list as key and a list of string as value
-    """
-    try:
-        string = open(path, "r").read()
-        commentList = re.findall(r"/\*{2}\s*([^*]*\*(?:[^/*][^*]*\*+)*)/", string)
-        commentList = [" ".join(re.findall(r"^\s*\*?\s*(.*?)\s*?(?:/{2}.*?)?$", comment, re.MULTILINE)).strip() for comment in commentList]
-        listDict = {}
-        for comment in commentList:
-            index = comment.find("$WIZARD_LIST")
-            if index != -1:
-                exec(comment[index + 1:])
-                listDict.update(WIZARD_LIST)
-        return listDict
-    except SyntaxError:
-        raise DefineException.EnumDefineException(path)
-
-def loadDefineListsDict(project):
-    """
-    Store in the project the dict containing all the define lists
-    """
-    defineListsDict = {}
-    for filename, path in findDefinitions("*.h", project):
-        defineListsDict.update(loadDefineLists(path + "/" + filename))
-    lists = project.info("LISTS")
-    if lists is not None:
-        defineListsDict.update(lists)
-    project.setInfo("LISTS", defineListsDict)
 
 def sub(string, parameter, value):
     """
