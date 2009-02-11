@@ -164,6 +164,23 @@ def getInfos(definition):
     del D["include"]
     return D
 
+def loadModuleData(project):
+    moduleInfosDict = {}
+    listInfosDict = {}
+    configurationsInfoDict = {}
+    for filename, path in findDefinitions("*.h", project):
+        moduleInfos, listInfos, configurationInfos= loadModuleInfos(path + "/" + filename)
+        moduleInfosDict.update(moduleInfos)
+        listInfosDict.update(listInfos)
+        for configuration in configurationInfos.keys():
+            configurationsInfoDict[configuration] = loadConfigurationInfos(project.info("SOURCES_PATH") + "/" + configuration)
+    print "*_" + project.info("CPU_INFOS")["TOOLCHAIN"] + ".h"
+    for filename, path in findDefinitions("*_" + project.info("CPU_INFOS")["TOOLCHAIN"] + ".h", project):
+        listInfosDict.update(loadDefineLists(path + "/" + filename))
+    project.setInfo("MODULES", moduleInfosDict)
+    project.setInfo("LISTS", listInfosDict)
+    project.setInfo("CONFIGURATIONS", configurationsInfoDict)
+
 def getDefinitionBlocks(text):
     """
     Take a text and return a list of tuple (description, name-value).
@@ -258,24 +275,32 @@ def loadModuleInfos(path):
     """
     try:
         moduleInfos = {}
+        listInfos = {}
+        configurationsInfos = {}
         string = open(path, "r").read()
         commentList = re.findall(r"/\*{2}\s*([^*]*\*(?:[^/*][^*]*\*+)*)/", string)
         commentList = [" ".join(re.findall(r"^\s*\*?\s*(.*?)\s*?(?:/{2}.*?)?$", comment, re.MULTILINE)).strip() for comment in commentList]
-        for comment in commentList:
-            index = comment.find("$WIZARD_MODULE")
-            if index != -1:
-                exec(comment[index + 1:])
-                moduleInfos[WIZARD_MODULE["name"]] = {"depends": WIZARD_MODULE["depends"],
-                                                        "configuration": WIZARD_MODULE["configuration"],
-                                                        "description": "",
-                                                        "enabled": False}
-                index = comment.find("\\brief")
+        if len(commentList) > 0:
+            comment = commentList[0]
+            if comment.find("$WIZARD_MODULE") != -1:
+                index = comment.find("$WIZARD_MODULE")
                 if index != -1:
-                    description = comment[index + 7:]
-                    description = description[:description.find(" * ")]
-                    moduleInfos[WIZARD_MODULE["name"]]["description"] = description
-                return moduleInfos
-        return {}
+                    # 14 is the length of "$WIZARD_MODULE"
+                    if len(comment[index + 14:].strip()) > 0:
+                        exec(comment[index + 1:])
+                        moduleInfos[WIZARD_MODULE["name"]] = {"depends": WIZARD_MODULE["depends"],
+                                                                "configuration": WIZARD_MODULE["configuration"],
+                                                                "description": "",
+                                                                "enabled": False}
+                        index = comment.find("\\brief")
+                        if index != -1:
+                            description = comment[index + 7:]
+                            description = description[:description.find(" * ")]
+                            moduleInfos[WIZARD_MODULE["name"]]["description"] = description
+                        if "configuration" in WIZARD_MODULE.keys() and len(WIZARD_MODULE["configuration"]) > 0:
+                            configurationsInfos[WIZARD_MODULE["configuration"]] = {}
+                    listInfos.update(loadDefineLists(path))
+        return moduleInfos, listInfos, configurationsInfos
     except SyntaxError:
         raise DefineException.ModuleDefineException(path)
 

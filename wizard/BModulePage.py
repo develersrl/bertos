@@ -39,9 +39,7 @@ class BModulePage(BWizardPage):
     
     def _loadModuleData(self):
         try:
-            bertos_utils.loadModuleInfosDict(self._project())
-            bertos_utils.loadDefineListsDict(self._project())
-            bertos_utils.loadConfigurationInfosDict(self._project())
+            bertos_utils.loadModuleData(self._project())
         except ModuleDefineException, e:
             self._exceptionOccurred(self.tr("Error parsing module information in file %1").arg(e.path))
         except EnumDefineException, e:

@@ -19,6 +19,7 @@ sys.path.append("../")
 
 import BProject
 import BModulePage
+import bertos_utils
 
 # Add a custom UI_LOCATION constant
 BModulePage.UI_LOCATION = "../ui"
@@ -28,6 +29,8 @@ def main():
     app.project = BProject.BProject()
     page = BModulePage.BModulePage()
     page._projectInfoStore("SOURCES_PATH", "../../")
+    page._projectInfoStore("CPU_INFOS", {"TOOLCHAIN": "avr"})
+    bertos_utils.loadSourceTree(page._project())
     page.reloadData()
     page.show()
     app.exec_()
