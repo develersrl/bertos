@@ -18,9 +18,6 @@ import shutil
 import const
 import DefineException
 
-# Try to use the new parsing module for the module information and the define lists
-import newParser
-
 def isBertosDir(directory):
    return os.path.exists(directory + "/VERSION")
 
@@ -167,18 +164,103 @@ def getInfos(definition):
     del D["include"]
     return D
 
+def getCommentList(string):
+    commentList = re.findall(r"/\*{2}\s*([^*]*\*(?:[^/*][^*]*\*+)*)/", string)
+    commentList = [re.findall(r"^\s*\* *(.*?)$", comment, re.MULTILINE) for comment in commentList]
+    return commentList
+
+def loadModuleDefinition(first_comment):
+    toBeParsed = False
+    moduleDefinition = {}
+    for num, line in enumerate(first_comment):
+        index = line.find("$WIZ$")
+        if index != -1:
+            toBeParsed = True
+            try:
+                exec line[index + len("$WIZ$ "):] in {}, moduleDefinition
+            except:
+                raise ParseError(num, line[index:])
+        elif line.find("\\brief") != -1:
+            moduleDefinition["module_description"] = line[line.find("\\brief") + len("\\brief "):]
+    moduleDict = {}
+    if "module_name" in moduleDefinition.keys():
+        moduleDict[moduleDefinition["module_name"]] = {}
+        if "module_depends" in moduleDefinition.keys():
+            if type(moduleDefinition["module_depends"]) == str:
+                moduleDefinition["module_depends"] = (moduleDefinition["module_depends"],)
+            moduleDict[moduleDefinition["module_name"]]["depends"] = moduleDefinition["module_depends"]
+        else:
+            moduleDict[moduleDefinition["module_name"]]["depends"] = ()
+        if "module_configuration" in moduleDefinition.keys():
+            moduleDict[moduleDefinition["module_name"]]["configuration"] = moduleDefinition["module_configuration"]
+        else:
+            moduleDict[moduleDefinition["module_name"]]["configuration"] = ""
+        if "module_description" in moduleDefinition.keys():
+            moduleDict[moduleDefinition["module_name"]]["description"] = moduleDefinition["module_description"]
+        moduleDict[moduleDefinition["module_name"]]["enabled"] = False
+    return toBeParsed, moduleDict
+
+def loadDefineLists(commentList):
+    defineList = {}
+    for comment in commentList:
+        for num, line in enumerate(comment):
+            index = line.find("$WIZ$")
+            if index != -1:
+                try:
+                    exec line[index + len("$WIZ$ "):] in {}, defineList
+                except:
+                    raise ParseError(num, line[index:])
+    for key, value in defineList.items():
+        if type(value) == str:
+            defineList[key] = (value,)
+    return defineList
+
+def getDescriptionInformations(comment): 
+    """ 
+    Take the doxygen comment and strip the wizard informations, returning the tuple 
+    (comment, wizard_information) 
+    """
+    description = ""
+    information = {}
+    for num, line in enumerate(comment):
+        index = line.find("$WIZ$")
+        if index != -1:
+            description += " " + line[:index]
+            try:
+                exec line[index + len("$WIZ$ "):] in {}, information
+            except:
+                raise ParseError(num, line[index:])
+        else:
+            description += " " + line
+    return description.strip(), information
+
+def getDefinitionBlocks(text):
+    """
+    Take a text and return a list of tuple (description, name-value).
+    """
+    block = []
+    block_tmp = re.findall(r"/\*{2}\s*([^*]*\*(?:[^/*][^*]*\*+)*)/\s*#define\s+((?:[^/]*?/?)+)\s*?(?:/{2,3}[^<].*?)?$", text, re.MULTILINE)
+    for comment, define in block_tmp:
+        # Only the first element is needed
+        block.append(([re.findall(r"^\s*\* *(.*?)$", line, re.MULTILINE)[0] for line in comment.splitlines()], define))
+    for comment, define in re.findall(r"/{3}\s*([^<].*?)\s*#define\s+((?:[^/]*?/?)+)\s*?(?:/{2,3}[^<].*?)?$", text, re.MULTILINE):
+        block.append(([comment], define))
+    for define, comment in re.findall(r"#define\s*(.*?)\s*/{3}<\s*(.+?)\s*?(?:/{2,3}[^<].*?)?$", text, re.MULTILINE):
+        block.append(([comment], define))
+    return block
+
 def loadModuleData(project):
     moduleInfoDict = {}
     listInfoDict = {}
     configurationInfoDict = {}
     for filename, path in findDefinitions("*.h", project):
-        commentList = newParser.getCommentList(open(path + "/" + filename, "r").read())
+        commentList = getCommentList(open(path + "/" + filename, "r").read())
         if len(commentList) > 0:
             moduleInfo = {}
             configurationInfo = {}
             try:
-                toBeParsed, moduleDict = newParser.loadModuleDefinition(commentList[0])
-            except newParser.ParseError, err:
+                toBeParsed, moduleDict = loadModuleDefinition(commentList[0])
+            except ParseError, err:
                 print "error in file %s. line: %d - statement %s" % (path + "/" + filename, err.line_number, err.line)
                 print err.args
                 print err.message
@@ -191,54 +273,20 @@ def loadModuleData(project):
             configurationInfoDict.update(configurationInfo)
             if toBeParsed:
                 try:
-                    listDict = newParser.loadDefineLists(commentList[1:])
+                    listDict = loadDefineLists(commentList[1:])
                     listInfoDict.update(listDict)
-                except newParser.ParseError, err:
+                except ParseError, err:
                     print "error in file %s. line: %d - statement %s" % (path + "/" + filename, err.line_number, err.line)
                     print err.args
                     print err.message
                     raise Exception
     for filename, path in findDefinitions("*_" + project.info("CPU_INFOS")["TOOLCHAIN"] + ".h", project):
-        commentList = newParser.getCommentList(open(path + "/" + filename, "r").read())
-        listInfoDict.update(newParser.loadDefineLists(commentList))
+        commentList = getCommentList(open(path + "/" + filename, "r").read())
+        listInfoDict.update(loadDefineLists(commentList))
     project.setInfo("MODULES", moduleInfoDict)
     project.setInfo("LISTS", listInfoDict)
     project.setInfo("CONFIGURATIONS", configurationInfoDict)
     
-
-def loadModuleData_old(project):
-    """
-    Loads all the module data, like module definition, list definition, and module configurations
-    int the given BProject, using the SOURCES_PATH information from this as the base for find the
-    header files.
-    """
-    moduleInfosDict = {}
-    listInfosDict = {}
-    configurationsInfoDict = {}
-    for filename, path in findDefinitions("*.h", project):
-        moduleInfos, listInfos, configurationInfos= loadModuleInfos(path + "/" + filename)
-        moduleInfosDict.update(moduleInfos)
-        listInfosDict.update(listInfos)
-        for configuration in configurationInfos.keys():
-            configurationsInfoDict[configuration] = loadConfigurationInfos(project.info("SOURCES_PATH") + "/" + configuration)
-    for filename, path in findDefinitions("*_" + project.info("CPU_INFOS")["TOOLCHAIN"] + ".h", project):
-        listInfosDict.update(loadDefineLists(path + "/" + filename))
-    project.setInfo("MODULES", moduleInfosDict)
-    project.setInfo("LISTS", listInfosDict)
-    project.setInfo("CONFIGURATIONS", configurationsInfoDict)
-
-def getDefinitionBlocks(text):
-    """
-    Take a text and return a list of tuple (description, name-value).
-    """
-    block = []
-    block_tmp = re.findall(r"/\*{2}\s*([^*]*\*(?:[^/*][^*]*\*+)*)/\s*#define\s+((?:[^/]*?/?)+)\s*?(?:/{2,3}[^<].*?)?$", text, re.MULTILINE)
-    for comment, define in block_tmp:
-        block.append((" ".join(re.findall(r"^\s*\*?\s*(.*?)\s*?(?:/{2}.*?)?$", comment, re.MULTILINE)).strip(), define))
-    block += re.findall(r"/{3}\s*([^<].*?)\s*#define\s+((?:[^/]*?/?)+)\s*?(?:/{2,3}[^<].*?)?$", text, re.MULTILINE)
-    block += [(comment, define) for define, comment in re.findall(r"#define\s*(.*?)\s*/{3}<\s*(.+?)\s*?(?:/{2,3}[^<].*?)?$", text, re.MULTILINE)]
-    return block
-
 def formatParamNameValue(text):
     """
     Take the given string and return a tuple with the name of the parameter in the first position
@@ -247,59 +295,7 @@ def formatParamNameValue(text):
     block = re.findall("\s*([^\s]+)\s*(.+?)\s*$", text, re.MULTILINE)
     return block[0]
 
-def getDescriptionInformations(text): 
-    """ 
-    Take the doxygen comment and strip the wizard informations, returning the tuple 
-    (comment, wizard_informations) 
-    """ 
-    index = text.find("$WIZARD") 
-    if index != -1: 
-        exec(text[index + 1:]) 
-        informations = WIZARD 
-        return text[:index].strip(), informations
-    else:
-        return text.strip(), {}
-
 def loadConfigurationInfos(path):
-    """
-    Return the module configurations found in the given file as a dict with the
-    parameter name as key and a dict containig the fields above as value:
-        "value": the value of the parameter
-        "description": the description of the parameter
-        "informations": a dict containig optional informations:
-            "type": "int" | "boolean" | "enum"
-            "min": the minimum value for integer parameters
-            "max": the maximum value for integer parameters
-            "long": boolean indicating if the num is a long
-            "value_list": the name of the enum for enum parameters
-    """
-    try:
-        configurationInfos = {}
-        for comment, define in newParser.getDefinitionBlocks(open(path, "r").read()):
-            name, value = formatParamNameValue(define)
-            description, informations = newParser.getDescriptionInformations(comment)
-            configurationInfos[name] = {}
-            configurationInfos[name]["value"] = value
-            configurationInfos[name]["informations"] = informations
-            if ("type" in configurationInfos[name]["informations"].keys() and
-                    configurationInfos[name]["informations"]["type"] == "int" and
-                    configurationInfos[name]["value"].find("L") != -1):
-                configurationInfos[name]["informations"]["long"] = True
-                configurationInfos[name]["value"] = configurationInfos[name]["value"].replace("L", "")
-            if ("type" in configurationInfos[name]["informations"].keys() and
-                    configurationInfos[name]["informations"]["type"] == "int" and
-                    configurationInfos[name]["value"].find("U") != -1):
-                configurationInfos[name]["informations"]["unsigned"] = True
-                configurationInfos[name]["value"] = configurationInfos[name]["value"].replace("U", "")
-            configurationInfos[name]["description"] = description
-        return configurationInfos
-    except newParser.ParseError, err:
-        print "error in file %s. line: %d - statement %s" % (path, err.line_number, err.line)
-        print err.args
-        print err.message
-        raise Exception
-
-def loadConfigurationInfos_old(path):
     """
     Return the module configurations found in the given file as a dict with the
     parameter name as key and a dict containig the fields above as value:
@@ -332,62 +328,11 @@ def loadConfigurationInfos_old(path):
                 configurationInfos[name]["value"] = configurationInfos[name]["value"].replace("U", "")
             configurationInfos[name]["description"] = description
         return configurationInfos
-    except SyntaxError:
-        raise DefineException.ConfigurationDefineException(path, name)
-
-def loadDefineLists(path):
-    """
-    Return a dict with the name of the list as key and a list of string as value
-    """
-    try:
-        string = open(path, "r").read()
-        commentList = re.findall(r"/\*{2}\s*([^*]*\*(?:[^/*][^*]*\*+)*)/", string)
-        commentList = [" ".join(re.findall(r"^\s*\*?\s*(.*?)\s*?(?:/{2}.*?)?$", comment, re.MULTILINE)).strip() for comment in commentList]
-        listDict = {}
-        for comment in commentList:
-            index = comment.find("$WIZARD_LIST")
-            if index != -1:
-                exec(comment[index + 1:])
-                listDict.update(WIZARD_LIST)
-        return listDict
-    except SyntaxError:
-        raise DefineException.EnumDefineException(path)
-
-def loadModuleInfos(path):
-    """
-    Returns the module infos and the lists infos founded in the file located in the path,
-    and the configurations infos for the module defined in this file.
-    """
-    try:
-        moduleInfos = {}
-        listInfos = {}
-        configurationsInfos = {}
-        string = open(path, "r").read()
-        commentList = re.findall(r"/\*{2}\s*([^*]*\*(?:[^/*][^*]*\*+)*)/", string)
-        commentList = [" ".join(re.findall(r"^\s*\*?\s*(.*?)\s*?(?:/{2}.*?)?$", comment, re.MULTILINE)).strip() for comment in commentList]
-        if len(commentList) > 0:
-            comment = commentList[0]
-            if comment.find("$WIZARD_MODULE") != -1:
-                index = comment.find("$WIZARD_MODULE")
-                if index != -1:
-                    # 14 is the length of "$WIZARD_MODULE"
-                    if len(comment[index + 14:].strip()) > 0:
-                        exec(comment[index + 1:])
-                        moduleInfos[WIZARD_MODULE["name"]] = {"depends": WIZARD_MODULE["depends"],
-                                                                "configuration": WIZARD_MODULE["configuration"],
-                                                                "description": "",
-                                                                "enabled": False}
-                        index = comment.find("\\brief")
-                        if index != -1:
-                            description = comment[index + 7:]
-                            description = description[:description.find(" * ")]
-                            moduleInfos[WIZARD_MODULE["name"]]["description"] = description
-                        if "configuration" in WIZARD_MODULE.keys() and len(WIZARD_MODULE["configuration"]) > 0:
-                            configurationsInfos[WIZARD_MODULE["configuration"]] = {}
-                    listInfos.update(loadDefineLists(path))
-        return moduleInfos, listInfos, configurationsInfos
-    except SyntaxError:
-        raise DefineException.ModuleDefineException(path)
+    except ParseError, err:
+        print "error in file %s. line: %d - statement %s" % (path, err.line_number, err.line)
+        print err.args
+        print err.message
+        raise Exception
 
 def sub(string, parameter, value):
     """
@@ -430,3 +375,9 @@ def isUnsignedLong(informations):
         return True
     else:
         return False
+
+class ParseError(Exception):
+    def __init__(self, line_number, line):
+        Exception.__init__(self)
+        self.line_number = line_number
+        self.line = line
