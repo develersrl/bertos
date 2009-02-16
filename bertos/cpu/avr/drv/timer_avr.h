@@ -55,8 +55,7 @@
  *
  * Select which hardware timer interrupt to use for system clock and softtimers.
  * \note The timer 1 overflow mode set the timer as a 24 kHz PWM.
- *
- * \{
+ * $WIZ$ timer_select = "TIMER_ON_OUTPUT_COMPARE0", "TIMER_ON_OVERFLOW1", "TIMER_ON_OUTPUT_COMPARE2", "TIMER_ON_OVERFLOW3", "TIMER_DEFAULT"
  */
 #define TIMER_ON_OUTPUT_COMPARE0  1
 #define TIMER_ON_OVERFLOW1        2
@@ -64,7 +63,6 @@
 #define TIMER_ON_OVERFLOW3        4
 
 #define TIMER_DEFAULT TIMER_ON_OUTPUT_COMPARE0 ///< Default system timer
-/* \} */
 
 /*
  * Hardware dependent timer initialization.
