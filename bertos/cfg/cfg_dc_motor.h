@@ -43,7 +43,8 @@
 /**
  * Number of the DC motors to mange.
  *
- * $WIZARD = { "type" : "int", "min": "0" }
+ * $WIZ$ type = "int"
+ * $WIZ$ min = "0"
  */
 #define CONFIG_NUM_DC_MOTOR       1
 

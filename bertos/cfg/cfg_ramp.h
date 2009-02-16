@@ -1,4 +1,4 @@
-/**
+$WIZ$ /**
  * \file
  * <!--
  * This file is part of BeRTOS.
@@ -47,7 +47,7 @@
  * \note Floating point operations will be always done within ramp_compute() to
  * precalculate values, so there has to be at least a floating point emulation support.
  *
- * $WIZARD = { "type" : "boolean" }
+ * $WIZ$ type = "boolean"
  */
 #define RAMP_USE_FLOATING_POINT   0
 
@@ -67,22 +67,49 @@
 	 * a runtime assertion.
 	 *
 	 * \note This macro is used only for the fixed-point version of the ramp.
-	 * $WIZARD = { "type" : "int", "min" : "0", "max" : "32" }
+	 * $WIZ$ type = "int"
+	 * $WIZ$ min = "0"
+	 * $WIZ$ max = "32"
 	 */
 	#define RAMP_CLOCK_SHIFT_PRECISION 2
 #endif
 
 
-///< Negative pulse width for ramp. $WIZARD = { "type" : "int", "min" : "0" }
+/**
+* Negative pulse width for ramp.
+* $WIZ$ type = "int"
+* $WIZ$ min = "0"
+*/
 #define RAMP_PULSE_WIDTH    50
 
- /*
-  * Default ramp
-  */
-#define RAMP_DEF_TIME     6000000UL ///< microsecs.                $WIZARD = { "type" : "int" }
-#define RAMP_DEF_MAXFREQ       5000 ///< Hz.                       $WIZARD = { "type" : "int", "min" : "0" }
-#define RAMP_DEF_MINFREQ        200 ///< Hz.                       $WIZARD = { "type" : "int", "min" : "0" }
-#define RAMP_DEF_POWERRUN        10 ///< 10 deciampere (1 ampere). $WIZARD = { "type" : "int", "min" : "0" }
-#define RAMP_DEF_POWERIDLE        1 ///< 1 deciampere.             $WIZARD = { "type" : "int", "min" : "0" }
+/**
+ * Default ramp time (microsecs).
+ * $WIZ$ type = "int"
+ */
+#define RAMP_DEF_TIME     6000000UL
+/**
+ * Default ramp maxfreq (Hz).
+ * $WIZ$ type = "int"
+ * $WIZ$ min = "0"
+ */
+#define RAMP_DEF_MAXFREQ       5000
+/**
+ * Default ramp minfreq (Hz).
+ * $WIZ$ type = "int"
+ * $WIZ$ min = "0"
+ */
+#define RAMP_DEF_MINFREQ        200
+/**
+ * Default ramp powerrun (deciampere).
+ * $WIZ$ type = "int"
+ * $WIZ$ min = "0"
+ */
+#define RAMP_DEF_POWERRUN        10
+/**
+ * Default ramp poweridle (Hz).
+ * $WIZ$ type = "int"
+ * $WIZ$ min = "0"
+ */
+#define RAMP_DEF_POWERIDLE        1
 
 #endif /* CFG_RAMP_H */

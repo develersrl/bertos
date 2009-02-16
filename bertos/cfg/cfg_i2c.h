@@ -40,7 +40,11 @@
 #ifndef CFG_I2C_H
 #define CFG_I2C_H
 
-/// Comunication frequency. $WIZARD = { "type" : "int" }
+/**
+*Comunication frequency.
+*
+* $WIZ$ type = "int"
+*/
 #define CONFIG_I2C_FREQ  100000UL
 
 /**
@@ -48,7 +52,7 @@
  * the twi_start should try to get an ACK before
  * returning error.
  *
- * $WIZARD = { "type" : "int" }
+ * $WIZ$ type = "int"
  */
 #define CONFIG_I2C_START_TIMEOUT 100
 
@@ -58,24 +62,24 @@
  * I2C_BACKEND_BITBANG: Use the emulated bitbang driver.
  * \see drv/i2c.h for more information.
  *
- * $WIZARD = {
- * "type" : "enum",
- * "value_list" : "i2c_backend"
- * }
+ * $WIZ$ type = "enum",
+ * $WIZ$ value_list = "i2c_backend"
  */
 #define CONFIG_I2C_BACKEND I2C_BACKEND_BUILTIN
 
 /**
  * Module logging level.
  *
- * $WIZARD = { "type" : "enum", "value_list" : "log_level" }
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
  */
 #define I2C_LOG_LEVEL      LOG_LVL_INFO
 
 /**
  * module logging format.
  *
- * $WIZARD = { "type" : "enum", "value_list" : "log_format" }
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
  */
 #define I2C_LOG_FORMAT     LOG_FMT_TERSE
 

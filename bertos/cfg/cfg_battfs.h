@@ -43,14 +43,16 @@
 /**
  * Module logging level.
  *
- * $WIZARD = { "type" : "enum", "value_list" : "log_level" }
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
  */
 #define BATTFS_LOG_LEVEL      LOG_LVL_INFO
 
 /**
  * module logging format.
  *
- * $wizard = { "type" : "enum", "value_list" : "log_format" }
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
  */
 #define BATTFS_LOG_FORMAT     LOG_FMT_VERBOSE
 
@@ -58,6 +60,7 @@
  * Set to 1 to enable free page shuffling: this
  * increase memories life but makes debugging
  * more difficult due to its unrepeteable state.
+ * $WIZ$ type = "boolean"
  */
 #define CONFIG_BATTFS_SHUFFLE_FREE_PAGES 0
 

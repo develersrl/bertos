@@ -35,27 +35,34 @@
  * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
- * $WIZ$
  */
 
 #ifndef CFG_TIMER_H
 #define CFG_TIMER_H
 
 /**
- *
- * $WIZ$ timer_select = "TIMER_DEFAULT"
+ * Hardware timer selection for drv/timer.c.
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "timer_select"
  */
-
-/// Hardware timer selection for drv/timer.c. $WIZARD = { "type" : "enum", "value_list" : "timer_select" }
 #define CONFIG_TIMER TIMER_DEFAULT
 
-/// Debug timer interrupt using a strobe pin. $WIZARD = { "type" : "boolean" }
+/**
+ * Debug timer interrupt using a strobe pin.
+ * $WIZ$ type = "boolean"
+ */
 #define CONFIG_TIMER_STROBE  0
 
-/// Enable asynchronous timers. $WIZARD = { "type" : "boolean" }
+/**
+ * Enable asynchronous timers.
+ * $WIZ$ type = "boolean"
+ */
 #define CONFIG_TIMER_EVENTS  1
 
-/// Support hi-res timer_usleep(). $WIZARD = { "type" : "boolean" }
+/**
+ * Support hi-res timer_usleep().
+ * $WIZ$ type = "boolean"
+ */
 #define CONFIG_TIMER_UDELAY  1
 
 #endif /* CFG_TIMER_H */

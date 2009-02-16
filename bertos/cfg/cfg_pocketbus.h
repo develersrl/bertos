@@ -40,7 +40,11 @@
 #ifndef CFG_POCKETBUS_H
 #define CFG_POCKETBUS_H
 
-/// Buffer len for pockebus protocol. $WIZARD = { "type" : "int", "min" : "0" }
+/**
+ *Buffer len for pockebus protocol.
+ * $WIZ$ type = "int"
+ * $WIZ$ min = "0"
+ */
 #define CONFIG_POCKETBUS_BUFLEN     128
 
 #endif /* CFG_POCKETBUS_H */

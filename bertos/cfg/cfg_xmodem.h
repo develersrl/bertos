@@ -40,19 +40,27 @@
 #ifndef CFG_XMODEM_H
 #define CFG_XMODEM_H
 
-/// Enable Rx. $WIZARD = { "type" : "boolean" }
+/// Enable Rx. $WIZ$ type = "boolean"
 #define CONFIG_XMODEM_RECV   1
 
-/// Enable TX. $WIZARD = { "type" : "boolean" }
+/// Enable TX. $WIZ$ type = "boolean"
 #define CONFIG_XMODEM_SEND   1
 
-/// Allow a Rx/Tx of 1Kbyte block. $WIZARD = { "type" : "boolean" }
+/// Allow a Rx/Tx of 1Kbyte block. $WIZ$ type = "boolean"
 #define CONFIG_XMODEM_1KCRC  1
 
-/// Max retries before giving up. $WIZARD = { "type" : "int", "min" : "0" }
+/**
+ * Max retries before giving up.
+ * $WIZ$ type = "int"
+ * $WIZ$ min = "0"
+ */
 #define CONFIG_XMODEM_MAXRETRIES     15
 
-/// Max retries before switching to BCC.  $WIZARD = { "type" : "int", "min" : "0" }
+/**
+ * Max retries before switching to BCC.
+ * $WIZ$ type = "int"
+ * $WIZ$ min = "0"
+ */
 #define CONFIG_XMODEM_MAXCRCRETRIES   7
 
 #endif /* CFG_XMODEM_H */

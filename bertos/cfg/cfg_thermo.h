@@ -39,13 +39,13 @@
 #ifndef CFG_THERMO_H
 #define CFG_THERMO_H
 
-/// Interval at which thermo control is performed. $WIZARD = { "type" : "int" }
+/// Interval at which thermo control is performed. $WIZ$ type = "int"
 #define CONFIG_THERMO_INTERVAL_MS        100
 
 /**
  * Number of different samples we interpolate over to get the hifi temperature.
  *
- * $WIZARD = { "type" : "int" }
+ * $WIZ$ type = "int"
  */
 #define CONFIG_THERMO_HIFI_NUM_SAMPLES    10
 

@@ -221,7 +221,6 @@ def loadModuleData_old(project):
         listInfosDict.update(listInfos)
         for configuration in configurationInfos.keys():
             configurationsInfoDict[configuration] = loadConfigurationInfos(project.info("SOURCES_PATH") + "/" + configuration)
-    print "*_" + project.info("CPU_INFOS")["TOOLCHAIN"] + ".h"
     for filename, path in findDefinitions("*_" + project.info("CPU_INFOS")["TOOLCHAIN"] + ".h", project):
         listInfosDict.update(loadDefineLists(path + "/" + filename))
     project.setInfo("MODULES", moduleInfosDict)
@@ -262,6 +261,45 @@ def getDescriptionInformations(text):
         return text.strip(), {}
 
 def loadConfigurationInfos(path):
+    """
+    Return the module configurations found in the given file as a dict with the
+    parameter name as key and a dict containig the fields above as value:
+        "value": the value of the parameter
+        "description": the description of the parameter
+        "informations": a dict containig optional informations:
+            "type": "int" | "boolean" | "enum"
+            "min": the minimum value for integer parameters
+            "max": the maximum value for integer parameters
+            "long": boolean indicating if the num is a long
+            "value_list": the name of the enum for enum parameters
+    """
+    try:
+        configurationInfos = {}
+        for comment, define in newParser.getDefinitionBlocks(open(path, "r").read()):
+            name, value = formatParamNameValue(define)
+            description, informations = newParser.getDescriptionInformations(comment)
+            configurationInfos[name] = {}
+            configurationInfos[name]["value"] = value
+            configurationInfos[name]["informations"] = informations
+            if ("type" in configurationInfos[name]["informations"].keys() and
+                    configurationInfos[name]["informations"]["type"] == "int" and
+                    configurationInfos[name]["value"].find("L") != -1):
+                configurationInfos[name]["informations"]["long"] = True
+                configurationInfos[name]["value"] = configurationInfos[name]["value"].replace("L", "")
+            if ("type" in configurationInfos[name]["informations"].keys() and
+                    configurationInfos[name]["informations"]["type"] == "int" and
+                    configurationInfos[name]["value"].find("U") != -1):
+                configurationInfos[name]["informations"]["unsigned"] = True
+                configurationInfos[name]["value"] = configurationInfos[name]["value"].replace("U", "")
+            configurationInfos[name]["description"] = description
+        return configurationInfos
+    except newParser.ParseError, err:
+        print "error in file %s. line: %d - statement %s" % (path, err.line_number, err.line)
+        print err.args
+        print err.message
+        raise Exception
+
+def loadConfigurationInfos_old(path):
     """
     Return the module configurations found in the given file as a dict with the
     parameter name as key and a dict containig the fields above as value:

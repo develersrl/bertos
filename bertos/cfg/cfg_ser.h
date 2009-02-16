@@ -46,98 +46,92 @@
  * Edit these define for your project.
  */
 
-/// Serial port settings. $WIZARD = { "type" : "int" }
+/// Serial port settings. $WIZ$ type = "int"
 #define CONFIG_SER_PORT      0
-/// Serial port baudrate. $WIZARD = { "type" : "int" }
+/// Serial port baudrate. $WIZ$ type = "int"
 #define CONFIG_SER_BAUDRATE  115200UL
 
-/// Spi port settings. $WIZARD = { "type" : "int" }
+/// Spi port settings. $WIZ$ type = "int"
 #define CONFIG_SPI_PORT      0
-/// Spi port baudrate. $WIZARD = { "type" : "int" }
+/// Spi port baudrate. $WIZ$ type = "int"
 #define CONFIG_SPI_BAUDRATE  5000000UL
 
 
-/// [bytes] Size of the outbound FIFO buffer for port 0. $WIZARD = { "type" : "int" }
+/// [bytes] Size of the outbound FIFO buffer for port 0. $WIZ$ type = "int"
 #define CONFIG_UART0_TXBUFSIZE  32
 
-/// [bytes] Size of the inbound FIFO buffer for port 0. $WIZARD = { "type" : "int" }
+/// [bytes] Size of the inbound FIFO buffer for port 0. $WIZ$ type = "int"
 #define CONFIG_UART0_RXBUFSIZE  32
 
-/// [bytes] Size of the outbound FIFO buffer for port 1. $WIZARD = { "type" : "int" }
+/// [bytes] Size of the outbound FIFO buffer for port 1. $WIZ$ type = "int"
 #define CONFIG_UART1_TXBUFSIZE  32
 
-/// [bytes] Size of the inbound FIFO buffer for port 1. $WIZARD = { "type" : "int" }
+/// [bytes] Size of the inbound FIFO buffer for port 1. $WIZ$ type = "int"
 #define CONFIG_UART1_RXBUFSIZE  32
 
 
-/// [bytes] Size of the outbound FIFO buffer for SPI port (AVR only). $WIZARD = { "type" : "int" }
+/// [bytes] Size of the outbound FIFO buffer for SPI port (AVR only). $WIZ$ type = "int"
 #define CONFIG_SPI_TXBUFSIZE    32
 
-/// [bytes] Size of the inbound FIFO buffer for SPI port (AVR only). $WIZARD = { "type" : "int" }
+/// [bytes] Size of the inbound FIFO buffer for SPI port (AVR only). $WIZ$ type = "int"
 #define CONFIG_SPI_RXBUFSIZE    32
 
-/// [bytes] Size of the outbound FIFO buffer for SPI port 0. $WIZARD = { "type" : "int" }
+/// [bytes] Size of the outbound FIFO buffer for SPI port 0. $WIZ$ type = "int"
 #define CONFIG_SPI0_TXBUFSIZE	32
 
-/// [bytes] Size of the inbound FIFO buffer for SPI port 0. $WIZARD = { "type" : "int" }
+/// [bytes] Size of the inbound FIFO buffer for SPI port 0. $WIZ$ type = "int"
 #define CONFIG_SPI0_RXBUFSIZE	32
 
-/// [bytes] Size of the outbound FIFO buffer for SPI port 1. $WIZARD = { "type" : "int" }
+/// [bytes] Size of the outbound FIFO buffer for SPI port 1. $WIZ$ type = "int"
 #define CONFIG_SPI1_TXBUFSIZE	32
 
-/// [bytes] Size of the inbound FIFO buffer for SPI port 1. $WIZARD = { "type" : "int" }
+/// [bytes] Size of the inbound FIFO buffer for SPI port 1. $WIZ$ type = "int"
 #define CONFIG_SPI1_RXBUFSIZE	32
 
 /**
  * SPI data order (AVR only).
  *
- * $WIZARD = {
- * "type" : "enum",
- * "value_list" : "ser_order_bit"
- * }
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "ser_order_bit"
  */
 #define CONFIG_SPI_DATA_ORDER	SER_MSB_FIRST
 
-/// SPI clock division factor (AVR only). $WIZARD = { "type" : "int" }
+/// SPI clock division factor (AVR only). $WIZ$ type = "int"
 #define CONFIG_SPI_CLOCK_DIV	16
 /**
  * SPI clock polarity: normal low or normal high (AVR only).
- * $WIZARD = {
- * "type" : "enum",
- * "value_list" : "ser_spi_pol"
- * }
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "ser_spi_pol"
  */
 #define CONFIG_SPI_CLOCK_POL        SPI_NORMAL_LOW
 
 /**
  * SPI clock phase you can choose sample on first edge or
  * sample on second clock edge (AVR only)
- * $WIZARD = {
- * "type" : "enum",
- * "value_list" : "ser_spi_phase"
- * }
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "ser_spi_phase"
  */
 #define CONFIG_SPI_CLOCK_PHASE	    SPI_SAMPLE_ON_FIRST_EDGE
 
-/// Default transmit timeout (ms). Set to -1 to disable timeout support. $WIZARD = { "type" : "int" }
+/// Default transmit timeout (ms). Set to -1 to disable timeout support. $WIZ$ type = "int"
 #define CONFIG_SER_TXTIMEOUT    -1
 
-/// Default receive timeout (ms). Set to -1 to disable timeout support. $WIZARD = { "type" : "int" }
+/// Default receive timeout (ms). Set to -1 to disable timeout support. $WIZ$ type = "int"
 #define CONFIG_SER_RXTIMEOUT    -1
 
-/// Use RTS/CTS handshake. $WIZARD = { "type" : "boolean" }
+/// Use RTS/CTS handshake. $WIZ$ type = "boolean"
 #define CONFIG_SER_HWHANDSHAKE   0
 
-/// Default baud rate (set to 0 to disable). $WIZARD = { "type" : "boolean" }
+/// Default baud rate (set to 0 to disable). $WIZ$ type = "boolean"
 #define CONFIG_SER_DEFBAUDRATE   0
 
-/// Enable ser_gets() and ser_gets_echo(). $WIZARD = { "type" : "boolean" }
+/// Enable ser_gets() and ser_gets_echo(). $WIZ$ type = "boolean"
 #define CONFIG_SER_GETS          0
 
-/// Enable second serial port in emulator. $WIZARD = { "type" : "boolean" }
+/// Enable second serial port in emulator. $WIZ$ type = "boolean"
 #define CONFIG_EMUL_UART1        0
 
-/// For serial debug. $WIZARD = { "type" : "boolean" }
+/// For serial debug. $WIZ$ type = "boolean"
 #define CONFIG_SER_STROBE        0
 
 #endif /* CFG_SER_H */

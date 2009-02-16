@@ -40,10 +40,14 @@
 #ifndef CFG_MD2_H
 #define CFG_MD2_H
 
-/// Size of block for MD2 algorithm. $WIZARD = { "type" : "int", "min" : "0" }
+/**
+ * Size of block for MD2 algorithm.
+ * $WIZ$ type = "int"
+ * $WIZ$ min = "0"
+ */
 #define CONFIG_MD2_BLOCK_LEN    16
 
-/// Use standard permutation in MD2 algorithm. $WIZARD = { "type" : "boolean" }
+/// Use standard permutation in MD2 algorithm. $WIZ$ type = "boolean"
 #define CONFIG_MD2_STD_PERM     0
 
 #endif /* CFG_MD2_H */

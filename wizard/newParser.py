@@ -63,6 +63,41 @@ def loadDefineLists(commentList):
             defineList[key] = (value,)
     return defineList
 
+def getDescriptionInformations(comment): 
+    """ 
+    Take the doxygen comment and strip the wizard informations, returning the tuple 
+    (comment, wizard_information) 
+    """
+    description = ""
+    information = {}
+    for num, line in enumerate(comment):
+        index = line.find("$WIZ$")
+        if index != -1:
+            description += " " + line[:index]
+            try:
+                exec line[index + len("$WIZ$ "):] in {}, information
+            except:
+                raise ParseError(num, line[index:])
+        else:
+            description += " " + line
+    return description.strip(), information
+
+def getDefinitionBlocks(text):
+    """
+    Take a text and return a list of tuple (description, name-value).
+    """
+    block = []
+    block_tmp = re.findall(r"/\*{2}\s*([^*]*\*(?:[^/*][^*]*\*+)*)/\s*#define\s+((?:[^/]*?/?)+)\s*?(?:/{2,3}[^<].*?)?$", text, re.MULTILINE)
+    for comment, define in block_tmp:
+        # Only the first element is needed
+        block.append(([re.findall(r"^\s*\* *(.*?)$", line, re.MULTILINE)[0] for line in comment.splitlines()], define))
+    for comment, define in re.findall(r"/{3}\s*([^<].*?)\s*#define\s+((?:[^/]*?/?)+)\s*?(?:/{2,3}[^<].*?)?$", text, re.MULTILINE):
+        block.append(([comment], define))
+    for define, comment in re.findall(r"#define\s*(.*?)\s*/{3}<\s*(.+?)\s*?(?:/{2,3}[^<].*?)?$", text, re.MULTILINE):
+        block.append(([comment], define))
+    print block
+    return block
+
 class ParseError(Exception):
     def __init__(self, line_number, line):
         Exception.__init__(self)

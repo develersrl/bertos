@@ -39,9 +39,9 @@
 #ifndef CFG_NTC_H
 #define CFG_NTC_H
 
-///< Max value of the dsty cycle on triac. $WIZARD = { "type" : "int" }
-#define NTC_OPEN_CIRCUIT  -3s768
-///< Max value of the triac power. $WIZARD = { "type" : "int" }
+/// Max value of the dsty cycle on triac. $WIZ$ type = "int"
+#define NTC_OPEN_CIRCUIT  -32768
+/// Max value of the triac power. $WIZ$ type = "int"
 #define NTC_SHORT_CIRCUIT 32767
 
 #endif /* CFG_NTC_H */

@@ -42,55 +42,57 @@
 /**
  * Module logging level.
  *
- * $WIZARD = { "type" : "enum", "value_list" : "log_level" }
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
  */
 #define ADC_LOG_LEVEL      LOG_LVL_INFO
 
 /**
  * module logging format.
  *
- * $WIZARD = { "type" : "enum", "value_list" : "log_format" }
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
  */
 #define ADC_LOG_FORMAT     LOG_FMT_VERBOSE
 
 /**
  * Frequency clock for ADC conversion.
  *
- * $WIZARD = { "type" : "int" }
+ * $WIZ$ type = "int"
  */
 #define CONFIG_ADC_CLOCK        4800000UL
 
 /**
  * Minimum time for startup a conversion in micro second.
  *
- * $WIZARD = { "type" : "int" }
+ * $WIZ$ type = "int"
  */
 #define CONFIG_ADC_STARTUP_TIME 20
 
 /**
  * Minimum time for sample and hold in nano second.
  *
- * $WIZARD = { "type" : "int" }
+ * $WIZ$ type = "int"
  */
 #define CONFIG_ADC_SHTIME       834
 
 /**
  * ADC setting for AVR target.
  *
- * $WIZARD = {"type" : "int" }
+ * $WIZ$ type = "int"
  */
 #define CONFIG_ADC_AVR_REF      1
 /*
  * ADC setting for AVR target.
  *
- * $WIZARD = {"type" : "int" }
+ * $WIZ$ type = "int"
  */
 #define CONFIG_ADC_AVR_DIVISOR  2
 
 /**
  * Enable ADS strobe.
  *
- * $WIZARD = {"type" : "boolean" }
+ * $WIZ$ type = "boolean"
  */
 #define CONFIG_ADC_STROBE  0
 

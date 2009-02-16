@@ -40,7 +40,7 @@
 #ifndef CFG_WDT_H
 #define CFG_WDT_H
 
-/// Enable watchdog timer. $WIZARD = { "type" : "boolean" }
+/// Enable watchdog timer. $WIZ$ type = "boolean"
 #define CONFIG_WATCHDOG      0
 
 #endif /* CFG_WDT_H */

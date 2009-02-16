@@ -39,10 +39,10 @@
 #ifndef CFG_PHASE_H
 #define CFG_PHASE_H
 
-/// Max value of the duty cycle on triac. $WIZARD = { "type" : "int" }
+/// Max value of the duty cycle on triac. $WIZ$ type = "int"
 #define CONFIG_TRIAC_MAX_DUTY  100
 
-/// Max value of the triac power. $WIZARD = { "type" : "int" }
+/// Max value of the triac power. $WIZ$ type = "int"
 #define CONFIG_TRIAC_MAX_POWER 100
 
 #endif /* CFG_PHASE_H */

@@ -41,13 +41,15 @@
 
 /**
  * Module logging level.
- * $WIZARD = { "type" : "enum", "value_list" : "log_level" }
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
  */
 #define DATAFLASH_LOG_LEVEL      LOG_LVL_INFO
 
 /**
  * Module logging format.
- * $WIZARD = { "type" : "enum", "value_list" : "log_format" }
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
  */
 #define DATAFLASH_LOG_FORMAT     LOG_FMT_TERSE
 

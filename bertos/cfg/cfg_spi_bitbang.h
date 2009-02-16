@@ -43,10 +43,8 @@
 /**
  * Set data order for emulated SPI.
  *
- * $WIZARD = {
- * "type" : "enum",
- * "value_list" : "ordet_bit_list"
- * }
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "ordet_bit_list"
  */
 #define CONFIG_SPI_DATAORDER  SPI_LSB_FIRST
 
