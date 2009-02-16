@@ -95,7 +95,6 @@ def getDefinitionBlocks(text):
         block.append(([comment], define))
     for define, comment in re.findall(r"#define\s*(.*?)\s*/{3}<\s*(.+?)\s*?(?:/{2,3}[^<].*?)?$", text, re.MULTILINE):
         block.append(([comment], define))
-    print block
     return block
 
 class ParseError(Exception):
