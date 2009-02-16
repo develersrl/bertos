@@ -73,7 +73,7 @@ def main():
     try:
         defineLists = {}
         modules = {}
-        commentList = getCommentList(open("test/to_parse.h", "r").read())
+        commentList = getCommentList(open("test/to_parse", "r").read())
         toBeParsedm, moduleInfo = loadModuleDefinition(commentList[0])
         modules.update(moduleInfo)
         if toBeParsed:
