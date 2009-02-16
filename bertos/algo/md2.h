@@ -42,11 +42,8 @@
  * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  *
- * $WIZARD_MODULE = {
- * "name" : "md2",
- * "depends" : [],
- * "configuration" : "bertos/cfg/cfg_md2.h"
- * }
+ * $WIZ$ module_name = "md2"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_md2.h"
  */
 
 #ifndef ALGO_MD2_H

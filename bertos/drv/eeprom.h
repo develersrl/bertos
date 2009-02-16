@@ -37,11 +37,8 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
- * $WIZARD_MODULE = {
- * "name" : "eeprom",
- * "depends" : ["kfile"],
- * "configuration" : ""
- * }
+ * $WIZ$ module_name = "eeprom"
+ * $WIZ$ module_depends = "kfile"
  */
 
 #ifndef DRV_EEPROM_H

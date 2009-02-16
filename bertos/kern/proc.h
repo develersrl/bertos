@@ -35,11 +35,8 @@
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
- * $WIZARD_MODULE = {
- * "name" : "kernel",
- * "depends" : [],
- * "configuration" : "bertos/cfg/cfg_kern.h"
- * }
+ * $WIZ$ module_name = "kernel"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_kern.h"
  */
 
 #ifndef KERN_PROC_H

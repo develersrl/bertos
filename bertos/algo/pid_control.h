@@ -36,11 +36,8 @@
  *
  * \author Daniele Basile <asterix@develer.com>
  *
- * $WIZARD_MODULE = {
- * "name" : "pid_control",
- * "depends" : ["timer"],
- * "configuration" : ""
- * }
+ * $WIZ$ module_name = "pid_control"
+ * $WIZ$ module_depends = "timer"
  */
 
 #ifndef ALGO_PID_CONTROL_H

@@ -35,6 +35,7 @@
  * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
+ * $WIZ$
  */
 
 #ifndef CFG_TIMER_H
@@ -42,7 +43,7 @@
 
 /**
  *
- * $WIZARD_LIST = { "timer_select" : ["TIMER_DEFAULT"] }
+ * $WIZ$ timer_select = "TIMER_DEFAULT"
  */
 
 /// Hardware timer selection for drv/timer.c. $WIZARD = { "type" : "enum", "value_list" : "timer_select" }

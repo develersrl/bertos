@@ -36,10 +36,9 @@
  *
  * \author Daniele Basile <asterix@develer.com>
  *
- * $WIZARD_MODULE = {
- * "name" : "dataflash",
- * "depends" : ["kfile"],
- * "configuration" : "bertos/cfg/cfg_dataflash.h"
+ * $WIZ$ module_name = "dataflash"
+ * $WIZ$ module_depends = "kfile"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_dataflash.h"
  * }
  */
 

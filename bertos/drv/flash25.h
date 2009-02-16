@@ -36,11 +36,9 @@
  * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  *
- * $wizard_module = {
- * "name" : "flash25",
- * "depends" : ["kfile"],
- * "configuration" : "bertos/cfg/cfg_flash25.h"
- * }
+ * $WIZ$ module_name = "flash25"
+ * $WIZ$ module_depends = "kfile"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_flash25.h"
  */
 
 
@@ -90,9 +88,7 @@ INLINE Flash25 * FLASH25_CAST(KFile *fd)
  * this drive. Every time we call flash25_init() function we check
  * if memory defined are right (see flash25.c form more detail).
  *
- * $WIZARD_LIST = {
- * "flash25_list" : ["FLASH25_AT25F2048"]
- * }
+ * $WIZ$ flash25_list = "FLASH25_AT25F2048"
  */
 #define FLASH25_AT25F2048         1
 

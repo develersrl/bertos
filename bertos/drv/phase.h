@@ -36,10 +36,9 @@
  * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  *
- * $WIZARD_MODULE = {
- * "name" : "phase",
- * "depends" : ["timer"],
- * "configuration" : "bertos/cfg/cfg_phase.h"
+ * $WIZ$ module_name = "phase"
+ * $WIZ$ module_depends = "timer"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_phase.h"
  * }
  */
 

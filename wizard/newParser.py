@@ -45,9 +45,10 @@ def loadModuleDefinition(first_comment):
             moduleDict[moduleDefinition["module_name"]]["configuration"] = ""
         if "module_description" in moduleDefinition.keys():
             moduleDict[moduleDefinition["module_name"]]["description"] = moduleDefinition["module_description"]
+        moduleDict[moduleDefinition["module_name"]]["enabled"] = False
     return toBeParsed, moduleDict
 
-def loadDefineList(commentList):
+def loadDefineLists(commentList):
     defineList = {}
     for comment in commentList:
         for num, line in enumerate(comment):
@@ -70,9 +71,15 @@ class ParseError(Exception):
 
 def main():
     try:
+        defineLists = {}
+        modules = {}
         commentList = getCommentList(open("test/to_parse.h", "r").read())
-        print loadModuleDefinition(commentList[0])
-        print loadDefineList(commentList[1:])
+        toBeParsedm, moduleInfo = loadModuleDefinition(commentList[0])
+        modules.update(moduleInfo)
+        if toBeParsed:
+            defineLists.update(loadDefineList(commentList[1:]))
+        print modules
+        print defineLists
     except ParseError, err:
         print "Error: line %d - %s" % (err.line_number, err.line)
 

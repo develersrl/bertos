@@ -41,11 +41,7 @@
  *
  * \author Francesco Sacchi <batt@develer.com>
  *
- * $WIZARD_MODULE = {
- * "name" : "rotating_hash",
- * "depends" : [],
- * "configuration" : ""
- * }
+ * $WIZ$ module_name = "rotating_hash"
  */
 
 

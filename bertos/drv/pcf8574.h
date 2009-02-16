@@ -35,11 +35,8 @@
  * \version $Id: ft245rl.c 22301 2008-09-09 16:53:17Z batt $
  * \author Francesco Sacchi <batt@develer.com>
  *
- * $WIZARD_MODULE = {
- * "name" : "pcf8574",
- * "depends" : ["i2c"],
- * "configuration" : ""
- * }
+ * $WIZ$ module_name = "pcf8574"
+ * $WIZ$ module_depends = "i2c"
  */
 
 #ifndef DRV_PCF8574_H

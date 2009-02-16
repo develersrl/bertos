@@ -35,11 +35,8 @@
  *
  * \author Francesco Sacchi <batt@develer.com>
  *
- * $WIZARD_MODULE = {
- * "name" : "pocketcmd",
- * "depends" : ["timer", "pocketbus"],
- * "configuration" : ""
- * }
+ * $WIZ$ module_name = "pocketcmd"
+ * $WIZ$ module_depends = "timer", "pocketbus"
  */
 
 #ifndef NET_POCKETCMD_H

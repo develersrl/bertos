@@ -36,11 +36,9 @@
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Francesco Sacchi <batt@develer.com>
  *
- * $WIZARD_MODULE = {
- * "name" : "xmodem",
- * "depends" : ["kfile"],
- * "configuration" : "bertos/cfg/cfg_xmodem.h"
- * }
+ * $WIZ$ module_name = "xmodem"
+ * $WIZ$ module_depends = "kfile"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_xmodem.h"
  */
 
 

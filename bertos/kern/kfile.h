@@ -93,11 +93,8 @@
  * \author Francesco Sacchi <batt@develer.com>
  * \author Daniele Basile <asterix@develer.com>
  *
- * $WIZARD_MODULE = {
- * "name" : "kfile",
- * "depends" : [],
- * "configuration" : "bertos/cfg/cfg_kfile.h"
- * }
+ * $WIZ$ module_name = "kfile"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_kfile.h"
  */
 
 #ifndef KERN_KFILE_H

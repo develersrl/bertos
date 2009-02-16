@@ -47,10 +47,9 @@
  * \author Giovanni Bajo <rasky@develer.com>
  * \author Francesco Sacchi <batt@develer.com>
  *
- * $WIZARD_MODULE = {
- * "name" : "thermo",
- * "depends" : ["timer", "ntc"],
- * "configuration" : "bertos/cfg/cfg_thermo.h"
+ * $WIZ$ module_name = "thermo"
+ * $WIZ$ module_depends = "timer", "ntc"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_thermo.h"
  * }
  */
 

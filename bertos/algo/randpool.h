@@ -36,11 +36,9 @@
  * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  *
- * $WIZARD_MODULE = {
- * "name" : "randpool",
- * "depends" : ["timer"],
- * "configuration" : "bertos/cfg/cfg_randpool.h"
- * }
+ * $WIZ$ module_name = "randpool"
+ * $WIZ$ module_depends = "timer"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_randpool.h"
  */
 
 #ifndef ALGO_RANDPOOL_H

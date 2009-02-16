@@ -35,11 +35,9 @@
  *
  * \brief Basical functions to use pocketBus protocol.
  *
- * $WIZARD_MODULE = {
- * "name" : "pocketbus",
- * "depends" : ["rotating_hash", "kfile"],
- * "configuration" : "bertos/cfg/cfg_pocketbus.h"
- * }
+ * $WIZ$ module_name = "pocketbus"
+ * $WIZ$ module_depends = "rotating_hash", "kfile"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_pocketbus.h"
  */
 
 #ifndef NET_POCKETBUS_H

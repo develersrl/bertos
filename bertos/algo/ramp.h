@@ -43,11 +43,8 @@
  * \author Giovanni Bajo <rasky@develer.com>
  * \author Daniele Basile <asterix@develer.com>
  *
- * $WIZARD_MODULE = {
- * "name" : "ramp",
- * "depends" : [],
- * "configuration" : "bertos/cfg/cfg_ramp.h"
- * }
+ * $WIZ$ module_name = "ramp"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_ramp.h"
  */
 
 #ifndef ALGO_RAMP_H

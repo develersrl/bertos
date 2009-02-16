@@ -35,11 +35,8 @@
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
- * $WIZARD_MODULE = {
- * "name" : "timer",
- * "depends" : [],
- * "configuration" : "bertos/cfg/cfg_timer.h"
- * }
+ * $WIZ$ module_name = "timer"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_timer.h"
  */
 
 #ifndef DRV_TIMER_H

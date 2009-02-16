@@ -36,11 +36,7 @@
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
- * $WIZARD_MODULE = {
- * "name" : "rle",
- * "depends" : [],
- * "configuration" : ""
- * }
+ * $WIZ$ module_name = "rle"
  */
 #ifndef RLE_H
 #define RLE_H

@@ -36,11 +36,8 @@
  * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  *
- * $WIZARD_MODULE = {
- * "name" : "ft245rl",
- * "depends" : ["kfile", "timer"],
- * "configuration" : ""
- * }
+ * $WIZ$ module_name = "ft245rl"
+ * $WIZ$ module_depends = "kfile", "timer"
  */
 
 

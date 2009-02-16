@@ -37,11 +37,8 @@
  * \author Giovanni Bajo <rasky@develer.com>
  * \author Francesco Sacchi <batt@develer.com>
  *
- * $WIZARD_MODULE = {
- * "name" : "ntc",
- * "depends" : ["adc"],
- * "configuration" : ""
- * }
+ * $WIZ$ module_name = "ntc"
+ * $WIZ$ module_depends = "adc"
  */
 
 #ifndef DRV_NTC_H

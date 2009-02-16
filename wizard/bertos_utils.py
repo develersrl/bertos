@@ -18,6 +18,9 @@ import shutil
 import const
 import DefineException
 
+# Try to use the new parsing module for the module information and the define lists
+import newParser
+
 def isBertosDir(directory):
    return os.path.exists(directory + "/VERSION")
 
@@ -165,6 +168,45 @@ def getInfos(definition):
     return D
 
 def loadModuleData(project):
+    moduleInfoDict = {}
+    listInfoDict = {}
+    configurationInfoDict = {}
+    for filename, path in findDefinitions("*.h", project):
+        commentList = newParser.getCommentList(open(path + "/" + filename, "r").read())
+        if len(commentList) > 0:
+            moduleInfo = {}
+            configurationInfo = {}
+            try:
+                toBeParsed, moduleDict = newParser.loadModuleDefinition(commentList[0])
+            except newParser.ParseError, err:
+                print "error in file %s. line: %d - statement %s" % (path + "/" + filename, err.line_number, err.line)
+                print err.args
+                print err.message
+                raise Exception
+            for module, information in moduleDict.items():
+                if "configuration" in information.keys() and len(information["configuration"]):
+                    configuration = moduleDict[module]["configuration"]
+                    configurationInfo[configuration] = loadConfigurationInfos(project.info("SOURCES_PATH") + "/" + configuration)
+            moduleInfoDict.update(moduleDict)
+            configurationInfoDict.update(configurationInfo)
+            if toBeParsed:
+                try:
+                    listDict = newParser.loadDefineLists(commentList[1:])
+                    listInfoDict.update(listDict)
+                except newParser.ParseError, err:
+                    print "error in file %s. line: %d - statement %s" % (path + "/" + filename, err.line_number, err.line)
+                    print err.args
+                    print err.message
+                    raise Exception
+    for filename, path in findDefinitions("*_" + project.info("CPU_INFOS")["TOOLCHAIN"] + ".h", project):
+        commentList = newParser.getCommentList(open(path + "/" + filename, "r").read())
+        listInfoDict.update(newParser.loadDefineLists(commentList))
+    project.setInfo("MODULES", moduleInfoDict)
+    project.setInfo("LISTS", listInfoDict)
+    project.setInfo("CONFIGURATIONS", configurationInfoDict)
+    
+
+def loadModuleData_old(project):
     """
     Loads all the module data, like module definition, list definition, and module configurations
     int the given BProject, using the SOURCES_PATH information from this as the base for find the

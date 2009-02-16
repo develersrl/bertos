@@ -46,11 +46,7 @@
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
- * $WIZARD_MODULE = {
- * "name" : "crc16",
- * "depends" : [],
- * "configuration" : ""
- * }
+ * $WIZ$ module_name = "crc16"
  */
 
 #ifndef ALGO_CRC_H

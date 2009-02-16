@@ -36,11 +36,9 @@
  *
  * \author Daniele Basile <asterix@develer.com>
  *
- * $WIZARD_MODULE = {
- * "name" : "dc_motor",
- * "depends" : ["pwm", "pid_control", "adc", "timer"],
- * "configuration" : "bertos/cfg/cfg_dc_motor.h"
- * }
+ * $WIZ$ module_name = "dc_motor"
+ * $WIZ$ module_depends = "pwm", "pid_control", "adc", "timer"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_dc_motor.h"
  */
 
 #ifndef DRV_DC_MOTOR_H

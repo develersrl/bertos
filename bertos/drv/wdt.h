@@ -36,11 +36,8 @@
  *
  * \brief Watchdog module, supplies a simple API to manage wdt on supported target.
  *
- * $WIZARD_MODULE = {
- * "name" : "wdt",
- * "depends" : [],
- * "configuration" : "bertos/cfg/cfg_wdt.h"
- * }
+ * $WIZ$ module_name = "wdt"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_wdt.h"
  */
 
 #ifndef DRV_WDT_H

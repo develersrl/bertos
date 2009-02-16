@@ -37,11 +37,8 @@
  * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  *
- * $WIZARD_MODULE = {
- * "name" : "adc",
- * "depends" : [],
- * "configuration" : "bertos/cfg/cfg_adc.h"
- * }
+ * $WIZ$ module_name = "adc"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_adc.h"
  */
 
 

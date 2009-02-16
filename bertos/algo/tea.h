@@ -38,11 +38,7 @@
  * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  *
- * $WIZARD_MODULE = {
- * "name" : "tea",
- * "depends" : [],
- * "configuration" : ""
- * }
+ * $WIZ$ module_name = "tea"
  */
 
 #ifndef ALGO_TEA_H
