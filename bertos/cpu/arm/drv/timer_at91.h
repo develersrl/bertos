@@ -50,12 +50,11 @@
  *
  * Select which hardware timer interrupt to use for system clock and softtimers.
  *
- * \{
+ * $WIZ$ timer_select = "TIMER_ON_PIT", "TIMER_DEFAULT"
  */
 #define TIMER_ON_PIT 1  ///< System timer on Periodic interval timer
 
 #define TIMER_DEFAULT TIMER_ON_PIT  ///< Default system timer
-/* \} */
 
 /*
  * Hardware dependent timer initialization.
