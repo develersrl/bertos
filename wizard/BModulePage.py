@@ -41,11 +41,11 @@ class BModulePage(BWizardPage):
         try:
             bertos_utils.loadModuleData(self._project())
         except ModuleDefineException, e:
-            self._exceptionOccurred(self.tr("Error parsing module information in file %1").arg(e.path))
+            self._exceptionOccurred(self.tr("Error parsing line '%2' in file %1").arg(e.path).arg(e.line))
         except EnumDefineException, e:
-            self._exceptionOccurred(self.tr("Error parsing enum informations in file %1").arg(e.path))
+            self._exceptionOccurred(self.tr("Error parsing line '%2' in file %1").arg(e.path).arg(e.line))
         except ConfigurationDefineException, e:
-            self._exceptionOccurred(self.tr("Error parsing configuration informations in file %1, reading parameter %2").arg(e.path).arg(e.name))
+            self._exceptionOccurred(self.tr("Error parsing line '%2' in file %1").arg(e.path).arg(e.line))
     
     def _fillModuleTable(self):
         modules = self._projectInfoRetrieve("MODULES")
@@ -177,7 +177,7 @@ class BModulePage(BWizardPage):
         self._resetPropertyDescription()
         configurations = self._currentModuleConfigurations()
         if self._currentProperty() in configurations.keys():
-            description = configurations[self._currentProperty()]["description"]
+            description = configurations[self._currentProperty()]["brief"]
             name = self._currentProperty()
             self._currentPropertyItem().setText(name + "\n" + description)
     

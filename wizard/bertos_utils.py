@@ -285,14 +285,14 @@ def loadModuleData(project):
             try:
                 toBeParsed, moduleDict = loadModuleDefinition(commentList[0])
             except ParseError, err:
-                print "error in file %s. line: %d - statement %s" % (path + "/" + filename, err.line_number, err.line)
-                print err.args
-                print err.message
-                raise Exception
+                raise DefineException.ModuleDefineException(path, err.line_number, err.line)
             for module, information in moduleDict.items():
                 if "configuration" in information.keys() and len(information["configuration"]):
                     configuration = moduleDict[module]["configuration"]
-                    configurationInfo[configuration] = loadConfigurationInfos(project.info("SOURCES_PATH") + "/" + configuration)
+                    try:
+                        configurationInfo[configuration] = loadConfigurationInfos(project.info("SOURCES_PATH") + "/" + configuration)
+                    except ParseError, err:
+                        raise DefineException.ConfigurationDefineException(project.info("SOURCES_PATH") + "/" + configuration, err.line_number, err.line)
             moduleInfoDict.update(moduleDict)
             configurationInfoDict.update(configurationInfo)
             if toBeParsed:
@@ -300,10 +300,7 @@ def loadModuleData(project):
                     listDict = loadDefineLists(commentList[1:])
                     listInfoDict.update(listDict)
                 except ParseError, err:
-                    print "error in file %s. line: %d - statement %s" % (path + "/" + filename, err.line_number, err.line)
-                    print err.args
-                    print err.message
-                    raise Exception
+                    raise DefineException.EnumDefineException(path, err.line_number, err.line)
     for filename, path in findDefinitions("*_" + project.info("CPU_INFOS")["TOOLCHAIN"] + ".h", project):
         commentList = getCommentList(open(path + "/" + filename, "r").read())
         listInfoDict.update(loadDefineLists(commentList))
@@ -336,32 +333,26 @@ def loadConfigurationInfos(path):
             "long": boolean indicating if the num is a long
             "value_list": the name of the enum for enum parameters
     """
-    try:
-        configurationInfos = {}
-        for comment, define in getDefinitionBlocks(open(path, "r").read()):
-            name, value = formatParamNameValue(define)
-            brief, description, informations = getDescriptionInformations(comment)
-            configurationInfos[name] = {}
-            configurationInfos[name]["value"] = value
-            configurationInfos[name]["informations"] = informations
-            if ("type" in configurationInfos[name]["informations"].keys() and
-                    configurationInfos[name]["informations"]["type"] == "int" and
-                    configurationInfos[name]["value"].find("L") != -1):
-                configurationInfos[name]["informations"]["long"] = True
-                configurationInfos[name]["value"] = configurationInfos[name]["value"].replace("L", "")
-            if ("type" in configurationInfos[name]["informations"].keys() and
-                    configurationInfos[name]["informations"]["type"] == "int" and
-                    configurationInfos[name]["value"].find("U") != -1):
-                configurationInfos[name]["informations"]["unsigned"] = True
-                configurationInfos[name]["value"] = configurationInfos[name]["value"].replace("U", "")
-            configurationInfos[name]["description"] = description
-            configurationInfos[name]["brief"] = brief
-        return configurationInfos
-    except ParseError, err:
-        print "error in file %s. line: %d - statement %s" % (path, err.line_number, err.line)
-        print err.args
-        print err.message
-        raise Exception
+    configurationInfos = {}
+    for comment, define in getDefinitionBlocks(open(path, "r").read()):
+        name, value = formatParamNameValue(define)
+        brief, description, informations = getDescriptionInformations(comment)
+        configurationInfos[name] = {}
+        configurationInfos[name]["value"] = value
+        configurationInfos[name]["informations"] = informations
+        if ("type" in configurationInfos[name]["informations"].keys() and
+                configurationInfos[name]["informations"]["type"] == "int" and
+                configurationInfos[name]["value"].find("L") != -1):
+            configurationInfos[name]["informations"]["long"] = True
+            configurationInfos[name]["value"] = configurationInfos[name]["value"].replace("L", "")
+        if ("type" in configurationInfos[name]["informations"].keys() and
+                configurationInfos[name]["informations"]["type"] == "int" and
+                configurationInfos[name]["value"].find("U") != -1):
+            configurationInfos[name]["informations"]["unsigned"] = True
+            configurationInfos[name]["value"] = configurationInfos[name]["value"].replace("U", "")
+        configurationInfos[name]["description"] = description
+        configurationInfos[name]["brief"] = brief
+    return configurationInfos
 
 def sub(string, parameter, value):
     """
