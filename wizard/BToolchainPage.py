@@ -45,11 +45,12 @@ class BToolchainPage(BWizardPage):
         self.pageContent.toolchainList.clear()
     
     def _selectionChanged(self):
-        infos = collections.defaultdict(lambda: unicode("not defined"))
-        infos.update(qvariant_converter.getStringDict(self.pageContent.toolchainList.currentItem().data(Qt.UserRole)))
-        self.pageContent.infoLabel.setText("GCC " + infos["version"] + " (" + infos["build"] + ")\nTarget: " + infos["target"] + "\nPath: " + infos["path"])
-        self.pageContent.infoLabel.setVisible(True)
-        self.emit(SIGNAL("completeChanged()"))
+        if self.pageContent.toolchainList.currentIndex != -1:
+            infos = collections.defaultdict(lambda: unicode("not defined"))
+            infos.update(qvariant_converter.getStringDict(self.pageContent.toolchainList.currentItem().data(Qt.UserRole)))
+            self.pageContent.infoLabel.setText("GCC " + infos["version"] + " (" + infos["build"] + ")\nTarget: " + infos["target"] + "\nPath: " + infos["path"])
+            self.pageContent.infoLabel.setVisible(True)
+            self.emit(SIGNAL("completeChanged()"))
     
     def _search(self):
         dirList = self.searchDirList()
@@ -92,7 +93,7 @@ class BToolchainPage(BWizardPage):
         sel_toolchain = QFileDialog.getOpenFileName(self, self.tr("Choose the toolchain"), "")
         if not sel_toolchain.isEmpty():
             item = QListWidgetItem(sel_toolchain)
-            item.setData(Qt.UserRole, qvariant_converter.convertString(sel_toolchain))
+            item.setData(Qt.UserRole, qvariant_converter.convertString({"path": sel_toolchain}))
             self.pageContent.toolchainList.addItem(item)
             toolchains = self.toolchains()
             toolchains[sel_toolchain] = False
@@ -137,7 +138,7 @@ class BToolchainPage(BWizardPage):
     def isComplete(self):
         if self.pageContent.toolchainList.currentRow() != -1:
             self._projectInfoStore("TOOLCHAIN", 
-                qvariant_converter.getStringDict(self.pageContent.toolchainList.currentItem().data(Qt.UserRole))["path"])
+                qvariant_converter.getStringDict(self.pageContent.toolchainList.currentItem().data(Qt.UserRole)))
             return True
         else:
             return False
