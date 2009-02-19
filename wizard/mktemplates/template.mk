@@ -13,14 +13,12 @@ $pname_DEBUG = 1
 
 # Our target application
 TRG += $pname
-CPU = $cpuname
-BOOT_ADDR_START = 0x1E000
 
 $pname_PREFIX = $prefix
 
 $pname_SUFFIX = $suffix
 
-$pname_MCU = $(CPU)
+$pname_MCU = $cpuname
 
 $pname_CSRC = \
 	$csrc
