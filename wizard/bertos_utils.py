@@ -236,19 +236,27 @@ def getDescriptionInformations(comment):
     Take the doxygen comment and strip the wizard informations, returning the tuple 
     (comment, wizard_information) 
     """
+    brief = ""
     description = ""
     information = {}
     for num, line in enumerate(comment):
         index = line.find("$WIZ$")
         if index != -1:
-            description += " " + line[:index]
+            if len(brief) == 0:
+                brief += line[:index].strip()
+            else:
+                description += " " + line[:index]
             try:
                 exec line[index + len("$WIZ$ "):] in {}, information
             except:
                 raise ParseError(num, line[index:])
         else:
-            description += " " + line
-    return description.strip(), information
+            if len(brief) == 0:
+                brief += line.strip()
+            else:
+                description += " " + line
+                description = description.strip()
+    return brief.strip(), description.strip(), information
 
 def getDefinitionBlocks(text):
     """
@@ -332,7 +340,7 @@ def loadConfigurationInfos(path):
         configurationInfos = {}
         for comment, define in getDefinitionBlocks(open(path, "r").read()):
             name, value = formatParamNameValue(define)
-            description, informations = getDescriptionInformations(comment)
+            brief, description, informations = getDescriptionInformations(comment)
             configurationInfos[name] = {}
             configurationInfos[name]["value"] = value
             configurationInfos[name]["informations"] = informations
@@ -347,6 +355,7 @@ def loadConfigurationInfos(path):
                 configurationInfos[name]["informations"]["unsigned"] = True
                 configurationInfos[name]["value"] = configurationInfos[name]["value"].replace("U", "")
             configurationInfos[name]["description"] = description
+            configurationInfos[name]["brief"] = brief
         return configurationInfos
     except ParseError, err:
         print "error in file %s. line: %d - statement %s" % (path, err.line_number, err.line)
