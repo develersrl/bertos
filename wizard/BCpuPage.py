@@ -64,6 +64,7 @@ class BCpuPage(BWizardPage):
                 if type(CPU_DEF[key]) == str or type(CPU_DEF) == unicode:
                     infos[key] = qvariant_converter.getString(value)
             self._projectInfoStore("CPU_INFOS", infos)
+            self._projectInfoStore("CPU_NAME", unicode(self.pageContent.cpuList.currentItem().text()))
             return True
         else:
             return False
