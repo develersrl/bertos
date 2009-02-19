@@ -232,24 +232,24 @@ class BModulePage(BWizardPage):
         modules[selectedModule]["enabled"] = True
         self._projectInfoStore("MODULES", modules)
         depends = self._projectInfoRetrieve("MODULES")[selectedModule]["depends"]
-        unsatisfied = self.selectDependencyCheck(selectedModule)
+        unsatisfied = []
+        if self.pageContent.automaticFix.isChecked():
+            unsatisfied = self.selectDependencyCheck(selectedModule)
         if len(unsatisfied) > 0:
-            message = self.tr("The module %1 needs the following modules:\n%2.\n\nDo you want to resolve automatically the problem?")
-            message = message.arg(selectedModule).arg(", ".join(unsatisfied))
-            choice = QMessageBox.warning(self, self.tr("Dependency error"), message, QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
-            if choice == QMessageBox.Yes:
-                for module in unsatisfied:
-                    modules = self._projectInfoRetrieve("MODULES")
-                    modules[module]["enabled"] = True
-                for index in range(self.pageContent.moduleTable.rowCount()):
-                    if unicode(self.pageContent.moduleTable.item(index, 1).text()) in unsatisfied:
-                        self._buttonGroup.button(index).setChecked(True)
+            for module in unsatisfied:
+                modules = self._projectInfoRetrieve("MODULES")
+                modules[module]["enabled"] = True
+            for index in range(self.pageContent.moduleTable.rowCount()):
+                if unicode(self.pageContent.moduleTable.item(index, 1).text()) in unsatisfied:
+                    self._buttonGroup.button(index).setChecked(True)
     
     def _moduleUnselected(self, unselectedModule):
         modules = self._projectInfoRetrieve("MODULES")
         modules[unselectedModule]["enabled"] = False
         self._projectInfoStore("MODULES", modules)
-        unsatisfied = self.unselectDependencyCheck(unselectedModule)
+        unsatisfied = []
+        if self.pageContent.automaticFix.isChecked():
+            unsatisfied = self.unselectDependencyCheck(unselectedModule)
         if len(unsatisfied) > 0:
             message = self.tr("The module %1 is needed by the following modules:\n%2.\n\nDo you want to resolve automatically the problem?")
             message = message.arg(unselectedModule).arg(", ".join(unsatisfied))
