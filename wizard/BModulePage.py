@@ -72,7 +72,7 @@ class BModulePage(BWizardPage):
                 configurations = self._projectInfoRetrieve("CONFIGURATIONS")[configuration]
                 self.pageContent.propertyTable.setRowCount(len(configurations))
                 for index, property in enumerate(configurations):
-                    item = QTableWidgetItem(property)
+                    item = QTableWidgetItem(configurations[property]["brief"])
                     item.setData(Qt.UserRole, qvariant_converter.convertString(property))
                     self.pageContent.propertyTable.setItem(index, 0, item)
                     if "type" in configurations[property]["informations"].keys() and configurations[property]["informations"]["type"] == "boolean":
@@ -171,7 +171,10 @@ class BModulePage(BWizardPage):
     def _resetPropertyDescription(self):
         for index in range(self.pageContent.propertyTable.rowCount()):
             propertyName = qvariant_converter.getString(self.pageContent.propertyTable.item(index, 0).data(Qt.UserRole))
-            self.pageContent.propertyTable.item(index, 0).setText(propertyName)
+            # Awful solution! Needed because if the user change the module, the selection changed...
+            if propertyName not in self._currentModuleConfigurations().keys():
+                break
+            self.pageContent.propertyTable.item(index, 0).setText(self._currentModuleConfigurations()[propertyName]['brief'])
     
     def _showPropertyDescription(self):
         self._resetPropertyDescription()
@@ -179,7 +182,7 @@ class BModulePage(BWizardPage):
         if self._currentProperty() in configurations.keys():
             description = configurations[self._currentProperty()]["brief"]
             name = self._currentProperty()
-            self._currentPropertyItem().setText(name + "\n" + description)
+            self._currentPropertyItem().setText(description + "\n" + name)
     
     def _setupUi(self):
         self.pageContent.moduleTable.horizontalHeader().setResizeMode(QHeaderView.ResizeToContents)
