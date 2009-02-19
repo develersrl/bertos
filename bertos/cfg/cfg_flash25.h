@@ -43,7 +43,7 @@
 /**
  * Eeprom memory type.
  *
- *$WIZ$ type = "enum",
+ *$WIZ$ type = "enum"
  *$WIZ$ value_list = "flash25_list"
  */
 #define CONFIG_FLASH25 FLASH25_AT25F2048
