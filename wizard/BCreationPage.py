@@ -59,6 +59,15 @@ class BCreationPage(BWizardPage):
             toolchainTarget = QTreeWidgetItem(toolchainTitle, QStringList([self.tr("version: " + "GCC " + toolchainInfo["version"] + " (" + toolchainInfo["build"] + ")")]))
         toolchainPath = QTreeWidgetItem(toolchainTitle, QStringList([self.tr("path: " + toolchainInfo["path"])]))
         topLevel.append(toolchainTitle)
+        moduleTitle = QTreeWidgetItem(QStringList([self.tr("Modules")]))
+        configurations = self._projectInfoRetrieve("CONFIGURATIONS")
+        for module, information in self._projectInfoRetrieve("MODULES").items():
+            if information["enabled"]:
+                moduleItem = QTreeWidgetItem(moduleTitle, QStringList([module + " - " + information["description"]]))
+                if len(information["configuration"]) > 0:
+                    for property, data in configurations[information["configuration"]].items():
+                        configurationItem = QTreeWidgetItem(moduleItem, QStringList([data["description"] + " - " + data["value"]]))
+        topLevel.append(moduleTitle)
         self.pageContent.summaryTree.insertTopLevelItems(0, topLevel)
     
     def _connectSignals(self):
