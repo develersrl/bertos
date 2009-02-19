@@ -24,13 +24,13 @@ def isBertosDir(directory):
 def bertosVersion(directory):
    return open(directory + "/VERSION").readline().strip()
 
-def createBertosProject(projectInfos):
-    directory = projectInfos.info("PROJECT_PATH")
-    sourcesDir = projectInfos.info("SOURCES_PATH")
+def createBertosProject(projectInfo):
+    directory = projectInfo.info("PROJECT_PATH")
+    sourcesDir = projectInfo.info("SOURCES_PATH")
     if not os.path.isdir(directory):
         os.mkdir(directory)
     f = open(directory + "/project.bertos", "w")
-    f.write(repr(projectInfos))
+    f.write(repr(projectInfo))
     f.close()
     ## Destination source dir
     srcdir = directory + "/bertos"
@@ -41,7 +41,7 @@ def createBertosProject(projectInfos):
     if os.path.exists(makefile):
         os.remove(makefile)
     makefile = open("mktemplates/Makefile").read()
-    makefile = makefileGenerator(projectInfos, makefile)
+    makefile = makefileGenerator(projectInfo, makefile)
     open(directory + "/Makefile", "w").write(makefile)
     ## Destination project dir
     prjdir = directory + "/" + os.path.basename(directory)
@@ -51,7 +51,7 @@ def createBertosProject(projectInfos):
     cfgdir = prjdir + "/cfg"
     shutil.rmtree(cfgdir, True)
     os.mkdir(cfgdir)
-    for key, value in projectInfos.info("CONFIGURATIONS").items():
+    for key, value in projectInfo.info("CONFIGURATIONS").items():
         string = open(sourcesDir + "/" + key, "r").read()
         for parameter, infos in value.items():
             value = infos["value"]
@@ -65,32 +65,48 @@ def createBertosProject(projectInfos):
         f.close()
     ## Destinatio mk file
     makefile = open("mktemplates/template.mk", "r").read()
-    makefile = mkGenerator(projectInfos, makefile)
+    makefile = mkGenerator(projectInfo, makefile)
     open(prjdir + "/" + os.path.basename(prjdir) + ".mk", "w").write(makefile)
 
-def mkGenerator(projectInfos, makefile):
+def mkGenerator(projectInfo, makefile):
     """
     Generates the mk file for the current project.
     """
     mkData = {}
-    mkData["pname"] = os.path.basename(projectInfos.info("PROJECT_PATH"))
-    mkData["cpuname"] = projectInfos.info("CPU_INFOS")["CPU_NAME"]
-    mkData["cflags"] = " ".join(projectInfos.info("CPU_INFOS")["C_FLAGS"])
-    mkData["ldflags"] = " ".join(projectInfos.info("CPU_INFOS")["LD_FLAGS"])
+    mkData["$pname"] = os.path.basename(projectInfo.info("PROJECT_PATH"))
+    mkData["$cpuname"] = projectInfo.info("CPU_INFOS")["CPU_NAME"]
+    mkData["$cflags"] = " ".join(projectInfo.info("CPU_INFOS")["C_FLAGS"])
+    mkData["$ldflags"] = " ".join(projectInfo.info("CPU_INFOS")["LD_FLAGS"])
+    mkData["$csrc"] = csrcGenerator(projectInfo)
     for key in mkData:
         while makefile.find(key) != -1:
             makefile = makefile.replace(key, mkData[key])
     return makefile
 
-def makefileGenerator(projectInfos, makefile):
+def makefileGenerator(projectInfo, makefile):
     """
     Generate the Makefile for the current project.
     """
     # TODO: write a general function that works for both the mk file and the Makefile
     while makefile.find("project_name") != -1:
-        makefile = makefile.replace("project_name", os.path.basename(projectInfos.info("PROJECT_PATH")))
+        makefile = makefile.replace("project_name", os.path.basename(projectInfo.info("PROJECT_PATH")))
     return makefile
 
+def csrcGenerator(projectInfo):
+    modules = projectInfo.info("MODULES")
+    files = []
+    for module, information in modules.items():
+        if information["enabled"]:
+            for filename, path in findDefinitions(module + ".c", projectInfo):
+                files.append(path + "/" + filename)
+            for filename, path in findDefinitions(module + "_" + projectInfo.info("CPU_INFOS")["TOOLCHAIN"] + ".c", projectInfo):
+                files.append(path + "/" + filename)
+            for tag in projectInfo.info("CPU_INFOS")["CPU_TAGS"]:
+                for filename, path in findDefinitions(module + "_" + tag + ".c", projectInfo):
+                    files.append(path + "/" + filename)
+    csrc = " \\\n\t".join(files)
+    return csrc
+    
 def getSystemPath():
     path = os.environ["PATH"]
     if os.name == "nt":
@@ -283,6 +299,10 @@ def loadModuleData(project):
     for filename, path in findDefinitions("*_" + project.info("CPU_INFOS")["TOOLCHAIN"] + ".h", project):
         commentList = getCommentList(open(path + "/" + filename, "r").read())
         listInfoDict.update(loadDefineLists(commentList))
+    for tag in project.info("CPU_INFOS")["CPU_TAGS"]:
+        for filename, path in findDefinitions("*_" + tag + ".h", project):
+            commentList = getCommentList(open(path + "/" + filename, "r").read())
+            listInfoDict.update(loadDefineLists(commentList))
     project.setInfo("MODULES", moduleInfoDict)
     project.setInfo("LISTS", listInfoDict)
     project.setInfo("CONFIGURATIONS", configurationInfoDict)

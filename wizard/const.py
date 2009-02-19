@@ -14,7 +14,7 @@ CPU_DEF = {
     "CPU_DIR": "",
     "DEFINITION_PATH": "",
     "TOOLCHAIN": "",
-    "CPU_TAGS": "",
+    "CPU_TAGS": [],
     "CORE_CPU": "",
     "SCRIPT_DIR": "",
     "HW_DIR": "",

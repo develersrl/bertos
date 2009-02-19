@@ -9,25 +9,25 @@
 #
 
 # Set to 1 for debug builds
-pname_DEBUG = 1
+$pname_DEBUG = 1
 
 # Our target application
-TRG += pname
-CPU = cpuname
+TRG += $pname
+CPU = $cpuname
 BOOT_ADDR_START = 0x1E000
 
-pname_PREFIX = prefix
+$pname_PREFIX = $prefix
 
-pname_SUFFIX = suffix
+$pname_SUFFIX = $suffix
 
-pname_MCU = $(CPU)
+$pname_MCU = $(CPU)
 
-pname_CSRC = \
-	csrc
+$pname_CSRC = \
+	$csrc
 	#
 
-pname_PCSRC += pcsrc
+$pname_PCSRC += $pcsrc
 
 
-pname_CFLAGS = cflags
-pname_LDFLAGS = ldflags
+$pname_CFLAGS = $cflags
+$pname_LDFLAGS = $ldflags

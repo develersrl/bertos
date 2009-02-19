@@ -29,11 +29,12 @@ def main():
     app.project = BProject.BProject()
     page = BModulePage.BModulePage()
     page._projectInfoStore("SOURCES_PATH", "../../")
-    page._projectInfoStore("CPU_INFOS", {"TOOLCHAIN": "avr"})
+    page._projectInfoStore("CPU_INFOS", {"TOOLCHAIN": "avr", "CPU_TAGS": []})
     bertos_utils.loadSourceTree(page._project())
     page.reloadData()
     page.show()
     app.exec_()
+    bertos_utils.csrcGenerator(app.project)
 
 
 if __name__ == '__main__':
