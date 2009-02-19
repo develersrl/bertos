@@ -25,16 +25,41 @@ class BCreationPage(BWizardPage):
         self._connectSignals()
         self._completed = False
     
-    def reloadData(self):
-        self._completed = False
-        self._setupUi()
-    
     def _setupUi(self):
         self._confirmGroup = QWidgetGroup(self.pageContent.summaryTree,
                                             self.pageContent.createButton)
         self._finalGroup = QWidgetGroup(self.pageContent.iconLabel,
                                             self.pageContent.textLabel)
         self._finalGroup.setVisible(False)
+        summary = self.pageContent.summaryTree
+        summary.setHeaderHidden(True)
+        summary.setColumnCount(1)
+    
+    def reloadData(self):
+        self._completed = False
+        self._setupUi()
+        self.pageContent.summaryTree.clear()
+        topLevel = []
+        folderTitle = QTreeWidgetItem(QStringList([self.tr("Project folder")]))
+        folderItem = QTreeWidgetItem(folderTitle, QStringList([self._projectInfoRetrieve("PROJECT_PATH")]))
+        topLevel.append(folderTitle)
+        versionTitle = QTreeWidgetItem(QStringList([self.tr("BeRTOS version")]))
+        sources_path = self._projectInfoRetrieve("SOURCES_PATH")
+        version = QTreeWidgetItem(versionTitle, QStringList([self.tr("version: ") + bertos_utils.bertosVersion(sources_path)]))
+        sourcePath = QTreeWidgetItem(versionTitle, QStringList([self.tr("path: ") + sources_path]))
+        topLevel.append(versionTitle)
+        cpuTitle = QTreeWidgetItem(QStringList([self.tr("CPU")]))
+        cpuName = QTreeWidgetItem(cpuTitle, QStringList([self.tr("cpu name: ") + self._projectInfoRetrieve("CPU_NAME")]))
+        topLevel.append(cpuTitle)
+        toolchainTitle = QTreeWidgetItem(QStringList([self.tr("Toolchain")]))
+        toolchainInfo = self._projectInfoRetrieve("TOOLCHAIN")
+        if "target" in toolchainInfo.keys():
+            toolchainTarget = QTreeWidgetItem(toolchainTitle, QStringList([self.tr("target: " + toolchainInfo["target"])]))
+        if "version" in toolchainInfo.keys():
+            toolchainTarget = QTreeWidgetItem(toolchainTitle, QStringList([self.tr("version: " + "GCC " + toolchainInfo["version"] + " (" + toolchainInfo["build"] + ")")]))
+        toolchainPath = QTreeWidgetItem(toolchainTitle, QStringList([self.tr("path: " + toolchainInfo["path"])]))
+        topLevel.append(toolchainTitle)
+        self.pageContent.summaryTree.insertTopLevelItems(0, topLevel)
     
     def _connectSignals(self):
         self.connect(self.pageContent.createButton, SIGNAL("clicked(bool)"), self._createProject)
