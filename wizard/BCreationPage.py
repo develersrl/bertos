@@ -66,7 +66,7 @@ class BCreationPage(BWizardPage):
                 moduleItem = QTreeWidgetItem(moduleTitle, QStringList([module + " - " + information["description"]]))
                 if len(information["configuration"]) > 0:
                     for property, data in configurations[information["configuration"]].items():
-                        configurationItem = QTreeWidgetItem(moduleItem, QStringList([data["description"] + " - " + data["value"]]))
+                        configurationItem = QTreeWidgetItem(moduleItem, QStringList([data["brief"] + " " + data["value"]]))
         topLevel.append(moduleTitle)
         self.pageContent.summaryTree.insertTopLevelItems(0, topLevel)
     
