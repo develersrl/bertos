@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>466</width>
-    <height>366</height>
+    <width>491</width>
+    <height>409</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -25,19 +25,19 @@
       <widget class="QCheckBox" name="automaticFix" >
        <property name="minimumSize" >
         <size>
-         <width>150</width>
+         <width>175</width>
          <height>0</height>
         </size>
        </property>
        <property name="maximumSize" >
         <size>
-         <width>150</width>
+         <width>175</width>
          <height>16777215</height>
         </size>
        </property>
        <property name="text" >
-        <string>Correct conflicts
-automatically</string>
+        <string>Automatically fix
+dependecies</string>
        </property>
        <property name="checked" >
         <bool>true</bool>
@@ -45,31 +45,24 @@ automatically</string>
       </widget>
      </item>
      <item>
-      <widget class="QTableWidget" name="moduleTable" >
+      <widget class="QTreeWidget" name="moduleTree" >
        <property name="minimumSize" >
         <size>
-         <width>150</width>
+         <width>175</width>
          <height>0</height>
         </size>
        </property>
        <property name="maximumSize" >
         <size>
-         <width>150</width>
+         <width>175</width>
          <height>16777215</height>
         </size>
        </property>
-       <property name="editTriggers" >
-        <set>QAbstractItemView::NoEditTriggers</set>
-       </property>
-       <property name="selectionMode" >
-        <enum>QAbstractItemView::SingleSelection</enum>
-       </property>
-       <property name="selectionBehavior" >
-        <enum>QAbstractItemView::SelectRows</enum>
-       </property>
-       <property name="showGrid" >
-        <bool>false</bool>
-       </property>
+       <column>
+        <property name="text" >
+         <string>1</string>
+        </property>
+       </column>
       </widget>
      </item>
     </layout>
@@ -106,7 +99,7 @@ automatically</string>
         <enum>QAbstractItemView::SelectRows</enum>
        </property>
        <property name="showGrid" >
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
       </widget>
      </item>

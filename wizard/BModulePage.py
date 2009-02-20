@@ -28,9 +28,8 @@ class BModulePage(BWizardPage):
     
     def reloadData(self):
         self._setupUi()
-        self._setupButtonGroup()
         self._loadModuleData()
-        self._fillModuleTable()
+        self._fillModuleTree()
     
     def _setupButtonGroup(self):
         self._buttonGroup = QButtonGroup()
@@ -47,17 +46,22 @@ class BModulePage(BWizardPage):
         except ConfigurationDefineException, e:
             self._exceptionOccurred(self.tr("Error parsing line '%2' in file %1").arg(e.path).arg(e.line))
     
-    def _fillModuleTable(self):
+    def _fillModuleTree(self):
         modules = self._projectInfoRetrieve("MODULES")
         if modules is None:
             return
-        self.pageContent.moduleTable.setRowCount(len(modules))
-        for index, module in enumerate(modules):
-            self.pageContent.moduleTable.setItem(index, 1, QTableWidgetItem(module))
-            checkBox = QCheckBox()
-            self._buttonGroup.addButton(checkBox, index)
-            self.pageContent.moduleTable.setCellWidget(index, 0, checkBox)
-            checkBox.setChecked(modules[module]["enabled"])
+        categories = {}
+        for module, information in modules.items():
+            if information["category"] not in categories.keys():
+                categories[information["category"]] = []
+            categories[information["category"]].append(module)
+        for category, modules in categories.items():
+            item = QTreeWidgetItem(QStringList([category]))
+            for module in modules:
+                moduleItem = QTreeWidgetItem(item, QStringList([module]))
+                moduleItem.setCheckState(0, Qt.Unchecked)
+            self.pageContent.moduleTree.addTopLevelItem(item)
+        
     
     def _fillPropertyTable(self):
         module = self._currentModule()
@@ -143,9 +147,10 @@ class BModulePage(BWizardPage):
         
     
     def _currentModule(self):
-        currentModule = self.pageContent.moduleTable.item(self.pageContent.moduleTable.currentRow(), 1)
-        if currentModule is not None:
-            return unicode(currentModule.text())
+        currentModule = self.pageContent.moduleTree.currentItem()
+        # return only the child items
+        if currentModule is not None and currentModule.parent() is not None:
+            return unicode(currentModule.text(0))
         else:
             return None
     
@@ -157,9 +162,6 @@ class BModulePage(BWizardPage):
     
     def _currentPropertyItem(self):
         return self.pageContent.propertyTable.item(self.pageContent.propertyTable.currentRow(), 0)
-    
-    def _module(self, row):
-        return unicode(self.pageContent.moduleTable.item(row, 1).text())
     
     def _configurations(self, module):
         configuration = self._projectInfoRetrieve("MODULES")[module]["configuration"]
@@ -185,13 +187,7 @@ class BModulePage(BWizardPage):
             self._currentPropertyItem().setText(description + "\n" + name)
     
     def _setupUi(self):
-        self.pageContent.moduleTable.horizontalHeader().setResizeMode(QHeaderView.ResizeToContents)
-        self.pageContent.moduleTable.horizontalHeader().setStretchLastSection(True)
-        self.pageContent.moduleTable.horizontalHeader().setVisible(False)
-        self.pageContent.moduleTable.verticalHeader().setResizeMode(QHeaderView.ResizeToContents)
-        self.pageContent.moduleTable.verticalHeader().setVisible(False)
-        self.pageContent.moduleTable.setColumnCount(2)
-        self.pageContent.moduleTable.setRowCount(0)
+        self.pageContent.moduleTree.setHeaderHidden(True)
         self.pageContent.propertyTable.horizontalHeader().setResizeMode(QHeaderView.Stretch)
         self.pageContent.propertyTable.horizontalHeader().setVisible(False)
         self.pageContent.propertyTable.verticalHeader().setResizeMode(QHeaderView.ResizeToContents)
@@ -201,7 +197,8 @@ class BModulePage(BWizardPage):
         self.pageContent.moduleLabel.setVisible(False)
     
     def _connectSignals(self):
-        self.connect(self.pageContent.moduleTable, SIGNAL("itemSelectionChanged()"), self._fillPropertyTable)
+        self.connect(self.pageContent.moduleTree, SIGNAL("itemPressed(QTreeWidgetItem*, int)"), self._fillPropertyTable)
+        self.connect(self.pageContent.moduleTree, SIGNAL("itemChanged(QTreeWidgetItem*, int)"), self._dependencyCheck)
         self.connect(self.pageContent.propertyTable, SIGNAL("itemSelectionChanged()"), self._showPropertyDescription)
         self.connect(self._controlGroup, SIGNAL("stateChanged"), self._saveValue)
     
@@ -227,6 +224,14 @@ class BModulePage(BWizardPage):
         else:
             self._moduleUnselected(module)
     
+    def _dependencyCheck(self, item):
+        checked = False
+        module = unicode(item.text(0))
+        if item.checkState(0) == Qt.Checked:
+            self._moduleSelected(module)
+        else:
+            self._moduleUnselected(module)
+    
     def _moduleSelected(self, selectedModule):
         modules = self._projectInfoRetrieve("MODULES")
         modules[selectedModule]["enabled"] = True
@@ -239,9 +244,11 @@ class BModulePage(BWizardPage):
             for module in unsatisfied:
                 modules = self._projectInfoRetrieve("MODULES")
                 modules[module]["enabled"] = True
-            for index in range(self.pageContent.moduleTable.rowCount()):
-                if unicode(self.pageContent.moduleTable.item(index, 1).text()) in unsatisfied:
-                    self._buttonGroup.button(index).setChecked(True)
+            for category in range(self.pageContent.moduleTree.topLevelItemCount()):
+                item = self.pageContent.moduleTree.topLevelItem(category)
+                for child in range(item.childCount()):
+                    if unicode(item.child(child).text(0)) in unsatisfied:
+                        item.child(child).setCheckState(0, Qt.Checked)
     
     def _moduleUnselected(self, unselectedModule):
         modules = self._projectInfoRetrieve("MODULES")
@@ -251,16 +258,18 @@ class BModulePage(BWizardPage):
         if self.pageContent.automaticFix.isChecked():
             unsatisfied = self.unselectDependencyCheck(unselectedModule)
         if len(unsatisfied) > 0:
-            message = self.tr("The module %1 is needed by the following modules:\n%2.\n\nDo you want to resolve automatically the problem?")
+            message = self.tr("The module %1 is needed by the following modules:\n%2.\n\nDo you want to remove these modules too?")
             message = message.arg(unselectedModule).arg(", ".join(unsatisfied))
             choice = QMessageBox.warning(self, self.tr("Dependency error"), message, QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
             if choice == QMessageBox.Yes:
                 for module in unsatisfied:
                     modules = self._projectInfoRetrieve("MODULES")
                     modules[module]["enabled"] = False
-                for index in range(self.pageContent.moduleTable.rowCount()):
-                    if unicode(self.pageContent.moduleTable.item(index, 1).text()) in unsatisfied:
-                        self._buttonGroup.button(index).setChecked(False)
+                for category in range(self.pageContent.moduleTree.topLevelItemCount()):
+                    item = self.pageContent.moduleTree.topLevelItem(category)
+                    for child in range(item.childCount()):
+                        if unicode(item.child(child).text(0)) in unsatisfied:
+                            item.child(child).setCheckState(0, Qt.Unchecked)
     
     def selectDependencyCheck(self, module):
         unsatisfied = set()
