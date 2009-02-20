@@ -34,8 +34,6 @@ def main():
     page.reloadData()
     page.show()
     app.exec_()
-    bertos_utils.csrcGenerator(app.project)
-
 
 if __name__ == '__main__':
     main()
