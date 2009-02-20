@@ -187,6 +187,7 @@ class BModulePage(BWizardPage):
             self._currentPropertyItem().setText(description + "\n" + name)
     
     def _setupUi(self):
+        self.pageContent.moduleTree.clear()
         self.pageContent.moduleTree.setHeaderHidden(True)
         self.pageContent.propertyTable.horizontalHeader().setResizeMode(QHeaderView.Stretch)
         self.pageContent.propertyTable.horizontalHeader().setVisible(False)
