@@ -88,7 +88,7 @@ REGISTER Process *CurrentProcess;
  */
 List StackFreeList;
 
-#define NPROC 8
+#define NPROC 10
 cpu_stack_t proc_stacks[NPROC][(64 * 1024) / sizeof(cpu_stack_t)];
 #endif
 
@@ -166,6 +166,7 @@ struct Process *proc_new_with_name(UNUSED_ARG(const char *, name), void (*entry)
 #if (ARCH & ARCH_EMUL)
 	/* Ignore stack provided by caller and use the large enough default instead. */
 	PROC_ATOMIC(stack_base = (cpu_stack_t *)list_remHead(&StackFreeList));
+	ASSERT(stack_base);
 
 	stack_size = CONFIG_KERN_MINSTACKSIZE;
 #elif CONFIG_KERN_HEAP
