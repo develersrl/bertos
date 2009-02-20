@@ -262,7 +262,6 @@ class BModulePage(BWizardPage):
                     if unicode(self.pageContent.moduleTable.item(index, 1).text()) in unsatisfied:
                         self._buttonGroup.button(index).setChecked(False)
     
-    
     def selectDependencyCheck(self, module):
         unsatisfied = set()
         modules = self._projectInfoRetrieve("MODULES")
