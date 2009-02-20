@@ -61,12 +61,23 @@ class BCreationPage(BWizardPage):
         topLevel.append(toolchainTitle)
         moduleTitle = QTreeWidgetItem(QStringList([self.tr("Modules")]))
         configurations = self._projectInfoRetrieve("CONFIGURATIONS")
+        moduleCategories = {}
         for module, information in self._projectInfoRetrieve("MODULES").items():
             if information["enabled"]:
-                moduleItem = QTreeWidgetItem(moduleTitle, QStringList([module + " - " + information["description"]]))
+                if information["category"] not in moduleCategories.keys():
+                    moduleCategories[information["category"]] = []
+                moduleItem = QTreeWidgetItem(QStringList([module + " - " + information["description"]]))
+                moduleCategories[information["category"]].append(moduleItem)
                 if len(information["configuration"]) > 0:
                     for property, data in configurations[information["configuration"]].items():
-                        configurationItem = QTreeWidgetItem(moduleItem, QStringList([data["brief"] + " " + data["value"]]))
+                        # If the final char of the brief is a dot (".") removes it.
+                        brief = data["brief"]
+                        if brief[-1] == ".":
+                            brief = brief[:-1]
+                        configurationItem = QTreeWidgetItem(moduleItem, QStringList([brief + ": " + data["value"]]))
+        for key, value in moduleCategories.items():
+            categoryItem = QTreeWidgetItem(moduleTitle, QStringList([key]))
+            categoryItem.addChildren(value)
         topLevel.append(moduleTitle)
         self.pageContent.summaryTree.insertTopLevelItems(0, topLevel)
     
