@@ -287,6 +287,7 @@ def loadModuleData(project):
             except ParseError, err:
                 raise DefineException.ModuleDefineException(path, err.line_number, err.line)
             for module, information in moduleDict.items():
+                information["category"] = os.path.basename(path)
                 if "configuration" in information.keys() and len(information["configuration"]):
                     configuration = moduleDict[module]["configuration"]
                     try:
