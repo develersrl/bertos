@@ -29,6 +29,8 @@ CPU_DEF = {
     "CPU_DESC" : []
 }
 
+TOOLCHAIN_ITEMS = ["ld", "as"]
+
 CPU_DEFINITION = "*.cdef"
 
 GCC_NAME = "*gcc*"
