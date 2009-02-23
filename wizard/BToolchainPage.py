@@ -118,18 +118,31 @@ class BToolchainPage(BWizardPage):
     
     def validateToolchain(self, i):
         filename = qvariant_converter.getStringDict(self.pageContent.toolchainList.item(i).data(Qt.UserRole))["path"]
-        self._validationProcess = QProcess()
-        self._validationProcess.start(filename, ["-v"])
-        self._validationProcess.waitForStarted(1000)
-        if self._validationProcess.waitForFinished(200):
-            description = str(self._validationProcess.readAllStandardError())
-            infos = bertos_utils.getToolchainInfo(description)
-            if len(infos.keys()) >= 4:
-                self._validItem(i, infos)
+        valid = False
+        info = {}
+        ## Check for the other tools of the toolchain
+        for tool in TOOLCHAIN_ITEMS:
+            if os.path.exists(filename.replace("gcc", tool)):
+                valid = True
             else:
-                self._invalidItem(i)
+                valid = False
+                break
+        ## Try to retrieve the informations about the toolchain only for the valid toolchains
+        if valid:
+            self._validationProcess = QProcess()
+            self._validationProcess.start(filename, ["-v"])
+            self._validationProcess.waitForStarted(1000)
+            if self._validationProcess.waitForFinished(200):
+                description = str(self._validationProcess.readAllStandardError())
+                info = bertos_utils.getToolchainInfo(description)
+                if len(info.keys()) >= 4:
+                    valid = True
+            else:
+                self._validationProcess.kill()
+        ## Add the item in the list with the appropriate associate data.
+        if valid:
+            self._validItem(i, info)
         else:
-            self._validationProcess.kill()
             self._invalidItem(i)
         toolchains = self.toolchains()
         toolchains[filename] = True
