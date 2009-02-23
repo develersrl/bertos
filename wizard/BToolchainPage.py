@@ -54,7 +54,7 @@ class BToolchainPage(BWizardPage):
     
     def _search(self):
         dirList = self.searchDirList()
-        if(self.pathSearch()):
+        if self.pathSearch():
             dirList += [element for element in bertos_utils.getSystemPath()]
         toolchainList = bertos_utils.findToolchains(dirList)
         storedToolchains = self.toolchains()
