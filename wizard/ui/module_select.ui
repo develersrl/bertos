@@ -22,6 +22,27 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_3" >
      <item>
+      <widget class="QTreeWidget" name="moduleTree" >
+       <property name="minimumSize" >
+        <size>
+         <width>175</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize" >
+        <size>
+         <width>175</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <column>
+        <property name="text" >
+         <string>1</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+     <item>
       <widget class="QCheckBox" name="automaticFix" >
        <property name="minimumSize" >
         <size>
@@ -42,27 +63,6 @@ dependecies</string>
        <property name="checked" >
         <bool>true</bool>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QTreeWidget" name="moduleTree" >
-       <property name="minimumSize" >
-        <size>
-         <width>175</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="maximumSize" >
-        <size>
-         <width>175</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <column>
-        <property name="text" >
-         <string>1</string>
-        </property>
-       </column>
       </widget>
      </item>
     </layout>
@@ -92,6 +92,9 @@ dependecies</string>
        <property name="editTriggers" >
         <set>QAbstractItemView::NoEditTriggers</set>
        </property>
+       <property name="alternatingRowColors" >
+        <bool>true</bool>
+       </property>
        <property name="selectionMode" >
         <enum>QAbstractItemView::SingleSelection</enum>
        </property>
@@ -99,7 +102,13 @@ dependecies</string>
         <enum>QAbstractItemView::SelectRows</enum>
        </property>
        <property name="showGrid" >
+        <bool>false</bool>
+       </property>
+       <property name="wordWrap" >
         <bool>true</bool>
+       </property>
+       <property name="cornerButtonEnabled" >
+        <bool>false</bool>
        </property>
       </widget>
      </item>
