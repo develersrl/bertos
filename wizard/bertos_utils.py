@@ -119,8 +119,7 @@ def findToolchains(pathList):
     toolchains = []
     for element in pathList:
         for toolchain in glob.glob(element+ "/" + const.GCC_NAME):
-            if not os.path.islink(toolchain):
-                toolchains.append(toolchain)
+            toolchains.append(toolchain)
     return list(set(toolchains))
 
 def getToolchainInfo(output):
