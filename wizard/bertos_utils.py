@@ -78,6 +78,8 @@ def mkGenerator(projectInfo, makefile):
     mkData["$cflags"] = " ".join(projectInfo.info("CPU_INFOS")["C_FLAGS"])
     mkData["$ldflags"] = " ".join(projectInfo.info("CPU_INFOS")["LD_FLAGS"])
     mkData["$csrc"] = csrcGenerator(projectInfo)
+    mkData["$prefix"] = os.path.basename(projectInfo.info("TOOLCHAIN")["path"]).split("gcc")[0]
+    mkData["$suffix"] = os.path.basename(projectInfo.info("TOOLCHAIN")["path"]).split("gcc")[1]
     for key in mkData:
         while makefile.find(key) != -1:
             makefile = makefile.replace(key, mkData[key])
