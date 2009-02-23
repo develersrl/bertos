@@ -44,14 +44,14 @@ class BFolderPage(BWizardPage):
         self._setProjectPath()
     
     def _directoryChanged(self, directory):
-        self._destinationFolder = str(directory)
+        self._destinationFolder = str(QDir.toNativeSeparators(directory))
         self._setProjectPath()
     
     def _setProjectPath(self):
         if self._destinationFolder != "" and self._projectName <> "":
             if not self._destinationFolder.endswith(os.sep):
-                self._destinationFolder += os.sep
-            self.pageContent.projectPath.setText(self._destinationFolder + self._projectName)
+                self._destinationFolder += "/"
+            self.pageContent.projectPath.setText(QDir.toNativeSeparators(self._destinationFolder + self._projectName))
             if os.path.exists(self._destinationFolder + self._projectName):
                 self.pageContent.warningLabel.setVisible(True)
                 self.pageContent.warningLabel.setText(self.tr("<font color='#FF0000'>Warning: the selected directory exists, \

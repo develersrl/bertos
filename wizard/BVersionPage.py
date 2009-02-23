@@ -9,6 +9,8 @@
 # Author: Lorenzo Berni <duplo@develer.com>
 #
 
+import os
+
 from PyQt4.QtGui import *
 from BWizardPage import *
 import bertos_utils
@@ -47,11 +49,11 @@ class BVersionPage(BWizardPage):
         
     def _insertListElement(self, directory):
         if bertos_utils.isBertosDir(directory):
-            item = QListWidgetItem(QIcon(":/images/ok.png"), bertos_utils.bertosVersion(directory) + " (\"" + directory + "\")")
+            item = QListWidgetItem(QIcon(":/images/ok.png"), bertos_utils.bertosVersion(directory) + " (\"" + os.path.normpath(directory) + "\")")
             item.setData(Qt.UserRole, qvariant_converter.convertString(directory))
             self.pageContent.versionList.addItem(item)
         elif len(directory) > 0:
-            item = QListWidgetItem(QIcon(":/images/warning.png"), "UNKNOWN" + " (\"" + directory + "\")")
+            item = QListWidgetItem(QIcon(":/images/warning.png"), "UNKNOWN" + " (\"" + os.path.normpath(directory) + "\")")
             item.setData(Qt.UserRole, qvariant_converter.convertString(directory))
             self.pageContent.versionList.addItem(item)
     

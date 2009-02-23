@@ -48,7 +48,7 @@ class BToolchainPage(BWizardPage):
         if self.pageContent.toolchainList.currentIndex != -1:
             infos = collections.defaultdict(lambda: unicode("not defined"))
             infos.update(qvariant_converter.getStringDict(self.pageContent.toolchainList.currentItem().data(Qt.UserRole)))
-            self.pageContent.infoLabel.setText("GCC " + infos["version"] + " (" + infos["build"] + ")\nTarget: " + infos["target"] + "\nPath: " + infos["path"])
+            self.pageContent.infoLabel.setText("GCC " + infos["version"] + " (" + infos["build"] + ")\nTarget: " + infos["target"] + "\nPath: " + os.path.normpath(infos["path"]))
             self.pageContent.infoLabel.setVisible(True)
             self.emit(SIGNAL("completeChanged()"))
     

@@ -9,6 +9,8 @@
 # Author: Lorenzo Berni <duplo@develer.com>
 #
 
+import os
+
 from PyQt4.QtGui import *
 
 from BWizardPage import *
@@ -41,12 +43,12 @@ class BCreationPage(BWizardPage):
         self.pageContent.summaryTree.clear()
         topLevel = []
         folderTitle = QTreeWidgetItem(QStringList([self.tr("Project folder")]))
-        folderItem = QTreeWidgetItem(folderTitle, QStringList([self._projectInfoRetrieve("PROJECT_PATH")]))
+        folderItem = QTreeWidgetItem(folderTitle, QStringList([os.path.normpath(self._projectInfoRetrieve("PROJECT_PATH"))]))
         topLevel.append(folderTitle)
         versionTitle = QTreeWidgetItem(QStringList([self.tr("BeRTOS version")]))
         sources_path = self._projectInfoRetrieve("SOURCES_PATH")
         version = QTreeWidgetItem(versionTitle, QStringList([self.tr("version: ") + bertos_utils.bertosVersion(sources_path)]))
-        sourcePath = QTreeWidgetItem(versionTitle, QStringList([self.tr("path: ") + sources_path]))
+        sourcePath = QTreeWidgetItem(versionTitle, QStringList([self.tr("path: ") + os.path.normpath(sources_path)]))
         topLevel.append(versionTitle)
         cpuTitle = QTreeWidgetItem(QStringList([self.tr("CPU")]))
         cpuName = QTreeWidgetItem(cpuTitle, QStringList([self.tr("cpu name: ") + self._projectInfoRetrieve("CPU_NAME")]))
@@ -57,7 +59,7 @@ class BCreationPage(BWizardPage):
             toolchainTarget = QTreeWidgetItem(toolchainTitle, QStringList([self.tr("target: " + toolchainInfo["target"])]))
         if "version" in toolchainInfo.keys():
             toolchainTarget = QTreeWidgetItem(toolchainTitle, QStringList([self.tr("version: " + "GCC " + toolchainInfo["version"] + " (" + toolchainInfo["build"] + ")")]))
-        toolchainPath = QTreeWidgetItem(toolchainTitle, QStringList([self.tr("path: " + toolchainInfo["path"])]))
+        toolchainPath = QTreeWidgetItem(toolchainTitle, QStringList([self.tr("path: " + os.path.normpath(toolchainInfo["path"]))]))
         topLevel.append(toolchainTitle)
         moduleTitle = QTreeWidgetItem(QStringList([self.tr("Modules")]))
         configurations = self._projectInfoRetrieve("CONFIGURATIONS")
