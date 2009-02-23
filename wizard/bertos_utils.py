@@ -106,7 +106,7 @@ def csrcGenerator(projectInfo):
             for tag in projectInfo.info("CPU_INFOS")["CPU_TAGS"]:
                 for filename, path in findDefinitions(module + "_" + tag + ".c", projectInfo):
                     files.append(path + "/" + filename)
-    csrc = " \\\n\t".join(files)
+    csrc = " \\\n\t".join(files) + " \\"
     return csrc
     
 def getSystemPath():
