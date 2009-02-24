@@ -47,12 +47,14 @@ class BCpuPage(BWizardPage):
         self.pageContent.descriptionLabel.setText("")
     
     def reloadData(self):
+        QApplication.instance().setOverrideCursor(Qt.WaitCursor)
         bertos_utils.loadSourceTree(self._project())
         self._populateCpuList()
         cpuName = self._projectInfoRetrieve("CPU_NAME")
         self._setupUi()
         if not cpuName is None:
             self._selectItem(cpuName)
+        QApplication.instance().restoreOverrideCursor()
         self.emit(SIGNAL("completeChanged()"))
     
     def isComplete(self):
