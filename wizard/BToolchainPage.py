@@ -45,7 +45,7 @@ class BToolchainPage(BWizardPage):
         self.pageContent.toolchainList.clear()
     
     def _selectionChanged(self):
-        if self.pageContent.toolchainList.currentIndex != -1:
+        if self.pageContent.toolchainList.currentRow() != -1:
             infos = collections.defaultdict(lambda: unicode("not defined"))
             infos.update(qvariant_converter.getStringDict(self.pageContent.toolchainList.currentItem().data(Qt.UserRole)))
             self.pageContent.infoLabel.setText("GCC " + infos["version"] + " (" + infos["build"] + ")\nTarget: " + infos["target"] + "\nPath: " + os.path.normpath(infos["path"]))
