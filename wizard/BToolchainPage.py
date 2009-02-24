@@ -79,7 +79,7 @@ class BToolchainPage(BWizardPage):
         newData.update(infos)
         item.setData(Qt.UserRole, qvariant_converter.convertStringDict(newData))
         needed = self._projectInfoRetrieve("CPU_INFOS")
-        if infos["target"].find(needed["TOOLCHAIN"]) != -1:
+        if "target" in infos.keys() and infos["target"].find(needed["TOOLCHAIN"]) != -1:
             item.setIcon(QIcon(":/images/ok.png"))
         else:
             item.setIcon(QIcon(":/images/warning.png"))
