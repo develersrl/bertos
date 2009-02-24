@@ -114,8 +114,10 @@ class BToolchainPage(BWizardPage):
         search.exec_()
     
     def validateAllToolchains(self):
+        QApplication.instance().setOverrideCursor(Qt.WaitCursor)
         for i in range(self.pageContent.toolchainList.count()):
             self.validateToolchain(i)
+        QApplication.instance().restoreOverrideCursor()
     
     def validateToolchain(self, i):
         filename = qvariant_converter.getStringDict(self.pageContent.toolchainList.item(i).data(Qt.UserRole))["path"]
