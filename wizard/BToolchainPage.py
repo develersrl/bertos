@@ -83,7 +83,8 @@ class BToolchainPage(BWizardPage):
             item.setIcon(QIcon(":/images/ok.png"))
         else:
             item.setIcon(QIcon(":/images/warning.png"))
-        item.setText("GCC " + infos["version"] + " - " + infos["target"])
+        if "version" in infos.keys() and "target" in infos.keys():
+            item.setText("GCC " + infos["version"] + " - " + infos["target"])
     
     def _invalidItem(self, index):
         item = self.pageContent.toolchainList.item(index)
