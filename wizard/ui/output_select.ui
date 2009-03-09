@@ -29,9 +29,18 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout" >
       <item>
-       <widget class="QRadioButton" name="bbsButton" >
+       <widget class="QCheckBox" name="standardCheckBox" >
+        <property name="enabled" >
+         <bool>false</bool>
+        </property>
         <property name="text" >
          <string>BeRTOS build system</string>
+        </property>
+        <property name="checkable" >
+         <bool>true</bool>
+        </property>
+        <property name="checked" >
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -75,10 +84,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2" >
       <item>
-       <widget class="QRadioButton" name="eclipseButton" >
-        <property name="enabled" >
-         <bool>false</bool>
-        </property>
+       <widget class="QCheckBox" name="eclipseCheckBox" >
         <property name="text" >
          <string>Eclipse project</string>
         </property>
@@ -127,10 +133,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3" >
       <item>
-       <widget class="QRadioButton" name="xcodeButton" >
-        <property name="enabled" >
-         <bool>false</bool>
-        </property>
+       <widget class="QCheckBox" name="xcodeCheckBox" >
         <property name="text" >
          <string>XCode project</string>
         </property>
@@ -169,7 +172,7 @@
    <item>
     <widget class="QFrame" name="frame_4" >
      <property name="enabled" >
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="frameShape" >
       <enum>QFrame::StyledPanel</enum>
@@ -179,10 +182,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4" >
       <item>
-       <widget class="QRadioButton" name="codeliteButton" >
-        <property name="enabled" >
-         <bool>false</bool>
-        </property>
+       <widget class="QCheckBox" name="codeliteCheckBox" >
         <property name="text" >
          <string>CodeLite project</string>
         </property>

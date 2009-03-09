@@ -22,32 +22,19 @@ class BOutputPage(BWizardPage):
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/output_select.ui")
         self.setTitle(self.tr("Choose the project output"))
-        self._setupButtonGroup()
         self._connectSignals()
+        self._projectInfoStore("OUTPUT", [])
     
     def _connectSignals(self):
-        self.connect(self._buttonGroup, SIGNAL("buttonClicked(int)"), self._buttonClicked)
+        self.connect(self.pageContent.eclipseCheckBox, SIGNAL("stateChanged(int)"), lambda checked: self._modeChecked(checked, "eclipse"))
+        self.connect(self.pageContent.xcodeCheckBox, SIGNAL("stateChanged(int)"), lambda checked: self._modeChecked(checked, "xcode"))
+        self.connect(self.pageContent.codeliteCheckBox, SIGNAL("stateChanged(int)"), lambda checked: self._modeChecked(checked, "codelite"))
     
-    def _setupButtonGroup(self):
-        self._buttonGroup = QButtonGroup()
-        self._buttonGroup.addButton(self.pageContent.bbsButton)
-        self._buttonGroup.addButton(self.pageContent.eclipseButton)
-        self._buttonGroup.addButton(self.pageContent.codeliteButton)
-        self._buttonGroup.addButton(self.pageContent.xcodeButton)
+    def _modeChecked(self, checked, value):
+        outputList = self._projectInfoRetrieve("OUTPUT")
+        if checked == Qt.Checked:
+            outputList.append(value)
+        else:
+            outputList.remove(value)
+        self._projectInfoStore("OUTPUT", outputList)
     
-    def _buttonClicked(self):
-        self.emit(SIGNAL("completeChanged()"))
-    
-    def isComplete(self):
-        for button in self._buttonGroup.buttons():
-            if button.isChecked():
-                if button is self.pageContent.bbsButton:
-                    self._projectInfoStore("OUTPUT", "makefile")
-                elif button is self.pageContent.eclipseButton:
-                    self._projectInfoStore("OUTPUT", "eclipse")
-                elif button is self.pageContent.codeliteButton:
-                    self._projectInfoStore("OUTPUT", "codelite")
-                elif button is self.pageContent.xcodeButton:
-                    self._projectInfoStore("OUTPUT", "xcode")
-                return True
-        return False
