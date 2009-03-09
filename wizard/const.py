@@ -29,7 +29,7 @@ CPU_DEF = {
     "CPU_DESC" : []
 }
 
-TOOLCHAIN_ITEMS = ["ld", "as"]
+TOOLCHAIN_ITEMS = ("ld", "as")
 
 CPU_DEFINITION = "*.cdef"
 
@@ -38,3 +38,11 @@ GCC_NAME = "*gcc*"
 MODULE_CONFIGURATION = "cfg_*.h"
 
 UI_LOCATION = "ui"
+
+EXTENSION_FILTER = (
+    ".c",
+    ".cpp",
+    ".cxx",
+    ".h",
+    ".c++",
+)

@@ -67,6 +67,10 @@ def createBertosProject(projectInfo):
     makefile = open("mktemplates/template.mk", "r").read()
     makefile = mkGenerator(projectInfo, makefile)
     open(prjdir + "/" + os.path.basename(prjdir) + ".mk", "w").write(makefile)
+    workspace = codeliteWorkspaceGenerator(projectInfo)
+    open(directory + "/" + os.path.basename(prjdir) + ".workspace", "w").write(workspace)
+    project = codeliteProjectGenerator(projectInfo)
+    open(directory + "/" + os.path.basename(prjdir) + ".project", "w").write(project)
 
 def mkGenerator(projectInfo, makefile):
     """
@@ -108,6 +112,43 @@ def csrcGenerator(projectInfo):
                     files.append(path + "/" + filename)
     csrc = " \\\n\t".join(files) + " \\"
     return csrc
+
+def clFiles(fileDict, directory):
+    filelist = []
+    filelist.append("<VirtualDirectory Name=\"%s\">" %os.path.basename(directory))
+    for f in fileDict[directory]["files"]:
+        filelist.append("<File Name=\"%s\"/>" %os.path.join(directory, f))
+    for d in fileDict[directory]["dirs"]:
+        filelist += clFiles(fileDict, os.path.join(directory, d))
+    filelist.append("</VirtualDirectory>")
+    return filelist
+
+def findSources(path):
+    fileDict = {}
+    for root, dirs, files in os.walk(path):
+        if root.find("svn") == -1:
+            fileDict[root] = {"dirs": [], "files": []}
+            for dir in dirs:
+                if dir.find("svn") == -1:
+                    fileDict[root]["dirs"].append(dir)
+            for file in files:
+                if file.endswith(const.EXTENSION_FILTER):
+                    fileDict[root]["files"].append(file)
+    return fileDict
+
+def codeliteProjectGenerator(projectInfo):
+    template = open("cltemplates/bertos.project").read()
+    filelist = "\n".join(clFiles(findSources(projectInfo.info("PROJECT_PATH")), projectInfo.info("PROJECT_PATH")))
+    while template.find("$filelist") != -1:
+        template = template.replace("$filelist", filelist)
+    return template
+
+def codeliteWorkspaceGenerator(projectInfo):
+    template = open("cltemplates/bertos.workspace").read()
+    projectName = os.path.basename(projectInfo.info("PROJECT_PATH"))
+    while template.find("$project") != -1:
+        template = template.replace("$project", projectName)
+    return template
     
 def getSystemPath():
     path = os.environ["PATH"]
