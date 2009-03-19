@@ -60,13 +60,13 @@ DRV_DIR = CPU_DIR + "avr/drv/"
 
 
 # Common GCC flags.
-C_FLAGS = [ "-O0", "-fno-strict-aliasing"]
+C_FLAGS = [ "-O0", "-fno-strict-aliasing", "-I" + CPU_DIR + "avr/"]
 
 
 # If you want to use, one o more, of these modules in your project you should compile in
 # different way.
 PC_SRC = [ "kdebug",
-	    "formartwr",
+	    "formatwr",
 	    "sprintf",
 	    "text_format",
 	    "text" ]

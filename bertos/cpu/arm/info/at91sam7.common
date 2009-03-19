@@ -60,6 +60,7 @@ HW_DIR = CPU_DIR + "arm/hw/"
 DRV_DIR = CPU_DIR + "arm/drv/"
 
 # Common GCC flags.
+C_FLAGS = ["-I" + CPU_DIR + "arm/"]
 CPPA_FLAGS = [ "-O0", "-g -gdwarf-2", "-g -gen-debug" ]
 CPP_FLAGS = [ "-O0", "-g3 -gdwarf-2", "-fverbose-asm" ]
 LD_FLAGS = [ "-nostartfiles", "-Wl,--no-warn-mismatch" ]
