@@ -113,20 +113,17 @@ def csrcGenerator(projectInfo):
         if information["enabled"]:
             for filename, path in findDefinitions(module + ".c", projectInfo):
                 path = path.replace(projectInfo.info("SOURCES_PATH"), projectInfo.info("PROJECT_PATH"))
-                print path
                 csrc.append(path + "/" + filename)
                 if module in pcsrc_need:
                     pcsrc.append(path + "/" + filename)
             for filename, path in findDefinitions(module + "_" + projectInfo.info("CPU_INFOS")["TOOLCHAIN"] + ".c", projectInfo):
                 path = path.replace(projectInfo.info("SOURCES_PATH"), projectInfo.info("PROJECT_PATH"))
-                print path
                 csrc.append(path + "/" + filename)
                 if module in pcsrc_need:
                     pcsrc.append(path + "/" + filename)
             for tag in projectInfo.info("CPU_INFOS")["CPU_TAGS"]:
                 for filename, path in findDefinitions(module + "_" + tag + ".c", projectInfo):
                     path = path.replace(projectInfo.info("SOURCES_PATH"), projectInfo.info("PROJECT_PATH"))
-                    print path
                     csrc.append(path + "/" + filename)
                     if module in pcsrc_need:
                         pcsrc.append(path + "/" + filename)
