@@ -80,12 +80,13 @@ def mkGenerator(projectInfo, makefile):
     """
     mkData = {}
     mkData["$pname"] = os.path.basename(projectInfo.info("PROJECT_PATH"))
-    mkData["$cpuname"] = projectInfo.info("CPU_INFOS")["CPU_NAME"]
+    mkData["$cpuname"] = projectInfo.info("CPU_INFOS")["CORE_CPU"]
     mkData["$cflags"] = " ".join(projectInfo.info("CPU_INFOS")["C_FLAGS"])
     mkData["$ldflags"] = " ".join(projectInfo.info("CPU_INFOS")["LD_FLAGS"])
-    mkData["$csrc"] = csrcGenerator(projectInfo)
-    mkData["$prefix"] = os.path.basename(projectInfo.info("TOOLCHAIN")["path"]).split("gcc")[0]
-    mkData["$suffix"] = os.path.basename(projectInfo.info("TOOLCHAIN")["path"]).split("gcc")[1]
+    mkData["$csrc"], mkData["$pcsrc"] = csrcGenerator(projectInfo)
+    mkData["$prefix"] = projectInfo.info("TOOLCHAIN")["path"].split("gcc")[0]
+    mkData["$suffix"] = projectInfo.info("TOOLCHAIN")["path"].split("gcc")[1]
+    mkData["$cross"] = projectInfo.info("TOOLCHAIN")["path"].split("gcc")[0]
     for key in mkData:
         while makefile.find(key) != -1:
             makefile = makefile.replace(key, mkData[key])
@@ -102,24 +103,45 @@ def makefileGenerator(projectInfo, makefile):
 
 def csrcGenerator(projectInfo):
     modules = projectInfo.info("MODULES")
-    files = []
+    if "harvard" in projectInfo.info("CPU_INFOS")["CPU_TAGS"]:
+        pcsrc_need = projectInfo.info("CPU_INFOS")["PC_SRC"]
+    else:
+        pcsrc_need = []
+    csrc = []
+    pcsrc = []
     for module, information in modules.items():
         if information["enabled"]:
             for filename, path in findDefinitions(module + ".c", projectInfo):
-                files.append(path + "/" + filename)
+                path = path.replace(projectInfo.info("SOURCES_PATH"), projectInfo.info("PROJECT_PATH"))
+                print path
+                csrc.append(path + "/" + filename)
+                if module in pcsrc_need:
+                    pcsrc.append(path + "/" + filename)
             for filename, path in findDefinitions(module + "_" + projectInfo.info("CPU_INFOS")["TOOLCHAIN"] + ".c", projectInfo):
-                files.append(path + "/" + filename)
+                path = path.replace(projectInfo.info("SOURCES_PATH"), projectInfo.info("PROJECT_PATH"))
+                print path
+                csrc.append(path + "/" + filename)
+                if module in pcsrc_need:
+                    pcsrc.append(path + "/" + filename)
             for tag in projectInfo.info("CPU_INFOS")["CPU_TAGS"]:
                 for filename, path in findDefinitions(module + "_" + tag + ".c", projectInfo):
-                    files.append(path + "/" + filename)
-    csrc = " \\\n\t".join(files) + " \\"
-    return csrc
+                    path = path.replace(projectInfo.info("SOURCES_PATH"), projectInfo.info("PROJECT_PATH"))
+                    print path
+                    csrc.append(path + "/" + filename)
+                    if module in pcsrc_need:
+                        pcsrc.append(path + "/" + filename)
+    csrc = " \\\n\t".join(csrc) + " \\"
+    pcsrc = " \\\n\t".join(pcsrc) + " \\"
+    return csrc, pcsrc
 
 def codeliteProjectGenerator(projectInfo):
     template = open("cltemplates/bertos.project").read()
     filelist = "\n".join(codelite_project.clFiles(codelite_project.findSources(projectInfo.info("PROJECT_PATH")), projectInfo.info("PROJECT_PATH")))
     while template.find("$filelist") != -1:
         template = template.replace("$filelist", filelist)
+    projectName = os.path.basename(projectInfo.info("PROJECT_PATH"))
+    while template.find("$project") != -1:
+        template = template.replace("$project", projectName)
     return template
 
 def codeliteWorkspaceGenerator(projectInfo):

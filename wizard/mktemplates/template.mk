@@ -18,6 +18,8 @@ $pname_PREFIX = $prefix
 
 $pname_SUFFIX = $suffix
 
+$pname_CROSS = $cross
+
 $pname_MCU = $cpuname
 
 $pname_CSRC = \
