@@ -108,9 +108,9 @@ def makefileGenerator(projectInfo, makefile):
 def csrcGenerator(projectInfo):
     modules = projectInfo.info("MODULES")
     if "harvard" in projectInfo.info("CPU_INFOS")["CPU_TAGS"]:
-        pcsrc_need = projectInfo.info("CPU_INFOS")["PC_SRC"]
+        harvard = True
     else:
-        pcsrc_need = []
+        harvard = False
     csrc = []
     pcsrc = []
     constants = {}
@@ -120,19 +120,22 @@ def csrcGenerator(projectInfo):
                 constants.update(information["constants"])
             for filename, path in findDefinitions(module + ".c", projectInfo):
                 path = path.replace(projectInfo.info("SOURCES_PATH"), projectInfo.info("PROJECT_PATH"))
-                csrc.append(path + "/" + filename)
-                if module in pcsrc_need:
+                if not harvard or "harvard" not in information or information["harvard"] == "both":
+                    csrc.append(path + "/" + filename)
+                if harvard and "harvard" in information:
                     pcsrc.append(path + "/" + filename)
             for filename, path in findDefinitions(module + "_" + projectInfo.info("CPU_INFOS")["TOOLCHAIN"] + ".c", projectInfo):
                 path = path.replace(projectInfo.info("SOURCES_PATH"), projectInfo.info("PROJECT_PATH"))
-                csrc.append(path + "/" + filename)
-                if module in pcsrc_need:
+                if not harvard or "harvard" not in information or information["harvard"] == "both":
+                    csrc.append(path + "/" + filename)
+                if harvard and "harvard" in information:
                     pcsrc.append(path + "/" + filename)
             for tag in projectInfo.info("CPU_INFOS")["CPU_TAGS"]:
                 for filename, path in findDefinitions(module + "_" + tag + ".c", projectInfo):
                     path = path.replace(projectInfo.info("SOURCES_PATH"), projectInfo.info("PROJECT_PATH"))
-                    csrc.append(path + "/" + filename)
-                    if module in pcsrc_need:
+                    if not harvard or "harvard" not in information or information["harvard"] == "both":
+                        csrc.append(path + "/" + filename)
+                    if harvard and "harvard" in information:
                         pcsrc.append(path + "/" + filename)
     csrc = " \\\n\t".join(csrc) + " \\"
     pcsrc = " \\\n\t".join(pcsrc) + " \\"
@@ -266,6 +269,11 @@ def loadModuleDefinition(first_comment):
         if "module_description" in moduleDefinition.keys():
             moduleDict[moduleName]["description"] = moduleDefinition["module_description"]
             del moduleDefinition["module_description"]
+        if const.MODULE_DEFINITION["module_harvard"] in moduleDefinition.keys():
+            harvard = moduleDefinition[const.MODULE_DEFINITION["module_harvard"]]
+            if harvard == "both" or harvard == "pgm_memory":
+                moduleDict[moduleName]["harvard"] = harvard
+            del moduleDefinition[const.MODULE_DEFINITION["module_harvard"]]
         moduleDict[moduleName]["constants"] = moduleDefinition
         moduleDict[moduleName]["enabled"] = False
     return toBeParsed, moduleDict
