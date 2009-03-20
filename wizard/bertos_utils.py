@@ -240,20 +240,26 @@ def loadModuleDefinition(first_comment):
             moduleDefinition["module_description"] = line[line.find("\\brief") + len("\\brief "):]
     moduleDict = {}
     if "module_name" in moduleDefinition.keys():
-        moduleDict[moduleDefinition[const.MODULE_DEFINITION["module_name"]]] = {}
-        if "module_depends" in moduleDefinition.keys():
+        moduleName = moduleDefinition[const.MODULE_DEFINITION["module_name"]]
+        del moduleDefinition[const.MODULE_DEFINITION["module_name"]]
+        moduleDict[moduleName] = {}
+        if const.MODULE_DEFINITION["module_depends"] in moduleDefinition.keys():
             if type(moduleDefinition[const.MODULE_DEFINITION["module_depends"]]) == str:
                 moduleDefinition[const.MODULE_DEFINITION["module_depends"]] = (moduleDefinition[const.MODULE_DEFINITION["module_depends"]],)
-            moduleDict[moduleDefinition[const.MODULE_DEFINITION["module_name"]]]["depends"] = moduleDefinition[const.MODULE_DEFINITION["module_depends"]]
+            moduleDict[moduleName]["depends"] = moduleDefinition[const.MODULE_DEFINITION["module_depends"]]
+            del moduleDefinition[const.MODULE_DEFINITION["module_depends"]]
         else:
-            moduleDict[moduleDefinition[const.MODULE_DEFINITION["module_name"]]]["depends"] = ()
-        if "module_configuration" in moduleDefinition.keys():
-            moduleDict[moduleDefinition[const.MODULE_DEFINITION["module_name"]]]["configuration"] = moduleDefinition[const.MODULE_DEFINITION["module_configuration"]]
+            moduleDict[moduleName]["depends"] = ()
+        if const.MODULE_DEFINITION["module_configuration"] in moduleDefinition.keys():
+            moduleDict[moduleName]["configuration"] = moduleDefinition[const.MODULE_DEFINITION["module_configuration"]]
+            del moduleDefinition[const.MODULE_DEFINITION["module_configuration"]]
         else:
-            moduleDict[moduleDefinition[const.MODULE_DEFINITION["module_name"]]]["configuration"] = ""
+            moduleDict[moduleName]["configuration"] = ""
         if "module_description" in moduleDefinition.keys():
-            moduleDict[moduleDefinition[const.MODULE_DEFINITION["module_name"]]]["description"] = moduleDefinition["module_description"]
-        moduleDict[moduleDefinition[const.MODULE_DEFINITION["module_name"]]]["enabled"] = False
+            moduleDict[moduleName]["description"] = moduleDefinition["module_description"]
+            del moduleDefinition["module_description"]
+        moduleDict[moduleName]["consts"] = moduleDefinition
+        moduleDict[moduleName]["enabled"] = False
     return toBeParsed, moduleDict
 
 def loadDefineLists(commentList):

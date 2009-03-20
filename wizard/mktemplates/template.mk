@@ -24,6 +24,7 @@ $pname_MCU = $cpuname
 
 $pname_CSRC = \
 	$csrc
+	$main \
 	#
 
 $pname_PCSRC += $pcsrc
