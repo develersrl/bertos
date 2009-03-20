@@ -69,7 +69,7 @@ def createBertosProject(projectInfo):
     makefile = mkGenerator(projectInfo, makefile)
     open(prjdir + "/" + os.path.basename(prjdir) + ".mk", "w").write(makefile)
     ## Destination main.c file
-    main = open("srctemplates/main.c","r").read()
+    main = open("srctemplates/main.c", "r").read()
     open(prjdir + "/main.c", "w").write(main)
     if "codelite" in projectInfo.info("OUTPUT"):
         workspace = codeliteWorkspaceGenerator(projectInfo)
@@ -90,6 +90,7 @@ def mkGenerator(projectInfo, makefile):
     mkData["$prefix"] = projectInfo.info("TOOLCHAIN")["path"].split("gcc")[0]
     mkData["$suffix"] = projectInfo.info("TOOLCHAIN")["path"].split("gcc")[1]
     mkData["$cross"] = projectInfo.info("TOOLCHAIN")["path"].split("gcc")[0]
+    mkData["$main"] = projectInfo.info("PROJECT_PATH") + "/" + os.path.basename(projectInfo.info("PROJECT_PATH")) + "/main.c"
     for key in mkData:
         while makefile.find(key) != -1:
             makefile = makefile.replace(key, mkData[key])
