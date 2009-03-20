@@ -75,19 +75,25 @@ class BModulePage(BWizardPage):
             if len(configuration) > 0:
                 configurations = self._projectInfoRetrieve("CONFIGURATIONS")[configuration]
                 self.pageContent.propertyTable.setRowCount(len(configurations))
-                for index, property in enumerate(configurations):
-                    item = QTableWidgetItem(configurations[property]["brief"])
-                    item.setData(Qt.UserRole, qvariant_converter.convertString(property))
-                    self.pageContent.propertyTable.setItem(index, 0, item)
-                    if "type" in configurations[property]["informations"].keys() and configurations[property]["informations"]["type"] == "boolean":
-                        self._insertCheckBox(index, configurations[property]["value"])
-                    elif "type" in configurations[property]["informations"].keys() and configurations[property]["informations"]["type"] == "enum":
-                        self._insertComboBox(index, configurations[property]["value"], configurations[property]["informations"]["value_list"])
-                    elif "type" in configurations[property]["informations"] and configurations[property]["informations"]["type"] == "int":
-                        self._insertSpinBox(index, configurations[property]["value"], configurations[property]["informations"])
+                index = 0
+                for property in configurations:
+                    if "type" in configurations[property]["informations"] and configurations[property]["informations"]["type"] == "autoenabled":
+                        ## Doesn't show the hidden fields
+                        pass
                     else:
-                        # Not defined type, rendered as a text field
-                        self.pageContent.propertyTable.setItem(index, 1, QTableWidgetItem(property))
+                        item = QTableWidgetItem(configurations[property]["brief"])
+                        item.setData(Qt.UserRole, qvariant_converter.convertString(property))
+                        self.pageContent.propertyTable.setItem(index, 0, item)
+                        if "type" in configurations[property]["informations"].keys() and configurations[property]["informations"]["type"] == "boolean":
+                            self._insertCheckBox(index, configurations[property]["value"])
+                        elif "type" in configurations[property]["informations"].keys() and configurations[property]["informations"]["type"] == "enum":
+                            self._insertComboBox(index, configurations[property]["value"], configurations[property]["informations"]["value_list"])
+                        elif "type" in configurations[property]["informations"] and configurations[property]["informations"]["type"] == "int":
+                            self._insertSpinBox(index, configurations[property]["value"], configurations[property]["informations"])
+                        else:
+                            # Not defined type, rendered as a text field
+                            self.pageContent.propertyTable.setItem(index, 1, QTableWidgetItem(configurations[property]["value"]))
+                        index += 1
             else:
                 self.pageContent.propertyTable.setRowCount(0)
     

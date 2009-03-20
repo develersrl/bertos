@@ -56,6 +56,8 @@ def createBertosProject(projectInfo):
         string = open(sourcesDir + "/" + key, "r").read()
         for parameter, infos in value.items():
             value = infos["value"]
+            if "type" in infos["informations"] and infos["informations"]["type"] == "autoenabled":
+                value = "1"
             if "unsigned" in infos["informations"].keys() and infos["informations"]["unsigned"]:
                 value += "U"
             if "long" in infos["informations"].keys() and infos["informations"]["long"]:
