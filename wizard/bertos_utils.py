@@ -68,6 +68,9 @@ def createBertosProject(projectInfo):
     makefile = open("mktemplates/template.mk", "r").read()
     makefile = mkGenerator(projectInfo, makefile)
     open(prjdir + "/" + os.path.basename(prjdir) + ".mk", "w").write(makefile)
+    ## Destination main.c file
+    main = open("srctemplates/main.c","r").read()
+    open(prjdir + "/main.c", "w").write(main)
     if "codelite" in projectInfo.info("OUTPUT"):
         workspace = codeliteWorkspaceGenerator(projectInfo)
         open(directory + "/" + os.path.basename(prjdir) + ".workspace", "w").write(workspace)
