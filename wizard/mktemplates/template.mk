@@ -8,8 +8,8 @@
 #
 #
 
-# Set to 1 for debug builds
-$pname_DEBUG = 1
+# Constants automatically defined by the selected modules
+$constants
 
 # Our target application
 TRG += $pname

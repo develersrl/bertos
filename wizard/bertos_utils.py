@@ -86,7 +86,7 @@ def mkGenerator(projectInfo, makefile):
     mkData["$cpuname"] = projectInfo.info("CPU_INFOS")["CORE_CPU"]
     mkData["$cflags"] = " ".join(projectInfo.info("CPU_INFOS")["C_FLAGS"])
     mkData["$ldflags"] = " ".join(projectInfo.info("CPU_INFOS")["LD_FLAGS"])
-    mkData["$csrc"], mkData["$pcsrc"] = csrcGenerator(projectInfo)
+    mkData["$csrc"], mkData["$pcsrc"], mkData["$constants"] = csrcGenerator(projectInfo)
     mkData["$prefix"] = projectInfo.info("TOOLCHAIN")["path"].split("gcc")[0]
     mkData["$suffix"] = projectInfo.info("TOOLCHAIN")["path"].split("gcc")[1]
     mkData["$cross"] = projectInfo.info("TOOLCHAIN")["path"].split("gcc")[0]
@@ -113,8 +113,11 @@ def csrcGenerator(projectInfo):
         pcsrc_need = []
     csrc = []
     pcsrc = []
+    constants = {}
     for module, information in modules.items():
         if information["enabled"]:
+            if "constants" in information:
+                constants.update(information["constants"])
             for filename, path in findDefinitions(module + ".c", projectInfo):
                 path = path.replace(projectInfo.info("SOURCES_PATH"), projectInfo.info("PROJECT_PATH"))
                 csrc.append(path + "/" + filename)
@@ -133,7 +136,8 @@ def csrcGenerator(projectInfo):
                         pcsrc.append(path + "/" + filename)
     csrc = " \\\n\t".join(csrc) + " \\"
     pcsrc = " \\\n\t".join(pcsrc) + " \\"
-    return csrc, pcsrc
+    constants = "\n".join([os.path.basename(projectInfo.info("PROJECT_PATH")) + "_" + key + " = " + str(value) for key, value in constants.items()])
+    return csrc, pcsrc, constants
 
 def codeliteProjectGenerator(projectInfo):
     template = open("cltemplates/bertos.project").read()
@@ -262,7 +266,7 @@ def loadModuleDefinition(first_comment):
         if "module_description" in moduleDefinition.keys():
             moduleDict[moduleName]["description"] = moduleDefinition["module_description"]
             del moduleDefinition["module_description"]
-        moduleDict[moduleName]["consts"] = moduleDefinition
+        moduleDict[moduleName]["constants"] = moduleDefinition
         moduleDict[moduleName]["enabled"] = False
     return toBeParsed, moduleDict
 
