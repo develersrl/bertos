@@ -48,3 +48,9 @@ EXTENSION_FILTER = (
     ".mk",
     "Makefile",
 )
+
+MODULE_DEFINITION = {
+    "module_name": "module_name",
+    "module_configuration": "module_configuration",
+    "module_depends": "module_depends",
+}
