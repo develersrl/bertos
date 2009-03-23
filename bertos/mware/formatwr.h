@@ -37,6 +37,7 @@
  * $WIZ$ module_name = "formatwr"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_formatwr.h"
  * $WIZ$ module_depends = "hex"
+ * $WIZ$ module_harvard = "both"
  */
 
 #ifndef MWARE_FORMATWR_H
