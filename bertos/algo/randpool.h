@@ -37,7 +37,7 @@
  * \author Daniele Basile <asterix@develer.com>
  *
  * $WIZ$ module_name = "randpool"
- * $WIZ$ module_depends = "timer"
+ * $WIZ$ module_depends = "timer", "sprintf"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_randpool.h"
  */
 

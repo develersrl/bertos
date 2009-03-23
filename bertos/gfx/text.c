@@ -41,7 +41,6 @@
 #include <gfx/gfx.h>
 #include <gfx/font.h>
 #include <gfx/text.h>
-#include <gfx/text.h>
 
 #include <gfx/gfx_p.h> // FIXME: BM_DRAWPIXEL
 

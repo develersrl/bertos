@@ -43,6 +43,9 @@
  * \version $Id$
  *
  * \author Giovanni Bajo <rasky@develer.com>
+ *
+ * $WIZ$ module_name = "readline"
+ * $WIZ$ module_depends = "sprintf"
  */
 
 
