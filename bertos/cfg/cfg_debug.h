@@ -40,10 +40,16 @@
 #ifndef CFG_DEBUG_H
 #define CFG_DEBUG_H
 
-/// kdebug console.
+/**
+ * Debug console port.
+ * $WIZ$ type = "int"; min = 0
+ */
 #define CONFIG_KDEBUG_PORT 0
 
-/// Baud-rate for the kdebug console.
-#define CONFIG_KDEBUG_BAUDRATE  115200
+/**
+ * Baudrate for the debug console.
+ * $WIZ$ type = "int"; min = 0
+ */
+#define CONFIG_KDEBUG_BAUDRATE  115200UL
 
 #endif /* CFG_DEBUG_H */

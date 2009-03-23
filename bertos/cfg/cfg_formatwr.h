@@ -37,11 +37,12 @@
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef CFG_FORMTWR_H
-#define CFG_FORMTWR_H
+#ifndef CFG_FORMATWR_H
+#define CFG_FORMATWR_H
 
 /**
  * printf()-style formatter configuration.
+ * $WIZ$ type = "enum"; value_list = "printf_list"
  *
  * \sa PRINTF_DISABLED
  * \sa PRINTF_NOMODIFIERS
@@ -52,5 +53,5 @@
 #define CONFIG_PRINTF PRINTF_FULL
 
 
-#endif /* CFG_FORMTWR_H */
+#endif /* CFG_FORMATWR_H */
 

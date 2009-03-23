@@ -33,6 +33,10 @@
  * \version $Id$
  *
  * \brief Basic "printf", "sprintf" and "fprintf" formatter.
+ *
+ * $WIZ$ module_name = "formatwr"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_formatwr.h"
+ * $WIZ$ module_depends = "hex"
  */
 
 #ifndef MWARE_FORMATWR_H
@@ -46,6 +50,7 @@
 
 /**
  * \name _formatted_write() configuration
+ * $WIZ$ printf_list = "PRINTF_DISABLED", "PRINTF_NOMODIFIERS", "PRINTF_REDUCED", "PRINTF_NOFLOAT", "PRINTF_FULL"
  * \{
  */
 #define PRINTF_DISABLED    0

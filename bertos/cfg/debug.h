@@ -38,6 +38,11 @@
  *
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
+ *
+ * $WIZ$ module_name = "debug"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_debug.h"
+ * $WIZ$ DEBUG = 1
+ * $WIZ$ module_depends = "formatwr"
  */
 
 #ifndef BERTOS_DEBUG_H

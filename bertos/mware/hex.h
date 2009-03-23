@@ -35,6 +35,7 @@
  * \version $Id$
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
+ * $WIZ$ module_name = "hex"
  */
 
 #ifndef MWARE_HEX_H
