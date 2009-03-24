@@ -64,8 +64,12 @@ class BVersionPage(BWizardPage):
 
     def isComplete(self):
         if self.pageContent.versionList.currentRow() != -1:
-            self._projectInfoStore("SOURCES_PATH", qvariant_converter.getString(self.pageContent.versionList.currentItem().data(Qt.UserRole)))
-            return True
+	    # Remove trailing slash
+	    sources_path = qvariant_converter.getString(self.pageContent.versionList.currentItem().data(Qt.UserRole))
+	    if sources_path.endswith(os.sep):
+                 sources_path = sources_path[:-1]
+            self._projectInfoStore("SOURCES_PATH", sources_path)
+	    return True
         else:
             return False
     
