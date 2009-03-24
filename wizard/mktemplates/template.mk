@@ -27,7 +27,9 @@ $pname_CSRC = \
 	$main \
 	#
 
-$pname_PCSRC += $pcsrc
+$pname_PCSRC += \
+	$pcsrc
+	#
 
 
 $pname_CFLAGS = $cflags
