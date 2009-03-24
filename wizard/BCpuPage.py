@@ -50,10 +50,10 @@ class BCpuPage(BWizardPage):
         QApplication.instance().setOverrideCursor(Qt.WaitCursor)
         bertos_utils.loadSourceTree(self._project())
         self._populateCpuList()
-        cpuName = self._projectInfoRetrieve("CPU_NAME")
+        cpu_name = self._projectInfoRetrieve("CPU_NAME")
         self._setupUi()
-        if not cpuName is None:
-            self._selectItem(cpuName)
+        if not cpu_name is None:
+            self._selectItem(cpu_name)
         QApplication.instance().restoreOverrideCursor()
         self.emit(SIGNAL("completeChanged()"))
     

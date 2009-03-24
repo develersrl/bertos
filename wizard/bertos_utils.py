@@ -25,24 +25,24 @@ def isBertosDir(directory):
 def bertosVersion(directory):
    return open(directory + "/VERSION").readline().strip()
 
-def createBertosProject(projectInfo):
-    directory = projectInfo.info("PROJECT_PATH")
-    sourcesDir = projectInfo.info("SOURCES_PATH")
+def createBertosProject(project_info):
+    directory = project_info.info("PROJECT_PATH")
+    sources_dir = project_info.info("SOURCES_PATH")
     if not os.path.isdir(directory):
         os.mkdir(directory)
     f = open(directory + "/project.bertos", "w")
-    f.write(repr(projectInfo))
+    f.write(repr(project_info))
     f.close()
     ## Destination source dir
     srcdir = directory + "/bertos"
     shutil.rmtree(srcdir, True)
-    shutil.copytree(sourcesDir + "/bertos", srcdir)
+    shutil.copytree(sources_dir + "/bertos", srcdir)
     ## Destination makefile
     makefile = directory + "/Makefile"
     if os.path.exists(makefile):
         os.remove(makefile)
     makefile = open("mktemplates/Makefile").read()
-    makefile = makefileGenerator(projectInfo, makefile)
+    makefile = makefileGenerator(project_info, makefile)
     open(directory + "/Makefile", "w").write(makefile)
     ## Destination project dir
     prjdir = directory + "/" + os.path.basename(directory)
@@ -52,8 +52,8 @@ def createBertosProject(projectInfo):
     cfgdir = prjdir + "/cfg"
     shutil.rmtree(cfgdir, True)
     os.mkdir(cfgdir)
-    for key, value in projectInfo.info("CONFIGURATIONS").items():
-        string = open(sourcesDir + "/" + key, "r").read()
+    for key, value in project_info.info("CONFIGURATIONS").items():
+        string = open(sources_dir + "/" + key, "r").read()
         for parameter, infos in value.items():
             value = infos["value"]
             if "type" in infos["informations"] and infos["informations"]["type"] == "autoenabled":
@@ -68,49 +68,49 @@ def createBertosProject(projectInfo):
         f.close()
     ## Destinatio mk file
     makefile = open("mktemplates/template.mk", "r").read()
-    makefile = mkGenerator(projectInfo, makefile)
+    makefile = mkGenerator(project_info, makefile)
     open(prjdir + "/" + os.path.basename(prjdir) + ".mk", "w").write(makefile)
     ## Destination main.c file
     main = open("srctemplates/main.c", "r").read()
     open(prjdir + "/main.c", "w").write(main)
-    if "codelite" in projectInfo.info("OUTPUT"):
-        workspace = codeliteWorkspaceGenerator(projectInfo)
+    if "codelite" in project_info.info("OUTPUT"):
+        workspace = codeliteWorkspaceGenerator(project_info)
         open(directory + "/" + os.path.basename(prjdir) + ".workspace", "w").write(workspace)
-        project = codeliteProjectGenerator(projectInfo)
+        project = codeliteProjectGenerator(project_info)
         open(directory + "/" + os.path.basename(prjdir) + ".project", "w").write(project)
 
-def mkGenerator(projectInfo, makefile):
+def mkGenerator(project_info, makefile):
     """
     Generates the mk file for the current project.
     """
-    mkData = {}
-    mkData["$pname"] = os.path.basename(projectInfo.info("PROJECT_PATH"))
-    mkData["$cpuname"] = projectInfo.info("CPU_INFOS")["CORE_CPU"]
-    mkData["$cflags"] = " ".join(projectInfo.info("CPU_INFOS")["C_FLAGS"])
-    mkData["$ldflags"] = " ".join(projectInfo.info("CPU_INFOS")["LD_FLAGS"])
-    mkData["$csrc"], mkData["$pcsrc"], mkData["$constants"] = csrcGenerator(projectInfo)
-    mkData["$prefix"] = projectInfo.info("TOOLCHAIN")["path"].split("gcc")[0]
-    mkData["$suffix"] = projectInfo.info("TOOLCHAIN")["path"].split("gcc")[1]
-    mkData["$cross"] = projectInfo.info("TOOLCHAIN")["path"].split("gcc")[0]
-    mkData["$main"] = os.path.basename(projectInfo.info("PROJECT_PATH")) + "/main.c"
-    for key in mkData:
+    mk_data = {}
+    mk_data["$pname"] = os.path.basename(project_info.info("PROJECT_PATH"))
+    mk_data["$cpuname"] = project_info.info("CPU_INFOS")["CORE_CPU"]
+    mk_data["$cflags"] = " ".join(project_info.info("CPU_INFOS")["C_FLAGS"])
+    mk_data["$ldflags"] = " ".join(project_info.info("CPU_INFOS")["LD_FLAGS"])
+    mk_data["$csrc"], mk_data["$pcsrc"], mk_data["$constants"] = csrcGenerator(project_info)
+    mk_data["$prefix"] = project_info.info("TOOLCHAIN")["path"].split("gcc")[0]
+    mk_data["$suffix"] = project_info.info("TOOLCHAIN")["path"].split("gcc")[1]
+    mk_data["$cross"] = project_info.info("TOOLCHAIN")["path"].split("gcc")[0]
+    mk_data["$main"] = os.path.basename(project_info.info("PROJECT_PATH")) + "/main.c"
+    for key in mk_data:
         while makefile.find(key) != -1:
-            makefile = makefile.replace(key, mkData[key])
+            makefile = makefile.replace(key, mk_data[key])
     return makefile
 
-def makefileGenerator(projectInfo, makefile):
+def makefileGenerator(project_info, makefile):
     """
     Generate the Makefile for the current project.
     """
     # TODO: write a general function that works for both the mk file and the Makefile
     while makefile.find("project_name") != -1:
-        makefile = makefile.replace("project_name", os.path.basename(projectInfo.info("PROJECT_PATH")))
+        makefile = makefile.replace("project_name", os.path.basename(project_info.info("PROJECT_PATH")))
     return makefile
 
-def csrcGenerator(projectInfo):
-    modules = projectInfo.info("MODULES")
-    files = projectInfo.info("FILES")
-    if "harvard" in projectInfo.info("CPU_INFOS")["CPU_TAGS"]:
+def csrcGenerator(project_info):
+    modules = project_info.info("MODULES")
+    files = project_info.info("FILES")
+    if "harvard" in project_info.info("CPU_INFOS")["CPU_TAGS"]:
         harvard = True
     else:
         harvard = False
@@ -120,76 +120,76 @@ def csrcGenerator(projectInfo):
     pcsrc = []
     ## constants to be included at the beginning of the makefile
     constants = {}
-    moduleFiles = set([])
-    dependencyFiles = set([])
+    module_files = set([])
+    dependency_files = set([])
     ## assembly sources
-    asmFiles = set([])
+    asm_files = set([])
     for module, information in modules.items():
         if information["enabled"]:
             if "constants" in information:
                 constants.update(information["constants"])
-            cfiles, sfiles = findModuleFiles(module, projectInfo)
-            moduleFiles |= set(cfiles)
-            asmFiles |= set(sfiles)
-            for fileDependency in information["depends"]:
-                if fileDependency in files:
-                    dependencyCFiles, dependencySFiles = findModuleFiles(fileDependency, projectInfo)
-                    dependencyFiles |= set(dependencyCFiles)
-                    asmFiles |= set(dependencySFiles)
-            for file in moduleFiles:
+            cfiles, sfiles = findModuleFiles(module, project_info)
+            module_files |= set(cfiles)
+            asm_files |= set(sfiles)
+            for file_dependency in information["depends"]:
+                if file_dependency in files:
+                    dependencyCFiles, dependencySFiles = findModuleFiles(file_dependency, project_info)
+                    dependency_files |= set(dependencyCFiles)
+                    asm_files |= set(dependencySFiles)
+            for file in module_files:
                 if not harvard or "harvard" not in information or information["harvard"] == "both":
                     csrc.append(file)
                 if harvard and "harvard" in information:
                     pcsrc.append(file)
-            for file in dependencyFiles:
+            for file in dependency_files:
                 csrc.append(file)
     csrc = " \\\n\t".join(csrc) + " \\"
     pcsrc = " \\\n\t".join(pcsrc) + " \\"
-    constants = "\n".join([os.path.basename(projectInfo.info("PROJECT_PATH")) + "_" + key + " = " + str(value) for key, value in constants.items()])
+    constants = "\n".join([os.path.basename(project_info.info("PROJECT_PATH")) + "_" + key + " = " + str(value) for key, value in constants.items()])
     return csrc, pcsrc, constants
     
-def findModuleFiles(module, projectInfo):
+def findModuleFiles(module, project_info):
     ## Find the files related to the selected module
     cfiles = []
     sfiles = []
     ## .c files related to the module and the cpu architecture
-    for filename, path in findDefinitions(module + ".c", projectInfo) + \
-            findDefinitions(module + "_" + projectInfo.info("CPU_INFOS")["TOOLCHAIN"] + ".c", projectInfo):
-        path = path.replace(projectInfo.info("SOURCES_PATH") + "/", "")
+    for filename, path in findDefinitions(module + ".c", project_info) + \
+            findDefinitions(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".c", project_info):
+        path = path.replace(project_info.info("SOURCES_PATH") + "/", "")
         cfiles.append(path + "/" + filename)
     ## .s files related to the module and the cpu architecture
-    for filename, path in findDefinitions(module + ".s", projectInfo) + \
-            findDefinitions(module + "_" + projectInfo.info("CPU_INFOS")["TOOLCHAIN"] + ".s", projectInfo) + \
-            findDefinitions(module + ".S", projectInfo) + \
-            findDefinitions(module + "_" + projectInfo.info("CPU_INFOS")["TOOLCHAIN"] + ".S", projectInfo):
-        path = path.replace(projectInfo.info("SOURCES_PATH") + "/", "")
+    for filename, path in findDefinitions(module + ".s", project_info) + \
+            findDefinitions(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".s", project_info) + \
+            findDefinitions(module + ".S", project_info) + \
+            findDefinitions(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".S", project_info):
+        path = path.replace(project_info.info("SOURCES_PATH") + "/", "")
         sfiles.append(path + "/" + filename)
     ## .c and .s files related to the module and the cpu tags
-    for tag in projectInfo.info("CPU_INFOS")["CPU_TAGS"]:
-        for filename, path in findDefinitions(module + "_" + tag + ".c", projectInfo):
-            path = path.replace(projectInfo.info("SOURCES_PATH") + "/", "")
+    for tag in project_info.info("CPU_INFOS")["CPU_TAGS"]:
+        for filename, path in findDefinitions(module + "_" + tag + ".c", project_info):
+            path = path.replace(project_info.info("SOURCES_PATH") + "/", "")
             cfiles.append(path + "/" + filename)
-        for filename, path in findDefinitions(module + "_" + tag + ".s", projectInfo) + \
-                findDefinitions(module + "_" + tag + ".S", projectInfo):
-            path = path.replace(projectInfo.info("SOURCES_PATH") + "/", "")
+        for filename, path in findDefinitions(module + "_" + tag + ".s", project_info) + \
+                findDefinitions(module + "_" + tag + ".S", project_info):
+            path = path.replace(project_info.info("SOURCES_PATH") + "/", "")
             sfiles.append(path + "/" + filename)
     return cfiles, sfiles
 
-def codeliteProjectGenerator(projectInfo):
+def codeliteProjectGenerator(project_info):
     template = open("cltemplates/bertos.project").read()
-    filelist = "\n".join(codelite_project.clFiles(codelite_project.findSources(projectInfo.info("PROJECT_PATH")), projectInfo.info("PROJECT_PATH")))
+    filelist = "\n".join(codelite_project.clFiles(codelite_project.findSources(project_info.info("PROJECT_PATH")), project_info.info("PROJECT_PATH")))
     while template.find("$filelist") != -1:
         template = template.replace("$filelist", filelist)
-    projectName = os.path.basename(projectInfo.info("PROJECT_PATH"))
+    project_name = os.path.basename(project_info.info("PROJECT_PATH"))
     while template.find("$project") != -1:
-        template = template.replace("$project", projectName)
+        template = template.replace("$project", project_name)
     return template
 
-def codeliteWorkspaceGenerator(projectInfo):
+def codeliteWorkspaceGenerator(project_info):
     template = open("cltemplates/bertos.workspace").read()
-    projectName = os.path.basename(projectInfo.info("PROJECT_PATH"))
+    project_name = os.path.basename(project_info.info("PROJECT_PATH"))
     while template.find("$project") != -1:
-        template = template.replace("$project", projectName)
+        template = template.replace("$project", project_name)
     return template
     
 def getSystemPath():
@@ -200,9 +200,9 @@ def getSystemPath():
         path = path.split(":")
     return path
 
-def findToolchains(pathList):
+def findToolchains(path_list):
     toolchains = []
-    for element in pathList:
+    for element in path_list:
         for toolchain in glob.glob(element+ "/" + const.GCC_NAME):
             toolchains.append(toolchain)
     return list(set(toolchains))
@@ -265,66 +265,66 @@ def getInfos(definition):
     return D
 
 def getCommentList(string):
-    commentList = re.findall(r"/\*{2}\s*([^*]*\*(?:[^/*][^*]*\*+)*)/", string)
-    commentList = [re.findall(r"^\s*\* *(.*?)$", comment, re.MULTILINE) for comment in commentList]
-    return commentList
+    comment_list = re.findall(r"/\*{2}\s*([^*]*\*(?:[^/*][^*]*\*+)*)/", string)
+    comment_list = [re.findall(r"^\s*\* *(.*?)$", comment, re.MULTILINE) for comment in comment_list]
+    return comment_list
 
 def loadModuleDefinition(first_comment):
-    toBeParsed = False
-    moduleDefinition = {}
+    to_be_parsed = False
+    module_definition = {}
     for num, line in enumerate(first_comment):
         index = line.find("$WIZ$")
         if index != -1:
-            toBeParsed = True
+            to_be_parsed = True
             try:
-                exec line[index + len("$WIZ$ "):] in {}, moduleDefinition
+                exec line[index + len("$WIZ$ "):] in {}, module_definition
             except:
                 raise ParseError(num, line[index:])
         elif line.find("\\brief") != -1:
-            moduleDefinition["module_description"] = line[line.find("\\brief") + len("\\brief "):]
-    moduleDict = {}
-    if "module_name" in moduleDefinition.keys():
-        moduleName = moduleDefinition[const.MODULE_DEFINITION["module_name"]]
-        del moduleDefinition[const.MODULE_DEFINITION["module_name"]]
-        moduleDict[moduleName] = {}
-        if const.MODULE_DEFINITION["module_depends"] in moduleDefinition.keys():
-            if type(moduleDefinition[const.MODULE_DEFINITION["module_depends"]]) == str:
-                moduleDefinition[const.MODULE_DEFINITION["module_depends"]] = (moduleDefinition[const.MODULE_DEFINITION["module_depends"]],)
-            moduleDict[moduleName]["depends"] = moduleDefinition[const.MODULE_DEFINITION["module_depends"]]
-            del moduleDefinition[const.MODULE_DEFINITION["module_depends"]]
+            module_definition["module_description"] = line[line.find("\\brief") + len("\\brief "):]
+    module_dict = {}
+    if "module_name" in module_definition.keys():
+        module_name = module_definition[const.MODULE_DEFINITION["module_name"]]
+        del module_definition[const.MODULE_DEFINITION["module_name"]]
+        module_dict[module_name] = {}
+        if const.MODULE_DEFINITION["module_depends"] in module_definition.keys():
+            if type(module_definition[const.MODULE_DEFINITION["module_depends"]]) == str:
+                module_definition[const.MODULE_DEFINITION["module_depends"]] = (module_definition[const.MODULE_DEFINITION["module_depends"]],)
+            module_dict[module_name]["depends"] = module_definition[const.MODULE_DEFINITION["module_depends"]]
+            del module_definition[const.MODULE_DEFINITION["module_depends"]]
         else:
-            moduleDict[moduleName]["depends"] = ()
-        if const.MODULE_DEFINITION["module_configuration"] in moduleDefinition.keys():
-            moduleDict[moduleName]["configuration"] = moduleDefinition[const.MODULE_DEFINITION["module_configuration"]]
-            del moduleDefinition[const.MODULE_DEFINITION["module_configuration"]]
+            module_dict[module_name]["depends"] = ()
+        if const.MODULE_DEFINITION["module_configuration"] in module_definition.keys():
+            module_dict[module_name]["configuration"] = module_definition[const.MODULE_DEFINITION["module_configuration"]]
+            del module_definition[const.MODULE_DEFINITION["module_configuration"]]
         else:
-            moduleDict[moduleName]["configuration"] = ""
-        if "module_description" in moduleDefinition.keys():
-            moduleDict[moduleName]["description"] = moduleDefinition["module_description"]
-            del moduleDefinition["module_description"]
-        if const.MODULE_DEFINITION["module_harvard"] in moduleDefinition.keys():
-            harvard = moduleDefinition[const.MODULE_DEFINITION["module_harvard"]]
+            module_dict[module_name]["configuration"] = ""
+        if "module_description" in module_definition.keys():
+            module_dict[module_name]["description"] = module_definition["module_description"]
+            del module_definition["module_description"]
+        if const.MODULE_DEFINITION["module_harvard"] in module_definition.keys():
+            harvard = module_definition[const.MODULE_DEFINITION["module_harvard"]]
             if harvard == "both" or harvard == "pgm_memory":
-                moduleDict[moduleName]["harvard"] = harvard
-            del moduleDefinition[const.MODULE_DEFINITION["module_harvard"]]
-        moduleDict[moduleName]["constants"] = moduleDefinition
-        moduleDict[moduleName]["enabled"] = False
-    return toBeParsed, moduleDict
+                module_dict[module_name]["harvard"] = harvard
+            del module_definition[const.MODULE_DEFINITION["module_harvard"]]
+        module_dict[module_name]["constants"] = module_definition
+        module_dict[module_name]["enabled"] = False
+    return to_be_parsed, module_dict
 
-def loadDefineLists(commentList):
-    defineList = {}
-    for comment in commentList:
+def loadDefineLists(comment_list):
+    define_list = {}
+    for comment in comment_list:
         for num, line in enumerate(comment):
             index = line.find("$WIZ$")
             if index != -1:
                 try:
-                    exec line[index + len("$WIZ$ "):] in {}, defineList
+                    exec line[index + len("$WIZ$ "):] in {}, define_list
                 except:
                     raise ParseError(num, line[index:])
-    for key, value in defineList.items():
+    for key, value in define_list.items():
         if type(value) == str:
-            defineList[key] = (value,)
-    return defineList
+            define_list[key] = (value,)
+    return define_list
 
 def getDescriptionInformations(comment): 
     """ 
@@ -369,46 +369,46 @@ def getDefinitionBlocks(text):
     return block
 
 def loadModuleData(project):
-    moduleInfoDict = {}
-    listInfoDict = {}
-    configurationInfoDict = {}
-    fileDict = {}
+    module_info_dict = {}
+    list_info_dict = {}
+    configuration_info_dict = {}
+    file_dict = {}
     for filename, path in findDefinitions("*.h", project) + findDefinitions("*.c", project) + findDefinitions("*.s", project) + findDefinitions("*.S", project):
-        commentList = getCommentList(open(path + "/" + filename, "r").read())
-        if len(commentList) > 0:
-            moduleInfo = {}
-            configurationInfo = {}
+        comment_list = getCommentList(open(path + "/" + filename, "r").read())
+        if len(comment_list) > 0:
+            module_info = {}
+            configuration_info = {}
             try:
-                toBeParsed, moduleDict = loadModuleDefinition(commentList[0])
+                to_be_parsed, module_dict = loadModuleDefinition(comment_list[0])
             except ParseError, err:
                 raise DefineException.ModuleDefineException(path, err.line_number, err.line)
-            for module, information in moduleDict.items():
+            for module, information in module_dict.items():
                 information["category"] = os.path.basename(path)
                 if "configuration" in information.keys() and len(information["configuration"]):
-                    configuration = moduleDict[module]["configuration"]
+                    configuration = module_dict[module]["configuration"]
                     try:
-                        configurationInfo[configuration] = loadConfigurationInfos(project.info("SOURCES_PATH") + "/" + configuration)
+                        configuration_info[configuration] = loadConfigurationInfos(project.info("SOURCES_PATH") + "/" + configuration)
                     except ParseError, err:
                         raise DefineException.ConfigurationDefineException(project.info("SOURCES_PATH") + "/" + configuration, err.line_number, err.line)
-            moduleInfoDict.update(moduleDict)
-            configurationInfoDict.update(configurationInfo)
-            if toBeParsed:
+            module_info_dict.update(module_dict)
+            configuration_info_dict.update(configuration_info)
+            if to_be_parsed:
                 try:
-                    listDict = loadDefineLists(commentList[1:])
-                    listInfoDict.update(listDict)
+                    list_dict = loadDefineLists(comment_list[1:])
+                    list_info_dict.update(list_dict)
                 except ParseError, err:
                     raise DefineException.EnumDefineException(path, err.line_number, err.line)
     for filename, path in findDefinitions("*_" + project.info("CPU_INFOS")["TOOLCHAIN"] + ".h", project):
-        commentList = getCommentList(open(path + "/" + filename, "r").read())
-        listInfoDict.update(loadDefineLists(commentList))
+        comment_list = getCommentList(open(path + "/" + filename, "r").read())
+        list_info_dict.update(loadDefineLists(comment_list))
     for tag in project.info("CPU_INFOS")["CPU_TAGS"]:
         for filename, path in findDefinitions("*_" + tag + ".h", project):
-            commentList = getCommentList(open(path + "/" + filename, "r").read())
-            listInfoDict.update(loadDefineLists(commentList))
-    project.setInfo("MODULES", moduleInfoDict)
-    project.setInfo("LISTS", listInfoDict)
-    project.setInfo("CONFIGURATIONS", configurationInfoDict)
-    project.setInfo("FILES", fileDict)
+            comment_list = getCommentList(open(path + "/" + filename, "r").read())
+            list_info_dict.update(loadDefineLists(comment_list))
+    project.setInfo("MODULES", module_info_dict)
+    project.setInfo("LISTS", list_info_dict)
+    project.setInfo("CONFIGURATIONS", configuration_info_dict)
+    project.setInfo("FILES", file_dict)
     
 def formatParamNameValue(text):
     """
@@ -432,28 +432,28 @@ def loadConfigurationInfos(path):
             "unsigned": boolean indicating if the num is an unsigned
             "value_list": the name of the enum for enum parameters
     """
-    configurationInfos = {}
+    configuration_infos = {}
     for comment, define in getDefinitionBlocks(open(path, "r").read()):
         name, value = formatParamNameValue(define)
         brief, description, informations = getDescriptionInformations(comment)
-        configurationInfos[name] = {}
-        configurationInfos[name]["value"] = value
-        configurationInfos[name]["informations"] = informations
-        if not "type" in configurationInfos[name]["informations"]:
-            configurationInfos[name]["informations"]["type"] = findParameterType(configurationInfos[name])
-        if ("type" in configurationInfos[name]["informations"].keys() and
-                configurationInfos[name]["informations"]["type"] == "int" and
-                configurationInfos[name]["value"].find("L") != -1):
-            configurationInfos[name]["informations"]["long"] = True
-            configurationInfos[name]["value"] = configurationInfos[name]["value"].replace("L", "")
-        if ("type" in configurationInfos[name]["informations"].keys() and
-                configurationInfos[name]["informations"]["type"] == "int" and
-                configurationInfos[name]["value"].find("U") != -1):
-            configurationInfos[name]["informations"]["unsigned"] = True
-            configurationInfos[name]["value"] = configurationInfos[name]["value"].replace("U", "")
-        configurationInfos[name]["description"] = description
-        configurationInfos[name]["brief"] = brief
-    return configurationInfos
+        configuration_infos[name] = {}
+        configuration_infos[name]["value"] = value
+        configuration_infos[name]["informations"] = informations
+        if not "type" in configuration_infos[name]["informations"]:
+            configuration_infos[name]["informations"]["type"] = findParameterType(configuration_infos[name])
+        if ("type" in configuration_infos[name]["informations"].keys() and
+                configuration_infos[name]["informations"]["type"] == "int" and
+                configuration_infos[name]["value"].find("L") != -1):
+            configuration_infos[name]["informations"]["long"] = True
+            configuration_infos[name]["value"] = configuration_infos[name]["value"].replace("L", "")
+        if ("type" in configuration_infos[name]["informations"].keys() and
+                configuration_infos[name]["informations"]["type"] == "int" and
+                configuration_infos[name]["value"].find("U") != -1):
+            configuration_infos[name]["informations"]["unsigned"] = True
+            configuration_infos[name]["value"] = configuration_infos[name]["value"].replace("U", "")
+        configuration_infos[name]["description"] = description
+        configuration_infos[name]["brief"] = brief
+    return configuration_infos
 
 def findParameterType(parameter):
     if "value_list" in parameter["informations"]:

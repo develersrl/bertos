@@ -31,10 +31,10 @@ class BOutputPage(BWizardPage):
         self.connect(self.pageContent.codeliteCheckBox, SIGNAL("stateChanged(int)"), lambda checked: self._modeChecked(checked, "codelite"))
     
     def _modeChecked(self, checked, value):
-        outputList = self._projectInfoRetrieve("OUTPUT")
+        output_list = self._projectInfoRetrieve("OUTPUT")
         if checked == Qt.Checked:
-            outputList.append(value)
+            output_list.append(value)
         else:
-            outputList.remove(value)
-        self._projectInfoStore("OUTPUT", outputList)
+            output_list.remove(value)
+        self._projectInfoStore("OUTPUT", output_list)
     

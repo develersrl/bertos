@@ -35,10 +35,10 @@ class BStartPage(QDialog):
         self.connect(self.content.editButton, SIGNAL("clicked()"), self.editProject)
     
     def _initializeButtons(self):
-        self.buttonGroup = QButtonGroup()
-        self.buttonGroup.addButton(self.content.newButton)
-        self.buttonGroup.addButton(self.content.editButton)
-        self.buttonGroup.setExclusive(True)
+        self.button_group = QButtonGroup()
+        self.button_group.addButton(self.content.newButton)
+        self.button_group.addButton(self.content.editButton)
+        self.button_group.setExclusive(True)
         
     def newProject(self):
         self.close()

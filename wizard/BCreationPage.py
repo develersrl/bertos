@@ -28,11 +28,11 @@ class BCreationPage(BWizardPage):
         self._completed = False
     
     def _setupUi(self):
-        self._confirmGroup = QWidgetGroup(self.pageContent.summaryTree,
+        self._confirm_group = QWidgetGroup(self.pageContent.summaryTree,
                                             self.pageContent.createButton)
-        self._finalGroup = QWidgetGroup(self.pageContent.iconLabel,
+        self._final_group = QWidgetGroup(self.pageContent.iconLabel,
                                             self.pageContent.textLabel)
-        self._finalGroup.setVisible(False)
+        self._final_group.setVisible(False)
         summary = self.pageContent.summaryTree
         summary.setHeaderHidden(True)
         summary.setColumnCount(1)
@@ -41,56 +41,56 @@ class BCreationPage(BWizardPage):
         self._completed = False
         self._setupUi()
         self.pageContent.summaryTree.clear()
-        topLevel = []
-        folderTitle = QTreeWidgetItem(QStringList([self.tr("Project folder")]))
-        folderItem = QTreeWidgetItem(folderTitle, QStringList([os.path.normpath(self._projectInfoRetrieve("PROJECT_PATH"))]))
-        topLevel.append(folderTitle)
-        versionTitle = QTreeWidgetItem(QStringList([self.tr("BeRTOS version")]))
+        top_level = []
+        folder_title = QTreeWidgetItem(QStringList([self.tr("Project folder")]))
+        folder_item = QTreeWidgetItem(folder_title, QStringList([os.path.normpath(self._projectInfoRetrieve("PROJECT_PATH"))]))
+        top_level.append(folder_title)
+        version_title = QTreeWidgetItem(QStringList([self.tr("BeRTOS version")]))
         sources_path = self._projectInfoRetrieve("SOURCES_PATH")
-        version = QTreeWidgetItem(versionTitle, QStringList([self.tr("version: ") + bertos_utils.bertosVersion(sources_path)]))
-        sourcePath = QTreeWidgetItem(versionTitle, QStringList([self.tr("path: ") + os.path.normpath(sources_path)]))
-        topLevel.append(versionTitle)
-        cpuTitle = QTreeWidgetItem(QStringList([self.tr("CPU")]))
-        cpuName = QTreeWidgetItem(cpuTitle, QStringList([self.tr("cpu name: ") + self._projectInfoRetrieve("CPU_NAME")]))
-        topLevel.append(cpuTitle)
-        toolchainTitle = QTreeWidgetItem(QStringList([self.tr("Toolchain")]))
-        toolchainInfo = self._projectInfoRetrieve("TOOLCHAIN")
-        if "target" in toolchainInfo.keys():
-            toolchainTarget = QTreeWidgetItem(toolchainTitle, QStringList([self.tr("target: " + toolchainInfo["target"])]))
-        if "version" in toolchainInfo.keys():
-            toolchainTarget = QTreeWidgetItem(toolchainTitle, QStringList([self.tr("version: " + "GCC " + toolchainInfo["version"] + " (" + toolchainInfo["build"] + ")")]))
-        toolchainPath = QTreeWidgetItem(toolchainTitle, QStringList([self.tr("path: " + os.path.normpath(toolchainInfo["path"]))]))
-        topLevel.append(toolchainTitle)
-        moduleTitle = QTreeWidgetItem(QStringList([self.tr("Modules")]))
+        version = QTreeWidgetItem(version_title, QStringList([self.tr("version: ") + bertos_utils.bertosVersion(sources_path)]))
+        source_path = QTreeWidgetItem(version_title, QStringList([self.tr("path: ") + os.path.normpath(sources_path)]))
+        top_level.append(version_title)
+        cpu_title = QTreeWidgetItem(QStringList([self.tr("CPU")]))
+        cpu_name = QTreeWidgetItem(cpu_title, QStringList([self.tr("cpu name: ") + self._projectInfoRetrieve("CPU_NAME")]))
+        top_level.append(cpu_title)
+        toolchain_title = QTreeWidgetItem(QStringList([self.tr("Toolchain")]))
+        toolchain_info = self._projectInfoRetrieve("TOOLCHAIN")
+        if "target" in toolchain_info.keys():
+            toolchain_target = QTreeWidgetItem(toolchain_title, QStringList([self.tr("target: " + toolchain_info["target"])]))
+        if "version" in toolchain_info.keys():
+            toolchain_target = QTreeWidgetItem(toolchain_title, QStringList([self.tr("version: " + "GCC " + toolchain_info["version"] + " (" + toolchain_info["build"] + ")")]))
+        toolchain_path = QTreeWidgetItem(toolchain_title, QStringList([self.tr("path: " + os.path.normpath(toolchain_info["path"]))]))
+        top_level.append(toolchain_title)
+        module_title = QTreeWidgetItem(QStringList([self.tr("Modules")]))
         configurations = self._projectInfoRetrieve("CONFIGURATIONS")
-        moduleCategories = {}
+        module_categories = {}
         for module, information in self._projectInfoRetrieve("MODULES").items():
             if information["enabled"]:
-                if information["category"] not in moduleCategories.keys():
-                    moduleCategories[information["category"]] = []
+                if information["category"] not in module_categories.keys():
+                    module_categories[information["category"]] = []
                 moduleItem = QTreeWidgetItem(QStringList([module + " - " + information["description"]]))
-                moduleCategories[information["category"]].append(moduleItem)
+                module_categories[information["category"]].append(moduleItem)
                 if len(information["configuration"]) > 0:
                     for property, data in configurations[information["configuration"]].items():
                         # If the final char of the brief is a dot (".") removes it.
                         brief = data["brief"]
                         if brief[-1] == ".":
                             brief = brief[:-1]
-                        configurationItem = QTreeWidgetItem(moduleItem, QStringList([brief + ": " + data["value"]]))
-        for key, value in moduleCategories.items():
-            categoryItem = QTreeWidgetItem(moduleTitle, QStringList([key]))
-            categoryItem.addChildren(value)
-        topLevel.append(moduleTitle)
-        self.pageContent.summaryTree.insertTopLevelItems(0, topLevel)
+                        configuration_item = QTreeWidgetItem(moduleItem, QStringList([brief + ": " + data["value"]]))
+        for key, value in module_categories.items():
+            category_item = QTreeWidgetItem(module_title, QStringList([key]))
+            category_item.addChildren(value)
+        top_level.append(module_title)
+        self.pageContent.summaryTree.insertTopLevelItems(0, top_level)
     
     def _connectSignals(self):
         self.connect(self.pageContent.createButton, SIGNAL("clicked(bool)"), self._createProject)
     
     def _createProject(self):
         QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
-        self._confirmGroup.setVisible(False)
+        self._confirm_group.setVisible(False)
         bertos_utils.createBertosProject(self.wizard().project())
-        self._finalGroup.setVisible(True)
+        self._final_group.setVisible(True)
         self._completed = True
         QApplication.restoreOverrideCursor()
         self.emit(SIGNAL("completeChanged()"))

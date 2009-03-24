@@ -30,9 +30,9 @@ class BFolderPage(BWizardPage):
         self.pageContent.warningLabel.setVisible(False)
     
     def _initializeAttributes(self):
-        self._projectName = ""
-        self._destinationFolder = os.path.expanduser("~")
-        self.pageContent.directoryEdit.setText(self._destinationFolder)
+        self._project_name = ""
+        self._destination_folder = os.path.expanduser("~")
+        self.pageContent.directoryEdit.setText(self._destination_folder)
     
     def _connectSignals(self):
         self.connect(self.pageContent.nameEdit, SIGNAL("textChanged(const QString)"), self._nameChanged)
@@ -40,19 +40,19 @@ class BFolderPage(BWizardPage):
         self.connect(self.pageContent.directoryButton, SIGNAL("clicked()"), self._selectDirectory)
     
     def _nameChanged(self, name):
-        self._projectName = str(name).replace(" ", "_")
+        self._project_name = str(name).replace(" ", "_")
         self._setProjectPath()
     
     def _directoryChanged(self, directory):
-        self._destinationFolder = str(QDir.toNativeSeparators(directory))
+        self._destination_folder = str(QDir.toNativeSeparators(directory))
         self._setProjectPath()
     
     def _setProjectPath(self):
-        if self._destinationFolder != "" and self._projectName <> "":
-            if not self._destinationFolder.endswith(os.sep):
-                self._destinationFolder += "/"
-            self.pageContent.projectPath.setText(QDir.toNativeSeparators(self._destinationFolder + self._projectName))
-            if os.path.exists(self._destinationFolder + self._projectName):
+        if self._destination_folder != "" and self._project_name <> "":
+            if not self._destination_folder.endswith(os.sep):
+                self._destination_folder += "/"
+            self.pageContent.projectPath.setText(QDir.toNativeSeparators(self._destination_folder + self._project_name))
+            if os.path.exists(self._destination_folder + self._project_name):
                 self.pageContent.warningLabel.setVisible(True)
                 self.pageContent.warningLabel.setText(self.tr("<font color='#FF0000'>Warning: the selected directory exists, \
                     it will be destroyed with all contained subdirectories and files...</font>"))

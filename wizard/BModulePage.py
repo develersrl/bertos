@@ -23,7 +23,7 @@ class BModulePage(BWizardPage):
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/module_select.ui")
         self.setTitle(self.tr("Configure the BeRTOS modules"))
-        self._controlGroup = QControlGroup()
+        self._control_group = QControlGroup()
         self._connectSignals()
     
     def reloadData(self):
@@ -32,9 +32,9 @@ class BModulePage(BWizardPage):
         self._fillModuleTree()
     
     def _setupButtonGroup(self):
-        self._buttonGroup = QButtonGroup()
-        self._buttonGroup.setExclusive(False)
-        self.connect(self._buttonGroup, SIGNAL("buttonClicked(int)"), self._moduleSelectionChanged)
+        self._button_group = QButtonGroup()
+        self._button_group.setExclusive(False)
+        self.connect(self._button_group, SIGNAL("buttonClicked(int)"), self._moduleSelectionChanged)
     
     def _loadModuleData(self):
         try:
@@ -58,8 +58,8 @@ class BModulePage(BWizardPage):
         for category, modules in categories.items():
             item = QTreeWidgetItem(QStringList([category]))
             for module in modules:
-                moduleItem = QTreeWidgetItem(item, QStringList([module]))
-                moduleItem.setCheckState(0, Qt.Unchecked)
+                module_item = QTreeWidgetItem(item, QStringList([module]))
+                module_item.setCheckState(0, Qt.Unchecked)
             self.pageContent.moduleTree.addTopLevelItem(item)
         self.pageContent.moduleTree.sortItems(0, Qt.AscendingOrder)
         
@@ -67,10 +67,10 @@ class BModulePage(BWizardPage):
     def _fillPropertyTable(self):
         module = self._currentModule()
         if module is not None:
-            self._controlGroup.clear()
+            self._control_group.clear()
             configuration = self._projectInfoRetrieve("MODULES")[module]["configuration"]
-            moduleDescription = self._projectInfoRetrieve("MODULES")[module]["description"]
-            self.pageContent.moduleLabel.setText(moduleDescription)
+            module_description = self._projectInfoRetrieve("MODULES")[module]["description"]
+            self.pageContent.moduleLabel.setText(module_description)
             self.pageContent.moduleLabel.setVisible(True)
             self.pageContent.propertyTable.clear()
             if len(configuration) > 0:
@@ -100,34 +100,34 @@ class BModulePage(BWizardPage):
     
     def _insertCheckBox(self, index, value):
         ## boolean property
-        checkBox = QCheckBox()
-        self.pageContent.propertyTable.setCellWidget(index, 1, checkBox)
+        check_box = QCheckBox()
+        self.pageContent.propertyTable.setCellWidget(index, 1, check_box)
         if value == "1":
-            checkBox.setChecked(True)
+            check_box.setChecked(True)
         else:
-            checkBox.setChecked(False)
-        self._controlGroup.addControl(index, checkBox)
+            check_box.setChecked(False)
+        self._control_group.addControl(index, check_box)
     
     def _insertComboBox(self, index, value, value_list):
         ## enum property
-        comboBox = QComboBox()
-        self.pageContent.propertyTable.setCellWidget(index, 1, comboBox)
+        combo_box = QComboBox()
+        self.pageContent.propertyTable.setCellWidget(index, 1, combo_box)
         enum = self._projectInfoRetrieve("LISTS")[value_list]
         for i, element in enumerate(enum):
-            comboBox.addItem(element)
+            combo_box.addItem(element)
             if element == value:
-                comboBox.setCurrentIndex(i)
-        self._controlGroup.addControl(index, comboBox)
+                combo_box.setCurrentIndex(i)
+        self._control_group.addControl(index, combo_box)
     
     def _insertSpinBox(self, index, value, informations):
         ## int, long or undefined type property
-        spinBox = None
+        spin_box = None
         if bertos_utils.isLong(informations) or bertos_utils.isUnsignedLong(informations):
-            spinBox = QDoubleSpinBox()
-            spinBox.setDecimals(0)
+            spin_box = QDoubleSpinBox()
+            spin_box.setDecimals(0)
         else:
-            spinBox = QSpinBox()
-        self.pageContent.propertyTable.setCellWidget(index, 1, spinBox)
+            spin_box = QSpinBox()
+        self.pageContent.propertyTable.setCellWidget(index, 1, spin_box)
         minimum = -32768
         maximum = 32767
         suff = ""
@@ -147,17 +147,17 @@ class BModulePage(BWizardPage):
             minimum = int(informations["min"])
         if "max" in informations.keys():
             maximum = int(informations["max"])
-        spinBox.setRange(minimum, maximum)
-        spinBox.setSuffix(suff)
-        spinBox.setValue(int(value.replace("L", "").replace("U", "")))
-        self._controlGroup.addControl(index, spinBox)
+        spin_box.setRange(minimum, maximum)
+        spin_box.setSuffix(suff)
+        spin_box.setValue(int(value.replace("L", "").replace("U", "")))
+        self._control_group.addControl(index, spin_box)
         
     
     def _currentModule(self):
-        currentModule = self.pageContent.moduleTree.currentItem()
+        current_module = self.pageContent.moduleTree.currentItem()
         # return only the child items
-        if currentModule is not None and currentModule.parent() is not None:
-            return unicode(currentModule.text(0))
+        if current_module is not None and current_module.parent() is not None:
+            return unicode(current_module.text(0))
         else:
             return None
     
@@ -179,11 +179,11 @@ class BModulePage(BWizardPage):
     
     def _resetPropertyDescription(self):
         for index in range(self.pageContent.propertyTable.rowCount()):
-            propertyName = qvariant_converter.getString(self.pageContent.propertyTable.item(index, 0).data(Qt.UserRole))
+            property_name = qvariant_converter.getString(self.pageContent.propertyTable.item(index, 0).data(Qt.UserRole))
             # Awful solution! Needed because if the user change the module, the selection changed...
-            if propertyName not in self._currentModuleConfigurations().keys():
+            if property_name not in self._currentModuleConfigurations().keys():
                 break
-            self.pageContent.propertyTable.item(index, 0).setText(self._currentModuleConfigurations()[propertyName]['brief'])
+            self.pageContent.propertyTable.item(index, 0).setText(self._currentModuleConfigurations()[property_name]['brief'])
     
     def _showPropertyDescription(self):
         self._resetPropertyDescription()
@@ -208,7 +208,7 @@ class BModulePage(BWizardPage):
         self.connect(self.pageContent.moduleTree, SIGNAL("itemPressed(QTreeWidgetItem*, int)"), self._fillPropertyTable)
         self.connect(self.pageContent.moduleTree, SIGNAL("itemChanged(QTreeWidgetItem*, int)"), self._dependencyCheck)
         self.connect(self.pageContent.propertyTable, SIGNAL("itemSelectionChanged()"), self._showPropertyDescription)
-        self.connect(self._controlGroup, SIGNAL("stateChanged"), self._saveValue)
+        self.connect(self._control_group, SIGNAL("stateChanged"), self._saveValue)
     
     def _saveValue(self, index):
         property = qvariant_converter.getString(self.pageContent.propertyTable.item(index, 0).data(Qt.UserRole))
@@ -227,7 +227,7 @@ class BModulePage(BWizardPage):
     
     def _moduleSelectionChanged(self, index):
         module = unicode(self.pageContent.moduleTable.item(index, 1).text())
-        if self._buttonGroup.button(index).isChecked():
+        if self._button_group.button(index).isChecked():
             self._moduleSelected(module)
         else:
             self._moduleUnselected(module)

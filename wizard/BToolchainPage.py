@@ -24,7 +24,7 @@ class BToolchainPage(BWizardPage):
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/toolchain_select.ui")
         self.setTitle(self.tr("Select toolchain"))
-        self._validationProcess = None
+        self._validation_process = None
         self._updateUi()
         #self._populateToolchainList()
         self._connectSignals()
@@ -53,18 +53,18 @@ class BToolchainPage(BWizardPage):
             self.emit(SIGNAL("completeChanged()"))
     
     def _search(self):
-        dirList = self.searchDirList()
+        dir_list = self.searchDirList()
         if self.pathSearch():
-            dirList += [element for element in bertos_utils.getSystemPath()]
-        toolchainList = bertos_utils.findToolchains(dirList)
-        storedToolchains = self.toolchains()
-        for element in toolchainList:
-            if not element in storedToolchains.keys():
+            dir_list += [element for element in bertos_utils.getSystemPath()]
+        toolchain_list = bertos_utils.findToolchains(dir_list)
+        stored_toolchains = self.toolchains()
+        for element in toolchain_list:
+            if not element in stored_toolchains.keys():
                 item = QListWidgetItem(element)
                 item.setData(Qt.UserRole, qvariant_converter.convertStringDict({"path": element}))
                 self.pageContent.toolchainList.addItem(item)
-                storedToolchains[element] = False
-        self.setToolchains(storedToolchains)
+                stored_toolchains[element] = False
+        self.setToolchains(stored_toolchains)
         
     def _connectSignals(self):
         self.connect(self.pageContent.toolchainList, SIGNAL("itemSelectionChanged()"), self._selectionChanged)
@@ -75,9 +75,9 @@ class BToolchainPage(BWizardPage):
     
     def _validItem(self, index, infos):
         item = self.pageContent.toolchainList.item(index)
-        newData = qvariant_converter.getStringDict(self.pageContent.toolchainList.item(index).data(Qt.UserRole))
-        newData.update(infos)
-        item.setData(Qt.UserRole, qvariant_converter.convertStringDict(newData))
+        new_data = qvariant_converter.getStringDict(self.pageContent.toolchainList.item(index).data(Qt.UserRole))
+        new_data.update(infos)
+        item.setData(Qt.UserRole, qvariant_converter.convertStringDict(new_data))
         needed = self._projectInfoRetrieve("CPU_INFOS")
         if "target" in infos.keys() and infos["target"].find(needed["TOOLCHAIN"]) != -1:
             item.setIcon(QIcon(":/images/ok.png"))
@@ -132,16 +132,16 @@ class BToolchainPage(BWizardPage):
                 break
         ## Try to retrieve the informations about the toolchain only for the valid toolchains
         if valid:
-            self._validationProcess = QProcess()
-            self._validationProcess.start(filename, ["-v"])
-            self._validationProcess.waitForStarted(1000)
-            if self._validationProcess.waitForFinished(200):
-                description = str(self._validationProcess.readAllStandardError())
+            self._validation_process = QProcess()
+            self._validation_process.start(filename, ["-v"])
+            self._validation_process.waitForStarted(1000)
+            if self._validation_process.waitForFinished(200):
+                description = str(self._validation_process.readAllStandardError())
                 info = bertos_utils.getToolchainInfo(description)
                 if len(info.keys()) >= 4:
                     valid = True
             else:
-                self._validationProcess.kill()
+                self._validation_process.kill()
         ## Add the item in the list with the appropriate associate data.
         if valid:
             self._validItem(i, info)
