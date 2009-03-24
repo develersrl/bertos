@@ -118,37 +118,67 @@ def csrcGenerator(projectInfo):
     pcsrc = []
     constants = {}
     moduleFiles = set([])
+    dependencyFiles = set([])
+    asmFiles = set([])
     for module, information in modules.items():
         if information["enabled"]:
             if "constants" in information:
                 constants.update(information["constants"])
-            moduleFiles |= set(findModuleFiles(module, projectInfo))
+            cfiles, sfiles = findModuleFiles(module, projectInfo)
+            moduleFiles |= set(cfiles)
+            asmFiles |= set(sfiles)
             for fileDependency in information["depends"]:
                 if fileDependency in files:
-                    moduleFiles |= set(findModuleFiles(fileDependency, projectInfo))
+                    dependencyCFiles, dependencySFiles = findModuleFiles(fileDependency, projectInfo)
+                    dependencyFiles |= set(dependencyCFiles)
+                    asmFiles |= set(dependencySFiles)
             for file in moduleFiles:
                 if not harvard or "harvard" not in information or information["harvard"] == "both":
                     csrc.append(file)
                 if harvard and "harvard" in information:
                     pcsrc.append(file)
+            for file in dependencyFiles:
+                csrc.append(file)
     csrc = " \\\n\t".join(csrc) + " \\"
     pcsrc = " \\\n\t".join(pcsrc) + " \\"
     constants = "\n".join([os.path.basename(projectInfo.info("PROJECT_PATH")) + "_" + key + " = " + str(value) for key, value in constants.items()])
+    print asmFiles
     return csrc, pcsrc, constants
     
 def findModuleFiles(module, projectInfo):
-    files = []
+    cfiles = []
+    sfiles = []
     for filename, path in findDefinitions(module + ".c", projectInfo):
         path = path.replace(projectInfo.info("SOURCES_PATH") + "/", "")
-        files.append(path + "/" + filename)
+        cfiles.append(path + "/" + filename)
     for filename, path in findDefinitions(module + "_" + projectInfo.info("CPU_INFOS")["TOOLCHAIN"] + ".c", projectInfo):
         path = path.replace(projectInfo.info("SOURCES_PATH") + "/", "")
-        files.append(path + "/" + filename)
+        cfiles.append(path + "/" + filename)
     for tag in projectInfo.info("CPU_INFOS")["CPU_TAGS"]:
         for filename, path in findDefinitions(module + "_" + tag + ".c", projectInfo):
             path = path.replace(projectInfo.info("SOURCES_PATH") + "/", "")
-            files.append(path + "/" + filename)
-    return files
+            cfiles.append(path + "/" + filename)
+    for filename, path in findDefinitions(module + ".s", projectInfo):
+        path = path.replace(projectInfo.info("SOURCES_PATH") + "/", "")
+        sfiles.append(path + "/" + filename)
+    for filename, path in findDefinitions(module + "_" + projectInfo.info("CPU_INFOS")["TOOLCHAIN"] + ".s", projectInfo):
+        path = path.replace(projectInfo.info("SOURCES_PATH") + "/", "")
+        sfiles.append(path + "/" + filename)
+    for tag in projectInfo.info("CPU_INFOS")["CPU_TAGS"]:
+        for filename, path in findDefinitions(module + "_" + tag + ".s", projectInfo):
+            path = path.replace(projectInfo.info("SOURCES_PATH") + "/", "")
+            sfiles.append(path + "/" + filename)
+    for filename, path in findDefinitions(module + ".S", projectInfo):
+        path = path.replace(projectInfo.info("SOURCES_PATH") + "/", "")
+        sfiles.append(path + "/" + filename)
+    for filename, path in findDefinitions(module + "_" + projectInfo.info("CPU_INFOS")["TOOLCHAIN"] + ".S", projectInfo):
+        path = path.replace(projectInfo.info("SOURCES_PATH") + "/", "")
+        sfiles.append(path + "/" + filename)
+    for tag in projectInfo.info("CPU_INFOS")["CPU_TAGS"]:
+        for filename, path in findDefinitions(module + "_" + tag + ".S", projectInfo):
+            path = path.replace(projectInfo.info("SOURCES_PATH") + "/", "")
+            sfiles.append(path + "/" + filename)
+    return cfiles, sfiles
 
 def codeliteProjectGenerator(projectInfo):
     template = open("cltemplates/bertos.project").read()
