@@ -92,7 +92,7 @@ def mkGenerator(projectInfo, makefile):
     mkData["$prefix"] = projectInfo.info("TOOLCHAIN")["path"].split("gcc")[0]
     mkData["$suffix"] = projectInfo.info("TOOLCHAIN")["path"].split("gcc")[1]
     mkData["$cross"] = projectInfo.info("TOOLCHAIN")["path"].split("gcc")[0]
-    mkData["$main"] = projectInfo.info("PROJECT_PATH") + "/" + os.path.basename(projectInfo.info("PROJECT_PATH")) + "/main.c"
+    mkData["$main"] = os.path.basename(projectInfo.info("PROJECT_PATH")) + "/main.c"
     for key in mkData:
         while makefile.find(key) != -1:
             makefile = makefile.replace(key, mkData[key])
@@ -109,6 +109,7 @@ def makefileGenerator(projectInfo, makefile):
 
 def csrcGenerator(projectInfo):
     modules = projectInfo.info("MODULES")
+    files = projectInfo.info("FILES")
     if "harvard" in projectInfo.info("CPU_INFOS")["CPU_TAGS"]:
         harvard = True
     else:
@@ -116,33 +117,38 @@ def csrcGenerator(projectInfo):
     csrc = []
     pcsrc = []
     constants = {}
+    moduleFiles = set([])
     for module, information in modules.items():
         if information["enabled"]:
             if "constants" in information:
                 constants.update(information["constants"])
-            for filename, path in findDefinitions(module + ".c", projectInfo):
-                path = path.replace(projectInfo.info("SOURCES_PATH"), projectInfo.info("PROJECT_PATH"))
+            moduleFiles |= set(findModuleFiles(module, projectInfo))
+            for fileDependency in information["depends"]:
+                if fileDependency in files:
+                    moduleFiles |= set(findModuleFiles(fileDependency, projectInfo))
+            for file in moduleFiles:
                 if not harvard or "harvard" not in information or information["harvard"] == "both":
-                    csrc.append(path + "/" + filename)
+                    csrc.append(file)
                 if harvard and "harvard" in information:
-                    pcsrc.append(path + "/" + filename)
-            for filename, path in findDefinitions(module + "_" + projectInfo.info("CPU_INFOS")["TOOLCHAIN"] + ".c", projectInfo):
-                path = path.replace(projectInfo.info("SOURCES_PATH"), projectInfo.info("PROJECT_PATH"))
-                if not harvard or "harvard" not in information or information["harvard"] == "both":
-                    csrc.append(path + "/" + filename)
-                if harvard and "harvard" in information:
-                    pcsrc.append(path + "/" + filename)
-            for tag in projectInfo.info("CPU_INFOS")["CPU_TAGS"]:
-                for filename, path in findDefinitions(module + "_" + tag + ".c", projectInfo):
-                    path = path.replace(projectInfo.info("SOURCES_PATH"), projectInfo.info("PROJECT_PATH"))
-                    if not harvard or "harvard" not in information or information["harvard"] == "both":
-                        csrc.append(path + "/" + filename)
-                    if harvard and "harvard" in information:
-                        pcsrc.append(path + "/" + filename)
+                    pcsrc.append(file)
     csrc = " \\\n\t".join(csrc) + " \\"
     pcsrc = " \\\n\t".join(pcsrc) + " \\"
     constants = "\n".join([os.path.basename(projectInfo.info("PROJECT_PATH")) + "_" + key + " = " + str(value) for key, value in constants.items()])
     return csrc, pcsrc, constants
+    
+def findModuleFiles(module, projectInfo):
+    files = []
+    for filename, path in findDefinitions(module + ".c", projectInfo):
+        path = path.replace(projectInfo.info("SOURCES_PATH") + "/", "")
+        files.append(path + "/" + filename)
+    for filename, path in findDefinitions(module + "_" + projectInfo.info("CPU_INFOS")["TOOLCHAIN"] + ".c", projectInfo):
+        path = path.replace(projectInfo.info("SOURCES_PATH") + "/", "")
+        files.append(path + "/" + filename)
+    for tag in projectInfo.info("CPU_INFOS")["CPU_TAGS"]:
+        for filename, path in findDefinitions(module + "_" + tag + ".c", projectInfo):
+            path = path.replace(projectInfo.info("SOURCES_PATH") + "/", "")
+            files.append(path + "/" + filename)
+    return files
 
 def codeliteProjectGenerator(projectInfo):
     template = open("cltemplates/bertos.project").read()
@@ -341,6 +347,7 @@ def loadModuleData(project):
     moduleInfoDict = {}
     listInfoDict = {}
     configurationInfoDict = {}
+    fileDict = {}
     for filename, path in findDefinitions("*.h", project):
         commentList = getCommentList(open(path + "/" + filename, "r").read())
         if len(commentList) > 0:
@@ -376,6 +383,7 @@ def loadModuleData(project):
     project.setInfo("MODULES", moduleInfoDict)
     project.setInfo("LISTS", listInfoDict)
     project.setInfo("CONFIGURATIONS", configurationInfoDict)
+    project.setInfo("FILES", fileDict)
     
 def formatParamNameValue(text):
     """

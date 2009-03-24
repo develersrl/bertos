@@ -238,6 +238,7 @@ class BModulePage(BWizardPage):
             self._moduleSelected(module)
         else:
             self._moduleUnselected(module)
+            self.removeFileDependencies(module)
     
     def _moduleSelected(self, selectedModule):
         modules = self._projectInfoRetrieve("MODULES")
@@ -281,11 +282,18 @@ class BModulePage(BWizardPage):
     def selectDependencyCheck(self, module):
         unsatisfied = set()
         modules = self._projectInfoRetrieve("MODULES")
+        files = self._projectInfoRetrieve("FILES")
         for dependency in modules[module]["depends"]:
-            if not modules[dependency]["enabled"]:
+            if dependency in modules and not modules[dependency]["enabled"]:
                 unsatisfied |= set([dependency])
                 if dependency not in unsatisfied:
                     unsatisfied |= self.selectDependencyCheck(dependency)
+            if dependency not in modules:
+                if dependency in files:
+                    files[dependency] += 1
+                else:
+                    files[dependency] = 1
+        self._projectInfoStore("FILES", files)
         return unsatisfied
     
     def unselectDependencyCheck(self, dependency):
@@ -297,6 +305,17 @@ class BModulePage(BWizardPage):
                 if dependency not in unsatisfied:
                     unsatisfied |= self.unselectDependencyCheck(module)
         return unsatisfied
+    
+    def removeFileDependencies(self, module):
+        modules = self._projectInfoRetrieve("MODULES")
+        files = self._projectInfoRetrieve("FILES")
+        dependencies = modules[module]["depends"]
+        for dependency in dependencies:
+            if dependency in files:
+                files[dependency] -= 1
+                if files[dependency] == 0:
+                    del files[dependency]
+        self._projectInfoStore("FILES", files)
 
 class QControlGroup(QObject):
     def __init__(self):
