@@ -114,11 +114,15 @@ def csrcGenerator(projectInfo):
         harvard = True
     else:
         harvard = False
+    ## file to be included in CSRC variable
     csrc = []
+    ## file to be included in PCSRC variable
     pcsrc = []
+    ## constants to be included at the beginning of the makefile
     constants = {}
     moduleFiles = set([])
     dependencyFiles = set([])
+    ## assembly sources
     asmFiles = set([])
     for module, information in modules.items():
         if information["enabled"]:
@@ -142,40 +146,31 @@ def csrcGenerator(projectInfo):
     csrc = " \\\n\t".join(csrc) + " \\"
     pcsrc = " \\\n\t".join(pcsrc) + " \\"
     constants = "\n".join([os.path.basename(projectInfo.info("PROJECT_PATH")) + "_" + key + " = " + str(value) for key, value in constants.items()])
-    print asmFiles
     return csrc, pcsrc, constants
     
 def findModuleFiles(module, projectInfo):
+    ## Find the files related to the selected module
     cfiles = []
     sfiles = []
-    for filename, path in findDefinitions(module + ".c", projectInfo):
+    ## .c files related to the module and the cpu architecture
+    for filename, path in findDefinitions(module + ".c", projectInfo) + \
+            findDefinitions(module + "_" + projectInfo.info("CPU_INFOS")["TOOLCHAIN"] + ".c", projectInfo):
         path = path.replace(projectInfo.info("SOURCES_PATH") + "/", "")
         cfiles.append(path + "/" + filename)
-    for filename, path in findDefinitions(module + "_" + projectInfo.info("CPU_INFOS")["TOOLCHAIN"] + ".c", projectInfo):
+    ## .s files related to the module and the cpu architecture
+    for filename, path in findDefinitions(module + ".s", projectInfo) + \
+            findDefinitions(module + "_" + projectInfo.info("CPU_INFOS")["TOOLCHAIN"] + ".s", projectInfo) + \
+            findDefinitions(module + ".S", projectInfo) + \
+            findDefinitions(module + "_" + projectInfo.info("CPU_INFOS")["TOOLCHAIN"] + ".S", projectInfo):
         path = path.replace(projectInfo.info("SOURCES_PATH") + "/", "")
-        cfiles.append(path + "/" + filename)
+        sfiles.append(path + "/" + filename)
+    ## .c and .s files related to the module and the cpu tags
     for tag in projectInfo.info("CPU_INFOS")["CPU_TAGS"]:
         for filename, path in findDefinitions(module + "_" + tag + ".c", projectInfo):
             path = path.replace(projectInfo.info("SOURCES_PATH") + "/", "")
             cfiles.append(path + "/" + filename)
-    for filename, path in findDefinitions(module + ".s", projectInfo):
-        path = path.replace(projectInfo.info("SOURCES_PATH") + "/", "")
-        sfiles.append(path + "/" + filename)
-    for filename, path in findDefinitions(module + "_" + projectInfo.info("CPU_INFOS")["TOOLCHAIN"] + ".s", projectInfo):
-        path = path.replace(projectInfo.info("SOURCES_PATH") + "/", "")
-        sfiles.append(path + "/" + filename)
-    for tag in projectInfo.info("CPU_INFOS")["CPU_TAGS"]:
-        for filename, path in findDefinitions(module + "_" + tag + ".s", projectInfo):
-            path = path.replace(projectInfo.info("SOURCES_PATH") + "/", "")
-            sfiles.append(path + "/" + filename)
-    for filename, path in findDefinitions(module + ".S", projectInfo):
-        path = path.replace(projectInfo.info("SOURCES_PATH") + "/", "")
-        sfiles.append(path + "/" + filename)
-    for filename, path in findDefinitions(module + "_" + projectInfo.info("CPU_INFOS")["TOOLCHAIN"] + ".S", projectInfo):
-        path = path.replace(projectInfo.info("SOURCES_PATH") + "/", "")
-        sfiles.append(path + "/" + filename)
-    for tag in projectInfo.info("CPU_INFOS")["CPU_TAGS"]:
-        for filename, path in findDefinitions(module + "_" + tag + ".S", projectInfo):
+        for filename, path in findDefinitions(module + "_" + tag + ".s", projectInfo) + \
+                findDefinitions(module + "_" + tag + ".S", projectInfo):
             path = path.replace(projectInfo.info("SOURCES_PATH") + "/", "")
             sfiles.append(path + "/" + filename)
     return cfiles, sfiles
@@ -378,7 +373,7 @@ def loadModuleData(project):
     listInfoDict = {}
     configurationInfoDict = {}
     fileDict = {}
-    for filename, path in findDefinitions("*.h", project):
+    for filename, path in findDefinitions("*.h", project) + findDefinitions("*.c", project) + findDefinitions("*.s", project) + findDefinitions("*.S", project):
         commentList = getCommentList(open(path + "/" + filename, "r").read())
         if len(commentList) > 0:
             moduleInfo = {}
