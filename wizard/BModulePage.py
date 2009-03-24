@@ -61,6 +61,7 @@ class BModulePage(BWizardPage):
                 moduleItem = QTreeWidgetItem(item, QStringList([module]))
                 moduleItem.setCheckState(0, Qt.Unchecked)
             self.pageContent.moduleTree.addTopLevelItem(item)
+        self.pageContent.moduleTree.sortItems(0, Qt.AscendingOrder)
         
     
     def _fillPropertyTable(self):
