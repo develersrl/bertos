@@ -429,6 +429,7 @@ def loadConfigurationInfos(path):
             "min": the minimum value for integer parameters
             "max": the maximum value for integer parameters
             "long": boolean indicating if the num is a long
+            "unsigned": boolean indicating if the num is an unsigned
             "value_list": the name of the enum for enum parameters
     """
     configurationInfos = {}
@@ -438,6 +439,8 @@ def loadConfigurationInfos(path):
         configurationInfos[name] = {}
         configurationInfos[name]["value"] = value
         configurationInfos[name]["informations"] = informations
+        if not "type" in configurationInfos[name]["informations"]:
+            configurationInfos[name]["informations"]["type"] = findParameterType(configurationInfos[name])
         if ("type" in configurationInfos[name]["informations"].keys() and
                 configurationInfos[name]["informations"]["type"] == "int" and
                 configurationInfos[name]["value"].find("L") != -1):
@@ -451,6 +454,12 @@ def loadConfigurationInfos(path):
         configurationInfos[name]["description"] = description
         configurationInfos[name]["brief"] = brief
     return configurationInfos
+
+def findParameterType(parameter):
+    if "value_list" in parameter["informations"]:
+        return "enum"
+    if "min" in parameter["informations"] or "max" in parameter["informations"] or re.match(r"^\d+U?L?$", parameter["value"]) != None:
+        return "int"
 
 def sub(string, parameter, value):
     """
