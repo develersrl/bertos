@@ -72,7 +72,7 @@
 
 #include "hw/hw_cpu.h"
 #include <cpu/detect.h>
-#include <cfg/cfg_arch.h>
+#include "cfg/cfg_arch.h"
 
 
 #if CLOCK_FREQ != 48023000L

@@ -44,7 +44,7 @@
  * $test$: echo "#define CONFIG_KERN_SIGNALS 1" >> $cfgdir/cfg_signal.h
  */
 
-#include <cfg/cfg_timer.h>
+#include "cfg/cfg_timer.h"
 #include <cfg/debug.h>
 #include <cfg/test.h>
 

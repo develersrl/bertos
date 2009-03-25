@@ -127,7 +127,7 @@
 #endif
 
 
-#include <cfg/cfg_arch.h> /* For ARCH_QT */
+#include "cfg/cfg_arch.h" /* For ARCH_QT */
 
 /*
  * We want Qt and other frameworks to look like OSes because you would
