@@ -75,13 +75,15 @@ class BModulePage(BWizardPage):
             self.pageContent.propertyTable.clear()
             if len(configuration) > 0:
                 configurations = self._projectInfoRetrieve("CONFIGURATIONS")[configuration]
-                self.pageContent.propertyTable.setRowCount(len(configurations))
+                self.pageContent.propertyTable.setRowCount(0)
                 index = 0
                 for property in configurations:
                     if "type" in configurations[property]["informations"] and configurations[property]["informations"]["type"] == "autoenabled":
                         ## Doesn't show the hidden fields
                         pass
                     else:
+                        ## Set the row count to the current index + 1
+                        self.pageContent.propertyTable.setRowCount(index + 1)
                         item = QTableWidgetItem(configurations[property]["brief"])
                         item.setData(Qt.UserRole, qvariant_converter.convertString(property))
                         self.pageContent.propertyTable.setItem(index, 0, item)
