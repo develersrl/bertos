@@ -37,8 +37,8 @@
 #ifndef CPU_POWER_H
 #define CPU_POWER_H
 
-#include <cfg/cfg_kern.h>
-#include <cfg/cfg_wdt.h>
+#include "cfg/cfg_proc.h"
+#include "cfg/cfg_wdt.h"
 
 #if CONFIG_KERN
 	#include <kern/proc.h>
