@@ -36,35 +36,64 @@
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
-#ifndef CFG_KERN_H
-#define CFG_KERN_H
+#ifndef CFG_PROC_H
+#define CFG_PROC_H
 
 /**
  * Enable the multithreading kernel.
+ *
+ * $WIZ$ type = "autoenabled"
  */
-#define CONFIG_KERN  0
+#define CONFIG_KERN 0
 
 /**
- * \name Optional kernel features
- * \{
+ * Kernel interrupt supervisor.
+ * $WIZ$ type = "boolean"
  */
-#define CONFIG_KERN_SCHED       0  ///< Process schedling
-#define CONFIG_KERN_SIGNALS     0  ///< Inter-process signals
-#define CONFIG_KERN_IRQ         0  ///< Interrupt supervisor
-#define CONFIG_KERN_HEAP        0  ///< Dynamic memory allocation
-#define CONFIG_KERN_SEMAPHORES  0  ///< Re-entrant mutual exclusion primitives
-#define CONFIG_KERN_MONITOR     0  ///< Process monitor
-#define CONFIG_KERN_PREEMPT     0  ///< Preemptive process scheduling
-#define CONFIG_KERN_PRI         0  ///< Priority-based scheduling policy
-/*\}*/
+#define CONFIG_KERN_IRQ 0
 
-/// [ms] Time sharing quantum (a prime number prevents interference effects)
-#define CONFIG_KERN_QUANTUM     47
+/**
+ * Dynamic memory allocation for processes.
+ *
+ * $WIZ$ type = "boolean"
+ */
+#define CONFIG_KERN_HEAP 0
 
-/// Module logging level.
-#define KERN_LOG_LEVEL      LOG_LVL_ERR
+/**
+ * Preemptive process scheduling. WARNING: Experimental, still incomplete!
+ *
+ * $WIZ$ type = "boolean"
+ */
+#define CONFIG_KERN_PREEMPT 0
 
-/// Module logging format.
-#define KERN_LOG_FORMAT     LOG_FMT_VERBOSE
+/**
+ * Priority-based scheduling policy.
+ * $WIZ$ type = "boolean"
+ */
+#define CONFIG_KERN_PRI 0
 
-#endif /*  CFG_KERN_H */
+/**
+ * Time sharing quantum (a prime number prevents interference effects) [ms].
+ *
+ * $WIZ$ type = "int"
+ * $WIZ$ min = "0"
+ */
+#define CONFIG_KERN_QUANTUM 47
+
+/**
+ * Module logging level.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
+ */
+#define KERN_LOG_LEVEL LOG_LVL_ERR
+
+/**
+ * Module logging format.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define KERN_LOG_FORMAT LOG_FMT_VERBOSE
+
+#endif /*  CFG_PROC_H */
