@@ -39,8 +39,6 @@
 #include "emul.h"
 #include "emulwin.h"
 
-#include "cfg/cfg_kern.h"
-
 #include <cfg/module.h>
 
 #include <QtGui/qapplication.h>
