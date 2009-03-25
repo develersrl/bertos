@@ -34,6 +34,16 @@
  *
  * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
+ *
+ * $test$: cp bertos/cfg/cfg_proc.h $cfgdir/
+ * $test$: echo  "#undef CONFIG_KERN" >> $cfgdir/cfg_proc.h
+ * $test$: echo "#define CONFIG_KERN 1" >> $cfgdir/cfg_proc.h
+ * $test$: cp bertos/cfg/cfg_monitor.h $cfgdir/
+ * $test$: echo  "#undef CONFIG_KERN_MONITOR" >> $cfgdir/cfg_monitor.h
+ * $test$: echo "#define CONFIG_KERN_MONITOR 1" >> $cfgdir/cfg_monitor.h
+ * $test$: cp bertos/cfg/cfg_signal.h $cfgdir/
+ * $test$: echo  "#undef CONFIG_KERN_SIGNALS" >> $cfgdir/cfg_signal.h
+ * $test$: echo "#define CONFIG_KERN_SIGNALS 1" >> $cfgdir/cfg_signal.h
  */
 
 #include <kern/proc.h>
