@@ -36,6 +36,12 @@
  * \author Daniele Basile <asterix@develer.com>
  * \author Stefano Fedrigo <aleph@develer.com>
  *
+ * $test$: cp bertos/cfg/cfg_proc.h $cfgdir/
+ * $test$: echo  "#undef CONFIG_KERN" >> $cfgdir/cfg_proc.h
+ * $test$: echo "#define CONFIG_KERN 1" >> $cfgdir/cfg_proc.h
+ * $test$: cp bertos/cfg/cfg_sem.h $cfgdir/
+ * $test$: echo  "#undef CONFIG_KERN_SEMAPHORES" >> $cfgdir/cfg_sem.h
+ * $test$: echo "#define CONFIG_KERN_SEMAPHORES 1" >> $cfgdir/cfg_sem.h
  */
 
 #include <cfg/debug.h>
