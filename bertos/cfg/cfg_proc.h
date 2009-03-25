@@ -47,12 +47,6 @@
 #define CONFIG_KERN 0
 
 /**
- * Left for backwards compatibility, do not use.
- * Will be deprecated.
- */
-#define CONFIG_KERN_SCHED CONFIG_KERN
-
-/**
  * Kernel interrupt supervisor.
  * $WIZ$ type = "boolean"
  */
@@ -66,7 +60,7 @@
 #define CONFIG_KERN_HEAP 0
 
 /**
- * Preemptive process scheduling. WARNING: Experimental, do not use!
+ * Preemptive process scheduling. WARNING: Experimental, still incomplete!
  *
  * $WIZ$ type = "boolean"
  */
@@ -95,10 +89,10 @@
 #define KERN_LOG_LEVEL LOG_LVL_ERR
 
 /**
- * Module logging level.
+ * Module logging format.
  *
  * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_level"
+ * $WIZ$ value_list = "log_format"
  */
 #define KERN_LOG_FORMAT LOG_FMT_VERBOSE
 

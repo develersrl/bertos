@@ -30,26 +30,19 @@
  * Copyright 1999, 2000, 2001, 2008 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
- * \brief Kernel configuration parameters (deprecated)
+ * \brief Kernel monitor configuration parameters
  *
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
-#ifndef CFG_KERN_H
-#define CFG_KERN_H
-
-#warning This file is deprecated, you should use the correct combination of cfg_proc.h, cfg_sem.h, cfg_signal.h and cfg_monitor.h
-#include "cfg_proc.h"
-#include "cfg_sem.h"
-#include "cfg_signal.h"
-#include "cfg_monitor.h"
-
+#ifndef CFG_MONITOR_H
+#define CFG_MONITOR_H
 
 /**
- * Left for backwards compatibility.
- * Do not use this anymore, will be deprecated soon.
+ * Process monitor.
+ * $WIZ$ type = "autoenabled"
  */
-#define CONFIG_KERN_SCHED CONFIG_KERN
+#define CONFIG_KERN_MONITOR 0
 
-#endif /*  CFG_KERN_H */
+#endif /*  CFG_MONITOR_H */
