@@ -358,14 +358,23 @@ def getDefinitionBlocks(text):
     Take a text and return a list of tuple (description, name-value).
     """
     block = []
-    block_tmp = re.findall(r"/\*{2}\s*([^*]*\*(?:[^/*][^*]*\*+)*)/\s*#define\s+((?:[^/]*?/?)+)\s*?(?:/{2,3}[^<].*?)?$", text, re.MULTILINE)
-    for comment, define in block_tmp:
+    block_tmp = re.finditer(r"/\*{2}\s*([^*]*\*(?:[^/*][^*]*\*+)*)/\s*#define\s+((?:[^/]*?/?)+)\s*?(?:/{2,3}[^<].*?)?$", text, re.MULTILINE)
+    for match in block_tmp:
         # Only the first element is needed
-        block.append(([re.findall(r"^\s*\* *(.*?)$", line, re.MULTILINE)[0] for line in comment.splitlines()], define))
-    for comment, define in re.findall(r"/{3}\s*([^<].*?)\s*#define\s+((?:[^/]*?/?)+)\s*?(?:/{2,3}[^<].*?)?$", text, re.MULTILINE):
-        block.append(([comment], define))
-    for define, comment in re.findall(r"#define\s*(.*?)\s*/{3}<\s*(.+?)\s*?(?:/{2,3}[^<].*?)?$", text, re.MULTILINE):
-        block.append(([comment], define))
+        comment = match.group(1)
+        define = match.group(2)
+        start = match.start()
+        block.append(([re.findall(r"^\s*\* *(.*?)$", line, re.MULTILINE)[0] for line in comment.splitlines()], define, start))
+    for match in re.finditer(r"/{3}\s*([^<].*?)\s*#define\s+((?:[^/]*?/?)+)\s*?(?:/{2,3}[^<].*?)?$", text, re.MULTILINE):
+        comment = match.group(1)
+        define = match.group(2)
+        start = match.start()
+        block.append(([comment], define, start))
+    for match in re.finditer(r"#define\s*(.*?)\s*/{3}<\s*(.+?)\s*?(?:/{2,3}[^<].*?)?$", text, re.MULTILINE):
+        comment = match.group(2)
+        define = match.group(1)
+        start = match.start()
+        block.append(([comment], define, start))
     return block
 
 def loadModuleData(project):
@@ -433,7 +442,7 @@ def loadConfigurationInfos(path):
             "value_list": the name of the enum for enum parameters
     """
     configuration_infos = {}
-    for comment, define in getDefinitionBlocks(open(path, "r").read()):
+    for comment, define, start in getDefinitionBlocks(open(path, "r").read()):
         name, value = formatParamNameValue(define)
         brief, description, informations = getDescriptionInformations(comment)
         configuration_infos[name] = {}
