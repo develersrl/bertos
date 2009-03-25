@@ -44,7 +44,7 @@
 #include <kern/proc_p.h>
 #include <kern/proc.h>
 
-#include <cfg/cfg_kern.h>
+#include "cfg/cfg_proc.h"
 
 #include <unistd.h> // FIXME: move POSIX stuff to irq_posix.h
 
