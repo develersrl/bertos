@@ -40,7 +40,8 @@
 
 #include "cfg/cfg_timer.h"
 #include "cfg/cfg_wdt.h"
-#include "cfg/cfg_kern.h"
+#include "cfg/cfg_proc.h"
+#include "cfg/cfg_signal.h"
 #include <cfg/os.h>
 #include <cfg/debug.h>
 #include <cfg/module.h>
@@ -48,6 +49,7 @@
 #include <cpu/attr.h>
 #include <cpu/types.h>
 #include <cpu/irq.h>
+#include <cpu/power.h> // cpu_relax()
 
 /*
  * Include platform-specific binding code if we're hosted.
@@ -197,11 +199,7 @@ void timer_delayTicks(ticks_t delay)
 
 	/* Busy wait */
 	while (timer_clock() - start < delay)
-	{
-#if CONFIG_WATCHDOG
-		wdt_reset();
-#endif
-	}
+		cpu_relax();
 
 #endif /* !CONFIG_KERN_SIGNALS */
 }
