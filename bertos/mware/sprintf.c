@@ -34,6 +34,10 @@
  *
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
+ *
+ * $WIZ$ module_name = "sprintf"
+ * $WIZ$ module_depends = "formatwr"
+ * $WIZ$ module_harvard = "both"
  */
 
 #include <mware/formatwr.h>
