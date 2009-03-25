@@ -36,6 +36,10 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  *
  * \brief printf-family routines for text output
+ *
+ * $WIZ$ module_name = "text_format"
+ * $WIZ$ module_depends = "sprintf", "formatwr", "text"
+ * $WIZ$ module_harvard = "both"
  */
 
 #include "text.h"
