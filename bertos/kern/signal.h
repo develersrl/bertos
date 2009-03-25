@@ -36,6 +36,10 @@
  * \version $Id$
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
+ *
+ * $WIZ$ module_name = "signal"
+ * $WIZ$ module_depends = "kernel"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_signal.h"
  */
 
 #ifndef KERN_SIGNAL_H

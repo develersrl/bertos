@@ -37,6 +37,10 @@
  * \version $Id$
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
+ *
+ * $WIZ$ module_name = "semaphores"
+ * $WIZ$ module_depends = "kernel"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_sem.h"
  */
 
 

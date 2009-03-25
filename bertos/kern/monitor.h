@@ -35,12 +35,16 @@
  * \version $Id$
  *
  * \author Giovanni Bajo <rasky@develer.com>
+ *
+ * $WIZ$ module_name = "monitor"
+ * $WIZ$ module_depends = "kernel"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_monitor.h"
  */
 
 #ifndef KERN_MONITOR_H
 #define KERN_MONITOR_H
 
-#include "cfg/cfg_kern.h"
+#include "cfg/cfg_monitor.h"
 
 #include <cpu/types.h>
 
