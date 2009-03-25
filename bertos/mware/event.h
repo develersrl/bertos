@@ -43,7 +43,8 @@
 #define KERN_EVENT_H
 
 #include <cfg/compiler.h>
-#include "cfg/cfg_kern.h"
+#include "cfg/cfg_proc.h"
+#include "cfg/cfg_signal.h"
 
 #if CONFIG_KERN
 	#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS

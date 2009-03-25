@@ -50,7 +50,7 @@
 
 #include "hw/hw_dataflash.h"
 #include "cfg/cfg_dataflash.h"
-#include "cfg/cfg_kern.h"
+#include "cfg/cfg_proc.h"
 
 #include <cfg/test.h>
 #include <cfg/debug.h>

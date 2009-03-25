@@ -56,7 +56,7 @@
 #include "ser_p.h"
 
 #include "cfg/cfg_ser.h"
-#include "cfg/cfg_kern.h"
+#include "cfg/cfg_proc.h"
 #include <cfg/debug.h>
 
 #include <mware/formatwr.h>

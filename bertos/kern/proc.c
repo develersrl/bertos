@@ -41,7 +41,8 @@
 #include "proc.h"
 
 #include "cfg/cfg_arch.h"  // ARCH_EMUL
-#include "cfg/cfg_kern.h"
+#include "cfg/cfg_proc.h"
+#include "cfg/cfg_monitor.h"
 #include <cfg/macros.h>    // ROUND_UP2
 #include <cfg/module.h>
 #include <cfg/depend.h>    // CONFIG_DEPEND()
@@ -56,12 +57,6 @@
 #endif
 
 #include <string.h>           /* memset() */
-
-// Check config dependencies
-CONFIG_DEPEND(CONFIG_KERN_SIGNALS,    CONFIG_KERN_SCHED);
-CONFIG_DEPEND(CONFIG_KERN_SEMAPHORES, CONFIG_KERN_SIGNALS);
-CONFIG_DEPEND(CONFIG_KERN_MONITOR,    CONFIG_KERN_SCHED);
-
 
 /*
  * The scheduer tracks ready processes by enqueuing them in the

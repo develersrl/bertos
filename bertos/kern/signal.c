@@ -100,8 +100,9 @@
 
 #include "signal.h"
 
-#include <cfg/cfg_timer.h>
+#include "cfg/cfg_timer.h"
 #include <cfg/debug.h>
+#include <cfg/depend.h>
 
 #include <cpu/irq.h>
 #include <kern/proc.h>
@@ -109,6 +110,9 @@
 
 
 #if CONFIG_KERN_SIGNALS
+
+// Check config dependencies
+CONFIG_DEPEND(CONFIG_KERN_SIGNALS, CONFIG_KERN);
 
 /**
  * Check if any of the signals in \a sigs has occurred and clear them.

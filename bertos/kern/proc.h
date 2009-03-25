@@ -42,7 +42,9 @@
 #ifndef KERN_PROC_H
 #define KERN_PROC_H
 
-#include "cfg/cfg_kern.h"
+#include "cfg/cfg_proc.h"
+#include "cfg/cfg_monitor.h"
+
 #include <cfg/compiler.h>
 
 #if CONFIG_KERN_PREEMPT

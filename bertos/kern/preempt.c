@@ -44,7 +44,7 @@
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
-#include <cfg/cfg_kern.h>
+#include "cfg/cfg_proc.h"
 
 #if CONFIG_KERN_PREEMPT
 
@@ -61,7 +61,7 @@
 #include <cfg/depend.h>    // CONFIG_DEPEND()
 
 // Check config dependencies
-CONFIG_DEPEND(CONFIG_KERN_PREEMPT,    CONFIG_KERN_SCHED && CONFIG_TIMER_EVENTS && CONFIG_KERN_IRQ);
+CONFIG_DEPEND(CONFIG_KERN_PREEMPT, CONFIG_KERN && CONFIG_TIMER_EVENTS && CONFIG_KERN_IRQ);
 
 MOD_DEFINE(preempt)
 

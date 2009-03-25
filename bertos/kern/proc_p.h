@@ -40,7 +40,10 @@
 #ifndef KERN_PROC_P_H
 #define KERN_PROC_P_H
 
-#include "cfg/cfg_kern.h"
+#include "cfg/cfg_proc.h"
+#include "cfg/cfg_signal.h"
+#include "cfg/cfg_monitor.h"
+
 #include <cfg/compiler.h>
 
 #include <cpu/types.h>        /* for cpu_stack_t */

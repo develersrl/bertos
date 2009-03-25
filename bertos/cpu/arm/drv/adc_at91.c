@@ -50,7 +50,8 @@
 #include <cpu/irq.h>
 
 #include "cfg/cfg_adc.h"
-#include "cfg/cfg_kern.h"
+#include "cfg/cfg_proc.h"
+#include "cfg/cfg_signal.h"
 #include <cfg/macros.h>
 #include <cfg/compiler.h>
 
