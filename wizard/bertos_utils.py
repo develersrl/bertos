@@ -121,11 +121,11 @@ def csrcGenerator(project_info):
     pcsrc = []
     ## constants to be included at the beginning of the makefile
     constants = {}
-    module_files = set([])
-    dependency_files = set([])
-    ## assembly sources
-    asm_files = set([])
     for module, information in modules.items():
+        module_files = set([])
+        dependency_files = set([])
+        ## assembly sources
+        asm_files = set([])
         if information["enabled"]:
             if "constants" in information:
                 constants.update(information["constants"])
