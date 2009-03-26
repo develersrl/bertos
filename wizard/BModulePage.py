@@ -98,6 +98,10 @@ class BModulePage(BWizardPage):
                             # Not defined type, rendered as a text field
                             self.pageContent.propertyTable.setItem(index, 1, QTableWidgetItem(configurations[property]["value"]))
                         index += 1
+            if self.pageContent.propertyTable.rowCount() == 0:
+                module_label = self.pageContent.moduleLabel.text()
+                module_label += "\n\nNo configuration needed."
+                self.pageContent.moduleLabel.setText(module_label)
     
     def _insertCheckBox(self, index, value):
         ## boolean property
