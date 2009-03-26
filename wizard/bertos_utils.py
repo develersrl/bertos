@@ -52,9 +52,10 @@ def createBertosProject(project_info):
     cfgdir = prjdir + "/cfg"
     shutil.rmtree(cfgdir, True)
     os.mkdir(cfgdir)
-    for key, value in project_info.info("CONFIGURATIONS").items():
-        string = open(sources_dir + "/" + key, "r").read()
-        for parameter, infos in value.items():
+    for configuration, information in project_info.info("CONFIGURATIONS").items():
+        string = open(sources_dir + "/" + configuration, "r").read()
+        for start, parameter in information["paramlist"]:
+            infos = information[parameter]
             value = infos["value"]
             if "type" in infos["informations"] and infos["informations"]["type"] == "autoenabled":
                 value = "1"
@@ -63,7 +64,7 @@ def createBertosProject(project_info):
             if "long" in infos["informations"].keys() and infos["informations"]["long"]:
                 value += "L"
             string = sub(string, parameter, value)
-        f = open(cfgdir + "/" + os.path.basename(key), "w")
+        f = open(cfgdir + "/" + os.path.basename(configuration), "w")
         f.write(string)
         f.close()
     ## Destinatio mk file

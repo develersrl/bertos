@@ -71,12 +71,12 @@ class BCreationPage(BWizardPage):
                 moduleItem = QTreeWidgetItem(QStringList([module + " - " + information["description"]]))
                 module_categories[information["category"]].append(moduleItem)
                 if len(information["configuration"]) > 0:
-                    for property, data in configurations[information["configuration"]].items():
+                    for start, property in configurations[information["configuration"]]["paramlist"]:
                         # If the final char of the brief is a dot (".") removes it.
-                        brief = data["brief"]
+                        brief = configurations[information["configuration"]][property]["brief"]
                         if brief[-1] == ".":
                             brief = brief[:-1]
-                        configuration_item = QTreeWidgetItem(moduleItem, QStringList([brief + ": " + data["value"]]))
+                        configuration_item = QTreeWidgetItem(moduleItem, QStringList([brief + ": " + configurations[information["configuration"]][property]["value"]]))
         for key, value in module_categories.items():
             category_item = QTreeWidgetItem(module_title, QStringList([key]))
             category_item.addChildren(value)
