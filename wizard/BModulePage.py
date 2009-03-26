@@ -73,32 +73,30 @@ class BModulePage(BWizardPage):
             self.pageContent.moduleLabel.setText(module_description)
             self.pageContent.moduleLabel.setVisible(True)
             self.pageContent.propertyTable.clear()
-            if len(configuration) > 0:
-                configurations = self._projectInfoRetrieve("CONFIGURATIONS")[configuration]
-                self.pageContent.propertyTable.setRowCount(0)
-                index = 0
-                for property in configurations:
-                    if "type" in configurations[property]["informations"] and configurations[property]["informations"]["type"] == "autoenabled":
-                        ## Doesn't show the hidden fields
-                        pass
+            configurations = self._projectInfoRetrieve("CONFIGURATIONS")[configuration]
+            param_list = sorted(configurations["paramlist"])
+            self.pageContent.propertyTable.setRowCount(0)
+            index = 0
+            for i, property in param_list:
+                if "type" in configurations[property]["informations"] and configurations[property]["informations"]["type"] == "autoenabled":
+                    ## Doesn't show the hidden fields
+                    pass
+                else:
+                    ## Set the row count to the current index + 1
+                    self.pageContent.propertyTable.setRowCount(index + 1)
+                    item = QTableWidgetItem(configurations[property]["brief"])
+                    item.setData(Qt.UserRole, qvariant_converter.convertString(property))
+                    self.pageContent.propertyTable.setItem(index, 0, item)
+                    if "type" in configurations[property]["informations"].keys() and configurations[property]["informations"]["type"] == "boolean":
+                        self._insertCheckBox(index, configurations[property]["value"])
+                    elif "type" in configurations[property]["informations"].keys() and configurations[property]["informations"]["type"] == "enum":
+                        self._insertComboBox(index, configurations[property]["value"], configurations[property]["informations"]["value_list"])
+                    elif "type" in configurations[property]["informations"] and configurations[property]["informations"]["type"] == "int":
+                        self._insertSpinBox(index, configurations[property]["value"], configurations[property]["informations"])
                     else:
-                        ## Set the row count to the current index + 1
-                        self.pageContent.propertyTable.setRowCount(index + 1)
-                        item = QTableWidgetItem(configurations[property]["brief"])
-                        item.setData(Qt.UserRole, qvariant_converter.convertString(property))
-                        self.pageContent.propertyTable.setItem(index, 0, item)
-                        if "type" in configurations[property]["informations"].keys() and configurations[property]["informations"]["type"] == "boolean":
-                            self._insertCheckBox(index, configurations[property]["value"])
-                        elif "type" in configurations[property]["informations"].keys() and configurations[property]["informations"]["type"] == "enum":
-                            self._insertComboBox(index, configurations[property]["value"], configurations[property]["informations"]["value_list"])
-                        elif "type" in configurations[property]["informations"] and configurations[property]["informations"]["type"] == "int":
-                            self._insertSpinBox(index, configurations[property]["value"], configurations[property]["informations"])
-                        else:
-                            # Not defined type, rendered as a text field
-                            self.pageContent.propertyTable.setItem(index, 1, QTableWidgetItem(configurations[property]["value"]))
-                        index += 1
-            else:
-                self.pageContent.propertyTable.setRowCount(0)
+                        # Not defined type, rendered as a text field
+                        self.pageContent.propertyTable.setItem(index, 1, QTableWidgetItem(configurations[property]["value"]))
+                    index += 1
     
     def _insertCheckBox(self, index, value):
         ## boolean property

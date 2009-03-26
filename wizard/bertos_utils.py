@@ -442,9 +442,11 @@ def loadConfigurationInfos(path):
             "value_list": the name of the enum for enum parameters
     """
     configuration_infos = {}
+    configuration_infos["paramlist"] = []
     for comment, define, start in getDefinitionBlocks(open(path, "r").read()):
         name, value = formatParamNameValue(define)
         brief, description, informations = getDescriptionInformations(comment)
+        configuration_infos["paramlist"].append((start, name))
         configuration_infos[name] = {}
         configuration_infos[name]["value"] = value
         configuration_infos[name]["informations"] = informations
