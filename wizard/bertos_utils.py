@@ -141,13 +141,13 @@ def csrcGenerator(project_info):
                     asm_files |= set(dependencySFiles)
             for file in module_files:
                 if not harvard or "harvard" not in information or information["harvard"] == "both":
-                    csrc.append(file)
+                    csrc.append(os.path.normpath(file))
                 if harvard and "harvard" in information:
-                    pcsrc.append(file)
+                    pcsrc.append(os.path.normpath(file))
             for file in dependency_files:
-                csrc.append(file)
+                csrc.append(os.path.normpath(file))
             for file in asm_files:
-                asrc.append(file)
+                asrc.append(os.path.normpath(file))
     csrc = " \\\n\t".join(csrc) + " \\"
     pcsrc = " \\\n\t".join(pcsrc) + " \\"
     asrc = " \\\n\t".join(asrc) + " \\"
