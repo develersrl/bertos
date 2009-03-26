@@ -89,7 +89,7 @@ def mkGenerator(project_info, makefile):
     mk_data["$cpuname"] = project_info.info("CPU_INFOS")["CORE_CPU"]
     mk_data["$cflags"] = " ".join(project_info.info("CPU_INFOS")["C_FLAGS"])
     mk_data["$ldflags"] = " ".join(project_info.info("CPU_INFOS")["LD_FLAGS"])
-    mk_data["$csrc"], mk_data["$pcsrc"], mk_data["$constants"] = csrcGenerator(project_info)
+    mk_data["$csrc"], mk_data["$pcsrc"], mk_data["$asrc"], mk_data["$constants"] = csrcGenerator(project_info)
     mk_data["$prefix"] = project_info.info("TOOLCHAIN")["path"].split("gcc")[0]
     mk_data["$suffix"] = project_info.info("TOOLCHAIN")["path"].split("gcc")[1]
     mk_data["$cross"] = project_info.info("TOOLCHAIN")["path"].split("gcc")[0]
@@ -119,6 +119,8 @@ def csrcGenerator(project_info):
     csrc = []
     ## file to be included in PCSRC variable
     pcsrc = []
+    ## files to be included in CPPASRC variable
+    asrc = []
     ## constants to be included at the beginning of the makefile
     constants = {}
     for module, information in modules.items():
@@ -144,10 +146,13 @@ def csrcGenerator(project_info):
                     pcsrc.append(file)
             for file in dependency_files:
                 csrc.append(file)
+            for file in asm_files:
+                asrc.append(file)
     csrc = " \\\n\t".join(csrc) + " \\"
     pcsrc = " \\\n\t".join(pcsrc) + " \\"
+    asrc = " \\\n\t".join(asrc) + " \\"
     constants = "\n".join([os.path.basename(project_info.info("PROJECT_PATH")) + "_" + key + " = " + str(value) for key, value in constants.items()])
-    return csrc, pcsrc, constants
+    return csrc, pcsrc, asrc, constants
     
 def findModuleFiles(module, project_info):
     ## Find the files related to the selected module

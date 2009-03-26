@@ -31,6 +31,9 @@ $pname_PCSRC += \
 	$pcsrc
 	#
 
+$pname_CPPASRC += \
+	$asrc
+	#
 
 $pname_CFLAGS = $cflags
 $pname_LDFLAGS = $ldflags
