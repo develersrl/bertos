@@ -398,6 +398,9 @@ def loadModuleData(project):
             except ParseError, err:
                 raise DefineException.ModuleDefineException(path, err.line_number, err.line)
             for module, information in module_dict.items():
+                if "depends" not in information:
+                    information["depends"] = ()
+                information["depends"] += (filename.split(".")[0],)
                 information["category"] = os.path.basename(path)
                 if "configuration" in information.keys() and len(information["configuration"]):
                     configuration = module_dict[module]["configuration"]
