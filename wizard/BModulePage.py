@@ -37,14 +37,18 @@ class BModulePage(BWizardPage):
         self.connect(self._button_group, SIGNAL("buttonClicked(int)"), self._moduleSelectionChanged)
     
     def _loadModuleData(self):
-        try:
-            bertos_utils.loadModuleData(self._project())
-        except ModuleDefineException, e:
-            self._exceptionOccurred(self.tr("Error parsing line '%2' in file %1").arg(e.path).arg(e.line))
-        except EnumDefineException, e:
-            self._exceptionOccurred(self.tr("Error parsing line '%2' in file %1").arg(e.path).arg(e.line))
-        except ConfigurationDefineException, e:
-            self._exceptionOccurred(self.tr("Error parsing line '%2' in file %1").arg(e.path).arg(e.line))
+        ## Load the module data only if it isn't already loaded
+        if self._projectInfoRetrieve("MODULES") == None \
+                and self._projectInfoRetrieve("LISTS") == None \
+                and self._projectInfoRetrieve("CONFIGURATIONS") == None:
+            try:
+                bertos_utils.loadModuleData(self._project())
+            except ModuleDefineException, e:
+                self._exceptionOccurred(self.tr("Error parsing line '%2' in file %1").arg(e.path).arg(e.line))
+            except EnumDefineException, e:
+                self._exceptionOccurred(self.tr("Error parsing line '%2' in file %1").arg(e.path).arg(e.line))
+            except ConfigurationDefineException, e:
+                self._exceptionOccurred(self.tr("Error parsing line '%2' in file %1").arg(e.path).arg(e.line))
     
     def _fillModuleTree(self):
         modules = self._projectInfoRetrieve("MODULES")
@@ -55,11 +59,15 @@ class BModulePage(BWizardPage):
             if information["category"] not in categories.keys():
                 categories[information["category"]] = []
             categories[information["category"]].append(module)
-        for category, modules in categories.items():
+        for category, module_list in categories.items():
             item = QTreeWidgetItem(QStringList([category]))
-            for module in modules:
+            for module in module_list:
+                enabled = modules[module]["enabled"]
                 module_item = QTreeWidgetItem(item, QStringList([module]))
-                module_item.setCheckState(0, Qt.Unchecked)
+                if enabled:
+                    module_item.setCheckState(0, Qt.Checked)
+                else:
+                    module_item.setCheckState(0, Qt.Unchecked)
             self.pageContent.moduleTree.addTopLevelItem(item)
         self.pageContent.moduleTree.sortItems(0, Qt.AscendingOrder)
         
