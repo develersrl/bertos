@@ -123,14 +123,18 @@ class BModulePage(BWizardPage):
     
     def _insertComboBox(self, index, value, value_list):
         ## enum property
-        combo_box = QComboBox()
-        self.pageContent.propertyTable.setCellWidget(index, 1, combo_box)
-        enum = self._projectInfoRetrieve("LISTS")[value_list]
-        for i, element in enumerate(enum):
-            combo_box.addItem(element)
-            if element == value:
-                combo_box.setCurrentIndex(i)
-        self._control_group.addControl(index, combo_box)
+        try:
+            enum = self._projectInfoRetrieve("LISTS")[value_list]
+            combo_box = QComboBox()
+            self.pageContent.propertyTable.setCellWidget(index, 1, combo_box)
+            for i, element in enumerate(enum):
+                combo_box.addItem(element)
+                if element == value:
+                    combo_box.setCurrentIndex(i)
+            self._control_group.addControl(index, combo_box)
+        except KeyError:
+            self._exceptionOccurred(self.tr("Define list \"%1\" not found. Check definition files.").arg(value_list))
+            self.pageContent.propertyTable.setItem(index, 1, QTableWidgetItem(value))
     
     def _insertSpinBox(self, index, value, informations):
         ## int, long or undefined type property
