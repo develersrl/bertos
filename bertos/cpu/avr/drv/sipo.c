@@ -32,55 +32,76 @@
  *
  * \version $Id$
  *
- * \author Andrea Grandi <andrea@develer.com>
- *
  * \brief SIPO Module
  *
  * The SIPO module trasform a serial input in
  * a parallel output. Please check hw_sipo.h
  * file to customize hardware relative parameters.
  *
+ * \author Daniele Basile <asterix@develer.com>
  */
 
 #include "sipo.h"
+
 #include "hw/hw_sipo.h"
 
-#include <drv/ser.h>
+#include <cfg/compiler.h>
 
-Serial *sipo_port;
+#include <kern/kfile.h>
 
-/** Initialize the SIPO port */
-void sipo_init(void)
+#include <string.h>
+
+/**
+ * Write a char in sipo shift register
+ */
+INLINE void sipo_putchar(uint8_t c)
 {
-	CLOCK_LOW;
-	SET_SOUT_LOW;
-	LOAD_LOW;
-	SET_SCK_OUT;
-	SET_SOUT_OUT;
-	LOAD_INIT;
-	sipo_putchar(0x0);
-	OE_OUT;
-	OE_LOW;
-}
-
-/** Write a char in the SIPO port and manage the LOAD pin */
-void sipo_putchar(uint8_t c)
-{
-	for(int i = 0; i <= 7; i++)
+	for(int i = 0; i < 8; i++)
 	{
 		if((c & BV(i)) == 0)
-		{
-			SET_SOUT_LOW;
-		}
+			SIPO_SI_LOW();
 		else
-		{
-			SET_SOUT_HIGH;
-		}
+			SIPO_SI_HIGH();
 
-		CLOCK_PULSE;
+		SIPO_SI_CLOCK();
 	}
-
-	LOAD_HIGH;
-	LOAD_LOW;
 }
 
+/**
+ * Write a buffer into sipo register and when finish to
+ * we load it.
+ */
+ static size_t sipo_write(UNUSED_ARG(struct KFile *, fd), const void *_buf, size_t size)
+{
+	const uint8_t *buf = (const uint8_t *)_buf;
+	size_t write_len = size;
+	ASSERT(buf);
+
+	// Load into shift register all byte in buffer
+	while(size--)
+		sipo_putchar(*buf++);
+
+	// We finsh to load bytes into shift register, load it.
+	SIPO_LOAD();
+
+	return write_len;
+}
+
+/**
+ * Initialize the SIPO
+ */
+void sipo_init(Sipo *fd)
+{
+	ASSERT(fd);
+
+	memset(fd, 0, sizeof(Sipo));
+
+	//Set kfile struct type as a generic kfile structure.
+	DB(fd->fd._type = KFT_SIPO);
+
+	// Set up data flash programming functions.
+	fd->fd.write = sipo_write;
+
+	SIPO_INIT_PIN();
+
+}

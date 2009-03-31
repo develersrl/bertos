@@ -27,7 +27,7 @@
  * the GNU General Public License.
  *
  * Copyright 2003, 2004, 2006, 2008 Develer S.r.l. (http://www.develer.com/)
- * Copyright 2000 Bernie Innocenti <bernie@codewiz.org>
+ * Copyright 2000 Bernardo Innocenti <bernie@codewiz.org>
  * All Rights Reserved.
  * -->
  *
@@ -36,7 +36,7 @@
  *
  * \version $Id$
  *
- * \author Andrea Grandi <andrea@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
  */
 
 #ifndef HW_SIPO_H
@@ -44,19 +44,37 @@
 
 #warning TODO:This is an example implementation, you must implement it!
 
-#define LOAD_HIGH       /* Implement me! */
-#define LOAD_LOW        /* Implement me! */
-#define LOAD_INIT       /* Implement me! */
-#define SET_SCK_OUT     /* Implement me! */
-#define SET_SOUT_OUT    /* Implement me! */
-#define CLOCK_HIGH      /* Implement me! */
-#define CLOCK_LOW       /* Implement me! */
-#define SET_SOUT_HIGH   /* Implement me! */
-#define SET_SOUT_LOW    /* Implement me! */
-#define CLOCK_PULSE     /* Implement me! */
 
-#define OE_OUT
-#define OE_LOW
+/**
+ * Define the procedure to set one bit low/hight to
+ * serial input in sipo device.
+ */
+#define SIPO_SI_HIGH()/* Implement me! */
+#define SIPO_SI_LOW() /* Implement me! */
 
+/**
+ * Drive pin to load the bit, presented in serial-in pin,
+ * into sipo shift register.
+ */
+#define SIPO_SI_CLOCK() /* Implement me! */
+
+/**
+ * Clock the content of shift register to output.
+ */
+#define SIPO_LOAD()   /* Implement me! */
+
+/**
+ * Enable the shift register output.
+ */
+#define SIPO_ENABLE() /* Implement me! */
+
+
+/**
+ * Do anything that needed to init sipo pins.
+ */
+#define SIPO_INIT_PIN() \
+	do { \
+		/* Implement me! */ \
+	} while(0)
 
 #endif /* HW_SIPO_H */

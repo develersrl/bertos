@@ -35,18 +35,37 @@
  *
  * \version $Id$
  *
- * \author Andrea Grandi <andrea@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef SIPO_H
-#define SIPO_H
+#ifndef DRV_SIPO_H
+#define DRV_SIPO_H
 
-#include "hw/hw_sipo.h"
+#include <kern/kfile.h>
 
-#include <avr/io.h>
+/**
+ * Sipo KFile context structure.
+ */
+typedef struct Sipo
+{
+	KFile fd;                       ///< File descriptor.
+} Sipo;
 
-void sipo_init(void);
-void sipo_putchar(uint8_t c);
+/**
+ * ID for sipo.
+ */
+#define KFT_SIPO MAKE_ID('S', 'I', 'P', 'O')
 
-#endif // SIPO_H
+/**
+ * Convert + ASSERT from generic KFile to Sipo.
+ */
+INLINE Sipo * SIPO_CAST(KFile *fd)
+{
+	ASSERT(fd->_type == KFT_SIPO);
+	return (Sipo *)fd;
+}
+
+void sipo_init(Sipo *fd);
+
+#endif // DRV_SIPO_H
 
