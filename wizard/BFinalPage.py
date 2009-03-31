@@ -19,12 +19,18 @@ import bertos_utils
 from const import *
 
 class BFinalPage(BWizardPage):
+    """
+    Last page of the wizard. It creates the project and show a success message.
+    """
     
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/final_page.ui")
         self.setTitle(self.tr("Project created successfully"))
         
     def reloadData(self):
+        """
+        Overload of the BWizardPage reloadData method.
+        """
         QApplication.instance().setOverrideCursor(Qt.WaitCursor)
         bertos_utils.createBertosProject(self.wizard().project())
         QApplication.instance().restoreOverrideCursor()

@@ -17,6 +17,9 @@ import qvariant_converter
 from const import *
 
 class BCpuPage(BWizardPage):
+    """
+    Page of the wizard that permits to choose the cpu from the supported ones.
+    """
     
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/cpu_select.ui")
@@ -25,6 +28,9 @@ class BCpuPage(BWizardPage):
         self._setupUi()
     
     def _populateCpuList(self):
+        """
+        Fills the cpu list.
+        """
         self.pageContent.cpuList.clear()
         self.pageContent.cpuList.setCurrentItem(None)
         infos = bertos_utils.loadCpuInfos(self._project())
@@ -34,19 +40,31 @@ class BCpuPage(BWizardPage):
             self.pageContent.cpuList.addItem(item)
     
     def _connectSignals(self):
+        """
+        Connects the signals with the related slots.
+        """
         self.connect(self.pageContent.cpuList, SIGNAL("itemSelectionChanged()"), self.rowChanged)
     
     def _selectItem(self, cpu):
+        """
+        Selects the given cpu from the list.
+        """
         elements = self.pageContent.cpuList.findItems(cpu, Qt.MatchCaseSensitive)
         if len(elements) == 1:
             self.pageContent.cpuList.setCurrentItem(elements[0])
     
     def _setupUi(self):
+        """
+        Sets up the user interface.
+        """
         self.pageContent.cpuList.setSortingEnabled(True)
         self.pageContent.descriptionLabel.setVisible(False)
         self.pageContent.descriptionLabel.setText("")
     
     def reloadData(self):
+        """
+        Overload of the BWizardPage reloadData method.
+        """
         QApplication.instance().setOverrideCursor(Qt.WaitCursor)
         bertos_utils.loadSourceTree(self._project())
         self._populateCpuList()
@@ -58,6 +76,9 @@ class BCpuPage(BWizardPage):
         self.emit(SIGNAL("completeChanged()"))
     
     def isComplete(self):
+        """
+        Overload of the QWizardPage isComplete method.
+        """
         if self.pageContent.cpuList.currentRow() != -1:
             infos = qvariant_converter.getDict(self.pageContent.cpuList.currentItem().data(Qt.UserRole))
             for key, value in infos.items():
@@ -72,6 +93,9 @@ class BCpuPage(BWizardPage):
             return False
         
     def rowChanged(self):
+        """
+        Slot called when the user select an entry from the cpu list.
+        """
         description = qvariant_converter.getDict(self.pageContent.cpuList.currentItem().data(Qt.UserRole))["CPU_DESC"]
         description = qvariant_converter.getStringList(description)
         self.pageContent.descriptionLabel.setText("<br>".join(description))

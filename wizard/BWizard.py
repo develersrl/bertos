@@ -24,6 +24,9 @@ import BCreationPage
 import BFinalPage
 
 class BWizard(QWizard):
+    """
+    Main class of the wizard. It adds the pages automatically.
+    """
     
     def __init__(self):
         QWizard.__init__(self)
@@ -33,6 +36,9 @@ class BWizard(QWizard):
         self._connectSignals()
     
     def _addPages(self):
+        """
+        Method used by the constructor in order to add the pages in the wizard.
+        """
         self.addPage(BFolderPage.BFolderPage())
         self.addPage(BVersionPage.BVersionPage())
         self.addPage(BCpuPage.BCpuPage())
@@ -43,12 +49,22 @@ class BWizard(QWizard):
         self.addPage(BFinalPage.BFinalPage())
     
     def _connectSignals(self):
+        """
+        Connects the signals with the related slots.
+        """
         self.connect(self, SIGNAL("currentIdChanged(int)"), self._pageChanged)
     
     def _pageChanged(self, pageId):
+        """
+        Slot called when the user change the current page. It calls the reloadData
+        method of the next page.
+        """
         page = self.page(pageId)
         if page is not None:
             page.reloadData()
     
     def project(self):
+        """
+        Returns the BProject associated with the wizard.
+        """
         return copy.deepcopy(QApplication.instance().project)

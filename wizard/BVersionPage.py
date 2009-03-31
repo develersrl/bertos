@@ -19,6 +19,10 @@ import qvariant_converter
 from const import *
 
 class BVersionPage(BWizardPage):
+    """
+    Page of the wizard that permits to choose which BeRTOS version the user wants
+    to use. This page show some pieces of information about the version.
+    """
     
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/bertos_versions.ui")
@@ -28,6 +32,9 @@ class BVersionPage(BWizardPage):
         self.setTitle(self.tr("Select the BeRTOS version needed"))
     
     def _connectSignals(self):
+        """
+        Connects the signals to the related slots.
+        """
         self.connect(self.pageContent.versionList, SIGNAL("itemSelectionChanged()"), self.rowChanged)
         self.connect(self.pageContent.addButton, SIGNAL("clicked()"), self.addVersion)
         self.connect(self.pageContent.removeButton, SIGNAL("clicked()"), self.removeVersion)
@@ -35,19 +42,31 @@ class BVersionPage(BWizardPage):
         self.connect(self.pageContent.updateButton, SIGNAL("clicked()"), self.updateClicked)
     
     def _setupUi(self):
+        """
+        Sets up the user interface.
+        """
         self.pageContent.versionList.setCurrentRow(-1)
     
     def _storeVersion(self, directory):
+        """
+        Stores the directory selected by the user in the QSettings.
+        """
         versions = self.versions()
         versions = set(versions + [directory])
         self.setVersions(list(versions))
     
     def _deleteVersion(self, directory):
+        """
+        Removes the given directory from the QSettings.
+        """
         versions = self.versions()
         versions.remove(directory)
         self.setVersions(versions)
         
     def _insertListElement(self, directory):
+        """
+        Inserts the given directory in the version list.
+        """
         if bertos_utils.isBertosDir(directory):
             item = QListWidgetItem(QIcon(":/images/ok.png"), bertos_utils.bertosVersion(directory) + " (\"" + os.path.normpath(directory) + "\")")
             item.setData(Qt.UserRole, qvariant_converter.convertString(directory))
@@ -58,11 +77,17 @@ class BVersionPage(BWizardPage):
             self.pageContent.versionList.addItem(item)
     
     def _fillVersionList(self):
+        """
+        Fills the version list with all the BeRTOS versions founded in the QSettings.
+        """
         versions = self.versions()
         for directory in versions:
             self._insertListElement(directory)
 
     def isComplete(self):
+        """
+        Overload of the QWizardPage isComplete method.
+        """
         if self.pageContent.versionList.currentRow() != -1:
 	    # Remove trailing slash
 	    sources_path = qvariant_converter.getString(self.pageContent.versionList.currentItem().data(Qt.UserRole))
@@ -74,6 +99,9 @@ class BVersionPage(BWizardPage):
             return False
     
     def addVersion(self):
+        """
+        Slot called when the user add a BeRTOS version.
+        """
         directory = QFileDialog.getExistingDirectory(self, self.tr("Choose a directory"), "", QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks)
         if not directory.isEmpty():
             self._storeVersion(unicode(directory))
@@ -82,13 +110,21 @@ class BVersionPage(BWizardPage):
             self.emit(SIGNAL("completeChanged()"))
     
     def removeVersion(self):
+        """
+        Slot called when the user remove a BeRTOS version.
+        """
         item = self.pageContent.versionList.takeItem(self.pageContent.versionList.currentRow())
         self._deleteVersion(qvariant_converter.getString(item.data(Qt.UserRole)))
         self.emit(SIGNAL("completeChanged()"))
     
     def updateClicked(self):
-        print "fake update checking"
+        """
+        Checks for update (TO BE IMPLEMENTED).
+        """
+        pass
     
     def rowChanged(self):
+        """
+        Slot called when the user select an entry from the version list.
+        """
         self.emit(SIGNAL("completeChanged()"))
-    

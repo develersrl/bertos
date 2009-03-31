@@ -18,6 +18,9 @@ import bertos_utils
 from const import *
 
 class BOutputPage(BWizardPage):
+    """
+    Page of the wizard that show a little summary of the previous decisions.
+    """
     
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/output_select.ui")
@@ -26,11 +29,17 @@ class BOutputPage(BWizardPage):
         self._projectInfoStore("OUTPUT", [])
     
     def _connectSignals(self):
+        """
+        Connects the signals with the related slots.
+        """
         self.connect(self.pageContent.eclipseCheckBox, SIGNAL("stateChanged(int)"), lambda checked: self._modeChecked(checked, "eclipse"))
         self.connect(self.pageContent.xcodeCheckBox, SIGNAL("stateChanged(int)"), lambda checked: self._modeChecked(checked, "xcode"))
         self.connect(self.pageContent.codeliteCheckBox, SIGNAL("stateChanged(int)"), lambda checked: self._modeChecked(checked, "codelite"))
     
     def _modeChecked(self, checked, value):
+        """
+        Slot called when one of the mode checkbox is checked. It stores it.
+        """
         output_list = self._projectInfoRetrieve("OUTPUT")
         if checked == Qt.Checked:
             output_list.append(value)

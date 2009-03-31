@@ -18,6 +18,10 @@ import bertos_utils
 from const import *
 
 class BFolderPage(BWizardPage):
+    """
+    Initial page of the wizard. Permit to select the project name and the directory
+    where the project will be created.
+    """
     
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/dir_select.ui")
@@ -27,27 +31,45 @@ class BFolderPage(BWizardPage):
         self._connectSignals()
 
     def _setupUi(self):
+        """
+        Sets up the user interface.
+        """
         self.pageContent.warningLabel.setVisible(False)
     
     def _initializeAttributes(self):
+        """
+        Initializes the page attributes to the default values.
+        """
         self._project_name = ""
         self._destination_folder = os.path.expanduser("~")
         self.pageContent.directoryEdit.setText(self._destination_folder)
     
     def _connectSignals(self):
+        """
+        Connects the signals to the related slots.
+        """
         self.connect(self.pageContent.nameEdit, SIGNAL("textChanged(const QString)"), self._nameChanged)
         self.connect(self.pageContent.directoryEdit, SIGNAL("textChanged(const QString)"), self._directoryChanged)
         self.connect(self.pageContent.directoryButton, SIGNAL("clicked()"), self._selectDirectory)
     
     def _nameChanged(self, name):
+        """
+        Slot called when the project name is changed manually by the user.
+        """
         self._project_name = str(name).replace(" ", "_")
         self._setProjectPath()
     
     def _directoryChanged(self, directory):
+        """
+        Slot called when the project folder is changed manually by the user.
+        """
         self._destination_folder = str(QDir.toNativeSeparators(directory))
         self._setProjectPath()
     
     def _setProjectPath(self):
+        """
+        Analyzes the page attributes and generates the path string.
+        """
         if self._destination_folder != "" and self._project_name <> "":
             if not self._destination_folder.endswith(os.sep):
                 self._destination_folder += "/"
@@ -66,11 +88,17 @@ class BFolderPage(BWizardPage):
         self.emit(SIGNAL("completeChanged()"))
     
     def _selectDirectory(self):
+        """
+        Slot called when the project folder is changed using the file dialog.
+        """
         directory = unicode(QFileDialog.getExistingDirectory(self, self.tr("Open Directory"), "", QFileDialog.ShowDirsOnly))
         if len(directory) > 0:
             self.pageContent.directoryEdit.setText(directory)
     
     def isComplete(self):
+        """
+        Overload of the QWizardPage isComplete method.
+        """
         if self.pageContent.projectPath.text() != "None":
             self._projectInfoStore("PROJECT_PATH", unicode(self.pageContent.projectPath.text()))
             return True

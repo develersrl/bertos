@@ -10,14 +10,23 @@
 #
 
 class BProject(object):
+    """
+    Simple class for store and retrieve project informations.
+    """
     
     def __init__(self):
         self.infos = {}
     
     def setInfo(self, key, value):
+        """
+        Store the given value with the name key.
+        """
         self.infos[key] = value
     
     def info(self, key):
+        """
+        Retrieve the value associated with the name key.
+        """
         if key in self.infos.keys():
             return self.infos[key]
         return None

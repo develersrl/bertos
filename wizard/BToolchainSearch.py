@@ -18,6 +18,9 @@ import qvariant_converter
 from const import *
 
 class BToolchainSearch(QDialog):
+    """
+    Dialog that permits to choice the settings for the toolchain search procedure.
+    """
     
     def __init__(self):
         QDialog.__init__(self)
@@ -26,6 +29,9 @@ class BToolchainSearch(QDialog):
         self.setWindowTitle(self.tr("Toolchain search page"))
     
     def _setupUi(self):
+        """
+        Sets up the user interface.
+        """
         self.content = uic.loadUi(UI_LOCATION + "/toolchain_search.ui", None)
         layout = QVBoxLayout()
         layout.addWidget(self.content)
@@ -35,6 +41,9 @@ class BToolchainSearch(QDialog):
         self._setSearchButton()
     
     def _connectSignals(self):
+        """
+        Connects the signals with the related slots.
+        """
         self.connect(self.content.pathBox, SIGNAL("stateChanged(int)"), self._stateChanged)
         self.connect(self.content.addButton, SIGNAL("clicked()"), self._addDir)
         self.connect(self.content.removeButton, SIGNAL("clicked()"), self._removeDir)
@@ -42,24 +51,39 @@ class BToolchainSearch(QDialog):
         self.connect(self.content.searchButton, SIGNAL("clicked()"), self.accept)
         
     def _setSearchButton(self):
+        """
+        Toggles the 'searchButton' evaluating the settings.
+        """
         self.content.searchButton.setDefault(True)
         self.content.searchButton.setEnabled(self.content.pathBox.isChecked() or self.content.customDirList.count() != 0)
     
     def _populateDirList(self):
+        """
+        Fills the dir list with the directories stored in the QSettings.
+        """
         search_dir_list = qvariant_converter.getStringList(QApplication.instance().settings.value("search_dir_list"))
         for element in search_dir_list:
             item = QListWidgetItem(element)
             self.content.customDirList.addItem(item)
     
     def _setPathSearch(self):
+        """
+        Sets the path search checkbox to the stored value.
+        """
         pathSearch = qvariant_converter.getBool(QApplication.instance().settings.value(QString("path_search")))
         self.content.pathBox.setChecked(pathSearch)
     
     def _stateChanged(self, state):
+        """
+        Slot called when the path search checkbox state changes. Stores the value in the QSettings.
+        """
         QApplication.instance().settings.setValue(QString("path_search"), QVariant(state != 0))
         self._setSearchButton()
     
     def _addDir(self):
+        """
+        Slot called when the user adds a dir.
+        """
         directory = QFileDialog.getExistingDirectory(self, self.tr("Open Directory"), "", QFileDialog.ShowDirsOnly)
         if not directory.isEmpty():
             directory = unicode(directory)
@@ -71,6 +95,9 @@ class BToolchainSearch(QDialog):
             self._setSearchButton()
     
     def _removeDir(self):
+        """
+        Slot called when the user removes a dir.
+        """
         if self.content.customDirList.currentRow() != -1:
             item = self.content.customDirList.takeItem(self.content.customDirList.currentRow())
             search_dir_list = qvariant_converter.getStringList(QApplication.instance().settings.value(QString("search_dir_list")))

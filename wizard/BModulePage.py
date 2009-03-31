@@ -19,6 +19,9 @@ from DefineException import *
 from const import *
 
 class BModulePage(BWizardPage):
+    """
+    Page of the wizard that permits to select and configurate the BeRTOS modules.
+    """
     
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/module_select.ui")
@@ -27,6 +30,9 @@ class BModulePage(BWizardPage):
         self._connectSignals()
     
     def reloadData(self):
+        """
+        Overload of the BWizardPage reloadData method.
+        """
         QApplication.instance().setOverrideCursor(Qt.WaitCursor)
         self._setupUi()
         self._loadModuleData()
@@ -34,11 +40,17 @@ class BModulePage(BWizardPage):
         QApplication.instance().restoreOverrideCursor()
     
     def _setupButtonGroup(self):
+        """
+        Sets up the button group.
+        """
         self._button_group = QButtonGroup()
         self._button_group.setExclusive(False)
         self.connect(self._button_group, SIGNAL("buttonClicked(int)"), self._moduleSelectionChanged)
     
     def _loadModuleData(self):
+        """
+        Loads the module data.
+        """
         ## Load the module data only if it isn't already loaded
         if self._projectInfoRetrieve("MODULES") == None \
                 and self._projectInfoRetrieve("LISTS") == None \
@@ -53,6 +65,9 @@ class BModulePage(BWizardPage):
                 self._exceptionOccurred(self.tr("Error parsing line '%2' in file %1").arg(e.path).arg(e.line))
     
     def _fillModuleTree(self):
+        """
+        Fills the module tree with the module entries separated in categories.
+        """
         modules = self._projectInfoRetrieve("MODULES")
         if modules is None:
             return
@@ -75,6 +90,11 @@ class BModulePage(BWizardPage):
         
     
     def _fillPropertyTable(self):
+        """
+        Slot called when the user selects a module from the module tree.
+        Fills the property table using the configuration parameters defined in
+        the source tree.
+        """
         module = self._currentModule()
         if module is not None:
             self._control_group.clear()
@@ -114,7 +134,10 @@ class BModulePage(BWizardPage):
                 self.pageContent.moduleLabel.setText(module_label)
     
     def _insertCheckBox(self, index, value):
-        ## boolean property
+        """
+        Inserts in the table at index a checkbox for a boolean property setted
+        to value.
+        """
         check_box = QCheckBox()
         self.pageContent.propertyTable.setCellWidget(index, 1, check_box)
         if value == "1":
@@ -124,7 +147,10 @@ class BModulePage(BWizardPage):
         self._control_group.addControl(index, check_box)
     
     def _insertComboBox(self, index, value, value_list):
-        ## enum property
+        """
+        Inserts in the table at index a combobox for an enum property setted
+        to value.
+        """
         try:
             enum = self._projectInfoRetrieve("LISTS")[value_list]
             combo_box = QComboBox()
@@ -139,6 +165,10 @@ class BModulePage(BWizardPage):
             self.pageContent.propertyTable.setItem(index, 1, QTableWidgetItem(value))
     
     def _insertSpinBox(self, index, value, informations):
+        """
+        Inserts in the table at index a spinbox for an int, a long or an unsigned
+        long property setted to value.
+        """
         ## int, long or undefined type property
         spin_box = None
         if bertos_utils.isLong(informations) or bertos_utils.isUnsignedLong(informations):
@@ -173,6 +203,9 @@ class BModulePage(BWizardPage):
         
     
     def _currentModule(self):
+        """
+        Retuns the current module name.
+        """
         current_module = self.pageContent.moduleTree.currentItem()
         # return only the child items
         if current_module is not None and current_module.parent() is not None:
@@ -181,15 +214,27 @@ class BModulePage(BWizardPage):
             return None
     
     def _currentModuleConfigurations(self):
+        """
+        Returns the current module configuration.
+        """
         return self._configurations(self._currentModule())
     
     def _currentProperty(self):
+        """
+        Rerturns the current property from the property table.
+        """
         return qvariant_converter.getString(self.pageContent.propertyTable.item(self.pageContent.propertyTable.currentRow(), 0).data(Qt.UserRole))
     
     def _currentPropertyItem(self):
+        """
+        Returns the QTableWidgetItem of the current property.
+        """
         return self.pageContent.propertyTable.item(self.pageContent.propertyTable.currentRow(), 0)
     
     def _configurations(self, module):
+        """
+        Returns the configuration for the selected module.
+        """
         configuration = self._projectInfoRetrieve("MODULES")[module]["configuration"]
         if len(configuration) > 0:
             return self._projectInfoRetrieve("CONFIGURATIONS")[configuration]
@@ -197,6 +242,9 @@ class BModulePage(BWizardPage):
             return {}
     
     def _resetPropertyDescription(self):
+        """
+        Resets the label for each property table entry.
+        """
         for index in range(self.pageContent.propertyTable.rowCount()):
             property_name = qvariant_converter.getString(self.pageContent.propertyTable.item(index, 0).data(Qt.UserRole))
             # Awful solution! Needed because if the user change the module, the selection changed...
@@ -205,6 +253,10 @@ class BModulePage(BWizardPage):
             self.pageContent.propertyTable.item(index, 0).setText(self._currentModuleConfigurations()[property_name]['brief'])
     
     def _showPropertyDescription(self):
+        """
+        Slot called when the property selection changes. Shows the description
+        of the selected property.
+        """
         self._resetPropertyDescription()
         configurations = self._currentModuleConfigurations()
         if self._currentProperty() in configurations.keys():
@@ -213,6 +265,9 @@ class BModulePage(BWizardPage):
             self._currentPropertyItem().setText(description + "\n" + name)
     
     def _setupUi(self):
+        """
+        Set up the user interface.
+        """
         self.pageContent.moduleTree.clear()
         self.pageContent.moduleTree.setHeaderHidden(True)
         self.pageContent.propertyTable.horizontalHeader().setResizeMode(QHeaderView.Stretch)
@@ -224,12 +279,18 @@ class BModulePage(BWizardPage):
         self.pageContent.moduleLabel.setVisible(False)
     
     def _connectSignals(self):
+        """
+        Connect the signals with the related slots.
+        """
         self.connect(self.pageContent.moduleTree, SIGNAL("itemPressed(QTreeWidgetItem*, int)"), self._fillPropertyTable)
         self.connect(self.pageContent.moduleTree, SIGNAL("itemChanged(QTreeWidgetItem*, int)"), self._dependencyCheck)
         self.connect(self.pageContent.propertyTable, SIGNAL("itemSelectionChanged()"), self._showPropertyDescription)
         self.connect(self._control_group, SIGNAL("stateChanged"), self._saveValue)
     
     def _saveValue(self, index):
+        """
+        Slot called when the user modifies one of the configuration parameters.
+        It stores the new value."""
         property = qvariant_converter.getString(self.pageContent.propertyTable.item(index, 0).data(Qt.UserRole))
         configuration = self._projectInfoRetrieve("MODULES")[self._currentModule()]["configuration"]
         configurations = self._projectInfoRetrieve("CONFIGURATIONS")
@@ -245,6 +306,10 @@ class BModulePage(BWizardPage):
         self._projectInfoStore("CONFIGURATIONS", configurations)
     
     def _moduleSelectionChanged(self, index):
+        """
+        Slot called when the user selects or unselects a module from the module
+        tree.
+        """
         module = unicode(self.pageContent.moduleTable.item(index, 1).text())
         if self._button_group.button(index).isChecked():
             self._moduleSelected(module)
@@ -252,6 +317,9 @@ class BModulePage(BWizardPage):
             self._moduleUnselected(module)
     
     def _dependencyCheck(self, item):
+        """
+        Checks the dependencies of the module associated with the given item.
+        """
         checked = False
         module = unicode(item.text(0))
         if item.checkState(0) == Qt.Checked:
@@ -261,6 +329,9 @@ class BModulePage(BWizardPage):
             self.removeFileDependencies(module)
     
     def _moduleSelected(self, selectedModule):
+        """
+        Resolves the selection dependencies.
+        """
         modules = self._projectInfoRetrieve("MODULES")
         modules[selectedModule]["enabled"] = True
         self._projectInfoStore("MODULES", modules)
@@ -279,6 +350,9 @@ class BModulePage(BWizardPage):
                         item.child(child).setCheckState(0, Qt.Checked)
     
     def _moduleUnselected(self, unselectedModule):
+        """
+        Resolves the unselection dependencies.
+        """
         modules = self._projectInfoRetrieve("MODULES")
         modules[unselectedModule]["enabled"] = False
         self._projectInfoStore("MODULES", modules)
@@ -300,6 +374,9 @@ class BModulePage(BWizardPage):
                             item.child(child).setCheckState(0, Qt.Unchecked)
     
     def selectDependencyCheck(self, module):
+        """
+        Returns the list of unsatisfied dependencies after a selection.
+        """
         unsatisfied = set()
         modules = self._projectInfoRetrieve("MODULES")
         files = self._projectInfoRetrieve("FILES")
@@ -317,6 +394,9 @@ class BModulePage(BWizardPage):
         return unsatisfied
     
     def unselectDependencyCheck(self, dependency):
+        """
+        Returns the list of unsatisfied dependencies after an unselection.
+        """
         unsatisfied = set()
         modules = self._projectInfoRetrieve("MODULES")
         for module, informations in modules.items():
@@ -327,6 +407,9 @@ class BModulePage(BWizardPage):
         return unsatisfied
     
     def removeFileDependencies(self, module):
+        """
+        Removes the files dependencies of the given module.
+        """
         modules = self._projectInfoRetrieve("MODULES")
         files = self._projectInfoRetrieve("FILES")
         dependencies = modules[module]["depends"]
@@ -338,11 +421,20 @@ class BModulePage(BWizardPage):
         self._projectInfoStore("FILES", files)
 
 class QControlGroup(QObject):
+    """
+    Simple class that permit to connect different signals of different widgets
+    with a slot that emit a signal. Permits to group widget and to understand which of
+    them has sent the signal.
+    """
+    
     def __init__(self):
         QObject.__init__(self)
         self._controls = {}
     
     def addControl(self, id, control):
+        """
+        Add a control.
+        """
         self._controls[id] = control
         if type(control) == QCheckBox:
             self.connect(control, SIGNAL("stateChanged(int)"), lambda: self._stateChanged(id))
@@ -354,7 +446,14 @@ class QControlGroup(QObject):
             self.connect(control, SIGNAL("valueChanged(double)"), lambda: self._stateChanged(id))
     
     def clear(self):
+        """
+        Remove all the controls.
+        """
         self._controls = {}
     
     def _stateChanged(self, id):
+        """
+        Slot called when the value of one of the stored widget changes. It emits
+        another signal.
+        """
         self.emit(SIGNAL("stateChanged"), id)
