@@ -24,21 +24,15 @@ class BCreationPage(BWizardPage):
         BWizardPage.__init__(self, UI_LOCATION + "/project_creation.ui")
         self.setTitle(self.tr("Create the BeRTOS project"))
         self._setupUi()
-        self._connectSignals()
         self._completed = False
+        self.setButtonText(QWizard.NextButton, self.tr("Create"))
     
     def _setupUi(self):
-        self._confirm_group = QWidgetGroup(self.pageContent.summaryTree,
-                                            self.pageContent.createButton)
-        self._final_group = QWidgetGroup(self.pageContent.iconLabel,
-                                            self.pageContent.textLabel)
-        self._final_group.setVisible(False)
         summary = self.pageContent.summaryTree
         summary.setHeaderHidden(True)
         summary.setColumnCount(1)
     
     def reloadData(self):
-        self._completed = False
         self._setupUi()
         self.pageContent.summaryTree.clear()
         top_level = []
@@ -82,43 +76,4 @@ class BCreationPage(BWizardPage):
             category_item.addChildren(value)
         top_level.append(module_title)
         self.pageContent.summaryTree.insertTopLevelItems(0, top_level)
-    
-    def _connectSignals(self):
-        self.connect(self.pageContent.createButton, SIGNAL("clicked(bool)"), self._createProject)
-    
-    def _createProject(self):
-        QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
-        self._confirm_group.setVisible(False)
-        bertos_utils.createBertosProject(self.wizard().project())
-        self._final_group.setVisible(True)
-        self._completed = True
-        QApplication.restoreOverrideCursor()
-        self.emit(SIGNAL("completeChanged()"))
-    
-    def isComplete(self):
-        return self._completed
-
-class QWidgetGroup(QObject):
-    """
-    Container class, this class contains widgets and permit to set some
-    properties of the contained widgets at the same time.
-    """
-    def __init__(self, *elements):
-        self._widgets = []
-        for element in elements:
-            self._widgets.append(element)
-    
-    def addWidget(self, widget):
-        if widget not in self._widgets:
-            self._widgets.append(widget)
-    
-    def setVisible(self, visible):
-        for widget in self._widgets:
-            widget.setVisible(visible)
-    
-    def isVisible(self):
-        for widget in self._widgets:
-            if not widget.isVisible():
-                return False
-        return True
 

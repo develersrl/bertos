@@ -27,9 +27,11 @@ class BModulePage(BWizardPage):
         self._connectSignals()
     
     def reloadData(self):
+        QApplication.instance().setOverrideCursor(Qt.WaitCursor)
         self._setupUi()
         self._loadModuleData()
         self._fillModuleTree()
+        QApplication.instance().restoreOverrideCursor()
     
     def _setupButtonGroup(self):
         self._button_group = QButtonGroup()

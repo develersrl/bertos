@@ -21,6 +21,7 @@ import BToolchainPage
 import BModulePage
 import BOutputPage
 import BCreationPage
+import BFinalPage
 
 class BWizard(QWizard):
     
@@ -29,6 +30,7 @@ class BWizard(QWizard):
         # TODO: choose the right minimum size
         self.setMinimumSize(1000, 500)
         self.setWindowTitle(self.tr("Create a BeRTOS project"))
+        self.setOption(QWizard.DisabledBackButtonOnLastPage, True)
         self._addPages()
         self._connectSignals()
     
@@ -40,6 +42,7 @@ class BWizard(QWizard):
         self.addPage(BModulePage.BModulePage())
         self.addPage(BOutputPage.BOutputPage())
         self.addPage(BCreationPage.BCreationPage())
+        self.addPage(BFinalPage.BFinalPage())
     
     def _connectSignals(self):
         self.connect(self, SIGNAL("currentIdChanged(int)"), self._pageChanged)
