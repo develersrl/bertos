@@ -179,7 +179,6 @@ int msg_testRun(void)
 	TestMsg msg4;
 	TestMsg msg5;
 	TestMsg *reply;
-	ticks_t start_time = timer_clock();
 
 	// Allocate and start the test process
     struct Process *recv0 = RECV_INIT_PROC(0);
