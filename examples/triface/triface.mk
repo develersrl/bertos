@@ -40,8 +40,8 @@ triface_CSRC = \
 	bertos/drv/timer.c \
 	bertos/drv/ser.c \
 	bertos/drv/buzzer.c \
+	bertos/drv/sipo.c \
 	bertos/cpu/avr/drv/ser_avr.c \
-	bertos/cpu/avr/drv/sipo.c \
 	bertos/mware/formatwr.c \
 	bertos/mware/hex.c \
 	bertos/struct/hashtable.c \

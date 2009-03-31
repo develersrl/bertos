@@ -42,6 +42,8 @@
 #ifndef PROTOCOL_H
 #define PROTOCOL_H
 
+#include <drv/sipo.h>
+
 #include <kern/kfile.h>
 
 void protocol_init(KFile *fd);

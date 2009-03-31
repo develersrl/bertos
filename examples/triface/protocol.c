@@ -45,6 +45,7 @@
 #include "protocol.h"
 #include "cmd_ctor.h"  // MAKE_CMD, REGISTER_CMD
 #include "verstag.h"
+
 #include "hw/hw_adc.h"
 #include "hw/hw_input.h"
 
@@ -82,6 +83,8 @@ static bool interactive;
 
 /// Readline context, used for interactive mode.
 static struct RLContext rl_ctx;
+
+static Sipo fd_sipo;
 
 uint8_t reg_status_dout;
 /**
@@ -280,7 +283,7 @@ MAKE_CMD(ping, "", "",
 /* Dout  */
 MAKE_CMD(dout, "d", "",
 ({
-	sipo_putchar((uint8_t)args[1].l);
+	kfile_write(&fd_sipo.fd, (uint8_t *)&args[1].l, 1);
 
 	//Store status of dout ports.
 	reg_status_dout = (uint8_t)args[1].l;
@@ -356,6 +359,9 @@ static void protocol_registerCmds(void)
 /* Initialization: readline context, parser and register commands.  */
 void protocol_init(KFile *fd)
 {
+	/* SPI Port Initialization */
+	sipo_init(&fd_sipo);
+
 	interactive = FORCE_INTERACTIVE;
 
 	rl_init_ctx(&rl_ctx);

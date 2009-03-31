@@ -36,24 +36,74 @@
  *
  * \version $Id$
  *
- * \author Andrea Grandi <andrea@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
  */
+
 #ifndef HW_SIPO_H
 #define HW_SIPO_H
 
-#define LOAD_HIGH     (PORTB |= BV(PB3))
-#define LOAD_LOW      (PORTB &= ~BV(PB3))
-#define LOAD_INIT     (DDRB |= BV(PB3))
-#define SET_SCK_OUT   (DDRB |= BV(PB1))
-#define SET_SOUT_OUT  (DDRB |= BV(PB2))
-#define CLOCK_HIGH    (PORTB |= BV(PB1))
-#define CLOCK_LOW     (PORTB &= ~BV(PB1))
-#define SET_SOUT_HIGH (PORTB |= BV(PB2))
-#define SET_SOUT_LOW  (PORTB &= ~BV(PB2))
-#define CLOCK_PULSE   do { CLOCK_HIGH; CLOCK_LOW; } while(0)
+#include <cfg/macros.h>
 
-#define OE_OUT        (DDRG |= BV(PG3))
-#define OE_LOW        (PORTG &= BV(PG3))
+#include <avr/io.h>
+
+//Set output pin for sipo
+#define SCK_OUT            (DDRB |= BV(PB1))  // Load clock pin
+#define SOUT_OUT           (DDRB |= BV(PB2))  // Serial in pin
+#define SLOAD_OUT          (DDRB |= BV(PB3))  // Store clock pin
+#define OE_OUT             (DDRG |= BV(PG3))  // Output enable pin
+
+//Define output level
+#define SCK_HIGH           (PORTB |= BV(PB1))
+#define SCK_LOW            (PORTB &= ~BV(PB1))
+#define SOUT_OUT_HIGH      (PORTB |= BV(PB2))
+#define SOUT_OUT_LOW       (PORTB &= ~BV(PB2))
+#define SLOAD_OUT_HIGH     (PORTB |= BV(PB3))
+#define SLOAD_OUT_LOW      (PORTB &= ~BV(PB3))
+#define OE_LOW             (PORTG &= BV(PG3))
+
+/**
+ * Define the procedure to set one bit low/hight to
+ * serial input in sipo device.
+ */
+#define SIPO_SI_HIGH()    SOUT_OUT_HIGH
+#define SIPO_SI_LOW()     SOUT_OUT_LOW
+
+/**
+ * Drive pin to load the bit, presented in serial-in pin,
+ * into sipo shift register.
+ */
+#define SIPO_SI_CLOCK() \
+	do{ \
+		SCK_HIGH; \
+		SCK_LOW; \
+	}while(0)
+
+/**
+ * Clock the content of shift register to output.
+ */
+#define SIPO_LOAD() \
+	do { \
+		SLOAD_OUT_HIGH; \
+		SLOAD_OUT_LOW; \
+	}while(0)
+
+/**
+ * Enable the shift register output.
+ */
+#define SIPO_ENABLE() OE_LOW;
 
 
-#endif // HW_SIPO_H
+/**
+ * Do anything that needed to init sipo pins.
+ */
+#define SIPO_INIT_PIN() \
+	do { \
+		OE_OUT; \
+		SOUT_OUT; \
+		SCK_OUT; \
+		SLOAD_OUT; \
+		SIPO_ENABLE(); \
+	} while(0)
+
+
+#endif /* HW_SIPO_H */

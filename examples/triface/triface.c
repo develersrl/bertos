@@ -51,21 +51,15 @@
 #include <drv/timer.h>
 #include <drv/buzzer.h>
 #include <drv/ser.h>
-#include <drv/sipo.h>
 
 #include <mware/parser.h>
 #include <net/keytag.h>
-
-
 
 static Serial fd_ser;
 static Serial tag_ser;
 
 int main(void)
 {
-	/* SPI Port Initialization */
-	sipo_init();
-
 	kdbg_init();
 	timer_init();
 	adc_init();
