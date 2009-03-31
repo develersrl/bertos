@@ -23,32 +23,33 @@ class BCreationPage(BWizardPage):
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/project_creation.ui")
         self.setTitle(self.tr("Create the BeRTOS project"))
-        self._setupUi()
         self._completed = False
-        self.setButtonText(QWizard.NextButton, self.tr("Create"))
+
+    ## Overloaded BWizardPage methods ##
     
-    def _setupUi(self):
+    def setupUi(self):
         summary = self.pageContent.summaryTree
         summary.setHeaderHidden(True)
         summary.setColumnCount(1)
+        self.setButtonText(QWizard.NextButton, self.tr("Create"))
     
     def reloadData(self):
-        self._setupUi()
+        self.setupUi()
         self.pageContent.summaryTree.clear()
         top_level = []
         folder_title = QTreeWidgetItem(QStringList([self.tr("Project folder")]))
-        folder_item = QTreeWidgetItem(folder_title, QStringList([os.path.normpath(self._projectInfoRetrieve("PROJECT_PATH"))]))
+        folder_item = QTreeWidgetItem(folder_title, QStringList([os.path.normpath(self.projectInfo("PROJECT_PATH"))]))
         top_level.append(folder_title)
         version_title = QTreeWidgetItem(QStringList([self.tr("BeRTOS version")]))
-        sources_path = self._projectInfoRetrieve("SOURCES_PATH")
+        sources_path = self.projectInfo("SOURCES_PATH")
         version = QTreeWidgetItem(version_title, QStringList([self.tr("version: ") + bertos_utils.bertosVersion(sources_path)]))
         source_path = QTreeWidgetItem(version_title, QStringList([self.tr("path: ") + os.path.normpath(sources_path)]))
         top_level.append(version_title)
         cpu_title = QTreeWidgetItem(QStringList([self.tr("CPU")]))
-        cpu_name = QTreeWidgetItem(cpu_title, QStringList([self.tr("cpu name: ") + self._projectInfoRetrieve("CPU_NAME")]))
+        cpu_name = QTreeWidgetItem(cpu_title, QStringList([self.tr("cpu name: ") + self.projectInfo("CPU_NAME")]))
         top_level.append(cpu_title)
         toolchain_title = QTreeWidgetItem(QStringList([self.tr("Toolchain")]))
-        toolchain_info = self._projectInfoRetrieve("TOOLCHAIN")
+        toolchain_info = self.projectInfo("TOOLCHAIN")
         if "target" in toolchain_info.keys():
             toolchain_target = QTreeWidgetItem(toolchain_title, QStringList([self.tr("target: " + toolchain_info["target"])]))
         if "version" in toolchain_info.keys():
@@ -56,9 +57,9 @@ class BCreationPage(BWizardPage):
         toolchain_path = QTreeWidgetItem(toolchain_title, QStringList([self.tr("path: " + os.path.normpath(toolchain_info["path"]))]))
         top_level.append(toolchain_title)
         module_title = QTreeWidgetItem(QStringList([self.tr("Modules")]))
-        configurations = self._projectInfoRetrieve("CONFIGURATIONS")
+        configurations = self.projectInfo("CONFIGURATIONS")
         module_categories = {}
-        for module, information in self._projectInfoRetrieve("MODULES").items():
+        for module, information in self.projectInfo("MODULES").items():
             if information["enabled"]:
                 if information["category"] not in module_categories.keys():
                     module_categories[information["category"]] = []
@@ -76,4 +77,5 @@ class BCreationPage(BWizardPage):
             category_item.addChildren(value)
         top_level.append(module_title)
         self.pageContent.summaryTree.insertTopLevelItems(0, top_level)
-
+    
+    ####

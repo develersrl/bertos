@@ -26,6 +26,8 @@ class BFinalPage(BWizardPage):
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/final_page.ui")
         self.setTitle(self.tr("Project created successfully"))
+    
+    ## Overloaded BWizardPage methods ##
         
     def reloadData(self):
         """
@@ -34,3 +36,5 @@ class BFinalPage(BWizardPage):
         QApplication.instance().setOverrideCursor(Qt.WaitCursor)
         bertos_utils.createBertosProject(self.wizard().project())
         QApplication.instance().restoreOverrideCursor()
+    
+    ####

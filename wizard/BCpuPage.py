@@ -24,57 +24,9 @@ class BCpuPage(BWizardPage):
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/cpu_select.ui")
         self.setTitle(self.tr("Select the CPU"))
-        self._connectSignals()
-        self._setupUi()
     
-    def _populateCpuList(self):
-        """
-        Fills the cpu list.
-        """
-        self.pageContent.cpuList.clear()
-        self.pageContent.cpuList.setCurrentItem(None)
-        infos = bertos_utils.loadCpuInfos(self._project())
-        for cpu in infos:
-            item = QListWidgetItem(cpu["CPU_NAME"])
-            item.setData(Qt.UserRole, qvariant_converter.convertDict(cpu))
-            self.pageContent.cpuList.addItem(item)
-    
-    def _connectSignals(self):
-        """
-        Connects the signals with the related slots.
-        """
-        self.connect(self.pageContent.cpuList, SIGNAL("itemSelectionChanged()"), self.rowChanged)
-    
-    def _selectItem(self, cpu):
-        """
-        Selects the given cpu from the list.
-        """
-        elements = self.pageContent.cpuList.findItems(cpu, Qt.MatchCaseSensitive)
-        if len(elements) == 1:
-            self.pageContent.cpuList.setCurrentItem(elements[0])
-    
-    def _setupUi(self):
-        """
-        Sets up the user interface.
-        """
-        self.pageContent.cpuList.setSortingEnabled(True)
-        self.pageContent.descriptionLabel.setVisible(False)
-        self.pageContent.descriptionLabel.setText("")
-    
-    def reloadData(self):
-        """
-        Overload of the BWizardPage reloadData method.
-        """
-        QApplication.instance().setOverrideCursor(Qt.WaitCursor)
-        bertos_utils.loadSourceTree(self._project())
-        self._populateCpuList()
-        cpu_name = self._projectInfoRetrieve("CPU_NAME")
-        self._setupUi()
-        if not cpu_name is None:
-            self._selectItem(cpu_name)
-        QApplication.instance().restoreOverrideCursor()
-        self.emit(SIGNAL("completeChanged()"))
-    
+    ## Overloaded QWizardPage methods ##
+
     def isComplete(self):
         """
         Overload of the QWizardPage isComplete method.
@@ -86,12 +38,48 @@ class BCpuPage(BWizardPage):
                     infos[key] = qvariant_converter.getStringList(value)
                 if type(CPU_DEF[key]) == str or type(CPU_DEF) == unicode:
                     infos[key] = qvariant_converter.getString(value)
-            self._projectInfoStore("CPU_INFOS", infos)
-            self._projectInfoStore("CPU_NAME", unicode(self.pageContent.cpuList.currentItem().text()))
+            self.setProjectInfo("CPU_INFOS", infos)
+            self.setProjectInfo("CPU_NAME", unicode(self.pageContent.cpuList.currentItem().text()))
             return True
         else:
             return False
-        
+    
+    ####
+    
+    ## Overloaded BWizardPage methods ##
+
+    def setupUi(self):
+        """
+        Overload of the BWizardPage setupUi method.
+        """
+        self.pageContent.cpuList.setSortingEnabled(True)
+        self.pageContent.descriptionLabel.setVisible(False)
+        self.pageContent.descriptionLabel.setText("")
+
+    def connectSignals(self):
+        """
+        Overload of the BWizardPage connectSignals method.
+        """
+        self.connect(self.pageContent.cpuList, SIGNAL("itemSelectionChanged()"), self.rowChanged)
+
+    def reloadData(self):
+        """
+        Overload of the BWizardPage reloadData method.
+        """
+        QApplication.instance().setOverrideCursor(Qt.WaitCursor)
+        bertos_utils.loadSourceTree(self.project())
+        self.populateCpuList()
+        cpu_name = self.projectInfo("CPU_NAME")
+        self.setupUi()
+        if not cpu_name is None:
+            self.selectItem(cpu_name)
+        QApplication.instance().restoreOverrideCursor()
+        self.emit(SIGNAL("completeChanged()"))
+
+    ####
+    
+    ## Slots ##
+
     def rowChanged(self):
         """
         Slot called when the user select an entry from the cpu list.
@@ -101,3 +89,25 @@ class BCpuPage(BWizardPage):
         self.pageContent.descriptionLabel.setText("<br>".join(description))
         self.pageContent.descriptionLabel.setVisible(True)
         self.emit(SIGNAL("completeChanged()"))
+
+    ####
+    
+    def populateCpuList(self):
+        """
+        Fills the cpu list.
+        """
+        self.pageContent.cpuList.clear()
+        self.pageContent.cpuList.setCurrentItem(None)
+        infos = bertos_utils.loadCpuInfos(self.project())
+        for cpu in infos:
+            item = QListWidgetItem(cpu["CPU_NAME"])
+            item.setData(Qt.UserRole, qvariant_converter.convertDict(cpu))
+            self.pageContent.cpuList.addItem(item)
+    
+    def selectItem(self, cpu):
+        """
+        Selects the given cpu from the list.
+        """
+        elements = self.pageContent.cpuList.findItems(cpu, Qt.MatchCaseSensitive)
+        if len(elements) == 1:
+            self.pageContent.cpuList.setCurrentItem(elements[0])

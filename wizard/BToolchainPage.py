@@ -29,22 +29,114 @@ class BToolchainPage(BWizardPage):
         BWizardPage.__init__(self, UI_LOCATION + "/toolchain_select.ui")
         self.setTitle(self.tr("Select toolchain"))
         self._validation_process = None
-        self._setupUi()
-        #self._populateToolchainList()
-        self._connectSignals()
+
+    ## Overloaded QWizardPage methods. ##
+
+    def isComplete(self):
+        """
+        Overload of the QWizard isComplete method.
+        """
+        if self.pageContent.toolchainList.currentRow() != -1:
+            self.setProjectInfo("TOOLCHAIN", 
+                qvariant_converter.getStringDict(self.pageContent.toolchainList.currentItem().data(Qt.UserRole)))
+            return True
+        else:
+            return False
     
-    def _setupUi(self):
+    ####
+    
+    ## Overloaded BWizardPage methods. ##
+    
+    def setupUi(self):
         """
         Sets up the user interface.
         """
         self.pageContent.infoLabel.setVisible(False)
+    
+    def connectSignals(self):
+        """
+        Connects the signals with the related slots.
+        """
+        self.connect(self.pageContent.toolchainList, SIGNAL("itemSelectionChanged()"), self.selectionChanged)
+        self.connect(self.pageContent.addButton, SIGNAL("clicked()"), self.addToolchain)
+        self.connect(self.pageContent.removeButton, SIGNAL("clicked()"), self.removeToolchain)
+        self.connect(self.pageContent.searchButton, SIGNAL("clicked()"), self.searchToolchain)
+        self.connect(self.pageContent.checkButton, SIGNAL("clicked()"), self.validateAllToolchains)
+
+    def reloadData(self):
+        """
+        Overload of the BWizard reloadData method.
+        """
+        self._clearList()
+        self.setupUi()
+        self._populateToolchainList()
+
+    ####
+
+    ## Slots ##
+
+    def selectionChanged(self):
+        """
+        Slot called when the user click on an entry of the toolchain list.
+        """
+        if self.pageContent.toolchainList.currentRow() != -1:
+            infos = collections.defaultdict(lambda: unicode("not defined"))
+            infos.update(qvariant_converter.getStringDict(self.pageContent.toolchainList.currentItem().data(Qt.UserRole)))
+            self.pageContent.infoLabel.setText("GCC " + infos["version"] + " (" + infos["build"] + ")\nTarget: " + infos["target"] + "\nPath: " + os.path.normpath(infos["path"]))
+            self.pageContent.infoLabel.setVisible(True)
+            self.emit(SIGNAL("completeChanged()"))
+
+    def addToolchain(self):
+        """
+        Slot called when the user adds manually a toolchain.
+        """
+        sel_toolchain = QFileDialog.getOpenFileName(self, self.tr("Choose the toolchain"), "")
+        if not sel_toolchain.isEmpty():
+            item = QListWidgetItem(sel_toolchain)
+            item.setData(Qt.UserRole, qvariant_converter.convertString({"path": sel_toolchain}))
+            self.pageContent.toolchainList.addItem(item)
+            toolchains = self.toolchains()
+            toolchains[sel_toolchain] = False
+            self.setToolchains(toolchains)
+
+    def removeToolchain(self):
+        """
+        Slot called when the user removes manually a toolchain.
+        """
+        if self.pageContent.toolchainList.currentRow() != -1:
+            item = self.pageContent.toolchainList.takeItem(self.pageContent.toolchainList.currentRow())
+            toolchain = qvariant_converter.getStringDict(item.data(Qt.UserRole))["path"]
+            toolchains = self.toolchains()
+            del toolchains[toolchain]
+            self.setToolchains(toolchains)
+
+    def searchToolchain(self):
+        """
+        Slot called when the user clicks on the 'search' button. It opens the 
+        toolchain search dialog.
+        """
+        search = BToolchainSearch.BToolchainSearch()
+        self.connect(search, SIGNAL("accepted()"), self._search)
+        search.exec_()
+
+    def validateAllToolchains(self):
+        """
+        Slot called when the user clicks on the validate button. It starts the
+        toolchain validation procedure for all the toolchains.
+        """
+        QApplication.instance().setOverrideCursor(Qt.WaitCursor)
+        for i in range(self.pageContent.toolchainList.count()):
+            self.validateToolchain(i)
+        QApplication.instance().restoreOverrideCursor()
+    
+    ####
     
     def _populateToolchainList(self):
         """
         Fills the toolchain list with the toolchains stored in the QSettings.
         """
         toolchains = self.toolchains()
-        sel_toolchain = self._projectInfoRetrieve("TOOLCHAIN")
+        sel_toolchain = self.projectInfo("TOOLCHAIN")
         for key, value in toolchains.items():
             item = QListWidgetItem(key)
             item.setData(Qt.UserRole, qvariant_converter.convertStringDict({"path": key}))
@@ -59,17 +151,6 @@ class BToolchainPage(BWizardPage):
         Removes all the toolchain from the list.
         """
         self.pageContent.toolchainList.clear()
-    
-    def _selectionChanged(self):
-        """
-        Slot called when the user click on an entry of the toolchain list.
-        """
-        if self.pageContent.toolchainList.currentRow() != -1:
-            infos = collections.defaultdict(lambda: unicode("not defined"))
-            infos.update(qvariant_converter.getStringDict(self.pageContent.toolchainList.currentItem().data(Qt.UserRole)))
-            self.pageContent.infoLabel.setText("GCC " + infos["version"] + " (" + infos["build"] + ")\nTarget: " + infos["target"] + "\nPath: " + os.path.normpath(infos["path"]))
-            self.pageContent.infoLabel.setVisible(True)
-            self.emit(SIGNAL("completeChanged()"))
     
     def _search(self):
         """
@@ -89,16 +170,6 @@ class BToolchainPage(BWizardPage):
                 stored_toolchains[element] = False
         self.setToolchains(stored_toolchains)
         
-    def _connectSignals(self):
-        """
-        Connects the signals with the related slots.
-        """
-        self.connect(self.pageContent.toolchainList, SIGNAL("itemSelectionChanged()"), self._selectionChanged)
-        self.connect(self.pageContent.addButton, SIGNAL("clicked()"), self.addToolchain)
-        self.connect(self.pageContent.removeButton, SIGNAL("clicked()"), self.removeToolchain)
-        self.connect(self.pageContent.searchButton, SIGNAL("clicked()"), self.searchToolchain)
-        self.connect(self.pageContent.checkButton, SIGNAL("clicked()"), self.validateAllToolchains)
-    
     def _validItem(self, index, infos):
         """
         Sets the item at index as a valid item and associates the given info to it.
@@ -107,7 +178,7 @@ class BToolchainPage(BWizardPage):
         new_data = qvariant_converter.getStringDict(self.pageContent.toolchainList.item(index).data(Qt.UserRole))
         new_data.update(infos)
         item.setData(Qt.UserRole, qvariant_converter.convertStringDict(new_data))
-        needed = self._projectInfoRetrieve("CPU_INFOS")
+        needed = self.projectInfo("CPU_INFOS")
         if "target" in infos.keys() and infos["target"].find(needed["TOOLCHAIN"]) != -1:
             item.setIcon(QIcon(":/images/ok.png"))
         else:
@@ -121,50 +192,7 @@ class BToolchainPage(BWizardPage):
         """
         item = self.pageContent.toolchainList.item(index)
         item.setIcon(QIcon(":/images/error.png"))
-    
-    def addToolchain(self):
-        """
-        Slot called when the user adds manually a toolchain.
-        """
-        sel_toolchain = QFileDialog.getOpenFileName(self, self.tr("Choose the toolchain"), "")
-        if not sel_toolchain.isEmpty():
-            item = QListWidgetItem(sel_toolchain)
-            item.setData(Qt.UserRole, qvariant_converter.convertString({"path": sel_toolchain}))
-            self.pageContent.toolchainList.addItem(item)
-            toolchains = self.toolchains()
-            toolchains[sel_toolchain] = False
-            self.setToolchains(toolchains)
-    
-    def removeToolchain(self):
-        """
-        Slot called when the user removes manually a toolchain.
-        """
-        if self.pageContent.toolchainList.currentRow() != -1:
-            item = self.pageContent.toolchainList.takeItem(self.pageContent.toolchainList.currentRow())
-            toolchain = qvariant_converter.getStringDict(item.data(Qt.UserRole))["path"]
-            toolchains = self.toolchains()
-            del toolchains[toolchain]
-            self.setToolchains(toolchains)
-    
-    def searchToolchain(self):
-        """
-        Slot called when the user clicks on the 'search' button. It opens the 
-        toolchain search dialog.
-        """
-        search = BToolchainSearch.BToolchainSearch()
-        self.connect(search, SIGNAL("accepted()"), self._search)
-        search.exec_()
-    
-    def validateAllToolchains(self):
-        """
-        Slot called when the user clicks on the validate button. It starts the
-        toolchain validation procedure for all the toolchains.
-        """
-        QApplication.instance().setOverrideCursor(Qt.WaitCursor)
-        for i in range(self.pageContent.toolchainList.count()):
-            self.validateToolchain(i)
-        QApplication.instance().restoreOverrideCursor()
-    
+        
     def validateToolchain(self, i):
         """
         Toolchain validation procedure.
@@ -199,22 +227,3 @@ class BToolchainPage(BWizardPage):
         toolchains = self.toolchains()
         toolchains[filename] = True
         self.setToolchains(toolchains)
-    
-    def isComplete(self):
-        """
-        Overload of the QWizard isComplete method.
-        """
-        if self.pageContent.toolchainList.currentRow() != -1:
-            self._projectInfoStore("TOOLCHAIN", 
-                qvariant_converter.getStringDict(self.pageContent.toolchainList.currentItem().data(Qt.UserRole)))
-            return True
-        else:
-            return False
-    
-    def reloadData(self):
-        """
-        Overload of the BWizard reloadData method.
-        """
-        self._clearList()
-        self._setupUi()
-        self._populateToolchainList()

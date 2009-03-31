@@ -26,14 +26,38 @@ class BVersionPage(BWizardPage):
     
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/bertos_versions.ui")
-        self._connectSignals()
-        self._fillVersionList()
-        self._setupUi()
         self.setTitle(self.tr("Select the BeRTOS version needed"))
+
+    ## Overloaded QWizardPage methods ##
     
-    def _connectSignals(self):
+    def isComplete(self):
         """
-        Connects the signals to the related slots.
+        Overload of the QWizardPage isComplete method.
+        """
+        if self.pageContent.versionList.currentRow() != -1:
+	    # Remove trailing slash
+	    sources_path = qvariant_converter.getString(self.pageContent.versionList.currentItem().data(Qt.UserRole))
+	    if sources_path.endswith(os.sep):
+                 sources_path = sources_path[:-1]
+            self.setProjectInfo("SOURCES_PATH", sources_path)
+	    return True
+        else:
+            return False
+    
+    ####
+    
+    ## Overloaded BWizardPage methods ##
+
+    def setupUi(self):
+        """
+        Overload of the BWizardPage setupUi method.
+        """
+        self.fillVersionList()
+        self.pageContent.versionList.setCurrentRow(-1)
+
+    def connectSignals(self):
+        """
+        Overload of the BWizardPage connectSignals method.
         """
         self.connect(self.pageContent.versionList, SIGNAL("itemSelectionChanged()"), self.rowChanged)
         self.connect(self.pageContent.addButton, SIGNAL("clicked()"), self.addVersion)
@@ -41,13 +65,45 @@ class BVersionPage(BWizardPage):
         # Fake signal connection for the update button
         self.connect(self.pageContent.updateButton, SIGNAL("clicked()"), self.updateClicked)
     
-    def _setupUi(self):
-        """
-        Sets up the user interface.
-        """
-        self.pageContent.versionList.setCurrentRow(-1)
+    ####
     
-    def _storeVersion(self, directory):
+    ## Slots ##
+    
+    def addVersion(self):
+        """
+        Slot called when the user add a BeRTOS version.
+        """
+        directory = QFileDialog.getExistingDirectory(self, self.tr("Choose a directory"), "", QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks)
+        if not directory.isEmpty():
+            self.storeVersion(unicode(directory))
+            self.pageContent.versionList.clear()
+            self.fillVersionList()
+            self.emit(SIGNAL("completeChanged()"))
+    
+    def removeVersion(self):
+        """
+        Slot called when the user remove a BeRTOS version.
+        """
+        item = self.pageContent.versionList.takeItem(self.pageContent.versionList.currentRow())
+        self.deleteVersion(qvariant_converter.getString(item.data(Qt.UserRole)))
+        self.emit(SIGNAL("completeChanged()"))
+    
+    def rowChanged(self):
+        """
+        Slot called when the user select an entry from the version list.
+        """
+        self.emit(SIGNAL("completeChanged()"))
+
+    def updateClicked(self):
+        """
+        Slot called when the user clicks on the 'update' button. It checks for
+        update (TO BE IMPLEMENTED).
+        """
+        pass    
+
+    ####
+    
+    def storeVersion(self, directory):
         """
         Stores the directory selected by the user in the QSettings.
         """
@@ -55,7 +111,7 @@ class BVersionPage(BWizardPage):
         versions = set(versions + [directory])
         self.setVersions(list(versions))
     
-    def _deleteVersion(self, directory):
+    def deleteVersion(self, directory):
         """
         Removes the given directory from the QSettings.
         """
@@ -63,7 +119,7 @@ class BVersionPage(BWizardPage):
         versions.remove(directory)
         self.setVersions(versions)
         
-    def _insertListElement(self, directory):
+    def insertListElement(self, directory):
         """
         Inserts the given directory in the version list.
         """
@@ -76,55 +132,10 @@ class BVersionPage(BWizardPage):
             item.setData(Qt.UserRole, qvariant_converter.convertString(directory))
             self.pageContent.versionList.addItem(item)
     
-    def _fillVersionList(self):
+    def fillVersionList(self):
         """
         Fills the version list with all the BeRTOS versions founded in the QSettings.
         """
         versions = self.versions()
         for directory in versions:
-            self._insertListElement(directory)
-
-    def isComplete(self):
-        """
-        Overload of the QWizardPage isComplete method.
-        """
-        if self.pageContent.versionList.currentRow() != -1:
-	    # Remove trailing slash
-	    sources_path = qvariant_converter.getString(self.pageContent.versionList.currentItem().data(Qt.UserRole))
-	    if sources_path.endswith(os.sep):
-                 sources_path = sources_path[:-1]
-            self._projectInfoStore("SOURCES_PATH", sources_path)
-	    return True
-        else:
-            return False
-    
-    def addVersion(self):
-        """
-        Slot called when the user add a BeRTOS version.
-        """
-        directory = QFileDialog.getExistingDirectory(self, self.tr("Choose a directory"), "", QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks)
-        if not directory.isEmpty():
-            self._storeVersion(unicode(directory))
-            self.pageContent.versionList.clear()
-            self._fillVersionList()
-            self.emit(SIGNAL("completeChanged()"))
-    
-    def removeVersion(self):
-        """
-        Slot called when the user remove a BeRTOS version.
-        """
-        item = self.pageContent.versionList.takeItem(self.pageContent.versionList.currentRow())
-        self._deleteVersion(qvariant_converter.getString(item.data(Qt.UserRole)))
-        self.emit(SIGNAL("completeChanged()"))
-    
-    def updateClicked(self):
-        """
-        Checks for update (TO BE IMPLEMENTED).
-        """
-        pass
-    
-    def rowChanged(self):
-        """
-        Slot called when the user select an entry from the version list.
-        """
-        self.emit(SIGNAL("completeChanged()"))
+            self.insertListElement(directory)

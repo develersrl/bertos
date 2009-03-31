@@ -26,17 +26,67 @@ class BFolderPage(BWizardPage):
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/dir_select.ui")
         self.setTitle(self.tr("Select the project name"))
-        self._initializeAttributes()
-        self._setupUi()
-        self._connectSignals()
+        self.initializeAttributes()
+    
+    ## Overloaded QWizardPage methods ##
 
-    def _setupUi(self):
+    def isComplete(self):
         """
-        Sets up the user interface.
+        Overload of the QWizardPage isComplete method.
+        """
+        if self.pageContent.projectPath.text() != "None":
+            self.setProjectInfo("PROJECT_PATH", unicode(self.pageContent.projectPath.text()))
+            return True
+        else:
+            return False
+    
+    ####
+
+    ## Overloaded BWizardPage methods ##
+
+    def setupUi(self):
+        """
+        Overload of the BWizardPage setupUi method.
         """
         self.pageContent.warningLabel.setVisible(False)
     
-    def _initializeAttributes(self):
+    def connectSignals(self):
+        """
+        Overload of the BWizardPage connectSignals method.
+        """
+        self.connect(self.pageContent.nameEdit, SIGNAL("textChanged(const QString)"), self.nameChanged)
+        self.connect(self.pageContent.directoryEdit, SIGNAL("textChanged(const QString)"), self.directoryChanged)
+        self.connect(self.pageContent.directoryButton, SIGNAL("clicked()"), self.selectDirectory)
+    
+    ####
+
+    ## Slots ##
+    
+    def nameChanged(self, name):
+        """
+        Slot called when the project name is changed manually by the user.
+        """
+        self._project_name = str(name).replace(" ", "_")
+        self.setProjectPath()
+    
+    def directoryChanged(self, directory):
+        """
+        Slot called when the project folder is changed manually by the user.
+        """
+        self._destination_folder = str(QDir.toNativeSeparators(directory))
+        self.setProjectPath()
+
+    def selectDirectory(self):
+        """
+        Slot called when the project folder is changed using the file dialog.
+        """
+        directory = unicode(QFileDialog.getExistingDirectory(self, self.tr("Open Directory"), "", QFileDialog.ShowDirsOnly))
+        if len(directory) > 0:
+            self.pageContent.directoryEdit.setText(directory)
+
+    ####
+    
+    def initializeAttributes(self):
         """
         Initializes the page attributes to the default values.
         """
@@ -44,29 +94,7 @@ class BFolderPage(BWizardPage):
         self._destination_folder = os.path.expanduser("~")
         self.pageContent.directoryEdit.setText(self._destination_folder)
     
-    def _connectSignals(self):
-        """
-        Connects the signals to the related slots.
-        """
-        self.connect(self.pageContent.nameEdit, SIGNAL("textChanged(const QString)"), self._nameChanged)
-        self.connect(self.pageContent.directoryEdit, SIGNAL("textChanged(const QString)"), self._directoryChanged)
-        self.connect(self.pageContent.directoryButton, SIGNAL("clicked()"), self._selectDirectory)
-    
-    def _nameChanged(self, name):
-        """
-        Slot called when the project name is changed manually by the user.
-        """
-        self._project_name = str(name).replace(" ", "_")
-        self._setProjectPath()
-    
-    def _directoryChanged(self, directory):
-        """
-        Slot called when the project folder is changed manually by the user.
-        """
-        self._destination_folder = str(QDir.toNativeSeparators(directory))
-        self._setProjectPath()
-    
-    def _setProjectPath(self):
+    def setProjectPath(self):
         """
         Analyzes the page attributes and generates the path string.
         """
@@ -86,21 +114,3 @@ class BFolderPage(BWizardPage):
             self.pageContent.warningLabel.setVisible(False)
             self.pageContent.warningLabel.setText("")
         self.emit(SIGNAL("completeChanged()"))
-    
-    def _selectDirectory(self):
-        """
-        Slot called when the project folder is changed using the file dialog.
-        """
-        directory = unicode(QFileDialog.getExistingDirectory(self, self.tr("Open Directory"), "", QFileDialog.ShowDirsOnly))
-        if len(directory) > 0:
-            self.pageContent.directoryEdit.setText(directory)
-    
-    def isComplete(self):
-        """
-        Overload of the QWizardPage isComplete method.
-        """
-        if self.pageContent.projectPath.text() != "None":
-            self._projectInfoStore("PROJECT_PATH", unicode(self.pageContent.projectPath.text()))
-            return True
-        else:
-            return False

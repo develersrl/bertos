@@ -25,25 +25,32 @@ class BOutputPage(BWizardPage):
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/output_select.ui")
         self.setTitle(self.tr("Choose the project output"))
-        self._connectSignals()
-        self._projectInfoStore("OUTPUT", [])
+        self.connectSignals()
+        self.setProjectInfo("OUTPUT", [])
     
-    def _connectSignals(self):
+    ## Overloaded BWizardPage connectSignals method. ##
+    
+    def connectSignals(self):
         """
         Connects the signals with the related slots.
         """
-        self.connect(self.pageContent.eclipseCheckBox, SIGNAL("stateChanged(int)"), lambda checked: self._modeChecked(checked, "eclipse"))
-        self.connect(self.pageContent.xcodeCheckBox, SIGNAL("stateChanged(int)"), lambda checked: self._modeChecked(checked, "xcode"))
-        self.connect(self.pageContent.codeliteCheckBox, SIGNAL("stateChanged(int)"), lambda checked: self._modeChecked(checked, "codelite"))
+        self.connect(self.pageContent.eclipseCheckBox, SIGNAL("stateChanged(int)"), lambda checked: self.modeChecked(checked, "eclipse"))
+        self.connect(self.pageContent.xcodeCheckBox, SIGNAL("stateChanged(int)"), lambda checked: self.modeChecked(checked, "xcode"))
+        self.connect(self.pageContent.codeliteCheckBox, SIGNAL("stateChanged(int)"), lambda checked: self.modeChecked(checked, "codelite"))
     
-    def _modeChecked(self, checked, value):
+    ####
+    
+    ## Slots ##
+    
+    def modeChecked(self, checked, value):
         """
         Slot called when one of the mode checkbox is checked. It stores it.
         """
-        output_list = self._projectInfoRetrieve("OUTPUT")
+        output_list = self.projectInfo("OUTPUT")
         if checked == Qt.Checked:
             output_list.append(value)
         else:
             output_list.remove(value)
-        self._projectInfoStore("OUTPUT", output_list)
-    
+        self.setProjectInfo("OUTPUT", output_list)
+
+    ####
