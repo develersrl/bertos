@@ -27,8 +27,6 @@ class BWizard(QWizard):
     
     def __init__(self):
         QWizard.__init__(self)
-        # TODO: choose the right minimum size
-        self.setMinimumSize(1000, 500)
         self.setWindowTitle(self.tr("Create a BeRTOS project"))
         self.setOption(QWizard.DisabledBackButtonOnLastPage, True)
         self._addPages()
