@@ -46,9 +46,6 @@ class BWizard(QWizard):
         self.connect(self, SIGNAL("currentIdChanged(int)"), self._pageChanged)
     
     def _pageChanged(self, pageId):
-        prev_page = self.page(pageId - 1)
-        if prev_page is not None:
-            prev_page.saveData()
         page = self.page(pageId)
         if page is not None:
             page.reloadData()
