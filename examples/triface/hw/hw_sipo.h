@@ -47,9 +47,9 @@
 #include <avr/io.h>
 
 //Set output pin for sipo
-#define SCK_OUT            (DDRB |= BV(PB1))  // Load clock pin
-#define SOUT_OUT           (DDRB |= BV(PB2))  // Serial in pin
-#define SLOAD_OUT          (DDRB |= BV(PB3))  // Store clock pin
+#define SCK_OUT            (DDRB |= BV(PB1))  // Shift register clock input pin
+#define SOUT_OUT           (DDRB |= BV(PB2))  // Serial data input pin
+#define SLOAD_OUT          (DDRB |= BV(PB3))  // Storage register clock input pin
 #define OE_OUT             (DDRG |= BV(PG3))  // Output enable pin
 
 //Define output level
