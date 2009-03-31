@@ -34,10 +34,13 @@ class BToolchainPage(BWizardPage):
     
     def _populateToolchainList(self):
         toolchains = self.toolchains()
+        sel_toolchain = self._projectInfoRetrieve("TOOLCHAIN")
         for key, value in toolchains.items():
             item = QListWidgetItem(key)
             item.setData(Qt.UserRole, qvariant_converter.convertStringDict({"path": key}))
             self.pageContent.toolchainList.addItem(item)
+            if sel_toolchain is not None and sel_toolchain["path"] == key:
+                self.pageContent.toolchainList.setCurrentItem(item)
             if value:
                 self.validateToolchain(self.pageContent.toolchainList.row(item))
 
