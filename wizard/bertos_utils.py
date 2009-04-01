@@ -14,6 +14,7 @@ import fnmatch
 import glob
 import re
 import shutil
+import pickle
 
 import const
 import codelite_project
@@ -31,7 +32,7 @@ def createBertosProject(project_info):
     if not os.path.isdir(directory):
         os.mkdir(directory)
     f = open(directory + "/project.bertos", "w")
-    f.write(repr(project_info))
+    f.write(pickle.dumps(project_info))
     f.close()
     ## Destination source dir
     srcdir = directory + "/bertos"
