@@ -21,15 +21,28 @@ import BProject
 import BStartPage
 import BWizard
 
+from BFolderPage import BFolderPage
+from BVersionPage import BVersionPage
+from BCpuPage import BCpuPage
+from BToolchainPage import BToolchainPage
+from BModulePage import BModulePage
+from BOutputPage import BOutputPage
+from BCreationPage import BCreationPage
+from BFinalPage import BFinalPage
+
 import bertos_utils
 
 def newProject():
-    wizard = BWizard.BWizard()
+    page_list = [BFolderPage, BVersionPage, BCpuPage, BToolchainPage, BModulePage, BOutputPage, BCreationPage, BFinalPage]
+    wizard = BWizard.BWizard(page_list)
     wizard.show()
     wizard.exec_()
     
 def editProject():
-    print "editProject"
+    page_list = [BVersionPage, BCpuPage, BToolchainPage, BModulePage, BOutputPage, BCreationPage, BFinalPage]
+    wizard = BWizard.BWizard(page_list)
+    wizard.show()
+    wizard.exec_()
 
 def showStartPage():
     QApplication.instance().dialog = BStartPage.BStartPage()

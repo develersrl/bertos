@@ -28,26 +28,20 @@ class BWizard(QWizard):
     Main class of the wizard. It adds the pages automatically.
     """
     
-    def __init__(self):
+    def __init__(self, page_list):
         QWizard.__init__(self)
         self.setWindowTitle(self.tr("Create a BeRTOS project"))
         self.setOption(QWizard.DisabledBackButtonOnLastPage, True)
-        self.addPages()
+        self.addPages(page_list)
         self.connectSignals()
     
-    def addPages(self):
+    def addPages(self, page_list):
         """
-        Method used by the constructor in order to add the pages in the wizard.
+        Adds the pages in the wizard.
         """
-        self.addPage(BFolderPage.BFolderPage())
-        self.addPage(BVersionPage.BVersionPage())
-        self.addPage(BCpuPage.BCpuPage())
-        self.addPage(BToolchainPage.BToolchainPage())
-        self.addPage(BModulePage.BModulePage())
-        self.addPage(BOutputPage.BOutputPage())
-        self.addPage(BCreationPage.BCreationPage())
-        self.addPage(BFinalPage.BFinalPage())
-    
+        for page in page_list:
+            self.addPage(page())
+
     def connectSignals(self):
         """
         Connects the signals with the related slots.
