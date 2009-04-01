@@ -22,6 +22,7 @@ import BStartPage
 import BWizard
 
 from BFolderPage import BFolderPage
+from BOpenPage import BOpenPage
 from BVersionPage import BVersionPage
 from BCpuPage import BCpuPage
 from BToolchainPage import BToolchainPage
@@ -39,7 +40,7 @@ def newProject():
     wizard.exec_()
     
 def editProject():
-    page_list = [BVersionPage, BCpuPage, BToolchainPage, BModulePage, BOutputPage, BCreationPage, BFinalPage]
+    page_list = [BOpenPage, BVersionPage, BCpuPage, BToolchainPage, BModulePage, BOutputPage, BCreationPage, BFinalPage]
     wizard = BWizard.BWizard(page_list)
     wizard.show()
     wizard.exec_()

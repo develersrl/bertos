@@ -48,13 +48,6 @@ class BVersionPage(BWizardPage):
     
     ## Overloaded BWizardPage methods ##
 
-    def setupUi(self):
-        """
-        Overload of the BWizardPage setupUi method.
-        """
-        self.fillVersionList()
-        self.pageContent.versionList.setCurrentRow(-1)
-
     def connectSignals(self):
         """
         Overload of the BWizardPage connectSignals method.
@@ -64,6 +57,13 @@ class BVersionPage(BWizardPage):
         self.connect(self.pageContent.removeButton, SIGNAL("clicked()"), self.removeVersion)
         # Fake signal connection for the update button
         self.connect(self.pageContent.updateButton, SIGNAL("clicked()"), self.updateClicked)
+    
+    def reloadData(self):
+        """
+        Overload of the BWizardPage reloadData method.
+        """
+        self.pageContent.versionList.setCurrentRow(-1)
+        self.fillVersionList()
     
     ####
     
@@ -121,21 +121,33 @@ class BVersionPage(BWizardPage):
         
     def insertListElement(self, directory):
         """
-        Inserts the given directory in the version list.
+        Inserts the given directory in the version list and returns the
+        inserted item.
         """
         if bertos_utils.isBertosDir(directory):
             item = QListWidgetItem(QIcon(":/images/ok.png"), bertos_utils.bertosVersion(directory) + " (\"" + os.path.normpath(directory) + "\")")
             item.setData(Qt.UserRole, qvariant_converter.convertString(directory))
             self.pageContent.versionList.addItem(item)
+            return item
         elif len(directory) > 0:
             item = QListWidgetItem(QIcon(":/images/warning.png"), "UNKNOWN" + " (\"" + os.path.normpath(directory) + "\")")
             item.setData(Qt.UserRole, qvariant_converter.convertString(directory))
             self.pageContent.versionList.addItem(item)
+            return item
     
     def fillVersionList(self):
         """
         Fills the version list with all the BeRTOS versions founded in the QSettings.
         """
         versions = self.versions()
+        selected = self.projectInfo("SOURCES_PATH")
         for directory in versions:
-            self.insertListElement(directory)
+            item = self.insertListElement(directory)
+            if not selected is None and selected == directory:
+                self.setCurrentItem(item)
+    
+    def setCurrentItem(self, item):
+        """
+        Select the given item in the version list.
+        """
+        self.pageContent.versionList.setCurrentItem(item)
