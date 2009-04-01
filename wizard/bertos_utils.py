@@ -74,6 +74,7 @@ def createBertosProject(project_info):
     ## Destination main.c file
     main = open("srctemplates/main.c", "r").read()
     open(prjdir + "/main.c", "w").write(main)
+    ## Codelite project files
     if "codelite" in project_info.info("OUTPUT"):
         workspace = codeliteWorkspaceGenerator(project_info)
         open(directory + "/" + os.path.basename(prjdir) + ".workspace", "w").write(workspace)
