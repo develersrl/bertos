@@ -19,22 +19,22 @@ class BStartPage(QDialog):
     
     def __init__(self):
         QDialog.__init__(self)
-        self._setupUi()
-        self._connectSignals()
+        self.setupUi()
+        self.connectSignals()
         self.setWindowTitle(self.tr("Create or edit a BeRTOS project"))
-        self._initializeButtons()
+        self.initializeButtons()
     
-    def _setupUi(self):
+    def setupUi(self):
         self.content = uic.loadUi(UI_LOCATION + "/start.ui", None)
         layout = QVBoxLayout()
         layout.addWidget(self.content)
         self.setLayout(layout)
     
-    def _connectSignals(self):
+    def connectSignals(self):
         self.connect(self.content.newButton, SIGNAL("clicked()"), self.newProject)
         self.connect(self.content.editButton, SIGNAL("clicked()"), self.editProject)
     
-    def _initializeButtons(self):
+    def initializeButtons(self):
         self.button_group = QButtonGroup()
         self.button_group.addButton(self.content.newButton)
         self.button_group.addButton(self.content.editButton)

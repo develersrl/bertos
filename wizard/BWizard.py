@@ -32,10 +32,10 @@ class BWizard(QWizard):
         QWizard.__init__(self)
         self.setWindowTitle(self.tr("Create a BeRTOS project"))
         self.setOption(QWizard.DisabledBackButtonOnLastPage, True)
-        self._addPages()
-        self._connectSignals()
+        self.addPages()
+        self.connectSignals()
     
-    def _addPages(self):
+    def addPages(self):
         """
         Method used by the constructor in order to add the pages in the wizard.
         """
@@ -48,13 +48,13 @@ class BWizard(QWizard):
         self.addPage(BCreationPage.BCreationPage())
         self.addPage(BFinalPage.BFinalPage())
     
-    def _connectSignals(self):
+    def connectSignals(self):
         """
         Connects the signals with the related slots.
         """
-        self.connect(self, SIGNAL("currentIdChanged(int)"), self._pageChanged)
+        self.connect(self, SIGNAL("currentIdChanged(int)"), self.pageChanged)
     
-    def _pageChanged(self, pageId):
+    def pageChanged(self, pageId):
         """
         Slot called when the user change the current page. It calls the reloadData
         method of the next page.
