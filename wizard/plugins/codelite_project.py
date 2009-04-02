@@ -66,3 +66,14 @@ def codeliteWorkspaceGenerator(project_info):
     while template.find("$project") != -1:
         template = template.replace("$project", project_name)
     return template
+
+def createProject(project_info):
+    """
+    Function that creates codelite projects.
+    """
+    directory = project_info.info("PROJECT_PATH")
+    prjdir = directory + "/" + os.path.basename(directory)
+    workspace = codeliteWorkspaceGenerator(project_info)
+    open(directory + "/" + os.path.basename(prjdir) + ".workspace", "w").write(workspace)
+    project = codeliteProjectGenerator(project_info)
+    open(directory + "/" + os.path.basename(prjdir) + ".project", "w").write(project)

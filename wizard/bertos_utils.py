@@ -17,7 +17,7 @@ import shutil
 import pickle
 
 import const
-import codelite_project
+from plugins import codelite_project
 import DefineException
 
 def isBertosDir(directory):
@@ -77,10 +77,7 @@ def createBertosProject(project_info):
     open(prjdir + "/main.c", "w").write(main)
     ## Codelite project files
     if "codelite" in project_info.info("OUTPUT"):
-        workspace = codelite_project.codeliteWorkspaceGenerator(project_info)
-        open(directory + "/" + os.path.basename(prjdir) + ".workspace", "w").write(workspace)
-        project = codelite_project.codeliteProjectGenerator(project_info)
-        open(directory + "/" + os.path.basename(prjdir) + ".project", "w").write(project)
+        codelite_project.createProject(project_info)
 
 def mkGenerator(project_info, makefile):
     """
