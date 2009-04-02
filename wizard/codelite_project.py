@@ -14,6 +14,10 @@ import os
 import const
 
 def clFiles(file_dict, directory):
+    """
+    Creates the list of the lines for the files founded in file_dict, using
+    directory as the base folder.
+    """
     filelist = []
     filelist.append("<VirtualDirectory Name=\"%s\">" %os.path.basename(directory))
     for f in file_dict[directory]["files"]:
@@ -24,6 +28,10 @@ def clFiles(file_dict, directory):
     return filelist
 
 def findSources(path):
+    """
+    Analyzes the directory tree from path and return a dict with filename and
+    path.
+    """
     file_dict = {}
     for root, dirs, files in os.walk(path):
         if root.find("svn") == -1:
@@ -37,6 +45,9 @@ def findSources(path):
     return file_dict
 
 def codeliteProjectGenerator(project_info):
+    """
+    Returns the string rapresenting the codelite project.
+    """
     template = open("cltemplates/bertos.project").read()
     filelist = "\n".join(clFiles(findSources(project_info.info("PROJECT_PATH")), project_info.info("PROJECT_PATH")))
     while template.find("$filelist") != -1:
@@ -47,6 +58,9 @@ def codeliteProjectGenerator(project_info):
     return template
 
 def codeliteWorkspaceGenerator(project_info):
+    """
+    Returns the string rapresentig the codelite workspace.
+    """
     template = open("cltemplates/bertos.workspace").read()
     project_name = os.path.basename(project_info.info("PROJECT_PATH"))
     while template.find("$project") != -1:
