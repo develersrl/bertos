@@ -35,3 +35,20 @@ def findSources(path):
                 if file.endswith(const.EXTENSION_FILTER):
                     file_dict[root]["files"].append(file)
     return file_dict
+
+def codeliteProjectGenerator(project_info):
+    template = open("cltemplates/bertos.project").read()
+    filelist = "\n".join(clFiles(findSources(project_info.info("PROJECT_PATH")), project_info.info("PROJECT_PATH")))
+    while template.find("$filelist") != -1:
+        template = template.replace("$filelist", filelist)
+    project_name = os.path.basename(project_info.info("PROJECT_PATH"))
+    while template.find("$project") != -1:
+        template = template.replace("$project", project_name)
+    return template
+
+def codeliteWorkspaceGenerator(project_info):
+    template = open("cltemplates/bertos.workspace").read()
+    project_name = os.path.basename(project_info.info("PROJECT_PATH"))
+    while template.find("$project") != -1:
+        template = template.replace("$project", project_name)
+    return template

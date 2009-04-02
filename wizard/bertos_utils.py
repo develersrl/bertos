@@ -77,9 +77,9 @@ def createBertosProject(project_info):
     open(prjdir + "/main.c", "w").write(main)
     ## Codelite project files
     if "codelite" in project_info.info("OUTPUT"):
-        workspace = codeliteWorkspaceGenerator(project_info)
+        workspace = codelite_project.codeliteWorkspaceGenerator(project_info)
         open(directory + "/" + os.path.basename(prjdir) + ".workspace", "w").write(workspace)
-        project = codeliteProjectGenerator(project_info)
+        project = codelite_project.codeliteProjectGenerator(project_info)
         open(directory + "/" + os.path.basename(prjdir) + ".project", "w").write(project)
 
 def mkGenerator(project_info, makefile):
@@ -183,23 +183,6 @@ def findModuleFiles(module, project_info):
             sfiles.append(path + "/" + filename)
     return cfiles, sfiles
 
-def codeliteProjectGenerator(project_info):
-    template = open("cltemplates/bertos.project").read()
-    filelist = "\n".join(codelite_project.clFiles(codelite_project.findSources(project_info.info("PROJECT_PATH")), project_info.info("PROJECT_PATH")))
-    while template.find("$filelist") != -1:
-        template = template.replace("$filelist", filelist)
-    project_name = os.path.basename(project_info.info("PROJECT_PATH"))
-    while template.find("$project") != -1:
-        template = template.replace("$project", project_name)
-    return template
-
-def codeliteWorkspaceGenerator(project_info):
-    template = open("cltemplates/bertos.workspace").read()
-    project_name = os.path.basename(project_info.info("PROJECT_PATH"))
-    while template.find("$project") != -1:
-        template = template.replace("$project", project_name)
-    return template
-    
 def getSystemPath():
     path = os.environ["PATH"]
     if os.name == "nt":
