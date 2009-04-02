@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2009 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
@@ -35,6 +35,7 @@
  *
  * \version $Id$
  *
+ * \author Andrea Grandi <andrea@develer.com>
  * \author Daniele Basile <asterix@develer.com>
  */
 

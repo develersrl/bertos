@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2006, 2009 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000 Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
@@ -36,6 +36,7 @@
  *
  * \version $Id$
  *
+ * \author Andrea Grandi <andrea@develer.com>
  * \author Daniele Basile <asterix@develer.com>
  */
 
@@ -62,8 +63,8 @@
 #define OE_LOW             (PORTG &= BV(PG3))
 
 /**
- * Define the procedure to set one bit low/hight to
- * serial input in sipo device.
+ * Define the macros needed to set the serial input bit of SIPO device
+ * low or high.
  */
 #define SIPO_SI_HIGH()    SOUT_OUT_HIGH
 #define SIPO_SI_LOW()     SOUT_OUT_LOW
@@ -94,7 +95,7 @@
 
 
 /**
- * Do anything that needed to init sipo pins.
+ * Do everything needed in order to init the SIPO pins.
  */
 #define SIPO_INIT_PIN() \
 	do { \

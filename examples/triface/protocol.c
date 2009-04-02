@@ -283,7 +283,7 @@ MAKE_CMD(ping, "", "",
 /* Dout  */
 MAKE_CMD(dout, "d", "",
 ({
-	kfile_write(&fd_sipo.fd, (uint8_t *)&args[1].l, 1);
+	kfile_putc((uint8_t)&args[1].l, &fd_sipo.fd);
 
 	//Store status of dout ports.
 	reg_status_dout = (uint8_t)args[1].l;

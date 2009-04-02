@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2009 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
@@ -34,10 +34,11 @@
  *
  * \brief SIPO Module
  *
- * The SIPO module trasform a serial input in
+ * The SIPO module transforms a serial input in
  * a parallel output. Please check hw_sipo.h
- * file to customize hardware relative parameters.
+ * file to customize hardware related parameters.
  *
+ * \author Andrea Grandi <andrea@develer.com>
  * \author Daniele Basile <asterix@develer.com>
  */
 
@@ -68,8 +69,7 @@ INLINE void sipo_putchar(uint8_t c)
 }
 
 /**
- * Write a buffer into sipo register and when finish to
- * we load it.
+ * Write a buffer into the sipo register and, when finished, give a load pulse.
  */
  static size_t sipo_write(UNUSED_ARG(struct KFile *, fd), const void *_buf, size_t size)
 {
@@ -77,11 +77,11 @@ INLINE void sipo_putchar(uint8_t c)
 	size_t write_len = size;
 	ASSERT(buf);
 
-	// Load into shift register all byte in buffer
+	// Load into the shift register all the buffer bytes
 	while(size--)
 		sipo_putchar(*buf++);
 
-	// We finsh to load bytes into shift register, load it.
+	// We have just finished to shift the bytes into the register, now load them.
 	SIPO_LOAD();
 
 	return write_len;
@@ -96,10 +96,10 @@ void sipo_init(Sipo *fd)
 
 	memset(fd, 0, sizeof(Sipo));
 
-	//Set kfile struct type as a generic kfile structure.
+	//Set kfile struct type as a Sipo structure.
 	DB(fd->fd._type = KFT_SIPO);
 
-	// Set up data flash programming functions.
+	// Set up SIPO writing functions.
 	fd->fd.write = sipo_write;
 
 	SIPO_INIT_PIN();
