@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 # encoding: utf-8
 #
 # Copyright 2008 Develer S.r.l. (http://www.develer.com/)
@@ -56,7 +56,7 @@ def main():
     app.settings = QSettings("Develer", "Bertos Configurator")
     app.project = BProject.BProject()
     if newer("bertos.qrc", "bertos.rcc"):
-        os.system("rcc -binary bertos.qrc > bertos.rcc")
+        os.system("rcc -binary bertos.qrc -o bertos.rcc")
     QResource.registerResource("bertos.rcc")
     showStartPage()
     sys.exit(app.exec_())
