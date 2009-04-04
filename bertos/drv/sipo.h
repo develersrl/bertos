@@ -30,13 +30,20 @@
  *
  * -->
  *
- * \brief Macro for SIPO_H
+ * \brief Generic Serial-in, Parallel-out implementation (SIPO).
+ * 
+ * This module use kfile interface.
  *
  *
  * \version $Id$
  *
  * \author Andrea Grandi <andrea@develer.com>
  * \author Daniele Basile <asterix@develer.com>
+ * 
+ * $WIZ$ module_name = "sipo"
+ * $WIZ$ module_depends = "kfile"
+ * $WIZ$ module_configuration = ""
+ * 
  */
 
 #ifndef DRV_SIPO_H
