@@ -58,8 +58,18 @@ def main():
     if newer("bertos.qrc", "bertos.rcc"):
         os.system("rcc -binary bertos.qrc -o bertos.rcc")
     QResource.registerResource("bertos.rcc")
-    showStartPage()
-    sys.exit(app.exec_())
+    if "--create" in sys.argv and "--edit" not in sys.argv:
+        newProject()
+    elif "--edit" in sys.argv and "--create" not in sys.argv:
+        editProject()
+    elif "--create" in sys.argv and "--edit" in sys.argv:
+        ## TODO: need an explaining message
+        print " ".join(sys.argv)
+        print "Invalid usage!"
+        pass
+    else:
+        showStartPage()
+        sys.exit(app.exec_())
 
 if __name__ == '__main__':
     main()
