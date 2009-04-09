@@ -36,7 +36,7 @@ class BVersionPage(BWizardPage):
         """
         if self.pageContent.versionList.currentRow() != -1:
             sources_path = qvariant_converter.getString(self.pageContent.versionList.currentItem().data(Qt.UserRole))
-            ## Remove the trailing slash
+            # Remove the trailing slash
             if sources_path.endswith(os.sep):
                 sources_path = sources_path[:-1]
             self.setProjectInfo("SOURCES_PATH", sources_path)

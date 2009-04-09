@@ -200,14 +200,14 @@ class BToolchainPage(BWizardPage):
         filename = qvariant_converter.getStringDict(self.pageContent.toolchainList.item(i).data(Qt.UserRole))["path"]
         valid = False
         info = {}
-        ## Check for the other tools of the toolchain
+        # Check for the other tools of the toolchain
         for tool in TOOLCHAIN_ITEMS:
             if os.path.exists(filename.replace("gcc", tool)):
                 valid = True
             else:
                 valid = False
                 break
-        ## Try to retrieve the informations about the toolchain only for the valid toolchains
+        # Try to retrieve the informations about the toolchain only for the valid toolchains
         if valid:
             self._validation_process = QProcess()
             self._validation_process.start(filename, ["-v"])
@@ -219,7 +219,7 @@ class BToolchainPage(BWizardPage):
                     valid = True
             else:
                 self._validation_process.kill()
-        ## Add the item in the list with the appropriate associate data.
+        # Add the item in the list with the appropriate associate data.
         if valid:
             self._validItem(i, info)
         else:

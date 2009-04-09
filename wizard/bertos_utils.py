@@ -34,22 +34,22 @@ def createBertosProject(project_info):
     f = open(directory + "/project.bertos", "w")
     f.write(pickle.dumps(project_info))
     f.close()
-    ## Destination source dir
+    # Destination source dir
     srcdir = directory + "/bertos"
     shutil.rmtree(srcdir, True)
     shutil.copytree(sources_dir + "/bertos", srcdir)
-    ## Destination makefile
+    # Destination makefile
     makefile = directory + "/Makefile"
     if os.path.exists(makefile):
         os.remove(makefile)
     makefile = open("mktemplates/Makefile").read()
     makefile = makefileGenerator(project_info, makefile)
     open(directory + "/Makefile", "w").write(makefile)
-    ## Destination project dir
+    # Destination project dir
     prjdir = directory + "/" + os.path.basename(directory)
     shutil.rmtree(prjdir, True)
     os.mkdir(prjdir)
-    ## Destination configurations files
+    # Destination configurations files
     cfgdir = prjdir + "/cfg"
     shutil.rmtree(cfgdir, True)
     os.mkdir(cfgdir)
@@ -68,14 +68,14 @@ def createBertosProject(project_info):
         f = open(cfgdir + "/" + os.path.basename(configuration), "w")
         f.write(string)
         f.close()
-    ## Destinatio mk file
+    # Destinatio mk file
     makefile = open("mktemplates/template.mk", "r").read()
     makefile = mkGenerator(project_info, makefile)
     open(prjdir + "/" + os.path.basename(prjdir) + ".mk", "w").write(makefile)
-    ## Destination main.c file
+    # Destination main.c file
     main = open("srctemplates/main.c", "r").read()
     open(prjdir + "/main.c", "w").write(main)
-    ## Codelite project files
+    # Codelite project files
     if "codelite" in project_info.info("OUTPUT"):
         codelite_project.createProject(project_info)
 
@@ -102,7 +102,7 @@ def makefileGenerator(project_info, makefile):
     """
     Generate the Makefile for the current project.
     """
-    # TODO: write a general function that works for both the mk file and the Makefile
+    # TODO write a general function that works for both the mk file and the Makefile
     while makefile.find("project_name") != -1:
         makefile = makefile.replace("project_name", os.path.basename(project_info.info("PROJECT_PATH")))
     return makefile
@@ -114,18 +114,18 @@ def csrcGenerator(project_info):
         harvard = True
     else:
         harvard = False
-    ## file to be included in CSRC variable
+    # file to be included in CSRC variable
     csrc = []
-    ## file to be included in PCSRC variable
+    # file to be included in PCSRC variable
     pcsrc = []
-    ## files to be included in CPPASRC variable
+    # files to be included in CPPASRC variable
     asrc = []
-    ## constants to be included at the beginning of the makefile
+    # constants to be included at the beginning of the makefile
     constants = {}
     for module, information in modules.items():
         module_files = set([])
         dependency_files = set([])
-        ## assembly sources
+        # assembly sources
         asm_files = set([])
         if information["enabled"]:
             if "constants" in information:
@@ -154,22 +154,22 @@ def csrcGenerator(project_info):
     return csrc, pcsrc, asrc, constants
     
 def findModuleFiles(module, project_info):
-    ## Find the files related to the selected module
+    # Find the files related to the selected module
     cfiles = []
     sfiles = []
-    ## .c files related to the module and the cpu architecture
+    # .c files related to the module and the cpu architecture
     for filename, path in findDefinitions(module + ".c", project_info) + \
             findDefinitions(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".c", project_info):
         path = path.replace(project_info.info("SOURCES_PATH") + "/", "")
         cfiles.append(path + "/" + filename)
-    ## .s files related to the module and the cpu architecture
+    # .s files related to the module and the cpu architecture
     for filename, path in findDefinitions(module + ".s", project_info) + \
             findDefinitions(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".s", project_info) + \
             findDefinitions(module + ".S", project_info) + \
             findDefinitions(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".S", project_info):
         path = path.replace(project_info.info("SOURCES_PATH") + "/", "")
         sfiles.append(path + "/" + filename)
-    ## .c and .s files related to the module and the cpu tags
+    # .c and .s files related to the module and the cpu tags
     for tag in project_info.info("CPU_INFOS")["CPU_TAGS"]:
         for filename, path in findDefinitions(module + "_" + tag + ".c", project_info):
             path = path.replace(project_info.info("SOURCES_PATH") + "/", "")

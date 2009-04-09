@@ -89,10 +89,10 @@ class BModulePage(BWizardPage):
                 index = 0
                 for i, property in param_list:
                     if "type" in configurations[property]["informations"] and configurations[property]["informations"]["type"] == "autoenabled":
-                        ## Doesn't show the hidden fields
+                        # Doesn't show the hidden fields
                         pass
                     else:
-                        ## Set the row count to the current index + 1
+                        # Set the row count to the current index + 1
                         self.pageContent.propertyTable.setRowCount(index + 1)
                         item = QTableWidgetItem(configurations[property]["brief"])
                         item.setData(Qt.UserRole, qvariant_converter.convertString(property))
@@ -160,7 +160,7 @@ class BModulePage(BWizardPage):
         """
         Loads the module data.
         """
-        ## Load the module data only if it isn't already loaded
+        # Load the module data only if it isn't already loaded
         if self.projectInfo("MODULES") == None \
                 and self.projectInfo("LISTS") == None \
                 and self.projectInfo("CONFIGURATIONS") == None:
@@ -233,7 +233,7 @@ class BModulePage(BWizardPage):
         Inserts in the table at index a spinbox for an int, a long or an unsigned
         long property setted to value.
         """
-        ## int, long or undefined type property
+        # int, long or undefined type property
         spin_box = None
         if bertos_utils.isLong(informations) or bertos_utils.isUnsignedLong(informations):
             spin_box = QDoubleSpinBox()

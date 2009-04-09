@@ -55,7 +55,7 @@ def main():
     app = QApplication(sys.argv)
     app.settings = QSettings("Develer", "Bertos Configurator")
     app.project = BProject.BProject()
-    ## Development utility lines, to be removed for production
+    # Development utility lines, to be removed for production
     if newer("bertos.qrc", "bertos.rcc"):
         os.system("rcc -binary bertos.qrc -o bertos.rcc")
     QResource.registerResource("bertos.rcc")
@@ -64,7 +64,7 @@ def main():
     elif "--edit" in sys.argv and "--create" not in sys.argv:
         editProject()
     elif "--create" in sys.argv and "--edit" in sys.argv:
-        ## TODO: need an explaining message
+        # TODO need an explaining message
         print " ".join(sys.argv)
         print "Invalid usage!"
         pass
