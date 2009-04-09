@@ -100,7 +100,7 @@ class BFolderPage(BWizardPage):
         """
         if self._destination_folder != "" and self._project_name <> "":
             if not self._destination_folder.endswith(os.sep):
-                self._destination_folder += "/"
+                self._destination_folder += os.sep
             self.pageContent.projectPath.setText(QDir.toNativeSeparators(self._destination_folder + self._project_name))
             if os.path.exists(self._destination_folder + self._project_name):
                 self.pageContent.warningLabel.setVisible(True)
