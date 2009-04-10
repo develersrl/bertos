@@ -65,7 +65,7 @@ demo_CSRC = \
 	bertos/verstag.c
 
 demo_CPPASRC = \
-	bertos/emul/switch.S
+	bertos/emul/switch_ctx_emul.S
 
 # FIXME: maybe this junk should go in emul/emul.mk?
 $(OBJDIR)/demo/bertos/emul/emulwin.o: bertos/emul/emulwin_moc.cpp

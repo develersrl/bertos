@@ -37,6 +37,7 @@
  *
  * $WIZ$ module_name = "kernel"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_proc.h"
+ * $WIZ$ module_depends = "switch_ctx"
  */
 
 #ifndef KERN_PROC_H
