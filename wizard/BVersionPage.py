@@ -62,6 +62,7 @@ class BVersionPage(BWizardPage):
         """
         Overload of the BWizardPage reloadData method.
         """
+        self.resetVersionList()
         self.pageContent.versionList.setCurrentRow(-1)
         self.fillVersionList()
     
@@ -118,7 +119,13 @@ class BVersionPage(BWizardPage):
         versions = self.versions()
         versions.remove(directory)
         self.setVersions(versions)
-        
+    
+    def resetVersionList(self):
+        """
+        Remove all the version entries from the list.
+        """
+        self.pageContent.versionList.clear()
+    
     def insertListElement(self, directory):
         """
         Inserts the given directory in the version list and returns the
