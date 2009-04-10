@@ -140,19 +140,19 @@ def csrcGenerator(project_info):
                     asm_files |= set(dependencySFiles)
             for file in module_files:
                 if not harvard or "harvard" not in information or information["harvard"] == "both":
-                    csrc.append(os.path.normpath(file))
+                    csrc.append(file)
                 if harvard and "harvard" in information:
-                    pcsrc.append(os.path.normpath(file))
+                    pcsrc.append(file)
             for file in dependency_files:
-                csrc.append(os.path.normpath(file))
+                csrc.append(file)
             for file in asm_files:
-                asrc.append(os.path.normpath(file))
+                asrc.append(file)
     csrc = " \\\n\t".join(csrc) + " \\"
     pcsrc = " \\\n\t".join(pcsrc) + " \\"
     asrc = " \\\n\t".join(asrc) + " \\"
     constants = "\n".join([os.path.basename(project_info.info("PROJECT_PATH")) + "_" + key + " = " + str(value) for key, value in constants.items()])
     return csrc, pcsrc, asrc, constants
-    
+
 def findModuleFiles(module, project_info):
     # Find the files related to the selected module
     cfiles = []
@@ -161,24 +161,40 @@ def findModuleFiles(module, project_info):
     for filename, path in findDefinitions(module + ".c", project_info) + \
             findDefinitions(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".c", project_info):
         path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
-        cfiles.append(path + os.sep + filename)
+        if os.sep != "/":
+            path = replaceSeparators(path)
+        cfiles.append(path + "/" + filename)
     # .s files related to the module and the cpu architecture
     for filename, path in findDefinitions(module + ".s", project_info) + \
             findDefinitions(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".s", project_info) + \
             findDefinitions(module + ".S", project_info) + \
             findDefinitions(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".S", project_info):
         path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
-        sfiles.append(path + os.sep + filename)
+        if os.sep != "/":
+            path = replaceSeparators(path)
+        sfiles.append(path + "/" + filename)
     # .c and .s files related to the module and the cpu tags
     for tag in project_info.info("CPU_INFOS")["CPU_TAGS"]:
         for filename, path in findDefinitions(module + "_" + tag + ".c", project_info):
             path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
-            cfiles.append(path + os.sep + filename)
+            if os.sep != "/":
+                path = replaceSeparators(path)
+            cfiles.append(path + "/" + filename)
         for filename, path in findDefinitions(module + "_" + tag + ".s", project_info) + \
                 findDefinitions(module + "_" + tag + ".S", project_info):
             path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
-            sfiles.append(path + os.sep + filename)
+            if os.sep != "/":
+                path = replaceSeparators(path)
+            sfiles.append(path + "/" + filename)
     return cfiles, sfiles
+
+def replaceSeparators(path):
+    """
+    Replace the separators in the given path with unix standard separator.
+    """
+    while path.find(os.sep) != -1:
+        path = path.replace(os.sep, "/")
+    return path
 
 def getSystemPath():
     path = os.environ["PATH"]
@@ -314,10 +330,10 @@ def loadDefineLists(comment_list):
             define_list[key] = (value,)
     return define_list
 
-def getDescriptionInformations(comment): 
-    """ 
-    Take the doxygen comment and strip the wizard informations, returning the tuple 
-    (comment, wizard_information) 
+def getDescriptionInformations(comment):
+    """
+    Take the doxygen comment and strip the wizard informations, returning the tuple
+    (comment, wizard_information)
     """
     brief = ""
     description = ""
@@ -409,7 +425,7 @@ def loadModuleData(project):
     project.setInfo("LISTS", list_info_dict)
     project.setInfo("CONFIGURATIONS", configuration_info_dict)
     project.setInfo("FILES", file_dict)
-    
+
 def formatParamNameValue(text):
     """
     Take the given string and return a tuple with the name of the parameter in the first position
