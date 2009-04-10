@@ -57,7 +57,7 @@ TOOLCHAIN = "avr"
 CPU_FLAG_NAME = "MCU"
 
 # Where are locate the bertos directories
-SCRIPT_DIR = CPU_DIR + "avr/script/"
+SCRIPT_DIR = CPU_DIR + "avr/scripts/"
 HW_DIR = CPU_DIR + "avr/hw/"
 DRV_DIR = CPU_DIR + "avr/drv/"
 
@@ -84,4 +84,4 @@ SUPPORTED_DRV = [ "adc",
 	          "ic2",
 	          "kdebug",
 	          "lcd_32122a" ]
-	
+

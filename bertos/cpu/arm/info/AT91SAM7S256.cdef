@@ -49,6 +49,6 @@ CPU_DESC += [ "256 Kbytes internal flash memory",
 
 # GCC flags for this cpu.
 CPP_FLAGS += [ "-D__ARM_AT91SAM7S256__" ]
-LD_FLAGS += [ "-T " + SCRIPT_DIR + " at91sam7_256_rom.ld" ]
+LD_FLAGS += [ "-T " + SCRIPT_DIR + "at91sam7_256_rom.ld" ]
 
 

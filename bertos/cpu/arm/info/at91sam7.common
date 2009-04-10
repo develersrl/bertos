@@ -58,7 +58,7 @@ CORE_CPU = "arm7tdmi"
 CPU_FLAG_NAME = "CPU"
 
 # Where are locate the bertos directories
-SCRIPT_DIR = CPU_DIR + "arm/script/"
+SCRIPT_DIR = CPU_DIR + "arm/scripts/"
 HW_DIR = CPU_DIR + "arm/hw/"
 DRV_DIR = CPU_DIR + "arm/drv/"
 
@@ -78,4 +78,4 @@ SUPPORTED_DRV = [ "adc",
 		  "stepper",
 		  "timer",
 		  "twi" ]
-	
+
