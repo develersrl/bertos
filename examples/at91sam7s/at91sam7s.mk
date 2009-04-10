@@ -35,7 +35,7 @@ at91sam7s_CPPASRC = \
 	bertos/cpu/arm/hw/crtat91sam7_rom.S \
 	bertos/cpu/arm/hw/switch_arm.S
 
-at91sam7s_CROSS = arm-none-eabi-
+at91sam7s_PREFIX = arm-none-eabi-
 
 at91sam7s_CPPAFLAGS = -O0 -g -gdwarf-2 -g -gen-debug
 at91sam7s_CPPFLAGS = -O0 -D'ARCH=0' -D__ARM_AT91SAM7S256__ -g3 -gdwarf-2 -fverbose-asm -Iexamples/at91sam7s/hw -Iexamples/at91sam7s -Ibertos/cpu/arm

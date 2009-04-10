@@ -62,18 +62,13 @@ tags:
 
 # Run testsuite
 .PHONY: check
-check: 
+check:
 	$L "Running testsuite"
 	$Q test/run_tests.sh
 
 define build_target
 
-ifneq ($$($(1)_CROSS),)
-        #use embedded specific map flags
-        $(1)_MAP_FLAGS = $$(MAP_FLAGS_EMB)
-        #In embedded we need s19, hex and bin
-        $$(OUTDIR)/$(1).tgt : $$(OUTDIR)/$(1).s19 $$(OUTDIR)/$(1).hex $$(OUTDIR)/$(1).bin
-else
+ifeq ($$($(1)_HOSTED),1)
         #On Darwin architecture the assembly doesn't link correctly if these flags are set.
         ifeq ($(shell uname | grep -c "Darwin"),1)
                 LIST_FLAGS := ""
@@ -90,12 +85,17 @@ else
                 #Otherwise in  hosted application we need only executable file.
                 $$(OUTDIR)/$(1).tgt : $$(OUTDIR)/$(1)
         endif
+else
+        #use embedded specific map flags
+        $(1)_MAP_FLAGS = $$(MAP_FLAGS_EMB)
+        #In embedded we need s19, hex and bin
+        $$(OUTDIR)/$(1).tgt : $$(OUTDIR)/$(1).s19 $$(OUTDIR)/$(1).hex $$(OUTDIR)/$(1).bin
 endif
 
 $(1)_LDFLAGS += $$($(1)_MAP_FLAGS)
 
 # In embedded systems the target CPU is needed,
-# but there are different options on how pass
+# but there are different options on how to pass
 # it to the compiler.
 ifneq ($$(strip $$($(1)_MCU)),)
         $(1)_MCPU = -mmcu=$$($(1)_MCU)
@@ -104,7 +104,7 @@ ifneq ($$(strip $$($(1)_CPU)),)
         $(1)_MCPU = -mcpu=$$($(1)_CPU)
 endif
 
-# If a CPU is specified add to 
+# If a CPU is specified add to
 # project specific flags.
 ifneq ($$($(1)_MCPU),)
         $(1)_CFLAGS    += $$($(1)_MCPU)
@@ -118,12 +118,30 @@ ifneq ($$(strip $$($(1)_LDSCRIPT)),)
         $(1)_LDFLAGS += -Wl,-T$$($(1)_LDSCRIPT)
 endif
 
+ifneq ($$($(1)_CROSS),)
+	#deprecated: use PREFIX, SUFFIX and HOSTED mechanism instead
+	$(1)_PREFIX = $$($(1)_CROSS)
+	$(1)_SUFFIX = ""
+endif
+
+$(1)_CC      ?= $$($(1)_PREFIX)$$(CC)$$($(1)_SUFFIX)
+$(1)_CXX     ?= $$($(1)_PREFIX)$$(CXX)$$($(1)_SUFFIX)
+$(1)_AS      ?= $$($(1)_PREFIX)$$(AS)$$($(1)_SUFFIX)
+$(1)_AR      ?= $$($(1)_PREFIX)$$(AR)$$($(1)_SUFFIX)
+$(1)_OBJCOPY ?= $$($(1)_PREFIX)$$(OBJCOPY)$$($(1)_SUFFIX)
+$(1)_STRIP   ?= $$($(1)_PREFIX)$$(STRIP)$$($(1)_SUFFIX)
+ifneq ($$(strip $$($(1)_CXXSRC)),)
+	$(1)_LD = $$($(1)_PREFIX)$$(LDXX)$$($(1)_SUFFIX)
+else
+	$(1)_LD = $$($(1)_PREFIX)$$(LD)$$($(1)_SUFFIX)
+endif
+
 # Debug stuff
 ifeq ($$($(1)_DEBUG),1)
         # AVR is an harvard processor
         # and needs debug module
         # to be compiled in program memory
-        ifeq ($$(findstring avr, $$($(1)_CROSS)),avr)
+        ifeq ($$(findstring avr, $$($(1)_PREFIX)),avr)
                 $(1)_DEBUGSRC = $(1)_PCSRC
         else
                 $(1)_DEBUGSRC = $(1)_CSRC
@@ -136,16 +154,14 @@ ifeq ($$($(1)_DEBUG),1)
                 $$($(1)_DEBUGSRC) += bertos/mware/formatwr.c
         endif
 
-        $(1)_CFLAGS += -D_DEBUG	
+        # Also add hex.c (for printf) if not already present
+        ifneq ($$(findstring hex.c, $$($$($(1)_CSRC))),hex.c)
+                $$($(1)_CSRC) += bertos/mware/hex.c
+        endif
+
+        $(1)_CFLAGS += -D_DEBUG
         $(1)_CXXFLAGS += -D_DEBUG
 endif
-
-$(1)_CC      ?= $$($(1)_CROSS)$$(CC)
-$(1)_CXX     ?= $$($(1)_CROSS)$$(CXX)
-$(1)_AS      ?= $$($(1)_CROSS)$$(AS)
-$(1)_AR      ?= $$($(1)_CROSS)$$(AR)
-$(1)_OBJCOPY ?= $$($(1)_CROSS)$$(OBJCOPY)
-$(1)_STRIP   ?= $$($(1)_CROSS)$$(STRIP)
 
 $(1)_COBJ    = $$(foreach file,$$($(1)_CSRC:%.c=%.o),$$(OBJDIR)/$(1)/$$(file))
 $(1)_CXXOBJ  = $$(foreach file,$$($(1)_CXXSRC:%.cpp=%.o),$$(OBJDIR)/$(1)/$$(file))
@@ -155,12 +171,6 @@ $(1)_CPPAOBJ = $$(foreach file,$$($(1)_CPPASRC:%.S=%.o),$$(OBJDIR)/$(1)/$$(file)
 $(1)_OBJ    := $$($(1)_COBJ) $$($(1)_CXXOBJ) $$($(1)_PCOBJ) $$($(1)_AOBJ) $$($(1)_CPPAOBJ)
 $(1)_SRC    := $$($(1)_CSRC) $$($(1)_CXXSRC) $$($(1)_PCSRC) $$($(1)_ASRC) $$($(1)_CPPASRC)
 OBJ         += $$($(1)_OBJ)
-
-ifneq ($$(strip $$($(1)_CXXSRC)),)
-$(1)_LD = $$($(1)_CROSS)$$(LDXX)
-else
-$(1)_LD = $$($(1)_CROSS)$$(LD)
-endif
 
 # Sometimes $(CC) is actually set to a C++ compiler in disguise, and it
 # would whine if we passed it C-only flags.  Checking for the presence of

@@ -22,7 +22,7 @@ armtest_CSRC = $(arm_CSRC) examples/test/empty_main.c
 
 armtest_CPPASRC = $(arm_ASRC)
 
-armtest_CROSS = arm-none-eabi-
+armtest_PREFIX = arm-none-eabi-
 
 armtest_CPPAFLAGS = -O0 -g -gdwarf-2 -g -gen-debug
 armtest_CPPFLAGS = -O0 -D'ARCH=ARCH_NIGHTTEST' -D__ARM_AT91SAM7S256__ -g3 -gdwarf-2 -fverbose-asm -Iexamples/test -Ibertos/cpu/arm

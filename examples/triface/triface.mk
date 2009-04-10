@@ -17,7 +17,7 @@ TRG += triface
 CPU = atmega1281
 BOOT_ADDR_START = 0x1E000
 
-triface_CROSS = avr-
+triface_PREFIX = avr-
 
 ifeq ($(CPU), atmega1281)
 triface_hfuse = 0x98
@@ -77,7 +77,7 @@ boot_CSRC = \
 	bertos/mware/hex.c \
 	bertos/kern/kfile.c \
 	#
-boot_CROSS = avr-
+boot_PREFIX = avr-
 boot_CPPFLAGS = -D'ARCH=(ARCH_TRIFACE|ARCH_BOOT)' -Iexamples/triface/boot -Ibertos/cpu/avr
 boot_CFLAGS = -Os -mcall-prologues
 boot_LDFLAGS = -Wl,--relax -Wl,--section-start=.text=$(BOOT_ADDR_START)

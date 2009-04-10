@@ -17,6 +17,8 @@
 # Set to 1 for debug builds
 randpool_demo_DEBUG = 0
 
+randpool_demo_HOSTED = 1
+
 # Our target application
 TRG += randpool_demo
 
@@ -25,7 +27,7 @@ randpool_demo_CSRC = \
 	algos/randpool.c \
 	algos/md2.c \
 	drv/timer.c \
-	os/hptime.c 
+	os/hptime.c
 
 randpool_demo_CFLAGS = -O0 -D'ARCH=0' -Iexamples/randpool/ -Iexamples/randpool/hw
 

@@ -27,6 +27,6 @@ avrtest_CPPASRC = $(avr_ASRC)
 
 avrtest_PCSRC += bertos/mware/formatwr.c
 
-avrtest_CROSS = avr-
-avrtest_CPPFLAGS = -D'ARCH=ARCH_NIGHTTEST' -Iexamples/test -Ibertos/cpu/avr 
+avrtest_PREFIX = avr-
+avrtest_CPPFLAGS = -D'ARCH=ARCH_NIGHTTEST' -Iexamples/test -Ibertos/cpu/avr
 avrtest_CFLAGS = -Os -mcall-prologues -fno-strict-aliasing

@@ -14,6 +14,9 @@ include bertos/emul/emul.mk
 # Set to 1 for debug builds
 demo_DEBUG = 1
 
+# This is an hosted application
+demo_HOSTED = 1
+
 # Our target application
 TRG += demo
 
