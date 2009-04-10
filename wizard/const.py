@@ -29,6 +29,9 @@ CPU_DEF = {
     "AR_FLAGS": [],
     "LD_FLAGS" : [],
     "CPPA_SRC" : [],
+    "CXX_SRC": [],
+    "ASRC": [],
+    "C_SRC": [],
     "SUPPORTED_DRV" : [],
     "PC_SRC" : [],
     "CPU_DESC" : []

@@ -94,7 +94,7 @@ def mkGenerator(project_info, makefile):
     mk_data["$cxxflags"] = " ".join(project_info.info("CPU_INFOS")["CXX_FLAGS"])
     mk_data["$asflags"] = " ".join(project_info.info("CPU_INFOS")["AS_FLAGS"])
     mk_data["$arflags"] = " ".join(project_info.info("CPU_INFOS")["AR_FLAGS"])
-    mk_data["$csrc"], mk_data["$pcsrc"], mk_data["$asrc"], mk_data["$constants"] = csrcGenerator(project_info)
+    mk_data["$csrc"], mk_data["$pcsrc"], mk_data["$cppasrc"], mk_data["$cxxsrc"], mk_data["$asrc"], mk_data["$constants"] = csrcGenerator(project_info)
     mk_data["$prefix"] = project_info.info("TOOLCHAIN")["path"].split("gcc")[0]
     mk_data["$suffix"] = project_info.info("TOOLCHAIN")["path"].split("gcc")[1]
     mk_data["$main"] = os.path.basename(project_info.info("PROJECT_PATH")) + "/main.c"
@@ -124,6 +124,10 @@ def csrcGenerator(project_info):
     # file to be included in PCSRC variable
     pcsrc = []
     # files to be included in CPPASRC variable
+    cppasrc = []
+    # files to be included in CXXSRC variable
+    cxxsrc = []
+    # files to be included in ASRC variable
     asrc = []
     # constants to be included at the beginning of the makefile
     constants = {}
@@ -150,13 +154,25 @@ def csrcGenerator(project_info):
                     pcsrc.append(file)
             for file in dependency_files:
                 csrc.append(file)
+            for file in project_info.info("CPU_INFOS")["C_SRC"]:
+                csrc.append(file)
+            for file in project_info.info("CPU_INFOS")["PC_SRC"]:
+                pcsrc.append(file)
             for file in asm_files:
-                asrc.append(file)
+                cppasrc.append(file)
+    for file in project_info.info("CPU_INFOS")["CPPA_SRC"]:
+        cppasrc.append(file)
+    for file in project_info.info("CPU_INFOS")["CXX_SRC"]:
+        cxxsrc.append(file)
+    for file in project_info.info("CPU_INFOS")["ASRC"]:
+        asrc.append(file)
     csrc = " \\\n\t".join(csrc) + " \\"
     pcsrc = " \\\n\t".join(pcsrc) + " \\"
+    cppasrc = " \\\n\t".join(cppasrc) + " \\"
+    cxxsrc = " \\\n\t".join(cxxsrc) + " \\"
     asrc = " \\\n\t".join(asrc) + " \\"
     constants = "\n".join([os.path.basename(project_info.info("PROJECT_PATH")) + "_" + key + " = " + str(value) for key, value in constants.items()])
-    return csrc, pcsrc, asrc, constants
+    return csrc, pcsrc, cppasrc, cxxsrc, asrc, constants
 
 def findModuleFiles(module, project_info):
     # Find the files related to the selected module
