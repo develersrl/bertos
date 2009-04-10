@@ -41,7 +41,7 @@
 #define HW_CPUFREQ_H
 
 #ifndef CPU_FREQ
-	#warning CPU_FREQ is not defined, you should upgrade to the new clock frequency defining method.
+	#warning CPU_FREQ is not defined, you should upgrade to the newer clock frequency defining method.
 
 	/*
 	 * This is DEPRECATED file, it will be removed in the next major release.
