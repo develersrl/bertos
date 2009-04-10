@@ -25,7 +25,6 @@ DEBUGCFLAGS = -ggdb
 #
 # define some variables based on the AVR base path in $(AVR)
 #
-#CROSS   = avr-
 CC      = gcc
 CXX     = g++
 AR      = ar
