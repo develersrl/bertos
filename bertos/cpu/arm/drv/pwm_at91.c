@@ -39,7 +39,7 @@
 
 #include "pwm_at91.h"
 #include "hw/pwm_map.h"
-#include "hw/hw_cpu.h"
+#include <hw/hw_cpufreq.h>
 #include "cfg/cfg_pwm.h"
 
 // Define logging setting (for cfg/log.h module).
@@ -120,7 +120,7 @@ void pwm_hw_setFrequency(PwmDev dev, uint32_t freq)
 
 	for(int i = 0; i <= PWM_HW_MAX_PRESCALER_STEP; i++)
 	{
-		period = CLOCK_FREQ / (BV(i) * freq);
+		period = CPU_FREQ / (BV(i) * freq);
 // 		LOG_INFO("period[%ld], prescale[%d]\n", period, i);
 		if ((period < PWM_HW_MAX_PERIOD) && (period != 0))
 		{

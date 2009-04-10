@@ -40,7 +40,7 @@
 
 
 #include "pwm_avr.h"
-#include "hw/hw_cpu.h"
+#include <hw/hw_cpufreq.h>
 
 #warning TODO:This is an exmple of implementation of PWM low level channel for AVR, implemnt it!
 

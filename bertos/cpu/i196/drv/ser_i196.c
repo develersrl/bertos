@@ -111,7 +111,7 @@ INTERRUPT(0x32) void RI_interrupt(void)
 static void ser_setbaudrate(unsigned long rate)
 {
 	// Calcola il periodo per la generazione del baud rate richiesto
-	uint16_t baud = (uint16_t)(((CLOCK_FREQ / 16) / rate) - 1) | 0x8000;
+	uint16_t baud = (uint16_t)(((CPU_FREQ / 16) / rate) - 1) | 0x8000;
 	BAUD_RATE = (uint8_t)baud;
 	BAUD_RATE = (uint8_t)(baud >> 8);
 }

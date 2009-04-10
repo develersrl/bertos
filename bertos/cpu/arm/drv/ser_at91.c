@@ -39,7 +39,7 @@
  */
 
 #include "hw/hw_ser.h"  /* Required for bus macros overrides */
-#include "hw/hw_cpu.h"  /* CLOCK_FREQ */
+#include <hw/hw_cpufreq.h>  /* CPU_FREQ */
 
 #include "cfg/cfg_ser.h"
 #include <cfg/debug.h>
@@ -326,7 +326,7 @@ static void uart0_enabletxirq(struct SerialHardware *_hw)
 static void uart0_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned long rate)
 {
 	/* Compute baud-rate period */
-	US0_BRGR = CLOCK_FREQ / (16 * rate);
+	US0_BRGR = CPU_FREQ / (16 * rate);
 	//DB(kprintf("uart0_setbaudrate(rate=%lu): period=%d\n", rate, period);)
 }
 
@@ -421,7 +421,7 @@ static void uart1_enabletxirq(struct SerialHardware *_hw)
 static void uart1_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned long rate)
 {
 	/* Compute baud-rate period */
-	US1_BRGR = CLOCK_FREQ / (16 * rate);
+	US1_BRGR = CPU_FREQ / (16 * rate);
 	//DB(kprintf("uart0_setbaudrate(rate=%lu): period=%d\n", rate, period);)
 }
 
@@ -534,8 +534,8 @@ static void spi0_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned 
 {
 	SPI0_CSR0 &= ~SPI_SCBR;
 
-	ASSERT((uint8_t)DIV_ROUND(CLOCK_FREQ, rate));
-	SPI0_CSR0 |= DIV_ROUND(CLOCK_FREQ, rate) << SPI_SCBR_SHIFT;
+	ASSERT((uint8_t)DIV_ROUND(CPU_FREQ, rate));
+	SPI0_CSR0 |= DIV_ROUND(CPU_FREQ, rate) << SPI_SCBR_SHIFT;
 }
 
 #if CPU_ARM_AT91SAM7X128 || CPU_ARM_AT91SAM7X256
@@ -618,8 +618,8 @@ static void spi1_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned 
 {
 	SPI1_CSR0 &= ~SPI_SCBR;
 
-	ASSERT((uint8_t)DIV_ROUND(CLOCK_FREQ, rate));
-	SPI1_CSR0 |= DIV_ROUND(CLOCK_FREQ, rate) << SPI_SCBR_SHIFT;
+	ASSERT((uint8_t)DIV_ROUND(CPU_FREQ, rate));
+	SPI1_CSR0 |= DIV_ROUND(CPU_FREQ, rate) << SPI_SCBR_SHIFT;
 }
 #endif
 

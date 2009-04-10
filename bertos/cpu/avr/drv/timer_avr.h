@@ -43,7 +43,7 @@
 #ifndef DRV_TIMER_AVR_H
 #define DRV_TIMER_AVR_H
 
-#include "hw/hw_cpu.h"        /* CLOCK_FREQ */
+#include <hw/hw_cpufreq.h>        /* CPU_FREQ */
 
 #include "cfg/cfg_timer.h"     /* CONFIG_TIMER */
 #include <cfg/compiler.h>  /* uint8_t */
@@ -129,13 +129,13 @@
 
 
 /** Frequency of the hardware high precision timer. */
-#define TIMER_HW_HPTICKS_PER_SEC  DIV_ROUND(CLOCK_FREQ, TIMER_PRESCALER)
+#define TIMER_HW_HPTICKS_PER_SEC  DIV_ROUND(CPU_FREQ, TIMER_PRESCALER)
 
 /**
  * System timer: additional division after the prescaler
  * 12288000 / 64 / 192 (0..191) = 1 ms
  */
-#define OCR_DIVISOR  (DIV_ROUND(DIV_ROUND(CLOCK_FREQ, TIMER_PRESCALER), TIMER_TICKS_PER_SEC) - 1)
+#define OCR_DIVISOR  (DIV_ROUND(DIV_ROUND(CPU_FREQ, TIMER_PRESCALER), TIMER_TICKS_PER_SEC) - 1)
 
 /** Not needed, IRQ timer flag cleared automatically */
 #define timer_hw_irq() do {} while (0)

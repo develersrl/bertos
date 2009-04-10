@@ -41,7 +41,7 @@
 #ifndef HW_STEPPER_H
 #define HW_STEPPER_H
 
-#include "hw/hw_cpu.h"
+#include <hw/hw_cpufreq.h>
 
 #include <cfg/macros.h>
 
@@ -67,7 +67,7 @@ do { \
 /**
  * Stepper timer clock frequency.
  */
-#define STEPPER_CLOCK ((CLOCK_FREQ) >> STEPPER_PRESCALER_LOG2)
+#define STEPPER_CLOCK ((CPU_FREQ) >> STEPPER_PRESCALER_LOG2)
 
 /**
  * us delay to reset a stepper motor.

@@ -39,7 +39,7 @@
  * \author Francesco Sacchi <batt@develer.com>
  */
 
-#include "hw/hw_cpu.h"     /* for CLOCK_FREQ */
+#include <hw/hw_cpufreq.h>     /* for CPU_FREQ */
 #include "hw/hw_ser.h"     /* Required for bus macros overrides */
 
 #include "cfg/cfg_debug.h"
@@ -171,7 +171,7 @@
 	#define KDBG_RESTORE_IRQ(old)  do { IRQ_RESTORE((old)); } while(0)
 	typedef cpu_flags_t kdbg_irqsave_t;
 
-	#define KDBG_DELAY (((CLOCK_FREQ + CONFIG_KDEBUG_BAUDRATE / 2) / CONFIG_KDEBUG_BAUDRATE) + 7) / 14
+	#define KDBG_DELAY (((CPU_FREQ + CONFIG_KDEBUG_BAUDRATE / 2) / CONFIG_KDEBUG_BAUDRATE) + 7) / 14
 
 	static void _kdebug_bitbang_delay(void)
 	{
@@ -230,7 +230,7 @@ INLINE void kdbg_hw_init(void)
 		SER_BITBANG_INIT;
 	#else /* CONFIG_KDEBUG_PORT != 666 */
 		/* Compute the baud rate */
-		uint16_t period = DIV_ROUND(CLOCK_FREQ / 16UL, CONFIG_KDEBUG_BAUDRATE) - 1;
+		uint16_t period = DIV_ROUND(CPU_FREQ / 16UL, CONFIG_KDEBUG_BAUDRATE) - 1;
 
 		#if (CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281)
 			#if CONFIG_KDEBUG_PORT == 0

@@ -34,23 +34,31 @@
  *
  * \version $Id$
  *
- * \author Bernie Innocenti <bernie@codewiz.org>
+ * \author Francesco Sacchi <bernie@codewiz.org>
  */
 
-#ifndef HW_CPU_H
-#define HW_CPU_H
+#ifndef HW_CPUFREQ_H
+#define HW_CPUFREQ_H
 
-#warning TODO:This is an example implementation, you must implement it!
+#ifndef CPU_FREQ
+	#warning CPU_FREQ is not defined, you should upgrade to the new clock frequency defining method.
 
-/// CPU Clock frequency
-#define CLOCK_FREQ     (48023000L/* Implement me! */)
+	/*
+	 * This is DEPRECATED file, it will be removed in the next major release.
+	 * We have set up a new cpu frequency definition method.
+	 * The new macro CPU_FREQ should be defined as a compiler flag in the
+	 * makefile instead of the old CLOCK_FREQ macro. With new projects you should only
+	 * use the CPU_FREQ macro.
+	 *
+	 * With gcc you should add something like this:
+	 *
+	 * -D'CPU_FREQ=(12288000UL)'
+	 *
+	 * For backward compatibility the old method is still supported.
+	 */
+	#include "hw/hw_cpu.h"
 
+	#define CPU_FREQ (CLOCK_FREQ)
+#endif /* CPU_FREQ */
 
-/* Timer IRQ strobe */
-//#if CONFIG_TIMER_STROBE
-//	#define TIMER_STROBE_ON    /* Implement me! */
-//	#define TIMER_STROBE_OFF   /* Implement me! */
-//	#define TIMER_STROBE_INIT  /* Implement me! */
-//#endif /* CONFIG_TIMER_STROBE */
-
-#endif /*  HW_CPU_H */
+#endif /*  HW_CPUFREQ_H */

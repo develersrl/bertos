@@ -45,7 +45,7 @@
 #include <cfg/compiler.h>
 #include <appconfig.h>
 #include <cfg/macros.h> /* BV() */
-#include "hw/hw_cpu.h"
+#include <hw/hw_cpufreq.h>
 
 #include <avr/io.h>
 
@@ -111,7 +111,7 @@ void _ser_settimeouts(void)
 void _ser_setbaudrate(unsigned long rate)
 {
 	/* Compute baud-rate period */
-	uint16_t period = DIV_ROUND(CLOCK_FREQ / 16UL, rate) - 1;
+	uint16_t period = DIV_ROUND(CPU_FREQ / 16UL, rate) - 1;
 
 	UBRR0H = (period) >> 8;
 	UBRR0L = (period);

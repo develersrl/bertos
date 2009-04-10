@@ -40,7 +40,7 @@
 #ifndef DRV_AT91_TIMER_H
 #define DRV_AT91_TIMER_H
 
-#include "hw/hw_cpu.h"            /* CLOCK_FREQ */
+#include <hw/hw_cpufreq.h>            /* CPU_FREQ */
 
 #include "cfg/cfg_timer.h"     /* CONFIG_TIMER */
 #include <cfg/compiler.h>      /* uint8_t */
@@ -65,10 +65,10 @@
 
 	#define DEFINE_TIMER_ISR     void timer_handler(void)
 	#define TIMER_TICKS_PER_SEC  1000
-	#define TIMER_HW_CNT         (CLOCK_FREQ / (16 * TIMER_TICKS_PER_SEC) - 1)
+	#define TIMER_HW_CNT         (CPU_FREQ / (16 * TIMER_TICKS_PER_SEC) - 1)
 
 	/** Frequency of the hardware high-precision timer. */
-	#define TIMER_HW_HPTICKS_PER_SEC (CLOCK_FREQ / 16)
+	#define TIMER_HW_HPTICKS_PER_SEC (CPU_FREQ / 16)
 
 	/// Type of time expressed in ticks of the hardware high-precision timer
 	typedef uint32_t hptime_t;

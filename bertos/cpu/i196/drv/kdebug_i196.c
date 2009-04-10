@@ -43,7 +43,7 @@
 #include <cfg/debug.h>
 #include <cfg/macros.h> /* for BV() */
 #include <appconfig.h>
-#include <hw_cpu.h>     /* for CLOCK_FREQ */
+#include <hw/hw_cpufreq.h>     /* for CPU_FREQ */
 #include <hw_ser.h>     /* Required for bus macros overrides */
 
 

@@ -38,7 +38,7 @@
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
-#include "hw/hw_cpu.h"  /* CLOCK_FREQ */
+#include <hw/hw_cpufreq.h>  /* CPU_FREQ */
 
 #include "cfg/cfg_i2c.h"
 
@@ -237,7 +237,7 @@ void i2c_builtin_init(void)
 
 		/*
 		 * Set speed:
-		 * F = CLOCK_FREQ / (16 + 2*TWBR * 4^TWPS)
+		 * F = CPU_FREQ / (16 + 2*TWBR * 4^TWPS)
 		 */
 		#ifndef CONFIG_I2C_FREQ
 			#warning Using default value of 300000L for CONFIG_I2C_FREQ
@@ -245,7 +245,7 @@ void i2c_builtin_init(void)
 		#endif
 		#define TWI_PRESC 1       /* 4 ^ TWPS */
 
-		TWBR = (CLOCK_FREQ / (2 * CONFIG_I2C_FREQ * TWI_PRESC)) - (8 / TWI_PRESC);
+		TWBR = (CPU_FREQ / (2 * CONFIG_I2C_FREQ * TWI_PRESC)) - (8 / TWI_PRESC);
 		TWSR = 0;
 		TWCR = BV(TWEN);
 	);

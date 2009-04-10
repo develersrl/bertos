@@ -41,7 +41,7 @@
 #ifndef DRV_ADC_AT91_H
 #define DRV_ADC_AT91_H
 
-#include "hw/hw_cpu.h"
+#include <hw/hw_cpufreq.h>
 
 #include "cfg/cfg_adc.h"
 
@@ -57,7 +57,7 @@
  * Macro for computing correct value to write into ADC
  * register.
  */
-#define ADC_COMPUTED_PRESCALER    ((CLOCK_FREQ/(2 * CONFIG_ADC_CLOCK)) - 1)
+#define ADC_COMPUTED_PRESCALER    ((CPU_FREQ/(2 * CONFIG_ADC_CLOCK)) - 1)
 #define ADC_COMPUTED_STARTUPTIME  (((CONFIG_ADC_STARTUP_TIME * CONFIG_ADC_CLOCK)/ 8000000UL) - 1)
 #define ADC_COMPUTED_SHTIME       (((CONFIG_ADC_SHTIME * CONFIG_ADC_CLOCK)/1000000000UL) - 1)
 

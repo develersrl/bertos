@@ -40,19 +40,18 @@
 #warning FIXME:This module is obsolete, yuo must refactor it.
 
 #if 0
-#include "hw/hw_cpu.h"
+#include <hw/hw_cpufreq.h>
 #include "timer_simple_avr.h"
 #include <drv/wdt.h>
 #include <cfg/compiler.h>
 #include <cfg/macros.h> /* BV() */
-#include <hw_cpu.h>  /* CLOCK_FREQ */
 
 #include <avr/io.h>
 
 
 #define MS_PER_SEC       1000UL
 #define TIMER_PRESCALER  64UL
-#define TIMER_DELAY_1MS  (255 - CLOCK_FREQ / TIMER_PRESCALER / MS_PER_SEC)
+#define TIMER_DELAY_1MS  (255 - CPU_FREQ / TIMER_PRESCALER / MS_PER_SEC)
 
 /**
  * Wait \a time ms using timer 0.

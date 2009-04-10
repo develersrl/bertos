@@ -40,7 +40,7 @@
  */
 
 #include "hw/hw_ser.h"  /* Required for bus macros overrides */
-#include "hw/hw_cpu.h"  /* CLOCK_FREQ */
+#include <hw/hw_cpufreq.h>  /* CPU_FREQ */
 
 #include "cfg/cfg_ser.h"
 
@@ -377,7 +377,7 @@ static void uart0_enabletxirq(struct SerialHardware *_hw)
 static void uart0_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned long rate)
 {
 	/* Compute baud-rate period */
-	uint16_t period = DIV_ROUND(CLOCK_FREQ / 16UL, rate) - 1;
+	uint16_t period = DIV_ROUND(CPU_FREQ / 16UL, rate) - 1;
 
 #if !CPU_AVR_ATMEGA103
 	UBRR0H = (period) >> 8;
@@ -430,7 +430,7 @@ static void uart1_enabletxirq(struct SerialHardware *_hw)
 static void uart1_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned long rate)
 {
 	/* Compute baud-rate period */
-	uint16_t period = DIV_ROUND(CLOCK_FREQ / 16UL, rate) - 1;
+	uint16_t period = DIV_ROUND(CPU_FREQ / 16UL, rate) - 1;
 
 	UBRR1H = (period) >> 8;
 	UBRR1L = (period);

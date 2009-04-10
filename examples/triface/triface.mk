@@ -55,7 +55,7 @@ triface_CSRC = \
 triface_PCSRC += bertos/mware/formatwr.c
 
 
-triface_CFLAGS = -O2 -D'ARCH=(ARCH_TRIFACE)' -fno-strict-aliasing -Iexamples/triface -Ibertos/cpu/avr
+triface_CFLAGS = -O2 -D'ARCH=(ARCH_TRIFACE)' -D'CPU_FREQ=(14745600UL)' -fno-strict-aliasing -Iexamples/triface -Ibertos/cpu/avr
 triface_LDFLAGS = -Wl
 
 
@@ -78,7 +78,7 @@ boot_CSRC = \
 	bertos/kern/kfile.c \
 	#
 boot_PREFIX = avr-
-boot_CPPFLAGS = -D'ARCH=(ARCH_TRIFACE|ARCH_BOOT)' -Iexamples/triface/boot -Ibertos/cpu/avr
+boot_CPPFLAGS = -D'ARCH=(ARCH_TRIFACE|ARCH_BOOT)' -D'CPU_FREQ=(14745600UL)' -Iexamples/triface/boot -Ibertos/cpu/avr
 boot_CFLAGS = -Os -mcall-prologues
 boot_LDFLAGS = -Wl,--relax -Wl,--section-start=.text=$(BOOT_ADDR_START)
 
