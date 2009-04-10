@@ -17,7 +17,7 @@ VERBOSE=${VERBOSE:-1}
 
 CC=gcc
 #FIXME: -Ibertos/emul should not be needed
-CFLAGS="-W -Wall -Wextra -O0 -g3 -ggdb -Ibertos -Ibertos/emul -std=gnu99 -fno-builtin -D_DEBUG -DARCH=(ARCH_EMUL|ARCH_UNITTEST)"
+CFLAGS="-W -Wall -Wextra -O0 -g3 -ggdb -Ibertos -Ibertos/emul -std=gnu99 -fno-builtin -D_DEBUG -DARCH=(ARCH_EMUL|ARCH_UNITTEST) -DCPU_FREQ=(12288000UL)"
 
 CXX=g++
 CXXFLAGS="$CFLAGS"
