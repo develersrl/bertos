@@ -91,7 +91,6 @@ def mkGenerator(project_info, makefile):
     mk_data["$csrc"], mk_data["$pcsrc"], mk_data["$asrc"], mk_data["$constants"] = csrcGenerator(project_info)
     mk_data["$prefix"] = project_info.info("TOOLCHAIN")["path"].split("gcc")[0]
     mk_data["$suffix"] = project_info.info("TOOLCHAIN")["path"].split("gcc")[1]
-    mk_data["$cross"] = project_info.info("TOOLCHAIN")["path"].split("gcc")[0]
     mk_data["$main"] = os.path.basename(project_info.info("PROJECT_PATH")) + "/main.c"
     for key in mk_data:
         while makefile.find(key) != -1:
