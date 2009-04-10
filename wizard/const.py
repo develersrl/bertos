@@ -15,6 +15,7 @@ CPU_DEF = {
     "DEFINITION_PATH": "",
     "TOOLCHAIN": "",
     "CPU_TAGS": [],
+    "CPU_FLAG_NAME": "",
     "CORE_CPU": "",
     "SCRIPT_DIR": "",
     "HW_DIR": "",

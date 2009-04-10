@@ -85,6 +85,7 @@ def mkGenerator(project_info, makefile):
     """
     mk_data = {}
     mk_data["$pname"] = os.path.basename(project_info.info("PROJECT_PATH"))
+    mk_data["$cpuflag"] = project_info.info("CPU_INFOS")["CPU_FLAG_NAME"]
     mk_data["$cpuname"] = project_info.info("CPU_INFOS")["CORE_CPU"]
     mk_data["$cflags"] = " ".join(project_info.info("CPU_INFOS")["C_FLAGS"])
     mk_data["$ldflags"] = " ".join(project_info.info("CPU_INFOS")["LD_FLAGS"])
