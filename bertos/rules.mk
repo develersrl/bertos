@@ -121,7 +121,7 @@ endif
 ifneq ($$($(1)_CROSS),)
 	#deprecated: use PREFIX, SUFFIX and HOSTED mechanism instead
 	$(1)_PREFIX = $$($(1)_CROSS)
-	$(1)_SUFFIX = ""
+	$(1)_SUFFIX =
 endif
 
 $(1)_CC      ?= $$($(1)_PREFIX)$$(CC)$$($(1)_SUFFIX)
