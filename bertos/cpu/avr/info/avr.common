@@ -53,6 +53,9 @@ CPU_TAGS = ["harvard"]
 # Type of the toolchain we should use to compile the source for this CPU.
 TOOLCHAIN = "avr"
 
+# Name of the flag used by the build system to pass to the compiler the CPU type.
+CPU_FLAG_NAME = "MCU"
+
 # Where are locate the bertos directories
 SCRIPT_DIR = CPU_DIR + "avr/script/"
 HW_DIR = CPU_DIR + "avr/hw/"

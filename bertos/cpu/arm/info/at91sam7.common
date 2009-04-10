@@ -54,6 +54,9 @@ TOOLCHAIN = "arm"
 # If we use the GCC compiler we should pass some flags.
 CORE_CPU = "arm7tdmi"
 
+# Name of the flag used by the build system to pass to the compiler the CPU type.
+CPU_FLAG_NAME = "CPU"
+
 # Where are locate the bertos directories
 SCRIPT_DIR = CPU_DIR + "arm/script/"
 HW_DIR = CPU_DIR + "arm/hw/"
