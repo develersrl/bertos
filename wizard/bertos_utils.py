@@ -160,24 +160,24 @@ def findModuleFiles(module, project_info):
     # .c files related to the module and the cpu architecture
     for filename, path in findDefinitions(module + ".c", project_info) + \
             findDefinitions(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".c", project_info):
-        path = path.replace(project_info.info("SOURCES_PATH") + "/", "")
-        cfiles.append(path + "/" + filename)
+        path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
+        cfiles.append(path + os.sep + filename)
     # .s files related to the module and the cpu architecture
     for filename, path in findDefinitions(module + ".s", project_info) + \
             findDefinitions(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".s", project_info) + \
             findDefinitions(module + ".S", project_info) + \
             findDefinitions(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".S", project_info):
-        path = path.replace(project_info.info("SOURCES_PATH") + "/", "")
-        sfiles.append(path + "/" + filename)
+        path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
+        sfiles.append(path + os.sep + filename)
     # .c and .s files related to the module and the cpu tags
     for tag in project_info.info("CPU_INFOS")["CPU_TAGS"]:
         for filename, path in findDefinitions(module + "_" + tag + ".c", project_info):
-            path = path.replace(project_info.info("SOURCES_PATH") + "/", "")
-            cfiles.append(path + "/" + filename)
+            path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
+            cfiles.append(path + os.sep + filename)
         for filename, path in findDefinitions(module + "_" + tag + ".s", project_info) + \
                 findDefinitions(module + "_" + tag + ".S", project_info):
-            path = path.replace(project_info.info("SOURCES_PATH") + "/", "")
-            sfiles.append(path + "/" + filename)
+            path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
+            sfiles.append(path + os.sep + filename)
     return cfiles, sfiles
 
 def getSystemPath():
