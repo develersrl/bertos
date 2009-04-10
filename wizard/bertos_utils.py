@@ -89,6 +89,11 @@ def mkGenerator(project_info, makefile):
     mk_data["$cpuname"] = project_info.info("CPU_INFOS")["CORE_CPU"]
     mk_data["$cflags"] = " ".join(project_info.info("CPU_INFOS")["C_FLAGS"])
     mk_data["$ldflags"] = " ".join(project_info.info("CPU_INFOS")["LD_FLAGS"])
+    mk_data["$cppflags"] = " ".join(project_info.info("CPU_INFOS")["CPP_FLAGS"])
+    mk_data["$cppaflags"] = " ".join(project_info.info("CPU_INFOS")["CPPA_FLAGS"])
+    mk_data["$cxxflags"] = " ".join(project_info.info("CPU_INFOS")["CXX_FLAGS"])
+    mk_data["$asflags"] = " ".join(project_info.info("CPU_INFOS")["AS_FLAGS"])
+    mk_data["$arflags"] = " ".join(project_info.info("CPU_INFOS")["AR_FLAGS"])
     mk_data["$csrc"], mk_data["$pcsrc"], mk_data["$asrc"], mk_data["$constants"] = csrcGenerator(project_info)
     mk_data["$prefix"] = project_info.info("TOOLCHAIN")["path"].split("gcc")[0]
     mk_data["$suffix"] = project_info.info("TOOLCHAIN")["path"].split("gcc")[1]

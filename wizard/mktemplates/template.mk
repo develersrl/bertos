@@ -59,3 +59,8 @@ $pname_CPPASRC = $($pname_WIZARD_CPPASRC) $($pname_USER_CPPASRC)
 
 $pname_CFLAGS = $cflags
 $pname_LDFLAGS = $ldflags
+$pname_CPPFLAGS = $cppflags
+$pname_CPPAFLAGS = $cppaflags
+$pname_CXXFLAGS = $cxxflags
+$pname_ASFLAGS = $asflags
+$pname_ARFLAGS = $arflags
