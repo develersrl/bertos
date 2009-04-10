@@ -83,8 +83,8 @@ $pname_ASRC = $($pname_WIZARD_ASRC) $($pname_USER_ASRC)
 
 $pname_CFLAGS = $cflags
 $pname_LDFLAGS = $ldflags
-$pname_CPPFLAGS = $cppflags
-$pname_CPPAFLAGS = -D'CPU_FREQ=($cpuclockfreq)' $cppaflags
+$pname_CPPFLAGS = -D'CPU_FREQ=($cpuclockfreq)' $cppflags
+$pname_CPPAFLAGS = $cppaflags
 $pname_CXXFLAGS = $cxxflags
 $pname_ASFLAGS = $asflags
 $pname_ARFLAGS = $arflags
