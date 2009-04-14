@@ -32,16 +32,18 @@ def findSources(path):
     Analyzes the directory tree from path and return a dict with filename and
     path.
     """
+    if not path.endswith(os.sep):
+        path += os.sep
     file_dict = {}
     for root, dirs, files in os.walk(path):
         if root.find("svn") == -1:
-            file_dict[root] = {"dirs": [], "files": []}
+            file_dict[root.replace(path, "")] = {"dirs": [], "files": []}
             for dir in dirs:
                 if dir.find("svn") == -1:
-                    file_dict[root]["dirs"].append(dir)
+                    file_dict[root.replace(path, "")]["dirs"].append(dir)
             for file in files:
                 if file.endswith(const.EXTENSION_FILTER):
-                    file_dict[root]["files"].append(file)
+                    file_dict[root.replace(path, "")]["files"].append(file)
     return file_dict
 
 def codeliteProjectGenerator(project_info):
@@ -49,7 +51,7 @@ def codeliteProjectGenerator(project_info):
     Returns the string rapresenting the codelite project.
     """
     template = open("cltemplates/bertos.project", "r").read()
-    filelist = "\n".join(clFiles(findSources(project_info.info("PROJECT_PATH")), project_info.info("PROJECT_PATH")))
+    filelist = "\n".join(clFiles(findSources(project_info.info("PROJECT_PATH")), ""))
     while template.find("$filelist") != -1:
         template = template.replace("$filelist", filelist)
     project_name = os.path.basename(project_info.info("PROJECT_PATH"))
