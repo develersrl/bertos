@@ -66,6 +66,12 @@ class BVersionPage(BWizardPage):
         self.pageContent.versionList.setCurrentRow(-1)
         self.fillVersionList()
     
+    def setupUi(self):
+        """
+        Overload of the BWizardPage setupUi method.
+        """
+        self.pageContent.updateButton.setVisible(False)
+    
     ####
     
     ## Slots ##
