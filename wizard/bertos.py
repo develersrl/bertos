@@ -52,6 +52,7 @@ def showStartPage():
     QApplication.instance().dialog.show()
 
 def main():
+    os.chdir("./" + os.path.dirname(sys.argv[0]))
     app = QApplication(sys.argv)
     app.settings = QSettings("Develer", "Bertos Configurator")
     app.project = BProject.BProject()
