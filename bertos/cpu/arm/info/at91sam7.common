@@ -57,6 +57,9 @@ CORE_CPU = "arm7tdmi"
 # Name of the flag used by the build system to pass to the compiler the CPU type.
 CPU_FLAG_NAME = "CPU"
 
+# CPU default clock frequency
+CPU_DEFAULT_FREQ = "48023000UL"
+
 # Where are locate the bertos directories
 SCRIPT_DIR = CPU_DIR + "arm/scripts/"
 HW_DIR = CPU_DIR + "arm/hw/"

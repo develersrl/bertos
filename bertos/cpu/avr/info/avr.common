@@ -56,6 +56,9 @@ TOOLCHAIN = "avr"
 # Name of the flag used by the build system to pass to the compiler the CPU type.
 CPU_FLAG_NAME = "MCU"
 
+# CPU default clock frequency
+CPU_DEFAULT_FREQ = "8000000UL"
+
 # Where are locate the bertos directories
 SCRIPT_DIR = CPU_DIR + "avr/scripts/"
 HW_DIR = CPU_DIR + "avr/hw/"
