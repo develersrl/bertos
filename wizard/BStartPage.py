@@ -26,6 +26,7 @@ class BStartPage(QDialog):
     
     def setupUi(self):
         self.content = uic.loadUi(UI_LOCATION + "/start.ui", None)
+        self.setWindowIcon(QIcon(":/images/appicon.png"))
         layout = QVBoxLayout()
         layout.addWidget(self.content)
         self.setLayout(layout)
