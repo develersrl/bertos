@@ -8,5 +8,6 @@
 	<file>images/warning.png</file>
 	<file>images/error.png</file>
 	<file>images/folderopen.png</file>
+	<file>images/appicon.png</file>
   </qresource>
 </RCC>

@@ -31,6 +31,7 @@ class BWizard(QWizard):
     def __init__(self, page_list):
         QWizard.__init__(self)
         self.setWindowTitle(self.tr("Create a BeRTOS project"))
+        self.setWindowIcon(QIcon(":/images/appicon.png"))
         self.setOption(QWizard.DisabledBackButtonOnLastPage, True)
         self.addPages(page_list)
         self.connectSignals()
