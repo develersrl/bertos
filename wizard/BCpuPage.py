@@ -32,6 +32,8 @@ class BCpuPage(BWizardPage):
         Overload of the QWizardPage isComplete method.
         """
         if self.pageContent.cpuList.currentRow() != -1:
+            self.pageContent.frequencyLabel.setVisible(True)
+            self.pageContent.frequencySpinBox.setVisible(True)
             infos = qvariant_converter.getDict(self.pageContent.cpuList.currentItem().data(Qt.UserRole))
             for key, value in infos.items():
                 if type(CPU_DEF[key]) == list:
@@ -40,6 +42,7 @@ class BCpuPage(BWizardPage):
                     infos[key] = qvariant_converter.getString(value)
             self.setProjectInfo("CPU_INFOS", infos)
             self.setProjectInfo("CPU_NAME", unicode(self.pageContent.cpuList.currentItem().text()))
+            self.setProjectInfo("SELECTED_FREQ", unicode(long(self.pageContent.frequencySpinBox.value())))
             return True
         else:
             return False
@@ -55,12 +58,15 @@ class BCpuPage(BWizardPage):
         self.pageContent.cpuList.setSortingEnabled(True)
         self.pageContent.descriptionLabel.setVisible(False)
         self.pageContent.descriptionLabel.setText("")
+        self.pageContent.frequencyLabel.setVisible(False)
+        self.pageContent.frequencySpinBox.setVisible(False)
 
     def connectSignals(self):
         """
         Overload of the BWizardPage connectSignals method.
         """
         self.connect(self.pageContent.cpuList, SIGNAL("itemSelectionChanged()"), self.rowChanged)
+        self.connect(self.pageContent.frequencySpinBox, SIGNAL("valueChanged(double)"), self.freqChanged)
 
     def reloadData(self):
         """
@@ -86,8 +92,15 @@ class BCpuPage(BWizardPage):
         """
         description = qvariant_converter.getDict(self.pageContent.cpuList.currentItem().data(Qt.UserRole))["CPU_DESC"]
         description = qvariant_converter.getStringList(description)
+        frequency = qvariant_converter.getDict(self.pageContent.cpuList.currentItem().data(Qt.UserRole))["CPU_DEFAULT_FREQ"]
+        frequency = qvariant_converter.getString(frequency)
+        frequency = frequency.replace("U", "").replace("L", "")
         self.pageContent.descriptionLabel.setText("<br>".join(description))
         self.pageContent.descriptionLabel.setVisible(True)
+        self.pageContent.frequencySpinBox.setValue(long(frequency))
+        self.emit(SIGNAL("completeChanged()"))
+    
+    def freqChanged(self):
         self.emit(SIGNAL("completeChanged()"))
 
     ####

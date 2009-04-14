@@ -34,7 +34,8 @@ CPU_DEF = {
     "C_SRC": [],
     "SUPPORTED_DRV" : [],
     "PC_SRC" : [],
-    "CPU_DESC" : []
+    "CPU_DESC" : [],
+    "CPU_DEFAULT_FREQ": "1"
 }
 
 TOOLCHAIN_ITEMS = ("ld", "as")
