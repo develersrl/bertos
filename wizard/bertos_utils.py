@@ -53,13 +53,21 @@ def createBertosProject(project_info):
     cfgdir = prjdir + "/cfg"
     shutil.rmtree(cfgdir, True)
     os.mkdir(cfgdir)
+    # Set to 1 the autoenabled for enabled modules
+    for module, information in project_info.info("MODULES").items():
+        if information["enabled"] and "configuration" in information and information["configuration"] != "":
+            configurations = project_info.info("CONFIGURATIONS")
+            configuration = configurations[information["configuration"]]
+            for start, parameter in configuration["paramlist"]:
+                if "type" in configuration[parameter] and configuration[parameter]["type"] == "autoenabled":
+                    configuration[parameter]["value"] = "1"
+            project_info.setInfo("CONFIGURATIONS", configurations)
+    # Copy all the configuration files
     for configuration, information in project_info.info("CONFIGURATIONS").items():
         string = open(sources_dir + "/" + configuration, "r").read()
         for start, parameter in information["paramlist"]:
             infos = information[parameter]
             value = infos["value"]
-            if "type" in infos["informations"] and infos["informations"]["type"] == "autoenabled":
-                value = "1"
             if "unsigned" in infos["informations"].keys() and infos["informations"]["unsigned"]:
                 value += "U"
             if "long" in infos["informations"].keys() and infos["informations"]["long"]:
