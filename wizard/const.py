@@ -4,7 +4,7 @@
 # Copyright 2008 Develer S.r.l. (http://www.develer.com/)
 # All rights reserved.
 #
-# $Id:$
+# $Id$
 #
 # Author: Lorenzo Berni <duplo@develer.com>
 #
@@ -56,6 +56,10 @@ EXTENSION_FILTER = (
     ".c++",
     ".mk",
     "Makefile",
+)
+
+IGNORE_LIST = (
+    "*svn*",
 )
 
 MODULE_DEFINITION = {

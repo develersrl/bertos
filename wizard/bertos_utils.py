@@ -4,7 +4,7 @@
 # Copyright 2008 Develer S.r.l. (http://www.develer.com/)
 # All rights reserved.
 #
-# $Id:$
+# $Id$
 #
 # Author: Lorenzo Berni <duplo@develer.com>
 #
@@ -14,6 +14,8 @@ import fnmatch
 import glob
 import re
 import shutil
+# Use custom copytree function
+import copytree
 import pickle
 
 import const
@@ -37,7 +39,7 @@ def createBertosProject(project_info):
     # Destination source dir
     srcdir = directory + "/bertos"
     shutil.rmtree(srcdir, True)
-    shutil.copytree(sources_dir + "/bertos", srcdir)
+    copytree.copytree(sources_dir + "/bertos", srcdir, ignore_list=const.IGNORE_LIST)
     # Destination makefile
     makefile = directory + "/Makefile"
     if os.path.exists(makefile):
