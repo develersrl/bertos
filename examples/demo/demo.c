@@ -31,7 +31,7 @@
  *
  * \brief Multifunction system test for BeRTOS modules.
  *
- * \version $Id: demo.c 18242 2007-10-08 17:35:23Z marco $
+ * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 

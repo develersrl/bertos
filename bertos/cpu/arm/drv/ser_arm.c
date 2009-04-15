@@ -32,7 +32,7 @@
  *
  * \brief Low-level serial module for ARM (inplementation).
  *
- * \version $Id: timer_arm.c 18260 2007-10-11 14:08:10Z batt $
+ * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  *

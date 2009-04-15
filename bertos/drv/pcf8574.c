@@ -40,7 +40,7 @@
  * each pin as input or output, see datasheet on how this
  * is achieved.
  *
- * \version $Id: ft245rl.c 22301 2008-09-09 16:53:17Z batt $
+ * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  */
 

@@ -32,7 +32,7 @@
  *
  * \brief I2C bitbang driver (implementation)
  *
- * \version $Id: adc.c 1604 2008-08-10 17:19:51Z bernie $
+ * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  */
 

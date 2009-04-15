@@ -40,7 +40,7 @@
  * In the POSIX implementaiton, context switching is done by the portable
  * SVR4 swapcontext() facility.
  *
- * \version $Id: proc.c 1616 2008-08-10 19:41:26Z bernie $
+ * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 

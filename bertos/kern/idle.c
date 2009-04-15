@@ -31,7 +31,7 @@
  *
  * \brief Idle loop for preemptive scheduling
  *
- * \version $Id: proc.c 1616 2008-08-10 19:41:26Z bernie $
+ * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 

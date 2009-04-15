@@ -32,7 +32,7 @@
  *
  * \brief General pourpose double-linked lists
  *
- * \version $Id: list.h 1594 2008-08-10 12:20:10Z bernie $
+ * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 

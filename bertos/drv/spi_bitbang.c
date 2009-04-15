@@ -33,7 +33,7 @@
  *
  * \brief Emulated SPI Master for DSP firmware download (impl.)
  *
- * \version $Id: spi.c 15328 2007-03-21 15:07:04Z batt $
+ * \version $Id$
  *
  * \author Francesco Sacchi <batt@develer.com>
  * \author Daniele Basile <asterix@develer.com>

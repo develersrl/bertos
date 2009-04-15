@@ -60,7 +60,7 @@
  * location and head points to the first one:
  *		\code head == begin && tail == end \endcode
  *
- * \version $Id: fifobuf.h 1532 2008-08-04 07:21:26Z bernie $
+ * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 

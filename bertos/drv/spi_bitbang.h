@@ -33,7 +33,7 @@
  *
  * \brief Emulated SPI driver.
  *
- * \version $Id: spi.h 15321 2007-03-21 14:45:12Z asterix $
+ * \version $Id$
  *
  * \author Francesco Sacchi <batt@develer.com>
  * \author Daniele Basile <asterix@develer.com>

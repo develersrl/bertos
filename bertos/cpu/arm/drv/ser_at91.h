@@ -33,7 +33,7 @@
  *
  * \brief High level serial I/O API
  *
- * \version $Id: ser_at91.h 20552 2008-02-14 16:40:41Z batt $
+ * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 

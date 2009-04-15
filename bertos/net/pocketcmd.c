@@ -50,7 +50,7 @@
  * The CMD ID used is the same supplied by the master when
  * the command was sent.
  *
- * \version $Id: pocketcmd.c 16587 2007-10-02 14:31:02Z batt $
+ * \version $Id$
  *
  * \author Francesco Sacchi <batt@develer.com>
  */

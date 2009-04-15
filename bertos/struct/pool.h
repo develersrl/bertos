@@ -31,7 +31,7 @@
  *
  * \brief Pool macros.
  *
- * \version $Id: pool.h 1294 2008-05-20 13:43:57Z asterix $
+ * \version $Id$
  * \author Giovanni Bajo <rasky@develer.com>
  */
 

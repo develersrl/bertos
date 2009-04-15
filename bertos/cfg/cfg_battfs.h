@@ -32,7 +32,7 @@
  *
  * \brief Configuration file for BattFS module.
  *
- * \version $Id: cfg_adc.h 1603 2008-08-10 17:18:44Z bernie $
+ * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 

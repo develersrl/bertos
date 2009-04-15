@@ -32,7 +32,7 @@
  *
  * \brief Simple cooperative multitasking scheduler.
  *
- * \version $Id: proc.c 1616 2008-08-10 19:41:26Z bernie $
+ * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  */

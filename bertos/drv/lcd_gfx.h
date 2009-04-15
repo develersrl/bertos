@@ -31,7 +31,7 @@
  * This file is part of DevLib - See README.devlib for information.
  * -->
  *
- * \version $Id: lcd_gfx.h,v 1.6 2006/07/19 12:56:25 bernie Exp $
+ * \version $Id$
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>

@@ -36,7 +36,7 @@
  * in this form also within the implementation. This would probably remove
  * memory alignment problems, and also some aliasing issues.
  *
- * \version $Id: heap.h 1532 2008-08-04 07:21:26Z bernie $
+ * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 

@@ -31,7 +31,7 @@
  *
  * \brief PocketBus command abstraction layer.
  *
- * \version $Id: pocketcmd.h 20030 2007-12-04 16:16:09Z batt $
+ * \version $Id$
  *
  * \author Francesco Sacchi <batt@develer.com>
  *

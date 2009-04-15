@@ -29,7 +29,7 @@
  * Copyright 2007 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \version $Id: pocketbus.h 20131 2007-12-13 17:39:55Z batt $
+ * \version $Id$
  *
  * \author Francesco Sacchi <batt@develer.com>
  *

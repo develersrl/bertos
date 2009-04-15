@@ -34,7 +34,7 @@
  * \brief ARM UART and SPI I/O driver
  *
  *
- * \version $Id: ser_at91.c 20881 2008-03-04 14:07:02Z batt $
+ * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 
