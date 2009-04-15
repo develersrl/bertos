@@ -4,7 +4,7 @@
 # Copyright 2008 Develer S.r.l. (http://www.develer.com/)
 # All rights reserved.
 #
-# $Id:$
+# $Id$
 #
 # Author: Lorenzo Berni <duplo@develer.com>
 #
@@ -34,6 +34,7 @@ class BFolderPage(BWizardPage):
         """
         Overload of the QWizardPage isComplete method.
         """
+        self.setDefaultFolder(self._destination_folder)
         if self.pageContent.projectPath.text() != "None":
             self.setProjectInfo("PROJECT_PATH", unicode(self.pageContent.projectPath.text()))
             return True
@@ -91,7 +92,11 @@ class BFolderPage(BWizardPage):
         Initializes the page attributes to the default values.
         """
         self._project_name = ""
-        self._destination_folder = os.path.expanduser("~")
+        stored_folder = self.defaultFolder()
+        if stored_folder != "":
+            self._destination_folder = stored_folder
+        else:
+            self._destination_folder = os.path.expanduser("~")
         self.pageContent.directoryEdit.setText(self._destination_folder)
     
     def setProjectPath(self):

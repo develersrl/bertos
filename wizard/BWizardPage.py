@@ -4,7 +4,7 @@
 # Copyright 2008 Develer S.r.l. (http://www.develer.com/)
 # All rights reserved.
 #
-# $Id:$
+# $Id$
 #
 # Author: Lorenzo Berni <duplo@develer.com>
 #
@@ -121,6 +121,18 @@ class BWizardPage(QWizardPage):
         Stores the toolchains in the QSettings.
         """
         self.settingsStore("toolchains", qvariant_converter.convertBoolDict(toolchains))
+    
+    def defaultFolder(self):
+        """
+        Returns the default save folder stored in the QSettings.
+        """
+        return qvariant_converter.getString(self.settingsRetrieve("folder"))
+    
+    def setDefaultFolder(self, folder):
+        """
+        Stores the default save folder in the QSettings.
+        """
+        self.settingsStore("folder", qvariant_converter.convertString(folder))
 
     ####
     
