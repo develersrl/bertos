@@ -95,6 +95,11 @@ class BFolderPage(BWizardPage):
         stored_folder = self.defaultFolder()
         if stored_folder != "":
             self._destination_folder = stored_folder
+        elif os.name == "nt":
+            from win32com.shell import shell, shellcon
+            self._destination_folder = shell.SHGetFolderPath(0, shellcon.CSIDL_PERSONAL, 0, 0)
+            del shell
+            del shellcon
         else:
             self._destination_folder = os.path.expanduser("~")
         self.pageContent.directoryEdit.setText(self._destination_folder)
