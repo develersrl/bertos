@@ -4,7 +4,7 @@
 # Copyright 2008 Develer S.r.l. (http://www.develer.com/)
 # All rights reserved.
 #
-# $Id:$
+# $Id$
 #
 # Author: Lorenzo Berni <duplo@develer.com>
 #
@@ -26,7 +26,8 @@ class BVersionPage(BWizardPage):
     
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/bertos_versions.ui")
-        self.setTitle(self.tr("Select the BeRTOS version needed"))
+        self.setTitle(self.tr("Select the BeRTOS directory"))
+        self.setSubTitle(self.tr("The project created will be based on the BeRTOS version found"))
 
     ## Overloaded QWizardPage methods ##
     
