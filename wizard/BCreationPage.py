@@ -4,7 +4,7 @@
 # Copyright 2009 Develer S.r.l. (http://www.develer.com/)
 # All rights reserved.
 #
-# $Id:$
+# $Id$
 #
 # Author: Lorenzo Berni <duplo@develer.com>
 #
@@ -52,8 +52,13 @@ class BCreationPage(BWizardPage):
         toolchain_info = self.projectInfo("TOOLCHAIN")
         if "target" in toolchain_info.keys():
             toolchain_target = QTreeWidgetItem(toolchain_title, QStringList([self.tr("target: " + toolchain_info["target"])]))
+        version = ""
         if "version" in toolchain_info.keys():
-            toolchain_target = QTreeWidgetItem(toolchain_title, QStringList([self.tr("version: " + "GCC " + toolchain_info["version"] + " (" + toolchain_info["build"] + ")")]))
+            version += "version: " + "GCC " + toolchain_info["version"] + " "
+        if "build" in toolchain_info.keys():
+            version += "(" + toolchain_info["build"] + ")"
+        if "version" in toolchain_info.keys():
+            toolchain_target = QTreeWidgetItem(toolchain_title, QStringList([version]))
         toolchain_path = QTreeWidgetItem(toolchain_title, QStringList([self.tr("path: " + os.path.normpath(toolchain_info["path"]))]))
         top_level.append(toolchain_title)
         module_title = QTreeWidgetItem(QStringList([self.tr("Modules")]))
