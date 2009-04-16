@@ -73,7 +73,7 @@ enum
 SER_UART0,
 SER_UART1,
 SER_SPI0,
-#if CPU_ARM_AT91SAM7X128 || CPU_ARM_AT91SAM7X256
+#if CPU_ARM_SAM7X
 SER_SPI1,
 #endif
 SER_CNT  /**< Number of serial ports */

@@ -82,7 +82,7 @@
 #endif
 
 
-#if CPU_ARM_AT91SAM7S256 || CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128
+#if CPU_ARM_SAM7S_LARGE || CPU_ARM_SAM7X
 	/**
 	* With a 18.420MHz cristal, master clock is:
 	* (((18.420 * PLL_MUL_VAL + 1) / PLL_DIV_VAL) / AT91MCK_PRES) = 48.023MHz

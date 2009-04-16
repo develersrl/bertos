@@ -51,6 +51,7 @@
 
 	#if defined(__ARM_AT91SAM7S64__)
 		#define CPU_ARM_AT91         1
+		#define CPU_ARM_SAM7S_LARGE  1
 		#define CPU_ARM_AT91SAM7S64  1
 	#else
 		#define CPU_ARM_AT91SAM7S64  0
@@ -58,6 +59,7 @@
 
 	#if defined(__ARM_AT91SAM7S128__)
 		#define CPU_ARM_AT91         1
+		#define CPU_ARM_SAM7S_LARGE  1
 		#define CPU_ARM_AT91SAM7S128 1
 	#else
 		#define CPU_ARM_AT91SAM7S128 0
@@ -65,14 +67,24 @@
 
 	#if defined(__ARM_AT91SAM7S256__)
 		#define CPU_ARM_AT91         1
+		#define CPU_ARM_SAM7S_LARGE  1
 		#define CPU_ARM_AT91SAM7S256 1
 	#else
 		#define CPU_ARM_AT91SAM7S256 0
 	#endif
 
+	#if defined(__ARM_AT91SAM7S512__)
+		#define CPU_ARM_AT91         1
+		#define CPU_ARM_SAM7S_LARGE  1
+		#define CPU_ARM_AT91SAM7S512 1
+	#else
+		#define CPU_ARM_AT91SAM7S512 0
+	#endif
+
 	// AT91SAM7X core family
 	#if defined(__ARM_AT91SAM7X128__)
 		#define CPU_ARM_AT91         1
+		#define CPU_ARM_SAM7X        1
 		#define CPU_ARM_AT91SAM7X128 1
 	#else
 		#define CPU_ARM_AT91SAM7X128 0
@@ -80,9 +92,19 @@
 
 	#if defined(__ARM_AT91SAM7X256__)
 		#define CPU_ARM_AT91         1
+		#define CPU_ARM_SAM7X        1
 		#define CPU_ARM_AT91SAM7X256 1
 	#else
 		#define CPU_ARM_AT91SAM7X256 0
+	#endif
+
+
+	#if defined(__ARM_AT91SAM7X512__)
+		#define CPU_ARM_AT91         1
+		#define CPU_ARM_SAM7X        1
+		#define CPU_ARM_AT91SAM7X512 1
+	#else
+		#define CPU_ARM_AT91SAM7X512 0
 	#endif
 
 	#if defined (__ARM_LM3S1968__)
@@ -92,12 +114,21 @@
 		#define CPU_ARM_LM3S1968    0
 	#endif
 
+	#if !defined(CPU_ARM_SAM7S_LARGE)
+		#define CPU_ARM_SAM7S_LARGE 0
+	#endif
+
+	#if !defined(CPU_ARM_SAM7X)
+		#define CPU_ARM_SAM7X 0
+	#endif
 
 
 	#if defined(CPU_ARM_AT91)
 		#if CPU_ARM_AT91SAM7S32 + CPU_ARM_AT91SAM7S64 \
 		+ CPU_ARM_AT91SAM7S128 + CPU_ARM_AT91SAM7S256 \
-		+ CPU_ARM_AT91SAM7X128 + CPU_ARM_AT91SAM7X256 != 1
+		+ CPU_ARM_AT91SAM7S512 \
+		+ CPU_ARM_AT91SAM7X128 + CPU_ARM_AT91SAM7X256 \
+		+ CPU_ARM_AT91SAM7X512 != 1
 			#error ARM CPU configuration error
 		#endif
 		#define CPU_ARM_LM3S        0
@@ -124,13 +155,19 @@
 	#define CPU_ARM_AT91            0
 	#define CPU_ARM_LM3S            0
 
+	/* SAM7 sub-families */
+	#define CPU_ARM_SAM7S_LARGE     0
+	#define CPU_ARM_SAM7X           0
+
 	/* ARM CPUs */
 	#define CPU_ARM_AT91SAM7S32     0
 	#define CPU_ARM_AT91SAM7S64     0
 	#define CPU_ARM_AT91SAM7S128    0
 	#define CPU_ARM_AT91SAM7S256    0
+	#define CPU_ARM_AT91SAM7S512    0
 	#define CPU_ARM_AT91SAM7X128    0
 	#define CPU_ARM_AT91SAM7X256    0
+	#define CPU_ARM_AT91SAM7X512    0
 
 	#define CPU_ARM_LM3S1968        0
 #endif

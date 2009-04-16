@@ -76,7 +76,7 @@
 
 #include <cfg/compiler.h>
 
-#if CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128 || CPU_ARM_AT91SAM7S256
+#if CPU_ARM_SAM7X || CPU_ARM_SAM7S_LARGE
 	#define FLASH_BASE      0x100000UL
 	#define RAM_BASE        0x200000UL
 
@@ -100,7 +100,7 @@
 	#define VREG_BASE       0xFFFFFD60      ///< Voltage regulator mode controller base address.
 	#define MC_BASE         0xFFFFFF00      ///< Memory controller base.
 
-	#if CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128
+	#if CPU_ARM_SAM7X
 		#define CAN_BASE        0xFFFD0000      ///< PWM controller base address.
 		#define EMAC_BASE       0xFFFDC000      ///< Ethernet MAC address.
 		#define SPI0_BASE       0xFFFE0000      ///< SPI0 base address.
@@ -108,7 +108,7 @@
 		#define PIOB_BASE       0xFFFFF600      ///< PIO base address.
 	#endif
 
-	#if CPU_ARM_AT91SAM7S256
+	#if CPU_ARM_SAM7S_LARGE
 		#define SPI_BASE        0xFFFE0000      ///< SPI0 base address.
 	#endif
 
@@ -147,7 +147,7 @@
  * Peripheral Identifiers and Interrupts
  *\{
  */
-#if CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7S256 || CPU_ARM_AT91SAM7X128
+#if CPU_ARM_SAM7X || CPU_ARM_SAM7S_LARGE
 	#define FIQ_ID      0       ///< Fast interrupt ID.
 	#define SYSC_ID     1       ///< System controller interrupt.
 	#define US0_ID      6       ///< USART 0 ID.
@@ -163,7 +163,7 @@
 	#define IRQ0_ID     30      ///< External interrupt 0 ID.
 	#define IRQ1_ID     31      ///< External interrupt 1 ID.
 
-	#if CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128
+	#if CPU_ARM_SAM7X
 		#define PIOA_ID     2       ///< Parallel A I/O controller ID.
 		#define PIOB_ID     3       ///< Parallel B I/O controller ID.
 		#define SPI0_ID     4       ///< Serial peripheral interface 0 ID.
@@ -175,7 +175,7 @@
 
 	#endif
 
-	#if CPU_ARM_AT91SAM7S256
+	#if CPU_ARM_SAM7S_LARGE
 		#define PIOA_ID     2       ///< Parallel I/O controller ID.
 		/* ID 3 is reserved */
 		#define ADC_ID      4       ///< Analog to digital converter ID.
@@ -193,14 +193,14 @@
  * USART & DEBUG pin names
  *\{
  */
-#if CPU_ARM_AT91SAM7S256
+#if CPU_ARM_SAM7S_LARGE
 	#define RXD0        5
 	#define TXD0        6
 	#define RXD1       21
 	#define TXD1       22
 	#define DTXD       10
 	#define DRXD        9
-#elif CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128
+#elif CPU_ARM_SAM7X
 	#define RXD0        0 // PA0
 	#define TXD0        1 // PA1
 	#define RXD1        5 // PA5
@@ -216,13 +216,13 @@
  * SPI pins name
  *\{
  */
-#if CPU_ARM_AT91SAM7S256
+#if CPU_ARM_SAM7S_LARGE
 	#define SPI0_NPCS0      11  // Same as NSS pin.
 	#define SPI0_MISO       12
 	#define SPI0_MOSI       13
 	#define SPI0_SPCK       14
 
-#elif CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128
+#elif CPU_ARM_SAM7X
 	#define SPI0_NPCS0  12 // Same as NSS pin. PA12
 	#define SPI0_NPCS1  13 // PA13
 	#define SPI0_NPCS2  14 // PA14
@@ -249,7 +249,7 @@
  * Timer counter pins definition.
  *\{
  */
-#if CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128
+#if CPU_ARM_SAM7X
 	#define TIOA0  23 // PB23
 	#define TIOB0  24 // PB24
 	#define TIOA1  25 // PB25
@@ -260,7 +260,7 @@
 	#define TIO_PIO_PDR     PIOB_PDR
 	#define TIO_PIO_ABSR    PIOB_ASR
 
-#elif CPU_ARM_AT91SAM7S256
+#elif CPU_ARM_SAM7S_LARGE
 	#define TIOA0  0 // PA0
 	#define TIOB0  1 // PA1
 	#define TIOA1  15 // PA15
@@ -282,7 +282,7 @@
  * PWM pins definition.
  *\{
  */
-#if CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128
+#if CPU_ARM_SAM7X
 	#define PWM0  19 // PB19
 	#define PWM1  20 // PB20
 	#define PWM2  21 // PB21
@@ -294,7 +294,7 @@
 	#define PWM_PIO_OER     PIOB_OER
 	#define PWM_PIO_ABSR    PIOB_ASR
 
-#elif CPU_ARM_AT91SAM7S256
+#elif CPU_ARM_SAM7S_LARGE
 	#define PWM0  11 // PA11
 	#define PWM1  12 // PA12
 	#define PWM2  13 // PA13
@@ -316,11 +316,11 @@
  * TWI pins definition.
  *\{
  */
-#if CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128
+#if CPU_ARM_SAM7X
 	#define TWD  10
 	#define TWCK 11
 
-#elif CPU_ARM_AT91SAM7S256
+#elif CPU_ARM_SAM7S_LARGE
 	#define TWD  3    //PA3
 	#define TWCK 4    //PA4
 
@@ -332,14 +332,14 @@
  * ADC pins definition.
  *\{
  */
-#if CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128
+#if CPU_ARM_SAM7X
 	#define ADTRG   18 // PB18
 	#define AD0     23 // PB27
 	#define AD1     24 // PB28
 	#define AD2     25 // PB29
 	#define AD3     26 // PB30
 
-#elif CPU_ARM_AT91SAM7S256
+#elif CPU_ARM_SAM7S_LARGE
 	#define ADTRG   18 // PA8
 	#define AD0      0 // PA17
 	#define AD1      1 // PA18

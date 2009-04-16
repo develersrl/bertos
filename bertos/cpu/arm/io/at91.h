@@ -75,7 +75,7 @@
 
 #include <cpu/detect.h>
 
-#if CPU_ARM_AT91SAM7S256 || CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128
+#if CPU_ARM_SAM7S_LARGE || CPU_ARM_SAM7X
 	#include "at91sam7.h"
 
 #else

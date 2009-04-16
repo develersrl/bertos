@@ -158,7 +158,7 @@
 #define TWI_GACC                0x00000020      ///< General call access.
 */
 
-#if CPU_ARM_AT91SAM7X256 || CPU_ARM_AT91SAM7X128
+#if CPU_ARM_SAM7X
 #define TWI_OVRE                         6      ///< Overrun error.
 #define TWI_UNRE                         7      ///< Underrun error.
 #endif

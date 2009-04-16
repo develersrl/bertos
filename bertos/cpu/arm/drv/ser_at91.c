@@ -84,7 +84,7 @@
 	 *
 	 * - Disable GPIO on USART0 tx/rx pins
 	 */
-	#if !CPU_ARM_AT91SAM7S256 && !CPU_ARM_AT91SAM7X256 && !CPU_ARM_AT91SAM7X128
+	#if !CPU_ARM_SAM7S_LARGE && !CPU_ARM_SAM7X
 		#warning Check USART0 pins!
 	#endif
 	#define SER_UART0_BUS_TXINIT do { \
@@ -124,7 +124,7 @@
 	 *
 	 * - Disable GPIO on USART1 tx/rx pins
 	 */
-	#if !CPU_ARM_AT91SAM7S256 && !CPU_ARM_AT91SAM7X256 && !CPU_ARM_AT91SAM7X128
+	#if !CPU_ARM_SAM7S_LARGE && !CPU_ARM_SAM7X
 		#warning Check USART1 pins!
 	#endif
 	#define SER_UART1_BUS_TXINIT do { \
@@ -181,7 +181,7 @@
 	#define SER_SPI0_BUS_TXCLOSE
 #endif
 
-#if CPU_ARM_AT91SAM7X128 || CPU_ARM_AT91SAM7X256
+#if CPU_ARM_SAM7X
 
 	#ifndef SER_SPI1_BUS_TXINIT
 		/**
@@ -231,7 +231,7 @@ static unsigned char uart1_rxbuffer[CONFIG_UART1_RXBUFSIZE];
 
 static unsigned char spi0_txbuffer[CONFIG_SPI0_TXBUFSIZE];
 static unsigned char spi0_rxbuffer[CONFIG_SPI0_RXBUFSIZE];
-#if CPU_ARM_AT91SAM7X128 || CPU_ARM_AT91SAM7X256
+#if CPU_ARM_SAM7X
 static unsigned char spi1_txbuffer[CONFIG_SPI1_TXBUFSIZE];
 static unsigned char spi1_rxbuffer[CONFIG_SPI1_RXBUFSIZE];
 #endif
@@ -261,7 +261,7 @@ struct ArmSerial
 static void uart0_irq_dispatcher(void);
 static void uart1_irq_dispatcher(void);
 static void spi0_irq_handler(void);
-#if CPU_ARM_AT91SAM7X128 || CPU_ARM_AT91SAM7X256
+#if CPU_ARM_SAM7X
 static void spi1_irq_handler(void);
 #endif
 /*
@@ -538,7 +538,7 @@ static void spi0_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned 
 	SPI0_CSR0 |= DIV_ROUND(CPU_FREQ, rate) << SPI_SCBR_SHIFT;
 }
 
-#if CPU_ARM_AT91SAM7X128 || CPU_ARM_AT91SAM7X256
+#if CPU_ARM_SAM7X
 /* SPI driver */
 static void spi1_init(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(struct Serial *, ser))
 {
@@ -677,7 +677,7 @@ static const struct SerialHardwareVT SPI0_VT =
 	C99INIT(txStart, spi0_starttx),
 	C99INIT(txSending, tx_sending),
 };
-#if CPU_ARM_AT91SAM7X128 || CPU_ARM_AT91SAM7X256
+#if CPU_ARM_SAM7X
 static const struct SerialHardwareVT SPI1_VT =
 {
 	C99INIT(init, spi1_init),
@@ -722,7 +722,7 @@ static struct ArmSerial UARTDescs[SER_CNT] =
 		},
 		C99INIT(sending, false),
 	},
-	#if CPU_ARM_AT91SAM7X128 || CPU_ARM_AT91SAM7X256
+	#if CPU_ARM_SAM7X
 	{
 		C99INIT(hw, /**/) {
 			C99INIT(table, &SPI1_VT),
@@ -903,7 +903,7 @@ static void spi0_irq_handler(void)
 }
 
 
-#if CPU_ARM_AT91SAM7X128 || CPU_ARM_AT91SAM7X256
+#if CPU_ARM_SAM7X
 /**
  * SPI1 interrupt handler
  */

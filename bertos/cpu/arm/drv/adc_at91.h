@@ -69,11 +69,11 @@
  * Define PIO controller for enable ADC function.
  * \{
  */
-#if CPU_ARM_AT91SAM7X256
+#if CPU_ARM_SAM7X
 	#define ADC_PIO_DISABLE           PIOB_PDR
 	#define ADC_PIO_EN_FUNC           PIOB_ASR
 
-#elif CPU_ARM_AT91SAM7S256
+#elif CPU_ARM_SAM7S_LARGE
 	#define ADC_PIO_DISABLE           PIOA_PDR
 	#define ADC_PIO_EN_FUNC           PIOA_BSR
 
