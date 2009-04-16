@@ -14,9 +14,9 @@ $constants
 # Our target application
 TRG += $pname
 
-$pname_PREFIX = $prefix
+$pname_PREFIX = "$prefix"
 
-$pname_SUFFIX = $suffix
+$pname_SUFFIX = "$suffix"
 
 $pname_$cpuflag = $cpuname
 
