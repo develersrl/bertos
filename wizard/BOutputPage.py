@@ -4,7 +4,7 @@
 # Copyright 2009 Develer S.r.l. (http://www.develer.com/)
 # All rights reserved.
 #
-# $Id:$
+# $Id$
 #
 # Author: Lorenzo Berni <duplo@develer.com>
 #
@@ -34,8 +34,6 @@ class BOutputPage(BWizardPage):
         """
         Connects the signals with the related slots.
         """
-        self.connect(self.pageContent.eclipseCheckBox, SIGNAL("stateChanged(int)"), lambda checked: self.modeChecked(checked, "eclipse"))
-        self.connect(self.pageContent.xcodeCheckBox, SIGNAL("stateChanged(int)"), lambda checked: self.modeChecked(checked, "xcode"))
         self.connect(self.pageContent.codeliteCheckBox, SIGNAL("stateChanged(int)"), lambda checked: self.modeChecked(checked, "codelite"))
     
     ####
