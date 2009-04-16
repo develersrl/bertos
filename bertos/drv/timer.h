@@ -37,6 +37,7 @@
  *
  * $WIZ$ module_name = "timer"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_timer.h"
+ * $WIZ$ module_supports = "not atmega103"
  */
 
 #ifndef DRV_TIMER_H

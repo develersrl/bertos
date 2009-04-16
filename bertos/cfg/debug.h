@@ -43,6 +43,7 @@
  * $WIZ$ module_configuration = "bertos/cfg/cfg_debug.h"
  * $WIZ$ DEBUG = 1
  * $WIZ$ module_depends = "formatwr"
+ * $WIZ$ module_supports = "not atmega103"
  */
 
 #ifndef BERTOS_DEBUG_H
