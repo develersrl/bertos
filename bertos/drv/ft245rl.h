@@ -38,6 +38,7 @@
  *
  * $WIZ$ module_name = "ft245rl"
  * $WIZ$ module_depends = "kfile", "timer"
+ * $WIZ$ module_hw = "bertos/hw/hw_ft245rl.h"
  */
 
 

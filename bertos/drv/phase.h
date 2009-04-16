@@ -39,7 +39,7 @@
  * $WIZ$ module_name = "phase"
  * $WIZ$ module_depends = "timer"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_phase.h"
- * }
+ * $WIZ$ module_hw = "bertos/hw/hw_phase.h", "bertos/hw/phase_map.h", "bertos/hw/hw_phase.c"
  */
 
 #ifndef DRV_PHASE_H

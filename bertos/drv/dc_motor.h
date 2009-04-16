@@ -39,6 +39,7 @@
  * $WIZ$ module_name = "dc_motor"
  * $WIZ$ module_depends = "pwm", "pid_control", "adc", "timer"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_dc_motor.h"
+ * $WIZ$ module_hw = "bertos/hw/hw_dc_motor.h"
  */
 
 #ifndef DRV_DC_MOTOR_H

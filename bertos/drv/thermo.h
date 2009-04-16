@@ -50,7 +50,7 @@
  * $WIZ$ module_name = "thermo"
  * $WIZ$ module_depends = "timer", "ntc"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_thermo.h"
- * }
+ * $WIZ$ module_hw = "bertos/hw/hw_thermo.h", "bertos/hw/thermo_map.h"
  */
 
 #ifndef DRV_THERMO_H

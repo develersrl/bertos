@@ -39,6 +39,7 @@
  *
  * $WIZ$ module_name = "ntc"
  * $WIZ$ module_depends = "adc"
+ * $WIZ$ module_hw = "bertos/hw/hw_ntc.h", "bertos/hw/ntc_map.h"
  */
 
 #ifndef DRV_NTC_H

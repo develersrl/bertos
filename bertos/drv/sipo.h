@@ -42,7 +42,7 @@
  * 
  * $WIZ$ module_name = "sipo"
  * $WIZ$ module_depends = "kfile"
- * $WIZ$ module_configuration = ""
+ * $WIZ$ module_hw = "bertos/hw/hw_sipo.h"
  * 
  */
 

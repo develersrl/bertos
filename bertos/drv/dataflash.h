@@ -39,7 +39,7 @@
  * $WIZ$ module_name = "dataflash"
  * $WIZ$ module_depends = "kfile"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_dataflash.h"
- * }
+ * $WIZ$ module_hw = "bertos/hw/hw_dataflash.h", "bertos/hw/hw_dataflash.c"
  */
 
 

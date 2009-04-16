@@ -39,6 +39,7 @@
  * $WIZ$ module_name = "ser"
  * $WIZ$ module_depends = "kfile", "timer"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_ser.h"
+ * $WIZ$ module_hw = "bertos/hw/hw_ser.h"
  */
 
 #ifndef DRV_SER_H

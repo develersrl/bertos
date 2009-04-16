@@ -36,7 +36,8 @@
  * \author Francesco Sacchi <batt@develer.com>
  *
  * $WIZ$ module_name = "i2c"
- * "configuration" : "bertos/cfg/cfg_i2c.h"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_i2c.h"
+ * $WIZ$ module_hw = "bertos/hw/hw_i2c_bitbang.h"
  */
  
 #ifndef DRV_I2C_H

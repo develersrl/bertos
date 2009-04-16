@@ -18,7 +18,7 @@
  * $WIZ$ module_name = "stepper"
  * $WIZ$ module_depends = "timer", "ramp"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_stepper.h"
- * }
+ * $WIZ$ module_hw = "bertos/hw/hw_stepper.h"
  */
 
 #ifndef DRV_STEPPER_H

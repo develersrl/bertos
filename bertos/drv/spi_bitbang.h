@@ -40,6 +40,7 @@
  *
  * $WIZ$ module_name = "spi_bitbang"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_spi_bitbang.h"
+ * $WIZ$ module_hw = "bertos/hw/hw_spi.h"
  */
 
 

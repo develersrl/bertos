@@ -37,11 +37,8 @@
  *
  * \brief Buzzer driver.
  *
- * $WIZARD = {
- * "name" : "buzzer"
- * "depends" : [],
- * "configuration" : ""
- * }
+ * $WIZ$ module_name = "buzzer"
+ * $WIZ$ module_hw = "bertos/hw/hw_buzzer.h"
  */
 
 #ifndef DRV_BUZZER_H
