@@ -38,7 +38,6 @@
  * \version $Id$
  *
  * $WIZ$ module_name = "text"
- * $WIZ$ module_harvard = "both"
  */
 
 #ifndef GFX_TEXT_H
