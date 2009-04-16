@@ -69,4 +69,5 @@ MODULE_DEFINITION = {
     "module_configuration": "module_configuration",
     "module_depends": "module_depends",
     "module_harvard": "module_harvard",
+    "module_hw": "module_hw",
 }

@@ -51,6 +51,15 @@ def createBertosProject(project_info):
     prjdir = directory + "/" + os.path.basename(directory)
     shutil.rmtree(prjdir, True)
     os.mkdir(prjdir)
+    # Destination hw files
+    hwdir = prjdir + "/hw"
+    shutil.rmtree(hwdir, True)
+    os.mkdir(hwdir)
+    # Copy all the hw files
+    for module, information in project_info.info("MODULES").items():
+        for hwfile in information["hw"]:
+            string = open(sources_dir + "/" + hwfile, "r").read()
+            open(hwdir + "/" + os.path.basename(hwfile), "w").write(string)
     # Destination configurations files
     cfgdir = prjdir + "/cfg"
     shutil.rmtree(cfgdir, True)
@@ -147,12 +156,16 @@ def csrcGenerator(project_info):
         dependency_files = set([])
         # assembly sources
         asm_files = set([])
+        hwdir = os.path.basename(project_info.info("PROJECT_PATH")) + "/hw" 
         if information["enabled"]:
             if "constants" in information:
                 constants.update(information["constants"])
             cfiles, sfiles = findModuleFiles(module, project_info)
             module_files |= set(cfiles)
             asm_files |= set(sfiles)
+            for file in information["hw"]:
+                if file.endswith(".c"):
+                    module_files |= set([hwdir + "/" + os.path.basename(file)])
             for file_dependency in information["depends"]:
                 if file_dependency in files:
                     dependencyCFiles, dependencySFiles = findModuleFiles(file_dependency, project_info)
@@ -343,6 +356,14 @@ def loadModuleDefinition(first_comment):
             if harvard == "both" or harvard == "pgm_memory":
                 module_dict[module_name]["harvard"] = harvard
             del module_definition[const.MODULE_DEFINITION["module_harvard"]]
+        if const.MODULE_DEFINITION["module_hw"] in module_definition.keys():
+            hw = module_definition[const.MODULE_DEFINITION["module_hw"]]
+            del module_definition[const.MODULE_DEFINITION["module_hw"]]
+            if type(hw) == str:
+                hw = (hw, )
+            module_dict[module_name]["hw"] = hw
+        else:
+            module_dict[module_name]["hw"] = ()
         module_dict[module_name]["constants"] = module_definition
         module_dict[module_name]["enabled"] = False
     return to_be_parsed, module_dict
