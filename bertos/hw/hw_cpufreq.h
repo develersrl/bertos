@@ -44,7 +44,7 @@
 	#warning CPU_FREQ is not defined, you should upgrade to the newer clock frequency defining method.
 
 	/*
-	 * This is DEPRECATED file, it will be removed in the next major release.
+	 * This file is DEPRECATED, it will be removed in the next major release.
 	 * We have set up a new cpu frequency definition method.
 	 * The new macro CPU_FREQ should be defined as a compiler flag in the
 	 * makefile instead of the old CLOCK_FREQ macro. With new projects you should only
