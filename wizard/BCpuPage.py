@@ -4,7 +4,7 @@
 # Copyright 2008 Develer S.r.l. (http://www.develer.com/)
 # All rights reserved.
 #
-# $Id:$
+# $Id$
 #
 # Author: Lorenzo Berni <duplo@develer.com>
 #
@@ -79,6 +79,9 @@ class BCpuPage(BWizardPage):
         self.setupUi()
         if not cpu_name is None:
             self.selectItem(cpu_name)
+        cpu_frequency = self.projectInfo("SELECTED_FREQ")
+        if not cpu_frequency is None:
+            self.pageContent.frequencySpinBox.setValue(cpu_frequency)
         QApplication.instance().restoreOverrideCursor()
         self.emit(SIGNAL("completeChanged()"))
 
