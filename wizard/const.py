@@ -59,7 +59,9 @@ EXTENSION_FILTER = (
 )
 
 IGNORE_LIST = (
-    "*svn*",
+    "*/.svn",
+    "*/CVS",
+    "*/.git",
 )
 
 MODULE_DEFINITION = {
