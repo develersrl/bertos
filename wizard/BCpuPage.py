@@ -44,6 +44,13 @@ class BCpuPage(BWizardPage):
             self.setProjectInfo("CPU_INFOS", infos)
             self.setProjectInfo("CPU_NAME", unicode(self.pageContent.cpuList.currentItem().text()))
             self.setProjectInfo("SELECTED_FREQ", unicode(long(self.pageContent.frequencySpinBox.value())))
+            tag_dict = self.projectInfo("ALL_CPU_TAGS")
+            for tag in tag_dict:
+                if tag in infos["CPU_TAGS"] + [infos["CPU_NAME"], infos["CORE_CPU"]]:
+                    tag_dict[tag] = "True"
+                else:
+                    tag_dict[tag] = "False"
+            self.setProjectInfo("ALL_CPU_TAGS", tag_dict)
             return True
         else:
             return False
@@ -119,6 +126,12 @@ class BCpuPage(BWizardPage):
         self.pageContent.cpuList.clear()
         self.pageContent.cpuList.setCurrentItem(None)
         infos = bertos_utils.loadCpuInfos(self.project())
+        tag_list = bertos_utils.getTagSet(infos)
+        # Create, fill and store the dict with the tags
+        tag_dict = {}
+        for element in tag_list:
+            tag_dict[element] = "False"
+        self.setProjectInfo("ALL_CPU_TAGS", tag_dict)
         for cpu in infos:
             item = QListWidgetItem(cpu["CPU_NAME"])
             item.setData(Qt.UserRole, qvariant_converter.convertDict(cpu))

@@ -301,6 +301,15 @@ def loadCpuInfos(project):
         cpuInfos.append(getInfos(definition))
     return cpuInfos
 
+def getTagSet(cpu_info):
+    tag_set = set([])
+    for cpu in cpu_info:
+        tag_set |= set([cpu["CPU_NAME"]])
+        tag_set |= set(cpu["CPU_TAGS"])
+        tag_set |= set([cpu["CORE_CPU"]])
+    return tag_set
+        
+
 def getInfos(definition):
     D = {}
     D.update(const.CPU_DEF)
@@ -337,10 +346,11 @@ def loadModuleDefinition(first_comment):
         del module_definition[const.MODULE_DEFINITION["module_name"]]
         module_dict[module_name] = {}
         if const.MODULE_DEFINITION["module_depends"] in module_definition.keys():
-            if type(module_definition[const.MODULE_DEFINITION["module_depends"]]) == str:
-                module_definition[const.MODULE_DEFINITION["module_depends"]] = (module_definition[const.MODULE_DEFINITION["module_depends"]],)
-            module_dict[module_name]["depends"] = module_definition[const.MODULE_DEFINITION["module_depends"]]
+            depends = module_definition[const.MODULE_DEFINITION["module_depends"]]
             del module_definition[const.MODULE_DEFINITION["module_depends"]]
+            if type(depends) == str:
+                depends = (depends,)
+            module_dict[module_name]["depends"] = depends
         else:
             module_dict[module_name]["depends"] = ()
         if const.MODULE_DEFINITION["module_configuration"] in module_definition.keys():
@@ -364,6 +374,10 @@ def loadModuleDefinition(first_comment):
             module_dict[module_name]["hw"] = hw
         else:
             module_dict[module_name]["hw"] = ()
+        if const.MODULE_DEFINITION["module_supports"] in module_definition.keys():
+            supports = module_definition[const.MODULE_DEFINITION["module_supports"]]
+            del module_definition[const.MODULE_DEFINITION["module_supports"]]
+            module_dict[module_name]["supports"] = supports
         module_dict[module_name]["constants"] = module_definition
         module_dict[module_name]["enabled"] = False
     return to_be_parsed, module_dict
