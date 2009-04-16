@@ -24,7 +24,7 @@ class BCpuPage(BWizardPage):
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/cpu_select.ui")
         self.setTitle(self.tr("Select the CPU"))
-        self.default_freqs = {}
+        self.freq_modified = False
     
     ## Overloaded QWizardPage methods ##
 
@@ -67,7 +67,7 @@ class BCpuPage(BWizardPage):
         Overload of the BWizardPage connectSignals method.
         """
         self.connect(self.pageContent.cpuList, SIGNAL("itemSelectionChanged()"), self.rowChanged)
-        self.connect(self.pageContent.frequencySpinBox, SIGNAL("valueChanged(double)"), self.freqChanged)
+        self.connect(self.pageContent.frequencySpinBox, SIGNAL("editingFinished()"), self.freqChanged)
 
     def reloadData(self):
         """
@@ -80,11 +80,6 @@ class BCpuPage(BWizardPage):
         self.setupUi()
         if not cpu_name is None:
             self.selectItem(cpu_name)
-        if self.default_freqs == {}:
-            for index in range(self.pageContent.cpuList.count()):
-                default_freq = qvariant_converter.getStringDict(self.pageContent.cpuList.item(index).data(Qt.UserRole))["CPU_DEFAULT_FREQ"]
-                default_freq = long(default_freq.replace("U", "").replace("L", ""))
-                self.default_freqs[default_freq] = default_freq
         QApplication.instance().restoreOverrideCursor()
         self.emit(SIGNAL("completeChanged()"))
 
@@ -98,24 +93,21 @@ class BCpuPage(BWizardPage):
         """
         description = qvariant_converter.getDict(self.pageContent.cpuList.currentItem().data(Qt.UserRole))["CPU_DESC"]
         description = qvariant_converter.getStringList(description)
-        # Retrieve the default cpu frequency
-        default_freq = qvariant_converter.getDict(self.pageContent.cpuList.currentItem().data(Qt.UserRole))["CPU_DEFAULT_FREQ"]
-        default_freq = qvariant_converter.getString(default_freq)
-        default_freq = long(default_freq.replace("U", "").replace("L", ""))
-        current_freq = self.default_freqs[default_freq]
+        if not self.freq_modified:
+            # Retrieve the default cpu frequency when the value isn't already modified
+            current_freq = qvariant_converter.getDict(self.pageContent.cpuList.currentItem().data(Qt.UserRole))["CPU_DEFAULT_FREQ"]
+            current_freq = qvariant_converter.getString(current_freq)
+            current_freq = long(current_freq.replace("U", "").replace("L", ""))
+            self.pageContent.frequencySpinBox.setValue(long(current_freq))
         self.pageContent.descriptionLabel.setText("<br>".join(description))
         self.pageContent.descriptionLabel.setVisible(True)
-        self.pageContent.frequencySpinBox.setValue(long(current_freq))
         self.emit(SIGNAL("completeChanged()"))
     
     def freqChanged(self):
         """
         Slot called when the user change the frequency value.
         """
-        default_freq = qvariant_converter.getDict(self.pageContent.cpuList.currentItem().data(Qt.UserRole))["CPU_DEFAULT_FREQ"]
-        default_freq = qvariant_converter.getString(default_freq)
-        default_freq = long(default_freq.replace("U", "").replace("L", ""))
-        self.default_freqs[default_freq] = long(self.pageContent.frequencySpinBox.value())
+        self.freq_modified = True
         self.emit(SIGNAL("completeChanged()"))
 
     ####
