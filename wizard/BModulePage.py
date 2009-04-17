@@ -46,6 +46,7 @@ class BModulePage(BWizardPage):
         self.pageContent.propertyTable.setColumnCount(2)
         self.pageContent.propertyTable.setRowCount(0)
         self.pageContent.moduleLabel.setVisible(False)
+        self.pageContent.warningLabel.setVisible(False)
     
     def connectSignals(self):
         """
@@ -77,11 +78,23 @@ class BModulePage(BWizardPage):
         """
         module = self.currentModule()
         if module is not None:
+            try:
+                supported = bertos_utils.isSupported(module, self.project())
+            except SupportedException, e:
+                self.exceptionOccurred(self.tr("Error evaluating \"%1\" for module %2").arg(e.support_string).arg(selectedModule))
+                supported = True
             self._control_group.clear()
             configuration = self.projectInfo("MODULES")[module]["configuration"]
             module_description = self.projectInfo("MODULES")[module]["description"]
             self.pageContent.moduleLabel.setText(module_description)
             self.pageContent.moduleLabel.setVisible(True)
+            if not supported:
+                self.pageContent.warningLabel.setVisible(True)
+                selected_cpu = self.projectInfo("CPU_NAME")
+                self.pageContent.warningLabel.setText(self.tr("<font color='#FF0000'>Warning: the selected module, \
+                    is not completely supported by the %1.</font>").arg(selected_cpu))
+            else:
+                self.pageContent.warningLabel.setVisible(False)
             self.pageContent.propertyTable.clear()
             self.pageContent.propertyTable.setRowCount(0)
             if configuration != "":
@@ -191,6 +204,13 @@ class BModulePage(BWizardPage):
             for module in module_list:
                 enabled = modules[module]["enabled"]
                 module_item = QTreeWidgetItem(item, QStringList([module]))
+                try:
+                    supported = bertos_utils.isSupported(module, self.project())
+                except SupportedException, e:
+                    self.exceptionOccurred(self.tr("Error evaluating \"%1\" for module %2").arg(e.support_string).arg(selectedModule))
+                    supported = True
+                if not supported:
+                    module_item.setForeground(0, QBrush(QColor(Qt.red)))
                 if enabled:
                     module_item.setCheckState(0, Qt.Checked)
                 else:
@@ -322,16 +342,6 @@ class BModulePage(BWizardPage):
         Resolves the selection dependencies.
         """
         modules = self.projectInfo("MODULES")
-        try:
-            supported = bertos_utils.isSupported(selectedModule, self.project())
-        except SupportedException, e:
-            self.exceptionOccurred(self.tr("Error evaluating \"%1\" for module %2").arg(e.support_string).arg(selectedModule))
-            supported = True
-        # Temporary feedback
-        if supported:
-            print "%s is supported" %selectedModule
-        else:
-            print "%s is not supported" %selectedModule
         modules[selectedModule]["enabled"] = True
         self.setProjectInfo("MODULES", modules)
         depends = self.projectInfo("MODULES")[selectedModule]["depends"]
