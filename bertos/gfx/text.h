@@ -38,6 +38,7 @@
  * \version $Id$
  *
  * $WIZ$ module_name = "text"
+ * $WIZ$ module_harvard = "pgm_memory"
  */
 
 #ifndef GFX_TEXT_H
