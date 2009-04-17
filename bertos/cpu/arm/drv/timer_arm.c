@@ -38,6 +38,9 @@
  */
 
 #include <cpu/detect.h>
+#include <cfg/cfg_arch.h>
+
+#if !(ARCH & ARCH_NIGHTTEST)
 
 #if CPU_ARM_AT91
 	#include "timer_at91.c"
@@ -45,3 +48,5 @@
 #else
 	#error Unknown CPU
 #endif
+
+#endif /* (ARCH & ARCH_NIGHTLYTEST) */
