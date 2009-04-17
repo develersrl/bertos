@@ -4,7 +4,7 @@
 # Copyright 2008 Develer S.r.l. (http://www.develer.com/)
 # All rights reserved.
 #
-# $Id:$
+# $Id$
 #
 # Author: Lorenzo Berni <duplo@develer.com>
 #
@@ -73,6 +73,6 @@ def main():
         showStartPage()
         sys.exit(app.exec_())
 
-if __name__ == '__main__' or (hasattr(sys, 'frozen') and sys.frozen):
+if __name__ == '__main__':
     main()
 
