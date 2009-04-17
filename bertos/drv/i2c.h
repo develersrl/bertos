@@ -38,7 +38,7 @@
  * $WIZ$ module_name = "i2c"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_i2c.h"
  * $WIZ$ module_hw = "bertos/hw/hw_i2c_bitbang.h"
- * $WIZ$ module_supports = "not atmega103"
+ * $WIZ$ module_supports = "not atmega103 and not atmega168"
  */
 
 #ifndef DRV_I2C_H

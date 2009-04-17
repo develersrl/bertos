@@ -40,7 +40,8 @@
  * $WIZ$ module_depends = "kfile", "timer"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_ser.h"
  * $WIZ$ module_hw = "bertos/hw/hw_ser.h"
- * $WIZ$ module_supports = "not atmega103"
+ * $WIZ$ module_supports =  "not atmega103 and not atmega168 "
+ * $WIZ$ module_supports += "and not atmega32 and not atmega8"
  */
 
 #ifndef DRV_SER_H
