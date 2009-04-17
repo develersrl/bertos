@@ -43,12 +43,9 @@
 
 #include <drv/timer.h>
 #include <drv/mcp41.h>
-#include <drv/ser.h>
+#include <kern/kfile.h>
 
-#warning FIXME:This implementation is obsolete. Refactor with KFile interface.
-
-#if 0
-static Serial *spi_ser;
+static KFile *ch;
 
 /**
  * Set resitance for digital pot \a dev
@@ -57,8 +54,9 @@ void mcp41_setResistance(Mcp41Dev dev, mcp41_res_t res)
 {
 	MCP41_ON(dev);
 	/* send command byte */
-	ser_putchar(MCP41_WRITE_DATA, spi_ser);
-	ser_putchar(((MCP41_HW_MAX * (uint32_t)res)  + (MCP41_MAX / 2)) / MCP41_MAX, spi_ser);
+	kfile_putc(MCP41_WRITE_DATA, ch);
+	kfile_putc(((MCP41_HW_MAX * (uint32_t)res)  + (MCP41_MAX / 2)) / MCP41_MAX, ch);
+	kfile_flush(ch);
 	ser_drain(spi_ser);
 
 	MCP41_OFF(dev);
@@ -68,7 +66,7 @@ void mcp41_setResistance(Mcp41Dev dev, mcp41_res_t res)
 /**
  * Initialize mcp41 potentiometer driver
  */
-void mcp41_init(Serial *spi_port)
+void mcp41_init(KFile *_ch)
 {
 	Mcp41Dev dev;
 
@@ -79,7 +77,5 @@ void mcp41_init(Serial *spi_port)
 		MCP41_OFF(dev);
 	}
 
-	spi_ser = spi_port;
+	ch = _ch;
 }
-
-#endif

@@ -31,10 +31,14 @@
  *
  * \version $Id$
  *
- * \brief MCP41xxx digital potentiomenter driver (interface)
+ * \brief MCP41xxx digital potentiomenter driver.
  *
  * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
+ *
+ * $WIZ$ module_name = "mcp41"
+ * $WIZ$ module_depends = "timer", "kfile"
+ * $WIZ$ module_hw = "bertos/hw/hw_mcp41.h"
  */
 
 #ifndef DRV_MCP41_H
@@ -43,7 +47,7 @@
 #include "hw/mcp41_map.h"
 #include <cfg/compiler.h>
 
-#include <drv/ser.h>
+#include <kern/kfile.h>
 
 #define MCP41_WRITE_DATA 0x11
 #define MCP41_HW_MAX     255
@@ -55,6 +59,6 @@
 typedef uint16_t mcp41_res_t;
 
 void mcp41_setResistance(Mcp41Dev dev, mcp41_res_t res);
-void mcp41_init(Serial *spi_port);
+void mcp41_init(KFile *ch);
 
 #endif /* DRV_MCP41_H */
