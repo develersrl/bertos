@@ -38,6 +38,7 @@ CPU_DIR="${BERTOS_DIR}/cpu"
 #Directory to exclude
 OS_DIR="${BERTOS_DIR}/os"
 EMUL_DIR="${BERTOS_DIR}/emul"
+WIZARD_DIR="./wizard"
 APP_DIR="./examples"
 
 if [ $# \< 2 ] ; then
@@ -48,7 +49,7 @@ if [ $# \< 2 ] ; then
 fi
 CPU_TARGET=$1
 #Create a list of source file without a cpu specific source
-GEN_SRC=`find . \( -name \.svn -prune -o -path $COPY_DIR -prune -o -path $CPU_DIR -prune -o -path $APP_DIR  -prune -o -path $OS_DIR -prune -o -path $EMUL_DIR -prune \) -o -name *.${2} -print | xargs`
+GEN_SRC=`find . \( -name \.svn -prune -o -path $COPY_DIR -prune -o -path $CPU_DIR -prune -o -path $APP_DIR  -prune -o -path $OS_DIR -prune -o -path $WIZARD_DIR -prune -o -path $EMUL_DIR -prune \) -o -name *.${2} -print | xargs`
 
 #Select c and asm sources for selected cpu target
 TRG_SRC=`find ${CPU_DIR}/$CPU_TARGET -name \.svn -prune -o -name *.${2} -print | xargs`

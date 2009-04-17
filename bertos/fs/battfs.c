@@ -32,7 +32,7 @@
  *
  * \brief BattFS: a filesystem for embedded platforms (implementation).
  *
- * \version $Id:$
+ * \version $Id$
  *
  * \author Francesco Sacchi <batt@develer.com>
  *

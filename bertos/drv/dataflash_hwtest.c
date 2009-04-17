@@ -108,9 +108,9 @@ static uint8_t save_buf[DATAFLASH_TEST_STR_LEN];
  * Setup all needed to test dataflash memory
  *
  */
-int dataflash_testSetUp(void)
+int dataflash_testSetup(void)
 {
-        kfile_testSetUp();
+        kfile_testSetup();
         LOG_INFO("KFILE setup..ok\n");
 
         LOG_INFO("Check if kernel is enable (if enable you should see the assert message.)\n");
@@ -173,7 +173,7 @@ int dataflash_testRun(void)
         LOG_INFO("Run KFILE test.\n");
 
         SILENT_ASSERT("bertos/drv/dataflash.c:405: Assertion failed: fd->fd.seek_pos + size <= fd->fd.size");
-        if (kfile_testRun(&dflash_fd.fd, test_buf, save_buf, sizeof(test_buf)) != EOF)
+        if (kfile_testRunGeneric(&dflash_fd.fd, test_buf, save_buf, sizeof(test_buf)) != EOF)
         {
                 LOG_INFO("KFILE test..ok\n");
         }
@@ -212,7 +212,7 @@ int main(void)
 	proc_init();
     #endif
 
-	if (!dataflash_testSetUp())
+	if (!dataflash_testSetup())
 	{
 			LOG_INFO("DATAFLASH setup..ok\n");
 	}

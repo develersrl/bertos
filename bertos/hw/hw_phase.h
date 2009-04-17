@@ -46,6 +46,9 @@
 
 #warning TODO:This is an example implementation, you must implement it!
 
+#define TRIAC_MAX_DUTY  100
+#define TRIAC_MAX_POWER 100
+
 #define PHASE_HW_INIT  do { /* Implement me! */ }while (0)
 
 INLINE void TRIAC_OFF(TriacDev i)
@@ -64,6 +67,17 @@ INLINE void TRIAC_ON(TriacDev i)
 		//Only for test remove when implement this function
 		(void)i;
 }
+
+INLINE void SET_TRIAC_DDR(TriacDev i)
+{
+		/* Implement me! */
+
+		//Only for test remove when implement this function
+		(void)i;
+}
+
+void zerocross_isr(void);
+#define DEFINE_ZEROCROSS_ISR() void zerocross_isr(void)
 
 
 #endif /* HW_PHASE_H */

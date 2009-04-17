@@ -39,7 +39,7 @@ OPTS=1
 if [ $# = 1 ] ; then
 	if [ $1 = "-h" ] ; then
 		printf "Nightly test help.\n"
-		printf "\t--no-silent disable the silent of the TODO/FIXME warning message.\n"
+		printf "\t--no-silent disable the silent of the TODO/FIXME warning messages.\n"
 		exit 1
 	elif [ $1 = "--no-silent" ] ; then
 		OPTS=0
@@ -49,14 +49,14 @@ fi
 if [ $OPTS = 1 ] ; then
 #Copy BeRTOS sources
 printf "Starting nightlytest..\n"
-	printf "Silent mode enable, removing the TODO/FIXME message warning.\n"
+	printf "Silent mode enable, removing the TODO/FIXME message warnings.\n"
 	cp -R $BERTOS_DIR $BERTOS_DIR_BAK || exit 1
 
 	#Strip away TODOs and FIXME
 	find $BERTOS_DIR -name "*.[ch]" | xargs perl -p -i -e 's/^\s*#warning\s*(TODO|FIXME).*//g;'
 fi
 
-#Cpu target that we want to test
+#Cpu targets that we want to test
 TRG="avr arm"
 
 for i in $TRG ;

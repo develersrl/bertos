@@ -96,7 +96,7 @@ static size_t fake_read(KFile *fd, void *buf, size_t size)
 
 static size_t fake_write(KFile *fd, const void *buf, size_t size)
 {
-	fake_t *src = (fake_t *)buf;
+	const fake_t *src = (const fake_t *)buf;
 	size_t wr_len;
 
 	wr_len = MIN((kfile_off_t)size, fd->size - fd->seek_pos);
@@ -109,14 +109,14 @@ static size_t fake_write(KFile *fd, const void *buf, size_t size)
 	return wr_len;
 }
 
-int fake_flush(KFile *fd)
+static int fake_flush(KFile *fd)
 {
 	(void)fd;
 
 	return 0;
 }
 
-void fake_kfileInit(void)
+static void fake_kfileInit(void)
 {
 	// Setup data flash programming functions.
 	fd.reopen = kfile_genericReopen;
@@ -136,12 +136,11 @@ void fake_kfileInit(void)
  */
 static void init_testBuf(void)
 {
-	#include <stdlib.h>
 
 	kprintf("Init fake buffer..\n");
 	for (int i = 0; i < BUF_TEST_LEN; i++)
 	{
-		test_disk[i] = random();
+		test_disk[i] = i;
 		kprintf("%d ", test_disk[i]);
 	}
 	kprintf("\nend\n");

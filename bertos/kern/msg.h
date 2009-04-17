@@ -283,4 +283,8 @@ INLINE void msg_reply(Msg *msg)
 	msg_put(msg->replyPort, msg);
 }
 
+int msg_testRun(void);
+int msg_testSetup(void);
+int msg_testTearDown(void);
+
 #endif /* KERN_MSG_H */

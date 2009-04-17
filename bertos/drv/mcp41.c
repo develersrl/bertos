@@ -57,7 +57,6 @@ void mcp41_setResistance(Mcp41Dev dev, mcp41_res_t res)
 	kfile_putc(MCP41_WRITE_DATA, ch);
 	kfile_putc(((MCP41_HW_MAX * (uint32_t)res)  + (MCP41_MAX / 2)) / MCP41_MAX, ch);
 	kfile_flush(ch);
-	ser_drain(spi_ser);
 
 	MCP41_OFF(dev);
 }

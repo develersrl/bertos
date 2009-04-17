@@ -51,9 +51,20 @@
 
 #include <kern/msg.h>
 #include <kern/proc.h>
-#include <kern/irq.h>
+#include <kern/signal.h>
+
+#include <mware/event.h>
 
 #include <drv/timer.h>
+
+/*
+ * In the nightly build test, signals are disables, so this
+ * code won't compile.
+ * Since this code is used when we run "make check" it will be
+ * compiled and therefor tested there.
+ */
+#if CONFIG_KERN_SIGNALS
+
 
 // Global settings for the test.
 #define MAX_GLOBAL_COUNT            11040
@@ -83,21 +94,22 @@
 /*
  * These macros generate the code needed to create the test process functions.
  */
-#define RECV_PROC(num, sig) static void receiver_proc##num(void) \
-    { \
-        TestMsg *rec_msg; \
-		for (;;) \
-        { \
-            sig_wait(sig); \
-            kprintf("Proc[%d]..get message\n", num); \
-            rec_msg = containerof(msg_get(&test_port##num), TestMsg, msg); \
-			timer_delay(rec_msg->delay); \
-            rec_msg->result += rec_msg->val;  \
-            kprintf("Proc[%d]..process message val[%d],delay[%d],res[%d]\n", num, rec_msg->val, rec_msg->delay, rec_msg->result); \
-            msg_reply(&rec_msg->msg); \
-            kprintf("Proc[%d] reply\n", num); \
-        } \
-    }
+#define RECV_PROC(num, sig) \
+static void receiver_proc##num(void) \
+{ \
+	TestMsg *rec_msg; \
+	for (;;) \
+	{ \
+		sig_wait(sig); \
+		kprintf("Proc[%d]..get message\n", num); \
+		rec_msg = containerof(msg_get(&test_port##num), TestMsg, msg); \
+		timer_delay(rec_msg->delay); \
+		rec_msg->result += rec_msg->val; \
+		kprintf("Proc[%d]..process message val[%d],delay[%d],res[%d]\n", num, rec_msg->val, rec_msg->delay, rec_msg->result); \
+		msg_reply(&rec_msg->msg); \
+		kprintf("Proc[%d] reply\n", num); \
+	} \
+}
 
 #define SEND_MSG(num) \
 	do { \
@@ -108,7 +120,7 @@
 
 #define RECV_STACK(num) static cpu_stack_t receiver_stack##num[CONFIG_KERN_MINSTACKSIZE / sizeof(cpu_stack_t)]
 #define RECV_INIT_PROC(num) proc_new(receiver_proc##num, NULL, sizeof(receiver_stack##num), receiver_stack##num)
-#define RECV_INIT_MSG(num, proc,sig) msg_initPort(&test_port##num, event_createSignal(proc, sig))
+#define RECV_INIT_MSG(num, proc, sig) msg_initPort(&test_port##num, event_createSignal(proc, sig))
 
 // A test message with the parameters and a result.
 typedef struct
@@ -268,3 +280,5 @@ int msg_testTearDown(void)
 }
 
 TEST_MAIN(msg);
+
+#endif /* CONFIG_KERN_SIGNALS */

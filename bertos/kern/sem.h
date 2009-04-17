@@ -71,4 +71,8 @@ void sem_obtain(struct Semaphore *s);
 void sem_release(struct Semaphore *s);
 /* \} */
 
+int sem_testRun(void);
+int sem_testSetup(void);
+int sem_testTearDown(void);
+
 #endif /* KERN_SEM_H */

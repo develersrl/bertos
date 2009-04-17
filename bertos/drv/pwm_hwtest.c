@@ -118,7 +118,7 @@ static PwmTest pwm_test_cfg[PWM_CNT] =
  * Setup all needed to test PWM on AT91
  *
  */
-int pwm_testSetUp(void)
+int pwm_testSetup(void)
 {
 	LOG_INFO("Init pwm..");
 	pwm_init();
@@ -132,12 +132,12 @@ int pwm_testSetUp(void)
  * Test suit for genation of pwm waveform.
  *
  */
-int pwm_testRun(void)
+void NORETURN pwm_testRun(void)
 {
         pwm_duty_t duty = 0;
         int delay = 0;
 
-        pwm_testSetUp();
+        pwm_testSetup();
 
         LOG_INFO("\n\n===== BeRTOS PWM test =====\n\n");
 
@@ -203,8 +203,6 @@ int pwm_testRun(void)
                 }
                 delay++;
         }
-
-		return 0;
 }
 
 /**
@@ -226,14 +224,14 @@ int pwm_testTearDown(void)
 #if 0
 int main(void)
 {
-        IRQ_ENABLE;
+	IRQ_ENABLE;
 	kdbg_init();
 
 	pwm_testRun();
 
-        for(;;)
-        {
-        }
+	for(;;)
+	{
+	}
 
 }
 #endif

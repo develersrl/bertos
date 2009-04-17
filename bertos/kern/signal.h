@@ -56,6 +56,9 @@ void sig_signal(struct Process *proc, sigmask_t sig);
 sigmask_t sig_wait(sigmask_t sigs);
 sigmask_t sig_waitTimeout(sigmask_t sigs, ticks_t timeout);
 
+int signal_testRun(void);
+int signal_testSetup(void);
+int signal_testTearDown(void);
 
 /**
  * \name Signal definitions

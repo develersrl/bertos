@@ -48,8 +48,6 @@
 
 #include <cpu/types.h>
 
-#if CONFIG_KERN_MONITOR
-
 /**
  * Start the kernel monitor. It is a special process which checks every second the stacks of the
  * running processes trying to detect stack overflows.
@@ -77,6 +75,4 @@ size_t monitor_checkStack(cpu_stack_t *stack_base, size_t stack_size);
 /** Print a report of the stack status through kdebug */
 void monitor_report(void);
 
-
-#endif /* CONFIG_KERN_MONITOR */
 #endif /* KERN_MONITOR_H */

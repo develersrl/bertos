@@ -50,8 +50,8 @@
  * Define the macros needed to set the serial input bit of SIPO device
  * low or high.
  */
-#define SIPO_SI_HIGH()/* Implement me! */
-#define SIPO_SI_LOW() /* Implement me! */
+#define SIPO_SI_HIGH() do { /* Implement me! */ } while (0)
+#define SIPO_SI_LOW()  do { /* Implement me! */ } while (0)
 
 /**
  * Drive pin to load the bit, presented in serial-in pin,

@@ -75,7 +75,8 @@ sigmask_t sig_to_slave;
 /*
  * These macros generate the code needed to create the test process functions.
  */
-#define PROC_TEST_SLAVE(index, signal) static void proc_test##index(void) \
+#define PROC_TEST_SLAVE(index, signal) \
+static void NORETURN proc_test##index(void) \
 { \
 	for(;;) \
 	{ \

@@ -50,9 +50,6 @@
 
 #include <math.h>
 
-#warning TODO:Generalize this moduele for all target supported.
-
-#if 0
 /** Array  of triacs */
 static Triac triacs[TRIAC_CNT];
 
@@ -183,7 +180,7 @@ void phase_init(void)
 		triacs[dev].running = false;
 		SET_TRIAC_DDR(dev);
 		TRIAC_OFF(dev);
-		timer_set_event_softint(&triacs[dev].timer, (Hook)phase_softint, (void *)dev);
+		timer_setSoftint(&triacs[dev].timer, (Hook)phase_softint, (void *)dev);
 	}
 	IRQ_SAVE_DISABLE(flags);
 
@@ -192,5 +189,4 @@ void phase_init(void)
 	DB(phase_initialized = true;)
 	IRQ_RESTORE(flags);
 }
-#endif
 

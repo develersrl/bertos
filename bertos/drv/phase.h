@@ -31,7 +31,7 @@
  *
  * \version $Id$
  *
- * \brief Phase control driver, to manage triac swicth.
+ * \brief Phase partialization driver with TRIACs.
  *
  * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>

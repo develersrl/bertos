@@ -197,7 +197,9 @@ bool dataflash_diskInit(struct BattFsSuper *d, DataFlash *fd, pgcnt_t *page_arra
  *
  * (see drv/datafalsh_test.c for more detail)
  */
-int dataflash_testSetUp(void);
+int dataflash_testSetup(void);
+/* For backward compatibility */
+#define dataflash_testSetUp() dataflash_testSetup()
 int dataflash_testRun(void);
 int dataflash_testTearDown(void);
 
