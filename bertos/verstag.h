@@ -49,15 +49,10 @@
 #define APP_NAME "Appname"
 #define APP_DESCRIPTION "Long application name description"
 #define APP_AUTHOR "Develer"
-#define APP_COPYRIGHT "Copyright 2006 Develer (http://www.develer.com/)"
+#define APP_COPYRIGHT "Copyright 2009 Develer (http://www.develer.com/)"
 
 
-#if ARCH & ARCH_FOO
-	#define VERS_MAJOR 0
-	#define VERS_MINOR 1
-	#define VERS_REV   0
-	#define VERS_LETTER ""
-#elif ARCH & ARCH_BAR
+#if ARCH & ARCH_DEFAULT
 	#define VERS_MAJOR 0
 	#define VERS_MINOR 1
 	#define VERS_REV   0

@@ -31,7 +31,7 @@
  *
  * -->
  *
- * \brief Set system configuration
+ * \brief Set system configuration.
  *
  * \version $Id$
  *
@@ -43,8 +43,8 @@
 #ifndef CFG_ARCH_CONFIG_H
 #define CFG_ARCH_CONFIG_H
 
-#define ARCH_FOO       (1<<0) ///< FOO architecture
-#define ARCH_BAR       (1<<1) ///< BAR architecture
+#define ARCH_DEFAULT   (1<<0) ///< Default architecture
+
 #define ARCH_EMUL      (1<<2) ///< EMUL architecture
 #define ARCH_QT        (1<<3) ///< QT architecture
 #define ARCH_UNITTEST  (1<<4) ///< UNITTEST architecture
