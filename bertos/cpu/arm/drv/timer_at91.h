@@ -40,10 +40,13 @@
 #ifndef DRV_AT91_TIMER_H
 #define DRV_AT91_TIMER_H
 
-#include <hw/hw_cpufreq.h>            /* CPU_FREQ */
+#include <hw/hw_cpufreq.h>     /* CPU_FREQ */
 
 #include "cfg/cfg_timer.h"     /* CONFIG_TIMER */
 #include <cfg/compiler.h>      /* uint8_t */
+#include <cfg/macros.h>        /* BV */
+
+#include <io/arm.h>
 
 /**
  * \name Values for CONFIG_TIMER.
@@ -70,12 +73,33 @@
 	/** Frequency of the hardware high-precision timer. */
 	#define TIMER_HW_HPTICKS_PER_SEC (CPU_FREQ / 16)
 
-	/// Type of time expressed in ticks of the hardware high-precision timer
+	/** Type of time expressed in ticks of the hardware high-precision timer */
 	typedef uint32_t hptime_t;
+
+	INLINE void timer_hw_irq(void)
+	{
+		/* Reset counters, this is needed to reset timer and interrupt flags */
+		uint32_t dummy = PIVR;
+		(void) dummy;
+	}
+
+	INLINE bool timer_hw_triggered(void)
+	{
+		return PIT_SR & BV(PITS);
+	}
+
+	INLINE hptime_t timer_hw_hpread(void)
+	{
+		/* In the upper part of PIT_PIIR there is unused data */
+		return PIIR & CPIV_MASK;
+	}
+
 #else
 
 	#error Unimplemented value for CONFIG_TIMER
 #endif /* CONFIG_TIMER */
+
+void timer_hw_init(void);
 
 
 #endif /* DRV_TIMER_AT91_H */

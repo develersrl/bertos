@@ -58,8 +58,6 @@
 #if OS_HOSTED
 	//#include OS_CSOURCE(timer)
 	#include <emul/timer_posix.c>
-#else
-	#include CPU_CSOURCE(timer)
 #endif
 
 /*

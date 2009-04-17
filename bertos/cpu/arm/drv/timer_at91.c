@@ -49,19 +49,8 @@
 
 /** HW dependent timer initialization  */
 #if (CONFIG_TIMER == TIMER_ON_PIT)
-	INLINE void timer_hw_irq(void)
-	{
-		/* Reset counters, this is needed to reset timer and interrupt flags */
-		uint32_t dummy = PIVR;
-		(void) dummy;
-	}
 
-	INLINE bool timer_hw_triggered(void)
-	{
-		return PIT_SR & BV(PITS);
-	}
-
-	INLINE void timer_hw_init(void)
+	void timer_hw_init(void)
 	{
 		sysirq_init();
 
@@ -84,12 +73,6 @@
 		(void) dummy;
 
 		IRQ_RESTORE(flags);
-	}
-
-	INLINE hptime_t timer_hw_hpread(void)
-	{
-		/* In the upper part of PIT_PIIR there is unused data */
-		return PIIR & CPIV_MASK;
 	}
 
 #else

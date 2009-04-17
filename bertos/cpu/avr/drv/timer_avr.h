@@ -43,12 +43,14 @@
 #ifndef DRV_TIMER_AVR_H
 #define DRV_TIMER_AVR_H
 
-#include <hw/hw_cpufreq.h>        /* CPU_FREQ */
+#include <hw/hw_cpufreq.h>   /* CPU_FREQ */
 
-#include "cfg/cfg_timer.h"     /* CONFIG_TIMER */
-#include <cfg/compiler.h>  /* uint8_t */
-#include <cfg/macros.h>    /* DIV_ROUND */
+#include "cfg/cfg_timer.h"   /* CONFIG_TIMER */
+#include <cfg/compiler.h>    /* uint8_t */
+#include <cfg/macros.h>      /* DIV_ROUND */
 
+#include <avr/io.h>
+#include <avr/interrupt.h>
 
 /**
  * \name Values for CONFIG_TIMER.
@@ -82,6 +84,11 @@
 	/// Type of time expressed in ticks of the hardware high-precision timer
 	typedef uint8_t hptime_t;
 
+	INLINE hptime_t timer_hw_hpread(void)
+	{
+		return TCNT0;
+	}
+
 #elif (CONFIG_TIMER == TIMER_ON_OVERFLOW1)
 
 	#define TIMER_PRESCALER      1
@@ -93,6 +100,11 @@
 
 	/// Type of time expressed in ticks of the hardware high precision timer
 	typedef uint16_t hptime_t;
+
+	INLINE hptime_t timer_hw_hpread(void)
+	{
+		return TCNT1;
+	}
 
 #elif (CONFIG_TIMER == TIMER_ON_OUTPUT_COMPARE2)
 
@@ -107,9 +119,13 @@
 	/** Value for OCR register in output-compare based timers. */
 	#define TIMER_HW_CNT         OCR_DIVISOR
 
-
 	/// Type of time expressed in ticks of the hardware high precision timer
 	typedef uint8_t hptime_t;
+
+	INLINE hptime_t timer_hw_hpread(void)
+	{
+		return TCNT2;
+	}
 
 #elif (CONFIG_TIMER == TIMER_ON_OVERFLOW3)
 
@@ -122,6 +138,12 @@
 
 	/// Type of time expressed in ticks of the hardware high precision timer
 	typedef uint16_t hptime_t;
+
+	INLINE hptime_t timer_hw_hpread(void)
+	{
+		return TCNT3;
+	}
+
 #else
 
 	#error Unimplemented value for CONFIG_TIMER
@@ -143,5 +165,6 @@
 /** Not needed, timer IRQ handler called only for timer source */
 #define timer_hw_triggered() (true)
 
+void timer_hw_init(void);
 
 #endif /* DRV_TIMER_AVR_H */

@@ -48,7 +48,6 @@
 #include <cpu/types.h>
 #include <cpu/irq.h>
 
-#include <avr/interrupt.h>
 #include <avr/io.h>
 
 #if CPU_AVR_ATMEGA1281 || CPU_AVR_ATMEGA168
@@ -118,7 +117,7 @@
 /** HW dependent timer initialization  */
 #if (CONFIG_TIMER == TIMER_ON_OUTPUT_COMPARE0)
 
-	static void timer_hw_init(void)
+	void timer_hw_init(void)
 	{
 		cpu_flags_t flags;
 		IRQ_SAVE_DISABLE(flags);
@@ -149,14 +148,9 @@
 		IRQ_RESTORE(flags);
 	}
 
-	INLINE hptime_t timer_hw_hpread(void)
-	{
-		return TCNT0;
-	}
-
 #elif (CONFIG_TIMER == TIMER_ON_OVERFLOW1)
 
-	static void timer_hw_init(void)
+	void timer_hw_init(void)
 	{
 		cpu_flags_t flags;
 		IRQ_SAVE_DISABLE(flags);
@@ -188,13 +182,8 @@
 		IRQ_RESTORE(flags);
 	}
 
-	INLINE hptime_t timer_hw_hpread(void)
-	{
-		return TCNT1;
-	}
-
 #elif (CONFIG_TIMER == TIMER_ON_OUTPUT_COMPARE2)
-	static void timer_hw_init(void)
+	void timer_hw_init(void)
 	{
 		cpu_flags_t flags;
 		IRQ_SAVE_DISABLE(flags);
@@ -225,13 +214,9 @@
 		IRQ_RESTORE(flags);
 	}
 
-	INLINE hptime_t timer_hw_hpread(void)
-	{
-		return TCNT2;
-	}
 #elif (CONFIG_TIMER == TIMER_ON_OVERFLOW3)
 
-	static void timer_hw_init(void)
+	void timer_hw_init(void)
 	{
 		cpu_flags_t flags;
 		IRQ_SAVE_DISABLE(flags);
@@ -262,11 +247,6 @@
 		REG_TIMSK3 = |= BV(TOIE3);
 
 		IRQ_RESTORE(flags);
-	}
-
-	INLINE hptime_t timer_hw_hpread(void)
-	{
-		return TCNT3;
 	}
 
 #else
