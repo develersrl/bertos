@@ -48,8 +48,9 @@
 #define CONFIG_I2C_FREQ  100000UL
 
 /**
- * I2C start timeout: for how many milliseconds
- * the twi_start should try to get an ACK before
+ * I2C start timeout.
+ * For how many milliseconds the i2c_start
+ * should try to get an ACK before
  * returning error.
  *
  * $WIZ$ type = "int"
@@ -57,7 +58,8 @@
 #define CONFIG_I2C_START_TIMEOUT 100
 
 /**
- * I2C driver can have 2 backends:
+ * I2C backend the driver should use.
+ *
  * I2C_BACKEND_BUILTIN: Use (if present) the builtin i2c hardware.
  * I2C_BACKEND_BITBANG: Use the emulated bitbang driver.
  * \see drv/i2c.h for more information.
