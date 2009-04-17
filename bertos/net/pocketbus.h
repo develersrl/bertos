@@ -48,8 +48,6 @@
 
 #include <algo/rotating_hash.h>
 
-#include <drv/ser.h>
-
 #include <kern/kfile.h>
 
 /**

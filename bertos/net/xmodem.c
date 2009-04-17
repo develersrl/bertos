@@ -50,8 +50,6 @@
 #include "cfg/cfg_xmodem.h"
 #include <cfg/debug.h>
 
-#include <drv/ser.h>
-
 #include <algo/crc.h>
 
 #include <string.h> /* for memset() */
