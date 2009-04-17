@@ -37,6 +37,8 @@
  * This module is automatically included so no need to include
  * in test list.
  * notest: avr
+ *
+ * $WIZ$
  */
 
 #include "adc_avr.h"
@@ -54,9 +56,16 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
+/**
+ * ADC voltage referencese.
+ *
+ * $WIZ$ avr_adc_refs = "ADC_AVR_AREF", "ADC_AVR_AVCC", "ADC_AVR_INT256"
+ * \{
+ */
 #define ADC_AVR_AREF   0
 #define ADC_AVR_AVCC   1
 #define ADC_AVR_INT256 2
+/* \} */
 
 #if CONFIG_KERN
 	#include <cfg/module.h>
@@ -65,7 +74,7 @@
 
 
 	#if !CONFIG_KERN_SIGNALS
-		#error Signals must be active to use ADC with kernel
+		#error Signals must be active to use the ADC with kernel
 	#endif
 
 	/* Signal adc convertion end */

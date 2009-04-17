@@ -30,7 +30,7 @@
  *
  * -->
  *
- * \brief Configuration file for ADC module.
+ * \brief Configuration file for the ADC module.
  *
  * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
@@ -48,7 +48,7 @@
 #define ADC_LOG_LEVEL      LOG_LVL_INFO
 
 /**
- * module logging format.
+ * Module logging format.
  *
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_format"
@@ -56,41 +56,52 @@
 #define ADC_LOG_FORMAT     LOG_FMT_VERBOSE
 
 /**
- * Frequency clock for ADC conversion.
+ * Clock Frequency for ADC conversion.
  *
  * $WIZ$ type = "int"
+ * $WIZ$ supports = "at91"
  */
 #define CONFIG_ADC_CLOCK        4800000UL
 
 /**
- * Minimum time for startup a conversion in micro second.
+ * Minimum time for starting up a conversion [us].
  *
  * $WIZ$ type = "int"
+ * $WIZ$ min = "0"
+ * $WIZ$ supports = "at91"
  */
 #define CONFIG_ADC_STARTUP_TIME 20
 
 /**
- * Minimum time for sample and hold in nano second.
+ * Minimum time for sample and hold [us].
  *
  * $WIZ$ type = "int"
+ * $WIZ$ min = "0"
+ * $WIZ$ supports = "at91"
  */
 #define CONFIG_ADC_SHTIME       834
 
 /**
- * ADC setting for AVR target.
+ * ADC Voltage Reference.
  *
- * $WIZ$ type = "int"
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "avr_adc_refs"
+ * $WIZ$ supports = "avr"
  */
-#define CONFIG_ADC_AVR_REF      1
-/*
- * ADC setting for AVR target.
+#define CONFIG_ADC_AVR_REF      ADC_AVR_AVCC
+
+/**
+ * ADC clock divisor from main crystal.
  *
  * $WIZ$ type = "int"
+ * $WIZ$ min = "2"
+ * $WIZ$ max = "128"
+ * $WIZ$ supports = "avr"
  */
 #define CONFIG_ADC_AVR_DIVISOR  2
 
 /**
- * Enable ADS strobe.
+ * Enable ADC strobe for debugging ADC ISR.
  *
  * $WIZ$ type = "boolean"
  */
