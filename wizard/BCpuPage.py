@@ -46,7 +46,7 @@ class BCpuPage(BWizardPage):
             self.setProjectInfo("SELECTED_FREQ", unicode(long(self.pageContent.frequencySpinBox.value())))
             tag_dict = self.projectInfo("ALL_CPU_TAGS")
             for tag in tag_dict:
-                if tag in infos["CPU_TAGS"] + [infos["CPU_NAME"], infos["CORE_CPU"]]:
+                if tag in infos["CPU_TAGS"] + [infos["CPU_NAME"], infos["CORE_CPU"], infos["TOOLCHAIN"]]:
                     tag_dict[tag] = "True"
                 else:
                     tag_dict[tag] = "False"
