@@ -40,19 +40,19 @@
 #ifndef CFG_KBD_H
 #define CFG_KBD_H
 
-/// Keyboard polling method
+/// Keyboard polling method. $WIZ$ supports = "False"
 #define CONFIG_KBD_POLL  KBD_POLL_SOFTINT
 
-/// Enable keyboard event delivery to observers
+/// Enable keyboard event delivery to observers. $WIZ$ type = "boolean"
 #define CONFIG_KBD_OBSERVER  0
 
-/// Enable key beeps
+/// Enable key beeps. $WIZ$ type = "boolean"
 #define CONFIG_KBD_BEEP  1
 
-/// Enable long pression handler for keys
+/// Enable long pression handler for keys. $WIZ$ type = "boolean"
 #define CONFIG_KBD_LONGPRESS  0
 
-/// Enable calling poor man's scheduler to be called inside kbd_peek
+/// Enable calling poor man's scheduler to be called inside kbd_peek. $WIZ$ type = "boolean"
 #define CONFIG_KBD_SCHED 0
 
 #endif /* CFG_KBD_H */

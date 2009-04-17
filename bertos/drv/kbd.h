@@ -31,7 +31,7 @@
  *
  * -->
  *
- * \brief Keyboard driver (interface)
+ * \brief Keyboard driver.
  *
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
