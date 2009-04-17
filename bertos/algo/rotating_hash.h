@@ -30,7 +30,7 @@
  * All Rights Reserved.
  * -->
  *
- * \brief Rotating Hash algorithm (interface).
+ * \brief Rotating Hash algorithm.
  *
  * This is a simple yet powerfull checksum algorithm.
  * Instead of just xor-ing the data, rotating hash
