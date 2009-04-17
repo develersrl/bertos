@@ -4,7 +4,7 @@
 # Copyright 2008 Develer S.r.l. (http://www.develer.com/)
 # All rights reserved.
 #
-# $Id:$
+# $Id$
 #
 # Author: Lorenzo Berni <duplo@develer.com>
 #
@@ -184,7 +184,7 @@ class BToolchainPage(BWizardPage):
         else:
             item.setIcon(QIcon(":/images/warning.png"))
         if "version" in infos.keys() and "target" in infos.keys():
-            item.setText("GCC " + infos["version"] + " - " + infos["target"])
+            item.setText("GCC " + infos["version"] + " - " + infos["target"].strip())
 
     def _invalidItem(self, index):
         """
