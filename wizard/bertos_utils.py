@@ -383,11 +383,14 @@ def loadModuleDefinition(first_comment):
         module_dict[module_name]["enabled"] = False
     return to_be_parsed, module_dict
 
-def isSupported(module, project):
+def isSupported(project, module=None, property_id=None):
+    if module is None and property_id is not None:
+        item = project.info("CONFIGURATIONS")[property_id[0]][property_id[1]]["informations"]
+    else:
+        item = project.info("MODULES")[module]
     tag_dict = project.info("ALL_CPU_TAGS")
-    module = project.info("MODULES")[module]
-    if "supports" in module:
-        support_string = module["supports"]
+    if "supports" in item:
+        support_string = item["supports"]
         supported = {}
         try:
             exec "supported = " + support_string in tag_dict, supported
@@ -396,7 +399,6 @@ def isSupported(module, project):
         return supported["supported"]
     else:
         return True
-            
 
 def loadDefineLists(comment_list):
     define_list = {}

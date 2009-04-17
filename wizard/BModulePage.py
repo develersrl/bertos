@@ -79,7 +79,7 @@ class BModulePage(BWizardPage):
         module = self.currentModule()
         if module is not None:
             try:
-                supported = bertos_utils.isSupported(module, self.project())
+                supported = bertos_utils.isSupported(self.project(), module=module)
             except SupportedException, e:
                 self.exceptionOccurred(self.tr("Error evaluating \"%1\" for module %2").arg(e.support_string).arg(selectedModule))
                 supported = True
@@ -104,23 +104,30 @@ class BModulePage(BWizardPage):
                 for i, property in param_list:
                     if "type" in configurations[property]["informations"] and configurations[property]["informations"]["type"] == "autoenabled":
                         # Doesn't show the hidden fields
-                        pass
+                        continue
+                    try:
+                        param_supported = bertos_utils.isSupported(self.project(), property_id=(configuration, property))
+                    except SupportedException, e:
+                        self.exceptionOccurred(self.tr("Error evaluating \"%1\" for module %2").arg(e.support_string).arg(selectedModule))
+                        param_supported = True
+                    if not param_supported:
+                        # Doesn't show the unsupported parameters
+                        continue
+                    # Set the row count to the current index + 1
+                    self.pageContent.propertyTable.setRowCount(index + 1)
+                    item = QTableWidgetItem(configurations[property]["brief"])
+                    item.setData(Qt.UserRole, qvariant_converter.convertString(property))
+                    self.pageContent.propertyTable.setItem(index, 0, item)
+                    if "type" in configurations[property]["informations"].keys() and configurations[property]["informations"]["type"] == "boolean":
+                        self.insertCheckBox(index, configurations[property]["value"])
+                    elif "type" in configurations[property]["informations"].keys() and configurations[property]["informations"]["type"] == "enum":
+                        self.insertComboBox(index, configurations[property]["value"], configurations[property]["informations"]["value_list"])
+                    elif "type" in configurations[property]["informations"] and configurations[property]["informations"]["type"] == "int":
+                        self.insertSpinBox(index, configurations[property]["value"], configurations[property]["informations"])
                     else:
-                        # Set the row count to the current index + 1
-                        self.pageContent.propertyTable.setRowCount(index + 1)
-                        item = QTableWidgetItem(configurations[property]["brief"])
-                        item.setData(Qt.UserRole, qvariant_converter.convertString(property))
-                        self.pageContent.propertyTable.setItem(index, 0, item)
-                        if "type" in configurations[property]["informations"].keys() and configurations[property]["informations"]["type"] == "boolean":
-                            self.insertCheckBox(index, configurations[property]["value"])
-                        elif "type" in configurations[property]["informations"].keys() and configurations[property]["informations"]["type"] == "enum":
-                            self.insertComboBox(index, configurations[property]["value"], configurations[property]["informations"]["value_list"])
-                        elif "type" in configurations[property]["informations"] and configurations[property]["informations"]["type"] == "int":
-                            self.insertSpinBox(index, configurations[property]["value"], configurations[property]["informations"])
-                        else:
-                            # Not defined type, rendered as a text field
-                            self.pageContent.propertyTable.setItem(index, 1, QTableWidgetItem(configurations[property]["value"]))
-                        index += 1
+                        # Not defined type, rendered as a text field
+                        self.pageContent.propertyTable.setItem(index, 1, QTableWidgetItem(configurations[property]["value"]))
+                    index += 1
             if self.pageContent.propertyTable.rowCount() == 0:
                 module_label = self.pageContent.moduleLabel.text()
                 module_label += "\n\nNo configuration needed."
@@ -205,7 +212,7 @@ class BModulePage(BWizardPage):
                 enabled = modules[module]["enabled"]
                 module_item = QTreeWidgetItem(item, QStringList([module]))
                 try:
-                    supported = bertos_utils.isSupported(module, self.project())
+                    supported = bertos_utils.isSupported(self.project(), module=module)
                 except SupportedException, e:
                     self.exceptionOccurred(self.tr("Error evaluating \"%1\" for module %2").arg(e.support_string).arg(selectedModule))
                     supported = True

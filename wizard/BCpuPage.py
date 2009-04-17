@@ -47,9 +47,9 @@ class BCpuPage(BWizardPage):
             tag_dict = self.projectInfo("ALL_CPU_TAGS")
             for tag in tag_dict:
                 if tag in infos["CPU_TAGS"] + [infos["CPU_NAME"], infos["CORE_CPU"], infos["TOOLCHAIN"]]:
-                    tag_dict[tag] = "True"
+                    tag_dict[tag] = True
                 else:
-                    tag_dict[tag] = "False"
+                    tag_dict[tag] = False
             self.setProjectInfo("ALL_CPU_TAGS", tag_dict)
             return True
         else:
@@ -134,7 +134,7 @@ class BCpuPage(BWizardPage):
         # Create, fill and store the dict with the tags
         tag_dict = {}
         for element in tag_list:
-            tag_dict[element] = "False"
+            tag_dict[element] = False
         self.setProjectInfo("ALL_CPU_TAGS", tag_dict)
         for cpu in infos:
             item = QListWidgetItem(cpu["CPU_NAME"])
