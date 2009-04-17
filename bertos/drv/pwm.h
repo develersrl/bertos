@@ -40,6 +40,7 @@
  * $WIZ$ module_name = "pwm"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_pwm.h"
  * $WIZ$ module_hw = "bertos/hw/pwm_map.h"
+ * $WIZ$ module_supports = "not avr"
  */
 
 #ifndef DRV_PWM_H

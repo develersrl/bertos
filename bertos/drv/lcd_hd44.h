@@ -30,12 +30,17 @@
  *
  * -->
  *
- * \brief Hitachi HD44780 and clones LCD module (interface)
+ * \brief Hitachi HD44780 and clones LCD module.
  *
  * \version $Id$
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
+ *
+ * $WIZ$ module_name = "lcd_hd44"
+ * $WIZ$ module_depends = "timer"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_lcd.h"
+ * $WIZ$ module_hw = "bertos/hw/hw_lcd.h"
  */
 
 #ifndef DRV_LCD_HD44_H

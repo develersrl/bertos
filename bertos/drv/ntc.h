@@ -30,7 +30,7 @@
  * All Rights Reserved.
  * -->
  *
- * \brief Driver for NTC sensors (reads a temperature through an ADC)
+ * \brief Driver for NTC sensors (reads a temperature through an ADC).
  *
  * \version $Id$
  *
@@ -38,7 +38,6 @@
  * \author Francesco Sacchi <batt@develer.com>
  *
  * $WIZ$ module_name = "ntc"
- * $WIZ$ module_depends = "adc"
  * $WIZ$ module_hw = "bertos/hw/hw_ntc.h", "bertos/hw/ntc_map.h"
  */
 

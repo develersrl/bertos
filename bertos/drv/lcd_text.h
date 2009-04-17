@@ -35,6 +35,9 @@
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
+ *
+ * $WIZ$ module_name = "lcd_text"
+ * $WIZ$ module_depends = "lcd_hd44", "timer", "formatwr"
  */
 
 #ifndef DRV_LCD_H

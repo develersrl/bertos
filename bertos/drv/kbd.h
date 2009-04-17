@@ -37,6 +37,11 @@
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  * \author Francesco Sacchi <batt@develer.com>
+ *
+ * $WIZ$ module_name = "kbd"
+ * $WIZ$ module_depends = "timer"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_kbd.h"
+ * $WIZ$ module_hw = "bertos/hw/hw_kbd.h", "bertos/hw/kbd_map.h"
  */
 
 #ifndef DRV_KBD_H
