@@ -172,7 +172,7 @@ def csrcGenerator(project_info):
                     dependency_files |= set(dependencyCFiles)
                     asm_files |= set(dependencySFiles)
             for file in module_files:
-                if not harvard or "harvard" not in information or information["harvard"] == "both":
+                if not harvard or information.get("harvard", "both") == "both":
                     csrc.append(file)
                 if harvard and "harvard" in information:
                     pcsrc.append(file)
@@ -307,6 +307,7 @@ def getTagSet(cpu_info):
         tag_set |= set([cpu["CPU_NAME"]])
         tag_set |= set(cpu["CPU_TAGS"])
         tag_set |= set([cpu["CORE_CPU"]])
+        tag_set |= set([cpu["TOOLCHAIN"]])
     return tag_set
         
 
@@ -381,6 +382,24 @@ def loadModuleDefinition(first_comment):
         module_dict[module_name]["constants"] = module_definition
         module_dict[module_name]["enabled"] = False
     return to_be_parsed, module_dict
+
+def isSupported(module, project):
+    tag_dict = project.info("ALL_CPU_TAGS")
+    module = project.info("MODULES")[module]
+    if "supports" in module:
+        support_string = module["supports"]
+        for tag, value in tag_dict.items():
+            while support_string.find(tag) != -1:
+                support_string = support_string.replace(tag, value)
+        supported = {}
+        try:
+            exec "supported = " + support_string in {}, supported
+        except:
+            raise SupportedException(support_string)
+        return supported["supported"]
+    else:
+        return True
+            
 
 def loadDefineLists(comment_list):
     define_list = {}
@@ -593,3 +612,8 @@ class ParseError(Exception):
         Exception.__init__(self)
         self.line_number = line_number
         self.line = line
+
+class SupportedException(Exception):
+    def __init__(self, support_string):
+        Exception.__init__(self)
+        self.support_string = support_string

@@ -4,7 +4,7 @@
 # Copyright 2009 Develer S.r.l. (http://www.develer.com/)
 # All rights reserved.
 #
-# $Id:$
+# $Id$
 #
 # Author: Lorenzo Berni <duplo@develer.com>
 #
@@ -15,6 +15,7 @@ from PyQt4.QtGui import *
 from BWizardPage import *
 import bertos_utils
 
+from bertos_utils import SupportedException
 from DefineException import *
 from const import *
 
@@ -321,6 +322,16 @@ class BModulePage(BWizardPage):
         Resolves the selection dependencies.
         """
         modules = self.projectInfo("MODULES")
+        try:
+            supported = bertos_utils.isSupported(selectedModule, self.project())
+        except SupportedException, e:
+            self.exceptionOccurred(self.tr("Error evaluating \"%1\" for module %2").arg(e.support_string).arg(selectedModule))
+            supported = True
+        # Temporary feedback
+        if supported:
+            print "%s is supported" %selectedModule
+        else:
+            print "%s is not supported" %selectedModule
         modules[selectedModule]["enabled"] = True
         self.setProjectInfo("MODULES", modules)
         depends = self.projectInfo("MODULES")[selectedModule]["depends"]
