@@ -84,9 +84,13 @@ class BCpuPage(BWizardPage):
         bertos_utils.loadSourceTree(self.project())
         self.populateCpuList()
         cpu_name = self.projectInfo("CPU_NAME")
+        selected_freq = self.projectInfo("SELECTED_FREQ")
         self.setupUi()
         if not cpu_name is None:
             self.selectItem(cpu_name)
+            if not selected_freq is None:
+                self.setFrequency(selected_freq)
+                self.freq_modified = True
         QApplication.instance().restoreOverrideCursor()
         self.emit(SIGNAL("completeChanged()"))
 
@@ -144,3 +148,6 @@ class BCpuPage(BWizardPage):
         elements = self.pageContent.cpuList.findItems(cpu, Qt.MatchCaseSensitive)
         if len(elements) == 1:
             self.pageContent.cpuList.setCurrentItem(elements[0])
+    
+    def setFrequency(self, frequency):
+        self.pageContent.frequencySpinBox.setValue(long(frequency))
