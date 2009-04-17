@@ -56,7 +56,7 @@
 
 #include <cpu/power.h> /* cpu_relax() */
 
-#warning FIXME:This file was change, but is untest!
+#warning FIXME:This file was changed, but is untested!
 
 /**
  * Wait until flash memory is ready.
