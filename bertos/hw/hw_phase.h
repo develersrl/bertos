@@ -40,7 +40,7 @@
 #ifndef HW_PHASE_H
 #define HW_PHASE_H
 
-#include "phase_map.h"
+#include "hw/phase_map.h"
 
 #include <cfg/compiler.h>
 
