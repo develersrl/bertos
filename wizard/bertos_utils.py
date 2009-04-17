@@ -388,12 +388,9 @@ def isSupported(module, project):
     module = project.info("MODULES")[module]
     if "supports" in module:
         support_string = module["supports"]
-        for tag, value in tag_dict.items():
-            while support_string.find(tag) != -1:
-                support_string = support_string.replace(tag, value)
         supported = {}
         try:
-            exec "supported = " + support_string in {}, supported
+            exec "supported = " + support_string in tag_dict, supported
         except:
             raise SupportedException(support_string)
         return supported["supported"]
