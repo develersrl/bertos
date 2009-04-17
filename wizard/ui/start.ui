@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>Form</class>
- <widget class="QWidget" name="Form" >
-  <property name="geometry" >
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,55 +10,55 @@
     <height>311</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4" >
+  <layout class="QVBoxLayout" name="verticalLayout_4">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_3" >
+    <layout class="QVBoxLayout" name="verticalLayout_3">
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout" >
+      <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QToolButton" name="newButton" >
-         <property name="minimumSize" >
+        <widget class="QToolButton" name="newButton">
+         <property name="minimumSize">
           <size>
            <width>128</width>
            <height>128</height>
           </size>
          </property>
-         <property name="maximumSize" >
+         <property name="maximumSize">
           <size>
            <width>128</width>
            <height>128</height>
           </size>
          </property>
-         <property name="text" >
+         <property name="text">
           <string/>
          </property>
-         <property name="icon" >
-          <iconset resource="bertos.qrc" >
+         <property name="icon">
+          <iconset resource="../bertos.qrc">
            <normaloff>:/images/filenew.png</normaloff>:/images/filenew.png</iconset>
          </property>
-         <property name="iconSize" >
+         <property name="iconSize">
           <size>
            <width>128</width>
            <height>128</height>
           </size>
          </property>
-         <property name="checkable" >
+         <property name="checkable">
           <bool>false</bool>
          </property>
-         <property name="checked" >
+         <property name="checked">
           <bool>false</bool>
          </property>
         </widget>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout" >
+        <layout class="QVBoxLayout" name="verticalLayout">
          <item>
-          <widget class="QLabel" name="newAction" >
-           <property name="text" >
-            <string>Create a new bertos project</string>
+          <widget class="QLabel" name="newAction">
+           <property name="text">
+            <string>Create a new BeRTOS project</string>
            </property>
           </widget>
          </item>
@@ -66,52 +67,52 @@
       </layout>
      </item>
      <item>
-      <widget class="Line" name="line" >
-       <property name="orientation" >
+      <widget class="Line" name="line">
+       <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_2" >
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
-        <widget class="QToolButton" name="editButton" >
-         <property name="minimumSize" >
+        <widget class="QToolButton" name="editButton">
+         <property name="minimumSize">
           <size>
            <width>128</width>
            <height>128</height>
           </size>
          </property>
-         <property name="maximumSize" >
+         <property name="maximumSize">
           <size>
            <width>128</width>
            <height>128</height>
           </size>
          </property>
-         <property name="text" >
+         <property name="text">
           <string/>
          </property>
-         <property name="icon" >
-          <iconset resource="bertos.qrc" >
+         <property name="icon">
+          <iconset resource="../bertos.qrc">
            <normaloff>:/images/fileopen.png</normaloff>:/images/fileopen.png</iconset>
          </property>
-         <property name="iconSize" >
+         <property name="iconSize">
           <size>
            <width>128</width>
            <height>128</height>
           </size>
          </property>
-         <property name="checkable" >
+         <property name="checkable">
           <bool>false</bool>
          </property>
         </widget>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_2" >
+        <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
-          <widget class="QLabel" name="editAction" >
-           <property name="text" >
-            <string>Edit an existent bertos project</string>
+          <widget class="QLabel" name="editAction">
+           <property name="text">
+            <string>Edit an existent BeRTOS project</string>
            </property>
           </widget>
          </item>
@@ -124,7 +125,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="bertos.qrc" />
+  <include location="../bertos.qrc"/>
  </resources>
  <connections/>
 </ui>
