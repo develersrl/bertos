@@ -38,7 +38,7 @@
  *
  * $WIZ$ module_name = "mcp41"
  * $WIZ$ module_depends = "timer", "kfile"
- * $WIZ$ module_hw = "bertos/hw/hw_mcp41.h"
+ * $WIZ$ module_hw = "bertos/hw/hw_mcp41.h", "bertos/hw/hw_mcp41.c", "bertos/hw/mcp41_map.h"
  */
 
 #ifndef DRV_MCP41_H
