@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>Form</class>
- <widget class="QWidget" name="Form" >
-  <property name="geometry" >
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,30 +10,30 @@
     <height>146</height>
    </rect>
   </property>
-  <property name="sizePolicy" >
-   <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3" >
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_4" >
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_2" >
+      <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QLabel" name="label" >
-         <property name="text" >
+        <widget class="QLabel" name="label">
+         <property name="text">
           <string>Project Name</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_2" >
-         <property name="text" >
+        <widget class="QLabel" name="label_2">
+         <property name="text">
           <string>Destination directory</string>
          </property>
         </widget>
@@ -40,18 +41,18 @@
       </layout>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout" >
+      <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2" >
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <widget class="QLineEdit" name="nameEdit" />
+          <widget class="QLineEdit" name="nameEdit"/>
          </item>
          <item>
-          <spacer name="horizontalSpacer" >
-           <property name="orientation" >
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" stdset="0" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>40</width>
              <height>20</height>
@@ -62,38 +63,38 @@
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3" >
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
-          <widget class="QLineEdit" name="directoryEdit" />
+          <widget class="QLineEdit" name="directoryEdit"/>
          </item>
          <item>
-          <widget class="QToolButton" name="directoryButton" >
-           <property name="sizePolicy" >
-            <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+          <widget class="QToolButton" name="directoryButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>26</horstretch>
              <verstretch>26</verstretch>
             </sizepolicy>
            </property>
-           <property name="minimumSize" >
+           <property name="minimumSize">
             <size>
              <width>26</width>
              <height>26</height>
             </size>
            </property>
-           <property name="maximumSize" >
+           <property name="maximumSize">
             <size>
              <width>26</width>
              <height>26</height>
             </size>
            </property>
-           <property name="text" >
+           <property name="text">
             <string/>
            </property>
-           <property name="icon" >
-            <iconset resource="../bertos.qrc" >
+           <property name="icon">
+            <iconset resource="../bertos.qrc">
              <normaloff>:/images/folderopen.png</normaloff>:/images/folderopen.png</iconset>
            </property>
-           <property name="iconSize" >
+           <property name="iconSize">
             <size>
              <width>26</width>
              <height>26</height>
@@ -108,23 +109,23 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" >
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLabel" name="label_3" >
-       <property name="maximumSize" >
+      <widget class="QLabel" name="label_3">
+       <property name="maximumSize">
         <size>
          <width>110</width>
          <height>16777215</height>
         </size>
        </property>
-       <property name="text" >
+       <property name="text">
         <string>Project directory:</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="projectPath" >
-       <property name="text" >
+      <widget class="QLabel" name="projectPath">
+       <property name="text">
         <string>None</string>
        </property>
       </widget>
@@ -132,16 +133,19 @@
     </layout>
    </item>
    <item>
-    <widget class="QLabel" name="warningLabel" >
-     <property name="text" >
+    <widget class="QLabel" name="warningLabel">
+     <property name="text">
       <string/>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
  <resources>
-  <include location="../bertos.qrc" />
+  <include location="../bertos.qrc"/>
  </resources>
  <connections/>
 </ui>
