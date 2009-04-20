@@ -21,6 +21,7 @@ at91sam7s_CSRC = \
 	bertos/drv/ser.c \
 	bertos/cpu/arm/drv/sysirq_at91.c \
 	bertos/cpu/arm/drv/ser_at91.c \
+	bertos/cpu/arm/drv/timer_at91.c \
 	bertos/mware/event.c \
 	bertos/mware/formatwr.c \
 	bertos/mware/hex.c \
