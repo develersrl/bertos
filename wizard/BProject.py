@@ -9,6 +9,8 @@
 # Author: Lorenzo Berni <duplo@develer.com>
 #
 
+import copy
+
 class BProject(object):
     """
     Simple class for store and retrieve project informations.
@@ -28,7 +30,7 @@ class BProject(object):
         Retrieve the value associated with the name key.
         """
         if key in self.infos:
-            return self.infos[key]
+            return copy.deepcopy(self.infos[key])
         return None
     
     def __repr__(self):
