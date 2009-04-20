@@ -35,6 +35,12 @@ class BWizardPage(QWizardPage):
         Simple message box showing method.
         """
         QMessageBox.critical(self, self.tr("Error occurred"), message, QMessageBox.Ok, QMessageBox.NoButton)
+    
+    def showMessage(self, title, message):
+        """
+        Show an information message box with title and message.
+        """
+        QMessageBox.information(self, title, message)
         
     ## BProject interaction methods ##
     
