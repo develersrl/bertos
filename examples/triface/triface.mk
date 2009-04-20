@@ -42,6 +42,7 @@ triface_CSRC = \
 	bertos/drv/buzzer.c \
 	bertos/drv/sipo.c \
 	bertos/cpu/avr/drv/ser_avr.c \
+	bertos/cpu/avr/drv/timer_avr.c \
 	bertos/mware/formatwr.c \
 	bertos/mware/hex.c \
 	bertos/struct/hashtable.c \
@@ -72,6 +73,7 @@ boot_CSRC = \
 	bertos/drv/ser.c \
 	bertos/cpu/avr/drv/ser_avr.c \
 	bertos/cpu/avr/drv/flash_avr.c \
+	bertos/cpu/avr/drv/timer_avr.c \
 	bertos/drv/timer.c \
 	bertos/algo/crc.c \
 	bertos/mware/hex.c \
