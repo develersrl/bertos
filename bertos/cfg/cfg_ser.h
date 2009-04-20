@@ -49,21 +49,21 @@
 /**
  * Size of the outbound FIFO buffer for port 0 [bytes].
  * $WIZ$ type = "int"
- * $WIZ$ min = "2"
+ * $WIZ$ min = 2
  */
 #define CONFIG_UART0_TXBUFSIZE  32
 
 /**
  * Size of the inbound FIFO buffer for port 0 [bytes].
  * $WIZ$ type = "int"
- * $WIZ$ min = "2"
+ * $WIZ$ min = 2
  */
 #define CONFIG_UART0_RXBUFSIZE  32
 
 /**
  * Size of the outbound FIFO buffer for port 1 [bytes].
  * $WIZ$ type = "int"
- * $WIZ$ min = "2"
+ * $WIZ$ min = 2
  * $WIZ$ supports = "at91 and not atmega8 and not atmega168 and not atmega32"
  */
 #define CONFIG_UART1_TXBUFSIZE  32
@@ -71,24 +71,24 @@
 /**
  * Size of the inbound FIFO buffer for port 1 [bytes].
  * $WIZ$ type = "int"
- * $WIZ$ min = "2"
+ * $WIZ$ min = 2
  * $WIZ$ supports = "at91 and not atmega8 and not atmega168 and not atmega32"
  */
 #define CONFIG_UART1_RXBUFSIZE  32
 
 
 /**
- * [bytes] Size of the outbound FIFO buffer for SPI port.
+ * Size of the outbound FIFO buffer for SPI port [bytes].
  * $WIZ$ type = "int"
- * $WIZ$ min = "2"
+ * $WIZ$ min = 2
  * $WIZ$ supports = "avr"
  */
 #define CONFIG_SPI_TXBUFSIZE    32
 
 /**
- * [bytes] Size of the inbound FIFO buffer for SPI port.
+ * Size of the inbound FIFO buffer for SPI port [bytes].
  * $WIZ$ type = "int"
- * $WIZ$ min = "2"
+ * $WIZ$ min = 2
  * $WIZ$ supports = "avr"
  */
 #define CONFIG_SPI_RXBUFSIZE    32
@@ -96,7 +96,7 @@
 /**
  * Size of the outbound FIFO buffer for SPI port 0 [bytes].
  * $WIZ$ type = "int"
- * $WIZ$ min = "2"
+ * $WIZ$ min = 2
  * $WIZ$ supports = "at91"
  */
 #define CONFIG_SPI0_TXBUFSIZE	32
@@ -104,7 +104,7 @@
 /**
  * Size of the inbound FIFO buffer for SPI port 0 [bytes].
  * $WIZ$ type = "int"
- * $WIZ$ min = "2"
+ * $WIZ$ min = 2
  * $WIZ$ supports = "at91"
  */
 #define CONFIG_SPI0_RXBUFSIZE	32
@@ -112,7 +112,7 @@
 /**
  * Size of the outbound FIFO buffer for SPI port 1 [bytes].
  * $WIZ$ type = "int"
- * $WIZ$ min = "2"
+ * $WIZ$ min = 2
  * $WIZ$ supports = "at91"
  */
 #define CONFIG_SPI1_TXBUFSIZE	32
@@ -120,7 +120,7 @@
 /**
  * Size of the inbound FIFO buffer for SPI port 1 [bytes].
  * $WIZ$ type = "int"
- * $WIZ$ min = "2"
+ * $WIZ$ min = 2
  * $WIZ$ supports = "at91"
  */
 #define CONFIG_SPI1_RXBUFSIZE	32
@@ -161,14 +161,14 @@
 /**
  * Default transmit timeout (ms). Set to -1 to disable timeout support.
  * $WIZ$ type = "int"
- * $WIZ$ min = "-1"
+ * $WIZ$ min = -1
  */
 #define CONFIG_SER_TXTIMEOUT    -1
 
 /**
  * Default receive timeout (ms). Set to -1 to disable timeout support.
  * $WIZ$ type = "int"
- * $WIZ$ min = "-1"
+ * $WIZ$ min = -1
  */
 #define CONFIG_SER_RXTIMEOUT    -1
 
@@ -176,9 +176,9 @@
 #define CONFIG_SER_HWHANDSHAKE   0
 
 /**
- * Default baud rate for all serial ports (set to 0 to disable).
+ * Default baudrate for all serial ports (set to 0 to disable).
  * $WIZ$ type = "int"
- * $WIZ$ min = "0"
+ * $WIZ$ min = 0
  */
 #define CONFIG_SER_DEFBAUDRATE   0UL
 
