@@ -108,7 +108,7 @@ class BModulePage(BWizardPage):
                     try:
                         param_supported = bertos_utils.isSupported(self.project(), property_id=(configuration, property))
                     except SupportedException, e:
-                        self.exceptionOccurred(self.tr("Error evaluating \"%1\" for module %2").arg(e.support_string).arg(selectedModule))
+                        self.exceptionOccurred(self.tr("Error evaluating \"%1\" for parameter %2").arg(e.support_string).arg(property))
                         param_supported = True
                     if not param_supported:
                         # Doesn't show the unsupported parameters
@@ -214,7 +214,7 @@ class BModulePage(BWizardPage):
                 try:
                     supported = bertos_utils.isSupported(self.project(), module=module)
                 except SupportedException, e:
-                    self.exceptionOccurred(self.tr("Error evaluating \"%1\" for module %2").arg(e.support_string).arg(selectedModule))
+                    self.exceptionOccurred(self.tr("Error evaluating \"%1\" for module %2").arg(e.support_string).arg(module))
                     supported = True
                 if not supported:
                     module_item.setForeground(0, QBrush(QColor(Qt.red)))
