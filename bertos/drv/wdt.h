@@ -38,6 +38,7 @@
  *
  * $WIZ$ module_name = "wdt"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_wdt.h"
+ * $WIZ$ module_supports = "avr"
  */
 
 #ifndef DRV_WDT_H
