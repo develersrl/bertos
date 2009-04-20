@@ -64,7 +64,7 @@
  * I2C_BACKEND_BITBANG: Use the emulated bitbang driver.
  * \see drv/i2c.h for more information.
  *
- * $WIZ$ type = "enum",
+ * $WIZ$ type = "enum"
  * $WIZ$ value_list = "i2c_backend"
  */
 #define CONFIG_I2C_BACKEND I2C_BACKEND_BUILTIN
