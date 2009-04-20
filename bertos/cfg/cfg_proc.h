@@ -47,8 +47,9 @@
 #define CONFIG_KERN 0
 
 /**
- * Kernel interrupt supervisor.
+ * Kernel interrupt supervisor. WARNING: Experimental, still incomplete!
  * $WIZ$ type = "boolean"
+ * $WIZ$ supports = "False"
  */
 #define CONFIG_KERN_IRQ 0
 
@@ -63,6 +64,7 @@
  * Preemptive process scheduling. WARNING: Experimental, still incomplete!
  *
  * $WIZ$ type = "boolean"
+ * $WIZ$ supports = "False"
  */
 #define CONFIG_KERN_PREEMPT 0
 
