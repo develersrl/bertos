@@ -37,18 +37,18 @@ triface_CSRC = \
 	examples/triface/triface.c \
 	examples/triface/protocol.c \
 	examples/triface/hw/hw_adc.c \
+	bertos/cpu/avr/drv/ser_avr.c \
+	bertos/cpu/avr/drv/timer_avr.c \
 	bertos/drv/timer.c \
 	bertos/drv/ser.c \
 	bertos/drv/buzzer.c \
 	bertos/drv/sipo.c \
-	bertos/cpu/avr/drv/ser_avr.c \
-	bertos/cpu/avr/drv/timer_avr.c \
 	bertos/mware/formatwr.c \
 	bertos/mware/hex.c \
-	bertos/struct/hashtable.c \
 	bertos/mware/readline.c \
 	bertos/mware/parser.c \
 	bertos/mware/event.c \
+	bertos/struct/hashtable.c \
 	bertos/kern/kfile.c \
 	bertos/net/keytag.c \
 	#
@@ -69,12 +69,12 @@ TRG += boot
 boot_MCU = $(CPU)
 boot_CSRC = \
 	examples/triface/boot/main.c \
-	bertos/net/xmodem.c \
-	bertos/drv/ser.c \
 	bertos/cpu/avr/drv/ser_avr.c \
 	bertos/cpu/avr/drv/flash_avr.c \
 	bertos/cpu/avr/drv/timer_avr.c \
 	bertos/drv/timer.c \
+	bertos/drv/ser.c \
+	bertos/net/xmodem.c \
 	bertos/algo/crc.c \
 	bertos/mware/hex.c \
 	bertos/kern/kfile.c \
