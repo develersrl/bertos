@@ -52,14 +52,14 @@
 /**
  * Max retries before giving up.
  * $WIZ$ type = "int"
- * $WIZ$ min = "0"
+ * $WIZ$ min = 1
  */
 #define CONFIG_XMODEM_MAXRETRIES     15
 
 /**
  * Max retries before switching to BCC.
  * $WIZ$ type = "int"
- * $WIZ$ min = "0"
+ * $WIZ$ min = 1
  */
 #define CONFIG_XMODEM_MAXCRCRETRIES   7
 
