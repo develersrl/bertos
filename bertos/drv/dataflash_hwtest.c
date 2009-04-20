@@ -130,10 +130,10 @@ int dataflash_testSetup(void)
          * Init SPI module and dataflash driver.
          */
         // Open SPI comunication channel
-        spimaster_init(&spi_fd, CONFIG_SPI_PORT);
+        spimaster_init(&spi_fd, 0);
         LOG_INFO("SPI0 init..ok\n");
 
-        ser_setbaudrate(&spi_fd, CONFIG_SPI_BAUDRATE);
+        ser_setbaudrate(&spi_fd, 5000000UL);
         LOG_INFO("SPI0 set baudrate..ok\n");
 
         //Init dataflash memory

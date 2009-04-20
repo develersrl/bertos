@@ -46,17 +46,6 @@
  * Edit these define for your project.
  */
 
-/// Serial port settings. $WIZ$ type = "int"
-#define CONFIG_SER_PORT      0
-/// Serial port baudrate. $WIZ$ type = "int"
-#define CONFIG_SER_BAUDRATE  115200UL
-
-/// Spi port settings. $WIZ$ type = "int"
-#define CONFIG_SPI_PORT      0
-/// Spi port baudrate. $WIZ$ type = "int"
-#define CONFIG_SPI_BAUDRATE  5000000UL
-
-
 /// [bytes] Size of the outbound FIFO buffer for port 0. $WIZ$ type = "int"
 #define CONFIG_UART0_TXBUFSIZE  32
 
@@ -70,10 +59,18 @@
 #define CONFIG_UART1_RXBUFSIZE  32
 
 
-/// [bytes] Size of the outbound FIFO buffer for SPI port (AVR only). $WIZ$ type = "int"
+/**
+ * [bytes] Size of the outbound FIFO buffer for SPI port.
+ * $WIZ$ type = "int"
+ * $WIZ$ supports = "avr"
+ */
 #define CONFIG_SPI_TXBUFSIZE    32
 
-/// [bytes] Size of the inbound FIFO buffer for SPI port (AVR only). $WIZ$ type = "int"
+/**
+ * [bytes] Size of the inbound FIFO buffer for SPI port.
+ * $WIZ$ type = "int"
+ * $WIZ$ supports = "avr"
+ */
 #define CONFIG_SPI_RXBUFSIZE    32
 
 /// [bytes] Size of the outbound FIFO buffer for SPI port 0. $WIZ$ type = "int"
@@ -89,27 +86,35 @@
 #define CONFIG_SPI1_RXBUFSIZE	32
 
 /**
- * SPI data order (AVR only).
+ * SPI data order.
  *
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "ser_order_bit"
+ * $WIZ$ supports = "avr"
  */
 #define CONFIG_SPI_DATA_ORDER	SER_MSB_FIRST
 
-/// SPI clock division factor (AVR only). $WIZ$ type = "int"
-#define CONFIG_SPI_CLOCK_DIV	16
 /**
- * SPI clock polarity: normal low or normal high (AVR only).
+ * SPI clock division factor.
+ * $WIZ$ type = "int"
+ * $WIZ$ supports = "avr"
+ */
+#define CONFIG_SPI_CLOCK_DIV	16
+
+/**
+ * SPI clock polarity: normal low or normal high.
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "ser_spi_pol"
+ * $WIZ$ supports = "avr"
  */
 #define CONFIG_SPI_CLOCK_POL        SPI_NORMAL_LOW
 
 /**
  * SPI clock phase you can choose sample on first edge or
- * sample on second clock edge (AVR only)
+ * sample on second clock edge.
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "ser_spi_phase"
+ * $WIZ$ supports = "avr"
  */
 #define CONFIG_SPI_CLOCK_PHASE	    SPI_SAMPLE_ON_FIRST_EDGE
 
