@@ -77,7 +77,7 @@ class BModulePage(BWizardPage):
         the source tree.
         """
         module = self.currentModule()
-        if module is not None:
+        if module:
             try:
                 supported = bertos_utils.isSupported(self.project(), module=module)
             except SupportedException, e:
@@ -182,9 +182,9 @@ class BModulePage(BWizardPage):
         Loads the module data.
         """
         # Load the module data only if it isn't already loaded
-        if self.projectInfo("MODULES") == None \
-                and self.projectInfo("LISTS") == None \
-                and self.projectInfo("CONFIGURATIONS") == None:
+        if not self.projectInfo("MODULES") \
+                and not self.projectInfo("LISTS") \
+                and not self.projectInfo("CONFIGURATIONS"):
             try:
                 bertos_utils.loadModuleData(self.project())
             except ModuleDefineException, e:
@@ -199,7 +199,7 @@ class BModulePage(BWizardPage):
         Fills the module tree with the module entries separated in categories.
         """
         modules = self.projectInfo("MODULES")
-        if modules is None:
+        if not modules:
             return
         categories = {}
         for module, information in modules.items():
@@ -300,7 +300,7 @@ class BModulePage(BWizardPage):
         """
         current_module = self.pageContent.moduleTree.currentItem()
         # return only the child items
-        if current_module is not None and current_module.parent() is not None:
+        if current_module and current_module.parent():
             return unicode(current_module.text(0))
         else:
             return None

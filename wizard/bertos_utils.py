@@ -384,7 +384,7 @@ def loadModuleDefinition(first_comment):
     return to_be_parsed, module_dict
 
 def isSupported(project, module=None, property_id=None):
-    if module is None and property_id is not None:
+    if not module and property_id:
         item = project.info("CONFIGURATIONS")[property_id[0]][property_id[1]]["informations"]
     else:
         item = project.info("MODULES")[module]

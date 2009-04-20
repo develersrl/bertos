@@ -86,9 +86,9 @@ class BCpuPage(BWizardPage):
         cpu_name = self.projectInfo("CPU_NAME")
         selected_freq = self.projectInfo("SELECTED_FREQ")
         self.setupUi()
-        if not cpu_name is None:
+        if cpu_name:
             self.selectItem(cpu_name)
-            if not selected_freq is None:
+            if selected_freq:
                 self.setFrequency(selected_freq)
                 self.freq_modified = True
         QApplication.instance().restoreOverrideCursor()

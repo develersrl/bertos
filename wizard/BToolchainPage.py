@@ -141,7 +141,7 @@ class BToolchainPage(BWizardPage):
             item = QListWidgetItem(key)
             item.setData(Qt.UserRole, qvariant_converter.convertStringDict({"path": key}))
             self.pageContent.toolchainList.addItem(item)
-            if sel_toolchain is not None and sel_toolchain["path"] == key:
+            if sel_toolchain and sel_toolchain["path"] == key:
                 self.pageContent.toolchainList.setCurrentItem(item)
             if value:
                 self.validateToolchain(self.pageContent.toolchainList.row(item))

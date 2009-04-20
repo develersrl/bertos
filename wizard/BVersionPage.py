@@ -157,7 +157,7 @@ class BVersionPage(BWizardPage):
         selected = self.projectInfo("SOURCES_PATH")
         for directory in versions:
             item = self.insertListElement(directory)
-            if not selected is None and selected == directory:
+            if selected and selected == directory:
                 self.setCurrentItem(item)
     
     def setCurrentItem(self, item):

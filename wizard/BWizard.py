@@ -4,7 +4,7 @@
 # Copyright 2008 Develer S.r.l. (http://www.develer.com/)
 # All rights reserved.
 #
-# $Id:$
+# $Id$
 #
 # Author: Lorenzo Berni <duplo@develer.com>
 #
@@ -55,7 +55,7 @@ class BWizard(QWizard):
         method of the next page.
         """
         page = self.page(pageId)
-        if page is not None:
+        if page:
             page.reloadData()
     
     def project(self):
