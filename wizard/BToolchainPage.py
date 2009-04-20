@@ -169,6 +169,7 @@ class BToolchainPage(BWizardPage):
                 self.pageContent.toolchainList.addItem(item)
                 stored_toolchains[element] = False
         self.setToolchains(stored_toolchains)
+        self.showMessage(self.tr("Toolchain search result."), self.tr("%1 toolchains founded").arg(len(stored_toolchains)))
 
     def _validItem(self, index, infos):
         """
