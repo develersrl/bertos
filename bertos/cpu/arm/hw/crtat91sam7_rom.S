@@ -77,7 +77,7 @@
 #if CPU_FREQ != 48023000L
 	/* Avoid errors on nightly test */
 	#if !defined(ARCH_NIGHTTEST) || !(ARCH & ARCH_NIGHTTEST)
-		#error Clock registers set for 48MHz operation, revise following code if you want a different clock.
+		#warning Clock registers set for 48.023MHz operation, revise following code if you want a different clock.
 	#endif
 #endif
 
