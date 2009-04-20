@@ -40,14 +40,32 @@
 #ifndef CFG_LCD_H
 #define CFG_LCD_H
 
-/// Number bit for lcd bus
+/**
+ * Use 4 bit addressing mode.
+ * $WIZ$ type = "boolean"
+ */
 #define CONFIG_LCD_4BIT            0
 
-/// TODO:
+/**
+ * Use a table to speed up LCD memory addressing.
+ * This will use about 100 bytes of RAM.
+ * $WIZ$ type = "boolean"
+ */
 #define CONFIG_LCD_ADDRESS_FAST    1
 
-#define CONFIG_LCD_SOFTINT_REFRESH 0    ///< LCD setting for 32122A (AVR implementation)
-#define CONFIG_LCD_WAIT            1    ///< LCD setting for 32122A (AVR implementation)
+/**
+ * LCD setting for 32122A (AVR implementation).
+ * $WIZ$ type = "boolean"
+ * $WIZ$ supports = "avr and False"
+ */
+#define CONFIG_LCD_SOFTINT_REFRESH 0
+
+/**
+ * LCD setting for 32122A (AVR implementation).
+ * $WIZ$ type = "boolean"
+ * $WIZ$ supports = "avr and False"
+ */
+#define CONFIG_LCD_WAIT            1
 
 
 #endif /* CFG_LCD_H */
