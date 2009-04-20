@@ -4,7 +4,7 @@
 # Copyright 2009 Develer S.r.l. (http://www.develer.com/)
 # All rights reserved.
 #
-# $Id:$
+# $Id$
 #
 # Author: Lorenzo Berni <duplo@develer.com>
 #
@@ -34,7 +34,7 @@ class BFinalPage(BWizardPage):
         Overload of the BWizardPage reloadData method.
         """
         QApplication.instance().setOverrideCursor(Qt.WaitCursor)
-        bertos_utils.createBertosProject(self.wizard().project())
+        bertos_utils.createBertosProject(self.project())
         QApplication.instance().restoreOverrideCursor()
     
     ####
