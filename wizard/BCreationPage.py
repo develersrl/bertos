@@ -50,14 +50,14 @@ class BCreationPage(BWizardPage):
         top_level.append(cpu_title)
         toolchain_title = QTreeWidgetItem(QStringList([self.tr("Toolchain")]))
         toolchain_info = self.projectInfo("TOOLCHAIN")
-        if "target" in toolchain_info.keys():
+        if "target" in toolchain_info:
             toolchain_target = QTreeWidgetItem(toolchain_title, QStringList([self.tr("target: " + toolchain_info["target"])]))
         version = ""
-        if "version" in toolchain_info.keys():
+        if "version" in toolchain_info:
             version += "version: " + "GCC " + toolchain_info["version"] + " "
-        if "build" in toolchain_info.keys():
+        if "build" in toolchain_info:
             version += "(" + toolchain_info["build"] + ")"
-        if "version" in toolchain_info.keys():
+        if "version" in toolchain_info:
             toolchain_target = QTreeWidgetItem(toolchain_title, QStringList([version]))
         toolchain_path = QTreeWidgetItem(toolchain_title, QStringList([self.tr("path: " + os.path.normpath(toolchain_info["path"]))]))
         top_level.append(toolchain_title)
@@ -66,7 +66,7 @@ class BCreationPage(BWizardPage):
         module_categories = {}
         for module, information in self.projectInfo("MODULES").items():
             if information["enabled"]:
-                if information["category"] not in module_categories.keys():
+                if information["category"] not in module_categories:
                     module_categories[information["category"]] = []
                 moduleItem = QTreeWidgetItem(QStringList([module + " - " + information["description"]]))
                 module_categories[information["category"]].append(moduleItem)

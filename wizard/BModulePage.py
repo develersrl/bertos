@@ -118,9 +118,9 @@ class BModulePage(BWizardPage):
                     item = QTableWidgetItem(configurations[property]["brief"])
                     item.setData(Qt.UserRole, qvariant_converter.convertString(property))
                     self.pageContent.propertyTable.setItem(index, 0, item)
-                    if "type" in configurations[property]["informations"].keys() and configurations[property]["informations"]["type"] == "boolean":
+                    if "type" in configurations[property]["informations"] and configurations[property]["informations"]["type"] == "boolean":
                         self.insertCheckBox(index, configurations[property]["value"])
-                    elif "type" in configurations[property]["informations"].keys() and configurations[property]["informations"]["type"] == "enum":
+                    elif "type" in configurations[property]["informations"] and configurations[property]["informations"]["type"] == "enum":
                         self.insertComboBox(index, configurations[property]["value"], configurations[property]["informations"]["value_list"])
                     elif "type" in configurations[property]["informations"] and configurations[property]["informations"]["type"] == "int":
                         self.insertSpinBox(index, configurations[property]["value"], configurations[property]["informations"])
@@ -152,7 +152,7 @@ class BModulePage(BWizardPage):
         """
         self.resetPropertyDescription()
         configurations = self.currentModuleConfigurations()
-        if self.currentProperty() in configurations.keys():
+        if self.currentProperty() in configurations:
             description = configurations[self.currentProperty()]["brief"]
             name = self.currentProperty()
             self.currentPropertyItem().setText(description + "\n" + name)
@@ -164,7 +164,7 @@ class BModulePage(BWizardPage):
         property = qvariant_converter.getString(self.pageContent.propertyTable.item(index, 0).data(Qt.UserRole))
         configuration = self.projectInfo("MODULES")[self.currentModule()]["configuration"]
         configurations = self.projectInfo("CONFIGURATIONS")
-        if "type" not in configurations[configuration][property]["informations"].keys() or configurations[configuration][property]["informations"]["type"] == "int":
+        if "type" not in configurations[configuration][property]["informations"] or configurations[configuration][property]["informations"]["type"] == "int":
             configurations[configuration][property]["value"] = str(int(self.pageContent.propertyTable.cellWidget(index, 1).value()))
         elif configurations[configuration][property]["informations"]["type"] == "enum":
             configurations[configuration][property]["value"] = unicode(self.pageContent.propertyTable.cellWidget(index, 1).currentText())
@@ -203,7 +203,7 @@ class BModulePage(BWizardPage):
             return
         categories = {}
         for module, information in modules.items():
-            if information["category"] not in categories.keys():
+            if information["category"] not in categories:
                 categories[information["category"]] = []
             categories[information["category"]].append(module)
         for category, module_list in categories.items():
@@ -284,9 +284,9 @@ class BModulePage(BWizardPage):
             minimum = 0
             maximum = 4294967295
             suff = "UL"
-        if "min" in informations.keys():
+        if "min" in informations:
             minimum = int(informations["min"])
-        if "max" in informations.keys():
+        if "max" in informations:
             maximum = int(informations["max"])
         spin_box.setRange(minimum, maximum)
         spin_box.setSuffix(suff)
@@ -340,7 +340,7 @@ class BModulePage(BWizardPage):
         for index in range(self.pageContent.propertyTable.rowCount()):
             property_name = qvariant_converter.getString(self.pageContent.propertyTable.item(index, 0).data(Qt.UserRole))
             # Awful solution! Needed because if the user change the module, the selection changed...
-            if property_name not in self.currentModuleConfigurations().keys():
+            if property_name not in self.currentModuleConfigurations():
                 break
             self.pageContent.propertyTable.item(index, 0).setText(self.currentModuleConfigurations()[property_name]['brief'])
     

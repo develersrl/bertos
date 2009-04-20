@@ -79,9 +79,9 @@ def createBertosProject(project_info):
         for start, parameter in information["paramlist"]:
             infos = information[parameter]
             value = infos["value"]
-            if "unsigned" in infos["informations"].keys() and infos["informations"]["unsigned"]:
+            if "unsigned" in infos["informations"] and infos["informations"]["unsigned"]:
                 value += "U"
-            if "long" in infos["informations"].keys() and infos["informations"]["long"]:
+            if "long" in infos["informations"] and infos["informations"]["long"]:
                 value += "L"
             string = sub(string, parameter, value)
         f = open(cfgdir + "/" + os.path.basename(configuration), "w")
@@ -342,11 +342,11 @@ def loadModuleDefinition(first_comment):
         elif line.find("\\brief") != -1:
             module_definition["module_description"] = line[line.find("\\brief") + len("\\brief "):]
     module_dict = {}
-    if "module_name" in module_definition.keys():
+    if "module_name" in module_definition:
         module_name = module_definition[const.MODULE_DEFINITION["module_name"]]
         del module_definition[const.MODULE_DEFINITION["module_name"]]
         module_dict[module_name] = {}
-        if const.MODULE_DEFINITION["module_depends"] in module_definition.keys():
+        if const.MODULE_DEFINITION["module_depends"] in module_definition:
             depends = module_definition[const.MODULE_DEFINITION["module_depends"]]
             del module_definition[const.MODULE_DEFINITION["module_depends"]]
             if type(depends) == str:
@@ -354,20 +354,20 @@ def loadModuleDefinition(first_comment):
             module_dict[module_name]["depends"] = depends
         else:
             module_dict[module_name]["depends"] = ()
-        if const.MODULE_DEFINITION["module_configuration"] in module_definition.keys():
+        if const.MODULE_DEFINITION["module_configuration"] in module_definition:
             module_dict[module_name]["configuration"] = module_definition[const.MODULE_DEFINITION["module_configuration"]]
             del module_definition[const.MODULE_DEFINITION["module_configuration"]]
         else:
             module_dict[module_name]["configuration"] = ""
-        if "module_description" in module_definition.keys():
+        if "module_description" in module_definition:
             module_dict[module_name]["description"] = module_definition["module_description"]
             del module_definition["module_description"]
-        if const.MODULE_DEFINITION["module_harvard"] in module_definition.keys():
+        if const.MODULE_DEFINITION["module_harvard"] in module_definition:
             harvard = module_definition[const.MODULE_DEFINITION["module_harvard"]]
             if harvard == "both" or harvard == "pgm_memory":
                 module_dict[module_name]["harvard"] = harvard
             del module_definition[const.MODULE_DEFINITION["module_harvard"]]
-        if const.MODULE_DEFINITION["module_hw"] in module_definition.keys():
+        if const.MODULE_DEFINITION["module_hw"] in module_definition:
             hw = module_definition[const.MODULE_DEFINITION["module_hw"]]
             del module_definition[const.MODULE_DEFINITION["module_hw"]]
             if type(hw) == str:
@@ -375,7 +375,7 @@ def loadModuleDefinition(first_comment):
             module_dict[module_name]["hw"] = hw
         else:
             module_dict[module_name]["hw"] = ()
-        if const.MODULE_DEFINITION["module_supports"] in module_definition.keys():
+        if const.MODULE_DEFINITION["module_supports"] in module_definition:
             supports = module_definition[const.MODULE_DEFINITION["module_supports"]]
             del module_definition[const.MODULE_DEFINITION["module_supports"]]
             module_dict[module_name]["supports"] = supports
@@ -485,7 +485,7 @@ def loadModuleData(project):
                     information["depends"] = ()
                 information["depends"] += (filename.split(".")[0],)
                 information["category"] = os.path.basename(path)
-                if "configuration" in information.keys() and len(information["configuration"]):
+                if "configuration" in information and len(information["configuration"]):
                     configuration = module_dict[module]["configuration"]
                     try:
                         configuration_info[configuration] = loadConfigurationInfos(project.info("SOURCES_PATH") + "/" + configuration)
@@ -544,12 +544,12 @@ def loadConfigurationInfos(path):
         configuration_infos[name]["informations"] = informations
         if not "type" in configuration_infos[name]["informations"]:
             configuration_infos[name]["informations"]["type"] = findParameterType(configuration_infos[name])
-        if ("type" in configuration_infos[name]["informations"].keys() and
+        if ("type" in configuration_infos[name]["informations"] and
                 configuration_infos[name]["informations"]["type"] == "int" and
                 configuration_infos[name]["value"].find("L") != -1):
             configuration_infos[name]["informations"]["long"] = True
             configuration_infos[name]["value"] = configuration_infos[name]["value"].replace("L", "")
-        if ("type" in configuration_infos[name]["informations"].keys() and
+        if ("type" in configuration_infos[name]["informations"] and
                 configuration_infos[name]["informations"]["type"] == "int" and
                 configuration_infos[name]["value"].find("U") != -1):
             configuration_infos[name]["informations"]["unsigned"] = True
@@ -574,7 +574,7 @@ def isInt(informations):
     """
     Return True if the value is a simple int.
     """
-    if ("long" not in informatios.keys() or not informations["long"]) and ("unsigned" not in informations.keys() or informations["unsigned"]):
+    if ("long" not in informatios or not informations["long"]) and ("unsigned" not in informations or informations["unsigned"]):
         return True
     else:
         return False
@@ -583,7 +583,7 @@ def isLong(informations):
     """
     Return True if the value is a long.
     """
-    if "long" in informations.keys() and informations["long"] and "unsigned" not in informations.keys():
+    if "long" in informations and informations["long"] and "unsigned" not in informations:
         return True
     else:
         return False
@@ -592,7 +592,7 @@ def isUnsigned(informations):
     """
     Return True if the value is an unsigned.
     """
-    if "unsigned" in informations.keys() and informations["unsigned"] and "long" not in informations.keys():
+    if "unsigned" in informations and informations["unsigned"] and "long" not in informations:
         return True
     else:
         return False
@@ -601,7 +601,7 @@ def isUnsignedLong(informations):
     """
     Return True if the value is an unsigned long.
     """
-    if "unsigned" in informations.keys() and "long" in informations.keys() and informations["unsigned"] and informations["long"]:
+    if "unsigned" in informations and "long" in informations and informations["unsigned"] and informations["long"]:
         return True
     else:
         return False

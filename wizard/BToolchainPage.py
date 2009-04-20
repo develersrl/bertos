@@ -163,7 +163,7 @@ class BToolchainPage(BWizardPage):
         toolchain_list = bertos_utils.findToolchains(dir_list)
         stored_toolchains = self.toolchains()
         for element in toolchain_list:
-            if not element in stored_toolchains.keys():
+            if not element in stored_toolchains:
                 item = QListWidgetItem(element)
                 item.setData(Qt.UserRole, qvariant_converter.convertStringDict({"path": element}))
                 self.pageContent.toolchainList.addItem(item)
@@ -179,11 +179,11 @@ class BToolchainPage(BWizardPage):
         new_data.update(infos)
         item.setData(Qt.UserRole, qvariant_converter.convertStringDict(new_data))
         needed = self.projectInfo("CPU_INFOS")
-        if "target" in infos.keys() and infos["target"].find(needed["TOOLCHAIN"]) != -1:
+        if "target" in infos and infos["target"].find(needed["TOOLCHAIN"]) != -1:
             item.setIcon(QIcon(":/images/ok.png"))
         else:
             item.setIcon(QIcon(":/images/warning.png"))
-        if "version" in infos.keys() and "target" in infos.keys():
+        if "version" in infos and "target" in infos:
             item.setText("GCC " + infos["version"] + " - " + infos["target"].strip())
 
     def _invalidItem(self, index):
@@ -215,7 +215,7 @@ class BToolchainPage(BWizardPage):
             if self._validation_process.waitForFinished(200):
                 description = str(self._validation_process.readAllStandardError())
                 info = bertos_utils.getToolchainInfo(description)
-                if len(info.keys()) >= 4:
+                if len(info) >= 4:
                     valid = True
             else:
                 self._validation_process.kill()

@@ -4,7 +4,7 @@
 # Copyright 2008 Develer S.r.l. (http://www.develer.com/)
 # All rights reserved.
 #
-# $Id:$
+# $Id$
 #
 # Author: Lorenzo Berni <duplo@develer.com>
 #
@@ -27,7 +27,7 @@ class BProject(object):
         """
         Retrieve the value associated with the name key.
         """
-        if key in self.infos.keys():
+        if key in self.infos:
             return self.infos[key]
         return None
     
