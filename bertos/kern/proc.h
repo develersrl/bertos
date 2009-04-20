@@ -30,7 +30,7 @@
  * Copyright 1999, 2000, 2001, 2008 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
- * \brief Bertos Kernel core (Process scheduler).
+ * \brief BeRTOS Kernel core (Process scheduler).
  *
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
