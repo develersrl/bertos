@@ -11,8 +11,16 @@
 
 from _winreg import *
 
-DIR_KEY = OpenKey(HKEY_LOCAL_MACHINE, "SOFTWARE\Develer\BeRTOS SDK\BeRTOS Dirs")
-TOOLCHAIN_KEY = OpenKey(HKEY_LOCAL_MACHINE, "SOFTWARE\Develer\BeRTOS SDK\Toolchain Executables")
+# Open the registry keys. When the keys don't exist it do nothing
+try:
+    DIR_KEY = OpenKey(HKEY_LOCAL_MACHINE, "SOFTWARE\Develer\BeRTOS SDK\BeRTOS Dirs")
+except WindowsError:
+    DIR_KEY = None
+
+try:
+    TOOLCHAIN_KEY = OpenKey(HKEY_LOCAL_MACHINE, "SOFTWARE\Develer\BeRTOS SDK\Toolchain Executables")
+except WindowsError:
+    TOOLCHAIN_KEY = None
 
 def getBertosDirs():
     """
@@ -33,10 +41,12 @@ def getFromRegistry(key):
     """
     index = 0
     items = []
-    while True:
-        try:
-            item = EnumValue(TOOLCHAIN_KEY, index)[1]
-            items.append(item)
-        except WindowsError:
-            break
+    if key:
+        while True:
+            try:
+                item = EnumValue(key, index)[1]
+                items.append(item)
+                index += 1
+            except WindowsError:
+                break
     return items
