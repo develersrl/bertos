@@ -43,7 +43,7 @@
 /**
  *Buffer len for pockebus protocol.
  * $WIZ$ type = "int"
- * $WIZ$ min = "0"
+ * $WIZ$ min = 2
  */
 #define CONFIG_POCKETBUS_BUFLEN     128
 
