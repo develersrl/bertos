@@ -57,7 +57,7 @@ def main():
     app.settings = QSettings("Develer", "Bertos Configurator")
     app.project = BProject.BProject()
     # Development utility lines, to be removed for production
-    if newer("bertos.qrc", "bertos.rcc"):
+    if not (hasattr(sys, "frozen") and sys.frozen) and newer("bertos.qrc", "bertos.rcc"):
         os.system("rcc -binary bertos.qrc -o bertos.rcc")
     QResource.registerResource("bertos.rcc")
     if "--create" in sys.argv and "--edit" not in sys.argv:
