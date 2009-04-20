@@ -12,16 +12,31 @@
 from _winreg import *
 
 DIR_KEY = OpenKey(HKEY_LOCAL_MACHINE, "SOFTWARE\Develer\BeRTOS SDK\BeRTOS Dirs")
+TOOLCHAIN_KEY = OpenKey(HKEY_LOCAL_MACHINE, "SOFTWARE\Develer\BeRTOS SDK\Toolchain Executables")
 
 def getBertosDirs():
+    """
+    Returns the path of the BeRTOS versions installed by the BeRTOS SDK installer.
+    """
+    return getFromRegistry(DIR_KEY)
+
+def getBertosToolchain():
+    """
+    Returns the path of the executables of the toolchains installed by the BeRTOS
+    SDK installer.
+    """
+    return getFromRegistry(TOOLCHAIN_KEY)
+
+def getFromRegistry(key):
+    """
+    Returns the value of all the named values of the given key.
+    """
     index = 0
-    dirs = []
+    items = []
     while True:
         try:
-            dir = EnumValue(DIR_KEY, index)[1]
-            dirs.append(dir)
-            index += 1
+            item = EnumValue(TOOLCHAIN_KEY, index)[1]
+            items.append(item)
         except WindowsError:
             break
-    return dirs
-       
+    return items
