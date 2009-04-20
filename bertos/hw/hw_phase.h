@@ -46,9 +46,6 @@
 
 #warning TODO:This is an example implementation, you must implement it!
 
-#define TRIAC_MAX_DUTY  100
-#define TRIAC_MAX_POWER 100
-
 #define PHASE_HW_INIT  do { /* Implement me! */ }while (0)
 
 INLINE void TRIAC_OFF(TriacDev i)

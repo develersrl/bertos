@@ -74,10 +74,10 @@ DEFINE_ZEROCROSS_ISR()
 	for (dev = 0; dev < TRIAC_CNT; dev++)
 	{
 		/* Only turn off triac if duty is != 100% */
-		if (triacs[dev].duty != TRIAC_MAX_DUTY)
+		if (triacs[dev].duty != CONFIG_TRIAC_MAX_DUTY)
 			TRIAC_OFF(dev);
 		/* Compute delay from duty */
-		timer_setDelay(&triacs[dev].timer, DIV_ROUND(period * (TRIAC_MAX_DUTY - triacs[dev].duty), TRIAC_MAX_DUTY));
+		timer_setDelay(&triacs[dev].timer, DIV_ROUND(period * (CONFIG_TRIAC_MAX_DUTY - triacs[dev].duty), CONFIG_TRIAC_MAX_DUTY));
 
 		/* This check avoids inserting the same timer twice
 		 * in case of an intempestive zerocross or spike */
@@ -115,7 +115,7 @@ void phase_setDuty(TriacDev dev, triac_duty_t duty)
  */
 void phase_setDutyUnlock(TriacDev dev, triac_duty_t duty)
 {
-	triacs[dev].duty = MIN(duty, (triac_duty_t)TRIAC_MAX_DUTY);
+	triacs[dev].duty = MIN(duty, (triac_duty_t)CONFIG_TRIAC_MAX_DUTY);
 }
 
 
@@ -131,18 +131,18 @@ void phase_setPower(TriacDev dev, triac_power_t power)
 	bool greater_fifty = false;
 	triac_duty_t duty;
 
-	power = MIN(power, (triac_power_t)TRIAC_MAX_POWER);
+	power = MIN(power, (triac_power_t)CONFIG_TRIAC_MAX_POWER);
 
-	if (power > TRIAC_MAX_POWER / 2)
+	if (power > CONFIG_TRIAC_MAX_POWER / 2)
 	{
 		greater_fifty = true;
-		power = TRIAC_MAX_POWER - power;
+		power = CONFIG_TRIAC_MAX_POWER - power;
 	}
 
 	duty = TRIAC_POWER_K * sqrt(power);
 
 	if (greater_fifty)
-		duty = TRIAC_MAX_DUTY - duty;
+		duty = CONFIG_TRIAC_MAX_DUTY - duty;
 	phase_setDuty(dev, duty);
 }
 
