@@ -81,7 +81,7 @@ class BModulePage(BWizardPage):
             try:
                 supported = bertos_utils.isSupported(self.project(), module=module)
             except SupportedException, e:
-                self.exceptionOccurred(self.tr("Error evaluating \"%1\" for module %2").arg(e.support_string).arg(selectedModule))
+                self.exceptionOccurred(self.tr("Error evaluating \"%1\" for module %2").arg(e.support_string).arg(module))
                 supported = True
             self._control_group.clear()
             configuration = self.projectInfo("MODULES")[module]["configuration"]
