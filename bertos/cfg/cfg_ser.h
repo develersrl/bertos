@@ -182,7 +182,7 @@
  */
 #define CONFIG_SER_DEFBAUDRATE   0UL
 
-/// Enable strobe pin for serial debug. $WIZ$ type = "boolean"
+/// Enable strobe pin for debugging serial interrupt. $WIZ$ type = "boolean"
 #define CONFIG_SER_STROBE        0
 
 #endif /* CFG_SER_H */
