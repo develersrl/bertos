@@ -81,7 +81,7 @@ class BFolderPage(BWizardPage):
         """
         Slot called when the project folder is changed using the file dialog.
         """
-        directory = unicode(QFileDialog.getExistingDirectory(self, self.tr("Open Directory"), "", QFileDialog.ShowDirsOnly))
+        directory = unicode(QFileDialog.getExistingDirectory(self, self.tr("Open Directory"), self.pageContent.directoryEdit.text(), QFileDialog.ShowDirsOnly))
         if len(directory) > 0:
             self.pageContent.directoryEdit.setText(directory)
 
