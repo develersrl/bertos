@@ -67,7 +67,7 @@
  * Minimum time for starting up a conversion [us].
  *
  * $WIZ$ type = "int"
- * $WIZ$ min = "0"
+ * $WIZ$ min = 0
  * $WIZ$ supports = "at91"
  */
 #define CONFIG_ADC_STARTUP_TIME 20
@@ -76,7 +76,7 @@
  * Minimum time for sample and hold [us].
  *
  * $WIZ$ type = "int"
- * $WIZ$ min = "0"
+ * $WIZ$ min = 0
  * $WIZ$ supports = "at91"
  */
 #define CONFIG_ADC_SHTIME       834
@@ -94,8 +94,8 @@
  * ADC clock divisor from main crystal.
  *
  * $WIZ$ type = "int"
- * $WIZ$ min = "2"
- * $WIZ$ max = "128"
+ * $WIZ$ min = 2
+ * $WIZ$ max = 128
  * $WIZ$ supports = "avr"
  */
 #define CONFIG_ADC_AVR_DIVISOR  2

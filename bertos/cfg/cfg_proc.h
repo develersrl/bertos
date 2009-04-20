@@ -78,7 +78,7 @@
  * Time sharing quantum (a prime number prevents interference effects) [ms].
  *
  * $WIZ$ type = "int"
- * $WIZ$ min = "0"
+ * $WIZ$ min = 1
  */
 #define CONFIG_KERN_QUANTUM 47
 

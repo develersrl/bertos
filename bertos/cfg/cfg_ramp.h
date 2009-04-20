@@ -68,8 +68,8 @@
 	 *
 	 * \note This macro is used only for the fixed-point version of the ramp.
 	 * $WIZ$ type = "int"
-	 * $WIZ$ min = "0"
-	 * $WIZ$ max = "32"
+	 * $WIZ$ min = 0
+	 * $WIZ$ max = 32
 	 */
 	#define RAMP_CLOCK_SHIFT_PRECISION 2
 #endif
@@ -78,37 +78,38 @@
 /**
 * Negative pulse width for ramp.
 * $WIZ$ type = "int"
-* $WIZ$ min = "0"
+* $WIZ$ min = 1
 */
 #define RAMP_PULSE_WIDTH    50
 
 /**
  * Default ramp time (microsecs).
  * $WIZ$ type = "int"
+ * $WIZ$ min = 1000
  */
 #define RAMP_DEF_TIME     6000000UL
 /**
  * Default ramp maxfreq (Hz).
  * $WIZ$ type = "int"
- * $WIZ$ min = "0"
+ * $WIZ$ min = 1
  */
 #define RAMP_DEF_MAXFREQ       5000
 /**
  * Default ramp minfreq (Hz).
  * $WIZ$ type = "int"
- * $WIZ$ min = "0"
+ * $WIZ$ min = 1
  */
 #define RAMP_DEF_MINFREQ        200
 /**
  * Default ramp powerrun (deciampere).
  * $WIZ$ type = "int"
- * $WIZ$ min = "0"
+ * $WIZ$ min = 0
  */
 #define RAMP_DEF_POWERRUN        10
 /**
  * Default ramp poweridle (Hz).
  * $WIZ$ type = "int"
- * $WIZ$ min = "0"
+ * $WIZ$ min = 0
  */
 #define RAMP_DEF_POWERIDLE        1
 

@@ -43,7 +43,7 @@
 /**
  * Size of block for MD2 algorithm.
  * $WIZ$ type = "int"
- * $WIZ$ min = "0"
+ * $WIZ$ min = 2
  */
 #define CONFIG_MD2_BLOCK_LEN    16
 

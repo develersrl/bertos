@@ -56,14 +56,14 @@
 /**
  * Max number of the stepper motor.
  * $WIZ$ type = "int"
- * $WIZ$ min = "0"
+ * $WIZ$ min = 1
  */
 #define CONFIG_NUM_STEPPER_MOTORS    6
 
 /**
  * Max number of the timer usable on target to drive stepper motor.
  * $WIZ$ type = "int"
- * $WIZ$ min = "0"
+ * $WIZ$ min = 1
  */
 #define CONFIG_TC_STEPPER_MAX_NUM    6
 

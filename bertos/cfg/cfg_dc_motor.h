@@ -44,7 +44,7 @@
  * Number of the DC motors to manage.
  *
  * $WIZ$ type = "int"
- * $WIZ$ min = "1"
+ * $WIZ$ min = 1
  */
 #define CONFIG_NUM_DC_MOTOR       1
 

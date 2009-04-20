@@ -44,7 +44,7 @@
 /**
  * Define a size, in byte, of entropy pool.
  * $WIZ$ type = "int"
- * $WIZ$ min = "0"
+ * $WIZ$ min = 1
  */
 #define CONFIG_SIZE_ENTROPY_POOL   64
 

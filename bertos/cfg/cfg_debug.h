@@ -48,7 +48,7 @@
 
 /**
  * Baudrate for the debug console.
- * $WIZ$ type = "int"; min = 0
+ * $WIZ$ type = "int"; min = 300
  */
 #define CONFIG_KDEBUG_BAUDRATE  115200UL
 
