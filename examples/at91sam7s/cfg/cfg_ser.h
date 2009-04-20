@@ -101,12 +101,6 @@
 /// Default baud rate (set to 0 to disable).
 #define CONFIG_SER_DEFBAUDRATE   0
 
-/// Enable ser_gets() and ser_gets_echo().
-#define CONFIG_SER_GETS          0
-
-/// Enable second serial port in emulator.
-#define CONFIG_EMUL_UART1        0
-
 /// For serial debug.
 #define CONFIG_SER_STROBE        0
 
