@@ -153,7 +153,11 @@ class BVersionPage(BWizardPage):
         """
         Fills the version list with all the BeRTOS versions founded in the QSettings.
         """
-        versions = self.versions()
+        versions = set([])
+        if os.name == "nt":
+            import winreg_importer
+            versions |= set(winreg_importer.getBertosDirs())
+        versions |= set(self.versions())
         selected = self.projectInfo("SOURCES_PATH")
         for directory in versions:
             item = self.insertListElement(directory)
