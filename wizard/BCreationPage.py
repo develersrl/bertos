@@ -51,12 +51,12 @@ class BCreationPage(BWizardPage):
         toolchain_title = QTreeWidgetItem(QStringList([self.tr("Toolchain")]))
         toolchain_info = self.projectInfo("TOOLCHAIN")
         if "target" in toolchain_info:
-            toolchain_target = QTreeWidgetItem(toolchain_title, QStringList([self.tr("target: " + toolchain_info["target"])]))
+            toolchain_target = QTreeWidgetItem(toolchain_title, QStringList([self.tr("target: " + toolchain_info["target"].strip())]))
         version = ""
         if "version" in toolchain_info:
-            version += "version: " + "GCC " + toolchain_info["version"] + " "
+            version += "version: " + "GCC " + toolchain_info["version"].strip() + " "
         if "build" in toolchain_info:
-            version += "(" + toolchain_info["build"] + ")"
+            version += "(" + toolchain_info["build"].strip() + ")"
         if "version" in toolchain_info:
             toolchain_target = QTreeWidgetItem(toolchain_title, QStringList([version]))
         toolchain_path = QTreeWidgetItem(toolchain_title, QStringList([self.tr("path: " + os.path.normpath(toolchain_info["path"]))]))
