@@ -115,8 +115,8 @@ def mkGenerator(project_info, makefile):
     mk_data["$asflags"] = " ".join(project_info.info("CPU_INFOS")["AS_FLAGS"])
     mk_data["$arflags"] = " ".join(project_info.info("CPU_INFOS")["AR_FLAGS"])
     mk_data["$csrc"], mk_data["$pcsrc"], mk_data["$cppasrc"], mk_data["$cxxsrc"], mk_data["$asrc"], mk_data["$constants"] = csrcGenerator(project_info)
-    mk_data["$prefix"] = project_info.info("TOOLCHAIN")["path"].split("gcc")[0]
-    mk_data["$suffix"] = project_info.info("TOOLCHAIN")["path"].split("gcc")[1]
+    mk_data["$prefix"] = replaceSeparators(project_info.info("TOOLCHAIN")["path"].split("gcc")[0])
+    mk_data["$suffix"] = replaceSeparators(project_info.info("TOOLCHAIN")["path"].split("gcc")[1])
     mk_data["$main"] = os.path.basename(project_info.info("PROJECT_PATH")) + "/main.c"
     for key in mk_data:
         while makefile.find(key) != -1:
@@ -206,8 +206,7 @@ def findModuleFiles(module, project_info):
     for filename, path in findDefinitions(module + ".c", project_info) + \
             findDefinitions(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".c", project_info):
         path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
-        if os.sep != "/":
-            path = replaceSeparators(path)
+        path = replaceSeparators(path)
         cfiles.append(path + "/" + filename)
     # .s files related to the module and the cpu architecture
     for filename, path in findDefinitions(module + ".s", project_info) + \
@@ -215,8 +214,7 @@ def findModuleFiles(module, project_info):
             findDefinitions(module + ".S", project_info) + \
             findDefinitions(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".S", project_info):
         path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
-        if os.sep != "/":
-            path = replaceSeparators(path)
+        path = replaceSeparators(path)
         sfiles.append(path + "/" + filename)
     # .c and .s files related to the module and the cpu tags
     for tag in project_info.info("CPU_INFOS")["CPU_TAGS"]:
@@ -228,8 +226,7 @@ def findModuleFiles(module, project_info):
         for filename, path in findDefinitions(module + "_" + tag + ".s", project_info) + \
                 findDefinitions(module + "_" + tag + ".S", project_info):
             path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
-            if os.sep != "/":
-                path = replaceSeparators(path)
+            path = replaceSeparators(path)
             sfiles.append(path + "/" + filename)
     return cfiles, sfiles
 
@@ -237,8 +234,9 @@ def replaceSeparators(path):
     """
     Replace the separators in the given path with unix standard separator.
     """
-    while path.find(os.sep) != -1:
-        path = path.replace(os.sep, "/")
+    if os.sep != "/":
+        while path.find(os.sep) != -1:
+            path = path.replace(os.sep, "/")
     return path
 
 def getSystemPath():
