@@ -136,6 +136,11 @@ class BToolchainPage(BWizardPage):
         Fills the toolchain list with the toolchains stored in the QSettings.
         """
         toolchains = self.toolchains()
+        if os.name == "nt":
+            import winreg_importer
+            stored_toolchains = winreg_importer.getBertosToolchains()
+            for toolchain in stored_toolchains:
+                toolchains[toolchain] = True
         sel_toolchain = self.projectInfo("TOOLCHAIN")
         for key, value in toolchains.items():
             item = QListWidgetItem(key)
