@@ -58,6 +58,11 @@
 #if OS_HOSTED
 	//#include OS_CSOURCE(timer)
 	#include <emul/timer_posix.c>
+#else
+	#ifndef WIZ_AUTOGEN
+		#warning Deprecated: now you should include timer_<cpu> directly in the makefile. Remove this line and the following once done.
+		#include CPU_CSOURCE(timer)
+	#endif
 #endif
 
 /*

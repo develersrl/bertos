@@ -114,7 +114,7 @@
  * Select mux channel \a ch.
  * \todo only first 8 channels are selectable!
  */
-INLINE void adc_hw_select_ch(uint8_t ch)
+void adc_hw_select_ch(uint8_t ch)
 {
 	//Disable all channels
 	ADC_CHDR = ADC_CH_MASK;
@@ -128,7 +128,7 @@ INLINE void adc_hw_select_ch(uint8_t ch)
  * If a kernel is present, preempt until convertion is complete, otherwise
  * a busy wait on ADCS bit is done.
  */
-INLINE uint16_t adc_hw_read(void)
+uint16_t adc_hw_read(void)
 {
 	ASSERT(!(ADC_SR & ADC_EOC_MASK));
 
@@ -155,7 +155,7 @@ INLINE uint16_t adc_hw_read(void)
 /**
  * Init ADC hardware.
  */
-INLINE void adc_hw_init(void)
+void adc_hw_init(void)
 {
 	//Init ADC pins.
 	ADC_INIT_PINS();

@@ -38,7 +38,12 @@
 
 #include <drv/adc.h>
 
-#include CPU_CSOURCE(adc)
+#ifndef WIZ_AUTOGEN
+	#warning Deprecated: now you should include adc_<cpu> directly in the makefile. Remove this line and the following once done.
+	#include CPU_CSOURCE(adc)
+#else
+	#include CPU_HEADER(adc)
+#endif
 
 #include <cfg/debug.h>     // ASSERT()
 #include <cfg/macros.h>    // MIN()

@@ -97,7 +97,7 @@
  * Select mux channel \a ch.
  * \todo only first 8 channels are selectable!
  */
-INLINE void adc_hw_select_ch(uint8_t ch)
+void adc_hw_select_ch(uint8_t ch)
 {
 	/* Set to 0 all mux registers */
 	ADMUX &= ~(BV(MUX4) | BV(MUX3) | BV(MUX2) | BV(MUX1) | BV(MUX0));
@@ -112,7 +112,7 @@ INLINE void adc_hw_select_ch(uint8_t ch)
  * If a kernel is present, preempt until convertion is complete, otherwise
  * a busy wait on ADCS bit is done.
  */
-INLINE uint16_t adc_hw_read(void)
+uint16_t adc_hw_read(void)
 {
 	// Ensure another convertion is not running.
 	ASSERT(!(ADCSRA & BV(ADSC)));
@@ -136,7 +136,7 @@ INLINE uint16_t adc_hw_read(void)
 /**
  * Init ADC hardware.
  */
-INLINE void adc_hw_init(void)
+void adc_hw_init(void)
 {
 	/*
 	 * Select channel 0 as default,

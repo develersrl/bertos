@@ -90,5 +90,8 @@
 	do { \
 	} while (0)
 
+void adc_hw_select_ch(uint8_t ch);
+uint16_t adc_hw_read(void);
+void adc_hw_init(void);
 
 #endif /* DRV_ADC_AT91_H */
