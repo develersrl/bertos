@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>Form</class>
- <widget class="QWidget" name="Form" >
-  <property name="geometry" >
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,47 +10,47 @@
     <height>298</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" >
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QListWidget" name="toolchainList" />
+    <widget class="QListWidget" name="toolchainList"/>
    </item>
    <item>
-    <widget class="QLabel" name="infoLabel" >
-     <property name="text" >
+    <widget class="QLabel" name="infoLabel">
+     <property name="text">
       <string/>
      </property>
-     <property name="wordWrap" >
+     <property name="wordWrap">
       <bool>true</bool>
      </property>
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" >
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QToolButton" name="addButton" >
-       <property name="minimumSize" >
+      <widget class="QToolButton" name="addButton">
+       <property name="minimumSize">
         <size>
          <width>26</width>
          <height>26</height>
         </size>
        </property>
-       <property name="maximumSize" >
+       <property name="maximumSize">
         <size>
          <width>26</width>
          <height>26</height>
         </size>
        </property>
-       <property name="text" >
+       <property name="text">
         <string/>
        </property>
-       <property name="icon" >
-        <iconset resource="bertos.qrc" >
+       <property name="icon">
+        <iconset resource="../bertos.qrc">
          <normaloff>:/images/listadd.png</normaloff>:/images/listadd.png</iconset>
        </property>
-       <property name="iconSize" >
+       <property name="iconSize">
         <size>
          <width>16</width>
          <height>16</height>
@@ -58,27 +59,27 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="removeButton" >
-       <property name="minimumSize" >
+      <widget class="QToolButton" name="removeButton">
+       <property name="minimumSize">
         <size>
          <width>26</width>
          <height>26</height>
         </size>
        </property>
-       <property name="maximumSize" >
+       <property name="maximumSize">
         <size>
          <width>26</width>
          <height>26</height>
         </size>
        </property>
-       <property name="text" >
+       <property name="text">
         <string/>
        </property>
-       <property name="icon" >
-        <iconset resource="bertos.qrc" >
+       <property name="icon">
+        <iconset resource="../bertos.qrc">
          <normaloff>:/images/listremove.png</normaloff>:/images/listremove.png</iconset>
        </property>
-       <property name="iconSize" >
+       <property name="iconSize">
         <size>
          <width>16</width>
          <height>16</height>
@@ -87,11 +88,11 @@
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer" >
-       <property name="orientation" >
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
-       <property name="sizeHint" stdset="0" >
+       <property name="sizeHint" stdset="0">
         <size>
          <width>40</width>
          <height>20</height>
@@ -100,47 +101,28 @@
       </spacer>
      </item>
      <item>
-      <widget class="QToolButton" name="checkButton" >
-       <property name="minimumSize" >
-        <size>
-         <width>26</width>
-         <height>26</height>
-        </size>
-       </property>
-       <property name="maximumSize" >
-        <size>
-         <width>26</width>
-         <height>26</height>
-        </size>
-       </property>
-       <property name="toolTip" >
-        <string>Validate all the toolchains</string>
-       </property>
-       <property name="text" >
-        <string/>
-       </property>
-       <property name="icon" >
-        <iconset resource="bertos.qrc" >
-         <normaloff>:/images/ok.png</normaloff>:/images/ok.png</iconset>
+      <widget class="QToolButton" name="checkButton">
+       <property name="text">
+        <string>Validate</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="searchButton" >
-       <property name="minimumSize" >
+      <widget class="QToolButton" name="searchButton">
+       <property name="minimumSize">
         <size>
          <width>26</width>
          <height>26</height>
         </size>
        </property>
-       <property name="maximumSize" >
+       <property name="maximumSize">
         <size>
          <width>16777215</width>
          <height>26</height>
         </size>
        </property>
-       <property name="text" >
-        <string>Search</string>
+       <property name="text">
+        <string>Search...</string>
        </property>
       </widget>
      </item>
@@ -149,7 +131,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="bertos.qrc" />
+  <include location="../bertos.qrc"/>
  </resources>
  <connections/>
 </ui>
