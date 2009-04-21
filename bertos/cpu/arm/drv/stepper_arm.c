@@ -42,12 +42,14 @@
  */
 #ifndef WIZ_AUTOGEN
 	#warning This file is deprecated, you should use stepper_at91.c
+
 	#include <cpu/detect.h>
 
-#if CPU_ARM_AT91
-	#include "stepper_at91.c"
-/*#elif  Add other ARM families here */
-#else
-	#error Unknown CPU
-#endif
+	#if CPU_ARM_AT91
+		#include "stepper_at91.c"
+	/*#elif  Add other ARM families here */
+	#else
+		#error Unknown CPU
+	#endif
+#endif /* WIZ_AUTOGEN */
 
