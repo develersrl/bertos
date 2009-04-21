@@ -82,5 +82,7 @@ class BCreationPage(BWizardPage):
             category_item.addChildren(value)
         top_level.append(module_title)
         self.pageContent.summaryTree.insertTopLevelItems(0, top_level)
+        for item in top_level:
+            self.pageContent.summaryTree.expandItem(item)
     
     ####
