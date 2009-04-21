@@ -28,7 +28,7 @@ def getBertosDirs():
     """
     return getFromRegistry(DIR_KEY)
 
-def getBertosToolchain():
+def getBertosToolchains():
     """
     Returns the path of the executables of the toolchains installed by the BeRTOS
     SDK installer.
