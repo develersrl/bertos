@@ -40,7 +40,4 @@
 #ifndef HW_SER_H
 #define HW_SER_H
 
-#warning TODO:This is an example implementation, you must implement it!
-
-
 #endif /* HW_SER_H */
