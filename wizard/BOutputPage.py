@@ -26,7 +26,7 @@ class BOutputPage(BWizardPage):
         BWizardPage.__init__(self, UI_LOCATION + "/output_select.ui")
         self.setTitle(self.tr("Choose the project output"))
         self.connectSignals()
-        self.setProjectInfo("OUTPUT", [])
+        self.setProjectInfo("OUTPUT", ["codelite"])
     
     ## Overloaded BWizardPage connectSignals method. ##
     
