@@ -29,6 +29,7 @@ class BToolchainPage(BWizardPage):
         BWizardPage.__init__(self, UI_LOCATION + "/toolchain_select.ui")
         self.setTitle(self.tr("Select toolchain"))
         self._validation_process = None
+        self._valid_items = []
 
     ## Overloaded QWizardPage methods. ##
 
@@ -70,6 +71,8 @@ class BToolchainPage(BWizardPage):
         self._clearList()
         self.setupUi()
         self._populateToolchainList()
+        if len(self._valid_items) == 1:
+            self.pageContent.toolchainList.setCurrentItem(self._valid_items[0])
 
     ####
 
@@ -187,6 +190,7 @@ class BToolchainPage(BWizardPage):
         needed = self.projectInfo("CPU_INFOS")
         if "target" in infos and infos["target"].find(needed["TOOLCHAIN"]) != -1:
             item.setIcon(QIcon(":/images/ok.png"))
+            self._valid_items.append(item)
         else:
             item.setIcon(QIcon(":/images/warning.png"))
         if "version" in infos and "target" in infos:
