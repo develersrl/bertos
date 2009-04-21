@@ -37,13 +37,21 @@
  *
  * \author Daniele Basile <asterix@develer.com>
  *
+ * This module is automatically included so no need to include
+ * in test list.
+ * notest: arm
+ *
  */
 
-#include <cpu/detect.h>
+#ifndef WIZ_AUTOGEN
+	#warning This file is deprecated, you should use adc_at91.c
 
-#if CPU_ARM_AT91
-	#include "adc_at91.c"
-/*#elif  Add other ARM families here */
-#else
-	#error Unknown CPU
-#endif
+	#include <cpu/detect.h>
+
+	#if CPU_ARM_AT91
+		#include "adc_at91.c"
+	/*#elif  Add other ARM families here */
+	#else
+		#error Unknown CPU
+	#endif
+#endif  /* WIZ_AUTOGEN */

@@ -35,18 +35,23 @@
  * \author Francesco Sacchi <batt@develer.com>
  *
  * \brief Low-level timer module for ARM (inplementation).
+ *
+ * This module is automatically included so no need to include
+ * in test list.
+ * notest: arm
  */
 
-#include <cpu/detect.h>
-#include <cfg/cfg_arch.h>
+#ifndef WIZ_AUTOGEN
+	#warning This file is deprecated, you should use timer_at91.c
 
-#if !(ARCH & ARCH_NIGHTTEST)
+	#include <cpu/detect.h>
+	#include <cfg/cfg_arch.h>
 
-#if CPU_ARM_AT91
-	#include "timer_at91.c"
-/*#elif  Add other ARM families here */
-#else
-	#error Unknown CPU
-#endif
+	#if CPU_ARM_AT91
+		#include "timer_at91.c"
+	/*#elif  Add other ARM families here */
+	#else
+		#error Unknown CPU
+	#endif
 
-#endif /* (ARCH & ARCH_NIGHTLYTEST) */
+#endif /* WIZ_AUTOGEN */
