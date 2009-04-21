@@ -37,7 +37,7 @@
  *
  * $WIZ$ module_name = "timer"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_timer.h"
- * $WIZ$ module_depends = "event"
+ * $WIZ$ module_depends = "event", "sysirq"
  * $WIZ$ module_supports = "not atmega103 and not atmega8"
  */
 
