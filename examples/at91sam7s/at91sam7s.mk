@@ -30,11 +30,13 @@ at91sam7s_CSRC = \
 	bertos/kern/coop.c \
 	bertos/kern/proc_test.c \
 	bertos/kern/monitor.c \
-	bertos/kern/signal.c
+	bertos/kern/signal.c \
+	#
 
 at91sam7s_CPPASRC = \
 	bertos/cpu/arm/hw/crtat91sam7_rom.S \
-	bertos/cpu/arm/hw/switch_ctx_arm.S
+	bertos/cpu/arm/hw/switch_ctx_arm.S \
+	#
 
 at91sam7s_PREFIX = arm-none-eabi-
 
