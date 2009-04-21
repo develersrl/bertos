@@ -22,7 +22,7 @@ class BCreationPage(BWizardPage):
     
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/project_creation.ui")
-        self.setTitle(self.tr("Create the BeRTOS project"))
+        self.setTitle(self.tr("Settings summary"))
         self._completed = False
 
     ## Overloaded BWizardPage methods ##
