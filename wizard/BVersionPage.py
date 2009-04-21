@@ -163,6 +163,21 @@ class BVersionPage(BWizardPage):
             item = self.insertListElement(directory)
             if selected and selected == directory:
                 self.setCurrentItem(item)
+        if not selected:
+            self.setCurrentItem(self.latestVersionItem())
+    
+    def latestVersionItem(self):
+        """
+        Returns the latest BeRTOS version founded.
+        """
+        latest_version_item = QTableWidgetItem("")
+        for index in range(self.pageContent.versionList.count()):
+            item = self.pageContent.versionList.item(index)
+            version = item.text().split(" (")[0]
+            latest = latest_version_item.text().split(" (")[0]
+            if version != "UNKNOWN" and version > latest:
+                latest_version_item = item
+        return latest_version_item
     
     def setCurrentItem(self, item):
         """
