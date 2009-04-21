@@ -101,26 +101,14 @@
       </spacer>
      </item>
      <item>
-      <widget class="QToolButton" name="checkButton">
+      <widget class="QPushButton" name="checkButton">
        <property name="text">
         <string>Validate</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="searchButton">
-       <property name="minimumSize">
-        <size>
-         <width>26</width>
-         <height>26</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>26</height>
-        </size>
-       </property>
+      <widget class="QPushButton" name="searchButton">
        <property name="text">
         <string>Search...</string>
        </property>
