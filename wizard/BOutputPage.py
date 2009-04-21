@@ -25,16 +25,26 @@ class BOutputPage(BWizardPage):
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/output_select.ui")
         self.setTitle(self.tr("Choose the project output"))
-        self.connectSignals()
-        self.setProjectInfo("OUTPUT", ["codelite"])
     
-    ## Overloaded BWizardPage connectSignals method. ##
+    ## Overloaded BWizardPage methods. ##
     
     def connectSignals(self):
         """
         Connects the signals with the related slots.
         """
         self.connect(self.pageContent.codeliteCheckBox, SIGNAL("stateChanged(int)"), lambda checked: self.modeChecked(checked, "codelite"))
+    
+    def reloadData(self):
+        """
+        Overload of the BWizardPage reloadData method.
+        """
+        output = []
+        if self.pageContent.codeliteCheckBox.isChecked():
+            output.append("codelite")
+        else:
+            if "codelite" in output:
+                output.remove("codelite")
+        self.setProjectInfo("OUTPUT", output)
     
     ####
     
