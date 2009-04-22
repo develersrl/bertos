@@ -40,6 +40,7 @@ class BFinalPage(BWizardPage):
             output = self.projectInfo("OUTPUT")
             import winreg_importer
             command_lines = winreg_importer.getCommandLines()
+            self.setProjectInfo("COMMAND_LINES", command_lines)
             layout = QVBoxLayout()
             self._plugin_dict = {}
             for plugin in output:
