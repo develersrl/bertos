@@ -87,6 +87,10 @@ class BToolchainPage(BWizardPage):
             infos.update(qvariant_converter.getStringDict(self.pageContent.toolchainList.currentItem().data(Qt.UserRole)))
             self.pageContent.infoLabel.setText("GCC " + infos["version"] + " (" + infos["build"] + ")\nTarget: " + infos["target"] + "\nPath: " + os.path.normpath(infos["path"]))
             self.pageContent.infoLabel.setVisible(True)
+            if self.isDefaultToolchain(infos):
+                self.disableRemoveButton()
+            else:
+                self.enableRemoveButton()
             self.emit(SIGNAL("completeChanged()"))
 
     def addToolchain(self):
@@ -237,3 +241,27 @@ class BToolchainPage(BWizardPage):
         toolchains = self.toolchains()
         toolchains[filename] = True
         self.setToolchains(toolchains)
+    
+    def isDefaultToolchain(self, toolchain):
+        """
+        Returns True if the given toolchain is one of the default toolchains.
+        """
+        if os.name == "nt":
+            import winreg_importer
+            stored_toolchains = [toolchain[0] for toolchain in winreg_importer.getBertosToolchains()]
+            if toolchain["path"] in stored_toolchains:
+                return True
+        return False
+    
+    def disableRemoveButton(self):
+        """
+        Disable the remove button.
+        """
+        self.pageContent.removeButton.setEnabled(False)
+    
+    def enableRemoveButton(self):
+        """
+        Enable the remove button.
+        """
+        self.pageContent.removeButton.setEnabled(True)
+        
