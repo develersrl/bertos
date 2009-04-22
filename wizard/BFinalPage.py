@@ -37,7 +37,6 @@ class BFinalPage(BWizardPage):
         bertos_utils.createBertosProject(self.project())
         QApplication.instance().restoreOverrideCursor()
         if os.name == "nt":
-            self.pageContent.setVisible(True)
             output = self.projectInfo("OUTPUT")
             import winreg_importer
             command_lines = winreg_importer.getCommandLines()
@@ -50,6 +49,8 @@ class BFinalPage(BWizardPage):
                     self._plugin_dict[check] = plugin
             widget = QWidget()
             widget.setLayout(layout)
+            if len(self._plugin_dict) > 0:
+                self.pageContent.scrollArea.setVisible(True)
             self.pageContent.scrollArea.setWidget(widget)
     
     def setupUi(self):
