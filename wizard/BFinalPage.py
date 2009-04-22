@@ -57,11 +57,25 @@ class BFinalPage(BWizardPage):
             if len(self._plugin_dict) > 0:
                 self.pageContent.scrollArea.setVisible(True)
             self.pageContent.scrollArea.setWidget(widget)
+            for plugin in self._plugin_dict:
+                self.connect(plugin, SIGNAL("stateChanged(int)"), self.modeChecked)
+        self.modeChecked()
     
     def setupUi(self):
         """
         Overload of the BWizardPage setupUi method.
         """
         self.pageContent.scrollArea.setVisible(False)
+    
+    ####
+
+    ## Slots ##
+
+    def modeChecked(self):
+        to_be_opened = []
+        for check, plugin in self._plugin_dict.items():
+            if check.checkState() == Qt.Checked:
+                to_be_opened.append(plugin)
+        self.setProjectInfo("TO_BE_OPENED", to_be_opened)
     
     ####
