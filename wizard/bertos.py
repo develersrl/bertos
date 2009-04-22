@@ -38,6 +38,17 @@ def newProject():
     wizard = BWizard.BWizard(page_list)
     wizard.show()
     wizard.exec_()
+    project = QApplication.instance().project
+    to_be_opened = project.info("TO_BE_OPENED")
+    command_lines = project.info("COMMAND_LINES")
+    relevant_files = project.info("RELEVANT_FILES")
+    if to_be_opened:
+        for ide in to_be_opened:
+            command_line = command_lines[ide]
+            relevant_file = relevant_files[ide]
+            import subprocess
+            subprocess.call(command_line + " \"" + relevant_file + "\"")
+    sys.exit()
     
 def editProject():
     page_list = [BOpenPage, BVersionPage, BCpuPage, BToolchainPage, BModulePage, BOutputPage, BCreationPage, BFinalPage]
@@ -71,7 +82,6 @@ def main():
         pass
     else:
         newProject()
-        sys.exit(app.exec_())
 
 if __name__ == '__main__':
     main()
