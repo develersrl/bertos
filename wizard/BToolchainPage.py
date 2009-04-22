@@ -248,7 +248,7 @@ class BToolchainPage(BWizardPage):
         """
         if os.name == "nt":
             import winreg_importer
-            stored_toolchains = [toolchain[0] for toolchain in winreg_importer.getBertosToolchains()]
+            stored_toolchains = winreg_importer.getBertosToolchains()
             if toolchain["path"] in stored_toolchains:
                 return True
         return False
