@@ -23,7 +23,7 @@ except WindowsError:
     TOOLCHAIN_KEY = None
 
 try:
-    CLI_KEY = OpenKey(HKEY_LOCAL_MACHINE, "SOFTWARE\Develer\BeRTOS SDK\Command Lines")
+    CLI_KEY = OpenKey(HKEY_LOCAL_MACHINE, "SOFTWARE\Develer\BeRTOS SDK\Ide Command Lines")
 except WindowsError:
     CLI_KEY = None
 
