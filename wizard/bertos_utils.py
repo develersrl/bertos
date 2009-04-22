@@ -95,9 +95,11 @@ def createBertosProject(project_info):
     main = open("srctemplates/main.c", "r").read()
     open(prjdir + "/main.c", "w").write(main)
     # Files for selected plugins
+    relevants_files = {}
     for plugin in project_info.info("OUTPUT"):
         module = getattr(__import__("plugins", {}, {}, [plugin]), plugin)
-        module.createProject(project_info)
+        relevants_files[plugin] = module.createProject(project_info)
+    project_info.setInfo("RELEVANTS_FILES", relevants_files)
 
 def mkGenerator(project_info, makefile):
     """
