@@ -36,13 +36,13 @@ class BFinalPage(BWizardPage):
         QApplication.instance().setOverrideCursor(Qt.WaitCursor)
         bertos_utils.createBertosProject(self.project())
         QApplication.instance().restoreOverrideCursor()
+        self._plugin_dict = {}
         if os.name == "nt":
             output = self.projectInfo("OUTPUT")
             import winreg_importer
             command_lines = winreg_importer.getCommandLines()
             self.setProjectInfo("COMMAND_LINES", command_lines)
             layout = QVBoxLayout()
-            self._plugin_dict = {}
             for plugin in output:
                 if plugin in command_lines:
                     module = bertos_utils.loadPlugin(plugin)
