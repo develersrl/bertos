@@ -15,6 +15,8 @@ from PyQt4.QtGui import *
 from BWizardPage import *
 import bertos_utils
 
+import plugins
+
 from const import *
 
 class BOutputPage(BWizardPage):
@@ -30,35 +32,47 @@ class BOutputPage(BWizardPage):
     
     def connectSignals(self):
         """
-        Connects the signals with the related slots.
+        Overload of the BWizardPage connectSignals method.
         """
-        self.connect(self.pageContent.codeliteCheckBox, SIGNAL("stateChanged(int)"), lambda checked: self.modeChecked(checked, "codelite"))
+        for plugin in self._plugin_dict:
+            self.connect(plugin, SIGNAL("stateChanged(int)"), self.modeChecked)
+    
+    def setupUi(self):
+        """
+        Overload of the BWizardPage setupUi method.
+        """
+        self._plugin_dict = {}
+        layout = QVBoxLayout()
+        for plugin in self.availablePlugins():
+            check = QCheckBox(plugin)
+            layout.addWidget(check)
+            check.setCheckState(Qt.Checked)
+            self._plugin_dict[check] = plugin
+        widget = QWidget()
+        widget.setLayout(layout)
+        self.pageContent.scrollArea.setWidget(widget)
     
     def reloadData(self):
         """
         Overload of the BWizardPage reloadData method.
         """
-        output = []
-        if self.pageContent.codeliteCheckBox.isChecked():
-            output.append("codelite")
-        else:
-            if "codelite" in output:
-                output.remove("codelite")
-        self.setProjectInfo("OUTPUT", output)
-    
+        self.modeChecked()
+        
     ####
     
     ## Slots ##
     
-    def modeChecked(self, checked, value):
+    def modeChecked(self):
         """
         Slot called when one of the mode checkbox is checked. It stores it.
         """
-        output_list = self.projectInfo("OUTPUT")
-        if checked == Qt.Checked:
-            output_list.append(value)
-        else:
-            output_list.remove(value)
-        self.setProjectInfo("OUTPUT", output_list)
+        plugins = []
+        for checkBox, plugin in self._plugin_dict.items():
+            if checkBox.checkState() == Qt.Checked:
+                plugins.append(plugin)
+        self.setProjectInfo("OUTPUT", plugins)
 
     ####
+    
+    def availablePlugins(self):
+        return plugins.__all__
