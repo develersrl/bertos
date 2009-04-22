@@ -37,7 +37,7 @@
  *
  * $WIZ$ module_name = "kernel"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_proc.h"
- * $WIZ$ module_depends = "switch_ctx"
+ * $WIZ$ module_depends = "switch_ctx", "coop"
  * $WIZ$ module_supports = "not atmega103"
  */
 
