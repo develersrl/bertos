@@ -22,30 +22,41 @@ try:
 except WindowsError:
     TOOLCHAIN_KEY = None
 
+try:
+    CLI_KEY = OpenKey(HKEY_LOCAL_MACHINE, "SOFTWARE\Develer\BeRTOS SDK\Command Lines")
+except WindowsError:
+    CLI_KEY = None
+
 def getBertosDirs():
     """
     Returns the path of the BeRTOS versions installed by the BeRTOS SDK installer.
     """
-    return getFromRegistry(DIR_KEY)
+    return getFromRegistry(DIR_KEY).values()
 
 def getBertosToolchains():
     """
     Returns the path of the executables of the toolchains installed by the BeRTOS
     SDK installer.
     """
-    return getFromRegistry(TOOLCHAIN_KEY)
+    return getFromRegistry(TOOLCHAIN_KEY).values()
+
+def getCommandLines():
+    """
+    Returns the command lines to launch in order to open the selected IDE.
+    """
+    return getFromRegistry(CLI_KEY)
 
 def getFromRegistry(key):
     """
     Returns the value of all the named values of the given key.
     """
     index = 0
-    items = []
+    items = {}
     if key:
         while True:
             try:
-                item = EnumValue(key, index)[1]
-                items.append(item)
+                item = EnumValue(key, index)
+                items[item[0]] = item[1]
                 index += 1
             except WindowsError:
                 break
