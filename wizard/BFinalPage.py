@@ -36,5 +36,18 @@ class BFinalPage(BWizardPage):
         QApplication.instance().setOverrideCursor(Qt.WaitCursor)
         bertos_utils.createBertosProject(self.project())
         QApplication.instance().restoreOverrideCursor()
+        if os.name == "nt":
+            output = self.projectInfo("OUTPUT")
+            import winreg_importer
+            command_lines = winreg_importer.getCommandLines()
+            if "codelite" in output and "codelite" in command_lines:
+                self.pageContent.codeliteCheck.setVisible(True)
+            
+    
+    def setupUi(self):
+        """
+        Overload of the BWizardPage setupUi method.
+        """
+        self.pageContent.codeliteCheck.setVisible(False)
     
     ####
