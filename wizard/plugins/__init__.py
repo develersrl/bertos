@@ -18,3 +18,8 @@ __all__ = []
 for module in _modules:
     if module != "__init__.py":
         __all__.append(module.replace(".py", ""))
+
+del os
+del glob
+del _modules
+del module
