@@ -14,7 +14,6 @@ from PyQt4.QtGui import *
 import PyQt4.uic as uic
 
 from const import *
-from version import wizard_version
 
 class BStartPage(QDialog):
 
@@ -22,7 +21,7 @@ class BStartPage(QDialog):
         QDialog.__init__(self)
         self.setupUi()
         self.connectSignals()
-        self.setWindowTitle(self.tr("Create or edit a BeRTOS project - rev.%1").arg(wizard_version))
+        self.setWindowTitle(self.tr("Create or edit a BeRTOS project"))
         self.initializeButtons()
 
     def setupUi(self):

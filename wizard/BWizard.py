@@ -23,19 +23,24 @@ import BOutputPage
 import BCreationPage
 import BFinalPage
 
+try:
+    from version import wizard_version
+except ImportError:
+    wizard_version = "sandbox"
+
 class BWizard(QWizard):
     """
     Main class of the wizard. It adds the pages automatically.
     """
-    
+
     def __init__(self, page_list):
         QWizard.__init__(self)
-        self.setWindowTitle(self.tr("Create a BeRTOS project"))
+        self.setWindowTitle(self.tr("Create a BeRTOS project - rev.%1").arg(wizard_version))
         self.setWindowIcon(QIcon(":/images/appicon.png"))
         self.setOption(QWizard.DisabledBackButtonOnLastPage, True)
         self.addPages(page_list)
         self.connectSignals()
-    
+
     def addPages(self, page_list):
         """
         Adds the pages in the wizard.
@@ -48,7 +53,7 @@ class BWizard(QWizard):
         Connects the signals with the related slots.
         """
         self.connect(self, SIGNAL("currentIdChanged(int)"), self.pageChanged)
-    
+
     def pageChanged(self, pageId):
         """
         Slot called when the user change the current page. It calls the reloadData
@@ -57,7 +62,7 @@ class BWizard(QWizard):
         page = self.page(pageId)
         if page:
             page.reloadData()
-    
+
     def project(self):
         """
         Returns the BProject associated with the wizard.
