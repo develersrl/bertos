@@ -13,6 +13,26 @@ import os
 
 import const
 
+## Plugin interface ##
+
+PLUGIN_NAME = "CodeLite"
+
+PLUGIN_DESCRIPTION = "Create CodeLite project files"
+
+def createProject(project_info):
+    """
+    Function that creates codelite projects and return the project relevant file.
+    """
+    directory = project_info.info("PROJECT_PATH")
+    prjdir = directory + "/" + os.path.basename(directory)
+    workspace = codeliteWorkspaceGenerator(project_info)
+    open(directory + "/" + os.path.basename(prjdir) + ".workspace", "w").write(workspace)
+    project = codeliteProjectGenerator(project_info)
+    open(directory + "/" + os.path.basename(prjdir) + ".project", "w").write(project)
+    return directory + "/" + os.path.basename(prjdir) + ".workspace"
+
+####
+
 def clFiles(file_dict, directory):
     """
     Creates the list of the lines for the files founded in file_dict, using
@@ -68,15 +88,3 @@ def codeliteWorkspaceGenerator(project_info):
     while template.find("$project") != -1:
         template = template.replace("$project", project_name)
     return template
-
-def createProject(project_info):
-    """
-    Function that creates codelite projects and return the project relevant file.
-    """
-    directory = project_info.info("PROJECT_PATH")
-    prjdir = directory + "/" + os.path.basename(directory)
-    workspace = codeliteWorkspaceGenerator(project_info)
-    open(directory + "/" + os.path.basename(prjdir) + ".workspace", "w").write(workspace)
-    project = codeliteProjectGenerator(project_info)
-    open(directory + "/" + os.path.basename(prjdir) + ".project", "w").write(project)
-    return directory + "/" + os.path.basename(prjdir) + ".workspace"

@@ -97,10 +97,16 @@ def createBertosProject(project_info):
     # Files for selected plugins
     relevants_files = {}
     for plugin in project_info.info("OUTPUT"):
-        module = getattr(__import__("plugins", {}, {}, [plugin]), plugin)
+        module = loadPlugin(plugin)
         relevants_files[plugin] = module.createProject(project_info)
     project_info.setInfo("RELEVANTS_FILES", relevants_files)
 
+def loadPlugin(plugin):
+    """
+    Returns the given plugin module.
+    """
+    return getattr(__import__("plugins", {}, {}, [plugin]), plugin)
+    
 def mkGenerator(project_info, makefile):
     """
     Generates the mk file for the current project.

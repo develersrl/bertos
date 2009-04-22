@@ -42,14 +42,21 @@ class BOutputPage(BWizardPage):
         Overload of the BWizardPage setupUi method.
         """
         self._plugin_dict = {}
-        layout = QVBoxLayout()
+        scrollLayout = QVBoxLayout()
+        group, check = self.createNewOutput("BeRTOS Build System",
+                                            "Classic BeRTOS makefile based project",
+                                            True, False)
+        scrollLayout.addWidget(group)
         for plugin in self.availablePlugins():
-            check = QCheckBox(plugin)
-            layout.addWidget(check)
-            check.setCheckState(Qt.Checked)
+            module = bertos_utils.loadPlugin(plugin)
+            group, check = self.createNewOutput(module.PLUGIN_NAME,
+                                                module.PLUGIN_DESCRIPTION,
+                                                True, True)
+            scrollLayout.addWidget(group)
             self._plugin_dict[check] = plugin
+        scrollLayout.addStretch()
         widget = QWidget()
-        widget.setLayout(layout)
+        widget.setLayout(scrollLayout)
         self.pageContent.scrollArea.setWidget(widget)
     
     def reloadData(self):
@@ -75,4 +82,25 @@ class BOutputPage(BWizardPage):
     ####
     
     def availablePlugins(self):
+        """
+        Returns the list of the available plugins.
+        """
         return plugins.__all__
+    
+    def createNewOutput(self, name, description, checked=True, enabled=True):
+        """
+        Create a groupBox for the given pieces of information. Returns the
+        groupBox and the checkBox
+        """
+        check = QCheckBox(description)
+        if checked:
+            check.setCheckState(Qt.Checked)
+        else:
+            check.setCheckState(Qt.Unchecked)
+        groupLayout = QVBoxLayout()
+        groupLayout.addWidget(check)
+        group = QGroupBox(name)
+        group.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
+        group.setLayout(groupLayout)
+        group.setEnabled(enabled)
+        return group, check
