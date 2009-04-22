@@ -45,9 +45,12 @@ class BFinalPage(BWizardPage):
             for plugin in output:
                 if plugin in command_lines:
                     module = bertos_utils.loadPlugin(plugin)
-                    checked = len(output) == 1
-                    group, check  = self.createNewOutput(self, module.PLUGIN_NAME, module.PLUGIN_DESCRIPTION, checked)
-                    layout.addWidget(group)
+                    check = QCheckBox(self.tr("Open project in %s" %module.PLUGIN_NAME))
+                    if len(output) == 1:
+                        check.setCheckState(Qt.Checked)
+                    else:
+                        check.setCheckState(Qt.Unchecked)
+                    layout.addWidget(check)
                     self._plugin_dict[check] = plugin
             widget = QWidget()
             widget.setLayout(layout)
@@ -62,21 +65,3 @@ class BFinalPage(BWizardPage):
         self.pageContent.scrollArea.setVisible(False)
     
     ####
-    
-    def createNewOutput(self, name, description, checked=True, enabled=True):
-        """
-        Create a groupBox for the given pieces of information. Returns the
-        groupBox and the checkBox
-        """
-        check = QCheckBox(description)
-        if checked:
-            check.setCheckState(Qt.Checked)
-        else:
-            check.setCheckState(Qt.Unchecked)
-        groupLayout = QVBoxLayout()
-        groupLayout.addWidget(check)
-        group = QGroupBox(name)
-        group.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
-        group.setLayout(groupLayout)
-        group.setEnabled(enabled)
-        return group, check
