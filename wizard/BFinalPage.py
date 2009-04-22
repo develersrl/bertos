@@ -37,17 +37,25 @@ class BFinalPage(BWizardPage):
         bertos_utils.createBertosProject(self.project())
         QApplication.instance().restoreOverrideCursor()
         if os.name == "nt":
+            self.pageContent.setVisible(True)
             output = self.projectInfo("OUTPUT")
             import winreg_importer
             command_lines = winreg_importer.getCommandLines()
-            if "codelite" in output and "codelite" in command_lines:
-                self.pageContent.codeliteCheck.setVisible(True)
-            
+            layout = QVBoxLayout()
+            self._plugin_dict = {}
+            for plugin in output:
+                if plugin in command_lines:
+                    check = QCheckBox(plugin)
+                    layout.addWidget(check)
+                    self._plugin_dict[check] = plugin
+            widget = QWidget()
+            widget.setLayout(layout)
+            self.pageContent.scrollArea.setWidget(widget)
     
     def setupUi(self):
         """
         Overload of the BWizardPage setupUi method.
         """
-        self.pageContent.codeliteCheck.setVisible(False)
+        self.pageContent.scrollArea.setVisible(False)
     
     ####

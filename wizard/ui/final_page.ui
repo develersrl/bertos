@@ -48,10 +48,20 @@
     </layout>
    </item>
    <item>
-    <widget class="QCheckBox" name="codeliteCheck">
-     <property name="text">
-      <string>Start CodeLite automatically</string>
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="widgetResizable">
+      <bool>true</bool>
      </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>455</width>
+        <height>76</height>
+       </rect>
+      </property>
+     </widget>
     </widget>
    </item>
   </layout>
