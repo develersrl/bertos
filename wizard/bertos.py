@@ -70,7 +70,7 @@ def main():
         print "Invalid usage!"
         pass
     else:
-        showStartPage()
+        newProject()
         sys.exit(app.exec_())
 
 if __name__ == '__main__':
