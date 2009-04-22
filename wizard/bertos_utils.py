@@ -19,7 +19,7 @@ import copytree
 import pickle
 
 import const
-from plugins import codelite
+import plugins
 import DefineException
 
 def isBertosDir(directory):
@@ -94,9 +94,10 @@ def createBertosProject(project_info):
     # Destination main.c file
     main = open("srctemplates/main.c", "r").read()
     open(prjdir + "/main.c", "w").write(main)
-    # Codelite project files
-    if "codelite" in project_info.info("OUTPUT"):
-        codelite.createProject(project_info)
+    # Files for selected plugins
+    for plugin in project_info.info("OUTPUT"):
+        module = getattr(__import__("plugins", {}, {}, [plugin]), plugin)
+        module.createProject(project_info)
 
 def mkGenerator(project_info, makefile):
     """
