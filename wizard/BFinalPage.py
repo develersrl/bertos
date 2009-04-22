@@ -46,7 +46,8 @@ class BFinalPage(BWizardPage):
                 if plugin in command_lines:
                     module = bertos_utils.loadPlugin(plugin)
                     checked = len(output) == 1
-                    group, check  = self.createNewOutput(self, module.NAME, module.DESCRIPTION, checked)
+                    group, check  = self.createNewOutput(self, module.PLUGIN_NAME, module.PLUGIN_DESCRIPTION, checked)
+                    layout.addWidget(group)
                     self._plugin_dict[check] = plugin
             widget = QWidget()
             widget.setLayout(layout)
