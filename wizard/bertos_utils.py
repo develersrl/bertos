@@ -99,7 +99,7 @@ def createBertosProject(project_info):
     for plugin in project_info.info("OUTPUT"):
         module = loadPlugin(plugin)
         relevants_files[plugin] = module.createProject(project_info)
-    project_info.setInfo("RELEVANTS_FILES", relevants_files)
+    project_info.setInfo("RELEVANT_FILES", relevants_files)
 
 def loadPlugin(plugin):
     """
