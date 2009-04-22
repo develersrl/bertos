@@ -100,6 +100,10 @@ class BVersionPage(BWizardPage):
         """
         Slot called when the user select an entry from the version list.
         """
+        if self.isDefaultVersion(self.currentVersion()):
+            self.disableRemoveButton()
+        else:
+            self.enableRemoveButton()
         self.emit(SIGNAL("completeChanged()"))
 
     def updateClicked(self):
@@ -166,6 +170,18 @@ class BVersionPage(BWizardPage):
         if not selected:
             self.setCurrentItem(self.latestVersionItem())
     
+    def disableRemoveButton(self):
+        """
+        Disable the Remove button.
+        """
+        self.pageContent.removeButton.setEnabled(False)
+
+    def enableRemoveButton(self):
+        """
+        Enable the Remove button.
+        """
+        self.pageContent.removeButton.setEnabled(True)
+    
     def latestVersionItem(self):
         """
         Returns the latest BeRTOS version founded.
@@ -184,3 +200,26 @@ class BVersionPage(BWizardPage):
         Select the given item in the version list.
         """
         self.pageContent.versionList.setCurrentItem(item)
+    
+    def currentItem(self):
+        """
+        Returns the current selected item.
+        """
+        return self.pageContent.versionList.currentItem()
+    
+    def currentVersion(self):
+        """
+        Return the path of the selected version.
+        """
+        current = self.currentItem()
+        return qvariant_converter.getString(current.data(Qt.UserRole))
+    
+    def isDefaultVersion(self, version):
+        """
+        Returns True if the given version is one of the default versions.
+        """
+        if os.name == "nt":
+            import winreg_importer
+            if version in winreg_importer.getBertosDirs():
+                return True
+        return False
