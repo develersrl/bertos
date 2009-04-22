@@ -4,7 +4,7 @@
 # Copyright 2009 Develer S.r.l. (http://www.develer.com/)
 # All rights reserved.
 #
-# $Id:$
+# $Id$
 #
 # Author: Lorenzo Berni <duplo@develer.com>
 #
@@ -12,6 +12,8 @@
 import os
 import fnmatch
 from shutil import *
+
+del copytree
 
 def copytree(src, dst, symlinks=False, ignore_list=[]):
     """
@@ -27,7 +29,7 @@ def copytree(src, dst, symlinks=False, ignore_list=[]):
         try:
             ignored = False
             for ignore in ignore_list:
-                if fnmatch.fnmatch(srcname, ignore):
+                if fnmatch.fnmatch(name, ignore):
                     ignored = True
                     break
             if ignored:
@@ -36,7 +38,7 @@ def copytree(src, dst, symlinks=False, ignore_list=[]):
                 linkto = os.readlink(srcname)
                 os.symlink(linkto, dstname)
             elif os.path.isdir(srcname):
-                copytree(srcname, dstname, symlinks)
+                copytree(srcname, dstname, symlinks, ignore_list)
             else:
                 copy2(srcname, dstname)
             # XXX What about devices, sockets etc.?
