@@ -1,4 +1,4 @@
-/**
+﻿/**
  * \file
  * <!--
  * This file is part of BeRTOS.
@@ -38,7 +38,7 @@
  * \author Francesco Sacchi <batt@develer.com>
  *
  * $WIZ$ module_name = "ntc"
- * $WIZ$ module_hw = "bertos/hw/hw_ntc.h", "bertos/hw/ntc_map.h"
+ * $WIZ$ module_hw = "bertos/hw/hw_ntc.h", "bertos/hw/ntc_map.h", "bertos/hw/hw_ntc.c"
  */
 
 #ifndef DRV_NTC_H
