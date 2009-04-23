@@ -63,7 +63,10 @@ EXTERN_C int emul_kbdReadCols(void);
  */
 INLINE keymask_t kbd_readkeys(void)
 {
-	return (keymask_t)emul_kbdReadCols();
+	/* Implement me! */
+
+	//Only for test remove when implement this function
+	return 0;
 }
 
 #endif /* HW_KBD_H */
