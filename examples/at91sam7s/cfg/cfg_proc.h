@@ -56,8 +56,9 @@
  * Dynamic memory allocation for processes.
  *
  * $WIZ$ type = "boolean"
+ * $WIZ$ supports = "False"
  */
-#define CONFIG_KERN_HEAP 0
+#define CONFIG_KERN_HEAP 1
 
 /**
  * Preemptive process scheduling. WARNING: Experimental, still incomplete!
