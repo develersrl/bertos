@@ -71,6 +71,7 @@ class BCreationPage(BWizardPage):
         top_level.append(version_title)
         cpu_title = QTreeWidgetItem(QStringList([self.tr("CPU")]))
         cpu_name = QTreeWidgetItem(cpu_title, QStringList([self.tr("cpu name: ") + self.projectInfo("CPU_NAME")]))
+        cpu_freq = QTreeWidgetItem(cpu_title, QStringList([self.tr("frequency: ") + self.projectInfo("SELECTED_FREQ") + "Hz"]))
         top_level.append(cpu_title)
         toolchain_title = QTreeWidgetItem(QStringList([self.tr("Toolchain")]))
         toolchain_info = self.projectInfo("TOOLCHAIN")
