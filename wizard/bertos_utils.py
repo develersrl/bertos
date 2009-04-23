@@ -70,7 +70,7 @@ def createBertosProject(project_info):
             configurations = project_info.info("CONFIGURATIONS")
             configuration = configurations[information["configuration"]]
             for start, parameter in configuration["paramlist"]:
-                if "type" in configuration[parameter] and configuration[parameter]["type"] == "autoenabled":
+                if "type" in configuration[parameter]["informations"] and configuration[parameter]["informations"]["type"] == "autoenabled":
                     configuration[parameter]["value"] = "1"
             project_info.setInfo("CONFIGURATIONS", configurations)
     # Copy all the configuration files
