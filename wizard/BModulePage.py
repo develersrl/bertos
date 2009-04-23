@@ -189,7 +189,7 @@ class BModulePage(BWizardPage):
         configuration = self.projectInfo("MODULES")[self.currentModule()]["configuration"]
         configurations = self.projectInfo("CONFIGURATIONS")
         if "type" not in configurations[configuration][property]["informations"] or configurations[configuration][property]["informations"]["type"] == "int":
-            configurations[configuration][property]["value"] = str(int(self.pageContent.propertyTable.cellWidget(index, 1).value()))
+            configurations[configuration][property]["value"] = unicode(int(self.pageContent.propertyTable.cellWidget(index, 1).value()))
         elif configurations[configuration][property]["informations"]["type"] == "enum":
             configurations[configuration][property]["value"] = unicode(self.pageContent.propertyTable.cellWidget(index, 1).currentText())
         elif configurations[configuration][property]["informations"]["type"] == "boolean":

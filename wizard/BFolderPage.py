@@ -91,14 +91,14 @@ class BFolderPage(BWizardPage):
         """
         Slot called when the project name is changed manually by the user.
         """
-        self._project_name = str(name).replace(" ", "_")
+        self._project_name = unicode(name).replace(" ", "_")
         self.setProjectPath()
     
     def directoryChanged(self, directory):
         """
         Slot called when the project folder is changed manually by the user.
         """
-        self._destination_folder = str(QDir.toNativeSeparators(directory))
+        self._destination_folder = unicode(QDir.toNativeSeparators(directory))
         self.setProjectPath()
 
     def selectDirectory(self):

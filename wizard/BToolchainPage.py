@@ -251,7 +251,7 @@ class BToolchainPage(BWizardPage):
             self._validation_process.start(filename, ["-v"])
             self._validation_process.waitForStarted(1000)
             if self._validation_process.waitForFinished(200):
-                description = str(self._validation_process.readAllStandardError())
+                description = unicode(self._validation_process.readAllStandardError())
                 info = bertos_utils.getToolchainInfo(description)
                 if len(info) >= 4:
                     valid = True
