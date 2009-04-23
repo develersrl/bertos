@@ -38,7 +38,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Project created successfully. Now start develop your BeRTOS application!</string>
+        <string>Project created successfully. Now start to develop your BeRTOS application!</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
