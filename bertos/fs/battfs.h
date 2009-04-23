@@ -37,11 +37,9 @@
  * \brief BattFS: a filesystem for embedded platforms (interface).
  * TODO: Add detailed filesystem description.
  *
- * $WIZAR_MODULE = {
- * "name" : "battfs",
- * "depends" : ["rotating_hash", "kfile"],
- * "configuration" : "bertos/cfg/cfg_battfs.h"
- * }
+ * $WIZ$ module_name = "battfs"
+ * $WIZ$ module_depends = "rotating_hash", "kfile"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_battfs.h"
  */
 
 #ifndef FS_BATTFS_H
