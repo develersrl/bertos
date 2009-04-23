@@ -47,6 +47,7 @@
 #include "hw/ntc_map.h"
 
 #include <cfg/compiler.h>
+#include <cfg/debug.h>
 
 #define NTC_OPEN_CIRCUIT  -32768
 #define NTC_SHORT_CIRCUIT 32767
