@@ -11,3 +11,5 @@
 import codelite
 
 __all__ = ["codelite"]
+
+plugin_list = ["codelite"]

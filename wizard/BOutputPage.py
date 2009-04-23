@@ -85,7 +85,7 @@ class BOutputPage(BWizardPage):
         """
         Returns the list of the available plugins.
         """
-        return plugins.__all__
+        return plugins.plugin_list
     
     def createNewOutput(self, name, description, checked=True, enabled=True):
         """
