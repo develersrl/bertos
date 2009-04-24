@@ -45,7 +45,6 @@
 #include <drv/timer.h>
 #include <drv/sysirq_at91.h>
 #include <drv/ser.h>
-#include <drv/ntc.h>
 
 #include <io/arm.h>
 
