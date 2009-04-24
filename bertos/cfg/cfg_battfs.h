@@ -57,8 +57,8 @@
 #define BATTFS_LOG_FORMAT     LOG_FMT_VERBOSE
 
 /**
- * Set to 1 to enable free page shuffling: this
- * increase memories life but makes debugging
+ * Set to 1 to enable free page shuffling.
+ * This increase memories life but makes debugging
  * more difficult due to its unrepeteable state.
  * $WIZ$ type = "boolean"
  */

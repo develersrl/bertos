@@ -31,7 +31,7 @@
  *
  * -->
  *
- * \brief Signal module (public interface).
+ * \brief Signal module for IPC.
  *
  * \version $Id$
  *
