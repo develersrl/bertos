@@ -86,14 +86,15 @@ static void leds_toggle(void)
 	timer_add(&leds_timer);
 }
 
-
 int main(void)
 {
 	char msg[]="BeRTOS, be fast be beatiful be realtime";
+
+
 	kdbg_init();
 	timer_init();
-
 	proc_init();
+
 	ASSERT(!IRQ_ENABLED());
 
 	/* Open the main communication port */
@@ -119,11 +120,21 @@ int main(void)
 	/* turn first led on */
 	PIOA_CODR  = 0x00000001;
 
+	/*
+	 * Register timer and arm timer interupt.
+	 */
 	timer_setSoftint(&leds_timer, (Hook)leds_toggle, 0);
 	timer_setDelay(&leds_timer, ms_to_ticks(100));
 	timer_add(&leds_timer);
 
-	ASSERT(proc_testRun() == 0);
+	/*
+	 * Run process test.
+	 */
+	if(!proc_testRun())
+		kfile_printf(&ser_fd.fd, "ProcTest..ok!\n");
+	else
+		kfile_printf(&ser_fd.fd, "ProcTest..FAIL!\n");
+
 	// Main loop
 	for(;;)
 	{
