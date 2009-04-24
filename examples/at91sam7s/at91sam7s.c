@@ -45,6 +45,7 @@
 #include <drv/timer.h>
 #include <drv/sysirq_at91.h>
 #include <drv/ser.h>
+#include <drv/ntc.h>
 
 #include <io/arm.h>
 
@@ -71,7 +72,7 @@ static void leds_toggle(void)
 			roll = 1;
 
 		PIOA_SODR = a;
-		PIOA_CODR = a >> 1;	
+		PIOA_CODR = a >> 1;
 	}
 	else
 	{

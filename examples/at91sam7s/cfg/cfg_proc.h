@@ -58,7 +58,7 @@
  * $WIZ$ type = "boolean"
  * $WIZ$ supports = "False"
  */
-#define CONFIG_KERN_HEAP 1
+#define CONFIG_KERN_HEAP 0
 
 /**
  * Preemptive process scheduling. WARNING: Experimental, still incomplete!
