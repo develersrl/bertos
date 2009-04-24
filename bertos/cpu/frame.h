@@ -58,7 +58,7 @@
 
 #elif CPU_ARM
 
-	#define CPU_SAVED_REGS_CNT     9
+	#define CPU_SAVED_REGS_CNT     10
 	#define CPU_STACK_GROWS_UPWARD 0
 	#define CPU_SP_ON_EMPTY_SLOT   0
 
@@ -74,7 +74,14 @@
 	 * - ARM state.
 	 * - CPU in Supervisor Mode (SVC).
 	 */
-	#define CPU_REG_INIT_VALUE(reg) (reg == (CPU_SAVED_REGS_CNT - 1) ? 0x13 : 0)
+	#define CPU_REG_INIT_VALUE(reg) \
+	({  int a = 0; \
+		if(reg == 0) \
+			a = (int)proc_exit; \
+		else if(reg == (CPU_SAVED_REGS_CNT - 1)) \
+			a = 0x13; \
+		a; \
+	})
 
 #elif CPU_PPC
 
