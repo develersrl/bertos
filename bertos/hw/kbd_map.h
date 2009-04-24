@@ -63,7 +63,9 @@ typedef uint16_t keymask_t;
 
 #define K_REPEAT   BV(14) /**< This is a repeated keyevent. */
 #define K_TIMEOUT  BV(15) /**< Fake key event for timeouts. */
+#define K_LONG     BV(16)
 /*@}*/
 
+#define K_LNG_MASK 0
 
 #endif /* HW_KBD_MAP_H */
