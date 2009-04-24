@@ -98,7 +98,7 @@
 static void receiver_proc##num(void) \
 { \
 	TestMsg *rec_msg; \
-	for (;;) \
+	for(;;) \
 	{ \
 		sig_wait(sig); \
 		kprintf("Proc[%d]..get message\n", num); \
@@ -118,7 +118,7 @@ static void receiver_proc##num(void) \
 		msg_put(&test_port##num, &msg##num.msg); \
 	} while(0)
 
-#define RECV_STACK(num) static cpu_stack_t receiver_stack##num[CONFIG_KERN_MINSTACKSIZE / sizeof(cpu_stack_t)]
+#define RECV_STACK(num) static cpu_stack_t receiver_stack##num[800 / sizeof(cpu_stack_t)]
 #define RECV_INIT_PROC(num) proc_new(receiver_proc##num, NULL, sizeof(receiver_stack##num), receiver_stack##num)
 #define RECV_INIT_MSG(num, proc, sig) msg_initPort(&test_port##num, event_createSignal(proc, sig))
 

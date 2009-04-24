@@ -76,7 +76,7 @@ sigmask_t sig_to_slave;
  * These macros generate the code needed to create the test process functions.
  */
 #define PROC_TEST_SLAVE(index, signal) \
-static void NORETURN proc_test##index(void) \
+static void NORETURN proc_signalTest##index(void) \
 { \
 	for(;;) \
 	{ \
@@ -96,8 +96,8 @@ static void NORETURN proc_test##index(void) \
 		count++; \
 	} while(0) \
 
-#define PROC_TEST_SLAVE_STACK(index) static cpu_stack_t proc_test##index##_stack[CONFIG_KERN_MINSTACKSIZE / sizeof(cpu_stack_t)];
-#define PROC_TEST_SLAVE_INIT(index, master_process) proc_new(proc_test##index, master_process, sizeof(proc_test##index##_stack), proc_test##index##_stack)
+#define PROC_TEST_SLAVE_STACK(index) static cpu_stack_t proc_signal_test##index##_stack[700 / sizeof(cpu_stack_t)];
+#define PROC_TEST_SLAVE_INIT(index, master_process) proc_new(proc_signalTest##index, master_process, sizeof(proc_signal_test##index##_stack), proc_signal_test##index##_stack)
 
 // Generate the code for signal test.
 PROC_TEST_SLAVE(0, SIG_USER0)

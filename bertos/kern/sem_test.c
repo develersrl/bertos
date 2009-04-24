@@ -90,7 +90,7 @@ unsigned int global_count = 0;
 /*
  * These macros generate the code needed to create the test process functions.
  */
-#define PROC_TEST(num) static void proc_test##num(void) \
+#define PROC_TEST(num) static void proc_semTest##num(void) \
 { \
 	unsigned int local_count = 0; \
 	\
@@ -109,8 +109,8 @@ unsigned int global_count = 0;
 	} \
 } \
 
-#define PROC_TEST_STACK(num)  static cpu_stack_t proc_test##num##_stack[CONFIG_KERN_MINSTACKSIZE / sizeof(cpu_stack_t)];
-#define PROC_TEST_INIT(num)   proc_new(proc_test##num, NULL, sizeof(proc_test##num##_stack), proc_test##num##_stack);
+#define PROC_TEST_STACK(num)  static cpu_stack_t proc_sem_test##num##_stack[1024 / sizeof(cpu_stack_t)];
+#define PROC_TEST_INIT(num)   proc_new(proc_semTest##num, NULL, sizeof(proc_sem_test##num##_stack), proc_sem_test##num##_stack);
 
 // Define process
 PROC_TEST(1)
