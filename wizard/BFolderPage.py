@@ -91,6 +91,11 @@ class BFolderPage(BWizardPage):
         """
         Slot called when the project name is changed manually by the user.
         """
+        try:
+            name = unicode(name).encode("ascii")
+        except UnicodeEncodeError:
+            name = self._project_name
+            self.pageContent.nameEdit.setText(name)
         self._project_name = unicode(name).replace(" ", "_")
         self.setProjectPath()
     
