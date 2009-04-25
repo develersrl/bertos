@@ -55,8 +55,9 @@ def bertosVersion(directory):
 def createBertosProject(project_info):
     directory = project_info.info("PROJECT_PATH")
     sources_dir = project_info.info("SOURCES_PATH")
-    if not os.path.isdir(directory):
-        os.mkdir(directory)
+    if os.path.isdir(directory):
+        shutil.rmtree(directory, True)        
+    os.makedirs(directory)
     f = open(directory + "/project.bertos", "w")
     f.write(pickle.dumps(project_info))
     f.close()
