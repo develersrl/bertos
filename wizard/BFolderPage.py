@@ -103,7 +103,12 @@ class BFolderPage(BWizardPage):
         """
         Slot called when the project folder is changed manually by the user.
         """
-        self._destination_folder = unicode(QDir.toNativeSeparators(directory))
+        try:
+            directory = unicode(directory).encode("ascii")
+        except UnicodeEncodeError:
+            directory = self._destination_folder
+            self.pageContent.directoryEdit.setText(directory)
+        self._destination_folder = directory
         self.setProjectPath()
 
     def selectDirectory(self):
