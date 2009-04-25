@@ -112,7 +112,7 @@ class BFolderPage(BWizardPage):
         """
         directory = unicode(QFileDialog.getExistingDirectory(self, self.tr("Open Directory"), self.pageContent.directoryEdit.text(), QFileDialog.ShowDirsOnly))
         if len(directory) > 0:
-            self.pageContent.directoryEdit.setText(directory)
+            self.pageContent.directoryEdit.setText(QDir.toNativeSeparators(directory))
 
     ####
     
