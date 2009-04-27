@@ -36,20 +36,22 @@
  * \author Daniele Basile <asterix@develer.com>
  *
  * \brief Simple BeRTOS test on AT91SAM7X-EK evaluation board.
- * 
+ *
  * This short program shows you a simple demo of some BeRTOS feature:
- * 
+ *
  * - Debug system
  * - Timer interrupt
  * - Serial
  * - Cooperative BeRTOS Kernel
- * 
+ *
  */
 
 #include "cfg/cfg_ser.h"
 #include <cfg/macros.h>
 
 #include <kern/proc.h>
+
+#include <cpu/detect.h>
 
 #include <drv/timer.h>
 #include <drv/sysirq_at91.h>
@@ -59,40 +61,81 @@
 
 Timer leds_timer;
 Serial ser_fd;
-int roll = 0;
+
+enum
+{
+	FORWARD,
+	BACKWARD,
+};
+
+int direction = FORWARD;
+
+static void leds_init(void)
+{
+	#if CPU_ARM_AT91SAM7X256
+		/* Set PB19..22 connected to PIOB */
+		PIOB_PER  = 0x780000;
+		/* Set PB19..22 as output */
+		PIOB_OER  = 0x780000;
+
+		/* Set PB19..22 to 1 to turn off leds */
+		PIOB_SODR  = 0x780000;
+
+		/* turn first led on (PB19) */
+		PIOB_CODR  = 0x80000;
+	#elif CPU_ARM_AT91SAM7S256
+		/* Set PA0..3 connected to PIOA */
+		PIOA_PER  = 0x0000001f;
+		/* Set PA0..3 as output */
+		PIOA_OER  = 0x0000001f;
+
+		/* Set PA0..3 to 1 to turn off leds */
+		PIOA_SODR  = 0x0000000f;
+		/* turn first led on (PA0) */
+		PIOA_CODR  = 0x00000001;
+	#endif
+}
+
+#if CPU_ARM_AT91SAM7X256
+	#define GET_PIO_STATUS()  (~PIOB_ODSR & 0x780000)
+	#define LAST_LED                        0x200000
+	#define FIRST_LED                       0x100000
+	#define SET_PIO_BITS                    PIOB_SODR
+	#define CLEAR_PIO_BITS                  PIOB_CODR
+	#define AT91SAM7_MSG      "BeRTOS is run on AT91SAM7X256..\n"
+#elif CPU_ARM_AT91SAM7S256
+	#define GET_PIO_STATUS()  (~PIOA_ODSR & 0x0000000f)
+	#define LAST_LED                        0x00000004
+	#define FIRST_LED                       0x00000002
+	#define SET_PIO_BITS                    PIOA_SODR
+	#define CLEAR_PIO_BITS                  PIOA_CODR
+	#define AT91SAM7_MSG      "BeRTOS is run on AT91SAM7S256..\n"
+#endif
 
 /*
- * Supercar leds effect..
+ * Knight Rider leds effect..
  */
 static void leds_toggle(void)
 {
-	uint32_t a = (~PIOB_ODSR & 0x780000);
+	uint32_t led_status = GET_PIO_STATUS();
 
 	// Turn on led in forward direction
-	if (roll == 1)
+	if (direction == FORWARD)
 	{
-		if(a == 0x200000)
-			roll = 2;
+		if(led_status == LAST_LED)
+			direction = BACKWARD;
 
-		PIOB_SODR = a;
-		PIOB_CODR = a << 1;
+		SET_PIO_BITS = led_status;
+		CLEAR_PIO_BITS = led_status << 1;
 	}
 	// Turn on led in backward direction
-	else if (roll == 2)
+	else if (direction == BACKWARD)
 	{
-		if(a == 0x100000)
-			roll = 1;
+		if(led_status == FIRST_LED)
+			direction = FORWARD;
 
-		PIOB_SODR = a;
-		PIOB_CODR = a >> 1;
-	}
-	// Start to turn on first led
-	else
-	{
-		PIOB_SODR  = 0x780000;
-		/* turn first led on */
-		PIOB_CODR  = 0x80000;
-		roll = 1;
+		SET_PIO_BITS = led_status;
+		CLEAR_PIO_BITS = led_status >> 1;
 	}
 
 	/* Wait for interval time */
@@ -107,6 +150,7 @@ int main(void)
 	kdbg_init();
 	timer_init();
 	proc_init();
+	leds_init();
 
 	ASSERT(!IRQ_ENABLED());
 
@@ -117,21 +161,6 @@ int main(void)
 
 	IRQ_ENABLE;
 	ASSERT(IRQ_ENABLED());
-
-	/* Disable all pullups */
-	PIOB_PUDR = 0xffffffff;
-	/* Set PB0..3 connected to PIOA */
-	PIOB_PER  = 0x780000;
-	/* Set PB0..3 as output */
-	PIOB_OER  = 0x780000;
-	/* Disable multidrive on all pins */
-	PIOB_MDDR = 0xffffffff;
-
-	/* Set PA0..3 to 1 to turn off leds */
-	PIOB_SODR  = 0x780000;
-	
-	/* turn first led on */
-	PIOB_CODR  = 0x80000;
 
 	/*
 	 * Register timer and arm timer interupt.
@@ -147,6 +176,9 @@ int main(void)
 		kfile_printf(&ser_fd.fd, "ProcTest..ok!\n");
 	else
 		kfile_printf(&ser_fd.fd, "ProcTest..FAIL!\n");
+
+
+	kputs(AT91SAM7_MSG);
 
 	// Main loop
 	for(;;)
