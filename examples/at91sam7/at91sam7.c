@@ -102,14 +102,14 @@ static void leds_init(void)
 	#define FIRST_LED                       0x100000
 	#define SET_PIO_BITS                    PIOB_SODR
 	#define CLEAR_PIO_BITS                  PIOB_CODR
-	#define AT91SAM7_MSG      "BeRTOS is run on AT91SAM7X256..\n"
+	#define AT91SAM7_MSG      "BeRTOS is running on AT91SAM7X256..\n"
 #elif CPU_ARM_AT91SAM7S256
 	#define GET_PIO_STATUS()  (~PIOA_ODSR & 0x0000000f)
 	#define LAST_LED                        0x00000004
 	#define FIRST_LED                       0x00000002
 	#define SET_PIO_BITS                    PIOA_SODR
 	#define CLEAR_PIO_BITS                  PIOA_CODR
-	#define AT91SAM7_MSG      "BeRTOS is run on AT91SAM7S256..\n"
+	#define AT91SAM7_MSG      "BeRTOS is running on AT91SAM7S256..\n"
 #endif
 
 /*
