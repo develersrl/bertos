@@ -16,7 +16,7 @@ at91sam7x_DEBUG = 1
 TRG += at91sam7x
 
 at91sam7x_CSRC = \
-	examples/at91sam7x/at91sam7x.c \
+	examples/at91sam7/at91sam7.c \
 	bertos/drv/timer.c \
 	bertos/drv/ser.c \
 	bertos/cpu/arm/drv/sysirq_at91.c \
