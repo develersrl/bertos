@@ -57,6 +57,9 @@ class BOpenPage(BWizardPage):
     ## Overloaded BWizardPage methods ##
     
     def reloadData(self):
+        """
+        Overload of the BWizardPage reloadData method.
+        """
         project = unicode(QFileDialog.getOpenFileName(self, self.tr("Open project file"), os.path.expanduser("~"), self.tr("Project file (project.bertos)")))
         if project == "":
             QApplication.instance().quit()
