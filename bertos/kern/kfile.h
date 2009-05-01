@@ -95,6 +95,7 @@
  *
  * $WIZ$ module_name = "kfile"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_kfile.h"
+ * $WIZ$ module_depends = "timer", "formatwr"
  */
 
 #ifndef KERN_KFILE_H
