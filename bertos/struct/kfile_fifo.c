@@ -51,7 +51,7 @@ static size_t kfilefifo_read(struct KFile *_fd, void *_buf, size_t size)
 	while (size-- && !fifo_isempty_locked(fd->fifo))
 		*buf++ = fifo_pop_locked(fd->fifo);
 
-	return (void *)buf - _buf;
+	return buf - (uint8_t *)_buf;
 }
 
 static size_t kfilefifo_write(struct KFile *_fd, const void *_buf, size_t size)
@@ -62,7 +62,7 @@ static size_t kfilefifo_write(struct KFile *_fd, const void *_buf, size_t size)
 	while (size-- && !fifo_isfull_locked(fd->fifo))
 		fifo_push_locked(fd->fifo, *buf++);
 
-	return (void *)buf - _buf;
+	return buf - (const uint8_t *)_buf;
 }
 
 void kfilefifo_init(KFileFifo *kf, FIFOBuffer *fifo)
