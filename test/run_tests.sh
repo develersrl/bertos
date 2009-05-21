@@ -27,7 +27,7 @@ TESTS=${TESTS:-`find . \
 	-o -name "*_test.c" -print` }
 
 TESTOUT="testout"
-SRC_LIST="bertos/algo/ramp.c bertos/drv/kdebug.c bertos/drv/timer.c bertos/fs/battfs.c bertos/kern/coop.c bertos/kern/idle.c bertos/kern/kfile.c bertos/kern/monitor.c bertos/kern/proc.c bertos/kern/signal.c bertos/kern/sem.c bertos/mware/event.c bertos/mware/formatwr.c bertos/mware/hex.c bertos/mware/sprintf.c bertos/os/hptime.c bertos/struct/kfile_fifo.c bertos/emul/switch_ctx_emul.S"
+SRC_LIST="bertos/algo/ramp.c bertos/drv/kdebug.c bertos/drv/timer.c bertos/fs/battfs.c bertos/kern/coop.c bertos/kern/idle.c bertos/kern/kfile.c bertos/kern/monitor.c bertos/kern/proc.c bertos/kern/signal.c bertos/kern/sem.c bertos/mware/event.c bertos/mware/formatwr.c bertos/mware/hex.c bertos/mware/sprintf.c bertos/os/hptime.c bertos/struct/kfile_fifo.c bertos/fs/fatfs/src/ff.c bertos/emul/diskio_emul.c bertos/fs/fat.c bertos/emul/switch_ctx_emul.S"
 
 buildout='/dev/null'
 runout='/dev/null'
