@@ -25,7 +25,9 @@
 #ifndef _FATFS
 #define _FATFS
 
+#ifndef _WORD_ACCESS
 #define _WORD_ACCESS	0
+#endif
 /* The _WORD_ACCESS option defines which access method is used to the word
 /  data in the FAT structure.
 /
@@ -37,14 +39,16 @@
 /  If it is not the case, the value can also be set to 1 to improve the
 /  performance and code efficiency. */
 
-
+#ifndef _FS_READONLY
 #define _FS_READONLY	0
+#endif
 /* Setting _FS_READONLY to 1 defines read only configuration. This removes
 /  writing functions, f_write, f_sync, f_unlink, f_mkdir, f_chmod, f_rename,
 /  f_truncate and useless f_getfree. */
 
-
+#ifndef _FS_MINIMIZE
 #define _FS_MINIMIZE	0
+#endif
 /* The _FS_MINIMIZE option defines minimization level to remove some functions.
 /
 /   0: Full function.
@@ -53,41 +57,51 @@
 /   2: f_opendir and f_readdir are removed in addition to level 1.
 /   3: f_lseek is removed in addition to level 2. */
 
-
+#ifndef _FS_TINY
 #define	_FS_TINY	0
+#endif
 /* When _FS_TINY is set to 1, FatFs uses the sector buffer in the file system
 /  object instead of the sector buffer in the individual file object for file
 /  data transfer. This reduces memory consumption 512 bytes each file object. */
 
-
+#ifndef _USE_STRFUNC
 #define	_USE_STRFUNC	0
+#endif
 /* To enable string functions, set _USE_STRFUNC to 1 or 2. */
 
-
+#ifndef _USE_MKFS
 #define	_USE_MKFS	0
+#define
 /* To enable f_mkfs function, set _USE_MKFS to 1 and set _FS_READONLY to 0 */
 
 
+#ifndef _USE_FORWARD
 #define	_USE_FORWARD	0
+#endif
 /* To enable f_forward function, set _USE_FORWARD to 1 and set _FS_TINY to 1. */
 
 
+#ifndef _DRIVES
 #define _DRIVES		1
+#endif
 /* Number of volumes (logical drives) to be used. */
 
-
+#ifndef _MAX_SS
 #define	_MAX_SS	512
+#endif
 /* Maximum sector size to be handled. (512/1024/2048/4096) */
 /* 512 for memroy card and hard disk, 1024 for floppy disk, 2048 for MO disk */
 
-
+#ifndef _MULTI_PARTITION
 #define	_MULTI_PARTITION	0
+#endif
 /* When _MULTI_PARTITION is set to 0, each volume is bound to the same physical
 / drive number and can mount only first primaly partition. When it is set to 1,
 / each volume is tied to the partitions listed in Drives[]. */
 
-
+#ifndef _CODE_PAGE
 #define _CODE_PAGE	932
+#endif
 /* The _CODE_PAGE specifies the OEM code page to be used on the target system.
 /  When it is non LFN configuration, there is no difference between SBCS code
 /  pages. When LFN is enabled, the code page must always be set correctly.
@@ -110,9 +124,12 @@
 /   1258 - Vietnam
 */
 
-
+#ifndef _USE_LFN
 #define	_USE_LFN	0
+#endif
+#ifndef _MAX_LFN
 #define	_MAX_LFN	255		/* Maximum LFN length to handle (max:255) */
+#endif
 /* The _USE_LFN option switches the LFN support.
 /
 /   0: Disable LFN.
@@ -123,11 +140,16 @@
 /  a Unicode - OEM code conversion function ff_convert() must be added to
 /  the project. */
 
-
+#ifndef _FS_REENTRANT
 #define _FS_REENTRANT	0
+#endif
+#ifndef _TIMEOUT
 #define _TIMEOUT		1000	/* Timeout period in unit of time ticks */
+#endif
+#ifndef _SYNC_t
 #define	_SYNC_t			HANDLE	/* Type of sync object used on the OS. */
 								/* e.g. HANDLE, OS_EVENT*, ID and etc.. */
+#endif
 /* To make the FatFs module re-entrant, set _FS_REENTRANT to 1 and add user
 /  provided synchronization handlers, ff_req_grant, ff_rel_grant,
 /  ff_del_syncobj and ff_cre_syncobj function to the project. */
