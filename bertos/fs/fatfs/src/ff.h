@@ -13,9 +13,6 @@
 / * Redistributions of source code must retain the above copyright notice.
 /----------------------------------------------------------------------------*/
 
-#include "integer.h"
-#include "cfg/cfg_fat.h"
-
 /*---------------------------------------------------------------------------/
 / FatFs Configuration Options
 /
@@ -25,6 +22,9 @@
 /----------------------------------------------------------------------------*/
 #ifndef _FATFS
 #define _FATFS
+
+#include "integer.h"
+#include "cfg/cfg_fat.h"
 
 #ifndef _WORD_ACCESS
 #define _WORD_ACCESS	0
@@ -72,7 +72,7 @@
 
 #ifndef _USE_MKFS
 #define	_USE_MKFS	0
-#define
+#endif
 /* To enable f_mkfs function, set _USE_MKFS to 1 and set _FS_READONLY to 0 */
 
 
