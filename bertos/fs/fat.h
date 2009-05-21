@@ -36,7 +36,12 @@
  *
  * \author Luca Ottaviano <lottaviano@develer.com>
  *
+ * $WIZ$ module_name = "fat"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_fat.h"
+ * $WIZ$ module_depends = "kfile", "ff"
+ *
  */
+
 #ifndef FS_FAT_H
 #define FS_FAT_H
 
