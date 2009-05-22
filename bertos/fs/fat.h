@@ -46,7 +46,7 @@
 #define FS_FAT_H
 
 #include <kern/kfile.h>
-#include "fatfs/src/ff.h"
+#include "fatfs/ff.h"
 
 typedef struct FatFile
 {

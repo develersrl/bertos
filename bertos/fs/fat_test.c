@@ -43,8 +43,8 @@
 
 #include "fat.h"
 
-#include "fatfs/src/ff.h"
-#include "fatfs/src/diskio.h"
+#include "fatfs/ff.h"
+#include "fatfs/diskio.h"
 
 #include <cfg/test.h>
 

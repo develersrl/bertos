@@ -40,7 +40,7 @@
 /* Low level disk I/O module skeleton for FatFs     (C)ChaN, 2007        */
 /*-----------------------------------------------------------------------*/
 
-#include <fs/fatfs/src/diskio.h>
+#include <fs/fatfs/diskio.h>
 #include <stdio.h>
 #include <errno.h>
 #include <time.h>
