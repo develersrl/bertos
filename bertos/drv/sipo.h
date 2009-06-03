@@ -31,32 +31,72 @@
  * -->
  *
  * \brief Generic Serial-in, Parallel-out implementation (SIPO).
- * 
- * This module use kfile interface.
  *
  *
  * \version $Id$
  *
  * \author Andrea Grandi <andrea@develer.com>
  * \author Daniele Basile <asterix@develer.com>
- * 
+ *
  * $WIZ$ module_name = "sipo"
  * $WIZ$ module_depends = "kfile"
  * $WIZ$ module_hw = "bertos/hw/hw_sipo.h"
- * 
  */
+
+
+
+
 
 #ifndef DRV_SIPO_H
 #define DRV_SIPO_H
 
+#include "hw/hw_sipo.h"
+
 #include <kern/kfile.h>
+
+#define SIPO_DATAORDER_START_LSB        1
+#define SIPO_DATAORDER_START_MSB     0x80
+
+/**
+ * Define enum to set sipo data order.
+ */
+typedef enum SipoBitOrder
+{
+	SIPO_DATAORDER_MSB = 0,
+	SIPO_DATAORDER_LSB = 1
+} SipoBitOrder;
+
+/**
+ * Define enum to set the start level of clock.
+ */
+typedef enum SipoClockPol
+{
+	SIPO_START_LOW = 0,
+	SIPO_START_HIGH = 1
+
+} SipoClkPol;
+
+/**
+ * Define enum to set load signal level.
+ */
+typedef enum SipoLoadPol
+{
+	SIPO_LOW_TO_HIGH = 0,
+	SIPO_HIGH_TO_LOW = 1
+
+} SipoLoadPol;
 
 /**
  * Sipo KFile context structure.
  */
 typedef struct Sipo
 {
-	KFile fd;                       ///< File descriptor.
+	KFile fd;                 ///< File descriptor.
+	SipoMap load_device;      ///< Descriptor of the device that we want drive.
+	SipoLoadPol load_pol;     ///< Set polarity of load signal.
+	SipoClkPol clock_pol;     ///< Set polarity of data clock.
+	SipoBitOrder bit_order;   ///< Set the order of pushed bits in sipo.
+
 } Sipo;
 
 /**

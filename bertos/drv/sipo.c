@@ -34,8 +34,7 @@
  *
  * \brief SIPO Module
  *
- * The SIPO module transforms a serial input in
- * a parallel output. Please check hw_sipo.h
+ * The SIPO module transforms a serial input in a parallel output. Please check hw_sipo.h
  * file to customize hardware related parameters.
  *
  * \author Andrea Grandi <andrea@develer.com>
@@ -47,42 +46,57 @@
 #include "hw/hw_sipo.h"
 
 #include <cfg/compiler.h>
+#include <cfg/log.h>
 
 #include <kern/kfile.h>
 
 #include <string.h>
 
+
+#define SIPO_DATAORDER_START(order)          (order ? SIPO_DATAORDER_START_LSB : SIPO_DATAORDER_START_MSB)
+#define SIPO_DATAORDER_SHIFT(shift, order)   (order ?  ((shift) <<= 1) : ((shift) >>= 1))
+
 /**
  * Write a char in sipo shift register
  */
-INLINE void sipo_putchar(uint8_t c)
+INLINE void sipo_putchar(uint8_t c, uint8_t bit_order, uint8_t clock_pol)
 {
+	uint8_t shift = SIPO_DATAORDER_START(bit_order);
+
 	for(int i = 0; i < 8; i++)
 	{
-		if((c & BV(i)) == 0)
+		if((c & shift) == 0)
 			SIPO_SI_LOW();
 		else
 			SIPO_SI_HIGH();
 
-		SIPO_SI_CLOCK();
+		SIPO_SI_CLOCK(clock_pol);
+
+		SIPO_DATAORDER_SHIFT(shift, bit_order);
 	}
 }
 
 /**
  * Write a buffer into the sipo register and, when finished, give a load pulse.
  */
- static size_t sipo_write(UNUSED_ARG(struct KFile *, fd), const void *_buf, size_t size)
+ static size_t sipo_write(struct KFile *_fd, const void *_buf, size_t size)
 {
 	const uint8_t *buf = (const uint8_t *)_buf;
+	Sipo *fd = SIPO_CAST(_fd);
 	size_t write_len = size;
+
 	ASSERT(buf);
+
+	SIPO_SET_SI_LEVEL();
+	SIPO_SET_CLK_LEVEL(fd->clock_pol);
+	SIPO_SET_LD_LEVEL(fd->load_device, fd->load_pol);
 
 	// Load into the shift register all the buffer bytes
 	while(size--)
-		sipo_putchar(*buf++);
+		sipo_putchar(*buf++, fd->bit_order, fd->clock_pol);
 
-	// We have just finished to shift the bytes into the register, now load them.
-	SIPO_LOAD();
+	// We finsh to load bytes, so load it.
+	SIPO_LOAD(fd->load_device, fd->load_pol);
 
 	return write_len;
 }
@@ -96,7 +110,7 @@ void sipo_init(Sipo *fd)
 
 	memset(fd, 0, sizeof(Sipo));
 
-	//Set kfile struct type as a Sipo structure.
+	//Set kfile struct type as a generic kfile structure.
 	DB(fd->fd._type = KFT_SIPO);
 
 	// Set up SIPO writing functions.
@@ -104,4 +118,6 @@ void sipo_init(Sipo *fd)
 
 	SIPO_INIT_PIN();
 
+	/* Enable sipo output */
+	SIPO_ENABLE();
 }
