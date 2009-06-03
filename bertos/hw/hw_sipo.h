@@ -47,6 +47,18 @@
 
 
 /**
+ * Mapping sipo connection on board.
+ * See scheme to more info.
+ */
+typedef enum SipoMap {
+
+	/* Add device here */
+
+	SIPO_CNT
+} SipoMap;
+
+
+/**
  * Define the macros needed to set the serial input bit of SIPO device
  * low or high.
  */
@@ -57,17 +69,46 @@
  * Drive pin to load the bit, presented in serial-in pin,
  * into sipo shift register.
  */
-#define SIPO_SI_CLOCK() /* Implement me! */
+#define SIPO_SI_CLOCK(clk_pol)
+	do { \
+		/* Implement me! */ \
+		(void)clk_pol; \
+	} while (0)
 
 /**
  * Clock the content of shift register to output.
  */
-#define SIPO_LOAD()   /* Implement me! */
+#define SIPO_LOAD(device, load_pol)  \
+	do { \
+		/* Implement me! */ \
+		(void)device; \
+		(void)load_pol; \
+	} while (0)
 
 /**
  * Enable the shift register output.
  */
 #define SIPO_ENABLE() /* Implement me! */
+
+/**
+ * Set logic level for load signal
+ */
+#define SIPO_SET_LD_LEVEL(device, load_pol) \
+	do { \
+		/* Implement me! */ \
+		(void)device; \
+		(void)load_pol; \
+	} while (0)
+
+
+/**
+ * Sel logic level for clock signal
+ */
+#define SIPO_SET_CLK_LEVEL(clock_pol)  \
+	do { \
+		/* Implement me! */ \
+		(void)clock_pol; \
+	} while (0)
 
 
 /**
