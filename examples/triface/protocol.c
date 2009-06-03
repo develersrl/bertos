@@ -360,6 +360,11 @@ static void protocol_registerCmds(void)
 void protocol_init(KFile *fd)
 {
 	/* SPI Port Initialization */
+	fd_sipo.load_device = TRIFACE_DOUT;
+	fd_sipo.bit_order = SIPO_DATAORDER_LSB;
+	fd_sipo.clock_pol = SIPO_START_LOW;
+	fd_sipo.load_pol = SIPO_LOW_TO_HIGH;
+
 	sipo_init(&fd_sipo);
 
 	interactive = FORCE_INTERACTIVE;

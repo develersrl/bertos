@@ -47,6 +47,19 @@
 
 #include <avr/io.h>
 
+/**
+ *  * Mapping sipo connection on board.
+ *   * See scheme to more info.
+ *    */
+typedef enum SipoMap
+{
+	TRIFACE_DOUT = 0,
+
+	SIPO_CNT
+} SipoMap;
+
+
+
 //Set output pin for sipo
 #define SCK_OUT            (DDRB |= BV(PB1))  // Shift register clock input pin
 #define SOUT_OUT           (DDRB |= BV(PB2))  // Serial data input pin
@@ -73,8 +86,9 @@
  * Drive pin to load the bit, presented in serial-in pin,
  * into sipo shift register.
  */
-#define SIPO_SI_CLOCK() \
+#define SIPO_SI_CLOCK(clk_pol) \
 	do{ \
+		(void)clk_pol; \
 		SCK_HIGH; \
 		SCK_LOW; \
 	}while(0)
@@ -82,8 +96,10 @@
 /**
  * Clock the content of shift register to output.
  */
-#define SIPO_LOAD() \
+#define SIPO_LOAD(device, load_pol) \
 	do { \
+		(void)device; \
+		(void)load_pol; \
 		SLOAD_OUT_HIGH; \
 		SLOAD_OUT_LOW; \
 	}while(0)
@@ -93,6 +109,31 @@
  */
 #define SIPO_ENABLE() OE_LOW;
 
+/**
+ * Set logic level for load signal
+ */
+#define SIPO_SET_LD_LEVEL(device, load_pol) \
+	do { \
+		(void)device; \
+		if(load_pol) \
+			SLOAD_OUT_HIGH; \
+		else \
+			SLOAD_OUT_LOW; \
+	} while (0)
+
+
+/**
+ * Sel logic level for clock signal
+ */
+#define SIPO_SET_CLK_LEVEL(clock_pol) \
+	do { \
+		if(clock_pol) \
+			SCK_HIGH; \
+		else \
+			SCK_LOW; \
+	} while (0)
+
+#define SIPO_SET_SI_LEVEL()     SIPO_SI_LOW()
 
 /**
  * Do everything needed in order to init the SIPO pins.
