@@ -79,7 +79,7 @@ INLINE void sipo_putchar(uint8_t c, uint8_t bit_order, uint8_t clock_pol)
 /**
  * Write a buffer into the sipo register and, when finished, give a load pulse.
  */
- static size_t sipo_write(struct KFile *_fd, const void *_buf, size_t size)
+static size_t sipo_write(struct KFile *_fd, const void *_buf, size_t size)
 {
 	const uint8_t *buf = (const uint8_t *)_buf;
 	Sipo *fd = SIPO_CAST(_fd);
