@@ -48,9 +48,9 @@
 #include <avr/io.h>
 
 /**
- *  * Mapping sipo connection on board.
- *   * See scheme to more info.
- *    */
+ * Mapping sipo connection on board.
+ * See schematics for more info.
+ */
 typedef enum SipoMap
 {
 	TRIFACE_DOUT = 0,
