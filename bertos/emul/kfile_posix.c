@@ -37,6 +37,7 @@
  */
 
 #include <emul/kfile_posix.h>
+#include <string.h>
 
 static size_t kfile_posix_read(struct KFile *_fd, void *buf, size_t size)
 {
@@ -67,9 +68,13 @@ static kfile_off_t kfile_posix_seek(struct KFile *_fd, kfile_off_t offset, KSeek
 			break;
 		default:
 			ASSERT(0);
+			return EOF;
 	}
+	int err = fseek(fd->fp, offset, std_whence);
+	if (err)
+		return err;
 
-	return fseek(fd->fp, offset, std_whence);
+	return ftell(fd->fp);
 }
 
 static int kfile_posix_close(struct KFile *_fd)
@@ -86,7 +91,8 @@ static int kfile_posix_flush(struct KFile *_fd)
 
 FILE *kfile_posix_init(KFilePosix *file, const char *filename, const char *mode)
 {
-	file->fd._type = KFT_KFILEPOSIX;
+	memset(file, 0, sizeof(*file));
+	DB(file->fd._type = KFT_KFILEPOSIX);
 	file->fd.read = kfile_posix_read;
 	file->fd.write = kfile_posix_write;
 	file->fd.close = kfile_posix_close;
