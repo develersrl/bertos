@@ -115,14 +115,17 @@ static char *getValue(const char *line, char *value, size_t size)
  */
 static int findKey(KFile *fd, const char *key, char *line, size_t size)
 {
-	while (kfile_gets(fd, line, size) != EOF && *line != '[')
+	int err;
+	do
 	{
+		err = kfile_gets(fd, line, size);
 		char curr_key[30];
 		getKey(line, curr_key, 30);
 		/* check key */
 		if (!strcmp(curr_key, key))
 			return 0;
 	}
+	while (err != EOF && *line != '[');
 	return EOF;
 }
 

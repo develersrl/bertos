@@ -87,6 +87,9 @@ int ini_reader_testRun(void)
 
 	ASSERT(ini_getString(&kf.fd, "Long section with spaces", "value", "", buf, 30) != EOF);
 	ASSERT(strcmp(buf, "long value") == 0);
+
+	ASSERT(ini_getString(&kf.fd, "Long section with spaces", "no_new_line", "", buf, 30) != EOF);
+	ASSERT(strcmp(buf, "value") == 0);
 	return 0;
 }
 
