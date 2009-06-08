@@ -110,7 +110,4 @@ int sprintf_testTearDown(void)
 	return 0;
 }
 
-#if UNIT_TEST
-	TEST_MAIN(sprintf);
-#endif /* UNIT_TEST */
-
+TEST_MAIN(sprintf);
