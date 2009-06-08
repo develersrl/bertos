@@ -36,6 +36,9 @@
  * \author Luca Ottaviano <lottaviano@develer.com>
  */
 
+#ifndef KFILE_POSIX_H
+#define KFILE_POSIX_H
+
 #include <kern/kfile.h>
 #include <stdio.h>
 
@@ -54,3 +57,5 @@ INLINE KFilePosix *KFILEPOSIX_CAST(KFile *fd)
 }
 
 FILE *kfile_posix_init(KFilePosix *file, const char *filename, const char *mode);
+
+#endif /* KFILE_POSIX_H */

@@ -63,9 +63,10 @@ static kfile_off_t kfile_posix_seek(struct KFile *_fd, kfile_off_t offset, KSeek
 			std_whence = SEEK_END;
 			break;
 		case KSM_SEEK_SET:
-			/* fall */
-		default:
 			std_whence = SEEK_SET;
+			break;
+		default:
+			ASSERT(0);
 	}
 
 	return fseek(fd->fp, offset, std_whence);
@@ -83,7 +84,7 @@ static int kfile_posix_flush(struct KFile *_fd)
 	return fflush(fd->fp);
 }
 
-FILE* kfile_posix_init(KFilePosix *file, const char *filename, const char *mode)
+FILE *kfile_posix_init(KFilePosix *file, const char *filename, const char *mode)
 {
 	file->fd._type = KFT_KFILEPOSIX;
 	file->fd.read = kfile_posix_read;
