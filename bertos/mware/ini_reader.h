@@ -42,6 +42,10 @@
  *
  * \version $Id$
  * \author Luca Ottaviano <lottaviano@develer.com>
+ *
+ * $WIZ$ module_name = "ini_reader"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_ini_reader.h"
+ * $WIZ$ module_depends = "kfile"
  */
 
 #ifndef INI_READER_H

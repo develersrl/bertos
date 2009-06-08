@@ -44,6 +44,6 @@
  * Maximum ini file line length (chars).
  * $WIZ$ type = "int"; min = 1
  */
-#define CONFIG_INI_MAX_LINE_LEN 512
+#define CONFIG_INI_MAX_LINE_LEN 64
 
 #endif /* CFG_INI_READER_H */
