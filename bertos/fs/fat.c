@@ -136,7 +136,7 @@ static void fatfile_clearerr(struct KFile *_fd)
 
 FRESULT fatfile_open(FatFile *file, const char *file_path, BYTE mode)
 {
-	file->fd._type = KFT_FATFILE;
+	DB(file->fd._type = KFT_FATFILE);
 	file->fd.read = fatfile_read;
 	file->fd.write = fatfile_write;
 	file->fd.reopen = 0;
