@@ -51,16 +51,16 @@
  * \endcode
  *
  * Code size on AVR4 with GCC 3.4.1 (-O2):
- *   PRINTF_FULL        2912byte (0xB60)
- *   PRINTF_NOFLOAT     1684byte (0x694)
- *   PRINTF_REDUCED      924byte (0x39C)
- *   PRINTF_NOMODIFIERS  416byte (0x1A0)
+ * \li  PRINTF_FULL        2912byte (0xB60)
+ * \li  PRINTF_NOFLOAT     1684byte (0x694)
+ * \li  PRINTF_REDUCED      924byte (0x39C)
+ * \li  PRINTF_NOMODIFIERS  416byte (0x1A0)
  *
  * Code/data size in words on DSP56K with CodeWarrior 6.0:
- *   PRINTF_FULL         1493/45
- *   PRINTF_NOFLOAT      795/45
- *   PRINTF_REDUCED      482/0
- *   PRINTF_NOMODIFIERS  301/0
+ * \li  PRINTF_FULL         1493/45
+ * \li  PRINTF_NOFLOAT      795/45
+ * \li  PRINTF_REDUCED      482/0
+ * \li  PRINTF_NOMODIFIERS  301/0
  *
  * The reduced version of formatter is suitable when program size is critical
  * rather than formatting power.  This routine uses less than 20 bytes of
