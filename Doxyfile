@@ -593,7 +593,9 @@ EXCLUDE                = doc \
                          CVS \
                          .svn \
                          qtext/qextftp.cpp \
-                         wizard
+                         wizard \
+                         testout \
+                         testout.old
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or 
 # directories that are symbolic links (a Unix filesystem feature) are excluded 
