@@ -74,6 +74,8 @@ The modules are sorted in subdirectories by their category:
 The top-level directory contains a few support headers that are meant to be
 usable by any C/C++ embedded or hosted application.
 
+See the \ref dev_status page for information about the various drivers.
+
 \section license License
 
 BeRTOS is provided under the term of the GNU General Public License

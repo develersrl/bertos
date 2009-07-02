@@ -38,7 +38,7 @@ PROJECT_NUMBER         =
 # If a relative path is entered, it will be relative to the location 
 # where doxygen was started. If left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = doc/reference
+OUTPUT_DIRECTORY       = doc/offline-reference
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create 
 # 4096 sub-directories (in 2 levels) under the output directory of each output 
@@ -577,7 +577,8 @@ INPUT_ENCODING         = UTF-8
 
 FILE_PATTERNS          = *.h \
                          README.bertos \
-                         *.c
+                         *.c \
+                         STATUS
 
 # The RECURSIVE tag can be used to turn specify whether or not subdirectories 
 # should be searched for input files as well. Possible values are YES and NO. 
@@ -593,7 +594,9 @@ EXCLUDE                = doc \
                          CVS \
                          .svn \
                          qtext/qextftp.cpp \
-                         wizard
+                         wizard \
+                         testout \
+                         testout.old
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or 
 # directories that are symbolic links (a Unix filesystem feature) are excluded 
@@ -652,7 +655,7 @@ IMAGE_PATH             =
 # to standard output.  If FILTER_PATTERNS is specified, this tag will be 
 # ignored.
 
-INPUT_FILTER           = "python doc/wizard-tag-filter.py"
+INPUT_FILTER           = "python doc/tag-filter.py"
 
 # The FILTER_PATTERNS tag can be used to specify filters on a per file pattern 
 # basis.  Doxygen will compare the file name with each pattern and apply the 

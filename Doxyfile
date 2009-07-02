@@ -577,7 +577,8 @@ INPUT_ENCODING         = UTF-8
 
 FILE_PATTERNS          = *.h \
                          README.bertos \
-                         *.c
+                         *.c \
+                         STATUS
 
 # The RECURSIVE tag can be used to turn specify whether or not subdirectories 
 # should be searched for input files as well. Possible values are YES and NO. 
@@ -654,7 +655,7 @@ IMAGE_PATH             =
 # to standard output.  If FILTER_PATTERNS is specified, this tag will be 
 # ignored.
 
-INPUT_FILTER           = "python doc/wizard-tag-filter.py"
+INPUT_FILTER           = "python doc/tag-filter.py"
 
 # The FILTER_PATTERNS tag can be used to specify filters on a per file pattern 
 # basis.  Doxygen will compare the file name with each pattern and apply the 
