@@ -1,0 +1,294 @@
+﻿/*
+ * This document is automatically processed by Doxygen (http://www.doxygen.org/).
+ * Don't remove special formatting tags.
+ */
+/*!
+\page dev_status BeRTOS Development Status
+
+If you are looking for the list of BeRTOS ports or a detailed overview of all modules completeness and stability this is the right place.
+
+BeRTOS is quite stable (it is used in production environments) but it is also a very large project, so all of its parts may not be at the same level.
+
+Table of contents:
+
+ \li \ref kernel
+ \li \ref compilers
+ \li \ref core_drivers
+ \li \ref internal_peripherals
+ \li \ref independant_drivers
+ \li \ref emulator
+ \li \ref algorithms
+ \li \ref graphics
+ \li \ref networking
+ \li \ref fs
+ \li \ref data_structures
+ \li \ref mware
+
+\section kernel Kernel
+BeRTOS features a cooperative kernel with synchronization primitives.
+
+Embedded systems are mostly I/O bound systems. In these systems the microprocessor/microcontroller spends the most part of its computing power doing... absolutely nothing :-)
+
+Since the system simply waits for external events to happen we decided to implement a strong and robust cooperative kernel with very low memory footprint and high modularity. This allows the kernel to be used on a variety of different CPUs, even the smaller ones.
+Currently the kernel code is very stable.
+
+<b> Kernel features </b>:
+  \li \link coop.c Cooperative \endlink round-robin scheduling.
+  \li \link monitor.h Stack process monitor \endlink, useful to prevent stack overflows.
+  \li \link msg.h Inter-process messaging system \endlink (with very low overhead).
+  \li \link sem.h Binary semaphores \endlink.
+  \li \link signal.c Signals \endlink.
+
+We have plans to add, as soon as possible, a <b> preemptive scheduler </b>, browse <A href="http://dev.bertos.org/browser/trunk/bertos/kern">kernel source code</A> to see the latest additions.
+
+The kernel has a port layer (a single assembly function) that needs to be reimplemented each time a new CPU is added.
+Here is a list of currently available CPU family ports:
+
+<table>
+<tr> <td> <b> CPU Family </b> </td> <td> <b> Port status </b> </td></tr>
+<tr> <td>  ARM </td> <td> stable </td></tr>
+<tr> <td>  <A href="http://www.atmel.com/avr">Atmel AVR</A> </td>  <td> stable </td> </tr>
+<tr> <td>  <A href="http://www.freescale.com/webapp/sps/site/taxonomy.jsp?nodeId=01624686366292">Freescale DSP56800</A> </td>  <td> unmantained </td> </tr>
+<tr> <td>  Intel i196 </td>  <td> unmantained </td> </tr>
+<tr> <td>  PowerPC          </td>  <td> \ref emulator only </td> </tr>
+<tr> <td>  Intel/AMD x86    </td>  <td> \ref emulator only </td> </tr>
+<tr> <td>  Intel/AMD x86-64 </td>  <td> \ref emulator only </td> </tr>
+</table>
+
+\section compilers Compilers
+BeRTOS was born as a collection of reusable code snippets.
+In this perspective it was of primary importance that the code was reusable and well portable.
+
+So, although BeRTOS is primarily intended to be used with open source tools such as <A href="http://gcc.gnu.org">GCC</A>, it supports other compilers too. It is possible to develop with BeRTOS on Linux, Windows and Mac.
+
+For every port we have indicated the current compiler used and were to find a suitable development suite:
+<table>
+<tr> <td> <b> CPU Family </b> </td> <td> <b> Compiler </b> </td> <td> <b> Linux/Mac Toolchain </b> </td> <td> <b> Windows Toolchain </b> </td> </tr>
+<tr> <td> ARM</td>  <td>GCC</td>  <td><A href="http://www.codesourcery.com/sgpp/lite/arm/portal/release642">Sourcery G++ toolchain</A> (open source)</td>  <td> <A href="http://dev.bertos.org/wiki/DownloadPage">BeRTOS ARM IDE (open source)</A> </td> </tr>
+<tr> <td> ARM</td>  <td>IAR (unmantained)</td>  <td>none</td>  <td>http://www.iar.com (proprietary)</td> </tr>
+<tr> <td> AVR</td>  <td>GCC</td>  <td><A href="http://www.develer.com/oss/AvrToolchain">AVR Toolchain installer</A> (open source)</td> <td> <A href="http://dev.bertos.org/wiki/DownloadPage">BeRTOS AVR IDE (open source)</A> </td> </tr>
+<tr> <td> DSP56800</td>  <td>CodeWarrior (unmantained)</td>  <td>none</td>  <td><A href="http://www.freescale.com/webapp/sps/site/homepage.jsp?nodeId=012726">CodeWarrior</A> (proprietary)</td> </tr>
+<tr> <td> i196</td>  <td>fillme</td>  <td>fillme</td>  <td>fillme</td> </tr>
+<tr> <td> PowerPC </td>  <td> GCC  </td>  <td> use your system GCC </td>  <td> none </td> </tr>
+<tr> <td> x86</td>  <td>GCC</td>  <td>use your system GCC</td>  <td>http://www.mingw.org/ (open source)</td> </tr>
+<tr> <td> x86</td>  <td>MSVC (unmantained)</td>  <td>none</td>  <td><A href="http://www.microsoft.com/express/">Visual Studio</A> (proprietary)</td> </tr>
+<tr> <td> x86-64  </td>  <td> GCC  </td>  <td> use your system GCC </td>  <td> none </td> </tr>
+</table>
+
+
+\section core_drivers Core Drivers
+BeRTOS is not only a kernel, it aims to supply full operating system services.
+To achieve this we need at least some core drivers for every CPU port.
+
+These drivers are: <b> system timer </b>, <b> debug system </b> and <b> serial comm driver </b>.
+
+Here is the list of CPU whose internal core drivers are supported:
+<table>
+<tr> <td> <b> Family </b> </td> <td> <b> CPU </b> </td> <td> <b> Core driver status </b> </td> </tr>
+<tr> <td> ARM</td>  <td>AT91SAM7S256</td>  <td>stable</td> </tr>
+<tr> <td> ARM</td>  <td>AT91SAM7X128</td>  <td>stable</td> </tr>
+<tr> <td> ARM</td>  <td>AT91SAM7X256</td>  <td>stable</td> </tr>
+<tr> <td> AVR</td>  <td>ATMega8</td>  <td>stable</td> </tr>
+<tr> <td> AVR</td>  <td>ATMega32</td>  <td>stable</td> </tr>
+<tr> <td> AVR</td>  <td>ATMega64</td>  <td>stable</td> </tr>
+<tr> <td> AVR</td>  <td>ATMega103</td>  <td>stable</td> </tr>
+<tr> <td> AVR</td>  <td>ATMega128</td>  <td>stable</td> </tr>
+<tr> <td> AVR</td>  <td>ATMega168</td>  <td>stable</td> </tr>
+<tr> <td> AVR</td>  <td>ATMega1281</td>  <td>stable</td> </tr>
+<tr> <td> DSP56800</td>  <td>all</td>  <td>unmantained</td> </tr>
+<tr> <td> i196</td>  <td>all</td>  <td>unmantained</td> </tr>
+<tr> <td> PowerPC </td>  <td> all </td>  <td> see \ref emulator </td> </tr>
+<tr> <td> x86     </td>  <td> all </td>  <td> see \ref emulator </td> </tr>
+<tr> <td> x86-64  </td>  <td> all </td>  <td> see \ref emulator </td> </tr>
+</table>
+
+Adding CPU support for an already present CPU family is quite simple since hardware manufacturers share peripherals design between the same CPU cores.
+
+\section internal_peripherals MCU Internal peripheral drivers 
+Since BeRTOS aims to supply full operating system services, for every CPU port we try to implement as much drivers as possible. This section covers the current development status for MCU Internal peripheral drivers.
+
+ \li <b> MCU family: Atmel AVR </b>
+
+<table>
+   <tr> <td> <b> Driver </b> </td> <td> <b> Status </b> </td> </tr>
+   <tr> <td> \link adc_avr.c ADC \endlink</td>  <td>stable</td> </tr>
+   <tr> <td> \link flash_avr.c Internal Flash \endlink</td>  <td>stable</td> </tr>
+   <tr> <td> UART</td>  <td>stable</td> </tr>
+   <tr> <td> SPI</td>  <td>stable</td> </tr>
+   <tr> <td> Timer</td>  <td>stable</td> </tr>
+   <tr> <td> \link i2c_avr.c TWI \endlink</td>  <td>stable</td> </tr>
+</table>
+
+   To get up to date informations look at the <A href="http://dev.bertos.org/browser/trunk/bertos/cpu/avr/drv">AVR drivers source code</A>.
+
+ \li <b> MCU family: Atmel AT91 ARM </b>
+
+<table>
+   <tr> <td> <b> Driver </b> </td> <td> <b> Status </b> </td> </tr>
+   <tr> <td> UART</td>  <td>stable</td> </tr>
+   <tr> <td> SPI</td>  <td>stable</td> </tr>
+   <tr> <td> Timers</td>  <td>stable</td> </tr>
+   <tr> <td> TWI</td>  <td>beta</td> </tr>
+   <tr> <td> ADC</td>  <td>beta</td> </tr>
+   <tr> <td> PWM</td>  <td>beta</td> </tr>
+</table>
+
+   To get up to date informations look at the <A href="http://dev.bertos.org/browser/trunk/bertos/cpu/arm/drv">ARM drivers source code</A>.
+
+ \li <b> MCU family: Freescale DSP56800 </b>
+
+   Only core drivers are supported.
+
+ \li <b> MCU family: Intel i196 </b>
+
+   Only core drivers are supported.
+
+ \li <b> MCU family: PowerPC </b>
+
+   See \ref emulator.
+
+ \li <b> MCU family: x86 </b>
+
+   See \ref emulator.
+
+ \li <b> MCU family: x86-64 </b>
+
+   See \ref emulator.
+
+\section independant_drivers Generic CPU independent drivers 
+BeRTOS supplies a full set of CPU independent generic hardware drivers. To achieve this all drivers are structured to have an hardware abstraction layer (HAL) that isolate CPU specific code and makes porting to new CPU easy.
+Current driver list:
+<table>
+<tr> <td> <b> Driver </b> </td> <td> <b> Status </b> </td> </tr>
+<tr> <td> \link adc.h ADC API \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link buzzer.h Buzzer \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link dataflash.h Atmel Dataflash \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link eeprom.h I2C EEPROM \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link flash25.h AT25Fxxx Atmel flash memories \endlink</td>  <td>beta</td> </tr>
+<tr> <td> \link ft245rl.h FT245RL USB to parallel converter \endlink</td>  <td>beta</td> </tr>
+<tr> <td> \link kbd.h Keyboard \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link i2c.h I2C \endlink with bitbang support</td>  <td>stable</td> </tr>
+<tr> <td> Displaytech 32122A Graphic LCD</td>  <td>stable</td> </tr>
+<tr> <td> \link dc_motor.h DC Motor with PID \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link lcd_text.h Alphanumeric LCD \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link mcp41.h MPC41 digital potentiometer \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link ntc.h NTC \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link phase.h TRIAC phase partialization \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link pwm.h PWM API \endlink</td>  <td>beta</td> </tr>
+<tr> <td> \link pcf8574.h PCF85974 I2C port expander \endlink</td>  <td>beta</td> </tr>
+<tr> <td> \link ser.h Serial API \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link spi_bitbang.h Bitbanged SPI \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link tc520.h TC520 ADC \endlink</td>  <td>obsolete</td> </tr>
+<tr> <td> \link thermo.h Thermostat \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link timer.h System timer API \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link stepper.h Stepper motor with ramps \endlink</td>  <td>stable</td> </tr>
+<tr> <td> Watchdog</td>  <td>beta</td> </tr>
+</table>
+
+To get up to date informations look at the <A href="http://dev.bertos.org/browser/trunk/bertos/drv">drivers source code</A>.
+
+\section emulator Emulator 
+BeRTOS features can be emulated under a Unix system, check DemoApp.
+
+The emulator uses Qt to display emulated I/O devices in a window.  It supports task
+scheduling and a number of other embedded peripherals.
+
+<table>
+<tr> <td> <b> Emulator </b>      </td>  <td> <b> Status </b> </td> </tr>
+<tr> <td>  timer                 </td>  <td> stable       </td> </tr>
+<tr> <td>  scheduler             </td>  <td> stable       </td> </tr>
+<tr> <td>  keyboard              </td>  <td> stable       </td> </tr>
+<tr> <td>  graphical LCD display </td>  <td> stable       </td> </tr>
+
+<tr> <td>  text LCD display      </td>  <td> unmaintained </td> </tr>
+<tr> <td>  buzzer                </td>  <td> unmaintained </td> </tr>
+<tr> <td>  serial port           </td>  <td> unmaintained </td> </tr>
+<tr> <td>  flash                 </td>  <td> unmaintained </td> </tr>
+<tr> <td>  debug console         </td>  <td> stable       </td> </tr>
+<tr> <td>  file read/write       </td>  <td> stable       </td> </tr>
+</table>
+
+\section algorithms Algorithms 
+In embedded programming sometimes you have to cope with protocols, security systems and things like that.
+BeRTOS comes in help with a set of optimized portable algorithms:
+<table>
+<tr> <td> <b> Algorithm </b> </td> <td> <b> Status </b> </td> </tr>
+<tr> <td> \link crc.c CRC16 \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link md2.c MD2 \endlink</td>  <td>beta</td> </tr>
+<tr> <td> \link randpool.c Cryptographically secure Random Pool \endlink</td>  <td>beta</td> </tr>
+<tr> <td> \link rotating_hash.h Rotating hash checksum \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link tea.c TEA (Tiny Encryption Algorithm) \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link ramp.c Stepper motor ramp generator \endlink</td>  <td>beta</td> </tr>
+<tr> <td> \link pid_control.c PID Controller \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link rle.c RLE (Run lenght en/decondig) \endlink</td>  <td>stable</td> </tr>
+</table>
+
+To get up to date informations look at the <A href="http://dev.bertos.org/browser/trunk/bertos/algo">algorithms source code</A>.
+
+\section graphics Graphic subsystem 
+BeRTOS also features a complete graphic subsystem, suitable for generating compact yet powerful GUI.
+This system is composed of several modules ranging from simple graphic primitives to complex menu management functions.
+
+<table>
+<tr> <td> <b> Module </b> </td> <td> <b> Status </b> </td> </tr>
+<tr> <td> \link bitmap.c Bitmaps manipulation \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link line.c Lines drawing \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link line.c Rectangles drawing \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link win.c Simple windowing system \endlink</td>  <td>stable</td> </tr>
+<tr> <td> Proportional and fixed size fonts</td>  <td>stable</td> </tr>
+<tr> <td> \link text.c Text rendering \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link charts.c Simple Charts \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link menu.c Menus \endlink</td>  <td>stable</td> </tr>
+</table>
+
+To get up to date informations look at <A href="http://dev.bertos.org/browser/trunk/bertos/">the source code</A> in the directories \b gfx, \b gui or \b fonts.
+
+\section networking Network protocols 
+Since BeRTOS can also be used in very tiny systems, some simple communication protocols has been developed.
+
+This is the current status:
+<table>
+<tr> <td> <b> Protocol </b> </td> <td> <b> Status </b> </td> </tr>
+<tr> <td> \link pocketbus.c PocketBus \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link keytag.c Keytag (for 125KHz transponders) \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link xmodem.c XModem protocol \endlink</td>  <td>stable</td> </tr>
+</table>
+
+For more information take a look at <A href="http://dev.bertos.org/browser/trunk/bertos/net/">network directory</A>.
+
+
+\section fs File system 
+The latest SVN version of BeRTOS supports \link fat.h FAT \endlink filesystems using the <A href="http://elm-chan.org/fsw/ff/00index_e.html">FatFs</A>  library. The module is highly configurable, for example it can be compiled in read-only mode for some space saving.
+
+\link battfs.c BattFs\endlink, a file system specifically planned for embedded platforms, is in the beta stage. The goal is to have a filesystem suitable for little flash and eeprom memories (like dataflash), reliable, robust and capable of wear-levelling the memory pages to increase its life.
+Currently you can create files, append data to them but file deletion is still not supported. Wear-levelling is achieved by rotating a page every time it is written. Plans are to add even transactions (a whole write can be performed atomically).
+
+File system development takes place in the <A href="http://dev.bertos.org/browser/trunk/bertos/fs">fs directory</A>.
+
+\section data_structures Data Structures 
+BeRTOS supplies common data structures, implemented and optimized for low memory footprint and speed.
+
+<table>
+<tr> <td> <b> Module </b></td> <td> <b> Status </b></td></tr>
+<tr> <td> \link fifobuf.h FIFO \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link hashtable.h Hash table \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link heap.h Embedded-optimized dynamic memory allocator \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link list.h Lists \endlink</td>  <td>stable</td> </tr>
+</table>
+
+\section mware Middleware 
+This section covers all BeRTOS modules that provide general purpose utility functions. Most of them should be moved to \ref algorithms directory.
+
+In the meanwhile, here is the list:
+<table>
+<tr> <td> <b> Module </b> </td> <td> <b> Status </b> </td></tr>
+<tr> <td> \link cpu/byteorder.h Integers to/from host byte-order conversion \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link event.h Events \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link except.h C++ like exception handling in C \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link formatwr.c Embedded-optimized printf \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link readline.h Command shell with history \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link ini_reader.h Ini file reader \endlink</td>  <td>stable</td> </tr>
+</table>
+
+As usual, check <A href="http://dev.bertos.org/browser/trunk/bertos/mware">source code</A> for detailed reference.
+*/
