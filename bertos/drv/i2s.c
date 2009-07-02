@@ -1,4 +1,8 @@
-#include <drv/i2s.h>
+
+
+#include "i2s.h"
+
+#include <drv/timer.h>
 #include <cfg/macros.h>
 #include <cfg/log.h>
 #include <io/arm.h>
@@ -109,11 +113,17 @@ static void i2s_dma_tx_irq_handler(void)
 
 bool i2s_start(void)
 {
+	SSC_CR = BV(SSC_TXDIS);
+	//kprintf("%08lX\n", SSC_TCMR);
+	timer_udelay(15);
 	SSC_PTCR = BV(PDC_TXTDIS);
 	SSC_TPR = (reg32_t)play_buf1;
 	SSC_TCR = CONFIG_PLAY_BUF_LEN / 2;
 	SSC_PTCR = BV(PDC_TXTEN);
-	ASSERT(SSC_PTSR & BV(PDC_TXTEN));
+	/* enable output */
+	SSC_CR = BV(SSC_TXEN);
+
+//	ASSERT(SSC_PTSR & BV(PDC_TXTEN));
 	/*
 	kprintf("i2s_start start\n");
 	if (status & (BV(FIRST_BUF_FULL) | BV(SECOND_BUF_FULL)))
@@ -139,25 +149,26 @@ bool i2s_start(void)
 	return true;
 }
 
+// TODO renderlo configurabile
 #define MCK_DIV 16
-#define DELAY ((0 << SSC_STTDLY_SHIFT) & SSC_STTDLY)
-#define PERIOD ((7 << (SSC_PERIOD_SHIFT)) & SSC_PERIOD)
-/* wtf?? it seems that no 16 won't be sent with MSB first...*/
-#define DATALEN (15 & SSC_DATLEN)
-#define DATNB ((1 << SSC_DATNB_SHIFT) & SSC_DATNB)
-#define FSLEN ((1 << SSC_FSLEN_SHIFT) & SSC_FSLEN)
+#define DELAY ((1 << SSC_STTDLY_SHIFT) & SSC_STTDLY_MASK)
+#define PERIOD ((15 << (SSC_PERIOD_SHIFT)) & SSC_PERIOD_MASK)
+#define DATALEN (15 & SSC_DATLEN_MASK)
+#define DATNB ((1 << SSC_DATNB_SHIFT) & SSC_DATNB_MASK)
+#define FSLEN ((15 << SSC_FSLEN_SHIFT) & SSC_FSLEN_MASK)
 
 #define SSC_DMA_IRQ_PRIORITY 5
 
 void i2s_init(void)
 {
+	//TODO sistemare i pin
 	PIOA_PDR = BV(SPI1_SPCK) | BV(SPI1_MOSI) | BV(SPI1_NPCS0);
 	/* reset device */
 	SSC_CR = BV(SSC_SWRST);
 
-	SSC_CMR = MCK_DIV & SSC_DIV;
-	SSC_TCMR = SSC_CKS_DIV | SSC_CKO_TRAN | SSC_CKG_NONE | SSC_START_CONT | DELAY | PERIOD;
-	SSC_TFMR = DATALEN | FSLEN | SSC_MSBF | SSC_FSOS_POSITIVE;
+	SSC_CMR = MCK_DIV & SSC_DIV_MASK;
+	SSC_TCMR = SSC_CKS_DIV | SSC_CKO_CONT | SSC_CKG_NONE | DELAY | PERIOD | SSC_START_FALL_F;
+	SSC_TFMR = DATALEN | DATNB | FSLEN | BV(SSC_MSBF) | SSC_FSOS_NEGATIVE;
 
 	/* Disable all irqs */
 	SSC_IDR = 0xFFFFFFFF;
@@ -173,16 +184,13 @@ void i2s_init(void)
 	/* enable i2s */
 	PMC_PCER = BV(SSC_ID);
 
-	/* enable output */
-	SSC_CR = BV(SSC_TXEN);
-
 	/* set current buffer to 1 */
 	status = 0x01;
 	for (int i = 0; i < CONFIG_PLAY_BUF_LEN; ++i)
 	{
 		//uint32_t tmp = 0x5555;
 		//uint32_t tmp2 = 0x9999;
-		play_buf1[i] = (uint8_t)i;
+		play_buf1[i] = i;
 		//play_buf1[i+4] = tmp2;
 	}
 }

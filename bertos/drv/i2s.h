@@ -3,7 +3,7 @@
 
 #include <cfg/compiler.h>
 
-#define CONFIG_PLAY_BUF_LEN 16
+#define CONFIG_PLAY_BUF_LEN 64
 #define I2S_FIRST_BUF  1
 #define I2S_SECOND_BUF 2
 
