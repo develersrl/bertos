@@ -35,6 +35,7 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  *
  * \brief Bitmap manipulation routines.
+ * \sa gfx.h
  */
 
 #include "gfx.h"

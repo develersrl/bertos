@@ -37,6 +37,17 @@
  *  - \c CONFIG_CHART_TYPE_X: type for the input dataset of X-coordinates
  *  - \c CONFIG_CHART_TYPE_Y: type for the input dataset of Y-coordinates
  *
+ * Sample usage:
+ *
+ * \code
+ *	bm = chart_init(0, ymax, N_POINTS_CURVE, ymin);
+ *
+ *	chart_drawCurve(bm, curve_y, curve_points + 1);
+ *	gfx_setViewRect(bm, xmin, ymax, xmax, ymin);
+ *	chart_drawDots(bm, samples_x, samples_y, samples_cnt);
+ *
+ *	print_bitmap(bm);
+ * \endcode
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */

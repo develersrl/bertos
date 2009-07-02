@@ -65,6 +65,10 @@ INLINE FatFile * FATFILE_CAST(KFile *fd)
 
 /**
  * Initialize \a file and open \a file_path for reading.
+ * \param file A pointer to a FatFile structure.
+ * \param file_path The file path on the filesystem.
+ * \param mode Open mode for the file.
+ * \sa ff.h for return code meaning and \a mode flags.
  */
 FRESULT fatfile_open(FatFile *file, const char *file_path, BYTE mode);
 

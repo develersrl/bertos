@@ -231,13 +231,13 @@ In embedded programming sometimes you have to cope with protocols, security syst
 BeRTOS comes in help with a set of optimized portable algorithms:
 <table>
 <tr> <td> <b> Algorithm </b> </td> <td> <b> Status </b> </td> </tr>
-<tr> <td> \link crc.c CRC16 \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link crc.h CRC16 \endlink</td>  <td>stable</td> </tr>
 <tr> <td> \link md2.c MD2 \endlink</td>  <td>beta</td> </tr>
 <tr> <td> \link randpool.c Cryptographically secure Random Pool \endlink</td>  <td>beta</td> </tr>
 <tr> <td> \link rotating_hash.h Rotating hash checksum \endlink</td>  <td>stable</td> </tr>
-<tr> <td> \link tea.c TEA (Tiny Encryption Algorithm) \endlink</td>  <td>stable</td> </tr>
-<tr> <td> \link ramp.c Stepper motor ramp generator \endlink</td>  <td>beta</td> </tr>
-<tr> <td> \link pid_control.c PID Controller \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link tea.h TEA (Tiny Encryption Algorithm) \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link ramp.h Stepper motor ramp generator \endlink</td>  <td>beta</td> </tr>
+<tr> <td> \link pid_control.h PID Controller \endlink</td>  <td>stable</td> </tr>
 <tr> <td> \link rle.c RLE (Run lenght en/decondig) \endlink</td>  <td>stable</td> </tr>
 </table>
 
@@ -252,11 +252,11 @@ This system is composed of several modules ranging from simple graphic primitive
 <tr> <td> \link bitmap.c Bitmaps manipulation \endlink</td>  <td>stable</td> </tr>
 <tr> <td> \link line.c Lines drawing \endlink</td>  <td>stable</td> </tr>
 <tr> <td> \link line.c Rectangles drawing \endlink</td>  <td>stable</td> </tr>
-<tr> <td> \link win.c Simple windowing system \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link win.h Simple windowing system \endlink</td>  <td>stable</td> </tr>
 <tr> <td> Proportional and fixed size fonts</td>  <td>stable</td> </tr>
-<tr> <td> \link text.c Text rendering \endlink</td>  <td>stable</td> </tr>
-<tr> <td> \link charts.c Simple Charts \endlink</td>  <td>stable</td> </tr>
-<tr> <td> \link menu.c Menus \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link text.h Text rendering \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link charts.h Simple Charts \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link menu.h Menus \endlink</td>  <td>stable</td> </tr>
 </table>
 
 To get up to date informations look at <A href="http://dev.bertos.org/browser/trunk/bertos/">the source code</A> in the directories \b gfx, \b gui or \b fonts.
@@ -278,7 +278,7 @@ For more information take a look at <A href="http://dev.bertos.org/browser/trunk
 \section fs File system 
 The latest SVN version of BeRTOS supports \link fat.h FAT \endlink filesystems using the <A href="http://elm-chan.org/fsw/ff/00index_e.html">FatFs</A>  library. The module is highly configurable, for example it can be compiled in read-only mode for some space saving.
 
-\link battfs.c BattFs\endlink, a file system specifically planned for embedded platforms, is in the beta stage. The goal is to have a filesystem suitable for little flash and eeprom memories (like dataflash), reliable, robust and capable of wear-levelling the memory pages to increase its life.
+\link battfs.h BattFs\endlink, a file system specifically planned for embedded platforms, is in the beta stage. The goal is to have a filesystem suitable for little flash and eeprom memories (like dataflash), reliable, robust and capable of wear-levelling the memory pages to increase its life.
 Currently you can create files, append data to them but file deletion is still not supported. Wear-levelling is achieved by rotating a page every time it is written. Plans are to add even transactions (a whole write can be performed atomically).
 
 File system development takes place in the <A href="http://dev.bertos.org/browser/trunk/bertos/fs">fs directory</A>.

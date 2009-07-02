@@ -37,6 +37,7 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  *
  * \brief Line drawing graphics routines
+ * \sa gfx.h
  */
 
 #include "gfx.h"

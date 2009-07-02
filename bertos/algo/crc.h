@@ -77,7 +77,7 @@ extern const uint16_t crc16tab[256];
 
 #ifdef INLINE
 /**
- * \brief Compute the updated CRC16 value for one octet (macro version)
+ * \brief Compute the updated CRC16 value for one octet (inline version)
  */
 INLINE uint16_t updcrc16(uint8_t c, uint16_t oldcrc)
 {

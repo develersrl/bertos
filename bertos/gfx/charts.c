@@ -36,17 +36,6 @@
  *
  * \brief Simple charts on top of mware/gfx routines (implementation).
  *
- * Sample usage:
- *
- * \code
- *	bm = chart_init(0, ymax, N_POINTS_CURVE, ymin);
- *
- *	chart_drawCurve(bm, curve_y, curve_points + 1);
- *	gfx_setViewRect(bm, xmin, ymax, xmax, ymin);
- *	chart_drawDots(bm, samples_x, samples_y, samples_cnt);
- *
- *	print_bitmap(bm);
- * \endcode
  */
 
 #include "charts.h"

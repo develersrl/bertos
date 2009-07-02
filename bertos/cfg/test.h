@@ -41,9 +41,11 @@
  * platforms, these macros come in handy.
  * Your module_test should supply three basic functions:
  *
+ * \code
  * int module_testSetup(void)
  * int module_testRun(void)
  * int module_testTearDown(void)
+ * \endcode
  *
  * All of these should return 0 if ok or a value != 0 on errors.
  *
