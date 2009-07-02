@@ -1,8 +1,15 @@
-/*
- * This document is automatically processed by Doxygen (http://www.doxygen.org/).
- * Don't remove special formatting tags.
- */
 /*!
+
+\if DEVELOPER_NOTE_ON
+
+This document is automatically processed by Doxygen (http://www.doxygen.org/).
+Don't remove special formatting tags.
+This section won't be processed unless enabled.
+
+See STATUS for further information and tips about Doxygen tags.
+\endif
+
+
 
 \mainpage
 

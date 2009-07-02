@@ -1,8 +1,26 @@
-﻿/*
- * This document is automatically processed by Doxygen (http://www.doxygen.org/).
- * Don't remove special formatting tags.
- */
-/*!
+﻿/*!
+\if DEVELOPER_NOTE_ON
+
+This document is automatically processed by Doxygen (http://www.doxygen.org/).
+Don't remove special formatting tags.
+This section won't be processed unless enabled.
+
+Doxygen supports a LaTeX-like syntax to write documentation; use that syntax to make changes to this file.
+You can find a reference here: http://www.stack.nl/~dimitri/doxygen/manual.html, inside the section 'Special commands'.
+
+For tables, use ONLY the html formatting tags that you can find in the previous page in the section 'HTML commands'. This way
+we'll always be able to generate valid documentation for every language supported by Doxygen.
+
+Remember to use Doxygen tags sparingly inside source code.
+
+\endif
+
+
+
+
+
+
+ 
 \page dev_status BeRTOS Development Status
 
 If you are looking for the list of BeRTOS ports or a detailed overview of all modules completeness and stability this is the right place.
