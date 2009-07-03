@@ -122,8 +122,25 @@
 	#define SSC_HAS_PDC                1
 	#define USART_HAS_PDC              1
 
+	/* PDC registers */
+	#define PERIPH_RPR_OFF  0x100  ///< Receive Pointer Register.
+	#define PERIPH_RCR_OFF  0x104  ///< Receive Counter Register.
+	#define PERIPH_TPR_OFF  0x108  ///< Transmit Pointer Register.
+	#define PERIPH_TCR_OFF  0x10C  ///< Transmit Counter Register.
+	#define PERIPH_RNPR_OFF 0x110  ///< Receive Next Pointer Register.
+	#define PERIPH_RNCR_OFF 0x114  ///< Receive Next Counter Register.
+	#define PERIPH_TNPR_OFF 0x118  ///< Transmit Next Pointer Register.
+	#define PERIPH_TNCR_OFF 0x11C  ///< Transmit Next Counter Register.
+	#define PERIPH_PTCR_OFF 0x120  ///< PDC Transfer Control Register.
+	#define PERIPH_PTSR_OFF 0x124  ///< PDC Transfer Status Register.
+
+	#define PDC_RXTEN  0
+	#define PDC_RXTDIS 1
+	#define PDC_TXTEN  8
+	#define PDC_TXTDIS 9
+
 #else
-	#error No base addrese register definition for selected ARM CPU
+	#error No base address register definition for selected ARM CPU
 
 #endif
 
@@ -141,6 +158,7 @@
 #include "at91_pwm.h"
 #include "at91_spi.h"
 #include "at91_twi.h"
+#include "at91_ssc.h"
 //TODO: add other peripherals
 
 /**
@@ -241,6 +259,34 @@
 
 #else
 	#error No SPI pins name definition for selected ARM CPU
+
+#endif
+/*\}*/
+
+/**
+ * SSC pins name
+ *\{
+ */
+#if CPU_ARM_SAM7S_LARGE
+
+	#define SSC_TF     15 // PA15
+	#define SSC_TK     16 // PA16
+	#define SSC_TD     17 // PA17
+	#define SSC_RD     18 // PA18
+	#define SSC_RK     19 // PA19
+	#define SSC_RF     20 // PA20
+
+#elif CPU_ARM_SAM7X
+
+	#define SSC_TF     21 // PA21
+	#define SSC_TK     22 // PA22
+	#define SSC_TD     23 // PA23
+	#define SSC_RD     24 // PA24
+	#define SSC_RK     25 // PA25
+	#define SSC_RF     26 // PA26
+
+#else
+	#error No SSC pins name definition for selected ARM CPU
 
 #endif
 /*\}*/
