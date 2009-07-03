@@ -233,16 +233,16 @@
 	#define SPI0_CSR2	(*((reg32_t *)(SPI0_BASE + SPI_CSR2_OFF)))      ///< SPI Chip Select Register 2 Read/Write Reset=0x0.
 	#define SPI0_CSR3	(*((reg32_t *)(SPI0_BASE + SPI_CSR3_OFF)))      ///< SPI Chip Select Register 3 Read/Write Reset=0x0.
 	#if defined(SPI_HAS_PDC)
-		#define SPI0_RPR    (*((reg32_t *)(SPI0_BASE + PERIPH_RPR_OFF))    ///< PDC channel 0 receive pointer register.
-		#define SPI0_RCR    (*((reg32_t *)(SPI0_BASE + PERIPH_RCR_OFF))    ///< PDC channel 0 receive counter register.
-		#define SPI0_TPR    (*((reg32_t *)(SPI0_BASE + PERIPH_TPR_OFF))    ///< PDC channel 0 transmit pointer register.
-		#define SPI0_TCR    (*((reg32_t *)(SPI0_BASE + PERIPH_TCR_OFF))    ///< PDC channel 0 transmit counter register.
-		#define SPI0_RNPR   (*((reg32_t *)(SPI0_BASE + PERIPH_RNPR_OFF))   ///< PDC channel 0 receive next pointer register.
-		#define SPI0_RNCR   (*((reg32_t *)(SPI0_BASE + PERIPH_RNCR_OFF))   ///< PDC channel 0 receive next counter register.
-		#define SPI0_TNPR   (*((reg32_t *)(SPI0_BASE + PERIPH_TNPR_OFF))   ///< PDC channel 0 transmit next pointer register.
-		#define SPI0_TNCR   (*((reg32_t *)(SPI0_BASE + PERIPH_TNCR_OFF))   ///< PDC channel 0 transmit next counter register.
-		#define SPI0_PTCR   (*((reg32_t *)(SPI0_BASE + PERIPH_PTCR_OFF))   ///< PDC channel 0 transfer control register.
-		#define SPI0_PTSR   (*((reg32_t *)(SPI0_BASE + PERIPH_PTSR_OFF))   ///< PDC channel 0 transfer status register.
+		#define SPI0_RPR    (*((reg32_t *)(SPI0_BASE + PERIPH_RPR_OFF)))    ///< PDC channel 0 receive pointer register.
+		#define SPI0_RCR    (*((reg32_t *)(SPI0_BASE + PERIPH_RCR_OFF)))    ///< PDC channel 0 receive counter register.
+		#define SPI0_TPR    (*((reg32_t *)(SPI0_BASE + PERIPH_TPR_OFF)))    ///< PDC channel 0 transmit pointer register.
+		#define SPI0_TCR    (*((reg32_t *)(SPI0_BASE + PERIPH_TCR_OFF)))    ///< PDC channel 0 transmit counter register.
+		#define SPI0_RNPR   (*((reg32_t *)(SPI0_BASE + PERIPH_RNPR_OFF)))   ///< PDC channel 0 receive next pointer register.
+		#define SPI0_RNCR   (*((reg32_t *)(SPI0_BASE + PERIPH_RNCR_OFF)))   ///< PDC channel 0 receive next counter register.
+		#define SPI0_TNPR   (*((reg32_t *)(SPI0_BASE + PERIPH_TNPR_OFF)))   ///< PDC channel 0 transmit next pointer register.
+		#define SPI0_TNCR   (*((reg32_t *)(SPI0_BASE + PERIPH_TNCR_OFF)))   ///< PDC channel 0 transmit next counter register.
+		#define SPI0_PTCR   (*((reg32_t *)(SPI0_BASE + PERIPH_PTCR_OFF)))   ///< PDC channel 0 transfer control register.
+		#define SPI0_PTSR   (*((reg32_t *)(SPI0_BASE + PERIPH_PTSR_OFF)))   ///< PDC channel 0 transfer status register.
 	#endif /* SPI_HAS_PDC */
 #endif /* SPI0_BASE */
 /*\}*/
