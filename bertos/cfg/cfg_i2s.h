@@ -52,7 +52,7 @@
  *
  * $WIZ$ type = "int"
  */
-#define CONFIG_SAMPLE_FREQ     44100
+#define CONFIG_SAMPLE_FREQ     44100UL
 
 /**
  * Module logging level.

@@ -57,7 +57,7 @@
  *
  * $WIZ$ module_name = "i2s"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_i2s.h"
- * $WIZ$ module_supports = "not atmega103 and not atmega168 and not at91"
+ * $WIZ$ module_supports = "not atmega103 and not atmega168 and not atmega8"
  */
 
 #ifndef I2S_H
