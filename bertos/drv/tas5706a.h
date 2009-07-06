@@ -35,6 +35,10 @@
  *
  * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
+ *
+ * $WIZ$ module_name = "tas5706a"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_tas5706a.h"
+ * $WIZ$ module_hw = "bertos/hw/hw_tas5706a.h"
  */
 
 #ifndef DRV_TAS5706A_H

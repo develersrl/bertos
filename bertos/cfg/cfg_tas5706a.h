@@ -45,7 +45,6 @@
  * $WIZ$ type = "int"
  * $WIZ$ min = -100
  * $WIZ$ max = 24
- * $WIZ$ supports = "at91"
  */
 #define CONFIG_TAS_MAX_VOL  -39
 
