@@ -177,29 +177,32 @@ BeRTOS supplies a full set of CPU independent generic hardware drivers. To achie
 Current driver list:
 <table>
 <tr> <td> <b> Driver </b> </td> <td> <b> Status </b> </td> </tr>
-<tr> <td> \link adc.h ADC API \endlink</td>  <td>stable</td> </tr>
-<tr> <td> \link buzzer.h Buzzer \endlink</td>  <td>stable</td> </tr>
-<tr> <td> \link dataflash.h Atmel Dataflash \endlink</td>  <td>stable</td> </tr>
-<tr> <td> \link eeprom.h I2C EEPROM \endlink</td>  <td>stable</td> </tr>
-<tr> <td> \link flash25.h AT25Fxxx Atmel flash memories \endlink</td>  <td>beta</td> </tr>
+<tr> <td> \link adc.h ADC API \endlink</td>                                <td>stable</td> </tr>
+<tr> <td> \link buzzer.h Buzzer \endlink</td>                              <td>stable</td> </tr>
+<tr> <td> \link dataflash.h Atmel Dataflash \endlink</td>                  <td>stable</td> </tr>
+<tr> <td> \link eeprom.h I2C EEPROM \endlink</td>                          <td>stable</td> </tr>
+<tr> <td> \link flash25.h AT25Fxxx Atmel flash memories \endlink</td>      <td>beta</td> </tr>
 <tr> <td> \link ft245rl.h FT245RL USB to parallel converter \endlink</td>  <td>beta</td> </tr>
-<tr> <td> \link kbd.h Keyboard \endlink</td>  <td>stable</td> </tr>
-<tr> <td> \link i2c.h I2C \endlink with bitbang support</td>  <td>stable</td> </tr>
-<tr> <td> Displaytech 32122A Graphic LCD</td>  <td>stable</td> </tr>
-<tr> <td> \link dc_motor.h DC Motor with PID \endlink</td>  <td>stable</td> </tr>
-<tr> <td> \link lcd_text.h Alphanumeric LCD \endlink</td>  <td>stable</td> </tr>
-<tr> <td> \link mcp41.h MPC41 digital potentiometer \endlink</td>  <td>stable</td> </tr>
-<tr> <td> \link ntc.h NTC \endlink</td>  <td>stable</td> </tr>
-<tr> <td> \link phase.h TRIAC phase partialization \endlink</td>  <td>stable</td> </tr>
-<tr> <td> \link pwm.h PWM API \endlink</td>  <td>beta</td> </tr>
-<tr> <td> \link pcf8574.h PCF85974 I2C port expander \endlink</td>  <td>beta</td> </tr>
-<tr> <td> \link ser.h Serial API \endlink</td>  <td>stable</td> </tr>
-<tr> <td> \link spi_bitbang.h Bitbanged SPI \endlink</td>  <td>stable</td> </tr>
-<tr> <td> \link tc520.h TC520 ADC \endlink</td>  <td>obsolete</td> </tr>
-<tr> <td> \link thermo.h Thermostat \endlink</td>  <td>stable</td> </tr>
-<tr> <td> \link timer.h System timer API \endlink</td>  <td>stable</td> </tr>
-<tr> <td> \link stepper.h Stepper motor with ramps \endlink</td>  <td>stable</td> </tr>
-<tr> <td> Watchdog</td>  <td>beta</td> </tr>
+<tr> <td> \link kbd.h Keyboard \endlink</td>                               <td>stable</td> </tr>
+<tr> <td> \link i2s.h I2S digital audio bus \endlink </td>                 <td>stable</td> </tr>
+<tr> <td> \link i2c.h I2C \endlink with bitbang support</td>               <td>stable</td> </tr>
+<tr> <td> Displaytech 32122A Graphic LCD</td>                              <td>stable</td> </tr>
+<tr> <td> \link dc_motor.h DC Motor with PID \endlink</td>                 <td>stable</td> </tr>
+<tr> <td> \link lcd_text.h Alphanumeric LCD \endlink</td>                  <td>stable</td> </tr>
+<tr> <td> \link mcp41.h MPC41 digital potentiometer \endlink</td>          <td>stable</td> </tr>
+<tr> <td> \link ntc.h NTC \endlink</td>                                    <td>stable</td> </tr>
+<tr> <td> \link phase.h TRIAC phase partialization \endlink</td>           <td>stable</td> </tr>
+<tr> <td> \link pwm.h PWM API \endlink</td>                                <td>beta</td> </tr>
+<tr> <td> \link pcf8574.h PCF85974 I2C port expander \endlink</td>         <td>beta</td> </tr>
+<tr> <td> \link sd.h Secure Digital card API \endlink</td>                 <td>stable</td> </tr>
+<tr> <td> \link ser.h Serial API \endlink</td>                             <td>stable</td> </tr>
+<tr> <td> \link spi_bitbang.h Bitbanged SPI \endlink</td>                  <td>stable</td> </tr>
+<tr> <td> \link tas5706a.h TAS5706A \endlink digital audio DSP</td>        <td>stable</td> </tr>
+<tr> <td> \link tc520.h TC520 ADC \endlink</td>                            <td>obsolete</td> </tr>
+<tr> <td> \link thermo.h Thermostat \endlink</td>                          <td>stable</td> </tr>
+<tr> <td> \link timer.h System timer API \endlink</td>                     <td>stable</td> </tr>
+<tr> <td> \link stepper.h Stepper motor with ramps \endlink</td>           <td>stable</td> </tr>
+<tr> <td> Watchdog</td>                                                    <td>beta</td> </tr>
 </table>
 
 To get up to date informations look at the <A href="http://dev.bertos.org/browser/trunk/bertos/drv">drivers source code</A>.
