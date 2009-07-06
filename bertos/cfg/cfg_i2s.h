@@ -51,6 +51,8 @@
  * Sampling frequency of the audio file.
  *
  * $WIZ$ type = "int"
+ * $WIZ$ min =  32000UL
+ * $WIZ$ max = 192000UL
  */
 #define CONFIG_SAMPLE_FREQ     44100UL
 
