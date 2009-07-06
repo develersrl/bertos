@@ -37,6 +37,7 @@
  * \author Francesco Sacchi <batt@develer.com>
  *
  * $WIZ$ module_name = "tas5706a"
+ * $WIZ$ module_depends = "timer", "i2c"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_tas5706a.h"
  * $WIZ$ module_hw = "bertos/hw/hw_tas5706a.h"
  */
