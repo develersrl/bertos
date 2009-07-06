@@ -35,7 +35,7 @@
  * \author Luca Ottaviano <lottaviano@develer.com>
  */
 
-#include "i2s.h"
+#include "i2s_at91.h"
 
 #include <drv/timer.h>
 #include <cfg/log.h>
@@ -133,7 +133,6 @@ bool i2s_start(void)
 	return true;
 }
 
-#define CONFIG_SAMPLE_FREQ 44100
 #define BITS_PER_CHANNEL 16
 #define N_OF_CHANNEL 2
 // TODO: check the computed value?
