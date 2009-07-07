@@ -148,6 +148,7 @@ Since BeRTOS aims to supply full operating system services, for every CPU port w
    <tr> <td> TWI</td>  <td>beta</td> </tr>
    <tr> <td> ADC</td>  <td>beta</td> </tr>
    <tr> <td> PWM</td>  <td>beta</td> </tr>
+   <tr> <td> \link i2s_at91.h I2S \endlink digital audio bus </td> <td>stable</td> </tr>
 </table>
 
    To get up to date informations look at the <A href="http://dev.bertos.org/browser/trunk/bertos/cpu/arm/drv">ARM drivers source code</A>.
@@ -184,7 +185,6 @@ Current driver list:
 <tr> <td> \link flash25.h AT25Fxxx Atmel flash memories \endlink</td>      <td>beta</td> </tr>
 <tr> <td> \link ft245rl.h FT245RL USB to parallel converter \endlink</td>  <td>beta</td> </tr>
 <tr> <td> \link kbd.h Keyboard \endlink</td>                               <td>stable</td> </tr>
-<tr> <td> \link i2s.h I2S digital audio bus \endlink </td>                 <td>stable</td> </tr>
 <tr> <td> \link i2c.h I2C \endlink with bitbang support</td>               <td>stable</td> </tr>
 <tr> <td> Displaytech 32122A Graphic LCD</td>                              <td>stable</td> </tr>
 <tr> <td> \link dc_motor.h DC Motor with PID \endlink</td>                 <td>stable</td> </tr>
