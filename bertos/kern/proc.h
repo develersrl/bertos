@@ -62,7 +62,28 @@
  */
 struct Process;
 
+/**
+ * Initialize the process subsystem (kernel).
+ * It must be called before using any process related function.
+ */
 void proc_init(void);
+
+/**
+ * Create a new named process and schedules it for execution.
+ *
+ * \note The function
+ * \code
+ * proc_new(entry, data, stacksize, stack)
+ * \endcode
+ * is a more convenient way to create a process, as you don't have to specify
+ * the name.
+ *
+ * \param name The name of the process (currently unused).
+ * \param entry The function that the process will execute.
+ * \param data A pointer to user data.
+ * \param stacksize The length of the stack.
+ * \param stack A pointer to the memory area to be used as a stack.
+ */
 struct Process *proc_new_with_name(const char *name, void (*entry)(void), iptr_t data, size_t stacksize, cpu_stack_t *stack);
 
 #if !CONFIG_KERN_MONITOR
@@ -71,11 +92,32 @@ struct Process *proc_new_with_name(const char *name, void (*entry)(void), iptr_t
 	#define proc_new(entry,data,size,stack) proc_new_with_name(#entry,(entry),(data),(size),(stack))
 #endif
 
+/**
+ * Terminates the execution of the current process.
+ */
 void proc_exit(void);
+
+/**
+ * Co-operative context switch.
+ *
+ * The process that calls this function will release the cpu before its cpu quantum
+ * expires, the scheduler will run afterwards.
+ * \note This function is enabled only if CONFIG_KERN is enabled
+ * \sa cpu_relax(), which the recommended method to release the cpu.
+ */
 void proc_yield(void);
+
 void proc_rename(struct Process *proc, const char *name);
 const char *proc_name(struct Process *proc);
 const char *proc_currentName(void);
+
+/**
+ * Return a pointer to the user data of the current process.
+ *
+ * To obtain user data, just call this function inside the process. Remember to cast
+ * the returned pointer to the correct type.
+ * \return A pointer to the user data of the current process.
+ */
 iptr_t proc_currentUserData(void);
 
 int proc_testSetup(void);
@@ -227,10 +269,10 @@ INLINE bool proc_allowed(void)
 		 * stack.
 		 *
 		 * The actual size computed by the default formula is:
-		 *   AVR:    102
-		 *   i386:   156
-		 *   ARM:    164
-		 *   x86_64: 184
+		 *  \li AVR:    102
+		 *  \li i386:   156
+		 *  \li ARM:    164
+		 *  \li x86_64: 184
 		 *
 		 * Note that on most 16bit architectures, interrupts will also
 		 * run on the stack of the currently running process.  Nested
