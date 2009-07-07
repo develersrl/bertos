@@ -217,7 +217,8 @@ OPTIMIZE_OUTPUT_VHDL   = NO
 # use: inc=Fortran f=C. Note that for custom extensions you also need to set
 # FILE_PATTERNS otherwise the files are not read by doxygen.
 
-EXTENSION_MAPPING      = 
+# commented, generates warnings with old version of doxygen
+#EXTENSION_MAPPING      = 
 
 # If you use STL classes (i.e. std::string, std::vector, etc.) but do not want 
 # to include (a tag file for) the STL sources as input, then you should 
@@ -905,18 +906,21 @@ QHP_VIRTUAL_FOLDER     = doc
 # For more information please see 
 # http://doc.trolltech.com/qthelpproject.html#custom-filters
 
-QHP_CUST_FILTER_NAME   = 
+# commented, generates warnings with old version of doxygen
+#QHP_CUST_FILTER_NAME   = 
 
 # The QHP_CUST_FILT_ATTRS tag specifies the list of the attributes of the custom filter to add.For more information please see 
 # <a href="http://doc.trolltech.com/qthelpproject.html#custom-filters">Qt Help Project / Custom Filters</a>.
 
-QHP_CUST_FILTER_ATTRS  = 
+# commented, generates warnings with old version of doxygen
+#QHP_CUST_FILTER_ATTRS  = 
 
 # The QHP_SECT_FILTER_ATTRS tag specifies the list of the attributes this project's 
 # filter section matches. 
 # <a href="http://doc.trolltech.com/qthelpproject.html#filter-attributes">Qt Help Project / Filter Attributes</a>.
 
-QHP_SECT_FILTER_ATTRS  = 
+# commented, generates warnings with old version of doxygen
+#QHP_SECT_FILTER_ATTRS  = 
 
 # If the GENERATE_QHP tag is set to YES, the QHG_LOCATION tag can 
 # be used to specify the location of Qt's qhelpgenerator. 
@@ -1048,7 +1052,8 @@ LATEX_HIDE_INDICES     = NO
 # Note that which sources are shown also depends on other settings
 # such as SOURCE_BROWSER.
 
-LATEX_SOURCE_CODE      = NO
+# commented, generates warnings with old version of doxygen
+#LATEX_SOURCE_CODE      = NO
 
 #---------------------------------------------------------------------------
 # configuration options related to the RTF output
@@ -1258,7 +1263,8 @@ PREDEFINED             = __doxygen__ \
                          FORMAT(x,y,z)= \
                          PGM_FUNC(x)=x \
                          INLINE=inline \
-                         CONFIG_FAT_DRIVES=1
+                         CONFIG_FAT_DRIVES=1 \
+                         CONFIG_KERN_PRI=1
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 
