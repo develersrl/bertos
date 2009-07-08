@@ -216,6 +216,7 @@ typedef struct _PriNode
 	#define INVALIDATE_NODE(n) ((n)->succ = (n)->pred = NULL)
 #else
 	#define LIST_ASSERT_VALID(l) do {} while (0)
+	#define LIST_ASSERT_NOT_CONTAINS(list,node) do {} while (0)
 	#define INVALIDATE_NODE(n) do {} while (0)
 #endif
 
