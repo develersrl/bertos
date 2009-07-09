@@ -32,6 +32,27 @@
  *
  * \brief KFile interface over a FIFO buffer.
  *
+ * Convenient way to push data into a FIFO using the KFile interface.
+ * For example, it's possible to read from a serial port and put the characters
+ * into a fifo:
+ * \code
+ * // serial reader process
+ * {
+ *   // other stuff here...
+ *   kfile_read(&ser_port.fd, buffer, sizeof(buffer));
+ *   kfile_write(&kfifo.fd, buffer, sizeof(buffer));
+ *   // ...
+ * }
+ *
+ * // controller process
+ * {
+ *   //...
+ *   kfile_read(&kfifo.fd, buffer2, sizeof(buffer2));
+ *   // use read data
+ * }
+ * \endcode
+ *
+ *
  * \version $Id: cfg_adc.h 2348 2009-02-16 13:43:44Z duplo $
  * \author Francesco Sacchi <asterix@develer.com>
  *
@@ -65,6 +86,12 @@ INLINE KFileFifo * KFILEFIFO_CAST(KFile *fd)
 	return (KFileFifo *)fd;
 }
 
+/**
+ * Initialize KFileFifo struct.
+ *
+ * \param kf Interface to initialize.
+ * \param fifo Fifo buffer to operate on.
+ */
 void kfilefifo_init(KFileFifo *kf, FIFOBuffer *fifo);
 
 #endif /* STRUCT_KFILE_FIFO */
