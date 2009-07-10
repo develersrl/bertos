@@ -78,11 +78,11 @@ void proc_init(void);
  * is a more convenient way to create a process, as you don't have to specify
  * the name.
  *
- * \param name The name of the process (currently unused).
- * \param entry The function that the process will execute.
- * \param data A pointer to user data.
- * \param stacksize The length of the stack.
- * \param stack A pointer to the memory area to be used as a stack.
+ * \param name Name of the process (currently unused).
+ * \param entry Function that the process will execute.
+ * \param data Pointer to user data.
+ * \param stacksize Length of the stack.
+ * \param stack Pointer to the memory area to be used as a stack.
  */
 struct Process *proc_new_with_name(const char *name, void (*entry)(void), iptr_t data, size_t stacksize, cpu_stack_t *stack);
 
@@ -93,17 +93,18 @@ struct Process *proc_new_with_name(const char *name, void (*entry)(void), iptr_t
 #endif
 
 /**
- * Terminates the execution of the current process.
+ * Terminate the execution of the current process.
  */
 void proc_exit(void);
 
 /**
  * Co-operative context switch.
  *
- * The process that calls this function will release the cpu before its cpu quantum
- * expires, the scheduler will run afterwards.
- * \note This function is enabled only if CONFIG_KERN is enabled
- * \sa cpu_relax(), which the recommended method to release the cpu.
+ * The process that calls this function will release the CPU before its cpu quantum
+ * expires, the scheduler will run to select the next process that will take control
+ * of the processor.
+ * \note This function is available only if CONFIG_KERN is enabled
+ * \sa cpu_relax(), which is the recommended method to release the cpu.
  */
 void proc_yield(void);
 
@@ -116,7 +117,7 @@ const char *proc_currentName(void);
  *
  * To obtain user data, just call this function inside the process. Remember to cast
  * the returned pointer to the correct type.
- * \return A pointer to the user data of the current process.
+ * \return Pointer to the user data of the current process.
  */
 iptr_t proc_currentUserData(void);
 
