@@ -38,6 +38,7 @@
 #include <cfg/macros.h>
 
 #include <emul/emul.h>
+#include <emul/kfile_posix.h>
 
 #include <kern/irq.h>
 #include <kern/proc.h>

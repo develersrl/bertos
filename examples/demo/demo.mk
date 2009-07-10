@@ -48,6 +48,7 @@ demo_CSRC = \
 	bertos/drv/buzzer.c \
 	bertos/drv/ser.c \
 	bertos/emul/ser_posix.c \
+	bertos/emul/kfile_posix.c \
 	bertos/mware/formatwr.c \
 	bertos/mware/hex.c \
 	bertos/mware/event.c \
