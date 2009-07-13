@@ -215,6 +215,8 @@ class BVersionPage(BWizardPage):
         latest_version_item = None
         for index in range(self.pageContent.versionList.count()):
             item = self.pageContent.versionList.item(index)
+            if not latest_version_item:
+                latest_version_item = item
             version = item.text().split(" (")[0]
             latest = latest_version_item.text().split(" (")[0]
             if version != "UNKNOWN" and version > latest:
