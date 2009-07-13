@@ -192,7 +192,9 @@ class BVersionPage(BWizardPage):
             if selected and selected == directory:
                 self.setCurrentItem(item)
         if not selected:
-            self.setCurrentItem(self.latestVersionItem())
+            latest_version_item = self.latestVersionItem()
+            if latest_version_item:
+                self.setCurrentItem(latest_version_item)
     
     def disableRemoveButton(self):
         """
@@ -210,7 +212,7 @@ class BVersionPage(BWizardPage):
         """
         Returns the latest BeRTOS version founded.
         """
-        latest_version_item = QTableWidgetItem("")
+        latest_version_item = None
         for index in range(self.pageContent.versionList.count()):
             item = self.pageContent.versionList.item(index)
             version = item.text().split(" (")[0]
