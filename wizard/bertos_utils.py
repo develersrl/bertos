@@ -45,12 +45,47 @@ import pickle
 import const
 import plugins
 import DefineException
+import BProject
 
 def isBertosDir(directory):
    return os.path.exists(directory + "/VERSION")
 
 def bertosVersion(directory):
    return open(directory + "/VERSION").readline().strip()
+
+def loadBertosProject(project_file):
+    project_data = pickle.loads(open(project_file, "r").read())
+    project_info = BProject.BProject()
+    project_info.setInfo("PROJECT_PATH", os.path.dirname(project_file))
+    project_info.setInfo("SOURCES_PATH", project_data["SOURCES_PATH"])
+    loadSourceTree(project_info)
+    cpu_name = project_data["CPU_NAME"]
+    project_info.setInfo("CPU_NAME", cpu_name)
+    cpu_info = loadCpuInfos(project_info)
+    for cpu in cpu_info:
+        print cpu["CPU_NAME"], cpu_name
+        if cpu["CPU_NAME"] == cpu_name:
+            print "sono uguali"
+            project_info.setInfo("CPU_INFOS", cpu)
+            break
+    loadModuleData(project_info)
+    print project_info
+
+
+def projectFileGenerator(project_info):
+    directory = project_info.info("PROJECT_PATH")
+    project_data = {}
+    enabled_modules = []
+    for module, information in project_info.info("MODULES").items():
+        if information["enabled"]:
+            enabled_modules.append(module)
+    project_data["ENABLED_MODULES"] = enabled_modules
+    project_data["SOURCES_PATH"] = project_info.info("SOURCES_PATH")
+    project_data["TOOLCHAIN"] = project_info.info("TOOLCHAIN")
+    project_data["CPU_NAME"] = project_info.info("CPU_NAME")
+    print project_info.info("CPU_NAME")
+    project_data["SELECTED_FREQ"] = project_info.info("SELECTED_FREQ")
+    return pickle.dumps(project_data)
 
 def createBertosProject(project_info):
     directory = project_info.info("PROJECT_PATH")
@@ -59,7 +94,7 @@ def createBertosProject(project_info):
         shutil.rmtree(directory, True)        
     os.makedirs(directory)
     f = open(directory + "/project.bertos", "w")
-    f.write(pickle.dumps(project_info))
+    f.write(projectFileGenerator(project_info))
     f.close()
     # Destination source dir
     srcdir = directory + "/bertos"
