@@ -63,14 +63,11 @@ def loadBertosProject(project_file):
     project_info.setInfo("CPU_NAME", cpu_name)
     cpu_info = loadCpuInfos(project_info)
     for cpu in cpu_info:
-        print cpu["CPU_NAME"], cpu_name
         if cpu["CPU_NAME"] == cpu_name:
-            print "sono uguali"
             project_info.setInfo("CPU_INFOS", cpu)
             break
-    loadModuleData(project_info)
-    print project_info
-
+    loadModuleData(project_info, True)
+    return project_info
 
 def projectFileGenerator(project_info):
     directory = project_info.info("PROJECT_PATH")
@@ -83,7 +80,6 @@ def projectFileGenerator(project_info):
     project_data["SOURCES_PATH"] = project_info.info("SOURCES_PATH")
     project_data["TOOLCHAIN"] = project_info.info("TOOLCHAIN")
     project_data["CPU_NAME"] = project_info.info("CPU_NAME")
-    print project_info.info("CPU_NAME")
     project_data["SELECTED_FREQ"] = project_info.info("SELECTED_FREQ")
     return pickle.dumps(project_data)
 
@@ -431,8 +427,7 @@ def loadModuleDefinition(first_comment):
             del module_definition["module_description"]
         if const.MODULE_DEFINITION["module_harvard"] in module_definition:
             harvard = module_definition[const.MODULE_DEFINITION["module_harvard"]]
-            if harvard == "both" or harvard == "pgm_memory":
-                module_dict[module_name]["harvard"] = harvard
+            module_dict[module_name]["harvard"] = harvard
             del module_definition[const.MODULE_DEFINITION["module_harvard"]]
         if const.MODULE_DEFINITION["module_hw"] in module_definition:
             hw = module_definition[const.MODULE_DEFINITION["module_hw"]]
@@ -533,7 +528,7 @@ def getDefinitionBlocks(text):
         block.append(([comment], define, start))
     return block
 
-def loadModuleData(project):
+def loadModuleData(project, edit=False):
     module_info_dict = {}
     list_info_dict = {}
     configuration_info_dict = {}
@@ -558,6 +553,14 @@ def loadModuleData(project):
                         configuration_info[configuration] = loadConfigurationInfos(project.info("SOURCES_PATH") + "/" + configuration)
                     except ParseError, err:
                         raise DefineException.ConfigurationDefineException(project.info("SOURCES_PATH") + "/" + configuration, err.line_number, err.line)
+                    if edit:
+                        try:
+                            path = os.path.basename(project.info("PROJECT_PATH"))
+                            directory = project.info("PROJECT_PATH")
+                            user_configuration = loadConfigurationInfos(directory + "/" + configuration.replace("bertos", path))
+                            configuration_info[configuration] = updateConfigurationValues(configuration_info[configuration], user_configuration)
+                        except ParseError, err:
+                            raise DefineException.ConfigurationDefineException(directory + "/" + configuration.replace("bertos", path))
             module_info_dict.update(module_dict)
             configuration_info_dict.update(configuration_info)
             if to_be_parsed:
@@ -624,6 +627,11 @@ def loadConfigurationInfos(path):
         configuration_infos[name]["description"] = description
         configuration_infos[name]["brief"] = brief
     return configuration_infos
+
+def updateConfigurationValues(def_conf, user_conf):
+    for param in def_conf["paramlist"]:
+        def_conf[param[1]]["value"] = user_conf[param[1]]["value"]
+    return def_conf
 
 def findParameterType(parameter):
     if "value_list" in parameter["informations"]:
