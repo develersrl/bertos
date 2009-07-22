@@ -66,6 +66,18 @@ def loadBertosProject(project_file):
         if cpu["CPU_NAME"] == cpu_name:
             project_info.setInfo("CPU_INFOS", cpu)
             break
+    tag_list = getTagSet(cpu_info)
+    # Create, fill and store the dict with the tags
+    tag_dict = {}
+    for element in tag_list:
+        tag_dict[element] = False
+    infos = project_info.info("CPU_INFOS")
+    for tag in tag_dict:
+        if tag in infos["CPU_TAGS"] + [infos["CPU_NAME"], infos["CORE_CPU"], infos["TOOLCHAIN"]]:
+            tag_dict[tag] = True
+        else:
+            tag_dict[tag] = False
+    project_info.setInfo("ALL_CPU_TAGS", tag_dict)
     loadModuleData(project_info, True)
     return project_info
 
