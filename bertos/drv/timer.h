@@ -32,6 +32,14 @@
  *
  * \brief Hardware independent timer driver.
  *
+ * All timer related functions are implemented in this module. You have several options to use timers:
+ * \li simple delay: just use timer_delay() if you want to wait for a few milliseconds;
+ * \li delay with callback: create a timer structure and use timer_setDelay() and timer_setSoftint() to set the callback;
+ * \li delay with signal: same as above but use timer_setSignal() to set specify which signal to send.
+ *
+ * Whenever a timer expires you need to explicitly arm it again with timer_add(). If you want to abort a timer, use timer_abort().
+ * You can use conversion macros when using msecs to specify the delay.
+ *
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
@@ -112,6 +120,7 @@ extern volatile ticks_t _clock;
  * \note This function must disable interrupts on 8/16bit CPUs because the
  * clock variable is larger than the processor word size and can't
  * be copied atomically.
+ * \sa timer_delay()
  */
 INLINE ticks_t timer_clock(void)
 {
@@ -203,6 +212,12 @@ INLINE utime_t hptime_to_us(hptime_t hpticks)
 }
 
 void timer_delayTicks(ticks_t delay);
+/**
+ * Wait some time [ms].
+ *
+ * \note CPU is released while waiting so you don't have to call cpu_relax() explicitly.
+ * \param delay Time to wait [ms].
+ */
 INLINE void timer_delay(mtime_t delay)
 {
 	timer_delayTicks(ms_to_ticks(delay));
@@ -244,7 +259,7 @@ typedef struct Timer
 	DB(uint16_t magic;)
 } Timer;
 
-/** Timer is active when Timer.magic contains this value (for debugging purposes). */
+/* Timer is active when Timer.magic contains this value (for debugging purposes). */
 #define TIMER_MAGIC_ACTIVE    0xABBA
 #define TIMER_MAGIC_INACTIVE  0xBAAB
 
