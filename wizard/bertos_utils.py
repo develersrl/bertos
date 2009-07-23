@@ -58,6 +58,7 @@ def loadBertosProject(project_file):
     project_info = BProject.BProject()
     project_info.setInfo("PROJECT_PATH", os.path.dirname(project_file))
     project_info.setInfo("SOURCES_PATH", project_data["SOURCES_PATH"])
+    project_info.setInfo("TOOLCHAIN", project_data["TOOLCHAIN"])
     loadSourceTree(project_info)
     cpu_name = project_data["CPU_NAME"]
     project_info.setInfo("CPU_NAME", cpu_name)

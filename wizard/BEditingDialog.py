@@ -53,7 +53,63 @@ class BEditingDialog(QDialog):
         layout = QVBoxLayout()
         self.module_page = BModulePage.BModulePage()
         layout.addWidget(self.module_page)
+        button_layout = QHBoxLayout()
+        self.advanced_button = QToolButton()
+        self.setupMenu()
+        self.advanced_button.setMenu(self.menu)
+        self.advanced_button.setPopupMode(QToolButton.InstantPopup)
+        self.advanced_button.setText(self.tr("Advanced"))
+        button_layout.addWidget(self.advanced_button)
+        button_layout.addStretch()
+        self.cancel_button = QPushButton(self.tr("Cancel"))
+        button_layout.addWidget(self.cancel_button)
+        self.apply_button = QPushButton(self.tr("Apply"))
+        button_layout.addWidget(self.apply_button)
+        layout.addLayout(button_layout)
         self.setLayout(layout)
+
+    def setupMenu(self):
+        self.menu = QMenu(self.tr("Advanced options"))
+        self.setupToolchainMenu()
+        self.menu.addMenu(self.toolchain_menu)
+        self.setupVersionMenu()
+        self.menu.addMenu(self.version_menu)
+
+    def setupToolchainMenu(self):
+        self.toolchain_menu = QMenu(self.tr("select toolchain"))
+        action_group = QActionGroup(self.toolchain_menu)
+        for toolchain in sorted(self.toolchains()):
+            action = self.toolchain_menu.addAction(toolchain)
+            action_group.addAction(action)
+            action.setCheckable(True)
+            action.setChecked(True if unicode(action.text()) == self.currentToolchain()["path"] else False)
+
+    def setupVersionMenu(self):
+        self.version_menu = QMenu(self.tr("select BeRTOS version"))
+        action_group = QActionGroup(self.version_menu)
+        for version in sorted(self.versions()):
+            action = self.version_menu.addAction(version)
+            action_group.addAction(action)
+            action.setCheckable(True)
+            action.setChecked(True if unicode(action.text()) == self.currentVersion() else False)
+
+    def toolchains(self):
+        return self.module_page.toolchains()
+    
+    def currentToolchain(self):
+        return self.module_page.projectInfo("TOOLCHAIN")
+    
+    def setCurrentToolchain(self, toolchain):
+        self.module_page.setProjectInfo("TOOLCHAIN", toolchain)
+
+    def versions(self):
+        return self.module_page.versions()
+
+    def currentVersion(self):
+        return self.module_page.projectInfo("SOURCES_PATH")
+    
+    def setCurrentVersion(self, version):
+        self.module_page.setProjectInfo("SOURCES_PATH", version)
 
 
 
@@ -65,6 +121,7 @@ def main():
         sys.exit()
     app = QApplication([])
     app.project = loadBertosProject(project_file)
+    app.settings = QSettings("Develer", "Bertos Configurator")
     dialog = BEditingDialog()
     dialog.show()
     sys.exit(app.exec_())
