@@ -39,7 +39,7 @@ import os
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from bertos_utils import loadBertosProject
+from bertos_utils import loadBertosProject, bertosVersion
 import BModulePage
 
 class BEditingDialog(QDialog):
@@ -87,7 +87,7 @@ class BEditingDialog(QDialog):
     def setupVersionMenu(self):
         self.version_menu = QMenu(self.tr("select BeRTOS version"))
         action_group = QActionGroup(self.version_menu)
-        for version in sorted(self.versions()):
+        for version in sorted([bertosVersion(v) for v in self.versions()]):
             action = self.version_menu.addAction(version)
             action_group.addAction(action)
             action.setCheckable(True)
