@@ -1,0 +1,53 @@
+#
+# The following command wills be executed on
+# reset (because of run_and_init in the config-file)
+# - halt target
+# - init ecr
+# - flash content of file main.bin into target-memory
+# - shutdown openocd
+#
+# created by Martin Thomas
+# http://www.siwawi.arubi.uni-kl.de/avr_projects/arm_projects
+# based on information from Dominic Rath
+# modified for latest oocd - 4/29/09  -jkl
+#
+
+halt
+sleep 10
+
+# moved from below
+# AT91SAM7 flash command-"batch"
+# adapted by Martin Thomas based on information from Dominic Rath - Thanks
+arm7_9 dcc_downloads enable
+
+# added from internet script
+armv4_5 core_state arm
+arm7_9 fast_memory_access enable
+# end added from script
+# end moved section
+
+# Init - taken from the script openocd_at91sam7_ecr.script
+mww 0xfffffd44 0x00008000  # disable watchdog
+mww 0xfffffd08 0xa5000001  # enable user reset
+mww 0xfffffc20 0x00000601  # CKGR_MOR : enable the main oscillator
+sleep 10
+mww 0xfffffc2c 0x00481c0e   # CKGR_PLLR: 96.1097 MHz
+sleep 10
+mww 0xfffffc30 0x00000007  # PMC_MCKR : MCK = PLL / 2 ~= 48 MHz
+sleep 10
+mww 0xffffff60 0x003c0100  # MC_FMR: flash mode (FWS=1,FMCN=60)
+# arm7_9 force_hw_bkpts enable  # program resides in flash
+sleep 10
+
+# section was here
+
+poll
+flash probe 0
+# added from script on internet
+#flash protect 0 0 31 off
+#flash erase_sector 0 0 31
+#flash erase_sector 0 0 31
+# end add from script
+#flash write_bank 0 blink1ROM_rom.bin 0x0
+flash write_image ../../../../images/at91sam7s.bin 0x0100000 bin
+
