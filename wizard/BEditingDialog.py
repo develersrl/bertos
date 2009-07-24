@@ -41,6 +41,7 @@ from PyQt4.QtGui import *
 
 from bertos_utils import loadBertosProject, bertosVersion, getToolchainName
 from toolchain_validation import validateToolchain
+import qvariant_converter
 import BModulePage
 
 class BEditingDialog(QDialog):
@@ -48,6 +49,7 @@ class BEditingDialog(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
         self.setupUi()
+        self.connectSignals()
         self.module_page.reloadData()
     
     def setupUi(self):
@@ -89,15 +91,25 @@ class BEditingDialog(QDialog):
             action_group.addAction(action)
             action.setCheckable(True)
             action.setChecked(True if toolchain == self.currentToolchain()["path"] else False)
+            action.setData(qvariant_converter.convertString(toolchain))
 
     def setupVersionMenu(self):
         self.version_menu = QMenu(self.tr("select BeRTOS version"))
         action_group = QActionGroup(self.version_menu)
-        for version in sorted([bertosVersion(v) for v in self.versions()]):
+        versions = [(path, bertosVersion(path)) for path in self.versions()]
+        for path, version in versions: 
             action = self.version_menu.addAction(version)
             action_group.addAction(action)
             action.setCheckable(True)
-            action.setChecked(True if unicode(action.text()) == self.currentVersion() else False)
+            action.setChecked(True if path == self.currentVersion() else False)
+            action.setData(qvariant_converter.convertString(path))
+            self.connect(action, SIGNAL("triggered(bool)"), lambda: self.versionChanged(path))
+
+    def toolchainChanged(self, toolchain):
+        print toolchain
+
+    def versionChanged(self, version):
+        print version
 
     def toolchains(self):
         return self.module_page.toolchains()

@@ -53,7 +53,6 @@ def validateToolchain(toolchain):
     if validation_process.waitForFinished(200):
         description = unicode(validation_process.readAllStandardError())
         info = bertos_utils.getToolchainInfo(description)
-        print info
         if len(info) >= 4:
             return True, info
         else:
