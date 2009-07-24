@@ -39,7 +39,8 @@ import os
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from bertos_utils import loadBertosProject, bertosVersion
+from bertos_utils import loadBertosProject, bertosVersion, getToolchainName
+from toolchain_validation import validateToolchain
 import BModulePage
 
 class BEditingDialog(QDialog):
@@ -79,10 +80,15 @@ class BEditingDialog(QDialog):
         self.toolchain_menu = QMenu(self.tr("select toolchain"))
         action_group = QActionGroup(self.toolchain_menu)
         for toolchain in sorted(self.toolchains()):
-            action = self.toolchain_menu.addAction(toolchain)
+            info = validateToolchain(toolchain)
+            if info[0]:
+                name = getToolchainName(info[1])
+            else:
+                name = toolchain
+            action = self.toolchain_menu.addAction(name)
             action_group.addAction(action)
             action.setCheckable(True)
-            action.setChecked(True if unicode(action.text()) == self.currentToolchain()["path"] else False)
+            action.setChecked(True if toolchain == self.currentToolchain()["path"] else False)
 
     def setupVersionMenu(self):
         self.version_menu = QMenu(self.tr("select BeRTOS version"))

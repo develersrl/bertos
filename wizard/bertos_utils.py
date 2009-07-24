@@ -358,6 +358,10 @@ def getToolchainInfo(output):
         info["thread"] = thread[0].split("Thread model: ")[1]
     return info
 
+def getToolchainName(toolchain_info):
+    name = "GCC " + toolchain_info["version"] + " - " + toolchain_info["target"].strip()
+    return name
+
 def loadSourceTree(project):
     fileList = [f for f in os.walk(project.info("SOURCES_PATH"))]
     project.setInfo("FILE_LIST", fileList)
