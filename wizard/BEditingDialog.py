@@ -80,6 +80,7 @@ class BEditingDialog(QDialog):
 
     def setupToolchainMenu(self):
         self.toolchain_menu = QMenu(self.tr("select toolchain"))
+        self.toolchain_actions = []
         action_group = QActionGroup(self.toolchain_menu)
         for toolchain in sorted(self.toolchains()):
             info = validateToolchain(toolchain)
@@ -92,9 +93,11 @@ class BEditingDialog(QDialog):
             action.setCheckable(True)
             action.setChecked(True if toolchain == self.currentToolchain()["path"] else False)
             action.setData(qvariant_converter.convertString(toolchain))
+            self.toolchain_actions.append(action)
 
     def setupVersionMenu(self):
         self.version_menu = QMenu(self.tr("select BeRTOS version"))
+        self.version_actions = []
         action_group = QActionGroup(self.version_menu)
         versions = [(path, bertosVersion(path)) for path in self.versions()]
         for path, version in versions: 
@@ -103,13 +106,27 @@ class BEditingDialog(QDialog):
             action.setCheckable(True)
             action.setChecked(True if path == self.currentVersion() else False)
             action.setData(qvariant_converter.convertString(path))
-            self.connect(action, SIGNAL("triggered(bool)"), lambda: self.versionChanged(path))
+            self.version_actions.append(action)
 
-    def toolchainChanged(self, toolchain):
-        print toolchain
+    def connectSignals(self):
+        for toolchain_action in self.toolchain_actions:
+            self.connect(toolchain_action, SIGNAL("toggled(bool)"), lambda x, toolchain_action=toolchain_action: self.toolchainChanged(
+                qvariant_converter.getString(toolchain_action.data()),
+                x
+            ))
+        for version_action in self.version_actions:
+            self.connect(version_action, SIGNAL("toggled(bool)"), lambda x, version_action=version_action: self.versionChanged(
+                qvariant_converter.getString(version_action.data()),
+                x
+            ))
 
-    def versionChanged(self, version):
-        print version
+    def toolchainChanged(self, toolchain, activated):
+        if activated:
+            self.setCurrentToolchain(toolchain)
+
+    def versionChanged(self, version, activated):
+        if activated:
+            self.setCurrentVersion(version)
 
     def toolchains(self):
         return self.module_page.toolchains()
