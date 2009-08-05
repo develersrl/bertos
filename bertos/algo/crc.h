@@ -53,6 +53,8 @@
 #define ALGO_CRC_H
 
 #include <cfg/compiler.h>
+#include <cpu/pgm.h>
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,7 +62,7 @@ extern "C" {
 
 
 /* CRC table */
-extern const uint16_t crc16tab[256];
+const uint16_t crc16tab[256];
 
 
 /**
@@ -72,7 +74,11 @@ extern const uint16_t crc16tab[256];
  * \param c New octet (range 0-255)
  * \param oldcrc Previous CRC16 value (referenced twice, beware of side effects)
  */
-#define UPDCRC16(c, oldcrc) (crc16tab[((oldcrc) >> 8) ^ ((unsigned char)(c))] ^ ((oldcrc) << 8))
+#if CPU_AVR
+	#define UPDCRC16(c, oldcrc) (pgm_read_uint16_t(&crc16tab[((oldcrc) >> 8) ^ ((unsigned char)(c))]) ^ ((oldcrc) << 8))
+#else
+	#define UPDCRC16(c, oldcrc) ((crc16tab[((oldcrc) >> 8) ^ ((unsigned char)(c))]) ^ ((oldcrc) << 8))
+#endif
 
 
 #ifdef INLINE
@@ -81,7 +87,11 @@ extern const uint16_t crc16tab[256];
  */
 INLINE uint16_t updcrc16(uint8_t c, uint16_t oldcrc)
 {
+#if CPU_AVR
+	return pgm_read_uint16_t(&crc16tab[(oldcrc >> 8) ^ c]) ^ (oldcrc << 8);
+#else
 	return crc16tab[(oldcrc >> 8) ^ c] ^ (oldcrc << 8);
+#endif
 }
 #endif // INLINE
 
