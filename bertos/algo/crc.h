@@ -55,14 +55,10 @@
 #include <cfg/compiler.h>
 #include <cpu/pgm.h>
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
+EXTERN_C_BEGIN
 
 /* CRC table */
-const uint16_t crc16tab[256];
+extern const uint16_t crc16tab[256];
 
 
 /**
@@ -107,8 +103,6 @@ INLINE uint16_t updcrc16(uint8_t c, uint16_t oldcrc)
  */
 extern uint16_t crc16(uint16_t crc, const void *buf, size_t len);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+EXTERN_C_END
 
 #endif /* ALGO_CRC_H */
