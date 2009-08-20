@@ -500,12 +500,12 @@ typedef unsigned char page_t;    /**< Type for banked memory pages. */
  */
 #if COMPILER_TYPEOF && COMPILER_STATEMENT_EXPRESSIONS
 	#define containerof(ptr, type, member) ({ \
-		const typeof( ((type *)0)->member ) *_mptr = (ptr); /* type check */ \
-		(type *)((char *)_mptr - offsetof(type, member)); \
+		typeof( ((type *)0)->member ) *_mptr = (ptr); /* type check */ \
+		(type *)(void *)((char *)_mptr - offsetof(type, member)); \
 	})
 #else
 	#define containerof(ptr, type, member) \
-		( (type *)((char *)(ptr) - offsetof(type, member)) )
+		( (type *)(void *)((char *)(ptr) - offsetof(type, member)) )
 #endif
 
 /** Issue a compilation error if the \a condition is false */
