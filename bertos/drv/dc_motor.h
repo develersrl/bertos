@@ -77,6 +77,7 @@ typedef struct DCMotorConfig
 
 	PwmDev pwm_dev;         ///< Pwm channel.
 	pwm_freq_t freq;        ///< Pwm waveform frequency.
+	bool pol;               ///< Pwm waveform polarity.
 
 	adc_ch_t adc_ch;        ///< ADC channel.
 	adcread_t adc_max;      ///< ADC max scale value.
@@ -84,6 +85,8 @@ typedef struct DCMotorConfig
 	mtime_t sample_delay;   ///< Delay before to sampling.
 
 	bool dir;               ///< Default direction for select DC motor.
+	int speed_trm_id;       ///< Index of trimmer to set speed.
+	dc_speed_t speed;       ///< Default speed value for select DC motor.
 
 } DCMotorConfig;
 

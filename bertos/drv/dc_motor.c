@@ -43,21 +43,21 @@
 #include "dc_motor.h"
 #include "hw/hw_dc_motor.h"
 
+// Define logging setting (for cfg/log.h module).
+#define LOG_LEVEL         DC_MOTOR_LOG_LEVEL
+#define LOG_VERBOSITY     DC_MOTOR_LOG_FORMAT
+
+#include <cfg/log.h>
+#include <cfg/debug.h>
+
 #include <algo/pid_control.h>
 
 #include <drv/timer.h>
 #include <drv/adc.h>
 
-#include <cfg/debug.h>
-
 #include <kern/proc.h>
 
-#define DC_MOTOR_TARGET_TRIM 0
-
-#if DC_MOTOR_TARGET_TRIM
-	#define DC_MOTOR_TARGET_TRIM_SAMPLE_PER 50
-	static int tgt_sample_period = 0;
-#endif
+#include <string.h>
 
 /**
  * DC motor definition.
@@ -65,13 +65,13 @@
 static DCMotor dcm_all[CONFIG_NUM_DC_MOTOR];
 
 /// Stack process for DC motor poll.
-static cpu_stack_t dc_motor_poll_stack[200];
+static cpu_stack_t dc_motor_poll_stack[1024];
 
 ///< Sample period for all DC motor.
 static mtime_t sample_period;
 
 // Only for Debug
-// static int debug_msg_delay = 0;
+LOG_INFOB(static int debug_msg_delay = 0;);
 
 //Forward declaration
 static void dc_motor_do(int index);
@@ -121,23 +121,6 @@ static void NORETURN dc_motor_poll(void)
 
 		//Wait some time to allow signal to stabilize before sampling
 		timer_delay(max_sample_delay);
-
-#if DC_MOTOR_TARGET_TRIM
-		if (tgt_sample_period == DC_MOTOR_TARGET_TRIM_SAMPLE_PER)
-		{
-			dc_speed_t tgt_speed = ADC_RANGECONV(adc_read(6), 0, 65535);
-
-			for (i = 0; i < CONFIG_NUM_DC_MOTOR; i++)
-			{
-				if ((dcm_all[i].tgt_speed >= tgt_speed - 100) && (dcm_all[i].tgt_speed <= tgt_speed + 100))
-					TRACEMSG("DCmt[%d]> tgt[%d]", i, tgt_speed);
-
-				dc_motor_setSpeed(i, tgt_speed);
-			}
-			tgt_sample_period = 0;
-		}
-		tgt_sample_period++;
-#endif
 	}
 }
 
@@ -162,16 +145,17 @@ static void dc_motor_do(int index)
 	//Compute next value for reaching target speed from current position
 	new_pid = pid_control_update(&dcm->pid_ctx, dcm->tgt_speed, curr_pos);
 
-//TODO: Add a multilevel debug..
-// 	if (debug_msg_delay == 20)
-// 	{
-// 		TRACEMSG("DCmt[%d]>curr_speed[%d],tgt[%d],err[%f],P[%f],I[%f],D[%f]", dcm->index, curr_pos, dcm->tgt_speed);
-// 		kprintf("%d,", curr_pos);
-// 		debug_msg_delay = 0;
-// 	}
-// 	debug_msg_delay++;
 
-// 	TRACEMSG("tg[%d], new_pid[%d], pos[%d]", dcm->tgt_speed, new_pid, curr_pos);
+ 	LOG_INFOB(if (debug_msg_delay == 20)
+ 	{
+ 		LOG_INFO("DCmt[%d]>curr_speed[%d],tgt[%d]\n", dcm->index, curr_pos, dcm->tgt_speed);
+ 		LOG_INFO("%d,", curr_pos);
+ 		debug_msg_delay = 0;
+ 	}
+ 	debug_msg_delay++;
+	kputs("\n"););
+
+ 	LOG_WARN("tg[%d], new_pid[%d], pos[%d]\n", dcm->tgt_speed, new_pid, curr_pos);
 
  	//Apply the compute duty value
 	pwm_setDuty(dcm->cfg->pwm_dev, new_pid);
@@ -197,9 +181,14 @@ void dc_motor_setDir(int index, bool dir)
 		//Reset previous direction flag, and set new
 		dcm->status &= ~DC_MOTOR_DIR;
 		dcm->status |= DC_MOTOR_DIR;
+
+		/*
+		 * To set dc motor direction we must also set the
+		 * PWM polarity according with dc motor driver chip
+		 */
+		pwm_setPolarity(dcm->cfg->pwm_dev, dir);
 		DC_MOTOR_SET_DIR(index, dir);
 	}
-
 }
 
 
@@ -219,7 +208,7 @@ void dc_motor_enable(int index, bool state)
 	DCMotor *dcm = &dcm_all[index];
 
 	/*
-	 * Clean all PID stutus variable, becouse 
+	 * Clean all PID stutus variable, becouse
 	 * we start with new one.
 	 */
 	pid_control_reset(&dcm->pid_ctx);
@@ -251,9 +240,8 @@ void dc_motor_setup(int index, DCMotorConfig *dcm_conf)
 	 */
 	dcm->index = index;
 
-	DC_MOTOR_INIT(dcm->index);
-
 	pwm_setFrequency(dcm->cfg->pwm_dev, dcm->cfg->freq);
+	pwm_setPolarity(dcm->cfg->pwm_dev, dcm->cfg->pol);
 	pwm_enable(dcm->cfg->pwm_dev, false);
 
 	//Init pid control
@@ -278,10 +266,11 @@ void dc_motor_setup(int index, DCMotorConfig *dcm_conf)
 	//Set default direction for DC motor
 	DC_MOTOR_SET_DIR(dcm->index, dcm->cfg->dir);
 
-	TRACEMSG("DC motort[%d]> kp[%f],ki[%f],kd[%f]", dcm->index, dcm_conf->pid_cfg.kp, dcm_conf->pid_cfg.ki, dcm_conf->pid_cfg.kd);
-	TRACEMSG("               > pwm_dev[%d], freq[%ld], sample[%ld]", dcm_conf->pwm_dev, dcm_conf->freq, dcm_conf->sample_delay);
-	TRACEMSG("               > adc_ch[%d], adc_max[%d], adc_min[%d]", dcm_conf->adc_ch, dcm_conf->adc_max, dcm_conf->adc_min);
-	TRACEMSG("               > dir[%d]", dcm->cfg->dir);
+	LOG_INFO("DC motort[%d]:\n", dcm->index);
+	LOG_INFO("> PID: kp[%lf],ki[%lf],kd[%lf]\n", dcm->cfg->pid_cfg.kd, dcm->cfg->pid_cfg.ki, dcm->cfg->pid_cfg.kd);
+	LOG_INFO("> PWM: pwm_dev[%d], freq[%ld], sample[%ld]\n", dcm->cfg->pwm_dev, dcm->cfg->freq, dcm->cfg->sample_delay);
+	LOG_INFO("> ADC: adc_ch[%d], adc_max[%d], adc_min[%d]\n", dcm->cfg->adc_ch, dcm->cfg->adc_max, dcm->cfg->adc_min);
+	LOG_INFO("> DC: dir[%d], speed[%d]\n", dcm->cfg->dir, dcm->cfg->speed);
 
 }
 
@@ -291,11 +280,12 @@ void dc_motor_setup(int index, DCMotorConfig *dcm_conf)
  */
 void dc_motor_init(void)
 {
-	for (int i = 0; i < CONFIG_NUM_DC_MOTOR; i++)
-		dcm_all[i].status &= ~DC_MOTOR_ACTIVE;
+	memset(dcm_all, 0, sizeof(dcm_all));
 
 	//Init a sample period
 	sample_period = 0;
+
+	MOTOR_DC_INIT();
 
 	//Create a dc motor poll process
 	proc_new(dc_motor_poll, NULL, sizeof(dc_motor_poll_stack), dc_motor_poll_stack);
