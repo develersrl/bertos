@@ -46,6 +46,22 @@
  * $WIZ$ type = "int"
  * $WIZ$ min = 1
  */
-#define CONFIG_NUM_DC_MOTOR       1
+#define CONFIG_NUM_DC_MOTOR       4
+
+/**
+ * Module logging level.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
+ */
+#define DC_MOTOR_LOG_LEVEL      LOG_LVL_WARN
+
+/**
+ * Module logging format.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define DC_MOTOR_LOG_FORMAT     LOG_FMT_TERSE
 
 #endif /* CFG_DC_MOTOR_H */
