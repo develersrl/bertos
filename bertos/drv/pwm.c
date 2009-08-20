@@ -38,7 +38,15 @@
  * \author Daniele Basile <asterix@develer.com>
  */
 
+#include "cfg/cfg_pwm.h"
+
 #include <cfg/macros.h>
+
+// Define logging setting (for cfg/log.h module).
+#define LOG_LEVEL         PWM_LOG_LEVEL
+#define LOG_VERBOSITY     PWM_LOG_FORMAT
+
+#include <cfg/log.h>
 #include <cfg/debug.h>
 
 #include <drv/pwm.h>
@@ -63,7 +71,7 @@ void pwm_setDuty(PwmDev dev, pwm_duty_t duty)
 
 	real_duty = (uint64_t)(duty * period) >> (uint64_t)PWM_MAX_PERIOD_LOG2;
 
-// 	TRACEMSG("real_duty[%d] duty[%d], period[%d]", real_duty, duty, period);
+	LOG_INFO("real_duty[%d] duty[%d], period[%d]", real_duty, duty, period);
 	pwm_hw_setDutyUnlock(dev, real_duty);
 }
 
