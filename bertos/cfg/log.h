@@ -85,7 +85,7 @@
  *
  * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
- * 
+ *
  * $WIZ$
  */
 
@@ -144,20 +144,27 @@
 
 #if LOG_LEVEL >= LOG_LVL_ERR
 	#define LOG_ERR(str,...)       LOG_PRINT("ERR", str, ## __VA_ARGS__)
+	#define LOG_ERRB(x)            x
 #else
 	#define LOG_ERR(str,...)       /* Nothing */
+	#define LOG_ERRB(x)            /* Nothing */
 #endif
 
 #if LOG_LEVEL >= LOG_LVL_WARN
 	#define LOG_WARN(str,...)       LOG_PRINT("WARN", str, ## __VA_ARGS__)
+	#define LOG_WARNB(x)            x
 #else
 	#define LOG_WARN(str,...)       /* Nothing */
+	#define LOG_WARNB(x)            /* Nothing */
 #endif
 
 #if LOG_LEVEL >= LOG_LVL_INFO
 	#define LOG_INFO(str,...)       LOG_PRINT("INFO", str, ## __VA_ARGS__)
+	#define LOG_INFOB(x)            x
 #else
 	#define LOG_INFO(str,...)       /* Nothing */
+	#define LOG_INFOB(x)            /* Nothing */
 #endif
+
 
 #endif /* CFG_LOG_H */
