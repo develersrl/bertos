@@ -39,6 +39,13 @@
 
 #include "pid_control.h"
 
+#include "cfg/cfg_pid.h"
+
+// Define logging setting (for cfg/log.h module).
+#define LOG_LEVEL         PID_LOG_LEVEL
+#define LOG_VERBOSITY     PID_LOG_FORMAT
+
+#include <cfg/log.h>
 #include <cfg/debug.h>
 
 /**
@@ -80,14 +87,14 @@ piddata_t pid_control_update(PidContext *pid_ctx, piddata_t target, piddata_t cu
 	D = (err - pid_ctx->prev_err) * pid_ctx->cfg->kd / ((piddata_t)pid_ctx->cfg->sample_period / 1000);
 
 
-// 	TRACEMSG("curr_pos[%lf],tgt[%lf],err[%f],P[%f],I[%f],D[%f]", curr_pos, target, err, P, I, D);
+ 	LOG_INFO("curr_pos[%lf],tgt[%lf],err[%f],P[%f],I[%f],D[%f]", curr_pos, target, err, P, I, D);
 
 
 	//Store the last error value
 	pid_ctx->prev_err = err;
 	piddata_t pid = MINMAX(pid_ctx->cfg->out_min, (P + I + D), pid_ctx->cfg->out_max);
 
-// 	TRACEMSG("pid[%lf]",pid);
+ 	LOG_INFO("pid[%lf]",pid);
 
 	//Clamp out between out_min and out_max
 	return pid;
