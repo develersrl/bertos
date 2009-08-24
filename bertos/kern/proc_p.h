@@ -152,9 +152,9 @@ INLINE void SCHED_CHANGE_PRI(struct Process *proc)
 	PriNode *pos = NULL;
 	FOREACH_NODE(n, &ProcReadyList)
 	{
-		if (n == &proc->link)
+		if (n == &proc->link.link)
 		{
-			pos = n;
+			pos = (PriNode *)n;
 			break;
 		}
 	}
