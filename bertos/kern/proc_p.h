@@ -47,6 +47,7 @@
 #include <cfg/compiler.h>
 
 #include <cpu/types.h>        /* for cpu_stack_t */
+#include <cpu/irq.h>          // IRQ_ASSERT_DISABLED()
 
 #include <struct/list.h>
 
@@ -132,6 +133,41 @@ extern REGISTER List     ProcReadyList;
 		SCHED_ENQUEUE_INTERNAL(proc); \
 	} while (0)
 
+#ifdef CONFIG_KERN_PRI
+/**
+ * Changes the priority of an already enqueued process.
+ *
+ * Searches and removes the process from the ready list, then uses LIST_ENQUEUE(()
+ * to insert again to fix priority.
+ *
+ * No action is performed for processes that aren't in the ready list, eg. in semaphore queues.
+ *
+ * \note Performance could be improved with a different implementation of priority list.
+ */
+INLINE void SCHED_CHANGE_PRI(struct Process *proc)
+{
+	IRQ_ASSERT_DISABLED();
+	LIST_ASSERT_VALID(&ProcReadyList);
+	Node *n;
+	PriNode *pos = NULL;
+	FOREACH_NODE(n, &ProcReadyList)
+	{
+		if (n == &proc->link)
+		{
+			pos = n;
+			break;
+		}
+	}
+
+	// only remove and enqueue again if process is already in the ready list
+	// otherwise leave it alone
+	if (pos)
+	{
+		REMOVE(&proc->link.link);
+		LIST_ENQUEUE(&ProcReadyList, &proc->link);
+	}
+}
+#endif //CONFIG_KERN_PRI
 
 /// Schedule another process *without* adding the current one to the ready list.
 void proc_switch(void);

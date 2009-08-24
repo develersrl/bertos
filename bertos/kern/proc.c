@@ -318,9 +318,9 @@ void proc_setPri(struct Process *proc, int pri)
 
 		if (proc != CurrentProcess)
 		{
-				//proc_forbid();
-				//TODO: re-enqueue process
-				//pric_permit();
+				proc_forbid();
+				ATOMIC(SCHED_CHANGE_PRI(proc));
+				proc_permit();
 		}
 }
 #endif // CONFIG_KERN_PRI
