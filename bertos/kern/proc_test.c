@@ -38,6 +38,8 @@
  * $test$: cp bertos/cfg/cfg_proc.h $cfgdir/
  * $test$: echo  "#undef CONFIG_KERN" >> $cfgdir/cfg_proc.h
  * $test$: echo "#define CONFIG_KERN 1" >> $cfgdir/cfg_proc.h
+ * $test$: echo  "#undef CONFIG_KERN_PRI" >> $cfgdir/cfg_proc.h
+ * $test$: echo "#define CONFIG_KERN_PRI 1" >> $cfgdir/cfg_proc.h
  * $test$: cp bertos/cfg/cfg_monitor.h $cfgdir/
  * $test$: echo  "#undef CONFIG_KERN_MONITOR" >> $cfgdir/cfg_monitor.h
  * $test$: echo "#define CONFIG_KERN_MONITOR 1" >> $cfgdir/cfg_monitor.h
@@ -129,12 +131,32 @@ PROC_TEST_STACK(6)
 PROC_TEST_STACK(7)
 PROC_TEST_STACK(8)
 
+// Define params to test priority
+#define PROC_PRI_TEST(num) static void proc_pri_test##num(void) \
+{ \
+	struct Process *main_proc = (struct Process *) proc_currentUserData(); \
+	sig_signal(main_proc, SIG_USER##num); \
+} \
+
+// Default priority is 0
+#define PROC_PRI_TEST_INIT(num, proc)  \
+do { \
+	struct Process *p = proc_new(proc_pri_test##num, (proc), sizeof(proc_test##num##_stack), proc_test##num##_stack); \
+	proc_setPri(p, num + 1); \
+} while (0)
+
+PROC_TEST_STACK(0)
+PROC_PRI_TEST(0)
+PROC_PRI_TEST(1)
+PROC_PRI_TEST(2)
+
 
 /**
  * Process scheduling test
  */
 int proc_testRun(void)
 {
+	int ret_value = 0;
 	kprintf("Run Process test..\n");
 
 	//Init the process tests
@@ -165,10 +187,55 @@ int proc_testRun(void)
 		t8_count == INC_PROC_T8)
 	{
 		kputs("> Main: process test finished..ok!\n");
-		return 0;
+		ret_value = 0;
+	}
+	else
+	{
+		kputs("> Main: process test..fail!\n");
+		ret_value = -1;
 	}
 
-	kputs("> Main: process test..fail!\n");
+
+	// test process priority
+	// main process must have the higher priority to check signals received
+	proc_setPri(proc_current(), 10);
+
+	struct Process *curr = proc_current();
+	// the order in which the processes are created is important!
+	PROC_PRI_TEST_INIT(0, curr);
+	PROC_PRI_TEST_INIT(1, curr);
+	PROC_PRI_TEST_INIT(2, curr);
+
+	// signals must be: USER2, 1, 0 in order
+	sigmask_t signals = sig_wait(SIG_USER0 | SIG_USER1 | SIG_USER2);
+	if (!(signals & SIG_USER2))
+		goto priority_fail;
+
+	signals = sig_wait(SIG_USER0 | SIG_USER1 | SIG_USER2);
+	if (!(signals & SIG_USER1))
+		goto priority_fail;
+
+	signals = sig_wait(SIG_USER0 | SIG_USER1 | SIG_USER2);
+	if (!(signals & SIG_USER0))
+		goto priority_fail;
+
+	// All processes must have quit by now, but just in case...
+	signals = sig_waitTimeout(SIG_USER0 | SIG_USER1 | SIG_USER2, 200);
+	if (signals & (SIG_USER0 | SIG_USER1 | SIG_USER2))
+		goto priority_fail;
+
+	if (signals & SIG_TIMEOUT)
+	{
+		kputs("Priority test successfull.\n");
+	}
+
+	if (!ret_value)
+		return 0;
+	else
+		return ret_value;
+
+priority_fail:
+	kputs("Priority test failed.\n");
 	return -1;
 }
 
