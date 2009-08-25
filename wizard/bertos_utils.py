@@ -100,10 +100,10 @@ def projectFileGenerator(project_info):
     project_data["SELECTED_FREQ"] = project_info.info("SELECTED_FREQ")
     return pickle.dumps(project_data)
 
-def createBertosProject(project_info):
+def createBertosProject(project_info, edit=False):
     directory = project_info.info("PROJECT_PATH")
     sources_dir = project_info.info("SOURCES_PATH")
-    if os.path.isdir(directory):
+    if os.path.isdir(directory) and not edit:
         shutil.rmtree(directory, True)        
     os.makedirs(directory)
     f = open(directory + "/project.bertos", "w")
@@ -137,14 +137,14 @@ def createBertosProject(project_info):
     cfgdir = prjdir + "/cfg"
     shutil.rmtree(cfgdir, True)
     os.mkdir(cfgdir)
-    # Set to 1 the autoenabled for enabled modules
+    # Set properly the autoenabled parameters
     for module, information in project_info.info("MODULES").items():
-        if information["enabled"] and "configuration" in information and information["configuration"] != "":
+        if "configuration" in information and information["configuration"] != "":
             configurations = project_info.info("CONFIGURATIONS")
             configuration = configurations[information["configuration"]]
             for start, parameter in configuration["paramlist"]:
                 if "type" in configuration[parameter]["informations"] and configuration[parameter]["informations"]["type"] == "autoenabled":
-                    configuration[parameter]["value"] = "1"
+                    configuration[parameter]["value"] = "1" if information["enabled"] else "0"
             project_info.setInfo("CONFIGURATIONS", configurations)
     # Copy all the configuration files
     for configuration, information in project_info.info("CONFIGURATIONS").items():
