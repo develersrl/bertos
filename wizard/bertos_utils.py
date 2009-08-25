@@ -80,6 +80,10 @@ def loadBertosProject(project_file):
             tag_dict[tag] = False
     project_info.setInfo("ALL_CPU_TAGS", tag_dict)
     loadModuleData(project_info, True)
+    modules = project_info.info("MODULES")
+    for module, information in modules.items():
+        information["enabled"] = module in project_data["ENABLED_MODULES"]
+    project_info.setInfo("MODULES", modules)
     return project_info
 
 def projectFileGenerator(project_info):
