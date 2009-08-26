@@ -39,7 +39,7 @@ import os
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from bertos_utils import loadBertosProject, bertosVersion, getToolchainName
+from bertos_utils import loadBertosProject, bertosVersion, getToolchainName, createBertosProject
 from toolchain_validation import validateToolchain
 import qvariant_converter
 import BModulePage
@@ -119,6 +119,8 @@ class BEditingDialog(QDialog):
                 qvariant_converter.getString(version_action.data()),
                 x
             ))
+        self.connect(self.apply_button, SIGNAL("clicked()"), self.apply)
+        self.connect(self.cancel_button, SIGNAL("clicked()"), self.reject)
 
     def toolchainChanged(self, toolchain, activated):
         if activated:
@@ -127,6 +129,10 @@ class BEditingDialog(QDialog):
     def versionChanged(self, version, activated):
         if activated:
             self.setCurrentVersion(version)
+
+    def apply(self):
+        createBertosProject(self.module_page.project(), edit=True)
+        self.accept()
 
     def toolchains(self):
         return self.module_page.toolchains()

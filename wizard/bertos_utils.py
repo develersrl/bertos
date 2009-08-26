@@ -59,6 +59,8 @@ def loadBertosProject(project_file):
     project_info.setInfo("PROJECT_PATH", os.path.dirname(project_file))
     project_info.setInfo("SOURCES_PATH", project_data["SOURCES_PATH"])
     project_info.setInfo("TOOLCHAIN", project_data["TOOLCHAIN"])
+    project_info.setInfo("SELECTED_FREQ", project_data["SELECTED_FREQ"])
+    project_info.setInfo("OUTPUT", project_data["OUTPUT"])
     loadSourceTree(project_info)
     cpu_name = project_data["CPU_NAME"]
     project_info.setInfo("CPU_NAME", cpu_name)
@@ -86,6 +88,10 @@ def loadBertosProject(project_file):
     project_info.setInfo("MODULES", modules)
     return project_info
 
+def mergeSources(srcdir, new_sources, old_sources):
+    # TODO: implement the three way merge algorithm
+    pass
+
 def projectFileGenerator(project_info):
     directory = project_info.info("PROJECT_PATH")
     project_data = {}
@@ -98,45 +104,62 @@ def projectFileGenerator(project_info):
     project_data["TOOLCHAIN"] = project_info.info("TOOLCHAIN")
     project_data["CPU_NAME"] = project_info.info("CPU_NAME")
     project_data["SELECTED_FREQ"] = project_info.info("SELECTED_FREQ")
+    project_data["OUTPUT"] = project_info.info("OUTPUT")
     return pickle.dumps(project_data)
 
 def createBertosProject(project_info, edit=False):
     directory = project_info.info("PROJECT_PATH")
     sources_dir = project_info.info("SOURCES_PATH")
-    if os.path.isdir(directory) and not edit:
-        shutil.rmtree(directory, True)        
-    os.makedirs(directory)
+    if not edit:
+        if os.path.isdir(directory):
+            shutil.rmtree(directory, True)        
+        os.makedirs(directory)
+    # Write the project file
     f = open(directory + "/project.bertos", "w")
     f.write(projectFileGenerator(project_info))
     f.close()
     # Destination source dir
     srcdir = directory + "/bertos"
-    shutil.rmtree(srcdir, True)
-    copytree.copytree(sources_dir + "/bertos", srcdir, ignore_list=const.IGNORE_LIST)
+    if not edit:
+        # If not in editing mode it copies all the bertos sources in the /bertos subdirectory of the project
+        shutil.rmtree(srcdir, True)
+        copytree.copytree(sources_dir + "/bertos", srcdir, ignore_list=const.IGNORE_LIST)
+    else:
+        # If in editing mode it merges the current bertos sources with the selected ones
+        # TODO: implement the three way merge algotihm
+        #
+        # mergeSources(srcdir, sources_dir, old_sources_dir)
+        #
+        pass
     # Destination makefile
     makefile = directory + "/Makefile"
-    if os.path.exists(makefile):
-        os.remove(makefile)
     makefile = open("mktemplates/Makefile").read()
     makefile = makefileGenerator(project_info, makefile)
     open(directory + "/Makefile", "w").write(makefile)
     # Destination project dir
     prjdir = directory + "/" + os.path.basename(directory)
-    shutil.rmtree(prjdir, True)
-    os.mkdir(prjdir)
+    if not edit:
+        shutil.rmtree(prjdir, True)
+        os.mkdir(prjdir)
     # Destination hw files
     hwdir = prjdir + "/hw"
-    shutil.rmtree(hwdir, True)
-    os.mkdir(hwdir)
+    if not edit:
+        shutil.rmtree(hwdir, True)
+        os.mkdir(hwdir)
     # Copy all the hw files
     for module, information in project_info.info("MODULES").items():
         for hwfile in information["hw"]:
             string = open(sources_dir + "/" + hwfile, "r").read()
-            open(hwdir + "/" + os.path.basename(hwfile), "w").write(string)
+            hwfile_path = hwdir + "/" + os.path.basename(hwfile)
+            if not edit or not os.path.exists(hwfile_path):
+                # If not in editing mode it copies all the hw files. If in
+                # editing mode it copies only the files that don't exist yet
+                open(hwdir + "/" + os.path.basename(hwfile), "w").write(string)
     # Destination configurations files
     cfgdir = prjdir + "/cfg"
-    shutil.rmtree(cfgdir, True)
-    os.mkdir(cfgdir)
+    if not edit:
+        shutil.rmtree(cfgdir, True)
+        os.mkdir(cfgdir)
     # Set properly the autoenabled parameters
     for module, information in project_info.info("MODULES").items():
         if "configuration" in information and information["configuration"] != "":
@@ -165,8 +188,9 @@ def createBertosProject(project_info, edit=False):
     makefile = mkGenerator(project_info, makefile)
     open(prjdir + "/" + os.path.basename(prjdir) + ".mk", "w").write(makefile)
     # Destination main.c file
-    main = open("srctemplates/main.c", "r").read()
-    open(prjdir + "/main.c", "w").write(main)
+    if not edit:
+        main = open("srctemplates/main.c", "r").read()
+        open(prjdir + "/main.c", "w").write(main)
     # Files for selected plugins
     relevants_files = {}
     for plugin in project_info.info("OUTPUT"):
