@@ -1,0 +1,4 @@
+
+# CPU type used for flashing
+PROGRAMMER_CPU = CORE_CPU
+

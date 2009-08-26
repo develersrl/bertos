@@ -244,11 +244,10 @@ $$(OUTDIR)/$(1)_whole.elf: bumprev $$($(1)_SRC) $$($(1)_LDSCRIPT)
 # Flash target
 # NOTE: we retry in case of failure because the STK500 programmer is crappy
 .PHONY: flash_$(1)
-flash_$(1): $(OUTDIR)/$(1).s19 flash_$(1)_local
-	if ! $(AVRDUDE) $(DPROG) -p $$($(1)_MCU) -U flash:w:$$< ; then \
-	     $(AVRDUDE) $(DPROG) -p $$($(1)_MCU) -U flash:w:$$< ; \
-	fi
-	#avarice --mkII -j usb --erase --program --verify --file images/triface.elf
+flash_$(1): $(OUTDIR)/$(1).hex flash_$(1)_local
+	PROGRAMMER_CPU=$$($(1)_PROGRAMMER_CPU) PROGRAMMER_TYPE=$(PROGRAMMER_TYPE) \
+	PROGRAMMER_PORT=$(PROGRAMMER_PORT) IMAGE_FILE=$$< \
+	$$($(1)_FLASH_SCRIPT)
 
 .PHONY: flash_$(1)_local
 flash_$(1)_local:

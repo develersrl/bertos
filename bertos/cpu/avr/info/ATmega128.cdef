@@ -51,3 +51,4 @@ CPU_DESC += [ "128 Kbyte in-System Programmable Flash",
 # If we use the GCC compiler we should pass some flags.
 CORE_CPU = "atmega128"
 
+include("avr_post.common")

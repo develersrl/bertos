@@ -55,10 +55,11 @@ triface_CSRC = \
 
 triface_PCSRC += bertos/mware/formatwr.c
 
-
 triface_CFLAGS = -O2 -D'ARCH=(ARCH_TRIFACE)' -D'CPU_FREQ=(14745600UL)'  -D'WIZ_AUTOGEN' -fno-strict-aliasing -Iexamples/triface -Ibertos/cpu/avr
 triface_LDFLAGS = -Wl
 
+triface_PROGRAMMER_CPU = atmega1281
+triface_FLASH_SCRIPT = bertos/cpu/avr/scripts/flash.sh
 
 # Set to 1 for debug builds
 boot_DEBUG = 0
@@ -87,3 +88,5 @@ boot_CFLAGS = -Os -mcall-prologues
 boot_LDFLAGS = -Wl,--relax -Wl,--section-start=.text=$(BOOT_ADDR_START)
 
 
+boot_PROGRAMMER_CPU = atmega1281
+boot_FLASH_SCRIPT = bertos/cpu/avr/scripts/flash.sh

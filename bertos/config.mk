@@ -11,7 +11,6 @@
 # Programmer type
 # see local pgm_config.mk for programmer customization.
 -include pgm_config.mk
-DPROG ?= -V -c stk500 -P /dev/ttyS0
 
 OPTCFLAGS = -ffunction-sections -fdata-sections
 #OPTCFLAGS = -funsafe-loop-optimizations
