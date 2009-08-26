@@ -229,6 +229,9 @@ def mkGenerator(project_info, makefile):
     mk_data["$prefix"] = replaceSeparators(project_info.info("TOOLCHAIN")["path"].split("gcc")[0])
     mk_data["$suffix"] = replaceSeparators(project_info.info("TOOLCHAIN")["path"].split("gcc")[1])
     mk_data["$main"] = os.path.basename(project_info.info("PROJECT_PATH")) + "/main.c"
+    mk_data["$programmercpu"] = project_info.info("CPU_INFOS")["PROGRAMMER_CPU"]
+    mk_data["$flashscript"] = project_info.info("CPU_INFOS")["FLASH_SCRIPT"]
+    mk_data["$debugscript"] = project_info.info("CPU_INFOS")["DEBUG_SCRIPT"]
     for key in mk_data:
         while makefile.find(key) != -1:
             makefile = makefile.replace(key, mk_data[key])

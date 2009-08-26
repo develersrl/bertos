@@ -52,3 +52,7 @@ $pname_CPPAFLAGS = $cppaflags
 $pname_CXXFLAGS = $cxxflags
 $pname_ASFLAGS = $asflags
 $pname_ARFLAGS = $arflags
+
+$pname_PROGRAMMER_CPU = $programmercpu
+$pname_FLASH_SCRIPT = $flashscript
+$pname_DEBUG_SCRIPT = $debugscript

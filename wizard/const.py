@@ -59,7 +59,10 @@ CPU_DEF = {
     "SUPPORTED_DRV" : [],
     "PC_SRC" : [],
     "CPU_DESC" : [],
-    "CPU_DEFAULT_FREQ": "1000000"
+    "CPU_DEFAULT_FREQ": "1000000",
+    "PROGRAMMER_CPU": "",
+    "FLASH_SCRIPT": "",
+    "DEBUG_SCRIPT": "",
 }
 
 TOOLCHAIN_ITEMS = ("ld", "as")
