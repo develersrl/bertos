@@ -12,6 +12,6 @@ default: all
 
 include bertos/config.mk
 
-include project_name/project_name.mk
+include $pname/$pname.mk
 
 include bertos/rules.mk

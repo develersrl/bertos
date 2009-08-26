@@ -183,10 +183,15 @@ def createBertosProject(project_info, edit=False):
         f = open(cfgdir + "/" + os.path.basename(configuration), "w")
         f.write(string)
         f.close()
-    # Destinatio mk file
-    makefile = open("mktemplates/template.mk", "r").read()
+    if not edit:
+        # Destination user mk file (only on project creation)
+        makefile = open("mktemplates/template.mk", "r").read()
+        makefile = mkGenerator(project_info, makefile)
+        open(prjdir + "/" + os.path.basename(prjdir) + ".mk", "w").write(makefile)
+    # Destination wizard mk file
+    makefile = open("mktemplates/template_wiz.mk", "r").read()
     makefile = mkGenerator(project_info, makefile)
-    open(prjdir + "/" + os.path.basename(prjdir) + ".mk", "w").write(makefile)
+    open(prjdir + "/" + os.path.basename(prjdir) + "_wiz.mk", "w").write(makefile)
     # Destination main.c file
     if not edit:
         main = open("srctemplates/main.c", "r").read()
@@ -234,8 +239,8 @@ def makefileGenerator(project_info, makefile):
     Generate the Makefile for the current project.
     """
     # TODO write a general function that works for both the mk file and the Makefile
-    while makefile.find("project_name") != -1:
-        makefile = makefile.replace("project_name", os.path.basename(project_info.info("PROJECT_PATH")))
+    while makefile.find("$pname") != -1:
+        makefile = makefile.replace("$pname", os.path.basename(project_info.info("PROJECT_PATH")))
     return makefile
 
 def csrcGenerator(project_info):
