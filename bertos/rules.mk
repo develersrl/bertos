@@ -242,7 +242,6 @@ $$(OUTDIR)/$(1)_whole.elf: bumprev $$($(1)_SRC) $$($(1)_LDSCRIPT)
 	$Q $$($(1)_CC) $$($(1)_SRC) $$(CFLAGS) $$($(1)_CFLAGS) $$(LIB) $$(LDFLAGS) $$($(1)_LDFLAGS) -o $$@
 
 # Flash target
-# NOTE: we retry in case of failure because the STK500 programmer is crappy
 .PHONY: flash_$(1)
 flash_$(1): $(OUTDIR)/$(1).hex flash_$(1)_local
 	$L "$(1): Flashing target"
@@ -257,6 +256,20 @@ flash_$(1): $(OUTDIR)/$(1).hex flash_$(1)_local
 
 .PHONY: flash_$(1)_local
 flash_$(1)_local:
+
+# Debug target
+.PHONY: debug_$(1)
+debug_$(1): $(OUTDIR)/$(1).elf
+	$L "$(1): Debugging target"
+	$Q if [ ! "$$($(1)_PROGRAMMER_TYPE)" == "none" ] ; then \
+		PROGRAMMER_CPU=$$($(1)_PROGRAMMER_CPU) PROGRAMMER_TYPE=$$($(1)_PROGRAMMER_TYPE) \
+		PROGRAMMER_PORT=$$($(1)_PROGRAMMER_PORT) GDB_PORT=3333 \
+		ELF_FILE=$$< \
+		$$($(1)_DEBUG_SCRIPT) ; \
+	else \
+		printf "No programmer interface configured, see http://dev.bertos.org/wiki/ProgrammerInterface\n" ; \
+		exit 1 ; \
+	fi
 
 .PHONY: fuses_$(!)
 fuses_$(1):
