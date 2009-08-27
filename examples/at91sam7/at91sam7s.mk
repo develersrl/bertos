@@ -46,3 +46,5 @@ at91sam7s_LDFLAGS = -nostartfiles -T bertos/cpu/arm/scripts/at91sam7_256_rom.ld 
 
 at91sam7s_CPU = arm7tdmi
 
+at91sam7s_PROGRAMMER_CPU = at91sam7
+at91sam7s_FLASH_SCRIPT = bertos/cpu/arm/scripts/flash.sh
