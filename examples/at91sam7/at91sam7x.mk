@@ -49,3 +49,4 @@ at91sam7x_CPU = arm7tdmi
 at91sam7x_PROGRAMMER_CPU = at91sam7
 at91sam7x_PROGRAMMER_TYPE = jtag-tiny
 at91sam7x_FLASH_SCRIPT = bertos/cpu/arm/scripts/flash.sh
+at91sam7x_DEBUG_SCRIPT = bertos/cpu/arm/scripts/debug.sh

@@ -62,6 +62,7 @@ triface_PROGRAMMER_CPU = atmega1281
 triface_PROGRAMMER_TYPE = stk500v2
 triface_PROGRAMMER_PORT = /dev/ttyS1
 triface_FLASH_SCRIPT = bertos/cpu/avr/scripts/flash.sh
+triface_DEBUG_SCRIPT = bertos/cpu/avr/scripts/debug.sh
 
 # Set to 1 for debug builds
 boot_DEBUG = 0
