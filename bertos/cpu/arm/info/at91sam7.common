@@ -73,6 +73,7 @@ DRV_DIR = CPU_DIR + "arm/drv/"
 
 FLASH_SCRIPT = SCRIPT_DIR + "flash.sh"
 DEBUG_SCRIPT = SCRIPT_DIR + "debug.sh"
+GDB_INIT_SCRIPT = SCRIPT_DIR + "openocd/gdbinit-sam7"
 
 # Common GCC flags.
 CPPA_FLAGS = [ "-O0", "-g -gdwarf-2", "-g -gen-debug" ]
