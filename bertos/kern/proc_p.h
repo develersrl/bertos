@@ -133,7 +133,7 @@ extern REGISTER List     ProcReadyList;
 		SCHED_ENQUEUE_INTERNAL(proc); \
 	} while (0)
 
-#ifdef CONFIG_KERN_PRI
+#if CONFIG_KERN_PRI
 /**
  * Changes the priority of an already enqueued process.
  *
