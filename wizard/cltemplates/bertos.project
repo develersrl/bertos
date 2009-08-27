@@ -5,15 +5,16 @@ $filelist
   <Dependencies/>
   <Settings Type="Dynamic Library">
     <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Dynamic Library">
-      <General OutputFile="" IntermediateDirectory="./Debug" Command="" CommandArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
+     <General OutputFile="" IntermediateDirectory="./Debug" Command="./images/$project.elf" CommandArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
       <Compiler Required="yes" Options="-g">
         <IncludePath Value="."/>
       </Compiler>
       <Linker Required="yes" Options=""/>
-      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
-        <PostConnectCommands></PostConnectCommands>
+      <Debugger IsRemote="yes" RemoteHostName="localhost" RemoteHostPort="3333" DebuggerPath="$debuggerpath">
+        <PostConnectCommands>monitor soft_reset_halt
+tbreak main</PostConnectCommands>
         <StartupCommands></StartupCommands>
-      </Debugger>
+      </Debugger>      
       <ResourceCompiler Required="no" Options=""/>
       <PreBuild/>
       <PostBuild/>
