@@ -63,6 +63,7 @@ CPU_DEF = {
     "PROGRAMMER_CPU": "",
     "FLASH_SCRIPT": "",
     "DEBUG_SCRIPT": "",
+    "GDB_INIT_SCRIPT": "",
 }
 
 TOOLCHAIN_ITEMS = ("ld", "as")

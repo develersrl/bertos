@@ -11,8 +11,9 @@ $filelist
       </Compiler>
       <Linker Required="yes" Options=""/>
       <Debugger IsRemote="yes" RemoteHostName="localhost" RemoteHostPort="3333" DebuggerPath="$debuggerpath">
-        <PostConnectCommands>monitor soft_reset_halt
-tbreak main</PostConnectCommands>
+        <PostConnectCommands>
+source $initscript
+	</PostConnectCommands>
         <StartupCommands></StartupCommands>
       </Debugger>      
       <ResourceCompiler Required="no" Options=""/>
