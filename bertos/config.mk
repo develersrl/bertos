@@ -10,7 +10,6 @@
 #
 # Programmer type
 # see local pgm_config.mk for programmer customization.
--include pgm_config.mk
 
 OPTCFLAGS = -ffunction-sections -fdata-sections
 #OPTCFLAGS = -funsafe-loop-optimizations

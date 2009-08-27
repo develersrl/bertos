@@ -245,9 +245,15 @@ $$(OUTDIR)/$(1)_whole.elf: bumprev $$($(1)_SRC) $$($(1)_LDSCRIPT)
 # NOTE: we retry in case of failure because the STK500 programmer is crappy
 .PHONY: flash_$(1)
 flash_$(1): $(OUTDIR)/$(1).hex flash_$(1)_local
-	PROGRAMMER_CPU=$$($(1)_PROGRAMMER_CPU) PROGRAMMER_TYPE=$(PROGRAMMER_TYPE) \
-	PROGRAMMER_PORT=$(PROGRAMMER_PORT) IMAGE_FILE=$$< \
-	$$($(1)_FLASH_SCRIPT)
+	$L "$(1): Flashing target"
+	$Q if [ ! "$$($(1)_PROGRAMMER_TYPE)" == "none" ] ; then \
+		PROGRAMMER_CPU=$$($(1)_PROGRAMMER_CPU) PROGRAMMER_TYPE=$$($(1)_PROGRAMMER_TYPE) \
+		PROGRAMMER_PORT=$$($(1)_PROGRAMMER_PORT) IMAGE_FILE=$$< \
+		$$($(1)_FLASH_SCRIPT) ; \
+	else \
+		printf "No programmer interface configured, see http://dev.bertos.org/wiki/ProgrammerInterface\n" ; \
+		exit 1 ; \
+	fi
 
 .PHONY: flash_$(1)_local
 flash_$(1)_local:
