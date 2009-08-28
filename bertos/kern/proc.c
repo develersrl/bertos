@@ -319,7 +319,7 @@ void proc_setPri(struct Process *proc, int pri)
 		if (proc != CurrentProcess)
 		{
 				proc_forbid();
-				ATOMIC(SCHED_CHANGE_PRI(proc));
+				ATOMIC(sched_reenqueue(proc));
 				proc_permit();
 		}
 }

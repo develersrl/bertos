@@ -144,7 +144,7 @@ extern REGISTER List     ProcReadyList;
  *
  * \note Performance could be improved with a different implementation of priority list.
  */
-INLINE void SCHED_CHANGE_PRI(struct Process *proc)
+INLINE void sched_reenqueue(struct Process *proc)
 {
 	IRQ_ASSERT_DISABLED();
 	LIST_ASSERT_VALID(&ProcReadyList);
