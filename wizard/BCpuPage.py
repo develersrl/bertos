@@ -61,12 +61,14 @@ class BCpuPage(BWizardPage):
             self.pageContent.frequencySpinBox.setVisible(True)
             infos = qvariant_converter.getDict(self.pageContent.cpuList.currentItem().data(Qt.UserRole))
             for key, value in infos.items():
-	        if key in CPU_DEF:
-	            if type(CPU_DEF[key]) == list:
-	                infos[key] = qvariant_converter.getStringList(value)
-		    if type(CPU_DEF[key]) == str or type(CPU_DEF) == unicode:
-	                infos[key] = qvariant_converter.getString(value)
-	        else:
+                if key in CPU_DEF:
+                    if type(CPU_DEF[key]) == list:
+                        infos[key] = qvariant_converter.getStringList(value)
+                    if type(CPU_DEF[key]) == str or type(CPU_DEF) == unicode:
+                        infos[key] = qvariant_converter.getString(value)
+                elif key.startswith("MK_"):
+                    pass
+                else:
                     del infos[key]
             self.setProjectInfo("CPU_INFOS", infos)
             self.setProjectInfo("CPU_NAME", unicode(self.pageContent.cpuList.currentItem().text()))
