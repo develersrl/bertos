@@ -220,7 +220,6 @@ def mkGenerator(project_info, makefile):
     for key, value in project_info.info("CPU_INFOS").items():
         if key.startswith("MK_"):
             cpu_mk_parameters.append("%s = %s" %(key.replace("MK", mk_data["$pname"]), value))
-    print project_info.info("CPU_INFOS")
     mk_data["$cpuparameters"] = "\n".join(cpu_mk_parameters)
     mk_data["$csrc"], mk_data["$pcsrc"], mk_data["$cppasrc"], mk_data["$cxxsrc"], mk_data["$asrc"], mk_data["$constants"] = csrcGenerator(project_info)
     mk_data["$prefix"] = replaceSeparators(project_info.info("TOOLCHAIN")["path"].split("gcc")[0])
