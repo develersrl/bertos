@@ -61,16 +61,19 @@ class BCpuPage(BWizardPage):
             self.pageContent.frequencySpinBox.setVisible(True)
             infos = qvariant_converter.getDict(self.pageContent.cpuList.currentItem().data(Qt.UserRole))
             for key, value in infos.items():
-                if type(CPU_DEF[key]) == list:
-                    infos[key] = qvariant_converter.getStringList(value)
-                if type(CPU_DEF[key]) == str or type(CPU_DEF) == unicode:
-                    infos[key] = qvariant_converter.getString(value)
+	        if key in CPU_DEF:
+	            if type(CPU_DEF[key]) == list:
+	                infos[key] = qvariant_converter.getStringList(value)
+		    if type(CPU_DEF[key]) == str or type(CPU_DEF) == unicode:
+	                infos[key] = qvariant_converter.getString(value)
+	        else:
+                    del infos[key]
             self.setProjectInfo("CPU_INFOS", infos)
             self.setProjectInfo("CPU_NAME", unicode(self.pageContent.cpuList.currentItem().text()))
             self.setProjectInfo("SELECTED_FREQ", unicode(long(self.pageContent.frequencySpinBox.value())))
             tag_dict = self.projectInfo("ALL_CPU_TAGS")
             for tag in tag_dict:
-                if tag in infos["CPU_TAGS"] + [infos["CPU_NAME"], infos["CORE_CPU"], infos["TOOLCHAIN"]]:
+                if tag in infos["CPU_TAGS"] + [infos["CPU_NAME"], infos["TOOLCHAIN"]]:
                     tag_dict[tag] = True
                 else:
                     tag_dict[tag] = False

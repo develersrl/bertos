@@ -55,39 +55,31 @@ TOOLCHAIN = "arm"
 CORE_CPU = "arm7tdmi"
 
 # CPU type used for flashing/debugging
-PROGRAMMER_CPU = "at91sam7"
+MK_PROGRAMMER_CPU = "at91sam7"
 
 # Name of the flag used by the build system to pass to the compiler the CPU type.
-CPU_FLAG_NAME = "CPU"
+MK_CPU = CORE_CPU
 
 # CPU default clock frequency
 CPU_DEFAULT_FREQ = "48023000UL"
 
 # Special CPU related tags.
-CPU_TAGS = ["at91"]
+CPU_TAGS = ["at91", CORE_CPU]
 
 # Where are locate the bertos directories
 SCRIPT_DIR = CPU_DIR + "arm/scripts/"
 HW_DIR = CPU_DIR + "arm/hw/"
-DRV_DIR = CPU_DIR + "arm/drv/"
+PROG_SCRIPT_DIR = "prog_scripts/arm/"
 
-FLASH_SCRIPT = SCRIPT_DIR + "flash.sh"
-DEBUG_SCRIPT = SCRIPT_DIR + "debug.sh"
-GDB_INIT_SCRIPT = SCRIPT_DIR + "openocd/gdbinit-sam7"
+MK_FLASH_SCRIPT = PROG_SCRIPT_DIR + "flash.sh"
+MK_DEBUG_SCRIPT = PROG_SCRIPT_DIR + "debug.sh"
+MK_GDB_INIT_SCRIPT = PROG_SCRIPT_DIR + "openocd/gdbinit-sam7"
 
 # Common GCC flags.
-CPPA_FLAGS = [ "-O0", "-g -gdwarf-2", "-g -gen-debug" ]
-CPP_FLAGS = [ "-O0", "-g3 -gdwarf-2", "-fverbose-asm", "-I" + CPU_DIR + "arm/" ]
-LD_FLAGS = [ "-nostartfiles", "-Wl,--no-warn-mismatch" ]
-# CRT file.
-CPPA_SRC = [ HW_DIR + "crtat91sam7_rom.S"]
+MK_CPPAFLAGS = "-O0 -g -gdwarf-2 -g -gen-debug"
+MK_CPU_CPPFLAGS = "-O0 -g3 -gdwarf-2 -fverbose-asm -I" + CPU_DIR + "arm/"
+MK_LDFLAGS = "-nostartfiles -Wl,--no-warn-mismatch"
 
-# For this cpu core BeRTOS supports these drivers:
-SUPPORTED_DRV = [ "adc",
-		  "kdebug",
-		  "pwm",
-		  "ser",
-		  "stepper",
-		  "timer",
-		  "twi" ]
+# CRT file.
+MK_CPPASRC = [ HW_DIR + "crtat91sam7_rom.S"]
 

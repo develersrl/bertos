@@ -48,6 +48,6 @@ CPU_DESC += [ "64 Kbytes internal flash memory",
 	      "16 Kbytes internal SRAM memory" ]
 
 # GCC flags for this cpu.
-CPP_FLAGS += [ "-D__ARM_AT91SAM7S64__" ]
-LD_FLAGS += [ "-T " + SCRIPT_DIR + "at91sam7_64_rom.ld" ]
+MK_CPU_CPPFLAGS += " -D__ARM_AT91SAM7S64__"
+MK_LDFLAGS += " -T " + SCRIPT_DIR + "at91sam7_64_rom.ld"
 

@@ -76,7 +76,7 @@ def loadBertosProject(project_file):
         tag_dict[element] = False
     infos = project_info.info("CPU_INFOS")
     for tag in tag_dict:
-        if tag in infos["CPU_TAGS"] + [infos["CPU_NAME"], infos["CORE_CPU"], infos["TOOLCHAIN"]]:
+        if tag in infos["CPU_TAGS"] + [infos["CPU_NAME"], infos["TOOLCHAIN"]]:
             tag_dict[tag] = True
         else:
             tag_dict[tag] = False
@@ -216,19 +216,15 @@ def mkGenerator(project_info, makefile):
     mk_data = {}
     mk_data["$pname"] = os.path.basename(project_info.info("PROJECT_PATH"))
     mk_data["$cpuclockfreq"] = project_info.info("SELECTED_FREQ")
-
     cpu_mk_parameters = []
     for key, value in project_info.info("CPU_INFOS").items():
         if key.startswith("MK_"):
-            cpu_mk_parameters.append("%s = %s" %(key.replace("MK_", mk_data["$pname"]), value)
+            cpu_mk_parameters.append("%s = %s" %(key.replace("MK_", mk_data["$pname"]), value))
     mk_data["$cpuparameters"] = "\n".join(cpu_mk_parameters)
     mk_data["$csrc"], mk_data["$pcsrc"], mk_data["$cppasrc"], mk_data["$cxxsrc"], mk_data["$asrc"], mk_data["$constants"] = csrcGenerator(project_info)
     mk_data["$prefix"] = replaceSeparators(project_info.info("TOOLCHAIN")["path"].split("gcc")[0])
     mk_data["$suffix"] = replaceSeparators(project_info.info("TOOLCHAIN")["path"].split("gcc")[1])
     mk_data["$main"] = os.path.basename(project_info.info("PROJECT_PATH")) + "/main.c"
-    mk_data["$programmercpu"] = project_info.info("CPU_INFOS")["PROGRAMMER_CPU"]
-    mk_data["$flashscript"] = project_info.info("CPU_INFOS")["FLASH_SCRIPT"]
-    mk_data["$debugscript"] = project_info.info("CPU_INFOS")["DEBUG_SCRIPT"]
     for key in mk_data:
         while makefile.find(key) != -1:
             makefile = makefile.replace(key, mk_data[key])
@@ -419,7 +415,6 @@ def getTagSet(cpu_info):
     for cpu in cpu_info:
         tag_set |= set([cpu["CPU_NAME"]])
         tag_set |= set(cpu["CPU_TAGS"])
-        tag_set |= set([cpu["CORE_CPU"]])
         tag_set |= set([cpu["TOOLCHAIN"]])
     return tag_set
         
