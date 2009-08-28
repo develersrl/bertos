@@ -215,16 +215,13 @@ def mkGenerator(project_info, makefile):
     """
     mk_data = {}
     mk_data["$pname"] = os.path.basename(project_info.info("PROJECT_PATH"))
-    mk_data["$cpuflag"] = project_info.info("CPU_INFOS")["CPU_FLAG_NAME"]
-    mk_data["$cpuname"] = project_info.info("CPU_INFOS")["CORE_CPU"]
     mk_data["$cpuclockfreq"] = project_info.info("SELECTED_FREQ")
-    mk_data["$cflags"] = " ".join(project_info.info("CPU_INFOS")["C_FLAGS"])
-    mk_data["$ldflags"] = " ".join(project_info.info("CPU_INFOS")["LD_FLAGS"])
-    mk_data["$cppflags"] = " ".join(project_info.info("CPU_INFOS")["CPP_FLAGS"])
-    mk_data["$cppaflags"] = " ".join(project_info.info("CPU_INFOS")["CPPA_FLAGS"])
-    mk_data["$cxxflags"] = " ".join(project_info.info("CPU_INFOS")["CXX_FLAGS"])
-    mk_data["$asflags"] = " ".join(project_info.info("CPU_INFOS")["AS_FLAGS"])
-    mk_data["$arflags"] = " ".join(project_info.info("CPU_INFOS")["AR_FLAGS"])
+
+    cpu_mk_parameters = []
+    for key, value in project_info.info("CPU_INFOS").items():
+        if key.startswith("MK_"):
+            cpu_mk_parameters.append("%s = %s" %(key.replace("MK_", mk_data["$pname"]), value)
+    mk_data["$cpuparameters"] = "\n".join(cpu_mk_parameters)
     mk_data["$csrc"], mk_data["$pcsrc"], mk_data["$cppasrc"], mk_data["$cxxsrc"], mk_data["$asrc"], mk_data["$constants"] = csrcGenerator(project_info)
     mk_data["$prefix"] = replaceSeparators(project_info.info("TOOLCHAIN")["path"].split("gcc")[0])
     mk_data["$suffix"] = replaceSeparators(project_info.info("TOOLCHAIN")["path"].split("gcc")[1])
