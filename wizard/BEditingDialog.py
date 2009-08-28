@@ -40,7 +40,8 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from bertos_utils import loadBertosProject, bertosVersion, getToolchainName, createBertosProject
-from toolchain_validation import validateToolchain
+from BToolchainPage import BToolchainPage
+from BVersionPage import BVersionPage
 import qvariant_converter
 import BModulePage
 
@@ -73,62 +74,52 @@ class BEditingDialog(QDialog):
 
     def setupMenu(self):
         self.menu = QMenu(self.tr("Advanced options"))
-        self.setupToolchainMenu()
-        self.menu.addMenu(self.toolchain_menu)
-        self.setupVersionMenu()
-        self.menu.addMenu(self.version_menu)
-
-    def setupToolchainMenu(self):
-        self.toolchain_menu = QMenu(self.tr("select toolchain"))
-        self.toolchain_actions = []
-        action_group = QActionGroup(self.toolchain_menu)
-        for toolchain in sorted(self.toolchains()):
-            info = validateToolchain(toolchain)
-            if info[0]:
-                name = getToolchainName(info[1])
-            else:
-                name = toolchain
-            action = self.toolchain_menu.addAction(name)
-            action_group.addAction(action)
-            action.setCheckable(True)
-            action.setChecked(True if toolchain == self.currentToolchain()["path"] else False)
-            action.setData(qvariant_converter.convertString(toolchain))
-            self.toolchain_actions.append(action)
-
-    def setupVersionMenu(self):
-        self.version_menu = QMenu(self.tr("select BeRTOS version"))
-        self.version_actions = []
-        action_group = QActionGroup(self.version_menu)
-        versions = [(path, bertosVersion(path)) for path in self.versions()]
-        for path, version in versions: 
-            action = self.version_menu.addAction(version)
-            action_group.addAction(action)
-            action.setCheckable(True)
-            action.setChecked(True if path == self.currentVersion() else False)
-            action.setData(qvariant_converter.convertString(path))
-            self.version_actions.append(action)
+        self.change_toolchain = QAction(self.tr("Change toolchain"), self)
+        self.change_bertos_version = QAction(self.tr("Change BeRTOS version"), self)
+        self.menu.addAction(self.change_toolchain)
+        self.menu.addAction(self.change_bertos_version)
 
     def connectSignals(self):
-        for toolchain_action in self.toolchain_actions:
-            self.connect(toolchain_action, SIGNAL("toggled(bool)"), lambda x, toolchain_action=toolchain_action: self.toolchainChanged(
-                qvariant_converter.getString(toolchain_action.data()),
-                x
-            ))
-        for version_action in self.version_actions:
-            self.connect(version_action, SIGNAL("toggled(bool)"), lambda x, version_action=version_action: self.versionChanged(
-                qvariant_converter.getString(version_action.data()),
-                x
-            ))
+        self.connect(self.change_toolchain, SIGNAL("triggered(bool)"), self.changeToolchain)
+        self.connect(self.change_bertos_version, SIGNAL("triggered(bool)"), self.changeBertosVersion)
         self.connect(self.apply_button, SIGNAL("clicked()"), self.apply)
         self.connect(self.cancel_button, SIGNAL("clicked()"), self.reject)
 
-    def toolchainChanged(self, toolchain, activated):
-        if activated:
-            self.setCurrentToolchain(toolchain)
-
-    def versionChanged(self, version, activated):
-        if activated:
-            self.setCurrentVersion(version)
+    def changeToolchain(self):
+        dialog = QDialog()
+        layout = QVBoxLayout()
+        toolchain_page = BToolchainPage()
+        toolchain_page.reloadData()
+        layout.addWidget(toolchain_page)
+        button_layout = QHBoxLayout()
+        button_layout.addStretch()
+        cancel_button = QPushButton(self.tr("Cancel")) 
+        button_layout.addWidget(cancel_button)
+        ok_button = QPushButton(self.tr("Ok"))
+        button_layout.addWidget(ok_button)
+        dialog.connect(cancel_button, SIGNAL("clicked()"), dialog.reject)
+        layout.addLayout(button_layout)
+        dialog.setLayout(layout)
+        dialog.connect(ok_button, SIGNAL("clicked()"), dialog.accept)
+        dialog.exec_()
+    
+    def changeBertosVersion(self):
+        dialog = QDialog()
+        layout = QVBoxLayout()
+        version_page = BVersionPage()
+        version_page.reloadData()
+        layout.addWidget(version_page)
+        button_layout = QHBoxLayout()
+        button_layout.addStretch()
+        cancel_button = QPushButton(self.tr("Cancel")) 
+        button_layout.addWidget(cancel_button)
+        ok_button = QPushButton(self.tr("Ok"))
+        button_layout.addWidget(ok_button)
+        dialog.connect(cancel_button, SIGNAL("clicked()"), dialog.reject)
+        layout.addLayout(button_layout)
+        dialog.setLayout(layout)
+        dialog.connect(ok_button, SIGNAL("clicked()"), dialog.accept)
+        dialog.exec_()
 
     def apply(self):
         createBertosProject(self.module_page.project(), edit=True)
