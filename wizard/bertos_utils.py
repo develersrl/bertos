@@ -218,7 +218,7 @@ def mkGenerator(project_info, makefile):
     mk_data["$cpuclockfreq"] = project_info.info("SELECTED_FREQ")
     cpu_mk_parameters = []
     for key, value in project_info.info("CPU_INFOS").items():
-        if key.startswith("MK_"):
+        if key.startswith(const.MK_PARAM_ID):
             cpu_mk_parameters.append("%s = %s" %(key.replace("MK", mk_data["$pname"]), value))
     mk_data["$cpuparameters"] = "\n".join(cpu_mk_parameters)
     mk_data["$csrc"], mk_data["$pcsrc"], mk_data["$cppasrc"], mk_data["$cxxsrc"], mk_data["$asrc"], mk_data["$constants"] = csrcGenerator(project_info)

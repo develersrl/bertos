@@ -83,3 +83,5 @@ MODULE_DEFINITION = {
     "module_hw": "module_hw",
     "module_supports": "module_supports",
 }
+
+MK_PARAM_ID = "MK_"
