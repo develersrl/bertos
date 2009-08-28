@@ -69,11 +69,11 @@ CPU_TAGS = ["at91", CORE_CPU]
 # Where are locate the bertos directories
 SCRIPT_DIR = CPU_DIR + "arm/scripts/"
 HW_DIR = CPU_DIR + "arm/hw/"
-PROG_SCRIPT_DIR = "prog_scripts/arm/"
 
-MK_FLASH_SCRIPT = PROG_SCRIPT_DIR + "flash.sh"
-MK_DEBUG_SCRIPT = PROG_SCRIPT_DIR + "debug.sh"
-MK_GDB_INIT_SCRIPT = PROG_SCRIPT_DIR + "openocd/gdbinit-sam7"
+MK_FLASH_SCRIPT = PRG_SCRIPTS_DIR + "arm/flash.sh"
+MK_DEBUG_SCRIPT = PRG_SCRIPTS_DIR + "arm/debug.sh"
+
+GDB_INIT_SCRIPT = PRG_SCRIPTS_DIR + "arm/openocd/gdbinit-sam7"
 
 # Common GCC flags.
 MK_CPPAFLAGS = "-O0 -g -gdwarf-2 -g -gen-debug"
@@ -81,5 +81,4 @@ MK_CPU_CPPFLAGS = "-O0 -g3 -gdwarf-2 -fverbose-asm -I" + CPU_DIR + "arm/"
 MK_LDFLAGS = "-nostartfiles -Wl,--no-warn-mismatch"
 
 # CRT file.
-MK_CPPASRC = [ HW_DIR + "crtat91sam7_rom.S"]
-
+MK_CPPASRC = HW_DIR + "crtat91sam7_rom.S"

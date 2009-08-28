@@ -42,3 +42,5 @@
 
 # BeRTOS cpu directory
 CPU_DIR = "bertos/cpu/"
+
+PRG_SCRIPTS_DIR = "bertos/prg_scripts/"

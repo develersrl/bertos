@@ -58,10 +58,9 @@ CPU_DEFAULT_FREQ = "8000000UL"
 
 # Where are locate the bertos directories
 SCRIPT_DIR = CPU_DIR + "avr/scripts/"
-PROG_SCRIPT_DIR = "prog_scripts/avr/"
 
-MK_FLASH_SCRIPT = PROG_SCRIPT_DIR + "flash.sh"
-MK_DEBUG_SCRIPT = PROG_SCRIPT_DIR + "debug.sh"
+MK_FLASH_SCRIPT = PRG_SCRIPTS_DIR + "avr/flash.sh"
+MK_DEBUG_SCRIPT = PRG_SCRIPTS_DIR + "avr/debug.sh"
 
 # Common GCC flags.
 MK_CPU_CPPFLAGS = "-Os -fno-strict-aliasing -I" + CPU_DIR + "avr/"
