@@ -67,7 +67,7 @@ class BCpuPage(BWizardPage):
                     if type(CPU_DEF[key]) == str or type(CPU_DEF) == unicode:
                         infos[key] = qvariant_converter.getString(value)
                 elif key.startswith("MK_"):
-                    pass
+                    infos[key] = qvariant_converter.getString(value)
                 else:
                     del infos[key]
             self.setProjectInfo("CPU_INFOS", infos)
