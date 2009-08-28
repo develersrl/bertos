@@ -55,6 +55,8 @@ from BOutputPage import BOutputPage
 from BCreationPage import BCreationPage
 from BFinalPage import BFinalPage
 
+from BEditingDialog import BEditingDialog
+
 import bertos_utils
 
 def newProject():
@@ -74,11 +76,10 @@ def newProject():
             subprocess.call(command_line + " \"" + relevant_file + "\"")
     sys.exit()
     
-def editProject():
-    page_list = [BOpenPage, BVersionPage, BCpuPage, BToolchainPage, BModulePage, BOutputPage, BCreationPage, BFinalPage]
-    wizard = BWizard.BWizard(page_list)
-    wizard.show()
-    wizard.exec_()
+def editProject(project_file):
+    QApplication.instance().project = bertos_utils.loadBertosProject(project_file)
+    dialog = BEditingDialog()
+    dialog.exec_()
 
 def showStartPage():
     QApplication.instance().dialog = BStartPage.BStartPage()
@@ -95,17 +96,11 @@ def main():
     if not (hasattr(sys, "frozen") and sys.frozen) and newer("bertos.qrc", "bertos.rcc"):
         os.system("rcc -binary bertos.qrc -o bertos.rcc")
     QResource.registerResource("bertos.rcc")
-    if "--create" in sys.argv and "--edit" not in sys.argv:
-        newProject()
-    elif "--edit" in sys.argv and "--create" not in sys.argv:
-        editProject()
-    elif "--create" in sys.argv and "--edit" in sys.argv:
-        # TODO need an explaining message
-        print " ".join(sys.argv)
-        print "Invalid usage!"
-        pass
+    if len(sys.argv) == 3 and sys.argv[1] == "--edit":
+        editProject(sys.argv[2])
     else:
         newProject()
+ 
 
 if __name__ == '__main__':
     main()
