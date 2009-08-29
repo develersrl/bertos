@@ -33,7 +33,7 @@ without giving up reliability and performace.
 
 To achieve the highest possible reusability, most BeRTOS components are
 designed for fine-grained modularity and minimal external dependencies.
-Most non-essential features can be configured out for application with small
+Most non-essential features can be configured out for applications with small
 memory footprint requirements.
 
 \section features Features
