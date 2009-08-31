@@ -65,6 +65,7 @@
 #include <drv/timer.h>
 
 #include <cpu/byteorder.h>
+#include <cpu/detect.h>
 
 #include <string.h>
 
@@ -83,7 +84,24 @@ void pocketcmd_poll(struct PocketCmdCtx *ctx)
 		if (msg.addr == ctx->addr ||
 		    msg.addr == POCKETBUS_BROADCAST_ADDR)
 		{
-			const PocketCmdHdr *hdr = (const PocketCmdHdr *)msg.payload;
+
+			#if CPU_AVR
+				const PocketCmdHdr *hdr = (const PocketCmdHdr *)msg.payload;
+			#else
+				#if !CPU_ARM
+					#warning Fix alignment problem..
+					/*
+					 * The code below make one memcopy, this the only way to
+					 * solve alignment problem on ARM. If you are use other
+					 * architecture you should find other way to optimize
+					 * this code.
+					 */
+				#endif
+				PocketCmdHdr hd;
+				memcpy(&hd, msg.payload, sizeof(PocketCmdHdr));
+				const PocketCmdHdr *hdr =  &hd;
+			#endif
+
 			pocketcmd_t cmd = be16_to_cpu(hdr->cmd);
 
 			/* We're no longer waiting for a reply (in case we were) */

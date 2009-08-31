@@ -208,12 +208,16 @@ bool pocketbus_recv(struct PocketBusCtx *ctx, struct PocketMsg *msg)
 
 				/* Compute checksum */
 				rotating_update(ctx->buf, ctx->len, &ctx->in_cks);
-				rotating_t recv_cks = be16_to_cpu(*((rotating_t *)(ctx->buf + ctx->len)));
+				uint8_t cks_h = *(ctx->buf + ctx->len);
+				uint8_t cks_l = *(ctx->buf + ctx->len + 1);
+
+				rotating_t recv_cks = (cks_h << 8) | cks_l;
 
 				/* Checksum check */
 				if (recv_cks == ctx->in_cks)
 				{
-					PocketBusHdr *hdr = (PocketBusHdr *)(ctx->buf);
+					PocketBusHdr *hdr = (PocketBusHdr *)ctx;
+
 					/* Check packet version */
 					if (hdr->ver == POCKETBUS_VER)
 					{

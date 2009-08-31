@@ -88,15 +88,16 @@ typedef struct PocketBusHdr
  */
 typedef struct PocketBusCtx
 {
+	uint8_t buf[CONFIG_POCKETBUS_BUFLEN]; ///< receiving Buffer
 	struct KFile *fd;   ///< File descriptor
 	bool sync;           ///< Status flag: true if we have received an STX, false otherwise
 	bool escape;         ///< Status flag: true if we are in escape mode, false otherwise
 	rotating_t in_cks;   ///< Checksum computation for received data.
 	rotating_t out_cks;  ///< Checksum computation for transmitted data.
 	pocketbus_len_t len; ///< Received length
-	uint8_t buf[CONFIG_POCKETBUS_BUFLEN]; ///< receiving Buffer
 } PocketBusCtx;
 
+STATIC_ASSERT(offsetof(PocketBusCtx, buf) == 0);
 /**
  * Structure holding pocketBus message parameters.
  */
