@@ -138,9 +138,7 @@ class BEditingDialog(QDialog):
                     modules, lists, configurations, files = project.info("MODULES"), project.info("LISTS"), project.info("CONFIGURATIONS"), project.info("FILES")
                     bertos_utils.loadSourceTree(version_page.project())
                     bertos_utils.loadModuleData(version_page.project(), True)
-                    modules_, lists_, configurations_, files_ = project.info("MODULES"), project.info("LISTS"), project.info("CONFIGURATIONS"), project.info("FILES")
                     self.module_page.fillModuleTree()
-                    print modules == modules_, lists == lists_, configurations == configurations_, files == files_
 
     def apply(self):
         createBertosProject(self.module_page.project(), edit=True)
