@@ -40,12 +40,14 @@
 #ifndef HW_SD_H
 #define HW_SD_H
 
-#define SD_CS_INIT() do { PIOA_PER = BV(11); PIOA_OER = BV(11); } while(0)
-#define SD_CS_ON()   do { PIOA_CODR = BV(11); } while(0)
-#define SD_CS_OFF()  do { PIOA_SODR = BV(11); } while(0)
+#warning FIXME: This is an example implementation, you must implement it
 
-#define SD_PIN_INIT()      do { PIOA_PER = BV(30) | BV(31); PIOA_PUER = BV(30) | BV(31); } while(0)
-#define SD_CARD_PRESENT()  (!(PIOA_PDSR & BV(31)))
-#define SD_WRITE_PROTECT() ((PIOA_PDSR & BV(30)))
+#define SD_CS_INIT() do { /* implement me */} while(0)
+#define SD_CS_ON()   do { /* implement me */} while(0)
+#define SD_CS_OFF()  do { /* implement me */} while(0)
+
+#define SD_PIN_INIT()      do { /* implement me */} while(0)
+#define SD_CARD_PRESENT()  true /* implement me */
+#define SD_WRITE_PROTECT() false /* implement me */
 
 #endif /* HW_SD_H */

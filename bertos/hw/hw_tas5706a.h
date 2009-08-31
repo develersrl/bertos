@@ -43,26 +43,23 @@
 #include <io/arm.h>
 #include <cfg/macros.h>
 
-#define TAS5706A_SETPOWERDOWN(val) do { if (val) PIOA_CODR = BV(6); else PIOA_SODR = BV(6); } while (0)
-#define TAS5706A_SETRESET(val)     do { if (val) PIOA_CODR = BV(7); else PIOA_SODR = BV(7); } while (0)
-#define TAS5706A_SETMUTE(val)      do { if (val) PIOA_CODR = BV(8); else PIOA_SODR = BV(8); } while (0)
+#warning FIXME: This is an example implementation, you must implement it
+
+#define TAS5706A_SETPOWERDOWN(val) do { /* implement me */ } while (0)
+#define TAS5706A_SETRESET(val)     do { /* implement me */ } while (0)
+#define TAS5706A_SETMUTE(val)      do { /* implement me */ } while (0)
 
 #define TAS5706A_PIN_INIT() \
 	do { \
 		TAS5706A_SETPOWERDOWN(true); \
 		TAS5706A_SETRESET(true); \
 		TAS5706A_SETMUTE(true); \
-		PIOA_PER = BV(6) | BV(7) | BV(8); \
-		PIOA_OER = BV(6) | BV(7) | BV(8); \
+		/* complete me */ \
 	} while (0)
 
 #define TAS5706A_MCLK_INIT() \
 	do { \
-		PIOA_PDR = BV(2); /* enable PWM pin */ \
-		PWM_CMR2 = 0; /* set prescaler to MCK, left aligned, start with low level */ \
-		PWM_CPRD2 = 4; /* 11.2896 MHz MCLK */ \
-		PWM_CDTY2 = 2; /* 50% duty */ \
-		PWM_ENA = BV(2); /* Enable PWM on MCLK pin */ \
+		/* implement me */ \
 	} while(0)
 
 
