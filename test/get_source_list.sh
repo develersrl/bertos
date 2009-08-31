@@ -40,6 +40,7 @@ OS_DIR="${BERTOS_DIR}/os"
 EMUL_DIR="${BERTOS_DIR}/emul"
 WIZARD_DIR="./wizard"
 APP_DIR="./examples"
+FAT_DIR="${BERTOS_DIR}/fs/fatfs"
 
 if [ $# \< 2 ] ; then
 	printf "You must specify a cpu target, and source file type!\n"
@@ -48,8 +49,14 @@ if [ $# \< 2 ] ; then
 	exit 1
 fi
 CPU_TARGET=$1
+EXCLUDE_DIRS="$COPY_DIR $CPU_DIR $APP_DIR $OS_DIR $WIZARD_DIR $EMUL_DIR $FAT_DIR"
+EXCLUDE_CMD="\.svn -prune "
+for i in $EXCLUDE_DIRS; do 
+	EXCLUDE_CMD="$EXCLUDE_CMD -o -path $i -prune ";
+done
+
 #Create a list of source file without a cpu specific source
-GEN_SRC=`find . \( -name \.svn -prune -o -path $COPY_DIR -prune -o -path $CPU_DIR -prune -o -path $APP_DIR  -prune -o -path $OS_DIR -prune -o -path $WIZARD_DIR -prune -o -path $EMUL_DIR -prune \) -o -name *.${2} -print | xargs`
+GEN_SRC=`find . \( -name $EXCLUDE_CMD \) -o -name *.${2} -print | xargs`
 
 #Select c and asm sources for selected cpu target
 TRG_SRC=`find ${CPU_DIR}/$CPU_TARGET -name \.svn -prune -o -name *.${2} -print | xargs`
