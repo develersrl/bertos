@@ -679,7 +679,8 @@ def loadConfigurationInfos(path):
 
 def updateConfigurationValues(def_conf, user_conf):
     for param in def_conf["paramlist"]:
-        def_conf[param[1]]["value"] = user_conf[param[1]]["value"]
+        if param[1] in user_conf and "value" in user_conf[param[1]]:
+            def_conf[param[1]]["value"] = user_conf[param[1]]["value"]
     return def_conf
 
 def findParameterType(parameter):

@@ -222,6 +222,7 @@ class BModulePage(BWizardPage):
         """
         Fills the module tree with the module entries separated in categories.
         """
+        self.pageContent.moduleTree.clear()
         modules = self.projectInfo("MODULES")
         if not modules:
             return
