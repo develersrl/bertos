@@ -63,12 +63,16 @@ def clFiles(file_dict, directory):
     directory as the base folder.
     """
     filelist = []
-    filelist.append("<VirtualDirectory Name=\"%s\">" %os.path.basename(directory))
+    # Do not create an empty VDir.
+    # TODO: this is *really* ugly, but an empty VDir is worse
+    if directory:
+        filelist.append("<VirtualDirectory Name=\"%s\">" %os.path.basename(directory))
     for f in file_dict[directory]["files"]:
         filelist.append("<File Name=\"%s\"/>" %os.path.join(directory, f))
     for d in file_dict[directory]["dirs"]:
         filelist += clFiles(file_dict, os.path.join(directory, d))
-    filelist.append("</VirtualDirectory>")
+    if directory:
+        filelist.append("</VirtualDirectory>")
     return filelist
 
 def findSources(path):
