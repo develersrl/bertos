@@ -134,10 +134,10 @@ class BEditingDialog(QDialog):
                 ) == QMessageBox.Ok:
                     version_page.setProjectInfo("SOURCES_PATH", version)
                     version_page.setProjectInfo("OLD_SOURCES_PATH", current_version)
-                    project = version_page.project()
-                    modules, lists, configurations, files = project.info("MODULES"), project.info("LISTS"), project.info("CONFIGURATIONS"), project.info("FILES")
+                    enabled_modules = bertos_utils.enabledModules(version_page.project())
                     bertos_utils.loadSourceTree(version_page.project())
                     bertos_utils.loadModuleData(version_page.project(), True)
+                    bertos_utils.setEnabledModules(version_page.project(), enabled_modules)
                     self.module_page.fillModuleTree()
 
     def apply(self):

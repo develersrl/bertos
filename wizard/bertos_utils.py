@@ -82,11 +82,21 @@ def loadBertosProject(project_file):
             tag_dict[tag] = False
     project_info.setInfo("ALL_CPU_TAGS", tag_dict)
     loadModuleData(project_info, True)
+    setEnabledModules(project_info, project_data["ENABLED_MODULES"])
+    return project_info
+
+def setEnabledModules(project_info, enabled_modules):
     modules = project_info.info("MODULES")
     for module, information in modules.items():
-        information["enabled"] = module in project_data["ENABLED_MODULES"]
+        information["enabled"] = module in enabled_modules
     project_info.setInfo("MODULES", modules)
-    return project_info
+
+def enabledModules(project_info):
+    enabled_modules = []
+    for name, module in project_info.info("MODULES").items():
+        if module["enabled"]:
+            enabled_modules.append(name)
+    return enabled_modules
 
 def mergeSources(srcdir, new_sources, old_sources):
     # The current mergeSources function provide only a raw copy of the sources in the
