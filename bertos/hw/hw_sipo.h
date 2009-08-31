@@ -43,80 +43,55 @@
 #ifndef HW_SIPO_H
 #define HW_SIPO_H
 
-#warning TODO:This is an example implementation, you must implement it!
+/**
+ * Define generic macro to set pins logic level
+ */
+#define SIPO_SET_LEVEL_LOW(dev)    do { /* Implement me! */   } while (0)
+#define SIPO_SET_LEVEL_HIGH(dev)   do { /* Implement me! */   } while (0)
 
 
 /**
- * Mapping sipo connection on board.
- * See scheme to more info.
+ * Generate one low pulse on select line.
  */
-typedef enum SipoMap {
+#define PULSE_LOW(dev)    do { /* Implement me! */   } while (0)
 
-	/* Add device here */
-
-	SIPO_CNT
-} SipoMap;
+/**
+ * Generate one hight pulse on select line.
+ */
+#define PULSE_HIGH(dev)     do { /* Implement me! */   } while (0)
 
 
 /**
- * Define the macros needed to set the serial input bit of SIPO device
- * low or high.
+ * Define the procedure to drive serial input in sipo device (SI).
  */
-#define SIPO_SI_HIGH() do { /* Implement me! */ } while (0)
-#define SIPO_SI_LOW()  do { /* Implement me! */ } while (0)
+#define SIPO_SI_HIGH()   do { /* Implement me! */   } while (0)
+#define SIPO_SI_LOW()    do { /* Implement me! */   } while (0)
 
 /**
- * Drive pin to load the bit, presented in serial-in pin,
- * into sipo shift register.
+ * Drive clock to shift SI data into latch.
  */
-#define SIPO_SI_CLOCK(clk_pol) \
-	do { \
-		/* Implement me! */ \
-		(void)clk_pol; \
-	} while (0)
+#define SIPO_SI_CLOCK(clk_pol)       do { /* Implement me! */   } while (0)
 
 /**
- * Clock the content of shift register to output.
+ * Do everything needed in order to load dato into sipo.
  */
-#define SIPO_LOAD(device, load_pol)  \
-	do { \
-		/* Implement me! */ \
-		(void)device; \
-		(void)load_pol; \
-	} while (0)
+#define SIPO_LOAD(device, load_pol)   do { /* Implement me! */   } while (0)
 
 /**
  * Enable the shift register output.
  */
-#define SIPO_ENABLE() /* Implement me! */
+#define SIPO_ENABLE()             do { /* Implement me! */   } while (0)
 
 /**
- * Set logic level for load signal
+ * Set polarity for Load, Clk, SI signals.
  */
-#define SIPO_SET_LD_LEVEL(device, load_pol) \
-	do { \
-		/* Implement me! */ \
-		(void)device; \
-		(void)load_pol; \
-	} while (0)
-
+#define SIPO_SET_LD_LEVEL(device, load_pol)  do { /* Implement me! */   } while (0)
+#define SIPO_SET_CLK_LEVEL(clock_pol)        do { /* Implement me! */   } while (0)
+#define SIPO_SET_SI_LEVEL()       do { /* Implement me! */   } while (0)
 
 /**
- * Sel logic level for clock signal
+ * Do anything that needed to init sipo pins.
  */
-#define SIPO_SET_CLK_LEVEL(clock_pol)  \
-	do { \
-		/* Implement me! */ \
-		(void)clock_pol; \
-	} while (0)
-
-
-/**
- * Do everything needed in order to init the SIPO pins.
- */
-#define SIPO_INIT_PIN() \
-	do { \
-		/* Implement me! */ \
-	} while(0)
+#define SIPO_INIT_PIN()           do { /* Implement me! */   } while (0)
 
 #endif /* HW_SIPO_H */
