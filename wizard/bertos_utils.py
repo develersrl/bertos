@@ -89,8 +89,13 @@ def loadBertosProject(project_file):
     return project_info
 
 def mergeSources(srcdir, new_sources, old_sources):
+    # The current mergeSources function provide only a raw copy of the sources in the
+    # created project.
+    #
     # TODO: implement the three way merge algorithm
-    pass
+    #
+    shutil.rmtree(srcdir, True)
+    copytree.copytree(sources_dir + "/bertos", srcdir, ignore_list=const.IGNORE_LIST)
 
 def projectFileGenerator(project_info):
     directory = project_info.info("PROJECT_PATH")
