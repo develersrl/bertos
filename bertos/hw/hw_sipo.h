@@ -69,7 +69,7 @@ typedef enum SipoMap {
  * Drive pin to load the bit, presented in serial-in pin,
  * into sipo shift register.
  */
-#define SIPO_SI_CLOCK(clk_pol)
+#define SIPO_SI_CLOCK(clk_pol) \
 	do { \
 		/* Implement me! */ \
 		(void)clk_pol; \
