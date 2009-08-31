@@ -289,3 +289,5 @@ class BToolchainPage(BWizardPage):
         """
         self.pageContent.removeButton.setEnabled(True)
         
+    def currentItem(self):
+        return self.pageContent.toolchainList.currentItem()

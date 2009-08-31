@@ -110,6 +110,7 @@ def projectFileGenerator(project_info):
 def createBertosProject(project_info, edit=False):
     directory = project_info.info("PROJECT_PATH")
     sources_dir = project_info.info("SOURCES_PATH")
+    old_sources_dir = project_info.info("OLD_SOURCES_PATH")
     if not edit:
         if os.path.isdir(directory):
             shutil.rmtree(directory, True)        
@@ -124,13 +125,11 @@ def createBertosProject(project_info, edit=False):
         # If not in editing mode it copies all the bertos sources in the /bertos subdirectory of the project
         shutil.rmtree(srcdir, True)
         copytree.copytree(sources_dir + "/bertos", srcdir, ignore_list=const.IGNORE_LIST)
-    else:
+    elif old_sources_dir:
         # If in editing mode it merges the current bertos sources with the selected ones
         # TODO: implement the three way merge algotihm
         #
-        # mergeSources(srcdir, sources_dir, old_sources_dir)
-        #
-        pass
+        mergeSources(srcdir, sources_dir, old_sources_dir)
     # Destination makefile
     makefile = directory + "/Makefile"
     makefile = open("mktemplates/Makefile").read()

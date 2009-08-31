@@ -251,3 +251,4 @@ class BVersionPage(BWizardPage):
             if version in winreg_importer.getBertosDirs():
                 return True
         return False
+

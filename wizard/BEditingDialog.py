@@ -101,7 +101,9 @@ class BEditingDialog(QDialog):
         layout.addLayout(button_layout)
         dialog.setLayout(layout)
         dialog.connect(ok_button, SIGNAL("clicked()"), dialog.accept)
-        dialog.exec_()
+        if dialog.exec_():
+            toolchain = qvariant_converter.getStringDict(toolchain_page.currentItem().data(Qt.UserRole))
+            toolchain_page.setProjectInfo("TOOLCHAIN", toolchain)
     
     def changeBertosVersion(self):
         dialog = QDialog()
@@ -119,7 +121,18 @@ class BEditingDialog(QDialog):
         layout.addLayout(button_layout)
         dialog.setLayout(layout)
         dialog.connect(ok_button, SIGNAL("clicked()"), dialog.accept)
-        dialog.exec_()
+        current_version = version_page.projectInfo("SOURCES_PATH")
+        if dialog.exec_():
+            version = qvariant_converter.getString(version_page.currentItem().data(Qt.UserRole))
+            if version != current_version:
+                if QMessageBox.question(
+                    version_page,
+                    self.tr("BeRTOS version update"),
+                    self.tr("Changing the BeRTOS version will destroy all the modification done on the BeRTOS sources"),
+                    QMessageBox.Ok | QMessageBox.Cancel
+                ) == QMessageBox.Ok:
+                    version_page.setProjectInfo("SOURCES_PATH", version)
+                    version_page.setProjectInfo("OLD_SOURCES_PATH", current_version)
 
     def apply(self):
         createBertosProject(self.module_page.project(), edit=True)
