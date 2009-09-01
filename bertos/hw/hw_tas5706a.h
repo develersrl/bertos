@@ -40,7 +40,6 @@
 #ifndef HW_TAS5706A_H
 #define HW_TAS5706A_H
 
-#include <io/arm.h>
 #include <cfg/macros.h>
 
 #warning FIXME: This is an example implementation, you must implement it
