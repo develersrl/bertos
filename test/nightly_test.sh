@@ -54,6 +54,11 @@ printf "Starting nightlytest..\n"
 
 	#Strip away TODOs and FIXME
 	find $BERTOS_DIR -name "*.[ch]" | xargs perl -p -i -e 's/^\s*#warning\s*(TODO|FIXME).*//g;'
+	CFG_LIST=`find $BERTOS_DIR/cfg -name "cfg_*.h"`
+	for i in $CFG_LIST ;
+	do
+		$TEST_DIR/enablecfg.py $i
+	done
 fi
 
 #Cpu targets that we want to test
@@ -67,7 +72,6 @@ done
 #Clean and launch make on all
 make -f ${MAKEFILE_TEST_DIR}/Makefile.test clean
 make -f ${MAKEFILE_TEST_DIR}/Makefile.test
-
 
 if [ $OPTS = 1 ] ; then
 	#Restore original sources
