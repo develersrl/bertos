@@ -102,9 +102,13 @@ These drivers are: <b> system timer </b>, <b> debug system </b> and <b> serial c
 Here is the list of CPU whose internal core drivers are supported:
 <table>
 <tr> <td> <b> Family </b> </td> <td> <b> CPU </b> </td> <td> <b> Core driver status </b> </td> </tr>
+<tr> <td> ARM</td>  <td>AT91SAM7S64</td>  <td>stable</td> </tr>
+<tr> <td> ARM</td>  <td>AT91SAM7S128</td>  <td>stable</td> </tr>
 <tr> <td> ARM</td>  <td>AT91SAM7S256</td>  <td>stable</td> </tr>
+<tr> <td> ARM</td>  <td>AT91SAM7S512</td>  <td>stable</td> </tr>
 <tr> <td> ARM</td>  <td>AT91SAM7X128</td>  <td>stable</td> </tr>
 <tr> <td> ARM</td>  <td>AT91SAM7X256</td>  <td>stable</td> </tr>
+<tr> <td> ARM</td>  <td>AT91SAM7X512</td>  <td>stable</td> </tr>
 <tr> <td> AVR</td>  <td>ATMega8</td>  <td>stable</td> </tr>
 <tr> <td> AVR</td>  <td>ATMega32</td>  <td>stable</td> </tr>
 <tr> <td> AVR</td>  <td>ATMega64</td>  <td>stable</td> </tr>
