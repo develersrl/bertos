@@ -72,14 +72,12 @@ static kfile_off_t fatfile_seek(struct KFile *_fd, kfile_off_t offset, KSeekMode
 	 * don't clip at end-of-file when in write mode
 	 */
 	FatFile *fd = FATFILE_CAST(_fd);
-	DWORD lseek_offset;
+	DWORD lseek_offset = 0;
 	switch (whence)
 	{
 	case KSM_SEEK_SET:
 		if (offset > 0)
 			lseek_offset = (DWORD) offset;
-		else
-			lseek_offset = 0;
 		break;
 	case KSM_SEEK_CUR:
 		if (offset > 0)
@@ -88,8 +86,6 @@ static kfile_off_t fatfile_seek(struct KFile *_fd, kfile_off_t offset, KSeekMode
 		{
 			if (fd->fat_file.fptr > (DWORD) (-offset))
 				lseek_offset = fd->fat_file.fptr - (DWORD)(-offset);
-			else
-				lseek_offset = 0;
 		}
 		break;
 	case KSM_SEEK_END:
@@ -99,8 +95,6 @@ static kfile_off_t fatfile_seek(struct KFile *_fd, kfile_off_t offset, KSeekMode
 		{
 			if (fd->fat_file.fsize > (DWORD) (-offset))
 				lseek_offset = fd->fat_file.fsize + (DWORD) offset;
-			else
-				lseek_offset = 0;
 		}
 		break;
 	}
