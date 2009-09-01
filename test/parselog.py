@@ -34,7 +34,7 @@ f = file(sys.argv[1])
 warn_suppress_cnt = 0
 for line in f:
 	if "__FILTER_NEXT_WARNING__" in line:
-		warn_suppress_cnt += 1
+		warn_suppress_cnt += 2
 	
 	if "warning" in line:
 		if warn_suppress_cnt == 0:
