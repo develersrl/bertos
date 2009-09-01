@@ -42,6 +42,7 @@
 #include "menu.h"
 
 #include "cfg/cfg_gfx.h"
+#include "cfg/cfg_arch.h"
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
 
@@ -276,7 +277,10 @@ static void menu_layout(
 		if (!(item->flags & MIF_HIDDEN))
 		{
 			/* Check if a special render function is supplied, otherwise use defaults */
-			RenderHook renderhook = (item->flags & MIF_RENDERHOOK) ? (RenderHook)item->label : menu_defaultRenderHook;
+			#if (ARCH & ARCH_NIGHTTEST)
+				#warning __FILTER_NEXT_WARNING__
+			#endif
+			RenderHook renderhook = (item->flags & MIF_RENDERHOOK) ? CONST_CAST(RenderHook, item->label) : menu_defaultRenderHook;
 
 			/* Render menuitem */
 			renderhook(menu->bitmap, ypos++, (i == selected), item);
@@ -538,6 +542,9 @@ iptr_t menu_handle(const struct Menu *menu)
 
 	/* Store currently selected item before leaving. */
 	if (menu->flags & MF_SAVESEL)
+		#if (ARCH & ARCH_NIGHTTEST)
+			#warning __FILTER_NEXT_WARNING__
+		#endif
 		CONST_CAST(struct Menu *, menu)->selected = selected;
 
 	return result;
