@@ -89,7 +89,7 @@ static size_t fake_read(KFile *fd, void *buf, size_t size)
 	memcpy(dest, test_disk, size);
 	fd->seek_pos += rd_len;
 
-	LOG_INFO("Read: real[%ld] expected[%ld]\n", rd_len, size);
+	LOG_INFO("Read: real[%zd] expected[%zd]\n", rd_len, size);
 
 	return rd_len;
 }
@@ -104,7 +104,7 @@ static size_t fake_write(KFile *fd, const void *buf, size_t size)
 	memcpy(test_disk, src, wr_len);
 	fd->seek_pos += wr_len;
 
-	LOG_INFO("Write: real[%ld] expected[%ld]\n", wr_len, size);
+	LOG_INFO("Write: real[%zd] expected[%zd]\n", wr_len, size);
 
 	return wr_len;
 }
@@ -220,7 +220,7 @@ int kfile_testRunGeneric(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t
 	 */
 	if (save_buf)
 	{
-		LOG_INFO("Saved content..form [%d] to [%ld]\n", fd->seek_pos, fd->seek_pos + size);
+		LOG_INFO("Saved content..form [%ld] to [%ld]\n", fd->seek_pos, fd->seek_pos + size);
 		kfile_read(fd, save_buf, size);
 	}
 
@@ -251,12 +251,12 @@ int kfile_testRunGeneric(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t
 		if (kfile_write(fd, save_buf, size) != size)
 			goto kfile_test_end;
 
-		LOG_INFO("Restore content..form [%d] to [%ld]\n", fd->seek_pos, fd->seek_pos + size);
+		LOG_INFO("Restore content..form [%ld] to [%ld]\n", fd->seek_pos, fd->seek_pos + size);
 	}
 	/* TEST 1 END. */
 
 	/* TEST 2 BEGIN. */
-	LOG_INFO("Test 2: write from pos [%d] to [%ld]\n", fd->size/2 , fd->size/2 + size);
+	LOG_INFO("Test 2: write from pos [%ld] to [%ld]\n", fd->size/2 , fd->size/2 + size);
 
 	/*
 	 * Go to half test size.
@@ -271,7 +271,7 @@ int kfile_testRunGeneric(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t
 	{
 		kfile_read(fd, save_buf, size);
 		kfile_seek(fd, -(kfile_off_t)size, KSM_SEEK_CUR);
-		LOG_INFO("Saved content..form [%d] to [%ld]\n", fd->seek_pos, fd->seek_pos + size);
+		LOG_INFO("Saved content..form [%ld] to [%ld]\n", fd->seek_pos, fd->seek_pos + size);
 	}
 
 	/*
@@ -292,13 +292,13 @@ int kfile_testRunGeneric(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t
 		if (kfile_write(fd, save_buf, size) != size)
 			goto kfile_test_end;
 
-		LOG_INFO("Restore content..form [%d] to [%ld]\n", fd->seek_pos, fd->seek_pos + size);
+		LOG_INFO("Restore content..form [%ld] to [%ld]\n", fd->seek_pos, fd->seek_pos + size);
 	}
 
 	/* TEST 2 END. */
 
 	/* TEST 3 BEGIN. */
-	LOG_INFO("Test 3: write outside of fd->size limit [%d]\n", fd->size);
+	LOG_INFO("Test 3: write outside of fd->size limit [%ld]\n", fd->size);
 	LOG_INFO("This test should FAIL!, you must see an assertion fail message.\n");
 
 	/*
@@ -314,7 +314,7 @@ int kfile_testRunGeneric(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t
 	{
 		kfile_read(fd, save_buf, len);
 		kfile_seek(fd, -len, KSM_SEEK_CUR);
-		LOG_INFO("Saved content..form [%d] to [%d]\n", fd->seek_pos, fd->seek_pos + len);
+		LOG_INFO("Saved content..form [%ld] to [%ld]\n", fd->seek_pos, fd->seek_pos + len);
 	}
 
 	/*
@@ -335,7 +335,7 @@ int kfile_testRunGeneric(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t
 		if ((kfile_off_t)kfile_write(fd, save_buf, len) != len)
 			goto kfile_test_end;
 
-		LOG_INFO("Restore content..form [%d] to [%d]\n", fd->seek_pos, fd->seek_pos + len);
+		LOG_INFO("Restore content..form [%ld] to [%ld]\n", fd->seek_pos, fd->seek_pos + len);
 	}
 
 	/* TEST 3 END. */
