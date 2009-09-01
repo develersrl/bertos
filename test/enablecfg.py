@@ -48,7 +48,20 @@ whitelist = [
 	'RAMP_USE_FLOATING_POINT',
 ]
 
-pattern = r'\s*#define\s+(\w+)\s+(0)\W?'
+tests = [
+	'#define T_0 0\n',
+	'#define T_1 0\n',
+	'    #define    	T_2    	0		\n',
+	'#define T_3 0    /* */\n',
+	'#define T_4 0/* */\n',
+]
+no_tests = [
+	'#define T_1 0A\n',
+	'#define T_1 0x0A/* */\n',
+	'#define T_1 0UL /* */\n',
+	'#define T_1 0UL/* */\n',
+]
+pattern = r'\s*#define\s+(\w+)\s+(0)(?:\s+|/|$)'
 
 def f(match):
 	if match.group(1) in whitelist:
@@ -59,7 +72,14 @@ def f(match):
 		ex = match.end(2) - match.end(0)
 		return data[:sx] + '1' + data[ex:]
 
-data = file(sys.argv[1]).read()
-data, count = re.subn(pattern, f, data)
-if count:
-	file(sys.argv[1], 'w').write(data)
+if len(sys.argv) == 1:
+	for t in tests:
+		print t, re.subn(pattern, f, t)[0]
+	print '-' * 42
+	for t in no_tests:
+		print t, re.subn(pattern, f, t)[0]
+else:
+	data = file(sys.argv[1]).read()
+	data, count = re.subn(pattern, f, data)
+	if count:
+		file(sys.argv[1], 'w').write(data)
