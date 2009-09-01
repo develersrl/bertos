@@ -37,6 +37,7 @@
  */
 
 #include "timer.h"
+#include "hw/hw_timer.h"
 
 #include "cfg/cfg_timer.h"
 #include "cfg/cfg_wdt.h"
