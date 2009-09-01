@@ -87,6 +87,14 @@ typedef enum SipoLoadPol
 } SipoLoadPol;
 
 /**
+ * Map sipo connection on board.
+ */
+typedef enum SipoMap
+{
+	SIPO_CNT
+} SipoMap;
+
+/**
  * Sipo KFile context structure.
  */
 typedef struct Sipo
