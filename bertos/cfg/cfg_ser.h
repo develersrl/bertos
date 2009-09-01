@@ -172,7 +172,11 @@
  */
 #define CONFIG_SER_RXTIMEOUT    -1
 
-/// Use RTS/CTS handshake. $WIZ$ type = "boolean"
+/**
+ * Use RTS/CTS handshake.
+ * $WIZ$ type = "boolean"
+ * $WIZ$ supports = "False"
+ */
 #define CONFIG_SER_HWHANDSHAKE   0
 
 /**
