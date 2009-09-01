@@ -64,7 +64,7 @@ int sprintf_testRun(void)
 	if (strcmp(buf, test_string) != 0)
 		return 1;
 
-	snprintf(buf, sizeof buf, "%S", (wchar_t *)test_string_pgm);
+	snprintf(buf, sizeof buf, "%S", (const wchar_t *)test_string_pgm);
 	if (strcmp(buf, test_string_pgm) != 0)
 		return 2;
 

@@ -38,6 +38,8 @@
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  *
+ * notest: avr
+ *
  */
 
 #include "lcd_32122a_avr.h"
