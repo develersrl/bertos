@@ -44,9 +44,9 @@
 
 #warning FIXME: This is an example implementation, you must implement it
 
-#define TAS5706A_SETPOWERDOWN(val) do { /* implement me */ } while (0)
-#define TAS5706A_SETRESET(val)     do { /* implement me */ } while (0)
-#define TAS5706A_SETMUTE(val)      do { /* implement me */ } while (0)
+#define TAS5706A_SETPOWERDOWN(val) do { (void) val; /* implement me */ } while (0)
+#define TAS5706A_SETRESET(val)     do { (void) val; /* implement me */ } while (0)
+#define TAS5706A_SETMUTE(val)      do { (void) val; /* implement me */ } while (0)
 
 #define TAS5706A_PIN_INIT() \
 	do { \

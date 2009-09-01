@@ -83,7 +83,7 @@ typedef struct _Layer
 	lcdpos_t addr;
 
 	/** Priority of this layer (greater in front of lesser). */
-	char pri;
+	signed char pri;
 
 	/**
 	 * Layer backing store buffer.
