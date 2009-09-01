@@ -68,4 +68,7 @@
  */
 int ini_getString(KFile *fd, const char *section, const char *key, const char *default_value, char *buf, size_t size);
 
+int ini_reader_testSetup(void);
+int ini_reader_testRun(void);
+int ini_reader_testTearDown(void);
 #endif /* INI_READER_H */

@@ -95,7 +95,7 @@
  * These macros generate the code needed to create the test process functions.
  */
 #define RECV_PROC(num, sig) \
-static void receiver_proc##num(void) \
+static NORETURN void receiver_proc##num(void) \
 { \
 	TestMsg *rec_msg; \
 	for(;;) \

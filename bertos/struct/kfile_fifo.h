@@ -94,4 +94,7 @@ INLINE KFileFifo * KFILEFIFO_CAST(KFile *fd)
  */
 void kfilefifo_init(KFileFifo *kf, FIFOBuffer *fifo);
 
+int kfilefifo_testSetup(void);
+int kfilefifo_testRun(void);
+int kfilefifo_testTearDown(void);
 #endif /* STRUCT_KFILE_FIFO */
