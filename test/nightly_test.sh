@@ -72,7 +72,7 @@ done
 #Clean and launch make on all
 make -f ${MAKEFILE_TEST_DIR}/Makefile.test clean
 make -f ${MAKEFILE_TEST_DIR}/Makefile.test
-
+RET=$?
 if [ $OPTS = 1 ] ; then
 	#Restore original sources
 	if [ -d $BERTOS_DIR_BAK ] ; then
@@ -86,5 +86,5 @@ if [ $OPTS = 1 ] ; then
 fi
 
 printf "Nightly test done.\n\n"
-
+exit $RET
 
