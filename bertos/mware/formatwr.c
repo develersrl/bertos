@@ -108,7 +108,9 @@
 
 	/*bernie: save some memory, who cares about floats with lots of decimals? */
 	#define FRMWRI_BUFSIZE 134
-	#warning 134 is too much, the code must be fixed to have a lower precision limit
+	#if !(ARCH & ARCH_NIGHTTEST)
+		#warning 134 is too much, the code must be fixed to have a lower precision limit
+	#endif
 #else
 	/*
 	 * Conservative estimate. Should be (probably) 12 (which is the size necessary

@@ -454,10 +454,9 @@ static void spi_init(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(struct
 	 * - as input but tied high forever!
 	 * This driver set the pin as output.
 	 */
-	#if (ARCH & ARCH_NIGHTTEST)
-		#warning __FILTER_NEXT_WARNING__
+	#if !(ARCH & ARCH_NIGHTTEST)
+		#warning SPI SS pin set as output for proper operation, check schematics for possible conflicts.
 	#endif
-	#warning SPI SS pin set as output for proper operation, check schematics for possible conflicts.
 	ATOMIC(SPI_DDR |= BV(SPI_SS_BIT));
 
 	ATOMIC(SPI_DDR &= ~BV(SPI_MISO_BIT));
