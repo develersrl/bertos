@@ -46,6 +46,7 @@
 
 #include <cfg/macros.h> /* DIV_ROUND */
 #include <cfg/debug.h>
+#include <cfg/cfg_arch.h> // ARCH_NIGHTTEST
 
 #include <drv/ser.h>
 #include <drv/ser_p.h>
@@ -453,6 +454,9 @@ static void spi_init(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(struct
 	 * - as input but tied high forever!
 	 * This driver set the pin as output.
 	 */
+	#if (ARCH & ARCH_NIGHTTEST)
+		#warning __FILTER_NEXT_WARNING__
+	#endif
 	#warning SPI SS pin set as output for proper operation, check schematics for possible conflicts.
 	ATOMIC(SPI_DDR |= BV(SPI_SS_BIT));
 
