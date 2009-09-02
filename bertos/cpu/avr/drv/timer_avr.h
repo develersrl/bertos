@@ -83,6 +83,7 @@
 
 	/// Type of time expressed in ticks of the hardware high-precision timer
 	typedef uint8_t hptime_t;
+	#define SIZEOF_HPTIME_T 1
 
 	INLINE hptime_t timer_hw_hpread(void)
 	{
@@ -100,6 +101,7 @@
 
 	/// Type of time expressed in ticks of the hardware high precision timer
 	typedef uint16_t hptime_t;
+	#define SIZEOF_HPTIME_T 2
 
 	INLINE hptime_t timer_hw_hpread(void)
 	{
@@ -121,6 +123,7 @@
 
 	/// Type of time expressed in ticks of the hardware high precision timer
 	typedef uint8_t hptime_t;
+	#define SIZEOF_HPTIME_T 1
 
 	INLINE hptime_t timer_hw_hpread(void)
 	{
@@ -138,6 +141,7 @@
 
 	/// Type of time expressed in ticks of the hardware high precision timer
 	typedef uint16_t hptime_t;
+	#define SIZEOF_HPTIME_T 2
 
 	INLINE hptime_t timer_hw_hpread(void)
 	{

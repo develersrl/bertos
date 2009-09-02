@@ -47,6 +47,7 @@
 
 /// Type of time expressed in ticks of the hardware high-precision timer.
 typedef unsigned int hptime_t;
+#define SIZEOF_HPTIME_T 4
 
 /// Frequency of the hardware high-precision timer.
 #define TIMER_HW_HPTICKS_PER_SEC  1000

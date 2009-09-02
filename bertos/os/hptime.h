@@ -45,6 +45,7 @@ extern "C" {
 
 	/** our type for "high precision absolute time" */
 	typedef __int64 hptime_t;
+	#define SIZEOF_HPTIME_T 8
 
 	#define HPTIME_TICKS_PER_SECOND		(10000000I64)
 	#define HPTIME_TICKS_PER_MILLISEC	(10000I64)
@@ -63,6 +64,7 @@ extern "C" {
 
 	/** Type for "high precision absolute time". */
 	typedef int64_t hptime_t;
+	#define SIZEOF_HPTIME_T 8
 
 	#define HPTIME_TICKS_PER_SECOND		(1000000LL)
 	#define HPTIME_TICKS_PER_MILLISEC	(1000LL)

@@ -75,6 +75,7 @@
 
 	/** Type of time expressed in ticks of the hardware high-precision timer */
 	typedef uint32_t hptime_t;
+	#define SIZEOF_HPTIME_T 4
 
 	INLINE void timer_hw_irq(void)
 	{

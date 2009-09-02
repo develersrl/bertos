@@ -70,6 +70,8 @@
 	#include CPU_HEADER(timer)
 #endif
 
+STATIC_ASSERT(sizeof(hptime_t) == SIZEOF_HPTIME_T);
+
 #include "cfg/cfg_timer.h"
 #include <cfg/debug.h>
 #include <cfg/compiler.h>

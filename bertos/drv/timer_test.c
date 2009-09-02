@@ -68,7 +68,9 @@ static void timer_test_constants(void)
 	kprintf("ticks_to_us(10000) = %lu\n",   (unsigned long)ticks_to_us(10000));
 	kprintf("\n");
 	kprintf("hptime_to_us(100)  = %lu\n",   (unsigned long)hptime_to_us(100));
-	kprintf("hptime_to_us(10000)= %lu\n",   (unsigned long)hptime_to_us(10000));
+	#if (SIZEOF_HPTIME_T > 1)
+		kprintf("hptime_to_us(10000)= %lu\n",   (unsigned long)hptime_to_us(10000));
+	#endif
 	kprintf("us_to_hptime(100)  = %lu\n",   (unsigned long)us_to_hptime(100));
 	kprintf("us_to_hptime(10000)= %lu\n",   (unsigned long)us_to_hptime(10000));
 }
