@@ -39,7 +39,9 @@ runout='/dev/null'
 set -o pipefail
 
 rm -rf "${TESTOUT}.old"
-mv -f "${TESTOUT}" "$TESTOUT.old"
+if [ -d "${TESTOUT}" ] ; then
+	mv -f "${TESTOUT}" "$TESTOUT.old"
+fi
 mkdir -p "$TESTOUT"
 
 for src in $TESTS; do
