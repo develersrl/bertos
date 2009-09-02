@@ -280,7 +280,7 @@ static void menu_layout(
 			#if (ARCH & ARCH_NIGHTTEST)
 				#warning __FILTER_NEXT_WARNING__
 			#endif
-			RenderHook renderhook = (item->flags & MIF_RENDERHOOK) ? CONST_CAST(RenderHook, item->label) : menu_defaultRenderHook;
+			RenderHook renderhook = (item->flags & MIF_RENDERHOOK) ? (RenderHook)item->label : menu_defaultRenderHook;
 
 			/* Render menuitem */
 			renderhook(menu->bitmap, ypos++, (i == selected), item);
