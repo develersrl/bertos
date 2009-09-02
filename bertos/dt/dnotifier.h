@@ -99,7 +99,7 @@ typedef struct DFilter
 } DFilter;
 
 /// Type for filter-mask checking
-typedef uint16_t dfilter_mask_t;
+typedef unsigned int dfilter_mask_t;
 
 /// Filter init
 void filter_init(DFilter *f, const DFilterMap *map, bool masked, DNotifier *source, DNotifier *target);
