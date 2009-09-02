@@ -49,7 +49,7 @@ fi
 if [ $OPTS = 1 ] ; then
 #Copy BeRTOS sources
 printf "Starting nightlytest..\n"
-	printf "Silent mode enable, removing the TODO/FIXME message warnings.\n"
+	printf "Silent mode enable, removing the TODO/FIXME messages.\n"
 	cp -R $BERTOS_DIR $BERTOS_DIR_BAK || exit 1
 
 	#Strip away TODOs and FIXME
