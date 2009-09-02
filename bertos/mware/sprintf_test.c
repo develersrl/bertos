@@ -30,6 +30,8 @@
  *
  * -->
  *
+ * notest: avr
+ * notest: arm
  * \brief sprintf() implementation based on _formatted_write()
  *
  * \version $Id$
