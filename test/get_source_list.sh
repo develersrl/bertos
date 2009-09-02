@@ -70,7 +70,7 @@ SRC_ALL=${GEN_SRC}" "${TRG_SRC}
 NOTEST="notest:"
 for src in $SRC_ALL ;
 do
-	grep "$NOTEST\s*$CPU_TARGET" $src 2>&1 > /dev/null
+	grep -P "$NOTEST\s*$CPU_TARGET" $src 2>&1 > /dev/null
 	if [ $? -eq 0 ] ; then
 		EXCLUDE_LIST="$EXCLUDE_LIST $src"
 	fi	
