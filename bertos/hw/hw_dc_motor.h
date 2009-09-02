@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2006 Develer S.r.l. (http://www.develer.com/)
  * All Rights Reserved.
  * -->
  *
@@ -40,95 +40,46 @@
 #ifndef HW_DC_MOTOR_H
 #define HW_DC_MOTOR_H
 
-#warning TODO:This is an example implementation, you must implement it!
+typedef enum MotorDCMap
+{
 
-//DC motor 0
-#define DC_MOTOR0_EN_PIN      /* Implement me! */
-#define DC_MOTOR0_DIR_PIN     /* Implement me! */
-#define DC_MOTOR0_CLEAR       /* Implement me! */
-#define DC_MOTOR0_SET         /* Implement me! */
+	/* Put here motor dc declaration */
+	MOTOR_DC_CNT
 
-/* Add other motor here */
+} MotorDCMap;
 
-
-#define DC_MOTOR_PIN_INIT_MACRO(port, index) \
+/*
+ * Init all pin and device to manage dc motor.
+ */
+#define MOTOR_DC_INIT() \
     do { \
-        /* put here code to init pins */ \
+		/* Implement me! */ \
+    } while (0)
+
+
+/*
+ * Enable DC motor.
+ */
+#define DC_MOTOR_ENABLE(dev) \
+	do { \
+		/* Implement me! */ \
 	} while (0)
 
+/*
+ * Disable DC motor.
+ */
+#define DC_MOTOR_DISABLE(dev) \
+	do { \
+		/* Implement me! */ \
+	} while (0)
 
-#define DC_MOTOR_SET_ENABLE(index)     do { /* Implement me! */ } while (0)
-#define DC_MOTOR_SET_DISABLE(index)    do { /* Implement me! */ } while (0)
-#define DC_MOTOR_DIR_CW_MACRO(index)   do { /* Implement me! */ } while (0)
-#define DC_MOTOR_DIR_CCW_MACRO(index)  do { /* Implement me! */ } while (0)
+/*
+ * Set direction for DC motor.
+ */
+#define DC_MOTOR_SET_DIR(dev, dir) \
+	do { \
+		/* Implement me! */ \
+	} while (0)
 
-
-#define DC_MOTOR_ENABLE(index) \
-   do {  \
-        switch (index) \
-        { \
-        case 0:\
-            DC_MOTOR_SET_ENABLE(0); \
-            break; \
-		/* Add other motor here */ \
-        } \
-    } while(0)
-
-#define DC_MOTOR_DISABLE(index) \
-   do {  \
-        switch (index) \
-        { \
-        case 0:\
-            DC_MOTOR_SET_DISABLE(0); \
-            break; \
-		/* Add other motor here */ \
-        } \
-    } while(0)
-
-
-#define DC_MOTOR_DIR_CW(index) \
-   do {  \
-        switch (index) \
-        { \
-        case 0:\
-            DC_MOTOR_DIR_CW_MACRO(0); \
-            break; \
-		/* Add other motor here */ \
-        } \
-    } while(0)
-
- #define DC_MOTOR_DIR_CCW(index) \
-   do {  \
-        switch (index) \
-        { \
-        case 0:\
-            DC_MOTOR_DIR_CCW_MACRO(0); \
-            break; \
-		/* Add other motor here */ \
-        } \
-    } while(0)
-
-
-
-#define DC_MOTOR_SET_DIR(index, dir) \
-    do { \
-        if (dir) \
-            DC_MOTOR_DIR_CW(index); \
-        else \
-            DC_MOTOR_DIR_CCW(index); \
-    } while (0)
-
-#define DC_MOTOR_INIT(index) \
-    do { \
-        switch (index) \
-        { \
-        case 0: \
-            DC_MOTOR_PIN_INIT_MACRO(A, 0); \
-            break; \
-        case 1: \
-            DC_MOTOR_PIN_INIT_MACRO(A, 1); \
-            break; \
-        } \
-    } while (0)
 
 #endif /* HW_DC_MOTOR_H */

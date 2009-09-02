@@ -70,7 +70,11 @@
 /**
  * Drive clock to shift SI data into latch.
  */
-#define SIPO_SI_CLOCK(clk_pol)       do { /* Implement me! */   } while (0)
+#define SIPO_SI_CLOCK(clk_pol) \
+	do { \
+		(void)clk_pol; \
+		/* Implement me! */ \
+	} while (0)
 
 /**
  * Do everything needed in order to load dato into sipo.
