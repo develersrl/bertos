@@ -21,10 +21,11 @@ environments, from 8-bit processor to Linux and Win32 hosted application
 
 \section history History and Motivation
 
-BeRTOS was born as a collection of useful, highly optimized and fine-tuned
-libraries for embedded systems.  Each library had its own scope and could be
-used singularly in a project, though they were also meant to cooperate to
-build the whole underlying software layer commonly called "operating system".
+BeRTOS was born as a extremely modular, highly optimized and fine-tuned
+operating system for embedded programming.
+As a result, each module has its own scope and can be used alone or in
+cooperation with other modules.
+It's even possible to use most of the drivers without activating the kernel module.
 
 We have grown it following our guidelines: simplicity and beauty.
 These guidelines made it possible to evolve it in a full-featured real

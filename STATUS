@@ -73,10 +73,7 @@ Here is a list of currently available CPU family ports:
 </table>
 
 \section compilers Compilers
-BeRTOS was born as a collection of reusable code snippets.
-In this perspective it was of primary importance that the code was reusable and well portable.
-
-So, although BeRTOS is primarily intended to be used with open source tools such as <A href="http://gcc.gnu.org">GCC</A>, it supports other compilers too. It is possible to develop with BeRTOS on Linux, Windows and Mac.
+BeRTOS is primarily intended to be used with open source tools such as <A href="http://gcc.gnu.org">GCC</A>, although it supports other compilers too. It is possible to develop with BeRTOS on Linux, Windows and Mac.
 
 For every port we have indicated the current compiler used and were to find a suitable development suite:
 <table>
@@ -212,7 +209,7 @@ Current driver list:
 To get up to date informations look at the <A href="http://dev.bertos.org/browser/trunk/bertos/drv">drivers source code</A>.
 
 \section emulator Emulator 
-BeRTOS features can be emulated under a Unix system, check DemoApp.
+BeRTOS features can be emulated on a common PC, check DemoApp.
 
 The emulator uses Qt to display emulated I/O devices in a window.  It supports task
 scheduling and a number of other embedded peripherals.
@@ -242,7 +239,7 @@ BeRTOS comes in help with a set of optimized portable algorithms:
 <tr> <td> \link randpool.c Cryptographically secure Random Pool \endlink</td>  <td>beta</td> </tr>
 <tr> <td> \link rotating_hash.h Rotating hash checksum \endlink</td>  <td>stable</td> </tr>
 <tr> <td> \link tea.h TEA (Tiny Encryption Algorithm) \endlink</td>  <td>stable</td> </tr>
-<tr> <td> \link ramp.h Stepper motor ramp generator \endlink</td>  <td>beta</td> </tr>
+<tr> <td> \link ramp.h Stepper motor ramp generator \endlink</td>  <td>stable</td> </tr>
 <tr> <td> \link pid_control.h PID Controller \endlink</td>  <td>stable</td> </tr>
 <tr> <td> \link rle.c RLE (Run lenght en/decondig) \endlink</td>  <td>stable</td> </tr>
 </table>
