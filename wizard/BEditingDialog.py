@@ -135,8 +135,18 @@ class BEditingDialog(QDialog):
                     version_page.setProjectInfo("SOURCES_PATH", version)
                     version_page.setProjectInfo("OLD_SOURCES_PATH", current_version)
                     enabled_modules = bertos_utils.enabledModules(version_page.project())
+                    old_configuration = version_page.projectInfo("CONFIGURATIONS")
                     bertos_utils.loadSourceTree(version_page.project())
-                    bertos_utils.loadModuleData(version_page.project(), True)
+                    bertos_utils.loadModuleData(version_page.project())
+                    new_configuration = version_page.projectInfo("CONFIGURATIONS")
+                    merged_configuration = {}
+                    for conf in new_configuration:
+                        if conf in old_configuration:
+                            configuration = bertos_utils.updateConfigurationValues(new_configuration[conf], old_configuration[conf])
+                        else:
+                            configuration = new_configuration[conf]
+                        merged_configuration[conf] = configuration
+                    version_page.setProjectInfo("CONFIGURATIONS", merged_configuration)
                     bertos_utils.setEnabledModules(version_page.project(), enabled_modules)
                     self.module_page.fillModuleTree()
 
