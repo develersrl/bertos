@@ -44,6 +44,14 @@
 #define HW_SIPO_H
 
 /**
+ * Map sipo connection on board.
+ */
+typedef enum SipoMap
+{
+	SIPO_CNT
+} SipoMap;
+
+/**
  * Define generic macro to set pins logic level
  */
 #define SIPO_SET_LEVEL_LOW(dev)    do { /* Implement me! */   } while (0)
