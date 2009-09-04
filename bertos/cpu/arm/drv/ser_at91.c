@@ -202,21 +202,6 @@
 /*\}*/
 
 
-/**
- * \def CONFIG_SER_STROBE
- *
- * This is a debug facility that can be used to
- * monitor SER interrupt activity on an external pin.
- *
- * To use strobes, redefine the macros SER_STROBE_ON,
- * SER_STROBE_OFF and SER_STROBE_INIT and set
- * CONFIG_SER_STROBE to 1.
- */
-#if !defined(CONFIG_SER_STROBE) || !CONFIG_SER_STROBE
-	#define SER_STROBE_ON    do {/*nop*/} while(0)
-	#define SER_STROBE_OFF   do {/*nop*/} while(0)
-	#define SER_STROBE_INIT  do {/*nop*/} while(0)
-#endif
 
 
 /* From the high-level serial driver */

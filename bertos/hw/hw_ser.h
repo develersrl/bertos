@@ -48,10 +48,6 @@
 	#define SER_STROBE_INIT do { /* implement me */ } while (0)
 	#define SER_STROBE_ON do { /* implement me */ } while (0)
 	#define SER_STROBE_OFF do { /* implement me */ } while (0)
-#else
-	#define SER_STROBE_INIT /* nothing */
-	#define SER_STROBE_ON /* nothing */
-	#define SER_STROBE_OFF /* nothing */
 #endif
 
 #endif /* HW_SER_H */
