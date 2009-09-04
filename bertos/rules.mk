@@ -261,6 +261,16 @@ flash_$(1): $(OUTDIR)/$(1).hex flash_$(1)_local
 .PHONY: flash_$(1)_local
 flash_$(1)_local:
 
+.PHONY: stopflash_$(1)
+stopflash_$(1): 
+	$L "$(1): Stopping target flashing"
+	$Q if [ ! -f $$($(1)_STOPFLASH_SCRIPT) ] ; then \
+		printf "No stopflash script found.\n" ; \
+		exit 1 ; \
+	fi
+	$Q $$($(1)_STOPFLASH_SCRIPT) ;
+
+
 # Debug target
 .PHONY: debug_$(1)
 debug_$(1): $(OUTDIR)/$(1).elf
@@ -278,6 +288,15 @@ debug_$(1): $(OUTDIR)/$(1).elf
 		printf "No programmer interface configured, see http://dev.bertos.org/wiki/ProgrammerInterface\n" ; \
 		exit 1 ; \
 	fi
+
+.PHONY: stopdebug_$(1)
+stopdebug_$(1): 
+	$L "$(1): Stopping debugger"
+	$Q if [ ! -f $$($(1)_STOPDEBUG_SCRIPT) ] ; then \
+		printf "No stopdebug script found.\n" ; \
+		exit 1 ; \
+	fi
+	$Q $$($(1)_STOPDEBUG_SCRIPT) ;
 
 .PHONY: fuses_$(!)
 fuses_$(1):
