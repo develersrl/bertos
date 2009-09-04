@@ -155,7 +155,10 @@ class BModulePage(BWizardPage):
             if self.pageContent.propertyTable.rowCount() == 0:
                 module_label = self.pageContent.moduleLabel.text()
                 module_label += "\n\nNo configuration needed."
-                self.pageContent.moduleLabel.setText(module_label)
+                self.pageContent.moduleLabel.setText(module_label) 
+        else:
+            self.pageContent.moduleLabel.setText("")
+            self.pageContent.moduleLabel.setVisible(False)
 
     def dependencyCheck(self, item):
         """
@@ -249,6 +252,7 @@ class BModulePage(BWizardPage):
                     module_item.setCheckState(0, Qt.Unchecked)
             self.pageContent.moduleTree.addTopLevelItem(item)
         self.pageContent.moduleTree.sortItems(0, Qt.AscendingOrder)
+        self.fillPropertyTable()
             
     def insertCheckBox(self, index, value):
         """
