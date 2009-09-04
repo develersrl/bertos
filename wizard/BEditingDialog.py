@@ -72,6 +72,7 @@ class BEditingDialog(QDialog):
         button_layout.addWidget(self.apply_button)
         layout.addLayout(button_layout)
         self.setLayout(layout)
+        self.setWindowTitle(self.tr("Edit %1 project").arg(os.path.basename(self.module_page.projectInfo("SOURCES_PATH"))))
 
     def setupMenu(self):
         self.menu = QMenu(self.tr("Advanced options"))
@@ -102,6 +103,7 @@ class BEditingDialog(QDialog):
         layout.addLayout(button_layout)
         dialog.setLayout(layout)
         dialog.connect(ok_button, SIGNAL("clicked()"), dialog.accept)
+        dialog.setWindowTitle(self.tr("Change toolchain"))
         if dialog.exec_():
             toolchain = qvariant_converter.getStringDict(toolchain_page.currentItem().data(Qt.UserRole))
             toolchain_page.setProjectInfo("TOOLCHAIN", toolchain)
@@ -123,6 +125,7 @@ class BEditingDialog(QDialog):
         dialog.setLayout(layout)
         dialog.connect(ok_button, SIGNAL("clicked()"), dialog.accept)
         current_version = version_page.projectInfo("SOURCES_PATH")
+        dialog.setWindowTitle(self.tr("Change BeRTOS version"))
         if dialog.exec_():
             version = qvariant_converter.getString(version_page.currentItem().data(Qt.UserRole))
             if version != current_version:
