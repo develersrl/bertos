@@ -62,7 +62,9 @@ triface_PROGRAMMER_CPU = atmega1281
 triface_PROGRAMMER_TYPE = stk500v2
 triface_PROGRAMMER_PORT = /dev/ttyS1
 triface_FLASH_SCRIPT = bertos/prg_scripts/avr/flash.sh
-triface_DEBUG_SCRIPT = bertos/prg_scripts/avr/debug.sh
+triface_STOPFLASH_SCRIPT = bertos/prg_scripts/none.sh
+triface_DEBUG_SCRIPT = bertos/prg_scripts/nodebug.sh
+triface_STOPDEBUG_SCRIPT = bertos/prg_scripts/none.sh
 
 # Set to 1 for debug builds
 boot_DEBUG = 0
@@ -91,8 +93,10 @@ boot_CFLAGS = -Os -mcall-prologues
 boot_LDFLAGS = -Wl,--relax -Wl,--section-start=.text=$(BOOT_ADDR_START)
 
 
-boot_PROGRAMMER_CPU = atmega1281
-boot_PROGRAMMER_TYPE = stk500v2
-boot_PROGRAMMER_PORT = /dev/ttyS1
-boot_FLASH_SCRIPT = bertos/prg_scripts/avr/flash.sh
-boot_DEBUG_SCRIPT = bertos/prg_scripts/avr/debug.sh
+boot_PROGRAMMER_CPU = $(triface_PROGRAMMER_CPU)
+boot_PROGRAMMER_TYPE = $(triface_PROGRAMMER_TYPE)
+boot_PROGRAMMER_PORT = $(triface_PROGRAMMER_PORT)
+boot_FLASH_SCRIPT = $(triface_FLASH_SCRIPT)
+boot_STOPFLASH_SCRIPT = $(triface_STOPFLASH_SCRIPT)
+boot_DEBUG_SCRIPT = $(triface_DEBUG_SCRIPT)
+boot_STOPDEBUG_SCRIPT = $(triface_STOPDEBUG_SCRIPT)

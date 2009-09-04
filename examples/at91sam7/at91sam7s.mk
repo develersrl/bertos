@@ -49,4 +49,6 @@ at91sam7s_CPU = arm7tdmi
 at91sam7s_PROGRAMMER_CPU = at91sam7
 at91sam7s_PROGRAMMER_TYPE = jtag-tiny
 at91sam7s_FLASH_SCRIPT = bertos/prg_scripts/arm/flash.sh
+at91sam7s_STOPFLASH_SCRIPT = bertos/prg_scripts/arm/stopopenocd.sh
 at91sam7s_DEBUG_SCRIPT = bertos/prg_scripts/arm/debug.sh
+at91sam7s_STOPDEBUG_SCRIPT = bertos/prg_scripts/arm/stopopenocd.sh

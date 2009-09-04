@@ -61,8 +61,8 @@ SCRIPT_DIR = CPU_DIR + "avr/scripts/"
 
 MK_FLASH_SCRIPT = PRG_SCRIPTS_DIR + "avr/flash.sh"
 MK_STOPFLASH_SCRIPT = PRG_SCRIPTS_DIR + "avr/stopflash.sh"
-MK_DEBUG_SCRIPT = PRG_SCRIPTS_DIR + "avr/debug.sh"
-MK_STOPDEBUG_SCRIPT = PRG_SCRIPTS_DIR + "avr/stopdebug.sh"
+MK_DEBUG_SCRIPT = PRG_SCRIPTS_DIR + "nodebug.sh"
+MK_STOPDEBUG_SCRIPT = PRG_SCRIPTS_DIR + "none.sh"
 
 # Common GCC flags.
 MK_CPU_CPPFLAGS = "-Os -fno-strict-aliasing -I" + CPU_DIR + "avr/"

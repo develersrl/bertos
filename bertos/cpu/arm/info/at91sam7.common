@@ -71,9 +71,9 @@ SCRIPT_DIR = CPU_DIR + "arm/scripts/"
 HW_DIR = CPU_DIR + "arm/hw/"
 
 MK_FLASH_SCRIPT = PRG_SCRIPTS_DIR + "arm/flash.sh"
-MK_STOPFLASH_SCRIPT = PRG_SCRIPTS_DIR + "arm/stopflash.sh"
+MK_STOPFLASH_SCRIPT = PRG_SCRIPTS_DIR + "arm/stopopenocd.sh"
 MK_DEBUG_SCRIPT = PRG_SCRIPTS_DIR + "arm/debug.sh"
-MK_STOPDEBUG_SCRIPT = PRG_SCRIPTS_DIR + "arm/stopdebug.sh"
+MK_STOPDEBUG_SCRIPT = PRG_SCRIPTS_DIR + "arm/stopopenocd.sh"
 
 GDB_INIT_SCRIPT = PRG_SCRIPTS_DIR + "arm/openocd/gdbinit-sam7"
 
