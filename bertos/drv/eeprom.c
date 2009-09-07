@@ -177,7 +177,7 @@ static size_t eeprom_writeVerify(struct KFile *_fd, const void *_buf, size_t siz
 {
 	Eeprom *fd = EEPROM_CAST(_fd);
 	int retries = 5;
-	size_t wr_len;
+	size_t wr_len = 0;
 
 	while (retries--)
 	{
