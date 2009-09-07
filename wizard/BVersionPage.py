@@ -240,7 +240,10 @@ class BVersionPage(BWizardPage):
         Return the path of the selected version.
         """
         current = self.currentItem()
-        return qvariant_converter.getString(current.data(Qt.UserRole))
+        if current:
+            return qvariant_converter.getString(current.data(Qt.UserRole))
+        else:
+            return None
     
     def isDefaultVersion(self, version):
         """
