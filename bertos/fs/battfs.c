@@ -835,7 +835,7 @@ static size_t battfs_read(struct KFile *fd, void *_buf, size_t size)
 			return total_read;
 		}
 
-		#if _DEBUG
+		#ifdef _DEBUG
 			BattFsPageHeader hdr;
 			readHdr(disk, fdb->start[pg_offset], &hdr);
 			ASSERT(hdr.inode == fdb->inode);
