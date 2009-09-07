@@ -246,7 +246,7 @@ $$(OUTDIR)/$(1)_whole.elf: bumprev $$($(1)_SRC) $$($(1)_LDSCRIPT)
 flash_$(1): $(OUTDIR)/$(1).hex flash_$(1)_local
 	$L "$(1): Flashing target"
 	$Q if [ ! -f $$($(1)_FLASH_SCRIPT) ] ; then \
-		printf "No flash script found.\n" ; \
+		printf "CLDLG: No flash script found.\n" ; \
 		exit 1 ; \
 	fi
 	$Q if [ ! "$$($(1)_PROGRAMMER_TYPE)" == "none" ] ; then \
@@ -254,7 +254,7 @@ flash_$(1): $(OUTDIR)/$(1).hex flash_$(1)_local
 		PROGRAMMER_PORT=$$($(1)_PROGRAMMER_PORT) IMAGE_FILE=$$< \
 		$$($(1)_FLASH_SCRIPT) ; \
 	else \
-		printf "No programmer interface configured, see http://dev.bertos.org/wiki/ProgrammerInterface\n" ; \
+		printf "CLDLG: No programmer interface configured, see http://dev.bertos.org/wiki/ProgrammerInterface\n" ; \
 		exit 1 ; \
 	fi 
 
@@ -265,7 +265,7 @@ flash_$(1)_local:
 stopflash_$(1): 
 	$L "$(1): Stopping target flashing"
 	$Q if [ ! -f $$($(1)_STOPFLASH_SCRIPT) ] ; then \
-		printf "No stopflash script found.\n" ; \
+		printf "CLDLG: No stopflash script found.\n" ; \
 		exit 1 ; \
 	fi
 	$Q $$($(1)_STOPFLASH_SCRIPT) ;
@@ -276,7 +276,7 @@ stopflash_$(1):
 debug_$(1): $(OUTDIR)/$(1).elf
 	$L "$(1): Debugging target"
 	$Q if [ ! -f $$($(1)_DEBUG_SCRIPT) ] ; then \
-		printf "No debug script found.\n" ; \
+		printf "CLDLG: No debug script found.\n" ; \
 		exit 1 ; \
 	fi
 	$Q if [ ! "$$($(1)_PROGRAMMER_TYPE)" == "none" ] ; then \
@@ -285,7 +285,7 @@ debug_$(1): $(OUTDIR)/$(1).elf
 		ELF_FILE=$$< \
 		$$($(1)_DEBUG_SCRIPT) ; \
 	else \
-		printf "No programmer interface configured, see http://dev.bertos.org/wiki/ProgrammerInterface\n" ; \
+		printf "CLDLG: No programmer interface configured, see http://dev.bertos.org/wiki/ProgrammerInterface\n" ; \
 		exit 1 ; \
 	fi
 
@@ -293,7 +293,7 @@ debug_$(1): $(OUTDIR)/$(1).elf
 stopdebug_$(1): 
 	$L "$(1): Stopping debugger"
 	$Q if [ ! -f $$($(1)_STOPDEBUG_SCRIPT) ] ; then \
-		printf "No stopdebug script found.\n" ; \
+		printf "CLDLG: No stopdebug script found.\n" ; \
 		exit 1 ; \
 	fi
 	$Q $$($(1)_STOPDEBUG_SCRIPT) ;
