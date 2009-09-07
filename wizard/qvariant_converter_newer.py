@@ -28,7 +28,7 @@
 #
 # Copyright 2009 Develer S.r.l. (http://www.develer.com/)
 #
-# $Id:$
+# $Id$
 #
 # Author: Lorenzo Berni <duplo@develer.com>
 #
@@ -56,8 +56,8 @@ def convertStringList(string_list):
 def getStringDict(qvariant):
     dict_str_str = {}
     try:
-        for key, value in qvariant.toPyObject().items():
-            dict_str_str[unicode(key)] = unicode(value)
+        for key, value in qvariant.toMap().items():
+            dict_str_str[unicode(key)] = unicode(value.toString())
     except:
         pass
     return dict_str_str
@@ -92,7 +92,7 @@ def convertBoolDict(dict_str_bool):
 def getDict(qvariant):
     dict_str_variant = {}
     try:
-        for key, value in qvariant.toPyObject().items():
+        for key, value in qvariant.toMap().items():
             dict_str_variant[unicode(key)] = value
     except:
         pass
