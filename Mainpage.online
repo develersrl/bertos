@@ -1,0 +1,100 @@
+/*!
+<!--
+This document is automatically processed by Doxygen (http://www.doxygen.org/).
+Don't remove special formatting tags.
+This section won't be processed unless enabled.
+
+See STATUS for further information and tips about Doxygen tags.
+-->
+
+
+\mainpage
+
+\section overview Overview
+
+BeRTOS is a real-time operating system designed for building applications
+for embedded systems, like reference boards, test boards, or custom boards.
+
+It has a modular structure: its components can be used in very different
+environments, from 8-bit processor to Linux and Win32 hosted application
+(for debug purpose), using a wide range of compilers.
+
+\section history History and Motivation
+
+BeRTOS was born as a extremely modular, highly optimized and fine-tuned
+operating system for embedded programming.
+As a result, each module has its own scope and can be used alone or in
+cooperation with other modules.
+It's even possible to use most of the drivers without activating the kernel module.
+
+We have grown it following our guidelines: simplicity and beauty.
+These guidelines made it possible to evolve it in a full-featured real
+time operating system, with more modularity than many other embedded OSes,
+without giving up reliability and performace.
+
+To achieve the highest possible reusability, most BeRTOS components are
+designed for fine-grained modularity and minimal external dependencies.
+Most non-essential features can be configured out for applications with small
+memory footprint requirements.
+
+\section features Features
+
+  - multitasking kernel with IPC, semaphores, priority levels;
+  - a comprehensive set of generic drivers for a wide range of devices,
+    which can be easily customized to the actual hardware: timer, serial,
+    adc, ntc, pwm, stepper motors, dc motors, lcd, keyboards, buzzer, eeprom;
+  - full graphic subsystem for simple displays, with font support, bitmaps,
+    clipping, text formatting, interactive menus;
+  - simple console with command parser;
+  - readline-like support for command history;
+  - entropy generator and random numbers generator optimized for embedded
+    systems;
+  - checksumming and hashing functions (CRC, MD2);
+  - full hash-table implementation with double-hashing collision resolution;
+  - XMODEM protocol implementation;
+  - RLE compression algorithm;
+
+\section structure Directory Structure
+
+The modules are sorted in subdirectories by their category:
+
+  - app/            : demo applications;
+  - bertos/algo/    : algorithms;
+  - bertos/cfg/     : configuration stuff;
+  - bertos/drv/     : hardware drivers;
+  - bertos/dt/	    : experimental object oriented gui toolkit;
+  - bertos/emul/    : Qt-based emulator framework for embedded applications;
+  - bertos/fonts/   : fonts;
+  - bertos/fs/      : file system related stuff;
+  - bertos/gfx/     : general purpose graphics routines;
+  - bertos/gui/     : widgets for simple displays;
+  - bertos/hw/	    : hardware-specific declarations;
+  - bertos/icons/   : conversion tool from image TXT format to LCD bitmap;
+  - bertos/kern/    : multitasking kernel;
+  - bertos/mware/   : algorithms, other standalone code;
+  - bertos/struct/  : containers and other data structures;
+  - bertos/os/	    : OS-abstraction layers for hosted environments;
+  - doc/            : documentation;
+
+The top-level directory contains a few support headers that are meant to be
+usable by any C/C++ embedded or hosted application.
+
+\section license License
+
+BeRTOS is provided under the term of the GNU General Public License
+(see LICENSE.GPL) with following exception:
+
+\verbatim
+
+As a special exception, you may use this file as part of a free software
+library without restriction.  Specifically, if other files instantiate
+templates or use macros or inline functions from this file, or you compile
+this file and link it with other files to produce an executable, this
+file does not by itself cause the resulting executable to be covered by
+the GNU General Public License.  This exception does not however
+invalidate any other reasons why the executable file might be covered by
+the GNU General Public License.
+
+\endverbatim
+
+*/
