@@ -72,7 +72,7 @@ class BEditingDialog(QDialog):
         button_layout.addWidget(self.apply_button)
         layout.addLayout(button_layout)
         self.setLayout(layout)
-        self.setWindowTitle(self.tr("Edit %1 project").arg(os.path.basename(self.module_page.projectInfo("SOURCES_PATH"))))
+        self.setWindowTitle(self.tr("Edit \"%1\" project").arg(os.path.basename(self.module_page.projectInfo("PROJECT_PATH"))))
 
     def setupMenu(self):
         self.menu = QMenu(self.tr("Advanced options"))
