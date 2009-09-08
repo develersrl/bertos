@@ -113,7 +113,7 @@ def mergeSources(srcdir, new_sources, old_sources):
     # TODO: implement the three way merge algorithm
     #
     shutil.rmtree(srcdir, True)
-    copytree.copytree(sources_dir + "/bertos", srcdir, ignore_list=const.IGNORE_LIST)
+    copytree.copytree(os.path.join(new_sources, "bertos"), srcdir, ignore_list=const.IGNORE_LIST)
 
 def projectFileGenerator(project_info):
     directory = project_info.info("PROJECT_PATH")
