@@ -91,7 +91,7 @@ def findSources(path):
                 if dir.find("svn") == -1 and dir != "images" and dir != "obj":
                     file_dict[root.replace(path, "")]["dirs"].append(dir)
             for file in files:
-                if file.endswith(const.EXTENSION_FILTER):
+                if file.endswith(const.EXTENSION_FILTER) and file != "buildrev.h":
                     file_dict[root.replace(path, "")]["files"].append(file)
     return file_dict
 
