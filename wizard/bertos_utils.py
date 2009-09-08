@@ -87,9 +87,17 @@ def loadBertosProject(project_file):
 
 def setEnabledModules(project_info, enabled_modules):
     modules = project_info.info("MODULES")
+    files = {}
     for module, information in modules.items():
         information["enabled"] = module in enabled_modules
+	for dependency in information["depends"]:
+            if not dependency in modules:
+	        if dependency in files:
+		    files[dependency] += 1
+		else:
+		    files[dependency] = 1
     project_info.setInfo("MODULES", modules)
+    project_info.setInfo("FILES", files)
 
 def enabledModules(project_info):
     enabled_modules = []
