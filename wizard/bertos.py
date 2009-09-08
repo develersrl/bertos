@@ -40,6 +40,8 @@ from distutils.dep_util import newer
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+import exception_handler
+
 import BProject
 
 import BStartPage
