@@ -84,6 +84,7 @@ class BEditingDialog(QDialog):
         layout.addLayout(button_layout)
         self.setLayout(layout)
         self.setWindowTitle(self.tr("Edit \"%1\" project").arg(os.path.basename(self.module_page.projectInfo("PROJECT_PATH"))))
+	self.setWindowIcon(QIcon(":/images/appicon.png"))
 
     def setupMenu(self):
         self.menu = QMenu(self.tr("Advanced options"))
@@ -109,6 +110,7 @@ class BEditingDialog(QDialog):
 
     def changeToolchain(self):
         dialog = QDialog()
+	dialog.setWindowIcon(QIcon(":/images/appicon.png"))
         layout = QVBoxLayout()
         toolchain_page = BToolchainPage()
 	current_toolchain = toolchain_page.projectInfo("TOOLCHAIN")
@@ -138,6 +140,7 @@ class BEditingDialog(QDialog):
     
     def changeBertosVersion(self):
         dialog = QDialog()
+	dialog.setWindowIcon(QIcon(":/images/appicon.png"))
         layout = QVBoxLayout()
         version_page = BVersionPage()
         version_page.reloadData()
