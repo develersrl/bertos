@@ -160,6 +160,9 @@ class BEditingDialog(QDialog):
                     version_page.setProjectInfo("CONFIGURATIONS", merged_configuration)
                     bertos_utils.setEnabledModules(version_page.project(), enabled_modules)
                     self.module_page.fillModuleTree()
+		else:
+		    # Rollback version to the previous selected one.
+		    version_page.setProjectInfo("SOURCES_PATH", current_version)
 
     def apply(self):
         createBertosProject(self.module_page.project(), edit=True)
