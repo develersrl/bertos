@@ -53,11 +53,22 @@ class BEditingDialog(QDialog):
         self.setupUi()
         self.connectSignals()
         self.module_page.reloadData()
+	self.setFrequency()
     
     def setupUi(self):
         layout = QVBoxLayout()
         self.module_page = BModulePage.BModulePage()
         layout.addWidget(self.module_page)
+	frequency_layout = QHBoxLayout()
+	frequency_layout.addWidget(QLabel(self.tr("CPU frequency")))
+	self.cpu_frequency_spinbox = QDoubleSpinBox()
+	self.cpu_frequency_spinbox.setSuffix("Hz")
+	self.cpu_frequency_spinbox.setRange(1, 1000000000)
+	self.cpu_frequency_spinbox.setSingleStep(1000)
+	self.cpu_frequency_spinbox.setDecimals(0)
+	frequency_layout.addWidget(self.cpu_frequency_spinbox)
+	frequency_layout.addStretch()
+	layout.addLayout(frequency_layout)
         button_layout = QHBoxLayout()
         self.advanced_button = QToolButton()
         self.setupMenu()
@@ -86,6 +97,15 @@ class BEditingDialog(QDialog):
         self.connect(self.change_bertos_version, SIGNAL("triggered(bool)"), self.changeBertosVersion)
         self.connect(self.apply_button, SIGNAL("clicked()"), self.apply)
         self.connect(self.cancel_button, SIGNAL("clicked()"), self.reject)
+	self.connect(self.cpu_frequency_spinbox, SIGNAL("valueChanged(double)"), self.frequencyChanged)
+    
+    def setFrequency(self):
+	frequency = long(self.module_page.projectInfo("SELECTED_FREQ"))
+	self.cpu_frequency_spinbox.setValue(frequency)
+
+    def frequencyChanged(self, frequency):
+	frequency = unicode(long(frequency))
+	self.module_page.setProjectInfo("SELECTED_FREQ", frequency)
 
     def changeToolchain(self):
         dialog = QDialog()
