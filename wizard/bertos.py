@@ -72,8 +72,7 @@ def newProject():
         for ide in to_be_opened:
             command_line = command_lines[ide]
             relevant_file = relevant_files[ide]
-            import subprocess
-            subprocess.call(command_line + " \"" + relevant_file + "\"")
+            QProcess.startDetached(command_line, [relevant_file,])
     sys.exit()
     
 def editProject(project_file):
