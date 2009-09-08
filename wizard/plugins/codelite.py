@@ -88,7 +88,7 @@ def findSources(path):
             file_dict[root.replace(path, "")] = {"dirs": [], "files": []}
             for dir in dirs:
                 # TODO: place the directory name in a constant file.
-                if dir.find("svn") == -1 and dir != "images" and dir != "object":
+                if dir.find("svn") == -1 and dir != "images" and dir != "obj":
                     file_dict[root.replace(path, "")]["dirs"].append(dir)
             for file in files:
                 if file.endswith(const.EXTENSION_FILTER):
