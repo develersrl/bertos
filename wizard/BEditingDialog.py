@@ -93,6 +93,7 @@ class BEditingDialog(QDialog):
         toolchain_page = BToolchainPage()
 	current_toolchain = toolchain_page.projectInfo("TOOLCHAIN")
         toolchain_page.reloadData()
+	# TODO: to be moved in BToolchainPage
 	for toolchain_row in range(toolchain_page.pageContent.toolchainList.count()):
             toolchain = qvariant_converter.getStringDict(toolchain_page.pageContent.toolchainList.item(toolchain_row).data(Qt.UserRole))
 	    if toolchain["path"] == current_toolchain["path"]:
