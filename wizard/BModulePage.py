@@ -77,6 +77,7 @@ class BModulePage(BWizardPage):
         Overload of the BWizardPage connectSignals method.
         """
         self.connect(self.pageContent.moduleTree, SIGNAL("itemPressed(QTreeWidgetItem*, int)"), self.fillPropertyTable)
+        self.connect(self.pageContent.moduleTree, SIGNAL("itemPressed(QTreeWidgetItem*, int)"), self.moduleClicked)
         self.connect(self.pageContent.moduleTree, SIGNAL("itemChanged(QTreeWidgetItem*, int)"), self.dependencyCheck)
         self.connect(self.pageContent.propertyTable, SIGNAL("itemSelectionChanged()"), self.showPropertyDescription)
 
@@ -93,6 +94,9 @@ class BModulePage(BWizardPage):
     ####
     
     ## Slots ##
+
+    def moduleClicked(self, item, column):
+        self.setBold(item, False)
 
     def fillPropertyTable(self):
         """
@@ -373,6 +377,13 @@ class BModulePage(BWizardPage):
                 break
             self.pageContent.propertyTable.item(index, 0).setText(self.currentModuleConfigurations()[property_name]['brief'])
     
+    def setBold(self, item, bold):
+        self.pageContent.moduleTree.blockSignals(True)
+        font = item.font(0)
+        font.setBold(bold)
+        item.setFont(0, font)
+        self.pageContent.moduleTree.blockSignals(False)
+
     def moduleSelected(self, selectedModule):
         """
         Resolves the selection dependencies.
@@ -392,6 +403,8 @@ class BModulePage(BWizardPage):
                 item = self.pageContent.moduleTree.topLevelItem(category)
                 for child in range(item.childCount()):
                     if unicode(item.child(child).text(0)) in unsatisfied:
+                        self.setBold(item.child(child), True)
+                        self.setBold(item, True)
                         item.child(child).setCheckState(0, Qt.Checked)
     
     def moduleUnselected(self, unselectedModule):
