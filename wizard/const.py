@@ -65,6 +65,8 @@ EXTENSION_FILTER = (
     ".cxx",
     ".h",
     ".c++",
+    ".ld",
+    ".S",
     ".mk",
     "Makefile",
 )
