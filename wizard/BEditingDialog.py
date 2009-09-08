@@ -91,7 +91,14 @@ class BEditingDialog(QDialog):
         dialog = QDialog()
         layout = QVBoxLayout()
         toolchain_page = BToolchainPage()
+	current_toolchain = toolchain_page.projectInfo("TOOLCHAIN")
         toolchain_page.reloadData()
+	for toolchain_row in range(toolchain_page.pageContent.toolchainList.count()):
+            toolchain = qvariant_converter.getStringDict(toolchain_page.pageContent.toolchainList.item(toolchain_row).data(Qt.UserRole))
+	    if toolchain["path"] == current_toolchain["path"]:
+                toolchain_page.pageContent.toolchainList.setCurrentRow(toolchain_row)
+		toolchain_page.selectionChanged()
+		break
         layout.addWidget(toolchain_page)
         button_layout = QHBoxLayout()
         button_layout.addStretch()
