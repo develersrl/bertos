@@ -114,27 +114,27 @@ SECTIONS
 
 	PROVIDE (__stack_fiq_start = .);
 	. += FIQ_STACK_SIZE;
-	. = ALIGN(4);
+	. = ALIGN(8);
 	PROVIDE (__stack_fiq_end = .);
 
 	PROVIDE (__stack_irq_start = .);
 	. += IRQ_STACK_SIZE;
-	. = ALIGN(4);
+	. = ALIGN(8);
 	PROVIDE (__stack_irq_end = .);
 
 	PROVIDE (__stack_abt_start = .);
 	. += ABT_STACK_SIZE;
-	. = ALIGN(4);
+	. = ALIGN(8);
 	PROVIDE (__stack_abt_end = .);
 
 	PROVIDE (__stack_und_start = .);
 	. += UND_STACK_SIZE;
-	. = ALIGN(4);
+	. = ALIGN(8);
 	PROVIDE (__stack_und_end = .);
 
 	PROVIDE (__stack_svc_start = .);
 	. += SVC_STACK_SIZE;
-	. = ALIGN(4);
+	. = ALIGN(8);
 	PROVIDE (__stack_svc_end = .);
 
 	PROVIDE (__stack_end = .);
