@@ -71,6 +71,14 @@ void proc_init(void);
 /**
  * Create a new named process and schedules it for execution.
  *
+ * When defining the stacksize take into account that you may want at least:
+ * \li save all the registers for each nested function call;
+ * \li have memory for the struct Process, which is positioned at the bottom
+ * of the stack;
+ * \li have some memory for temporary variables inside called functions.
+ *
+ * The value given by CONFIG_KERN_MINSTACKSIZE is rather safe to use in the first place.
+ *
  * \note The function
  * \code
  * proc_new(entry, data, stacksize, stack)
