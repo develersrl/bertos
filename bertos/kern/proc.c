@@ -233,7 +233,7 @@ struct Process *proc_new_with_name(UNUSED_ARG(const char *, name), void (*entry)
 
 		getcontext(&proc->context);
 		proc->context.uc_stack.ss_sp = proc->stack;
-		proc->context.uc_stack.ss_size = stack_size - PROC_SIZE_WORDS - 1;
+		proc->context.uc_stack.ss_size = stack_size - 1;
 		proc->context.uc_link = NULL;
 		makecontext(&proc->context, (void (*)(void))proc_entry, 1, entry);
 
