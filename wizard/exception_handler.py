@@ -47,6 +47,8 @@ def _excepthook(exc_type, exc_value, exc_traceback):
         content = open(file_name, "r").read()
     else:
         content = ""
+        if not os.path.exists(os.path.dirname(file_name)):
+            os.makedirs(os.path.dirname(file_name))
     f = open(file_name, "w")
     message = "\n".join(traceback.format_exception(exc_type, exc_value, exc_traceback))
     f.write(message)
