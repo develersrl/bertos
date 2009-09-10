@@ -216,7 +216,7 @@ struct Process *proc_new_with_name(UNUSED_ARG(const char *, name), void (*entry)
 			proc->stack--;
 	}
 
-	stack_size = stack_size - PROC_SIZE_WORDS;
+	stack_size -= PROC_SIZE_WORDS * sizeof(cpu_stack_t);
 	proc_init_struct(proc);
 	proc->user_data = data;
 
