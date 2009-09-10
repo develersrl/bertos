@@ -19,5 +19,6 @@ include examples/demo/demo.mk
 #include examples/at91sam7/at91sam7x.mk
 #include examples/triface/triface.mk
 #include examples/benchmark/kernel-only_arm/kernel-only_arm.mk
+#include examples/benchmark/kernel-core_avr/kernel-core_avr.mk
 
 include bertos/rules.mk
