@@ -46,6 +46,7 @@
 #define KERN_SIGNAL_H
 
 #include <cfg/compiler.h>
+#include <cfg/macros.h>    // BV()
 
 /* Fwd decl */
 struct Process;
