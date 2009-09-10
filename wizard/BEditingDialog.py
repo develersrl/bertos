@@ -166,6 +166,7 @@ class BEditingDialog(QDialog):
                     self.tr("Changing the BeRTOS version will destroy all the modification done on the BeRTOS sources"),
                     QMessageBox.Ok | QMessageBox.Cancel
                 ) == QMessageBox.Ok:
+		    qApp.setOverrideCursor(QCursor(Qt.WaitCursor))
                     version_page.setProjectInfo("SOURCES_PATH", version)
                     version_page.setProjectInfo("OLD_SOURCES_PATH", current_version)
                     enabled_modules = bertos_utils.enabledModules(version_page.project())
@@ -183,12 +184,15 @@ class BEditingDialog(QDialog):
                     version_page.setProjectInfo("CONFIGURATIONS", merged_configuration)
                     bertos_utils.setEnabledModules(version_page.project(), enabled_modules)
                     self.module_page.fillModuleTree()
+                    qApp.restoreOverrideCursor()
 		else:
 		    # Rollback version to the previous selected one.
 		    version_page.setProjectInfo("SOURCES_PATH", current_version)
 
     def apply(self):
+        qApp.setOverrideCursor(QCursor(Qt.WaitCursor))
         createBertosProject(self.module_page.project(), edit=True)
+        qApp.restoreOverrideCursor()
         self.accept()
 
     def toolchains(self):
