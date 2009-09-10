@@ -195,7 +195,7 @@ int proc_testRun(void)
 		ret_value = -1;
 	}
 
-
+#if CONFIG_KERN_SIGNALS
 	// test process priority
 	// main process must have the higher priority to check signals received
 	proc_setPri(proc_current(), 10);
@@ -229,14 +229,14 @@ int proc_testRun(void)
 		kputs("Priority test successfull.\n");
 	}
 
-	if (!ret_value)
-		return 0;
-	else
-		return ret_value;
-
 priority_fail:
 	kputs("Priority test failed.\n");
-	return -1;
+	ret_value = -1;
+
+#endif
+
+	return ret_value
+
 }
 
 
