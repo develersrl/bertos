@@ -38,7 +38,7 @@
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * $WIZ$ module_name = "signal"
- * $WIZ$ module_depends = "kernel"
+ * $WIZ$ module_depends = "kernel", "timer"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_signal.h"
  */
 
