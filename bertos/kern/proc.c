@@ -203,7 +203,7 @@ struct Process *proc_new_with_name(UNUSED_ARG(const char *, name), void (*entry)
 		proc = (Process *)stack_base;
 		proc->stack = stack_base + PROC_SIZE_WORDS;
 		// On some architecture stack should be aligned, so we do it.
-		proc->stack = (void *)proc->stack + (sizeof(cpu_aligned_stack_t) - ((long)proc->stack % sizeof(cpu_aligned_stack_t)));
+		proc->stack = (cpu_stack_t *)((uintptr_t)proc->stack + (sizeof(cpu_aligned_stack_t) - ((uintptr_t)proc->stack % sizeof(cpu_aligned_stack_t))));
 		if (CPU_SP_ON_EMPTY_SLOT)
 			proc->stack++;
 	}
@@ -211,10 +211,12 @@ struct Process *proc_new_with_name(UNUSED_ARG(const char *, name), void (*entry)
 	{
 		proc = (Process *)(stack_base + stack_size / sizeof(cpu_stack_t) - PROC_SIZE_WORDS);
 		// On some architecture stack should be aligned, so we do it.
-		proc->stack = (void *)proc - ((long)proc % sizeof(cpu_aligned_stack_t));
+		proc->stack = (cpu_stack_t *)((uintptr_t)proc - ((uintptr_t)proc % sizeof(cpu_aligned_stack_t)));
 		if (CPU_SP_ON_EMPTY_SLOT)
 			proc->stack--;
 	}
+	/* Ensure stack is aligned */
+	ASSERT((uintptr_t)proc->stack % sizeof(cpu_aligned_stack_t) == 0);
 
 	stack_size -= PROC_SIZE_WORDS * sizeof(cpu_stack_t);
 	proc_init_struct(proc);
