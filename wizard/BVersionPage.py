@@ -184,8 +184,8 @@ class BVersionPage(BWizardPage):
         versions = set([])
         if os.name == "nt":
             import winreg_importer
-            versions |= set(winreg_importer.getBertosDirs())
-        versions |= set(self.versions())
+            versions |= set([os.path.normpath(dir) for dir in winreg_importer.getBertosDirs()])
+        versions |= set([os.path.normpath(dir) for dir in self.versions()])
         selected = self.projectInfo("SOURCES_PATH")
         for directory in versions:
             item = self.insertListElement(directory)
