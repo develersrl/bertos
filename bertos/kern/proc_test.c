@@ -229,16 +229,17 @@ int proc_testRun(void)
 		kputs("Priority test successfull.\n");
 	}
 
+	return ret_value;
+
 priority_fail:
 	kputs("Priority test failed.\n");
-	ret_value = -1;
+	return -1;
 
 #endif
 
-	return ret_value
+	return ret_value;
 
 }
-
 
 int proc_testSetup(void)
 {
