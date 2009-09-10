@@ -203,7 +203,7 @@ struct Process *proc_new_with_name(UNUSED_ARG(const char *, name), void (*entry)
 		proc = (Process *)stack_base;
 		proc->stack = stack_base + PROC_SIZE_WORDS;
 		// On some architecture stack should be aligned, so we do it.
-		proc->stack = (void *)proc->stack + (sizeof(cpu_aligned_stack_t) - ((long)proc->stack % sizeof(cpu_stack_aligned_t)));
+		proc->stack = (void *)proc->stack + (sizeof(cpu_aligned_stack_t) - ((long)proc->stack % sizeof(cpu_aligned_stack_t)));
 		if (CPU_SP_ON_EMPTY_SLOT)
 			proc->stack++;
 	}
