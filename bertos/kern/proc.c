@@ -240,17 +240,9 @@ struct Process *proc_new_with_name(UNUSED_ARG(const char *, name), void (*entry)
 		makecontext(&proc->context, (void (*)(void))proc_entry, 1, entry);
 
 	#else // !CONFIG_KERN_PREEMPT
-	{
-		size_t i;
-
-		/* Initialize process stack frame */
-		CPU_PUSH_CALL_FRAME(proc->stack, proc_exit);
-		CPU_PUSH_CALL_FRAME(proc->stack, entry);
-
-		/* Push a clean set of CPU registers for asm_switch_context() */
-		for (i = 0; i < CPU_SAVED_REGS_CNT; i++)
-			CPU_PUSH_WORD(proc->stack, CPU_REG_INIT_VALUE(i));
-	}
+	
+		CPU_CREATE_NEW_STACK(proc->stack, entry, proc_exit);
+		
 	#endif // CONFIG_KERN_PREEMPT
 
 	#if CONFIG_KERN_MONITOR

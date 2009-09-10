@@ -64,24 +64,37 @@
 
 	/**
 	 * Initialization value for registers in stack frame.
-	 * The register index is not directly corrispondent to CPU
-	 * register numbers, but is related to how are pushed to
-	 * stack (\see asm_switch_context).
-	 * Index (CPU_SAVED_REGS_CNT - 1) is the CPSR register,
-	 * the initial value is set to:
+	 * For the CPSR register, the initial value is set to:
 	 * - All flags (N, Z, C, V) set to 0.
 	 * - IRQ and FIQ enabled.
 	 * - ARM state.
 	 * - CPU in Supervisor Mode (SVC).
 	 */
-	#define CPU_REG_INIT_VALUE(reg) \
-	({  int a = 0; \
-		if(reg == 0) \
-			a = (int)proc_exit; \
-		else if(reg == (CPU_SAVED_REGS_CNT - 1)) \
-			a = 0x13; \
-		a; \
-	})
+	#define CPU_CREATE_NEW_STACK(stack, entry, exit) \
+	do { \
+		/* Process entry point */ \
+		CPU_PUSH_CALL_FRAME(stack, entry); \
+		/* LR (proc_exit) */ \
+		CPU_PUSH_CALL_FRAME(stack, exit); \
+		/* R11 */ \
+		CPU_PUSH_WORD(stack, 0x11111111); \
+		/* R10 */ \
+		CPU_PUSH_WORD(stack, 0x10101010); \
+		/* R9 */ \
+		CPU_PUSH_WORD(stack, 0x09090909); \
+		/* R8 */ \
+		CPU_PUSH_WORD(stack, 0x08080808); \
+		/* R7 */ \
+		CPU_PUSH_WORD(stack, 0x07070707); \
+		/* R6 */ \
+		CPU_PUSH_WORD(stack, 0x06060606); \
+		/* R5 */ \
+		CPU_PUSH_WORD(stack, 0x05050505); \
+		/* R4 */ \
+		CPU_PUSH_WORD(stack, 0x04040404); \
+		/* CPSR */ \
+		CPU_PUSH_WORD(stack, 0x00000013); \
+	} while (0)
 
 #elif CPU_PPC
 
@@ -243,5 +256,22 @@
 		#define CPU_IDLE do { /* nothing */ } while (0)
 	#endif /* !ARCH_EMUL */
 #endif /* !CPU_IDLE */
+
+/**
+ * Default macro for creating a new Process stack
+ */ 
+#ifndef CPU_CREATE_NEW_STACK
+
+	#define CPU_CREATE_NEW_STACK(stack, entry, exit) \
+		do { \
+			size_t i; \
+			/* Initialize process stack frame */ \
+			CPU_PUSH_CALL_FRAME(stack, exit); \
+			CPU_PUSH_CALL_FRAME(stack, entry); \
+			/* Push a clean set of CPU registers for asm_switch_context() */ \
+			for (i = 0; i < CPU_SAVED_REGS_CNT; i++) \
+				CPU_PUSH_WORD(stack, CPU_REG_INIT_VALUE(i)); \
+		} while (0)
+#endif
 
 #endif /* CPU_ATTR_H */
