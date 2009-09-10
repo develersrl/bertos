@@ -174,6 +174,9 @@
  *		}
  *	}
  * \endcode
+ *
+ * $WIZ$ module_name = "msg"
+ * $WIZ$ module_depends = "event", "signal", "kernel"
  */
 
 
