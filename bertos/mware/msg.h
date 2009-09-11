@@ -38,8 +38,8 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-#ifndef MWARE_MSG_H
-#define MWARE_MSG_H
+#ifndef MWARE_MESSAGES_H
+#define MWARE_MESSAGES_H
 
 enum
 {
@@ -64,5 +64,5 @@ enum
 #define PTRMSG(x)  ((x) < (const_iptr_t)256 ? msg_strings[(unsigned int)(x)] : (const char *)(x))
 
 
-#endif /* MWARE_MSG_H */
+#endif /* MWARE_MESSAGES_H */
 

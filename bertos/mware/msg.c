@@ -38,7 +38,7 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-#include "msg.h"
+#include "messages.h"
 
 /**
  * Array of pointers to localized strings. Should be filled
