@@ -319,10 +319,15 @@ def csrcGenerator(project_info):
         cxxsrc.append(file)
     for file in project_info.info("CPU_INFOS")["ASRC"]:
         asrc.append(file)
+    csrc = set(csrc)
     csrc = " \\\n\t".join(csrc) + " \\"
+    pcsrc = set(pcsrc)
     pcsrc = " \\\n\t".join(pcsrc) + " \\"
+    cppasrc = set(cppasrc)
     cppasrc = " \\\n\t".join(cppasrc) + " \\"
+    cxxsrc = set(cxxsrc)
     cxxsrc = " \\\n\t".join(cxxsrc) + " \\"
+    asrc = set(asrc)
     asrc = " \\\n\t".join(asrc) + " \\"
     constants = "\n".join([os.path.basename(project_info.info("PROJECT_PATH")) + "_" + key + " = " + unicode(value) for key, value in constants.items()])
     return csrc, pcsrc, cppasrc, cxxsrc, asrc, constants
