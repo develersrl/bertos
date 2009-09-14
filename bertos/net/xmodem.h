@@ -37,7 +37,7 @@
  * \author Francesco Sacchi <batt@develer.com>
  *
  * $WIZ$ module_name = "xmodem"
- * $WIZ$ module_depends = "kfile"
+ * $WIZ$ module_depends = "kfile", "crc16"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_xmodem.h"
  */
 
