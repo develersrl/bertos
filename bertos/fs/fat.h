@@ -68,9 +68,15 @@ INLINE FatFile * FATFILE_CAST(KFile *fd)
 
 /**
  * Initialize \a file and open \a file_path for reading.
+ *
+ * \a mode is a OR combination of various flags, you can use \a FA_READ for
+ * read access or \a FA_WRITE for write access.
+ * The function returns \a FR_OK if success, other values (defined in ff.h) in case
+ * of failure.
+ *
  * \param file A pointer to a FatFile structure.
  * \param file_path The file path on the filesystem.
- * \param mode Open mode for the file.
+ * \param mode Open mode for the file, which can be OR'ed together
  * \sa ff.h for return code meaning and \a mode flags.
  */
 FRESULT fatfile_open(FatFile *file, const char *file_path, BYTE mode);
