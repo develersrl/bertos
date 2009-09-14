@@ -47,7 +47,7 @@
 #define CONFIG_KBD_OBSERVER  0
 
 /// Enable key beeps. $WIZ$ type = "boolean"
-#define CONFIG_KBD_BEEP  1
+#define CONFIG_KBD_BEEP  0
 
 /// Enable long pression handler for keys. $WIZ$ type = "boolean"
 #define CONFIG_KBD_LONGPRESS  0
