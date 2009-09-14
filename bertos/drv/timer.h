@@ -268,7 +268,16 @@ typedef struct Timer
 void timer_add(Timer *timer);
 Timer *timer_abort(Timer *timer);
 
-/** Set the timer so that it calls an user hook when it expires */
+/**
+ * Set the timer so that it calls an user hook when it expires
+ *
+ * Sometimes you may want to use the same callback for different events, so you must have
+ * different data to operate on. The user_data parameter is such data.
+ *
+ * \param timer Timer struct to set the callback to
+ * \param func  Function that will be called when the timer expires
+ * \param user_data Additional data you may want to pass to the callback
+ */
 INLINE void timer_setSoftint(Timer *timer, Hook func, iptr_t user_data)
 {
 	event_initSoftint(&timer->expire, func, user_data);
