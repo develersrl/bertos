@@ -57,6 +57,16 @@
 #include <cpu/frame.h> // CPU_SAVED_REGS_CNT
 
 /*
+ * Define stack for one process.
+ *
+ * This macro define a static stack for one process and do
+ * check if given stack size is enough to run process.
+ */
+#define PROC_DEFINE_STACK(name, size) \
+	STATIC_ASSERT(size >= CONFIG_KERN_MINSTACKSIZE); \
+	cpu_stack_t name[size / sizeof(cpu_stack_t)]; \
+
+/*
  * Forward declaration. The definition of struct Process is private to the
  * scheduler and hidden in proc_p.h.
  */
