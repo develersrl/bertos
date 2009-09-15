@@ -57,9 +57,11 @@ from BOutputPage import BOutputPage
 from BCreationPage import BCreationPage
 from BFinalPage import BFinalPage
 
-from BEditingDialog import BEditingDialog
+from BEditingDialog import BEditingDialog, BVersionDialog, BToolchainDialog
 
 import bertos_utils
+
+from LoadException import VersionException, ToolchainException
 
 def newProject():
     page_list = [BFolderPage, BVersionPage, BCpuPage, BToolchainPage, BModulePage, BOutputPage, BCreationPage, BFinalPage]
@@ -78,7 +80,34 @@ def newProject():
     sys.exit()
     
 def editProject(project_file):
-    QApplication.instance().project = bertos_utils.loadBertosProject(project_file)
+    info_dict = {}
+    while(True):
+        try:
+            QApplication.instance().project = bertos_utils.loadBertosProject(project_file, info_dict)
+        except VersionException:
+            QMessageBox.critical(
+                None,
+                QObject().tr("BeRTOS version not found!"),
+                QObject().tr("The selected BeRTOS version is not found, please select an existing one...")
+            )
+            dialog = BVersionDialog()
+            if dialog.exec_():
+                version = dialog.version_page.currentVersion()
+                info_dict["SOURCES_PATH"] = version
+            continue
+        except ToolchainException, exc:
+            QMessageBox.critical(
+                None,
+                QObject().tr("Toolchain not found!"),
+                QObject().tr("The selected toolchain is not found, please select an existing one...")
+            )
+            QApplication.instance().project = exc.partial_project
+            dialog = BToolchainDialog()
+            if dialog.exec_():
+                toolchain = dialog.toolchain_page.currentToolchain()
+                info_dict["TOOLCHAIN"] = toolchain
+            continue
+        break
     dialog = BEditingDialog()
     dialog.exec_()
 

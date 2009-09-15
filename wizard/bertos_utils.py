@@ -47,20 +47,24 @@ import plugins
 import DefineException
 import BProject
 
+from LoadException import VersionException, ToolchainException
+
 def isBertosDir(directory):
    return os.path.exists(directory + "/VERSION")
 
 def bertosVersion(directory):
    return open(directory + "/VERSION").readline().strip()
 
-def loadBertosProject(project_file):
+def loadBertosProject(project_file, info_dict):
     project_data = pickle.loads(open(project_file, "r").read())
     project_info = BProject.BProject()
     project_info.setInfo("PROJECT_PATH", os.path.dirname(project_file))
-    project_info.setInfo("SOURCES_PATH", project_data["SOURCES_PATH"])
-    project_info.setInfo("TOOLCHAIN", project_data["TOOLCHAIN"])
-    project_info.setInfo("SELECTED_FREQ", project_data["SELECTED_FREQ"])
-    project_info.setInfo("OUTPUT", project_data["OUTPUT"])
+    if "SOURCES_PATH" in info_dict:
+        project_data["SOURCES_PATH"] = info_dict["SOURCES_PATH"]
+    if os.path.exists(project_data["SOURCES_PATH"]):
+        project_info.setInfo("SOURCES_PATH", project_data["SOURCES_PATH"])
+    else:
+        raise VersionException(project_info)
     loadSourceTree(project_info)
     cpu_name = project_data["CPU_NAME"]
     project_info.setInfo("CPU_NAME", cpu_name)
@@ -81,6 +85,14 @@ def loadBertosProject(project_file):
         else:
             tag_dict[tag] = False
     project_info.setInfo("ALL_CPU_TAGS", tag_dict)
+    if "TOOLCHAIN" in info_dict:
+        project_data["TOOLCHAIN"] = info_dict["TOOLCHAIN"]
+    if os.path.exists(project_data["TOOLCHAIN"]["path"]):
+        project_info.setInfo("TOOLCHAIN", project_data["TOOLCHAIN"])
+    else:
+        raise ToolchainException(project_info)
+    project_info.setInfo("SELECTED_FREQ", project_data["SELECTED_FREQ"])
+    project_info.setInfo("OUTPUT", project_data["OUTPUT"])
     loadModuleData(project_info, True)
     setEnabledModules(project_info, project_data["ENABLED_MODULES"])
     return project_info

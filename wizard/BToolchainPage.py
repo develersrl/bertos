@@ -174,13 +174,18 @@ class BToolchainPage(BWizardPage):
                 toolchains[toolchain] = True
         sel_toolchain = self.projectInfo("TOOLCHAIN")
         for key, value in toolchains.items():
-            item = QListWidgetItem(key)
-            item.setData(Qt.UserRole, qvariant_converter.convertStringDict({"path": key}))
-            self.pageContent.toolchainList.addItem(item)
-            if sel_toolchain and sel_toolchain["path"] == key:
-                self.pageContent.toolchainList.setCurrentItem(item)
-            if value:
-                self.validateToolchain(self.pageContent.toolchainList.row(item))
+            if os.path.exists(key):
+                item = QListWidgetItem(key)
+                item.setData(Qt.UserRole, qvariant_converter.convertStringDict({"path": key}))
+                self.pageContent.toolchainList.addItem(item)
+                if sel_toolchain and sel_toolchain["path"] == key:
+                    self.pageContent.toolchainList.setCurrentItem(item)
+                if value:
+                    self.validateToolchain(self.pageContent.toolchainList.row(item))
+
+    def currentToolchain(self):
+        selected_toolchain = qvariant_converter.getStringDict(self.pageContent.toolchainList.currentItem().data(Qt.UserRole))
+        return selected_toolchain
 
     def _clearList(self):
         """

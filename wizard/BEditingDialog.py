@@ -112,7 +112,7 @@ class BEditingDialog(QDialog):
         dialog = BToolchainDialog()
         if dialog.exec_():
             toolchain = qvariant_converter.getStringDict(dialog.toolchain_page.currentItem().data(Qt.UserRole))
-            toolchain_page.setProjectInfo("TOOLCHAIN", toolchain)
+            dialog.toolchain_page.setProjectInfo("TOOLCHAIN", toolchain)
     
     def changeBertosVersion(self):
         dialog = BVersionDialog()
@@ -183,10 +183,11 @@ class BToolchainDialog(QDialog):
 	# TODO: to be moved in BToolchainPage
 	for toolchain_row in range(toolchain_page.pageContent.toolchainList.count()):
             toolchain = qvariant_converter.getStringDict(toolchain_page.pageContent.toolchainList.item(toolchain_row).data(Qt.UserRole))
-	    if toolchain["path"] == current_toolchain["path"]:
+	    if current_toolchain and toolchain["path"] == current_toolchain["path"]:
                 toolchain_page.pageContent.toolchainList.setCurrentRow(toolchain_row)
 		toolchain_page.selectionChanged()
 		break
+	self.toolchain_page = toolchain_page
         layout.addWidget(toolchain_page)
         button_layout = QHBoxLayout()
         button_layout.addStretch()
@@ -207,6 +208,7 @@ class BVersionDialog(QDialog):
         layout = QVBoxLayout()
         version_page = BVersionPage()
         version_page.reloadData()
+	self.version_page = version_page
         layout.addWidget(version_page)
         button_layout = QHBoxLayout()
         button_layout.addStretch()
