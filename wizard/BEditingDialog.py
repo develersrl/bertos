@@ -109,54 +109,13 @@ class BEditingDialog(QDialog):
 	self.module_page.setProjectInfo("SELECTED_FREQ", frequency)
 
     def changeToolchain(self):
-        dialog = QDialog()
-	dialog.setWindowIcon(QIcon(":/images/appicon.png"))
-        layout = QVBoxLayout()
-        toolchain_page = BToolchainPage()
-	current_toolchain = toolchain_page.projectInfo("TOOLCHAIN")
-        toolchain_page.reloadData()
-	# TODO: to be moved in BToolchainPage
-	for toolchain_row in range(toolchain_page.pageContent.toolchainList.count()):
-            toolchain = qvariant_converter.getStringDict(toolchain_page.pageContent.toolchainList.item(toolchain_row).data(Qt.UserRole))
-	    if toolchain["path"] == current_toolchain["path"]:
-                toolchain_page.pageContent.toolchainList.setCurrentRow(toolchain_row)
-		toolchain_page.selectionChanged()
-		break
-        layout.addWidget(toolchain_page)
-        button_layout = QHBoxLayout()
-        button_layout.addStretch()
-        cancel_button = QPushButton(self.tr("Cancel")) 
-        button_layout.addWidget(cancel_button)
-        ok_button = QPushButton(self.tr("Ok"))
-        button_layout.addWidget(ok_button)
-        dialog.connect(cancel_button, SIGNAL("clicked()"), dialog.reject)
-        layout.addLayout(button_layout)
-        dialog.setLayout(layout)
-        dialog.connect(ok_button, SIGNAL("clicked()"), dialog.accept)
-        dialog.setWindowTitle(self.tr("Change toolchain"))
+        dialog = BToolchainDialog()
         if dialog.exec_():
-            toolchain = qvariant_converter.getStringDict(toolchain_page.currentItem().data(Qt.UserRole))
+            toolchain = qvariant_converter.getStringDict(dialog.toolchain_page.currentItem().data(Qt.UserRole))
             toolchain_page.setProjectInfo("TOOLCHAIN", toolchain)
     
     def changeBertosVersion(self):
-        dialog = QDialog()
-	dialog.setWindowIcon(QIcon(":/images/appicon.png"))
-        layout = QVBoxLayout()
-        version_page = BVersionPage()
-        version_page.reloadData()
-        layout.addWidget(version_page)
-        button_layout = QHBoxLayout()
-        button_layout.addStretch()
-        cancel_button = QPushButton(self.tr("Cancel")) 
-        button_layout.addWidget(cancel_button)
-        ok_button = QPushButton(self.tr("Ok"))
-        button_layout.addWidget(ok_button)
-        dialog.connect(cancel_button, SIGNAL("clicked()"), dialog.reject)
-        layout.addLayout(button_layout)
-        dialog.setLayout(layout)
-        dialog.connect(ok_button, SIGNAL("clicked()"), dialog.accept)
-        current_version = version_page.projectInfo("SOURCES_PATH")
-        dialog.setWindowTitle(self.tr("Change BeRTOS version"))
+        dialog = BVersionDialog()
         if dialog.exec_():
             version = qvariant_converter.getString(version_page.currentItem().data(Qt.UserRole))
             if version != current_version:
@@ -213,6 +172,54 @@ class BEditingDialog(QDialog):
     def setCurrentVersion(self, version):
         self.module_page.setProjectInfo("SOURCES_PATH", version)
 
+class BToolchainDialog(QDialog):
+    def __init__(self):
+        QDialog.__init__(self)
+	self.setWindowIcon(QIcon(":/images/appicon.png"))
+        layout = QVBoxLayout()
+        toolchain_page = BToolchainPage()
+	current_toolchain = toolchain_page.projectInfo("TOOLCHAIN")
+        toolchain_page.reloadData()
+	# TODO: to be moved in BToolchainPage
+	for toolchain_row in range(toolchain_page.pageContent.toolchainList.count()):
+            toolchain = qvariant_converter.getStringDict(toolchain_page.pageContent.toolchainList.item(toolchain_row).data(Qt.UserRole))
+	    if toolchain["path"] == current_toolchain["path"]:
+                toolchain_page.pageContent.toolchainList.setCurrentRow(toolchain_row)
+		toolchain_page.selectionChanged()
+		break
+        layout.addWidget(toolchain_page)
+        button_layout = QHBoxLayout()
+        button_layout.addStretch()
+        cancel_button = QPushButton(self.tr("Cancel")) 
+        button_layout.addWidget(cancel_button)
+        ok_button = QPushButton(self.tr("Ok"))
+        button_layout.addWidget(ok_button)
+        self.connect(cancel_button, SIGNAL("clicked()"), self.reject)
+        layout.addLayout(button_layout)
+        self.setLayout(layout)
+        self.connect(ok_button, SIGNAL("clicked()"), self.accept)
+        self.setWindowTitle(self.tr("Change toolchain"))
+
+class BVersionDialog(QDialog):
+    def __init__(self):
+        QDialog.__init__(self)
+	self.setWindowIcon(QIcon(":/images/appicon.png"))
+        layout = QVBoxLayout()
+        version_page = BVersionPage()
+        version_page.reloadData()
+        layout.addWidget(version_page)
+        button_layout = QHBoxLayout()
+        button_layout.addStretch()
+        cancel_button = QPushButton(self.tr("Cancel")) 
+        button_layout.addWidget(cancel_button)
+        ok_button = QPushButton(self.tr("Ok"))
+        button_layout.addWidget(ok_button)
+        self.connect(cancel_button, SIGNAL("clicked()"), self.reject)
+        layout.addLayout(button_layout)
+        self.setLayout(layout)
+        self.connect(ok_button, SIGNAL("clicked()"), self.accept)
+        current_version = version_page.projectInfo("SOURCES_PATH")
+        self.setWindowTitle(self.tr("Change BeRTOS version"))
 
 
 def main():
