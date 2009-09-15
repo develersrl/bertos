@@ -105,7 +105,7 @@ static void randpool_stir(EntropyPool *pool)
 		/*Insert a message digest in entropy pool.*/
 		randpool_push(pool, md2_end(&context), MD2_DIGEST_LEN);
 
-		pool->counter = pool->counter + 1; 
+		pool->counter = pool->counter + 1;
 
 	}
 
@@ -156,8 +156,8 @@ void randpool_add(EntropyPool *pool, void *data, size_t entropy)
 
 /**
  * Randpool function initialization.
- * The entropy pool can be initialize also with 
- * a previous entropy pool. 
+ * The entropy pool can be initialize also with
+ * a previous entropy pool.
  */
 void randpool_init(EntropyPool *pool, void *_data, size_t len)
 {
@@ -175,7 +175,7 @@ void randpool_init(EntropyPool *pool, void *_data, size_t len)
 	if(data)
 	{
 		/*
-		 * Initialize a entropy pool with a 
+		 * Initialize a entropy pool with a
 		 * previous pool, and assume all pool as
 		 * entropy.
 		 */
@@ -215,7 +215,7 @@ void randpool_get(EntropyPool *pool, void *_data, size_t n_byte)
 	data = (uint8_t *)_data;
 
 	/* Test if i + CONFIG_MD2_BLOCK_LEN  is inside of entropy pool.*/
-	ASSERT((MD2_DIGEST_LEN + i) < CONFIG_SIZE_ENTROPY_POOL);
+	ASSERT((MD2_DIGEST_LEN + i) <= CONFIG_SIZE_ENTROPY_POOL);
 
 	md2_init(&context);
 
