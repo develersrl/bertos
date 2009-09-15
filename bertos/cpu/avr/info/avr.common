@@ -65,5 +65,5 @@ MK_DEBUG_SCRIPT = PRG_SCRIPTS_DIR + "nodebug.sh"
 MK_STOPDEBUG_SCRIPT = PRG_SCRIPTS_DIR + "none.sh"
 
 # Common GCC flags.
-MK_CPU_CPPFLAGS = "-Os -fno-strict-aliasing -I" + CPU_DIR + "avr/"
+MK_CPU_CPPFLAGS = "-Os -I" + CPU_DIR + "avr/"
 
