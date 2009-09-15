@@ -54,8 +54,8 @@
 typedef struct EntropyPool
 {
 	size_t entropy;                                  ///< Actual value of entropy (byte).
-	size_t pos_add;                                  ///< Number of byte  idd in entropy pool.
-	size_t pos_get;                                  ///< Number of byte get in entropy pool.
+	size_t pos_add;                                  ///< Number of byte added in entropy pool.
+	size_t pos_get;                                  ///< Number of byte got in entropy pool.
 	size_t counter;                                  ///< Counter.
 
 #if CONFIG_RANDPOOL_TIMER
