@@ -41,7 +41,6 @@
 #define KERN_PROC_P_H
 
 #include "cfg/cfg_proc.h"
-#include "cfg/cfg_signal.h"
 #include "cfg/cfg_monitor.h"
 
 #include <cfg/compiler.h>
@@ -49,49 +48,11 @@
 #include <cpu/types.h>        /* for cpu_stack_t */
 #include <cpu/irq.h>          // IRQ_ASSERT_DISABLED()
 
-#include <struct/list.h>
-
 #if CONFIG_KERN_PREEMPT
 	#include <ucontext.h> // XXX
 #endif
 
-typedef struct Process
-{
-#if CONFIG_KERN_PRI
-	PriNode      link;        /**< Link Process into scheduler lists */
-#else
-	Node         link;        /**< Link Process into scheduler lists */
-#endif
-	cpu_stack_t  *stack;       /**< Per-process SP */
-	iptr_t       user_data;   /**< Custom data passed to the process */
-
-#if CONFIG_KERN_SIGNALS
-	sigmask_t    sig_wait;    /**< Signals the process is waiting for */
-	sigmask_t    sig_recv;    /**< Received signals */
-#endif
-
-#if CONFIG_KERN_HEAP
-	uint16_t     flags;       /**< Flags */
-#endif
-
-#if CONFIG_KERN_HEAP | CONFIG_KERN_MONITOR | (ARCH & ARCH_EMUL)
-	cpu_stack_t  *stack_base;  /**< Base of process stack */
-	size_t       stack_size;  /**< Size of process stack */
-#endif
-
-#if CONFIG_KERN_PREEMPT
-	ucontext_t   context;
-#endif
-
-#if CONFIG_KERN_MONITOR
-	struct ProcMonitor
-	{
-		Node        link;
-		const char *name;
-	} monitor;
-#endif
-
-} Process;
+#include <kern/proc.h>   // struct Process
 
 
 /**

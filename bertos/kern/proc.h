@@ -45,7 +45,10 @@
 #define KERN_PROC_H
 
 #include "cfg/cfg_proc.h"
+#include "cfg/cfg_signal.h"
 #include "cfg/cfg_monitor.h"
+
+#include <struct/list.h> // Node, PriNode
 
 #include <cfg/compiler.h>
 
@@ -57,20 +60,49 @@
 #include <cpu/frame.h> // CPU_SAVED_REGS_CNT
 
 /*
- * Define stack for one process.
+ * WARNING: struct Process is considered private, so its definition can change any time
+ * without notice. DO NOT RELY on any field defined here, use only the interface
+ * functions below.
  *
- * This macro define a static stack for one process and do
- * check if given stack size is enough to run process.
+ * You have been warned.
  */
-#define PROC_DEFINE_STACK(name, size) \
-	STATIC_ASSERT(size >= CONFIG_KERN_MINSTACKSIZE); \
-	cpu_stack_t name[size / sizeof(cpu_stack_t)]; \
+typedef struct Process
+{
+#if CONFIG_KERN_PRI
+	PriNode      link;        /**< Link Process into scheduler lists */
+#else
+	Node         link;        /**< Link Process into scheduler lists */
+#endif
+	cpu_stack_t  *stack;       /**< Per-process SP */
+	iptr_t       user_data;   /**< Custom data passed to the process */
 
-/*
- * Forward declaration. The definition of struct Process is private to the
- * scheduler and hidden in proc_p.h.
- */
-struct Process;
+#if CONFIG_KERN_SIGNALS
+	sigmask_t    sig_wait;    /**< Signals the process is waiting for */
+	sigmask_t    sig_recv;    /**< Received signals */
+#endif
+
+#if CONFIG_KERN_HEAP
+	uint16_t     flags;       /**< Flags */
+#endif
+
+#if CONFIG_KERN_HEAP | CONFIG_KERN_MONITOR | (ARCH & ARCH_EMUL)
+	cpu_stack_t  *stack_base;  /**< Base of process stack */
+	size_t       stack_size;  /**< Size of process stack */
+#endif
+
+#if CONFIG_KERN_PREEMPT
+	ucontext_t   context;
+#endif
+
+#if CONFIG_KERN_MONITOR
+	struct ProcMonitor
+	{
+		Node        link;
+		const char *name;
+	} monitor;
+#endif
+
+} Process;
 
 /**
  * Initialize the process subsystem (kernel).
@@ -274,36 +306,54 @@ INLINE bool proc_allowed(void)
 		proc_permit(); \
 	} while(0)
 
-#ifndef CONFIG_KERN_MINSTACKSIZE
+/**
+ * Default stack size for each thread, in bytes.
+ *
+ * The goal here is to allow a minimal task to save all of its
+ * registers twice, plus push a maximum of 32 variables on the
+ * stack. We add also struct Process size since we save it into the process'
+ * stack.
+ *
+ * The actual size computed by the default formula greatly depends on what
+ * options are active and on the architecture.
+ *
+ * Note that on most 16bit architectures, interrupts will also
+ * run on the stack of the currently running process.  Nested
+ * interrupts will greatly increases the amount of stack space
+ * required per process.  Use irqmanager to minimize stack
+ * usage.
+ */
 
-	#if (ARCH & ARCH_EMUL)
-		/* We need a large stack because system libraries are bloated */
-		#define CONFIG_KERN_MINSTACKSIZE  65536
-	#else
-		/**
-		 * Default stack size for each thread, in bytes.
-		 *
-		 * The goal here is to allow a minimal task to save all of its
-		 * registers twice, plus push a maximum of 32 variables on the
-		 * stack.
-		 *
-		 * The actual size computed by the default formula is:
-		 *  \li AVR:    102
-		 *  \li i386:   156
-		 *  \li ARM:    164
-		 *  \li x86_64: 184
-		 *
-		 * Note that on most 16bit architectures, interrupts will also
-		 * run on the stack of the currently running process.  Nested
-		 * interrupts will greatly increases the amount of stack space
-		 * required per process.  Use irqmanager to minimize stack
-		 * usage.
-		 */
-		#define CONFIG_KERN_MINSTACKSIZE  \
-		    (CPU_SAVED_REGS_CNT * 2 * sizeof(cpu_stack_t) \
-		    + 48 * sizeof(int))
-	#endif
+#if (ARCH & ARCH_EMUL)
+	/* We need a large stack because system libraries are bloated */
+	#define KERN_MINSTACKSIZE 65536
+#else
+	#define KERN_MINSTACKSIZE \
+		(sizeof(Process) + CPU_SAVED_REGS_CNT * 2 * sizeof(cpu_stack_t) \
+		+ 32 * sizeof(int))
 #endif
+
+#ifndef CONFIG_KERN_MINSTACKSIZE
+	/* For backward compatibility */
+	#define CONFIG_KERN_MINSTACKSIZE KERN_MINSTACKSIZE
+#else
+	#warning FIXME: This macro is deprecated, use KERN_MINSTACKSIZE instead
+#endif
+
+/**
+ * Utility macro to allocate a stack of size \a size.
+ *
+ * This macro define a static stack for one process and do
+ * check if given stack size is enough to run process.
+ * \note If you plan to use kprintf() and similar functions, you will need
+ * at least KERN_MINSTACKSIZE * 2 bytes.
+ *
+ * \param name Variable name for the stack.
+ * \param size Stack size in bytes. It must be at least KERN_MINSTACKSIZE.
+ */
+#define PROC_DEFINE_STACK(name, size) \
+	STATIC_ASSERT((size) >= KERN_MINSTACKSIZE); \
+	cpu_stack_t name[(size) / sizeof(cpu_stack_t)];
 
 /* Memory fill codes to help debugging */
 #if CONFIG_KERN_MONITOR
