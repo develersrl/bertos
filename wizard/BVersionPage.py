@@ -117,7 +117,8 @@ class BVersionPage(BWizardPage):
         Slot called when the user remove a BeRTOS version.
         """
         item = self.pageContent.versionList.takeItem(self.pageContent.versionList.currentRow())
-        self.deleteVersion(qvariant_converter.getString(item.data(Qt.UserRole)))
+	if item:
+		self.deleteVersion(qvariant_converter.getString(item.data(Qt.UserRole)))
         self.emit(SIGNAL("completeChanged()"))
     
     def rowChanged(self):
@@ -151,8 +152,8 @@ class BVersionPage(BWizardPage):
         """
         Removes the given directory from the QSettings.
         """
-        versions = self.versions()
-        versions.remove(directory)
+        versions = [os.path.normpath(path) for path in self.versions()]
+        versions.remove(os.path.normpath(directory))
         self.setVersions(versions)
     
     def resetVersionList(self):
