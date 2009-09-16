@@ -78,7 +78,7 @@
 /**
  * \brief Receive a file using the XModem protocol.
  *
- * \param KFile channel to use for transfer
+ * \param ch Channel to use for transfer
  * \param fd Destination file
  *
  * \note This function allocates a large amount of stack (\see XM_BUFSIZE).
@@ -297,7 +297,7 @@ bool xmodem_recv(KFile *ch, KFile *fd)
 /**
  * \brief Transmit some data using the XModem protocol.
  *
- * \param KFile channel to use for transfer
+ * \param ch Channel to use for transfer
  * \param fd Source file
  *
  * \note This function allocates a large amount of stack for
