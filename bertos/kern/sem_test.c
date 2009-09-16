@@ -109,7 +109,7 @@ unsigned int global_count = 0;
 	} \
 } \
 
-#define PROC_TEST_STACK(num)  static cpu_stack_t proc_sem_test##num##_stack[1024 / sizeof(cpu_stack_t)];
+#define PROC_TEST_STACK(num)  PROC_DEFINE_STACK(proc_sem_test##num##_stack, KERN_MINSTACKSIZE * 2)
 #define PROC_TEST_INIT(num)   proc_new(proc_semTest##num, NULL, sizeof(proc_sem_test##num##_stack), proc_sem_test##num##_stack);
 
 // Define process

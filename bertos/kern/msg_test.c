@@ -68,7 +68,7 @@
 
 // Global settings for the test.
 #define MAX_GLOBAL_COUNT            11040
-#define TEST_TIME_OUT_MS               10
+#define TEST_TIME_OUT_MS             5000
 #define DELAY                           5
 
 // Settings for the test message.
@@ -107,6 +107,7 @@ static NORETURN void receiver_proc##num(void) \
 		rec_msg->result += rec_msg->val; \
 		kprintf("Proc[%d]..process message val[%d],delay[%d],res[%d]\n", num, rec_msg->val, rec_msg->delay, rec_msg->result); \
 		msg_reply(&rec_msg->msg); \
+		process_num++; \
 		kprintf("Proc[%d] reply\n", num); \
 	} \
 }
@@ -118,7 +119,7 @@ static NORETURN void receiver_proc##num(void) \
 		msg_put(&test_port##num, &msg##num.msg); \
 	} while(0)
 
-#define RECV_STACK(num) static cpu_stack_t receiver_stack##num[800 / sizeof(cpu_stack_t)]
+#define RECV_STACK(num) PROC_DEFINE_STACK(receiver_stack##num, KERN_MINSTACKSIZE * 2)
 #define RECV_INIT_PROC(num) proc_new(receiver_proc##num, NULL, sizeof(receiver_stack##num), receiver_stack##num)
 #define RECV_INIT_MSG(num, proc, sig) msg_initPort(&test_port##num, event_createSignal(proc, sig))
 
@@ -134,6 +135,7 @@ typedef struct
 
 // Global count to check if the test is going ok.
 static int count = 0;
+static int process_num;
 
 // Our message port.
 static MsgPort test_port0;
@@ -223,6 +225,7 @@ int msg_testRun(void)
 	// Send and wait the message
 	for (int i = 0; i < 23; ++i)
     {
+		process_num = 0;
 		SEND_MSG(0);
 		SEND_MSG(1);
 		SEND_MSG(2);
@@ -231,14 +234,24 @@ int msg_testRun(void)
 		SEND_MSG(5);
 		while(1)
 		{
-			if(sig_waitTimeout(SIG_SINGLE, TEST_TIME_OUT_MS) && SIG_SINGLE)
+			sigmask_t sigs = sig_waitTimeout(SIG_SINGLE, ms_to_ticks(TEST_TIME_OUT_MS));
+			if (sigs & SIG_SINGLE)
 			{
 				// Wait for a reply...
-				reply = containerof(msg_get(&test_portMain), TestMsg, msg);
-				if(reply == NULL)
-					break;
-				count += reply->result;
-				kprintf("Main recv[%d] count[%d]\n", reply->result, count);
+				while ((reply = (TestMsg *)msg_get(&test_portMain)))
+				{
+					count += reply->result;
+					kprintf("Main recv[%d] count[%d]\n", reply->result, count);
+				}
+			}
+			
+			if (process_num == 6)
+				break;
+
+			if (sigs & SIG_TIMEOUT)
+			{
+				kputs("Main: sig timeout\n");
+				goto error;
 			}
 		}
     }
@@ -248,7 +261,8 @@ int msg_testRun(void)
 		kprintf("Message test finished..ok!\n");
 		return 0;
 	}
-
+	
+error:
 	kprintf("Message test finished..fail!\n");
 	return -1;
 }

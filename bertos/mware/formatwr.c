@@ -106,9 +106,10 @@
 	/* Maximum precision for floating point values */
 	typedef long double max_float_t;
 
-	/*bernie: save some memory, who cares about floats with lots of decimals? */
-	#define FRMWRI_BUFSIZE 134
-	#warning FIXME:134 is too much, the code must be fixed to have a lower precision limit
+	/*luca: FIXME: this should be enough to print floating point values, must be investigated
+	 * further.
+	 */
+	#define FRMWRI_BUFSIZE 20
 #else
 	/*
 	 * Conservative estimate. Should be (probably) 12 (which is the size necessary

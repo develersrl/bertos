@@ -41,7 +41,8 @@
 #include <cfg/module.h>
 
 
-static cpu_stack_t idle_stack[CONFIG_KERN_MINSTACKSIZE / sizeof(cpu_stack_t)];
+// below there's a TRACE so we need a big stack
+PROC_DEFINE_STACK(idle_stack, KERN_MINSTACKSIZE * 2);
 
 /**
  * The idle process

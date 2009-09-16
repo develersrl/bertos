@@ -106,7 +106,7 @@
  *	} TestMsg;
  *
  *
- *  static cpu_stack_t sender_stack[CONFIG_KERN_MINSTACKSIZE / sizeof(cpu_stack_t)];
+ *  PROC_DEFINE_STACK(sender_stack, KERN_MINSTACKSIZE);
  *
  *	// A process that sends two messages and waits for replies.
  *	static void sender_proc(void)

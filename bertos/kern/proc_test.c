@@ -103,12 +103,12 @@ unsigned int t8_count = 0;
 	for (int i = 0; i < INC_PROC_T##num; ++i) \
 	{ \
 		t##num##_count++; \
-		kprintf("> Process[%d]: count[%d]\n", num, t##num##_count); \
+		kputs("> Process[" #num "]\n"); \
 		timer_delay(DELAY_PROC_T##num); \
 	} \
-} \
+}
 
-#define PROC_TEST_STACK(num)  static cpu_stack_t proc_test##num##_stack[700 / sizeof(cpu_stack_t)];
+#define PROC_TEST_STACK(num)  PROC_DEFINE_STACK(proc_test##num##_stack, KERN_MINSTACKSIZE);
 #define PROC_TEST_INIT(num)   proc_new(proc_test##num, NULL, sizeof(proc_test##num##_stack), proc_test##num##_stack);
 
 // Define process
@@ -135,8 +135,9 @@ PROC_TEST_STACK(8)
 #define PROC_PRI_TEST(num) static void proc_pri_test##num(void) \
 { \
 	struct Process *main_proc = (struct Process *) proc_currentUserData(); \
+	kputs("> Process: " #num "\n"); \
 	sig_signal(main_proc, SIG_USER##num); \
-} \
+}
 
 // Default priority is 0
 #define PROC_PRI_TEST_INIT(num, proc)  \
@@ -195,7 +196,7 @@ int proc_testRun(void)
 		ret_value = -1;
 	}
 
-#if CONFIG_KERN_SIGNALS
+#if CONFIG_KERN_SIGNALS & CONFIG_KERN_PRI
 	// test process priority
 	// main process must have the higher priority to check signals received
 	proc_setPri(proc_current(), 10);

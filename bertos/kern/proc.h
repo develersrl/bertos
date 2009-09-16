@@ -119,7 +119,7 @@ void proc_init(void);
  * of the stack;
  * \li have some memory for temporary variables inside called functions.
  *
- * The value given by CONFIG_KERN_MINSTACKSIZE is rather safe to use in the first place.
+ * The value given by KERN_MINSTACKSIZE is rather safe to use in the first place.
  *
  * \note The function
  * \code

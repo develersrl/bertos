@@ -80,12 +80,12 @@ static void NORETURN proc_signalTest##index(void) \
 { \
 	for(;;) \
 	{ \
-		kprintf("> Slave [%d]: Wait signal [%d]\n", index, signal); \
+		kputs("> Slave [" #index "]: Wait signal [" #signal "]\n"); \
 		sig_wait(signal); \
-		kprintf("> Slave [%d]: send signal [%d]\n", index, signal); \
+		kputs("> Slave [" #index "]: send signal [" #signal "]\n"); \
 		sig_signal(proc_currentUserData(), signal); \
 	} \
-} \
+}
 
 #define MAIN_CHECK_SIGNAL(index, slave) \
 	do { \
@@ -96,7 +96,7 @@ static void NORETURN proc_signalTest##index(void) \
 		count++; \
 	} while(0) \
 
-#define PROC_TEST_SLAVE_STACK(index) static cpu_stack_t proc_signal_test##index##_stack[700 / sizeof(cpu_stack_t)];
+#define PROC_TEST_SLAVE_STACK(index) PROC_DEFINE_STACK(proc_signal_test##index##_stack, KERN_MINSTACKSIZE);
 #define PROC_TEST_SLAVE_INIT(index, master_process) proc_new(proc_signalTest##index, master_process, sizeof(proc_signal_test##index##_stack), proc_signal_test##index##_stack)
 
 // Generate the code for signal test.

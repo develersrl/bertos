@@ -167,14 +167,14 @@ struct Process *proc_new_with_name(UNUSED_ARG(const char *, name), void (*entry)
 	PROC_ATOMIC(stack_base = (cpu_stack_t *)list_remHead(&StackFreeList));
 	ASSERT(stack_base);
 
-	stack_size = CONFIG_KERN_MINSTACKSIZE;
+	stack_size = KERN_MINSTACKSIZE;
 #elif CONFIG_KERN_HEAP
 	/* Did the caller provide a stack for us? */
 	if (!stack_base)
 	{
 		/* Did the caller specify the desired stack size? */
 		if (!stack_size)
-			stack_size = CONFIG_KERN_MINSTACKSIZE;
+			stack_size = KERN_MINSTACKSIZE;
 
 		/* Allocate stack dinamically */
 		if (!(stack_base = heap_alloc(stack_size)))
