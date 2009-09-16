@@ -40,8 +40,12 @@
 #include "proc_p.h"
 #include "proc.h"
 
-#include "cfg/cfg_arch.h"  // ARCH_EMUL
 #include "cfg/cfg_proc.h"
+#define LOG_LEVEL KERN_LOG_LEVEL
+#define LOG_FORMAT KERN_LOG_FORMAT
+#include <cfg/log.h>
+
+#include "cfg/cfg_arch.h"  // ARCH_EMUL
 #include "cfg/cfg_monitor.h"
 #include <cfg/macros.h>    // ROUND_UP2
 #include <cfg/module.h>
@@ -156,7 +160,7 @@ struct Process *proc_new_with_name(UNUSED_ARG(const char *, name), void (*entry)
 #if CONFIG_KERN_HEAP
 	bool free_stack = false;
 #endif
-	TRACEMSG("name=%s", name);
+	LOG_INFO("name=%s", name);
 
 #if (ARCH & ARCH_EMUL)
 	/* Ignore stack provided by caller and use the large enough default instead. */
@@ -328,7 +332,7 @@ void proc_setPri(struct Process *proc, int pri)
  */
 void proc_exit(void)
 {
-	TRACEMSG("%p:%s", CurrentProcess, proc_currentName());
+	LOG_INFO("%p:%s", CurrentProcess, proc_currentName());
 
 #if CONFIG_KERN_MONITOR
 	monitor_remove(CurrentProcess);
