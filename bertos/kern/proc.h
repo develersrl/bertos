@@ -110,33 +110,28 @@ typedef struct Process
  */
 void proc_init(void);
 
-/**
- * Create a new named process and schedules it for execution.
- *
- * When defining the stacksize take into account that you may want at least:
- * \li save all the registers for each nested function call;
- * \li have memory for the struct Process, which is positioned at the bottom
- * of the stack;
- * \li have some memory for temporary variables inside called functions.
- *
- * The value given by KERN_MINSTACKSIZE is rather safe to use in the first place.
- *
- * \note The function
- * \code
- * proc_new(entry, data, stacksize, stack)
- * \endcode
- * is a more convenient way to create a process, as you don't have to specify
- * the name.
- *
- * \param name Name of the process (currently unused).
- * \param entry Function that the process will execute.
- * \param data Pointer to user data.
- * \param stacksize Length of the stack.
- * \param stack Pointer to the memory area to be used as a stack.
- */
 struct Process *proc_new_with_name(const char *name, void (*entry)(void), iptr_t data, size_t stacksize, cpu_stack_t *stack);
 
 #if !CONFIG_KERN_MONITOR
+	/**
+	 * Create a new named process and schedules it for execution.
+	 *
+	 * When defining the stacksize take into account that you may want at least:
+	 * \li save all the registers for each nested function call;
+	 * \li have memory for the struct Process, which is positioned at the bottom
+	 * of the stack;
+	 * \li have some memory for temporary variables inside called functions.
+	 *
+	 * The value given by KERN_MINSTACKSIZE is rather safe to use in the first place.
+	 *
+	 * \param entry Function that the process will execute.
+	 * \param data Pointer to user data.
+	 * \param size Length of the stack.
+	 * \param stack Pointer to the memory area to be used as a stack.
+	 * 
+	 * \return Process structure of new created process
+	 *         if successful, NULL otherwise.
+	 */
 	#define proc_new(entry,data,size,stack) proc_new_with_name(NULL,(entry),(data),(size),(stack))
 #else
 	#define proc_new(entry,data,size,stack) proc_new_with_name(#entry,(entry),(data),(size),(stack))

@@ -150,6 +150,14 @@ void proc_init(void)
 /**
  * Create a new process, starting at the provided entry point.
  *
+ *
+ * \note The function
+ * \code
+ * proc_new(entry, data, stacksize, stack)
+ * \endcode
+ * is a more convenient way to create a process, as you don't have to specify
+ * the name.
+ * 
  * \return Process structure of new created process
  *         if successful, NULL otherwise.
  */

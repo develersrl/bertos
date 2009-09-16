@@ -46,7 +46,7 @@
  *  -D CONFIG_PRINTF=PRINTF_FULL         Full ANSI printf formatter, with some C99 extensions
  *  -D CONFIG_PRINTF=PRINTF_NOFLOAT      Exclude support for floats
  *  -D CONFIG_PRINTF=PRINTF_REDUCED      Simplified formatter (see below)
- *  -D CONFIG_PRINTF=PRINTF_NOMODIFIERS  Exclude 'l', 'z' and 'h' modifiers in reduced version
+ *  -D CONFIG_PRINTF=PRINTF_NOMODIFIERS  Exclude "l", "z" and "h" modifiers in reduced version
  *  -D CONFIG_PRINTF=PRINTF_DISABLED     No formatter at all
  * \endcode
  *
