@@ -48,7 +48,7 @@
  */
 #define CONFIG_SIZE_ENTROPY_POOL   64
 
-/// Turn on or off timer support in Randpool. $WIZ$ type = "boolean"
+/// Enable timer in randpool algo. $WIZ$ type = "boolean"
 #define CONFIG_RANDPOOL_TIMER       1
 
 #endif /* CFG_RANDPOOL_H */
