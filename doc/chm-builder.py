@@ -34,7 +34,7 @@ move(bertos_toc, toc_file)
 # compile CHM
 os.system(r"hhc " + DOC_PATH + "index.hhp")
 
-chm_target = r"doc\bertos-doc.chm"
+chm_target = r"bertos\bertos-doc.chm"
 move(DOC_PATH + r"bertos-doc.chm", chm_target)
 
 
