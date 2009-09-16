@@ -80,6 +80,7 @@
  *
  * $WIZ$ type = "int"
  * $WIZ$ min = 1
+ * $WIZ$ supports = "False"
  */
 #define CONFIG_KERN_QUANTUM 47
 
