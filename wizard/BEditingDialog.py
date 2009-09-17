@@ -117,7 +117,7 @@ class BEditingDialog(QDialog):
     def changeBertosVersion(self):
         dialog = BVersionDialog()
         if dialog.exec_():
-            version = qvariant_converter.getString(version_page.currentItem().data(Qt.UserRole))
+            version = qvariant_converter.getString(dialog.version_page.currentItem().data(Qt.UserRole))
             if version != current_version:
                 if QMessageBox.question(
                     version_page,
@@ -126,13 +126,13 @@ class BEditingDialog(QDialog):
                     QMessageBox.Ok | QMessageBox.Cancel
                 ) == QMessageBox.Ok:
 		    qApp.setOverrideCursor(QCursor(Qt.WaitCursor))
-                    version_page.setProjectInfo("SOURCES_PATH", version)
-                    version_page.setProjectInfo("OLD_SOURCES_PATH", current_version)
-                    enabled_modules = bertos_utils.enabledModules(version_page.project())
-                    old_configuration = version_page.projectInfo("CONFIGURATIONS")
-                    bertos_utils.loadSourceTree(version_page.project())
-                    bertos_utils.loadModuleData(version_page.project())
-                    new_configuration = version_page.projectInfo("CONFIGURATIONS")
+                    dialog.version_page.setProjectInfo("SOURCES_PATH", version)
+                    dialog.version_page.setProjectInfo("OLD_SOURCES_PATH", current_version)
+                    enabled_modules = bertos_utils.enabledModules(dialog.version_page.project())
+                    old_configuration = dialog.version_page.projectInfo("CONFIGURATIONS")
+                    bertos_utils.loadSourceTree(dialog.version_page.project())
+                    bertos_utils.loadModuleData(dialog.version_page.project())
+                    new_configuration = dialog.version_page.projectInfo("CONFIGURATIONS")
                     merged_configuration = {}
                     for conf in new_configuration:
                         if conf in old_configuration:
@@ -140,13 +140,13 @@ class BEditingDialog(QDialog):
                         else:
                             configuration = new_configuration[conf]
                         merged_configuration[conf] = configuration
-                    version_page.setProjectInfo("CONFIGURATIONS", merged_configuration)
-                    bertos_utils.setEnabledModules(version_page.project(), enabled_modules)
+                    dialog.version_page.setProjectInfo("CONFIGURATIONS", merged_configuration)
+                    bertos_utils.setEnabledModules(dialog.version_page.project(), enabled_modules)
                     self.module_page.fillModuleTree()
                     qApp.restoreOverrideCursor()
 		else:
 		    # Rollback version to the previous selected one.
-		    version_page.setProjectInfo("SOURCES_PATH", current_version)
+		    dialog.version_page.setProjectInfo("SOURCES_PATH", current_version)
 
     def apply(self):
         qApp.setOverrideCursor(QCursor(Qt.WaitCursor))
