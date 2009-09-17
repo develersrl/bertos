@@ -115,6 +115,7 @@ class BEditingDialog(QDialog):
             dialog.toolchain_page.setProjectInfo("TOOLCHAIN", toolchain)
     
     def changeBertosVersion(self):
+	current_version = self.module_page.projectInfo("SOURCES_PATH")
         dialog = BVersionDialog()
         if dialog.exec_():
             version = qvariant_converter.getString(dialog.version_page.currentItem().data(Qt.UserRole))
