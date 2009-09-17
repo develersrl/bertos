@@ -200,7 +200,15 @@
 	#define CPU_HARVARD             1
 
 	/// Valid pointers should be >= than this value (used for debug)
-	#define CPU_RAM_START       0x100
+	#if CPU_AVR_ATMEGA8 || CPU_AVR_ATMEGA32 || CPU_AVR_ATMEGA103
+		#define CPU_RAM_START       0x60
+	#elif CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA168
+		#define CPU_RAM_START       0x100
+	#elif CPU_AVR_ATMEGA1281
+		#define CPU_RAM_START       0x200
+	#else
+		#warning Fix CPU_RAM_START address for your AVR, default value set to 0x100
+		#define CPU_RAM_START       0x100
 
 #else
 	#error No CPU_... defined.
