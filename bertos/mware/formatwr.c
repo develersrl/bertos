@@ -106,16 +106,25 @@
 	/* Maximum precision for floating point values */
 	typedef long double max_float_t;
 
-	/*luca: FIXME: this should be enough to print floating point values, must be investigated
-	 * further.
-	 */
-	#define FRMWRI_BUFSIZE 20
+	#warning FIXME: be sure to fix buffer size below
+	#if CONFIG_FRMWRI_BUFSIZE
+		#define FRMWRI_BUFSIZE CONFIG_FRMWRI_BUFSIZE
+	#else
+		/* Conservative estimate. Max float is 3.40282e+038, so %f (but not %e or %g) must have
+		 * space for: sign + all 38 digits + '.' + 6 decimal digits (default)
+		 */
+		#define FRMWRI_BUFSIZE 50
+	#endif
 #else
-	/*
-	 * Conservative estimate. Should be (probably) 12 (which is the size necessary
-	 * to represent (2^32-1) in octal plus the sign bit.
-	 */
-	#define FRMWRI_BUFSIZE 16
+	#if CONFIG_FRMWRI_BUFSIZE
+		#define FRMWRI_BUFSIZE CONFIG_FRMWRI_BUFSIZE
+	#else
+		/*
+		 * Conservative estimate. Should be (probably) 12 (which is the size necessary
+		 * to represent (2^32-1) in octal plus the sign bit.
+		 */
+		#define FRMWRI_BUFSIZE 16
+	#endif
 #endif
 
 /* Probably useful for fancy microcontrollers such as the PIC, nobody knows. */
