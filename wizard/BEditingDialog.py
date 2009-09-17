@@ -120,7 +120,7 @@ class BEditingDialog(QDialog):
             version = qvariant_converter.getString(dialog.version_page.currentItem().data(Qt.UserRole))
             if version != current_version:
                 if QMessageBox.question(
-                    version_page,
+                    dialog.version_page,
                     self.tr("BeRTOS version update"),
                     self.tr("Changing the BeRTOS version will destroy all the modification done on the BeRTOS sources"),
                     QMessageBox.Ok | QMessageBox.Cancel
