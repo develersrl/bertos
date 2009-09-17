@@ -109,6 +109,7 @@
 	#else
 		#warning Fix CPU_RAM_START address for your ARM, default value set to 0x200
 		#define CPU_RAM_START		0x200
+	#endif
 
 	#ifdef __IAR_SYSTEMS_ICC__
 		#warning Check CPU_BYTE_ORDER
@@ -213,6 +214,7 @@
 	#else
 		#warning Fix CPU_RAM_START address for your AVR, default value set to 0x100
 		#define CPU_RAM_START       0x100
+	#endif
 
 #else
 	#error No CPU_... defined.
