@@ -104,7 +104,11 @@
 	#define CPU_HARVARD            0
 
 	/// Valid pointers should be >= than this value (used for debug)
-	#define CPU_RAM_START		0x200
+	#if CPU_ARM_AT91
+		#define CPU_RAM_START		0x00200000
+	#else
+		#warning Fix CPU_RAM_START address for your ARM, default value set to 0x200
+		#define CPU_RAM_START		0x200
 
 	#ifdef __IAR_SYSTEMS_ICC__
 		#warning Check CPU_BYTE_ORDER
