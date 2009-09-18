@@ -106,7 +106,6 @@
 	/* Maximum precision for floating point values */
 	typedef long double max_float_t;
 
-	#warning FIXME: be sure to fix buffer size below
 	#if CONFIG_FRMWRI_BUFSIZE
 		#define FRMWRI_BUFSIZE CONFIG_FRMWRI_BUFSIZE
 	#else
@@ -114,7 +113,7 @@
 		 * space for: sign + all 38 digits + '.' + 6 decimal digits (default)
 		 * Use a high value to avoid unexpected buffer overflows.
 		 */
-		#define FRMWRI_BUFSIZE 100
+		#define FRMWRI_BUFSIZE 134
 	#endif
 #else
 	#if CONFIG_FRMWRI_BUFSIZE
