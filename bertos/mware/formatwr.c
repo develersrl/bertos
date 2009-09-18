@@ -112,8 +112,9 @@
 	#else
 		/* Conservative estimate. Max float is 3.40282e+038, so %f (but not %e or %g) must have
 		 * space for: sign + all 38 digits + '.' + 6 decimal digits (default)
+		 * Use a high value to avoid unexpected buffer overflows.
 		 */
-		#define FRMWRI_BUFSIZE 50
+		#define FRMWRI_BUFSIZE 100
 	#endif
 #else
 	#if CONFIG_FRMWRI_BUFSIZE

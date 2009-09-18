@@ -61,7 +61,7 @@
  * $WIZ$ type = "int"
  * $WIZ$ min = 4
  */
-#define CONFIG_FRMWRI_BUFSIZE  20
+#define CONFIG_FRMWRI_BUFSIZE  100
 
 #endif /* CFG_FORMATWR_H */
 
