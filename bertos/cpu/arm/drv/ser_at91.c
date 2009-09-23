@@ -530,10 +530,13 @@ static void spi1_init(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(struc
 	/* Disable PIO on SPI pins */
 	PIOA_PDR = BV(SPI1_SPCK) | BV(SPI1_MOSI) | BV(SPI1_MISO);
 
+	/* SPI1 pins are on B peripheral function! */
+	PIOA_BSR = BV(SPI1_SPCK) | BV(SPI1_MOSI) | BV(SPI1_MISO);
+
 	/* Reset device */
 	SPI1_CR = BV(SPI_SWRST);
 
-/*
+	/*
 	 * Set SPI to master mode, fixed peripheral select, chip select directly connected to a peripheral device,
 	 * SPI clock set to MCK, mode fault detection disabled, loopback disable, NPCS0 active, Delay between CS = 0
 	 */
