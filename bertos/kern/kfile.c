@@ -255,4 +255,30 @@ void kfile_resync(KFile *fd, mtime_t delay)
 	}
 }
 
+/**
+ * Stub function that does nothing.
+ * This is a generic implementation that only return 0.
+ */
+static int kfile_generic(UNUSED_ARG(struct KFile *, fd))
+{
+	return 0;
+};
+
+
+/**
+ * Base class KFile constructor.
+ */
+void kfile_init(struct KFile *fd)
+{
+	ASSERT(fd);
+	memset(fd, 0, sizeof(*fd));
+	fd->clearerr = (ClearErrFunc_t)kfile_generic;
+	fd->close =  kfile_genericClose;
+	fd->error = kfile_generic;
+	fd->flush = kfile_generic;
+	fd->read = (ReadFunc_t)kfile_generic;
+	fd->reopen = kfile_genericReopen;
+	fd->seek = kfile_genericSeek;
+	fd->write = (WriteFunc_t)kfile_generic;
+}
 
