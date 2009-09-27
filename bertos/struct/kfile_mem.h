@@ -70,7 +70,7 @@ INLINE KFileMem * KFILEMEM_CAST(KFile *fd)
 /**
  * Initialize KFileMem struct.
  *
- * \param kf Interface to initialize.
+ * \param km Interface to initialize.
  * \param mem Pointer to the memory buffer to operate on.
  * \param len Size of the buffer
  */
