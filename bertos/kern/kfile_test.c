@@ -41,6 +41,7 @@
 
 
 #include "kfile.h"
+#include <struct/kfile_mem.h>
 
 #include "cfg/cfg_kfile.h"
 #include <cfg/debug.h>
@@ -63,73 +64,11 @@ MOD_DEFINE(kfile_test);
 #define BUF_TEST_LEN     3209
 
 // Buffer for test
-typedef uint8_t fake_t;
-fake_t test_buf[BUF_TEST_LEN];
-fake_t test_buf_save[BUF_TEST_LEN];
-fake_t test_disk[BUF_TEST_LEN];
+uint8_t test_buf[BUF_TEST_LEN];
+uint8_t test_buf_save[BUF_TEST_LEN];
 
-KFile fd;
-
-/*
- * Beckend to use kfile structure on pc.
- */
-static int fake_close(KFile *fd)
-{
-	(void)fd;
-	return 0;
-}
-
-static size_t fake_read(KFile *fd, void *buf, size_t size)
-{
-	fake_t *dest = (fake_t *)buf;
-	size_t rd_len;
-
-	rd_len = MIN((kfile_off_t)size, fd->size - fd->seek_pos);
-
-	memcpy(dest, test_disk, size);
-	fd->seek_pos += rd_len;
-
-	LOG_INFO("Read: real[%zd] expected[%zd]\n", rd_len, size);
-
-	return rd_len;
-}
-
-static size_t fake_write(KFile *fd, const void *buf, size_t size)
-{
-	const fake_t *src = (const fake_t *)buf;
-	size_t wr_len;
-
-	wr_len = MIN((kfile_off_t)size, fd->size - fd->seek_pos);
-
-	memcpy(test_disk, src, wr_len);
-	fd->seek_pos += wr_len;
-
-	LOG_INFO("Write: real[%zd] expected[%zd]\n", wr_len, size);
-
-	return wr_len;
-}
-
-static int fake_flush(KFile *fd)
-{
-	(void)fd;
-
-	return 0;
-}
-
-static void fake_kfileInit(void)
-{
-	// Setup data flash programming functions.
-	fd.reopen = kfile_genericReopen;
-	fd.close = fake_close;
-	fd.read = fake_read;
-	fd.write = fake_write;
-	fd.seek = kfile_genericSeek;
-	fd.flush = fake_flush;
-
-	fd.seek_pos = 0;
-	fd.size = BUF_TEST_LEN;
-
-}
+uint8_t test_disk[BUF_TEST_LEN];
+KFileMem mem;
 
 /*
  * Help function to init disk and the buffers.
@@ -299,7 +238,6 @@ int kfile_testRunGeneric(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t
 
 	/* TEST 3 BEGIN. */
 	LOG_INFO("Test 3: write outside of fd->size limit [%ld]\n", fd->size);
-	LOG_INFO("This test should FAIL!, you must see an assertion fail message.\n");
 
 	/*
 	 * Go to the Flash end
@@ -361,7 +299,7 @@ int kfile_testSetup(void)
         LOG_INFO("Mod init..ok\n");
 
 		// Init our backend and the buffers
-		fake_kfileInit();
+		kfilemem_init(&mem, test_disk, BUF_TEST_LEN);
 		init_testBuf();
 
         return 0;
@@ -369,7 +307,7 @@ int kfile_testSetup(void)
 
 int kfile_testRun(void)
 {
-	return kfile_testRunGeneric(&fd, test_buf, test_buf_save, BUF_TEST_LEN);
+	return kfile_testRunGeneric(&mem.fd, test_buf, test_buf_save, BUF_TEST_LEN);
 }
 
 /**
