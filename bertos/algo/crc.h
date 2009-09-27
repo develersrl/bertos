@@ -31,7 +31,7 @@
  *
  * -->
  *
- * \brief Cyclic Redundancy Check 16 (CRC).
+ * \brief Cyclic Redundancy Check 16 (CRC). This algorithm is the one used by the XMODEM protocol.
  *
  * \note This algorithm is incompatible with the CCITT-CRC16.
  *
@@ -70,12 +70,14 @@ extern const uint16_t crc16tab[256];
  * \param c New octet (range 0-255)
  * \param oldcrc Previous CRC16 value (referenced twice, beware of side effects)
  */
-#if CPU_AVR
+#if CPU_HARVARD
 	#define UPDCRC16(c, oldcrc) (pgm_read_uint16_t(&crc16tab[((oldcrc) >> 8) ^ ((unsigned char)(c))]) ^ ((oldcrc) << 8))
 #else
 	#define UPDCRC16(c, oldcrc) ((crc16tab[((oldcrc) >> 8) ^ ((unsigned char)(c))]) ^ ((oldcrc) << 8))
 #endif
 
+/** CRC-16 init value */
+#define CRC16_INIT_VAL ((uint16_t)0)
 
 #ifdef INLINE
 /**
@@ -83,7 +85,7 @@ extern const uint16_t crc16tab[256];
  */
 INLINE uint16_t updcrc16(uint8_t c, uint16_t oldcrc)
 {
-#if CPU_AVR
+#if CPU_HARVARD
 	return pgm_read_uint16_t(&crc16tab[(oldcrc >> 8) ^ c]) ^ (oldcrc << 8);
 #else
 	return crc16tab[(oldcrc >> 8) ^ c] ^ (oldcrc << 8);
