@@ -273,11 +273,11 @@
 
 	#define BIT_MASK_SINGLE__(use_bv, index, max, arg) \
 		((index < max) ? (PP_CAT(BIT_EXTRACT_FLAG_, use_bv) arg) : 0) \
-		/**/
+		/* */
 
 	#define BIT_MASK_IF_SINGLE__(use_bv, index, max, arg) \
 		(((index < max) && (BIT_EXTRACT_VALUE__ arg)) ? (PP_CAT(BIT_EXTRACT_FLAG_, use_bv) arg) : 0) \
-		/**/
+		/* */
 
 	#define BIT_ITER__2(macro, use_bv, max, a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15, ...) \
 		(macro(use_bv, 0, max, a0) | \
@@ -296,23 +296,23 @@
 		macro(use_bv, 13, max, a13) | \
 		macro(use_bv, 14, max, a14) | \
 		macro(use_bv, 15, max, a15)) \
-		/**/
+		/* */
 
 	#define BIT_ITER__(macro, use_bv, ...) \
 		BIT_ITER__2(macro, use_bv, PP_COUNT(__VA_ARGS__), __VA_ARGS__, (0,1),(0,1),(0,1),(0,1),(0,1),(0,1),(0,1),(0,1),(0,1),(0,1),(0,1),(0,1),(0,1),(0,1),(0,1),(0,1)) \
-		/**/
+		/* */
 
 	#define BIT_MASKS__(use_bv, ...) \
 		BIT_ITER__(BIT_MASK_SINGLE__, use_bv, __VA_ARGS__)
-		/**/
+		/* */
 
 	#define BIT_MASKS_CONDITIONAL__(use_bv, ...) \
 		BIT_ITER__(BIT_MASK_IF_SINGLE__, use_bv, __VA_ARGS__)
-		/**/
+		/* */
 
 	#define BIT_CHANGE__(reg, use_bv, ...) \
 		((reg) = ((reg) & ~BIT_MASKS__(use_bv, __VA_ARGS__)) | BIT_MASKS_CONDITIONAL__(use_bv, __VA_ARGS__)) \
-		/**/
+		/* */
 
 	#define BIT_CHANGE(reg, ...)        BIT_CHANGE__(reg, 0, __VA_ARGS__)
 	#define BIT_CHANGE_BV(reg, ...)     BIT_CHANGE__(reg, 1, __VA_ARGS__)

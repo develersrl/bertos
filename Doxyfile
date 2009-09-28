@@ -1266,7 +1266,8 @@ PREDEFINED             = __doxygen__ \
                          CONFIG_KERN_PRI=1 \
                          CONFIG_TIMER_EVENTS=1 \
                          CONFIG_TIMER_UDELAY=1 \
-                         CONFIG_KERN_SIGNALS=1
+                         CONFIG_KERN_SIGNALS=1 \
+                         COMPILER_VARIADIC_MACROS=1
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 
