@@ -105,6 +105,10 @@ INLINE uint16_t updcrc16(uint8_t c, uint16_t oldcrc)
  */
 extern uint16_t crc16(uint16_t crc, const void *buf, size_t len);
 
+int crc_testSetup(void);
+int crc_testRun(void);
+int crc_testTearDown(void);
+
 EXTERN_C_END
 
 #endif /* ALGO_CRC_H */
