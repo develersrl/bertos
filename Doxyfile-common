@@ -1229,6 +1229,8 @@ PREDEFINED             = __doxygen__ \
                          CONFIG_TIMER_EVENTS=1 \
                          CONFIG_TIMER_UDELAY=1 \
                          CONFIG_KERN_SIGNALS=1 \
+                         CONFIG_XMODEM_RECV=1 \
+                         CONFIG_XMODEM_SEND=1 \
                          COMPILER_VARIADIC_MACROS=1
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then 
