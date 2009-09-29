@@ -123,7 +123,7 @@ typedef struct AX25Msg
 #define AX25_PID_NOLAYER3 0xF0
 
 /**
- * HDLC flags
+ * \name HDLC flags.
  * These should be moved in
  * a separated HDLC related file one day...
  * \{
