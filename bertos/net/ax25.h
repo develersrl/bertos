@@ -115,7 +115,7 @@ typedef struct AX25Msg
 	#endif
 	uint16_t ctrl; ///< AX25 control field
 	uint8_t pid;   ///< AX25 PID field
-	uint8_t *info; ///< Pointer to the info field (payload) of the message
+	const uint8_t *info; ///< Pointer to the info field (payload) of the message
 	size_t len;    ///< Payload length
 } AX25Msg;
 
