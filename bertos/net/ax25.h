@@ -39,7 +39,7 @@
  *
  * $WIZ$ module_name = "ax25"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_ax25.h"
- * $WIZ$ module_depends = "kfile"
+ * $WIZ$ module_depends = "kfile", "crc-ccitt"
  */
 
 
@@ -154,5 +154,9 @@ void ax25_poll(AX25Ctx *ctx);
  * \param hook Callback function called when a message is received
  */
 void ax25_init(AX25Ctx *ctx, KFile *channel, ax25_callback_t hook);
+
+int ax25_testSetup(void);
+int ax25_testTearDown(void);
+int ax25_testRun(void);
 
 #endif /* NET_AX25_H */
