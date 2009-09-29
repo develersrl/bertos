@@ -66,7 +66,7 @@ static void msg_callback(AX25Msg *msg)
 	ASSERT(msg->ctrl == AX25_CTRL_UI);
 	ASSERT(msg->pid == AX25_PID_NOLAYER3);
 	ASSERT(msg->len == 30);
-	ASSERT(strncmp((char *)msg->info, "=4603.63N/01431.26E-Op. Andrej", 30) == 0);
+	ASSERT(strncmp((const char *)msg->info, "=4603.63N/01431.26E-Op. Andrej", 30) == 0);
 }
 
 int ax25_testSetup(void)
