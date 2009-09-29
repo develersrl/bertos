@@ -38,7 +38,6 @@
 
 #include "ax25.h"
 
-#include <drv/afsk.h>
 #include <struct/kfile_mem.h>
 
 #include <cfg/debug.h>

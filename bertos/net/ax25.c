@@ -42,7 +42,6 @@
 #include "ax25.h"
 #include "cfg/cfg_ax25.h"
 
-#include <drv/afsk.h>
 #include <algo/crc_ccitt.h>
 
 #define LOG_LEVEL  AX25_LOG_LEVEL
