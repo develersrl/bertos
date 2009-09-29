@@ -47,10 +47,13 @@
 
 #include <kern/kfile.h>
 
+/**
+ * Context for KFile over memory buffer.
+ */
 typedef struct KFileMem
 {
-		KFile fd;
-		void *mem;
+	KFile fd;  ///< KFile base class
+	void *mem; ///< Pointer to the memory buffer used.
 } KFileMem;
 
 /**
@@ -74,6 +77,6 @@ INLINE KFileMem * KFILEMEM_CAST(KFile *fd)
  * \param mem Pointer to the memory buffer to operate on.
  * \param len Size of the buffer
  */
-void kfilemem_init(KFileMem *kf, void *mem, size_t len);
+void kfilemem_init(KFileMem *km, void *mem, size_t len);
 
 #endif /* STRUCT_KFILE_MEM */
