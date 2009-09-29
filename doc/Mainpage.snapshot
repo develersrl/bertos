@@ -10,8 +10,8 @@ See STATUS for further information and tips about Doxygen tags.
 
 \mainpage
 
-This documentation is generated from BeRTOS SVN. As such, it may contain modules
-and/or additional documentation not present in official releases.
+<b>This documentation is generated from BeRTOS SVN. As such, it may contain modules
+and/or additional documentation not present in official releases.</b>
 
 \section overview Overview
 
