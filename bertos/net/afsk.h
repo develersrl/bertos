@@ -37,7 +37,7 @@
  * 
  * $WIZ$ module_name = "afsk"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_afsk.h"
- * $WIZ$ module_depends = "timer", "fifo", "kfile"
+ * $WIZ$ module_depends = "timer", "kfile"
  */
 
 #ifndef DRV_AFSK_H
