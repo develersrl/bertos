@@ -77,10 +77,12 @@
 
 	void afsk_adc_isr(void);
 	#define DEFINE_AFSK_ADC_ISR() void afsk_adc_isr(void)
+	#define AFSK_ADC_IRQ_END()    do { /* Implement me */ } while (0)
 
 	#define AFSK_READ_ADC()     (afsk_adc_val)
 
 	#define DEFINE_AFSK_DAC_ISR()  void afsk_dac_isr(void)
+	#define AFSK_DAC_IRQ_END()     do { /* Implement me */ } while (0)
 	#define AFSK_DAC_IRQ_START()   do { afsk_tx_test = true; } while (0)
 	#define AFSK_DAC_IRQ_STOP()    do { afsk_tx_test = false; } while (0)
 	#define AFSK_SET_DAC(_val)     \
