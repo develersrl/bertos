@@ -50,11 +50,13 @@
 
 	void afsk_adc_isr(void);
 	#define DEFINE_AFSK_ADC_ISR() void afsk_adc_isr(void)
+	#define AFSK_ADC_IRQ_END()    do { /* Implement me */ } while (0)
 
 	#define AFSK_READ_ADC()     (0)
 
 	void afsk_dac_isr(void);
 	#define DEFINE_AFSK_DAC_ISR()  void afsk_dac_isr(void)
+	#define AFSK_DAC_IRQ_END()     do { /* Implement me */ } while (0)
 	#define AFSK_DAC_IRQ_START()   do { /* Implement me */ } while (0)
 	#define AFSK_DAC_IRQ_STOP()    do { /* Implement me */ } while (0)
 	#define AFSK_SET_DAC(val)      do { (void)val; } while (0)
