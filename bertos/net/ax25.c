@@ -120,7 +120,7 @@ void ax25_poll(AX25Ctx *ctx)
 	{
 		if (!ctx->escape && c == HDLC_FLAG)
 		{
-			LOG_INFO("Frame start\n");
+			LOG_INFO("Frame start, frm_len %d\n", ctx->frm_len);
 			if (ctx->frm_len >= AX25_MIN_FRAME_LEN)
 			{
 				if (ctx->crc_in == AX25_CRC_CORRECT)
