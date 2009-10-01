@@ -37,6 +37,8 @@
  */
 
 #include "afsk.h"
+#include <net/ax25.h>
+
 #include "cfg/cfg_afsk.h"
 #include "hw/hw_afsk.h"
 
@@ -202,9 +204,9 @@ static void hdlc_parse(bool bit)
 	{
 		if ((hdlc_currchar == HDLC_FLAG
 			|| hdlc_currchar == HDLC_RESET
-			|| hdlc_currchar == AFSK_ESC)
+			|| hdlc_currchar == AX25_ESC)
 			&& !fifo_isfull_locked(&rx_fifo))
-			fifo_push(&rx_fifo, AFSK_ESC);
+			fifo_push(&rx_fifo, AX25_ESC);
 		else
 			hdlc_rxstart = false;
 
@@ -292,7 +294,9 @@ DEFINE_AFSK_ADC_ISR()
 		hdlc_parse(!EDGE_FOUND(found_bits));
 	}
 
+
 	AFSK_STROBE_OFF();
+	AFSK_ADC_IRQ_END();
 }
 
 /* True while modem sends data */
@@ -326,6 +330,7 @@ DEFINE_AFSK_DAC_ISR()
 			{
 				AFSK_DAC_IRQ_STOP();
 				sending = false;
+				AFSK_DAC_IRQ_END();
 				return;
 			}
 			else
@@ -341,12 +346,13 @@ DEFINE_AFSK_DAC_ISR()
 				curr_out = fifo_pop(&tx_fifo);
 
 				/* Handle char escape */
-				if (curr_out == AFSK_ESC)
+				if (curr_out == AX25_ESC)
 				{
 					if (fifo_isempty(&tx_fifo))
 					{
 						AFSK_DAC_IRQ_STOP();
 						sending = false;
+						AFSK_DAC_IRQ_END();
 						return;
 					}
 					else
@@ -406,6 +412,7 @@ DEFINE_AFSK_DAC_ISR()
 
 	AFSK_SET_DAC(sin_sample(phase_acc));
 	sample_count--;
+	AFSK_DAC_IRQ_END();
 }
 
 
@@ -479,6 +486,7 @@ void afsk_init(Afsk *af)
 	fifo_init(&tx_fifo, tx_buf, sizeof(tx_buf));
 
 	AFSK_ADC_INIT();
+	AFSK_STROBE_INIT();
 	kprintf("MARK_INC %d, SPACE_INC %d\n", MARK_INC, SPACE_INC);
 
 	memset(af, 0, sizeof(*af));

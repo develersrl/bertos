@@ -34,7 +34,7 @@
  *
  * \version $Id$
  * \author Francesco Sacchi <asterix@develer.com>
- * 
+ *
  * $WIZ$ module_name = "afsk"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_afsk.h"
  * $WIZ$ module_depends = "timer", "kfile"
@@ -61,9 +61,5 @@ INLINE Afsk *AFSK_CAST(KFile *fd)
 }
 
 void afsk_init(Afsk *af);
-
-#define HDLC_FLAG  0x7E
-#define HDLC_RESET 0x7F
-#define AFSK_ESC   0x1B
 
 #endif
