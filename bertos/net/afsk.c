@@ -241,23 +241,38 @@ DEFINE_AFSK_ADC_ISR()
 
 	/*
 	 * Frequency discrimination is achieved by simply multiplying
-	 * the sample with a delayed sample of (bits per sample) / 2.
-	 * Then the signal is lowpass filtered with a first order, 600 Hz
-	 * Butterworth filter.
+	 * the sample with a delayed sample of (samples per bit) / 2.
+	 * Then the signal is lowpass filtered with a first order,
+	 * 600 Hz filter. The filter implementation is selectable
+	 * through the CONFIG_AFSK_FILTER config variable.
 	 */
 
 	iir_x[0] = iir_x[1];
-	iir_x[1] = ((int8_t)fifo_pop(&delay_fifo) * curr_sample) >> 2;
+
+	#if (CONFIG_AFSK_FILTER == AFSK_BUTTERWORTH) || (CONFIG_AFSK_FILTER == AFSK_CHEBYSHEV)
+		iir_x[1] = ((int8_t)fifo_pop(&delay_fifo) * curr_sample) >> 2;
+	#else
+		#error Filter type not found!
+	#endif
+
 	iir_y[0] = iir_y[1];
 
-	/*
-	 * This strange sum + shift is an optimization for iir_y[0] * 0.668.
-	 * iir * 0.668 ~= (iir * 21) / 32 =
-	 * = (iir * 16) / 32 + (iir * 4) / 32 + iir / 32 =
-	 * = iir / 2 + iir / 8 + iir / 32 =
-	 * = iir >> 1 + iir >> 3 + iir >> 5
-	 */
-	iir_y[1] = iir_x[0] + iir_x[1] + (iir_y[0] >> 1) + (iir_y[0] >> 3) + (iir_y[0] >> 5);
+	#if CONFIG_AFSK_FILTER == AFSK_BUTTERWORTH
+		/*
+		 * This strange sum + shift is an optimization for iir_y[0] * 0.668.
+		 * iir * 0.668 ~= (iir * 21) / 32 =
+		 * = (iir * 16) / 32 + (iir * 4) / 32 + iir / 32 =
+		 * = iir / 2 + iir / 8 + iir / 32 =
+		 * = iir >> 1 + iir >> 3 + iir >> 5
+		 */
+		iir_y[1] = iir_x[0] + iir_x[1] + (iir_y[0] >> 1) + (iir_y[0] >> 3) + (iir_y[0] >> 5);
+	#elif CONFIG_AFSK_FILTER == AFSK_CHEBYSHEV
+		/*
+		 * This should be (iir_y[0] * 0.438) but
+		 * (iir_y[0] >> 1) is a faster approximation :-)
+		 */
+		iir_y[1] = iir_x[0] + iir_x[1] + (iir_y[0] >> 1);
+	#endif
 
 	/* Save this sampled bit in a delay line */
 	sampled_bits <<= 1;

@@ -39,6 +39,15 @@
 #ifndef CFG_AFSK_H
 #define CFG_AFSK_H
 
+
+/**
+ * AFSK discriminator filter type.
+ *
+ * $WIZ$ type = "enum"; value_list = "afsk_filter_list"
+ */
+#define CONFIG_AFSK_FILTER AFSK_CHEBYSHEV
+
+
 /**
  * AFSK receiver buffer length.
  *

@@ -63,4 +63,14 @@ INLINE Afsk *AFSK_CAST(KFile *fd)
 
 void afsk_init(Afsk *af);
 
+/**
+ * \name afsk filter type
+ * $WIZ$ afsk_filter_list = "AFSK_BUTTERWORTH", "AFSK_CHEBYSHEV"
+ * \{
+ */
+#define AFSK_BUTTERWORTH  0
+#define AFSK_CHEBYSHEV    1
+/* \} */
+
+
 #endif
