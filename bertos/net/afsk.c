@@ -205,11 +205,13 @@ static void hdlc_parse(bool bit)
 	{
 		if ((hdlc_currchar == HDLC_FLAG
 			|| hdlc_currchar == HDLC_RESET
-			|| hdlc_currchar == AX25_ESC)
-			&& !fifo_isfull(&rx_fifo))
-			fifo_push(&rx_fifo, AX25_ESC);
-		else
-			hdlc_rxstart = false;
+			|| hdlc_currchar == AX25_ESC))
+		{
+			if (!fifo_isfull(&rx_fifo))
+				fifo_push(&rx_fifo, AX25_ESC);
+			else
+				hdlc_rxstart = false;
+		}
 
 		if (!fifo_isfull(&rx_fifo))
 			fifo_push(&rx_fifo, hdlc_currchar);
