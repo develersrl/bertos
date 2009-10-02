@@ -171,13 +171,14 @@ static void hdlc_parse(bool bit)
 	/* HDLC Flag */
 	if (demod_bits == HDLC_FLAG)
 	{
-		if (!fifo_isfull_locked(&rx_fifo))
+		if (!fifo_isfull(&rx_fifo))
 		{
 			fifo_push(&rx_fifo, HDLC_FLAG);
 			hdlc_rxstart = true;
 		}
 		else
 			hdlc_rxstart = false;
+
 		hdlc_currchar = 0;
 		hdlc_bit_idx = 0;
 		return;
@@ -205,12 +206,12 @@ static void hdlc_parse(bool bit)
 		if ((hdlc_currchar == HDLC_FLAG
 			|| hdlc_currchar == HDLC_RESET
 			|| hdlc_currchar == AX25_ESC)
-			&& !fifo_isfull_locked(&rx_fifo))
+			&& !fifo_isfull(&rx_fifo))
 			fifo_push(&rx_fifo, AX25_ESC);
 		else
 			hdlc_rxstart = false;
 
-		if (!fifo_isfull_locked(&rx_fifo))
+		if (!fifo_isfull(&rx_fifo))
 			fifo_push(&rx_fifo, hdlc_currchar);
 		else
 			hdlc_rxstart = false;
@@ -430,7 +431,7 @@ static size_t afsk_read(UNUSED_ARG(KFile *, fd), void *_buf, size_t size)
 		ticks_t start = timer_clock();
 		#endif
 
-		do
+		while (fifo_isempty_locked(&rx_fifo));
 		{
 			cpu_relax();
 			#if CONFIG_AFSK_RXTIMEOUT != -1
@@ -438,7 +439,6 @@ static size_t afsk_read(UNUSED_ARG(KFile *, fd), void *_buf, size_t size)
 				return buf - (uint8_t *)_buf;
 			#endif
 		}
-		while (fifo_isempty_locked(&rx_fifo));
 
 		*buf++ = fifo_pop_locked(&rx_fifo);
 	}
