@@ -151,6 +151,7 @@ static uint8_t tx_buf[CONFIG_AFSK_TX_BUFLEN];
 
 static int16_t iir_x[2];
 static int16_t iir_y[2];
+
 static uint8_t sampled_bits;
 static uint8_t found_bits;
 static uint8_t demod_bits;
@@ -249,8 +250,12 @@ DEFINE_AFSK_ADC_ISR()
 
 	iir_x[0] = iir_x[1];
 
-	#if (CONFIG_AFSK_FILTER == AFSK_BUTTERWORTH) || (CONFIG_AFSK_FILTER == AFSK_CHEBYSHEV)
+	#if (CONFIG_AFSK_FILTER == AFSK_BUTTERWORTH)
 		iir_x[1] = ((int8_t)fifo_pop(&delay_fifo) * curr_sample) >> 2;
+		//iir_x[1] = ((int8_t)fifo_pop(&delay_fifo) * curr_sample) / 6.027339492;
+	#elif (CONFIG_AFSK_FILTER == AFSK_CHEBYSHEV)
+		iir_x[1] = ((int8_t)fifo_pop(&delay_fifo) * curr_sample) >> 2;
+		//iir_x[1] = ((int8_t)fifo_pop(&delay_fifo) * curr_sample) / 3.558147322;
 	#else
 		#error Filter type not found!
 	#endif
@@ -266,12 +271,14 @@ DEFINE_AFSK_ADC_ISR()
 		 * = iir >> 1 + iir >> 3 + iir >> 5
 		 */
 		iir_y[1] = iir_x[0] + iir_x[1] + (iir_y[0] >> 1) + (iir_y[0] >> 3) + (iir_y[0] >> 5);
+		//iir_y[1] = iir_x[0] + iir_x[1] + iir_y[0] * 0.6681786379;
 	#elif CONFIG_AFSK_FILTER == AFSK_CHEBYSHEV
 		/*
 		 * This should be (iir_y[0] * 0.438) but
 		 * (iir_y[0] >> 1) is a faster approximation :-)
 		 */
 		iir_y[1] = iir_x[0] + iir_x[1] + (iir_y[0] >> 1);
+		//iir_y[1] = iir_x[0] + iir_x[1] + iir_y[0] * 0.4379097269;
 	#endif
 
 	/* Save this sampled bit in a delay line */
@@ -300,10 +307,17 @@ DEFINE_AFSK_ADC_ISR()
 		found_bits <<= 1;
 
 		/*
-		 * TODO: maybe a better algorithm to find the sample bit
-		 * other than reading the last one.
+		 * Determine bit value by reading the last 3 sampled bits.
+		 * If the number of ones is two or greater, the bit value it's a 1,
+		 * otherwise it's a 0.
 		 */
-		found_bits |= sampled_bits & 1;
+		uint8_t bits = sampled_bits & 0x07;
+		if (bits == 0x07 // 111, 3 bits set to 1
+		 || bits == 0x06 // 110, 2 bits
+		 || bits == 0x05 // 101, 2 bits
+		 || bits == 0x03 // 011, 2 bits
+		)
+			found_bits |= 1;
 
 		/*
 		 * NRZI coding: if 2 consecutive bits have the same value
