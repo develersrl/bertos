@@ -106,7 +106,7 @@ static void ax25_decode(AX25Ctx *ctx)
 
 	msg.len = ctx->frm_len - 2 - (buf - ctx->buf);
 	msg.info = buf;
-	LOG_INFO("DATA[%.*s]\n", msg.len, msg.info);
+	LOG_INFO("DATA: %.*s\n", msg.len, msg.info);
 
 	if (ctx->hook)
 		ctx->hook(&msg);
@@ -120,7 +120,6 @@ void ax25_poll(AX25Ctx *ctx)
 	{
 		if (!ctx->escape && c == HDLC_FLAG)
 		{
-			LOG_INFO("Frame start, frm_len %d\n", ctx->frm_len);
 			if (ctx->frm_len >= AX25_MIN_FRAME_LEN)
 			{
 				if (ctx->crc_in == AX25_CRC_CORRECT)
