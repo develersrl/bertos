@@ -308,8 +308,8 @@ DEFINE_AFSK_ADC_ISR()
 
 		/*
 		 * Determine bit value by reading the last 3 sampled bits.
-		 * If the number of ones is two or greater, the bit value it's a 1,
-		 * otherwise it's a 0.
+		 * If the number of ones is two or greater, the bit value is a 1,
+		 * otherwise is a 0.
 		 */
 		uint8_t bits = sampled_bits & 0x07;
 		if (bits == 0x07 // 111, 3 bits set to 1
