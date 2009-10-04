@@ -72,5 +72,8 @@ void afsk_init(Afsk *af);
 #define AFSK_CHEBYSHEV    1
 /* \} */
 
+int afsk_testSetup(void);
+int afsk_testRun(void);
+int afsk_testTearDown(void);
 
 #endif
