@@ -73,7 +73,11 @@ static void message_hook(UNUSED_ARG(struct AX25Msg *, msg))
 int afsk_testSetup(void)
 {
 	kdbg_init();
-	fp_adc = fopen("test/afsk_test.au", "rb");
+	#if CPU_AVR
+		#warning TODO: open the file?
+	#else
+		fp_adc = fopen("test/afsk_test.au", "rb");
+	#endif
 	ASSERT(fp_adc);
 
 	char snd[5];
@@ -84,33 +88,37 @@ int afsk_testSetup(void)
 	uint32_t offset;
 	ASSERT(fread(&offset, 1, sizeof(offset), fp_adc) == sizeof(offset));
 	offset = be32_to_cpu(offset);
-	kprintf("AU file offset: %d\n", offset);
+	kprintf("AU file offset: %ld\n", offset);
 	ASSERT(offset >= 24);
 
 	ASSERT(fread(&data_size, 1, sizeof(data_size), fp_adc) == sizeof(data_size));
 	data_size = be32_to_cpu(data_size);
-	kprintf("AU file data_size: %d\n", data_size);
+	kprintf("AU file data_size: %ld\n", data_size);
 	ASSERT(data_size);
 
 	uint32_t encoding;
 	ASSERT(fread(&encoding, 1, sizeof(encoding), fp_adc) == sizeof(encoding));
 	encoding = be32_to_cpu(encoding);
-	kprintf("AU file encoding: %d\n", encoding);
+	kprintf("AU file encoding: %ld\n", encoding);
 	ASSERT(encoding == 2); // 8 bit linear PCM
 
 	uint32_t sample_rate;
 	ASSERT(fread(&sample_rate, 1, sizeof(sample_rate), fp_adc) == sizeof(sample_rate));
 	sample_rate = be32_to_cpu(sample_rate);
-	kprintf("AU file sample_rate: %d\n", sample_rate);
+	kprintf("AU file sample_rate: %ld\n", sample_rate);
 	ASSERT(sample_rate == 9600);
 
 	uint32_t channels;
 	ASSERT(fread(&channels, 1, sizeof(channels), fp_adc) == sizeof(channels));
 	channels = be32_to_cpu(channels);
-	kprintf("AU file channels: %d\n", channels);
+	kprintf("AU file channels: %ld\n", channels);
 	ASSERT(channels == 1);
 
-	ASSERT(fseek(fp_adc, offset, SEEK_SET) == 0);
+	#if CPU_AVR
+		#warning TODO: fseek?
+	#else
+		ASSERT(fseek(fp_adc, offset, SEEK_SET) == 0);
+	#endif
 
 	#if 0
 	fp_dac = fopen("test/afsk_test_out.au", "w+b");
