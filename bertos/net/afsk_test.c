@@ -88,30 +88,30 @@ int afsk_testSetup(void)
 	uint32_t offset;
 	ASSERT(fread(&offset, 1, sizeof(offset), fp_adc) == sizeof(offset));
 	offset = be32_to_cpu(offset);
-	kprintf("AU file offset: %ld\n", offset);
+	kprintf("AU file offset: %ld\n", (long)offset);
 	ASSERT(offset >= 24);
 
 	ASSERT(fread(&data_size, 1, sizeof(data_size), fp_adc) == sizeof(data_size));
 	data_size = be32_to_cpu(data_size);
-	kprintf("AU file data_size: %ld\n", data_size);
+	kprintf("AU file data_size: %ld\n", (long)data_size);
 	ASSERT(data_size);
 
 	uint32_t encoding;
 	ASSERT(fread(&encoding, 1, sizeof(encoding), fp_adc) == sizeof(encoding));
 	encoding = be32_to_cpu(encoding);
-	kprintf("AU file encoding: %ld\n", encoding);
+	kprintf("AU file encoding: %ld\n", (long)encoding);
 	ASSERT(encoding == 2); // 8 bit linear PCM
 
 	uint32_t sample_rate;
 	ASSERT(fread(&sample_rate, 1, sizeof(sample_rate), fp_adc) == sizeof(sample_rate));
 	sample_rate = be32_to_cpu(sample_rate);
-	kprintf("AU file sample_rate: %ld\n", sample_rate);
+	kprintf("AU file sample_rate: %ld\n", (long)sample_rate);
 	ASSERT(sample_rate == 9600);
 
 	uint32_t channels;
 	ASSERT(fread(&channels, 1, sizeof(channels), fp_adc) == sizeof(channels));
 	channels = be32_to_cpu(channels);
-	kprintf("AU file channels: %ld\n", channels);
+	kprintf("AU file channels: %ld\n", (long)channels);
 	ASSERT(channels == 1);
 
 	#if CPU_AVR
