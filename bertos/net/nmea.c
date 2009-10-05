@@ -33,6 +33,7 @@
  *
  * \author Daniele Basile <asterix@develer.com>
  *
+ * notest:avr
  */
 
 #include "nmea.h"
@@ -177,7 +178,7 @@ static time_t timestampToSec(uint32_t time_stamp, uint32_t date_stamp)
 	memset(&tmr, 0, sizeof(tmr));
 	memset(&date, 0, sizeof(date));
 
-	LOG_INFO("time_s[%u],date[%u]\n", time_stamp, date_stamp);
+	LOG_INFO("time_s[%lu],date[%lu]\n", (long)time_stamp, (long)date_stamp);
 	uint32_t res = time_stamp / 1000;
 	uint32_t all = time_stamp;
 	msec = all - res * 1000;

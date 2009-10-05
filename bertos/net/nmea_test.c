@@ -33,6 +33,8 @@
  * \brief NMEA parser test.
  *
  * \author Daniele Basile <asterix@develer.com>
+ *
+ * notest:avr
  */
 
 #include "nmea.h"
@@ -82,7 +84,7 @@ static void gpgga_callout(nmeap_context_t *context, void *data, void *user_data)
 	(void)user_data;
 	NmeaGga *gga = (NmeaGga *)data;
 
-    kprintf("found GPGGA message %d %d %d %lu %d %d %d %d\n",
+    kprintf("found GPGGA message %ld %ld %d %lu %d %d %d %d\n",
             gga->latitude,
             gga->longitude,
             gga->altitude,
@@ -103,7 +105,7 @@ static void gprmc_callout(nmeap_context_t *context, void *data, void *user_data)
 	(void)user_data;
     NmeaRmc *rmc = (NmeaRmc *)data;
 
-	kprintf("found GPRMC Message %lu %c %d %d %d %d %d\n",
+	kprintf("found GPRMC Message %lu %c %d %ld %ld %d %d\n",
             rmc->time,
             rmc->warn,
             rmc->latitude,
