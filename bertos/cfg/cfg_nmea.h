@@ -54,4 +54,32 @@
  */
 #define NMEA_LOG_FORMAT     LOG_FMT_TERSE
 
+
+/**
+ * Maximum number of sentence parsers supported.
+ *
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 1
+ */
+#define CONFIG_NMEAP_MAX_SENTENCES         8
+
+/**
+ * Max length of a complete sentence. The standard says 82 bytes, but its probably
+ * better to go at least 128 since some units don't adhere to the 82 bytes
+ * especially for proprietary sentences.
+ *
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 1
+ */
+#define CONFIG_NMEAP_MAX_SENTENCE_LENGTH   255
+
+/**
+ * Max tokens in one sentence. 24 is enough for any standard sentence.
+ *
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 1
+ */
+#define CONFIG_NMEAP_MAX_TOKENS            24
+
 #endif /* CFG_NMEA_H */
+

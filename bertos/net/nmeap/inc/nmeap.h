@@ -26,6 +26,8 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern "C" {
 #endif
 
+#include "cfg/cfg_nmea.h"
+
 /*
 ============================================
 COMPILE TIME CONFIGURATION CONSTANTS
@@ -37,14 +39,14 @@ COMPILE TIME CONFIGURATION CONSTANTS
 /* these constants affect the size of the context object. tweak them as desired but know what you are doing */
 
 /** maximum number of sentence parsers supported */
-#define NMEAP_MAX_SENTENCES            8
+#define NMEAP_MAX_SENTENCES            CONFIG_NMEAP_MAX_SENTENCES
 /** length of sentence name. leave this at 5 unless you really know what you are doing */
 #define NMEAP_MAX_SENTENCE_NAME_LENGTH 5
 /** max length of a complete sentence. the standard says 82 bytes, but its probably better to go at least 128 since
  * some units don't adhere to the 82 bytes especially for proprietary sentences */
-#define NMEAP_MAX_SENTENCE_LENGTH      255
+#define NMEAP_MAX_SENTENCE_LENGTH      CONFIG_NMEAP_MAX_SENTENCE_LENGTH
 /** max tokens in one sentence. 24 is enough for any standard sentence */
-#define NMEAP_MAX_TOKENS               24
+#define NMEAP_MAX_TOKENS               CONFIG_NMEAP_MAX_TOKENS
 
 /* predefined message ID's */
 
