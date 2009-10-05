@@ -34,8 +34,6 @@ COMPILE TIME CONFIGURATION CONSTANTS
 ============================================
 */
 
-#define NDEBUG
-
 /* these constants affect the size of the context object. tweak them as desired but know what you are doing */
 
 /** maximum number of sentence parsers supported */
