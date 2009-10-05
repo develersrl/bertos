@@ -35,7 +35,7 @@
  *
  * $WIZ$ module_name = "nmea"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_nmea.h"
- * $WIZ$ module_depends = "kfile"
+ * $WIZ$ module_depends = "kfile", "nmeap01"
  */
 
 #ifndef NET_NMEA_H
@@ -139,5 +139,9 @@ int nmea_gpgsv(nmeap_context_t *context, nmeap_sentence_t *sentence);
 int nmea_gpvtg(nmeap_context_t *context, nmeap_sentence_t *sentence);
 int nmea_gprmc(nmeap_context_t *context, nmeap_sentence_t *sentence);
 int nmea_gpgga(nmeap_context_t *context, nmeap_sentence_t *sentence);
+
+int nmea_testSetup(void);
+int nmea_testTearDown(void);
+int nmea_testRun(void);
 
 #endif /* NET_NMEA_H */
