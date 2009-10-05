@@ -52,6 +52,6 @@
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_format"
  */
-#define NMEA_LOG_FORMAT     LOG_FMT_VERBOSE
+#define NMEA_LOG_FORMAT     LOG_FMT_TERSE
 
 #endif /* CFG_NMEA_H */
