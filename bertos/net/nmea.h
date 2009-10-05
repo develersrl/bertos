@@ -47,6 +47,8 @@
 
 #include <kern/kfile.h>
 
+#include <time.h>
+
 /*
  * Implemented NMEA parser strings.
  */
@@ -59,42 +61,45 @@
 typedef uint32_t udegree_t;    // Micro degrees
 typedef uint32_t mdegree_t;    // Milli degrees
 typedef uint16_t degree_t;     // Degrees
-typedef uint16_t cm_t;         // Centimeter
-typedef uint32_t sec_t;        // Seconds
-typedef uint32_t str_time_t;   // Time format HH:MM:SS
-typedef uint32_t mknots_t;     // Milli knots
-typedef uint32_t mkh_t;        // Milli kilometers/hour
-typedef uint16_t number_t;      // Pure number
 
 
 /**
+ * Global Positioning System Fix Data.
  * Extracted data from a GGA message
+ *
+ * Note: time membert containt the second elapsed from 00:00:00 1/1/1970,
+ * becouse from nmea sentence we read only the time of UTC position, we
+ * not have any reference of date (day, month and year) so time is refered to
+ * the start of unix time.
  */
 typedef struct NmeaGga
 {
-	udegree_t     latitude;
-	udegree_t     longitude;
-	cm_t          altitude;
-	sec_t         time;
-	number_t       satellites;
-	number_t       quality;
-	udegree_t     hdop;
-	udegree_t     geoid;
+	udegree_t     latitude;   /* Latitude (micro degree) */
+	udegree_t     longitude;  /* Longitude (micro degree) */
+	uint16_t      altitude;   /* Altitude (Meter) */
+	time_t        time;       /* UTC of position  (Unix time) */
+	uint16_t      satellites; /* Satellites are in view */
+	uint16_t      quality;    /* Fix Quality: 0 = Invalid; 1 = GPS fix; 2 = DGPS fix; */
+	uint16_t      hdop;       /* Relative accuracy of horizontal position (hdop * 10) */
+	uint16_t      geoid;      /* Height of geoid above WGS84 ellipsoid (Meter) */
 } NmeaGga;
 
 /**
+ * Recommended minimum specific GPS/Transit data.
  * Extracted data from an RMC message
+ *
+ * Note: RMC sentece contain also date stamp so, time contain real second elapsed
+ * from 0:00:00 1/1/1970.
  */
 typedef struct NmeaRmc
 {
-	str_time_t    time;
-	char          warn;
-	udegree_t     latitude;
-	udegree_t     longitude;
-	mknots_t      speed;
-	mdegree_t     course;
-	str_time_t    date;
-	mdegree_t     mag_var;
+	time_t        time;       /* UTC of position  (Unix time) */
+	char          warn;       /* Navigation receiver warning A = OK, V = warning */
+	udegree_t     latitude;   /* Latitude (micro degree) */
+	udegree_t     longitude;  /* Longitude (micro degree) */
+	uint16_t      speed;      /* Speed over ground (knots) */
+	degree_t      course;     /* Track made good in degrees True (degree) */
+	degree_t      mag_var;    /* Magnetic variation degrees (degree) */
 } NmeaRmc;
 
 /**
@@ -102,9 +107,9 @@ typedef struct NmeaRmc
  */
 typedef struct NmeaVtg
 {
-	mdegree_t     track_good;
-	mknots_t      knot_speed;
-	mkh_t         km_speed;
+	degree_t     track_good;  /* True track made good (degree) */
+	uint16_t     knot_speed;  /* Speed over ground (knots) */
+	uint16_t     km_speed;    /* Speed over ground in kilometers/hour */
 } NmeaVtg;
 
 /**
@@ -112,25 +117,25 @@ typedef struct NmeaVtg
  */
 typedef struct NmeaGsv
 {
-	number_t       tot_message;
-	number_t       message_num;
-	number_t       tot_svv;
-	number_t       sv_prn;
-	degree_t	  elevation;
-	degree_t      azimut;
-	number_t       snr;
-	number_t       sv_prn2;
-	degree_t	  elevation2;
-	degree_t      azimut2;
-	number_t       snr2;
-	number_t       sv_prn3;
-	degree_t	  elevation3;
-	degree_t      azimut3;
-	number_t       snr3;
-	number_t       sv_prn4;
-	degree_t	  elevation4;
-	degree_t      azimut4;
-	number_t       snr4;
+	uint16_t    tot_message;
+	uint16_t    message_num;
+	uint16_t    tot_svv;
+	uint16_t    sv_prn;
+	degree_t    elevation;
+	degree_t    azimut;
+	uint16_t    snr;
+	uint16_t    sv_prn2;
+	degree_t	elevation2;
+	degree_t    azimut2;
+	uint16_t    snr2;
+	uint16_t    sv_prn3;
+	degree_t	elevation3;
+	degree_t    azimut3;
+	uint16_t    snr3;
+	uint16_t    sv_prn4;
+	degree_t	elevation4;
+	degree_t    azimut4;
+	uint16_t    snr4;
 } NmeaGsv;
 
 void nmea_poll(nmeap_context_t *context, KFile *channel);

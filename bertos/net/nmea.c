@@ -48,6 +48,8 @@
 #include <net/nmeap/inc/nmeap.h>
 
 #include <ctype.h>
+#include <time.h>
+#include <string.h>
 
 
 static uint32_t tokenToInt(const char *s)
@@ -142,7 +144,7 @@ static udegree_t nmea_longitude(const char *plot, const char *phem)
 	return ew  * lot;
 }
 
-static cm_t nmea_altitude(const char *palt, const char *punits)
+static uint16_t nmea_altitude(const char *palt, const char *punits)
 {
 	uint32_t alt;
 
@@ -168,6 +170,58 @@ static cm_t nmea_altitude(const char *palt, const char *punits)
 	return alt;
 }
 
+static time_t timestampToSec(uint32_t time_stamp, uint32_t date_stamp)
+{
+	struct tm t;
+	uint16_t msec;
+	uint16_t tmr[3];
+	uint16_t date[3];
+
+	memset(&t, 0, sizeof(t));
+	memset(&tmr, 0, sizeof(tmr));
+	memset(&date, 0, sizeof(date));
+
+	LOG_INFO("time_s[%u],date[%u]\n", time_stamp, date_stamp);
+	uint32_t res = time_stamp / 1000;
+	uint32_t all = time_stamp;
+	msec = all - res * 1000;
+	for (int i = 0; i < 3; i++)
+	{
+		all = res;
+		res = all / 100;
+		tmr[i]  = all - res * 100;
+		LOG_INFO("t[%d]%d\n", tmr[i],i);
+	}
+
+	t.tm_sec = tmr[0] + (ROUND_UP(msec, 1000) / 1000);
+	t.tm_min = tmr[1];
+	t.tm_hour = tmr[2];
+	t.tm_mday = 1;
+	t.tm_mon = 1;
+	t.tm_year = 70;
+
+	if (date_stamp)
+	{
+		res = all = date_stamp;
+		for (int i = 0; i < 3; i++)
+		{
+			all = res;
+			res = all / 100;
+			date[i]  = all - res * 100;
+			LOG_INFO("d[%d]%d\n", date[i],i);
+		}
+		t.tm_mday = date[2];
+		t.tm_mon = date[1] - 1; // time struct count month from 0 to 11;
+		// we should specific number of years from 1900, but the year field
+		// is only two cipher, so we sum 100 (2000 - 1900)..
+		t.tm_year = date[0] + 100;
+	}
+	LOG_INFO("times=%d,%d,%d,%d,%d,%d\n",t.tm_sec, t.tm_min, t.tm_hour, t.tm_year, t.tm_mon, t.tm_mday);
+
+	return  mktime(&t);
+}
+
+
 /**
  * standard GPGGA sentence parser
  */
@@ -186,7 +240,7 @@ int nmea_gpgga(nmeap_context_t *context, nmeap_sentence_t *sentence)
 		gga->latitude   = nmea_latitude(context->token[2],context->token[3]);
 		gga->longitude  = nmea_longitude(context->token[4],context->token[5]);
 		gga->altitude   = nmea_altitude(context->token[9],context->token[10]);
-		gga->time       = tokenToInt(context->token[1]);
+		gga->time       = timestampToSec(tokenToInt(context->token[1]), 0);
 		gga->satellites = tokenToInt(context->token[7]);
 		gga->quality    = tokenToInt(context->token[6]);
 		gga->hdop       = tokenToInt(context->token[8]);
@@ -199,7 +253,7 @@ int nmea_gpgga(nmeap_context_t *context, nmeap_sentence_t *sentence)
 	 * if the sentence has a callout, call it
 	 */
 	if (sentence->callout != 0)
-		(*sentence->callout)(context,gga,context->user_data);
+		(*sentence->callout)(context, gga, context->user_data);
 
 	return NMEA_GPGGA;
 }
@@ -223,13 +277,12 @@ int nmea_gprmc(nmeap_context_t *context, nmeap_sentence_t *sentence)
 		/*
 		 * extract data from the tokens
 		 */
-		rmc->time       = tokenToInt(context->token[1]);
+		rmc->time       = timestampToSec(tokenToInt(context->token[1]), tokenToInt(context->token[9]));
 		rmc->warn       = *context->token[2];
 		rmc->latitude   = nmea_latitude(context->token[3],context->token[4]);
 		rmc->longitude  = nmea_longitude(context->token[5],context->token[6]);
-		rmc->speed      = tokenToInt(context->token[7]) * 100;
-		rmc->course     = tokenToInt(context->token[8]) * 100;
-		rmc->date       = tokenToInt(context->token[9]);
+		rmc->speed      = tokenToInt(context->token[7]);
+		rmc->course     = tokenToInt(context->token[8]);
 		rmc->mag_var    = tokenToInt(context->token[10]);
 	}
 
@@ -237,7 +290,7 @@ int nmea_gprmc(nmeap_context_t *context, nmeap_sentence_t *sentence)
 	 * if the sentence has a callout, call it
 	 */
     if (sentence->callout != 0)
-        (*sentence->callout)(context,rmc,context->user_data);
+        (*sentence->callout)(context, rmc, context->user_data);
 
     return NMEA_GPRMC;
 }
@@ -262,16 +315,16 @@ int nmea_gpvtg(nmeap_context_t *context, nmeap_sentence_t *sentence)
 		/*
 		 * extract data from the tokens
 		 */
-		vtg->track_good  = tokenToInt(context->token[1]) * 100;
-		vtg->knot_speed  = tokenToInt(context->token[5]) * 100;
-		vtg->km_speed    = tokenToInt(context->token[7]) * 100;
+		vtg->track_good  = tokenToInt(context->token[1]);
+		vtg->knot_speed  = tokenToInt(context->token[5]);
+		vtg->km_speed    = tokenToInt(context->token[7]);
 	}
 
     /*
 	 * if the sentence has a callout, call it
 	 */
     if (sentence->callout != 0)
-        (*sentence->callout)(context,vtg,context->user_data);
+        (*sentence->callout)(context, vtg, context->user_data);
 
     return NMEA_GPVTG;
 }
