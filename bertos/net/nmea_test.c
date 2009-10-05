@@ -54,10 +54,10 @@ static KFileMem mem;
 
 static char nmea_test_vector[] =
 {
-"$GPGGA,123519,3929.946667,N,11946.086667,E,1,08,0.9,545.4,M,46.9,M,,*4A\r\n" /* good */
+"$GPGGA,123519.021,3929.946667,N,11946.086667,E,1,08,0.9,545.4,M,46.9,M,,*4A\r\n" /* good */
 "$xyz,1234,asdfadfasdfasdfljsadfkjasdfk\r\n"                                  /* junk */
-"$GPRMC,225446,A,4916.45,N,12311.12,W,000.5,054.7,191194,020.3,E*68\r\n"      /* good */
-"$GPRMC,225446,A,4916.45,N,12311.12,W,000.5,054.7,191194,020.3,E*48\r\n"      /* checksum error */
+"$GPRMC,225446,A,4916.45,N,12311.120,W,000.5,054.7,191194,020.3,E*68\r\n"      /* good */
+"$GPRMC,225446,A,4916.45,N,12311.120,W,000.5,054.7,191194,020.3,E*48\r\n"      /* checksum error */
 "$GPGGA,091144.698,0000.0000,S,00000.0000,W,0,00,00.0,0.0,M,0.0,M,,*5C\r\n"   /* acquired */
 "$GPRMC,091144.698,V,0000.0000,S,00000.0000,W,0.00,0.00,051009,,,A*75\r\n"    /* acquired */
 "$GPVTG,0.00,T,,,0.00,N,0.00,K,A*70\r\n"                                      /* acquired */
@@ -77,7 +77,7 @@ static void gpgga_callout(nmeap_context_t *context, void *data, void *user_data)
 	(void)user_data;
 	NmeaGga *gga = (NmeaGga *)data;
 
-    kprintf("found GPGGA message %d %d %d %d %d %d %d %d\n",
+    kprintf("found GPGGA message %d %d %d %lu %d %d %d %d\n",
             gga->latitude,
             gga->longitude,
             gga->altitude,
@@ -98,14 +98,13 @@ static void gprmc_callout(nmeap_context_t *context, void *data, void *user_data)
 	(void)user_data;
     NmeaRmc *rmc = (NmeaRmc *)data;
 
-	kprintf("found GPRMC Message %d %c %d %d %d %d %d %d\n",
+	kprintf("found GPRMC Message %lu %c %d %d %d %d %d\n",
             rmc->time,
             rmc->warn,
             rmc->latitude,
             rmc->longitude,
             rmc->speed,
             rmc->course,
-            rmc->date,
             rmc->mag_var
             );
 }
