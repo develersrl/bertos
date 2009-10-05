@@ -26,29 +26,27 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * see the file COPYING for terms of the licnese
 */
 
-#include <string.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include <cfg/debug.h>
+#include <string.h>
 #include <ctype.h>
 
 #include "../inc/nmeap.h"
 
+#include <cfg/debug.h>
+
 #define assert(x)    ASSERT(x)
 
-/*
- * Removed to compile in BeRTOS environment.
- *
- * #include <stdio.h>
- * #include <stdlib.h>
- * #include <string.h>
- * #include <cfg/debug.h>
- * #include <assert.h>
- * #include <ctype.h>
- *
- * #include "nmeap.h"
- *
- */
+#include "cfg/cfg_nmea.h"
 
+#define LOG_LEVEL  NMEA_LOG_LEVEL
+#define LOG_FORMAT NMEA_LOG_FORMAT
+#include <cfg/log.h>
+
+#ifdef _DEBUG
+	#undef NDEBUG
+	#define printf(str,...)  LOG_INFO(str, ## __VA_ARGS__)
+#endif
 
 /* this only works if you are sure you have an upper case hex digit */
 #define HEXTOBIN(ch) ((ch <= '9') ? ch - '0' : ch - ('A' - 10))
