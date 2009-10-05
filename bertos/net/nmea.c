@@ -91,6 +91,8 @@ static udegree_t convertToDegree(const char *str)
 	deg = dec / 1000000;
 	min = dec - deg * 1000000;
 	dec = deg * 1000000 + ((min * 5) + 1) / 3;
+
+	return dec;
 }
 
 static udegree_t nmea_latitude(const char *plat, const char *phem)
