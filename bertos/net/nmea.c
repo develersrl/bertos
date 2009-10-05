@@ -196,6 +196,7 @@ static time_t timestampToSec(uint32_t time_stamp, uint32_t date_stamp)
 	t.tm_sec = tmr[0] + (ROUND_UP(msec, 1000) / 1000);
 	t.tm_min = tmr[1];
 	t.tm_hour = tmr[2];
+	//If we not have refence data, we set as default 1/1/1970.
 	t.tm_mday = 1;
 	t.tm_mon = 1;
 	t.tm_year = 70;
@@ -374,7 +375,7 @@ int nmea_gpgsv(nmeap_context_t *context, nmeap_sentence_t *sentence)
 	 * if the sentence has a callout, call it
 	 */
     if (sentence->callout != 0)
-        (*sentence->callout)(context,gsv,context->user_data);
+        (*sentence->callout)(context, gsv, context->user_data);
 
     return NMEA_GPGSV;
 }
@@ -384,8 +385,7 @@ void nmea_poll(nmeap_context_t *context, KFile *channel)
 	int c;
 	while ((c = kfile_getc(channel)) != EOF)
 	{
-		if (nmeap_parse(context, c) == -1)
-			break;
+		nmeap_parse(context, c);
 	}
 }
 
