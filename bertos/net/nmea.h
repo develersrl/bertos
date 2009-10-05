@@ -117,25 +117,25 @@ typedef struct NmeaVtg
  */
 typedef struct NmeaGsv
 {
-	uint16_t    tot_message;
-	uint16_t    message_num;
-	uint16_t    tot_svv;
-	uint16_t    sv_prn;
-	degree_t    elevation;
-	degree_t    azimut;
-	uint16_t    snr;
-	uint16_t    sv_prn2;
-	degree_t	elevation2;
-	degree_t    azimut2;
-	uint16_t    snr2;
-	uint16_t    sv_prn3;
-	degree_t	elevation3;
-	degree_t    azimut3;
-	uint16_t    snr3;
-	uint16_t    sv_prn4;
-	degree_t	elevation4;
-	degree_t    azimut4;
-	uint16_t    snr4;
+	uint16_t    tot_message;  /* Total number of messages of this type in this cycle */
+	uint16_t    message_num;  /* Message number */
+	uint16_t    tot_svv;      /* Total number of SVs in view */
+	uint16_t    sv_prn;       /* SV PRN number */
+	degree_t    elevation;    /* Elevation in degrees, 90 maximum */
+	degree_t    azimut;       /* Azimuth, degrees from true north, 000 to 359 */
+	uint16_t    snr;          /* SNR, 00-99 dB (null when not tracking) */
+	uint16_t    sv_prn2;      /* Information about second SV PRN number */
+	degree_t	elevation2;   /* Information about second SV elevation in degrees, 90 maximum */
+	degree_t    azimut2;      /* Information about second SV azimuth, degrees from true north, 000 to 359 */
+	uint16_t    snr2;         /* Information about second SV SNR, 00-99 dB (null when not tracking) */
+	uint16_t    sv_prn3;      /* Information about third SV PRN number */
+	degree_t	elevation3;   /* Information about third SV elevation in degrees, 90 maximum */
+	degree_t    azimut3;      /* Information about third SV azimuth, degrees from true north, 000 to 359 */
+	uint16_t    snr3;         /* Information about third SV SNR, 00-99 dB (null when not tracking) */
+	uint16_t    sv_prn4;      /* Information about fourth SV PRN number */
+	degree_t	elevation4;   /* Information about fourth SV elevation in degrees, 90 maximum */
+	degree_t    azimut4;      /* Information about fourth SV azimuth, degrees from true north, 000 to 359 */
+	uint16_t    snr4;         /* Information about fourth SV SNR, 00-99 dB (null when not tracking) */
 } NmeaGsv;
 
 void nmea_poll(nmeap_context_t *context, KFile *channel);
