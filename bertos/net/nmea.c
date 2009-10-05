@@ -76,22 +76,32 @@ static uint32_t tokenToInt(const char *s)
 	return num;
 }
 
+static udegree_t convertToDegree(const char *str)
+{
+	uint32_t dec;
+	uint32_t deg;
+	uint32_t min;
+
+	if (*str == 0)
+	{
+        return 0;
+    }
+
+	dec = tokenToInt(str);
+	deg = dec / 1000000;
+	min = dec - deg * 1000000;
+	dec = deg * 1000000 + ((min * 5) + 1) / 3;
+}
 
 static udegree_t nmea_latitude(const char *plat, const char *phem)
 {
 	int ns;
-	uint32_t lat;
-	uint32_t deg;
-	uint32_t min;
 
-	if (*plat == 0)
-	{
-        return 0;
-    }
     if (*phem == 0)
 	{
         return 0;
     }
+
 
     /* north lat is +, south lat is - */
     if (*phem == 'N')
@@ -103,29 +113,13 @@ static udegree_t nmea_latitude(const char *plat, const char *phem)
         ns = -1;
     }
 
-	lat = tokenToInt(plat);
-	deg = lat / 1000000;
-	min = lat - deg * 1000000;
-	lat = deg * 1000000 + ((min * 5) + 1) / 3;
 
-	return ns * lat;
+	return ns * convertToDegree(plat);
 }
 
 static udegree_t nmea_longitude(const char *plot, const char *phem)
 {
 	int ew;
-	uint32_t lot;
-	uint32_t deg;
-	uint32_t min;
-
-	if (*plot == 0)
-	{
-        return 0;
-    }
-    if (*phem == 0)
-	{
-        return 0;
-    }
 
     /* west long is negative, east long is positive */
     if (*phem == 'E')
@@ -136,12 +130,12 @@ static udegree_t nmea_longitude(const char *plot, const char *phem)
         ew = -1;
     }
 
-	lot = tokenToInt(plot);
-	deg = lot / 1000000;
-	min = lot - deg * 1000000;
-	lot = deg * 1000000 + ((min * 5) + 1) / 3;
+    if (*phem == 0)
+	{
+        return 0;
+    }
 
-	return ew  * lot;
+	return ew * convertToDegree(plot);
 }
 
 static uint16_t nmea_altitude(const char *palt, const char *punits)
