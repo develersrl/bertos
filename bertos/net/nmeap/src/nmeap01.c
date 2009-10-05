@@ -5,34 +5,50 @@ All rights reserved.
 This product is licensed for use and distribution under the BSD Open Source License.
 see the file COPYING for more details.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
-OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT 
-OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
-OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
-WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE 
-OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
 /**
  * nmeap01.c
  * nmeap gps data parser
- * 
+ *
  * see the file COPYING for terms of the licnese
-*/ 
- 
- 
-#include <stdio.h>
-#include <stdlib.h>
+*/
+
 #include <string.h>
-#include <assert.h>
+#include <stdlib.h>
+#include <cfg/debug.h>
 #include <ctype.h>
-#include "nmeap.h"
+
+#include "../inc/nmeap.h"
+
+#define assert(x)    ASSERT(x)
+
+/*
+ * Removed to compile in BeRTOS environment.
+ *
+ * #include <stdio.h>
+ * #include <stdlib.h>
+ * #include <string.h>
+ * #include <cfg/debug.h>
+ * #include <assert.h>
+ * #include <ctype.h>
+ *
+ * #include "nmeap.h"
+ *
+ */
+
 
 /* this only works if you are sure you have an upper case hex digit */
 #define HEXTOBIN(ch) ((ch <= '9') ? ch - '0' : ch - ('A' - 10))
@@ -51,7 +67,7 @@ int nmeap_parse(nmeap_context_t *context,char ch);
 int nmeap_parseBuffer(nmeap_context_t *context,const char *buffer,int *length);
 
 /**
- * get a latitude out of a pair of nmea tokens 
+ * get a latitude out of a pair of nmea tokens
  */
 double nmeap_latitude(const char *plat,const char *phem)
 {
@@ -59,17 +75,17 @@ double nmeap_latitude(const char *plat,const char *phem)
     int    deg;
     double min;
     int    ns;
-    
+
     assert(plat != 0);
     assert(phem != 0);
-    
+
     if (*plat == 0) {
         return 0.0;
     }
     if (*phem == 0) {
         return 0.0;
     }
-    
+
     /* north lat is +, south lat is - */
     if (*phem == 'N') {
         ns = 1;
@@ -77,26 +93,26 @@ double nmeap_latitude(const char *plat,const char *phem)
     else {
         ns = -1;
     }
-    
+
     /* latitude is degrees, minutes, fractional minutes */
     /* no validation is performed on the token. it better be good.*/
     /* if it comes back 0.0 then probably the token was bad */
     lat = atof(plat);
-    
+
     /* extract the degree part */
     deg = (int)(lat / 100.0);
-    
+
     /* mask out the degrees */
     min = lat - (deg * 100.0);
-    
+
     /* compute the actual latitude in degrees.decimal-degrees */
     lat = (deg + (min / 60.0)) * ns;
-    
+
     return lat;
 }
 
 /**
- * get a longitude out of a pair of nmea tokens 
+ * get a longitude out of a pair of nmea tokens
  */
 double nmeap_longitude(const char *plon,const char *phem)
 {
@@ -104,17 +120,17 @@ double nmeap_longitude(const char *plon,const char *phem)
     int    deg;
     double min;
     int    ew;
-    
+
     assert(plon != 0);
     assert(phem != 0);
-    
+
     if (*plon == 0) {
         return 0.0;
     }
     if (*phem == 0) {
         return 0.0;
     }
-    
+
     /* west long is negative, east long is positive */
     if (*phem == 'E') {
         ew = 1;
@@ -122,48 +138,48 @@ double nmeap_longitude(const char *plon,const char *phem)
     else {
         ew = -1;
     }
-    
+
     /* longitude is degrees, minutes, fractional minutes */
     /* no validation is performed on the token. it better be good.*/
     /* if it comes back 0.0 then probably the token was bad */
     lon = atof(plon);
-    
+
     /* extract the degree part */
     deg = (int)(lon / 100.0);
-    
+
     /* mask out the degrees */
     min = lon - (deg * 100.0);
-    
+
     /* compute the actual lonitude in degrees.decimal-degrees */
     lon = (deg + (min / 60.0)) * ew;
 
-    
+
     return lon;
 }
 
 /**
  * get an altitude longitude out of a pair of nmea tokens
- * ALTITUDE is returned in METERS 
+ * ALTITUDE is returned in METERS
  */
 double nmeap_altitude(const char *palt,const char *punits)
 {
     double alt;
-    
+
     if (*palt == 0) {
         return 0.0;
     }
-    
+
     /* convert with no error checking */
     alt = atof(palt);
-    
+
     if (*punits == 'M') {
-        /* already in meters */ 
+        /* already in meters */
     }
     else if (*punits == 'F') {
         /* convert to feet */
         alt = alt * 3.2808399;
     }
-    
+
     return alt;
 }
 
@@ -178,10 +194,9 @@ int nmeap_init(nmeap_context_t *context,void *user_data)
 
     context->user_data = user_data;
 
-    return 0;    
+    return 0;
 }
 
- 
 /**
  * register an NMEA sentence parser
  */
@@ -193,40 +208,40 @@ int nmeap_addParser(nmeap_context_t         *context,
 					 )
 {
     nmeap_sentence_t *s = 0;
-    
+
     /* runtime error */
     assert(context != 0);
-    
+
     /* sentence capacity overflow */
     if (context->sentence_count >= NMEAP_MAX_SENTENCES) {
         return -1;
     }
-    
+
     /* point at next empty sentence buffer */
     s = &context->sentence[context->sentence_count];
-    
+
     /* advance sentence data count */
     context->sentence_count++;
-    
+
     /* clear the sentence data */
     memset(s,0,sizeof(*s));
-    
+
     /* name */
     strncpy(s->name,sentence_name,NMEAP_MAX_SENTENCE_NAME_LENGTH);
-    
+
     /* parser */
     s->parser = sentence_parser;
-    
+
     /* callout */
     s->callout = sentence_callout;
-    
+
     /* data */
     s->data    = sentence_data;
 
     return 0;
 }
 
-/** 
+/**
  * tokenize a buffer
  */
 int nmeap_tokenize(nmeap_context_t *context)
@@ -234,12 +249,12 @@ int nmeap_tokenize(nmeap_context_t *context)
     char *s;
     int   tokens;
     int   state;
-    
+
     /* first token is header. assume it is there */
     tokens = 0;
     s = context->input;
     context->token[tokens] = s;
-    
+
     /* get rest of tokens */
     tokens = 1;
     state = 0;
@@ -261,7 +276,7 @@ int nmeap_tokenize(nmeap_context_t *context)
                 /* delimit at the comma */
                 *s    = 0;
             }
-            else {   
+            else {
                 /* not a comma */
                 state = 0;
             }
@@ -270,7 +285,7 @@ int nmeap_tokenize(nmeap_context_t *context)
             state = 0;
             break;
         }
-        
+
         // next character
         s++;
     }
@@ -278,21 +293,21 @@ int nmeap_tokenize(nmeap_context_t *context)
 }
 
 /**
- * process a sentence 
+ * process a sentence
  */
 int nmeap_process(nmeap_context_t *context)
 {
     int id;
     int i;
     nmeap_sentence_t *s;
-	
+
     /* copy the input to a debug buffer */
     /* remove debug_input when everything is working. */
     strncpy(context->debug_input,context->input,sizeof(context->debug_input));
-    
+
     /* tokenize the input */
     context->tokens = nmeap_tokenize(context);
-    
+
     /* try to find a matching sentence parser */
     /* this search is O(n). it has a lot of potential for optimization, at the expense of complexity, if you have a lot of sentences */
     /* binary search instead of linear (have to keep sentences in sorted order) O(NlogN) */
@@ -308,7 +323,7 @@ int nmeap_process(nmeap_context_t *context)
             }
         }
     }
-        
+
     return id;
 }
 
@@ -324,7 +339,7 @@ int nmeap_process(nmeap_context_t *context)
                                  +------+           +------+         +------+
                                  |3-cks |--xdigit-->|4-cks |-xdigit->| 5-CR |
                                  +------+           +------+         +------+
-                                 
+
 return to start conditions:
 1. buffer overflow
 2. invalid character for state
@@ -338,23 +353,23 @@ sentences.
 int nmeap_parse(nmeap_context_t *context,char ch)
 {
     int status = 0;
-    
+
     /* check for input buffer overrun first to avoid duplicating code in the
     individual states
     */
-    if (context->input_count >= (sizeof(context->input)-1)) {
+    if ((size_t)context->input_count >= (sizeof(context->input)-1)) {
         /* input buffer overrun, restart state machine */
         context->input_state = 0;
         /* reset input count */
         context->input_count = 0;
     }
-    
+
     /* store the byte */
     context->input[context->input_count] = ch;
-    
+
     /* next buffer position */
     context->input_count++;
-    
+
     /* run it through the lexical scanner */
     switch(context->input_state) {
     /* LOOKING FOR $ */
@@ -459,15 +474,15 @@ int nmeap_parse(nmeap_context_t *context,char ch)
     case 6:
         if (ch == '\n') {
             /* linefeed, line complete */
-            
+
             /* delimit buffer */
             context->input[context->input_count] = 0;
-            
+
             /* if the checksums match, process the sentence */
 			if (context->ccks == context->icks) {
 				/* process */
 				status = nmeap_process(context);
-				
+
 				/* count good messages */
 				context->msgs++;
 			}
@@ -475,7 +490,7 @@ int nmeap_parse(nmeap_context_t *context,char ch)
 				/* count checksum errors */
 				context->err_cks++;
 			}
-            
+
             /* restart next time */
             context->input_state = 0;
             context->input_count = 0;
@@ -492,11 +507,11 @@ int nmeap_parse(nmeap_context_t *context,char ch)
         context->input_state = 0;
         break;
     }
-            
+
 	return status;
 }
 
-/** 
+/**
  * parse a buffer of nmea data
  */
 int nmeap_parseBuffer(nmeap_context_t *context,const char *buffer,int *length)
@@ -505,7 +520,7 @@ int nmeap_parseBuffer(nmeap_context_t *context,const char *buffer,int *length)
     int  status;
     int  rem;
     int  tlen;
-    
+
     tlen   = *length;
     rem    = *length;
     status = 0;
@@ -520,25 +535,25 @@ int nmeap_parseBuffer(nmeap_context_t *context,const char *buffer,int *length)
             break;
         }
     }
-	
+
     /* return remaining byte count */
     *length = rem;
-	
+
     return status;
 }
 
-/** 
- * standard GPGGA sentence parser 
+/**
+ * standard GPGGA sentence parser
  */
 int nmeap_gpgga(nmeap_context_t *context,nmeap_sentence_t *sentence)
 {
-#ifndef NDEBUG	
+#ifndef NDEBUG
     int i;
 #endif
-    
+
     /* get pointer to sentence data */
     nmeap_gga_t *gga = (nmeap_gga_t *)sentence->data;
-    
+
     /* if there is a data element, extract data from the tokens */
 	if (gga != 0) {
 		gga->latitude  = nmeap_latitude(context->token[2],context->token[3]);
@@ -551,39 +566,39 @@ int nmeap_gpgga(nmeap_context_t *context,nmeap_sentence_t *sentence)
 		gga->geoid      = nmeap_altitude(context->token[11],context->token[12]);
 	}
 
-#ifndef NDEBUG    
+#ifndef NDEBUG
     /* print raw input string */
     printf("%s",context->debug_input);
-    
+
     /* print some validation data */
     printf("%s==%s %02x==%02x\n",context->input_name,sentence->name,context->icks,context->ccks);
-    
+
     /* print the tokens */
     for(i=0;i<context->tokens;i++) {
         printf("%d:%s\n",i,context->token[i]);
     }
-#endif   
+#endif
 
     /* if the sentence has a callout, call it */
     if (sentence->callout != 0) {
         (*sentence->callout)(context,gga,context->user_data);
     }
-    
+
     return NMEAP_GPGGA;
 }
 
-/** 
- * standard GPRMCntence parser 
+/**
+ * standard GPRMCntence parser
  */
 int nmeap_gprmc(nmeap_context_t *context,nmeap_sentence_t *sentence)
 {
-#ifndef NDEBUG	
+#ifndef NDEBUG
     int i;
 #endif
 
     /* get pointer to sentence data */
     nmeap_rmc_t *rmc = (nmeap_rmc_t *)sentence->data;
-    
+
 	/* if there is a data element, use it */
 	if (rmc != 0) {
 		/* extract data from the tokens */
@@ -597,24 +612,24 @@ int nmeap_gprmc(nmeap_context_t *context,nmeap_sentence_t *sentence)
 		rmc->magvar     = atof(context->token[10]);
 	}
 
-#ifndef NDEBUG    
+#ifndef NDEBUG
     /* print raw input string */
     printf("%s",context->debug_input);
-    
+
     /* print some validation data */
     printf("%s==%s %02x==%02x\n",context->input_name,sentence->name,context->icks,context->ccks);
-    
+
     /* print the tokens */
     for(i=0;i<context->tokens;i++) {
         printf("%d:%s\n",i,context->token[i]);
     }
-#endif   
+#endif
 
     /* if the sentence has a callout, call it */
     if (sentence->callout != 0) {
         (*sentence->callout)(context,rmc,context->user_data);
     }
-    
+
     return NMEAP_GPRMC;
 }
 

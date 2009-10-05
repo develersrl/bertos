@@ -5,17 +5,17 @@ All rights reserved.
 This product is licensed for use and distribution under the BSD Open Source License.
 see the file COPYING for more details.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
-OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT 
-OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
-OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
-WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE 
-OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
@@ -26,11 +26,13 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern "C" {
 #endif
 
-/* 
+/*
 ============================================
 COMPILE TIME CONFIGURATION CONSTANTS
 ============================================
 */
+
+#define NDEBUG
 
 /* these constants affect the size of the context object. tweak them as desired but know what you are doing */
 
@@ -58,7 +60,7 @@ COMPILE TIME CONFIGURATION CONSTANTS
 struct nmeap_context;
 struct nmeap_sentence;
 
-/* 
+/*
 ============================================
 CALLOUTS
 ============================================
@@ -71,7 +73,7 @@ CALLOUTS
  * the callout must cast the 'sentence_data' to the appropriate type for that callout
  * @param context			nmea object context
  * @param sentence_data		sentence specific data
-*/ 
+*/
 typedef void (*nmeap_callout_t)(struct nmeap_context *context,void *sentence_data,void *user_data);
 
 /**
@@ -83,7 +85,7 @@ typedef void (*nmeap_callout_t)(struct nmeap_context *context,void *sentence_dat
  * @param context			nmea object context
  * @param sentence_data		sentence specific data
  * @return id of sentence  (each sentence parser knows its own ID)
-*/ 
+*/
 typedef int (*nmeap_sentence_parser_t)(struct nmeap_context *context,struct nmeap_sentence *sentence);
 
 
@@ -91,7 +93,7 @@ typedef int (*nmeap_sentence_parser_t)(struct nmeap_context *context,struct nmea
 #include "nmeap_def.h"
 
 
-/* 
+/*
 ============================================
 STANDARD SENTENCE DATA STRUCTURES
 ============================================
@@ -124,7 +126,7 @@ struct nmeap_rmc {
 
 typedef struct nmeap_rmc nmeap_rmc_t;
 
-/* 
+/*
 ============================================
 METHODS
 ============================================
@@ -143,11 +145,11 @@ int nmeap_init(nmeap_context_t *context,void *user_data);
  * @param context 		   nmea object context
  * @param sentence_name    string matching the sentence name for this parser. e.g. "GPGGA". not including the '$'
  * @param sentence_parser  parser function for this sentence
- * @param sentence_callout callout triggered when this sentence is received and parsed. 
+ * @param sentence_callout callout triggered when this sentence is received and parsed.
  *                         if null, no callout is triggered for this sentence
  * @param sentence_data    user allocated sentence specific data defined by the application. the parser uses
                            this data item to store the extracted data. This data object needs to persist over the life
-						   of the parser, so be careful if allocated on the stack. 
+						   of the parser, so be careful if allocated on the stack.
  * @return 0 if registered ok, -1 if registration failed
  */
 int nmeap_addParser(nmeap_context_t         *context,
@@ -157,7 +159,7 @@ int nmeap_addParser(nmeap_context_t         *context,
 					 void                   *sentence_data
 					 );
 
-/** 
+/**
  * parse a buffer of nmea data.
  * @param context 		   nmea object context
  * @param buffer          buffer of input characters
@@ -167,23 +169,23 @@ int nmeap_addParser(nmeap_context_t         *context,
  */
 int nmeap_parseBuffer(nmeap_context_t *context,const char *buffer,int *length);
 
-/** 
+/**
  * parse one character of nmea data.
  * @param context 		   nmea object context
  * @param ch              input character
- * @return -1 if error, 0 if the data did not complete a sentence, sentence code if a sentence was found in the stream  
+ * @return -1 if error, 0 if the data did not complete a sentence, sentence code if a sentence was found in the stream
  */
 int nmeap_parse(nmeap_context_t *context,char ch);
 
 
-/** 
+/**
  * built-in parser for GGA sentences.
  * @param context 		   nmea object context
  * @param sentence         sentence object for this parser
   */
 int nmeap_gpgga(nmeap_context_t *context,nmeap_sentence_t *sentence);
 
-/** 
+/**
  * built-in parser for RMC sentences.
  * @param context 		   nmea object context
  * @param sentence         sentence object for this parser
@@ -206,6 +208,15 @@ double nmeap_latitude(const char *plat,const char *phem);
  * @return longitude in degrees and fractional degrees
  */
 double nmeap_longitude(const char *plat,const char *phem);
+
+
+/**
+ * extract altitude from 2 tokens in xx.x format.
+ * @param palt pointer to token with numerical altitude
+ * @param punits pointer to token with measure unint
+ * @return altitude in meter or feet
+ */
+double nmeap_altitude(const char *palt,const char *punits);
 
 #ifdef __cplusplus
 } // extern C
