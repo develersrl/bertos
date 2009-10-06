@@ -28,7 +28,38 @@ TESTS=${TESTS:-`find . \
 	-o -name "*_test.c" -print` }
 
 TESTOUT="testout"
-SRC_LIST="bertos/algo/ramp.c bertos/drv/kdebug.c bertos/drv/timer.c bertos/fs/battfs.c bertos/kern/coop.c bertos/kern/idle.c bertos/kern/kfile.c bertos/kern/monitor.c bertos/kern/proc.c bertos/kern/signal.c bertos/kern/sem.c bertos/mware/event.c bertos/mware/formatwr.c bertos/mware/hex.c bertos/mware/sprintf.c bertos/os/hptime.c bertos/struct/kfile_fifo.c bertos/fs/fatfs/ff.c bertos/emul/diskio_emul.c bertos/fs/fat.c bertos/emul/switch_ctx_emul.S bertos/mware/ini_reader.c bertos/emul/kfile_posix.c bertos/algo/crc_ccitt.c bertos/algo/crc.c bertos/struct/kfile_mem.c bertos/net/ax25.c bertos/net/afsk.c bertos/net/nmeap/src/nmeap01.c bertos/net/nmea.c"
+SRC_LIST="
+	bertos/algo/ramp.c
+	bertos/drv/kdebug.c
+	bertos/drv/timer.c
+	bertos/fs/battfs.c
+	bertos/kern/coop.c
+	bertos/kern/idle.c
+	bertos/kern/kfile.c
+	bertos/kern/monitor.c
+	bertos/kern/proc.c
+	bertos/kern/signal.c
+	bertos/kern/sem.c
+	bertos/mware/event.c
+	bertos/mware/formatwr.c
+	bertos/mware/hex.c
+	bertos/mware/sprintf.c
+	bertos/os/hptime.c
+	bertos/struct/kfile_fifo.c
+	bertos/fs/fatfs/ff.c
+	bertos/emul/diskio_emul.c
+	bertos/fs/fat.c
+	bertos/emul/switch_ctx_emul.S
+	bertos/mware/ini_reader.c
+	bertos/emul/kfile_posix.c
+	bertos/algo/crc_ccitt.c
+	bertos/algo/crc.c
+	bertos/struct/kfile_mem.c
+	bertos/net/ax25.c
+	bertos/net/afsk.c
+	bertos/net/nmeap/src/nmeap01.c
+	bertos/net/nmea.c
+"
 
 buildout='/dev/null'
 runout='/dev/null'
