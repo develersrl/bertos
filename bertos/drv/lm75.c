@@ -63,10 +63,10 @@ deci_celsius_t lm75_read(addr_t sens_addr)
 	i2c_start_w(SELECT_ADDRESS(sens_addr));
 	i2c_put(LM75_PAD_BYTE);
 	i2c_start_r(SELECT_ADDRESS(sens_addr));
-	i2c_recv(&data, sizeof(data));
+	i2c_recv(data, sizeof(data));
 
-	degree = (uint16_t)data[0];
-	deci_degree = (uint16_t)(((data[1] >> 7) & 1 ) * 5);
+	degree = (int16_t)data[0];
+	deci_degree = (int16_t)(((data[1] >> 7) & 1 ) * 5);
 
 	LOG_INFO("[%d.%d C]\n", degree, deci_degree);
 
@@ -75,9 +75,8 @@ deci_celsius_t lm75_read(addr_t sens_addr)
 
 void lm75_init(void)
 {
-	i2c_init();
-	LOG_INFO("Init I2C module.\n");
-
+	// Check dependence
+	MOD_CHECK(i2c);
 	LM75_HW_INIT();
 }
 
