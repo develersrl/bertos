@@ -96,6 +96,13 @@ typedef struct AX25Call
 } AX25Call;
 
 /**
+ * Create an AX25Call structure on the fly and return its pointer.
+ * \param str callsign, can be 6 characters or shorter.
+ * \param id  ssid associated with the callsign.
+ */
+#define AX25_CALL(str, id) ({ static const AX25Call _call = { .call = (str), .ssid = (id) }; &_call; })
+
+/**
  * Maximum number of Repeaters in a AX25 message.
  */
 #define AX25_MAX_RPT 8
@@ -145,6 +152,19 @@ typedef struct AX25Msg
  * \param ctx AX25 context to operate on.
  */
 void ax25_poll(AX25Ctx *ctx);
+
+/**
+ * Send an AX25 frame on the channel.
+ * \param ctx AX25 context to operate on.
+ * \param dst the destination callsign for the frame, \see AX25_CALL
+ *        for a handy way to create a callsign on the fly.
+ * \param src the source callsign for the frame, \see AX25_CALL
+ *        for a handy way to create a callsign on the fly.
+ * \param _buf payload buffer.
+ * \param len length of the payload.
+ */
+void ax25_send(AX25Ctx *ctx, const AX25Call *dst, const AX25Call *src, const void *_buf, size_t len);
+
 
 /**
  * Init the AX25 protocol decoder.

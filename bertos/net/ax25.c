@@ -48,12 +48,12 @@
 #define LOG_FORMAT AX25_LOG_FORMAT
 #include <cfg/log.h>
 
-#include <string.h> //memset
+#include <string.h> //memset, memcmp
+#include <ctype.h>  //isalnum, toupper
 
 #define DECODE_CALL(buf, addr) \
 	for (unsigned i = 0; i < sizeof((addr)); i++) \
 	{ \
-		ASSERT(!(*(buf) & 0x01)); \
 		(addr)[i] = *(buf)++ >> 1; \
 	}
 
@@ -93,14 +93,14 @@ static void ax25_decode(AX25Ctx *ctx)
 	msg.ctrl = *buf++;
 	if (msg.ctrl != AX25_CTRL_UI)
 	{
-		LOG_INFO("Only UI frames are handled, got [%02X]\n", msg.ctrl);
+		LOG_WARN("Only UI frames are handled, got [%02X]\n", msg.ctrl);
 		return;
 	}
 
 	msg.pid = *buf++;
 	if (msg.pid != AX25_PID_NOLAYER3)
 	{
-		LOG_INFO("Only frames without layer3 protocol are handled, got [%02X]\n", msg.pid);
+		LOG_WARN("Only frames without layer3 protocol are handled, got [%02X]\n", msg.pid);
 		return;
 	}
 
@@ -172,6 +172,65 @@ void ax25_poll(AX25Ctx *ctx)
 		LOG_ERR("Channel error [%04x]\n", kfile_error(ctx->ch));
 		kfile_clearerr(ctx->ch);
 	}
+}
+
+static void ax25_putchar(AX25Ctx *ctx, uint8_t c)
+{
+	if (c == HDLC_FLAG || c == HDLC_RESET
+		|| c == AX25_ESC)
+		kfile_putc(AX25_ESC, ctx->ch);
+	ctx->crc_out = updcrc_ccitt(c, ctx->crc_out);
+	kfile_putc(c, ctx->ch);
+}
+
+static void ax25_sendCall(AX25Ctx *ctx, const AX25Call *addr)
+{
+	unsigned len = MIN(sizeof(addr->call), strlen(addr->call));
+
+	for (unsigned i = 0; i < len; i++)
+	{
+		uint8_t c = addr->call[i];
+		ASSERT(isalnum(c) || c == ' ');
+		c = toupper(c);
+		ax25_putchar(ctx, c << 1);
+	}
+
+	/* Fill with spaces the rest of the CALL if it's shorter */
+	if (len < sizeof(addr->call))
+		for (unsigned i = 0; i < sizeof(addr->call) - len; i++)
+			ax25_putchar(ctx, ' ' << 1);
+}
+
+void ax25_send(AX25Ctx *ctx, const AX25Call *dst, const AX25Call *src, const void *_buf, size_t len)
+{
+	const uint8_t *buf = (const uint8_t *)_buf;
+
+	ctx->crc_out = CRC_CCITT_INIT_VAL;
+	kfile_putc(HDLC_FLAG, ctx->ch);
+
+	ax25_sendCall(ctx, dst);
+	ax25_putchar(ctx, dst->ssid << 1);
+
+	ax25_sendCall(ctx, src);
+	ax25_putchar(ctx, (src->ssid << 1) | 0x01);
+	ax25_putchar(ctx, AX25_CTRL_UI);
+	ax25_putchar(ctx, AX25_PID_NOLAYER3);
+
+	while (len--)
+		ax25_putchar(ctx, *buf++);
+
+	/*
+	 * According to AX25 protocol,
+	 * CRC is sent in reverse order!
+	 */
+	uint8_t crcl = (ctx->crc_out & 0xff) ^ 0xff;
+	uint8_t crch = (ctx->crc_out >> 8) ^ 0xff;
+	ax25_putchar(ctx, crcl);
+	ax25_putchar(ctx, crch);
+
+	ASSERT(ctx->crc_out == AX25_CRC_CORRECT);
+
+	kfile_putc(HDLC_FLAG, ctx->ch);
 }
 
 void ax25_init(AX25Ctx *ctx, KFile *channel, ax25_callback_t hook)
