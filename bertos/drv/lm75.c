@@ -43,6 +43,7 @@
 #include "cfg/cfg_lm75.h"
 
 #include <cfg/debug.h>
+#include <cfg/module.h>
 
 // Define logging setting (for cfg/log.h module).
 #define LOG_LEVEL   LM75_LOG_LEVEL
