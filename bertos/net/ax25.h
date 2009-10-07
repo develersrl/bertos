@@ -141,38 +141,9 @@ typedef struct AX25Msg
 /* \} */
 
 
-/**
- * Check if there are any AX25 messages to be processed.
- * This function read available characters from the medium and search for
- * any AX25 messages.
- * If a message is found it is decoded and the linked callback executed.
- * This function may be blocking if there are no available chars and the KFile
- * used in \a ctx to access the medium is configured in blocking mode.
- *
- * \param ctx AX25 context to operate on.
- */
+
 void ax25_poll(AX25Ctx *ctx);
-
-/**
- * Send an AX25 frame on the channel.
- * \param ctx AX25 context to operate on.
- * \param dst the destination callsign for the frame, \see AX25_CALL
- *        for a handy way to create a callsign on the fly.
- * \param src the source callsign for the frame, \see AX25_CALL
- *        for a handy way to create a callsign on the fly.
- * \param _buf payload buffer.
- * \param len length of the payload.
- */
 void ax25_send(AX25Ctx *ctx, const AX25Call *dst, const AX25Call *src, const void *_buf, size_t len);
-
-
-/**
- * Init the AX25 protocol decoder.
- *
- * \param ctx AX25 context to init.
- * \param channel Used to gain access to the physical medium
- * \param hook Callback function called when a message is received
- */
 void ax25_init(AX25Ctx *ctx, KFile *channel, ax25_callback_t hook);
 
 int ax25_testSetup(void);
