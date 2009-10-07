@@ -42,6 +42,12 @@
 #include <cfg/test.h>
 
 
+/* Silent compiler warning */
+int reverse_testSetup(void);
+int reverse_testRun(void);
+int reverse_testTearDown(void);
+
+
 int reverse_testSetup(void)
 {
 	kdbg_init();
@@ -54,7 +60,7 @@ int reverse_testTearDown(void)
 }
 
 /**
- * Naice reverse implementation.
+ * Naive reverse implementation.
  */
 static uint8_t reverse(uint8_t b)
 {
