@@ -154,6 +154,12 @@
 		(b) = tmp; \
 	} while (0)
 
+/**
+ * Reverse the bits contained in b (LSB becomes the MSB and so on).
+ * \note \a b is evaluated twice
+ */
+#define REVERSE(b) \
+	((uint8_t)((((b) * 0x0802UL & 0x22110UL) | ((b) * 0x8020UL & 0x88440UL)) * 0x10101UL >> 16))
 
 #ifndef BV
 	/** Convert a bit value to a binary flag. */
