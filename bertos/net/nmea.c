@@ -53,26 +53,37 @@
 #include <string.h>
 
 
-static uint32_t tokenToInt(const char *s)
+static uint32_t tokenToInt(const char *s, int precision)
 {
 	uint32_t num = 0;
+	bool sep_found = false;
 	int i;
 
-	ASSERT(s);
+	if (!s)
+		return 0;
 
-	for(i = 0; i < NMEAP_MAX_TOKENS; i++)
+	for(i = 0; i < NMEAP_MAX_SENTENCE_LENGTH; i++)
 	{
 		char c = *s++;
 
 		if (c == '.')
+		{
+			sep_found = true;
 			continue;
+		}
 
-		if (c == '\0' || !isdigit(c))
+		if (c == '\0' || !isdigit(c) || (precision == 0 && sep_found))
 			break;
+
+		if (sep_found)
+			precision--;
 
 		num *= 10;
 		num += c - '0';
 	}
+
+	while (precision--)
+		num *= 10;
 
 	return num;
 }
@@ -88,7 +99,7 @@ static udegree_t convertToDegree(const char *str)
         return 0;
     }
 
-	dec = tokenToInt(str);
+	dec = tokenToInt(str, 4);
 	deg = dec / 1000000;
 	min = dec - deg * 1000000;
 	dec = deg * 1000000 + ((min * 5) + 1) / 3;
@@ -150,7 +161,7 @@ static uint16_t nmea_altitude(const char *palt, const char *punits)
         return 0;
     }
 
-	alt = tokenToInt(palt);
+	alt = atoi(palt);
 
     if (*punits == 'F')
 	{
@@ -230,26 +241,24 @@ int nmea_gpgga(nmeap_context_t *context, nmeap_sentence_t *sentence)
 	 */
 	NmeaGga *gga = (NmeaGga *)sentence->data;
 
+	ASSERT(gga);
+
 	/*
 	 * if there is a data element, extract data from the tokens
 	 */
-	if (gga != 0)
-	{
-		gga->latitude   = nmea_latitude(context->token[2],context->token[3]);
-		gga->longitude  = nmea_longitude(context->token[4],context->token[5]);
-		gga->altitude   = nmea_altitude(context->token[9],context->token[10]);
-		gga->time       = timestampToSec(tokenToInt(context->token[1]), 0);
-		gga->satellites = tokenToInt(context->token[7]);
-		gga->quality    = tokenToInt(context->token[6]);
-		gga->hdop       = tokenToInt(context->token[8]);
-		gga->geoid      = nmea_altitude(context->token[11],context->token[12]);
-
-	}
-
+	gga->latitude   = nmea_latitude(context->token[2],context->token[3]);
+	gga->longitude  = nmea_longitude(context->token[4],context->token[5]);
+	gga->altitude   = nmea_altitude(context->token[9],context->token[10]);
+	gga->time       = timestampToSec(tokenToInt(context->token[1], 3), 0);
+	gga->satellites = atoi(context->token[7]);
+	gga->quality    = atoi(context->token[6]);
+	gga->hdop       = tokenToInt(context->token[8], 1);
+	gga->geoid      = nmea_altitude(context->token[11],context->token[12]);
 
 	/*
 	 * if the sentence has a callout, call it
 	 */
+
 	if (sentence->callout != 0)
 		(*sentence->callout)(context, gga, context->user_data);
 
@@ -275,13 +284,13 @@ int nmea_gprmc(nmeap_context_t *context, nmeap_sentence_t *sentence)
 		/*
 		 * extract data from the tokens
 		 */
-		rmc->time       = timestampToSec(tokenToInt(context->token[1]), tokenToInt(context->token[9]));
+		rmc->time       = timestampToSec(tokenToInt(context->token[1], 3), atoi(context->token[9]));
 		rmc->warn       = *context->token[2];
 		rmc->latitude   = nmea_latitude(context->token[3],context->token[4]);
 		rmc->longitude  = nmea_longitude(context->token[5],context->token[6]);
-		rmc->speed      = tokenToInt(context->token[7]);
-		rmc->course     = tokenToInt(context->token[8]);
-		rmc->mag_var    = tokenToInt(context->token[10]);
+		rmc->speed      = atoi(context->token[7]);
+		rmc->course     = atoi(context->token[8]);
+		rmc->mag_var    = atoi(context->token[10]);
 	}
 
     /*
@@ -313,9 +322,9 @@ int nmea_gpvtg(nmeap_context_t *context, nmeap_sentence_t *sentence)
 		/*
 		 * extract data from the tokens
 		 */
-		vtg->track_good  = tokenToInt(context->token[1]);
-		vtg->knot_speed  = tokenToInt(context->token[5]);
-		vtg->km_speed    = tokenToInt(context->token[7]);
+		vtg->track_good  = atoi(context->token[1]);
+		vtg->knot_speed  = atoi(context->token[5]);
+		vtg->km_speed    = atoi(context->token[7]);
 	}
 
     /*
@@ -346,25 +355,25 @@ int nmea_gpgsv(nmeap_context_t *context, nmeap_sentence_t *sentence)
 		/*
 		 * extract data from the tokens
 		 */
-		gsv->tot_message     = tokenToInt(context->token[1]);
-		gsv->message_num     = tokenToInt(context->token[2]);
-		gsv->tot_svv         = tokenToInt(context->token[3]);
-		gsv->sv_prn          = tokenToInt(context->token[4]);
-		gsv->elevation       = tokenToInt(context->token[5]);
-		gsv->azimut          = tokenToInt(context->token[6]);
-		gsv->snr             = tokenToInt(context->token[7]);
-		gsv->sv_prn2         = tokenToInt(context->token[8]);
-		gsv->elevation2      = tokenToInt(context->token[9]);
-		gsv->azimut2         = tokenToInt(context->token[10]);
-		gsv->snr2            = tokenToInt(context->token[11]);
-		gsv->sv_prn3         = tokenToInt(context->token[12]);
-		gsv->elevation3      = tokenToInt(context->token[13]);
-		gsv->azimut3         = tokenToInt(context->token[14]);
-		gsv->snr3            = tokenToInt(context->token[15]);
-		gsv->sv_prn4         = tokenToInt(context->token[16]);
-		gsv->elevation4      = tokenToInt(context->token[17]);
-		gsv->azimut4         = tokenToInt(context->token[18]);
-		gsv->snr4            = tokenToInt(context->token[19]);
+		gsv->tot_message     = atoi(context->token[1]);
+		gsv->message_num     = atoi(context->token[2]);
+		gsv->tot_svv         = atoi(context->token[3]);
+		gsv->sv_prn          = atoi(context->token[4]);
+		gsv->elevation       = atoi(context->token[5]);
+		gsv->azimut          = atoi(context->token[6]);
+		gsv->snr             = atoi(context->token[7]);
+		gsv->sv_prn2         = atoi(context->token[8]);
+		gsv->elevation2      = atoi(context->token[9]);
+		gsv->azimut2         = atoi(context->token[10]);
+		gsv->snr2            = atoi(context->token[11]);
+		gsv->sv_prn3         = atoi(context->token[12]);
+		gsv->elevation3      = atoi(context->token[13]);
+		gsv->azimut3         = atoi(context->token[14]);
+		gsv->snr3            = atoi(context->token[15]);
+		gsv->sv_prn4         = atoi(context->token[16]);
+		gsv->elevation4      = atoi(context->token[17]);
+		gsv->azimut4         = atoi(context->token[18]);
+		gsv->snr4            = atoi(context->token[19]);
 	}
 
 
