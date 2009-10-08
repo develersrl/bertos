@@ -51,6 +51,7 @@
 #include <ctype.h>
 #include <time.h>
 #include <string.h>
+#include <stdlib.h>
 
 
 static uint32_t tokenToInt(const char *s, int precision)
@@ -112,20 +113,13 @@ static udegree_t nmea_latitude(const char *plat, const char *phem)
 	int ns;
 
     if (*phem == 0)
-	{
         return 0;
-    }
-
 
     /* north lat is +, south lat is - */
     if (*phem == 'N')
-	{
         ns = 1;
-    }
     else
-	{
         ns = -1;
-    }
 
 
 	return ns * convertToDegree(plat);
@@ -135,19 +129,14 @@ static udegree_t nmea_longitude(const char *plot, const char *phem)
 {
 	int ew;
 
+    if (*phem == 0)
+        return 0;
+
     /* west long is negative, east long is positive */
     if (*phem == 'E')
-	{
         ew = 1;
-    }
-    else {
+    else
         ew = -1;
-    }
-
-    if (*phem == 0)
-	{
-        return 0;
-    }
 
 	return ew * convertToDegree(plot);
 }
@@ -157,9 +146,7 @@ static uint16_t nmea_altitude(const char *palt, const char *punits)
 	uint32_t alt;
 
 	if (*palt == 0)
-	{
         return 0;
-    }
 
 	alt = atoi(palt);
 
