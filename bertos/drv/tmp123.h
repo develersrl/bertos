@@ -47,9 +47,9 @@
 
 #include <kern/kfile.h>
 
-typedef int16_t deci_celsius_t;
+#include <drv/ntc.h> // Macro and data type to manage celsius degree
 
-deci_celsius_t tmp123_read(KFile *fd);
+deg_t tmp123_read(KFile *fd);
 
 void tmp123_init(void);
 

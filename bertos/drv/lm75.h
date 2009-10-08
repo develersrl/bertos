@@ -45,13 +45,14 @@
 
 #include <cpu/types.h>
 
+#include <drv/ntc.h> // Macro and data type to manage celsius degree
+
 #define LM75_ADDRESS_BYTE    0x91
 #define LM75_PAD_BYTE        0x0
 
-typedef int16_t deci_celsius_t;
 typedef uint8_t addr_t;
 
-deci_celsius_t lm75_read(addr_t sens_addr);
+deg_t lm75_read(addr_t sens_addr);
 
 void lm75_init(void);
 

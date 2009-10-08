@@ -52,10 +52,11 @@
 #include <cfg/log.h>
 
 #include <drv/i2c.h>
+#include <drv/ntc.h> // Macro and data type to manage celsius degree
 
 #define SELECT_ADDRESS(addr)   LM75_ADDRESS_BYTE | (addr << 1)
 
-deci_celsius_t lm75_read(addr_t sens_addr)
+deg_t lm75_read(addr_t sens_addr)
 {
 	uint8_t data[2];
 	int16_t degree;

@@ -46,10 +46,12 @@
 
 #include <kern/kfile.h>
 
+#include <drv/ntc.h> // Macro and data type to manage celsius degree
+
 /**
  * Read temperature from TMP123 chip.
  */
-deci_celsius_t tmp123_read(KFile *fd)
+deg_t tmp123_read(KFile *fd)
 {
 	int16_t tmp;
 
