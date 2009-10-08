@@ -82,12 +82,12 @@ NmeaGga gga_test =
 {
 	.latitude = 43851403,
     .longitude = 11147808,
-    .altitude = 574,
+    .altitude = 57,
     .time = 2736328,
     .satellites = 5,
     .quality = 1,
     .hdop = 26,
-    .geoid = 452,
+    .geoid = 45,
 };
 
 #define TOT_GOOD_SENTENCE_NUM    12
