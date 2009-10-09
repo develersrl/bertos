@@ -81,6 +81,7 @@
 
 	#define AFSK_READ_ADC()     (afsk_adc_val)
 
+	void afsk_dac_isr(void);
 	#define DEFINE_AFSK_DAC_ISR()  void afsk_dac_isr(void)
 	#define AFSK_DAC_IRQ_END()     do { /* Implement me */ } while (0)
 	#define AFSK_DAC_IRQ_START()   do { afsk_tx_test = true; } while (0)
