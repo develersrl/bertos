@@ -229,10 +229,8 @@ int nmea_gpgga(nmeap_context_t *context, nmeap_sentence_t *sentence)
 	NmeaGga *gga = (NmeaGga *)sentence->data;
 
 	ASSERT(gga);
+	ASSERT(context->tokens >= 12);
 
-	/*
-	 * if there is a data element, extract data from the tokens
-	 */
 	gga->latitude   = nmea_latitude(context->token[2],context->token[3]);
 	gga->longitude  = nmea_longitude(context->token[4],context->token[5]);
 	gga->altitude   = nmea_altitude(context->token[9],context->token[10]);
@@ -263,26 +261,20 @@ int nmea_gprmc(nmeap_context_t *context, nmeap_sentence_t *sentence)
 	 */
     NmeaRmc *rmc = (NmeaRmc *)sentence->data;
 
-	/*
-	 * if there is a data element, use it
-	 */
-	if (rmc != 0)
-	{
-		/*
-		 * extract data from the tokens
-		 */
-		rmc->time       = timestampToSec(tokenToInt(context->token[1], 3), atoi(context->token[9]));
-		rmc->warn       = *context->token[2];
-		rmc->latitude   = nmea_latitude(context->token[3],context->token[4]);
-		rmc->longitude  = nmea_longitude(context->token[5],context->token[6]);
-		rmc->speed      = atoi(context->token[7]);
-		rmc->course     = atoi(context->token[8]);
-		rmc->mag_var    = atoi(context->token[10]);
-	}
+	ASSERT(rmc);
+	ASSERT(context->tokens >= 10);
 
-    /*
-	 * if the sentence has a callout, call it
+	/*
+	 * extract data from the tokens
 	 */
+	rmc->time       = timestampToSec(tokenToInt(context->token[1], 3), atoi(context->token[9]));
+	rmc->warn       = *context->token[2];
+	rmc->latitude   = nmea_latitude(context->token[3],context->token[4]);
+	rmc->longitude  = nmea_longitude(context->token[5],context->token[6]);
+	rmc->speed      = atoi(context->token[7]);
+	rmc->course     = atoi(context->token[8]);
+	rmc->mag_var    = atoi(context->token[10]);
+
     if (sentence->callout != 0)
         (*sentence->callout)(context, rmc, context->user_data);
 
@@ -301,18 +293,15 @@ int nmea_gpvtg(nmeap_context_t *context, nmeap_sentence_t *sentence)
 	 */
     NmeaVtg *vtg = (NmeaVtg *)sentence->data;
 
+	ASSERT(vtg);
+	ASSERT(context->tokens >= 7);
+
 	/*
-	 * if there is a data element, use it
+	 * extract data from the tokens
 	 */
-	if (vtg != 0)
-	{
-		/*
-		 * extract data from the tokens
-		 */
-		vtg->track_good  = atoi(context->token[1]);
-		vtg->knot_speed  = atoi(context->token[5]);
-		vtg->km_speed    = atoi(context->token[7]);
-	}
+	vtg->track_good  = atoi(context->token[1]);
+	vtg->knot_speed  = atoi(context->token[5]);
+	vtg->km_speed    = atoi(context->token[7]);
 
     /*
 	 * if the sentence has a callout, call it
@@ -334,35 +323,24 @@ int nmea_gpgsv(nmeap_context_t *context, nmeap_sentence_t *sentence)
 	 */
     NmeaGsv *gsv = (NmeaGsv *)sentence->data;
 
-	/*
-	 * if there is a data element, use it
-	 */
-	if (gsv != 0)
-	{
-		/*
-		 * extract data from the tokens
-		 */
-		gsv->tot_message     = atoi(context->token[1]);
-		gsv->message_num     = atoi(context->token[2]);
-		gsv->tot_svv         = atoi(context->token[3]);
-		gsv->sv_prn          = atoi(context->token[4]);
-		gsv->elevation       = atoi(context->token[5]);
-		gsv->azimut          = atoi(context->token[6]);
-		gsv->snr             = atoi(context->token[7]);
-		gsv->sv_prn2         = atoi(context->token[8]);
-		gsv->elevation2      = atoi(context->token[9]);
-		gsv->azimut2         = atoi(context->token[10]);
-		gsv->snr2            = atoi(context->token[11]);
-		gsv->sv_prn3         = atoi(context->token[12]);
-		gsv->elevation3      = atoi(context->token[13]);
-		gsv->azimut3         = atoi(context->token[14]);
-		gsv->snr3            = atoi(context->token[15]);
-		gsv->sv_prn4         = atoi(context->token[16]);
-		gsv->elevation4      = atoi(context->token[17]);
-		gsv->azimut4         = atoi(context->token[18]);
-		gsv->snr4            = atoi(context->token[19]);
-	}
 
+	/*
+	 * extract data from the tokens
+	 */
+	gsv->tot_message     = atoi(context->token[1]);
+	gsv->message_num     = atoi(context->token[2]);
+	gsv->tot_svv         = atoi(context->token[3]);
+
+	// Fill remaning member until we have token
+	int  j = 0;
+	for (int i = 4; i < context->tokens - 3; i += 4, j++)
+	{
+
+		gsv->info[j].sv_prn     = atoi(context->token[i]);
+		gsv->info[j].elevation  = atoi(context->token[i + 1]);
+		gsv->info[j].azimut     = atoi(context->token[i + 2]);
+		gsv->info[j].snr        = atoi(context->token[i + 3]);
+	}
 
     /*
 	 * if the sentence has a callout, call it

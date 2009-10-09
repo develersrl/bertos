@@ -90,6 +90,8 @@ NmeaGga gga_test =
     .geoid = 45,
 };
 
+#include <net/nmea_log.c>
+
 #define TOT_GOOD_SENTENCE_NUM    12
 
 #define MAX_SENTENCE_POLL  20
@@ -152,15 +154,13 @@ static void gpgsv_callout(nmeap_context_t *context, void *data, void *user_data)
 
 	tot_sentence_parsed++;
 
-    LOG_INFO("[%d]found GPGSV message %d %d %d %d %d %d %d\n",tot_sentence_parsed,
+    LOG_INFO("[%d]found GPGSV message %d %d %d\n",tot_sentence_parsed,
 			gsv->tot_message,
 			gsv->message_num,
-			gsv->tot_svv,
-			gsv->sv_prn,
-			gsv->elevation,
-			gsv->azimut,
-			gsv->snr
-            );
+			gsv->tot_svv);
+
+	for (int i = 0; i < 4; i++)
+	    LOG_INFO("[%d]%d %d %d %d\n", i, gsv->info[i].sv_prn, gsv->info[i].elevation, gsv->info[i].azimut, gsv->info[i].snr);
 }
 
 /**
@@ -185,19 +185,14 @@ int nmea_testSetup(void)
 {
 	kdbg_init();
 
-	kfilemem_init(&mem, nmea_test_vector, sizeof(nmea_test_vector));
+	kfilemem_init(&mem, test, sizeof(test));
 	LOG_INFO("Init test buffer..done.\n");
 
     nmeap_init(&nmea, NULL);
-	LOG_INFO("Init NMEA context..done.\n");
     nmeap_addParser(&nmea, "GPGGA", nmea_gpgga, gpgga_callout, &gga);
-	LOG_INFO("Init NMEA GPGGA parser..done.\n");
     nmeap_addParser(&nmea, "GPRMC", nmea_gprmc, gprmc_callout, &rmc);
-	LOG_INFO("Init NMEA GPRMC parser..done.\n");
 	nmeap_addParser(&nmea, "GPGSV", nmea_gpgsv, gpgsv_callout, &gsv);
-	LOG_INFO("Init NMEA GPGSV parser..done.\n");
 	nmeap_addParser(&nmea, "GPVTG", nmea_gpvtg, gpvtg_callout, &vtg);
-	LOG_INFO("Init NMEA GPVTG parser..done.\n");
 
 	return 0;
 }
