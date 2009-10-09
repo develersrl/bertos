@@ -62,7 +62,7 @@
  * $WIZ$ type = "int"
  * $WIZ$ min = 2
  */
-#define CONFIG_AFSK_TX_BUFLEN 256
+#define CONFIG_AFSK_TX_BUFLEN 32
 
 /**
  * AFSK DAC sample rate for modem outout.
@@ -77,5 +77,22 @@
  * $WIZ$ min = -1
  */
 #define CONFIG_AFSK_RXTIMEOUT 0
+
+
+/**
+ * AFSK Preamble length in [ms], before starting transmissions.
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 1
+ */
+#define CONFIG_AFSK_PREAMBLE_LEN 300UL
+
+
+
+/**
+ * AFSK Trailer length in [ms], before stopping transmissions.
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 1
+ */
+#define CONFIG_AFSK_TRAILER_LEN 50UL
 
 #endif /* CFG_AFSK_H */

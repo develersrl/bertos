@@ -164,6 +164,9 @@ static uint8_t hdlc_bit_idx;
 #define BIT_DIFFER(bitline1, bitline2) (((bitline1) ^ (bitline2)) & 0x01)
 #define EDGE_FOUND(bitline)            BIT_DIFFER((bitline), (bitline) >> 1)
 
+static uint16_t preamble_len;
+static uint16_t trailer_len;
+
 static void hdlc_parse(bool bit)
 {
 	demod_bits <<= 1;
@@ -342,8 +345,10 @@ static void afsk_txStart(void)
 		phase_acc = 0;
 		stuff_cnt = 0;
 		sending = true;
+		preamble_len = DIV_ROUND(CONFIG_AFSK_PREAMBLE_LEN * BITRATE, 8000);
 		AFSK_DAC_IRQ_START();
 	}
+	ATOMIC(trailer_len  = DIV_ROUND(CONFIG_AFSK_TRAILER_LEN  * BITRATE, 8000));
 }
 
 #define BIT_STUFF_LEN 5
@@ -358,7 +363,7 @@ DEFINE_AFSK_DAC_ISR()
 		if (tx_bit == 0)
 		{
 			/* We have just finished transimitting a char, get a new one. */
-			if (fifo_isempty(&tx_fifo))
+			if (fifo_isempty(&tx_fifo) && trailer_len == 0)
 			{
 				AFSK_DAC_IRQ_STOP();
 				sending = false;
@@ -375,7 +380,25 @@ DEFINE_AFSK_DAC_ISR()
 					stuff_cnt = 0;
 
 				bit_stuff = true;
-				curr_out = fifo_pop(&tx_fifo);
+
+				/*
+				 * Handle preamble and trailer
+				 */
+				if (preamble_len == 0)
+				{
+					if (fifo_isempty(&tx_fifo))
+					{
+						trailer_len--;
+						curr_out = HDLC_FLAG;
+					}
+					else
+						curr_out = fifo_pop(&tx_fifo);
+				}
+				else
+				{
+					preamble_len--;
+					curr_out = HDLC_FLAG;
+				}
 
 				/* Handle char escape */
 				if (curr_out == AX25_ESC)
