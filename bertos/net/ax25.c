@@ -63,7 +63,6 @@ static void ax25_decode(AX25Ctx *ctx)
 	uint8_t *buf = ctx->buf;
 
 	DECODE_CALL(buf, msg.dst.call);
-	ASSERT(!(*buf & 0x01));
 	msg.dst.ssid = (*buf++ >> 1) & 0x0F;
 
 	DECODE_CALL(buf, msg.src.call);
