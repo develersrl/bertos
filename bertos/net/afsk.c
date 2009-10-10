@@ -254,7 +254,9 @@ void afsk_adc_isr(Afsk *af, int8_t curr_sample)
 		 * Determine bit value by reading the last 3 sampled bits.
 		 * If the number of ones is two or greater, the bit value is a 1,
 		 * otherwise is a 0.
+		 * This algorithm presumes that there are 8 samples per bit.
 		 */
+		STATIC_ASSERT(SAMPLEPERBIT == 8);
 		uint8_t bits = af->sampled_bits & 0x07;
 		if (bits == 0x07 // 111, 3 bits set to 1
 		 || bits == 0x06 // 110, 2 bits
