@@ -81,6 +81,10 @@ typedef struct Hdlc
 	bool rxstart;       ///< True if an HDLC_FLAG char has been found in the bitstream.
 } Hdlc;
 
+/**
+ * RX FIFO buffer full error.
+ */
+#define AFSK_RXFIFO_OVERRUN BV(0)
 
 /**
  * AFSK1200 modem context.
@@ -164,6 +168,12 @@ typedef struct Afsk
 
 	/** True while modem sends data */
 	volatile bool sending;
+
+	/**
+	 * AFSK modem status.
+	 * If 0 all is ok, otherwise errors are present.
+	 */
+	volatile int status;
 
 	/** Hdlc context */
 	Hdlc hdlc;

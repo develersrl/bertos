@@ -120,8 +120,10 @@ INLINE uint8_t sin_sample(uint16_t idx)
 #define EDGE_FOUND(bitline)            BIT_DIFFER((bitline), (bitline) >> 1)
 
 
-static void hdlc_parse(Hdlc *hdlc, bool bit, FIFOBuffer *fifo)
+static bool hdlc_parse(Hdlc *hdlc, bool bit, FIFOBuffer *fifo)
 {
+	bool ret = true;
+
 	hdlc->demod_bits <<= 1;
 	hdlc->demod_bits |= bit ? 1 : 0;
 
@@ -134,26 +136,29 @@ static void hdlc_parse(Hdlc *hdlc, bool bit, FIFOBuffer *fifo)
 			hdlc->rxstart = true;
 		}
 		else
+		{
+			ret = false;
 			hdlc->rxstart = false;
+		}
 
 		hdlc->currchar = 0;
 		hdlc->bit_idx = 0;
-		return;
+		return ret;
 	}
 
 	/* Reset */
 	if ((hdlc->demod_bits & HDLC_RESET) == HDLC_RESET)
 	{
 		hdlc->rxstart = false;
-		return;
+		return ret;
 	}
 
 	if (!hdlc->rxstart)
-		return;
+		return ret;
 
 	/* Stuffed bit */
 	if ((hdlc->demod_bits & 0x3f) == 0x3e)
-		return;
+		return ret;
 
 	if (hdlc->demod_bits & 0x01)
 		hdlc->currchar |= 0x80;
@@ -167,20 +172,27 @@ static void hdlc_parse(Hdlc *hdlc, bool bit, FIFOBuffer *fifo)
 			if (!fifo_isfull(fifo))
 				fifo_push(fifo, AX25_ESC);
 			else
+			{
 				hdlc->rxstart = false;
+				ret = false;
+			}
 		}
 
 		if (!fifo_isfull(fifo))
 			fifo_push(fifo, hdlc->currchar);
 		else
+		{
 			hdlc->rxstart = false;
+			ret = false;
+		}
 
 		hdlc->currchar = 0;
 		hdlc->bit_idx = 0;
-		return;
 	}
+	else
+		hdlc->currchar >>= 1;
 
-	hdlc->currchar >>= 1;
+	return ret;
 }
 
 
@@ -288,7 +300,8 @@ void afsk_adc_isr(Afsk *af, int8_t curr_sample)
 		 * NRZI coding: if 2 consecutive bits have the same value
 		 * a 1 is received, otherwise it's a 0.
 		 */
-		hdlc_parse(&af->hdlc, !EDGE_FOUND(af->found_bits), &af->rx_fifo);
+		if (!hdlc_parse(&af->hdlc, !EDGE_FOUND(af->found_bits), &af->rx_fifo))
+			af->status |= AFSK_RXFIFO_OVERRUN;
 	}
 
 
@@ -491,6 +504,21 @@ static int afsk_flush(KFile *fd)
 	return 0;
 }
 
+static int afsk_error(KFile *fd)
+{
+	Afsk *af = AFSK_CAST(fd);
+	int err;
+
+	ATOMIC(err = af->status);
+	return err;
+}
+
+static void afsk_clearerr(KFile *fd)
+{
+	Afsk *af = AFSK_CAST(fd);
+	ATOMIC(af->status = 0);
+}
+
 
 /**
  * Initialize an AFSK1200 modem.
@@ -525,5 +553,7 @@ void afsk_init(Afsk *af, int adc_ch, int dac_ch)
 	af->fd.write = afsk_write;
 	af->fd.read = afsk_read;
 	af->fd.flush = afsk_flush;
+	af->fd.error = afsk_error;
+	af->fd.clearerr = afsk_clearerr;
 	af->phase_inc = MARK_INC;
 }

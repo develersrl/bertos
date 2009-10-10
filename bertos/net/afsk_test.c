@@ -147,7 +147,6 @@ int afsk_testSetup(void)
 
 	timer_init();
 	afsk_init(&afsk_fd, 0 ,0);
-	afsk_fd.fd.error = kfile_genericClose;
 	ax25_init(&ax25, &afsk_fd.fd, message_hook);
 	return 0;
 }
