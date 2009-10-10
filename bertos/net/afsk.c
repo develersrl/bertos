@@ -346,6 +346,8 @@ static void afsk_txStart(Afsk *af)
  */
 uint8_t afsk_dac_isr(Afsk *af)
 {
+	AFSK_STROBE_ON();
+
 	/* Check if we are at a start of a sample cycle */
 	if (af->sample_count == 0)
 	{
@@ -356,6 +358,7 @@ uint8_t afsk_dac_isr(Afsk *af)
 			{
 				AFSK_DAC_IRQ_STOP(af->dac_ch);
 				af->sending = false;
+				AFSK_STROBE_OFF();
 				return 0;
 			}
 			else
@@ -395,6 +398,7 @@ uint8_t afsk_dac_isr(Afsk *af)
 					{
 						AFSK_DAC_IRQ_STOP(af->dac_ch);
 						af->sending = false;
+						AFSK_STROBE_OFF();
 						return 0;
 					}
 					else
@@ -453,6 +457,7 @@ uint8_t afsk_dac_isr(Afsk *af)
 	af->phase_acc %= SIN_LEN;
 
 	af->sample_count--;
+	AFSK_STROBE_OFF();
 	return sin_sample(af->phase_acc);
 }
 
