@@ -61,11 +61,8 @@ FILE *fp_adc;
 FILE *fp_dac;
 uint32_t data_size;
 uint32_t data_written;
-bool afsk_tx_test;
 Afsk afsk_fd;
 AX25Ctx ax25;
-
-int8_t afsk_adc_val;
 
 int msg_cnt;
 static void message_hook(UNUSED_ARG(struct AX25Msg *, msg))
@@ -183,12 +180,13 @@ int afsk_testRun(void)
 
 	ax25_send(&ax25, AX25_CALL("abcdef", 0), AX25_CALL("123456", 1), buf, sizeof(buf));
 
-	while (afsk_tx_test)
+	do
 	{
 		int8_t val = afsk_dac_isr(&afsk_fd) - 128;
 		ASSERT(fwrite(&val, 1, sizeof(val), fp_dac) == sizeof(val));
 		data_written++;
 	}
+	while (afsk_fd.sending);
 
 	#define SND_DATASIZE_OFF 8
 	#if CPU_AVR
