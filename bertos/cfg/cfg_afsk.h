@@ -39,6 +39,22 @@
 #ifndef CFG_AFSK_H
 #define CFG_AFSK_H
 
+/**
+ * Module logging level.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
+ */
+#define AFSK_LOG_LEVEL      LOG_LVL_WARN
+
+/**
+ * Module logging format.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define AFSK_LOG_FORMAT     LOG_FMT_TERSE
+
 
 /**
  * AFSK discriminator filter type.
