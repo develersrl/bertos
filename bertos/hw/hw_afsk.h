@@ -63,7 +63,7 @@
 
 	/**
 	 * Initialize the specified channel of the DAC for AFSK needs.
-	 * The DAC have to be configured in order to call an ISR for every sample sent.
+	 * The DAC has to be configured in order to call an ISR for every sample sent.
 	 * The DAC doesn't have to start the IRQ immediatly but have to wait
 	 * the AFSK driver to call AFSK_DAC_IRQ_START().
 	 * The ISR must then call afsk_dac_isr() passing the AFSK context.
