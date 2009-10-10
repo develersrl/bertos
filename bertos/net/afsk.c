@@ -51,6 +51,7 @@
 #include <cfg/log.h>
 
 #include <cpu/power.h>
+#include <cpu/pgm.h>
 #include <struct/fifobuf.h>
 
 #include <string.h> /* memset */
@@ -78,9 +79,8 @@ STATIC_ASSERT(!(CONFIG_AFSK_DAC_SAMPLERATE % BITRATE));
  * The rest of the wave is computed from this first quarter.
  * This table is used to generate the modulated data.
  */
-static const uint8_t sin_table[] =
+static const uint8_t PROGMEM sin_table[] =
 {
-	//TODO put in flash!
 	128, 129, 131, 132, 134, 135, 137, 138, 140, 142, 143, 145, 146, 148, 149, 151,
 	152, 154, 155, 157, 158, 160, 162, 163, 165, 166, 167, 169, 170, 172, 173, 175,
 	176, 178, 179, 181, 182, 183, 185, 186, 188, 189, 190, 192, 193, 194, 196, 197,
@@ -105,7 +105,14 @@ INLINE uint8_t sin_sample(uint16_t idx)
 	ASSERT(idx < SIN_LEN);
 	uint16_t new_idx = idx % (SIN_LEN / 2);
 	new_idx = (new_idx >= (SIN_LEN / 4)) ? (SIN_LEN / 2 - new_idx - 1) : new_idx;
-	return (idx >= (SIN_LEN / 2)) ? (255 - sin_table[new_idx]) : sin_table[new_idx];
+
+	#if CPU_HARVARD
+		uint8_t data = pgm_read_char(&sin_table[new_idx]);
+	#else
+		uint8_t data = sin_table[new_idx];
+	#endif
+
+	return (idx >= (SIN_LEN / 2)) ? (255 - data) : data;
 }
 
 
@@ -333,7 +340,7 @@ void afsk_dac_isr(Afsk *af)
 			else
 			{
 				/*
-				 * If we have just finished af->sending an unstuffed byte,
+				 * If we have just finished sending an unstuffed byte,
 				 * reset bitstuff counter.
 				 */
 				if (!af->bit_stuff)
@@ -399,7 +406,7 @@ void afsk_dac_isr(Afsk *af)
 				/*
 				 * Transmit a 1:
 				 * - Stay on the previous tone
-				 * - Increace bit stuff count
+				 * - Increase bit stuff counter
 				 */
 				af->stuff_cnt++;
 			}
@@ -407,7 +414,7 @@ void afsk_dac_isr(Afsk *af)
 			{
 				/*
 				 * Transmit a 0:
-				 * - Reset bit stuff count
+				 * - Reset bit stuff counter
 				 * - Switch tone
 				 */
 				af->stuff_cnt = 0;
