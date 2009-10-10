@@ -85,21 +85,11 @@
 	 */
 	#define AFSK_DAC_IRQ_STOP(ch)    do { (void)ch; /* Implement me */ } while (0)
 
-	/**
-	 * Set the next DAC value for channel \a ch.
-	 * This macro is called by afsk_dac_isr() to set the next DAC output value.
-	 * \param ch DAC channel.
-	 * \param val Next DAC output value for channel.
-	 */
-	#define AFSK_DAC_SET(ch, val)    do { (void)ch; (void)val; } while (0)
 #else /* (ARCH & ARCH_UNITTEST) */
 
-	#include <stdio.h>
 	#include <cfg/compiler.h>
 
 	/* For test */
-	extern uint32_t data_written;
-	extern FILE *fp_dac;
 	extern bool afsk_tx_test;
 
 	#define AFSK_ADC_INIT(ch, ctx)    do { (void)ch, (void)ctx; } while (0)
@@ -111,13 +101,6 @@
 	#define AFSK_DAC_INIT(ch, ctx)   do { (void)ch, (void)ctx; } while (0)
 	#define AFSK_DAC_IRQ_START(ch)   do { (void)ch; afsk_tx_test = true; } while (0)
 	#define AFSK_DAC_IRQ_STOP(ch)    do { (void)ch; afsk_tx_test = false; } while (0)
-	#define AFSK_DAC_SET(ch, _val)     \
-	do { \
-		(void)ch; \
-		int8_t val = (_val) - 128; \
-		ASSERT(fwrite(&val, 1, sizeof(val), fp_dac) == sizeof(val)); \
-		data_written++; \
-	} while (0)
 
 #endif /* !(ARCH & ARCH_UNITTEST) */
 
