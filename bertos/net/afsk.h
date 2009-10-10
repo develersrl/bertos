@@ -193,33 +193,9 @@ INLINE Afsk *AFSK_CAST(KFile *fd)
   return (Afsk *)fd;
 }
 
-/**
- * ADC ISR callback.
- * This function has to be called by the ADC ISR when a sample of the configured
- * channel is available.
- * \param af Afsk context to operate one (\see Afsk).
- * \param sample current sample from the ADC.
- */
+
 void afsk_adc_isr(Afsk *af, int8_t sample);
-
-/**
- * DAC ISR callback.
- * This function has to be called by the DAC ISR when a sample of the configured
- * channel has been converted out.
- *
- * \param af Afsk context to operate one (\see Afsk).
- *
- * \note The next DAC output sample is supplied by the Afsk driver through calling
- *        the AFSK_DAC_SET() callback.
- */
 void afsk_dac_isr(Afsk *af);
-
-/**
- * Initialize an AFSK1200 modem.
- * \param af Afsk context to operate one (\see Afsk).
- * \param adc_ch  ADC channel used by the demodulator.
- * \param dac_ch  DAC channel used by the modulator.
- */
 void afsk_init(Afsk *af, int adc_ch, int dac_ch);
 
 

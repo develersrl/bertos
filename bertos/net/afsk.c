@@ -172,6 +172,14 @@ static void hdlc_parse(Hdlc *hdlc, bool bit, FIFOBuffer *fifo)
 	hdlc->currchar >>= 1;
 }
 
+
+/**
+ * ADC ISR callback.
+ * This function has to be called by the ADC ISR when a sample of the configured
+ * channel is available.
+ * \param af Afsk context to operate one (\see Afsk).
+ * \param curr_sample current sample from the ADC.
+ */
 void afsk_adc_isr(Afsk *af, int8_t curr_sample)
 {
 	AFSK_STROBE_ON();
@@ -294,6 +302,16 @@ static void afsk_txStart(Afsk *af)
 
 #define SWITCH_TONE(inc)  (((inc) == MARK_INC) ? SPACE_INC : MARK_INC)
 
+/**
+ * DAC ISR callback.
+ * This function has to be called by the DAC ISR when a sample of the configured
+ * channel has been converted out.
+ *
+ * \param af Afsk context to operate one (\see Afsk).
+ *
+ * \note The next DAC output sample is supplied by the Afsk driver through calling
+ *        the AFSK_DAC_SET() callback.
+ */
 void afsk_dac_isr(Afsk *af)
 {
 	/* Check if we are at a start of a sample cycle */
@@ -463,6 +481,12 @@ static int afsk_flush(KFile *fd)
 }
 
 
+/**
+ * Initialize an AFSK1200 modem.
+ * \param af Afsk context to operate one (\see Afsk).
+ * \param adc_ch  ADC channel used by the demodulator.
+ * \param dac_ch  DAC channel used by the modulator.
+ */
 void afsk_init(Afsk *af, int adc_ch, int dac_ch)
 {
 	#if CONFIG_AFSK_RXTIMEOUT != -1
