@@ -52,7 +52,7 @@
 	 * and call afsk_adc_isr(), passing the context and the sample.
 	 *
 	 * \param ch channel to be used for AFSK demodulation.
-	 * \param ctx AFSK context. This parameter must be saved and
+	 * \param ctx AFSK context (\see Afsk). This parameter must be saved and
 	 *            passed back to afsk_adc_isr() for every convertion.
 	 */
 	#define AFSK_ADC_INIT(ch, ctx) do { (void)ch, (void)ctx; } while (0)
@@ -68,7 +68,7 @@
 	 * the AFSK driver to call AFSK_DAC_IRQ_START().
 	 * The ISR must then call afsk_dac_isr() passing the AFSK context.
 	 * \param ch DAC channel to be used for AFSK modulation.
-	 * \param ctx AFSK context.  This parameter must be saved and
+	 * \param ctx AFSK context (\see Afsk).  This parameter must be saved and
 	 *             passed back to afsk_dac_isr() for every convertion.
 	 */
 	#define AFSK_DAC_INIT(ch, ctx)   do { (void)ch, (void)ctx; } while (0)
