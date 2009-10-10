@@ -209,7 +209,7 @@ static bool hdlc_parse(Hdlc *hdlc, bool bit, FIFOBuffer *fifo)
  * ADC ISR callback.
  * This function has to be called by the ADC ISR when a sample of the configured
  * channel is available.
- * \param af Afsk context to operate one (\see Afsk).
+ * \param af Afsk context to operate on.
  * \param curr_sample current sample from the ADC.
  */
 void afsk_adc_isr(Afsk *af, int8_t curr_sample)
@@ -340,7 +340,7 @@ static void afsk_txStart(Afsk *af)
  * This function has to be called by the DAC ISR when a sample of the configured
  * channel has been converted out.
  *
- * \param af Afsk context to operate one (\see Afsk).
+ * \param af Afsk context to operate on.
  *
  * \return The next DAC output sample.
  */
@@ -535,7 +535,7 @@ static void afsk_clearerr(KFile *fd)
 
 /**
  * Initialize an AFSK1200 modem.
- * \param af Afsk context to operate one (\see Afsk).
+ * \param af Afsk context to operate on.
  * \param adc_ch  ADC channel used by the demodulator.
  * \param dac_ch  DAC channel used by the modulator.
  */

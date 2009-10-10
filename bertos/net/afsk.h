@@ -210,7 +210,7 @@ void afsk_init(Afsk *af, int adc_ch, int dac_ch);
 
 
 /**
- * \name afsk filter type
+ * \name Afsk filter types.
  * $WIZ$ afsk_filter_list = "AFSK_BUTTERWORTH", "AFSK_CHEBYSHEV"
  * \{
  */
