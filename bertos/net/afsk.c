@@ -109,67 +109,67 @@ INLINE uint8_t sin_sample(uint16_t idx)
 #define EDGE_FOUND(bitline)            BIT_DIFFER((bitline), (bitline) >> 1)
 
 
-static void hdlc_parse(Afsk *af, bool bit)
+static void hdlc_parse(Hdlc *hdlc, bool bit, FIFOBuffer *fifo)
 {
-	af->hdlc_demod_bits <<= 1;
-	af->hdlc_demod_bits |= bit ? 1 : 0;
+	hdlc->demod_bits <<= 1;
+	hdlc->demod_bits |= bit ? 1 : 0;
 
 	/* HDLC Flag */
-	if (af->hdlc_demod_bits == HDLC_FLAG)
+	if (hdlc->demod_bits == HDLC_FLAG)
 	{
-		if (!fifo_isfull(&af->rx_fifo))
+		if (!fifo_isfull(fifo))
 		{
-			fifo_push(&af->rx_fifo, HDLC_FLAG);
-			af->hdlc_rxstart = true;
+			fifo_push(fifo, HDLC_FLAG);
+			hdlc->rxstart = true;
 		}
 		else
-			af->hdlc_rxstart = false;
+			hdlc->rxstart = false;
 
-		af->hdlc_currchar = 0;
-		af->hdlc_bit_idx = 0;
+		hdlc->currchar = 0;
+		hdlc->bit_idx = 0;
 		return;
 	}
 
 	/* Reset */
-	if ((af->hdlc_demod_bits & HDLC_RESET) == HDLC_RESET)
+	if ((hdlc->demod_bits & HDLC_RESET) == HDLC_RESET)
 	{
-		af->hdlc_rxstart = false;
+		hdlc->rxstart = false;
 		return;
 	}
 
-	if (!af->hdlc_rxstart)
+	if (!hdlc->rxstart)
 		return;
 
 	/* Stuffed bit */
-	if ((af->hdlc_demod_bits & 0x3f) == 0x3e)
+	if ((hdlc->demod_bits & 0x3f) == 0x3e)
 		return;
 
-	if (af->hdlc_demod_bits & 0x01)
-		af->hdlc_currchar |= 0x80;
+	if (hdlc->demod_bits & 0x01)
+		hdlc->currchar |= 0x80;
 
-	if (++af->hdlc_bit_idx >= 8)
+	if (++hdlc->bit_idx >= 8)
 	{
-		if ((af->hdlc_currchar == HDLC_FLAG
-			|| af->hdlc_currchar == HDLC_RESET
-			|| af->hdlc_currchar == AX25_ESC))
+		if ((hdlc->currchar == HDLC_FLAG
+			|| hdlc->currchar == HDLC_RESET
+			|| hdlc->currchar == AX25_ESC))
 		{
-			if (!fifo_isfull(&af->rx_fifo))
-				fifo_push(&af->rx_fifo, AX25_ESC);
+			if (!fifo_isfull(fifo))
+				fifo_push(fifo, AX25_ESC);
 			else
-				af->hdlc_rxstart = false;
+				hdlc->rxstart = false;
 		}
 
-		if (!fifo_isfull(&af->rx_fifo))
-			fifo_push(&af->rx_fifo, af->hdlc_currchar);
+		if (!fifo_isfull(fifo))
+			fifo_push(fifo, hdlc->currchar);
 		else
-			af->hdlc_rxstart = false;
+			hdlc->rxstart = false;
 
-		af->hdlc_currchar = 0;
-		af->hdlc_bit_idx = 0;
+		hdlc->currchar = 0;
+		hdlc->bit_idx = 0;
 		return;
 	}
 
-	af->hdlc_currchar >>= 1;
+	hdlc->currchar >>= 1;
 }
 
 void afsk_adc_isr(Afsk *af, int8_t curr_sample)
@@ -267,7 +267,7 @@ void afsk_adc_isr(Afsk *af, int8_t curr_sample)
 		 * NRZI coding: if 2 consecutive bits have the same value
 		 * a 1 is received, otherwise it's a 0.
 		 */
-		hdlc_parse(af, !EDGE_FOUND(af->found_bits));
+		hdlc_parse(&af->hdlc, !EDGE_FOUND(af->found_bits), &af->rx_fifo);
 	}
 
 

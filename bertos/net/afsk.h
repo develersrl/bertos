@@ -58,12 +58,31 @@
 
 #define SAMPLEPERBIT (SAMPLERATE / BITRATE)
 
+/**
+ * HDLC (High-Level Data Link Control) context.
+ * Maybe to be moved in a separate HDLC module one day.
+ */
+typedef struct Hdlc
+{
+	uint8_t demod_bits; ///< Bitstream from the demodulator.
+	uint8_t bit_idx;    ///< Current received bit.
+	uint8_t currchar;   ///< Current received character.
+	bool rxstart;       ///< True if an HDLC_FLAG char has been found in the bitstream.
+} Hdlc;
 
+
+/**
+ * AFSK1200 modem context.
+ */
 typedef struct Afsk
 {
+	/** Base "class" */
 	KFile fd;
 
+	/** ADC channel to be used by the demodulator */
 	int adc_ch;
+
+	/** DAC channel to be used by the modulator */
 	int dac_ch;
 
 	/** Current sample of bit for output data. */
@@ -98,29 +117,60 @@ typedef struct Afsk
 	 */
 	int8_t delay_buf[SAMPLEPERBIT / 2 + 1];
 
+	/** FIFO for received data */
 	FIFOBuffer rx_fifo;
+
+	/** FIFO rx buffer */
 	uint8_t rx_buf[CONFIG_AFSK_RX_BUFLEN];
 
+	/** FIFO for transmitted data */
 	FIFOBuffer tx_fifo;
+
+	/** FIFO tx buffer */
 	uint8_t tx_buf[CONFIG_AFSK_TX_BUFLEN];
 
+	/** IIR filter X cells, used to filter sampled data by the demodulator */
 	int16_t iir_x[2];
+
+	/** IIR filter Y cells, used to filter sampled data by the demodulator */
 	int16_t iir_y[2];
 
+	/**
+	 * Bits sampled by the demodulator are here.
+	 * Since ADC samplerate is higher than the bitrate, the bits here are
+	 * SAMPLEPERBIT times the bitrate.
+	 */
 	uint8_t sampled_bits;
-	uint8_t found_bits;
+
+	/**
+	 * Current phase, needed to know when the bitstream at ADC speed
+	 * should be sampled.
+	 */
 	int8_t curr_phase;
 
-	/* True while modem sends data */
+	/** Bits found by the demodulator at the correct bitrate speed. */
+	uint8_t found_bits;
+
+	/** True while modem sends data */
 	volatile bool sending;
 
+	/** Hdlc context */
+	Hdlc hdlc;
 
-	bool hdlc_rxstart;
-	uint8_t hdlc_currchar;
-	uint8_t hdlc_bit_idx;
-	uint8_t hdlc_demod_bits;
-
+	/**
+	 * Preamble length.
+	 * When the AFSK modem wants to send data, before sending the actual data,
+	 * shifts out preamble_len HDLC_FLAG characters.
+	 * This helps to synchronize the demodulator filters on the receiver side.
+	 */
 	uint16_t preamble_len;
+
+	/**
+	 * Preamble length.
+	 * After sending the actual data, the AFSK shifts out
+	 * trailer_len HDLC_FLAG characters.
+	 * This helps to synchronize the demodulator filters on the receiver side.
+	 */
 	uint16_t trailer_len;
 } Afsk;
 
