@@ -205,7 +205,7 @@ INLINE Afsk *AFSK_CAST(KFile *fd)
 
 
 void afsk_adc_isr(Afsk *af, int8_t sample);
-void afsk_dac_isr(Afsk *af);
+uint8_t afsk_dac_isr(Afsk *af);
 void afsk_init(Afsk *af, int adc_ch, int dac_ch);
 
 

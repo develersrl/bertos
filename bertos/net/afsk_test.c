@@ -184,8 +184,11 @@ int afsk_testRun(void)
 	ax25_send(&ax25, AX25_CALL("abcdef", 0), AX25_CALL("123456", 1), buf, sizeof(buf));
 
 	while (afsk_tx_test)
-		afsk_dac_isr(&afsk_fd);
-
+	{
+		int8_t val = afsk_dac_isr(&afsk_fd) - 128;
+		ASSERT(fwrite(&val, 1, sizeof(val), fp_dac) == sizeof(val));
+		data_written++;
+	}
 
 	#define SND_DATASIZE_OFF 8
 	#if CPU_AVR

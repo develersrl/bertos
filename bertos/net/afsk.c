@@ -342,10 +342,9 @@ static void afsk_txStart(Afsk *af)
  *
  * \param af Afsk context to operate one (\see Afsk).
  *
- * \note The next DAC output sample is supplied by the Afsk driver through calling
- *        the AFSK_DAC_SET() callback.
+ * \return The next DAC output sample.
  */
-void afsk_dac_isr(Afsk *af)
+uint8_t afsk_dac_isr(Afsk *af)
 {
 	/* Check if we are at a start of a sample cycle */
 	if (af->sample_count == 0)
@@ -357,7 +356,7 @@ void afsk_dac_isr(Afsk *af)
 			{
 				AFSK_DAC_IRQ_STOP(af->dac_ch);
 				af->sending = false;
-				return;
+				return 0;
 			}
 			else
 			{
@@ -396,7 +395,7 @@ void afsk_dac_isr(Afsk *af)
 					{
 						AFSK_DAC_IRQ_STOP(af->dac_ch);
 						af->sending = false;
-						return;
+						return 0;
 					}
 					else
 						af->curr_out = fifo_pop(&af->tx_fifo);
@@ -453,8 +452,8 @@ void afsk_dac_isr(Afsk *af)
 	af->phase_acc += af->phase_inc;
 	af->phase_acc %= SIN_LEN;
 
-	AFSK_DAC_SET(af->dac_ch, sin_sample(af->phase_acc));
 	af->sample_count--;
+	return sin_sample(af->phase_acc);
 }
 
 
