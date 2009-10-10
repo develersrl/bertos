@@ -119,7 +119,16 @@ INLINE uint8_t sin_sample(uint16_t idx)
 #define BIT_DIFFER(bitline1, bitline2) (((bitline1) ^ (bitline2)) & 0x01)
 #define EDGE_FOUND(bitline)            BIT_DIFFER((bitline), (bitline) >> 1)
 
-
+/**
+ * High-Level Data Link Control parsing function.
+ * Parse bitstream in order to find characters.
+ *
+ * \param hdlc HDLC context.
+ * \param bit  current bit to be parsed.
+ * \param fifo FIFO buffer used to push characters.
+ *
+ * \return True if all is ok, False if the fifo is full.
+ */
 static bool hdlc_parse(Hdlc *hdlc, bool bit, FIFOBuffer *fifo)
 {
 	bool ret = true;
