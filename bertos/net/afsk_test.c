@@ -171,8 +171,7 @@ int afsk_testRun(void)
 	int c;
 	while ((c = fgetc(fp_adc)) != EOF)
 	{
-		afsk_adc_val = (int8_t)c;
-		afsk_adc_isr();
+		afsk_adc_isr(&afsk_fd, (int8_t)c);
 
 		ax25_poll(&ax25);
 	}
@@ -186,7 +185,7 @@ int afsk_testRun(void)
 	ax25_send(&ax25, AX25_CALL("abcdef", 0), AX25_CALL("123456", 1), buf, sizeof(buf));
 
 	while (afsk_tx_test)
-		afsk_dac_isr();
+		afsk_dac_isr(&afsk_fd);
 
 
 	#define SND_DATASIZE_OFF 8
@@ -204,8 +203,7 @@ int afsk_testRun(void)
 
 	while ((c = fgetc(fp_adc)) != EOF)
 	{
-		afsk_adc_val = (int8_t)c;
-		afsk_adc_isr();
+		afsk_adc_isr(&afsk_fd, (int8_t)c);
 
 		ax25_poll(&ax25);
 	}

@@ -40,6 +40,8 @@
 #ifndef HW_AFSK_H
 #define HW_AFSK_H
 
+#include "cfg/cfg_arch.h"
+
 #if !(ARCH & ARCH_UNITTEST)
 	#warning TODO:This is an example implementation, you must implement it!
 	#define AFSK_ADC_INIT()    do { /* Implement me */ } while (0)
@@ -63,8 +65,9 @@
 #else /* (ARCH & ARCH_UNITTEST) */
 
 	#include <stdio.h>
+	#include <cfg/compiler.h>
+
 	/* For test */
-	extern int8_t afsk_adc_val;
 	extern uint32_t data_written;
 	extern FILE *fp_dac;
 	extern bool afsk_tx_test;
@@ -75,14 +78,8 @@
 	#define AFSK_STROBE_ON()    /* Implement me */
 	#define AFSK_STROBE_OFF()   /* Implement me */
 
-	void afsk_adc_isr(void);
-	#define DEFINE_AFSK_ADC_ISR() void afsk_adc_isr(void)
 	#define AFSK_ADC_IRQ_END()    do { /* Implement me */ } while (0)
 
-	#define AFSK_READ_ADC()     (afsk_adc_val)
-
-	void afsk_dac_isr(void);
-	#define DEFINE_AFSK_DAC_ISR()  void afsk_dac_isr(void)
 	#define AFSK_DAC_IRQ_END()     do { /* Implement me */ } while (0)
 	#define AFSK_DAC_IRQ_START()   do { afsk_tx_test = true; } while (0)
 	#define AFSK_DAC_IRQ_STOP()    do { afsk_tx_test = false; } while (0)
