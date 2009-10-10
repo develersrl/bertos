@@ -44,24 +44,17 @@
 
 #if !(ARCH & ARCH_UNITTEST)
 	#warning TODO:This is an example implementation, you must implement it!
-	#define AFSK_ADC_INIT()    do { /* Implement me */ } while (0)
+
+	#define AFSK_ADC_INIT(ch, ctx) do { (void)ch, (void)ctx; } while (0)
 
 	#define AFSK_STROBE_INIT() do { /* Implement me */ } while (0)
 	#define AFSK_STROBE_ON()   do { /* Implement me */ } while (0)
 	#define AFSK_STROBE_OFF()  do { /* Implement me */ } while (0)
 
-	void afsk_adc_isr(void);
-	#define DEFINE_AFSK_ADC_ISR() void afsk_adc_isr(void)
-	#define AFSK_ADC_IRQ_END()    do { /* Implement me */ } while (0)
-
-	#define AFSK_READ_ADC()     (0)
-
-	void afsk_dac_isr(void);
-	#define DEFINE_AFSK_DAC_ISR()  void afsk_dac_isr(void)
-	#define AFSK_DAC_IRQ_END()     do { /* Implement me */ } while (0)
-	#define AFSK_DAC_IRQ_START()   do { /* Implement me */ } while (0)
-	#define AFSK_DAC_IRQ_STOP()    do { /* Implement me */ } while (0)
-	#define AFSK_SET_DAC(val)      do { (void)val; } while (0)
+	#define AFSK_DAC_INIT(ch, ctx)   do { (void)ch, (void)ctx; } while (0)
+	#define AFSK_DAC_IRQ_START(ch)   do { (void)ch; /* Implement me */ } while (0)
+	#define AFSK_DAC_IRQ_STOP(ch)    do { (void)ch; /* Implement me */ } while (0)
+	#define AFSK_DAC_SET(ch, val)    do { (void)ch; (void)val; } while (0)
 #else /* (ARCH & ARCH_UNITTEST) */
 
 	#include <stdio.h>
@@ -72,19 +65,18 @@
 	extern FILE *fp_dac;
 	extern bool afsk_tx_test;
 
-	#define AFSK_ADC_INIT()    do { } while (0)
+	#define AFSK_ADC_INIT(ch, ctx)    do { (void)ch, (void)ctx; } while (0)
 
 	#define AFSK_STROBE_INIT()  /* Implement me */
 	#define AFSK_STROBE_ON()    /* Implement me */
 	#define AFSK_STROBE_OFF()   /* Implement me */
 
-	#define AFSK_ADC_IRQ_END()    do { /* Implement me */ } while (0)
-
-	#define AFSK_DAC_IRQ_END()     do { /* Implement me */ } while (0)
-	#define AFSK_DAC_IRQ_START()   do { afsk_tx_test = true; } while (0)
-	#define AFSK_DAC_IRQ_STOP()    do { afsk_tx_test = false; } while (0)
-	#define AFSK_SET_DAC(_val)     \
+	#define AFSK_DAC_INIT(ch, ctx)   do { (void)ch, (void)ctx; } while (0)
+	#define AFSK_DAC_IRQ_START(ch)   do { (void)ch; afsk_tx_test = true; } while (0)
+	#define AFSK_DAC_IRQ_STOP(ch)    do { (void)ch; afsk_tx_test = false; } while (0)
+	#define AFSK_DAC_SET(ch, _val)     \
 	do { \
+		(void)ch; \
 		int8_t val = (_val) - 128; \
 		ASSERT(fwrite(&val, 1, sizeof(val), fp_dac) == sizeof(val)); \
 		data_written++; \

@@ -63,6 +63,9 @@ typedef struct Afsk
 {
 	KFile fd;
 
+	int adc_ch;
+	int dac_ch;
+
 	/** Current sample of bit for output data. */
 	uint8_t sample_count;
 
@@ -131,7 +134,7 @@ INLINE Afsk *AFSK_CAST(KFile *fd)
 
 void afsk_adc_isr(Afsk *af, int8_t curr_sample);
 void afsk_dac_isr(Afsk *af);
-void afsk_init(Afsk *af);
+void afsk_init(Afsk *af, int adc_ch, int dac_ch);
 
 
 /**

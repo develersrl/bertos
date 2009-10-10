@@ -272,7 +272,6 @@ void afsk_adc_isr(Afsk *af, int8_t curr_sample)
 
 
 	AFSK_STROBE_OFF();
-	AFSK_ADC_IRQ_END();
 }
 
 static void afsk_txStart(Afsk *af)
@@ -284,7 +283,7 @@ static void afsk_txStart(Afsk *af)
 		af->stuff_cnt = 0;
 		af->sending = true;
 		af->preamble_len = DIV_ROUND(CONFIG_AFSK_PREAMBLE_LEN * BITRATE, 8000);
-		AFSK_DAC_IRQ_START();
+		AFSK_DAC_IRQ_START(af->dac_ch);
 	}
 	ATOMIC(af->trailer_len  = DIV_ROUND(CONFIG_AFSK_TRAILER_LEN  * BITRATE, 8000));
 }
@@ -303,9 +302,8 @@ void afsk_dac_isr(Afsk *af)
 			/* We have just finished transimitting a char, get a new one. */
 			if (fifo_isempty(&af->tx_fifo) && af->trailer_len == 0)
 			{
-				AFSK_DAC_IRQ_STOP();
+				AFSK_DAC_IRQ_STOP(af->dac_ch);
 				af->sending = false;
-				AFSK_DAC_IRQ_END();
 				return;
 			}
 			else
@@ -343,9 +341,8 @@ void afsk_dac_isr(Afsk *af)
 				{
 					if (fifo_isempty(&af->tx_fifo))
 					{
-						AFSK_DAC_IRQ_STOP();
+						AFSK_DAC_IRQ_STOP(af->dac_ch);
 						af->sending = false;
-						AFSK_DAC_IRQ_END();
 						return;
 					}
 					else
@@ -403,9 +400,8 @@ void afsk_dac_isr(Afsk *af)
 	af->phase_acc += af->phase_inc;
 	af->phase_acc %= SIN_LEN;
 
-	AFSK_SET_DAC(sin_sample(af->phase_acc));
+	AFSK_DAC_SET(af->dac_ch, sin_sample(af->phase_acc));
 	af->sample_count--;
-	AFSK_DAC_IRQ_END();
 }
 
 
@@ -465,12 +461,14 @@ static int afsk_flush(KFile *fd)
 }
 
 
-void afsk_init(Afsk *af)
+void afsk_init(Afsk *af, int adc_ch, int dac_ch)
 {
 	#if CONFIG_AFSK_RXTIMEOUT != -1
 	MOD_CHECK(timer);
 	#endif
 	memset(af, 0, sizeof(*af));
+	af->adc_ch = adc_ch;
+	af->dac_ch = dac_ch;
 
 	fifo_init(&af->delay_fifo, (uint8_t *)af->delay_buf, sizeof(af->delay_buf));
 	fifo_init(&af->rx_fifo, af->rx_buf, sizeof(af->rx_buf));
@@ -481,7 +479,8 @@ void afsk_init(Afsk *af)
 
 	fifo_init(&af->tx_fifo, af->tx_buf, sizeof(af->tx_buf));
 
-	AFSK_ADC_INIT();
+	AFSK_ADC_INIT(adc_ch, af);
+	AFSK_DAC_INIT(dac_ch, af);
 	AFSK_STROBE_INIT();
 	kprintf("MARK_INC %d, SPACE_INC %d\n", MARK_INC, SPACE_INC);
 

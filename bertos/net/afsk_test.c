@@ -146,7 +146,7 @@ int afsk_testSetup(void)
 	ASSERT(fwrite(snd_header, 1, sizeof(snd_header), fp_dac) == sizeof(snd_header));
 
 	timer_init();
-	afsk_init(&afsk_fd);
+	afsk_init(&afsk_fd, 0 ,0);
 	afsk_fd.fd.error = kfile_genericClose;
 	ax25_init(&ax25, &afsk_fd.fd, message_hook);
 	return 0;
