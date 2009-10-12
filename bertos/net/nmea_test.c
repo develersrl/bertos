@@ -90,8 +90,6 @@ NmeaGga gga_test =
     .geoid = 45,
 };
 
-#include <net/nmea_log.c>
-
 #define TOT_GOOD_SENTENCE_NUM    12
 
 #define MAX_SENTENCE_POLL  20
@@ -185,7 +183,7 @@ int nmea_testSetup(void)
 {
 	kdbg_init();
 
-	kfilemem_init(&mem, test, sizeof(test));
+	kfilemem_init(&mem, nmea_test_vector, sizeof(nmea_test_vector));
 	LOG_INFO("Init test buffer..done.\n");
 
     nmeap_init(&nmea, NULL);
