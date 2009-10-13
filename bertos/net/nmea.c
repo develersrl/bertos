@@ -67,7 +67,12 @@
 #include <string.h>
 #include <stdlib.h>
 
-
+/*
+ * Make conversion from one string to int.
+ *
+ * You can specify the precision if the string is a float
+ * number. The result is an int multiplied to 10^precision.
+ */
 static uint32_t tokenToInt(const char *s, int precision)
 {
 	uint32_t num = 0;
@@ -103,6 +108,9 @@ static uint32_t tokenToInt(const char *s, int precision)
 	return num;
 }
 
+/*
+ * Convert a string to micro degree.
+ */
 static udegree_t convertToDegree(const char *str)
 {
 	uint32_t dec;
@@ -122,6 +130,9 @@ static udegree_t convertToDegree(const char *str)
 	return dec;
 }
 
+/*
+ * Retun latitude in micro degree from a string.
+ */
 static udegree_t nmea_latitude(const char *plat, const char *phem)
 {
 	int ns;
@@ -130,15 +141,15 @@ static udegree_t nmea_latitude(const char *plat, const char *phem)
         return 0;
 
     /* north lat is +, south lat is - */
-    if (*phem == 'N')
-        ns = 1;
-    else
-        ns = -1;
+	ns = (*phem == 'N') ? 1 : -1;
 
 
 	return ns * convertToDegree(plat);
 }
 
+/*
+ * Retun longitude in micro degree from a string.
+ */
 static udegree_t nmea_longitude(const char *plot, const char *phem)
 {
 	int ew;
@@ -147,14 +158,15 @@ static udegree_t nmea_longitude(const char *plot, const char *phem)
         return 0;
 
     /* west long is negative, east long is positive */
-    if (*phem == 'E')
-        ew = 1;
-    else
-        ew = -1;
+   ew = (*phem == 'E') ? 1 : -1;
 
 	return ew * convertToDegree(plot);
 }
 
+/*
+ * Return altitude in meter from a string.
+ *
+ */
 static uint16_t nmea_altitude(const char *palt, const char *punits)
 {
 	uint32_t alt;
@@ -179,6 +191,9 @@ static uint16_t nmea_altitude(const char *palt, const char *punits)
 	return alt;
 }
 
+/*
+ * Convert time and date stamp string to unix time.
+ */
 static time_t timestampToSec(uint32_t time_stamp, uint32_t date_stamp)
 {
 	struct tm t;
@@ -433,6 +448,10 @@ int nmea_gpgsv(nmeap_context_t *context, nmeap_sentence_t *sentence)
     return NMEA_GPGSV;
 }
 
+
+/*
+ * Parse NMEA sentence from a channel.
+ */
 void nmea_poll(nmeap_context_t *context, KFile *channel)
 {
 	int c;
