@@ -29,7 +29,21 @@
  * Copyright 2009 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
- * \brief NMEA implementation.
+ *
+ * \brief NMEA parser implementation.
+ *
+ * NMEA 0183 is acronym of National Marine Electronics Association that
+ * combined electrical and data specification for communication between marine
+ * electronic devices such as echo sounder, sonars, anemometer (wind speed and direction),
+ * gyrocompass, autopilot, GPS receivers and many other types of instruments.
+ * It has been defined by, and is controlled by, the U.S.-based National Marine
+ * Electronics Association.
+ * The NMEA 0183 standard uses a simple ASCII, serial communications protocol
+ * that defines how data is transmitted in a "sentence" from one "talker"
+ * to multiple "listeners" at a time.
+ * At the application layer, the standard also defines the contents of each sentence
+ * (message) type so that all listeners can parse messages accurately.
+ *
  *
  * \author Daniele Basile <asterix@develer.com>
  *
@@ -180,6 +194,7 @@ static time_t timestampToSec(uint32_t time_stamp, uint32_t date_stamp)
 	uint32_t res = time_stamp / 1000;
 	uint32_t all = time_stamp;
 	msec = all - res * 1000;
+
 	for (int i = 0; i < 3; i++)
 	{
 		all = res;
@@ -193,7 +208,7 @@ static time_t timestampToSec(uint32_t time_stamp, uint32_t date_stamp)
 	t.tm_hour = tmr[2];
 	//If we not have refence data, we set as default 1/1/1970.
 	t.tm_mday = 1;
-	t.tm_mon = 1;
+	t.tm_mon = 0;
 	t.tm_year = 70;
 
 	if (date_stamp)
@@ -216,6 +231,73 @@ static time_t timestampToSec(uint32_t time_stamp, uint32_t date_stamp)
 
 	return  mktime(&t);
 }
+
+/**
+ *  Callout example for GGA data
+ */
+void gpgga_callout(nmeap_context_t *context, void *data, void *user_data)
+{
+	(void)context;
+	(void)user_data;
+	NmeaGga *gga = (NmeaGga *)data;
+
+    LOG_INFO("Found GPGGA message %ld %ld %d %lu %d %d %d %d\n",
+            (long)gga->latitude,
+            (long)gga->longitude,
+            gga->altitude,
+            gga->time,
+            gga->satellites,
+            gga->quality,
+            gga->hdop,
+            gga->geoid);
+}
+
+/**
+ * Callout example for RMC
+ */
+void gprmc_callout(nmeap_context_t *context, void *data, void *user_data)
+{
+	(void)context;
+	(void)user_data;
+    NmeaRmc *rmc = (NmeaRmc *)data;
+
+	LOG_INFO("Found GPRMC message %lu %c %ld %ld %d %d %d\n",
+            rmc->time,
+            rmc->warn,
+            (long)rmc->latitude,
+            (long)rmc->longitude,
+            rmc->speed,
+            rmc->course,
+            rmc->mag_var);
+}
+
+/**
+ * Callout example for GSV data
+ */
+void gpgsv_callout(nmeap_context_t *context, void *data, void *user_data)
+{
+	(void)context;
+	(void)user_data;
+	NmeaGsv *gsv = (NmeaGsv *)data;
+
+    LOG_INFO("Found GPGSV message %d %d %d\n", gsv->tot_message, gsv->message_num, gsv->tot_svv);
+
+	for (int i = 0; i < 4; i++)
+	    LOG_INFO("%d %d %d %d\n", gsv->info[i].sv_prn, gsv->info[i].elevation, gsv->info[i].azimut, gsv->info[i].snr);
+}
+
+/**
+ * Callout example for VTG data
+ */
+void gpvtg_callout(nmeap_context_t *context, void *data, void *user_data)
+{
+	(void)context;
+	(void)user_data;
+	NmeaVtg *vtg = (NmeaVtg *)data;
+
+    LOG_INFO("Found GPVTG message %d %d %d\n", vtg->track_good,	vtg->knot_speed, vtg->km_speed);
+}
+
 
 
 /**
@@ -267,7 +349,7 @@ int nmea_gprmc(nmeap_context_t *context, nmeap_sentence_t *sentence)
 	/*
 	 * extract data from the tokens
 	 */
-	rmc->time       = timestampToSec(tokenToInt(context->token[1], 3), atoi(context->token[9]));
+	rmc->time       = timestampToSec(tokenToInt(context->token[1], 3), tokenToInt(context->token[9], 0));
 	rmc->warn       = *context->token[2];
 	rmc->latitude   = nmea_latitude(context->token[3],context->token[4]);
 	rmc->longitude  = nmea_longitude(context->token[5],context->token[6]);

@@ -29,7 +29,7 @@
  * Copyright 2009 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
- * \brief NMEA Parser
+ * \brief NMEA Parser.
  *
  * \author Daniele Basile <asterix@develer.com>
  *
@@ -137,6 +137,12 @@ int nmea_gpgsv(nmeap_context_t *context, nmeap_sentence_t *sentence);
 int nmea_gpvtg(nmeap_context_t *context, nmeap_sentence_t *sentence);
 int nmea_gprmc(nmeap_context_t *context, nmeap_sentence_t *sentence);
 int nmea_gpgga(nmeap_context_t *context, nmeap_sentence_t *sentence);
+
+// Example of callout
+void gpgga_callout(nmeap_context_t *context, void *data, void *user_data);
+void gprmc_callout(nmeap_context_t *context, void *data, void *user_data);
+void gpgsv_callout(nmeap_context_t *context, void *data, void *user_data);
+void gpvtg_callout(nmeap_context_t *context, void *data, void *user_data);
 
 int nmea_testSetup(void);
 int nmea_testTearDown(void);
