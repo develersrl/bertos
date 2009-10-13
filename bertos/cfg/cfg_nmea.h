@@ -44,7 +44,7 @@
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_level"
  */
-#define NMEA_LOG_LEVEL      LOG_LVL_INFO
+#define NMEA_LOG_LEVEL      LOG_LVL_ERR
 
 /**
  * Module logging format.
