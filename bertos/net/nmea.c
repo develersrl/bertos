@@ -254,7 +254,8 @@ void gpgga_callout(nmeap_context_t *context, void *data, void *user_data)
 {
 	(void)context;
 	(void)user_data;
-	NmeaGga *gga = (NmeaGga *)data;
+	(void)data;
+	LOG_INFOB(NmeaGga *gga = (NmeaGga *)data;);
 
     LOG_INFO("Found GPGGA message %ld %ld %d %lu %d %d %d %d\n",
             (long)gga->latitude,
@@ -274,7 +275,8 @@ void gprmc_callout(nmeap_context_t *context, void *data, void *user_data)
 {
 	(void)context;
 	(void)user_data;
-    NmeaRmc *rmc = (NmeaRmc *)data;
+	(void)data;
+    LOG_INFOB(NmeaRmc *rmc = (NmeaRmc *)data;);
 
 	LOG_INFO("Found GPRMC message %lu %c %ld %ld %d %d %d\n",
             rmc->time,
@@ -293,7 +295,8 @@ void gpgsv_callout(nmeap_context_t *context, void *data, void *user_data)
 {
 	(void)context;
 	(void)user_data;
-	NmeaGsv *gsv = (NmeaGsv *)data;
+	(void)data;
+	LOG_INFOB(NmeaGsv *gsv = (NmeaGsv *)data;);
 
     LOG_INFO("Found GPGSV message %d %d %d\n", gsv->tot_message, gsv->message_num, gsv->tot_svv);
 
@@ -308,7 +311,8 @@ void gpvtg_callout(nmeap_context_t *context, void *data, void *user_data)
 {
 	(void)context;
 	(void)user_data;
-	NmeaVtg *vtg = (NmeaVtg *)data;
+	(void)data;
+	LOG_INFOB(NmeaVtg *vtg = (NmeaVtg *)data;);
 
     LOG_INFO("Found GPVTG message %d %d %d\n", vtg->track_good,	vtg->knot_speed, vtg->km_speed);
 }
