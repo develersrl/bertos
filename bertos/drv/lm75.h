@@ -50,9 +50,7 @@
 #define LM75_ADDRESS_BYTE    0x91
 #define LM75_PAD_BYTE        0x0
 
-typedef uint8_t addr_t;
-
-deg_t lm75_read(addr_t sens_addr);
+deg_t lm75_read(uint8_t sens_addr);
 
 void lm75_init(void);
 
