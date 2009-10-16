@@ -55,10 +55,10 @@ deg_t tmp123_read(KFile *fd)
 {
 	int16_t tmp;
 
-	CS_ENABLE();
+	TMP123_HW_CS_EN();
 	kfile_read(fd, &tmp, sizeof(tmp));
 	tmp = be16_to_cpu(tmp);
-	CS_DISABLE();
+	TMP123_HW_CS_DIS();
 
 	tmp >>= 3;
 	return DIV_ROUND((tmp * 10), 16);

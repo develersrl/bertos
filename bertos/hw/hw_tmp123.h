@@ -40,8 +40,8 @@
 
 #warning TODO:This is an example implentation, you must implement it!
 
-#define CS_ENABLE()    /* Implement me! */
-#define CS_DISABLE()   /* Implement me! */
+#define TMP123_HW_CS_EN()    /* Implement me! */
+#define TMP123_HW_CS_DIS()   /* Implement me! */
 
 #define TMP123_HW_INIT() \
 	do { \
