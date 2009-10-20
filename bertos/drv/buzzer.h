@@ -38,6 +38,7 @@
  * \brief Buzzer driver.
  *
  * $WIZ$ module_name = "buzzer"
+ * $WIZ$ module_depends = "timer"
  * $WIZ$ module_hw = "bertos/hw/hw_buzzer.h"
  */
 
