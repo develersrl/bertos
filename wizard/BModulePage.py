@@ -163,6 +163,8 @@ class BModulePage(BWizardPage):
         else:
             self.pageContent.moduleLabel.setText("")
             self.pageContent.moduleLabel.setVisible(False)
+            self.pageContent.propertyTable.clear()
+            self.pageContent.propertyTable.setRowCount(0)
 
     def dependencyCheck(self, item):
         """
