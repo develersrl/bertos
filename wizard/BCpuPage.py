@@ -93,8 +93,6 @@ class BCpuPage(BWizardPage):
         Overload of the BWizardPage setupUi method.
         """
         self.pageContent.cpuList.setSortingEnabled(True)
-        self.pageContent.descriptionLabel.setVisible(False)
-        self.pageContent.descriptionLabel.setText("")
         self.pageContent.frequencyLabel.setVisible(False)
         self.pageContent.frequencySpinBox.setVisible(False)
 

@@ -35,7 +35,7 @@
      </widget>
      <widget class="QLabel" name="descriptionLabel">
       <property name="text">
-       <string/>
+       <string>Select a CPU from the list...</string>
       </property>
      </widget>
     </widget>
