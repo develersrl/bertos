@@ -102,6 +102,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="checkButton">
+       <property name="toolTip">
+        <string>Get information on toolchains</string>
+       </property>
        <property name="text">
         <string>Validate</string>
        </property>
