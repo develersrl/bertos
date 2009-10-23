@@ -709,6 +709,14 @@ def loadConfigurationInfos(path):
                 configuration_infos[name]["value"].find("U") != -1):
             configuration_infos[name]["informations"]["unsigned"] = True
             configuration_infos[name]["value"] = configuration_infos[name]["value"].replace("U", "")
+        if "conditional_deps" in configuration_infos[name]["informations"]:
+            if (type(configuration_infos[name]["informations"]["conditional_deps"]) == str or
+                    type(configuration_infos[name]["informations"]["conditional_deps"]) == unicode):
+                configuration_infos[name]["informations"]["conditional_deps"] = (configuration_infos[name]["informations"]["conditional_deps"], )
+            elif type(configurations_infos[name]["informations"]["conditional_deps"]) == tuple:
+                pass
+            else:
+                configurations_infos[name]["informations"]["conditional_deps"] = ()
         configuration_infos[name]["description"] = description
         configuration_infos[name]["brief"] = brief
     return configuration_infos
