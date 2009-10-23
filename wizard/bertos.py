@@ -47,6 +47,7 @@ import BProject
 import BStartPage
 import BWizard
 
+from BIntroPage import BIntroPage
 from BFolderPage import BFolderPage
 from BOpenPage import BOpenPage
 from BVersionPage import BVersionPage
@@ -64,7 +65,7 @@ import bertos_utils
 from LoadException import VersionException, ToolchainException
 
 def newProject():
-    page_list = [BFolderPage, BVersionPage, BCpuPage, BToolchainPage, BModulePage, BOutputPage, BCreationPage, BFinalPage]
+    page_list = [BIntroPage, BFolderPage, BVersionPage, BCpuPage, BToolchainPage, BModulePage, BOutputPage, BCreationPage, BFinalPage]
     wizard = BWizard.BWizard(page_list)
     wizard.show()
     wizard.exec_()
