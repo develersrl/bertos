@@ -686,6 +686,7 @@ def loadConfigurationInfos(path):
             "long": boolean indicating if the num is a long
             "unsigned": boolean indicating if the num is an unsigned
             "value_list": the name of the enum for enum parameters
+            "conditional_deps": the list of conditional dependencies for boolean parameters
     """
     configuration_infos = {}
     configuration_infos["paramlist"] = []
