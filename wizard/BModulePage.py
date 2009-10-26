@@ -207,6 +207,8 @@ class BModulePage(BWizardPage):
             else:
                 configurations[configuration][property]["value"] = "0"
         self.setProjectInfo("CONFIGURATIONS", configurations)
+        if self.moduleItem(self.currentModule()).checkState(0) == Qt.Checked:
+            self.dependencyCheck(self.moduleItem(self.currentModule()))
 
     ####
     
@@ -339,6 +341,15 @@ class BModulePage(BWizardPage):
             return unicode(current_module.text(0))
         else:
             return None
+
+    def moduleItem(self, module):
+        for top_level_index in range(self.pageContent.moduleTree.topLevelItemCount()):
+            top_level_item = self.pageContent.moduleTree.topLevelItem(top_level_index)
+            for child_index in range(top_level_item.childCount()):
+                child_item = top_level_item.child(child_index)
+                if unicode(child_item.text(0)) == module:
+                    return child_item
+        return None
     
     def currentModuleConfigurations(self):
         """
@@ -417,12 +428,24 @@ class BModulePage(BWizardPage):
         modules[unselectedModule]["enabled"] = False
         self.setProjectInfo("MODULES", modules)
         unsatisfied = []
+        unsatisfied_params = []
         if self.pageContent.automaticFix.isChecked():
-            unsatisfied = self.unselectDependencyCheck(unselectedModule)
-        if len(unsatisfied) > 0:
-            message = self.tr("The module %1 is needed by the following modules:\n%2.\n\nDo you want to remove these modules too?")
-            message = message.arg(unselectedModule).arg(", ".join(unsatisfied))
-            choice = QMessageBox.warning(self, self.tr("Dependency error"), message, QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            unsatisfied, unsatisfied_params = self.unselectDependencyCheck(unselectedModule)
+        if len(unsatisfied) > 0 or len(unsatisfied_params) > 0:
+            message = []
+            heading = self.tr("The module %1 is needed by").arg(unselectedModule)
+            message.append(heading)
+            module_list = ", ".join(unsatisfied)
+            param_list = ", ".join(["%s (%s)" %(param_name, module) for module, param_name in unsatisfied_params])
+            if module_list:
+                message.append(QString(module_list))
+            if module_list and param_list:
+                message.append(self.tr("and by"))
+            if param_list:
+                message.append(QString(param_list))
+            message_str = QStringList(message).join(" ")
+            message_str.append(self.tr("\n\nDo you want to automatically fix these conflicts?"))
+            choice = QMessageBox.warning(self, self.tr("Dependency error"), message_str, QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
             if choice == QMessageBox.Yes:
                 for module in unsatisfied:
                     modules = self.projectInfo("MODULES")
@@ -432,6 +455,11 @@ class BModulePage(BWizardPage):
                     for child in range(item.childCount()):
                         if unicode(item.child(child).text(0)) in unsatisfied:
                             item.child(child).setCheckState(0, Qt.Unchecked)
+                for module, param in unsatisfied_params:
+                    configuration_file = self.projectInfo("MODULES")[module]["configuration"]
+                    configurations = self.projectInfo("CONFIGURATIONS")
+                    configurations[configuration_file][param]["value"] = "0"
+                    self.setProjectInfo("CONFIGURATIONS", configurations)
     
     def selectDependencyCheck(self, module):
         """
@@ -440,7 +468,13 @@ class BModulePage(BWizardPage):
         unsatisfied = set()
         modules = self.projectInfo("MODULES")
         files = self.projectInfo("FILES")
-        for dependency in modules[module]["depends"]:
+        configurations = self.projectInfo("CONFIGURATIONS")[modules[module]["configuration"]]
+        conditional_deps = ()
+        for i, param_name in configurations["paramlist"]:
+            information = configurations[param_name]
+            if information["informations"]["type"] == "boolean" and information["value"] != "0" and "conditional_deps" in information["informations"]:
+                conditional_deps += information["informations"]["conditional_deps"]
+        for dependency in modules[module]["depends"] + conditional_deps:
             if dependency in modules and not modules[dependency]["enabled"]:
                 unsatisfied |= set([dependency])
                 if dependency not in unsatisfied:
@@ -458,13 +492,27 @@ class BModulePage(BWizardPage):
         Returns the list of unsatisfied dependencies after an unselection.
         """
         unsatisfied = set()
+        unsatisfied_params = set()
         modules = self.projectInfo("MODULES")
         for module, informations in modules.items():
+            configurations = self.projectInfo("CONFIGURATIONS").get(informations["configuration"], {"paramlist": ()})
+            conditional_deps = {}
+            for i, param_name in configurations["paramlist"]:
+                information = configurations[param_name]
+                if information["informations"]["type"] == "boolean" and information["value"] != "0" and "conditional_deps" in information["informations"]:
+                    for dep in information["informations"]["conditional_deps"]:
+                        if not dep in conditional_deps:
+                            conditional_deps[dep] = []
+                        conditional_deps[dep].append((module, param_name))
             if dependency in informations["depends"] and informations["enabled"]:
                 unsatisfied |= set([module])
                 if dependency not in unsatisfied:
-                    unsatisfied |= self.unselectDependencyCheck(module)
-        return unsatisfied
+                    tmp = self.unselectDependencyCheck(module)
+                    unsatisfied |= tmp[0]
+                    unsatisfied_params |= tmp[1]
+            if dependency in conditional_deps:
+                unsatisfied_params |= set(conditional_deps[dependency])
+        return unsatisfied, unsatisfied_params
     
     def removeFileDependencies(self, module):
         """
