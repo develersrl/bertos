@@ -468,7 +468,7 @@ class BModulePage(BWizardPage):
         unsatisfied = set()
         modules = self.projectInfo("MODULES")
         files = self.projectInfo("FILES")
-        configurations = self.projectInfo("CONFIGURATIONS")[modules[module]["configuration"]]
+        configurations = self.projectInfo("CONFIGURATIONS").get(modules[module]["configuration"], {"paramlist": ()})
         conditional_deps = ()
         for i, param_name in configurations["paramlist"]:
             information = configurations[param_name]
