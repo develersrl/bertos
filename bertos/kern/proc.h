@@ -348,7 +348,7 @@ INLINE bool proc_allowed(void)
  */
 #define PROC_DEFINE_STACK(name, size) \
 	STATIC_ASSERT((size) >= KERN_MINSTACKSIZE); \
-	cpu_stack_t name[(size) / sizeof(cpu_stack_t)];
+	cpu_stack_t name[((size) + sizeof(cpu_stack_t) - 1) / sizeof(cpu_stack_t)];
 
 /* Memory fill codes to help debugging */
 #if CONFIG_KERN_MONITOR
