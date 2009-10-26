@@ -281,7 +281,7 @@ INLINE void proc_permit(void)
  * \note This accessor is needed because _preempt_forbid_cnt
  *       must be absoultely private.
  */
-INLINE bool proc_allowed(void)
+INLINE bool proc_preemptAllowed(void)
 {
 	#if CONFIG_KERN_PREEMPT
 		extern cpu_atomic_t _preempt_forbid_cnt;
@@ -290,6 +290,9 @@ INLINE bool proc_allowed(void)
 		return true;
 	#endif
 }
+
+/** Deprecated, use the proc_preemptAllowed() macro. */
+#define proc_allowed() proc_preemptAllowed()
 
 /**
  * Execute a block of \a CODE atomically with respect to task scheduling.

@@ -75,7 +75,7 @@ void proc_schedule(void)
 {
 	IRQ_DISABLE;
 
-	ASSERT(proc_allowed());
+	ASSERT(proc_preemptAllowed());
 	LIST_ASSERT_VALID(&ProcReadyList);
 	CurrentProcess = (struct Process *)list_remHead(&ProcReadyList);
 	ASSERT2(CurrentProcess, "no idle proc?");
@@ -87,7 +87,7 @@ void proc_schedule(void)
 
 void proc_preempt(UNUSED_ARG(void *, param))
 {
-	if (proc_allowed())
+	if (proc_preemptAllowed())
 	{
 		IRQ_DISABLE;
 
@@ -123,7 +123,7 @@ void proc_switch(void)
 
 	/* Sleeping with IRQs disabled or preemption forbidden is illegal */
 	IRQ_ASSERT_ENABLED();
-	ASSERT(proc_allowed());
+	ASSERT(proc_preemptAllowed());
 
 	// Will invoke proc_switch() in interrupt context
 	kill(0, SIGUSR1);
