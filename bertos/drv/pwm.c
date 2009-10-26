@@ -41,6 +41,7 @@
 #include "cfg/cfg_pwm.h"
 
 #include <cfg/macros.h>
+#include <cfg/module.h>
 
 // Define logging setting (for cfg/log.h module).
 #define LOG_LEVEL         PWM_LOG_LEVEL
@@ -94,6 +95,8 @@ void pwm_enable(PwmDev dev, bool state)
 		pwm_hw_disable(dev);
 }
 
+MOD_DEFINE(pwm);
+
 /**
  * Initialize PWM hw.
  */
@@ -111,6 +114,7 @@ void pwm_init(void)
 		pwm_setDuty(dev, 0);
 
 	IRQ_RESTORE(flags);
+	MOD_INIT(pwm);
 }
 
 
