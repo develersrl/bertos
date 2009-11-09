@@ -241,37 +241,19 @@ static size_t ser_write(struct KFile *fd, const void *_buf, size_t size)
 #if CONFIG_SER_RXTIMEOUT != -1 || CONFIG_SER_TXTIMEOUT != -1
 void ser_settimeouts(struct Serial *fd, mtime_t rxtimeout, mtime_t txtimeout)
 {
-	fd->rxtimeout = ms_to_ticks(rxtimeout);
-	fd->txtimeout = ms_to_ticks(txtimeout);
+	#if CONFIG_SER_RXTIMEOUT != -1
+		fd->rxtimeout = ms_to_ticks(rxtimeout);
+	#else
+		(void)rxtimeout;
+	#endif
+
+	#if CONFIG_SER_TXTIMEOUT != -1
+		fd->txtimeout = ms_to_ticks(txtimeout);
+	#else
+		(void)txtimeout;
+	#endif
 }
 #endif /* CONFIG_SER_RXTIMEOUT || CONFIG_SER_TXTIMEOUT */
-
-#if CONFIG_SER_RXTIMEOUT != -1
-/**
- * Discard input to resynchronize with remote end.
- *
- * Discard incoming data until the port stops receiving
- * characters for at least \a delay milliseconds.
- *
- * \note Serial errors are reset before and after executing the purge.
- */
-void ser_resync(struct Serial *fd, mtime_t delay)
-{
-	mtime_t old_rxtimeout = ticks_to_ms(fd->rxtimeout);
-
-	ser_settimeouts(fd, delay, ticks_to_ms(fd->txtimeout));
-	do
-	{
-		ser_setstatus(fd, 0);
-		ser_getchar(fd);
-	}
-	while (!(ser_getstatus(fd) & SERRF_RXTIMEOUT));
-
-	/* Restore port to an usable status */
-	ser_setstatus(fd, 0);
-	ser_settimeouts(fd, old_rxtimeout, ticks_to_ms(fd->txtimeout));
-}
-#endif /* CONFIG_SER_RXTIMEOUT */
 
 
 void ser_setbaudrate(struct Serial *fd, unsigned long rate)
