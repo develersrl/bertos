@@ -95,6 +95,7 @@ INLINE void rl_clear_history(struct RLContext *ctx)
 {
 	memset(ctx->real_history, 0, sizeof(ctx->real_history));
 	ctx->history_pos = 0;
+	ctx->line_pos = ctx->history_pos;
 	ctx->history = ctx->real_history;
 }
 
