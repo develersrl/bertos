@@ -366,13 +366,6 @@ void rl_refresh(struct RLContext* ctx)
 
 const char* rl_readline(struct RLContext* ctx)
 {
-	size_t i = ctx->history_pos;
-
-	if (ctx->prompt)
-		rl_puts(ctx, ctx->prompt);
-
-	insert_chars(ctx, &i, NULL, 0);
-
 	while (1)
 	{
 		char ch;
@@ -391,18 +384,10 @@ const char* rl_readline(struct RLContext* ctx)
 		{
 			// Ask the match hook if available
 			if (!ctx->match)
-				return false;
+				return NULL;
 
 			complete_word(ctx, &ctx->line_pos);
 			continue;
-		}
-
-		if (c == '\r' || c == '\n')
-		{
-			// Terminate line
-			insert_chars(ctx, &ctx->line_pos, NULL, 0);
-			rl_puts(ctx, "\r\n");
-			break;
 		}
 
 		// Backspace cancels a character, or it is ignored if at
@@ -417,17 +402,20 @@ const char* rl_readline(struct RLContext* ctx)
 			continue;
 		}
 
+		if (c == '\r' || c == '\n')
+		{
+			rl_puts(ctx, "\r\n");
+			break;
+		}
+
+
 		// Add a character to the buffer, if possible
 		ch = (char)c;
 		ASSERT2(ch == c, "a special key was not properly handled");
 		if (insert_chars(ctx, &ctx->line_pos, &ch, 1))
-		{
 			rl_putc(ctx, ch);
-		}
 		else
-		{
 			beep(ctx);
-		}
 	}
 
 	ctx->history_pos = ctx->line_pos + 1;
@@ -442,9 +430,18 @@ const char* rl_readline(struct RLContext* ctx)
 	dump_history(ctx);
 #endif
 
+	const char *buf = &ctx->history[ctx->line_pos + 1];
+
+	ctx->line_pos = ctx->history_pos;
+
+	if (ctx->prompt)
+		rl_puts(ctx, ctx->prompt);
+
+	insert_chars(ctx, &ctx->line_pos, NULL, 0);
+
 	// Since the current pointer now points to the separator, we need
 	//  to return the first character
-	return &ctx->history[ctx->line_pos + 1];
+	return buf;
 }
 
 
