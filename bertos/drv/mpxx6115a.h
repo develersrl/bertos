@@ -44,18 +44,18 @@
 
 
 /**
- * Covert read voltage from MPXX6115A Pressure Sensor in hPascal value.
+ * Convert read voltage from MPXX6115A Pressure Sensor in hPascal value.
  *
- * The convertion formula may be consulted on costructor datasheet
+ * The conversion formula may be consulted on constructor datasheet
  * (see Freescale Semiconductor MP3H6115A, MPXAZ6115A).
  *
  * \param vout output voltage read from pin sensor.
  * \param vref reference voltage that supplies the MPXX6115A sensor.
  *
- * \return interger value that represent measured pressure in hPascal.
+ * \return integer value that represent measured pressure in hPascal.
  *
  * \note: To compute the pressure we use the Vout/Vref ratio, so
- * these two values can be expressed in any unit, even adc levels.
+ * these two values can be expressed in any unit, even ADC levels.
  *
  */
 INLINE int16_t mpxx6115a_press(adcread_t vout,  adcread_t vref)
