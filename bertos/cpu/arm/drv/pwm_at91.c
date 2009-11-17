@@ -157,7 +157,7 @@ void pwm_hw_setDutyUnlock(PwmDev dev, uint16_t duty)
 	}
 	else
 	{
-		/*
+	/*
          * If polarity flag is true we must invert
          * PWM polarity.
          */
