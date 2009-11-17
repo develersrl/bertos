@@ -79,8 +79,8 @@ int reverse_testRun(void)
 {
 	for (int i = 0; i < 256; i++)
 	{
-		kprintf("i [%02X], REVERSE(i) [%02X], reverse(i) [%02X]\n", i, REVERSE(i), reverse(i));
-		ASSERT(reverse(i) == REVERSE(i));
+		kprintf("i [%02X], REVERSE(i) [%02X], reverse(i) [%02X]\n", i, REVERSE_UINT8(i), reverse(i));
+		ASSERT(reverse(i) == REVERSE_UINT8(i));
 	}
 	return  0;
 }
