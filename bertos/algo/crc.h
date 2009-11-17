@@ -71,7 +71,7 @@ extern const uint16_t crc16tab[256];
  * \param c New octet (range 0-255)
  * \param oldcrc Previous CRC16 value (referenced twice, beware of side effects)
  */
-#if CPU_HARVARD && !(ARCH & defined(ARCH_BOOT))
+#if CPU_HARVARD && !(defined(ARCH_BOOT) && (ARCH & ARCH_BOOT))
 	#define UPDCRC16(c, oldcrc) (pgm_read_uint16_t(&crc16tab[((oldcrc) >> 8) ^ ((unsigned char)(c))]) ^ ((oldcrc) << 8))
 #else
 	#define UPDCRC16(c, oldcrc) ((crc16tab[((oldcrc) >> 8) ^ ((unsigned char)(c))]) ^ ((oldcrc) << 8))
@@ -86,7 +86,7 @@ extern const uint16_t crc16tab[256];
  */
 INLINE uint16_t updcrc16(uint8_t c, uint16_t oldcrc)
 {
-#if CPU_HARVARD  && !(ARCH & defined(ARCH_BOOT))
+#if CPU_HARVARD && !(defined(ARCH_BOOT) && (ARCH & ARCH_BOOT))
 	return pgm_read_uint16_t(&crc16tab[(oldcrc >> 8) ^ c]) ^ (oldcrc << 8);
 #else
 	return crc16tab[(oldcrc >> 8) ^ c] ^ (oldcrc << 8);
