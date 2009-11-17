@@ -187,7 +187,7 @@ typedef struct Afsk
 	uint16_t preamble_len;
 
 	/**
-	 * Preamble length.
+	 * Trailer length.
 	 * After sending the actual data, the AFSK shifts out
 	 * trailer_len HDLC_FLAG characters.
 	 * This helps to synchronize the demodulator filters on the receiver side.

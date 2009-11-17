@@ -127,7 +127,7 @@ INLINE uint8_t sin_sample(uint16_t idx)
  * \param bit  current bit to be parsed.
  * \param fifo FIFO buffer used to push characters.
  *
- * \return True if all is ok, False if the fifo is full.
+ * \return true if all is ok, false if the fifo is full.
  */
 static bool hdlc_parse(Hdlc *hdlc, bool bit, FIFOBuffer *fifo)
 {
