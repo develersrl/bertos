@@ -41,7 +41,7 @@
 /**
  * crctab calculated by Mark G. Mendel, Network Systems Corporation
  */
-#if CPU_HARVARD && !(ARCH & defined(ARCH_BOOT))
+#if CPU_HARVARD && !(defined(ARCH_BOOT) && (ARCH & ARCH_BOOT))
 	#define CRC_TABLE const uint16_t PROGMEM crc16tab[256]
 #else
 	#define CRC_TABLE const uint16_t crc16tab[256]
