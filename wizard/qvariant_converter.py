@@ -35,11 +35,14 @@
 
 from PyQt4.QtCore import PYQT_VERSION_STR
 
+# Choose the right version of the qvariant_converter module. It's awful,
+# I know, but this is the only solution in order to mantain compatibility
+# with older PyQt4 version.
 if PYQT_VERSION_STR <= "4.4.3":
     from qvariant_converter_old import *
 elif PYQT_VERSION_STR < "4.5.0":
-    from qvariant_converter_new import *
+    from qvariant_converter_4_4 import *
 elif PYQT_VERSION_STR < "4.6.0":
-    from qvariant_converter_newer import *
+    from qvariant_converter_4_5 import *
 else:
-    from qvariant_converter_newest import *
+    from qvariant_converter_4_6 import *
