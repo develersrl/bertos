@@ -40,9 +40,9 @@ from PyQt4.QtCore import PYQT_VERSION_STR
 # with older PyQt4 version.
 if PYQT_VERSION_STR <= "4.4.3":
     from qvariant_converter_old import *
-elif PYQT_VERSION_STR < "4.5.0":
+elif "4.4.3" < PYQT_VERSION_STR < "4.5":
     from qvariant_converter_4_4 import *
-elif PYQT_VERSION_STR < "4.6.0":
+elif "4.5" <= PYQT_VERSION_STR < "4.6":
     from qvariant_converter_4_5 import *
 else:
     from qvariant_converter_4_6 import *
