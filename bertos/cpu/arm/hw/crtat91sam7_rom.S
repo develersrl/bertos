@@ -124,7 +124,7 @@
 	#elif CPU_ARM_SAM7X
 		#define PMC_PIO_CLK_EN ((1 << 2) | (1 << 3))
 	#else
-		#error CPU non supported
+		#error CPU not supported
 	#endif
 
 	#define CKGR_MOR_OFF        0x00000020
