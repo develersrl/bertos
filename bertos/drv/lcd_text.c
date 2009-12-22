@@ -438,9 +438,10 @@ static void lcd_setDefLayer(Layer *layer)
 #include <cfg/debug.h>
 void lcd_init(void)
 {
-    #if CONFIG_KERN
-    sem_init(&lcd_semaphore);
-    #endif
+	#if CONFIG_KERN
+	sem_init(&lcd_semaphore);
+	#endif
+
 	int i;
 
 	LIST_INIT(&lcd_Layers);
