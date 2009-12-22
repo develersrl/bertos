@@ -108,6 +108,7 @@
 	#define WDT_WDDIS            (1 << 15)
 
 	#define PMC_BASE            0xFFFFFC00
+	#define PMC_PCER_OFF        0x00000010
 	#define PMC_SR_OFF          0x00000068
 	#define PMC_MCKR_OFF        0x00000030
 	#define PMC_MOSCS             (1 << 0)
@@ -117,6 +118,14 @@
 	#define PMC_CSS_PLL_CLK     0x00000003
 	#define PMC_PRES_MASK       0x0000001C
 	#define PMC_PRES_CLK_2      0x00000004
+
+	#if CPU_ARM_SAM7S_LARGE
+		#define PMC_PIO_CLK_EN (1 << 2)
+	#elif CPU_ARM_SAM7X
+		#define PMC_PIO_CLK_EN ((1 << 2) | (1 << 3))
+	#else
+		#error CPU non supported
+	#endif
 
 	#define CKGR_MOR_OFF        0x00000020
 	#define CKGR_PLLR_OFF       0x0000002C
@@ -345,6 +354,15 @@ _41:
          * Initialize user stack pointer.
          */
         ldr     r13, =__stack_end
+
+
+	/*
+	 * Enable clock for PIO(s)
+	 */
+        ldr     r1, =PMC_BASE
+        mov     r0, #PMC_PIO_CLK_EN
+        str     r0, [r1, #PMC_PCER_OFF]
+
 
         /*
          * Jump to main
