@@ -47,6 +47,7 @@ SRC_LIST="
 	bertos/mware/sprintf.c
 	bertos/os/hptime.c
 	bertos/struct/kfile_fifo.c
+	bertos/struct/heap.c
 	bertos/fs/fatfs/ff.c
 	bertos/emul/diskio_emul.c
 	bertos/fs/fat.c
