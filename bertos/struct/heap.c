@@ -38,28 +38,26 @@
 
 #include "heap.h"
 
-#include <cfg/macros.h>           // IS_POW2()
-#include <cfg/debug.h>            // ASSERT()
-
-#include <string.h>           // memset()
-
-/* NOTE: struct size must be a 2's power! */
-typedef struct _MemChunk
-{
-	struct _MemChunk *next;
-	size_t size;
-} MemChunk;
-
-STATIC_ASSERT(IS_POW2(sizeof(MemChunk)));
+#include <cfg/debug.h> // ASSERT()
+#include <string.h>    // memset()
 
 #define FREE_FILL_CODE     0xDEAD
 #define ALLOC_FILL_CODE    0xBEEF
 
+
+/*
+ * This function prototype is deprecated, will change in:
+ * void heap_init(struct Heap* h, heap_buf_t* memory, size_t size)
+ * in the nex BeRTOS release.
+ */
 void heap_init(struct Heap* h, void* memory, size_t size)
 {
-#ifdef _DEBUG
+	#ifdef _DEBUG
 	memset(memory, FREE_FILL_CODE, size);
-#endif
+	#endif
+
+	ASSERT2((((uintptr_t)memory % sizeof(heap_buf_t)) == 0),
+	"memory buffer is unaligned, please use the HEAP_DEFINE_BUF() macro to declare heap buffers!\n");
 
 	/* Initialize heap with a single big chunk */
 	h->FreeList = (MemChunk *)memory;

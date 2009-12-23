@@ -45,15 +45,33 @@
 
 #include "cfg/cfg_heap.h"
 #include <cfg/compiler.h>
+#include <cfg/macros.h> // IS_POW2()
 
-struct _MemChunk;
+/* NOTE: struct size must be a 2's power! */
+typedef struct _MemChunk
+{
+	struct _MemChunk *next;
+	size_t size;
+} MemChunk;
+
+STATIC_ASSERT(IS_POW2(sizeof(MemChunk)));
+
+typedef MemChunk heap_buf_t;
 
 /// A heap
-struct Heap
+typedef struct Heap
 {
 	struct _MemChunk *FreeList;     ///< Head of the free list
-};
+} Heap;
 
+/**
+ * Utility macro to allocate a heap of size \a size.
+ *
+ * \param name Variable name for the heap.
+ * \param size Heap size in bytes.
+ */
+#define HEAP_DEFINE_BUF(name, size) \
+	heap_buf_t name[((size) + sizeof(heap_buf_t) - 1) / sizeof(heap_buf_t)];
 
 /// Initialize \a heap within the buffer pointed by \a memory which is of \a size bytes
 void heap_init(struct Heap* heap, void* memory, size_t size);
