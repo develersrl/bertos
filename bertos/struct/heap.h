@@ -104,4 +104,8 @@ void heap_free(struct Heap* heap, void * mem);
 
 #endif
 
+int heap_testSetup(void);
+int heap_testRun(void);
+int heap_testTearDown(void);
+
 #endif /* STRUCT_HEAP_H */
