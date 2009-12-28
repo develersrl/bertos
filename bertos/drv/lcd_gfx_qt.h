@@ -39,6 +39,9 @@
 #ifndef DRV_LCD_GFX_QT_H
 #define DRV_LCD_GFX_QT_H
 
+// uint8_t
+#include <cfg/compiler.h>
+
 #include <QtGui/QColor>
 #include <QtGui/QFrame>
 
