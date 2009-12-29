@@ -67,6 +67,11 @@
  * receiver wakes up, it usually invokes msg_get() to pick
  * the next message from the port.
  *
+ * \note
+ * When you put a message into a port, such message becomes
+ * unavailable until you retrieve it using msg_get(), eg.
+ * you must not delete it or put it into another port.
+ *
  * Message ports can hold any number of pending messages,
  * and receivers usually process them in FIFO order.
  * Other scheduling policies are possible, but not implemented
