@@ -97,6 +97,18 @@ static void timer_test_hook(iptr_t _timer)
 }
 
 static Timer test_timers[5];
+
+List synctimer_list;
+static Timer synctimer_timers[5];
+
+static void synctimer_test_hook(iptr_t _timer)
+{
+	Timer *timer = (Timer *)(void *)_timer;
+	kprintf("Sync timer process %lu expired\n", (unsigned long)ticks_to_ms(timer->_delay));
+	synctimer_add(timer, &synctimer_list);
+}
+
+
 static const mtime_t test_delays[5] = { 170, 50, 310, 1500, 310 };
 
 static void timer_test_async(void)
@@ -131,11 +143,47 @@ static void timer_test_poll(void)
 	}
 }
 
+static void synctimer_test(void)
+{
+	size_t i;
+
+	for (i = 0; i < countof(synctimer_timers); ++i)
+	{
+		Timer *timer = &synctimer_timers[i];
+		timer_setDelay(timer, ms_to_ticks(test_delays[i]));
+		timer_setSoftint(timer, synctimer_test_hook, (iptr_t)timer);
+		synctimer_add(timer, &synctimer_list);
+	}
+
+	int secs = 0;
+	mtime_t start_time = ticks_to_ms(timer_clock());
+	mtime_t now;
+
+	while (secs <= 10)
+	{
+		now = ticks_to_ms(timer_clock());
+		synctimer_poll(&synctimer_list);
+		if (now - start_time >= 1000)
+		{
+			++secs;
+			start_time += 1000;
+			kprintf("seconds = %d, ticks=%lu\n", secs, (unsigned long)now);
+		}
+		wdt_reset();
+	}
+
+	for (i = 0; i < countof(synctimer_timers); ++i)
+	{
+		synctimer_abort(&synctimer_timers[i]);
+	}
+}
+
 int timer_testSetup(void)
 {
 	IRQ_ENABLE;
 	wdt_start(7);
 	timer_init();
+	LIST_INIT(&synctimer_list);
 	kdbg_init();
 	return 0;
 }
@@ -146,6 +194,7 @@ int timer_testRun(void)
 	timer_test_delay();
 	timer_test_async();
 	timer_test_poll();
+	synctimer_test();
 	return 0;
 }
 

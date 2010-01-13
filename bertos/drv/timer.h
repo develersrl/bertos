@@ -36,6 +36,7 @@
  * \li simple delay: just use timer_delay() if you want to wait for a few milliseconds;
  * \li delay with callback: create a timer structure and use timer_setDelay() and timer_setSoftint() to set the callback;
  * \li delay with signal: same as above but use timer_setSignal() to set specify which signal to send.
+ * \li simple synchronous timer based scheduler: use synctimer_add() to schedule an event in a user provided queue.
  *
  * Whenever a timer expires you need to explicitly arm it again with timer_add(). If you want to abort a timer, use timer_abort().
  * You can use conversion macros when using msecs to specify the delay.
@@ -288,6 +289,15 @@ INLINE void timer_setDelay(Timer *timer, ticks_t delay)
 {
 	timer->_delay = delay;
 }
+
+
+void synctimer_add(Timer *timer, List* q);
+
+/** \sa timer_abort */
+#define synctimer_abort(t) timer_abort(t)
+
+void synctimer_poll(List* q);
+
 
 #endif /* CONFIG_TIMER_EVENTS */
 
