@@ -62,6 +62,8 @@
 	#define CPU_STACK_GROWS_UPWARD 0
 	#define CPU_SP_ON_EMPTY_SLOT   0
 
+
+	EXTERN_C void asm_proc_entry(void);
 	/**
 	 * Initialization value for registers in stack frame.
 	 * For the CPSR register, the initial value is set to:
@@ -72,12 +74,11 @@
 	 */
 	#define CPU_CREATE_NEW_STACK(stack, entry, exit) \
 	do { \
-		/* Process entry point */ \
+		/* LR (asm proc_entry trampoline) */ \
+		CPU_PUSH_CALL_FRAME(stack, asm_proc_entry); \
+		/* R11 (Process entry point) DO NOT CHANGE: asm_proc_entry expects \
+		 * to find the actual process entry point in R11 */ \
 		CPU_PUSH_CALL_FRAME(stack, entry); \
-		/* LR (proc_exit) */ \
-		CPU_PUSH_CALL_FRAME(stack, exit); \
-		/* R11 */ \
-		CPU_PUSH_WORD(stack, 0x11111111); \
 		/* R10 */ \
 		CPU_PUSH_WORD(stack, 0x10101010); \
 		/* R9 */ \
@@ -259,7 +260,7 @@
 
 /**
  * Default macro for creating a new Process stack
- */ 
+ */
 #ifndef CPU_CREATE_NEW_STACK
 
 	#define CPU_CREATE_NEW_STACK(stack, entry, exit) \

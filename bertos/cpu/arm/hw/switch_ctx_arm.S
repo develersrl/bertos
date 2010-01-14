@@ -43,12 +43,6 @@
 asm_switch_context:
 	mrs	r2, cpsr               /* Save status. */
 
-	/*
-	 * To work correctly the lr should point to proc_exit, so when process finish
-	 * could be return
-	 */
-	push {lr}                  /* Add one element on stack, for next switching */
-
 	stmfd	sp!, {r2, r4-r11, lr}  /* Save registers. */
 
 	str     sp, [r1]               /* Save old stack pointer. */
@@ -57,5 +51,15 @@ asm_switch_context:
 	ldmfd	sp!, {r2, r4-r11, lr}  /* Load new registers. */
 	msr	cpsr, r2               /* restore flags reg. */
 
-	pop {r0}                  /* pop on stack address of the process that we want to jump */
-	mov	pc, r0
+	mov	pc, lr
+
+
+/* proc_entry trampoline needed because ARM does not pop return addresses
+from the stack, but uses lr instead.*/
+.globl asm_proc_entry
+asm_proc_entry:
+	mov	lr, pc
+	/* In r11 we have the real process entry point as set up by CPU_CREATE_NEW_STACK */
+	bx	r11
+	bl	proc_exit
+
