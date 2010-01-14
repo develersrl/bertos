@@ -32,7 +32,6 @@
  *
  * \brief ARM context switch
  *
- * \version $Id: proc.c 18271 2007-10-11 14:51:31Z batt $
  *
  * \author Stefano Fedrigo <aleph@develer.com>
  * \author Francesco Sacchi <batt@develer.com>
