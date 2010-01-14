@@ -190,7 +190,9 @@ Current driver list:
 <tr> <td> Displaytech 32122A Graphic LCD</td>                              <td>stable</td> </tr>
 <tr> <td> \link dc_motor.h DC Motor with PID \endlink</td>                 <td>stable</td> </tr>
 <tr> <td> \link lcd_text.h Alphanumeric LCD \endlink</td>                  <td>stable</td> </tr>
+<tr> <td> \link lm75.h LM75 temperature sensor \endlink</td>               <td>stable</td> </tr>
 <tr> <td> \link mcp41.h MPC41 digital potentiometer \endlink</td>          <td>stable</td> </tr>
+<tr> <td> \link mpxx6115a.h MPxx6115A pressure sensor \endlink</td>          <td>stable</td> </tr>
 <tr> <td> \link ntc.h NTC \endlink</td>                                    <td>stable</td> </tr>
 <tr> <td> \link phase.h TRIAC phase partialization \endlink</td>           <td>stable</td> </tr>
 <tr> <td> \link pwm.h PWM API \endlink</td>                                <td>beta</td> </tr>
@@ -202,6 +204,7 @@ Current driver list:
 <tr> <td> \link tc520.h TC520 ADC \endlink</td>                            <td>obsolete</td> </tr>
 <tr> <td> \link thermo.h Thermostat \endlink</td>                          <td>stable</td> </tr>
 <tr> <td> \link timer.h System timer API \endlink</td>                     <td>stable</td> </tr>
+<tr> <td> \link tmp123.h TMP123 temperature sensor \endlink</td>           <td>stable</td> </tr>
 <tr> <td> \link stepper.h Stepper motor with ramps \endlink</td>           <td>stable</td> </tr>
 <tr> <td> Watchdog</td>                                                    <td>beta</td> </tr>
 </table>
@@ -273,16 +276,19 @@ This is the current status:
 <tr> <td> \link pocketbus.c PocketBus \endlink</td>  <td>stable</td> </tr>
 <tr> <td> \link keytag.c Keytag (for 125KHz transponders) \endlink</td>  <td>stable</td> </tr>
 <tr> <td> \link xmodem.c XModem protocol \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link nmea.c NMEA GPS protocol parser \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link afsk.c AFSK1200 modem \endlink</td>  <td>stable</td> </tr>
+<tr> <td> \link ax25.h AX25 data link layer protocol \endlink</td>  <td>beta</td> </tr>
 </table>
 
 For more information take a look at <A href="http://dev.bertos.org/browser/trunk/bertos/net/">network directory</A>.
 
 
 \section fs File system 
-The latest SVN version of BeRTOS supports \link fat.h FAT \endlink filesystems using the <A href="http://elm-chan.org/fsw/ff/00index_e.html">FatFs</A>  library. The module is highly configurable, for example it can be compiled in read-only mode for some space saving.
+BeRTOS supports two file systems. The first one is the mainstream \link fat.h FAT \endlink filesystem, using the <A href="http://elm-chan.org/fsw/ff/00index_e.html">FatFs</A>  library. The module is highly configurable, for example it can be compiled in read-only mode for some space saving.
 
-\link battfs.h BattFs\endlink, a file system specifically planned for embedded platforms, is in the beta stage. The goal is to have a filesystem suitable for little flash and eeprom memories (like dataflash), reliable, robust and capable of wear-levelling the memory pages to increase its life.
-Currently you can create files, append data to them but file deletion is still not supported. Wear-levelling is achieved by rotating a page every time it is written. Plans are to add even transactions (a whole write can be performed atomically).
+The second is \link battfs.h BattFs\endlink, a file system specifically planned for embedded platforms. The goal is to have a filesystem suitable for little flash and eeprom memories (like dataflash), reliable, robust and capable of wear-levelling the memory pages to increase its life.
+The code is in beta stage. Currently you can create files, append data to them but file deletion is still not supported. Wear-levelling is achieved by rotating a page every time it is written. Plans are to add even transactions (a whole write can be performed atomically).
 
 File system development takes place in the <A href="http://dev.bertos.org/browser/trunk/bertos/fs">fs directory</A>.
 
