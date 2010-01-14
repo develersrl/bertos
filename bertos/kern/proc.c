@@ -157,7 +157,7 @@ void proc_init(void)
  * \endcode
  * is a more convenient way to create a process, as you don't have to specify
  * the name.
- * 
+ *
  * \return Process structure of new created process
  *         if successful, NULL otherwise.
  */
@@ -252,9 +252,9 @@ struct Process *proc_new_with_name(UNUSED_ARG(const char *, name), void (*entry)
 		makecontext(&proc->context, (void (*)(void))proc_entry, 1, entry);
 
 	#else // !CONFIG_KERN_PREEMPT
-	
+
 		CPU_CREATE_NEW_STACK(proc->stack, entry, proc_exit);
-		
+
 	#endif // CONFIG_KERN_PREEMPT
 
 	#if CONFIG_KERN_MONITOR
