@@ -505,14 +505,21 @@ NEXT_FLAG:
 		{
 			case 'l':
 			case 'L':
+		#if SIZEOF_SIZE_T == SIZEOF_LONG
 			case 'z':
 				flags.l_L_modifier = true;
+		#elif SIZEOF_SIZE_T == SIZEOF_INT
+				flags.l_L_modifier = true;
+			case 'z':
+		#endif
 				format++;
 				break;
+
 			case 'h':
 				flags.h_modifier = true;
 				format++;
 				break;
+
 		}
 
 		/*
@@ -853,10 +860,13 @@ FLOATING_CONVERSION:
 		switch (PGM_READ_CHAR(format))
 		{
 			case 'l':
+		#if SIZEOF_SIZE_T == SIZEOF_LONG
 			case 'z':
-				/* for the 'z' modifier, we make this assumption */
-				STATIC_ASSERT(sizeof(size_t) == sizeof(long));
 				l_modifier = true;
+		#elif SIZEOF_SIZE_T == SIZEOF_INT
+				l_modifier = true;
+			case 'z':
+		#endif
 				format++;
 				break;
 

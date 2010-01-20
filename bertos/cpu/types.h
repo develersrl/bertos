@@ -174,6 +174,16 @@
 #endif
 #endif
 
+#ifndef SIZEOF_SIZE_T
+#if CPU_REG_BITS < 32
+	#define SIZEOF_SIZE_T   2
+#elif CPU_REG_BITS == 32
+	#define SIZEOF_SIZE_T   4
+#else /* CPU_REG_BITS > 32 */
+	#define SIZEOF_SIZE_T   8
+#endif
+#endif
+
 #ifndef CPU_BITS_PER_CHAR
 #define CPU_BITS_PER_CHAR   (SIZEOF_CHAR * 8)
 #endif
@@ -215,6 +225,6 @@ STATIC_ASSERT(sizeof(uint64_t) * CPU_BITS_PER_CHAR == 64);
 #endif
 STATIC_ASSERT(sizeof(cpu_stack_t) == SIZEOF_CPUSTACK_T);
 STATIC_ASSERT(sizeof(cpu_aligned_stack_t) == SIZEOF_CPUALIGNED_T);
-
+STATIC_ASSERT(sizeof(size_t) == SIZEOF_SIZE_T);
 
 #endif /* CPU_TYPES_H */
