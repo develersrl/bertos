@@ -713,10 +713,10 @@ def loadConfigurationInfos(path):
             if (type(configuration_infos[name]["informations"]["conditional_deps"]) == str or
                     type(configuration_infos[name]["informations"]["conditional_deps"]) == unicode):
                 configuration_infos[name]["informations"]["conditional_deps"] = (configuration_infos[name]["informations"]["conditional_deps"], )
-            elif type(configurations_infos[name]["informations"]["conditional_deps"]) == tuple:
+            elif type(configuration_infos[name]["informations"]["conditional_deps"]) == tuple:
                 pass
             else:
-                configurations_infos[name]["informations"]["conditional_deps"] = ()
+                configuration_infos[name]["informations"]["conditional_deps"] = ()
         configuration_infos[name]["description"] = description
         configuration_infos[name]["brief"] = brief
     return configuration_infos
