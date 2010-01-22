@@ -472,8 +472,12 @@ class BModulePage(BWizardPage):
         conditional_deps = ()
         for i, param_name in configurations["paramlist"]:
             information = configurations[param_name]
-            if information["informations"]["type"] == "boolean" and information["value"] != "0" and "conditional_deps" in information["informations"]:
+            if information["informations"]["type"] == "boolean" and \
+                information["value"] != "0" and \
+                "conditional_deps" in information["informations"]:
+
                 conditional_deps += information["informations"]["conditional_deps"]
+
         for dependency in modules[module]["depends"] + conditional_deps:
             if dependency in modules and not modules[dependency]["enabled"]:
                 unsatisfied |= set([dependency])
