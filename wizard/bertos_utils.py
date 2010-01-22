@@ -307,8 +307,7 @@ def csrcGenerator(project_info):
             for file in information["hw"]:
                 if file.endswith(".c"):
                     module_files |= set([hwdir + "/" + os.path.basename(file)])
-            for file_dependency in information["depends"]:
-                if file_dependency in files:
+            for file_dependency in information["depends"] + tuple(files.keys()):
                     dependencyCFiles, dependencySFiles = findModuleFiles(file_dependency, project_info)
                     dependency_files |= set(dependencyCFiles)
                     asm_files |= set(dependencySFiles)
