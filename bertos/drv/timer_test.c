@@ -147,6 +147,7 @@ static void synctimer_test(void)
 {
 	size_t i;
 
+	LIST_INIT(&synctimer_list);
 	for (i = 0; i < countof(synctimer_timers); ++i)
 	{
 		Timer *timer = &synctimer_timers[i];
@@ -183,7 +184,6 @@ int timer_testSetup(void)
 	IRQ_ENABLE;
 	wdt_start(7);
 	timer_init();
-	LIST_INIT(&synctimer_list);
 	kdbg_init();
 	return 0;
 }
