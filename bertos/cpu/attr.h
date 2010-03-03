@@ -158,6 +158,11 @@
 		 */
 		#define ISR_FUNC __attribute__((interrupt))
 
+		/*
+		 * Function attribute to move it into ram memory.
+		 */
+		#define RAM_FUNC __attribute__((section(".data")))
+
 	#endif /* !__IAR_SYSTEMS_ICC_ */
 
 #elif CPU_PPC

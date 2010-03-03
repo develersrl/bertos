@@ -144,6 +144,17 @@
 
 #endif
 
+#if CPU_ARM_AT91SAM7S256 || CPU_ARM_AT91SAM7X256
+	#define FLASH_MEM_SIZE          0x40000UL ///< Internal flash memory size
+	#define FLASH_PAGE_SIZE_BYTES         256 ///< Size of cpu flash memory page in bytes
+	#define FLASH_BANKS_NUM                 1 ///< Number of flash banks
+	#define FLASH_SECTORS_NUM              16 ///< Number of flash sector
+	#define FLASH_PAGE_PER_SECTOR          64 ///< Number of page for sector
+
+#else
+	#error Memory size definition for selected ARM CPU
+#endif
+
 #include "at91_aic.h"
 #include "at91_pit.h"
 #include "at91_pmc.h"
