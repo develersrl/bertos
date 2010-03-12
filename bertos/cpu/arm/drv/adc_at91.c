@@ -126,13 +126,13 @@ void adc_hw_select_ch(uint8_t ch)
 /**
  * Start an ADC convertion.
  * If a kernel is present, preempt until convertion is complete, otherwise
- * a busy wait on ADCS bit is done.
+ * a busy wait on ADC_DRDY bit is done.
  */
 uint16_t adc_hw_read(void)
 {
-	ASSERT(!(ADC_SR & ADC_EOC_MASK));
-
 	#if CONFIG_KERN
+		/* Ensure ADC is not already in use by another process */
+		ASSERT(adc_process == NULL);
 		adc_process = proc_current();
 	#endif
 
@@ -143,13 +143,19 @@ uint16_t adc_hw_read(void)
 		// Ensure IRQs enabled.
 		IRQ_ASSERT_ENABLED();
 		sig_wait(SIG_ADC_COMPLETE);
+
+		/* Prevent race condition in case of preemptive kernel */
+		uint16_t ret = ADC_LCDR;
+		MEMORY_BARRIER;
+		adc_process = NULL;
+		return ret;
 	#else
 		//Wait in polling until is done
 		while (!(ADC_SR & BV(ADC_DRDY)));
-	#endif
 
-	//Return the last converted data
-	return(ADC_LCDR);
+		//Return the last converted data
+		return(ADC_LCDR);
+	#endif
 }
 
 /**
