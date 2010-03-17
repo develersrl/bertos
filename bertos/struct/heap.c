@@ -56,7 +56,7 @@ void heap_init(struct Heap* h, void* memory, size_t size)
 	memset(memory, FREE_FILL_CODE, size);
 	#endif
 
-	ASSERT2((((uintptr_t)memory % sizeof(heap_buf_t)) == 0),
+	ASSERT2(((size_t)memory % alignof(heap_buf_t)) == 0,
 	"memory buffer is unaligned, please use the HEAP_DEFINE_BUF() macro to declare heap buffers!\n");
 
 	/* Initialize heap with a single big chunk */

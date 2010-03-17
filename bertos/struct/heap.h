@@ -71,8 +71,7 @@ typedef struct Heap
  * \param size Heap size in bytes.
  */
 #define HEAP_DEFINE_BUF(name, size) \
-	heap_buf_t name[((size) + sizeof(heap_buf_t) - 1) / sizeof(heap_buf_t)]; \
-	STATIC_ASSERT(sizeof(name) % sizeof(heap_buf_t) == 0)
+	heap_buf_t name[((size) + sizeof(heap_buf_t) - 1) / sizeof(heap_buf_t)]
 
 /// Initialize \a heap within the buffer pointed by \a memory which is of \a size bytes
 void heap_init(struct Heap* heap, void* memory, size_t size);
