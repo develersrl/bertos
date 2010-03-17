@@ -67,7 +67,8 @@
 INLINE void cpu_relax(void)
 {
 #if CONFIG_KERN
-	proc_yield();
+	if (proc_preemptAllowed())
+		proc_yield();
 #endif
 
 #if CONFIG_WATCHDOG

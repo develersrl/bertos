@@ -74,9 +74,9 @@
 /*
  * Forward declaration for interrupt handler
  */
-static void stepper_tc0_irq(void);
-static void stepper_tc1_irq(void);
-static void stepper_tc2_irq(void);
+static ISR_PROTO(stepper_tc0_irq);
+static ISR_PROTO(stepper_tc1_irq);
+static ISR_PROTO(stepper_tc2_irq);
 
 ///< Static array of timer counter struct for stepper.
 static struct TimerCounter stepper_timers[CONFIG_TC_STEPPER_MAX_NUM] =
@@ -253,7 +253,7 @@ INLINE void stepper_tc_tio_irq(struct TimerCounter * t)
 /*
  * Interrupt handler for timer counter TCKL0
  */
-static void ISR_FUNC stepper_tc0_irq(void)
+DECLARE_ISR(stepper_tc0_irq)
 {
 	/*
 	 * Warning: when we read the status_reg register, we reset it.
@@ -277,7 +277,7 @@ static void ISR_FUNC stepper_tc0_irq(void)
 /*
  * Interrupt handler for timer counter TCKL1
  */
-static void ISR_FUNC stepper_tc1_irq(void)
+DECLARE_ISR(stepper_tc1_irq)
 {
 	/*
 	 * Warning: when we read the status_reg register, we reset it.
@@ -302,7 +302,7 @@ static void ISR_FUNC stepper_tc1_irq(void)
 /*
  * Interrupt handler for timer counter TCKL2
  */
-static void ISR_FUNC stepper_tc2_irq(void)
+DECLARE_ISR(stepper_tc2_irq)
 {
 
 	/*

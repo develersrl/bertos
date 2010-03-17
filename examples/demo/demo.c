@@ -301,9 +301,6 @@ int main(int argc, char *argv[])
 {
 	emul_init(&argc, argv);
 
-	#if CONFIG_KERN_PREEMPT
-		irq_init();
-	#endif
 	timer_init();
 	buz_init();
 	kbd_init();

@@ -26,33 +26,33 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
- * \version $Id$
+ * \brief Preeptive kernel funtion interfaces.
  *
- * \author Bernie Innocenti <bernie@codewiz.org>
- *
- * \brief Low-level timer module for Qt emulator (interface).
+ * \author Francesco Sacchi <batt@develer.com>
  */
-#ifndef DRV_TIMER_QT_H
-#define DRV_TIMER_QT_H
 
-// HW dependent timer initialization
+#ifndef KERN_PREEMPT_H
+#define KERN_PREEMPT_H
 
-#define DEFINE_TIMER_ISR     DECLARE_ISR_CONTEXT_SWITCH(timer_isr)
-#define TIMER_TICKS_PER_SEC  250
-#define TIMER_HW_CNT         (1<<31) /* We assume 32bit integers here */
+#include <cfg/compiler.h>
 
-/// Type of time expressed in ticks of the hardware high-precision timer.
-typedef unsigned int hptime_t;
-#define SIZEOF_HPTIME_T 4
+#if CONFIG_KERN_PREEMPT
+	void preempt_init(void);
+	void proc_preempt(void);
+	int proc_needPreempt(void);
 
-/// Frequency of the hardware high-precision timer.
-#define TIMER_HW_HPTICKS_PER_SEC  1000
+	INLINE void proc_decQuantum(void)
+	{
+		extern int _proc_quantum;
+		if (_proc_quantum > 0)
+			_proc_quantum--;
+	}
+#else /* !CONFIG_KERN_PREEMPT */
+	#define proc_decQuantum() /* NOP */
+#endif /* CONFIG_KERN_PREEMPT */
 
-/// Not needed.
-#define timer_hw_irq() do {} while (0)
-
-#endif /* DRV_TIMER_QT_H */
+#endif /* KERN_PREEMPT_H */

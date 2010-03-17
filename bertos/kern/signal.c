@@ -125,8 +125,8 @@ sigmask_t sig_check(sigmask_t sigs)
 	cpu_flags_t flags;
 
 	IRQ_SAVE_DISABLE(flags);
-	result = CurrentProcess->sig_recv & sigs;
-	CurrentProcess->sig_recv &= ~sigs;
+	result = current_process->sig_recv & sigs;
+	current_process->sig_recv &= ~sigs;
 	IRQ_RESTORE(flags);
 
 	return result;
@@ -140,7 +140,6 @@ sigmask_t sig_check(sigmask_t sigs)
 sigmask_t sig_wait(sigmask_t sigs)
 {
 	sigmask_t result;
-	cpu_flags_t flags;
 
 	/* Sleeping with IRQs disabled or preemption forbidden is illegal */
 	IRQ_ASSERT_ENABLED();
@@ -155,17 +154,16 @@ sigmask_t sig_wait(sigmask_t sigs)
 	 * In this case, we'd deadlock with the signal bit already set
 	 * and the process never being reinserted into the ready list.
 	 */
-	// FIXME: just use IRQ_DISABLE() here
-	IRQ_SAVE_DISABLE(flags);
+	IRQ_DISABLE;
 
 	/* Loop until we get at least one of the signals */
-	while (!(result = CurrentProcess->sig_recv & sigs))
+	while (!(result = current_process->sig_recv & sigs))
 	{
 		/*
 		 * Tell "them" that we want to be awaken when any of these
 		 * signals arrives.
 		 */
-		CurrentProcess->sig_wait = sigs;
+		current_process->sig_wait = sigs;
 
 		/*
 		 * Go to sleep and proc_switch() to another process.
@@ -173,9 +171,9 @@ sigmask_t sig_wait(sigmask_t sigs)
 		 * We re-enable IRQs because proc_switch() does not
 		 * guarantee to save and restore the interrupt mask.
 		 */
-		IRQ_RESTORE(flags);
+		IRQ_ENABLE;
 		proc_switch();
-		IRQ_SAVE_DISABLE(flags);
+		IRQ_DISABLE;
 
 		/*
 		 * When we come back here, the wait mask must have been
@@ -183,14 +181,14 @@ sigmask_t sig_wait(sigmask_t sigs)
 		 * one of the signals we were expecting must have been
 		 * delivered to us.
 		 */
-		ASSERT(!CurrentProcess->sig_wait);
-		ASSERT(CurrentProcess->sig_recv & sigs);
+		ASSERT(!current_process->sig_wait);
+		ASSERT(current_process->sig_recv & sigs);
 	}
 
 	/* Signals found: clear them and return */
-	CurrentProcess->sig_recv &= ~sigs;
+	current_process->sig_recv &= ~sigs;
 
-	IRQ_RESTORE(flags);
+	IRQ_ENABLE;
 	return result;
 }
 
@@ -249,9 +247,14 @@ void sig_signal(Process *proc, sigmask_t sigs)
 	/* Check if process needs to be awoken */
 	if (proc->sig_recv & proc->sig_wait)
 	{
-		/* Wake up process and enqueue in ready list */
+		/*
+		 * Wake up process and enqueue in ready list.
+		 *
+		 * Move this process to the head of the ready list, so that it
+		 * will be chosen at the next scheduling point.
+		 */
 		proc->sig_wait = 0;
-		SCHED_ENQUEUE(proc);
+		SCHED_ENQUEUE_HEAD(proc);
 	}
 
 	IRQ_RESTORE(flags);

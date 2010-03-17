@@ -34,13 +34,13 @@ SRC_LIST="
 	bertos/drv/kdebug.c
 	bertos/drv/timer.c
 	bertos/fs/battfs.c
-	bertos/kern/coop.c
 	bertos/kern/idle.c
 	bertos/kern/kfile.c
 	bertos/kern/monitor.c
 	bertos/kern/proc.c
 	bertos/kern/signal.c
 	bertos/kern/sem.c
+	bertos/kern/mtask.c
 	bertos/mware/event.c
 	bertos/mware/formatwr.c
 	bertos/mware/hex.c

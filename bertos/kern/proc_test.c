@@ -26,27 +26,42 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2009 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
  *
- * \brief Test kernel process.
+ * \brief Test kernel preemption.
  *
- * \version $Id$
- * \author Daniele Basile <asterix@develer.com>
+ * This testcase spawns TASKS parallel threads that runs for TIME seconds. They
+ * continuously spin updating a global counter (one counter for each thread).
+ *
+ * At exit each thread checks if the others have been che chance to update
+ * their own counter. If not, it means the preemption didn't occur and the
+ * testcase returns an error message.
+ *
+ * Otherwise, if all the threads have been able to update their own counter it
+ * means preemption successfully occurs, since there is no active sleep inside
+ * each thread's implementation.
+ *
+ * \author Andrea Righi <arighi@develer.com>
  *
  * $test$: cp bertos/cfg/cfg_proc.h $cfgdir/
  * $test$: echo  "#undef CONFIG_KERN" >> $cfgdir/cfg_proc.h
  * $test$: echo "#define CONFIG_KERN 1" >> $cfgdir/cfg_proc.h
  * $test$: echo  "#undef CONFIG_KERN_PRI" >> $cfgdir/cfg_proc.h
  * $test$: echo "#define CONFIG_KERN_PRI 1" >> $cfgdir/cfg_proc.h
+ * $test$: echo  "#undef CONFIG_KERN_PREEMPT" >> $cfgdir/cfg_proc.h
+ * $test$: echo "#define CONFIG_KERN_PREEMPT 1" >> $cfgdir/cfg_proc.h
  * $test$: cp bertos/cfg/cfg_monitor.h $cfgdir/
- * $test$: echo  "#undef CONFIG_KERN_MONITOR" >> $cfgdir/cfg_monitor.h
- * $test$: echo "#define CONFIG_KERN_MONITOR 1" >> $cfgdir/cfg_monitor.h
+ * $test$: sed -i "s/CONFIG_KERN_MONITOR 0/CONFIG_KERN_MONITOR 1/" $cfgdir/cfg_monitor.h
  * $test$: cp bertos/cfg/cfg_signal.h $cfgdir/
  * $test$: echo  "#undef CONFIG_KERN_SIGNALS" >> $cfgdir/cfg_signal.h
  * $test$: echo "#define CONFIG_KERN_SIGNALS 1" >> $cfgdir/cfg_signal.h
+ *
  */
+
+#include <stdio.h> // sprintf
+#include <string.h> // memset
 
 #include <kern/proc.h>
 #include <kern/irq.h>
@@ -54,82 +69,186 @@
 
 #include <drv/timer.h>
 #include <cfg/test.h>
+#include <cfg/cfg_proc.h>
 
+enum
+{
+	TEST_OK = 1,
+	TEST_FAIL = 2,
+};
 
-// Global settings for the test.
-#define DELAY                           5
+/* Number of tasks to spawn */
+#define TASKS	8
 
-// Settings for the test process.
-//Process 1
-#define INC_PROC_T1                     1
-#define DELAY_PROC_T1   INC_PROC_T1*DELAY
-//Process 2
-#define INC_PROC_T2                     3
-#define DELAY_PROC_T2   INC_PROC_T2*DELAY
-//Process 3
-#define INC_PROC_T3                     5
-#define DELAY_PROC_T3   INC_PROC_T3*DELAY
-//Process 4
-#define INC_PROC_T4                     7
-#define DELAY_PROC_T4   INC_PROC_T4*DELAY
-//Process 5
-#define INC_PROC_T5                    11
-#define DELAY_PROC_T5   INC_PROC_T5*DELAY
-//Process 6
-#define INC_PROC_T6                    13
-#define DELAY_PROC_T6   INC_PROC_T6*DELAY
-//Process 7
-#define INC_PROC_T7                    17
-#define DELAY_PROC_T7   INC_PROC_T7*DELAY
-//Process 8
-#define INC_PROC_T8                    19
-#define DELAY_PROC_T8   INC_PROC_T8*DELAY
+static char name[TASKS][32];
 
-//Global count for each process.
-unsigned int t1_count = 0;
-unsigned int t2_count = 0;
-unsigned int t3_count = 0;
-unsigned int t4_count = 0;
-unsigned int t5_count = 0;
-unsigned int t6_count = 0;
-unsigned int t7_count = 0;
-unsigned int t8_count = 0;
+static unsigned int done[TASKS];
 
-/*
- * These macros generate the code needed to create the test process functions.
- */
-#define PROC_TEST(num) static void proc_test##num(void) \
-{ \
-	for (int i = 0; i < INC_PROC_T##num; ++i) \
-	{ \
-		t##num##_count++; \
-		kputs("> Process[" #num "]\n"); \
-		timer_delay(DELAY_PROC_T##num); \
-	} \
-}
+#define WORKER_STACK_SIZE KERN_MINSTACKSIZE * 3
 
-#define PROC_TEST_STACK(num)  PROC_DEFINE_STACK(proc_test##num##_stack, KERN_MINSTACKSIZE);
-#define PROC_TEST_INIT(num)   proc_new(proc_test##num, NULL, sizeof(proc_test##num##_stack), proc_test##num##_stack);
-
-// Define process
-PROC_TEST(1)
-PROC_TEST(2)
-PROC_TEST(3)
-PROC_TEST(4)
-PROC_TEST(5)
-PROC_TEST(6)
-PROC_TEST(7)
-PROC_TEST(8)
+/* Base time delay for processes using timer_delay() */
+#define DELAY	5
 
 // Define process stacks for test.
-PROC_TEST_STACK(1)
-PROC_TEST_STACK(2)
-PROC_TEST_STACK(3)
-PROC_TEST_STACK(4)
-PROC_TEST_STACK(5)
-PROC_TEST_STACK(6)
-PROC_TEST_STACK(7)
-PROC_TEST_STACK(8)
+static cpu_stack_t worker_stack[TASKS][WORKER_STACK_SIZE / sizeof(cpu_stack_t)];
+
+static int prime_numbers[] =
+{
+	1, 3, 5, 7, 11, 13, 17, 19,
+	23, 29, 31, 37, 41, 43, 47, 53,
+};
+
+STATIC_ASSERT(TASKS <= countof(prime_numbers));
+
+static void worker(void)
+{
+	long pid = (long)proc_currentUserData();
+	long tot = prime_numbers[pid - 1];
+	unsigned int my_count = 0;
+	int i;
+
+	for (i = 0; i < tot; i++)
+	{
+		my_count++;
+		PROC_ATOMIC(kprintf("> %s[%ld] running\n", __func__, pid));
+		timer_delay(tot * DELAY);
+	}
+	done[pid - 1] = 1;
+	PROC_ATOMIC(kprintf("> %s[%ld] completed\n", __func__, pid));
+}
+
+static int worker_test(void)
+{
+	long i;
+
+	// Init the test processes
+	kputs("Run Proc test..\n");
+	for (i = 0; i < TASKS; i++)
+	{
+		sprintf(&name[i][0], "worker_%ld", i + 1);
+		proc_new_with_name(name[i], worker, (iptr_t)(i + 1),
+				WORKER_STACK_SIZE, &worker_stack[i][0]);
+	}
+	kputs("> Main: Processes started\n");
+	while (1)
+	{
+		for (i = 0; i < TASKS; i++)
+		{
+			if (!done[i])
+				break;
+		}
+		if (i == TASKS)
+			break;
+		monitor_report();
+		timer_delay(93);
+	}
+	kputs("> Main: process test finished..ok!\n");
+	return 0;
+}
+
+#if CONFIG_KERN_PREEMPT
+/* Time to run each preemptible thread (in seconds) */
+#define TIME	10
+
+static char preempt_name[TASKS][32];
+
+static cpu_atomic_t barrier[TASKS];
+static cpu_atomic_t main_barrier;
+
+static unsigned int preempt_counter[TASKS];
+static unsigned int preempt_done[TASKS];
+
+static cpu_stack_t preempt_worker_stack[TASKS][WORKER_STACK_SIZE / sizeof(cpu_stack_t)];
+
+static void preempt_worker(void)
+{
+	long pid = (long)proc_currentUserData();
+	unsigned int *my_count = &preempt_counter[pid - 1];
+	ticks_t start, stop;
+	int i;
+
+	barrier[pid - 1] = 1;
+	/* Synchronize on the main barrier */
+	while (!main_barrier)
+		proc_yield();
+	PROC_ATOMIC(kprintf("> %s[%ld] running\n", __func__, pid));
+	start = timer_clock();
+	stop  = ms_to_ticks(TIME * 1000);
+	while (timer_clock() - start < stop)
+	{
+		IRQ_ASSERT_ENABLED();
+		(*my_count)++;
+		/* be sure to wrap to a value different than 0 */
+		if (UNLIKELY(*my_count == (unsigned int)~0))
+			*my_count = 1;
+	}
+	PROC_ATOMIC(kprintf("> %s[%ld] completed: (counter = %d)\n",
+				__func__, pid, *my_count));
+	for (i = 0; i < TASKS; i++)
+		if (!preempt_counter[i])
+		{
+			preempt_done[pid - 1] = TEST_FAIL;
+			return;
+		}
+	preempt_done[pid - 1] = TEST_OK;
+}
+
+static int preempt_worker_test(void)
+{
+	unsigned long score = 0;
+	long i;
+
+	// Init the test processes
+	kputs("Run Preemption test..\n");
+	for (i = 0; i < TASKS; i++)
+	{
+		sprintf(&preempt_name[i][0], "preempt_worker_%ld", i + 1);
+		proc_new_with_name(preempt_name[i], preempt_worker, (iptr_t)(i + 1),
+				WORKER_STACK_SIZE, &preempt_worker_stack[i][0]);
+	}
+	kputs("> Main: Processes created\n");
+	/* Synchronize on start */
+	while (1)
+	{
+		for (i = 0; i < TASKS; i++)
+			if (!barrier[i])
+				break;
+		if (i == TASKS)
+			break;
+		proc_yield();
+	}
+	/* Now all threads have been created, start them all */
+	main_barrier = 1;
+	MEMORY_BARRIER;
+	kputs("> Main: Processes started\n");
+	while (1)
+	{
+		for (i = 0; i < TASKS; i++)
+		{
+			if (!preempt_done[i])
+				break;
+			else if (preempt_done[i] == TEST_FAIL)
+			{
+				kputs("> Main: process test finished..fail!\n");
+				return -1;
+			}
+		}
+		if (i == TASKS)
+			break;
+		monitor_report();
+		timer_delay(1000);
+	}
+	for (i = 0; i < TASKS; i++)
+		score += preempt_counter[i];
+	kputs("> Main: process test finished..ok!\n");
+	kprintf("> Score: %lu\n", score);
+	return 0;
+}
+#endif /* CONFIG_KERN_PREEMPT */
+
+#if CONFIG_KERN_SIGNALS & CONFIG_KERN_PRI
+
+#define PROC_PRI_TEST_STACK(num)  PROC_DEFINE_STACK(proc_test##num##_stack, KERN_MINSTACKSIZE);
 
 // Define params to test priority
 #define PROC_PRI_TEST(num) static void proc_pri_test##num(void) \
@@ -140,68 +259,33 @@ PROC_TEST_STACK(8)
 }
 
 // Default priority is 0
-#define PROC_PRI_TEST_INIT(num, proc)  \
-do { \
-	struct Process *p = proc_new(proc_pri_test##num, (proc), sizeof(proc_test##num##_stack), proc_test##num##_stack); \
-	proc_setPri(p, num + 1); \
+#define PROC_PRI_TEST_INIT(num, proc)					\
+do {									\
+	struct Process *p = proc_new(proc_pri_test##num, (proc),	\
+					sizeof(proc_test##num##_stack),	\
+					proc_test##num##_stack);	\
+	proc_setPri(p, num + 1);					\
 } while (0)
 
-PROC_TEST_STACK(0)
+PROC_PRI_TEST_STACK(0)
+PROC_PRI_TEST_STACK(1)
+PROC_PRI_TEST_STACK(2)
+
 PROC_PRI_TEST(0)
 PROC_PRI_TEST(1)
 PROC_PRI_TEST(2)
 
-
-/**
- * Process scheduling test
- */
-int proc_testRun(void)
+static int prio_worker_test(void)
 {
-	int ret_value = 0;
-	kprintf("Run Process test..\n");
+	struct Process *curr = proc_current();
+	int orig_pri = curr->link.pri;
+	int ret = 0;
 
-	//Init the process tests
-	PROC_TEST_INIT(1)
-	PROC_TEST_INIT(2)
-	PROC_TEST_INIT(3)
-	PROC_TEST_INIT(4)
-	PROC_TEST_INIT(5)
-	PROC_TEST_INIT(6)
-	PROC_TEST_INIT(7)
-	PROC_TEST_INIT(8)
-	kputs("> Main: Processes created\n");
-
-	for (int i = 0; i < 30; ++i)
-	{
-		kputs("> Main\n");
-		timer_delay(93);
-		monitor_report();
-	}
-
-	if( t1_count == INC_PROC_T1 &&
-		t2_count == INC_PROC_T2 &&
-		t3_count == INC_PROC_T3 &&
-		t4_count == INC_PROC_T4 &&
-		t5_count == INC_PROC_T5 &&
-		t6_count == INC_PROC_T6 &&
-		t7_count == INC_PROC_T7 &&
-		t8_count == INC_PROC_T8)
-	{
-		kputs("> Main: process test finished..ok!\n");
-		ret_value = 0;
-	}
-	else
-	{
-		kputs("> Main: process test..fail!\n");
-		ret_value = -1;
-	}
-
-#if CONFIG_KERN_SIGNALS & CONFIG_KERN_PRI
 	// test process priority
 	// main process must have the higher priority to check signals received
 	proc_setPri(proc_current(), 10);
 
-	struct Process *curr = proc_current();
+	kputs("Run Priority test..\n");
 	// the order in which the processes are created is important!
 	PROC_PRI_TEST_INIT(0, curr);
 	PROC_PRI_TEST_INIT(1, curr);
@@ -210,47 +294,70 @@ int proc_testRun(void)
 	// signals must be: USER2, 1, 0 in order
 	sigmask_t signals = sig_wait(SIG_USER0 | SIG_USER1 | SIG_USER2);
 	if (!(signals & SIG_USER2))
-		goto priority_fail;
-
+	{
+		ret = -1;
+		goto out;
+	}
 	signals = sig_wait(SIG_USER0 | SIG_USER1 | SIG_USER2);
 	if (!(signals & SIG_USER1))
-		goto priority_fail;
-
+	{
+		ret = -1;
+		goto out;
+	}
 	signals = sig_wait(SIG_USER0 | SIG_USER1 | SIG_USER2);
 	if (!(signals & SIG_USER0))
-		goto priority_fail;
-
+	{
+		ret = -1;
+		goto out;
+	}
 	// All processes must have quit by now, but just in case...
 	signals = sig_waitTimeout(SIG_USER0 | SIG_USER1 | SIG_USER2, 200);
 	if (signals & (SIG_USER0 | SIG_USER1 | SIG_USER2))
-		goto priority_fail;
-
+	{
+		ret = -1;
+		goto out;
+	}
 	if (signals & SIG_TIMEOUT)
 	{
 		kputs("Priority test successfull.\n");
 	}
+out:
+	proc_setPri(proc_current(), orig_pri);
+	if (ret != 0)
+		kputs("Priority test failed.\n");
+	return ret;
+}
+#endif /* CONFIG_KERN_SIGNALS & CONFIG_KERN_PRI */
 
-	return ret_value;
+/**
+ * Process scheduling test
+ */
+int proc_testRun(void)
+{
+#if CONFIG_KERN_PREEMPT
+	// Clear shared data (this is needed when this testcase is embedded in
+	// the demo application).
+	memset(preempt_counter, 0, sizeof(preempt_counter));
+	memset(preempt_done, 0, sizeof(preempt_done));
+	memset(barrier, 0, sizeof(barrier));
+	main_barrier = 0;
+#endif /* CONFIG_KERN_PREEMPT */
+	memset(done, 0, sizeof(done));
 
-priority_fail:
-	kputs("Priority test failed.\n");
-	return -1;
-
-#endif
-
-	return ret_value;
-
+	/* Start tests */
+	worker_test();
+#if CONFIG_KERN_PREEMPT
+	preempt_worker_test();
+#endif /* CONFIG_KERN_PREEMPT */
+#if CONFIG_KERN_SIGNALS & CONFIG_KERN_PRI
+	prio_worker_test();
+#endif /* CONFIG_KERN_SIGNALS & CONFIG_KERN_PRI */
+	return 0;
 }
 
 int proc_testSetup(void)
 {
 	kdbg_init();
-
-	#if CONFIG_KERN_PREEMPT
-		kprintf("Init Interrupt (preempt mode)..");
-		irq_init();
-		kprintf("Done.\n");
-	#endif
 
 	kprintf("Init Timer..");
 	timer_init();

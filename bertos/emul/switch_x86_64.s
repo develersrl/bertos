@@ -39,20 +39,22 @@
 /* void asm_switch_context(void **new_sp [%rdi], void **save_sp [%rsi]) */
 .globl asm_switch_context
 asm_switch_context:
-	pushq	%rax
-	pushq	%rbx
-	pushq	%rcx
-	pushq	%rdx
-	pushq	%rsi
-	pushq	%rdi
 	pushq	%rbp
+	pushq	%rdi
+	pushq	%rsi
+	pushq	%rbx
+	pushq	%r8
+	pushq	%r9
+	pushq	%r10
+	pushq	%r11
 	movq	%rsp,(%rsi)             /* *save_sp = rsp */
 	movq	(%rdi),%rsp             /* rsp = *new_sp */
-	popq	%rbp
-	popq	%rdi
-	popq	%rsi
-	popq	%rdx
-	popq	%rcx
+	popq	%r11
+	popq	%r10
+	popq	%r9
+	popq	%r8
 	popq	%rbx
-	popq	%rax
+	popq	%rsi
+	popq	%rdi
+	popq	%rbp
 	ret

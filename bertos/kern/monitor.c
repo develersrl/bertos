@@ -118,12 +118,12 @@ void monitor_report(void)
 	Node *node;
 	int i;
 
+	proc_forbid();
 	kprintf("%-9s%-9s%-9s%-9s%s\n", "TCB", "SPbase", "SPsize", "SPfree", "Name");
 	for (i = 0; i < 56; i++)
 		kputchar('-');
 	kputchar('\n');
 
-	proc_forbid();
 	FOREACH_NODE(node, &MonitorProcs)
 	{
 		Process *p = containerof(node, Process, monitor.link);

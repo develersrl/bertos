@@ -52,6 +52,8 @@
 #include <cpu/irq.h>
 #include <cpu/power.h> // cpu_relax()
 
+#include <kern/preempt.h> // proc_decQuantun()
+
 /*
  * Include platform-specific binding code if we're hosted.
  * Try the CPU specific one for bare-metal environments.
@@ -240,30 +242,34 @@ void synctimer_poll(List *queue)
 
 /**
  * Wait for the specified amount of timer ticks.
+ *
+ * \note Sleeping while preemption is disabled fallbacks to a busy wait sleep.
  */
 void timer_delayTicks(ticks_t delay)
 {
 	/* We shouldn't sleep with interrupts disabled */
 	IRQ_ASSERT_ENABLED();
 
-#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
+#if CONFIG_KERN_SIGNALS
 	Timer t;
 
-	ASSERT(!sig_check(SIG_SINGLE));
-	timer_setSignal(&t, proc_current(), SIG_SINGLE);
-	timer_setDelay(&t, delay);
-	timer_add(&t);
-	sig_wait(SIG_SINGLE);
-
-#else /* !CONFIG_KERN_SIGNALS */
-
-	ticks_t start = timer_clock();
-
-	/* Busy wait */
-	while (timer_clock() - start < delay)
-		cpu_relax();
-
+	if (proc_preemptAllowed())
+	{
+		ASSERT(!sig_check(SIG_SINGLE));
+		timer_setSignal(&t, proc_current(), SIG_SINGLE);
+		timer_setDelay(&t, delay);
+		timer_add(&t);
+		sig_wait(SIG_SINGLE);
+	}
+	else
 #endif /* !CONFIG_KERN_SIGNALS */
+	{
+		ticks_t start = timer_clock();
+
+		/* Busy wait */
+		while (timer_clock() - start < delay)
+			cpu_relax();
+	}
 }
 
 
@@ -315,7 +321,6 @@ void timer_delayHp(hptime_t delay)
 }
 #endif /* CONFIG_TIMER_UDELAY */
 
-
 /**
  * Timer interrupt handler. Find soft timers expired and
  * trigger corresponding events.
@@ -345,6 +350,9 @@ DEFINE_TIMER_ISR
 
 	/* Update the master ms counter */
 	++_clock;
+
+	/* Update the current task's quantum (if enabled). */
+	proc_decQuantum();
 
 	#if CONFIG_TIMER_EVENTS
 		timer_poll(&timers_queue);

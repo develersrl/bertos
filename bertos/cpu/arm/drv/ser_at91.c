@@ -243,11 +243,11 @@ struct ArmSerial
 	volatile bool sending;
 };
 
-static void uart0_irq_dispatcher(void);
-static void uart1_irq_dispatcher(void);
-static void spi0_irq_handler(void);
+static ISR_PROTO(uart0_irq_dispatcher);
+static ISR_PROTO(uart1_irq_dispatcher);
+static ISR_PROTO(spi0_irq_handler);
 #if CPU_ARM_SAM7X
-static void spi1_irq_handler(void);
+static ISR_PROTO(spi1_irq_handler);
 #endif
 /*
  * Callbacks for USART0
@@ -783,8 +783,7 @@ static void uart0_irq_rx(void)
 /**
  * Serial IRQ dispatcher for USART0.
  */
-static void uart0_irq_dispatcher(void) __attribute__ ((interrupt));
-static void uart0_irq_dispatcher(void)
+static DECLARE_ISR(uart0_irq_dispatcher)
 {
 	if (US0_CSR & BV(US_RXRDY))
 		uart0_irq_rx();
@@ -848,8 +847,7 @@ static void uart1_irq_rx(void)
 /**
  * Serial IRQ dispatcher for USART1.
  */
-static void uart1_irq_dispatcher(void) __attribute__ ((interrupt));
-static void uart1_irq_dispatcher(void)
+static DECLARE_ISR(uart1_irq_dispatcher)
 {
 	if (US1_CSR & BV(US_RXRDY))
 		uart1_irq_rx();
@@ -864,8 +862,7 @@ static void uart1_irq_dispatcher(void)
 /**
  * SPI0 interrupt handler
  */
-static void spi0_irq_handler(void) __attribute__ ((interrupt));
-static void spi0_irq_handler(void)
+static DECLARE_ISR(spi0_irq_handler)
 {
 	SER_STROBE_ON;
 
@@ -895,8 +892,7 @@ static void spi0_irq_handler(void)
 /**
  * SPI1 interrupt handler
  */
-static void spi1_irq_handler(void) __attribute__ ((interrupt));
-static void spi1_irq_handler(void)
+static DECLARE_ISR(spi1_irq_handler)
 {
 	SER_STROBE_ON;
 

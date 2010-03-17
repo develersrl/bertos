@@ -26,78 +26,43 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2001, 2004 Develer S.r.l. (http://www.develer.com/)
- * Copyright 1999, 2000, 2001, 2008 Bernie Innocenti <bernie@codewiz.org>
+ * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
+ * All Rights Reserved.
  * -->
  *
- * \brief Kernel configuration parameters
+ * \brief Configuration file for timer module.
  *
  * \version $Id$
- * \author Bernie Innocenti <bernie@codewiz.org>
- */
-
-#ifndef CFG_PROC_H
-#define CFG_PROC_H
-
-/**
- * Enable the multithreading kernel.
  *
- * $WIZ$ type = "autoenabled"
+ * \author Daniele Basile <asterix@develer.com>
  */
-#define CONFIG_KERN 0
+
+#ifndef CFG_TIMER_H
+#define CFG_TIMER_H
 
 /**
- * Kernel interrupt supervisor. WARNING: Experimental, still incomplete!
- * $WIZ$ type = "boolean"
- * $WIZ$ supports = "False"
- */
-#define CONFIG_KERN_IRQ 0
-
-/**
- * Dynamic memory allocation for processes.
- *
- * $WIZ$ type = "boolean"
- * $WIZ$ supports = "False"
- */
-#define CONFIG_KERN_HEAP 0
-
-/**
- * Preemptive process scheduling.
- *
- * $WIZ$ type = "boolean"
- * $WIZ$ conditional_deps = "timer", "idle"
- */
-#define CONFIG_KERN_PREEMPT 0
-
-/**
- * Priority-based scheduling policy.
- * $WIZ$ type = "boolean"
- */
-#define CONFIG_KERN_PRI 0
-
-/**
- * Time sharing quantum (a prime number prevents interference effects) [ms].
- *
- * $WIZ$ type = "int"
- * $WIZ$ min = 1
- * $WIZ$ supports = "False"
- */
-#define CONFIG_KERN_QUANTUM 47
-
-/**
- * Module logging level.
- *
+ * Hardware timer selection for drv/timer.c.
  * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_level"
+ * $WIZ$ value_list = "timer_select"
  */
-#define KERN_LOG_LEVEL LOG_LVL_ERR
+#define CONFIG_TIMER TIMER_DEFAULT
 
 /**
- * Module logging format.
- *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_format"
+ * Debug timer interrupt using a strobe pin.
+ * $WIZ$ type = "boolean"
  */
-#define KERN_LOG_FORMAT LOG_FMT_VERBOSE
+#define CONFIG_TIMER_STROBE  0
 
-#endif /*  CFG_PROC_H */
+/**
+ * Enable asynchronous timers.
+ * $WIZ$ type = "boolean"
+ */
+#define CONFIG_TIMER_EVENTS  1
+
+/**
+ * Support hi-res timer_usleep().
+ * $WIZ$ type = "boolean"
+ */
+#define CONFIG_TIMER_UDELAY  1
+
+#endif /* CFG_TIMER_H */

@@ -207,6 +207,11 @@
 
 /*\}*/
 
+#ifndef INT_MAX
+	#define INT_MAX	((int)((unsigned int)~0 >> 1))
+	#define INT_MIN	(-INT_MAX - 1)
+#endif
+
 /* Sanity checks for the above definitions */
 STATIC_ASSERT(sizeof(char) == SIZEOF_CHAR);
 STATIC_ASSERT(sizeof(short) == SIZEOF_SHORT);

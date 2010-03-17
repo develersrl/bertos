@@ -44,7 +44,10 @@
 #include "detect.h"
 #include "types.h"
 
+#include <kern/preempt.h>
+
 #include <cfg/compiler.h> /* for uintXX_t */
+#include "cfg/cfg_proc.h" /* CONFIG_KERN_PREEMPT */
 
 #if CPU_I196
 	#define IRQ_DISABLE             disable_interrupt()
@@ -149,6 +152,111 @@
 
 		#define IRQ_ENABLED() ((CPU_READ_FLAGS() & 0xc0) != 0xc0)
 
+		#if CONFIG_KERN_PREEMPT
+			EXTERN_C void asm_irq_switch_context(void);
+
+			/**
+			 * At the beginning of any ISR immediately ajust the
+			 * return address and store all the caller-save
+			 * registers (the ISR may change these registers that
+			 * are shared with the user-context).
+			 */
+			#define IRQ_ENTRY() asm volatile ( \
+						"sub	lr, lr, #4\n\t" \
+						"stmfd	sp!, {r0-r3, ip, lr}\n\t")
+			#define IRQ_EXIT()  asm volatile ( \
+						"b	asm_irq_switch_context\n\t")
+			/**
+			 * Function attribute to declare an interrupt service
+			 * routine.
+			 *
+			 * An ISR function must be declared as naked because we
+			 * want to add our IRQ_ENTRY() prologue and IRQ_EXIT()
+			 * epilogue code to handle the context switch and save
+			 * all the registers (not only the callee-save).
+			 *
+			 */
+			#define ISR_FUNC __attribute__((naked))
+
+			/**
+			 * The compiler cannot establish which
+			 * registers actually need to be saved, because
+			 * the interrupt can happen at any time, so the
+			 * "normal" prologue and epilogue used for a
+			 * generic function call are not suitable for
+			 * the ISR.
+			 *
+			 * Using a naked function has the drawback that
+			 * the stack is not automatically adjusted at
+			 * this point, like a "normal" function call.
+			 *
+			 * So, an ISR can _only_ contain other function
+			 * calls and they can't use the stack in any
+			 * other way.
+			 *
+			 * NOTE: we need to explicitly disable IRQs after
+			 * IRQ_ENTRY(), because the IRQ status flag is not
+			 * masked by the hardware and an IRQ ack inside the ISR
+			 * may cause the triggering of another IRQ before
+			 * exiting from the current ISR.
+			 *
+			 * The respective IRQ_ENABLE is not necessary, because
+			 * IRQs will be automatically re-enabled when restoring
+			 * the context of the user task.
+			 */
+			#define DECLARE_ISR_CONTEXT_SWITCH(func)	\
+				void ISR_FUNC func(void);		\
+				static void __isr_##func(void);		\
+				void ISR_FUNC func(void)		\
+				{					\
+					IRQ_ENTRY();			\
+					IRQ_DISABLE;			\
+					__isr_##func();			\
+					IRQ_EXIT();			\
+				}					\
+				static void __isr_##func(void)
+			/**
+			 * Interrupt service routine prototype: can be used for
+			 * forward declarations.
+			 */
+			#define ISR_PROTO_CONTEXT_SWITCH(func)	\
+				void ISR_FUNC func(void)
+			/**
+			 * With task priorities enabled each ISR is used a point to
+			 * check if we need to perform a context switch.
+			 *
+			 * Instead, without priorities a context switch can occur only
+			 * when the running task expires its time quantum. In this last
+			 * case, the context switch can only occur in the timer
+			 * ISR, that must be always declared with the
+			 * DECLARE_ISR_CONTEXT_SWITCH() macro.
+			 */
+			#if CONFIG_KERN_PRI
+				#define DECLARE_ISR(func) \
+					DECLARE_ISR_CONTEXT_SWITCH(func)
+
+				#define ISR_PROTO(func) \
+					ISR_PROTO_CONTEXT_SWITCH(func)
+			#endif /* !CONFIG_KERN_PRI */
+		#endif /* CONFIG_KERN_PREEMPT */
+
+		#ifndef DECLARE_ISR
+			#define DECLARE_ISR(func) \
+				void __attribute__((interrupt)) func(void)
+		#endif
+		#ifndef DECLARE_ISR_CONTEXT_SWITCH
+			#define DECLARE_ISR_CONTEXT_SWITCH(func) \
+				void __attribute__((interrupt)) func(void)
+		#endif
+		#ifndef ISR_PROTO
+			#define ISR_PROTO(func) \
+				void __attribute__((interrupt)) func(void)
+		#endif
+		#ifndef ISR_PROTO_CONTEXT_SWITCH
+			#define ISR_PROTO_CONTEXT_SWITCH(func)	\
+				void __attribute__((interrupt)) func(void)
+		#endif
+
 	#endif /* !__IAR_SYSTEMS_ICC_ */
 
 #elif CPU_PPC
@@ -218,16 +326,59 @@
 		); \
 		(bool)(sreg & 0x80); \
 	})
+	#if CONFIG_KERN_PREEMPT
+		#define DECLARE_ISR_CONTEXT_SWITCH(vect)		\
+			INLINE void __isr_##vect(void);			\
+			ISR(vect)					\
+			{						\
+				__isr_##vect();				\
+				IRQ_PREEMPT_HANDLER();			\
+			}						\
+			INLINE void __isr_##vect(void)
+
+		/**
+		 * Interrupt service routine prototype: can be used for
+		 * forward declarations.
+		 */
+		#define ISR_PROTO(vect)	ISR(vect)
+
+		/**
+		 * With task priorities enabled each ISR is used a point to
+		 * check if we need to perform a context switch.
+		 *
+		 * Instead, without priorities a context switch can occur only
+		 * when the running task expires its time quantum. In this last
+		 * case, the context switch can only occur in the timer ISR,
+		 * that must be always declared with the
+		 * DECLARE_ISR_CONTEXT_SWITCH() macro.
+		 */
+		#if CONFIG_KERN_PRI
+			#define DECLARE_ISR(func) \
+				DECLARE_ISR_CONTEXT_SWITCH(func)
+
+			#define ISR_PROTO(func) \
+				ISR_PROTO_CONTEXT_SWITCH(func)
+		#endif /* !CONFIG_KERN_PRI */
+	#endif
+
+	#ifndef DECLARE_ISR
+		#define ISR_PROTO(vect) ISR(vect)
+	#endif
+	#ifndef DECLARE_ISR
+		#define DECLARE_ISR(vect) ISR(vect)
+	#endif
+	#ifndef DECLARE_ISR_CONTEXT_SWITCH
+		#define DECLARE_ISR_CONTEXT_SWITCH(vect) ISR(vect)
+	#endif
+	#ifndef ISR_PROTO
+		#define ISR_PROTO(func) ISR(vect)
+	#endif
+	#ifndef ISR_PROTO_CONTEXT_SWITCH
+		#define ISR_PROTO_CONTEXT_SWITCH(func) ISR(vect)
+	#endif
+
 #else
 	#error No CPU_... defined.
-#endif
-
-#ifndef IRQ_ENTRY
-	#define IRQ_ENTRY() /* NOP */
-#endif
-
-#ifndef IRQ_EXIT
-	#define IRQ_EXIT() /* NOP */
 #endif
 
 #ifdef IRQ_RUNNING
@@ -250,6 +401,22 @@
 #else
 	#define IRQ_ASSERT_ENABLED() do {} while(0)
 	#define IRQ_ASSERT_DISABLED() do {} while(0)
+#endif
+
+
+#ifndef IRQ_PREEMPT_HANDLER
+	#if CONFIG_KERN_PREEMPT
+		/**
+		 * Handle preemptive context switch inside timer IRQ.
+		 */
+		INLINE void IRQ_PREEMPT_HANDLER(void)
+		{
+			if (proc_needPreempt())
+				proc_preempt();
+		}
+	#else
+		#define IRQ_PREEMPT_HANDLER() /* Nothing */
+	#endif
 #endif
 
 /**

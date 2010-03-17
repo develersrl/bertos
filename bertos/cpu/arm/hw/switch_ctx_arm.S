@@ -35,30 +35,65 @@
  *
  * \author Stefano Fedrigo <aleph@develer.com>
  * \author Francesco Sacchi <batt@develer.com>
+ * \author Andrea Righi <arighi@develer.com>
  */
+
+#include "cfg/cfg_proc.h"
 
 /* void asm_switch_context(void **new_sp [r0], void **save_sp [r1]) */
 .globl asm_switch_context
 asm_switch_context:
-	mrs	r2, cpsr               /* Save status. */
+	/* Save registers */
+	stmfd	sp!, {r4 - r11, lr}
+	/* Save old stack pointer */
+	str     sp, [r1]
+	/* Load new stack pointer */
+	ldr	sp, [r0]
+	/* Load new registers */
+	ldmfd	sp!, {r4 - r11, pc}
 
-	stmfd	sp!, {r2, r4-r11, lr}  /* Save registers. */
+#if CONFIG_KERN_PREEMPT
 
-	str     sp, [r1]               /* Save old stack pointer. */
-	ldr	sp, [r0]               /* Load new stack pointer */
+/* ARM interrupt mode with IRQ and FIQ disabled */
+#define ARM_IRQ_MODE 0xD2
+/* ARM supervisor mode with IRQ and FIQ disabled */
+#define ARM_SVC_MODE 0xD3
 
-	ldmfd	sp!, {r2, r4-r11, lr}  /* Load new registers. */
-	msr	cpsr, r2               /* restore flags reg. */
+.globl asm_irq_switch_context
+asm_irq_switch_context:
+	/* Return if preemption is not needed */
+	bl	proc_needPreempt
+	cmp	r0, #0
+	ldmeqfd	sp!, {r0 - r3, ip, pc}^
 
-	mov	pc, lr
+	/* Otherwise restore regs used by the ISR */
+	ldmfd   sp!, {r0 - r3, ip, lr}
 
+	/* Save current process context */
+	msr     cpsr_c, #ARM_SVC_MODE
+	stmfd   sp!, {r0 - r3, ip, lr}
 
-/* proc_entry trampoline needed because ARM does not pop return addresses
-from the stack, but uses lr instead.*/
-.globl asm_proc_entry
-asm_proc_entry:
-	mov	lr, pc
-	/* In r11 we have the real process entry point as set up by CPU_CREATE_NEW_STACK */
-	bx	r11
-	bl	proc_exit
+	/* Save lr_irq and spsr_irq in process stack */
+	msr     cpsr_c, #ARM_IRQ_MODE
+	mov     r0, lr
+	mrs     r1, spsr
+	msr     cpsr_c, #ARM_SVC_MODE
+	stmfd   sp!, {r0, r1}
 
+	/* Perform the context switch */
+	bl	proc_preempt
+
+	/* Restore lr_irq and spsr_irq from process stack */
+	ldmfd   sp!, {r0, r1}
+	msr     cpsr_c, #ARM_IRQ_MODE
+	mov     lr, r0
+	msr     spsr_cxsf, r1
+
+	/* Restore process regs */
+	msr     cpsr_c, #ARM_SVC_MODE
+	ldmfd   sp!, {r0 - r3, ip, lr}
+
+	/* Exit from ISR */
+	msr     cpsr_c, #ARM_IRQ_MODE
+	movs	pc, lr
+#endif /* CONFIG_KERN_PREEMPT */

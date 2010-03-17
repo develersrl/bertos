@@ -39,6 +39,8 @@
 #ifndef CFG_OS_H
 #define CFG_OS_H
 
+#include "cfg/cfg_proc.h"
+
 /*
  * OS autodetection (Some systems trigger multiple OS definitions)
  */
@@ -108,6 +110,40 @@
 		sigprocmask(SIG_SETMASK, NULL, &sigs__); \
 		sigismember(&sigs__, SIGALRM) ? false : true; \
 	 })
+
+	#if CONFIG_KERN_PREEMPT
+		#define DECLARE_ISR_CONTEXT_SWITCH(vect)	\
+			void vect(UNUSED_ARG(int, arg));	\
+			INLINE void __isr_##vect(void);		\
+			void vect(UNUSED_ARG(int, arg))		\
+			{					\
+				__isr_##vect();			\
+				IRQ_PREEMPT_HANDLER();		\
+			}					\
+			INLINE void __isr_##vect(void)
+		/**
+		 * With task priorities enabled each ISR is used a point to
+		 * check if we need to perform a context switch.
+		 *
+		 * Instead, without priorities a context switch can occur only
+		 * when the running task expires its time quantum. In this last
+		 * case, the context switch can only occur in the timer ISR,
+		 * that must be always declared with the
+		 * DECLARE_ISR_CONTEXT_SWITCH() macro.
+		 */
+		#if CONFIG_KERN_PRI
+			#define DECLARE_ISR(vect) \
+				DECLARE_ISR_CONTEXT_SWITCH(vect)
+		#endif /* CONFIG_KERN_PRI */
+	#endif
+	#ifndef DECLARE_ISR
+		#define DECLARE_ISR(vect) \
+				void vect(UNUSED_ARG(int, arg))
+	#endif
+	#ifndef DECLARE_ISR_CONTEXT_SWITCH
+		#define DECLARE_ISR_CONTEXT_SWITCH(vect) \
+				void vect(UNUSED_ARG(int, arg))
+	#endif
 
 #else
 	#define OS_UNIX   0

@@ -93,11 +93,15 @@ STATIC_ASSERT(countof(sysirq_tab) == SYSIRQ_CNT);
  * This function checks for interrupt enable state of
  * various sources (system timer, etc..) and calls
  * the corresponding handler.
+ *
+ * \note On ARM all IRQs are handled by the sysirq_dispatcher, so we can't
+ * differentiate between context-switch and non-context-switch ISR.
  */
-static void sysirq_dispatcher(void) __attribute__ ((interrupt));
-static void sysirq_dispatcher(void)
+static DECLARE_ISR_CONTEXT_SWITCH(sysirq_dispatcher)
 {
-	for (unsigned i = 0; i < countof(sysirq_tab); i++)
+	unsigned int i;
+
+	for (i = 0; i < countof(sysirq_tab); i++)
 	{
 		if (sysirq_tab[i].enabled
 		 && sysirq_tab[i].handler)

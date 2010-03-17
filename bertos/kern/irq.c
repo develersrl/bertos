@@ -48,7 +48,6 @@
 
 #include <unistd.h> // FIXME: move POSIX stuff to irq_posix.h
 
-
 MOD_DEFINE(irq)
 
 // FIXME
@@ -57,32 +56,7 @@ static void (*irq_handlers[100])(void);
 /* signal handler */
 void irq_entry(int signum)
 {
-#if CONFIG_KERN_PREEMPT
-	Process * const old_process = CurrentProcess;
-#endif
-
 	irq_handlers[signum]();
-
-#if CONFIG_KERN_PREEMPT
-	ASSERT2(CurrentProcess, "no idle proc?");
-
-	if (old_process != CurrentProcess)
-	{
-		IRQ_DISABLE;
-
-		TRACEMSG("switching from %p:%s to %p:%s",
-			old_process, old_process ? old_process->monitor.name : "---",
-			CurrentProcess, proc_currentName());
-
-		if (old_process)
-			swapcontext(&old_process->context, &CurrentProcess->context);
-		else
-			setcontext(&CurrentProcess->context);
-
-		IRQ_ENABLE;
-	}
-	TRACEMSG("resuming %p:%s", CurrentProcess, CurrentProcess->monitor.name);
-#endif // CONFIG_KERN_PREEMPT
 }
 
 void irq_register(int irq, void (*callback)(void))

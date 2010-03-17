@@ -67,13 +67,13 @@ static void proc_schedule(void)
 {
 	cpu_flags_t flags;
 
-	ATOMIC(LIST_ASSERT_VALID(&ProcReadyList));
+	ATOMIC(LIST_ASSERT_VALID(&proc_ready_list));
 	ASSERT_USER_CONTEXT();
 	IRQ_ASSERT_ENABLED();
 
 	/* Poll on the ready queue for the first ready process */
 	IRQ_SAVE_DISABLE(flags);
-	while (!(CurrentProcess = (struct Process *)list_remHead(&ProcReadyList)))
+	while (!(current_process = (struct Process *)list_remHead(&proc_ready_list)))
 	{
 		/*
 		 * Make sure we physically reenable interrupts here, no matter what
@@ -82,7 +82,7 @@ static void proc_schedule(void)
 		 * process will ever wake up.
 		 *
 		 * During idle-spinning, an interrupt can occur and it may
-		 * modify \p ProcReadyList. To ensure that compiler reload this
+		 * modify \p proc_ready_list. To ensure that compiler reload this
 		 * variable every while cycle we call CPU_MEMORY_BARRIER.
 		 * The memory barrier ensure that all variables used in this context
 		 * are reloaded.
@@ -101,7 +101,7 @@ static void proc_schedule(void)
 void proc_switch(void)
 {
 	/* Remember old process to save its context later */
-	Process * const old_process = CurrentProcess;
+	Process * const old_process = current_process;
 
 	proc_schedule();
 
@@ -109,14 +109,14 @@ void proc_switch(void)
 	 * Optimization: don't switch contexts when the active
 	 * process has not changed.
 	 */
-	if (CurrentProcess != old_process)
+	if (current_process != old_process)
 	{
 		cpu_stack_t *dummy;
 
 		#if CONFIG_KERN_MONITOR
 			LOG_INFO("Switch from %p(%s) to %p(%s)\n",
 				old_process,    proc_name(old_process),
-				CurrentProcess, proc_currentName());
+				current_process, proc_currentName());
 		#endif
 
 		/* Save context of old process and switch to new process. If there is no
@@ -126,18 +126,17 @@ void proc_switch(void)
 		 * TODO: Instead of physically clearing the process at exit time, a zombie
 		 * list should be created.
 		 */
-		asm_switch_context(&CurrentProcess->stack, old_process ? &old_process->stack : &dummy);
+		asm_switch_context(&current_process->stack, old_process ? &old_process->stack : &dummy);
 	}
 
 	/* This RET resumes the execution on the new process */
 }
-
 
 /**
  * Co-operative context switch
  */
 void proc_yield(void)
 {
-	ATOMIC(SCHED_ENQUEUE(CurrentProcess));
+	ATOMIC(SCHED_ENQUEUE(current_process));
 	proc_switch();
 }

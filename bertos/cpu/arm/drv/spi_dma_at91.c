@@ -75,8 +75,7 @@ INLINE void spi_dma_startTx(void)
 	}
 }
 
-static void spi0_dma_write_irq_handler(void) __attribute__ ((interrupt));
-static void spi0_dma_write_irq_handler(void)
+static DECLARE_ISR(spi0_dma_write_irq_handler)
 {
 	SPI_DMA_STROBE_ON();
 	/* Pop sent chars from FIFO */
@@ -143,8 +142,7 @@ static int spi_dma_flush(UNUSED_ARG(struct KFile *, fd))
 	return 0;
 }
 
-static void spi0_dma_read_irq_handler(void) __attribute__ ((interrupt));
-static void spi0_dma_read_irq_handler(void)
+static DECLARE_ISR(spi0_dma_read_irq_handler)
 {
 	/* do nothing */
 	AIC_EOICR = 0;

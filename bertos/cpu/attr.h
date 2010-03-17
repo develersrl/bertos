@@ -42,6 +42,7 @@
 
 #include "detect.h"
 
+#include "cfg/cfg_proc.h"      /* CONFIG_KERN_PREEMPT */
 #include "cfg/cfg_attr.h"      /* CONFIG_FAST_MEM */
 
 
@@ -94,6 +95,8 @@
 
 	#ifdef __GNUC__
 		#define NOP         asm volatile ("nop")
+		/* This is a good thing to insert into busy-wait loops. */
+		#define PAUSE       asm volatile ("rep; nop" ::: "memory")
 		#define BREAKPOINT  asm volatile ("int3" ::)
 	#endif
 
@@ -152,11 +155,6 @@
 			#define FAST_RODATA /**/
 			#define FAST_FUNC /**/
 		#endif
-
-		/**
-		 * Function attribute to declare an interrupt service routine.
-		 */
-		#define ISR_FUNC __attribute__((interrupt))
 
 		/*
 		 * Function attribute to move it into ram memory.
@@ -237,6 +235,11 @@
 #ifndef FAST_RODATA
 	/// Data attribute to move constant data to fast memory storage.
 	#define FAST_RODATA /* */
+#endif
+
+#ifndef PAUSE
+	/// Generic PAUSE implementation.
+	#define PAUSE	{NOP; MEMORY_BARRIER;}
 #endif
 
 #endif /* CPU_ATTR_H */

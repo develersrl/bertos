@@ -645,7 +645,7 @@ struct SerialHardware *ser_hw_getdesc(int unit)
 #if CONFIG_SER_HWHANDSHAKE
 
 /// This interrupt is triggered when the CTS line goes high
-SIGNAL(SIG_CTS)
+DECLARE_ISR(SIG_CTS)
 {
 	// Re-enable UDR empty interrupt and TX, then disable CTS interrupt
 	UCSR0B = BV(BIT_RXCIE0) | BV(BIT_UDRIE0) | BV(BIT_RXEN0) | BV(BIT_TXEN0);
@@ -658,7 +658,7 @@ SIGNAL(SIG_CTS)
 /**
  * Serial 0 TX interrupt handler
  */
-SIGNAL(USART0_UDRE_vect)
+DECLARE_ISR(USART0_UDRE_vect)
 {
 	SER_STROBE_ON;
 
@@ -706,7 +706,7 @@ SIGNAL(USART0_UDRE_vect)
  * otherwise we'd stop the serial port with some data
  * still pending in the buffer.
  */
-SIGNAL(SIG_UART0_TRANS)
+DECLARE_ISR(SIG_UART0_TRANS)
 {
 	SER_STROBE_ON;
 
@@ -729,7 +729,7 @@ SIGNAL(SIG_UART0_TRANS)
 /**
  * Serial 1 TX interrupt handler
  */
-SIGNAL(USART1_UDRE_vect)
+DECLARE_ISR(USART1_UDRE_vect)
 {
 	SER_STROBE_ON;
 
@@ -767,7 +767,7 @@ SIGNAL(USART1_UDRE_vect)
  *
  * \sa port 0 TX complete handler.
  */
-SIGNAL(USART1_TX_vect)
+DECLARE_ISR(USART1_TX_vect)
 {
 	SER_STROBE_ON;
 
@@ -802,7 +802,7 @@ SIGNAL(USART1_TX_vect)
  *       RXCIE is cleared.  Unfortunately the RXC flag is read-only
  *       and can't be cleared by code.
  */
-SIGNAL(USART0_RX_vect)
+DECLARE_ISR(USART0_RX_vect)
 {
 	SER_STROBE_ON;
 
@@ -850,9 +850,9 @@ SIGNAL(USART0_RX_vect)
  * is heavily loaded, because an interrupt could be retriggered
  * when executing the handler prologue before RXCIE is disabled.
  *
- * \see SIGNAL(USART1_RX_vect)
+ * \see DECLARE_ISR(USART1_RX_vect)
  */
-SIGNAL(USART1_RX_vect)
+DECLARE_ISR(USART1_RX_vect)
 {
 	SER_STROBE_ON;
 
@@ -893,7 +893,7 @@ SIGNAL(USART1_RX_vect)
 /**
  * SPI interrupt handler
  */
-SIGNAL(SIG_SPI)
+DECLARE_ISR(SIG_SPI)
 {
 	SER_STROBE_ON;
 

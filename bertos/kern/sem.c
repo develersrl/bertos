@@ -82,9 +82,9 @@ bool sem_attempt(struct Semaphore *s)
 
 	proc_forbid();
 	sem_verify(s);
-	if ((!s->owner) || (s->owner == CurrentProcess))
+	if ((!s->owner) || (s->owner == current_process))
 	{
-		s->owner = CurrentProcess;
+		s->owner = current_process;
 		s->nest_count++;
 		result = true;
 	}
@@ -117,10 +117,10 @@ void sem_obtain(struct Semaphore *s)
 	sem_verify(s);
 
 	/* Is the semaphore already locked by another process? */
-	if (UNLIKELY(s->owner && (s->owner != CurrentProcess)))
+	if (UNLIKELY(s->owner && (s->owner != current_process)))
 	{
 		/* Append calling process to the wait queue */
-		ADDTAIL(&s->wait_queue, (Node *)CurrentProcess);
+		ADDTAIL(&s->wait_queue, (Node *)current_process);
 
 		/*
 		 * We will wake up only when the current owner calls
@@ -135,7 +135,7 @@ void sem_obtain(struct Semaphore *s)
 		ASSERT(LIST_EMPTY(&s->wait_queue));
 
 		/* The semaphore was free: lock it */
-		s->owner = CurrentProcess;
+		s->owner = current_process;
 		s->nest_count++;
 		proc_permit();
 	}
@@ -160,7 +160,7 @@ void sem_release(struct Semaphore *s)
 	proc_forbid();
 	sem_verify(s);
 
-	ASSERT(s->owner == CurrentProcess);
+	ASSERT(s->owner == current_process);
 
 	/*
 	 * Decrement nesting count and check if the semaphore

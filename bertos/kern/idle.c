@@ -38,11 +38,15 @@
 #include "idle.h"
 #include "proc.h"
 
+#include <cpu/power.h> // cpu_relax()
 #include <cfg/module.h>
+#include <cpu/types.h> // INT_MIN
 
+#include <kern/proc_p.h>
 
-// below there's a TRACE so we need a big stack
-PROC_DEFINE_STACK(idle_stack, KERN_MINSTACKSIZE * 2);
+struct Process *idle_proc;
+
+static PROC_DEFINE_STACK(idle_stack, KERN_MINSTACKSIZE);
 
 /**
  * The idle process
@@ -60,14 +64,21 @@ static NORETURN void idle(void)
 {
 	for (;;)
 	{
-		TRACE;
-		//monitor_report();
-		proc_yield(); // FIXME: CPU_IDLE
+		PAUSE;
+		proc_switch();
 	}
 }
 
 void idle_init(void)
 {
-	struct Process *idle_proc = proc_new(idle, NULL, sizeof(idle_stack), idle_stack);
-	proc_setPri(idle_proc, (int)~0);
+	/*
+	 * Idle will be added to the ProcReadyList, but immediately removed
+	 * after the first cpu_relax() execution.
+	 *
+	 * XXX: it would be better to never add idle_proc to the ProcReadyList,
+	 * e.g., changing the prototype of proc_new() (or introducing a
+	 * proc_new_nostart()) to allow the creation of "sleeping" tasks.
+	 */
+	idle_proc = proc_new(idle, NULL, sizeof(idle_stack), idle_stack);
+	proc_setPri(idle_proc, INT_MIN);
 }

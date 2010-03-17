@@ -65,13 +65,13 @@
  *
  * $WIZ$ type = "boolean"
  */
-#define CONFIG_KERN_PREEMPT 0
+#define CONFIG_KERN_PREEMPT 1
 
 /**
  * Priority-based scheduling policy.
  * $WIZ$ type = "boolean"
  */
-#define CONFIG_KERN_PRI 0
+#define CONFIG_KERN_PRI 1
 
 /**
  * Time sharing quantum (a prime number prevents interference effects) [ms].

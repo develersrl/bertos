@@ -48,11 +48,8 @@
 #include <cpu/types.h>        /* for cpu_stack_t */
 #include <cpu/irq.h>          // IRQ_ASSERT_DISABLED()
 
-#if CONFIG_KERN_PREEMPT
-	#include <ucontext.h> // XXX
-#endif
-
 #include <kern/proc.h>   // struct Process
+#include <kern/idle.h>        // idle_proc
 
 
 /**
@@ -64,19 +61,30 @@
 
 
 /** Track running processes. */
-extern REGISTER Process	*CurrentProcess;
+extern REGISTER Process	*current_process;
 
 /**
  * Track ready processes.
  *
  * Access to this list must be performed with interrupts disabled
  */
-extern REGISTER List     ProcReadyList;
+extern REGISTER List     proc_ready_list;
 
 #if CONFIG_KERN_PRI
-	#define SCHED_ENQUEUE_INTERNAL(proc) LIST_ENQUEUE(&ProcReadyList, &(proc)->link)
+	#define prio_next()	(LIST_EMPTY(&proc_ready_list) ? idle_proc->link.pri : \
+					((PriNode *)LIST_HEAD(&proc_ready_list))->pri)
+	#define prio_curr()	(current_process->link.pri)
+
+	#define SCHED_ENQUEUE_INTERNAL(proc) \
+			LIST_ENQUEUE(&proc_ready_list, &(proc)->link)
+	#define SCHED_ENQUEUE_HEAD_INTERNAL(proc) \
+			LIST_ENQUEUE_HEAD(&proc_ready_list, &(proc)->link)
 #else
-	#define SCHED_ENQUEUE_INTERNAL(proc) ADDTAIL(&ProcReadyList, &(proc)->link)
+	#define prio_next()	0
+	#define prio_curr()	0
+
+	#define SCHED_ENQUEUE_INTERNAL(proc) ADDTAIL(&proc_ready_list, &(proc)->link)
+	#define SCHED_ENQUEUE_HEAD_INTERNAL(proc) ADDHEAD(&proc_ready_list, &(proc)->link)
 #endif
 
 /**
@@ -90,9 +98,16 @@ extern REGISTER List     ProcReadyList;
  */
 #define SCHED_ENQUEUE(proc)  do { \
 		IRQ_ASSERT_DISABLED(); \
-		LIST_ASSERT_VALID(&ProcReadyList); \
+		LIST_ASSERT_VALID(&proc_ready_list); \
 		SCHED_ENQUEUE_INTERNAL(proc); \
 	} while (0)
+
+#define SCHED_ENQUEUE_HEAD(proc)  do { \
+		IRQ_ASSERT_DISABLED(); \
+		LIST_ASSERT_VALID(&proc_ready_list); \
+		SCHED_ENQUEUE_HEAD_INTERNAL(proc); \
+	} while (0)
+
 
 #if CONFIG_KERN_PRI
 /**
@@ -108,10 +123,10 @@ extern REGISTER List     ProcReadyList;
 INLINE void sched_reenqueue(struct Process *proc)
 {
 	IRQ_ASSERT_DISABLED();
-	LIST_ASSERT_VALID(&ProcReadyList);
+	LIST_ASSERT_VALID(&proc_ready_list);
 	Node *n;
 	PriNode *pos = NULL;
-	FOREACH_NODE(n, &ProcReadyList)
+	FOREACH_NODE(n, &proc_ready_list)
 	{
 		if (n == &proc->link.link)
 		{
@@ -125,18 +140,14 @@ INLINE void sched_reenqueue(struct Process *proc)
 	if (pos)
 	{
 		REMOVE(&proc->link.link);
-		LIST_ENQUEUE(&ProcReadyList, &proc->link);
+		LIST_ENQUEUE(&proc_ready_list, &proc->link);
 	}
 }
 #endif //CONFIG_KERN_PRI
 
 /// Schedule another process *without* adding the current one to the ready list.
 void proc_switch(void);
-
-#if CONFIG_KERN_PREEMPT
-void proc_entry(void (*user_entry)(void));
-void preempt_init(void);
-#endif
+void proc_entry(void);
 
 #if CONFIG_KERN_MONITOR
 	/** Initialize the monitor */

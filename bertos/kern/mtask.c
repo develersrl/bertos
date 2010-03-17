@@ -26,78 +26,25 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2001, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2001, 2004, 2008 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999, 2000, 2001, 2008 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
- * \brief Kernel configuration parameters
+ * \brief Choose the multitasking scheduler.
  *
- * \version $Id$
- * \author Bernie Innocenti <bernie@codewiz.org>
+ * \author Francesco Sacchi <batt@develer.com>
  */
 
-#ifndef CFG_PROC_H
-#define CFG_PROC_H
 
-/**
- * Enable the multithreading kernel.
- *
- * $WIZ$ type = "autoenabled"
+#include "cfg/cfg_proc.h"
+
+/*
+ * Choose which file to compile depending on
+ * the multitasking type.
  */
-#define CONFIG_KERN 0
+#if CONFIG_KERN_PREEMPT
+	#include "preempt.c"
+#else
+	#include "coop.c"
+#endif
 
-/**
- * Kernel interrupt supervisor. WARNING: Experimental, still incomplete!
- * $WIZ$ type = "boolean"
- * $WIZ$ supports = "False"
- */
-#define CONFIG_KERN_IRQ 0
-
-/**
- * Dynamic memory allocation for processes.
- *
- * $WIZ$ type = "boolean"
- * $WIZ$ supports = "False"
- */
-#define CONFIG_KERN_HEAP 0
-
-/**
- * Preemptive process scheduling.
- *
- * $WIZ$ type = "boolean"
- * $WIZ$ conditional_deps = "timer", "idle"
- */
-#define CONFIG_KERN_PREEMPT 0
-
-/**
- * Priority-based scheduling policy.
- * $WIZ$ type = "boolean"
- */
-#define CONFIG_KERN_PRI 0
-
-/**
- * Time sharing quantum (a prime number prevents interference effects) [ms].
- *
- * $WIZ$ type = "int"
- * $WIZ$ min = 1
- * $WIZ$ supports = "False"
- */
-#define CONFIG_KERN_QUANTUM 47
-
-/**
- * Module logging level.
- *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_level"
- */
-#define KERN_LOG_LEVEL LOG_LVL_ERR
-
-/**
- * Module logging format.
- *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_format"
- */
-#define KERN_LOG_FORMAT LOG_FMT_VERBOSE
-
-#endif /*  CFG_PROC_H */

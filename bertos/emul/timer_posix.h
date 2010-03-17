@@ -41,7 +41,7 @@
 
 // HW dependent timer initialization
 
-#define DEFINE_TIMER_ISR     void timer_isr(UNUSED_ARG(int, arg))
+#define DEFINE_TIMER_ISR     DECLARE_ISR_CONTEXT_SWITCH(timer_isr)
 
 /** Most Linux kernels can't do better than this (CONFIG_HZ=250). */
 #define TIMER_TICKS_PER_SEC  250

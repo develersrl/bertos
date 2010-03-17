@@ -60,11 +60,11 @@
 #define CONFIG_KERN_HEAP 0
 
 /**
- * Preemptive process scheduling. WARNING: Experimental, still incomplete!
+ * Preemptive process scheduling.
  *
  * $WIZ$ type = "boolean"
  */
-#define CONFIG_KERN_PREEMPT 0
+#define CONFIG_KERN_PREEMPT 1
 
 /**
  * Priority-based scheduling policy.

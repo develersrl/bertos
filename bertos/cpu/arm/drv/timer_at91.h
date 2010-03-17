@@ -64,9 +64,13 @@
  */
 #if (CONFIG_TIMER == TIMER_ON_PIT)
 
-	void timer_handler(void);
+	/*
+	 * On ARM all IRQs are handled by the sysirq_dispatcher, so the actual
+	 * timer handler can be treated like any other normal routine.
+	 */
+	#define DEFINE_TIMER_ISR	void timer_handler(void);	\
+					void timer_handler(void)
 
-	#define DEFINE_TIMER_ISR     void timer_handler(void)
 	#define TIMER_TICKS_PER_SEC  1000
 	#define TIMER_HW_CNT         (CPU_FREQ / (16 * TIMER_TICKS_PER_SEC) - 1)
 

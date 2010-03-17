@@ -50,6 +50,8 @@
 /** HW dependent timer initialization  */
 #if (CONFIG_TIMER == TIMER_ON_PIT)
 
+	ISR_PROTO_CONTEXT_SWITCH(timer_handler);
+
 	void timer_hw_init(void)
 	{
 		sysirq_init();

@@ -46,22 +46,16 @@
 /* void asm_switch_context(void ** new_sp [sp+4], void ** save_sp [sp+8]) */
 .globl SWITCH_CONTEXT
 SWITCH_CONTEXT:
-	pushl	%eax
-	pushl	%ebx
-	pushl	%ecx
-	pushl	%edx
-	pushl	%esi
-	pushl	%edi
 	pushl	%ebp
+	pushl	%edi
+	pushl	%esi
+	pushl	%ebx
 	movl	0x24(%esp),%ebp         /* ebp = save_sp */
 	movl	%esp,(%ebp)             /* *save_sp = esp */
 	movl	0x20(%esp),%ebp         /* ebp = new_sp */
 	movl	(%ebp),%esp             /* esp = *new_sp */
-	popl	%ebp
-	popl	%edi
-	popl	%esi
-	popl	%edx
-	popl	%ecx
 	popl	%ebx
-	popl	%eax
+	popl	%esi
+	popl	%edi
+	popl	%ebp
 	ret

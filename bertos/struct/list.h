@@ -276,9 +276,24 @@ typedef struct _PriNode
 /**
  * Insert a priority node in a priority queue.
  *
- * The new node is inserted immediately before the
- * first node with lower priority or appended to
- * the tail if no such node exists.
+ * The new node is inserted immediately before the first node with the same
+ * priority or appended to the tail if no such node exists.
+ */
+#define LIST_ENQUEUE_HEAD(list, node) \
+	do { \
+		PriNode *ln; \
+		LIST_ASSERT_NOT_CONTAINS((list),(node)); \
+		FOREACH_NODE(ln, (list)) \
+			if (ln->pri <= (node)->pri) \
+				break; \
+		INSERT_BEFORE(&(node)->link, &ln->link); \
+	} while (0)
+
+/**
+ * Insert a priority node in a priority queue.
+ *
+ * The new node is inserted immediately before the first node with lower
+ * priority or appended to the tail if no such node exists.
  */
 #define LIST_ENQUEUE(list, node) \
 	do { \

@@ -84,7 +84,7 @@
 	 * ADC ISR.
 	 * Simply signal the adc process that convertion is complete.
 	 */
-	static void ISR_FUNC adc_conversion_end_irq(void)
+	static DECLARE_ISR(adc_conversion_end_irq)
 	{
 		sig_signal(adc_process, SIG_ADC_COMPLETE);
 

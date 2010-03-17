@@ -37,5 +37,7 @@
 #ifndef KERN_IDLE_H
 #define KERN_IDLE_H
 
+extern struct Process *idle_proc;
+
 void idle_init(void);
 #endif /* KERN_IDLE_H */

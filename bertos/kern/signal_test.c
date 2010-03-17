@@ -166,12 +166,6 @@ int signal_testSetup(void)
 {
 	kdbg_init();
 
-	#if CONFIG_KERN_PREEMPT
-		kprintf("Init Interrupt (preempt mode)..");
-		irq_init();
-		kprintf("Done.\n");
-	#endif
-
 	kprintf("Init Timer..");
 	timer_init();
 	kprintf("Done.\n");

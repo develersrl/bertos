@@ -51,51 +51,26 @@
 #include <cfg/compiler.h>      /* for uintXX_t */
 
 #if CPU_X86
+	#if CPU_X86_32
 
-	#define CPU_SAVED_REGS_CNT      7
-	#define CPU_STACK_GROWS_UPWARD  0
-	#define CPU_SP_ON_EMPTY_SLOT	0
+		#define CPU_SAVED_REGS_CNT      4
+		#define CPU_STACK_GROWS_UPWARD  0
+		#define CPU_SP_ON_EMPTY_SLOT	0
+
+	#elif CPU_X86_64
+
+		#define CPU_SAVED_REGS_CNT      8
+		#define CPU_STACK_GROWS_UPWARD  0
+		#define CPU_SP_ON_EMPTY_SLOT	0
+	#else
+		#error "unknown CPU"
+	#endif
 
 #elif CPU_ARM
 
-	#define CPU_SAVED_REGS_CNT     10
+	#define CPU_SAVED_REGS_CNT     8
 	#define CPU_STACK_GROWS_UPWARD 0
 	#define CPU_SP_ON_EMPTY_SLOT   0
-
-
-	EXTERN_C void asm_proc_entry(void);
-	/**
-	 * Initialization value for registers in stack frame.
-	 * For the CPSR register, the initial value is set to:
-	 * - All flags (N, Z, C, V) set to 0.
-	 * - IRQ and FIQ enabled.
-	 * - ARM state.
-	 * - CPU in Supervisor Mode (SVC).
-	 */
-	#define CPU_CREATE_NEW_STACK(stack, entry, exit) \
-	do { \
-		/* LR (asm proc_entry trampoline) */ \
-		CPU_PUSH_CALL_FRAME(stack, asm_proc_entry); \
-		/* R11 (Process entry point) DO NOT CHANGE: asm_proc_entry expects \
-		 * to find the actual process entry point in R11 */ \
-		CPU_PUSH_CALL_FRAME(stack, entry); \
-		/* R10 */ \
-		CPU_PUSH_WORD(stack, 0x10101010); \
-		/* R9 */ \
-		CPU_PUSH_WORD(stack, 0x09090909); \
-		/* R8 */ \
-		CPU_PUSH_WORD(stack, 0x08080808); \
-		/* R7 */ \
-		CPU_PUSH_WORD(stack, 0x07070707); \
-		/* R6 */ \
-		CPU_PUSH_WORD(stack, 0x06060606); \
-		/* R5 */ \
-		CPU_PUSH_WORD(stack, 0x05050505); \
-		/* R4 */ \
-		CPU_PUSH_WORD(stack, 0x04040404); \
-		/* CPSR */ \
-		CPU_PUSH_WORD(stack, 0x00000013); \
-	} while (0)
 
 #elif CPU_PPC
 
@@ -111,17 +86,9 @@
 
 #elif CPU_AVR
 
-	#define CPU_SAVED_REGS_CNT     19
+	#define CPU_SAVED_REGS_CNT     18
 	#define CPU_STACK_GROWS_UPWARD  0
 	#define CPU_SP_ON_EMPTY_SLOT    1
-
-	/**
-	 * Initialization value for registers in stack frame.
-	 * The register index is not directly corrispondent to CPU
-	 * register numbers. Index 0 is the SREG register: the initial
-	 * value is all 0 but the interrupt bit (bit 7).
-	 */
-	#define CPU_REG_INIT_VALUE(reg) (reg == 0 ? 0x80 : 0)
 
 #else
 	#error No CPU_... defined.
@@ -137,7 +104,7 @@
 
 /// Default for macro not defined in the right arch section
 #ifndef CPU_REG_INIT_VALUE
-	#define CPU_REG_INIT_VALUE(reg)     0
+	#define CPU_REG_INIT_VALUE(reg)     (reg)
 #endif
 
 /*
@@ -263,12 +230,11 @@
  */
 #ifndef CPU_CREATE_NEW_STACK
 
-	#define CPU_CREATE_NEW_STACK(stack, entry, exit) \
+	#define CPU_CREATE_NEW_STACK(stack) \
 		do { \
 			size_t i; \
 			/* Initialize process stack frame */ \
-			CPU_PUSH_CALL_FRAME(stack, exit); \
-			CPU_PUSH_CALL_FRAME(stack, entry); \
+			CPU_PUSH_CALL_FRAME(stack, proc_entry); \
 			/* Push a clean set of CPU registers for asm_switch_context() */ \
 			for (i = 0; i < CPU_SAVED_REGS_CNT; i++) \
 				CPU_PUSH_WORD(stack, CPU_REG_INIT_VALUE(i)); \

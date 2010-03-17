@@ -74,9 +74,9 @@
 	#define TIMER_PRESCALER      64
 	#define TIMER_HW_BITS        8
 	#if CPU_AVR_ATMEGA1281 || CPU_AVR_ATMEGA168
-		#define DEFINE_TIMER_ISR     SIGNAL(SIG_OUTPUT_COMPARE0A)
+		#define DEFINE_TIMER_ISR     DECLARE_ISR_CONTEXT_SWITCH(TIMER0_COMPA_vect)
 	#else
-		#define DEFINE_TIMER_ISR     SIGNAL(SIG_OUTPUT_COMPARE0)
+		#define DEFINE_TIMER_ISR     DECLARE_ISR_CONTEXT_SWITCH(TIMER0_COMP_vect)
 	#endif
 	#define TIMER_TICKS_PER_SEC  1000
 	#define TIMER_HW_CNT         OCR_DIVISOR
@@ -96,7 +96,7 @@
 	#define TIMER_HW_BITS        8
 	/** This value is the maximum in overflow based timers. */
 	#define TIMER_HW_CNT         (1 << TIMER_HW_BITS)
-	#define DEFINE_TIMER_ISR     SIGNAL(SIG_OVERFLOW1)
+	#define DEFINE_TIMER_ISR     DECLARE_ISR_CONTEXT_SWITCH(TIMER1_OVF_vect)
 	#define TIMER_TICKS_PER_SEC  DIV_ROUND(TIMER_HW_HPTICKS_PER_SEC, TIMER_HW_CNT)
 
 	/// Type of time expressed in ticks of the hardware high precision timer
@@ -113,9 +113,9 @@
 	#define TIMER_PRESCALER      64
 	#define TIMER_HW_BITS        8
 	#if CPU_AVR_ATMEGA1281 || CPU_AVR_ATMEGA168
-		#define DEFINE_TIMER_ISR     SIGNAL(SIG_OUTPUT_COMPARE2A)
+		#define DEFINE_TIMER_ISR     DECLARE_ISR_CONTEXT_SWITCH(TIMER2_COMPA_vect)
 	#else
-		#define DEFINE_TIMER_ISR     SIGNAL(SIG_OUTPUT_COMPARE2)
+		#define DEFINE_TIMER_ISR     DECLARE_ISR_CONTEXT_SWITCH(TIMER2_COMP_vect)
 	#endif
 	#define TIMER_TICKS_PER_SEC  1000
 	/** Value for OCR register in output-compare based timers. */
@@ -136,7 +136,7 @@
 	#define TIMER_HW_BITS        8
 	/** This value is the maximum in overflow based timers. */
 	#define TIMER_HW_CNT         (1 << TIMER_HW_BITS)
-	#define DEFINE_TIMER_ISR     SIGNAL(SIG_OVERFLOW3)
+	#define DEFINE_TIMER_ISR     DECLARE_ISR_CONTEXT_SWITCH(TIMER3_OVF_vect)
 	#define TIMER_TICKS_PER_SEC  DIV_ROUND(TIMER_HW_HPTICKS_PER_SEC, TIMER_HW_CNT)
 
 	/// Type of time expressed in ticks of the hardware high precision timer

@@ -37,7 +37,7 @@
  *
  * $WIZ$ module_name = "kernel"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_proc.h"
- * $WIZ$ module_depends = "switch_ctx", "coop"
+ * $WIZ$ module_depends = "switch_ctx", "mtask"
  * $WIZ$ module_supports = "not atmega103"
  */
 
@@ -85,14 +85,13 @@ typedef struct Process
 	uint16_t     flags;       /**< Flags */
 #endif
 
-#if CONFIG_KERN_HEAP | CONFIG_KERN_MONITOR | (ARCH & ARCH_EMUL)
+#if CONFIG_KERN_HEAP | CONFIG_KERN_MONITOR
 	cpu_stack_t  *stack_base;  /**< Base of process stack */
 	size_t       stack_size;  /**< Size of process stack */
 #endif
 
-#if CONFIG_KERN_PREEMPT
-	ucontext_t   context;
-#endif
+	/* The actual process entry point */
+	void (*user_entry)(void);
 
 #if CONFIG_KERN_MONITOR
 	struct ProcMonitor
@@ -128,7 +127,7 @@ struct Process *proc_new_with_name(const char *name, void (*entry)(void), iptr_t
 	 * \param data Pointer to user data.
 	 * \param size Length of the stack.
 	 * \param stack Pointer to the memory area to be used as a stack.
-	 * 
+	 *
 	 * \return Process structure of new created process
 	 *         if successful, NULL otherwise.
 	 */
@@ -179,8 +178,8 @@ int proc_testTearDown(void);
  */
 INLINE struct Process *proc_current(void)
 {
-	extern struct Process *CurrentProcess;
-	return CurrentProcess;
+	extern struct Process *current_process;
+	return current_process;
 }
 
 #if CONFIG_KERN_PRI
@@ -191,30 +190,28 @@ INLINE struct Process *proc_current(void)
 	}
 #endif
 
-/**
- * Disable preemptive task switching.
- *
- * The scheduler maintains a global nesting counter.  Task switching is
- * effectively re-enabled only when the number of calls to proc_permit()
- * matches the number of calls to proc_forbid().
- *
- * \note Calling functions that could sleep while task switching is disabled
- * is dangerous and unsupported.
- *
- * \note calling proc_forbid() from within an interrupt is illegal and
- * meaningless.
- *
- * \note proc_permit() expands inline to 1-2 asm instructions, so it's a
- * very efficient locking primitive in simple but performance-critical
- * situations.  In all other cases, semaphores offer a more flexible and
- * fine-grained locking primitive.
- *
- * \sa proc_permit()
- */
-INLINE void proc_forbid(void)
-{
-	#if CONFIG_KERN_PREEMPT
-		extern cpu_atomic_t _preempt_forbid_cnt;
+#if CONFIG_KERN_PREEMPT
+
+	/**
+	 * Disable preemptive task switching.
+	 *
+	 * The scheduler maintains a global nesting counter.  Task switching is
+	 * effectively re-enabled only when the number of calls to proc_permit()
+	 * matches the number of calls to proc_forbid().
+	 *
+	 * \note Calling functions that could sleep while task switching is disabled
+	 * is dangerous and unsupported.
+	 *
+	 * \note proc_permit() expands inline to 1-2 asm instructions, so it's a
+	 * very efficient locking primitive in simple but performance-critical
+	 * situations.  In all other cases, semaphores offer a more flexible and
+	 * fine-grained locking primitive.
+	 *
+	 * \sa proc_permit()
+	 */
+	INLINE void proc_forbid(void)
+	{
+		extern cpu_atomic_t preempt_count;
 		/*
 		 * We don't need to protect the counter against other processes.
 		 * The reason why is a bit subtle.
@@ -238,58 +235,54 @@ INLINE void proc_forbid(void)
 		 * "preempt_forbid_cnt != 0" means that no task switching is
 		 * possible.
 		 */
-		++_preempt_forbid_cnt;
+		++preempt_count;
 
 		/*
-		 * Make sure _preempt_forbid_cnt is flushed to memory so the
-		 * preemption softirq will see the correct value from now on.
+		 * Make sure preempt_count is flushed to memory so the preemption
+		 * softirq will see the correct value from now on.
 		 */
 		MEMORY_BARRIER;
-	#endif
-}
+	}
 
-/**
- * Re-enable preemptive task switching.
- *
- * \sa proc_forbid()
- */
-INLINE void proc_permit(void)
-{
-	#if CONFIG_KERN_PREEMPT
+	/**
+	 * Re-enable preemptive task switching.
+	 *
+	 * \sa proc_forbid()
+	 */
+	INLINE void proc_permit(void)
+	{
+		extern cpu_atomic_t preempt_count;
 
 		/*
 		 * This is to ensure any global state changed by the process gets
 		 * flushed to memory before task switching is re-enabled.
 		 */
 		MEMORY_BARRIER;
-		extern cpu_atomic_t _preempt_forbid_cnt;
 		/* No need to protect against interrupts here. */
-		ASSERT(_preempt_forbid_cnt != 0);
-		--_preempt_forbid_cnt;
-
+		ASSERT(preempt_count > 0);
+		--preempt_count;
 		/*
-		 * This ensures _preempt_forbid_cnt is flushed to memory immediately
-		 * so the preemption interrupt sees the correct value.
+		 * This ensures preempt_count is flushed to memory immediately so the
+		 * preemption interrupt sees the correct value.
 		 */
 		MEMORY_BARRIER;
+	}
 
-	#endif
-}
-
-/**
- * \return true if preemptive task switching is allowed.
- * \note This accessor is needed because _preempt_forbid_cnt
- *       must be absoultely private.
- */
-INLINE bool proc_preemptAllowed(void)
-{
-	#if CONFIG_KERN_PREEMPT
-		extern cpu_atomic_t _preempt_forbid_cnt;
-		return (_preempt_forbid_cnt == 0);
-	#else
-		return true;
-	#endif
-}
+	/**
+	 * \return true if preemptive task switching is allowed.
+	 * \note This accessor is needed because preempt_count
+	 *       must be absoultely private.
+	 */
+	INLINE bool proc_preemptAllowed(void)
+	{
+		extern cpu_atomic_t preempt_count;
+		return (preempt_count == 0);
+	}
+#else /* CONFIG_KERN_PREEMPT */
+	#define proc_forbid() /* NOP */
+	#define proc_permit() /* NOP */
+	#define proc_preemptAllowed() (true)
+#endif /* CONFIG_KERN_PREEMPT */
 
 /** Deprecated, use the proc_preemptAllowed() macro. */
 #define proc_allowed() proc_preemptAllowed()
@@ -326,9 +319,28 @@ INLINE bool proc_preemptAllowed(void)
 	/* We need a large stack because system libraries are bloated */
 	#define KERN_MINSTACKSIZE 65536
 #else
-	#define KERN_MINSTACKSIZE \
-		(sizeof(Process) + CPU_SAVED_REGS_CNT * 2 * sizeof(cpu_stack_t) \
-		+ 32 * sizeof(int))
+	#if CONFIG_KERN_PREEMPT
+		/*
+		 * A preemptible kernel needs a larger stack compared to the
+		 * cooperative case. A task can be interrupted anytime in each
+		 * node of the call graph, at any level of depth. This may
+		 * result in a higher stack consumption, to call the ISR, save
+		 * the current user context and to execute the kernel
+		 * preemption routines implemented as ISR prologue and
+		 * epilogue. All these calls are nested into the process stack.
+		 *
+		 * So, to reduce the risk of stack overflow/underflow problems
+		 * add a x2 to the portion stack reserved to the user process.
+		 */
+		#define KERN_MINSTACKSIZE \
+			(sizeof(Process) + CPU_SAVED_REGS_CNT * 2 * sizeof(cpu_stack_t) \
+			+ 32 * sizeof(int) * 2)
+	#else
+		#define KERN_MINSTACKSIZE \
+			(sizeof(Process) + CPU_SAVED_REGS_CNT * 2 * sizeof(cpu_stack_t) \
+			+ 32 * sizeof(int))
+	#endif /* CONFIG_KERN_PREEMPT */
+
 #endif
 
 #ifndef CONFIG_KERN_MINSTACKSIZE
@@ -350,8 +362,8 @@ INLINE bool proc_preemptAllowed(void)
  * \param size Stack size in bytes. It must be at least KERN_MINSTACKSIZE.
  */
 #define PROC_DEFINE_STACK(name, size) \
-	STATIC_ASSERT((size) >= KERN_MINSTACKSIZE); \
-	cpu_stack_t name[((size) + sizeof(cpu_stack_t) - 1) / sizeof(cpu_stack_t)];
+	cpu_stack_t name[((size) + sizeof(cpu_stack_t) - 1) / sizeof(cpu_stack_t)]; \
+	STATIC_ASSERT((size) >= KERN_MINSTACKSIZE)
 
 /* Memory fill codes to help debugging */
 #if CONFIG_KERN_MONITOR
