@@ -52,19 +52,14 @@
 
 #if CPU_X86
 	#if CPU_X86_32
-
 		#define CPU_SAVED_REGS_CNT      2
-		#define CPU_STACK_GROWS_UPWARD  0
-		#define CPU_SP_ON_EMPTY_SLOT	0
-
 	#elif CPU_X86_64
-
 		#define CPU_SAVED_REGS_CNT      8
-		#define CPU_STACK_GROWS_UPWARD  0
-		#define CPU_SP_ON_EMPTY_SLOT	0
 	#else
 		#error "unknown CPU"
 	#endif
+	#define CPU_STACK_GROWS_UPWARD  0
+	#define CPU_SP_ON_EMPTY_SLOT	0
 
 #elif CPU_ARM
 
