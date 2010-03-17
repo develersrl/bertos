@@ -337,12 +337,6 @@
 			INLINE void __isr_##vect(void)
 
 		/**
-		 * Interrupt service routine prototype: can be used for
-		 * forward declarations.
-		 */
-		#define ISR_PROTO(vect)	ISR(vect)
-
-		/**
 		 * With task priorities enabled each ISR is used a point to
 		 * check if we need to perform a context switch.
 		 *
@@ -355,23 +349,23 @@
 		#if CONFIG_KERN_PRI
 			#define DECLARE_ISR(func) \
 				DECLARE_ISR_CONTEXT_SWITCH(func)
-
+			/**
+			 * Interrupt service routine prototype: can be used for
+			 * forward declarations.
+			 */
 			#define ISR_PROTO(func) \
 				ISR_PROTO_CONTEXT_SWITCH(func)
 		#endif /* !CONFIG_KERN_PRI */
 	#endif
 
-	#ifndef DECLARE_ISR
-		#define ISR_PROTO(vect) ISR(vect)
+	#ifndef ISR_PROTO
+		#define ISR_PROTO(vect)	ISR(vect)
 	#endif
 	#ifndef DECLARE_ISR
 		#define DECLARE_ISR(vect) ISR(vect)
 	#endif
 	#ifndef DECLARE_ISR_CONTEXT_SWITCH
 		#define DECLARE_ISR_CONTEXT_SWITCH(vect) ISR(vect)
-	#endif
-	#ifndef ISR_PROTO
-		#define ISR_PROTO(func) ISR(vect)
 	#endif
 	#ifndef ISR_PROTO_CONTEXT_SWITCH
 		#define ISR_PROTO_CONTEXT_SWITCH(func) ISR(vect)
