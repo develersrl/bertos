@@ -94,8 +94,10 @@ STATIC_ASSERT(countof(sysirq_tab) == SYSIRQ_CNT);
  * various sources (system timer, etc..) and calls
  * the corresponding handler.
  *
- * \note On ARM all IRQs are handled by the sysirq_dispatcher, so we can't
- * differentiate between context-switch and non-context-switch ISR.
+ * \note On AT91SAM7, all system IRQs (timer included) are handled
+ * by the sysirq_dispatcher, so we can't differentiate between
+ * context-switch and non-context-switch ISR inside this
+ * class of IRQs.
  */
 static DECLARE_ISR_CONTEXT_SWITCH(sysirq_dispatcher)
 {

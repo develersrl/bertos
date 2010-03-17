@@ -65,7 +65,7 @@
 #if (CONFIG_TIMER == TIMER_ON_PIT)
 
 	/*
-	 * On ARM all IRQs are handled by the sysirq_dispatcher, so the actual
+	 * On ARM all system IRQs are handled by the sysirq_dispatcher, so the actual
 	 * timer handler can be treated like any other normal routine.
 	 */
 	#define DEFINE_TIMER_ISR	void timer_handler(void);	\
