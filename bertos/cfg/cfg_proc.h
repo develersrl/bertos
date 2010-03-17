@@ -55,11 +55,17 @@
 
 /**
  * Dynamic memory allocation for processes.
- *
  * $WIZ$ type = "boolean"
- * $WIZ$ supports = "False"
+ * $WIZ$ conditional_deps = "heap"
  */
 #define CONFIG_KERN_HEAP 0
+
+/**
+ * Size of the dynamic memory pool used by processes.
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 0
+ */
+#define CONFIG_KERN_HEAP_SIZE 8192L
 
 /**
  * Preemptive process scheduling.
@@ -80,7 +86,6 @@
  *
  * $WIZ$ type = "int"
  * $WIZ$ min = 1
- * $WIZ$ supports = "False"
  */
 #define CONFIG_KERN_QUANTUM 47
 

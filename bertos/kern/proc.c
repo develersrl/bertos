@@ -85,7 +85,7 @@ static struct Process main_process;
 /**
  * Local heap dedicated to allocate the memory used by the processes.
  */
-static HEAP_DEFINE_BUF(heap_buf, KERN_MINSTACKSIZE * 128);
+static HEAP_DEFINE_BUF(heap_buf, CONFIG_KERN_HEAP_SIZE);
 static Heap proc_heap;
 
 /*
