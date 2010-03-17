@@ -84,13 +84,17 @@ static char name[TASKS][32];
 
 static unsigned int done[TASKS];
 
-#define WORKER_STACK_SIZE KERN_MINSTACKSIZE * 3
+static cpu_atomic_t barrier[TASKS];
+static cpu_atomic_t main_barrier;
+
+#define WORKER_STACK_SIZE KERN_MINSTACKSIZE * 2
 
 /* Base time delay for processes using timer_delay() */
 #define DELAY	5
 
 // Define process stacks for test.
-static PROC_DEFINE_STACK(worker_stack, TASKS * WORKER_STACK_SIZE);
+static cpu_stack_t worker_stack[TASKS][(WORKER_STACK_SIZE +
+			sizeof(cpu_stack_t) - 1) / sizeof(cpu_stack_t)];
 
 static int prime_numbers[] =
 {
@@ -100,6 +104,27 @@ static int prime_numbers[] =
 
 STATIC_ASSERT(TASKS <= countof(prime_numbers));
 
+#if CONFIG_KERN_PREEMPT
+/* Time to run each preemptible thread (in seconds) */
+#define TIME	10
+
+static unsigned int preempt_counter[TASKS];
+static unsigned int preempt_done[TASKS];
+#endif
+
+static void cleanup(void)
+{
+#if CONFIG_KERN_PREEMPT
+	// Clear shared data (this is needed when this testcase is embedded in
+	// the demo application).
+	memset(preempt_counter, 0, sizeof(preempt_counter));
+	memset(preempt_done, 0, sizeof(preempt_done));
+#endif /* CONFIG_KERN_PREEMPT */
+	memset(done, 0, sizeof(done));
+	memset(barrier, 0, sizeof(barrier));
+	main_barrier = 0;
+}
+
 static void worker(void)
 {
 	ssize_t pid = (ssize_t)proc_currentUserData();
@@ -107,6 +132,10 @@ static void worker(void)
 	unsigned int my_count = 0;
 	int i;
 
+	barrier[pid - 1] = 1;
+	/* Synchronize on the main barrier */
+	while (!main_barrier)
+		proc_yield();
 	for (i = 0; i < tot; i++)
 	{
 		my_count++;
@@ -122,6 +151,7 @@ static int worker_test(void)
 	ssize_t i;
 
 	// Init the test processes
+	cleanup();
 	kputs("Run Proc test..\n");
 	for (i = 0; i < TASKS; i++)
 	{
@@ -129,9 +159,20 @@ static int worker_test(void)
 		snprintf(&name[i][0], sizeof(name[i]), "worker_%zd", i + 1);
 		name[i][sizeof(name[i]) - 1] = '\0';
 		proc_new_with_name(name[i], worker, (iptr_t)(i + 1),
-				WORKER_STACK_SIZE,
-				(cpu_stack_t *)((size_t)&worker_stack + WORKER_STACK_SIZE * i));
+				WORKER_STACK_SIZE, &worker_stack[i][0]);
 	}
+	/* Synchronize on start */
+	while (1)
+	{
+		for (i = 0; i < TASKS; i++)
+			if (!barrier[i])
+				break;
+		if (i == TASKS)
+			break;
+		proc_yield();
+	}
+	main_barrier = 1;
+	MEMORY_BARRIER;
 	kputs("> Main: Processes started\n");
 	while (1)
 	{
@@ -150,15 +191,6 @@ static int worker_test(void)
 }
 
 #if CONFIG_KERN_PREEMPT
-/* Time to run each preemptible thread (in seconds) */
-#define TIME	10
-
-static cpu_atomic_t barrier[TASKS];
-static cpu_atomic_t main_barrier;
-
-static unsigned int preempt_counter[TASKS];
-static unsigned int preempt_done[TASKS];
-
 static void preempt_worker(void)
 {
 	ssize_t pid = (ssize_t)proc_currentUserData();
@@ -198,6 +230,7 @@ static int preempt_worker_test(void)
 	ssize_t i;
 
 	// Init the test processes
+	cleanup();
 	kputs("Run Preemption test..\n");
 	for (i = 0; i < TASKS; i++)
 	{
@@ -206,8 +239,7 @@ static int preempt_worker_test(void)
 				"preempt_worker_%zd", i + 1);
 		name[i][sizeof(name[i]) - 1] = '\0';
 		proc_new_with_name(name[i], preempt_worker, (iptr_t)(i + 1),
-				WORKER_STACK_SIZE,
-				(cpu_stack_t *)((size_t)&worker_stack + WORKER_STACK_SIZE * i));
+				WORKER_STACK_SIZE, &worker_stack[i][0]);
 	}
 	kputs("> Main: Processes created\n");
 	/* Synchronize on start */
@@ -337,16 +369,6 @@ out:
  */
 int proc_testRun(void)
 {
-#if CONFIG_KERN_PREEMPT
-	// Clear shared data (this is needed when this testcase is embedded in
-	// the demo application).
-	memset(preempt_counter, 0, sizeof(preempt_counter));
-	memset(preempt_done, 0, sizeof(preempt_done));
-	memset(barrier, 0, sizeof(barrier));
-	main_barrier = 0;
-#endif /* CONFIG_KERN_PREEMPT */
-	memset(done, 0, sizeof(done));
-
 	/* Start tests */
 	worker_test();
 #if CONFIG_KERN_PREEMPT
