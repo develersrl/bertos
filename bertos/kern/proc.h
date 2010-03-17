@@ -363,7 +363,7 @@ INLINE struct Process *proc_current(void)
  */
 #define PROC_DEFINE_STACK(name, size) \
 	cpu_stack_t name[((size) + sizeof(cpu_stack_t) - 1) / sizeof(cpu_stack_t)]; \
-	STATIC_ASSERT((size) >= KERN_MINSTACKSIZE)
+	STATIC_ASSERT((size) >= KERN_MINSTACKSIZE);
 
 /* Memory fill codes to help debugging */
 #if CONFIG_KERN_MONITOR
