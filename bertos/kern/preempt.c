@@ -203,6 +203,7 @@ void proc_preempt(void)
 void proc_switch(void)
 {
 	ASSERT(proc_preemptAllowed());
+	IRQ_ASSERT_ENABLED();
 
 	ATOMIC(proc_schedule());
 }
@@ -219,6 +220,7 @@ void proc_yield(void)
 	 * ASSERT if it happens.
 	 */
 	ASSERT(proc_preemptAllowed());
+	IRQ_ASSERT_ENABLED();
 
 	ATOMIC(
 		SCHED_ENQUEUE(current_process);
