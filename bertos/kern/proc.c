@@ -60,6 +60,8 @@
 
 #include <string.h>           /* memset() */
 
+#define PROC_SIZE_WORDS (ROUND_UP2(sizeof(Process), sizeof(cpu_stack_t)) / sizeof(cpu_stack_t))
+
 /*
  * The scheduer tracks ready processes by enqueuing them in the
  * ready list.
@@ -163,8 +165,10 @@ static void proc_freeZombies(void)
 			return;
 
 		if (proc->flags & PF_FREESTACK)
+		{
 			PROC_ATOMIC(heap_freemem(&proc_heap, proc->stack_base,
-					proc->stack_size));
+				proc->stack_size + PROC_SIZE_WORDS * sizeof(cpu_stack_t)));
+		}
 	}
 }
 
@@ -206,7 +210,6 @@ static void proc_addZombie(Process *proc)
 struct Process *proc_new_with_name(UNUSED_ARG(const char *, name), void (*entry)(void), iptr_t data, size_t stack_size, cpu_stack_t *stack_base)
 {
 	Process *proc;
-	const size_t PROC_SIZE_WORDS = ROUND_UP2(sizeof(Process), sizeof(cpu_stack_t)) / sizeof(cpu_stack_t);
 	LOG_INFO("name=%s", name);
 #if CONFIG_KERN_HEAP
 	bool free_stack = false;
