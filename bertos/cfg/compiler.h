@@ -490,6 +490,16 @@ typedef unsigned char page_t;    /**< Type for banked memory pages. */
 	 */
 	#define countof(a)  (sizeof(a) / sizeof(*(a)))
 #endif
+#ifndef alignof
+	/**
+	 * Return the alignment in memory of a generic data type.
+	 *
+	 * \note We need to worry about alignment when allocating memory that
+	 * will be used later by unknown objects (e.g., malloc()) or, more
+	 * generally, whenever creating generic container types.
+	 */
+	#define alignof(type) offsetof(struct { char c; type member; }, member)
+#endif
 
 /**
  * Cast a member of a structure out to the containing structure.
