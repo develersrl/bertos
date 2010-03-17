@@ -53,7 +53,7 @@
 #if CPU_X86
 	#if CPU_X86_32
 
-		#define CPU_SAVED_REGS_CNT      4
+		#define CPU_SAVED_REGS_CNT      2
 		#define CPU_STACK_GROWS_UPWARD  0
 		#define CPU_SP_ON_EMPTY_SLOT	0
 

@@ -34,6 +34,19 @@
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * \brief i386 context switch
+ *
+ * x86 function calling convention:
+ * --------------------------------
+ *  arguments         | callee-saved        | extra caller-saved | return
+ * [callee-clobbered] |                     | [callee-clobbered] |
+ * -------------------------------------------------------------------------
+ * eax edx ecx        | ebx edi esi ebp [*] | <none>             | eax, edx
+ *
+ *  [*]  In the frame-pointers case rbp must hold a base address for the
+ *       current stack frame.
+ *
+ * asm_switch_context() can be considered as a normal function call, so we need
+ * to save all the callee-clobbered registers minus the return registers.
  */
 
 #ifdef __APPLE__
@@ -47,15 +60,11 @@
 .globl SWITCH_CONTEXT
 SWITCH_CONTEXT:
 	pushl	%ebp
-	pushl	%edi
-	pushl	%esi
-	pushl	%ebx
-	movl	0x24(%esp),%ebp         /* ebp = save_sp */
+	pushl	%ecx
+	movl	0x10(%esp),%ebp         /* ebp = save_sp */
 	movl	%esp,(%ebp)             /* *save_sp = esp */
-	movl	0x20(%esp),%ebp         /* ebp = new_sp */
+	movl	0x0c(%esp),%ebp         /* ebp = new_sp */
 	movl	(%ebp),%esp             /* esp = *new_sp */
-	popl	%ebx
-	popl	%esi
-	popl	%edi
+	popl	%ecx
 	popl	%ebp
 	ret

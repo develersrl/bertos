@@ -33,7 +33,20 @@
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
- * \brief i386 context switch
+ * \brief x86_64 context switch
+ *
+ * x86_64 function call convention:
+ * --------------------------------
+ *  arguments           |  callee-saved      | extra caller-saved | return
+ * [callee-clobbered]   |                    | [callee-clobbered] |
+ * -------------------------------------------------------------------------
+ * rdi rsi rdx rcx r8-9 | rbx rbp [*] r12-15 | r10-11             | rax, rdx
+ *
+ *  [*]  In the frame-pointers case rbp must hold a base address for the
+ *       current stack frame.
+ *
+ * asm_switch_context() can be considered as a normal function call, so we need
+ * to save all the callee-clobbered registers minus the return registers.
  */
 
 /* void asm_switch_context(void **new_sp [%rdi], void **save_sp [%rsi]) */
@@ -42,7 +55,7 @@ asm_switch_context:
 	pushq	%rbp
 	pushq	%rdi
 	pushq	%rsi
-	pushq	%rbx
+	pushq	%rcx
 	pushq	%r8
 	pushq	%r9
 	pushq	%r10
@@ -53,7 +66,7 @@ asm_switch_context:
 	popq	%r10
 	popq	%r9
 	popq	%r8
-	popq	%rbx
+	popq	%rcx
 	popq	%rsi
 	popq	%rdi
 	popq	%rbp
