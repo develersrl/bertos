@@ -80,6 +80,7 @@ bertos/emul/timer_qt_moc.cpp: bertos/emul/timer_qt.c
 	$(QT_MOC) -o $@ $<
 
 
+demo_CPPAFLAGS =
 demo_CFLAGS = -O0 -g3 -ggdb -Iexamples/demo $(EMUL_CFLAGS)
 demo_CXXFLAGS = -O0 -g3 -ggdb -Iexamples/demo $(EMUL_CFLAGS)
 demo_LDFLAGS = $(EMUL_LDFLAGS)
