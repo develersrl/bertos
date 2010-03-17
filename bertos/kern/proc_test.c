@@ -90,7 +90,7 @@ static unsigned int done[TASKS];
 #define DELAY	5
 
 // Define process stacks for test.
-static cpu_stack_t worker_stack[TASKS][WORKER_STACK_SIZE / sizeof(cpu_stack_t)];
+static PROC_DEFINE_STACK(worker_stack, TASKS * WORKER_STACK_SIZE);
 
 static int prime_numbers[] =
 {
@@ -125,10 +125,12 @@ static int worker_test(void)
 	kputs("Run Proc test..\n");
 	for (i = 0; i < TASKS; i++)
 	{
+		name[i][0] = '\0';
 		snprintf(&name[i][0], sizeof(name[i]), "worker_%zd", i + 1);
 		name[i][sizeof(name) - 1] = '\0';
 		proc_new_with_name(name[i], worker, (iptr_t)(i + 1),
-				WORKER_STACK_SIZE, &worker_stack[i][0]);
+				WORKER_STACK_SIZE,
+				(cpu_stack_t *)((size_t)&worker_stack + WORKER_STACK_SIZE * i));
 	}
 	kputs("> Main: Processes started\n");
 	while (1)
@@ -151,15 +153,11 @@ static int worker_test(void)
 /* Time to run each preemptible thread (in seconds) */
 #define TIME	10
 
-static char preempt_name[TASKS][32];
-
 static cpu_atomic_t barrier[TASKS];
 static cpu_atomic_t main_barrier;
 
 static unsigned int preempt_counter[TASKS];
 static unsigned int preempt_done[TASKS];
-
-static cpu_stack_t preempt_worker_stack[TASKS][WORKER_STACK_SIZE / sizeof(cpu_stack_t)];
 
 static void preempt_worker(void)
 {
@@ -203,11 +201,13 @@ static int preempt_worker_test(void)
 	kputs("Run Preemption test..\n");
 	for (i = 0; i < TASKS; i++)
 	{
-		snprintf(&preempt_name[i][0], sizeof(preempt_name[i]),
+		name[i][0] = '\0';
+		snprintf(&name[i][0], sizeof(name[i]),
 				"preempt_worker_%zd", i + 1);
-		preempt_name[i][sizeof(preempt_name) - 1] = '\0';
-		proc_new_with_name(preempt_name[i], preempt_worker, (iptr_t)(i + 1),
-				WORKER_STACK_SIZE, &preempt_worker_stack[i][0]);
+		name[i][sizeof(name) - 1] = '\0';
+		proc_new_with_name(name[i], preempt_worker, (iptr_t)(i + 1),
+				WORKER_STACK_SIZE,
+				(cpu_stack_t *)((size_t)&worker_stack + WORKER_STACK_SIZE * i));
 	}
 	kputs("> Main: Processes created\n");
 	/* Synchronize on start */
