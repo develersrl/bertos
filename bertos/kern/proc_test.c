@@ -127,7 +127,7 @@ static int worker_test(void)
 	{
 		name[i][0] = '\0';
 		snprintf(&name[i][0], sizeof(name[i]), "worker_%zd", i + 1);
-		name[i][sizeof(name) - 1] = '\0';
+		name[i][sizeof(name[i]) - 1] = '\0';
 		proc_new_with_name(name[i], worker, (iptr_t)(i + 1),
 				WORKER_STACK_SIZE,
 				(cpu_stack_t *)((size_t)&worker_stack + WORKER_STACK_SIZE * i));
@@ -204,7 +204,7 @@ static int preempt_worker_test(void)
 		name[i][0] = '\0';
 		snprintf(&name[i][0], sizeof(name[i]),
 				"preempt_worker_%zd", i + 1);
-		name[i][sizeof(name) - 1] = '\0';
+		name[i][sizeof(name[i]) - 1] = '\0';
 		proc_new_with_name(name[i], preempt_worker, (iptr_t)(i + 1),
 				WORKER_STACK_SIZE,
 				(cpu_stack_t *)((size_t)&worker_stack + WORKER_STACK_SIZE * i));
