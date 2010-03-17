@@ -147,7 +147,7 @@ static void NORETURN monitor(void)
 			Process *p = containerof(node, Process, monitor.link);
 			size_t free = monitor_checkStack(p->stack_base, p->stack_size);
 
-			if (free < 0x20)
+			if (p->stack_base && free < 0x20)
 				kprintf("MONITOR: Free stack of process '%s' is only %u chars\n",
 						p->monitor.name, (unsigned int)free);
 		}
