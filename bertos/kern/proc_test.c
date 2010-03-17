@@ -125,7 +125,8 @@ static int worker_test(void)
 	kputs("Run Proc test..\n");
 	for (i = 0; i < TASKS; i++)
 	{
-		sprintf(&name[i][0], "worker_%zd", i + 1);
+		snprintf(&name[i][0], sizeof(name[i]), "worker_%zd", i + 1);
+		name[i][sizeof(name) - 1] = '\0';
 		proc_new_with_name(name[i], worker, (iptr_t)(i + 1),
 				WORKER_STACK_SIZE, &worker_stack[i][0]);
 	}
@@ -202,7 +203,9 @@ static int preempt_worker_test(void)
 	kputs("Run Preemption test..\n");
 	for (i = 0; i < TASKS; i++)
 	{
-		sprintf(&preempt_name[i][0], "preempt_worker_%zd", i + 1);
+		snprintf(&preempt_name[i][0], sizeof(preempt_name[i]),
+				"preempt_worker_%zd", i + 1);
+		preempt_name[i][sizeof(preempt_name) - 1] = '\0';
 		proc_new_with_name(preempt_name[i], preempt_worker, (iptr_t)(i + 1),
 				WORKER_STACK_SIZE, &preempt_worker_stack[i][0]);
 	}
