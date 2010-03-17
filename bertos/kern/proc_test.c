@@ -102,7 +102,7 @@ STATIC_ASSERT(TASKS <= countof(prime_numbers));
 
 static void worker(void)
 {
-	long pid = (long)proc_currentUserData();
+	ssize_t pid = (ssize_t)proc_currentUserData();
 	long tot = prime_numbers[pid - 1];
 	unsigned int my_count = 0;
 	int i;
@@ -110,22 +110,22 @@ static void worker(void)
 	for (i = 0; i < tot; i++)
 	{
 		my_count++;
-		PROC_ATOMIC(kprintf("> %s[%ld] running\n", __func__, pid));
+		PROC_ATOMIC(kprintf("> %s[%zd] running\n", __func__, pid));
 		timer_delay(tot * DELAY);
 	}
 	done[pid - 1] = 1;
-	PROC_ATOMIC(kprintf("> %s[%ld] completed\n", __func__, pid));
+	PROC_ATOMIC(kprintf("> %s[%zd] completed\n", __func__, pid));
 }
 
 static int worker_test(void)
 {
-	long i;
+	ssize_t i;
 
 	// Init the test processes
 	kputs("Run Proc test..\n");
 	for (i = 0; i < TASKS; i++)
 	{
-		sprintf(&name[i][0], "worker_%ld", i + 1);
+		sprintf(&name[i][0], "worker_%zd", i + 1);
 		proc_new_with_name(name[i], worker, (iptr_t)(i + 1),
 				WORKER_STACK_SIZE, &worker_stack[i][0]);
 	}
@@ -162,7 +162,7 @@ static cpu_stack_t preempt_worker_stack[TASKS][WORKER_STACK_SIZE / sizeof(cpu_st
 
 static void preempt_worker(void)
 {
-	long pid = (long)proc_currentUserData();
+	ssize_t pid = (ssize_t)proc_currentUserData();
 	unsigned int *my_count = &preempt_counter[pid - 1];
 	ticks_t start, stop;
 	int i;
@@ -171,7 +171,7 @@ static void preempt_worker(void)
 	/* Synchronize on the main barrier */
 	while (!main_barrier)
 		proc_yield();
-	PROC_ATOMIC(kprintf("> %s[%ld] running\n", __func__, pid));
+	PROC_ATOMIC(kprintf("> %s[%zd] running\n", __func__, pid));
 	start = timer_clock();
 	stop  = ms_to_ticks(TIME * 1000);
 	while (timer_clock() - start < stop)
@@ -182,7 +182,7 @@ static void preempt_worker(void)
 		if (UNLIKELY(*my_count == (unsigned int)~0))
 			*my_count = 1;
 	}
-	PROC_ATOMIC(kprintf("> %s[%ld] completed: (counter = %d)\n",
+	PROC_ATOMIC(kprintf("> %s[%zd] completed: (counter = %d)\n",
 				__func__, pid, *my_count));
 	for (i = 0; i < TASKS; i++)
 		if (!preempt_counter[i])
@@ -196,13 +196,13 @@ static void preempt_worker(void)
 static int preempt_worker_test(void)
 {
 	unsigned long score = 0;
-	long i;
+	ssize_t i;
 
 	// Init the test processes
 	kputs("Run Preemption test..\n");
 	for (i = 0; i < TASKS; i++)
 	{
-		sprintf(&preempt_name[i][0], "preempt_worker_%ld", i + 1);
+		sprintf(&preempt_name[i][0], "preempt_worker_%zd", i + 1);
 		proc_new_with_name(preempt_name[i], preempt_worker, (iptr_t)(i + 1),
 				WORKER_STACK_SIZE, &preempt_worker_stack[i][0]);
 	}
