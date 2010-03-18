@@ -87,7 +87,7 @@
  * $WIZ$ type = "int"
  * $WIZ$ min = 1
  */
-#define CONFIG_KERN_QUANTUM 47
+#define CONFIG_KERN_QUANTUM 11
 
 /**
  * Module logging level.
