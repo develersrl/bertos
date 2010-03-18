@@ -112,7 +112,7 @@ STATIC_ASSERT(TASKS <= countof(prime_numbers));
 /* Time to run each preemptible thread (in seconds) */
 #define TIME	10
 
-static unsigned int preempt_counter[TASKS];
+static unsigned long preempt_counter[TASKS];
 static unsigned int preempt_done[TASKS];
 #endif
 
@@ -198,7 +198,7 @@ static int worker_test(void)
 static void preempt_worker(void)
 {
 	ssize_t pid = (ssize_t)proc_currentUserData();
-	unsigned int *my_count = &preempt_counter[pid - 1];
+	unsigned long *my_count = &preempt_counter[pid - 1];
 	ticks_t start, stop;
 	int i;
 
