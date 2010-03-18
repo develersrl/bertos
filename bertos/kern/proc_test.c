@@ -217,7 +217,7 @@ static void preempt_worker(void)
 		if (UNLIKELY(*my_count == (unsigned int)~0))
 			*my_count = 1;
 	}
-	PROC_ATOMIC(kprintf("> %s[%zd] completed: (counter = %d)\n",
+	PROC_ATOMIC(kprintf("> %s[%zd] completed: (counter = %lu)\n",
 				__func__, pid, *my_count));
 	for (i = 0; i < TASKS; i++)
 		if (!preempt_counter[i])
