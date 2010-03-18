@@ -58,6 +58,13 @@
  */
 EXTERN_C void asm_switch_context(cpu_stack_t **new_sp, cpu_stack_t **save_sp);
 
+/**
+ * Define function prototypes exported outside.
+ *
+ * Required to silent gcc "no previous prototype" warnings.
+ */
+void coop_yield(void);
+void coop_switch(void);
 
 /**
  * System scheduler: pass CPU control to the next process in

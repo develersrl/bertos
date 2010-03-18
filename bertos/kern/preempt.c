@@ -86,8 +86,6 @@
 
 #include "cfg/cfg_proc.h"
 
-#if CONFIG_KERN_PREEMPT
-
 #include "proc_p.h"
 #include "proc.h"
 
@@ -122,6 +120,17 @@ cpu_atomic_t preempt_count;
  * preemption is enabled a new process is selected to run.
  */
 int _proc_quantum;
+
+/**
+ * Define function prototypes exported outside.
+ *
+ * Required to silent gcc "no previous prototype" warnings.
+ */
+void preempt_yield(void);
+int preempt_needPreempt(void);
+void preempt_preempt(void);
+void preempt_switch(void);
+void preempt_init(void);
 
 /**
  * Call the scheduler and eventually replace the current running process.
@@ -233,5 +242,3 @@ void preempt_init(void)
 	idle_init();
 	MOD_INIT(preempt);
 }
-
-#endif // CONFIG_KERN_PREEMPT
