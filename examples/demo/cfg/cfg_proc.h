@@ -65,7 +65,7 @@
  * $WIZ$ type = "int"
  * $WIZ$ min = 0
  */
-#define CONFIG_KERN_HEAP_SIZE 262144L
+#define CONFIG_KERN_HEAP_SIZE 2097152L
 
 /**
  * Preemptive process scheduling.
