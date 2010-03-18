@@ -91,7 +91,7 @@ static cpu_atomic_t main_barrier;
 #define DELAY	5
 
 // Define process stacks for test.
-#define WORKER_STACK_SIZE KERN_MINSTACKSIZE * 2
+#define WORKER_STACK_SIZE KERN_MINSTACKSIZE * 3
 
 #if CONFIG_KERN_HEAP
 #define WORKER_STACK(id)	 NULL
