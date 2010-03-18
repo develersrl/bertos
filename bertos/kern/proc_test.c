@@ -87,21 +87,25 @@ static unsigned int done[TASKS];
 static cpu_atomic_t barrier[TASKS];
 static cpu_atomic_t main_barrier;
 
-#define WORKER_STACK_SIZE KERN_MINSTACKSIZE * 2
-
 /* Base time delay for processes using timer_delay() */
 #define DELAY	5
 
 // Define process stacks for test.
+#define WORKER_STACK_SIZE KERN_MINSTACKSIZE * 2
+
+#if CONFIG_KERN_HEAP
+#define WORKER_STACK(id)	 NULL
+#else /* !CONFIG_KERN_HEAP */
 static cpu_stack_t worker_stack[TASKS][(WORKER_STACK_SIZE +
 			sizeof(cpu_stack_t) - 1) / sizeof(cpu_stack_t)];
+#define WORKER_STACK(id)	 (&worker_stack[id][0])
+#endif /* CONFIG_KERN_HEAP */
 
 static int prime_numbers[] =
 {
 	1, 3, 5, 7, 11, 13, 17, 19,
 	23, 29, 31, 37, 41, 43, 47, 53,
 };
-
 STATIC_ASSERT(TASKS <= countof(prime_numbers));
 
 #if CONFIG_KERN_PREEMPT
@@ -159,7 +163,7 @@ static int worker_test(void)
 		snprintf(&name[i][0], sizeof(name[i]), "worker_%zd", i + 1);
 		name[i][sizeof(name[i]) - 1] = '\0';
 		proc_new_with_name(name[i], worker, (iptr_t)(i + 1),
-				WORKER_STACK_SIZE, &worker_stack[i][0]);
+				WORKER_STACK_SIZE, WORKER_STACK(i));
 	}
 	/* Synchronize on start */
 	while (1)
@@ -239,7 +243,7 @@ static int preempt_worker_test(void)
 				"preempt_worker_%zd", i + 1);
 		name[i][sizeof(name[i]) - 1] = '\0';
 		proc_new_with_name(name[i], preempt_worker, (iptr_t)(i + 1),
-				WORKER_STACK_SIZE, &worker_stack[i][0]);
+				WORKER_STACK_SIZE, WORKER_STACK(i));
 	}
 	kputs("> Main: Processes created\n");
 	/* Synchronize on start */
@@ -283,8 +287,6 @@ static int preempt_worker_test(void)
 
 #if CONFIG_KERN_SIGNALS & CONFIG_KERN_PRI
 
-#define PROC_PRI_TEST_STACK(num)  PROC_DEFINE_STACK(proc_test##num##_stack, KERN_MINSTACKSIZE);
-
 // Define params to test priority
 #define PROC_PRI_TEST(num) static void proc_pri_test##num(void) \
 { \
@@ -297,14 +299,10 @@ static int preempt_worker_test(void)
 #define PROC_PRI_TEST_INIT(num, proc)					\
 do {									\
 	struct Process *p = proc_new(proc_pri_test##num, (proc),	\
-					sizeof(proc_test##num##_stack),	\
-					proc_test##num##_stack);	\
+					WORKER_STACK_SIZE,		\
+					WORKER_STACK(num));		\
 	proc_setPri(p, num + 1);					\
 } while (0)
-
-PROC_PRI_TEST_STACK(0)
-PROC_PRI_TEST_STACK(1)
-PROC_PRI_TEST_STACK(2)
 
 PROC_PRI_TEST(0)
 PROC_PRI_TEST(1)
