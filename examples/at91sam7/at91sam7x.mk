@@ -29,7 +29,8 @@ at91sam7x_CSRC = \
 	bertos/struct/heap.c \
 	bertos/kern/kfile.c \
 	bertos/kern/proc.c \
-	bertos/kern/mtask.c \
+	bertos/kern/coop.c \
+	bertos/kern/preempt.c \
 	bertos/kern/idle.c \
 	bertos/kern/proc_test.c \
 	bertos/kern/monitor.c \

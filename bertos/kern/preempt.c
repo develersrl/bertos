@@ -39,7 +39,7 @@
  * the time sharing interval.
  *
  * When the quantum expires the handler proc_needPreempt() checks if the
- * preemption is enabled and in this case proc_schedule() is called, that
+ * preemption is enabled and in this case preempt_schedule() is called, that
  * possibly replaces the current running thread with a different one.
  *
  * The preemption can be disabled or enabled via proc_forbid() and
@@ -126,7 +126,7 @@ int _proc_quantum;
 /**
  * Call the scheduler and eventually replace the current running process.
  */
-static void proc_schedule(void)
+static void preempt_schedule(void)
 {
 	Process *old_process = current_process;
 
@@ -166,7 +166,7 @@ static void proc_schedule(void)
 /**
  * Check if we need to schedule another task
  */
-int proc_needPreempt(void)
+int preempt_needPreempt(void)
 {
 	if (UNLIKELY(current_process == NULL))
 		return 0;
@@ -179,7 +179,7 @@ int proc_needPreempt(void)
 /**
  * Preempt the current task.
  */
-void proc_preempt(void)
+void preempt_preempt(void)
 {
 	IRQ_ASSERT_DISABLED();
 	ASSERT(current_process);
@@ -189,7 +189,7 @@ void proc_preempt(void)
 	/* We are inside a IRQ context, so ATOMIC is not needed here */
 	if (current_process != idle_proc)
 		SCHED_ENQUEUE(current_process);
-	proc_schedule();
+	preempt_schedule();
 }
 
 /**
@@ -200,18 +200,18 @@ void proc_preempt(void)
  * \warning This should be considered an internal kernel function, even if it
  * is allowed, usage from application code is strongly discouraged.
  */
-void proc_switch(void)
+void preempt_switch(void)
 {
 	ASSERT(proc_preemptAllowed());
 	IRQ_ASSERT_ENABLED();
 
-	ATOMIC(proc_schedule());
+	ATOMIC(preempt_schedule());
 }
 
 /**
  * Voluntarily release the CPU.
  */
-void proc_yield(void)
+void preempt_yield(void)
 {
 	/*
 	 * Voluntary preemption while preemption is disabled is considered
@@ -224,7 +224,7 @@ void proc_yield(void)
 
 	ATOMIC(
 		SCHED_ENQUEUE(current_process);
-		proc_schedule();
+		preempt_schedule();
 	);
 }
 

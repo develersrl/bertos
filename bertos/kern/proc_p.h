@@ -145,9 +145,14 @@ INLINE void sched_reenqueue(struct Process *proc)
 }
 #endif //CONFIG_KERN_PRI
 
-/// Schedule another process *without* adding the current one to the ready list.
-void proc_switch(void);
+/* Process trampoline */
 void proc_entry(void);
+
+/* Schedule another process *without* adding the current one to the ready list. */
+void proc_switch(void);
+
+/* Initialize a scheduler class. */
+void proc_schedInit(void);
 
 #if CONFIG_KERN_MONITOR
 	/** Initialize the monitor */

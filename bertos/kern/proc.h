@@ -37,7 +37,7 @@
  *
  * $WIZ$ module_name = "kernel"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_proc.h"
- * $WIZ$ module_depends = "switch_ctx", "mtask"
+ * $WIZ$ module_depends = "switch_ctx", "coop", "preempt"
  * $WIZ$ module_supports = "not atmega103"
  */
 
@@ -54,6 +54,7 @@
 
 #if CONFIG_KERN_PREEMPT
 	#include <cfg/debug.h> // ASSERT()
+	#include <kern/preempt.h>
 #endif
 
 #include <cpu/types.h> // cpu_stack_t
@@ -142,15 +143,44 @@ struct Process *proc_new_with_name(const char *name, void (*entry)(void), iptr_t
 void proc_exit(void);
 
 /**
- * Co-operative context switch.
- *
- * The process that calls this function will release the CPU before its cpu quantum
- * expires, the scheduler will run to select the next process that will take control
- * of the processor.
- * \note This function is available only if CONFIG_KERN is enabled
- * \sa cpu_relax(), which is the recommended method to release the cpu.
+ * Public scheduling class methods.
  */
 void proc_yield(void);
+void proc_preempt(void);
+int proc_needPreempt(void);
+
+/**
+ * Dummy function that defines unimplemented scheduler class methods.
+ */
+INLINE void __proc_noop(void)
+{
+}
+
+#if CONFIG_KERN_PREEMPT
+	/**
+	 * Preemptive scheduler public methods.
+	 */
+	#define preempt_yield		proc_yield
+	#define preempt_needPreempt	proc_needPreempt
+	#define preempt_preempt		proc_preempt
+	/**
+	 * Preemptive scheduler: private methods.
+	 */
+	#define preempt_switch		proc_switch
+	#define preempt_init		proc_schedInit
+#else
+	/**
+	 * Co-operative scheduler: public methods.
+	 */
+	#define coop_yield		proc_yield
+	#define proc_needPreempt	__proc_noop
+	#define proc_preempt		__proc_noop
+	/**
+	 * Co-operative scheduler: private methods.
+	 */
+	#define coop_switch		proc_switch
+	#define proc_schedInit		__proc_noop
+#endif
 
 void proc_rename(struct Process *proc, const char *name);
 const char *proc_name(struct Process *proc);

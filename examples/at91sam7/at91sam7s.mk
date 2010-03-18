@@ -28,7 +28,8 @@ at91sam7s_CSRC = \
 	bertos/mware/sprintf.c \
 	bertos/kern/kfile.c \
 	bertos/kern/proc.c \
-	bertos/kern/mtask.c \
+	bertos/kern/coop.c \
+	bertos/kern/preempt.c \
 	bertos/kern/idle.c \
 	bertos/kern/proc_test.c \
 	bertos/kern/monitor.c \

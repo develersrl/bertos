@@ -139,10 +139,7 @@ void proc_init(void)
 	monitor_init();
 	monitor_add(current_process, "main");
 #endif
-
-#if CONFIG_KERN_PREEMPT
-	preempt_init();
-#endif
+	proc_schedInit();
 
 	MOD_INIT(proc);
 }

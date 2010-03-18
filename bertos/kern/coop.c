@@ -63,7 +63,7 @@ EXTERN_C void asm_switch_context(cpu_stack_t **new_sp, cpu_stack_t **save_sp);
  * System scheduler: pass CPU control to the next process in
  * the ready queue.
  */
-static void proc_schedule(void)
+static void coop_schedule(void)
 {
 	cpu_flags_t flags;
 
@@ -98,12 +98,12 @@ static void proc_schedule(void)
 	IRQ_RESTORE(flags);
 }
 
-void proc_switch(void)
+void coop_switch(void)
 {
 	/* Remember old process to save its context later */
 	Process * const old_process = current_process;
 
-	proc_schedule();
+	coop_schedule();
 
 	/*
 	 * Optimization: don't switch contexts when the active
@@ -135,7 +135,7 @@ void proc_switch(void)
 /**
  * Co-operative context switch
  */
-void proc_yield(void)
+void coop_yield(void)
 {
 	ATOMIC(SCHED_ENQUEUE(current_process));
 	proc_switch();

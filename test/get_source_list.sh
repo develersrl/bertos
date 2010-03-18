@@ -51,7 +51,7 @@ if [ $# \< 2 ] ; then
 fi
 CPU_TARGET=$1
 EXCLUDE_DIRS="$COPY_DIR $CPU_DIR $APP_DIR $OS_DIR $WIZARD_DIR $EMUL_DIR $FAT_DIR $NMEA_DIR"
-EXCLUDE_CMD="\.svn -or -name preempt.c -or -name coop.c -prune "
+EXCLUDE_CMD="\.svn -prune "
 for i in $EXCLUDE_DIRS; do 
 	EXCLUDE_CMD="$EXCLUDE_CMD -o -path $i -prune ";
 done

@@ -41,10 +41,6 @@
 #include <cfg/compiler.h>
 
 #if CONFIG_KERN_PREEMPT
-	void preempt_init(void);
-	void proc_preempt(void);
-	int proc_needPreempt(void);
-
 	INLINE void proc_decQuantum(void)
 	{
 		extern int _proc_quantum;

@@ -44,7 +44,7 @@
 #include "detect.h"
 #include "types.h"
 
-#include <kern/preempt.h>
+#include <kern/proc.h> /* proc_needPreempt() / proc_preempt() */
 
 #include <cfg/compiler.h> /* for uintXX_t */
 #include "cfg/cfg_proc.h" /* CONFIG_KERN_PREEMPT */
