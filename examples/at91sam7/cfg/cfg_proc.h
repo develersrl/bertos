@@ -47,23 +47,31 @@
 #define CONFIG_KERN 1
 
 /**
- * Kernel interrupt supervisor.
+ * Kernel interrupt supervisor. WARNING: Experimental, still incomplete!
  * $WIZ$ type = "boolean"
+ * $WIZ$ supports = "False"
  */
 #define CONFIG_KERN_IRQ 0
 
 /**
  * Dynamic memory allocation for processes.
- *
  * $WIZ$ type = "boolean"
- * $WIZ$ supports = "False"
+ * $WIZ$ conditional_deps = "heap"
  */
 #define CONFIG_KERN_HEAP 0
 
 /**
- * Preemptive process scheduling. WARNING: Experimental, still incomplete!
+ * Size of the dynamic memory pool used by processes.
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 0
+ */
+#define CONFIG_KERN_HEAP_SIZE 16386L
+
+/**
+ * Preemptive process scheduling.
  *
  * $WIZ$ type = "boolean"
+ * $WIZ$ conditional_deps = "timer", "idle"
  */
 #define CONFIG_KERN_PREEMPT 1
 
@@ -77,7 +85,7 @@
  * Time sharing quantum (a prime number prevents interference effects) [ms].
  *
  * $WIZ$ type = "int"
- * $WIZ$ min = "0"
+ * $WIZ$ min = 1
  */
 #define CONFIG_KERN_QUANTUM 11
 
