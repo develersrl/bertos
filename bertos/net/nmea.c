@@ -255,17 +255,18 @@ void gpgga_callout(nmeap_context_t *context, void *data, void *user_data)
 	(void)context;
 	(void)user_data;
 	(void)data;
-	LOG_INFOB(NmeaGga *gga = (NmeaGga *)data;);
-
-    LOG_INFO("Found GPGGA message %ld %ld %d %lu %d %d %d %d\n",
-            (long)gga->latitude,
-            (long)gga->longitude,
-            gga->altitude,
-            gga->time,
-            gga->satellites,
-            gga->quality,
-            gga->hdop,
-            gga->geoid);
+	LOG_INFOB(
+		NmeaGga *gga = (NmeaGga *)data;
+		LOG_INFO("Found GPGGA message %ld %ld %d %lu %d %d %d %d\n",
+				(long)gga->latitude,
+				(long)gga->longitude,
+				gga->altitude,
+				gga->time,
+				gga->satellites,
+				gga->quality,
+				gga->hdop,
+				gga->geoid);
+	);
 }
 
 /**
@@ -276,16 +277,18 @@ void gprmc_callout(nmeap_context_t *context, void *data, void *user_data)
 	(void)context;
 	(void)user_data;
 	(void)data;
-    LOG_INFOB(NmeaRmc *rmc = (NmeaRmc *)data;);
+    LOG_INFOB(
+		NmeaRmc *rmc = (NmeaRmc *)data;
 
-	LOG_INFO("Found GPRMC message %lu %c %ld %ld %d %d %d\n",
-            rmc->time,
-            rmc->warn,
-            (long)rmc->latitude,
-            (long)rmc->longitude,
-            rmc->speed,
-            rmc->course,
-            rmc->mag_var);
+		LOG_INFO("Found GPRMC message %lu %c %ld %ld %d %d %d\n",
+				rmc->time,
+				rmc->warn,
+				(long)rmc->latitude,
+				(long)rmc->longitude,
+				rmc->speed,
+				rmc->course,
+				rmc->mag_var);
+	);
 }
 
 /**
@@ -296,12 +299,14 @@ void gpgsv_callout(nmeap_context_t *context, void *data, void *user_data)
 	(void)context;
 	(void)user_data;
 	(void)data;
-	LOG_INFOB(NmeaGsv *gsv = (NmeaGsv *)data;);
+	LOG_INFOB(
+		NmeaGsv *gsv = (NmeaGsv *)data;
 
-    LOG_INFO("Found GPGSV message %d %d %d\n", gsv->tot_message, gsv->message_num, gsv->tot_svv);
+	    LOG_INFO("Found GPGSV message %d %d %d\n", gsv->tot_message, gsv->message_num, gsv->tot_svv);
 
-	for (int i = 0; i < 4; i++)
-	    LOG_INFO("%d %d %d %d\n", gsv->info[i].sv_prn, gsv->info[i].elevation, gsv->info[i].azimut, gsv->info[i].snr);
+		for (int i = 0; i < 4; i++)
+			LOG_INFO("%d %d %d %d\n", gsv->info[i].sv_prn, gsv->info[i].elevation, gsv->info[i].azimut, gsv->info[i].snr);
+	);
 }
 
 /**
@@ -312,9 +317,10 @@ void gpvtg_callout(nmeap_context_t *context, void *data, void *user_data)
 	(void)context;
 	(void)user_data;
 	(void)data;
-	LOG_INFOB(NmeaVtg *vtg = (NmeaVtg *)data;);
-
-    LOG_INFO("Found GPVTG message %d %d %d\n", vtg->track_good,	vtg->knot_speed, vtg->km_speed);
+	LOG_INFOB(
+		NmeaVtg *vtg = (NmeaVtg *)data;
+	    LOG_INFO("Found GPVTG message %d %d %d\n", vtg->track_good,	vtg->knot_speed, vtg->km_speed);
+	);
 }
 
 
