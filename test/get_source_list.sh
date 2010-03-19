@@ -66,7 +66,10 @@ TRG_SRC=`find ${CPU_DIR}/$CPU_TARGET -name \.svn -prune -o -name *.${2} -print |
 SRC_ALL=${GEN_SRC}" "${TRG_SRC}
 
 # Find the files that contain the string
-# NOTEST <cpu target> and put it in a list
+# NOTEST <cpu target>
+# or
+# NOTEST all
+# and put them in a list
 
 NOTEST="notest:"
 for src in $SRC_ALL ;
@@ -74,7 +77,11 @@ do
 	grep -P "$NOTEST\s*$CPU_TARGET" $src 2>&1 > /dev/null
 	if [ $? -eq 0 ] ; then
 		EXCLUDE_LIST="$EXCLUDE_LIST $src"
-	fi	
+	fi
+	grep -P "$NOTEST\s*all" $src 2>&1 > /dev/null
+	if [ $? -eq 0 ] ; then
+		EXCLUDE_LIST="$EXCLUDE_LIST $src"
+	fi
 done
 
 # Remove the exclude list files from the sources to be
