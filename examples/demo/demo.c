@@ -294,8 +294,11 @@ static struct MenuItem main_items[] =
 };
 static struct Menu main_menu = { main_items, "Main Menu", MF_STICKY, &lcd_bitmap, 0 };
 
-
-static cpu_stack_t monitor_stack[CONFIG_KERN_MINSTACKSIZE / sizeof(cpu_stack_t)];
+#if CONFIG_KERN_HEAP
+#define monitor_stack NULL
+#else
+static PROC_DEFINE_STACK(monitor_stack, KERN_MINSTACKSIZE);
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -306,7 +309,7 @@ int main(int argc, char *argv[])
 	kbd_init();
 	lcd_init();
 	proc_init();
-	monitor_start(sizeof(monitor_stack), monitor_stack);
+	monitor_start(KERN_MINSTACKSIZE, monitor_stack);
 
 	menu_handle(&main_menu);
 
