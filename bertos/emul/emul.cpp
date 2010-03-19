@@ -101,6 +101,5 @@ extern "C" void emul_idle()
 {
 	// We process GUI events when the application is idle.
 	emul->emulApp->processEvents();
-	usleep(1000);
 }
 

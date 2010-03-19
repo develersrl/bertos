@@ -178,9 +178,7 @@ keymask_t kbd_peek(void)
 	keymask_t key = 0;
 
 #if CONFIG_KBD_SCHED
-	/* Let other tasks run for a while */
-	extern void schedule(void);
-	schedule();
+	timer_delay(1);
 #endif
 
 	/* Extract an event from the keyboard buffer */

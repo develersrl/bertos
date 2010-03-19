@@ -77,11 +77,7 @@
 	INLINE void wdt_reset(void)
 	{
 	#if CONFIG_WATCHDOG
-		#if OS_QT
-			// Let Qt handle events
-			ASSERT(qApp);
-			qApp->processEvents();
-		#elif OS_POSIX
+		#if OS_POSIX
 			static struct timeval tv = { 0, 0 };
 			select(0, NULL, NULL, NULL, &tv);
 		#endif

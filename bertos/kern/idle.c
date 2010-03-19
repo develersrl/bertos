@@ -64,7 +64,7 @@ static NORETURN void idle(void)
 {
 	for (;;)
 	{
-		PAUSE;
+		CPU_IDLE;
 		proc_switch();
 	}
 }
