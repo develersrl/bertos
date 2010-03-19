@@ -102,14 +102,6 @@ CONFIG_DEPEND(CONFIG_KERN_PREEMPT, CONFIG_KERN);
 
 MOD_DEFINE(preempt)
 
-/**
- * CPU dependent context switching routines.
- *
- * Saving and restoring the context on the stack is done by a CPU-dependent
- * support routine which usually needs to be written in assembly.
- */
-EXTERN_C void asm_switch_context(cpu_stack_t **new_sp, cpu_stack_t **save_sp);
-
 /* Global preemption nesting counter */
 cpu_atomic_t preempt_count;
 
