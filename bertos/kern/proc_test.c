@@ -52,6 +52,10 @@
  * $test$: echo "#define CONFIG_KERN_PRI 1" >> $cfgdir/cfg_proc.h
  * $test$: echo  "#undef CONFIG_KERN_PREEMPT" >> $cfgdir/cfg_proc.h
  * $test$: echo "#define CONFIG_KERN_PREEMPT 1" >> $cfgdir/cfg_proc.h
+ * $test$: echo  "#undef CONFIG_KERN_HEAP" >> $cfgdir/cfg_proc.h
+ * $test$: echo "#define CONFIG_KERN_HEAP 1" >> $cfgdir/cfg_proc.h
+ * $test$: echo  "#undef CONFIG_KERN_HEAP_SIZE" >> $cfgdir/cfg_proc.h
+ * $test$: echo "#define CONFIG_KERN_HEAP_SIZE 2097152L" >> $cfgdir/cfg_proc.h
  * $test$: cp bertos/cfg/cfg_monitor.h $cfgdir/
  * $test$: sed -i "s/CONFIG_KERN_MONITOR 0/CONFIG_KERN_MONITOR 1/" $cfgdir/cfg_monitor.h
  * $test$: cp bertos/cfg/cfg_signal.h $cfgdir/
