@@ -146,7 +146,7 @@
 	#define LOG_ERR(str,...)       LOG_PRINT("ERR", str, ## __VA_ARGS__)
 	#define LOG_ERRB(x)            x
 #else
-	#define LOG_ERR(str,...)       /* Nothing */
+	INLINE void LOG_ERR(UNUSED_ARG(const char *, fmt), ...) { /* nop */ }
 	#define LOG_ERRB(x)            /* Nothing */
 #endif
 
@@ -154,7 +154,7 @@
 	#define LOG_WARN(str,...)       LOG_PRINT("WARN", str, ## __VA_ARGS__)
 	#define LOG_WARNB(x)            x
 #else
-	#define LOG_WARN(str,...)       /* Nothing */
+	INLINE void LOG_WARN(UNUSED_ARG(const char *, fmt), ...) { /* nop */ }
 	#define LOG_WARNB(x)            /* Nothing */
 #endif
 
@@ -162,7 +162,7 @@
 	#define LOG_INFO(str,...)       LOG_PRINT("INFO", str, ## __VA_ARGS__)
 	#define LOG_INFOB(x)            x
 #else
-	#define LOG_INFO(str,...)       /* Nothing */
+	INLINE void LOG_INFO(UNUSED_ARG(const char *, fmt), ...) { /* nop */ }
 	#define LOG_INFOB(x)            /* Nothing */
 #endif
 
