@@ -49,7 +49,6 @@
 #include <cpu/irq.h>          // IRQ_ASSERT_DISABLED()
 
 #include <kern/proc.h>   // struct Process
-#include <kern/idle.h>        // idle_proc
 
 
 /**
@@ -71,7 +70,7 @@ extern REGISTER Process	*current_process;
 extern REGISTER List     proc_ready_list;
 
 #if CONFIG_KERN_PRI
-	#define prio_next()	(LIST_EMPTY(&proc_ready_list) ? idle_proc->link.pri : \
+	#define prio_next()	(LIST_EMPTY(&proc_ready_list) ? INT_MIN : \
 					((PriNode *)LIST_HEAD(&proc_ready_list))->pri)
 	#define prio_curr()	(current_process->link.pri)
 
@@ -150,6 +149,9 @@ void proc_entry(void);
 
 /* Schedule another process *without* adding the current one to the ready list. */
 void proc_switch(void);
+
+/* Low level scheduling routine. */
+void proc_schedule(void);
 
 /* Initialize a scheduler class. */
 void proc_schedInit(void);

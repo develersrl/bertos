@@ -167,7 +167,6 @@ INLINE void __proc_noop(void)
 	 * Preemptive scheduler: private methods.
 	 */
 	#define preempt_switch		proc_switch
-	#define preempt_init		proc_schedInit
 #else
 	/**
 	 * Co-operative scheduler: public methods.
@@ -179,7 +178,6 @@ INLINE void __proc_noop(void)
 	 * Co-operative scheduler: private methods.
 	 */
 	#define coop_switch		proc_switch
-	#define proc_schedInit		__proc_noop
 #endif
 
 void proc_rename(struct Process *proc, const char *name);

@@ -91,7 +91,6 @@
 
 #include <kern/irq.h>
 #include <kern/monitor.h>
-#include <kern/idle.h> // idle_proc
 #include <cpu/frame.h> // CPU_IDLE
 #include <cpu/irq.h>   // IRQ_DISABLE()...
 #include <cfg/log.h>
@@ -137,39 +136,8 @@ void preempt_init(void);
  */
 static void preempt_schedule(void)
 {
-	Process *old_process = current_process;
-
-	IRQ_ASSERT_DISABLED();
-
-	/* Poll on the ready queue for the first ready process */
-	LIST_ASSERT_VALID(&proc_ready_list);
-	current_process = (Process *)list_remHead(&proc_ready_list);
-	if (UNLIKELY(!current_process))
-		current_process = idle_proc;
 	_proc_quantum = CONFIG_KERN_QUANTUM;
-	/*
-	 * Optimization: don't switch contexts when the active process has not
-	 * changed.
-	 */
-	if (LIKELY(old_process != current_process))
-	{
-		cpu_stack_t *dummy;
-
-		/*
-		 * Save context of old process and switch to new process. If
-		 * there is no old process, we save the old stack pointer into
-		 * a dummy variable that we ignore. In fact, this happens only
-		 * when the old process has just exited.
-		 *
-		 * \todo Instead of physically clearing the process at exit
-		 * time, a zombie list should be created.
-		 */
-		asm_switch_context(&current_process->stack,
-				old_process ? &old_process->stack : &dummy);
-	}
-
-	/* This RET resumes the execution on the new process */
-	LOG_INFO("resuming %p:%s\n", current_process, proc_currentName());
+	proc_schedule();
 }
 
 /**
@@ -196,8 +164,7 @@ void preempt_preempt(void)
 	/* Perform the kernel preemption */
 	LOG_INFO("preempting %p:%s\n", current_process, proc_currentName());
 	/* We are inside a IRQ context, so ATOMIC is not needed here */
-	if (current_process != idle_proc)
-		SCHED_ENQUEUE(current_process);
+	SCHED_ENQUEUE(current_process);
 	preempt_schedule();
 }
 
@@ -239,6 +206,5 @@ void preempt_yield(void)
 
 void preempt_init(void)
 {
-	idle_init();
 	MOD_INIT(preempt);
 }

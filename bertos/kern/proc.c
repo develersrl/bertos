@@ -62,6 +62,14 @@
 
 #define PROC_SIZE_WORDS (ROUND_UP2(sizeof(Process), sizeof(cpu_stack_t)) / sizeof(cpu_stack_t))
 
+/**
+ * CPU dependent context switching routines.
+ *
+ * Saving and restoring the context on the stack is done by a CPU-dependent
+ * support routine which usually needs to be written in assembly.
+ */
+EXTERN_C void asm_switch_context(cpu_stack_t **new_sp, cpu_stack_t **save_sp);
+
 /*
  * The scheduer tracks ready processes by enqueuing them in the
  * ready list.
@@ -139,8 +147,6 @@ void proc_init(void)
 	monitor_init();
 	monitor_add(current_process, "main");
 #endif
-	proc_schedInit();
-
 	MOD_INIT(proc);
 }
 
@@ -429,4 +435,57 @@ void proc_exit(void)
 iptr_t proc_currentUserData(void)
 {
 	return current_process->user_data;
+}
+
+/**
+ * Call the scheduler and eventually replace the current running process.
+ */
+void proc_schedule(void)
+{
+	Process *old_process = current_process;
+
+	IRQ_ASSERT_DISABLED();
+
+	/* Poll on the ready queue for the first ready process */
+	LIST_ASSERT_VALID(&proc_ready_list);
+	while (!(current_process = (struct Process *)list_remHead(&proc_ready_list)))
+	{
+		/*
+		 * Make sure we physically reenable interrupts here, no matter what
+		 * the current task status is. This is important because if we
+		 * are idle-spinning, we must allow interrupts, otherwise no
+		 * process will ever wake up.
+		 *
+		 * During idle-spinning, an interrupt can occur and it may
+		 * modify \p proc_ready_list. To ensure that compiler reload this
+		 * variable every while cycle we call CPU_MEMORY_BARRIER.
+		 * The memory barrier ensure that all variables used in this context
+		 * are reloaded.
+		 * \todo If there was a way to write sig_wait() so that it does not
+		 * disable interrupts while waiting, there would not be any
+		 * reason to do this.
+		 */
+		IRQ_ENABLE;
+		CPU_IDLE;
+		MEMORY_BARRIER;
+		IRQ_DISABLE;
+	}
+	/*
+	 * Optimization: don't switch contexts when the active process has not
+	 * changed.
+	 */
+	if (LIKELY(current_process != old_process)) {
+		cpu_stack_t *dummy;
+
+		/*
+		 * Save context of old process and switch to new process. If
+		 * there is no old process, we save the old stack pointer into
+		 * a dummy variable that we ignore. In fact, this happens only
+		 * when the old process has just exited.
+		 */
+		asm_switch_context(&current_process->stack,
+				old_process ? &old_process->stack : &dummy);
+	}
+	/* This RET resumes the execution on the new process */
+	LOG_INFO("resuming %p:%s\n", current_process, proc_currentName());
 }

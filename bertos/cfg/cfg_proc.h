@@ -71,7 +71,7 @@
  * Preemptive process scheduling.
  *
  * $WIZ$ type = "boolean"
- * $WIZ$ conditional_deps = "timer", "idle"
+ * $WIZ$ conditional_deps = "timer"
  */
 #define CONFIG_KERN_PREEMPT 0
 

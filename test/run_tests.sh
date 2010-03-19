@@ -34,7 +34,6 @@ SRC_LIST="
 	bertos/drv/kdebug.c
 	bertos/drv/timer.c
 	bertos/fs/battfs.c
-	bertos/kern/idle.c
 	bertos/kern/kfile.c
 	bertos/kern/monitor.c
 	bertos/kern/proc.c
