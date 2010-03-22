@@ -54,6 +54,28 @@
 #define CONFIG_KERN_IRQ 0
 
 /**
+ * Preemptive process scheduling.
+ *
+ * $WIZ$ type = "boolean"
+ * $WIZ$ conditional_deps = "timer"
+ */
+#define CONFIG_KERN_PREEMPT 0
+
+/**
+ * Time sharing quantum (a prime number prevents interference effects) [ms].
+ *
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 1
+ */
+#define CONFIG_KERN_QUANTUM 11
+
+/**
+ * Priority-based scheduling policy.
+ * $WIZ$ type = "boolean"
+ */
+#define CONFIG_KERN_PRI 0
+
+/**
  * Dynamic memory allocation for processes.
  * $WIZ$ type = "boolean"
  * $WIZ$ conditional_deps = "heap"
@@ -65,29 +87,7 @@
  * $WIZ$ type = "int"
  * $WIZ$ min = 0
  */
-#define CONFIG_KERN_HEAP_SIZE 8192L
-
-/**
- * Preemptive process scheduling.
- *
- * $WIZ$ type = "boolean"
- * $WIZ$ conditional_deps = "timer"
- */
-#define CONFIG_KERN_PREEMPT 0
-
-/**
- * Priority-based scheduling policy.
- * $WIZ$ type = "boolean"
- */
-#define CONFIG_KERN_PRI 0
-
-/**
- * Time sharing quantum (a prime number prevents interference effects) [ms].
- *
- * $WIZ$ type = "int"
- * $WIZ$ min = 1
- */
-#define CONFIG_KERN_QUANTUM 11
+#define CONFIG_KERN_HEAP_SIZE 2048L
 
 /**
  * Module logging level.
