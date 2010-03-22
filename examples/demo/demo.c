@@ -63,10 +63,8 @@
  */
 void schedule(void)
 {
-	PROC_ATOMIC(
-		lcd_blitBitmap(&lcd_bitmap);
-		emul_idle();
-	);
+	lcd_blitBitmap(&lcd_bitmap);
+	emul_idle();
 }
 
 /**
@@ -87,26 +85,21 @@ static void hello_world(Bitmap *bm)
 	extern const Font font_ncenB18;
 	const Font *old_font;
 
-	PROC_ATOMIC(
-		old_font = bm->font;
+	old_font = bm->font;
 
-		gfx_bitmapClear(bm);
+	gfx_bitmapClear(bm);
 
-		/* Set big font */
-		gfx_setFont(bm, &font_ncenB18);
+	/* Set big font */
+	gfx_setFont(bm, &font_ncenB18);
 
-		text_xprintf(bm, 1, 0, STYLEF_BOLD | TEXT_FILL | TEXT_CENTER,
-				"Hello, world!");
-
-		lcd_blitBitmap(bm);
-	);
+	text_xprintf(bm, 1, 0, STYLEF_BOLD | TEXT_FILL | TEXT_CENTER,
+			"Hello, world!");
+	schedule();
 
 	timer_delay(1000);
 
-	PROC_ATOMIC(
-		/* Restore old font */
-		gfx_setFont(bm, old_font);
-	);
+	/* Restore old font */
+	gfx_setFont(bm, old_font);
 }
 
 /**
@@ -137,14 +130,12 @@ static void bouncing_logo(Bitmap *bm)
 		}
 
 		/* Update graphics */
-		PROC_ATOMIC(
-			gfx_bitmapClear(bm);
-			gfx_blitImage(bm,
-				(bm->width - bertos_logo.width) / 2,
-				h / SPEED_SCALE,
-				&bertos_logo);
-			lcd_blitBitmap(bm);
-		);
+		gfx_bitmapClear(bm);
+		gfx_blitImage(bm,
+			(bm->width - bertos_logo.width) / 2,
+			h / SPEED_SCALE,
+			&bertos_logo);
+		schedule();
 		timer_delay(10);
 	}
 }
@@ -181,51 +172,49 @@ void win_demo(Bitmap *bm)
 
 	for(;;)
 	{
-		PROC_ATOMIC(
-			/* Background animation */
-			bm = root_win.bitmap;
-			gfx_bitmapClear(bm);
-			// gfx_setClipRect(bm, 0, 0, bm->width, bm->height);
-			// gfx_rectDraw(bm, 10, 10, bm->width-10, bm->height-10);
-			// gfx_setClipRect(bm, 11, 11, bm->width-11, bm->height-11);
-			magic(bm, x, y);
-			x += xdir;
-			y += ydir;
-			if (x >= bm->width)  xdir = -1;
-			if (x <= -50)        xdir = +1;
-			if (y >= bm->height) ydir = -1;
-			if (y <= -50)        ydir = +1;
+		/* Background animation */
+		bm = root_win.bitmap;
+		gfx_bitmapClear(bm);
+		// gfx_setClipRect(bm, 0, 0, bm->width, bm->height);
+		// gfx_rectDraw(bm, 10, 10, bm->width-10, bm->height-10);
+		// gfx_setClipRect(bm, 11, 11, bm->width-11, bm->height-11);
+		magic(bm, x, y);
+		x += xdir;
+		y += ydir;
+		if (x >= bm->width)  xdir = -1;
+		if (x <= -50)        xdir = +1;
+		if (y >= bm->height) ydir = -1;
+		if (y <= -50)        ydir = +1;
 
-			/* Large window animation */
-			bm = large_win.bitmap;
-			gfx_bitmapClear(bm);
-			for (i = 0; i < bm->height / 2; i += 2)
-				gfx_rectDraw(bm, 0 + i, 0 + i, bm->width - i, bm->height - i);
+		/* Large window animation */
+		bm = large_win.bitmap;
+		gfx_bitmapClear(bm);
+		for (i = 0; i < bm->height / 2; i += 2)
+			gfx_rectDraw(bm, 0 + i, 0 + i, bm->width - i, bm->height - i);
 
-			/* Small window animation */
-			bm = small_win.bitmap;
-			gfx_bitmapClear(bm);
-			gfx_rectDraw(bm, 0, 0, bm->width, bm->height);
-			gfx_line(bm, 0, 0, bm->width, bm->height);
-			gfx_line(bm, bm->width, 0, 0, bm->height);
+		/* Small window animation */
+		bm = small_win.bitmap;
+		gfx_bitmapClear(bm);
+		gfx_rectDraw(bm, 0, 0, bm->width, bm->height);
+		gfx_line(bm, 0, 0, bm->width, bm->height);
+		gfx_line(bm, bm->width, 0, 0, bm->height);
 
-			/* Move windows around */
-			win_move(&large_win, large_win.geom.xmin + xdir_large, large_top);
-			if (large_win.geom.xmin < -20) xdir_large = +1;
-			if (large_win.geom.xmin > RECT_WIDTH(&root_win.geom) - 5) xdir_large = -1;
+		/* Move windows around */
+		win_move(&large_win, large_win.geom.xmin + xdir_large, large_top);
+		if (large_win.geom.xmin < -20) xdir_large = +1;
+		if (large_win.geom.xmin > RECT_WIDTH(&root_win.geom) - 5) xdir_large = -1;
 
-			win_move(&small_win, small_left, small_win.geom.ymin + ydir_small);
-			if (small_win.geom.ymin < -20) ydir_small = +1;
-			if (small_win.geom.ymin > RECT_HEIGHT(&root_win.geom) - 5) ydir_small = -1;
+		win_move(&small_win, small_left, small_win.geom.ymin + ydir_small);
+		if (small_win.geom.ymin < -20) ydir_small = +1;
+		if (small_win.geom.ymin > RECT_HEIGHT(&root_win.geom) - 5) ydir_small = -1;
 
-			++raise_counter;
-			if (raise_counter % 997 == 0)
-				win_raise(&small_win);
-			else if (raise_counter % 731 == 0)
-				win_raise(&large_win);
+		++raise_counter;
+		if (raise_counter % 997 == 0)
+			win_raise(&small_win);
+		else if (raise_counter % 731 == 0)
+			win_raise(&large_win);
 
-			win_compose(&root_win);
-		);
+		win_compose(&root_win);
 		/* Also does LCD refresh, etc. */
 		if (kbd_peek())
 			break;
