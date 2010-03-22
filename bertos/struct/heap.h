@@ -38,6 +38,9 @@
  *
  * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
+ *
+ * $WIZ$ module_name = "heap"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_heap.h"
  */
 
 #ifndef STRUCT_HEAP_H

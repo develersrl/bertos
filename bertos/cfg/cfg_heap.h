@@ -40,7 +40,10 @@
 #ifndef CFG_HEAP_H
 #define CFG_HEAP_H
 
-/// TODO
+/**
+ * Enable malloc/free like API.
+ * $WIZ$ type = "boolean"
+ */
 #define CONFIG_HEAP_MALLOC     1
 
 #endif /* CFG_HEAP_H */
