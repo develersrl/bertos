@@ -178,6 +178,7 @@ keymask_t kbd_peek(void)
 	keymask_t key = 0;
 
 #if CONFIG_KBD_SCHED
+	extern void schedule(void);
 	schedule();
 #endif
 
