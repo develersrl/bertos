@@ -95,8 +95,9 @@ static void hello_world(Bitmap *bm)
 	text_xprintf(bm, 1, 0, STYLEF_BOLD | TEXT_FILL | TEXT_CENTER,
 			"Hello, world!");
 	schedule();
-
-	timer_delay(1000);
+	while (1)
+		if (kbd_peek())
+			break;
 
 	/* Restore old font */
 	gfx_setFont(bm, old_font);
