@@ -212,9 +212,9 @@
 	#if defined(ARCH_QT) && (ARCH & ARCH_QT)
 		/* This emulator hook should yield the CPU to the host.  */
 		EXTERN_C_BEGIN
-		void refresh(void);
+		void schedule(void);
 		EXTERN_C_END
-		#define CPU_IDLE refresh()
+		#define CPU_IDLE schedule()
 	#else /* !ARCH_EMUL */
 		#define CPU_IDLE do { /* nothing */ } while (0)
 	#endif /* !ARCH_EMUL */
