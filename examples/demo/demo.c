@@ -61,7 +61,7 @@
 /**
  * Refresh the GUI.
  */
-void refresh(void)
+void schedule(void)
 {
 	PROC_ATOMIC(
 		lcd_blitBitmap(&lcd_bitmap);
