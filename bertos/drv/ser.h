@@ -62,10 +62,10 @@
 	#define SERRF_TXTIMEOUT      BV(2)  /**< Transmit timeout */
 
 	/* Hardware errors */
-	#define SERRF_RXSROVERRUN    0      /**< Unsupported in emulated serial port. */
-	#define SERRF_FRAMEERROR     0      /**< Unsupported in emulated serial port. */
-	#define SERRF_PARITYERROR    0      /**< Unsupported in emulated serial port. */
-	#define SERRF_NOISEERROR     0      /**< Unsupported in emulated serial port. */
+	#define SERRF_RXSROVERRUN    0      /**< Rx shift register overrun, unsupported in emulated serial port. */
+	#define SERRF_FRAMEERROR     0      /**< Stop bit missing, unsupported in emulated serial port. */
+	#define SERRF_PARITYERROR    0      /**< Parity error, unsupported in emulated serial port. */
+	#define SERRF_NOISEERROR     0      /**< Noise error, unsupported in emulated serial port. */
 
 	enum
 	{
@@ -93,8 +93,8 @@
 	| SERRF_RXSROVERRUN \
 	| SERRF_PARITYERROR \
 	| SERRF_FRAMEERROR \
-	| SERRF_NOISEERROR)
-#define SERRF_TX  (SERRF_TXTIMEOUT)
+	| SERRF_NOISEERROR)       /**< All possible rx errors */
+#define SERRF_TX  (SERRF_TXTIMEOUT)  /**< All possible tx errors */
 /*\}*/
 
 /**
@@ -212,8 +212,8 @@ void spimaster_init(Serial *fds, unsigned int unit);
  *
  * \{
  */
-#define ser_getstatus(h)    ((h)->status)
-#define ser_setstatus(h, x) ((h)->status = (x))
+#define ser_getstatus(serial)    ((serial)->status)
+#define ser_setstatus(serial, new_status) ((serial)->status = (new_status))
 /* \} */
 
 #endif /* DRV_SER_H */

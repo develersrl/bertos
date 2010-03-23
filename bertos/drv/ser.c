@@ -410,6 +410,8 @@ static struct KFile *ser_reopen(struct KFile *fd)
 
 /**
  * Init serial driver for \a unit.
+ *
+ * Use values SER_UARTn as values for \a unit.
  */
 void ser_init(struct Serial *fds, unsigned int unit)
 {
@@ -475,6 +477,8 @@ static size_t spimaster_write(struct KFile *fd, const void *buf, size_t size)
 
 /**
  * Init SPI serial driver \a unit in master mode.
+ *
+ * Use SER_SPIn for \a unit parameter.
  *
  * This interface implements the SPI master protocol over a serial SPI
  * driver. This is needed because normal serial driver send/receive data
