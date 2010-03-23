@@ -119,6 +119,7 @@ def showStartPage():
     QApplication.instance().dialog.show()
 
 def main():
+    rundir = os.getcwd()
     os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
     app = QApplication(sys.argv)
     app.settings = QSettings("Develer", "Bertos Configurator")
@@ -128,7 +129,7 @@ def main():
         os.system("rcc -binary bertos.qrc -o bertos.rcc")
     QResource.registerResource("bertos.rcc")
     if len(sys.argv) == 3 and sys.argv[1] == "--edit":
-        editProject(sys.argv[2])
+        editProject(os.path.join(rundir, sys.argv[2]))
     else:
         newProject()
  

@@ -42,6 +42,8 @@ from PyQt4.QtGui import *
 
 def _excepthook(exc_type, exc_value, exc_traceback):
     project_dir = QApplication.instance().project.info("PROJECT_PATH")
+    if not project_dir:
+        project_dir = os.getcwd()
     file_name = os.path.join(project_dir, "wizard_error.log")
     if os.path.exists(file_name):
         content = open(file_name, "r").read()
@@ -55,6 +57,7 @@ def _excepthook(exc_type, exc_value, exc_traceback):
     f.write(">"*80 + "\n")
     f.write(content)
     f.close()
+    print>>sys.stderr, message
     QMessageBox.critical(
         None,
         "Exception occurred",
