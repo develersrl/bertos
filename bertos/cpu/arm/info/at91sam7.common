@@ -78,7 +78,7 @@ MK_STOPDEBUG_SCRIPT = PRG_SCRIPTS_DIR + "arm/stopopenocd.sh"
 GDB_INIT_SCRIPT = PRG_SCRIPTS_DIR + "arm/openocd/gdbinit-sam7"
 
 # Common GCC flags.
-MK_CPU_CPPAFLAGS = "-O0 -g -gdwarf-2 -g -gen-debug"
+MK_CPU_CPPAFLAGS = "-g -gdwarf-2"
 MK_CPU_CPPFLAGS = "-O0 -g3 -gdwarf-2 -fverbose-asm -I" + CPU_DIR + "arm/"
 MK_CPU_LDFLAGS = "-nostartfiles -Wl,--no-warn-mismatch"
 
