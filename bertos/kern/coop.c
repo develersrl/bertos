@@ -57,12 +57,40 @@
  */
 void coop_yield(void);
 void coop_switch(void);
+void coop_wakeup(Process *proc);
 
+/**
+ * Give the control of the CPU to another process.
+ *
+ * \note Assume the current process has been already added to a wait queue.
+ *
+ * \warning This should be considered an internal kernel function, even if it
+ * is allowed, usage from application code is strongly discouraged.
+ */
 void coop_switch(void)
 {
-	IRQ_ASSERT_ENABLED();
-
 	ATOMIC(proc_schedule());
+}
+
+/**
+ * Immediately wakeup a process, dispatching it to the CPU.
+ */
+void coop_wakeup(Process *proc)
+{
+	ASSERT(proc_preemptAllowed());
+	ASSERT(current_process);
+	IRQ_ASSERT_DISABLED();
+
+	if (prio_proc(proc) >= prio_curr())
+	{
+		Process *old_process = current_process;
+
+		SCHED_ENQUEUE(current_process);
+		current_process = proc;
+		proc_switchTo(current_process, old_process);
+	}
+	else
+		SCHED_ENQUEUE_HEAD(proc);
 }
 
 /**

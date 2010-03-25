@@ -50,6 +50,30 @@
 
 #include <kern/proc.h>   // struct Process
 
+/**
+ * CPU dependent context switching routines.
+ *
+ * Saving and restoring the context on the stack is done by a CPU-dependent
+ * support routine which usually needs to be written in assembly.
+ */
+EXTERN_C void asm_switch_context(cpu_stack_t **new_sp, cpu_stack_t **save_sp);
+
+/*
+ * Save context of old process and switch to new process.
+  */
+INLINE void proc_switchTo(Process *next, Process *prev)
+{
+	cpu_stack_t *dummy;
+
+	if (UNLIKELY(next == prev))
+		return;
+	/*
+	 * If there is no old process, we save the old stack pointer into a
+	 * dummy variable that we ignore.  In fact, this happens only when the
+	 * old process has just exited.
+	 */
+	asm_switch_context(&next->stack, prev ? &prev->stack : &dummy);
+}
 
 /**
  * \name Flags for Process.flags.
@@ -72,7 +96,8 @@ extern REGISTER List     proc_ready_list;
 #if CONFIG_KERN_PRI
 	#define prio_next()	(LIST_EMPTY(&proc_ready_list) ? INT_MIN : \
 					((PriNode *)LIST_HEAD(&proc_ready_list))->pri)
-	#define prio_curr()	(current_process->link.pri)
+	#define prio_proc(proc)	(proc->link.pri)
+	#define prio_curr()	prio_proc(current_process)
 
 	#define SCHED_ENQUEUE_INTERNAL(proc) \
 			LIST_ENQUEUE(&proc_ready_list, &(proc)->link)
@@ -80,6 +105,7 @@ extern REGISTER List     proc_ready_list;
 			LIST_ENQUEUE_HEAD(&proc_ready_list, &(proc)->link)
 #else
 	#define prio_next()	0
+	#define prio_proc(proc)	0
 	#define prio_curr()	0
 
 	#define SCHED_ENQUEUE_INTERNAL(proc) ADDTAIL(&proc_ready_list, &(proc)->link)
@@ -152,6 +178,9 @@ void proc_switch(void);
 
 /* Low level scheduling routine. */
 void proc_schedule(void);
+
+/* Low level context switch routine. */
+void proc_switchTo(Process *next, Process *prev);
 
 /* Initialize a scheduler class. */
 void proc_schedInit(void);

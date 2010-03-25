@@ -62,14 +62,6 @@
 
 #define PROC_SIZE_WORDS (ROUND_UP2(sizeof(Process), sizeof(cpu_stack_t)) / sizeof(cpu_stack_t))
 
-/**
- * CPU dependent context switching routines.
- *
- * Saving and restoring the context on the stack is done by a CPU-dependent
- * support routine which usually needs to be written in assembly.
- */
-EXTERN_C void asm_switch_context(cpu_stack_t **new_sp, cpu_stack_t **save_sp);
-
 /*
  * The scheduer tracks ready processes by enqueuing them in the
  * ready list.
@@ -428,15 +420,6 @@ void proc_exit(void)
 	ASSERT(0);
 }
 
-
-/**
- * Get the pointer to the user data of the current process
- */
-iptr_t proc_currentUserData(void)
-{
-	return current_process->user_data;
-}
-
 /**
  * Call the scheduler and eventually replace the current running process.
  */
@@ -470,22 +453,7 @@ void proc_schedule(void)
 		MEMORY_BARRIER;
 		IRQ_DISABLE;
 	}
-	/*
-	 * Optimization: don't switch contexts when the active process has not
-	 * changed.
-	 */
-	if (LIKELY(current_process != old_process)) {
-		cpu_stack_t *dummy;
-
-		/*
-		 * Save context of old process and switch to new process. If
-		 * there is no old process, we save the old stack pointer into
-		 * a dummy variable that we ignore. In fact, this happens only
-		 * when the old process has just exited.
-		 */
-		asm_switch_context(&current_process->stack,
-				old_process ? &old_process->stack : &dummy);
-	}
+	proc_switchTo(current_process, old_process);
 	/* This RET resumes the execution on the new process */
 	LOG_INFO("resuming %p:%s\n", current_process, proc_currentName());
 }

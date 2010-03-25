@@ -148,6 +148,7 @@ void proc_exit(void);
 void proc_yield(void);
 void proc_preempt(void);
 int proc_needPreempt(void);
+void proc_wakeup(Process *proc);
 
 /**
  * Dummy function that defines unimplemented scheduler class methods.
@@ -167,6 +168,7 @@ INLINE void __proc_noop(void)
 	 * Preemptive scheduler: private methods.
 	 */
 	#define preempt_switch		proc_switch
+	#define preempt_wakeup		proc_wakeup
 #else
 	/**
 	 * Co-operative scheduler: public methods.
@@ -178,6 +180,7 @@ INLINE void __proc_noop(void)
 	 * Co-operative scheduler: private methods.
 	 */
 	#define coop_switch		proc_switch
+	#define coop_wakeup		proc_wakeup
 #endif
 
 void proc_rename(struct Process *proc, const char *name);
@@ -191,7 +194,11 @@ const char *proc_currentName(void);
  * the returned pointer to the correct type.
  * \return Pointer to the user data of the current process.
  */
-iptr_t proc_currentUserData(void);
+INLINE iptr_t proc_currentUserData(void)
+{
+	extern struct Process *current_process;
+	return current_process->user_data;
+}
 
 int proc_testSetup(void);
 int proc_testRun(void);
