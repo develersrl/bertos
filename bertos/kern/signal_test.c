@@ -93,8 +93,25 @@ static void proc_signalTest##index(void) \
 		count++; \
 	} while(0) \
 
-#define PROC_TEST_SLAVE_STACK(index) PROC_DEFINE_STACK(proc_signal_test##index##_stack, KERN_MINSTACKSIZE);
+#if CONFIG_KERN_HEAP
+
+#define PROC_TEST_SLAVE_INIT(index, master_process) proc_new(proc_signalTest##index, master_process, KERN_MINSTACKSIZE * 2, NULL)
+
+#else
+
+#define PROC_TEST_SLAVE_STACK(index) PROC_DEFINE_STACK(proc_signal_test##index##_stack, KERN_MINSTACKSIZE * 2);
 #define PROC_TEST_SLAVE_INIT(index, master_process) proc_new(proc_signalTest##index, master_process, sizeof(proc_signal_test##index##_stack), proc_signal_test##index##_stack)
+
+PROC_TEST_SLAVE_STACK(0)
+PROC_TEST_SLAVE_STACK(1)
+PROC_TEST_SLAVE_STACK(2)
+PROC_TEST_SLAVE_STACK(3)
+PROC_TEST_SLAVE_STACK(4)
+PROC_TEST_SLAVE_STACK(5)
+PROC_TEST_SLAVE_STACK(6)
+PROC_TEST_SLAVE_STACK(7)
+
+#endif
 
 // Generate the code for signal test.
 PROC_TEST_SLAVE(0, SIG_USER0)
@@ -105,15 +122,6 @@ PROC_TEST_SLAVE(4, SIG_TIMEOUT)
 PROC_TEST_SLAVE(5, SIG_SYSTEM5)
 PROC_TEST_SLAVE(6, SIG_SYSTEM6)
 PROC_TEST_SLAVE(7, SIG_SINGLE)
-
-PROC_TEST_SLAVE_STACK(0)
-PROC_TEST_SLAVE_STACK(1)
-PROC_TEST_SLAVE_STACK(2)
-PROC_TEST_SLAVE_STACK(3)
-PROC_TEST_SLAVE_STACK(4)
-PROC_TEST_SLAVE_STACK(5)
-PROC_TEST_SLAVE_STACK(6)
-PROC_TEST_SLAVE_STACK(7)
 
 /**
  * Run signal test
