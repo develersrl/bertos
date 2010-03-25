@@ -157,6 +157,8 @@ void sem_obtain(struct Semaphore *s)
  */
 void sem_release(struct Semaphore *s)
 {
+	Process *proc = NULL;
+
 	proc_forbid();
 	sem_verify(s);
 
@@ -168,8 +170,6 @@ void sem_release(struct Semaphore *s)
 	 */
 	if (--s->nest_count == 0)
 	{
-		Process *proc;
-
 		/* Disown semaphore */
 		s->owner = NULL;
 
@@ -178,9 +178,10 @@ void sem_release(struct Semaphore *s)
 		{
 			s->nest_count = 1;
 			s->owner = proc;
-			ATOMIC(SCHED_ENQUEUE(proc));
 		}
 	}
-
 	proc_permit();
+
+	if (proc)
+		ATOMIC(proc_wakeup(proc));
 }

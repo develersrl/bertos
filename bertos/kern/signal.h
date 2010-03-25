@@ -53,7 +53,16 @@ struct Process;
 
 /* Inter-process Communication services */
 sigmask_t sig_check(sigmask_t sigs);
-void sig_signal(struct Process *proc, sigmask_t sig);
+void sig_send(struct Process *proc, sigmask_t sig);
+void sig_post(struct Process *proc, sigmask_t sig);
+/*
+ * XXX: this is provided for backword compatibility, consider to make this
+ * deprecated for the future.
+ */
+INLINE void sig_signal(struct Process *proc, sigmask_t sig)
+{
+	sig_post(proc, sig);
+}
 sigmask_t sig_wait(sigmask_t sigs);
 sigmask_t sig_waitTimeout(sigmask_t sigs, ticks_t timeout);
 

@@ -65,10 +65,42 @@
  * particular event has occurred, because the same signal may be
  * delivered twice before the process can notice.
  *
- * Any execution context, including an interrupt handler, can deliver
- * a signal to a process using sig_signal().  Multiple independent signals
- * may be delivered at once with a single invocation of sig_signal(),
- * although this is rarely useful.
+ * Signals can be delivered synchronously via sig_send() or asynchronously via
+ * sig_post().
+ *
+ * In the synchronous case the process is awakened if it was waiting for any
+ * signal and immediately dispatched for execution via a direct context switch,
+ * if its priority is greater than the running process.
+ *
+ * <pre>
+ * - Synchronous-signal delivery:
+ *
+ *     P1__                                   __P2
+ *         \                                 /
+ *          \__sig_send()____proc_wakeup()__/
+ * </pre>
+ *
+ * In the asynchronous case, the process is scheduled for execution as a
+ * consequence of the delivery, but it will be dispatched by the scheduler as
+ * usual, according to the scheduling policy.
+ *
+ * <pre>
+ * - Asynchronous-signal delivery:
+ *
+ *     P1__                  __P1__                       __P2
+ *         \                /      \                     /
+ *          \__sig_post()__/        \__proc_schedule()__/
+ * </pre>
+ *
+ * In this way, any execution context, including an interrupt handler, can
+ * deliver a signal to a process. However, synchronous signal delivery from a
+ * non-sleepable context (like an interrupt handler) is forbidden in order to
+ * avoid potential deadlock conditions. Instead, sig_post() can be used from
+ * any context, expecially from interrupt context or when the preemption is
+ * disabled.
+ *
+ * Multiple independent signals may be delivered at once with a single
+ * invocation of sig_send() or sig_post(), although this is rarely useful.
  *
  * \section signal_allocation Signal Allocation
  *
@@ -146,13 +178,13 @@ sigmask_t sig_wait(sigmask_t sigs)
 	ASSERT(proc_preemptAllowed());
 
 	/*
-	 * This is subtle: there's a race condition where a concurrent
-	 * process or an interrupt may call sig_signal() to set a bit in
-	 * Process.sig_recv just after we have checked for it, but before
-	 * we've set Process.sig_wait to let them know we want to be awaken.
+	 * This is subtle: there's a race condition where a concurrent process
+	 * or an interrupt may call sig_send()/sig_post() to set a bit in
+	 * Process.sig_recv just after we have checked for it, but before we've
+	 * set Process.sig_wait to let them know we want to be awaken.
 	 *
-	 * In this case, we'd deadlock with the signal bit already set
-	 * and the process never being reinserted into the ready list.
+	 * In this case, we'd deadlock with the signal bit already set and the
+	 * process never being reinserted into the ready list.
 	 */
 	IRQ_DISABLE;
 
@@ -165,20 +197,12 @@ sigmask_t sig_wait(sigmask_t sigs)
 		 */
 		current_process->sig_wait = sigs;
 
-		/*
-		 * Go to sleep and proc_switch() to another process.
-		 *
-		 * We re-enable IRQs because proc_switch() does not
-		 * guarantee to save and restore the interrupt mask.
-		 */
-		IRQ_ENABLE;
+		/* Go to sleep and proc_switch() to another process. */
 		proc_switch();
-		IRQ_DISABLE;
-
 		/*
 		 * When we come back here, the wait mask must have been
-		 * cleared by someone through sig_signal(), and at least
-		 * one of the signals we were expecting must have been
+		 * cleared by someone through sig_send()/sig_post(), and at
+		 * least one of the signals we were expecting must have been
 		 * delivered to us.
 		 */
 		ASSERT(!current_process->sig_wait);
@@ -227,18 +251,13 @@ sigmask_t sig_waitTimeout(sigmask_t sigs, ticks_t timeout)
 
 #endif // CONFIG_TIMER_EVENTS
 
-
-/**
- * Send the signals \a sigs to the process \a proc.
- * The process will be awoken if it was waiting for any of them.
- *
- * \note This call is interrupt safe.
- */
-void sig_signal(Process *proc, sigmask_t sigs)
+INLINE void __sig_signal(Process *proc, sigmask_t sigs, bool wakeup)
 {
 	cpu_flags_t flags;
 
-	/* See comment in sig_wait() for why this protection is necessary */
+	if (UNLIKELY(proc == current_process))
+		return;
+
 	IRQ_SAVE_DISABLE(flags);
 
 	/* Set the signals */
@@ -247,17 +266,43 @@ void sig_signal(Process *proc, sigmask_t sigs)
 	/* Check if process needs to be awoken */
 	if (proc->sig_recv & proc->sig_wait)
 	{
-		/*
-		 * Wake up process and enqueue in ready list.
-		 *
-		 * Move this process to the head of the ready list, so that it
-		 * will be chosen at the next scheduling point.
-		 */
 		proc->sig_wait = 0;
-		SCHED_ENQUEUE_HEAD(proc);
+		if (wakeup)
+			proc_wakeup(proc);
+		else
+			SCHED_ENQUEUE_HEAD(proc);
 	}
-
 	IRQ_RESTORE(flags);
+}
+
+/**
+ * Send the signals \a sigs to the process \a proc and immeditaly dispatch it
+ * for execution.
+ *
+ * The process will be awoken if it was waiting for any of them and immediately
+ * dispatched for execution.
+ *
+ * \note This function can't be called from IRQ context, use sig_post()
+ * instead.
+ */
+void sig_send(Process *proc, sigmask_t sigs)
+{
+	ASSERT_USER_CONTEXT();
+	IRQ_ASSERT_ENABLED();
+	ASSERT(proc_preemptAllowed());
+
+	__sig_signal(proc, sigs, true);
+}
+
+/**
+ * Send the signals \a sigs to the process \a proc.
+ * The process will be awoken if it was waiting for any of them.
+ *
+ * \note This call is interrupt safe.
+ */
+void sig_post(Process *proc, sigmask_t sigs)
+{
+	__sig_signal(proc, sigs, false);
 }
 
 #endif /* CONFIG_KERN_SIGNALS */
