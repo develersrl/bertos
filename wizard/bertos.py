@@ -79,7 +79,7 @@ def newProject():
             relevant_file = relevant_files[ide]
             QProcess.startDetached(command_line, [relevant_file,])
     sys.exit()
-    
+
 def editProject(project_file):
     info_dict = {}
     while(True):
@@ -120,7 +120,11 @@ def showStartPage():
 
 def main():
     rundir = os.getcwd()
-    os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
+    datadir = sys.argv[0]
+    if os.path.islink(datadir):
+        datadir = os.readlink(datadir)
+    datadir = os.path.dirname(os.path.abspath(datadir))
+    os.chdir(datadir)
     app = QApplication(sys.argv)
     app.settings = QSettings("Develer", "Bertos Configurator")
     app.project = BProject.BProject()
@@ -132,7 +136,7 @@ def main():
         editProject(os.path.join(rundir, sys.argv[2]))
     else:
         newProject()
- 
+
 
 if __name__ == '__main__':
     main()
