@@ -86,7 +86,7 @@
 	 */
 	static DECLARE_ISR(adc_conversion_end_irq)
 	{
-		sig_signal(adc_process, SIG_ADC_COMPLETE);
+		sig_post(adc_process, SIG_ADC_COMPLETE);
 
 		/* Inform hw that we have served the IRQ */
 		AIC_EOICR = 0;

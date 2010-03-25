@@ -16,6 +16,7 @@ avr-kern_PROGRAMMER_PORT = none
 avr-kern_USER_CSRC = \
 	examples/avr-kern/main.c \
 	bertos/kern/proc_test.c \
+	bertos/kern/signal_test.c \
 	bertos/mware/sprintf.c \
 	#
 

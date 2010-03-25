@@ -49,7 +49,7 @@ int main(void)
 	
 	while (1)
 	{
-		sig_signal(p, SIG_USER0);
+		sig_send(p, SIG_USER0);
 		proc_yield();
 	}
 

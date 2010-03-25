@@ -34,7 +34,7 @@ int main(void)
 	Msg *msg_re = msg_get(&in_port);
 	msg_reply(msg_re);
 	// generate code for signals
-	sig_signal(p, SIG_USER0);
+	sig_send(p, SIG_USER0);
 	sig_wait(SIG_USER0);
 
 	return 0;

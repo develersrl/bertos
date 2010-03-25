@@ -296,7 +296,7 @@ static int preempt_worker_test(void)
 { \
 	struct Process *main_proc = (struct Process *) proc_currentUserData(); \
 	kputs("> Process: " #num "\n"); \
-	sig_signal(main_proc, SIG_USER##num); \
+	sig_send(main_proc, SIG_USER##num); \
 }
 
 // Default priority is 0

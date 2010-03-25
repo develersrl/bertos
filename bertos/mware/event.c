@@ -47,7 +47,7 @@ void event_hook_ignore(UNUSED_ARG(Event *, e))
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 void event_hook_signal(Event *e)
 {
-	sig_signal((e)->Ev.Sig.sig_proc, (e)->Ev.Sig.sig_bit);
+	sig_post((e)->Ev.Sig.sig_proc, (e)->Ev.Sig.sig_bit);
 }
 #endif
 

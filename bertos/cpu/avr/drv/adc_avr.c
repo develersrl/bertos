@@ -89,7 +89,7 @@
 	 */
 	ISR(ADC_vect)
 	{
-		sig_signal(adc_process, SIG_ADC_COMPLETE);
+		sig_post(adc_process, SIG_ADC_COMPLETE);
 	}
 #endif /* CONFIG_KERN */
 

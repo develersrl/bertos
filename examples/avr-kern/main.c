@@ -4,6 +4,7 @@
 #include <cpu/irq.h>
 #include <drv/timer.h>
 #include <kern/proc.h>
+#include <kern/signal.h>
 #include <stdio.h>
 
 static void init(void)
@@ -27,6 +28,7 @@ int main(void)
 	kputs("\n");
 
 	proc_testRun();
+	signal_testRun();
 	while (1)
 		cpu_relax();
 

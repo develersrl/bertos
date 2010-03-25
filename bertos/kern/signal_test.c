@@ -76,21 +76,18 @@ sigmask_t sig_to_slave;
  * These macros generate the code needed to create the test process functions.
  */
 #define PROC_TEST_SLAVE(index, signal) \
-static void NORETURN proc_signalTest##index(void) \
+static void proc_signalTest##index(void) \
 { \
-	for(;;) \
-	{ \
-		kputs("> Slave [" #index "]: Wait signal [" #signal "]\n"); \
-		sig_wait(signal); \
-		kputs("> Slave [" #index "]: send signal [" #signal "]\n"); \
-		sig_signal(proc_currentUserData(), signal); \
-	} \
+	kputs("> Slave [" #index "]: Wait signal [" #signal "]\n"); \
+	sig_wait(signal); \
+	kputs("> Slave [" #index "]: send signal [" #signal "]\n"); \
+	sig_send(proc_currentUserData(), signal); \
 }
 
 #define MAIN_CHECK_SIGNAL(index, slave) \
 	do { \
 		kprintf("> Main: send signal [%d]\n", test_signal[index]); \
-		sig_signal(slave, test_signal[index]); \
+		sig_send(slave, test_signal[index]); \
 		kprintf("> Main: wait signal [%d]\n", test_signal[index]); \
 		sig_wait(test_signal[index]); \
 		count++; \
