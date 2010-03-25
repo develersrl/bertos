@@ -50,6 +50,7 @@
 #include <cfg/macros.h>
 
 #include <kern/proc.h>
+#include <kern/signal.h>
 
 #include <cpu/detect.h>
 
@@ -176,7 +177,13 @@ int main(void)
 		kfile_printf(&ser_fd.fd, "ProcTest..ok!\n");
 	else
 		kfile_printf(&ser_fd.fd, "ProcTest..FAIL!\n");
-
+	/*
+	 * Run signal test.
+	 */
+	if(!signal_testRun())
+		kfile_printf(&ser_fd.fd, "SignalTest..ok!\n");
+	else
+		kfile_printf(&ser_fd.fd, "SignalTest..FAIL!\n");
 
 	kputs(AT91SAM7_MSG);
 
