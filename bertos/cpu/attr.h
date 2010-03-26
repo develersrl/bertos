@@ -212,7 +212,7 @@
 	/// Valid pointers should be >= than this value (used for debug)
 	#if CPU_AVR_ATMEGA8 || CPU_AVR_ATMEGA32 || CPU_AVR_ATMEGA103
 		#define CPU_RAM_START       0x60
-	#elif CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA168
+	#elif CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA168 || CPU_AVR_ATMEGA328P
 		#define CPU_RAM_START       0x100
 	#elif CPU_AVR_ATMEGA1281
 		#define CPU_RAM_START       0x200

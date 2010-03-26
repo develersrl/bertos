@@ -73,7 +73,7 @@
 	#define KDBG_UART0_BUS_TX    do {} while (0)
 	#endif
 
-	#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281 || CPU_AVR_ATMEGA168
+	#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281 || CPU_AVR_ATMEGA168 || CPU_AVR_ATMEGA328P
 		#define UCR UCSR0B
 		#define UDR UDR0
 		#define USR UCSR0A
@@ -245,7 +245,7 @@ INLINE void kdbg_hw_init(void)
 				#error CONFIG_KDEBUG_PORT must be either 0 or 1
 			#endif
 
-		#elif CPU_AVR_ATMEGA168
+		#elif CPU_AVR_ATMEGA168 || CPU_AVR_ATMEGA328P
 			UBRR0H = (uint8_t)(period>>8);
 			UBRR0L = (uint8_t)period;
 			KDBG_UART0_BUS_INIT;
