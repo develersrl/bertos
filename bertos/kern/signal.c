@@ -75,9 +75,7 @@
  * <pre>
  * - Synchronous-signal delivery:
  *
- *     P1__                                   __P2
- *         \                                 /
- *          \__sig_send()____proc_wakeup()__/
+ *     [P1]____sig_send()____proc_wakeup()____[P2]
  * </pre>
  *
  * In the asynchronous case, the process is scheduled for execution as a
@@ -87,9 +85,7 @@
  * <pre>
  * - Asynchronous-signal delivery:
  *
- *     P1__                  __P1__                       __P2
- *         \                /      \                     /
- *          \__sig_post()__/        \__proc_schedule()__/
+ *     [P1]____sig_post()____[P1]____proc_schedule()____[P2]
  * </pre>
  *
  * In this way, any execution context, including an interrupt handler, can
