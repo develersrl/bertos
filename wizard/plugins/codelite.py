@@ -99,7 +99,7 @@ def codeliteProjectGenerator(project_info):
     """
     Returns the string rapresenting the codelite project.
     """
-    template = open("cltemplates/bertos.project", "r").read()
+    template = open(os.path.join(const.DATA_DIR, "cltemplates/bertos.project"), "r").read()
     filelist = "\n".join(clFiles(findSources(project_info.info("PROJECT_PATH")), ""))
     debugger_path = project_info.info("TOOLCHAIN")["path"].replace("gcc", "gdb")
     init_script = project_info.info("CPU_INFOS")["GDB_INIT_SCRIPT"]
@@ -118,7 +118,7 @@ def codeliteWorkspaceGenerator(project_info):
     """
     Returns the string rapresentig the codelite workspace.
     """
-    template = open("cltemplates/bertos.workspace", "r").read()
+    template = open(os.path.join(const.DATA_DIR, "cltemplates/bertos.workspace"), "r").read()
     project_name = os.path.basename(project_info.info("PROJECT_PATH"))
     while template.find("$project") != -1:
         template = template.replace("$project", project_name)

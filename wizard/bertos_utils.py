@@ -167,7 +167,7 @@ def createBertosProject(project_info, edit=False):
         mergeSources(srcdir, sources_dir, old_sources_dir)
     # Destination makefile
     makefile = directory + "/Makefile"
-    makefile = open("mktemplates/Makefile").read()
+    makefile = open(os.path.join(const.DATA_DIR, "mktemplates/Makefile"), 'r').read()
     makefile = makefileGenerator(project_info, makefile)
     open(directory + "/Makefile", "w").write(makefile)
     # Destination project dir
@@ -219,16 +219,16 @@ def createBertosProject(project_info, edit=False):
         f.close()
     if not edit:
         # Destination user mk file (only on project creation)
-        makefile = open("mktemplates/template.mk", "r").read()
+        makefile = open(os.path.join(const.DATA_DIR, "mktemplates/template.mk"), "r").read()
         makefile = mkGenerator(project_info, makefile)
         open(prjdir + "/" + os.path.basename(prjdir) + ".mk", "w").write(makefile)
     # Destination wizard mk file
-    makefile = open("mktemplates/template_wiz.mk", "r").read()
+    makefile = open(os.path.join(const.DATA_DIR, "mktemplates/template_wiz.mk"), "r").read()
     makefile = mkGenerator(project_info, makefile)
     open(prjdir + "/" + os.path.basename(prjdir) + "_wiz.mk", "w").write(makefile)
     # Destination main.c file
     if not edit:
-        main = open("srctemplates/main.c", "r").read()
+        main = open(os.path.join(const.DATA_DIR, "srctemplates/main.c"), "r").read()
         open(prjdir + "/main.c", "w").write(main)
     # Files for selected plugins
     relevants_files = {}

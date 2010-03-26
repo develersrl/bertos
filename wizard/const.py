@@ -33,6 +33,14 @@
 # Author: Lorenzo Berni <duplo@develer.com>
 #
 
+import os, sys
+
+_tmp = sys.argv[0]
+if os.path.islink(_tmp):
+    _tmp = os.readlink(_tmp)
+DATA_DIR = os.path.dirname(os.path.abspath(_tmp))
+del _tmp
+
 CPU_DEF = {
     "CPU_NAME": "",
     "CPU_DIR": "",

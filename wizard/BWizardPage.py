@@ -33,11 +33,15 @@
 # Author: Lorenzo Berni <duplo@develer.com>
 #
 
+import os
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4 import uic
 
 import qvariant_converter
+
+import const
 
 class BWizardPage(QWizardPage):
     """
@@ -47,7 +51,7 @@ class BWizardPage(QWizardPage):
     
     def __init__(self, wizardGui, parent = None):
         QWizardPage.__init__(self, parent)
-        self.pageContent = uic.loadUi(wizardGui, None)
+        self.pageContent = uic.loadUi(os.path.join(const.DATA_DIR, wizardGui), None)
         layout = QVBoxLayout()
         layout.addWidget(self.pageContent)
         self.setLayout(layout)
