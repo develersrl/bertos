@@ -26,24 +26,43 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2007 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
- * \version $Id$
+ * \brief LM3S1968 Cortex-M3 testcase
  *
- * \author Manuele Fanelli <qwert@develer.com>
- *
- * \brief LM3S168 porting test.
+ * \author Andrea Righi <arighi@develer.com>
  */
 
-#include "bertos/cpu/detect.h"
+#include <cpu/irq.h>
+#include "io/lm3s.h"
+#include "drv/timer.h"
 
-int main (void)
+extern unsigned long ticks;
+
+int main(void)
 {
-	int c;
+	timer_hw_init();
 
-	for (;;)
-		c++;
-	return 0;
+	/* Enable the GPIO port that is used for the on-board LED */
+	SYSCTL_RCGC2_R = SYSCTL_RCGC2_GPIOG;
+	/*
+	 * Perform a dummy read to insert a few cycles delay before enabling
+	 * the peripheral.
+	 */
+	(void)SYSCTL_RCGC2_R;
+	/* Enable the GPIO pin for the LED */
+	GPIO_PORTG_DIR_R = 0x04;
+	GPIO_PORTG_DEN_R = 0x04;
+
+	while(1)
+	{
+		/* Turn on the LED */
+		if ((ticks & 0x04) == 0x04)
+			GPIO_PORTG_DATA_R |= 0x04;
+		/* Turn off the LED */
+		else if ((ticks & 0x04) == 0)
+			GPIO_PORTG_DATA_R &= ~0x04;
+	}
 }
