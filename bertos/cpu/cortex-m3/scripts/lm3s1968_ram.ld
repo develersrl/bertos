@@ -30,22 +30,19 @@
  *
  * -->
  *
- * \version $Id:$
- *
  * \author Manuele Fanelli <qwert@develer.com>
  *
- * \brief Linker script for Luminary LM3S1968 processor.
+ * \brief Script for Luminary Micro LM3S1968 Cortex M3 family processors.
  *
  */
 
 
-ENTRY(_init)
 SEARCH_DIR(.)
 OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
 
 /*
- * Define memory configuration.
+ * Define memory configuration for LM3S1968 board
  */
 MEMORY
 {
@@ -87,9 +84,11 @@ SECTIONS
 	_etext = .;
 	PROVIDE (__etext = .);
 
-	.data : AT (__etext)
+	.data : AT (_etext)
 	{
 		PROVIDE (__data_start = .);
+		*(vtable)
+		. = ALIGN (0x400);
 		*(.data .data.*)
 		. = ALIGN (4);
 		_edata = .;

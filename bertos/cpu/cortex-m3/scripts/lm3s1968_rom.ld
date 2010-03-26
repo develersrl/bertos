@@ -30,16 +30,12 @@
  *
  * -->
  *
- * \version $Id: sysirq_at91.c 18273 2007-10-11 14:53:02Z batt $
- *
  * \author Manuele Fanelli <qwert@develer.com>
  *
  * \brief Script for Luminary Micro LM3S1968 Cortex M3 family processors.
  *
  */
 
-
-ENTRY(_init)
 SEARCH_DIR(.)
 OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
@@ -90,6 +86,8 @@ SECTIONS
 	.data : AT (_etext)
 	{
 		PROVIDE (__data_start = .);
+		*(vtable)
+		. = ALIGN (0x400);
 		*(.data .data.*)
 		. = ALIGN (4);
 		_edata = .;

@@ -63,6 +63,37 @@
 		#define IRQ_RESTORE(x)          FIXME
 	#endif /* OS_EMBEDDED */
 
+#elif CPU_ARM_LM3S1968
+
+	#define IRQ_DISABLE asm volatile ("cpsid i" : : : "memory", "cc")
+	#define IRQ_ENABLE asm volatile ("cpsie i" : : : "memory", "cc")
+
+	#define IRQ_SAVE_DISABLE(x)					\
+	({								\
+		asm volatile (						\
+			"mrs %0, PRIMASK\n"				\
+			"cpsid i"					\
+			: "=r" (x) : : "memory", "cc");			\
+	})
+
+	#define IRQ_RESTORE(x)						\
+	({								\
+		if (x)							\
+			IRQ_DISABLE;					\
+		else							\
+			IRQ_ENABLE;					\
+	})
+
+	#define CPU_READ_FLAGS()					\
+	({								\
+		cpu_flags_t sreg;					\
+		asm volatile (						\
+			"mrs %0, PRIMASK\n\t"				\
+			: "=r" (sreg) : : "memory", "cc");		\
+		sreg;							\
+	})
+
+	#define IRQ_ENABLED() (!CPU_READ_FLAGS())
 
 #elif CPU_ARM
 

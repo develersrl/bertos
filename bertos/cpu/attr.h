@@ -109,6 +109,8 @@
 	/// Valid pointers should be >= than this value (used for debug)
 	#if CPU_ARM_AT91
 		#define CPU_RAM_START		0x00200000
+	#elif CPU_ARM_LM3S1968
+		#define CPU_RAM_START		0x20000000
 	#else
 		#warning Fix CPU_RAM_START address for your ARM, default value set to 0x200
 		#define CPU_RAM_START		0x200
