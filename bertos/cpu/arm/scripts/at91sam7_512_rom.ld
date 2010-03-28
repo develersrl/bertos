@@ -49,4 +49,4 @@ MEMORY
 }
 
 
-INCLUDE "bertos/cpu/arm/scripts/at91sam7_rom.ld"
+INCLUDE "bertos/cpu/arm/scripts/arm7tdmi_rom.ld"

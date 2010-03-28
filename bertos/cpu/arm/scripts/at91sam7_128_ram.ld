@@ -49,4 +49,4 @@ MEMORY
   ram(rwx) : org = 0x00200000, len = 32k
 }
 
-INCLUDE "bertos/cpu/arm/scripts/at91sam7_ram.ld"
+INCLUDE "bertos/cpu/arm/scripts/arm7tdmi_ram.ld"
