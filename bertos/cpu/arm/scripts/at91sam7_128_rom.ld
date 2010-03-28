@@ -45,7 +45,7 @@
 MEMORY
 {
   rom(rx) : org = 0x00100000, len = 128k
-  ram(rwx) : org = 0x00200000, len = 64k
+  ram(rwx) : org = 0x00200000, len = 32k
 }
 
 
