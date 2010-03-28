@@ -65,9 +65,14 @@ SECTIONS
 		*(.text .text.*);
 		. = ALIGN (4);
 		*(.glue_7t);
-    		. = ALIGN(4);
-    		*(.glue_7);
-    		. = ALIGN(4);
+		. = ALIGN(4);
+		*(.glue_7);
+		. = ALIGN(4);
+		*(.gcc*);
+		. = ALIGN(4);
+		*(.ctors);
+		. = ALIGN(4);
+		*(.dtors);
 	} > rom
 
 	_etext = .;
