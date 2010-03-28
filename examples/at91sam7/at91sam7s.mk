@@ -31,6 +31,7 @@ at91sam7s_CSRC = \
 	bertos/kern/coop.c \
 	bertos/kern/preempt.c \
 	bertos/kern/proc_test.c \
+	bertos/kern/signal_test.c \
 	bertos/kern/monitor.c \
 	bertos/kern/signal.c \
 	#
