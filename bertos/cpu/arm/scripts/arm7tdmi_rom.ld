@@ -73,10 +73,10 @@ SECTIONS
 		*(.ctors);
 		. = ALIGN(4);
 		*(.dtors);
+		_etext = .;
+		PROVIDE (__etext = .);
 	} > rom
 
-	_etext = .;
-	PROVIDE (__etext = .);
 
 	.data : AT (_etext)
 	{
@@ -98,8 +98,8 @@ SECTIONS
 	} > ram
 
 	/*
-	 * Allocated stack at the end of bss section.
-	 * Data heap is allocate at end of stack.
+	 * Allocate stack at the end of bss section.
+	 * Data heap is allocated at end of stack.
 	 */
 	PROVIDE (__stack_start = .);
 
