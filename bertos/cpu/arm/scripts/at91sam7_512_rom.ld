@@ -39,11 +39,6 @@
  */
 
 
-ENTRY(_init)
-SEARCH_DIR(.)
-OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
-OUTPUT_ARCH(arm)
-
 /*
  * Define memory configuration for AT91SAM7_512 family
  */
@@ -54,90 +49,4 @@ MEMORY
 }
 
 
-/*
- * Define stack size here
- */
-FIQ_STACK_SIZE = 0x0100;
-IRQ_STACK_SIZE = 0x0400;
-ABT_STACK_SIZE = 0x0100;
-UND_STACK_SIZE = 0x0100;
-SVC_STACK_SIZE = 0x1000;
-
-/*
- * Allocate section memory
- */
-SECTIONS
-{
-	.text :
-	{
-		KEEP(*(.vectors));
-		. = ALIGN (4);
-		KEEP(*(.init));
-		. = ALIGN (4);
-		*(.rodata .rodata.*);
-		. = ALIGN (4);
-		*(.text .text.*);
-		. = ALIGN (4);
-		*(.glue_7t);
-    		. = ALIGN(4);
-    		*(.glue_7);
-    		. = ALIGN(4);
-	} > rom
-
-	_etext = .;
-	PROVIDE (__etext = .);
-
-	.data : AT (_etext)
-	{
-		PROVIDE (__data_start = .);
-		*(.data .data.*)
-		. = ALIGN (4);
-		_edata = .;
-		PROVIDE (__data_end = .);
-	} > ram
-
-	.bss :
-	{
-		PROVIDE (__bss_start = .);
-		*(.bss .bss.*)
-		. = ALIGN(4);
-		*(COMMON)
-		. = ALIGN(4);
-		PROVIDE (__bss_end = .);
-	} > ram
-
-	/*
-	 * Allocated stack at the end of bss section.
-	 * Data heap is allocate at end of stack.
-	 */
-	PROVIDE (__stack_start = .);
-
-	PROVIDE (__stack_fiq_start = .);
-	. += FIQ_STACK_SIZE;
-	. = ALIGN(8);
-	PROVIDE (__stack_fiq_end = .);
-
-	PROVIDE (__stack_irq_start = .);
-	. += IRQ_STACK_SIZE;
-	. = ALIGN(8);
-	PROVIDE (__stack_irq_end = .);
-
-	PROVIDE (__stack_abt_start = .);
-	. += ABT_STACK_SIZE;
-	. = ALIGN(8);
-	PROVIDE (__stack_abt_end = .);
-
-	PROVIDE (__stack_und_start = .);
-	. += UND_STACK_SIZE;
-	. = ALIGN(8);
-	PROVIDE (__stack_und_end = .);
-
-	PROVIDE (__stack_svc_start = .);
-	. += SVC_STACK_SIZE;
-	. = ALIGN(8);
-	PROVIDE (__stack_svc_end = .);
-
-	PROVIDE (__stack_end = .);
-
-	PROVIDE (__heap_start = .);
-}
+INCLUDE "bertos/cpu/arm/scripts/at91sam7_rom.ld"
