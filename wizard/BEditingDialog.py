@@ -206,7 +206,7 @@ class BVersionDialog(QDialog):
         QDialog.__init__(self)
 	self.setWindowIcon(QIcon(":/images/appicon.png"))
         layout = QVBoxLayout()
-        version_page = BVersionPage()
+        version_page = BVersionPage(edit=True)
         version_page.reloadData()
 	self.version_page = version_page
         layout.addWidget(version_page)

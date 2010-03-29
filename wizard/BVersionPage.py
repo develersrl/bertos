@@ -48,7 +48,8 @@ class BVersionPage(BWizardPage):
     to use. This page show some pieces of information about the version.
     """
     
-    def __init__(self):
+    def __init__(self, edit=False):
+        self._edit = edit
         BWizardPage.__init__(self, UI_LOCATION + "/bertos_versions.ui")
         self.setTitle(self.tr("Select the BeRTOS directory"))
         self.setSubTitle(self.tr("The project created will be based on the BeRTOS version found"))
@@ -183,6 +184,8 @@ class BVersionPage(BWizardPage):
         Fills the version list with all the BeRTOS versions founded in the QSettings.
         """
         versions = set([])
+        if self._edit:
+            versions.add(self.projectInfo("SOURCES_PATH"))
         if os.name == "nt":
             import winreg_importer
             versions |= set([os.path.normpath(dir) for dir in winreg_importer.getBertosDirs()])

@@ -135,7 +135,9 @@ def projectFileGenerator(project_info):
         if information["enabled"]:
             enabled_modules.append(module)
     project_data["ENABLED_MODULES"] = enabled_modules
-    project_data["SOURCES_PATH"] = project_info.info("SOURCES_PATH")
+    # Use the local BeRTOS version instead of the original one
+    # project_data["SOURCES_PATH"] = project_info.info("SOURCES_PATH")
+    project_data["SOURCES_PATH"] = directory
     project_data["TOOLCHAIN"] = project_info.info("TOOLCHAIN")
     project_data["CPU_NAME"] = project_info.info("CPU_NAME")
     project_data["SELECTED_FREQ"] = project_info.info("SELECTED_FREQ")
