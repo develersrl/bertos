@@ -42,12 +42,12 @@
 
         .global __vectors
 __vectors:
-        ldr     pc, [pc, #24]   /* Reset */
-        ldr     pc, [pc, #24]   /* Undefined instruction */
-        ldr     pc, [pc, #24]   /* Software interrupt */
-        ldr     pc, [pc, #24]   /* Prefetch abort */
-        ldr     pc, [pc, #24]   /* Data abort */
-        .word	0               /* Reserved */
+        ldr     pc, _init           /* Reset */
+        ldr     pc, _undef          /* Undefined instruction */
+        ldr     pc, _swi            /* Software interrupt */
+        ldr     pc, _prefetch_abort /* Prefetch abort */
+        ldr     pc, _data_abort     /* Data abort */
+        .word	0                   /* Reserved */
 
         /*
          * On IRQ the PC will be loaded from AIC_IVR, which
@@ -58,11 +58,15 @@ __vectors:
         ldr     pc, [pc, #-0xF20]   /* Interrupt request, auto vectoring. */
         ldr     pc, [pc, #-0xF20]   /* Fast interrupt request, auto vectoring. */
 
+_init:
         .word   __init
+_undef:
         .word   __undef
+_swi:
         .word   __swi
+_prefetch_abort:
         .word   __prefetch_abort
+_data_abort:
         .word   __data_abort
-
 
         .ltorg
