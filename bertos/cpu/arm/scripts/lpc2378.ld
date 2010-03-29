@@ -55,4 +55,4 @@ __eth_ram_start = 0x7FE00000;
 __eth_ram_size  = 16k;
 __eth_ram_end   = __eth_ram_start + __eth_ram_size;
 
-INCLUDE "arm7tdmi.ld"
+INCLUDE "bertos/cpu/arm/scripts/arm7tdmi_rom.ld"
