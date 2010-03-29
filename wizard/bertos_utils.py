@@ -154,6 +154,9 @@ def createBertosProject(project_info, edit=False):
     f = open(directory + "/project.bertos", "w")
     f.write(projectFileGenerator(project_info))
     f.close()
+    # VERSION file
+    version_file = open(os.path.join(const.DATA_DIR, "vtemplates/VERSION"), "r").read()
+    open(directory + "/VERSION", "w").write(versionFileGenerator(project_info, version_file))
     # Destination source dir
     srcdir = directory + "/bertos"
     if not edit:
@@ -242,7 +245,11 @@ def loadPlugin(plugin):
     Returns the given plugin module.
     """
     return getattr(__import__("plugins", {}, {}, [plugin]), plugin)
-    
+
+def versionFileGenerator(project_info, version_file):
+    version = bertosVersion(project_info.info("SOURCES_PATH"))
+    return version_file.replace('$version', version)
+
 def mkGenerator(project_info, makefile):
     """
     Generates the mk file for the current project.
