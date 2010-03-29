@@ -256,12 +256,18 @@ void ser_settimeouts(struct Serial *fd, mtime_t rxtimeout, mtime_t txtimeout)
 #endif /* CONFIG_SER_RXTIMEOUT || CONFIG_SER_TXTIMEOUT */
 
 
+/**
+ * Set the baudrate for the serial port
+ */
 void ser_setbaudrate(struct Serial *fd, unsigned long rate)
 {
 	fd->hw->table->setBaudrate(fd->hw, rate);
 }
 
 
+/**
+ * Set the parity for the \a fd serial port
+ */
 void ser_setparity(struct Serial *fd, int parity)
 {
 	fd->hw->table->setParity(fd->hw, parity);
