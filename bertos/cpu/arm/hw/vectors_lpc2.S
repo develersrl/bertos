@@ -47,7 +47,7 @@ __vectors:
         ldr     pc, _swi             /* Software interrupt */
         ldr     pc, _prefetch_abort  /* Prefetch abort */
         ldr     pc, _data_abort      /* Data abort */
-        .word	0                    /* In LPX2xxx, this location holds the checksum of the previous vectors */
+        .word	0xb9205f88           /* In LPX2xxx, this location holds the checksum of the previous vectors */
 
         ldr     pc, [pc, #-0xFF0]    /* Use VIC */
         ldr     pc, _fiq	     /* Fast interrupt request */
