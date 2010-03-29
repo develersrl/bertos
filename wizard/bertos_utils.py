@@ -58,19 +58,23 @@ def bertosVersion(directory):
    return open(directory + "/VERSION").readline().strip()
 
 def loadBertosProject(project_file, info_dict):
+    project_dir = os.path.dirname(project_file)
     project_data = pickle.loads(open(project_file, "r").read())
     project_info = BProject.BProject()
     project_info.setInfo("PROJECT_PATH", os.path.dirname(project_file))
     # Check for the Wizard version
     wizard_version = project_data.get("WIZARD_VERSION", 0)
     if not wizard_version:
-        project_data["SOURCES_PATH"] = os.path.dirname(project_file)
+        project_data["SOURCES_PATH"] = project_dir
     if "SOURCES_PATH" in info_dict:
         project_data["SOURCES_PATH"] = info_dict["SOURCES_PATH"]
     if os.path.exists(project_data["SOURCES_PATH"]):
         project_info.setInfo("SOURCES_PATH", project_data["SOURCES_PATH"])
     else:
         raise VersionException(project_info)
+    if not isBertosDir(os.path.dirname(project_file)):
+        version_file = open(os.path.join(const.DATA_DIR, "vtemplates/VERSION"), "r").read()
+        open(os.path.join(project_dir, "VERSION"), "w").write(version_file.replace("$version", "").strip())
     loadSourceTree(project_info)
     cpu_name = project_data["CPU_NAME"]
     project_info.setInfo("CPU_NAME", cpu_name)
