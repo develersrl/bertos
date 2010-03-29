@@ -35,8 +35,11 @@
  * \author Andrea Righi <arighi@develer.com>
  */
 
+#include <cfg/compiler.h>
 #include <cfg/debug.h>
 #include "drv/irq.h"
+#include "drv/clock.h"
+#include "io/lm3s.h"
 
 extern size_t _etext, __data_start, __data_end,
 		__bss_start, __bss_end, __stack_irq_end;
@@ -44,9 +47,33 @@ extern size_t _etext, __data_start, __data_end,
 extern int main(void);
 
 /* Architecture's entry point */
-static void _entry(void)
+static void NORETURN _entry(void)
 {
 	size_t *src, *dst;
+
+	/*
+	 * PLL may not function properly at default LDO setting.
+	 *
+	 * Description:
+	 *
+	 * In designs that enable and use the PLL module, unstable device
+	 * behavior may occur with the LDO set at its default of 2.5 volts or
+	 * below (minimum of 2.25 volts). Designs that do not use the PLL
+	 * module are not affected.
+	 *
+	 * Workaround: Prior to enabling the PLL module, it is recommended that
+	 * the default LDO voltage setting of 2.5 V be adjusted to 2.75 V using
+	 * the LDO Power Control (LDOPCTL) register.
+	 *
+	 * Silicon Revision Affected: A1, A2
+	 *
+	 * See also: Stellaris LM3S1968 A2 Errata documentation.
+	 */
+	if (REVISION_IS_A1 | REVISION_IS_A2)
+		HWREG(SYSCTL_LDOPCTL) = SYSCTL_LDOPCTL_2_75V;
+
+	/* Set the appropriate clocking configuration */
+	clock_set_rate();
 
 	/* Copy the data segment initializers from flash to SRAM */
 	src = &_etext;
@@ -62,6 +89,7 @@ static void _entry(void)
 
 	/* Call the application's entry point */
 	main();
+	UNREACHABLE();
 }
 
 static void nmi_isr(void)

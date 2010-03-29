@@ -30,24 +30,18 @@
  *
  * -->
  *
+ * \brief Low-level clocking driver for LM3S1968.
+ *
  * \author Andrea Righi <arighi@develer.com>
  */
 
-#ifndef LM3S_H
-#define LM3S_H
+#ifndef DRV_LM3S1968_CLOCK_H
+#define DRV_LM3S1968_CLOCK_H
 
-#include <cpu/detect.h>
-#include <cfg/compiler.h>
+/* Crystal frequency attached to the main oscillator. */
+#define XTAL_FREQ	SYSCTL_RCC_XTAL_8MHZ
 
+unsigned long clock_get_rate(void);
+void clock_set_rate(void);
 
-#if CPU_ARM_LM3S1968
-	#include "lm3s1968.h"
-	#include "lm3s_types.h"
-	#include "lm3s_ints.h"
-	#include "lm3s_nvic.h"
-	#include "lm3s_sysctl.h"
-#else
-	#error Missing I/O definitions for CPU.
-#endif
-
-#endif /* LM3S_H */
+#endif /* DRV_LM3S1968_CLOCK_H */

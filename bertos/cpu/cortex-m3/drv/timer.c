@@ -68,7 +68,7 @@ static void timer_hw_disable(void)
 
 void timer_hw_init(void)
 {
-	timer_hw_setPeriod(100000);
+	timer_hw_setPeriod(1000000);
 	sysirq_setHandler(FAULT_SYSTICK, timer_hw_handler);
 	timer_hw_enable();
 }
