@@ -106,6 +106,7 @@ unsigned long clock_get_rate(void)
 void clock_set_rate(void)
 {
 	reg32_t rcc, rcc2;
+	unsigned long clk;
 	int i;
 
 	rcc = HWREG(SYSCTL_RCC);
@@ -158,14 +159,23 @@ void clock_set_rate(void)
 	 * frequency for the microcontroller.
 	 */
 	rcc &= ~(SYSCTL_RCC_SYSDIV_M | SYSCTL_RCC_USESYSDIV);
-	for (i = 0; i < 15; i++)
+
+	/*
+	 * Try to evaluate the correct SYSDIV value depending on the desired
+	 * CPU frequency.
+	 */
+	clk = RCC_TO_CLK(rcc);
+	for (i = 0; i < 16; i++)
 	{
-		if (CPU_FREQ == RCC_TO_CLK(rcc))
+		clk = clk / (i + 1);
+		if (CPU_FREQ >= clk)
 			break;
-		rcc |= SYSCTL_RCC_USESYSDIV;
 	}
 	if (i)
+	{
+		rcc |= SYSCTL_RCC_USESYSDIV;
 		rcc |= i << SYSCTL_RCC_SYSDIV_SHIFT;
+	}
 
 	/*
 	 * Step #4: wait for the PLL to lock by polling the PLLLRIS bit in the
