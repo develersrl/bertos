@@ -467,13 +467,19 @@ def loadSourceTree(project):
         fileList = []
     project.setInfo("FILE_LIST", fileList)
 
+_cached_queries = {}
+
 def findDefinitions(ftype, project):
+    definitions = _cached_queries.get(ftype, None)
+    if definitions is not None:
+        return definitions
     L = project.info("FILE_LIST")
     definitions = []
     for element in L:
         for filename in element[2]:
             if fnmatch.fnmatch(filename, ftype):
                 definitions.append((filename, element[0]))
+    _cached_queries[ftype] = definitions
     return definitions
 
 def loadCpuInfos(project):
