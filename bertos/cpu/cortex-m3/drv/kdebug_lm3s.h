@@ -30,40 +30,24 @@
  *
  * -->
  *
- * \brief LM3S1968 Cortex-M3 testcase
+ * \brief LM3S debug support (interface).
  *
  * \author Andrea Righi <arighi@develer.com>
  */
 
-#include <cpu/irq.h>
-#include "io/lm3s.h"
-#include "drv/timer_lm3s.h"
+#ifndef DRV_KDEBUG_LM3S_H
+#define DRV_KDEBUG_LM3S_H
 
-extern unsigned long ticks;
+/**
+ * \name Values for CONFIG_KDEBUG_PORT.
+ *
+ * Select which hardware UART to use for system debug.
+ *
+ * \{
+ */
+#define KDEBUG_PORT_DBGU 0  ///< Debug on Debug Unit.
 
-int main(void)
-{
-	kdbg_init();
-	timer_hw_init();
+#define KDEBUG_PORT_DEFAULT KDEBUG_PORT_DBGU  ///< Default debug port.
+/* \} */
 
-	/* Enable the GPIO port that is used for the on-board LED */
-	SYSCTL_RCGC2_R = SYSCTL_RCGC2_GPIOG;
-	/*
-	 * Perform a dummy read to insert a few cycles delay before enabling
-	 * the peripheral.
-	 */
-	(void)SYSCTL_RCGC2_R;
-	/* Enable the GPIO pin for the LED */
-	GPIO_PORTG_DIR_R = 0x04;
-	GPIO_PORTG_DEN_R = 0x04;
-
-	while(1)
-	{
-		/* Turn on the LED */
-		if ((ticks & 0x04) == 0x04)
-			GPIO_PORTG_DATA_R |= 0x04;
-		/* Turn off the LED */
-		else if ((ticks & 0x04) == 0)
-			GPIO_PORTG_DATA_R &= ~0x04;
-	}
-}
+#endif /* DRV_KDEBUG_LM3S_H */

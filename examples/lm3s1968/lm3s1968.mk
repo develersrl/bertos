@@ -10,7 +10,7 @@
 #
 
 # Set to 1 for debug builds
-lm3s1968_DEBUG = 0
+lm3s1968_DEBUG = 1
 
 # Our target application
 TRG += lm3s1968
@@ -20,6 +20,7 @@ lm3s1968_CSRC = \
 	bertos/cpu/cortex-m3/drv/irq_lm3s.c \
 	bertos/cpu/cortex-m3/drv/timer_lm3s.c \
 	bertos/cpu/cortex-m3/drv/clock_lm3s.c \
+	bertos/cpu/cortex-m3/drv/kdebug_lm3s.c \
 	bertos/cpu/cortex-m3/hw/startup_lm3s.c
 
 # This is an hosted application
