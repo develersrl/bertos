@@ -114,6 +114,13 @@
 		#define CPU_ARM_LM3S1968    0
 	#endif
 
+	#if defined(__ARM_LPC2378__)
+		#define CPU_ARM_LPC2        1
+		#define CPU_ARM_LPC2378     1
+	#else
+		#define CPU_ARM_LPC2378     0
+	#endif	
+
 	#if !defined(CPU_ARM_SAM7S_LARGE)
 		#define CPU_ARM_SAM7S_LARGE 0
 	#endif
@@ -132,20 +139,31 @@
 			#error ARM CPU configuration error
 		#endif
 		#define CPU_ARM_LM3S        0
+		#define CPU_ARM_LPC2        0
 
 	#elif defined (CPU_ARM_LM3S)
 		#if CPU_ARM_LM3S1968 + 0 != 1
 			#error Luminary ARM CPU configuration error
 		#endif
 		#define CPU_ARM_AT91        0
+		#define CPU_ARM_LPC2        0
+	#elif defined (CPU_ARM_LPC2)
+		
+		#if CPU_ARM_LPC2378 + 0 != 1
+			#error NXP LPC2xxx ARM CPU configuration error
+		#endif
+		#define CPU_ARM_AT91        0
+		#define CPU_ARM_LM3S        0
 	/* #elif Add other ARM families here */
 	#else
 		#define CPU_ARM_AT91        0
 		#define CPU_ARM_LM3S        0
+		#define CPU_ARM_LPC2        0
 	#endif
 
 
-	#if CPU_ARM_AT91 + CPU_ARM_LM3S + 0 /* Add other ARM families here */ != 1
+	#if CPU_ARM_AT91 + CPU_ARM_LM3S \
+		+ CPU_ARM_LPC2 + 0 /* Add other ARM families here */ != 1
 		#error ARM CPU configuration error
 	#endif
 #else
@@ -154,6 +172,7 @@
 	/* ARM Families */
 	#define CPU_ARM_AT91            0
 	#define CPU_ARM_LM3S            0
+	#define CPU_ARM_LPC2            0
 
 	/* SAM7 sub-families */
 	#define CPU_ARM_SAM7S_LARGE     0
@@ -170,6 +189,8 @@
 	#define CPU_ARM_AT91SAM7X512    0
 
 	#define CPU_ARM_LM3S1968        0
+
+	#define CPU_ARM_LPC2378         0
 #endif
 
 #if (defined(__IAR_SYSTEMS_ICC__) || defined(__IAR_SYSTEMS_ICC)) \
@@ -285,7 +306,7 @@
 	#define CPU_AVR                 0
 	#define CPU_AVR_ATMEGA8         0
 	#define CPU_AVR_ATMEGA168       0
-	#define CPU_AVR_ATMEGA328P       0
+	#define CPU_AVR_ATMEGA328P      0
 	#define CPU_AVR_ATMEGA32        0
 	#define CPU_AVR_ATMEGA64        0
 	#define CPU_AVR_ATMEGA103       0
