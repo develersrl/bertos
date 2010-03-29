@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2005, 2010 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000 Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
@@ -37,6 +37,7 @@
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Francesco Sacchi <batt@develer.com>
+ * \author Luca Ottaviano <lottaviano@develer.com>
  *
  */
 
@@ -73,7 +74,7 @@
 
 	#define TIMER_PRESCALER      64
 	#define TIMER_HW_BITS        8
-	#if CPU_AVR_ATMEGA1281 || CPU_AVR_ATMEGA168
+	#if CPU_AVR_ATMEGA1281 || CPU_AVR_ATMEGA168 || CPU_AVR_ATMEGA328P
 		#define DEFINE_TIMER_ISR     DECLARE_ISR_CONTEXT_SWITCH(TIMER0_COMPA_vect)
 	#else
 		#define DEFINE_TIMER_ISR     DECLARE_ISR_CONTEXT_SWITCH(TIMER0_COMP_vect)
@@ -112,7 +113,7 @@
 
 	#define TIMER_PRESCALER      64
 	#define TIMER_HW_BITS        8
-	#if CPU_AVR_ATMEGA1281 || CPU_AVR_ATMEGA168
+	#if CPU_AVR_ATMEGA1281 || CPU_AVR_ATMEGA168 || CPU_AVR_ATMEGA328P
 		#define DEFINE_TIMER_ISR     DECLARE_ISR_CONTEXT_SWITCH(TIMER2_COMPA_vect)
 	#else
 		#define DEFINE_TIMER_ISR     DECLARE_ISR_CONTEXT_SWITCH(TIMER2_COMP_vect)

@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2005, 2010 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
@@ -34,6 +34,7 @@
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Francesco Sacchi <batt@develer.com>
+ * \author Luca Ottaviano <lottaviano@develer.com>
  *
  * \brief Low-level timer module for AVR (implementation).
  *
@@ -50,7 +51,7 @@
 
 #include <avr/io.h>
 
-#if CPU_AVR_ATMEGA1281 || CPU_AVR_ATMEGA168
+#if CPU_AVR_ATMEGA1281 || CPU_AVR_ATMEGA168 || CPU_AVR_ATMEGA328P
 	#define REG_TIFR0 TIFR0
 	#define REG_TIFR1 TIFR1
 	#define REG_TIFR2 TIFR2
