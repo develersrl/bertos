@@ -36,25 +36,24 @@
 #ifndef LM3S_TYPES_H
 #define LM3S_TYPES_H
 
+#include <cfg/compiler.h>
+
 /**
  * Macros for hardware access, both direct and via the bit-band region.
  */
 /*\{*/
-#define HWREG(x)                                                              \
-        (*((volatile unsigned long *)(x)))
-#define HWREGH(x)                                                             \
-        (*((volatile unsigned short *)(x)))
-#define HWREGB(x)                                                             \
-        (*((volatile unsigned char *)(x)))
-#define HWREGBITW(x, b)                                                       \
-        HWREG(((unsigned long)(x) & 0xF0000000) | 0x02000000 |                \
-              (((unsigned long)(x) & 0x000FFFFF) << 5) | ((b) << 2))
-#define HWREGBITH(x, b)                                                       \
-        HWREGH(((unsigned long)(x) & 0xF0000000) | 0x02000000 |               \
-               (((unsigned long)(x) & 0x000FFFFF) << 5) | ((b) << 2))
-#define HWREGBITB(x, b)                                                       \
-        HWREGB(((unsigned long)(x) & 0xF0000000) | 0x02000000 |               \
-               (((unsigned long)(x) & 0x000FFFFF) << 5) | ((b) << 2))
+#define HWREG(x) (*((reg32_t *)(x)))
+#define HWREGH(x) (*((reg16_t *)(x)))
+#define HWREGB(x) (*((reg8_t *)(x)))
+#define HWREGBITW(x, b) \
+        HWREG(((reg32_t)(x) & 0xF0000000) | 0x02000000 |		\
+              (((reg32_t)(x) & 0x000FFFFF) << 5) | ((b) << 2))
+#define HWREGBITH(x, b) \
+        HWREGH(((reg32_t)(x) & 0xF0000000) | 0x02000000 |		\
+               (((reg32_t)(x) & 0x000FFFFF) << 5) | ((b) << 2))
+#define HWREGBITB(x, b) \
+        HWREGB(((reg32_t)(x) & 0xF0000000) | 0x02000000 |		\
+               (((reg32_t)(x) & 0x000FFFFF) << 5) | ((b) << 2))
 /*\}*/
 
 /**

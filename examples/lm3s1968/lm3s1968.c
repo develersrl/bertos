@@ -37,7 +37,7 @@
 
 #include <cpu/irq.h>
 #include "io/lm3s.h"
-#include "drv/timer.h"
+#include "drv/timer_lm3s.h"
 
 extern unsigned long ticks;
 

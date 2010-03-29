@@ -30,7 +30,7 @@
  *
  * -->
  *
- * \brief Low-level timer driver for LM3S1968.
+ * \brief Cortex-M3 IRQ management.
  *
  * \author Andrea Righi <arighi@develer.com>
  */
@@ -38,43 +38,49 @@
 #include <cfg/debug.h>
 #include <cpu/irq.h>
 #include "io/lm3s.h"
+#include "irq_lm3s.h"
 
-#include "irq.h"
-#include "timer.h"
+static void (*irq_table[NUM_INTERRUPTS])(void)
+			__attribute__((section("vtable")));
 
-unsigned long ticks;
-
-INLINE void timer_hw_setPeriod(unsigned long period)
+static void unhandled_isr(void)
 {
-	ASSERT(period < (1 << 24));
-	HWREG(NVIC_ST_RELOAD) = period;
+	/* Unhandled IRQ */
+	ASSERT(0);
 }
 
-static void timer_hw_handler(void)
+void sysirq_setHandler(sysirq_t irq, sysirq_handler_t handler)
 {
-	ticks++;
+	cpu_flags_t flags;
+
+	ASSERT(irq < NUM_INTERRUPTS);
+
+	IRQ_SAVE_DISABLE(flags);
+	irq_table[irq] = handler;
+	IRQ_RESTORE(flags);
 }
 
-static void timer_hw_enable(void)
+void sysirq_freeHandler(sysirq_t irq)
 {
-	HWREG(NVIC_ST_CTRL) |=
-		NVIC_ST_CTRL_CLK_SRC | NVIC_ST_CTRL_ENABLE | NVIC_ST_CTRL_INTEN;
+	cpu_flags_t flags;
+
+	ASSERT(irq < NUM_INTERRUPTS);
+
+	IRQ_SAVE_DISABLE(flags);
+	irq_table[irq] = unhandled_isr;
+	IRQ_RESTORE(flags);
 }
 
-static void timer_hw_disable(void)
+void sysirq_init(void)
 {
-	HWREG(NVIC_ST_CTRL) &= ~(NVIC_ST_CTRL_ENABLE | NVIC_ST_CTRL_INTEN);
-}
+	cpu_flags_t flags;
+	int i;
 
-void timer_hw_init(void)
-{
-	timer_hw_setPeriod(1000000);
-	sysirq_setHandler(FAULT_SYSTICK, timer_hw_handler);
-	timer_hw_enable();
-}
+	IRQ_SAVE_DISABLE(flags);
+	for (i = 0; i < NUM_INTERRUPTS; i++)
+		irq_table[i] = unhandled_isr;
 
-void timer_hw_exit(void)
-{
-	timer_hw_disable();
-	sysirq_freeHandler(FAULT_SYSTICK);
+	/* Update NVIC to point to the new vector table */
+	HWREG(NVIC_VTABLE) = (size_t)irq_table;
+	IRQ_RESTORE(flags);
 }

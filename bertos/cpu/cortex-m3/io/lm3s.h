@@ -46,6 +46,9 @@
 	#include "lm3s_ints.h"
 	#include "lm3s_nvic.h"
 	#include "lm3s_sysctl.h"
+	#include "lm3s_gpio.h"
+	#include "lm3s_memmap.h"
+	#include "lm3s_uart.h"
 #else
 	#error Missing I/O definitions for CPU.
 #endif

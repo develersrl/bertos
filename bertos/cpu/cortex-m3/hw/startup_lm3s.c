@@ -37,8 +37,8 @@
 
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
-#include "drv/irq.h"
-#include "drv/clock.h"
+#include "drv/irq_lm3s.h"
+#include "drv/clock_lm3s.h"
 #include "io/lm3s.h"
 
 extern size_t _etext, __data_start, __data_end,

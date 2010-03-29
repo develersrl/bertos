@@ -38,45 +38,15 @@
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
 #include "io/lm3s.h"
-#include "clock.h"
+#include "clock_lm3s.h"
 
-/* See: LM3S1968 Microcontroller DATASHEET, p.80 */
-static const unsigned long xtal_clk[] =
-{
-	1000000,
-	1843200,
-	2000000,
-	2457600,
-	3579545,
-	3686400,
-	4000000,
-	4096000,
-	4915200,
-	5000000,
-	5120000,
-	6000000,
-	6144000,
-	7372800,
-	8000000,
-	8192000,
-	10000000,
-	12000000,
-	12288000,
-	13560000,
-	14318180,
-	16000000,
-	16384000,
-};
+/* The PLL VCO frequency is 400 MHz */
+#define PLL_VCO	400000000UL
 
-/* Extract the main oscillator frequency from the RCC register */
-#define RCC_TO_CLK(rcc) \
-		(xtal_clk[(((rcc) & SYSCTL_RCC_XTAL_MASK) >> \
-				SYSCTL_RCC_XTAL_SHIFT)])
-
-/* Extract the main oscillator frequency from the RCC register */
-#define RCC_TO_SYSDIV(rcc) \
-		(((rcc & SYSCTL_RCC_SYSDIV_MASK) >> \
-			SYSCTL_RCC_SYSDIV_SHIFT) + 1)
+/* Extract the system clock divisor from the RCC register */
+#define RCC_TO_DIV(rcc)						\
+		(((rcc & SYSCTL_RCC_SYSDIV_MASK) >>		\
+				SYSCTL_RCC_SYSDIV_SHIFT) + 1)
 
 /*
  * Very small delay: each loop takes 3 cycles.
@@ -91,16 +61,10 @@ INLINE void __delay(unsigned long iterations)
 
 unsigned long clock_get_rate(void)
 {
-	unsigned long rcc, clk;
+	reg32_t rcc = HWREG(SYSCTL_RCC);
 
-	rcc = HWREG(SYSCTL_RCC);
-
-	/* Get the main oscillator frequency */
-	clk = RCC_TO_CLK(rcc);
-	/* Apply system clock divider */
-	clk /= RCC_TO_SYSDIV(rcc);
-
-	return clk;
+	return rcc & SYSCTL_RCC_USESYSDIV ?
+			PLL_VCO / RCC_TO_DIV(rcc) : PLL_VCO;
 }
 
 void clock_set_rate(void)
@@ -150,6 +114,7 @@ void clock_set_rate(void)
 	HWREG(SYSCTL_MISC) = SYSCTL_INT_PLL_LOCK;
 
         HWREG(SYSCTL_RCC) = rcc;
+	HWREG(SYSCTL_RCC) = rcc2;
 
 	__delay(16);
 
@@ -163,19 +128,16 @@ void clock_set_rate(void)
 	/*
 	 * Try to evaluate the correct SYSDIV value depending on the desired
 	 * CPU frequency.
+	 *
+	 * NOTE: with BYPASS=0, SYSDIV < 3 are reserved values (see LM3S1968
+	 * Microcontroller DATASHEET, p.78).
 	 */
-	clk = RCC_TO_CLK(rcc);
-	for (i = 0; i < 16; i++)
-	{
-		clk = clk / (i + 1);
-		if (CPU_FREQ >= clk)
+	clk = PLL_VCO / 2;
+	for (i = 3; i < 16; i++)
+		if (CPU_FREQ >= (clk / (i + 1)))
 			break;
-	}
 	if (i)
-	{
-		rcc |= SYSCTL_RCC_USESYSDIV;
-		rcc |= i << SYSCTL_RCC_SYSDIV_SHIFT;
-	}
+		rcc |= SYSCTL_RCC_USESYSDIV | (i << SYSCTL_RCC_SYSDIV_SHIFT);
 
 	/*
 	 * Step #4: wait for the PLL to lock by polling the PLLLRIS bit in the
