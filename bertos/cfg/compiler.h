@@ -190,6 +190,10 @@
 		#define DEPRECATED  __attribute__((__deprecated__))
 	#endif
 
+	#if GNUC_PREREQ(4,5)
+		#define UNREACHABLE() __builtin_unreachable()
+	#endif
+
 	#ifndef __cplusplus
 		#define ASSERT_TYPE_EQUAL(var1, var2) \
 			STATIC_ASSERT(__builtin_types_compatible_p(typeof(var1), typeof(var2)))
@@ -322,6 +326,9 @@
 #ifndef MEMORY_BARRIER
 #define MEMORY_BARRIER         /* nothing */
 #warning No memory barrier defined for select compiler. If you use the kernel check it.
+#endif
+#ifndef UNREACHABLE
+#define UNREACHABLE() for (;;)
 #endif
 
 
