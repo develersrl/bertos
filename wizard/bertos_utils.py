@@ -236,7 +236,8 @@ def createBertosProject(project_info, edit=False):
     if not edit:
         # Destination user mk file (only on project creation)
         makefile = open(os.path.join(const.DATA_DIR, "mktemplates/template.mk"), "r").read()
-        makefile = mkGenerator(project_info, makefile)
+        # Deadly performances loss was here :(
+        makefile = userMkGenerator(project_info, makefile)
         open(prjdir + "/" + os.path.basename(prjdir) + ".mk", "w").write(makefile)
     # Destination wizard mk file
     makefile = open(os.path.join(const.DATA_DIR, "mktemplates/template_wiz.mk"), "r").read()
@@ -262,6 +263,14 @@ def loadPlugin(plugin):
 def versionFileGenerator(project_info, version_file):
     version = bertosVersion(project_info.info("SOURCES_PATH"))
     return version_file.replace('$version', version)
+
+def userMkGenerator(project_info, makefile):
+    mk_data = {}
+    mk_data["$pname"] = os.path.basename(project_info.info("PROJECT_PATH"))
+    for key in mk_data:
+        while makefile.find(key) != -1:
+            makefile = makefile.replace(key, mk_data[key])
+    return makefile
 
 def mkGenerator(project_info, makefile):
     """
