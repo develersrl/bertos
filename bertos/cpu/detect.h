@@ -39,7 +39,13 @@
 #if defined(__arm__) /* GCC */ \
 	|| defined(__ARM4TM__) /* IAR: defined for all cores >= 4tm */
 	#define CPU_ARM                 1
-	#define CPU_ID                  arm
+
+	// Cortex-M3 core family
+	#if defined(__ARM_LM3S1968__)
+		#define CPU_ID                  lm3s
+	#else
+		#define CPU_ID                  arm
+	#endif
 
 	// AT91SAM7S core family
 	#if defined(__ARM_AT91SAM7S32__)
