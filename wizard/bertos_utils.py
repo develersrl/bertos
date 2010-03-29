@@ -267,6 +267,7 @@ def versionFileGenerator(project_info, version_file):
 def userMkGenerator(project_info, makefile):
     mk_data = {}
     mk_data["$pname"] = os.path.basename(project_info.info("PROJECT_PATH"))
+    mk_data["$main"] = os.path.basename(project_info.info("PROJECT_PATH")) + "/main.c"
     for key in mk_data:
         while makefile.find(key) != -1:
             makefile = makefile.replace(key, mk_data[key])
