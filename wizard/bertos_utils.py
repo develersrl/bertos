@@ -47,6 +47,8 @@ import plugins
 import DefineException
 import BProject
 
+from _wizard_version import WIZARD_VERSION
+
 from LoadException import VersionException, ToolchainException
 
 def isBertosDir(directory):
@@ -59,6 +61,10 @@ def loadBertosProject(project_file, info_dict):
     project_data = pickle.loads(open(project_file, "r").read())
     project_info = BProject.BProject()
     project_info.setInfo("PROJECT_PATH", os.path.dirname(project_file))
+    # Check for the Wizard version
+    wizard_version = project_data.get("WIZARD_VERSION", 0)
+    if not wizard_version:
+        project_data["SOURCES_PATH"] = os.path.dirname(project_file)
     if "SOURCES_PATH" in info_dict:
         project_data["SOURCES_PATH"] = info_dict["SOURCES_PATH"]
     if os.path.exists(project_data["SOURCES_PATH"]):
@@ -142,6 +148,7 @@ def projectFileGenerator(project_info):
     project_data["CPU_NAME"] = project_info.info("CPU_NAME")
     project_data["SELECTED_FREQ"] = project_info.info("SELECTED_FREQ")
     project_data["OUTPUT"] = project_info.info("OUTPUT")
+    project_data["WIZARD_VERSION"] = WIZARD_VERSION
     return pickle.dumps(project_data)
 
 def createBertosProject(project_info, edit=False):
@@ -439,7 +446,12 @@ def getToolchainName(toolchain_info):
     return name
 
 def loadSourceTree(project):
-    fileList = [f for f in os.walk(project.info("SOURCES_PATH"))]
+    # Index only the SOURCES_PATH/bertos content
+    bertos_sources_dir = os.path.join(project.info("SOURCES_PATH"), 'bertos')
+    if os.path.exists(bertos_sources_dir):
+        fileList = [f for f in os.walk(bertos_sources_dir)]
+    else:
+        fileList = []
     project.setInfo("FILE_LIST", fileList)
 
 def findDefinitions(ftype, project):
