@@ -67,6 +67,12 @@
 	#define CPU_STACK_GROWS_UPWARD 0
 	#define CPU_SP_ON_EMPTY_SLOT   0
 
+#elif CPU_CM3
+
+	#define CPU_SAVED_REGS_CNT     fixme
+	#define CPU_STACK_GROWS_UPWARD 0
+	#define CPU_SP_ON_EMPTY_SLOT   0
+
 #elif CPU_PPC
 
 	#define CPU_SAVED_REGS_CNT     1

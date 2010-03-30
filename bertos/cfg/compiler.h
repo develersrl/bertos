@@ -448,7 +448,7 @@ typedef unsigned char page_t;    /**< Type for banked memory pages. */
 	#if CPU_X86
 		/* 32bit or 64bit (32bit for _WIN64). */
 		typedef long ssize_t;
-	#elif CPU_ARM
+	#elif CPU_ARM || CPU_CM3
 		typedef int ssize_t;
 	#elif CPU_AVR
 		/* 16bit (missing in avr-libc's sys/types.h). */

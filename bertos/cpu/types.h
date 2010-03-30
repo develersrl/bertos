@@ -77,14 +77,22 @@
 		#define SIZEOF_CPUALIGNED_T SIZEOF_CPUSTACK_T
 	#endif
 
-#elif CPU_ARM
+#elif CPU_ARM || CPU_CM3
 
 	typedef uint32_t cpu_flags_t;
 	typedef uint32_t cpu_atomic_t;
 	typedef uint32_t cpu_stack_t;
-	typedef uint64_t cpu_aligned_stack_t;
 	#define SIZEOF_CPUSTACK_T 4
-	#define SIZEOF_CPUALIGNED_T 8
+
+	#if CPU_ARM
+		typedef uint64_t cpu_aligned_stack_t;
+		#define SIZEOF_CPUALIGNED_T 8
+	#elif CPU_CM3
+		typedef uint32_t cpu_aligned_stack_t;
+		#define SIZEOF_CPUALIGNED_T 4
+	#else
+		#error CPU configuration error
+	#endif
 
 #elif CPU_PPC
 
