@@ -71,11 +71,14 @@ class BOutputPage(BWizardPage):
                                             "Classic BeRTOS makefile based project",
                                             True, False)
         scrollLayout.addWidget(group)
+        plugin_list = self.plugins()
         for plugin in self.availablePlugins():
             module = bertos_utils.loadPlugin(plugin)
+            selected = False
+            if plugin in plugin_list: selected = True
             group, check = self.createNewOutput(module.PLUGIN_NAME,
                                                 module.PLUGIN_DESCRIPTION,
-                                                True, True)
+                                                selected, True)
             scrollLayout.addWidget(group)
             self._plugin_dict[check] = plugin
         scrollLayout.addStretch()
@@ -101,6 +104,7 @@ class BOutputPage(BWizardPage):
         for checkBox, plugin in self._plugin_dict.items():
             if checkBox.checkState() == Qt.Checked:
                 plugins.append(plugin)
+        self.setPlugins(plugins)
         self.setProjectInfo("OUTPUT", plugins)
 
     ####
