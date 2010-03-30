@@ -49,13 +49,13 @@ class BProject(object):
         """
         self.infos[key] = value
     
-    def info(self, key):
+    def info(self, key, default=None):
         """
         Retrieve the value associated with the name key.
         """
         if key in self.infos:
             return copy.deepcopy(self.infos[key])
-        return None
+        return default
     
     def __repr__(self):
         return repr(self.infos)

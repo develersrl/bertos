@@ -61,18 +61,21 @@ def loadBertosProject(project_file, info_dict):
     project_dir = os.path.dirname(project_file)
     project_data = pickle.loads(open(project_file, "r").read())
     project_info = BProject.BProject()
+    # If PROJECT_NAME is not defined it use the directory name as PROJECT_NAME
+    # NOTE: this can throw an Exception if the user has changed the directory containing the project
+    project_info.setInfo("PROJECT_NAME", project_data.get("PROJECT_NAME", os.path.basename(project_dir)))
     project_info.setInfo("PROJECT_PATH", os.path.dirname(project_file))
     # Check for the Wizard version
     wizard_version = project_data.get("WIZARD_VERSION", 0)
-    if not wizard_version:
-        project_data["SOURCES_PATH"] = project_dir
+    # Ignore the SOURCES_PATH inside the project file
+    project_data["SOURCES_PATH"] = project_dir
     if "SOURCES_PATH" in info_dict:
         project_data["SOURCES_PATH"] = info_dict["SOURCES_PATH"]
     if os.path.exists(project_data["SOURCES_PATH"]):
         project_info.setInfo("SOURCES_PATH", project_data["SOURCES_PATH"])
     else:
         raise VersionException(project_info)
-    if not isBertosDir(os.path.dirname(project_file)):
+    if not isBertosDir(project_dir):
         version_file = open(os.path.join(const.DATA_DIR, "vtemplates/VERSION"), "r").read()
         open(os.path.join(project_dir, "VERSION"), "w").write(version_file.replace("$version", "").strip())
     loadSourceTree(project_info)
@@ -146,6 +149,7 @@ def projectFileGenerator(project_info):
     # Use the local BeRTOS version instead of the original one
     # project_data["SOURCES_PATH"] = project_info.info("SOURCES_PATH")
     project_data["SOURCES_PATH"] = directory
+    project_data["PROJECT_NAME"] = project_info.info("PROJECT_NAME", os.path.basename(directory))
     project_data["TOOLCHAIN"] = project_info.info("TOOLCHAIN")
     project_data["CPU_NAME"] = project_info.info("CPU_NAME")
     project_data["SELECTED_FREQ"] = project_info.info("SELECTED_FREQ")
@@ -185,7 +189,8 @@ def createBertosProject(project_info, edit=False):
     makefile = makefileGenerator(project_info, makefile)
     open(directory + "/Makefile", "w").write(makefile)
     # Destination project dir
-    prjdir = directory + "/" + os.path.basename(directory)
+    # prjdir = directory + "/" + os.path.basename(directory)
+    prjdir = os.path.join(directory, project_info.info("PROJECT_NAME"))
     if not edit:
         shutil.rmtree(prjdir, True)
         os.mkdir(prjdir)
@@ -677,7 +682,7 @@ def loadModuleData(project, edit=False):
                         raise DefineException.ConfigurationDefineException(project.info("SOURCES_PATH") + "/" + configuration, err.line_number, err.line)
                     if edit:
                         try:
-                            path = os.path.basename(project.info("PROJECT_PATH"))
+                            path = project.info("PROJECT_NAME")
                             directory = project.info("PROJECT_PATH")
                             user_configuration = loadConfigurationInfos(directory + "/" + configuration.replace("bertos", path))
                             configuration_info[configuration] = updateConfigurationValues(configuration_info[configuration], user_configuration)

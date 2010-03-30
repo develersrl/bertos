@@ -61,6 +61,7 @@ class BFolderPage(BWizardPage):
         self.setDefaultFolder(self._destination_folder)
         if self.pageContent.projectPath.text() != "None":
             self.setProjectInfo("PROJECT_PATH", unicode(self.pageContent.projectPath.text()))
+            self.setProjectInfo("PROJECT_NAME", os.path.basename(unicode(self.pageContent.projectPath.text())))
             return True
         else:
             return False
