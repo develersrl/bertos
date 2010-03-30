@@ -64,7 +64,7 @@ unsigned long clock_get_rate(void)
 	reg32_t rcc = HWREG(SYSCTL_RCC);
 
 	return rcc & SYSCTL_RCC_USESYSDIV ?
-			PLL_VCO / RCC_TO_DIV(rcc) : PLL_VCO;
+			PLL_VCO / 2 / RCC_TO_DIV(rcc) : PLL_VCO;
 }
 
 void clock_set_rate(void)
