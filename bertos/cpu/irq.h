@@ -63,7 +63,8 @@
 		#define IRQ_RESTORE(x)          FIXME
 	#endif /* OS_EMBEDDED */
 
-#elif CPU_ARM_LM3S1968
+#elif CPU_CM3
+	/* Cortex-M3 */
 
 	#define IRQ_DISABLE asm volatile ("cpsid i" : : : "memory", "cc")
 	#define IRQ_ENABLE asm volatile ("cpsie i" : : : "memory", "cc")

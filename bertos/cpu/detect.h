@@ -36,16 +36,10 @@
 #ifndef CPU_DETECT_H
 #define CPU_DETECT_H
 
-#if defined(__arm__) /* GCC */ \
+#if defined(__ARM_ARCH_4T__) /* GCC */ \
 	|| defined(__ARM4TM__) /* IAR: defined for all cores >= 4tm */
-	#define CPU_ARM                 1
-
-	// Cortex-M3 core family
-	#if defined(__ARM_LM3S1968__)
-		#define CPU_ID                  lm3s
-	#else
-		#define CPU_ID                  arm
-	#endif
+	#define CPU_ARM 1
+	#define CPU_ID	arm
 
 	// AT91SAM7S core family
 	#if defined(__ARM_AT91SAM7S32__)
@@ -113,19 +107,12 @@
 		#define CPU_ARM_AT91SAM7X512 0
 	#endif
 
-	#if defined (__ARM_LM3S1968__)
-		#define CPU_ARM_LM3S        1
-		#define CPU_ARM_LM3S1968    1
-	#else
-		#define CPU_ARM_LM3S1968    0
-	#endif
-
 	#if defined(__ARM_LPC2378__)
 		#define CPU_ARM_LPC2        1
 		#define CPU_ARM_LPC2378     1
 	#else
 		#define CPU_ARM_LPC2378     0
-	#endif	
+	#endif
 
 	#if !defined(CPU_ARM_SAM7S_LARGE)
 		#define CPU_ARM_SAM7S_LARGE 0
@@ -144,32 +131,22 @@
 		+ CPU_ARM_AT91SAM7X512 != 1
 			#error ARM CPU configuration error
 		#endif
-		#define CPU_ARM_LM3S        0
 		#define CPU_ARM_LPC2        0
 
-	#elif defined (CPU_ARM_LM3S)
-		#if CPU_ARM_LM3S1968 + 0 != 1
-			#error Luminary ARM CPU configuration error
-		#endif
-		#define CPU_ARM_AT91        0
-		#define CPU_ARM_LPC2        0
 	#elif defined (CPU_ARM_LPC2)
-		
+
 		#if CPU_ARM_LPC2378 + 0 != 1
 			#error NXP LPC2xxx ARM CPU configuration error
 		#endif
 		#define CPU_ARM_AT91        0
-		#define CPU_ARM_LM3S        0
 	/* #elif Add other ARM families here */
 	#else
 		#define CPU_ARM_AT91        0
-		#define CPU_ARM_LM3S        0
 		#define CPU_ARM_LPC2        0
 	#endif
 
 
-	#if CPU_ARM_AT91 + CPU_ARM_LM3S \
-		+ CPU_ARM_LPC2 + 0 /* Add other ARM families here */ != 1
+	#if CPU_ARM_AT91 + CPU_ARM_LPC2 + 0 /* Add other ARM families here */ != 1
 		#error ARM CPU configuration error
 	#endif
 #else
@@ -177,7 +154,6 @@
 
 	/* ARM Families */
 	#define CPU_ARM_AT91            0
-	#define CPU_ARM_LM3S            0
 	#define CPU_ARM_LPC2            0
 
 	/* SAM7 sub-families */
@@ -194,9 +170,41 @@
 	#define CPU_ARM_AT91SAM7X256    0
 	#define CPU_ARM_AT91SAM7X512    0
 
-	#define CPU_ARM_LM3S1968        0
-
 	#define CPU_ARM_LPC2378         0
+#endif
+
+#if defined(__ARM_ARCH_7M__)
+	/* Cortex-M3 */
+	#define CPU_CM3 1
+	#define CPU_ID	cm3
+
+	#if defined (__ARM_LM3S1968__)
+		#define CPU_CM3_LM3S        1
+		#define CPU_CM3_LM3S1968    1
+	#else
+		#define CPU_CM3_LM3S1968    0
+	#endif
+
+	#if defined (CPU_CM3_LM3S)
+		#if CPU_CM3_LM3S1968 + 0 != 1
+			#error Luminary Cortex-M3 CPU configuration error
+		#endif
+	/* #elif Add other Cortex-M3 families here */
+	#else
+		#define CPU_CM3_LM3S        0
+	#endif
+
+
+	#if CPU_CM3_LM3S + 0 /* Add other Cortex-M3 families here */ != 1
+		#error Cortex-M3 CPU configuration error
+	#endif
+
+#else
+	#define CPU_CM3 0
+
+	#define CPU_CM3_LM3S 0
+
+	#define CPU_CM3_LM3S1968 0
 #endif
 
 #if (defined(__IAR_SYSTEMS_ICC__) || defined(__IAR_SYSTEMS_ICC)) \
@@ -322,11 +330,11 @@
 
 
 /* Self-check for the detection: only one CPU must be detected */
-#if CPU_ARM + CPU_I196 + CPU_X86 + CPU_PPC + CPU_DSP56K + CPU_AVR == 0
+#if CPU_ARM + CPU_CM3 + CPU_I196 + CPU_X86 + CPU_PPC + CPU_DSP56K + CPU_AVR == 0
 	#error Unknown CPU
 #elif !defined(CPU_ID)
 	#error CPU_ID not defined
-#elif CPU_ARM + CPU_I196 + CPU_X86 + CPU_PPC + CPU_DSP56K + CPU_AVR != 1
+#elif CPU_ARM + CPU_CM3 + CPU_I196 + CPU_X86 + CPU_PPC + CPU_DSP56K + CPU_AVR != 1
 	#error Internal CPU configuration error
 #endif
 

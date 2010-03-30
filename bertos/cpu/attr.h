@@ -109,8 +109,6 @@
 	/// Valid pointers should be >= than this value (used for debug)
 	#if CPU_ARM_AT91
 		#define CPU_RAM_START		0x00200000
-	#elif CPU_ARM_LM3S1968
-		#define CPU_RAM_START		0x20000000
 	#else
 		#warning Fix CPU_RAM_START address for your ARM, default value set to 0x200
 		#define CPU_RAM_START		0x200
@@ -164,6 +162,30 @@
 		#define RAM_FUNC __attribute__((section(".data")))
 
 	#endif /* !__IAR_SYSTEMS_ICC_ */
+#elif CPU_CM3
+
+	#define CPU_REG_BITS           32
+	#define CPU_REGS_CNT           fixme
+	#define CPU_HARVARD            0
+
+	/// Valid pointers should be >= than this value (used for debug)
+	#if CPU_CM3_LM3S1968
+		#define CPU_RAM_START 0x20000000
+	#else
+		#warning Fix CPU_RAM_START address for your Cortex-M3, default value set to 0x200
+		#define CPU_RAM_START 0x200
+	#endif
+
+	#if defined(__ARMEB__)
+		#define CPU_BYTE_ORDER CPU_BIG_ENDIAN
+	#elif defined(__ARMEL__)
+		#define CPU_BYTE_ORDER CPU_LITTLE_ENDIAN
+	#else
+		#error Unable to detect Cortex-M3 endianness!
+	#endif
+
+	#define NOP         fixme
+	#define BREAKPOINT  /* asm("bkpt 0") DOES NOT WORK */
 
 #elif CPU_PPC
 

@@ -46,9 +46,6 @@
 #if CPU_ARM_AT91
 	#include "at91.h"
 /*#elif  Add other ARM families here */
-#elif CPU_ARM_LM3S
-	#include "lm3s.h"
-
 #else
 	#error Unknown CPU
 #endif

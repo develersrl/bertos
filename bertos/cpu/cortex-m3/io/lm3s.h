@@ -40,7 +40,7 @@
 #include <cfg/compiler.h>
 
 
-#if CPU_ARM_LM3S1968
+#if CPU_CM3_LM3S1968
 	#include "lm3s1968.h"
 	#include "lm3s_types.h"
 	#include "lm3s_ints.h"
