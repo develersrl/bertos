@@ -108,7 +108,7 @@ class BCpuPage(BWizardPage):
         Overload of the BWizardPage reloadData method.
         """
         QApplication.instance().setOverrideCursor(Qt.WaitCursor)
-        bertos_utils.loadSourceTree(self.project())
+        self.project().loadSourceTree()
         self.populateCpuList()
         cpu_name = self.projectInfo("CPU_NAME")
         selected_freq = self.projectInfo("SELECTED_FREQ")

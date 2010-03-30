@@ -78,7 +78,7 @@ def loadBertosProject(project_file, info_dict):
     if not isBertosDir(project_dir):
         version_file = open(os.path.join(const.DATA_DIR, "vtemplates/VERSION"), "r").read()
         open(os.path.join(project_dir, "VERSION"), "w").write(version_file.replace("$version", "").strip())
-    loadSourceTree(project_info)
+    project_info.loadSourceTree()
     cpu_name = project_data["CPU_NAME"]
     project_info.setInfo("CPU_NAME", cpu_name)
     cpu_info = loadCpuInfos(project_info)
@@ -381,28 +381,28 @@ def findModuleFiles(module, project_info):
     cfiles = []
     sfiles = []
     # .c files related to the module and the cpu architecture
-    for filename, path in findDefinitions(module + ".c", project_info) + \
-            findDefinitions(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".c", project_info):
+    for filename, path in project_info.findDefinitions(module + ".c") + \
+            project_info.findDefinitions(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".c"):
         path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
         path = replaceSeparators(path)
         cfiles.append(path + "/" + filename)
     # .s files related to the module and the cpu architecture
-    for filename, path in findDefinitions(module + ".s", project_info) + \
-            findDefinitions(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".s", project_info) + \
-            findDefinitions(module + ".S", project_info) + \
-            findDefinitions(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".S", project_info):
+    for filename, path in project_info.findDefinitions(module + ".s") + \
+            project_info.findDefinitions(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".s") + \
+            project_info.findDefinitions(module + ".S") + \
+            project_info.findDefinitions(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".S"):
         path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
         path = replaceSeparators(path)
         sfiles.append(path + "/" + filename)
     # .c and .s files related to the module and the cpu tags
     for tag in project_info.info("CPU_INFOS")["CPU_TAGS"]:
-        for filename, path in findDefinitions(module + "_" + tag + ".c", project_info):
+        for filename, path in project_info.findDefinitions(module + "_" + tag + ".c"):
             path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
             if os.sep != "/":
                 path = replaceSeparators(path)
             cfiles.append(path + "/" + filename)
-        for filename, path in findDefinitions(module + "_" + tag + ".s", project_info) + \
-                findDefinitions(module + "_" + tag + ".S", project_info):
+        for filename, path in project_info.findDefinitions(module + "_" + tag + ".s") + \
+                project_info.findDefinitions(module + "_" + tag + ".S"):
             path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
             path = replaceSeparators(path)
             sfiles.append(path + "/" + filename)
@@ -462,33 +462,9 @@ def getToolchainName(toolchain_info):
     name = "GCC " + toolchain_info["version"] + " - " + toolchain_info["target"].strip()
     return name
 
-def loadSourceTree(project):
-    # Index only the SOURCES_PATH/bertos content
-    bertos_sources_dir = os.path.join(project.info("SOURCES_PATH"), 'bertos')
-    if os.path.exists(bertos_sources_dir):
-        fileList = [f for f in os.walk(bertos_sources_dir)]
-    else:
-        fileList = []
-    project.setInfo("FILE_LIST", fileList)
-
-_cached_queries = {}
-
-def findDefinitions(ftype, project):
-    definitions = _cached_queries.get(ftype, None)
-    if definitions is not None:
-        return definitions
-    L = project.info("FILE_LIST")
-    definitions = []
-    for element in L:
-        for filename in element[2]:
-            if fnmatch.fnmatch(filename, ftype):
-                definitions.append((filename, element[0]))
-    _cached_queries[ftype] = definitions
-    return definitions
-
-def loadCpuInfos(project):
+def loadCpuInfos(project_info):
     cpuInfos = []
-    for definition in findDefinitions(const.CPU_DEFINITION, project):
+    for definition in project_info.findDefinitions(const.CPU_DEFINITION):
         cpuInfos.append(getInfos(definition))
     return cpuInfos
 
@@ -655,12 +631,12 @@ def getDefinitionBlocks(text):
         block.append(([comment], define, start))
     return block
 
-def loadModuleData(project, edit=False):
+def loadModuleData(project_info, edit=False):
     module_info_dict = {}
     list_info_dict = {}
     configuration_info_dict = {}
     file_dict = {}
-    for filename, path in findDefinitions("*.h", project) + findDefinitions("*.c", project) + findDefinitions("*.s", project) + findDefinitions("*.S", project):
+    for filename, path in project_info.findDefinitions("*.h") + project_info.findDefinitions("*.c") + project_info.findDefinitions("*.s") + project_info.findDefinitions("*.S"):
         comment_list = getCommentList(open(path + "/" + filename, "r").read())
         if len(comment_list) > 0:
             module_info = {}
@@ -677,13 +653,13 @@ def loadModuleData(project, edit=False):
                 if "configuration" in information and len(information["configuration"]):
                     configuration = module_dict[module]["configuration"]
                     try:
-                        configuration_info[configuration] = loadConfigurationInfos(project.info("SOURCES_PATH") + "/" + configuration)
+                        configuration_info[configuration] = loadConfigurationInfos(project_info.info("SOURCES_PATH") + "/" + configuration)
                     except ParseError, err:
-                        raise DefineException.ConfigurationDefineException(project.info("SOURCES_PATH") + "/" + configuration, err.line_number, err.line)
+                        raise DefineException.ConfigurationDefineException(project_info.info("SOURCES_PATH") + "/" + configuration, err.line_number, err.line)
                     if edit:
                         try:
-                            path = project.info("PROJECT_NAME")
-                            directory = project.info("PROJECT_PATH")
+                            path = project_info.info("PROJECT_NAME")
+                            directory = project_info.info("PROJECT_PATH")
                             user_configuration = loadConfigurationInfos(directory + "/" + configuration.replace("bertos", path))
                             configuration_info[configuration] = updateConfigurationValues(configuration_info[configuration], user_configuration)
                         except ParseError, err:
@@ -696,17 +672,17 @@ def loadModuleData(project, edit=False):
                     list_info_dict.update(list_dict)
                 except ParseError, err:
                     raise DefineException.EnumDefineException(path, err.line_number, err.line)
-    for filename, path in findDefinitions("*_" + project.info("CPU_INFOS")["TOOLCHAIN"] + ".h", project):
+    for filename, path in project_info.findDefinitions("*_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".h"):
         comment_list = getCommentList(open(path + "/" + filename, "r").read())
         list_info_dict.update(loadDefineLists(comment_list))
-    for tag in project.info("CPU_INFOS")["CPU_TAGS"]:
-        for filename, path in findDefinitions("*_" + tag + ".h", project):
+    for tag in project_info.info("CPU_INFOS")["CPU_TAGS"]:
+        for filename, path in project_info.findDefinitions("*_" + tag + ".h"):
             comment_list = getCommentList(open(path + "/" + filename, "r").read())
             list_info_dict.update(loadDefineLists(comment_list))
-    project.setInfo("MODULES", module_info_dict)
-    project.setInfo("LISTS", list_info_dict)
-    project.setInfo("CONFIGURATIONS", configuration_info_dict)
-    project.setInfo("FILES", file_dict)
+    project_info.setInfo("MODULES", module_info_dict)
+    project_info.setInfo("LISTS", list_info_dict)
+    project_info.setInfo("CONFIGURATIONS", configuration_info_dict)
+    project_info.setInfo("FILES", file_dict)
 
 def formatParamNameValue(text):
     """

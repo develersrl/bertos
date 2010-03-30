@@ -130,7 +130,7 @@ class BEditingDialog(QDialog):
                 dialog.version_page.setProjectInfo("OLD_SOURCES_PATH", current_version)
                 enabled_modules = bertos_utils.enabledModules(dialog.version_page.project())
                 old_configuration = dialog.version_page.projectInfo("CONFIGURATIONS")
-                bertos_utils.loadSourceTree(dialog.version_page.project())
+                dialog.version_page.project().loadSourceTree()
                 bertos_utils.loadModuleData(dialog.version_page.project())
                 new_configuration = dialog.version_page.projectInfo("CONFIGURATIONS")
                 merged_configuration = {}
@@ -150,7 +150,12 @@ class BEditingDialog(QDialog):
 
     def apply(self):
         qApp.setOverrideCursor(QCursor(Qt.WaitCursor))
-        createBertosProject(self.module_page.project(), edit=True)
+        def foo():
+            print "qui"
+            createBertosProject(self.module_page.project(), edit=True)
+        import cProfile
+        print "quo"
+        cProfile.runctx("foo()", globals(), locals(), sort=1)
         qApp.restoreOverrideCursor()
         self.accept()
 

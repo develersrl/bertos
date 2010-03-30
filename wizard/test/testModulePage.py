@@ -54,7 +54,7 @@ def main():
     page = BModulePage.BModulePage()
     page.setProjectInfo("SOURCES_PATH", "../../")
     page.setProjectInfo("CPU_INFOS", {"TOOLCHAIN": "avr", "CPU_TAGS": []})
-    bertos_utils.loadSourceTree(page.project())
+    page.project().loadSourceTree()
     page.reloadData()
     page.show()
     app.exec_()
