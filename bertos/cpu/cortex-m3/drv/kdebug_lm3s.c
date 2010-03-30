@@ -132,5 +132,5 @@ INLINE void kdbg_hw_init(void)
 	HWREG(GPIO_PORTA_BASE + GPIO_O_AMSEL) &= ~(BV(0) | BV(1));
 
 	/* 115.200, 8-bit word, no parity, one stop bit */
-	uart_config(UART0_BASE, 115200, UART_LCRH_WLEN_8);
+	uart_config(UART0_BASE, CONFIG_KDEBUG_BAUDRATE, UART_LCRH_WLEN_8);
 }
