@@ -125,33 +125,37 @@ class BEditingDialog(QDialog):
                 self.tr("Changing the BeRTOS version will destroy all the modification done on the BeRTOS sources"),
                 QMessageBox.Ok | QMessageBox.Cancel
             ) == QMessageBox.Ok:
-                qApp.setOverrideCursor(QCursor(Qt.WaitCursor))
-                dialog.version_page.setProjectInfo("SOURCES_PATH", version)
-                dialog.version_page.setProjectInfo("OLD_SOURCES_PATH", current_version)
-                enabled_modules = bertos_utils.enabledModules(dialog.version_page.project())
-                old_configuration = dialog.version_page.projectInfo("CONFIGURATIONS")
-                dialog.version_page.project().loadSourceTree()
-                bertos_utils.loadModuleData(dialog.version_page.project())
-                new_configuration = dialog.version_page.projectInfo("CONFIGURATIONS")
-                merged_configuration = {}
-                for conf in new_configuration:
-                    if conf in old_configuration:
-                        configuration = bertos_utils.updateConfigurationValues(new_configuration[conf], old_configuration[conf])
-                    else:
-                        configuration = new_configuration[conf]
-                    merged_configuration[conf] = configuration
-                dialog.version_page.setProjectInfo("CONFIGURATIONS", merged_configuration)
-                bertos_utils.setEnabledModules(dialog.version_page.project(), enabled_modules)
-                self.module_page.fillModuleTree()
-                qApp.restoreOverrideCursor()
+                try:
+                    qApp.setOverrideCursor(QCursor(Qt.WaitCursor))
+                    dialog.version_page.setProjectInfo("SOURCES_PATH", version)
+                    dialog.version_page.setProjectInfo("OLD_SOURCES_PATH", current_version)
+                    enabled_modules = bertos_utils.enabledModules(dialog.version_page.project())
+                    old_configuration = dialog.version_page.projectInfo("CONFIGURATIONS")
+                    dialog.version_page.project().loadSourceTree()
+                    bertos_utils.loadModuleData(dialog.version_page.project())
+                    new_configuration = dialog.version_page.projectInfo("CONFIGURATIONS")
+                    merged_configuration = {}
+                    for conf in new_configuration:
+                        if conf in old_configuration:
+                            configuration = bertos_utils.updateConfigurationValues(new_configuration[conf], old_configuration[conf])
+                        else:
+                            configuration = new_configuration[conf]
+                        merged_configuration[conf] = configuration
+                    dialog.version_page.setProjectInfo("CONFIGURATIONS", merged_configuration)
+                    bertos_utils.setEnabledModules(dialog.version_page.project(), enabled_modules)
+                    self.module_page.fillModuleTree()
+                finally:
+                    qApp.restoreOverrideCursor()
             else:
                 # Rollback version to the previous selected one.
                 dialog.version_page.setProjectInfo("SOURCES_PATH", current_version)
 
     def apply(self):
-        qApp.setOverrideCursor(QCursor(Qt.WaitCursor))
-        createBertosProject(self.module_page.project(), edit=True)
-        qApp.restoreOverrideCursor()
+        try:
+            qApp.setOverrideCursor(QCursor(Qt.WaitCursor))
+            createBertosProject(self.module_page.project(), edit=True)
+        finally:
+            qApp.restoreOverrideCursor()
         self.accept()
 
     def toolchains(self):

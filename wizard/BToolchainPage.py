@@ -155,10 +155,12 @@ class BToolchainPage(BWizardPage):
         Slot called when the user clicks on the validate button. It starts the
         toolchain validation procedure for all the toolchains.
         """
-        QApplication.instance().setOverrideCursor(Qt.WaitCursor)
-        for i in range(self.pageContent.toolchainList.count()):
-            self.validateToolchain(i)
-        QApplication.instance().restoreOverrideCursor()
+        try:
+            QApplication.instance().setOverrideCursor(Qt.WaitCursor)
+            for i in range(self.pageContent.toolchainList.count()):
+                self.validateToolchain(i)
+        finally:
+            QApplication.instance().restoreOverrideCursor()
 
     ####
 

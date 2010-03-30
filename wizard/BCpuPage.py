@@ -107,18 +107,20 @@ class BCpuPage(BWizardPage):
         """
         Overload of the BWizardPage reloadData method.
         """
-        QApplication.instance().setOverrideCursor(Qt.WaitCursor)
-        self.project().loadSourceTree()
-        self.populateCpuList()
-        cpu_name = self.projectInfo("CPU_NAME")
-        selected_freq = self.projectInfo("SELECTED_FREQ")
-        self.setupUi()
-        if cpu_name:
-            self.selectItem(cpu_name)
-            if selected_freq:
-                self.setFrequency(selected_freq)
-                self.freq_modified = True
-        QApplication.instance().restoreOverrideCursor()
+        try:
+            QApplication.instance().setOverrideCursor(Qt.WaitCursor)
+            self.project().loadSourceTree()
+            self.populateCpuList()
+            cpu_name = self.projectInfo("CPU_NAME")
+            selected_freq = self.projectInfo("SELECTED_FREQ")
+            self.setupUi()
+            if cpu_name:
+                self.selectItem(cpu_name)
+                if selected_freq:
+                    self.setFrequency(selected_freq)
+                    self.freq_modified = True
+        finally:
+            QApplication.instance().restoreOverrideCursor()
         self.emit(SIGNAL("completeChanged()"))
 
     ####

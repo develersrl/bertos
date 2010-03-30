@@ -86,11 +86,13 @@ class BModulePage(BWizardPage):
         """
         Overload of the BWizardPage reloadData method.
         """
-        QApplication.instance().setOverrideCursor(Qt.WaitCursor)
-        self.setupUi()
-        self.loadModuleData()
-        self.fillModuleTree()
-        QApplication.instance().restoreOverrideCursor()
+        try:
+            QApplication.instance().setOverrideCursor(Qt.WaitCursor)
+            self.setupUi()
+            self.loadModuleData()
+            self.fillModuleTree()
+        finally:
+            QApplication.instance().restoreOverrideCursor()
     
     ####
     
@@ -402,70 +404,74 @@ class BModulePage(BWizardPage):
         """
         Resolves the selection dependencies.
         """
-        qApp.setOverrideCursor(Qt.WaitCursor)
-        modules = self.projectInfo("MODULES")
-        modules[selectedModule]["enabled"] = True
-        self.setProjectInfo("MODULES", modules)
-        depends = self.projectInfo("MODULES")[selectedModule]["depends"]
-        unsatisfied = []
-        if self.pageContent.automaticFix.isChecked():
-            unsatisfied = self.selectDependencyCheck(selectedModule)
-        if len(unsatisfied) > 0:
-            for module in unsatisfied:
-                modules = self.projectInfo("MODULES")
-                modules[module]["enabled"] = True
-            for category in range(self.pageContent.moduleTree.topLevelItemCount()):
-                item = self.pageContent.moduleTree.topLevelItem(category)
-                for child in range(item.childCount()):
-                    if unicode(item.child(child).text(0)) in unsatisfied:
-                        self.setBold(item.child(child), True)
-                        self.setBold(item, True)
-                        item.child(child).setCheckState(0, Qt.Checked)
-        qApp.restoreOverrideCursor()
+        try:
+            qApp.setOverrideCursor(Qt.WaitCursor)
+            modules = self.projectInfo("MODULES")
+            modules[selectedModule]["enabled"] = True
+            self.setProjectInfo("MODULES", modules)
+            depends = self.projectInfo("MODULES")[selectedModule]["depends"]
+            unsatisfied = []
+            if self.pageContent.automaticFix.isChecked():
+                unsatisfied = self.selectDependencyCheck(selectedModule)
+            if len(unsatisfied) > 0:
+                for module in unsatisfied:
+                    modules = self.projectInfo("MODULES")
+                    modules[module]["enabled"] = True
+                for category in range(self.pageContent.moduleTree.topLevelItemCount()):
+                    item = self.pageContent.moduleTree.topLevelItem(category)
+                    for child in range(item.childCount()):
+                        if unicode(item.child(child).text(0)) in unsatisfied:
+                            self.setBold(item.child(child), True)
+                            self.setBold(item, True)
+                            item.child(child).setCheckState(0, Qt.Checked)
+        finally:
+            qApp.restoreOverrideCursor()
     
     def moduleUnselected(self, unselectedModule):
         """
         Resolves the unselection dependencies.
         """
-        qApp.setOverrideCursor(Qt.WaitCursor)
-        modules = self.projectInfo("MODULES")
-        modules[unselectedModule]["enabled"] = False
-        self.setProjectInfo("MODULES", modules)
-        unsatisfied = []
-        unsatisfied_params = []
-        if self.pageContent.automaticFix.isChecked():
-            unsatisfied, unsatisfied_params = self.unselectDependencyCheck(unselectedModule)
-        if len(unsatisfied) > 0 or len(unsatisfied_params) > 0:
-            message = []
-            heading = self.tr("The module %1 is needed by").arg(unselectedModule)
-            message.append(heading)
-            module_list = ", ".join(unsatisfied)
-            param_list = ", ".join(["%s (%s)" %(param_name, module) for module, param_name in unsatisfied_params])
-            if module_list:
-                message.append(QString(module_list))
-            if module_list and param_list:
-                message.append(self.tr("and by"))
-            if param_list:
-                message.append(QString(param_list))
-            message_str = QStringList(message).join(" ")
-            message_str.append(self.tr("\n\nDo you want to automatically fix these conflicts?"))
-            qApp.restoreOverrideCursor()
-            choice = QMessageBox.warning(self, self.tr("Dependency error"), message_str, QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+        try:
             qApp.setOverrideCursor(Qt.WaitCursor)
-            if choice == QMessageBox.Yes:
-                for module in unsatisfied:
-                    modules = self.projectInfo("MODULES")
-                    modules[module]["enabled"] = False
-                for category in range(self.pageContent.moduleTree.topLevelItemCount()):
-                    item = self.pageContent.moduleTree.topLevelItem(category)
-                    for child in range(item.childCount()):
-                        if unicode(item.child(child).text(0)) in unsatisfied:
-                            item.child(child).setCheckState(0, Qt.Unchecked)
-                for module, param in unsatisfied_params:
-                    configuration_file = self.projectInfo("MODULES")[module]["configuration"]
-                    configurations = self.projectInfo("CONFIGURATIONS")
-                    configurations[configuration_file][param]["value"] = "0"
-                    self.setProjectInfo("CONFIGURATIONS", configurations)
+            modules = self.projectInfo("MODULES")
+            modules[unselectedModule]["enabled"] = False
+            self.setProjectInfo("MODULES", modules)
+            unsatisfied = []
+            unsatisfied_params = []
+            if self.pageContent.automaticFix.isChecked():
+                unsatisfied, unsatisfied_params = self.unselectDependencyCheck(unselectedModule)
+            if len(unsatisfied) > 0 or len(unsatisfied_params) > 0:
+                message = []
+                heading = self.tr("The module %1 is needed by").arg(unselectedModule)
+                message.append(heading)
+                module_list = ", ".join(unsatisfied)
+                param_list = ", ".join(["%s (%s)" %(param_name, module) for module, param_name in unsatisfied_params])
+                if module_list:
+                    message.append(QString(module_list))
+                if module_list and param_list:
+                    message.append(self.tr("and by"))
+                if param_list:
+                    message.append(QString(param_list))
+                message_str = QStringList(message).join(" ")
+                message_str.append(self.tr("\n\nDo you want to automatically fix these conflicts?"))
+                qApp.restoreOverrideCursor()
+                choice = QMessageBox.warning(self, self.tr("Dependency error"), message_str, QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+                qApp.setOverrideCursor(Qt.WaitCursor)
+                if choice == QMessageBox.Yes:
+                    for module in unsatisfied:
+                        modules = self.projectInfo("MODULES")
+                        modules[module]["enabled"] = False
+                    for category in range(self.pageContent.moduleTree.topLevelItemCount()):
+                        item = self.pageContent.moduleTree.topLevelItem(category)
+                        for child in range(item.childCount()):
+                            if unicode(item.child(child).text(0)) in unsatisfied:
+                                item.child(child).setCheckState(0, Qt.Unchecked)
+                    for module, param in unsatisfied_params:
+                        configuration_file = self.projectInfo("MODULES")[module]["configuration"]
+                        configurations = self.projectInfo("CONFIGURATIONS")
+                        configurations[configuration_file][param]["value"] = "0"
+                        self.setProjectInfo("CONFIGURATIONS", configurations)
+        finally:
             qApp.restoreOverrideCursor()
     
     def selectDependencyCheck(self, module):

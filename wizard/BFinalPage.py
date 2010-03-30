@@ -57,9 +57,11 @@ class BFinalPage(BWizardPage):
         """
         Overload of the BWizardPage reloadData method.
         """
-        QApplication.instance().setOverrideCursor(Qt.WaitCursor)
-        bertos_utils.createBertosProject(self.project())
-        QApplication.instance().restoreOverrideCursor()
+        try:
+            QApplication.instance().setOverrideCursor(Qt.WaitCursor)
+            bertos_utils.createBertosProject(self.project())
+        finally:
+            QApplication.instance().restoreOverrideCursor()
         self._plugin_dict = {}
         if os.name == "nt":
             output = self.projectInfo("OUTPUT")
