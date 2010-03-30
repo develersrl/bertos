@@ -63,22 +63,26 @@ class BProject(object):
     def loadSourceTree(self):
         # Index only the SOURCES_PATH/bertos content
         bertos_sources_dir = os.path.join(self.info("SOURCES_PATH"), 'bertos')
+        file_dict = {}
         if os.path.exists(bertos_sources_dir):
-            fileList = [f for f in os.walk(bertos_sources_dir)]
-        else:
-            fileList = []
-        self.setInfo("FILE_LIST", fileList)
+            for element in os.walk(bertos_sources_dir):
+                for f in element[2]:
+                    file_dict[f] = file_dict.get(f, []) + [element[0]]
+        self.setInfo("FILE_DICT", file_dict)
+
+    def searchFiles(self, filename):
+        file_dict = self.infos["FILE_DICT"]
+        return [(filename, dirname) for dirname in file_dict.get(filename, [])]
 
     def findDefinitions(self, ftype):
         definitions = self._cached_queries.get(ftype, None)
         if definitions is not None:
             return definitions
-        L = self.infos["FILE_LIST"]
+        file_dict = self.infos["FILE_DICT"]
         definitions = []
-        for element in L:
-            for filename in element[2]:
-                if fnmatch.fnmatch(filename, ftype):
-                    definitions.append((filename, element[0]))
+        for filename in file_dict:
+            if fnmatch.fnmatch(filename, ftype):
+                definitions += [(filename, dirname) for dirname in file_dict.get(filename, [])]
         self._cached_queries[ftype] = definitions
         return definitions
 

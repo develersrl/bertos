@@ -381,28 +381,28 @@ def findModuleFiles(module, project_info):
     cfiles = []
     sfiles = []
     # .c files related to the module and the cpu architecture
-    for filename, path in project_info.findDefinitions(module + ".c") + \
-            project_info.findDefinitions(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".c"):
+    for filename, path in project_info.searchFiles(module + ".c") + \
+            project_info.searchFiles(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".c"):
         path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
         path = replaceSeparators(path)
         cfiles.append(path + "/" + filename)
     # .s files related to the module and the cpu architecture
-    for filename, path in project_info.findDefinitions(module + ".s") + \
-            project_info.findDefinitions(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".s") + \
-            project_info.findDefinitions(module + ".S") + \
-            project_info.findDefinitions(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".S"):
+    for filename, path in project_info.searchFiles(module + ".s") + \
+            project_info.searchFiles(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".s") + \
+            project_info.searchFiles(module + ".S") + \
+            project_info.searchFiles(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".S"):
         path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
         path = replaceSeparators(path)
         sfiles.append(path + "/" + filename)
     # .c and .s files related to the module and the cpu tags
     for tag in project_info.info("CPU_INFOS")["CPU_TAGS"]:
-        for filename, path in project_info.findDefinitions(module + "_" + tag + ".c"):
+        for filename, path in project_info.searchFiles(module + "_" + tag + ".c"):
             path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
             if os.sep != "/":
                 path = replaceSeparators(path)
             cfiles.append(path + "/" + filename)
-        for filename, path in project_info.findDefinitions(module + "_" + tag + ".s") + \
-                project_info.findDefinitions(module + "_" + tag + ".S"):
+        for filename, path in project_info.searchFiles(module + "_" + tag + ".s") + \
+                project_info.searchFiles(module + "_" + tag + ".S"):
             path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
             path = replaceSeparators(path)
             sfiles.append(path + "/" + filename)
