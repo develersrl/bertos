@@ -130,7 +130,7 @@ def main():
         os.system("rcc -binary %s -o %s" %(qrc, rcc))
     QResource.registerResource(rcc)
     if len(sys.argv) == 3 and sys.argv[1] == "--edit":
-        editProject(sys.argv[2])
+        editProject(os.path.abspath(sys.argv[2]))
     else:
         newProject()
 
