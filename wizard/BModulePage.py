@@ -35,6 +35,7 @@
 
 import os
 
+from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from BWizardPage import *
 import bertos_utils
@@ -401,6 +402,7 @@ class BModulePage(BWizardPage):
         """
         Resolves the selection dependencies.
         """
+        qApp.setOverrideCursor(Qt.WaitCursor)
         modules = self.projectInfo("MODULES")
         modules[selectedModule]["enabled"] = True
         self.setProjectInfo("MODULES", modules)
@@ -419,11 +421,13 @@ class BModulePage(BWizardPage):
                         self.setBold(item.child(child), True)
                         self.setBold(item, True)
                         item.child(child).setCheckState(0, Qt.Checked)
+        qApp.restoreOverrideCursor()
     
     def moduleUnselected(self, unselectedModule):
         """
         Resolves the unselection dependencies.
         """
+        qApp.setOverrideCursor(Qt.WaitCursor)
         modules = self.projectInfo("MODULES")
         modules[unselectedModule]["enabled"] = False
         self.setProjectInfo("MODULES", modules)
@@ -445,7 +449,9 @@ class BModulePage(BWizardPage):
                 message.append(QString(param_list))
             message_str = QStringList(message).join(" ")
             message_str.append(self.tr("\n\nDo you want to automatically fix these conflicts?"))
+            qApp.restoreOverrideCursor()
             choice = QMessageBox.warning(self, self.tr("Dependency error"), message_str, QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            qApp.setOverrideCursor(Qt.WaitCursor)
             if choice == QMessageBox.Yes:
                 for module in unsatisfied:
                     modules = self.projectInfo("MODULES")
@@ -460,6 +466,7 @@ class BModulePage(BWizardPage):
                     configurations = self.projectInfo("CONFIGURATIONS")
                     configurations[configuration_file][param]["value"] = "0"
                     self.setProjectInfo("CONFIGURATIONS", configurations)
+            qApp.restoreOverrideCursor()
     
     def selectDependencyCheck(self, module):
         """
