@@ -67,8 +67,8 @@ __init0:
         ldr     r0, =__stack_und_end
         msr     CPSR_c, #ARM_MODE_UNDEF | IRQ_BIT | FIQ_BIT
         mov     r13, r0
-        ldr     r0, =__stack_sys_end
-        msr     CPSR_c, #ARM_MODE_SYS | IRQ_BIT | FIQ_BIT
+        ldr     r0, =__stack_svc_end
+        msr     CPSR_c, #ARM_MODE_SVC | IRQ_BIT | FIQ_BIT
         mov     r13, r0
 
 	/*
