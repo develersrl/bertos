@@ -95,6 +95,11 @@
 
 	#define IRQ_ENABLED() (!CPU_READ_FLAGS())
 
+	/* TODO: context switch is not yet supported */
+	#define DECLARE_ISR_CONTEXT_SWITCH(func) void func(void)
+
+	/* TODO: context switch is not yet supported */
+	#define ISR_PROTO_CONTEXT_SWITCH(func) void func(void)
 #elif CPU_ARM
 
 	#ifdef __IAR_SYSTEMS_ICC__

@@ -42,17 +42,12 @@
 #include "irq_lm3s.h"
 #include "timer_lm3s.h"
 
-unsigned long ticks;
+ISR_PROTO_CONTEXT_SWITCH(timer_handler);
 
 INLINE void timer_hw_setPeriod(unsigned long period)
 {
 	ASSERT(period < (1 << 24));
-	HWREG(NVIC_ST_RELOAD) = period;
-}
-
-static void timer_hw_handler(void)
-{
-	ticks++;
+	HWREG(NVIC_ST_RELOAD) = period - 1;
 }
 
 static void timer_hw_enable(void)
@@ -68,8 +63,8 @@ static void timer_hw_disable(void)
 
 void timer_hw_init(void)
 {
-	timer_hw_setPeriod(1000000);
-	sysirq_setHandler(FAULT_SYSTICK, timer_hw_handler);
+	timer_hw_setPeriod(CPU_FREQ / TIMER_TICKS_PER_SEC);
+	sysirq_setHandler(FAULT_SYSTICK, timer_handler);
 	timer_hw_enable();
 }
 

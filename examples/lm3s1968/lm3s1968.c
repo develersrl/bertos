@@ -36,16 +36,11 @@
  */
 
 #include <cpu/irq.h>
+#include <drv/timer.h>
 #include "io/lm3s.h"
-#include "drv/timer_lm3s.h"
 
-extern unsigned long ticks;
-
-int main(void)
+static void led_init(void)
 {
-	kdbg_init();
-	timer_hw_init();
-
 	/* Enable the GPIO port that is used for the on-board LED */
 	SYSCTL_RCGC2_R = SYSCTL_RCGC2_GPIOG;
 	/*
@@ -56,14 +51,32 @@ int main(void)
 	/* Enable the GPIO pin for the LED */
 	GPIO_PORTG_DIR_R = 0x04;
 	GPIO_PORTG_DEN_R = 0x04;
+}
+
+static void led_on(void)
+{
+	GPIO_PORTG_DATA_R |= 0x04;
+}
+
+static void led_off(void)
+{
+	GPIO_PORTG_DATA_R &= ~0x04;
+}
+
+int main(void)
+{
+	IRQ_ENABLE;
+	kdbg_init();
+	timer_init();
+	led_init();
 
 	while(1)
 	{
-		/* Turn on the LED */
-		if ((ticks & 0x04) == 0x04)
-			GPIO_PORTG_DATA_R |= 0x04;
-		/* Turn off the LED */
-		else if ((ticks & 0x04) == 0)
-			GPIO_PORTG_DATA_R &= ~0x04;
+		kputs("STATUS LED: on \r");
+		led_on();
+		timer_delay(1000);
+		kputs("STATUS LED: off\r");
+		led_off();
+		timer_delay(1000);
 	}
 }

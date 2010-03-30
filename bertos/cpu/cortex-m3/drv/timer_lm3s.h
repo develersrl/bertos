@@ -38,6 +38,39 @@
 #ifndef DRV_CORTEX_M3_TIMER_H
 #define DRV_CORTEX_M3_TIMER_H
 
+#include <io/lm3s.h>
+
+/* Ticks frequency (HZ) */
+#define TIMER_TICKS_PER_SEC	1000
+
+/* Frequency of the hardware high-precision timer. */
+#define TIMER_HW_HPTICKS_PER_SEC (CPU_FREQ)
+
+/* Maximum value of the high-precision hardware counter register */
+#define TIMER_HW_CNT (CPU_FREQ / TIMER_TICKS_PER_SEC)
+
+/** Type of time expressed in ticks of the hardware high-precision timer */
+typedef uint32_t hptime_t;
+#define SIZEOF_HPTIME_T 4
+
+/* Timer ISR prototype */
+#define DEFINE_TIMER_ISR void timer_handler(void); \
+				void timer_handler(void)
+
+INLINE void timer_hw_irq(void)
+{
+}
+
+INLINE bool timer_hw_triggered(void)
+{
+	return true;
+}
+
+INLINE hptime_t timer_hw_hpread(void)
+{
+	return HWREG(NVIC_ST_CURRENT);
+}
+
 void timer_hw_init(void);
 void timer_hw_exit(void);
 

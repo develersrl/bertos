@@ -17,6 +17,10 @@ TRG += lm3s1968
 
 lm3s1968_CSRC = \
 	examples/lm3s1968/lm3s1968.c \
+	bertos/mware/formatwr.c \
+	bertos/mware/hex.c \
+	bertos/mware/sprintf.c \
+	bertos/drv/timer.c \
 	bertos/cpu/cortex-m3/drv/irq_lm3s.c \
 	bertos/cpu/cortex-m3/drv/timer_lm3s.c \
 	bertos/cpu/cortex-m3/drv/clock_lm3s.c \
@@ -27,7 +31,7 @@ lm3s1968_CSRC = \
 lm3s1968_PREFIX = arm-none-eabi-
 
 lm3s1968_CPPAFLAGS = -O0 -g -gdwarf-2 -g -gen-debug -mthumb -fno-strict-aliasing -fwrapv
-lm3s1968_CPPFLAGS = -O0 -D'ARCH=0' -D__ARM_LM3S1968__ -D'CPU_FREQ=(50000000L)' -g3 -gdwarf-2 -fverbose-asm -mthumb  -Iexamples/lm3s1968 -Ibertos/cpu/cortex-m3 -fno-strict-aliasing -fwrapv
+lm3s1968_CPPFLAGS = -O0 -D'ARCH=0' -D__ARM_LM3S1968__ -D'CPU_FREQ=(50000000L)' -D'WIZ_AUTOGEN' -g3 -gdwarf-2 -fverbose-asm -mthumb  -Iexamples/lm3s1968 -Ibertos/cpu/cortex-m3 -fno-strict-aliasing -fwrapv
 lm3s1968_LDFLAGS = -nostartfiles -T bertos/cpu/cortex-m3/scripts/lm3s1968_rom.ld -Wl,--no-warn-mismatch -fno-strict-aliasing -fwrapv
 
 lm3s1968_CPU = cortex-m3
