@@ -181,6 +181,12 @@
 	#define RESTRICT                __restrict__
 	#define MUST_CHECK              __attribute__((warn_unused_result))
 	#define PACKED                  __attribute__((packed))
+	#if CPU_ARM | CPU_CM3
+		#define NAKED		__attribute__((naked))
+	#else
+		#define NAKED
+	#endif
+
 	/**
 	 * Force compiler to realod context variable.
 	 */
