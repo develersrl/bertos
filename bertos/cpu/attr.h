@@ -165,7 +165,7 @@
 #elif CPU_CM3
 
 	#define CPU_REG_BITS           32
-	#define CPU_REGS_CNT           fixme
+	#define CPU_REGS_CNT           16
 	#define CPU_HARVARD            0
 
 	/// Valid pointers should be >= than this value (used for debug)
@@ -181,11 +181,26 @@
 	#elif defined(__ARMEL__)
 		#define CPU_BYTE_ORDER CPU_LITTLE_ENDIAN
 	#else
-		#error Unable to detect Cortex-M3 endianness!
+		#error Unable to detect Cortex-M3 endianess!
 	#endif
 
-	#define NOP         fixme
+	#define NOP         asm volatile ("nop")
 	#define BREAKPOINT  /* asm("bkpt 0") DOES NOT WORK */
+
+	/*
+	 * Builtin GCC memset() can be buggy! We need to redefine it here for
+	 * this architecture. :(
+	 */
+	#include <cfg/compiler.h>
+	#define memset	__cm3_memset
+	INLINE void *__cm3_memset(void *s, int c, size_t n)
+	{
+		uint8_t *p = (uint8_t *)s;
+
+		while (n--)
+			*p++ = c;
+		return s;
+	}
 
 #elif CPU_PPC
 
