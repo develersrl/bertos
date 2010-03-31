@@ -121,6 +121,64 @@ end:
 __dummy_init:
 	mov	pc, lr
 
+	/*
+	 * Redefine your own __init() in order to supply
+	 * a completely custom initialization routine.
+	 */
+        .weak   __init
+        .set    __init, __init0
+
+	/*
+	 * Redefine your own __init1() in order to supply
+	 * an hardware initialization routine.
+	 * Remember that __init1() is called *before*
+	 * clearing .bss and loading .data sections.
+	 */
+        .weak   __init1
+        .set    __init1, __dummy_init
+
+	/*
+	 * Redefine your own __init2() in order to supply
+	 * an hardware initialization routine.
+	 * Remember that __init2() is called *after*
+	 * clearing .bss and loading .data sections, just
+	 * before calling main().
+	 */
+        .weak   __init2
+        .set    __init2, __dummy_init
+
+	/*
+	 * Redefine your own __undef() in order to supply
+	 * a custom handler for undefined instruction exception.
+	 */
+        .weak   __undef
+        .set    __undef, __xcpt_dummy_undef
+
+	/*
+	 * Redefine your own __swi() in order to supply
+	 * a custom handler for software interrupt exception.
+	 */
+        .weak   __swi
+        .set    __swi, __xcpt_dummy_swi
+
+	/*
+	 * Redefine your own __prefetch_abort() in order to supply
+	 * a custom handler for prefetch abort exception.
+	 */
+        .weak   __prefetch_abort
+        .set    __prefetch_abort, __xcpt_dummy_pref
+
+	/*
+	 * Redefine your own __data_abort() in order to supply
+	 * a custom handler for data abort exception.
+	 */
+        .weak   __data_abort
+        .set    __data_abort, __xcpt_dummy_dab
+
+        .ltorg
+
+	.section .vectors, "ax", %progbits
+
 __xcpt_dummy_undef:
         b       __xcpt_dummy_undef
 
@@ -132,21 +190,3 @@ __xcpt_dummy_pref:
 
 __xcpt_dummy_dab:
         b       __xcpt_dummy_dab
-
-        .weak   __init1
-        .set    __init1, __dummy_init
-        .weak   __init2
-        .set    __init2, __dummy_init
-
-        .weak   __init
-        .set    __init, __init0
-        .weak   __undef
-        .set    __undef, __xcpt_dummy_undef
-        .weak   __swi
-        .set    __swi, __xcpt_dummy_swi
-        .weak   __prefetch_abort
-        .set    __prefetch_abort, __xcpt_dummy_pref
-        .weak   __data_abort
-        .set    __data_abort, __xcpt_dummy_dab
-
-        .ltorg
