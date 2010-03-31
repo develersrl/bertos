@@ -35,7 +35,8 @@
  * \author Andrea Righi <arighi@develer.com>
  */
 
-#include <cfg/debug.h>
+#include <cfg/debug.h> /* ASSERT() */
+#include <cfg/log.h> /* LOG_ERR() */
 #include <cpu/irq.h>
 #include "io/lm3s.h"
 #include "irq_lm3s.h"
@@ -43,9 +44,15 @@
 static void (*irq_table[NUM_INTERRUPTS])(void)
 			__attribute__((section("vtable")));
 
-static void unhandled_isr(void)
+/* Unhandled IRQ */
+static NORETURN NAKED void unhandled_isr(void)
 {
-	/* Unhandled IRQ */
+	reg32_t reg;
+
+	asm volatile ("mrs %0, ipsr" : "=r"(reg));
+	LOG_ERR("unhandled IRQ %lu\n", reg);
+	PAUSE;
+	UNREACHABLE();
 	ASSERT(0);
 }
 
