@@ -63,20 +63,34 @@ static void led_off(void)
 	GPIO_PORTG_DATA_R &= ~0x04;
 }
 
+static NORETURN void spinner_thread(void)
+{
+	char spinner[] = {'/', '-', '\\', '|'};
+	int i;
+
+	kputs("\n");
+	for(i = 0; ; i++)
+	{
+		kprintf("BeRTOS is up & running: %c\r",
+				spinner[i % countof(spinner)]);
+		timer_delay(100);
+	}
+}
+
 int main(void)
 {
 	IRQ_ENABLE;
-	kdbg_init();
-	timer_init();
 	led_init();
 
+	proc_testSetup();
+	proc_testRun();
+
+	proc_new(spinner_thread, NULL, KERN_MINSTACKSIZE, NULL);
 	while(1)
 	{
-		kputs("STATUS LED: on \r");
 		led_on();
-		timer_delay(1000);
-		kputs("STATUS LED: off\r");
+		timer_delay(250);
 		led_off();
-		timer_delay(1000);
+		timer_delay(250);
 	}
 }
