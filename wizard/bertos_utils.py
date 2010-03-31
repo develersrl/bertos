@@ -409,12 +409,6 @@ def getToolchainName(toolchain_info):
     name = "GCC " + toolchain_info["version"] + " - " + toolchain_info["target"].strip()
     return name
 
-def loadCpuInfos(project_info):
-    cpuInfos = []
-    for definition in project_info.findDefinitions(const.CPU_DEFINITION):
-        cpuInfos.append(getInfos(definition))
-    return cpuInfos
-
 def getTagSet(cpu_info):
     tag_set = set([])
     for cpu in cpu_info:

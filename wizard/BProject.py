@@ -39,10 +39,11 @@ import copy
 import pickle
 
 import DefineException
+import const
 
 from bertos_utils import (
                             # Utility functions
-                            isBertosDir, loadCpuInfos, getTagSet, setEnabledModules,
+                            isBertosDir, getTagSet, setEnabledModules, getInfos,
                             loadConfigurationInfos, loadDefineLists, loadModuleDefinition,
                             getCommentList, updateConfigurationValues,
                             
@@ -84,7 +85,7 @@ class BProject(object):
         self.loadSourceTree()
         cpu_name = project_data["CPU_NAME"]
         self.infos["CPU_NAME"] = cpu_name
-        cpu_info = loadCpuInfos(self)
+        cpu_info = self.loadCpuInfos()
         for cpu in cpu_info:
             if cpu["CPU_NAME"] == cpu_name:
                 self.infos["CPU_INFOS"] = cpu
@@ -165,6 +166,16 @@ class BProject(object):
         self.infos["CONFIGURATIONS"] = configuration_info_dict
         self.infos["FILES"] = file_dict
 
+    def loadCpuInfos(self):
+        cpuInfos = []
+        for definition in self.findDefinitions(const.CPU_DEFINITION):
+            cpuInfos.append(getInfos(definition))
+        return cpuInfos
+
+    def reloadCpuInfo(self):
+        for cpu_info in self.loadCpuInfos():
+            if cpu_info["CPU_NAME"]:
+                self.infos["CPU_INFOS"] = cpu_info
 
     def setInfo(self, key, value):
         """

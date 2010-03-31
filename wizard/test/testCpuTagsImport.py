@@ -46,7 +46,7 @@ def main():
     p = BProject.BProject()
     p.setInfo("SOURCES_PATH", "../../")
     p.loadSourceTree()
-    info = loadCpuInfos(p)
+    info = p.loadCpuInfos()
     tags = getTagSet(info)
     print tags
 
