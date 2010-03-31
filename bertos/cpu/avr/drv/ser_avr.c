@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2003, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2010 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000 Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
@@ -37,6 +37,7 @@
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
+ * \author Luca Ottaviano <lottaviano@develer.com>
  */
 
 #include "hw/hw_ser.h"  /* Required for bus macros overrides */
@@ -85,6 +86,16 @@
 	#define BIT_RXEN1  RXEN1
 	#define BIT_TXEN1  TXEN1
 	#define BIT_UDRIE1 UDRIE1
+#elif CPU_AVR_ATMEGA328P
+	#define BIT_RXCIE0 RXCIE0
+	#define BIT_RXEN0  RXEN0
+	#define BIT_TXEN0  TXEN0
+	#define BIT_UDRIE0 UDRIE0
+
+	#define BIT_RXCIE1 RXCIE0
+	#define BIT_RXEN1  RXEN0
+	#define BIT_TXEN1  TXEN0
+	#define BIT_UDRIE1 UDRIE0
 #else
 	#define BIT_RXCIE0 RXCIE
 	#define BIT_RXEN0  RXEN
@@ -248,7 +259,16 @@
 	#define SPI_SCK_BIT   PB1
 	#define SPI_MOSI_BIT  PB2
 	#define SPI_MISO_BIT  PB3
-#elif CPU_AVR_ATMEGA8
+// TODO: these bits are the same as ATMEGA8 but the defines in avr-gcc are different.
+// They should be the same!
+#elif CPU_AVR_ATMEGA328P
+	#define SPI_PORT      PORTB
+	#define SPI_DDR       DDRB
+	#define SPI_SS_BIT    PORTB2
+	#define SPI_SCK_BIT   PORTB5
+	#define SPI_MOSI_BIT  PORTB3
+	#define SPI_MISO_BIT  PORTB4
+#elif CPU_AVR_ATMEGA8 || CPU_AVR_ATMEGA168
 	#define SPI_PORT      PORTB
 	#define SPI_DDR       DDRB
 	#define SPI_SS_BIT    PB2
@@ -262,6 +282,11 @@
 /* USART register definitions */
 #if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281
 	#define AVR_HAS_UART1 1
+#elif CPU_AVR_ATMEGA328P
+	#define AVR_HAS_UART1 0
+	#define USART0_UDRE_vect USART_UDRE_vect
+	#define USART0_RX_vect USART_RX_vect
+	#define SIG_UART0_TRANS SIG_UART_TRANS
 #elif CPU_AVR_ATMEGA8
 	#define AVR_HAS_UART1 0
 	#define UCSR0A UCSRA
@@ -270,6 +295,7 @@
 	#define UDR0   UDR
 	#define UBRR0L UBRRL
 	#define UBRR0H UBRRH
+/* TODO: The following SIGs are old style interrupts, must be refactored */
 	#define SIG_UART0_DATA SIG_UART_DATA
 	#define SIG_UART0_RECV SIG_UART_RECV
 	#define SIG_UART0_TRANS SIG_UART_TRANS
@@ -279,6 +305,7 @@
 	#define UDR0   UDR
 	#define UCSR0A USR
 	#define UBRR0L UBRR
+/* TODO: The following SIGs are old style interrupts, must be refactored */
 	#define SIG_UART0_DATA SIG_UART_DATA
 	#define SIG_UART0_RECV SIG_UART_RECV
 	#define SIG_UART0_TRANS SIG_UART_TRANS

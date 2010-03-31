@@ -26,13 +26,14 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2007 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2007, 2010 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
  * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
+ * \author Luca Ottaviano <lottaviano@develer.com>
  *
  * \brief Low-level serial module for AVR (interface).
  *
@@ -90,7 +91,7 @@ enum
 	SER_UART0,
 	SER_UART1,
 	SER_SPI,
-#elif CPU_AVR_ATMEGA103 || CPU_AVR_ATMEGA8
+#elif CPU_AVR_ATMEGA103 || CPU_AVR_ATMEGA8 || CPU_AVR_ATMEGA328P
 	SER_UART0,
 	SER_SPI,
 #else
