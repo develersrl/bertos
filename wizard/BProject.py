@@ -36,6 +36,7 @@
 import os
 import fnmatch
 import copy
+import pickle
 
 from bertos_utils import *
 

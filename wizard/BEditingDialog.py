@@ -39,14 +39,14 @@ import os
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from bertos_utils import loadBertosProject, bertosVersion, getToolchainName, createBertosProject
+from bertos_utils import bertosVersion, getToolchainName, createBertosProject
 from BToolchainPage import BToolchainPage
 from BVersionPage import BVersionPage
 
 from BProject import BProject
 
 import qvariant_converter
-import BModulePage
+from BModulePage import BModulePage
 import bertos_utils
 
 class BEditingDialog(QDialog):
@@ -60,18 +60,18 @@ class BEditingDialog(QDialog):
     
     def setupUi(self):
         layout = QVBoxLayout()
-        self.module_page = BModulePage.BModulePage()
+        self.module_page = BModulePage()
         layout.addWidget(self.module_page)
-	frequency_layout = QHBoxLayout()
-	frequency_layout.addWidget(QLabel(self.tr("CPU frequency")))
-	self.cpu_frequency_spinbox = QDoubleSpinBox()
-	self.cpu_frequency_spinbox.setSuffix("Hz")
-	self.cpu_frequency_spinbox.setRange(1, 1000000000)
-	self.cpu_frequency_spinbox.setSingleStep(1000)
-	self.cpu_frequency_spinbox.setDecimals(0)
-	frequency_layout.addWidget(self.cpu_frequency_spinbox)
-	frequency_layout.addStretch()
-	layout.addLayout(frequency_layout)
+        frequency_layout = QHBoxLayout()
+        frequency_layout.addWidget(QLabel(self.tr("CPU frequency")))
+        self.cpu_frequency_spinbox = QDoubleSpinBox()
+        self.cpu_frequency_spinbox.setSuffix("Hz")
+        self.cpu_frequency_spinbox.setRange(1, 1000000000)
+        self.cpu_frequency_spinbox.setSingleStep(1000)
+        self.cpu_frequency_spinbox.setDecimals(0)
+        frequency_layout.addWidget(self.cpu_frequency_spinbox)
+        frequency_layout.addStretch()
+        layout.addLayout(frequency_layout)
         button_layout = QHBoxLayout()
         self.advanced_button = QToolButton()
         self.setupMenu()

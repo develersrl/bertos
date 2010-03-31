@@ -42,10 +42,9 @@ from PyQt4.QtGui import *
 
 import exception_handler
 
-import BProject
+from BProject import BProject
 
-import BStartPage
-import BWizard
+from BWizard import BWizard
 
 from BIntroPage import BIntroPage
 from BFolderPage import BFolderPage
@@ -61,14 +60,14 @@ from BFinalPage import BFinalPage
 
 from BEditingDialog import BEditingDialog, BVersionDialog, BToolchainDialog
 
-import bertos_utils
-import const
+from const import DATA_DIR
 
 from LoadException import VersionException, ToolchainException
 
 def newProject():
+    QApplication.instance().project = BProject()
     page_list = [BIntroPage, BFolderPage, BBoardPage, BVersionPage, BCpuPage, BToolchainPage, BModulePage, BOutputPage, BCreationPage, BFinalPage]
-    wizard = BWizard.BWizard(page_list)
+    wizard = BWizard(page_list)
     wizard.show()
     wizard.exec_()
     project = QApplication.instance().project
@@ -86,7 +85,7 @@ def editProject(project_file):
     info_dict = {}
     while(True):
         try:
-            QApplication.instance().project = BProject.BProject(project_file, info_dict)
+            QApplication.instance().project = BProject(project_file, info_dict)
         except VersionException:
             QMessageBox.critical(
                 None,
@@ -114,18 +113,11 @@ def editProject(project_file):
     dialog = BEditingDialog()
     dialog.exec_()
 
-def showStartPage():
-    QApplication.instance().dialog = BStartPage.BStartPage()
-    QApplication.instance().connect(QApplication.instance().dialog, SIGNAL("newProject"), newProject)
-    QApplication.instance().connect(QApplication.instance().dialog, SIGNAL("editProject"), editProject)
-    QApplication.instance().dialog.show()
-
 def main():
     app = QApplication(sys.argv)
     app.settings = QSettings("Develer", "Bertos Configurator")
-    app.project = BProject.BProject()
     # Development utility lines, to be removed for production
-    datadir = const.DATA_DIR
+    datadir = DATA_DIR
     qrc, rcc = os.path.join(datadir, 'bertos.qrc'), os.path.join(datadir, 'bertos.rcc')
     if not (hasattr(sys, "frozen") and sys.frozen) and newer(qrc, rcc):
         os.system("rcc -binary %s -o %s" %(qrc, rcc))
