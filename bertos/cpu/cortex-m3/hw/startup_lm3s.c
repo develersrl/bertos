@@ -41,13 +41,13 @@
 #include "drv/clock_lm3s.h"
 #include "io/lm3s.h"
 
-extern size_t _etext, __data_start, __data_end,
-		__bss_start, __bss_end, __stack_irq_end;
+extern size_t __text_end, __data_start, __data_end,
+		__bss_start, __bss_end, __stack_end;
 
 extern int main(void);
 
 /* Architecture's entry point */
-static void NORETURN _entry(void)
+static void NORETURN NAKED _entry(void)
 {
 	size_t *src, *dst;
 
@@ -76,7 +76,7 @@ static void NORETURN _entry(void)
 	clock_set_rate();
 
 	/* Copy the data segment initializers from flash to SRAM */
-	src = &_etext;
+	src = &__text_end;
 	for (dst = &__data_start; dst < &__data_end ; )
 		*dst++ = *src++;
 
@@ -92,27 +92,18 @@ static void NORETURN _entry(void)
 	UNREACHABLE();
 }
 
-static void nmi_isr(void)
+static void NORETURN NAKED default_isr(void)
 {
-	ASSERT(0);
-}
-
-static void fault_isr(void)
-{
-	ASSERT(0);
-}
-
-static void default_isr(void)
-{
-	ASSERT(0);
+	PAUSE;
+	UNREACHABLE();
 }
 
 /* Startup vector table */
 static void (* const irq_vectors[])(void) __attribute__ ((section(".vectors"))) = {
-	(void (*)(void))&__stack_irq_end,	/* Initial stack pointer */
+	(void (*)(void))&__stack_end,	/* Initial stack pointer */
 	_entry,		/* The reset handler */
-	nmi_isr,	/* The NMI handler */
-	fault_isr,	/* The hard fault handler */
+	default_isr,	/* The NMI handler */
+	default_isr,	/* The hard fault handler */
 	default_isr,	/* The MPU fault handler */
 	default_isr,	/* The bus fault handler */
 	default_isr,	/* The usage fault handler */
