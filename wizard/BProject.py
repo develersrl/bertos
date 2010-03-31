@@ -46,7 +46,7 @@ from bertos_utils import (
                             isBertosDir, getTagSet, setEnabledModules, getInfos,
                             loadConfigurationInfos, loadDefineLists, loadModuleDefinition,
                             getCommentList, updateConfigurationValues,
-                            
+
                             # Custom exceptions
                             ParseError, SupportedException
                         )
@@ -55,7 +55,7 @@ class BProject(object):
     """
     Simple class for store and retrieve project informations.
     """
-    
+
     def __init__(self, project_file="", info_dict={}):
         self.infos = {}
         self._cached_queries = {}
@@ -169,20 +169,22 @@ class BProject(object):
     def loadCpuInfos(self):
         cpuInfos = []
         for definition in self.findDefinitions(const.CPU_DEFINITION):
+            print definition
             cpuInfos.append(getInfos(definition))
         return cpuInfos
 
     def reloadCpuInfo(self):
         for cpu_info in self.loadCpuInfos():
-            if cpu_info["CPU_NAME"]:
+            if cpu_info["CPU_NAME"] == self.infos["CPU_NAME"]:
                 self.infos["CPU_INFOS"] = cpu_info
+                print cpu_info
 
     def setInfo(self, key, value):
         """
         Store the given value with the name key.
         """
         self.infos[key] = value
-    
+
     def info(self, key, default=None):
         """
         Retrieve the value associated with the name key.
@@ -206,7 +208,9 @@ class BProject(object):
         return [(filename, dirname) for dirname in file_dict.get(filename, [])]
 
     def findDefinitions(self, ftype):
-        definitions = self._cached_queries.get(ftype, None)
+        # Maintain a cache for every scanned SOURCES_PATH
+        definitions_dict = self._cached_queries.get(self.infos["SOURCES_PATH"], {})
+        definitions = definitions_dict.get(ftype, None)
         if definitions is not None:
             return definitions
         file_dict = self.infos["FILE_DICT"]
@@ -214,7 +218,12 @@ class BProject(object):
         for filename in file_dict:
             if fnmatch.fnmatch(filename, ftype):
                 definitions += [(filename, dirname) for dirname in file_dict.get(filename, [])]
-        self._cached_queries[ftype] = definitions
+
+        # If no cache for the current SOURCES_PATH create an empty one
+        if not definitions_dict:
+            self._cached_queries[self.infos["SOURCES_PATH"]] = {}
+        # Fill the empty cache with the result
+        self._cached_queries[self.infos["SOURCES_PATH"]][ftype] = definitions
         return definitions
 
     def __repr__(self):
