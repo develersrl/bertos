@@ -185,36 +185,36 @@ endif
 $$($(1)_COBJ) : $$(OBJDIR)/$(1)/%.o : %.c
 	$L "$(1): Compiling $$< (C)"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$($(1)_CC) -c $$($(1)_REAL_CFLAGS) $$($(1)_CFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$< -o $$@
+	$Q $$($(1)_CC) -c $$($(1)_REAL_CFLAGS) $$($(1)_CFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$($$(*F)_CFLAGS) $$< -o $$@
 
 # Compile: instructions to create assembler and/or object files from C++ source
 $$($(1)_CXXOBJ) : $$(OBJDIR)/$(1)/%.o : %.cpp
 	$L "$(1): Compiling $$< (C++)"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$($(1)_CXX) -c $$(CXXFLAGS) $$($(1)_CXXFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$< -o $$@
+	$Q $$($(1)_CXX) -c $$(CXXFLAGS) $$($(1)_CXXFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$($$(*F)_CXXFLAGS) $$< -o $$@
 
 # Generate assembly sources from C files (debug)
 $$(OBJDIR)/$(1)/%.s : %.c
 	$L "$(1): Generating asm source $$<"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$($(1)_CC) -S $$(CFLAGS) $$($(1)_CFLAGS) $$($(1)_CPPFLAGS) $$< -o $$@
+	$Q $$($(1)_CC) -S $$(CFLAGS) $$($(1)_CFLAGS) $$($(1)_CPPFLAGS) $$($$(*F)_CFLAGS) $$< -o $$@
 
 # Generate special progmem variant of a source file
 $$($(1)_PCOBJ) : $$(OBJDIR)/$(1)/%_P.o : %.c
 	$L "$(1): Compiling $$< (PROGMEM)"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$($(1)_CC) -c -D_PROGMEM $$(CFLAGS) $$($(1)_CFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$< -o $$@
+	$Q $$($(1)_CC) -c -D_PROGMEM $$(CFLAGS) $$($(1)_CFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$($$(*F)_CFLAGS) $$< -o $$@
 
 # Assemble: instructions to create object file from assembler files
 $$($(1)_AOBJ): $$(OBJDIR)/$(1)/%.o : %.s
 	$L "$(1): Assembling $$<"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$($(1)_AS) -c $$(ASFLAGS) $$($(1)_ASFLAGS) $$< -o $$@
+	$Q $$($(1)_AS) -c $$(ASFLAGS) $$($(1)_ASFLAGS) $$($$(*F)_ASFLAGS) $$< -o $$@
 
 $$($(1)_CPPAOBJ): $$(OBJDIR)/$(1)/%.o : %.S
 	$L "$(1): Assembling with CPP $$<"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$($(1)_CC) -c $$(CPPAFLAGS) $$($(1)_CPPAFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$< -o $$@
+	$Q $$($(1)_CC) -c $$(CPPAFLAGS) $$($(1)_CPPAFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$($$(*F)_CPPAFLAGS) $$< -o $$@
 
 
 # Link: instructions to create elf output file from object files
