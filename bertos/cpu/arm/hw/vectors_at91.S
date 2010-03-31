@@ -35,6 +35,13 @@
  * \brief Atmel AT91SAM interrupt vectors.
  */
 
+#include "cfg/cfg_arch.h"
+#if defined(ARCH_NIGHTTEST) && (ARCH & ARCH_NIGHTTEST)
+	/* Avoid errors during nigthly test */
+	#define __vectors __vectors_at91
+#endif
+
+
 /*
  * Section 0: Vector table and reset entry.
  */

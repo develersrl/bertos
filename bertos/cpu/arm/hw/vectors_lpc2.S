@@ -35,6 +35,12 @@
  * \brief NXP LPC2xxx interrupt vectors.
  */
 
+#include "cfg/cfg_arch.h"
+#if defined(ARCH_NIGHTTEST) && (ARCH & ARCH_NIGHTTEST)
+	/* Avoid errors during nigthly test */
+	#define __vectors __vectors_lpc2
+#endif
+
 /*
  * Section 0: Vector table and reset entry.
  */
