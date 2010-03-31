@@ -39,6 +39,9 @@ import copy
 import pickle
 
 import DefineException
+
+from LoadException import VersionException, ToolchainException
+
 import const
 
 from bertos_utils import (
