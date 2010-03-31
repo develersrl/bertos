@@ -38,7 +38,7 @@ import fnmatch
 import copy
 import pickle
 
-from bertos_utils import *
+from bertos_utils import isBertosDir, loadCpuInfos, getTagSet, loadModuleData, setEnabledModules
 
 class BProject(object):
     """
