@@ -41,6 +41,8 @@
 
 #if CPU_ARM_AT91
 	#include "kdebug_at91.c"
+#elif CPU_ARM_LPC2
+	#include "kdebug_lpc2.c"
 /*#elif  Add other ARM families here */
 #else
 	#error Unknown CPU
