@@ -69,8 +69,12 @@ class BWizard(QWizard):
         """
         Adds the pages in the wizard.
         """
-        for page in page_list:
-            self.addPage(page())
+        self._page_list = page_list
+        for i, page in enumerate(self._page_list):
+            self.setPage(i, page())
+
+    def pageIndex(self, page_class):
+        return self._page_list.index(page_class)
 
     def connectSignals(self):
         """
