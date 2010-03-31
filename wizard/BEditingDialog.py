@@ -132,6 +132,7 @@ class BEditingDialog(QDialog):
                     qApp.setOverrideCursor(QCursor(Qt.WaitCursor))
                     dialog.version_page.setProjectInfo("SOURCES_PATH", version)
                     dialog.version_page.setProjectInfo("OLD_SOURCES_PATH", current_version)
+                    QApplication.instance().project.reloadCpuInfo()
                     enabled_modules = bertos_utils.enabledModules(dialog.version_page.project())
                     old_configuration = dialog.version_page.projectInfo("CONFIGURATIONS")
                     dialog.version_page.project().loadSourceTree()
