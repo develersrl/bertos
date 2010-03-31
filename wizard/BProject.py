@@ -38,7 +38,17 @@ import fnmatch
 import copy
 import pickle
 
-from bertos_utils import isBertosDir, loadCpuInfos, getTagSet, loadModuleData, setEnabledModules
+import DefineException
+
+from bertos_utils import (
+                            # Utility functions
+                            isBertosDir, loadCpuInfos, getTagSet, setEnabledModules,
+                            loadConfigurationInfos, loadDefineLists, loadModuleDefinition,
+                            getCommentList, updateConfigurationValues,
+                            
+                            # Custom exceptions
+                            ParseError, SupportedException
+                        )
 
 class BProject(object):
     """
@@ -99,8 +109,62 @@ class BProject(object):
             raise ToolchainException(self)
         self.infos["SELECTED_FREQ"] = project_data["SELECTED_FREQ"]
         self.infos["OUTPUT"] = project_data["OUTPUT"]
-        loadModuleData(self, True)
+        self.loadModuleData(True)
         setEnabledModules(self, project_data["ENABLED_MODULES"])
+
+    def loadModuleData(self, edit=False):
+        module_info_dict = {}
+        list_info_dict = {}
+        configuration_info_dict = {}
+        file_dict = {}
+        for filename, path in self.findDefinitions("*.h") + self.findDefinitions("*.c") + self.findDefinitions("*.s") + self.findDefinitions("*.S"):
+            comment_list = getCommentList(open(path + "/" + filename, "r").read())
+            if len(comment_list) > 0:
+                module_info = {}
+                configuration_info = {}
+                try:
+                    to_be_parsed, module_dict = loadModuleDefinition(comment_list[0])
+                except ParseError, err:
+                    raise DefineException.ModuleDefineException(path, err.line_number, err.line)
+                for module, information in module_dict.items():
+                    if "depends" not in information:
+                        information["depends"] = ()
+                    information["depends"] += (filename.split(".")[0],)
+                    information["category"] = os.path.basename(path)
+                    if "configuration" in information and len(information["configuration"]):
+                        configuration = module_dict[module]["configuration"]
+                        try:
+                            configuration_info[configuration] = loadConfigurationInfos(self.infos["SOURCES_PATH"] + "/" + configuration)
+                        except ParseError, err:
+                            raise DefineException.ConfigurationDefineException(self.infos["SOURCES_PATH"] + "/" + configuration, err.line_number, err.line)
+                        if edit:
+                            try:
+                                path = self.infos["PROJECT_NAME"]
+                                directory = self.infos["PROJECT_PATH"]
+                                user_configuration = loadConfigurationInfos(directory + "/" + configuration.replace("bertos", path))
+                                configuration_info[configuration] = updateConfigurationValues(configuration_info[configuration], user_configuration)
+                            except ParseError, err:
+                                raise DefineException.ConfigurationDefineException(directory + "/" + configuration.replace("bertos", path))
+                module_info_dict.update(module_dict)
+                configuration_info_dict.update(configuration_info)
+                if to_be_parsed:
+                    try:
+                        list_dict = loadDefineLists(comment_list[1:])
+                        list_info_dict.update(list_dict)
+                    except ParseError, err:
+                        raise DefineException.EnumDefineException(path, err.line_number, err.line)
+        for filename, path in self.findDefinitions("*_" + self.infos["CPU_INFOS"]["TOOLCHAIN"] + ".h"):
+            comment_list = getCommentList(open(path + "/" + filename, "r").read())
+            list_info_dict.update(loadDefineLists(comment_list))
+        for tag in self.infos["CPU_INFOS"]["CPU_TAGS"]:
+            for filename, path in self.findDefinitions("*_" + tag + ".h"):
+                comment_list = getCommentList(open(path + "/" + filename, "r").read())
+                list_info_dict.update(loadDefineLists(comment_list))
+        self.infos["MODULES"] = module_info_dict
+        self.infos["LISTS"] = list_info_dict
+        self.infos["CONFIGURATIONS"] = configuration_info_dict
+        self.infos["FILES"] = file_dict
+
 
     def setInfo(self, key, value):
         """

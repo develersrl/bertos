@@ -578,59 +578,6 @@ def getDefinitionBlocks(text):
         block.append(([comment], define, start))
     return block
 
-def loadModuleData(project_info, edit=False):
-    module_info_dict = {}
-    list_info_dict = {}
-    configuration_info_dict = {}
-    file_dict = {}
-    for filename, path in project_info.findDefinitions("*.h") + project_info.findDefinitions("*.c") + project_info.findDefinitions("*.s") + project_info.findDefinitions("*.S"):
-        comment_list = getCommentList(open(path + "/" + filename, "r").read())
-        if len(comment_list) > 0:
-            module_info = {}
-            configuration_info = {}
-            try:
-                to_be_parsed, module_dict = loadModuleDefinition(comment_list[0])
-            except ParseError, err:
-                raise DefineException.ModuleDefineException(path, err.line_number, err.line)
-            for module, information in module_dict.items():
-                if "depends" not in information:
-                    information["depends"] = ()
-                information["depends"] += (filename.split(".")[0],)
-                information["category"] = os.path.basename(path)
-                if "configuration" in information and len(information["configuration"]):
-                    configuration = module_dict[module]["configuration"]
-                    try:
-                        configuration_info[configuration] = loadConfigurationInfos(project_info.info("SOURCES_PATH") + "/" + configuration)
-                    except ParseError, err:
-                        raise DefineException.ConfigurationDefineException(project_info.info("SOURCES_PATH") + "/" + configuration, err.line_number, err.line)
-                    if edit:
-                        try:
-                            path = project_info.info("PROJECT_NAME")
-                            directory = project_info.info("PROJECT_PATH")
-                            user_configuration = loadConfigurationInfos(directory + "/" + configuration.replace("bertos", path))
-                            configuration_info[configuration] = updateConfigurationValues(configuration_info[configuration], user_configuration)
-                        except ParseError, err:
-                            raise DefineException.ConfigurationDefineException(directory + "/" + configuration.replace("bertos", path))
-            module_info_dict.update(module_dict)
-            configuration_info_dict.update(configuration_info)
-            if to_be_parsed:
-                try:
-                    list_dict = loadDefineLists(comment_list[1:])
-                    list_info_dict.update(list_dict)
-                except ParseError, err:
-                    raise DefineException.EnumDefineException(path, err.line_number, err.line)
-    for filename, path in project_info.findDefinitions("*_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".h"):
-        comment_list = getCommentList(open(path + "/" + filename, "r").read())
-        list_info_dict.update(loadDefineLists(comment_list))
-    for tag in project_info.info("CPU_INFOS")["CPU_TAGS"]:
-        for filename, path in project_info.findDefinitions("*_" + tag + ".h"):
-            comment_list = getCommentList(open(path + "/" + filename, "r").read())
-            list_info_dict.update(loadDefineLists(comment_list))
-    project_info.setInfo("MODULES", module_info_dict)
-    project_info.setInfo("LISTS", list_info_dict)
-    project_info.setInfo("CONFIGURATIONS", configuration_info_dict)
-    project_info.setInfo("FILES", file_dict)
-
 def formatParamNameValue(text):
     """
     Take the given string and return a tuple with the name of the parameter in the first position
