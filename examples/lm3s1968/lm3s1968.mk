@@ -33,10 +33,12 @@ lm3s1968_CSRC = \
 	bertos/cpu/cortex-m3/drv/timer_lm3s.c \
 	bertos/cpu/cortex-m3/drv/clock_lm3s.c \
 	bertos/cpu/cortex-m3/drv/kdebug_lm3s.c \
-	bertos/cpu/cortex-m3/hw/startup_lm3s.c
+	bertos/cpu/cortex-m3/hw/vectors_lm3s.c \
+	bertos/cpu/cortex-m3/hw/init_lm3s.c
 
 lm3s1968_CPPASRC = \
 	bertos/cpu/cortex-m3/hw/switch_ctx_cm3.S \
+	bertos/cpu/cortex-m3/hw/crt_cm3.S \
 	#
 
 # This is an hosted application
@@ -56,7 +58,7 @@ lm3s1968_DEBUG_SCRIPT = bertos/prg_scripts/arm/debug.sh
 lm3s1968_STOPDEBUG_SCRIPT = bertos/prg_scripts/arm/stopopenocd.sh
 
 # Debug stuff
-ifeq ($(demo_DEBUG),0)
-	demo_CFLAGS += -Os -fomit-frame-pointer
-	demo_CXXFLAGS += -Os -fomit-frame-pointer
+ifeq ($(lm3s1968_DEBUG),0)
+	demo_CFLAGS += -O1 -fomit-frame-pointer
+	demo_CXXFLAGS += -O1 -fomit-frame-pointer
 endif

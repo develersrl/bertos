@@ -30,67 +30,16 @@
  *
  * -->
  *
- * \brief Cortex-M3 architecture's entry point
+ * \brief LM3S1968 startup interrupt vector table
  *
  * \author Andrea Righi <arighi@develer.com>
  */
 
 #include <cfg/compiler.h>
-#include <cfg/debug.h>
-#include "drv/irq_lm3s.h"
-#include "drv/clock_lm3s.h"
-#include "io/lm3s.h"
+#include <cpu/attr.h> /* PAUSE, UNREACHABLE */
 
-extern size_t __text_end, __data_start, __data_end,
-		__bss_start, __bss_end, __stack_end;
-
-extern int main(void);
-
-/* Architecture's entry point */
-static void NORETURN NAKED _entry(void)
-{
-	size_t *src, *dst;
-
-	/*
-	 * PLL may not function properly at default LDO setting.
-	 *
-	 * Description:
-	 *
-	 * In designs that enable and use the PLL module, unstable device
-	 * behavior may occur with the LDO set at its default of 2.5 volts or
-	 * below (minimum of 2.25 volts). Designs that do not use the PLL
-	 * module are not affected.
-	 *
-	 * Workaround: Prior to enabling the PLL module, it is recommended that
-	 * the default LDO voltage setting of 2.5 V be adjusted to 2.75 V using
-	 * the LDO Power Control (LDOPCTL) register.
-	 *
-	 * Silicon Revision Affected: A1, A2
-	 *
-	 * See also: Stellaris LM3S1968 A2 Errata documentation.
-	 */
-	if (REVISION_IS_A1 | REVISION_IS_A2)
-		HWREG(SYSCTL_LDOPCTL) = SYSCTL_LDOPCTL_2_75V;
-
-	/* Set the appropriate clocking configuration */
-	clock_set_rate();
-
-	/* Copy the data segment initializers from flash to SRAM */
-	src = &__text_end;
-	for (dst = &__data_start; dst < &__data_end ; )
-		*dst++ = *src++;
-
-	/* Zero fill the bss segment */
-	for (dst = &__bss_start; dst < &__bss_end ; )
-		*dst++ = 0;
-
-	/* Initialize IRQ vector table in RAM */
-	sysirq_init();
-
-	/* Call the application's entry point */
-	main();
-	UNREACHABLE();
-}
+extern size_t __stack_end;
+extern void __init(void);
 
 static void NORETURN NAKED default_isr(void)
 {
@@ -98,10 +47,10 @@ static void NORETURN NAKED default_isr(void)
 	UNREACHABLE();
 }
 
-/* Startup vector table */
-static void (* const irq_vectors[])(void) __attribute__ ((section(".vectors"))) = {
+static void (* const irq_vectors[])(void) __attribute__ ((section(".vectors"))) =
+{
 	(void (*)(void))&__stack_end,	/* Initial stack pointer */
-	_entry,		/* The reset handler */
+	__init,		/* The reset handler */
 	default_isr,	/* The NMI handler */
 	default_isr,	/* The hard fault handler */
 	default_isr,	/* The MPU fault handler */
