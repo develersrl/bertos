@@ -67,6 +67,24 @@ unsigned long clock_get_rate(void)
 			PLL_VCO / 2 / RCC_TO_DIV(rcc) : PLL_VCO;
 }
 
+/*
+ * Try to evaluate the correct SYSDIV value depending on the desired CPU
+ * frequency.
+ */
+INLINE int evaluate_sysdiv(unsigned long freq)
+{
+	int i;
+
+	 /*
+	  * NOTE: with BYPASS=0, SYSDIV < 3 are reserved values (see LM3S1968
+	  * Microcontroller DATASHEET, p.78).
+	  */
+	for (i = 3; i < 16; i++)
+		if (freq >= (PLL_VCO / 2 / (i + 1)))
+			break;
+	return i;
+}
+
 void clock_set_rate(void)
 {
 	reg32_t rcc, rcc2;
@@ -125,19 +143,12 @@ void clock_set_rate(void)
 	 */
 	rcc &= ~(SYSCTL_RCC_SYSDIV_M | SYSCTL_RCC_USESYSDIV);
 
-	/*
-	 * Try to evaluate the correct SYSDIV value depending on the desired
-	 * CPU frequency.
-	 *
-	 * NOTE: with BYPASS=0, SYSDIV < 3 are reserved values (see LM3S1968
-	 * Microcontroller DATASHEET, p.78).
-	 */
 	clk = PLL_VCO / 2;
 	for (i = 3; i < 16; i++)
 		if (CPU_FREQ >= (clk / (i + 1)))
 			break;
-	if (i)
-		rcc |= SYSCTL_RCC_USESYSDIV | (i << SYSCTL_RCC_SYSDIV_SHIFT);
+	rcc |= SYSCTL_RCC_USESYSDIV |
+			(evaluate_sysdiv(CPU_FREQ) << SYSCTL_RCC_SYSDIV_SHIFT);
 
 	/*
 	 * Step #4: wait for the PLL to lock by polling the PLLLRIS bit in the
