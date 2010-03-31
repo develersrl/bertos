@@ -86,7 +86,7 @@ def editProject(project_file):
     info_dict = {}
     while(True):
         try:
-            QApplication.instance().project = bertos_utils.loadBertosProject(project_file, info_dict)
+            QApplication.instance().project = BProject.BProject(project_file, info_dict)
         except VersionException:
             QMessageBox.critical(
                 None,

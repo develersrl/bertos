@@ -37,15 +37,70 @@ import os
 import fnmatch
 import copy
 
+from bertos_utils import *
+
 class BProject(object):
     """
     Simple class for store and retrieve project informations.
     """
     
-    def __init__(self):
+    def __init__(self, project_file="", info_dict={}):
         self.infos = {}
         self._cached_queries = {}
-    
+        if project_file:
+            self.loadBertosProject(project_file, info_dict)
+
+    def loadBertosProject(self, project_file, info_dict):
+        project_dir = os.path.dirname(project_file)
+        project_data = pickle.loads(open(project_file, "r").read())
+        # If PROJECT_NAME is not defined it use the directory name as PROJECT_NAME
+        # NOTE: this can throw an Exception if the user has changed the directory containing the project
+        self.infos["PROJECT_NAME"] = project_data.get("PROJECT_NAME", os.path.basename(project_dir))
+        self.infos["PROJECT_PATH"] = os.path.dirname(project_file)
+        # Check for the Wizard version
+        wizard_version = project_data.get("WIZARD_VERSION", 0)
+        # Ignore the SOURCES_PATH inside the project file
+        project_data["SOURCES_PATH"] = project_dir
+        if "SOURCES_PATH" in info_dict:
+            project_data["SOURCES_PATH"] = info_dict["SOURCES_PATH"]
+        if os.path.exists(project_data["SOURCES_PATH"]):
+            self.infos["SOURCES_PATH"] = project_data["SOURCES_PATH"]
+        else:
+            raise VersionException(self)
+        if not isBertosDir(project_dir):
+            version_file = open(os.path.join(const.DATA_DIR, "vtemplates/VERSION"), "r").read()
+            open(os.path.join(project_dir, "VERSION"), "w").write(version_file.replace("$version", "").strip())
+        self.loadSourceTree()
+        cpu_name = project_data["CPU_NAME"]
+        self.infos["CPU_NAME"] = cpu_name
+        cpu_info = loadCpuInfos(self)
+        for cpu in cpu_info:
+            if cpu["CPU_NAME"] == cpu_name:
+                self.infos["CPU_INFOS"] = cpu
+                break
+        tag_list = getTagSet(cpu_info)
+        # Create, fill and store the dict with the tags
+        tag_dict = {}
+        for element in tag_list:
+            tag_dict[element] = False
+        infos = self.info("CPU_INFOS")
+        for tag in tag_dict:
+            if tag in infos["CPU_TAGS"] + [infos["CPU_NAME"], infos["TOOLCHAIN"]]:
+                tag_dict[tag] = True
+            else:
+                tag_dict[tag] = False
+        self.infos["ALL_CPU_TAGS"] = tag_dict
+        if "TOOLCHAIN" in info_dict:
+            project_data["TOOLCHAIN"] = info_dict["TOOLCHAIN"]
+        if os.path.exists(project_data["TOOLCHAIN"]["path"]):
+            self.infos["TOOLCHAIN"] = project_data["TOOLCHAIN"]
+        else:
+            raise ToolchainException(self)
+        self.infos["SELECTED_FREQ"] = project_data["SELECTED_FREQ"]
+        self.infos["OUTPUT"] = project_data["OUTPUT"]
+        loadModuleData(self, True)
+        setEnabledModules(self, project_data["ENABLED_MODULES"])
+
     def setInfo(self, key, value):
         """
         Store the given value with the name key.
@@ -68,7 +123,7 @@ class BProject(object):
             for element in os.walk(bertos_sources_dir):
                 for f in element[2]:
                     file_dict[f] = file_dict.get(f, []) + [element[0]]
-        self.setInfo("FILE_DICT", file_dict)
+        self.infos["FILE_DICT"] = file_dict
 
     def searchFiles(self, filename):
         file_dict = self.infos["FILE_DICT"]

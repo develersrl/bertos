@@ -42,6 +42,9 @@ from PyQt4.QtGui import *
 from bertos_utils import loadBertosProject, bertosVersion, getToolchainName, createBertosProject
 from BToolchainPage import BToolchainPage
 from BVersionPage import BVersionPage
+
+from BProject import BProject
+
 import qvariant_converter
 import BModulePage
 import bertos_utils
@@ -235,7 +238,7 @@ def main():
         print "Invalid usage: use <command> project_file"
         sys.exit()
     app = QApplication([])
-    app.project = loadBertosProject(project_file)
+    app.project = BProject(project_file)
     app.settings = QSettings("Develer", "Bertos Configurator")
     dialog = BEditingDialog()
     dialog.show()

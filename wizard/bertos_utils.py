@@ -57,59 +57,6 @@ def isBertosDir(directory):
 def bertosVersion(directory):
    return open(directory + "/VERSION").readline().strip()
 
-def loadBertosProject(project_file, info_dict):
-    project_dir = os.path.dirname(project_file)
-    project_data = pickle.loads(open(project_file, "r").read())
-    project_info = BProject.BProject()
-    # If PROJECT_NAME is not defined it use the directory name as PROJECT_NAME
-    # NOTE: this can throw an Exception if the user has changed the directory containing the project
-    project_info.setInfo("PROJECT_NAME", project_data.get("PROJECT_NAME", os.path.basename(project_dir)))
-    project_info.setInfo("PROJECT_PATH", os.path.dirname(project_file))
-    # Check for the Wizard version
-    wizard_version = project_data.get("WIZARD_VERSION", 0)
-    # Ignore the SOURCES_PATH inside the project file
-    project_data["SOURCES_PATH"] = project_dir
-    if "SOURCES_PATH" in info_dict:
-        project_data["SOURCES_PATH"] = info_dict["SOURCES_PATH"]
-    if os.path.exists(project_data["SOURCES_PATH"]):
-        project_info.setInfo("SOURCES_PATH", project_data["SOURCES_PATH"])
-    else:
-        raise VersionException(project_info)
-    if not isBertosDir(project_dir):
-        version_file = open(os.path.join(const.DATA_DIR, "vtemplates/VERSION"), "r").read()
-        open(os.path.join(project_dir, "VERSION"), "w").write(version_file.replace("$version", "").strip())
-    project_info.loadSourceTree()
-    cpu_name = project_data["CPU_NAME"]
-    project_info.setInfo("CPU_NAME", cpu_name)
-    cpu_info = loadCpuInfos(project_info)
-    for cpu in cpu_info:
-        if cpu["CPU_NAME"] == cpu_name:
-            project_info.setInfo("CPU_INFOS", cpu)
-            break
-    tag_list = getTagSet(cpu_info)
-    # Create, fill and store the dict with the tags
-    tag_dict = {}
-    for element in tag_list:
-        tag_dict[element] = False
-    infos = project_info.info("CPU_INFOS")
-    for tag in tag_dict:
-        if tag in infos["CPU_TAGS"] + [infos["CPU_NAME"], infos["TOOLCHAIN"]]:
-            tag_dict[tag] = True
-        else:
-            tag_dict[tag] = False
-    project_info.setInfo("ALL_CPU_TAGS", tag_dict)
-    if "TOOLCHAIN" in info_dict:
-        project_data["TOOLCHAIN"] = info_dict["TOOLCHAIN"]
-    if os.path.exists(project_data["TOOLCHAIN"]["path"]):
-        project_info.setInfo("TOOLCHAIN", project_data["TOOLCHAIN"])
-    else:
-        raise ToolchainException(project_info)
-    project_info.setInfo("SELECTED_FREQ", project_data["SELECTED_FREQ"])
-    project_info.setInfo("OUTPUT", project_data["OUTPUT"])
-    loadModuleData(project_info, True)
-    setEnabledModules(project_info, project_data["ENABLED_MODULES"])
-    return project_info
-
 def setEnabledModules(project_info, enabled_modules):
     modules = project_info.info("MODULES")
     files = {}
