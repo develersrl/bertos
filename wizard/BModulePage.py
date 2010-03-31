@@ -224,7 +224,7 @@ class BModulePage(BWizardPage):
                 and not self.projectInfo("LISTS") \
                 and not self.projectInfo("CONFIGURATIONS"):
             try:
-                self.project().loadModuleData(self.project())
+                self.project().loadModuleData()
             except ModuleDefineException, e:
                 self.exceptionOccurred(self.tr("Error parsing line '%2' in file %1").arg(e.path).arg(e.line))
             except EnumDefineException, e:
