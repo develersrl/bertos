@@ -185,11 +185,12 @@
 	#endif
 
 	#define NOP         asm volatile ("nop")
+	#define PAUSE       asm volatile ("wfi" ::: "memory")
 	#define BREAKPOINT  /* asm("bkpt 0") DOES NOT WORK */
 
 	/*
-	 * Builtin GCC memset() can be buggy! We need to redefine it here for
-	 * this architecture. :(
+	 * FIXME: builtin GCC memset() can be buggy! We need to redefine it
+	 * here for this architecture. :(
 	 */
 	#include <cfg/compiler.h>
 	#define memset	__cm3_memset
