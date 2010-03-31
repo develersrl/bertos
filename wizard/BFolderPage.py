@@ -39,6 +39,8 @@ from PyQt4.QtGui import *
 from BWizardPage import *
 import bertos_utils
 
+from BVersionPage import BVersionPage
+
 from const import *
 
 class BFolderPage(BWizardPage):
@@ -65,6 +67,13 @@ class BFolderPage(BWizardPage):
             return True
         else:
             return False
+
+    def nextId(self):
+        """
+        Overload of the QWizardPage nextId method.
+        """
+        return self.wizard().pageIndex(self.next_page)
+        
     
     ####
 
@@ -121,6 +130,19 @@ class BFolderPage(BWizardPage):
             self.pageContent.directoryEdit.setText(QDir.toNativeSeparators(directory))
 
     ####
+
+    @property
+    def next_page(self):
+        """
+        Contains the next page class.
+        """
+        # Actually it does nothing.
+        if self.pageContent.customButton.isChecked():
+            return BVersionPage
+        else:
+            # TODO: change it with the predefined board selection page.
+            # return BBoardPage
+            return BVersionPage
     
     def initializeAttributes(self):
         """
