@@ -40,6 +40,7 @@ from BWizardPage import *
 import bertos_utils
 
 from BVersionPage import BVersionPage
+from BBoardPage import BBoardPage
 
 from const import *
 
@@ -136,13 +137,10 @@ class BFolderPage(BWizardPage):
         """
         Contains the next page class.
         """
-        # Actually it does nothing.
         if self.pageContent.customButton.isChecked():
             return BVersionPage
         else:
-            # TODO: change it with the predefined board selection page.
-            # return BBoardPage
-            return BVersionPage
+            return BBoardPage
     
     def initializeAttributes(self):
         """

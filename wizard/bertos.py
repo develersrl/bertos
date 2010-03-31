@@ -49,6 +49,7 @@ import BWizard
 
 from BIntroPage import BIntroPage
 from BFolderPage import BFolderPage
+from BBoardPage import BBoardPage
 from BOpenPage import BOpenPage
 from BVersionPage import BVersionPage
 from BCpuPage import BCpuPage
@@ -66,7 +67,7 @@ import const
 from LoadException import VersionException, ToolchainException
 
 def newProject():
-    page_list = [BIntroPage, BFolderPage, BVersionPage, BCpuPage, BToolchainPage, BModulePage, BOutputPage, BCreationPage, BFinalPage]
+    page_list = [BIntroPage, BFolderPage, BBoardPage, BVersionPage, BCpuPage, BToolchainPage, BModulePage, BOutputPage, BCreationPage, BFinalPage]
     wizard = BWizard.BWizard(page_list)
     wizard.show()
     wizard.exec_()

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>607</width>
+    <height>378</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
+   <item>
+    <widget class="QListWidget" name="boardList">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
+     <item>
+      <widget class="QLabel" name="descriptionLabel">
+       <property name="text">
+        <string>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus enim nisl, interdum ut venenatis in, suscipit in dolor. Integer a nisi sed libero ultrices commodo. Duis vitae nibh id arcu ullamcorper auctor non et metus. Cras ut justo ac dolor porttitor feugiat eget vitae velit. Fusce et rhoncus metus. Quisque vel mauris et augue elementum volutpat. Phasellus dolor dui, ultricies sit amet dictum ut, commodo et lacus. Proin eu ullamcorper purus. Aliquam in risus in lorem tempor condimentum ac quis erat. Mauris semper dui a urna facilisis vitae porttitor urna dictum. Nunc metus leo, iaculis non dignissim at, mollis at.</string>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
