@@ -172,7 +172,6 @@ class BProject(object):
     def loadCpuInfos(self):
         cpuInfos = []
         for definition in self.findDefinitions(const.CPU_DEFINITION):
-            print definition
             cpuInfos.append(getInfos(definition))
         return cpuInfos
 
@@ -180,7 +179,6 @@ class BProject(object):
         for cpu_info in self.loadCpuInfos():
             if cpu_info["CPU_NAME"] == self.infos["CPU_NAME"]:
                 self.infos["CPU_INFOS"] = cpu_info
-                print cpu_info
 
     def setInfo(self, key, value):
         """
