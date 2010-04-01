@@ -150,9 +150,6 @@ void __init2(void);
  */
 void __init1(void)
 {
-	/* Use 2 cycles for flash access. */
-	MC_FMR = MC_FWS_2R3W;
-
         /* Disable all interrupts. Useful for debugging w/o target reset. */
 	AIC_EOICR = 0xFFFFFFFF;
 	AIC_IDCR =  0xFFFFFFFF;
