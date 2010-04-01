@@ -116,6 +116,9 @@ class BProject(object):
         self.loadModuleData(True)
         setEnabledModules(self, project_data["ENABLED_MODULES"])
 
+    def loadProjectPresets(self, preset_directory):
+        pass
+
     def loadModuleData(self, edit=False):
         module_info_dict = {}
         list_info_dict = {}
