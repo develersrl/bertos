@@ -39,7 +39,7 @@ from PyQt4.QtGui import *
 from BWizardPage import *
 import bertos_utils
 
-from BVersionPage import BVersionPage
+from BCpuPage import BCpuPage
 from BBoardPage import BBoardPage
 
 from const import *
@@ -65,16 +65,10 @@ class BFolderPage(BWizardPage):
         if self.pageContent.projectPath.text() != "None":
             self.setProjectInfo("PROJECT_PATH", unicode(self.pageContent.projectPath.text()))
             self.setProjectInfo("PROJECT_NAME", os.path.basename(unicode(self.pageContent.projectPath.text())))
+            self.setProjectInfo("ROUTE", self.next_page)
             return True
         else:
             return False
-
-    def nextId(self):
-        """
-        Overload of the QWizardPage nextId method.
-        """
-        return self.wizard().pageIndex(self.next_page)
-        
     
     ####
 
@@ -93,6 +87,7 @@ class BFolderPage(BWizardPage):
         self.connect(self.pageContent.nameEdit, SIGNAL("textChanged(const QString)"), self.nameChanged)
         self.connect(self.pageContent.directoryEdit, SIGNAL("textChanged(const QString)"), self.directoryChanged)
         self.connect(self.pageContent.directoryButton, SIGNAL("clicked()"), self.selectDirectory)
+        self.connect(self.pageContent.customButton, SIGNAL("toggled(bool)"), self.isComplete)
     
     ####
 
@@ -138,7 +133,7 @@ class BFolderPage(BWizardPage):
         Contains the next page class.
         """
         if self.pageContent.customButton.isChecked():
-            return BVersionPage
+            return BCpuPage
         else:
             return BBoardPage
     

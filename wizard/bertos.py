@@ -66,7 +66,7 @@ from LoadException import VersionException, ToolchainException
 
 def newProject():
     QApplication.instance().project = BProject()
-    page_list = [BIntroPage, BFolderPage, BBoardPage, BVersionPage, BCpuPage, BToolchainPage, BModulePage, BOutputPage, BCreationPage, BFinalPage]
+    page_list = [BIntroPage, BFolderPage, BVersionPage, BBoardPage, BCpuPage, BToolchainPage, BModulePage, BOutputPage, BCreationPage, BFinalPage]
     wizard = BWizard(page_list)
     wizard.show()
     wizard.exec_()
