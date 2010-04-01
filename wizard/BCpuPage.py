@@ -95,6 +95,9 @@ class BCpuPage(BWizardPage):
         self.pageContent.cpuList.setSortingEnabled(True)
         self.pageContent.frequencyLabel.setVisible(False)
         self.pageContent.frequencySpinBox.setVisible(False)
+        preset_advanced = self.projectInfo("PRESET_ADVANCED_CONFIG")
+        if preset_advanced:
+            self.pageContent.cpuList.setEnabled(False)
 
     def connectSignals(self):
         """

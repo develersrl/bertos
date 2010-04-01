@@ -38,6 +38,9 @@ from PyQt4.QtGui import *
 
 from BWizardPage import BWizardPage
 
+from BCpuPage import BCpuPage
+from BOutputPage import BOutputPage
+
 import const
 import qvariant_converter
 from bertos_utils import presetList
@@ -59,7 +62,24 @@ class BBoardPage(BWizardPage):
         """
         Overload of the QWizardPage isComplete method.
         """
-        return False
+        return self.pageContent.boardList.currentItem() is not None
+
+    def nextId(self):
+        """
+        Overload of the QWizardPage nextId method.
+        """
+        # Stub of nextId logic
+        if self.advanced:
+            self.setProjectInfo("PRESET_ADVANCED_CONFIG", True)
+            return self.wizard().pageIndex(BCpuPage)
+        # Search for suitable toolchains. If there isn't one return 
+        # BToolchainPage id (BToolchainPage should then route to BOutputPage
+        # instead of BModulePage).
+
+        # If a suitable toolchain is found the user has to be prompted
+        # directly to the BOutputPage
+        else:
+            return self.wizard().pageIndex(BOutputPage)
 
     ####
 
@@ -106,5 +126,10 @@ class BBoardPage(BWizardPage):
         selected_preset = presets[preset_path]
         self.pageContent.descriptionLabel.setText(selected_preset['description'])
         self._last_selected = preset_path
+        self.emit(SIGNAL("completeChanged()"))
 
     ####
+
+    @property
+    def advanced(self):
+        return self.pageContent.advancedCheckBox.isChecked()
