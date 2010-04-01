@@ -177,7 +177,7 @@ __dummy_init:
 
         .ltorg
 
-	.section .vectors, "ax", %progbits
+	.section .exceptions, "ax", %progbits
 
 __xcpt_dummy_undef:
         b       __xcpt_dummy_undef

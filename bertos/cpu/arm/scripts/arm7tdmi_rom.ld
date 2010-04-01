@@ -57,6 +57,8 @@ SECTIONS
 	{
 		KEEP(*(.vectors));
 		. = ALIGN (4);
+		KEEP(*(.exceptions));
+		. = ALIGN (4);
 		*(.init);
 		. = ALIGN (4);
 		*(.rodata .rodata.*);

@@ -36,7 +36,6 @@
  *
  */
 
-ENTRY(_init)
 OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
 
@@ -58,7 +57,9 @@ SECTIONS
 	{
 		KEEP(*(.vectors));
 		. = ALIGN (4);
-		KEEP(*(.init));
+		KEEP(*(.exceptions));
+		. = ALIGN (4);
+		*(.init);
 		. = ALIGN (4);
 		*(.rodata .rodata.*);
 		. = ALIGN (4);
@@ -73,10 +74,10 @@ SECTIONS
 		*(.ctors);
 		. = ALIGN(4);
 		*(.dtors);
+		_etext = .;
+		PROVIDE (__etext = .);
 	} > ram
 
-	_etext = .;
-	PROVIDE (__etext = .);
 
 	.data : AT (_etext)
 	{
