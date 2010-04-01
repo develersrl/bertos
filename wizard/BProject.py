@@ -117,6 +117,9 @@ class BProject(object):
         setEnabledModules(self, project_data["ENABLED_MODULES"])
 
     def loadProjectPresets(self, preset_directory):
+        # This method will save:
+        # "CPU_NAME"
+        # ...
         pass
 
     def loadModuleData(self, edit=False):
