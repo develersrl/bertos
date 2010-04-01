@@ -45,7 +45,6 @@ import pickle
 import const
 import plugins
 import DefineException
-import BProject
 
 from _wizard_version import WIZARD_VERSION
 
@@ -75,6 +74,26 @@ def enabledModules(project_info):
         if module["enabled"]:
             enabled_modules.append(name)
     return enabled_modules
+
+def presetList(directory):
+    """
+    Return the list of the preset found in the selected BeRTOS Version.
+    """
+    def getPresetInfo(preset_dir):
+        # Find and returns information about the preset
+        # Keys needed for BBoardPage:
+        #  - "name": <name of the board/preset>
+        #  - "description": <description of the preset>
+
+        # NOTE: this is only a test stub.
+        preset_info = pickle.loads(open(os.path.join(preset_dir, 'info'), "r").read())
+        return preset_info
+    abspath = os.path.join(directory, const.PREDEFINED_BOARDS_DIR)
+    preset_list = dict([
+        (os.path.join(abspath, preset_dir), getPresetInfo(os.path.join(abspath, preset_dir)))
+        for preset_dir in os.listdir(os.path.join(directory, const.PREDEFINED_BOARDS_DIR))
+    ])
+    return preset_list
 
 def mergeSources(srcdir, new_sources, old_sources):
     # The current mergeSources function provide only a raw copy of the sources in the
