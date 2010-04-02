@@ -150,6 +150,23 @@ void __init2(void);
  */
 void __init1(void)
 {
+	/*
+	 * Compute number of master clock cycles in 1.5us.
+	 * Needed by flash writing functions.
+	 * The maximum FMCN value is 0xFF and 0 can be used only if
+	 * master clock is less than 33kHz.
+	 */
+	#define MCN  DIV_ROUNDUP(CPU_FREQ, 666667UL)
+	#define FMCN (CPU_FREQ <= 33333UL ? 0 : (MCN < 0xFF ? MCN : 0xFF))
+
+	#if CPU_FREQ < 30000000UL
+		/* Use 1 cycles for flash access. */
+		MC_FMR = FMCN << MC_FMCN_SHIFT | MC_FWS_1R2W;
+	#else
+		/* Use 2 cycles for flash access. */
+		MC_FMR = FMCN << MC_FMCN_SHIFT | MC_FWS_2R3W;
+	#endif
+
         /* Disable all interrupts. Useful for debugging w/o target reset. */
 	AIC_EOICR = 0xFFFFFFFF;
 	AIC_IDCR =  0xFFFFFFFF;
