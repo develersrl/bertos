@@ -109,6 +109,7 @@
 #define MC_FWS_3R4W             0x00000200      ///< 3 cycles for read, 4 for write operations.
 #define MC_FWS_4R4W             0x00000300      ///< 4 cycles for read and write operations.
 #define MC_FMCN_MASK            0x00FF0000      ///< Flash microsecond cycle number mask.
+#define MC_FMCN_SHIFT                   16      ///< Flash microsecond cycle number shift.
 
 #define MC_FCR_OFF              0x00000064      ///< MC flash command register offset.
 #define MC_FCR      (*((reg32_t *)(MC_BASE + MC_FCR_OFF)))      ///< MC flash command register address.
