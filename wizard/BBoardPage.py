@@ -106,10 +106,11 @@ class BBoardPage(BWizardPage):
         self.populatePresetList()
 
     def populatePresetList(self):
+        self.pageContent.boardList.clear()
         presets = self.projectInfo("PRESETS")
         for preset, info in presets.items():
             board_list = self.pageContent.boardList
-            item = QListWidgetItem(info["name"], board_list)
+            item = QListWidgetItem(info["PRESET_NAME"], board_list)
             item.setData(Qt.UserRole, qvariant_converter.convertString(preset))
             if self._last_selected == preset:
                 self.pageContent.boardList.setCurrentItem(item)
@@ -124,7 +125,14 @@ class BBoardPage(BWizardPage):
         preset_path = qvariant_converter.getString(self.pageContent.boardList.currentItem().data(Qt.UserRole))
         presets = self.projectInfo("PRESETS")
         selected_preset = presets[preset_path]
-        self.pageContent.descriptionLabel.setText(selected_preset['description'])
+        text_components = [
+            "Board: %s" %selected_preset["PRESET_NAME"],
+            "CPU: %s" %selected_preset["CPU_NAME"],
+        ]
+        if selected_preset["PRESET_DESCRIPTION"]:
+            text_components.append("Description: %s" %selected_preset["PRESET_DESCRIPTION"])
+        text = "\n".join(text_components)
+        self.pageContent.descriptionLabel.setText(text)
         self._last_selected = preset_path
         self.emit(SIGNAL("completeChanged()"))
 

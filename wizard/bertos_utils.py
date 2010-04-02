@@ -79,21 +79,31 @@ def presetList(directory):
     """
     Return the list of the preset found in the selected BeRTOS Version.
     """
-    def getPresetInfo(preset_dir):
-        # Find and returns information about the preset
-        # Keys needed for BBoardPage:
-        #  - "name": <name of the board/preset>
-        #  - "description": <description of the preset>
-
-        # NOTE: this is only a test stub.
-        preset_info = pickle.loads(open(os.path.join(preset_dir, 'info'), "r").read())
-        return preset_info
     abspath = os.path.join(directory, const.PREDEFINED_BOARDS_DIR)
     preset_list = dict([
-        (os.path.join(abspath, preset_dir), getPresetInfo(os.path.join(abspath, preset_dir)))
+        (os.path.join(abspath, preset_dir), presetInfo(os.path.join(abspath, preset_dir)))
         for preset_dir in os.listdir(os.path.join(directory, const.PREDEFINED_BOARDS_DIR))
     ])
     return preset_list
+
+def presetInfo(preset_dir):
+    """
+    Return the preset-relevant info contined into the project_file.
+    """
+    preset_info = pickle.loads(open(os.path.join(preset_dir, "project.bertos"), "r").read())
+    try:
+        description = open(os.path.join(preset_dir, "description"), "r").read()
+    except IOError:
+        # No description file found.
+        description = ""
+    relevant_info = {
+        "CPU_NAME": preset_info.get("CPU_NAME"),
+        "SELECTED_FREQ": preset_info.get("SELECTED_FREQ"),
+        "WIZARD_VERSION": preset_info.get("WIZARD_VERSION", None),
+        "PRESET_NAME": preset_info.get("PROJECT_NAME"),
+        "PRESET_DESCRIPTION": description.decode("utf-8"),
+    }
+    return relevant_info
 
 def mergeSources(srcdir, new_sources, old_sources):
     # The current mergeSources function provide only a raw copy of the sources in the
