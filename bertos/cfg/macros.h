@@ -182,6 +182,13 @@
  */
 #define DIV_ROUND(dividend, divisor)  (((dividend) + (divisor) / 2) / (divisor))
 
+/**
+ * Perform an integer division rounding the result to the upper int value.
+ * \note \a divisor should preferibly be a costant, otherwise this macro generates
+ * 2 division. Also divisor is evaluated twice.
+ */
+#define DIV_ROUNDUP(dividend, divisor)  (((dividend) + (divisor) - 1) / (divisor))
+
 /** Round up \a x to an even multiple of the 2's power \a pad. */
 #define ROUND_UP2(x, pad) (((x) + ((pad) - 1)) & ~((pad) - 1))
 
