@@ -33,9 +33,9 @@
  * \author Francesco Sacchi <batt@develer.com>
  *
  * \brief LPC2378 CRT.
+ * notest:arm
  */
 #include <cpu/irq.h>
-
 #include <io/lpc23xx.h>
 
 #if CPU_FREQ != 72000000UL
