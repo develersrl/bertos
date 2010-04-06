@@ -52,6 +52,37 @@ extern void __init2(void);
 
 #if CONFIG_KERN_PREEMPT
 /*
+ * Kernel preemption: implementation details.
+ *
+ * The kernel preemption is implemented using the PendSV IRQ. Inside the
+ * SysTick handler when a process needs to be interrupted (expires its time
+ * quantum or a high-priority process is awakend) a pending PendSV call is
+ * triggered.
+ *
+ * The PendSV handler is called immediately after the SysTick handler, using
+ * the architecture's tail-chaining functionality (an ISR call without the
+ * overhead of state saving and restoration between different IRQs). Inside the
+ * PendSV handler we perform the stack-switching between the old and new
+ * processes.
+ *
+ * Voluntary context switch is implemented as a soft-interrupt call (SVCall),
+ * so any process is always suspended and resumed from an interrupt context.
+ *
+ * NOTE: interrupts must be disabled or enabled when resuming a process context
+ * depending of the type of the previous suspension. If a process was suspended
+ * by a voluntary context switch IRQs must be disabled on resume (voluntary
+ * context switch always happen with IRQs disabled). Instead, if a process was
+ * suspended by the kernel preemption IRQs must be always re-enabled, because
+ * the PendSV handler resumes directly the process context. To keep track of
+ * this, we save the state of the IRQ priority in register r3 before performing
+ * the context switch.
+ *
+ * If CONFIG_KERN_PREEMPT is not enabled the cooperative implementation
+ * fallbacks to the default stack-switching mechanism, performed directly in
+ * thread-mode and implemented as a normal function call.
+ */
+
+/*
  * Voluntary context switch handler.
  */
 static void NAKED svcall_handler(void)
