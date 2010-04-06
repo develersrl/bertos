@@ -41,6 +41,8 @@
 /* Crystal frequency attached to the main oscillator. */
 #define XTAL_FREQ	SYSCTL_RCC_XTAL_8MHZ
 
+extern void __delay(unsigned long iterations);
+
 unsigned long clock_get_rate(void);
 void clock_set_rate(void);
 

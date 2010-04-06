@@ -51,12 +51,15 @@
 /*
  * Very small delay: each loop takes 3 cycles.
  */
-INLINE void __delay(unsigned long iterations)
+void NAKED __delay(unsigned long iterations)
 {
+	register uint32_t __n asm("r0") = iterations;
+
 	asm volatile (
-		"1:	subs	%0, #1\n\t"
-		"	bne 1b\n\t"
-		: "=r"(iterations) : : "memory", "cc");
+		"1: subs r0, #1\n\t"
+		"bne 1b\n\t"
+		"bx lr\n\t"
+		: : "r"(__n) : "memory", "cc");
 }
 
 unsigned long clock_get_rate(void)
@@ -109,6 +112,8 @@ void clock_set_rate(void)
 	/* Write back RCC/RCC2 registers */
 	HWREG(SYSCTL_RCC) = rcc;
 	HWREG(SYSCTL_RCC) = rcc2;
+
+	__delay(16);
 
 	/*
 	 * Step #2: select the crystal value (XTAL) and oscillator source
