@@ -39,6 +39,10 @@
 #include <drv/timer.h>
 #include "io/lm3s.h"
 
+static Process *hp_proc, *lp_proc;
+
+static hptime_t start, end;
+
 static void led_init(void)
 {
 	/* Enable the GPIO port that is used for the on-board LED */
@@ -53,44 +57,85 @@ static void led_init(void)
 	GPIO_PORTG_DEN_R = 0x04;
 }
 
-static void led_on(void)
+INLINE void led_on(void)
 {
 	GPIO_PORTG_DATA_R |= 0x04;
 }
 
-static void led_off(void)
+INLINE void led_off(void)
 {
 	GPIO_PORTG_DATA_R &= ~0x04;
 }
 
-static NORETURN void spinner_thread(void)
+INLINE hptime_t get_hp_ticks(void)
+{
+	return (TIMER_HW_CNT - timer_hw_hpread()) +
+			timer_clock_unlocked() * TIMER_HW_CNT;
+}
+
+#if CONFIG_KERN_HEAP
+#define hp_stack NULL
+#define HP_STACK_SIZE	KERN_MINSTACKSIZE * 2
+#else
+static PROC_DEFINE_STACK(hp_stack, KERN_MINSTACKSIZE * 2);
+#define HP_STACK_SIZE	sizeof(hp_stack)
+#endif
+
+static void NORETURN hp_process(void)
 {
 	char spinner[] = {'/', '-', '\\', '|'};
 	int i;
 
-	kputs("\n");
 	for(i = 0; ; i++)
 	{
-		kprintf("BeRTOS is up & running: %c\r",
-				spinner[i % countof(spinner)]);
-		timer_delay(100);
+		sig_wait(SIG_USER0);
+		end = get_hp_ticks();
+		kprintf("%c context switch in %lu clock cycles (~%lu us)    \r",
+				spinner[i % countof(spinner)],
+				end - start,
+				((end - start) * 1000000 / CPU_FREQ));
+		led_off();
+		timer_delay(50);
+		sig_send(lp_proc, SIG_USER0);
+	}
+}
+
+static void NORETURN lp_process(void)
+{
+	while (1)
+	{
+		led_on();
+		timer_delay(50);
+		start = get_hp_ticks();
+		sig_send(hp_proc, SIG_USER0);
+		sig_wait(SIG_USER0);
 	}
 }
 
 int main(void)
 {
 	IRQ_ENABLE;
-	led_init();
+	kdbg_init();
 
-	proc_testSetup();
+	kputs("Init LED..");
+	led_init();
+	kputs("Done.\n");
+	kputs("Init Timer..");
+	timer_init();
+	kputs("Done.\n");
+	kputs("Init Process..");
+	proc_init();
+	kputs("Done.\n");
+
+	kputs("Check scheduling functionality\n");
 	proc_testRun();
 
-	proc_new(spinner_thread, NULL, KERN_MINSTACKSIZE, NULL);
-	while(1)
-	{
-		led_on();
-		timer_delay(250);
-		led_off();
-		timer_delay(250);
-	}
+	kputs("BeRTOS is up & running\n\n");
+	hp_proc = proc_new(hp_process, NULL, HP_STACK_SIZE, hp_stack);
+	lp_proc = proc_current();
+
+	proc_setPri(hp_proc, 2);
+	proc_setPri(lp_proc, 1);
+
+	lp_process();
 }

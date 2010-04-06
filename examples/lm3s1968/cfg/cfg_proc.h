@@ -58,7 +58,7 @@
  * $WIZ$ type = "boolean"
  * $WIZ$ conditional_deps = "timer"
  */
-#define CONFIG_KERN_PREEMPT 0
+#define CONFIG_KERN_PREEMPT 1
 
 /**
  * Time sharing quantum (a prime number prevents interference effects) [ms].
@@ -86,7 +86,7 @@
  * $WIZ$ type = "int"
  * $WIZ$ min = 0
  */
-#define CONFIG_KERN_HEAP_SIZE 8192L
+#define CONFIG_KERN_HEAP_SIZE 16384L
 
 /**
  * Module logging level.
