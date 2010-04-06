@@ -45,15 +45,38 @@ static void (*irq_table[NUM_INTERRUPTS])(void)
 			__attribute__((section("vtable")));
 
 /* Unhandled IRQ */
-static NORETURN NAKED void unhandled_isr(void)
+static NAKED NORETURN void unhandled_isr(void)
 {
-	reg32_t reg;
+	register uint32_t reg;
 
 	asm volatile ("mrs %0, ipsr" : "=r"(reg));
 	LOG_ERR("unhandled IRQ %lu\n", reg);
-	PAUSE;
-	UNREACHABLE();
-	ASSERT(0);
+	while (1)
+		PAUSE;
+}
+
+void sysirq_setPriority(sysirq_t irq, int prio)
+{
+	uint32_t pos = (irq & 3) * 8;
+	reg32_t reg;
+
+	switch (irq >> 2)
+	{
+	case 1:
+		reg = NVIC_SYS_PRI1;
+		break;
+	case 2:
+		reg = NVIC_SYS_PRI2;
+		break;
+	case 3:
+		reg = NVIC_SYS_PRI3;
+		break;
+	default:
+		ASSERT(0);
+		return;
+	}
+	HWREG(reg) &= ~(0xff << pos);
+	HWREG(reg) |= prio << pos;
 }
 
 void sysirq_setHandler(sysirq_t irq, sysirq_handler_t handler)
@@ -64,6 +87,7 @@ void sysirq_setHandler(sysirq_t irq, sysirq_handler_t handler)
 
 	IRQ_SAVE_DISABLE(flags);
 	irq_table[irq] = handler;
+	sysirq_setPriority(irq, IRQ_PRIO);
 	IRQ_RESTORE(flags);
 }
 

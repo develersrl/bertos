@@ -42,6 +42,7 @@ typedef void (*sysirq_handler_t)(void);
 typedef unsigned int sysirq_t;
 
 void sysirq_setHandler(sysirq_t irq, sysirq_handler_t handler);
+void sysirq_setPriority(sysirq_t irq, int prio);
 void sysirq_freeHandler(sysirq_t irq);
 
 void sysirq_init(void);
