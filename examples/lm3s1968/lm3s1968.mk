@@ -33,10 +33,10 @@ lm3s1968_CSRC = \
 	bertos/cpu/cortex-m3/drv/timer_lm3s.c \
 	bertos/cpu/cortex-m3/drv/clock_lm3s.c \
 	bertos/cpu/cortex-m3/drv/kdebug_lm3s.c \
-	bertos/cpu/cortex-m3/hw/vectors_lm3s.c \
 	bertos/cpu/cortex-m3/hw/init_lm3s.c
 
 lm3s1968_CPPASRC = \
+	bertos/cpu/cortex-m3/hw/vectors_lm3s.S \
 	bertos/cpu/cortex-m3/hw/switch_ctx_cm3.S \
 	bertos/cpu/cortex-m3/hw/crt_cm3.S \
 	#
