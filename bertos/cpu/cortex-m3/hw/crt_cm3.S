@@ -35,6 +35,9 @@
  * \author Andrea Righi <arighi@develer.com>
  */
 
+#define CONTROL_UNPRIVILEGED	1
+#define CONTROL_PSP		2
+
 .syntax unified
 .thumb
 .section .init, "ax", %progbits
@@ -61,6 +64,11 @@ __dummy_init:
 __init0:
 	/* Disable IRQs */
 	cpsid i
+	/*
+	 * Initialize process stack pointer.
+	 */
+	ldr     r0, =__psp_end
+	msr     psp, r0
 
 	/* Call the early hardware initialization routine */
 	bl __init1
@@ -86,10 +94,18 @@ bss_loop:
 	strlo r0, [r1], #4
 	blo bss_loop
 
+	/* Switch to the process stack */
+	movs r0, CONTROL_PSP
+	msr control, r0
+	isb
+
 	/* Call the hardware initialization routine */
 	bl __init2
 
 	/* Call the application's entry point */
+	cpsie i
+	mov r0, #0
+	mov r1, #0
 	bl main
 end:
 	wfi

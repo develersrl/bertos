@@ -35,20 +35,24 @@
  * \author Andrea Righi <arighi@develer.com>
  */
 
+#include <cfg/cfg_proc.h>
+
 .syntax unified
 
+#if !CONFIG_KERN_PREEMPT
 /* void asm_switch_context(void **new_sp [r0], void **save_sp [r1]) */
 .global asm_switch_context
 .thumb_func
 asm_switch_context:
-	mrs r12, msp
+	mrs ip, psp
         /* Save registers */
-	stmdb r12!, {r4-r11, lr}
+	stmdb ip!, {r4-r11, lr}
         /* Save old stack pointer */
-	str r12, [r1]
+	str ip, [r1]
         /* Load new stack pointer */
-	ldr r12, [r0]
+	ldr ip, [r0]
         /* Load new registers */
-	ldmia r12!, {r4-r11, lr}
-	msr msp, r12
+	ldmia ip!, {r4-r11, lr}
+	msr psp, ip
 	bx lr
+#endif /* CONFIG_KERN_PREEMPT */

@@ -52,7 +52,7 @@ MEMORY
 /*
  * Define stack size here
  */
-MAIN_STACK_SIZE = 0x0400;
+STACK_SIZE = 0x1000;
 
 /*
  * Allocate section memory
@@ -103,10 +103,15 @@ SECTIONS
 	 * Allocated stack at the end of bss section.
 	 * Data heap is allocate at end of stack.
 	 */
-	PROVIDE (__stack_start = .);
+	PROVIDE (__msp_start = .);
 	. = ALIGN(4);
-	. += MAIN_STACK_SIZE;
-	PROVIDE (__stack_end = .);
+	. += STACK_SIZE;
+	PROVIDE (__msp_end = .);
+
+	PROVIDE (__psp_start = .);
+	. = ALIGN(4);
+	. += STACK_SIZE;
+	PROVIDE (__psp_end = .);
 
 	PROVIDE (__heap_start = .);
 	. = ALIGN(4);
