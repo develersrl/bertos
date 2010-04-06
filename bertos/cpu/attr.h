@@ -190,21 +190,6 @@
 	#define PAUSE       asm volatile ("wfi" ::: "memory")
 	#define BREAKPOINT  /* asm("bkpt 0") DOES NOT WORK */
 
-	/*
-	 * FIXME: builtin GCC memset() can be buggy! We need to redefine it
-	 * here for this architecture. :(
-	 */
-	#include <cfg/compiler.h>
-	#define memset	__cm3_memset
-	INLINE void *__cm3_memset(void *s, int c, size_t n)
-	{
-		uint8_t *p = (uint8_t *)s;
-
-		while (n--)
-			*p++ = c;
-		return s;
-	}
-
 #elif CPU_PPC
 
 	#define CPU_REG_BITS           (CPU_PPC32 ? 32 : 64)
