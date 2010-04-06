@@ -45,6 +45,7 @@
 #define HWREG(x) (*((reg32_t *)(x)))
 #define HWREGH(x) (*((reg16_t *)(x)))
 #define HWREGB(x) (*((reg8_t *)(x)))
+
 #define HWREGBITW(x, b) \
         HWREG(((reg32_t)(x) & 0xF0000000) | 0x02000000 |		\
               (((reg32_t)(x) & 0x000FFFFF) << 5) | ((b) << 2))

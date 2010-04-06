@@ -36,8 +36,12 @@
  */
 
 #include <cfg/compiler.h>
+#include <cfg/cfg_proc.h> /* CONFIG_KERN_PREEMPT */
+#include <kern/proc_p.h>
 #include <cfg/debug.h>
 #include <cpu/attr.h> /* PAUSE */
+#include <cpu/irq.h> /* IRQ_DISABLE */
+#include <cpu/types.h>
 #include "drv/irq_lm3s.h"
 #include "drv/clock_lm3s.h"
 #include "io/lm3s.h"
@@ -46,9 +50,64 @@ extern size_t __text_end, __data_start, __data_end, __bss_start, __bss_end;
 
 extern void __init2(void);
 
+#if CONFIG_KERN_PREEMPT
+/*
+ * Voluntary context switch handler.
+ */
+static void NAKED svcall_handler(void)
+{
+	asm volatile (
+	/* Save context */
+		"mrs r3, basepri\n\t"
+		"mrs ip, psp\n\t"
+		"stmdb ip!, {r3-r11, lr}\n\t"
+	/* Stack switch */
+		"str ip, [r1]\n\t"
+		"ldr ip, [r0]\n\t"
+	/* Restore context */
+		"ldmia ip!, {r3-r11, lr}\n\t"
+		"msr psp, ip\n\t"
+		"msr basepri, r3\n\t"
+		"bx lr" : : : "memory");
+}
+
+/*
+ * Preemptible context switch handler.
+ */
+static void NAKED pendsv_handler(void)
+{
+	register cpu_stack_t *stack asm("ip");
+
+	asm volatile (
+		"mrs r3, basepri\n\t"
+		"mov %0, %2\n\t"
+		"msr basepri, %0\n\t"
+		"mrs %0, psp\n\t"
+		"stmdb %0!, {r3-r11, lr}\n\t"
+		: "=r"(stack)
+		: "r"(stack), "i"(IRQ_PRIO_DISABLED)
+		: "r3", "memory");
+	proc_current()->stack = stack;
+	proc_preempt();
+	stack = proc_current()->stack;
+	asm volatile (
+		"ldmia %0!, {r3-r11, lr}\n\t"
+		"msr psp, %0\n\t"
+		"msr basepri, r3\n\t"
+		"bx lr"
+		: "=r"(stack) : "r"(stack)
+		: "memory");
+}
+#endif
+
 /* Architecture's entry point */
 void __init2(void)
 {
+	/*
+	 * The main application expects IRQs disabled.
+	 */
+	IRQ_DISABLE;
+
 	/*
 	 * PLL may not function properly at default LDO setting.
 	 *
@@ -75,4 +134,24 @@ void __init2(void)
 
 	/* Initialize IRQ vector table in RAM */
 	sysirq_init();
+
+#if CONFIG_KERN_PREEMPT
+	/*
+	 * Voluntary context switch handler.
+	 *
+	 * This software interrupt can always be triggered and must be
+	 * dispatched as soon as possible, thus we just disable IRQ priority
+	 * for it.
+	 */
+	sysirq_setHandler(FAULT_SVCALL, svcall_handler);
+	sysirq_setPriority(FAULT_SVCALL, IRQ_PRIO_MAX);
+	/*
+	 * Preemptible context switch handler
+	 *
+	 * The priority of this IRQ must be the lowest priority in the system
+	 * in order to run last in the interrupt service routines' chain.
+	 */
+	sysirq_setHandler(FAULT_PENDSV, pendsv_handler);
+	sysirq_setPriority(FAULT_PENDSV, IRQ_PRIO_MIN);
+#endif
 }

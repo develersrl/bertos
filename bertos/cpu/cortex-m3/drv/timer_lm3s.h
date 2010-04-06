@@ -54,8 +54,8 @@ typedef uint32_t hptime_t;
 #define SIZEOF_HPTIME_T 4
 
 /* Timer ISR prototype */
-#define DEFINE_TIMER_ISR void timer_handler(void); \
-				void timer_handler(void)
+ISR_PROTO_CONTEXT_SWITCH(timer_handler);
+#define DEFINE_TIMER_ISR DECLARE_ISR_CONTEXT_SWITCH(timer_handler)
 
 INLINE void timer_hw_irq(void)
 {

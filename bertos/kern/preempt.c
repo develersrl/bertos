@@ -142,6 +142,8 @@ int preempt_needPreempt(void)
 		return 0;
 	if (!proc_preemptAllowed())
 		return 0;
+	if (LIST_EMPTY(&proc_ready_list))
+		return 0;
 	return _proc_quantum ? prio_next() > prio_curr() :
 			prio_next() >= prio_curr();
 }

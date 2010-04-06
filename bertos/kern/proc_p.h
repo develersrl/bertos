@@ -50,6 +50,20 @@
 
 #include <kern/proc.h>   // struct Process
 
+/*
+ * Check if the process context switch can be performed directly by the
+ * architecture-dependent asm_switch_context() or if it must be delayed
+ * because we're in the middle of an ISR.
+ *
+ * Return true if asm_switch_context() can be executed, false
+ * otherwise.
+ *
+ * NOTE: if an architecture does not implement IRQ_RUNNING() this function
+ * always returns true.
+ */
+#define CONTEXT_SWITCH_FROM_ISR()	(!IRQ_RUNNING())
+
+#ifndef asm_switch_context
 /**
  * CPU dependent context switching routines.
  *
@@ -57,6 +71,7 @@
  * support routine which usually needs to be written in assembly.
  */
 EXTERN_C void asm_switch_context(cpu_stack_t **new_sp, cpu_stack_t **save_sp);
+#endif
 
 /*
  * Save context of old process and switch to new process.

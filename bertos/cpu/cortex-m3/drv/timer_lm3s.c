@@ -42,8 +42,6 @@
 #include "irq_lm3s.h"
 #include "timer_lm3s.h"
 
-ISR_PROTO_CONTEXT_SWITCH(timer_handler);
-
 INLINE void timer_hw_setPeriod(unsigned long period)
 {
 	ASSERT(period < (1 << 24));

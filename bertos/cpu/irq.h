@@ -66,41 +66,144 @@
 #elif CPU_CM3
 	/* Cortex-M3 */
 
-	#define IRQ_DISABLE asm volatile ("cpsid i" : : : "memory", "cc")
-	#define IRQ_ENABLE asm volatile ("cpsie i" : : : "memory", "cc")
+	/*
+	 * Interrupt priority.
+	 *
+	 * NOTE: 0 means that an interrupt is not affected by the global IRQ
+	 * priority settings.
+	 */
+	#define IRQ_PRIO		0x80
+	#define IRQ_PRIO_MIN		0xf0
+	#define IRQ_PRIO_MAX		0
+	/*
+	 * To disable interrupts we just raise the system base priority to a
+	 * number lower than the default IRQ priority. In this way, all the
+	 * "normal" interrupt can't be triggered. High-priority interrupt can
+	 * still happen (at the moment only the soft-interrupt svcall uses a
+	 * priority greater than the default IRQ priority).
+	 *
+	 * To enable interrupts we set the system base priority to 0, that
+	 * means IRQ priority mechanism is disabled, and any interrupt can
+	 * happen.
+	 */
+	#define IRQ_PRIO_DISABLED	0x40
+	#define IRQ_PRIO_ENABLED	0
 
-	#define IRQ_SAVE_DISABLE(x)					\
+	#define IRQ_DISABLE						\
 	({								\
+		register cpu_flags_t reg = IRQ_PRIO_DISABLED;		\
 		asm volatile (						\
-			"mrs %0, PRIMASK\n"				\
-			"cpsid i"					\
-			: "=r" (x) : : "memory", "cc");			\
+			"msr basepri, %0"				\
+			: : "r"(reg) : "memory", "cc");			\
 	})
 
-	#define IRQ_RESTORE(x)						\
+	#define IRQ_ENABLE						\
 	({								\
-		if (x)							\
-			IRQ_DISABLE;					\
-		else							\
-			IRQ_ENABLE;					\
+		register cpu_flags_t reg = IRQ_PRIO_ENABLED;		\
+		asm volatile (						\
+			"msr basepri, %0"				\
+			: : "r"(reg) : "memory", "cc");			\
 	})
 
 	#define CPU_READ_FLAGS()					\
 	({								\
-		cpu_flags_t sreg;					\
+		register cpu_flags_t reg;				\
 		asm volatile (						\
-			"mrs %0, PRIMASK\n\t"				\
-			: "=r" (sreg) : : "memory", "cc");		\
-		sreg;							\
+			"mrs %0, basepri"				\
+			 : "=r"(reg) : : "memory", "cc");		\
+		reg;							\
 	})
 
-	#define IRQ_ENABLED() (!CPU_READ_FLAGS())
+	#define IRQ_SAVE_DISABLE(x)					\
+	({								\
+		x = CPU_READ_FLAGS();					\
+		IRQ_DISABLE;						\
+	})
 
-	/* TODO: context switch is not yet supported */
-	#define DECLARE_ISR_CONTEXT_SWITCH(func) void func(void)
+	#define IRQ_RESTORE(x)						\
+	({								\
+		asm volatile (						\
+			"msr basepri, %0"				\
+			: : "r"(x) : "memory", "cc");			\
+	})
 
-	/* TODO: context switch is not yet supported */
-	#define ISR_PROTO_CONTEXT_SWITCH(func) void func(void)
+	#define IRQ_ENABLED() (CPU_READ_FLAGS() == IRQ_PRIO_ENABLED)
+
+	INLINE bool irq_running(void)
+	{
+		register uint32_t ret;
+
+		/*
+		 * Check if the current stack pointer is the main stack or
+		 * process stack: we use the main stack only in Handler mode,
+		 * so this means we're running inside an ISR.
+		 */
+		asm volatile (
+			"mrs %0, msp\n\t"
+			"cmp sp, %0\n\t"
+			"ite ne\n\t"
+			"movne %0, #0\n\t"
+			"moveq %0, #1\n\t" : "=r"(ret) : : "cc");
+		return ret;
+	}
+	#define IRQ_RUNNING() irq_running()
+
+	#if CONFIG_KERN_PREEMPT
+
+		#define DECLARE_ISR_CONTEXT_SWITCH(func)		\
+		INLINE void __isr_##func(void);				\
+		void func(void)						\
+		{							\
+			__isr_##func();					\
+			if (!proc_needPreempt())			\
+				return;					\
+			/*
+			 * Set a PendSV request.
+			 *
+			 * The preemption handler will be called immediately
+			 * after this ISR in tail-chaining mode (without the
+			 * overhead of hardware state saving and restoration
+			 * between interrupts).
+			 */						\
+			HWREG(NVIC_INT_CTRL) = NVIC_INT_CTRL_PEND_SV;	\
+		}							\
+		INLINE void __isr_##func(void)
+
+		/**
+		 * With task priorities enabled each ISR is used a point to
+		 * check if we need to perform a context switch.
+		 *
+		 * Instead, without priorities a context switch can occur only
+		 * when the running task expires its time quantum. In this last
+		 * case, the context switch can only occur in the timer ISR,
+		 * that must be always declared with the
+		 * DECLARE_ISR_CONTEXT_SWITCH() macro.
+		 */
+		#if CONFIG_KERN_PRI
+			#define DECLARE_ISR(func) \
+				DECLARE_ISR_CONTEXT_SWITCH(func)
+			/**
+			 * Interrupt service routine prototype: can be used for
+			 * forward declarations.
+			 */
+			#define ISR_PROTO(func) \
+				ISR_PROTO_CONTEXT_SWITCH(func)
+		#endif /* !CONFIG_KERN_PRI */
+	#endif
+
+	#ifndef ISR_PROTO
+		#define ISR_PROTO(func)	void func(void)
+	#endif
+	#ifndef DECLARE_ISR
+		#define DECLARE_ISR(func) void func(void)
+	#endif
+	#ifndef DECLARE_ISR_CONTEXT_SWITCH
+		#define DECLARE_ISR_CONTEXT_SWITCH(func) void func(void)
+	#endif
+	#ifndef ISR_PROTO_CONTEXT_SWITCH
+		#define ISR_PROTO_CONTEXT_SWITCH(func) void func(void)
+	#endif
+
 #elif CPU_ARM
 
 	#ifdef __IAR_SYSTEMS_ICC__
@@ -405,7 +508,7 @@
 		#define DECLARE_ISR_CONTEXT_SWITCH(vect) ISR(vect)
 	#endif
 	#ifndef ISR_PROTO_CONTEXT_SWITCH
-		#define ISR_PROTO_CONTEXT_SWITCH(func) ISR(vect)
+		#define ISR_PROTO_CONTEXT_SWITCH(vect) ISR(vect)
 	#endif
 
 #else
@@ -419,6 +522,7 @@
 	/// Ensure callee is not running within an interrupt
 	#define ASSERT_USER_CONTEXT() ASSERT(!IRQ_RUNNING())
 #else
+	#define IRQ_RUNNING()	false
 	#define ASSERT_USER_CONTEXT()  do {} while(0)
 	#define ASSERT_IRQ_CONTEXT()   do {} while(0)
 #endif

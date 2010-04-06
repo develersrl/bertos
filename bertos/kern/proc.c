@@ -453,7 +453,8 @@ void proc_schedule(void)
 		MEMORY_BARRIER;
 		IRQ_DISABLE;
 	}
-	proc_switchTo(current_process, old_process);
+	if (CONTEXT_SWITCH_FROM_ISR())
+		proc_switchTo(current_process, old_process);
 	/* This RET resumes the execution on the new process */
 	LOG_INFO("resuming %p:%s\n", current_process, proc_currentName());
 }
