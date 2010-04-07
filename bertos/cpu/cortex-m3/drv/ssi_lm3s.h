@@ -75,4 +75,4 @@ INLINE void lm3s_ssi_wait_txdone(uint32_t base)
 		cpu_relax();
 }
 
-#endif /* LM3S_SSI_H */
+#endif /* SSI_LM3S_H */

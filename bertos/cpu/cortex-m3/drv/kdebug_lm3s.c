@@ -40,6 +40,7 @@
 #include "clock_lm3s.h" /* __delay() */
 #include "cfg/cfg_debug.h"
 #include "io/lm3s.h"
+#include "gpio_lm3s.h"
 
 INLINE void uart_disable(size_t base)
 {
@@ -125,14 +126,9 @@ INLINE void kdbg_hw_init(void)
 	SYSCTL_RCGC1_R |= SYSCTL_RCGC1_UART0;
 	SYSCTL_RCGC2_R |= SYSCTL_RCGC2_GPIOA;
 	__delay(512);
-
 	/* Set GPIO A0 and A1 as UART pins */
-	HWREG(GPIO_PORTA_BASE + GPIO_O_DIR) |= BV(0) | BV(1);
-	HWREG(GPIO_PORTA_BASE + GPIO_O_AFSEL) |= BV(0) | BV(1);
-	HWREG(GPIO_PORTA_BASE + GPIO_O_DR2R) |= BV(0) | BV(1);
-	HWREG(GPIO_PORTA_BASE + GPIO_O_DEN) |= BV(0) | BV(1);
-	HWREG(GPIO_PORTA_BASE + GPIO_O_AMSEL) &= ~(BV(0) | BV(1));
-
+	lm3s_gpio_pin_config(GPIO_PORTA_BASE, BV(0) | BV(1),
+			GPIO_DIR_MODE_HW, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD);
 	/* 115.200, 8-bit word, no parity, one stop bit */
 	uart_config(UART0_BASE, CONFIG_KDEBUG_BAUDRATE, UART_LCRH_WLEN_8);
 }
