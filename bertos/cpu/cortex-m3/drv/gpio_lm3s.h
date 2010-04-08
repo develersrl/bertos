@@ -68,6 +68,12 @@
 #define GPIO_PIN_TYPE_ANALOG    0x00000000  //< Analog comparator
 /*\}*/
 
+/* Write a value to the specified pin(s) */
+INLINE void lm3s_gpio_pin_write(uint32_t port, uint8_t pins, uint8_t val)
+{
+	HWREG(port + (GPIO_O_DATA + (pins << 2))) = val;
+}
+
 int lm3s_gpio_pin_config(uint32_t port, uint8_t pins,
 		uint32_t mode, uint32_t strength, uint32_t type);
 void lm3s_gpio_pin_write(uint32_t port, uint8_t pins, uint8_t val);

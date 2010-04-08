@@ -40,12 +40,6 @@
 #include "io/lm3s.h"
 #include "gpio_lm3s.h"
 
-/* Write a value to the specified pin(s) */
-void lm3s_gpio_pin_write(uint32_t port, uint8_t pins, uint8_t val)
-{
-	HWREG(port + (GPIO_O_DATA + (pins << 2))) = val;
-}
-
 /**
  * Configure a GPIO pin
  *

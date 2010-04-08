@@ -154,7 +154,7 @@ typedef struct Image
 	 * Compute the size in bytes of a raster suitable for
 	 * holding a bitmap of \a width x \a height pixels.
 	 */
-	#define RAST_SIZE(width, height) ( ((width) + 7 / 8) * (height) )
+	#define RAST_SIZE(width, height) ( (((width) + 7) / 8) * (height) )
 
 #elif CONFIG_BITMAP_FMT == BITMAP_FMT_PLANAR_V_LSB
 	/**
