@@ -92,7 +92,7 @@ static void hello_world(Bitmap *bm)
 	/* Set big font */
 	gfx_setFont(bm, &font_ncenB18);
 
-	text_xprintf(bm, 1, 0, STYLEF_BOLD | TEXT_FILL | TEXT_CENTER,
+	text_xprintf(bm, 0, 0, STYLEF_BOLD | TEXT_FILL | TEXT_CENTER,
 			"Hello, world!");
 	schedule();
 	while (1)

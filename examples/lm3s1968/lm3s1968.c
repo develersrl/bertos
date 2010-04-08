@@ -35,13 +35,36 @@
  * \author Andrea Righi <arighi@develer.com>
  */
 
+#include <cfg/compiler.h>
+#include <cfg/cfg_gfx.h>
 #include <cpu/irq.h>
 #include <drv/timer.h>
-#include "io/lm3s.h"
+#include <drv/lcd_lm3s.h>
+#include <io/lm3s.h>
+#include <gfx/gfx.h>
+#include <gfx/font.h>
+#include <gfx/text.h>
+#include <icons/logo.h>
+#include <stdio.h>
 
-static Process *hp_proc, *lp_proc;
+#define PROC_STACK_SIZE	KERN_MINSTACKSIZE * 2
+
+#if CONFIG_KERN_HEAP
+#define hp_stack NULL
+#define lp_stack NULL
+#else
+static PROC_DEFINE_STACK(hp_stack, PROC_STACK_SIZE);
+static PROC_DEFINE_STACK(lp_stack, PROC_STACK_SIZE);
+#endif
+
+static Process *hp_proc, *lp_proc, *res_proc;
 
 static hptime_t start, end;
+
+static uint8_t raster[RAST_SIZE(128, 96)];
+static Bitmap bm;
+
+extern Font font_helvB10;
 
 static void led_init(void)
 {
@@ -73,30 +96,60 @@ INLINE hptime_t get_hp_ticks(void)
 			timer_clock_unlocked() * TIMER_HW_CNT;
 }
 
-#if CONFIG_KERN_HEAP
-#define hp_stack NULL
-#define HP_STACK_SIZE	KERN_MINSTACKSIZE * 2
-#else
-static PROC_DEFINE_STACK(hp_stack, KERN_MINSTACKSIZE * 2);
-#define HP_STACK_SIZE	sizeof(hp_stack)
-#endif
+static void NORETURN res_process(void)
+{
+	const char spinner[] = {'/', '-', '\\', '|'};
+	char buffer[256], c;
+	int i;
+
+	for (i = 0; ; i++)
+	{
+		ticks_t clock;
+
+		sig_wait(SIG_USER0);
+		clock = timer_clock_unlocked();
+
+		/* Display uptime (in ticks) */
+		buffer[sizeof(buffer) - 1] = '\0';
+		snprintf(buffer, sizeof(buffer) - 1,
+			"uptime: %lu sec", clock / 1000);
+		text_xprintf(&bm, 2, 0, TEXT_FILL, buffer);
+
+		/* Show context switch (in clock cycles) */
+		c = spinner[i % countof(spinner)];
+		buffer[sizeof(buffer) - 1] = '\0';
+		snprintf(buffer, sizeof(buffer) - 1,
+			"%c Context switch %c", c, c);
+		text_xprintf(&bm, 4, 0, TEXT_CENTER | TEXT_FILL, buffer);
+		buffer[sizeof(buffer) - 1] = '\0';
+		snprintf(buffer, sizeof(buffer) - 1,
+			" %lu clock cycles", end - start);
+		text_xprintf(&bm, 6, 0, TEXT_FILL, buffer);
+
+		/* Show context switch (in usec) */
+		buffer[sizeof(buffer) - 1] = '\0';
+		snprintf(buffer, sizeof(buffer) - 1,
+			" %lu.%lu usec",
+				((end - start) * 1000000) / CPU_FREQ,
+				((end - start) * (100000000 / CPU_FREQ)) % 100);
+		text_xprintf(&bm, 7, 0, TEXT_FILL, buffer);
+		lm3s_lcd_blitBitmap(&bm);
+
+		/* Blink the status LED and restart the test */
+		led_off();
+		timer_delay(100);
+		led_on();
+		sig_send(lp_proc, SIG_USER0);
+	}
+}
 
 static void NORETURN hp_process(void)
 {
-	char spinner[] = {'/', '-', '\\', '|'};
-	int i;
-
-	for(i = 0; ; i++)
+	while (1)
 	{
 		sig_wait(SIG_USER0);
 		end = get_hp_ticks();
-		kprintf("%c context switch in %lu clock cycles (~%lu us)    \r",
-				spinner[i % countof(spinner)],
-				end - start,
-				((end - start) * 1000000 / CPU_FREQ));
-		led_off();
-		timer_delay(50);
-		sig_send(lp_proc, SIG_USER0);
+		sig_send(res_proc, SIG_USER0);
 	}
 }
 
@@ -104,16 +157,52 @@ static void NORETURN lp_process(void)
 {
 	while (1)
 	{
-		led_on();
-		timer_delay(50);
 		start = get_hp_ticks();
 		sig_send(hp_proc, SIG_USER0);
 		sig_wait(SIG_USER0);
 	}
 }
 
+/**
+ * Show the splash screen
+ */
+static void bouncing_logo(Bitmap *bm)
+{
+	const long SPEED_SCALE = 1000;
+	const long GRAVITY_ACCEL = 100;
+	const long BOUNCE_ELASTICITY = 2;
+	const long TOT_FRAMES = 100;
+	long h = (long)(-bertos_logo.height) * SPEED_SCALE;
+	long speed = 0, i;
+
+	for (i = 0; i < TOT_FRAMES; i++)
+	{
+		/* Move */
+		h += speed;
+
+		/* Gravity acceleration */
+		speed += GRAVITY_ACCEL;
+
+		if (h > 0 && speed > 0)
+		{
+			/* Bounce */
+			speed = -(speed / BOUNCE_ELASTICITY);
+
+		}
+		/* Update graphics */
+		gfx_blitImage(bm,
+			(LCD_WIDTH - bertos_logo.width) / 2,
+			(LCD_HEIGHT - bertos_logo.height) / 2 + h / SPEED_SCALE,
+			&bertos_logo);
+		lm3s_lcd_blitBitmap(bm);
+		timer_delay(5);
+	}
+}
+
 int main(void)
 {
+	char buffer[32];
+
 	IRQ_ENABLE;
 	kdbg_init();
 
@@ -126,16 +215,34 @@ int main(void)
 	kputs("Init Process..");
 	proc_init();
 	kputs("Done.\n");
+	kputs("Init OLED display..");
+	lm3s_lcd_init(CPU_FREQ / 2);
+	gfx_bitmapInit(&bm, raster, LCD_WIDTH, LCD_HEIGHT);
+	gfx_setFont(&bm, &font_helvB10);
+	kputs("Done.\n");
 
-	kputs("Check scheduling functionality\n");
+	bouncing_logo(&bm);
+
+	gfx_bitmapClear(&bm);
+#ifdef _DEBUG
+	text_xprintf(&bm, 4, 0, TEXT_CENTER | TEXT_FILL, "BeRTOS up & running!");
+	lm3s_lcd_blitBitmap(&bm);
 	proc_testRun();
+#endif
+	snprintf(buffer, sizeof(buffer),
+			"CPU: Cortex-M3 %luMHz", CPU_FREQ / 1000000);
+	text_xprintf(&bm, 0, 0, TEXT_FILL, buffer);
+	lm3s_lcd_blitBitmap(&bm);
+	text_xprintf(&bm, 1, 0, TEXT_FILL, "Board: LM3S1968 EVB");
+	lm3s_lcd_blitBitmap(&bm);
 
-	kputs("BeRTOS is up & running\n\n");
-	hp_proc = proc_new(hp_process, NULL, HP_STACK_SIZE, hp_stack);
-	lp_proc = proc_current();
+	hp_proc = proc_new(hp_process, NULL, PROC_STACK_SIZE, hp_stack);
+	lp_proc = proc_new(lp_process, NULL, PROC_STACK_SIZE, lp_stack);
+
+	res_proc = proc_current();
 
 	proc_setPri(hp_proc, 2);
 	proc_setPri(lp_proc, 1);
 
-	lp_process();
+	res_process();
 }

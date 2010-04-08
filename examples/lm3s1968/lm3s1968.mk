@@ -10,13 +10,23 @@
 #
 
 # Set to 1 for debug builds
-lm3s1968_DEBUG = 1
+lm3s1968_DEBUG = 0
+
+include bertos/fonts/fonts.mk
 
 # Our target application
 TRG += lm3s1968
 
 lm3s1968_CSRC = \
 	examples/lm3s1968/lm3s1968.c \
+	bertos/gfx/bitmap.c \
+	bertos/gfx/line.c \
+	bertos/gfx/win.c \
+	bertos/gfx/text.c \
+	bertos/gfx/text_format.c \
+	bertos/fonts/luBS14.c \
+	bertos/fonts/helvB10.c \
+	bertos/icons/logo.c \
 	bertos/mware/formatwr.c \
 	bertos/mware/hex.c \
 	bertos/mware/sprintf.c \
@@ -29,10 +39,13 @@ lm3s1968_CSRC = \
 	bertos/kern/coop.c \
 	bertos/kern/preempt.c \
 	bertos/kern/signal.c \
+	bertos/cpu/cortex-m3/drv/gpio_lm3s.c \
 	bertos/cpu/cortex-m3/drv/irq_lm3s.c \
 	bertos/cpu/cortex-m3/drv/timer_lm3s.c \
 	bertos/cpu/cortex-m3/drv/clock_lm3s.c \
 	bertos/cpu/cortex-m3/drv/kdebug_lm3s.c \
+	bertos/cpu/cortex-m3/drv/ssi_lm3s.c \
+	bertos/cpu/cortex-m3/drv/lcd_lm3s.c \
 	bertos/cpu/cortex-m3/hw/init_lm3s.c
 
 lm3s1968_CPPASRC = \
@@ -44,8 +57,8 @@ lm3s1968_CPPASRC = \
 # This is an hosted application
 lm3s1968_PREFIX = arm-none-eabi-
 
-lm3s1968_CPPAFLAGS = -g -gdwarf-2 -mthumb -mno-thumb-interwork -falign-functions=16 -fno-strict-aliasing -fwrapv
-lm3s1968_CPPFLAGS = -O0 -D'ARCH=0' -D__ARM_LM3S1968__ -D'CPU_FREQ=(50000000L)' -D'WIZ_AUTOGEN' -g3 -gdwarf-2 -fverbose-asm -mthumb -mno-thumb-interwork -falign-functions=16 -Iexamples/lm3s1968 -Ibertos/cpu/cortex-m3 -fno-strict-aliasing -fwrapv
+lm3s1968_CPPAFLAGS = -mthumb -mno-thumb-interwork -falign-functions=16 -fno-strict-aliasing -fwrapv
+lm3s1968_CPPFLAGS = -D'ARCH=0' -D__ARM_LM3S1968__ -D'CPU_FREQ=(50000000L)' -D'WIZ_AUTOGEN' -mthumb -mno-thumb-interwork -falign-functions=16 -Iexamples/lm3s1968 -Ibertos/cpu/cortex-m3 -fno-strict-aliasing -fwrapv
 lm3s1968_LDFLAGS = -nostartfiles -T bertos/cpu/cortex-m3/scripts/lm3s1968_rom.ld -Wl,--no-warn-mismatch -fno-strict-aliasing -fwrapv -mthumb -mno-thumb-interwork -falign-functions=16
 
 lm3s1968_CPU = cortex-m3
@@ -57,8 +70,12 @@ lm3s1968_STOPFLASH_SCRIPT = bertos/prg_scripts/arm/stopopenocd.sh
 lm3s1968_DEBUG_SCRIPT = bertos/prg_scripts/arm/debug.sh
 lm3s1968_STOPDEBUG_SCRIPT = bertos/prg_scripts/arm/stopopenocd.sh
 
-# Debug stuff
 ifeq ($(lm3s1968_DEBUG),0)
-	demo_CFLAGS += -Os -fomit-frame-pointer
-	demo_CXXFLAGS += -Os -fomit-frame-pointer
+	# Production options
+	lm3s1968_CFLAGS += -O2 -fomit-frame-pointer
+	lm3s1968_CXXFLAGS += -O2 -fomit-frame-pointer
+else
+	# Debug options
+	lm3s1968_CPPAFLAGS += -g -gdwarf-2
+	lm3s1968_CPPFLAGS += -O0 -g3 -gdwarf-2 -fverbose-asm
 endif
