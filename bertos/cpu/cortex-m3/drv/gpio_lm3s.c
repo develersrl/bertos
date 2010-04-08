@@ -49,11 +49,11 @@ void lm3s_gpio_pin_write(uint32_t port, uint8_t pins, uint8_t val)
 /**
  * Configure a GPIO pin
  *
- * @port: the base address of the GPIO port
- * @pins: the bit-packed representation of the pin(s)
- * @mode: the pin(s) configuration mode
- * @strength: the output drive strength
- * @type: the pin(s) type
+ * \param port Base address of the GPIO port
+ * \param pins Bit-packed representation of the pin(s)
+ * \param mode Pin(s) configuration mode
+ * \param strength Output drive strength
+ * \param type Pin(s) type
  *
  * Return 0 on success, otherwise a negative value.
  */
