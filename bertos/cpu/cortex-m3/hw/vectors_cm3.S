@@ -30,7 +30,7 @@
  *
  * -->
  *
- * \brief LM3S1968 startup interrupt vector table
+ * \brief Cortex-M3 startup interrupt vector table
  *
  * \author Andrea Righi <arighi@develer.com>
  */
@@ -63,47 +63,11 @@ irq_vectors:
 	.word 0			/* Reserved */
 	.word default_isr	/* The PendSV handler */
 	.word default_isr	/* The SysTick handler */
-	.word default_isr	/* GPIO Port A */
-	.word default_isr	/* GPIO Port B */
-	.word default_isr	/* GPIO Port C */
-	.word default_isr	/* GPIO Port D */
-	.word default_isr	/* GPIO Port E */
-	.word default_isr	/* UART0 Rx and Tx */
-	.word default_isr	/* UART1 Rx and Tx */
-	.word default_isr	/* SSI0 Rx and Tx */
-	.word default_isr	/* I2C0 Master and Slave */
-	.word default_isr	/* PWM Fault */
-	.word default_isr	/* PWM Generator 0 */
-	.word default_isr	/* PWM Generator 1 */
-	.word default_isr	/* PWM Generator 2 */
-	.word default_isr	/* Quadrature Encoder 0 */
-	.word default_isr	/* ADC Sequence 0 */
-	.word default_isr	/* ADC Sequence 1 */
-	.word default_isr	/* ADC Sequence 2 */
-	.word default_isr	/* ADC Sequence 3 */
-	.word default_isr	/* Watchdog timer */
-	.word default_isr	/* Timer 0 subtimer A */
-	.word default_isr	/* Timer 0 subtimer B */
-	.word default_isr	/* Timer 1 subtimer A */
-	.word default_isr	/* Timer 1 subtimer B */
-	.word default_isr	/* Timer 2 subtimer A */
-	.word default_isr	/* Timer 2 subtimer B */
-	.word default_isr	/* Analog Comparator 0 */
-	.word default_isr	/* Analog Comparator 1 */
-	.word default_isr	/* Analog Comparator 2 */
-	.word default_isr	/* System Control (PLL, OSC, BO) */
-	.word default_isr	/* FLASH Control */
-	.word default_isr	/* GPIO Port F */
-	.word default_isr	/* GPIO Port G */
-	.word default_isr	/* GPIO Port H */
-	.word default_isr	/* UART2 Rx and Tx */
-	.word default_isr	/* SSI1 Rx and Tx */
-	.word default_isr	/* Timer 3 subtimer A */
-	.word default_isr	/* Timer 3 subtimer B */
-	.word default_isr	/* I2C1 Master and Slave */
-	.word default_isr	/* Quadrature Encoder 1 */
-	.word default_isr	/* CAN0 */
-	.word default_isr	/* CAN1 */
-	.word default_isr	/* CAN2 */
-	.word default_isr	/* Ethernet */
-	.word default_isr	/* Hibernate */
+/*
+ * This IRQ vector table will be replaced by another one in RAM after the IRQ
+ * module initialization and the reset handler disables IRQ at the very
+ * beginning, so there is no chance to trigger the following IRQs.
+ *
+ * We can safely trim the rest of this table to reduce the memory footprint and
+ * save some space in flash.
+ */
