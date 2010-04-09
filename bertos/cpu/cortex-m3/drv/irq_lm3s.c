@@ -38,7 +38,7 @@
 #include <cfg/debug.h> /* ASSERT() */
 #include <cfg/log.h> /* LOG_ERR() */
 #include <cpu/irq.h>
-#include "io/lm3s.h"
+#include <io/lm3s.h>
 #include "irq_lm3s.h"
 
 static void (*irq_table[NUM_INTERRUPTS])(void)

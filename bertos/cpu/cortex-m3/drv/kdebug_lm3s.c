@@ -35,12 +35,12 @@
  * \author Andrea Righi <arighi@develer.com>
  */
 
+#include <cfg/cfg_debug.h>
 #include <cfg/macros.h> /* for BV() */
+#include <drv/clock_lm3s.h> /* __delay() */
+#include <drv/gpio_lm3s.h>
+#include <io/lm3s.h>
 #include "kdebug_lm3s.h"
-#include "clock_lm3s.h" /* __delay() */
-#include "cfg/cfg_debug.h"
-#include "io/lm3s.h"
-#include "gpio_lm3s.h"
 
 INLINE void uart_disable(size_t base)
 {

@@ -37,9 +37,8 @@
 
 #include <cfg/debug.h>
 #include <cpu/irq.h>
-#include "io/lm3s.h"
-
-#include "irq_lm3s.h"
+#include <io/lm3s.h>
+#include <drv/irq_lm3s.h>
 #include "timer_lm3s.h"
 
 INLINE void timer_hw_setPeriod(unsigned long period)

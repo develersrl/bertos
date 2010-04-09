@@ -36,6 +36,8 @@
 #ifndef GPIO_LM3S_H
 #define GPIO_LM3S_H
 
+#include <io/lm3s.h>
+
 /**
  * GPIO mode
  */

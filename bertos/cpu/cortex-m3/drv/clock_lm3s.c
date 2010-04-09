@@ -37,7 +37,7 @@
 
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
-#include "io/lm3s.h"
+#include <io/lm3s.h>
 #include "clock_lm3s.h"
 
 /* The PLL VCO frequency is 400 MHz */

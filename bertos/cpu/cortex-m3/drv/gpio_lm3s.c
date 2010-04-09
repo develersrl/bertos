@@ -37,7 +37,7 @@
 
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
-#include "io/lm3s.h"
+#include <io/lm3s.h>
 #include "gpio_lm3s.h"
 
 /**
