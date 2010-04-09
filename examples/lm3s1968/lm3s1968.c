@@ -39,13 +39,14 @@
 #include <cfg/cfg_gfx.h>
 #include <cpu/irq.h>
 #include <drv/timer.h>
-#include <drv/lcd_lm3s.h>
 #include <io/lm3s.h>
 #include <gfx/gfx.h>
 #include <gfx/font.h>
 #include <gfx/text.h>
 #include <icons/logo.h>
 #include <stdio.h>
+
+#include "hw/hw_lcd.h"
 
 #define PROC_STACK_SIZE	KERN_MINSTACKSIZE * 2
 
@@ -133,7 +134,7 @@ static void NORETURN res_process(void)
 				((end - start) * 1000000) / CPU_FREQ,
 				((end - start) * (100000000 / CPU_FREQ)) % 100);
 		text_xprintf(&bm, 7, 0, TEXT_FILL, buffer);
-		lm3s_lcd_blitBitmap(&bm);
+		rit128x96_lcd_blitBitmap(&bm);
 
 		/* Blink the status LED and restart the test */
 		led_off();
@@ -190,11 +191,12 @@ static void bouncing_logo(Bitmap *bm)
 
 		}
 		/* Update graphics */
+		gfx_bitmapClear(bm);
 		gfx_blitImage(bm,
 			(LCD_WIDTH - bertos_logo.width) / 2,
 			(LCD_HEIGHT - bertos_logo.height) / 2 + h / SPEED_SCALE,
 			&bertos_logo);
-		lm3s_lcd_blitBitmap(bm);
+		rit128x96_lcd_blitBitmap(bm);
 		timer_delay(5);
 	}
 }
@@ -216,25 +218,24 @@ int main(void)
 	proc_init();
 	kputs("Done.\n");
 	kputs("Init OLED display..");
-	lm3s_lcd_init(CPU_FREQ / 2);
+	rit128x96_lcd_init();
 	gfx_bitmapInit(&bm, raster, LCD_WIDTH, LCD_HEIGHT);
 	gfx_setFont(&bm, &font_helvB10);
 	kputs("Done.\n");
 
 	bouncing_logo(&bm);
-
 	gfx_bitmapClear(&bm);
 #ifdef _DEBUG
 	text_xprintf(&bm, 4, 0, TEXT_CENTER | TEXT_FILL, "BeRTOS up & running!");
-	lm3s_lcd_blitBitmap(&bm);
+	rit128x96_lcd_blitBitmap(&bm);
 	proc_testRun();
 #endif
 	snprintf(buffer, sizeof(buffer),
 			"CPU: Cortex-M3 %luMHz", CPU_FREQ / 1000000);
 	text_xprintf(&bm, 0, 0, TEXT_FILL, buffer);
-	lm3s_lcd_blitBitmap(&bm);
+	rit128x96_lcd_blitBitmap(&bm);
 	text_xprintf(&bm, 1, 0, TEXT_FILL, "Board: LM3S1968 EVB");
-	lm3s_lcd_blitBitmap(&bm);
+	rit128x96_lcd_blitBitmap(&bm);
 
 	hp_proc = proc_new(hp_process, NULL, PROC_STACK_SIZE, hp_stack);
 	lp_proc = proc_new(lp_process, NULL, PROC_STACK_SIZE, lp_stack);
