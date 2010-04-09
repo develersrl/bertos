@@ -30,22 +30,15 @@
  *
  * -->
  *
- * \brief LM3S1968 OLED display driver.
+ * \brief OLED-RIT-128x96 (P14201) graphic display driver
  *
  * \author Andrea Righi <arighi@develer.com>
  */
 
 #include <cfg/debug.h>
 #include <cfg/macros.h>
-#include "io/lm3s.h"
-#include "clock_lm3s.h"
-#include "ssi_lm3s.h"
-#include "gpio_lm3s.h"
-#include "lcd_lm3s.h"
 
-#define GPIO_OLEDDC_BASE            GPIO_PORTH_BASE
-#define GPIO_OLEDDC_PIN             BV(2)
-#define GPIO_OLEDEN_PIN             BV(3)
+#include "lcd_rit128x96.h"
 
 /*
  * Hard-coded command initialization sequence.
@@ -108,36 +101,38 @@ static const uint8_t horizontal_inc[] =
 };
 
 /**
- * Write a sequence of data bytes to the LCD SSD1329 controller
+ * Write a sequence of data bytes to the LCD controller
  */
-static void lcd_writeData(const uint8_t *buf, size_t count)
+static void lcd_dataWrite(const uint8_t *buf, size_t count)
 {
 	while (count--)
-		lm3s_ssi_write_frame(SSI0_BASE, *buf++);
+	{
+		LCD_WRITE(*buf++);
+		/* Dummy read to drain the FIFO */
+		(void)LCD_READ();
+	}
 }
 
 /* Turn on the OLED display */
-void lm3s_lcd_on(void)
+void rit128x96_lcd_on(void)
 {
 	unsigned int i;
 
 	/* Loop through the SSD1329 controller initialization sequence */
+	LCD_SET_COMMAND();
 	for (i = 0; i < sizeof(init_cmd); i += init_cmd[i] + 1)
-	{
-		lm3s_gpio_pin_write(GPIO_OLEDDC_BASE, GPIO_OLEDDC_PIN, 0);
-		lcd_writeData(init_cmd + i + 1, init_cmd[i] - 1);
-	}
+		lcd_dataWrite(init_cmd + i + 1, init_cmd[i] - 1);
 }
 
 /* Turn off the OLED display */
-void lm3s_lcd_off(void)
+void rit128x96_lcd_off(void)
 {
-	lm3s_gpio_pin_write(GPIO_OLEDDC_BASE, GPIO_OLEDDC_PIN, 0);
-	lcd_writeData(exit_cmd, sizeof(exit_cmd));
+	LCD_SET_COMMAND();
+	lcd_dataWrite(exit_cmd, sizeof(exit_cmd));
 }
 
 /* Refresh a bitmap on screen */
-void lm3s_lcd_blitBitmap(const Bitmap *bm)
+void rit128x96_lcd_blitBitmap(const Bitmap *bm)
 {
 	uint8_t lcd_row[bm->width / 2];
 	uint8_t buffer[8];
@@ -147,24 +142,24 @@ void lm3s_lcd_blitBitmap(const Bitmap *bm)
 	ASSERT(bm->width == LCD_WIDTH && bm->height == LCD_HEIGHT);
 
 	/* Enter command mode */
-	lm3s_gpio_pin_write(GPIO_OLEDDC_BASE, GPIO_OLEDDC_PIN, 0);
+	LCD_SET_COMMAND();
 
 	buffer[0] = 0x15;
 	buffer[1] = 0;
 	buffer[2] = (bm->width - 2) / 2;
-	lcd_writeData(buffer, 3);
+	lcd_dataWrite(buffer, 3);
 
 	buffer[0] = 0x75;
 	buffer[1] = 0;
 	buffer[2] = bm->height - 1;
-	lcd_writeData(buffer, 3);
-	lcd_writeData((const uint8_t *)&horizontal_inc, sizeof(horizontal_inc));
+	lcd_dataWrite(buffer, 3);
+	lcd_dataWrite((const uint8_t *)&horizontal_inc, sizeof(horizontal_inc));
 
 	/*
 	 * Enter data mode and send the encoded image data to the OLED display,
 	 * over the SSI bus.
 	 */
-	lm3s_gpio_pin_write(GPIO_OLEDDC_BASE, GPIO_OLEDDC_PIN, GPIO_OLEDDC_PIN);
+	LCD_SET_DATA();
 	for (l = 0; l < bm->height / 8; l++)
 	{
 		for (mask = 1; mask; mask <<= 1)
@@ -177,52 +172,17 @@ void lm3s_lcd_blitBitmap(const Bitmap *bm)
 					lcd_row[i / 2] &= i & 1 ? 0xf0 : 0x0f;
 			}
 			/* Write an entire row at once */
-			lcd_writeData(lcd_row, sizeof(lcd_row));
+			lcd_dataWrite(lcd_row, sizeof(lcd_row));
 		}
 	}
 }
 
-/**
- * Initialize the OLED display
- *
- * \param freq The SSI Clock Frequency
- */
-void lm3s_lcd_init(unsigned long freq)
+/* Initialize the OLED display */
+void rit128x96_lcd_init(void)
 {
-	uint32_t dummy;
-
-	/* Enable the peripheral clock */
-	SYSCTL_RCGC1_R |= SYSCTL_RCGC1_SSI0;
-	SYSCTL_RCGC2_R |= SYSCTL_RCGC2_GPIOA;
-	SYSCTL_RCGC2_R |= SYSCTL_RCGC2_GPIOH;
-	__delay(512);
-
-	/* Configure the SSI0CLK and SSIOTX pins for SSI operation. */
-	lm3s_gpio_pin_config(GPIO_PORTA_BASE, BV(2) | BV(3) | BV(5),
-		GPIO_DIR_MODE_HW, GPIO_STRENGTH_8MA, GPIO_PIN_TYPE_STD_WPU);
-	/*
-	 * Configure the GPIO port pin used as a D/Cn signal for OLED device,
-	 * and the port pin used to enable power to the OLED panel.
-	 */
-	lm3s_gpio_pin_config(GPIO_OLEDDC_BASE, GPIO_OLEDDC_PIN | GPIO_OLEDEN_PIN,
-		GPIO_DIR_MODE_OUT, GPIO_STRENGTH_8MA, GPIO_PIN_TYPE_STD);
-	lm3s_gpio_pin_write(GPIO_OLEDDC_BASE, GPIO_OLEDDC_PIN | GPIO_OLEDEN_PIN,
-			GPIO_OLEDDC_PIN | GPIO_OLEDEN_PIN);
-
-	/* Configure the SSI0 port for master mode */
-	lm3s_ssi_init(SSI0_BASE, SSI_FRF_MOTO_MODE_2, SSI_MODE_MASTER, freq, 8);
-	/*
-	 * Configure the GPIO port pin used as a D/Cn signal for OLED device,
-	 * and the port pin used to enable power to the OLED panel.
-	 */
-	lm3s_gpio_pin_config(GPIO_PORTA_BASE, GPIO_OLEDEN_PIN,
-		GPIO_DIR_MODE_HW, GPIO_STRENGTH_8MA, GPIO_PIN_TYPE_STD_WPU);
-	/* Enable the SSI port */
-	lm3s_ssi_enable(SSI0_BASE);
-
-	/* Drain the RX fifo */
-	while (lm3s_ssi_read_frame_nonblocking(SSI0_BASE, &dummy));
+	/* Initialize the communication bus */
+	lcd_bus_init();
 
 	/* Turn on the OLED display */
-	lm3s_lcd_on();
+	rit128x96_lcd_on();
 }

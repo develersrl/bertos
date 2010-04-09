@@ -30,20 +30,24 @@
  *
  * -->
  *
- * \brief LM3S1968 OLED display driver.
+ * \brief OLED-RIT-128x96 (P14201) graphic display driver
  */
 
 #ifndef LCD_LM3S_H
 #define LCD_LM3S_H
 
+#include <drv/clock_lm3s.h>
+#include <drv/ssi_lm3s.h>
+#include <drv/gpio_lm3s.h>
 #include <gfx/gfx.h> /* Bitmap */
+#include <hw/hw_lcd.h>
 
 #define LCD_WIDTH	128
 #define LCD_HEIGHT	96
 
-void lm3s_lcd_blitBitmap(const Bitmap *bm);
-void lm3s_lcd_on(void);
-void lm3s_lcd_off(void);
-void lm3s_lcd_init(unsigned long freq);
+void rit128x96_lcd_blitBitmap(const Bitmap *bm);
+void rit128x96_lcd_on(void);
+void rit128x96_lcd_off(void);
+void rit128x96_lcd_init(void);
 
 #endif /* LCD_LM3S_H */
