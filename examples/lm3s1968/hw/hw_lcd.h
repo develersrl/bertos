@@ -97,7 +97,7 @@ INLINE void lcd_bus_init(void)
 	SYSCTL_RCGC1_R |= SYSCTL_RCGC1_SSI0;
 	SYSCTL_RCGC2_R |= SYSCTL_RCGC2_GPIOA;
 	SYSCTL_RCGC2_R |= SYSCTL_RCGC2_GPIOH;
-	__delay(512);
+	lm3s_busyWait(512);
 
 	/* Configure the SSI0CLK and SSIOTX pins for SSI operation. */
 	lm3s_gpio_pin_config(GPIO_PORTA_BASE, BV(2) | BV(3) | BV(5),

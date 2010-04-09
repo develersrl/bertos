@@ -37,7 +37,7 @@
 
 #include <cfg/cfg_debug.h>
 #include <cfg/macros.h> /* for BV() */
-#include <drv/clock_lm3s.h> /* __delay() */
+#include <drv/clock_lm3s.h> /* lm3s_busyWait() */
 #include <drv/gpio_lm3s.h>
 #include <io/lm3s.h>
 #include "kdebug_lm3s.h"
@@ -125,7 +125,8 @@ INLINE void kdbg_hw_init(void)
 	/* Enable the peripheral clock */
 	SYSCTL_RCGC1_R |= SYSCTL_RCGC1_UART0;
 	SYSCTL_RCGC2_R |= SYSCTL_RCGC2_GPIOA;
-	__delay(512);
+	lm3s_busyWait(512);
+
 	/* Set GPIO A0 and A1 as UART pins */
 	lm3s_gpio_pin_config(GPIO_PORTA_BASE, BV(0) | BV(1),
 			GPIO_DIR_MODE_HW, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD);

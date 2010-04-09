@@ -51,7 +51,7 @@
 /*
  * Very small delay: each loop takes 3 cycles.
  */
-void NAKED __delay(unsigned long iterations)
+void NAKED lm3s_busyWait(unsigned long iterations)
 {
 	register uint32_t __n asm("r0") = iterations;
 
@@ -113,7 +113,7 @@ void clock_set_rate(void)
 	HWREG(SYSCTL_RCC) = rcc;
 	HWREG(SYSCTL_RCC) = rcc2;
 
-	__delay(16);
+	lm3s_busyWait(16);
 
 	/*
 	 * Step #2: select the crystal value (XTAL) and oscillator source
@@ -139,7 +139,7 @@ void clock_set_rate(void)
         HWREG(SYSCTL_RCC) = rcc;
 	HWREG(SYSCTL_RCC) = rcc2;
 
-	__delay(16);
+	lm3s_busyWait(16);
 
 	/*
 	 * Step #3: select the desired system divider (SYSDIV) in RCC/RCC2 and
@@ -171,5 +171,5 @@ void clock_set_rate(void)
 
 	HWREG(SYSCTL_RCC) = rcc;
 
-	__delay(16);
+	lm3s_busyWait(16);
 }
