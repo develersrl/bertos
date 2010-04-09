@@ -56,6 +56,11 @@
 #include <sstream>
 #include <iomanip>
 
+extern "C" {
+#include <string.h>
+#include <stdio.h>
+}
+
 #define RASTER_WIDTH 82
 #define RASTER_HEIGHT 64
 
