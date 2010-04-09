@@ -37,11 +37,11 @@
 
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
-#include "io/lm3s.h"
-#include "drv/ssi_lm3s.h"
+#include <string.h> /* memset() */
+#include "ssi_lm3s.h"
 
 /* SSI clocking informations (CPSDVSR + SCR) */
-struct ssi_clock
+struct SSIClock
 {
 	unsigned int cpsdvsr;
 	unsigned int scr;
@@ -50,10 +50,10 @@ struct ssi_clock
 /*
  * Evaluate the SSI clock prescale (SSICPSR) and SSI serial clock rate (SCR).
  */
-INLINE struct ssi_clock
-lm3s_ssi_prescale(unsigned int bitrate)
+INLINE struct SSIClock
+lm3s_ssiPrescale(unsigned int bitrate)
 {
-	struct ssi_clock ret;
+	struct SSIClock ret;
 
 	for (ret.cpsdvsr = 2, ret.scr = CPU_FREQ / bitrate / ret.cpsdvsr - 1;
 			ret.scr > 255; ret.cpsdvsr += 2);
@@ -65,133 +65,141 @@ lm3s_ssi_prescale(unsigned int bitrate)
 /*
  * Initialize the SSI interface.
  *
- * @base: the SSI port base address.
- * @frame: the data transfer protocol (SSI_FRF_MOTO_MODE_0,
- * SSI_FRF_MOTO_MODE_1, SSI_FRF_MOTO_MODE_2, SSI_FRF_MOTO_MODE_3, SSI_FRF_TI or
- * SSI_FRF_NMW)
- * @mode: the mode of operation (SSI_MODE_MASTER, SSI_MODE_SLAVE,
- * SSI_MODE_SLAVE_OD)
- * @bitrate: the SSI clock rate
- * @data_width: number of bits per frame
- *
  * Return 0 in case of success, a negative value otherwise.
  */
-int lm3s_ssi_init(uint32_t base, uint32_t frame, int mode,
-                   unsigned int bitrate, unsigned int data_width)
+int lm3s_ssiOpen(uint32_t addr, uint32_t frame, int mode,
+			int bitrate, uint32_t data_width)
 {
-	struct ssi_clock ssi_clock;
+	struct SSIClock ssi_clock;
 
-	ASSERT(base == SSI0_BASE || base == SSI1_BASE);
+	ASSERT(addr == SSI0_BASE || addr == SSI1_BASE);
 	/* Configure the SSI operating mode */
 	switch (mode)
 	{
 		/* SSI Slave Mode Output Disable */
 		case SSI_MODE_SLAVE_OD:
-			HWREG(base + SSI_O_CR1) = SSI_CR1_SOD;
+			HWREG(addr + SSI_O_CR1) = SSI_CR1_SOD;
 			break;
 		/* SSI Slave */
 		case SSI_MODE_SLAVE:
-			HWREG(base + SSI_O_CR1) = SSI_CR1_MS;
+			HWREG(addr + SSI_O_CR1) = SSI_CR1_MS;
 			break;
 		/* SSI Master */
 		case SSI_MODE_MASTER:
-			HWREG(base + SSI_O_CR1) = 0;
+			HWREG(addr + SSI_O_CR1) = 0;
 			break;
 		default:
 			ASSERT(0);
 			return -1;
 	}
 	/* Configure the peripheral clock and frame format */
-	ssi_clock = lm3s_ssi_prescale(bitrate);
-	HWREG(base + SSI_O_CPSR) = ssi_clock.cpsdvsr;
-	HWREG(base + SSI_O_CR0) =
-			(ssi_clock.scr << 8)	|
-			((frame & 3) << 6)	|
-			(frame & SSI_CR0_FRF_M) |
+	ssi_clock = lm3s_ssiPrescale(bitrate);
+	HWREG(addr + SSI_O_CPSR) = ssi_clock.cpsdvsr;
+	HWREG(addr + SSI_O_CR0) =
+			(ssi_clock.scr << 8)		|
+			((frame & 3) << 6)		|
+			(frame & SSI_CR0_FRF_M)		|
 			(data_width - 1);
+	/* Enable the SSI interface */
+	HWREG(addr + SSI_O_CR1) |= SSI_CR1_SSE;
+
 	return 0;
 }
 
-/* Enable the SSI interface */
-void lm3s_ssi_enable(uint32_t base)
+/*
+ * Write data to the SSI bus.
+ *
+ * Return the number of bytes written to the bus.
+ */
+static size_t lm3s_ssiWrite(struct KFile *fd, const void *buf, size_t size)
 {
-	HWREG(base + SSI_O_CR1) |= SSI_CR1_SSE;
+	LM3SSSI *fds = LM3SSSI_CAST(fd);
+	const char *p = (const char *)buf;
+	uint32_t frame;
+	size_t count = 0;
+
+	while (count < size)
+	{
+		frame = p[count];
+		if (fds->flags & LM3S_SSI_NONBLOCK)
+		{
+			if (!lm3s_ssiWriteFrameNonBlocking(fds->addr,
+								frame))
+				break;
+		}
+		else
+			lm3s_ssiWriteFrame(fds->addr, frame);
+		count++;
+	}
+	return count;
+}
+
+/*
+ * Read data from the SSI bus.
+ *
+ * Return the number of bytes read from the bus.
+ */
+static size_t lm3s_ssiRead(struct KFile *fd, void *buf, size_t size)
+{
+	LM3SSSI *fds = LM3SSSI_CAST(fd);
+
+	uint8_t *p = (uint8_t *)buf;
+	uint32_t frame;
+	size_t count = 0;
+
+	while (count < size)
+	{
+		if (fds->flags & LM3S_SSI_NONBLOCK)
+		{
+			if (!lm3s_ssiReadFrameNonBlocking(fds->addr, &frame))
+				break;
+		}
+		else
+			lm3s_ssiReadFrame(fds->addr, &frame);
+		*p++ = (uint8_t)frame;
+		count++;
+	}
+	return count;
+}
+
+
+/* Wait for data in the TX FIFO being actually transmitted */
+static int lm3s_ssiFlush(struct KFile *fd)
+{
+	LM3SSSI *fds = LM3SSSI_CAST(fd);
+
+	while (!lm3s_ssiTxDone(fds->addr))
+		cpu_relax();
+	return 0;
 }
 
 /* Disable the SSI interface */
-void lm3s_ssi_disable(uint32_t base)
+static int lm3s_ssiClose(struct KFile *fd)
 {
-	HWREG(base + SSI_O_CR1) &= ~SSI_CR1_SSE;
+	LM3SSSI *fds = LM3SSSI_CAST(fd);
+
+	lm3s_ssiFlush(fd);
+	HWREG(fds->addr + SSI_O_CR1) &= ~SSI_CR1_SSE;
+	return 0;
 }
 
-/*
- * Put a frame into the SSI transmit FIFO.
- *
- * NOTE: the upper bits of the frame will be automatically discarded by the
- * hardware according to the frame data width, configured by lm3s_ssi_init().
+/**
+ * Initialize a LM3S SSI driver.
  */
-void lm3s_ssi_write_frame(uint32_t base, uint32_t val)
+void lm3s_ssiInit(struct LM3SSSI *fds, uint32_t addr, uint32_t frame, int mode,
+			int bitrate, uint32_t data_width)
 {
-	/* Wait for available space in the TX FIFO */
-	while (!(HWREG(base + SSI_O_SR) & SSI_SR_TNF))
-		cpu_relax();
-	/* Enqueue data to the TX FIFO */
-	HWREG(base + SSI_O_DR) = val;
-}
+	memset(fds, 0, sizeof(*fds));
+	DB(fds->fd._type = KFT_LM3SSSI);
 
-/*
- * Put a frame into the SSI transmit FIFO without blocking.
- *
- * NOTE: the upper bits of the frame will be automatically discarded by the
- * hardware according to the frame data width, configured by lm3s_ssi_init().
- *
- * Return the number of frames written to the TX FIFO.
- */
-int lm3s_ssi_write_frame_nonblocking(uint32_t base, uint32_t val)
-{
-	/* Check for available space in the TX FIFO */
-	if (!(HWREG(base + SSI_O_SR) & SSI_SR_TNF))
-		return 0;
-	/* Enqueue data to the TX FIFO */
-	HWREG(base + SSI_O_DR) = val;
-	return 1;
-}
+	/* TODO: only 8-bit frame size is supported */
+	ASSERT(data_width == 8);
 
-/*
- * Get a frame from the SSI receive FIFO.
- */
-void lm3s_ssi_read_frame(uint32_t base, uint32_t *val)
-{
-	/* Wait for data available in the RX FIFO */
-	while (!(HWREG(base + SSI_O_SR) & SSI_SR_RNE))
-		cpu_relax();
-	/* Read data from SSI RX FIFO */
-	*val = HWREG(base + SSI_O_DR);
-}
+	fds->fd.write = lm3s_ssiWrite;
+	fds->fd.read = lm3s_ssiRead;
+	fds->fd.close = lm3s_ssiClose;
+	fds->fd.flush = lm3s_ssiFlush;
 
-/*
- * Get a frame into the SSI receive FIFO without blocking.
- *
- * Return the number of frames read from the RX FIFO.
- */
-int lm3s_ssi_read_frame_nonblocking(uint32_t base, uint32_t *val)
-{
-	/* Check for data available in the RX FIFO */
-	if (!(HWREG(base + SSI_O_SR) & SSI_SR_RNE))
-		return 0;
-	/* Read data from SSI RX FIFO */
-	*val = HWREG(base + SSI_O_DR);
-	return 1;
-}
-
-/*
- * Check if the SSI transmitter is busy or not
- *
- * This allows to determine whether the TX FIFO have been cleared by the
- * hardware, so the transmission can be safely considered completed.
- */
-bool lm3s_ssi_txdone(uint32_t base)
-{
-	/* Check if the SSI is busy */
-	return (HWREG(base + SSI_O_SR) & SSI_SR_BSY) ? true : false;
+	fds->addr = addr;
+	lm3s_ssiOpen(addr, frame, mode, bitrate, data_width);
 }
