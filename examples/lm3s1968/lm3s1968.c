@@ -35,16 +35,16 @@
  * \author Andrea Righi <arighi@develer.com>
  */
 
-#include <cfg/compiler.h>
-#include <cfg/cfg_gfx.h>
 #include <cpu/irq.h>
 #include <drv/timer.h>
-#include <io/lm3s.h>
 #include <gfx/gfx.h>
 #include <gfx/font.h>
 #include <gfx/text.h>
 #include <icons/logo.h>
 #include <stdio.h>
+
+#include "cfg/compiler.h"
+#include "cfg/cfg_gfx.h"
 
 #include "hw/hw_lcd.h"
 

@@ -38,8 +38,8 @@
 #ifndef HW_LCD_H
 #define HW_LCD_H
 
-#include <cfg/macros.h>   /* BV() */
-#include <cfg/debug.h>
+#include "cfg/macros.h"   /* BV() */
+#include "cfg/debug.h"
 
 #include <cpu/attr.h>
 #include <cpu/irq.h>
