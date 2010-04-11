@@ -128,7 +128,7 @@ INLINE void kdbg_hw_init(void)
 	lm3s_busyWait(512);
 
 	/* Set GPIO A0 and A1 as UART pins */
-	lm3s_gpio_pin_config(GPIO_PORTA_BASE, BV(0) | BV(1),
+	lm3s_gpioPinConfig(GPIO_PORTA_BASE, BV(0) | BV(1),
 			GPIO_DIR_MODE_HW, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD);
 	/* 115.200, 8-bit word, no parity, one stop bit */
 	uart_config(UART0_BASE, CONFIG_KDEBUG_BAUDRATE, UART_LCRH_WLEN_8);

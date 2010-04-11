@@ -69,11 +69,11 @@
  */
 /* Enter command mode */
 #define LCD_SET_COMMAND() \
-	lm3s_gpio_pin_write(GPIO_PORTH_BASE, GPIO_OLEDDC_PIN, 0)
+	lm3s_gpioPinWrite(GPIO_PORTH_BASE, GPIO_OLEDDC_PIN, 0)
 
 /* Enter data mode */
 #define LCD_SET_DATA() \
-	lm3s_gpio_pin_write(GPIO_PORTH_BASE, GPIO_OLEDDC_PIN, GPIO_OLEDDC_PIN)
+	lm3s_gpioPinWrite(GPIO_PORTH_BASE, GPIO_OLEDDC_PIN, GPIO_OLEDDC_PIN)
 
 /* Send data to the display */
 #define LCD_WRITE(x)	lm3s_ssiWriteFrame(SSI0_BASE, x)
@@ -101,16 +101,16 @@ INLINE void lcd_bus_init(void)
 	lm3s_busyWait(512);
 
 	/* Configure the SSI0CLK and SSIOTX pins for SSI operation. */
-	lm3s_gpio_pin_config(GPIO_PORTA_BASE, BV(2) | BV(3) | BV(5),
+	lm3s_gpioPinConfig(GPIO_PORTA_BASE, BV(2) | BV(3) | BV(5),
 		GPIO_DIR_MODE_HW, GPIO_STRENGTH_8MA, GPIO_PIN_TYPE_STD_WPU);
 	/*
 	 * Configure the GPIO port pin used as a D/C# signal (data/command
 	 * control) for OLED device, and the port pin used to enable power to
 	 * the OLED panel.
 	 */
-	lm3s_gpio_pin_config(GPIO_PORTH_BASE, GPIO_OLEDDC_PIN | GPIO_OLEDEN_PIN,
+	lm3s_gpioPinConfig(GPIO_PORTH_BASE, GPIO_OLEDDC_PIN | GPIO_OLEDEN_PIN,
 		GPIO_DIR_MODE_OUT, GPIO_STRENGTH_8MA, GPIO_PIN_TYPE_STD);
-	lm3s_gpio_pin_write(GPIO_PORTH_BASE, GPIO_OLEDDC_PIN | GPIO_OLEDEN_PIN,
+	lm3s_gpioPinWrite(GPIO_PORTH_BASE, GPIO_OLEDDC_PIN | GPIO_OLEDEN_PIN,
 			GPIO_OLEDDC_PIN | GPIO_OLEDEN_PIN);
 
 	/* Configure the SSI0 port for master mode */
@@ -120,7 +120,7 @@ INLINE void lcd_bus_init(void)
 	 * Configure the GPIO port pin used as a D/Cn signal for OLED device,
 	 * and the port pin used to enable power to the OLED panel.
 	 */
-	lm3s_gpio_pin_config(GPIO_PORTA_BASE, GPIO_OLEDEN_PIN,
+	lm3s_gpioPinConfig(GPIO_PORTA_BASE, GPIO_OLEDEN_PIN,
 		GPIO_DIR_MODE_HW, GPIO_STRENGTH_8MA, GPIO_PIN_TYPE_STD_WPU);
 
 	/* Drain the SSI RX FIFO */

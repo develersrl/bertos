@@ -42,42 +42,50 @@
  * GPIO mode
  */
 /*\{*/
-#define GPIO_DIR_MODE_IN        0x00000000  //< Pin is a GPIO input
-#define GPIO_DIR_MODE_OUT       0x00000001  //< Pin is a GPIO output
-#define GPIO_DIR_MODE_HW        0x00000002  //< Pin is a peripheral function
+enum
+{
+	GPIO_DIR_MODE_IN = 0, //< Pin is a GPIO input
+	GPIO_DIR_MODE_OUT,    //< Pin is a GPIO output
+	GPIO_DIR_MODE_HW,     //< Pin is a peripheral function
+};
 /*\}*/
 
 /**
  * GPIO strenght
  */
 /*\{*/
-#define GPIO_STRENGTH_2MA       0x00000001  //< 2mA drive strength
-#define GPIO_STRENGTH_4MA       0x00000002  //< 4mA drive strength
-#define GPIO_STRENGTH_8MA       0x00000004  //< 8mA drive strength
-#define GPIO_STRENGTH_8MA_SC    0x0000000C  //< 8mA drive with slew rate control
+enum
+{
+	GPIO_STRENGTH_2MA = 0, //< 2mA drive strength
+	GPIO_STRENGTH_4MA,     //< 4mA drive strength
+	GPIO_STRENGTH_8MA,     //< 8mA drive strength
+	GPIO_STRENGTH_8MA_SC,  //< 8mA drive with slew rate control
+};
 /*\}*/
 
 /**
  * GPIO type
  */
 /*\{*/
-#define GPIO_PIN_TYPE_STD       0x00000008  //< Push-pull
-#define GPIO_PIN_TYPE_STD_WPU   0x0000000A  //< Push-pull with weak pull-up
-#define GPIO_PIN_TYPE_STD_WPD   0x0000000C  //< Push-pull with weak pull-down
-#define GPIO_PIN_TYPE_OD        0x00000009  //< Open-drain
-#define GPIO_PIN_TYPE_OD_WPU    0x0000000B  //< Open-drain with weak pull-up
-#define GPIO_PIN_TYPE_OD_WPD    0x0000000D  //< Open-drain with weak pull-down
-#define GPIO_PIN_TYPE_ANALOG    0x00000000  //< Analog comparator
+enum
+{
+	GPIO_PIN_TYPE_ANALOG = 0, //< Analog comparator
+	GPIO_PIN_TYPE_STD,        //< Push-pull
+	GPIO_PIN_TYPE_STD_WPU,    //< Push-pull with weak pull-up
+	GPIO_PIN_TYPE_STD_WPD,    //< Push-pull with weak pull-down
+	GPIO_PIN_TYPE_OD,         //< Open-drain
+	GPIO_PIN_TYPE_OD_WPU,     //< Open-drain with weak pull-up
+	GPIO_PIN_TYPE_OD_WPD,     //< Open-drain with weak pull-down
+};
 /*\}*/
 
 /* Write a value to the specified pin(s) */
-INLINE void lm3s_gpio_pin_write(uint32_t port, uint8_t pins, uint8_t val)
+INLINE void lm3s_gpioPinWrite(uint32_t port, uint8_t pins, uint8_t val)
 {
 	HWREG(port + (GPIO_O_DATA + (pins << 2))) = val;
 }
 
-int lm3s_gpio_pin_config(uint32_t port, uint8_t pins,
+int lm3s_gpioPinConfig(uint32_t port, uint8_t pins,
 		uint32_t mode, uint32_t strength, uint32_t type);
-void lm3s_gpio_pin_write(uint32_t port, uint8_t pins, uint8_t val);
 
 #endif /* GPIO_LM3S_H */
