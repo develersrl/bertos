@@ -95,6 +95,12 @@
 #define LCD_CLR_E       /* Implement me! */
 #define LCD_SET_E       /* Implement me! */
 
+/* Enter command mode */
+#define LCD_SET_COMMAND() /* Implement me! */
+
+/* Enter data mode */
+#define LCD_SET_DATA() /* Implement me! */
+
 #if CONFIG_LCD_4BIT
 	#define LCD_WRITE_H(x)  ((void)x)/* Implement me! */
 	#define LCD_WRITE_L(x)  ((void)x)/* Implement me! */

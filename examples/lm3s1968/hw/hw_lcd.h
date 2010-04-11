@@ -40,6 +40,7 @@
 
 #include "cfg/macros.h"   /* BV() */
 #include "cfg/debug.h"
+#include "cfg/cfg_lcd.h" /* CONFIG_LCD_4BIT */
 
 #include <cpu/attr.h>
 #include <cpu/irq.h>
@@ -78,7 +79,7 @@
 #define LCD_WRITE(x)	lm3s_ssiWriteFrame(SSI0_BASE, x)
 
 /* Read data from the display */
-#define LCD_READ()					\
+#define LCD_READ					\
 	({						\
 		uint32_t frame;				\
 		lm3s_ssiReadFrame(SSI0_BASE, &frame);	\

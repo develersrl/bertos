@@ -26,25 +26,43 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
- *
+ * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
+ * All Rights Reserved.
  * -->
  *
- * \brief OLED-RIT-128x96 (P14201) graphic display driver
+ * \brief Configuration file for lcd display module.
  */
 
-#ifndef LCD_LM3S_H
-#define LCD_LM3S_H
+#ifndef CFG_LCD_H
+#define CFG_LCD_H
 
-#include <gfx/gfx.h> /* Bitmap */
-#include <hw/hw_lcd.h>
+/**
+ * Use 4 bit addressing mode.
+ * $WIZ$ type = "boolean"
+ */
+#define CONFIG_LCD_4BIT            0
 
-#define LCD_WIDTH	128
-#define LCD_HEIGHT	96
+/**
+ * Use a table to speed up LCD memory addressing.
+ * This will use about 100 bytes of RAM.
+ * $WIZ$ type = "boolean"
+ */
+#define CONFIG_LCD_ADDRESS_FAST    0
 
-void rit128x96_lcd_blitBitmap(const Bitmap *bm);
-void rit128x96_lcd_on(void);
-void rit128x96_lcd_off(void);
-void rit128x96_lcd_init(void);
+/**
+ * LCD setting for 32122A (AVR implementation).
+ * $WIZ$ type = "boolean"
+ * $WIZ$ supports = "avr and False"
+ */
+#define CONFIG_LCD_SOFTINT_REFRESH 0
 
-#endif /* LCD_LM3S_H */
+/**
+ * LCD setting for 32122A (AVR implementation).
+ * $WIZ$ type = "boolean"
+ * $WIZ$ supports = "avr and False"
+ */
+#define CONFIG_LCD_WAIT            0
+
+
+#endif /* CFG_LCD_H */
+
