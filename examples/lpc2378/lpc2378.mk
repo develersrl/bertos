@@ -15,6 +15,9 @@ lpc2378_PROGRAMMER_PORT = none
 # Files included by the user.
 lpc2378_USER_CSRC = \
 	examples/lpc2378/main.c \
+	bertos/drv/timer.c \
+	bertos/cpu/arm/drv/vic_lpc2.c \
+	bertos/cpu/arm/drv/timer_lpc2.c \
 	#
 
 # Files included by the user.
