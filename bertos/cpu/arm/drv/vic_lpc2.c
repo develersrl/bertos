@@ -32,51 +32,20 @@
  *
  * \author Francesco Sacchi <batt@develer.com>
  *
- * \brief NXP LPC2xxx interrupt vectors.
+ * \brief Vectored Interrupt Controller VIC driver.
+ *
+ * notest:arm
  */
+#include "vic_lpc2.h"
+#include <cfg/log.h>
 
-#include <cpu/detect.h>
-#include "cfg/cfg_arch.h"
-#if defined(ARCH_NIGHTTEST) && (ARCH & ARCH_NIGHTTEST)
-	/* Avoid errors during nigthly test */
-	#define __vectors __vectors_lpc2
-#endif
 
-/*
- * Section 0: Vector table and reset entry.
- */
-        .section .vectors,"ax",%progbits
-
-        .global __vectors
-__vectors:
-        ldr     pc, _init            /* Reset */
-        ldr     pc, _undef           /* Undefined instruction */
-        ldr     pc, _swi             /* Software interrupt */
-        ldr     pc, _prefetch_abort  /* Prefetch abort */
-        ldr     pc, _data_abort      /* Data abort */
-        .word	0xb9205f88           /* In LPX2xxx, this location holds the checksum of the previous vectors */
-#if CPU_ARM_LPC2378
-        ldr     pc, [pc, #-0x120]    /* Use VIC */
-#else
-	#warning Check correct VICAddress register for this CPU, default set to 0xFFFFF030
-        ldr     pc, [pc, #-0xFF0]    /* Use VIC */
-#endif
-        ldr     pc, _fiq	     /* Fast interrupt request */
-_init:
-        .word   __init
-_undef:
-        .word   __undef
-_swi:
-        .word   __swi
-_prefetch_abort:
-        .word   __prefetch_abort
-_data_abort:
-        .word   __data_abort
-_fiq:
-	.word	__fiq
-
-	.weak	__fiq
-__fiq:
-	b	__fiq
-
-        .ltorg
+void NORETURN vic_defaultHandler(void)
+{
+	IRQ_DISABLE;
+	LOG_ERR("Unhandled IRQ\n"
+		"VICIRQStatus %08lX\n"
+		"VICFIQStatus %08lX\n", VICIRQStatus, VICFIQStatus);
+	while (1)
+		PAUSE;
+}

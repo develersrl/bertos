@@ -32,51 +32,47 @@
  *
  * \author Francesco Sacchi <batt@develer.com>
  *
- * \brief NXP LPC2xxx interrupt vectors.
+ * \brief Vectored Interrupt Controller VIC driver.
  */
+ 
+#ifndef DRV_VIC_LPC2_H
+#define DRV_VIC_LPC2_H
 
-#include <cpu/detect.h>
-#include "cfg/cfg_arch.h"
-#if defined(ARCH_NIGHTTEST) && (ARCH & ARCH_NIGHTTEST)
-	/* Avoid errors during nigthly test */
-	#define __vectors __vectors_lpc2
-#endif
+#include <cfg/compiler.h>
+#include <cpu/irq.h>
 
-/*
- * Section 0: Vector table and reset entry.
- */
-        .section .vectors,"ax",%progbits
-
-        .global __vectors
-__vectors:
-        ldr     pc, _init            /* Reset */
-        ldr     pc, _undef           /* Undefined instruction */
-        ldr     pc, _swi             /* Software interrupt */
-        ldr     pc, _prefetch_abort  /* Prefetch abort */
-        ldr     pc, _data_abort      /* Data abort */
-        .word	0xb9205f88           /* In LPX2xxx, this location holds the checksum of the previous vectors */
 #if CPU_ARM_LPC2378
-        ldr     pc, [pc, #-0x120]    /* Use VIC */
+	#include <io/lpc23xx.h>
+	#define vic_vector(i)   (*(&VICVectAddr0 + i))
+	#define vic_priority(i) (*(&VICVectCntl0 + i))
+	#define VIC_SRC_CNT 32
+	#define vic_enable(i)  do { ASSERT(i < VIC_SRC_CNT); VICIntEnable = BV(i); } while (0)
+	#define vic_disable(i) do { ASSERT(i < VIC_SRC_CNT); VICIntEnClr  = BV(i); } while (0)
+
+	typedef void vic_handler_t(void);
+	void vic_defaultHandler(void);
+
+	INLINE void vic_init(void)
+	{
+		IRQ_DISABLE;
+		/* Assign all sources to IRQ (not to FIQ) */
+		VICIntSelect = 0;
+		/* Disable all sw interrupts */
+		VICSoftIntClr = 0xFFFFFFFF;
+		/* Disable all interrupts */
+		VICIntEnClr = 0xFFFFFFFF;
+
+		for (int i = 0; i < VIC_SRC_CNT; i++)
+			vic_vector(i) = (reg32_t)vic_defaultHandler;
+	}
+
+	INLINE void vic_setVector(int id, vic_handler_t *handler)
+	{
+		ASSERT(id < VIC_SRC_CNT);
+		vic_vector(id) = (reg32_t)handler;
+	}
 #else
-	#warning Check correct VICAddress register for this CPU, default set to 0xFFFFF030
-        ldr     pc, [pc, #-0xFF0]    /* Use VIC */
+	#error Unknown CPU
 #endif
-        ldr     pc, _fiq	     /* Fast interrupt request */
-_init:
-        .word   __init
-_undef:
-        .word   __undef
-_swi:
-        .word   __swi
-_prefetch_abort:
-        .word   __prefetch_abort
-_data_abort:
-        .word   __data_abort
-_fiq:
-	.word	__fiq
 
-	.weak	__fiq
-__fiq:
-	b	__fiq
-
-        .ltorg
+#endif /* DRV_VIC_LPC2_H */

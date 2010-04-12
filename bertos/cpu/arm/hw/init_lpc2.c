@@ -36,6 +36,7 @@
  * notest:arm
  */
 #include <cpu/irq.h>
+#include <drv/vic_lpc2.h>
 #include <io/lpc23xx.h>
 
 #if CPU_FREQ != 72000000UL
@@ -118,4 +119,11 @@ void __init1(void)
 	
 	/* Memory accelerator module fully enabled */
 	MAMCR = 0x02;
+}
+
+void __init2(void);
+
+void __init2(void)
+{
+	vic_init();
 }
