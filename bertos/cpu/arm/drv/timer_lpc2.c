@@ -26,24 +26,56 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2007 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
- * \version $Id$
- *
  * \author Francesco Sacchi <batt@develer.com>
  *
- * \brief Low-level timer module for ARM (interface).
+ * \brief Low-level timer module for LPC2xxx (implementation).
+ *
+ * notest:arm
  */
+#include "cfg/cfg_timer.h"
+#include <cfg/macros.h> // BV()
+#include <cfg/debug.h> // BV()
 
-#include <cpu/detect.h>
+#include <drv/vic_lpc2.h>
+#include <io/lpc23xx.h>
+#include "timer_lpc2.h"
 
-#if CPU_ARM_AT91
-	#include "timer_at91.h"
-#elif CPU_ARM_LPC2
-	#include "timer_lpc2.h"
-/*#elif  Add other ARM families here */
+/** HW dependent timer initialization  */
+#if (CONFIG_TIMER == TIMER0_COMPARE0)
+	#define TIMER0_ID 4
+	void timer_hw_init(void)
+	{
+		/* Power on timer0 */
+		PCONP |= BV(1);
+
+		/* Set TIMER0 clk to CPU_FREQ */
+		PCLKSEL0 &= ~0x0C;
+		PCLKSEL0 |= 0x04;
+
+		/* reset prescaler counter */
+		T0PR = 0;
+
+		/* Set match register 0 */
+		T0MR0 = TIMER_HW_CNT;
+		/* IRQ and reset counter on compare match 0 */
+		T0MCR &= ~0x03;
+		T0MCR |= 0x03;
+		/* Reset timer0 counter and prescaler */
+		T0TCR = 0x02;
+
+		vic_setVector(TIMER0_ID, timer_handler);
+		vic_enable(TIMER0_ID);
+
+		/* Start timer0 */
+		T0TCR = 0x01;
+	}
+
+
 #else
-	#error Unknown CPU
-#endif
+	#error Unimplemented value for CONFIG_TIMER
+#endif /* CONFIG_TIMER */
+
