@@ -16,8 +16,17 @@ lpc2378_PROGRAMMER_PORT = none
 lpc2378_USER_CSRC = \
 	examples/lpc2378/main.c \
 	bertos/drv/timer.c \
+	bertos/drv/timer_test.c \
 	bertos/cpu/arm/drv/vic_lpc2.c \
 	bertos/cpu/arm/drv/timer_lpc2.c \
+	bertos/mware/event.c \
+	bertos/kern/proc.c \
+	bertos/kern/coop.c \
+	bertos/kern/preempt.c \
+	bertos/kern/proc_test.c \
+	bertos/kern/monitor.c \
+	bertos/mware/sprintf.c \
+	bertos/struct/heap.c \
 	#
 
 # Files included by the user.
@@ -26,6 +35,7 @@ lpc2378_USER_PCSRC = \
 
 # Files included by the user.
 lpc2378_USER_CPPASRC = \
+	bertos/cpu/arm/hw/switch_ctx_arm.S \
 	#
 
 # Files included by the user.

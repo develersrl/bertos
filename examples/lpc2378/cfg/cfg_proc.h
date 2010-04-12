@@ -44,7 +44,7 @@
  *
  * $WIZ$ type = "autoenabled"
  */
-#define CONFIG_KERN 0
+#define CONFIG_KERN 1
 
 /**
  * Kernel interrupt supervisor. WARNING: Experimental, still incomplete!
@@ -59,7 +59,7 @@
  * $WIZ$ type = "boolean"
  * $WIZ$ conditional_deps = "timer"
  */
-#define CONFIG_KERN_PREEMPT 0
+#define CONFIG_KERN_PREEMPT 1
 
 /**
  * Time sharing quantum (a prime number prevents interference effects) [ms].
@@ -73,21 +73,21 @@
  * Priority-based scheduling policy.
  * $WIZ$ type = "boolean"
  */
-#define CONFIG_KERN_PRI 0
+#define CONFIG_KERN_PRI 1
 
 /**
  * Dynamic memory allocation for processes.
  * $WIZ$ type = "boolean"
  * $WIZ$ conditional_deps = "heap"
  */
-#define CONFIG_KERN_HEAP 0
+#define CONFIG_KERN_HEAP 1
 
 /**
  * Size of the dynamic memory pool used by processes.
  * $WIZ$ type = "int"
  * $WIZ$ min = 0
  */
-#define CONFIG_KERN_HEAP_SIZE 2048L
+#define CONFIG_KERN_HEAP_SIZE 16384L
 
 /**
  * Module logging level.
