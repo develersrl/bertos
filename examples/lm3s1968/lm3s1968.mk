@@ -60,9 +60,9 @@ lm3s1968_CPPASRC = \
 # This is an hosted application
 lm3s1968_PREFIX = arm-none-eabi-
 
-lm3s1968_CPPAFLAGS = -mthumb -mno-thumb-interwork -falign-functions=16 -fno-strict-aliasing -fwrapv
-lm3s1968_CPPFLAGS = -D'ARCH=0' -D__ARM_LM3S1968__ -D'CPU_FREQ=(50000000L)' -D'WIZ_AUTOGEN' -mthumb -mno-thumb-interwork -falign-functions=16 -Iexamples/lm3s1968 -Ibertos/cpu/cortex-m3 -fno-strict-aliasing -fwrapv
-lm3s1968_LDFLAGS = -nostartfiles -T bertos/cpu/cortex-m3/scripts/lm3s1968_rom.ld -Wl,--no-warn-mismatch -fno-strict-aliasing -fwrapv -mthumb -mno-thumb-interwork -falign-functions=16
+lm3s1968_CPPAFLAGS = -mthumb -mno-thumb-interwork
+lm3s1968_CPPFLAGS = -D'ARCH=0' -D__ARM_LM3S1968__ -D'CPU_FREQ=(50000000L)' -D'WIZ_AUTOGEN' -mthumb -mno-thumb-interwork -Iexamples/lm3s1968 -Ibertos/cpu/cortex-m3 -fno-strict-aliasing -fwrapv
+lm3s1968_LDFLAGS = -nostartfiles -T bertos/cpu/cortex-m3/scripts/lm3s1968_rom.ld -Wl,--no-warn-mismatch -mthumb -mno-thumb-interwork
 
 lm3s1968_CPU = cortex-m3
 
