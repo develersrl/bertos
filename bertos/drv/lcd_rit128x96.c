@@ -107,16 +107,9 @@ static void lcd_dataWrite(const uint8_t *buf, size_t count)
 {
 	while (count--)
 	{
-#if !CONFIG_LCD_4BIT
 		LCD_WRITE(*buf++);
 		/* Dummy read to drain the FIFO */
 		(void)LCD_READ;
-#else
-		LCD_WRITE_H(*buf);
-		LCD_WRITE_L(*buf++);
-		(void)LCD_READ_H;
-		(void)LCD_READ_L;
-#endif
 	}
 }
 

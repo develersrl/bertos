@@ -30,21 +30,52 @@
  *
  * -->
  *
- * \brief OLED-RIT-128x96 (P14201) graphic display driver
+ * \brief LM3S1986: OLED-RIT-128x96 (P14201) low-level hardware macros
+ *
+ * \author Andrea Righi <arighi@develer.com>
  */
 
-#ifndef LCD_LM3S_H
-#define LCD_LM3S_H
+#ifndef HW_RIT128x96_H
+#define HW_RIT128x96_H
 
-#include <gfx/gfx.h> /* Bitmap */
-#include "hw/hw_rit128x96.h"
+#include "cfg/macros.h"   /* BV() */
+#include "cfg/debug.h"
 
-#define LCD_WIDTH	128
-#define LCD_HEIGHT	96
+#include <cpu/attr.h>
+#include <cpu/irq.h>
+#include <cpu/types.h>
 
-void rit128x96_lcd_blitBitmap(const Bitmap *bm);
-void rit128x96_lcd_on(void);
-void rit128x96_lcd_off(void);
-void rit128x96_lcd_init(void);
+/**
+ * \name LCD I/O pins/ports
+ * @{
+ */
+/* OLED Data/Command control pin */
+#define GPIO_OLEDDC_PIN 0 /* Implement me! */
 
-#endif /* LCD_LM3S_H */
+/* OLED enable pin */
+#define GPIO_OLEDEN_PIN 0 /* Implement me! */
+/*@}*/
+
+/**
+ * \name LCD bus control macros
+ * @{
+ */
+/* Enter command mode */
+#define LCD_SET_COMMAND() /* Implement me! */
+
+/* Enter data mode */
+#define LCD_SET_DATA() /* Implement me! */
+
+/* Send data to the display */
+#define LCD_WRITE(x)    ((void)x)/* Implement me! */
+
+/* Read data from the display */
+#define LCD_READ        (0 /* Implement me! */ )
+/*@}*/
+
+INLINE void lcd_bus_init(void)
+{
+	/* Implement me! */
+}
+
+#endif /* HW_RIT128x96_H */

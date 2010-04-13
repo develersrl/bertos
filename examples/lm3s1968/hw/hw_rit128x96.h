@@ -35,12 +35,11 @@
  * \author Andrea Righi <arighi@develer.com>
  */
 
-#ifndef HW_LCD_H
-#define HW_LCD_H
+#ifndef HW_RIT128x96_H
+#define HW_RIT128x96_H
 
 #include "cfg/macros.h"   /* BV() */
 #include "cfg/debug.h"
-#include "cfg/cfg_lcd.h" /* CONFIG_LCD_4BIT */
 
 #include <cpu/attr.h>
 #include <cpu/irq.h>
@@ -49,8 +48,6 @@
 #include <drv/clock_lm3s.h>
 #include <drv/ssi_lm3s.h>
 #include <drv/gpio_lm3s.h>
-
-#include <drv/lcd_rit128x96.h>
 
 /**
  * \name LCD I/O pins/ports
@@ -129,4 +126,4 @@ INLINE void lcd_bus_init(void)
 	IRQ_RESTORE(flags);
 }
 
-#endif /* HW_LCD_H */
+#endif /* HW_RIT128x96_H */

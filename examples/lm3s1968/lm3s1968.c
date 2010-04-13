@@ -38,6 +38,7 @@
 #include <cpu/irq.h>
 #include <drv/timer.h>
 #include <drv/ser.h>
+#include <drv/lcd_rit128x96.h>
 #include <gfx/gfx.h>
 #include <gfx/font.h>
 #include <gfx/text.h>
@@ -47,7 +48,7 @@
 #include "cfg/compiler.h"
 #include "cfg/cfg_gfx.h"
 
-#include "hw/hw_lcd.h"
+#include "hw/hw_rit128x96.h"
 
 #define PROC_STACK_SIZE	KERN_MINSTACKSIZE
 
