@@ -68,9 +68,6 @@
 
 /* Send data to the display */
 #define LCD_WRITE(x)    ((void)x)/* Implement me! */
-
-/* Read data from the display */
-#define LCD_READ        (0 /* Implement me! */ )
 /*@}*/
 
 INLINE void lcd_bus_init(void)

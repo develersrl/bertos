@@ -73,23 +73,19 @@
 	lm3s_gpioPinWrite(GPIO_PORTH_BASE, GPIO_OLEDDC_PIN, GPIO_OLEDDC_PIN)
 
 /* Send data to the display */
-#define LCD_WRITE(x)	lm3s_ssiWriteFrame(SSI0_BASE, x)
-
-/* Read data from the display */
-#define LCD_READ					\
-	({						\
-		uint32_t frame;				\
-		lm3s_ssiReadFrame(SSI0_BASE, &frame);	\
-		frame;					\
-	})
+#define LCD_WRITE(x)							\
+	{								\
+		uint32_t _x;						\
+		lm3s_ssiWriteFrame(SSI0_BASE, x);			\
+		/* Dummy read to drain the FIFO */			\
+		while (!lm3s_ssiReadFrameNonBlocking(SSI0_BASE, &_x));	\
+			cpu_relax();					\
+	}
 /*@}*/
 
 INLINE void lcd_bus_init(void)
 {
-	cpu_flags_t flags;
 	uint32_t dummy;
-
-	IRQ_SAVE_DISABLE(flags);
 
 	/* Enable the peripheral clock */
 	SYSCTL_RCGC1_R |= SYSCTL_RCGC1_SSI0;
@@ -122,8 +118,6 @@ INLINE void lcd_bus_init(void)
 
 	/* Drain the SSI RX FIFO */
 	while (lm3s_ssiReadFrameNonBlocking(SSI0_BASE, &dummy));
-
-	IRQ_RESTORE(flags);
 }
 
 #endif /* HW_RIT128x96_H */

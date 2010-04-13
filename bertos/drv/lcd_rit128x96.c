@@ -106,11 +106,7 @@ static const uint8_t horizontal_inc[] =
 static void lcd_dataWrite(const uint8_t *buf, size_t count)
 {
 	while (count--)
-	{
 		LCD_WRITE(*buf++);
-		/* Dummy read to drain the FIFO */
-		(void)LCD_READ;
-	}
 }
 
 /* Turn on the OLED display */
@@ -135,7 +131,7 @@ void rit128x96_lcd_off(void)
 void rit128x96_lcd_blitBitmap(const Bitmap *bm)
 {
 	uint8_t lcd_row[bm->width / 2];
-	uint8_t buffer[8];
+	uint8_t buffer[3];
 	uint8_t mask;
 	int i, l;
 
