@@ -50,7 +50,7 @@
 
 #include "hw/hw_rit128x96.h"
 
-#define PROC_STACK_SIZE	KERN_MINSTACKSIZE
+#define PROC_STACK_SIZE	KERN_MINSTACKSIZE * 2
 
 #if CONFIG_KERN_HEAP
 #define hp_stack NULL
@@ -137,8 +137,8 @@ INLINE hptime_t get_hp_ticks(void)
 static void NORETURN res_process(void)
 {
 	const char spinner[] = {'/', '-', '\\', '|'};
-	char buffer[32], c;
 	int i;
+	char c;
 
 	for (i = 0; ; i++)
 	{
@@ -147,29 +147,17 @@ static void NORETURN res_process(void)
 		clock = timer_clock_unlocked();
 
 		/* Display uptime (in ticks) */
-		buffer[sizeof(buffer) - 1] = '\0';
-		snprintf(buffer, sizeof(buffer) - 1,
-			"uptime: %lu sec", clock / 1000);
-		text_xprintf(&bm, 2, 0, TEXT_FILL, buffer);
+		text_xprintf(&bm, 2, 0, TEXT_FILL, "uptime: %lu sec", clock / 1000);
 
 		/* Show context switch (in clock cycles) */
 		c = spinner[i % countof(spinner)];
-		buffer[sizeof(buffer) - 1] = '\0';
-		snprintf(buffer, sizeof(buffer) - 1,
-			"%c Context switch %c", c, c);
-		text_xprintf(&bm, 4, 0, TEXT_CENTER | TEXT_FILL, buffer);
-		buffer[sizeof(buffer) - 1] = '\0';
-		snprintf(buffer, sizeof(buffer) - 1,
-			" %lu clock cycles", end - start);
-		text_xprintf(&bm, 6, 0, TEXT_FILL, buffer);
-
+		text_xprintf(&bm, 4, 0, TEXT_CENTER | TEXT_FILL, "%c Context switch %c", c, c);
+		text_xprintf(&bm, 6, 0, TEXT_FILL, " %lu clock cycles", end - start);
 		/* Show context switch (in usec) */
-		buffer[sizeof(buffer) - 1] = '\0';
-		snprintf(buffer, sizeof(buffer) - 1,
+		text_xprintf(&bm, 7, 0, TEXT_FILL,
 			" %lu.%lu usec",
 				((end - start) * 1000000) / CPU_FREQ,
 				((end - start) * (100000000 / CPU_FREQ)) % 100);
-		text_xprintf(&bm, 7, 0, TEXT_FILL, buffer);
 		rit128x96_lcd_blitBitmap(&bm);
 	}
 }
@@ -234,8 +222,6 @@ static void bouncing_logo(Bitmap *bm)
 
 int main(void)
 {
-	char buffer[32];
-
 	IRQ_ENABLE;
 	kdbg_init();
 
@@ -262,9 +248,8 @@ int main(void)
 	rit128x96_lcd_blitBitmap(&bm);
 	proc_testRun();
 #endif
-	snprintf(buffer, sizeof(buffer),
+	text_xprintf(&bm, 0, 0, TEXT_FILL,
 			"CPU: Cortex-M3 %luMHz", CPU_FREQ / 1000000);
-	text_xprintf(&bm, 0, 0, TEXT_FILL, buffer);
 	rit128x96_lcd_blitBitmap(&bm);
 	text_xprintf(&bm, 1, 0, TEXT_FILL, "Board: LM3S1968 EVB");
 	rit128x96_lcd_blitBitmap(&bm);
