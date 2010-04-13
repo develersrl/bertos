@@ -30,13 +30,20 @@
  *
  * -->
  *
- * \brief IRQ management for the Cortex M3 processor.
+ * \brief IRQ management for the Cortex-M3 processor.
  *
  * \author Andrea Righi <arighi@develer.com>
  */
 
 #ifndef DRV_CORTEX_M3_SYSIRQ_H
 #define DRV_CORTEX_M3_SYSIRQ_H
+
+#if CPU_CM3_LM3S
+	#include <io/lm3s.h>
+/*#elif  Add other families here */
+#else
+	#error Unknown CPU
+#endif
 
 typedef void (*sysirq_handler_t)(void);
 typedef unsigned int sysirq_t;

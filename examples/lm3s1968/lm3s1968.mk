@@ -41,11 +41,11 @@ lm3s1968_CSRC = \
 	bertos/kern/preempt.c \
 	bertos/kern/signal.c \
 	bertos/cpu/cortex-m3/drv/gpio_lm3s.c \
-	bertos/cpu/cortex-m3/drv/irq_lm3s.c \
 	bertos/cpu/cortex-m3/drv/timer_lm3s.c \
 	bertos/cpu/cortex-m3/drv/clock_lm3s.c \
 	bertos/cpu/cortex-m3/drv/kdebug_lm3s.c \
 	bertos/cpu/cortex-m3/drv/ssi_lm3s.c \
+	bertos/cpu/cortex-m3/drv/irq_cm3.c \
 	bertos/cpu/cortex-m3/hw/switch_ctx_cm3.c \
 	bertos/cpu/cortex-m3/hw/init_lm3s.c
 

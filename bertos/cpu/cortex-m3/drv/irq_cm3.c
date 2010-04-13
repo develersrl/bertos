@@ -38,11 +38,23 @@
 #include <cfg/debug.h> /* ASSERT() */
 #include <cfg/log.h> /* LOG_ERR() */
 #include <cpu/irq.h>
-#include <io/lm3s.h>
-#include "irq_lm3s.h"
+#include "irq_cm3.h"
 
 static void (*irq_table[NUM_INTERRUPTS])(void)
 			__attribute__((section("vtable")));
+
+/* Priority register / IRQ number table */
+static const uint32_t nvic_prio_reg[] =
+{
+	/* System exception registers */
+	0, NVIC_SYS_PRI1, NVIC_SYS_PRI2, NVIC_SYS_PRI3,
+
+	/* External interrupts registers */
+	NVIC_PRI0, NVIC_PRI1, NVIC_PRI2, NVIC_PRI3,
+	NVIC_PRI4, NVIC_PRI5, NVIC_PRI6, NVIC_PRI7,
+	NVIC_PRI8, NVIC_PRI9, NVIC_PRI10, NVIC_PRI11,
+	NVIC_PRI12, NVIC_PRI13
+};
 
 /* Unhandled IRQ */
 static NAKED NORETURN void unhandled_isr(void)
@@ -58,25 +70,22 @@ static NAKED NORETURN void unhandled_isr(void)
 void sysirq_setPriority(sysirq_t irq, int prio)
 {
 	uint32_t pos = (irq & 3) * 8;
-	reg32_t reg;
+	reg32_t reg = nvic_prio_reg[irq >> 2];
+	uint32_t val;
 
-	switch (irq >> 2)
-	{
-	case 1:
-		reg = NVIC_SYS_PRI1;
-		break;
-	case 2:
-		reg = NVIC_SYS_PRI2;
-		break;
-	case 3:
-		reg = NVIC_SYS_PRI3;
-		break;
-	default:
-		ASSERT(0);
-		return;
-	}
-	HWREG(reg) &= ~(0xff << pos);
-	HWREG(reg) |= prio << pos;
+	val = HWREG(reg);
+	val &= ~(0xff << pos);
+	val |= prio << pos;
+	HWREG(reg) = val;
+}
+
+static void sysirq_enable(sysirq_t irq)
+{
+	/* Enable the IRQ line (only for generic IRQs) */
+	if (irq >= 16 && irq < 48)
+		HWREG(NVIC_EN0) = 1 << (irq - 16);
+	else if (irq >= 48)
+		HWREG(NVIC_EN1) = 1 << (irq - 48);
 }
 
 void sysirq_setHandler(sysirq_t irq, sysirq_handler_t handler)
@@ -88,6 +97,7 @@ void sysirq_setHandler(sysirq_t irq, sysirq_handler_t handler)
 	IRQ_SAVE_DISABLE(flags);
 	irq_table[irq] = handler;
 	sysirq_setPriority(irq, IRQ_PRIO);
+	sysirq_enable(irq);
 	IRQ_RESTORE(flags);
 }
 

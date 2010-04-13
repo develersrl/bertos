@@ -42,7 +42,7 @@
 #include <cpu/attr.h> /* PAUSE */
 #include <cpu/irq.h> /* IRQ_DISABLE */
 #include <cpu/types.h>
-#include <drv/irq_lm3s.h>
+#include <drv/irq_cm3.h>
 #include <drv/clock_lm3s.h>
 #include <io/lm3s.h>
 #include "switch_ctx_cm3.h"
