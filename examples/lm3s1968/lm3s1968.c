@@ -116,7 +116,7 @@ static void NORETURN ser_process(void)
 	char buf[32];
 	int i;
 
-	ser_init(&ser_port, SER_UART1);
+	ser_init(&ser_port, SER_UART0);
 	ser_setbaudrate(&ser_port, 115200);
 
 	/* BeRTOS terminal */
