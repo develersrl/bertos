@@ -54,10 +54,11 @@ __vectors:
         ldr     pc, _swi             /* Software interrupt */
         ldr     pc, _prefetch_abort  /* Prefetch abort */
         ldr     pc, _data_abort      /* Data abort */
-        .word	0xb9205f88           /* In LPX2xxx, this location holds the checksum of the previous vectors */
 #if CPU_ARM_LPC2378
+        .word	0xb9206e58           /* In LPX2xxx, this location holds the checksum of the previous vectors */
         ldr     pc, [pc, #-0x120]    /* Use VIC */
 #else
+        .word	0xb9205f88           /* In LPX2xxx, this location holds the checksum of the previous vectors */
 	#warning Check correct VICAddress register for this CPU, default set to 0xFFFFF030
         ldr     pc, [pc, #-0xFF0]    /* Use VIC */
 #endif
