@@ -37,6 +37,7 @@
 
 #include <cpu/irq.h>
 #include <drv/timer.h>
+#include <drv/ser.h>
 #include <gfx/gfx.h>
 #include <gfx/font.h>
 #include <gfx/text.h>
@@ -48,21 +49,25 @@
 
 #include "hw/hw_lcd.h"
 
-#define PROC_STACK_SIZE	KERN_MINSTACKSIZE * 2
+#define PROC_STACK_SIZE	KERN_MINSTACKSIZE
 
 #if CONFIG_KERN_HEAP
 #define hp_stack NULL
 #define lp_stack NULL
+#define ser_stack NULL
+#define led_stack NULL
 #else
 static PROC_DEFINE_STACK(hp_stack, PROC_STACK_SIZE);
 static PROC_DEFINE_STACK(lp_stack, PROC_STACK_SIZE);
+static PROC_DEFINE_STACK(ser_stack, PROC_STACK_SIZE);
+static PROC_DEFINE_STACK(led_stack, PROC_STACK_SIZE);
 #endif
 
 static Process *hp_proc, *lp_proc, *res_proc;
 
 static hptime_t start, end;
 
-static uint8_t raster[RAST_SIZE(128, 96)];
+static uint8_t raster[RAST_SIZE(LCD_WIDTH, LCD_HEIGHT)];
 static Bitmap bm;
 
 extern Font font_helvB10;
@@ -91,6 +96,20 @@ INLINE void led_off(void)
 	GPIO_PORTG_DATA_R &= ~0x04;
 }
 
+static void NORETURN led_process(void)
+{
+	int i;
+
+	for (i = 0; ; i++)
+	{
+		if (i & 1)
+			led_on();
+		else
+			led_off();
+		timer_delay(50);
+	}
+}
+
 INLINE hptime_t get_hp_ticks(void)
 {
 	return (TIMER_HW_CNT - timer_hw_hpread()) +
@@ -100,14 +119,13 @@ INLINE hptime_t get_hp_ticks(void)
 static void NORETURN res_process(void)
 {
 	const char spinner[] = {'/', '-', '\\', '|'};
-	char buffer[256], c;
+	char buffer[32], c;
 	int i;
 
 	for (i = 0; ; i++)
 	{
 		ticks_t clock;
 
-		sig_wait(SIG_USER0);
 		clock = timer_clock_unlocked();
 
 		/* Display uptime (in ticks) */
@@ -135,12 +153,6 @@ static void NORETURN res_process(void)
 				((end - start) * (100000000 / CPU_FREQ)) % 100);
 		text_xprintf(&bm, 7, 0, TEXT_FILL, buffer);
 		rit128x96_lcd_blitBitmap(&bm);
-
-		/* Blink the status LED and restart the test */
-		led_off();
-		timer_delay(100);
-		led_on();
-		sig_send(lp_proc, SIG_USER0);
 	}
 }
 
@@ -150,7 +162,8 @@ static void NORETURN hp_process(void)
 	{
 		sig_wait(SIG_USER0);
 		end = get_hp_ticks();
-		sig_send(res_proc, SIG_USER0);
+		timer_delay(100);
+		sig_send(lp_proc, SIG_USER0);
 	}
 }
 
@@ -201,6 +214,24 @@ static void bouncing_logo(Bitmap *bm)
 	}
 }
 
+static void NORETURN ser_process(void)
+{
+	char buf[32];
+	Serial ser_port;
+	int i;
+
+	ser_init(&ser_port, SER_UART0);
+	ser_setbaudrate(&ser_port, 115200);
+
+	/* BeRTOS terminal */
+	for (i = 0; ; i++)
+	{
+		kfile_printf(&ser_port.fd, "\n\r[%03d] BeRTOS:~$ ", i);
+		kfile_gets_echo(&ser_port.fd, buf, sizeof(buf), true);
+		kfile_printf(&ser_port.fd, "%s", buf);
+	}
+}
+
 int main(void)
 {
 	char buffer[32];
@@ -221,6 +252,7 @@ int main(void)
 	rit128x96_lcd_init();
 	gfx_bitmapInit(&bm, raster, LCD_WIDTH, LCD_HEIGHT);
 	gfx_setFont(&bm, &font_helvB10);
+	rit128x96_lcd_blitBitmap(&bm);
 	kputs("Done.\n");
 
 	bouncing_logo(&bm);
@@ -239,6 +271,8 @@ int main(void)
 
 	hp_proc = proc_new(hp_process, NULL, PROC_STACK_SIZE, hp_stack);
 	lp_proc = proc_new(lp_process, NULL, PROC_STACK_SIZE, lp_stack);
+	proc_new(led_process, NULL, PROC_STACK_SIZE, led_stack);
+	proc_new(ser_process, NULL, PROC_STACK_SIZE, ser_stack);
 
 	res_proc = proc_current();
 

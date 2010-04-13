@@ -33,7 +33,9 @@ lm3s1968_CSRC = \
 	bertos/mware/event.c \
 	bertos/struct/heap.c \
 	bertos/drv/timer.c \
+	bertos/drv/ser.c \
 	bertos/drv/lcd_rit128x96.c \
+	bertos/kern/kfile.c \
 	bertos/kern/monitor.c \
 	bertos/kern/proc_test.c \
 	bertos/kern/proc.c \
@@ -43,6 +45,7 @@ lm3s1968_CSRC = \
 	bertos/cpu/cortex-m3/drv/gpio_lm3s.c \
 	bertos/cpu/cortex-m3/drv/timer_lm3s.c \
 	bertos/cpu/cortex-m3/drv/clock_lm3s.c \
+	bertos/cpu/cortex-m3/drv/ser_lm3s.c \
 	bertos/cpu/cortex-m3/drv/kdebug_lm3s.c \
 	bertos/cpu/cortex-m3/drv/ssi_lm3s.c \
 	bertos/cpu/cortex-m3/drv/irq_cm3.c \
