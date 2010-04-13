@@ -64,14 +64,14 @@ static PROC_DEFINE_STACK(ser_stack, PROC_STACK_SIZE);
 static PROC_DEFINE_STACK(led_stack, PROC_STACK_SIZE);
 #endif
 
-static Process *hp_proc, *lp_proc, *res_proc;
-
-static hptime_t start, end;
-
+extern Font font_helvB10;
 static uint8_t raster[RAST_SIZE(LCD_WIDTH, LCD_HEIGHT)];
 static Bitmap bm;
 
-extern Font font_helvB10;
+static Process *hp_proc, *lp_proc, *res_proc;
+static hptime_t start, end;
+
+static Serial ser_port;
 
 static void led_init(void)
 {
@@ -108,6 +108,23 @@ static void NORETURN led_process(void)
 		else
 			led_off();
 		timer_delay(50);
+	}
+}
+
+static void NORETURN ser_process(void)
+{
+	char buf[32];
+	int i;
+
+	ser_init(&ser_port, SER_UART1);
+	ser_setbaudrate(&ser_port, 115200);
+
+	/* BeRTOS terminal */
+	for (i = 0; ; i++)
+	{
+		kfile_printf(&ser_port.fd, "\n\r[%03d] BeRTOS:~$ ", i);
+		kfile_gets_echo(&ser_port.fd, buf, sizeof(buf), true);
+		kfile_printf(&ser_port.fd, "%s", buf);
 	}
 }
 
@@ -212,24 +229,6 @@ static void bouncing_logo(Bitmap *bm)
 			&bertos_logo);
 		rit128x96_lcd_blitBitmap(bm);
 		timer_delay(5);
-	}
-}
-
-static void NORETURN ser_process(void)
-{
-	char buf[32];
-	Serial ser_port;
-	int i;
-
-	ser_init(&ser_port, SER_UART0);
-	ser_setbaudrate(&ser_port, 115200);
-
-	/* BeRTOS terminal */
-	for (i = 0; ; i++)
-	{
-		kfile_printf(&ser_port.fd, "\n\r[%03d] BeRTOS:~$ ", i);
-		kfile_gets_echo(&ser_port.fd, buf, sizeof(buf), true);
-		kfile_printf(&ser_port.fd, "%s", buf);
 	}
 }
 
