@@ -76,6 +76,22 @@
  */
 #define CONFIG_UART1_RXBUFSIZE  32
 
+/**
+ * Size of the outbound FIFO buffer for port 2 [bytes].
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 2
+ * $WIZ$ supports = "lm3s"
+ */
+#define CONFIG_UART2_TXBUFSIZE  32
+
+/**
+ * Size of the inbound FIFO buffer for port 2 [bytes].
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 2
+ * $WIZ$ supports = "lm3s"
+ */
+#define CONFIG_UART2_RXBUFSIZE  32
+
 
 /**
  * Size of the outbound FIFO buffer for SPI port [bytes].

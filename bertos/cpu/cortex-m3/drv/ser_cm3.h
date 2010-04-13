@@ -30,50 +30,16 @@
  *
  * -->
  *
- * \brief LM3S debug support (implementation).
+ * \brief Low-level serial module for Cortex-M3 (interface).
  *
  * \author Andrea Righi <arighi@develer.com>
  */
 
-#include <cfg/cfg_debug.h>
-#include <cfg/macros.h> /* for BV() */
-#include <drv/clock_lm3s.h> /* lm3s_busyWait() */
-#include <drv/gpio_lm3s.h>
-#include <io/lm3s.h>
-#include <drv/ser_lm3s.h>
-#include "kdebug_lm3s.h"
+#include <cpu/detect.h>
 
-#if CONFIG_KDEBUG_PORT == KDEBUG_PORT_DBGU
-
-#if CONFIG_KDEBUG_PORT == 0
-	#define UART_BASE UART0_BASE
-#elif CONFIG_KDEBUG_PORT == 1
-	#define UART_BASE UART1_BASE
-#elif CONFIG_KDEBUG_PORT == 2
-	#define UART_BASE UART2_BASE
+#if CPU_CM3_LM3S
+	#include "ser_lm3s.h"
+/*#elif  Add other Cortex-M3 CPUs here */
 #else
-	#error "UART port not supported in this board"
+	#error Unknown CPU
 #endif
-
-#define KDBG_WAIT_READY()     while (!lm3s_uartReady(UART_BASE)) {}
-#define KDBG_WAIT_TXDONE()    while (!lm3s_uartTxDone(UART_BASE)) {}
-
-#define KDBG_WRITE_CHAR(c)    do { lm3s_uartPutCharNonBlocking(UART_BASE, c); } while(0)
-
-/* Debug unit is used only for debug purposes so does not generate interrupts. */
-#define KDBG_MASK_IRQ(old)    do { (void)old; } while(0)
-
-/* Debug unit is used only for debug purposes so does not generate interrupts. */
-#define KDBG_RESTORE_IRQ(old) do { (void)old; } while(0)
-
-typedef uint32_t kdbg_irqsave_t;
-
-#else
-#error CONFIG_KDEBUG_PORT should be KDEBUG_PORT_DBGU
-#endif
-
-INLINE void kdbg_hw_init(void)
-{
-	/* Initialize UART0 */
-	lm3s_uartInit(CONFIG_KDEBUG_PORT);
-}
