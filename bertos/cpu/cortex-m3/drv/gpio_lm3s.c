@@ -43,21 +43,23 @@
 /* Set the pin(s) direction and mode */
 INLINE int lm3s_gpioPinConfigMode(uint32_t port, uint8_t pins, uint32_t mode)
 {
-	switch (mode)
+	if (mode == GPIO_DIR_MODE_IN)
 	{
-	case GPIO_DIR_MODE_IN:
 		HWREG(port + GPIO_O_DIR)   &= ~pins;
 		HWREG(port + GPIO_O_AFSEL) &= ~pins;
-		break;
-	case GPIO_DIR_MODE_OUT:
+	}
+	else if (mode == GPIO_DIR_MODE_OUT)
+	{
 		HWREG(port + GPIO_O_DIR)   |= pins;
 		HWREG(port + GPIO_O_AFSEL) &= ~pins;
-		break;
-	case GPIO_DIR_MODE_HW:
+	}
+	else if (mode == GPIO_DIR_MODE_HW)
+	{
 		HWREG(port + GPIO_O_DIR)   &= ~pins;
 		HWREG(port + GPIO_O_AFSEL) |= pins;
-		break;
-	default:
+	}
+	else
+	{
 		ASSERT(0);
 		return -1;
 	}
@@ -68,33 +70,36 @@ INLINE int lm3s_gpioPinConfigMode(uint32_t port, uint8_t pins, uint32_t mode)
 INLINE int
 lm3s_gpioPinConfigStrength(uint32_t port, uint8_t pins, uint32_t strength)
 {
-	switch (strength)
+	if (strength == GPIO_STRENGTH_2MA)
 	{
-	case GPIO_STRENGTH_2MA:
 		HWREG(port + GPIO_O_DR2R) |= pins;
 		HWREG(port + GPIO_O_DR4R) &= ~pins;
 		HWREG(port + GPIO_O_DR8R) &= ~pins;
 		HWREG(port + GPIO_O_SLR)  &= ~pins;
-		break;
-	case GPIO_STRENGTH_4MA:
+	}
+	else if (strength == GPIO_STRENGTH_4MA)
+	{
 		HWREG(port + GPIO_O_DR2R) &= ~pins;
 		HWREG(port + GPIO_O_DR4R) |= pins;
 		HWREG(port + GPIO_O_DR8R) &= ~pins;
 		HWREG(port + GPIO_O_SLR)  &= ~pins;
-		break;
-	case GPIO_STRENGTH_8MA:
+	}
+	else if (strength == GPIO_STRENGTH_8MA)
+	{
 		HWREG(port + GPIO_O_DR2R) &= ~pins;
 		HWREG(port + GPIO_O_DR4R) &= ~pins;
 		HWREG(port + GPIO_O_DR8R) |= pins;
 		HWREG(port + GPIO_O_SLR)  &= ~pins;
-		break;
-	case GPIO_STRENGTH_8MA_SC:
+	}
+	else if (strength == GPIO_STRENGTH_8MA_SC)
+	{
 		HWREG(port + GPIO_O_DR2R) &= ~pins;
 		HWREG(port + GPIO_O_DR4R) &= ~pins;
 		HWREG(port + GPIO_O_DR8R) |= pins;
 		HWREG(port + GPIO_O_SLR)  |= pins;
-		break;
-	default:
+	}
+	else
+	{
 		ASSERT(0);
 		return -1;
 	}
@@ -104,58 +109,64 @@ lm3s_gpioPinConfigStrength(uint32_t port, uint8_t pins, uint32_t strength)
 /* Set the pin(s) type */
 INLINE int lm3s_gpioPinConfigType(uint32_t port, uint8_t pins, uint32_t type)
 {
-	switch (type)
+	if (type == GPIO_PIN_TYPE_STD)
 	{
-	case GPIO_PIN_TYPE_ANALOG:
-		HWREG(port + GPIO_O_ODR)   &= ~pins;
-		HWREG(port + GPIO_O_PUR)   &= ~pins;
-		HWREG(port + GPIO_O_PDR)   &= ~pins;
-		HWREG(port + GPIO_O_DEN)   &= ~pins;
-		HWREG(port + GPIO_O_AMSEL) |= pins;
-		break;
-	case GPIO_PIN_TYPE_STD:
 		HWREG(port + GPIO_O_ODR)   &= ~pins;
 		HWREG(port + GPIO_O_PUR)   &= ~pins;
 		HWREG(port + GPIO_O_PDR)   &= ~pins;
 		HWREG(port + GPIO_O_DEN)   |= pins;
 		HWREG(port + GPIO_O_AMSEL) &= ~pins;
-		break;
-	case GPIO_PIN_TYPE_STD_WPU:
+	}
+	else if (type == GPIO_PIN_TYPE_STD_WPU)
+	{
 		HWREG(port + GPIO_O_ODR)   &= ~pins;
 		HWREG(port + GPIO_O_PUR)   |= pins;
 		HWREG(port + GPIO_O_PDR)   &= ~pins;
 		HWREG(port + GPIO_O_DEN)   |= pins;
 		HWREG(port + GPIO_O_AMSEL) &= ~pins;
-		break;
-	case GPIO_PIN_TYPE_STD_WPD:
+	}
+	else if (type == GPIO_PIN_TYPE_STD_WPD)
+	{
 		HWREG(port + GPIO_O_ODR)   &= ~pins;
 		HWREG(port + GPIO_O_PUR)   &= ~pins;
 		HWREG(port + GPIO_O_PDR)   |= pins;
 		HWREG(port + GPIO_O_DEN)   |= pins;
 		HWREG(port + GPIO_O_AMSEL) &= ~pins;
-		break;
-	case GPIO_PIN_TYPE_OD:
+	}
+	else if (type == GPIO_PIN_TYPE_OD)
+	{
 		HWREG(port + GPIO_O_ODR)   |= pins;
 		HWREG(port + GPIO_O_PUR)   &= ~pins;
 		HWREG(port + GPIO_O_PDR)   &= ~pins;
 		HWREG(port + GPIO_O_DEN)   |= pins;
 		HWREG(port + GPIO_O_AMSEL) &= ~pins;
-		break;
-	case GPIO_PIN_TYPE_OD_WPU:
+	}
+	else if (type == GPIO_PIN_TYPE_OD_WPU)
+	{
 		HWREG(port + GPIO_O_ODR)   |= pins;
 		HWREG(port + GPIO_O_PUR)   |= pins;
 		HWREG(port + GPIO_O_PDR)   &= ~pins;
 		HWREG(port + GPIO_O_DEN)   |= pins;
 		HWREG(port + GPIO_O_AMSEL) &= ~pins;
-		break;
-	case GPIO_PIN_TYPE_OD_WPD:
+	}
+	else if (type == GPIO_PIN_TYPE_OD_WPD)
+	{
 		HWREG(port + GPIO_O_ODR)   |= pins;
 		HWREG(port + GPIO_O_PUR)   &= pins;
 		HWREG(port + GPIO_O_PDR)   |= pins;
 		HWREG(port + GPIO_O_DEN)   |= pins;
 		HWREG(port + GPIO_O_AMSEL) &= ~pins;
-		break;
-	default:
+	}
+	else if (type == GPIO_PIN_TYPE_ANALOG)
+	{
+		HWREG(port + GPIO_O_ODR)   &= ~pins;
+		HWREG(port + GPIO_O_PUR)   &= ~pins;
+		HWREG(port + GPIO_O_PDR)   &= ~pins;
+		HWREG(port + GPIO_O_DEN)   &= ~pins;
+		HWREG(port + GPIO_O_AMSEL) |= pins;
+	}
+	else
+	{
 		ASSERT(0);
 		return -1;
 	}
