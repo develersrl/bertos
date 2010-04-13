@@ -151,6 +151,7 @@
 	#if CONFIG_KERN_PREEMPT
 
 		#define DECLARE_ISR_CONTEXT_SWITCH(func)		\
+		void func(void);					\
 		INLINE void __isr_##func(void);				\
 		void func(void)						\
 		{							\
