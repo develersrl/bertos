@@ -30,7 +30,7 @@
  *
  * -->
  *
- * \brief Low-level timer driver for LM3S1968.
+ * \brief Low-level timer driver (SysTick) for LM3S1968.
  *
  * \author Andrea Righi <arighi@develer.com>
  */

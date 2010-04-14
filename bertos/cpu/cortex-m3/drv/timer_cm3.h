@@ -30,9 +30,9 @@
  *
  * -->
  *
- * \author Francesco Sacchi <batt@develer.com>
+ * \author Andrea Righi <arighi@develer.com>
  *
- * \brief Low-level timer module for Cortex-M3 (interface).
+ * \brief Low-level timer driver (SysTick) for Cortex-M3.
  */
 
 #include <cpu/detect.h>

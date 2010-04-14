@@ -43,11 +43,11 @@ lm3s1968_CSRC = \
 	bertos/kern/preempt.c \
 	bertos/kern/signal.c \
 	bertos/cpu/cortex-m3/drv/gpio_lm3s.c \
-	bertos/cpu/cortex-m3/drv/timer_lm3s.c \
 	bertos/cpu/cortex-m3/drv/clock_lm3s.c \
 	bertos/cpu/cortex-m3/drv/ser_lm3s.c \
 	bertos/cpu/cortex-m3/drv/kdebug_lm3s.c \
 	bertos/cpu/cortex-m3/drv/ssi_lm3s.c \
+	bertos/cpu/cortex-m3/drv/timer_cm3.c \
 	bertos/cpu/cortex-m3/drv/irq_cm3.c \
 	bertos/cpu/cortex-m3/hw/switch_ctx_cm3.c \
 	bertos/cpu/cortex-m3/hw/init_lm3s.c
@@ -70,7 +70,7 @@ lm3s1968_PROGRAMMER_CPU = lm3s1968
 lm3s1968_PROGRAMMER_TYPE = lm3s1968
 lm3s1968_FLASH_SCRIPT = bertos/prg_scripts/arm/flash-cortex.sh
 lm3s1968_STOPFLASH_SCRIPT = bertos/prg_scripts/arm/stopopenocd.sh
-lm3s1968_DEBUG_SCRIPT = bertos/prg_scripts/arm/debug.sh
+lm3s1968_DEBUG_SCRIPT = bertos/prg_scripts/arm/debug-cortex.sh
 lm3s1968_STOPDEBUG_SCRIPT = bertos/prg_scripts/arm/stopopenocd.sh
 
 ifeq ($(lm3s1968_DEBUG),0)

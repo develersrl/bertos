@@ -30,16 +30,15 @@
  *
  * -->
  *
- * \brief Low-level timer driver for LM3S1968.
+ * \brief Low-level timer driver (SysTick) for LM3S1968.
  *
  * \author Andrea Righi <arighi@develer.com>
  */
 
 #include <cfg/debug.h>
 #include <cpu/irq.h>
-#include <io/lm3s.h>
 #include <drv/irq_cm3.h>
-#include "timer_lm3s.h"
+#include "timer_cm3.h"
 
 INLINE void timer_hw_setPeriod(unsigned long period)
 {
