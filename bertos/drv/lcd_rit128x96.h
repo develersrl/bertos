@@ -31,6 +31,9 @@
  * -->
  *
  * \brief OLED-RIT-128x96 (P14201) graphic display driver
+ *
+ * $WIZ$ module_name = "lcd_rit128x96"
+ * $WIZ$ module_hw = "bertos/hw/hw_rit128x96.h"
  */
 
 #ifndef LCD_LM3S_H
