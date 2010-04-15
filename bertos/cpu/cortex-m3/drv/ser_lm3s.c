@@ -58,6 +58,35 @@ struct CM3Serial
 /* Forward declaration */
 static struct CM3Serial UARTDesc[SER_CNT];
 
+/* GPIO descriptor for UART pins */
+struct gpio_uart_info
+{
+	/* GPIO base address register */
+	uint32_t base;
+	/* Pin(s) bitmask */
+	uint8_t pins;
+};
+
+/* Table to retrieve GPIO pins configuration to work as UART pins */
+static const struct gpio_uart_info gpio_uart[SER_CNT] =
+{
+	/* UART0 */
+	{
+		.base = GPIO_PORTA_BASE,
+		.pins = BV(1) | BV(0),
+	},
+	/* UART1 */
+	{
+		.base = GPIO_PORTD_BASE,
+		.pins = BV(3) | BV(2),
+	},
+	/* UART2 */
+	{
+		.base = GPIO_PORTG_BASE,
+		.pins = BV(1) | BV(0),
+	},
+};
+
 /* Clear the flags register */
 INLINE void lm3s_uartClear(uint32_t base)
 {
@@ -127,8 +156,8 @@ void lm3s_uartInit(int port)
 	SYSCTL_RCGC2_R |= SYSCTL_RCGC2_GPIOA;
 	lm3s_busyWait(512);
 
-	/* Set GPIO A0 and A1 as UART pins */
-	lm3s_gpioPinConfig(GPIO_PORTA_BASE, BV(0) | BV(1),
+	/* Configure GPIO pins to work as UART pins */
+	lm3s_gpioPinConfig(gpio_uart[port].base, gpio_uart[port].pins,
 			GPIO_DIR_MODE_HW, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD);
 
 	/* Set serial param: 115.200 bps, no parity */
