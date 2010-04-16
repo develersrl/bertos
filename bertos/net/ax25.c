@@ -54,7 +54,8 @@
 #define DECODE_CALL(buf, addr) \
 	for (unsigned i = 0; i < sizeof((addr)); i++) \
 	{ \
-		(addr)[i] = *(buf)++ >> 1; \
+		char c = (*(buf)++ >> 1); \
+		(addr)[i] = (c == ' ') ? '\x0' : c; \
 	}
 
 static void ax25_decode(AX25Ctx *ctx)
@@ -256,6 +257,36 @@ void ax25_sendVia(AX25Ctx *ctx, const AX25Call *path, size_t path_len, const voi
 	ASSERT(ctx->crc_out == AX25_CRC_CORRECT);
 
 	kfile_putc(HDLC_FLAG, ctx->ch);
+}
+
+static void print_call(KFile *ch, const AX25Call *call)
+{
+	kfile_printf(ch, "%.6s", call->call);
+	if (call->ssid)
+		kfile_printf(ch, "-%d", call->ssid);
+}
+	
+/**
+ * Print a AX25 message in TNC-2 packet monitor format.
+ * \param ch a kfile channel where the message will be printed.
+ * \param msg the message to be printed.
+ */
+void ax25_print(KFile *ch, const AX25Msg *msg)
+{
+	print_call(ch, &msg->src);
+	kfile_putc('>', ch);
+	print_call(ch, &msg->dst);	
+	
+	#if CONFIG_AX25_RPT_LST
+	for (int i = 0; i < msg->rpt_cnt; i++)
+	{
+		kfile_putc(',', ch);
+		print_call(ch, &msg->rpt_lst[i]);
+		// TODO: add * to the trasmitting digi
+	}
+	#endif
+
+	kfile_printf(ch, ":%.*s\n", msg->len, msg->info);
 }
 
 

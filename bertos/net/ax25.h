@@ -179,6 +179,8 @@ void ax25_sendVia(AX25Ctx *ctx, const AX25Call *path, size_t path_len, const voi
 #define ax25_send(ctx, dst, src, buf, len) ax25_sendVia(ctx, ({static AX25Call __path[]={dst, src}; __path;}), 2, buf, len)
 void ax25_init(AX25Ctx *ctx, KFile *channel, ax25_callback_t hook);
 
+void ax25_print(KFile *ch, const AX25Msg *msg);
+
 int ax25_testSetup(void);
 int ax25_testTearDown(void);
 int ax25_testRun(void);

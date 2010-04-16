@@ -41,12 +41,14 @@
 #include <struct/kfile_mem.h>
 
 #include <cfg/debug.h>
+#include <cfg/kfile_debug.h>
 #include <cfg/test.h>
 
 #include <string.h> //strncmp
 
 static AX25Ctx ax25;
 static KFileMem mem;
+static KFileDebug dbg;
 
 #define APRS_MSG \
 	0x3D, 0x34, 0x36, 0x30, 0x33, 0x2E, 0x36, 0x33, \
@@ -73,8 +75,9 @@ uint8_t aprs_packet_check[256];
 
 static void msg_callback(AX25Msg *msg)
 {
-	ASSERT(strncmp(msg->dst.call, "APRS  ", 6) == 0);
-	ASSERT(strncmp(msg->src.call, "S57LN ", 6) == 0);
+	ax25_print(&dbg.fd, msg);
+	ASSERT(strncmp(msg->dst.call, "APRS\x0\x0", 6) == 0);
+	ASSERT(strncmp(msg->src.call, "S57LN\x0", 6) == 0);
 	ASSERT(msg->src.ssid == 0);
 	ASSERT(msg->dst.ssid == 0);
 	ASSERT(msg->ctrl == AX25_CTRL_UI);
@@ -86,6 +89,7 @@ static void msg_callback(AX25Msg *msg)
 int ax25_testSetup(void)
 {
 	kdbg_init();
+	kfiledebug_init(&dbg);
 	kfilemem_init(&mem, aprs_packet, sizeof(aprs_packet));
 	kfilemem_init(&mem1, aprs_packet_check, sizeof(aprs_packet_check));
 	ax25_init(&ax25, &mem.fd, msg_callback);

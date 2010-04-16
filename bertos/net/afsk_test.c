@@ -51,6 +51,7 @@
 
 #include <cfg/test.h>
 #include <cfg/debug.h>
+#include <cfg/kfile_debug.h>
 
 #include <cpu/byteorder.h>
 
@@ -63,11 +64,13 @@ uint32_t data_size;
 uint32_t data_written;
 Afsk afsk_fd;
 AX25Ctx ax25;
+KFileDebug dbg;
 
 int msg_cnt;
-static void message_hook(UNUSED_ARG(struct AX25Msg *, msg))
+static void message_hook(struct AX25Msg *msg)
 {
 	msg_cnt++;
+	ax25_print(&dbg.fd, msg);
 }
 
 static FILE *afsk_fileOpen(const char *name)
@@ -126,6 +129,7 @@ static FILE *afsk_fileOpen(const char *name)
 int afsk_testSetup(void)
 {
 	kdbg_init();
+	kfiledebug_init(&dbg);
 	fp_adc = afsk_fileOpen("test/afsk_test.au");
 	#if CPU_AVR
 		#warning TODO: open the file?

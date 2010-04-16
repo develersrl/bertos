@@ -61,6 +61,7 @@ SRC_LIST="
 	bertos/net/afsk.c
 	bertos/net/nmeap/src/nmeap01.c
 	bertos/net/nmea.c
+	bertos/cfg/kfile_debug.c
 "
 
 buildout='/dev/null'
