@@ -59,6 +59,15 @@ void coop_yield(void);
 void coop_switch(void);
 void coop_wakeup(Process *proc);
 
+static void coop_switchTo(Process *proc)
+{
+	Process *old_process = current_process;
+
+	SCHED_ENQUEUE(current_process);
+	current_process = proc;
+	proc_switchTo(current_process, old_process);
+}
+
 /**
  * Give the control of the CPU to another process.
  *
@@ -82,13 +91,7 @@ void coop_wakeup(Process *proc)
 	IRQ_ASSERT_DISABLED();
 
 	if (prio_proc(proc) >= prio_curr())
-	{
-		Process *old_process = current_process;
-
-		SCHED_ENQUEUE(current_process);
-		current_process = proc;
-		proc_switchTo(current_process, old_process);
-	}
+		coop_switchTo(proc);
 	else
 		SCHED_ENQUEUE_HEAD(proc);
 }
@@ -98,6 +101,11 @@ void coop_wakeup(Process *proc)
  */
 void coop_yield(void)
 {
-	ATOMIC(SCHED_ENQUEUE(current_process));
-	coop_switch();
+	Process *proc;
+
+	IRQ_DISABLE;
+	proc = (struct Process *)list_remHead(&proc_ready_list);
+	if (proc)
+		coop_switchTo(proc);
+	IRQ_ENABLE;
 }

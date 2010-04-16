@@ -124,6 +124,16 @@ void preempt_switch(void);
 void preempt_wakeup(Process *proc);
 void preempt_init(void);
 
+static void preempt_switchTo(Process *proc)
+{
+	Process *old_process = current_process;
+
+	SCHED_ENQUEUE(current_process);
+	_proc_quantum = CONFIG_KERN_QUANTUM;
+	current_process = proc;
+	proc_switchTo(current_process, old_process);
+}
+
 /**
  * Call the scheduler and eventually replace the current running process.
  */
@@ -188,14 +198,7 @@ void preempt_wakeup(Process *proc)
 	IRQ_ASSERT_DISABLED();
 
 	if (prio_proc(proc) >= prio_curr())
-	{
-		Process *old_process = current_process;
-
-		SCHED_ENQUEUE(current_process);
-		_proc_quantum = CONFIG_KERN_QUANTUM;
-		current_process = proc;
-		proc_switchTo(current_process, old_process);
-	}
+		preempt_switchTo(proc);
 	else
 		SCHED_ENQUEUE_HEAD(proc);
 }
@@ -205,6 +208,8 @@ void preempt_wakeup(Process *proc)
  */
 void preempt_yield(void)
 {
+	Process *proc;
+
 	/*
 	 * Voluntary preemption while preemption is disabled is considered
 	 * illegal, as not very useful in practice.
@@ -214,10 +219,11 @@ void preempt_yield(void)
 	ASSERT(proc_preemptAllowed());
 	IRQ_ASSERT_ENABLED();
 
-	ATOMIC(
-		SCHED_ENQUEUE(current_process);
-		preempt_schedule();
-	);
+	IRQ_DISABLE;
+	proc = (struct Process *)list_remHead(&proc_ready_list);
+	if (proc)
+		preempt_switchTo(proc);
+	IRQ_ENABLE;
 }
 
 void preempt_init(void)
