@@ -59,7 +59,9 @@ __vectors:
         ldr     pc, [pc, #-0x120]    /* Use VIC */
 #else
         .word	0xb9205f88           /* In LPX2xxx, this location holds the checksum of the previous vectors */
-	#warning Check correct VICAddress register for this CPU, default set to 0xFFFFF030
+	#if CPU_ARM_LPC2
+		#warning Check correct VICAddress register for this CPU, default set to 0xFFFFF030
+	#endif
         ldr     pc, [pc, #-0xFF0]    /* Use VIC */
 #endif
         ldr     pc, _fiq	     /* Fast interrupt request */
