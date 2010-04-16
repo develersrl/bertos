@@ -96,11 +96,11 @@ typedef struct AX25Call
 } AX25Call;
 
 /**
- * Create an AX25Call structure on the fly and return its pointer.
+ * Create an AX25Call structure on the fly.
  * \param str callsign, can be 6 characters or shorter.
  * \param id  ssid associated with the callsign.
  */
-#define AX25_CALL(str, id) ({ static const AX25Call _call = { .call = (str), .ssid = (id) }; &_call; })
+#define AX25_CALL(str, id) {.call = (str), .ssid = (id) }
 
 /**
  * Maximum number of Repeaters in a AX25 message.
@@ -141,9 +141,42 @@ typedef struct AX25Msg
 /* \} */
 
 
+/**
+ * Declare an AX25 path.
+ * \param dst the destination callsign for the path, \see AX25_CALL
+ *        for a handy way to create a callsign on the fly.
+ * \param src the source callsign for the path, \see AX25_CALL
+ *        for a handy way to create a callsign on the fly.
+ *
+ * Additional optional callsigns can be specified at the end of this macro
+ * in order to add repeater callsigns or specific unproto paths.
+ *
+ * This macro can be used to simply path array declaration.
+ * Should be used in this way:
+ * \code
+ * AX25Call path[] = AX25_PATH(AX25_CALL("abcdef", 0), AX25_CALL("ghjklm", 0), AX25_CALL("wide1", 1), AX25_CALL("wide2", 2));
+ * \endcode
+ *
+ * The declared path can then be passed to ax25_sendVia().
+ */
+#define AX25_PATH(dst, src, ...) { dst, src, ## __VA_ARGS__ }
 
 void ax25_poll(AX25Ctx *ctx);
-void ax25_send(AX25Ctx *ctx, const AX25Call *dst, const AX25Call *src, const void *_buf, size_t len);
+void ax25_sendVia(AX25Ctx *ctx, const AX25Call *path, size_t path_len, const void *_buf, size_t len);
+
+/**
+ * Send an AX25 frame on the channel.
+ * \param ctx AX25 context to operate on.
+ * \param dst the destination callsign for the frame, \see AX25_CALL
+ *        for a handy way to create a callsign on the fly.
+ * \param src the source callsign for the frame, \see AX25_CALL
+ *        for a handy way to create a callsign on the fly.
+ * \param buf payload buffer.
+ * \param len length of the payload.
+ *
+ * \see ax25_sendVia() if you want to send a frame with a specific path.
+ */
+#define ax25_send(ctx, dst, src, buf, len) ax25_sendVia(ctx, ({static AX25Call __path[]={dst, src}; __path;}), 2, buf, len)
 void ax25_init(AX25Ctx *ctx, KFile *channel, ax25_callback_t hook);
 
 int ax25_testSetup(void);

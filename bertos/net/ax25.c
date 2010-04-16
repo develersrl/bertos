@@ -193,7 +193,7 @@ static void ax25_putchar(AX25Ctx *ctx, uint8_t c)
 	kfile_putc(c, ctx->ch);
 }
 
-static void ax25_sendCall(AX25Ctx *ctx, const AX25Call *addr)
+static void ax25_sendCall(AX25Ctx *ctx, const AX25Call *addr, bool last)
 {
 	unsigned len = MIN(sizeof(addr->call), strlen(addr->call));
 
@@ -209,30 +209,35 @@ static void ax25_sendCall(AX25Ctx *ctx, const AX25Call *addr)
 	if (len < sizeof(addr->call))
 		for (unsigned i = 0; i < sizeof(addr->call) - len; i++)
 			ax25_putchar(ctx, ' ' << 1);
+
+	/* The bit0 of last call SSID should be set to 1 */
+	uint8_t ssid = addr->ssid << 1 | (last ? 0x01 : 0);
+	ax25_putchar(ctx, ssid);
 }
 
 /**
- * Send an AX25 frame on the channel.
+ * Send an AX25 frame on the channel through a specific path.
  * \param ctx AX25 context to operate on.
- * \param dst the destination callsign for the frame, \see AX25_CALL
- *        for a handy way to create a callsign on the fly.
- * \param src the source callsign for the frame, \see AX25_CALL
- *        for a handy way to create a callsign on the fly.
+ * \param path An array of callsigns used as path, \see AX25_PATH for
+ *        an handy way to create a path.
+ * \param path_len callsigns path lenght.
  * \param _buf payload buffer.
  * \param len length of the payload.
  */
-void ax25_send(AX25Ctx *ctx, const AX25Call *dst, const AX25Call *src, const void *_buf, size_t len)
+void ax25_sendVia(AX25Ctx *ctx, const AX25Call *path, size_t path_len, const void *_buf, size_t len)
 {
 	const uint8_t *buf = (const uint8_t *)_buf;
+	ASSERT(path);
+	ASSERT(path_len >= 2);
 
 	ctx->crc_out = CRC_CCITT_INIT_VAL;
 	kfile_putc(HDLC_FLAG, ctx->ch);
 
-	ax25_sendCall(ctx, dst);
-	ax25_putchar(ctx, dst->ssid << 1);
 
-	ax25_sendCall(ctx, src);
-	ax25_putchar(ctx, (src->ssid << 1) | 0x01);
+	/* Send call */
+	for (size_t i = 0; i < path_len; i++)
+		ax25_sendCall(ctx, &path[i], (i == path_len - 1));
+
 	ax25_putchar(ctx, AX25_CTRL_UI);
 	ax25_putchar(ctx, AX25_PID_NOLAYER3);
 
