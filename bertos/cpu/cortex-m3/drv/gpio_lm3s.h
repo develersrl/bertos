@@ -82,7 +82,13 @@ enum
 /* Write a value to the specified pin(s) */
 INLINE void lm3s_gpioPinWrite(uint32_t port, uint8_t pins, uint8_t val)
 {
-	HWREG(port + (GPIO_O_DATA + (pins << 2))) = val;
+	HWREG(port + GPIO_O_DATA + (pins << 2)) = val;
+}
+
+/* Read a value from the specified pin(s) */
+INLINE uint32_t lm3s_gpioPinRead(uint32_t port, uint8_t pins)
+{
+	return HWREG(port + GPIO_O_DATA + (pins << 2));
 }
 
 int lm3s_gpioPinConfig(uint32_t port, uint8_t pins,
