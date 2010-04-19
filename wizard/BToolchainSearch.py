@@ -33,13 +33,15 @@
 # Author: Lorenzo Berni <duplo@develer.com>
 #
 
+import os
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import PyQt4.uic as uic
 
 import qvariant_converter
 
-from const import *
+import const
 
 class BToolchainSearch(QDialog):
     """
@@ -56,7 +58,7 @@ class BToolchainSearch(QDialog):
         """
         Sets up the user interface.
         """
-        self.content = uic.loadUi(UI_LOCATION + "/toolchain_search.ui", None)
+        self.content = uic.loadUi(os.path.join(const.DATA_DIR, const.UI_LOCATION, "toolchain_search.ui"), None)
         layout = QVBoxLayout()
         layout.addWidget(self.content)
         self.setLayout(layout)
