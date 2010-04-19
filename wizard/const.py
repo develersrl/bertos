@@ -43,6 +43,11 @@ del _tmp
 
 PREDEFINED_BOARDS_DIR = 'predefined_boards'
 PREDEFINED_BOARD_SPEC_FILE = '.spec'
+PREDEFINED_BOARD_ICON_FILE = '.icon.png'
+
+# Predefined icons in resouces
+PREDEFINED_BOARD_DEFAULT_DIR_ICON = ':images/default_dir_icon.png'
+PREDEFINED_BOARD_DEFAULT_PROJECT_ICON = ':images/default_project_icon.png'
 # PREDEFINED_BOARD_SPEC_INFO = {
 #    'name': <name of the board/directory>,
 #    'description': <description of the board/directory>,

@@ -131,6 +131,7 @@ class BProject(object):
         _tree = {}
         _tree['info'] = self._loadPresetInfo(os.path.join(path, const.PREDEFINED_BOARD_SPEC_FILE))
         _tree['info']['filename'] = os.path.basename(path)
+        _tree['info']['path'] = path
         _tree['children'] = []
         entries = set(os.listdir(path))
         for entry in entries:

@@ -18,6 +18,12 @@
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
       <widget class="QTreeWidget" name="boardTree">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <attribute name="headerVisible">
         <bool>false</bool>
        </attribute>
@@ -31,13 +37,6 @@
        </column>
       </widget>
      </item>
-     <item>
-      <widget class="QCheckBox" name="advancedCheckBox">
-       <property name="text">
-        <string>Advanced configuration</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
    <item>
@@ -45,7 +44,7 @@
      <item>
       <widget class="QLabel" name="descriptionLabel">
        <property name="text">
-        <string>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus enim nisl, interdum ut venenatis in, suscipit in dolor. Integer a nisi sed libero ultrices commodo. Duis vitae nibh id arcu ullamcorper auctor non et metus. Cras ut justo ac dolor porttitor feugiat eget vitae velit. Fusce et rhoncus metus. Quisque vel mauris et augue elementum volutpat. Phasellus dolor dui, ultricies sit amet dictum ut, commodo et lacus. Proin eu ullamcorper purus. Aliquam in risus in lorem tempor condimentum ac quis erat. Mauris semper dui a urna facilisis vitae porttitor urna dictum. Nunc metus leo, iaculis non dignissim at, mollis at.</string>
+        <string>&lt;a href='http://duplo.develer.com'&gt;duplo's blog&lt;/a&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus enim nisl, interdum ut venenatis in, suscipit in dolor. Integer a nisi sed libero ultrices commodo. Duis vitae nibh id arcu ullamcorper auctor non et metus. Cras ut justo ac dolor porttitor feugiat eget vitae velit. Fusce et rhoncus metus. Quisque vel mauris et augue elementum volutpat. Phasellus dolor dui, ultricies sit amet dictum ut, commodo et lacus. Proin eu ullamcorper purus. Aliquam in risus in lorem tempor condimentum ac quis erat. Mauris semper dui a urna facilisis vitae porttitor urna dictum. Nunc metus leo, iaculis non dignissim at, mollis at.</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>

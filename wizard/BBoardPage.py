@@ -33,6 +33,8 @@
 # Author: Lorenzo Berni <duplo@develer.com>
 #
 
+import os
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
@@ -101,6 +103,7 @@ class BBoardPage(BWizardPage):
     ####
 
     def _fillPresetTree(self):
+        self.pageContent.boardTree.clear()
         self.project.loadProjectPresets()
         preset_tree = self.project.info("PRESET_TREE")
         for obj in preset_tree['children']:
@@ -109,6 +112,16 @@ class BBoardPage(BWizardPage):
     def _createPresetNode(self, parent, obj):
         item_name = obj['info'].get('name', obj['info']['filename'])
         item = QTreeWidgetItem(parent, [item_name]) 
+        item.setIcon(0, QIcon(self._getNodeIcon(obj)))
         children_dict = obj['children']
         for child in children_dict:
             self._createPresetNode(item, child)
+
+    def _getNodeIcon(self, obj):
+        icon_file = os.path.join(obj['info']['path'], const.PREDEFINED_BOARD_ICON_FILE)
+        if os.path.exists(icon_file):
+            return icon_file
+        elif obj['children']:
+            return const.PREDEFINED_BOARD_DEFAULT_DIR_ICON
+        else:
+            return const.PREDEFINED_BOARD_DEFAULT_PROJECT_ICON
