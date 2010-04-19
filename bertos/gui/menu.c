@@ -442,7 +442,7 @@ iptr_t menu_handle(const struct Menu *menu)
 
 
 	items_per_page =
-		(menu->bitmap->height / menu->bitmap->font->height)
+		(menu->bitmap->height / menu->bitmap->font->height - 1)
 #if CONFIG_MENU_MENUBAR
 		- 1 /* menu bar labels */
 #endif
