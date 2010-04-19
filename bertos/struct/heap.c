@@ -196,8 +196,8 @@ void heap_freemem(struct Heap* h, void *mem, size_t size)
 size_t heap_freeSpace(struct Heap *h)
 {
 	size_t free_mem = 0;
-	for (MemChunck *chunk = h->FreeList; hunk; chunk = chunk->next)
-		free_mem += chunck->size;
+	for (MemChunk *chunk = h->FreeList; chunk; chunk = chunk->next)
+		free_mem += chunk->size;
 
 	return free_mem;
 }
