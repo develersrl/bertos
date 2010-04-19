@@ -110,7 +110,7 @@ class BModulePage(BWizardPage):
         module = self.currentModule()
         if module:
             try:
-                supported = bertos_utils.isSupported(self.project(), module=module)
+                supported = bertos_utils.isSupported(self.project, module=module)
             except SupportedException, e:
                 self.exceptionOccurred(self.tr("Error evaluating \"%1\" for module %2").arg(e.support_string).arg(module))
                 supported = True
@@ -137,7 +137,7 @@ class BModulePage(BWizardPage):
                         # Doesn't show the hidden fields
                         continue
                     try:
-                        param_supported = bertos_utils.isSupported(self.project(), property_id=(configuration, property))
+                        param_supported = bertos_utils.isSupported(self.project, property_id=(configuration, property))
                     except SupportedException, e:
                         self.exceptionOccurred(self.tr("Error evaluating \"%1\" for parameter %2").arg(e.support_string).arg(property))
                         param_supported = True
@@ -224,7 +224,7 @@ class BModulePage(BWizardPage):
                 and not self.projectInfo("LISTS") \
                 and not self.projectInfo("CONFIGURATIONS"):
             try:
-                self.project().loadModuleData()
+                self.project.loadModuleData()
             except ModuleDefineException, e:
                 self.exceptionOccurred(self.tr("Error parsing line '%2' in file %1").arg(e.path).arg(e.line))
             except EnumDefineException, e:
@@ -251,7 +251,7 @@ class BModulePage(BWizardPage):
                 enabled = modules[module]["enabled"]
                 module_item = QTreeWidgetItem(item, QStringList([module]))
                 try:
-                    supported = bertos_utils.isSupported(self.project(), module=module)
+                    supported = bertos_utils.isSupported(self.project, module=module)
                 except SupportedException, e:
                     self.exceptionOccurred(self.tr("Error evaluating \"%1\" for module %2").arg(e.support_string).arg(module))
                     supported = True

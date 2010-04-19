@@ -59,7 +59,7 @@ class BFinalPage(BWizardPage):
         """
         try:
             QApplication.instance().setOverrideCursor(Qt.WaitCursor)
-            bertos_utils.createBertosProject(self.project())
+            bertos_utils.createBertosProject(self.project)
         finally:
             QApplication.instance().restoreOverrideCursor()
         self._plugin_dict = {}

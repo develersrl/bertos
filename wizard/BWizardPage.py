@@ -85,6 +85,7 @@ class BWizardPage(QWizardPage):
         """
         return QApplication.instance().project.info(key)
     
+    @property
     def project(self):
         """
         Returns the BProject instance.

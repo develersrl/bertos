@@ -112,7 +112,7 @@ class BCpuPage(BWizardPage):
         """
         try:
             QApplication.instance().setOverrideCursor(Qt.WaitCursor)
-            self.project().loadSourceTree()
+            self.project.loadSourceTree()
             self.populateCpuList()
             cpu_name = self.projectInfo("CPU_NAME")
             selected_freq = self.projectInfo("SELECTED_FREQ")
@@ -161,7 +161,7 @@ class BCpuPage(BWizardPage):
         """
         self.pageContent.cpuList.clear()
         self.pageContent.cpuList.setCurrentItem(None)
-        infos = self.project().loadCpuInfos()
+        infos = self.project.loadCpuInfos()
         tag_list = bertos_utils.getTagSet(infos)
         # Create, fill and store the dict with the tags
         tag_dict = {}
