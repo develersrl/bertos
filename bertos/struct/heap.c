@@ -127,9 +127,9 @@ void heap_freemem(struct Heap* h, void *mem, size_t size)
 	if (!size)
 		size = sizeof(MemChunk);
 
-	/* Special case: first chunk in the free list */
+	/* Special cases: first chunk in the free list or memory completely full */
 	ASSERT((uint8_t*)mem != (uint8_t*)h->FreeList);
-	if (((uint8_t *)mem) < ((uint8_t *)h->FreeList))
+	if (((uint8_t *)mem) < ((uint8_t *)h->FreeList) || !h->FreeList)
 	{
 		/* Insert memory block before the current free list head */
 		prev = (MemChunk *)mem;
