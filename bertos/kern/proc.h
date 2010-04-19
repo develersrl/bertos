@@ -37,7 +37,7 @@
  *
  * $WIZ$ module_name = "kernel"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_proc.h"
- * $WIZ$ module_depends = "switch_ctx", "coop", "preempt"
+ * $WIZ$ module_depends = "switch_ctx"
  * $WIZ$ module_supports = "not atmega103"
  */
 
@@ -51,11 +51,7 @@
 #include <struct/list.h> // Node, PriNode
 
 #include <cfg/compiler.h>
-
-#if CONFIG_KERN_PREEMPT
-	#include <cfg/debug.h> // ASSERT()
-	#include <kern/preempt.h>
-#endif
+#include <cfg/debug.h> // ASSERT()
 
 #include <cpu/types.h> // cpu_stack_t
 #include <cpu/frame.h> // CPU_SAVED_REGS_CNT
@@ -146,41 +142,19 @@ void proc_exit(void);
  * Public scheduling class methods.
  */
 void proc_yield(void);
-void proc_preempt(void);
-int proc_needPreempt(void);
-void proc_wakeup(Process *proc);
-
-/**
- * Dummy function that defines unimplemented scheduler class methods.
- */
-INLINE void __proc_noop(void)
-{
-}
 
 #if CONFIG_KERN_PREEMPT
-	/**
-	 * Preemptive scheduler public methods.
-	 */
-	#define preempt_yield		proc_yield
-	#define preempt_needPreempt	proc_needPreempt
-	#define preempt_preempt		proc_preempt
-	/**
-	 * Preemptive scheduler: private methods.
-	 */
-	#define preempt_switch		proc_switch
-	#define preempt_wakeup		proc_wakeup
+bool proc_needPreempt(void);
+void proc_preempt(void);
 #else
-	/**
-	 * Co-operative scheduler: public methods.
-	 */
-	#define coop_yield		proc_yield
-	#define proc_needPreempt	__proc_noop
-	#define proc_preempt		__proc_noop
-	/**
-	 * Co-operative scheduler: private methods.
-	 */
-	#define coop_switch		proc_switch
-	#define coop_wakeup		proc_wakeup
+INLINE bool proc_needPreempt(void)
+{
+	return false;
+}
+
+INLINE void proc_preempt(void)
+{
+}
 #endif
 
 void proc_rename(struct Process *proc, const char *name);

@@ -50,19 +50,6 @@
 
 #include <kern/proc.h>   // struct Process
 
-/*
- * Check if the process context switch can be performed directly by the
- * architecture-dependent asm_switch_context() or if it must be delayed
- * because we're in the middle of an ISR.
- *
- * Return true if asm_switch_context() can be executed, false
- * otherwise.
- *
- * NOTE: if an architecture does not implement IRQ_RUNNING() this function
- * always returns true.
- */
-#define CONTEXT_SWITCH_FROM_ISR()	(!IRQ_RUNNING())
-
 #ifndef asm_switch_context
 /**
  * CPU dependent context switching routines.
@@ -72,23 +59,6 @@
  */
 EXTERN_C void asm_switch_context(cpu_stack_t **new_sp, cpu_stack_t **save_sp);
 #endif
-
-/*
- * Save context of old process and switch to new process.
-  */
-INLINE void proc_switchTo(Process *next, Process *prev)
-{
-	cpu_stack_t *dummy;
-
-	if (UNLIKELY(next == prev))
-		return;
-	/*
-	 * If there is no old process, we save the old stack pointer into a
-	 * dummy variable that we ignore.  In fact, this happens only when the
-	 * old process has just exited.
-	 */
-	asm_switch_context(&next->stack, prev ? &prev->stack : &dummy);
-}
 
 /**
  * \name Flags for Process.flags.
@@ -191,11 +161,8 @@ void proc_entry(void);
 /* Schedule another process *without* adding the current one to the ready list. */
 void proc_switch(void);
 
-/* Low level scheduling routine. */
-void proc_schedule(void);
-
-/* Low level context switch routine. */
-void proc_switchTo(Process *next, Process *prev);
+/* Immediately schedule a particular process bypassing the scheduler. */
+void proc_wakeup(Process *proc);
 
 /* Initialize a scheduler class. */
 void proc_schedInit(void);
@@ -213,5 +180,39 @@ void proc_schedInit(void);
 	/** Rename a process */
 	void monitor_rename(Process *proc, const char *name);
 #endif /* CONFIG_KERN_MONITOR */
+
+#if CONFIG_KERN_PREEMPT
+INLINE int preempt_quantum(void)
+{
+	extern int _proc_quantum;
+	return _proc_quantum;
+}
+
+INLINE void proc_decQuantum(void)
+{
+	extern int _proc_quantum;
+	if (_proc_quantum > 0)
+		_proc_quantum--;
+}
+
+INLINE void preempt_reset_quantum(void)
+{
+	extern int _proc_quantum;
+	_proc_quantum = CONFIG_KERN_QUANTUM;
+}
+#else /* !CONFIG_KERN_PREEMPT */
+INLINE int preempt_quantum(void)
+{
+	return 0;
+}
+
+INLINE void proc_decQuantum(void)
+{
+}
+
+INLINE void preempt_reset_quantum(void)
+{
+}
+#endif /* CONFIG_KERN_PREEMPT */
 
 #endif /* KERN_PROC_P_H */

@@ -50,7 +50,7 @@ Since the system simply waits for external events to happen we decided to implem
 Currently the kernel code is very stable.
 
 <b> Kernel features </b>:
-  \li \link coop.c Cooperative \endlink round-robin scheduling.
+  \li \link preempt.c Cooperative and preemptive \endlink round-robin scheduling.
   \li \link monitor.h Stack process monitor \endlink, useful to prevent stack overflows.
   \li \link msg.h Inter-process messaging system \endlink (with very low overhead).
   \li \link sem.h Binary semaphores \endlink.

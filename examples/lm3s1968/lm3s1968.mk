@@ -39,8 +39,6 @@ lm3s1968_CSRC = \
 	bertos/kern/monitor.c \
 	bertos/kern/proc_test.c \
 	bertos/kern/proc.c \
-	bertos/kern/coop.c \
-	bertos/kern/preempt.c \
 	bertos/kern/signal.c \
 	bertos/cpu/cortex-m3/drv/gpio_lm3s.c \
 	bertos/cpu/cortex-m3/drv/clock_lm3s.c \

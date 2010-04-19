@@ -39,7 +39,6 @@ SRC_LIST="
 	bertos/kern/proc.c
 	bertos/kern/signal.c
 	bertos/kern/sem.c
-	bertos/kern/coop.c
 	bertos/kern/preempt.c
 	bertos/mware/event.c
 	bertos/mware/formatwr.c

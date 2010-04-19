@@ -56,8 +56,6 @@ demo_CSRC = \
 	bertos/mware/resource.c \
 	bertos/mware/sprintf.c \
 	bertos/struct/heap.c \
-	bertos/kern/coop.c \
-	bertos/kern/preempt.c \
 	bertos/kern/irq.c \
 	bertos/kern/proc.c \
 	bertos/kern/proc_test.c \

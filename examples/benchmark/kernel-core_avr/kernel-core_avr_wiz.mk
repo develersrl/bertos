@@ -22,7 +22,6 @@ kernel-core_avr_SUFFIX = ""
 kernel-core_avr_WIZARD_CSRC = \
 	bertos/cpu/avr/drv/ser_avr.c \
 	bertos/drv/ser.c \
-	bertos/kern/coop.c \
 	bertos/kern/proc.c \
 	bertos/mware/formatwr.c \
 	bertos/mware/hex.c \

@@ -26,8 +26,6 @@ avr-kern_WIZARD_CSRC = \
 	bertos/struct/heap.c \
 	bertos/kern/monitor.c \
 	bertos/drv/timer.c \
-	bertos/kern/coop.c \
-	bertos/kern/preempt.c \
 	bertos/cpu/avr/drv/timer_avr.c \
 	bertos/kern/proc.c \
 	bertos/mware/formatwr.c \

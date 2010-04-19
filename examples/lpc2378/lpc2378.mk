@@ -21,8 +21,6 @@ lpc2378_USER_CSRC = \
 	bertos/cpu/arm/drv/timer_lpc2.c \
 	bertos/mware/event.c \
 	bertos/kern/proc.c \
-	bertos/kern/coop.c \
-	bertos/kern/preempt.c \
 	bertos/kern/proc_test.c \
 	bertos/kern/monitor.c \
 	bertos/mware/sprintf.c \
