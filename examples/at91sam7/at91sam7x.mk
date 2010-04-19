@@ -45,7 +45,7 @@ at91sam7x_CPPASRC = \
 at91sam7x_PREFIX = arm-none-eabi-
 
 at91sam7x_CPPAFLAGS = -O0 -g -gdwarf-2 -g
-at91sam7x_CPPFLAGS = -O0 -D'ARCH=0' -D__ARM_AT91SAM7X256__ -D'CPU_FREQ=(48023000UL)' -D'WIZ_AUTOGEN' -g3 -gdwarf-2 -fverbose-asm -Iexamples/at91sam7 -Ibertos/cpu/arm
+at91sam7x_CPPFLAGS = -O0 -D'ARCH=0' -D__ARM_AT91SAM7X256__ -D'CPU_FREQ=(48023000UL)' -D'WIZ_AUTOGEN' -g3 -gdwarf-2 -fverbose-asm -Iexamples/at91sam7 -Ibertos/cpu/arm -fno-strict-aliasing -fwrapv
 at91sam7x_LDFLAGS = -nostartfiles -T bertos/cpu/arm/scripts/at91sam7_256_rom.ld -Wl,--no-warn-mismatch
 
 at91sam7x_CPU = arm7tdmi
