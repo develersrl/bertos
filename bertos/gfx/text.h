@@ -39,7 +39,7 @@
  *
  * $WIZ$ module_name = "text"
  * $WIZ$ module_harvard = "pgm_memory"
- * $WIZ$ module_depends = "bitmap"
+ * $WIZ$ module_depends = "bitmap", "line"
  */
 
 #ifndef GFX_TEXT_H
