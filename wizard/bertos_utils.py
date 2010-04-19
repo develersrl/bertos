@@ -357,21 +357,32 @@ def findModuleFiles(module, project_info):
     cfiles = []
     sfiles = []
     # .c files related to the module and the cpu architecture
-    for filename, path in project_info.searchFiles(module + ".c") + \
-            project_info.searchFiles(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".c"):
+    for filename, path in project_info.searchFiles(module + ".c"):
         path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
         path = replaceSeparators(path)
         cfiles.append(path + "/" + filename)
     # .s files related to the module and the cpu architecture
     for filename, path in project_info.searchFiles(module + ".s") + \
-            project_info.searchFiles(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".s") + \
-            project_info.searchFiles(module + ".S") + \
-            project_info.searchFiles(module + "_" + project_info.info("CPU_INFOS")["TOOLCHAIN"] + ".S"):
+            project_info.searchFiles(module + ".S"):
         path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
         path = replaceSeparators(path)
         sfiles.append(path + "/" + filename)
     # .c and .s files related to the module and the cpu tags
-    for tag in project_info.info("CPU_INFOS")["CPU_TAGS"]:
+    tags = project_info.info("CPU_INFOS")["CPU_TAGS"]
+
+    # Awful, but secure check for version
+    # TODO: split me in a method/function
+    try
+        version_string = bertosVersion(project_info.info("SOURCES_PATH"))
+        version_list = [int(i) for i in version_string.split()[-1].split('.')]
+        if version_list < [2, 5]:
+            # For older versions of BeRTOS add the toolchain to the tags
+            tags.append(project_info.info("CPU_INFOS")["TOOLCHAIN"])
+    except ValueError:
+        # If the version file hasn't a valid version number do nothing
+        pass
+
+    for tag in tags:
         for filename, path in project_info.searchFiles(module + "_" + tag + ".c"):
             path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
             if os.sep != "/":
