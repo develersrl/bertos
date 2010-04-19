@@ -117,8 +117,11 @@ class BProject(object):
         setEnabledModules(self, project_data["ENABLED_MODULES"])
 
     def loadProjectPresets(self, preset_directory):
-        preset_prj_file = os.path.join(preset_directory, 'project.bertos')
-        preset_data = pickle.loads(open(preset_prj_file, "r").read())
+        """
+        Load the default presets (into the const.PREDEFINED_BOARDS_DIR).
+        """
+        # NOTE: this method does nothing (for now).
+        preset_path = os.path.join(self.infos["SOURCES_PATH"], const.PREDEFINED_BOARDS_DIR)
 
     def loadModuleData(self, edit=False):
         module_info_dict = {}
@@ -161,9 +164,11 @@ class BProject(object):
                         list_info_dict.update(list_dict)
                     except ParseError, err:
                         raise DefineException.EnumDefineException(path, err.line_number, err.line)
+        # NOTE: These lines probably should be removed
         for filename, path in self.findDefinitions("*_" + self.infos["CPU_INFOS"]["TOOLCHAIN"] + ".h"):
             comment_list = getCommentList(open(path + "/" + filename, "r").read())
             list_info_dict.update(loadDefineLists(comment_list))
+        # end of lines to be removed
         for tag in self.infos["CPU_INFOS"]["CPU_TAGS"]:
             for filename, path in self.findDefinitions("*_" + tag + ".h"):
                 comment_list = getCommentList(open(path + "/" + filename, "r").read())
