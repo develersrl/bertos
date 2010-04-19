@@ -91,7 +91,7 @@ class BBoardPage(BWizardPage):
         """
         Overload of the BWizardPage reloadData method.
         """
-        self.project.loadPresets()
+        self.project.loadProjectPresets()
 
     ####
 

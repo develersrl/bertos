@@ -116,7 +116,7 @@ class BProject(object):
         self.loadModuleData(True)
         setEnabledModules(self, project_data["ENABLED_MODULES"])
 
-    def loadProjectPresets(self, preset_directory):
+    def loadProjectPresets(self):
         """
         Load the default presets (into the const.PREDEFINED_BOARDS_DIR).
         """
