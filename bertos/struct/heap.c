@@ -32,7 +32,6 @@
  *
  * \brief Heap subsystem (public interface).
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
@@ -48,7 +47,7 @@
 /*
  * This function prototype is deprecated, will change in:
  * void heap_init(struct Heap* h, heap_buf_t* memory, size_t size)
- * in the nex BeRTOS release.
+ * in the next BeRTOS release.
  */
 void heap_init(struct Heap* h, void* memory, size_t size)
 {
