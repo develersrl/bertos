@@ -122,6 +122,29 @@ class BProject(object):
         """
         # NOTE: this method does nothing (for now).
         preset_path = os.path.join(self.infos["SOURCES_PATH"], const.PREDEFINED_BOARDS_DIR)
+        preset_tree = {}
+        if os.path.exists(preset_path):
+            preset_tree = self._loadProjectPresetTree(preset_path)
+        self.infos["PRESET_TREE"] = preset_tree
+
+    def _loadProjectPresetTree(self, path):
+        _tree = {}
+        _tree['info'] = self._loadPresetInfo(os.path.join(path, const.PREDEFINED_BOARD_SPEC_FILE))
+        _tree['info']['filename'] = os.path.basename(path)
+        _tree['children'] = []
+        entries = set(os.listdir(path))
+        for entry in entries:
+            _path = os.path.join(path, entry)
+            if os.path.isdir(_path):
+                sub_entries = set(os.listdir(_path))
+                if const.PREDEFINED_BOARD_SPEC_FILE in sub_entries:
+                    _tree['children'].append(self._loadProjectPresetTree(_path))
+        return _tree
+
+    def _loadPresetInfo(self, preset_spec_file):
+        D = {}
+        execfile(preset_spec_file, {}, D)
+        return D
 
     def loadModuleData(self, edit=False):
         module_info_dict = {}

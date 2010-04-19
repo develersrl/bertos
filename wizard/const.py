@@ -42,6 +42,11 @@ DATA_DIR = os.path.dirname(os.path.abspath(_tmp))
 del _tmp
 
 PREDEFINED_BOARDS_DIR = 'predefined_boards'
+PREDEFINED_BOARD_SPEC_FILE = '.spec'
+# PREDEFINED_BOARD_SPEC_INFO = {
+#    'name': <name of the board/directory>,
+#    'description': <description of the board/directory>,
+# }
 
 CPU_DEF = {
     "CPU_NAME": "",

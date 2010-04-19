@@ -91,7 +91,7 @@ class BBoardPage(BWizardPage):
         """
         Overload of the BWizardPage reloadData method.
         """
-        self.project.loadProjectPresets()
+        self._fillPresetTree()
 
     ####
 
@@ -100,3 +100,15 @@ class BBoardPage(BWizardPage):
 
     ####
 
+    def _fillPresetTree(self):
+        self.project.loadProjectPresets()
+        preset_tree = self.project.info("PRESET_TREE")
+        for obj in preset_tree['children']:
+            self._createPresetNode(self.pageContent.boardTree, obj)
+
+    def _createPresetNode(self, parent, obj):
+        item_name = obj['info'].get('name', obj['info']['filename'])
+        item = QTreeWidgetItem(parent, [item_name]) 
+        children_dict = obj['children']
+        for child in children_dict:
+            self._createPresetNode(item, child)
