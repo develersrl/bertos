@@ -53,5 +53,22 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>advancedButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>advancedGroupBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>41</x>
+     <y>43</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>84</x>
+     <y>57</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
