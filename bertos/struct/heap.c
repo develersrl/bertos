@@ -184,6 +184,25 @@ void heap_freemem(struct Heap* h, void *mem, size_t size)
 	}
 }
 
+/**
+ * Returns the number of free bytes in a heap.
+ * \param h the heap to check.
+ *
+ * \note The returned value is the sum of all free memory regions 
+ *       in the heap.
+ *       Those regions are likely to be *not* contiguous,
+ *       so a successive allocation may fail even if the
+ *       requested amount of memory is lower than the current free space.
+ */
+size_t heap_freeSpace(struct Heap *h)
+{
+	size_t free_mem = 0;
+	for (MemChunck *chunk = h->FreeList; hunk; chunk = chunk->next)
+		free_mem += chunck->size;
+
+	return free_mem;
+}
+
 #if CONFIG_HEAP_MALLOC
 
 void *heap_malloc(struct Heap* h, size_t size)

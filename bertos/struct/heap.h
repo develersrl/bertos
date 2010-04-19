@@ -85,6 +85,7 @@ void *heap_allocmem(struct Heap* heap, size_t size);
 /// Free a chunk of memory of \a size bytes from the heap
 void heap_freemem(struct Heap* heap, void *mem, size_t size);
 
+size_t heap_freeSpace(struct Heap *h);
 
 #define HNEW(heap, type) \
 	(type*)heap_allocmem(heap, sizeof(type))
