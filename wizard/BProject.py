@@ -164,11 +164,6 @@ class BProject(object):
                         list_info_dict.update(list_dict)
                     except ParseError, err:
                         raise DefineException.EnumDefineException(path, err.line_number, err.line)
-        # NOTE: These lines probably should be removed
-        for filename, path in self.findDefinitions("*_" + self.infos["CPU_INFOS"]["TOOLCHAIN"] + ".h"):
-            comment_list = getCommentList(open(path + "/" + filename, "r").read())
-            list_info_dict.update(loadDefineLists(comment_list))
-        # end of lines to be removed
         for tag in self.infos["CPU_INFOS"]["CPU_TAGS"]:
             for filename, path in self.findDefinitions("*_" + tag + ".h"):
                 comment_list = getCommentList(open(path + "/" + filename, "r").read())
