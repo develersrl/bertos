@@ -372,7 +372,7 @@ def findModuleFiles(module, project_info):
 
     # Awful, but secure check for version
     # TODO: split me in a method/function
-    try
+    try:
         version_string = bertosVersion(project_info.info("SOURCES_PATH"))
         version_list = [int(i) for i in version_string.split()[-1].split('.')]
         if version_list < [2, 5]:
