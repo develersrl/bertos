@@ -734,7 +734,7 @@ struct SerialHardware *ser_hw_getdesc(int unit)
 /**
  * Serial 0 TX interrupt handler
  */
-static void uart0_irq_tx(void)
+INLINE void uart0_irq_tx(void)
 {
 	SER_STROBE_ON;
 
@@ -743,7 +743,7 @@ static void uart0_irq_tx(void)
 	if (fifo_isempty(txfifo))
 	{
 		/*
-	 	 * - Disable the TX empty interrupts
+		 * - Disable the TX empty interrupts
 		 */
 		US0_IDR = BV(US_TXEMPTY);
 		SER_UART0_BUS_TXEND;
@@ -761,7 +761,7 @@ static void uart0_irq_tx(void)
 /**
  * Serial 0 RX complete interrupt handler.
  */
-static void uart0_irq_rx(void)
+INLINE void uart0_irq_rx(void)
 {
 	SER_STROBE_ON;
 
@@ -798,7 +798,7 @@ static DECLARE_ISR(uart0_irq_dispatcher)
 /**
  * Serial 1 TX interrupt handler
  */
-static void uart1_irq_tx(void)
+INLINE void uart1_irq_tx(void)
 {
 	SER_STROBE_ON;
 
@@ -807,7 +807,7 @@ static void uart1_irq_tx(void)
 	if (fifo_isempty(txfifo))
 	{
 		/*
-	 	 * - Disable the TX empty interrupts
+		 * - Disable the TX empty interrupts
 		 */
 		US1_IDR = BV(US_TXEMPTY);
 		SER_UART1_BUS_TXEND;
@@ -825,7 +825,7 @@ static void uart1_irq_tx(void)
 /**
  * Serial 1 RX complete interrupt handler.
  */
-static void uart1_irq_rx(void)
+INLINE void uart1_irq_rx(void)
 {
 	SER_STROBE_ON;
 
