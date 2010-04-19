@@ -117,10 +117,8 @@ class BProject(object):
         setEnabledModules(self, project_data["ENABLED_MODULES"])
 
     def loadProjectPresets(self, preset_directory):
-        # This method will save:
-        # "CPU_NAME"
-        # ...
-        pass
+        preset_prj_file = os.path.join(preset_directory, 'project.bertos')
+        preset_data = pickle.loads(open(preset_prj_file, "r").read())
 
     def loadModuleData(self, edit=False):
         module_info_dict = {}
