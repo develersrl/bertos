@@ -40,21 +40,19 @@ from BWizardPage import BWizardPage
 
 from BCpuPage import BCpuPage
 from BOutputPage import BOutputPage
-from BRoutePage import BRoutePage
 
 import const
 import qvariant_converter
 from bertos_utils import presetList
 
-class BBoardPage(BWizardPage):
+class BRoutePage(BWizardPage):
     """
-    Initial page of the alternative route. Permit to select one of the
-    predefined projects for supported board.
+    Let the user choice Advanced or base route.
     """
     
     def __init__(self):
-        BWizardPage.__init__(self, const.UI_LOCATION + "/board_select.ui")
-        self.setTitle(self.tr("Select the board from the predefined ones"))
+        BWizardPage.__init__(self, const.UI_LOCATION + "/route_select.ui")
+        self.setTitle(self.tr("Select Advanced or Base setup"))
         self._last_selected = None
 
     ## Overloaded QWizardPage methods ##
@@ -69,7 +67,9 @@ class BBoardPage(BWizardPage):
         """
         Overload of the QWizardPage nextId method.
         """
-        return self.wizard().pageIndex(BRoutePage)
+        # Route to Toolchain page if the user select advanced
+        # or to Output page if the user select base
+        return self.wizard().pageIndex(BToolchainPage)
 
     ####
 
@@ -100,3 +100,6 @@ class BBoardPage(BWizardPage):
 
     ####
 
+    @property
+    def advanced(self):
+        return self.pageContent.advancedButton.isChecked()
