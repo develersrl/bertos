@@ -46,7 +46,12 @@
 #define TEST_LEN 31
 #define ALLOC_SIZE 113
 
-HEAP_DEFINE_BUF(heap_buf, 4027);
+#define TEST_LEN2 32
+#define ALLOC_SIZE2 128
+
+#define HEAP_SIZE 4096
+
+HEAP_DEFINE_BUF(heap_buf, HEAP_SIZE);
 STATIC_ASSERT(sizeof(heap_buf) % sizeof(heap_buf_t) == 0);
 
 Heap h;
@@ -58,27 +63,54 @@ int heap_testSetup(void)
 	return 0;
 }
 
-int heap_testRun(void)
+static void alloc_test(size_t size, size_t test_len)
 {
 	//Simple test
-	uint8_t *a[TEST_LEN];
-	for (int i = 0; i < TEST_LEN; i++)
+	uint8_t *a[test_len];
+
+	for (size_t i = 0; i < test_len; i++)
 	{
-		a[i] = heap_allocmem(&h, ALLOC_SIZE);
+		a[i] = heap_allocmem(&h, size);
 		ASSERT(a[i]);
-		for (int j = 0; j < ALLOC_SIZE; j++)
+		for (size_t j = 0; j < size; j++)
 			a[i][j] = i;
 	}
 
-	for (int i = 0; i < TEST_LEN; i++)
+	ASSERT(heap_freeSpace(&h) == HEAP_SIZE - test_len * ROUND_UP2(size, sizeof(MemChunk)));
+
+	for (size_t i = 0; i < test_len; i++)
 	{
-		for (int j = 0; j < ALLOC_SIZE; j++)
+		for (size_t j = 0; j < size; j++)
 		{
 			kprintf("a[%d][%d] = %d\n", i, j, a[i][j]);
 			ASSERT(a[i][j] == i);
 		}
-		heap_freemem(&h, a[i], ALLOC_SIZE);
+		heap_freemem(&h, a[i], size);
 	}
+	ASSERT(heap_freeSpace(&h) == HEAP_SIZE);
+}
+
+int heap_testRun(void)
+{
+	alloc_test(ALLOC_SIZE, TEST_LEN);
+	alloc_test(ALLOC_SIZE2, TEST_LEN2);
+	/* Try to allocate the whole heap */
+	uint8_t *b = heap_allocmem(&h, HEAP_SIZE);
+	ASSERT(b);
+	ASSERT(heap_freeSpace(&h) == 0);
+
+	ASSERT(!heap_allocmem(&h, HEAP_SIZE));
+
+	for (int j = 0; j < HEAP_SIZE; j++)
+		b[j] = j;
+	
+	for (int j = 0; j < HEAP_SIZE; j++)
+	{
+		kprintf("b[%d] = %d\n", j, j);
+		ASSERT(b[j] == (j & 0xff));
+	}
+	heap_freemem(&h, b, HEAP_SIZE);
+	ASSERT(heap_freeSpace(&h) == HEAP_SIZE);
 
 	return 0;
 }
