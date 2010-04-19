@@ -38,8 +38,8 @@ from PyQt4.QtGui import *
 
 from BWizardPage import BWizardPage
 
-from BCpuPage import BCpuPage
 from BOutputPage import BOutputPage
+from BToolchainPage import BToolchainPage
 
 import const
 import qvariant_converter
@@ -69,7 +69,10 @@ class BRoutePage(BWizardPage):
         """
         # Route to Toolchain page if the user select advanced
         # or to Output page if the user select base
-        return self.wizard().pageIndex(BToolchainPage)
+        if self.advanced:
+            return self.wizard().pageIndex(BToolchainPage)
+        else:
+            return self.wizard().pageIndex(BOutputPage)
 
     ####
 
