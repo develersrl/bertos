@@ -276,16 +276,7 @@ class BProject(object):
         # VERSION file
         self._writeVersionFile(directory + "/VERSION")
         # Destination source dir
-        srcdir = directory + "/bertos"
-        if not edit:
-            # If not in editing mode it copies all the bertos sources in the /bertos subdirectory of the project
-            shutil.rmtree(srcdir, True)
-            copytree.copytree(sources_dir + "/bertos", srcdir, ignore_list=const.IGNORE_LIST)
-        elif old_sources_dir:
-            # If in editing mode it merges the current bertos sources with the selected ones
-            # TODO: implement the three way merge algotihm
-            #
-            mergeSources(srcdir, sources_dir, old_sources_dir)
+        self._createSourcesDir(sources_dir, directory + "/bertos", old_sources_dir, edit)
         # Destination makefile
         self._writeMakefile(directory + "/Makefile")
         # Destination project dir
@@ -379,6 +370,17 @@ class BProject(object):
                     if "type" in configuration[parameter]["informations"] and configuration[parameter]["informations"]["type"] == "autoenabled":
                         configuration[parameter]["value"] = "1" if information["enabled"] else "0"
                 self.infos["CONFIGURATIONS"] = configurations
+
+    def _createSourcesDir(self, sources_dir, dest_srcdir, old_sources_dir, edit=False):
+        if not edit:
+            # If not in editing mode it copies all the bertos sources in the /bertos subdirectory of the project
+            shutil.rmtree(dest_srcdir, True)
+            copytree.copytree(sources_dir + "/bertos", dest_srcdir, ignore_list=const.IGNORE_LIST)
+        elif old_sources_dir:
+            # If in editing mode it merges the current bertos sources with the selected ones
+            # TODO: implement the three way merge algotihm
+            #
+            mergeSources(dest_srcdir, sources_dir, old_sources_dir)
 
     def _createDestinationDirectory(self, maindir, edit=False):
         if not edit:
