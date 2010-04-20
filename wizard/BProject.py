@@ -37,6 +37,8 @@ import os
 import fnmatch
 import copy
 import pickle
+import shutil
+import copytree
 
 import DefineException
 
@@ -48,7 +50,11 @@ from bertos_utils import (
                             # Utility functions
                             isBertosDir, getTagSet, getInfos, updateConfigurationValues,
                             loadConfigurationInfos, loadDefineLists, loadModuleDefinition,
-                            getCommentList,
+                            getCommentList, sub,
+                            
+                            # Project creation functions
+                            projectFileGenerator, versionFileGenerator, makefileGenerator,
+                            userMkGenerator, mkGenerator, loadPlugin,
 
                             # Custom exceptions
                             ParseError, SupportedException
@@ -258,6 +264,106 @@ class BProject(object):
                 self.infos["CPU_INFOS"] = cpu_info
 
     #-------------------------------------------------------------------------#
+
+    def createBertosProject(self, edit=False):
+        directory = self.infos["PROJECT_PATH"]
+        sources_dir = self.infos["SOURCES_PATH"]
+        old_sources_dir = self.infos.get("OLD_SOURCES_PATH", None)
+        if not edit:
+            if os.path.isdir(directory):
+                shutil.rmtree(directory, True)        
+            os.makedirs(directory)
+        # Write the project file
+        f = open(directory + "/project.bertos", "w")
+        f.write(projectFileGenerator(self))
+        f.close()
+        # VERSION file
+        version_file = open(os.path.join(const.DATA_DIR, "vtemplates/VERSION"), "r").read()
+        open(directory + "/VERSION", "w").write(versionFileGenerator(self, version_file))
+        # Destination source dir
+        srcdir = directory + "/bertos"
+        if not edit:
+            # If not in editing mode it copies all the bertos sources in the /bertos subdirectory of the project
+            shutil.rmtree(srcdir, True)
+            copytree.copytree(sources_dir + "/bertos", srcdir, ignore_list=const.IGNORE_LIST)
+        elif old_sources_dir:
+            # If in editing mode it merges the current bertos sources with the selected ones
+            # TODO: implement the three way merge algotihm
+            #
+            mergeSources(srcdir, sources_dir, old_sources_dir)
+        # Destination makefile
+        makefile = directory + "/Makefile"
+        makefile = open(os.path.join(const.DATA_DIR, "mktemplates/Makefile"), 'r').read()
+        makefile = makefileGenerator(self, makefile)
+        open(directory + "/Makefile", "w").write(makefile)
+        # Destination project dir
+        # prjdir = directory + "/" + os.path.basename(directory)
+        prjdir = os.path.join(directory, self.infos["PROJECT_NAME"])
+        if not edit:
+            shutil.rmtree(prjdir, True)
+            os.mkdir(prjdir)
+        # Destination hw files
+        hwdir = prjdir + "/hw"
+        if not edit:
+            shutil.rmtree(hwdir, True)
+            os.mkdir(hwdir)
+        # Copy all the hw files
+        for module, information in self.infos["MODULES"].items():
+            for hwfile in information["hw"]:
+                string = open(sources_dir + "/" + hwfile, "r").read()
+                hwfile_path = hwdir + "/" + os.path.basename(hwfile)
+                if not edit or not os.path.exists(hwfile_path):
+                    # If not in editing mode it copies all the hw files. If in
+                    # editing mode it copies only the files that don't exist yet
+                    open(hwdir + "/" + os.path.basename(hwfile), "w").write(string)
+        # Destination configurations files
+        cfgdir = prjdir + "/cfg"
+        if not edit:
+            shutil.rmtree(cfgdir, True)
+            os.mkdir(cfgdir)
+        # Set properly the autoenabled parameters
+        for module, information in self.infos["MODULES"].items():
+            if "configuration" in information and information["configuration"] != "":
+                configurations = self.infos["CONFIGURATIONS"]
+                configuration = configurations[information["configuration"]]
+                for start, parameter in configuration["paramlist"]:
+                    if "type" in configuration[parameter]["informations"] and configuration[parameter]["informations"]["type"] == "autoenabled":
+                        configuration[parameter]["value"] = "1" if information["enabled"] else "0"
+                self.infos["CONFIGURATIONS"] = configurations
+        # Copy all the configuration files
+        for configuration, information in self.infos["CONFIGURATIONS"].items():
+            string = open(sources_dir + "/" + configuration, "r").read()
+            for start, parameter in information["paramlist"]:
+                infos = information[parameter]
+                value = infos["value"]
+                if "unsigned" in infos["informations"] and infos["informations"]["unsigned"]:
+                    value += "U"
+                if "long" in infos["informations"] and infos["informations"]["long"]:
+                    value += "L"
+                string = sub(string, parameter, value)
+            f = open(cfgdir + "/" + os.path.basename(configuration), "w")
+            f.write(string)
+            f.close()
+        if not edit:
+            # Destination user mk file (only on project creation)
+            makefile = open(os.path.join(const.DATA_DIR, "mktemplates/template.mk"), "r").read()
+            # Deadly performances loss was here :(
+            makefile = userMkGenerator(self, makefile)
+            open(prjdir + "/" + os.path.basename(prjdir) + ".mk", "w").write(makefile)
+        # Destination wizard mk file
+        makefile = open(os.path.join(const.DATA_DIR, "mktemplates/template_wiz.mk"), "r").read()
+        makefile = mkGenerator(self, makefile)
+        open(prjdir + "/" + os.path.basename(prjdir) + "_wiz.mk", "w").write(makefile)
+        # Destination main.c file
+        if not edit:
+            main = open(os.path.join(const.DATA_DIR, "srctemplates/main.c"), "r").read()
+            open(prjdir + "/main.c", "w").write(main)
+        # Files for selected plugins
+        relevants_files = {}
+        for plugin in self.infos["OUTPUT"]:
+            module = loadPlugin(plugin)
+            relevants_files[plugin] = module.createProject(self)
+        self.infos["RELEVANT_FILES"] = relevants_files
 
     def setInfo(self, key, value):
         """

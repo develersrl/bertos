@@ -39,7 +39,7 @@ import os
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from bertos_utils import bertosVersion, getToolchainName, createBertosProject
+from bertos_utils import bertosVersion, getToolchainName
 from BToolchainPage import BToolchainPage
 from BVersionPage import BVersionPage
 
@@ -157,7 +157,7 @@ class BEditingDialog(QDialog):
     def apply(self):
         try:
             qApp.setOverrideCursor(QCursor(Qt.WaitCursor))
-            createBertosProject(self.module_page.project, edit=True)
+            QApplication.instance().project.createBertosProject(edit=True)
         finally:
             qApp.restoreOverrideCursor()
         self.accept()
