@@ -61,7 +61,8 @@ class BRoutePage(BWizardPage):
         """
         Overload of the QWizardPage isComplete method.
         """
-        return False
+        self.setProjectInfo("EMPTY_MAIN", self.empty_main)
+        return True
 
     def nextId(self):
         """
@@ -88,13 +89,14 @@ class BRoutePage(BWizardPage):
         """
         Overload of the BWizardPage connectSignals method.
         """
-        pass
+        self.connect(self.pageContent.emptyCheckBox, SIGNAL("stateChanged(int)"), self, SIGNAL("completeChanged()"))
 
     def reloadData(self):
         """
         Overload of the BWizardPage reloadData method.
         """
-        pass
+        preset = self.projectInfo('PROJECT_PRESET')
+        self.project.loadProjectFromPreset(preset)
 
     ####
 
@@ -106,3 +108,10 @@ class BRoutePage(BWizardPage):
     @property
     def advanced(self):
         return self.pageContent.advancedButton.isChecked()
+
+    @property
+    def empty_main(self):
+        if self.advanced:
+            return self.pageContent.emptyCheckBox.isChecked()
+        else:
+            return False
