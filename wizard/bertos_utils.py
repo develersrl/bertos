@@ -56,18 +56,6 @@ def isBertosDir(directory):
 def bertosVersion(directory):
    return open(directory + "/VERSION").readline().strip()
 
-def setEnabledModules(project_info, enabled_modules):
-    modules = project_info.info("MODULES")
-    files = {}
-    for module, information in modules.items():
-        information["enabled"] = module in enabled_modules
-        if information["enabled"]:
-            for dependency in information["depends"]:
-                if not dependency in modules:
-                    files[dependency] = files.get(dependency, 0) + 1
-    project_info.setInfo("MODULES", modules)
-    project_info.setInfo("FILES", files)
-
 def enabledModules(project_info):
     enabled_modules = []
     for name, module in project_info.info("MODULES").items():

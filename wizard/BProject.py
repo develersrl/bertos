@@ -46,9 +46,9 @@ import const
 
 from bertos_utils import (
                             # Utility functions
-                            isBertosDir, getTagSet, setEnabledModules, getInfos,
+                            isBertosDir, getTagSet, getInfos, updateConfigurationValues,
                             loadConfigurationInfos, loadDefineLists, loadModuleDefinition,
-                            getCommentList, updateConfigurationValues,
+                            getCommentList,
 
                             # Custom exceptions
                             ParseError, SupportedException
@@ -92,7 +92,7 @@ class BProject(object):
         self.loadToolchainStuff(project_data, info_dict.get("TOOLCHAIN", None))
         self.infos["OUTPUT"] = project_data["OUTPUT"]
         self.loadModuleData(True)
-        setEnabledModules(self, project_data["ENABLED_MODULES"])
+        self.setEnabledModules(project_data["ENABLED_MODULES"])
 
     def loadBertosSourceStuff(self, project_data, forced_version=None):
         bertos_source_path = project_data["SOURCES_PATH"]
@@ -290,5 +290,17 @@ class BProject(object):
         self._cached_queries[self.infos["SOURCES_PATH"]][ftype] = definitions
         return definitions
 
+    def setEnabledModules(self, enabled_modules):
+        modules = self.infos["MODULES"]
+        files = {}
+        for module, information in modules.items():
+            information["enabled"] = module in enabled_modules
+            if information["enabled"]:
+                for dependency in information["depends"]:
+                    if not dependency in modules:
+                        files[dependency] = files.get(dependency, 0) + 1
+        self.infos["MODULES"] = modules
+        self.infos["FILES"] = files
+            
     def __repr__(self):
         return repr(self.infos)
