@@ -74,19 +74,19 @@ class BProject(object):
         # NOTE: this can throw an Exception if the user has changed the directory containing the project
         self.infos["PROJECT_NAME"] = project_data.get("PROJECT_NAME", os.path.basename(project_dir))
         self.infos["PROJECT_PATH"] = os.path.dirname(project_file)
-        
+
         # Check for the Wizard version
         wizard_version = project_data.get("WIZARD_VERSION", 0)
         if wizard_version < 1:
             # Ignore the SOURCES_PATH inside the project file for older projects
             project_data["SOURCES_PATH"] = project_dir
         self.loadBertosSourceStuff(project_data, info_dict.get("SOURCES_PATH", None))
-        
+
         # For those projects that don't have a VERSION file create a dummy one.
         if not isBertosDir(project_dir):
             version_file = open(os.path.join(const.DATA_DIR, "vtemplates/VERSION"), "r").read()
             open(os.path.join(project_dir, "VERSION"), "w").write(version_file.replace("$version", "").strip())
-            
+
         self.loadSourceTree()
         self.loadCpuStuff(project_data)
         self.loadToolchainStuff(project_data, info_dict.get("TOOLCHAIN", None))
@@ -301,6 +301,6 @@ class BProject(object):
                         files[dependency] = files.get(dependency, 0) + 1
         self.infos["MODULES"] = modules
         self.infos["FILES"] = files
-            
+
     def __repr__(self):
         return repr(self.infos)
