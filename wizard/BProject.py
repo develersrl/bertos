@@ -268,34 +268,26 @@ class BProject(object):
     #-------------------------------------------------------------------------#
 
     def createBertosProject(self):
+        # NOTE: Temporary hack.
         if self.edit:
             self._editBertosProject()
         else:
             self._newBertosProject()
     
     def _newBertosProject(self):
-        directory = self.infos["PROJECT_PATH"]
-        sources_dir = self.infos["SOURCES_PATH"]
-        old_sources_dir = self.infos.get("OLD_SOURCES_PATH", None)
-        # Create the destination directory
-        self._createDestinationDirectory(directory)
+        maindir, srcdir, prjdir, hwdir, cfgdir, sources_dir, old_srcdir = self._projectDirectories()
+        for directory in (maindir, srcdir, prjdir, hwdir, cfgdir):
+            self._createDirectory(directory)
         # Write the project file
-        self._writeProjectFile(directory + "/project.bertos")
+        self._writeProjectFile(maindir + "/project.bertos")
         # VERSION file
-        self._writeVersionFile(directory + "/VERSION")
-        # Destination source dir
-        self._createSourcesDir(sources_dir, directory + "/bertos", old_sources_dir)
+        self._writeVersionFile(maindir + "/VERSION")
         # Destination makefile
-        self._writeMakefile(directory + "/Makefile")
-        # Destination project dir
-        # prjdir = directory + "/" + os.path.basename(directory)
-        prjdir = self._createProjectDir(directory)
-        # Destination hw files
-        hwdir = self._createHwFilesDir(prjdir)
+        self._writeMakefile(maindir + "/Makefile")
+        # Copy the sources
+        self._copySources(sources_dir, srcdir)
         # Copy all the hw files
         self._writeHwFiles(sources_dir, hwdir)
-        # Destination configurations files
-        cfgdir = self._createCfgFilesDir(prjdir)
         # Set properly the autoenabled parameters
         self._setupAutoenabledParameters()
         # Copy all the configuration files
@@ -316,25 +308,17 @@ class BProject(object):
         self.infos["RELEVANT_FILES"] = relevants_files
 
     def _editBertosProject(self):
-        directory = self.infos["PROJECT_PATH"]
-        sources_dir = self.infos["SOURCES_PATH"]
-        old_sources_dir = self.infos.get("OLD_SOURCES_PATH", None)
+        maindir, srcdir, prjdir, hwdir, cfgdir, sources_dir, old_srcdir = self._projectDirectories()
         # Write the project file
-        self._writeProjectFile(directory + "/project.bertos")
+        self._writeProjectFile(maindir + "/project.bertos")
         # VERSION file
-        self._writeVersionFile(directory + "/VERSION")
-        # Destination source dir
-        self._createSourcesDir(sources_dir, directory + "/bertos", old_sources_dir)
+        self._writeVersionFile(maindir + "/VERSION")
         # Destination makefile
-        self._writeMakefile(directory + "/Makefile")
-        # Destination project dir
-        prjdir = self._createProjectDir(directory)
-        # Destination hw files
-        hwdir = self._createHwFilesDir(prjdir)
+        self._writeMakefile(maindir + "/Makefile")
+        # Merge sources
+        self._mergeSources(sources_dir, srcdir, old_srcdir)
         # Copy all the hw files
         self._writeHwFiles(sources_dir, hwdir)
-        # Destination configurations files
-        cfgdir = self._createCfgFilesDir(prjdir)
         # Set properly the autoenabled parameters
         self._setupAutoenabledParameters()
         # Copy all the configuration files
@@ -412,42 +396,31 @@ class BProject(object):
                         configuration[parameter]["value"] = "1" if information["enabled"] else "0"
                 self.infos["CONFIGURATIONS"] = configurations
 
-    def _createSourcesDir(self, sources_dir, dest_srcdir, old_sources_dir):
-        if not self.edit:
-            # If not in editing mode it copies all the bertos sources in the /bertos subdirectory of the project
-            shutil.rmtree(dest_srcdir, True)
-            copytree.copytree(sources_dir + "/bertos", dest_srcdir, ignore_list=const.IGNORE_LIST)
-        elif old_sources_dir:
-            # If in editing mode it merges the current bertos sources with the selected ones
-            # TODO: implement the three way merge algotihm
-            #
-            mergeSources(dest_srcdir, sources_dir, old_sources_dir)
-
-    def _createDestinationDirectory(self, maindir):
-        if os.path.isdir(maindir):
-            shutil.rmtree(maindir, True)        
-        os.makedirs(maindir)
-
-    def _createProjectDir(self, maindir):
+    def _projectDirectories(self):
+        maindir = self.infos["PROJECT_PATH"]
+        srcdir =  maindir + "/bertos"
         prjdir = os.path.join(maindir, self.infos["PROJECT_NAME"])
-        if not self.edit:
-            shutil.rmtree(prjdir, True)
-            os.mkdir(prjdir)
-        return prjdir
-
-    def _createHwFilesDir(self, prjdir):
         hwdir = prjdir + "/hw"
-        if not self.edit:
-            shutil.rmtree(hwdir, True)
-            os.mkdir(hwdir)
-        return hwdir
-
-    def _createCfgFilesDir(self, prjdir):
         cfgdir = prjdir + "/cfg"
-        if not self.edit:
-            shutil.rmtree(cfgdir, True)
-            os.mkdir(cfgdir)
-        return cfgdir
+        old_srcdir = self.infos.get("OLD_SOURCES_PATH", None)
+        sources_dir = self.infos["SOURCES_PATH"]
+        return maindir, srcdir, prjdir, hwdir, cfgdir, sources_dir, old_srcdir
+
+    def _createDirectory(self, directory):
+        if not directory:
+            return
+        if os.path.isdir(directory):
+            shutil.rmtree(directory, True)        
+        os.makedirs(directory)
+
+    def _copySources(self, origin, destination):
+        # If not in editing mode it copies all the bertos sources in the /bertos subdirectory of the project
+        shutil.rmtree(destination, True)        
+        copytree.copytree(origin + "/bertos", destination, ignore_list=const.IGNORE_LIST)
+
+    def _mergeSources(self, origin, destination, old_sources_dir):
+        if old_sources_dir:
+            mergeSources(destination, origin, old_sources_dir)
 
     def setInfo(self, key, value):
         """
