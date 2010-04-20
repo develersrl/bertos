@@ -54,7 +54,7 @@ from bertos_utils import (
                             
                             # Project creation functions
                             projectFileGenerator, versionFileGenerator, makefileGenerator,
-                            userMkGenerator, mkGenerator, loadPlugin,
+                            userMkGenerator, mkGenerator, loadPlugin, mergeSources,
 
                             # Custom exceptions
                             ParseError, SupportedException
