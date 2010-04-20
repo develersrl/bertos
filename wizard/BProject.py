@@ -274,8 +274,7 @@ class BProject(object):
         # Write the project file
         self._writeProjectFile(directory + "/project.bertos")
         # VERSION file
-        version_file = open(os.path.join(const.DATA_DIR, "vtemplates/VERSION"), "r").read()
-        open(directory + "/VERSION", "w").write(versionFileGenerator(self, version_file))
+        self._writeVersionFile(directory + "/VERSION")
         # Destination source dir
         srcdir = directory + "/bertos"
         if not edit:
@@ -316,6 +315,10 @@ class BProject(object):
             module = loadPlugin(plugin)
             relevants_files[plugin] = module.createProject(self)
         self.infos["RELEVANT_FILES"] = relevants_files
+
+    def _writeVersionFile(self, filename):
+        version_file = open(os.path.join(const.DATA_DIR, "vtemplates/VERSION"), "r").read()
+        open(filename, "w").write(versionFileGenerator(self, version_file))
 
     def _writeProjectFile(self, filename):
         f = open(filename, "w")
