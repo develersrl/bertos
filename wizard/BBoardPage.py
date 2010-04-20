@@ -66,9 +66,14 @@ class BBoardPage(BWizardPage):
         Overload of the QWizardPage isComplete method.
         """
         if self.selected:
-            _type = qvariant_converter.getDict(self.selected.data(0, Qt.UserRole))["type"]
+            _info_dict = qvariant_converter.getDict(self.selected.data(0, Qt.UserRole))
+            _type = _info_dict["type"]
             type = qvariant_converter.getString(_type)
-            return type == "project"
+            if type == "project":
+                self.setProjectInfo("PROJECT_PRESET", qvariant_converter.getString(_info_dict["path"]))
+                return True
+            else:
+                return False
         else:
             return False
 
