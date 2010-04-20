@@ -96,7 +96,11 @@ class BRoutePage(BWizardPage):
         Overload of the BWizardPage reloadData method.
         """
         preset = self.projectInfo('PROJECT_PRESET')
-        self.project.loadProjectFromPreset(preset)
+        try:
+            QApplication.instance().setOverrideCursor(Qt.WaitCursor)
+            self.project.loadProjectFromPreset(preset)
+        finally:
+            QApplication.instance().restoreOverrideCursor()
 
     ####
 
