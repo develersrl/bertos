@@ -80,7 +80,7 @@ class BProject(object):
         if wizard_version < 1:
             # Ignore the SOURCES_PATH inside the project file for older projects
             project_data["SOURCES_PATH"] = project_dir
-        self.loadBertosSourceStuff(project_data, info_dict.get("SOURCES_PATH", None))
+        self._loadBertosSourceStuff(project_data, info_dict.get("SOURCES_PATH", None))
 
         # For those projects that don't have a VERSION file create a dummy one.
         if not isBertosDir(project_dir):
@@ -88,13 +88,13 @@ class BProject(object):
             open(os.path.join(project_dir, "VERSION"), "w").write(version_file.replace("$version", "").strip())
 
         self.loadSourceTree()
-        self.loadCpuStuff(project_data)
-        self.loadToolchainStuff(project_data, info_dict.get("TOOLCHAIN", None))
+        self._loadCpuStuff(project_data)
+        self._loadToolchainStuff(project_data, info_dict.get("TOOLCHAIN", None))
         self.infos["OUTPUT"] = project_data["OUTPUT"]
         self.loadModuleData(True)
         self.setEnabledModules(project_data["ENABLED_MODULES"])
 
-    def loadBertosSourceStuff(self, project_data, forced_version=None):
+    def _loadBertosSourceStuff(self, project_data, forced_version=None):
         bertos_source_path = project_data["SOURCES_PATH"]
         if forced_version:
             bertos_source_path = forced_version
@@ -103,7 +103,7 @@ class BProject(object):
         else:
             raise VersionException(self)
 
-    def loadCpuStuff(self, project_data):
+    def _loadCpuStuff(self, project_data):
         cpu_name = project_data["CPU_NAME"]
         self.infos["CPU_NAME"] = cpu_name
         cpu_info = self.getCpuInfos()
@@ -125,7 +125,7 @@ class BProject(object):
         self.infos["ALL_CPU_TAGS"] = tag_dict
         self.infos["SELECTED_FREQ"] = project_data["SELECTED_FREQ"]
 
-    def loadToolchainStuff(self, project_data, forced_toolchain=None):
+    def _loadToolchainStuff(self, project_data, forced_toolchain=None):
         toolchain = project_data["TOOLCHAIN"]
         if forced_toolchain:
             toolchain = forced_toolchain
