@@ -80,7 +80,7 @@ class BProject(object):
         if wizard_version < 1:
             # Ignore the SOURCES_PATH inside the project file for older projects
             project_data["SOURCES_PATH"] = project_dir
-        self._loadBertosSourceStuff(project_data, info_dict.get("SOURCES_PATH", None))
+        self._loadBertosSourceStuff(project_data["SOURCES_PATH"], info_dict.get("SOURCES_PATH", None))
 
         # For those projects that don't have a VERSION file create a dummy one.
         if not isBertosDir(project_dir):
@@ -88,23 +88,21 @@ class BProject(object):
             open(os.path.join(project_dir, "VERSION"), "w").write(version_file.replace("$version", "").strip())
 
         self.loadSourceTree()
-        self._loadCpuStuff(project_data)
-        self._loadToolchainStuff(project_data, info_dict.get("TOOLCHAIN", None))
+        self._loadCpuStuff(project_data["CPU_NAME"], project_data["SELECTED_FREQ"])
+        self._loadToolchainStuff(project_data["TOOLCHAIN"], info_dict.get("TOOLCHAIN", None))
         self.infos["OUTPUT"] = project_data["OUTPUT"]
         self.loadModuleData(True)
         self.setEnabledModules(project_data["ENABLED_MODULES"])
 
-    def _loadBertosSourceStuff(self, project_data, forced_version=None):
-        bertos_source_path = project_data["SOURCES_PATH"]
+    def _loadBertosSourceStuff(self, sources_path, forced_version=None):
         if forced_version:
-            bertos_source_path = forced_version
-        if os.path.exists(bertos_source_path):
-            self.infos["SOURCES_PATH"] = bertos_source_path
+            sources_path = forced_version
+        if os.path.exists(sources_path):
+            self.infos["SOURCES_PATH"] = sources_path
         else:
             raise VersionException(self)
 
-    def _loadCpuStuff(self, project_data):
-        cpu_name = project_data["CPU_NAME"]
+    def _loadCpuStuff(self, cpu_name, cpu_frequency):
         self.infos["CPU_NAME"] = cpu_name
         cpu_info = self.getCpuInfos()
         for cpu in cpu_info:
@@ -123,10 +121,10 @@ class BProject(object):
             else:
                 tag_dict[tag] = False
         self.infos["ALL_CPU_TAGS"] = tag_dict
-        self.infos["SELECTED_FREQ"] = project_data["SELECTED_FREQ"]
+        self.infos["SELECTED_FREQ"] = cpu_frequency
 
-    def _loadToolchainStuff(self, project_data, forced_toolchain=None):
-        toolchain = project_data["TOOLCHAIN"]
+    def _loadToolchainStuff(self, toolchain, forced_toolchain=None):
+        toolchain = toolchain
         if forced_toolchain:
             toolchain = forced_toolchain
         if os.path.exists(toolchain["path"]):
@@ -139,7 +137,21 @@ class BProject(object):
         Load a project from a preset.
         NOTE: this is a stub.
         """
-        self.loadBertosProject(os.path.join(preset, 'project.bertos'), {})
+        project_file = os.path.join(preset, "project.bertos")
+        project_data = pickle.loads(open(project_file, "r").read())
+        self.loadSourceTree()
+        self._loadCpuStuff(project_data["CPU_NAME"], project_data["SELECTED_FREQ"])
+        self._loadToolchainStuff(project_data["TOOLCHAIN"])
+        # NOTE: this is a HACK!!!
+        # TODO: find a better way to reuse loadModuleData
+        old_project_name = self.infos["PROJECT_NAME"]
+        old_project_path = self.infos["PROJECT_PATH"]
+        self.infos["PROJECT_NAME"] = project_data.get("PROJECT_NAME", os.path.basename(preset))
+        self.infos["PROJECT_PATH"] = preset
+        self.loadModuleData(True)
+        self.setEnabledModules(project_data["ENABLED_MODULES"])
+        self.infos["PROJECT_NAME"] = old_project_name
+        self.infos["PROJECT_PATH"] = old_project_path        
 
     def loadProjectPresets(self):
         """
