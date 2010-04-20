@@ -129,11 +129,14 @@ class BBoardPage(BWizardPage):
             self._createPresetNode(self.pageContent.boardTree, obj)
 
     def _createPresetNode(self, parent, obj):
+        selected_item_name = self.projectInfo("PROJECT_PRESET")
         item_name = obj["info"].get("name", obj["info"]["filename"])
         item = QTreeWidgetItem(parent, [item_name]) 
         item.setIcon(0, QIcon(self._getNodeIcon(obj)))
         children_dict = obj["children"]
         item.setData(0, Qt.UserRole, qvariant_converter.convertDict(obj["info"]))
+        if obj["info"]["path"] == selected_item_name:
+            self.pageContent.boardTree.setCurrentItem(item)
         for child in children_dict:
             self._createPresetNode(item, child)
 
