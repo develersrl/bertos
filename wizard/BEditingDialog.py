@@ -157,7 +157,7 @@ class BEditingDialog(QDialog):
     def apply(self):
         try:
             qApp.setOverrideCursor(QCursor(Qt.WaitCursor))
-            QApplication.instance().project.createBertosProject(edit=True)
+            QApplication.instance().project.createBertosProject()
         finally:
             qApp.restoreOverrideCursor()
         self.accept()

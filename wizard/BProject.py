@@ -68,7 +68,9 @@ class BProject(object):
     def __init__(self, project_file="", info_dict={}):
         self.infos = {}
         self._cached_queries = {}
+        self.edit = False
         if project_file:
+            self.edit = True
             self.loadBertosProject(project_file, info_dict)
 
     #--- Load methods (methods that loads data into project) ------------------#
@@ -265,41 +267,80 @@ class BProject(object):
 
     #-------------------------------------------------------------------------#
 
-    def createBertosProject(self, edit=False):
+    def createBertosProject(self):
+        if self.edit:
+            self._editBertosProject()
+        else:
+            self._newBertosProject()
+    
+    def _newBertosProject(self):
         directory = self.infos["PROJECT_PATH"]
         sources_dir = self.infos["SOURCES_PATH"]
         old_sources_dir = self.infos.get("OLD_SOURCES_PATH", None)
         # Create the destination directory
-        self._createDestinationDirectory(directory, edit)
+        self._createDestinationDirectory(directory)
         # Write the project file
         self._writeProjectFile(directory + "/project.bertos")
         # VERSION file
         self._writeVersionFile(directory + "/VERSION")
         # Destination source dir
-        self._createSourcesDir(sources_dir, directory + "/bertos", old_sources_dir, edit)
+        self._createSourcesDir(sources_dir, directory + "/bertos", old_sources_dir)
         # Destination makefile
         self._writeMakefile(directory + "/Makefile")
         # Destination project dir
         # prjdir = directory + "/" + os.path.basename(directory)
         prjdir = self._createProjectDir(directory)
         # Destination hw files
-        hwdir = self._createHwFilesDir(prjdir, edit)
+        hwdir = self._createHwFilesDir(prjdir)
         # Copy all the hw files
-        self._writeHwFiles(sources_dir, hwdir, edit)
+        self._writeHwFiles(sources_dir, hwdir)
         # Destination configurations files
-        cfgdir = self._createCfgFilesDir(prjdir, edit)
+        cfgdir = self._createCfgFilesDir(prjdir)
         # Set properly the autoenabled parameters
         self._setupAutoenabledParameters()
         # Copy all the configuration files
         self._writeCfgFiles(sources_dir, cfgdir)
-        if not edit:
+        if not self.edit:
             # Destination user mk file (only on project creation)
             self._writeUserMkFile(os.path.join(prjdir, os.path.basename(prjdir) + ".mk"))
         # Destination wizard mk file
         self._writeWizardMkFile(prjdir + "/" + os.path.basename(prjdir) + "_wiz.mk")
         # Destination main.c file
-        if not edit:
+        if not self.edit:
             self._writeMainFile(prjdir + "/main.c")
+        # Files for selected plugins
+        relevants_files = {}
+        for plugin in self.infos["OUTPUT"]:
+            module = loadPlugin(plugin)
+            relevants_files[plugin] = module.createProject(self)
+        self.infos["RELEVANT_FILES"] = relevants_files
+
+    def _editBertosProject(self):
+        directory = self.infos["PROJECT_PATH"]
+        sources_dir = self.infos["SOURCES_PATH"]
+        old_sources_dir = self.infos.get("OLD_SOURCES_PATH", None)
+        # Write the project file
+        self._writeProjectFile(directory + "/project.bertos")
+        # VERSION file
+        self._writeVersionFile(directory + "/VERSION")
+        # Destination source dir
+        self._createSourcesDir(sources_dir, directory + "/bertos", old_sources_dir)
+        # Destination makefile
+        self._writeMakefile(directory + "/Makefile")
+        # Destination project dir
+        prjdir = self._createProjectDir(directory)
+        # Destination hw files
+        hwdir = self._createHwFilesDir(prjdir)
+        # Copy all the hw files
+        self._writeHwFiles(sources_dir, hwdir)
+        # Destination configurations files
+        cfgdir = self._createCfgFilesDir(prjdir)
+        # Set properly the autoenabled parameters
+        self._setupAutoenabledParameters()
+        # Copy all the configuration files
+        self._writeCfgFiles(sources_dir, cfgdir)
+        # Destination wizard mk file
+        self._writeWizardMkFile(prjdir + "/" + os.path.basename(prjdir) + "_wiz.mk")
         # Files for selected plugins
         relevants_files = {}
         for plugin in self.infos["OUTPUT"]:
@@ -336,12 +377,12 @@ class BProject(object):
         main = open(os.path.join(const.DATA_DIR, "srctemplates/main.c"), "r").read()
         open(filename, "w").write(main)
 
-    def _writeHwFiles(self, source_dir, destination_dir, edit=False):
+    def _writeHwFiles(self, source_dir, destination_dir):
         for module, information in self.infos["MODULES"].items():
             for hwfile in information["hw"]:
                 string = open(source_dir + "/" + hwfile, "r").read()
                 hwfile_path = destination_dir + "/" + os.path.basename(hwfile)
-                if not edit or not os.path.exists(hwfile_path):
+                if not self.edit or not os.path.exists(hwfile_path):
                     # If not in editing mode it copies all the hw files. If in
                     # editing mode it copies only the files that don't exist yet
                     open(destination_dir + "/" + os.path.basename(hwfile), "w").write(string)
@@ -371,8 +412,8 @@ class BProject(object):
                         configuration[parameter]["value"] = "1" if information["enabled"] else "0"
                 self.infos["CONFIGURATIONS"] = configurations
 
-    def _createSourcesDir(self, sources_dir, dest_srcdir, old_sources_dir, edit=False):
-        if not edit:
+    def _createSourcesDir(self, sources_dir, dest_srcdir, old_sources_dir):
+        if not self.edit:
             # If not in editing mode it copies all the bertos sources in the /bertos subdirectory of the project
             shutil.rmtree(dest_srcdir, True)
             copytree.copytree(sources_dir + "/bertos", dest_srcdir, ignore_list=const.IGNORE_LIST)
@@ -382,29 +423,28 @@ class BProject(object):
             #
             mergeSources(dest_srcdir, sources_dir, old_sources_dir)
 
-    def _createDestinationDirectory(self, maindir, edit=False):
-        if not edit:
-            if os.path.isdir(maindir):
-                shutil.rmtree(maindir, True)        
-            os.makedirs(maindir)
+    def _createDestinationDirectory(self, maindir):
+        if os.path.isdir(maindir):
+            shutil.rmtree(maindir, True)        
+        os.makedirs(maindir)
 
-    def _createProjectDir(self, maindir, edit=False):
+    def _createProjectDir(self, maindir):
         prjdir = os.path.join(maindir, self.infos["PROJECT_NAME"])
-        if not edit:
+        if not self.edit:
             shutil.rmtree(prjdir, True)
             os.mkdir(prjdir)
         return prjdir
 
-    def _createHwFilesDir(self, prjdir, edit=False):
+    def _createHwFilesDir(self, prjdir):
         hwdir = prjdir + "/hw"
-        if not edit:
+        if not self.edit:
             shutil.rmtree(hwdir, True)
             os.mkdir(hwdir)
         return hwdir
 
-    def _createCfgFilesDir(self, prjdir, edit=False):
+    def _createCfgFilesDir(self, prjdir):
         cfgdir = prjdir + "/cfg"
-        if not edit:
+        if not self.edit:
             shutil.rmtree(cfgdir, True)
             os.mkdir(cfgdir)
         return cfgdir
