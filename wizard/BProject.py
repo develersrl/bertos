@@ -65,6 +65,8 @@ class BProject(object):
         if project_file:
             self.loadBertosProject(project_file, info_dict)
 
+    #--- Load methods (methods that loads data into project) ------------------#
+
     def loadBertosProject(self, project_file, info_dict):
         project_dir = os.path.dirname(project_file)
         project_data = pickle.loads(open(project_file, "r").read())
@@ -72,23 +74,39 @@ class BProject(object):
         # NOTE: this can throw an Exception if the user has changed the directory containing the project
         self.infos["PROJECT_NAME"] = project_data.get("PROJECT_NAME", os.path.basename(project_dir))
         self.infos["PROJECT_PATH"] = os.path.dirname(project_file)
+        
         # Check for the Wizard version
         wizard_version = project_data.get("WIZARD_VERSION", 0)
-        # Ignore the SOURCES_PATH inside the project file
-        project_data["SOURCES_PATH"] = project_dir
-        if "SOURCES_PATH" in info_dict:
-            project_data["SOURCES_PATH"] = info_dict["SOURCES_PATH"]
-        if os.path.exists(project_data["SOURCES_PATH"]):
-            self.infos["SOURCES_PATH"] = project_data["SOURCES_PATH"]
-        else:
-            raise VersionException(self)
+        if wizard_version < 1:
+            # Ignore the SOURCES_PATH inside the project file for older projects
+            project_data["SOURCES_PATH"] = project_dir
+        self.loadBertosSourceStuff(project_data, info_dict.get("SOURCES_PATH", None))
+        
+        # For those projects that don't have a VERSION file create a dummy one.
         if not isBertosDir(project_dir):
             version_file = open(os.path.join(const.DATA_DIR, "vtemplates/VERSION"), "r").read()
             open(os.path.join(project_dir, "VERSION"), "w").write(version_file.replace("$version", "").strip())
+            
         self.loadSourceTree()
+        self.loadCpuStuff(project_data)
+        self.loadToolchainStuff(project_data, info_dict.get("TOOLCHAIN", None))
+        self.infos["OUTPUT"] = project_data["OUTPUT"]
+        self.loadModuleData(True)
+        setEnabledModules(self, project_data["ENABLED_MODULES"])
+
+    def loadBertosSourceStuff(self, project_data, forced_version=None):
+        bertos_source_path = project_data["SOURCES_PATH"]
+        if forced_version:
+            bertos_source_path = forced_version
+        if os.path.exists(bertos_source_path):
+            self.infos["SOURCES_PATH"] = bertos_source_path
+        else:
+            raise VersionException(self)
+
+    def loadCpuStuff(self, project_data):
         cpu_name = project_data["CPU_NAME"]
         self.infos["CPU_NAME"] = cpu_name
-        cpu_info = self.loadCpuInfos()
+        cpu_info = self.getCpuInfos()
         for cpu in cpu_info:
             if cpu["CPU_NAME"] == cpu_name:
                 self.infos["CPU_INFOS"] = cpu
@@ -105,20 +123,21 @@ class BProject(object):
             else:
                 tag_dict[tag] = False
         self.infos["ALL_CPU_TAGS"] = tag_dict
-        if "TOOLCHAIN" in info_dict:
-            project_data["TOOLCHAIN"] = info_dict["TOOLCHAIN"]
-        if os.path.exists(project_data["TOOLCHAIN"]["path"]):
-            self.infos["TOOLCHAIN"] = project_data["TOOLCHAIN"]
+        self.infos["SELECTED_FREQ"] = project_data["SELECTED_FREQ"]
+
+    def loadToolchainStuff(self, project_data, forced_toolchain=None):
+        toolchain = project_data["TOOLCHAIN"]
+        if forced_toolchain:
+            toolchain = forced_toolchain
+        if os.path.exists(toolchain["path"]):
+            self.infos["TOOLCHAIN"] = toolchain
         else:
             raise ToolchainException(self)
-        self.infos["SELECTED_FREQ"] = project_data["SELECTED_FREQ"]
-        self.infos["OUTPUT"] = project_data["OUTPUT"]
-        self.loadModuleData(True)
-        setEnabledModules(self, project_data["ENABLED_MODULES"])
 
     def loadProjectFromPreset(self, preset):
         """
         Load a project from a preset.
+        NOTE: this is a stub.
         """
         self.loadBertosProject(os.path.join(preset, 'project.bertos'), {})
 
@@ -208,16 +227,25 @@ class BProject(object):
         self.infos["CONFIGURATIONS"] = configuration_info_dict
         self.infos["FILES"] = file_dict
 
-    def loadCpuInfos(self):
-        cpuInfos = []
-        for definition in self.findDefinitions(const.CPU_DEFINITION):
-            cpuInfos.append(getInfos(definition))
-        return cpuInfos
+    def loadSourceTree(self):
+        """
+        Index BeRTOS source and load it in memory.
+        """
+        # Index only the SOURCES_PATH/bertos content
+        bertos_sources_dir = os.path.join(self.info("SOURCES_PATH"), 'bertos')
+        file_dict = {}
+        if os.path.exists(bertos_sources_dir):
+            for element in os.walk(bertos_sources_dir):
+                for f in element[2]:
+                    file_dict[f] = file_dict.get(f, []) + [element[0]]
+        self.infos["FILE_DICT"] = file_dict
 
     def reloadCpuInfo(self):
-        for cpu_info in self.loadCpuInfos():
+        for cpu_info in self.getCpuInfos():
             if cpu_info["CPU_NAME"] == self.infos["CPU_NAME"]:
                 self.infos["CPU_INFOS"] = cpu_info
+
+    #-------------------------------------------------------------------------#
 
     def setInfo(self, key, value):
         """
@@ -233,15 +261,11 @@ class BProject(object):
             return copy.deepcopy(self.infos[key])
         return default
 
-    def loadSourceTree(self):
-        # Index only the SOURCES_PATH/bertos content
-        bertos_sources_dir = os.path.join(self.info("SOURCES_PATH"), 'bertos')
-        file_dict = {}
-        if os.path.exists(bertos_sources_dir):
-            for element in os.walk(bertos_sources_dir):
-                for f in element[2]:
-                    file_dict[f] = file_dict.get(f, []) + [element[0]]
-        self.infos["FILE_DICT"] = file_dict
+    def getCpuInfos(self):
+        cpuInfos = []
+        for definition in self.findDefinitions(const.CPU_DEFINITION):
+            cpuInfos.append(getInfos(definition))
+        return cpuInfos
 
     def searchFiles(self, filename):
         file_dict = self.infos["FILE_DICT"]

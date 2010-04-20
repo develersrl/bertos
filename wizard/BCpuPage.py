@@ -161,7 +161,7 @@ class BCpuPage(BWizardPage):
         """
         self.pageContent.cpuList.clear()
         self.pageContent.cpuList.setCurrentItem(None)
-        infos = self.project.loadCpuInfos()
+        infos = self.project.getCpuInfos()
         tag_list = bertos_utils.getTagSet(infos)
         # Create, fill and store the dict with the tags
         tag_dict = {}
