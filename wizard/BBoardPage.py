@@ -65,7 +65,12 @@ class BBoardPage(BWizardPage):
         """
         Overload of the QWizardPage isComplete method.
         """
-        return False
+        if self.selected:
+            _type = qvariant_converter.getDict(self.selected.data(0, Qt.UserRole))["type"]
+            type = qvariant_converter.getString(_type)
+            return type == "project"
+        else:
+            return False
 
     def nextId(self):
         """
@@ -87,7 +92,7 @@ class BBoardPage(BWizardPage):
         """
         Overload of the BWizardPage connectSignals method.
         """
-        pass
+        self.connect(self.pageContent.boardTree, SIGNAL("itemSelectionChanged()"), self, SIGNAL("completeChanged()"))
 
     def reloadData(self):
         """
@@ -102,26 +107,36 @@ class BBoardPage(BWizardPage):
 
     ####
 
+    @property
+    def selected(self):
+        # We can only take the selected item list (not the single item)
+        _selected_items = self.pageContent.boardTree.selectedItems()
+        if _selected_items:
+            return _selected_items[0]
+        else:
+            return None
+
     def _fillPresetTree(self):
         self.pageContent.boardTree.clear()
         self.project.loadProjectPresets()
         preset_tree = self.project.info("PRESET_TREE")
-        for obj in preset_tree['children']:
+        for obj in preset_tree["children"]:
             self._createPresetNode(self.pageContent.boardTree, obj)
 
     def _createPresetNode(self, parent, obj):
-        item_name = obj['info'].get('name', obj['info']['filename'])
+        item_name = obj["info"].get("name", obj["info"]["filename"])
         item = QTreeWidgetItem(parent, [item_name]) 
         item.setIcon(0, QIcon(self._getNodeIcon(obj)))
-        children_dict = obj['children']
+        children_dict = obj["children"]
+        item.setData(0, Qt.UserRole, qvariant_converter.convertDict(obj["info"]))
         for child in children_dict:
             self._createPresetNode(item, child)
 
     def _getNodeIcon(self, obj):
-        icon_file = os.path.join(obj['info']['path'], const.PREDEFINED_BOARD_ICON_FILE)
+        icon_file = os.path.join(obj["info"]["path"], const.PREDEFINED_BOARD_ICON_FILE)
         if os.path.exists(icon_file):
             return icon_file
-        elif obj['children']:
+        elif obj["info"]["type"] == "dir":
             return const.PREDEFINED_BOARD_DEFAULT_DIR_ICON
         else:
             return const.PREDEFINED_BOARD_DEFAULT_PROJECT_ICON
