@@ -269,14 +269,10 @@ class BProject(object):
         directory = self.infos["PROJECT_PATH"]
         sources_dir = self.infos["SOURCES_PATH"]
         old_sources_dir = self.infos.get("OLD_SOURCES_PATH", None)
-        if not edit:
-            if os.path.isdir(directory):
-                shutil.rmtree(directory, True)        
-            os.makedirs(directory)
+        # Create the destination directory
+        self._createDestinationDirectory(directory, edit)
         # Write the project file
-        f = open(directory + "/project.bertos", "w")
-        f.write(projectFileGenerator(self))
-        f.close()
+        self._writeProjectFile(directory + "/project.bertos")
         # VERSION file
         version_file = open(os.path.join(const.DATA_DIR, "vtemplates/VERSION"), "r").read()
         open(directory + "/VERSION", "w").write(versionFileGenerator(self, version_file))
@@ -292,47 +288,73 @@ class BProject(object):
             #
             mergeSources(srcdir, sources_dir, old_sources_dir)
         # Destination makefile
-        makefile = directory + "/Makefile"
-        makefile = open(os.path.join(const.DATA_DIR, "mktemplates/Makefile"), 'r').read()
-        makefile = makefileGenerator(self, makefile)
-        open(directory + "/Makefile", "w").write(makefile)
+        self._writeMakefile(directory + "/Makefile")
         # Destination project dir
         # prjdir = directory + "/" + os.path.basename(directory)
-        prjdir = os.path.join(directory, self.infos["PROJECT_NAME"])
-        if not edit:
-            shutil.rmtree(prjdir, True)
-            os.mkdir(prjdir)
+        prjdir = self._createProjectDir(directory)
         # Destination hw files
-        hwdir = prjdir + "/hw"
-        if not edit:
-            shutil.rmtree(hwdir, True)
-            os.mkdir(hwdir)
+        hwdir = self._createHwFilesDir(prjdir, edit)
         # Copy all the hw files
+        self._writeHwFiles(sources_dir, hwdir, edit)
+        # Destination configurations files
+        cfgdir = self._createCfgFilesDir(prjdir, edit)
+        # Set properly the autoenabled parameters
+        self._setupAutoenabledParameters()
+        # Copy all the configuration files
+        self._writeCfgFiles(sources_dir, cfgdir)
+        if not edit:
+            # Destination user mk file (only on project creation)
+            self._writeUserMkFile(os.path.join(prjdir, os.path.basename(prjdir) + ".mk"))
+        # Destination wizard mk file
+        self._writeWizardMkFile(prjdir + "/" + os.path.basename(prjdir) + "_wiz.mk")
+        # Destination main.c file
+        if not edit:
+            self._writeMainFile(prjdir + "/main.c")
+        # Files for selected plugins
+        relevants_files = {}
+        for plugin in self.infos["OUTPUT"]:
+            module = loadPlugin(plugin)
+            relevants_files[plugin] = module.createProject(self)
+        self.infos["RELEVANT_FILES"] = relevants_files
+
+    def _writeProjectFile(self, filename):
+        f = open(filename, "w")
+        f.write(projectFileGenerator(self))
+        f.close()
+
+    def _writeMakefile(self, filename):
+        makefile = open(os.path.join(const.DATA_DIR, "mktemplates/Makefile"), 'r').read()
+        makefile = makefileGenerator(self, makefile)
+        open(filename, "w").write(makefile)
+
+    def _writeUserMkFile(self, filename):
+        makefile = open(os.path.join(const.DATA_DIR, "mktemplates/template.mk"), "r").read()
+        # Deadly performances loss was here :(
+        makefile = userMkGenerator(self, makefile)
+        open(filename, "w").write(makefile)
+
+    def _writeWizardMkFile(self, filename):
+        makefile = open(os.path.join(const.DATA_DIR, "mktemplates/template_wiz.mk"), "r").read()
+        makefile = mkGenerator(self, makefile)
+        open(filename, "w").write(makefile)
+
+    def _writeMainFile(self, filename):
+        main = open(os.path.join(const.DATA_DIR, "srctemplates/main.c"), "r").read()
+        open(filename, "w").write(main)
+
+    def _writeHwFiles(self, source_dir, destination_dir, edit=False):
         for module, information in self.infos["MODULES"].items():
             for hwfile in information["hw"]:
-                string = open(sources_dir + "/" + hwfile, "r").read()
-                hwfile_path = hwdir + "/" + os.path.basename(hwfile)
+                string = open(source_dir + "/" + hwfile, "r").read()
+                hwfile_path = destination_dir + "/" + os.path.basename(hwfile)
                 if not edit or not os.path.exists(hwfile_path):
                     # If not in editing mode it copies all the hw files. If in
                     # editing mode it copies only the files that don't exist yet
-                    open(hwdir + "/" + os.path.basename(hwfile), "w").write(string)
-        # Destination configurations files
-        cfgdir = prjdir + "/cfg"
-        if not edit:
-            shutil.rmtree(cfgdir, True)
-            os.mkdir(cfgdir)
-        # Set properly the autoenabled parameters
-        for module, information in self.infos["MODULES"].items():
-            if "configuration" in information and information["configuration"] != "":
-                configurations = self.infos["CONFIGURATIONS"]
-                configuration = configurations[information["configuration"]]
-                for start, parameter in configuration["paramlist"]:
-                    if "type" in configuration[parameter]["informations"] and configuration[parameter]["informations"]["type"] == "autoenabled":
-                        configuration[parameter]["value"] = "1" if information["enabled"] else "0"
-                self.infos["CONFIGURATIONS"] = configurations
-        # Copy all the configuration files
+                    open(destination_dir + "/" + os.path.basename(hwfile), "w").write(string)
+
+    def _writeCfgFiles(self, source_dir, destination_dir):
         for configuration, information in self.infos["CONFIGURATIONS"].items():
-            string = open(sources_dir + "/" + configuration, "r").read()
+            string = open(source_dir + "/" + configuration, "r").read()
             for start, parameter in information["paramlist"]:
                 infos = information[parameter]
                 value = infos["value"]
@@ -341,29 +363,46 @@ class BProject(object):
                 if "long" in infos["informations"] and infos["informations"]["long"]:
                     value += "L"
                 string = sub(string, parameter, value)
-            f = open(cfgdir + "/" + os.path.basename(configuration), "w")
+            f = open(destination_dir + "/" + os.path.basename(configuration), "w")
             f.write(string)
             f.close()
+
+    def _setupAutoenabledParameters(self):
+        for module, information in self.infos["MODULES"].items():
+            if "configuration" in information and information["configuration"] != "":
+                configurations = self.infos["CONFIGURATIONS"]
+                configuration = configurations[information["configuration"]]
+                for start, parameter in configuration["paramlist"]:
+                    if "type" in configuration[parameter]["informations"] and configuration[parameter]["informations"]["type"] == "autoenabled":
+                        configuration[parameter]["value"] = "1" if information["enabled"] else "0"
+                self.infos["CONFIGURATIONS"] = configurations
+
+    def _createDestinationDirectory(self, maindir, edit=False):
         if not edit:
-            # Destination user mk file (only on project creation)
-            makefile = open(os.path.join(const.DATA_DIR, "mktemplates/template.mk"), "r").read()
-            # Deadly performances loss was here :(
-            makefile = userMkGenerator(self, makefile)
-            open(prjdir + "/" + os.path.basename(prjdir) + ".mk", "w").write(makefile)
-        # Destination wizard mk file
-        makefile = open(os.path.join(const.DATA_DIR, "mktemplates/template_wiz.mk"), "r").read()
-        makefile = mkGenerator(self, makefile)
-        open(prjdir + "/" + os.path.basename(prjdir) + "_wiz.mk", "w").write(makefile)
-        # Destination main.c file
+            if os.path.isdir(maindir):
+                shutil.rmtree(maindir, True)        
+            os.makedirs(maindir)
+
+    def _createProjectDir(self, maindir, edit=False):
+        prjdir = os.path.join(maindir, self.infos["PROJECT_NAME"])
         if not edit:
-            main = open(os.path.join(const.DATA_DIR, "srctemplates/main.c"), "r").read()
-            open(prjdir + "/main.c", "w").write(main)
-        # Files for selected plugins
-        relevants_files = {}
-        for plugin in self.infos["OUTPUT"]:
-            module = loadPlugin(plugin)
-            relevants_files[plugin] = module.createProject(self)
-        self.infos["RELEVANT_FILES"] = relevants_files
+            shutil.rmtree(prjdir, True)
+            os.mkdir(prjdir)
+        return prjdir
+
+    def _createHwFilesDir(self, prjdir, edit=False):
+        hwdir = prjdir + "/hw"
+        if not edit:
+            shutil.rmtree(hwdir, True)
+            os.mkdir(hwdir)
+        return hwdir
+
+    def _createCfgFilesDir(self, prjdir, edit=False):
+        cfgdir = prjdir + "/cfg"
+        if not edit:
+            shutil.rmtree(cfgdir, True)
+            os.mkdir(cfgdir)
+        return cfgdir
 
     def setInfo(self, key, value):
         """
