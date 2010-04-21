@@ -295,7 +295,7 @@ static void menu_layout(
 		/* Clear rest of area */
 		gfx_rectClear(bm, bm->cr.xmin, ypos, bm->cr.xmax, bm->cr.ymax);
 
-		lcd_blitBitmap(&lcd_bitmap);
+		lcd_blitBitmap(bm);
 	}
 
 	/* Restore old cliprect */
