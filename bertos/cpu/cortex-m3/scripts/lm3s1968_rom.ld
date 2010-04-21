@@ -104,15 +104,15 @@ SECTIONS
 	 * Data heap is allocate at end of stack.
 	 */
 	PROVIDE (__msp_start = .);
-	. = ALIGN(4);
+	. = ALIGN(8);
 	. += STACK_SIZE;
 	PROVIDE (__msp_end = .);
 
 	PROVIDE (__psp_start = .);
-	. = ALIGN(4);
+	. = ALIGN(8);
 	. += STACK_SIZE;
 	PROVIDE (__psp_end = .);
 
 	PROVIDE (__heap_start = .);
-	. = ALIGN(4);
+	. = ALIGN(8);
 }

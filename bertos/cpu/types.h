@@ -84,15 +84,8 @@
 	typedef uint32_t cpu_stack_t;
 	#define SIZEOF_CPUSTACK_T 4
 
-	#if CPU_ARM
-		typedef uint64_t cpu_aligned_stack_t;
-		#define SIZEOF_CPUALIGNED_T 8
-	#elif CPU_CM3
-		typedef uint32_t cpu_aligned_stack_t;
-		#define SIZEOF_CPUALIGNED_T 4
-	#else
-		#error CPU configuration error
-	#endif
+	typedef uint64_t cpu_aligned_stack_t;
+	#define SIZEOF_CPUALIGNED_T 8
 
 #elif CPU_PPC
 
