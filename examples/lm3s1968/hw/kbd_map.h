@@ -58,6 +58,7 @@ typedef uint16_t keymask_t;
 #define K_LEFT     BV(5)
 #define K_RIGHT    BV(6)
 #define K_OK       BV(7)
+#define K_CANCEL   BV(8)
 
 #define K_REPEAT   BV(13) /**< This is a repeated keyevent. */
 #define K_TIMEOUT  BV(14) /**< Fake key event for timeouts. */

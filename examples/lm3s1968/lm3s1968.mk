@@ -24,8 +24,10 @@ lm3s1968_CSRC = \
 	bertos/gfx/win.c \
 	bertos/gfx/text.c \
 	bertos/gfx/text_format.c \
-	bertos/fonts/luBS14.c \
+	bertos/gui/menu.c \
 	bertos/fonts/helvB10.c \
+	bertos/fonts/luBS14.c \
+	bertos/fonts/ncenB18.c \
 	bertos/icons/logo.c \
 	bertos/mware/formatwr.c \
 	bertos/mware/hex.c \
@@ -34,6 +36,7 @@ lm3s1968_CSRC = \
 	bertos/struct/heap.c \
 	bertos/drv/timer.c \
 	bertos/drv/ser.c \
+	bertos/drv/kbd.c \
 	bertos/drv/lcd_rit128x96.c \
 	bertos/kern/kfile.c \
 	bertos/kern/monitor.c \

@@ -76,10 +76,9 @@
 #define LCD_WRITE(x)							\
 	{								\
 		uint32_t _x;						\
-		lm3s_ssiWriteFrame(SSI0_BASE, x);			\
+		while (!lm3s_ssiWriteFrameNonBlocking(SSI0_BASE, x));	\
 		/* Dummy read to drain the FIFO */			\
 		while (!lm3s_ssiReadFrameNonBlocking(SSI0_BASE, &_x));	\
-			cpu_relax();					\
 	}
 /*@}*/
 
@@ -119,5 +118,11 @@ INLINE void lcd_bus_init(void)
 	/* Drain the SSI RX FIFO */
 	while (lm3s_ssiReadFrameNonBlocking(SSI0_BASE, &dummy));
 }
+
+/*
+ * XXX: menu stuff requires lcd_blitBimap() function to be defined.
+ * Find a better way to do this.
+ */
+#define rit128x96_lcd_blitBitmap lcd_blitBitmap
 
 #endif /* HW_RIT128x96_H */

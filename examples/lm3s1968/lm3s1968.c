@@ -38,10 +38,12 @@
 #include <cpu/irq.h>
 #include <drv/timer.h>
 #include <drv/ser.h>
+#include <drv/kbd.h>
 #include <drv/lcd_rit128x96.h>
 #include <gfx/gfx.h>
 #include <gfx/font.h>
 #include <gfx/text.h>
+#include <gui/menu.h>
 #include <icons/logo.h>
 #include <stdio.h>
 
@@ -66,9 +68,11 @@ static PROC_DEFINE_STACK(led_stack, PROC_STACK_SIZE);
 
 extern Font font_helvB10;
 static uint8_t raster[RAST_SIZE(LCD_WIDTH, LCD_HEIGHT)];
-static Bitmap bm;
+static Bitmap lcd_bitmap;
 
-static Process *hp_proc, *lp_proc, *res_proc;
+#define KEY_MASK (K_UP | K_DOWN | K_LEFT | K_RIGHT | K_OK)
+
+static Process *hp_proc, *lp_proc, *led_proc;
 static hptime_t start, end;
 
 static Serial ser_port;
@@ -97,12 +101,19 @@ INLINE void led_off(void)
 	GPIO_PORTG_DATA_R &= ~0x04;
 }
 
+static bool led_blinking;
+
 static void NORETURN led_process(void)
 {
 	int i;
 
 	for (i = 0; ; i++)
 	{
+		if (!led_blinking)
+		{
+			led_off();
+			sig_wait(SIG_USER0);
+		}
 		if (i & 1)
 			led_on();
 		else
@@ -111,20 +122,66 @@ static void NORETURN led_process(void)
 	}
 }
 
-static void NORETURN ser_process(void)
+static void led_test(UNUSED_ARG(Bitmap *, bm))
 {
-	char buf[32];
-	int i;
+	led_blinking = !led_blinking;
+	sig_send(led_proc, SIG_USER0);
+}
 
-	ser_init(&ser_port, SER_UART0);
-	ser_setbaudrate(&ser_port, 115200);
+static void bouncing_logo(Bitmap *bm)
+{
+	const long SPEED_SCALE = 1000;
+	const long GRAVITY_ACCEL = 100;
+	const long BOUNCE_ELASTICITY = 1;
+	long h = (long)(-bertos_logo.height) * SPEED_SCALE;
+	long speed = 0, i;
 
-	/* BeRTOS terminal */
 	for (i = 0; ; i++)
 	{
-		kfile_printf(&ser_port.fd, "\n\r[%03d] BeRTOS:~$ ", i);
-		kfile_gets_echo(&ser_port.fd, buf, sizeof(buf), true);
-		kfile_printf(&ser_port.fd, "%s", buf);
+		/* Move */
+		h += speed;
+
+		/* Gravity acceleration */
+		speed += GRAVITY_ACCEL;
+
+		if (h > 0 && speed > 0)
+		{
+			/* Bounce */
+			speed = -(speed / BOUNCE_ELASTICITY);
+
+		}
+		/* Update graphics */
+		gfx_bitmapClear(bm);
+		gfx_blitImage(bm,
+			(LCD_WIDTH - bertos_logo.width) / 2,
+			(LCD_HEIGHT - bertos_logo.height) / 2 + h / SPEED_SCALE,
+			&bertos_logo);
+		text_xprintf(bm, 7, 0, TEXT_FILL | TEXT_CENTER, "Press SELECT to quit");
+		rit128x96_lcd_blitBitmap(bm);
+		timer_delay(5);
+		if (kbd_peek() & KEY_MASK)
+			break;
+	}
+}
+
+static void screen_saver(Bitmap *bm)
+{
+	int x1, y1, x2, y2;
+	int i;
+
+	for (i = 0; ; i++)
+	{
+		x1 = i % LCD_WIDTH;
+		y1 = i % LCD_HEIGHT;
+
+		x2 = LCD_WIDTH - i % LCD_WIDTH;
+		y2 = LCD_HEIGHT - i % LCD_HEIGHT;
+
+		gfx_bitmapClear(bm);
+		gfx_rectDraw(bm, x1, y1, x2, y2);
+		rit128x96_lcd_blitBitmap(bm);
+		if (kbd_peek() & KEY_MASK)
+			break;
 	}
 }
 
@@ -132,34 +189,6 @@ INLINE hptime_t get_hp_ticks(void)
 {
 	return (TIMER_HW_CNT - timer_hw_hpread()) +
 			timer_clock_unlocked() * TIMER_HW_CNT;
-}
-
-static void NORETURN res_process(void)
-{
-	const char spinner[] = {'/', '-', '\\', '|'};
-	int i;
-	char c;
-
-	for (i = 0; ; i++)
-	{
-		ticks_t clock;
-
-		clock = timer_clock_unlocked();
-
-		/* Display uptime (in ticks) */
-		text_xprintf(&bm, 2, 0, TEXT_FILL, "uptime: %lu sec", clock / 1000);
-
-		/* Show context switch (in clock cycles) */
-		c = spinner[i % countof(spinner)];
-		text_xprintf(&bm, 4, 0, TEXT_CENTER | TEXT_FILL, "%c Context switch %c", c, c);
-		text_xprintf(&bm, 6, 0, TEXT_FILL, " %lu clock cycles", end - start);
-		/* Show context switch (in usec) */
-		text_xprintf(&bm, 7, 0, TEXT_FILL,
-			" %lu.%lu usec",
-				((end - start) * 1000000) / CPU_FREQ,
-				((end - start) * (100000000 / CPU_FREQ)) % 100);
-		rit128x96_lcd_blitBitmap(&bm);
-	}
 }
 
 static void NORETURN hp_process(void)
@@ -183,42 +212,119 @@ static void NORETURN lp_process(void)
 	}
 }
 
-/**
- * Show the splash screen
- */
-static void bouncing_logo(Bitmap *bm)
+static void res_process(void)
 {
-	const long SPEED_SCALE = 1000;
-	const long GRAVITY_ACCEL = 100;
-	const long BOUNCE_ELASTICITY = 2;
-	const long TOT_FRAMES = 100;
-	long h = (long)(-bertos_logo.height) * SPEED_SCALE;
-	long speed = 0, i;
+	const char spinner[] = {'/', '-', '\\', '|'};
+	int i;
+	char c;
 
-	for (i = 0; i < TOT_FRAMES; i++)
+	for (i = 0; ; i++)
 	{
-		/* Move */
-		h += speed;
-
-		/* Gravity acceleration */
-		speed += GRAVITY_ACCEL;
-
-		if (h > 0 && speed > 0)
-		{
-			/* Bounce */
-			speed = -(speed / BOUNCE_ELASTICITY);
-
-		}
-		/* Update graphics */
-		gfx_bitmapClear(bm);
-		gfx_blitImage(bm,
-			(LCD_WIDTH - bertos_logo.width) / 2,
-			(LCD_HEIGHT - bertos_logo.height) / 2 + h / SPEED_SCALE,
-			&bertos_logo);
-		rit128x96_lcd_blitBitmap(bm);
+		/* Show context switch (in clock cycles) */
+		c = spinner[i % countof(spinner)];
+		text_xprintf(&lcd_bitmap, 3, 0, TEXT_CENTER | TEXT_FILL, "%c Context switch %c", c, c);
+		text_xprintf(&lcd_bitmap, 5, 0, TEXT_FILL, " %lu clock cycles", end - start);
+		/* Show context switch (in usec) */
+		text_xprintf(&lcd_bitmap, 6, 0, TEXT_FILL,
+			" %lu.%lu usec",
+				((end - start) * 1000000) / CPU_FREQ,
+				((end - start) * (100000000 / CPU_FREQ)) % 100);
+		rit128x96_lcd_blitBitmap(&lcd_bitmap);
 		timer_delay(5);
+		if (kbd_peek() & KEY_MASK)
+			break;
 	}
 }
+
+static void context_switch_test(Bitmap *bm)
+{
+	gfx_bitmapClear(bm);
+	text_xprintf(bm, 0, 0, TEXT_FILL,
+			"CPU: Cortex-M3 %luMHz", CPU_FREQ / 1000000);
+	rit128x96_lcd_blitBitmap(bm);
+	text_xprintf(bm, 1, 0, TEXT_FILL, "Board: LM3S1968 EVB");
+	rit128x96_lcd_blitBitmap(bm);
+
+	res_process();
+}
+
+static void uptime(Bitmap *bm)
+{
+	extern const Font font_ncenB18;
+	const Font *old_font;
+
+	old_font = bm->font;
+
+	/* Set big font */
+	gfx_bitmapClear(bm);
+	gfx_setFont(bm, &font_ncenB18);
+	text_xprintf(bm, 0, 0, TEXT_FILL | TEXT_CENTER, "Uptime");
+	while (1)
+	{
+		ticks_t clock = ticks_to_ms(timer_clock_unlocked());
+
+		/* Display uptime (in ticks) */
+		text_xprintf(&lcd_bitmap, 2, 0, TEXT_FILL | TEXT_CENTER,
+				"%lu", clock / 1000);
+		rit128x96_lcd_blitBitmap(bm);
+		timer_delay(5);
+		if (kbd_peek() & KEY_MASK)
+			break;
+	}
+	gfx_setFont(bm, old_font);
+}
+
+static void NORETURN soft_reset(Bitmap * bm)
+{
+	extern const Font font_ncenB18;
+	int i;
+
+	/* Set big font */
+	gfx_bitmapClear(bm);
+	gfx_setFont(bm, &font_ncenB18);
+	for (i = 5; i; --i)
+	{
+		text_xprintf(bm, 2, 0, TEXT_FILL | TEXT_CENTER, "%d", i);
+		rit128x96_lcd_blitBitmap(bm);
+		timer_delay(1000);
+	}
+	text_xprintf(bm, 2, 0, TEXT_FILL | TEXT_CENTER, "REBOOT");
+	rit128x96_lcd_blitBitmap(bm);
+	timer_delay(1000);
+
+	/* Perform a software reset request */
+	HWREG(NVIC_APINT) = NVIC_APINT_VECTKEY | NVIC_APINT_SYSRESETREQ;
+	UNREACHABLE();
+}
+
+static void NORETURN ser_process(void)
+{
+	char buf[32];
+	int i;
+
+	ser_init(&ser_port, SER_UART0);
+	ser_setbaudrate(&ser_port, 115200);
+
+	/* BeRTOS terminal */
+	for (i = 0; ; i++)
+	{
+		kfile_printf(&ser_port.fd, "\n\r[%03d] BeRTOS:~$ ", i);
+		kfile_gets_echo(&ser_port.fd, buf, sizeof(buf), true);
+		kfile_printf(&ser_port.fd, "%s", buf);
+	}
+}
+
+static struct MenuItem main_items[] =
+{
+	{ (const_iptr_t)"LED blinking", 0, (MenuHook)led_test, (iptr_t)&lcd_bitmap },
+	{ (const_iptr_t)"Bouncing logo", 0, (MenuHook)bouncing_logo, (iptr_t)&lcd_bitmap },
+	{ (const_iptr_t)"Screen saver demo", 0, (MenuHook)screen_saver, (iptr_t)&lcd_bitmap },
+	{ (const_iptr_t)"Scheduling test", 0, (MenuHook)context_switch_test, (iptr_t)&lcd_bitmap },
+	{ (const_iptr_t)"Show uptime", 0, (MenuHook)uptime, (iptr_t)&lcd_bitmap },
+	{ (const_iptr_t)"Reboot", 0, (MenuHook)soft_reset, (iptr_t)&lcd_bitmap },
+	{ (const_iptr_t)0, 0, NULL, (iptr_t)0 }
+};
+static struct Menu main_menu = { main_items, "BeRTOS", MF_STICKY | MF_SAVESEL, &lcd_bitmap, 0 };
 
 int main(void)
 {
@@ -236,33 +342,26 @@ int main(void)
 	kputs("Done.\n");
 	kputs("Init OLED display..");
 	rit128x96_lcd_init();
-	gfx_bitmapInit(&bm, raster, LCD_WIDTH, LCD_HEIGHT);
-	gfx_setFont(&bm, &font_helvB10);
-	rit128x96_lcd_blitBitmap(&bm);
+	gfx_bitmapInit(&lcd_bitmap, raster, LCD_WIDTH, LCD_HEIGHT);
+	gfx_setFont(&lcd_bitmap, &font_helvB10);
+	rit128x96_lcd_blitBitmap(&lcd_bitmap);
 	kputs("Done.\n");
-
-	bouncing_logo(&bm);
-	gfx_bitmapClear(&bm);
-#ifdef _DEBUG
-	text_xprintf(&bm, 4, 0, TEXT_CENTER | TEXT_FILL, "BeRTOS up & running!");
-	rit128x96_lcd_blitBitmap(&bm);
-	proc_testRun();
-#endif
-	text_xprintf(&bm, 0, 0, TEXT_FILL,
-			"CPU: Cortex-M3 %luMHz", CPU_FREQ / 1000000);
-	rit128x96_lcd_blitBitmap(&bm);
-	text_xprintf(&bm, 1, 0, TEXT_FILL, "Board: LM3S1968 EVB");
-	rit128x96_lcd_blitBitmap(&bm);
+	kputs("Init Keypad..");
+	kbd_init();
+	kputs("Done.\n");
 
 	hp_proc = proc_new(hp_process, NULL, PROC_STACK_SIZE, hp_stack);
 	lp_proc = proc_new(lp_process, NULL, PROC_STACK_SIZE, lp_stack);
-	proc_new(led_process, NULL, PROC_STACK_SIZE, led_stack);
+	led_proc = proc_new(led_process, NULL, PROC_STACK_SIZE, led_stack);
+	/* Open a dummy echo terminal on UART0 */
 	proc_new(ser_process, NULL, PROC_STACK_SIZE, ser_stack);
-
-	res_proc = proc_current();
 
 	proc_setPri(hp_proc, 2);
 	proc_setPri(lp_proc, 1);
 
-	res_process();
+	while (1)
+	{
+		menu_handle(&main_menu);
+		cpu_relax();
+	}
 }
