@@ -157,7 +157,7 @@ static void bouncing_logo(Bitmap *bm)
 			(LCD_HEIGHT - bertos_logo.height) / 2 + h / SPEED_SCALE,
 			&bertos_logo);
 		text_xprintf(bm, 7, 0, TEXT_FILL | TEXT_CENTER, "Press SELECT to quit");
-		rit128x96_lcd_blitBitmap(bm);
+		rit128x96_blitBitmap(bm);
 		timer_delay(5);
 		if (kbd_peek() & KEY_MASK)
 			break;
@@ -179,7 +179,7 @@ static void screen_saver(Bitmap *bm)
 
 		gfx_bitmapClear(bm);
 		gfx_rectDraw(bm, x1, y1, x2, y2);
-		rit128x96_lcd_blitBitmap(bm);
+		rit128x96_blitBitmap(bm);
 		if (kbd_peek() & KEY_MASK)
 			break;
 	}
@@ -229,7 +229,7 @@ static void res_process(void)
 			" %lu.%lu usec",
 				((end - start) * 1000000) / CPU_FREQ,
 				((end - start) * (100000000 / CPU_FREQ)) % 100);
-		rit128x96_lcd_blitBitmap(&lcd_bitmap);
+		rit128x96_blitBitmap(&lcd_bitmap);
 		timer_delay(5);
 		if (kbd_peek() & KEY_MASK)
 			break;
@@ -241,9 +241,9 @@ static void context_switch_test(Bitmap *bm)
 	gfx_bitmapClear(bm);
 	text_xprintf(bm, 0, 0, TEXT_FILL,
 			"CPU: Cortex-M3 %luMHz", CPU_FREQ / 1000000);
-	rit128x96_lcd_blitBitmap(bm);
+	rit128x96_blitBitmap(bm);
 	text_xprintf(bm, 1, 0, TEXT_FILL, "Board: LM3S1968 EVB");
-	rit128x96_lcd_blitBitmap(bm);
+	rit128x96_blitBitmap(bm);
 
 	res_process();
 }
@@ -266,7 +266,7 @@ static void uptime(Bitmap *bm)
 		/* Display uptime (in ticks) */
 		text_xprintf(&lcd_bitmap, 2, 0, TEXT_FILL | TEXT_CENTER,
 				"%lu", clock / 1000);
-		rit128x96_lcd_blitBitmap(bm);
+		rit128x96_blitBitmap(bm);
 		timer_delay(5);
 		if (kbd_peek() & KEY_MASK)
 			break;
@@ -285,11 +285,11 @@ static void NORETURN soft_reset(Bitmap * bm)
 	for (i = 5; i; --i)
 	{
 		text_xprintf(bm, 2, 0, TEXT_FILL | TEXT_CENTER, "%d", i);
-		rit128x96_lcd_blitBitmap(bm);
+		rit128x96_blitBitmap(bm);
 		timer_delay(1000);
 	}
 	text_xprintf(bm, 2, 0, TEXT_FILL | TEXT_CENTER, "REBOOT");
-	rit128x96_lcd_blitBitmap(bm);
+	rit128x96_blitBitmap(bm);
 	timer_delay(1000);
 
 	/* Perform a software reset request */
@@ -341,10 +341,10 @@ int main(void)
 	proc_init();
 	kputs("Done.\n");
 	kputs("Init OLED display..");
-	rit128x96_lcd_init();
+	rit128x96_init();
 	gfx_bitmapInit(&lcd_bitmap, raster, LCD_WIDTH, LCD_HEIGHT);
 	gfx_setFont(&lcd_bitmap, &font_helvB10);
-	rit128x96_lcd_blitBitmap(&lcd_bitmap);
+	rit128x96_blitBitmap(&lcd_bitmap);
 	kputs("Done.\n");
 	kputs("Init Keypad..");
 	kbd_init();

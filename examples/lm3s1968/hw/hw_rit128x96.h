@@ -123,6 +123,6 @@ INLINE void lcd_bus_init(void)
  * XXX: menu stuff requires lcd_blitBimap() function to be defined.
  * Find a better way to do this.
  */
-#define rit128x96_lcd_blitBitmap lcd_blitBitmap
+#define rit128x96_blitBitmap lcd_blitBitmap
 
 #endif /* HW_RIT128x96_H */

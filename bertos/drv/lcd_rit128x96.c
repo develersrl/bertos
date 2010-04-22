@@ -110,7 +110,7 @@ static void lcd_dataWrite(const uint8_t *buf, size_t count)
 }
 
 /* Turn on the OLED display */
-void rit128x96_lcd_on(void)
+void rit128x96_on(void)
 {
 	unsigned int i;
 
@@ -121,36 +121,58 @@ void rit128x96_lcd_on(void)
 }
 
 /* Turn off the OLED display */
-void rit128x96_lcd_off(void)
+void rit128x96_off(void)
 {
 	LCD_SET_COMMAND();
 	lcd_dataWrite(exit_cmd, sizeof(exit_cmd));
 }
 
-/* Refresh a bitmap on screen */
-void rit128x96_lcd_blitBitmap(const Bitmap *bm)
+static void lcd_start_blit(uint8_t width, uint8_t height)
 {
-	uint8_t lcd_row[bm->width / 2];
 	uint8_t buffer[3];
-	uint8_t mask;
-	int i, l;
 
-	ASSERT(bm->width == LCD_WIDTH && bm->height == LCD_HEIGHT);
+	ASSERT(width == LCD_WIDTH && height == LCD_HEIGHT);
 
 	/* Enter command mode */
 	LCD_SET_COMMAND();
 
 	buffer[0] = 0x15;
 	buffer[1] = 0;
-	buffer[2] = (bm->width - 2) / 2;
+	buffer[2] = (width - 2) / 2;
 	lcd_dataWrite(buffer, 3);
 
 	buffer[0] = 0x75;
 	buffer[1] = 0;
-	buffer[2] = bm->height - 1;
+	buffer[2] = height - 1;
 	lcd_dataWrite(buffer, 3);
 	lcd_dataWrite((const uint8_t *)&horizontal_inc, sizeof(horizontal_inc));
+}
 
+/* Refresh a raw image on screen */
+void rit128x96_blitRaw(const uint8_t *data, uint8_t width, uint8_t height)
+{
+	lcd_start_blit(width, height);
+	/*
+	 * Enter data mode and send the encoded image data to the OLED display,
+	 * over the SSI bus.
+	 */
+	LCD_SET_DATA();
+	while (height--)
+	{
+		/* Write an entire row at once */
+		lcd_dataWrite(data, width / 2);
+		data += width / 2;
+	}
+}
+
+/* Refresh a bitmap on screen */
+void rit128x96_blitBitmap(const Bitmap *bm)
+{
+	uint8_t lcd_row[bm->width / 2];
+	uint8_t mask;
+	int i, l;
+
+	lcd_start_blit(bm->width, bm->height);
 	/*
 	 * Enter data mode and send the encoded image data to the OLED display,
 	 * over the SSI bus.
@@ -174,11 +196,11 @@ void rit128x96_lcd_blitBitmap(const Bitmap *bm)
 }
 
 /* Initialize the OLED display */
-void rit128x96_lcd_init(void)
+void rit128x96_init(void)
 {
 	/* Initialize the communication bus */
 	lcd_bus_init();
 
 	/* Turn on the OLED display */
-	rit128x96_lcd_on();
+	rit128x96_on();
 }

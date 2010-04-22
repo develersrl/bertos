@@ -45,9 +45,10 @@
 #define LCD_WIDTH	128
 #define LCD_HEIGHT	96
 
-void rit128x96_lcd_blitBitmap(const Bitmap *bm);
-void rit128x96_lcd_on(void);
-void rit128x96_lcd_off(void);
-void rit128x96_lcd_init(void);
+void rit128x96_blitRaw(const uint8_t *data, uint8_t width, uint8_t height);
+void rit128x96_blitBitmap(const Bitmap *bm);
+void rit128x96_on(void);
+void rit128x96_off(void);
+void rit128x96_init(void);
 
 #endif /* LCD_LM3S_H */
