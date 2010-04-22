@@ -61,6 +61,8 @@ static struct CM3Serial UARTDesc[SER_CNT];
 /* GPIO descriptor for UART pins */
 struct gpio_uart_info
 {
+	/* Sysctl */
+	uint32_t sysctl;
 	/* GPIO base address register */
 	uint32_t base;
 	/* Pin(s) bitmask */
@@ -74,16 +76,19 @@ static const struct gpio_uart_info gpio_uart[SER_CNT] =
 	{
 		.base = GPIO_PORTA_BASE,
 		.pins = BV(1) | BV(0),
+		.sysctl = SYSCTL_RCGC2_GPIOA,
 	},
 	/* UART1 */
 	{
 		.base = GPIO_PORTD_BASE,
 		.pins = BV(3) | BV(2),
+		.sysctl = SYSCTL_RCGC2_GPIOD,
 	},
 	/* UART2 */
 	{
 		.base = GPIO_PORTG_BASE,
 		.pins = BV(1) | BV(0),
+		.sysctl = SYSCTL_RCGC2_GPIOG,
 	},
 };
 
@@ -153,7 +158,7 @@ void lm3s_uartInit(int port)
 
 	/* Enable the peripheral clock */
 	SYSCTL_RCGC1_R |= reg_clock;
-	SYSCTL_RCGC2_R |= SYSCTL_RCGC2_GPIOA;
+	SYSCTL_RCGC2_R |= gpio_uart[port].sysctl;
 	lm3s_busyWait(512);
 
 	/* Configure GPIO pins to work as UART pins */
