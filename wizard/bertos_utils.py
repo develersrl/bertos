@@ -151,7 +151,7 @@ def mkGenerator(project_info, makefile):
     Generates the mk file for the current project.
     """
     mk_data = {}
-    mk_data["$pname"] = os.path.basename(project_info.info("PROJECT_PATH"))
+    mk_data["$pname"] = project_info.info("PROJECT_NAME")
     mk_data["$cpuclockfreq"] = project_info.info("SELECTED_FREQ")
     cpu_mk_parameters = []
     for key, value in project_info.info("CPU_INFOS").items():
@@ -173,7 +173,7 @@ def makefileGenerator(project_info, makefile):
     """
     # TODO write a general function that works for both the mk file and the Makefile
     while makefile.find("$pname") != -1:
-        makefile = makefile.replace("$pname", os.path.basename(project_info.info("PROJECT_PATH")))
+        makefile = makefile.replace("$pname", project_info.info("PROJECT_NAME"))
     return makefile
 
 def csrcGenerator(project_info):
