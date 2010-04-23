@@ -51,7 +51,7 @@ from bertos_utils import (
                             isBertosDir, getTagSet, getInfos, updateConfigurationValues,
                             loadConfigurationInfos, loadDefineLists, loadModuleDefinition,
                             getCommentList, sub,
-                            
+
                             # Project creation functions
                             projectFileGenerator, versionFileGenerator, makefileGenerator,
                             userMkGenerator, mkGenerator, loadPlugin, mergeSources,
@@ -159,7 +159,7 @@ class BProject(object):
         self.loadModuleData(True)
         self.setEnabledModules(project_data["ENABLED_MODULES"])
         self.infos["PROJECT_NAME"] = old_project_name
-        self.infos["PROJECT_PATH"] = old_project_path        
+        self.infos["PROJECT_PATH"] = old_project_path
         self.infos["PRESET_NAME"] = project_data.get("PROJECT_NAME", os.path.basename(preset))
         self.infos["PRESET_PATH"] = preset
 
@@ -176,22 +176,22 @@ class BProject(object):
 
     def _loadProjectPresetTree(self, path):
         _tree = {}
-        _tree['info'] = self._loadPresetInfo(os.path.join(path, const.PREDEFINED_BOARD_SPEC_FILE))
-        _tree['info']['filename'] = os.path.basename(path)
-        _tree['info']['path'] = path
-        _tree['children'] = []
+        _tree["info"] = self._loadPresetInfo(os.path.join(path, const.PREDEFINED_BOARD_SPEC_FILE))
+        _tree["info"]["filename"] = os.path.basename(path)
+        _tree["info"]["path"] = path
+        _tree["children"] = []
         entries = set(os.listdir(path))
         for entry in entries:
             _path = os.path.join(path, entry)
             if os.path.isdir(_path):
                 sub_entries = set(os.listdir(_path))
                 if const.PREDEFINED_BOARD_SPEC_FILE in sub_entries:
-                    _tree['children'].append(self._loadProjectPresetTree(_path))
+                    _tree["children"].append(self._loadProjectPresetTree(_path))
         # Add into the info dict the dir type (dir/project)
-        if _tree['children']:
-            _tree['info']['type'] = 'dir'
+        if _tree["children"]:
+            _tree["info"]["type"] = "dir"
         else:
-            _tree['info']['type'] = 'project'
+            _tree["info"]["type"] = "project"
         return _tree
 
     def _loadPresetInfo(self, preset_spec_file):
@@ -254,7 +254,7 @@ class BProject(object):
         Index BeRTOS source and load it in memory.
         """
         # Index only the SOURCES_PATH/bertos content
-        bertos_sources_dir = os.path.join(self.info("SOURCES_PATH"), 'bertos')
+        bertos_sources_dir = os.path.join(self.info("SOURCES_PATH"), "bertos")
         file_dict = {}
         if os.path.exists(bertos_sources_dir):
             for element in os.walk(bertos_sources_dir):
@@ -278,7 +278,7 @@ class BProject(object):
                 self._newCustomBertosProject()
             else:
                 self._newBertosProjectFromPreset()
-    
+
     def _newBertosProject(self):
         for directory in (self.maindir, self.srcdir, self.prjdir, self.hwdir, self.cfgdir):
             self._createDirectory(directory)
@@ -361,7 +361,7 @@ class BProject(object):
         f.close()
 
     def _writeMakefile(self, filename):
-        makefile = open(os.path.join(const.DATA_DIR, "mktemplates/Makefile"), 'r').read()
+        makefile = open(os.path.join(const.DATA_DIR, "mktemplates/Makefile"), "r").read()
         makefile = makefileGenerator(self, makefile)
         open(filename, "w").write(makefile)
 
@@ -416,7 +416,7 @@ class BProject(object):
                 if os.path.isdir(full_path):
                     copytree.copytree(full_path, os.path.join(self.prjdir, element), ignore_list=const.IGNORE_LIST)
                 else:
-                    shutil.copy(full_path, self.prjdir)        
+                    shutil.copy(full_path, self.prjdir)
 
     def _setupAutoenabledParameters(self):
         for module, information in self.infos["MODULES"].items():
@@ -431,7 +431,7 @@ class BProject(object):
     @property
     def maindir(self):
         return self.infos.get("PROJECT_PATH", None)
-    
+
     @property
     def srcdir(self):
         if self.maindir:
@@ -449,14 +449,14 @@ class BProject(object):
     @property
     def hwdir(self):
         if self.prjdir:
-            return os.path.join(self.prjdir, 'hw')
+            return os.path.join(self.prjdir, "hw")
         else:
             return None
 
     @property
     def cfgdir(self):
         if self.prjdir:
-            return os.path.join(self.prjdir, 'cfg')
+            return os.path.join(self.prjdir, "cfg")
         else:
             return None
 
@@ -476,12 +476,12 @@ class BProject(object):
         if not directory:
             return
         if os.path.isdir(directory):
-            shutil.rmtree(directory, True)        
+            shutil.rmtree(directory, True)
         os.makedirs(directory)
 
     def _copySources(self, origin, destination):
         # If not in editing mode it copies all the bertos sources in the /bertos subdirectory of the project
-        shutil.rmtree(destination, True)        
+        shutil.rmtree(destination, True)
         copytree.copytree(origin + "/bertos", destination, ignore_list=const.IGNORE_LIST)
 
     def _mergeSources(self, origin, destination, old_sources_dir):
@@ -544,4 +544,4 @@ class BProject(object):
         self.infos["FILES"] = files
 
     def __repr__(self):
-        return '<BProject:instance %d>%s' %(id(self), repr(self.infos))
+        return "<BProject:instance %d>%s" %(id(self), repr(self.infos))
