@@ -412,11 +412,11 @@ class BProject(object):
         project_related_stuff = ("cfg", "hw", self.infos["PROJECT_NAME"] + "_wiz.mk") + const.IGNORE_LIST
         for element in os.listdir(origin):
             if element not in project_related_stuff:
-                element = os.path.join(origin, element)
-                if os.path.isdir(element):
-                    copytree.copytree(element, self.prjdir, ignore_list=const.IGNORE_LIST)
+                full_path = os.path.join(origin, element)
+                if os.path.isdir(full_path):
+                    copytree.copytree(full_path, os.path.join(self.prjdir, element), ignore_list=const.IGNORE_LIST)
                 else:
-                    shutil.copy(element, self.prjdir)        
+                    shutil.copy(full_path, self.prjdir)        
 
     def _setupAutoenabledParameters(self):
         for module, information in self.infos["MODULES"].items():
