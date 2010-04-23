@@ -36,7 +36,6 @@
  */
 
 #include <cfg/macros.h> /* for BV() */
-#include <drv/clock_lm3s.h> /* lm3s_busyWait() */
 #include <drv/gpio_lm3s.h>
 #include <drv/ser_p.h>
 #include <drv/ser.h>

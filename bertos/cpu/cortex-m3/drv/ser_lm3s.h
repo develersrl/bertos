@@ -40,6 +40,7 @@
 
 #include <cfg/cfg_debug.h>
 #include <cpu/power.h> /* cpu_relax() */
+#include <drv/clock_lm3s.h> /* lm3s_busyWait() */
 #include <io/lm3s.h>
 
 /* Serial hardware numbers */
@@ -76,6 +77,7 @@ INLINE void lm3s_uartDisable(uint32_t base)
 	/* Disable the UART */
 	HWREG(base + UART_O_CTL) &=
 		~(UART_CTL_UARTEN | UART_CTL_TXE | UART_CTL_RXE);
+	lm3s_busyWait(512);
 }
 
 INLINE void lm3s_uartEnable(uint32_t base)
@@ -86,6 +88,7 @@ INLINE void lm3s_uartEnable(uint32_t base)
 	/* Enable RX, TX, and the UART */
 	HWREG(base + UART_O_CTL) |=
 			UART_CTL_UARTEN | UART_CTL_TXE | UART_CTL_RXE;
+	lm3s_busyWait(512);
 }
 
 INLINE bool lm3s_uartTxDone(uint32_t base)
