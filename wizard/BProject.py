@@ -310,6 +310,10 @@ class BProject(object):
     def _newBertosProjectFromPreset(self):
         # Create/write/copy the common things
         self._newBertosProject()
+        
+        # Copy the sources files
+        # TODO: implement it!
+        
         # Copy the user mk predefined file
         # TODO: implement it!
         
