@@ -315,9 +315,11 @@ class BProject(object):
 
         # Copy all the files and dirs except cfg/hw/*_wiz.mk
         self._writeCustomSrcFiles()
-        # Override the main.c with the empty one if requested by the user
-        # TODO: implement it!
-        
+
+        if self.infos["EMPTY_MAIN"]:
+            # Create and empty main.c file only if the user check the box
+            self._writeMainFile(self.prjdir + "/main.c")
+
         # Create project files for selected plugins
         self._createProjectFiles()
 
