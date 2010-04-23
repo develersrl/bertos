@@ -160,6 +160,8 @@ class BProject(object):
         self.setEnabledModules(project_data["ENABLED_MODULES"])
         self.infos["PROJECT_NAME"] = old_project_name
         self.infos["PROJECT_PATH"] = old_project_path        
+        self.infos["PRESET_NAME"] = project_data.get("PROJECT_NAME", os.path.basename(preset))
+        self.infos["PRESET_PATH"] = preset
 
     def loadProjectPresets(self):
         """
@@ -310,14 +312,10 @@ class BProject(object):
     def _newBertosProjectFromPreset(self):
         # Create/write/copy the common things
         self._newBertosProject()
-        
-        # Copy the sources files
-        # TODO: implement it!
-        
-        # Copy the user mk predefined file
-        # TODO: implement it!
-        
-        # Copy the main.c file (if the user doesn't check the empty main checkbox)
+
+        # Copy all the files and dirs except cfg/hw/*_wiz.mk
+        self._writeCustomSrcFiles()
+        # Override the main.c with the empty one if requested by the user
         # TODO: implement it!
         
         # Create project files for selected plugins
@@ -404,6 +402,19 @@ class BProject(object):
             f = open(os.path.join(destination_dir, os.path.basename(configuration)), "w")
             f.write(string)
             f.close()
+
+    def _writeCustomSrcFiles(self):
+        preset = self.infos["PRESET_PATH"]
+        preset_name = self.infos["PRESET_NAME"]
+        origin = os.path.join(preset, preset_name)
+        project_related_stuff = ("cfg", "hw", self.infos["PROJECT_NAME"] + "_wiz.mk") + const.IGNORE_LIST
+        for element in os.listdir(origin):
+            if element not in project_related_stuff:
+                element = os.path.join(origin, element)
+                if os.path.isdir(element):
+                    copytree.copytree(element, self.prjdir, ignore_list=const.IGNORE_LIST)
+                else:
+                    shutil.copy(element, self.prjdir)        
 
     def _setupAutoenabledParameters(self):
         for module, information in self.infos["MODULES"].items():
