@@ -272,57 +272,74 @@ class BProject(object):
         if self.edit:
             self._editBertosProject()
         else:
-            self._newBertosProject()
+            if not self.from_preset:
+                self._newCustomBertosProject()
+            else:
+                self._newBertosProjectFromPreset()
     
     def _newBertosProject(self):
-        maindir, srcdir, prjdir, hwdir, cfgdir, sources_dir, old_srcdir = self._projectDirectories()
-        for directory in (maindir, srcdir, prjdir, hwdir, cfgdir):
+        for directory in (self.maindir, self.srcdir, self.prjdir, self.hwdir, self.cfgdir):
             self._createDirectory(directory)
         # Write the project file
-        self._writeProjectFile(maindir + "/project.bertos")
+        self._writeProjectFile(self.maindir + "/project.bertos")
         # VERSION file
-        self._writeVersionFile(maindir + "/VERSION")
+        self._writeVersionFile(self.maindir + "/VERSION")
         # Destination makefile
-        self._writeMakefile(maindir + "/Makefile")
+        self._writeMakefile(self.maindir + "/Makefile")
         # Copy the sources
-        self._copySources(sources_dir, srcdir)
+        self._copySources(self.sources_dir, self.srcdir)
         # Copy all the hw files
-        self._writeHwFiles(sources_dir, hwdir)
+        self._writeHwFiles(self.sources_dir, self.hwdir)
         # Set properly the autoenabled parameters
         self._setupAutoenabledParameters()
         # Copy all the configuration files
-        self._writeCfgFiles(sources_dir, cfgdir)
-        # Destination user mk file (only on project creation)
-        self._writeUserMkFile(os.path.join(prjdir, os.path.basename(prjdir) + ".mk"))
+        self._writeCfgFiles(self.sources_dir, self.cfgdir)
         # Destination wizard mk file
-        self._writeWizardMkFile(prjdir + "/" + os.path.basename(prjdir) + "_wiz.mk")
+        self._writeWizardMkFile(self.prjdir + "/" + os.path.basename(self.prjdir) + "_wiz.mk")
+
+    def _newCustomBertosProject(self):
+        # Create/write/copy the common things
+        self._newBertosProject()
+        # Destination user mk file
+        self._writeUserMkFile(os.path.join(self.prjdir, os.path.basename(self.prjdir) + ".mk"))
         # Destination main.c file
-        self._writeMainFile(prjdir + "/main.c")
-        # Files for selected plugins
-        relevants_files = {}
-        for plugin in self.infos["OUTPUT"]:
-            module = loadPlugin(plugin)
-            relevants_files[plugin] = module.createProject(self)
-        self.infos["RELEVANT_FILES"] = relevants_files
+        self._writeMainFile(self.prjdir + "/main.c")
+        # Create project files for selected plugins
+        self._createProjectFiles()
+
+    def _newBertosProjectFromPreset(self):
+        # Create/write/copy the common things
+        self._newBertosProject()
+        # Copy the user mk predefined file
+        # TODO: implement it!
+        
+        # Copy the main.c file (if the user doesn't check the empty main checkbox)
+        # TODO: implement it!
+        
+        # Create project files for selected plugins
+        self._createProjectFiles()
 
     def _editBertosProject(self):
-        maindir, srcdir, prjdir, hwdir, cfgdir, sources_dir, old_srcdir = self._projectDirectories()
         # Write the project file
-        self._writeProjectFile(maindir + "/project.bertos")
+        self._writeProjectFile(self.maindir + "/project.bertos")
         # VERSION file
-        self._writeVersionFile(maindir + "/VERSION")
+        self._writeVersionFile(self.maindir + "/VERSION")
         # Destination makefile
-        self._writeMakefile(maindir + "/Makefile")
+        self._writeMakefile(self.maindir + "/Makefile")
         # Merge sources
-        self._mergeSources(sources_dir, srcdir, old_srcdir)
+        self._mergeSources(self.sources_dir, self.srcdir, self.old_srcdir)
         # Copy all the hw files
-        self._writeHwFiles(sources_dir, hwdir)
+        self._writeHwFiles(self.sources_dir, self.hwdir)
         # Set properly the autoenabled parameters
         self._setupAutoenabledParameters()
         # Copy all the configuration files
-        self._writeCfgFiles(sources_dir, cfgdir)
+        self._writeCfgFiles(self.sources_dir, self.cfgdir)
         # Destination wizard mk file
-        self._writeWizardMkFile(prjdir + "/" + os.path.basename(prjdir) + "_wiz.mk")
+        self._writeWizardMkFile(self.prjdir + "/" + os.path.basename(self.prjdir) + "_wiz.mk")
+        # Create project files for selected plugins
+        self._createProjectFiles()
+
+    def _createProjectFiles(self):
         # Files for selected plugins
         relevants_files = {}
         for plugin in self.infos["OUTPUT"]:
@@ -394,15 +411,49 @@ class BProject(object):
                         configuration[parameter]["value"] = "1" if information["enabled"] else "0"
                 self.infos["CONFIGURATIONS"] = configurations
 
-    def _projectDirectories(self):
-        maindir = self.infos["PROJECT_PATH"]
-        srcdir =  maindir + "/bertos"
-        prjdir = os.path.join(maindir, self.infos["PROJECT_NAME"])
-        hwdir = prjdir + "/hw"
-        cfgdir = prjdir + "/cfg"
-        old_srcdir = self.infos.get("OLD_SOURCES_PATH", None)
-        sources_dir = self.infos["SOURCES_PATH"]
-        return maindir, srcdir, prjdir, hwdir, cfgdir, sources_dir, old_srcdir
+    @property
+    def maindir(self):
+        return self.infos.get("PROJECT_PATH", None)
+    
+    @property
+    def srcdir(self):
+        if self.maindir:
+            return os.path.join(self.maindir, "bertos")
+        else:
+            return None
+
+    @property
+    def prjdir(self):
+        if self.maindir:
+            return os.path.join(self.maindir, self.infos["PROJECT_NAME"])
+        else:
+            return None
+
+    @property
+    def hwdir(self):
+        if self.prjdir:
+            return os.path.join(self.prjdir, 'hw')
+        else:
+            return None
+
+    @property
+    def cfgdir(self):
+        if self.prjdir:
+            return os.path.join(self.prjdir, 'cfg')
+        else:
+            return None
+
+    @property
+    def old_srcdir(self):
+        return self.infos.get("OLD_SOURCES_PATH", None)
+
+    @property
+    def sources_dir(self):
+        return self.infos.get("SOURCES_PATH", None)
+
+    @property
+    def from_preset(self):
+        return self.infos.get("PROJECT_FROM_PRESET", False)
 
     def _createDirectory(self, directory):
         if not directory:
@@ -476,4 +527,4 @@ class BProject(object):
         self.infos["FILES"] = files
 
     def __repr__(self):
-        return repr(self.infos)
+        return '<BProject:instance %d>%s' %(id(self), repr(self.infos))
