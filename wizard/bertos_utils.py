@@ -119,6 +119,7 @@ def projectFileGenerator(project_info):
         # project_data["SOURCES_PATH"] = project_info.info("SOURCES_PATH")
         project_data["SOURCES_PATH"] = directory
     project_data["PROJECT_NAME"] = project_info.info("PROJECT_NAME", os.path.basename(directory))
+    project_data["PROJECT_SRC_PATH"] = project_info.info("PROJECT_SRC_PATH")
     project_data["TOOLCHAIN"] = project_info.info("TOOLCHAIN")
     project_data["CPU_NAME"] = project_info.info("CPU_NAME")
     project_data["SELECTED_FREQ"] = project_info.info("SELECTED_FREQ")

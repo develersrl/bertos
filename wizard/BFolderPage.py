@@ -65,6 +65,7 @@ class BFolderPage(BWizardPage):
         if self.pageContent.projectPath.text() != "None":
             self.setProjectInfo("PROJECT_PATH", unicode(self.pageContent.projectPath.text()))
             self.setProjectInfo("PROJECT_NAME", os.path.basename(unicode(self.pageContent.projectPath.text())))
+            self.setProjectInfo("PROJECT_SRC_PATH", os.path.join(self.projectInfo("PROJECT_PATH"), self.projectInfo("PROJECT_NAME")))
             self.setProjectInfo("ROUTE", self.next_page)
             self.setProjectInfo("PROJECT_FROM_PRESET", self.from_preset)
             return True
