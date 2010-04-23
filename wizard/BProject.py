@@ -281,11 +281,11 @@ class BProject(object):
         for directory in (self.maindir, self.srcdir, self.prjdir, self.hwdir, self.cfgdir):
             self._createDirectory(directory)
         # Write the project file
-        self._writeProjectFile(self.maindir + "/project.bertos")
+        self._writeProjectFile(os.path.join(self.maindir, "project.bertos"))
         # VERSION file
-        self._writeVersionFile(self.maindir + "/VERSION")
+        self._writeVersionFile(os.path.join(self.maindir, "VERSION"))
         # Destination makefile
-        self._writeMakefile(self.maindir + "/Makefile")
+        self._writeMakefile(os.path.join(self.maindir, "Makefile"))
         # Copy the sources
         self._copySources(self.sources_dir, self.srcdir)
         # Copy all the hw files
@@ -295,7 +295,7 @@ class BProject(object):
         # Copy all the configuration files
         self._writeCfgFiles(self.sources_dir, self.cfgdir)
         # Destination wizard mk file
-        self._writeWizardMkFile(self.prjdir + "/" + os.path.basename(self.prjdir) + "_wiz.mk")
+        self._writeWizardMkFile(os.path.join(self.prjdir, os.path.basename(self.prjdir) + "_wiz.mk"))
 
     def _newCustomBertosProject(self):
         # Create/write/copy the common things
@@ -325,11 +325,11 @@ class BProject(object):
 
     def _editBertosProject(self):
         # Write the project file
-        self._writeProjectFile(self.maindir + "/project.bertos")
+        self._writeProjectFile(os.path.join(self.maindir, "project.bertos"))
         # VERSION file
-        self._writeVersionFile(self.maindir + "/VERSION")
+        self._writeVersionFile(os.path.join(self.maindir, "VERSION"))
         # Destination makefile
-        self._writeMakefile(self.maindir + "/Makefile")
+        self._writeMakefile(os.path.join(self.maindir, "Makefile"))
         # Merge sources
         self._mergeSources(self.sources_dir, self.srcdir, self.old_srcdir)
         # Copy all the hw files
@@ -339,7 +339,7 @@ class BProject(object):
         # Copy all the configuration files
         self._writeCfgFiles(self.sources_dir, self.cfgdir)
         # Destination wizard mk file
-        self._writeWizardMkFile(self.prjdir + "/" + os.path.basename(self.prjdir) + "_wiz.mk")
+        self._writeWizardMkFile(os.path.join(self.prjdir, os.path.basename(self.prjdir) + "_wiz.mk"))
         # Create project files for selected plugins
         self._createProjectFiles()
 
@@ -388,7 +388,7 @@ class BProject(object):
                 if not self.edit or not os.path.exists(hwfile_path):
                     # If not in editing mode it copies all the hw files. If in
                     # editing mode it copies only the files that don't exist yet
-                    open(destination_dir + "/" + os.path.basename(hwfile), "w").write(string)
+                    open(os.path.join(destination_dir,os.path.basename(hwfile)), "w").write(string)
 
     def _writeCfgFiles(self, source_dir, destination_dir):
         for configuration, information in self.infos["CONFIGURATIONS"].items():
@@ -401,7 +401,7 @@ class BProject(object):
                 if "long" in infos["informations"] and infos["informations"]["long"]:
                     value += "L"
                 string = sub(string, parameter, value)
-            f = open(destination_dir + "/" + os.path.basename(configuration), "w")
+            f = open(os.path.join(destination_dir, os.path.basename(configuration)), "w")
             f.write(string)
             f.close()
 
