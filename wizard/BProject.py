@@ -83,12 +83,18 @@ class BProject(object):
         self.infos["PROJECT_NAME"] = project_data.get("PROJECT_NAME", os.path.basename(project_dir))
         self.infos["PROJECT_PATH"] = os.path.dirname(project_file)
 
-        # Check for the Wizard version
-        wizard_version = project_data.get("WIZARD_VERSION", 0)
-        if wizard_version < 1:
-            # Ignore the SOURCES_PATH inside the project file for older projects
+        preset = project_data.get("PRESET", False)
+        if not preset:
+            # Ignore the SOURCES_PATH inside the project file if it's not setted as 'preset'
             project_data["SOURCES_PATH"] = project_dir
+        else:
+            linked_sources_path = project_data["SOURCES_PATH"]
+            sources_abspath = os.path.abspath(os.path.join(project_dir, linked_sources_path))
+            project_data["SOURCES_PATH"] = sources_abspath
+        
         self._loadBertosSourceStuff(project_data["SOURCES_PATH"], info_dict.get("SOURCES_PATH", None))
+        
+        self.infos["PRESET"] = preset
 
         # For those projects that don't have a VERSION file create a dummy one.
         if not isBertosDir(project_dir):

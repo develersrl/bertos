@@ -110,9 +110,14 @@ def projectFileGenerator(project_info):
         if information["enabled"]:
             enabled_modules.append(module)
     project_data["ENABLED_MODULES"] = enabled_modules
-    # Use the local BeRTOS version instead of the original one
-    # project_data["SOURCES_PATH"] = project_info.info("SOURCES_PATH")
-    project_data["SOURCES_PATH"] = directory
+    if project_info.info("PRESET"):
+        # For presets save again the SOURCES_PATH into project file
+        project_data["PRESET"] = True
+        project_data["SOURCES_PATH"] = project_info.info("SOURCES_PATH")
+    else:
+        # Use the local BeRTOS version instead of the original one
+        # project_data["SOURCES_PATH"] = project_info.info("SOURCES_PATH")
+        project_data["SOURCES_PATH"] = directory
     project_data["PROJECT_NAME"] = project_info.info("PROJECT_NAME", os.path.basename(directory))
     project_data["TOOLCHAIN"] = project_info.info("TOOLCHAIN")
     project_data["CPU_NAME"] = project_info.info("CPU_NAME")
