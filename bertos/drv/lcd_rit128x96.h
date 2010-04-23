@@ -45,7 +45,8 @@
 #define LCD_WIDTH	128
 #define LCD_HEIGHT	96
 
-void rit128x96_blitRaw(const uint8_t *data, uint8_t width, uint8_t height);
+void rit128x96_blitRaw(const uint8_t *data,
+		uint8_t x, uint8_t y, uint8_t width, uint8_t height);
 void rit128x96_blitBitmap(const Bitmap *bm);
 void rit128x96_on(void);
 void rit128x96_off(void);

@@ -127,7 +127,7 @@ void rit128x96_off(void)
 	lcd_dataWrite(exit_cmd, sizeof(exit_cmd));
 }
 
-static void lcd_start_blit(uint8_t width, uint8_t height)
+static void lcd_start_blit(uint8_t x, uint8_t y, uint8_t width, uint8_t height)
 {
 	uint8_t buffer[3];
 
@@ -137,21 +137,22 @@ static void lcd_start_blit(uint8_t width, uint8_t height)
 	LCD_SET_COMMAND();
 
 	buffer[0] = 0x15;
-	buffer[1] = 0;
-	buffer[2] = (width - 2) / 2;
+	buffer[1] = x / 2;
+	buffer[2] = (x + width - 2) / 2;
 	lcd_dataWrite(buffer, 3);
 
 	buffer[0] = 0x75;
-	buffer[1] = 0;
-	buffer[2] = height - 1;
+	buffer[1] = y;
+	buffer[2] = y + height - 1;
 	lcd_dataWrite(buffer, 3);
 	lcd_dataWrite((const uint8_t *)&horizontal_inc, sizeof(horizontal_inc));
 }
 
 /* Refresh a raw image on screen */
-void rit128x96_blitRaw(const uint8_t *data, uint8_t width, uint8_t height)
+void rit128x96_blitRaw(const uint8_t *data,
+		uint8_t x, uint8_t y, uint8_t width, uint8_t height)
 {
-	lcd_start_blit(width, height);
+	lcd_start_blit(x, y, width, height);
 	/*
 	 * Enter data mode and send the encoded image data to the OLED display,
 	 * over the SSI bus.
@@ -172,7 +173,7 @@ void rit128x96_blitBitmap(const Bitmap *bm)
 	uint8_t mask;
 	int i, l;
 
-	lcd_start_blit(bm->width, bm->height);
+	lcd_start_blit(0, 0, bm->width, bm->height);
 	/*
 	 * Enter data mode and send the encoded image data to the OLED display,
 	 * over the SSI bus.
