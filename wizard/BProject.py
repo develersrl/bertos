@@ -292,14 +292,12 @@ class BProject(object):
         self._setupAutoenabledParameters()
         # Copy all the configuration files
         self._writeCfgFiles(sources_dir, cfgdir)
-        if not self.edit:
-            # Destination user mk file (only on project creation)
-            self._writeUserMkFile(os.path.join(prjdir, os.path.basename(prjdir) + ".mk"))
+        # Destination user mk file (only on project creation)
+        self._writeUserMkFile(os.path.join(prjdir, os.path.basename(prjdir) + ".mk"))
         # Destination wizard mk file
         self._writeWizardMkFile(prjdir + "/" + os.path.basename(prjdir) + "_wiz.mk")
         # Destination main.c file
-        if not self.edit:
-            self._writeMainFile(prjdir + "/main.c")
+        self._writeMainFile(prjdir + "/main.c")
         # Files for selected plugins
         relevants_files = {}
         for plugin in self.infos["OUTPUT"]:
