@@ -66,6 +66,7 @@ class BFolderPage(BWizardPage):
             self.setProjectInfo("PROJECT_PATH", unicode(self.pageContent.projectPath.text()))
             self.setProjectInfo("PROJECT_NAME", os.path.basename(unicode(self.pageContent.projectPath.text())))
             self.setProjectInfo("ROUTE", self.next_page)
+            self.setProjectInfo("PROJECT_FROM_PRESET", self.from_preset)
             return True
         else:
             return False
@@ -132,10 +133,14 @@ class BFolderPage(BWizardPage):
         """
         Contains the next page class.
         """
-        if self.pageContent.customButton.isChecked():
-            return BCpuPage
-        else:
+        if self.from_preset:
             return BBoardPage
+        else:
+            return BCpuPage
+
+    @property
+    def from_preset(self):
+        return self.pageContent.predefinedButton.isChecked()
     
     def initializeAttributes(self):
         """
