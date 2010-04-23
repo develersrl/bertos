@@ -66,7 +66,7 @@ static PROC_DEFINE_STACK(ser_stack, PROC_STACK_SIZE);
 static PROC_DEFINE_STACK(led_stack, PROC_STACK_SIZE);
 #endif
 
-extern Font font_helvB10;
+extern Font font_gohu;
 static uint8_t raster[RAST_SIZE(LCD_WIDTH, LCD_HEIGHT)];
 static Bitmap lcd_bitmap;
 
@@ -250,14 +250,14 @@ static void context_switch_test(Bitmap *bm)
 
 static void uptime(Bitmap *bm)
 {
-	extern const Font font_ncenB18;
+	extern const Font font_luBS14;
 	const Font *old_font;
 
 	old_font = bm->font;
 
 	/* Set big font */
 	gfx_bitmapClear(bm);
-	gfx_setFont(bm, &font_ncenB18);
+	gfx_setFont(bm, &font_luBS14);
 	text_xprintf(bm, 0, 0, TEXT_FILL | TEXT_CENTER, "Uptime");
 	while (1)
 	{
@@ -276,12 +276,12 @@ static void uptime(Bitmap *bm)
 
 static void NORETURN soft_reset(Bitmap * bm)
 {
-	extern const Font font_ncenB18;
+	extern const Font font_luBS14;
 	int i;
 
 	/* Set big font */
 	gfx_bitmapClear(bm);
-	gfx_setFont(bm, &font_ncenB18);
+	gfx_setFont(bm, &font_luBS14);
 	for (i = 5; i; --i)
 	{
 		text_xprintf(bm, 2, 0, TEXT_FILL | TEXT_CENTER, "%d", i);
@@ -343,7 +343,7 @@ int main(void)
 	kputs("Init OLED display..");
 	rit128x96_init();
 	gfx_bitmapInit(&lcd_bitmap, raster, LCD_WIDTH, LCD_HEIGHT);
-	gfx_setFont(&lcd_bitmap, &font_helvB10);
+	gfx_setFont(&lcd_bitmap, &font_gohu);
 	rit128x96_blitBitmap(&lcd_bitmap);
 	kputs("Done.\n");
 	kputs("Init Keypad..");

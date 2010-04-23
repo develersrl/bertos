@@ -25,9 +25,8 @@ lm3s1968_CSRC = \
 	bertos/gfx/text.c \
 	bertos/gfx/text_format.c \
 	bertos/gui/menu.c \
-	bertos/fonts/helvB10.c \
+	bertos/fonts/gohu.c \
 	bertos/fonts/luBS14.c \
-	bertos/fonts/ncenB18.c \
 	bertos/icons/logo.c \
 	bertos/mware/formatwr.c \
 	bertos/mware/hex.c \
