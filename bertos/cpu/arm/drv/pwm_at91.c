@@ -147,6 +147,16 @@ void pwm_hw_setDutyUnlock(PwmDev dev, uint16_t duty)
 
 
 	/*
+	 * If polarity flag is true we must invert
+	 * PWM polarity.
+	 */
+	if (pwm_map[dev].pol)
+	{
+		duty = (uint16_t)*pwm_map[dev].period_reg - duty;
+		LOG_INFO("Inverted duty[%d], pol[%d]\n", duty, pwm_map[dev].pol);
+	}
+
+	/*
 	 * WARNING: is forbidden to write 0 to duty cycle value,
 	 * and so for duty = 0 we must enable PIO and clear output!
 	 */
@@ -158,16 +168,6 @@ void pwm_hw_setDutyUnlock(PwmDev dev, uint16_t duty)
 	}
 	else
 	{
-        /*
-         * If polarity flag is true we must invert
-         * PWM polarity.
-         */
-        if (pwm_map[dev].pol)
-        {
-                duty = (uint16_t)*pwm_map[dev].period_reg - duty;
-				LOG_INFO("Inverted duty[%d], pol[%d]\n", duty, pwm_map[dev].pol);
-        }
-
 		PWM_PIO_PDR = pwm_map[dev].pwm_pin;
 		PWM_PIO_ABSR = pwm_map[dev].pwm_pin;
 
