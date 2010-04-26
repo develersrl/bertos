@@ -107,7 +107,7 @@ class BProject(object):
         self.infos["PRESET"] = project_data.get("PRESET", False)
 
         # For those projects that don't have a VERSION file create a dummy one.
-        if not isBertosDir(project_dir):
+        if not isBertosDir(project_dir) and not self.is_preset:
             version_file = open(os.path.join(const.DATA_DIR, "vtemplates/VERSION"), "r").read()
             open(os.path.join(project_dir, "VERSION"), "w").write(version_file.replace("$version", "").strip())
 
