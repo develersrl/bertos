@@ -166,6 +166,7 @@ class BProject(object):
         self.loadSourceTree()
         self._loadCpuStuff(project_data["CPU_NAME"], project_data["SELECTED_FREQ"])
         self._loadToolchainStuff(project_data["TOOLCHAIN"])
+
         # NOTE: this is a HACK!!!
         # TODO: find a better way to reuse loadModuleData
         preset_project_name = project_data.get("PROJECT_NAME", os.path.basename(preset))
@@ -185,6 +186,7 @@ class BProject(object):
         self.infos["PROJECT_NAME"] = old_project_name
         self.infos["PROJECT_PATH"] = old_project_path
         self.infos["PROJECT_SRC_PATH"] = old_project_src_path
+        # End of the ugly HACK!
 
         self.infos["PRESET_NAME"] = preset_project_name
         self.infos["PRESET_PATH"] = preset
