@@ -93,14 +93,14 @@ class BProject(object):
 
         wizard_version = project_data.get("WIZARD_VERSION", 0)
         if wizard_version < 1:
-            # Ignore the SOURCES_PATH inside the project file for older project
-            project_data["SOURCES_PATH"] = project_dir
+            # Ignore the BERTOS_PATH inside the project file for older project
+            project_data["BERTOS_PATH"] = project_dir
         else:
-            linked_sources_path = project_data["SOURCES_PATH"]
+            linked_sources_path = project_data["BERTOS_PATH"]
             sources_abspath = os.path.abspath(os.path.join(project_dir, linked_sources_path))
-            project_data["SOURCES_PATH"] = sources_abspath
+            project_data["BERTOS_PATH"] = sources_abspath
         
-        self._loadBertosSourceStuff(project_data["SOURCES_PATH"], info_dict.get("SOURCES_PATH", None))
+        self._loadBertosSourceStuff(project_data["BERTOS_PATH"], info_dict.get("BERTOS_PATH", None))
         
         self.infos["PRESET"] = project_data.get("PRESET", False)
 
@@ -120,7 +120,7 @@ class BProject(object):
         if forced_version:
             sources_path = forced_version
         if os.path.exists(sources_path):
-            self.infos["SOURCES_PATH"] = sources_path
+            self.infos["BERTOS_PATH"] = sources_path
         else:
             raise VersionException(self)
 
@@ -193,7 +193,7 @@ class BProject(object):
         Load the default presets (into the const.PREDEFINED_BOARDS_DIR).
         """
         # NOTE: this method does nothing (for now).
-        preset_path = os.path.join(self.infos["SOURCES_PATH"], const.PREDEFINED_BOARDS_DIR)
+        preset_path = os.path.join(self.infos["BERTOS_PATH"], const.PREDEFINED_BOARDS_DIR)
         preset_tree = {}
         if os.path.exists(preset_path):
             preset_tree = self._loadProjectPresetTree(preset_path)
@@ -246,9 +246,9 @@ class BProject(object):
                     if "configuration" in information and len(information["configuration"]):
                         configuration = module_dict[module]["configuration"]
                         try:
-                            configuration_info[configuration] = loadConfigurationInfos(self.infos["SOURCES_PATH"] + "/" + configuration)
+                            configuration_info[configuration] = loadConfigurationInfos(self.infos["BERTOS_PATH"] + "/" + configuration)
                         except ParseError, err:
-                            raise DefineException.ConfigurationDefineException(self.infos["SOURCES_PATH"] + "/" + configuration, err.line_number, err.line)
+                            raise DefineException.ConfigurationDefineException(self.infos["BERTOS_PATH"] + "/" + configuration, err.line_number, err.line)
                         if edit:
                             try:
                                 path = self.infos["PROJECT_SRC_PATH"]
@@ -277,8 +277,8 @@ class BProject(object):
         """
         Index BeRTOS source and load it in memory.
         """
-        # Index only the SOURCES_PATH/bertos content
-        bertos_sources_dir = os.path.join(self.info("SOURCES_PATH"), "bertos")
+        # Index only the BERTOS_PATH/bertos content
+        bertos_sources_dir = os.path.join(self.info("BERTOS_PATH"), "bertos")
         file_dict = {}
         if os.path.exists(bertos_sources_dir):
             for element in os.walk(bertos_sources_dir):
@@ -490,11 +490,11 @@ class BProject(object):
 
     @property
     def old_srcdir(self):
-        return self.infos.get("OLD_SOURCES_PATH", None)
+        return self.infos.get("OLD_BERTOS_PATH", None)
 
     @property
     def sources_dir(self):
-        return self.infos.get("SOURCES_PATH", None)
+        return self.infos.get("BERTOS_PATH", None)
 
     @property
     def from_preset(self):
@@ -541,8 +541,8 @@ class BProject(object):
         return [(filename, dirname) for dirname in file_dict.get(filename, [])]
 
     def findDefinitions(self, ftype):
-        # Maintain a cache for every scanned SOURCES_PATH
-        definitions_dict = self._cached_queries.get(self.infos["SOURCES_PATH"], {})
+        # Maintain a cache for every scanned BERTOS_PATH
+        definitions_dict = self._cached_queries.get(self.infos["BERTOS_PATH"], {})
         definitions = definitions_dict.get(ftype, None)
         if definitions is not None:
             return definitions
@@ -552,11 +552,11 @@ class BProject(object):
             if fnmatch.fnmatch(filename, ftype):
                 definitions += [(filename, dirname) for dirname in file_dict.get(filename, [])]
 
-        # If no cache for the current SOURCES_PATH create an empty one
+        # If no cache for the current BERTOS_PATH create an empty one
         if not definitions_dict:
-            self._cached_queries[self.infos["SOURCES_PATH"]] = {}
+            self._cached_queries[self.infos["BERTOS_PATH"]] = {}
         # Fill the empty cache with the result
-        self._cached_queries[self.infos["SOURCES_PATH"]][ftype] = definitions
+        self._cached_queries[self.infos["BERTOS_PATH"]][ftype] = definitions
         return definitions
 
     def setEnabledModules(self, enabled_modules):

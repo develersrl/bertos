@@ -111,13 +111,13 @@ def projectFileGenerator(project_info):
             enabled_modules.append(module)
     project_data["ENABLED_MODULES"] = enabled_modules
     if project_info.info("PRESET"):
-        # For presets save again the SOURCES_PATH into project file
+        # For presets save again the BERTOS_PATH into project file
         project_data["PRESET"] = True
-        project_data["SOURCES_PATH"] = project_info.info("SOURCES_PATH")
+        project_data["BERTOS_PATH"] = project_info.info("BERTOS_PATH")
     else:
         # Use the local BeRTOS version instead of the original one
-        # project_data["SOURCES_PATH"] = project_info.info("SOURCES_PATH")
-        project_data["SOURCES_PATH"] = directory
+        # project_data["BERTOS_PATH"] = project_info.info("BERTOS_PATH")
+        project_data["BERTOS_PATH"] = directory
     project_data["PROJECT_NAME"] = project_info.info("PROJECT_NAME", os.path.basename(directory))
     project_data["PROJECT_SRC_PATH"] = project_info.info("PROJECT_SRC_PATH")
     project_data["TOOLCHAIN"] = project_info.info("TOOLCHAIN")
@@ -134,7 +134,7 @@ def loadPlugin(plugin):
     return getattr(__import__("plugins", {}, {}, [plugin]), plugin)
 
 def versionFileGenerator(project_info, version_file):
-    version = bertosVersion(project_info.info("SOURCES_PATH"))
+    version = bertosVersion(project_info.info("BERTOS_PATH"))
     return version_file.replace('$version', version)
 
 def userMkGenerator(project_info, makefile):
@@ -252,13 +252,13 @@ def findModuleFiles(module, project_info):
     sfiles = []
     # .c files related to the module and the cpu architecture
     for filename, path in project_info.searchFiles(module + ".c"):
-        path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
+        path = path.replace(project_info.info("BERTOS_PATH") + os.sep, "")
         path = replaceSeparators(path)
         cfiles.append(path + "/" + filename)
     # .s files related to the module and the cpu architecture
     for filename, path in project_info.searchFiles(module + ".s") + \
             project_info.searchFiles(module + ".S"):
-        path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
+        path = path.replace(project_info.info("BERTOS_PATH") + os.sep, "")
         path = replaceSeparators(path)
         sfiles.append(path + "/" + filename)
     # .c and .s files related to the module and the cpu tags
@@ -267,7 +267,7 @@ def findModuleFiles(module, project_info):
     # Awful, but secure check for version
     # TODO: split me in a method/function
     try:
-        version_string = bertosVersion(project_info.info("SOURCES_PATH"))
+        version_string = bertosVersion(project_info.info("BERTOS_PATH"))
         version_list = [int(i) for i in version_string.split()[-1].split('.')]
         if version_list < [2, 5]:
             # For older versions of BeRTOS add the toolchain to the tags
@@ -278,13 +278,13 @@ def findModuleFiles(module, project_info):
 
     for tag in tags:
         for filename, path in project_info.searchFiles(module + "_" + tag + ".c"):
-            path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
+            path = path.replace(project_info.info("BERTOS_PATH") + os.sep, "")
             if os.sep != "/":
                 path = replaceSeparators(path)
             cfiles.append(path + "/" + filename)
         for filename, path in project_info.searchFiles(module + "_" + tag + ".s") + \
                 project_info.searchFiles(module + "_" + tag + ".S"):
-            path = path.replace(project_info.info("SOURCES_PATH") + os.sep, "")
+            path = path.replace(project_info.info("BERTOS_PATH") + os.sep, "")
             path = replaceSeparators(path)
             sfiles.append(path + "/" + filename)
     return cfiles, sfiles

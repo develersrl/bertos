@@ -44,7 +44,7 @@ from bertos_utils import *
 
 def main():
     p = BProject.BProject()
-    p.setInfo("SOURCES_PATH", "../../")
+    p.setInfo("BERTOS_PATH", "../../")
     p.loadProjectPresets()
 
 

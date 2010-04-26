@@ -118,7 +118,7 @@ class BEditingDialog(QDialog):
             dialog.toolchain_page.setProjectInfo("TOOLCHAIN", toolchain)
     
     def changeBertosVersion(self):
-	current_version = self.module_page.projectInfo("SOURCES_PATH")
+	current_version = self.module_page.projectInfo("BERTOS_PATH")
         dialog = BVersionDialog()
         if dialog.exec_():
             version = qvariant_converter.getString(dialog.version_page.currentItem().data(Qt.UserRole))
@@ -130,8 +130,8 @@ class BEditingDialog(QDialog):
             ) == QMessageBox.Ok:
                 try:
                     qApp.setOverrideCursor(QCursor(Qt.WaitCursor))
-                    dialog.version_page.setProjectInfo("SOURCES_PATH", version)
-                    dialog.version_page.setProjectInfo("OLD_SOURCES_PATH", current_version)
+                    dialog.version_page.setProjectInfo("BERTOS_PATH", version)
+                    dialog.version_page.setProjectInfo("OLD_BERTOS_PATH", current_version)
                     enabled_modules = bertos_utils.enabledModules(dialog.version_page.project)
                     old_configuration = dialog.version_page.projectInfo("CONFIGURATIONS")
                     dialog.version_page.project.loadSourceTree()
@@ -152,7 +152,7 @@ class BEditingDialog(QDialog):
                     qApp.restoreOverrideCursor()
             else:
                 # Rollback version to the previous selected one.
-                dialog.version_page.setProjectInfo("SOURCES_PATH", current_version)
+                dialog.version_page.setProjectInfo("BERTOS_PATH", current_version)
 
     def apply(self):
         try:
@@ -175,10 +175,10 @@ class BEditingDialog(QDialog):
         return self.module_page.versions()
 
     def currentVersion(self):
-        return self.module_page.projectInfo("SOURCES_PATH")
+        return self.module_page.projectInfo("BERTOS_PATH")
     
     def setCurrentVersion(self, version):
-        self.module_page.setProjectInfo("SOURCES_PATH", version)
+        self.module_page.setProjectInfo("BERTOS_PATH", version)
 
 class BToolchainDialog(QDialog):
     def __init__(self):
@@ -228,7 +228,7 @@ class BVersionDialog(QDialog):
         layout.addLayout(button_layout)
         self.setLayout(layout)
         self.connect(ok_button, SIGNAL("clicked()"), self.accept)
-        current_version = version_page.projectInfo("SOURCES_PATH")
+        current_version = version_page.projectInfo("BERTOS_PATH")
         self.setWindowTitle(self.tr("Change BeRTOS version"))
 
 

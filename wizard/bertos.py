@@ -96,7 +96,7 @@ def editProject(project_file):
             dialog = BVersionDialog()
             if dialog.exec_():
                 version = dialog.version_page.currentVersion()
-                info_dict["SOURCES_PATH"] = version
+                info_dict["BERTOS_PATH"] = version
             continue
         except ToolchainException, exc:
             QMessageBox.critical(

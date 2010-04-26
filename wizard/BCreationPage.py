@@ -65,7 +65,7 @@ class BCreationPage(BWizardPage):
         folder_item = QTreeWidgetItem(folder_title, QStringList([os.path.normpath(self.projectInfo("PROJECT_PATH"))]))
         top_level.append(folder_title)
         version_title = QTreeWidgetItem(QStringList([self.tr("BeRTOS version")]))
-        sources_path = self.projectInfo("SOURCES_PATH")
+        sources_path = self.projectInfo("BERTOS_PATH")
         version = QTreeWidgetItem(version_title, QStringList([self.tr("version: ") + bertos_utils.bertosVersion(sources_path)]))
         source_path = QTreeWidgetItem(version_title, QStringList([self.tr("path: ") + os.path.normpath(sources_path)]))
         top_level.append(version_title)

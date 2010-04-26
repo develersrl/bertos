@@ -65,7 +65,7 @@ class BVersionPage(BWizardPage):
             # Remove the trailing slash
             if sources_path.endswith(os.sep):
                 sources_path = sources_path[:-1]
-            self.setProjectInfo("SOURCES_PATH", sources_path)
+            self.setProjectInfo("BERTOS_PATH", sources_path)
             return True
         else:
             return False
@@ -193,12 +193,12 @@ class BVersionPage(BWizardPage):
         """
         versions = set([])
         if self._edit:
-            versions.add(self.projectInfo("SOURCES_PATH"))
+            versions.add(self.projectInfo("BERTOS_PATH"))
         if os.name == "nt":
             import winreg_importer
             versions |= set([os.path.normpath(dir) for dir in winreg_importer.getBertosDirs()])
         versions |= set([os.path.normpath(dir) for dir in self.versions()])
-        selected = self.projectInfo("SOURCES_PATH")
+        selected = self.projectInfo("BERTOS_PATH")
         for directory in versions:
             item = self.insertListElement(directory)
             if selected and selected == directory:

@@ -52,7 +52,7 @@ def main():
     app = QApplication([])
     app.project = BProject.BProject()
     page = BModulePage.BModulePage()
-    page.setProjectInfo("SOURCES_PATH", "../../")
+    page.setProjectInfo("BERTOS_PATH", "../../")
     page.setProjectInfo("CPU_INFOS", {"TOOLCHAIN": "avr", "CPU_TAGS": []})
     page.project().loadSourceTree()
     page.reloadData()
