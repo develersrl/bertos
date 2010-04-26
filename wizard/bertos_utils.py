@@ -125,6 +125,7 @@ def projectFileGenerator(project_info):
     project_data["SELECTED_FREQ"] = project_info.info("SELECTED_FREQ")
     project_data["OUTPUT"] = project_info.info("OUTPUT")
     project_data["WIZARD_VERSION"] = WIZARD_VERSION
+    project_data["PRESET"] = project_info.info("PRESET")
     return pickle.dumps(project_data)
 
 def loadPlugin(plugin):

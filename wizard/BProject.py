@@ -98,10 +98,9 @@ class BProject(object):
         elif wizard_version == 1:
             # Use SOURCES_PATH instead of BERTOS_PATH for backward compatibility
             project_data["BERTOS_PATH"] = project_data["SOURCES_PATH"]
-        else:
-            linked_sources_path = project_data["BERTOS_PATH"]
-            sources_abspath = os.path.abspath(os.path.join(project_dir, linked_sources_path))
-            project_data["BERTOS_PATH"] = sources_abspath
+        linked_sources_path = project_data["BERTOS_PATH"]
+        sources_abspath = os.path.abspath(os.path.join(project_dir, linked_sources_path))
+        project_data["BERTOS_PATH"] = sources_abspath
         
         self._loadBertosSourceStuff(project_data["BERTOS_PATH"], info_dict.get("BERTOS_PATH", None))
         
@@ -355,22 +354,25 @@ class BProject(object):
     def _editBertosProject(self):
         # Write the project file
         self._writeProjectFile(os.path.join(self.maindir, "project.bertos"))
-        # VERSION file
-        self._writeVersionFile(os.path.join(self.maindir, "VERSION"))
-        # Destination makefile
-        self._writeMakefile(os.path.join(self.maindir, "Makefile"))
-        # Merge sources
-        self._mergeSources(self.sources_dir, self.srcdir, self.old_srcdir)
-        # Copy all the hw files
-        self._writeHwFiles(self.sources_dir, self.hwdir)
+        if not self.is_preset:
+            # Generate this files only if the project isn't a preset
+            # VERSION file
+            self._writeVersionFile(os.path.join(self.maindir, "VERSION"))
+            # Destination makefile
+            self._writeMakefile(os.path.join(self.maindir, "Makefile"))
+            # Merge sources
+            self._mergeSources(self.sources_dir, self.srcdir, self.old_srcdir)
+            # Copy all the hw files
+            self._writeHwFiles(self.sources_dir, self.hwdir)
+            # Destination wizard mk file
+            self._writeWizardMkFile(os.path.join(self.prjdir, os.path.basename(self.prjdir) + "_wiz.mk"))
         # Set properly the autoenabled parameters
         self._setupAutoenabledParameters()
         # Copy all the configuration files
         self._writeCfgFiles(self.sources_dir, self.cfgdir)
-        # Destination wizard mk file
-        self._writeWizardMkFile(os.path.join(self.prjdir, os.path.basename(self.prjdir) + "_wiz.mk"))
-        # Create project files for selected plugins
-        self._createProjectFiles()
+        if not self.is_preset:
+            # Create project files for selected plugins only if the project isn't a preset
+            self._createProjectFiles()
 
     def _createProjectFiles(self):
         # Files for selected plugins
@@ -502,6 +504,10 @@ class BProject(object):
     @property
     def from_preset(self):
         return self.infos.get("PROJECT_FROM_PRESET", False)
+
+    @property
+    def is_preset(self):
+        return self.infos.get("PRESET", False)
 
     def _createDirectory(self, directory):
         if not directory:
