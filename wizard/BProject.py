@@ -83,8 +83,13 @@ class BProject(object):
         self.infos["PROJECT_NAME"] = project_data.get("PROJECT_NAME", os.path.basename(project_dir))
         self.infos["PROJECT_PATH"] = os.path.dirname(project_file)
         project_src_path = project_data.get("PROJECT_SRC_PATH", None)
+        project_src_path = os.path.join(project_dir, project_data.get("PROJECT_SRC_PATH", None))
         if project_src_path:
             self.infos["PROJECT_SRC_PATH"] = project_src_path
+            
+        else:
+            # In projects created with older versions of the Wizard this metadata doesn't exist
+            self.infos["PROJECT_SRC_PATH"] = os.path.join(self.infos["PROJECT_PATH"], self.infos["PROJECT_NAME"])
 
         wizard_version = project_data.get("WIZARD_VERSION", 0)
         if wizard_version < 1:
@@ -161,16 +166,27 @@ class BProject(object):
         self._loadToolchainStuff(project_data["TOOLCHAIN"])
         # NOTE: this is a HACK!!!
         # TODO: find a better way to reuse loadModuleData
+        preset_project_name = project_data.get("PROJECT_NAME", os.path.basename(preset))
+        preset_prj_src_path = os.path.join(preset, project_data.get("PROJECT_SRC_PATH", os.path.join(preset, preset_project_name)))
+
         old_project_name = self.infos["PROJECT_NAME"]
         old_project_path = self.infos["PROJECT_PATH"]
-        self.infos["PROJECT_NAME"] = project_data.get("PROJECT_NAME", os.path.basename(preset))
+        old_project_src_path = self.infos["PROJECT_SRC_PATH"]
+
+        self.infos["PROJECT_NAME"] = preset_project_name
         self.infos["PROJECT_PATH"] = preset
+        self.infos["PROJECT_SRC_PATH"] = preset_prj_src_path
+
         self.loadModuleData(True)
         self.setEnabledModules(project_data["ENABLED_MODULES"])
+
         self.infos["PROJECT_NAME"] = old_project_name
         self.infos["PROJECT_PATH"] = old_project_path
-        self.infos["PRESET_NAME"] = project_data.get("PROJECT_NAME", os.path.basename(preset))
+        self.infos["PROJECT_SRC_PATH"] = old_project_src_path
+
+        self.infos["PRESET_NAME"] = preset_project_name
         self.infos["PRESET_PATH"] = preset
+        self.infos["PRESET_SRC_PATH"] = preset_prj_src_path
 
     def loadProjectPresets(self):
         """
@@ -235,12 +251,11 @@ class BProject(object):
                             raise DefineException.ConfigurationDefineException(self.infos["SOURCES_PATH"] + "/" + configuration, err.line_number, err.line)
                         if edit:
                             try:
-                                path = self.infos["PROJECT_NAME"]
-                                directory = self.infos["PROJECT_PATH"]
-                                user_configuration = loadConfigurationInfos(directory + "/" + configuration.replace("bertos", path))
+                                path = self.infos["PROJECT_SRC_PATH"]
+                                user_configuration = loadConfigurationInfos(configuration.replace("bertos", path))
                                 configuration_info[configuration] = updateConfigurationValues(configuration_info[configuration], user_configuration)
                             except ParseError, err:
-                                raise DefineException.ConfigurationDefineException(directory + "/" + configuration.replace("bertos", path))
+                                raise DefineException.ConfigurationDefineException(configuration.replace("bertos", path))
                 module_info_dict.update(module_dict)
                 configuration_info_dict.update(configuration_info)
                 if to_be_parsed:
@@ -289,7 +304,7 @@ class BProject(object):
                 self._newBertosProjectFromPreset()
 
     def _newBertosProject(self):
-        for directory in (self.maindir, self.srcdir, self.prjdir, self.hwdir, self.cfgdir):
+        for directory in (self.maindir, self.srcdir, self.prjdir, self.cfgdir):
             self._createDirectory(directory)
         # Write the project file
         self._writeProjectFile(os.path.join(self.maindir, "project.bertos"))
@@ -299,8 +314,6 @@ class BProject(object):
         self._writeMakefile(os.path.join(self.maindir, "Makefile"))
         # Copy the sources
         self._copySources(self.sources_dir, self.srcdir)
-        # Copy all the hw files
-        self._writeHwFiles(self.sources_dir, self.hwdir)
         # Set properly the autoenabled parameters
         self._setupAutoenabledParameters()
         # Copy all the configuration files
@@ -311,6 +324,10 @@ class BProject(object):
     def _newCustomBertosProject(self):
         # Create/write/copy the common things
         self._newBertosProject()
+        # Copy the clean hw files
+        self._createDirectory(self.hwdir)
+        # Copy all the hw files
+        self._writeHwFiles(self.sources_dir, self.hwdir)
         # Destination user mk file
         self._writeUserMkFile(os.path.join(self.prjdir, os.path.basename(self.prjdir) + ".mk"))
         # Destination main.c file
@@ -415,10 +432,15 @@ class BProject(object):
             f.close()
 
     def _writeCustomSrcFiles(self):
-        preset = self.infos["PRESET_PATH"]
-        preset_name = self.infos["PRESET_NAME"]
-        origin = os.path.join(preset, preset_name)
-        project_related_stuff = ("cfg", "hw", self.infos["PROJECT_NAME"] + "_wiz.mk") + const.IGNORE_LIST
+        origin = self.infos["PRESET_SRC_PATH"]
+        # Files to be ignored (all project files, cfg dir, wizard mk file, all global ignored dirs)
+        project_related_stuff = (
+            "cfg",
+            self.infos["PROJECT_NAME"] + "_wiz.mk",
+            "project.bertos",
+            self.infos["PROJECT_NAME"] + ".project",
+            self.infos["PROJECT_NAME"] + ".workspace",
+        ) + const.IGNORE_LIST
         for element in os.listdir(origin):
             if element not in project_related_stuff:
                 full_path = os.path.join(origin, element)
@@ -450,10 +472,7 @@ class BProject(object):
 
     @property
     def prjdir(self):
-        if self.maindir:
-            return os.path.join(self.maindir, self.infos["PROJECT_NAME"])
-        else:
-            return None
+        return self.infos.get("PROJECT_SRC_PATH", None)
 
     @property
     def hwdir(self):
