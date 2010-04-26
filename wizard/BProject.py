@@ -443,10 +443,10 @@ class BProject(object):
         # Files to be ignored (all project files, cfg dir, wizard mk file, all global ignored dirs)
         project_related_stuff = (
             "cfg",
-            self.infos["PROJECT_NAME"] + "_wiz.mk",
+            self.infos["PRESET_NAME"] + "_wiz.mk",
             "project.bertos",
-            self.infos["PROJECT_NAME"] + ".project",
-            self.infos["PROJECT_NAME"] + ".workspace",
+            self.infos["PRESET_NAME"] + ".project",
+            self.infos["PRESET_NAME"] + ".workspace",
         ) + const.IGNORE_LIST
         for element in os.listdir(origin):
             if element not in project_related_stuff:
