@@ -92,9 +92,12 @@ class BProject(object):
             self.infos["PROJECT_SRC_PATH"] = os.path.join(self.infos["PROJECT_PATH"], self.infos["PROJECT_NAME"])
 
         wizard_version = project_data.get("WIZARD_VERSION", 0)
-        if wizard_version < 1:
+        if wizard_version == 0:
             # Ignore the BERTOS_PATH inside the project file for older project
             project_data["BERTOS_PATH"] = project_dir
+        elif wizard_version == 1:
+            # Use SOURCES_PATH instead of BERTOS_PATH for backward compatibility
+            project_data["BERTOS_PATH"] = project_data["SOURCES_PATH"]
         else:
             linked_sources_path = project_data["BERTOS_PATH"]
             sources_abspath = os.path.abspath(os.path.join(project_dir, linked_sources_path))
