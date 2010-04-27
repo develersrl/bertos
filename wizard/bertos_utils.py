@@ -149,9 +149,7 @@ def userMkGeneratorFromPreset(project_info):
     destination = os.path.join(project_info.prjdir, "%s_user.mk" %project_info.info("PROJECT_NAME"))
     # Temporary code.
     # TODO: write it using regular expressions to secure this function
-    if preset_name != project_name:
-        while makefile.find(preset_name + "_") != -1:
-            makefile = makefile.replace(preset_name + "_", project_name + "_")
+    makefile = makefile.replace(preset_name + "_", project_name + "_")
     open(destination, "w").write(makefile)
 
 def userMkGenerator(project_info):
