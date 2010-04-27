@@ -40,6 +40,7 @@ import re
 import shutil
 # Use custom copytree function
 import copytree
+import relpath
 import pickle
 
 import const
@@ -119,7 +120,8 @@ def projectFileGenerator(project_info):
         # project_data["BERTOS_PATH"] = project_info.info("BERTOS_PATH")
         project_data["BERTOS_PATH"] = directory
     project_data["PROJECT_NAME"] = project_info.info("PROJECT_NAME", os.path.basename(directory))
-    project_data["PROJECT_SRC_PATH"] = project_info.info("PROJECT_SRC_PATH")
+    project_src_relpath = relpath.relpath(project_info.info("PROJECT_SRC_PATH"), directory)
+    project_data["PROJECT_SRC_PATH"] = project_src_relpath
     project_data["TOOLCHAIN"] = project_info.info("TOOLCHAIN")
     project_data["CPU_NAME"] = project_info.info("CPU_NAME")
     project_data["SELECTED_FREQ"] = project_info.info("SELECTED_FREQ")
@@ -144,8 +146,8 @@ def userMkGenerator(project_info):
     # Deadly performances loss was here :(
     mk_data = {}
     mk_data["$pname"] = os.path.basename(project_info.info("PROJECT_PATH"))
-    mk_data["$ppath"] = os.path.basename(project_info.info("PROJECT_SRC_PATH"))
-    mk_data["$main"] = os.path.basename(project_info.info("PROJECT_PATH")) + "/main.c"
+    mk_data["$ppath"] = relpath.relpath(project_info.info("PROJECT_SRC_PATH"), project_info.info("PROJECT_PATH"))
+    mk_data["$main"] = os.path.join("$(%s_PROJECT_SRC_PATH)" %project_info.info("PROJECT_NAME"), "main.c")
     for key in mk_data:
         while makefile.find(key) != -1:
             makefile = makefile.replace(key, mk_data[key])
@@ -159,7 +161,7 @@ def mkGenerator(project_info):
     destination = os.path.join(project_info.prjdir, os.path.basename(project_info.prjdir) + ".mk")
     mk_data = {}
     mk_data["$pname"] = project_info.info("PROJECT_NAME")
-    mk_data["$ppath"] = os.path.basename(project_info.info("PROJECT_SRC_PATH"))
+    mk_data["$ppath"] = relpath.relpath(project_info.info("PROJECT_SRC_PATH"), project_info.info("PROJECT_PATH"))
     mk_data["$cpuclockfreq"] = project_info.info("SELECTED_FREQ")
     cpu_mk_parameters = []
     for key, value in project_info.info("CPU_INFOS").items():
@@ -169,7 +171,6 @@ def mkGenerator(project_info):
     mk_data["$csrc"], mk_data["$pcsrc"], mk_data["$cppasrc"], mk_data["$cxxsrc"], mk_data["$asrc"], mk_data["$constants"] = csrcGenerator(project_info)
     mk_data["$prefix"] = replaceSeparators(project_info.info("TOOLCHAIN")["path"].split("gcc")[0])
     mk_data["$suffix"] = replaceSeparators(project_info.info("TOOLCHAIN")["path"].split("gcc")[1])
-    mk_data["$main"] = os.path.basename(project_info.info("PROJECT_PATH")) + "/main.c"
     for key in mk_data:
         while makefile.find(key) != -1:
             makefile = makefile.replace(key, mk_data[key])
