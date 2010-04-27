@@ -138,24 +138,28 @@ def versionFileGenerator(project_info, version_file):
     version = bertosVersion(project_info.info("BERTOS_PATH"))
     return version_file.replace('$version', version)
 
-def userMkGenerator(project_info, destination):
-    makefile = open(os.path.join(const.DATA_DIR, "mktemplates/template.mk"), "r").read()
+def userMkGenerator(project_info):
+    makefile = open(os.path.join(const.DATA_DIR, "mktemplates/template_user.mk"), "r").read()
+    destination = os.path.join(project_info.prjdir, os.path.basename(project_info.prjdir) + "_user.mk")
     # Deadly performances loss was here :(
     mk_data = {}
     mk_data["$pname"] = os.path.basename(project_info.info("PROJECT_PATH"))
+    mk_data["$ppath"] = os.path.basename(project_info.info("PROJECT_SRC_PATH"))
     mk_data["$main"] = os.path.basename(project_info.info("PROJECT_PATH")) + "/main.c"
     for key in mk_data:
         while makefile.find(key) != -1:
             makefile = makefile.replace(key, mk_data[key])
     open(destination, "w").write(makefile)
 
-def mkGenerator(project_info, destination):
+def mkGenerator(project_info):
     """
     Generates the mk file for the current project.
     """
-    makefile = open(os.path.join(const.DATA_DIR, "mktemplates/template_wiz.mk"), "r").read()
+    makefile = open(os.path.join(const.DATA_DIR, "mktemplates/template.mk"), "r").read()
+    destination = os.path.join(project_info.prjdir, os.path.basename(project_info.prjdir) + ".mk")
     mk_data = {}
     mk_data["$pname"] = project_info.info("PROJECT_NAME")
+    mk_data["$ppath"] = os.path.basename(project_info.info("PROJECT_SRC_PATH"))
     mk_data["$cpuclockfreq"] = project_info.info("SELECTED_FREQ")
     cpu_mk_parameters = []
     for key, value in project_info.info("CPU_INFOS").items():
@@ -171,14 +175,19 @@ def mkGenerator(project_info, destination):
             makefile = makefile.replace(key, mk_data[key])
     open(destination, "w").write(makefile)
 
-def makefileGenerator(project_info, destination):
+def makefileGenerator(project_info):
     """
     Generate the Makefile for the current project.
     """
     makefile = open(os.path.join(const.DATA_DIR, "mktemplates/Makefile"), "r").read()
+    destination = os.path.join(project_info.maindir, "Makefile")
     # TODO write a general function that works for both the mk file and the Makefile
-    while makefile.find("$pname") != -1:
-        makefile = makefile.replace("$pname", project_info.info("PROJECT_NAME"))
+    mk_data = {}
+    mk_data["$pname"] = project_info.info("PROJECT_NAME")
+    mk_data["$ppath"] = os.path.basename(project_info.info("PROJECT_SRC_PATH"))
+    for key in mk_data:
+        while makefile.find(key) != -1:
+            makefile = makefile.replace(key, mk_data[key])
     open(destination, "w").write(makefile)
 
 def csrcGenerator(project_info):

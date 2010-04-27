@@ -37,8 +37,9 @@ import const
 import os
 from bertos_utils import replaceSeparators, csrcGenerator
 
-def _userMkGenerator(project_info, destination):
+def _userMkGenerator(project_info):
     makefile = open(os.path.join(const.DATA_DIR, "mktemplates/old/template.mk"), "r").read()
+    destination = os.path.join(project_info.prjdir, os.path.basename(project_info.prjdir) + ".mk")
     # Deadly performances loss was here :(
     mk_data = {}
     mk_data["$pname"] = os.path.basename(project_info.info("PROJECT_PATH"))
@@ -48,11 +49,12 @@ def _userMkGenerator(project_info, destination):
             makefile = makefile.replace(key, mk_data[key])
     open(destination, "w").write(makefile)
 
-def _mkGenerator(project_info, destination):
+def _mkGenerator(project_info):
     """
     Generates the mk file for the current project.
     """
     makefile = open(os.path.join(const.DATA_DIR, "mktemplates/old/template_wiz.mk"), "r").read()
+    destination = os.path.join(project_info.prjdir, os.path.basename(project_info.prjdir) + "_wiz.mk")
     mk_data = {}
     mk_data["$pname"] = project_info.info("PROJECT_NAME")
     mk_data["$cpuclockfreq"] = project_info.info("SELECTED_FREQ")
@@ -70,11 +72,12 @@ def _mkGenerator(project_info, destination):
             makefile = makefile.replace(key, mk_data[key])
     open(destination, "w").write(makefile)
 
-def _makefileGenerator(project_info, destination):
+def _makefileGenerator(project_info):
     """
     Generate the Makefile for the current project.
     """
     makefile = open(os.path.join(const.DATA_DIR, "mktemplates/old/Makefile"), "r").read()
+    destination = os.path.join(project_info.maindir, "Makefile")
     # TODO write a general function that works for both the mk file and the Makefile
     while makefile.find("$pname") != -1:
         makefile = makefile.replace("$pname", project_info.info("PROJECT_NAME"))

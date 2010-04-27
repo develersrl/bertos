@@ -312,7 +312,7 @@ class BProject(object):
         # VERSION file
         self._writeVersionFile(os.path.join(self.maindir, "VERSION"))
         # Destination makefile
-        self._writeMakefile(os.path.join(self.maindir, "Makefile"))
+        self._writeMakefile()
         # Copy the sources
         self._copySources(self.sources_dir, self.srcdir)
         # Set properly the autoenabled parameters
@@ -320,7 +320,7 @@ class BProject(object):
         # Copy all the configuration files
         self._writeCfgFiles(self.sources_dir, self.cfgdir)
         # Destination wizard mk file
-        self._writeWizardMkFile(os.path.join(self.prjdir, os.path.basename(self.prjdir) + "_wiz.mk"))
+        self._writeWizardMkFile()
 
     def _newCustomBertosProject(self):
         # Create/write/copy the common things
@@ -330,7 +330,7 @@ class BProject(object):
         # Copy all the hw files
         self._writeHwFiles(self.sources_dir, self.hwdir)
         # Destination user mk file
-        self._writeUserMkFile(os.path.join(self.prjdir, os.path.basename(self.prjdir) + ".mk"))
+        self._writeUserMkFile()
         # Destination main.c file
         self._writeMainFile(self.prjdir + "/main.c")
         # Create project files for selected plugins
@@ -358,13 +358,13 @@ class BProject(object):
             # VERSION file
             self._writeVersionFile(os.path.join(self.maindir, "VERSION"))
             # Destination makefile
-            self._writeMakefile(os.path.join(self.maindir, "Makefile"))
+            self._writeMakefile()
             # Merge sources
             self._mergeSources(self.sources_dir, self.srcdir, self.old_srcdir)
             # Copy all the hw files
             self._writeHwFiles(self.sources_dir, self.hwdir)
             # Destination wizard mk file
-            self._writeWizardMkFile(os.path.join(self.prjdir, os.path.basename(self.prjdir) + "_wiz.mk"))
+            self._writeWizardMkFile()
         # Set properly the autoenabled parameters
         self._setupAutoenabledParameters()
         # Copy all the configuration files
@@ -390,14 +390,14 @@ class BProject(object):
         f.write(projectFileGenerator(self))
         f.close()
 
-    def _writeMakefile(self, filename):
-        bertos_utils.makefileGenerator(self, filename)
+    def _writeMakefile(self):
+        bertos_utils.makefileGenerator(self)
 
-    def _writeUserMkFile(self, filename):
-        bertos_utils.userMkGenerator(self, filename)
+    def _writeUserMkFile(self):
+        bertos_utils.userMkGenerator(self)
 
-    def _writeWizardMkFile(self, filename):
-        bertos_utils.mkGenerator(self, filename)
+    def _writeWizardMkFile(self):
+        bertos_utils.mkGenerator(self)
 
     def _writeMainFile(self, filename):
         main = open(os.path.join(const.DATA_DIR, "srctemplates/main.c"), "r").read()

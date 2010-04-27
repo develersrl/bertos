@@ -12,6 +12,6 @@ default: all
 
 include bertos/config.mk
 
-include $pname/$pname.mk
+include $ppath/$pname.mk
 
 include bertos/rules.mk
