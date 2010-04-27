@@ -1,0 +1,56 @@
+= DevelGPS v0.1 =
+
+== Overview ==
+
+The purpose of this project is to implement a portable GPS locator / geocaching
+finder tool using the Cortex-M3 based Luminary Micro LM3S1968 evaluation board.
+
+The device proposes a user interface to configure the GPS coordinates of a
+target location and shows on the OLED display the direction and distance to
+reach the target.
+
+== Hardware requirements ==
+
+ - Luminary Micro LM3S1968 Evaluation Kit
+ - a GPS module
+ - a mobile phone battery
+
+== Software requirements ==
+
+ - BeRTOS kernel
+
+BeRTOS components used for this project:
+ - Kernel with preemptive scheduler and task priorities
+ - Device drivers: UART, OLED display, navigation/select pushbuttons
+ - NMEA parser
+ - GFX library (+ menu management module)
+
+== Implementation ==
+
+The GPS module is connected to UART1 RX pin (UART0 is kept for debugging
+purposes). The mobile phone batter is used as a power source both for the GPS
+module and the LM3S1968 board.
+
+From the software's point of view, BeRTOS already provides the drivers to
+manage all the required devices and a NMEA parser to retrieve the right
+informations from the raw GPS strings: position, date & time, link quality.
+
+The multi-process environment and preemptive scheduler provided by BeRTOS is
+exploited to create independent threads operating in producer/consumer way:
+ - a thread takes care of retrieving and processing NMEA string from the UART,
+ - a thread manages the GUI, updating the OLED display on new GPS informations
+   or user's input,
+ - a thread reports the status of the GPS receiver blinking a LED when GPS data
+   are correctly received.
+
+The GUI is organized using a main menu that allows to select:
+ - a form to insert the target GPS coordinates,
+ - a form showing a compass with target direction, distance and GPS positions
+   to reach the target,
+ - a form to show the status of the GPS receiver.
+
+NOTE: the distance is evaluated using the Haversine formula between the current
+and target GPS position. The Haversine formula remains particularly
+well-conditioned for numerical computation even at small distances, making the
+device particularly useful when walking, hiking or moving at a close distance
+to the target.
