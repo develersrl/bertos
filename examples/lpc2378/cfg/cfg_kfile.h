@@ -57,6 +57,6 @@
  * Enable the gets function with echo.
  * $WIZ$ type = "boolean"
  */
-#define CONFIG_KFILE_GETS      0
+#define CONFIG_KFILE_GETS      1
 
 #endif /* CFG_KFILE_H */

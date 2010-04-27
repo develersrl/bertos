@@ -2,11 +2,17 @@
 #include <cpu/irq.h>
 #include <cfg/debug.h>
 #include <drv/timer.h>
+#include <drv/ser.h>
 #include <io/lpc23xx.h>
+
+#define PRIO_HIGH	1
+#define PRIO_LOW	0
 
 #define STATUS_LED (1<<19)
 #define LED_ON()  do { IOCLR1 =  STATUS_LED; } while (0)
 #define LED_OFF() do { IOSET1 =  STATUS_LED; } while (0)
+
+static Serial ser_port;
 
 static void init(void)
 {
@@ -14,15 +20,35 @@ static void init(void)
 	kdbg_init();
 	timer_init();
 	proc_init();
+
 	timer_delay(3000);
 	kprintf("NXP LPC2378 BeRTOS port test\n");
 	timer_delay(3000);
 	/* Turn off boot led */
-	IODIR0 = (1<<21);	
-	IOCLR0 = (1<<21);	
+	IODIR0 = (1<<21);
+	IOCLR0 = (1<<21);
 	/* Init status led */
 	IODIR1 |= STATUS_LED;
 	LED_OFF();
+}
+
+static void NORETURN ser_prompt(void)
+{
+	char buf[32];
+	int i;
+
+	ser_init(&ser_port, SER_UART1);
+	ser_setbaudrate(&ser_port, 115200);
+
+	/* BeRTOS "echo" terminal */
+	kfile_printf(&ser_port.fd, "\n\rBeRTOS echo terminal\n\r");
+	proc_setPri(proc_current(), PRIO_HIGH);
+	for (i = 0; ; i++)
+	{
+		kfile_printf(&ser_port.fd, "\n\r[%03d] BeRTOS:~$ ", i);
+		kfile_gets_echo(&ser_port.fd, buf, sizeof(buf), true);
+		kfile_printf(&ser_port.fd, "%s", buf);
+	}
 }
 
 static void NORETURN bertos_up(void)
@@ -46,7 +72,7 @@ static void NORETURN status(void)
 	{
 		LED_ON();
 		timer_delay(250);
-		
+
 		LED_OFF();
 		timer_delay(250);
 	}
@@ -58,6 +84,7 @@ int main(void)
 	init();
 	proc_testRun();
 	proc_new(bertos_up, NULL, KERN_MINSTACKSIZE * 3, NULL);
+	proc_new(ser_prompt, NULL, KERN_MINSTACKSIZE * 3, NULL);
 	proc_new(status, NULL, 0, NULL);
 	while (1)
 	{
@@ -65,4 +92,3 @@ int main(void)
 
 	return 0;
 }
-
