@@ -41,7 +41,9 @@
 #       When the current Wizard is opening project done with this version of
 #       the Wizard it has to change the original SOURCES_PATH to the local path
 #   1 - SOURCES_PATH used instead of BERTOS_PATH
-#   2 - current version.
+#   2 - Use the old makefile templates (into /mktemplates/old) and the old logic
+#       Instead of the new one.
+#   3 - Current version.
 
 
 # NOTE: Change this variable may cause the wizard to not work properly. 
