@@ -33,6 +33,8 @@
  * \brief LPC23xx UART driver.
  *
  * \author Andrea Righi <arighi@develer.com>
+ *
+ * notest:arm
  */
 
 #include <cfg/macros.h> /* for BV() */
