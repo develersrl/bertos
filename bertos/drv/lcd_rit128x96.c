@@ -131,7 +131,8 @@ static void lcd_start_blit(uint8_t x, uint8_t y, uint8_t width, uint8_t height)
 {
 	uint8_t buffer[3];
 
-	ASSERT(width == LCD_WIDTH && height == LCD_HEIGHT);
+	ASSERT((x + width) <= LCD_WIDTH);
+	ASSERT((y + height) <= LCD_HEIGHT);
 
 	/* Enter command mode */
 	LCD_SET_COMMAND();
