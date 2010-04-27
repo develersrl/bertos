@@ -26,25 +26,48 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2007 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
- * \brief Low-level serial module for ARM (interface).
+ * \brief LPC23xx UART driver.
  *
- * \version $Id$
- *
- * \author Daniele Basile <asterix@develer.com>
- *
+ * \author Andrea Righi <arighi@develer.com>
  */
 
-#include <cpu/detect.h>
+#ifndef SER_LPC2_H
+#define SER_LPC2_H
 
-#if CPU_ARM_AT91
-	#include "ser_at91.h"
-#elif CPU_ARM_LPC2378
-	#include "ser_lpc2.h"
-/*#elif  Add other ARM families here */
-#else
-	#error Unknown CPU
-#endif
+#include <cfg/cfg_debug.h>
+#include <io/lpc23xx.h>
+
+/* Serial hardware numbers */
+enum
+{
+	SER_UART0,
+	SER_UART1,
+	SER_UART2,
+	SER_UART3,
+
+	SER_CNT //< Number of serial ports
+};
+
+/* Software errors */
+#define SERRF_RXFIFOOVERRUN  BV(0) //< Rx FIFO buffer overrun
+#define SERRF_RXTIMEOUT      BV(1) //< Receive timeout
+#define SERRF_TXTIMEOUT      BV(2) //< Transmit timeout
+
+/*
+ * Hardware errors.
+ */
+#define SERRF_RXSROVERRUN    0 //< Input overrun
+#define SERRF_FRAMEERROR     0 //< Stop bit missing
+#define SERRF_PARITYERROR    0 //< Parity error
+#define SERRF_NOISEERROR     0 //< Noise error
+
+/* Serial error/status flags */
+typedef uint32_t serstatus_t;
+
+void lpc2_uartInit(int port);
+
+#endif /* SER_LPC2_H */

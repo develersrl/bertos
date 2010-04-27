@@ -32,8 +32,6 @@
  *
  * \brief Configuration file for serial module.
  *
- * \version $Id: cfg_ser.h 2845 2009-09-01 14:41:47Z lottaviano $
- *
  * \author Daniele Basile <asterix@develer.com>
  */
 
@@ -64,7 +62,7 @@
  * Size of the outbound FIFO buffer for port 1 [bytes].
  * $WIZ$ type = "int"
  * $WIZ$ min = 2
- * $WIZ$ supports = "at91 and not atmega8 and not atmega168 and not atmega32"
+ * $WIZ$ supports = "lm3s or lpc2 or (at91 and not atmega8 and not atmega168 and not atmega32)"
  */
 #define CONFIG_UART1_TXBUFSIZE  32
 
@@ -72,9 +70,41 @@
  * Size of the inbound FIFO buffer for port 1 [bytes].
  * $WIZ$ type = "int"
  * $WIZ$ min = 2
- * $WIZ$ supports = "at91 and not atmega8 and not atmega168 and not atmega32"
+ * $WIZ$ supports = "lm3s or lpc2 or (at91 and not atmega8 and not atmega168 and not atmega32)"
  */
 #define CONFIG_UART1_RXBUFSIZE  32
+
+/**
+ * Size of the outbound FIFO buffer for port 2 [bytes].
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 2
+ * $WIZ$ supports = "lm3s or lpc2"
+ */
+#define CONFIG_UART2_TXBUFSIZE  32
+
+/**
+ * Size of the inbound FIFO buffer for port 2 [bytes].
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 2
+ * $WIZ$ supports = "lm3s or lpc2"
+ */
+#define CONFIG_UART2_RXBUFSIZE  32
+
+/**
+ * Size of the outbound FIFO buffer for port 3 [bytes].
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 2
+ * $WIZ$ supports = "lpc2"
+ */
+#define CONFIG_UART3_TXBUFSIZE  32
+
+/**
+ * Size of the inbound FIFO buffer for port 3 [bytes].
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 2
+ * $WIZ$ supports = "lpc2"
+ */
+#define CONFIG_UART3_RXBUFSIZE  32
 
 
 /**
