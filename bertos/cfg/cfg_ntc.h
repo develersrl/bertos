@@ -30,18 +30,25 @@
  *
  * -->
  *
- * \brief Configuration file for phase module.
+ * \brief Configuration file for NTC module.
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 
 #ifndef CFG_NTC_H
 #define CFG_NTC_H
 
-/// Max value of the dsty cycle on triac. $WIZ$ type = "int"
-#define NTC_OPEN_CIRCUIT  -32768
-/// Max value of the triac power. $WIZ$ type = "int"
-#define NTC_SHORT_CIRCUIT 32767
+/**
+ * Module logging level.
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
+ */
+#define CONFIG_NTC_LOG_LEVEL        LOG_LVL_INFO
+/**
+ * Module logging format.
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define CONFIG_NTC_LOG_FORMAT       LOG_FMT_TERSE
 
 #endif /* CFG_NTC_H */
