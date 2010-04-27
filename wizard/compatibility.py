@@ -33,6 +33,53 @@
 # Author: Lorenzo Berni <duplo@develer.com>
 #
 
+import const
+import os
+from bertos_utils import replaceSeparators, csrcGenerator
+
+def _userMkGenerator(project_info, destination):
+    makefile = open(os.path.join(const.DATA_DIR, "mktemplates/old/template.mk"), "r").read()
+    # Deadly performances loss was here :(
+    mk_data = {}
+    mk_data["$pname"] = os.path.basename(project_info.info("PROJECT_PATH"))
+    mk_data["$main"] = os.path.basename(project_info.info("PROJECT_PATH")) + "/main.c"
+    for key in mk_data:
+        while makefile.find(key) != -1:
+            makefile = makefile.replace(key, mk_data[key])
+    open(destination, "w").write(makefile)
+
+def _mkGenerator(project_info, destination):
+    """
+    Generates the mk file for the current project.
+    """
+    makefile = open(os.path.join(const.DATA_DIR, "mktemplates/old/template_wiz.mk"), "r").read()
+    mk_data = {}
+    mk_data["$pname"] = project_info.info("PROJECT_NAME")
+    mk_data["$cpuclockfreq"] = project_info.info("SELECTED_FREQ")
+    cpu_mk_parameters = []
+    for key, value in project_info.info("CPU_INFOS").items():
+        if key.startswith(const.MK_PARAM_ID):
+            cpu_mk_parameters.append("%s = %s" %(key.replace("MK", mk_data["$pname"]), value))
+    mk_data["$cpuparameters"] = "\n".join(cpu_mk_parameters)
+    mk_data["$csrc"], mk_data["$pcsrc"], mk_data["$cppasrc"], mk_data["$cxxsrc"], mk_data["$asrc"], mk_data["$constants"] = csrcGenerator(project_info)
+    mk_data["$prefix"] = replaceSeparators(project_info.info("TOOLCHAIN")["path"].split("gcc")[0])
+    mk_data["$suffix"] = replaceSeparators(project_info.info("TOOLCHAIN")["path"].split("gcc")[1])
+    mk_data["$main"] = os.path.basename(project_info.info("PROJECT_PATH")) + "/main.c"
+    for key in mk_data:
+        while makefile.find(key) != -1:
+            makefile = makefile.replace(key, mk_data[key])
+    open(destination, "w").write(makefile)
+
+def _makefileGenerator(project_info, destination):
+    """
+    Generate the Makefile for the current project.
+    """
+    makefile = open(os.path.join(const.DATA_DIR, "mktemplates/old/Makefile"), "r").read()
+    # TODO write a general function that works for both the mk file and the Makefile
+    while makefile.find("$pname") != -1:
+        makefile = makefile.replace("$pname", project_info.info("PROJECT_NAME"))
+    open(destination, "w").write(makefile)
+
 def updateProject(project_data):
     """
     Update incrementally the project_data loaded from a BeRTOS Wizard project
@@ -45,5 +92,11 @@ def updateProject(project_data):
     if wizard_version < 2:
         # Use SOURCES_PATH instead of BERTOS_PATH for backward compatibility
         project_data["BERTOS_PATH"] = project_data["SOURCES_PATH"]
+    if wizard_version < 3:
+        # Use older makefile templates and generators using monkey patching
+        import bertos_utils
+        bertos_utils.mkGenerator = _mkGenerator
+        bertos_utils.userMkGenerator = _userMkGenerator
+        bertos_utils.makefileGenerator = _makefileGenerator
     return project_data
 

@@ -53,12 +53,13 @@ from bertos_utils import (
                             getCommentList, sub,
 
                             # Project creation functions
-                            projectFileGenerator, versionFileGenerator, makefileGenerator,
-                            userMkGenerator, mkGenerator, loadPlugin, mergeSources,
+                            projectFileGenerator, versionFileGenerator, loadPlugin, 
+                            mergeSources,
 
                             # Custom exceptions
                             ParseError, SupportedException
                         )
+import bertos_utils
 
 from compatibility import updateProject
 
@@ -390,13 +391,13 @@ class BProject(object):
         f.close()
 
     def _writeMakefile(self, filename):
-        makefileGenerator(self, filename)
+        bertos_utils.makefileGenerator(self, filename)
 
     def _writeUserMkFile(self, filename):
-        userMkGenerator(self, filename)
+        bertos_utils.userMkGenerator(self, filename)
 
     def _writeWizardMkFile(self, filename):
-        mkGenerator(self, filename)
+        bertos_utils.mkGenerator(self, filename)
 
     def _writeMainFile(self, filename):
         main = open(os.path.join(const.DATA_DIR, "srctemplates/main.c"), "r").read()
