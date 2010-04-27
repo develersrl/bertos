@@ -39,8 +39,9 @@
 # Previous versions:
 #   0 - the project file doesn't contain the version number.
 #       When the current Wizard is opening project done with this version of
-#       the Wizard it has to change the origina BERTOS_PATH to the local path
-#   1 - this is the current version. No special behaviours needed.
+#       the Wizard it has to change the original SOURCES_PATH to the local path
+#   1 - SOURCES_PATH used instead of BERTOS_PATH
+#   2 - current version.
 
 
 # NOTE: Change this variable may cause the wizard to not work properly. 
