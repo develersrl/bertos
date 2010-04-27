@@ -40,6 +40,8 @@
 #include <cfg/compiler.h>
 
 
+#define PWM_BASE     0x40028000UL
+
 #if CPU_CM3_LM3S1968
 	#include "lm3s1968.h"
 	#include "lm3s_types.h"
@@ -50,6 +52,7 @@
 	#include "lm3s_memmap.h"
 	#include "lm3s_uart.h"
 	#include "lm3s_ssi.h"
+	#include "lm3s_pwm.h"
 #else
 	#error Missing I/O definitions for CPU.
 #endif
