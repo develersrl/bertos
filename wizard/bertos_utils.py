@@ -140,6 +140,20 @@ def versionFileGenerator(project_info, version_file):
     version = bertosVersion(project_info.info("BERTOS_PATH"))
     return version_file.replace('$version', version)
 
+def userMkGeneratorFromPreset(project_info):
+    project_name = project_info.info("PROJECT_NAME")
+    preset_path = project_info.info("PRESET_PATH")
+    preset_name = project_info.info("PRESET_NAME")
+    preset_src_dir = project_info.info("PRESET_SRC_PATH")
+    makefile = open(os.path.join(preset_path, preset_src_dir, "%s_user.mk" %preset_name), 'r').read()
+    destination = os.path.join(project_info.prjdir, "%s_user.mk" %project_info.info("PROJECT_NAME"))
+    # Temporary code.
+    # TODO: write it using regular expressions to secure this function
+    if preset_name != project_name:
+        while makefile.find(preset_name + "_") != -1:
+            makefile = makefile.replace(preset_name + "_", project_name + "_")
+    open(destination, "w").write(makefile)
+
 def userMkGenerator(project_info):
     makefile = open(os.path.join(const.DATA_DIR, "mktemplates/template_user.mk"), "r").read()
     destination = os.path.join(project_info.prjdir, os.path.basename(project_info.prjdir) + "_user.mk")

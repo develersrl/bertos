@@ -339,8 +339,11 @@ class BProject(object):
         # Create/write/copy the common things
         self._newBertosProject()
 
-        # Copy all the files and dirs except cfg/hw/*_wiz.mk
+        # Copy all the files and dirs except cfg/hw/*.mk
         self._writeCustomSrcFiles()
+
+        # Copyt the new *_user.mk file
+        self._writeUserMkFileFromPreset()
 
         if self.infos["EMPTY_MAIN"]:
             # Create and empty main.c file only if the user check the box
@@ -395,6 +398,9 @@ class BProject(object):
     def _writeUserMkFile(self):
         bertos_utils.userMkGenerator(self)
 
+    def _writeUserMkFileFromPreset(self):
+        bertos_utils.userMkGeneratorFromPreset(self)
+
     def _writeWizardMkFile(self):
         bertos_utils.mkGenerator(self)
 
@@ -432,7 +438,8 @@ class BProject(object):
         # Files to be ignored (all project files, cfg dir, wizard mk file, all global ignored dirs)
         project_related_stuff = (
             "cfg",
-            self.infos["PRESET_NAME"] + "_wiz.mk",
+            self.infos["PRESET_NAME"] + ".mk",
+            self.infos["PRESET_NAME"] + "_user.mk",
             "project.bertos",
             self.infos["PRESET_NAME"] + ".project",
             self.infos["PRESET_NAME"] + ".workspace",
