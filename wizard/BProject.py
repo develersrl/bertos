@@ -78,6 +78,7 @@ class BProject(object):
     def loadBertosProject(self, project_file, info_dict):
         project_dir = os.path.dirname(project_file)
         project_data = pickle.loads(open(project_file, "r").read())
+        updateProject(project_data)
         # If PROJECT_NAME is not defined it use the directory name as PROJECT_NAME
         # NOTE: this can throw an Exception if the user has changed the directory containing the project
         self.infos["PROJECT_NAME"] = project_data.get("PROJECT_NAME", os.path.basename(project_dir))
@@ -91,13 +92,6 @@ class BProject(object):
             # In projects created with older versions of the Wizard this metadata doesn't exist
             self.infos["PROJECT_SRC_PATH"] = os.path.join(self.infos["PROJECT_PATH"], self.infos["PROJECT_NAME"])
 
-        wizard_version = project_data.get("WIZARD_VERSION", 0)
-        if wizard_version == 0:
-            # Ignore the BERTOS_PATH inside the project file for older project
-            project_data["BERTOS_PATH"] = project_dir
-        elif wizard_version == 1:
-            # Use SOURCES_PATH instead of BERTOS_PATH for backward compatibility
-            project_data["BERTOS_PATH"] = project_data["SOURCES_PATH"]
         linked_sources_path = project_data["BERTOS_PATH"]
         sources_abspath = os.path.abspath(os.path.join(project_dir, linked_sources_path))
         project_data["BERTOS_PATH"] = sources_abspath
@@ -394,20 +388,13 @@ class BProject(object):
         f.close()
 
     def _writeMakefile(self, filename):
-        makefile = open(os.path.join(const.DATA_DIR, "mktemplates/Makefile"), "r").read()
-        makefile = makefileGenerator(self, makefile)
-        open(filename, "w").write(makefile)
+        makefileGenerator(self, filename)
 
     def _writeUserMkFile(self, filename):
-        makefile = open(os.path.join(const.DATA_DIR, "mktemplates/template.mk"), "r").read()
-        # Deadly performances loss was here :(
-        makefile = userMkGenerator(self, makefile)
-        open(filename, "w").write(makefile)
+        userMkGenerator(self, filename)
 
     def _writeWizardMkFile(self, filename):
-        makefile = open(os.path.join(const.DATA_DIR, "mktemplates/template_wiz.mk"), "r").read()
-        makefile = mkGenerator(self, makefile)
-        open(filename, "w").write(makefile)
+        mkGenerator(self, filename)
 
     def _writeMainFile(self, filename):
         main = open(os.path.join(const.DATA_DIR, "srctemplates/main.c"), "r").read()

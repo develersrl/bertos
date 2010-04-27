@@ -138,19 +138,22 @@ def versionFileGenerator(project_info, version_file):
     version = bertosVersion(project_info.info("BERTOS_PATH"))
     return version_file.replace('$version', version)
 
-def userMkGenerator(project_info, makefile):
+def userMkGenerator(project_info, destination):
+    makefile = open(os.path.join(const.DATA_DIR, "mktemplates/template.mk"), "r").read()
+    # Deadly performances loss was here :(
     mk_data = {}
     mk_data["$pname"] = os.path.basename(project_info.info("PROJECT_PATH"))
     mk_data["$main"] = os.path.basename(project_info.info("PROJECT_PATH")) + "/main.c"
     for key in mk_data:
         while makefile.find(key) != -1:
             makefile = makefile.replace(key, mk_data[key])
-    return makefile
+    open(destination, "w").write(makefile)
 
-def mkGenerator(project_info, makefile):
+def mkGenerator(project_info, destination):
     """
     Generates the mk file for the current project.
     """
+    makefile = open(os.path.join(const.DATA_DIR, "mktemplates/template_wiz.mk"), "r").read()
     mk_data = {}
     mk_data["$pname"] = project_info.info("PROJECT_NAME")
     mk_data["$cpuclockfreq"] = project_info.info("SELECTED_FREQ")
@@ -166,16 +169,17 @@ def mkGenerator(project_info, makefile):
     for key in mk_data:
         while makefile.find(key) != -1:
             makefile = makefile.replace(key, mk_data[key])
-    return makefile
+    open(destination, "w").write(makefile)
 
-def makefileGenerator(project_info, makefile):
+def makefileGenerator(project_info, destination):
     """
     Generate the Makefile for the current project.
     """
+    makefile = open(os.path.join(const.DATA_DIR, "mktemplates/Makefile"), "r").read()
     # TODO write a general function that works for both the mk file and the Makefile
     while makefile.find("$pname") != -1:
         makefile = makefile.replace("$pname", project_info.info("PROJECT_NAME"))
-    return makefile
+    open(destination, "w").write(makefile)
 
 def csrcGenerator(project_info):
     modules = project_info.info("MODULES")
