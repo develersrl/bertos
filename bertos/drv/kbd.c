@@ -33,7 +33,6 @@
  *
  * \brief Keyboard driver (implementation)
  *
- * \version $Id$
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
@@ -178,6 +177,7 @@ keymask_t kbd_peek(void)
 	keymask_t key = 0;
 
 #if CONFIG_KBD_SCHED
+	/* Let other tasks run for a while */
 	extern void schedule(void);
 	schedule();
 #endif
