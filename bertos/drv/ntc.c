@@ -32,8 +32,6 @@
  *
  * \brief Driver for NTC (reads a temperature through an ADC)
  *
- * \version $Id$
- *
  * \author Giovanni Bajo <rasky@develer.com>
  * \author Francesco Sacchi <batt@develer.com>
  *
@@ -46,6 +44,12 @@
 #include "hw/hw_ntc.h"
 #include "hw/ntc_map.h"
 
+#include "cfg/cfg_ntc.h"
+
+// Define logging setting (for cfg/log.h module).
+#define LOG_LEVEL         CONFIG_NTC_LOG_LEVEL
+#define LOG_VERBOSITY     CONFIG_NTC_LOG_FORMAT
+#include <cfg/log.h>
 #include <cfg/debug.h>
 
 #include <drv/ntc.h>
@@ -102,9 +106,9 @@ deg_t ntc_read(NtcDev dev)
 	const NtcHwInfo* hw = ntc_hw_getInfo(dev);
 	const res_t* r = hw->resistances;
 
-	float rx;
+	res_t rx;
 	size_t i;
-	deg_t degrees;
+	deg_t degrees = 0;
 
 	rx = ntc_hw_read(dev);
 
