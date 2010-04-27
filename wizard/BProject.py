@@ -60,6 +60,8 @@ from bertos_utils import (
                             ParseError, SupportedException
                         )
 
+from compatibility import updateProject
+
 class BProject(object):
     """
     Simple class for store and retrieve project informations.
