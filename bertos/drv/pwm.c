@@ -32,7 +32,6 @@
  *
  * \brief PWM driver (implementation)
  *
- * \version $Id$
  *
  * \author Francesco Sacchi <batt@develer.com>
  * \author Daniele Basile <asterix@develer.com>
@@ -72,7 +71,7 @@ void pwm_setDuty(PwmDev dev, pwm_duty_t duty)
 
 	real_duty = (uint64_t)(duty * period) >> (uint64_t)PWM_MAX_PERIOD_LOG2;
 
-	LOG_INFO("real_duty[%d] duty[%d], period[%d]", real_duty, duty, period);
+	LOG_INFO("real_duty[%d] duty[%d], period[%d]\n", real_duty, duty, period);
 	pwm_hw_setDutyUnlock(dev, real_duty);
 }
 

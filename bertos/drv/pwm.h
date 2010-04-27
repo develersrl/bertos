@@ -29,7 +29,6 @@
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \version $Id$
  *
  * \brief Pulse Width Modulation (PWM) driver.
  *
@@ -76,6 +75,7 @@ INLINE void pwm_setPolarity(PwmDev dev, bool pol)
 
 void pwm_setDuty(PwmDev dev, pwm_duty_t duty);
 void pwm_setFrequency(PwmDev dev, pwm_freq_t freq);
+void pwm_setPolarity(PwmDev dev, bool pol);
 void pwm_enable(PwmDev dev, bool state);
 void pwm_init(void);
 
