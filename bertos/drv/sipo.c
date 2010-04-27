@@ -30,7 +30,6 @@
  *
  * -->
  *
- * \version $Id$
  *
  * \brief SIPO Module
  *
