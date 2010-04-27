@@ -86,8 +86,7 @@ class BProject(object):
         # NOTE: this can throw an Exception if the user has changed the directory containing the project
         self.infos["PROJECT_NAME"] = project_data.get("PROJECT_NAME", os.path.basename(project_dir))
         self.infos["PROJECT_PATH"] = os.path.dirname(project_file)
-        project_src_path = project_data.get("PROJECT_SRC_PATH", None)
-        project_src_path = os.path.join(project_dir, project_data.get("PROJECT_SRC_PATH", None))
+        project_src_path = os.path.join(project_dir, project_data.get("PROJECT_SRC_PATH", project_data["PROJECT_NAME"]))
         if project_src_path:
             self.infos["PROJECT_SRC_PATH"] = project_src_path
             

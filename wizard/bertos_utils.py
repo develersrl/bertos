@@ -283,12 +283,13 @@ def findModuleFiles(module, project_info):
     try:
         version_string = bertosVersion(project_info.info("BERTOS_PATH"))
         version_list = [int(i) for i in version_string.split()[-1].split('.')]
-        if version_list < [2, 5]:
-            # For older versions of BeRTOS add the toolchain to the tags
-            tags.append(project_info.info("CPU_INFOS")["TOOLCHAIN"])
     except ValueError:
-        # If the version file hasn't a valid version number do nothing
-        pass
+        # If the version file hasn't a valid version number assume it's an older
+        # project.
+        version_list = [0, 0]
+    if version_list < [2, 5]:
+        # For older versions of BeRTOS add the toolchain to the tags
+        tags.append(project_info.info("CPU_INFOS")["TOOLCHAIN"])
 
     for tag in tags:
         for filename, path in project_info.searchFiles(module + "_" + tag + ".c"):
