@@ -147,7 +147,7 @@ def userMkGenerator(project_info):
     mk_data = {}
     mk_data["$pname"] = os.path.basename(project_info.info("PROJECT_PATH"))
     mk_data["$ppath"] = relpath.relpath(project_info.info("PROJECT_SRC_PATH"), project_info.info("PROJECT_PATH"))
-    mk_data["$main"] = os.path.join("$(%s_PROJECT_SRC_PATH)" %project_info.info("PROJECT_NAME"), "main.c")
+    mk_data["$main"] = os.path.join("$(%s_SRC_PATH)" %project_info.info("PROJECT_NAME"), "main.c")
     for key in mk_data:
         while makefile.find(key) != -1:
             makefile = makefile.replace(key, mk_data[key])
