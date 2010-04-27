@@ -32,7 +32,6 @@
  *
  * \brief Configuration file for DC motor module.
  *
- * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  */
@@ -63,5 +62,27 @@
  * $WIZ$ value_list = "log_format"
  */
 #define DC_MOTOR_LOG_FORMAT     LOG_FMT_TERSE
+
+
+/**
+ * Min value of DC motor speed.
+ * \note Generally this value is the min value of the ADC conversion,
+ * if you use it.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_DC_MOTOR_MIN_SPEED              0
+
+
+/**
+ * Min value of DC motor speed.
+ * \note Generally this value is the min value of the ADC conversion,
+ * if you use it.
+ *
+ * $WIZ$ type = "int"
+ * $WIZ$ max = 65535
+ */
+#define CONFIG_DC_MOTOR_MAX_SPEED         65535
+
 
 #endif /* CFG_DC_MOTOR_H */

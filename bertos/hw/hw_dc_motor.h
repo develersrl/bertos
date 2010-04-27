@@ -32,54 +32,37 @@
  *
  * \brief DC motor hardware-specific definitions
  *
- * \version $Id$
- *
  * \author Daniele Basile <asterix@develer.com>
  */
 
 #ifndef HW_DC_MOTOR_H
 #define HW_DC_MOTOR_H
 
-typedef enum MotorDCMap
-{
+#warning TODO:This is an example implementation, you must implement it!
 
-	/* Put here motor dc declaration */
-	MOTOR_DC_CNT
-
-} MotorDCMap;
-
-/*
- * Init all pin and device to manage dc motor.
+/**
+ * Define fuctions which read  adc value from specific device
  */
-#define MOTOR_DC_INIT() \
-    do { \
-		/* Implement me! */ \
-    } while (0)
+ #define HW_DC_MOTOR_READ_VALUE(dev, min, max) \
+	({ \
+		 /* Put here the fuction that read from ADC */ \
+		(void)(dev); \
+		(void)(min); \
+		(void)(max); \
+		(0); \
+	})
 
+// Macro that enable the select DC motor
+#define DC_MOTOR_ENABLE(dev)	/* Implement me! */
+// Macro that disable the select DC motor
+#define DC_MOTOR_DISABLE(dev)	/* Implement me! */
 
-/*
- * Enable DC motor.
- */
-#define DC_MOTOR_ENABLE(dev) \
-	do { \
-		/* Implement me! */ \
-	} while (0)
+// Macro that put in short circuit DC motor supply pins
+#define DC_MOTOR_IDLE(dev)          do { /* Implement me! */ } while (0)
+// Macro that set motor direction
+#define DC_MOTOR_SET_DIR(dev, dir)  do { /* Implement me! */ } while (0)
 
-/*
- * Disable DC motor.
- */
-#define DC_MOTOR_DISABLE(dev) \
-	do { \
-		/* Implement me! */ \
-	} while (0)
-
-/*
- * Set direction for DC motor.
- */
-#define DC_MOTOR_SET_DIR(dev, dir) \
-	do { \
-		/* Implement me! */ \
-	} while (0)
+#define MOTOR_DC_INIT()             do { /* Implement me! */ } while (0)
 
 
 #endif /* HW_DC_MOTOR_H */

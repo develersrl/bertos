@@ -31,9 +31,7 @@
  *
  *
  * \brief DC motor driver.
- *
- * \version $Id$
- *
+*
  * \author Daniele Basile <asterix@develer.com>
  *
  * $WIZ$ module_name = "dc_motor"
@@ -56,12 +54,14 @@
 #include <drv/timer.h>
 #include <drv/adc.h>
 
-
-/**
- * Define status bit for DC motor device.
+/*
+ * DC motor mode stop.
  */
-#define DC_MOTOR_ACTIVE     BV(0)     ///< DC motor enable or disable flag.
-#define DC_MOTOR_DIR        BV(1)     ///< Spin direction of DC motor.
+#define DC_MOTOR_DISABLE_MODE      0   ///< Disable the DC motor shutting down the driver
+#define DC_MOTOR_IDLE_MODE         1   ///< Put the motor pins in short circuit
+
+
+#define DC_MOTOR_NO_EXPIRE  -1         ///< The DC motor runs do not expire, so it runs forever.
 
 /**
  * Type for DC motor.
@@ -74,10 +74,10 @@ typedef uint16_t dc_speed_t;
 typedef struct DCMotorConfig
 {
 	PidCfg pid_cfg;         ///< Pid control.
+	bool pid_enable;        ///< Flag to disable or enable pid control.
 
 	PwmDev pwm_dev;         ///< Pwm channel.
 	pwm_freq_t freq;        ///< Pwm waveform frequency.
-	bool pol;               ///< Pwm waveform polarity.
 
 	adc_ch_t adc_ch;        ///< ADC channel.
 	adcread_t adc_max;      ///< ADC max scale value.
@@ -85,8 +85,11 @@ typedef struct DCMotorConfig
 	mtime_t sample_delay;   ///< Delay before to sampling.
 
 	bool dir;               ///< Default direction for select DC motor.
-	int speed_trm_id;       ///< Index of trimmer to set speed.
-	dc_speed_t speed;       ///< Default speed value for select DC motor.
+
+	dc_speed_t speed;       ///< Fixed speed value for select DC motor, if enable_dev_speed flag is false.
+
+	adc_ch_t speed_dev_id;  ///< Index of the device where read speed.
+	bool enable_dev_speed;  ///< If this flag is true read target speed from device, otherwise use fixed speed.
 
 } DCMotorConfig;
 
@@ -101,14 +104,19 @@ typedef struct DCMotor
 
 	int index;                ///< DC motor id.
 	uint32_t status;          ///< Status of select DC motor
+	dc_speed_t zero_speed;    ///< Start value for motor speed (Value read from adc when motor is off)
 	dc_speed_t tgt_speed;     ///< Target speed for select DC motor
+
+	ticks_t expire_time;      ///< Among of time that  dc motor run
 
 } DCMotor;
 
 void dc_motor_setDir(int index, bool dir);
-void dc_motor_enable(int index, bool state);
+void dc_motor_enable(int index, bool state, int mode);
 void dc_motor_setSpeed(int index, dc_speed_t speed);
+void dc_motor_setTimer(int index, mtime_t on_time);
 void dc_motor_setup(int index, DCMotorConfig *cfg);
-void dc_motor_init(void);
+dc_speed_t dc_motor_readTargetSpeed(int index);
+void dc_motor_init(int priority);
 
 #endif /* DRV_DC_MOTOR_H */
