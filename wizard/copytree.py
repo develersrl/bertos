@@ -34,50 +34,54 @@
 #
 
 import os
+import sys
 import fnmatch
 from shutil import *
 
 del copytree
 
-def copytree(src, dst, symlinks=False, ignore_list=[]):
-    """
-    Reimplementation of the shutil.copytree function that use ignore_list.
-    ignore_list is a list containing patterns to ignore during the copy.
-    """
-    names = os.listdir(src)
-    os.makedirs(dst)
-    errors = []
-    for name in names:
-        srcname = os.path.join(src, name)
-        dstname = os.path.join(dst, name)
+if sys.version_info < (2, 6, 0):
+    def copytree(src, dst, symlinks=False, ignore_list=[]):
+        """
+        Reimplementation of the shutil.copytree function that use ignore_list.
+        ignore_list is a list containing patterns to ignore during the copy.
+        """
+        names = os.listdir(src)
+        os.makedirs(dst)
+        errors = []
+        for name in names:
+            srcname = os.path.join(src, name)
+            dstname = os.path.join(dst, name)
+            try:
+                ignored = False
+                for ignore in ignore_list:
+                    if fnmatch.fnmatch(name, ignore):
+                        ignored = True
+                        break
+                if ignored:
+                    continue
+                if symlinks and os.path.islink(srcname):
+                    linkto = os.readlink(srcname)
+                    os.symlink(linkto, dstname)
+                elif os.path.isdir(srcname):
+                    copytree(srcname, dstname, symlinks, ignore_list)
+                else:
+                    copy2(srcname, dstname)
+                # XXX What about devices, sockets etc.?
+            except (IOError, os.error), why:
+                errors.append((srcname, dstname, str(why)))
+            # catch the Error from the recursive copytree so that we can
+            # continue with other files
+            except Error, err:
+                errors.extend(err.args[0])
         try:
-            ignored = False
-            for ignore in ignore_list:
-                if fnmatch.fnmatch(name, ignore):
-                    ignored = True
-                    break
-            if ignored:
-                continue
-            if symlinks and os.path.islink(srcname):
-                linkto = os.readlink(srcname)
-                os.symlink(linkto, dstname)
-            elif os.path.isdir(srcname):
-                copytree(srcname, dstname, symlinks, ignore_list)
-            else:
-                copy2(srcname, dstname)
-            # XXX What about devices, sockets etc.?
-        except (IOError, os.error), why:
-            errors.append((srcname, dstname, str(why)))
-        # catch the Error from the recursive copytree so that we can
-        # continue with other files
-        except Error, err:
-            errors.extend(err.args[0])
-    try:
-        copystat(src, dst)
-    except WindowsError:
-        # can't copy file access times on Windows
-        pass
-    except OSError, why:
-        errors.extend((src, dst, str(why)))
-    if errors:
-        raise Error, errors
+            copystat(src, dst)
+        except WindowsError:
+            # can't copy file access times on Windows
+            pass
+        except OSError, why:
+            errors.extend((src, dst, str(why)))
+        if errors:
+            raise Error, errors
+else:
+    from shutil import copytree
