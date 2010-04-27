@@ -33,7 +33,6 @@
  * \brief Function library for serial Flash memory.
  *
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  *
  * $WIZ$ module_name = "flash25"
@@ -100,7 +99,7 @@ INLINE Flash25 * FLASH25_CAST(KFile *fd)
 	#define FLASH25_SECTOR_SIZE        65536UL // Section size in byte
 	#define FLASH25_MEM_SIZE           FLASH25_NUM_SECTOR * FLASH25_SECTOR_SIZE
 	#define FLASH25_NUM_PAGE           FLASH25_MEM_SIZE / FLASH25_PAGE_SIZE
-#else
+#elif
 	#error Nothing memory defined in CONFIG_FLASH25 are support.
 #endif
 
