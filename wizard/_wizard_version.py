@@ -45,4 +45,4 @@
 
 
 # NOTE: Change this variable may cause the wizard to not work properly. 
-WIZARD_VERSION = 2
+WIZARD_VERSION = 3
