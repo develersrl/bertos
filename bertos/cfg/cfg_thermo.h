@@ -32,12 +32,25 @@
  *
  * \brief Configuration file for thermo module.
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 
 #ifndef CFG_THERMO_H
 #define CFG_THERMO_H
+
+/**
+ * Module logging level.
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
+ */
+#define CONFIG_THERMO_LOG_LEVEL        LOG_LVL_ERR
+/**
+ * Module logging format.
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define CONFIG_THERMO_LOG_FORMAT       LOG_FMT_TERSE
+
 
 /**
  * Interval at which thermo control is performed [ms].

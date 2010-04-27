@@ -32,8 +32,6 @@
  *
  * \brief Thermo regulation control map definitions.
  *
- * \version $Id$
- *
  * \author Francesco Sacchi <batt@develer.com>
  */
 
@@ -45,26 +43,13 @@
 
 #warning TODO:This is an example implentation, you must implement it!
 
-typedef uint8_t thermostatus_t;
-
-#define THERMO_OFF          0
-#define THERMO_HEATING      BV(0)
-#define THERMO_FREEZING     BV(1)
-#define THERMO_TGT_REACH    BV(2)
-#define THERMOERRF_NTCSHORT BV(3)
-#define THERMOERRF_NTCOPEN  BV(4)
-#define THERMOERRF_TIMEOUT  BV(5)
-#define THERMO_ACTIVE       BV(6)
-
-#define THERMO_ERRMASK      (THERMOERRF_NTCSHORT | THERMOERRF_NTCOPEN | THERMOERRF_TIMEOUT)
-
 typedef enum ThermoDev
 {
-	THERMO_TEST,
 
+	THERMO_TEST,
 	/* Put here your thermo device */
 
-	THERMO_CNT,
+	THERMO_CNT
 } ThermoDev;
 
 #endif /* THERMO_MAP_H */

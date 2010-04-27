@@ -30,12 +30,18 @@
  *
  * -->
  *
- * \brief Thermo-control driver
+ * \brief Thermo-control driver.
  *
- * \version $Id$
+ * The Thermo controll can works both with kernel or without it. In the case
+ * we use kernel, the thermo controll is done by one process that poll every
+ * CONFIG_THERMO_INTERVAL_MS the temperature sensor and make all operation to
+ * follow the target temperature. While we not use the kernel the module works
+ * with one timer interrupt in the same way of the kenel case.
  *
  * \author Giovanni Bajo <rasky@develer.com>
  * \author Francesco Sacchi <batt@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
+ *
  */
 
 #include "hw/thermo_map.h"
@@ -46,16 +52,37 @@
 #include <cfg/module.h>
 #include <cfg/macros.h>
 #include <cfg/debug.h>
+// Define logging setting (for cfg/log.h module).
+#define LOG_LEVEL         CONFIG_THERMO_LOG_LEVEL
+#define LOG_VERBOSITY     CONFIG_THERMO_LOG_FORMAT
+#include <cfg/log.h>
 
 #include <drv/thermo.h>
 #include <drv/timer.h>
 #include <drv/ntc.h>
 
+#include <kern/proc.h>
+
+#define THERMO_OFF          0
+#define THERMO_HEATING      BV(0)
+#define THERMO_FREEZING     BV(1)
+#define THERMO_TGT_REACH    BV(2)
+#define THERMOERRF_NTCSHORT BV(3)
+#define THERMOERRF_NTCOPEN  BV(4)
+#define THERMOERRF_TIMEOUT  BV(5)
+#define THERMO_ACTIVE       BV(6)
+#define THERMO_TIMER        BV(7)
+
+#define THERMO_ERRMASK      (THERMOERRF_NTCSHORT | THERMOERRF_NTCOPEN | THERMOERRF_TIMEOUT)
 
 
-
-/** Timer for thermo-regulation. */
-static Timer thermo_timer;
+#if CONFIG_KERN
+	/** Stack process for Thermo process. */
+	static PROC_DEFINE_STACK(thermo_poll_stack, 400);
+#else
+	/** Timer for thermo-regulation. */
+	static Timer thermo_timer;
+#endif
 
 typedef struct ThermoControlDev
 {
@@ -64,17 +91,18 @@ typedef struct ThermoControlDev
 	deg_t          target;
 	thermostatus_t status;
 	ticks_t        expire;
+	ticks_t        on_time;
 } ThermoControlDev;
 
 /** Array of thermo-devices. */
 ThermoControlDev devs[THERMO_CNT];
-
 
 /**
  * Return the status of the specific \a dev thermo-device.
  */
 thermostatus_t thermo_status(ThermoDev dev)
 {
+	ASSERT(dev < THERMO_CNT);
 	return devs[dev].status;
 }
 
@@ -101,18 +129,17 @@ static void thermo_do(ThermoDev index)
 	{
 		if (cur_temp == NTC_SHORT_CIRCUIT)
 		{
-			#ifdef _DEBUG
-			if (!(dev->status & THERMOERRF_NTCSHORT))
-				kprintf("dev[%d], thermo_do: NTC_SHORT\n",index);
-			#endif
+			LOG_INFOB(if (!(dev->status & THERMOERRF_NTCSHORT))
+				LOG_INFO("dev[%d], thermo_do: NTC_SHORT\n",index););
+
 			dev->status |= THERMOERRF_NTCSHORT;
 		}
 		else
 		{
-			#ifdef _DEBUG
-			if (!(dev->status & THERMOERRF_NTCOPEN))
-				kprintf("dev[%d], thermo_do: NTC_OPEN\n", index);
-			#endif
+
+			LOG_INFOB(if (!(dev->status & THERMOERRF_NTCOPEN))
+				LOG_INFO("dev[%d], thermo_do: NTC_OPEN\n", index););
+
 			dev->status |= THERMOERRF_NTCOPEN;
 		}
 
@@ -131,7 +158,7 @@ static void thermo_do(ThermoDev index)
 		if (timer_clock() - dev->expire > 0)
 		{
 			dev->status |= THERMOERRF_TIMEOUT;
-			kprintf("dev[%d], thermo_do: TIMEOUT\n", index);
+			LOG_INFO("dev[%d], thermo_do: TIMEOUT\n", index);
 		}
 	}
 	else /* In target */
@@ -153,18 +180,52 @@ static void thermo_do(ThermoDev index)
 
 }
 
+static void poll(void)
+{
+	for (int i = 0; i < THERMO_CNT; ++i)
+		if (devs[i].status & THERMO_ACTIVE)
+		{
+			LOG_INFO("THERMO [%d] on_time[%ld],\n", i, ticks_to_ms(devs[i].on_time));
+			if ((devs[i].status & THERMO_TIMER) && (devs[i].on_time - timer_clock() < 0))
+			{
+				thermo_stop(i);
+				continue;
+			}
+
+			thermo_do((ThermoDev)i);
+		}
+}
+
+#if CONFIG_KERN
+	static void NORETURN thermo_poll(void)
+	{
+		for (;;)
+		{
+			poll();
+			timer_delay(CONFIG_THERMO_INTERVAL_MS);
+		}
+	}
+#else
+	/**
+	 * Thermo soft interrupt.
+	 */
+	static void thermo_softint(void)
+	{
+		poll();
+		timer_add(&thermo_timer);
+	}
+#endif
 
 /**
- * Thermo soft interrupt.
+ * Starts a thermo-regulation for channel \a dev, and turn off timer
+ * when \a on_time was elapsed.
  */
-static void thermo_softint(void)
+void thermo_timer(ThermoDev dev, mtime_t on_time)
 {
-	int i;
-	for (i = 0; i < THERMO_CNT; ++i)
-		if (devs[i].status & THERMO_ACTIVE)
-			thermo_do((ThermoDev)i);
-
-	timer_add(&thermo_timer);
+	ASSERT(dev < THERMO_CNT);
+	devs[dev].on_time = timer_clock() + ms_to_ticks(on_time);
+	devs[dev].status |= THERMO_TIMER;
+	thermo_start(dev);
 }
 
 
@@ -177,7 +238,7 @@ void thermo_setTarget(ThermoDev dev, deg_t temperature)
 	devs[dev].target = temperature;
 	devs[dev].expire = timer_clock() + thermo_hw_timeout(dev);
 
-	kprintf("setTarget dev[%d], T[%d.%d]\n", dev, temperature / 10, temperature % 10);
+	LOG_INFO("THERMO Set Target dev[%d], T[%d.%d]\n", dev, temperature / 10, temperature % 10);
 }
 
 /**
@@ -191,6 +252,7 @@ void thermo_start(ThermoDev dev)
 	ASSERT(dev < THERMO_CNT);
 
 	devs[dev].status |= THERMO_ACTIVE;
+	LOG_INFO("THERMO Start dev[%d], status[%04x]\n", dev, devs[dev].status);
 
 	/* Initialize the hifi FIFO with a constant value (the current temperature) */
 	temp = thermo_hw_read(dev);
@@ -255,7 +317,11 @@ void thermo_init(void)
 
 	MOD_INIT(thermo);
 
-	timer_setDelay(&thermo_timer, ms_to_ticks(CONFIG_THERMO_INTERVAL_MS));
-	timer_setSoftint(&thermo_timer, (Hook)thermo_softint, 0);
-	timer_add(&thermo_timer);
+	#if CONFIG_KERN
+		proc_new_with_name("Thermo", thermo_poll, NULL, sizeof(thermo_poll_stack), thermo_poll_stack);
+	#else
+		timer_setDelay(&thermo_timer, ms_to_ticks(CONFIG_THERMO_INTERVAL_MS));
+		timer_setSoftint(&thermo_timer, (Hook)thermo_softint, 0);
+		timer_add(&thermo_timer);
+	#endif
 }

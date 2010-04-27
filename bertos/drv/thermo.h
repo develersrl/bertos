@@ -42,10 +42,10 @@
  * of the black box). This low-level driver also controls the units in which the temperature
  * is expressed: thermo control treats it just as a number.
  *
- * \version $Id$
  *
  * \author Giovanni Bajo <rasky@develer.com>
  * \author Francesco Sacchi <batt@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
  *
  * $WIZ$ module_name = "thermo"
  * $WIZ$ module_depends = "timer", "ntc"
@@ -59,8 +59,9 @@
 #include "hw/thermo_map.h"
 
 #include <drv/ntc.h>
+#include <drv/timer.h>
 
-void thermo_init(void);
+typedef uint8_t thermostatus_t;
 
 
 /**
@@ -70,6 +71,12 @@ void thermo_init(void);
  * \param temperature Target temperature
  */
 void thermo_setTarget(ThermoDev dev, deg_t temperature);
+
+/**
+ * Start thermo control for a certain device \a dev and stop it after
+ *  \a on_time msec.
+ */
+void thermo_timer(ThermoDev dev, mtime_t on_time);
 
 /** Start thermo control for a certain device \a dev */
 void thermo_start(ThermoDev dev);
@@ -91,6 +98,8 @@ thermostatus_t thermo_status(ThermoDev dev);
  * \return Current temperature (Celsius degrees * 10)
  */
 deg_t thermo_readTemperature(ThermoDev dev);
+
+void thermo_init(void);
 
 
 #endif /* DRV_THERMO_H */
