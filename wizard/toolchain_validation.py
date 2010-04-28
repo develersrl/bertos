@@ -43,10 +43,10 @@ from const import TOOLCHAIN_ITEMS
 
 def validateToolchain(toolchain):
     if not os.path.exists(toolchain):
-        return False, {}
+        return {}
     for tool in TOOLCHAIN_ITEMS:
         if not os.path.exists(toolchain.replace("gcc", tool)):
-            return False, {}
+            return {}
     validation_process = QProcess()
     validation_process.start(toolchain, ["-v"])
     validation_process.waitForStarted(1000)
@@ -54,9 +54,9 @@ def validateToolchain(toolchain):
         description = unicode(validation_process.readAllStandardError())
         info = bertos_utils.getToolchainInfo(description)
         if len(info) >= 4:
-            return True, info
+            return info
         else:
-            return False, {}
+            return {}
     else:
         validation_process.kill()
-        return False, {}
+        return {}

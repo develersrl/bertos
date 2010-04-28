@@ -41,6 +41,8 @@ import BToolchainSearch
 import bertos_utils
 import qvariant_converter
 
+from toolchain_manager import ToolchainManager
+
 from const import *
 
 class BToolchainPage(BWizardPage):
@@ -54,6 +56,7 @@ class BToolchainPage(BWizardPage):
         self.setTitle(self.tr("Select toolchain"))
         self._validation_process = None
         self._valid_items = []
+        self._toolchain_manager = ToolchainManager()
 
     ## Overloaded QWizardPage methods. ##
 
@@ -126,9 +129,7 @@ class BToolchainPage(BWizardPage):
             item = QListWidgetItem(sel_toolchain)
             item.setData(Qt.UserRole, qvariant_converter.convertStringDict({"path": sel_toolchain}))
             self.pageContent.toolchainList.addItem(item)
-            toolchains = self.toolchains()
-            toolchains[sel_toolchain] = False
-            self.setToolchains(toolchains)
+            self._toolchain_manager.addToolchain(sel_toolchain)
 
     def removeToolchain(self):
         """
@@ -137,9 +138,7 @@ class BToolchainPage(BWizardPage):
         if self.pageContent.toolchainList.currentRow() != -1:
             item = self.pageContent.toolchainList.takeItem(self.pageContent.toolchainList.currentRow())
             toolchain = qvariant_converter.getStringDict(item.data(Qt.UserRole))["path"]
-            toolchains = self.toolchains()
-            del toolchains[toolchain]
-            self.setToolchains(toolchains)
+            self._toolchain_manager.removeToolchain(toolchain)
 
     def searchToolchain(self):
         """
@@ -168,21 +167,20 @@ class BToolchainPage(BWizardPage):
         """
         Fills the toolchain list with the toolchains stored in the QSettings.
         """
-        toolchains = self.toolchains()
-        if os.name == "nt":
-            import winreg_importer
-            stored_toolchains = winreg_importer.getBertosToolchains()
-            for toolchain in stored_toolchains:
-                toolchains[toolchain] = True
+        self.pageContent.toolchainList.clear()
+        toolchains = self._toolchain_manager.predefined_toolchains + self._toolchain_manager.toolchains
         sel_toolchain = self.projectInfo("TOOLCHAIN")
-        for key, value in toolchains.items():
+        for key, value in toolchains:
             if os.path.exists(key):
                 item = QListWidgetItem(key)
-                item.setData(Qt.UserRole, qvariant_converter.convertStringDict({"path": key}))
+                item_data = {"path":key}
+                if value:
+                    item_data.update(value)
+                item.setData(Qt.UserRole, qvariant_converter.convertStringDict(item_data))
                 self.pageContent.toolchainList.addItem(item)
                 if sel_toolchain and sel_toolchain["path"] == key:
                     self.pageContent.toolchainList.setCurrentItem(item)
-                if value:
+                if value is not None:
                     self.validateToolchain(self.pageContent.toolchainList.row(item))
 
     def currentToolchain(self):
@@ -203,16 +201,12 @@ class BToolchainPage(BWizardPage):
         dir_list = self.searchDirList()
         if self.pathSearch():
             dir_list += [element for element in bertos_utils.getSystemPath()]
+        _toolchain_dict = self._toolchain_manager.storedToolchainDict()
         toolchain_list = bertos_utils.findToolchains(dir_list)
-        stored_toolchains = self.toolchains()
-        for element in toolchain_list:
-            if not element in stored_toolchains:
-                item = QListWidgetItem(element)
-                item.setData(Qt.UserRole, qvariant_converter.convertStringDict({"path": element}))
-                self.pageContent.toolchainList.addItem(item)
-                stored_toolchains[element] = False
-        self.setToolchains(stored_toolchains)
-        self.showMessage(self.tr("Toolchain search result."), self.tr("%1 toolchains founded").arg(len(stored_toolchains)))
+        for toolchain in toolchain_list:
+            self._toolchain_manager.addToolchain(toolchain, _toolchain_dict.get(toolchain, False))
+        self._populateToolchainList()
+        self.showMessage(self.tr("Toolchain search result."), self.tr("%1 toolchains founded").arg(len(self._toolchain_manager.toolchains)))
 
     def _validItem(self, index, infos):
         """
@@ -243,46 +237,19 @@ class BToolchainPage(BWizardPage):
         Toolchain validation procedure.
         """
         filename = qvariant_converter.getStringDict(self.pageContent.toolchainList.item(i).data(Qt.UserRole))["path"]
-        valid = False
-        info = {}
-        # Check for the other tools of the toolchain
-        for tool in TOOLCHAIN_ITEMS:
-            if os.path.exists(filename.replace("gcc", tool)):
-                valid = True
-            else:
-                valid = False
-                break
-        # Try to retrieve the informations about the toolchain only for the valid toolchains
-        if valid:
-            self._validation_process = QProcess()
-            self._validation_process.start(filename, ["-v"])
-            self._validation_process.waitForStarted(1000)
-            if self._validation_process.waitForFinished(200):
-                description = unicode(self._validation_process.readAllStandardError())
-                info = bertos_utils.getToolchainInfo(description)
-                if len(info) >= 4:
-                    valid = True
-            else:
-                self._validation_process.kill()
+        info = self._toolchain_manager.validateToolchain(filename)
+
         # Add the item in the list with the appropriate associate data.
-        if valid:
+        if info:
             self._validItem(i, info)
         else:
             self._invalidItem(i)
-        toolchains = self.toolchains()
-        toolchains[filename] = True
-        self.setToolchains(toolchains)
     
     def isDefaultToolchain(self, toolchain):
         """
         Returns True if the given toolchain is one of the default toolchains.
         """
-        if os.name == "nt":
-            import winreg_importer
-            stored_toolchains = winreg_importer.getBertosToolchains()
-            if toolchain["path"] in stored_toolchains:
-                return True
-        return False
+        return toolchain["path"] in self._toolchain_manager._predefined_toolchain_set
     
     def disableRemoveButton(self):
         """
