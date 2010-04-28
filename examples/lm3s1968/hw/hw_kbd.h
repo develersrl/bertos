@@ -40,6 +40,7 @@
 
 #include <cfg/macros.h> /* BV() */
 #include <io/lm3s.h> /* GPIO_PORTG_BASE */
+#include <drv/clock_lm3s.h> /* lm3s_busyWait() */
 #include <drv/gpio_lm3s.h> /* lm3s_gpioPinConfig() / lm3s_gpioPinRead() */
 #include "hw/kbd_map.h"
 
@@ -47,6 +48,8 @@
 
 #define KBD_HW_INIT					\
 	do {						\
+		SYSCTL_RCGC2_R |= SYSCTL_RCGC2_GPIOG;	\
+		lm3s_busyWait(512);			\
 		lm3s_gpioPinConfig(GPIO_PORTG_BASE,	\
 			K_RPT_MASK,			\
 			GPIO_DIR_MODE_IN,		\
