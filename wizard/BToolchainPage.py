@@ -37,6 +37,8 @@ import os
 import collections
 
 from BWizardPage import *
+from BOutputPage import BOutputPage
+
 import BToolchainSearch
 import bertos_utils
 import qvariant_converter
@@ -70,6 +72,16 @@ class BToolchainPage(BWizardPage):
             return True
         else:
             return False
+
+    def nextId(self):
+        """
+        Overload of the QWizardPage nextId method.
+        """
+        # Route to Output page if it's a predefined easy project.
+        if self.projectInfo("PROJECT_FROM_PRESET") and self.projectInfo("BASE_MODE"):
+            return self.wizard().pageIndex(BOutputPage)
+        else:
+            return QWizardPage.nextId(self)
 
     ####
 

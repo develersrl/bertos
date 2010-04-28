@@ -44,6 +44,7 @@ from BToolchainPage import BToolchainPage
 import const
 import qvariant_converter
 from bertos_utils import presetList
+from toolchain_manager import ToolchainManager
 
 class BRoutePage(BWizardPage):
     """
@@ -62,6 +63,7 @@ class BRoutePage(BWizardPage):
         Overload of the QWizardPage isComplete method.
         """
         self.setProjectInfo("EMPTY_MAIN", self.empty_main)
+        self.setProjectInfo("BASE_MODE", not self.advanced)
         return True
 
     def nextId(self):
@@ -73,7 +75,22 @@ class BRoutePage(BWizardPage):
         if self.advanced:
             return self.wizard().pageIndex(BToolchainPage)
         else:
-            return self.wizard().pageIndex(BOutputPage)
+            cpu_info = self.projectInfo("CPU_INFOS")
+            if cpu_info:
+                target = cpu_info["TOOLCHAIN"]
+            else:
+                # It seems that the nextId method is called before the
+                # reloadData one (that is called after the page changing.
+                #
+                # TODO: fix this awful code lines
+                target = None
+            # Try to find a suitable toolchain automatically
+            tm = ToolchainManager()
+            suitable_toolchains = tm.suitableToolchains(target)
+            if len(suitable_toolchains) == 1:
+                return self.wizard().pageIndex(BOutputPage)
+            else:
+                return self.wizard().pageIndex(BToolchainPage)
 
     ####
 
@@ -90,6 +107,7 @@ class BRoutePage(BWizardPage):
         Overload of the BWizardPage connectSignals method.
         """
         self.connect(self.pageContent.emptyCheckBox, SIGNAL("stateChanged(int)"), self, SIGNAL("completeChanged()"))
+        self.connect(self.pageContent.baseButton, SIGNAL("toggled(bool)"), self, SIGNAL("completeChanged()"))
 
     def reloadData(self):
         """
