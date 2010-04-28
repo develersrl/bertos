@@ -45,8 +45,7 @@ def _userMkGenerator(project_info):
     mk_data["$pname"] = os.path.basename(project_info.info("PROJECT_PATH"))
     mk_data["$main"] = os.path.basename(project_info.info("PROJECT_PATH")) + "/main.c"
     for key in mk_data:
-        while makefile.find(key) != -1:
-            makefile = makefile.replace(key, mk_data[key])
+        makefile = makefile.replace(key, mk_data[key])
     open(destination, "w").write(makefile)
 
 def _mkGenerator(project_info):
@@ -68,8 +67,7 @@ def _mkGenerator(project_info):
     mk_data["$suffix"] = replaceSeparators(project_info.info("TOOLCHAIN")["path"].split("gcc")[1])
     mk_data["$main"] = os.path.basename(project_info.info("PROJECT_PATH")) + "/main.c"
     for key in mk_data:
-        while makefile.find(key) != -1:
-            makefile = makefile.replace(key, mk_data[key])
+        makefile = makefile.replace(key, mk_data[key])
     open(destination, "w").write(makefile)
 
 def _makefileGenerator(project_info):
@@ -79,8 +77,7 @@ def _makefileGenerator(project_info):
     makefile = open(os.path.join(const.DATA_DIR, "mktemplates/old/Makefile"), "r").read()
     destination = os.path.join(project_info.maindir, "Makefile")
     # TODO write a general function that works for both the mk file and the Makefile
-    while makefile.find("$pname") != -1:
-        makefile = makefile.replace("$pname", project_info.info("PROJECT_NAME"))
+    makefile = makefile.replace("$pname", project_info.info("PROJECT_NAME"))
     open(destination, "w").write(makefile)
 
 def updateProject(project_data):

@@ -161,8 +161,7 @@ def userMkGenerator(project_info):
     mk_data["$ppath"] = relpath.relpath(project_info.info("PROJECT_SRC_PATH"), project_info.info("PROJECT_PATH"))
     mk_data["$main"] = os.path.join("$(%s_SRC_PATH)" %project_info.info("PROJECT_NAME"), "main.c")
     for key in mk_data:
-        while makefile.find(key) != -1:
-            makefile = makefile.replace(key, mk_data[key])
+        makefile = makefile.replace(key, mk_data[key])
     open(destination, "w").write(makefile)
 
 def mkGenerator(project_info):
@@ -184,8 +183,7 @@ def mkGenerator(project_info):
     mk_data["$prefix"] = replaceSeparators(project_info.info("TOOLCHAIN")["path"].split("gcc")[0])
     mk_data["$suffix"] = replaceSeparators(project_info.info("TOOLCHAIN")["path"].split("gcc")[1])
     for key in mk_data:
-        while makefile.find(key) != -1:
-            makefile = makefile.replace(key, mk_data[key])
+        makefile = makefile.replace(key, mk_data[key])
     open(destination, "w").write(makefile)
 
 def makefileGenerator(project_info):
@@ -199,8 +197,7 @@ def makefileGenerator(project_info):
     mk_data["$pname"] = project_info.info("PROJECT_NAME")
     mk_data["$ppath"] = os.path.basename(project_info.info("PROJECT_SRC_PATH"))
     for key in mk_data:
-        while makefile.find(key) != -1:
-            makefile = makefile.replace(key, mk_data[key])
+        makefile = makefile.replace(key, mk_data[key])
     open(destination, "w").write(makefile)
 
 def csrcGenerator(project_info):
@@ -322,8 +319,7 @@ def replaceSeparators(path):
     Replace the separators in the given path with unix standard separator.
     """
     if os.sep != "/":
-        while path.find(os.sep) != -1:
-            path = path.replace(os.sep, "/")
+        path = path.replace(os.sep, "/")
     return path
 
 def getSystemPath():
