@@ -32,7 +32,6 @@
  * -->
  * \brief X-Modem serial transmission protocol.
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Francesco Sacchi <batt@develer.com>
  *
@@ -57,16 +56,6 @@
 #define XMODEM_CHECK_ABORT (false)
 #endif
 /*\}*/
-
-
-/**
- * Called to printf progress messages.
- * Default to kprintf debug, redefine to whatever you need.
- * \{
- */
-#ifndef XMODEM_PROGRESS
-#define XMODEM_PROGRESS(msg, ...) kprintf(msg, ## __VA_ARGS__)
-#endif
 
 bool xmodem_recv(KFile *ch, KFile *fd);
 bool xmodem_send(KFile *ch, KFile *fd);

@@ -38,8 +38,6 @@
  *
  * \todo Break xmodem_send() and xmodem_recv() in smaller functions.
  *
- * \version $Id$
- *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Francesco Sacchi <batt@develer.com>
  */
@@ -48,7 +46,13 @@
 #include "xmodem.h"
 
 #include "cfg/cfg_xmodem.h"
+
 #include <cfg/debug.h>
+// Define log settings for cfg/log.h
+#define LOG_LEVEL    CONFIG_XMODEM_LOG_LEVEL
+#define LOG_FORMAT   CONFIG_XMODEM_LOG_FORMAT
+#include <cfg/log.h>
+
 
 #include <algo/crc.h>
 
@@ -95,7 +99,7 @@ bool xmodem_recv(KFile *ch, KFile *fd)
 	bool usecrc = true;
 
 
-	XMODEM_PROGRESS("Starting Transfer...\n");
+	LOG_INFO("Starting Transfer...\n");
 	purge = true;
 	kfile_clearerr(ch);
 
@@ -106,7 +110,7 @@ bool xmodem_recv(KFile *ch, KFile *fd)
 		{
 			kfile_putc(XM_CAN, ch);
 			kfile_putc(XM_CAN, ch);
-			XMODEM_PROGRESS("Transfer aborted\n");
+			LOG_INFO("Transfer aborted\n");
 			return false;
 		}
 
@@ -119,7 +123,9 @@ bool xmodem_recv(KFile *ch, KFile *fd)
 			purge = false;
 
 			if (kfile_error(ch))
-				XMODEM_PROGRESS("Retries %d\n", retries);
+			{
+				LOG_ERR("Retries %d\n", retries);
+			}
 
 			kfile_resync(ch, 200);
 			retries++;
@@ -128,7 +134,7 @@ bool xmodem_recv(KFile *ch, KFile *fd)
 			{
 				kfile_putc(XM_CAN, ch);
 				kfile_putc(XM_CAN, ch);
-				XMODEM_PROGRESS("Transfer aborted\n");
+				LOG_INFO("Transfer aborted\n");
 				return false;
 			}
 
@@ -137,14 +143,14 @@ bool xmodem_recv(KFile *ch, KFile *fd)
 			{
 				if (retries < CONFIG_XMODEM_MAXCRCRETRIES)
 				{
-					XMODEM_PROGRESS("Request Tx (CRC)\n");
+					LOG_INFO("Request Tx (CRC)\n");
 					kfile_putc(XM_C, ch);
 				}
 				else
 				{
 					/* Give up with CRC and fall back to checksum */
 					usecrc = false;
-					XMODEM_PROGRESS("Request Tx (BCC)\n");
+					LOG_INFO("Request Tx (BCC)\n");
 					kfile_putc(XM_NAK, ch);
 				}
 			}
@@ -171,22 +177,26 @@ bool xmodem_recv(KFile *ch, KFile *fd)
 			/* Check complemented block number */
 			if ((~c & 0xff) != kfile_getc(ch))
 			{
-				XMODEM_PROGRESS("Bad blk (%d)\n", c);
+				LOG_WARN("Bad blk (%d)\n", c);
 				purge = true;
 				break;
 			}
 
 			/* Determine which block is being sent */
 			if (c == (blocknr & 0xff))
+			{
 				/* Last block repeated */
-				XMODEM_PROGRESS("Repeat blk %d\n", blocknr);
+				LOG_INFO("Repeat blk %d\n", blocknr);
+			}
 			else if (c == ((blocknr + 1) & 0xff))
+			{
 				/* Next block */
-				XMODEM_PROGRESS("Recv blk %d\n", ++blocknr);
+				LOG_INFO("Recv blk %d\n", ++blocknr);
+			}
 			else
 			{
 				/* Sync lost */
-				XMODEM_PROGRESS("Sync lost (%d/%d)\n", c, blocknr);
+				LOG_WARN("Sync lost (%d/%d)\n", c, blocknr);
 				purge = true;
 				break;
 			}
@@ -237,7 +247,7 @@ bool xmodem_recv(KFile *ch, KFile *fd)
 
 				if (crc)
 				{
-					XMODEM_PROGRESS("Bad CRC: %04x\n", crc);
+					LOG_ERR("Bad CRC: %04x\n", crc);
 					purge = true;
 					break;
 				}
@@ -245,7 +255,7 @@ bool xmodem_recv(KFile *ch, KFile *fd)
 			/* Compare the checksum */
 			else if (c != checksum)
 			{
-				XMODEM_PROGRESS("Bad sum: %04x/%04x\n", checksum, c);
+				LOG_ERR("Bad sum: %04x/%04x\n", checksum, c);
 				purge = true;
 				break;
 			}
@@ -276,7 +286,7 @@ bool xmodem_recv(KFile *ch, KFile *fd)
 
 		case XM_EOT:	/* End of transmission */
 			kfile_putc(XM_ACK, ch);
-			XMODEM_PROGRESS("Transfer completed\n");
+			LOG_INFO("Transfer completed\n");
 			return true;
 
 		case EOF: /* Timeout or serial error */
@@ -284,7 +294,7 @@ bool xmodem_recv(KFile *ch, KFile *fd)
 			break;
 
 		default:
-			XMODEM_PROGRESS("Skipping garbage\n");
+			LOG_INFO("Skipping garbage\n");
 			purge = true;
 			break;
 		}
@@ -322,7 +332,7 @@ bool xmodem_send(KFile *ch, KFile *fd)
 	size = kfile_read(fd, block_buffer, XM_BUFSIZE);
 
 	kfile_clearerr(ch);
-	XMODEM_PROGRESS("Wait remote host\n");
+	LOG_INFO("Wait remote host\n");
 
 	for(;;)
 	{
@@ -335,18 +345,20 @@ bool xmodem_send(KFile *ch, KFile *fd)
 			switch (c = kfile_getc(ch))
 			{
 			case XM_NAK:
-				XMODEM_PROGRESS("Resend blk %d\n", blocknr);
+				LOG_INFO("Resend blk %d\n", blocknr);
 				proceed = true;
 				break;
 
 			case XM_C:
 				if (c == XM_C)
 				{
-					XMODEM_PROGRESS("Tx start (CRC)\n");
+					LOG_INFO("Tx start (CRC)\n");
 					usecrc = true;
 				}
 				else
-					XMODEM_PROGRESS("Tx start (BCC)\n");
+				{
+					LOG_INFO("Tx start (BCC)\n");
+				}
 
 				proceed = true;
 				break;
@@ -358,7 +370,7 @@ bool xmodem_send(KFile *ch, KFile *fd)
 
 				/* Call user function to read in one block */
 				size = kfile_read(fd, block_buffer, XM_BUFSIZE);
-				XMODEM_PROGRESS("Send blk %d\n", blocknr);
+				LOG_INFO("Send blk %d\n", blocknr);
 				blocknr++;
 				retries = 0;
 				proceed = true;
@@ -367,17 +379,17 @@ bool xmodem_send(KFile *ch, KFile *fd)
 			case EOF:
 				kfile_clearerr(ch);
 				retries++;
-				XMODEM_PROGRESS("Retries %d\n", retries);
+				LOG_INFO("Retries %d\n", retries);
 				if (retries <= CONFIG_XMODEM_MAXRETRIES)
 					break;
 				/* falling through! */
 
 			case XM_CAN:
-				XMODEM_PROGRESS("Transfer aborted\n");
+				LOG_INFO("Transfer aborted\n");
 				return false;
 
 			default:
-				XMODEM_PROGRESS("Skipping garbage\n");
+				LOG_INFO("Skipping garbage\n");
 				break;
 			}
 		}
@@ -414,8 +426,6 @@ bool xmodem_send(KFile *ch, KFile *fd)
 		/* Send CRC/Checksum */
 		if (usecrc)
 		{
-			crc = UPDCRC16(0, crc);
-			crc = UPDCRC16(0, crc);
 			kfile_putc(crc >> 8, ch);
 			kfile_putc(crc & 0xFF, ch);
 		}
