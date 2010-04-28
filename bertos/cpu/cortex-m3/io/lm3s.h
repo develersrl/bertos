@@ -39,7 +39,7 @@
 #include <cpu/detect.h>
 #include <cfg/compiler.h>
 
-#if CPU_CM3_LM3S1968
+#if (CPU_CM3_LM3S1968 ||  CPU_CM3_LM3S8962)
 	#include "lm3s1968.h"
 	#include "lm3s_types.h"
 	#include "lm3s_ints.h"

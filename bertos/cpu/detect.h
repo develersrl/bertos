@@ -185,8 +185,15 @@
 		#define CPU_CM3_LM3S1968    0
 	#endif
 
+	#if defined (__ARM_LM3S8962__)
+		#define CPU_CM3_LM3S        1
+		#define CPU_CM3_LM3S8962    1
+	#else
+		#define CPU_CM3_LM3S8962    0
+	#endif
+
 	#if defined (CPU_CM3_LM3S)
-		#if CPU_CM3_LM3S1968 + 0 != 1
+		#if CPU_CM3_LM3S1968 + CPU_CM3_LM3S8962 + 0 != 1
 			#error Luminary Cortex-M3 CPU configuration error
 		#endif
 	/* #elif Add other Cortex-M3 families here */
@@ -205,6 +212,8 @@
 	#define CPU_CM3_LM3S 0
 
 	#define CPU_CM3_LM3S1968 0
+
+	#define CPU_CM3_LM3S8968 0
 #endif
 
 #if (defined(__IAR_SYSTEMS_ICC__) || defined(__IAR_SYSTEMS_ICC)) \
