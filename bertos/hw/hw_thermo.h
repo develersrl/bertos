@@ -32,7 +32,6 @@
  *
  * \brief thermo hardware-specific control functions.
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  *
  */
@@ -40,143 +39,83 @@
 #ifndef HW_THERMO_H
 #define HW_THERMO_H
 
-#include "thermo_map.h"
-#include "ntc_map.h"
-
-#include <drv/phase.h>
-#include <drv/ntc.h>
+#include "hw/thermo_map.h"
 
 #include <cfg/debug.h>
-#include <cfg/compiler.h>
 
-#warning TODO:This is an example implentation, you must implement it!
+#include <drv/ntc.h>
 
-/*!
+
+INLINE ticks_t thermo_hw_timeout(ThermoDev dev)
+{
+	(void)dev;
+	return 0;
+}
+
+/**
  * This function should return the temperature set tolerance.
  */
 INLINE deg_t thermo_hw_tolerance(ThermoDev dev)
 {
-	ASSERT(dev < THERMO_CNT);
-
-	switch (dev)
-	{
-	case THERMO_TEST: 
-		/* Put here convertion function to temperature size */
-		break;
-
-	/* Put here your thermo device */
-
-	default:
-		ASSERT(0);
-	}
-
+	(void)dev;
 	return 0;
 }
 
-
-/*!
- * This function should return the timeout for reaching the
- * target temperature.
- */
-INLINE ticks_t thermo_hw_timeout(ThermoDev dev)
-{
-	ASSERT(dev < THERMO_CNT);
-
-	switch (dev)
-	{
-	case THERMO_TEST:
-		/* return ms_to_ticks(60000); */
-		break;
-
-	/* Put here a time out for select thermo device */
-
-	default:
-		ASSERT(0);
-	}
-
-	return 0;
-}
-
-
-
-/*!
+/**
  * Read the temperature of the hw device \a dev.
  */
 INLINE deg_t thermo_hw_read(ThermoDev dev)
 {
-	return ntc_read(dev);
+	ASSERT(dev < THERMO_CNT);
+	/* Put here the code to read current temperature */
+	return 0;
 }
 
 
-/*!
+/**
  * Turns off a specific device.
  * This function is usefull to handle errors.
  */
 INLINE void thermo_hw_off(ThermoDev dev)
 {
 	ASSERT(dev < THERMO_CNT);
-
-	switch (dev)
-	{
-	case THERMO_TEST:
-		phase_setPower(TRIAC_TEST, 0);
-		break;
-
-	/* Put here a thermo device to turn off */
-
-	default:
-		ASSERT(0);
-	}
-
+	/* Put here the code to turn off the thermo device */
 }
 
-
-/*!
- * Based on the current temperature \a cur_temp and the target temperature \a target, this function turns on and off specific
- * triac channel and handles the freezer alarm.
+/**
+ * Based on the current temperature \a cur_temp and the target temperature \a target,
+ * this function turns on and off specific thermo device.
  * It may use also PID control for thermo-regolations.
  */
 INLINE void thermo_hw_set(ThermoDev dev, deg_t target, deg_t cur_temp)
 {
 	ASSERT(dev < THERMO_CNT);
 
-	deg_t dist = target - cur_temp;
-	//kprintf("dev[%d], dist[%d]\n", dev, dist);
-
-	switch(dev)
+	if (target - cur_temp > 0)
 	{
-	case THERMO_TEST:
-		if (dist > 0)
-		{
-			/*	phase_setPower(TRIAC_TEST, dist * PID_TEST_K); */
-		}
-		else
-		{
-			/* phase_setPower(TRIAC_TEST, 0); */
-		}
-		break;
-
-	/* Put here an other thermo device */
-
-	default:
-		ASSERT(0);
+		/*
+		 * We are leveaving the target temperature, so
+		 * turn on the thermo device!
+		 */
 	}
-}
+	else
+	{
+		/*
+		 * Ok, we are near the target temperature, so
+		 * turn off the thermo device!
+		 */
+	}
 
+}
 
 #define THERMO_HW_INIT	_thermo_hw_init()
 
-/*!
+/**
  * Init hw associated with thermo-control.
  */
 INLINE void _thermo_hw_init(void)
 {
-	ASSERT(phase_initialized);
-	ASSERT(ntc_initialized);
-
-	phase_setPower(TRIAC_TEST, 0);
-
-	/* Add here the other thermo device */
+	/* Init your devices here! */
 }
 
 #endif /* HW_THERMO_H */
