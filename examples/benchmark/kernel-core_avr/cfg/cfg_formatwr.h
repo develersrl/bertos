@@ -32,8 +32,6 @@
  *
  * \brief Configuration file for formatted write module.
  *
- * \version $Id$
- *
  * \author Daniele Basile <asterix@develer.com>
  */
 
@@ -52,6 +50,16 @@
  */
 #define CONFIG_PRINTF PRINTF_NOFLOAT
 
+/**
+ * Size of buffer to format "%" sequences in printf.
+ *
+ * Warning: no check on buffer size is done when formatting, be careful especially
+ * with big numbers and %f formatting.
+ *
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 4
+ */
+#define CONFIG_FRMWRI_BUFSIZE  134
 
 #endif /* CFG_FORMATWR_H */
 
