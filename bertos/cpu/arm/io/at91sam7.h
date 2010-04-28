@@ -144,11 +144,32 @@
 
 #endif
 
-#if CPU_ARM_AT91SAM7S256 || CPU_ARM_AT91SAM7X256
+#if CPU_ARM_AT91SAM7S64
+	#define FLASH_MEM_SIZE          0x10000UL ///< Internal flash memory size
+	#define FLASH_PAGE_SIZE_BYTES         128 ///< Size of cpu flash memory page in bytes
+	#define FLASH_BANKS_NUM                 1 ///< Number of flash banks
+	#define FLASH_SECTORS_NUM              16 ///< Number of flash sector
+	#define FLASH_PAGE_PER_SECTOR          32 ///< Number of page for sector
+
+#elif CPU_ARM_AT91SAM7S128 || CPU_ARM_AT91SAM7X128
+	#define FLASH_MEM_SIZE          0x20000UL ///< Internal flash memory size
+	#define FLASH_PAGE_SIZE_BYTES         256 ///< Size of cpu flash memory page in bytes
+	#define FLASH_BANKS_NUM                 1 ///< Number of flash banks
+	#define FLASH_SECTORS_NUM               8 ///< Number of flash sector
+	#define FLASH_PAGE_PER_SECTOR          64 ///< Number of page for sector
+
+#elif CPU_ARM_AT91SAM7S256 || CPU_ARM_AT91SAM7X256
 	#define FLASH_MEM_SIZE          0x40000UL ///< Internal flash memory size
 	#define FLASH_PAGE_SIZE_BYTES         256 ///< Size of cpu flash memory page in bytes
 	#define FLASH_BANKS_NUM                 1 ///< Number of flash banks
 	#define FLASH_SECTORS_NUM              16 ///< Number of flash sector
+	#define FLASH_PAGE_PER_SECTOR          64 ///< Number of page for sector
+
+#elif CPU_ARM_AT91SAM7S512 || CPU_ARM_AT91SAM7X512
+	#define FLASH_MEM_SIZE          0x80000UL ///< Internal flash memory size
+	#define FLASH_PAGE_SIZE_BYTES         256 ///< Size of cpu flash memory page in bytes
+	#define FLASH_BANKS_NUM                 2 ///< Number of flash banks
+	#define FLASH_SECTORS_NUM              32 ///< Number of flash sector
 	#define FLASH_PAGE_PER_SECTOR          64 ///< Number of page for sector
 
 #else
