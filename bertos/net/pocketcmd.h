@@ -31,8 +31,6 @@
  *
  * \brief PocketBus command abstraction layer.
  *
- * \version $Id$
- *
  * \author Francesco Sacchi <batt@develer.com>
  *
  * $WIZ$ module_name = "pocketcmd"
@@ -46,8 +44,6 @@
 #include <cfg/compiler.h>
 
 #define PKTCMD_NULL 0 ///< pocketBus Null command
-
-#define PKTCMD_REPLY_TIMEOUT 50 ///< Command replay timeout in milliseconds
 
 typedef uint16_t pocketcmd_t; ///< Type for Command IDs
 
@@ -116,6 +112,7 @@ INLINE void pocketcmd_setAddr(struct PocketCmdCtx *ctx, pocketbus_addr_t addr)
 void pocketcmd_init(struct PocketCmdCtx *ctx, struct PocketBusCtx *bus_ctx, pocketbus_addr_t addr, pocketcmd_lookup_t search);
 void pocketcmd_poll(struct PocketCmdCtx *ctx);
 bool pocketcmd_send(struct PocketCmdCtx *ctx, pocketcmd_t cmd, const void *buf, size_t len, bool has_replay);
+bool pocketcmd_recv(struct PocketCmdCtx *ctx, PocketCmdMsg *recv_msg);
 void pocketcmd_replyNak(struct PocketCmdMsg *msg);
 void pocketcmd_replyAck(struct PocketCmdMsg *msg);
 
@@ -135,6 +132,18 @@ INLINE bool pocketcmd_slaveReply(struct PocketCmdCtx *ctx, pocketcmd_t cmd, cons
 {
 	return pocketcmd_send(ctx, cmd, buf, len, false);
 }
+
+/**
+ * Return true if message contain NAK.
+ */
+INLINE bool pocketcmd_checkNak(struct PocketCmdMsg *msg)
+{
+	if (msg->buf[0] == POCKETBUS_NAK)
+		return true;
+
+	return false;
+}
+
 
 
 #endif /* NET_POCKETCMD_H */

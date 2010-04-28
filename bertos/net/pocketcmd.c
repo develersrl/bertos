@@ -50,16 +50,20 @@
  * The CMD ID used is the same supplied by the master when
  * the command was sent.
  *
- * \version $Id$
- *
  * \author Francesco Sacchi <batt@develer.com>
  */
 
 #include "pocketcmd.h"
 #include "pocketbus.h"
 
-#include <cfg/macros.h>
+#include "cfg/cfg_pocketbus.h"
+
+// Define logging setting (for cfg/log.h module).
+#define LOG_LEVEL         POCKETBUS_LOG_LEVEL
+#define LOG_VERBOSITY     POCKETBUS_LOG_FORMAT
+#include <cfg/log.h>
 #include <cfg/debug.h>
+#include <cfg/macros.h>
 #include <cfg/module.h>
 
 #include <drv/timer.h>
@@ -74,6 +78,26 @@
  * Call it to read and process pocketBus commands.
  */
 void pocketcmd_poll(struct PocketCmdCtx *ctx)
+{
+	PocketCmdMsg msg;
+	while (pocketcmd_recv(ctx, &msg))
+	{
+		/* Check for command callback */
+		pocketcmd_hook_t callback = ctx->search(msg.cmd);
+
+		/* Call it if exists */
+		if (callback)
+			callback(&msg);
+	}
+}
+
+
+
+/**
+ * pocketBus Command recv function.
+ * Call it to read and process pocketBus commands.
+ */
+bool pocketcmd_recv(struct PocketCmdCtx *ctx, PocketCmdMsg *recv_msg)
 {
 	PocketMsg msg;
 
@@ -108,24 +132,18 @@ void pocketcmd_poll(struct PocketCmdCtx *ctx)
 			if (cmd == ctx->waiting)
 				ctx->waiting = PKTCMD_NULL;
 
-			/* Check for command callback */
-			pocketcmd_hook_t callback = ctx->search(cmd);
+			recv_msg->cmd_ctx = ctx;
+			recv_msg->cmd = cmd;
+			recv_msg->len = msg.len - sizeof(PocketCmdHdr);
+			recv_msg->buf = msg.payload + sizeof(PocketCmdHdr);
 
-			/* Call it if exists */
-			if (callback)
-			{
-				PocketCmdMsg cmd_msg;
-
-				cmd_msg.cmd_ctx = ctx;
-				cmd_msg.cmd = cmd;
-				cmd_msg.len = msg.len - sizeof(PocketCmdHdr);
-				cmd_msg.buf = msg.payload + sizeof(PocketCmdHdr);
-
-				callback(&cmd_msg);
-			}
+			return true;
 		}
 	}
+
+	return false;
 }
+
 
 /**
  * Send command \a cmd to/from slave adding \a len arguments in \a buf.
@@ -139,14 +157,14 @@ bool pocketcmd_send(struct PocketCmdCtx *ctx, pocketcmd_t cmd, const void *buf, 
 	if (ctx->waiting != PKTCMD_NULL)
 	{
 		/* Check is reply timeout is elapsed */
-		if (timer_clock() - ctx->reply_timer < ms_to_ticks(PKTCMD_REPLY_TIMEOUT))
+		if (timer_clock() - ctx->reply_timer < ms_to_ticks(CONFIG_POCKETBUS_CMD_REPLY_TIMEOUT))
 		{
-			TRACEMSG("Pkt discard! waiting cmd[%04X]\n", ctx->waiting);
+			LOG_ERR("Pkt discard! waiting cmd[%04X]\n", ctx->waiting);
 			return false;
 		}
 		else
 		{
-			TRACEMSG("Timeout waiting cmd[%04X]\n", ctx->waiting);
+			LOG_INFO("Timeout waiting cmd[%04X]\n", ctx->waiting);
 			ctx->waiting = PKTCMD_NULL;
 		}
 	}
@@ -162,9 +180,10 @@ bool pocketcmd_send(struct PocketCmdCtx *ctx, pocketcmd_t cmd, const void *buf, 
 
 	if (wait_reply)
 	{
-		ctx->waiting = cmd;
+		ctx->waiting = be16_to_cpu(cmd);
 		ctx->reply_timer = timer_clock();
 	}
+
 	return true;
 }
 

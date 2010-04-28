@@ -32,8 +32,6 @@
  *
  * \brief Configuration file for pocketbus module.
  *
- * \version $Id$
- *
  * \author Daniele Basile <asterix@develer.com>
  */
 
@@ -41,10 +39,33 @@
 #define CFG_POCKETBUS_H
 
 /**
+ * Module logging level.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
+ */
+#define POCKETBUS_LOG_LEVEL      LOG_LVL_ERR
+
+/**
+ * Module logging format.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define POCKETBUS_LOG_FORMAT     LOG_FMT_TERSE
+
+
+/**
  *Buffer len for pockebus protocol.
  * $WIZ$ type = "int"
  * $WIZ$ min = 2
  */
 #define CONFIG_POCKETBUS_BUFLEN     128
+
+/**
+ * Command replay timeout in milliseconds.
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_POCKETBUS_CMD_REPLY_TIMEOUT   50
 
 #endif /* CFG_POCKETBUS_H */

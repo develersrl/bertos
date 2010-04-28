@@ -78,8 +78,14 @@
 
 #include "pocketbus.h"
 
-#include <cfg/macros.h>
+#include "cfg/cfg_pocketbus.h"
+
+// Define logging setting (for cfg/log.h module).
+#define LOG_LEVEL         POCKETBUS_LOG_LEVEL
+#define LOG_VERBOSITY     POCKETBUS_LOG_FORMAT
+#include <cfg/log.h>
 #include <cfg/debug.h>
+#include <cfg/macros.h>
 
 #include <kern/kfile.h>
 
@@ -264,7 +270,7 @@ bool pocketbus_recv(struct PocketBusCtx *ctx, struct PocketMsg *msg)
 	 */
 	if (kfile_error(ctx->fd))
 	{
-		TRACEMSG("fd status[%04X]", kfile_error(ctx->fd));
+		LOG_ERR("fd status[%04X]\n", kfile_error(ctx->fd));
 		kfile_clearerr(ctx->fd);
 	}
 
