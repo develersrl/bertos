@@ -18,6 +18,7 @@ include examples/demo/demo.mk
 #include examples/at91sam7/at91sam7s.mk
 #include examples/at91sam7/at91sam7x.mk
 #include examples/lm3s1968/lm3s1968.mk
+#include examples/lm3s8962/lm3s8962.mk
 #include examples/develgps/develgps.mk
 #include examples/lpc2378/lpc2378.mk
 #include examples/avr-kern/avr-kern.mk
