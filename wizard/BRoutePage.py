@@ -82,6 +82,10 @@ class BRoutePage(BWizardPage):
                 tm = ToolchainManager()
                 suitable_toolchains = tm.suitableToolchains(target)
                 if len(suitable_toolchains) == 1:
+                    toolchain = suitable_toolchains.pop()
+                    toolchain_info = tm._validateToolchain(toolchain)
+                    toolchain_info["path"] = toolchain
+                    self.setProjectInfo("TOOLCHAIN", toolchain_info)
                     return self.wizard().pageIndex(BOutputPage)
                 else:
                     return self.wizard().pageIndex(BToolchainPage)
