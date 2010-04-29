@@ -66,11 +66,11 @@ lm3s1968_LDFLAGS = -nostartfiles -T bertos/cpu/cortex-m3/scripts/lm3s1968_rom.ld
 
 lm3s1968_CPU = cortex-m3
 
-lm3s1968_PROGRAMMER_CPU = lm3s1968
-lm3s1968_PROGRAMMER_TYPE = lm3s1968
+lm3s1968_PROGRAMMER_CPU = lm3s
+lm3s1968_PROGRAMMER_TYPE = luminary
 lm3s1968_FLASH_SCRIPT = bertos/prg_scripts/arm/flash-cortex.sh
 lm3s1968_STOPFLASH_SCRIPT = bertos/prg_scripts/arm/stopopenocd.sh
-lm3s1968_DEBUG_SCRIPT = bertos/prg_scripts/arm/debug-cortex.sh
+lm3s1968_DEBUG_SCRIPT = bertos/prg_scripts/arm/debug.sh
 lm3s1968_STOPDEBUG_SCRIPT = bertos/prg_scripts/arm/stopopenocd.sh
 
 ifeq ($(lm3s1968_DEBUG),0)

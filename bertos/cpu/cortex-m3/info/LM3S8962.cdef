@@ -44,7 +44,7 @@
 include("cm3.common")
 
 # CPU type used for flashing/debugging
-MK_PROGRAMMER_CPU = "lm3s1968"
+MK_PROGRAMMER_CPU = "lm3s"
 
 # CPU default clock frequency
 CPU_DEFAULT_FREQ = "50000000UL"
