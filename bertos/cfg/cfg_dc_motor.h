@@ -75,8 +75,8 @@
 
 
 /**
- * Min value of DC motor speed.
- * \note Generally this value is the min value of the ADC conversion,
+ * Max value of DC motor speed.
+ * \note Generally this value is the max value of the ADC conversion,
  * if you use it.
  *
  * $WIZ$ type = "int"
