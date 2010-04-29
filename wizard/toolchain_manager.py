@@ -127,7 +127,8 @@ class ToolchainManager(object):
         toolchains = self.toolchains
         suitable_toolchains = []
         for name, info in toolchains:
-            if info and info.get('target', None) == target:
+            t = info.get("target", None)
+            if t and t.find(target) != -1:
                 suitable_toolchains.append(name)
         return suitable_toolchains
 

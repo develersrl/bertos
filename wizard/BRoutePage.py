@@ -78,18 +78,19 @@ class BRoutePage(BWizardPage):
             cpu_info = self.projectInfo("CPU_INFOS")
             if cpu_info:
                 target = cpu_info["TOOLCHAIN"]
+                # Try to find a suitable toolchain automatically
+                tm = ToolchainManager()
+                suitable_toolchains = tm.suitableToolchains(target)
+                if len(suitable_toolchains) == 1:
+                    return self.wizard().pageIndex(BOutputPage)
+                else:
+                    return self.wizard().pageIndex(BToolchainPage)
             else:
                 # It seems that the nextId method is called before the
                 # reloadData one (that is called after the page changing.
                 #
                 # TODO: fix this awful code lines
                 target = None
-            # Try to find a suitable toolchain automatically
-            tm = ToolchainManager()
-            suitable_toolchains = tm.suitableToolchains(target)
-            if len(suitable_toolchains) == 1:
-                return self.wizard().pageIndex(BOutputPage)
-            else:
                 return self.wizard().pageIndex(BToolchainPage)
 
     ####
