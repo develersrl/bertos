@@ -46,10 +46,27 @@
 #include "cfg/cfg_ser.h"
 #include "ser_lpc2.h"
 
+/* IRQ numbers */
 #define INT_UART0	6
 #define INT_UART1	7
 #define INT_UART2	28
 #define INT_UART3	29
+
+/* Register offsets */
+#define RBR	0x00
+#define THR	0x00
+#define DLL	0x00
+#define DLM	0x04
+#define IER	0x04
+#define IIR	0x08
+#define FCR	0x08
+#define LCR	0x0c
+#define LSR	0x14
+#define SCR	0x1c
+#define ACR	0x20
+#define ICR	0x24
+#define FDR	0x28
+#define TER	0x30
 
 /* From the high-level serial driver */
 extern struct Serial *ser_handles[SER_CNT];
@@ -158,16 +175,16 @@ static void lpc2_uartSetBaudRate(int port, unsigned long baud)
 	IRQ_SAVE_DISABLE(flags);
 
 	/* LCR: DLAB = 1 (enable divisor modify) */
-	*(reg8_t *)(uart_param[port].base + 0x0c) |= 0x80;
+	*(reg8_t *)(uart_param[port].base + LCR) |= 0x80;
 	/* DLL */
-	*(reg8_t *)(uart_param[port].base + 0x00) =
+	*(reg8_t *)(uart_param[port].base + DLL) =
 		DIV_ROUND(CPU_FREQ, 16 * baud) & 0xFF;
 	/* DLM */
-	*(reg8_t *)(uart_param[port].base + 0x04) =
+	*(reg8_t *)(uart_param[port].base + DLM) =
 		(DIV_ROUND(CPU_FREQ, 16 * baud) >> 8) & 0xFF;
-	*(reg32_t *)(uart_param[port].base + 0x0c) &= ~0x80;
+	*(reg32_t *)(uart_param[port].base + LCR) &= ~0x80;
 	/* LCR: DLAB = 0 (disable divisor modify) */
-	*(reg8_t *)(uart_param[port].base + 0x0c) &= ~0x80;
+	*(reg8_t *)(uart_param[port].base + LCR) &= ~0x80;
 
 	IRQ_RESTORE(flags);
 }
@@ -197,15 +214,15 @@ static void lpc2_uartSetParity(int port, int parity)
                 return;
         }
 	/* LCR */
-	*(reg8_t *)(uart_param[port].base + 0x0c) = config;
+	*(reg8_t *)(uart_param[port].base + LCR) = config;
 
 	IRQ_RESTORE(flags);
 }
 
 static void lpc2_uartPutChar(uint32_t base, uint8_t c)
 {
-	reg8_t *lsr = (reg8_t *)base + 0x14;
-	reg8_t *thr = (reg8_t *)base + 0x00;
+	reg8_t *lsr = (reg8_t *)base + LSR;
+	reg8_t *thr = (reg8_t *)base + THR;
 
 	while (!(*lsr & BV(6)))
 		cpu_relax();
@@ -227,15 +244,15 @@ void lpc2_uartInit(int port)
 	PCLKSEL1 |= uart_param[port].pclksel1;
 
 	/* LCR: 8bit, 1 stop bit, no parity, DLAB = 1 (enable divisor modify) */
-	*(reg8_t *)(uart_param[port].base + 0x0c) = 0x83;
+	*(reg8_t *)(uart_param[port].base + LCR) = 0x83;
 	/* DLL */
-	*(reg8_t *)(uart_param[port].base + 0x00) =
+	*(reg8_t *)(uart_param[port].base + DLL) =
 		DIV_ROUND(CPU_FREQ, 16 * CONFIG_KDEBUG_BAUDRATE) & 0xFF;
 	/* DLM */
-	*(reg8_t *)(uart_param[port].base + 0x04) =
+	*(reg8_t *)(uart_param[port].base + DLM) =
 		(DIV_ROUND(CPU_FREQ, 16 * CONFIG_KDEBUG_BAUDRATE) >> 8) & 0xFF;
 	/* FDR */
-	*(reg32_t *)(uart_param[port].base + 0x28) = 0x10;
+	*(reg32_t *)(uart_param[port].base + FDR) = 0x10;
 
 	/* Assign TX pin to UART0*/
 	PINSEL0 &= ~uart_param[port].pinsel0_mask;
@@ -243,12 +260,12 @@ void lpc2_uartInit(int port)
 	PINSEL4 &= ~uart_param[port].pinsel4_mask;
 	PINSEL4 |= uart_param[port].pinsel4;
 	/* LCR: set 8bit, 1 stop bit, no parity, DLAB = 0 (disable divisor modify) */
-	*(reg8_t *)(uart_param[port].base + 0x0c) = 0x03;
+	*(reg8_t *)(uart_param[port].base + LCR) = 0x03;
 
 	/* TER: Enable transmitter */
-	*(reg8_t *)(uart_param[port].base + 0x30) = BV(7);
+	*(reg8_t *)(uart_param[port].base + TER) = BV(7);
 	/* IER: Enable RBR interrupt */
-	*(reg8_t *)(uart_param[port].base + 0x04) = BV(0);
+	*(reg8_t *)(uart_param[port].base + IER) = BV(0);
 
 	IRQ_RESTORE(flags);
 }
@@ -262,7 +279,7 @@ static bool tx_sending(struct SerialHardware *_hw)
 INLINE bool lpc2_uartRxReady(int port)
 {
 	/* LSR: check Receiver Data Ready (RDR) bit */
-	return *(reg8_t *)(uart_param[port].base + 0x14) & BV(0) ? true : false;
+	return *(reg8_t *)(uart_param[port].base + LSR) & BV(0) ? true : false;
 }
 
 static void uart_irq_rx(int port)
@@ -272,7 +289,8 @@ static void uart_irq_rx(int port)
 
 	while (lpc2_uartRxReady(port))
 	{
-		c = *(reg8_t *)(uart_param[port].base + 0x00);
+		/* RBR: read a character from the Receiver Buffer Register */
+		c = *(reg8_t *)(uart_param[port].base + RBR);
 		if (fifo_isfull(rxfifo))
 			ser_handles[port]->status |= SERRF_RXFIFOOVERRUN;
 		else
@@ -283,7 +301,7 @@ static void uart_irq_rx(int port)
 INLINE bool lpc2_uartTxReady(int port)
 {
 	/* LSR: check Transmitter Holding Register Empty (THRE) bit */
-	return *(reg8_t *)(uart_param[port].base + 0x14) & BV(5) ? true : false;
+	return *(reg8_t *)(uart_param[port].base + LSR) & BV(5) ? true : false;
 }
 
 static void uart_irq_tx(int port)
@@ -299,19 +317,19 @@ static void uart_irq_tx(int port)
 		if (fifo_isempty(txfifo))
 		{
 			/* IER: Disable THRE interrupt */
-			*(reg8_t *)(uart_param[port].base + 0x04) &= ~BV(1);
+			*(reg8_t *)(uart_param[port].base + IER) &= ~BV(1);
 			UARTDesc[port].sending = false;
 			break;
 		}
 		/* THR: put a character to the Transmit Holding Register */
-		*(reg8_t *)(uart_param[port].base + 0x00) = fifo_pop(txfifo);
+		*(reg8_t *)(uart_param[port].base + THR) = fifo_pop(txfifo);
 	}
 }
 
 static void uart_common_irq_handler(int port)
 {
 	/* IIR: identify the interrupt source */
-	uint32_t status = *(reg32_t *)(uart_param[port].base + 0x08) >> 1 & 0x7;
+	uint32_t status = *(reg32_t *)(uart_param[port].base + IIR) >> 1 & 0x7;
 
 	/* Receiver Data Ready (RDR) */
 	if (status == 0x02)
@@ -362,7 +380,7 @@ static void lpc2_uartIRQDisable(int port)
 		{								\
 			hw->sending = true;					\
 			/* IER: Enable THRE interrupt */			\
-			*(reg8_t *)(uart_param[port].base + 0x04) |= BV(1);	\
+			*(reg8_t *)(uart_param[port].base + IER) |= BV(1);	\
 		}								\
 	}									\
 										\
