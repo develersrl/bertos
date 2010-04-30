@@ -41,7 +41,7 @@ if os.path.islink(_tmp):
 DATA_DIR = os.path.dirname(os.path.abspath(_tmp))
 del _tmp
 
-PREDEFINED_BOARDS_DIR = 'predefined_boards'
+PREDEFINED_BOARDS_DIR = 'boards'
 PREDEFINED_BOARD_SPEC_FILE = '.spec'
 PREDEFINED_BOARD_ICON_FILE = '.icon.png'
 
