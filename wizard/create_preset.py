@@ -72,7 +72,6 @@ assert(os.path.exists(preset_dir + "/" + hw_path     + "/hw"))
 assert(os.path.exists(preset_dir + "/" + bertos_path + "/bertos"))
 
 s["BERTOS_PATH"] = bertos_path
-s["PRESET"] = True
 s["PROJECT_HW_PATH"] = hw_path
 s["PROJECT_SRC_PATH"] = "."
 s["PRESET"] = True
@@ -80,9 +79,7 @@ pprint.pprint(s)
 p = open(preset_dir + "/project.bertos", "w")
 pickle.dump(s, p)
 
-p = open(preset_dir + "/.spec", "w")
-p.write("name = '%s preset'" % pname)
-p.close()
+open(preset_dir + "/.spec", "w").write("name = '%s preset'" % pname)
 
 bertos_path = os.path.abspath(preset_dir + "/" + bertos_path)
 hw_path = os.path.abspath(preset_dir + "/" + hw_path)
