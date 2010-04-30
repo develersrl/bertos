@@ -249,17 +249,26 @@ class BProject(object):
                         information["depends"] = ()
                     information["depends"] += (filename.split(".")[0],)
                     information["category"] = os.path.basename(path)
+                    
+                    # Hack to remove 'bertos/' from the configuration file path.
+                    #
+                    # The new module information format substitute paths like 'bertos/cfg/config_file.h'
+                    # with the relative path into the bertos directory ('cfg/config_file.h')
+                    information["configuration"] = information["configuration"].replace("bertos/", "")
+                    information["hw"] = [hw.replace("bertos/", "") for hw in information["hw"]]
+
                     if "configuration" in information and len(information["configuration"]):
                         configuration = module_dict[module]["configuration"]
                         try:
-                            configuration_info[configuration] = loadConfigurationInfos(self.infos["BERTOS_PATH"] + "/" + configuration)
+                            cfg_file_path = os.path.join(self.bertos_srcdir, configuration)
+                            configuration_info[configuration] = loadConfigurationInfos(cfg_file_path)
                         except ParseError, err:
                             raise DefineException.ConfigurationDefineException(self.infos["BERTOS_PATH"] + "/" + configuration, err.line_number, err.line)
                         if edit:
                             try:
                                 path = self.infos["PROJECT_SRC_PATH"]
-                                user_configuration = loadConfigurationInfos(configuration.replace("bertos", path))
-                                configuration_info[configuration] = updateConfigurationValues(configuration_info[configuration], user_configuration)
+                                cfg_file_path = os.path.join(path, configuration)
+                                configuration_info[configuration] = updateConfigurationValues(configuration_info[configuration], cfg_file_path)
                             except ParseError, err:
                                 raise DefineException.ConfigurationDefineException(configuration.replace("bertos", path))
                 module_info_dict.update(module_dict)
@@ -319,11 +328,11 @@ class BProject(object):
         # Destination makefile
         self._writeMakefile()
         # Copy the sources
-        self._copySources(self.sources_dir, self.srcdir)
+        self._copySources(self.bertos_maindir, self.srcdir)
         # Set properly the autoenabled parameters
         self._setupAutoenabledParameters()
         # Copy all the configuration files
-        self._writeCfgFiles(self.sources_dir, self.cfgdir)
+        self._writeCfgFiles(self.bertos_srcdir, self.cfgdir)
         # Destination wizard mk file
         self._writeWizardMkFile()
 
@@ -333,7 +342,7 @@ class BProject(object):
         # Copy the clean hw files
         self._createDirectory(self.hwdir)
         # Copy all the hw files
-        self._writeHwFiles(self.sources_dir, self.hwdir)
+        self._writeHwFiles(self.bertos_srcdir, self.hwdir)
         # Destination user mk file
         self._writeUserMkFile()
         # Destination main.c file
@@ -371,15 +380,15 @@ class BProject(object):
             # Destination makefile
             self._writeMakefile()
             # Merge sources
-            self._mergeSources(self.sources_dir, self.srcdir, self.old_srcdir)
+            self._mergeSources(self.bertos_maindir, self.srcdir, self.old_srcdir)
             # Copy all the hw files
-            self._writeHwFiles(self.sources_dir, self.hwdir)
+            self._writeHwFiles(self.bertos_srcdir, self.hwdir)
             # Destination wizard mk file
             self._writeWizardMkFile()
         # Set properly the autoenabled parameters
         self._setupAutoenabledParameters()
         # Copy all the configuration files
-        self._writeCfgFiles(self.sources_dir, self.cfgdir)
+        self._writeCfgFiles(self.bertos_srcdir, self.cfgdir)
         if not self.is_preset:
             # Create project files for selected plugins only if the project isn't a preset
             self._createProjectFiles()
@@ -472,6 +481,7 @@ class BProject(object):
                         configuration[parameter]["value"] = "1" if information["enabled"] else "0"
                 self.infos["CONFIGURATIONS"] = configurations
 
+    # Project related properties
     @property
     def maindir(self):
         return self.infos.get("PROJECT_PATH", None)
@@ -505,16 +515,24 @@ class BProject(object):
     def old_srcdir(self):
         return self.infos.get("OLD_BERTOS_PATH", None)
 
+    # BeRTOS sources related properties
     @property
-    def sources_dir(self):
+    def bertos_maindir(self):
         return self.infos.get("BERTOS_PATH", None)
+
+    @property
+    def bertos_srcdir(self):
+        if self.bertos_maindir:
+            return os.path.join(self.bertos_maindir, "bertos")
+        else:
+            return None
 
     @property
     def src_hwdir(self):
         if self.from_preset:
             return os.path.join(self.infos["PRESET_PATH"], self.infos["PRESET_HW_PATH"])
         else:
-            return self.sources_dir
+            return self.bertos_maindir
 
     @property
     def from_preset(self):
