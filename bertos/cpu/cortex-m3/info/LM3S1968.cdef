@@ -45,6 +45,7 @@ include("cm3.common")
 
 # CPU type used for flashing/debugging
 MK_PROGRAMMER_CPU = "lm3s"
+MK_FLASH_SCRIPT = PRG_SCRIPTS_DIR + "arm/flash-lm3s.sh"
 
 # CPU default clock frequency
 CPU_DEFAULT_FREQ = "50000000UL"

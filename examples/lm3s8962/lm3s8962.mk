@@ -57,13 +57,13 @@ lm3s8962_PREFIX = arm-none-eabi-
 
 lm3s8962_CPPAFLAGS = -mthumb -mno-thumb-interwork
 lm3s8962_CPPFLAGS = -D'ARCH=0' -D__ARM_LM3S8962__ -D'CPU_FREQ=(50000000L)' -D'WIZ_AUTOGEN' -mthumb -mno-thumb-interwork -Iexamples/lm3s8962 -Ibertos/cpu/cortex-m3 -fno-strict-aliasing -fwrapv
-lm3s8962_LDFLAGS = -nostartfiles -T bertos/cpu/cortex-m3/scripts/lm3s1968_rom.ld -Wl,--no-warn-mismatch -mthumb -mno-thumb-interwork
+lm3s8962_LDFLAGS = -nostartfiles -T bertos/cpu/cortex-m3/scripts/lm3s8962_rom.ld -Wl,--no-warn-mismatch -mthumb -mno-thumb-interwork
 
 lm3s8962_CPU = cortex-m3
 
 lm3s8962_PROGRAMMER_CPU = lm3s
 lm3s8962_PROGRAMMER_TYPE = lm3s
-lm3s8962_FLASH_SCRIPT = bertos/prg_scripts/arm/flash-cortex.sh
+lm3s8962_FLASH_SCRIPT = bertos/prg_scripts/arm/flash-lm3s.sh
 lm3s8962_STOPFLASH_SCRIPT = bertos/prg_scripts/arm/stopopenocd.sh
 lm3s8962_DEBUG_SCRIPT = bertos/prg_scripts/arm/debug.sh
 lm3s8962_STOPDEBUG_SCRIPT = bertos/prg_scripts/arm/stopopenocd.sh

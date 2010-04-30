@@ -65,7 +65,6 @@ SCRIPT_DIR = CPU_DIR + "cortex-m3/scripts/"
 HW_DIR = CPU_DIR + "cortex-m3/hw/"
 DRV_DIR = CPU_DIR + "cortex-m3/drv/"
 
-MK_FLASH_SCRIPT = PRG_SCRIPTS_DIR + "arm/flash-cortex.sh"
 MK_STOPFLASH_SCRIPT = PRG_SCRIPTS_DIR + "arm/stopopenocd.sh"
 MK_DEBUG_SCRIPT = PRG_SCRIPTS_DIR + "arm/debug.sh"
 MK_STOPDEBUG_SCRIPT = PRG_SCRIPTS_DIR + "arm/stopopenocd.sh"

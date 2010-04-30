@@ -68,7 +68,7 @@ develgps_CPU = cortex-m3
 
 develgps_PROGRAMMER_CPU = lm3s
 develgps_PROGRAMMER_TYPE = luminary
-develgps_FLASH_SCRIPT = bertos/prg_scripts/arm/flash-cortex.sh
+develgps_FLASH_SCRIPT = bertos/prg_scripts/arm/flash-lm3s.sh
 develgps_STOPFLASH_SCRIPT = bertos/prg_scripts/arm/stopopenocd.sh
 develgps_DEBUG_SCRIPT = bertos/prg_scripts/arm/debug.sh
 develgps_STOPDEBUG_SCRIPT = bertos/prg_scripts/arm/stopopenocd.sh
