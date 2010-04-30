@@ -50,19 +50,7 @@ irq_vectors:
 	.word __msp_end		/* Initial stack pointer */
 	.word __init		/* The reset handler */
 	.word default_isr	/* The NMI handler */
-	.word 	default_isr	/* The hard fault handler */
-	.word default_isr	/* The MPU fault handler */
-	.word default_isr	/* The bus fault handler */
-	.word default_isr	/* The usage fault handler */
-	.word 0			/* Reserved */
-	.word 0			/* Reserved */
-	.word 0			/* Reserved */
-	.word 0			/* Reserved */
-	.word default_isr	/* SVCall handler */
-	.word default_isr	/* Debug monitor handler */
-	.word 0			/* Reserved */
-	.word default_isr	/* The PendSV handler */
-	.word default_isr	/* The SysTick handler */
+	.word default_isr	/* The hard fault handler */
 /*
  * This IRQ vector table will be replaced by another one in RAM after the IRQ
  * module initialization and the reset handler disables IRQ at the very
