@@ -41,16 +41,19 @@ if s["WIZARD_VERSION"] < 3:
 pname = s["PROJECT_NAME"] 
 preset_dir += pname
 
+#find hw/ path for the board
 hw_path = findPath(preset_dir, "hw")
 if not hw_path:
     print "hw/ path not found in parent directories of %s" % preset_dir
     exit(1)
 
+#find bertos/ path
 bertos_path = findPath(preset_dir, "bertos")
 if not bertos_path:
     print "bertos/ path not found in parent directories of %s" % preset_dir
     exit(1)
 
+#Copy the project and remove unneeded files.
 shutil.copytree(prj_dir, preset_dir)
 remove(preset_dir + "/bertos")
 remove(preset_dir + "/images")
@@ -61,16 +64,42 @@ remove(preset_dir + "/VERSION")
 remove(preset_dir + "/" + pname + ".project")
 remove(preset_dir + "/" + pname + ".workspace")
 
+#Flatten project sources.
+#A wizard created project called pname
+#usually has the following structure:
+#
+#pname
+#  |
+#  +-<project files>
+#  |
+#  +-bertos
+#  |
+#  +-pname
+#      |   
+#      +<pname sources>
+#
+#This has been done in order to have the chance to
+#add multiple projects sharing the same bertos version.
+#After the copy and after removing the bertos tree inside the 
+#project, the double pname directory is redundant, so we move
+#all pname sources into the parent directory
 l = glob.glob(preset_dir + "/" + pname + "/*")
 for f in l:
     shutil.move(f, preset_dir)
 
+#Remove the now empty project src dir and the hw/ dir.
+#hw files are located in parent directories and are common
+#for all projects on the same board. 
 remove(preset_dir + "/" + pname)
 remove(preset_dir + "/hw")
 
 assert(os.path.exists(preset_dir + "/" + hw_path     + "/hw"))
 assert(os.path.exists(preset_dir + "/" + bertos_path + "/bertos"))
 
+#Update wizard project info.
+#A preset is still a Wizard-editable project
+#but has its bertos/ and hw/ dirs shared with 
+#others.
 s["BERTOS_PATH"] = bertos_path
 s["PROJECT_HW_PATH"] = hw_path
 s["PROJECT_SRC_PATH"] = "."
@@ -79,6 +108,7 @@ pprint.pprint(s)
 p = open(preset_dir + "/project.bertos", "w")
 pickle.dump(s, p)
 
+#Create a .spec file in order to make this preset visible in the Wizard
 open(preset_dir + "/.spec", "w").write("name = '%s preset'" % pname)
 
 bertos_path = os.path.abspath(preset_dir + "/" + bertos_path)
@@ -87,6 +117,7 @@ hw_path = os.path.abspath(preset_dir + "/" + hw_path)
 src_path = os.path.relpath(preset_dir, bertos_path)
 hw_path  = os.path.relpath(hw_path, bertos_path)
 
+#Update project makefiles adapting them to the new directory layout
 mk = open(preset_dir + "/" + pname + ".mk").read()
 mk = re.sub(r"(%s_SRC_PATH\s*=\s*).*" % pname, r"\1%s" % src_path, mk)
 mk = re.sub(r"(%s_HW_PATH\s*=\s*).*" % pname, r"\1%s" % hw_path, mk)
