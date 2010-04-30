@@ -49,7 +49,7 @@ CPU_DESC = ["ARM Cortex-M3",
 	  "16-bit and 32-bit RISC Architecture"]
 
 # Type of the toolchain we should use to compile the source for this CPU.
-TOOLCHAIN = "arm-"
+TOOLCHAIN = "arm"
 
 # If we use the GCC compiler we should pass some flags.
 CORE_CPU = "cortex-m3"

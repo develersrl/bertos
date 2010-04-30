@@ -61,7 +61,7 @@ MK_CPU = CORE_CPU
 CPU_DEFAULT_FREQ = "72000000UL"
 
 # Special CPU related tags.
-CPU_TAGS = ["lpc2", CORE_CPU]
+CPU_TAGS = ["lpc2", CORE_CPU, TOOLCHAIN]
 
 # Where are locate the bertos directories
 SCRIPT_DIR = CPU_DIR + "arm/scripts/"

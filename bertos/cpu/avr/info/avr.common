@@ -47,11 +47,11 @@ include("../../path.common")
 CPU_DESC = [ "ATMEL AVR Microcontroller ",
 	     "8-bit RISC Architecture"]
 
-# Special CPU related tags.
-CPU_TAGS = ["harvard", "avr"]
-
 # Type of the toolchain we should use to compile the source for this CPU.
 TOOLCHAIN = "avr"
+
+# Special CPU related tags.
+CPU_TAGS = ["harvard", TOOLCHAIN]
 
 # CPU default clock frequency
 CPU_DEFAULT_FREQ = "8000000UL"
