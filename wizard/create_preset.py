@@ -19,7 +19,6 @@ def findPath(start, target):
     pa = start
     while pa != "/":
         pa = os.path.abspath(pa + "/..")
-        print pa
         if os.path.exists(pa + "/" + target):
             return os.path.relpath(pa, start)
 
@@ -40,7 +39,7 @@ if s["WIZARD_VERSION"] < 3:
     print "Project version too old."
     exit(1)
 pname = s["PROJECT_NAME"] 
-preset_dir += pname + ".test"
+preset_dir += pname
 
 hw_path = findPath(preset_dir, "hw")
 if not hw_path:
