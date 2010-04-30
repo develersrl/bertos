@@ -268,7 +268,7 @@ class BProject(object):
                             try:
                                 path = self.infos["PROJECT_SRC_PATH"]
                                 cfg_file_path = os.path.join(path, configuration)
-                                configuration_info[configuration] = updateConfigurationValues(configuration_info[configuration], cfg_file_path)
+                                configuration_info[configuration] = updateConfigurationValues(configuration_info[configuration], loadConfigurationInfos(cfg_file_path))
                             except ParseError, err:
                                 raise DefineException.ConfigurationDefineException(cfg_file_path, err.line_number, err.line)
                 module_info_dict.update(module_dict)
