@@ -128,7 +128,7 @@ def projectFileGenerator(project_info):
     project_data["OUTPUT"] = project_info.info("OUTPUT")
     project_data["WIZARD_VERSION"] = WIZARD_VERSION
     project_data["PRESET"] = project_info.info("PRESET")
-    project_data["HW_PATH"] = relpath.relpath(project_info.info("HW_PATH"), directory)
+    project_data["PROJECT_HW_PATH"] = relpath.relpath(project_info.info("PROJECT_HW_PATH"), directory)
     return pickle.dumps(project_data)
 
 def loadPlugin(plugin):
@@ -183,7 +183,7 @@ def mkGenerator(project_info):
     mk_data["$csrc"], mk_data["$pcsrc"], mk_data["$cppasrc"], mk_data["$cxxsrc"], mk_data["$asrc"], mk_data["$constants"] = csrcGenerator(project_info)
     mk_data["$prefix"] = replaceSeparators(project_info.info("TOOLCHAIN")["path"].split("gcc")[0])
     mk_data["$suffix"] = replaceSeparators(project_info.info("TOOLCHAIN")["path"].split("gcc")[1])
-    mk_data["$hwpath"] = relpath.relpath(project_info.info("HW_PATH"), project_info.info("PROJECT_PATH"))
+    mk_data["$hwpath"] = relpath.relpath(project_info.info("PROJECT_HW_PATH"), project_info.info("PROJECT_PATH"))
     for key in mk_data:
         makefile = makefile.replace(key, mk_data[key])
     open(destination, "w").write(makefile)

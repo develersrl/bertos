@@ -93,7 +93,7 @@ class BProject(object):
         else:
             # In projects created with older versions of the Wizard this metadata doesn't exist
             self.infos["PROJECT_SRC_PATH"] = os.path.join(self.infos["PROJECT_PATH"], self.infos["PROJECT_NAME"])
-        self.infos["HW_PATH"] = os.path.join(self.infos["PROJECT_PATH"], project_data.get("HW_PATH", self.infos["PROJECT_PATH"]))
+        self.infos["PROJECT_HW_PATH"] = os.path.join(self.infos["PROJECT_PATH"], project_data.get("PROJECT_HW_PATH", self.infos["PROJECT_PATH"]))
 
         linked_sources_path = project_data["BERTOS_PATH"]
         sources_abspath = os.path.abspath(os.path.join(project_dir, linked_sources_path))
@@ -168,15 +168,17 @@ class BProject(object):
         # TODO: find a better way to reuse loadModuleData
         preset_project_name = project_data.get("PROJECT_NAME", os.path.basename(preset))
         preset_prj_src_path = os.path.join(preset, project_data.get("PROJECT_SRC_PATH", os.path.join(preset, preset_project_name)))
-        preset_hw_path = os.path.join(preset, project_data.get("PROJET_HW_DIR", preset))
+        preset_prj_hw_path = os.path.join(preset, project_data.get("PROJECT_HW_PATH", preset))
 
         old_project_name = self.infos["PROJECT_NAME"]
         old_project_path = self.infos["PROJECT_PATH"]
         old_project_src_path = self.infos["PROJECT_SRC_PATH"]
+        old_project_hw_path = self.infos["PROJECT_HW_PATH"]
 
         self.infos["PROJECT_NAME"] = preset_project_name
         self.infos["PROJECT_PATH"] = preset
         self.infos["PROJECT_SRC_PATH"] = preset_prj_src_path
+        self.infos["PROJECT_HW_PATH"] = preset_prj_hw_path
 
         self.loadModuleData(True)
         self.setEnabledModules(project_data["ENABLED_MODULES"])
@@ -184,12 +186,13 @@ class BProject(object):
         self.infos["PROJECT_NAME"] = old_project_name
         self.infos["PROJECT_PATH"] = old_project_path
         self.infos["PROJECT_SRC_PATH"] = old_project_src_path
+        self.infos["PROJECT_HW_PATH"] = old_project_hw_path
         # End of the ugly HACK!
 
         self.infos["PRESET_NAME"] = preset_project_name
         self.infos["PRESET_PATH"] = preset
         self.infos["PRESET_SRC_PATH"] = preset_prj_src_path
-        self.infos["PRESET_HW_DIR"] = preset_hw_path
+        self.infos["PRESET_HW_PATH"] = preset_prj_hw_path
 
     def loadProjectPresets(self):
         """
@@ -509,7 +512,7 @@ class BProject(object):
     @property
     def src_hwdir(self):
         if self.from_preset:
-            return os.path.join(self.infos["PRESET_PATH"], self.infos["PRESET_HW_DIR"])
+            return os.path.join(self.infos["PRESET_PATH"], self.infos["PRESET_HW_PATH"])
         else:
             return self.sources_dir
 
