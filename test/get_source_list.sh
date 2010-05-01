@@ -39,7 +39,7 @@ CPU_DIR="${BERTOS_DIR}/cpu"
 OS_DIR="${BERTOS_DIR}/os"
 EMUL_DIR="${BERTOS_DIR}/emul"
 WIZARD_DIR="./wizard"
-APP_DIR="./examples"
+APP_DIR="./examples ./boards"
 FAT_DIR="${BERTOS_DIR}/fs/fatfs"
 NMEA_DIR="${BERTOS_DIR}/net/nmeap"
 
