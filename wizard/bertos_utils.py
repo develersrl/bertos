@@ -114,11 +114,11 @@ def projectFileGenerator(project_info):
     if project_info.info("PRESET"):
         # For presets save again the BERTOS_PATH into project file
         project_data["PRESET"] = True
-        project_data["BERTOS_PATH"] = project_info.info("BERTOS_PATH")
+        project_data["BERTOS_PATH"] = relpath.relpath(project_info.info("BERTOS_PATH"), directory)
     else:
         # Use the local BeRTOS version instead of the original one
         # project_data["BERTOS_PATH"] = project_info.info("BERTOS_PATH")
-        project_data["BERTOS_PATH"] = directory
+        project_data["BERTOS_PATH"] = "."
     project_data["PROJECT_NAME"] = project_info.info("PROJECT_NAME", os.path.basename(directory))
     project_src_relpath = relpath.relpath(project_info.info("PROJECT_SRC_PATH"), directory)
     project_data["PROJECT_SRC_PATH"] = project_src_relpath
