@@ -192,8 +192,6 @@ class BVersionPage(BWizardPage):
         Fills the version list with all the BeRTOS versions founded in the QSettings.
         """
         versions = set([])
-        if self._edit:
-            versions.add(self.projectInfo("BERTOS_PATH"))
         if os.name == "nt":
             import winreg_importer
             versions |= set([os.path.normpath(dir) for dir in winreg_importer.getBertosDirs()])
