@@ -162,7 +162,6 @@ class BProject(object):
         project_data = pickle.loads(open(project_file, "r").read())
         self.loadSourceTree()
         self._loadCpuStuff(project_data["CPU_NAME"], project_data["SELECTED_FREQ"])
-        self._loadToolchainStuff(project_data["TOOLCHAIN"])
 
         # NOTE: this is a HACK!!!
         # TODO: find a better way to reuse loadModuleData
