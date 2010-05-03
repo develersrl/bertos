@@ -401,8 +401,9 @@ class BProject(object):
         self.infos["RELEVANT_FILES"] = relevants_files
 
     def _writeVersionFile(self, filename):
-        version_file = open(os.path.join(const.DATA_DIR, "vtemplates/VERSION"), "r").read()
-        open(filename, "w").write(versionFileGenerator(self, version_file))
+        if not self.edit or self.old_srcdir:
+            version_file = open(os.path.join(const.DATA_DIR, "vtemplates/VERSION"), "r").read()
+            open(filename, "w").write(versionFileGenerator(self, version_file))
 
     def _writeProjectFile(self, filename):
         f = open(filename, "w")
