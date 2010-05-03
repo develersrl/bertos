@@ -85,6 +85,8 @@ def newProject():
 def editProject(project_file):
     info_dict = {}
     while(True):
+        # Empty project is the default fallback.
+        QApplication.instance().project = BProject()
         try:
             QApplication.instance().project = BProject(project_file, info_dict)
         except VersionException:
