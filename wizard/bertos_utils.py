@@ -115,6 +115,9 @@ def projectFileGenerator(project_info):
         # For presets save again the BERTOS_PATH into project file
         project_data["PRESET"] = True
         project_data["BERTOS_PATH"] = relpath.relpath(project_info.info("BERTOS_PATH"), directory)
+    elif project_info.edit:
+        # If in editing mode the BERTOS_PATH is maintained
+        project_data["BERTOS_PATH"] = relpath.relpath(project_info.info("BERTOS_PATH"), directory)
     else:
         # Use the local BeRTOS version instead of the original one
         # project_data["BERTOS_PATH"] = project_info.info("BERTOS_PATH")
