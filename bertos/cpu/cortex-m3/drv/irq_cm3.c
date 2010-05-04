@@ -83,9 +83,9 @@ static void sysirq_enable(sysirq_t irq)
 {
 	/* Enable the IRQ line (only for generic IRQs) */
 	if (irq >= 16 && irq < 48)
-		HWREG(NVIC_EN0) = 1 << (irq - 16);
+		NVIC_EN0_R = 1 << (irq - 16);
 	else if (irq >= 48)
-		HWREG(NVIC_EN1) = 1 << (irq - 48);
+		NVIC_EN1_R = 1 << (irq - 48);
 }
 
 void sysirq_setHandler(sysirq_t irq, sysirq_handler_t handler)
@@ -122,6 +122,6 @@ void sysirq_init(void)
 		irq_table[i] = unhandled_isr;
 
 	/* Update NVIC to point to the new vector table */
-	HWREG(NVIC_VTABLE) = (size_t)irq_table;
+	NVIC_VTABLE_R = (size_t)irq_table;
 	IRQ_RESTORE(flags);
 }

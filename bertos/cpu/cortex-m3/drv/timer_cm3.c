@@ -43,18 +43,18 @@
 INLINE void timer_hw_setPeriod(unsigned long period)
 {
 	ASSERT(period < (1 << 24));
-	HWREG(NVIC_ST_RELOAD) = period - 1;
+	NVIC_ST_RELOAD_R = period - 1;
 }
 
 static void timer_hw_enable(void)
 {
-	HWREG(NVIC_ST_CTRL) |=
+	NVIC_ST_CTRL_R |=
 		NVIC_ST_CTRL_CLK_SRC | NVIC_ST_CTRL_ENABLE | NVIC_ST_CTRL_INTEN;
 }
 
 static void timer_hw_disable(void)
 {
-	HWREG(NVIC_ST_CTRL) &= ~(NVIC_ST_CTRL_ENABLE | NVIC_ST_CTRL_INTEN);
+	NVIC_ST_CTRL_R &= ~(NVIC_ST_CTRL_ENABLE | NVIC_ST_CTRL_INTEN);
 }
 
 void timer_hw_init(void)
