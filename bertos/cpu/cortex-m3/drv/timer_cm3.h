@@ -35,11 +35,50 @@
  * \brief Low-level timer driver (SysTick) for Cortex-M3.
  */
 
-#include <cpu/detect.h>
+#ifndef TIMER_CM3_H
+#define TIMER_CM3_H
 
 #if CPU_CM3_LM3S
-	#include "timer_lm3s.h"
+	#include <io/lm3s.h>
+#elif CPU_CM3_STM32
+	#include <io/stm32.h>
 /*#elif  Add other families here */
 #else
 	#error Unknown CPU
 #endif
+
+/* Ticks frequency (HZ) */
+#define TIMER_TICKS_PER_SEC	1000
+
+/* Frequency of the hardware high-precision timer. */
+#define TIMER_HW_HPTICKS_PER_SEC (CPU_FREQ)
+
+/* Maximum value of the high-precision hardware counter register */
+#define TIMER_HW_CNT (CPU_FREQ / TIMER_TICKS_PER_SEC)
+
+/** Type of time expressed in ticks of the hardware high-precision timer */
+typedef uint32_t hptime_t;
+#define SIZEOF_HPTIME_T 4
+
+/* Timer ISR prototype */
+ISR_PROTO_CONTEXT_SWITCH(timer_handler);
+#define DEFINE_TIMER_ISR DECLARE_ISR_CONTEXT_SWITCH(timer_handler)
+
+INLINE void timer_hw_irq(void)
+{
+}
+
+INLINE bool timer_hw_triggered(void)
+{
+	return true;
+}
+
+INLINE hptime_t timer_hw_hpread(void)
+{
+	return HWREG(NVIC_ST_CURRENT);
+}
+
+void timer_hw_init(void);
+void timer_hw_exit(void);
+
+#endif /* TIMER_CM3_H */
