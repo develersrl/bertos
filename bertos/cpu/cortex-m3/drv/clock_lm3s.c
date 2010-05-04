@@ -62,7 +62,7 @@ void NAKED lm3s_busyWait(unsigned long iterations)
 		: : "r"(__n) : "memory", "cc");
 }
 
-unsigned long clock_get_rate(void)
+INLINE unsigned long clock_get_rate(void)
 {
 	reg32_t rcc = HWREG(SYSCTL_RCC);
 
@@ -88,7 +88,7 @@ INLINE int evaluate_sysdiv(unsigned long freq)
 	return i;
 }
 
-void clock_set_rate(void)
+void clock_init(void)
 {
 	reg32_t rcc, rcc2;
 	unsigned long clk;

@@ -43,7 +43,6 @@
 
 extern void lm3s_busyWait(unsigned long iterations);
 
-unsigned long clock_get_rate(void);
-void clock_set_rate(void);
+void clock_init(void);
 
 #endif /* DRV_LM3S1968_CLOCK_H */
