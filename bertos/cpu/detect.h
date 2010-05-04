@@ -192,17 +192,31 @@
 		#define CPU_CM3_LM3S8962    0
 	#endif
 
+	#if defined (__ARM_STM32P103__)
+		#define CPU_CM3_STM32       1
+		#define CPU_CM3_STM32P103   1
+	#else
+		#define CPU_CM3_STM32P103   0
+	#endif
+
 	#if defined (CPU_CM3_LM3S)
 		#if CPU_CM3_LM3S1968 + CPU_CM3_LM3S8962 + 0 != 1
 			#error Luminary Cortex-M3 CPU configuration error
 		#endif
+		#define CPU_CM3_STM32       0
+	#elif defined (CPU_CM3_STM32)
+		#if CPU_CM3_STM32P103 + 0 != 1
+			#error STM32 Cortex-M3 CPU configuration error
+		#endif
+		#define CPU_CM3_LM3S        0
 	/* #elif Add other Cortex-M3 families here */
 	#else
 		#define CPU_CM3_LM3S        0
+		#define CPU_CM3_STM32       0
 	#endif
 
 
-	#if CPU_CM3_LM3S + 0 /* Add other Cortex-M3 families here */ != 1
+	#if CPU_CM3_LM3S + CPU_CM3_STM32 + 0 /* Add other Cortex-M3 families here */ != 1
 		#error Cortex-M3 CPU configuration error
 	#endif
 
@@ -214,6 +228,10 @@
 	#define CPU_CM3_LM3S1968 0
 
 	#define CPU_CM3_LM3S8968 0
+
+	#define CPU_CM3_STM32 0
+
+	#define CPU_CM3_STM32P103 0
 #endif
 
 #if (defined(__IAR_SYSTEMS_ICC__) || defined(__IAR_SYSTEMS_ICC)) \
