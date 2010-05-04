@@ -41,12 +41,14 @@
 #include <cfg/compiler.h>
 #include <cfg/macros.h>
 
+
+#warning TODO:This is an example implentation, you must implement it!
+
 typedef enum ThermoDev
 {
-	THERMO_MIXER1 = 0,
-	THERMO_MIXER2,
-	THERMO_MIXER3,
-	THERMO_MIXER4,
+	THERMO_TEST,
+
+	/* Put here your thermo device */
 
 	THERMO_CNT
 } ThermoDev;
