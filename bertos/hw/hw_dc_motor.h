@@ -57,8 +57,11 @@
 // Macro that disable the select DC motor
 #define DC_MOTOR_DISABLE(dev)	/* Implement me! */
 
+// Macro that left the DC motor rotor float
+#define DC_MOTOR_STOP_FLOAT(dev)    DC_MOTOR_DISABLE(dev)
 // Macro that put in short circuit DC motor supply pins
-#define DC_MOTOR_IDLE(dev)          do { /* Implement me! */ } while (0)
+#define DC_MOTOR_STOP_BRAKED(dev)   do { /* Implement me! */ } while (0)
+
 // Macro that set motor direction
 #define DC_MOTOR_SET_DIR(dev, dir)  do { /* Implement me! */ } while (0)
 

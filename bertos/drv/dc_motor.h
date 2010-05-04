@@ -54,14 +54,8 @@
 #include <drv/timer.h>
 #include <drv/adc.h>
 
-/*
- * DC motor mode stop.
- */
-#define DC_MOTOR_DISABLE_MODE      0   ///< Disable the DC motor shutting down the driver
-#define DC_MOTOR_IDLE_MODE         1   ///< Put the motor pins in short circuit
-
-
-#define DC_MOTOR_NO_EXPIRE  -1         ///< The DC motor runs do not expire, so it runs forever.
+#define DC_MOTOR_NO_EXPIRE        -1  ///< The DC motor runs do not expire, so it runs forever.
+#define DC_MOTOR_NO_DEV_SPEED     -1  ///< Disable the speed acquire from device (like trimmer, etc.).
 
 /**
  * Type for DC motor.
@@ -82,14 +76,13 @@ typedef struct DCMotorConfig
 	adc_ch_t adc_ch;        ///< ADC channel.
 	adcread_t adc_max;      ///< ADC max scale value.
 	adcread_t adc_min;      ///< ADC min scale value.
-	mtime_t sample_delay;   ///< Delay before to sampling.
 
 	bool dir;               ///< Default direction for select DC motor.
+	bool braked;            ///< If true the motor is braked when we turn off it.
 
-	dc_speed_t speed;       ///< Fixed speed value for select DC motor, if enable_dev_speed flag is false.
+	dc_speed_t speed;       ///< Default speed value for select DC motor.
 
-	adc_ch_t speed_dev_id;  ///< Index of the device where read speed.
-	bool enable_dev_speed;  ///< If this flag is true read target speed from device, otherwise use fixed speed.
+	int speed_dev_id;       ///<  Index of the device where read speed, to disable set to DC_MOTOR_NO_DEV_SPEED.
 
 } DCMotorConfig;
 
@@ -104,19 +97,30 @@ typedef struct DCMotor
 
 	int index;                ///< DC motor id.
 	uint32_t status;          ///< Status of select DC motor
-	dc_speed_t zero_speed;    ///< Start value for motor speed (Value read from adc when motor is off)
 	dc_speed_t tgt_speed;     ///< Target speed for select DC motor
 
-	ticks_t expire_time;      ///< Among of time that  dc motor run
+	ticks_t expire_time;      ///< Amount of time that  dc motor run
 
 } DCMotor;
 
 void dc_motor_setDir(int index, bool dir);
-void dc_motor_enable(int index, bool state, int mode);
+void dc_motor_enable(int index, bool state);
 void dc_motor_setSpeed(int index, dc_speed_t speed);
-void dc_motor_setTimer(int index, mtime_t on_time);
-void dc_motor_setup(int index, DCMotorConfig *cfg);
+void dc_motor_startTimer(int index, mtime_t on_time);
+void dc_motor_waitStop(int index);
+void dc_motor_setup(int index, DCMotorConfig *dcm_conf);
 dc_speed_t dc_motor_readTargetSpeed(int index);
-void dc_motor_init(int priority);
+void dc_motor_setPriority(int priority);
+void dc_motor_init(void);
+
+
+/**
+ * Test function prototypes.
+ *
+ * See dc_motor_hwtest.c file.
+ */
+int dc_motor_testSetUp(void);
+void dc_motor_testRun(void);
+int dc_motor_testTearDown(void);
 
 #endif /* DRV_DC_MOTOR_H */
