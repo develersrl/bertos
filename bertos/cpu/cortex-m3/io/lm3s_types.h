@@ -30,32 +30,14 @@
  *
  * -->
  *
- * \brief LM3S1968 generic hardware macros.
+ * \brief LM3S generic hardware macros.
  */
 
 #ifndef LM3S_TYPES_H
 #define LM3S_TYPES_H
 
 #include <cfg/compiler.h>
-
-/**
- * Macros for hardware access, both direct and via the bit-band region.
- */
-/*\{*/
-#define HWREG(x) (*((reg32_t *)(x)))
-#define HWREGH(x) (*((reg16_t *)(x)))
-#define HWREGB(x) (*((reg8_t *)(x)))
-
-#define HWREGBITW(x, b) \
-        HWREG(((reg32_t)(x) & 0xF0000000) | 0x02000000 |		\
-              (((reg32_t)(x) & 0x000FFFFF) << 5) | ((b) << 2))
-#define HWREGBITH(x, b) \
-        HWREGH(((reg32_t)(x) & 0xF0000000) | 0x02000000 |		\
-               (((reg32_t)(x) & 0x000FFFFF) << 5) | ((b) << 2))
-#define HWREGBITB(x, b) \
-        HWREGB(((reg32_t)(x) & 0xF0000000) | 0x02000000 |		\
-               (((reg32_t)(x) & 0x000FFFFF) << 5) | ((b) << 2))
-/*\}*/
+#include <io/cm3_types.h>
 
 /**
  * Helper Macros for determining the particular hardware revision.
