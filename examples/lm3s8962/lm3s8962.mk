@@ -45,7 +45,7 @@ lm3s8962_CSRC = \
 	bertos/cpu/cortex-m3/drv/timer_cm3.c \
 	bertos/cpu/cortex-m3/drv/irq_cm3.c \
 	bertos/cpu/cortex-m3/hw/switch_ctx_cm3.c \
-	bertos/cpu/cortex-m3/hw/init_lm3s.c
+	bertos/cpu/cortex-m3/hw/init_cm3.c
 
 lm3s8962_CPPASRC = \
 	bertos/cpu/cortex-m3/hw/vectors_cm3.S \

@@ -43,9 +43,15 @@
 #include <cpu/irq.h> /* IRQ_DISABLE */
 #include <cpu/types.h>
 #include <drv/irq_cm3.h>
+#include "switch_ctx_cm3.h"
+
+#if CPU_CM3_LM3S
 #include <drv/clock_lm3s.h>
 #include <io/lm3s.h>
-#include "switch_ctx_cm3.h"
+#elif CPU_CM3_STM32
+#include <drv/clock_stm32.h>
+#include <io/stm32.h>
+#endif
 
 extern size_t __text_end, __data_start, __data_end, __bss_start, __bss_end;
 
@@ -59,6 +65,7 @@ void __init2(void)
 	 */
 	IRQ_DISABLE;
 
+#if CPU_CM3_LM3S
 	/*
 	 * PLL may not function properly at default LDO setting.
 	 *
@@ -79,9 +86,9 @@ void __init2(void)
 	 */
 	if (REVISION_IS_A1 | REVISION_IS_A2)
 		HWREG(SYSCTL_LDOPCTL) = SYSCTL_LDOPCTL_2_75V;
-
+#endif
 	/* Set the appropriate clocking configuration */
-	clock_set_rate();
+	clock_init();
 
 	/* Initialize IRQ vector table in RAM */
 	sysirq_init();

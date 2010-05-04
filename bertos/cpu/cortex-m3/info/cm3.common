@@ -78,4 +78,4 @@ MK_CPU_LDFLAGS = "-mthumb -mno-thumb-interwork -nostartfiles -Wl,--no-warn-misma
 
 # CRT files.
 MK_CPU_CPPASRC = HW_DIR + "crt_cm3.S " + HW_DIR + "vectors_cm3.S "
-MK_CPU_CSRC = HW_DIR + "init_lm3s.c " + DRV_DIR + "irq_cm3.c "
+MK_CPU_CSRC = HW_DIR + "init_cm3.c " + DRV_DIR + "irq_cm3.c "
