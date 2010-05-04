@@ -47,6 +47,15 @@
 	#error Unknown CPU
 #endif
 
+/**
+ * \name Values for CONFIG_TIMER.
+ *
+ * Select which hardware timer interrupt to use for system clock and softtimers.
+ *
+ * $WIZ$ timer_select = "TIMER_DEFAULT"
+ */
+#define TIMER_DEFAULT  /*  */ ///< Default system timer
+
 /* Ticks frequency (HZ) */
 #define TIMER_TICKS_PER_SEC	1000
 
