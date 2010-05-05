@@ -31,7 +31,7 @@
  *
  *
  * \brief DC motor driver.
-*
+ *
  * \author Daniele Basile <asterix@develer.com>
  *
  * $WIZ$ module_name = "dc_motor"
