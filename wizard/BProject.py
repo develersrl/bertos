@@ -53,7 +53,7 @@ from bertos_utils import (
                             getCommentList, sub,
 
                             # Project creation functions
-                            projectFileGenerator, versionFileGenerator, loadPlugin, 
+                            projectFileGenerator, versionFileGenerator, loadPlugin,
                             mergeSources,
 
                             # Custom exceptions
@@ -89,7 +89,7 @@ class BProject(object):
         project_src_path = os.path.join(project_dir, project_data.get("PROJECT_SRC_PATH", project_data["PROJECT_NAME"]))
         if project_src_path:
             self.infos["PROJECT_SRC_PATH"] = project_src_path
-            
+
         else:
             # In projects created with older versions of the Wizard this metadata doesn't exist
             self.infos["PROJECT_SRC_PATH"] = os.path.join(self.infos["PROJECT_PATH"], self.infos["PROJECT_NAME"])
@@ -98,9 +98,9 @@ class BProject(object):
         linked_sources_path = project_data["BERTOS_PATH"]
         sources_abspath = os.path.abspath(os.path.join(project_dir, linked_sources_path))
         project_data["BERTOS_PATH"] = sources_abspath
-        
+
         self._loadBertosSourceStuff(project_data["BERTOS_PATH"], info_dict.get("BERTOS_PATH", None))
-        
+
         self.infos["PRESET"] = project_data.get("PRESET", False)
 
         # For those projects that don't have a VERSION file create a dummy one.
@@ -248,7 +248,7 @@ class BProject(object):
                         information["depends"] = ()
                     information["depends"] += (filename.split(".")[0],)
                     information["category"] = os.path.basename(path)
-                    
+
                     # Hack to remove 'bertos/' from the configuration file path.
                     #
                     # The new module information format substitute paths like 'bertos/cfg/config_file.h'
@@ -355,7 +355,7 @@ class BProject(object):
 
         # Copy all the files and dirs except cfg/hw/*.mk
         self._writeCustomSrcFiles()
-        
+
         # Copy the hw files
         self._writeHwFiles(self.src_hwdir, self.hwdir)
 
@@ -429,6 +429,8 @@ class BProject(object):
     def _writeHwFiles(self, source_dir, destination_dir):
         for module, information in self.infos["MODULES"].items():
             for hwfile in information["hw"]:
+                if hwfile == "":
+                    continue
                 string = open(source_dir + "/" + hwfile, "r").read()
                 hwfile_path = destination_dir + "/" + os.path.basename(hwfile)
                 if not self.edit or not os.path.exists(hwfile_path):
