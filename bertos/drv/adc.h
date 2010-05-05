@@ -30,11 +30,8 @@
  *
  * -->
  *
- * \version $Id$
- *
  * \brief Analog to Digital Converter driver (ADC).
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  *
  * $WIZ$ module_name = "adc"
