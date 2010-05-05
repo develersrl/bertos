@@ -46,6 +46,8 @@
 #ifndef DRV_MPXX6115A_H
 #define DRV_MPXX6115A_H
 
+#include <drv/adc.h>
+
 #define MPXX6115A_DIV_CONST    0.009f
 #define MPXX6115A_ADD_CONST    0.095f
 
