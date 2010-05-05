@@ -47,7 +47,7 @@
  * The file pointer is positioned at the start of the next line.
  * Returns EOF if no section was found, 0 otherwise.
  */
-static int findSection(KFile *fd, const char *section, char *line, size_t size)
+static int findSection(KFile *fd, const char *section, size_t section_len, char *line, size_t size)
 {
 	while (kfile_gets(fd, line, size) != EOF)
 	{
@@ -56,11 +56,17 @@ static int findSection(KFile *fd, const char *section, char *line, size_t size)
 		/* accept only sections that begin at first char */
 		if (*ptr++ != '[')
 			continue;
+
 		/* find the end-of-section character */
 		for (i = 0; i < size && *ptr != ']'; ++i, ++ptr)
 			;
+
+		/* The found section could be long that our section key */
+		if (section_len != i)
+			continue;
+
 		/* did we find the correct section? */
-		if(strncmp(&line[1], section, i))
+		if(strncmp(&line[1], section, section_len))
 			continue;
 		else
 			return 0;
@@ -135,10 +141,11 @@ static int findKey(KFile *fd, const char *key, char *line, size_t size)
 int ini_getString(KFile *fd, const char *section, const char *key, const char *default_value, char *buf, size_t size)
 {
 	char line[CONFIG_INI_MAX_LINE_LEN];
+
 	if (kfile_seek(fd, 0, KSM_SEEK_SET) == EOF)
 	    goto error;
 
-	if (findSection(fd, section, line, CONFIG_INI_MAX_LINE_LEN) == EOF)
+	if (findSection(fd, section, strlen(section), line, CONFIG_INI_MAX_LINE_LEN) == EOF)
 		goto error;
 
 	if (findKey(fd, key, line, CONFIG_INI_MAX_LINE_LEN) == EOF)
