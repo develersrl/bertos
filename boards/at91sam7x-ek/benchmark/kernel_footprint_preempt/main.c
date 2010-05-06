@@ -46,6 +46,7 @@
  * Note by default this project compile without any compile optimization, so if we
  * want to try to change it go to kernel_footprint_preempt_user.mk, and add the flag
  * in the section kernel_footprint_preempt_USER_CPPFLAGS.
+ * To see the flag optimization effects you shoul clean the project and rebuild it.
  */
 
 #include <cpu/irq.h>
