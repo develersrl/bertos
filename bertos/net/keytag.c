@@ -53,6 +53,7 @@
 
 #include <kern/kfile.h>
 
+#include <string.h>
 /**
  * Starting communication char (STX).
  */
@@ -69,14 +70,22 @@ static void keytag_clearPkt(struct TagPacket *pkt)
 	pkt->len = 0;
 }
 
-void keytag_init(struct TagPacket *pkt, struct KFile *comm, struct KFile *tag)
+/**
+ * DEPRECATED FUCNTIONS
+ * To read the tag string from device you shoul use the keytag_recv
+ * fuction, that return the string if we had received it.
+ */
+void keytag_poll(struct TagPacket *pkt)
 {
-	keytag_clearPkt(pkt);
-	pkt->host = comm;
-	pkt->tag = tag;
+	#warning __FILTER_NEXT_WARNING__
+	#warning keytag_poll function is depreca use keytag_recv instead
+	uint8_t buf[CONFIG_TAG_MAX_LEN];
+	int len;
+	if ((len = keytag_recv(pkt, buf, sizeof(buf))) != EOF)
+		kfile_write(pkt->host, buf, len);
 }
 
-void keytag_poll(struct TagPacket *pkt)
+int keytag_recv(struct TagPacket *pkt, uint8_t *tag, size_t len)
 {
 	int c;
 
@@ -98,11 +107,12 @@ void keytag_poll(struct TagPacket *pkt)
 			if (c == TAG_ETX)
 			{
 				/* Terminate the tag string */
-				uint16_t len = MIN((uint16_t)CONFIG_TAG_MAX_LEN, pkt->len);
-				pkt->buf[len] = '\0';
-				/* Write read TAG on communication serial */
-				kfile_printf(pkt->host, "%s%s", CONFIG_TAG_LABEL, pkt->buf);
+				size_t tag_len = MIN(len, pkt->len);
+
+				/* Save read tag */
+				memcpy(tag, pkt->buf, tag_len);
 				pkt->sync = false;
+				return tag_len;
 			}
 			else
 			{
@@ -126,8 +136,20 @@ void keytag_poll(struct TagPacket *pkt)
 	}
 	if (kfile_error(pkt->tag) != 0)
 	{
-		LOG_ERR("Error %08x\n", kfile_error(pkt->tag));
+		LOG_ERR("Error %04x\n", kfile_error(pkt->tag));
 		kfile_clearerr(pkt->tag);
 	}
 
+	return EOF;
 }
+
+/**
+ * Init the keytag module.
+ */
+void keytag_init(struct TagPacket *pkt, struct KFile *comm, struct KFile *tag)
+{
+	keytag_clearPkt(pkt);
+	pkt->tag = tag;
+	pkt->host = comm;
+}
+

@@ -56,11 +56,13 @@ typedef struct TagPacket
 	KFile *tag;                        ///< Tag communication channel
 	KFile *host;                       ///< Host communication channel
 	bool sync;                         ///< Status flag: true if we find an STX
-	uint16_t len;                      ///< Packet lenght
+	size_t len;                        ///< Packet lenght
 	uint8_t buf[CONFIG_TAG_MAX_LEN];   ///< Reception buffer
 } TagPacket;
 
 void keytag_init(struct TagPacket *pkt, struct KFile *comm, struct KFile *tag);
+int keytag_recv(struct TagPacket *pkt, uint8_t *tag, size_t len);
+
 void keytag_poll(struct TagPacket *pkt);
 
 #endif /* NET_TAG_H */

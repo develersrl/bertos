@@ -55,12 +55,7 @@
  * Max buffer lenght
  * $WIZ$ type = "int"
  */
-#define CONFIG_TAG_MAX_LEN 14
-
-/**
- * Label to put before the tag code.
- */
-#define CONFIG_TAG_LABEL "tag "
+#define CONFIG_TAG_MAX_LEN 14U
 
 #endif /* CFG_KEYTAG_H */
 
