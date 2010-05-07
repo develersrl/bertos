@@ -78,11 +78,12 @@
  *        the common case (external keys) both can be used.</li>
  *    </ul>
  *
- * \version $Id$
  * \author Giovanni Bajo <rasky@develer.com>
  */
 
 #include "hashtable.h"
+
+#include "cfg/cfg_hashtable.h"
 #include <cfg/debug.h>
 #include <cfg/compiler.h>
 #include <cfg/macros.h> //ROTL(), ROTR();

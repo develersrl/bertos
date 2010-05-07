@@ -30,6 +30,8 @@
  * Copyright 2004 Giovanni Bajo
  * -->
  *
+ * \author Giovanni Bajo <rasky@develer.com>
+ *
  * \brief Portable hash table
  *
  * This file implements a portable hash table, with the following features:
@@ -48,22 +50,18 @@
  * a marker for a free node, so it is invalid to store a NULL pointer in the table
  * with \c ht_insert().
  *
- * \version $Id$
- * \author Giovanni Bajo <rasky@develer.com>
+ * $WIZ$ module_name = "hashtable"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_hashtable.h"
  */
 
 #ifndef STRUCT_HASHTABLE_H
 #define STRUCT_HASHTABLE_H
 
+#include "cfg/cfg_hashtable.h"
+
 #include <cfg/compiler.h>
 #include <cfg/macros.h>
 #include <cfg/debug.h>
-
-/**
- * Enable/disable support to declare special hash tables which maintain a copy of
- * the key internally instead of relying on the hook to extract it from the data.
- */
-#define CONFIG_HT_OPTIONAL_INTERNAL_KEY      1
 
 /// Maximum length of the internal key (use (2^n)-1 for slight speedup)
 #define INTERNAL_KEY_MAX_LENGTH     15
@@ -151,7 +149,7 @@ typedef struct
  * \param ht Hash table declared with \c DECLARE_HASHTABLE
  *
  * \note This function must be called before using the hash table. Optionally,
- * it can be called later in the program to clear the hash table, 
+ * it can be called later in the program to clear the hash table,
  * removing all its elements.
  */
 void ht_init(struct HashTable* ht);
