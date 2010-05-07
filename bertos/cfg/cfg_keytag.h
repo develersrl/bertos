@@ -59,7 +59,6 @@
 
 /**
  * Label to put before the tag code.
- * $WIZ$ type = "string"
  */
 #define CONFIG_TAG_LABEL "tag "
 
