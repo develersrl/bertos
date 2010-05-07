@@ -31,8 +31,12 @@
  * -->
  *
  * \author Andrea Grandi <andrea@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
  *
- * \brief Tag protocol (protocol).
+ * \brief KeyTAG parser.
+ *
+ * This module parse TAG message that come from comunication channel,
+ * and convert the tag value into string.
  *
  * TAG protocol is decribed in this way:
  * <pre>
@@ -85,6 +89,11 @@ void keytag_poll(struct TagPacket *pkt)
 		kfile_write(pkt->host, buf, len);
 }
 
+/**
+ * Receive the tag message from channel, and if
+ * the tag is good put the converted string into given buffer.
+ * The fuction return the len of found tag string, otherwise EOF.
+ */
 int keytag_recv(struct TagPacket *pkt, uint8_t *tag, size_t len)
 {
 	int c;
