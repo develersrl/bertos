@@ -32,7 +32,6 @@
  *
  * \brief AFSK1200 modem.
  *
- * \version $Id$
  * \author Francesco Sacchi <asterix@develer.com>
  *
  * $WIZ$ module_name = "afsk"
@@ -41,8 +40,8 @@
  * $WIZ$ module_hw = "bertos/hw/hw_afsk.h"
  */
 
-#ifndef DRV_AFSK_H
-#define DRV_AFSK_H
+#ifndef NET_AFSK_H
+#define NET_AFSK_H
 
 #include "cfg/cfg_afsk.h"
 #include "hw/hw_afsk.h"
@@ -222,4 +221,4 @@ int afsk_testSetup(void);
 int afsk_testRun(void);
 int afsk_testTearDown(void);
 
-#endif
+#endif /* NET_AFSK_H */
