@@ -63,8 +63,6 @@
  * \todo Use up/down to move through history  The history line will be copied to the current line,
  * making sure there is room for it.
  *
- * \version $Id$
- *
  * \author Giovanni Bajo <rasky@develer.com>
  */
 

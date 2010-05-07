@@ -40,7 +40,6 @@
  * - no comments are allowed inside a line with key=value pair.
  * - every line that doesn't contain a '=' or doesn't start with '[' will be ignored.
  *
- * \version $Id$
  * \author Luca Ottaviano <lottaviano@develer.com>
  *
  * $WIZ$ module_name = "ini_reader"
