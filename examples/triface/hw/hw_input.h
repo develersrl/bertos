@@ -33,9 +33,6 @@
  *
  * \brief Macro for HW_INPUT_H
  *
- *
- * \version $Id$
- *
  * \author Andrea Grandi <andrea@develer.com>
  */
 
@@ -45,14 +42,14 @@
 #include <avr/io.h>
 
 /* Set pins as input and enable pull-up */
-#define INPUT_INIT_D do 					\
+#define INPUT_INIT_D do					\
 {								\
 	(DDRD &= ~(BV(PD4) | BV(PD5) | BV(PD6) | BV(PD7)));	\
 	(PORTD |= (BV(PD4) | BV(PD5) | BV(PD6) | BV(PD7)));	\
 } while(0)
 
 #define INPUT_INIT_E do						\
-{ 								\
+{								\
 	(DDRE &= ~(BV(PE4) | BV(PE5) | BV(PE6) | BV(PE7)));	\
 	ATOMIC((PORTE |= (BV(PE4) | BV(PE5) | BV(PE6) | BV(PE7))));	\
 } while(0)

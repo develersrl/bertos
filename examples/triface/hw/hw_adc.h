@@ -34,8 +34,6 @@
  * \brief Macro for HW_AIN_H
  *
  *
- * \version $Id$
- *
  * \author Andrea Grandi <andrea@develer.com>
  */
 

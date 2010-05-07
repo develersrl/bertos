@@ -31,9 +31,6 @@
  *
  * \brief Macro for defining command for protocol.
  *
- *
- * \version $Id$
- *
  * \author Marco Benelli <marco@develer.com>
  */
 

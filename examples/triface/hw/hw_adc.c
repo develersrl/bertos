@@ -34,8 +34,6 @@
  * \brief ADC: Analogic to Digital Converter
  *
  *
- * \version $Id$
- *
  * \author Andrea Grandi <andrea@develer.com>
  */
 

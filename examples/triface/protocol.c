@@ -34,8 +34,6 @@
  * \brief Implementation of the command protocol between the board and the host
  *
  *
- * \version $Id$
- *
  * \author Giovanni Bajo <rasky@develer.com>
  * \author Marco Benelli <marco@develer.com>
  * \author Bernie Innocenti <bernie@codewiz.org>

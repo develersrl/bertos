@@ -33,8 +33,6 @@
  *
  * \brief Implementation of the command protocol between the board and the host
  *
- * \version $Id$
- *
  * \author Marco Benelli <marco@develer.com>
  */
 

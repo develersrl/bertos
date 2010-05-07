@@ -33,10 +33,8 @@
  *
  * \brief Buzzer hardware-specific definitions
  *
- * \version $Id$
- *
- * \author 	Francesco Sacchi <batt@develer.com>
- * 		Andrea Grandi <andrea@develer.com>
+ * \author Francesco Sacchi <batt@develer.com>
+ * \author Andrea Grandi <andrea@develer.com>
  */
 
 #ifndef HW_BUZZER_H
@@ -46,7 +44,7 @@
 #include <cfg/macros.h>
 
 #define BUZZER_BIT     BV(PE3)
-#define IS_BUZZER_ON 	(PORTE & BUZZER_BIT)
+#define IS_BUZZER_ON	(PORTE & BUZZER_BIT)
 #define BUZZER_HW_INIT  do { DDRE |= BV(DDE3); } while (0)
 #define BUZZER_ON       do { PORTE |= BUZZER_BIT; } while (0)
 #define BUZZER_OFF      do { PORTE &= ~BUZZER_BIT; } while (0)

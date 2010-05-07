@@ -31,7 +31,6 @@
  *
  * \brief ADC hardware-specific definition
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  *
  * This module is automatically included so no need to include

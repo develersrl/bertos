@@ -31,8 +31,6 @@
  *
  * -->
  *
- * \version $Id$
- *
  * \author Marco Benelli <marco@develer.com>
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Daniele Basile <asterix@develer.com>
