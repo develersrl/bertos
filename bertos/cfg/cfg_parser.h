@@ -32,16 +32,13 @@
  *
  * \brief Configuration file for parser module.
  *
- * \version $Id$
- *
  * \author Daniele Basile <asterix@develer.com>
  */
 
 #ifndef CFG_PARSER_H
 #define CFG_PARSER_H
 
-/// TODO
-#define CONFIG_INTERNAL_COMMANDS 0
+
 
 #endif /* CFG_PARSER_H */
 

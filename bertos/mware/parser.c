@@ -30,9 +30,9 @@
  * All Rights Reserved.
  * -->
  *
- * \brief Serial protocol parser and commands.
+ * \brief Channel protocol parser and commands.
  *
- * This file contains the serial protocol parser and
+ * This file contains the channel protocol parser and
  * the definition of the protocol commands. Commands are defined
  * in a "CmdTemplate" type array, containing:
  * - the name of the command,
@@ -44,8 +44,6 @@
  * using an union: the element of the union to use for each
  * argument is determined by format strings present in the
  * CmdTemplate table.
- *
- * \version $Id$
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
@@ -59,13 +57,14 @@
 
 #include "cfg/cfg_parser.h"
 
-#include <drv/ser.h>
+#include <kern/kfile.h>
 #include <struct/hashtable.h>
 
 #include <stdlib.h> // atol(), NULL
 #include <string.h> // strchr(), strcmp()
 
-
+//TODO:
+#define CONFIG_INTERNAL_COMMANDS  0
 
 #define ARG_SEP_S " "
 #define ARG_SEP_C ' '
@@ -173,13 +172,13 @@ static bool parseArgs(const char *fmt, const char *input, parms argv[])
  * in the array result, using the format specified
  * in fmt.
  *
- * \param ser     Serial handle.
+ * \param ch     Channel handle.
  * \param fmt     Values format string.
  * \param result  Array containing result to be printed.
  *
  * \return -1 in case of errors, otherwise 0.
  */
-static int printResult(struct Serial *ser, const char *fmt, parms result[])
+static int printResult(KFile *ch, const char *fmt, parms result[])
 {
 	long n;
 	char repeat_cnt = 0;
@@ -203,23 +202,23 @@ static int printResult(struct Serial *ser, const char *fmt, parms result[])
 				switch (*fmt)
 				{
 					case 'd':
-						ser_printf(ser, ARG_SEP_S "%ld", (*result).l);
+						kfile_printf(ch, ARG_SEP_S "%ld", (*result).l);
 						result++;
 						break;
 					case 'c':
-						ser_print(ser, ARG_SEP_S);
-						ser_print(ser, (*result).s);
+						kfile_print(ch, ARG_SEP_S);
+						kfile_print(ch, (*result).s);
 						result++;
 						break;
 					case 's':
-						ser_printf(ser, ARG_SEP_S "%s", (*result).s);
+						kfile_printf(ch, ARG_SEP_S "%s", (*result).s);
 						result++;
 						break;
 					case 'n':
 						n = (*result++).l;
-						ser_printf(ser, ARG_SEP_S "%ld", n);
+						kfile_printf(ch, ARG_SEP_S "%ld", n);
 						while (n--) {
-							ser_printf(ser, ARG_SEP_S "%ld", (*result).l);
+							kfile_printf(ch, ARG_SEP_S "%ld", (*result).l);
 							result++;
 						}
 						break;
@@ -236,7 +235,7 @@ static int printResult(struct Serial *ser, const char *fmt, parms result[])
 	} /* while (*fmt) */
 
 
-	ser_print(ser, "\r\n");
+	kfile_print(ch, "\r\n");
 	return 0;
 }
 #endif /* UNUSED_CODE */

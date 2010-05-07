@@ -30,13 +30,15 @@
  * All Rights Reserved.
  * -->
  *
- * \version $Id$
- *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  * \author Giovanni Bajo <rasky@develer.com>
  *
- * \brief serial protocol parser and commands.
+ * \brief Channel protocol parser and commands.
+ *
+ * $WIZ$ module_name = "parser"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_parser.h"
+ * $WIZ$ module_depends = "kfile", "hashtable"
  */
 
 
