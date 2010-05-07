@@ -26,41 +26,42 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
- *
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ * All Rights Reserved.
  * -->
  *
- * \author Andrea Grandi <andrea@develer.com>
+ * \brief Configuration file for keytag module.
  *
- * \brief Tag protocol. (interface).
- *
- * $WIZ$ module_name = "keytag"
- * $WIZ$ module_configuration = "bertos/cfg/cfg_keytag.h"
- * $WIZ$ module_depends = "kfile"
- * $WIZ$ module_hw = ""
+ * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef NET_KEYTAG_H
-#define NET_KEYTAG_H
-
-#include <cfg/cfg_keytag.h>
-
-#include <kern/kfile.h>
-
+#ifndef CFG_KEYTAG_H
+#define CFG_KEYTAG_H
 
 /**
- * Structure of a Tag packet
+ * Module logging level.
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
  */
-typedef struct TagPacket
-{
-	KFile *tag;                        ///< Tag communication channel
-	KFile *host;                       ///< Host communication channel
-	bool sync;                         ///< Status flag: true if we find an STX
-	uint16_t len;                      ///< Packet lenght
-	uint8_t buf[CONFIG_TAG_MAX_LEN];   ///< Reception buffer
-} TagPacket;
+#define CONFIG_KEYTAG_LOG_LEVEL        LOG_LVL_ERR
+/**
+ * Module logging format.
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define CONFIG_KEYTAG_LOG_FORMAT       LOG_FMT_TERSE
 
-void keytag_init(struct TagPacket *pkt, struct KFile *comm, struct KFile *tag);
-void keytag_poll(struct TagPacket *pkt);
+/**
+ * Max buffer lenght
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_TAG_MAX_LEN 14
 
-#endif /* NET_TAG_H */
+/**
+ * Label to put before the tag code.
+ * $WIZ$ type = "string"
+ */
+#define CONFIG_TAG_LABEL "tag "
+
+#endif /* CFG_KEYTAG_H */
+

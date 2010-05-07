@@ -44,13 +44,24 @@
 
 #include "keytag.h"
 
+#include <cfg/debug.h>
+// Define log settings for cfg/log.h
+#define LOG_LEVEL    CONFIG_KEYTAG_LOG_LEVEL
+#define LOG_FORMAT   CONFIG_KEYTAG_LOG_FORMAT
+#include <cfg/log.h>
+#include <cfg/macros.h>
+
 #include <kern/kfile.h>
 
-#include <drv/timer.h>
-#include <drv/ser.h>
+/**
+ * Starting communication char (STX).
+ */
+#define TAG_STX 0x02
 
-#include <cfg/macros.h>
-#include <cfg/debug.h>
+/**
+ * Ending communication char (ETX).
+ */
+#define TAG_ETX 0x03
 
 static void keytag_clearPkt(struct TagPacket *pkt)
 {
@@ -77,7 +88,7 @@ void keytag_poll(struct TagPacket *pkt)
 		{
 			/* When STX is found a new packet begins */
 			if (pkt->sync)
-				kprintf("TAG double sync!\n");
+				LOG_WARN("TAG double sync!\n");
 			keytag_clearPkt(pkt);
 			pkt->sync = true;
 		}
@@ -86,17 +97,19 @@ void keytag_poll(struct TagPacket *pkt)
 			/* Check for end of packet */
 			if (c == TAG_ETX)
 			{
-				pkt->buf[TAG_MAX_PRINT_CHARS] = '\x0';
+				/* Terminate the tag string */
+				uint16_t len = MIN((uint16_t)CONFIG_TAG_MAX_LEN, pkt->len);
+				pkt->buf[len] = '\0';
 				/* Write read TAG on communication serial */
-				kfile_printf(pkt->host, "tag %s", pkt->buf);
+				kfile_printf(pkt->host, "%s%s", CONFIG_TAG_LABEL, pkt->buf);
 				pkt->sync = false;
 			}
 			else
 			{
 				/* Check for buffer overflow */
-				if (pkt->len >= TAG_MAX_LEN)
+				if (pkt->len >= CONFIG_TAG_MAX_LEN)
 				{
-					kprintf("TAG buffer overflow\n");
+					LOG_ERR("TAG buffer overflow\n");
 					pkt->sync = false;
 				}
 				else
@@ -113,7 +126,7 @@ void keytag_poll(struct TagPacket *pkt)
 	}
 	if (kfile_error(pkt->tag) != 0)
 	{
-		kprintf("Error %08x\n", kfile_error(pkt->tag));
+		LOG_ERR("Error %08x\n", kfile_error(pkt->tag));
 		kfile_clearerr(pkt->tag);
 	}
 
