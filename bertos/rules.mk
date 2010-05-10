@@ -161,6 +161,9 @@ ifeq ($$($(1)_DEBUG),1)
 
         $(1)_CFLAGS += -D_DEBUG
         $(1)_CXXFLAGS += -D_DEBUG
+else
+        $(1)_CFLAGS += -fomit-frame-pointer
+        $(1)_CXXFLAGS += -fomit-frame-pointer
 endif
 
 $(1)_COBJ    = $$(foreach file,$$($(1)_CSRC:%.c=%.o),$$(OBJDIR)/$(1)/$$(file))
