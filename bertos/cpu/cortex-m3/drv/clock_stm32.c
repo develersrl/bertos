@@ -71,7 +71,7 @@ INLINE uint16_t pll_clock(void)
 	/* Hopefully this is evaluate at compile time... */
 	for (div = 2; div; div--)
 		for (mul = 2; mul <= 16; mul++)
-			if (CPU_FREQ >= (PLL_VCO / div * mul))
+			if (CPU_FREQ <= (PLL_VCO / div * mul))
 				break;
 	return mul << 8 | div;
 }
