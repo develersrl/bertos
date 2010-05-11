@@ -423,7 +423,6 @@ typedef const void * const_iptr_t;
 
 typedef unsigned char sigbit_t;  /**< Type for signal bits. */
 typedef unsigned char sigmask_t; /**< Type for signal masks. */
-typedef unsigned char page_t;    /**< Type for banked memory pages. */
 
 
 /**

@@ -30,29 +30,42 @@
  *
  * -->
  *
- * \brief Self programming routines (interface).
- *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  * \author Daniele Basile <asterix@develer.com>
+ *
+ * \brief AVR Internal flash read/write driver.
+ *
+ *
  */
 
-#ifndef DRV_FLASH_AVR_H
-#define DRV_FLASH_AVR_H
+#ifndef FLASH_AT91_H
+#define FLASH_AT91_H
+
+#include <cpu/types.h>
 
 #include <cfg/compiler.h>
+
 #include <kern/kfile.h>
+
 #include <avr/io.h>
 
+
+#define FLASH_PAGE_SIZE SPM_PAGESIZE
 
 /**
  * Definition of type for avr flash module.
  */
-typedef uint16_t avr_page_t;
+typedef uint16_t page_t;
 
+/* Forward declaration */
+struct Flash;
 
 /**
  * FlashAvr KFile context structure.
+ * DEPREACTED STRUCTURE!
+ * Use Flash instead
+ *
+ * \{
  */
 typedef struct FlashAvr
 {
@@ -62,43 +75,33 @@ typedef struct FlashAvr
 	KFile fd;
 
 	/**
-	 * Current buffered page.
-	 */
-	avr_page_t curr_page;
-
-	/**
 	 * Flag for checking if current page is modified.
 	 */
 	bool page_dirty;
+
+	/**
+	 * Current buffered page.
+	 */
+	page_t curr_page;
 
 	/**
 	 * Temporary buffer cointaing data block to
 	 * write on flash.
 	 */
 	uint8_t page_buf[SPM_PAGESIZE];
-
-
 } FlashAvr;
+/* \} */
 
-
-
-/**
- * ID for FlashAvr
- */
-#define KFT_FLASHAVR MAKE_ID('F', 'L', 'A', 'V')
+void flash_hw_init(struct Flash *fd);
 
 /**
- * Convert + ASSERT from generic KFile to FlashAvr.
+ * WARNING!
+ * This function is DEPRECADED!
+ * use the flash module instead.
  */
-INLINE FlashAvr * FLASHAVR_CAST(KFile *fd)
+INLINE void flash_avr_init(struct FlashAvr *fd)
 {
-	ASSERT(fd->_type == KFT_FLASHAVR);
-	return (FlashAvr *)fd;
+	flash_hw_init((struct Flash *)fd);
 }
-
-
-void flash_avr_init(struct FlashAvr *fd);
-
-
 
 #endif /* DRV_FLASH_AVR_H */

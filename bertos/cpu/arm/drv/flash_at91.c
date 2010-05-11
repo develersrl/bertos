@@ -59,6 +59,7 @@
 #include <io/arm.h>
 
 #include <drv/timer.h>
+#include <drv/flash.h>
 
 #include <string.h>
 
@@ -130,15 +131,15 @@ RAM_FUNC static int flash_at91_getStatus(struct KFile *_fd)
  * Write modified page on internal latch, and then send write command to
  * flush page to internal flash.
  */
-RAM_FUNC static void flash_at91_flush(FlashAt91 *fd)
+RAM_FUNC static void flash_at91_flush(Flash *fd)
 {
 	if (fd->page_dirty)
 	{
 		//Compute page address of current page.
-		arm_page_addr_t *addr = (arm_page_addr_t *)((fd->curr_page * FLASH_PAGE_SIZE_BYTES) + FLASH_BASE);
+		page_addr_t *addr = (page_addr_t *)((fd->curr_page * FLASH_PAGE_SIZE_BYTES) + FLASH_BASE);
 
 		//Copy modified page into internal latch.
-		for (arm_page_addr_t page_addr = 0; page_addr < FLASH_PAGE_SIZE_BYTES; page_addr += 4)
+		for (page_addr_t page_addr = 0; page_addr < FLASH_PAGE_SIZE_BYTES; page_addr += 4)
 		{
 			uint32_t data;
 			memcpy(&data, &fd->page_buf[page_addr], sizeof(data));
@@ -159,7 +160,7 @@ RAM_FUNC static void flash_at91_flush(FlashAt91 *fd)
  */
 static int flash_at91_kfileFlush(struct KFile *_fd)
 {
-	FlashAt91 *fd = FLASHAT91_CAST(_fd);
+	Flash *fd = FLASH_CAST(_fd);
 	flash_at91_flush(fd);
 	return 0;
 }
@@ -169,7 +170,7 @@ static int flash_at91_kfileFlush(struct KFile *_fd)
  * Check current page and if \a page is different, load it in
  * temporary buffer.
  */
-static void flash_at91_loadPage(FlashAt91 *fd, arm_page_t page)
+static void flash_at91_loadPage(Flash *fd, page_t page)
 {
 	if (page != fd->curr_page)
 	{
@@ -189,11 +190,11 @@ static void flash_at91_loadPage(FlashAt91 *fd, arm_page_t page)
  */
 static size_t flash_at91_write(struct KFile *_fd, const void *_buf, size_t size)
 {
-	FlashAt91 *fd = FLASHAT91_CAST(_fd);
+	Flash *fd = FLASH_CAST(_fd);
 	const uint8_t *buf =(const uint8_t *)_buf;
 
-	arm_page_t page;
-	arm_page_addr_t page_addr;
+	page_t page;
+	page_addr_t page_addr;
 	size_t total_write = 0;
 
 	size = MIN((kfile_off_t)size, (kfile_off_t)(fd->fd.size - (fd->fd.seek_pos - FLASH_BASE)));
@@ -225,7 +226,7 @@ static size_t flash_at91_write(struct KFile *_fd, const void *_buf, size_t size)
  */
 static int flash_at91_close(struct KFile *_fd)
 {
-	FlashAt91 *fd = FLASHAT91_CAST(_fd);
+	Flash *fd = FLASH_CAST(_fd);
 	flash_at91_flush(fd);
 	LOG_INFO("Flash file closed\n");
 
@@ -237,7 +238,7 @@ static int flash_at91_close(struct KFile *_fd)
  * \a name and \a mode are unused, cause flash memory is
  * threated like one file.
  */
-static void flash_at91_open(struct FlashAt91 *fd)
+static void flash_at91_open(struct Flash *fd)
 {
 	fd->fd.size = FLASH_BASE + FLASH_MEM_SIZE;
 	fd->fd.seek_pos = FLASH_BASE + FLASH_BOOT_SIZE;
@@ -256,7 +257,7 @@ static void flash_at91_open(struct FlashAt91 *fd)
  */
 static kfile_off_t flash_at91_seek(struct KFile *_fd, kfile_off_t offset, KSeekMode whence)
 {
-	FlashAt91 *fd = FLASHAT91_CAST(_fd);
+	Flash *fd = FLASH_CAST(_fd);
 	kfile_off_t seek_pos;
 
 	switch (whence)
@@ -293,7 +294,7 @@ static kfile_off_t flash_at91_seek(struct KFile *_fd, kfile_off_t offset, KSeekM
  */
 static struct KFile *flash_at91_reopen(struct KFile *_fd)
 {
-	FlashAt91 *fd = FLASHAT91_CAST(_fd);
+	Flash *fd = FLASH_CAST(_fd);
 	flash_at91_close(_fd);
 	flash_at91_open(fd);
 
@@ -306,7 +307,7 @@ static struct KFile *flash_at91_reopen(struct KFile *_fd)
  */
 static size_t flash_at91_read(struct KFile *_fd, void *_buf, size_t size)
 {
-	FlashAt91 *fd = FLASHAT91_CAST(_fd);
+	Flash *fd = FLASH_CAST(_fd);
 	uint8_t *buf =(uint8_t *)_buf;
 
 	size = MIN((kfile_off_t)size, fd->fd.size - fd->fd.seek_pos);
@@ -330,10 +331,10 @@ static size_t flash_at91_read(struct KFile *_fd, void *_buf, size_t size)
  * Init module to perform write and read operation on internal
  * flash memory.
  */
-void flash_at91_init(FlashAt91 *fd)
+void flash_hw_init(struct Flash *fd)
 {
 	memset(fd, 0, sizeof(*fd));
-	DB(fd->fd._type = KFT_FLASHAT91);
+	DB(fd->fd._type = KFT_FLASH);
 
 	// Set up flash programming functions.
 	fd->fd.reopen = flash_at91_reopen;

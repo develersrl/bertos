@@ -26,80 +26,21 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2009 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2007 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
+ * \brief Low-level flash module for ARM (interface).
+ *
  * \author Daniele Basile <asterix@develer.com>
  *
- * \brief At91sam7 Internal flash read/write driver.
- *
- *
  */
 
-#ifndef FLASH_AT91_H
-#define FLASH_AT91_H
+#include <cpu/detect.h>
 
-#include <cpu/types.h>
-
-#include <kern/kfile.h>
-
-#include <io/arm.h>
-
-
-#define FLASH_PAGE_SIZE FLASH_PAGE_SIZE_BYTES
-
-/**
- * Define data type to manage page and memory address.
- */
-typedef uint32_t page_t;
-typedef uint32_t page_addr_t;
-
-struct Flash;
-
-/**
- * FlashAt91 KFile context structure.
- *
- * DEPREACTED STRUCTURE!
- * Use EmbFlash instead
- *
- * \{
- */
-typedef struct FlashAt91
-{
-	/**
-	 * File descriptor.
-	 */
-	KFile fd;
-
-	/**
-	 * Flag for checking if current page is modified.
-	 */
-	bool page_dirty;
-
-	/**
-	 * Current buffered page.
-	 */
-	page_t curr_page;
-
-	/**
-	 * Temporary buffer cointaing data block to
-	 * write on flash.
-	 */
-	uint8_t page_buf[FLASH_PAGE_SIZE_BYTES];
-} FlashAt91;
-/* \} */
-
-void flash_hw_init(struct Flash *fd);
-
-/**
- * WARNING!
- * This function is DEPRECADED!
- * use the emb_flash module instead.
- */
-INLINE void flash_at91_init(struct FlashAt91 *fd)
-{
-	flash_hw_init((struct Flash *)fd);
-}
-
-#endif /* DRV_FLASH_ARM_H */
+#if CPU_ARM_AT91
+	#include "flash_at91.h"
+/*#elif  Add other ARM families here */
+#else
+	#error Unknown CPU
+#endif
