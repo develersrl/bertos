@@ -43,7 +43,7 @@
 #include <drv/lcd_rit128x96.h>
 #include <drv/timer.h>
 #include <drv/ser.h>
-#include <drv/flash_lm3s.h>
+#include <drv/flash.h>
 #include <drv/kbd.h>
 
 #include <kern/proc.h>
@@ -84,7 +84,7 @@ static long target_lat, target_lon;
 
 /* Storage stuff */
 #define GPS_POS_MAGIC 0xdeadbeef
-static FlashLM3S flash;
+static Flash flash;
 
 static void flash_load_target(void)
 {
@@ -550,7 +550,7 @@ static void init(void)
 	scrsvr_timestamp = ticks_to_ms(timer_clock_unlocked());
 	led_init();
 
-	flash_lm3sInit(&flash);
+	flash_init(&flash);
 	flash_load_target();
 
 	ser_init(&ser_port, SER_UART1);
