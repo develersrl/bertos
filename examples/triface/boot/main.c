@@ -57,7 +57,7 @@
 
 #include <drv/ser.h>
 #include <drv/timer.h>
-#include <drv/flash_avr.h>
+#include <drv/flash.h>
 
 #include <string.h>
 
@@ -89,12 +89,12 @@ void wdt_init(void)
 
 int main(void)
 {
-	FlashAvr flash;
+	Flash flash;
 	Serial ser;
 
 
 	// Set up flash programming functions.
-	flash_avr_init(&flash);
+	flash_init(&flash);
 
 	IRQ_ENABLE;
 
