@@ -27,36 +27,20 @@
  * the GNU General Public License.
  *
  * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
- *
+ * All Rights Reserved.
  * -->
  *
- * \brief Configuration file for KFile interface module.
+ * \brief Configuration file for parser module.
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef CFG_KFILE_H
-#define CFG_KFILE_H
+#ifndef CFG_PARSER_H
+#define CFG_PARSER_H
 
-/**
- * Module logging level.
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_level"
- */
-#define KFILE_LOG_LEVEL        LOG_LVL_INFO
 
-/**
- * Module logging format.
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_format"
- */
-#define KFILE_LOG_FORMAT       LOG_FMT_TERSE
 
-/**
- * Enable the gets function with echo.
- * $WIZ$ type = "boolean"
- */
-#define CONFIG_KFILE_GETS      0
+#endif /* CFG_PARSER_H */
 
-#endif /* CFG_KFILE_H */
+
+

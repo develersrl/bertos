@@ -27,33 +27,35 @@
  * the GNU General Public License.
  *
  * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ *
  * -->
  *
- * \brief Configuration file for keyboard module.
- *
- * \version $Id$
+ * \brief Configuration file for KFile interface module.
  *
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef CFG_KBD_H
-#define CFG_KBD_H
+#ifndef CFG_KFILE_H
+#define CFG_KFILE_H
 
-/// Keyboard polling method. $WIZ$ supports = "False"
-#define CONFIG_KBD_POLL  KBD_POLL_SOFTINT
+/**
+ * Module logging level.
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
+ */
+#define KFILE_LOG_LEVEL        LOG_LVL_INFO
 
-/// Enable keyboard event delivery to observers. $WIZ$ type = "boolean"
-#define CONFIG_KBD_OBSERVER  0
+/**
+ * Module logging format.
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define KFILE_LOG_FORMAT       LOG_FMT_TERSE
 
-/// Enable key beeps. $WIZ$ type = "boolean"
-#define CONFIG_KBD_BEEP  0
+/**
+ * Enable the gets function with echo.
+ * $WIZ$ type = "boolean"
+ */
+#define CONFIG_KFILE_GETS      0
 
-/// Enable long pression handler for keys. $WIZ$ type = "boolean"
-#define CONFIG_KBD_LONGPRESS  0
-
-/// Enable calling poor man's scheduler to be called inside kbd_peek. $WIZ$ type = "boolean"
-#define CONFIG_KBD_SCHED 0
-
-#endif /* CFG_KBD_H */
-
+#endif /* CFG_KFILE_H */

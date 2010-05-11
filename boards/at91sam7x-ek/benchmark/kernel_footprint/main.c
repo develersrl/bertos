@@ -26,56 +26,29 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ *
  * -->
  *
- * \brief Configuration file for xmodem module.
- *
- * \version $Id$
- *
  * \author Daniele Basile <asterix@develer.com>
+ *
+ * \brief Kernel footprint benchmark.
+ *
+ * This benchmark show you how much flash space could use the BeRTOS kernel application.
+ * Try to compile it and verify how few space the kernel needs to run.
+ * By default this benchmark have all kernel switch enabled, and the context switch is preemptive
+ * mode, try to modify the kernel setting throught the cfg file.
  */
 
-#ifndef CFG_XMODEM_H
-#define CFG_XMODEM_H
+#include <benchmark/kernel_footprint.h>
 
-/**
- * Module logging level.
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_level"
- */
-#define CONFIG_XMODEM_LOG_LEVEL        LOG_LVL_ERR
-/**
- * Module logging format.
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_format"
- */
-#define CONFIG_XMODEM_LOG_FORMAT       LOG_FMT_TERSE
+int main(void)
+{
+	kernel_footprint();
+	while (1)
+	{
+	}
 
-
-/// Enable Rx. $WIZ$ type = "boolean"
-#define CONFIG_XMODEM_RECV   1
-
-/// Enable TX. $WIZ$ type = "boolean"
-#define CONFIG_XMODEM_SEND   1
-
-/// Allow a Rx/Tx of 1Kbyte block. $WIZ$ type = "boolean"
-#define CONFIG_XMODEM_1KCRC  1
-
-/**
- * Max retries before giving up.
- * $WIZ$ type = "int"
- * $WIZ$ min = 1
- */
-#define CONFIG_XMODEM_MAXRETRIES     15
-
-/**
- * Max retries before switching to BCC.
- * $WIZ$ type = "int"
- * $WIZ$ min = 1
- */
-#define CONFIG_XMODEM_MAXCRCRETRIES   7
-
-#endif /* CFG_XMODEM_H */
+	return 0;
+}
 

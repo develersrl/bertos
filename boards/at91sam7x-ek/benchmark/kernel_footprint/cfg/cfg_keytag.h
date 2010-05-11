@@ -26,56 +26,36 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
  * All Rights Reserved.
  * -->
  *
- * \brief Configuration file for xmodem module.
- *
- * \version $Id$
+ * \brief Configuration file for keytag module.
  *
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef CFG_XMODEM_H
-#define CFG_XMODEM_H
+#ifndef CFG_KEYTAG_H
+#define CFG_KEYTAG_H
 
 /**
  * Module logging level.
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_level"
  */
-#define CONFIG_XMODEM_LOG_LEVEL        LOG_LVL_ERR
+#define CONFIG_KEYTAG_LOG_LEVEL        LOG_LVL_ERR
 /**
  * Module logging format.
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_format"
  */
-#define CONFIG_XMODEM_LOG_FORMAT       LOG_FMT_TERSE
-
-
-/// Enable Rx. $WIZ$ type = "boolean"
-#define CONFIG_XMODEM_RECV   1
-
-/// Enable TX. $WIZ$ type = "boolean"
-#define CONFIG_XMODEM_SEND   1
-
-/// Allow a Rx/Tx of 1Kbyte block. $WIZ$ type = "boolean"
-#define CONFIG_XMODEM_1KCRC  1
+#define CONFIG_KEYTAG_LOG_FORMAT       LOG_FMT_TERSE
 
 /**
- * Max retries before giving up.
+ * Max buffer lenght
  * $WIZ$ type = "int"
- * $WIZ$ min = 1
  */
-#define CONFIG_XMODEM_MAXRETRIES     15
+#define CONFIG_TAG_MAX_LEN 14U
 
-/**
- * Max retries before switching to BCC.
- * $WIZ$ type = "int"
- * $WIZ$ min = 1
- */
-#define CONFIG_XMODEM_MAXCRCRETRIES   7
-
-#endif /* CFG_XMODEM_H */
+#endif /* CFG_KEYTAG_H */
 

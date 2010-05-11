@@ -27,36 +27,26 @@
  * the GNU General Public License.
  *
  * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
- *
+ * All Rights Reserved.
  * -->
  *
- * \brief Configuration file for KFile interface module.
+ * \brief Configuration file for hashtable module.
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef CFG_KFILE_H
-#define CFG_KFILE_H
+#ifndef CFG_HASHTABLE_H
+#define CFG_HASHTABLE_H
 
 /**
- * Module logging level.
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_level"
- */
-#define KFILE_LOG_LEVEL        LOG_LVL_INFO
-
-/**
- * Module logging format.
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_format"
- */
-#define KFILE_LOG_FORMAT       LOG_FMT_TERSE
-
-/**
- * Enable the gets function with echo.
+ * Enable/disable support to declare special hash tables which maintain a copy of
+ * the key internally instead of relying on the hook to extract it from the data.
+ *
  * $WIZ$ type = "boolean"
  */
-#define CONFIG_KFILE_GETS      0
+#define CONFIG_HT_OPTIONAL_INTERNAL_KEY      1
 
-#endif /* CFG_KFILE_H */
+#endif /* CFG_HASHTABLE_H */
+
+
+

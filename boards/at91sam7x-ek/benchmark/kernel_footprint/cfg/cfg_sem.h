@@ -26,29 +26,23 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * Copyright 2001, 2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 1999, 2000, 2001, 2008 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
- * \brief Configuration file for MD2 module.
+ * \brief Kernel semaphores configuration parameters.
  *
  * \version $Id$
- *
- * \author Daniele Basile <asterix@develer.com>
+ * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
-#ifndef CFG_MD2_H
-#define CFG_MD2_H
+#ifndef CFG_SEM_H
+#define CFG_SEM_H
 
 /**
- * Size of block for MD2 algorithm.
- * $WIZ$ type = "int"
- * $WIZ$ min = 2
+ * Re-entrant mutual exclusion primitives.
+ * $WIZ$ type = "autoenabled"
  */
-#define CONFIG_MD2_BLOCK_LEN    16
+#define CONFIG_KERN_SEMAPHORES  0
 
-/// Use standard permutation in MD2 algorithm. $WIZ$ type = "boolean"
-#define CONFIG_MD2_STD_PERM     0
-
-#endif /* CFG_MD2_H */
-
+#endif /*  CFG_SEM_H */
