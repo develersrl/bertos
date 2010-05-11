@@ -35,19 +35,25 @@
  * \author Andrea Righi <arighi@develer.com>
  */
 
-#include <cfg/macros.h>
-#include <kern/kfile.h>
-#include <drv/timer.h>
-#include <cpu/power.h> /* cpu_relax() */
-#include <string.h> /* memcpy() */
-#include "cfg/log.h"
 #include "flash_lm3s.h"
+#include "cfg/log.h"
 
-static int flash_lm3s_erase_page(volatile uint32_t *addr)
+#include <cfg/macros.h>
+
+#include <kern/kfile.h>
+
+#include <drv/timer.h>
+#include <drv/flash.h>
+#include <cpu/power.h> /* cpu_relax() */
+
+#include <string.h> /* memcpy() */
+
+
+static int flash_lm3s_erase_page(page_t addr)
 {
 	FLASH_FCMISC_R = FLASH_FCMISC_AMISC;
 
-	FLASH_FMA_R = (uint32_t)addr;
+	FLASH_FMA_R = (volatile uint32_t)addr;
 	FLASH_FMC_R = FLASH_FMC_WRKEY | FLASH_FMC_ERASE;
 
 	while (FLASH_FMC_R & FLASH_FMC_ERASE)
@@ -57,12 +63,14 @@ static int flash_lm3s_erase_page(volatile uint32_t *addr)
 	return 0;
 }
 
-static int flash_lm3s_write_word(volatile uint32_t *addr, uint32_t data)
+static int flash_lm3s_write_word(page_t addr, const uint8_t *data, size_t len)
 {
 	FLASH_FCMISC_R = FLASH_FCMISC_AMISC;
 
-	FLASH_FMA_R = (uint32_t)addr;
-	FLASH_FMD_R = data;
+	uint32_t _data;
+	memcpy(&_data, data, len);
+	FLASH_FMA_R = (volatile uint32_t)addr;
+	FLASH_FMD_R = (volatile uint32_t)_data;
 	FLASH_FMC_R = FLASH_FMC_WRKEY | FLASH_FMC_WRITE;
 
 	while (FLASH_FMC_R & FLASH_FMC_WRITE)
@@ -72,21 +80,21 @@ static int flash_lm3s_write_word(volatile uint32_t *addr, uint32_t data)
 	return 0;
 }
 
-static void _flash_lm3s_flush(FlashLM3S *fd)
+static void _flash_lm3s_flush(Flash *fd)
 {
-	unsigned int i;
-
 	if (!fd->page_dirty)
 		return;
+
 	LOG_INFO("Erase page %p\n", fd->curr_page);
 	flash_lm3s_erase_page(fd->curr_page);
+
 	LOG_INFO("Flush page %p\n", fd->curr_page);
-	for (i = 0; i < FLASH_PAGE_SIZE_BYTES / sizeof(uint32_t); i++)
-		flash_lm3s_write_word(&fd->curr_page[i], fd->page_buf[i]);
+	for (int i = 0; i < FLASH_PAGE_SIZE_BYTES; i+=4)
+		flash_lm3s_write_word(fd->curr_page + i, &fd->page_buf[i], sizeof(uint32_t));
 	fd->page_dirty = false;
 }
 
-static void flash_lm3s_load_page(FlashLM3S *fd, uint32_t *page)
+static void flash_lm3s_load_page(Flash *fd, page_t page)
 {
 	ASSERT(!((size_t)page % FLASH_PAGE_SIZE_BYTES));
 
@@ -109,7 +117,7 @@ static void flash_lm3s_load_page(FlashLM3S *fd, uint32_t *page)
  */
 static size_t flash_lm3s_write(struct KFile *_fd, const void *_buf, size_t size)
 {
-	FlashLM3S *fd = FLASHLM3S_CAST(_fd);
+	Flash *fd = FLASH_CAST(_fd);
 	const uint8_t *buf =(const uint8_t *)_buf;
 	size_t total_write = 0;
 	size_t len;
@@ -120,8 +128,7 @@ static size_t flash_lm3s_write(struct KFile *_fd, const void *_buf, size_t size)
 	LOG_INFO("Writing at pos[%lx]\n", fd->fd.seek_pos);
 	while (size)
 	{
-		uint32_t *page = (uint32_t *)(fd->fd.seek_pos &
-						~(FLASH_PAGE_SIZE_BYTES - 1));
+		page_t page = (fd->fd.seek_pos & ~(FLASH_PAGE_SIZE_BYTES - 1));
 		size_t offset = fd->fd.seek_pos % FLASH_PAGE_SIZE_BYTES;
 
 		flash_lm3s_load_page(fd, page);
@@ -145,7 +152,7 @@ static size_t flash_lm3s_write(struct KFile *_fd, const void *_buf, size_t size)
  */
 static int flash_lm3s_close(struct KFile *_fd)
 {
-	FlashLM3S *fd = FLASHLM3S_CAST(_fd);
+	Flash *fd = FLASH_CAST(_fd);
 	_flash_lm3s_flush(fd);
 	LOG_INFO("Flash file closed\n");
 	return 0;
@@ -154,7 +161,7 @@ static int flash_lm3s_close(struct KFile *_fd)
 /**
  * Open flash file \a fd
  */
-static void flash_lm3s_open(struct FlashLM3S *fd)
+static void flash_lm3s_open(Flash *fd)
 {
 	fd->fd.size = FLASH_BASE + FLASH_MEM_SIZE;
 	fd->fd.seek_pos = FLASH_BASE;
@@ -162,7 +169,7 @@ static void flash_lm3s_open(struct FlashLM3S *fd)
 	 * Set an invalid page to force the load of the next actually used page
 	 * in cache.
 	 */
-	fd->curr_page = (uint32_t *)FLASH_BASE + FLASH_MEM_SIZE;
+	fd->curr_page = FLASH_BASE + FLASH_MEM_SIZE;
 
 	fd->page_dirty = false;
 	LOG_INFO("Flash file opened\n");
@@ -173,7 +180,7 @@ static void flash_lm3s_open(struct FlashLM3S *fd)
  */
 static kfile_off_t flash_lm3s_seek(struct KFile *_fd, kfile_off_t offset, KSeekMode whence)
 {
-	FlashLM3S *fd = FLASHLM3S_CAST(_fd);
+	Flash *fd = FLASH_CAST(_fd);
 	kfile_off_t seek_pos;
 
 	switch (whence)
@@ -204,7 +211,7 @@ static kfile_off_t flash_lm3s_seek(struct KFile *_fd, kfile_off_t offset, KSeekM
  */
 static struct KFile *flash_lm3s_reopen(struct KFile *_fd)
 {
-	FlashLM3S *fd = FLASHLM3S_CAST(_fd);
+	Flash *fd = FLASH_CAST(_fd);
 	flash_lm3s_close(_fd);
 	flash_lm3s_open(fd);
 
@@ -217,7 +224,7 @@ static struct KFile *flash_lm3s_reopen(struct KFile *_fd)
  */
 static size_t flash_lm3s_read(struct KFile *_fd, void *_buf, size_t size)
 {
-	FlashLM3S *fd = FLASHLM3S_CAST(_fd);
+	Flash *fd = FLASH_CAST(_fd);
 	uint8_t *buf =(uint8_t *)_buf, *addr;
 
 	size = MIN((kfile_off_t)size, fd->fd.size - fd->fd.seek_pos);
@@ -239,7 +246,7 @@ static size_t flash_lm3s_read(struct KFile *_fd, void *_buf, size_t size)
 
 static int flash_lm3s_flush(struct KFile *_fd)
 {
-	FlashLM3S *fd = FLASHLM3S_CAST(_fd);
+	Flash *fd = FLASH_CAST(_fd);
 
 	_flash_lm3s_flush(fd);
 	return 0;
@@ -249,10 +256,10 @@ static int flash_lm3s_flush(struct KFile *_fd)
  * Init module to perform write and read operation on internal
  * flash memory.
  */
-void flash_lm3sInit(FlashLM3S *fd)
+void flash_hw_init(Flash *fd)
 {
 	memset(fd, 0, sizeof(*fd));
-	DB(fd->fd._type = KFT_FLASHLM3S);
+	DB(fd->fd._type = KFT_FLASH);
 
 	fd->fd.reopen = flash_lm3s_reopen;
 	fd->fd.close = flash_lm3s_close;

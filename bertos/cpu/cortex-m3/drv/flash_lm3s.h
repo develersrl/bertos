@@ -42,50 +42,19 @@
 #include <kern/kfile.h>
 
 /* Flash memory mapping */
-#define FLASH_MEM_SIZE		0x40000 //< 256KiB
+#define FLASH_MEM_SIZE          0x40000 //< 256KiB
 #define FLASH_PAGE_SIZE_BYTES	0x400   //< 1KiB
 
-/**
- * FlashLM3S KFile context structure.
- */
-typedef struct FlashLM3S
-{
-	/**
-	 * File descriptor.
-	 */
-	KFile fd;
 
-	/**
-	 * Flag for checking if current page is modified.
-	 */
-	bool page_dirty;
-
-	/**
-	 * Current buffered page.
-	 */
-	uint32_t *curr_page;
-
-	/**
-	 * Temporary buffer cointaing data block to
-	 * write on flash.
-	 */
-	uint32_t page_buf[FLASH_PAGE_SIZE_BYTES / sizeof(uint32_t)];
-} FlashLM3S;
+#define FLASH_PAGE_SIZE    FLASH_PAGE_SIZE_BYTES
 
 /**
- * ID for FlashLM3S
+ * Define data type to manage page and memory address.
  */
-#define KFT_FLASHLM3S MAKE_ID('F', 'L', '3', 'S')
+typedef uint32_t page_t;
 
-/**
- * Convert + ASSERT from generic KFile to FlashLM3S structure.
- */
-INLINE FlashLM3S * FLASHLM3S_CAST(KFile *fd)
-{
-	ASSERT(fd->_type == KFT_FLASHLM3S);
-	return (FlashLM3S *)fd;
-}
+struct Flash;
 
-void flash_lm3sInit(FlashLM3S *fd);
+void flash_hw_init(struct Flash *fd);
 
 #endif /* FLASH_LM3S_H */
