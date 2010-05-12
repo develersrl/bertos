@@ -1,0 +1,31 @@
+
+avrdude: AVR device initialized and ready to accept instructions
+
+Reading | ################################################## | 100% 0.04s
+
+avrdude: Device signature = 0x1e9704
+avrdude: NOTE: FLASH memory has been specified, an erase cycle will be performed
+         To disable this feature, specify the -D option.
+avrdude: erasing chip
+avrdude: reading input file "images/context_switch.hex"
+avrdude: input file images/context_switch.hex auto detected as Intel Hex
+avrdude: writing flash (12988 bytes):
+
+Writing | ################################################## | 100% 4.11s
+
+avrdude: 12988 bytes of flash written
+avrdude: verifying flash memory against images/context_switch.hex:
+avrdude: load data flash data from input file images/context_switch.hex:
+avrdude: input file images/context_switch.hex auto detected as Intel Hex
+avrdude: input file images/context_switch.hex contains 12988 bytes
+avrdude: reading on-chip flash data:
+
+Reading | ################################################## | 100% 3.07s
+
+avrdude: verifying ...
+avrdude: 12988 bytes of flash verified
+
+avrdude: safemode: Fuses OK
+
+avrdude done.  Thank you.
+
