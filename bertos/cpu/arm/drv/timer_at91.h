@@ -99,6 +99,11 @@
 		return PIIR & CPIV_MASK;
 	}
 
+	INLINE hptime_t timer_hw_hpticks(ticks_t clock)
+	{
+		return timer_hw_hpread() + clock * TIMER_HW_CNT;
+	}
+
 #else
 
 	#error Unimplemented value for CONFIG_TIMER

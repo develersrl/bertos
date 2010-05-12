@@ -146,6 +146,13 @@ INLINE ticks_t timer_clock_unlocked(void)
 	return _clock;
 }
 
+/**
+ */
+INLINE hptime_t timer_clock_hp(void)
+{
+	return timer_hw_hpticks(_clock);
+}
+
 /** Convert \a ms [ms] to ticks. */
 INLINE ticks_t ms_to_ticks(mtime_t ms)
 {

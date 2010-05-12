@@ -38,6 +38,8 @@
 #ifndef TIMER_CM3_H
 #define TIMER_CM3_H
 
+#include "cfg/cfg_timer.h"     /* CONFIG_TIMER */
+
 #if CPU_CM3_LM3S
 	#include <io/lm3s.h>
 #elif CPU_CM3_STM32
@@ -52,40 +54,54 @@
  *
  * Select which hardware timer interrupt to use for system clock and softtimers.
  *
- * $WIZ$ timer_select = "TIMER_DEFAULT"
+ * $WIZ$ timer_select = "TIMER_DEFAULT", "TIMER_ON_GPTM"
  */
-#define TIMER_DEFAULT  /*  */ ///< Default system timer
+#define TIMER_ON_GPTM  1
 
-/* Ticks frequency (HZ) */
-#define TIMER_TICKS_PER_SEC	1000
+#define TIMER_DEFAULT  TIMER_ON_GPTM ///< Default system timer
 
-/* Frequency of the hardware high-precision timer. */
-#define TIMER_HW_HPTICKS_PER_SEC (CPU_FREQ)
+#if (CONFIG_TIMER == TIMER_ON_GPTM)
+	/* Ticks frequency (HZ) */
+	#define TIMER_TICKS_PER_SEC	1000
 
-/* Maximum value of the high-precision hardware counter register */
-#define TIMER_HW_CNT (CPU_FREQ / TIMER_TICKS_PER_SEC)
+	/* Frequency of the hardware high-precision timer. */
+	#define TIMER_HW_HPTICKS_PER_SEC (CPU_FREQ)
 
-/** Type of time expressed in ticks of the hardware high-precision timer */
-typedef uint32_t hptime_t;
-#define SIZEOF_HPTIME_T 4
+	/* Maximum value of the high-precision hardware counter register */
+	#define TIMER_HW_CNT (CPU_FREQ / TIMER_TICKS_PER_SEC)
 
-/* Timer ISR prototype */
-ISR_PROTO_CONTEXT_SWITCH(timer_handler);
-#define DEFINE_TIMER_ISR DECLARE_ISR_CONTEXT_SWITCH(timer_handler)
+	/** Type of time expressed in ticks of the hardware high-precision timer */
+	typedef uint32_t hptime_t;
+	#define SIZEOF_HPTIME_T 4
 
-INLINE void timer_hw_irq(void)
-{
-}
+	/* Timer ISR prototype */
+	ISR_PROTO_CONTEXT_SWITCH(timer_handler);
+	#define DEFINE_TIMER_ISR DECLARE_ISR_CONTEXT_SWITCH(timer_handler)
 
-INLINE bool timer_hw_triggered(void)
-{
-	return true;
-}
+	INLINE void timer_hw_irq(void)
+	{
+	}
 
-INLINE hptime_t timer_hw_hpread(void)
-{
-	return NVIC_ST_CURRENT_R;
-}
+
+	INLINE bool timer_hw_triggered(void)
+	{
+		return true;
+	}
+
+	INLINE hptime_t timer_hw_hpread(void)
+	{
+		return NVIC_ST_CURRENT_R;
+	}
+
+	INLINE hptime_t timer_hw_hpticks(ticks_t clock)
+	{
+		return (TIMER_HW_CNT - timer_hw_hpread()) + clock * TIMER_HW_CNT;
+	}
+
+#else
+
+	#error Unimplemented value for CONFIG_TIMER
+#endif /* CONFIG_TIMER */
 
 void timer_hw_init(void);
 void timer_hw_exit(void);
