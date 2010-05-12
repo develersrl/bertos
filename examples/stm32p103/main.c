@@ -65,7 +65,7 @@ int main(void)
 	for (i = 0; ; i = !i)
 	{
 		stm32_gpioPinWrite((struct stm32_gpio *)GPIOC_BASE, LED_PIN, i);
-		kputs("hello world\n");
+		kputs("BeRTOS up & running!\n");
 		timer_delay(500);
 	}
 }
