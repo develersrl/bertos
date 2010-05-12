@@ -91,6 +91,12 @@ INLINE void lm3s_uartEnable(uint32_t base)
 	lm3s_busyWait(512);
 }
 
+/* Clear the flags register */
+INLINE void lm3s_uartClear(uint32_t base)
+{
+	HWREG(base + UART_O_FR) = 0;
+}
+
 INLINE bool lm3s_uartTxDone(uint32_t base)
 {
 	return HWREG(base + UART_O_FR) & UART_FR_TXFE ? true : false;

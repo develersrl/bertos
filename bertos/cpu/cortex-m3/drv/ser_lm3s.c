@@ -91,12 +91,6 @@ static const struct gpio_uart_info gpio_uart[SER_CNT] =
 	},
 };
 
-/* Clear the flags register */
-INLINE void lm3s_uartClear(uint32_t base)
-{
-	HWREG(base + UART_O_FR) = 0;
-}
-
 void lm3s_uartSetBaudRate(uint32_t base, unsigned long baud)
 {
 	unsigned long div;

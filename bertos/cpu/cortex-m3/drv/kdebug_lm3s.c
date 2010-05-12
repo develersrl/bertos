@@ -39,7 +39,6 @@
 #include <cfg/macros.h> /* for BV() */
 #include <drv/clock_lm3s.h> /* lm3s_busyWait() */
 #include <drv/gpio_lm3s.h>
-#include <io/lm3s.h>
 #include <drv/ser_lm3s.h>
 #include "kdebug_lm3s.h"
 
@@ -47,10 +46,19 @@
 
 #if CONFIG_KDEBUG_PORT == 0
 	#define UART_BASE UART0_BASE
+	#define UART_GPIO_BASE GPIO_PORTA_BASE
+	#define UART_PINS (BV(1) | BV(0))
+	#define UART_REG_SYSCTL SYSCTL_RCGC2_GPIOA
 #elif CONFIG_KDEBUG_PORT == 1
 	#define UART_BASE UART1_BASE
+	#define UART_GPIO_BASE GPIO_PORTD_BASE
+	#define UART_PINS (BV(3) | BV(2))
+	#define UART_REG_SYSCTL SYSCTL_RCGC2_GPIOD
 #elif CONFIG_KDEBUG_PORT == 2
 	#define UART_BASE UART2_BASE
+	#define UART_GPIO_BASE GPIO_PORTG_BASE
+	#define UART_PINS (BV(1) | BV(0))
+	#define UART_REG_SYSCTL SYSCTL_RCGC2_GPIOG
 #else
 	#error "UART port not supported in this board"
 #endif
@@ -72,8 +80,45 @@ typedef uint32_t kdbg_irqsave_t;
 #error CONFIG_KDEBUG_PORT should be KDEBUG_PORT_DBGU
 #endif
 
+INLINE void uart_hw_config(void)
+{
+	unsigned long div, baud = CONFIG_KDEBUG_BAUDRATE;
+	bool hi_speed;
+
+	if (baud * 16 > CPU_FREQ)
+	{
+		hi_speed = true;
+		baud /= 2;
+	}
+	div = (CPU_FREQ * 8 / baud + 1) / 2;
+
+	lm3s_uartDisable(UART_BASE);
+	if (hi_speed)
+		HWREG(UART_BASE + UART_O_CTL) |= UART_CTL_HSE;
+	else
+		HWREG(UART_BASE + UART_O_CTL) &= ~UART_CTL_HSE;
+	/* Set the baud rate */
+	HWREG(UART_BASE + UART_O_IBRD) = div / 64;
+	HWREG(UART_BASE + UART_O_FBRD) = div % 64;
+	/* Set word lenght and parity */
+	HWREG(UART_BASE + UART_O_LCRH) = UART_LCRH_WLEN_8;
+	lm3s_uartClear(UART_BASE);
+	lm3s_uartEnable(UART_BASE);
+}
+
 INLINE void kdbg_hw_init(void)
 {
-	/* Initialize UART0 */
-	lm3s_uartInit(CONFIG_KDEBUG_PORT);
+	uint32_t reg_clock = 1 << CONFIG_KDEBUG_PORT;
+
+	/* Enable the peripheral clock */
+	SYSCTL_RCGC1_R |= reg_clock;
+	SYSCTL_RCGC2_R |= UART_REG_SYSCTL;
+	lm3s_busyWait(512);
+
+	/* Configure GPIO pins to work as UART pins */
+	lm3s_gpioPinConfig(UART_GPIO_BASE, UART_PINS,
+			GPIO_DIR_MODE_HW, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD);
+
+	/* Low-level UART configuration */
+	uart_hw_config();
 }
