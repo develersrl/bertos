@@ -52,6 +52,17 @@ static void led_init(void)
 			LED_PIN, GPIO_MODE_OUT_PP, GPIO_SPEED_50MHZ);
 }
 
+static void NORETURN led_process(void)
+{
+	int i;
+
+	for (i = 0; ; i = !i)
+	{
+		stm32_gpioPinWrite((struct stm32_gpio *)GPIOC_BASE, LED_PIN, i);
+		timer_delay(250);
+	}
+}
+
 int main(void)
 {
 	int i;
@@ -62,9 +73,9 @@ int main(void)
 	proc_init();
 	led_init();
 
+	proc_new(led_process, NULL, KERN_MINSTACKSIZE, NULL);
 	for (i = 0; ; i = !i)
 	{
-		stm32_gpioPinWrite((struct stm32_gpio *)GPIOC_BASE, LED_PIN, i);
 		kputs("BeRTOS up & running!\n");
 		timer_delay(500);
 	}
