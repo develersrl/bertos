@@ -151,10 +151,11 @@ typedef uint32_t kdbg_irqsave_t;
 
 INLINE uint16_t evaluate_brr(void)
 {
-	uint32_t reg, div, frac;
+	uint32_t freq, reg, div, frac;
 
-	/* XXX: PCLK1 has been configured as CPU_FREQ / 2 */
-	div = (0x19 * CPU_FREQ / 2) / (0x04 * CONFIG_KDEBUG_BAUDRATE);
+	/* NOTE: PCLK1 has been configured as CPU_FREQ / 2 */
+	freq = (CONFIG_KDEBUG_PORT == 0) ? CPU_FREQ : CPU_FREQ / 2;
+	div = (0x19 * freq) / (0x04 * CONFIG_KDEBUG_BAUDRATE);
 	reg = (div / 0x64) << 0x04;
 	frac = div - (0x64 * (reg >> 0x04));
 	reg |= ((frac * 0x10 + 0x32) / 0x64) & 0x0f;
@@ -172,17 +173,17 @@ INLINE void kdbg_hw_init(void)
 	RCC->APB2ENR |= RCC_APB2_GPIOA;
 	RCC->APB2ENR |= RCC_APB2_USART1;
 	stm32_gpioPinConfig((struct stm32_gpio *)GPIOA_BASE, GPIO_USART1_TX_PIN,
-				GPIO_SPEED_50MHZ, GPIO_MODE_AF_PP);
+				GPIO_MODE_AF_PP, GPIO_SPEED_50MHZ);
 #elif CONFIG_KDEBUG_PORT == 1
 	RCC->APB2ENR |= RCC_APB2_GPIOA;
 	RCC->APB1ENR |= RCC_APB1_USART2;
 	stm32_gpioPinConfig((struct stm32_gpio *)GPIOA_BASE, GPIO_USART2_TX_PIN,
-				GPIO_SPEED_50MHZ, GPIO_MODE_AF_PP);
+				GPIO_MODE_AF_PP, GPIO_SPEED_50MHZ);
 #elif  CONFIG_KDEBUG_PORT == 2
 	RCC->APB2ENR |= RCC_APB2_GPIOB;
 	RCC->APB2ENR |= RCC_APB1_USART3;
 	stm32_gpioPinConfig((struct stm32_gpio *)GPIOB_BASE, GPIO_USART3_TX_PIN,
-				GPIO_SPEED_50MHZ, GPIO_MODE_AF_PP);
+				GPIO_MODE_AF_PP, GPIO_SPEED_50MHZ);
 #else
 	#error "UART port not supported in this board"
 #endif
