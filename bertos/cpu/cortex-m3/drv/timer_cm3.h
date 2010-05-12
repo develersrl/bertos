@@ -84,7 +84,7 @@ INLINE bool timer_hw_triggered(void)
 
 INLINE hptime_t timer_hw_hpread(void)
 {
-	return HWREG(NVIC_ST_CURRENT);
+	return NVIC_ST_CURRENT_R;
 }
 
 void timer_hw_init(void);

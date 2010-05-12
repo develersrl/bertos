@@ -50,7 +50,7 @@
 #define OB_BASE               (0x1FFFF800)
 
 /* Peripheral memory map */
-#define APB1PERIPH_BASE       ((uint32_t)PERIPH_BASE)
+#define APB1PERIPH_BASE       (PERIPH_BASE)
 #define APB2PERIPH_BASE       (PERIPH_BASE + 0x10000)
 #define AHBPERIPH_BASE        (PERIPH_BASE + 0x20000)
 

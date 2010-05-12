@@ -39,6 +39,8 @@
 
 #if CPU_CM3_LM3S
 	#include "kdebug_lm3s.c"
+#elif CPU_CM3_STM32
+	#include "kdebug_stm32.c"
 /*#elif  Add other families here */
 #else
 	#error Unknown CPU

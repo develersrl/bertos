@@ -26,28 +26,28 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ *
  * -->
  *
- * \brief Configuration file for Debug module.
+ * \brief STM32 debug support (interface).
  *
- * \author Daniele Basile <asterix@develer.com>
+ * \author Andrea Righi <arighi@develer.com>
  */
 
-#ifndef CFG_DEBUG_H
-#define CFG_DEBUG_H
+#ifndef DRV_KDEBUG_STM32_H
+#define DRV_KDEBUG_STM32_H
 
 /**
- * Debug console port.
- * $WIZ$ type = "int"; min = 0
+ * \name Values for CONFIG_KDEBUG_PORT.
+ *
+ * Select which hardware UART to use for system debug.
+ *
+ * \{
  */
-#define CONFIG_KDEBUG_PORT 1
+#define KDEBUG_PORT_DBGU 1  ///< Debug on Debug Unit.
 
-/**
- * Baudrate for the debug console.
- * $WIZ$ type = "int"; min = 300
- */
-#define CONFIG_KDEBUG_BAUDRATE  115200UL
+#define KDEBUG_PORT_DEFAULT KDEBUG_PORT_DBGU  ///< Default debug port.
+/* \} */
 
-#endif /* CFG_DEBUG_H */
+#endif /* DRV_KDEBUG_STM32_H */
