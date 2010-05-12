@@ -136,7 +136,7 @@ void clock_init(void)
 	RCC->CFGR |= RCC_HCLK_DIV1 << 3;
 	/* Configure system clock dividers: PCLK1 (36MHz) */
 	RCC->CFGR &= CFGR_PPRE1_RESET_MASK;
-	RCC->CFGR |= RCC_HCLK_DIV2 << 3;
+	RCC->CFGR |= RCC_HCLK_DIV2;
 	/* Configure system clock dividers: HCLK */
 	RCC->CFGR &= CFGR_HPRE_RESET_MASK;
 	RCC->CFGR |= RCC_SYSCLK_DIV1;
