@@ -9,7 +9,7 @@
 #
 
 # Programmer interface configuration, see http://dev.bertos.org/wiki/ProgrammerInterface for help
-gps_PROGRAMMER_TYPE = lm3s1968
+gps_PROGRAMMER_TYPE = luminary
 gps_PROGRAMMER_PORT = none
 
 # Files included by the user.
