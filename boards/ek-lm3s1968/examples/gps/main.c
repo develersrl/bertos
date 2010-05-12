@@ -1,9 +1,48 @@
+/**
+ * \file
+ * <!--
+ * This file is part of BeRTOS.
+ *
+ * Bertos is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * As a special exception, you may use this file as part of a free software
+ * library without restriction.  Specifically, if other files instantiate
+ * templates or use macros or inline functions from this file, or you compile
+ * this file and link it with other files to produce an executable, this
+ * file does not by itself cause the resulting executable to be covered by
+ * the GNU General Public License.  This exception does not however
+ * invalidate any other reasons why the executable file might be covered by
+ * the GNU General Public License.
+ *
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ *
+ * -->
+ *
+ * \author Andrea Righi <arighi@develer.com>
+ *
+ * \brief DevelGPS demo application with gps.
+ */
+
+#include "hw/hw_led.h"
+
 #include <cpu/irq.h>
 
 #include <drv/lcd_rit128x96.h>
 #include <drv/timer.h>
 #include <drv/ser.h>
-#include <drv/flash_lm3s.h>
+#include <drv/flash.h>
 #include <drv/kbd.h>
 
 #include <kern/proc.h>
@@ -44,7 +83,7 @@ static long target_lat, target_lon;
 
 /* Storage stuff */
 #define GPS_POS_MAGIC 0xdeadbeef
-static FlashLM3S flash;
+static Flash flash;
 
 static void flash_load_target(void)
 {
@@ -70,24 +109,6 @@ static void flash_save_target(void)
 	kfile_flush(&flash.fd);
 }
 
-/* Status LED management */
-static void led_init(void)
-{
-	SYSCTL_RCGC2_R = SYSCTL_RCGC2_GPIOG;
-	(void)SYSCTL_RCGC2_R;
-	GPIO_PORTG_DIR_R = 0x04;
-	GPIO_PORTG_DEN_R = 0x04;
-}
-
-INLINE void led_on(void)
-{
-	GPIO_PORTG_DATA_R |= 0x04;
-}
-
-INLINE void led_off(void)
-{
-	GPIO_PORTG_DATA_R &= ~0x04;
-}
 
 /* Display management */
 INLINE void video_off(void)
@@ -142,9 +163,9 @@ static void NORETURN led_process(void)
 			timer_delay(1000);
 			continue;
 		}
-		led_on();
+		LED_ON();
 		timer_delay(100);
-		led_off();
+		LED_OFF();
 		nmea_update = false;
 	}
 }
@@ -508,9 +529,9 @@ static void init(void)
 	proc_init();
 
 	scrsvr_timestamp = ticks_to_ms(timer_clock_unlocked());
-	led_init();
+	LED_INIT();
 
-	flash_lm3sInit(&flash);
+	flash_init(&flash);
 	flash_load_target();
 
 	ser_init(&ser_port, SER_UART1);
