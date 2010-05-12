@@ -126,8 +126,23 @@ void clock_init(void)
 	rcc_pll_config();
 	while(!rcc_get_flag_status(RCC_FLAG_PLLRDY));
 
+	/* Configure USB clock (48MHz) */
+	*CFGR_USBPRE_BB = RCC_USBCLK_PLLCLK_1DIV5;
+	/* Configure ADC clock: PCLK2 (9MHz) */
+	RCC->CFGR &= CFGR_ADCPRE_RESET_MASK;
+	RCC->CFGR |= RCC_PCLK2_DIV8;
+	/* Configure system clock dividers: PCLK2 (72MHz) */
+	RCC->CFGR &= CFGR_PPRE2_RESET_MASK;
+	RCC->CFGR |= RCC_HCLK_DIV1 << 3;
+	/* Configure system clock dividers: PCLK1 (36MHz) */
+	RCC->CFGR &= CFGR_PPRE1_RESET_MASK;
+	RCC->CFGR |= RCC_HCLK_DIV2 << 3;
+	/* Configure system clock dividers: HCLK */
+	RCC->CFGR &= CFGR_HPRE_RESET_MASK;
+	RCC->CFGR |= RCC_SYSCLK_DIV1;
+
 	/* Set 1 wait state for the flash memory */
-	*(reg32_t *)0x40022000 = 0x12;
+	*(reg32_t *)FLASH_BASE = 0x12;
 
 	/* Clock the system from the PLL */
 	rcc_set_clock_source(RCC_SYSCLK_PLLCLK);

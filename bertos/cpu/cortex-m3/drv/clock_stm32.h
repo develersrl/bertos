@@ -171,6 +171,34 @@
 #define RCC_PLLMUL_14              (0x00300000)
 #define RCC_PLLMUL_15              (0x00340000)
 #define RCC_PLLMUL_16              (0x00380000)
+
+/* APB1/APB2 clock source */
+#define RCC_HCLK_DIV1              (0x00000000)
+#define RCC_HCLK_DIV2              (0x00000400)
+#define RCC_HCLK_DIV4              (0x00000500)
+#define RCC_HCLK_DIV8              (0x00000600)
+#define RCC_HCLK_DIV16             (0x00000700)
+
+/* USB clock source */
+#define RCC_USBCLK_PLLCLK_1DIV5    (0x00)
+#define RCC_USBCLK_PLLCLK_DIV1     (0x01)
+
+/* ADC clock source */
+#define RCC_PCLK2_DIV2             (0x00000000)
+#define RCC_PCLK2_DIV4             (0x00004000)
+#define RCC_PCLK2_DIV6             (0x00008000)
+#define RCC_PCLK2_DIV8             (0x0000C000)
+
+/* AHB clock source */
+#define RCC_SYSCLK_DIV1            (0x00000000)
+#define RCC_SYSCLK_DIV2            (0x00000080)
+#define RCC_SYSCLK_DIV4            (0x00000090)
+#define RCC_SYSCLK_DIV8            (0x000000A0)
+#define RCC_SYSCLK_DIV16           (0x000000B0)
+#define RCC_SYSCLK_DIV64           (0x000000C0)
+#define RCC_SYSCLK_DIV128          (0x000000D0)
+#define RCC_SYSCLK_DIV256          (0x000000E0)
+#define RCC_SYSCLK_DIV512          (0x000000F0)
 /*\}*/
 
 /**
