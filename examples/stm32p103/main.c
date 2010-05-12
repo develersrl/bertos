@@ -43,25 +43,29 @@
 
 #define LED_PIN                    (1 << 12)
 
-int main(void)
+static void led_init(void)
 {
-	IRQ_ENABLE;
-	timer_init();
-
-	/* Enable clocking on RCC APB2 */
-	RCC->AHBENR |= 1;
 	/* Enable clocking on GPIOA and GPIOC */
-	RCC->APB2ENR |= RCC_APB2_GPIOA | RCC_APB2_GPIOC;
-
+	RCC->APB2ENR |= RCC_APB2_GPIOC;
+	/* Configure the LED pin as GPIO */
 	stm32_gpioPinConfig((struct stm32_gpio *)GPIOC_BASE,
 			LED_PIN, GPIO_MODE_OUT_PP, GPIO_SPEED_50MHZ);
-	while(1)
-	{
-		ticks_t clock = timer_clock_unlocked();
+}
 
-		if (clock & 0x10)
-			stm32_gpioPinWrite((struct stm32_gpio *)GPIOC_BASE, LED_PIN, 1);
-		else
-			stm32_gpioPinWrite((struct stm32_gpio *)GPIOC_BASE, LED_PIN, 0);
+int main(void)
+{
+	int i;
+
+	IRQ_ENABLE;
+	kdbg_init();
+	timer_init();
+	proc_init();
+	led_init();
+
+	for (i = 0; ; i = !i)
+	{
+		stm32_gpioPinWrite((struct stm32_gpio *)GPIOC_BASE, LED_PIN, i);
+		kputs("hello world\n");
+		timer_delay(500);
 	}
 }

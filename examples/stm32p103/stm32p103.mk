@@ -5,7 +5,7 @@
 # Author: Andrea Righi <arighi@develer.com>
 
 # Set to 1 for debug builds
-stm32p103_DEBUG = 0
+stm32p103_DEBUG = 1
 
 include bertos/fonts/fonts.mk
 
@@ -13,8 +13,16 @@ include bertos/fonts/fonts.mk
 TRG += stm32p103
 
 stm32p103_CSRC = \
+	bertos/mware/formatwr.c \
+	bertos/mware/hex.c \
+	bertos/mware/sprintf.c \
+	bertos/mware/event.c \
+	bertos/struct/heap.c \
+	bertos/kern/signal.c \
+	bertos/kern/monitor.c \
 	bertos/kern/proc.c \
 	bertos/drv/timer.c \
+	bertos/cpu/cortex-m3/drv/kdebug_stm32.c \
 	bertos/cpu/cortex-m3/drv/gpio_stm32.c \
 	bertos/cpu/cortex-m3/drv/clock_stm32.c \
 	bertos/cpu/cortex-m3/drv/timer_cm3.c \
