@@ -33,7 +33,6 @@
  *
  * \brief AVR debug support (implementation).
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  * \author Francesco Sacchi <batt@develer.com>
@@ -246,16 +245,29 @@ INLINE void kdbg_hw_init(void)
 			#endif
 
 		#elif CPU_AVR_ATMEGA168 || CPU_AVR_ATMEGA328P
-			UBRR0H = (uint8_t)(period>>8);
-			UBRR0L = (uint8_t)period;
-			KDBG_UART0_BUS_INIT;
+			#if CONFIG_KDEBUG_PORT == 0
+				UBRR0H = (uint8_t)(period>>8);
+				UBRR0L = (uint8_t)period;
+				KDBG_UART0_BUS_INIT;
+			#else
+				#error Only CONFIG_KDEBUG_PORT 0 is supported for this cpu
+			#endif
+
 		#elif CPU_AVR_ATMEGA8 || CPU_AVR_ATMEGA32
-			UBRRH = (uint8_t)(period>>8);
-			UBRRL = (uint8_t)period;
-			KDBG_UART0_BUS_INIT;
+			#if CONFIG_KDEBUG_PORT == 0
+				UBRRH = (uint8_t)(period>>8);
+				UBRRL = (uint8_t)period;
+				KDBG_UART0_BUS_INIT;
+			#else
+				#error Only CONFIG_KDEBUG_PORT 0 is supported for this cpu
+			#endif
 		#elif CPU_AVR_ATMEGA103
-			UBRR = (uint8_t)period;
-			KDBG_UART0_BUS_INIT;
+			#if CONFIG_KDEBUG_PORT == 0
+				UBRR = (uint8_t)period;
+				KDBG_UART0_BUS_INIT;
+			#else
+				#error Only CONFIG_KDEBUG_PORT 0 is supported for this cpu
+			#endif
 		#else
 			#error Unknown CPU
 		#endif
