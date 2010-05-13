@@ -21,6 +21,7 @@ kernel_footprint_HW_PATH = boards/triface
 kernel_footprint_WIZARD_CSRC = \
 	bertos/kern/signal.c \
 	bertos/kern/kfile.c \
+	bertos/kern/sem.c \
 	bertos/struct/heap.c \
 	bertos/mware/formatwr.c \
 	bertos/cpu/avr/drv/timer_avr.c \
