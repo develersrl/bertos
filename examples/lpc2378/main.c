@@ -4,13 +4,10 @@
 #include <drv/timer.h>
 #include <drv/ser.h>
 #include <io/lpc23xx.h>
+#include "hw/hw_led.h"
 
 #define PRIO_HIGH	1
 #define PRIO_LOW	0
-
-#define STATUS_LED (1<<19)
-#define LED_ON()  do { IOCLR1 =  STATUS_LED; } while (0)
-#define LED_OFF() do { IOSET1 =  STATUS_LED; } while (0)
 
 static Serial ser_port;
 
@@ -28,7 +25,7 @@ static void init(void)
 	IODIR0 = (1<<21);
 	IOCLR0 = (1<<21);
 	/* Init status led */
-	IODIR1 |= STATUS_LED;
+	LED_INIT();
 	LED_OFF();
 }
 
