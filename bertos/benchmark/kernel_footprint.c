@@ -44,6 +44,7 @@
 #include <kern/proc.h>
 #include <kern/signal.h>
 #include <kern/msg.h>
+#include <kern/sem.h>
 
 MsgPort in_port;
 
@@ -66,22 +67,30 @@ static NORETURN void proc1_main(void)
 
 void kernel_footprint(void)
 {
-    init();
+	init();
 
 	// generate code for process
-    struct Process *p = proc_new(proc1_main, 0, sizeof(proc1_stack), proc1_stack);
-    proc_setPri(p, 5);
-    proc_yield();
+	struct Process *p =
+		proc_new(proc1_main, 0, sizeof(proc1_stack), proc1_stack);
+	proc_setPri(p, 5);
+	proc_yield();
 
 	// generate code for msg
-    Msg msg;
-    msg_initPort(&in_port, event_createSignal(p, SIG_USER1));
-    msg_put(&in_port, &msg);
-    msg_peek(&in_port);
-    Msg *msg_re = msg_get(&in_port);
-    msg_reply(msg_re);
+	Msg msg;
+	msg_initPort(&in_port, event_createSignal(p, SIG_USER1));
+	msg_put(&in_port, &msg);
+	msg_peek(&in_port);
+	Msg *msg_re = msg_get(&in_port);
+	msg_reply(msg_re);
 
-    // generate code for signals
-    sig_send(p, SIG_USER0);
-    sig_wait(SIG_USER0);
+	// generate code for signals
+	sig_send(p, SIG_USER0);
+
+	// generate code for msg
+	Semaphore sem;
+	sem_init(&sem);
+	sem_obtain(&sem);
+	sem_release(&sem);
+
+	sig_wait(SIG_USER0);
 }
