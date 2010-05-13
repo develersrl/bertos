@@ -21,13 +21,14 @@ kernel_footprint_HW_PATH = boards/at91sam7x-ek
 kernel_footprint_WIZARD_CSRC = \
 	bertos/cpu/arm/drv/timer_arm.c \
 	bertos/kern/signal.c \
-	bertos/kern/kfile.c \
+	bertos/mware/event.c \
+	bertos/kern/sem.c \
 	bertos/cpu/arm/drv/sysirq_at91.c \
 	bertos/struct/heap.c \
 	bertos/mware/formatwr.c \
 	bertos/cpu/arm/drv/timer_at91.c \
 	bertos/drv/timer.c \
-	bertos/mware/event.c \
+	bertos/kern/kfile.c \
 	bertos/kern/proc.c \
 	bertos/benchmark/kernel_footprint.c \
 	bertos/mware/hex.c \

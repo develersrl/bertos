@@ -43,6 +43,6 @@
  * Re-entrant mutual exclusion primitives.
  * $WIZ$ type = "autoenabled"
  */
-#define CONFIG_KERN_SEMAPHORES  0
+#define CONFIG_KERN_SEMAPHORES  1
 
 #endif /*  CFG_SEM_H */
