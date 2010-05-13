@@ -27,9 +27,6 @@
        <attribute name="headerVisible">
         <bool>false</bool>
        </attribute>
-       <attribute name="headerVisible">
-        <bool>false</bool>
-       </attribute>
        <column>
         <property name="text">
          <string notr="true">1</string>
@@ -44,8 +41,7 @@
      <item>
       <widget class="QLabel" name="descriptionLabel">
        <property name="text">
-        <string>Click on your board and select which predefined project you want. From this page you can choose example, benchmark
-	or template.</string>
+        <string>Click on your board and select which predefined project you want. From this page you can choose example, benchmark or template.</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
