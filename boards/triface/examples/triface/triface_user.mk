@@ -10,7 +10,7 @@ triface_PROGRAMMER_PORT = none
 # Files included by the user.
 triface_USER_CSRC = \
     $(triface_SRC_PATH)/main.c \
-    triface/protocol.c \
+    $(triface_SRC_PATH)/protocol.c \
     #
 
 # Files included by the user.
