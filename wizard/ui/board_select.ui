@@ -44,7 +44,8 @@
      <item>
       <widget class="QLabel" name="descriptionLabel">
        <property name="text">
-        <string>&lt;a href='http://duplo.develer.com'&gt;duplo's blog&lt;/a&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus enim nisl, interdum ut venenatis in, suscipit in dolor. Integer a nisi sed libero ultrices commodo. Duis vitae nibh id arcu ullamcorper auctor non et metus. Cras ut justo ac dolor porttitor feugiat eget vitae velit. Fusce et rhoncus metus. Quisque vel mauris et augue elementum volutpat. Phasellus dolor dui, ultricies sit amet dictum ut, commodo et lacus. Proin eu ullamcorper purus. Aliquam in risus in lorem tempor condimentum ac quis erat. Mauris semper dui a urna facilisis vitae porttitor urna dictum. Nunc metus leo, iaculis non dignissim at, mollis at.</string>
+        <string>Click on your board and select which predefined project you want. From this page you can choose example, benchmark
+	or template.</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
