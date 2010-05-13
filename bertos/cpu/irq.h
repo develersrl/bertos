@@ -261,8 +261,7 @@
 
 		#define IRQ_SAVE_DISABLE(x)				\
 		do {							\
-			cpu_flags_t sreg;				\
-			(void) (&sreg == &x);				\
+			register cpu_flags_t sreg;			\
 			asm volatile (					\
 				"mrs %0, cpsr\n\t"			\
 				"orr %1, %0, #0xc0\n\t"			\
