@@ -35,7 +35,7 @@
  * \brief Kernel footprint benchmark.
  *
  * $WIZ$ module_name = "kernel_footprint"
- * $WIZ$ module_depends = "kfile", "kern", "signal", "msg", "event"
+ * $WIZ$ module_depends = "kfile", "kern", "signal", "msg", "semaphores", "event"
  */
 
 #ifndef BENCHMARK_KERNEL_FOOTPRINT_H
