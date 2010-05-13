@@ -118,12 +118,25 @@ typedef struct
  */
 #define DECLARE_HASHTABLE(name, size, hook_gk) \
 	static const void* name##_nodes[1 << UINT32_LOG2(size)]; \
-	struct HashTable name = { name##_nodes, UINT32_LOG2(size), { false }, hook_gk }
+	struct HashTable name = \
+		{ \
+			.mem = name##_nodes, \
+			.max_elts_log2 = UINT32_LOG2(size), \
+			.flags = { .key_internal = false }, \
+			.key_data.hook = hook_gk \
+		}
+
 
 /** Exactly like \c DECLARE_HASHTABLE, but the variable will be declared as static. */
 #define DECLARE_HASHTABLE_STATIC(name, size, hook_gk) \
 	static const void* name##_nodes[1 << UINT32_LOG2(size)]; \
-	static struct HashTable name = { name##_nodes, UINT32_LOG2(size), { false }, { hook_gk } }
+	static struct HashTable name = \
+		{ \
+			.mem = name##_nodes, \
+			.max_elts_log2 = UINT32_LOG2(size), \
+			.flags = { .key_internal = false }, \
+			.key_data.hook = hook_gk \
+		}
 
 #if CONFIG_HT_OPTIONAL_INTERNAL_KEY
 	/** Declare a hash table with internal copies of the keys. This version does not
@@ -140,7 +153,13 @@ typedef struct
 	#define DECLARE_HASHTABLE_INTERNALKEY_STATIC(name, size) \
 		static uint8_t name##_keys[(1 << UINT32_LOG2(size)) * (INTERNAL_KEY_MAX_LENGTH + 1)]; \
 		static const void* name##_nodes[1 << UINT32_LOG2(size)]; \
-		static struct HashTable name = { name##_nodes, UINT32_LOG2(size), { true }, name##_keys }
+		static struct HashTable name = \
+			{ \
+				.mem = name##_nodes, \
+				.max_elts_log2 = UINT32_LOG2(size), \
+				.flags = { .key_internal = true }, \
+				.key_data.mem = name##_keys \
+			}
 #endif
 
 /**
