@@ -73,7 +73,7 @@ static void NORETURN hp_process(void)
 	{
 		sig_wait(SIG_USER0);
 		#if CONFIG_USE_HP_TIMER
-			end = timer_clock_hp();
+			end = timer_hw_hpread();
 		#endif
 		#if CONFIG_USE_LED
 			LED_ON();
@@ -91,7 +91,7 @@ static void NORETURN lp_process(void)
 	{
 		sig_wait(SIG_USER1);
 		#if CONFIG_USE_HP_TIMER
-			start = timer_clock_hp();
+			start = timer_hw_hpread();
 		#endif
 		#if CONFIG_USE_LED
 			LED_ON();

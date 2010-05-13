@@ -90,12 +90,7 @@
 
 	INLINE hptime_t timer_hw_hpread(void)
 	{
-		return NVIC_ST_CURRENT_R;
-	}
-
-	INLINE hptime_t timer_hw_hpticks(ticks_t clock)
-	{
-		return (TIMER_HW_CNT - timer_hw_hpread()) + clock * TIMER_HW_CNT;
+		return (TIMER_HW_CNT - NVIC_ST_CURRENT_R);
 	}
 
 #else

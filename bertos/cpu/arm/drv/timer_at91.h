@@ -30,8 +30,6 @@
  *
  * -->
  *
- * \version $Id$
- *
  * \author Francesco Sacchi <batt@develer.com>
  *
  * \brief Low-level timer module for Atmel AT91 (interface).
@@ -97,11 +95,6 @@
 	{
 		/* In the upper part of PIT_PIIR there is unused data */
 		return PIIR & CPIV_MASK;
-	}
-
-	INLINE hptime_t timer_hw_hpticks(ticks_t clock)
-	{
-		return timer_hw_hpread() + clock * TIMER_HW_CNT;
 	}
 
 #else

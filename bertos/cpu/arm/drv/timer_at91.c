@@ -30,8 +30,6 @@
  *
  * -->
  *
- * \version $Id$
- *
  * \author Francesco Sacchi <batt@develer.com>
  *
  * \brief Low-level timer module for Atmel AT91 (inplementation).
