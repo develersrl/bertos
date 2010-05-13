@@ -239,59 +239,55 @@
 
 	#else /* !__IAR_SYSTEMS_ICC__ */
 
-		#define IRQ_DISABLE \
-		do { \
-			asm volatile ( \
-				"mrs r0, cpsr\n\t" \
-				"orr r0, r0, #0xc0\n\t" \
-				"msr cpsr_c, r0" \
-				::: "r0" \
-			); \
+		#define IRQ_DISABLE					\
+		do {							\
+			cpu_flags_t sreg;				\
+			asm volatile (					\
+				"mrs %0, cpsr\n\t"			\
+				"orr %0, %0, #0xc0\n\t"			\
+				"msr cpsr_c, %0\n\t"			\
+				: "=r" (sreg) : : "memory", "cc");	\
 		} while (0)
 
-		#define IRQ_ENABLE \
-		do { \
-			asm volatile ( \
-				"mrs r0, cpsr\n\t" \
-				"bic r0, r0, #0xc0\n\t" \
-				"msr cpsr_c, r0" \
-				::: "r0" \
-			); \
+		#define IRQ_ENABLE					\
+		do {							\
+			cpu_flags_t sreg;				\
+			asm volatile (					\
+				"mrs %0, cpsr\n\t"			\
+				"bic %0, %0, #0xc0\n\t"			\
+				"msr cpsr_c, %0\n\t"			\
+				: "=r" (sreg) : : "memory", "cc");	\
 		} while (0)
 
-		#define IRQ_SAVE_DISABLE(x) \
-		do { \
-			asm volatile ( \
-				"mrs %0, cpsr\n\t" \
-				"orr r0, %0, #0xc0\n\t" \
-				"msr cpsr_c, r0" \
-				: "=r" (x) \
-				: /* no inputs */ \
-				: "r0" \
-			); \
+		#define IRQ_SAVE_DISABLE(x)				\
+		do {							\
+			cpu_flags_t sreg;				\
+			(void) (&sreg == &x);				\
+			asm volatile (					\
+				"mrs %0, cpsr\n\t"			\
+				"orr %1, %0, #0xc0\n\t"			\
+				"msr cpsr_c, %1\n\t"			\
+				: "=r" (x), "=r" (sreg)			\
+				: : "memory", "cc");			\
 		} while (0)
 
-		#define IRQ_RESTORE(x) \
-		do { \
-			asm volatile ( \
-				"msr cpsr_c, %0" \
-				: /* no outputs */ \
-				: "r" (x) \
-			); \
+		#define IRQ_RESTORE(x)					\
+		do {							\
+			asm volatile (					\
+				"msr cpsr_c, %0\n\t"			\
+				: : "r" (x) : "memory", "cc");		\
 		} while (0)
 
-		#define CPU_READ_FLAGS() \
-		({ \
-			cpu_flags_t sreg; \
-			asm volatile ( \
-				"mrs %0, cpsr\n\t" \
-				: "=r" (sreg) \
-				: /* no inputs */ \
-			); \
-			sreg; \
+		#define CPU_READ_FLAGS()				\
+		({							\
+			cpu_flags_t sreg;				\
+			asm volatile (					\
+				"mrs %0, cpsr\n\t"			\
+				: "=r" (sreg) : : "memory", "cc");	\
+			sreg;						\
 		})
 
-		#define IRQ_ENABLED() ((CPU_READ_FLAGS() & 0xc0) != 0xc0)
+		#define IRQ_ENABLED() (!(CPU_READ_FLAGS() & 0x80))
 
 		#if CONFIG_KERN_PREEMPT
 			EXTERN_C void asm_irq_switch_context(void);
