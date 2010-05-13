@@ -285,4 +285,8 @@ INLINE HashIterator ht_iter_next(HashIterator h)
 	return h;
 }
 
+int hashtable_testSetup(void);
+int hashtable_testRun(void);
+int hashtable_testTearDown(void);
+
 #endif /* STRUCT_HASHTABLE_H */
