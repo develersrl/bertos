@@ -123,7 +123,7 @@ void NORETURN context_switch(void)
 	while (1)
 	{
 		#if CONFIG_USE_HP_TIMER
-			kfile_printf(&out.fd, "Switch: %lu.%lu usec\n",
+			kfile_printf(&out.fd, "Switch: %lu.%lu usec\n\r",
 							hptime_to_us((end - start)),
 							hptime_to_us((end - start) * 1000) % 1000);
 		#endif
