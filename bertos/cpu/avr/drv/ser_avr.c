@@ -920,7 +920,7 @@ DECLARE_ISR(USART1_RX_vect)
 /**
  * SPI interrupt handler
  */
-DECLARE_ISR(SIG_SPI)
+DECLARE_ISR(SPI_STC_vect)
 {
 	SER_STROBE_ON;
 
