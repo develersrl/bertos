@@ -34,7 +34,6 @@
  * For now, only UI frames without any Layer 3 protocol are handled.
  * This however is enough to send/receive APRS packets.
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  *
  */
@@ -265,7 +264,7 @@ static void print_call(KFile *ch, const AX25Call *call)
 	if (call->ssid)
 		kfile_printf(ch, "-%d", call->ssid);
 }
-	
+
 /**
  * Print a AX25 message in TNC-2 packet monitor format.
  * \param ch a kfile channel where the message will be printed.
@@ -275,8 +274,8 @@ void ax25_print(KFile *ch, const AX25Msg *msg)
 {
 	print_call(ch, &msg->src);
 	kfile_putc('>', ch);
-	print_call(ch, &msg->dst);	
-	
+	print_call(ch, &msg->dst);
+
 	#if CONFIG_AX25_RPT_LST
 	for (int i = 0; i < msg->rpt_cnt; i++)
 	{
