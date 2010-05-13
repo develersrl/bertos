@@ -39,8 +39,7 @@
 #define CFG_HASHTABLE_H
 
 /**
- * Enable/disable support to declare special hash tables which maintain a copy of
- * the key internally instead of relying on the hook to extract it from the data.
+ * Enable/disable support to declare special hash tables which maintain a copy of the key internally instead of relying on the hook to extract it from the data.
  *
  * $WIZ$ type = "boolean"
  */
