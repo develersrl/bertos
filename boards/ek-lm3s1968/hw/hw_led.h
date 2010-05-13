@@ -32,7 +32,7 @@
  *
  * \brief Led on/off macros.
  *
- * \author Daniele Basiel <asterix@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
  */
 
 #ifndef HW_LED_H
