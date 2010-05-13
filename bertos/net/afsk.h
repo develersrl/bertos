@@ -37,7 +37,7 @@
  * $WIZ$ module_name = "afsk"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_afsk.h"
  * $WIZ$ module_depends = "timer", "kfile"
- * $WIZ$ module_hw = "bertos/hw/hw_afsk.h"
+ * $WIZ$ module_hw = "bertos/hw/hw_afsk.h", "bertos/hw/hw_afsk.c"
  */
 
 #ifndef NET_AFSK_H
