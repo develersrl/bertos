@@ -3,8 +3,6 @@
  * Copyright 2004, 2006 Develer S.r.l. (http://www.develer.com/)
  *
  *
- * \version $Id$
- *
  * \author Stefano Fedrigo <aleph@develer.com>
  *
  * \brief Graphics level bar widget

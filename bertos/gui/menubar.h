@@ -32,14 +32,12 @@
  *
  * \brief Graphic menu bar widget.
  *
- * \version $Id$
- *
  * \author Stefano Fedrigo <aleph@develer.com>
  *
  */
 
-#ifndef MWARE_MENUBAR_H
-#define MWARE_MENUBAR_H
+#ifndef GUI_MENUBAR_H
+#define GUI_MENUBAR_H
 
 #include <cfg/compiler.h>
 
@@ -96,4 +94,4 @@ void mbar_init(
 		int num_labels);
 void mbar_draw(const struct MenuBar *mb);
 
-#endif /* MWARE_MENUBAR_H */
+#endif /* GUI_MENUBAR_H */

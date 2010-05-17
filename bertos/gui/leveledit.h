@@ -32,8 +32,6 @@
  *
  * \brief Generic editor for (volume/gain/contrast/...) setting.
  *
- * \version $Id$
- *
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 #ifndef GUI_LEVELEDIT_H

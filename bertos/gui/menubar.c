@@ -32,8 +32,6 @@
  *
  * \brief Graphics Menu bar widget
  *
- * \version $Id$
- *
  * \author Stefano Fedrigo <aleph@develer.com>
  * \author Francesco Sacchi <batt@develer.com>
  *

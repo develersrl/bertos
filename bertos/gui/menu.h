@@ -26,12 +26,10 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2006, 2010 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000 Bernie Innocenti <bernie@codewiz.org>
  * All Rights Reserved.
  * -->
- *
- * \version $Id$
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
@@ -39,64 +37,8 @@
  * \brief Common menu handling API
  */
 
-/*#*
- *#* $Log$
- *#* Revision 1.5  2007/09/19 16:23:27  batt
- *#* Fix doxygen warnings.
- *#*
- *#* Revision 1.4  2006/09/13 13:58:33  bernie
- *#* Add RenderHook support.
- *#*
- *#* Revision 1.3  2006/07/19 12:56:27  bernie
- *#* Convert to new Doxygen style.
- *#*
- *#* Revision 1.2  2006/06/03 13:58:02  bernie
- *#* Fix recursive timeout and add exit status information.
- *#*
- *#* Revision 1.1  2006/05/15 07:20:54  bernie
- *#* Move menu to gui/.
- *#*
- *#* Revision 1.4  2006/04/11 00:07:32  bernie
- *#* Implemenent MF_SAVESEL flag.
- *#*
- *#* Revision 1.3  2006/03/22 09:49:51  bernie
- *#* Simplifications from project_grl.
- *#*
- *#* Revision 1.2  2006/03/20 17:48:35  bernie
- *#* Implement support for ROM menus.
- *#*
- *#* Revision 1.1  2006/02/10 12:29:36  bernie
- *#* Add menu system.
- *#*
- *#* Revision 1.20  2005/11/16 18:10:19  bernie
- *#* Move top-level headers to cfg/ as in DevLib.
- *#*
- *#* Revision 1.19  2005/02/11 19:11:38  aleph
- *#* Move menu_displaymsg() in new displaymsg module
- *#*
- *#* Revision 1.18  2005/01/13 16:56:36  aleph
- *#* Fix progmem includes.
- *#*
- *#* Revision 1.17  2004/12/14 12:52:45  aleph
- *#* Add exclude menu flags
- *#*
- *#* Revision 1.16  2004/10/01 14:04:59  customer_pw
- *#* Add accessor functions for menu flags
- *#*
- *#* Revision 1.15  2004/09/09 08:31:36  customer_pw
- *#* Add disabled item type
- *#*
- *#* Revision 1.14  2004/08/29 21:46:12  bernie
- *#* CVSSILENT: Mark CVS log blocks.
- *#*
- *#* Revision 1.13  2004/08/25 15:35:23  customer_pw
- *#* IPTR -> iptr_t conversion.
- *#*
- *#* Revision 1.12  2004/08/25 13:23:45  bernie
- *#* IPTR -> iptr_t conversion.
- *#*/
-#ifndef MWARE_MENU_H
-#define MWARE_MENU_H
+#ifndef GUI_MENU_H
+#define GUI_MENU_H
 
 #include <cfg/compiler.h>
 
@@ -182,4 +124,4 @@ iptr_t menu_handle(const struct Menu *menu);
 int menu_setFlags(struct Menu *menu, int idx, int flags);
 int menu_clearFlags(struct Menu *menu, int idx, int flags);
 
-#endif /* MWARE_MENU_H */
+#endif /* GUI_MENU_H */
