@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2006, 2010 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000 Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
@@ -42,19 +42,17 @@
 #include <avr/io.h>
 
 /* Set pins as input and enable pull-up */
-#define INPUT_INIT_D do					\
-{								\
-	(DDRD &= ~(BV(PD4) | BV(PD5) | BV(PD6) | BV(PD7)));	\
-	(PORTD |= (BV(PD4) | BV(PD5) | BV(PD6) | BV(PD7)));	\
-} while(0)
+#define INPUT_INIT_D \
+	do{	\
+	DDRD &= ~(BV(PD4) | BV(PD5) | BV(PD6) | BV(PD7)); \
+	PORTD |= (BV(PD4) | BV(PD5) | BV(PD6) | BV(PD7)); \
+	} while(0)
 
-#define INPUT_INIT_E do						\
-{								\
-	(DDRE &= ~(BV(PE4) | BV(PE5) | BV(PE6) | BV(PE7)));	\
-	ATOMIC((PORTE |= (BV(PE4) | BV(PE5) | BV(PE6) | BV(PE7))));	\
-} while(0)
-
-#define INPUT_INIT do { INPUT_INIT_D; INPUT_INIT_E;} while(0)
+#define INPUT_INIT_E \
+	do{	\
+		DDRE &= ~(BV(PE4) | BV(PE5) | BV(PE6) | BV(PE7)); \
+		PORTE |= (BV(PE4) | BV(PE5) | BV(PE6) | BV(PE7)); \
+	} while(0)
 
 INLINE uint8_t INPUT_GET(void)
 {
@@ -62,10 +60,17 @@ INLINE uint8_t INPUT_GET(void)
 	out_d = PIND;
 	out_e = PINE;
 
+	/* Select our input (see scheme) */
 	out_d >>= 4;
 	out_e = out_e & 0xF0;
 
-	return out_e | out_d;
+	return (out_e | out_d);
 }
 
-#endif // HW_INPUT_H
+#define INPUT_INIT() \
+	do { \
+		INPUT_INIT_D; \
+		INPUT_INIT_E; \
+	} while(0)
+
+#endif /* HW_INPUT_H */
