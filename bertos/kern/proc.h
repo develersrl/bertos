@@ -32,7 +32,6 @@
  *
  * \brief BeRTOS Kernel core (Process scheduler).
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * $WIZ$ module_name = "kernel"
