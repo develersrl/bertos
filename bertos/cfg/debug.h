@@ -36,7 +36,6 @@
  * Freestanding (AKA embedded) applications use \c drv/kdebug.c to output
  * diagnostic messages to a serial terminal or a JTAG debugger.
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * $WIZ$ module_name = "debug"
