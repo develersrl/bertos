@@ -51,24 +51,20 @@
 
 #include <kern/proc.h>
 
-#define PROC_STACK_SIZE	   1024
+#define PROC_STACK_SIZE	   KERN_MINSTACKSIZE
 
 static PROC_DEFINE_STACK(hp_stack, PROC_STACK_SIZE);
 static PROC_DEFINE_STACK(lp_stack, PROC_STACK_SIZE);
 
 static Process *hp_proc, *lp_proc, *main_proc;
-Serial out;
+static Serial out;
 
 #if CONFIG_USE_HP_TIMER
-
 static hptime_t start, end;
-
 #endif
 
 static void NORETURN hp_process(void)
 {
-	proc_setPri(hp_proc, 2);
-
 	while (1)
 	{
 		sig_wait(SIG_USER0);
@@ -78,18 +74,15 @@ static void NORETURN hp_process(void)
 		#if CONFIG_USE_LED
 			LED_ON();
 		#endif
-		timer_delay(100);
-		sig_send(main_proc, SIG_USER1);
+		sig_send(main_proc, SIG_USER0);
 	}
 }
 
 static void NORETURN lp_process(void)
 {
-	proc_setPri(lp_proc, 1);
-
 	while (1)
 	{
-		sig_wait(SIG_USER1);
+		sig_wait(SIG_USER0);
 		#if CONFIG_USE_HP_TIMER
 			start = timer_hw_hpread();
 		#endif
@@ -97,7 +90,6 @@ static void NORETURN lp_process(void)
 			LED_ON();
 			LED_OFF();
 		#endif
-
 		sig_send(hp_proc, SIG_USER0);
 	}
 }
@@ -120,16 +112,21 @@ void NORETURN context_switch(void)
 	lp_proc = proc_new(lp_process, NULL, PROC_STACK_SIZE, lp_stack);
 	main_proc = proc_current();
 
+	proc_setPri(hp_proc, 2);
+	proc_setPri(lp_proc, 1);
+
 	while (1)
 	{
-		#if CONFIG_USE_HP_TIMER
-			kfile_printf(&out.fd, "Switch: %lu.%lu usec\n\r",
-							hptime_to_us((end - start)),
-							hptime_to_us((end - start) * 1000) % 1000);
-		#endif
+		sig_send(lp_proc, SIG_USER0);
+		sig_wait(SIG_USER0);
 
-		sig_send(lp_proc, SIG_USER1);
-		sig_wait(SIG_USER1);
+		#if CONFIG_USE_HP_TIMER
+			kfile_printf(&out.fd,
+				"Switch: %lu.%lu usec\n\r",
+				hptime_to_us((end - start)),
+				hptime_to_us((end - start) * 1000) % 1000);
+		#endif
+		timer_delay(100);
 	}
 
 }
