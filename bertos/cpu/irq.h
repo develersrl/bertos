@@ -340,16 +340,16 @@
 			 * IRQs will be automatically re-enabled when restoring
 			 * the context of the user task.
 			 */
-			#define DECLARE_ISR_CONTEXT_SWITCH(func)	\
-				void ISR_FUNC func(void);		\
-				static void __isr_##func(void);		\
-				void ISR_FUNC func(void)		\
-				{					\
-					IRQ_ENTRY();			\
-					IRQ_DISABLE;			\
-					__isr_##func();			\
-					IRQ_EXIT();			\
-				}					\
+			#define DECLARE_ISR_CONTEXT_SWITCH(func)		\
+				void ISR_FUNC func(void);			\
+				static NOINLINE void __isr_##func(void);	\
+				void ISR_FUNC func(void)			\
+				{						\
+					IRQ_ENTRY();				\
+					IRQ_DISABLE;				\
+					__isr_##func();				\
+					IRQ_EXIT();				\
+				}						\
 				static void __isr_##func(void)
 			/**
 			 * Interrupt service routine prototype: can be used for
@@ -376,21 +376,36 @@
 			#endif /* !CONFIG_KERN_PRI */
 		#endif /* CONFIG_KERN_PREEMPT */
 
+		#ifndef ISR_FUNC
+			#define ISR_FUNC  __attribute__((interrupt))
+		#endif
 		#ifndef DECLARE_ISR
 			#define DECLARE_ISR(func) \
-				void __attribute__((interrupt)) func(void)
+				void ISR_FUNC func(void);				\
+				/*							\
+				 * FIXME: avoid the inlining of this function.		\
+				 *							\
+				 * This is terribly inefficient, but it's a		\
+				 * reliable workaround to avoid gcc blowing		\
+				 * away the stack (see the bug below):			\
+				 *							\
+				 * http://gcc.gnu.org/bugzilla/show_bug.cgi?id=41999	\
+				 */							\
+				static NOINLINE void __isr_##func(void);		\
+				void ISR_FUNC func(void)				\
+				{							\
+					__isr_##func();					\
+				}							\
+				static void __isr_##func(void)
 		#endif
 		#ifndef DECLARE_ISR_CONTEXT_SWITCH
-			#define DECLARE_ISR_CONTEXT_SWITCH(func) \
-				void __attribute__((interrupt)) func(void)
+			#define DECLARE_ISR_CONTEXT_SWITCH(func) DECLARE_ISR(func)
 		#endif
 		#ifndef ISR_PROTO
-			#define ISR_PROTO(func) \
-				void __attribute__((interrupt)) func(void)
+			#define ISR_PROTO(func)	void ISR_FUNC func(void)
 		#endif
 		#ifndef ISR_PROTO_CONTEXT_SWITCH
-			#define ISR_PROTO_CONTEXT_SWITCH(func)	\
-				void __attribute__((interrupt)) func(void)
+			#define ISR_PROTO_CONTEXT_SWITCH(func) ISR_PROTO(func)
 		#endif
 
 	#endif /* !__IAR_SYSTEMS_ICC_ */
