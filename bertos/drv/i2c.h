@@ -32,7 +32,6 @@
  *
  * \brief I2C generic driver functions.
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  *
  * $WIZ$ module_name = "i2c"

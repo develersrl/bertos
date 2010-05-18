@@ -32,8 +32,6 @@
  *
  * \brief Configuration file for lcd display module.
  *
- * \version $Id$
- *
  * \author Daniele Basile <asterix@develer.com>
  */
 
