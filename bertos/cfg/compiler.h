@@ -172,6 +172,7 @@
 	#define UNUSED_VAR(type,name)	__attribute__((__unused__)) type name
 	#define USED_VAR(type,name)     __attribute__((__used__)) type name
 	#define INLINE                  static inline __attribute__((__always_inline__))
+	#define NOINLINE                __attribute__((noinline))
 	#define LIKELY(x)               __builtin_expect(!!(x), 1)
 	#define UNLIKELY(x)             __builtin_expect(!!(x), 0)
 	#define PURE_FUNC               __attribute__((pure))
@@ -280,6 +281,9 @@
 /* A few defaults for missing compiler features. */
 #ifndef INLINE
 #define INLINE                 static inline
+#endif
+#ifndef NOINLINE
+#define NOINLINE               /* nothing */
 #endif
 #ifndef NORETURN
 #define NORETURN               /* nothing */
