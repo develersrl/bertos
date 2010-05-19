@@ -30,8 +30,6 @@
  *
  * -->
  *
- * \version $Id$
- *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Francesco Sacchi <batt@develer.com>
  * \author Luca Ottaviano <lottaviano@develer.com>
@@ -138,7 +136,7 @@
 			#else
 				#error Unsupported value of TIMER_PRESCALER
 			#endif
-		;
+
 		TCNT0 = 0x00;                 /* Initialization of Timer/Counter */
 		REG_OCR0A = OCR_DIVISOR;           /* Timer/Counter Output Compare Register */
 
@@ -206,7 +204,7 @@
 		/* Clear on Compare match & prescaler = 64, internal sys clock.
 		   When changing prescaler change TIMER_HW_HPTICKS_PER_SEC too */
 		TCNT2 = 0x00;         /* initialization of Timer/Counter */
-		REG_OCR2A = OCR_DIVISOR;   /* Timer/Counter Output Compare Register */
+		REG_OCR2A = (uint8_t)OCR_DIVISOR;   /* Timer/Counter Output Compare Register */
 
 		/* Enable timer interrupts: Timer/Counter2 Output Compare (OCIE2) */
 		REG_TIMSK2 &= ~BV(TOIE2);
