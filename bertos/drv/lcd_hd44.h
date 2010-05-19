@@ -37,14 +37,14 @@
  *
  * $WIZ$ module_name = "lcd_hd44"
  * $WIZ$ module_depends = "timer"
- * $WIZ$ module_configuration = "bertos/cfg/cfg_lcd.h"
- * $WIZ$ module_hw = "bertos/hw/hw_lcd.h"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_lcd_hd44.h"
+ * $WIZ$ module_hw = "bertos/hw/hw_lcd_hd44.h"
  */
 
 #ifndef DRV_LCD_HD44_H
 #define DRV_LCD_HD44_H
 
-#include "cfg/cfg_lcd.h"
+#include "cfg/cfg_lcd_hd44.h"
 #include <cfg/compiler.h> /* For stdint types */
 
 /**

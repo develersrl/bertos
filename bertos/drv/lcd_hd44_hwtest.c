@@ -32,13 +32,12 @@
  *
  * \brief LM044L type LCD hardware module (impl.)
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
 #include "lcd_hd44.h"
-#include "hw/hw_lcd.h"
+#include "hw/hw_lcd_hd44.h"
 
 #include <cfg/test.h>
 #include <drv/timer.h>

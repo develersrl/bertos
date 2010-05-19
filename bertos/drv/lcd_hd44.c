@@ -38,7 +38,7 @@
 
 #include "lcd_hd44.h"
 
-#include "hw/hw_lcd.h"
+#include "hw/hw_lcd_hd44.h"
 
 #include "cfg/cfg_arch.h"
 
@@ -400,7 +400,7 @@ void lcd_remapfont(void)
 
 void lcd_hw_init(void)
 {
-	lcd_bus_init();
+	lcd_hd44_hw_bus_init();
 
 	timer_delay(50);
 
