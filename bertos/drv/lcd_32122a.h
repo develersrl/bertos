@@ -31,28 +31,26 @@
  *
  * -->
  *
- * \version $Id$
- *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  *
  * \brief Displaytech 32122A LCD driver
+ *
+ * $WIZ$ module_name = "lcd_32122a"
+ * $WIZ$ module_hw = "bertos/hw/hw_lcd_32122a.h"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_lcd_32122a.h"
+ * $WIZ$ module_depends = "timer", "pwm"
  */
 
-#ifndef LCD_32122A_AVR_H
-#define LCD_32122A_AVR_H
-
-/* Predefined LCD PWM contrast values */
-#define LCD_DEF_PWM 145
-#define LCD_MAX_PWM 505
-#define LCD_MIN_PWM 130
+#ifndef DRV_LCD_32122A_H
+#define DRV_LCD_32122A_H
 
 /* Display bitmap dims */
 #define LCD_WIDTH 122
 #define LCD_HEIGHT 32
 
-/* fwd decl */
-struct Bitmap;
+#warning __FILTER_NEXT_WARNING__
+#warning this drive is untested..
 
 extern struct Bitmap lcd_bitmap;
 
@@ -60,4 +58,4 @@ void lcd_32122_init(void);
 void lcd_32122_setPwm(int duty);
 void lcd_32122_blitBitmap(struct Bitmap *bm);
 
-#endif /* LCD_32122A_AVR_H */
+#endif /* DRV_LCD_32122A_H */
