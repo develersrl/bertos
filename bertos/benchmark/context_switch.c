@@ -68,11 +68,11 @@ static void NORETURN hp_process(void)
 	while (1)
 	{
 		sig_wait(SIG_USER0);
-		#if CONFIG_USE_HP_TIMER
-			end = timer_hw_hpread();
-		#endif
 		#if CONFIG_USE_LED
 			LED_ON();
+		#endif
+		#if CONFIG_USE_HP_TIMER
+			end = timer_hw_hpread();
 		#endif
 		sig_send(main_proc, SIG_USER0);
 	}
@@ -83,12 +83,12 @@ static void NORETURN lp_process(void)
 	while (1)
 	{
 		sig_wait(SIG_USER0);
-		#if CONFIG_USE_HP_TIMER
-			start = timer_hw_hpread();
-		#endif
 		#if CONFIG_USE_LED
 			LED_ON();
 			LED_OFF();
+		#endif
+		#if CONFIG_USE_HP_TIMER
+			start = timer_hw_hpread();
 		#endif
 		sig_send(hp_proc, SIG_USER0);
 	}
@@ -108,15 +108,18 @@ void NORETURN context_switch(void)
 		LED_INIT();
 	#endif
 
+	proc_forbid();
 	hp_proc = proc_new(hp_process, NULL, PROC_STACK_SIZE, hp_stack);
 	lp_proc = proc_new(lp_process, NULL, PROC_STACK_SIZE, lp_stack);
 	main_proc = proc_current();
-
 	proc_setPri(hp_proc, 2);
 	proc_setPri(lp_proc, 1);
+	proc_permit();
 
 	while (1)
 	{
+		timer_delay(100);
+
 		sig_send(lp_proc, SIG_USER0);
 		sig_wait(SIG_USER0);
 
@@ -126,7 +129,5 @@ void NORETURN context_switch(void)
 				hptime_to_us((end - start)),
 				hptime_to_us((end - start) * 1000) % 1000);
 		#endif
-		timer_delay(100);
 	}
-
 }
