@@ -33,23 +33,18 @@
  *
  * \brief LCD low-level hardware macros
  *
- * \version $Id$
- *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  *
  */
 
-#ifndef HW_LCD_H
-#define HW_LCD_H
+#ifndef HW_LCD_HD44_H
+#define HW_LCD_HD44_H
 
-#include "cfg/cfg_lcd.h"  /* CONFIG_LCD_4BIT */
-#include <cfg/macros.h>   /* BV() */
-#include <cfg/debug.h>
+#include "cfg/cfg_lcd_hd44.h"  /* CONFIG_LCD_4BIT */
 
-#include <cpu/attr.h>
-#include <cpu/irq.h>
 #include <cpu/types.h>
+#include <cpu/irq.h>
 
 #warning TODO:This is an example implementation, you must implement it!
 
@@ -117,7 +112,6 @@
 
 /** Set data bus direction to input (read from display) */
 #define LCD_DB_IN           /* Implement me! */
-
 /** Delay for write (Enable pulse width, 220ns) */
 #define LCD_DELAY_WRITE \
 	do { \
@@ -138,7 +132,8 @@
 	} while (0)
 
 
-INLINE void lcd_bus_init(void)
+
+INLINE void lcd_hd44_hw_bus_init(void)
 {
 	cpu_flags_t flags;
 	IRQ_SAVE_DISABLE(flags);
@@ -159,4 +154,4 @@ INLINE void lcd_bus_init(void)
 	IRQ_RESTORE(flags);
 }
 
-#endif /* HW_LCD_H */
+#endif /* HW_LCD_HD44_H */

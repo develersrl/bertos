@@ -51,20 +51,5 @@
  */
 #define CONFIG_LCD_ADDRESS_FAST    1
 
-/**
- * LCD setting for 32122A (AVR implementation).
- * $WIZ$ type = "boolean"
- * $WIZ$ supports = "avr and False"
- */
-#define CONFIG_LCD_SOFTINT_REFRESH 0
-
-/**
- * LCD setting for 32122A (AVR implementation).
- * $WIZ$ type = "boolean"
- * $WIZ$ supports = "avr and False"
- */
-#define CONFIG_LCD_WAIT            1
-
-
 #endif /* CFG_LCD_H */
 
