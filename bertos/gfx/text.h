@@ -35,6 +35,7 @@
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
+ * \version $Id$
  *
  * $WIZ$ module_name = "text"
  * $WIZ$ module_harvard = "pgm_memory"

@@ -32,6 +32,8 @@
  *
  * \brief dot-matrix LCD test.
  *
+ * \version $Id$
+ *
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
  */

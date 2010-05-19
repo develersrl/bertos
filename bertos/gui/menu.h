@@ -35,10 +35,6 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  *
  * \brief Common menu handling API
- *
- * $WIZ$ module_name = "menu"
- * $WIZ$ module_configuration = "bertos/cfg/cfg_menu.h"
- * $WIZ$ module_depends = "text", "gfx", "timer", "kbd"
  */
 
 #ifndef GUI_MENU_H
