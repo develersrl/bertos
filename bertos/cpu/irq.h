@@ -286,7 +286,7 @@
 			sreg;						\
 		})
 
-		#define IRQ_ENABLED() (!(CPU_READ_FLAGS() & 0x80))
+		#define IRQ_ENABLED() ((CPU_READ_FLAGS() & 0xc0) != 0xc0)
 
 		#if CONFIG_KERN_PREEMPT
 			EXTERN_C void asm_irq_switch_context(void);
