@@ -58,7 +58,7 @@
  * $WIZ$ type = "boolean"
  * $WIZ$ conditional_deps = "timer"
  */
-#define CONFIG_KERN_PREEMPT 0
+#define CONFIG_KERN_PREEMPT 1
 
 /**
  * Time sharing quantum (a prime number prevents interference effects) [ms].
