@@ -40,6 +40,7 @@
 #include "menu.h"
 
 #include "cfg/cfg_gfx.h"
+#include "cfg/cfg_menu.h"
 #include "cfg/cfg_arch.h"
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
@@ -58,6 +59,15 @@
 
 #if CONFIG_MENU_SMOOTH
 #include <drv/lcd_gfx.h>
+/**
+ * With this you can choose, at compile time, which backend to use.
+ *
+ * $WIZ$ menu_backend_lcd = "LCD_RIT128X96_DRV", "LCD_32122A_DRV"
+ */
+#define LCD_RIT128X96_DRV  0 ///<
+#define LCD_32122A_DRV     1 ///<
+
+
 #endif
 
 #if (CONFIG_MENU_TIMEOUT != 0)

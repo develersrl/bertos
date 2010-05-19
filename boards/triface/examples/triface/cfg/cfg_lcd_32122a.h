@@ -26,47 +26,38 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * Copyright 2003, 2004, 2005, 2006, 2010 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2001 Bernie Innocenti <bernie@codewiz.org>
+ *
  * -->
  *
- * \brief Configuration file for lcd display module.
+ * \brief Displaytech 32122A LCD driver configuration file.
  *
- * \version $Id$
+ * \author Bernie Innocenti <bernie@codewiz.org>
+ * \author Stefano Fedrigo <aleph@develer.com>
  *
- * \author Daniele Basile <asterix@develer.com>
  */
-
-#ifndef CFG_LCD_H
-#define CFG_LCD_H
+#ifndef CFG_LCD_32122A_H
+#define CFG_LCD_32122A_H
 
 /**
- * Use 4 bit addressing mode.
+ * Enable soft interrupt to refresh the LCD.
  * $WIZ$ type = "boolean"
  */
-#define CONFIG_LCD_4BIT            0
+#define CONFIG_LCD_SOFTINT_REFRESH     0
 
 /**
- * Use a table to speed up LCD memory addressing.
- * This will use about 100 bytes of RAM.
+ * Enable wait macro when display is busy.
  * $WIZ$ type = "boolean"
  */
-#define CONFIG_LCD_ADDRESS_FAST    1
+#define CONFIG_LCD_WAIT                0
 
 /**
- * LCD setting for 32122A (AVR implementation).
- * $WIZ$ type = "boolean"
- * $WIZ$ supports = "avr and False"
+ * Display refresh time 32122a.
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 0
  */
-#define CONFIG_LCD_SOFTINT_REFRESH 0
+#define CONFIG_LCD_REFRESH           100
 
-/**
- * LCD setting for 32122A (AVR implementation).
- * $WIZ$ type = "boolean"
- * $WIZ$ supports = "avr and False"
- */
-#define CONFIG_LCD_WAIT            1
-
-
-#endif /* CFG_LCD_H */
+#endif /* CFG_LCD_32122A_H */
 

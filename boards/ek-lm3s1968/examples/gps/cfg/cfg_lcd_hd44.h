@@ -30,39 +30,26 @@
  * All Rights Reserved.
  * -->
  *
- * \brief Configuration file for GFX module.
+ * \brief Configuration file for lcd display module.
  *
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef CFG_GFX_H
-#define CFG_GFX_H
-
+#ifndef CFG_LCD_H
+#define CFG_LCD_H
 
 /**
- * Enable line clipping algorithm.
+ * Use 4 bit addressing mode.
  * $WIZ$ type = "boolean"
  */
-#define CONFIG_GFX_CLIPPING  1
+#define CONFIG_LCD_4BIT            0
 
 /**
- * Enable text rendering in bitmaps.
+ * Use a table to speed up LCD memory addressing.
+ * This will use about 100 bytes of RAM.
  * $WIZ$ type = "boolean"
  */
-#define CONFIG_GFX_TEXT  1
+#define CONFIG_LCD_ADDRESS_FAST    1
 
-/**
- * Enable virtual coordinate system.
- * $WIZ$ type = "boolean"
- */
-#define CONFIG_GFX_VCOORDS  1
-
-/**
- * Select bitmap pixel format.
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "bitmap_format"
- */
-#define CONFIG_BITMAP_FMT  BITMAP_FMT_PLANAR_V_LSB
-
-#endif /* CFG_GFX_H */
+#endif /* CFG_LCD_H */
 
