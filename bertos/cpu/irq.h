@@ -350,7 +350,7 @@
 					__isr_##func();				\
 					IRQ_EXIT();				\
 				}						\
-				static void __isr_##func(void)
+				static NOINLINE void __isr_##func(void)
 			/**
 			 * Interrupt service routine prototype: can be used for
 			 * forward declarations.
@@ -377,7 +377,7 @@
 		#endif /* CONFIG_KERN_PREEMPT */
 
 		#ifndef ISR_FUNC
-			#define ISR_FUNC  __attribute__((interrupt))
+			#define ISR_FUNC __attribute__((naked))
 		#endif
 		#ifndef DECLARE_ISR
 			#define DECLARE_ISR(func) \
@@ -394,9 +394,14 @@
 				static NOINLINE void __isr_##func(void);		\
 				void ISR_FUNC func(void)				\
 				{							\
+					asm volatile (					\
+						"sub	lr, lr, #4\n\t"			\
+						"stmfd	sp!, {r0-r3, ip, lr}\n\t");	\
 					__isr_##func();					\
+					asm volatile (					\
+						"ldmfd sp!, {r0-r3, ip, pc}^\n\t");	\
 				}							\
-				static void __isr_##func(void)
+				static NOINLINE void __isr_##func(void)
 		#endif
 		#ifndef DECLARE_ISR_CONTEXT_SWITCH
 			#define DECLARE_ISR_CONTEXT_SWITCH(func) DECLARE_ISR(func)
