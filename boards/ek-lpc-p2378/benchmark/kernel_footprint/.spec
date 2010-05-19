@@ -1,1 +1,1 @@
-name = 'kernel_footprint preset'
+name = 'BeRTOS kernel footprint'

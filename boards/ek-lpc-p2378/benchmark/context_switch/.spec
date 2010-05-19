@@ -1,1 +1,1 @@
-name = 'context_switch preset'
+name = 'BeRTOS context switch'
