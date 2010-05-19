@@ -41,21 +41,21 @@
 #define CFG_LCD_32122A_H
 
 /**
- * LCD setting for 32122A.
+ * Enable soft interrupt to refresh the LCD.
  * $WIZ$ type = "boolean"
  */
 #define CONFIG_LCD_SOFTINT_REFRESH     0
 
 /**
- * lcd setting for 32122a.
- * $wiz$ type = "boolean"
+ * Enable wait macro when display is busy.
+ * $WIZ$ type = "boolean"
  */
 #define CONFIG_LCD_WAIT                0
 
 /**
  * Display refresh time 32122a.
- * $wiz$ type = "int"
- * $wiz$ min = 0
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 0
  */
 #define CONFIG_LCD_REFRESH           100
 
