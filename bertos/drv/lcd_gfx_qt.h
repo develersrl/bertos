@@ -30,7 +30,6 @@
  * All Rights Reserved.
  * -->
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * \brief Custom control for graphics LCD emulation (interface)
@@ -40,10 +39,13 @@
 #define DRV_LCD_GFX_QT_H
 
 // uint8_t
+#include <gfx/gfx.h>
 #include <cfg/compiler.h>
 
 #include <QtGui/QColor>
 #include <QtGui/QFrame>
+
+#define LCD_WIDTH	128
 
 // fwd decls
 class QSizePolicy;
@@ -88,5 +90,9 @@ protected:
 	/// Pixel storage
 	unsigned char raster[(WIDTH + 7 / 8) * HEIGHT];
 };
+
+
+void lcd_gfx_qt_init(Bitmap *lcd_bitmap);
+void lcd_gfx_qt_blitBitmap(const Bitmap *bm);
 
 #endif // DRV_LCD_GFX_QT_H

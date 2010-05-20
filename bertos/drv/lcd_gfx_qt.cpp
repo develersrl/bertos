@@ -30,7 +30,6 @@
  *
  * -->
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * \brief Custom control for graphics LCD emulation (implementation)
@@ -166,18 +165,18 @@ DECLARE_WALL(wall_before_raster, WALL_SIZE)
 static uint8_t lcd_raster[RAST_SIZE(EmulLCD::WIDTH, EmulLCD::HEIGHT)];
 DECLARE_WALL(wall_after_raster, WALL_SIZE)
 
-/** Default LCD bitmap */
-struct Bitmap lcd_bitmap;
 
-/*extern "C"*/ void lcd_init(void)
+
+
+/*extern "C"*/ void lcd_gfx_qt_init(Bitmap *lcd_bitmap)
 {
 	//FIXME INIT_WALL(wall_before_raster);
 	//FIXME INIT_WALL(wall_after_raster);
-	gfx_bitmapInit(&lcd_bitmap, lcd_raster, EmulLCD::WIDTH, EmulLCD::HEIGHT);
-	gfx_bitmapClear(&lcd_bitmap);
+	gfx_bitmapInit(lcd_bitmap, lcd_raster, EmulLCD::WIDTH, EmulLCD::HEIGHT);
+	gfx_bitmapClear(lcd_bitmap);
 }
 
-/*extern "C"*/ void lcd_blitBitmap(Bitmap *bm)
+/*extern "C"*/ void lcd_gfx_qt_blitBitmap(const	Bitmap *bm)
 {
 	//FIXME CHECK_WALL(wall_before_raster);
 	//FIXME CHECK_WALL(wall_after_raster);
