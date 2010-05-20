@@ -1,15 +1,42 @@
 /**
  * \file
+ * <!--
+ * This file is part of BeRTOS.
+ *
+ * Bertos is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * As a special exception, you may use this file as part of a free software
+ * library without restriction.  Specifically, if other files instantiate
+ * templates or use macros or inline functions from this file, or you compile
+ * this file and link it with other files to produce an executable, this
+ * file does not by itself cause the resulting executable to be covered by
+ * the GNU General Public License.  This exception does not however
+ * invalidate any other reasons why the executable file might be covered by
+ * the GNU General Public License.
+ *
  * Copyright 2003, 2004, 2005, 2006 Develer S.r.l. (http://www.develer.com/)
  * Copyright 1999 Bernie Innocenti <bernie@codewiz.org>
  *
- *
- * \version $Id$
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  *
  * \brief General pourpose graphics routines
+ *
+ * $WIZ$ module_name = "gfx"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_gfx.h"
  */
 
 #ifndef GFX_GFX_H
@@ -21,9 +48,13 @@
 #include <cpu/attr.h>       /* CPU_HARVARD */
 
 
+#define CONFIG_CHART_TYPE_X uint8_t ///< Type for the chart dataset
+#define CONFIG_CHART_TYPE_Y uint8_t ///< Type for the chart dataset
+
 /**
  * \name Known pixel formats for bitmap representation.
  * \{
+ * $WIZ$ bitmap_format = "BITMAP_FMT_PLANAR_H_MSB", "BITMAP_FMT_PLANAR_V_LSB"
  */
 #define BITMAP_FMT_PLANAR_H_MSB  1  /**< Planar pixels, horizontal bytes, MSB left. */
 #define BITMAP_FMT_PLANAR_V_LSB  2  /**< Planar pixels, vertical bytes, LSB top. */
