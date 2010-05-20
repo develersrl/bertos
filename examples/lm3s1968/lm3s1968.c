@@ -35,22 +35,29 @@
  * \author Andrea Righi <arighi@develer.com>
  */
 
-#include <cpu/irq.h>
-#include <drv/timer.h>
-#include <drv/ser.h>
-#include <drv/kbd.h>
-#include <drv/lcd_rit128x96.h>
-#include <gfx/gfx.h>
-#include <gfx/font.h>
-#include <gfx/text.h>
-#include <gui/menu.h>
-#include <icons/logo.h>
-#include <stdio.h>
+#include "hw/hw_rit128x96.h"
 
 #include "cfg/compiler.h"
 #include "cfg/cfg_gfx.h"
 
-#include "hw/hw_rit128x96.h"
+#include <cpu/irq.h>
+
+#include <drv/timer.h>
+#include <drv/ser.h>
+#include <drv/kbd.h>
+#include <drv/lcd_rit128x96.h>
+
+#include <gfx/gfx.h>
+#include <gfx/font.h>
+#include <gfx/text.h>
+
+#include <gui/menu.h>
+
+#include <icons/logo.h>
+
+#include <stdio.h>
+
+
 
 #define PROC_STACK_SIZE	KERN_MINSTACKSIZE * 2
 
@@ -316,15 +323,16 @@ static void NORETURN ser_process(void)
 
 static struct MenuItem main_items[] =
 {
-	{ (const_iptr_t)"LED blinking", 0, (MenuHook)led_test, (iptr_t)&lcd_bitmap },
-	{ (const_iptr_t)"Bouncing logo", 0, (MenuHook)bouncing_logo, (iptr_t)&lcd_bitmap },
-	{ (const_iptr_t)"Screen saver demo", 0, (MenuHook)screen_saver, (iptr_t)&lcd_bitmap },
-	{ (const_iptr_t)"Scheduling test", 0, (MenuHook)context_switch_test, (iptr_t)&lcd_bitmap },
-	{ (const_iptr_t)"Show uptime", 0, (MenuHook)uptime, (iptr_t)&lcd_bitmap },
-	{ (const_iptr_t)"Reboot", 0, (MenuHook)soft_reset, (iptr_t)&lcd_bitmap },
-	{ (const_iptr_t)0, 0, NULL, (iptr_t)0 }
+	{ (const_iptr_t)"LED blinking",      0, (MenuHook)led_test,            (iptr_t)&lcd_bitmap },
+	{ (const_iptr_t)"Bouncing logo",     0, (MenuHook)bouncing_logo,       (iptr_t)&lcd_bitmap },
+	{ (const_iptr_t)"Screen saver demo", 0, (MenuHook)screen_saver,        (iptr_t)&lcd_bitmap },
+	{ (const_iptr_t)"Scheduling test",   0, (MenuHook)context_switch_test, (iptr_t)&lcd_bitmap },
+	{ (const_iptr_t)"Show uptime",       0, (MenuHook)uptime,              (iptr_t)&lcd_bitmap },
+	{ (const_iptr_t)"Reboot",            0, (MenuHook)soft_reset,          (iptr_t)&lcd_bitmap },
+	{ (const_iptr_t)0,                   0, NULL,                          (iptr_t)0,          }
 };
-static struct Menu main_menu = { main_items, "BeRTOS", MF_STICKY | MF_SAVESEL, &lcd_bitmap, 0 };
+
+static struct Menu main_menu = { main_items, "BeRTOS", MF_STICKY | MF_SAVESEL, &lcd_bitmap, 0, rit128x96_blitBitmap };
 
 int main(void)
 {

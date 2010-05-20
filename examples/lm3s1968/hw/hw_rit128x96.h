@@ -82,7 +82,7 @@
 	}
 /*@}*/
 
-INLINE void lcd_bus_init(void)
+INLINE void lcd_rit128x96_hw_bus_init(void)
 {
 	uint32_t dummy;
 
@@ -118,11 +118,5 @@ INLINE void lcd_bus_init(void)
 	/* Drain the SSI RX FIFO */
 	while (lm3s_ssiReadFrameNonBlocking(SSI0_BASE, &dummy));
 }
-
-/*
- * XXX: menu stuff requires lcd_blitBimap() function to be defined.
- * Find a better way to do this.
- */
-#define rit128x96_blitBitmap lcd_blitBitmap
 
 #endif /* HW_RIT128x96_H */

@@ -324,7 +324,7 @@ static struct MenuItem main_items[] =
 	{ (const_iptr_t)"Reboot", 0, (MenuHook)soft_reset, (iptr_t)&lcd_bitmap },
 	{ (const_iptr_t)0, 0, NULL, (iptr_t)0 }
 };
-static struct Menu main_menu = { main_items, "BeRTOS", MF_STICKY | MF_SAVESEL, &lcd_bitmap, 0 };
+static struct Menu main_menu = { main_items, "BeRTOS", MF_STICKY | MF_SAVESEL, &lcd_bitmap, 0, rit128x96_blitBitmap };
 
 int main(void)
 {
