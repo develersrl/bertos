@@ -32,7 +32,6 @@
  *
  * \brief General pourpose debug support for embedded systems (implementation).
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  */
