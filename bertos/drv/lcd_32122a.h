@@ -49,13 +49,13 @@
 #define LCD_WIDTH 122
 #define LCD_HEIGHT 32
 
+#include <gfx/gfx.h> /* Bitmap */
+
 #warning __FILTER_NEXT_WARNING__
 #warning this drive is untested..
 
-extern struct Bitmap lcd_bitmap;
-
 void lcd_32122_init(void);
 void lcd_32122_setPwm(int duty);
-void lcd_32122_blitBitmap(struct Bitmap *bm);
+void lcd_32122_blitBitmap(const Bitmap *bm);
 
 #endif /* DRV_LCD_32122A_H */

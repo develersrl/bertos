@@ -291,7 +291,7 @@ void lcd_32122_setPwm(int duty)
 /**
  * Update the LCD display with data from the provided bitmap.
  */
-void lcd_32122_blitBitmap(Bitmap *bm)
+void lcd_32122_blitBitmap(const Bitmap *bm)
 {
 	lcd_32122_writeRaster(bm->raster);
 }
@@ -320,7 +320,8 @@ void lcd_32122_init(void)
 	lcd_32122_clear();
 	lcd_32122_setPwm(LCD_DEF_PWM);
 
-	gfx_bitmapInit(&lcd_bitmap, lcd_raster, LCD_WIDTH, LCD_HEIGHT); gfx_bitmapClear(&lcd_bitmap);
+	gfx_bitmapInit(&lcd_bitmap, lcd_raster, LCD_WIDTH, LCD_HEIGHT);
+	gfx_bitmapClear(&lcd_bitmap);
 
 #if CONFIG_LCD_SOFTINT_REFRESH
 	/* Init IRQ driven LCD refresh */
