@@ -46,8 +46,8 @@
 
 #include <drv/timer.h>
 #include <drv/buzzer.h>
-#include <drv/lcd_gfx.h>
 #include <drv/kbd.h>
+#include <drv/lcd_gfx_qt.h>
 
 #include <gfx/gfx.h>
 #include <gfx/win.h>
@@ -57,12 +57,15 @@
 #include <gui/menu.h>
 #include <icons/logo.h>
 
+/** Default LCD bitmap */
+static Bitmap lcd_bitmap;
+
 /**
  * Refresh the GUI.
  */
 void schedule(void)
 {
-	lcd_blitBitmap(&lcd_bitmap);
+	lcd_gfx_qt_blitBitmap(&lcd_bitmap);
 	emul_idle();
 }
 
@@ -186,7 +189,6 @@ void win_demo(Bitmap *bm)
 		if (y >= bm->height) ydir = -1;
 		if (y <= -50)        ydir = +1;
 
-		/* Large window animation */
 		bm = large_win.bitmap;
 		gfx_bitmapClear(bm);
 		for (i = 0; i < bm->height / 2; i += 2)
@@ -244,7 +246,7 @@ static struct MenuItem settings_items[] =
 	{ (const_iptr_t)"Power Saving", MIF_TOGGLE, (MenuHook)0, (iptr_t)0 },
 	{ (const_iptr_t)0, 0, NULL, (iptr_t)0 }
 };
-static struct Menu settings_menu = { settings_items, "Settings Menu", MF_STICKY | MF_SAVESEL, &lcd_bitmap, 0 };
+static struct Menu settings_menu = { settings_items, "Settings Menu", MF_STICKY | MF_SAVESEL, &lcd_bitmap, 0, lcd_gfx_qt_blitBitmap };
 
 
 /* MX SUBMENU */
@@ -258,7 +260,7 @@ static struct MenuItem mx_items[] =
 	{ (const_iptr_t)0, 0, NULL, (iptr_t)0 }
 };
 
-static struct Menu mx_menu = { mx_items, (const_iptr_t)0, MF_STICKY | MF_SAVESEL, &lcd_bitmap, 0 };
+static struct Menu mx_menu = { mx_items, (const_iptr_t)0, MF_STICKY | MF_SAVESEL, &lcd_bitmap, 0, lcd_gfx_qt_blitBitmap };
 
 
 /* DISPLAY SUBMENU */
@@ -271,7 +273,7 @@ static struct MenuItem display_items[] =
 	{ (const_iptr_t)"Icon Theme", 0, (MenuHook)0, (iptr_t)0 },
 	{ (const_iptr_t)0, 0, NULL, (iptr_t)0 }
 };
-static struct Menu display_menu = { display_items, "Display Menu", MF_SAVESEL, &lcd_bitmap, 0 };
+static struct Menu display_menu = { display_items, "Display Menu", MF_SAVESEL, &lcd_bitmap, 0, lcd_gfx_qt_blitBitmap };
 
 
 /* MAIN MENU */
@@ -288,7 +290,7 @@ static struct MenuItem main_items[] =
 	{ (const_iptr_t)"Settings",    0, (MenuHook)menu_handle,  (iptr_t)&settings_menu },
 	{ (const_iptr_t)0, 0, NULL, (iptr_t)0 }
 };
-static struct Menu main_menu = { main_items, "Main Menu", MF_STICKY, &lcd_bitmap, 0 };
+static struct Menu main_menu = { main_items, "Main Menu", MF_STICKY, &lcd_bitmap, 0, lcd_gfx_qt_blitBitmap };
 
 #if CONFIG_KERN_HEAP
 #define monitor_stack NULL
@@ -303,7 +305,7 @@ int main(int argc, char *argv[])
 	timer_init();
 	buz_init();
 	kbd_init();
-	lcd_init();
+	lcd_gfx_qt_init(&lcd_bitmap);
 	proc_init();
 	monitor_start(KERN_MINSTACKSIZE, monitor_stack);
 
