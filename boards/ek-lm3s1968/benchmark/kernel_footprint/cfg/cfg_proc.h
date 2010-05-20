@@ -79,7 +79,7 @@
  * $WIZ$ type = "boolean"
  * $WIZ$ conditional_deps = "heap"
  */
-#define CONFIG_KERN_HEAP 0
+#define CONFIG_KERN_HEAP 1
 
 /**
  * Size of the dynamic memory pool used by processes.
