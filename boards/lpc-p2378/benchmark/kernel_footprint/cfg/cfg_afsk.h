@@ -32,7 +32,6 @@
  *
  * \brief Configuration file for AFSK1200 modem.
  *
- * \version $Id$
  * \author Francesco Sacchi <asterix@develer.com>
  */
 

@@ -32,8 +32,6 @@
  *
  * \brief Configuration file for I2C module.
  *
- * \version $Id$
- *
  * \author Daniele Basile <asterix@develer.com>
  */
 
