@@ -39,8 +39,9 @@
 
 #include "menu.h"
 
-#include "cfg/cfg_gfx.h"
+#include "cfg/cfg_menu.h"
 #include "cfg/cfg_arch.h"
+
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
 
@@ -54,10 +55,6 @@
 
 #if CPU_HARVARD
 #include <avr/pgmspace.h> /* strncpy_P() */
-#endif
-
-#if CONFIG_MENU_SMOOTH
-#include <drv/lcd_gfx.h>
 #endif
 
 #if (CONFIG_MENU_TIMEOUT != 0)
@@ -195,13 +192,11 @@ static void menu_layout(
 
 	ypos = bm->cr.ymin;
 
-#if 1
 	if (redraw)
 	{
 		/* Clear screen */
 		text_clear(menu->bitmap);
 	}
-#endif
 
 	if (title)
 	{
@@ -293,7 +288,7 @@ static void menu_layout(
 		/* Clear rest of area */
 		gfx_rectClear(bm, bm->cr.xmin, ypos, bm->cr.xmax, bm->cr.ymax);
 
-		lcd_blitBitmap(bm);
+		menu->lcd_blitBitmap(bm);
 	}
 
 	/* Restore old cliprect */

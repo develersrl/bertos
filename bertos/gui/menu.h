@@ -46,11 +46,11 @@
 
 #include <cfg/compiler.h>
 
-/* Fwd decl */
-struct Bitmap;
+#include <gfx/gfx.h>
 
 /** Menu callback function */
 typedef iptr_t (*MenuHook)(iptr_t userdata);
+typedef void (*BlitBitmap)(const Bitmap *bm);
 
 /**
  * Menu item description.
@@ -100,6 +100,7 @@ typedef struct Menu
 	int              flags;    /**< See MF_#? definitions below */
 	struct Bitmap   *bitmap;   /**< Bitmap where the menu is rendered */
 	int              selected; /**< Initial selection (written to if MF_SAVESEL is set). */
+	BlitBitmap       lcd_blitBitmap; /**< Callback to call to do smooth the display */
 } Menu;
 
 /**
