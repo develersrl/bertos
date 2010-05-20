@@ -24,7 +24,5 @@ include examples/demo/demo.mk
 #include examples/lpc2378/lpc2378.mk
 #include examples/avr-kern/avr-kern.mk
 #include examples/triface/triface.mk
-#include examples/benchmark/kernel-only_arm/kernel-only_arm.mk
-#include examples/benchmark/kernel-core_avr/kernel-core_avr.mk
 
 include bertos/rules.mk
