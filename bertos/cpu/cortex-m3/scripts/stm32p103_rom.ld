@@ -81,8 +81,8 @@ SECTIONS
 	.data : AT (__text_end)
 	{
 		PROVIDE (__data_start = .);
-		*(vtable)
 		. = ALIGN (0x400);
+		*(vtable)
 		*(.data .data.*)
 		. = ALIGN (4);
 		_edata = .;
