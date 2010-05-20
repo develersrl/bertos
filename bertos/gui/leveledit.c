@@ -37,7 +37,7 @@
 
 #include "leveledit.h"
 
-#include "cfg/cfg_gfx.h"
+#include "cfg/cfg_menu.h"
 #include <cfg/macros.h> /* MAX() */
 
 #include <drv/kbd.h>
@@ -53,8 +53,6 @@
 #if CONFIG_MENU_MENUBAR
 #include <gui/menubar.h>
 #endif
-
-#include <drv/lcd_gfx.h>
 
 #warning FIXME: Revise me!
 
