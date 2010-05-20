@@ -32,7 +32,6 @@
  *
  * \brief Generic text LCD driver (impl.).
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  */
