@@ -35,10 +35,13 @@
  * \author Andrea Righi <arighi@develer.com>
  */
 
+#include "lcd_rit128x96.h"
+
+#include "hw/hw_rit128x96.h"
+
 #include <cfg/debug.h>
 #include <cfg/macros.h>
 
-#include "lcd_rit128x96.h"
 
 /*
  * Hard-coded command initialization sequence.
@@ -201,7 +204,7 @@ void rit128x96_blitBitmap(const Bitmap *bm)
 void rit128x96_init(void)
 {
 	/* Initialize the communication bus */
-	lcd_bus_init();
+	lcd_rit128x96_hw_bus_init();
 
 	/* Turn on the OLED display */
 	rit128x96_on();

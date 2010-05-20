@@ -40,7 +40,8 @@
 #define LCD_LM3S_H
 
 #include <gfx/gfx.h> /* Bitmap */
-#include "hw/hw_rit128x96.h"
+
+#include <cpu/types.h>
 
 #define LCD_WIDTH	128
 #define LCD_HEIGHT	96
