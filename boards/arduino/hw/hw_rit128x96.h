@@ -70,7 +70,7 @@
 #define LCD_WRITE(x)    ((void)x)/* Implement me! */
 /*@}*/
 
-INLINE void lcd_bus_init(void)
+INLINE void lcd_rit128x96_hw_bus_init(void)
 {
 	/* Implement me! */
 }
