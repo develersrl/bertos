@@ -80,9 +80,9 @@ SECTIONS
 
 	.data : AT (__text_end)
 	{
+		. = ALIGN (0x400);
 		PROVIDE (__data_start = .);
 		*(vtable)
-		. = ALIGN (0x400);
 		*(.data .data.*)
 		. = ALIGN (4);
 		_edata = .;
