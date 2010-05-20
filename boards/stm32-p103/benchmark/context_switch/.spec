@@ -1,1 +1,1 @@
-name = 'BeRTOS context switch'
+name = 'BeRTOS Context Switch'
