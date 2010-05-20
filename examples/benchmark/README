@@ -1,8 +1,0 @@
-In this directory there are a couple of projects useful to measure various
-BeRTOS features. Not all the projects are meaningful programs, for example
-flash occupation benchmarks just call once most or all functions of a module
-just to let the compiler generate the corresponding code.
-
-Below there's a description of single projects:
- - kernel-only_arm/: priority kernel, signals, message queues.
- - kernel-core_avr/: all kernel-only options plus serial and timer core drivers
