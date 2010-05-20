@@ -66,7 +66,7 @@ INLINE int rcc_get_flag_status(uint32_t flag)
 
 INLINE uint16_t pll_clock(void)
 {
-	int div, mul;
+	unsigned int div, mul;
 
 	/* Hopefully this is evaluate at compile time... */
 	for (div = 2; div; div--)
