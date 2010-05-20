@@ -38,10 +38,10 @@
 #ifndef HW_LED_H
 #define HW_LED_H
 
-#define LED_ON()    PORTG &= ~BV(PG4)
-#define LED_OFF()   PORTG |= BV(PG4)
+#include <avr/io.h>
 
-/* set pin PG4 as out */
-#define LED_INIT()   DDRG |= BV(PG4)
+#define LED_ON()    PORTB |= BV(5)
+#define LED_OFF()   PORTB &= ~BV(5)
+#define LED_INIT()  DDRB |= BV(5)
 
 #endif /* HW_LED_H */
