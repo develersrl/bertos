@@ -47,7 +47,10 @@
 #include <cpu/power.h>
 
 #include <drv/timer.h>
+#if CONFIG_USE_HP_TIMER
 #include <drv/ser.h>
+static Serial out;
+#endif
 
 #include <kern/proc.h>
 
@@ -57,8 +60,6 @@ static PROC_DEFINE_STACK(hp_stack, PROC_STACK_SIZE);
 static PROC_DEFINE_STACK(lp_stack, PROC_STACK_SIZE);
 
 static Process *hp_proc, *lp_proc, *main_proc;
-static Serial out;
-
 #if CONFIG_USE_HP_TIMER
 static hptime_t start, end;
 #endif
@@ -101,8 +102,10 @@ void NORETURN context_switch(void)
 	timer_init();
 	proc_init();
 
-	ser_init(&out, CONFIG_CTX_DEBUG_PORT);
-	ser_setbaudrate(&out, CONFIG_CTX_DEBUG_BAUDRATE);
+	#if CONFIG_USE_HP_TIMER
+		ser_init(&out, CONFIG_CTX_DEBUG_PORT);
+		ser_setbaudrate(&out, CONFIG_CTX_DEBUG_BAUDRATE);
+	#endif
 
 	#if CONFIG_USE_LED
 		LED_INIT();

@@ -39,12 +39,21 @@
 #define CFG_CONTEXT_SWITCH_H
 
 /**
- * Use hp timer for the bechmark, otherwise it use
- * one led.
+ * Use hp timer for the bechmark.
+ *
+ * $WIZ$ type = "boolean"
+ * $WIZ$ module= "boolean"
+ * $WIZ$ conditional_deps = "ser"
+ */
+#define CONFIG_USE_HP_TIMER       1
+
+
+/**
+ * Use board led for benchmark.
  *
  * $WIZ$ type = "boolean"
  */
-#define CONFIG_USE_HP_TIMER       1
+#define CONFIG_USE_LED       1
 
 
 /**

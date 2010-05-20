@@ -36,7 +36,7 @@
  * \author Daniele Basiele <asterix@develer.com>
  *
  * $WIZ$ module_name = "context_switch"
- * $WIZ$ module_depends = "kfile", "kern", "signal", "timer", "ser"
+ * $WIZ$ module_depends = "kfile", "kern", "signal", "timer"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_context_switch.h"
  * $WIZ$ module_hw = "bertos/hw/hw_led.h"
  */

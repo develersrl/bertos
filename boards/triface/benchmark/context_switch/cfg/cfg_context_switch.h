@@ -42,6 +42,8 @@
  * Use hp timer for the bechmark.
  *
  * $WIZ$ type = "boolean"
+ * $WIZ$ module= "boolean"
+ * $WIZ$ conditional_deps = "ser"
  */
 #define CONFIG_USE_HP_TIMER       1
 
