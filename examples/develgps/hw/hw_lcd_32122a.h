@@ -26,32 +26,34 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2003, 2004, 2005, 2008 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2005, 2006, 2010 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2001 Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
  *
- * \brief LCD low-level hardware macros
- *
- * \version $Id$
+ * \brief Displaytech 32122A LCD driver
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  *
  */
 
-#ifndef HW_LCD_H
-#define HW_LCD_H
+#ifndef HW_LCD_32122A_H
+#define HW_LCD_32122A_H
 
-#include "cfg/cfg_lcd.h"  /* CONFIG_LCD_4BIT */
-#include <cfg/macros.h>   /* BV() */
-#include <cfg/debug.h>
-
-#include <cpu/attr.h>
-#include <cpu/irq.h>
 #include <cpu/types.h>
+#include <cpu/irq.h>
 
 #warning TODO:This is an example implementation, you must implement it!
+
+/**
+ * Predefined LCD PWM contrast values
+ */
+#define LCD_DEF_PWM 145
+#define LCD_MAX_PWM 505
+#define LCD_MIN_PWM 130
+#define LCD_PWM_CH    0
+
 
 /**
  * \name LCD I/O pins/ports
@@ -59,7 +61,8 @@
  */
 #define LCD_RS    /* Implement me! */
 #define LCD_RW    /* Implement me! */
-#define LCD_E     /* Implement me! */
+#define LCD_PE_E1    /* Implement me! */
+#define LCD_PE_E2    /* Implement me! */
 #define LCD_DB0   /* Implement me! */
 #define LCD_DB1   /* Implement me! */
 #define LCD_DB2   /* Implement me! */
@@ -68,43 +71,36 @@
 #define LCD_DB5   /* Implement me! */
 #define LCD_DB6   /* Implement me! */
 #define LCD_DB7   /* Implement me! */
-/*@}*/
-
-/**
- * \name DB high nibble (DB[4-7])
- * @{
- */
-
-#if CONFIG_LCD_4BIT
-	#define LCD_MASK    (LCD_DB7 | LCD_DB6 | LCD_DB5 | LCD_DB4)
-	#define LCD_SHIFT   4
-#else
-	#define LCD_MASK (uint8_t)0xff
-	#define LCD_SHIFT 0
-#endif
+#define LCD_PF_DB0   /* Implment me! */
 /*@}*/
 
 /**
  * \name LCD bus control macros
  * @{
  */
-#define LCD_CLR_RS      /* Implement me! */
-#define LCD_SET_RS      /* Implement me! */
-#define LCD_CLR_RD      /* Implement me! */
-#define LCD_SET_RD      /* Implement me! */
-#define LCD_CLR_E       /* Implement me! */
-#define LCD_SET_E       /* Implement me! */
-
-#if CONFIG_LCD_4BIT
-	#define LCD_WRITE_H(x)  ((void)x)/* Implement me! */
-	#define LCD_WRITE_L(x)  ((void)x)/* Implement me! */
-	#define LCD_READ_H      ( 0 /* Implement me! */ )
-	#define LCD_READ_L      ( 0 /* Implement me! */ )
-#else
-	#define LCD_WRITE(x)    ((void)x)/* Implement me! */
-	#define LCD_READ        (0 /* Implement me! */ )
-#endif
+#define LCD_CLR_A0                do { /* Implement me! */ } while (0)
+#define LCD_SET_A0                do { /* Implement me! */ } while (0)
+#define LCD_CLR_RD                do { /* Implement me! */ } while (0)
+#define LCD_SET_RD                do { /* Implement me! */ } while (0)
+#define LCD_CLR_E1                do { /* Implement me! */ } while (0)
+#define LCD_SET_E1                do { /* Implement me! */ } while (0)
+#define LCD_CLR_E2                do { /* Implement me! */ } while (0)
+#define LCD_SET_E2                do { /* Implement me! */ } while (0)
+#define LCD_SET_E(x)              do { (void)x; /* Implement me! */ } while (0)
+#define LCD_CLR_E(x)              do { (void)x; /* Implement me! */ } while (0)
 /*@}*/
+
+/**
+ * \name Chip select bits for LCD_SET_E()
+ * @{
+ */
+#define LCDF_E1                   ( 0/* Implement me! */)
+#define LCDF_E2                   ( 0/* Implement me! */)
+/*@}*/
+/** Read from the LCD data bus (DB[0-7]) */
+#define LCD_WRITE(x)    ((void)x)/* Implement me! */
+/** Write to the LCD data bus (DB[0-7]) */
+#define LCD_READ        (0 /* Implement me! */ )
 
 /** Set data bus direction to output (write to display) */
 #define LCD_DB_OUT          /* Implement me! */
@@ -132,7 +128,9 @@
 	} while (0)
 
 
-INLINE void lcd_bus_init(void)
+#define LCD_32122_RESET()         do { /* Implement me! */ } while (0)
+
+INLINE void lcd_32122a_hw_bus_init(void)
 {
 	cpu_flags_t flags;
 	IRQ_SAVE_DISABLE(flags);
@@ -153,4 +151,5 @@ INLINE void lcd_bus_init(void)
 	IRQ_RESTORE(flags);
 }
 
-#endif /* HW_LCD_H */
+#endif /* HW_LCD_32122A_H */
+
