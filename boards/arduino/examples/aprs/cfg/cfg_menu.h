@@ -26,42 +26,42 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
  * All Rights Reserved.
  * -->
  *
- * \brief Configuration file for GFX module.
+ * \brief Configuration file for Menu module.
  *
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef CFG_GFX_H
-#define CFG_GFX_H
+#ifndef CFG_MENU_H
+#define CFG_MENU_H
 
 /**
- * Enable line clipping algorithm.
+ * Enable button bar behind menus
  * $WIZ$ type = "boolean"
  */
-#define CONFIG_GFX_CLIPPING  1
+#define CONFIG_MENU_MENUBAR        0
 
 /**
- * Enable text rendering in bitmaps.
+ * Level Edit Timeout
  * $WIZ$ type = "boolean"
  */
-#define CONFIG_GFX_TEXT  1
+#define CONFIG_LEVELEDIT_TIMEOUT   0
 
 /**
- * Enable virtual coordinate system.
+ * Menu timeout
  * $WIZ$ type = "boolean"
  */
-#define CONFIG_GFX_VCOORDS  1
+#define CONFIG_MENU_TIMEOUT        0
 
 /**
- * Select bitmap pixel format.
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "bitmap_format"
+ * Enable smooth scrolling in menus
+ * $WIZ$ type = "boolean"
  */
-#define CONFIG_BITMAP_FMT  BITMAP_FMT_PLANAR_V_LSB
+#define CONFIG_MENU_SMOOTH         1
 
-#endif /* CFG_GFX_H */
+
+#endif /* CFG_MENU_H */
 
