@@ -31,7 +31,6 @@
  *
  * \brief Multifunction system test for BeRTOS modules.
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
