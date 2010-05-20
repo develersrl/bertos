@@ -119,9 +119,4 @@ INLINE void lcd_bus_init(void)
 	while (lm3s_ssiReadFrameNonBlocking(SSI0_BASE, &dummy));
 }
 
-/*
- * XXX: menu stuff requires lcd_blitBimap() function to be defined.
- * Find a better way to do this.
- */
-
 #endif /* HW_RIT128x96_H */

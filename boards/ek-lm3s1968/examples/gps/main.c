@@ -517,7 +517,7 @@ static struct MenuItem main_items[] =
 
 static struct Menu main_menu =
 {
-	main_items, "DevelGPS v0.1", MF_STICKY | MF_SAVESEL, &lcd_bitmap, 0
+	main_items, "DevelGPS v0.1", MF_STICKY | MF_SAVESEL, &lcd_bitmap, 0, rit128x96_blitBitmap
 };
 
 static void init(void)
