@@ -83,7 +83,7 @@ typedef uint32_t kdbg_irqsave_t;
 INLINE void uart_hw_config(void)
 {
 	unsigned long div, baud = CONFIG_KDEBUG_BAUDRATE;
-	bool hi_speed;
+	bool hi_speed = false;
 
 	if (baud * 16 > CPU_FREQ)
 	{
