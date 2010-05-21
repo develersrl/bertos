@@ -67,7 +67,7 @@ class BFinalPage(BWizardPage):
                 QMessageBox.critical(
                     self,
                     self.tr("Error removing destination directory"),
-                    self.tr("Error removing the destination directory. This directory or a file in it is in use by another user or application.\nClose the application that is using the directory and retry."))
+                    self.tr("Error removing the destination directory. This directory or a file in it is in use by another user or application.\nClose the application which is using the directory and retry."))
                 self.wizard().back()
                 return
         finally:
