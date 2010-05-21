@@ -456,13 +456,19 @@ int nmea_gpgsv(nmeap_context_t *context, nmeap_sentence_t *sentence)
 }
 
 
-/*
+/**
  * Parse NMEA sentence from a channel.
  */
 void nmea_poll(nmeap_context_t *context, KFile *channel)
 {
-	int c;
+	int c, e;
 	while ((c = kfile_getc(channel)) != EOF)
 		nmeap_parse(context, c);
+
+	if ((e = kfile_error(channel)))
+	{
+		LOG_ERR("ch error [%0X]\n", e);
+		kfile_clearerr(channel);
+	}
 }
 
