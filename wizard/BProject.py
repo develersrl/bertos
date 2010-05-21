@@ -270,6 +270,9 @@ class BProject(object):
                                 configuration_info[configuration] = updateConfigurationValues(configuration_info[configuration], loadConfigurationInfos(cfg_file_path))
                             except ParseError, err:
                                 raise DefineException.ConfigurationDefineException(cfg_file_path, err.line_number, err.line)
+                            except IOError, err:
+                                # The wizard can't find the file, use the default configuration
+                                pass
                 module_info_dict.update(module_dict)
                 configuration_info_dict.update(configuration_info)
                 if to_be_parsed:
