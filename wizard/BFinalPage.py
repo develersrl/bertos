@@ -54,6 +54,7 @@ class BFinalPage(BWizardPage):
     ## Overloaded BWizardPage methods ##
         
     def reloadData(self):
+        self.setVisible(False)
         """
         Overload of the BWizardPage reloadData method.
         """
@@ -72,6 +73,7 @@ class BFinalPage(BWizardPage):
                 return
         finally:
             QApplication.instance().restoreOverrideCursor()
+        self.setVisible(True)
         self._plugin_dict = {}
         if os.name == "nt":
             output = self.projectInfo("OUTPUT")
