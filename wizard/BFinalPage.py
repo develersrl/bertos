@@ -59,7 +59,14 @@ class BFinalPage(BWizardPage):
         """
         try:
             QApplication.instance().setOverrideCursor(Qt.WaitCursor)
-            self.project.createBertosProject()
+            try:
+                # This operation can throw WindowsError, if the directory is
+                # locked.
+                self.project.createBertosProject()
+            except OSError, e:
+                QMessageBox.critical(self, self.tr("Error removing destination directory"), self.tr("Close all the application using this directory and retry."))
+                self.wizard().back()
+                return
         finally:
             QApplication.instance().restoreOverrideCursor()
         self._plugin_dict = {}
