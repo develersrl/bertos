@@ -64,7 +64,10 @@ class BFinalPage(BWizardPage):
                 # locked.
                 self.project.createBertosProject()
             except OSError, e:
-                QMessageBox.critical(self, self.tr("Error removing destination directory"), self.tr("Close all the application using this directory and retry."))
+                QMessageBox.critical(
+                    self,
+                    self.tr("Error removing destination directory"),
+                    self.tr("Error removing the destination directory. This directory or a file in it is in use by another user or application.\nClose the application that is using the directory and retry."))
                 self.wizard().back()
                 return
         finally:
