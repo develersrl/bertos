@@ -46,6 +46,48 @@
  * - wait the sample_time (from ini file)
  * - contine from beginning.
  *
+ * Here we put the ini file that this example uses. To use it copy
+ * the folling configutation line into the file called sd_fat.ini (or see INI_FILE_NAME
+ * define if you want chande the name).
+ * \code
+ *
+ *   # Bertos SD fat project example
+ *   #
+ *   # Basic configurarion
+ *   #
+ *
+ *   [log]
+ *   # Name of log file
+ *   name = test.log
+ *   # Enable the logging on serial device (enable = 1, disable = 0)
+ *   log_on_serial = 1
+ *   # Enable logging on sd file (enable = 1, disable = 0)
+ *   log_on_file = 1
+ *   # Period between two log in millisecond
+ *   sample_time = 1000
+ *
+ *   [serial_log]
+ *   # Select serial port where log
+ *   port = 0
+ *   # Serial port baudrate
+ *   baud = 115200
+ *
+ *   [log_format]
+ *   # Default text to insert on each log line
+ *   line_header = BeRTOS Log: 
+ *   # Use this char to separate each log field
+ *   field_sep = ;
+ *
+ *   [temperature]
+ *   unit_label = C
+ *
+ *   [pressure]
+ *   unit_label = hPa
+ *
+ *   [voltage]
+ *   unit_label = V
+ *
+ * \endcode
  */
 
 #include <cfg/debug.h>
