@@ -360,7 +360,7 @@ class BProject(object):
         self._writeCustomSrcFiles()
 
         # Copy the hw files
-        self._writeHwFiles(self.src_hwdir, self.hwdir)
+        self._writeAllPresetHwFiles(self.src_hwdir, self.hwdir)
 
         # Copyt the new *_user.mk file
         self._writeUserMkFileFromPreset()
@@ -440,6 +440,20 @@ class BProject(object):
                     # If not in editing mode it copies all the hw files. If in
                     # editing mode it copies only the files that don't exist yet
                     open(os.path.join(destination_dir,os.path.basename(hwfile)), "w").write(string)
+
+    def _writeAllPresetHwFiles(self, source_dir, destination_dir):
+        """
+        Copy all but directories contained into the preset hw directory.
+        It's needed because some presets need custom hw files not defined with
+        Wizard directives into modules...
+        """
+        source_dir = os.path.join(source_dir, "hw")
+        for f in os.listdir(source_dir):
+            abspath = os.path.join(source_dir, f)
+            if not os.path.isdir(abspath):
+                # Exlude directories from the copy!
+                hw_file = open(os.path.join(source_dir, f), 'r').read()
+                open(os.path.join(destination_dir, f), 'w').write(hw_file)
 
     def _writeCfgFiles(self, source_dir, destination_dir):
         for configuration, information in self.infos["CONFIGURATIONS"].items():
