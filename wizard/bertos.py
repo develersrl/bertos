@@ -93,7 +93,7 @@ def editProject(project_file):
             QMessageBox.critical(
                 None,
                 QObject().tr("BeRTOS version not found!"),
-                QObject().tr("The selected BeRTOS version is not found, please select an existing one...")
+                QObject().tr("The selected BeRTOS version was not found, please select another one...")
             )
             dialog = BVersionDialog()
             if dialog.exec_():
@@ -104,7 +104,7 @@ def editProject(project_file):
             QMessageBox.critical(
                 None,
                 QObject().tr("Toolchain not found!"),
-                QObject().tr("The selected toolchain is not found, please select an existing one...")
+                QObject().tr("The selected toolchain was not found, please select another one...")
             )
             QApplication.instance().project = exc.partial_project
             dialog = BToolchainDialog()
