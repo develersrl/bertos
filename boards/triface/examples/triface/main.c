@@ -74,7 +74,7 @@ static void init(void)
 	adc_init();
 	buz_init();
 
-	INPUT_INIT;
+	INPUT_INIT();
 }
 
 int main(void)
