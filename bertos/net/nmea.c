@@ -118,9 +118,7 @@ static udegree_t convertToDegree(const char *str)
 	uint32_t min;
 
 	if (*str == 0)
-	{
-        return 0;
-    }
+		return 0;
 
 	dec = tokenToInt(str, 4);
 	deg = dec / 1000000;
@@ -137,10 +135,10 @@ static udegree_t nmea_latitude(const char *plat, const char *phem)
 {
 	int ns;
 
-    if (*phem == 0)
-        return 0;
+	if (*phem == 0)
+		return 0;
 
-    /* north lat is +, south lat is - */
+	/* north lat is +, south lat is - */
 	ns = (*phem == 'N') ? 1 : -1;
 
 
@@ -154,11 +152,11 @@ static udegree_t nmea_longitude(const char *plot, const char *phem)
 {
 	int ew;
 
-    if (*phem == 0)
-        return 0;
+	if (*phem == 0)
+		return 0;
 
-    /* west long is negative, east long is positive */
-   ew = (*phem == 'E') ? 1 : -1;
+	/* west long is negative, east long is positive */
+	ew = (*phem == 'E') ? 1 : -1;
 
 	return ew * convertToDegree(plot);
 }
@@ -172,21 +170,21 @@ static uint16_t nmea_altitude(const char *palt, const char *punits)
 	uint32_t alt;
 
 	if (*palt == 0)
-        return 0;
+		return 0;
 
 	alt = atoi(palt);
 
-    if (*punits == 'F')
+	if (*punits == 'F')
 	{
-        /* convert to feet */
-        /* alt = alt * 3.2808399 */
+		/* convert to feet */
+		/* alt = alt * 3.2808399 */
 		alt = alt * 3 +  /* 3.0 */
-			  (alt >> 2) + /* 0.25 */
-			  (alt >> 6) + /* 0.015625 */
-			  (alt >> 7) + /* 0.0078125 */
-			  (alt >> 8); /* 0,00390625 */
+			(alt >> 2) + /* 0.25 */
+			(alt >> 6) + /* 0.015625 */
+			(alt >> 7) + /* 0.0078125 */
+			(alt >> 8); /* 0,00390625 */
 
-    }
+	}
 
 	return alt;
 }
@@ -221,7 +219,7 @@ static time_t timestampToSec(uint32_t time_stamp, uint32_t date_stamp)
 	t.tm_sec = tmr[0] + (ROUND_UP(msec, 1000) / 1000);
 	t.tm_min = tmr[1];
 	t.tm_hour = tmr[2];
-	//If we not have refence data, we set as default 1/1/1970.
+	//If we do not have refence data, we set 1/1/1970 as default
 	t.tm_mday = 1;
 	t.tm_mon = 0;
 	t.tm_year = 70;
@@ -238,8 +236,8 @@ static time_t timestampToSec(uint32_t time_stamp, uint32_t date_stamp)
 		}
 		t.tm_mday = date[2];
 		t.tm_mon = date[1] - 1; // time struct count month from 0 to 11;
-		// we should specific number of years from 1900, but the year field
-		// is only two cipher, so we sum 100 (2000 - 1900)..
+		// we should specify the number of years from 1900, but the year field
+		// is only two digits, so we add 100 (2000 - 1900)..
 		t.tm_year = date[0] + 100;
 	}
 	LOG_INFO("times=%d,%d,%d,%d,%d,%d\n",t.tm_sec, t.tm_min, t.tm_hour, t.tm_year, t.tm_mon, t.tm_mday);
@@ -258,14 +256,14 @@ void gpgga_callout(nmeap_context_t *context, void *data, void *user_data)
 	LOG_INFOB(
 		NmeaGga *gga = (NmeaGga *)data;
 		LOG_INFO("Found GPGGA message %ld %ld %d %lu %d %d %d %d\n",
-				(long)gga->latitude,
-				(long)gga->longitude,
-				gga->altitude,
-				gga->time,
-				gga->satellites,
-				gga->quality,
-				gga->hdop,
-				gga->geoid);
+			(long)gga->latitude,
+			(long)gga->longitude,
+			gga->altitude,
+			gga->time,
+			gga->satellites,
+			gga->quality,
+			gga->hdop,
+			gga->geoid);
 	);
 }
 
@@ -277,17 +275,17 @@ void gprmc_callout(nmeap_context_t *context, void *data, void *user_data)
 	(void)context;
 	(void)user_data;
 	(void)data;
-    LOG_INFOB(
+	LOG_INFOB(
 		NmeaRmc *rmc = (NmeaRmc *)data;
 
 		LOG_INFO("Found GPRMC message %lu %c %ld %ld %d %d %d\n",
-				rmc->time,
-				rmc->warn,
-				(long)rmc->latitude,
-				(long)rmc->longitude,
-				rmc->speed,
-				rmc->course,
-				rmc->mag_var);
+			rmc->time,
+			rmc->warn,
+			(long)rmc->latitude,
+			(long)rmc->longitude,
+			rmc->speed,
+			rmc->course,
+			rmc->mag_var);
 	);
 }
 
@@ -302,7 +300,7 @@ void gpgsv_callout(nmeap_context_t *context, void *data, void *user_data)
 	LOG_INFOB(
 		NmeaGsv *gsv = (NmeaGsv *)data;
 
-	    LOG_INFO("Found GPGSV message %d %d %d\n", gsv->tot_message, gsv->message_num, gsv->tot_svv);
+		LOG_INFO("Found GPGSV message %d %d %d\n", gsv->tot_message, gsv->message_num, gsv->tot_svv);
 
 		for (int i = 0; i < 4; i++)
 			LOG_INFO("%d %d %d %d\n", gsv->info[i].sv_prn, gsv->info[i].elevation, gsv->info[i].azimut, gsv->info[i].snr);
@@ -319,7 +317,7 @@ void gpvtg_callout(nmeap_context_t *context, void *data, void *user_data)
 	(void)data;
 	LOG_INFOB(
 		NmeaVtg *vtg = (NmeaVtg *)data;
-	    LOG_INFO("Found GPVTG message %d %d %d\n", vtg->track_good,	vtg->knot_speed, vtg->km_speed);
+		LOG_INFO("Found GPVTG message %d %d %d\n", vtg->track_good,	vtg->knot_speed, vtg->km_speed);
 	);
 }
 
@@ -363,10 +361,10 @@ int nmea_gpgga(nmeap_context_t *context, nmeap_sentence_t *sentence)
 int nmea_gprmc(nmeap_context_t *context, nmeap_sentence_t *sentence)
 {
 
-    /*
+	/*
 	 * get pointer to sentence data
 	 */
-    NmeaRmc *rmc = (NmeaRmc *)sentence->data;
+	NmeaRmc *rmc = (NmeaRmc *)sentence->data;
 
 	ASSERT(rmc);
 	ASSERT(context->tokens >= 10);
@@ -382,10 +380,10 @@ int nmea_gprmc(nmeap_context_t *context, nmeap_sentence_t *sentence)
 	rmc->course     = atoi(context->token[8]);
 	rmc->mag_var    = atoi(context->token[10]);
 
-    if (sentence->callout != 0)
-        (*sentence->callout)(context, rmc, context->user_data);
+	if (sentence->callout != 0)
+		(*sentence->callout)(context, rmc, context->user_data);
 
-    return NMEA_GPRMC;
+	return NMEA_GPRMC;
 }
 
 
@@ -395,10 +393,10 @@ int nmea_gprmc(nmeap_context_t *context, nmeap_sentence_t *sentence)
 int nmea_gpvtg(nmeap_context_t *context, nmeap_sentence_t *sentence)
 {
 
-    /*
+	/*
 	 * get pointer to sentence data
 	 */
-    NmeaVtg *vtg = (NmeaVtg *)sentence->data;
+	NmeaVtg *vtg = (NmeaVtg *)sentence->data;
 
 	ASSERT(vtg);
 	ASSERT(context->tokens >= 7);
@@ -410,13 +408,13 @@ int nmea_gpvtg(nmeap_context_t *context, nmeap_sentence_t *sentence)
 	vtg->knot_speed  = atoi(context->token[5]);
 	vtg->km_speed    = atoi(context->token[7]);
 
-    /*
+	/*
 	 * if the sentence has a callout, call it
 	 */
-    if (sentence->callout != 0)
-        (*sentence->callout)(context, vtg, context->user_data);
-
-    return NMEA_GPVTG;
+	if (sentence->callout != 0)
+		(*sentence->callout)(context, vtg, context->user_data);
+	
+	return NMEA_GPVTG;
 }
 
 /**
@@ -424,11 +422,10 @@ int nmea_gpvtg(nmeap_context_t *context, nmeap_sentence_t *sentence)
  */
 int nmea_gpgsv(nmeap_context_t *context, nmeap_sentence_t *sentence)
 {
-
-    /*
+	/*
 	 * get pointer to sentence data
 	 */
-    NmeaGsv *gsv = (NmeaGsv *)sentence->data;
+	NmeaGsv *gsv = (NmeaGsv *)sentence->data;
 
 
 	/*
@@ -449,13 +446,13 @@ int nmea_gpgsv(nmeap_context_t *context, nmeap_sentence_t *sentence)
 		gsv->info[j].snr        = atoi(context->token[i + 3]);
 	}
 
-    /*
+	/*
 	 * if the sentence has a callout, call it
 	 */
-    if (sentence->callout != 0)
-        (*sentence->callout)(context, gsv, context->user_data);
+	if (sentence->callout != 0)
+		(*sentence->callout)(context, gsv, context->user_data);
 
-    return NMEA_GPGSV;
+	return NMEA_GPGSV;
 }
 
 
@@ -466,8 +463,6 @@ void nmea_poll(nmeap_context_t *context, KFile *channel)
 {
 	int c;
 	while ((c = kfile_getc(channel)) != EOF)
-	{
 		nmeap_parse(context, c);
-	}
 }
 
