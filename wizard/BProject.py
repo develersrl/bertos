@@ -199,7 +199,7 @@ class BProject(object):
         """
         # NOTE: this method does nothing (for now).
         preset_path = os.path.join(self.infos["BERTOS_PATH"], const.PREDEFINED_BOARDS_DIR)
-        preset_tree = {}
+        preset_tree = {"children": []}
         if os.path.exists(preset_path):
             preset_tree = self._loadProjectPresetTree(preset_path)
         self.infos["PRESET_TREE"] = preset_tree
