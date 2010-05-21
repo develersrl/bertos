@@ -376,7 +376,12 @@ class BModulePage(BWizardPage):
         """
         Returns the configuration for the selected module.
         """
-        configuration = self.projectInfo("MODULES")[module]["configuration"]
+        configuration = []
+        if module:
+            # On linux platform it seems that the behaviour of the focus
+            # changing is a bit different from the mac one. So if module is
+            # None then no configurations should be returned.
+            configuration = self.projectInfo("MODULES")[module]["configuration"]
         if len(configuration) > 0:
             return self.projectInfo("CONFIGURATIONS")[configuration]
         else:
