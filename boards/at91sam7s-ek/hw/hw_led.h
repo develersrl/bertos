@@ -30,7 +30,7 @@
  * All Rights Reserved.
  * -->
  *
- * \brief Led on/off macros.
+ * \brief Led on/off macros for AT91SAM7S.
  *
  * \author Daniele Basile <asterix@develer.com>
  */
@@ -38,11 +38,23 @@
 #ifndef HW_LED_H
 #define HW_LED_H
 
-#warning FIXME: This is an example implementation, you must implement it
+#include <cfg/macros.h>
+#include <io/arm.h>
 
-#define LED_ON()   do { /* implement me */} while(0)
-#define LED_OFF()  do { /* implement me */} while(0)
+#define LED_PIN		BV(0)
 
-#define LED_INIT()      do { /* implement me */} while(0)
+#define LED_ON()   PIOA_SODR = LED_PIN;
+#define LED_OFF()  PIOA_CODR = LED_PIN;
+
+#define LED_INIT()						\
+	do {							\
+		PIOA_PER = LED_PIN;				\
+		/* Disable pullups */				\
+		PIOA_PUDR = LED_PIN;				\
+		/* Set PIO stepper power supply as output */	\
+		PIOA_OER  = LED_PIN;				\
+		/* Disable multidrive on all pins */		\
+		PIOA_MDDR = LED_PIN;				\
+	} while(0)
 
 #endif /* HW_LED_H */
