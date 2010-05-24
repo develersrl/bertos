@@ -1,1 +1,1 @@
-name = "Triface"
+name = "Develer Triface"
