@@ -62,6 +62,7 @@ class BProjectPresetsPage(QWidget):
 
     def setupUi(self):
         self.pageContent.presetList.clear()
+        self.pageContent.categoryDescription.setText(self.preset_data["info"].get("description", ""))
         for preset in sorted(self.preset_data["children"].values(), _cmp):
             item_name = preset["info"].get("name", preset["info"]["filename"])
             item_icon = os.path.join(preset["info"]["path"], const.PREDEFINED_BOARD_ICON_FILE)
