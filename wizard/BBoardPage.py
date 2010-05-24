@@ -57,7 +57,6 @@ class BBoardPage(BWizardPage):
     def __init__(self):
         BWizardPage.__init__(self, const.UI_LOCATION + "/board_select.ui")
         self.setTitle(self.tr("Select the board from the predefined ones"))
-        self._last_selected = None
 
     ## Overloaded QWizardPage methods ##
 
@@ -65,23 +64,13 @@ class BBoardPage(BWizardPage):
         """
         Overload of the QWizardPage isComplete method.
         """
-        if self.selected:
-            _info_dict = qvariant_converter.getDict(self.selected.data(0, Qt.UserRole))
-            _type = _info_dict["type"]
-            type = qvariant_converter.getString(_type)
-            if type == "project":
-                self.setProjectInfo("PROJECT_PRESET", qvariant_converter.getString(_info_dict["path"]))
-                return True
-            else:
-                return False
-        else:
-            return False
+        return False
 
-    def nextId(self):
-        """
-        Overload of the QWizardPage nextId method.
-        """
-        return self.wizard().pageIndex(BRoutePage)
+    # def nextId(self):
+    #     """
+    #     Overload of the QWizardPage nextId method.
+    #     """
+    #     return self.wizard().pageIndex(BRoutePage)
 
     ####
 
@@ -97,13 +86,17 @@ class BBoardPage(BWizardPage):
         """
         Overload of the BWizardPage connectSignals method.
         """
-        self.connect(self.pageContent.boardTree, SIGNAL("itemSelectionChanged()"), self, SIGNAL("completeChanged()"))
 
     def reloadData(self):
         """
         Overload of the BWizardPage reloadData method.
         """
-        self._fillPresetTree()
+        preset_list = self.projectInfo("PRESET_TREE")
+        preset_list = preset_list["children"]
+        def _cmp(x, y):
+            return cmp(x["info"].get('ord', 0), y["info"].get('ord', 0))
+        preset_list = sorted(preset_list, _cmp)
+        self.setItems(preset_list)
 
     ####
 
@@ -112,39 +105,7 @@ class BBoardPage(BWizardPage):
 
     ####
 
-    @property
-    def selected(self):
-        # We can only take the selected item list (not the single item)
-        _selected_items = self.pageContent.boardTree.selectedItems()
-        if _selected_items:
-            return _selected_items[0]
-        else:
-            return None
-
-    def _fillPresetTree(self):
-        self.pageContent.boardTree.clear()
-        self.project.loadProjectPresets()
-        preset_tree = self.project.info("PRESET_TREE")
-        for obj in preset_tree["children"]:
-            self._createPresetNode(self.pageContent.boardTree, obj)
-
-    def _createPresetNode(self, parent, obj):
-        selected_item_name = self.projectInfo("PROJECT_PRESET")
-        item_name = obj["info"].get("name", obj["info"]["filename"])
-        item = QTreeWidgetItem(parent, [item_name]) 
-        item.setIcon(0, QIcon(self._getNodeIcon(obj)))
-        children_dict = obj["children"]
-        item.setData(0, Qt.UserRole, qvariant_converter.convertDict(obj["info"]))
-        if obj["info"]["path"] == selected_item_name:
-            self.pageContent.boardTree.setCurrentItem(item)
-        for child in children_dict:
-            self._createPresetNode(item, child)
-
-    def _getNodeIcon(self, obj):
-        icon_file = os.path.join(obj["info"]["path"], const.PREDEFINED_BOARD_ICON_FILE)
-        if os.path.exists(icon_file):
-            return icon_file
-        elif obj["info"]["type"] == "dir":
-            return const.PREDEFINED_BOARD_DEFAULT_DIR_ICON
-        else:
-            return const.PREDEFINED_BOARD_DEFAULT_PROJECT_ICON
+    def setItems(self, preset_list):
+        self.pageContent.boardList.clear()
+        for item in preset_list:
+            self.pageContent.boardList.addItem(item["info"].get("name", item["info"]["filename"]))
