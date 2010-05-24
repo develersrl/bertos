@@ -368,10 +368,6 @@ class BProject(object):
         # Copyt the new *_user.mk file
         self._writeUserMkFileFromPreset()
 
-        if self.infos["EMPTY_MAIN"]:
-            # Create and empty main.c file only if the user check the box
-            self._writeMainFile(self.prjdir + "/main.c")
-
         # Create project files for selected plugins
         self._createProjectFiles()
 

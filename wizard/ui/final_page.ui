@@ -6,16 +6,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>483</width>
-    <height>206</height>
+    <width>584</width>
+    <height>321</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
      <item>
       <widget class="QLabel" name="iconLabel">
        <property name="sizePolicy">
@@ -63,7 +63,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>455</width>
+        <width>556</width>
         <height>76</height>
        </rect>
       </property>
