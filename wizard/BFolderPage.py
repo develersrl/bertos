@@ -67,8 +67,6 @@ class BFolderPage(BWizardPage):
             self.setProjectInfo("PROJECT_NAME", os.path.basename(unicode(self.pageContent.projectPath.text())))
             self.setProjectInfo("PROJECT_SRC_PATH", os.path.join(self.projectInfo("PROJECT_PATH"), self.projectInfo("PROJECT_NAME")))
             self.setProjectInfo("PROJECT_HW_PATH", os.path.join(self.projectInfo("PROJECT_PATH"), self.projectInfo("PROJECT_NAME")))
-            self.setProjectInfo("ROUTE", self.next_page)
-            self.setProjectInfo("PROJECT_FROM_PRESET", self.from_preset)
             return True
         else:
             return False
@@ -90,7 +88,7 @@ class BFolderPage(BWizardPage):
         self.connect(self.pageContent.nameEdit, SIGNAL("textChanged(const QString)"), self.nameChanged)
         self.connect(self.pageContent.directoryEdit, SIGNAL("textChanged(const QString)"), self.directoryChanged)
         self.connect(self.pageContent.directoryButton, SIGNAL("clicked()"), self.selectDirectory)
-        self.connect(self.pageContent.customButton, SIGNAL("toggled(bool)"), self.isComplete)
+        # self.connect(self.pageContent.customButton, SIGNAL("toggled(bool)"), self.isComplete)
     
     ####
 
@@ -129,20 +127,6 @@ class BFolderPage(BWizardPage):
             self.pageContent.directoryEdit.setText(QDir.toNativeSeparators(directory))
 
     ####
-
-    @property
-    def next_page(self):
-        """
-        Contains the next page class.
-        """
-        if self.from_preset:
-            return BBoardPage
-        else:
-            return BCpuPage
-
-    @property
-    def from_preset(self):
-        return self.pageContent.predefinedButton.isChecked()
     
     def initializeAttributes(self):
         """

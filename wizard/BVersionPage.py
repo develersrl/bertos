@@ -69,14 +69,6 @@ class BVersionPage(BWizardPage):
             return True
         else:
             return False
-
-    def nextId(self):
-        """
-        Overload of the QWizard nextId method.
-        """
-        # Pick up the class stored into the project in the 'folder' step
-        page_class = self.projectInfo("ROUTE")
-        return self.wizard().pageIndex(page_class)
     
     ####
     

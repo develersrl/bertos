@@ -226,7 +226,10 @@ class BProject(object):
 
     def _loadPresetInfo(self, preset_spec_file):
         D = {}
-        execfile(preset_spec_file, {}, D)
+        try:
+            execfile(preset_spec_file, {}, D)
+        except IOError, e:
+            pass
         return D
 
     def loadModuleData(self, edit=False):
