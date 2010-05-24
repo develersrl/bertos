@@ -42,6 +42,8 @@ from PyQt4.QtGui import *
 
 from BWizardPage import BWizardPage
 
+from bertos_utils import _cmp
+
 import const
 import qvariant_converter
 
@@ -60,8 +62,6 @@ class BProjectPresetsPage(QWidget):
 
     def setupUi(self):
         self.pageContent.presetList.clear()
-        def _cmp(x, y):
-            return cmp(x["info"].get('ord', 0), y["info"].get('ord', 0))
         for preset in sorted(self.preset_data["children"].values(), _cmp):
             item_name = preset["info"].get("name", preset["info"]["filename"])
             item_icon = os.path.join(preset["info"]["path"], const.PREDEFINED_BOARD_ICON_FILE)
@@ -123,8 +123,6 @@ class BProjectPresets(BWizardPage):
         preset_path = self.projectInfo("PROJECT_BOARD")
         preset_tree = self.projectInfo("PRESET_TREE")
         preset_list = preset_tree["children"][preset_path]["children"]
-        def _cmp(x, y):
-            return cmp(x["info"].get('ord', 0), y["info"].get('ord', 0))
         preset_list = sorted(preset_list.values(), _cmp)
         self.setupTabs(preset_list)
 

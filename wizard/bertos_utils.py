@@ -51,6 +51,9 @@ from _wizard_version import WIZARD_VERSION
 
 from LoadException import VersionException, ToolchainException
 
+def _cmp(x, y):
+    return cmp(x["info"].get('ord', 0), y["info"].get('ord', 0))
+
 def isBertosDir(directory):
    return os.path.exists(directory + "/VERSION")
 

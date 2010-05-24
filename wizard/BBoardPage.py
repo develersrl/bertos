@@ -46,7 +46,7 @@ from BRoutePage import BRoutePage
 
 import const
 import qvariant_converter
-from bertos_utils import presetList
+from bertos_utils import presetList, _cmp
 
 class BBoardPage(BWizardPage):
     """
@@ -96,8 +96,6 @@ class BBoardPage(BWizardPage):
         """
         preset_list = self.projectInfo("PRESET_TREE")
         preset_list = preset_list["children"]
-        def _cmp(x, y):
-            return cmp(x["info"].get('ord', 0), y["info"].get('ord', 0))
         preset_list = sorted(preset_list.values(), _cmp)
         self.setItems(preset_list)
 
