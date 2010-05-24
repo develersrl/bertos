@@ -80,7 +80,7 @@ class BModulePage(BWizardPage):
         self.connect(self.pageContent.moduleTree, SIGNAL("itemPressed(QTreeWidgetItem*, int)"), self.fillPropertyTable)
         self.connect(self.pageContent.moduleTree, SIGNAL("itemPressed(QTreeWidgetItem*, int)"), self.moduleClicked)
         self.connect(self.pageContent.moduleTree, SIGNAL("itemChanged(QTreeWidgetItem*, int)"), self.dependencyCheck)
-        self.connect(self.pageContent.propertyTable, SIGNAL("itemSelectionChanged()"), self.showPropertyDescription)
+        # self.connect(self.pageContent.propertyTable, SIGNAL("itemSelectionChanged()"), self.showPropertyDescription)
 
     def reloadData(self):
         """
@@ -147,6 +147,7 @@ class BModulePage(BWizardPage):
                     # Set the row count to the current index + 1
                     self.pageContent.propertyTable.setRowCount(index + 1)
                     item = QTableWidgetItem(configurations[property]["brief"])
+                    item.setToolTip(property)
                     item.setData(Qt.UserRole, qvariant_converter.convertString(property))
                     self.pageContent.propertyTable.setItem(index, 0, item)
                     if "type" in configurations[property]["informations"] and configurations[property]["informations"]["type"] == "boolean":
