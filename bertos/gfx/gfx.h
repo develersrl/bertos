@@ -37,6 +37,7 @@
  *
  * $WIZ$ module_name = "gfx"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_gfx.h"
+ * $WIZ$ module_depends = "bitmap", "line", "luBS14"
  */
 
 #ifndef GFX_GFX_H
