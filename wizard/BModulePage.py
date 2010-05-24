@@ -219,16 +219,17 @@ class BModulePage(BWizardPage):
         """
         Loads the module data.
         """
-        # Load the module data every time so that if the user changed the cpu
-        # the right configurations are picked up.
-        try:
-            self.project.loadModuleData()
-        except ModuleDefineException, e:
-            self.exceptionOccurred(self.tr("Error parsing line '%2' in file %1").arg(e.path).arg(e.line))
-        except EnumDefineException, e:
-            self.exceptionOccurred(self.tr("Error parsing line '%2' in file %1").arg(e.path).arg(e.line))
-        except ConfigurationDefineException, e:
-            self.exceptionOccurred(self.tr("Error parsing line '%2' in file %1").arg(e.path).arg(e.line))
+        if not self.project.edit:
+            # Load the module data every time so that if the user changed the cpu
+            # the right configurations are picked up.
+            try:
+                self.project.loadModuleData()
+            except ModuleDefineException, e:
+                self.exceptionOccurred(self.tr("Error parsing line '%2' in file %1").arg(e.path).arg(e.line))
+            except EnumDefineException, e:
+                self.exceptionOccurred(self.tr("Error parsing line '%2' in file %1").arg(e.path).arg(e.line))
+            except ConfigurationDefineException, e:
+                self.exceptionOccurred(self.tr("Error parsing line '%2' in file %1").arg(e.path).arg(e.line))
     
     def fillModuleTree(self):
         """
