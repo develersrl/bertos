@@ -12,5 +12,7 @@
 	<file>images/logo.png</file>
 	<file>images/default_dir_icon.png</file>
 	<file>images/default_project_icon.png</file>
+	<file>images/default_board_image.png</file>
+	<file>images/default_board_icon.png</file>
   </qresource>
 </RCC>

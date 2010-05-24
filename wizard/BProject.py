@@ -209,14 +209,14 @@ class BProject(object):
         _tree["info"] = self._loadPresetInfo(os.path.join(path, const.PREDEFINED_BOARD_SPEC_FILE))
         _tree["info"]["filename"] = os.path.basename(path)
         _tree["info"]["path"] = path
-        _tree["children"] = []
+        _tree["children"] = {}
         entries = set(os.listdir(path))
         for entry in entries:
             _path = os.path.join(path, entry)
             if os.path.isdir(_path):
                 sub_entries = set(os.listdir(_path))
                 if const.PREDEFINED_BOARD_SPEC_FILE in sub_entries:
-                    _tree["children"].append(self._loadProjectPresetTree(_path))
+                    _tree["children"][_path] = self._loadProjectPresetTree(_path)
         # Add into the info dict the dir type (dir/project)
         if _tree["children"]:
             _tree["info"]["type"] = "dir"

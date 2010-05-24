@@ -64,13 +64,14 @@ class BBoardPage(BWizardPage):
         """
         Overload of the QWizardPage isComplete method.
         """
-        return False
-
-    # def nextId(self):
-    #     """
-    #     Overload of the QWizardPage nextId method.
-    #     """
-    #     return self.wizard().pageIndex(BRoutePage)
+        if self.selected:
+            preset_path = qvariant_converter.getDict(self.selected.data(Qt.UserRole))
+            preset_path = qvariant_converter.getStringDict(preset_path["info"])
+            preset_path = preset_path["path"]
+            self.setProjectInfo("PROJECT_BOARD", preset_path)
+            return True
+        else:
+            return False
 
     ####
 
@@ -86,6 +87,8 @@ class BBoardPage(BWizardPage):
         """
         Overload of the BWizardPage connectSignals method.
         """
+        self.connect(self.pageContent.boardList, SIGNAL("itemSelectionChanged()"), self.updateUi)
+        self.connect(self.pageContent.boardList, SIGNAL("itemSelectionChanged()"), self, SIGNAL("completeChanged()"))
 
     def reloadData(self):
         """
@@ -95,17 +98,40 @@ class BBoardPage(BWizardPage):
         preset_list = preset_list["children"]
         def _cmp(x, y):
             return cmp(x["info"].get('ord', 0), y["info"].get('ord', 0))
-        preset_list = sorted(preset_list, _cmp)
+        preset_list = sorted(preset_list.values(), _cmp)
         self.setItems(preset_list)
 
     ####
 
     ## Slots ##
 
+    def updateUi(self):
+        if self.selected:
+            info_dict = qvariant_converter.getDict(self.selected.data(Qt.UserRole))
+            info_dict = qvariant_converter.getStringDict(info_dict["info"])
+            description = info_dict.get("description", "")
+            image = os.path.join(info_dict["path"], ".image.png")
+            if not os.path.exists(image):
+                image = ":/images/default_board_image.png"
+            self.pageContent.descriptionLabel.setText(description)
+            self.pageContent.imageLabel.setPixmap(QPixmap(image))
 
     ####
 
     def setItems(self, preset_list):
         self.pageContent.boardList.clear()
-        for item in preset_list:
-            self.pageContent.boardList.addItem(item["info"].get("name", item["info"]["filename"]))
+        selected_board = self.projectInfo("PROJECT_BOARD")
+        for item_data in preset_list:
+            item_name = item_data["info"].get("name", item_data["info"]["filename"])
+            item_icon = os.path.join(item_data["info"]["path"], const.PREDEFINED_BOARD_ICON_FILE)
+            if not os.path.exists(item_icon):
+                item_icon = ":/images/default_board_icon.png"
+            item = QListWidgetItem(QIcon(item_icon), item_name)
+            item.setData(Qt.UserRole, qvariant_converter.convertDict(item_data))
+            self.pageContent.boardList.addItem(item)
+            if selected_board and selected_board == item_data["info"]["path"]:
+                self.pageContent.boardList.setCurrentItem(item)
+
+    @property
+    def selected(self):
+        return self.pageContent.boardList.currentItem()
