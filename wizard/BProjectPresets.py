@@ -124,6 +124,7 @@ class BProjectPresets(BWizardPage):
         preset_tree = self.projectInfo("PRESET_TREE")
         preset_list = preset_tree["children"][preset_path]["children"]
         preset_list = sorted(preset_list.values(), _cmp)
+        self.setTitle(self.tr("Select the template/demo for %1").arg(preset_tree["children"][preset_path]["info"].get("name", preset_tree["children"][preset_path]["info"]["filename"])))
         self.setupTabs(preset_list)
 
     def connectSignals(self):
