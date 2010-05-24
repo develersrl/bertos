@@ -21,18 +21,18 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="2,3">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
      <item>
       <widget class="QListWidget" name="cpuList">
        <property name="minimumSize">
         <size>
-         <width>150</width>
+         <width>200</width>
          <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>16777215</width>
+         <width>200</width>
          <height>16777215</height>
         </size>
        </property>
