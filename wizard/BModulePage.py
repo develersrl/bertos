@@ -219,7 +219,9 @@ class BModulePage(BWizardPage):
         """
         Loads the module data.
         """
-        if not self.project.edit:
+        # Do not load the module data again when the Wizard is in editing mode
+        # or when it's working on a preset.
+        if not self.project.edit and not self.project.from_preset:
             # Load the module data every time so that if the user changed the cpu
             # the right configurations are picked up.
             try:
