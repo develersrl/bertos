@@ -4,7 +4,7 @@
 #
 
 # Programmer interface configuration, see http://dev.bertos.org/wiki/ProgrammerInterface for help
-empty_PROGRAMMER_TYPE = jtag-tiny
+empty_PROGRAMMER_TYPE = none
 empty_PROGRAMMER_PORT = none
 
 # Files included by the user.
@@ -40,5 +40,4 @@ empty_USER_CPPAFLAGS = \
 empty_USER_CPPFLAGS = \
 	-fno-strict-aliasing \
 	-fwrapv \
-	-O2 \
 	#
