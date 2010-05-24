@@ -127,7 +127,7 @@ class BBoardPage(BWizardPage):
             item_name = item_data["info"].get("name", item_data["info"]["filename"])
             item_icon = os.path.join(item_data["info"]["path"], const.PREDEFINED_BOARD_ICON_FILE)
             if not os.path.exists(item_icon):
-                item_icon = ":/images/default_board_icon.png"
+                item_icon = const.PREDEFINED_BOARD_DEFAULT_ICON
             item = QListWidgetItem(QIcon(item_icon), item_name)
             item.setData(Qt.UserRole, qvariant_converter.convertDict(item_data))
             self.pageContent.boardList.addItem(item)

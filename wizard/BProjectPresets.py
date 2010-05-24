@@ -66,7 +66,7 @@ class BProjectPresetsPage(QWidget):
             item_name = preset["info"].get("name", preset["info"]["filename"])
             item_icon = os.path.join(preset["info"]["path"], const.PREDEFINED_BOARD_ICON_FILE)
             if not os.path.exists(item_icon):
-                item_icon = const.PREDEFINED_BOARD_DEFAULT_ICON
+                item_icon = const.PREDEFINED_BOARD_DEFAULT_PROJECT_ICON
             item_icon = QIcon(item_icon)
             item = QListWidgetItem(item_icon, item_name)
             item.setData(Qt.UserRole, qvariant_converter.convertString(preset["info"]["path"]))
