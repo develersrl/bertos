@@ -62,7 +62,6 @@ class BRoutePage(BWizardPage):
         """
         Overload of the QWizardPage isComplete method.
         """
-        self.setProjectInfo("EMPTY_MAIN", self.empty_main)
         self.setProjectInfo("BASE_MODE", not self.advanced)
         return True
 
@@ -111,7 +110,6 @@ class BRoutePage(BWizardPage):
         """
         Overload of the BWizardPage connectSignals method.
         """
-        self.connect(self.pageContent.emptyCheckBox, SIGNAL("stateChanged(int)"), self, SIGNAL("completeChanged()"))
         self.connect(self.pageContent.baseButton, SIGNAL("toggled(bool)"), self, SIGNAL("completeChanged()"))
 
     def reloadData(self):

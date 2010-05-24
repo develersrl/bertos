@@ -31,44 +31,8 @@
      </property>
     </widget>
    </item>
-   <item>
-    <widget class="QGroupBox" name="advancedGroupBox">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="title">
-      <string>Advanced options</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <widget class="QCheckBox" name="emptyCheckBox">
-        <property name="text">
-         <string>Empty main.c</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>advancedButton</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>advancedGroupBox</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>41</x>
-     <y>43</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>84</x>
-     <y>57</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
