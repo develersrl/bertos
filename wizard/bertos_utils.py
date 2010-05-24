@@ -297,7 +297,7 @@ def findModuleFiles(module, project_info):
     # TODO: split me in a method/function
     try:
         version_string = bertosVersion(project_info.info("BERTOS_PATH"))
-        version_list = [int(i) for i in version_string.split()[-1].split('.')]
+        version_list = [int(i) for i in version_string.split()[1].split('.')]
     except ValueError:
         # If the version file hasn't a valid version number assume it's an older
         # project.
