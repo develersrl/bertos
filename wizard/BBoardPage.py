@@ -111,10 +111,12 @@ class BBoardPage(BWizardPage):
             info_dict = qvariant_converter.getStringDict(info_dict["info"])
             description = info_dict.get("description", "")
             image = os.path.join(info_dict["path"], ".image.png")
-            if not os.path.exists(image):
-                image = ":/images/default_board_image.png"
+            if os.path.exists(image):
+                self.pageContent.imageLabel.setPixmap(QPixmap(image))
+                self.pageContent.imageLabel.setVisible(True)
+            else:
+                self.pageContent.imageLabel.setVisible(False)
             self.pageContent.descriptionLabel.setText(description)
-            self.pageContent.imageLabel.setPixmap(QPixmap(image))
 
     ####
 

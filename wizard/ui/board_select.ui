@@ -24,12 +24,9 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QLabel" name="descriptionLabel">
+      <widget class="QLabel" name="imageLabel">
        <property name="text">
         <string/>
-       </property>
-       <property name="wordWrap">
-        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -47,9 +44,12 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="imageLabel">
+      <widget class="QLabel" name="descriptionLabel">
        <property name="text">
         <string/>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

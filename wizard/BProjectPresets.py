@@ -84,9 +84,11 @@ class BProjectPresetsPage(QWidget):
             preset = self.preset_data["children"][preset_path]
             self.pageContent.descriptionLabel.setText(preset["info"].get("description", ""))
             image = os.path.join(preset["info"]["path"], const.PREDEFINED_BOARD_IMAGE_FILE)
-            if not os.path.exists(image):
-                image = const.PREDEFINED_BOARD_DEFAULT_IMAGE
-            self.pageContent.imageLabel.setPixmap(QPixmap(image))
+            if os.path.exists(image):
+                self.pageContent.imageLabel.setPixmap(QPixmap(image))
+                self.pageContent.imageLabel.setVisible(True)
+            else:
+                self.pageContent.imageLabel.setVisible(False)
     
     @property
     def selected(self):
