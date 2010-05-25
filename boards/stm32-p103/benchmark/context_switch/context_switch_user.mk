@@ -4,7 +4,7 @@
 #
 
 # Programmer interface configuration, see http://dev.bertos.org/wiki/ProgrammerInterface for help
-context_switch_PROGRAMMER_TYPE = jtag-tiny
+context_switch_PROGRAMMER_TYPE = none
 context_switch_PROGRAMMER_PORT = none
 
 # Files included by the user.

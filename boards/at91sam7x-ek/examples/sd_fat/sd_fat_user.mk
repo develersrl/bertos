@@ -4,8 +4,8 @@
 #
 
 # Programmer interface configuration, see http://dev.bertos.org/wiki/ProgrammerInterface for help
-sd_fat_PROGRAMMER_TYPE = jtag-tiny
-sd_fat_PROGRAMMER_PORT = usb
+sd_fat_PROGRAMMER_TYPE = none
+sd_fat_PROGRAMMER_PORT = none
 
 # Files included by the user.
 sd_fat_USER_CSRC = \

@@ -4,8 +4,8 @@
 #
 
 # Programmer interface configuration, see http://dev.bertos.org/wiki/ProgrammerInterface for help
-kernel_PROGRAMMER_TYPE = arduino
-kernel_PROGRAMMER_PORT = "/dev/ttyUSB0 -b 57600"
+kernel_PROGRAMMER_TYPE = none
+kernel_PROGRAMMER_PORT = none
 
 # Files included by the user.
 kernel_USER_CSRC = \
