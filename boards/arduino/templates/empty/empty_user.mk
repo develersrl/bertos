@@ -4,7 +4,7 @@
 #
 
 # Programmer interface configuration, see http://dev.bertos.org/wiki/ProgrammerInterface for help
-empty_PROGRAMMER_TYPE = arduino
+empty_PROGRAMMER_TYPE = none
 empty_PROGRAMMER_PORT = none
 
 # Files included by the user.
@@ -38,7 +38,6 @@ empty_USER_CPPAFLAGS = \
 
 # Flags included by the user.
 empty_USER_CPPFLAGS = \
-	-O2 \
 	-fno-strict-aliasing \
 	-fwrapv \
 	#
