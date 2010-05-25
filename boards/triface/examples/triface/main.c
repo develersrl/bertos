@@ -73,6 +73,8 @@ static void init(void)
 	timer_init();
 	adc_init();
 	buz_init();
+	MCUSR = 0;
+	wdt_disable();
 
 	INPUT_INIT();
 }
