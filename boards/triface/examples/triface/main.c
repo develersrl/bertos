@@ -59,6 +59,7 @@
 #include <drv/buzzer.h>
 #include <drv/ser.h>
 #include <drv/adc.h>
+#include <drv/wdt_avr.h>
 
 #include <mware/parser.h>
 #include <net/keytag.h>
