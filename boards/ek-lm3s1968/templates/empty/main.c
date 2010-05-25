@@ -40,40 +40,56 @@
 
 #include <cfg/debug.h>
 #include <cpu/irq.h>
-#include <cpu/power.h>
 #include <hw/hw_led.h>
 #include <drv/timer.h>
 #include <drv/ser.h>
 #include <kern/proc.h>
-#include <drv/ser.h>
 #include <drv/lcd_rit128x96.h>
 #include <drv/kbd.h>
 
-static uint8_t raster[RAST_SIZE(LCD_WIDTH, LCD_HEIGHT)];
+/* Bitmap to display on the OLED display */
 static Bitmap lcd_bitmap;
+/* Raster associated to the Bitmap image */
+static uint8_t raster[RAST_SIZE(LCD_WIDTH, LCD_HEIGHT)];
 
 static Serial out;
 
 static void init(void)
 {
+	/* Enable all the interrupts */
 	IRQ_ENABLE;
 
+	/* Initialize debugging module (allow kprintf(), etc.) */
 	kdbg_init();
+	/* Initialize system timer */
 	timer_init();
-	proc_init();
+	/* Initialize UART0 */
+	ser_init(&out, SER_UART0);
+	/* Configure UART0 to work at 115.200 bps */
+	ser_setbaudrate(&out, 115200);
+	/* Initialize LED driver */
 	LED_INIT();
+	/* Initialize the OLED display (RIT128x96) */
 	rit128x96_init();
+	/* Draw an empty Bitmap on the screen */
 	gfx_bitmapInit(&lcd_bitmap, raster, LCD_WIDTH, LCD_HEIGHT);
+	/* Refresh the display */
 	rit128x96_blitBitmap(&lcd_bitmap);
+	/* Initialize the keypad driver */
 	kbd_init();
 
-	ser_init(&out, SER_UART0);
-	ser_setbaudrate(&out, 115200);
+	/*
+	 * Kernel initialization: processes (allow to create and dispatch
+	 * processes using proc_new()).
+	 */
+	proc_init();
 }
 
 int main(void)
 {
 	init();
+
+	/* Put your code here... */
 	while (1)
 	{
 	}

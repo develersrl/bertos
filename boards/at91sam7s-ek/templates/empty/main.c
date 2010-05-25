@@ -49,20 +49,32 @@ static Serial out;
 
 static void init(void)
 {
+	/* Enable all the interrupts */
 	IRQ_ENABLE;
 
+	/* Initialize debugging module (allow kprintf(), etc.) */
 	kdbg_init();
+	/* Initialize system timer */
 	timer_init();
-	proc_init();
+	/* Initialize UART0 */
+	ser_init(&out, SER_UART0);
+	/* Configure UART0 to work at 115.200 bps */
+	ser_setbaudrate(&out, 115200);
+	/* Initialize LED driver */
 	LED_INIT();
 
-	ser_init(&out, SER_UART0);
-	ser_setbaudrate(&out, 115200);
+	/*
+	 * Kernel initialization: processes (allow to create and dispatch
+	 * processes using proc_new()).
+	 */
+	proc_init();
 }
 
 int main(void)
 {
 	init();
+
+	/* Put your code here... */
 	while (1)
 	{
 	}

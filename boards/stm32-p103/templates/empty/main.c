@@ -46,17 +46,28 @@
 
 static void init(void)
 {
+	/* Enable all the interrupts */
 	IRQ_ENABLE;
 
+	/* Initialize debugging module (allow kprintf(), etc.) */
 	kdbg_init();
+	/* Initialize system timer */
 	timer_init();
-	proc_init();
+	/* Initialize LED driver */
 	LED_INIT();
+
+	/*
+	 * Kernel initialization: processes (allow to create and dispatch
+	 * processes using proc_new()).
+	 */
+	proc_init();
 }
 
 int main(void)
 {
 	init();
+
+	/* Put your code here... */
 	while (1)
 	{
 	}
