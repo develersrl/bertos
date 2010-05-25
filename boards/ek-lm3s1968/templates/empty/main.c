@@ -43,7 +43,6 @@
 #include <hw/hw_led.h>
 #include <drv/timer.h>
 #include <drv/ser.h>
-#include <kern/proc.h>
 #include <drv/lcd_rit128x96.h>
 #include <drv/kbd.h>
 
@@ -77,12 +76,6 @@ static void init(void)
 	rit128x96_blitBitmap(&lcd_bitmap);
 	/* Initialize the keypad driver */
 	kbd_init();
-
-	/*
-	 * Kernel initialization: processes (allow to create and dispatch
-	 * processes using proc_new()).
-	 */
-	proc_init();
 }
 
 int main(void)

@@ -43,7 +43,7 @@
  *
  * $WIZ$ type = "autoenabled"
  */
-#define CONFIG_KERN 1
+#define CONFIG_KERN 0
 
 /**
  * Kernel interrupt supervisor. WARNING: Experimental, still incomplete!

@@ -43,6 +43,6 @@
  * Inter-process signals.
  * $WIZ$ type = "autoenabled"
  */
-#define CONFIG_KERN_SIGNALS 1
+#define CONFIG_KERN_SIGNALS 0
 
 #endif /*  CFG_SIGNAL_H */

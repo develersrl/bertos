@@ -43,7 +43,6 @@
 #include <hw/hw_led.h>
 #include <drv/timer.h>
 #include <drv/ser.h>
-#include <kern/proc.h>
 
 static Serial out;
 
@@ -62,12 +61,6 @@ static void init(void)
 	ser_setbaudrate(&out, 115200);
 	/* Initialize LED driver */
 	LED_INIT();
-
-	/*
-	 * Kernel initialization: processes (allow to create and dispatch
-	 * processes using proc_new()).
-	 */
-	proc_init();
 }
 
 int main(void)
