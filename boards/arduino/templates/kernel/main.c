@@ -94,7 +94,7 @@ int main(void)
 	init();
 
 	/* Create a new child process */
-	proc_new(led_process, NULL, KERN_MINSTACKSIZE, NULL);
+	proc_new(led_process, NULL, KERN_MINSTACKSIZE * 2, NULL);
 
 	/*
 	 * The main process is kept to periodically report the stack
