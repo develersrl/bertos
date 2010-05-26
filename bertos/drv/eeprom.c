@@ -256,6 +256,7 @@ static size_t eeprom_read(struct KFile *_fd, void *_buf, size_t size)
 		rd_len++;
 	}
 
+	i2c_stop();
 	return rd_len;
 }
 
