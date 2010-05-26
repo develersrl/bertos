@@ -41,8 +41,6 @@ from PyQt4.QtGui import *
 from BWizardPage import BWizardPage
 
 from BCpuPage import BCpuPage
-from BOutputPage import BOutputPage
-from BRoutePage import BRoutePage
 
 import const
 import qvariant_converter

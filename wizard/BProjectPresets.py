@@ -42,7 +42,11 @@ from PyQt4.QtGui import *
 
 from BWizardPage import BWizardPage
 
+from BOutputPage import BOutputPage
+from BToolchainPage import BToolchainPage
+
 from bertos_utils import _cmp
+from toolchain_manager import ToolchainManager
 
 import const
 import qvariant_converter
@@ -103,19 +107,52 @@ class BProjectPresets(BWizardPage):
     ## Overloaded QWizardPage methods ##
 
     def isComplete(self):
-        current_widget = self.pageContent.boardTabWidget.currentWidget()
-        preset_path = None
-        if current_widget:
-            current_item = current_widget.pageContent.presetList.currentItem()
-            if current_item:
-                preset_path = current_item.data(Qt.UserRole)
-                preset_path = qvariant_converter.getString(preset_path)
+        preset_path = self.selected_path
         if preset_path:
             self.setProjectInfo("PROJECT_PRESET", preset_path)
+            self.setProjectInfo("BASE_MODE", not self.advanced)
+            # TODO: find a better place for preset loading...
+            try:
+                QApplication.instance().setOverrideCursor(Qt.WaitCursor)
+                self.project.loadProjectFromPreset(preset_path)
+            finally:
+                QApplication.instance().restoreOverrideCursor()            
             return True
         else:
             self.setProjectInfo("PROJECT_PRESET", None)
             return False
+
+    def nextId(self):
+        """
+        Overload of the QWizardPage nextId method.
+        """
+        # Route to Toolchain page if the user select advanced
+        # or to Output page if the user select base
+        if self.advanced:
+            return self.wizard().pageIndex(BToolchainPage)
+        else:
+            cpu_info = self.projectInfo("CPU_INFOS")
+            if cpu_info:
+                target = cpu_info["TOOLCHAIN"]
+                # Try to find a suitable toolchain automatically
+                tm = ToolchainManager()
+                suitable_toolchains = tm.suitableToolchains(target)
+                if len(suitable_toolchains) == 1:
+                    toolchain = suitable_toolchains.pop()
+                    toolchain_info = tm._validateToolchain(toolchain)
+                    toolchain_info["path"] = toolchain
+                    self.setProjectInfo("TOOLCHAIN", toolchain_info)
+                    return self.wizard().pageIndex(BOutputPage)
+                else:
+                    return self.wizard().pageIndex(BToolchainPage)
+            else:
+                # It seems that the nextId method is called before the
+                # reloadData one (that is called after the page changing.
+                #
+                # TODO: fix this awful code lines
+                target = None
+                return self.wizard().pageIndex(BToolchainPage)
+
     ####
     
     ## Overloaded BWizardPage methods ##
@@ -146,3 +183,29 @@ class BProjectPresets(BWizardPage):
             else:
                 self.pageContent.boardTabWidget.addTab(preset_page, preset["info"].get("name", preset["info"]["filename"]))
             self.connect(preset_page, SIGNAL("completeChanged()"), self, SIGNAL("completeChanged()"))
+
+    @property
+    def advanced(self):
+        if self.selected_data:
+            return self.selected_data["info"].get("advanced", False)
+        else:
+            return None
+
+    @property
+    def selected_path(self):
+        current_widget = self.pageContent.boardTabWidget.currentWidget()
+        preset_path = None
+        if current_widget:
+            current_item = current_widget.pageContent.presetList.currentItem()
+            if current_item:
+                preset_path = current_item.data(Qt.UserRole)
+                preset_path = qvariant_converter.getString(preset_path)
+        return preset_path
+
+    @property
+    def selected_data(self):
+        if self.selected_path:
+            current_widget = self.pageContent.boardTabWidget.currentWidget()
+            return current_widget.preset_data["children"][self.selected_path]
+        else:
+            return None
