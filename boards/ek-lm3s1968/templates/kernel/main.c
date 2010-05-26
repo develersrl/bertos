@@ -46,6 +46,7 @@
 #include <drv/ser.h>
 #include <drv/lcd_rit128x96.h>
 #include <drv/kbd.h>
+#include <drv/flash.h>
 #include <kern/proc.h>
 #include <kern/monitor.h>
 
@@ -53,7 +54,9 @@
 static Bitmap lcd_bitmap;
 /* Raster associated to the Bitmap image */
 static uint8_t raster[RAST_SIZE(LCD_WIDTH, LCD_HEIGHT)];
-
+/* Internal flash memory descriptor */
+static Flash flash;
+/* UART port descriptor */
 static Serial out;
 
 static void init(void)
@@ -79,6 +82,8 @@ static void init(void)
 	rit128x96_blitBitmap(&lcd_bitmap);
 	/* Initialize the keypad driver */
 	kbd_init();
+	/* Initialize the internal flash memory */
+        flash_init(&flash);
 
 	/*
 	 * Kernel initialization: processes (allow to create and dispatch
