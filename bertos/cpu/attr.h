@@ -1,4 +1,3 @@
-advanced = True
 /**
  * \file
  * <!--
