@@ -116,13 +116,9 @@ class BBoardPage(BWizardPage):
             info_dict = qvariant_converter.getDict(self.selected.data(Qt.UserRole))
             info_dict = qvariant_converter.getStringDict(info_dict["info"])
             description = info_dict.get("description", "")
-            image = os.path.join(info_dict["path"], ".image.png")
-            if os.path.exists(image):
-                self.pageContent.imageLabel.setPixmap(QPixmap(image))
-                self.pageContent.imageLabel.setVisible(True)
-            else:
-                self.pageContent.imageLabel.setVisible(False)
-            self.pageContent.descriptionLabel.setText(description)
+            path = unicode(QUrl.fromLocalFile(info_dict["path"]).toString())
+            description = description.replace("$path", path)
+            self.pageContent.descriptionArea.setHtml(description)
 
     def customButtonClicked(self):
         self.setProjectInfo("PROJECT_FROM_PRESET", False)

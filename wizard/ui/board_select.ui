@@ -60,7 +60,7 @@
        <item>
         <widget class="QPushButton" name="customButton">
          <property name="toolTip">
-          <string>&lt;p&gt;&lt;strong&gt;Custom board project &lt;/strong&gt;- select me when your board is not preset into the list above.&lt;/p&gt;</string>
+          <string>&lt;p&gt;&lt;strong&gt;Custom board project &lt;/strong&gt;- select me when your board is not present into the list above.&lt;/p&gt;</string>
          </property>
          <property name="text">
           <string>Custom Board</string>
@@ -85,55 +85,10 @@
     </layout>
    </item>
    <item>
-    <widget class="QScrollArea" name="scrollArea">
-     <property name="widgetResizable">
+    <widget class="QTextBrowser" name="descriptionArea">
+     <property name="openExternalLinks">
       <bool>true</bool>
      </property>
-     <widget class="QWidget" name="scrollAreaWidgetContents">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>316</width>
-        <height>336</height>
-       </rect>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1">
-       <item>
-        <widget class="QLabel" name="imageLabel">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="descriptionLabel">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
     </widget>
    </item>
   </layout>
