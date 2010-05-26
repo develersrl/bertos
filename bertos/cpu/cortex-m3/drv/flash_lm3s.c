@@ -189,7 +189,7 @@ static kfile_off_t flash_lm3s_seek(struct KFile *_fd, kfile_off_t offset, KSeekM
 		seek_pos = FLASH_BASE;
 		break;
 	case KSM_SEEK_END:
-		seek_pos = fd->fd.size;
+		seek_pos = FLASH_BASE + fd->fd.size;
 		break;
 	case KSM_SEEK_CUR:
 		seek_pos = fd->fd.seek_pos;
