@@ -42,8 +42,6 @@
 #include <drv/ser_lm3s.h>
 #include "kdebug_lm3s.h"
 
-#if CONFIG_KDEBUG_PORT == KDEBUG_PORT_DBGU
-
 #if CONFIG_KDEBUG_PORT == 0
 	#define UART_BASE UART0_BASE
 	#define UART_GPIO_BASE GPIO_PORTA_BASE
@@ -75,10 +73,6 @@
 #define KDBG_RESTORE_IRQ(old) do { (void)old; } while(0)
 
 typedef uint32_t kdbg_irqsave_t;
-
-#else
-#error CONFIG_KDEBUG_PORT should be KDEBUG_PORT_DBGU
-#endif
 
 INLINE void uart_hw_config(void)
 {

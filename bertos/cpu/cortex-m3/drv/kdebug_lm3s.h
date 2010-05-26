@@ -38,16 +38,7 @@
 #ifndef DRV_KDEBUG_LM3S_H
 #define DRV_KDEBUG_LM3S_H
 
-/**
- * \name Values for CONFIG_KDEBUG_PORT.
- *
- * Select which hardware UART to use for system debug.
- *
- * \{
- */
-#define KDEBUG_PORT_DBGU 0  ///< Debug on Debug Unit.
-
-#define KDEBUG_PORT_DEFAULT KDEBUG_PORT_DBGU  ///< Default debug port.
+#define KDEBUG_PORT_DEFAULT 0  ///< Default debug port.
 /* \} */
 
 #endif /* DRV_KDEBUG_LM3S_H */

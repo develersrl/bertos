@@ -111,8 +111,6 @@ struct stm32_usart
 #define USART_LASTBIT_DISABLE     ((uint16_t)0x0000)
 #define USART_LASTBIT_ENABLE      ((uint16_t)0x0100)
 
-#if CONFIG_KDEBUG_PORT == KDEBUG_PORT_DBGU
-
 #if CONFIG_KDEBUG_PORT == 0
 	#define UART_BASE ((struct stm32_usart *)USART1_BASE)
 #elif CONFIG_KDEBUG_PORT == 1
@@ -135,10 +133,6 @@ struct stm32_usart
 #define KDBG_RESTORE_IRQ(old)	do { (void)old; } while(0)
 
 typedef uint32_t kdbg_irqsave_t;
-
-#else
-#error CONFIG_KDEBUG_PORT should be KDEBUG_PORT_DBGU
-#endif
 
 #define GPIO_USART1_TX_PIN	(1 << 9)
 #define GPIO_USART1_RX_PIN	(1 << 10)
