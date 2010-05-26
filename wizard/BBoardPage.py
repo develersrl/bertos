@@ -69,9 +69,17 @@ class BBoardPage(BWizardPage):
             preset_path = qvariant_converter.getStringDict(preset_path["info"])
             preset_path = preset_path["path"]
             self.setProjectInfo("PROJECT_BOARD", preset_path)
+            self.setProjectInfo("PROJECT_FROM_PRESET", True)
             return True
         else:
             return False
+
+    def nextId(self):
+        wizard = self.wizard()
+        if not self.projectInfo("PROJECT_FROM_PRESET"):
+            return wizard.pageIndex(BCpuPage)
+        else:
+            return QWizardPage.nextId(self)
 
     ####
 
@@ -89,11 +97,13 @@ class BBoardPage(BWizardPage):
         """
         self.connect(self.pageContent.boardList, SIGNAL("itemSelectionChanged()"), self.updateUi)
         self.connect(self.pageContent.boardList, SIGNAL("itemSelectionChanged()"), self, SIGNAL("completeChanged()"))
+        self.connect(self.pageContent.customButton, SIGNAL("clicked()"), self.customButtonClicked)
 
     def reloadData(self):
         """
         Overload of the BWizardPage reloadData method.
         """
+        self.project.loadProjectPresets()
         preset_list = self.projectInfo("PRESET_TREE")
         preset_list = preset_list["children"]
         preset_list = sorted(preset_list.values(), _cmp)
@@ -115,6 +125,10 @@ class BBoardPage(BWizardPage):
             else:
                 self.pageContent.imageLabel.setVisible(False)
             self.pageContent.descriptionLabel.setText(description)
+
+    def customButtonClicked(self):
+        self.setProjectInfo("PROJECT_FROM_PRESET", False)
+        self.wizard().next()
 
     ####
 

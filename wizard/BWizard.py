@@ -38,16 +38,6 @@ import copy
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-import BFolderPage
-import BVersionPage
-import BTypePage
-import BCpuPage
-import BToolchainPage
-import BModulePage
-import BOutputPage
-import BCreationPage
-import BFinalPage
-
 try:
     from version import wizard_version
 except ImportError:
