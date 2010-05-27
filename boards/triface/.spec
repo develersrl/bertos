@@ -25,7 +25,7 @@ description = '''
 </table>
 </p>
 <p>
-Triface is a board designed by <a href="http://www.develer.com">Develer</a> and is based on AVR ATmega128/ATmega1281 CPU. Visit the <a href="http://www.bertos.org/use/">Triface page</a> on BeRTOS site for more information.
+Triface is a board designed by <a href="http://www.develer.com">Develer</a> and is based on AVR ATmega128/ATmega1281 CPU. Visit the <a href="http://www.bertos.org/use/examples-projects/triface-plc-control-board/">Triface page</a> on BeRTOS site for more information.
 </p>
 
 '''
