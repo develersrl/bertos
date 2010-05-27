@@ -50,7 +50,8 @@ class BWizard(QWizard):
 
     def __init__(self, page_list):
         QWizard.__init__(self)
-        self.setFixedSize(800, 500)
+        geometry = QApplication.instance().settings.value("geometry", QVariant()).toRect()
+        self.setGeometry(geometry)
         self.setWindowTitle(self.tr("Create a BeRTOS project - rev.%1").arg(wizard_version))
         self.setWindowIcon(QIcon(":/images/appicon.png"))
         self.setOption(QWizard.DisabledBackButtonOnLastPage, True)
@@ -89,3 +90,8 @@ class BWizard(QWizard):
         Returns the BProject associated with the wizard.
         """
         return copy.deepcopy(QApplication.instance().project)
+
+    def done(self, result):
+        geometry = self.geometry()
+        QApplication.instance().settings.setValue("geometry", geometry)
+        QWizard.done(self, result)
