@@ -61,5 +61,5 @@ CPU_DESC += [ "128 Kbytes on-chip flash memory",
 		"20 Kbytes on-chip SRAM memory" ]
 
 # GCC flags for this cpu.
-MK_CPU_CPPFLAGS += " -D__ARM_STM32F103R8__"
-MK_CPU_LDFLAGS += " -T " + SCRIPT_DIR + "stm32f103r8_rom.ld"
+MK_CPU_CPPFLAGS += " -D__ARM_STM32F103RB__"
+MK_CPU_LDFLAGS += " -T " + SCRIPT_DIR + "stm32f103rb_rom.ld"
