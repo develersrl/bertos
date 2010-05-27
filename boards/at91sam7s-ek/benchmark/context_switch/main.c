@@ -32,13 +32,14 @@
  *
  * \author Daniele Basile <asterix@develer.com>
  *
- * \brief Kernel switch context benchmark.
+ * \brief Kernel context switch benchmark.
  *
- * This benchmark show you the switch context time. This measure is make
- * by hp timer that measure accurately the kernel switch context time, and print
- * it on serial debug. If you want not use the hp timer you can measure this
- * time using one oscilloscope, connected to one board led. To use this
- * mode you should disable hp timer and implement hw_led.h low level module.
+ * This benchmark measures the overhead (in µs) required to deliver a
+ * signal and switch from a low-priority process to a high-priority process.
+ *
+ * The measure is made by the high-precision timer if supported by the
+ * architecture. Alternatively, the time can also be measured using an external
+ * oscilloscope connected to the board's status LED.
  */
 
 #include <benchmark/context_switch.h>

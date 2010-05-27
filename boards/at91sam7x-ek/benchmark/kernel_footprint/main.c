@@ -34,10 +34,13 @@
  *
  * \brief Kernel footprint benchmark.
  *
- * This benchmark show you how much flash space could use the BeRTOS kernel application.
- * Try to compile it and verify how few space the kernel needs to run.
- * By default this benchmark have all kernel switch enabled, and the context switch is preemptive
- * mode, try to modify the kernel setting throught the cfg file.
+ * This benchmark measures the memory footprint[1] of the BeRTOS kernel with a
+ * simple minimalist user application.
+ *
+ * The purpose of this test is to give a measure of the required space in a
+ * generic flash memory to store a full-featured BeRTOS kernel.
+ *
+ * [1] http://en.wikipedia.org/wiki/Memory_footprint
  */
 
 #include <benchmark/kernel_footprint.h>
