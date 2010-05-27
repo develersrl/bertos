@@ -146,7 +146,7 @@ class BEditingDialog(QDialog):
                             configuration = new_configuration[conf]
                         merged_configuration[conf] = configuration
                     dialog.version_page.setProjectInfo("CONFIGURATIONS", merged_configuration)
-                    bertos_utils.setEnabledModules(dialog.version_page.project, enabled_modules)
+                    dialog.version_page.project.setEnabledModules(enabled_modules)
                     self.module_page.fillModuleTree()
                 finally:
                     qApp.restoreOverrideCursor()
