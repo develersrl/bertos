@@ -93,5 +93,5 @@ class BWizard(QWizard):
 
     def done(self, result):
         geometry = self.geometry()
-        QApplication.instance().settings.setValue("geometry", geometry)
+        QApplication.instance().settings.setValue("geometry", QVariant(geometry))
         QWizard.done(self, result)
