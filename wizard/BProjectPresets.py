@@ -108,16 +108,24 @@ class BProjectPresets(BWizardPage):
         if preset_path:
             self.setProjectInfo("PROJECT_PRESET", preset_path)
             self.setProjectInfo("BASE_MODE", not self.advanced)
-            # TODO: find a better place for preset loading...
-            try:
-                QApplication.instance().setOverrideCursor(Qt.WaitCursor)
-                self.project.loadProjectFromPreset(preset_path)
-            finally:
-                QApplication.instance().restoreOverrideCursor()            
             return True
         else:
             self.setProjectInfo("PROJECT_PRESET", None)
             return False
+
+    def validatePage(self):
+        """
+        This hack permits to load the preset once, when the user go press the
+        Next button.
+        """
+        preset_path = self.selected_path
+        try:
+            QApplication.instance().setOverrideCursor(Qt.WaitCursor)
+            self.project.loadProjectFromPreset(preset_path)
+        finally:
+            QApplication.instance().restoreOverrideCursor()
+        # Return always True, this is a fake validation.
+        return True
 
     def nextId(self):
         """
