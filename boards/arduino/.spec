@@ -3,7 +3,7 @@ description = '''
 <h1 align="center">Arduino Duemilanove</h1>
 
 <p align="center">
-<table border="1">
+<table border="0" cellpadding="5">
 	<tr>
 		<td rowspan="4"><img src="$path/.image.png"/></td>
 		<td><b>CPU</b></td>
