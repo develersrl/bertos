@@ -32,8 +32,6 @@
  *
  * \brief Driver for the 24xx16 and 24xx256 I2C EEPROMS (implementation)
  *
- *
- * \version $Id$
  * \author Stefano Fedrigo <aleph@develer.com>
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
