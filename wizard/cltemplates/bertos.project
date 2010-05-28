@@ -14,8 +14,10 @@ $filelist
         <PostConnectCommands>
 source $initscript
 	</PostConnectCommands>
-        <StartupCommands></StartupCommands>
-      </Debugger>      
+        <StartupCommands>
+shell sleep 1
+        </StartupCommands>
+      </Debugger>
       <ResourceCompiler Required="no" Options=""/>
       <PreBuild/>
       <PostBuild/>
