@@ -70,7 +70,7 @@ static const uint8_t lcd_address[] =
 	0x84, 0x85, 0x86, 0x87,
 	0x88, 0x89, 0x8A, 0x8B,
 	0x8C, 0x8D, 0x8E, 0x8F,
-#if LCD_COLS > 16
+#if CONFIG_LCD_COLS > 16
 	0x90, 0x91, 0x92, 0x93,
 #endif
 
@@ -79,17 +79,17 @@ static const uint8_t lcd_address[] =
 	0xC4, 0xC5, 0xC6, 0xC7,
 	0xC8, 0xC9, 0xCA, 0xCB,
 	0xCC, 0xCD, 0xCE, 0xCF,
-#if LCD_COLS > 16
+#if CONFIG_LCD_COLS > 16
 	0xD0, 0xD1, 0xD2, 0xD3,
 #endif
 
-#if LCD_ROWS > 2
+#if CONFIG_LCD_ROWS > 2
 	/* row 2 */
 	0x94, 0x95, 0x96, 0x97,
 	0x98, 0x99, 0x9A, 0x9B,
 	0x9C, 0x9D, 0x9E, 0x9F,
 	0xA0, 0xA1, 0xA2, 0xA3,
-#if LCD_COLS > 16
+#if CONFIG_LCD_COLS > 16
 	0xA4, 0xA5, 0xA6, 0xA7,
 #endif
 
@@ -98,32 +98,32 @@ static const uint8_t lcd_address[] =
 	0xD8, 0xD9, 0xDA, 0xDB,
 	0xDC, 0xDD, 0xDE, 0xDF,
 	0xE0, 0xE1, 0xE2, 0xE3,
-#if LCD_COLS > 16
+#if CONFIG_LCD_COLS > 16
 	0xE4, 0xE5, 0xE6, 0xE7,
 #endif
 
-#endif /* LCD_ROWS > 2 */
+#endif /* CONFIG_LCD_ROWS > 2 */
 };
 
-STATIC_ASSERT(countof(lcd_address) == LCD_ROWS * LCD_COLS);
+STATIC_ASSERT(countof(lcd_address) == CONFIG_LCD_ROWS * CONFIG_LCD_COLS);
 #else  /* CONFIG_LCD_ADDRESS_FAST == 0 */
 
 static const uint8_t col_address[] =
 {
 	0x80,
 	0xC0,
-#if LCD_ROWS > 2
+#if CONFIG_LCD_ROWS > 2
 	0x94,
 	0xD4
 #endif
 };
-STATIC_ASSERT(countof(col_address) == LCD_ROWS);
+STATIC_ASSERT(countof(col_address) == CONFIG_LCD_ROWS);
 /**
  * Addresses of LCD display character positions, calculated runtime to save RAM
  */
 static uint8_t lcd_address(uint8_t addr)
 {
-	return col_address[addr / LCD_COLS] + addr % LCD_COLS;
+	return col_address[addr / CONFIG_LCD_COLS] + addr % CONFIG_LCD_COLS;
 }
 #endif /* CONFIG_LCD_ADDRESS_FAST */
 
@@ -345,11 +345,11 @@ void lcd_putc(uint8_t addr, uint8_t c)
 	lcd_current_addr = addr + 1;
 
 	/* If we are at end of display wrap the address to 0 */
-	if (lcd_current_addr == LCD_COLS * LCD_ROWS)
+	if (lcd_current_addr == CONFIG_LCD_COLS * CONFIG_LCD_ROWS)
 		lcd_current_addr = 0;
 
 	/* If we are at the end of a row put the cursor at the beginning of the next */
-	if (!(lcd_current_addr % LCD_COLS))
+	if (!(lcd_current_addr % CONFIG_LCD_COLS))
 		lcd_setReg(lcd_address(lcd_current_addr));
 }
 

@@ -85,8 +85,8 @@ static lcdpos_t lcd_CursorAddr;
 void lcd_setAddr(Layer *layer, lcdpos_t addr)
 {
 	/* Sanity check: wrap around to display limits */
-	while (addr >= LCD_ROWS * LCD_COLS)
-		addr -= LCD_ROWS * LCD_COLS;
+	while (addr >= CONFIG_LCD_ROWS * CONFIG_LCD_COLS)
+		addr -= CONFIG_LCD_ROWS * CONFIG_LCD_COLS;
 
 	layer->addr = addr;
 }
@@ -124,7 +124,7 @@ static void lcd_putCharUnlocked(char c, Layer *layer)
 	layer->buf[addr] = c;
 
 	/* Move to next character */
-	if (++layer->addr >= LCD_COLS * LCD_ROWS)
+	if (++layer->addr >= CONFIG_LCD_COLS * CONFIG_LCD_ROWS)
 		layer->addr = 0;
 
 	/* Do not write on LCD if layer is hidden. */
@@ -166,7 +166,7 @@ void lcd_layerSet(Layer *layer, char c)
 
 	LOCK_LCD;
 	lcd_setAddr(layer, 0);
-	for (i = 0; i < LCD_COLS * LCD_ROWS; i++)
+	for (i = 0; i < CONFIG_LCD_COLS * CONFIG_LCD_ROWS; i++)
 		lcd_putCharUnlocked(c, layer);
 	UNLOCK_LCD;
 }
@@ -184,7 +184,7 @@ void lcd_clearLine(Layer *layer, int y)
 
 	LOCK_LCD;
 	lcd_setAddr(layer, LCD_POS(0, y));
-	for (i = 0; i < LCD_COLS; i++)
+	for (i = 0; i < CONFIG_LCD_COLS; i++)
 		lcd_putCharUnlocked(0, layer);
 	UNLOCK_LCD;
 }
@@ -242,7 +242,7 @@ int lcd_vprintf(Layer *layer, lcdpos_t addr, uint8_t mode, const char *format, v
 		 * NOTE: calculating the string lenght BEFORE it gets
 		 * printf()-formatted. Real lenght may differ.
 		 */
-		pad = (LCD_COLS - strlen(format)) / 2;
+		pad = (CONFIG_LCD_COLS - strlen(format)) / 2;
 		while (pad--)
 			lcd_putCharUnlocked(' ', layer);
 	}
@@ -250,7 +250,7 @@ int lcd_vprintf(Layer *layer, lcdpos_t addr, uint8_t mode, const char *format, v
 	len = _formatted_write(format, (void (*)(char, void *))lcd_putCharUnlocked, layer, ap);
 
 	if (mode & (LCD_FILL | LCD_CENTER))
-		while (layer->addr % LCD_COLS)
+		while (layer->addr % CONFIG_LCD_COLS)
 			lcd_putCharUnlocked(' ', layer);
 
 	/*
@@ -321,7 +321,7 @@ Layer *lcd_newLayer(char pri)
 
 	layer = (Layer *)LIST_HEAD(&lcd_FreeLayers);
 	layer->addr = 0;
-	memset(layer->buf, 0, LCD_ROWS * LCD_COLS);
+	memset(layer->buf, 0, CONFIG_LCD_ROWS * CONFIG_LCD_COLS);
 
 	lcd_enqueueLayer(layer, pri);
 
@@ -339,7 +339,7 @@ static void lcd_refresh(void)
 	lcdpos_t addr;
 	Layer *l;
 
-	for (addr = 0; addr < LCD_ROWS * LCD_COLS; ++addr)
+	for (addr = 0; addr < CONFIG_LCD_ROWS * CONFIG_LCD_COLS; ++addr)
 	{
 		FOREACH_NODE(l, &lcd_Layers)
 		{
@@ -389,7 +389,7 @@ void lcd_deleteLayer(Layer *layer)
 	lcdpos_t addr;
 
 	/* Repair damage on underlaying layers */
-	for (addr = 0; addr < LCD_ROWS * LCD_COLS; ++addr)
+	for (addr = 0; addr < CONFIG_LCD_ROWS * CONFIG_LCD_COLS; ++addr)
 	{
 		/* If location was covered by us */
 		if (layer->buf[addr])

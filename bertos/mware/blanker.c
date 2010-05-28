@@ -95,25 +95,25 @@ void blk_retrigger(void)
  */
 static void blk_hack(void)
 {
-	static signed char blk_colstart[LCD_COLS];
+	static signed char blk_colstart[CONFIG_LCD_COLS];
 	UBYTE row, col;
 
 
 	if (rand()%3 == 0)
 	{
 		/* Modify one column */
-		col = rand() % LCD_COLS;
+		col = rand() % CONFIG_LCD_COLS;
 		blk_colstart[col] += rand() % 12 - 5;
 	}
 
-	for (col = 0; col < LCD_COLS; ++col)
+	for (col = 0; col < CONFIG_LCD_COLS; ++col)
 	{
 		if (blk_colstart[col] > 0)
 		{
 			--blk_colstart[col];
 
 			/* Scroll down */
-			for(row = LCD_ROWS-1; row; --row)
+			for(row = CONFIG_LCD_ROWS-1; row; --row)
 			{
 				lcd_SetAddr(blk_layer, LCD_POS(col,row));
 				lcd_PutChar(blk_layer->Buf[LCD_POS(col,row-1)], blk_layer);
@@ -128,7 +128,7 @@ static void blk_hack(void)
 			++blk_colstart[col];
 
 			/* Clear tail */
-			for(row = 0; row < LCD_ROWS; ++row)
+			for(row = 0; row < CONFIG_LCD_ROWS; ++row)
 			{
 				if (blk_layer->Buf[LCD_POS(col,row)] != ' ')
 				{

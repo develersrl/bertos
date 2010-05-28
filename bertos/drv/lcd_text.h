@@ -61,11 +61,11 @@
 #define LAYER_HIDDEN   -127
 
 /* Compute LCD address from x/y coordinates */
-#define LCD_POS(x,y)  ((lcdpos_t)((uint8_t)(x) + (uint8_t)(y) * (uint8_t)LCD_COLS))
-#define LCD_ROW0  (LCD_COLS * 0)
-#define LCD_ROW1  (LCD_COLS * 1)
-#define LCD_ROW2  (LCD_COLS * 2)
-#define LCD_ROW3  (LCD_COLS * 3)
+#define LCD_POS(x,y)  ((lcdpos_t)((uint8_t)(x) + (uint8_t)(y) * (uint8_t)CONFIG_LCD_COLS))
+#define LCD_ROW0  (CONFIG_LCD_COLS * 0)
+#define LCD_ROW1  (CONFIG_LCD_COLS * 1)
+#define LCD_ROW2  (CONFIG_LCD_COLS * 2)
+#define LCD_ROW3  (CONFIG_LCD_COLS * 3)
 
 /**
  * Overwrapping layer context.
@@ -91,7 +91,7 @@ typedef struct _Layer
 	 * Characters cells with value 0 are transparent with respect
 	 * to other layers in the background.
 	 */
-	char buf[LCD_COLS * LCD_ROWS];
+	char buf[CONFIG_LCD_COLS * CONFIG_LCD_ROWS];
 } Layer;
 
 

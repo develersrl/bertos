@@ -45,7 +45,7 @@ void lcd_test(void)
 {
 	int i;
 
-	for (i = 0; i < LCD_ROWS * LCD_COLS; ++i)
+	for (i = 0; i < CONFIG_LCD_ROWS * CONFIG_LCD_COLS; ++i)
 	{
 		lcd_putCharUnlocked('0' + (i % 10), lcd_DefLayer);
 		timer_delay(100);

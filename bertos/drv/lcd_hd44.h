@@ -48,12 +48,24 @@
 #include <cfg/compiler.h> /* For stdint types */
 
 /**
- * \name Display dimensions (in chars)
- * \{
+ * \name Values for CONFIG_LCD_ROWS.
+ *
+ * Select the number of rows which are available
+ * on the HD44780 Display.
+ * $WIZ$ lcd_hd44_rows = "LCD_HD44_ROWS_2", "LCD_HD44_ROWS_4"
  */
-#define LCD_ROWS  2
-#define LCD_COLS  16
-/* \} */
+#define LCD_HD44_ROWS_2 2
+#define LCD_HD44_ROWS_4 4
+
+/**
+ * \name Values for CONFIG_LCD_COLS.
+ *
+ * Select the number of columns which are available
+ * on the HD44780 Display.
+ * $WIZ$ lcd_hd44_cols = "LCD_HD44_COLS_16", "LCD_HD44_COLS_20"
+ */
+#define LCD_HD44_COLS_16 16
+#define LCD_HD44_COLS_20 20
 
 /**
  * \name Hitachi HD44 commands.
