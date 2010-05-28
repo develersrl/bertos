@@ -15,7 +15,7 @@ $filelist
 source $initscript
 	</PostConnectCommands>
         <StartupCommands>
-shell sleep 1
+shell sleep 2
         </StartupCommands>
       </Debugger>
       <ResourceCompiler Required="no" Options=""/>
