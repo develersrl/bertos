@@ -49,7 +49,7 @@ class BFinalPage(BWizardPage):
     
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/final_page.ui")
-        self.setTitle(self.tr("Project created successfully"))
+        self.setTitle(self.tr("Project created successfully!"))
     
     ## Overloaded BWizardPage methods ##
         

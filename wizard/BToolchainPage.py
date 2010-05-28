@@ -56,7 +56,7 @@ class BToolchainPage(BWizardPage):
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/toolchain_select.ui")
         self.setTitle(self.tr("Select toolchain"))
-        self._validation_process = None
+        self.setSubTitle(self.tr("You can look for more toolchains in your system by pressing the \"Search\" button, or manually add them with the \"+\" button"))
         self._valid_items = []
         self._toolchain_manager = ToolchainManager()
 

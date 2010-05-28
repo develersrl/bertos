@@ -147,7 +147,7 @@ class BModulePage(BWizardPage):
                     # Set the row count to the current index + 1
                     self.pageContent.propertyTable.setRowCount(index + 1)
                     item = QTableWidgetItem(configurations[property]["brief"])
-                    item.setFlags(Qt.NoItemFlags)
+                    item.setFlags(item.flags() & ~Qt.ItemIsSelectable)
                     item.setToolTip(property)
                     item.setData(Qt.UserRole, qvariant_converter.convertString(property))
                     self.pageContent.propertyTable.setItem(index, 0, item)

@@ -47,7 +47,7 @@ class BCpuPage(BWizardPage):
     
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/cpu_select.ui")
-        self.setTitle(self.tr("Select the CPU"))
+        self.setTitle(self.tr("Select the CPU on your board"))
         self.freq_modified = False
     
     ## Overloaded QWizardPage methods ##

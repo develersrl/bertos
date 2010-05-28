@@ -46,7 +46,8 @@ class BCreationPage(BWizardPage):
     
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/project_creation.ui")
-        self.setTitle(self.tr("Settings summary"))
+	self.setTitle(self.tr("Project summary"))
+	self.setSubTitle(self.tr("Your project is ready to be created. Review your selections and press the \"Create\" button"))
         self._completed = False
 
     ## Overloaded BWizardPage methods ##
@@ -86,7 +87,7 @@ class BCreationPage(BWizardPage):
             toolchain_target = QTreeWidgetItem(toolchain_title, QStringList([version]))
         toolchain_path = QTreeWidgetItem(toolchain_title, QStringList([self.tr("path: " + os.path.normpath(toolchain_info["path"]))]))
         top_level.append(toolchain_title)
-        module_title = QTreeWidgetItem(QStringList([self.tr("Modules")]))
+        module_title = QTreeWidgetItem(QStringList([self.tr("Selected modules")]))
         configurations = self.projectInfo("CONFIGURATIONS")
         module_categories = {}
         for module, information in self.projectInfo("MODULES").items():

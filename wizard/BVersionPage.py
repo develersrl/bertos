@@ -51,8 +51,8 @@ class BVersionPage(BWizardPage):
     def __init__(self, edit=False):
         self._edit = edit
         BWizardPage.__init__(self, UI_LOCATION + "/bertos_versions.ui")
-        self.setTitle(self.tr("Select the BeRTOS directory"))
-        self.setSubTitle(self.tr("The project created will be based on the BeRTOS version found"))
+        self.setTitle(self.tr("Select BeRTOS version"))
+        self.setSubTitle(self.tr("Your project will be created with the specified BeRTOS version"))
 
     ## Overloaded QWizardPage methods ##
     

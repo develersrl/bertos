@@ -54,7 +54,7 @@ class BBoardPage(BWizardPage):
     
     def __init__(self):
         BWizardPage.__init__(self, const.UI_LOCATION + "/board_select.ui")
-        self.setTitle(self.tr("Select the board from the predefined ones"))
+        self.setTitle(self.tr("Select your development board"))
 
     ## Overloaded QWizardPage methods ##
 
@@ -93,8 +93,8 @@ class BBoardPage(BWizardPage):
         """
         Overload of the BWizardPage connectSignals method.
         """
-        self.connect(self.pageContent.boardList, SIGNAL("itemSelectionChanged()"), self.updateUi)
-        self.connect(self.pageContent.boardList, SIGNAL("itemSelectionChanged()"), self, SIGNAL("completeChanged()"))
+        self.connect(self.pageContent.boardList, SIGNAL("currentItemChanged(QListWidgetItem*,QListWidgetItem*)"), self.updateUi)
+        self.connect(self.pageContent.boardList, SIGNAL("currentItemChanged(QListWidgetItem*,QListWidgetItem*)"), self, SIGNAL("completeChanged()"))
         self.connect(self.pageContent.customButton, SIGNAL("clicked()"), self.customButtonClicked)
 
     def reloadData(self):

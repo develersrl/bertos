@@ -23,14 +23,14 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>Search in PATH</string>
+      <string>Search in the system PATH</string>
      </property>
     </widget>
    </item>
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Custom directories</string>
+      <string>Additional search directories:</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
