@@ -37,7 +37,6 @@
  *
  * $WIZ$ module_name = "eeprom"
  * $WIZ$ module_depends = "kfile", "i2c"
- * $WIZ$ module_supports = "not at91"
  */
 
 #ifndef DRV_EEPROM_H
