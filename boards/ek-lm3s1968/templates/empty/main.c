@@ -68,8 +68,8 @@ static void init(void)
 	kdbg_init();
 	/* Initialize system timer */
 	timer_init();
-	/* Initialize UART0 */
-	ser_init(&out, SER_UART0);
+	/* Initialize UART1 */
+	ser_init(&out, SER_UART1);
 	/* Configure UART0 to work at 115.200 bps */
 	ser_setbaudrate(&out, 115200);
 	/* Initialize LED driver */
