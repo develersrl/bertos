@@ -111,7 +111,7 @@
 		sigismember(&sigs__, SIGALRM) ? false : true; \
 	 })
 
-	#if CONFIG_KERN_PREEMPT
+	#if (CONFIG_KERN && CONFIG_KERN_PREEMPT)
 		#define DECLARE_ISR_CONTEXT_SWITCH(vect)	\
 			void vect(UNUSED_ARG(int, arg));	\
 			INLINE void __isr_##vect(void);		\

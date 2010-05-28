@@ -82,7 +82,7 @@
 #define DC_MOTOR_SET_STATUS_DIR(status, dir) \
 		(dir == POS_DIR ? DC_MOTOR_POS_DIR(status) : DC_MOTOR_NEG_DIR(status))
 
-#if CONFIG_KERN_PREEMPT
+#if (CONFIG_KERN && CONFIG_KERN_PREEMPT)
 	#if CONFIG_DC_MOTOR_USE_SEM
 		#include <kern/sem.h>
 

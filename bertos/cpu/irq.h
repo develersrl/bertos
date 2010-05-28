@@ -148,7 +148,7 @@
 	}
 	#define IRQ_RUNNING() irq_running()
 
-	#if CONFIG_KERN_PREEMPT
+	#if (CONFIG_KERN && CONFIG_KERN_PREEMPT)
 
 		#define DECLARE_ISR_CONTEXT_SWITCH(func)		\
 		void func(void);					\
@@ -288,7 +288,7 @@
 
 		#define IRQ_ENABLED() ((CPU_READ_FLAGS() & 0xc0) != 0xc0)
 
-		#if CONFIG_KERN_PREEMPT
+		#if (CONFIG_KERN && CONFIG_KERN_PREEMPT)
 			EXTERN_C void asm_irq_switch_context(void);
 
 			/**
@@ -482,7 +482,7 @@
 		); \
 		(bool)(sreg & 0x80); \
 	})
-	#if CONFIG_KERN_PREEMPT
+	#if (CONFIG_KERN && CONFIG_KERN_PREEMPT)
 		#define DECLARE_ISR_CONTEXT_SWITCH(vect)		\
 			INLINE void __isr_##vect(void);			\
 			ISR(vect)					\
@@ -556,7 +556,7 @@
 
 
 #ifndef IRQ_PREEMPT_HANDLER
-	#if CONFIG_KERN_PREEMPT
+	#if (CONFIG_KERN && CONFIG_KERN_PREEMPT)
 		/**
 		 * Handle preemptive context switch inside timer IRQ.
 		 */

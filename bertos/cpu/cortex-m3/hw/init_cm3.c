@@ -93,7 +93,7 @@ void __init2(void)
 	/* Initialize IRQ vector table in RAM */
 	sysirq_init();
 
-#if CONFIG_KERN_PREEMPT
+#if (CONFIG_KERN && CONFIG_KERN_PREEMPT)
 	/*
 	 * Voluntary context switch handler.
 	 *

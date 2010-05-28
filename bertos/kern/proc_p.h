@@ -181,7 +181,12 @@ void proc_schedInit(void);
 	void monitor_rename(Process *proc, const char *name);
 #endif /* CONFIG_KERN_MONITOR */
 
-#if CONFIG_KERN_PREEMPT
+/*
+ * Quantum related macros are used in the
+ * timer module and must be empty when
+ * kernel is disabled.
+ */
+#if (CONFIG_KERN && CONFIG_KERN_PREEMPT)
 INLINE int preempt_quantum(void)
 {
 	extern int _proc_quantum;
@@ -200,7 +205,7 @@ INLINE void preempt_reset_quantum(void)
 	extern int _proc_quantum;
 	_proc_quantum = CONFIG_KERN_QUANTUM;
 }
-#else /* !CONFIG_KERN_PREEMPT */
+#else /* !(CONFIG_KERN && CONFIG_KERN_PREEMPT) */
 INLINE int preempt_quantum(void)
 {
 	return 0;
@@ -213,6 +218,6 @@ INLINE void proc_decQuantum(void)
 INLINE void preempt_reset_quantum(void)
 {
 }
-#endif /* CONFIG_KERN_PREEMPT */
+#endif /* (CONFIG_KERN && CONFIG_KERN_PREEMPT) */
 
 #endif /* KERN_PROC_P_H */
