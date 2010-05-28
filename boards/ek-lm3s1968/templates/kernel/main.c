@@ -39,14 +39,18 @@
  * continues to monitor the stack utilization of all the processes.
  */
 
+#include "hw/hw_led.h"
+
 #include <cfg/debug.h>
+
 #include <cpu/irq.h>
-#include <hw/hw_led.h>
+
 #include <drv/timer.h>
 #include <drv/ser.h>
 #include <drv/lcd_rit128x96.h>
 #include <drv/kbd.h>
 #include <drv/flash.h>
+
 #include <kern/proc.h>
 #include <kern/monitor.h>
 

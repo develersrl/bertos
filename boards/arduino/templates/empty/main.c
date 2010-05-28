@@ -38,10 +38,13 @@
  * supported board and proposes an empty main.
  */
 
+#include "hw/hw_led.h"
+
 #include <cfg/debug.h>
+
 #include <cpu/irq.h>
 #include <cpu/power.h>
-#include <hw/hw_led.h>
+
 #include <drv/timer.h>
 #include <drv/ser.h>
 
