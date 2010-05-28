@@ -59,10 +59,21 @@ static void init(void)
 	kdbg_init();
 	/* Initialize system timer */
 	timer_init();
+
+	/*
+	 * XXX: Arduino has a single UART port that was previously
+	 * initialized for debugging purpose.
+	 * In order to activate the serial driver you should disable 
+	 * the debugging module.
+	 */
+#if 0
 	/* Initialize UART0 */
 	ser_init(&out, SER_UART0);
 	/* Configure UART0 to work at 115.200 bps */
 	ser_setbaudrate(&out, 115200);
+#else
+	(void)out;
+#endif
 	/* Initialize LED driver */
 	LED_INIT();
 }
