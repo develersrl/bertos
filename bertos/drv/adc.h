@@ -36,7 +36,7 @@
  *
  * $WIZ$ module_name = "adc"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_adc.h"
- * $WIZ$ module_supports = "not atmega103 and not atmega168 and not atmega8"
+ * $WIZ$ module_supports = "not atmega103"
  */
 
 
