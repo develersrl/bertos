@@ -13,9 +13,16 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
    <item>
     <widget class="QTreeWidget" name="summaryTree"/>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="codeliteCheckBox">
+     <property name="text">
+      <string>Do not create Codelite project files</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

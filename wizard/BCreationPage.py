@@ -51,11 +51,16 @@ class BCreationPage(BWizardPage):
         self._completed = False
 
     ## Overloaded BWizardPage methods ##
+
+    def connectSignals(self):
+        self.connect(self.pageContent.codeliteCheckBox, SIGNAL("stateChanged(int)"), self.codelitePluginChanged)
     
     def setupUi(self):
         summary = self.pageContent.summaryTree
         summary.setHeaderHidden(True)
         summary.setColumnCount(1)
+        self.pageContent.codeliteCheckBox.setChecked("codelite" not in self.plugins())
+        self.codelitePluginChanged()
         self.setButtonText(QWizard.NextButton, self.tr("Create"))
     
     def reloadData(self):
@@ -111,4 +116,15 @@ class BCreationPage(BWizardPage):
         for item in top_level:
             self.pageContent.summaryTree.expandItem(item)
     
+    ####
+
+    ## Slots ##
+
+    def codelitePluginChanged(self):
+        if not self.pageContent.codeliteCheckBox.isChecked():
+            output = ["codelite"]
+        else:
+            output= []
+        self.setProjectInfo("OUTPUT", output)
+
     ####

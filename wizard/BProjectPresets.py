@@ -42,7 +42,7 @@ from PyQt4.QtGui import *
 
 from BWizardPage import BWizardPage
 
-from BOutputPage import BOutputPage
+from BCreationPage import BCreationPage
 from BToolchainPage import BToolchainPage
 
 from bertos_utils import _cmp
@@ -148,7 +148,7 @@ class BProjectPresets(BWizardPage):
                     toolchain_info = tm._validateToolchain(toolchain)
                     toolchain_info["path"] = toolchain
                     self.setProjectInfo("TOOLCHAIN", toolchain_info)
-                    return self.wizard().pageIndex(BOutputPage)
+                    return self.wizard().pageIndex(BCreationPage)
                 else:
                     return self.wizard().pageIndex(BToolchainPage)
             else:

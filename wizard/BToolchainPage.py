@@ -37,7 +37,7 @@ import os
 import collections
 
 from BWizardPage import *
-from BOutputPage import BOutputPage
+from BCreationPage import BCreationPage
 
 import BToolchainSearch
 import bertos_utils
@@ -79,7 +79,7 @@ class BToolchainPage(BWizardPage):
         """
         # Route to Output page if it's a predefined easy project.
         if self.projectInfo("PROJECT_FROM_PRESET") and self.projectInfo("BASE_MODE"):
-            return self.wizard().pageIndex(BOutputPage)
+            return self.wizard().pageIndex(BCreationPage)
         else:
             return QWizardPage.nextId(self)
 

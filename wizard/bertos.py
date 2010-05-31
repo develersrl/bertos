@@ -55,7 +55,6 @@ from BVersionPage import BVersionPage
 from BCpuPage import BCpuPage
 from BToolchainPage import BToolchainPage
 from BModulePage import BModulePage
-from BOutputPage import BOutputPage
 from BCreationPage import BCreationPage
 from BFinalPage import BFinalPage
 
@@ -67,7 +66,7 @@ from LoadException import VersionException, ToolchainException
 
 def newProject():
     QApplication.instance().project = BProject()
-    page_list = [BIntroPage, BFolderPage, BVersionPage, BBoardPage, BProjectPresets, BCpuPage, BToolchainPage, BModulePage, BOutputPage, BCreationPage, BFinalPage]
+    page_list = [BIntroPage, BFolderPage, BVersionPage, BBoardPage, BProjectPresets, BCpuPage, BToolchainPage, BModulePage, BCreationPage, BFinalPage]
     wizard = BWizard(page_list)
     wizard.show()
     wizard.exec_()
