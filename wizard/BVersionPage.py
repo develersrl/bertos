@@ -78,7 +78,7 @@ class BVersionPage(BWizardPage):
         """
         Overload of the BWizardPage connectSignals method.
         """
-        self.connect(self.pageContent.versionList, SIGNAL("itemSelectionChanged()"), self.rowChanged)
+        self.connect(self.pageContent.versionList, SIGNAL("currentItemChanged(QListWidgetItem *, QListWidgetItem*)"), self.rowChanged)
         self.connect(self.pageContent.addButton, SIGNAL("clicked()"), self.addVersion)
         self.connect(self.pageContent.removeButton, SIGNAL("clicked()"), self.removeVersion)
         # Fake signal connection for the update button

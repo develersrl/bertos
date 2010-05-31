@@ -80,8 +80,8 @@ class BProjectPresetsPage(QWidget):
         self.updateUi()
 
     def connectSignals(self):
-        self.connect(self.pageContent.presetList, SIGNAL("itemSelectionChanged()"), self.updateUi)
-        self.connect(self.pageContent.presetList, SIGNAL("itemSelectionChanged()"), self, SIGNAL("completeChanged()"))
+        self.connect(self.pageContent.presetList, SIGNAL("currentItemChanged(QListWidgetItem *, QListWidgetItem*)"), self.updateUi)
+        self.connect(self.pageContent.presetList, SIGNAL("currentItemChanged(QListWidgetItem *, QListWidgetItem*)"), self, SIGNAL("completeChanged()"))
 
     def updateUi(self):
         if self.selected:

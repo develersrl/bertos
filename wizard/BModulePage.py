@@ -80,7 +80,6 @@ class BModulePage(BWizardPage):
         self.connect(self.pageContent.moduleTree, SIGNAL("itemPressed(QTreeWidgetItem*, int)"), self.fillPropertyTable)
         self.connect(self.pageContent.moduleTree, SIGNAL("itemPressed(QTreeWidgetItem*, int)"), self.moduleClicked)
         self.connect(self.pageContent.moduleTree, SIGNAL("itemChanged(QTreeWidgetItem*, int)"), self.dependencyCheck)
-        # self.connect(self.pageContent.propertyTable, SIGNAL("itemSelectionChanged()"), self.showPropertyDescription)
 
     def reloadData(self):
         """

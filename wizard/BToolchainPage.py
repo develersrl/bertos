@@ -97,7 +97,7 @@ class BToolchainPage(BWizardPage):
         """
         Connects the signals with the related slots.
         """
-        self.connect(self.pageContent.toolchainList, SIGNAL("itemSelectionChanged()"), self.selectionChanged)
+        self.connect(self.pageContent.toolchainList, SIGNAL("currentItemChanged(QListWidgetItem *, QListWidgetItem*)"), self.selectionChanged)
         self.connect(self.pageContent.addButton, SIGNAL("clicked()"), self.addToolchain)
         self.connect(self.pageContent.removeButton, SIGNAL("clicked()"), self.removeToolchain)
         self.connect(self.pageContent.searchButton, SIGNAL("clicked()"), self.searchToolchain)

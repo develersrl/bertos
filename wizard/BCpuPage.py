@@ -103,7 +103,7 @@ class BCpuPage(BWizardPage):
         """
         Overload of the BWizardPage connectSignals method.
         """
-        self.connect(self.pageContent.cpuList, SIGNAL("itemSelectionChanged()"), self.rowChanged)
+        self.connect(self.pageContent.cpuList, SIGNAL("currentItemChanged(QListWidgetItem *, QListWidgetItem*)"), self.rowChanged)
         self.connect(self.pageContent.frequencySpinBox, SIGNAL("editingFinished()"), self.freqChanged)
 
     def reloadData(self):
