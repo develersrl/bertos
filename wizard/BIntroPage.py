@@ -49,19 +49,8 @@ class BIntroPage(BWizardPage):
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/intro_page.ui")
         self.setTitle(self.tr("Welcome in BeRTOS Wizard!"))
-        self.image = QPixmap(":/images/logo.png")
-
-    ## Overloaded QWidget methods ##
-
-    def resizeEvent(self, event):
-        self._scalePicture()
-        BWizardPage.resizeEvent(self, event)
-
-    def showEvent(self, event):
-        self._scalePicture()
-        BWizardPage.showEvent(self, event)
-
-    ##
+        pixmap = self.pageContent.imageLabel.pixmap()
+        self.pageContent.imageLabel.setPixmap(pixmap.scaled(300, 400, Qt.KeepAspectRatio))
 
     ## Overloaded QWizardPage methods ##
 
@@ -72,12 +61,3 @@ class BIntroPage(BWizardPage):
         return True
 
     ####
-
-    def _scalePicture(self):
-        """
-        I need this method because the scaledContent property of the QLabel
-        doesn't care the aspect ratio.
-        """
-        label_size = self.pageContent.imageLabel.size()
-        scaled_image = self.image.scaled(label_size, Qt.KeepAspectRatio)
-        self.pageContent.imageLabel.setPixmap(scaled_image)
