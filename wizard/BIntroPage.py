@@ -45,11 +45,24 @@ class BIntroPage(BWizardPage):
     Initial page of the wizard. Permit to select the project name and the directory
     where the project will be created.
     """
-    
+
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/intro_page.ui")
         self.setTitle(self.tr("Welcome in BeRTOS Wizard!"))
-    
+        self.image = QPixmap(":/images/logo.png")
+
+    ## Overloaded QWidget methods ##
+
+    def resizeEvent(self, event):
+        self._scalePicture()
+        BWizardPage.resizeEvent(self, event)
+
+    def showEvent(self, event):
+        self._scalePicture()
+        BWizardPage.showEvent(self, event)
+
+    ##
+
     ## Overloaded QWizardPage methods ##
 
     def isComplete(self):
@@ -57,6 +70,14 @@ class BIntroPage(BWizardPage):
         Overload of the QWizardPage isComplete method.
         """
         return True
-    
+
     ####
 
+    def _scalePicture(self):
+        """
+        I need this method because the scaledContent property of the QLabel
+        doesn't care the aspect ratio.
+        """
+        label_size = self.pageContent.imageLabel.size()
+        scaled_image = self.image.scaled(label_size, Qt.KeepAspectRatio)
+        self.pageContent.imageLabel.setPixmap(scaled_image)
