@@ -110,7 +110,7 @@ class BToolchainPage(BWizardPage):
         self._clearList()
         self.setupUi()
         self._populateToolchainList()
-        if len(self._valid_items) == 1:
+        if len(self._valid_items) >= 1:
             self.pageContent.toolchainList.setCurrentItem(self._valid_items[0])
 
     ####
