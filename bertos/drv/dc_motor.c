@@ -192,7 +192,7 @@ static void dc_motor_do(int index)
 	DC_MOTOR_LOCK;
 
 	//If select DC motor is not active we return
-	if (!dcm->status & DC_MOTOR_ACTIVE)
+	if (!(dcm->status & DC_MOTOR_ACTIVE))
 	{
 		DC_MOTOR_UNLOCK;
 		return;
