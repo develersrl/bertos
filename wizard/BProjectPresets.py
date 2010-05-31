@@ -122,6 +122,7 @@ class BProjectPresets(BWizardPage):
         try:
             QApplication.instance().setOverrideCursor(Qt.WaitCursor)
             self.project.loadProjectFromPreset(preset_path)
+            self.setProjectInfo("PRESET_LOADED", True)
         finally:
             QApplication.instance().restoreOverrideCursor()
         # Return always True, this is a fake validation.
@@ -163,12 +164,13 @@ class BProjectPresets(BWizardPage):
     ## Overloaded BWizardPage methods ##
     
     def reloadData(self):
-        preset_path = self.projectInfo("PROJECT_BOARD")
-        preset_tree = self.projectInfo("PRESET_TREE")
-        preset_list = preset_tree["children"][preset_path]["children"]
-        preset_list = sorted(preset_list.values(), _cmp)
-        self.setTitle(self.tr("Select the project template for %1").arg(preset_tree["children"][preset_path]["info"].get("name", preset_tree["children"][preset_path]["info"]["filename"])))
-        self.setupTabs(preset_list)
+        if not self.projectInfo("PRESET_LOADED"):
+            preset_path = self.projectInfo("PROJECT_BOARD")
+            preset_tree = self.projectInfo("PRESET_TREE")
+            preset_list = preset_tree["children"][preset_path]["children"]
+            preset_list = sorted(preset_list.values(), _cmp)
+            self.setTitle(self.tr("Select the project template for %1").arg(preset_tree["children"][preset_path]["info"].get("name", preset_tree["children"][preset_path]["info"]["filename"])))
+            self.setupTabs(preset_list)
 
     def connectSignals(self):
         self.connect(self.pageContent.boardTabWidget, SIGNAL("currentChanged(int)"), self, SIGNAL("completeChanged()"))

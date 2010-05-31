@@ -68,6 +68,7 @@ class BBoardPage(BWizardPage):
             preset_path = preset_path["path"]
             self.setProjectInfo("PROJECT_BOARD", preset_path)
             self.setProjectInfo("PROJECT_FROM_PRESET", True)
+            self.setProjectInfo("PRESET_LOADED", False)
             return True
         else:
             return False
