@@ -218,7 +218,7 @@ class BToolchainPage(BWizardPage):
         for toolchain in toolchain_list:
             self._toolchain_manager.addToolchain(toolchain, _toolchain_dict.get(toolchain, False))
         self._populateToolchainList()
-        self.showMessage(self.tr("Toolchain search result."), self.tr("%1 toolchains found").arg(len(self._toolchain_manager.toolchains)))
+        self.showMessage(self.tr("Toolchain search result."), self.tr("%1 toolchains found").arg(len(toolchain_list)))
 
     def _validItem(self, index, infos):
         """
