@@ -405,6 +405,7 @@ void lcd_hw_init(void)
 	timer_delay(50);
 
 #if CONFIG_LCD_4BIT
+	lcd_regWrite(LCD_CMD_SET8BIT);
 	lcd_mode4Bit();
 	timer_delay(2);
 #endif /* CONFIG_LCD_4BIT */

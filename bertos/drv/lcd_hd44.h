@@ -79,6 +79,7 @@
 	#define LCD_CMD_SETFUNC  0x38   /**< 8 bits, 2 lines, 5x7 dots */
 #endif
 
+#define LCD_CMD_SET8BIT          0x30
 #define LCD_CMD_DISPLAY_ON       0x0F   /**< Switch on display */
 #define LCD_CMD_DISPLAY_OFF      0x08   /**< Switch off display */
 #define LCD_CMD_CLEAR            0x01   /**< Clear display */
