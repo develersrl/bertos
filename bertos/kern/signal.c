@@ -251,9 +251,6 @@ INLINE void __sig_signal(Process *proc, sigmask_t sigs, bool wakeup)
 {
 	cpu_flags_t flags;
 
-	if (UNLIKELY(proc == current_process))
-		return;
-
 	IRQ_SAVE_DISABLE(flags);
 
 	/* Set the signals */
@@ -262,6 +259,8 @@ INLINE void __sig_signal(Process *proc, sigmask_t sigs, bool wakeup)
 	/* Check if process needs to be awoken */
 	if (proc->sig_recv & proc->sig_wait)
 	{
+		ASSERT(proc != current_process);
+
 		proc->sig_wait = 0;
 		if (wakeup)
 			proc_wakeup(proc);
