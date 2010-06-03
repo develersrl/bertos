@@ -71,6 +71,12 @@
 static const EepromInfo mem_info[] =
 {
 	{
+		/* 24XX08 */
+		.has_dev_addr = false,
+		.blk_size = 0x10,
+		.e2_size = 0x400,
+	},
+	{
 		/* 24XX16 */
 		.has_dev_addr = false,
 		.blk_size = 0x10,
