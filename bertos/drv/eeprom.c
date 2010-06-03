@@ -38,9 +38,6 @@
 
 #include "eeprom.h"
 
-#warning TODO:Test and complete this module for arm platform.
-#if !CPU_ARM
-
 #include <cfg/macros.h>  // MIN()
 #include <cfg/debug.h>
 #include <cfg/module.h>  // MOD_CHECK()
@@ -94,6 +91,13 @@ static const EepromInfo mem_info[] =
 		.blk_size = 0x80,
 		.e2_size = 0x10000,
 	},
+	{
+		/* 24XX1024 */
+		.has_dev_addr = true,
+		.blk_size = 0x100,
+		.e2_size = 0x20000,
+	},
+
 	/* Add other memories here */
 };
 
@@ -117,7 +121,7 @@ static size_t eeprom_writeRaw(struct KFile *_fd, const void *buf, size_t size)
 	STATIC_ASSERT(countof(addr_buf) <= sizeof(e2addr_t));
 
 	/* clamp size to memory limit (otherwise may roll back) */
-	ASSERT(_fd->seek_pos + size <= (kfile_off_t)_fd->size);
+	ASSERT(_fd->seek_pos + (kfile_off_t)size <= (kfile_off_t)_fd->size);
 	size = MIN((kfile_off_t)size, _fd->size - _fd->seek_pos);
 
 	if (mem_info[fd->type].has_dev_addr)
@@ -217,7 +221,7 @@ static size_t eeprom_read(struct KFile *_fd, void *_buf, size_t size)
 	STATIC_ASSERT(countof(addr_buf) <= sizeof(e2addr_t));
 
 	/* clamp size to memory limit (otherwise may roll back) */
-	ASSERT(_fd->seek_pos + size <= (kfile_off_t)_fd->size);
+	ASSERT(_fd->seek_pos + (kfile_off_t)size <= (kfile_off_t)_fd->size);
 	size = MIN((kfile_off_t)size, _fd->size - _fd->seek_pos);
 
 	e2dev_addr_t dev_addr;

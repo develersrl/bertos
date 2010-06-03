@@ -56,6 +56,7 @@ typedef enum EepromType
 	EEPROM_24XX16,
 	EEPROM_24XX256,
 	EEPROM_24XX512,
+	EEPROM_24XX1024,
 	EEPROM_CNT,
 } EepromType;
 
