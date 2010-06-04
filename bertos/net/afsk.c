@@ -476,7 +476,7 @@ static size_t afsk_read(KFile *fd, void *_buf, size_t size)
 		ticks_t start = timer_clock();
 		#endif
 
-		while (fifo_isempty_locked(&af->rx_fifo));
+		while (fifo_isempty_locked(&af->rx_fifo))
 		{
 			cpu_relax();
 			#if CONFIG_AFSK_RXTIMEOUT != -1
