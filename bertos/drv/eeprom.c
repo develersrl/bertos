@@ -397,5 +397,3 @@ void eeprom_init(Eeprom *fd, EepromType type, e2dev_addr_t addr, bool verify)
 
 	fd->fd.seek = kfile_genericSeek;
 }
-
-#endif
