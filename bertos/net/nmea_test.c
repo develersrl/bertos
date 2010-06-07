@@ -58,16 +58,15 @@ static NmeaVtg vtg;
 
 static KFileMem mem;
 
-static char nmea_test1[] =
+static uint8_t nmea_test[] =
 {
+/* For these first sentences, we have a test_vector */
 "$GPRMC,170525.949,A,4351.0843,N,01108.8687,E,0.00,237.67,051009,,,A*61\r\n"      /* acquired */
 "$GPVTG,237.67,T,,,0.00,N,0.00,K,A*77\r\n"                                        /* acquired */
 "$GPGSV,3,1,09,3,78,302,37,6,87,031,,7,05,292,37,14,05,135,*48\r\n"               /* acquired */
 "$GPGGA,170527.949,4351.0842,N,01108.8685,E,1,05,02.6,57.4,M,45.2,M,,*5C\r\n"     /* acquired */
-};
+"$GPGGA,170527.949,4351.0842,N,01108.8685,E,1,05,02.6,-57.4,M,45.2,M,,*71\r\n"    /* acquired */
 
-static uint8_t nmea_test2[] =
-{
 "$GPGGA,100019.604,4351.1480,N,01108.8750,E,1,03,16.8,0.0,M,45.2,M,,*64\r\n"
 "$GPRMC,100019.604,A,4351.1480,N,01108.8750,E,2.03,134.29,131009,,,A*6F\r\n"
 "$GPVTG,134.29,T,,,2.03,N,3.75,K,A*7D\r\n"
@@ -799,17 +798,28 @@ static uint8_t nmea_test2[] =
 "$GPGGA,100239.574,4351.1316,N,01108.8722,E,1,03,17.4,-0.0,M,45.2,M,,*4D\r\n"
 };
 
-
-static NmeaGga gga_test =
+static NmeaGga gga_test1 =
 {
 	.latitude = 43851403,
-    .longitude = 11147808,
-    .altitude = 57,
-    .time = 57928,
-    .satellites = 5,
-    .quality = 1,
-    .hdop = 26,
-    .geoid = 45,
+	.longitude = 11147808,
+	.altitude = 57,
+	.time = 57928,
+	.satellites = 5,
+	.quality = 1,
+	.hdop = 26,
+	.geoid = 45,
+};
+
+static NmeaGga gga_test2 =
+{
+	.latitude = 43851403,
+	.longitude = 11147808,
+	.altitude = -57,
+	.time = 57928,
+	.satellites = 5,
+	.quality = 1,
+	.hdop = 26,
+	.geoid = 45,
 };
 
 static NmeaRmc rmc_test =
@@ -837,7 +847,7 @@ static NmeaGsv gsv_test =
 	.message_num = 1,
 	.tot_svv = 9,
 	.info =
-    {
+	{
 		{  3, 78, 302, 37 },
 		{  6, 87,  31,  0 },
 		{  7,  5, 292, 37 },
@@ -846,11 +856,33 @@ static NmeaGsv gsv_test =
 	}
 };
 
+typedef struct NmeaTest
+{
+	int test_num;
+	void *val;
+} NmeaTest;
 
-#define TOT_GOOD_SENTENCE_NUM    663
-#define TOT_SENTENCE_NUM         729
+NmeaTest test_vector[] =
+{
+	{1, &rmc_test},
+	{2, &vtg_test},
+	{3, &gsv_test},
+	{4, &gga_test1},
+	{5, &gga_test2},
+};
 
-#define MAX_SENTENCE_POLL  20
+
+static void *find_test(int n)
+{
+	for (unsigned i=0; i < countof(test_vector); i++)
+		if (n == test_vector[i].test_num)
+			return test_vector[i].val;
+	
+	return NULL;
+}
+
+#define TOT_GOOD_SENTENCE_NUM    664
+#define TOT_SENTENCE_NUM         730
 
 static int tot_sentence_parsed = 0;
 
@@ -864,11 +896,14 @@ static void gpgga_callout_test(nmeap_context_t *context, void *data, void *user_
 	NmeaGga *gga = (NmeaGga *)data;
 
 	tot_sentence_parsed++;
+	void *test = find_test(tot_sentence_parsed);
+	if (test)
+		ASSERT(memcmp(test, gga, sizeof(*gga)) == 0);
 
-    LOG_INFO("[%d]found GPGGA message %ld %ld %d %lu %d %d %d %d\n",tot_sentence_parsed,
+	LOG_INFO("[%d]found GPGGA message %ld %ld %ld %lu %d %d %d %d\n",tot_sentence_parsed,
             (long)gga->latitude,
             (long)gga->longitude,
-            gga->altitude,
+            (long)gga->altitude,
             gga->time,
             gga->satellites,
             gga->quality,
@@ -883,9 +918,12 @@ static void gprmc_callout_test(nmeap_context_t *context, void *data, void *user_
 {
 	(void)context;
 	(void)user_data;
-    NmeaRmc *rmc = (NmeaRmc *)data;
+	NmeaRmc *rmc = (NmeaRmc *)data;
 
 	tot_sentence_parsed++;
+	void *test = find_test(tot_sentence_parsed);
+	if (test)
+		ASSERT(memcmp(test, rmc, sizeof(*rmc)) == 0);
 
 	LOG_INFO("[%d]found GPRMC Message %lu %c %ld %ld %d %d %d\n",tot_sentence_parsed,
             rmc->time,
@@ -907,8 +945,11 @@ static void gpgsv_callout_test(nmeap_context_t *context, void *data, void *user_
 	NmeaGsv *gsv = (NmeaGsv *)data;
 
 	tot_sentence_parsed++;
+	void *test = find_test(tot_sentence_parsed);
+	if (test)
+		ASSERT(memcmp(test, gsv, sizeof(*gsv)) == 0);
 
-    LOG_INFO("[%d]Found GPGSV message %d %d %d\n",tot_sentence_parsed,
+	LOG_INFO("[%d]Found GPGSV message %d %d %d\n",tot_sentence_parsed,
 			gsv->tot_message,
 			gsv->message_num,
 			gsv->tot_svv);
@@ -927,8 +968,11 @@ static void gpvtg_callout_test(nmeap_context_t *context, void *data, void *user_
 	NmeaVtg *vtg = (NmeaVtg *)data;
 
 	tot_sentence_parsed++;
+	void *test = find_test(tot_sentence_parsed);
+	if (test)
+		ASSERT(memcmp(test, vtg, sizeof(*vtg)) == 0);
 
-    LOG_INFO("[%d]Found GPVTG message %d %d %d\n",tot_sentence_parsed,
+	LOG_INFO("[%d]Found GPVTG message %d %d %d\n",tot_sentence_parsed,
 			vtg->track_good,
 			vtg->knot_speed,
 			vtg->km_speed);
@@ -938,7 +982,7 @@ int nmea_testSetup(void)
 {
 	kdbg_init();
 
-	kfilemem_init(&mem, nmea_test1, sizeof(nmea_test1));
+	kfilemem_init(&mem, nmea_test, sizeof(nmea_test));
 	LOG_INFO("Init test buffer..done.\n");
 
 	nmeap_init(&nmea, NULL);
@@ -957,26 +1001,9 @@ int nmea_testTearDown(void)
 
 int nmea_testRun(void)
 {
-	for (int i = 0; i < MAX_SENTENCE_POLL; i++)
-	{
-		nmea_poll(&nmea, &mem.fd);
-	}
-
-	if (memcmp(&gga_test, &gga, sizeof(gga_test)) &&
-		memcmp(&rmc_test, &rmc, sizeof(rmc_test)) &&
-		memcmp(&vtg_test, &vtg, sizeof(vtg_test)) &&
-		memcmp(&gsv_test, &gsv, sizeof(gsv_test)))
-	{
-		LOG_ERR("Last gga test sentence had unexpected value\n");
-		return -1;
-	}
-
-	kfilemem_init(&mem, nmea_test2, sizeof(nmea_test2));
-
 	for (int i = 0; i < TOT_SENTENCE_NUM; i++)
-	{
 		nmea_poll(&nmea, &mem.fd);
-	}
+
 	kprintf("tot sentence %d\n", tot_sentence_parsed);
 
 	if (tot_sentence_parsed != TOT_GOOD_SENTENCE_NUM)
