@@ -58,37 +58,37 @@
 #define NMEA_GPGSV 4   // GSV MESSAGE ID
 
 // Standart type to rappresent fiels.
-typedef uint32_t udegree_t;    // Micro degrees
-typedef uint32_t mdegree_t;    // Milli degrees
-typedef uint16_t degree_t;     // Degrees
+typedef int32_t udegree_t;    // Micro degrees
+typedef int32_t mdegree_t;    // Milli degrees
+typedef int16_t degree_t;     // Degrees
 
 
 /**
  * Global Positioning System Fix Data.
  * Extracted data from a GGA message
  *
- * Note: time membert containt the second elapsed from 00:00:00 1/1/1970,
- * becouse from nmea sentence we read only the time of UTC position, we
- * not have any reference of date (day, month and year) so time is refered to
+ * Note: time member contains the seconds elapsed from 00:00:00 1/1/1970,
+ * because from nmea sentence we read only the time of UTC position, we
+ * have not any reference of date (day, month and year) so time is referred to
  * the start of unix time.
  */
 typedef struct NmeaGga
 {
 	udegree_t     latitude;   /* Latitude (micro degree) */
 	udegree_t     longitude;  /* Longitude (micro degree) */
-	uint16_t      altitude;   /* Altitude (Meter) */
+	int32_t       altitude;   /* Altitude (Meter) */
 	time_t        time;       /* UTC of position  (Unix time) */
 	uint16_t      satellites; /* Satellites are in view */
 	uint16_t      quality;    /* Fix Quality: 0 = Invalid; 1 = GPS fix; 2 = DGPS fix; */
 	uint16_t      hdop;       /* Relative accuracy of horizontal position (hdop * 10) */
-	uint16_t      geoid;      /* Height of geoid above WGS84 ellipsoid (Meter) */
+	int16_t       geoid;      /* Height of geoid above WGS84 ellipsoid (Meter) */
 } NmeaGga;
 
 /**
  * Recommended minimum specific GPS/Transit data.
  * Extracted data from an RMC message
  *
- * Note: RMC sentece contain also date stamp so, time contain real second elapsed
+ * Note: RMC sentences contain also date stamp so, time contains real seconds elapsed
  * from 0:00:00 1/1/1970.
  */
 typedef struct NmeaRmc

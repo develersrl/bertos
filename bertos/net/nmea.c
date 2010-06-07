@@ -165,9 +165,9 @@ static udegree_t nmea_longitude(const char *plot, const char *phem)
  * Return altitude in meter from a string.
  *
  */
-static uint16_t nmea_altitude(const char *palt, const char *punits)
+static int32_t nmea_altitude(const char *palt, const char *punits)
 {
-	uint32_t alt;
+	int32_t alt;
 
 	if (*palt == 0)
 		return 0;
