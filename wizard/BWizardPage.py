@@ -185,7 +185,7 @@ class BWizardPage(QWizardPage):
     
     ## Methodo to be implemented in child classes when needed ##
     
-    def reloadData(self):
+    def reloadData(self, previous_id=None):
         """
         Method called before the page is loaded. The pages that need to use this
         method have to implement it.

@@ -98,7 +98,7 @@ class BBoardPage(BWizardPage):
         self.connect(self.pageContent.boardList, SIGNAL("currentItemChanged(QListWidgetItem*,QListWidgetItem*)"), self, SIGNAL("completeChanged()"))
         self.connect(self.pageContent.customButton, SIGNAL("clicked()"), self.customButtonClicked)
 
-    def reloadData(self):
+    def reloadData(self, previous_id=None):
         """
         Overload of the BWizardPage reloadData method.
         """

@@ -53,7 +53,7 @@ class BFinalPage(BWizardPage):
     
     ## Overloaded BWizardPage methods ##
         
-    def reloadData(self):
+    def reloadData(self, previous_id=None):
         self.setVisible(False)
         """
         Overload of the BWizardPage reloadData method.

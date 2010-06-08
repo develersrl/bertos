@@ -103,7 +103,7 @@ class BToolchainPage(BWizardPage):
         self.connect(self.pageContent.searchButton, SIGNAL("clicked()"), self.searchToolchain)
         self.connect(self.pageContent.checkButton, SIGNAL("clicked()"), self.validateAllToolchains)
 
-    def reloadData(self):
+    def reloadData(self, previous_id=None):
         """
         Overload of the BWizard reloadData method.
         """

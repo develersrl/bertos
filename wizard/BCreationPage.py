@@ -63,7 +63,7 @@ class BCreationPage(BWizardPage):
         self.codelitePluginChanged()
         self.setButtonText(QWizard.NextButton, self.tr("Create"))
     
-    def reloadData(self):
+    def reloadData(self, previous_id=None):
         self.setupUi()
         self.pageContent.summaryTree.clear()
         top_level = []

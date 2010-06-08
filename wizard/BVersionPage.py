@@ -84,7 +84,7 @@ class BVersionPage(BWizardPage):
         # Fake signal connection for the update button
         self.connect(self.pageContent.updateButton, SIGNAL("clicked()"), self.updateClicked)
     
-    def reloadData(self):
+    def reloadData(self, previous_id=None):
         """
         Overload of the BWizardPage reloadData method.
         """

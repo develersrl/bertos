@@ -163,7 +163,7 @@ class BProjectPresets(BWizardPage):
     
     ## Overloaded BWizardPage methods ##
     
-    def reloadData(self):
+    def reloadData(self, previous_id=None):
         if not self.projectInfo("PRESET_LOADED"):
             preset_path = self.projectInfo("PROJECT_BOARD")
             preset_tree = self.projectInfo("PRESET_TREE")

@@ -56,7 +56,7 @@ class BOpenPage(BWizardPage):
     
     ## Overloaded BWizardPage methods ##
     
-    def reloadData(self):
+    def reloadData(self, previous_id=None):
         """
         Overload of the BWizardPage reloadData method.
         """

@@ -49,6 +49,7 @@ class BWizard(QWizard):
     """
 
     def __init__(self, page_list):
+        self._current = None
         QWizard.__init__(self)
         geometry = QApplication.instance().settings.value("geometry", QVariant()).toRect()
         self.setGeometry(geometry)
@@ -83,7 +84,8 @@ class BWizard(QWizard):
         """
         page = self.page(pageId)
         if page:
-            page.reloadData()
+            page.reloadData(previous_id= self._current)
+        self._current = pageId
 
     def project(self):
         """
