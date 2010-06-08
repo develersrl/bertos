@@ -66,6 +66,7 @@ static uint8_t nmea_test[] =
 "$GPGSV,3,1,09,3,78,302,37,6,87,031,,7,05,292,37,14,05,135,*48\r\n"               /* acquired */
 "$GPGGA,170527.949,4351.0842,N,01108.8685,E,1,05,02.6,57.4,M,45.2,M,,*5C\r\n"     /* acquired */
 "$GPGGA,170527.949,4351.0842,N,01108.8685,E,1,05,02.6,-57.4,M,45.2,M,,*71\r\n"    /* acquired */
+"$GPGGA,170527.949,4351.0842,S,01108.8685,W,1,05,02.6,-57.4,M,-45.2,M,,*53\r\n"
 
 "$GPGGA,100019.604,4351.1480,N,01108.8750,E,1,03,16.8,0.0,M,45.2,M,,*64\r\n"
 "$GPRMC,100019.604,A,4351.1480,N,01108.8750,E,2.03,134.29,131009,,,A*6F\r\n"
@@ -822,6 +823,18 @@ static NmeaGga gga_test2 =
 	.geoid = 45,
 };
 
+static NmeaGga gga_test3 =
+{
+	.latitude = -43851403,
+	.longitude = -11147808,
+	.altitude = -57,
+	.time = 57928,
+	.satellites = 5,
+	.quality = 1,
+	.hdop = 26,
+	.geoid = -45,
+};
+
 static NmeaRmc rmc_test =
 {
 	.time = 1254758726,
@@ -869,6 +882,7 @@ NmeaTest test_vector[] =
 	{3, &gsv_test},
 	{4, &gga_test1},
 	{5, &gga_test2},
+	{6, &gga_test3},
 };
 
 
@@ -881,8 +895,8 @@ static void *find_test(int n)
 	return NULL;
 }
 
-#define TOT_GOOD_SENTENCE_NUM    664
-#define TOT_SENTENCE_NUM         730
+#define TOT_GOOD_SENTENCE_NUM    665
+#define TOT_SENTENCE_NUM         731
 
 static int tot_sentence_parsed = 0;
 
