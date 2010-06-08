@@ -107,11 +107,12 @@ class BToolchainPage(BWizardPage):
         """
         Overload of the BWizard reloadData method.
         """
-        self._clearList()
-        self.setupUi()
-        self._populateToolchainList()
-        if len(self._valid_items) >= 1:
-            self.pageContent.toolchainList.setCurrentItem(self.pageContent.toolchainList.currentItem() or self._valid_items[0])
+        if previous_id is None or previous_id < self.wizard().currentId():
+            self._clearList()
+            self.setupUi()
+            self._populateToolchainList()
+            if len(self._valid_items) >= 1:
+                self.pageContent.toolchainList.setCurrentItem(self.pageContent.toolchainList.currentItem() or self._valid_items[0])
 
     ####
 
