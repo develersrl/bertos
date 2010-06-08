@@ -172,7 +172,7 @@ def userMkGenerator(project_info):
     mk_data = {}
     mk_data["$pname"] = os.path.basename(project_info.info("PROJECT_PATH"))
     mk_data["$ppath"] = relpath.relpath(project_info.info("PROJECT_SRC_PATH"), project_info.info("PROJECT_PATH"))
-    mk_data["$main"] = os.path.join("$(%s_SRC_PATH)" %project_info.info("PROJECT_NAME"), "main.c")
+    mk_data["$main"] = "/".join("$(%s_SRC_PATH)" %project_info.info("PROJECT_NAME"), "main.c")
     for key in mk_data:
         makefile = makefile.replace(key, mk_data[key])
     open(destination, "w").write(makefile)
@@ -238,7 +238,7 @@ def csrcGenerator(project_info):
         dependency_files = set([])
         # assembly sources
         asm_files = set([])
-        hwdir = os.path.basename(project_info.info("PROJECT_PATH")) + "/hw" 
+        hwdir = os.path.basename(project_info.info("PROJECT_PATH")) + "/hw"
         if information["enabled"]:
             if "constants" in information:
                 constants.update(information["constants"])
@@ -388,7 +388,7 @@ def getTagSet(cpu_info):
         tag_set |= set(cpu["CPU_TAGS"])
         tag_set |= set([cpu["TOOLCHAIN"]])
     return tag_set
-        
+
 
 def getInfos(definition):
     D = {}
