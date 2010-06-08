@@ -180,6 +180,7 @@ class BToolchainPage(BWizardPage):
         Fills the toolchain list with the toolchains stored in the QSettings.
         """
         self.pageContent.toolchainList.clear()
+        self._valid_items = []
         toolchains = self._toolchain_manager.predefined_toolchains + self._toolchain_manager.toolchains
         sel_toolchain = self.projectInfo("TOOLCHAIN")
         for key, value in toolchains:
