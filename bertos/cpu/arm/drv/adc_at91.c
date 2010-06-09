@@ -184,6 +184,7 @@ void adc_hw_init(void)
 	#endif
 	/* \} */
 
+	LOG_INFO("Computed ADC_CLOCK %ld\n", ADC_COMPUTED_CLOCK);
 	LOG_INFO("prescaler[%ld], stup[%ld], shtim[%ld]\n",ADC_COMPUTED_PRESCALER, ADC_COMPUTED_STARTUPTIME,  ADC_COMPUTED_SHTIME);
 
 
@@ -201,7 +202,7 @@ void adc_hw_init(void)
 	ADC_MR &= ~ADC_SHTIME_MASK;
 	ADC_MR |= ((ADC_COMPUTED_SHTIME << ADC_SHTIME_SHIFT) & ADC_SHTIME_MASK);
 	LOG_INFO("shtime[%ld]\n", (ADC_COMPUTED_SHTIME << ADC_SHTIME_SHIFT) & ADC_SHTIME_MASK);
-
+	
 	#if CONFIG_KERN
 		//Register and enable irq for adc.
 		adc_enable_irq();
