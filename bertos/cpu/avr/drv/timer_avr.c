@@ -243,7 +243,7 @@
 		TCNT3 = 0x00;
 
 		/* Enable timer interrupt: Timer/Counter3 Overflow */
-		REG_TIMSK3 = |= BV(TOIE3);
+		REG_TIMSK3 |= BV(TOIE3);
 
 		IRQ_RESTORE(flags);
 	}
