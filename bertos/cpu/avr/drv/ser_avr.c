@@ -33,8 +33,6 @@
  *
  * \brief AVR UART and SPI I/O driver (Implementation)
  *
- * \version $Id$
- *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  * \author Luca Ottaviano <lottaviano@develer.com>
@@ -286,7 +284,7 @@
 	#define AVR_HAS_UART1 0
 	#define USART0_UDRE_vect USART_UDRE_vect
 	#define USART0_RX_vect USART_RX_vect
-	#define SIG_UART0_TRANS SIG_UART_TRANS
+	#define USART0_TX_vect USART_TX_vect
 #elif CPU_AVR_ATMEGA8
 	#define AVR_HAS_UART1 0
 	#define UCSR0A UCSRA
@@ -295,20 +293,18 @@
 	#define UDR0   UDR
 	#define UBRR0L UBRRL
 	#define UBRR0H UBRRH
-/* TODO: The following SIGs are old style interrupts, must be refactored */
-	#define SIG_UART0_DATA SIG_UART_DATA
-	#define SIG_UART0_RECV SIG_UART_RECV
-	#define SIG_UART0_TRANS SIG_UART_TRANS
+	#define USART0_UDRE_vect USART_UDRE_vect
+	#define USART0_RX_vect USART_RX_vect
+	#define USART0_TX_vect USART_TX_vect
 #elif CPU_AVR_ATMEGA103
 	#define AVR_HAS_UART1 0
 	#define UCSR0B UCR
 	#define UDR0   UDR
 	#define UCSR0A USR
 	#define UBRR0L UBRR
-/* TODO: The following SIGs are old style interrupts, must be refactored */
-	#define SIG_UART0_DATA SIG_UART_DATA
-	#define SIG_UART0_RECV SIG_UART_RECV
-	#define SIG_UART0_TRANS SIG_UART_TRANS
+	#define USART0_UDRE_vect USART_UDRE_vect
+	#define USART0_RX_vect USART_RX_vect
+	#define USART0_TX_vect USART_TX_vect
 #else
 	#error Unknown architecture
 #endif
@@ -733,7 +729,7 @@ DECLARE_ISR(USART0_UDRE_vect)
  * otherwise we'd stop the serial port with some data
  * still pending in the buffer.
  */
-DECLARE_ISR(SIG_UART0_TRANS)
+DECLARE_ISR(USART0_TX_vect)
 {
 	SER_STROBE_ON;
 
