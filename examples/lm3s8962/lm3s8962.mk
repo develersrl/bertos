@@ -62,7 +62,7 @@ lm3s8962_LDFLAGS = -nostartfiles -T bertos/cpu/cortex-m3/scripts/lm3s8962_rom.ld
 lm3s8962_CPU = cortex-m3
 
 lm3s8962_PROGRAMMER_CPU = lm3s
-lm3s8962_PROGRAMMER_TYPE = lm3s
+lm3s8962_PROGRAMMER_TYPE = luminary
 lm3s8962_FLASH_SCRIPT = bertos/prg_scripts/arm/flash-lm3s.sh
 lm3s8962_STOPFLASH_SCRIPT = bertos/prg_scripts/arm/stopopenocd.sh
 lm3s8962_DEBUG_SCRIPT = bertos/prg_scripts/arm/debug.sh
