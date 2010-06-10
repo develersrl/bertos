@@ -34,11 +34,9 @@
  * Right now, the interface for these function is the one defined in diskio.h from
  * the FatFS module.
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
- * 
+ *
  * $WIZ$ module_name = "sd"
- * $WIZ$ module_configuration = "bertos/cfg/cfg_fat.h"
  * $WIZ$ module_depends = "kfile", "timer"
  * $WIZ$ module_hw = "bertos/hw/hw_sd.h"
  */
@@ -47,9 +45,11 @@
 #ifndef DRV_SD_H
 #define DRV_SD_H
 
-#include <fs/fatfs/diskio.h>
-#include <kern/kfile.h>
 #include "cfg/cfg_fat.h"
+
+#include <kern/kfile.h>
+
+#include <fs/fatfs/diskio.h>
 
 bool sd_test(void);
 
