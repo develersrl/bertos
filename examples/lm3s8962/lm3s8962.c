@@ -158,7 +158,7 @@ static void bouncing_logo(Bitmap *bm)
 			&bertos_logo);
 		text_xprintf(bm, 7, 0, TEXT_FILL | TEXT_CENTER, "Press SELECT to quit");
 		rit128x96_blitBitmap(bm);
-		timer_delay(5);
+		timer_delay(15);
 		if (kbd_peek() & KEY_MASK)
 			break;
 	}
