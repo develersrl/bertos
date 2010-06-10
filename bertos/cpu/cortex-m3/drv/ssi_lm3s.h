@@ -32,8 +32,6 @@
  *
  * \brief LM3S1968 Synchronous Serial Interface (SSI) driver.
  *
- * $WIZ$ module_name = "lm3s_ssi"
- * $WIZ$ module_supports =  "lm3s"
  */
 
 #ifndef SSI_LM3S_H
