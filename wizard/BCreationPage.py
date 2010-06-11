@@ -43,7 +43,7 @@ import bertos_utils
 from const import *
 
 class BCreationPage(BWizardPage):
-    
+
     def __init__(self):
         BWizardPage.__init__(self, UI_LOCATION + "/project_creation.ui")
 	self.setTitle(self.tr("Project summary"))
@@ -54,15 +54,15 @@ class BCreationPage(BWizardPage):
 
     def connectSignals(self):
         self.connect(self.pageContent.codeliteCheckBox, SIGNAL("stateChanged(int)"), self.codelitePluginChanged)
-    
+
     def setupUi(self):
         summary = self.pageContent.summaryTree
         summary.setHeaderHidden(True)
         summary.setColumnCount(1)
-        self.pageContent.codeliteCheckBox.setChecked(isinstance(self.plugins(), list) and "codelite" not in self.plugins())
+        self.pageContent.codeliteCheckBox.setChecked(False)
         self.codelitePluginChanged()
         self.setButtonText(QWizard.NextButton, self.tr("Create"))
-    
+
     def reloadData(self, previous_id=None):
         self.setupUi()
         self.pageContent.summaryTree.clear()
@@ -115,7 +115,7 @@ class BCreationPage(BWizardPage):
         self.pageContent.summaryTree.insertTopLevelItems(0, top_level)
         for item in top_level:
             self.pageContent.summaryTree.expandItem(item)
-    
+
     ####
 
     ## Slots ##
