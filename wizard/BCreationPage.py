@@ -59,7 +59,7 @@ class BCreationPage(BWizardPage):
         summary = self.pageContent.summaryTree
         summary.setHeaderHidden(True)
         summary.setColumnCount(1)
-        self.pageContent.codeliteCheckBox.setChecked("codelite" not in self.plugins())
+        self.pageContent.codeliteCheckBox.setChecked(isinstance(self.plugins(), list) and "codelite" not in self.plugins())
         self.codelitePluginChanged()
         self.setButtonText(QWizard.NextButton, self.tr("Create"))
     
