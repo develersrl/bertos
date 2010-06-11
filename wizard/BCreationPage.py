@@ -126,5 +126,6 @@ class BCreationPage(BWizardPage):
         else:
             output= []
         self.setProjectInfo("OUTPUT", output)
+        self.setPlugins(output)
 
     ####
