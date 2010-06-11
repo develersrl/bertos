@@ -82,6 +82,7 @@
 	#define REG_TIFR0 TIFR
 	#define REG_TIFR1 TIFR
 	#define REG_TIFR2 TIFR
+	#define REG_TIFR3 TIFR
 
 	#define REG_TIMSK0 TIMSK
 	#define REG_TIMSK1 TIMSK
@@ -214,6 +215,10 @@
 	}
 
 #elif (CONFIG_TIMER == TIMER_ON_OVERFLOW3)
+
+	#if CPU_AVR_ATMEGA168 || CPU_AVR_ATMEGA328P || CPU_AVR_ATMEGA32
+		#error For select target there is not TIMER_ON_OVERFLOW3, please select an other one.
+	#endif
 
 	void timer_hw_init(void)
 	{
