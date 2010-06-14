@@ -410,6 +410,9 @@ class BModulePage(BWizardPage):
         item.setFont(0, font)
         self.pageContent.moduleTree.blockSignals(False)
 
+    def isBold(self, item):
+        return item.font(0).bold()
+
     def moduleSelected(self, selectedModule):
         """
         Resolves the selection dependencies.
@@ -473,9 +476,14 @@ class BModulePage(BWizardPage):
                         modules[module]["enabled"] = False
                     for category in range(self.pageContent.moduleTree.topLevelItemCount()):
                         item = self.pageContent.moduleTree.topLevelItem(category)
+                        self.setBold(item, False)
                         for child in range(item.childCount()):
                             if unicode(item.child(child).text(0)) in unsatisfied:
+                                self.setBold(item.child(child), False)
                                 item.child(child).setCheckState(0, Qt.Unchecked)
+                            else:
+                                if self.isBold(item.child(child)):
+                                    self.setBold(item, True)
                     for module, param in unsatisfied_params:
                         configuration_file = self.projectInfo("MODULES")[module]["configuration"]
                         configurations = self.projectInfo("CONFIGURATIONS")
