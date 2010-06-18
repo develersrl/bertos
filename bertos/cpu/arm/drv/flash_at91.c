@@ -346,33 +346,4 @@ void flash_hw_init(struct Flash *fd)
 	fd->fd.flush = flash_at91_kfileFlush;
 
 	flash_at91_open(fd);
-
-	uint32_t fmcn;
-	uint32_t fws = 0;
-
-
-	/*
-	 * Compute values to insert into mode register.
-	 */
-
-	/* main clocks in 1.5uS */
-	fmcn = (CPU_FREQ/1000000ul) + (CPU_FREQ/2000000ul) + 1;
-
-	/* hard overclocking */
-	if (fmcn > 0xFF)
-		fmcn = 0xFF;
-
-	/* Only allow fmcn=0 if clock period is > 30 us = 33kHz. */
-	if (CPU_FREQ <= 33333ul)
-		fmcn = 0;
-
-	/* Only allow fws=0 if clock frequency is < 30 MHz. */
-	if (CPU_FREQ > 30000000ul)
-	{
-		fws = 1;
-	}
-
-	// Set wait states and number of MCK cycles in 1.5 usecs
-	MC_FMR = fmcn << 16 | fws << 8;
-
 }
