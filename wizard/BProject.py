@@ -245,7 +245,7 @@ class BProject(object):
                 try:
                     to_be_parsed, module_dict = loadModuleDefinition(comment_list[0])
                 except ParseError, err:
-                    raise DefineException.ModuleDefineException(path, err.line_number, err.line)
+                    raise DefineException.ModuleDefineException(os.path.join(path, filename), err.line_number, err.line)
                 for module, information in module_dict.items():
                     if "depends" not in information:
                         information["depends"] = ()
@@ -283,7 +283,7 @@ class BProject(object):
                         list_dict = loadDefineLists(comment_list[1:])
                         list_info_dict.update(list_dict)
                     except ParseError, err:
-                        raise DefineException.EnumDefineException(path, err.line_number, err.line)
+                        raise DefineException.EnumDefineException(os.path.join(path, filename), err.line_number, err.line)
         for tag in self.infos["CPU_INFOS"]["CPU_TAGS"]:
             for filename, path in self.findDefinitions("*_" + tag + ".h"):
                 comment_list = getCommentList(open(path + "/" + filename, "r").read())
