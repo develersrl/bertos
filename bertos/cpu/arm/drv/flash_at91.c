@@ -67,30 +67,39 @@
 #define FLASH_START_ADDR (FLASH_START_PAGE * FLASH_PAGE_SIZE_BYTES)
 
 /**
+ * Really send the flash write command.
+ * 
+ * \note This function has to be placed in RAM because 
+ *       executing code from flash while a writing process
+ *       is in progress is forbidden.
+ */ 
+RAM_FUNC NOINLINE static void write_page(uint32_t page)
+{
+	// Send the 'write page' command
+	MC_FCR = MC_KEY | MC_FCMD_WP | (MC_PAGEN_MASK & (page << 8));
+
+	// Wait for the end of command
+	while(!(MC_FSR & BV(MC_FRDY)))
+	{
+		//NOP;
+	}
+}
+
+
+/**
  * Send write command.
  *
  * After WR command cpu write bufferd page into flash memory.
  * 
- * \note This function has to be placed in RAM because 
- *       executing code from Flash while a writing process
- *       is in progress is forbidden.
  */
-RAM_FUNC NOINLINE static void flash_at91_sendWRcmd(uint32_t page)
+INLINE void flash_at91_sendWRcmd(uint32_t page)
 {
 	cpu_flags_t flags;
 
 	LOG_INFO("Writing page %ld...\n", page);
 
 	IRQ_SAVE_DISABLE(flags);
-
-	// Send the 'write page' command
-	MC_FCR = MC_KEY | MC_FCMD_WP | (MC_PAGEN_MASK & (page << 8));
-
-	// Wait for end of command
-	while(!(MC_FSR & BV(MC_FRDY)))
-	{
-		//NOP;
-	}
+	write_page(page);
 
 	IRQ_RESTORE(flags);
 	LOG_INFO("Done\n");
