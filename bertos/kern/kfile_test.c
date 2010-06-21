@@ -105,7 +105,10 @@ static bool kfile_rwTest(KFile *f, uint8_t *buf, size_t size)
 	 * Write test buffer
 	 */
 	if (kfile_write(f, buf, size) != size)
+	{
+		LOG_ERR("error writing buf");
 		return false;
+	}
 
 	kfile_seek(f, -(kfile_off_t)size, KSM_SEEK_CUR);
 
@@ -118,7 +121,11 @@ static bool kfile_rwTest(KFile *f, uint8_t *buf, size_t size)
 	 * Read file in test buffer
 	 */
 	if (kfile_read(f, buf, size) != size)
+	{
+		LOG_ERR("error reading buf");
 		return false;
+	}
+
 
 	kfile_seek(f, -(kfile_off_t)size, KSM_SEEK_CUR);
 
@@ -126,8 +133,13 @@ static bool kfile_rwTest(KFile *f, uint8_t *buf, size_t size)
 	 * Check test result
 	 */
 	for (size_t i = 0; i < size; i++)
+	{
 		if (buf[i] != (i & 0xff))
+		{
+			LOG_ERR("error comparing at index [%d] read [%02x] expected [%02x]\n", i, buf[i], i);
 			return false;
+		}
+	}
 
 	return true;
 }
