@@ -39,7 +39,7 @@
 
 MEMORY
 {
-	/* last 12k used by the bootloader */
+	/* last 8k used by the bootloader */
 	rom(rx)  : org = 0x00000000, len = 512k - 8k
 	/* First 0x200 bytes and last 288 used by bootloader and debugger */
 	ram(rwx) : org = 0x40000200, len = 32k - 0x200 - 288
