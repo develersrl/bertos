@@ -192,7 +192,8 @@ static void uart_irq_tx(int port)
 
 	while (lm3s_uartTxReady(base))
 	{
-		if (fifo_isempty(txfifo)) {
+		if (fifo_isempty(txfifo))
+		{
 			/*
 			 * Disable TX empty interrupts if there're no more
 			 * characters to transmit.
@@ -220,8 +221,7 @@ static void uart_common_irq_handler(int port)
 		uart_irq_tx(port);
 }
 
-static void
-lm3s_uartIRQEnable(int port, sysirq_handler_t handler)
+static void lm3s_uartIRQEnable(int port, sysirq_handler_t handler)
 {
 	uint32_t base = UARTDesc[port].base;
 	sysirq_t irq = UARTDesc[port].irq;
