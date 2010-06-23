@@ -38,6 +38,8 @@
 #ifndef DRV_CORTEX_M3_SYSIRQ_H
 #define DRV_CORTEX_M3_SYSIRQ_H
 
+#include <cfg/compiler.h>
+
 #if CPU_CM3_LM3S
 	#include <io/lm3s.h>
 #elif CPU_CM3_STM32
