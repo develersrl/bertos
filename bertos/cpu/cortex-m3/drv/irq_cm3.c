@@ -35,10 +35,11 @@
  * \author Andrea Righi <arighi@develer.com>
  */
 
+#include "irq_cm3.h"
+
 #include <cfg/debug.h> /* ASSERT() */
 #include <cfg/log.h> /* LOG_ERR() */
 #include <cpu/irq.h>
-#include "irq_cm3.h"
 
 static void (*irq_table[NUM_INTERRUPTS])(void)
 			__attribute__((section("vtable")));
