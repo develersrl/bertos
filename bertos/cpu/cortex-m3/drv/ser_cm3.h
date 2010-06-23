@@ -39,6 +39,8 @@
 
 #if CPU_CM3_LM3S
 	#include "ser_lm3s.h"
+#elif CPU_CM3_STM32
+	#include "ser_stm32.h"
 /*#elif  Add other Cortex-M3 CPUs here */
 #else
 	#error Unknown CPU
