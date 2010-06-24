@@ -54,9 +54,9 @@ typedef uint32_t serstatus_t;
 #define SERRF_TXTIMEOUT      BV(2)  /**< Transmit timeout */
 
 /*
-	* Hardware errors.
-	* These flags map directly to the ARM USART Channel Status Register (US_CSR).
-	*/
+ * Hardware errors.
+ * These flags map directly to the ARM USART Channel Status Register (US_CSR).
+ */
 #define SERRF_RXSROVERRUN    BV(5)  /**< Rx shift register overrun */
 #define SERRF_FRAMEERROR     BV(6)  /**< Stop bit missing */
 #define SERRF_PARITYERROR    BV(7)  /**< Parity error */
