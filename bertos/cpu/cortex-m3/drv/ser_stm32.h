@@ -98,13 +98,13 @@ INLINE bool stm32_uartTxDone(uint32_t base)
 INLINE bool stm32_uartTxReady(uint32_t base)
 {
 	struct stm32_usart *_base = (struct stm32_usart *)base;
-	return (_base->SR & (BV(7) | BV(6)));
+	return (_base->SR & (BV(CR1_TXEIE) | BV(CR1_TCIE)));
 }
 
 INLINE bool stm32_uartRxReady(uint32_t base)
 {
 	struct stm32_usart *_base = (struct stm32_usart *)base;
-	return (_base->SR & BV(5));
+	return (_base->SR & BV(CR1_RXNEIE));
 }
 
 INLINE int stm32_uartPutChar(uint32_t base, unsigned char c)

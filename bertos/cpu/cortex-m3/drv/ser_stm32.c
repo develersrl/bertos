@@ -145,7 +145,6 @@ void stm32_uartInit(int port)
 {
 	struct stm32_usart *base = (struct stm32_usart *)UARTDesc[port].base;
 
-	kprintf("init port[%d]cnt[%d]\n", port, SER_CNT);
 	ASSERT(port >= 0 && port < SER_CNT);
 
 	/* Enable clocking on AFIO */
@@ -183,9 +182,6 @@ void stm32_uartInit(int port)
 	/* Enable trasmision and receiver */
 	base->CR1 |= (BV(CR1_TE) | BV(CR1_RE));
 
-
-	kprintf("INIT[%02x]\n", (uint8_t)base->SR); \
-
 }
 
 static bool tx_sending(struct SerialHardware *_hw)
@@ -221,7 +217,7 @@ static void uart_irq_tx(int port)
 		 * Disable TX empty interrupts if there're no more
 		 * characters to transmit.
 		 */
-		base->CR1 &= ~BV(7);
+		base->CR1 &= ~BV(CR1_TXEIE);
 		UARTDesc[port].sending = false;
 	}
 	else
@@ -238,11 +234,11 @@ static void uart_common_irq_handler(int port)
 	/* Read and clear the IRQ status */
 	status = base->SR;
 	/* Process the IRQ */
-	if (status & BV(5))
+	if (status & BV(CR1_RXNEIE))
 	{
 		uart_irq_rx(port);
 	}
-	if (status & (BV(7) | BV(6)))
+	if (status & (BV(CR1_TXEIE) | BV(CR1_TCIE)))
 	{
 		uart_irq_tx(port);
 	}
@@ -255,14 +251,14 @@ static void stm32_uartIRQEnable(int port, sysirq_handler_t handler)
 	/* Register the IRQ handler */
 	sysirq_setHandler(UARTDesc[port].irq, handler);
 
-	base->CR1 |= BV(5);
+	base->CR1 |= BV(CR1_RXNEIE);
 }
 
 static void stm32_uartIRQDisable(int port)
 {
 	struct stm32_usart *base = (struct stm32_usart *)UARTDesc[port].base;
 
-	base->CR1 &= ~(BV(5) | USART_FLAG_TXE);
+	base->CR1 &= ~(BV(CR1_RXNEIE) | USART_FLAG_TXE);
 }
 
 
@@ -289,9 +285,8 @@ static void stm32_uartIRQDisable(int port)
 		stm32_uartPutChar(USART ## port ## _BASE, fifo_pop(txfifo));	\
 		if (!fifo_isempty(txfifo))					\
 		{								\
-			kputs("tx_en_irq\n"); \
 			hw->sending = true;	 \
-			base->CR1 |= BV(7); \
+			base->CR1 |= BV(CR1_TXEIE); \
 		} \
 	}									\
 										\
