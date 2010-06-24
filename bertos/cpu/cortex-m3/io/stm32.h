@@ -45,6 +45,7 @@
 #include "stm32_nvic.h"
 #include "stm32_ints.h"
 #include "stm32_uart.h"
+#include "stm32_adc.h"
 
 #define GPIO_USART1_TX_PIN	BV(9)
 #define GPIO_USART1_RX_PIN	BV(10)
