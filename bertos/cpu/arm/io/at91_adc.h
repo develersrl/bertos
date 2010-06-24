@@ -30,8 +30,6 @@
  *
  * -->
  *
- * \version $Id$
- *
  * \author Daniele Basile <asterix@develer.com>
  *
  * AT91SAM7 Analog to Digital Converter.
