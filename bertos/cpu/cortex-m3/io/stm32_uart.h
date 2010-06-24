@@ -172,6 +172,19 @@
 #define CR3_IREN_RESET            ((uint16_t)0xFFFD)  /* USART IrDA Disable MASK */
 #define CR3_CLEAR_MASK            ((uint16_t)0xFCFF)  /* USART CR3 MASK */
 
+
+/* Status */
+#define SR_CTS                                    9
+#define SR_LBD                                    8
+#define SR_TXE                                    7
+#define SR_TC                                     6
+#define SR_RXNE                                   5
+#define SR_IDLE                                   4
+#define SR_ORE                                    3
+#define SR_NE                                     2
+#define SR_FE                                     1
+#define SR_PE                                     0
+
 #define GTPR_LSB_MASK             ((uint16_t)0x00FF)  /* Guard Time Register LSB MASK */
 #define GTPR_MSB_MASK             ((uint16_t)0xFF00)  /* Guard Time Register MSB MASK */
 

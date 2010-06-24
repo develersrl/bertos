@@ -233,6 +233,11 @@ static void uart_common_irq_handler(int port)
 
 	/* Read and clear the IRQ status */
 	status = base->SR;
+
+	/* Check hw errors */
+	ser_handles[port]->status = status &
+		(BV(SR_ORE) | BV(SR_FE) | BV(SR_PE) | BV(SR_NE));
+
 	/* Process the IRQ */
 	if (status & BV(CR1_RXNEIE))
 	{

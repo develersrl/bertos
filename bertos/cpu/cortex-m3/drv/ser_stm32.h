@@ -55,17 +55,17 @@ enum
 };
 
 /* Software errors */
-#define SERRF_RXFIFOOVERRUN  BV(0) //< Rx FIFO buffer overrun
-#define SERRF_RXTIMEOUT      BV(1) //< Receive timeout
-#define SERRF_TXTIMEOUT      BV(2) //< Transmit timeout
+#define SERRF_RXFIFOOVERRUN  BV(6) //< Rx FIFO buffer overrun
+#define SERRF_RXTIMEOUT      BV(5) //< Receive timeout
+#define SERRF_TXTIMEOUT      BV(4) //< Transmit timeout
 
 /*
  * Hardware errors.
  */
-#define SERRF_RXSROVERRUN    0 //< Input overrun
-#define SERRF_FRAMEERROR     0 //< Stop bit missing
-#define SERRF_PARITYERROR    0 //< Parity error
-#define SERRF_NOISEERROR     0 //< Noise error
+#define SERRF_RXSROVERRUN    SR_ORE	 //< Input overrun
+#define SERRF_FRAMEERROR     SR_FE   //< Stop bit missing
+#define SERRF_PARITYERROR    SR_PE   //< Parity error
+#define SERRF_NOISEERROR     SR_NE   //< Noise error
 
 /* Serial error/status flags */
 typedef uint32_t serstatus_t;
