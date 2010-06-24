@@ -32,9 +32,6 @@
  *
  * \brief Low-level ADC module for ARM (interface).
  *
- *
- * \version $Id$
- *
  * \author Daniele Basile <asterix@develer.com>
  *
  */

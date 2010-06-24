@@ -40,7 +40,6 @@
  * whit a loop the finishing of conversion.
  *
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 
@@ -202,7 +201,7 @@ void adc_hw_init(void)
 	ADC_MR &= ~ADC_SHTIME_MASK;
 	ADC_MR |= ((ADC_COMPUTED_SHTIME << ADC_SHTIME_SHIFT) & ADC_SHTIME_MASK);
 	LOG_INFO("shtime[%ld]\n", (ADC_COMPUTED_SHTIME << ADC_SHTIME_SHIFT) & ADC_SHTIME_MASK);
-	
+
 	#if CONFIG_KERN
 		//Register and enable irq for adc.
 		adc_enable_irq();

@@ -30,11 +30,8 @@
  *
  * -->
  *
- * \version $Id$
- *
  * \brief ADC hardware-specific definition
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 
