@@ -38,6 +38,9 @@
 #ifndef CLOCK_STM32_H
 #define CLOCK_STM32_H
 
+
+#include <cfg/compiler.h>
+
 /* RCC registers bit address */
 #define RCC_OFFSET                (RCC_BASE - PERIPH_BASE)
 

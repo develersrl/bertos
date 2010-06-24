@@ -35,10 +35,12 @@
  * \author Andrea Righi <arighi@develer.com>
  */
 
+#include "clock_stm32.h"
+
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
+
 #include <io/stm32.h>
-#include "clock_stm32.h"
 
 struct RCC *RCC;
 
