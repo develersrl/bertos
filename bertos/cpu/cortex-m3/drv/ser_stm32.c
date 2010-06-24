@@ -149,16 +149,15 @@ void stm32_uartInit(int port)
 
 	/* Enable clocking on AFIO */
 	RCC->APB2ENR |= RCC_APB2_AFIO;
+	RCC->APB2ENR |=  gpio_uart[port].sysctl;
 
 	/* Configure USART pins */
 	if (port == USART1_PORT)
 	{
-		RCC->APB2ENR |=  gpio_uart[port].sysctl;
 		RCC->APB2ENR |=  gpio_uart[port].sysctl1;
 	}
 	else
 	{
-		RCC->APB1ENR |=  gpio_uart[port].sysctl;
 		RCC->APB1ENR |=  gpio_uart[port].sysctl1;
 	}
 
