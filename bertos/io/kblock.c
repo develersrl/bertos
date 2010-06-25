@@ -37,6 +37,7 @@
 
 
 #include "kblock.h"
+#include <cfg/log.h>
 
 
 static void *kblock_swMap(struct KBlock *b, size_t offset, size_t size)

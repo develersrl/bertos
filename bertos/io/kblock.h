@@ -40,6 +40,7 @@
 
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
+#include <cfg/macros.h>
 
 /** Type for addressing blocks in the device. */
 typedef uint32_t block_idx_t;
@@ -99,7 +100,7 @@ typedef enum KBlockStatus
 	KBS_ERR_NOT_MAPPED,        ///< Error: trying to memory unmap a block not yet mapped.
 	KBS_ERR_MAP_NOT_AVAILABLE, ///< Error: mapping methods not implemented.
 
-	#define KBS_STATUS_MASK (BV(KBS_MAPPER) | 0 /* Add status flags here */)
+	#define KBS_STATUS_MASK (BV(KBS_MAPPED) | 0 /* Add status flags here */)
 	
 	#define KBS_ERROR_MASK (BV(KBS_ERR_ALREADY_MAPPED) | BV(KBS_ERR_ALREADY_MAPPED) \
 		| BV(KBS_ERR_MAP_NOT_AVAILABLE) | 0 /* Add error flags here */)
