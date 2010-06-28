@@ -64,12 +64,50 @@
 #include <drv/adc.h>
 #include <drv/clock_stm32.h>
 #include <drv/gpio_stm32.h>
-#include <drv/irq_cm3.h>
 
 #include <io/stm32.h>
 
-
 struct stm32_adc *adc = (struct stm32_adc *)ADC1_BASE;
+
+#if CONFIG_KERN
+	#include <cfg/module.h>
+
+	#include <kern/proc.h>
+	#include <kern/signal.h>
+
+	#include <drv/irq_cm3.h>
+
+
+	#if !CONFIG_KERN_SIGNALS
+		#error Signals must be active to use ADC with kernel
+	#endif
+
+	/* Signal adc convertion end */
+	#define SIG_ADC_COMPLETE SIG_USER0
+
+	/* ADC waiting process */
+	static struct Process *adc_process;
+
+	/**
+	 * ADC ISR.
+	 * Simply signal the adc process that convertion is complete.
+	 */
+	static DECLARE_ISR(adc_conversion_end_irq)
+	{
+		sig_post(adc_process, SIG_ADC_COMPLETE);
+
+		/* Clear the status bit */
+		adc->SR &= ~BV(SR_EOC);
+	}
+
+	static void adc_enable_irq(void)
+	{
+		/* Register the IRQ handler */
+		sysirq_setHandler(ADC_IRQHANDLER, adc_conversion_end_irq);
+		adc->CR1 |= BV(CR1_EOCIE);
+	}
+
+#endif /* CONFIG_KERN */
 
 /**
  * Select mux channel \a ch.
@@ -85,10 +123,6 @@ void adc_hw_select_ch(uint8_t ch)
 	adc->SQR3 = (ch & SQR3_SQ_MASK);
 }
 
-static DECLARE_ISR(adc_redyRead)
-{
-	kputs("end\n");
-}
 /**
  * Start an ADC convertion.
  * If a kernel is present, preempt until convertion is complete, otherwise
@@ -96,13 +130,32 @@ static DECLARE_ISR(adc_redyRead)
  */
 uint16_t adc_hw_read(void)
 {
+	#if CONFIG_KERN
+		/* Ensure ADC is not already in use by another process */
+		ASSERT(adc_process == NULL);
+		adc_process = proc_current();
+	#endif
+
 	/* Start convertion */
     adc->CR2 |= CR2_EXTTRIG_SWSTRT_SET;
 
-	while (!(adc->SR & BV(SR_EOC)));
+	#if CONFIG_KERN
+		/* Ensure IRQs enabled. */
+		IRQ_ASSERT_ENABLED();
+		sig_wait(SIG_ADC_COMPLETE);
 
-	/* Return the last converted data */
-	return (adc->DR);
+		/* Prevent race condition in case of preemptive kernel */
+		uint16_t ret = adc->DR;
+		MEMORY_BARRIER;
+		adc_process = NULL;
+		return ret;
+	#else
+		/* Wait in polling until is done */
+		while (!(adc->SR & BV(SR_EOC)));
+
+		/* Return the last converted data */
+		return (adc->DR);
+	#endif
 }
 
 /**
@@ -134,8 +187,8 @@ void adc_hw_init(void)
 	adc->SMPR1 |= ((ADC_SAMPLETIME_239CYCLES5 << ADC_CHANNEL_16) |
 		(ADC_SAMPLETIME_239CYCLES5 << ADC_CHANNEL_17));
 
-	/* Register the IRQ handler */
-	sysirq_setHandler(ADC_IRQHANDLER, adc_redyRead);
-	//adc->CR1 |= BV(CR1_EOCIE);
+	#if CONFIG_KERN
+		adc_enable_irq();
+	#endif
 
 }
