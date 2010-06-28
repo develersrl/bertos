@@ -81,8 +81,8 @@
 #define ADC_CHANNEL_13                              ((uint8_t)0x0D)
 #define ADC_CHANNEL_14                              ((uint8_t)0x0E)
 #define ADC_CHANNEL_15                              ((uint8_t)0x0F)
-#define ADC_CHANNEL_16                              ((uint8_t)0X10)
-#define ADC_CHANNEL_17                              ((uint8_t)0X11)
+#define ADC_CHANNEL_16                              ((uint8_t)0x10)
+#define ADC_CHANNEL_17                              ((uint8_t)0x11)
 
 /* ADC sampling times */
 #define ADC_SAMPLETIME_1CYCLES5                    ((uint8_t)0x00)
@@ -247,6 +247,27 @@
 #define SR_JEOC                                        2
 #define SR_JSTRT                                       3
 #define SR_STRT                                        4
+
+/* ADC sample time */
+#define SMPR1_CH17                                    21
+#define SMPR1_CH16                                    18
+#define SMPR1_CH15                                    15
+#define SMPR1_CH14                                    12
+#define SMPR1_CH13                                     9
+#define SMPR1_CH12                                     6
+#define SMPR1_CH11                                     3
+#define SMPR1_CH10                                     0
+
+#define SMPR2_CH9                                     27
+#define SMPR2_CH8                                     24
+#define SMPR2_CH7                                     21
+#define SMPR2_CH6                                     18
+#define SMPR2_CH5                                     15
+#define SMPR2_CH4                                     12
+#define SMPR2_CH3                                      9
+#define SMPR2_CH2                                      6
+#define SMPR2_CH1                                      3
+#define SMPR2_CH0                                      0
 
 /* ADC registers Masks */
 #define CR1_ADC_CLEAR_MASK             ((uint32_t)0xFFF0FEFF)

@@ -150,7 +150,7 @@ uint16_t adc_hw_read(void)
 		adc_process = NULL;
 		return ret;
 	#else
-		/* Wait in polling until is done */
+		/* Wait in polling until conversion is done */
 		while (!(adc->SR & BV(SR_EOC)));
 
 		/* Return the last converted data */
@@ -163,8 +163,6 @@ uint16_t adc_hw_read(void)
  */
 void adc_hw_init(void)
 {
-	/* Enable clocking on AFIO */
-	RCC->APB2ENR |= RCC_APB2_AFIO;
 	RCC->APB2ENR |= (RCC_APB2_GPIOA | RCC_APB2_GPIOB | RCC_APB2_GPIOC);
 	RCC->APB2ENR |= RCC_APB2_ADC1;
 
@@ -175,6 +173,13 @@ void adc_hw_init(void)
 	adc->SQR2 = 0;
 	adc->SQR3 = 0;
 
+	/* Calibrate ADC */
+	adc->CR2 |= BV(CR2_RTSCAL);
+	adc->CR2 |= BV(CR2_CAL);
+
+	/* Wait in polling until calibration is done */
+	while (adc->CR2 & BV(CR2_CAL));
+
 	/*
 	 * Configure ADC
 	 *  - Regular mode
@@ -183,12 +188,28 @@ void adc_hw_init(void)
 	 */
 	adc->CR2 |= (BV(CR2_ADON) | ADC_EXTERNALTRIGCONV_NONE | BV(CR2_TSVREFE));
 
-	/* Set 17.1usec sampling time on channel 16 and 17 */
-	adc->SMPR1 |= ((ADC_SAMPLETIME_239CYCLES5 << ADC_CHANNEL_16) |
-		(ADC_SAMPLETIME_239CYCLES5 << ADC_CHANNEL_17));
+	/* Set 17.1usec sampling time*/
+	adc->SMPR1 |= ((ADC_SAMPLETIME_239CYCLES5 << SMPR1_CH17) |
+		(ADC_SAMPLETIME_239CYCLES5 << SMPR1_CH16) |
+		(ADC_SAMPLETIME_239CYCLES5 << SMPR1_CH15) |
+		(ADC_SAMPLETIME_239CYCLES5 << SMPR1_CH14) |
+		(ADC_SAMPLETIME_239CYCLES5 << SMPR1_CH13) |
+		(ADC_SAMPLETIME_239CYCLES5 << SMPR1_CH12) |
+		(ADC_SAMPLETIME_239CYCLES5 << SMPR1_CH11) |
+		(ADC_SAMPLETIME_239CYCLES5 << SMPR1_CH10));
+
+	adc->SMPR2 |= ((ADC_SAMPLETIME_239CYCLES5 << SMPR2_CH9) |
+		(ADC_SAMPLETIME_239CYCLES5 << SMPR2_CH8) |
+		(ADC_SAMPLETIME_239CYCLES5 << SMPR2_CH7) |
+		(ADC_SAMPLETIME_239CYCLES5 << SMPR2_CH6) |
+		(ADC_SAMPLETIME_239CYCLES5 << SMPR2_CH5) |
+		(ADC_SAMPLETIME_239CYCLES5 << SMPR2_CH4) |
+		(ADC_SAMPLETIME_239CYCLES5 << SMPR2_CH3) |
+		(ADC_SAMPLETIME_239CYCLES5 << SMPR2_CH2) |
+		(ADC_SAMPLETIME_239CYCLES5 << SMPR2_CH1) |
+		(ADC_SAMPLETIME_239CYCLES5 << SMPR2_CH0));
 
 	#if CONFIG_KERN
 		adc_enable_irq();
 	#endif
-
 }
