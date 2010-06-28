@@ -72,8 +72,8 @@ struct gpio_uart_info
 	uint32_t rx_pin;
 	uint32_t tx_pin;
 	/* Sysctl */
-	uint32_t sysctl;
-	uint32_t sysctl1;
+	uint32_t sysctl_gpio;
+	uint32_t sysctl_usart;
 
 };
 
@@ -85,24 +85,24 @@ static const struct gpio_uart_info gpio_uart[SER_CNT] =
 		.base = GPIOA_BASE,
 		.rx_pin = GPIO_USART1_RX_PIN,
 		.tx_pin = GPIO_USART1_TX_PIN,
-		.sysctl = RCC_APB2_GPIOA,
-		.sysctl1 = RCC_APB2_USART1,
+		.sysctl_gpio = RCC_APB2_GPIOA,
+		.sysctl_usart = RCC_APB2_USART1,
 	},
 	/* UART2 */
 	{
 		.base = GPIOA_BASE,
 		.rx_pin = GPIO_USART2_RX_PIN,
 		.tx_pin = GPIO_USART2_TX_PIN,
-		.sysctl = RCC_APB2_GPIOA,
-		.sysctl1 = RCC_APB1_USART2,
+		.sysctl_gpio = RCC_APB2_GPIOA,
+		.sysctl_usart = RCC_APB1_USART2,
 	},
 	/* UART3 */
 	{
 		.base = GPIOB_BASE,
 		.rx_pin = GPIO_USART3_RX_PIN,
 		.tx_pin = GPIO_USART3_TX_PIN,
-		.sysctl = RCC_APB2_GPIOB,
-		.sysctl1 = RCC_APB1_USART3,
+		.sysctl_gpio = RCC_APB2_GPIOB,
+		.sysctl_usart = RCC_APB1_USART3,
 	},
 };
 
@@ -149,16 +149,16 @@ void stm32_uartInit(int port)
 
 	/* Enable clocking on AFIO */
 	RCC->APB2ENR |= RCC_APB2_AFIO;
-	RCC->APB2ENR |=  gpio_uart[port].sysctl;
+	RCC->APB2ENR |= gpio_uart[port].sysctl_gpio;
 
 	/* Configure USART pins */
 	if (port == USART1_PORT)
 	{
-		RCC->APB2ENR |=  gpio_uart[port].sysctl1;
+		RCC->APB2ENR |=  gpio_uart[port].sysctl_usart;
 	}
 	else
 	{
-		RCC->APB1ENR |=  gpio_uart[port].sysctl1;
+		RCC->APB1ENR |=  gpio_uart[port].sysctl_usart;
 	}
 
 	stm32_gpioPinConfig((struct stm32_gpio *)gpio_uart[port].base,  gpio_uart[port].tx_pin,
@@ -168,9 +168,9 @@ void stm32_uartInit(int port)
 				GPIO_MODE_IN_FLOATING, GPIO_SPEED_50MHZ);
 
 	/* Clear control registry */
-	base->CR2 = 0; //CR2_CLEAR_MASK;
-	base->CR1 = 0; //CR1_CLEAR_MASK;
-	base->CR3 = 0; //CR3_CLEAR_MASK;
+	base->CR2 = 0;
+	base->CR1 = 0;
+	base->CR3 = 0;
 	base->SR = 0;
 
 	/* Set serial param: 115.200 bps, no parity */

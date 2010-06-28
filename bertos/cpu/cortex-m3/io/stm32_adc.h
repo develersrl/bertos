@@ -272,7 +272,7 @@
 /* ADC registers Masks */
 #define CR1_ADC_CLEAR_MASK             ((uint32_t)0xFFF0FEFF)
 #define CR2_ADC_CLEAR_MASK             ((uint32_t)0xFFF1F7FD)
-#define SQR1_CLEAR_MASK            ((uint32_t)0xFF0FFFFF)
+#define SQR1_CLEAR_MASK                ((uint32_t)0xFF0FFFFF)
 
 
 
