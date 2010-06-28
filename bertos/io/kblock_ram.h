@@ -44,6 +44,7 @@
 typedef struct KBlockRam
 {
 	KBlock b;
+	uint8_t *pagebuf;
 	uint8_t *membuf;
 } KBlockRam;
 

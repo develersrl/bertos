@@ -43,40 +43,36 @@
 static int kblockram_load(KBlock *b, block_idx_t index)
 {
 	KBlockRam *r = KBLOCKRAM_CAST(b);
-	memcpy(r->b.priv.pagebuf, r->membuf + index * r->b.blk_size, r->b.blk_size);
+	memcpy(r->pagebuf, r->membuf + index * r->b.blk_size, r->b.blk_size);
 	return 0;
 }
 
 static int kblockram_store(struct KBlock *b, block_idx_t index)
 {
 	KBlockRam *r = KBLOCKRAM_CAST(b);
-	memcpy(r->membuf + index * r->b.blk_size, r->b.priv.pagebuf, r->b.blk_size);
+	memcpy(r->membuf + index * r->b.blk_size, r->pagebuf, r->b.blk_size);
 	return 0;
 }
 
 static size_t kblockram_readBuf(struct KBlock *b, void *buf, size_t offset, size_t size)
 {
 	KBlockRam *r = KBLOCKRAM_CAST(b);
-	memcpy(buf, (uint8_t *)r->b.priv.pagebuf + offset, size);
+	memcpy(buf, r->pagebuf + offset, size);
+	return size;
+}
+
+static size_t kblockram_readDirect(struct KBlock *b, block_idx_t index, void *buf, size_t offset, size_t size)
+{
+	KBlockRam *r = KBLOCKRAM_CAST(b);
+	memcpy(buf, r->membuf + index * r->b.blk_size + offset, size);
 	return size;
 }
 
 static size_t kblockram_writeBuf(struct KBlock *b, const void *buf, size_t offset, size_t size)
 {
 	KBlockRam *r = KBLOCKRAM_CAST(b);
-	memcpy((uint8_t *)r->b.priv.pagebuf + offset, buf, size);
+	memcpy(r->pagebuf + offset, buf, size);
 	return size;
-}
-
-static void * kblockram_map(struct KBlock *b, size_t offset, UNUSED_ARG(size_t, size))
-{
-	return (uint8_t *)b->priv.pagebuf + offset;
-}
-
-
-static int kblockram_unmap(UNUSED_ARG(struct KBlock *, b), UNUSED_ARG(size_t, offset), UNUSED_ARG(size_t, size))
-{
-	return 0;
 }
 
 static int kblockram_error(struct KBlock *b)
@@ -91,12 +87,12 @@ static int kblockram_dummy(UNUSED_ARG(struct KBlock *,b))
 
 static KBlockVTable kblockram_vt =
 {
+	.readDirect = kblockram_readDirect,
 	.readBuf = kblockram_readBuf,
 	.writeBuf = kblockram_writeBuf,
 	.load = kblockram_load,
 	.store = kblockram_store,
-	.map = kblockram_map,
-	.unmap = kblockram_unmap,
+
 	.error = kblockram_error,
 	.clearerr = kblockram_dummy,
 	.close = kblockram_dummy,
@@ -109,15 +105,13 @@ void kblockram_init(KBlockRam *ram, void *buf, size_t size, size_t block_size)
 	ASSERT(block_size);
 
 	memset(ram, 0, sizeof(*ram));
-	
+
 	DB(ram->b.priv.type = KBT_KBLOCKRAM);
-	
+
 	// First page used as page buffer
 	ram->b.blk_cnt = (size / block_size) - 1;
-	ram->b.priv.pagebuf = buf;
-	ram->b.priv.pagebuf_size = block_size;
-	
+	ram->pagebuf = (uint8_t *)buf;
 	ram->membuf = (uint8_t *)buf + block_size;
-	ram->b.blk_size = block_size;	
-	ram->b.vt = &kblockram_vt;
+	ram->b.blk_size = block_size;
+	ram->b.priv.vt = &kblockram_vt;
 }

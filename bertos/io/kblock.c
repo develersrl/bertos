@@ -39,35 +39,148 @@
 #include "kblock.h"
 #include <cfg/log.h>
 
-
-static void *kblock_swMap(struct KBlock *b, size_t offset, size_t size)
+INLINE size_t kblock_readDirect(struct KBlock *b, block_idx_t index, void *buf, size_t offset, size_t size)
 {
-	return (kblock_readBuf(b, b->priv.pagebuf, offset, size) == size) ? b->priv.pagebuf : NULL;
+	KB_ASSERT_METHOD(b, readDirect);
+	return b->priv.vt->readDirect(b, index, buf, offset, size);
+}
+
+INLINE size_t kblock_readBuf(struct KBlock *b, void *buf, size_t offset, size_t size)
+{
+	KB_ASSERT_METHOD(b, readBuf);
+	ASSERT(offset + size <= b->blk_size);
+
+	return b->priv.vt->readBuf(b, buf, offset, size);
+}
+
+INLINE size_t kblock_writeBuf(struct KBlock *b, const void *buf, size_t offset, size_t size)
+{
+	KB_ASSERT_METHOD(b, writeBuf);
+	ASSERT(offset + size <= b->blk_size);
+	return b->priv.vt->writeBuf(b, buf, offset, size);
+}
+
+INLINE int kblock_load(struct KBlock *b, block_idx_t index)
+{
+	KB_ASSERT_METHOD(b, load);
+	ASSERT(index < b->blk_cnt);
+
+	return b->priv.vt->load(b, b->priv.blk_start + index);
+}
+
+INLINE int kblock_store(struct KBlock *b, block_idx_t index)
+{
+	KB_ASSERT_METHOD(b, store);
+	ASSERT(index < b->blk_cnt);
+
+	return b->priv.vt->store(b, b->priv.blk_start + index);
 }
 
 
-static int kblock_swUnmap(struct KBlock *b, size_t offset, size_t size)
-{
-	return (kblock_writeBuf(b, b->priv.pagebuf, offset, size) == size) ? 0 : EOF;
-}
 
-
-void *kblock_unsupportedMap(struct KBlock *b, UNUSED_ARG(size_t, offset), UNUSED_ARG(size_t, size))
+size_t kblock_read(struct KBlock *b, block_idx_t idx, void *_buf, size_t offset, size_t size)
 {
-	LOG_WARN("This driver does not support block mapping: use kblock_addMapping() to add generic mapping functionality.\n");
-	b->priv.flags |= BV(KBS_ERR_MAP_NOT_AVAILABLE);
-	return NULL;
-}
+	size_t tot_rd = 0;
+	uint8_t *buf = (uint8_t *)_buf;
 
-void kblock_addMapping(struct KBlock *dev, void *buf, size_t size)
-{
+	ASSERT(b);
 	ASSERT(buf);
-	ASSERT(size);
-	ASSERT(dev);
-	
-	dev->vt->map = kblock_swMap;
-	dev->vt->unmap = kblock_swUnmap;
 
-	dev->priv.pagebuf = buf;
-	dev->priv.pagebuf_size = size;
+	while (size)
+	{
+		size_t len = MIN(size, b->blk_size - offset);
+		size_t rlen;
+
+		if (idx == b->priv.curr_blk)
+			rlen = kblock_readBuf(b, buf, offset, len);
+		else
+			rlen = kblock_readDirect(b, idx, buf, offset, len);
+
+		tot_rd += rlen;
+		if (rlen != len)
+			break;
+
+		idx++;
+		size -= rlen;
+		offset = 0;
+		buf += rlen;
+	}
+
+	return tot_rd;
 }
+
+
+int kblock_flush(struct KBlock *b)
+{
+	ASSERT(b);
+
+	if (b->priv.cache_dirty)
+	{
+		if (kblock_store(b, b->priv.curr_blk) == 0)
+			b->priv.cache_dirty = false;
+		else
+			return EOF;
+	}
+	return 0;
+}
+
+
+static bool kblock_loadPage(struct KBlock *b, block_idx_t idx)
+{
+	ASSERT(b);
+
+	if (idx != b->priv.curr_blk)
+	{
+		if (kblock_flush(b) != 0 || kblock_load(b, idx) != 0)
+				return false;
+
+		b->priv.curr_blk = idx;
+	}
+	return true;
+}
+
+
+size_t kblock_write(struct KBlock *b, block_idx_t idx, const void *_buf, size_t offset, size_t size)
+{
+	size_t tot_wr = 0;
+	const uint8_t *buf = (const uint8_t *)_buf;
+
+	ASSERT(b);
+	ASSERT(buf);
+
+	while (size)
+	{
+		size_t len = MIN(size, b->blk_size - offset);
+		size_t wlen;
+
+		if (!kblock_loadPage(b, idx))
+			break;
+
+		wlen = kblock_writeBuf(b, buf, offset, len);
+		b->priv.cache_dirty = true;
+
+		tot_wr += wlen;
+		if (wlen != len)
+			break;
+
+		idx++;
+		size -= wlen;
+		offset = 0;
+		buf += wlen;
+	}
+
+	return tot_wr;
+}
+
+int kblock_copy(struct KBlock *b, block_idx_t idx1, block_idx_t idx2)
+{
+	ASSERT(b);
+
+	if (!kblock_loadPage(b, idx1))
+		return EOF;
+
+	b->priv.curr_blk = idx2;
+	b->priv.cache_dirty = true;
+	return 0;
+}
+
