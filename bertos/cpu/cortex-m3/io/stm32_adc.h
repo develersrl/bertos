@@ -274,6 +274,15 @@
 #define CR2_ADC_CLEAR_MASK             ((uint32_t)0xFFF1F7FD)
 #define SQR1_CLEAR_MASK            ((uint32_t)0xFF0FFFFF)
 
+
+
+/* ADC defines for SMT32F103Bxx */
+#define ADC_TEMP_V25         4.3
+#define ADC_TEMP_SLOPE      1.43
+#define ADC_TEMP_CONST        25
+#define ADC_TEMP_CH           16
+#define ADC_VREFINT_CH        17
+
 struct stm32_adc
 {
 	reg32_t SR;
