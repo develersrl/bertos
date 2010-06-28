@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2009 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
@@ -109,6 +109,8 @@ void kblockram_init(KBlockRam *ram, void *buf, size_t size, size_t block_size)
 	ASSERT(block_size);
 
 	memset(ram, 0, sizeof(*ram));
+	
+	DB(ram->b.priv.type = KBT_KBLOCKRAM);
 	
 	// First page used as page buffer
 	ram->b.blk_cnt = (size / block_size) - 1;
