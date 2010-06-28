@@ -47,10 +47,10 @@ INLINE uint16_t hw_readVrefint(void)
 	return ADC_RANGECONV(adc_read(ADC_VREFINT_CH), 0, 3.3);
 }
 
-INLINE float hw_readIntTemp(void)
+INLINE uint16_t hw_readIntTemp(void)
 {
-	float vsens = ADC_RANGECONV(adc_read(ADC_TEMP_CH), 0, 3.3);
-	return (float)(((ADC_TEMP_V25 - vsens) / ADC_TEMP_SLOPE) + ADC_TEMP_CONST);
+	uint16_t vsens = ADC_RANGECONV(adc_read(ADC_TEMP_CH), 0, 3300);
+	return (((ADC_TEMP_V25 - vsens) / ADC_TEMP_SLOPE) + ADC_TEMP_CONST);
 }
 
 #endif /* HW_ADC_H */
