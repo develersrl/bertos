@@ -138,7 +138,7 @@
 #define CR1_RWU_SET               ((uint16_t)0x0002)  /* USART mute mode Enable MASK */
 #define CR1_RWU_RESET             ((uint16_t)0xFFFD)  /* USART mute mode Enable MASK */
 #define CR1_SBK_SET               ((uint16_t)0x0001)  /* USART Break Character send MASK */
-#define CR1_CLEAR_MASK            ((uint16_t)0xE9F3)  /* USART CR1 MASK */
+#define CR1_USART_CLEAR_MASK      ((uint16_t)0xE9F3)  /* USART CR1 MASK */
 #define CR1_UE                                   13
 #define CR1_M                                    12
 #define CR1_WAKE                                 11
@@ -157,7 +157,7 @@
 #define CR2_MASK                  ((uint16_t)0xFFF0)  /* USART address MASK */
 #define CR2_LINE_SET              ((uint16_t)0x4000)  /* USART LIN Enable MASK */
 #define CR2_LINE_RESET            ((uint16_t)0xBFFF)  /* USART LIN Disable MASK */
-#define CR2_CLEAR_MASK            ((uint16_t)0xC0FF)  /* USART CR2 MASK */
+#define CR2_USART_CLEAR_MASK      ((uint16_t)0xC0FF)  /* USART CR2 MASK */
 
 #define CR3_SCEN_SET              ((uint16_t)0x0020)  /* USART SC Enable MASK */
 #define CR3_SCEN_RESET            ((uint16_t)0xFFDF)  /* USART SC Disable MASK */
