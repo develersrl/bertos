@@ -35,6 +35,8 @@
  * \brief KBlock interface
  */
 
+#ifndef KBLOCK_RAM_H
+#define KBLOCK_RAM_H
 
 #include "kblock.h"
 
@@ -54,3 +56,6 @@ INLINE KBlockRam *KBLOCKRAM_CAST(KBlock *b)
 	return (KBlockRam *)b;
 }
 
+void kblockram_init(KBlockRam *ram, void *buf, size_t size, size_t block_size);
+
+#endif /* KBLOCK_RAM_H */

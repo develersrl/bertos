@@ -430,4 +430,6 @@ INLINE int kblock_close(struct KBlock *b)
 	return b->vt->close(b);
 }
 
+void *kblock_unsupportedMap(struct KBlock *b, UNUSED_ARG(size_t, offset), UNUSED_ARG(size_t, size));
+
 #endif /* IO_KBLOCK_H */

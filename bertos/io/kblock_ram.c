@@ -40,56 +40,56 @@
 #include <string.h>
 
 
-int kblockram_load(KBlock *b, block_idx_t index)
+static int kblockram_load(KBlock *b, block_idx_t index)
 {
 	KBlockRam *r = KBLOCKRAM_CAST(b);
 	memcpy(r->b.priv.pagebuf, r->membuf + index * r->b.blk_size, r->b.blk_size);
 	return 0;
 }
 
-int kblockram_store(struct KBlock *b, block_idx_t index)
+static int kblockram_store(struct KBlock *b, block_idx_t index)
 {
 	KBlockRam *r = KBLOCKRAM_CAST(b);
 	memcpy(r->membuf + index * r->b.blk_size, r->b.priv.pagebuf, r->b.blk_size);
 	return 0;
 }
 
-size_t kblockram_readBuf(struct KBlock *b, void *buf, size_t offset, size_t size)
+static size_t kblockram_readBuf(struct KBlock *b, void *buf, size_t offset, size_t size)
 {
 	KBlockRam *r = KBLOCKRAM_CAST(b);
 	memcpy(buf, (uint8_t *)r->b.priv.pagebuf + offset, size);
 	return size;
 }
 
-size_t kblockram_writeBuf(struct KBlock *b, const void *buf, size_t offset, size_t size)
+static size_t kblockram_writeBuf(struct KBlock *b, const void *buf, size_t offset, size_t size)
 {
 	KBlockRam *r = KBLOCKRAM_CAST(b);
 	memcpy((uint8_t *)r->b.priv.pagebuf + offset, buf, size);
 	return size;
 }
 
-void * kblockram_map(struct KBlock *b, size_t offset, UNUSED_ARG(size_t, size))
+static void * kblockram_map(struct KBlock *b, size_t offset, UNUSED_ARG(size_t, size))
 {
 	return (uint8_t *)b->priv.pagebuf + offset;
 }
 
 
-int kblockram_unmap(UNUSED_ARG(struct KBlock *, b), UNUSED_ARG(size_t, offset), UNUSED_ARG(size_t, size))
+static int kblockram_unmap(UNUSED_ARG(struct KBlock *, b), UNUSED_ARG(size_t, offset), UNUSED_ARG(size_t, size))
 {
 	return 0;
 }
 
-int kblockram_error(struct KBlock *b)
+static int kblockram_error(struct KBlock *b)
 {
 	return b->priv.flags;
 }
 
-int kblockram_dummy(UNUSED_ARG(struct KBlock *,b))
+static int kblockram_dummy(UNUSED_ARG(struct KBlock *,b))
 {
 	return 0;
 }
 
-static const KBlockVTable kblockram_vt =
+static KBlockVTable kblockram_vt =
 {
 	.readBuf = kblockram_readBuf,
 	.writeBuf = kblockram_writeBuf,
