@@ -73,11 +73,15 @@ struct stm32_adc *adc = (struct stm32_adc *)ADC1_BASE;
 
 /**
  * Select mux channel \a ch.
+ * Generally the stm32 cpu family allow us to program the order
+ * of adc channel that we want to read.
+ * In this driver implementation we put as fist channel to read the
+ * select ones.
  */
 void adc_hw_select_ch(uint8_t ch)
 {
-	kprintf("Select[%d]\n", ch);
-	adc->SQR1 |= (0x1 << SQR1_SQ_LEN_SHIFT);
+	/* We sample only from one channel */
+	adc->SQR1 |= BV(SQR1_SQ_LEN_SHIFT);
 	adc->SQR3 = (ch & SQR3_SQ_MASK);
 }
 
@@ -92,12 +96,12 @@ static DECLARE_ISR(adc_redyRead)
  */
 uint16_t adc_hw_read(void)
 {
-	// Start convertion
+	/* Start convertion */
     adc->CR2 |= CR2_EXTTRIG_SWSTRT_SET;
 
 	while (!(adc->SR & BV(SR_EOC)));
 
-	//Return the last converted data
+	/* Return the last converted data */
 	return (adc->DR);
 }
 
@@ -108,27 +112,23 @@ void adc_hw_init(void)
 {
 	/* Enable clocking on AFIO */
 	RCC->APB2ENR |= RCC_APB2_AFIO;
-	RCC->APB2ENR |= RCC_APB2_GPIOC;
+	RCC->APB2ENR |= (RCC_APB2_GPIOA | RCC_APB2_GPIOB | RCC_APB2_GPIOC);
 	RCC->APB2ENR |= RCC_APB2_ADC1;
 
-	/* Reset cr1 registry */
+	/* Reset registry */
 	adc->CR1 = 0;
 	adc->CR2 = 0;
+	adc->SQR1 = 0;
+	adc->SQR2 = 0;
+	adc->SQR3 = 0;
 
 	/*
 	 * Configure ADC
 	 *  - Regular mode
-	 *  - scan mode
+	 *  - Wake up adc
+	 *  - Wake up temperature and Vrefint
 	 */
 	adc->CR2 |= (BV(CR2_ADON) | ADC_EXTERNALTRIGCONV_NONE | BV(CR2_TSVREFE));
-	/*
-	 * Configure ADC settings
-	 *  - align rigth
-	 *  - enable adc
-	 */
-	adc->SQR1 = 0;
-	adc->SQR2 = 0;
-	adc->SQR3 = 0;
 
 	/* Set 17.1usec sampling time on channel 16 and 17 */
 	adc->SMPR1 |= ((ADC_SAMPLETIME_239CYCLES5 << ADC_CHANNEL_16) |
