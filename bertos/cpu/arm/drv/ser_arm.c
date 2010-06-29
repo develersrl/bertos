@@ -32,8 +32,6 @@
  *
  * \brief Low-level serial module for ARM (inplementation).
  *
- * \version $Id$
- *
  * \author Daniele Basile <asterix@develer.com>
  *
  * This module is automatically included so no need to include
