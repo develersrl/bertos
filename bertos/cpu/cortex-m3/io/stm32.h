@@ -46,6 +46,7 @@
 #include "stm32_ints.h"
 #include "stm32_uart.h"
 #include "stm32_adc.h"
+#include "stm32_i2c.h"
 
 #define GPIO_USART1_TX_PIN	BV(9)
 #define GPIO_USART1_RX_PIN	BV(10)
