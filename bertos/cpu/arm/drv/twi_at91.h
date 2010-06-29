@@ -32,8 +32,6 @@
  *
  * \brief Driver for the AT91 ARM TWI (implementation)
  *
- * \version $Id$
- *
  * \author Francesco Sacchi <batt@develer.com>
  */
 

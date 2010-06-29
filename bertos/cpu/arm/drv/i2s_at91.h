@@ -52,7 +52,6 @@
  * // now fill the buffer again
  * \endcode
  *
- * \version $Id$
  * \author Luca Ottaviano <lottaviano@develer.com>
  *
  * $WIZ$ module_name = "i2s"

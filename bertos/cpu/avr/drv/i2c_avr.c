@@ -32,8 +32,6 @@
  *
  * \brief Driver for the AVR ATMega TWI (implementation)
  *
- * \version $Id$
- *
  * \author Stefano Fedrigo <aleph@develer.com>
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
