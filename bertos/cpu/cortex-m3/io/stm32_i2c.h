@@ -53,8 +53,8 @@
 #define I2C_ACK_DISABLE                 ((uint16_t)0x0000)
 
 /* I2C_transfer_direction */
-#define  I2C_DIRECTION_TRANSMITTER      ((uint8_t)0x00)
-#define  I2C_DIRECTION_RECEIVER         ((uint8_t)0x01)
+#define I2C_DIRECTION_TRANSMITTER      ((uint8_t)0x00)
+#define I2C_DIRECTION_RECEIVER         ((uint8_t)0x01)
 
 /* I2C_acknowledged_address_defines  */
 #define I2C_ACKNOWLEDGEDADDRESS_7BIT    ((uint16_t)0x4000)
@@ -126,42 +126,43 @@
 #define I2C_FLAG_SB                     ((uint32_t)0x10000001)
 
 /* EV1  */
-#define  I2C_EVENT_SLAVE_TRANSMITTER_ADDRESS_MATCHED       ((uint32_t)0x00060082) /* TRA, BUSY, TXE and ADDR flags */
-#define  I2C_EVENT_SLAVE_RECEIVER_ADDRESS_MATCHED          ((uint32_t)0x00020002) /* BUSY and ADDR flags */
-#define  I2C_EVENT_SLAVE_TRANSMITTER_SECONDADDRESS_MATCHED ((uint32_t)0x00860080)  /* DUALF, TRA, BUSY and TXE flags */
-#define  I2C_EVENT_SLAVE_RECEIVER_SECONDADDRESS_MATCHED    ((uint32_t)0x00820000)  /* DUALF and BUSY flags */
-#define  I2C_EVENT_SLAVE_GENERALCALLADDRESS_MATCHED        ((uint32_t)0x00120000)  /* GENCALL and BUSY flags */
+#define I2C_EVENT_SLAVE_TRANSMITTER_ADDRESS_MATCHED       ((uint32_t)0x00060082) /* TRA, BUSY, TXE and ADDR flags */
+#define I2C_EVENT_SLAVE_RECEIVER_ADDRESS_MATCHED          ((uint32_t)0x00020002) /* BUSY and ADDR flags */
+#define I2C_EVENT_SLAVE_TRANSMITTER_SECONDADDRESS_MATCHED ((uint32_t)0x00860080)  /* DUALF, TRA, BUSY and TXE flags */
+#define I2C_EVENT_SLAVE_RECEIVER_SECONDADDRESS_MATCHED    ((uint32_t)0x00820000)  /* DUALF and BUSY flags */
+#define I2C_EVENT_SLAVE_GENERALCALLADDRESS_MATCHED        ((uint32_t)0x00120000)  /* GENCALL and BUSY flags */
 
 /* EV2  */
-#define  I2C_EVENT_SLAVE_BYTE_RECEIVED                     ((uint32_t)0x00020040)  /* BUSY and RXNE flags */
+#define I2C_EVENT_SLAVE_BYTE_RECEIVED                     ((uint32_t)0x00020040)  /* BUSY and RXNE flags */
 
 /* EV3 */
-#define  I2C_EVENT_SLAVE_BYTE_TRANSMITTED                  ((uint32_t)0x00060084)  /* TRA, BUSY, TXE and BTF flags */
+#define I2C_EVENT_SLAVE_BYTE_TRANSMITTED                  ((uint32_t)0x00060084)  /* TRA, BUSY, TXE and BTF flags */
 
 /* EV4 */
-#define  I2C_EVENT_SLAVE_STOP_DETECTED                     ((uint32_t)0x00000010)  /* STOPF flag */
+#define I2C_EVENT_SLAVE_STOP_DETECTED                     ((uint32_t)0x00000010)  /* STOPF flag */
 
 /* EV5 */
-#define  I2C_EVENT_MASTER_MODE_SELECT                      ((uint32_t)0x00030001)  /* BUSY, MSL and SB flag */
+#define I2C_EVENT_MASTER_MODE_SELECT                      ((uint32_t)0x00030001)  /* BUSY, MSL and SB flag */
+
 
 /* EV6 */
-#define  I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED        ((uint32_t)0x00070082)  /* BUSY, MSL, ADDR, TXE and TRA flags */
-#define  I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED           ((uint32_t)0x00030002)  /* BUSY, MSL and ADDR flags */
+#define I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED        ((uint32_t)0x00070082)  /* BUSY, MSL, ADDR, TXE and TRA flags */
+#define I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED           ((uint32_t)0x00030002)  /* BUSY, MSL and ADDR flags */
 
 /* EV7 */
-#define  I2C_EVENT_MASTER_BYTE_RECEIVED                    ((uint32_t)0x00030040)  /* BUSY, MSL and RXNE flags */
+#define I2C_EVENT_MASTER_BYTE_RECEIVED                    ((uint32_t)0x00030040)  /* BUSY, MSL and RXNE flags */
 
 /* EV8 */
 #define I2C_EVENT_MASTER_BYTE_TRANSMITTING                 ((uint32_t)0x00070080) /* TRA, BUSY, MSL, TXE flags */
 
 /* EV8_2 */
-#define  I2C_EVENT_MASTER_BYTE_TRANSMITTED                 ((uint32_t)0x00070084)  /* TRA, BUSY, MSL, TXE and BTF flags */
+#define I2C_EVENT_MASTER_BYTE_TRANSMITTED                 ((uint32_t)0x00070084)  /* TRA, BUSY, MSL, TXE and BTF flags */
 
 /* EV9 */
-#define  I2C_EVENT_MASTER_MODE_ADDRESS10                   ((uint32_t)0x00030008)  /* BUSY, MSL and ADD10 flags */
+#define I2C_EVENT_MASTER_MODE_ADDRESS10                   ((uint32_t)0x00030008)  /* BUSY, MSL and ADD10 flags */
 
 /* EV3_2 */
-#define  I2C_EVENT_SLAVE_ACK_FAILURE                       ((uint32_t)0x00000400)  /* AF flag */
+#define I2C_EVENT_SLAVE_ACK_FAILURE                       ((uint32_t)0x00000400)  /* AF flag */
 
 
 
@@ -219,6 +220,8 @@
 /* I2C FREQ mask */
 #define CR2_FREQ_RESET          ((uint16_t)0xFFC0)
 
+#define CR2_FREQ_36MHZ          ((uint16_t)0x100100)
+
 /* I2C ADD0 mask */
 #define OAR1_ADD0_SET           ((uint16_t)0x0001)
 #define OAR1_ADD0_RESET         ((uint16_t)0xFFFE)
@@ -236,11 +239,11 @@
 /* I2C CCR mask */
 #define CCR_CCR_SET             ((uint16_t)0x0FFF)
 
-/* I2C FLAG mask */
-#define FLAG_MASK               ((uint32_t)0x00FFFFFF)
+/* I2C Status */
+#define SR1_BUSY                                 1
+#define SR1_MSL                                  0
 
-/* I2C Interrupt Enable mask */
-#define ITEN_MASK               ((uint32_t)0x07000000)
+#define SR2_SB                                   0
 
 
 struct stm32_i2c
@@ -263,7 +266,6 @@ struct stm32_i2c
 	uint16_t  RESERVED7;
 	reg16_t TRISE;
 	uint16_t  RESERVED8;
-	reg16_t DR;
 };
 
 #endif /* STM32_I2C_H */
