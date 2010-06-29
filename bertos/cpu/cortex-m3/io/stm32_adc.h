@@ -277,11 +277,11 @@
 
 
 /* ADC defines for SMT32F103Bxx */
-#define ADC_TEMP_V25         4.3
-#define ADC_TEMP_SLOPE      1.43
-#define ADC_TEMP_CONST        25
-#define ADC_TEMP_CH           16
-#define ADC_VREFINT_CH        17
+#define ADC_TEMP_V25         4300  // uV / C
+#define ADC_TEMP_SLOPE       1430  // mV
+#define ADC_TEMP_CONST      25000
+#define ADC_TEMP_CH            16
+#define ADC_VREFINT_CH         17
 
 struct stm32_adc
 {

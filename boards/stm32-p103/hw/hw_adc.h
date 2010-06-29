@@ -43,7 +43,7 @@
 #include <io/stm32.h>
 
 /*
- * Return the Vrefint voltage in mV
+ * Return the Vrefint voltage in mV.
  */
 INLINE uint16_t hw_readVrefint(void)
 {
@@ -51,12 +51,14 @@ INLINE uint16_t hw_readVrefint(void)
 }
 
 /*
- * Return the cpu core temperature in degrees.
+ * Return the cpu core temperature in degrees * 100.
  */
-INLINE float hw_readIntTemp(void)
+INLINE uint16_t hw_readIntTemp(void)
 {
-	float vsens = ADC_RANGECONV(adc_read(ADC_TEMP_CH), 0, 3.3);
-	return (float)(((ADC_TEMP_V25 - vsens) / ADC_TEMP_SLOPE) + ADC_TEMP_CONST);
+	uint16_t vsens = ADC_RANGECONV(adc_read(ADC_TEMP_CH), 0, 3300);
+
+	uint16_t temp = (((ADC_TEMP_V25 - vsens) * 1000)/ ADC_TEMP_SLOPE) + ADC_TEMP_CONST;
+	return (temp / 10);
 }
 
 #endif /* HW_ADC_H */
