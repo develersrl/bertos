@@ -62,12 +62,12 @@ static void testCheck(BattFsSuper *disk, pgcnt_t *reference)
 {
 	ASSERT(battfs_fsck(disk));
 
-	for (int i = 0; i < disk->page_count; i++)
+	for (unsigned i = 0; i < disk->dev->blk_cnt; i++)
 	{
 		if (disk->page_array[i] != reference[i])
 		{
 			kprintf("Error at addr %d: page_array read", i);
-			for (pgcnt_t i = 0; i < disk->page_count; i++)
+			for (pgcnt_t i = 0; i < disk->dev->blk_cnt; i++)
 			{
 				if (!(i % 16))
 					kputchar('\n');
@@ -75,7 +75,7 @@ static void testCheck(BattFsSuper *disk, pgcnt_t *reference)
 			}
 			kputchar('\n');
 			kprintf("Expected:");
-			for (pgcnt_t i = 0; i < disk->page_count; i++)
+			for (pgcnt_t i = 0; i < disk->dev->blk_cnt; i++)
 			{
 				if (!(i % 16))
 					kputchar('\n');

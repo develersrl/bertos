@@ -107,9 +107,6 @@ typedef struct BattFsPageHeader
  */
 #define BATTFS_MAX_FILES (1 << (CPU_BITS_PER_CHAR * sizeof(inode_t)))
 
-/* Fwd decl */
-struct BattFsSuper;
-
 /**
  * Sentinel used to keep trace of unset pages in disk->page_array.
  */
@@ -125,9 +122,6 @@ typedef uint32_t disk_size_t; ///< Type for disk sizes.
 typedef struct BattFsSuper
 {
 	KBlock *dev;             ///< Block device context (physical disk).
-
-	pgaddr_t page_size;      ///< Size of a memory page, in bytes. Used by disk low level driver.
-	pgcnt_t page_count;      ///< Number of pages on disk.
 
 	pgaddr_t data_size;      ///< Size of space usable for data in a disk page, in bytes. The rest is used by the page header.
 	/**
@@ -155,7 +149,7 @@ typedef struct BattFsSuper
 /**
  * True if space on \a disk is over.
  */
-#define SPACE_OVER(disk) ((disk)->free_page_start >= (disk)->page_count)
+#define SPACE_OVER(disk) ((disk)->free_page_start >= (disk)->dev->blk_cnt)
 
 typedef uint8_t filemode_t;  ///< Type for file open modes.
 typedef int32_t file_size_t; ///< Type for file sizes.

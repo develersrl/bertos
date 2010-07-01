@@ -55,7 +55,7 @@
 static void dumpPageArray(struct BattFsSuper *disk)
 {
 	kprintf("Page array dump, free_page_start %d:", disk->free_page_start);
-	for (pgcnt_t i = 0; i < disk->page_count; i++)
+	for (pgcnt_t i = 0; i < disk->dev->blk_cnt; i++)
 	{
 		if (!(i % 16))
 			kputchar('\n');
@@ -199,13 +199,13 @@ static pgcnt_t countPages(pgoff_t *filelen_table, inode_t inode)
 static void movePages(struct BattFsSuper *disk, pgcnt_t src, int offset)
 {
 	pgcnt_t dst = src + offset;
-	LOG_INFO("src %d, offset %d, size %d\n", src, offset, (unsigned int)((disk->page_count - MAX(dst, src)) * sizeof(pgcnt_t)));
-	memmove(&disk->page_array[dst], &disk->page_array[src], (disk->page_count - MAX(dst, src)) * sizeof(pgcnt_t));
+	LOG_INFO("src %d, offset %d, size %d\n", src, offset, (unsigned int)((disk->dev->blk_cnt - MAX(dst, src)) * sizeof(pgcnt_t)));
+	memmove(&disk->page_array[dst], &disk->page_array[src], (disk->dev->blk_cnt - MAX(dst, src)) * sizeof(pgcnt_t));
 
 	if (offset < 0)
 	{
 		/* Fill empty space in array with sentinel */
-		for (pgcnt_t page = disk->page_count + offset; page < disk->page_count; page++)
+		for (pgcnt_t page = disk->dev->blk_cnt + offset; page < disk->dev->blk_cnt; page++)
 			disk->page_array[page] = PAGE_UNSET_SENTINEL;
 	}
 }
@@ -225,7 +225,7 @@ static bool countDiskFilePages(struct BattFsSuper *disk, pgoff_t *filelen_table)
 	disk->free_page_start = 0;
 
 	/* Count the number of disk page per file */
-	for (pgcnt_t page = 0; page < disk->page_count; page++)
+	for (pgcnt_t page = 0; page < disk->dev->blk_cnt; page++)
 	{
 		if (!readHdr(disk, page, &hdr))
 			return false;
@@ -270,7 +270,7 @@ static bool fillPageArray(struct BattFsSuper *disk, pgoff_t *filelen_table)
 	BattFsPageHeader hdr;
 	pgcnt_t curr_free_page = disk->free_page_start;
 	/* Fill page allocation array */
-	for (pgcnt_t page = 0; page < disk->page_count; page++)
+	for (pgcnt_t page = 0; page < disk->dev->blk_cnt; page++)
 	{
 		if (!readHdr(disk, page, &hdr))
 			return false;
@@ -368,22 +368,20 @@ bool battfs_mount(struct BattFsSuper *disk, struct KBlock *dev, pgcnt_t *page_ar
 
 	ASSERT(dev);
 	disk->dev = dev;
-	disk->page_size = dev->blk_size;
-	disk->page_count = dev->blk_cnt;
 
-	ASSERT(disk->page_size > BATTFS_HEADER_LEN);
+	ASSERT(disk->dev->blk_size > BATTFS_HEADER_LEN);
 	/* Fill page_size with the usable space */
-	disk->data_size = disk->page_size - BATTFS_HEADER_LEN;
-	ASSERT(disk->page_count);
-	ASSERT(disk->page_count < PAGE_UNSET_SENTINEL - 1);
+	disk->data_size = disk->dev->blk_size - BATTFS_HEADER_LEN;
+	ASSERT(disk->dev->blk_cnt);
+	ASSERT(disk->dev->blk_cnt < PAGE_UNSET_SENTINEL - 1);
 	ASSERT(page_array);
 	disk->page_array = page_array;
-	ASSERT(array_size >= disk->page_count * sizeof(pgcnt_t));
+	ASSERT(array_size >= disk->dev->blk_cnt * sizeof(pgcnt_t));
 
 	memset(filelen_table, 0, BATTFS_MAX_FILES * sizeof(pgoff_t));
 
 	disk->free_bytes = 0;
-	disk->disk_size = (disk_size_t)disk->data_size * disk->page_count;
+	disk->disk_size = (disk_size_t)disk->data_size * disk->dev->blk_cnt;
 
 	/* Count pages per file */
 	if (!countDiskFilePages(disk, filelen_table))
@@ -395,7 +393,7 @@ bool battfs_mount(struct BattFsSuper *disk, struct KBlock *dev, pgcnt_t *page_ar
 	/* Once here, we have filelen_table filled with file lengths */
 
 	/* Fill page array with sentinel */
-	for (pgcnt_t page = 0; page < disk->page_count; page++)
+	for (pgcnt_t page = 0; page < disk->dev->blk_cnt; page++)
 		disk->page_array[page] = PAGE_UNSET_SENTINEL;
 
 	/* Fill page allocation array using filelen_table */
@@ -408,7 +406,7 @@ bool battfs_mount(struct BattFsSuper *disk, struct KBlock *dev, pgcnt_t *page_ar
 		dumpPageArray(disk);
 	#endif
 	#if CONFIG_BATTFS_SHUFFLE_FREE_PAGES
-		SHUFFLE(&disk->page_array[disk->free_page_start], disk->page_count - disk->free_page_start);
+		SHUFFLE(&disk->page_array[disk->free_page_start], disk->dev->blk_cnt - disk->free_page_start);
 
 		LOG_INFO("Page array after shuffle:\n");
 		#if LOG_LEVEL >= LOG_LVL_INFO
@@ -428,8 +426,8 @@ bool battfs_fsck(struct BattFsSuper *disk)
 {
 	#define FSCHECK(cond) do { if(!(cond)) { LOG_ERR("\"" #cond "\"\n"); return false; } } while (0)
 
-	FSCHECK(disk->free_page_start <= disk->page_count);
-	FSCHECK(disk->data_size < disk->page_size);
+	FSCHECK(disk->free_page_start <= disk->dev->blk_cnt);
+	FSCHECK(disk->data_size < disk->dev->blk_size);
 	FSCHECK(disk->free_bytes <= disk->disk_size);
 
 	disk_size_t free_bytes = 0;
@@ -442,7 +440,7 @@ bool battfs_fsck(struct BattFsSuper *disk)
 	/* Uneeded, the first time will be overwritten but useful to silence
 	 * the warning for uninitialized value */
 	FSCHECK(readHdr(disk, 0, &prev_hdr));
-	for (pgcnt_t page = 0; page < disk->page_count; page++)
+	for (pgcnt_t page = 0; page < disk->dev->blk_cnt; page++)
 	{
 		FSCHECK(readHdr(disk, disk->page_array[page], &hdr));
 		free_bytes += disk->data_size;
@@ -556,7 +554,7 @@ static pgcnt_t renewPage(struct BattFsSuper *disk, pgcnt_t old_pos)
 
 	/* Insert previous page in free blocks list */
 	LOG_INFO("Setting page %d as free\n", old_pos);
-	disk->page_array[disk->page_count - 1] = old_pos;
+	disk->page_array[disk->dev->blk_cnt - 1] = old_pos;
 	return new_page;
 }
 
