@@ -114,4 +114,5 @@ void kblockram_init(KBlockRam *ram, void *buf, size_t size, size_t block_size)
 	ram->membuf = (uint8_t *)buf + block_size;
 	ram->b.blk_size = block_size;
 	ram->b.priv.vt = &kblockram_vt;
+	kblockram_load(&ram->b, 0);
 }
