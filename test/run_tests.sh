@@ -33,7 +33,6 @@ SRC_LIST="
 	bertos/algo/ramp.c
 	bertos/drv/kdebug.c
 	bertos/drv/timer.c
-	bertos/fs/battfs.c
 	bertos/kern/kfile.c
 	bertos/kern/monitor.c
 	bertos/kern/proc.c
@@ -51,6 +50,7 @@ SRC_LIST="
 	bertos/fs/fatfs/ff.c
 	bertos/emul/diskio_emul.c
 	bertos/fs/fat.c
+	bertos/fs/battfs.c
 	bertos/emul/switch_ctx_emul.S
 	bertos/mware/ini_reader.c
 	bertos/emul/kfile_posix.c
@@ -62,6 +62,9 @@ SRC_LIST="
 	bertos/net/nmeap/src/nmeap01.c
 	bertos/net/nmea.c
 	bertos/cfg/kfile_debug.c
+	bertos/io/kblock.c
+	bertos/io/kblock_ram.c
+	bertos/io/kblock_file.c
 "
 
 buildout='/dev/null'
