@@ -84,36 +84,17 @@ INLINE int kblock_store(struct KBlock *b, block_idx_t index)
 
 
 
-size_t kblock_read(struct KBlock *b, block_idx_t idx, void *_buf, size_t offset, size_t size)
+size_t kblock_read(struct KBlock *b, block_idx_t idx, void *buf, size_t offset, size_t size)
 {
-	size_t tot_rd = 0;
-	uint8_t *buf = (uint8_t *)_buf;
-
 	ASSERT(b);
 	ASSERT(buf);
+	ASSERT(offset + size <= b->blk_size);
 	LOG_INFO("blk_idx %d, offset %d, size %d\n", idx, offset, size);
 
-	while (size)
-	{
-		size_t len = MIN(size, b->blk_size - offset);
-		size_t rlen;
-
-		if (idx == b->priv.curr_blk)
-			rlen = kblock_readBuf(b, buf, offset, len);
-		else
-			rlen = kblock_readDirect(b, idx, buf, offset, len);
-
-		tot_rd += rlen;
-		if (rlen != len)
-			break;
-
-		idx++;
-		size -= rlen;
-		offset = 0;
-		buf += rlen;
-	}
-
-	return tot_rd;
+	if (idx == b->priv.curr_blk)
+		return kblock_readBuf(b, buf, offset, size);
+	else
+		return kblock_readDirect(b, idx, buf, offset, size);
 }
 
 
@@ -149,37 +130,19 @@ static bool kblock_loadPage(struct KBlock *b, block_idx_t idx)
 }
 
 
-size_t kblock_write(struct KBlock *b, block_idx_t idx, const void *_buf, size_t offset, size_t size)
+size_t kblock_write(struct KBlock *b, block_idx_t idx, const void *buf, size_t offset, size_t size)
 {
-	size_t tot_wr = 0;
-	const uint8_t *buf = (const uint8_t *)_buf;
-
 	ASSERT(b);
 	ASSERT(buf);
+	ASSERT(offset + size <= b->blk_size);
 
 	LOG_INFO("blk_idx %d, offset %d, size %d\n", idx, offset, size);
-	while (size)
-	{
-		size_t len = MIN(size, b->blk_size - offset);
-		size_t wlen;
 
-		if (!kblock_loadPage(b, idx))
-			break;
+	if (!kblock_loadPage(b, idx))
+		return 0;
 
-		wlen = kblock_writeBuf(b, buf, offset, len);
-		b->priv.cache_dirty = true;
-
-		tot_wr += wlen;
-		if (wlen != len)
-			break;
-
-		idx++;
-		size -= wlen;
-		offset = 0;
-		buf += wlen;
-	}
-
-	return tot_wr;
+	b->priv.cache_dirty = true;
+	return kblock_writeBuf(b, buf, offset, size);
 }
 
 int kblock_copy(struct KBlock *b, block_idx_t idx1, block_idx_t idx2)
