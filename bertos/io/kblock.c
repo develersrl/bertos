@@ -37,12 +37,16 @@
 
 
 #include "kblock.h"
+
+#define LOG_LEVEL LOG_LVL_ERR
+#define LOG_FORMAT LOG_FMT_VERBOSE
+
 #include <cfg/log.h>
 
 INLINE size_t kblock_readDirect(struct KBlock *b, block_idx_t index, void *buf, size_t offset, size_t size)
 {
 	KB_ASSERT_METHOD(b, readDirect);
-	return b->priv.vt->readDirect(b, index, buf, offset, size);
+	return b->priv.vt->readDirect(b, b->priv.blk_start + index, buf, offset, size);
 }
 
 INLINE size_t kblock_readBuf(struct KBlock *b, void *buf, size_t offset, size_t size)
@@ -65,6 +69,7 @@ INLINE int kblock_load(struct KBlock *b, block_idx_t index)
 	KB_ASSERT_METHOD(b, load);
 	ASSERT(index < b->blk_cnt);
 
+	LOG_INFO("index %d\n", index);
 	return b->priv.vt->load(b, b->priv.blk_start + index);
 }
 
@@ -73,6 +78,7 @@ INLINE int kblock_store(struct KBlock *b, block_idx_t index)
 	KB_ASSERT_METHOD(b, store);
 	ASSERT(index < b->blk_cnt);
 
+	LOG_INFO("index %d\n", index);
 	return b->priv.vt->store(b, b->priv.blk_start + index);
 }
 
@@ -85,6 +91,7 @@ size_t kblock_read(struct KBlock *b, block_idx_t idx, void *_buf, size_t offset,
 
 	ASSERT(b);
 	ASSERT(buf);
+	LOG_INFO("blk_idx %d, offset %d, size %d\n", idx, offset, size);
 
 	while (size)
 	{
@@ -116,6 +123,7 @@ int kblock_flush(struct KBlock *b)
 
 	if (b->priv.cache_dirty)
 	{
+		LOG_INFO("flushing block %d\n", b->priv.curr_blk);
 		if (kblock_store(b, b->priv.curr_blk) == 0)
 			b->priv.cache_dirty = false;
 		else
@@ -131,6 +139,7 @@ static bool kblock_loadPage(struct KBlock *b, block_idx_t idx)
 
 	if (idx != b->priv.curr_blk)
 	{
+		LOG_INFO("loading block %d\n", idx);
 		if (kblock_flush(b) != 0 || kblock_load(b, idx) != 0)
 				return false;
 
@@ -148,6 +157,7 @@ size_t kblock_write(struct KBlock *b, block_idx_t idx, const void *_buf, size_t 
 	ASSERT(b);
 	ASSERT(buf);
 
+	LOG_INFO("blk_idx %d, offset %d, size %d\n", idx, offset, size);
 	while (size)
 	{
 		size_t len = MIN(size, b->blk_size - offset);
