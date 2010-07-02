@@ -46,7 +46,7 @@
 #ifndef DRV_SER_H
 #define DRV_SER_H
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 #include <struct/fifobuf.h>
 #include <cfg/compiler.h>
 

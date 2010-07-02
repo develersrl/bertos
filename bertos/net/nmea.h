@@ -45,7 +45,7 @@
 
 #include <net/nmeap/inc/nmeap.h>
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 #include <time.h>
 

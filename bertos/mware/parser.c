@@ -57,7 +57,7 @@
 
 #include "cfg/cfg_parser.h"
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 #include <struct/hashtable.h>
 
 #include <stdlib.h> // atol(), NULL

@@ -42,7 +42,7 @@
 #ifndef DRV_SPI_DMA_AT91_H
 #define DRV_SPI_DMA_AT91_H
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 typedef struct SpiDmaAt91
 {

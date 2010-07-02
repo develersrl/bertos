@@ -57,7 +57,7 @@
 #include <drv/wdt.h>
 #include <drv/flash.h>
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 #include <avr/io.h>
 #include <avr/boot.h>

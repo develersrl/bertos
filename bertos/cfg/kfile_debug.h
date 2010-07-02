@@ -42,7 +42,7 @@
 #ifndef CFG_KFILE_DEBUG
 #define CFG_KFILE_DEBUG
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 /**
  * Context for KFile over debug console.

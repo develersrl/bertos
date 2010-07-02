@@ -45,7 +45,7 @@
 #ifndef STRUCT_KFILE_MEM
 #define STRUCT_KFILE_MEM
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 /**
  * Context for KFile over memory buffer.

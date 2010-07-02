@@ -39,7 +39,7 @@
 #define FLASH_LM3S_H
 
 #include <cpu/types.h>
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 /* Flash memory mapping */
 #define FLASH_MEM_SIZE          0x40000 //< 256KiB

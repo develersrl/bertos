@@ -52,7 +52,7 @@
 #include <drv/timer.h>
 #include <drv/flash25.h>
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 #include <cpu/power.h> /* cpu_relax() */
 

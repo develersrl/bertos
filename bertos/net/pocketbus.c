@@ -87,7 +87,7 @@
 #include <cfg/debug.h>
 #include <cfg/macros.h>
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 #include <cpu/byteorder.h>
 

@@ -59,7 +59,7 @@
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 #include <stdlib.h>
 #include <string.h>

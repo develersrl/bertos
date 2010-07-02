@@ -33,7 +33,6 @@ SRC_LIST="
 	bertos/algo/ramp.c
 	bertos/drv/kdebug.c
 	bertos/drv/timer.c
-	bertos/kern/kfile.c
 	bertos/kern/monitor.c
 	bertos/kern/proc.c
 	bertos/kern/signal.c
@@ -65,6 +64,7 @@ SRC_LIST="
 	bertos/io/kblock.c
 	bertos/io/kblock_ram.c
 	bertos/io/kblock_file.c
+	bertos/io/kfile.c
 "
 
 buildout='/dev/null'

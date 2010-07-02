@@ -45,7 +45,7 @@
 
 #include <cfg/compiler.h>
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 #include <avr/io.h>
 

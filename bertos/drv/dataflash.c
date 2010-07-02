@@ -52,7 +52,7 @@
 
 #include <fs/battfs.h>
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 #include <cpu/power.h> /* cpu_relax() */
 

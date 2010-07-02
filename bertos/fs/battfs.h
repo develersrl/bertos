@@ -49,7 +49,7 @@
 #include <cpu/types.h> // CPU_BITS_PER_CHAR
 #include <algo/rotating_hash.h>
 #include <struct/list.h>
-#include <kern/kfile.h>
+#include <io/kfile.h>
 #include <io/kblock.h>
 
 typedef uint16_t fill_t;    ///< Type for keeping trace of space filled inside a page

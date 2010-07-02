@@ -47,7 +47,7 @@
 #include "cfg/cfg_flash25.h"
 #include <cfg/compiler.h>
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 /**
  * Type definition for serial flash memory.

@@ -47,7 +47,7 @@
 
 #include "cfg/cfg_fat.h"
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 #include <fs/fatfs/diskio.h>
 

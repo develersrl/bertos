@@ -42,7 +42,7 @@
 
 #include <drv/sipo.h>
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 void protocol_init(KFile *fd);
 void protocol_run(KFile *fd);

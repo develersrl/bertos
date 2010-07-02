@@ -37,7 +37,7 @@
 
 #include "kfile_debug.h"
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 #include <string.h>
 

@@ -46,7 +46,7 @@
 #include "cfg/cfg_afsk.h"
 #include "hw/hw_afsk.h"
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 #include <cfg/compiler.h>
 #include <struct/fifobuf.h>
 

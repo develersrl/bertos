@@ -47,7 +47,7 @@
 #include <cfg/compiler.h>
 #include <cfg/log.h>
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 #include <string.h>
 

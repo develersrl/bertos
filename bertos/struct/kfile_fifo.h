@@ -64,7 +64,7 @@
 #define STRUCT_KFILE_FIFO
 
 #include "fifobuf.h"
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 typedef struct KFileFifo
 {

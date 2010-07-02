@@ -43,7 +43,7 @@
 
 #include <drv/timer.h>
 #include <drv/mcp41.h>
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 static KFile *ch;
 

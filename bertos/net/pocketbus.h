@@ -48,7 +48,7 @@
 
 #include <algo/rotating_hash.h>
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 /**
  * pocketBus special characters definitions.

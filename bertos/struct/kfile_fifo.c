@@ -39,7 +39,7 @@
 #include "kfile_fifo.h"
 #include "fifobuf.h"
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 #include <string.h>
 

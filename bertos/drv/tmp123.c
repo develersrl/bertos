@@ -44,7 +44,7 @@
 
 #include <cpu/byteorder.h>
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 #include <drv/ntc.h> // Macro and data type to manage celsius degree
 

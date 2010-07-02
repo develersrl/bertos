@@ -43,7 +43,7 @@
 #define DRV_TLV5618_H
 
 #include <cfg/compiler.h>
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 typedef struct Tlv5618
 {

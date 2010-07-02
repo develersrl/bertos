@@ -45,7 +45,7 @@
 #ifndef DRV_FT245RL_H
 #define DRV_FT245RL_H
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 #include <cfg/compiler.h>
 
 /**

@@ -55,7 +55,7 @@
 #include <cfg/log.h>
 #include <cfg/macros.h>
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 #include <string.h>
 /**

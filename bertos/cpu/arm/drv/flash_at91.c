@@ -54,7 +54,7 @@
 #include <cpu/attr.h>
 #include <cpu/power.h>
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 #include <io/arm.h>
 

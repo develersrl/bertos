@@ -50,7 +50,7 @@
 #ifndef INI_READER_H
 #define INI_READER_H
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 /**
  * \brief Returns the value for the given string in char* format.

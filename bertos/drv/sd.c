@@ -38,7 +38,7 @@
 
 #include "sd.h"
 #include "hw/hw_sd.h"
-#include <kern/kfile.h>
+#include <io/kfile.h>
 #include <drv/timer.h>
 
 #include <fs/fat.h>

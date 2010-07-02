@@ -49,7 +49,7 @@
 #include "cfg/cfg_ax25.h"
 
 #include <cfg/compiler.h>
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 /**
  * Maximum size of a AX25 frame.

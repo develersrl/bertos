@@ -42,7 +42,7 @@
 
 #include <cpu/types.h>
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 #include <io/arm.h>
 

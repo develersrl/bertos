@@ -43,7 +43,7 @@
  */
 
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 #include <drv/flash25.h>
 

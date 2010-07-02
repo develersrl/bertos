@@ -40,7 +40,7 @@
 
 #include <cfg/macros.h>
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 #include <drv/timer.h>
 #include <drv/flash.h>

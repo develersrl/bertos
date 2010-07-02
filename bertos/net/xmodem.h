@@ -45,7 +45,7 @@
 #define NET_XMODEM_H
 
 #include <cfg/compiler.h>
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 /**
  * Called to know if we want to abort data tranfer.

@@ -38,7 +38,7 @@
 #define SSI_LM3S_H
 
 #include <cpu/power.h> /* cpu_relax() */
-#include <kern/kfile.h> /* KFile */
+#include <io/kfile.h> /* KFile */
 #include <io/lm3s.h>
 
 /**

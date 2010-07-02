@@ -42,7 +42,7 @@
 #include "spi_dma_at91.h"
 #include "hw/hw_spi_dma.h"
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 #include <struct/fifobuf.h>
 #include <struct/kfile_fifo.h>
 #include <drv/timer.h>

@@ -45,7 +45,7 @@
 
 #include <cfg/cfg_keytag.h>
 
-#include <kern/kfile.h>
+#include <io/kfile.h>
 
 
 /**
