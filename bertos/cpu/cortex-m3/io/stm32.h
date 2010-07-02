@@ -56,4 +56,7 @@
 #define GPIO_USART3_RX_PIN	BV(11)
 
 
+#define GPIO_I2C1_SCL_PIN	BV(6)
+#define GPIO_I2C1_SDA_PIN	BV(7)
+
 #endif /* STM32_H */
