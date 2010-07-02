@@ -240,10 +240,17 @@
 #define CCR_CCR_SET             ((uint16_t)0x0FFF)
 
 /* I2C Status */
-#define SR1_BUSY                                 1
-#define SR1_MSL                                  0
+#define SR1_TXE                                  7
+#define SR1_RXE                                  6
+#define SR1_ADDR                                 1
+#define SR1_BTF                                  2
+#define SR1_SB                                   0
 
-#define SR2_SB                                   0
+#define SR2_TRA                                  2
+#define SR2_BUSY                                 1
+#define SR2_MSL                                  0
+
+
 
 
 struct stm32_i2c
