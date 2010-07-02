@@ -583,6 +583,7 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 
 	if (fd->seek_pos > fd->size)
 	{
+		// TODO: renew this last page only if needed
 		if (!readHdr(disk, fdb->start[fdb->max_off], &curr_hdr))
 		{
 			fdb->errors |= BATTFS_DISK_READ_ERR;
@@ -601,6 +602,7 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 
 		/* Fill unused space of first page with 0s */
 		uint8_t dummy = 0;
+		// TODO: write in blocks to speed up things
 		pgaddr_t zero_bytes = MIN(fd->seek_pos - fd->size, (kfile_off_t)(disk->data_size - curr_hdr.fill));
 		while (zero_bytes--)
 		{
@@ -623,46 +625,44 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 		/* Allocate the missing pages first. */
 		pgoff_t missing_pages = fd->seek_pos / disk->data_size - fdb->max_off;
 
-		if (missing_pages)
+		LOG_INFO("missing pages: %d\n", missing_pages);
+
+		while (missing_pages--)
 		{
-			LOG_INFO("missing pages: %d\n", missing_pages);
+			zero_bytes = MIN((kfile_off_t)disk->data_size, fd->seek_pos - fd->size);
 
-			while (missing_pages--)
+			new_page = allocateNewPage(disk, (fdb->start - disk->page_array) + fdb->max_off + 1, fdb->inode);
+			if (new_page == NO_SPACE)
 			{
-				zero_bytes = MIN((kfile_off_t)disk->data_size, fd->seek_pos - fd->size);
-
-				new_page = allocateNewPage(disk, (fdb->start - disk->page_array) + fdb->max_off + 1, fdb->inode);
-				if (new_page == NO_SPACE)
-				{
-					fdb->errors |= BATTFS_DISK_SPACEOVER_ERR;
-					return total_write;
-				}
+				fdb->errors |= BATTFS_DISK_SPACEOVER_ERR;
+				return total_write;
+			}
 
 
-				/* Fill page buffer with 0 to avoid filling unused pages with garbage */
-				for (pgaddr_t off = 0; off < disk->data_size; off++)
-				{
-					if (kblock_write(disk->dev, new_page, &dummy, off, 1) != 1)
-					{
-						fdb->errors |= BATTFS_DISK_WRITE_ERR;
-						return total_write;
-					}
-				}
-				curr_hdr.inode = fdb->inode;
-				curr_hdr.pgoff = ++fdb->max_off;
-				curr_hdr.fill = zero_bytes;
-				curr_hdr.seq = 0;
-
-				if (!writeHdr(disk, new_page, &curr_hdr))
+			// TODO: write in blocks to speed up things
+			/* Fill page buffer with 0 to avoid filling unused pages with garbage */
+			for (pgaddr_t off = 0; off < disk->data_size; off++)
+			{
+				if (kblock_write(disk->dev, new_page, &dummy, off, 1) != 1)
 				{
 					fdb->errors |= BATTFS_DISK_WRITE_ERR;
 					return total_write;
 				}
-
-				/* Update size and free space left */
-				fd->size += zero_bytes;
-				disk->free_bytes -= zero_bytes;
 			}
+			curr_hdr.inode = fdb->inode;
+			curr_hdr.pgoff = ++fdb->max_off;
+			curr_hdr.fill = zero_bytes;
+			curr_hdr.seq = 0;
+
+			if (!writeHdr(disk, new_page, &curr_hdr))
+			{
+				fdb->errors |= BATTFS_DISK_WRITE_ERR;
+				return total_write;
+			}
+
+			/* Update size and free space left */
+			fd->size += zero_bytes;
+			disk->free_bytes -= zero_bytes;
 		}
 	}
 
@@ -692,6 +692,7 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 		}
 		else
 		{
+			// TODO: do not renew page if its cached
 			if (!readHdr(disk, fdb->start[pg_offset], &curr_hdr))
 			{
 				fdb->errors |= BATTFS_DISK_READ_ERR;
