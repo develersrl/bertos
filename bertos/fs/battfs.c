@@ -545,7 +545,7 @@ static pgcnt_t renewPage(struct BattFsSuper *disk, pgcnt_t old_pos)
 	if (SPACE_OVER(disk))
 	{
 		LOG_ERR("No disk space available!\n");
-		return PAGE_UNSET_SENTINEL;
+		return NO_SPACE;
 	}
 
 	/* Get a free page */
