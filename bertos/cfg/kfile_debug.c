@@ -46,7 +46,7 @@ static size_t kfiledebug_write(struct KFile *_fd, const void *buf, size_t size)
 {
 	KFILEDEBUG_CAST(_fd);
 
-	kprintf("%.*s", size, (const char *)buf);
+	kprintf("%.*s", (int)size, (const char *)buf);
 
 	return size;
 }
