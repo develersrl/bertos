@@ -54,6 +54,11 @@
 
 struct stm32_i2c *i2c = (struct stm32_i2c *)I2C1_BASE;
 
+INLINE uint32_t get_status(struct stm32_i2c *base)
+{
+	return ((base->SR1 | (base->SR2 << 16)) & 0x00FFFFFF);
+}
+
 /**
  * Send START condition on the bus.
  *
@@ -61,10 +66,13 @@ struct stm32_i2c *i2c = (struct stm32_i2c *)I2C1_BASE;
  */
 static bool i2c_builtin_start(void)
 {
+	i2c->CR1 |= CR1_ACK_SET;
+	i2c->CR1 |= CR1_PE_SET;
 	i2c->CR1 |= CR1_START_SET;
+	
+	while (get_status(i2c) != I2C_EVENT_MASTER_MODE_SELECT);
 
-	return ((i2c->SR1 & (BV(SR1_BUSY) | BV(SR1_MSL))) &
-				(i2c->SR2 & BV(SR2_SB)));
+	return true;
 }
 
 
@@ -77,11 +85,14 @@ static bool i2c_builtin_start(void)
  */
 bool i2c_builtin_start_w(uint8_t id)
 {
-	id &=  OAR1_ADD0_RESET;
-	while (i2c_builtin_start())
-	{
-	}
-	return false;
+	id &= OAR1_ADD0_RESET;
+
+	i2c_builtin_start();
+
+	i2c->DR = id;
+	while (get_status(i2c) != I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED);
+	
+	return true;
 }
 
 
@@ -94,9 +105,14 @@ bool i2c_builtin_start_w(uint8_t id)
  */
 bool i2c_builtin_start_r(uint8_t id)
 {
-
 	id |=  OAR1_ADD0_SET;
-	return false;
+
+	i2c_builtin_start();
+
+	i2c->DR = id;
+	while (get_status(i2c) != I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED);
+
+	return true;
 }
 
 
@@ -106,6 +122,7 @@ bool i2c_builtin_start_r(uint8_t id)
 void i2c_builtin_stop(void)
 {
 	i2c->CR1 |= CR1_STOP_SET;
+	i2c->CR1 &= CR1_PE_RESET;
 }
 
 
@@ -117,6 +134,8 @@ void i2c_builtin_stop(void)
  */
 bool i2c_builtin_put(const uint8_t data)
 {
+	i2c->DR = data;
+	while (get_status(i2c) != I2C_EVENT_MASTER_BYTE_TRANSMITTED);
 
 	return true;
 }
@@ -131,9 +150,11 @@ bool i2c_builtin_put(const uint8_t data)
  */
 int i2c_builtin_get(bool ack)
 {
+	while (get_status(i2c) != I2C_EVENT_MASTER_BYTE_RECEIVED);
 
-	return 0;
+	return i2c->DR;
 }
+
 
 MOD_DEFINE(i2c);
 
@@ -163,12 +184,10 @@ void i2c_builtin_init(void)
 
 	/* Configure spi in standard mode */
 	#if CONFIG_I2C_FREQ <= 100000
+		i2c->CCR |= (uint16_t)((CR2_FREQ_36MHZ * 1000000) / (CONFIG_I2C_FREQ << 1));
 		i2c->TRISE |= (CR2_FREQ_36MHZ + 1);
-		i2c->CCR |= 4;
 	#else
 		#error fast mode not supported
 	#endif
 
-	i2c->CR1 |= CR1_PE_SET;
-	i2c->CR1 |= CR1_ACK_SET;
 }
