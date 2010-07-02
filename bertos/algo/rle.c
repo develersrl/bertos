@@ -35,7 +35,6 @@
  *
  * Original source code from http://www.compuphase.com/compress.htm
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 

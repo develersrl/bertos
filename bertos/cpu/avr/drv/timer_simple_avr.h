@@ -31,7 +31,6 @@
  *
  * \brief Simple delay routine
  *
- * \version $Id$
   * \author Francesco Sacchi <batt@develer.com>
  */
 

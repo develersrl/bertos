@@ -32,7 +32,6 @@
  *
  * \brief Portable abstraction for high-resolution time handling (implementation)
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 

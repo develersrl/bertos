@@ -36,7 +36,6 @@
  * in this form also within the implementation. This would probably remove
  * memory alignment problems, and also some aliasing issues.
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * $WIZ$ module_name = "heap"

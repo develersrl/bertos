@@ -32,7 +32,6 @@
  *
  * \brief Low-level PWM module for AVR (interface).
  *
- * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  *

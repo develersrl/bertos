@@ -33,7 +33,6 @@
  * \brief TAS5706A Power DAC i2c driver.
  *
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  *
  * $WIZ$ module_name = "tas5706a"

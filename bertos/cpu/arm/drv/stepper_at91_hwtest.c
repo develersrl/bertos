@@ -32,7 +32,6 @@
  *
  * \brief Low level test for stepper driver interface implementation.
  *
- * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  */

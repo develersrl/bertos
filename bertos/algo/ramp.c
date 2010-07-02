@@ -7,7 +7,6 @@
  *
  * \brief Compute, save and load ramps for stepper motors (implementation)
  *
- * \version $Id$
  *
  * \author Simone Zinanni <s.zinanni@develer.com>
  * \author Bernie Innocenti <bernie@codewiz.org>

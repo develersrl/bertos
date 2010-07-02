@@ -40,7 +40,6 @@
  * each pin as input or output, see datasheet on how this
  * is achieved.
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  */
 

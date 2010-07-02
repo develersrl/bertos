@@ -39,7 +39,6 @@
  * message having a given prespecified target message digest.
  *
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  *
  * $WIZ$ module_name = "md2"

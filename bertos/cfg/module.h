@@ -58,7 +58,6 @@
  * }
  * \endcode
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 #ifndef CFG_MODULE_H

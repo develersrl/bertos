@@ -31,7 +31,6 @@
  *
  * \brief Edit bool widget (interface).
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  */
 

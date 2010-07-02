@@ -34,7 +34,6 @@
  * notest: arm
  * \brief sprintf() implementation based on _formatted_write()
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 

@@ -34,7 +34,6 @@
  * \brief Mutually exclusive semaphores.
  *        Shared locking not supported in this implementation.
  *
- * \version $Id$
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
  *

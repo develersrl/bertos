@@ -33,7 +33,6 @@
  *
  * \brief PWM map device.
  *
- * \version $Id: pwm_map.h 1357 2008-05-26 09:30:19Z asterix $
  *
  * \author Daniele Basile <asterix@develer.com>
  */

@@ -31,7 +31,6 @@
  *
  * \brief Function library for dataflash AT45DB family (implementation).
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  * \author Francesco Sacchi <batt@develer.com>
  */

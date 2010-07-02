@@ -32,7 +32,6 @@
  *
  * \brief Hardware-specific definitions
  *
- * \version $Id$
  *
  * \author Francesco Sacchi <bernie@codewiz.org>
  */

@@ -32,7 +32,6 @@
  *
  * \brief NTC map definitions.
  *
- * \version $Id: ntc_map.h 1312 2008-05-20 16:54:52Z asterix $
  *
  * \author Giovanni Bajo <rasky@develer.com>
  * \author Francesco Sacchi <batt@develer.com>

@@ -34,7 +34,6 @@
  *
  * \note Only one copy of SpiDmaAt91 is allowed for each application.
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  * \author Luca Ottaviano <lottaviano@develer.com>
  */

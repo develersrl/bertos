@@ -32,7 +32,6 @@
  *
  * \brief TEA Tiny Encription Algorith functions (implementation).
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  *
  * The Tiny Encryption Algorithm (TEA) by David Wheeler and Roger Needham

@@ -33,7 +33,6 @@
  *
  * \brief Emulated SPI Master for DSP firmware download (impl.)
  *
- * \version $Id$
  *
  * \author Francesco Sacchi <batt@develer.com>
  * \author Daniele Basile <asterix@develer.com>

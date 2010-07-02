@@ -31,7 +31,6 @@
  *
  * -->
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * \brief Simple charts on top of mware/gfx routines (implementation).

@@ -32,7 +32,6 @@
  *
  * \brief HW pin handling.
  *
- * \version $Id: hw_tas5706a.h 2849 2009-09-01 15:46:14Z lottaviano $
  *
  * \author Francesco Sacchi <batt@develer.com>
  */

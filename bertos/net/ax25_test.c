@@ -32,7 +32,6 @@
  *
  * \brief AX25 test.
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  */
 

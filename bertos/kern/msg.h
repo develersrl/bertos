@@ -35,7 +35,6 @@
  * This module implements a common system for executing
  * a user defined action calling a hook function.
  *
- * \version $Id$
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
  *

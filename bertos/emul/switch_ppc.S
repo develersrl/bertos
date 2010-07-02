@@ -29,7 +29,6 @@
  * Copyright 2008 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
- * \version $Id: switch_i386.S 1578 2008-08-08 10:54:40Z bernie $
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * \brief PowerPC context switch

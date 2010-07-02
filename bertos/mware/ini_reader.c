@@ -32,7 +32,6 @@
  *
  * \brief Ini file reader module.
  *
- * \version $Id$
  * \author Luca Ottaviano <lottaviano@develer.com>
  */
 

@@ -33,7 +33,6 @@
  *
  * \brief PWM map device.
  *
- * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  */

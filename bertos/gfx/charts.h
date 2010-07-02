@@ -48,7 +48,6 @@
  *
  *	print_bitmap(bm);
  * \endcode
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 

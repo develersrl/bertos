@@ -32,7 +32,6 @@
  *
  * \brief Configuration file for spi dma module.
  *
- * \version $Id$
  *
  * \author Francesco Sacchi <batt@develer.com>
  */

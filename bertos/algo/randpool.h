@@ -33,7 +33,6 @@
  * \brief Collection of functions to manage entropy pool.
  *
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  *
  * $WIZ$ module_name = "randpool"

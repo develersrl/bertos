@@ -29,13 +29,11 @@
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \version $Id$
  *
  * \brief Widget (implementation).
  * A widget is typically a graphic object on a device.
  * Its proproperties are the position, the size and a context on which the widget is drawn.
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Francesco Sacchi <batt@ðeveler.com>
  */

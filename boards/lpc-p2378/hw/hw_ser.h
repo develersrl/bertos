@@ -32,7 +32,6 @@
  *
  * \brief Serial hardware-specific definitions
  *
- * \version $Id: hw_ser.h 2883 2009-09-04 19:46:02Z batt $
  *
  * \author Daniele Basile <asterix@develer.com>
  */

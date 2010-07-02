@@ -33,7 +33,6 @@
  *
  * \brief Keyboard map definitions.
  *
- * \version $Id: kbd_map.h 2848 2009-09-01 15:23:57Z lottaviano $
  *
  * \author Francesco Sacchi <batt@develer.com>
  * \author Stefano Fedrigo <a@develer.com>

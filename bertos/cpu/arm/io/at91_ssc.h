@@ -30,7 +30,6 @@
  *
  * -->
  *
- * \version $Id$
  *
  * \author Luca Ottaviano <lottaviano@develer.com>
  *

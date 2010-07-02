@@ -32,7 +32,6 @@
  *
  * \brief AFSK demodulator test.
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  * $test$: cp bertos/cfg/cfg_ax25.h $cfgdir/
  * $test$: echo "#undef AX25_LOG_LEVEL" >> $cfgdir/cfg_ax25.h

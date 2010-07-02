@@ -36,7 +36,6 @@
  * In avr-libc are also available several constants used to set the timeout value
  * (see documentation for more detail).
  *
- * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  *

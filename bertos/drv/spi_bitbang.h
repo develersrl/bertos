@@ -33,7 +33,6 @@
  *
  * \brief Emulated SPI driver.
  *
- * \version $Id$
  *
  * \author Francesco Sacchi <batt@develer.com>
  * \author Daniele Basile <asterix@develer.com>

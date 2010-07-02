@@ -32,7 +32,6 @@
  *
  * \brief Semaphore based synchronization services.
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 

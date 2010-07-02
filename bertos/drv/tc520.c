@@ -32,7 +32,6 @@
  *
  * \brief TC520 ADC driver (implementation)
  *
- * \version $Id$
  *
  * \author Francesco Sacchi <batt@develer.com>
  * \author Marco Benelli <marco@develer.com>

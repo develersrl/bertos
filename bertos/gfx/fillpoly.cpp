@@ -30,7 +30,6 @@
  *
  * -->
  *
- * \version $Id$
  * \author Massimiliano Corsini <chad@develer.com>
  *
  *

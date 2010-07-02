@@ -54,7 +54,6 @@
  * Note: To be simple and target independently we not use a timer module,
  * and so the delay is do with a for cycle.
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 

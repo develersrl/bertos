@@ -32,7 +32,6 @@
  *
  * \brief Dataflash HW control routines (interface).
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  */
 

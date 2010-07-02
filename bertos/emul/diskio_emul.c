@@ -32,7 +32,6 @@
  *
  * \brief Low level disk access for FatFs emulated.
  *
- * \version $Id$
  * \author Luca Ottaviano <lottaviano@develer.com>
  */
 

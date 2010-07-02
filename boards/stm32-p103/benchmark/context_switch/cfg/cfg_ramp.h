@@ -32,7 +32,6 @@
  *
  * \brief Configuration file Ramp algorithm module.
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 

@@ -33,7 +33,6 @@
  * \brief Function library for Accessing FT245RL USB interface.
  *
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  *
  * $WIZ$ module_name = "ft245rl"

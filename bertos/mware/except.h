@@ -33,7 +33,6 @@
  *
  * \brief C++-like structured exception handling for C programs
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 #ifndef MWARE_EXCEPT_H

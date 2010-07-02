@@ -32,7 +32,6 @@
  *
  * \brief ARM debug support (implementation).
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  */
 

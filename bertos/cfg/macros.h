@@ -32,7 +32,6 @@
  *
  * \brief Common and handy function macros
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Giovanni Bajo <rasky@develer.com>
  */

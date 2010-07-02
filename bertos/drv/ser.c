@@ -46,7 +46,6 @@
  *  \li \c CONFIG_SER_TXTIMEOUT - Enable software serial transmission timeouts
  *
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 

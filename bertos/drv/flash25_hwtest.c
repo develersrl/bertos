@@ -32,7 +32,6 @@
  *
  *  \brief Test function for serial Flash memory.
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 

@@ -32,7 +32,6 @@
  *
  * \brief NTC hardware-specific definition
  *
- * \version $Id$
  * \author Lorenzo Berni <duplo@develer.com>
  * 
  */

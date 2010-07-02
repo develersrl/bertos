@@ -32,7 +32,6 @@
  *
  * \brief Configuration file for Fat module.
  *
- * \version $Id$
  *
  * \author Luca Ottaviano <lottaviano@develer.com>
  * \author Francesco Sacchi <batt@develer.com>

@@ -33,7 +33,6 @@
  *
  * \brief Font 8x6 IBM-PC 8bit
  *
- * \version $Id$
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
  *

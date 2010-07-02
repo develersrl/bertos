@@ -31,7 +31,6 @@
  *
  * \brief Function library for secure digital memory.
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  */
 

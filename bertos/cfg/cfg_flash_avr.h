@@ -29,7 +29,6 @@
  * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \version $Id$
  * \author Manuele Fanelli <qwert@develer.com>
  *
  * \brief Configuration file for flash_avr module.

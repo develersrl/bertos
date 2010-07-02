@@ -44,7 +44,6 @@
  *     - Matrix of random number for octave program.
  *     - Vector of random number for octave program.
  * 
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 

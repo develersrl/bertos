@@ -32,7 +32,6 @@
  *
  * \brief Kernel signals configuration parameters
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 

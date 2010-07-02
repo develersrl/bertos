@@ -30,7 +30,6 @@
  * All Rights Reserved.
  * -->
  *
- * \version $Id$
  * \author Stefano Fedrigo <aleph@develer.com>
  *
  * \brief Conversion tool from image TXT format to LCD bitmap

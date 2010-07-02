@@ -32,7 +32,6 @@
  *
  * \brief Configuration file for I2S module.
  *
- * \version $Id$
  *
  * \author Luca Ottaviano <lottaviano@develer.com>
  */

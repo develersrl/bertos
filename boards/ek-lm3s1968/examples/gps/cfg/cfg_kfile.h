@@ -32,7 +32,6 @@
  *
  * \brief Configuration file for KFile interface module.
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 

@@ -29,12 +29,10 @@
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \version $Id$
  *
  * \brief Tags interface.
  * This module contains the base message definitions and the list of all available tags.
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Francesco Sacchi <batt@develer.com>
  */

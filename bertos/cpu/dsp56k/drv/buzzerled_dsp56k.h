@@ -33,7 +33,6 @@
  *
  * \brief Hardware support for buzzers and leds in DSP56K-based boards
  *
- * \version $Id$
  *
  * \author Giovanni Bajo <rasky@develer.com>
  */

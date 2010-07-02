@@ -32,7 +32,6 @@
  *
  * \brief Messages for LCD.
  *
- * \version $Id$
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>

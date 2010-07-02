@@ -32,7 +32,6 @@
  *
  * \brief API function for to manage entropy pool.
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 

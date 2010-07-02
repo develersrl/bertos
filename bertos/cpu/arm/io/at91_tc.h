@@ -30,7 +30,6 @@
  *
  * -->
  *
- * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  *

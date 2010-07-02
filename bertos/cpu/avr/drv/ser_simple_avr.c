@@ -32,7 +32,6 @@
  *
  * \brief Simple serial I/O driver
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  */
 

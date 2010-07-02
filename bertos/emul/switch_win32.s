@@ -31,7 +31,6 @@
  * This file is part of DevLib - See devlib/README for information.
  * -->
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * \brief i386 context switch for WIN32

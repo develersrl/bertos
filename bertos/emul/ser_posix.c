@@ -32,7 +32,6 @@
  *
  * \brief Serial port emulator for hosted environments.
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 

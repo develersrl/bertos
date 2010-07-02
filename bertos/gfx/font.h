@@ -32,7 +32,6 @@
  *
  * \brief Font 8x6 IBM-PC 8bit
  *
- * \version $Id$
  *
  * \author Stefano Fedrigo <aleph@develer.com>
  *

@@ -33,7 +33,6 @@
  *
  * \brief Very simple rand() algorithm.
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 

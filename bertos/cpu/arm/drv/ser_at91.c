@@ -34,7 +34,6 @@
  * \brief ARM UART and SPI I/O driver
  *
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 

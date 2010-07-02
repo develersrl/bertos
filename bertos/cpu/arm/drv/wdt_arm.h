@@ -32,7 +32,6 @@
  *
  * \brief Watchdog interface for ARM architecture.
  *
- * \version $Id$
  *
  * \author Luca Ottaviano <lottaviano@develer.com>
  *

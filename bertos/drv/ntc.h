@@ -32,7 +32,6 @@
  *
  * \brief Driver for NTC sensors (reads a temperature through an ADC).
  *
- * \version $Id$
  *
  * \author Giovanni Bajo <rasky@develer.com>
  * \author Francesco Sacchi <batt@develer.com>

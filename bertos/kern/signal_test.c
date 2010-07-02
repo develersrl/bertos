@@ -32,7 +32,6 @@
  *
  * \brief Signals test.
  *
- * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  *

@@ -42,7 +42,6 @@
  * a macro _PROGMEM (for more info see cpu/pgm.h).
  *
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 

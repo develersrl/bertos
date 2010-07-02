@@ -44,7 +44,6 @@
  * we use a kfile_test module that perform some generic test.
  *
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 

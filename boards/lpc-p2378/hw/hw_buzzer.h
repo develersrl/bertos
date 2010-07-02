@@ -33,7 +33,6 @@
  *
  * \brief Buzzer hardware-specific definitions
  *
- * \version $Id: hw_buzzer.h 2506 2009-04-15 08:29:07Z duplo $
  *
  * \author Francesco Sacchi <batt@develer.com>
  */

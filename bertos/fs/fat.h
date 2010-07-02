@@ -35,7 +35,6 @@
  * This driver needs some low level hardware access functions. An example implementation
  * is provided in sd.h.
  *
- * \version $Id$
  *
  * \author Luca Ottaviano <lottaviano@develer.com>
  *

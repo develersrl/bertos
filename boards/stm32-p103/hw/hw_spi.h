@@ -33,7 +33,6 @@
  * \brief Hardware macro definition.
  *
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 

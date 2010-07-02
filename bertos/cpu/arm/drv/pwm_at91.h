@@ -33,7 +33,6 @@
  *
  * \brief PWM hardware-specific definition
  *
- * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  */

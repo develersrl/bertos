@@ -33,7 +33,6 @@
  * \brief Some simple delay routines.
  *
  * Simple serial driver
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  */
 

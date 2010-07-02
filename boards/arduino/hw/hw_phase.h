@@ -32,7 +32,6 @@
  *
  * \brief Phase control hardware-specific definitions
  *
- * \version $Id$
  *
  * \author Francesco Sacchi <batt@develer.com>
  */

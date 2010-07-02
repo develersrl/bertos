@@ -32,7 +32,6 @@
  *
  * \brief thermo hardware-specific control functions.
  *
- * \version $Id: hw_thermo.h 1440 2008-06-10 17:59:13Z asterix $
  * \author Francesco Sacchi <batt@develer.com>
  *
  */

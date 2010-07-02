@@ -32,7 +32,6 @@
  *
  * \brief Configuration file for the ADC module.
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 

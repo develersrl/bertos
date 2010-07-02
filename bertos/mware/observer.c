@@ -32,7 +32,6 @@
  *
  * \brief Simple notifier for the observer/subject pattern (implementation)
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 

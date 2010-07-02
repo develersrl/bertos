@@ -33,7 +33,6 @@
  *
  * \brief REVERSE macro test.
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  */
 

@@ -30,7 +30,6 @@
  * Copyright 1999, 2000, 2001 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * \brief i386 context switch

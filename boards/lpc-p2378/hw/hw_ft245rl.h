@@ -32,7 +32,6 @@
  *
  * \brief FT245RL USB interface hardware-specific definitions
  *
- * \version $Id: hw_ft245rl.h 1777 2008-09-04 15:19:48Z batt $
  *
  * \author Francesco Sacchi <batt@develer.com>
  */

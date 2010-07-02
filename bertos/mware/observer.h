@@ -32,7 +32,6 @@
  *
  * \brief Simple notifier for the subject/observer pattern (interface)
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 #ifndef MWARE_OBSERVER_H

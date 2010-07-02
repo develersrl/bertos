@@ -53,7 +53,6 @@
  * \endcode
  *
  *
- * \version $Id: cfg_adc.h 2348 2009-02-16 13:43:44Z duplo $
  * \author Francesco Sacchi <asterix@develer.com>
  *
  * $WIZ$ module_name = "kfilefifo"

@@ -31,7 +31,6 @@
  *
  * \brief MCP41 hardware-specific definitions
  *
- * \version $Id: hw_mcp41.h 2544 2009-04-17 14:21:09Z batt $
  * \author Francesco Sacchi <batt@develer.com>
  */
 

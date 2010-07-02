@@ -32,7 +32,6 @@
  *
  * \brief Configuration file for data flash memory module.
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 

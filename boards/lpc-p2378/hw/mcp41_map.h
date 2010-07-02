@@ -32,7 +32,6 @@
  *
  * \brief MCP41 digital potentiometer map definitions.
  *
- * \version $Id: mcp41_map.h 2506 2009-04-15 08:29:07Z duplo $
  *
  * \author Francesco Sacchi <batt@develer.com>
  */

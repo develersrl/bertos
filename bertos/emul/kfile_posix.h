@@ -32,7 +32,6 @@
  *
  * \brief KFile interface implementation in Posix systems.
  *
- * \version $Id$
  * \author Luca Ottaviano <lottaviano@develer.com>
  */
 

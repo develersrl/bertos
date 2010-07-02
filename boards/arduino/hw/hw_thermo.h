@@ -32,7 +32,6 @@
  *
  * \brief thermo hardware-specific control functions.
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  *
  */

@@ -33,7 +33,6 @@
  *
  * \brief High level serial I/O API
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 

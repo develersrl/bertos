@@ -32,7 +32,6 @@
  *
  * \brief FT245RL USB interface hardware-specific definitions
  *
- * \version $Id$
  *
  * \author Francesco Sacchi <batt@develer.com>
  */

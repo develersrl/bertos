@@ -31,7 +31,6 @@
  *
  * \brief Notifier obj (interface).
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Francesco Sacchi <batt@develer.com>
  */

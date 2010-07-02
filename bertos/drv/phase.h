@@ -29,11 +29,9 @@
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \version $Id$
  *
  * \brief Phase partialization driver with TRIACs.
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  *
  * $WIZ$ module_name = "phase"

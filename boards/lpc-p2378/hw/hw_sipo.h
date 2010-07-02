@@ -34,7 +34,6 @@
  * \brief Macro for HW_SIPO_H
  *
  *
- * \version $Id: hw_sipo.h 2882 2009-09-04 19:17:37Z batt $
  *
  * \author Andrea Grandi <andrea@develer.com>
  * \author Daniele Basile <asterix@develer.com>

@@ -34,7 +34,6 @@
  * \brief Macro for I2C bitbang operation.
  *
  *
- * \version $Id: hw_i2c_bitbang.h 2506 2009-04-15 08:29:07Z duplo $
  *
  * \author Francesco Sacchi <batt@develer.com>
  */

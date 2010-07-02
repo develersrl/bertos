@@ -7,7 +7,6 @@
  *
  * \brief Driver to control stepper motor
  *
- * \version $Id$
  *
  * \author Francesco Michelini <francesco.michelini@seacfi.com>
  * \author Giovanni Bajo <rasky@develer.com>

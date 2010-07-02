@@ -32,7 +32,6 @@
  *
  * \brief NTC hardware-specific definition
  *
- * \version $Id: hw_ntc.h 1359 2008-05-26 09:42:37Z asterix $
  * \author Francesco Sacchi <batt@develer.com>
  *
  * A NTC acts as a variable resistor, whose resistance changes as a

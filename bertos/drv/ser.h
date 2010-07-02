@@ -33,7 +33,6 @@
  *
  * \brief High level serial I/O API.
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * $WIZ$ module_name = "ser"

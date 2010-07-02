@@ -61,7 +61,6 @@
  * library, available at http://www.boost.org). The version we developed the
  * code with is 1.31.
  *
- * \version $Id$
  *
  * \author Giovanni Bajo <rasky@develer.com>
  *

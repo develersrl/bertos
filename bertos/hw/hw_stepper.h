@@ -32,7 +32,6 @@
  *
  * \brief Stepper hardware-specific definitions
  *
- * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  */

@@ -122,7 +122,6 @@
  *  - Do not call system functions that may implicitly sleep, such as
  *    timer_delayTicks().
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 

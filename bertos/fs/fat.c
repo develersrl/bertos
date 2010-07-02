@@ -32,7 +32,6 @@
  *
  * \brief FatFS: kfile interface for FatFS module by ChaN.
  *
- * \version $Id$
  *
  * \author Luca Ottaviano <lottaviano@develer.com>
  *

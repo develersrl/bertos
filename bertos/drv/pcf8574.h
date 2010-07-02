@@ -32,7 +32,6 @@
  *
  * \brief PCF8574 i2c port expander driver.
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  *
  * $WIZ$ module_name = "pcf8574"

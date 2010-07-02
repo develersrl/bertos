@@ -32,7 +32,6 @@
  *
  * \brief MCP41xxx digital potentiomenter driver (implementation)
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  */
 

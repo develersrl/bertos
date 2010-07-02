@@ -32,7 +32,6 @@
  *
  * \brief Serial hardware-specific definitions
  *
- * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  */

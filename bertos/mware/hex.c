@@ -31,7 +31,6 @@
  *
  * \brief Poor man's hex arrays (implementation).
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 

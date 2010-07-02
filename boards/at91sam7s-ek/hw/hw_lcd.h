@@ -33,7 +33,6 @@
  *
  * \brief LCD low-level hardware macros
  *
- * \version $Id$
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>

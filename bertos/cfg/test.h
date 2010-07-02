@@ -32,7 +32,6 @@
  *
  * \brief Utility for the test suite.
  *
- * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  * \author Francesco Sacchi <batt@develer.com>

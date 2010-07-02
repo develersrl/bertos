@@ -40,7 +40,6 @@
  * \li Basic support for ANSI escape sequences for input of special codes.
  * \li Support for command name completion (through a hook).
  *
- * \version $Id$
  *
  * \author Giovanni Bajo <rasky@develer.com>
  *

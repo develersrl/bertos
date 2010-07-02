@@ -37,7 +37,6 @@
  * for DSP56000 (but a portable C version of it can be easily written, see the
  * comments in the code).
  *
- * \version $Id$
  *
  * \author Simone Zinanni <s.zinanni@develer.com>
  * \author Giovanni Bajo <rasky@develer.com>

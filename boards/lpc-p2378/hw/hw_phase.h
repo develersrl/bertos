@@ -32,7 +32,6 @@
  *
  * \brief Phase control hardware-specific definitions
  *
- * \version $Id: hw_phase.h 2564 2009-04-20 09:51:04Z batt $
  *
  * \author Francesco Sacchi <batt@develer.com>
  */

@@ -5,7 +5,6 @@
  *
  * \brief Graphics user interface element to display a level bar.
  *
- * \version $Id$
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 

@@ -33,7 +33,6 @@
  *
  * \brief Additional support macros for compiler independance
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 

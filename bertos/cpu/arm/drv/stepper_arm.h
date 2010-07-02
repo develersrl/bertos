@@ -32,7 +32,6 @@
  *
  * \brief Low-level stepper timer module for ARM (inplementation).
  *
- * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  *

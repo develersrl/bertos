@@ -32,7 +32,6 @@
  *
  * \brief NTC map definitions.
  *
- * \version $Id$
  *
  * \author Giovanni Bajo <rasky@develer.com>
  * \author Francesco Sacchi <batt@develer.com>

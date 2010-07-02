@@ -32,7 +32,6 @@
  *
  * \brief Hardware-specific definitions
  *
- * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  */

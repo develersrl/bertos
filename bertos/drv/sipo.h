@@ -33,7 +33,6 @@
  * \brief Generic Serial-in, Parallel-out implementation (SIPO).
  *
  *
- * \version $Id$
  *
  * \author Andrea Grandi <andrea@develer.com>
  * \author Daniele Basile <asterix@develer.com>

@@ -32,7 +32,6 @@
  *
  * \brief Configuration file for watchdog module.
  *
- * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  */

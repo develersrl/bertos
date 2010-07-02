@@ -37,7 +37,6 @@
  * circular shift the checksum 4 place left before xoring.
  * This is a bit more stronger than simply sum the data.
  *
- * \version $Id$
  *
  * \author Francesco Sacchi <batt@develer.com>
  *

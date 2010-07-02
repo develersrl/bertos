@@ -32,7 +32,6 @@
  *
  * \brief Proportional, integral, derivative controller (PID controller).
  *
- * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  *

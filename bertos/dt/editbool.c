@@ -34,7 +34,6 @@
  * The boolean value will be displayed using two strings:
  * one when the bool is false and one when it's true.
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@ðeveler.com>
  */
 

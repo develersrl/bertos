@@ -31,7 +31,6 @@
  *
  * \brief Functions to convert integers to/from host byte-order.
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  */

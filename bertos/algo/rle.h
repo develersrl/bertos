@@ -33,7 +33,6 @@
  *
  * \brief General-purpose run-length {en,de}coding algorithm.
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * $WIZ$ module_name = "rle"

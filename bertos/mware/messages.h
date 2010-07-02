@@ -32,7 +32,6 @@
  *
  * \brief Definitions of constant string messages.
  *
- * \version $Id$
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>

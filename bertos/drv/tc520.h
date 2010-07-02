@@ -29,11 +29,9 @@
  * Copyright 2006 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \version $Id$
  *
  * \brief TC520 ADC driver (intercace)
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  * \author Marco Benelli <marco@develer.com>
  */

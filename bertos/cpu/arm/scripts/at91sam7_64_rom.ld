@@ -30,7 +30,6 @@
  *
  * -->
  *
- * \version $Id: sysirq_at91.c 18273 2007-10-11 14:53:02Z batt $
  *
  * \author Daniele Basile <asterix@develer.com>
  *

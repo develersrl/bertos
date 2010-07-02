@@ -83,7 +83,6 @@
  * LOG_LEVEL and LOG_VERBOSE macros must be defined before to include log module,
  * otherwise the log module use a default settings.
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  *
  * $WIZ$

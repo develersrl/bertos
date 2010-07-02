@@ -32,7 +32,6 @@
  *
  * \brief CRC-CCITT table and support routines
  *
- * \version $Id: crc.c 2770 2009-08-05 07:57:59Z  $
  * \author Francesco Sacchi <batt@develer.com>
  */
 

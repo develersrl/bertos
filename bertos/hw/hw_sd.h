@@ -32,7 +32,6 @@
  *
  * \brief SD driver hardware-specific definitions.
  *
- * \version $Id$
  *
  * \author Luca Ottaviano <lottaviano@develer.com>
  */

@@ -33,7 +33,6 @@
  *
  * \brief Keyboard hardware-specific definitions
  *
- * \version $Id: hw_kbd.h 2649 2009-04-23 12:51:28Z duplo $
  *
  * \author Francesco Sacchi <batt@develer.com>
  * \author Stefano Fedrigo <a@develer.com>

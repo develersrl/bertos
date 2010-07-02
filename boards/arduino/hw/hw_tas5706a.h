@@ -32,7 +32,6 @@
  *
  * \brief HW pin handling.
  *
- * \version $Id$
  *
  * \author Francesco Sacchi <batt@develer.com>
  */

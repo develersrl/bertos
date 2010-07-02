@@ -32,7 +32,6 @@
  *
  * \brief Configuration file for the AX25 protocol module.
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  */
 

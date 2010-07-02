@@ -60,7 +60,6 @@
  * location and head points to the first one:
  *		\code head == begin && tail == end \endcode
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 

@@ -32,7 +32,6 @@
  *
  * \brief SPI driver with DMA.
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  * \author Luca Ottaviano <lottaviano@develer.com>
  */

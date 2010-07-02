@@ -45,7 +45,6 @@
  *    many different ways (many different pins), so this part should describe
  *    which devices are present, and how they are connected.
  *
- * \version $Id$
  *
  * \author Giovanni Bajo <rasky@develer.com>
  */

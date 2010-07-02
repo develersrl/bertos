@@ -32,7 +32,6 @@
  *
  * \brief Generic text LCD driver (Test).
  *
- * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  *

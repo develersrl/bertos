@@ -34,7 +34,6 @@
  * \brief Macro for I2C bitbang operation.
  *
  *
- * \version $Id$
  *
  * \author Francesco Sacchi <batt@develer.com>
  */

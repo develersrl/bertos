@@ -32,7 +32,6 @@
  *
  * \brief Configuration file for BattFS module.
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 

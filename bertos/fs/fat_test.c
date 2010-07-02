@@ -32,7 +32,6 @@
  *
  * \brief FatFs test.
  *
- * \version $Id$
  * \author Luca Ottaviano <lottaviano@develer.com>
  *
  * $test$: cp bertos/cfg/cfg_fat.h $cfgdir/

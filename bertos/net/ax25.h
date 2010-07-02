@@ -34,7 +34,6 @@
  * For now, only UI frames without any Layer 3 protocol are handled.
  * This however is enough to send/receive APRS packets.
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  *
  * $WIZ$ module_name = "ax25"

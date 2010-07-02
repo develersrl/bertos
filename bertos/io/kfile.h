@@ -88,7 +88,6 @@
  * the baudrate, are not part of interface and should be handled by the
  * driver-specific API.
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Francesco Sacchi <batt@develer.com>
  * \author Daniele Basile <asterix@develer.com>

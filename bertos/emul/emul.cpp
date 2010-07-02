@@ -32,7 +32,6 @@
  *
  * \brief Qt-based emulator framework for embedded applications (implementation)
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 

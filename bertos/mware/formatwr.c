@@ -30,7 +30,6 @@
  *
  * -->
  *
- * \version $Id$
  *
  * \brief Basic "printf", "sprintf" and "fprintf" formatter.
  *

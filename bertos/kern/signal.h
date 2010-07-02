@@ -33,7 +33,6 @@
  *
  * \brief Signal module for IPC.
  *
- * \version $Id$
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
  *

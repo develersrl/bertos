@@ -36,7 +36,6 @@
  * Typicaly this kind of memory use an SPI bus, but you should
  * use another comunication channel you have defined.
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 

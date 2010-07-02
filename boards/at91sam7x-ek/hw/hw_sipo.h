@@ -34,7 +34,6 @@
  * \brief Macro for HW_SIPO_H
  *
  *
- * \version $Id$
  *
  * \author Andrea Grandi <andrea@develer.com>
  * \author Daniele Basile <asterix@develer.com>

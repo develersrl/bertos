@@ -32,7 +32,6 @@
  *
  * \brief Triac map definitions.
  *
- * \version $Id: phase_map.h 1357 2008-05-26 09:30:19Z asterix $
  *
  * \author Francesco Sacchi <batt@develer.com>
  */

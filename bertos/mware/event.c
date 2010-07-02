@@ -32,7 +32,6 @@
  *
  * \brief Events handling implementation
  *
- * \version $Id$
  *
  * \author Giovanni Bajo <rasky@develer.com>
  */

@@ -31,7 +31,6 @@
  *
  * \brief Integer edit widget (implementation).
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Francesco Sacchi <batt@develer.com>
  */

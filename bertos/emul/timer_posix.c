@@ -31,7 +31,6 @@
  *
  * \brief Low-level timer module for Qt emulator (implementation).
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 //#include <cfg/compiler.h> // hptime.t

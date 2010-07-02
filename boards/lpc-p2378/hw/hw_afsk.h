@@ -32,7 +32,6 @@
  *
  * \brief AFSK modem hardware-specific definitions.
  *
- * \version $Id: hw_afsk.h 3072 2009-10-10 13:01:56Z batt $
  *
  * \author Francesco Sacchi <batt@develer.com>
  */

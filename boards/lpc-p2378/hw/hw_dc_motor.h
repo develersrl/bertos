@@ -32,7 +32,6 @@
  *
  * \brief DC motor hardware-specific definitions
  *
- * \version $Id: hw_dc_motor.h 2859 2009-09-02 09:30:18Z asterix $
  *
  * \author Daniele Basile <asterix@develer.com>
  */

@@ -33,7 +33,6 @@
  *
  * This module implements some generic I/O interfaces for kfile.
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  * \author Daniele Basile <asterix@develer.com>
  */

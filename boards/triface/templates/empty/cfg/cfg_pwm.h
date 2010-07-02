@@ -31,7 +31,6 @@
  *
  * \brief Configuration file for PWM module.
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 

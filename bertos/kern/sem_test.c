@@ -31,7 +31,6 @@
  *
  * \brief Semaphore test.
  *
- * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  * \author Stefano Fedrigo <aleph@develer.com>

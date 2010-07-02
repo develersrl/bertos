@@ -32,7 +32,6 @@
  *
  * \brief Low-level PWM module for ARM (inplementation).
  *
- * \version $Id$
  *
  * \author Daniele Basile <asterix@develer.com>
  *

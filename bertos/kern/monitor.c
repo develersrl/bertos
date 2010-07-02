@@ -32,7 +32,6 @@
  *
  * \brief Monitor to check for stack overflows
  *
- * \version $Id$
  * \author Giovanni Bajo <rasky@develer.com>
  */
 

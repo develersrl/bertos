@@ -31,7 +31,6 @@
  *
  * \brief Process scheduler (public interface).
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * Still in development, disable nightly test for now

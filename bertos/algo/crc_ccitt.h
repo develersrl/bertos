@@ -34,7 +34,6 @@
  *
  * \note This algorithm is incompatible with the CRC16.
  *
- * \version $Id: crc.h 2771 2009-08-06 07:01:06Z lottaviano $
  * \author Francesco Sacchi <batt@develer.com>
  *
  * $WIZ$ module_name = "crc-ccitt"

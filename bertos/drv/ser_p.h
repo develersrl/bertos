@@ -32,7 +32,6 @@
  *
  * \brief Hardware dependent serial driver (interface)
  *
- * \version $Id$
  *
  * \author Stefano Fedrigo <aleph@develer.com>
  * \author Giovanni Bajo <rasky@develer.com>

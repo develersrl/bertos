@@ -32,7 +32,6 @@
  *
  * \brief FIFO and KFileFifo test.
  *
- * \version $Id: kfilefifo_test.c 1962 2008-12-02 15:37:17Z batt $
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 

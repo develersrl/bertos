@@ -35,7 +35,6 @@
  * $test$: echo "#undef CONFIG_KFILE_GETS" >> $cfgdir/cfg_kfile.h
  * $test$: echo "#define CONFIG_KFILE_GETS 1" >> $cfgdir/cfg_kfile.h
  * 
- * \version $Id$
  * \author Luca Ottaviano <lottaviano@develer.com>
  */
 

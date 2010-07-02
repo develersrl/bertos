@@ -35,7 +35,6 @@
  * Documentation for TEA is available at
  * http://www.cl.cam.ac.uk/ftp/users/djw3/tea.ps.
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  *
  * $WIZ$ module_name = "tea"

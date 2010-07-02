@@ -32,7 +32,6 @@
  *
  * \brief Configuration file for the TAS5706A module.
  *
- * \version $Id$
  * \author Luca Ottaviano <lottaviano@develer.com>
  */
 

@@ -32,7 +32,6 @@
  *
  * \brief Configuration file for phase module.
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 

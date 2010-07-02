@@ -33,7 +33,6 @@
  *
  * \brief Internal scheduler structures and definitions for processes.
  *
- * \version $Id$
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 

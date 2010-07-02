@@ -32,7 +32,6 @@
  *
  * \brief Stepper hardware-specific definitions
  *
- * \version $Id: hw_stepper.h 2488 2009-04-10 17:52:12Z batt $
  *
  * \author Daniele Basile <asterix@develer.com>
  */

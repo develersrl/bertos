@@ -32,7 +32,6 @@
  *
  * \brief SD driver hardware-specific definitions.
  *
- * \version $Id: hw_sd.h 2834 2009-08-31 18:11:02Z batt $
  *
  * \author Luca Ottaviano <lottaviano@develer.com>
  */

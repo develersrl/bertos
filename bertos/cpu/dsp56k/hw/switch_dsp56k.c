@@ -29,7 +29,6 @@
  * Copyright 2004, 2008 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \version $Id$
  * \author Giovanni Bajo <rasky@develer.com>
  *
  * \brief DSP5680x task switching support

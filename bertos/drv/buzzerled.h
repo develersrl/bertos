@@ -33,7 +33,6 @@
  *
  * \brief Generic library to handle buzzers and leds
  *
- * \version $Id$
  *
  * \author Giovanni Bajo <rasky@develer.com>
  */

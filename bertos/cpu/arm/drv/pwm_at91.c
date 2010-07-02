@@ -33,7 +33,6 @@
  *
  * \brief PWM hardware-specific implementation
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 

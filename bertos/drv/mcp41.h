@@ -29,11 +29,9 @@
  * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \version $Id$
  *
  * \brief MCP41xxx digital potentiomenter driver.
  *
- * \version $Id$
  * \author Francesco Sacchi <batt@develer.com>
  *
  * $WIZ$ module_name = "mcp41"
