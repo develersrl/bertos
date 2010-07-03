@@ -188,7 +188,6 @@ void kblockfile_init(KBlockFile *f, FILE *fp, bool hwbuf, void *buf, size_t bloc
 			f->b.priv.vt = &kblockfile_swbuffered_vt;
 		kblockfile_load(&f->b, 0);
 		f->b.priv.curr_blk = 0;
-		f->b.priv.cache_dirty = false;
 	}
 	else
 		f->b.priv.vt = &kblockfile_unbuffered_vt;

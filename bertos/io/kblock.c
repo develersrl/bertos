@@ -84,6 +84,14 @@ INLINE int kblock_store(struct KBlock *b, block_idx_t index)
 	return b->priv.vt->store(b, b->priv.blk_start + index);
 }
 
+INLINE void kblock_setDirty(struct KBlock *b, bool dirty)
+{
+	if (dirty)
+		b->priv.flags |= KB_CACHE_DIRTY;
+	else
+		b->priv.flags &= ~KB_CACHE_DIRTY;
+}
+
 
 
 size_t kblock_read(struct KBlock *b, block_idx_t idx, void *buf, size_t offset, size_t size)
@@ -104,11 +112,11 @@ int kblock_flush(struct KBlock *b)
 {
 	ASSERT(b);
 
-	if (b->priv.cache_dirty)
+	if (kblock_cacheDirty(b))
 	{
 		LOG_INFO("flushing block %d\n", b->priv.curr_blk);
 		if (kblock_store(b, b->priv.curr_blk) == 0)
-			b->priv.cache_dirty = false;
+			kblock_setDirty(b, false);
 		else
 			return EOF;
 	}
@@ -144,7 +152,7 @@ size_t kblock_write(struct KBlock *b, block_idx_t idx, const void *buf, size_t o
 	if (!kblock_loadPage(b, idx))
 		return 0;
 
-	b->priv.cache_dirty = true;
+	kblock_setDirty(b, true);
 	return kblock_writeBuf(b, buf, offset, size);
 }
 
@@ -158,7 +166,7 @@ int kblock_copy(struct KBlock *b, block_idx_t idx1, block_idx_t idx2)
 		return EOF;
 
 	b->priv.curr_blk = idx2;
-	b->priv.cache_dirty = true;
+	kblock_setDirty(b, true);
 	return 0;
 }
 

@@ -92,7 +92,8 @@ typedef struct KBlockVTable
 } KBlockVTable;
 
 
-#define KB_BUFFERED BV(0)
+#define KB_BUFFERED    BV(0)
+#define KB_CACHE_DIRTY BV(1)
 
 /**
  * KBlock private members.
@@ -106,7 +107,6 @@ typedef struct KBlockPriv
 	void *buf;
 	block_idx_t blk_start; ///< Start block number when the device is trimmed. \sa kblock_trim()
 	block_idx_t curr_blk;
-	bool cache_dirty;
 
 	const struct KBlockVTable *vt; ///< Virtual table of interface functions.
 } KBlockPriv;
@@ -240,6 +240,12 @@ INLINE int kblock_readBlock(struct KBlock *b, block_idx_t index, void *buf)
 	return b->priv.vt->readBlock(b, b->priv.blk_start + index, buf);
 }
 
+INLINE bool kblock_cacheDirty(struct KBlock *b)
+{
+	ASSERT(b);
+	return (b->priv.flags & KB_CACHE_DIRTY);
+}
+
 INLINE block_idx_t kblock_cachedBlock(struct KBlock *b)
 {
 	return b->priv.curr_blk;
@@ -250,6 +256,7 @@ INLINE bool kblock_buffered(struct KBlock *b)
 	ASSERT(b);
 	return (b->priv.flags & KB_BUFFERED);
 }
+
 
 size_t kblock_read(struct KBlock *b, block_idx_t idx, void *buf, size_t offset, size_t size);
 
