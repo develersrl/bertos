@@ -366,6 +366,7 @@ bool battfs_mount(struct BattFsSuper *disk, struct KBlock *dev, pgcnt_t *page_ar
 	pgoff_t filelen_table[BATTFS_MAX_FILES];
 
 	ASSERT(dev);
+	ASSERT(kblock_buffered(dev));
 	disk->dev = dev;
 
 	ASSERT(disk->dev->blk_size > BATTFS_HEADER_LEN);
@@ -582,22 +583,32 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 
 	if (fd->seek_pos > fd->size)
 	{
-		// TODO: renew this last page only if needed
 		if (!readHdr(disk, fdb->start[fdb->max_off], &curr_hdr))
 		{
 			fdb->errors |= BATTFS_DISK_READ_ERR;
 			return total_write;
 		}
 
-		new_page = renewPage(disk, fdb->start[fdb->max_off]);
-		if (new_page == NO_SPACE)
+		/*
+		 * Renew page only if is not in cache.
+		 * This avoids rewriting the same page continuously 
+		 * if the user code keeps writing in the same portion
+		 * of the file.
+		 */
+		if ((fdb->start[fdb->max_off] != kblock_cachedBlock(disk->dev)) || !kblock_cacheDirty(disk->dev))
 		{
-			fdb->errors |= BATTFS_DISK_SPACEOVER_ERR;
-			return total_write;
-		}
+			new_page = renewPage(disk, fdb->start[fdb->max_off]);
+			if (new_page == NO_SPACE)
+			{
+				fdb->errors |= BATTFS_DISK_SPACEOVER_ERR;
+				return total_write;
+			}
 
-		kblock_copy(disk->dev, fdb->start[fdb->max_off], new_page);
-		fdb->start[fdb->max_off] = new_page;
+			kblock_copy(disk->dev, fdb->start[fdb->max_off], new_page);
+			fdb->start[fdb->max_off] = new_page;
+		}
+		else
+			new_page = fdb->start[fdb->max_off];
 
 		/* Fill unused space of first page with 0s */
 		uint8_t dummy = 0;
@@ -691,27 +702,36 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 		}
 		else
 		{
-			// TODO: do not renew page if its cached
 			if (!readHdr(disk, fdb->start[pg_offset], &curr_hdr))
 			{
 				fdb->errors |= BATTFS_DISK_READ_ERR;
 				return total_write;
 			}
 
-			new_page = renewPage(disk, fdb->start[pg_offset]);
-			if (new_page == NO_SPACE)
+			/* Renew page only if is not in cache. */
+			if ((fdb->start[fdb->max_off] != kblock_cachedBlock(disk->dev)) || !kblock_cacheDirty(disk->dev))
 			{
-				fdb->errors |= BATTFS_DISK_SPACEOVER_ERR;
-				return total_write;
-			}
+				new_page = renewPage(disk, fdb->start[pg_offset]);
+				if (new_page == NO_SPACE)
+				{
+					fdb->errors |= BATTFS_DISK_SPACEOVER_ERR;
+					return total_write;
+				}
 
-			LOG_INFO("Re-writing page %d to %d\n", fdb->start[pg_offset], new_page);
-			if (kblock_copy(disk->dev, fdb->start[pg_offset], new_page) != 0)
-			{
-				fdb->errors |= BATTFS_DISK_WRITE_ERR;
-				return total_write;
+				LOG_INFO("Re-writing page %d to %d\n", fdb->start[pg_offset], new_page);
+				if (kblock_copy(disk->dev, fdb->start[pg_offset], new_page) != 0)
+				{
+					fdb->errors |= BATTFS_DISK_WRITE_ERR;
+					return total_write;
+				}
+				fdb->start[pg_offset] = new_page;
 			}
-			fdb->start[pg_offset] = new_page;
+			else
+			{
+				LOG_INFO("Using cached block %d\n", fdb->start[pg_offset]);
+				new_page = fdb->start[pg_offset];
+			}
+				
 			curr_hdr.seq++;
 		}
 		//LOG_INFO("writing to buffer for page %d, offset %d, size %d\n", disk->curr_page, addr_offset, wr_len);
