@@ -42,10 +42,12 @@
 #define LOG_FORMAT LOG_FMT_VERBOSE
 
 #include <cfg/log.h>
+#include <string.h>
 
 INLINE size_t kblock_readDirect(struct KBlock *b, block_idx_t index, void *buf, size_t offset, size_t size)
 {
 	KB_ASSERT_METHOD(b, readDirect);
+	ASSERT(index < b->blk_cnt);
 	return b->priv.vt->readDirect(b, b->priv.blk_start + index, buf, offset, size);
 }
 
@@ -134,6 +136,7 @@ size_t kblock_write(struct KBlock *b, block_idx_t idx, const void *buf, size_t o
 {
 	ASSERT(b);
 	ASSERT(buf);
+	ASSERT(idx < b->blk_cnt);
 	ASSERT(offset + size <= b->blk_size);
 
 	LOG_INFO("blk_idx %d, offset %d, size %d\n", idx, offset, size);
@@ -148,6 +151,8 @@ size_t kblock_write(struct KBlock *b, block_idx_t idx, const void *buf, size_t o
 int kblock_copy(struct KBlock *b, block_idx_t idx1, block_idx_t idx2)
 {
 	ASSERT(b);
+	ASSERT(idx1 < b->blk_cnt);
+	ASSERT(idx2 < b->blk_cnt);
 
 	if (!kblock_loadPage(b, idx1))
 		return EOF;
@@ -157,3 +162,50 @@ int kblock_copy(struct KBlock *b, block_idx_t idx1, block_idx_t idx2)
 	return 0;
 }
 
+int kblock_swWriteBlock(struct KBlock *b, block_idx_t index, const void *buf)
+{
+	return (kblock_write(b, index, buf, 0, b->blk_size) == b->blk_size) ? 0 : EOF;
+}
+
+int kblock_swReadBlock(struct KBlock *b, block_idx_t index, void *buf)
+{
+	return (kblock_read(b, index, buf, 0, b->blk_size) == b->blk_size) ? 0 : EOF;
+}
+
+int kblock_swLoad(struct KBlock *b, block_idx_t index)
+{
+	return kblock_readBlock(b, index, b->priv.buf);
+}
+
+int kblock_swStore(struct KBlock *b, block_idx_t index)
+{
+	return kblock_writeBlock(b, index, b->priv.buf);
+}
+
+size_t kblock_swReadBuf(struct KBlock *b, void *buf, size_t offset, size_t size)
+{
+	ASSERT(buf);
+	ASSERT(offset + size <= b->blk_size);
+	
+	memcpy(buf, (uint8_t *)b->priv.buf + offset, size);
+	return size;
+}
+
+size_t kblock_swWriteBuf(struct KBlock *b, const void *buf, size_t offset, size_t size)
+{
+	ASSERT(buf);
+	ASSERT(offset + size <= b->blk_size);
+	memcpy((uint8_t *)b->priv.buf + offset, buf, size);
+	return size;
+}
+
+size_t kblock_swReadDirect(struct KBlock *b, block_idx_t index, void *buf, size_t offset, size_t size)
+{
+	ASSERT(buf);
+	ASSERT(index < b->blk_cnt);
+	
+	if (!kblock_loadPage(b, index))
+		return 0;
+		
+	return kblock_swReadBuf(b, buf, offset, size);
+}
