@@ -43,21 +43,21 @@
 static int kblockram_load(KBlock *b, block_idx_t index)
 {
 	KBlockRam *r = KBLOCKRAM_CAST(b);
-	memcpy(r->pagebuf, r->membuf + index * r->b.blk_size, r->b.blk_size);
+	memcpy(r->b.priv.buf, r->membuf + index * r->b.blk_size, r->b.blk_size);
 	return 0;
 }
 
 static int kblockram_store(struct KBlock *b, block_idx_t index)
 {
 	KBlockRam *r = KBLOCKRAM_CAST(b);
-	memcpy(r->membuf + index * r->b.blk_size, r->pagebuf, r->b.blk_size);
+	memcpy(r->membuf + index * r->b.blk_size, r->b.priv.buf, r->b.blk_size);
 	return 0;
 }
 
 static size_t kblockram_readBuf(struct KBlock *b, void *buf, size_t offset, size_t size)
 {
 	KBlockRam *r = KBLOCKRAM_CAST(b);
-	memcpy(buf, r->pagebuf + offset, size);
+	memcpy(buf, (uint8_t *)r->b.priv.buf + offset, size);
 	return size;
 }
 
@@ -71,13 +71,28 @@ static size_t kblockram_readDirect(struct KBlock *b, block_idx_t index, void *bu
 static size_t kblockram_writeBuf(struct KBlock *b, const void *buf, size_t offset, size_t size)
 {
 	KBlockRam *r = KBLOCKRAM_CAST(b);
-	memcpy(r->pagebuf + offset, buf, size);
+	memcpy((uint8_t *)r->b.priv.buf + offset, buf, size);
 	return size;
 }
 
-static int kblockram_error(struct KBlock *b)
+static int kblockram_writeBlock(struct KBlock *b, block_idx_t index, const void *buf)
 {
-	return b->priv.flags;
+	KBlockRam *r = KBLOCKRAM_CAST(b);
+	ASSERT(buf);
+	ASSERT(index < b->blk_cnt);
+
+	memcpy(r->membuf + index * r->b.blk_size, buf, r->b.blk_size);
+	return 0;
+}
+
+static int kblockram_readBlock(struct KBlock *b, block_idx_t index, void *buf)
+{
+	KBlockRam *r = KBLOCKRAM_CAST(b);
+	ASSERT(buf);
+	ASSERT(index < b->blk_cnt);
+
+	memcpy(buf, r->membuf + index * r->b.blk_size, r->b.blk_size);
+	return 0;
 }
 
 static int kblockram_dummy(UNUSED_ARG(struct KBlock *,b))
@@ -85,20 +100,50 @@ static int kblockram_dummy(UNUSED_ARG(struct KBlock *,b))
 	return 0;
 }
 
-static KBlockVTable kblockram_vt =
+static const KBlockVTable kblockram_hwbuffered_vt =
 {
 	.readDirect = kblockram_readDirect,
 	.readBuf = kblockram_readBuf,
 	.writeBuf = kblockram_writeBuf,
 	.load = kblockram_load,
 	.store = kblockram_store,
+	
+	.readBlock = kblock_swReadBlock,
+	.writeBlock = kblock_swWriteBlock,
 
-	.error = kblockram_error,
+	.error = kblockram_dummy,
 	.clearerr = kblockram_dummy,
 	.close = kblockram_dummy,
 };
 
-void kblockram_init(KBlockRam *ram, void *buf, size_t size, size_t block_size)
+
+static const KBlockVTable kblockram_swbuffered_vt =
+{
+	.readDirect = kblock_swReadDirect,
+	.readBuf = kblock_swReadBuf,
+	.writeBuf = kblock_swWriteBuf,
+	.load = kblock_swLoad,
+	.store = kblock_swStore,
+	
+	.readBlock = kblockram_readBlock,
+	.writeBlock = kblockram_writeBlock,
+
+	.error = kblockram_dummy,
+	.clearerr = kblockram_dummy,
+	.close = kblockram_dummy,
+};
+
+static const KBlockVTable kblockram_unbuffered_vt =
+{
+	.readBlock = kblockram_readBlock,
+	.writeBlock = kblockram_writeBlock,
+
+	.error = kblockram_dummy,
+	.clearerr = kblockram_dummy,
+	.close = kblockram_dummy,
+};
+
+void kblockram_init(KBlockRam *ram, void *buf, size_t size, size_t block_size, bool buffered, bool hwbuffered)
 {
 	ASSERT(buf);
 	ASSERT(size);
@@ -107,12 +152,27 @@ void kblockram_init(KBlockRam *ram, void *buf, size_t size, size_t block_size)
 	memset(ram, 0, sizeof(*ram));
 
 	DB(ram->b.priv.type = KBT_KBLOCKRAM);
-
-	// First page used as page buffer
-	ram->b.blk_cnt = (size / block_size) - 1;
-	ram->pagebuf = (uint8_t *)buf;
-	ram->membuf = (uint8_t *)buf + block_size;
 	ram->b.blk_size = block_size;
-	ram->b.priv.vt = &kblockram_vt;
-	kblockram_load(&ram->b, 0);
+	
+	if (buffered)
+	{
+		ram->b.priv.flags |= KB_BUFFERED;
+		ram->b.blk_cnt = (size / block_size) - 1;
+		ram->b.priv.buf = buf;
+		// First page used as page buffer
+		ram->membuf = (uint8_t *)buf + block_size;
+			
+		if (hwbuffered)
+			ram->b.priv.vt = &kblockram_hwbuffered_vt;
+		else
+			ram->b.priv.vt = &kblockram_swbuffered_vt;
+		
+		kblockram_load(&ram->b, 0);
+	}
+	else
+	{
+		ram->b.blk_cnt = (size / block_size);
+		ram->membuf = (uint8_t *)buf;
+		ram->b.priv.vt = &kblockram_unbuffered_vt;
+	}
 }

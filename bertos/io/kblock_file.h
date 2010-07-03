@@ -46,7 +46,6 @@ typedef struct KBlockFile
 {
 	KBlock b;
 	FILE *fp;
-	uint8_t *pagebuf;
 } KBlockFile;
 
 #define KBT_KBLOCKFILE MAKE_ID('K', 'B', 'F', 'L')
@@ -58,6 +57,6 @@ INLINE KBlockFile *KBLOCKFILE_CAST(KBlock *b)
 	return (KBlockFile *)b;
 }
 
-void kblockfile_init(KBlockFile *f, FILE *fp, void *buf, size_t block_size, block_idx_t block_count);
+void kblockfile_init(KBlockFile *f, FILE *fp, bool hwbuf, void *buf, size_t block_size, block_idx_t block_count);
 
 #endif /* KBLOCK_FILE_H */

@@ -50,6 +50,7 @@
 #define DATA_SIZE (PAGE_SIZE - BATTFS_HEADER_LEN)
 #define PAGE_COUNT (FILE_SIZE / PAGE_SIZE)
 
+#define HW_PAGEBUF false
 #if UNIT_TEST
 
 const char test_filename[]="battfs_disk.bin";
@@ -105,7 +106,7 @@ static void diskNew(BattFsSuper *disk)
 		ref[i] = i;
 
 	KBlockFile f;
-	kblockfile_init(&f, fpt, page_buffer, PAGE_SIZE, PAGE_COUNT);
+	kblockfile_init(&f, fpt, HW_PAGEBUF, page_buffer, PAGE_SIZE, PAGE_COUNT);
 	battfs_mount(disk, &f.b, page_array, sizeof(page_array));
 
 	testCheck(disk, ref);
@@ -122,7 +123,7 @@ static void disk1File(BattFsSuper *disk)
 		fputc(0xff, fp);
 
 	KBlockFile f;
-	kblockfile_init(&f, fp, page_buffer, PAGE_SIZE, PAGE_COUNT);
+	kblockfile_init(&f, fp, HW_PAGEBUF, page_buffer, PAGE_SIZE, PAGE_COUNT);
 
 	for (int i = 0; i < PAGE_COUNT; i++)
 	{
@@ -148,7 +149,7 @@ static void diskHalfFile(BattFsSuper *disk)
 		fputc(0xff, fp);
 
 	KBlockFile f;
-	kblockfile_init(&f, fp, page_buffer, PAGE_SIZE, PAGE_COUNT);
+	kblockfile_init(&f, fp, HW_PAGEBUF, page_buffer, PAGE_SIZE, PAGE_COUNT);
 
 	for (int i = 0; i < PAGE_COUNT / 2; i++)
 	{
@@ -180,7 +181,7 @@ static void oldSeq1(BattFsSuper *disk)
 	for (int i = 0; i < PAGE_SIZE * 4; i++)
 		fputc(0xff, fp);
 	KBlockFile f;
-	kblockfile_init(&f, fp, page_buffer, PAGE_SIZE, 4);
+	kblockfile_init(&f, fp, HW_PAGEBUF, page_buffer, PAGE_SIZE, 4);
 
 	// page, inode, seq, fill, pgoff
 	battfs_writeTestBlock(&f.b, 0, 0, 0, DATA_SIZE, 0);
@@ -208,7 +209,7 @@ static void oldSeq2(BattFsSuper *disk)
 	for (int i = 0; i < PAGE_SIZE * 4; i++)
 		fputc(0xff, fp);
 	KBlockFile f;
-	kblockfile_init(&f, fp, page_buffer, PAGE_SIZE, 4);
+	kblockfile_init(&f, fp, HW_PAGEBUF, page_buffer, PAGE_SIZE, 4);
 
 	// page, inode, seq, fill, pgoff
 	battfs_writeTestBlock(&f.b, 0, 0, 0, DATA_SIZE, 0);
@@ -236,7 +237,7 @@ static void oldSeq3(BattFsSuper *disk)
 	for (int i = 0; i < PAGE_SIZE * 4; i++)
 		fputc(0xff, fp);
 	KBlockFile f;
-	kblockfile_init(&f, fp, page_buffer, PAGE_SIZE, 4);
+	kblockfile_init(&f, fp, HW_PAGEBUF, page_buffer, PAGE_SIZE, 4);
 
 	// page, inode, seq, fill, pgoff
 	battfs_eraseBlock(&f.b, 0);
@@ -264,7 +265,7 @@ static void oldSeq2File(BattFsSuper *disk)
 	for (int i = 0; i < PAGE_SIZE * 8; i++)
 		fputc(0xff, fp);
 	KBlockFile f;
-	kblockfile_init(&f, fp, page_buffer, PAGE_SIZE, 8);
+	kblockfile_init(&f, fp, HW_PAGEBUF, page_buffer, PAGE_SIZE, 8);
 
 	// page, inode, seq, fill, pgoff
 	battfs_eraseBlock(&f.b, 0);
@@ -301,7 +302,7 @@ static void openFile(BattFsSuper *disk)
 	for (int i = 0; i < PAGE_SIZE * 8; i++)
 		fputc(0xff, fp);
 	KBlockFile f;
-	kblockfile_init(&f, fp, page_buffer, PAGE_SIZE, 8);
+	kblockfile_init(&f, fp, HW_PAGEBUF, page_buffer, PAGE_SIZE, 8);
 
 
 	int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
@@ -375,7 +376,7 @@ static void readFile(BattFsSuper *disk)
 	for (int i = 0; i < PAGE_SIZE * 8; i++)
 		fputc(0xff, fp);
 	KBlockFile f;
-	kblockfile_init(&f, fp, page_buffer, PAGE_SIZE, 8);
+	kblockfile_init(&f, fp, HW_PAGEBUF, page_buffer, PAGE_SIZE, 8);
 
 
 	unsigned int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
@@ -418,7 +419,7 @@ static void readAcross(BattFsSuper *disk)
 	for (int i = 0; i < PAGE_SIZE * 8; i++)
 		fputc(0xff, fp);
 	KBlockFile f;
-	kblockfile_init(&f, fp, page_buffer, PAGE_SIZE, 8);
+	kblockfile_init(&f, fp, HW_PAGEBUF, page_buffer, PAGE_SIZE, 8);
 
 	const unsigned int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
 	inode_t INODE = 0;
@@ -484,7 +485,7 @@ static void writeFile(BattFsSuper *disk)
 	for (int i = 0; i < PAGE_SIZE * 8; i++)
 		fputc(0xff, fp);
 	KBlockFile f;
-	kblockfile_init(&f, fp, page_buffer, PAGE_SIZE, 8);
+	kblockfile_init(&f, fp, HW_PAGEBUF, page_buffer, PAGE_SIZE, 8);
 
 
 	unsigned int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
@@ -535,7 +536,7 @@ static void writeAcross(BattFsSuper *disk)
 	for (int i = 0; i < PAGE_SIZE * 8; i++)
 		fputc(0xff, fp);
 	KBlockFile f;
-	kblockfile_init(&f, fp, page_buffer, PAGE_SIZE, 8);
+	kblockfile_init(&f, fp, HW_PAGEBUF, page_buffer, PAGE_SIZE, 8);
 
 	const unsigned int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
 	inode_t INODE = 0;
@@ -608,7 +609,7 @@ static void createFile(BattFsSuper *disk)
 	for (int i = 0; i < FILE_SIZE; i++)
 		fputc(0xff, fpt);
 	KBlockFile f;
-	kblockfile_init(&f, fpt, page_buffer, PAGE_SIZE, PAGE_COUNT);
+	kblockfile_init(&f, fpt, HW_PAGEBUF, page_buffer, PAGE_SIZE, PAGE_COUNT);
 
 	BattFs fd1;
 	inode_t INODE = 0;
@@ -628,7 +629,7 @@ static void createFile(BattFsSuper *disk)
 	ASSERT(battfs_umount(disk));
 
 	fpt = fopen(test_filename, "r+");
-	kblockfile_init(&f, fpt, page_buffer, PAGE_SIZE, PAGE_COUNT);
+	kblockfile_init(&f, fpt, HW_PAGEBUF, page_buffer, PAGE_SIZE, PAGE_COUNT);
 
 	ASSERT(battfs_mount(disk, &f.b, page_array, sizeof(page_array)));
 	ASSERT(battfs_fsck(disk));
@@ -661,7 +662,7 @@ static void multipleWrite(BattFsSuper *disk)
 	for (int i = 0; i < FILE_SIZE; i++)
 		fputc(0xff, fpt);
 	KBlockFile f;
-	kblockfile_init(&f, fpt, page_buffer, PAGE_SIZE, PAGE_COUNT);
+	kblockfile_init(&f, fpt, HW_PAGEBUF, page_buffer, PAGE_SIZE, PAGE_COUNT);
 
 
 	BattFs fd1;
@@ -697,7 +698,7 @@ static void multipleWrite(BattFsSuper *disk)
 	ASSERT(battfs_umount(disk));
 
 	fpt = fopen(test_filename, "r+");
-	kblockfile_init(&f, fpt, page_buffer, PAGE_SIZE, PAGE_COUNT);
+	kblockfile_init(&f, fpt, HW_PAGEBUF, page_buffer, PAGE_SIZE, PAGE_COUNT);
 
 	ASSERT(battfs_mount(disk, &f.b, page_array, sizeof(page_array)));
 	ASSERT(battfs_fsck(disk));
@@ -726,7 +727,7 @@ static void increaseFile(BattFsSuper *disk)
 		fputc(0xff, fpt);
 
 	KBlockFile f;
-	kblockfile_init(&f, fpt, page_buffer, PAGE_SIZE, PAGE_COUNT / 10);
+	kblockfile_init(&f, fpt, HW_PAGEBUF, page_buffer, PAGE_SIZE, PAGE_COUNT / 10);
 
 
 	BattFs fd1,fd2;
@@ -778,7 +779,7 @@ static void readEOF(BattFsSuper *disk)
 	for (int i = 0; i < PAGE_SIZE * 8; i++)
 		fputc(0xff, fp);
 	KBlockFile f;
-	kblockfile_init(&f, fp, page_buffer, PAGE_SIZE, 8);
+	kblockfile_init(&f, fp, HW_PAGEBUF, page_buffer, PAGE_SIZE, 8);
 
 
 	unsigned int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
@@ -818,7 +819,7 @@ static void writeEOF(BattFsSuper *disk)
 	for (int i = 0; i < FILE_SIZE / 5; i++)
 		fputc(0xff, fpt);
 	KBlockFile f;
-	kblockfile_init(&f, fpt, page_buffer, PAGE_SIZE, PAGE_COUNT / 5);
+	kblockfile_init(&f, fpt, HW_PAGEBUF, page_buffer, PAGE_SIZE, PAGE_COUNT / 5);
 
 	BattFs fd1;
 	inode_t INODE = 0;
@@ -902,7 +903,7 @@ static void endOfSpace(BattFsSuper *disk)
 	for (int i = 0; i < PAGE_SIZE * 4; i++)
 		fputc(0xff, fp);
 	KBlockFile f;
-	kblockfile_init(&f, fp, page_buffer, PAGE_SIZE, 4);
+	kblockfile_init(&f, fp, HW_PAGEBUF, page_buffer, PAGE_SIZE, 4);
 
 	unsigned int PAGE_FILL = PAGE_SIZE - BATTFS_HEADER_LEN;
 	inode_t INODE = 0;
@@ -938,7 +939,7 @@ static void multipleFilesRW(BattFsSuper *disk)
 	for (int i = 0; i < FILE_SIZE; i++)
 		fputc(0xff, fpt);
 	KBlockFile f;
-	kblockfile_init(&f, fpt, page_buffer, PAGE_SIZE, PAGE_COUNT);
+	kblockfile_init(&f, fpt, HW_PAGEBUF, page_buffer, PAGE_SIZE, PAGE_COUNT);
 
 	#define N_FILES 10
 	BattFs fd[N_FILES];
@@ -984,7 +985,7 @@ static void multipleFilesRW(BattFsSuper *disk)
 	ASSERT(battfs_umount(disk));
 
 	fpt = fopen(test_filename, "r+");
-	kblockfile_init(&f, fpt, page_buffer, PAGE_SIZE, PAGE_COUNT);
+	kblockfile_init(&f, fpt, HW_PAGEBUF, page_buffer, PAGE_SIZE, PAGE_COUNT);
 
 	ASSERT(battfs_mount(disk, &f.b, page_array, sizeof(page_array)));
 	ASSERT(battfs_fsck(disk));
@@ -1024,7 +1025,7 @@ static void openAllFiles(BattFsSuper *disk)
 	for (int i = 0; i < FILE_SIZE; i++)
 		fputc(0xff, fpt);
 	KBlockFile f;
-	kblockfile_init(&f, fpt, page_buffer, PAGE_SIZE, PAGE_COUNT);
+	kblockfile_init(&f, fpt, HW_PAGEBUF, page_buffer, PAGE_SIZE, PAGE_COUNT);
 
 	BattFs fd[BATTFS_MAX_FILES];
 	unsigned int MODE = BATTFS_CREATE;
@@ -1047,7 +1048,7 @@ static void openAllFiles(BattFsSuper *disk)
 
 
 	fpt = fopen(test_filename, "r+");
-	kblockfile_init(&f, fpt, page_buffer, PAGE_SIZE, PAGE_COUNT);
+	kblockfile_init(&f, fpt, HW_PAGEBUF, page_buffer, PAGE_SIZE, PAGE_COUNT);
 
 	ASSERT(battfs_mount(disk, &f.b, page_array, sizeof(page_array)));
 	ASSERT(battfs_fsck(disk));

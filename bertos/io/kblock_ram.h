@@ -44,7 +44,6 @@
 typedef struct KBlockRam
 {
 	KBlock b;
-	uint8_t *pagebuf;
 	uint8_t *membuf;
 } KBlockRam;
 
@@ -57,6 +56,6 @@ INLINE KBlockRam *KBLOCKRAM_CAST(KBlock *b)
 	return (KBlockRam *)b;
 }
 
-void kblockram_init(KBlockRam *ram, void *buf, size_t size, size_t block_size);
+void kblockram_init(KBlockRam *ram, void *buf, size_t size, size_t block_size, bool buffered, bool hwbuffered);
 
 #endif /* KBLOCK_RAM_H */
