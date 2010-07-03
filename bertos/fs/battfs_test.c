@@ -50,7 +50,7 @@
 #define DATA_SIZE (PAGE_SIZE - BATTFS_HEADER_LEN)
 #define PAGE_COUNT (FILE_SIZE / PAGE_SIZE)
 
-#define HW_PAGEBUF false
+#define HW_PAGEBUF true
 #if UNIT_TEST
 
 const char test_filename[]="battfs_disk.bin";
