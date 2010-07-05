@@ -85,16 +85,6 @@ static int kblockram_writeBlock(struct KBlock *b, block_idx_t index, const void 
 	return 0;
 }
 
-static int kblockram_readBlock(struct KBlock *b, block_idx_t index, void *buf)
-{
-	KBlockRam *r = KBLOCKRAM_CAST(b);
-	ASSERT(buf);
-	ASSERT(index < b->blk_cnt);
-
-	memcpy(buf, r->membuf + index * r->b.blk_size, r->b.blk_size);
-	return 0;
-}
-
 static int kblockram_dummy(UNUSED_ARG(struct KBlock *,b))
 {
 	return 0;
@@ -103,14 +93,12 @@ static int kblockram_dummy(UNUSED_ARG(struct KBlock *,b))
 static const KBlockVTable kblockram_hwbuffered_vt =
 {
 	.readDirect = kblockram_readDirect,
+	
 	.readBuf = kblockram_readBuf,
 	.writeBuf = kblockram_writeBuf,
 	.load = kblockram_load,
 	.store = kblockram_store,
 	
-	.readBlock = kblock_swReadBlock,
-	.writeBlock = kblock_swWriteBlock,
-
 	.error = kblockram_dummy,
 	.clearerr = kblockram_dummy,
 	.close = kblockram_dummy,
@@ -119,15 +107,14 @@ static const KBlockVTable kblockram_hwbuffered_vt =
 
 static const KBlockVTable kblockram_swbuffered_vt =
 {
-	.readDirect = kblock_swReadDirect,
+	.readDirect = kblockram_readDirect,
+	.writeBlock = kblockram_writeBlock,
+	
 	.readBuf = kblock_swReadBuf,
 	.writeBuf = kblock_swWriteBuf,
 	.load = kblock_swLoad,
 	.store = kblock_swStore,
-	
-	.readBlock = kblockram_readBlock,
-	.writeBlock = kblockram_writeBlock,
-
+		
 	.error = kblockram_dummy,
 	.clearerr = kblockram_dummy,
 	.close = kblockram_dummy,
@@ -135,7 +122,7 @@ static const KBlockVTable kblockram_swbuffered_vt =
 
 static const KBlockVTable kblockram_unbuffered_vt =
 {
-	.readBlock = kblockram_readBlock,
+	.readDirect = kblockram_readDirect,
 	.writeBlock = kblockram_writeBlock,
 
 	.error = kblockram_dummy,

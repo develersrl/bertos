@@ -88,15 +88,6 @@ static int kblockfile_writeBlock(struct KBlock *b, block_idx_t index, const void
 	return (fwrite(f->b.priv.buf, 1, b->blk_size, f->fp) == b->blk_size) ? 0 : EOF;
 }
 
-static int kblockfile_readBlock(struct KBlock *b, block_idx_t index, void *buf)
-{
-	KBlockFile *f = KBLOCKFILE_CAST(b);
-	ASSERT(buf);
-	ASSERT(index < b->blk_cnt);
-	fseek(f->fp, index * b->blk_size, SEEK_SET);
-	return (fread(f->b.priv.buf, 1, b->blk_size, f->fp) == b->blk_size) ? 0 : EOF;
-}
-
 static int kblockfile_error(struct KBlock *b)
 {
 	KBlockFile *f = KBLOCKFILE_CAST(b);
@@ -123,14 +114,12 @@ static int kblockfile_close(struct KBlock *b)
 static const KBlockVTable kblockfile_hwbuffered_vt =
 {
 	.readDirect = kblockfile_readDirect,
+
 	.readBuf = kblockfile_readBuf,
 	.writeBuf = kblockfile_writeBuf,
 	.load = kblockfile_load,
 	.store = kblockfile_store,
 	
-	.readBlock = kblock_swReadBlock,
-	.writeBlock = kblock_swWriteBlock,
-
 	.error = kblockfile_error,
 	.clearerr = kblockfile_claererr,
 	.close = kblockfile_close,
@@ -138,15 +127,14 @@ static const KBlockVTable kblockfile_hwbuffered_vt =
 
 static const KBlockVTable kblockfile_swbuffered_vt =
 {
-	.readDirect = kblock_swReadDirect,
+	.readDirect = kblockfile_readDirect,
+	.writeBlock =kblockfile_writeBlock,
+	
 	.readBuf = kblock_swReadBuf,
 	.writeBuf = kblock_swWriteBuf,
 	.load = kblock_swLoad,
 	.store = kblock_swStore,
 	
-	.readBlock = kblockfile_readBlock,
-	.writeBlock =kblockfile_writeBlock,
-
 	.error = kblockfile_error,
 	.clearerr = kblockfile_claererr,
 	.close = kblockfile_close,
@@ -154,7 +142,7 @@ static const KBlockVTable kblockfile_swbuffered_vt =
 
 static const KBlockVTable kblockfile_unbuffered_vt =
 {
-	.readBlock = kblockfile_readBlock,
+	.readDirect = kblockfile_readDirect,
 	.writeBlock =kblockfile_writeBlock,
 
 	.error = kblockfile_error,
