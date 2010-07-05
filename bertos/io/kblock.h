@@ -57,13 +57,12 @@ struct KBlock;
  *  \{
  */
 typedef size_t (* kblock_read_direct_t) (struct KBlock *b, block_idx_t index, void *buf, size_t offset, size_t size);
+typedef int    (* kblock_write_block_t) (struct KBlock *b, block_idx_t index, const void *buf);
+
 typedef size_t (* kblock_read_t)        (struct KBlock *b, void *buf, size_t offset, size_t size);
 typedef size_t (* kblock_write_t)       (struct KBlock *b, const void *buf, size_t offset, size_t size);
 typedef int    (* kblock_load_t)        (struct KBlock *b, block_idx_t index);
 typedef int    (* kblock_store_t)       (struct KBlock *b, block_idx_t index);
-
-typedef int    (* kblock_write_block_t) (struct KBlock *b, block_idx_t index, const void *buf);
-typedef int    (* kblock_read_block_t)  (struct KBlock *b, block_idx_t index, void *buf);
 
 typedef int    (* kblock_error_t)       (struct KBlock *b);
 typedef int    (* kblock_clearerr_t)    (struct KBlock *b);
@@ -76,15 +75,13 @@ typedef int    (* kblock_close_t)       (struct KBlock *b);
 typedef struct KBlockVTable
 {
 	kblock_read_direct_t readDirect;
-
+	kblock_write_block_t writeBlock;
+	
 	kblock_read_t  readBuf;
 	kblock_write_t writeBuf;
 	kblock_load_t  load;
 	kblock_store_t store;
-	
-	kblock_read_block_t readBlock;
-	kblock_write_block_t writeBlock;
-	
+		
 	kblock_error_t    error;    ///< \sa kblock_error()
 	kblock_clearerr_t clearerr; ///< \sa kblock_clearerr()
 
@@ -128,7 +125,7 @@ typedef struct KBlock
 {
 	KBlockPriv priv;         ///< Interface private data, do not use directly.
 
-	/* Public access members/methods */
+	/* Public access members */
 	size_t blk_size;         ///< Block size.
 	block_idx_t blk_cnt;     ///< Number of blocks available in the device.
 } KBlock;
@@ -226,20 +223,6 @@ INLINE int kblock_close(struct KBlock *b)
 	return b->priv.vt->close(b);
 }
 
-INLINE int kblock_writeBlock(struct KBlock *b, block_idx_t index, const void *buf)
-{
-	KB_ASSERT_METHOD(b, writeBlock);
-	ASSERT(index < b->blk_cnt);
-	return b->priv.vt->writeBlock(b, b->priv.blk_start + index, buf);
-}
-
-INLINE int kblock_readBlock(struct KBlock *b, block_idx_t index, void *buf)
-{
-	KB_ASSERT_METHOD(b, readDirect);
-	ASSERT(index < b->blk_cnt);
-	return b->priv.vt->readBlock(b, b->priv.blk_start + index, buf);
-}
-
 INLINE bool kblock_cacheDirty(struct KBlock *b)
 {
 	ASSERT(b);
@@ -257,20 +240,14 @@ INLINE bool kblock_buffered(struct KBlock *b)
 	return (b->priv.flags & KB_BUFFERED);
 }
 
-
 size_t kblock_read(struct KBlock *b, block_idx_t idx, void *buf, size_t offset, size_t size);
-
-int kblock_flush(struct KBlock *b);
 
 size_t kblock_write(struct KBlock *b, block_idx_t idx, const void *buf, size_t offset, size_t size);
 
+int kblock_flush(struct KBlock *b);
+
 int kblock_copy(struct KBlock *b, block_idx_t idx1, block_idx_t idx2);
 
-
-int kblock_swWriteBlock(struct KBlock *b, block_idx_t index, const void *buf);
-int kblock_swReadBlock(struct KBlock *b, block_idx_t index, void *buf);
-
-size_t kblock_swReadDirect(struct KBlock *b, block_idx_t index, void *buf, size_t offset, size_t size);
 int kblock_swLoad(struct KBlock *b, block_idx_t index);
 int kblock_swStore(struct KBlock *b, block_idx_t index);
 size_t kblock_swReadBuf(struct KBlock *b, void *buf, size_t offset, size_t size);
