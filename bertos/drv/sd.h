@@ -39,80 +39,75 @@
  * $WIZ$ module_name = "sd"
  * $WIZ$ module_depends = "kfile", "timer"
  * $WIZ$ module_hw = "bertos/hw/hw_sd.h"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_sd.h"
  */
 
 
 #ifndef DRV_SD_H
 #define DRV_SD_H
 
-#include "cfg/cfg_fat.h"
-
 #include <io/kfile.h>
+#include <io/kblock.h>
 
 #include <fs/fatfs/diskio.h>
 
-bool sd_test(void);
+#include "cfg/cfg_sd.h"
 
-/**
- * Initializes the SD driver.
- *
- * \param _fd A pointer to a kfile where the SD will read/write to.
- * \return true if initialization succeds, false otherwise.
- */
-bool sd_init(KFile *_fd);
 
-#if CONFIG_FAT_DRIVES == 1
+typedef struct Sd
+{
+	KBlock b;
+	KFile *ch;  ///< SPI communication channel
+	uint16_t r1;
+} Sd;
 
-	/**
-	 * Same as sd_disk_status.
-	 *
-	 * Card initialization must be done with sd_init.
-	 */
-	#define sd_disk_initialize disk_initialize
+bool sd_initUnbuf(Sd *sd, KFile *ch);
+bool sd_initBuf(Sd *sd, KFile *ch);
+
+#if CONFIG_SD_OLD_INIT
+	#warning "Deprecated: this API will be removed in the next major release,"
+	#warning "please disable CONFIG_SD_OLD_INIT and pass explicitly the SD context to sd_init()."
 
 	/**
-	 * Return the status of the disk.
+	 * Initializes the SD driver.
 	 *
-	 * \param drv The number of the drive to initialize. Currently only drive 0 is allowed.
-	 * \return RES_OK if the sd card was correctly initialized by a previous call to sd_init(), STA_NOINIT otherwise.
+	 * \param ch A pointer to a SPI channel where the SD will read/write to.
+	 *
+	 * \return true if initialization succeds, false otherwise.
+	 *
+	 * \note This API is deprecated, disable CONFIG_SD_OLD_INIT and
+	 *       use the new one instead.
 	 */
-	#define sd_disk_status     disk_status
-	/**
-	 * Read \a count sectors from SD card.
-	 *
-	 * \param drv The drive number to read from. Only 0 is supported.
-	 * \param buf A buffer to store read data. You can get sector size using sd_disk_ioctl.
-	 * \param sector Start sector number.
-	 * \param count The number of sectors to read.
-	 * \return RES_OK if the function succeded, RES_ERROR if any error occurred, RES_NOTRDY if the disk is not initialized.
-	 *
-	 * \sa diskio.h
-	 */
-	#define sd_disk_read       disk_read
+	#define sd_init(ch) {static struct Sd sd; sd_initUnbuf(&sd, (ch));}
 
-	#if	CONFIG_FAT_FS_READONLY == 0
-
-		/**
-		 * Write \a count sectors to SD card.
-		 *
-		 * \param drv The drive number to read from. Only 0 is supported.
-		 * \param buf The data to be written.
-		 * \param sector Start sector number.
-		 * \param count The number of sectors to write.
-		 * \return RES_OK if the function succeded, RES_ERROR if any error occurred, RES_NOTRDY if the disk is not initialized.
-		 *
-		 * \sa diskio.h
-		 */
-		#define sd_disk_write      disk_write
-	#endif
+#else
 
 	/**
-	 * Interface to send device independant commands to the device.
+	 * Initializes the SD driver.
 	 *
-	 * \sa diskio.h and related documentation for further explanations.
+	 * \param sd The SD KBlock context.
+	 * \param ch A pointer to a SPI channel where the SD will read/write to.
+	 * \param buffered Set to true if you want the KBlock to be buffered,
+	 *        to false otherwise. The FatFs module does not require the device
+	 *        to be buffered because it has an internal cache. This will save
+	 *        512 bytes of RAM in this case.
+	 *
+	 * \return true if initialization succeds, false otherwise.
 	 */
-	#define sd_disk_ioctl      disk_ioctl
+	#define sd_init(sd, ch, buffered) ((buffered) ? sd_initBuf((sd), (ch)) : sd_initUnbuf((sd), (ch)))
 
-#endif /* CONFIG_FAT_DRIVES == 1 */
+#endif
+
+
+#define KBT_SD MAKE_ID('S', 'D', 'B', 'K')
+
+bool sd_test(Sd *sd);
+
+INLINE Sd *SD_CAST(KBlock *b)
+{
+	ASSERT(b->priv.type == KBT_SD);
+	return (Sd *)b;
+}
+
 
 #endif /* DRV_SD_H */
