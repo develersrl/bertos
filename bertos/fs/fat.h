@@ -40,7 +40,7 @@
  *
  * $WIZ$ module_name = "fat"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_fat.h"
- * $WIZ$ module_depends = "kfile", "ff"
+ * $WIZ$ module_depends = "kfile", "ff", "diskio"
  *
  */
 
