@@ -6,14 +6,22 @@
 /*-----------------------------------------------------------------------*/
 
 #include "diskio.h"
+#include "ff.h"
 
-/*-----------------------------------------------------------------------*/
-/* Correspondence between physical drive number and physical drive.      */
+#include <io/kblock.h>
 
-#define ATA		0
-#define MMC		1
-#define USB		2
+#include "cfg/cfg_fat.h"
+#define LOG_LEVEL   FAT_LOG_LEVEL
+#define LOG_FORMAT  FAT_LOG_FORMAT
+#include <cfg/log.h>
 
+static KBlock *devs[_DRIVES];
+
+void disk_assignDrive(KBlock *dev, int dev_num)
+{
+	ASSERT(dev_num < _DRIVES);
+	devs[dev_num] = dev;
+}
 
 
 /*-----------------------------------------------------------------------*/
@@ -23,29 +31,7 @@ DSTATUS disk_initialize (
 	BYTE drv				/* Physical drive nmuber (0..) */
 )
 {
-	DSTATUS stat;
-	int result;
-
-	switch (drv) {
-	case ATA :
-		result = ATA_disk_initialize();
-		// translate the reslut code here
-
-		return stat;
-
-	case MMC :
-		result = MMC_disk_initialize();
-		// translate the reslut code here
-
-		return stat;
-
-	case USB :
-		result = USB_disk_initialize();
-		// translate the reslut code here
-
-		return stat;
-	}
-	return STA_NOINIT;
+	return disk_status(drv);
 }
 
 
@@ -57,29 +43,13 @@ DSTATUS disk_status (
 	BYTE drv		/* Physical drive nmuber (0..) */
 )
 {
-	DSTATUS stat;
-	int result;
+	KBlock *dev = devs[drv];
+	ASSERT(dev);
 
-	switch (drv) {
-	case ATA :
-		result = ATA_disk_status();
-		// translate the reslut code here
-
-		return stat;
-
-	case MMC :
-		result = MMC_disk_status();
-		// translate the reslut code here
-
-		return stat;
-
-	case USB :
-		result = USB_disk_status();
-		// translate the reslut code here
-
-		return stat;
-	}
-	return STA_NOINIT;
+	if (kblock_error(dev) != 0)
+		return STA_NOINIT;
+	else
+		return RES_OK;
 }
 
 
@@ -94,29 +64,17 @@ DRESULT disk_read (
 	BYTE count		/* Number of sectors to read (1..255) */
 )
 {
-	DRESULT res;
-	int result;
+	KBlock *dev = devs[drv];
+	ASSERT(dev);
 
-	switch (drv) {
-	case ATA :
-		result = ATA_disk_read(buff, sector, count);
-		// translate the reslut code here
 
-		return res;
-
-	case MMC :
-		result = MMC_disk_read(buff, sector, count);
-		// translate the reslut code here
-
-		return res;
-
-	case USB :
-		result = USB_disk_read(buff, sector, count);
-		// translate the reslut code here
-
-		return res;
+	while (count--)
+	{
+		if (kblock_read(dev, sector++, buff, 0, dev->blk_size) != dev->blk_size)
+			return RES_ERROR;
+		buff += dev->blk_size;
 	}
-	return RES_PARERR;
+	return RES_OK;
 }
 
 
@@ -132,29 +90,16 @@ DRESULT disk_write (
 	BYTE count			/* Number of sectors to write (1..255) */
 )
 {
-	DRESULT res;
-	int result;
+	KBlock *dev = devs[drv];
+	ASSERT(dev);
 
-	switch (drv) {
-	case ATA :
-		result = ATA_disk_write(buff, sector, count);
-		// translate the reslut code here
-
-		return res;
-
-	case MMC :
-		result = MMC_disk_write(buff, sector, count);
-		// translate the reslut code here
-
-		return res;
-
-	case USB :
-		result = USB_disk_write(buff, sector, count);
-		// translate the reslut code here
-
-		return res;
+	while (count--)
+	{
+		if (kblock_write(dev, sector++, buff, 0, dev->blk_size) != dev->blk_size)
+			return RES_ERROR;
+		buff += dev->blk_size;
 	}
-	return RES_PARERR;
+	return RES_OK;
 }
 #endif /* _READONLY */
 
@@ -169,34 +114,40 @@ DRESULT disk_ioctl (
 	void *buff		/* Buffer to send/receive control data */
 )
 {
-	DRESULT res;
-	int result;
+	KBlock *dev = devs[drv];
+	ASSERT(dev);
 
-	switch (drv) {
-	case ATA :
-		// pre-process here
 
-		result = ATA_disk_ioctl(ctrl, buff);
-		// post-process here
+	switch (ctrl)
+	{
+		case CTRL_SYNC:
+			if (kblock_flush(dev) == 0)
+				return RES_OK;
+			else
+				return RES_ERROR;
 
-		return res;
+		case GET_SECTOR_SIZE:
+			*(WORD *)buff = dev->blk_size;
+			return RES_OK;
 
-	case MMC :
-		// pre-process here
+		case GET_SECTOR_COUNT:
+			*(DWORD *)buff = dev->blk_cnt;
+			return RES_OK;
 
-		result = MMC_disk_ioctl(ctrl, buff);
-		// post-process here
+		case GET_BLOCK_SIZE:
+			*(DWORD *)buff = 1;
+			return RES_OK;
 
-		return res;
-
-	case USB :
-		// pre-process here
-
-		result = USB_disk_ioctl(ctrl, buff);
-		// post-process here
-
-		return res;
+		default:
+			LOG_ERR("unknown command: [%d]\n", ctrl);
+			return RES_PARERR;
 	}
-	return RES_PARERR;
 }
+
+
+DWORD get_fattime(void)
+{
+	return 0;
+}
+
 

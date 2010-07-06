@@ -8,6 +8,7 @@
 #define _USE_IOCTL	1
 
 #include "integer.h"
+#include <io/kblock.h>
 
 
 /* Status of Disk Functions */
@@ -25,7 +26,7 @@ typedef enum {
 
 /*---------------------------------------*/
 /* Prototypes for disk control functions */
-
+void disk_assignDrive(KBlock *dev, int dev_num);
 BOOL assign_drives (int argc, char *argv[]);
 DSTATUS disk_initialize (BYTE);
 DSTATUS disk_status (BYTE);
@@ -34,6 +35,7 @@ DRESULT disk_read (BYTE, BYTE*, DWORD, BYTE);
 DRESULT disk_write (BYTE, const BYTE*, DWORD, BYTE);
 #endif
 DRESULT disk_ioctl (BYTE, BYTE, void*);
+
 
 
 
