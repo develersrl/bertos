@@ -239,7 +239,16 @@
 /* I2C CCR mask */
 #define CCR_CCR_SET             ((uint16_t)0x0FFF)
 
+
+/* I2C CR1 */
+#define CR1_POS                                 11
+
 /* I2C Status */
+#define SR1_PECERR                              12
+#define SR1_OVR                                 11
+#define SR1_AF                                  10
+#define SR1_ARLO                                 9
+#define SR1_BERR                                 8
 #define SR1_TXE                                  7
 #define SR1_RXE                                  6
 #define SR1_ADDR                                 1
@@ -250,6 +259,12 @@
 #define SR2_BUSY                                 1
 #define SR2_MSL                                  0
 
+
+#define SR1_ERR_MASK        (BV(SR1_PECERR) | \
+							 BV(SR1_OVR)    | \
+							 BV(SR1_AF)     | \
+							 BV(SR1_ARLO)   | \
+							 BV(SR1_BERR))
 
 
 
