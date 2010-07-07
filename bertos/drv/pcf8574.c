@@ -56,8 +56,13 @@ int pcf8574_get(Pcf8574 *pcf)
 	if (!i2c_start_r(PCF8574ID | ((pcf->addr << 1) & 0xF7)))
 		return EOF;
 
-	int data = i2c_get(false);
+	int data; 
+	
+	if (!i2c_recv(&data, 1))
+		data = EOF;
+		
 	i2c_stop();
+	
 	return data;
 }
 
