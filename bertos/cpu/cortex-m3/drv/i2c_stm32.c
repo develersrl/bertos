@@ -49,6 +49,7 @@
 #include <drv/irq_cm3.h>
 #include <drv/clock_stm32.h>
 #include <drv/i2c.h>
+#include <drv/timer.h>
 
 #include <io/stm32.h>
 
@@ -66,11 +67,28 @@ INLINE uint32_t get_status(struct stm32_i2c *base)
  */
 static bool i2c_builtin_start(void)
 {
+
 	i2c->CR1 |= CR1_ACK_SET;
+	i2c->CR1 |= BV(CR1_POS);
+
 	i2c->CR1 |= CR1_PE_SET;
 	i2c->CR1 |= CR1_START_SET;
-	
-	while (get_status(i2c) != I2C_EVENT_MASTER_MODE_SELECT);
+
+	while (true)
+	{
+		uint32_t stat = get_status(i2c);
+
+		if (stat == I2C_EVENT_MASTER_MODE_SELECT)
+			break;
+
+		if (stat & SR1_ERR_MASK)
+		{
+			LOG_ERR("s_error[%08lx]\n", stat & SR1_ERR_MASK);
+			i2c->SR1 &= ~SR1_ERR_MASK;
+			return false;
+		}
+
+	}
 
 	return true;
 }
@@ -85,14 +103,46 @@ static bool i2c_builtin_start(void)
  */
 bool i2c_builtin_start_w(uint8_t id)
 {
-	id &= OAR1_ADD0_RESET;
 
-	i2c_builtin_start();
+	/*
+	 * Loop on the select write sequence: when the eeprom is busy
+	 * writing previously sent data it will reply to the SLA_W
+	 * control byte with a NACK.  In this case, we must
+	 * keep trying until the eeprom responds with an ACK.
+	 */
+	ticks_t start = timer_clock();
+	while (i2c_builtin_start())
+	{
+		i2c->DR = id & OAR1_ADD0_RESET;
 
-	i2c->DR = id;
-	while (get_status(i2c) != I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED);
-	
-	return true;
+		while (true)
+		{
+			uint32_t stat = get_status(i2c);
+			//LOG_ERR("[%08lx]\n", stat);
+
+			if (stat == I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)
+				return true;
+
+			if (stat & SR1_ERR_MASK)
+			{
+				LOG_ERR("w_error[%08lx]\n", stat & SR1_ERR_MASK);
+				i2c->SR1 &= ~SR1_ERR_MASK;
+
+				i2c->CR1 |= CR1_START_SET;
+				//i2c->CR1 &= CR1_PE_RESET;
+
+				break;
+			}
+		}
+
+		if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT))
+		{
+			LOG_ERR("Timeout on I2C_START\n");
+			break;
+		}
+	}
+
+	return false;
 }
 
 
@@ -106,11 +156,24 @@ bool i2c_builtin_start_w(uint8_t id)
 bool i2c_builtin_start_r(uint8_t id)
 {
 	id |=  OAR1_ADD0_SET;
-
 	i2c_builtin_start();
 
 	i2c->DR = id;
-	while (get_status(i2c) != I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED);
+
+	while (true)
+	{
+		uint32_t stat = get_status(i2c);
+
+		if (stat == I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED)
+			break;
+
+		if (stat & SR1_ERR_MASK)
+		{
+			LOG_ERR("r_error[%08lx]\n", stat & SR1_ERR_MASK);
+			i2c->SR1 &= ~SR1_ERR_MASK;
+			return false;
+		}
+	}
 
 	return true;
 }
@@ -126,35 +189,172 @@ void i2c_builtin_stop(void)
 }
 
 
-/**
- * Put a single byte in master transmitter mode
- * to the selected slave device through the TWI bus.
- *
- * \return true on success, false on error.
- */
+
 bool i2c_builtin_put(const uint8_t data)
 {
-	i2c->DR = data;
-	while (get_status(i2c) != I2C_EVENT_MASTER_BYTE_TRANSMITTED);
 
 	return true;
 }
 
-/**
- * Get 1 byte from slave in master transmitter mode
- * to the selected slave device through the TWI bus.
- * If \a ack is true issue a ACK after getting the byte,
- * otherwise a NACK is issued.
- *
- * \return the byte read if ok, EOF on errors.
- */
 int i2c_builtin_get(bool ack)
 {
-	while (get_status(i2c) != I2C_EVENT_MASTER_BYTE_RECEIVED);
 
-	return i2c->DR;
+	return 0;
 }
 
+bool i2c_send(const void *_buf, size_t count)
+{
+	const uint8_t *buf = (const uint8_t *)_buf;
+
+	i2c->DR = *buf++;
+	count--;
+
+
+	while (count)
+	{
+		ASSERT(buf);
+		while( !(i2c->SR1 & BV(SR1_BTF)) );
+
+		i2c->DR = *buf++;
+		count--;
+
+    }
+
+	while (true)
+	{
+		uint32_t stat = get_status(i2c);
+
+		if (stat == I2C_EVENT_MASTER_BYTE_TRANSMITTED)
+			break;
+
+		if (stat & SR1_ERR_MASK)
+		{
+			LOG_ERR("r_error[%08lx]\n", stat & SR1_ERR_MASK);
+			i2c->SR1 &= ~SR1_ERR_MASK;
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+bool i2c_recv(void *_buf, size_t count)
+{
+	uint8_t *buf = (uint8_t *)_buf;
+
+	while (count)
+	{
+		if (count == 1)
+		{
+			i2c->CR1 &= ~BV(CR1_POS);
+
+			while (true)
+			{
+				uint32_t stat = get_status(i2c);
+
+				if (stat == I2C_EVENT_MASTER_BYTE_RECEIVED)
+					break;
+
+				if (stat & SR1_ERR_MASK)
+				{
+					LOG_ERR("r_error[%08lx]\n", stat & SR1_ERR_MASK);
+					i2c->SR1 &= ~SR1_ERR_MASK;
+					return false;
+				}
+			}
+
+			i2c->CR1 &= CR1_ACK_RESET;
+
+			*buf++ = i2c->DR;
+			count = 0;
+		}
+		else if (count == 2)
+		{
+			i2c->CR1 &= CR1_ACK_RESET;
+
+
+			while (true)
+			{
+
+				if (i2c->SR1 & BV(SR1_BTF))
+					break;
+
+				uint32_t stat = get_status(i2c);
+				if (stat & SR1_ERR_MASK)
+				{
+					LOG_ERR("r1_error[%08lx]\n", stat & SR1_ERR_MASK);
+					i2c->SR1 &= ~SR1_ERR_MASK;
+					return false;
+				}
+			}
+
+			i2c->CR1 |= CR1_STOP_SET;
+
+			*buf++ = i2c->DR;
+			*buf++ = i2c->DR;
+			count = 0;
+
+			i2c->CR1 &= ~BV(CR1_POS);
+
+		}
+		else if (count == 3)
+		{
+			i2c->CR1 &= ~BV(CR1_POS);
+
+			while (true)
+			{
+
+				if (i2c->SR1 & BV(SR1_BTF))
+					break;
+
+				uint32_t stat = get_status(i2c);
+				if (stat & SR1_ERR_MASK)
+				{
+					LOG_ERR("r2_error[%08lx]\n", stat & SR1_ERR_MASK);
+					i2c->SR1 &= ~SR1_ERR_MASK;
+					return false;
+				}
+			}
+
+			i2c->CR1 &= CR1_ACK_RESET;
+			*buf++ = i2c->DR;
+
+			i2c->CR1 |= CR1_STOP_SET;
+
+			*buf++ = i2c->DR;
+
+			while (true)
+			{
+
+				if (i2c->SR1 & BV(SR1_RXE))
+					break;
+
+				uint32_t stat = get_status(i2c);
+				if (stat & SR1_ERR_MASK)
+				{
+					LOG_ERR("r3_error[%08lx]\n", stat & SR1_ERR_MASK);
+					i2c->SR1 &= ~SR1_ERR_MASK;
+					return false;
+				}
+			}
+
+			*buf++ = i2c->DR;
+
+			count = 0;
+		}
+		else
+		{
+			i2c->CR1 &= ~BV(CR1_POS);
+
+			while( !(i2c->SR1 & BV(SR1_BTF)) );
+			*buf++ = i2c->DR;
+			count--;
+		}
+	}
+
+	return true;
+}
 
 MOD_DEFINE(i2c);
 
