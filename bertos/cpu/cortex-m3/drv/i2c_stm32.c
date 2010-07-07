@@ -55,9 +55,37 @@
 
 struct stm32_i2c *i2c = (struct stm32_i2c *)I2C1_BASE;
 
+
+#define WAIT_BTF(base)        while( !(base->SR1 & BV(SR1_BTF)) )
+#define WAIT_RXE(base)        while( !(base->SR1 & BV(SR1_RXE)) )
+
 INLINE uint32_t get_status(struct stm32_i2c *base)
 {
 	return ((base->SR1 | (base->SR2 << 16)) & 0x00FFFFFF);
+}
+
+
+INLINE bool check_i2cStatus(uint32_t event)
+{
+	while (true)
+	{
+		uint32_t stat = get_status(i2c);
+
+		if (stat == event)
+			break;
+
+		if (stat & SR1_ERR_MASK)
+		{
+			LOG_ERR("[%08lx]\n", stat & SR1_ERR_MASK);
+			i2c->SR1 &= ~SR1_ERR_MASK;
+
+			i2c->CR1 |= CR1_START_SET;
+			return false;
+		}
+
+	}
+
+	return true;
 }
 
 /**
@@ -68,29 +96,14 @@ INLINE uint32_t get_status(struct stm32_i2c *base)
 static bool i2c_builtin_start(void)
 {
 
-	i2c->CR1 |= CR1_ACK_SET;
-	i2c->CR1 |= BV(CR1_POS);
+	i2c->CR1 |= (CR1_ACK_SET | BV(CR1_POS) | CR1_PE_SET);
 
-	i2c->CR1 |= CR1_PE_SET;
 	i2c->CR1 |= CR1_START_SET;
 
-	while (true)
-	{
-		uint32_t stat = get_status(i2c);
+	if(check_i2cStatus(I2C_EVENT_MASTER_MODE_SELECT))
+		return true;
 
-		if (stat == I2C_EVENT_MASTER_MODE_SELECT)
-			break;
-
-		if (stat & SR1_ERR_MASK)
-		{
-			LOG_ERR("s_error[%08lx]\n", stat & SR1_ERR_MASK);
-			i2c->SR1 &= ~SR1_ERR_MASK;
-			return false;
-		}
-
-	}
-
-	return true;
+	return false;
 }
 
 
@@ -115,25 +128,8 @@ bool i2c_builtin_start_w(uint8_t id)
 	{
 		i2c->DR = id & OAR1_ADD0_RESET;
 
-		while (true)
-		{
-			uint32_t stat = get_status(i2c);
-			//LOG_ERR("[%08lx]\n", stat);
-
-			if (stat == I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)
-				return true;
-
-			if (stat & SR1_ERR_MASK)
-			{
-				LOG_ERR("w_error[%08lx]\n", stat & SR1_ERR_MASK);
-				i2c->SR1 &= ~SR1_ERR_MASK;
-
-				i2c->CR1 |= CR1_START_SET;
-				//i2c->CR1 &= CR1_PE_RESET;
-
-				break;
-			}
-		}
+		if(check_i2cStatus(I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED))
+			return true;
 
 		if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT))
 		{
@@ -155,27 +151,14 @@ bool i2c_builtin_start_w(uint8_t id)
  */
 bool i2c_builtin_start_r(uint8_t id)
 {
-	id |=  OAR1_ADD0_SET;
 	i2c_builtin_start();
 
-	i2c->DR = id;
+	i2c->DR = (id | OAR1_ADD0_SET);
 
-	while (true)
-	{
-		uint32_t stat = get_status(i2c);
+	if(check_i2cStatus(I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED))
+		return true;
 
-		if (stat == I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED)
-			break;
-
-		if (stat & SR1_ERR_MASK)
-		{
-			LOG_ERR("r_error[%08lx]\n", stat & SR1_ERR_MASK);
-			i2c->SR1 &= ~SR1_ERR_MASK;
-			return false;
-		}
-	}
-
-	return true;
+	return false;
 }
 
 
@@ -192,7 +175,6 @@ void i2c_builtin_stop(void)
 
 bool i2c_builtin_put(const uint8_t data)
 {
-
 	return true;
 }
 
@@ -213,32 +195,24 @@ bool i2c_send(const void *_buf, size_t count)
 	while (count)
 	{
 		ASSERT(buf);
-		while( !(i2c->SR1 & BV(SR1_BTF)) );
+		WAIT_BTF(i2c);
 
 		i2c->DR = *buf++;
 		count--;
 
     }
 
-	while (true)
-	{
-		uint32_t stat = get_status(i2c);
+	if(check_i2cStatus(I2C_EVENT_MASTER_BYTE_TRANSMITTED))
+		return true;
 
-		if (stat == I2C_EVENT_MASTER_BYTE_TRANSMITTED)
-			break;
-
-		if (stat & SR1_ERR_MASK)
-		{
-			LOG_ERR("r_error[%08lx]\n", stat & SR1_ERR_MASK);
-			i2c->SR1 &= ~SR1_ERR_MASK;
-			return false;
-		}
-	}
-
-	return true;
+	return false;
 }
 
-
+/**
+ * In order to read bytes from the i2c we should make some tricks.
+ * This because the silicon manage automatically the NACK on last byte, so to read
+ * one, two or three byte we should manage separately these cases.
+ */
 bool i2c_recv(void *_buf, size_t count)
 {
 	uint8_t *buf = (uint8_t *)_buf;
@@ -249,20 +223,8 @@ bool i2c_recv(void *_buf, size_t count)
 		{
 			i2c->CR1 &= ~BV(CR1_POS);
 
-			while (true)
-			{
-				uint32_t stat = get_status(i2c);
-
-				if (stat == I2C_EVENT_MASTER_BYTE_RECEIVED)
-					break;
-
-				if (stat & SR1_ERR_MASK)
-				{
-					LOG_ERR("r_error[%08lx]\n", stat & SR1_ERR_MASK);
-					i2c->SR1 &= ~SR1_ERR_MASK;
-					return false;
-				}
-			}
+			if(!check_i2cStatus(I2C_EVENT_MASTER_BYTE_RECEIVED))
+				return false;
 
 			i2c->CR1 &= CR1_ACK_RESET;
 
@@ -273,26 +235,13 @@ bool i2c_recv(void *_buf, size_t count)
 		{
 			i2c->CR1 &= CR1_ACK_RESET;
 
-
-			while (true)
-			{
-
-				if (i2c->SR1 & BV(SR1_BTF))
-					break;
-
-				uint32_t stat = get_status(i2c);
-				if (stat & SR1_ERR_MASK)
-				{
-					LOG_ERR("r1_error[%08lx]\n", stat & SR1_ERR_MASK);
-					i2c->SR1 &= ~SR1_ERR_MASK;
-					return false;
-				}
-			}
+			WAIT_BTF(i2c);
 
 			i2c->CR1 |= CR1_STOP_SET;
 
 			*buf++ = i2c->DR;
 			*buf++ = i2c->DR;
+
 			count = 0;
 
 			i2c->CR1 &= ~BV(CR1_POS);
@@ -302,42 +251,17 @@ bool i2c_recv(void *_buf, size_t count)
 		{
 			i2c->CR1 &= ~BV(CR1_POS);
 
-			while (true)
-			{
-
-				if (i2c->SR1 & BV(SR1_BTF))
-					break;
-
-				uint32_t stat = get_status(i2c);
-				if (stat & SR1_ERR_MASK)
-				{
-					LOG_ERR("r2_error[%08lx]\n", stat & SR1_ERR_MASK);
-					i2c->SR1 &= ~SR1_ERR_MASK;
-					return false;
-				}
-			}
+			WAIT_BTF(i2c);
 
 			i2c->CR1 &= CR1_ACK_RESET;
+
 			*buf++ = i2c->DR;
 
 			i2c->CR1 |= CR1_STOP_SET;
 
 			*buf++ = i2c->DR;
 
-			while (true)
-			{
-
-				if (i2c->SR1 & BV(SR1_RXE))
-					break;
-
-				uint32_t stat = get_status(i2c);
-				if (stat & SR1_ERR_MASK)
-				{
-					LOG_ERR("r3_error[%08lx]\n", stat & SR1_ERR_MASK);
-					i2c->SR1 &= ~SR1_ERR_MASK;
-					return false;
-				}
-			}
+			WAIT_RXE(i2c);
 
 			*buf++ = i2c->DR;
 
@@ -347,8 +271,10 @@ bool i2c_recv(void *_buf, size_t count)
 		{
 			i2c->CR1 &= ~BV(CR1_POS);
 
-			while( !(i2c->SR1 & BV(SR1_BTF)) );
+			WAIT_BTF(i2c);
+
 			*buf++ = i2c->DR;
+
 			count--;
 		}
 	}
@@ -368,18 +294,22 @@ void i2c_builtin_init(void)
 	RCC->APB2ENR |= RCC_APB2_GPIOB;
 	RCC->APB1ENR |= RCC_APB1_I2C1;
 
+	/* Set gpio to use I2C driver */
 	stm32_gpioPinConfig((struct stm32_gpio *)GPIOB_BASE, GPIO_I2C1_SCL_PIN,
 				GPIO_MODE_AF_OD, GPIO_SPEED_50MHZ);
 
 	stm32_gpioPinConfig((struct stm32_gpio *)GPIOB_BASE, GPIO_I2C1_SDA_PIN,
 				GPIO_MODE_AF_OD, GPIO_SPEED_50MHZ);
 
+
+	/* Clear all needed registers */
 	i2c->CR1 = 0;
 	i2c->CR2 = 0;
 	i2c->CCR = 0;
 	i2c->TRISE = 0;
 	i2c->OAR1 = 0;
 
+	/* Set PCLK1 frequency accornding to the master clock settings. See stm32_clock.c */
 	i2c->CR2 |= CR2_FREQ_36MHZ;
 
 	/* Configure spi in standard mode */
