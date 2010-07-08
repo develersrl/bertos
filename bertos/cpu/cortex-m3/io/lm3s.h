@@ -49,6 +49,7 @@
 	#include "lm3s_memmap.h"
 	#include "lm3s_uart.h"
 	#include "lm3s_ssi.h"
+	#include "lm3s_i2c.h"
 #else
 	#error Missing I/O definitions for CPU.
 #endif
