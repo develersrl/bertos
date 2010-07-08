@@ -65,8 +65,10 @@ bool sd_initUnbuf(Sd *sd, KFile *ch);
 bool sd_initBuf(Sd *sd, KFile *ch);
 
 #if CONFIG_SD_OLD_INIT
-	#warning "Deprecated: this API will be removed in the next major release,"
-	#warning "please disable CONFIG_SD_OLD_INIT and pass explicitly the SD context to sd_init()."
+	#if !(ARCH & ARCH_NIGHTTEST)
+		#warning "Deprecated: this API will be removed in the next major release,"
+		#warning "please disable CONFIG_SD_OLD_INIT and pass explicitly the SD context to sd_init()."
+	#endif
 
 	/**
 	 * Initializes the SD driver.
