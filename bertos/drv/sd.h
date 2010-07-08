@@ -80,6 +80,8 @@ bool sd_initBuf(Sd *sd, KFile *ch);
 	 *
 	 * \note This API is deprecated, disable CONFIG_SD_OLD_INIT and
 	 *       use the new one instead.
+	 *
+	 * \see CONFIG_SD_OLD_INIT.
 	 */
 	#define sd_init(ch) {static struct Sd sd; sd_initUnbuf(&sd, (ch));}
 
