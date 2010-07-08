@@ -102,6 +102,7 @@ bool sd_initBuf(Sd *sd, KFile *ch);
 #define KBT_SD MAKE_ID('S', 'D', 'B', 'K')
 
 bool sd_test(Sd *sd);
+void sd_writeTest(Sd *sd);
 
 INLINE Sd *SD_CAST(KBlock *b)
 {
