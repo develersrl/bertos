@@ -51,43 +51,6 @@
 
 #include <string.h> /* memset */
 
-static uint8_t tx_fifo_buffer[CONFIG_SPI_DMA_TXBUFSIZE];
-static FIFOBuffer tx_fifo;
-static KFileFifo kfifo;
-
-
-INLINE void spi_dma_startTx(void)
-{
-	if (fifo_isempty(&tx_fifo))
-		return;
-
-	if (SPI0_SR & BV(SPI_TXBUFE))
-	{
-		SPI0_PTCR = BV(PDC_TXTDIS);
-		SPI0_TPR = (reg32_t)tx_fifo.head;
-		if (tx_fifo.head < tx_fifo.tail)
-			SPI0_TCR = tx_fifo.tail - tx_fifo.head;
-		else
-			SPI0_TCR = tx_fifo.end - tx_fifo.head + 1;
-
-		SPI0_PTCR = BV(PDC_TXTEN);
-	}
-}
-
-static DECLARE_ISR(spi0_dma_write_irq_handler)
-{
-	SPI_DMA_STROBE_ON();
-	/* Pop sent chars from FIFO */
-	tx_fifo.head = (uint8_t *)SPI0_TPR;
-	if (tx_fifo.head > tx_fifo.end)
-		tx_fifo.head = tx_fifo.begin;
-
-	spi_dma_startTx();
-
-	AIC_EOICR = 0;
-	SPI_DMA_STROBE_OFF();
-}
-
 
 void spi_dma_setclock(uint32_t rate)
 {
@@ -97,41 +60,11 @@ void spi_dma_setclock(uint32_t rate)
 	SPI0_CSR0 |= DIV_ROUND(CPU_FREQ, rate) << SPI_SCBR_SHIFT;
 }
 
-static size_t spi_dma_write(UNUSED_ARG(struct KFile *, fd), const void *_buf, size_t size)
-{
-	size_t count, total_wr = 0;
-	const uint8_t *buf = (const uint8_t *) _buf;
-
- 	// copy buffer to internal fifo
-	while (size)
-	{
-		#if CONFIG_SPI_DMA_TX_TIMEOUT != -1
-			ticks_t start = timer_clock();
-			while (fifo_isfull(&tx_fifo) && (timer_clock() - start < ms_to_ticks(CONFIG_SPI_DMA_TX_TIMEOUT)))
-				cpu_relax();
-
-			if (fifo_isfull(&tx_fifo))
-				break;
-		#else
-			while (fifo_isfull(&tx_fifo))
-				cpu_relax();
-		#endif /* CONFIG_SPI_DMA_TX_TIMEOUT */
-
-		// FIXME: improve copy performance
-		count = kfile_write(&kfifo.fd, buf, size);
-		size -= count;
-		buf += count;
-		total_wr += count;
-		spi_dma_startTx();
-	}
-
-	return total_wr;
-}
 
 static int spi_dma_flush(UNUSED_ARG(struct KFile *, fd))
 {
-	/* Wait FIFO flush */
-	while (!fifo_isempty(&tx_fifo))
+	/* Wait for DMA to finish */
+	while (!(SPI0_SR & BV(SPI_TXBUFE)))
 		cpu_relax();
 
 	/* Wait until last bit has been shifted out */
@@ -141,11 +74,16 @@ static int spi_dma_flush(UNUSED_ARG(struct KFile *, fd))
 	return 0;
 }
 
-static DECLARE_ISR(spi0_dma_read_irq_handler)
+static size_t spi_dma_write(struct KFile *fd, const void *_buf, size_t size)
 {
-	/* do nothing */
-	AIC_EOICR = 0;
+	spi_dma_flush(fd);
+	SPI0_PTCR = BV(PDC_TXTDIS);
+	SPI0_TPR = (reg32_t)_buf;
+	SPI0_TCR = size;
+	SPI0_PTCR = BV(PDC_TXTEN);
+	return size;
 }
+
 
 /*
  * Dummy buffer used to transmit 0xff chars while receiving data.
@@ -160,9 +98,6 @@ static size_t spi_dma_read(struct KFile *fd, void *_buf, size_t size)
 	uint8_t *buf = (uint8_t *)_buf;
 
 	spi_dma_flush(fd);
-
-	/* Dummy irq handler that do nothing */
-	AIC_SVR(SPI0_ID) = spi0_dma_read_irq_handler;
 
 	while (size)
 	{
@@ -190,9 +125,6 @@ static size_t spi_dma_read(struct KFile *fd, void *_buf, size_t size)
 		buf += count;
 	}
 	SPI0_PTCR = BV(PDC_RXTDIS) | BV(PDC_TXTDIS);
-
-	/* set write irq handler back in place */
-	AIC_SVR(SPI0_ID) = spi0_dma_write_irq_handler;
 
 	return total_rx;
 }
@@ -222,16 +154,8 @@ void spi_dma_init(SpiDmaAt91 *spi)
 
 	/* Disable all irqs */
 	SPI0_IDR = 0xFFFFFFFF;
-	/* Set the vector. */
-	AIC_SVR(SPI0_ID) = spi0_dma_write_irq_handler;
-	/* Initialize to edge triggered with defined priority. */
-	AIC_SMR(SPI0_ID) = AIC_SRCTYPE_INT_EDGE_TRIGGERED | SPI_DMA_IRQ_PRIORITY;
-	/* Enable the USART IRQ */
-	AIC_IECR = BV(SPI0_ID);
+	/* Enable SPI clock. */
 	PMC_PCER = BV(SPI0_ID);
-
-	/* Enable interrupt on tx buffer empty */
-	SPI0_IER = BV(SPI_ENDTX);
 
 	/* Enable SPI */
 	SPI0_CR = BV(SPI_SPIEN);
@@ -240,9 +164,6 @@ void spi_dma_init(SpiDmaAt91 *spi)
 	spi->fd.write = spi_dma_write;
 	spi->fd.read = spi_dma_read;
 	spi->fd.flush = spi_dma_flush;
-
-	fifo_init(&tx_fifo, tx_fifo_buffer, sizeof(tx_fifo_buffer));
-	kfilefifo_init(&kfifo, &tx_fifo);
 
 	SPI_DMA_STROBE_INIT();
 }
