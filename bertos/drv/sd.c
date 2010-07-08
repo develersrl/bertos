@@ -243,10 +243,14 @@ static size_t sd_readDirect(struct KBlock *b, block_idx_t idx, void *buf, size_t
 	Sd *sd = SD_CAST(b);
 	LOG_INFO("reading from block %ld, offset %d, size %d\n", idx, offset, size);
 
-	if ((sd->r1 = sd_setBlockLen(sd, size)))
+	if (sd->tranfer_len != size)
 	{
-		LOG_ERR("setBlockLen failed: %04X\n", sd->r1);
-		return 0;
+		if ((sd->r1 = sd_setBlockLen(sd, size)))
+		{
+			LOG_ERR("setBlockLen failed: %04X\n", sd->r1);
+			return 0;
+		}
+		sd->tranfer_len = size;
 	}
 
 	SD_SELECT(sd);
@@ -280,10 +284,14 @@ static int sd_writeBlock(KBlock *b, block_idx_t idx, const void *buf)
 	KFile *fd = sd->ch;
 
 	LOG_INFO("writing block %ld\n", idx);
-	if ((sd->r1 = sd_setBlockLen(sd, SD_DEFAULT_BLOCKLEN)))
+	if (sd->tranfer_len != SD_DEFAULT_BLOCKLEN)
 	{
-		LOG_ERR("setBlockLen failed: %04X\n", sd->r1);
-		return sd->r1;
+		if ((sd->r1 = sd_setBlockLen(sd, SD_DEFAULT_BLOCKLEN)))
+		{
+			LOG_ERR("setBlockLen failed: %04X\n", sd->r1);
+			return sd->r1;
+		}
+		sd->tranfer_len = SD_DEFAULT_BLOCKLEN;
 	}
 
 	SD_SELECT(sd);
@@ -461,6 +469,7 @@ static bool sd_blockInit(Sd *sd, KFile *ch)
 	}
 
 	sd->r1 = sd_setBlockLen(sd, SD_DEFAULT_BLOCKLEN);
+	sd->tranfer_len = SD_DEFAULT_BLOCKLEN;
 
 	if (sd->r1)
 	{

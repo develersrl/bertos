@@ -31,13 +31,11 @@
  *
  * \brief Function library for secure digital memory.
  *
- * Right now, the interface for these function is the one defined in diskio.h from
- * the FatFS module.
  *
  * \author Francesco Sacchi <batt@develer.com>
  *
  * $WIZ$ module_name = "sd"
- * $WIZ$ module_depends = "kfile", "timer"
+ * $WIZ$ module_depends = "kfile", "timer", "kblock"
  * $WIZ$ module_hw = "bertos/hw/hw_sd.h"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_sd.h"
  */
@@ -53,12 +51,15 @@
 
 #include "cfg/cfg_sd.h"
 
-
+/**
+ * SD Card context structure.
+ */
 typedef struct Sd
 {
-	KBlock b;
+	KBlock b;   ///< KBlock base class
 	KFile *ch;  ///< SPI communication channel
-	uint16_t r1;
+	uint16_t r1;  ///< Last status data received from SD
+	uint16_t tranfer_len; ///< Lenght for the read/write commands, cached in order to increase speed.
 } Sd;
 
 bool sd_initUnbuf(Sd *sd, KFile *ch);
