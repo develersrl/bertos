@@ -119,6 +119,9 @@ int kblock_flush(struct KBlock *b)
 {
 	ASSERT(b);
 
+	if (!kblock_buffered(b))
+		return 0;
+
 	if (kblock_cacheDirty(b))
 	{
 		LOG_INFO("flushing block %d\n", b->priv.curr_blk);
@@ -155,7 +158,7 @@ size_t kblock_write(struct KBlock *b, block_idx_t idx, const void *buf, size_t o
 	ASSERT(offset + size <= b->blk_size);
 
 	LOG_INFO("blk_idx %d, offset %d, size %d\n", idx, offset, size);
-	
+
 	if (kblock_buffered(b))
 	{
 		if (!kblock_loadPage(b, idx))
@@ -172,17 +175,17 @@ size_t kblock_write(struct KBlock *b, block_idx_t idx, const void *buf, size_t o
 	}
 }
 
-int kblock_copy(struct KBlock *b, block_idx_t idx1, block_idx_t idx2)
+int kblock_copy(struct KBlock *b, block_idx_t src, block_idx_t dest)
 {
 	ASSERT(b);
-	ASSERT(idx1 < b->blk_cnt);
-	ASSERT(idx2 < b->blk_cnt);
+	ASSERT(src < b->blk_cnt);
+	ASSERT(dest < b->blk_cnt);
 	ASSERT(kblock_buffered(b));
 
-	if (!kblock_loadPage(b, idx1))
+	if (!kblock_loadPage(b, src))
 		return EOF;
 
-	b->priv.curr_blk = idx2;
+	b->priv.curr_blk = dest;
 	kblock_setDirty(b, true);
 	return 0;
 }
@@ -201,7 +204,7 @@ size_t kblock_swReadBuf(struct KBlock *b, void *buf, size_t offset, size_t size)
 {
 	ASSERT(buf);
 	ASSERT(offset + size <= b->blk_size);
-	
+
 	memcpy(buf, (uint8_t *)b->priv.buf + offset, size);
 	return size;
 }
