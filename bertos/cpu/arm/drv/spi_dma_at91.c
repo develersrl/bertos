@@ -92,7 +92,7 @@ static size_t spi_dma_write(struct KFile *fd, const void *_buf, size_t size)
  */
 static const uint8_t tx_dummy_buf[CONFIG_SPI_DMA_MAX_RX] = { [0 ... (CONFIG_SPI_DMA_MAX_RX - 1)] = 0xFF };
 
-static size_t spi_dma_read(struct KFile *fd, void *_buf, size_t size)
+static size_t spi_dma_read(UNUSED_ARG(struct KFile *, fd), void *_buf, size_t size)
 {
 	size_t count, total_rx = 0;
 	uint8_t *buf = (uint8_t *)_buf;
