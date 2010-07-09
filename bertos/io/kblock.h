@@ -49,10 +49,11 @@ typedef uint32_t block_idx_t;
 struct KBlock;
 
 /**
- * \name Prototypes for KBlock access functions.
+ * \name Prototypes for KBlock low level access functions.
  *
- * A KBlock user can choose which function subset to implement,
- * but has to set to NULL unimplemented features.
+ * When writing a driver implementing the KBlock interface you can choose which
+ * function subset to implement, but you have to set to NULL unimplemented
+ * features.
  *
  *  \{
  */
@@ -76,12 +77,12 @@ typedef struct KBlockVTable
 {
 	kblock_read_direct_t readDirect;
 	kblock_write_block_t writeBlock;
-	
+
 	kblock_read_t  readBuf;
 	kblock_write_t writeBuf;
 	kblock_load_t  load;
 	kblock_store_t store;
-		
+
 	kblock_error_t    error;    ///< \sa kblock_error()
 	kblock_clearerr_t clearerr; ///< \sa kblock_clearerr()
 
@@ -89,21 +90,21 @@ typedef struct KBlockVTable
 } KBlockVTable;
 
 
-#define KB_BUFFERED    BV(0)
-#define KB_CACHE_DIRTY BV(1)
+#define KB_BUFFERED    BV(0) ///< Internal flag: true if the KBlock has a buffer
+#define KB_CACHE_DIRTY BV(1) ///< Internal flag: true if the cache is dirty
 
 /**
  * KBlock private members.
- * These are the private members of the KBlock class, please do not
+ * These are the private members of the KBlock interface, please do not
  * access these directly, use the KBlock API.
  */
 typedef struct KBlockPriv
 {
 	DB(id_t type);         ///< Used to keep track, at runtime, of the class type.
 	int flags;             ///< Status and error flags.
-	void *buf;
-	block_idx_t blk_start; ///< Start block number when the device is trimmed. \sa kblock_trim()
-	block_idx_t curr_blk;
+	void *buf;             ///< Pointer to the page buffer for RAM-cached KBlocks.
+	block_idx_t blk_start; ///< Start block number when the device is trimmed. \sa kblock_trim().
+	block_idx_t curr_blk;  ///< Current cached block number in cached KBlocks.
 
 	const struct KBlockVTable *vt; ///< Virtual table of interface functions.
 } KBlockPriv;
@@ -151,7 +152,7 @@ typedef struct KBlock
  * \code
  * //...init KBlock device dev
  * kblock_trim(dev, 200, 1500); // Restrict access to the 200-1700 physical block range.
- * kblock_load(dev, 0);  // Load the physical block #200.
+ * kblock_read(dev, 0, buf, 0, dev->blk_size);  // Read from physical block #200.
  * kblock_trim(dev, 0, 300); // Restrict access to the 200-500 physical block range.
  * \endcode
  *
@@ -223,30 +224,127 @@ INLINE int kblock_close(struct KBlock *b)
 	return b->priv.vt->close(b);
 }
 
-INLINE bool kblock_cacheDirty(struct KBlock *b)
-{
-	ASSERT(b);
-	return (b->priv.flags & KB_CACHE_DIRTY);
-}
-
-INLINE block_idx_t kblock_cachedBlock(struct KBlock *b)
-{
-	return b->priv.curr_blk;
-}
-
+/**
+ * \return true if the device \a b is buffered, false otherwise.
+ * \param b KBlock device.
+ * \sa kblock_cachedBlock(), kblock_cacheDirty().
+ */
 INLINE bool kblock_buffered(struct KBlock *b)
 {
 	ASSERT(b);
 	return (b->priv.flags & KB_BUFFERED);
 }
 
+
+/**
+ * \return The current cached block number if the device is buffered.
+ * \param b KBlock device.
+ * \note   This function will throw an ASSERT if called on a non buffered KBlock.
+ * \sa kblock_buffered(), kblock_cacheDirty().
+ */
+INLINE block_idx_t kblock_cachedBlock(struct KBlock *b)
+{
+	ASSERT(kblock_buffered(b));
+	return b->priv.curr_blk;
+}
+
+
+/**
+ * Return the status of the internal cache.
+ *
+ * \param b KBlock device.
+ * \return If the device supports buffering, returns true if the cache is dirty,
+ *         false if the cache is clean and coherent with device content.
+ * \note   This function will throw an ASSERT if called on a non buffered KBlock.
+ * \sa kblock_cachedBlock(), kblock_buffered().
+ */
+INLINE bool kblock_cacheDirty(struct KBlock *b)
+{
+	ASSERT(kblock_buffered(b));
+	return kblock_buffered(b) && (b->priv.flags & KB_CACHE_DIRTY);
+}
+
+
+/**
+ * Read data from the block device.
+ *
+ * This function will read \a size bytes from block \a idx starting at
+ * address \a offset inside the block.
+ *
+ * Most block devices (almost all flash memories, for instance),
+ * can efficiently read even a part of the block.
+ *
+ * \note This function can be slow if you try to partial read a block from
+ *       a device which does not support partial block reads and is opened
+ *       in unbuffered mode.
+ *
+ * \param b KBlock device.
+ * \param idx the block number where you want to read.
+ * \param buf a buffer where the data will be read.
+ * \param offset the offset inside the block from which data reading will start.
+ * \param size the size of data to be read.
+ *
+ * \return the number of bytes read.
+ *
+ * \sa kblock_write().
+ */
 size_t kblock_read(struct KBlock *b, block_idx_t idx, void *buf, size_t offset, size_t size);
 
+
+/**
+ * Write data to the block device.
+ *
+ * This function will write \a size bytes to block \a idx starting at
+ * address \a offset inside the block.
+ *
+ * \note Partial block writes are supported only if the device is opened in
+ *       buffered mode. You can use kblock_buffered() to check if the device
+ *       has an internal cache or not.
+ *
+ * \note If the device is opened in buffered mode, this function will use
+ *       efficiently and trasparently the cache provided.
+ *       In order to be sure that all modifications are actually written
+ *       to the device you have to call kblock_flush().
+ *
+ * \param b KBlock device.
+ * \param idx the block number where you want to write.
+ * \param buf a pointer to the data to be written.
+ * \param offset the offset inside the block from which data writing will start.
+ * \param size the size of data to be written.
+ *
+ * \return the number of bytes written.
+ *
+ * \sa kblock_read(), kblock_flush(), kblock_buffered().
+ */
 size_t kblock_write(struct KBlock *b, block_idx_t idx, const void *buf, size_t offset, size_t size);
 
+
+/**
+ * Flush the cache (if any) to the device.
+ *
+ * This function will write any pending modifications to the device.
+ * If the device does not have a cache, this function will do nothing.
+ *
+ * \return 0 if all is OK, EOF on errors.
+ * \sa kblock_read(), kblock_write(), kblock_buffered().
+ */
 int kblock_flush(struct KBlock *b);
 
-int kblock_copy(struct KBlock *b, block_idx_t idx1, block_idx_t idx2);
+
+/**
+ * Copy one block to another.
+ *
+ * This function will copy the content of block \a src to block \a dest.
+ *
+ * \note This function is available only on devices opened in buffered mode.
+ *
+ * \param b KBlock device.
+ * \param src source block number.
+ * \param dest destination block number.
+ *
+ * \return 0 if all is OK, EOF on errors.
+ */
+int kblock_copy(struct KBlock *b, block_idx_t src, block_idx_t dest);
 
 int kblock_swLoad(struct KBlock *b, block_idx_t index);
 int kblock_swStore(struct KBlock *b, block_idx_t index);
