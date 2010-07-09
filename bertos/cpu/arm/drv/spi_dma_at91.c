@@ -76,11 +76,11 @@ static int spi_dma_flush(UNUSED_ARG(struct KFile *, fd))
 
 static size_t spi_dma_write(struct KFile *fd, const void *_buf, size_t size)
 {
-	spi_dma_flush(fd);
 	SPI0_PTCR = BV(PDC_TXTDIS);
 	SPI0_TPR = (reg32_t)_buf;
 	SPI0_TCR = size;
 	SPI0_PTCR = BV(PDC_TXTEN);
+	spi_dma_flush(fd);
 	return size;
 }
 
@@ -96,8 +96,6 @@ static size_t spi_dma_read(struct KFile *fd, void *_buf, size_t size)
 {
 	size_t count, total_rx = 0;
 	uint8_t *buf = (uint8_t *)_buf;
-
-	spi_dma_flush(fd);
 
 	while (size)
 	{
