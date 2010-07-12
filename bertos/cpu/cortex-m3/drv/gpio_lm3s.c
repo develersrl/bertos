@@ -35,10 +35,14 @@
  * \author Andrea Righi <arighi@develer.com>
  */
 
+
+#include "gpio_lm3s.h"
+
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
+
 #include <io/lm3s.h>
-#include "gpio_lm3s.h"
+
 
 /* Set the pin(s) direction and mode */
 INLINE int lm3s_gpioPinConfigMode(uint32_t port, uint8_t pins, uint32_t mode)
