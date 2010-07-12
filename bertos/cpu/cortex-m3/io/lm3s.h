@@ -39,19 +39,23 @@
 #include <cpu/detect.h>
 #include <cfg/compiler.h>
 
-#if (CPU_CM3_LM3S1968 ||  CPU_CM3_LM3S8962)
-	#include "lm3s1968.h"
-	#include "lm3s_types.h"
-	#include "lm3s_ints.h"
-	#include "lm3s_nvic.h"
-	#include "lm3s_sysctl.h"
-	#include "lm3s_gpio.h"
-	#include "lm3s_memmap.h"
-	#include "lm3s_uart.h"
-	#include "lm3s_ssi.h"
-	#include "lm3s_i2c.h"
+#include "lm3s_com.h"
+#include "lm3s_types.h"
+#include "lm3s_ints.h"
+#include "lm3s_nvic.h"
+#include "lm3s_sysctl.h"
+#include "lm3s_gpio.h"
+#include "lm3s_memmap.h"
+#include "lm3s_uart.h"
+#include "lm3s_ssi.h"
+#include "lm3s_i2c.h"
+
+
+#if CPU_CM3_LM3S1968
+	#define GPIO_I2C0_SCL_PIN	BV(2)
+	#define GPIO_I2C0_SDA_PIN	BV(3)
 #else
-	#error Missing I/O definitions for CPU.
+	#error No i2c are defined for select cpu
 #endif
 
 #endif /* LM3S_H */
