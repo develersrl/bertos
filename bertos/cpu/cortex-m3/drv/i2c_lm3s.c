@@ -47,9 +47,17 @@
 
 #include <cpu/detect.h>
 #include <cpu/irq.h>
+
+#include <io/cm3_types.h>
+#include <io/lm3s.h>
+
 #include <drv/timer.h>
 #include <drv/i2c.h>
+#include <drv/gpio_lm3s.h>
+#include <drv/clock_lm3s.h>
 
+
+#define I2C     I2C0_MASTER_BASE
 
 /**
  * Send START condition on the bus.
@@ -58,8 +66,7 @@
  */
 static bool i2c_builtin_start(void)
 {
-
-	return false;
+	return true;
 }
 
 
@@ -72,23 +79,10 @@ static bool i2c_builtin_start(void)
  */
 bool i2c_builtin_start_w(uint8_t id)
 {
-	/*
-	 * Loop on the select write sequence: when the eeprom is busy
-	 * writing previously sent data it will reply to the SLA_W
-	 * control byte with a NACK.  In this case, we must
-	 * keep trying until the eeprom responds with an ACK.
-	 */
-	ticks_t start = timer_clock();
-	while (i2c_builtin_start())
-	{
-		else if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT))
-		{
-			LOG_ERR("Timeout on TWI_MT_START\n");
-			break;
-		}
-	}
 
-	return false;
+	HWREG(I2C + I2C_O_MSA) = (id << 1) | BV(I2C_MSA_ADDS);
+
+	return true;
 }
 
 
@@ -101,12 +95,9 @@ bool i2c_builtin_start_w(uint8_t id)
  */
 bool i2c_builtin_start_r(uint8_t id)
 {
-	if (i2c_builtin_start())
-	{
+	HWREG(I2C + I2C_O_MSA) = (id << 1) | BV(I2C_MSA_ADDR);
 
-	}
-
-	return false;
+	return true;
 }
 
 
@@ -154,6 +145,131 @@ int i2c_builtin_get(bool ack)
 	return 0;
 }
 
+
+INLINE bool check_i2cStatus(uint32_t base)
+{
+	ticks_t start = timer_clock();
+
+	while (true)
+	{
+		while(true)
+		{
+			uint32_t status = HWREG(base + I2C_O_MCS);
+
+			if (status & I2C_MCS_ADRACK)
+				if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT))
+				{
+					LOG_ERR("Timeout on I2C_START\n");
+						break;
+				}
+
+			if (status & I2C_MCS_BUSY)
+				continue;
+			else
+				return true;
+		}
+	}
+
+	return false;
+}
+
+bool i2c_send(const void *_buf, size_t count)
+{
+	const uint8_t *buf = (const uint8_t *)_buf;
+
+	if (count == 1)
+	{
+		HWREG(I2C + I2C_O_MDR) = *buf++;
+
+		HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_SINGLE_SEND;
+
+		if ( !check_i2cStatus(I2C) )
+			return false;
+
+		count--;
+	}
+
+	if (count > 1)
+	{
+		HWREG(I2C + I2C_O_MDR) = *buf++;
+		count--;
+
+		HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_SEND_START;
+
+		if ( !check_i2cStatus(I2C) )
+			return false;
+
+		while(count)
+		{
+			HWREG(I2C + I2C_O_MDR) = *buf++;
+			HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_SEND_CONT;
+
+			if ( !check_i2cStatus(I2C) )
+				return false;
+
+			count--;
+		}
+
+		HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_SEND_FINISH;
+
+		if ( !check_i2cStatus(I2C) )
+			return false;
+
+	}
+
+	return true;
+}
+
+/**
+ * In order to read bytes from the i2c we should make some tricks.
+ * This because the silicon manage automatically the NACK on last byte, so to read
+ * one, two or three byte we should manage separately these cases.
+ */
+bool i2c_recv(void *_buf, size_t count)
+{
+	uint8_t *buf = (const uint8_t *)_buf;
+
+	if (count == 1)
+	{
+		HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_SINGLE_RECEIVE;
+
+		if ( !check_i2cStatus(I2C) )
+			return false;
+
+		*buf++ = HWREGB(I2C + I2C_O_MDR);
+		count--;
+	}
+
+	if (count > 1)
+	{
+		HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_RECEIVE_START;
+
+		if ( !check_i2cStatus(I2C) )
+			return false;
+
+		while(count)
+		{
+			*buf++ = HWREGB(I2C + I2C_O_MDR);
+
+			HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_RECEIVE_CONT;
+
+			if ( !check_i2cStatus(I2C) )
+				return false;
+
+			count--;
+		}
+
+		HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_RECEIVE_FINISH;
+
+		if ( !check_i2cStatus(I2C) )
+			return false;
+
+		*buf++ = HWREGB(I2C + I2C_O_MDR);
+		count--;
+	}
+
+	return true;
+}
 MOD_DEFINE(i2c);
 
 /**
@@ -161,5 +277,26 @@ MOD_DEFINE(i2c);
  */
 void i2c_builtin_init(void)
 {
+
+	/* Enable the peripheral clock */
+	SYSCTL_RCGC1_R |= SYSCTL_RCGC1_I2C0;
+	SYSCTL_RCGC2_R |= SYSCTL_RCGC2_GPIOB;
+
+
+	/* Configure GPIO pins to work as I2C pins */
+	lm3s_gpioPinConfig(GPIO_PORTB_BASE, GPIO_I2C0_SCL_PIN | GPIO_I2C0_SDA_PIN,
+			GPIO_DIR_MODE_HW, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_OD);
+
+	//Enable I2C in master mode
+	HWREG(I2C + I2C_O_MCR) |= I2C_MCR_MFE;
+
+    /*
+	 * Compute the clock divider that achieves the fastest speed less than or
+     * equal to the desired speed.  The numerator is biased to favor a larger
+     * clock divider so that the resulting clock is always less than or equal
+     * to the desired clock, never greater.
+	 */
+    HWREG(I2C + I2C_O_MTPR) = ((CPU_FREQ + (2 * 10 * CONFIG_I2C_FREQ) - 1) / (2 * 10 * CONFIG_I2C_FREQ)) - 1;
+
 	MOD_INIT(i2c);
 }
