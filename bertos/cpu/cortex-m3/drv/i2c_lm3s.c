@@ -56,18 +56,26 @@
 #include <drv/gpio_lm3s.h>
 #include <drv/clock_lm3s.h>
 
-
-#define I2C     I2C0_MASTER_BASE
-
-/**
- * Send START condition on the bus.
+/*
  *
- * \return true on success, false otherwise.
  */
-static bool i2c_builtin_start(void)
-{
-	return true;
-}
+#if 0
+	/* I2C 0 */
+	#define I2C                        I2C0_MASTER_BASE
+	#define SYSCTL_RCGC1_I2C           SYSCTL_RCGC1_I2C0
+	#define SYSCTL_RCGC2_GPIO          SYSCTL_RCGC2_GPIOB
+	#define GPIO_I2C_SCL_PIN           GPIO_I2C0_SCL_PIN
+	#define GPIO_I2C_SDA_PIN           GPIO_I2C0_SDA_PIN
+	#define GPIO_PORT_BASE             GPIO_PORTB_BASE
+#else
+	/* I2C 1 */
+	#define I2C                        I2C1_MASTER_BASE
+	#define SYSCTL_RCGC1_I2C           SYSCTL_RCGC1_I2C1
+	#define SYSCTL_RCGC2_GPIO          SYSCTL_RCGC2_GPIOA
+	#define GPIO_I2C_SCL_PIN           GPIO_I2C1_SCL_PIN
+	#define GPIO_I2C_SDA_PIN           GPIO_I2C1_SDA_PIN
+	#define GPIO_PORT_BASE             GPIO_PORTA_BASE
+#endif
 
 
 /**
@@ -79,9 +87,7 @@ static bool i2c_builtin_start(void)
  */
 bool i2c_builtin_start_w(uint8_t id)
 {
-
-	HWREG(I2C + I2C_O_MSA) = (id << 1) | BV(I2C_MSA_ADDS);
-
+	HWREG(I2C + I2C_O_MSA) = id & ~BV(0);
 	return true;
 }
 
@@ -95,126 +101,97 @@ bool i2c_builtin_start_w(uint8_t id)
  */
 bool i2c_builtin_start_r(uint8_t id)
 {
-	HWREG(I2C + I2C_O_MSA) = (id << 1) | BV(I2C_MSA_ADDR);
-
+	HWREG(I2C + I2C_O_MSA) = id | 1;
 	return true;
 }
 
 
-/**
- * Send STOP condition.
- */
 void i2c_builtin_stop(void)
 {
-
 }
 
 
-/**
- * Put a single byte in master transmitter mode
- * to the selected slave device through the TWI bus.
- *
- * \return true on success, false on error.
- */
 bool i2c_builtin_put(const uint8_t data)
 {
+	(void)data;
 	return true;
 }
 
-/**
- * Get 1 byte from slave in master transmitter mode
- * to the selected slave device through the I2C bus.
- * If \a ack is true issue a ACK after getting the byte,
- * otherwise a NACK is issued.
- *
- * \return the byte read if ok, EOF on errors.
- */
+
 int i2c_builtin_get(bool ack)
 {
-
-	if (ack)
-	{
-
-	}
-	else
-	{
-
-	}
-
-	/* avoid sign extension */
+	(void)ack;
 	return 0;
 }
 
-
-INLINE bool check_i2cStatus(uint32_t base)
+INLINE bool check_ack(uint32_t mode_mask)
 {
 	ticks_t start = timer_clock();
-
-	while (true)
+	while ( HWREG(I2C + I2C_O_MCS) &  I2C_MCS_ADRACK )
 	{
-		while(true)
+		if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT))
 		{
-			uint32_t status = HWREG(base + I2C_O_MCS);
-
-			if (status & I2C_MCS_ADRACK)
-				if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT))
-				{
-					LOG_ERR("Timeout on I2C_START\n");
-						break;
-				}
-
-			if (status & I2C_MCS_BUSY)
-				continue;
-			else
-				return true;
+			LOG_ERR("Timeout on I2C_START\n");
+			return false;
 		}
+
+		HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_SEND_ERROR_STOP;
+
+		HWREG(I2C + I2C_O_MCS) = mode_mask;
+		while( HWREG(I2C + I2C_O_MCS) & I2C_MCS_BUSY );
+
 	}
 
-	return false;
+	return true;
 }
 
+/*
+ * With this function is allowed only the atomic write.
+ */
 bool i2c_send(const void *_buf, size_t count)
 {
 	const uint8_t *buf = (const uint8_t *)_buf;
 
 	if (count == 1)
 	{
-		HWREG(I2C + I2C_O_MDR) = *buf++;
+		HWREGB(I2C + I2C_O_MDR) = *buf;
 
 		HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_SINGLE_SEND;
 
-		if ( !check_i2cStatus(I2C) )
+		while( HWREG(I2C + I2C_O_MCS) & I2C_MCS_BUSY );
+
+		if ( !check_ack(I2C_MASTER_CMD_SINGLE_SEND) )
 			return false;
 
-		count--;
+		count = 0;
+		buf++;
 	}
 
 	if (count > 1)
 	{
-		HWREG(I2C + I2C_O_MDR) = *buf++;
+		HWREGB(I2C + I2C_O_MDR) = *buf++;
 		count--;
 
 		HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_SEND_START;
 
-		if ( !check_i2cStatus(I2C) )
+		while( HWREG(I2C + I2C_O_MCS) & I2C_MCS_BUSY );
+
+		if ( !check_ack(I2C_MASTER_CMD_BURST_SEND_START) )
 			return false;
 
-		while(count)
+		while(count - 1)
 		{
-			HWREG(I2C + I2C_O_MDR) = *buf++;
-			HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_SEND_CONT;
-
-			if ( !check_i2cStatus(I2C) )
-				return false;
-
+			HWREGB(I2C + I2C_O_MDR) = *buf++;
 			count--;
+			HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_SEND_CONT;
+			while( HWREG(I2C + I2C_O_MCS) & I2C_MCS_BUSY );
+
 		}
 
+		HWREGB(I2C + I2C_O_MDR) = *buf++;
+
 		HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_SEND_FINISH;
-
-		if ( !check_i2cStatus(I2C) )
-			return false;
-
+		while( HWREG(I2C + I2C_O_MCS) & I2C_MCS_BUSY );
 	}
 
 	return true;
@@ -222,54 +199,54 @@ bool i2c_send(const void *_buf, size_t count)
 
 /**
  * In order to read bytes from the i2c we should make some tricks.
- * This because the silicon manage automatically the NACK on last byte, so to read
- * one, two or three byte we should manage separately these cases.
  */
 bool i2c_recv(void *_buf, size_t count)
 {
-	uint8_t *buf = (const uint8_t *)_buf;
+	uint8_t *buf = (uint8_t *)_buf;
 
 	if (count == 1)
 	{
 		HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_SINGLE_RECEIVE;
+		while( HWREG(I2C + I2C_O_MCS) & I2C_MCS_BUSY );
 
-		if ( !check_i2cStatus(I2C) )
+		if ( !check_ack(I2C_MASTER_CMD_SINGLE_RECEIVE) )
 			return false;
 
-		*buf++ = HWREGB(I2C + I2C_O_MDR);
-		count--;
+		*buf++ = HWREG(I2C + I2C_O_MDR);
+		count = 0;
 	}
 
 	if (count > 1)
 	{
-		HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_RECEIVE_START;
 
-		if ( !check_i2cStatus(I2C) )
+		HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_RECEIVE_START;
+		while( HWREG(I2C + I2C_O_MCS) & I2C_MCS_BUSY );
+
+		if ( !check_ack(I2C_MASTER_CMD_BURST_RECEIVE_START) )
 			return false;
 
-		while(count)
+		*buf++ = (uint8_t)HWREG(I2C + I2C_O_MDR);
+		count--;
+
+		while(count - 1)
 		{
-			*buf++ = HWREGB(I2C + I2C_O_MDR);
 
 			HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_RECEIVE_CONT;
-
-			if ( !check_i2cStatus(I2C) )
-				return false;
-
+			while( HWREG(I2C + I2C_O_MCS) & I2C_MCS_BUSY );
+			*buf++ = (uint8_t)HWREG(I2C + I2C_O_MDR);
 			count--;
 		}
 
 		HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_RECEIVE_FINISH;
+		while( HWREG(I2C + I2C_O_MCS) & I2C_MCS_BUSY );
 
-		if ( !check_i2cStatus(I2C) )
-			return false;
-
-		*buf++ = HWREGB(I2C + I2C_O_MDR);
+		*buf++ = (uint8_t)HWREG(I2C + I2C_O_MDR);
 		count--;
 	}
 
 	return true;
 }
+
 MOD_DEFINE(i2c);
 
 /**
@@ -279,16 +256,15 @@ void i2c_builtin_init(void)
 {
 
 	/* Enable the peripheral clock */
-	SYSCTL_RCGC1_R |= SYSCTL_RCGC1_I2C0;
-	SYSCTL_RCGC2_R |= SYSCTL_RCGC2_GPIOB;
-
+	SYSCTL_RCGC1_R |= SYSCTL_RCGC1_I2C;
+	SYSCTL_RCGC2_R |= SYSCTL_RCGC2_GPIO;
 
 	/* Configure GPIO pins to work as I2C pins */
-	lm3s_gpioPinConfig(GPIO_PORTB_BASE, GPIO_I2C0_SCL_PIN | GPIO_I2C0_SDA_PIN,
-			GPIO_DIR_MODE_HW, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_OD);
+	lm3s_gpioPinConfig(GPIO_PORT_BASE, GPIO_I2C_SCL_PIN,
+		GPIO_DIR_MODE_HW, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_OD_WPU);
 
-	//Enable I2C in master mode
-	HWREG(I2C + I2C_O_MCR) |= I2C_MCR_MFE;
+	lm3s_gpioPinConfig(GPIO_PORT_BASE, GPIO_I2C_SDA_PIN,
+		GPIO_DIR_MODE_HW, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_OD_WPU);
 
     /*
 	 * Compute the clock divider that achieves the fastest speed less than or
@@ -297,6 +273,10 @@ void i2c_builtin_init(void)
      * to the desired clock, never greater.
 	 */
     HWREG(I2C + I2C_O_MTPR) = ((CPU_FREQ + (2 * 10 * CONFIG_I2C_FREQ) - 1) / (2 * 10 * CONFIG_I2C_FREQ)) - 1;
+
+
+	//Enable I2C in master mode
+	HWREG(I2C + I2C_O_MCR) |= I2C_MCR_MFE;
 
 	MOD_INIT(i2c);
 }
