@@ -55,26 +55,39 @@
 #include <io/lpc23xx.h>
 
 
+#define I2C_READBIT                      BV(0)
+
 /*
  *
  */
-#if 0
+#if 1
 	/* I2C 0 */
-	#define I2C                        I2C0_MASTER_BASE
-	#define SYSCTL_RCGC1_I2C           SYSCTL_RCGC1_I2C0
-	#define SYSCTL_RCGC2_GPIO          SYSCTL_RCGC2_GPIOB
-	#define GPIO_I2C_SCL_PIN           GPIO_I2C0_SCL_PIN
-	#define GPIO_I2C_SDA_PIN           GPIO_I2C0_SDA_PIN
-	#define GPIO_PORT_BASE             GPIO_PORTB_BASE
+
+	#define I2C_PCONP                    PCONP_PCI2C0
+	#define I2C_CONSET                   I20CONSET
+	#define I2C_CONCLR                   I20CONCLR
+	#define I2C_SCLH                     I20SCLH
+	#define I2C_SCLL                     I20SCLL
+	#define I2C_STAT                     I20STAT
+	#define I2C_DAT                      I20DAT
+	#define I2C_SDA_PINSEL_MASK          I2C_SDA0_PINSEL_MASK
+	#define I2C_SCL_PINSEL_MASK          I2C_SCL0_PINSEL_MASK
+	#define I2C_SDA_PINSEL               I2C_SDA0_PINSEL
+	#define I2C_SCL_PINSEL               I2C_SCL0_PINSEL
 #else
 	/* I2C 1 */
-	#define I2C                        I2C1_MASTER_BASE
-	#define SYSCTL_RCGC1_I2C           SYSCTL_RCGC1_I2C1
-	#define SYSCTL_RCGC2_GPIO          SYSCTL_RCGC2_GPIOA
-	#define GPIO_I2C_SCL_PIN           GPIO_I2C1_SCL_PIN
-	#define GPIO_I2C_SDA_PIN           GPIO_I2C1_SDA_PIN
-	#define GPIO_PORT_BASE             GPIO_PORTA_BASE
 #endif
+
+#define GET_STATUS()   (I2C_STAT)
+
+static uint8_t i2c_builtin_start(void)
+{
+	I2C_CONSET = BV(I2CON_STA) | BV(I2CON_AA);
+
+	while( !(I2C_CONSET & BV(I2CON_SI)) );
+
+	return true;
+}
 
 
 /**
@@ -86,8 +99,28 @@
  */
 bool i2c_builtin_start_w(uint8_t id)
 {
+	ticks_t start = timer_clock();
+	while (i2c_builtin_start())
+	{
+		uint32_t status = GET_STATUS();
 
-	return true;
+		if ((status == I2C_STAT_SEND) || (status == I2C_STAT_RESEND))
+			I2C_DAT = id & ~I2C_READBIT;
+
+		/* Clear the start bit and clear the SI bit */
+		I2C_CONCLR = BV(I2CON_SIC) | BV(I2CON_STAC);
+
+		if (status == I2C_STAT_SLAW_ACK)
+			return true;
+		else if (status == I2C_STAT_ARB_LOST)
+			break;
+		else if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT))
+		{
+			LOG_ERR("Timeout on I2C START\n");
+			break;
+		}
+	}
+	return false;
 }
 
 
@@ -100,13 +133,34 @@ bool i2c_builtin_start_w(uint8_t id)
  */
 bool i2c_builtin_start_r(uint8_t id)
 {
+	if (i2c_builtin_start())
+	{
+		uint32_t status = GET_STATUS();
 
-	return true;
+		if ((status == I2C_STAT_SEND) || (status == I2C_STAT_RESEND))
+			I2C_DAT = id | I2C_READBIT;
+
+		/* Clear the start bit and clear the SI bit */
+		I2C_CONCLR = BV(I2CON_SIC) | BV(I2CON_STAC);
+
+		while( !(I2C_CONSET & BV(I2CON_SI)) );
+
+		status = GET_STATUS();
+
+		if (status == I2C_STAT_SLAR_ACK)
+			return true;
+		else if (status == I2C_STAT_ARB_LOST)
+			return false;
+
+	}
+	return false;
 }
 
 
 void i2c_builtin_stop(void)
 {
+	I2C_CONSET = BV(I2CON_STO);
+	I2C_CONCLR = BV(I2CON_STAC) | BV(I2CON_SIC) | BV(I2CON_AAC);
 }
 
 
@@ -129,7 +183,37 @@ int i2c_builtin_get(bool ack)
 bool i2c_send(const void *_buf, size_t count)
 {
 	const uint8_t *buf = (const uint8_t *)_buf;
+	uint32_t status = 0;
 
+	while (count)
+	{
+		I2C_DAT = *buf++;
+		I2C_CONSET = BV(I2CON_AA);
+		I2C_CONCLR = BV(I2CON_SIC);
+		count--;
+
+		while( !(I2C_CONSET & BV(I2CON_SI)) );
+
+		status = GET_STATUS();
+		if (status == I2C_STAT_DATA_ACK)
+			continue;
+		else if (status == I2C_STAT_DATA_NACK)
+		{
+			LOG_ERR("send:%02x\n", (uint8_t)status);
+			return false;
+		}
+		else if (status == 0xf8)
+		{
+			LOG_ERR("send:%02x\n", (uint8_t)status);
+			return false;
+		}
+		else if (status == 0x10)
+		{
+			LOG_ERR("send:%02x\n", (uint8_t)status);
+			return false;
+		}
+
+	}
 
 	return true;
 }
@@ -139,51 +223,82 @@ bool i2c_send(const void *_buf, size_t count)
  */
 bool i2c_recv(void *_buf, size_t count)
 {
+	uint8_t *buf = (uint8_t *)_buf;
+	uint8_t status = GET_STATUS();
+
+//	LOG_ERR("recv:%02x\n", (uint8_t)status);
+
+	while (count)
+	{
+		*buf++ = I2C_DAT;
+		if (count > 1)
+			I2C_CONSET = BV(I2CON_AA);
+		else
+			I2C_CONCLR = BV(I2CON_AAC);
+
+		I2C_CONCLR = BV(I2CON_SIC);
+		count--;
+
+		while( !(I2C_CONSET & BV(I2CON_SI)) );
+
+		status = GET_STATUS();
+
+		if (status == I2C_STAT_RDATA_ACK)
+			continue;
+		else if (status == I2C_STAT_RDATA_NACK)
+		{
+		//	LOG_ERR("recv:%02x\n", (uint8_t)status);
+			return true;
+		}
+		else if (status == 0xf8)
+		{
+			LOG_ERR("recv:%02x\n", (uint8_t)status);
+			return false;
+		}
+		else if (status == 0x10)
+		{
+			LOG_ERR("recv:%02x\n", (uint8_t)status);
+			return false;
+		}
+	}
 
 	return true;
 }
 
 MOD_DEFINE(i2c);
 
-#define I2C_PCONP             PCONP_PCI2C0
-#define I2C_CONSET            I20CONSET
-#define I2C_CONCLR            I20CONCLR
-#define I2C_SCLH              I20SCLH
-#define I2C_SCLL              I20SCLL
-
-
 /**
  * Initialize I2C module.
  */
 void i2c_builtin_init(void)
 {
-	PCONP |= BV(I2C_PCONP); // enable I2C0 clock
+	/* Enable I2C clock */
+	PCONP |= BV(I2C_PCONP);
 
 	#if (CONFIG_I2C_FREQ > 400000)
 		#error i2c frequency is to hight.
 	#endif
 
-	I2C_CONCLR = BV(I2CON_I2ENC);
+	I2C_CONCLR = BV(I2CON_I2ENC) | BV(I2CON_STAC) | BV(I2CON_SIC) | BV(I2CON_AAC);
 
-	// Bit Frequency = Fplk / (I2C_I2SCLH + I2C_I2SCLL)
-	// value of I2SCLH and I2SCLL must be different
-
+	/*
+	 * Bit Frequency = Fplk / (I2C_I2SCLH + I2C_I2SCLL)
+	 * value of I2SCLH and I2SCLL must be different
+	 */
+	PCLKSEL0 &= ~I2C0_PCLK_MASK;
 	PCLKSEL0 |= I2C0_PCLK_DIV8;
+
 	I2C_SCLH = (((CPU_FREQ / 8) / CONFIG_I2C_FREQ) / 2) + 1;
 	I2C_SCLL = (((CPU_FREQ / 8) / CONFIG_I2C_FREQ) / 2);
 
 	ASSERT(I2C_SCLH > 4 || I2C_SCLL > 4);
 
-	//I2CState = I2C_IDLE;
-
-	// Assign pins to SCL and SDA (P0_27, P0_28)
-	PINSEL0 |= BV(27) | BV(28);
+	/* Assign pins to SCL and SDA (P0_27, P0_28) */
+	PINSEL1 &= ~I2C_PINSEL_MASK;
+	PINSEL1 |= I2C_PINSEL;
 
 	// Enable I2C
 	I2C_CONSET = BV(I2CON_I2EN);
-	I2C_CONCLR |= BV(I2CON_STAC) | BV(I2CON_SIC) | BV(I2CON_AAC);
-
-kprintf("h%ld l%ld\n", I2C_SCLH, I2C_SCLL);
 
 	MOD_INIT(i2c);
 }
