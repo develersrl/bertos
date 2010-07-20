@@ -73,6 +73,23 @@
 #define PP_STRINGIZE__(x)   #x
 
 
+/**
+ */
+#if COMPILER_C99
+	#define COUNT_PARMS2(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _, ...) _
+	#define COUNT_PARMS(...) \
+			COUNT_PARMS2(11 , ## __VA_ARGS__, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
+
+	#define FN_ARGS       ...
+
+#else
+	#define COUNT_PARMS2(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _, ...) _
+	#define COUNT_PARMS(args...) \
+			COUNT_PARMS2(11 , ## args, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
+
+	#define FN_ARGS       args...
+#endif
+
 #if defined(__IAR_SYSTEMS_ICC) || defined(__IAR_SYSTEMS_ICC__)
 
 	#pragma language=extended
