@@ -767,6 +767,8 @@ are for LPC24xx only. */
 #define I2CON_AA                                           2 // Assert acknowledge Clear bit
 
 /* I2C Status codes */
+#define I2C_STAT_ERROR                                  0x00
+#define I2C_STAT_UNKNOW                                 0xF8
 #define I2C_STAT_SEND                                   0x08
 #define I2C_STAT_RESEND                                 0x10
 #define I2C_STAT_SLAW_ACK                               0x18
@@ -786,8 +788,8 @@ are for LPC24xx only. */
 
 
 /* I2C pins defines */
-#define I2C_PINSEL_MASK                            0x3C00000
-#define I2C_PINSEL                                 0x1400000
+#define I2C0_PINSEL_MASK                           0x3C00000
+#define I2C0_PINSEL                                0x1400000
 
 /* SPI0 (Serial Peripheral Interface 0) */
 #define SPI0_BASE_ADDR		0xE0020000
