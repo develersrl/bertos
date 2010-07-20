@@ -31,13 +31,11 @@
  *
  * \brief Function library for secure digital memory.
  *
- * Right now, the interface for these function is the one defined in diskio.h from
- * the FatFS module.
  *
  * \author Francesco Sacchi <batt@develer.com>
  *
  * $WIZ$ module_name = "sd"
- * $WIZ$ module_depends = "kfile", "timer"
+ * $WIZ$ module_depends = "kfile", "timer", "kblock"
  * $WIZ$ module_hw = "bertos/hw/hw_sd.h"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_sd.h"
  */
@@ -53,20 +51,25 @@
 
 #include "cfg/cfg_sd.h"
 
-
+/**
+ * SD Card context structure.
+ */
 typedef struct Sd
 {
-	KBlock b;
+	KBlock b;   ///< KBlock base class
 	KFile *ch;  ///< SPI communication channel
-	uint16_t r1;
+	uint16_t r1;  ///< Last status data received from SD
+	uint16_t tranfer_len; ///< Lenght for the read/write commands, cached in order to increase speed.
 } Sd;
 
 bool sd_initUnbuf(Sd *sd, KFile *ch);
 bool sd_initBuf(Sd *sd, KFile *ch);
 
 #if CONFIG_SD_OLD_INIT
-	#warning "Deprecated: this API will be removed in the next major release,"
-	#warning "please disable CONFIG_SD_OLD_INIT and pass explicitly the SD context to sd_init()."
+	#if !(ARCH & ARCH_NIGHTTEST)
+		#warning "Deprecated: this API will be removed in the next major release,"
+		#warning "please disable CONFIG_SD_OLD_INIT and pass explicitly the SD context to sd_init()."
+	#endif
 
 	/**
 	 * Initializes the SD driver.
@@ -77,6 +80,8 @@ bool sd_initBuf(Sd *sd, KFile *ch);
 	 *
 	 * \note This API is deprecated, disable CONFIG_SD_OLD_INIT and
 	 *       use the new one instead.
+	 *
+	 * \see CONFIG_SD_OLD_INIT.
 	 */
 	#define sd_init(ch) {static struct Sd sd; sd_initUnbuf(&sd, (ch));}
 
@@ -102,6 +107,7 @@ bool sd_initBuf(Sd *sd, KFile *ch);
 #define KBT_SD MAKE_ID('S', 'D', 'B', 'K')
 
 bool sd_test(Sd *sd);
+void sd_writeTest(Sd *sd);
 
 INLINE Sd *SD_CAST(KBlock *b)
 {

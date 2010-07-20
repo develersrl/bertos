@@ -39,13 +39,6 @@
 #ifndef CFG_SPI_DMA_H
 #define CFG_SPI_DMA_H
 
-/**
- * Size of the outbound FIFO buffer for SPI DMA [bytes].
- * $WIZ$ type = "int"
- * $WIZ$ min = 2
- */
-#define CONFIG_SPI_DMA_TXBUFSIZE  512
-
 
 /**
  * Max size received for each DMA transfer [bytes].
