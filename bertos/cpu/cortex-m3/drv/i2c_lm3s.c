@@ -101,7 +101,7 @@ bool i2c_builtin_start_w(uint8_t id)
  */
 bool i2c_builtin_start_r(uint8_t id)
 {
-	HWREG(I2C + I2C_O_MSA) = id | 1;
+	HWREG(I2C + I2C_O_MSA) = id | BV(0);
 	return true;
 }
 
@@ -139,7 +139,6 @@ INLINE bool check_ack(uint32_t mode_mask)
 
 		HWREG(I2C + I2C_O_MCS) = mode_mask;
 		while( HWREG(I2C + I2C_O_MCS) & I2C_MCS_BUSY );
-
 	}
 
 	return true;
@@ -152,32 +151,34 @@ bool i2c_send(const void *_buf, size_t count)
 {
 	const uint8_t *buf = (const uint8_t *)_buf;
 
+	HWREGB(I2C + I2C_O_MDR) = *buf++;
+
 	if (count == 1)
 	{
-		HWREGB(I2C + I2C_O_MDR) = *buf;
+		count = 0;
 
 		HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_SINGLE_SEND;
 
 		while( HWREG(I2C + I2C_O_MCS) & I2C_MCS_BUSY );
 
 		if ( !check_ack(I2C_MASTER_CMD_SINGLE_SEND) )
+		{
+			LOG_ERR("No single send start");
 			return false;
-
-		count = 0;
-		buf++;
+		}
 	}
-
-	if (count > 1)
+	else
 	{
-		HWREGB(I2C + I2C_O_MDR) = *buf++;
 		count--;
-
 		HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_SEND_START;
 
 		while( HWREG(I2C + I2C_O_MCS) & I2C_MCS_BUSY );
 
 		if ( !check_ack(I2C_MASTER_CMD_BURST_SEND_START) )
+		{
+			LOG_ERR("No burst send start");
 			return false;
+		}
 
 		while(count - 1)
 		{
@@ -187,8 +188,8 @@ bool i2c_send(const void *_buf, size_t count)
 			while( HWREG(I2C + I2C_O_MCS) & I2C_MCS_BUSY );
 
 		}
-
 		HWREGB(I2C + I2C_O_MDR) = *buf++;
+		count--;
 
 		HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_SEND_FINISH;
 		while( HWREG(I2C + I2C_O_MCS) & I2C_MCS_BUSY );
@@ -215,8 +216,7 @@ bool i2c_recv(void *_buf, size_t count)
 		*buf++ = HWREG(I2C + I2C_O_MDR);
 		count = 0;
 	}
-
-	if (count > 1)
+	else
 	{
 
 		HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_RECEIVE_START;
@@ -233,6 +233,7 @@ bool i2c_recv(void *_buf, size_t count)
 
 			HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_RECEIVE_CONT;
 			while( HWREG(I2C + I2C_O_MCS) & I2C_MCS_BUSY );
+
 			*buf++ = (uint8_t)HWREG(I2C + I2C_O_MDR);
 			count--;
 		}
@@ -266,6 +267,15 @@ void i2c_builtin_init(void)
 	lm3s_gpioPinConfig(GPIO_PORT_BASE, GPIO_I2C_SDA_PIN,
 		GPIO_DIR_MODE_HW, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_OD_WPU);
 
+
+	/*
+	 * Note: to set correctly the i2c speed we shold before enable the i2c
+	 * device and then set in master time period the correct value
+	 */
+
+	/* Enable i2c device */
+	HWREG(I2C + I2C_O_MCR) |= I2C_MCR_MFE;
+
     /*
 	 * Compute the clock divider that achieves the fastest speed less than or
      * equal to the desired speed.  The numerator is biased to favor a larger
@@ -275,8 +285,6 @@ void i2c_builtin_init(void)
     HWREG(I2C + I2C_O_MTPR) = ((CPU_FREQ + (2 * 10 * CONFIG_I2C_FREQ) - 1) / (2 * 10 * CONFIG_I2C_FREQ)) - 1;
 
 
-	//Enable I2C in master mode
-	HWREG(I2C + I2C_O_MCR) |= I2C_MCR_MFE;
 
 	MOD_INIT(i2c);
 }
