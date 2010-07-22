@@ -191,21 +191,75 @@ void i2c_builtin_stop(void)
 
 bool i2c_builtin_put(const uint8_t data)
 {
-	(void)data;
-	return true;
+	I2C_DAT = data;
+	I2C_CONCLR = BV(I2CON_SIC);
+
+	WAIT_SI();
+
+	uint32_t status = GET_STATUS();
+
+	if (status == I2C_STAT_DATA_ACK)
+		return true;
+	else if (status == I2C_STAT_DATA_NACK)
+	{
+		LOG_ERR("Data NACK\n");
+		return false;
+	}
+	else if (status == I2C_STAT_ERROR)
+	{
+		LOG_ERR("I2C error.\n");
+		return false;
+	}
+	else if (status == I2C_STAT_UNKNOW)
+	{
+		LOG_ERR("I2C unable to read status.\n");
+		return false;
+	}
+
+	return false;
 }
 
 
 int i2c_builtin_get(bool ack)
 {
-	(void)ack;
-	return 0;
+
+	/*
+	 * Set ack bit if we want read more byte, otherwise
+	 * we disable it
+	 */
+	if (ack)
+		I2C_CONSET = BV(I2CON_AA);
+	else
+		I2C_CONCLR = BV(I2CON_AAC);
+
+	I2C_CONCLR = BV(I2CON_SIC);
+
+	WAIT_SI();
+
+	uint32_t status = GET_STATUS();
+
+	if (status == I2C_STAT_RDATA_ACK)
+		return (uint8_t)I2C_DAT;
+	else if (status == I2C_STAT_RDATA_NACK)
+		return true;
+	else if (status == I2C_STAT_ERROR)
+	{
+		LOG_ERR("I2C error.\n");
+		return EOF;
+	}
+	else if (status == I2C_STAT_UNKNOW)
+	{
+		LOG_ERR("I2C unable to read status.\n");
+		return EOF;
+	}
+
+	return EOF;
 }
 
 /*
  * With this function is allowed only the atomic write.
  */
-bool i2c_send(const void *_buf, size_t count)
+static bool i2c_send1(const void *_buf, size_t count)
 {
 	const uint8_t *buf = (const uint8_t *)_buf;
 	uint8_t status = 0;
@@ -246,7 +300,7 @@ bool i2c_send(const void *_buf, size_t count)
 /**
  * In order to read bytes from the i2c we should make some tricks.
  */
-bool i2c_recv(void *_buf, size_t count)
+static bool i2c_recv1(void *_buf, size_t count)
 {
 	uint8_t *buf = (uint8_t *)_buf;
 	uint8_t status = GET_STATUS();
