@@ -85,7 +85,18 @@
  * state F8 does not set SI since there is nothing for an interrupt service
  * routine to do in that case.
  */
-#define WAIT_SI()           while( !(I2C_CONSET & BV(I2CON_SI)) )
+#define WAIT_SI() \
+	do { \
+		ticks_t start = timer_clock(); \
+		while( !(I2C_CONSET & BV(I2CON_SI)) ) \
+		{ \
+			if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT)) \
+			{ \
+				LOG_ERR("Timeout SI assert\n"); \
+				break; \
+			} \
+		} \
+	} while (0)
 
 static uint8_t i2c_builtin_start(void)
 {
@@ -129,7 +140,8 @@ bool i2c_builtin_start_w(uint8_t id)
 			LOG_ERR("Arbitration lost\n");
 			break;
 		}
-		else if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT))
+
+		if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT))
 		{
 			LOG_ERR("Timeout on I2C START\n");
 			break;
@@ -254,99 +266,6 @@ int i2c_builtin_get(bool ack)
 	}
 
 	return EOF;
-}
-
-/*
- * With this function is allowed only the atomic write.
- */
-static bool i2c_send1(const void *_buf, size_t count)
-{
-	const uint8_t *buf = (const uint8_t *)_buf;
-	uint8_t status = 0;
-
-	while (count)
-	{
-		I2C_DAT = *buf++;
-		I2C_CONCLR = BV(I2CON_SIC);
-		count--;
-
-		WAIT_SI();
-
-		status = GET_STATUS();
-
-		if (status == I2C_STAT_DATA_ACK)
-			continue;
-		else if (status == I2C_STAT_DATA_NACK)
-		{
-			LOG_ERR("Data NACK\n");
-			return false;
-		}
-		else if (status == I2C_STAT_ERROR)
-		{
-			LOG_ERR("I2C error.\n");
-			return false;
-		}
-		else if (status == I2C_STAT_UNKNOW)
-		{
-			LOG_ERR("I2C unable to read status.\n");
-			return false;
-		}
-
-	}
-
-	return true;
-}
-
-/**
- * In order to read bytes from the i2c we should make some tricks.
- */
-static bool i2c_recv1(void *_buf, size_t count)
-{
-	uint8_t *buf = (uint8_t *)_buf;
-	uint8_t status = GET_STATUS();
-
-	/* Ready for read */
-	I2C_CONSET = BV(I2CON_AA);
-	I2C_CONCLR = BV(I2CON_SIC);
-
-	WAIT_SI();
-
-	while (count)
-	{
-		*buf++ = I2C_DAT;
-		/*
-		 * Set ack bit if we want read more byte, otherwise
-		 * we disable it
-		 */
-		if (count > 1)
-			I2C_CONSET = BV(I2CON_AA);
-		else
-			I2C_CONCLR = BV(I2CON_AAC);
-
-		I2C_CONCLR = BV(I2CON_SIC);
-		count--;
-
-		WAIT_SI();
-
-		status = GET_STATUS();
-
-		if (status == I2C_STAT_RDATA_ACK)
-			continue;
-		else if (status == I2C_STAT_RDATA_NACK)
-			return true;
-		else if (status == I2C_STAT_ERROR)
-		{
-			LOG_ERR("I2C error.\n");
-			return false;
-		}
-		else if (status == I2C_STAT_UNKNOW)
-		{
-			LOG_ERR("I2C unable to read status.\n");
-			return false;
-		}
-	}
-
-	return true;
 }
 
 MOD_DEFINE(i2c);
