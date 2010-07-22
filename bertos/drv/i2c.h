@@ -126,6 +126,8 @@ bool i2c_recv(void *_buf, size_t count);
  *
  */
 
+#define I2C_STOP          BV(0)    ///< Says to driver to generate the stop after i2c tranfer.
+
 struct I2cHardware;
 struct I2c;
 
