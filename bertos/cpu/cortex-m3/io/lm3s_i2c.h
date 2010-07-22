@@ -153,26 +153,18 @@
 
 
 
-#define I2C_MASTER_CMD_SINGLE_SEND                                            \
-                                0x00000007
-#define I2C_MASTER_CMD_SINGLE_RECEIVE                                         \
-                                0x00000007
-#define I2C_MASTER_CMD_BURST_SEND_START                                       \
-                                0x00000003
-#define I2C_MASTER_CMD_BURST_SEND_CONT                                        \
-                                0x00000001
-#define I2C_MASTER_CMD_BURST_SEND_FINISH                                      \
-                                0x00000005
-#define I2C_MASTER_CMD_BURST_SEND_ERROR_STOP                                  \
-                                0x00000004
-#define I2C_MASTER_CMD_BURST_RECEIVE_START                                    \
-                                0x0000000b
-#define I2C_MASTER_CMD_BURST_RECEIVE_CONT                                     \
-                                0x00000009
-#define I2C_MASTER_CMD_BURST_RECEIVE_FINISH                                   \
-                                0x00000005
-#define I2C_MASTER_CMD_BURST_RECEIVE_ERROR_STOP                               \
-                                0x00000004
+#define I2C_MASTER_CMD_SINGLE_SEND                     0x00000007
+#define I2C_MASTER_CMD_SINGLE_RECEIVE                  0x00000007
+
+#define I2C_MASTER_CMD_BURST_SEND_START                0x00000003
+#define I2C_MASTER_CMD_BURST_SEND_CONT                 0x00000001
+#define I2C_MASTER_CMD_BURST_SEND_FINISH               0x00000005
+#define I2C_MASTER_CMD_BURST_SEND_ERROR_STOP           0x00000004
+
+#define I2C_MASTER_CMD_BURST_RECEIVE_START             0x0000000b
+#define I2C_MASTER_CMD_BURST_RECEIVE_CONT              0x00000009
+#define I2C_MASTER_CMD_BURST_RECEIVE_FINISH            0x00000005
+#define I2C_MASTER_CMD_BURST_RECEIVE_ERROR_STOP        0x00000004
 
 
 /* The following definitions are deprecated. */
