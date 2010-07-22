@@ -44,11 +44,15 @@
 #define DRV_I2C_H
 
 #include "cfg/cfg_i2c.h"
+
 #include <cfg/compiler.h>
+#include <cfg/macros.h>
+
+#include <cpu/attr.h>
 
 #define I2C_READBIT BV(0)
 
-#define i2c_init(FN_ARGS) CAT(fn ## _, COUNT_PARMS(FN_ARGS)) (FN_ARGS)
+#define i2c_init(FN_ARGS) PP_CAT(i2c_init ## _, COUNT_PARMS(FN_ARGS)) (FN_ARGS)
 
 /**
  * I2C Backends.
@@ -117,17 +121,16 @@ bool i2c_send(const void *_buf, size_t count);
 bool i2c_recv(void *_buf, size_t count);
 
 
-
-
 /*
  * I2c new api
  *
  */
-#include CPU_HEADER(i2c)
 
 struct I2cHardware;
-typedef int (*i2c_writeRope_t)(I2c *i2c, uint16_t slave_addr, int flags, const void *buf, size_t len, ...);
-typedef int (*i2c_readRope_t)(I2c *i2c, uint16_t slave_addr, int flags, void *buf, size_t len, ...);
+struct I2c;
+
+typedef int (*i2c_writeRope_t)(struct I2c *i2c, uint16_t slave_addr, int flags, const void *buf, size_t len, ...);
+typedef int (*i2c_readRope_t)(struct I2c *i2c, uint16_t slave_addr, int flags, void *buf, size_t len, ...);
 
 typedef struct I2c
 {
@@ -138,37 +141,40 @@ typedef struct I2c
 	struct I2cHardware* hw;
 } I2c;
 
-void i2c_init_3(I2c *i2c, int dev, uint32_t clock)
+
+#include CPU_HEADER(i2c)
+
+INLINE void i2c_init_3(I2c *i2c, int dev, uint32_t clock)
 {
-	i2c_hw_init(I2c *i2c, int dev, uint32_t clock);
+	i2c_hw_init(i2c, dev, clock);
 }
 
-#define i2c_write(FN_ARGS) CAT(fn ## _, COUNT_PARMS(FN_ARGS)) (FN_ARGS)
-#define i2c_read(FN_ARGS) CAT(fn ## _, COUNT_PARMS(FN_ARGS)) (FN_ARGS)
+#define i2c_write(FN_ARGS) PP_CAT(i2c_write ## _, COUNT_PARMS(FN_ARGS)) (FN_ARGS)
+#define i2c_read(FN_ARGS) PP_CAT(i2c_read ## _, COUNT_PARMS(FN_ARGS)) (FN_ARGS)
 
 /*
  * Overloaded functions definition.
  */
-int i2c_write_5(I2c *i2c, uint16_t slave_addr, int flags, const void *buf, size_t len)
+INLINE int i2c_write_5(I2c *i2c, uint16_t slave_addr, int flags, const void *buf, size_t len)
 {
 	return i2c->write(i2c, slave_addr, flags, buf, len, NULL);
 }
 
-int i2c_read_5(I2c *i2c, uint16_t slave_addr, int flags, void *buf, size_t len);
+INLINE int i2c_read_5(I2c *i2c, uint16_t slave_addr, int flags, void *buf, size_t len)
 {
 	return i2c->read(i2c, slave_addr, flags, buf, len, NULL);
 }
 
 
-int i2c_write_7(I2c *i2c, uint16_t slave_addr, int flags, const void *buf, size_t len,
-														  const void *buf1, size_t len1);
+INLINE int i2c_write_7(I2c *i2c, uint16_t slave_addr, int flags, const void *buf, size_t len,
+														  const void *buf1, size_t len1)
 {
 	return i2c->write(i2c, slave_addr, flags, buf, len,
 											  buf1, len1, NULL);
 }
 
-int i2c_read_7(I2c *i2c, uint16_t slave_addr, int flags, void *buf, size_t len,
-														 void *buf1, size_t len1);
+INLINE int i2c_read_7(I2c *i2c, uint16_t slave_addr, int flags, void *buf, size_t len,
+														 void *buf1, size_t len1)
 
 {
 	return i2c->read(i2c, slave_addr, flags, buf, len,
@@ -176,28 +182,28 @@ int i2c_read_7(I2c *i2c, uint16_t slave_addr, int flags, void *buf, size_t len,
 }
 
 
-int i2c_write_9(I2c *i2c, uint16_t slave_addr, int flags, const void *buf, size_t len,
+INLINE int i2c_write_9(I2c *i2c, uint16_t slave_addr, int flags, const void *buf, size_t len,
 														  const void *buf1, size_t len1,
-														  const void *buf2, size_t len2);
+														  const void *buf2, size_t len2)
 {
 	return i2c->write(i2c, slave_addr, flags, buf, len,
 											  buf1, len1,
 											  buf2, len2, NULL);
 }
 
-int i2c_read_9(I2c *i2c, uint16_t slave_addr, int flags, void *buf, size_t len,
+INLINE int i2c_read_9(I2c *i2c, uint16_t slave_addr, int flags, void *buf, size_t len,
 														 void *buf1, size_t len1,
-														 void *buf2, size_t len2);
+														 void *buf2, size_t len2)
 {
 	return i2c->read(i2c, slave_addr, flags, buf, len,
 											  buf1, len1,
 											  buf2, len2, NULL);
 }
 
-int i2c_write_11(I2c *i2c, uint16_t slave_addr, int flags, const void *buf, size_t len,
+INLINE int i2c_write_11(I2c *i2c, uint16_t slave_addr, int flags, const void *buf, size_t len,
 														  const void *buf1, size_t len1,
-														  const void *buf2, size_t len2
-														  const void *buf3, size_t len3);
+														  const void *buf2, size_t len2,
+														  const void *buf3, size_t len3)
 {
 	return i2c->write(i2c, slave_addr, flags, buf, len,
 											  buf1, len1,
@@ -205,10 +211,10 @@ int i2c_write_11(I2c *i2c, uint16_t slave_addr, int flags, const void *buf, size
 											  buf3, len3, NULL);
 }
 
-int i2c_read_11(I2c *i2c, uint16_t slave_addr, int flags, void *buf, size_t len,
+INLINE int i2c_read_11(I2c *i2c, uint16_t slave_addr, int flags, void *buf, size_t len,
 														 void *buf1, size_t len1,
-														 void *buf2, size_t len2
-														 void *buf3, size_t len3);
+														 void *buf2, size_t len2,
+														 void *buf3, size_t len3)
 
 {
 	return i2c->read(i2c, slave_addr, flags, buf, len,
