@@ -175,37 +175,19 @@ void i2c_builtin_stop(void)
 
 bool i2c_builtin_put(const uint8_t data)
 {
-	return true;
+	i2c->DR = data;
+	WAIT_BTF(i2c);
+
+	if(check_i2cStatus(I2C_EVENT_MASTER_BYTE_TRANSMITTED))
+		return true;
+
+	return false;
 }
 
 int i2c_builtin_get(bool ack)
 {
 
 	return 0;
-}
-
-bool i2c_send(const void *_buf, size_t count)
-{
-	const uint8_t *buf = (const uint8_t *)_buf;
-
-	i2c->DR = *buf++;
-	count--;
-
-
-	while (count)
-	{
-		ASSERT(buf);
-		WAIT_BTF(i2c);
-
-		i2c->DR = *buf++;
-		count--;
-
-    }
-
-	if(check_i2cStatus(I2C_EVENT_MASTER_BYTE_TRANSMITTED))
-		return true;
-
-	return false;
 }
 
 /**
