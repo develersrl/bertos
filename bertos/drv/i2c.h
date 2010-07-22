@@ -114,4 +114,59 @@ int i2c_bitbang_get(bool ack);
 bool i2c_send(const void *_buf, size_t count);
 bool i2c_recv(void *_buf, size_t count);
 
+
+
+
+/*
+ * I2c new api
+ *
+ */
+#include CPU_HEADER(i2c)
+
+struct I2cHardware;
+typedef int (*i2c_writeRope_t)(I2c *i2c, uint16_t slave_addr, int flags, const void *buf, size_t len, ...);
+typedef int (*i2c_readRope_t)(I2c *i2c, uint16_t slave_addr, int flags, void *buf, size_t len, ...);
+
+typedef struct I2c
+{
+	int dev;
+	i2c_writeRope_t write;
+	i2c_readRope_t read;
+
+	struct I2cHardware* hw;
+} I2c;
+
+void i2c_init(I2c *i2c, int dev, uint32_t clock);
+
+#define i2c_write(FN_ARGS) CAT(fn ## _, COUNT_PARMS(FN_ARGS)) (FN_ARGS)
+#define i2c_read(FN_ARGS) CAT(fn ## _, COUNT_PARMS(FN_ARGS)) (FN_ARGS)
+
+/*
+ * Overloaded functions definition.
+ */
+int i2c_write_5(I2c *i2c, uint16_t slave_addr, int flags, const void *buf, size_t len);
+int i2c_read_5(I2c *i2c, uint16_t slave_addr, int flags, void *buf, size_t len);
+
+int i2c_write_7(I2c *i2c, uint16_t slave_addr, int flags, const void *buf, size_t len,
+														  const void *buf1, size_t len1);
+int i2c_read_7(I2c *i2c, uint16_t slave_addr, int flags, void *buf, size_t len,
+														 void *buf1, size_t len1);
+
+int i2c_write_9(I2c *i2c, uint16_t slave_addr, int flags, const void *buf, size_t len,
+														  const void *buf1, size_t len1,
+														  const void *buf2, size_t len2);
+int i2c_read_9(I2c *i2c, uint16_t slave_addr, int flags, void *buf, size_t len,
+														 void *buf1, size_t len1,
+														 void *buf2, size_t len2);
+
+int i2c_write_11(I2c *i2c, uint16_t slave_addr, int flags, const void *buf, size_t len,
+														  const void *buf1, size_t len1,
+														  const void *buf2, size_t len2
+														  const void *buf3, size_t len3);
+int i2c_read_11(I2c *i2c, uint16_t slave_addr, int flags, void *buf, size_t len,
+														 void *buf1, size_t len1,
+														 void *buf2, size_t len2
+														 void *buf3, size_t len3);
+
+
 #endif
