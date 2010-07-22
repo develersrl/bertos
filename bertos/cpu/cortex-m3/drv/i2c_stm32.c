@@ -96,9 +96,7 @@ INLINE bool check_i2cStatus(uint32_t event)
 static bool i2c_builtin_start(void)
 {
 
-	i2c->CR1 |= (CR1_ACK_SET | BV(CR1_POS) | CR1_PE_SET);
-
-	i2c->CR1 |= CR1_START_SET;
+	i2c->CR1 |= CR1_ACK_SET | CR1_PE_SET | CR1_START_SET;
 
 	if(check_i2cStatus(I2C_EVENT_MASTER_MODE_SELECT))
 		return true;
@@ -176,6 +174,7 @@ void i2c_builtin_stop(void)
 bool i2c_builtin_put(const uint8_t data)
 {
 	i2c->DR = data;
+
 	WAIT_BTF(i2c);
 
 	if(check_i2cStatus(I2C_EVENT_MASTER_BYTE_TRANSMITTED))
@@ -186,8 +185,8 @@ bool i2c_builtin_put(const uint8_t data)
 
 int i2c_builtin_get(bool ack)
 {
-
-	return 0;
+	(void)ack;
+	return EOF;
 }
 
 /**
@@ -203,8 +202,6 @@ bool i2c_recv(void *_buf, size_t count)
 	{
 		if (count == 1)
 		{
-			i2c->CR1 &= ~BV(CR1_POS);
-
 			if(!check_i2cStatus(I2C_EVENT_MASTER_BYTE_RECEIVED))
 				return false;
 
@@ -225,38 +222,11 @@ bool i2c_recv(void *_buf, size_t count)
 			*buf++ = i2c->DR;
 
 			count = 0;
-
-			i2c->CR1 &= ~BV(CR1_POS);
-
-		}
-		else if (count == 3)
-		{
-			i2c->CR1 &= ~BV(CR1_POS);
-
-			WAIT_BTF(i2c);
-
-			i2c->CR1 &= CR1_ACK_RESET;
-
-			*buf++ = i2c->DR;
-
-			i2c->CR1 |= CR1_STOP_SET;
-
-			*buf++ = i2c->DR;
-
-			WAIT_RXE(i2c);
-
-			*buf++ = i2c->DR;
-
-			count = 0;
 		}
 		else
 		{
-			i2c->CR1 &= ~BV(CR1_POS);
-
 			WAIT_BTF(i2c);
-
 			*buf++ = i2c->DR;
-
 			count--;
 		}
 	}
