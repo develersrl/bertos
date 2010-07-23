@@ -184,7 +184,9 @@ INLINE void i2c_start(I2c *i2c, uint16_t slave_addr, size_t size)
 {
 	ASSERT(i2c->vt);
 	ASSERT(i2c->vt->start);
-	ASSERT(i2c->xfer_size == 0);
+
+	if (!i2c->errors)
+		ASSERT(i2c->xfer_size == 0);
 
 	i2c->errors = 0;
 	i2c->xfer_size = size;
