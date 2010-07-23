@@ -134,6 +134,7 @@ bool i2c_recv(void *_buf, size_t count);
  *
  */
 #define I2C_OK               0
+#define I2C_ERR           BV(3)
 #define I2C_ARB_LOST      BV(2)
 #define I2C_START_TIMEOUT BV(0)
 #define I2C_NO_ACK        BV(1)
@@ -147,6 +148,7 @@ bool i2c_recv(void *_buf, size_t count);
 
 
 #define I2C_TEST_START(flag)  ((flag) & I2C_START_R)
+#define I2C_TEST_STOP(flag)   ((flag) & I2C_STOP)
 
 struct I2cHardware;
 struct I2c;
