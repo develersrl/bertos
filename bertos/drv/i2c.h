@@ -214,12 +214,16 @@ INLINE uint8_t i2c_get(I2c *i2c)
 	ASSERT(i2c->vt);
 	ASSERT(i2c->vt->get);
 
-	ASSERT(i2c->xfer_size >=  1);
+	ASSERT(i2c->xfer_size);
 
 	ASSERT(I2C_TEST_START(i2c->flags) == I2C_START_R);
 
 	if (!i2c->errors)
-		return i2c->vt->get(i2c);
+	{
+		uint8_t data = i2c->vt->get(i2c);
+		i2c->xfer_size--;
+		return data;
+	}
 	else
 		return 0xFF;
 }
@@ -230,12 +234,15 @@ INLINE void i2c_put(I2c *i2c, uint8_t data)
 	ASSERT(i2c->vt);
 	ASSERT(i2c->vt->put);
 
-	ASSERT(i2c->xfer_size >=  1);
+	ASSERT(i2c->xfer_size);
 
 	ASSERT(I2C_TEST_START(i2c->flags) == I2C_START_W);
 
 	if (!i2c->errors)
+	{
 		i2c->vt->put(i2c, data);
+		i2c->xfer_size--;
+	}
 }
 
 INLINE void i2c_send(I2c *i2c, const void *_buf, size_t count)
