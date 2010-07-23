@@ -136,6 +136,7 @@ bool i2c_recv(void *_buf, size_t count);
 #define I2C_OK               0
 #define I2C_START_ERR     BV(0)
 #define I2C_NO_ACK        BV(1)
+#define I2C_ARBLST        BV(2)
 
 
 #define I2C_NOSTOP           0
@@ -192,14 +193,14 @@ INLINE void i2c_start_r(I2c *i2c, uint16_t slave_addr, size_t size, int flags)
 {
 	ASSERT(i2c);
 	i2c->flags = flags | I2C_START_R;
-	i2c_start(i2c, slave_addr)
+	i2c_start(i2c, slave_addr, size);
 }
 
 INLINE void i2c_start_w(I2c *i2c, uint16_t slave_addr, size_t size, int flags)
 {
 	ASSERT(i2c);
 	i2c->flags = flags & ~I2C_START_R;
-	i2c_start(i2c, slave_addr);
+	i2c_start(i2c, slave_addr, size);
 }
 
 INLINE uint8_t i2c_get(I2c *i2c)
