@@ -176,32 +176,30 @@ typedef struct I2c
 
 #include CPU_HEADER(i2c)
 
-INLINE void i2c_start_r(I2c *i2c, uint16_t slave_addr, size_t size, int flags)
+INLINE void i2c_start(I2c *i2c, uint16_t slave_addr, size_t size)
 {
-	ASSERT(i2c);
 	ASSERT(i2c->vt);
 	ASSERT(i2c->vt->start);
 	ASSERT(i2c->xfer_size == 0);
 
-	i2c->flags = flags | I2C_START_R;
 	i2c->errors = 0;
 	i2c->xfer_size = size;
 
 	i2c->vt->start(i2c, slave_addr);
 }
 
+INLINE void i2c_start_r(I2c *i2c, uint16_t slave_addr, size_t size, int flags)
+{
+	ASSERT(i2c);
+	i2c->flags = flags | I2C_START_R;
+	i2c_start(i2c, slave_addr)
+}
+
 INLINE void i2c_start_w(I2c *i2c, uint16_t slave_addr, size_t size, int flags)
 {
 	ASSERT(i2c);
-	ASSERT(i2c->vt);
-	ASSERT(i2c->vt->start);
-	ASSERT(i2c->xfer_size == 0);
-
 	i2c->flags = flags & ~I2C_START_R;
-	i2c->errors = 0;
-	i2c->xfer_size = size;
-
-	i2c->vt->start(i2c, slave_addr);
+	i2c_start(i2c, slave_addr);
 }
 
 INLINE uint8_t i2c_get(I2c *i2c)
