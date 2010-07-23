@@ -134,9 +134,10 @@ bool i2c_recv(void *_buf, size_t count);
  *
  */
 #define I2C_OK               0
-#define I2C_START_ERR     BV(0)
+#define I2C_ARB_LOST      BV(2)
+#define I2C_START_TIMEOUT BV(0)
 #define I2C_NO_ACK        BV(1)
-#define I2C_ARBLST        BV(2)
+
 
 
 #define I2C_NOSTOP           0
