@@ -47,12 +47,17 @@
 
 #include <cfg/compiler.h>
 #include <cfg/macros.h>
+#include <cfg/debug.h>
 
 #include <cpu/attr.h>
 
 #define I2C_READBIT BV(0)
 
-#define i2c_init(FN_ARGS) PP_CAT(i2c_init ## _, COUNT_PARMS(FN_ARGS)) (FN_ARGS)
+#if COMPILER_C99
+	#define i2c_init(...)     PP_CAT(i2c_init ## _, COUNT_PARMS(__VA_ARGS__)) (__VA_ARGS__)
+#else
+	#define i2c_init(args...)     PP_CAT(i2c_init ## _, COUNT_PARMS(args)) (args)
+#endif
 
 /**
  * I2C Backends.
@@ -66,6 +71,7 @@
 #define I2C_BACKEND_BUILTIN 0 ///< Uses cpu builtin i2c driver
 #define I2C_BACKEND_BITBANG 1 ///< Uses emulated bitbang driver
 
+#if 0
 
 /**
  * I2c builtin prototypes.
@@ -117,112 +123,161 @@ int i2c_bitbang_get(bool ack);
 	#error Unsupported i2c backend.
 #endif
 
+
 bool i2c_send(const void *_buf, size_t count);
 bool i2c_recv(void *_buf, size_t count);
 
+#endif
 
 /*
  * I2c new api
  *
  */
+#define I2C_OK               0
+#define I2C_START_ERR     BV(0)
+#define I2C_NO_ACK        BV(1)
 
-#define I2C_STOP          BV(0)    ///< Says to driver to generate the stop after i2c tranfer.
+
+#define I2C_NOSTOP           0
+#define I2C_STOP          BV(0)
+#define I2C_START_R       BV(1)
+#define I2C_START_W          0
+
+
+#define I2C_TEST_START(flag)  ((flag) & I2C_START_R)
 
 struct I2cHardware;
 struct I2c;
 
-typedef int (*i2c_writeRope_t)(struct I2c *i2c, uint16_t slave_addr, int flags, const void *buf, size_t len, ...);
-typedef int (*i2c_readRope_t)(struct I2c *i2c, uint16_t slave_addr, int flags, void *buf, size_t len, ...);
+typedef void (*i2c_start_t)(struct I2c *i2c, uint16_t slave_addr);
+typedef uint8_t (*i2c_get_t)(struct I2c *i2c);
+typedef void (*i2c_put_t)(struct I2c *i2c, uint8_t data);
+typedef void (*i2c_send_t)(struct I2c *i2c, const void *_buf, size_t count);
+typedef void (*i2c_recv_t)(struct I2c *i2c, void *_buf, size_t count);
+
+typedef struct I2cVT
+{
+	i2c_start_t start;
+	i2c_get_t   get;
+	i2c_put_t   put;
+	i2c_send_t  send;
+	i2c_recv_t  recv;
+} I2cVT;
 
 typedef struct I2c
 {
-	int dev;
-	i2c_writeRope_t write;
-	i2c_readRope_t read;
-
+	int errors;
+	int flags;
+	size_t xfer_size;
 	struct I2cHardware* hw;
+	const struct I2cVT *vt;
 } I2c;
 
 
 #include CPU_HEADER(i2c)
 
+INLINE void i2c_start_r(I2c *i2c, uint16_t slave_addr, size_t size, int flags)
+{
+	ASSERT(i2c);
+	ASSERT(i2c->vt);
+	ASSERT(i2c->vt->start);
+	ASSERT(i2c->xfer_size == 0);
+
+	i2c->flags = flags | I2C_START_R;
+	i2c->errors = 0;
+	i2c->xfer_size = size;
+
+	i2c->vt->start(i2c, slave_addr);
+}
+
+INLINE void i2c_start_w(I2c *i2c, uint16_t slave_addr, size_t size, int flags)
+{
+	ASSERT(i2c);
+	ASSERT(i2c->vt);
+	ASSERT(i2c->vt->start);
+	ASSERT(i2c->xfer_size == 0);
+
+	i2c->flags = flags & ~I2C_START_R;
+	i2c->errors = 0;
+	i2c->xfer_size = size;
+
+	i2c->vt->start(i2c, slave_addr);
+}
+
+INLINE uint8_t i2c_get(I2c *i2c)
+{
+	ASSERT(i2c);
+	ASSERT(i2c->vt);
+	ASSERT(i2c->vt->get);
+
+	ASSERT(i2c->xfer_size >=  1);
+
+	ASSERT(I2C_TEST_START(i2c->flags) == I2C_START_R);
+
+	if (!i2c->errors)
+		return i2c->vt->get(i2c);
+	else
+		return 0xFF;
+}
+
+INLINE void i2c_put(I2c *i2c, uint8_t data)
+{
+	ASSERT(i2c);
+	ASSERT(i2c->vt);
+	ASSERT(i2c->vt->put);
+
+	ASSERT(i2c->xfer_size >=  1);
+
+	ASSERT(I2C_TEST_START(i2c->flags) == I2C_START_W);
+
+	if (!i2c->errors)
+		i2c->vt->put(i2c, data);
+}
+
+INLINE void i2c_send(I2c *i2c, const void *_buf, size_t count)
+{
+	ASSERT(i2c);
+	ASSERT(i2c->vt);
+	ASSERT(i2c->vt->send);
+
+	ASSERT(_buf);
+	ASSERT(count);
+	ASSERT(count <= i2c->xfer_size);
+
+	ASSERT(I2C_TEST_START(i2c->flags) == I2C_START_W);
+
+	if (!i2c->errors)
+		i2c->vt->send(i2c, _buf, count);
+}
+
+
+INLINE void i2c_recv(I2c *i2c, void *_buf, size_t count)
+{
+	ASSERT(i2c);
+	ASSERT(i2c->vt);
+	ASSERT(i2c->vt->recv);
+
+	ASSERT(_buf);
+	ASSERT(count);
+	ASSERT(count <= i2c->xfer_size);
+
+	ASSERT(I2C_TEST_START(i2c->flags) == I2C_START_R);
+
+	if (!i2c->errors)
+		i2c->vt->recv(i2c, _buf, count);
+}
+
+INLINE int i2c_error(I2c *i2c)
+{
+	ASSERT(i2c);
+	int err = i2c->errors;
+	i2c->errors = 0;
+	return err;
+}
+
 INLINE void i2c_init_3(I2c *i2c, int dev, uint32_t clock)
 {
 	i2c_hw_init(i2c, dev, clock);
-}
-
-#define i2c_write(FN_ARGS) PP_CAT(i2c_write ## _, COUNT_PARMS(FN_ARGS)) (FN_ARGS)
-#define i2c_read(FN_ARGS) PP_CAT(i2c_read ## _, COUNT_PARMS(FN_ARGS)) (FN_ARGS)
-
-/*
- * Overloaded functions definition.
- */
-INLINE int i2c_write_5(I2c *i2c, uint16_t slave_addr, int flags, const void *buf, size_t len)
-{
-	return i2c->write(i2c, slave_addr, flags, buf, len, NULL);
-}
-
-INLINE int i2c_read_5(I2c *i2c, uint16_t slave_addr, int flags, void *buf, size_t len)
-{
-	return i2c->read(i2c, slave_addr, flags, buf, len, NULL);
-}
-
-
-INLINE int i2c_write_7(I2c *i2c, uint16_t slave_addr, int flags, const void *buf, size_t len,
-														  const void *buf1, size_t len1)
-{
-	return i2c->write(i2c, slave_addr, flags, buf, len,
-											  buf1, len1, NULL);
-}
-
-INLINE int i2c_read_7(I2c *i2c, uint16_t slave_addr, int flags, void *buf, size_t len,
-														 void *buf1, size_t len1)
-
-{
-	return i2c->read(i2c, slave_addr, flags, buf, len,
-											 buf1, len1, NULL);
-}
-
-
-INLINE int i2c_write_9(I2c *i2c, uint16_t slave_addr, int flags, const void *buf, size_t len,
-														  const void *buf1, size_t len1,
-														  const void *buf2, size_t len2)
-{
-	return i2c->write(i2c, slave_addr, flags, buf, len,
-											  buf1, len1,
-											  buf2, len2, NULL);
-}
-
-INLINE int i2c_read_9(I2c *i2c, uint16_t slave_addr, int flags, void *buf, size_t len,
-														 void *buf1, size_t len1,
-														 void *buf2, size_t len2)
-{
-	return i2c->read(i2c, slave_addr, flags, buf, len,
-											  buf1, len1,
-											  buf2, len2, NULL);
-}
-
-INLINE int i2c_write_11(I2c *i2c, uint16_t slave_addr, int flags, const void *buf, size_t len,
-														  const void *buf1, size_t len1,
-														  const void *buf2, size_t len2,
-														  const void *buf3, size_t len3)
-{
-	return i2c->write(i2c, slave_addr, flags, buf, len,
-											  buf1, len1,
-											  buf2, len2,
-											  buf3, len3, NULL);
-}
-
-INLINE int i2c_read_11(I2c *i2c, uint16_t slave_addr, int flags, void *buf, size_t len,
-														 void *buf1, size_t len1,
-														 void *buf2, size_t len2,
-														 void *buf3, size_t len3)
-
-{
-	return i2c->read(i2c, slave_addr, flags, buf, len,
-											  buf1, len1,
-											  buf2, len2,
-											  buf3, len3, NULL);
 }
 
 #endif
