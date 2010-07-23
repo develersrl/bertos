@@ -57,7 +57,7 @@ INLINE bool i2c_bitbang_start(void)
 	I2C_HALFBIT_DELAY();
 	SDA_LO;
 	I2C_HALFBIT_DELAY();
-	ASSERT(!SDA_IN);
+
 	return !SDA_IN;
 }
 
@@ -177,3 +177,118 @@ void i2c_bitbang_init(void)
 	MOD_INIT(i2c);
 }
 
+
+/*
+ * New I2C API
+ */
+
+static void i2c_bitbang_stop(struct I2c *i2c)
+{
+	SDA_LO;
+	SCL_HI;
+	I2C_HALFBIT_DELAY();
+	SDA_HI;
+}
+
+
+void i2c_bitbang_start(struct I2c *i2c, uint16_t slave_addr)
+{
+	if (i2c->flags & I2C_START_R)
+		slave_addr |= I2C_READBIT;
+	else
+		slave_addr &= ~I2C_READBIT;
+
+	/*
+	 * Loop on the select write sequence: when the device is busy
+	 * writing previously sent data it will reply to the SLA_W
+	 * control byte with a NACK.  In this case, we must
+	 * keep trying until the deveice responds with an ACK.
+	 */
+	ticks_t start = timer_clock();
+	while (i2c_bitbang_start())
+	{
+		if (i2c_bitbang_put(slave_addr))
+			return;
+		else if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT))
+		{
+			LOG_ERR("Timeout on I2C start\n");
+			i2c->errors |= I2C_START_TIMEOUT;
+			i2c_bitbang_stop(i2c);
+			return;
+		}
+	}
+
+	LOG_ERR("START arbitration lost\n");
+	i2c->errors |= I2C_ARB_LOST;
+	i2c_bitbang_stop(i2c);
+	return;
+}
+
+uint8_t i2c_bitbang_get(struct I2c *i2c)
+{
+	uint8_t data = 0;
+	for (uint8_t i = 0x80; i != 0; i >>= 1)
+	{
+		SCL_LO;
+		I2C_HALFBIT_DELAY();
+		SCL_HI;
+		if (SDA_IN)
+			data |= i;
+		else
+			data &= ~i;
+
+		I2C_HALFBIT_DELAY();
+	}
+	SCL_LO;
+
+	/* Generate ACK/NACK */
+	if (i2c->xfer_size > 1)
+		SDA_LO;
+	else
+		SDA_HI;
+
+	I2C_HALFBIT_DELAY();
+	SCL_HI;
+	I2C_HALFBIT_DELAY();
+	SCL_LO;
+	SDA_HI;
+
+	/* Generate stop condition (if requested) */
+	if ((i2c->xfer_size == 1) && (i2c->flags & I2C_STOP))
+		i2c_bitbang_stop(i2c);
+
+	return data;
+}
+
+void i2c_bitbang_put(struct I2c *i2c, uint8_t _data)
+{
+	/* Add ACK bit */
+	uint16_t data = (_data << 1) | 1;
+
+	for (uint16_t i = 0x100; i != 0; i >>= 1)
+	{
+		SCL_LO;
+		if (data & i)
+			SDA_HI;
+		else
+			SDA_LO;
+		I2C_HALFBIT_DELAY();
+
+		SCL_HI;
+		I2C_HALFBIT_DELAY();
+	}
+
+	bool ack = !SDA_IN;
+	SCL_LO;
+	I2C_HALFBIT_DELAY();
+
+	if (!ack)
+	{
+		LOG_ERR("NO ACK received\n");
+		i2c->errors |= I2C_NO_ACK;
+	}
+
+	/* Generate stop condition (if requested) */
+	if (((i2c->xfer_size == 1) && (i2c->flags & I2C_STOP)) || i2c->errors)
+		i2c_bitbang_stop(i2c);
+}
