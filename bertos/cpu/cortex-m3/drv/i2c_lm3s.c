@@ -47,8 +47,8 @@
 
 #include <cpu/detect.h>
 #include <cpu/irq.h>
+#include <cpu/types.h>
 
-#include <io/cm3_types.h>
 #include <io/lm3s.h>
 
 #include <drv/timer.h>

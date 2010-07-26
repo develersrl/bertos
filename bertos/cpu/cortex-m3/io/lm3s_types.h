@@ -37,7 +37,7 @@
 #define LM3S_TYPES_H
 
 #include <cfg/compiler.h>
-#include <io/cm3_types.h>
+#include <cpu/types.h>
 
 /**
  * Helper Macros for determining the particular hardware revision.

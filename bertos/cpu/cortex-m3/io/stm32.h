@@ -39,7 +39,8 @@
 #include <cfg/compiler.h>
 #include <cfg/macros.h>
 
-#include <io/cm3_types.h>
+#include <cpu/types.h>
+
 #include <io/stm32_memmap.h>
 
 #include "stm32_nvic.h"
