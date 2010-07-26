@@ -59,33 +59,16 @@
 
 struct I2cHardware
 {
-	int dev;
+	uint32_t base;
+	uint32_t pconp;
+	uint32_t pinsel_port;
+	uint32_t pinsel;
+	uint32_t pinsel_mask;
+	uint32_t pclksel;
+	uint32_t pclk_mask;
+	uint32_t pclk_div;
 };
 
-/*
- *
- */
-#if 1
-	/* I2C 0 */
-	#define I2C_PCONP                    PCONP_PCI2C0
-	#define I2C_CONSET                   I20CONSET
-	#define I2C_CONCLR                   I20CONCLR
-	#define I2C_SCLH                     I20SCLH
-	#define I2C_SCLL                     I20SCLL
-	#define I2C_STAT                     I20STAT
-	#define I2C_DAT                      I20DAT
-	#define I2C_PINSEL_PORT              PINSEL1
-	#define I2C_PINSEL                   I2C0_PINSEL
-	#define I2C_PINSEL_MASK              I2C0_PINSEL_MASK
-	#define I2C_PCLKSEL                  PCLKSEL0
-	#define I2C_PCLK_MASK                I2C0_PCLK_MASK
-	#define I2C_PCLK_DIV8                I2C0_PCLK_DIV8
-#else
-	/* I2C 1 */
-	#error
-#endif
-
-#define GET_STATUS()   ((uint8_t)I2C_STAT)
 /*
  * Wait that SI bit is set.
  *
@@ -93,10 +76,10 @@ struct I2cHardware
  * state F8 does not set SI since there is nothing for an interrupt service
  * routine to do in that case.
  */
-#define WAIT_SI() \
+#define WAIT_SI(i2c) \
 	do { \
 		ticks_t start = timer_clock(); \
-		while( !(I2C_CONSET & BV(I2CON_SI)) ) \
+		while( !(HWREG(i2c->hw->base + I2C_CONSET_OFF) & BV(I2CON_SI)) ) \
 		{ \
 			if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT)) \
 			{ \
@@ -106,54 +89,54 @@ struct I2cHardware
 		} \
 	} while (0)
 
-static void i2c_hw_restart(void)
+static void i2c_hw_restart(I2c *i2c)
 {
 	// Clear all pending flags.
-	I2C_CONCLR = BV(I2CON_STAC) | BV(I2CON_SIC) | BV(I2CON_AAC);
+	HWREG(i2c->hw->base + I2C_CONCLR_OFF) = BV(I2CON_STAC) | BV(I2CON_SIC) | BV(I2CON_AAC);
 
 	// Set start and ack bit.
-	I2C_CONSET = BV(I2CON_STA);
+	HWREG(i2c->hw->base + I2C_CONSET_OFF) = BV(I2CON_STA);
 
-	WAIT_SI();
+	WAIT_SI(i2c);
 }
 
 
-static void i2c_hw_stop(void)
+static void i2c_hw_stop(I2c *i2c)
 {
 	/* Set the stop bit */
-	I2C_CONSET = BV(I2CON_STO);
+	HWREG(i2c->hw->base + I2C_CONSET_OFF) = BV(I2CON_STO);
 	/* Clear pending flags */
-	I2C_CONCLR = BV(I2CON_STAC) | BV(I2CON_SIC) | BV(I2CON_AAC);
+	HWREG(i2c->hw->base + I2C_CONCLR_OFF) = BV(I2CON_STAC) | BV(I2CON_SIC) | BV(I2CON_AAC);
 }
 
 static void i2c_lpc2_put(I2c *i2c, uint8_t data)
 {
-	I2C_DAT = data;
-	I2C_CONCLR = BV(I2CON_SIC);
+	HWREG(i2c->hw->base + I2C_DAT_OFF) = data;
+	HWREG(i2c->hw->base + I2C_CONCLR_OFF) = BV(I2CON_SIC);
 
-	WAIT_SI();
+	WAIT_SI(i2c);
 
-	uint32_t status = GET_STATUS();
+	uint32_t status = HWREG(i2c->hw->base + I2C_STAT_OFF);
 
 
 	/* Generate the stop if we finish to send all programmed bytes */
 	if (i2c->xfer_size == 1)
 	{
 		if (I2C_TEST_STOP(i2c->flags) == I2C_STOP)
-			i2c_hw_stop();
+			i2c_hw_stop(i2c);
 	}
 
 	if (status == I2C_STAT_DATA_NACK)
 	{
 		LOG_ERR("Data NACK\n");
 		i2c->errors |= I2C_NO_ACK;
-		i2c_hw_stop();
+		i2c_hw_stop(i2c);
 	}
 	else if ((status == I2C_STAT_ERROR) || (status == I2C_STAT_UNKNOW))
 	{
 		LOG_ERR("I2C error.\n");
 		i2c->errors |= I2C_ERR;
-		i2c_hw_stop();
+		i2c_hw_stop(i2c);
 	}
 }
 
@@ -164,16 +147,16 @@ static uint8_t i2c_lpc2_get(I2c *i2c)
 	 * we disable it
 	 */
 	if (i2c->xfer_size > 1)
-		I2C_CONSET = BV(I2CON_AA);
+		HWREG(i2c->hw->base + I2C_CONSET_OFF) = BV(I2CON_AA);
 	else
-		I2C_CONCLR = BV(I2CON_AAC);
+		HWREG(i2c->hw->base + I2C_CONCLR_OFF) = BV(I2CON_AAC);
 
-	I2C_CONCLR = BV(I2CON_SIC);
+	HWREG(i2c->hw->base + I2C_CONCLR_OFF) = BV(I2CON_SIC);
 
-	WAIT_SI();
+	WAIT_SI(i2c);
 
-	uint32_t status = GET_STATUS();
-	uint8_t data = (uint8_t)(I2C_DAT & 0xFF);
+	uint32_t status = HWREG(i2c->hw->base + I2C_STAT_OFF);
+	uint8_t data = (uint8_t)HWREG(i2c->hw->base + I2C_DAT_OFF);
 
 	if (status == I2C_STAT_RDATA_ACK)
 	{
@@ -186,7 +169,7 @@ static uint8_t i2c_lpc2_get(I2c *i2c)
 		 * required
 		 */
 		if (I2C_TEST_STOP(i2c->flags) == I2C_STOP)
-			i2c_hw_stop();
+			i2c_hw_stop(i2c);
 
 		return data;
 	}
@@ -194,7 +177,7 @@ static uint8_t i2c_lpc2_get(I2c *i2c)
 	{
 		LOG_ERR("I2C error.\n");
 		i2c->errors |= I2C_ERR;
-		i2c_hw_stop();
+		i2c_hw_stop(i2c);
 	}
 
 	return 0xFF;
@@ -209,68 +192,71 @@ static void i2c_lpc2_start(struct I2c *i2c, uint16_t slave_addr)
 		ticks_t start = timer_clock();
 		while (true)
 		{
-			i2c_hw_restart();
+			i2c_hw_restart(i2c);
 
-			uint8_t status = GET_STATUS();
+			uint8_t status = HWREG(i2c->hw->base + I2C_STAT_OFF);
 
 			/* Start status ok, set addres and the R/W bit */
 			if ((status == I2C_STAT_SEND) || (status == I2C_STAT_RESEND))
-				I2C_DAT = slave_addr & ~I2C_READBIT;
+				HWREG(i2c->hw->base + I2C_DAT_OFF) = slave_addr & ~I2C_READBIT;
 
 			/* Clear the start bit and clear the SI bit */
-			I2C_CONCLR = BV(I2CON_SIC) | BV(I2CON_STAC);
+			HWREG(i2c->hw->base + I2C_CONCLR_OFF) = BV(I2CON_SIC) | BV(I2CON_STAC);
 
 			if (status == I2C_STAT_SLAW_ACK)
 				break;
 
 			if (status == I2C_STAT_ARB_LOST)
-				goto error;
+			{
+				LOG_ERR("Arbitration lost\n");
+				i2c->errors |= I2C_ARB_LOST;
+				i2c_hw_stop(i2c);
+			}
 
 			if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT))
 			{
 				LOG_ERR("Timeout on I2C START\n");
 				i2c->errors |= I2C_NO_ACK;
-				i2c_hw_stop();
+				i2c_hw_stop(i2c);
 				break;
 			}
 		}
 	}
 	else if (I2C_TEST_START(i2c->flags) == I2C_START_R)
 	{
-		i2c_hw_restart();
+		i2c_hw_restart(i2c);
 
-		uint8_t status = GET_STATUS();
+		uint8_t status = HWREG(i2c->hw->base + I2C_STAT_OFF);
 
 		/* Start status ok, set addres and the R/W bit */
 		if ((status == I2C_STAT_SEND) || (status == I2C_STAT_RESEND))
-			I2C_DAT = slave_addr | I2C_READBIT;
+			HWREG(i2c->hw->base + I2C_DAT_OFF) = slave_addr | I2C_READBIT;
 
 		/* Clear the start bit and clear the SI bit */
-		I2C_CONCLR = BV(I2CON_SIC) | BV(I2CON_STAC);
+		HWREG(i2c->hw->base + I2C_CONCLR_OFF) = BV(I2CON_SIC) | BV(I2CON_STAC);
 
-		WAIT_SI();
+		WAIT_SI(i2c);
 
-		status = GET_STATUS();
+		status = HWREG(i2c->hw->base + I2C_STAT_OFF);
 
 		if (status == I2C_STAT_SLAR_NACK)
 		{
 			LOG_ERR("SLAR NACK:%02x\n", status);
 			i2c->errors |= I2C_NO_ACK;
-			i2c_hw_stop();
+			i2c_hw_stop(i2c);
 		}
 
 		if (status == I2C_STAT_ARB_LOST)
-			goto error;
+		{
+			LOG_ERR("Arbitration lost\n");
+			i2c->errors |= I2C_ARB_LOST;
+			i2c_hw_stop(i2c);
+		}
 	}
 	else
 	{
 		ASSERT(0);
 	}
-
-error:
-	LOG_ERR("Arbitration lost\n");
-	i2c->errors |= I2C_ARB_LOST;
-	i2c_hw_stop();
 }
 
 static const I2cVT i2c_lpc_vt =
@@ -282,45 +268,56 @@ static const I2cVT i2c_lpc_vt =
 	.recv = i2c_swRecv,
 };
 
-struct I2cHardware i2c_lpc2_hw =
+struct I2cHardware i2c_lpc2_hw[] =
 {
-	.dev = 0,
+	{ /* I2C0 */
+		.base = I2C0_BASE_ADDR,
+		.pconp = BV(PCONP_PCI2C0),
+		.pinsel_port = PINSEL1_OFF,
+		.pinsel = I2C0_PINSEL,
+		.pinsel_mask = I2C0_PINSEL_MASK,
+		.pclksel = PCLKSEL0_OFF,
+		.pclk_mask = I2C0_PCLK_MASK,
+		.pclk_div = I2C0_PCLK_DIV8,
+	},
 };
-
 
 /**
  * Initialize I2C module.
  */
 void i2c_hw_init(I2c *i2c, int dev, uint32_t clock)
 {
-	i2c->hw = &i2c_lpc2_hw;
+	i2c->hw = &i2c_lpc2_hw[dev];
 	i2c->vt = &i2c_lpc_vt;
 
+
 	/* Enable I2C clock */
-	PCONP |= BV(I2C_PCONP);
+	PCONP |= i2c->hw->pconp;
 
 	ASSERT(clock <= 400000);
 
-	I2C_CONCLR = BV(I2CON_I2ENC) | BV(I2CON_STAC) | BV(I2CON_SIC) | BV(I2CON_AAC);
+	HWREG(i2c->hw->base + I2C_CONCLR_OFF) = BV(I2CON_I2ENC) | BV(I2CON_STAC) | BV(I2CON_SIC) | BV(I2CON_AAC);
 
 	/*
 	 * Bit Frequency = Fplk / (I2C_I2SCLH + I2C_I2SCLL)
 	 * value of I2SCLH and I2SCLL must be different
 	 */
-	I2C_PCLKSEL &= ~I2C_PCLK_MASK;
-	I2C_PCLKSEL |= I2C_PCLK_DIV8;
+	HWREG(SCB_BASE_ADDR + i2c->hw->pclksel) &= ~i2c->hw->pclk_mask;
+	HWREG(SCB_BASE_ADDR + i2c->hw->pclksel) |= i2c->hw->pclk_div;
 
-	I2C_SCLH = (((CPU_FREQ / 8) / clock) / 2) + 1;
-	I2C_SCLL = (((CPU_FREQ / 8) / clock) / 2);
+	HWREG(i2c->hw->base + I2C_SCLH_OFF) = (((CPU_FREQ / 8) / clock) / 2) + 1;
+	HWREG(i2c->hw->base + I2C_SCLL_OFF) = (((CPU_FREQ / 8) / clock) / 2);
 
-	ASSERT(I2C_SCLH > 4 || I2C_SCLL > 4);
+	ASSERT(HWREG(i2c->hw->base + I2C_SCLH_OFF) > 4);
+	ASSERT(HWREG(i2c->hw->base + I2C_SCLL_OFF) > 4);
 
 	/* Assign pins to SCL and SDA (P0_27, P0_28) */
-	I2C_PINSEL_PORT &= ~I2C_PINSEL_MASK;
-	I2C_PINSEL_PORT |= I2C_PINSEL;
+	HWREG(PINSEL_BASE_ADDR + i2c->hw->pinsel_port) &= ~i2c->hw->pinsel_mask;
+	HWREG(PINSEL_BASE_ADDR + i2c->hw->pinsel_port) |= i2c->hw->pinsel;
+
 
 	// Enable I2C
-	I2C_CONSET = BV(I2CON_I2EN);
+	HWREG(i2c->hw->base + I2C_CONSET_OFF) = BV(I2CON_I2EN);
 
 	MOD_INIT(i2c);
 }
