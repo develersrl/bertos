@@ -54,6 +54,14 @@
 
 #include <io/lpc23xx.h>
 
+#include <stdarg.h>
+
+
+struct I2cHardware
+{
+	int dev;
+};
+
 /*
  *
  */
@@ -98,101 +106,19 @@
 		} \
 	} while (0)
 
-static uint8_t i2c_builtin_start(void)
+static void i2c_hw_restart(void)
 {
 	// Clear all pending flags.
 	I2C_CONCLR = BV(I2CON_STAC) | BV(I2CON_SIC) | BV(I2CON_AAC);
 
 	// Set start and ack bit.
-	I2C_CONSET = BV(I2CON_STA) | BV(I2CON_AA);
+	I2C_CONSET = BV(I2CON_STA);
 
 	WAIT_SI();
-
-	return true;
 }
 
 
-/**
- * Send START condition and select slave for write.
- * \c id is the device id comprehensive of address left shifted by 1.
- * The LSB of \c id is ignored and reset to 0 for write operation.
- *
- * \return true on success, false otherwise.
- */
-bool i2c_builtin_start_w(uint8_t id)
-{
-	ticks_t start = timer_clock();
-	while (i2c_builtin_start())
-	{
-		uint8_t status = GET_STATUS();
-
-		/* Start status ok, set addres and the R/W bit */
-		if ((status == I2C_STAT_SEND) || (status == I2C_STAT_RESEND))
-			I2C_DAT = id & ~I2C_READBIT;
-
-		/* Clear the start bit and clear the SI bit */
-		I2C_CONCLR = BV(I2CON_SIC) | BV(I2CON_STAC);
-
-		if (status == I2C_STAT_SLAW_ACK)
-			return true;
-		else if (status == I2C_STAT_ARB_LOST)
-		{
-			LOG_ERR("Arbitration lost\n");
-			break;
-		}
-
-		if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT))
-		{
-			LOG_ERR("Timeout on I2C START\n");
-			break;
-		}
-	}
-	return false;
-}
-
-
-/**
- * Send START condition and select slave for read.
- * \c id is the device id comprehensive of address left shifted by 1.
- * The LSB of \c id is ignored and set to 1 for read operation.
- *
- * \return true on success, false otherwise.
- */
-bool i2c_builtin_start_r(uint8_t id)
-{
-	if (i2c_builtin_start())
-	{
-		uint8_t status = GET_STATUS();
-
-		/* Start status ok, set addres and the R/W bit */
-		if ((status == I2C_STAT_SEND) || (status == I2C_STAT_RESEND))
-			I2C_DAT = id | I2C_READBIT;
-
-		/* Clear the start bit and clear the SI bit */
-		I2C_CONCLR = BV(I2CON_SIC) | BV(I2CON_STAC);
-
-		WAIT_SI();
-
-		status = GET_STATUS();
-
-		if (status == I2C_STAT_SLAR_ACK)
-			return true;
-
-		else if (status == I2C_STAT_SLAR_ACK)
-		{
-			LOG_ERR("SLAR NACK:%02x\n", status);
-		}
-		else if (status == I2C_STAT_ARB_LOST)
-		{
-			LOG_ERR("ARB Lost:%02x\n", status);
-		}
-
-	}
-	return false;
-}
-
-
-void i2c_builtin_stop(void)
+static void i2c_hw_stop(void)
 {
 	/* Set the stop bit */
 	I2C_CONSET = BV(I2CON_STO);
@@ -200,46 +126,49 @@ void i2c_builtin_stop(void)
 	I2C_CONCLR = BV(I2CON_STAC) | BV(I2CON_SIC) | BV(I2CON_AAC);
 }
 
-
-bool i2c_builtin_put(const uint8_t data)
+static void i2c_lpc2_put(I2c *i2c, uint8_t data)
 {
 	I2C_DAT = data;
+
+//	kprintf("w %02x\n", data);
+
 	I2C_CONCLR = BV(I2CON_SIC);
 
 	WAIT_SI();
 
 	uint32_t status = GET_STATUS();
+	//kprintf("w %08lx\n", status);
 
-	if (status == I2C_STAT_DATA_ACK)
-		return true;
-	else if (status == I2C_STAT_DATA_NACK)
+	/* if (status == I2C_STAT_DATA_ACK) */
+
+	/* Generate the stop if we finish to send all programmed bytes */
+	if (i2c->xfer_size == 1)
+	{
+		if (I2C_TEST_STOP(i2c->flags) == I2C_STOP)
+			i2c_hw_stop();
+	}
+
+	if (status == I2C_STAT_DATA_NACK)
 	{
 		LOG_ERR("Data NACK\n");
-		return false;
+		i2c->errors |= I2C_NO_ACK;
+		i2c_hw_stop();
 	}
-	else if (status == I2C_STAT_ERROR)
+	else if ((status == I2C_STAT_ERROR) || (status == I2C_STAT_UNKNOW))
 	{
 		LOG_ERR("I2C error.\n");
-		return false;
+		i2c->errors |= I2C_ERR;
+		i2c_hw_stop();
 	}
-	else if (status == I2C_STAT_UNKNOW)
-	{
-		LOG_ERR("I2C unable to read status.\n");
-		return false;
-	}
-
-	return false;
 }
 
-
-int i2c_builtin_get(bool ack)
+static uint8_t i2c_lpc2_get(I2c *i2c)
 {
-
 	/*
 	 * Set ack bit if we want read more byte, otherwise
 	 * we disable it
 	 */
-	if (ack)
+	if (i2c->xfer_size > 1)
 		I2C_CONSET = BV(I2CON_AA);
 	else
 		I2C_CONCLR = BV(I2CON_AAC);
@@ -249,38 +178,142 @@ int i2c_builtin_get(bool ack)
 	WAIT_SI();
 
 	uint32_t status = GET_STATUS();
+	uint8_t data = (uint8_t)(I2C_DAT & 0xFF);
+
+//	kprintf("r %02x\n", data);
+//	kprintf("r %08lx\n", status);
 
 	if (status == I2C_STAT_RDATA_ACK)
-		return (uint8_t)I2C_DAT;
+	{
+		return data;
+	}
 	else if (status == I2C_STAT_RDATA_NACK)
-		return true;
-	else if (status == I2C_STAT_ERROR)
+	{
+		/*
+		 * last byte to read generate the stop if
+		 * required
+		 */
+		if (I2C_TEST_STOP(i2c->flags) == I2C_STOP)
+			i2c_hw_stop();
+
+		return data;
+	}
+	else if ((status == I2C_STAT_ERROR) || (status == I2C_STAT_UNKNOW))
 	{
 		LOG_ERR("I2C error.\n");
-		return EOF;
-	}
-	else if (status == I2C_STAT_UNKNOW)
-	{
-		LOG_ERR("I2C unable to read status.\n");
-		return EOF;
+		i2c->errors |= I2C_ERR;
+		i2c_hw_stop();
 	}
 
-	return EOF;
+	return 0xFF;
 }
 
 MOD_DEFINE(i2c);
 
+static void i2c_lpc2_start(struct I2c *i2c, uint16_t slave_addr)
+{
+	if (I2C_TEST_START(i2c->flags) == I2C_START_W)
+	{
+		ticks_t start = timer_clock();
+		while (true)
+		{
+			i2c_hw_restart();
+
+			uint8_t status = GET_STATUS();
+
+			/* Start status ok, set addres and the R/W bit */
+			if ((status == I2C_STAT_SEND) || (status == I2C_STAT_RESEND))
+				I2C_DAT = slave_addr & ~I2C_READBIT;
+
+			/* Clear the start bit and clear the SI bit */
+			I2C_CONCLR = BV(I2CON_SIC) | BV(I2CON_STAC);
+
+			if (status == I2C_STAT_SLAW_ACK)
+				break;
+			else if (status == I2C_STAT_ARB_LOST)
+			{
+				LOG_ERR("Arbitration lost\n");
+				i2c->errors |= I2C_ARB_LOST;
+				i2c_hw_stop();
+				break;
+			}
+
+			if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT))
+			{
+				LOG_ERR("Timeout on I2C START\n");
+				i2c->errors |= I2C_NO_ACK;
+				i2c_hw_stop();
+				break;
+			}
+		}
+	}
+	else if (I2C_TEST_START(i2c->flags) == I2C_START_R)
+	{
+		i2c_hw_restart();
+
+		uint8_t status = GET_STATUS();
+
+		/* Start status ok, set addres and the R/W bit */
+		if ((status == I2C_STAT_SEND) || (status == I2C_STAT_RESEND))
+			I2C_DAT = slave_addr | I2C_READBIT;
+
+		/* Clear the start bit and clear the SI bit */
+		I2C_CONCLR = BV(I2CON_SIC) | BV(I2CON_STAC);
+
+		WAIT_SI();
+
+		status = GET_STATUS();
+/*
+		if (status == I2C_STAT_SLAR_ACK)
+			break;
+*/
+		if (status == I2C_STAT_SLAR_NACK)
+		{
+			LOG_ERR("SLAR NACK:%02x\n", status);
+			i2c->errors |= I2C_NO_ACK;
+			i2c_hw_stop();
+		}
+		else if (status == I2C_STAT_ARB_LOST)
+		{
+			LOG_ERR("Arbitration lost\n");
+			i2c->errors |= I2C_ARB_LOST;
+			i2c_hw_stop();
+		}
+	}
+	else
+	{
+		ASSERT(0);
+	}
+
+}
+
+static const I2cVT i2c_lpc_vt =
+{
+	.start = i2c_lpc2_start,
+	.get = i2c_lpc2_get,
+	.put = i2c_lpc2_put,
+	.send = i2c_swSend,
+	.recv = i2c_swRecv,
+};
+
+struct I2cHardware i2c_lpc2_hw =
+{
+	.dev = 0,
+};
+
+
 /**
  * Initialize I2C module.
  */
-void i2c_builtin_init(void)
+void i2c_hw_init(I2c *i2c, int dev, uint32_t clock)
 {
+	i2c->hw = &i2c_lpc2_hw;
+	i2c->vt = &i2c_lpc_vt;
+
 	/* Enable I2C clock */
 	PCONP |= BV(I2C_PCONP);
 
-	#if (CONFIG_I2C_FREQ > 400000)
-		#error i2c frequency is to hight.
-	#endif
+	ASSERT(clock <= 400000);
 
 	I2C_CONCLR = BV(I2CON_I2ENC) | BV(I2CON_STAC) | BV(I2CON_SIC) | BV(I2CON_AAC);
 
@@ -291,8 +324,8 @@ void i2c_builtin_init(void)
 	I2C_PCLKSEL &= ~I2C_PCLK_MASK;
 	I2C_PCLKSEL |= I2C_PCLK_DIV8;
 
-	I2C_SCLH = (((CPU_FREQ / 8) / CONFIG_I2C_FREQ) / 2) + 1;
-	I2C_SCLL = (((CPU_FREQ / 8) / CONFIG_I2C_FREQ) / 2);
+	I2C_SCLH = (((CPU_FREQ / 8) / clock) / 2) + 1;
+	I2C_SCLL = (((CPU_FREQ / 8) / clock) / 2);
 
 	ASSERT(I2C_SCLH > 4 || I2C_SCLL > 4);
 
