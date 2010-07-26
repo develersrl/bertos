@@ -136,20 +136,24 @@ bool i2c_recv(void *_buf, size_t count);
 
 /*
  * I2c new api
- *
  */
-#define I2C_OK               0
-#define I2C_ERR           BV(3)
-#define I2C_ARB_LOST      BV(2)
-#define I2C_START_TIMEOUT BV(0)
-#define I2C_NO_ACK        BV(1)
 
+ /*
+  * I2C error flags
+  */
+#define I2C_OK               0     ///< I2C no errors flag
+#define I2C_ERR           BV(3)    ///< I2C generic error
+#define I2C_ARB_LOST      BV(2)    ///< I2C arbitration lost error
+#define I2C_START_TIMEOUT BV(0)    ///< I2C timeout error on start
+#define I2C_NO_ACK        BV(1)    ///< I2C no ack for sla start
 
-
-#define I2C_NOSTOP           0
-#define I2C_STOP          BV(0)
-#define I2C_START_R       BV(1)
-#define I2C_START_W          0
+/*
+ * I2C command flags
+ */
+#define I2C_NOSTOP           0    ///< Do not program the stop for current transition
+#define I2C_STOP          BV(0)   ///< Program the stop for current transition
+#define I2C_START_R       BV(1)   ///< Start read command
+#define I2C_START_W          0    ///< Start write command
 
 
 #define I2C_TEST_START(flag)  ((flag) & I2C_START_R)
