@@ -129,17 +129,12 @@ static void i2c_hw_stop(void)
 static void i2c_lpc2_put(I2c *i2c, uint8_t data)
 {
 	I2C_DAT = data;
-
-//	kprintf("w %02x\n", data);
-
 	I2C_CONCLR = BV(I2CON_SIC);
 
 	WAIT_SI();
 
 	uint32_t status = GET_STATUS();
-	//kprintf("w %08lx\n", status);
 
-	/* if (status == I2C_STAT_DATA_ACK) */
 
 	/* Generate the stop if we finish to send all programmed bytes */
 	if (i2c->xfer_size == 1)
@@ -179,9 +174,6 @@ static uint8_t i2c_lpc2_get(I2c *i2c)
 
 	uint32_t status = GET_STATUS();
 	uint8_t data = (uint8_t)(I2C_DAT & 0xFF);
-
-//	kprintf("r %02x\n", data);
-//	kprintf("r %08lx\n", status);
 
 	if (status == I2C_STAT_RDATA_ACK)
 	{
@@ -230,13 +222,9 @@ static void i2c_lpc2_start(struct I2c *i2c, uint16_t slave_addr)
 
 			if (status == I2C_STAT_SLAW_ACK)
 				break;
-			else if (status == I2C_STAT_ARB_LOST)
-			{
-				LOG_ERR("Arbitration lost\n");
-				i2c->errors |= I2C_ARB_LOST;
-				i2c_hw_stop();
-				break;
-			}
+
+			if (status == I2C_STAT_ARB_LOST)
+				goto error;
 
 			if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT))
 			{
@@ -263,28 +251,26 @@ static void i2c_lpc2_start(struct I2c *i2c, uint16_t slave_addr)
 		WAIT_SI();
 
 		status = GET_STATUS();
-/*
-		if (status == I2C_STAT_SLAR_ACK)
-			break;
-*/
+
 		if (status == I2C_STAT_SLAR_NACK)
 		{
 			LOG_ERR("SLAR NACK:%02x\n", status);
 			i2c->errors |= I2C_NO_ACK;
 			i2c_hw_stop();
 		}
-		else if (status == I2C_STAT_ARB_LOST)
-		{
-			LOG_ERR("Arbitration lost\n");
-			i2c->errors |= I2C_ARB_LOST;
-			i2c_hw_stop();
-		}
+
+		if (status == I2C_STAT_ARB_LOST)
+			goto error;
 	}
 	else
 	{
 		ASSERT(0);
 	}
 
+error:
+	LOG_ERR("Arbitration lost\n");
+	i2c->errors |= I2C_ARB_LOST;
+	i2c_hw_stop();
 }
 
 static const I2cVT i2c_lpc_vt =
