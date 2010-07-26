@@ -45,6 +45,11 @@
 
 #include "cfg/cfg_i2c.h"
 
+#define LOG_LEVEL  I2C_LOG_LEVEL
+#define LOG_FORMAT I2C_LOG_FORMAT
+
+#include <cfg/log.h>
+
 #include <cfg/compiler.h>
 #include <cfg/macros.h>
 #include <cfg/debug.h>
@@ -180,6 +185,9 @@ typedef struct I2c
 
 #include CPU_HEADER(i2c)
 
+void i2c_swSend(struct I2c *i2c, const void *_buf, size_t count);
+void i2c_swRecv(struct I2c *i2c, void *_buf, size_t count);
+
 INLINE void i2c_start(I2c *i2c, uint16_t slave_addr, size_t size)
 {
 	ASSERT(i2c->vt);
@@ -283,6 +291,12 @@ INLINE int i2c_error(I2c *i2c)
 	ASSERT(i2c);
 	int err = i2c->errors;
 	i2c->errors = 0;
+
+	LOG_ERRB(
+		if (err)
+			LOG_ERR("err[%02x]\n", err);
+	);
+
 	return err;
 }
 
