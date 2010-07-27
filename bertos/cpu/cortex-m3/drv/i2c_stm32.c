@@ -45,6 +45,7 @@
 #include <cfg/macros.h> // BV()
 #include <cfg/module.h>
 
+#include <cpu/power.h>
 #include <drv/gpio_stm32.h>
 #include <drv/irq_cm3.h>
 #include <drv/clock_stm32.h>
@@ -63,8 +64,17 @@ struct I2cHardware
 	bool cached;
 };
 
-#define WAIT_BTF(base)        while( !(base->SR1 & BV(SR1_BTF)) )
-#define WAIT_RXNE(base)        while( !(base->SR1 & BV(SR1_RXNE)) )
+#define WAIT_BTF(base) \
+	do { \
+		while (!(base->SR1 & BV(SR1_BTF))) \
+			cpu_relax(); \
+	} while (0)
+
+#define WAIT_RXNE(base) \
+	do { \
+		while (!(base->SR1 & BV(SR1_RXNE))) \
+			cpu_relax(); \
+	} while (0)
 
 INLINE uint32_t get_status(struct stm32_i2c *base)
 {
@@ -72,7 +82,7 @@ INLINE uint32_t get_status(struct stm32_i2c *base)
 }
 
 
-INLINE bool check_i2cStatus(I2c *i2c, uint32_t event)
+INLINE bool wait_event(I2c *i2c, uint32_t event)
 {
 	while (true)
 	{
@@ -84,37 +94,11 @@ INLINE bool check_i2cStatus(I2c *i2c, uint32_t event)
 		if (stat & SR1_ERR_MASK)
 		{
 			i2c->hw->base->SR1 &= ~SR1_ERR_MASK;
-			i2c->hw->base->CR1 |= CR1_START_SET;
 			return false;
 		}
-
+		cpu_relax();
 	}
-
 	return true;
-}
-
-/**
- * Send START condition on the bus.
- *
- * \return true on success, false otherwise.
- */
-INLINE bool i2c_hw_restart(I2c *i2c)
-{
-
-	i2c->hw->base->CR1 |= CR1_ACK_SET | CR1_START_SET;
-
-	if(check_i2cStatus(i2c, I2C_EVENT_MASTER_MODE_SELECT))
-		return true;
-
-	return false;
-}
-
-/**
- * Send STOP condition.
- */
-static void i2c_hw_stop(I2c *i2c)
-{
-	i2c->hw->base->CR1 |= CR1_STOP_SET;
 }
 
 static void i2c_stm32_start(struct I2c *i2c, uint16_t slave_addr)
@@ -130,32 +114,41 @@ static void i2c_stm32_start(struct I2c *i2c, uint16_t slave_addr)
 		 * keep trying until the eeprom responds with an ACK.
 		 */
 		ticks_t start = timer_clock();
-		while (i2c_hw_restart(i2c))
+		while (true)
 		{
+			i2c->hw->base->CR1 |= CR1_ACK_SET | CR1_START_SET;
+
+			if(!wait_event(i2c, I2C_EVENT_MASTER_MODE_SELECT))
+			{
+				LOG_ERR("ARBIT lost\n");
+				i2c->errors |= I2C_ARB_LOST;
+				break;
+			}
+
 			i2c->hw->base->DR = slave_addr & OAR1_ADD0_RESET;
 
-			if(check_i2cStatus(i2c, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED))
+			if(wait_event(i2c, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED))
 				break;
 
 			if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT))
 			{
 				LOG_ERR("Timeout on I2C START\n");
-				i2c->errors |= I2C_NO_ACK;
-				i2c_hw_stop(i2c);
+				i2c->errors |= I2C_START_TIMEOUT;
+				i2c->hw->base->CR1 |= CR1_STOP_SET;
 				break;
 			}
 		}
 
 	}
-	else if (I2C_TEST_START(i2c->flags) == I2C_START_R)
+	else /* (I2C_TEST_START(i2c->flags) == I2C_START_R) */
 	{
 		i2c->hw->base->CR1 |= CR1_START_SET;
 
-		if(!check_i2cStatus(i2c, I2C_EVENT_MASTER_MODE_SELECT))
+		if(!wait_event(i2c, I2C_EVENT_MASTER_MODE_SELECT))
 		{
 			LOG_ERR("ARBIT lost\n");
 			i2c->errors |= I2C_ARB_LOST;
-			i2c_hw_stop(i2c);
+			i2c->hw->base->CR1 |= CR1_STOP_SET;
 			return;
 		}
 
@@ -164,14 +157,13 @@ static void i2c_stm32_start(struct I2c *i2c, uint16_t slave_addr)
 		if (i2c->xfer_size == 2)
 			i2c->hw->base->CR1 |= CR1_ACK_SET | CR1_POS_SET;
 
-		if(!check_i2cStatus(i2c, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED))
+		if(!wait_event(i2c, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED))
 		{
 			LOG_ERR("SLAR NACK:%08lx\n", get_status(i2c->hw->base));
 			i2c->errors |= I2C_NO_ACK;
-			i2c_hw_stop(i2c);
+			i2c->hw->base->CR1 |= CR1_STOP_SET;
 			return;
 		}
-
 
 		if (i2c->xfer_size == 1)
 		{
@@ -229,11 +221,6 @@ static void i2c_stm32_start(struct I2c *i2c, uint16_t slave_addr)
 			i2c->hw->base->CR1 |= CR1_ACK_SET;
 		}
 	}
-	else
-	{
-		ASSERT(0);
-	}
-
 }
 
 static void i2c_stm32_put(I2c *i2c, const uint8_t data)
@@ -242,12 +229,11 @@ static void i2c_stm32_put(I2c *i2c, const uint8_t data)
 
 	WAIT_BTF(i2c->hw->base);
 
-
 	/* Generate the stop if we finish to send all programmed bytes */
-	if ((i2c->xfer_size == 1) &&(I2C_TEST_STOP(i2c->flags) == I2C_STOP))
+	if ((i2c->xfer_size == 1) && (I2C_TEST_STOP(i2c->flags) == I2C_STOP))
 	{
-			check_i2cStatus(i2c, I2C_EVENT_MASTER_BYTE_TRANSMITTED);
-			i2c_hw_stop(i2c);
+			wait_event(i2c, I2C_EVENT_MASTER_BYTE_TRANSMITTED);
+			i2c->hw->base->CR1 |= CR1_STOP_SET;
 	}
 }
 
