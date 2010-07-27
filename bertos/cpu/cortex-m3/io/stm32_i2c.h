@@ -241,7 +241,8 @@
 
 
 /* I2C CR1 */
-#define CR1_POS                                 11
+#define CR1_POS_SET                ((uint16_t)0x800)
+#define CR1_POS_RESET                 (~CR1_POS_SET)
 
 /* I2C Status */
 #define SR1_PECERR                              12
@@ -250,7 +251,7 @@
 #define SR1_ARLO                                 9
 #define SR1_BERR                                 8
 #define SR1_TXE                                  7
-#define SR1_RXE                                  6
+#define SR1_RXNE                                 6
 #define SR1_ADDR                                 1
 #define SR1_BTF                                  2
 #define SR1_SB                                   0
@@ -265,8 +266,6 @@
 							 BV(SR1_AF)     | \
 							 BV(SR1_ARLO)   | \
 							 BV(SR1_BERR))
-
-
 
 struct stm32_i2c
 {
