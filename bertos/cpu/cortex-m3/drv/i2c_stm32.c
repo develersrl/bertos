@@ -57,9 +57,7 @@
 struct I2cHardware
 {
 	struct stm32_i2c *base;
-	uint32_t clk_gpio_en;
 	uint32_t clk_i2c_en;
-	struct stm32_gpio *gpio_base;
 	uint32_t pin_mask;
 	uint8_t cache[2];
 	bool cached;
@@ -309,20 +307,14 @@ struct I2cHardware i2c_stm32_hw[] =
 {
 	{ /* I2C1 */
 		.base = (struct stm32_i2c *)I2C1_BASE,
-		.clk_gpio_en = RCC_APB2_GPIOB,
 		.clk_i2c_en  = RCC_APB1_I2C1,
-		.gpio_base = (struct stm32_gpio *)GPIOB_BASE,
 		.pin_mask = (GPIO_I2C1_SCL_PIN | GPIO_I2C1_SDA_PIN),
 	},
-	#if 0
 	{ /* I2C2 */
 		.base = (struct stm32_i2c *)I2C2_BASE,
-		.clk_gpio_en = RCC_APB2_GPIO--,
 		.clk_i2c_en  = RCC_APB1_I2C2,
-		.gpio_base = (struct stm32_gpio *)GPIO---_BASE,
 		.pin_mask = (GPIO_I2C2_SCL_PIN | GPIO_I2C2_SDA_PIN),
 	},
-	#endif
 };
 
 MOD_DEFINE(i2c);
@@ -336,11 +328,11 @@ void i2c_hw_init(I2c *i2c, int dev, uint32_t clock)
 	i2c->hw = &i2c_stm32_hw[dev];
 	i2c->vt = &i2c_stm32_vt;
 
-	RCC->APB2ENR |= i2c->hw->clk_gpio_en;
+	RCC->APB2ENR |= RCC_APB2_GPIOB;
 	RCC->APB1ENR |= i2c->hw->clk_i2c_en;
 
 	/* Set gpio to use I2C driver */
-	stm32_gpioPinConfig(i2c->hw->gpio_base, i2c->hw->pin_mask,
+	stm32_gpioPinConfig((struct stm32_gpio *)GPIOB_BASE, i2c->hw->pin_mask,
 				GPIO_MODE_AF_OD, GPIO_SPEED_50MHZ);
 
 	/* Clear all needed registers */
