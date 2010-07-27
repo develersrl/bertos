@@ -125,7 +125,7 @@ these registers are known as "VICVectPriority(x)". */
 
 
 /* Pin Connect Block */
-#define PINSEL_BASE_ADDR	0xE002C000
+#define PINSEL_BASE_ADDR 0xE002C000
 #define PINSEL0        (*(reg32_t *)(PINSEL_BASE_ADDR + 0x00))
 #define PINSEL1        (*(reg32_t *)(PINSEL_BASE_ADDR + 0x04))
 #define PINSEL2        (*(reg32_t *)(PINSEL_BASE_ADDR + 0x08))
@@ -137,6 +137,18 @@ these registers are known as "VICVectPriority(x)". */
 #define PINSEL8        (*(reg32_t *)(PINSEL_BASE_ADDR + 0x20))
 #define PINSEL9        (*(reg32_t *)(PINSEL_BASE_ADDR + 0x24))
 #define PINSEL10       (*(reg32_t *)(PINSEL_BASE_ADDR + 0x28))
+
+#define PINSEL0_OFF        0x00
+#define PINSEL1_OFF        0x04
+#define PINSEL2_OFF        0x08
+#define PINSEL3_OFF        0x0C
+#define PINSEL4_OFF        0x10
+#define PINSEL5_OFF        0x14
+#define PINSEL6_OFF        0x18
+#define PINSEL7_OFF        0x1C
+#define PINSEL8_OFF        0x20
+#define PINSEL9_OFF        0x24
+#define PINSEL10_OFF       0x28
 
 #define PINMODE0        (*(reg32_t *)(PINSEL_BASE_ADDR + 0x40))
 #define PINMODE1        (*(reg32_t *)(PINSEL_BASE_ADDR + 0x44))
@@ -423,6 +435,13 @@ Reset, and Code Security/Debugging */
 #define CLKSRCSEL      (*(reg32_t *)(SCB_BASE_ADDR + 0x10C))
 #define PCLKSEL0       (*(reg32_t *)(SCB_BASE_ADDR + 0x1A8))
 #define PCLKSEL1       (*(reg32_t *)(SCB_BASE_ADDR + 0x1AC))
+
+#define CCLKCFG_OFF        0x104
+#define USBCLKCFG_OFF      0x108
+#define CLKSRCSEL_OFF      0x10C
+#define PCLKSEL0_OFF       0x1A8
+#define PCLKSEL1_OFF       0x1AC
+
 
 /* External Interrupts */
 #define EXTINT         (*(reg32_t *)(SCB_BASE_ADDR + 0x140))
@@ -723,7 +742,7 @@ are for LPC24xx only. */
 #define U3TER          (*(reg32_t *)(UART3_BASE_ADDR + 0x30))
 
 /* I2C Interface 0 */
-#define I2C0_BASE_ADDR	0xE001C000
+#define I2C0_BASE_ADDR 0xE001C000
 #define I20CONSET      (*(reg32_t *)(I2C0_BASE_ADDR + 0x00))
 #define I20STAT        (*(reg32_t *)(I2C0_BASE_ADDR + 0x04))
 #define I20DAT         (*(reg32_t *)(I2C0_BASE_ADDR + 0x08))
@@ -733,7 +752,7 @@ are for LPC24xx only. */
 #define I20CONCLR      (*(reg32_t *)(I2C0_BASE_ADDR + 0x18))
 
 /* I2C Interface 1 */
-#define I2C1_BASE_ADDR		0xE005C000
+#define I2C1_BASE_ADDR 0xE005C000
 #define I21CONSET      (*(reg32_t *)(I2C1_BASE_ADDR + 0x00))
 #define I21STAT        (*(reg32_t *)(I2C1_BASE_ADDR + 0x04))
 #define I21DAT         (*(reg32_t *)(I2C1_BASE_ADDR + 0x08))
@@ -743,7 +762,7 @@ are for LPC24xx only. */
 #define I21CONCLR      (*(reg32_t *)(I2C1_BASE_ADDR + 0x18))
 
 /* I2C Interface 2 */
-#define I2C2_BASE_ADDR		0xE0080000
+#define I2C2_BASE_ADDR 0xE0080000
 #define I22CONSET      (*(reg32_t *)(I2C2_BASE_ADDR + 0x00))
 #define I22STAT        (*(reg32_t *)(I2C2_BASE_ADDR + 0x04))
 #define I22DAT         (*(reg32_t *)(I2C2_BASE_ADDR + 0x08))
@@ -752,6 +771,14 @@ are for LPC24xx only. */
 #define I22SCLL        (*(reg32_t *)(I2C2_BASE_ADDR + 0x14))
 #define I22CONCLR      (*(reg32_t *)(I2C2_BASE_ADDR + 0x18))
 
+/* I2C offesets */
+#define I2C_CONSET_OFF      0x00
+#define I2C_STAT_OFF        0x04
+#define I2C_DAT_OFF         0x08
+#define I2C_ADR_OFF         0x0C
+#define I2C_SCLH_OFF        0x10
+#define I2C_SCLL_OFF        0x14
+#define I2C_CONCLR_OFF      0x18
 
 /* I2C register definition Clear */
 #define I2CON_I2ENC                                        6 // I2C interface Disable bit
@@ -784,12 +811,20 @@ are for LPC24xx only. */
 #define I2C0_PCLK_MASK                                0xC000
 #define I2C0_PCLK_DIV8                                0xC000
 #define I2C0_PCLK_DIV4                                0x4000
-#define I2C0_PCLK_OFFSET                                  14
-
+#define I2C1_PCLK_MASK                                0x00C0
+#define I2C1_PCLK_DIV8                                0x00C0
+#define I2C1_PCLK_DIV4                                0x0040
+#define I2C2_PCLK_MASK                              0x300000
+#define I2C2_PCLK_DIV8                              0x300000
+#define I2C2_PCLK_DIV4                              0x100000
 
 /* I2C pins defines */
 #define I2C0_PINSEL_MASK                           0x3C00000
 #define I2C0_PINSEL                                0x1400000
+#define I2C1_PINSEL_MASK                           0x000000F
+#define I2C1_PINSEL                                0x000000F
+#define I2C2_PINSEL_MASK                           0x0F00000
+#define I2C2_PINSEL                                0x0A00000
 
 /* SPI0 (Serial Peripheral Interface 0) */
 #define SPI0_BASE_ADDR		0xE0020000

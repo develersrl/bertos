@@ -84,6 +84,7 @@ struct I2cHardware
 			if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT)) \
 			{ \
 				LOG_ERR("Timeout SI assert\n"); \
+				LOG_ERR("[%08lx]\n", HWREG(i2c->hw->base + I2C_STAT_OFF)); \
 				break; \
 			} \
 		} \
@@ -280,6 +281,26 @@ struct I2cHardware i2c_lpc2_hw[] =
 		.pclk_mask = I2C0_PCLK_MASK,
 		.pclk_div = I2C0_PCLK_DIV8,
 	},
+	{ /* I2C1 */
+		.base = I2C1_BASE_ADDR,
+		.pconp = BV(PCONP_PCI2C1),
+		.pinsel_port = PINSEL0_OFF,
+		.pinsel = I2C1_PINSEL,
+		.pinsel_mask = I2C1_PINSEL_MASK,
+		.pclksel = PCLKSEL1_OFF,
+		.pclk_mask = I2C1_PCLK_MASK,
+		.pclk_div = I2C1_PCLK_DIV8,
+	},
+	{ /* I2C2 */
+		.base = I2C2_BASE_ADDR,
+		.pconp = BV(PCONP_PCI2C2),
+		.pinsel_port = PINSEL0_OFF,
+		.pinsel = I2C2_PINSEL,
+		.pinsel_mask = I2C2_PINSEL_MASK,
+		.pclksel = PCLKSEL1_OFF,
+		.pclk_mask = I2C2_PCLK_MASK,
+		.pclk_div = I2C2_PCLK_DIV8,
+	},
 };
 
 /**
@@ -289,7 +310,6 @@ void i2c_hw_init(I2c *i2c, int dev, uint32_t clock)
 {
 	i2c->hw = &i2c_lpc2_hw[dev];
 	i2c->vt = &i2c_lpc_vt;
-
 
 	/* Enable I2C clock */
 	PCONP |= i2c->hw->pconp;
@@ -311,10 +331,9 @@ void i2c_hw_init(I2c *i2c, int dev, uint32_t clock)
 	ASSERT(HWREG(i2c->hw->base + I2C_SCLH_OFF) > 4);
 	ASSERT(HWREG(i2c->hw->base + I2C_SCLL_OFF) > 4);
 
-	/* Assign pins to SCL and SDA (P0_27, P0_28) */
+	/* Assign pins to SCL and SDA */
 	HWREG(PINSEL_BASE_ADDR + i2c->hw->pinsel_port) &= ~i2c->hw->pinsel_mask;
 	HWREG(PINSEL_BASE_ADDR + i2c->hw->pinsel_port) |= i2c->hw->pinsel;
-
 
 	// Enable I2C
 	HWREG(i2c->hw->base + I2C_CONSET_OFF) = BV(I2CON_I2EN);
