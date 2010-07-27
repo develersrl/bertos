@@ -50,12 +50,8 @@
 
 #include <drv/timer.h>
 #include <drv/i2c.h>
-#include <drv/vic_lpc2.h> /* vic_handler_t */
 
 #include <io/lpc23xx.h>
-
-#include <stdarg.h>
-
 
 struct I2cHardware
 {

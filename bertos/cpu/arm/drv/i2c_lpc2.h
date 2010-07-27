@@ -39,8 +39,6 @@
 
 #include <drv/i2c.h>
 
-#include <io/lpc23xx.h>
-
 /**
  * \name I2C devices enum
  */
