@@ -57,6 +57,11 @@
 #include <compat/twi.h>
 
 
+struct I2cHardware
+{
+};
+
+
 /* Wait for TWINT flag set: bus is ready */
 #define WAIT_TWI_READY  do {} while (!(TWCR & BV(TWINT)))
 
@@ -148,7 +153,7 @@ bool i2c_builtin_start_r(uint8_t id)
  */
 void i2c_builtin_stop(void)
 {
-        TWCR = BV(TWINT) | BV(TWEN) | BV(TWSTO);
+	TWCR = BV(TWINT) | BV(TWEN) | BV(TWSTO);
 }
 
 
@@ -205,12 +210,61 @@ int i2c_builtin_get(bool ack)
 	return (int)(uint8_t)TWDR;
 }
 
+
+
+static void i2c_avr_start(struct I2c *i2c, uint16_t slave_addr)
+{
+	if (I2C_TEST_START(i2c->flags) == I2C_START_W)
+	{
+		if (i2c_builtin_start_w(slave_addr))
+		{
+			LOG_ERR("Start timeout\n");
+			i2c->errors |= I2C_START_TIMEOUT;
+		}
+	}
+	else /* (I2C_TEST_START(i2c->flags) == I2C_START_R) */
+	{
+		if (i2c_builtin_start_r(slave_addr))
+		{
+			LOG_ERR("Start r no ACK\n");
+			i2c->errors |= I2C_NO_ACK;
+		}
+	}
+}
+
+static void i2c_avr_put(I2c *i2c, const uint8_t data)
+{
+	if (i2c_builtin_put(data))
+	{
+		LOG_ERR("Start r no ACK\n");
+		i2c->errors |= I2C_DATA_NACK;
+	}
+
+	if ((i2c->xfer_size == 1) && (I2C_TEST_STOP(i2c->flags) == I2C_STOP))
+		i2c_bitbang_stop();
+}
+
+static uint8_t i2c_avr_get(I2c *i2c)
+{
+	bool ack = true;
+	if (i2c->xfer_size == 1)
+		ack = false;
+
+	uint8_t data = i2c_builtin_get(ack);
+
+	if ((i2c->xfer_size == 1) && (I2C_TEST_STOP(i2c->flags) == I2C_STOP))
+		i2c_bitbang_stop();
+
+	return data;
+}
+
+
 MOD_DEFINE(i2c);
 
 /**
  * Initialize TWI module.
  */
-void i2c_builtin_init(void)
+INLINE void i2c_avr_init(uint32_t clock)
 {
 	ATOMIC(
 		/*
@@ -237,15 +291,45 @@ void i2c_builtin_init(void)
 		 * Set speed:
 		 * F = CPU_FREQ / (16 + 2*TWBR * 4^TWPS)
 		 */
-		#ifndef CONFIG_I2C_FREQ
-			#warning Using default value of 300000L for CONFIG_I2C_FREQ
-			#define CONFIG_I2C_FREQ  300000L /* ~300 kHz */
-		#endif
-		#define TWI_PRESC 1       /* 4 ^ TWPS */
+		ASSERT(clock);
+		#define TWI_PRESC   1       /* 4 ^ TWPS */
 
-		TWBR = (CPU_FREQ / (2 * CONFIG_I2C_FREQ * TWI_PRESC)) - (8 / TWI_PRESC);
+		TWBR = (CPU_FREQ / (2 * clock * TWI_PRESC)) - (8 / TWI_PRESC);
 		TWSR = 0;
 		TWCR = BV(TWEN);
 	);
 	MOD_INIT(i2c);
 }
+
+
+static const I2cVT i2c_lm3s_vt =
+{
+	.start = i2c_avr_start,
+	.get = i2c_avr_get,
+	.put = i2c_avr_put,
+	.send = i2c_swSend,
+	.recv = i2c_swRecv,
+};
+
+struct I2cHardware i2c_avr_hw[] =
+{
+	{ /* I2C0 */
+	},
+};
+
+/**
+ * Initialize I2C module.
+ */
+void i2c_hw_init(I2c *i2c, int dev, uint32_t clock)
+{
+	i2c->hw = &i2c_avr_hw[dev];
+	i2c->vt = &i2c_avr_vt;
+
+	i2c_avr_init(clock);
+}
+
+void i2c_bitbang_init(void)
+{
+	i2c_avr_init(CONFIG_I2C_FREQ);
+}
+
