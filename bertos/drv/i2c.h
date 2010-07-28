@@ -137,6 +137,7 @@ bool i2c_recv(void *_buf, size_t count);
   * I2C error flags
   */
 #define I2C_OK               0     ///< I2C no errors flag
+#define I2C_DATA_NACK     BV(4)    ///< I2C generic error
 #define I2C_ERR           BV(3)    ///< I2C generic error
 #define I2C_ARB_LOST      BV(2)    ///< I2C arbitration lost error
 #define I2C_START_TIMEOUT BV(0)    ///< I2C timeout error on start
