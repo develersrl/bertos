@@ -48,6 +48,7 @@
 #include <cpu/detect.h>
 #include <cpu/irq.h>
 #include <cpu/types.h>
+#include <cpu/power.h>
 
 #include <io/lm3s.h>
 
@@ -64,12 +65,29 @@ struct I2cHardware
 	uint32_t sys_gpio;
 	uint32_t pin_mask;
 	uint32_t gpio_base;
-	bool first_send;
+	bool first_xtranf;
 };
 
+#define WAIT_BUSY(base) \
+	do { \
+		while (HWREG(base + I2C_O_MCS) & I2C_MCS_BUSY ) \
+			cpu_relax(); \
+	} while (0);
+
+
+/*
+ * The start is not performed when we call the start function
+ * because the hardware should know the first data byte to send.
+ * Generally to perform a byte send we should write the slave address
+ * in slave address register and the first byte to send in data registry.
+ * After then we can perform the start write procedure, and send really
+ * the our data. To use common bertos i2c api the really start will be
+ * performed when the user "put" or "send" its data. These tricks are hide
+ * from the driver implementation.
+ */
 static void i2c_lm3s_start(struct I2c *i2c, uint16_t slave_addr)
 {
-	i2c->hw->first_send = true;
+	i2c->hw->first_xtranf = true;
 
 	if (I2C_TEST_START(i2c->flags) == I2C_START_W)
 		HWREG(i2c->hw->base + I2C_O_MSA) = slave_addr & ~BV(0);
@@ -87,14 +105,15 @@ INLINE bool wait_addrAck(I2c *i2c, uint32_t mode_mask)
 		if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT))
 			return false;
 
-		if (status & I2C_MCS_ADRACK)
+		if(status & I2C_MCS_ADRACK)
 		{
 			HWREG(i2c->hw->base + I2C_O_MCS) = mode_mask;
-			while (HWREG(i2c->hw->base + I2C_O_MCS) & I2C_MCS_BUSY);
-			continue;
+			WAIT_BUSY(i2c->hw->base);
 		}
 		else
 			break;
+
+		cpu_relax();
 	}
 	return true;
 }
@@ -103,7 +122,7 @@ static void i2c_lm3s_put(I2c *i2c, const uint8_t data)
 {
 	HWREG(i2c->hw->base + I2C_O_MDR) = data;
 
-	if (i2c->hw->first_send)
+	if (i2c->hw->first_xtranf)
 	{
 		HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_RUN | I2C_MCS_START;
 		while( HWREG(i2c->hw->base + I2C_O_MCS) & I2C_MCS_BUSY );
@@ -113,90 +132,67 @@ static void i2c_lm3s_put(I2c *i2c, const uint8_t data)
 			LOG_ERR("Start timeout\n");
 			i2c->errors |= I2C_START_TIMEOUT;
 			HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_STOP;
-			while (HWREG(i2c->hw->base + I2C_O_MCS) & I2C_MCS_BUSY);
+			WAIT_BUSY(i2c->hw->base);
 			return;
 		}
 
-		i2c->hw->first_send = false;
+		i2c->hw->first_xtranf = false;
 	}
 	else
 	{
 		HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_RUN;
-		while (HWREG(i2c->hw->base + I2C_O_MCS) & I2C_MCS_BUSY);
+		WAIT_BUSY(i2c->hw->base);
 	}
 
 	if ((i2c->xfer_size == 1) && (I2C_TEST_STOP(i2c->flags) == I2C_STOP))
 	{
 		HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_STOP;
-		while (HWREG(i2c->hw->base + I2C_O_MCS) & I2C_MCS_BUSY );
+		WAIT_BUSY(i2c->hw->base);
 	}
 }
 
 static uint8_t i2c_lm3s_get(I2c *i2c)
 {
-	if ((i2c->xfer_size == 1) && (i2c->hw->first_send))
+	uint8_t data;
+	if (i2c->hw->first_xtranf)
 	{
-		HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_RUN | I2C_MCS_START;
-		while (HWREG(i2c->hw->base + I2C_O_MCS) & I2C_MCS_BUSY );
+		uint32_t start_mode;
+		if (i2c->xfer_size == 1)
+			start_mode = I2C_MCS_RUN | I2C_MCS_START;
+		else
+			start_mode = I2C_MCS_ACK | I2C_MCS_RUN | I2C_MCS_START;
 
-
-		if (!wait_addrAck(i2c, I2C_MCS_RUN | I2C_MCS_START))
+		HWREG(i2c->hw->base + I2C_O_MCS) = start_mode;
+		WAIT_BUSY(i2c->hw->base);
+		if (!wait_addrAck(i2c, start_mode))
 		{
 			LOG_ERR("Start timeout\n");
 			i2c->errors |= I2C_START_TIMEOUT;
 			HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_STOP;
+			WAIT_BUSY(i2c->hw->base);
 			return 0xFF;
 		}
 
-		uint8_t data = HWREG(i2c->hw->base + I2C_O_MDR);
-
-		if (I2C_TEST_STOP(i2c->flags) == I2C_STOP)
-		{
-			HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_STOP;
-			while (HWREG(i2c->hw->base + I2C_O_MCS) & I2C_MCS_BUSY );
-		}
-
-		i2c->hw->first_send = false;
-		return data;
+		data = HWREG(i2c->hw->base + I2C_O_MDR);
+		i2c->hw->first_xtranf = false;
 	}
 	else
 	{
-		if (i2c->hw->first_send)
-		{
-			HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_ACK | I2C_MCS_RUN | I2C_MCS_START;
-			while (HWREG(i2c->hw->base + I2C_O_MCS) & I2C_MCS_BUSY);
-
-			if (!wait_addrAck(i2c, I2C_MCS_ACK | I2C_MCS_RUN | I2C_MCS_START))
-			{
-				LOG_ERR("Start timeout\n");
-				i2c->errors |= I2C_START_TIMEOUT;
-				HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_STOP;
-				return 0xFF;
-			}
-
-			i2c->hw->first_send = false;
-			return HWREG(i2c->hw->base + I2C_O_MDR);
-		}
+		if (i2c->xfer_size > 1)
+			HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_ACK | I2C_MCS_RUN;
 		else
-		{
-			if (i2c->xfer_size > 1)
-				HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_ACK | I2C_MCS_RUN;
-			else
-				HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_RUN;
+			HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_RUN;
 
-			while (HWREG(i2c->hw->base + I2C_O_MCS) & I2C_MCS_BUSY );
-			uint8_t data = HWREG(i2c->hw->base + I2C_O_MDR);
-
-			if ((i2c->xfer_size == 1) && (I2C_TEST_STOP(i2c->flags) == I2C_STOP))
-			{
-				HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_STOP;
-				while (HWREG(i2c->hw->base + I2C_O_MCS) & I2C_MCS_BUSY );
-			}
-
-			return data;
-		}
+		WAIT_BUSY(i2c->hw->base);
+		data = HWREG(i2c->hw->base + I2C_O_MDR);
 	}
-	return 0xFF;
+
+	if ((i2c->xfer_size == 1) && (I2C_TEST_STOP(i2c->flags) == I2C_STOP))
+	{
+		HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_STOP;
+		WAIT_BUSY(i2c->hw->base);
+	}
+	return data;
 }
 
 MOD_DEFINE(i2c);
