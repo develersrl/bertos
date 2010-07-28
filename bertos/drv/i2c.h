@@ -184,6 +184,11 @@ typedef struct I2c
 
 #include CPU_HEADER(i2c)
 
+/*
+ * Low level i2c  init implementation prototype.
+ */
+void i2c_hw_init(I2c *i2c, int dev, uint32_t clock);
+
 void i2c_swSend(struct I2c *i2c, const void *_buf, size_t count);
 void i2c_swRecv(struct I2c *i2c, void *_buf, size_t count);
 

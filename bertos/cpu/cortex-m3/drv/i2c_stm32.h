@@ -50,6 +50,4 @@ enum
 	I2C_CNT  /**< Number of serial ports */
 };
 
-void i2c_hw_init(I2c *i2c, int dev, uint32_t clock);
-
-#endif /* I2C_LPC2_H */
+#endif /* I2C_STM32_H */
