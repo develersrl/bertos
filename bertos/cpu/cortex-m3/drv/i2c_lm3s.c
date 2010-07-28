@@ -56,225 +56,227 @@
 #include <drv/gpio_lm3s.h>
 #include <drv/clock_lm3s.h>
 
-/*
- *
- */
-#if 0
-	/* I2C 0 */
-	#define I2C                        I2C0_MASTER_BASE
-	#define SYSCTL_RCGC1_I2C           SYSCTL_RCGC1_I2C0
-	#define SYSCTL_RCGC2_GPIO          SYSCTL_RCGC2_GPIOB
-	#define GPIO_I2C_SCL_PIN           GPIO_I2C0_SCL_PIN
-	#define GPIO_I2C_SDA_PIN           GPIO_I2C0_SDA_PIN
-	#define GPIO_PORT_BASE             GPIO_PORTB_BASE
-#else
-	/* I2C 1 */
-	#define I2C                        I2C1_MASTER_BASE
-	#define SYSCTL_RCGC1_I2C           SYSCTL_RCGC1_I2C1
-	#define SYSCTL_RCGC2_GPIO          SYSCTL_RCGC2_GPIOA
-	#define GPIO_I2C_SCL_PIN           GPIO_I2C1_SCL_PIN
-	#define GPIO_I2C_SDA_PIN           GPIO_I2C1_SDA_PIN
-	#define GPIO_PORT_BASE             GPIO_PORTA_BASE
-#endif
 
-
-/**
- * Send START condition and select slave for write.
- * \c id is the device id comprehensive of address left shifted by 1.
- * The LSB of \c id is ignored and reset to 0 for write operation.
- *
- * \return true on success, false otherwise.
- */
-bool i2c_builtin_start_w(uint8_t id)
+struct I2cHardware
 {
-	HWREG(I2C + I2C_O_MSA) = id & ~BV(0);
-	return true;
+	uint32_t base;
+	uint32_t sys_cntl;
+	uint32_t sys_gpio;
+	uint32_t pin_mask;
+	uint32_t gpio_base;
+	bool first_send;
+};
+
+static void i2c_lm3s_start(struct I2c *i2c, uint16_t slave_addr)
+{
+	i2c->hw->first_send = true;
+
+	if (I2C_TEST_START(i2c->flags) == I2C_START_W)
+		HWREG(i2c->hw->base + I2C_O_MSA) = slave_addr & ~BV(0);
+	else /* (I2C_TEST_START(i2c->flags) == I2C_START_R) */
+		HWREG(i2c->hw->base + I2C_O_MSA) = slave_addr | BV(0);
 }
 
-
-/**
- * Send START condition and select slave for read.
- * \c id is the device id comprehensive of address left shifted by 1.
- * The LSB of \c id is ignored and set to 1 for read operation.
- *
- * \return true on success, false otherwise.
- */
-bool i2c_builtin_start_r(uint8_t id)
-{
-	HWREG(I2C + I2C_O_MSA) = id | BV(0);
-	return true;
-}
-
-
-void i2c_builtin_stop(void)
-{
-}
-
-
-bool i2c_builtin_put(const uint8_t data)
-{
-	(void)data;
-	return true;
-}
-
-
-int i2c_builtin_get(bool ack)
-{
-	(void)ack;
-	return 0;
-}
-
-INLINE bool check_ack(uint32_t mode_mask)
+INLINE bool wait_addrAck(I2c *i2c, uint32_t mode_mask)
 {
 	ticks_t start = timer_clock();
-	while ( HWREG(I2C + I2C_O_MCS) &  I2C_MCS_ADRACK )
+	while (1)
 	{
+		uint32_t status = HWREG(i2c->hw->base + I2C_O_MCS);
+
 		if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT))
-		{
-			LOG_ERR("Timeout on I2C_START\n");
 			return false;
+
+		if (status & I2C_MCS_ADRACK)
+		{
+			HWREG(i2c->hw->base + I2C_O_MCS) = mode_mask;
+			while (HWREG(i2c->hw->base + I2C_O_MCS) & I2C_MCS_BUSY);
+			continue;
 		}
-
-		HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_SEND_ERROR_STOP;
-
-		HWREG(I2C + I2C_O_MCS) = mode_mask;
-		while( HWREG(I2C + I2C_O_MCS) & I2C_MCS_BUSY );
+		else
+			break;
 	}
-
 	return true;
 }
 
-/*
- * With this function is allowed only the atomic write.
- */
-bool i2c_send(const void *_buf, size_t count)
+static void i2c_lm3s_put(I2c *i2c, const uint8_t data)
 {
-	const uint8_t *buf = (const uint8_t *)_buf;
-
-	HWREGB(I2C + I2C_O_MDR) = *buf++;
-
-	if (count == 1)
+	if ((i2c->xfer_size == 1) && (i2c->hw->first_send))
 	{
-		count = 0;
+		HWREG(i2c->hw->base + I2C_O_MDR) = data;
+		HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_RUN | I2C_MCS_START;
+		while( HWREG(i2c->hw->base + I2C_O_MCS) & I2C_MCS_BUSY );
 
-		HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_SINGLE_SEND;
-
-		while( HWREG(I2C + I2C_O_MCS) & I2C_MCS_BUSY );
-
-		if ( !check_ack(I2C_MASTER_CMD_SINGLE_SEND) )
+		if (!wait_addrAck(i2c, I2C_MCS_RUN | I2C_MCS_START))
 		{
-			LOG_ERR("No single send start");
-			return false;
+			LOG_ERR("Start timeout\n");
+			i2c->errors |= I2C_START_TIMEOUT;
+			HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_STOP;
+			while (HWREG(i2c->hw->base + I2C_O_MCS) & I2C_MCS_BUSY);
+			return;
 		}
+
+		if (I2C_TEST_STOP(i2c->flags) == I2C_STOP)
+		{
+			HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_STOP;
+			while (HWREG(i2c->hw->base + I2C_O_MCS) & I2C_MCS_BUSY );
+		}
+
+		i2c->hw->first_send = false;
+		return;
 	}
 	else
 	{
-		count--;
-		HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_SEND_START;
-
-		while( HWREG(I2C + I2C_O_MCS) & I2C_MCS_BUSY );
-
-		if ( !check_ack(I2C_MASTER_CMD_BURST_SEND_START) )
+		HWREG(i2c->hw->base + I2C_O_MDR) = data;
+		if (i2c->hw->first_send)
 		{
-			LOG_ERR("No burst send start");
-			return false;
-		}
+			HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_RUN | I2C_MCS_START;
+			while( HWREG(i2c->hw->base + I2C_O_MCS) & I2C_MCS_BUSY );
 
-		while(count - 1)
+			if (!wait_addrAck(i2c, I2C_MCS_RUN | I2C_MCS_START))
+			{
+				LOG_ERR("Start timeout\n");
+				i2c->errors |= I2C_START_TIMEOUT;
+				HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_STOP;
+				while (HWREG(i2c->hw->base + I2C_O_MCS) & I2C_MCS_BUSY );
+				return;
+			}
+
+			i2c->hw->first_send = false;
+			return;
+		}
+		else
 		{
-			HWREGB(I2C + I2C_O_MDR) = *buf++;
-			count--;
-			HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_SEND_CONT;
-			while( HWREG(I2C + I2C_O_MCS) & I2C_MCS_BUSY );
+			HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_RUN;
+			while (HWREG(i2c->hw->base + I2C_O_MCS) & I2C_MCS_BUSY );
 
+			if ((i2c->xfer_size == 1) && (I2C_TEST_STOP(i2c->flags) == I2C_STOP))
+			{
+				HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_STOP;
+				while (HWREG(i2c->hw->base + I2C_O_MCS) & I2C_MCS_BUSY );
+			}
 		}
-		HWREGB(I2C + I2C_O_MDR) = *buf++;
-		count--;
-
-		HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_SEND_FINISH;
-		while( HWREG(I2C + I2C_O_MCS) & I2C_MCS_BUSY );
 	}
-
-	return true;
 }
 
-/**
- * In order to read bytes from the i2c we should make some tricks.
- */
-bool i2c_recv(void *_buf, size_t count)
+static uint8_t i2c_lm3s_get(I2c *i2c)
 {
-	uint8_t *buf = (uint8_t *)_buf;
-
-	if (count == 1)
+	if ((i2c->xfer_size == 1) && (i2c->hw->first_send))
 	{
-		HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_SINGLE_RECEIVE;
-		while( HWREG(I2C + I2C_O_MCS) & I2C_MCS_BUSY );
+		HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_RUN | I2C_MCS_START;
+		while (HWREG(i2c->hw->base + I2C_O_MCS) & I2C_MCS_BUSY );
 
-		if ( !check_ack(I2C_MASTER_CMD_SINGLE_RECEIVE) )
-			return false;
 
-		*buf++ = HWREG(I2C + I2C_O_MDR);
-		count = 0;
+		if (!wait_addrAck(i2c, I2C_MCS_RUN | I2C_MCS_START))
+		{
+			LOG_ERR("Start timeout\n");
+			i2c->errors |= I2C_START_TIMEOUT;
+			HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_STOP;
+			return 0xFF;
+		}
+
+		uint8_t data = HWREG(i2c->hw->base + I2C_O_MDR);
+
+		if (I2C_TEST_STOP(i2c->flags) == I2C_STOP)
+		{
+			HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_STOP;
+			while (HWREG(i2c->hw->base + I2C_O_MCS) & I2C_MCS_BUSY );
+		}
+
+		i2c->hw->first_send = false;
+		return data;
 	}
 	else
 	{
-
-		HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_RECEIVE_START;
-		while( HWREG(I2C + I2C_O_MCS) & I2C_MCS_BUSY );
-
-		if ( !check_ack(I2C_MASTER_CMD_BURST_RECEIVE_START) )
-			return false;
-
-		*buf++ = (uint8_t)HWREG(I2C + I2C_O_MDR);
-		count--;
-
-		while(count - 1)
+		if (i2c->hw->first_send)
 		{
+			HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_ACK | I2C_MCS_RUN | I2C_MCS_START;
+			while (HWREG(i2c->hw->base + I2C_O_MCS) & I2C_MCS_BUSY);
 
-			HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_RECEIVE_CONT;
-			while( HWREG(I2C + I2C_O_MCS) & I2C_MCS_BUSY );
+			if (!wait_addrAck(i2c, I2C_MCS_ACK | I2C_MCS_RUN | I2C_MCS_START))
+			{
+				LOG_ERR("Start timeout\n");
+				i2c->errors |= I2C_START_TIMEOUT;
+				HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_STOP;
+				return 0xFF;
+			}
 
-			*buf++ = (uint8_t)HWREG(I2C + I2C_O_MDR);
-			count--;
+			i2c->hw->first_send = false;
+			return HWREG(i2c->hw->base + I2C_O_MDR);
 		}
+		else
+		{
+			if (i2c->xfer_size > 1)
+				HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_ACK | I2C_MCS_RUN;
+			else
+				HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_RUN;
 
-		HWREG(I2C + I2C_O_MCS) = I2C_MASTER_CMD_BURST_RECEIVE_FINISH;
-		while( HWREG(I2C + I2C_O_MCS) & I2C_MCS_BUSY );
+			while (HWREG(i2c->hw->base + I2C_O_MCS) & I2C_MCS_BUSY );
+			uint8_t data = HWREG(i2c->hw->base + I2C_O_MDR);
 
-		*buf++ = (uint8_t)HWREG(I2C + I2C_O_MDR);
-		count--;
+			if ((i2c->xfer_size == 1) && (I2C_TEST_STOP(i2c->flags) == I2C_STOP))
+			{
+				HWREG(i2c->hw->base + I2C_O_MCS) = I2C_MCS_STOP;
+				while (HWREG(i2c->hw->base + I2C_O_MCS) & I2C_MCS_BUSY );
+			}
+
+			return data;
+		}
 	}
-
-	return true;
+	return 0xFF;
 }
 
 MOD_DEFINE(i2c);
 
+static const I2cVT i2c_lm3s_vt =
+{
+	.start = i2c_lm3s_start,
+	.get = i2c_lm3s_get,
+	.put = i2c_lm3s_put,
+	.send = i2c_swSend,
+	.recv = i2c_swRecv,
+};
+
+struct I2cHardware i2c_lm3s_hw[] =
+{
+	{ /* I2C0 */
+		.base = I2C0_MASTER_BASE,
+		.sys_cntl = SYSCTL_RCGC1_I2C0,
+		.sys_gpio = SYSCTL_RCGC2_GPIOB,
+		.pin_mask = (GPIO_I2C0_SCL_PIN | GPIO_I2C0_SDA_PIN),
+		.gpio_base = GPIO_PORTB_BASE,
+	},
+	{ /* I2C1 */
+		.base = I2C1_MASTER_BASE,
+		.sys_cntl = SYSCTL_RCGC1_I2C1,
+		.sys_gpio = SYSCTL_RCGC2_GPIOA,
+		.pin_mask = (GPIO_I2C1_SCL_PIN | GPIO_I2C1_SDA_PIN),
+		.gpio_base = GPIO_PORTA_BASE,
+	},
+};
+
 /**
  * Initialize I2C module.
  */
-void i2c_builtin_init(void)
+void i2c_hw_init(I2c *i2c, int dev, uint32_t clock)
 {
+	i2c->hw = &i2c_lm3s_hw[dev];
+	i2c->vt = &i2c_lm3s_vt;
 
 	/* Enable the peripheral clock */
-	SYSCTL_RCGC1_R |= SYSCTL_RCGC1_I2C;
-	SYSCTL_RCGC2_R |= SYSCTL_RCGC2_GPIO;
+	SYSCTL_RCGC1_R |= i2c->hw->sys_cntl;
+	SYSCTL_RCGC2_R |= i2c->hw->sys_gpio;
 
 	/* Configure GPIO pins to work as I2C pins */
-	lm3s_gpioPinConfig(GPIO_PORT_BASE, GPIO_I2C_SCL_PIN,
+	lm3s_gpioPinConfig(i2c->hw->gpio_base, i2c->hw->pin_mask,
 		GPIO_DIR_MODE_HW, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_OD_WPU);
-
-	lm3s_gpioPinConfig(GPIO_PORT_BASE, GPIO_I2C_SDA_PIN,
-		GPIO_DIR_MODE_HW, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_OD_WPU);
-
-
 	/*
 	 * Note: to set correctly the i2c speed we shold before enable the i2c
 	 * device and then set in master time period the correct value
 	 */
 
 	/* Enable i2c device */
-	HWREG(I2C + I2C_O_MCR) |= I2C_MCR_MFE;
+	HWREG(i2c->hw->base + I2C_O_MCR) |= I2C_MCR_MFE;
 
     /*
 	 * Compute the clock divider that achieves the fastest speed less than or
@@ -282,9 +284,7 @@ void i2c_builtin_init(void)
      * clock divider so that the resulting clock is always less than or equal
      * to the desired clock, never greater.
 	 */
-    HWREG(I2C + I2C_O_MTPR) = ((CPU_FREQ + (2 * 10 * CONFIG_I2C_FREQ) - 1) / (2 * 10 * CONFIG_I2C_FREQ)) - 1;
-
-
+    HWREG(i2c->hw->base + I2C_O_MTPR) = ((CPU_FREQ + (2 * 10 * clock) - 1) / (2 * 10 * clock)) - 1;
 
 	MOD_INIT(i2c);
 }
