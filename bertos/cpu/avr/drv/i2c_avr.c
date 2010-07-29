@@ -378,7 +378,7 @@ static uint8_t i2c_avr_getc(I2c *i2c)
 
 	WAIT_READY();
 
-	if (TW_STATUS != TW_MR_DATA_ACK)
+	if (TW_STATUS != data_flag)
 	{
 		LOG_ERR("Data nack[%x]\n", TWSR);
 		i2c->errors |= I2C_DATA_NACK;
