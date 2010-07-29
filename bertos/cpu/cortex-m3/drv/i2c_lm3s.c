@@ -118,7 +118,7 @@ INLINE bool wait_addrAck(I2c *i2c, uint32_t mode_mask)
 	return true;
 }
 
-static void i2c_lm3s_put(I2c *i2c, const uint8_t data)
+static void i2c_lm3s_putc(I2c *i2c, const uint8_t data)
 {
 	HWREG(i2c->hw->base + I2C_O_MDR) = data;
 
@@ -151,7 +151,7 @@ static void i2c_lm3s_put(I2c *i2c, const uint8_t data)
 	}
 }
 
-static uint8_t i2c_lm3s_get(I2c *i2c)
+static uint8_t i2c_lm3s_getc(I2c *i2c)
 {
 	uint8_t data;
 	if (i2c->hw->first_xtranf)
@@ -200,10 +200,10 @@ MOD_DEFINE(i2c);
 static const I2cVT i2c_lm3s_vt =
 {
 	.start = i2c_lm3s_start,
-	.get = i2c_lm3s_get,
-	.put = i2c_lm3s_put,
-	.send = i2c_swSend,
-	.recv = i2c_swRecv,
+	.getc = i2c_lm3s_getc,
+	.putc = i2c_lm3s_putc,
+	.write = i2c_genericWrite,
+	.read = i2c_genericRead,
 };
 
 struct I2cHardware i2c_lm3s_hw[] =

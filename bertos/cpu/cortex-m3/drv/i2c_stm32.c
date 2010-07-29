@@ -237,7 +237,7 @@ static void i2c_stm32_start(struct I2c *i2c, uint16_t slave_addr)
 		start_r(i2c, slave_addr);
 }
 
-static void i2c_stm32_put(I2c *i2c, const uint8_t data)
+static void i2c_stm32_putc(I2c *i2c, const uint8_t data)
 {
 	i2c->hw->base->DR = data;
 
@@ -251,7 +251,7 @@ static void i2c_stm32_put(I2c *i2c, const uint8_t data)
 	}
 }
 
-static uint8_t i2c_stm32_get(I2c *i2c)
+static uint8_t i2c_stm32_getc(I2c *i2c)
 {
 	if (i2c->hw->cached)
 	{
@@ -297,10 +297,10 @@ static uint8_t i2c_stm32_get(I2c *i2c)
 static const I2cVT i2c_stm32_vt =
 {
 	.start = i2c_stm32_start,
-	.get = i2c_stm32_get,
-	.put = i2c_stm32_put,
-	.send = i2c_swSend,
-	.recv = i2c_swRecv,
+	.getc = i2c_stm32_getc,
+	.putc = i2c_stm32_putc,
+	.write = i2c_genericWrite,
+	.read = i2c_genericRead,
 };
 
 struct I2cHardware i2c_stm32_hw[] =

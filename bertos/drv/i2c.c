@@ -89,20 +89,19 @@ bool i2c_recv(void *_buf, size_t count)
 }
 
 
-void i2c_swSend(struct I2c *i2c, const void *_buf, size_t count)
+void i2c_genericWrite(struct I2c *i2c, const void *_buf, size_t count)
 {
 	const uint8_t *buf = (const uint8_t *)_buf;
 
 	while (count--)
-		i2c_put(i2c, *buf++);
+		i2c_putc(i2c, *buf++);
 }
 
-void i2c_swRecv(struct I2c *i2c, void *_buf, size_t count)
+void i2c_genericRead(struct I2c *i2c, void *_buf, size_t count)
 {
 	uint8_t *buf = (uint8_t *)_buf;
 
 	while (count--)
-		*buf++ = i2c_get(i2c);
+		*buf++ = i2c_getc(i2c);
 }
-
 

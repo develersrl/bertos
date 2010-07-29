@@ -106,7 +106,7 @@ static void i2c_hw_stop(I2c *i2c)
 	HWREG(i2c->hw->base + I2C_CONCLR_OFF) = BV(I2CON_STAC) | BV(I2CON_SIC) | BV(I2CON_AAC);
 }
 
-static void i2c_lpc2_put(I2c *i2c, uint8_t data)
+static void i2c_lpc2_putc(I2c *i2c, uint8_t data)
 {
 	HWREG(i2c->hw->base + I2C_DAT_OFF) = data;
 	HWREG(i2c->hw->base + I2C_CONCLR_OFF) = BV(I2CON_SIC);
@@ -137,7 +137,7 @@ static void i2c_lpc2_put(I2c *i2c, uint8_t data)
 	}
 }
 
-static uint8_t i2c_lpc2_get(I2c *i2c)
+static uint8_t i2c_lpc2_getc(I2c *i2c)
 {
 	/*
 	 * Set ack bit if we want read more byte, otherwise
@@ -259,10 +259,10 @@ static void i2c_lpc2_start(struct I2c *i2c, uint16_t slave_addr)
 static const I2cVT i2c_lpc_vt =
 {
 	.start = i2c_lpc2_start,
-	.get = i2c_lpc2_get,
-	.put = i2c_lpc2_put,
-	.send = i2c_swSend,
-	.recv = i2c_swRecv,
+	.getc = i2c_lpc2_getc,
+	.putc = i2c_lpc2_putc,
+	.write = i2c_genericWrite,
+	.read = i2c_genericRead,
 };
 
 struct I2cHardware i2c_lpc2_hw[] =
