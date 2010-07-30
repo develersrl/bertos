@@ -32,6 +32,7 @@
  *
  * \brief Driver for the LPC23xx I2C (implementation)
  *
+ * \author Daniele Basile <asterix@develer.com>
  */
 
 #include "cfg/cfg_i2c.h"
@@ -265,7 +266,7 @@ static const I2cVT i2c_lpc_vt =
 	.read = i2c_genericRead,
 };
 
-struct I2cHardware i2c_lpc2_hw[] =
+static const struct I2cHardware i2c_lpc2_hw[] =
 {
 	{ /* I2C0 */
 		.base = I2C0_BASE_ADDR,

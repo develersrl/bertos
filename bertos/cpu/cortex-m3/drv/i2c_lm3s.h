@@ -32,6 +32,7 @@
  *
  * \brief Driver for the LM3S I2C (interface)
  *
+ * \author Daniele Basile <asterix@develer.com>
  */
 
 #ifndef I2C_LM3S_H

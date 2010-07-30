@@ -32,6 +32,8 @@
  *
  * \brief Driver for the LPC23xx I2C (interface)
  *
+ * \author Daniele Basile <asterix@develer.com>
+ *
  */
 
 #ifndef I2C_LPC2_H

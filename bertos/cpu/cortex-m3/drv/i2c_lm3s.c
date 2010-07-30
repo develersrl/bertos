@@ -32,6 +32,8 @@
  *
  * \brief Driver for the LM3S I2C (implementation)
  *
+ * \author Daniele Basile <asterix@develer.com>
+ *
  */
 
 #include "cfg/cfg_i2c.h"

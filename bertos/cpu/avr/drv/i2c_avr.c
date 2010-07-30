@@ -34,6 +34,7 @@
  *
  * \author Stefano Fedrigo <aleph@develer.com>
  * \author Bernie Innocenti <bernie@codewiz.org>
+ * \author Daniele Basile <asterix@develer.com>
  */
 
 #include <hw/hw_cpufreq.h>  /* CPU_FREQ */
