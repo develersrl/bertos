@@ -35,10 +35,13 @@
  * \author Andrea Righi <arighi@develer.com>
  */
 
-#include <cfg/debug.h>
-#include <cpu/irq.h>
-#include <drv/irq_cm3.h>
 #include "timer_cm3.h"
+
+#include <cfg/debug.h>
+
+#include <cpu/irq.h>
+
+#include <drv/irq_cm3.h>
 
 INLINE void timer_hw_setPeriod(unsigned long period)
 {

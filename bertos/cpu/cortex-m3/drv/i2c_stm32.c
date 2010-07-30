@@ -45,149 +45,309 @@
 #include <cfg/macros.h> // BV()
 #include <cfg/module.h>
 
+#include <cpu/power.h>
 #include <drv/gpio_stm32.h>
 #include <drv/irq_cm3.h>
 #include <drv/clock_stm32.h>
 #include <drv/i2c.h>
+#include <drv/timer.h>
 
 #include <io/stm32.h>
 
-struct stm32_i2c *i2c = (struct stm32_i2c *)I2C1_BASE;
+
+struct I2cHardware
+{
+	struct stm32_i2c *base;
+	uint32_t clk_i2c_en;
+	uint32_t pin_mask;
+	uint8_t cache[2];
+	bool cached;
+};
+
+#define WAIT_BTF(base) \
+	do { \
+		while (!(base->SR1 & BV(SR1_BTF))) \
+			cpu_relax(); \
+	} while (0)
+
+#define WAIT_RXNE(base) \
+	do { \
+		while (!(base->SR1 & BV(SR1_RXNE))) \
+			cpu_relax(); \
+	} while (0)
 
 INLINE uint32_t get_status(struct stm32_i2c *base)
 {
 	return ((base->SR1 | (base->SR2 << 16)) & 0x00FFFFFF);
 }
 
-/**
- * Send START condition on the bus.
- *
- * \return true on success, false otherwise.
+/*
+ * This fuction read the status registers of the i2c device
+ * and waint until the selec event happen. If occur one error
+ * the funtions return false.
  */
-static bool i2c_builtin_start(void)
+INLINE bool wait_event(I2c *i2c, uint32_t event)
 {
-	i2c->CR1 |= CR1_ACK_SET;
-	i2c->CR1 |= CR1_PE_SET;
-	i2c->CR1 |= CR1_START_SET;
-	
-	while (get_status(i2c) != I2C_EVENT_MASTER_MODE_SELECT);
+	while (true)
+	{
+		uint32_t stat = get_status(i2c->hw->base);
 
+		if (stat == event)
+			break;
+
+		if (stat & SR1_ERR_MASK)
+		{
+			i2c->hw->base->SR1 &= ~SR1_ERR_MASK;
+			return false;
+		}
+		cpu_relax();
+	}
 	return true;
 }
 
 
-/**
- * Send START condition and select slave for write.
- * \c id is the device id comprehensive of address left shifted by 1.
- * The LSB of \c id is ignored and reset to 0 for write operation.
- *
- * \return true on success, false otherwise.
- */
-bool i2c_builtin_start_w(uint8_t id)
+INLINE void start_w(struct I2c *i2c, uint16_t slave_addr)
 {
-	id &= OAR1_ADD0_RESET;
+	/*
+	 * Loop on the select write sequence: when the eeprom is busy
+	 * writing previously sent data it will reply to the SLA_W
+	 * control byte with a NACK.  In this case, we must
+	 * keep trying until the eeprom responds with an ACK.
+	 */
+	ticks_t start = timer_clock();
+	while (true)
+	{
+		i2c->hw->base->CR1 |= CR1_ACK_SET | CR1_START_SET;
 
-	i2c_builtin_start();
+		if(!wait_event(i2c, I2C_EVENT_MASTER_MODE_SELECT))
+		{
+			LOG_ERR("ARBIT lost\n");
+			i2c->errors |= I2C_ARB_LOST;
+			break;
+		}
 
-	i2c->DR = id;
-	while (get_status(i2c) != I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED);
-	
+		i2c->hw->base->DR = slave_addr & OAR1_ADD0_RESET;
+
+		if(wait_event(i2c, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED))
+			break;
+
+		if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT))
+		{
+			LOG_ERR("Timeout on I2C START\n");
+			i2c->errors |= I2C_START_TIMEOUT;
+			i2c->hw->base->CR1 |= CR1_STOP_SET;
+			break;
+		}
+	}
+}
+
+INLINE bool start_and_addr(struct I2c *i2c, uint16_t slave_addr)
+{
+	i2c->hw->base->CR1 |= CR1_START_SET;
+	if(!wait_event(i2c, I2C_EVENT_MASTER_MODE_SELECT))
+	{
+		LOG_ERR("ARBIT lost\n");
+		i2c->errors |= I2C_ARB_LOST;
+		i2c->hw->base->CR1 |= CR1_STOP_SET;
+		return false;
+	}
+
+	i2c->hw->base->DR = (slave_addr | OAR1_ADD0_SET);
+
+	if (i2c->xfer_size == 2)
+		i2c->hw->base->CR1 |= CR1_ACK_SET | CR1_POS_SET;
+
+	if(!wait_event(i2c, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED))
+	{
+		LOG_ERR("SLAR NACK:%08lx\n", get_status(i2c->hw->base));
+		i2c->errors |= I2C_NO_ACK;
+		i2c->hw->base->CR1 |= CR1_STOP_SET;
+		return false;
+	}
+
 	return true;
 }
 
-
-/**
- * Send START condition and select slave for read.
- * \c id is the device id comprehensive of address left shifted by 1.
- * The LSB of \c id is ignored and set to 1 for read operation.
- *
- * \return true on success, false otherwise.
- */
-bool i2c_builtin_start_r(uint8_t id)
+INLINE void start_r(struct I2c *i2c, uint16_t slave_addr)
 {
-	id |=  OAR1_ADD0_SET;
+	if (!start_and_addr(i2c, slave_addr))
+		return;
+	/*
+	 * Due to the hardware receive bytes from slave in automatically mode
+	 * we should manage contextually all cases that we want to read one, two or more
+	 * than two bytes. To comply this behaviour to our api we shoul bufferd some byte
+	 * to hide all special case that needs to use this device.
+	 */
+	if (i2c->xfer_size == 1)
+	{
+		i2c->hw->base->CR1 &= CR1_ACK_RESET;
 
-	i2c_builtin_start();
+		cpu_flags_t irq;
 
-	i2c->DR = id;
-	while (get_status(i2c) != I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED);
+		IRQ_SAVE_DISABLE(irq);
+		(void)i2c->hw->base->SR2;
+		if (I2C_TEST_STOP(i2c->flags) == I2C_STOP)
+			i2c->hw->base->CR1 |= CR1_STOP_SET;
+		IRQ_RESTORE(irq);
 
-	return true;
+		WAIT_RXNE(i2c->hw->base);
+
+		i2c->hw->cache[0] = i2c->hw->base->DR;
+		i2c->hw->cached = true;
+
+		if (I2C_TEST_STOP(i2c->flags) == I2C_STOP)
+			while (i2c->hw->base->CR1 & CR1_STOP_SET);
+
+		i2c->hw->base->CR1 |= CR1_ACK_SET;
+	}
+	else if (i2c->xfer_size == 2)
+	{
+		cpu_flags_t irq;
+
+		IRQ_SAVE_DISABLE(irq);
+		(void)i2c->hw->base->SR2;
+		i2c->hw->base->CR1 &= CR1_ACK_RESET;
+		IRQ_RESTORE(irq);
+
+		WAIT_BTF(i2c->hw->base);
+
+		IRQ_SAVE_DISABLE(irq);
+		if (I2C_TEST_STOP(i2c->flags) == I2C_STOP)
+			i2c->hw->base->CR1 |= CR1_STOP_SET;
+		/*
+		 * We store read bytes like a fifo..
+		 */
+		i2c->hw->cache[1] = i2c->hw->base->DR;
+		i2c->hw->cache[0] = i2c->hw->base->DR;
+		i2c->hw->cached = true;
+		IRQ_RESTORE(irq);
+
+		i2c->hw->base->CR1 &= CR1_POS_RESET;
+		i2c->hw->base->CR1 |= CR1_ACK_SET;
+	}
+}
+
+static void i2c_stm32_start(struct I2c *i2c, uint16_t slave_addr)
+{
+	i2c->hw->cached = false;
+
+	if (I2C_TEST_START(i2c->flags) == I2C_START_W)
+		start_w(i2c, slave_addr);
+	else /* (I2C_TEST_START(i2c->flags) == I2C_START_R) */
+		start_r(i2c, slave_addr);
+}
+
+static void i2c_stm32_putc(I2c *i2c, const uint8_t data)
+{
+	i2c->hw->base->DR = data;
+
+	WAIT_BTF(i2c->hw->base);
+
+	/* Generate the stop if we finish to send all programmed bytes */
+	if ((i2c->xfer_size == 1) && (I2C_TEST_STOP(i2c->flags) == I2C_STOP))
+	{
+			wait_event(i2c, I2C_EVENT_MASTER_BYTE_TRANSMITTED);
+			i2c->hw->base->CR1 |= CR1_STOP_SET;
+	}
+}
+
+static uint8_t i2c_stm32_getc(I2c *i2c)
+{
+	if (i2c->hw->cached)
+	{
+		ASSERT(i2c->xfer_size <= 2);
+		return i2c->hw->cache[i2c->xfer_size - 1];
+	}
+	else
+	{
+		WAIT_BTF(i2c->hw->base);
+
+		if (i2c->xfer_size == 3)
+		{
+			i2c->hw->base->CR1 &= CR1_ACK_RESET;
+
+			cpu_flags_t irq;
+			IRQ_SAVE_DISABLE(irq);
+
+			uint8_t data = i2c->hw->base->DR;
+
+			if (I2C_TEST_STOP(i2c->flags) == I2C_STOP)
+				i2c->hw->base->CR1 |= CR1_STOP_SET;
+
+			i2c->hw->cache[1] = i2c->hw->base->DR;
+
+			IRQ_RESTORE(irq);
+
+			WAIT_RXNE(i2c->hw->base);
+
+			i2c->hw->cache[0] = i2c->hw->base->DR;
+			i2c->hw->cached = true;
+
+			if (I2C_TEST_STOP(i2c->flags) == I2C_STOP)
+				while (i2c->hw->base->CR1 & CR1_STOP_SET);
+
+			return data;
+		}
+		else
+			return i2c->hw->base->DR;
+	}
 }
 
 
-/**
- * Send STOP condition.
- */
-void i2c_builtin_stop(void)
+static const I2cVT i2c_stm32_vt =
 {
-	i2c->CR1 |= CR1_STOP_SET;
-	i2c->CR1 &= CR1_PE_RESET;
-}
+	.start = i2c_stm32_start,
+	.getc = i2c_stm32_getc,
+	.putc = i2c_stm32_putc,
+	.write = i2c_genericWrite,
+	.read = i2c_genericRead,
+};
 
-
-/**
- * Put a single byte in master transmitter mode
- * to the selected slave device through the TWI bus.
- *
- * \return true on success, false on error.
- */
-bool i2c_builtin_put(const uint8_t data)
+struct I2cHardware i2c_stm32_hw[] =
 {
-	i2c->DR = data;
-	while (get_status(i2c) != I2C_EVENT_MASTER_BYTE_TRANSMITTED);
-
-	return true;
-}
-
-/**
- * Get 1 byte from slave in master transmitter mode
- * to the selected slave device through the TWI bus.
- * If \a ack is true issue a ACK after getting the byte,
- * otherwise a NACK is issued.
- *
- * \return the byte read if ok, EOF on errors.
- */
-int i2c_builtin_get(bool ack)
-{
-	while (get_status(i2c) != I2C_EVENT_MASTER_BYTE_RECEIVED);
-
-	return i2c->DR;
-}
-
-
-MOD_DEFINE(i2c);
+	{ /* I2C1 */
+		.base = (struct stm32_i2c *)I2C1_BASE,
+		.clk_i2c_en  = RCC_APB1_I2C1,
+		.pin_mask = (GPIO_I2C1_SCL_PIN | GPIO_I2C1_SDA_PIN),
+	},
+	{ /* I2C2 */
+		.base = (struct stm32_i2c *)I2C2_BASE,
+		.clk_i2c_en  = RCC_APB1_I2C2,
+		.pin_mask = (GPIO_I2C2_SCL_PIN | GPIO_I2C2_SDA_PIN),
+	},
+};
 
 /**
  * Initialize I2C module.
  */
-void i2c_builtin_init(void)
+void i2c_hw_init(I2c *i2c, int dev, uint32_t clock)
 {
-	MOD_INIT(i2c);
+
+	i2c->hw = &i2c_stm32_hw[dev];
+	i2c->vt = &i2c_stm32_vt;
 
 	RCC->APB2ENR |= RCC_APB2_GPIOB;
-	RCC->APB1ENR |= RCC_APB1_I2C1;
+	RCC->APB1ENR |= i2c->hw->clk_i2c_en;
 
-	stm32_gpioPinConfig((struct stm32_gpio *)GPIOB_BASE, GPIO_I2C1_SCL_PIN,
+	/* Set gpio to use I2C driver */
+	stm32_gpioPinConfig((struct stm32_gpio *)GPIOB_BASE, i2c->hw->pin_mask,
 				GPIO_MODE_AF_OD, GPIO_SPEED_50MHZ);
 
-	stm32_gpioPinConfig((struct stm32_gpio *)GPIOB_BASE, GPIO_I2C1_SDA_PIN,
-				GPIO_MODE_AF_OD, GPIO_SPEED_50MHZ);
+	/* Clear all needed registers */
+	i2c->hw->base->CR1 = 0;
+	i2c->hw->base->CR2 = 0;
+	i2c->hw->base->CCR = 0;
+	i2c->hw->base->TRISE = 0;
+	i2c->hw->base->OAR1 = 0;
 
-	i2c->CR1 = 0;
-	i2c->CR2 = 0;
-	i2c->CCR = 0;
-	i2c->TRISE = 0;
-	i2c->OAR1 = 0;
-
-	i2c->CR2 |= CR2_FREQ_36MHZ;
+	/* Set PCLK1 frequency accornding to the master clock settings. See stm32_clock.c */
+	i2c->hw->base->CR2 |= CR2_FREQ_36MHZ;
 
 	/* Configure spi in standard mode */
-	#if CONFIG_I2C_FREQ <= 100000
-		i2c->CCR |= (uint16_t)((CR2_FREQ_36MHZ * 1000000) / (CONFIG_I2C_FREQ << 1));
-		i2c->TRISE |= (CR2_FREQ_36MHZ + 1);
-	#else
-		#error fast mode not supported
-	#endif
+	ASSERT2(clock >= 100000, "fast mode not supported");
 
+	i2c->hw->base->CCR |= (uint16_t)((CR2_FREQ_36MHZ * 1000000) / (clock << 1));
+	i2c->hw->base->TRISE |= (CR2_FREQ_36MHZ + 1);
+
+	i2c->hw->base->CR1 |= CR1_PE_SET;
 }

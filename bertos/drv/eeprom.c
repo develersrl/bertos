@@ -248,20 +248,11 @@ static size_t eeprom_read(struct KFile *_fd, void *_buf, size_t size)
 		return 0;
 	}
 
-	while (size--)
+
+	if (i2c_recv(buf, size))
 	{
-		/*
-		 * The last byte read does not have an ACK
-		 * to stop communication.
-		 */
-		int c = i2c_get(size);
-
-		if (c == EOF)
-			break;
-
-		*buf++ = c;
-		fd->fd.seek_pos++;
-		rd_len++;
+		fd->fd.seek_pos += size;
+		rd_len += size;
 	}
 
 	i2c_stop();

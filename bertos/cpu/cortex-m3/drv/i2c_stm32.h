@@ -30,29 +30,24 @@
  *
  * -->
  *
- * \brief Cortex-M3 generic hardware macros.
+ * \brief Driver for the STM32F103xx I2C (interface)
+ *
  */
 
-#ifndef CM3_TYPES_H
-#define CM3_TYPES_H
+#ifndef I2C_STM32_H
+#define I2C_STM32_H
+
+#include <drv/i2c.h>
 
 /**
- * Macros for hardware access, both direct and via the bit-band region.
+ * \name I2C devices enum
  */
-/*\{*/
-#define HWREG(x) (*((reg32_t *)(x)))
-#define HWREGH(x) (*((reg16_t *)(x)))
-#define HWREGB(x) (*((reg8_t *)(x)))
+enum
+{
+	I2C1,
+	I2C2,
 
-#define HWREGBITW(x, b) \
-        HWREG(((reg32_t)(x) & 0xF0000000) | 0x02000000 |		\
-              (((reg32_t)(x) & 0x000FFFFF) << 5) | ((b) << 2))
-#define HWREGBITH(x, b) \
-        HWREGH(((reg32_t)(x) & 0xF0000000) | 0x02000000 |		\
-               (((reg32_t)(x) & 0x000FFFFF) << 5) | ((b) << 2))
-#define HWREGBITB(x, b) \
-        HWREGB(((reg32_t)(x) & 0xF0000000) | 0x02000000 |		\
-               (((reg32_t)(x) & 0x000FFFFF) << 5) | ((b) << 2))
-/*\}*/
+	I2C_CNT  /**< Number of serial ports */
+};
 
-#endif /* CM3_TYPES_H */
+#endif /* I2C_STM32_H */

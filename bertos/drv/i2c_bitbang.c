@@ -33,9 +33,11 @@
  * \brief I2C bitbang driver (implementation)
  *
  * \author Francesco Sacchi <batt@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
  */
 
-#include "i2c.h"
+#include "hw/hw_i2c_bitbang.h"
+
 #include "cfg/cfg_i2c.h"
 
 #define LOG_LEVEL  I2C_LOG_LEVEL
@@ -46,9 +48,12 @@
 #include <cfg/module.h>
 
 #include <drv/timer.h>
+#include <drv/i2c.h>
+
 #include <cpu/irq.h>
 
-#include "hw/hw_i2c_bitbang.h"
+#include <cpu/attr.h>
+
 
 INLINE bool i2c_bitbang_start(void)
 {
@@ -57,7 +62,7 @@ INLINE bool i2c_bitbang_start(void)
 	I2C_HALFBIT_DELAY();
 	SDA_LO;
 	I2C_HALFBIT_DELAY();
-	ASSERT(!SDA_IN);
+
 	return !SDA_IN;
 }
 
@@ -175,5 +180,161 @@ void i2c_bitbang_init(void)
 	SDA_HI;
 	SCL_HI;
 	MOD_INIT(i2c);
+}
+
+
+/*
+ * New I2C API
+ */
+#define I2C_DEV(i2c)            ((int)((i2c)->hw))
+
+static void i2c_bitbang_stop_1(struct I2c *i2c)
+{
+	i2c_hw_sdaLo(I2C_DEV(i2c));
+	i2c_hw_sclHi(I2C_DEV(i2c));
+	i2c_hw_halfbitDelay(I2C_DEV(i2c));
+	i2c_hw_sdaHi(I2C_DEV(i2c));
+}
+
+INLINE bool i2c_bitbang_start_1(struct I2c *i2c)
+{
+	i2c_hw_sdaHi(I2C_DEV(i2c));
+	i2c_hw_sclHi(I2C_DEV(i2c));
+	i2c_hw_halfbitDelay(I2C_DEV(i2c));
+	i2c_hw_sdaLo(I2C_DEV(i2c));
+	i2c_hw_halfbitDelay(I2C_DEV(i2c));
+
+	return !i2c_hw_sdaIn(I2C_DEV(i2c));
+}
+
+
+static uint8_t i2c_bitbang_getc(struct I2c *i2c)
+{
+	uint8_t data = 0;
+	for (uint8_t i = 0x80; i != 0; i >>= 1)
+	{
+		i2c_hw_sclLo(I2C_DEV(i2c));
+		i2c_hw_halfbitDelay(I2C_DEV(i2c));
+		i2c_hw_sclHi(I2C_DEV(i2c));
+		if (i2c_hw_sdaIn(I2C_DEV(i2c)))
+			data |= i;
+		else
+			data &= ~i;
+
+		i2c_hw_halfbitDelay(I2C_DEV(i2c));
+	}
+	i2c_hw_sclLo(I2C_DEV(i2c));
+
+	/* Generate ACK/NACK */
+	if (i2c->xfer_size > 1)
+		i2c_hw_sdaLo(I2C_DEV(i2c));
+	else
+		i2c_hw_sdaHi(I2C_DEV(i2c));
+
+	i2c_hw_halfbitDelay(I2C_DEV(i2c));
+	i2c_hw_sclHi(I2C_DEV(i2c));
+	i2c_hw_halfbitDelay(I2C_DEV(i2c));
+	i2c_hw_sclLo(I2C_DEV(i2c));
+	i2c_hw_sdaHi(I2C_DEV(i2c));
+
+	/* Generate stop condition (if requested) */
+	if ((i2c->xfer_size == 1) && (i2c->flags & I2C_STOP))
+		i2c_bitbang_stop_1(i2c);
+
+	return data;
+}
+
+static void i2c_bitbang_putc(struct I2c *i2c, uint8_t _data)
+{
+	/* Add ACK bit */
+	uint16_t data = (_data << 1) | 1;
+
+	for (uint16_t i = 0x100; i != 0; i >>= 1)
+	{
+		i2c_hw_sclLo(I2C_DEV(i2c));
+		if (data & i)
+			i2c_hw_sdaHi(I2C_DEV(i2c));
+		else
+			i2c_hw_sdaLo(I2C_DEV(i2c));
+		i2c_hw_halfbitDelay(I2C_DEV(i2c));
+
+		i2c_hw_sclHi(I2C_DEV(i2c));
+		i2c_hw_halfbitDelay(I2C_DEV(i2c));
+	}
+
+	bool ack = !i2c_hw_sdaIn(I2C_DEV(i2c));
+	i2c_hw_sclLo(I2C_DEV(i2c));
+	i2c_hw_halfbitDelay(I2C_DEV(i2c));
+
+	if (!ack)
+	{
+		LOG_ERR("NO ACK received\n");
+		i2c->errors |= I2C_NO_ACK;
+	}
+
+	/* Generate stop condition (if requested) */
+	if (((i2c->xfer_size == 1) && (i2c->flags & I2C_STOP)) || i2c->errors)
+		i2c_bitbang_stop_1(i2c);
+}
+
+
+static void i2c_bitbang_start_2(struct I2c *i2c, uint16_t slave_addr)
+{
+	if (i2c->flags & I2C_START_R)
+		slave_addr |= I2C_READBIT;
+	else
+		slave_addr &= ~I2C_READBIT;
+
+	/*
+	 * Loop on the select write sequence: when the device is busy
+	 * writing previously sent data it will reply to the SLA_W
+	 * control byte with a NACK.  In this case, we must
+	 * keep trying until the deveice responds with an ACK.
+	 */
+	ticks_t start = timer_clock();
+	while (i2c_bitbang_start_1(i2c))
+	{
+		i2c_bitbang_putc(i2c, slave_addr);
+
+		if (!(i2c->errors & I2C_NO_ACK))
+			return;
+		else if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT))
+		{
+			LOG_ERR("Timeout on I2C start\n");
+			i2c->errors |= I2C_START_TIMEOUT;
+			i2c_bitbang_stop_1(i2c);
+			return;
+		}
+	}
+
+	LOG_ERR("START arbitration lost\n");
+	i2c->errors |= I2C_ARB_LOST;
+	i2c_bitbang_stop_1(i2c);
+	return;
+}
+
+
+static const I2cVT i2c_bitbang_vt =
+{
+	.start = i2c_bitbang_start_2,
+	.getc = i2c_bitbang_getc,
+	.putc = i2c_bitbang_putc,
+	.write = i2c_genericWrite,
+	.read = i2c_genericRead,
+};
+
+
+/**
+ * Initialize i2c module.
+ */
+void i2c_hw_bitbangInit(I2c *i2c, int dev)
+{
+	MOD_CHECK(timer);
+	i2c->hw = (struct I2cHardware *)(dev - I2C_BITBANG0);
+	i2c->vt = &i2c_bitbang_vt;
+
+	i2c_hw_bitbang_init(I2C_DEV(i2c));
+	i2c_hw_sdaHi(I2C_DEV(i2c));
+	i2c_hw_sclHi(I2C_DEV(i2c));
 }
 

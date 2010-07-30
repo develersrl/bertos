@@ -26,64 +26,24 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2007 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
- * \brief PCF8574 i2c port expander driver.
+ * \brief Low-level I2C module for ARM Cortex-m3 (interface).
  *
- * This driver controls the PCF8574.
- * The PCF8574 is an 8bit i2c port expander.
- * You can read/write 8 pins through an i2c bus.
- * The pins are quasi-bidirectionals, this mean that
- * without the need of a direction register you can use
- * each pin as input or output, see datasheet on how this
- * is achieved.
+ * \author Daniele Basile <asterix@develer.com>
  *
- * \author Francesco Sacchi <batt@develer.com>
  */
 
-#include "pcf8574.h"
-#include <cfg/module.h>
-#include <drv/i2c.h>
+#include <cpu/detect.h>
 
-/**
- * Read PCF8574 \a pcf bit status.
- * \return the pins status or EOF on errors.
- */
-int pcf8574_get(Pcf8574 *pcf)
-{
-	if (!i2c_start_r(PCF8574ID | ((pcf->addr << 1) & 0xF7)))
-		return EOF;
+#if CPU_CM3_LM3S
+	#include "i2c_lm3s.h"
+#elif CPU_CM3_STM32
+	#include "i2c_stm32.h"
+/*#elif  Add other Cortex-M3 CPUs here */
+#else
+	#error Unknown CPU
+#endif
 
-	int data; 
-	
-	if (!i2c_recv(&data, 1))
-		data = EOF;
-		
-	i2c_stop();
-	
-	return data;
-}
-
-/**
- * Write to PCF8574 \a pcf port \a data.
- * \return true if ok, false on errors.
- */
-bool pcf8574_put(Pcf8574 *pcf, uint8_t data)
-{
-	bool res = i2c_start_w(PCF8574ID | ((pcf->addr << 1) & 0xF7)) && i2c_put(data);
-	i2c_stop();
-	return res;
-}
-
-/**
- * Init a PCF8574 on the bus with addr \a addr.
- * \return true if device is found, false otherwise.
- */
-bool pcf8574_init(Pcf8574 *pcf, pcf8574_addr addr)
-{
-	MOD_CHECK(i2c);
-	pcf->addr = addr;
-	return pcf8574_get(pcf) != EOF;
-}

@@ -34,6 +34,7 @@
  *
  * \author Stefano Fedrigo <aleph@develer.com>
  * \author Bernie Innocenti <bernie@codewiz.org>
+ * \author Daniele Basile <asterix@develer.com>
  */
 
 #include <hw/hw_cpufreq.h>  /* CPU_FREQ */
@@ -53,6 +54,8 @@
 #include <cpu/irq.h>
 #include <drv/timer.h>
 #include <drv/i2c.h>
+
+#include <cpu/power.h>
 
 #include <compat/twi.h>
 
@@ -148,7 +151,7 @@ bool i2c_builtin_start_r(uint8_t id)
  */
 void i2c_builtin_stop(void)
 {
-        TWCR = BV(TWINT) | BV(TWEN) | BV(TWSTO);
+	TWCR = BV(TWINT) | BV(TWEN) | BV(TWSTO);
 }
 
 
@@ -205,6 +208,7 @@ int i2c_builtin_get(bool ack)
 	return (int)(uint8_t)TWDR;
 }
 
+
 MOD_DEFINE(i2c);
 
 /**
@@ -248,4 +252,204 @@ void i2c_builtin_init(void)
 		TWCR = BV(TWEN);
 	);
 	MOD_INIT(i2c);
+}
+
+/*
+ * New Api
+ */
+
+
+struct I2cHardware
+{
+};
+
+
+/* Wait for TWINT flag set: bus is ready */
+#define WAIT_READY() \
+	do { \
+		while (!(TWCR & BV(TWINT))) \
+			cpu_relax(); \
+	} while (0)
+
+/**
+ * Send START condition on the bus.
+ */
+INLINE bool i2c_hw_start(void)
+{
+	TWCR = BV(TWINT) | BV(TWSTA) | BV(TWEN);
+	WAIT_READY();
+
+	if (TW_STATUS == TW_START || TW_STATUS == TW_REP_START)
+		return true;
+
+	return false;
+}
+
+/**
+ * Send STOP condition.
+ */
+INLINE void i2c_hw_stop(void)
+{
+	TWCR = BV(TWINT) | BV(TWEN) | BV(TWSTO);
+}
+
+static void i2c_avr_start(I2c *i2c, uint16_t slave_addr)
+{
+	/*
+	 * Loop on the select write sequence: when the eeprom is busy
+	 * writing previously sent data it will reply to the SLA_W
+	 * control byte with a NACK.  In this case, we must
+	 * keep trying until the slave responds with an ACK.
+	 */
+	ticks_t start = timer_clock();
+	while (i2c_hw_start())
+	{
+		uint8_t sla_ack = 0;
+		uint8_t sla_nack = 0;
+		if (I2C_TEST_START(i2c->flags) == I2C_START_W)
+		{
+			TWDR = slave_addr & ~I2C_READBIT;
+			sla_ack = TW_MT_SLA_ACK;
+			sla_nack = TW_MT_SLA_NACK;
+		}
+		else
+		{
+			TWDR = slave_addr | I2C_READBIT;
+			sla_ack = TW_MR_SLA_ACK;
+			sla_nack = TW_MR_SLA_NACK;
+		}
+
+		TWCR = BV(TWINT) | BV(TWEN);
+		WAIT_READY();
+
+		if (TW_STATUS == sla_ack)
+			return;
+		else if (TW_STATUS != sla_nack)
+		{
+			LOG_ERR("Start addr NACK[%x]\n", TWSR);
+			i2c->errors |= I2C_NO_ACK;
+			i2c_hw_stop();
+			break;
+		}
+		else if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT))
+		{
+			LOG_ERR("Start timeout\n");
+			i2c->errors |= I2C_START_TIMEOUT;
+			i2c_hw_stop();
+			break;
+		}
+	}
+
+	LOG_ERR("I2c error\n");
+	i2c->errors |= I2C_ERR;
+	i2c_hw_stop();
+}
+
+static void i2c_avr_putc(I2c *i2c, const uint8_t data)
+{
+
+	TWDR = data;
+	TWCR = BV(TWINT) | BV(TWEN);
+	WAIT_READY();
+
+	if (TW_STATUS != TW_MT_DATA_ACK)
+	{
+		LOG_ERR("Data nack[%x]\n", TWSR);
+		i2c->errors |= I2C_DATA_NACK;
+		i2c_hw_stop();
+	}
+
+	if ((i2c->xfer_size == 1) && (I2C_TEST_STOP(i2c->flags) == I2C_STOP))
+		i2c_hw_stop();
+}
+
+static uint8_t i2c_avr_getc(I2c *i2c)
+{
+	uint8_t data_flag = 0;
+	if (i2c->xfer_size == 1)
+	{
+		TWCR = BV(TWINT) | BV(TWEN);
+		data_flag = TW_MR_DATA_NACK;
+	}
+	else
+	{
+		TWCR = BV(TWINT) | BV(TWEN) | BV(TWEA);
+		data_flag = TW_MR_DATA_ACK;
+	}
+
+	WAIT_READY();
+
+	if (TW_STATUS != data_flag)
+	{
+		LOG_ERR("Data nack[%x]\n", TWSR);
+		i2c->errors |= I2C_DATA_NACK;
+		i2c_hw_stop();
+
+		return 0xFF;
+	}
+
+	uint8_t data = TWDR;
+
+	if ((i2c->xfer_size == 1) && (I2C_TEST_STOP(i2c->flags) == I2C_STOP))
+		i2c_hw_stop();
+
+	return data;
+}
+
+
+static const I2cVT i2c_avr_vt =
+{
+	.start = i2c_avr_start,
+	.getc = i2c_avr_getc,
+	.putc = i2c_avr_putc,
+	.write = i2c_genericWrite,
+	.read = i2c_genericRead,
+};
+
+struct I2cHardware i2c_avr_hw[] =
+{
+	{ /* I2C0 */
+	},
+};
+
+/**
+ * Initialize I2C module.
+ */
+void i2c_hw_init(I2c *i2c, int dev, uint32_t clock)
+{
+	i2c->hw = &i2c_avr_hw[dev];
+	i2c->vt = &i2c_avr_vt;
+
+	ATOMIC(
+		/*
+		 * This is pretty useless according to AVR's datasheet,
+		 * but it helps us driving the TWI data lines on boards
+		 * where the bus pull-up resistors are missing.  This is
+		 * probably due to some unwanted interaction between the
+		 * port pin and the TWI lines.
+		 */
+	#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281
+		PORTD |= BV(PD0) | BV(PD1);
+		DDRD  |= BV(PD0) | BV(PD1);
+	#elif CPU_AVR_ATMEGA8
+		PORTC |= BV(PC4) | BV(PC5);
+		DDRC  |= BV(PC4) | BV(PC5);
+	#elif CPU_AVR_ATMEGA32
+		PORTC |= BV(PC1) | BV(PC0);
+		DDRC  |= BV(PC1) | BV(PC0);
+	#else
+		#error Unsupported architecture
+	#endif
+
+		/*
+		 * Set speed:
+		 * F = CPU_FREQ / (16 + 2*TWBR * 4^TWPS)
+		 */
+		ASSERT(clock);
+		#define TWI_PRESC    1       /* 4 ^ TWPS */
+
+		TWBR = (CPU_FREQ / (2 * clock * TWI_PRESC)) - (8 / TWI_PRESC);
+		TWSR = 0;
+		TWCR = BV(TWEN);
+	);
 }

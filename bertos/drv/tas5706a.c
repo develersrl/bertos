@@ -37,13 +37,16 @@
  */
 
 #include "tas5706a.h"
+
+#include "hw/hw_tas5706a.h"
+
+#include "cfg/cfg_tas5706a.h"
+
 #include <cfg/module.h>
 
 #include <drv/i2c.h>
 #include <drv/timer.h>
 
-#include "hw/hw_tas5706a.h"
-#include "cfg/cfg_tas5706a.h"
 
 #define TAS_ADDR 0x36
 

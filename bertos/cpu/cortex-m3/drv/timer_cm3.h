@@ -40,6 +40,9 @@
 
 #include "cfg/cfg_timer.h"     /* CONFIG_TIMER */
 
+#include <cpu/detect.h>
+#include <cpu/irq.h>
+
 #if CPU_CM3_LM3S
 	#include <io/lm3s.h>
 #elif CPU_CM3_STM32

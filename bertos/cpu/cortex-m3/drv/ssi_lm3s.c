@@ -35,12 +35,13 @@
  * \author Andrea Righi <arighi@develer.com>
  */
 
-#include "cfg/compiler.h"
-#include "cfg/debug.h"
-
-#include <string.h> /* memset() */
 
 #include "ssi_lm3s.h"
+
+#include <cfg/compiler.h>
+#include <cfg/debug.h>
+
+#include <string.h> /* memset() */
 
 /* SSI clocking informations (CPSDVSR + SCR) */
 struct SSIClock

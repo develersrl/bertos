@@ -233,4 +233,14 @@ STATIC_ASSERT(sizeof(cpu_stack_t) == SIZEOF_CPUSTACK_T);
 STATIC_ASSERT(sizeof(cpu_aligned_stack_t) == SIZEOF_CPUALIGNED_T);
 STATIC_ASSERT(sizeof(size_t) == SIZEOF_SIZE_T);
 
+
+/**
+ * Macros for hardware access, both direct and via the bit-band region.
+ */
+/*\{*/
+#define HWREG(x)   (*((reg32_t *)(x)))
+#define HWREGH(x)  (*((reg16_t *)(x)))
+#define HWREGB(x)  (*((reg8_t *)(x)))
+/*\}*/
+
 #endif /* CPU_TYPES_H */

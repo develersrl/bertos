@@ -37,20 +37,20 @@
  * notest:arm
  */
 
+#include "ser_lpc2.h"
+
+#include "cfg/cfg_ser.h"
+
 #include <cfg/macros.h> /* for BV() */
+
 #include <cpu/power.h> /* cpu_relax() */
+
 #include <drv/ser_p.h>
 #include <drv/ser.h>
 #include <drv/vic_lpc2.h> /* vic_handler_t */
-#include <io/lpc23xx.h>
-#include "cfg/cfg_ser.h"
-#include "ser_lpc2.h"
 
-/* IRQ numbers */
-#define INT_UART0	6
-#define INT_UART1	7
-#define INT_UART2	28
-#define INT_UART3	29
+#include <io/lpc23xx.h>
+
 
 /* Register offsets */
 #define RBR	0x00

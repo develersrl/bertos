@@ -40,6 +40,8 @@
 #include "cfg/cfg_proc.h"
 #include "cfg/cfg_wdt.h"
 
+#include <cfg/compiler.h>
+
 #if CONFIG_KERN
 	#include <kern/proc.h>
 #endif
