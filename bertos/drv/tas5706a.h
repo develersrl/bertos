@@ -46,6 +46,18 @@
 
 #include <cfg/compiler.h>
 
+#include <drv/i2c.h>
+
+#if COMPILER_C99
+	#define tas5706a_init(...)               PP_CAT(tas5706a_init ## _, COUNT_PARMS(__VA_ARGS__)) (__VA_ARGS__)
+	#define tas5706a_setLowPower(...)        PP_CAT(tas5706a_setLowPower ## _, COUNT_PARMS(__VA_ARGS__)) (__VA_ARGS__)
+	#define tas5706a_setVolume(...)          PP_CAT(tas5706a_setVolume ## _, COUNT_PARMS(__VA_ARGS__)) (__VA_ARGS__)
+#else
+	#define tas5706a_init(args...)           PP_CAT(tas5706a_init ## _, COUNT_PARMS(args)) (args)
+	#define tas5706a_setLowPower(args...)    PP_CAT(tas5706a_setLowPower ## _, COUNT_PARMS(args)) (args)
+	#define tas5706a_setVolume(args...)      PP_CAT(tas5706a_setVolume ## _, COUNT_PARMS(args)) (args)
+#endif
+
 typedef enum Tas5706aCh
 {
 	TAS_CH1,
@@ -73,12 +85,7 @@ typedef uint8_t tas5706a_vol_t;
  * \param ch The channel to be controlled.
  * \param vol The volume you want to set.
  */
-void tas5706a_setVolume(Tas5706aCh ch, tas5706a_vol_t vol);
-
-/**
- * Initialize the TAS chip.
- */
-void tas5706a_init(void);
+void tas5706a_setVolume_3(I2c *i2c, Tas5706aCh ch, tas5706a_vol_t vol);
 
 /**
  * Set TAS chip to low power mode.
@@ -88,6 +95,16 @@ void tas5706a_init(void);
  *
  * \param val True if you want to enable low power mode, false otherwise.
  */
-void tas5706a_setLowPower(bool val);
+void tas5706a_setLowPower_2(I2c *i2c, bool val);
+
+/**
+ * Initialize the TAS chip.
+ */
+void tas5706a_init_1(I2c *i2c);
+
+
+DEPRECATED void tas5706a_setVolume_2(Tas5706aCh ch, tas5706a_vol_t vol);
+DEPRECATED void tas5706a_setLowPower_1(bool val);
+DEPRECATED void tas5706a_init_0(void);
 
 #endif /* DRV_TAS5706A_H */

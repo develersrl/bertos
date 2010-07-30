@@ -44,25 +44,27 @@
  */
 
 #include "pcf8574.h"
+
 #include <cfg/module.h>
+
 #include <drv/i2c.h>
 
 /**
  * Read PCF8574 \a pcf bit status.
  * \return the pins status or EOF on errors.
  */
-int pcf8574_get(Pcf8574 *pcf)
+int pcf8574_get_1(Pcf8574 *pcf)
 {
 	if (!i2c_start_r(PCF8574ID | ((pcf->addr << 1) & 0xF7)))
 		return EOF;
 
-	int data; 
-	
+	int data;
+
 	if (!i2c_recv(&data, 1))
 		data = EOF;
-		
+
 	i2c_stop();
-	
+
 	return data;
 }
 
@@ -70,7 +72,7 @@ int pcf8574_get(Pcf8574 *pcf)
  * Write to PCF8574 \a pcf port \a data.
  * \return true if ok, false on errors.
  */
-bool pcf8574_put(Pcf8574 *pcf, uint8_t data)
+bool pcf8574_put_2(Pcf8574 *pcf, uint8_t data)
 {
 	bool res = i2c_start_w(PCF8574ID | ((pcf->addr << 1) & 0xF7)) && i2c_put(data);
 	i2c_stop();
@@ -81,9 +83,59 @@ bool pcf8574_put(Pcf8574 *pcf, uint8_t data)
  * Init a PCF8574 on the bus with addr \a addr.
  * \return true if device is found, false otherwise.
  */
-bool pcf8574_init(Pcf8574 *pcf, pcf8574_addr addr)
+bool pcf8574_init_2(Pcf8574 *pcf, pcf8574_addr addr)
 {
 	MOD_CHECK(i2c);
 	pcf->addr = addr;
 	return pcf8574_get(pcf) != EOF;
 }
+
+
+
+/*
+ * New API
+ */
+
+/**
+ * Read PCF8574 \a pcf bit status.
+ * \return the pins status or EOF on errors.
+ */
+int pcf8574_get_2(I2c *i2c, Pcf8574 *pcf)
+{
+	i2c_start_r(i2c, PCF8574ID | ((pcf->addr << 1) & 0xF7), 1, I2C_STOP);
+
+	int data = i2c_getc(i2c);
+
+	if (i2c_error(i2c))
+		data = EOF;
+
+	return data;
+}
+
+/**
+ * Write to PCF8574 \a pcf port \a data.
+ * \return true if ok, false on errors.
+ */
+bool pcf8574_put_3(I2c *i2c, Pcf8574 *pcf, uint8_t data)
+{
+	i2c_start_w(i2c, PCF8574ID | ((pcf->addr << 1) & 0xF7), 1, I2C_STOP);
+	i2c_putc(i2c, data);
+
+	if (i2c_error(i2c))
+		return false;
+
+	return true;
+}
+
+/**
+ * Init a PCF8574 on the bus with addr \a addr.
+ * \return true if device is found, false otherwise.
+ */
+bool pcf8574_init_3(I2c *i2c, Pcf8574 *pcf, pcf8574_addr addr)
+{
+	ASSERT(i2c);
+	pcf->addr = addr;
+
+	return (pcf8574_get(i2c, pcf) != EOF);
+}
+

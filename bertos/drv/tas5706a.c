@@ -47,10 +47,21 @@
 #include <drv/i2c.h>
 #include <drv/timer.h>
 
+typedef uint8_t tas_addr_t;
 
 #define TAS_ADDR 0x36
 
-typedef uint8_t tas_addr_t;
+#define TRIM_REG   0x1B
+#define SYS_REG2   0x05
+#define VOLUME_REG 0x07
+#define MUTE_VOL 0xFF
+
+#define DB_TO_REG(db) ((24 - (db)) * 2)
+
+#define CH1_VOL_REG 0x08
+#define CH2_VOL_REG 0x09
+#define CH3_VOL_REG 0x0A
+#define CH4_VOL_REG 0x0B
 
 static bool tas5706a_send(tas_addr_t addr, const void *buf, size_t len)
 {
@@ -59,7 +70,7 @@ static bool tas5706a_send(tas_addr_t addr, const void *buf, size_t len)
 	return ret;
 }
 
-INLINE bool tas5706a_putc(tas_addr_t addr, uint8_t ch)
+INLINE bool tas5706a_put(tas_addr_t addr, uint8_t ch)
 {
 	return tas5706a_send(addr, &ch, sizeof(ch));
 }
@@ -71,7 +82,7 @@ static bool tas5706a_recv(tas_addr_t addr, void *buf, size_t len)
 	return ret;
 }
 
-INLINE int tas5706a_getc(tas_addr_t addr)
+INLINE int tas5706a_get(tas_addr_t addr)
 {
 	uint8_t ch;
 	if (tas5706a_recv(addr, &ch, sizeof(ch)))
@@ -80,14 +91,7 @@ INLINE int tas5706a_getc(tas_addr_t addr)
 		return EOF;
 }
 
-#define TRIM_REG   0x1B
-#define SYS_REG2   0x05
-#define VOLUME_REG 0x07
-#define MUTE_VOL 0xFF
-
-#define DB_TO_REG(db) ((24 - (db)) * 2)
-
-void tas5706a_init(void)
+void tas5706a_init_0(void)
 {
 	MOD_CHECK(i2c);
 	MOD_CHECK(timer);
@@ -99,20 +103,15 @@ void tas5706a_init(void)
 	timer_delay(2);
 	TAS5706A_SETRESET(false);
 	timer_delay(20);
-	tas5706a_putc(TRIM_REG, 0x00);
+	tas5706a_put(TRIM_REG, 0x00);
 
-	tas5706a_putc(VOLUME_REG, DB_TO_REG(CONFIG_TAS_MAX_VOL));
+	tas5706a_put(VOLUME_REG, DB_TO_REG(CONFIG_TAS_MAX_VOL));
 
 	/* Unmute */
-	tas5706a_putc(SYS_REG2, 0);
+	tas5706a_put(SYS_REG2, 0);
 }
 
-#define CH1_VOL_REG 0x08
-#define CH2_VOL_REG 0x09
-#define CH3_VOL_REG 0x0A
-#define CH4_VOL_REG 0x0B
-
-void tas5706a_setVolume(Tas5706aCh ch, tas5706a_vol_t vol)
+void tas5706a_setVolume_2(Tas5706aCh ch, tas5706a_vol_t vol)
 {
 	ASSERT(ch < TAS_CNT);
 	ASSERT(vol <= TAS_VOL_MAX);
@@ -136,13 +135,86 @@ void tas5706a_setVolume(Tas5706aCh ch, tas5706a_vol_t vol)
 
 	uint8_t vol_att = 0xff - ((vol * 0xff) / TAS_VOL_MAX);
 
-	tas5706a_putc(addr1, vol_att);
-	tas5706a_putc(addr2, vol_att);
+	tas5706a_put(addr1, vol_att);
+	tas5706a_put(addr2, vol_att);
 }
 
-void tas5706a_setLowPower(bool val)
+void tas5706a_setLowPower_1(bool val)
 {
 	TAS5706A_SETPOWERDOWN(val);
 	TAS5706A_SETMUTE(val);
 }
 
+/*
+ * New API
+ */
+
+INLINE bool tas5706a_putc(I2c *i2c, tas_addr_t addr, uint8_t ch)
+{
+	i2c_start_w(i2c, TAS_ADDR, 2, I2C_STOP);
+	i2c_putc(i2c, addr);
+	i2c_putc(i2c, ch);
+
+	if (i2c_error(i2c))
+		return false;
+
+	return true;
+}
+
+void tas5706a_setVolume_3(I2c *i2c, Tas5706aCh ch, tas5706a_vol_t vol)
+{
+	ASSERT(ch < TAS_CNT);
+	ASSERT(vol <= TAS_VOL_MAX);
+
+	tas_addr_t addr1, addr2;
+
+	switch(ch)
+	{
+		case TAS_CH1:
+			addr1 = CH1_VOL_REG;
+			addr2 = CH3_VOL_REG;
+			break;
+		case TAS_CH2:
+			addr1 = CH2_VOL_REG;
+			addr2 = CH4_VOL_REG;
+			break;
+		default:
+			ASSERT(0);
+			return;
+	}
+
+	uint8_t vol_att = 0xff - ((vol * 0xff) / TAS_VOL_MAX);
+
+	tas5706a_putc(i2c, addr1, vol_att);
+	tas5706a_putc(i2c, addr2, vol_att);
+}
+
+void tas5706a_setLowPower_2(I2c *i2c, bool val)
+{
+	ASSERT(i2c);
+
+	TAS5706A_SETPOWERDOWN(val);
+	TAS5706A_SETMUTE(val);
+}
+
+
+void tas5706a_init_1(I2c *i2c)
+{
+	ASSERT(i2c);
+	MOD_CHECK(timer);
+
+	TAS5706A_PIN_INIT();
+	timer_delay(200);
+	TAS5706A_SETPOWERDOWN(false);
+	TAS5706A_SETMUTE(false);
+	TAS5706A_MCLK_INIT();
+	timer_delay(2);
+	TAS5706A_SETRESET(false);
+	timer_delay(20);
+	tas5706a_putc(i2c, TRIM_REG, 0x00);
+
+	tas5706a_putc(i2c, VOLUME_REG, DB_TO_REG(CONFIG_TAS_MAX_VOL));
+
+	/* Unmute */
+	tas5706a_putc(i2c, SYS_REG2, 0);
+}

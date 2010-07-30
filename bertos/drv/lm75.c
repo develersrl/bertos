@@ -55,8 +55,10 @@
 #include <drv/ntc.h> // Macro and data type to manage celsius degree
 
 #define SELECT_ADDRESS(addr)   LM75_ADDRESS_BYTE | (addr << 1)
+#define LM75_ADDRESS_BYTE    0x91
+#define LM75_PAD_BYTE        0x0
 
-deg_t lm75_read(uint8_t sens_addr)
+deg_t lm75_read_1(uint8_t sens_addr)
 {
 	uint8_t data[2];
 	int16_t degree;
@@ -85,11 +87,42 @@ deg_t lm75_read(uint8_t sens_addr)
 	return degree * 10 + deci_degree;
 }
 
-void lm75_init(void)
+void lm75_init_0(void)
 {
 	// Check dependence
 	MOD_CHECK(i2c);
 	LM75_HW_INIT();
 }
 
+/*
+ * New API
+ */
+deg_t lm75_read_2(I2c *i2c, uint8_t sens_addr)
+{
+	uint8_t data[2];
+	int16_t degree;
+	int16_t deci_degree;
 
+	i2c_start_w(i2c, SELECT_ADDRESS(sens_addr), 1, I2C_NOSTOP);
+	i2c_putc(i2c, LM75_PAD_BYTE);
+	i2c_start_r(i2c, SELECT_ADDRESS(sens_addr), sizeof(data), I2C_STOP);
+	i2c_read(i2c, data, sizeof(data));
+
+	if (i2c_error(i2c))
+		return EOF;
+
+	degree = (int16_t)data[0];
+	deci_degree = (int16_t)(((data[1] >> 7) & 1 ) * 5);
+
+	LOG_INFO("[%d.%d C]\n", degree, deci_degree);
+
+	return degree * 10 + deci_degree;
+}
+
+void lm75_init_1(I2c *i2c)
+{
+	ASSERT(i2c);
+
+	// Check dependence
+	LM75_HW_INIT();
+}
