@@ -265,7 +265,7 @@ static const I2cVT i2c_lpc_vt =
 	.read = i2c_genericRead,
 };
 
-static const struct I2cHardware i2c_lpc2_hw[] =
+static struct I2cHardware i2c_lpc2_hw[] =
 {
 	{ /* I2C0 */
 		.base = I2C0_BASE_ADDR,

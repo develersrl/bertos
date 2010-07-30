@@ -303,7 +303,7 @@ static const I2cVT i2c_stm32_vt =
 	.read = i2c_genericRead,
 };
 
-struct I2cHardware i2c_stm32_hw[] =
+static struct I2cHardware i2c_stm32_hw[] =
 {
 	{ /* I2C1 */
 		.base = (struct stm32_i2c *)I2C1_BASE,

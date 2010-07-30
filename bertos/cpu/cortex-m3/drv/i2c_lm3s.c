@@ -205,7 +205,7 @@ static const I2cVT i2c_lm3s_vt =
 	.read = i2c_genericRead,
 };
 
-struct I2cHardware i2c_lm3s_hw[] =
+static struct I2cHardware i2c_lm3s_hw[] =
 {
 	{ /* I2C0 */
 		.base = I2C0_MASTER_BASE,
