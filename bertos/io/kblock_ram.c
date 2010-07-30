@@ -75,14 +75,14 @@ static size_t kblockram_writeBuf(struct KBlock *b, const void *buf, size_t offse
 	return size;
 }
 
-static int kblockram_writeBlock(struct KBlock *b, block_idx_t index, const void *buf)
+static size_t kblockram_writeDirect(struct KBlock *b, block_idx_t index, const void *buf, size_t offset, size_t size)
 {
 	KBlockRam *r = KBLOCKRAM_CAST(b);
 	ASSERT(buf);
 	ASSERT(index < b->blk_cnt);
 
-	memcpy(r->membuf + index * r->b.blk_size, buf, r->b.blk_size);
-	return 0;
+	memcpy(r->membuf + index * r->b.blk_size + offset, buf, size);
+	return size;
 }
 
 static int kblockram_dummy(UNUSED_ARG(struct KBlock *,b))
@@ -93,12 +93,12 @@ static int kblockram_dummy(UNUSED_ARG(struct KBlock *,b))
 static const KBlockVTable kblockram_hwbuffered_vt =
 {
 	.readDirect = kblockram_readDirect,
-	
+
 	.readBuf = kblockram_readBuf,
 	.writeBuf = kblockram_writeBuf,
 	.load = kblockram_load,
 	.store = kblockram_store,
-	
+
 	.error = kblockram_dummy,
 	.clearerr = kblockram_dummy,
 	.close = kblockram_dummy,
@@ -108,13 +108,13 @@ static const KBlockVTable kblockram_hwbuffered_vt =
 static const KBlockVTable kblockram_swbuffered_vt =
 {
 	.readDirect = kblockram_readDirect,
-	.writeBlock = kblockram_writeBlock,
-	
+	.writeDirect = kblockram_writeDirect,
+
 	.readBuf = kblock_swReadBuf,
 	.writeBuf = kblock_swWriteBuf,
 	.load = kblock_swLoad,
 	.store = kblock_swStore,
-		
+
 	.error = kblockram_dummy,
 	.clearerr = kblockram_dummy,
 	.close = kblockram_dummy,
@@ -123,7 +123,7 @@ static const KBlockVTable kblockram_swbuffered_vt =
 static const KBlockVTable kblockram_unbuffered_vt =
 {
 	.readDirect = kblockram_readDirect,
-	.writeBlock = kblockram_writeBlock,
+	.writeDirect = kblockram_writeDirect,
 
 	.error = kblockram_dummy,
 	.clearerr = kblockram_dummy,
@@ -140,7 +140,8 @@ void kblockram_init(KBlockRam *ram, void *buf, size_t size, size_t block_size, b
 
 	DB(ram->b.priv.type = KBT_KBLOCKRAM);
 	ram->b.blk_size = block_size;
-	
+	ram->b.priv.flags |= KB_PARTIAL_WRITE;
+
 	if (buffered)
 	{
 		ram->b.priv.flags |= KB_BUFFERED;
@@ -148,12 +149,12 @@ void kblockram_init(KBlockRam *ram, void *buf, size_t size, size_t block_size, b
 		ram->b.priv.buf = buf;
 		// First page used as page buffer
 		ram->membuf = (uint8_t *)buf + block_size;
-			
+
 		if (hwbuffered)
 			ram->b.priv.vt = &kblockram_hwbuffered_vt;
 		else
 			ram->b.priv.vt = &kblockram_swbuffered_vt;
-		
+
 		kblockram_load(&ram->b, 0);
 	}
 	else

@@ -366,7 +366,7 @@ bool battfs_mount(struct BattFsSuper *disk, struct KBlock *dev, pgcnt_t *page_ar
 	pgoff_t filelen_table[BATTFS_MAX_FILES];
 
 	ASSERT(dev);
-	ASSERT(kblock_buffered(dev));
+	ASSERT(kblock_partialWrite(dev));
 	disk->dev = dev;
 
 	ASSERT(disk->dev->blk_size > BATTFS_HEADER_LEN);
@@ -591,11 +591,12 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 
 		/*
 		 * Renew page only if is not in cache.
-		 * This avoids rewriting the same page continuously 
+		 * This avoids rewriting the same page continuously
 		 * if the user code keeps writing in the same portion
 		 * of the file.
 		 */
-		if ((fdb->start[fdb->max_off] != kblock_cachedBlock(disk->dev)) || !kblock_cacheDirty(disk->dev))
+		if (kblock_buffered(disk->dev)
+			&& ((fdb->start[fdb->max_off] != kblock_cachedBlock(disk->dev)) || !kblock_cacheDirty(disk->dev)))
 		{
 			new_page = renewPage(disk, fdb->start[fdb->max_off]);
 			if (new_page == NO_SPACE)
@@ -709,7 +710,8 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 			}
 
 			/* Renew page only if is not in cache. */
-			if ((fdb->start[fdb->max_off] != kblock_cachedBlock(disk->dev)) || !kblock_cacheDirty(disk->dev))
+			if (kblock_buffered(disk->dev)
+				&& ((fdb->start[fdb->max_off] != kblock_cachedBlock(disk->dev)) || !kblock_cacheDirty(disk->dev)))
 			{
 				new_page = renewPage(disk, fdb->start[pg_offset]);
 				if (new_page == NO_SPACE)
@@ -731,7 +733,7 @@ static size_t battfs_write(struct KFile *fd, const void *_buf, size_t size)
 				LOG_INFO("Using cached block %d\n", fdb->start[pg_offset]);
 				new_page = fdb->start[pg_offset];
 			}
-				
+
 			curr_hdr.seq++;
 		}
 		//LOG_INFO("writing to buffer for page %d, offset %d, size %d\n", disk->curr_page, addr_offset, wr_len);

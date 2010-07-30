@@ -79,13 +79,13 @@ static size_t kblockfile_writeBuf(struct KBlock *b, const void *buf, size_t offs
 	return size;
 }
 
-static int kblockfile_writeBlock(struct KBlock *b, block_idx_t index, const void *buf)
+static size_t kblockfile_writeDirect(struct KBlock *b, block_idx_t index, const void *buf, size_t offset, size_t size)
 {
 	KBlockFile *f = KBLOCKFILE_CAST(b);
 	ASSERT(buf);
 	ASSERT(index < b->blk_cnt);
-	fseek(f->fp, index * b->blk_size, SEEK_SET);
-	return (fwrite(f->b.priv.buf, 1, b->blk_size, f->fp) == b->blk_size) ? 0 : EOF;
+	fseek(f->fp, index * b->blk_size + offset, SEEK_SET);
+	return fwrite(buf, 1, size, f->fp);
 }
 
 static int kblockfile_error(struct KBlock *b)
@@ -119,7 +119,7 @@ static const KBlockVTable kblockfile_hwbuffered_vt =
 	.writeBuf = kblockfile_writeBuf,
 	.load = kblockfile_load,
 	.store = kblockfile_store,
-	
+
 	.error = kblockfile_error,
 	.clearerr = kblockfile_claererr,
 	.close = kblockfile_close,
@@ -128,13 +128,13 @@ static const KBlockVTable kblockfile_hwbuffered_vt =
 static const KBlockVTable kblockfile_swbuffered_vt =
 {
 	.readDirect = kblockfile_readDirect,
-	.writeBlock =kblockfile_writeBlock,
-	
+	.writeDirect =kblockfile_writeDirect,
+
 	.readBuf = kblock_swReadBuf,
 	.writeBuf = kblock_swWriteBuf,
 	.load = kblock_swLoad,
 	.store = kblock_swStore,
-	
+
 	.error = kblockfile_error,
 	.clearerr = kblockfile_claererr,
 	.close = kblockfile_close,
@@ -143,7 +143,7 @@ static const KBlockVTable kblockfile_swbuffered_vt =
 static const KBlockVTable kblockfile_unbuffered_vt =
 {
 	.readDirect = kblockfile_readDirect,
-	.writeBlock =kblockfile_writeBlock,
+	.writeDirect =kblockfile_writeDirect,
 
 	.error = kblockfile_error,
 	.clearerr = kblockfile_claererr,
@@ -165,7 +165,8 @@ void kblockfile_init(KBlockFile *f, FILE *fp, bool hwbuf, void *buf, size_t bloc
 	f->fp = fp;
 	f->b.blk_size = block_size;
 	f->b.blk_cnt = block_count;
-	
+
+	f->b.priv.flags |= KB_PARTIAL_WRITE;
 	if (buf)
 	{
 		f->b.priv.flags |= KB_BUFFERED;

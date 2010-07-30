@@ -51,11 +51,11 @@ INLINE size_t kblock_readDirect(struct KBlock *b, block_idx_t index, void *buf, 
 	return b->priv.vt->readDirect(b, b->priv.blk_start + index, buf, offset, size);
 }
 
-INLINE int kblock_writeBlock(struct KBlock *b, block_idx_t index, const void *buf)
+INLINE size_t kblock_writeDirect(struct KBlock *b, block_idx_t index, const void *buf, size_t offset, size_t size)
 {
-	KB_ASSERT_METHOD(b, writeBlock);
+	KB_ASSERT_METHOD(b, writeDirect);
 	ASSERT(index < b->blk_cnt);
-	return b->priv.vt->writeBlock(b, b->priv.blk_start + index, buf);
+	return b->priv.vt->writeDirect(b, b->priv.blk_start + index, buf, offset, size);
 }
 
 INLINE size_t kblock_readBuf(struct KBlock *b, void *buf, size_t offset, size_t size)
@@ -169,9 +169,11 @@ size_t kblock_write(struct KBlock *b, block_idx_t idx, const void *buf, size_t o
 	}
 	else
 	{
-		ASSERT(offset == 0);
-		ASSERT(size == b->blk_size);
-		return (kblock_writeBlock(b, idx, buf) == 0) ? size : 0;
+		#ifdef _DEBUG
+		if (offset != 0 || size != b->blk_size)
+			ASSERT(kblock_partialWrite(b));
+		#endif
+		return kblock_writeDirect(b, idx, buf, offset, size);
 	}
 }
 
@@ -180,14 +182,40 @@ int kblock_copy(struct KBlock *b, block_idx_t src, block_idx_t dest)
 	ASSERT(b);
 	ASSERT(src < b->blk_cnt);
 	ASSERT(dest < b->blk_cnt);
-	ASSERT(kblock_buffered(b));
 
-	if (!kblock_loadPage(b, src))
+	if (kblock_buffered(b))
+	{
+		if (!kblock_loadPage(b, src))
+			return EOF;
+
+		b->priv.curr_blk = dest;
+		kblock_setDirty(b, true);
+		return 0;
+	}
+	else if (kblock_partialWrite(b))
+	{
+		uint8_t buf[16];
+		size_t blk_size = b->blk_size;
+		size_t offset = 0;
+
+		while (blk_size)
+		{
+			size_t size = MIN(sizeof(buf), blk_size);
+			if (kblock_readDirect(b, src, buf, offset, size) != size)
+				return EOF;
+			if (kblock_writeDirect(b, dest, buf, offset, size) != size)
+				return EOF;
+
+			blk_size -= size;
+			offset += size;
+		}
+		return 0;
+	}
+	else
+	{
+		ASSERT(0);
 		return EOF;
-
-	b->priv.curr_blk = dest;
-	kblock_setDirty(b, true);
-	return 0;
+	}
 }
 
 int kblock_swLoad(struct KBlock *b, block_idx_t index)
@@ -197,7 +225,7 @@ int kblock_swLoad(struct KBlock *b, block_idx_t index)
 
 int kblock_swStore(struct KBlock *b, block_idx_t index)
 {
-	return kblock_writeBlock(b, index, b->priv.buf);
+	return (kblock_writeDirect(b, index, b->priv.buf, 0, b->blk_size) == b->blk_size) ? 0 : EOF;
 }
 
 size_t kblock_swReadBuf(struct KBlock *b, void *buf, size_t offset, size_t size)

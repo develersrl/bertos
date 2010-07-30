@@ -278,10 +278,12 @@ static size_t sd_readDirect(struct KBlock *b, block_idx_t idx, void *buf, size_t
 #define SD_WRITE_SINGLEBLOCK 0x58
 #define SD_DATA_ACCEPTED     0x05
 
-static int sd_writeBlock(KBlock *b, block_idx_t idx, const void *buf)
+static size_t sd_writeDirect(KBlock *b, block_idx_t idx, const void *buf, size_t offset, size_t size)
 {
 	Sd *sd = SD_CAST(b);
 	KFile *fd = sd->ch;
+	ASSERT(offset == 0);
+	ASSERT(size == SD_DEFAULT_BLOCKLEN);
 
 	LOG_INFO("writing block %ld\n", idx);
 	if (sd->tranfer_len != SD_DEFAULT_BLOCKLEN)
@@ -289,7 +291,7 @@ static int sd_writeBlock(KBlock *b, block_idx_t idx, const void *buf)
 		if ((sd->r1 = sd_setBlockLen(sd, SD_DEFAULT_BLOCKLEN)))
 		{
 			LOG_ERR("setBlockLen failed: %04X\n", sd->r1);
-			return sd->r1;
+			return 0;
 		}
 		sd->tranfer_len = SD_DEFAULT_BLOCKLEN;
 	}
@@ -302,7 +304,7 @@ static int sd_writeBlock(KBlock *b, block_idx_t idx, const void *buf)
 	{
 		LOG_ERR("write single block failed: %04X\n", sd->r1);
 		sd_select(sd, false);
-		return sd->r1;
+		return 0;
 	}
 
 	kfile_putc(SD_STARTTOKEN, fd);
@@ -320,7 +322,7 @@ static int sd_writeBlock(KBlock *b, block_idx_t idx, const void *buf)
 		return EOF;
 	}
 
-	return 0;
+	return SD_DEFAULT_BLOCKLEN;
 }
 
 void sd_writeTest(Sd *sd)
@@ -330,7 +332,7 @@ void sd_writeTest(Sd *sd)
 
 	for (block_idx_t i = 0; i < sd->b.blk_cnt; i++)
 	{
-		LOG_INFO("writing block %ld: %s\n", i, (sd_writeBlock(&sd->b, i, buf) == 0) ? "OK" : "FAIL");
+		LOG_INFO("writing block %ld: %s\n", i, (sd_writeDirect(&sd->b, i, buf, 0, SD_DEFAULT_BLOCKLEN) == SD_DEFAULT_BLOCKLEN) ? "OK" : "FAIL");
 	}
 }
 
@@ -351,7 +353,7 @@ bool sd_test(Sd *sd)
 			kputchar('\n');
 	}
 
-	if (sd_writeBlock(&sd->b, 0, buf) != 0)
+	if (sd_writeDirect(&sd->b, 0, buf, 0, SD_DEFAULT_BLOCKLEN) != SD_DEFAULT_BLOCKLEN)
 		return false;
 
 	memset(buf, 0, sizeof(buf));
@@ -386,7 +388,7 @@ static int sd_clearerr(KBlock *b)
 static const KBlockVTable sd_unbuffered_vt =
 {
 	.readDirect = sd_readDirect,
-	.writeBlock = sd_writeBlock,
+	.writeDirect = sd_writeDirect,
 
 	.error = sd_error,
 	.clearerr = sd_clearerr,
@@ -395,7 +397,7 @@ static const KBlockVTable sd_unbuffered_vt =
 static const KBlockVTable sd_buffered_vt =
 {
 	.readDirect = sd_readDirect,
-	.writeBlock = sd_writeBlock,
+	.writeDirect = sd_writeDirect,
 
 	.readBuf = kblock_swReadBuf,
 	.writeBuf = kblock_swWriteBuf,
@@ -517,7 +519,7 @@ bool sd_initBuf(Sd *sd, KFile *ch)
 	if (sd_blockInit(sd, ch))
 	{
 		sd->b.priv.buf = sd_buf;
-		sd->b.priv.flags |= KB_BUFFERED;
+		sd->b.priv.flags |= KB_BUFFERED | KB_PARTIAL_WRITE;
 		sd->b.priv.vt = &sd_buffered_vt;
 		sd->b.priv.vt->load(&sd->b, 0);
 		return true;

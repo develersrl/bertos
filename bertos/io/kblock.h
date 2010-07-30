@@ -57,8 +57,8 @@ struct KBlock;
  *
  *  \{
  */
-typedef size_t (* kblock_read_direct_t) (struct KBlock *b, block_idx_t index, void *buf, size_t offset, size_t size);
-typedef int    (* kblock_write_block_t) (struct KBlock *b, block_idx_t index, const void *buf);
+typedef size_t (* kblock_read_direct_t)  (struct KBlock *b, block_idx_t index, void *buf, size_t offset, size_t size);
+typedef size_t (* kblock_write_direct_t) (struct KBlock *b, block_idx_t index, const void *buf, size_t offset, size_t size);
 
 typedef size_t (* kblock_read_t)        (struct KBlock *b, void *buf, size_t offset, size_t size);
 typedef size_t (* kblock_write_t)       (struct KBlock *b, const void *buf, size_t offset, size_t size);
@@ -76,7 +76,7 @@ typedef int    (* kblock_close_t)       (struct KBlock *b);
 typedef struct KBlockVTable
 {
 	kblock_read_direct_t readDirect;
-	kblock_write_block_t writeBlock;
+	kblock_write_direct_t writeDirect;
 
 	kblock_read_t  readBuf;
 	kblock_write_t writeBuf;
@@ -92,6 +92,7 @@ typedef struct KBlockVTable
 
 #define KB_BUFFERED    BV(0) ///< Internal flag: true if the KBlock has a buffer
 #define KB_CACHE_DIRTY BV(1) ///< Internal flag: true if the cache is dirty
+#define KB_PARTIAL_WRITE BV(2) ///< Internal flag: true if the device allows partial block write
 
 /**
  * KBlock private members.
@@ -264,6 +265,18 @@ INLINE bool kblock_cacheDirty(struct KBlock *b)
 	return kblock_buffered(b) && (b->priv.flags & KB_CACHE_DIRTY);
 }
 
+/**
+ * \return true if the device \a b supports partial block write. That is, you
+ *         can call kblock_write() with a size which is lesser than the block
+ *         size.
+ * \param b KBlock device.
+ * \sa kblock_write().
+ */
+INLINE bool kblock_partialWrite(struct KBlock *b)
+{
+	ASSERT(b);
+	return (b->priv.flags & KB_PARTIAL_WRITE);
+}
 
 /**
  * Read data from the block device.
@@ -297,9 +310,9 @@ size_t kblock_read(struct KBlock *b, block_idx_t idx, void *buf, size_t offset, 
  * This function will write \a size bytes to block \a idx starting at
  * address \a offset inside the block.
  *
- * \note Partial block writes are supported only if the device is opened in
- *       buffered mode. You can use kblock_buffered() to check if the device
- *       has an internal cache or not.
+ * \note Partial block writes are supported only on certain devices.
+ *       You can use kblock_partialWrite() in order to check if the device
+ *       has this feature or not.
  *
  * \note If the device is opened in buffered mode, this function will use
  *       efficiently and trasparently the cache provided.
@@ -314,7 +327,7 @@ size_t kblock_read(struct KBlock *b, block_idx_t idx, void *buf, size_t offset, 
  *
  * \return the number of bytes written.
  *
- * \sa kblock_read(), kblock_flush(), kblock_buffered().
+ * \sa kblock_read(), kblock_flush(), kblock_buffered(), kblock_partialWrite().
  */
 size_t kblock_write(struct KBlock *b, block_idx_t idx, const void *buf, size_t offset, size_t size);
 
@@ -336,7 +349,8 @@ int kblock_flush(struct KBlock *b);
  *
  * This function will copy the content of block \a src to block \a dest.
  *
- * \note This function is available only on devices opened in buffered mode.
+ * \note This function is available only on devices which support partial
+ *       block write or are opened in buffered mode.
  *
  * \param b KBlock device.
  * \param src source block number.
