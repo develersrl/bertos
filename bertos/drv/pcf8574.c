@@ -49,11 +49,8 @@
 
 #include <drv/i2c.h>
 
-/**
- * Read PCF8574 \a pcf bit status.
- * \return the pins status or EOF on errors.
- */
-int pcf8574_get_1(Pcf8574 *pcf)
+
+INLINE int pcf8574_get_priv(Pcf8574 *pcf)
 {
 	if (!i2c_start_r(PCF8574ID | ((pcf->addr << 1) & 0xF7)))
 		return EOF;
@@ -66,6 +63,16 @@ int pcf8574_get_1(Pcf8574 *pcf)
 	i2c_stop();
 
 	return data;
+}
+
+
+/**
+ * Read PCF8574 \a pcf bit status.
+ * \return the pins status or EOF on errors.
+ */
+int pcf8574_get_1(Pcf8574 *pcf)
+{
+	return pcf8574_get_priv(pcf);
 }
 
 /**
@@ -87,7 +94,7 @@ bool pcf8574_init_2(Pcf8574 *pcf, pcf8574_addr addr)
 {
 	MOD_CHECK(i2c);
 	pcf->addr = addr;
-	return pcf8574_get(pcf) != EOF;
+	return pcf8574_get_priv(pcf) != EOF;
 }
 
 
