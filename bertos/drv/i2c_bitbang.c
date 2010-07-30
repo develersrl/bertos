@@ -191,21 +191,21 @@ void i2c_bitbang_init(void)
 
 static void i2c_bitbang_stop_1(struct I2c *i2c)
 {
-	i2c_hw_sdaLo(I2C_DEV(i2c));
-	i2c_hw_sclHi(I2C_DEV(i2c));
-	i2c_hw_halfbitDelay(I2C_DEV(i2c));
-	i2c_hw_sdaHi(I2C_DEV(i2c));
+	i2c_sdaLo(I2C_DEV(i2c));
+	i2c_sclHi(I2C_DEV(i2c));
+	i2c_halfbitDelay(I2C_DEV(i2c));
+	i2c_sdaHi(I2C_DEV(i2c));
 }
 
 INLINE bool i2c_bitbang_start_1(struct I2c *i2c)
 {
-	i2c_hw_sdaHi(I2C_DEV(i2c));
-	i2c_hw_sclHi(I2C_DEV(i2c));
-	i2c_hw_halfbitDelay(I2C_DEV(i2c));
-	i2c_hw_sdaLo(I2C_DEV(i2c));
-	i2c_hw_halfbitDelay(I2C_DEV(i2c));
+	i2c_sdaHi(I2C_DEV(i2c));
+	i2c_sclHi(I2C_DEV(i2c));
+	i2c_halfbitDelay(I2C_DEV(i2c));
+	i2c_sdaLo(I2C_DEV(i2c));
+	i2c_halfbitDelay(I2C_DEV(i2c));
 
-	return !i2c_hw_sdaIn(I2C_DEV(i2c));
+	return !i2c_sdaIn(I2C_DEV(i2c));
 }
 
 
@@ -214,29 +214,29 @@ static uint8_t i2c_bitbang_getc(struct I2c *i2c)
 	uint8_t data = 0;
 	for (uint8_t i = 0x80; i != 0; i >>= 1)
 	{
-		i2c_hw_sclLo(I2C_DEV(i2c));
-		i2c_hw_halfbitDelay(I2C_DEV(i2c));
-		i2c_hw_sclHi(I2C_DEV(i2c));
-		if (i2c_hw_sdaIn(I2C_DEV(i2c)))
+		i2c_sclLo(I2C_DEV(i2c));
+		i2c_halfbitDelay(I2C_DEV(i2c));
+		i2c_sclHi(I2C_DEV(i2c));
+		if (i2c_sdaIn(I2C_DEV(i2c)))
 			data |= i;
 		else
 			data &= ~i;
 
-		i2c_hw_halfbitDelay(I2C_DEV(i2c));
+		i2c_halfbitDelay(I2C_DEV(i2c));
 	}
-	i2c_hw_sclLo(I2C_DEV(i2c));
+	i2c_sclLo(I2C_DEV(i2c));
 
 	/* Generate ACK/NACK */
 	if (i2c->xfer_size > 1)
-		i2c_hw_sdaLo(I2C_DEV(i2c));
+		i2c_sdaLo(I2C_DEV(i2c));
 	else
-		i2c_hw_sdaHi(I2C_DEV(i2c));
+		i2c_sdaHi(I2C_DEV(i2c));
 
-	i2c_hw_halfbitDelay(I2C_DEV(i2c));
-	i2c_hw_sclHi(I2C_DEV(i2c));
-	i2c_hw_halfbitDelay(I2C_DEV(i2c));
-	i2c_hw_sclLo(I2C_DEV(i2c));
-	i2c_hw_sdaHi(I2C_DEV(i2c));
+	i2c_halfbitDelay(I2C_DEV(i2c));
+	i2c_sclHi(I2C_DEV(i2c));
+	i2c_halfbitDelay(I2C_DEV(i2c));
+	i2c_sclLo(I2C_DEV(i2c));
+	i2c_sdaHi(I2C_DEV(i2c));
 
 	/* Generate stop condition (if requested) */
 	if ((i2c->xfer_size == 1) && (i2c->flags & I2C_STOP))
@@ -252,20 +252,20 @@ static void i2c_bitbang_putc(struct I2c *i2c, uint8_t _data)
 
 	for (uint16_t i = 0x100; i != 0; i >>= 1)
 	{
-		i2c_hw_sclLo(I2C_DEV(i2c));
+		i2c_sclLo(I2C_DEV(i2c));
 		if (data & i)
-			i2c_hw_sdaHi(I2C_DEV(i2c));
+			i2c_sdaHi(I2C_DEV(i2c));
 		else
-			i2c_hw_sdaLo(I2C_DEV(i2c));
-		i2c_hw_halfbitDelay(I2C_DEV(i2c));
+			i2c_sdaLo(I2C_DEV(i2c));
+		i2c_halfbitDelay(I2C_DEV(i2c));
 
-		i2c_hw_sclHi(I2C_DEV(i2c));
-		i2c_hw_halfbitDelay(I2C_DEV(i2c));
+		i2c_sclHi(I2C_DEV(i2c));
+		i2c_halfbitDelay(I2C_DEV(i2c));
 	}
 
-	bool ack = !i2c_hw_sdaIn(I2C_DEV(i2c));
-	i2c_hw_sclLo(I2C_DEV(i2c));
-	i2c_hw_halfbitDelay(I2C_DEV(i2c));
+	bool ack = !i2c_sdaIn(I2C_DEV(i2c));
+	i2c_sclLo(I2C_DEV(i2c));
+	i2c_halfbitDelay(I2C_DEV(i2c));
 
 	if (!ack)
 	{
@@ -334,8 +334,8 @@ void i2c_hw_bitbangInit(I2c *i2c, int dev)
 	i2c->hw = (struct I2cHardware *)(dev - I2C_BITBANG0);
 	i2c->vt = &i2c_bitbang_vt;
 
-	i2c_hw_bitbang_init(I2C_DEV(i2c));
-	i2c_hw_sdaHi(I2C_DEV(i2c));
-	i2c_hw_sclHi(I2C_DEV(i2c));
+	i2c_bitbang_init(I2C_DEV(i2c));
+	i2c_sdaHi(I2C_DEV(i2c));
+	i2c_sclHi(I2C_DEV(i2c));
 }
 
