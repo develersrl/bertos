@@ -334,7 +334,7 @@ void i2c_hw_bitbangInit(I2c *i2c, int dev)
 	i2c->hw = (struct I2cHardware *)(dev - I2C_BITBANG0);
 	i2c->vt = &i2c_bitbang_vt;
 
-	i2c_bitbang_init(I2C_DEV(i2c));
+	i2c_bitbangInit(I2C_DEV(i2c));
 	i2c_sdaHi(I2C_DEV(i2c));
 	i2c_sclHi(I2C_DEV(i2c));
 }

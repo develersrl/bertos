@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2003, 2004, 2005 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2005, 2010 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
@@ -37,6 +37,8 @@
  */
 
 #include "eeprom.h"
+
+#include "cfg/cfg_i2c.h"
 
 #include <cfg/macros.h>  // MIN()
 #include <cfg/debug.h>
@@ -103,6 +105,7 @@ static const EepromInfo mem_info[] =
 
 STATIC_ASSERT(countof(mem_info) == EEPROM_CNT);
 
+#if !CONFIG_I2C_DISABLE_OLD_API
 
 /**
  * Copy \a size bytes from buffer \a buf to
@@ -388,3 +391,5 @@ void eeprom_init(Eeprom *fd, EepromType type, e2dev_addr_t addr, bool verify)
 
 	fd->fd.seek = kfile_genericSeek;
 }
+
+#endif /* !CONFIG_I2C_DISABLE_OLD_API */

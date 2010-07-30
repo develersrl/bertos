@@ -66,6 +66,7 @@
 
 
 #if !CONFIG_I2C_DISABLE_OLD_API
+
 /**
  * I2C Backends.
  * Sometimes your cpu does not have a builtin
@@ -134,7 +135,8 @@ int i2c_bitbang_get(bool ack);
 bool i2c_send(const void *_buf, size_t count);
 bool i2c_recv(void *_buf, size_t count);
 
-#endif
+#endif /* !CONFIG_I2C_DISABLE_OLD_API */
+
 
 /*
  * I2c new api

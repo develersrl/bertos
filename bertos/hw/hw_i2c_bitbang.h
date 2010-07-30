@@ -118,7 +118,7 @@ INLINE void i2c_halfbitDelay(int dev)
 /**
  * This macro should set SDA and SCL lines as input.
  */
-INLINE void i2c_bitbang_init(int dev)
+INLINE void i2c_bitbangInit(int dev)
 {
 	(void)(dev);
 	/* Implement me! */
