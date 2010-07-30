@@ -54,6 +54,7 @@
 
 #include <cpu/attr.h>
 
+#if !CONFIG_I2C_DISABLE_OLD_API
 
 INLINE bool i2c_bitbang_start(void)
 {
@@ -181,7 +182,7 @@ void i2c_bitbang_init(void)
 	SCL_HI;
 	MOD_INIT(i2c);
 }
-
+#endif /* !CONFIG_I2C_DISABLE_OLD_API */
 
 /*
  * New I2C API
