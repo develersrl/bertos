@@ -134,6 +134,25 @@ bool i2c_recv(void *_buf, size_t count);
  * I2c new api
  */
 
+/**
+ * \name I2C bitbang devices enum
+ */
+enum
+{
+	I2C_BITBANG0 = 1000,
+	I2C_BITBANG1,
+	I2C_BITBANG2,
+	I2C_BITBANG3,
+	I2C_BITBANG4,
+	I2C_BITBANG5,
+	I2C_BITBANG6,
+	I2C_BITBANG7,
+	I2C_BITBANG8,
+	I2C_BITBANG9,
+
+	I2C_BITBANG_CNT  /**< Number of serial ports */
+};
+
  /*
   * I2C error flags
   */
@@ -190,6 +209,7 @@ typedef struct I2c
  * Low level i2c  init implementation prototype.
  */
 void i2c_hw_init(I2c *i2c, int dev, uint32_t clock);
+void i2c_hw_bitbangInit(I2c *i2c, int dev);
 
 void i2c_genericWrite(I2c *i2c, const void *_buf, size_t count);
 void i2c_genericRead(I2c *i2c, void *_buf, size_t count);
@@ -303,7 +323,11 @@ INLINE int i2c_error(I2c *i2c)
 
 INLINE void i2c_init_3(I2c *i2c, int dev, uint32_t clock)
 {
-	i2c_hw_init(i2c, dev, clock);
+	if (dev > I2C_BITBANG0)
+		i2c_hw_bitbangInit(i2c, dev);
+	else
+		i2c_hw_init(i2c, dev, clock);
+
 }
 
 #endif
