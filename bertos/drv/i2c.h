@@ -327,7 +327,6 @@ INLINE void i2c_init_3(I2c *i2c, int dev, uint32_t clock)
 		i2c_hw_bitbangInit(i2c, dev);
 	else
 		i2c_hw_init(i2c, dev, clock);
-
 }
 
 #endif

@@ -45,7 +45,6 @@
 
 #include <cfg/debug.h>
 #include <cfg/macros.h> // BV()
-#include <cfg/module.h>
 
 #include <cpu/detect.h>
 #include <cpu/irq.h>
@@ -197,8 +196,6 @@ static uint8_t i2c_lm3s_getc(I2c *i2c)
 	return data;
 }
 
-MOD_DEFINE(i2c);
-
 static const I2cVT i2c_lm3s_vt =
 {
 	.start = i2c_lm3s_start,
@@ -256,6 +253,4 @@ void i2c_hw_init(I2c *i2c, int dev, uint32_t clock)
      * to the desired clock, never greater.
 	 */
     HWREG(i2c->hw->base + I2C_O_MTPR) = ((CPU_FREQ + (2 * 10 * clock) - 1) / (2 * 10 * clock)) - 1;
-
-	MOD_INIT(i2c);
 }

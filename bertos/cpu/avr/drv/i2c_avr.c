@@ -452,6 +452,4 @@ void i2c_hw_init(I2c *i2c, int dev, uint32_t clock)
 		TWSR = 0;
 		TWCR = BV(TWEN);
 	);
-
-	MOD_INIT(i2c);
 }

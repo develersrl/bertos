@@ -317,8 +317,6 @@ struct I2cHardware i2c_stm32_hw[] =
 	},
 };
 
-MOD_DEFINE(i2c);
-
 /**
  * Initialize I2C module.
  */
@@ -352,6 +350,4 @@ void i2c_hw_init(I2c *i2c, int dev, uint32_t clock)
 	i2c->hw->base->TRISE |= (CR2_FREQ_36MHZ + 1);
 
 	i2c->hw->base->CR1 |= CR1_PE_SET;
-
-	MOD_INIT(i2c);
 }

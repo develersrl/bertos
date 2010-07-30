@@ -44,10 +44,10 @@
 
 #include <cfg/debug.h>
 #include <cfg/macros.h> // BV()
-#include <cfg/module.h>
 
 #include <cpu/detect.h>
 #include <cpu/irq.h>
+#include <cpu/power.h>
 
 #include <drv/timer.h>
 #include <drv/i2c.h>
@@ -74,17 +74,18 @@ struct I2cHardware
  * routine to do in that case.
  */
 #define WAIT_SI(i2c) \
-	do { \
-		ticks_t start = timer_clock(); \
-		while( !(HWREG(i2c->hw->base + I2C_CONSET_OFF) & BV(I2CON_SI)) ) \
-		{ \
-			if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT)) \
+		do { \
+			ticks_t start = timer_clock(); \
+			while( !(HWREG(i2c->hw->base + I2C_CONSET_OFF) & BV(I2CON_SI)) ) \
 			{ \
-				LOG_ERR("Timeout SI assert\n"); \
-				LOG_ERR("[%08lx]\n", HWREG(i2c->hw->base + I2C_STAT_OFF)); \
-				break; \
+				if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT)) \
+				{ \
+					LOG_ERR("Timeout SI assert\n"); \
+					LOG_ERR("[%08lx]\n", HWREG(i2c->hw->base + I2C_STAT_OFF)); \
+					break; \
+				} \
+				cpu_relax(); \
 			} \
-		} \
 	} while (0)
 
 static void i2c_hw_restart(I2c *i2c)
@@ -180,8 +181,6 @@ static uint8_t i2c_lpc2_getc(I2c *i2c)
 
 	return 0xFF;
 }
-
-MOD_DEFINE(i2c);
 
 static void i2c_lpc2_start(struct I2c *i2c, uint16_t slave_addr)
 {
@@ -334,6 +333,4 @@ void i2c_hw_init(I2c *i2c, int dev, uint32_t clock)
 
 	// Enable I2C
 	HWREG(i2c->hw->base + I2C_CONSET_OFF) = BV(I2CON_I2EN);
-
-	MOD_INIT(i2c);
 }
