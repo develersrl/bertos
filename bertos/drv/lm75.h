@@ -60,7 +60,7 @@
 	#define lm75_read(args...)    PP_CAT(lm75_read ## _, COUNT_PARMS(args)) (args)
 #endif
 
-#if CONFIG_I2C_DISABLE_OLD_API
+#if !CONFIG_I2C_DISABLE_OLD_API
 
 DEPRECATED deg_t lm75_read_1(uint8_t sens_addr);
 DEPRECATED void lm75_init_0(void);
