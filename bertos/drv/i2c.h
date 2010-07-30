@@ -321,12 +321,7 @@ INLINE int i2c_error(I2c *i2c)
 	return err;
 }
 
-INLINE void i2c_init_3(I2c *i2c, int dev, uint32_t clock)
-{
-	if (dev > I2C_BITBANG0)
-		i2c_hw_bitbangInit(i2c, dev);
-	else
-		i2c_hw_init(i2c, dev, clock);
-}
+#define i2c_init_3(i2c, dev, clock)   (dev > I2C_BITBANG0) ?  i2c_hw_bitbangInit(i2c, dev) : i2c_hw_init(i2c, dev, clock)
+
 
 #endif
