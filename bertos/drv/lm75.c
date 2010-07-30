@@ -58,6 +58,9 @@
 #define LM75_ADDRESS_BYTE    0x91
 #define LM75_PAD_BYTE        0x0
 
+
+#if !CONFIG_I2C_DISABLE_OLD_API
+
 deg_t lm75_read_1(uint8_t sens_addr)
 {
 	uint8_t data[2];
@@ -93,6 +96,8 @@ void lm75_init_0(void)
 	MOD_CHECK(i2c);
 	LM75_HW_INIT();
 }
+#endif /* !CONFIG_I2C_DISABLE_OLD_API */
+
 
 /*
  * New API

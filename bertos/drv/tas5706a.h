@@ -44,6 +44,8 @@
 #ifndef DRV_TAS5706A_H
 #define DRV_TAS5706A_H
 
+#include "cfg/cfg_i2c.h"
+
 #include <cfg/compiler.h>
 
 #include <drv/i2c.h>
@@ -102,9 +104,11 @@ void tas5706a_setLowPower_2(I2c *i2c, bool val);
  */
 void tas5706a_init_1(I2c *i2c);
 
+#if !CONFIG_I2C_DISABLE_OLD_API
 
 DEPRECATED void tas5706a_setVolume_2(Tas5706aCh ch, tas5706a_vol_t vol);
 DEPRECATED void tas5706a_setLowPower_1(bool val);
 DEPRECATED void tas5706a_init_0(void);
+#endif /* !CONFIG_I2C_DISABLE_OLD_API */
 
 #endif /* DRV_TAS5706A_H */

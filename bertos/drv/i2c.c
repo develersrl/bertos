@@ -37,6 +37,10 @@
 
 #include "i2c.h"
 
+#include "cfg/cfg_i2c.h"
+
+#if !CONFIG_I2C_DISABLE_OLD_API
+
 /**
  * Send a sequence of bytes in master transmitter mode
  * to the selected slave device through the I2C bus.
@@ -87,7 +91,7 @@ bool i2c_recv(void *_buf, size_t count)
 
 	return true;
 }
-
+#endif /* !CONFIG_I2C_DISABLE_OLD_API */
 
 void i2c_genericWrite(struct I2c *i2c, const void *_buf, size_t count)
 {

@@ -34,6 +34,7 @@
  *
  *
  * \author Francesco Sacchi <batt@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
  */
 
 #include "tas5706a.h"
@@ -41,6 +42,7 @@
 #include "hw/hw_tas5706a.h"
 
 #include "cfg/cfg_tas5706a.h"
+#include "cfg/cfg_i2c.h"
 
 #include <cfg/module.h>
 
@@ -62,6 +64,9 @@ typedef uint8_t tas_addr_t;
 #define CH2_VOL_REG 0x09
 #define CH3_VOL_REG 0x0A
 #define CH4_VOL_REG 0x0B
+
+
+#if !CONFIG_I2C_DISABLE_OLD_API
 
 static bool tas5706a_send(tas_addr_t addr, const void *buf, size_t len)
 {
@@ -144,11 +149,11 @@ void tas5706a_setLowPower_1(bool val)
 	TAS5706A_SETPOWERDOWN(val);
 	TAS5706A_SETMUTE(val);
 }
+#endif /* !CONFIG_I2C_DISABLE_OLD_API */
 
 /*
  * New API
  */
-
 INLINE bool tas5706a_putc(I2c *i2c, tas_addr_t addr, uint8_t ch)
 {
 	i2c_start_w(i2c, TAS_ADDR, 2, I2C_STOP);

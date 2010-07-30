@@ -37,6 +37,7 @@
  * $WIZ$ module_name = "i2c"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_i2c.h"
  * $WIZ$ module_hw = "bertos/hw/hw_i2c_bitbang.h"
+ * $WIZ$ module_depends = "i2c_bitbang"
  * $WIZ$ module_supports = "not atmega103 and not atmega168 and not at91"
  */
 
@@ -63,14 +64,14 @@
 	#define i2c_start_r(args...)    PP_CAT(i2c_start_r ## _, COUNT_PARMS(args)) (args)
 #endif
 
+
+#if !CONFIG_I2C_DISABLE_OLD_API
 /**
  * I2C Backends.
  * Sometimes your cpu does not have a builtin
  * i2c driver or you don't want, for some reason, to
  * use that.
  * With this you can choose, at compile time, which backend to use.
- *
- * $WIZ$ i2c_backend = "I2C_BACKEND_BUILTIN", "I2C_BACKEND_BITBANG"
  */
 #define I2C_BACKEND_BUILTIN 0 ///< Uses cpu builtin i2c driver
 #define I2C_BACKEND_BITBANG 1 ///< Uses emulated bitbang driver
@@ -107,6 +108,10 @@ bool i2c_bitbang_put(uint8_t _data);
 int i2c_bitbang_get(bool ack);
 /*\}*/
 
+#ifndef CONFIG_I2C_BACKEND
+#define  CONFIG_I2C_BACKEND  I2C_BACKEND_BUILTIN
+#endif
+
 #if CONFIG_I2C_BACKEND == I2C_BACKEND_BUILTIN
 	#define i2c_init_0      i2c_builtin_init
 	#define i2c_start_w_1   i2c_builtin_start_w
@@ -129,6 +134,7 @@ int i2c_bitbang_get(bool ack);
 bool i2c_send(const void *_buf, size_t count);
 bool i2c_recv(void *_buf, size_t count);
 
+#endif
 
 /*
  * I2c new api

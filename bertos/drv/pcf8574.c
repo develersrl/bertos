@@ -45,10 +45,13 @@
 
 #include "pcf8574.h"
 
+#include "cfg/cfg_i2c.h"
+
 #include <cfg/module.h>
 
 #include <drv/i2c.h>
 
+#if !CONFIG_I2C_DISABLE_OLD_API
 
 INLINE int pcf8574_get_priv(Pcf8574 *pcf)
 {
@@ -64,7 +67,6 @@ INLINE int pcf8574_get_priv(Pcf8574 *pcf)
 
 	return data;
 }
-
 
 /**
  * Read PCF8574 \a pcf bit status.
@@ -96,7 +98,7 @@ bool pcf8574_init_2(Pcf8574 *pcf, pcf8574_addr addr)
 	pcf->addr = addr;
 	return pcf8574_get_priv(pcf) != EOF;
 }
-
+#endif /* !CONFIG_I2C_DISABLE_OLD_API */
 
 
 /*

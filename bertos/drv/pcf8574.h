@@ -41,6 +41,8 @@
 #ifndef DRV_PCF8574_H
 #define DRV_PCF8574_H
 
+#include "cfg/cfg_i2c.h"
+
 #include <cfg/compiler.h>
 
 #include <drv/i2c.h>
@@ -67,9 +69,12 @@ typedef struct Pcf8574
 
 #define PCF8574ID 0x40 ///< I2C address
 
+#if !CONFIG_I2C_DISABLE_OLD_API
+
 DEPRECATED int pcf8574_get_1(Pcf8574 *pcf);
 DEPRECATED bool pcf8574_put_2(Pcf8574 *pcf, uint8_t data);
 DEPRECATED bool pcf8574_init_2(Pcf8574 *pcf, pcf8574_addr addr);
+#endif /* !CONFIG_I2C_DISABLE_OLD_API */
 
 
 int pcf8574_get_2(I2c *i2c, Pcf8574 *pcf);

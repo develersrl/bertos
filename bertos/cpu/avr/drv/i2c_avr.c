@@ -37,9 +37,10 @@
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#include <hw/hw_cpufreq.h>  /* CPU_FREQ */
 
 #include "cfg/cfg_i2c.h"
+
+#include <hw/hw_cpufreq.h>  /* CPU_FREQ */
 
 #define LOG_LEVEL  I2C_LOG_LEVEL
 #define LOG_FORMAT I2C_LOG_FORMAT
@@ -59,6 +60,7 @@
 
 #include <compat/twi.h>
 
+#if !CONFIG_I2C_DISABLE_OLD_API
 
 /* Wait for TWINT flag set: bus is ready */
 #define WAIT_TWI_READY  do {} while (!(TWCR & BV(TWINT)))
@@ -254,11 +256,11 @@ void i2c_builtin_init(void)
 	MOD_INIT(i2c);
 }
 
+#endif /* !CONFIG_I2C_DISABLE_OLD_API */
+
 /*
  * New Api
  */
-
-
 struct I2cHardware
 {
 };
