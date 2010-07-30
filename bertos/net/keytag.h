@@ -43,7 +43,8 @@
 #ifndef NET_KEYTAG_H
 #define NET_KEYTAG_H
 
-#include <cfg/cfg_keytag.h>
+#include "cfg/cfg_keytag.h"
+#include <cfg/compiler.h>
 
 #include <io/kfile.h>
 
@@ -63,6 +64,6 @@ typedef struct TagPacket
 void keytag_init(struct TagPacket *pkt, struct KFile *comm, struct KFile *tag);
 int keytag_recv(struct TagPacket *pkt, uint8_t *tag, size_t len);
 
-void keytag_poll(struct TagPacket *pkt);
+DEPRECATED void keytag_poll(struct TagPacket *pkt);
 
 #endif /* NET_TAG_H */

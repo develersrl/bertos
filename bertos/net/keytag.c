@@ -81,8 +81,6 @@ static void keytag_clearPkt(struct TagPacket *pkt)
  */
 void keytag_poll(struct TagPacket *pkt)
 {
-	#warning __FILTER_NEXT_WARNING__
-	#warning keytag_poll function is depreca use keytag_recv instead
 	uint8_t buf[CONFIG_TAG_MAX_LEN];
 	int len;
 	if ((len = keytag_recv(pkt, buf, sizeof(buf))) != EOF)
