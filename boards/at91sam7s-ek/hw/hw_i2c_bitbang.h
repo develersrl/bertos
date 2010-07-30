@@ -62,4 +62,66 @@
  */
 #define I2C_HALFBIT_DELAY() do { /* Implement me! */ } while (0)
 
+
+/*
+ * New api
+ */
+#include <cfg/compiler.h>
+
+INLINE void i2c_sdaHi(int dev)
+{
+	(void)(dev);
+	/* Implement me:Set SDA High by setting SDA pin as input */
+}
+
+INLINE void i2c_sdaLo(int dev)
+{
+	(void)(dev);
+	/* Implement me:Set SDA Low by setting SDA pin as open collector output */
+}
+
+INLINE void i2c_sclHi(int dev)
+{
+	(void)(dev);
+	/* Implement me:Set SCL High by setting SCL pin as input */
+}
+
+INLINE void i2c_sclLo(int dev)
+{
+	(void)(dev);
+	/* Implement me:Set SCL Low by setting SCL pin as open collector output */
+}
+
+INLINE bool i2c_sdaIn(int dev)
+{
+	(void)(dev);
+	/* Implement me: read SDA pin state */
+	return true;
+}
+
+INLINE bool i2c_sclIn(int dev)
+{
+	(void)(dev);
+	/* Implement me: read SCL pin state */
+	return true;
+}
+
+/**
+ * Half bit delay routine used to generate the correct timings.
+ */
+INLINE void i2c_halfbitDelay(int dev)
+{
+	(void)(dev);
+	/* Implement me! */
+}
+
+/**
+ * This macro should set SDA and SCL lines as input.
+ */
+INLINE void i2c_bitbangInit(int dev)
+{
+	(void)(dev);
+	/* Implement me! */
+}
+
 #endif /* HW_I2C_BITBANG_H */
