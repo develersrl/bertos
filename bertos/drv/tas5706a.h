@@ -84,6 +84,7 @@ typedef uint8_t tas5706a_vol_t;
  *
  * The volume must be expressed in % and will be at maximum CONFIG_TAS_MAX_VOL.
  *
+ * \param i2c The i2c context.
  * \param ch The channel to be controlled.
  * \param vol The volume you want to set.
  */
@@ -95,12 +96,15 @@ void tas5706a_setVolume_3(I2c *i2c, Tas5706aCh ch, tas5706a_vol_t vol);
  * When in low power mode, the TAS will not play any sound. You should put the TAS chip in low
  * power whenever possible to prevent overheating and to save power.
  *
+ * \param i2c The i2c context.
  * \param val True if you want to enable low power mode, false otherwise.
  */
 void tas5706a_setLowPower_2(I2c *i2c, bool val);
 
 /**
  * Initialize the TAS chip.
+ *
+ * \param i2c The i2c context.
  */
 void tas5706a_init_1(I2c *i2c);
 

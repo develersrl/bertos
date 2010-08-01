@@ -82,7 +82,9 @@
 
 	/**
 	 * usage:
+	 * \code
 	 * #define foo_init(...) PP_CAT(foo_init_, COUNT_PARMS(__VA_ARGS__)) (__VA_ARGS__)
+	 * \endcode
 	 */
 
 #else
@@ -92,7 +94,9 @@
 
 	/**
 	 * usage:
+	 * \code
 	 * #define foo_init(args...) PP_CAT(foo_init_, COUNT_PARMS(args)) (args)
+	 * \endcode
 	 */
 
 #endif
