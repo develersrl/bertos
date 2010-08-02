@@ -69,16 +69,40 @@ typedef struct Pcf8574
 
 #define PCF8574ID 0x40 ///< I2C address
 
+/**
+ * Read PCF8574 \a pcf bit status.
+ * \return the pins status or EOF on errors.
+ */
+int pcf8574_get_2(I2c *i2c, Pcf8574 *pcf);
+
+/**
+ * Write to PCF8574 \a pcf port \a data.
+ * \return true if ok, false on errors.
+ */
+bool pcf8574_put_3(I2c *i2c, Pcf8574 *pcf, uint8_t data);
+
+/**
+ * Init a PCF8574 on the bus with addr \a addr.
+ * \return true if device is found, false otherwise.
+ */
+bool pcf8574_init_3(I2c *i2c, Pcf8574 *pcf, pcf8574_addr addr);
+
 #if !CONFIG_I2C_DISABLE_OLD_API
 
-DEPRECATED int pcf8574_get_1(Pcf8574 *pcf);
-DEPRECATED bool pcf8574_put_2(Pcf8574 *pcf, uint8_t data);
-DEPRECATED bool pcf8574_init_2(Pcf8574 *pcf, pcf8574_addr addr);
+DEPRECATED INLINE int pcf8574_get_1(Pcf8574 *pcf)
+{
+	return pcf8574_get_2(&local_i2c_old_api, pcf);
+}
+
+DEPRECATED INLINE bool pcf8574_put_2(Pcf8574 *pcf, uint8_t data)
+{
+	return pcf8574_put_3(&local_i2c_old_api, pcf, data);
+}
+
+DEPRECATED INLINE bool pcf8574_init_2(Pcf8574 *pcf, pcf8574_addr addr)
+{
+	return pcf8574_init_3(&local_i2c_old_api, pcf, addr);
+}
 #endif /* !CONFIG_I2C_DISABLE_OLD_API */
-
-
-int pcf8574_get_2(I2c *i2c, Pcf8574 *pcf);
-bool pcf8574_put_3(I2c *i2c, Pcf8574 *pcf, uint8_t data);
-bool pcf8574_init_3(I2c *i2c, Pcf8574 *pcf, pcf8574_addr addr);
 
 #endif /* DRV_PCF8574_H */

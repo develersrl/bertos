@@ -53,22 +53,16 @@
 #define I2C_READBIT BV(0)
 
 #if COMPILER_C99
-	#define lm75_init(...)        PP_CAT(lm75_init ## _, COUNT_PARMS(__VA_ARGS__)) (__VA_ARGS__)
 	#define lm75_read(...)        PP_CAT(lm75_read ## _, COUNT_PARMS(__VA_ARGS__)) (__VA_ARGS__)
 #else
-	#define lm75_init(args...)    PP_CAT(lm75_init ## _, COUNT_PARMS(args)) (args)
 	#define lm75_read(args...)    PP_CAT(lm75_read ## _, COUNT_PARMS(args)) (args)
 #endif
 
 #if !CONFIG_I2C_DISABLE_OLD_API
 
 DEPRECATED deg_t lm75_read_1(uint8_t sens_addr);
-DEPRECATED void lm75_init_0(void);
-
 #endif /* !CONFIG_I2C_DISABLE_OLD_API */
 
-
 deg_t lm75_read_2(I2c *i2c, uint8_t sens_addr);
-void lm75_init_1(I2c *i2c);
 
 #endif /* DRV_LM75_H */

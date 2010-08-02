@@ -110,9 +110,19 @@ void tas5706a_init_1(I2c *i2c);
 
 #if !CONFIG_I2C_DISABLE_OLD_API
 
-DEPRECATED void tas5706a_setVolume_2(Tas5706aCh ch, tas5706a_vol_t vol);
-DEPRECATED void tas5706a_setLowPower_1(bool val);
-DEPRECATED void tas5706a_init_0(void);
+DEPRECATED INLINE void tas5706a_setVolume_2(Tas5706aCh ch, tas5706a_vol_t vol)
+{
+	tas5706a_setVolume_3(&local_i2c_old_api, ch, vol);
+}
+DEPRECATED INLINE void tas5706a_setLowPower_1(bool val)
+{
+	tas5706a_setLowPower_2(&local_i2c_old_api, val);
+}
+DEPRECATED INLINE void tas5706a_init_0(void)
+{
+	tas5706a_init_1(&local_i2c_old_api);
+}
+
 #endif /* !CONFIG_I2C_DISABLE_OLD_API */
 
 #endif /* DRV_TAS5706A_H */

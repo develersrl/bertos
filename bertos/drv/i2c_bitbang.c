@@ -169,74 +169,118 @@ int i2c_bitbang_get(bool ack)
 	return (int)(uint8_t)data;
 }
 
-MOD_DEFINE(i2c);
-
-/**
- * Initialize i2c module.
- */
-void i2c_bitbang_init(void)
-{
-	MOD_CHECK(timer);
-	I2C_BITBANG_HW_INIT;
-	SDA_HI;
-	SCL_HI;
-	MOD_INIT(i2c);
-}
 #endif /* !CONFIG_I2C_DISABLE_OLD_API */
 
 /*
  * New I2C API
  */
+static bool old_api = false;
 #define I2C_DEV(i2c)            ((int)((i2c)->hw))
 
 static void i2c_bitbang_stop_1(struct I2c *i2c)
 {
-	i2c_sdaLo(I2C_DEV(i2c));
-	i2c_sclHi(I2C_DEV(i2c));
-	i2c_halfbitDelay(I2C_DEV(i2c));
-	i2c_sdaHi(I2C_DEV(i2c));
+	if (old_api)
+	{
+		SDA_LO;
+		SCL_HI;
+		I2C_HALFBIT_DELAY();
+		SDA_HI;
+	}
+	else
+	{
+		i2c_sdaLo(I2C_DEV(i2c));
+		i2c_sclHi(I2C_DEV(i2c));
+		i2c_halfbitDelay(I2C_DEV(i2c));
+		i2c_sdaHi(I2C_DEV(i2c));
+	}
 }
 
 INLINE bool i2c_bitbang_start_1(struct I2c *i2c)
 {
-	i2c_sdaHi(I2C_DEV(i2c));
-	i2c_sclHi(I2C_DEV(i2c));
-	i2c_halfbitDelay(I2C_DEV(i2c));
-	i2c_sdaLo(I2C_DEV(i2c));
-	i2c_halfbitDelay(I2C_DEV(i2c));
+	bool ret;
+	if (old_api)
+	{
+		SDA_HI;
+		SCL_HI;
+		I2C_HALFBIT_DELAY();
+		SDA_LO;
+		I2C_HALFBIT_DELAY();
 
-	return !i2c_sdaIn(I2C_DEV(i2c));
+		ret = !SDA_IN;
+	}
+	else
+	{
+		i2c_sdaHi(I2C_DEV(i2c));
+		i2c_sclHi(I2C_DEV(i2c));
+		i2c_halfbitDelay(I2C_DEV(i2c));
+		i2c_sdaLo(I2C_DEV(i2c));
+		i2c_halfbitDelay(I2C_DEV(i2c));
+		ret = !i2c_sdaIn(I2C_DEV(i2c));
+	}
+
+	return ret;
 }
 
 
 static uint8_t i2c_bitbang_getc(struct I2c *i2c)
 {
 	uint8_t data = 0;
-	for (uint8_t i = 0x80; i != 0; i >>= 1)
+	if (old_api)
 	{
+		for (uint8_t i = 0x80; i != 0; i >>= 1)
+		{
+			SCL_LO;
+			I2C_HALFBIT_DELAY();
+			SCL_HI;
+			if (SDA_IN)
+				data |= i;
+			else
+				data &= ~i;
+
+			I2C_HALFBIT_DELAY();
+		}
+		SCL_LO;
+
+		/* Generate ACK/NACK */
+		if (i2c->xfer_size > 1)
+			SDA_LO;
+		else
+			SDA_HI;
+
+		I2C_HALFBIT_DELAY();
+		SCL_HI;
+		I2C_HALFBIT_DELAY();
+		SCL_LO;
+		SDA_HI;
+	}
+	else
+	{
+		for (uint8_t i = 0x80; i != 0; i >>= 1)
+		{
+			i2c_sclLo(I2C_DEV(i2c));
+			i2c_halfbitDelay(I2C_DEV(i2c));
+			i2c_sclHi(I2C_DEV(i2c));
+			if (i2c_sdaIn(I2C_DEV(i2c)))
+				data |= i;
+			else
+				data &= ~i;
+
+			i2c_halfbitDelay(I2C_DEV(i2c));
+		}
 		i2c_sclLo(I2C_DEV(i2c));
+
+		/* Generate ACK/NACK */
+		if (i2c->xfer_size > 1)
+			i2c_sdaLo(I2C_DEV(i2c));
+		else
+			i2c_sdaHi(I2C_DEV(i2c));
+
 		i2c_halfbitDelay(I2C_DEV(i2c));
 		i2c_sclHi(I2C_DEV(i2c));
-		if (i2c_sdaIn(I2C_DEV(i2c)))
-			data |= i;
-		else
-			data &= ~i;
-
 		i2c_halfbitDelay(I2C_DEV(i2c));
-	}
-	i2c_sclLo(I2C_DEV(i2c));
-
-	/* Generate ACK/NACK */
-	if (i2c->xfer_size > 1)
-		i2c_sdaLo(I2C_DEV(i2c));
-	else
+		i2c_sclLo(I2C_DEV(i2c));
 		i2c_sdaHi(I2C_DEV(i2c));
-
-	i2c_halfbitDelay(I2C_DEV(i2c));
-	i2c_sclHi(I2C_DEV(i2c));
-	i2c_halfbitDelay(I2C_DEV(i2c));
-	i2c_sclLo(I2C_DEV(i2c));
-	i2c_sdaHi(I2C_DEV(i2c));
+	}
 
 	/* Generate stop condition (if requested) */
 	if ((i2c->xfer_size == 1) && (i2c->flags & I2C_STOP))
@@ -249,23 +293,46 @@ static void i2c_bitbang_putc(struct I2c *i2c, uint8_t _data)
 {
 	/* Add ACK bit */
 	uint16_t data = (_data << 1) | 1;
+	bool ack;
 
-	for (uint16_t i = 0x100; i != 0; i >>= 1)
+	if (old_api)
 	{
-		i2c_sclLo(I2C_DEV(i2c));
-		if (data & i)
-			i2c_sdaHi(I2C_DEV(i2c));
-		else
-			i2c_sdaLo(I2C_DEV(i2c));
-		i2c_halfbitDelay(I2C_DEV(i2c));
+		for (uint16_t i = 0x100; i != 0; i >>= 1)
+		{
+			SCL_LO;
+			if (data & i)
+				SDA_HI;
+			else
+				SDA_LO;
+			I2C_HALFBIT_DELAY();
 
-		i2c_sclHi(I2C_DEV(i2c));
+			SCL_HI;
+			I2C_HALFBIT_DELAY();
+		}
+
+		ack = !SDA_IN;
+		SCL_LO;
+		I2C_HALFBIT_DELAY();
+	}
+	else
+	{
+		for (uint16_t i = 0x100; i != 0; i >>= 1)
+		{
+			i2c_sclLo(I2C_DEV(i2c));
+			if (data & i)
+				i2c_sdaHi(I2C_DEV(i2c));
+			else
+				i2c_sdaLo(I2C_DEV(i2c));
+			i2c_halfbitDelay(I2C_DEV(i2c));
+
+			i2c_sclHi(I2C_DEV(i2c));
+			i2c_halfbitDelay(I2C_DEV(i2c));
+		}
+
+		ack = !i2c_sdaIn(I2C_DEV(i2c));
+		i2c_sclLo(I2C_DEV(i2c));
 		i2c_halfbitDelay(I2C_DEV(i2c));
 	}
-
-	bool ack = !i2c_sdaIn(I2C_DEV(i2c));
-	i2c_sclLo(I2C_DEV(i2c));
-	i2c_halfbitDelay(I2C_DEV(i2c));
 
 	if (!ack)
 	{
@@ -331,11 +398,24 @@ static const I2cVT i2c_bitbang_vt =
 void i2c_hw_bitbangInit(I2c *i2c, int dev)
 {
 	MOD_CHECK(timer);
-	i2c->hw = (struct I2cHardware *)(dev - I2C_BITBANG0);
+	if (dev == I2C_BITBANG_OLD)
+		old_api = true;
+	else
+		i2c->hw = (struct I2cHardware *)(dev - I2C_BITBANG0);
+
 	i2c->vt = &i2c_bitbang_vt;
 
-	i2c_bitbangInit(I2C_DEV(i2c));
-	i2c_sdaHi(I2C_DEV(i2c));
-	i2c_sclHi(I2C_DEV(i2c));
+	if (old_api)
+	{
+		I2C_BITBANG_HW_INIT;
+		SDA_HI;
+		SCL_HI;
+	}
+	else
+	{
+		i2c_bitbangInit(I2C_DEV(i2c));
+		i2c_sdaHi(I2C_DEV(i2c));
+		i2c_sclHi(I2C_DEV(i2c));
+	}
 }
 

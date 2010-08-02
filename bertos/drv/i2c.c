@@ -41,6 +41,8 @@
 
 #if !CONFIG_I2C_DISABLE_OLD_API
 
+I2c local_i2c_old_api;
+
 /**
  * Send a sequence of bytes in master transmitter mode
  * to the selected slave device through the I2C bus.

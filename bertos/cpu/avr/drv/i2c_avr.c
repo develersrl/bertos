@@ -210,52 +210,6 @@ int i2c_builtin_get(bool ack)
 	return (int)(uint8_t)TWDR;
 }
 
-
-MOD_DEFINE(i2c);
-
-/**
- * Initialize TWI module.
- */
-void i2c_builtin_init(void)
-{
-	ATOMIC(
-		/*
-		 * This is pretty useless according to AVR's datasheet,
-		 * but it helps us driving the TWI data lines on boards
-		 * where the bus pull-up resistors are missing.  This is
-		 * probably due to some unwanted interaction between the
-		 * port pin and the TWI lines.
-		 */
-#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281
-		PORTD |= BV(PD0) | BV(PD1);
-		DDRD  |= BV(PD0) | BV(PD1);
-#elif CPU_AVR_ATMEGA8
-		PORTC |= BV(PC4) | BV(PC5);
-		DDRC  |= BV(PC4) | BV(PC5);
-#elif CPU_AVR_ATMEGA32
-		PORTC |= BV(PC1) | BV(PC0);
-		DDRC  |= BV(PC1) | BV(PC0);
-#else
-		#error Unsupported architecture
-#endif
-
-		/*
-		 * Set speed:
-		 * F = CPU_FREQ / (16 + 2*TWBR * 4^TWPS)
-		 */
-		#ifndef CONFIG_I2C_FREQ
-			#warning Using default value of 300000L for CONFIG_I2C_FREQ
-			#define CONFIG_I2C_FREQ  300000L /* ~300 kHz */
-		#endif
-		#define TWI_PRESC 1       /* 4 ^ TWPS */
-
-		TWBR = (CPU_FREQ / (2 * CONFIG_I2C_FREQ * TWI_PRESC)) - (8 / TWI_PRESC);
-		TWSR = 0;
-		TWCR = BV(TWEN);
-	);
-	MOD_INIT(i2c);
-}
-
 #endif /* !CONFIG_I2C_DISABLE_OLD_API */
 
 /*

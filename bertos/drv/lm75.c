@@ -63,38 +63,7 @@
 
 deg_t lm75_read_1(uint8_t sens_addr)
 {
-	uint8_t data[2];
-	int16_t degree;
-	int16_t deci_degree;
-
-	if( !(i2c_start_w(SELECT_ADDRESS(sens_addr))
-		&& i2c_put(LM75_PAD_BYTE)
-		&& i2c_start_r(SELECT_ADDRESS(sens_addr))) )
-	{
-		i2c_stop();
-		return EOF;
-	}
-
-	if ( !i2c_recv(data, sizeof(data)) )
-	{
-		i2c_stop();
-		return EOF;
-	}
-	i2c_stop();
-
-	degree = (int16_t)data[0];
-	deci_degree = (int16_t)(((data[1] >> 7) & 1 ) * 5);
-
-	LOG_INFO("[%d.%d C]\n", degree, deci_degree);
-
-	return degree * 10 + deci_degree;
-}
-
-void lm75_init_0(void)
-{
-	// Check dependence
-	MOD_CHECK(i2c);
-	LM75_HW_INIT();
+	return lm75_read_2(&local_i2c_old_api, sens_addr);
 }
 #endif /* !CONFIG_I2C_DISABLE_OLD_API */
 
@@ -122,12 +91,4 @@ deg_t lm75_read_2(I2c *i2c, uint8_t sens_addr)
 	LOG_INFO("[%d.%d C]\n", degree, deci_degree);
 
 	return degree * 10 + deci_degree;
-}
-
-void lm75_init_1(I2c *i2c)
-{
-	ASSERT(i2c);
-
-	// Check dependence
-	LM75_HW_INIT();
 }

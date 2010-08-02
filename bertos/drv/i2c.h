@@ -65,6 +65,26 @@
 #endif
 
 
+/**
+ * \name I2C bitbang devices enum
+ */
+enum
+{
+	I2C_BITBANG_OLD = -1,
+	I2C_BITBANG0 = 1000,
+	I2C_BITBANG1,
+	I2C_BITBANG2,
+	I2C_BITBANG3,
+	I2C_BITBANG4,
+	I2C_BITBANG5,
+	I2C_BITBANG6,
+	I2C_BITBANG7,
+	I2C_BITBANG8,
+	I2C_BITBANG9,
+
+	I2C_BITBANG_CNT  /**< Number of serial ports */
+};
+
 #if !CONFIG_I2C_DISABLE_OLD_API
 
 /**
@@ -85,7 +105,6 @@
  * that you want the builtin backend.
  * \{
  */
-void i2c_builtin_init(void);
 bool i2c_builtin_start_w(uint8_t id);
 bool i2c_builtin_start_r(uint8_t id);
 void i2c_builtin_stop(void);
@@ -101,7 +120,6 @@ int i2c_builtin_get(bool ack);
  * that you want the bitbang backend.
  * \{
  */
-void i2c_bitbang_init(void);
 bool i2c_bitbang_start_w(uint8_t id);
 bool i2c_bitbang_start_r(uint8_t id);
 void i2c_bitbang_stop(void);
@@ -114,14 +132,12 @@ int i2c_bitbang_get(bool ack);
 #endif
 
 #if CONFIG_I2C_BACKEND == I2C_BACKEND_BUILTIN
-	#define i2c_init_0      i2c_builtin_init
 	#define i2c_start_w_1   i2c_builtin_start_w
 	#define i2c_start_r_1   i2c_builtin_start_r
 	#define i2c_stop        i2c_builtin_stop
 	#define i2c_put         i2c_builtin_put
 	#define i2c_get         i2c_builtin_get
 #elif CONFIG_I2C_BACKEND == I2C_BACKEND_BITBANG
-	#define i2c_init_0      i2c_bitbang_init
 	#define i2c_start_w_1   i2c_bitbang_start_w
 	#define i2c_start_r_1   i2c_bitbang_start_r
 	#define i2c_stop        i2c_bitbang_stop
@@ -142,28 +158,9 @@ bool i2c_recv(void *_buf, size_t count);
  * I2c new api
  */
 
-/**
- * \name I2C bitbang devices enum
+/*
+ * I2C error flags
  */
-enum
-{
-	I2C_BITBANG0 = 1000,
-	I2C_BITBANG1,
-	I2C_BITBANG2,
-	I2C_BITBANG3,
-	I2C_BITBANG4,
-	I2C_BITBANG5,
-	I2C_BITBANG6,
-	I2C_BITBANG7,
-	I2C_BITBANG8,
-	I2C_BITBANG9,
-
-	I2C_BITBANG_CNT  /**< Number of serial ports */
-};
-
- /*
-  * I2C error flags
-  */
 #define I2C_OK               0     ///< I2C no errors flag
 #define I2C_DATA_NACK     BV(4)    ///< I2C generic error
 #define I2C_ERR           BV(3)    ///< I2C generic error
@@ -329,7 +326,24 @@ INLINE int i2c_error(I2c *i2c)
 	return err;
 }
 
-#define i2c_init_3(i2c, dev, clock)   (dev > I2C_BITBANG0) ?  i2c_hw_bitbangInit(i2c, dev) : i2c_hw_init(i2c, dev, clock)
+#define i2c_init_3(i2c, dev, clock)   ((((dev) > I2C_BITBANG0) | ((dev) == I2C_BITBANG_OLD)) ? \
+										i2c_hw_bitbangInit((i2c), (dev)) : i2c_hw_init((i2c), (dev), (clock)))
+
+#if !CONFIG_I2C_DISABLE_OLD_API
+
+extern I2c local_i2c_old_api;
+
+INLINE void i2c_init_0(void)
+{
+	#if CONFIG_I2C_BACKEND == I2C_BACKEND_BITBANG
+		i2c_init_3(&local_i2c_old_api, I2C_BITBANG_OLD, CONFIG_I2C_FREQ);
+	#else
+		i2c_init_3(&local_i2c_old_api, 0, CONFIG_I2C_FREQ);
+	#endif
+}
+
+#endif /* !CONFIG_I2C_DISABLE_OLD_API */
+
 
 
 #endif
