@@ -72,7 +72,8 @@
 	#define KDBG_UART0_BUS_TX    do {} while (0)
 	#endif
 
-	#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281 || CPU_AVR_ATMEGA168 || CPU_AVR_ATMEGA328P
+	#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281 || CPU_AVR_ATMEGA1280 \
+	    || CPU_AVR_ATMEGA168 || CPU_AVR_ATMEGA328P
 		#define UCR UCSR0B
 		#define UDR UDR0
 		#define USR UCSR0A
@@ -120,14 +121,14 @@
 #elif CONFIG_KDEBUG_PORT == 1
 
 	/*
-		* Support for special bus policies or external transceivers
-		* on UART1 (to be overridden in "hw/hw_ser.h").
-		*
-		* HACK: if we don't set TXEN, kdbg disables the transmitter
-		* after each output statement until the serial driver
-		* is initialized.  These glitches confuse the debug
-		* terminal that ends up printing some trash.
-		*/
+	 * Support for special bus policies or external transceivers
+	 * on UART1 (to be overridden in "hw/hw_ser.h").
+	 *
+	 * HACK: if we don't set TXEN, kdbg disables the transmitter
+	 * after each output statement until the serial driver
+	 * is initialized.  These glitches confuse the debug
+	 * terminal that ends up printing some trash.
+	 */
 	#ifndef KDBG_UART1_BUS_INIT
 	#define KDBG_UART1_BUS_INIT  do { \
 			UCSR1B = BV(TXEN1); \
@@ -158,6 +159,91 @@
 	} while(0)
 
 	typedef uint8_t kdbg_irqsave_t;
+
+#elif CONFIG_KDEBUG_PORT == 2
+
+	/*
+	 * Support for special bus policies or external transceivers
+	 * on UART2 (to be overridden in "hw/hw_ser.h").
+	 *
+	 * HACK: if we don't set TXEN, kdbg disables the transmitter
+	 * after each output statement until the serial driver
+	 * is initialized.  These glitches confuse the debug
+	 * terminal that ends up printing some trash.
+	 */
+	#ifndef KDBG_UART2_BUS_INIT
+	#define KDBG_UART2_BUS_INIT  do { \
+			UCSR2B = BV(TXEN2); \
+		} while (0)
+	#endif
+	#ifndef KDBG_UART2_BUS_RX
+	#define KDBG_UART2_BUS_RX    do {} while (0)
+	#endif
+	#ifndef KDBG_UART2_BUS_TX
+	#define KDBG_UART2_BUS_TX    do {} while (0)
+	#endif
+
+	#define KDBG_WAIT_READY()     do { loop_until_bit_is_set(UCSR2A, UDRE2); } while(0)
+	#define KDBG_WAIT_TXDONE()    do { loop_until_bit_is_set(UCSR2A, TXC2); } while(0)
+	#define KDBG_WRITE_CHAR(c)    do { UCSR2A |= BV(TXC2); UDR2 = (c); } while(0)
+
+	#define KDBG_MASK_IRQ(old)    do { \
+		(old) = UCSR2B; \
+		UCSR2B |= BV(TXEN2); \
+		UCSR2B &= ~(BV(TXCIE2) | BV(UDRIE2)); \
+		KDBG_UART2_BUS_TX; \
+	} while(0)
+
+	#define KDBG_RESTORE_IRQ(old) do { \
+		KDBG_WAIT_TXDONE(); \
+		KDBG_UART2_BUS_RX; \
+		UCSR2B = (old); \
+	} while(0)
+
+	typedef uint8_t kdbg_irqsave_t;
+
+#elif CONFIG_KDEBUG_PORT == 3
+
+	/*
+	 * Support for special bus policies or external transceivers
+	 * on UART3 (to be overridden in "hw/hw_ser.h").
+	 *
+	 * HACK: if we don't set TXEN, kdbg disables the transmitter
+	 * after each output statement until the serial driver
+	 * is initialized.  These glitches confuse the debug
+	 * terminal that ends up printing some trash.
+	 */
+	#ifndef KDBG_UART3_BUS_INIT
+	#define KDBG_UART3_BUS_INIT  do { \
+			UCSR3B = BV(TXEN3); \
+		} while (0)
+	#endif
+	#ifndef KDBG_UART3_BUS_RX
+	#define KDBG_UART3_BUS_RX    do {} while (0)
+	#endif
+	#ifndef KDBG_UART3_BUS_TX
+	#define KDBG_UART3_BUS_TX    do {} while (0)
+	#endif
+
+	#define KDBG_WAIT_READY()     do { loop_until_bit_is_set(UCSR3A, UDRE3); } while(0)
+	#define KDBG_WAIT_TXDONE()    do { loop_until_bit_is_set(UCSR3A, TXC3); } while(0)
+	#define KDBG_WRITE_CHAR(c)    do { UCSR3A |= BV(TXC3); UDR3 = (c); } while(0)
+
+	#define KDBG_MASK_IRQ(old)    do { \
+		(old) = UCSR3B; \
+		UCSR3B |= BV(TXEN3); \
+		UCSR3B &= ~(BV(TXCIE3) | BV(UDRIE3)); \
+		KDBG_UART3_BUS_TX; \
+	} while(0)
+
+	#define KDBG_RESTORE_IRQ(old) do { \
+		KDBG_WAIT_TXDONE(); \
+		KDBG_UART3_BUS_RX; \
+		UCSR3B = (old); \
+	} while(0)
+
+	typedef uint8_t kdbg_irqsave_t;
+
 
 /*
  * Special debug port for BitBanged Serial see below for details...
@@ -219,7 +305,7 @@
 		}
 	}
 #else
-	#error CONFIG_KDEBUG_PORT should be either 0, 1 or 666
+	#error CONFIG_KDEBUG_PORT should be either 0, 1, 2, 3 or 666
 #endif
 
 
@@ -242,6 +328,27 @@ INLINE void kdbg_hw_init(void)
 				KDBG_UART1_BUS_INIT;
 			#else
 				#error CONFIG_KDEBUG_PORT must be either 0 or 1
+			#endif
+
+		#elif CPU_AVR_ATMEGA1280
+			#if CONFIG_KDEBUG_PORT == 0
+				UBRR0H = (uint8_t)(period>>8);
+				UBRR0L = (uint8_t)period;
+				KDBG_UART0_BUS_INIT;
+			#elif CONFIG_KDEBUG_PORT == 1
+				UBRR1H = (uint8_t)(period>>8);
+				UBRR1L = (uint8_t)period;
+				KDBG_UART1_BUS_INIT;
+			#elif CONFIG_KDEBUG_PORT == 2
+				UBRR2H = (uint8_t)(period>>8);
+				UBRR2L = (uint8_t)period;
+				KDBG_UART2_BUS_INIT;
+			#elif CONFIG_KDEBUG_PORT == 3
+				UBRR3H = (uint8_t)(period>>8);
+				UBRR3L = (uint8_t)period;
+				KDBG_UART3_BUS_INIT;
+			#else
+				#error CONFIG_KDEBUG_PORT must be either 0 or 1 or 2 or 3
 			#endif
 
 		#elif CPU_AVR_ATMEGA168 || CPU_AVR_ATMEGA328P

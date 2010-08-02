@@ -239,7 +239,7 @@
 		#define CPU_RAM_START       0x60
 	#elif CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA168 || CPU_AVR_ATMEGA328P
 		#define CPU_RAM_START       0x100
-	#elif CPU_AVR_ATMEGA1281
+	#elif CPU_AVR_ATMEGA1281 || CPU_AVR_ATMEGA1280
 		#define CPU_RAM_START       0x200
 	#else
 		#warning Fix CPU_RAM_START address for your AVR, default value set to 0x100

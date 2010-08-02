@@ -339,8 +339,15 @@
 		#define CPU_AVR_ATMEGA1281  0
 	#endif
 
+	#if defined(__AVR_ATmega1280__)
+		#define CPU_AVR_ATMEGA1280  1
+	#else
+		#define CPU_AVR_ATMEGA1280  0
+	#endif
+
 	#if CPU_AVR_ATMEGA32 + CPU_AVR_ATMEGA64 + CPU_AVR_ATMEGA103 + CPU_AVR_ATMEGA128 \
-	  + CPU_AVR_ATMEGA8 + CPU_AVR_ATMEGA168 + CPU_AVR_ATMEGA328P + CPU_AVR_ATMEGA1281 != 1
+	  + CPU_AVR_ATMEGA8 + CPU_AVR_ATMEGA168 + CPU_AVR_ATMEGA328P + CPU_AVR_ATMEGA1281 \
+	  + CPU_AVR_ATMEGA1280 != 1
 		#error AVR CPU configuration error
 	#endif
 #else
@@ -353,6 +360,7 @@
 	#define CPU_AVR_ATMEGA103       0
 	#define CPU_AVR_ATMEGA128       0
 	#define CPU_AVR_ATMEGA1281      0
+	#define CPU_AVR_ATMEGA1280      0
 #endif
 
 
