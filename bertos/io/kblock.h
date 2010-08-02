@@ -66,7 +66,7 @@ typedef int    (* kblock_load_t)        (struct KBlock *b, block_idx_t index);
 typedef int    (* kblock_store_t)       (struct KBlock *b, block_idx_t index);
 
 typedef int    (* kblock_error_t)       (struct KBlock *b);
-typedef int    (* kblock_clearerr_t)    (struct KBlock *b);
+typedef void   (* kblock_clearerr_t)    (struct KBlock *b);
 typedef int    (* kblock_close_t)       (struct KBlock *b);
 /* \} */
 
@@ -206,11 +206,23 @@ INLINE int kblock_error(struct KBlock *b)
  *
  * \sa kblock_error()
  */
-INLINE int kblock_clearerr(struct KBlock *b)
+INLINE void kblock_clearerr(struct KBlock *b)
 {
 	KB_ASSERT_METHOD(b, clearerr);
-	return b->priv.vt->clearerr(b);
+	b->priv.vt->clearerr(b);
 }
+
+
+/**
+ * Flush the cache (if any) to the device.
+ *
+ * This function will write any pending modifications to the device.
+ * If the device does not have a cache, this function will do nothing.
+ *
+ * \return 0 if all is OK, EOF on errors.
+ * \sa kblock_read(), kblock_write(), kblock_buffered().
+ */
+int kblock_flush(struct KBlock *b);
 
 /**
  * Close the device.
@@ -222,7 +234,7 @@ INLINE int kblock_clearerr(struct KBlock *b)
 INLINE int kblock_close(struct KBlock *b)
 {
 	KB_ASSERT_METHOD(b, close);
-	return b->priv.vt->close(b);
+	return kblock_flush(b) | b->priv.vt->close(b);
 }
 
 /**
@@ -330,19 +342,6 @@ size_t kblock_read(struct KBlock *b, block_idx_t idx, void *buf, size_t offset, 
  * \sa kblock_read(), kblock_flush(), kblock_buffered(), kblock_partialWrite().
  */
 size_t kblock_write(struct KBlock *b, block_idx_t idx, const void *buf, size_t offset, size_t size);
-
-
-/**
- * Flush the cache (if any) to the device.
- *
- * This function will write any pending modifications to the device.
- * If the device does not have a cache, this function will do nothing.
- *
- * \return 0 if all is OK, EOF on errors.
- * \sa kblock_read(), kblock_write(), kblock_buffered().
- */
-int kblock_flush(struct KBlock *b);
-
 
 /**
  * Copy one block to another.

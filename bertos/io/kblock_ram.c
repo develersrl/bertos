@@ -100,7 +100,7 @@ static const KBlockVTable kblockram_hwbuffered_vt =
 	.store = kblockram_store,
 
 	.error = kblockram_dummy,
-	.clearerr = kblockram_dummy,
+	.clearerr = (kblock_clearerr_t)kblockram_dummy,
 	.close = kblockram_dummy,
 };
 
@@ -116,7 +116,7 @@ static const KBlockVTable kblockram_swbuffered_vt =
 	.store = kblock_swStore,
 
 	.error = kblockram_dummy,
-	.clearerr = kblockram_dummy,
+	.clearerr = (kblock_clearerr_t)kblockram_dummy,
 	.close = kblockram_dummy,
 };
 
@@ -126,7 +126,7 @@ static const KBlockVTable kblockram_unbuffered_vt =
 	.writeDirect = kblockram_writeDirect,
 
 	.error = kblockram_dummy,
-	.clearerr = kblockram_dummy,
+	.clearerr = (kblock_clearerr_t)kblockram_dummy,
 	.close = kblockram_dummy,
 };
 

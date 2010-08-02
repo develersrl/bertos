@@ -378,11 +378,10 @@ static int sd_error(KBlock *b)
 	return sd->r1;
 }
 
-static int sd_clearerr(KBlock *b)
+static void sd_clearerr(KBlock *b)
 {
 	Sd *sd = SD_CAST(b);
 	sd->r1 = 0;
-	return 0;
 }
 
 static const KBlockVTable sd_unbuffered_vt =
