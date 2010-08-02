@@ -202,7 +202,6 @@ INLINE int kblock_error(struct KBlock *b)
  *
  * \param b KBlock device.
  *
- * \return 0 on success, EOF on errors.
  *
  * \sa kblock_error()
  */
