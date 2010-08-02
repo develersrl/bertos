@@ -100,7 +100,6 @@ void kfileblock_init(KFileBlock *fb, KBlock *b)
 {
 	ASSERT(fb);
 	ASSERT(b);
-	ASSERT(kblock_partialWrite(b));
 	memset(fb, 0, sizeof(*fb));
 	kfile_init(&fb->fd);
 	DB(fb->fd._type = KFT_KFILEBLOCK);
