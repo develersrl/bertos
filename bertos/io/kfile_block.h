@@ -32,6 +32,9 @@
  *
  * \brief KFile interface over a KBlock.
  *
+ * With this module, you can access a KBlock device
+ * with the handy KFile interface.
+ * In order to achieve this, the block device must support partial block write.
  */
 
 #ifndef IO_KFILE_BLOCK_H
@@ -41,12 +44,25 @@
 #include <io/kblock.h>
 #include <io/kfile.h>
 
+/**
+ * KFileBlock context.
+ */
 typedef struct KFileBlock
 {
-	KFile fd;
-	KBlock *b;
+	KFile fd;  ///< KFile context
+	KBlock *b; ///< KBlock device
 } KFileBlock;
 
+/**
+ * Init a KFile over KBlock.
+ * After this you can access your KBlock device with a handy KFile interface.
+ *
+ * \note The block device must support partial block write in order support
+ *       random write access.
+ *
+ * \param fb KFileBlock context.
+ * \param b  block device to be accessed with a KFile interface.
+ */
 void kfileblock_init(KFileBlock *fb, KBlock *b);
 
 #endif /* IO_KFILE_KBLOCK_H */
