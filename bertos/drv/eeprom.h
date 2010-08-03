@@ -43,8 +43,11 @@
 #define DRV_EEPROM_H
 
 #include <cfg/compiler.h>
+#include <cfg/debug.h>
 
-#include <io/kfile.h>
+#include <drv/i2c.h>
+
+#include <io/kblock.h>
 
 
 /**
@@ -73,7 +76,8 @@ typedef uint8_t e2dev_addr_t;
  */
 typedef struct Eeprom
 {
-	KFile fd;          ///< File descriptor.
+	KBlock b;
+	I2c *i2c;
 	EepromType type;   ///< EEPROM type
 	e2dev_addr_t addr; ///< Device address.
 } Eeprom;
@@ -81,15 +85,15 @@ typedef struct Eeprom
 /**
  * ID for eeproms.
  */
-#define KFT_EEPROM MAKE_ID('E', 'E', 'P', 'R')
+#define KBT_EEPROM MAKE_ID('E', 'E', 'P', 'R')
 
 /**
  * Convert + ASSERT from generic KFile to Eeprom.
  */
-INLINE Eeprom * EEPROM_CAST(KFile *fd)
+INLINE Eeprom * EEPROM_CAST(KBlock *b)
 {
-	ASSERT(fd->_type == KFT_EEPROM);
-	return (Eeprom *)fd;
+	ASSERT(b->priv.type == KBT_EEPROM);
+	return (Eeprom *)b;
 }
 
 /// Type for EEPROM addresses
@@ -127,8 +131,12 @@ typedef struct EepromInfo
 	e2_size_t e2_size;     ///< eeprom size
 } EepromInfo;
 
+#if 0
 bool eeprom_erase(Eeprom *fd, e2addr_t addr, e2_size_t count);
 bool eeprom_verify(Eeprom *fd, const void *buf, size_t count);
 void eeprom_init(Eeprom *fd, EepromType, e2dev_addr_t, bool verify);
+#endif
+
+void eeprom_init(Eeprom *b, I2c *i2c, EepromType type, e2dev_addr_t addr);
 
 #endif /* DRV_EEPROM_H */

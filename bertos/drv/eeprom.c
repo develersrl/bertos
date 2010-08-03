@@ -105,8 +105,7 @@ static const EepromInfo mem_info[] =
 
 STATIC_ASSERT(countof(mem_info) == EEPROM_CNT);
 
-#if !CONFIG_I2C_DISABLE_OLD_API
-
+#if 0//!CONFIG_I2C_DISABLE_OLD_API
 /**
  * Copy \a size bytes from buffer \a buf to
  * eeprom.
@@ -393,3 +392,137 @@ void eeprom_init(Eeprom *fd, EepromType type, e2dev_addr_t addr, bool verify)
 }
 
 #endif /* !CONFIG_I2C_DISABLE_OLD_API */
+
+static size_t eeprom_writeDirect(KBlock *b, block_idx_t idx, const void *buf, size_t offset, size_t size)
+{
+	Eeprom *fd = EEPROM_CAST(b);
+	e2dev_addr_t dev_addr;
+	uint8_t addr_buf[2];
+	uint8_t addr_len;
+	uint32_t abs_addr = b->blk_size * idx + offset;
+
+	STATIC_ASSERT(countof(addr_buf) <= sizeof(e2addr_t));
+
+
+	/* clamp size to memory limit (otherwise may roll back) */
+	ASSERT(idx <= b->blk_cnt);
+	size = MIN(size, b->blk_size - offset);
+
+	if (mem_info[fd->type].has_dev_addr)
+	{
+		dev_addr = fd->addr;
+		addr_len = 2;
+	}
+	else
+	{
+		dev_addr = (e2dev_addr_t)((abs_addr >> 8) & 0x07);
+		addr_len = 1;
+	}
+
+	if (mem_info[fd->type].has_dev_addr)
+	{
+		addr_buf[0] = (abs_addr >> 8) & 0xFF;
+		addr_buf[1] = (abs_addr & 0xFF);
+	}
+	else
+	{
+		dev_addr = (e2dev_addr_t)((abs_addr >> 8) & 0x07);
+		addr_buf[0] = (abs_addr & 0xFF);
+	}
+
+	i2c_start_w(fd->i2c, EEPROM_ADDR(dev_addr),  addr_len + size, I2C_STOP);
+	i2c_write(fd->i2c, addr_buf, addr_len);
+	i2c_write(fd->i2c, buf, size);
+
+	if (i2c_error(fd->i2c))
+		return 0;
+
+	return size;
+}
+
+
+static size_t eeprom_readDirect(struct KBlock *b, block_idx_t idx, void *_buf, size_t offset, size_t size)
+{
+	Eeprom *fd = EEPROM_CAST(b);
+	uint8_t addr_buf[2];
+	uint8_t addr_len;
+	size_t rd_len = 0;
+	uint8_t *buf = (uint8_t *)_buf;
+	uint32_t abs_addr = mem_info[fd->type].blk_size * idx + offset;
+
+	STATIC_ASSERT(countof(addr_buf) <= sizeof(e2addr_t));
+
+	/* clamp size to memory limit (otherwise may roll back) */
+	ASSERT(idx <= b->blk_cnt);
+	size = MIN(size, b->blk_size - offset);
+
+	e2dev_addr_t dev_addr;
+	if (mem_info[fd->type].has_dev_addr)
+	{
+		dev_addr = fd->addr;
+		addr_len = 2;
+		addr_buf[0] = (abs_addr >> 8) & 0xFF;
+		addr_buf[1] = (abs_addr & 0xFF);
+	}
+	else
+	{
+		dev_addr = (e2dev_addr_t)((abs_addr >> 8) & 0x07);
+		addr_len = 1;
+		addr_buf[0] = (abs_addr & 0xFF);
+	}
+
+
+	i2c_start_w(fd->i2c, EEPROM_ADDR(dev_addr),  addr_len, I2C_NOSTOP);
+	i2c_write(fd->i2c, addr_buf, addr_len);
+
+	i2c_start_r(fd->i2c, EEPROM_ADDR(dev_addr), size, I2C_STOP);
+	i2c_read(fd->i2c, buf, size);
+
+	if (i2c_error(fd->i2c))
+		   return rd_len;
+
+	rd_len += size;
+
+	return rd_len;
+}
+
+static int kblockEeprom_dummy(UNUSED_ARG(struct KBlock *,b))
+{
+	return 0;
+}
+
+
+static const KBlockVTable eeprom_unbuffered_vt =
+{
+	.readDirect = eeprom_readDirect,
+	.writeDirect = eeprom_writeDirect,
+
+	.error = kblockEeprom_dummy,
+	.clearerr = (kblock_clearerr_t)kblockEeprom_dummy,
+};
+
+/**
+ * Initialize EEPROM module.
+ * \param b is the Kblock context.
+ * \param type is the eeprom device we want to initialize (\see EepromType)
+ * \param i2c context for i2c channel
+ * \param addr is the i2c devide address (usually pins A0, A1, A2).
+ */
+void eeprom_init(Eeprom *b, I2c *i2c, EepromType type, e2dev_addr_t addr)
+{
+	ASSERT(type < EEPROM_CNT);
+
+	memset(b, 0, sizeof(*b));
+	DB(b->b.priv.type = KBT_EEPROM);
+
+	b->type = type;
+	b->addr = addr;
+	b->i2c = i2c;
+
+	b->b.blk_size = mem_info[type].blk_size;
+	b->b.blk_cnt = mem_info[type].e2_size / mem_info[type].blk_size;
+	b->b.priv.flags |= KB_PARTIAL_WRITE;
+	b->b.priv.vt = &eeprom_unbuffered_vt;
+}
+
+
