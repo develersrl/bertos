@@ -45,6 +45,7 @@
 
 #include "stm32_nvic.h"
 #include "stm32_ints.h"
+#include "stm32_gpio.h"
 #include "stm32_uart.h"
 #include "stm32_adc.h"
 #include "stm32_i2c.h"
