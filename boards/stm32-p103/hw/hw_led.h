@@ -38,11 +38,14 @@
 #ifndef HW_LED_H
 #define HW_LED_H
 
+#include <cfg/macros.h>
+
 #include <io/stm32.h>
+
 #include <drv/gpio_stm32.h>
 #include <drv/clock_stm32.h>
 
-#define LED_PIN			(1 << 12)
+#define LED_PIN			    BV(12)
 #define LED_GPIO_BASE		((struct stm32_gpio *)GPIOC_BASE)
 
 #define LED_ON()							\
