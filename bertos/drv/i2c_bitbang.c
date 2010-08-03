@@ -198,6 +198,9 @@ static void i2c_bitbang_stop_1(struct I2c *i2c)
 INLINE bool i2c_bitbang_start_1(struct I2c *i2c)
 {
 	bool ret;
+	/* Clear all error, we restart */
+	i2c->errors &= ~(I2C_NO_ACK | I2C_ARB_LOST);
+
 	if (old_api)
 	{
 		SDA_HI;
@@ -215,6 +218,7 @@ INLINE bool i2c_bitbang_start_1(struct I2c *i2c)
 		i2c_halfbitDelay(I2C_DEV(i2c));
 		i2c_sdaLo(I2C_DEV(i2c));
 		i2c_halfbitDelay(I2C_DEV(i2c));
+
 		ret = !i2c_sdaIn(I2C_DEV(i2c));
 	}
 
@@ -328,17 +332,14 @@ static void i2c_bitbang_putc(struct I2c *i2c, uint8_t _data)
 			i2c_sclHi(I2C_DEV(i2c));
 			i2c_halfbitDelay(I2C_DEV(i2c));
 		}
-
 		ack = !i2c_sdaIn(I2C_DEV(i2c));
+
 		i2c_sclLo(I2C_DEV(i2c));
 		i2c_halfbitDelay(I2C_DEV(i2c));
 	}
 
 	if (!ack)
-	{
-		LOG_ERR("NO ACK received\n");
 		i2c->errors |= I2C_NO_ACK;
-	}
 
 	/* Generate stop condition (if requested) */
 	if (((i2c->xfer_size == 1) && (i2c->flags & I2C_STOP)) || i2c->errors)
