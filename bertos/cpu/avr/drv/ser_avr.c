@@ -74,7 +74,7 @@
 	/*\}*/
 #endif
 
-#if CPU_AVR_ATMEGA1281
+#if CPU_AVR_ATMEGA1281 || CPU_AVR_ATMEGA1280
 	#define BIT_RXCIE0 RXCIE0
 	#define BIT_RXEN0  RXEN0
 	#define BIT_TXEN0  TXEN0
@@ -84,6 +84,17 @@
 	#define BIT_RXEN1  RXEN1
 	#define BIT_TXEN1  TXEN1
 	#define BIT_UDRIE1 UDRIE1
+	#if CPU_AVR_ATMEGA1280
+		#define BIT_RXCIE2 RXCIE2
+		#define BIT_RXEN2  RXEN2
+		#define BIT_TXEN2  TXEN2
+		#define BIT_UDRIE2 UDRIE2
+
+		#define BIT_RXCIE3 RXCIE3
+		#define BIT_RXEN3  RXEN3
+		#define BIT_TXEN3  TXEN3
+		#define BIT_UDRIE3 UDRIE3
+	#endif
 #elif CPU_AVR_ATMEGA168 || CPU_AVR_ATMEGA328P
 	#define BIT_RXCIE0 RXCIE0
 	#define BIT_RXEN0  RXEN0
@@ -220,6 +231,76 @@
 	#define SER_UART1_BUS_TXOFF
 	#endif
 #endif
+
+#ifndef SER_UART2_BUS_TXINIT
+	/** \sa SER_UART0_BUS_TXINIT */
+	#define SER_UART2_BUS_TXINIT do { \
+		UCSR2B = BV(BIT_RXCIE2) | BV(BIT_RXEN2) | BV(BIT_TXEN2); \
+	} while (0)
+#endif
+#ifndef SER_UART2_BUS_TXBEGIN
+	/** \sa SER_UART0_BUS_TXBEGIN */
+	#define SER_UART2_BUS_TXBEGIN do { \
+		UCSR2B = BV(BIT_RXCIE2) | BV(BIT_UDRIE2) | BV(BIT_RXEN2) | BV(BIT_TXEN2); \
+	} while (0)
+#endif
+#ifndef SER_UART2_BUS_TXCHAR
+	/** \sa SER_UART0_BUS_TXCHAR */
+	#define SER_UART2_BUS_TXCHAR(c) do { \
+		UDR2 = (c); \
+	} while (0)
+#endif
+#ifndef SER_UART2_BUS_TXEND
+	/** \sa SER_UART0_BUS_TXEND */
+	#define SER_UART2_BUS_TXEND do { \
+		UCSR2B = BV(BIT_RXCIE2) | BV(BIT_RXEN2) | BV(BIT_TXEN2); \
+	} while (0)
+#endif
+#ifndef SER_UART2_BUS_TXOFF
+	/**
+	 * \def SER_UART2_BUS_TXOFF
+	 *
+	 * \see SER_UART0_BUS_TXOFF
+	 */
+	#ifdef __doxygen__
+	#define SER_UART2_BUS_TXOFF
+	#endif
+#endif
+
+#ifndef SER_UART3_BUS_TXINIT
+	/** \sa SER_UART0_BUS_TXINIT */
+	#define SER_UART3_BUS_TXINIT do { \
+		UCSR3B = BV(BIT_RXCIE3) | BV(BIT_RXEN3) | BV(BIT_TXEN3); \
+	} while (0)
+#endif
+#ifndef SER_UART3_BUS_TXBEGIN
+	/** \sa SER_UART0_BUS_TXBEGIN */
+	#define SER_UART3_BUS_TXBEGIN do { \
+		UCSR3B = BV(BIT_RXCIE3) | BV(BIT_UDRIE3) | BV(BIT_RXEN3) | BV(BIT_TXEN3); \
+	} while (0)
+#endif
+#ifndef SER_UART3_BUS_TXCHAR
+	/** \sa SER_UART0_BUS_TXCHAR */
+	#define SER_UART3_BUS_TXCHAR(c) do { \
+		UDR3 = (c); \
+	} while (0)
+#endif
+#ifndef SER_UART3_BUS_TXEND
+	/** \sa SER_UART0_BUS_TXEND */
+	#define SER_UART3_BUS_TXEND do { \
+		UCSR3B = BV(BIT_RXCIE3) | BV(BIT_RXEN3) | BV(BIT_TXEN3); \
+	} while (0)
+#endif
+#ifndef SER_UART3_BUS_TXOFF
+	/**
+	 * \def SER_UART3_BUS_TXOFF
+	 *
+	 * \see SER_UART0_BUS_TXOFF
+	 */
+	#ifdef __doxygen__
+	#define SER_UART3_BUS_TXOFF
+	#endif
+#endif
 /*\}*/
 
 
@@ -250,7 +331,8 @@
 
 
 /* SPI port and pin configuration */
-#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA103 || CPU_AVR_ATMEGA1281
+#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA103 || CPU_AVR_ATMEGA1281 \
+    || CPU_AVR_ATMEGA1280
 	#define SPI_PORT      PORTB
 	#define SPI_DDR       DDRB
 	#define SPI_SS_BIT    PB0
@@ -278,15 +360,25 @@
 #endif
 
 /* USART register definitions */
-#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281
+#if CPU_AVR_ATMEGA1280
 	#define AVR_HAS_UART1 1
+	#define AVR_HAS_UART2 1
+	#define AVR_HAS_UART3 1
+#elif CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281
+	#define AVR_HAS_UART1 1
+	#define AVR_HAS_UART2 0
+	#define AVR_HAS_UART3 0
 #elif CPU_AVR_ATMEGA168 || CPU_AVR_ATMEGA328P
 	#define AVR_HAS_UART1 0
+	#define AVR_HAS_UART2 0
+	#define AVR_HAS_UART3 0
 	#define USART0_UDRE_vect USART_UDRE_vect
 	#define USART0_RX_vect USART_RX_vect
 	#define USART0_TX_vect USART_TX_vect
 #elif CPU_AVR_ATMEGA8
 	#define AVR_HAS_UART1 0
+	#define AVR_HAS_UART2 0
+	#define AVR_HAS_UART3 0
 	#define UCSR0A UCSRA
 	#define UCSR0B UCSRB
 	#define UCSR0C UCSRC
@@ -298,6 +390,8 @@
 	#define USART0_TX_vect USART_TX_vect
 #elif CPU_AVR_ATMEGA103
 	#define AVR_HAS_UART1 0
+	#define AVR_HAS_UART2 0
+	#define AVR_HAS_UART3 0
 	#define UCSR0B UCR
 	#define UDR0   UDR
 	#define UCSR0A USR
@@ -319,6 +413,14 @@ static unsigned char uart0_rxbuffer[CONFIG_UART0_RXBUFSIZE];
 #if AVR_HAS_UART1
 	static unsigned char uart1_txbuffer[CONFIG_UART1_TXBUFSIZE];
 	static unsigned char uart1_rxbuffer[CONFIG_UART1_RXBUFSIZE];
+#endif
+#if AVR_HAS_UART2
+	static unsigned char uart2_txbuffer[CONFIG_UART2_TXBUFSIZE];
+	static unsigned char uart2_rxbuffer[CONFIG_UART2_RXBUFSIZE];
+#endif
+#if AVR_HAS_UART3
+	static unsigned char uart3_txbuffer[CONFIG_UART3_TXBUFSIZE];
+	static unsigned char uart3_rxbuffer[CONFIG_UART3_RXBUFSIZE];
 #endif
 static unsigned char spi_txbuffer[CONFIG_SPI_TXBUFSIZE];
 static unsigned char spi_rxbuffer[CONFIG_SPI_RXBUFSIZE];
@@ -451,6 +553,109 @@ static void uart1_setparity(UNUSED_ARG(struct SerialHardware *, _hw), int parity
 }
 
 #endif // AVR_HAS_UART1
+
+#if AVR_HAS_UART2
+
+static void uart2_init(
+	UNUSED_ARG(struct SerialHardware *, _hw),
+	UNUSED_ARG(struct Serial *, ser))
+{
+	SER_UART2_BUS_TXINIT;
+	RTS_ON;
+	SER_STROBE_INIT;
+}
+
+static void uart2_cleanup(UNUSED_ARG(struct SerialHardware *, _hw))
+{
+	UCSR2B = 0;
+}
+
+static void uart2_enabletxirq(struct SerialHardware *_hw)
+{
+	struct AvrSerial *hw = (struct AvrSerial *)_hw;
+
+	/*
+	 * WARNING: racy code here!  The tx interrupt
+	 * sets hw->sending to false when it runs with
+	 * an empty fifo.  The order of the statements
+	 * in the if-block matters.
+	 */
+	if (!hw->sending)
+	{
+		hw->sending = true;
+		SER_UART2_BUS_TXBEGIN;
+	}
+}
+
+static void uart2_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned long rate)
+{
+	/* Compute baud-rate period */
+	uint16_t period = DIV_ROUND(CPU_FREQ / 16UL, rate) - 1;
+
+	UBRR2H = (period) >> 8;
+	UBRR2L = (period);
+
+	//DB(kprintf("uart2_setbaudrate(rate=%ld): period=%d\n", rate, period);)
+}
+
+static void uart2_setparity(UNUSED_ARG(struct SerialHardware *, _hw), int parity)
+{
+	UCSR2C = (UCSR2C & ~(BV(UPM21) | BV(UPM20))) | ((parity) << UPM20);
+}
+
+#endif // AVR_HAS_UART2
+
+#if AVR_HAS_UART3
+
+static void uart3_init(
+	UNUSED_ARG(struct SerialHardware *, _hw),
+	UNUSED_ARG(struct Serial *, ser))
+{
+	SER_UART3_BUS_TXINIT;
+	RTS_ON;
+	SER_STROBE_INIT;
+}
+
+static void uart3_cleanup(UNUSED_ARG(struct SerialHardware *, _hw))
+{
+	UCSR3B = 0;
+}
+
+static void uart3_enabletxirq(struct SerialHardware *_hw)
+{
+	struct AvrSerial *hw = (struct AvrSerial *)_hw;
+
+	/*
+	 * WARNING: racy code here!  The tx interrupt
+	 * sets hw->sending to false when it runs with
+	 * an empty fifo.  The order of the statements
+	 * in the if-block matters.
+	 */
+	if (!hw->sending)
+	{
+		hw->sending = true;
+		SER_UART3_BUS_TXBEGIN;
+	}
+}
+
+static void uart3_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned long rate)
+{
+	/* Compute baud-rate period */
+	uint16_t period = DIV_ROUND(CPU_FREQ / 16UL, rate) - 1;
+
+	UBRR3H = (period) >> 8;
+	UBRR3L = (period);
+
+	//DB(kprintf("uart3_setbaudrate(rate=%ld): period=%d\n", rate, period);)
+}
+
+static void uart3_setparity(UNUSED_ARG(struct SerialHardware *, _hw), int parity)
+{
+	UCSR3C = (UCSR3C & ~(BV(UPM31) | BV(UPM30))) | ((parity) << UPM30);
+}
+
+#endif // AVR_HAS_UART3
+
 
 static void spi_init(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(struct Serial *, ser))
 {
@@ -608,6 +813,30 @@ static const struct SerialHardwareVT UART1_VT =
 };
 #endif // AVR_HAS_UART1
 
+#if AVR_HAS_UART2
+static const struct SerialHardwareVT UART2_VT =
+{
+	C99INIT(init, uart2_init),
+	C99INIT(cleanup, uart2_cleanup),
+	C99INIT(setBaudrate, uart2_setbaudrate),
+	C99INIT(setParity, uart2_setparity),
+	C99INIT(txStart, uart2_enabletxirq),
+	C99INIT(txSending, tx_sending),
+};
+#endif // AVR_HAS_UART2
+
+#if AVR_HAS_UART3
+static const struct SerialHardwareVT UART3_VT =
+{
+	C99INIT(init, uart3_init),
+	C99INIT(cleanup, uart3_cleanup),
+	C99INIT(setBaudrate, uart3_setbaudrate),
+	C99INIT(setParity, uart3_setparity),
+	C99INIT(txStart, uart3_enabletxirq),
+	C99INIT(txSending, tx_sending),
+};
+#endif // AVR_HAS_UART3
+
 static const struct SerialHardwareVT SPI_VT =
 {
 	C99INIT(init, spi_init),
@@ -638,6 +867,30 @@ static struct AvrSerial UARTDescs[SER_CNT] =
 			C99INIT(rxbuffer, uart1_rxbuffer),
 			C99INIT(txbuffer_size, sizeof(uart1_txbuffer)),
 			C99INIT(rxbuffer_size, sizeof(uart1_rxbuffer)),
+		},
+		C99INIT(sending, false),
+	},
+#endif
+#if AVR_HAS_UART2
+	{
+		C99INIT(hw, /**/) {
+			C99INIT(table, &UART2_VT),
+			C99INIT(txbuffer, uart2_txbuffer),
+			C99INIT(rxbuffer, uart2_rxbuffer),
+			C99INIT(txbuffer_size, sizeof(uart2_txbuffer)),
+			C99INIT(rxbuffer_size, sizeof(uart2_rxbuffer)),
+		},
+		C99INIT(sending, false),
+	},
+#endif
+#if AVR_HAS_UART3
+	{
+		C99INIT(hw, /**/) {
+			C99INIT(table, &UART3_VT),
+			C99INIT(txbuffer, uart3_txbuffer),
+			C99INIT(rxbuffer, uart3_rxbuffer),
+			C99INIT(txbuffer_size, sizeof(uart3_txbuffer)),
+			C99INIT(rxbuffer_size, sizeof(uart3_rxbuffer)),
 		},
 		C99INIT(sending, false),
 	},
@@ -809,6 +1062,142 @@ DECLARE_ISR(USART1_TX_vect)
 
 #endif // AVR_HAS_UART1
 
+#if AVR_HAS_UART2
+
+/**
+ * Serial 2 TX interrupt handler
+ */
+DECLARE_ISR(USART2_UDRE_vect)
+{
+	SER_STROBE_ON;
+
+	struct FIFOBuffer * const txfifo = &ser_handles[SER_UART2]->txfifo;
+
+	if (fifo_isempty(txfifo))
+	{
+		SER_UART2_BUS_TXEND;
+#ifndef SER_UART2_BUS_TXOFF
+		UARTDescs[SER_UART2].sending = false;
+#endif
+	}
+
+/**
+ * ATMEGA64, 128 and 103 do not have more than 2 USARTs
+
+#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA103
+	else if (!IS_CTS_ON)
+	{
+		// Disable rx interrupt and tx, enable CTS interrupt
+		// UNTESTED
+		UCSR1B = BV(BIT_RXCIE1) | BV(BIT_RXEN1) | BV(BIT_TXEN1);
+		EIFR |= EIMSKF_CTS;
+		EIMSK |= EIMSKF_CTS;
+	}
+#endif
+
+ */
+	else
+	{
+		char c = fifo_pop(txfifo);
+		SER_UART2_BUS_TXCHAR(c);
+	}
+
+	SER_STROBE_OFF;
+}
+
+#ifdef SER_UART2_BUS_TXOFF
+/**
+ * Serial port 2 TX complete interrupt handler.
+ *
+ * \sa port 0 TX complete handler.
+ */
+DECLARE_ISR(USART2_TX_vect)
+{
+	SER_STROBE_ON;
+
+	struct FIFOBuffer * const txfifo = &ser_handles[SER_UART2]->txfifo;
+	if (fifo_isempty(txfifo))
+	{
+		SER_UART2_BUS_TXOFF;
+		UARTDescs[SER_UART2].sending = false;
+	}
+	else
+		UCSR2B = BV(BIT_RXCIE2) | BV(BIT_UDRIE2) | BV(BIT_RXEN2) | BV(BIT_TXEN2);
+
+	SER_STROBE_OFF;
+}
+#endif /* SER_UART2_BUS_TXOFF */
+
+#endif // AVR_HAS_UART2
+
+#if AVR_HAS_UART3
+
+/**
+ * Serial 3 TX interrupt handler
+ */
+DECLARE_ISR(USART3_UDRE_vect)
+{
+	SER_STROBE_ON;
+
+	struct FIFOBuffer * const txfifo = &ser_handles[SER_UART3]->txfifo;
+
+	if (fifo_isempty(txfifo))
+	{
+		SER_UART3_BUS_TXEND;
+#ifndef SER_UART3_BUS_TXOFF
+		UARTDescs[SER_UART3].sending = false;
+#endif
+	}
+
+/**
+ * ATMEGA64, 128 and 103 do not have more than 2 USARTs
+
+#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA103
+	else if (!IS_CTS_ON)
+	{
+		// Disable rx interrupt and tx, enable CTS interrupt
+		// UNTESTED
+		UCSR1B = BV(BIT_RXCIE1) | BV(BIT_RXEN1) | BV(BIT_TXEN1);
+		EIFR |= EIMSKF_CTS;
+		EIMSK |= EIMSKF_CTS;
+	}
+#endif
+
+ */
+	else
+	{
+		char c = fifo_pop(txfifo);
+		SER_UART3_BUS_TXCHAR(c);
+	}
+
+	SER_STROBE_OFF;
+}
+
+#ifdef SER_UART3_BUS_TXOFF
+/**
+ * Serial port 3 TX complete interrupt handler.
+ *
+ * \sa port 0 TX complete handler.
+ */
+DECLARE_ISR(USART3_TX_vect)
+{
+	SER_STROBE_ON;
+
+	struct FIFOBuffer * const txfifo = &ser_handles[SER_UART3]->txfifo;
+	if (fifo_isempty(txfifo))
+	{
+		SER_UART3_BUS_TXOFF;
+		UARTDescs[SER_UART3].sending = false;
+	}
+	else
+		UCSR3B = BV(BIT_RXCIE3) | BV(BIT_UDRIE3) | BV(BIT_RXEN3) | BV(BIT_TXEN3);
+
+	SER_STROBE_OFF;
+}
+#endif /* SER_UART3_BUS_TXOFF */
+
+#endif // AVR_HAS_UART3
+
 
 /**
  * Serial 0 RX complete interrupt handler.
@@ -911,6 +1300,106 @@ DECLARE_ISR(USART1_RX_vect)
 }
 
 #endif // AVR_HAS_UART1
+
+#if AVR_HAS_UART2
+
+/**
+ * Serial 2 RX complete interrupt handler.
+ *
+ * This handler is interruptible.
+ * Interrupt are reenabled as soon as recv complete interrupt is
+ * disabled. Using INTERRUPT() is troublesome when the serial
+ * is heavily loaded, because an interrupt could be retriggered
+ * when executing the handler prologue before RXCIE is disabled.
+ *
+ * \see DECLARE_ISR(USART2_RX_vect)
+ */
+DECLARE_ISR(USART2_RX_vect)
+{
+	SER_STROBE_ON;
+
+	/* Disable Recv complete IRQ */
+	//UCSR1B &= ~BV(RXCIE);
+	//IRQ_ENABLE;
+
+	/* Should be read before UDR */
+	ser_handles[SER_UART2]->status |= UCSR2A & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
+
+	/* To avoid an IRQ storm, we must _always_ read the UDR even when we're
+	 * not going to accept the incoming data
+	 */
+	char c = UDR2;
+	struct FIFOBuffer * const rxfifo = &ser_handles[SER_UART2]->rxfifo;
+	//ASSERT_VALID_FIFO(rxfifo);
+
+	if (UNLIKELY(fifo_isfull(rxfifo)))
+		ser_handles[SER_UART2]->status |= SERRF_RXFIFOOVERRUN;
+	else
+	{
+		fifo_push(rxfifo, c);
+#if CONFIG_SER_HWHANDSHAKE
+		if (fifo_isfull(rxfifo))
+			RTS_OFF;
+#endif
+	}
+	/* Re-enable receive complete int */
+	//IRQ_DISABLE;
+	//UCSR1B |= BV(RXCIE);
+
+	SER_STROBE_OFF;
+}
+
+#endif // AVR_HAS_UART2
+
+#if AVR_HAS_UART3
+
+/**
+ * Serial 3 RX complete interrupt handler.
+ *
+ * This handler is interruptible.
+ * Interrupt are reenabled as soon as recv complete interrupt is
+ * disabled. Using INTERRUPT() is troublesome when the serial
+ * is heavily loaded, because an interrupt could be retriggered
+ * when executing the handler prologue before RXCIE is disabled.
+ *
+ * \see DECLARE_ISR(USART3_RX_vect)
+ */
+DECLARE_ISR(USART3_RX_vect)
+{
+	SER_STROBE_ON;
+
+	/* Disable Recv complete IRQ */
+	//UCSR1B &= ~BV(RXCIE);
+	//IRQ_ENABLE;
+
+	/* Should be read before UDR */
+	ser_handles[SER_UART3]->status |= UCSR3A & (SERRF_RXSROVERRUN | SERRF_FRAMEERROR);
+
+	/* To avoid an IRQ storm, we must _always_ read the UDR even when we're
+	 * not going to accept the incoming data
+	 */
+	char c = UDR3;
+	struct FIFOBuffer * const rxfifo = &ser_handles[SER_UART3]->rxfifo;
+	//ASSERT_VALID_FIFO(rxfifo);
+
+	if (UNLIKELY(fifo_isfull(rxfifo)))
+		ser_handles[SER_UART3]->status |= SERRF_RXFIFOOVERRUN;
+	else
+	{
+		fifo_push(rxfifo, c);
+#if CONFIG_SER_HWHANDSHAKE
+		if (fifo_isfull(rxfifo))
+			RTS_OFF;
+#endif
+	}
+	/* Re-enable receive complete int */
+	//IRQ_DISABLE;
+	//UCSR1B |= BV(RXCIE);
+
+	SER_STROBE_OFF;
+}
+
+#endif // AVR_HAS_UART3
 
 
 /**
