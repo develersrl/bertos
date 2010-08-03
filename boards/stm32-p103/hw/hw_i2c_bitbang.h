@@ -41,26 +41,56 @@
 #ifndef HW_I2C_BITBANG_H
 #define HW_I2C_BITBANG_H
 
-#warning TODO:This is an example implementation, you must implement it!
+#include <cfg/macros.h>
 
-#define SDA_HI  do { /* Implement me:Set SDA High by setting SDA pin as input */ } while (0)
-#define SDA_LO  do { /* Implement me:Set SDA Low by setting SDA pin as open collector output */ } while (0)
-#define SCL_HI  do { /* Implement me:Set SCL High by setting SCL pin as input */ } while (0)
-#define SCL_LO  do { /* Implement me:Set SCL Low by setting SCL pin as open collector output */ } while (0)
+#include <io/stm32.h>
+
+#include <drv/timer.h>
+#include <drv/gpio_stm32.h>
+#include <drv/clock_stm32.h>
+
+#define SDA_PIN   BV(0)
+#define SCL_PIN   BV(1)
+
+#define SDA_HI \
+			stm32_gpioPinConfig((struct stm32_gpio *)GPIOB_BASE, SDA_PIN, GPIO_MODE_IN_FLOATING, GPIO_SPEED_50MHZ)
+
+#define SDA_LO \
+			stm32_gpioPinConfig((struct stm32_gpio *)GPIOB_BASE, SDA_PIN, GPIO_MODE_OUT_PP, GPIO_SPEED_50MHZ)
+
+#define SCL_HI \
+			stm32_gpioPinConfig((struct stm32_gpio *)GPIOB_BASE, SCL_PIN, GPIO_MODE_IN_FLOATING, GPIO_SPEED_50MHZ)
+
+#define SCL_LO \
+			stm32_gpioPinConfig((struct stm32_gpio *)GPIOB_BASE, SCL_PIN, GPIO_MODE_OUT_PP, GPIO_SPEED_50MHZ)
 
 
-#define SCL_IN       (true) /* Implement me: read SDA pin state */
-#define SDA_IN       (true) /* Implement me: read SCL pin state */
+#define SCL_IN \
+		({ \
+			(stm32_gpioPinRead((struct stm32_gpio *)GPIOB_BASE, SCL_PIN)); \
+		})
+
+#define SDA_IN \
+		({ \
+			(stm32_gpioPinRead((struct stm32_gpio *)GPIOB_BASE, SDA_PIN)); \
+		})
 
 /**
  * This macro should set SDA and SCL lines as input.
  */
-#define I2C_BITBANG_HW_INIT do { /* Implement me! */ } while (0)
+#define I2C_BITBANG_HW_INIT \
+	do { \
+		RCC->APB2ENR |= RCC_APB2_GPIOB; \
+		stm32_gpioPinConfig((struct stm32_gpio *)GPIOB_BASE, SDA_PIN | SCL_PIN, GPIO_MODE_IN_FLOATING, GPIO_SPEED_50MHZ); \
+	} while (0)
 
 /**
  * Half bit delay routine used to generate the correct timings.
  */
-#define I2C_HALFBIT_DELAY() do { /* Implement me! */ } while (0)
+#define I2C_HALFBIT_DELAY() \
+	do { \
+	timer_delay(1); \
+	} while (0)
 
 
 /*
@@ -71,39 +101,37 @@
 INLINE void i2c_sdaHi(int dev)
 {
 	(void)(dev);
-	/* Implement me:Set SDA High by setting SDA pin as input */
+	stm32_gpioPinConfig((struct stm32_gpio *)GPIOB_BASE, SDA_PIN, GPIO_MODE_IN_FLOATING, GPIO_SPEED_50MHZ);
 }
 
 INLINE void i2c_sdaLo(int dev)
 {
 	(void)(dev);
-	/* Implement me:Set SDA Low by setting SDA pin as open collector output */
+	stm32_gpioPinConfig((struct stm32_gpio *)GPIOB_BASE, SDA_PIN, GPIO_MODE_OUT_PP, GPIO_SPEED_50MHZ);
 }
 
 INLINE void i2c_sclHi(int dev)
 {
 	(void)(dev);
-	/* Implement me:Set SCL High by setting SCL pin as input */
+	stm32_gpioPinConfig((struct stm32_gpio *)GPIOB_BASE, SCL_PIN, GPIO_MODE_IN_FLOATING, GPIO_SPEED_50MHZ);
 }
 
 INLINE void i2c_sclLo(int dev)
 {
 	(void)(dev);
-	/* Implement me:Set SCL Low by setting SCL pin as open collector output */
+	stm32_gpioPinConfig((struct stm32_gpio *)GPIOB_BASE, SCL_PIN, GPIO_MODE_OUT_PP, GPIO_SPEED_50MHZ);
 }
 
 INLINE bool i2c_sdaIn(int dev)
 {
 	(void)(dev);
-	/* Implement me: read SDA pin state */
-	return true;
+	return stm32_gpioPinRead((struct stm32_gpio *)GPIOB_BASE, SDA_PIN);
 }
 
 INLINE bool i2c_sclIn(int dev)
 {
 	(void)(dev);
-	/* Implement me: read SCL pin state */
-	return true;
+	return stm32_gpioPinRead((struct stm32_gpio *)GPIOB_BASE, SCL_PIN);
 }
 
 /**
@@ -112,7 +140,7 @@ INLINE bool i2c_sclIn(int dev)
 INLINE void i2c_halfbitDelay(int dev)
 {
 	(void)(dev);
-	/* Implement me! */
+	timer_udelay(1);
 }
 
 /**
@@ -121,7 +149,8 @@ INLINE void i2c_halfbitDelay(int dev)
 INLINE void i2c_bitbangInit(int dev)
 {
 	(void)(dev);
-	/* Implement me! */
+	RCC->APB2ENR |= RCC_APB2_GPIOB;
+	stm32_gpioPinConfig((struct stm32_gpio *)GPIOB_BASE, SDA_PIN | SCL_PIN, GPIO_MODE_IN_FLOATING, GPIO_SPEED_50MHZ);
 }
 
 #endif /* HW_I2C_BITBANG_H */
