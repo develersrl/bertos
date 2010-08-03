@@ -326,7 +326,7 @@ INLINE int i2c_error(I2c *i2c)
 	return err;
 }
 
-#define i2c_init_3(i2c, dev, clock)   ((((dev) > I2C_BITBANG0) | ((dev) == I2C_BITBANG_OLD)) ? \
+#define i2c_init_3(i2c, dev, clock)   ((((dev) >= I2C_BITBANG0) | ((dev) == I2C_BITBANG_OLD)) ? \
 										i2c_hw_bitbangInit((i2c), (dev)) : i2c_hw_init((i2c), (dev), (clock)))
 
 #if !CONFIG_I2C_DISABLE_OLD_API
