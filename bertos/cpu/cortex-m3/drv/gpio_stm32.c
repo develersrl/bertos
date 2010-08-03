@@ -35,10 +35,13 @@
  * \author Andrea Righi <arighi@develer.com>
  */
 
+#include "gpio_stm32.h"
+
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
+
 #include <io/stm32.h>
-#include "gpio_stm32.h"
+
 
 /**
  * Configure a GPIO pin
