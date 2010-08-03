@@ -101,7 +101,8 @@ void adc_hw_select_ch(uint8_t ch)
 	/* Set to 0 all mux registers */
 	#if CPU_AVR_ATMEGA8 || CPU_AVR_ATMEGA328P || CPU_AVR_ATMEGA168
 		ADMUX &= ~(BV(MUX3) | BV(MUX2) | BV(MUX1) | BV(MUX0));
-	#elif CPU_AVR_ATMEGA32 || CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281
+	#elif CPU_AVR_ATMEGA32 || CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281 \
+	      || CPU_AVR_ATMEGA1280
 		ADMUX &= ~(BV(MUX4) | BV(MUX3) | BV(MUX2) | BV(MUX1) | BV(MUX0));
 	#else
 		#error Unknown CPU
