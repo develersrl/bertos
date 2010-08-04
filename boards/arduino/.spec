@@ -15,7 +15,7 @@ description = '''
 	</tr>
 	<tr>
 		<td><b>Memory</b></td>
-		<td>32kB Flash, 2kB SRAM</td>
+		<td>32kB Flash, 2kB SRAM, 1kB EEPROM</td>
 	</tr>
 
 	<tr>
