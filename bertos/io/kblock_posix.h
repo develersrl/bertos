@@ -42,21 +42,21 @@
 
 #include <stdio.h>
 
-typedef struct KBlockFile
+typedef struct KBlockPosix
 {
 	KBlock b;
 	FILE *fp;
-} KBlockFile;
+} KBlockPosix;
 
-#define KBT_KBLOCKFILE MAKE_ID('K', 'B', 'F', 'L')
+#define KBT_KBLOCKPOSIX MAKE_ID('K', 'B', 'F', 'L')
 
 
-INLINE KBlockFile *KBLOCKFILE_CAST(KBlock *b)
+INLINE KBlockPosix *KBLOCKPOSIX_CAST(KBlock *b)
 {
-	ASSERT(b->priv.type == KBT_KBLOCKFILE);
-	return (KBlockFile *)b;
+	ASSERT(b->priv.type == KBT_KBLOCKPOSIX);
+	return (KBlockPosix *)b;
 }
 
-void kblockfile_init(KBlockFile *f, FILE *fp, bool hwbuf, void *buf, size_t block_size, block_idx_t block_count);
+void kblockposix_init(KBlockPosix *f, FILE *fp, bool hwbuf, void *buf, size_t block_size, block_idx_t block_count);
 
 #endif /* KBLOCK_POSIX_H */

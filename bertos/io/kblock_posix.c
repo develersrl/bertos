@@ -39,120 +39,120 @@
  */
 
 
-#include "kblock_file.h"
+#include "kblock_posix.h"
 #include <string.h>
 #include <stdio.h>
 
 
-static int kblockfile_load(KBlock *b, block_idx_t index)
+static int kblockposix_load(KBlock *b, block_idx_t index)
 {
-	KBlockFile *f = KBLOCKFILE_CAST(b);
+	KBlockPosix *f = KBLOCKPOSIX_CAST(b);
 	fseek(f->fp, index * b->blk_size, SEEK_SET);
 	return (fread(f->b.priv.buf, 1, b->blk_size, f->fp) == b->blk_size) ? 0 : EOF;
 }
 
-static int kblockfile_store(struct KBlock *b, block_idx_t index)
+static int kblockposix_store(struct KBlock *b, block_idx_t index)
 {
-	KBlockFile *f = KBLOCKFILE_CAST(b);
+	KBlockPosix *f = kblockposix_CAST(b);
 	fseek(f->fp, index * b->blk_size, SEEK_SET);
 	return (fwrite(f->b.priv.buf, 1, b->blk_size, f->fp) == b->blk_size) ? 0 : EOF;
 }
 
-static size_t kblockfile_readBuf(struct KBlock *b, void *buf, size_t offset, size_t size)
+static size_t kblockposix_readBuf(struct KBlock *b, void *buf, size_t offset, size_t size)
 {
-	KBlockFile *f = KBLOCKFILE_CAST(b);
+	KBlockPosix *f = KBLOCKPOSIX_CAST(b);
 	memcpy(buf, (uint8_t *)f->b.priv.buf + offset, size);
 	return size;
 }
 
-static size_t kblockfile_readDirect(struct KBlock *b, block_idx_t index, void *buf, size_t offset, size_t size)
+static size_t kblockposix_readDirect(struct KBlock *b, block_idx_t index, void *buf, size_t offset, size_t size)
 {
-	KBlockFile *f = KBLOCKFILE_CAST(b);
+	KBlockPosix *f = KBLOCKPOSIX_CAST(b);
 	fseek(f->fp, index * b->blk_size + offset, SEEK_SET);
 	return fread(buf, 1, size, f->fp);
 }
 
-static size_t kblockfile_writeBuf(struct KBlock *b, const void *buf, size_t offset, size_t size)
+static size_t kblockposix_writeBuf(struct KBlock *b, const void *buf, size_t offset, size_t size)
 {
-	KBlockFile *f = KBLOCKFILE_CAST(b);
+	KBlockPosix *f = KBLOCKPOSIX_CAST(b);
 	memcpy((uint8_t *)f->b.priv.buf + offset, buf, size);
 	return size;
 }
 
-static size_t kblockfile_writeDirect(struct KBlock *b, block_idx_t index, const void *buf, size_t offset, size_t size)
+static size_t kblockposix_writeDirect(struct KBlock *b, block_idx_t index, const void *buf, size_t offset, size_t size)
 {
-	KBlockFile *f = KBLOCKFILE_CAST(b);
+	KBlockPosix *f = KBLOCKPOSIX_CAST(b);
 	ASSERT(buf);
 	ASSERT(index < b->blk_cnt);
 	fseek(f->fp, index * b->blk_size + offset, SEEK_SET);
 	return fwrite(buf, 1, size, f->fp);
 }
 
-static int kblockfile_error(struct KBlock *b)
+static int kblockposix_error(struct KBlock *b)
 {
-	KBlockFile *f = KBLOCKFILE_CAST(b);
+	KBlockPosix *f = KBLOCKPOSIX_CAST(b);
 	return ferror(f->fp);
 }
 
 
-static int kblockfile_claererr(struct KBlock *b)
+static int kblockposix_claererr(struct KBlock *b)
 {
-	KBlockFile *f = KBLOCKFILE_CAST(b);
+	KBlockPosix *f = KBLOCKPOSIX_CAST(b);
 	clearerr(f->fp);
 	return 0;
 }
 
 
-static int kblockfile_close(struct KBlock *b)
+static int kblockposix_close(struct KBlock *b)
 {
-	KBlockFile *f = KBLOCKFILE_CAST(b);
+	KBlockPosix *f = KBLOCKPOSIX_CAST(b);
 
 	return fflush(f->fp) | fclose(f->fp);
 }
 
 
-static const KBlockVTable kblockfile_hwbuffered_vt =
+static const KBlockVTable kblockposix_hwbuffered_vt =
 {
-	.readDirect = kblockfile_readDirect,
+	.readDirect = kblockposix_readDirect,
 
-	.readBuf = kblockfile_readBuf,
-	.writeBuf = kblockfile_writeBuf,
-	.load = kblockfile_load,
-	.store = kblockfile_store,
+	.readBuf = kblockposix_readBuf,
+	.writeBuf = kblockposix_writeBuf,
+	.load = kblockposix_load,
+	.store = kblockposix_store,
 
-	.error = kblockfile_error,
-	.clearerr = kblockfile_claererr,
-	.close = kblockfile_close,
+	.error = kblockposix_error,
+	.clearerr = kblockposix_claererr,
+	.close = kblockposix_close,
 };
 
-static const KBlockVTable kblockfile_swbuffered_vt =
+static const KBlockVTable kblockposix_swbuffered_vt =
 {
-	.readDirect = kblockfile_readDirect,
-	.writeDirect =kblockfile_writeDirect,
+	.readDirect = kblockposix_readDirect,
+	.writeDirect =kblockposix_writeDirect,
 
 	.readBuf = kblock_swReadBuf,
 	.writeBuf = kblock_swWriteBuf,
 	.load = kblock_swLoad,
 	.store = kblock_swStore,
 
-	.error = kblockfile_error,
-	.clearerr = kblockfile_claererr,
-	.close = kblockfile_close,
+	.error = kblockposix_error,
+	.clearerr = kblockposix_claererr,
+	.close = kblockposix_close,
 };
 
-static const KBlockVTable kblockfile_unbuffered_vt =
+static const KBlockVTable kblockposix_unbuffered_vt =
 {
-	.readDirect = kblockfile_readDirect,
-	.writeDirect =kblockfile_writeDirect,
+	.readDirect = kblockposix_readDirect,
+	.writeDirect =kblockposix_writeDirect,
 
-	.error = kblockfile_error,
-	.clearerr = kblockfile_claererr,
-	.close = kblockfile_close,
+	.error = kblockposix_error,
+	.clearerr = kblockposix_claererr,
+	.close = kblockposix_close,
 };
 
 
 
-void kblockfile_init(KBlockFile *f, FILE *fp, bool hwbuf, void *buf, size_t block_size, block_idx_t block_count)
+void kblockposix_init(KBlockPosix *f, FILE *fp, bool hwbuf, void *buf, size_t block_size, block_idx_t block_count)
 {
 	ASSERT(f);
 	ASSERT(fp);
@@ -160,7 +160,7 @@ void kblockfile_init(KBlockFile *f, FILE *fp, bool hwbuf, void *buf, size_t bloc
 
 	memset(f, 0, sizeof(*f));
 
-	DB(f->b.priv.type = KBT_KBLOCKFILE);
+	DB(f->b.priv.type = KBT_KBLOCKPOSIX);
 
 	f->fp = fp;
 	f->b.blk_size = block_size;
@@ -172,12 +172,12 @@ void kblockfile_init(KBlockFile *f, FILE *fp, bool hwbuf, void *buf, size_t bloc
 		f->b.priv.flags |= KB_BUFFERED;
 		f->b.priv.buf = buf;
 		if (hwbuf)
-			f->b.priv.vt = &kblockfile_hwbuffered_vt;
+			f->b.priv.vt = &kblockposix_hwbuffered_vt;
 		else
-			f->b.priv.vt = &kblockfile_swbuffered_vt;
-		kblockfile_load(&f->b, 0);
+			f->b.priv.vt = &kblockposix_swbuffered_vt;
+		kblockposix_load(&f->b, 0);
 		f->b.priv.curr_blk = 0;
 	}
 	else
-		f->b.priv.vt = &kblockfile_unbuffered_vt;
+		f->b.priv.vt = &kblockposix_unbuffered_vt;
 }
