@@ -43,7 +43,6 @@
 #define ACR_HLFCYA_MASK          ((uint32_t)0xFFFFFFF7)
 #define ACR_PRFTBE_MASK          ((uint32_t)0xFFFFFFEF)
 
-#ifdef _FLASH_PROG
 /* Flash Access Control Register bits */
 #define ACR_PRFTBS_MASK          ((uint32_t)0x00000020)
 
@@ -132,11 +131,11 @@
 #define OB_IWDG_HW                  ((uint16_t)0x0000)  /* Hardware IWDG selected */
 
 /* Option Bytes nRST_STOP */
-#define OB_STOP_NoRST               ((uint16_t)0x0002) /* No reset generated when entering in STOP */
+#define OB_STOP_NORST               ((uint16_t)0x0002) /* No reset generated when entering in STOP */
 #define OB_STOP_RST                 ((uint16_t)0x0000) /* Reset generated when entering in STOP */
 
 /* Option Bytes nRST_STDBY */
-#define OB_STDBY_NoRST              ((uint16_t)0x0004) /* No reset generated when entering in STANDBY */
+#define OB_STDBY_NORST              ((uint16_t)0x0004) /* No reset generated when entering in STANDBY */
 #define OB_STDBY_RST                ((uint16_t)0x0000) /* Reset generated when entering in STANDBY */
 
 /* FLASH Interrupts */
