@@ -50,7 +50,7 @@
 typedef struct KFileBlock
 {
 	KFile fd;  ///< KFile context
-	KBlock *b; ///< KBlock device
+	KBlock *blk; ///< KBlock device
 } KFileBlock;
 
 /**
@@ -63,6 +63,6 @@ typedef struct KFileBlock
  * \param fb KFileBlock context.
  * \param b  block device to be accessed with a KFile interface.
  */
-void kfileblock_init(KFileBlock *fb, KBlock *b);
+void kfileblock_init(KFileBlock *fb, KBlock *blk);
 
 #endif /* IO_KFILE_KBLOCK_H */

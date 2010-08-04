@@ -55,56 +55,68 @@ INLINE KFileBlock * KFILEBLOCK_CAST(KFile *fd)
 #define KFILEBLOCK(dir, fd, buf, size) \
 ({ \
 	KFileBlock *fb = KFILEBLOCK_CAST(fd); \
-	block_idx_t id = (fd)->seek_pos / fb->b->blk_size; \
-	size_t offset = (fd)->seek_pos % fb->b->blk_size; \
-	size_t len = kblock_##dir(fb->b, id, buf, offset, size); \
-	(fd)->seek_pos += len; \
+	size_t len = 0; \
+	while (size) \
+	{ \
+		block_idx_t id = (fd)->seek_pos / fb->blk->blk_size; \
+		size_t offset = (fd)->seek_pos % fb->blk->blk_size; \
+		size_t count = MIN(size, (size_t)(fb->blk->blk_size - offset)); \
+		size_t ret_len = kblock_##dir(fb->blk, id, buf, offset, count); \
+		size -= ret_len; \
+		(fd)->seek_pos += ret_len; \
+		buf = buf + ret_len; \
+		len += ret_len; \
+		if (ret_len != count) \
+			break; \
+	} \
 	len; \
 })
 
-static size_t kfileblock_read(struct KFile *fd, void *buf, size_t size)
+static size_t kfileblock_read(struct KFile *fd, void *_buf, size_t size)
 {
+	uint8_t *buf = (uint8_t *)_buf;
 	return KFILEBLOCK(read, fd, buf, size);
 }
 
-static size_t kfileblock_write(struct KFile *fd, const void *buf, size_t size)
+static size_t kfileblock_write(struct KFile *fd, const void *_buf, size_t size)
 {
+	const uint8_t *buf = (const uint8_t *)_buf;
 	return KFILEBLOCK(write, fd, buf, size);
 }
 
 static int kfileblock_flush(struct KFile *fd)
 {
 	KFileBlock *fb = KFILEBLOCK_CAST(fd);
-	return kblock_flush(fb->b);
+	return kblock_flush(fb->blk);
 }
 
 static int kfileblock_error(struct KFile *fd)
 {
 	KFileBlock *fb = KFILEBLOCK_CAST(fd);
-	return kblock_error(fb->b);
+	return kblock_error(fb->blk);
 }
 
 static void kfileblock_clearerr(struct KFile *fd)
 {
 	KFileBlock *fb = KFILEBLOCK_CAST(fd);
-	return kblock_clearerr(fb->b);
+	return kblock_clearerr(fb->blk);
 }
 
 static int kfileblock_close(struct KFile *fd)
 {
 	KFileBlock *fb = KFILEBLOCK_CAST(fd);
-	return kblock_close(fb->b);
+	return kblock_close(fb->blk);
 }
 
-void kfileblock_init(KFileBlock *fb, KBlock *b)
+void kfileblock_init(KFileBlock *fb, KBlock *blk)
 {
 	ASSERT(fb);
-	ASSERT(b);
+	ASSERT(blk);
 	memset(fb, 0, sizeof(*fb));
 	kfile_init(&fb->fd);
 	DB(fb->fd._type = KFT_KFILEBLOCK);
-	fb->b = b;
-	fb->fd.size = b->blk_cnt * b->blk_size;
+	fb->blk = blk;
+	fb->fd.size = blk->blk_cnt * blk->blk_size;
 	fb->fd.read = kfileblock_read;
 	fb->fd.write = kfileblock_write;
 	fb->fd.flush = kfileblock_flush;
