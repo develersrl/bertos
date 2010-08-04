@@ -35,8 +35,8 @@
  * \brief KBlock interface
  */
 
-#ifndef KBLOCK_FILE_H
-#define KBLOCK_FILE_H
+#ifndef KBLOCK_POSIX_H
+#define KBLOCK_POSIX_H
 
 #include "kblock.h"
 
@@ -59,4 +59,4 @@ INLINE KBlockFile *KBLOCKFILE_CAST(KBlock *b)
 
 void kblockfile_init(KBlockFile *f, FILE *fp, bool hwbuf, void *buf, size_t block_size, block_idx_t block_count);
 
-#endif /* KBLOCK_FILE_H */
+#endif /* KBLOCK_POSIX_H */
