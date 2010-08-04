@@ -1080,22 +1080,6 @@ DECLARE_ISR(USART2_UDRE_vect)
 		UARTDescs[SER_UART2].sending = false;
 #endif
 	}
-
-/**
- * ATMEGA64, 128 and 103 do not have more than 2 USARTs
-
-#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA103
-	else if (!IS_CTS_ON)
-	{
-		// Disable rx interrupt and tx, enable CTS interrupt
-		// UNTESTED
-		UCSR1B = BV(BIT_RXCIE1) | BV(BIT_RXEN1) | BV(BIT_TXEN1);
-		EIFR |= EIMSKF_CTS;
-		EIMSK |= EIMSKF_CTS;
-	}
-#endif
-
- */
 	else
 	{
 		char c = fifo_pop(txfifo);
@@ -1148,22 +1132,6 @@ DECLARE_ISR(USART3_UDRE_vect)
 		UARTDescs[SER_UART3].sending = false;
 #endif
 	}
-
-/**
- * ATMEGA64, 128 and 103 do not have more than 2 USARTs
-
-#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA103
-	else if (!IS_CTS_ON)
-	{
-		// Disable rx interrupt and tx, enable CTS interrupt
-		// UNTESTED
-		UCSR1B = BV(BIT_RXCIE1) | BV(BIT_RXEN1) | BV(BIT_TXEN1);
-		EIFR |= EIMSKF_CTS;
-		EIMSK |= EIMSKF_CTS;
-	}
-#endif
-
- */
 	else
 	{
 		char c = fifo_pop(txfifo);
