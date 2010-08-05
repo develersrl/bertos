@@ -63,7 +63,7 @@ SRC_LIST="
 	bertos/cfg/kfile_debug.c
 	bertos/io/kblock.c
 	bertos/io/kblock_ram.c
-	bertos/io/kblock_file.c
+	bertos/io/kblock_posix.c
 	bertos/io/kfile.c
 "
 
