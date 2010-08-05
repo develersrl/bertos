@@ -61,7 +61,7 @@ typedef struct KFileBlock
  *       random write access.
  *
  * \param fb KFileBlock context.
- * \param b  block device to be accessed with a KFile interface.
+ * \param blk block device to be accessed with a KFile interface.
  */
 void kfileblock_init(KFileBlock *fb, KBlock *blk);
 
