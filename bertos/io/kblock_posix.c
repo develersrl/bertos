@@ -53,7 +53,7 @@ static int kblockposix_load(KBlock *b, block_idx_t index)
 
 static int kblockposix_store(struct KBlock *b, block_idx_t index)
 {
-	KBlockPosix *f = kblockposix_CAST(b);
+	KBlockPosix *f = KBLOCKPOSIX_CAST(b);
 	fseek(f->fp, index * b->blk_size, SEEK_SET);
 	return (fwrite(f->b.priv.buf, 1, b->blk_size, f->fp) == b->blk_size) ? 0 : EOF;
 }
