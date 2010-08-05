@@ -104,12 +104,23 @@ void adc_hw_select_ch(uint8_t ch)
 	#elif CPU_AVR_ATMEGA32 || CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281 \
 	      || CPU_AVR_ATMEGA1280
 		ADMUX &= ~(BV(MUX4) | BV(MUX3) | BV(MUX2) | BV(MUX1) | BV(MUX0));
+		#if CPU_AVR_ATMEGA1280
+			ADCSRB &= ~(BV(MUX5));
+		#endif
 	#else
 		#error Unknown CPU
 	#endif
 
-	/* Select channel, only first 8 channel modes are supported for now */
+	/* Select channel, only first 8 channel modes are supported */
 	ADMUX |= (ch & 0x07);
+
+	#if CPU_AVR_ATMEGA1280
+		/* Select channel, all 16 channels are supported */
+		if (ch > 0x07)
+			ADCSRB |= BV(MUX5);
+
+	#endif
+
 }
 
 
