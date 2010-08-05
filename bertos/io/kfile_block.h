@@ -49,7 +49,7 @@
  */
 typedef struct KFileBlock
 {
-	KFile fd;  ///< KFile context
+	KFile fd;    ///< KFile context
 	KBlock *blk; ///< KBlock device
 } KFileBlock;
 
