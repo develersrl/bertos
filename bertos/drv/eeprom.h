@@ -42,7 +42,7 @@
 #ifndef DRV_EEPROM_H
 #define DRV_EEPROM_H
 
-#define EEPROM_OLD_API  1
+#include "cfg/cfg_eeprom.h"
 
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
@@ -56,9 +56,11 @@
 #include <cpu/attr.h>
 
 #if COMPILER_C99
-	#define eeprom_init(...)        PP_CAT(eeprom_init ## _, COUNT_PARMS(__VA_ARGS__)) (__VA_ARGS__)
+	#define eeprom_init(...)          PP_CAT(eeprom_init ## _, COUNT_PARMS(__VA_ARGS__)) (__VA_ARGS__)
+	#define eeprom_verify(...)        PP_CAT(eeprom_verify ## _, COUNT_PARMS(__VA_ARGS__)) (__VA_ARGS__)
 #else
-	#define eeprom_init(args...)    PP_CAT(eeprom_init ## _, COUNT_PARMS(args)) (args)
+	#define eeprom_init(args...)      PP_CAT(eeprom_init ## _, COUNT_PARMS(args)) (args)
+	#define eeprom_verify(args...)    PP_CAT(eeprom_verify ## _, COUNT_PARMS(args)) (args)
 #endif
 
 
@@ -93,17 +95,17 @@ typedef struct Eeprom
 	EepromType type;   ///< EEPROM type
 	e2dev_addr_t addr; ///< Device address.
 	bool verify;
-#if EEPROM_OLD_API
+#if !CONFIG_EEPROM_DISABLE_OLD_API
 	union {
 		KFile fd;
 		KFileBlock fdblk;
 	} DEPRECATED;
-#endif
+#endif /* !CONFIG_EEPROM_DISABLE_OLD_API */
 } Eeprom;
 
-#if EEPROM_OLD_API
+#if !CONFIG_EEPROM_DISABLE_OLD_API
 	STATIC_ASSERT(offsetof(Eeprom, fd) == offsetof(Eeprom, fdblk.fd));
-#endif
+#endif /* !CONFIG_EEPROM_DISABLE_OLD_API */
 
 /**
  * ID for eeproms.
@@ -154,19 +156,21 @@ typedef struct EepromInfo
 	e2_size_t e2_size;     ///< eeprom size
 } EepromInfo;
 
-void eeprom_init_5(Eeprom *blk, I2c *i2c, EepromType type, e2dev_addr_t addr, bool verify);
+bool eeprom_erase(Eeprom *eep, e2addr_t addr, e2_size_t count);
+bool eeprom_verify_4(Eeprom *eep, e2addr_t addr, const void *buf, size_t count);
+void eeprom_init_5(Eeprom *eep, I2c *i2c, EepromType type, e2dev_addr_t addr, bool verify);
 
-#if EEPROM_OLD_API
-DEPRECATED bool eeprom_erase(Eeprom *fd, e2addr_t addr, e2_size_t count);
-DEPRECATED bool eeprom_verify(Eeprom *fd, const void *buf, size_t count);
+#if !CONFIG_EEPROM_DISABLE_OLD_API
 
-
-DEPRECATED INLINE void eeprom_init_4(Eeprom *ee, EepromType type, e2dev_addr_t addr, bool verify)
+DEPRECATED INLINE bool eeprom_verify_3(Eeprom *eep, const void *buf, size_t count)
 {
-	eeprom_init_5(ee, &local_i2c_old_api, type, addr, verify);
-	kfileblock_init(&ee->fdblk, &ee->blk);
+	return eeprom_verify_4(eep, (e2addr_t)eep->fdblk.fd.seek_pos, buf, count);
 }
-
-#endif
+DEPRECATED INLINE void eeprom_init_4(Eeprom *eep, EepromType type, e2dev_addr_t addr, bool verify)
+{
+	eeprom_init_5(eep, &local_i2c_old_api, type, addr, verify);
+	kfileblock_init(&eep->fdblk, &eep->blk);
+}
+#endif /* !CONFIG_EEPROM_DISABLE_OLD_API */
 
 #endif /* DRV_EEPROM_H */
