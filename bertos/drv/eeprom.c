@@ -108,6 +108,12 @@ STATIC_ASSERT(countof(mem_info) == EEPROM_CNT);
 
 #define CHUNCK_SIZE     16
 
+/**
+ * Erase EEPROM.
+ * \param eep is the Kblock context.
+ * \param addr eeprom address where start to erase
+ * \param size number of byte to erase
+ */
 bool eeprom_erase(Eeprom *eep, e2addr_t addr, e2_size_t size)
 {
 	uint8_t tmp[CHUNCK_SIZE] = { [0 ... (CHUNCK_SIZE - 1)] = 0xFF };
@@ -127,6 +133,13 @@ bool eeprom_erase(Eeprom *eep, e2addr_t addr, e2_size_t size)
 	return true;
 }
 
+/**
+ * Verify EEPROM.
+ * \param eep is the Kblock context.
+ * \param addr eeprom address where start to verify.
+ * \param buf buffer of data to compare with eeprom data read.
+ * \param size number of byte to verify.
+ */
 bool eeprom_verify(Eeprom *eep, e2addr_t addr, const void *buf, size_t size)
 {
     uint8_t verify_buf[CHUNCK_SIZE];
@@ -313,7 +326,7 @@ static const KBlockVTable eeprom_unbuffered_vt =
 
 /**
  * Initialize EEPROM module.
- * \param b is the Kblock context.
+ * \param eep is the Kblock context.
  * \param type is the eeprom device we want to initialize (\see EepromType)
  * \param i2c context for i2c channel
  * \param addr is the i2c devide address (usually pins A0, A1, A2).
