@@ -42,12 +42,24 @@
 #ifndef DRV_EEPROM_H
 #define DRV_EEPROM_H
 
+#define EEPROM_OLD_API  1
+
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
 
 #include <drv/i2c.h>
 
 #include <io/kblock.h>
+#include <io/kfile.h>
+#include <io/kfile_block.h>
+
+#include <cpu/attr.h>
+
+#if COMPILER_C99
+	#define eeprom_init(...)        PP_CAT(eeprom_init ## _, COUNT_PARMS(__VA_ARGS__)) (__VA_ARGS__)
+#else
+	#define eeprom_init(args...)    PP_CAT(eeprom_init ## _, COUNT_PARMS(args)) (args)
+#endif
 
 
 /**
@@ -76,11 +88,22 @@ typedef uint8_t e2dev_addr_t;
  */
 typedef struct Eeprom
 {
-	KBlock b;
+	KBlock blk;
 	I2c *i2c;
 	EepromType type;   ///< EEPROM type
 	e2dev_addr_t addr; ///< Device address.
+	bool verify;
+#if EEPROM_OLD_API
+	union {
+		KFile fd;
+		KFileBlock fdblk;
+	} DEPRECATED;
+#endif
 } Eeprom;
+
+#if EEPROM_OLD_API
+	STATIC_ASSERT(offsetof(Eeprom, fd) == offsetof(Eeprom, fdblk.fd));
+#endif
 
 /**
  * ID for eeproms.
@@ -90,10 +113,10 @@ typedef struct Eeprom
 /**
  * Convert + ASSERT from generic KFile to Eeprom.
  */
-INLINE Eeprom * EEPROM_CAST(KBlock *b)
+INLINE Eeprom * EEPROM_CAST_KBLOCK(KBlock *blk)
 {
-	ASSERT(b->priv.type == KBT_EEPROM);
-	return (Eeprom *)b;
+	ASSERT(blk->priv.type == KBT_EEPROM);
+	return (Eeprom *)blk;
 }
 
 /// Type for EEPROM addresses
@@ -131,12 +154,19 @@ typedef struct EepromInfo
 	e2_size_t e2_size;     ///< eeprom size
 } EepromInfo;
 
-#if 0
-bool eeprom_erase(Eeprom *fd, e2addr_t addr, e2_size_t count);
-bool eeprom_verify(Eeprom *fd, const void *buf, size_t count);
-void eeprom_init(Eeprom *fd, EepromType, e2dev_addr_t, bool verify);
-#endif
+void eeprom_init_5(Eeprom *blk, I2c *i2c, EepromType type, e2dev_addr_t addr, bool verify);
 
-void eeprom_init(Eeprom *b, I2c *i2c, EepromType type, e2dev_addr_t addr);
+#if EEPROM_OLD_API
+DEPRECATED bool eeprom_erase(Eeprom *fd, e2addr_t addr, e2_size_t count);
+DEPRECATED bool eeprom_verify(Eeprom *fd, const void *buf, size_t count);
+
+
+DEPRECATED INLINE void eeprom_init_4(Eeprom *ee, EepromType type, e2dev_addr_t addr, bool verify)
+{
+	eeprom_init_5(ee, &local_i2c_old_api, type, addr, verify);
+	kfileblock_init(&ee->fdblk, &ee->blk);
+}
+
+#endif
 
 #endif /* DRV_EEPROM_H */
