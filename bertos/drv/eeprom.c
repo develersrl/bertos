@@ -330,6 +330,7 @@ static const KBlockVTable eeprom_unbuffered_vt =
  * \param type is the eeprom device we want to initialize (\see EepromType)
  * \param i2c context for i2c channel
  * \param addr is the i2c devide address (usually pins A0, A1, A2).
+ * \param verify enable the write check.
  */
 void eeprom_init_5(Eeprom *eep, I2c *i2c, EepromType type, e2dev_addr_t addr, bool verify)
 {
