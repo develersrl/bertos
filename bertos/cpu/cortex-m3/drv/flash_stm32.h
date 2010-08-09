@@ -30,18 +30,21 @@
  *
  * -->
  *
- * \brief Low-level flash module for Cortex-M3 (interface).
+ * \brief STM32F103xx internal flash memory driver.
  *
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#include <cpu/detect.h>
+#ifndef FLASH_STM32_H
+#define FLASH_STM32_H
 
-#if CPU_CM3_LM3S
-	#include "flash_lm3s.h"
-#elif CPU_CM3_STM32
-	#include "flash_stm32.h"
-/*#elif  Add other Cortex-M3 CPUs here */
-#else
-	#error Unknown CPU
-#endif
+
+/* Flash memory mapping */
+#define FLASH_MEM_SIZE          0x40000 //< 256KiB
+#define FLASH_PAGE_SIZE_BYTES	0x400   //< 1KiB
+
+
+#define FLASH_PAGE_SIZE    FLASH_PAGE_SIZE_BYTES
+
+
+#endif /* FLASH_STM32_H */

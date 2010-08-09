@@ -26,22 +26,33 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
- *
+ * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \brief Low-level flash module for Cortex-M3 (interface).
- *
  * \author Daniele Basile <asterix@develer.com>
+ *
+ * \brief Configuration file for embedded flash module.
  */
 
-#include <cpu/detect.h>
+#ifndef CFG_EMB_FLASH_H
+#define CFG_EMB_FLASH_H
 
-#if CPU_CM3_LM3S
-	#include "flash_lm3s.h"
-#elif CPU_CM3_STM32
-	#include "flash_stm32.h"
-/*#elif  Add other Cortex-M3 CPUs here */
-#else
-	#error Unknown CPU
-#endif
+/**
+ * Module logging level.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
+ */
+#define CONFIG_FLASH_EMB_LOG_LEVEL      LOG_LVL_INFO
+
+/**
+ * module logging format.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define CONFIG_FLASH_EMB_LOG_FORMAT     LOG_FMT_TERSE
+
+#define CONFIG_FLASH_WR_TIMEOUT      100
+
+#endif /* CFG_FLASH_AT91_H */

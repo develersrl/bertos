@@ -43,14 +43,61 @@
 #define DRV_FLASH_H
 
 #include <cfg/macros.h>
-#include <cfg/module.h>
 
+#include <io/kblock.h>
+
+/*
+ * Embedded flash error flags
+ */
+#define FLASH_WR_OK             0     ///< Write ok.
+#define FLASH_NOT_ERASED     BV(1)    ///< Flash memory was not erased before to write it.
+#define FLASH_WR_PROTECT     BV(2)    ///< Write not allowed the flash memory was protected.
+#define FLASH_WR_TIMEOUT     BV(3)    ///<
+
+struct FlashHardware;
+
+/**
+ * EmbFlash KFile context structure.
+ */
+typedef struct Flash
+{
+	KBlock blk;
+	struct FlashHardware *hw;
+} Flash;
+
+/**
+ * ID for FLASH
+ */
+#define KBT_FLASH MAKE_ID('F', 'L', 'A', 'S')
+
+/**
+* Convert + ASSERT from generic KFile to Flash.
+*/
+INLINE Flash *FLASH_CAST(KBlock *fls)
+{
+	ASSERT(fls->priv.type == KBT_FLASH);
+	return (Flash *)fls;
+}
+
+void flash_hw_init(Flash *fls);
+void flash_hw_initUnbuffered(Flash *fls);
 
 #include CPU_HEADER(flash)
 
+INLINE void flash_init(Flash *fls)
+{
+	flash_hw_init(fls);
+}
+
+INLINE void flash_initUnbuffered(Flash *fls)
+{
+	flash_hw_initUnbuffered(fls);
+}
+
+#if 0
 /**
-* EmbFlash KFile context structure.
-*/
+ * EmbFlash KFile context structure.
+ */
 typedef struct Flash
 {
 	/**
@@ -103,6 +150,7 @@ INLINE void flash_init(Flash *fd)
 	MOD_INIT(flash);
 }
 
+#endif
 
 
 #endif /* DRV_FLASH_H */

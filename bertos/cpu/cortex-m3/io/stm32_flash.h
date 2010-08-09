@@ -36,7 +36,13 @@
 #ifndef STM32_FLASH_H
 #define STM32_FLASH_H
 
+#include <cfg/compiler.h>
+
 #include <cpu/types.h>
+
+/** Return the embedded flash size in kB */
+#define F_SIZE                   ((*(reg32_t *) 0x1FFFF7E0) & 0xFFFF)
+
 
 /* Flash Access Control Register bits */
 #define ACR_LATENCY_MASK         ((uint32_t)0x00000038)
@@ -148,5 +154,23 @@
 #define FLASH_FLAG_PGERR         ((uint32_t)0x00000004)  /* FLASH Program error flag */
 #define FLASH_FLAG_WRPRTERR      ((uint32_t)0x00000010)  /* FLASH Write protected error flag */
 #define FLASH_FLAG_OPTERR        ((uint32_t)0x00000001)  /* FLASH Option Byte error flag */
+
+
+
+/**
+ * Embbeded flash configuration registers structure
+ */
+struct stm32_flash
+{
+  reg32_t ACR;
+  reg32_t KEYR;
+  reg32_t OPTKEYR;
+  reg32_t SR;
+  reg32_t CR;
+  reg32_t AR;
+  reg32_t RESERVED;
+  reg32_t OBR;
+  reg32_t WRPR;
+};
 
 #endif /* STM32_FLASH_H */
