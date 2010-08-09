@@ -32,7 +32,7 @@
  *
  * \author Andrea Righi <arighi@develer.com>
  *
- * \brief Script for Olimex STM32-P103 Cortex-M3 board.
+ * \brief Script for STM32-P103 Cortex-M3 board.
  *
  */
 
@@ -41,7 +41,7 @@ OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
 
 /*
- * Define memory configuration for STM32F103R8 
+ * Define memory configuration for STM32F103R8
  */
 MEMORY
 {
@@ -70,9 +70,9 @@ SECTIONS
 		*(.text .text.*);
 		. = ALIGN (4);
 		*(.glue_7t);
-    		. = ALIGN(4);
-    		*(.glue_7);
-    		. = ALIGN(4);
+		. = ALIGN(4);
+		*(.glue_7);
+		. = ALIGN(4);
 	} > rom
 
 	__text_end = .;
