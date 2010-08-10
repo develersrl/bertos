@@ -53,6 +53,21 @@
  */
 #define CONFIG_FLASH_EMB_LOG_FORMAT     LOG_FMT_TERSE
 
+
+/**
+ * Write emb flash timeout.
+ * For how many milliseconds the cpu wait
+ * to complete write operation.
+ *
+ * $WIZ$ type = "int"
+ */
 #define CONFIG_FLASH_WR_TIMEOUT      100
+
+/**
+ * Check this to disable embedded flash deprecated API support.
+ *
+ * $WIZ$ type = "boolean"
+ */
+#define CONFIG_FLASH_DISABLE_OLD_API       0
 
 #endif /* CFG_FLASH_AT91_H */
