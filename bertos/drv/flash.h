@@ -42,9 +42,13 @@
 #ifndef DRV_FLASH_H
 #define DRV_FLASH_H
 
+#include "cfg/cfg_emb_flash.h"
+
 #include <cfg/macros.h>
 
 #include <io/kblock.h>
+#include <io/kfile.h>
+#include <io/kfile_block.h>
 
 /*
  * Embedded flash error flags
@@ -63,6 +67,12 @@ typedef struct Flash
 {
 	KBlock blk;
 	struct FlashHardware *hw;
+	#if !CONFIG_FLASH_DISABLE_OLD_API
+	union {
+		KFile fd;
+		KFileBlock fdblk;
+	} DEPRECATED;
+	#endif /* !CONFIG_FLASH_DISABLE_OLD_API */
 } Flash;
 
 /**
@@ -87,70 +97,16 @@ void flash_hw_initUnbuffered(Flash *fls);
 INLINE void flash_init(Flash *fls)
 {
 	flash_hw_init(fls);
+
+	#if !CONFIG_FLASH_DISABLE_OLD_API
+		kfileblock_init(&fls->fdblk, &fls->blk);
+	#endif /* !CONFIG_FLASH_DISABLE_OLD_API */
 }
 
 INLINE void flash_initUnbuffered(Flash *fls)
 {
 	flash_hw_initUnbuffered(fls);
 }
-
-#if 0
-/**
- * EmbFlash KFile context structure.
- */
-typedef struct Flash
-{
-	/**
-	 * File descriptor.
-	 */
-	KFile fd;
-
-	/**
-	 * Flag for checking if current page is modified.
-	 */
-	bool page_dirty;
-
-	/**
-	 * Current buffered page.
-	 */
-	page_t curr_page;
-
-	/**
-	 * Temporary buffer cointaing data block to
-	 * write on flash.
-	 */
-	uint8_t page_buf[FLASH_PAGE_SIZE];
-} Flash;
-
-/**
-* ID for FLASH
-*/
-#define KFT_FLASH MAKE_ID('F', 'L', 'A', 'S')
-
-/**
-* Convert + ASSERT from generic KFile to Flash.
-*/
-INLINE Flash * FLASH_CAST(KFile *fd)
-{
-	ASSERT(fd->_type == KFT_FLASH);
-	return (Flash *)fd;
-}
-
-
-MOD_DEFINE(flash);
-
-/**
- *
- * Initialize PWM hw.
- */
-INLINE void flash_init(Flash *fd)
-{
-	flash_hw_init(fd);
-
-	MOD_INIT(flash);
-}
-
-#endif
 
 
 #endif /* DRV_FLASH_H */
