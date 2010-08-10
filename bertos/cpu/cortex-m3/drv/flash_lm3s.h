@@ -38,23 +38,4 @@
 #ifndef FLASH_LM3S_H
 #define FLASH_LM3S_H
 
-#include <cpu/types.h>
-#include <io/kfile.h>
-
-/* Flash memory mapping */
-#define FLASH_MEM_SIZE          0x40000 //< 256KiB
-#define FLASH_PAGE_SIZE_BYTES	0x400   //< 1KiB
-
-
-#define FLASH_PAGE_SIZE    FLASH_PAGE_SIZE_BYTES
-
-/**
- * Define data type to manage page and memory address.
- */
-typedef uint32_t page_t;
-
-struct Flash;
-
-void flash_hw_init(struct Flash *fd);
-
 #endif /* FLASH_LM3S_H */
