@@ -68,7 +68,7 @@ struct FlashHardware
 	uint8_t status;
 };
 
-INLINE bool flash_wait(struct KBlock *blk)
+static bool flash_wait(struct KBlock *blk)
 {
 	Flash *fls = FLASH_CAST(blk);
 	ticks_t start = timer_clock();
@@ -175,44 +175,19 @@ static size_t stm32_flash_writeDirect(struct KBlock *blk, block_idx_t idx, const
 
 	uint32_t addr = idx * blk->blk_size + offset;
 	const uint8_t *buf = (const uint8_t *)_buf;
-	size_t count = 0;
 
-	if (addr % 2)
-	{
-		if (!stm32_writeWord(blk, addr - 1, (buf[0] << 8) | 0xFF))
-			return count;
-
-		buf++;
-		size--;
-		count++;
-		addr++;
-	}
-
-	ASSERT(!(addr % 2));
 	while (size)
 	{
-		uint16_t data;
-		size_t len;
-		if (size == 1)
-		{
-			data = 0xFF00 | *buf;
-			len = 1;
-		}
-		else
-		{
-			data = ((*buf + 1) << 8) | *buf;
-			len = 2;
-		}
-
+		uint16_t data = ((*buf + 1) << 8) | *buf;
 		if (!stm32_writeWord(blk, addr, data))
-			return count;
+			return 0;
 
-		buf += len;
-		size -= len;
-		count += len;
-		addr += len;
+		buf += 2;
+		size -= 2;
+		addr += 2;
 	}
-	return count;
+
+	return blk->blk_size;
 }
 
 static const KBlockVTable flash_stm32_buffered_vt =
@@ -228,8 +203,6 @@ static const KBlockVTable flash_stm32_buffered_vt =
 	.error = stm32_flash_error,
 	.clearerr = stm32_flash_clearerror,
 };
-
-
 
 static const KBlockVTable flash_stm32_unbuffered_vt =
 {

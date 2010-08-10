@@ -38,13 +38,4 @@
 #ifndef FLASH_STM32_H
 #define FLASH_STM32_H
 
-
-/* Flash memory mapping */
-#define FLASH_MEM_SIZE          0x40000 //< 256KiB
-#define FLASH_PAGE_SIZE_BYTES	0x400   //< 1KiB
-
-
-#define FLASH_PAGE_SIZE    FLASH_PAGE_SIZE_BYTES
-
-
 #endif /* FLASH_STM32_H */
