@@ -36,7 +36,7 @@
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * $WIZ$ module_name = "eeprom"
- * $WIZ$ module_depends = "kfile", "i2c"
+ * $WIZ$ module_depends = "kfile", "kfile_block", "kblock", "i2c"
  */
 
 #ifndef DRV_EEPROM_H
