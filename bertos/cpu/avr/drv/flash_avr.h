@@ -34,74 +34,16 @@
  * \author Daniele Basile <asterix@develer.com>
  *
  * \brief AVR Internal flash read/write driver.
- *
- *
  */
 
-#ifndef FLASH_AT91_H
-#define FLASH_AT91_H
+#ifndef FLASH_AVR_H
+#define FLASH_AVR_H
 
-#include <cpu/types.h>
+#include "cfg/cfg_emb_flash.h"
 
-#include <cfg/compiler.h>
-
-#include <io/kfile.h>
-
-#include <avr/io.h>
-
-
-#define FLASH_PAGE_SIZE SPM_PAGESIZE
-
-/**
- * Definition of type for avr flash module.
- */
-typedef uint16_t page_t;
-
-/* Forward declaration */
-struct Flash;
-
-/**
- * FlashAvr KFile context structure.
- * DEPREACTED STRUCTURE!
- * Use Flash instead
- *
- * \{
- */
-typedef struct FlashAvr
-{
-	/**
-	 * File descriptor.
-	 */
-	KFile fd;
-
-	/**
-	 * Flag for checking if current page is modified.
-	 */
-	bool page_dirty;
-
-	/**
-	 * Current buffered page.
-	 */
-	page_t curr_page;
-
-	/**
-	 * Temporary buffer cointaing data block to
-	 * write on flash.
-	 */
-	uint8_t page_buf[SPM_PAGESIZE];
-} FlashAvr;
-/* \} */
-
-void flash_hw_init(struct Flash *fd);
-
-/**
- * WARNING!
- * This function is DEPRECADED!
- * use the flash module instead.
- */
-INLINE void flash_avr_init(struct FlashAvr *fd)
-{
-	flash_hw_init((struct Flash *)fd);
-}
+#if !CONFIG_FLASH_DISABLE_OLD_API
+	/* For backwards compatibility */
+	#define FlashAvr  Flash
+#endif /* !CONFIG_FLASH_DISABLE_OLD_API */
 
 #endif /* DRV_FLASH_AVR_H */
