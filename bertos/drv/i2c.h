@@ -153,11 +153,6 @@ bool i2c_recv(void *_buf, size_t count);
 
 #endif /* !CONFIG_I2C_DISABLE_OLD_API */
 
-
-/*
- * I2c new api
- */
-
 /*
  * I2C error flags
  */
@@ -341,7 +336,6 @@ INLINE void i2c_init_0(void)
 		i2c_init_3(&local_i2c_old_api, 0, CONFIG_I2C_FREQ);
 	#endif
 }
-
 #endif /* !CONFIG_I2C_DISABLE_OLD_API */
 
 
