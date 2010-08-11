@@ -42,8 +42,10 @@
 #include "cfg/cfg_emb_flash.h"
 
 #if !CONFIG_FLASH_DISABLE_OLD_API
+
 	/* For backwards compatibility */
 	#define FlashAvr  Flash
+	#define flash_avr_init(fls)   flash_init(fls);
 #endif /* !CONFIG_FLASH_DISABLE_OLD_API */
 
 #endif /* DRV_FLASH_AVR_H */
