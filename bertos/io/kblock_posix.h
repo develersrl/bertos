@@ -32,7 +32,12 @@
  *
  * \author Francesco Sacchi <batt@develer.com>
  *
- * \brief KBlock interface
+ * \brief KBlock interface on POSIX file.
+ *
+ * \author Francesco Sacchi <batt@develer.com>
+ *
+ * $WIZ$ module_name = "kfile_posix"
+ * $WIZ$ module_depends = "kblock"
  */
 
 #ifndef KBLOCK_POSIX_H

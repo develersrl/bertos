@@ -30,9 +30,9 @@
  *
  * -->
  *
- * \author Francesco Sacchi <batt@develer.com>
- *
  * \brief KBlock interface
+ *
+ * \author Francesco Sacchi <batt@develer.com>
  */
 
 #ifndef KBLOCK_RAM_H

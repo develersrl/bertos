@@ -32,6 +32,9 @@
  *
  * \brief KFile interface over a KBlock.
  *
+ * \author Francesco Sacchi <batt@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
+ *
  */
 
 #include "kfile_block.h"

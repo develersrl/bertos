@@ -33,6 +33,8 @@
  * \author Francesco Sacchi <batt@develer.com>
  *
  * \brief KBlock interface
+ *
+ * $WIZ$ module_name = "kblock"
  */
 
 #ifndef IO_KBLOCK_H

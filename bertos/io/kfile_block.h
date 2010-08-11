@@ -35,6 +35,12 @@
  * With this module, you can access a KBlock device
  * with the handy KFile interface.
  * In order to achieve this, the block device must support partial block write.
+ *
+ * \author Francesco Sacchi <batt@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
+ *
+ * $WIZ$ module_name = "kfile_block"
+ * $WIZ$ module_depends = "kfile", "kblock"
  */
 
 #ifndef IO_KFILE_BLOCK_H

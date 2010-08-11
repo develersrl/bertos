@@ -32,7 +32,12 @@
  *
  * \author Francesco Sacchi <batt@develer.com>
  *
- * \brief KBlock interface
+ * \brief KBlock interface on RAM memory
+ *
+ * \author Francesco Sacchi <batt@develer.com>
+ *
+ * $WIZ$ module_name = "kfile_ram"
+ * $WIZ$ module_depends = "kblock"
  */
 
 
