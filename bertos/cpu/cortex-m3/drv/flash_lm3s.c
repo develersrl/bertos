@@ -178,16 +178,8 @@ static const KBlockVTable flash_lm3s_unbuffered_vt =
 	.clearerr = lm3s_flash_clearerror,
 };
 
-/* Flash memory mapping */
-#if CPU_CM3_LM3S1968
-	#define EMB_FLASH_SIZE               0x40000 //< 256KiB
-	#define EMB_FLASH_PAGE_SIZE          0x400   //< 1KiB
-#else
-	#error Unknown CPU
-#endif
-
 static struct FlashHardware flash_lm3s_hw;
-static uint8_t flash_buf[EMB_FLASH_PAGE_SIZE];
+static uint8_t flash_buf[FLASH_PAGE_SIZE];
 
 static void common_init(Flash *fls)
 {
@@ -198,8 +190,8 @@ static void common_init(Flash *fls)
 
 	fls->hw = &flash_lm3s_hw;
 
-	fls->blk.blk_size = EMB_FLASH_PAGE_SIZE;
-	fls->blk.blk_cnt =  EMB_FLASH_SIZE / EMB_FLASH_PAGE_SIZE;
+	fls->blk.blk_size = FLASH_PAGE_SIZE;
+	fls->blk.blk_cnt =  FLASH_SIZE / FLASH_PAGE_SIZE;
 }
 
 

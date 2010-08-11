@@ -56,13 +56,6 @@
 
 #define EMB_FLASH                ((struct stm32_flash*)FLASH_R_BASE)
 
-#if CPU_CM3_STM32F103RB
-	#define EMB_FLASH_PAGE_SIZE   1024
-#else
-	#error Unknown CPU
-#endif
-
-
 struct FlashHardware
 {
 	uint8_t status;
@@ -216,19 +209,17 @@ static const KBlockVTable flash_stm32_unbuffered_vt =
 };
 
 static struct FlashHardware flash_stm32_hw;
-static uint8_t flash_buf[EMB_FLASH_PAGE_SIZE];
+static uint8_t flash_buf[FLASH_PAGE_SIZE];
 
 static void common_init(Flash *fls)
 {
 	memset(fls, 0, sizeof(*fls));
 	DB(fls->blk.priv.type = KBT_FLASH);
 
-	EMB_FLASH->CR = 0;
-
 	fls->hw = &flash_stm32_hw;
 
-	fls->blk.blk_size = EMB_FLASH_PAGE_SIZE;
-	fls->blk.blk_cnt = (F_SIZE * 1024) / EMB_FLASH_PAGE_SIZE;
+	fls->blk.blk_size = FLASH_PAGE_SIZE;
+	fls->blk.blk_cnt = (F_SIZE * 1024) / FLASH_PAGE_SIZE;
 
 	/* Unlock flash memory for the FPEC Access */
 	EMB_FLASH->KEYR = FLASH_KEY1;

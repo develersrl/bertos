@@ -61,4 +61,13 @@
 	#error No i2c pins are defined for select cpu
 #endif
 
+
+/* Flash memory mapping */
+#if CPU_CM3_LM3S1968
+	#define FLASH_SIZE               0x40000 //< 256KiB
+	#define FLASH_PAGE_SIZE          0x400   //< 1KiB
+#else
+	#error No embedded definition for select cpu
+#endif
+
 #endif /* LM3S_H */

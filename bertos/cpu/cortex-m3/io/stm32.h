@@ -51,17 +51,30 @@
 #include "stm32_i2c.h"
 #include "stm32_flash.h"
 
-#define GPIO_USART1_TX_PIN	BV(9)
-#define GPIO_USART1_RX_PIN	BV(10)
-#define GPIO_USART2_TX_PIN	BV(2)
-#define GPIO_USART2_RX_PIN	BV(3)
-#define GPIO_USART3_TX_PIN	BV(10)
-#define GPIO_USART3_RX_PIN	BV(11)
+#if CPU_CM3_STM32F103RB
+	#define GPIO_USART1_TX_PIN	BV(9)
+	#define GPIO_USART1_RX_PIN	BV(10)
+	#define GPIO_USART2_TX_PIN	BV(2)
+	#define GPIO_USART2_RX_PIN	BV(3)
+	#define GPIO_USART3_TX_PIN	BV(10)
+	#define GPIO_USART3_RX_PIN	BV(11)
+#else
+	#error No USART pins are defined for select cpu
+#endif
 
+#if CPU_CM3_STM32F103RB
+	#define GPIO_I2C1_SCL_PIN	BV(6)
+	#define GPIO_I2C1_SDA_PIN	BV(7)
+	#define GPIO_I2C2_SCL_PIN	BV(10)
+	#define GPIO_I2C2_SDA_PIN	BV(11)
+#else
+	#error No i2c pins are defined for select cpu
+#endif
 
-#define GPIO_I2C1_SCL_PIN	BV(6)
-#define GPIO_I2C1_SDA_PIN	BV(7)
-#define GPIO_I2C2_SCL_PIN	BV(10)
-#define GPIO_I2C2_SDA_PIN	BV(11)
+#if CPU_CM3_STM32F103RB
+	#define FLASH_PAGE_SIZE   1024
+#else
+	#error No embedded definition for select cpu
+#endif
 
 #endif /* STM32_H */
