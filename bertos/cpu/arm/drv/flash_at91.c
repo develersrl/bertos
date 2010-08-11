@@ -39,23 +39,20 @@
 
 #include "flash_at91.h"
 
-#include "cfg/cfg_flash_at91.h"
+#include "cfg/cfg_emb_flash.h"
 #include <cfg/macros.h>
 
-#include "hw/hw_boot.h"
-
 // Define log settings for cfg/log.h
-#define LOG_LEVEL    CONFIG_FLASH_AT91_LOG_LEVEL
-#define LOG_FORMAT   CONFIG_FLASH_AT91_LOG_FORMAT
+#define LOG_LEVEL    CONFIG_FLASH_EMB_LOG_LEVEL
+#define LOG_FORMAT   CONFIG_FLASH_EMB_LOG_FORMAT
 #include <cfg/log.h>
-
 
 #include <cpu/irq.h>
 #include <cpu/attr.h>
 #include <cpu/power.h>
 
 #include <io/kfile.h>
-
+#include <io/kblock.h>
 #include <io/arm.h>
 
 #include <drv/timer.h>
@@ -63,16 +60,19 @@
 
 #include <string.h>
 
-#define FLASH_START_PAGE DIV_ROUNDUP(FLASH_BOOT_SIZE, FLASH_PAGE_SIZE_BYTES)
-#define FLASH_START_ADDR (FLASH_START_PAGE * FLASH_PAGE_SIZE_BYTES)
+struct FlashHardware
+{
+	uint8_t status;
+};
+
 
 /**
  * Really send the flash write command.
- * 
- * \note This function has to be placed in RAM because 
+ *
+ * \note This function has to be placed in RAM because
  *       executing code from flash while a writing process
  *       is in progress is forbidden.
- */ 
+ */
 RAM_FUNC NOINLINE static void write_page(uint32_t page)
 {
 	// Send the 'write page' command
@@ -90,9 +90,9 @@ RAM_FUNC NOINLINE static void write_page(uint32_t page)
  * Send write command.
  *
  * After WR command cpu write bufferd page into flash memory.
- * 
+ *
  */
-INLINE void flash_at91_sendWRcmd(uint32_t page)
+INLINE void flash_sendWRcmd(uint32_t page)
 {
 	cpu_flags_t flags;
 
@@ -106,173 +106,137 @@ INLINE void flash_at91_sendWRcmd(uint32_t page)
 }
 
 /**
- * Return 0 if no error are occurred after flash memory
+ * Return true if no error are occurred after flash memory
  * read or write operation, otherwise return error code.
  */
-static int flash_at91_getStatus(UNUSED_ARG(struct KFile *, _fd))
+static bool flash_getStatus(struct KBlock *blk)
 {
-	/*
-	 * This bit is set to one if we programming of at least one locked lock
-	 * region.
-	 */
-	if(MC_FSR & BV(MC_LOCKE))
-		return -1;
-
+	Flash *fls = FLASH_CAST(blk);
 	/*
 	 * This bit is set to one if an invalid command and/or a bad keywords was/were
 	 * written in the Flash Command Register.
 	 */
 	if(MC_FSR & BV(MC_PROGE))
-		return -2;
-
-	return 0;
-}
-
-
-/**
- * Write modified page on internal latch, and then send write command to
- * flush page to internal flash.
- */
-static int flash_at91_flush(KFile *_fd)
-{
-	Flash *fd = FLASH_CAST(_fd);
-	if (fd->page_dirty)
 	{
-		//Compute page address of current page.
-		page_addr_t *addr = (page_addr_t *)((fd->curr_page * FLASH_PAGE_SIZE_BYTES) + FLASH_BASE);
-
-		//Copy modified page into internal latch.
-		for (page_addr_t page_addr = 0; page_addr < FLASH_PAGE_SIZE_BYTES; page_addr += 4)
-		{
-			// This is needed in order to have a single 32bit write instruction in addr.
-			// (8 and 16 writes cause unpredictable results).
-			uint32_t data;
-			memcpy(&data, &fd->page_buf[page_addr], sizeof(data));
-			*addr++ = data;
-		}
-
-		// Send write command to transfer page from latch to internal flash memory.
-		flash_at91_sendWRcmd(fd->curr_page);
-		fd->page_dirty = false;
+		fls->hw->status |= FLASH_WR_ERR;
+		LOG_ERR("flash not erased..\n");
+		return false;
 	}
-	return 0;
-}
 
-
-/**
- * Check current page and if \a page is different, load it in
- * temporary buffer.
- */
-static void flash_at91_loadPage(Flash *fd, page_t page)
-{
-	if (page != fd->curr_page)
+	/*
+	 * This bit is set to one if we programming of at least one locked lock
+	 * region.
+	 */
+	if(MC_FSR & BV(MC_LOCKE))
 	{
-		flash_at91_flush(&fd->fd);
-		// Load page
-		memcpy(fd->page_buf, (char *)((page * FLASH_PAGE_SIZE_BYTES) + FLASH_BASE), FLASH_PAGE_SIZE_BYTES);
-		fd->curr_page = page;
-		LOG_INFO("Loaded page %lu\n", fd->curr_page);
+		fls->hw->status |= FLASH_WR_PROTECT;
+		LOG_ERR("wr protect..\n");
+		return false;
 	}
+
+	return true;
 }
 
-
-/**
- * Write program memory.
- * Write \a size bytes from buffer \a _buf to file \a fd
- * \note Write operations are buffered.
- */
-static size_t flash_at91_write(struct KFile *_fd, const void *_buf, size_t size)
+static size_t at91_flash_readDirect(struct KBlock *blk, block_idx_t idx, void *buf, size_t offset, size_t size)
 {
-	Flash *fd = FLASH_CAST(_fd);
-	const uint8_t *buf =(const uint8_t *)_buf;
+	ASSERT(offset == 0);
+	ASSERT(size == blk->blk_size);
 
-	page_t page;
-	page_addr_t page_addr;
-	size_t total_write = 0;
-
-	size = MIN((kfile_off_t)size, fd->fd.size - fd->fd.seek_pos);
-
-	LOG_INFO("Writing at pos[%lu]\n", fd->fd.seek_pos);
-	while (size)
-	{
-		page = (fd->fd.seek_pos + FLASH_START_ADDR) / FLASH_PAGE_SIZE_BYTES;
-		page_addr = (fd->fd.seek_pos + FLASH_START_ADDR) % FLASH_PAGE_SIZE_BYTES;
-
-		flash_at91_loadPage(fd, page);
-
-		size_t wr_len = MIN(size, (size_t)(FLASH_PAGE_SIZE_BYTES - page_addr));
-
-		memcpy(fd->page_buf + page_addr, buf, wr_len);
-		fd->page_dirty = true;
-
-		buf += wr_len;
-		fd->fd.seek_pos += wr_len;
-		size -= wr_len;
-		total_write += wr_len;
-	}
-	LOG_INFO("written %u bytes\n", total_write);
-	return total_write;
-}
-
-/**
- * Open flash file \a fd
- * \a name and \a mode are unused, cause flash memory is
- * threated like one file.
- */
-static void flash_at91_open(struct Flash *fd)
-{
-	fd->curr_page = FLASH_START_PAGE;
-	fd->fd.size = FLASH_MEM_SIZE - fd->curr_page * FLASH_PAGE_SIZE_BYTES;
-	fd->fd.seek_pos = 0;
-	
-	memcpy(fd->page_buf, (char *)((fd->curr_page * FLASH_PAGE_SIZE_BYTES) + FLASH_BASE), FLASH_PAGE_SIZE_BYTES);
-
-	fd->page_dirty = false;
-	LOG_INFO("Flash file opened, pos %ld, size %ld\n", fd->fd.seek_pos, fd->fd.size);
-}
-
-/**
- * Read from file \a fd \a size bytes and put it in buffer \a buf
- * \return the number of bytes read.
- */
-static size_t flash_at91_read(struct KFile *_fd, void *_buf, size_t size)
-{
-	Flash *fd = FLASH_CAST(_fd);
-	uint8_t *buf =(uint8_t *)_buf;
-
-	size = MIN((kfile_off_t)size, fd->fd.size - fd->fd.seek_pos);
-
-	LOG_INFO("Reading at pos[%lu]\n", fd->fd.seek_pos);
-
-	// Flush current buffered page (if modified).
-	flash_at91_flush(&fd->fd);
-
-	kfile_off_t *addr = (kfile_off_t *)(fd->fd.seek_pos + FLASH_START_ADDR);
-	memcpy(buf, addr, size);
-
-	fd->fd.seek_pos += size;
-
-	LOG_INFO("Read %u bytes\n", size);
+	memcpy(buf, (void *)(idx * blk->blk_size), size);
 	return size;
 }
 
-
-/**
- * Init module to perform write and read operation on internal
- * flash memory.
- */
-void flash_hw_init(struct Flash *fd)
+static size_t at91_flash_writeDirect(struct KBlock *blk, block_idx_t idx, const void *_buf, size_t offset, size_t size)
 {
-	memset(fd, 0, sizeof(*fd));
-	// Init base class.
-	kfile_init(&fd->fd);
-	DB(fd->fd._type = KFT_FLASH);
+	ASSERT(offset == 0);
+	ASSERT(size == blk->blk_size);
 
-	// Set up flash programming functions.
-	fd->fd.write = flash_at91_write;
-	fd->fd.read = flash_at91_read;
-	fd->fd.error = flash_at91_getStatus;
-	fd->fd.flush = flash_at91_flush;
+	uint32_t *addr = (uint32_t *)(idx * blk->blk_size);
+	const uint8_t *buf = (const uint8_t *)_buf;
 
-	flash_at91_open(fd);
+	while (size)
+	{
+		uint32_t data = (*(buf + 3) << 24) |
+						(*(buf + 2) << 16) |
+						(*(buf + 1) << 8)  |
+						*buf;
+		*addr = data;
+
+		size -= 4;
+		buf += 4;
+		addr += 4;
+	}
+
+	flash_sendWRcmd(idx);
+
+	if (!flash_getStatus(blk))
+		return 0;
+
+	return blk->blk_size;
 }
+
+
+static int at91_flash_error(struct KBlock *blk)
+{
+	Flash *fls = FLASH_CAST(blk);
+	return fls->hw->status;
+}
+
+static void at91_flash_clearerror(struct KBlock *blk)
+{
+	Flash *fls = FLASH_CAST(blk);
+	fls->hw->status = 0;
+}
+
+static const KBlockVTable flash_at91_buffered_vt =
+{
+	.readDirect = at91_flash_readDirect,
+	.writeDirect = at91_flash_writeDirect,
+
+	.readBuf = kblock_swReadBuf,
+	.writeBuf = kblock_swWriteBuf,
+	.load = kblock_swLoad,
+	.store = kblock_swStore,
+
+	.error = at91_flash_error,
+	.clearerr = at91_flash_clearerror,
+};
+
+static const KBlockVTable flash_at91_unbuffered_vt =
+{
+	.readDirect = at91_flash_readDirect,
+	.writeDirect = at91_flash_writeDirect,
+
+	.error = at91_flash_error,
+	.clearerr = at91_flash_clearerror,
+};
+
+static struct FlashHardware flash_at91_hw;
+static uint8_t flash_buf[FLASH_PAGE_SIZE_BYTES];
+
+static void common_init(Flash *fls)
+{
+	memset(fls, 0, sizeof(*fls));
+	DB(fls->blk.priv.type = KBT_FLASH);
+
+	fls->hw = &flash_at91_hw;
+
+	fls->blk.blk_size = FLASH_PAGE_SIZE_BYTES;
+	fls->blk.blk_cnt = FLASH_MEM_SIZE / FLASH_PAGE_SIZE_BYTES;
+
+}
+
+void flash_hw_init(Flash *fls)
+{
+	common_init(fls);
+	fls->blk.priv.vt = &flash_at91_buffered_vt;
+	fls->blk.priv.flags |= KB_BUFFERED | KB_PARTIAL_WRITE;
+	fls->blk.priv.buf = flash_buf;
+}
+
+void flash_hw_initUnbuffered(Flash *fls)
+{
+	common_init(fls);
+	fls->blk.priv.vt = &flash_at91_unbuffered_vt;
+}
+

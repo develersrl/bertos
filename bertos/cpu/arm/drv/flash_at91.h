@@ -40,66 +40,13 @@
 #ifndef FLASH_AT91_H
 #define FLASH_AT91_H
 
-#include <cpu/types.h>
+#include "cfg/cfg_emb_flash.h"
 
-#include <io/kfile.h>
+#if !CONFIG_FLASH_DISABLE_OLD_API
 
-#include <io/arm.h>
-
-
-#define FLASH_PAGE_SIZE FLASH_PAGE_SIZE_BYTES
-
-/**
- * Define data type to manage page and memory address.
- */
-typedef uint32_t page_t;
-typedef uint32_t page_addr_t;
-
-struct Flash;
-
-/**
- * FlashAt91 KFile context structure.
- *
- * DEPREACTED STRUCTURE!
- * Use EmbFlash instead
- *
- * \{
- */
-typedef struct FlashAt91
-{
-	/**
-	 * File descriptor.
-	 */
-	KFile fd;
-
-	/**
-	 * Flag for checking if current page is modified.
-	 */
-	bool page_dirty;
-
-	/**
-	 * Current buffered page.
-	 */
-	page_t curr_page;
-
-	/**
-	 * Temporary buffer cointaing data block to
-	 * write on flash.
-	 */
-	uint8_t page_buf[FLASH_PAGE_SIZE_BYTES];
-} FlashAt91;
-/* \} */
-
-void flash_hw_init(struct Flash *fd);
-
-/**
- * WARNING!
- * This function is DEPRECADED!
- * use the emb_flash module instead.
- */
-INLINE void flash_at91_init(struct FlashAt91 *fd)
-{
-	flash_hw_init((struct Flash *)fd);
-}
+	/* For backwards compatibility */
+	#define FlashAt91  Flash
+	#define flash_at91_init(fls)   flash_init(fls);
+#endif /* !CONFIG_FLASH_DISABLE_OLD_API */
 
 #endif /* DRV_FLASH_ARM_H */
