@@ -45,6 +45,7 @@
 #include "cfg/cfg_emb_flash.h"
 
 #include <cfg/macros.h>
+#include <cfg/compiler.h>
 
 #include <io/kblock.h>
 #include <io/kfile.h>
@@ -56,7 +57,8 @@
 #define FLASH_WR_OK             0     ///< Write ok.
 #define FLASH_NOT_ERASED     BV(1)    ///< Flash memory was not erased before to write it.
 #define FLASH_WR_PROTECT     BV(2)    ///< Write not allowed the flash memory was protected.
-#define FLASH_WR_TIMEOUT     BV(3)    ///<
+#define FLASH_WR_TIMEOUT     BV(3)    ///< Timeout while writing
+#define FLASH_WR_ERR         BV(4)    ///< Invalid command and/or a bad keywords
 
 struct FlashHardware;
 
@@ -108,6 +110,7 @@ INLINE void flash_initUnbuffered(Flash *fls)
 	flash_hw_initUnbuffered(fls);
 }
 
+#include CPU_HEADER(flash)
 
 #endif /* DRV_FLASH_H */
 
