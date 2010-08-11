@@ -146,8 +146,10 @@ static void stm32_flash_clearerror(struct KBlock *blk)
 
 static size_t stm32_flash_readDirect(struct KBlock *blk, block_idx_t idx, void *buf, size_t offset, size_t size)
 {
-	memcpy(buf, (void *)(idx * blk->blk_size + offset), size);
+	ASSERT(offest == 0);
+	ASSERT(size == blk->blk_size);
 
+	memcpy(buf, (void *)(idx * blk->blk_size), size);
 	return size;
 }
 
@@ -173,7 +175,7 @@ static size_t stm32_flash_writeDirect(struct KBlock *blk, block_idx_t idx, const
 	if (!stm32_erasePage(blk, (idx * blk->blk_size)))
 		return 0;
 
-	uint32_t addr = idx * blk->blk_size + offset;
+	uint32_t addr = idx * blk->blk_size;
 	const uint8_t *buf = (const uint8_t *)_buf;
 
 	while (size)
