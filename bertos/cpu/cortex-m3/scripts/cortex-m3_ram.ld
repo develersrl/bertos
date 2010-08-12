@@ -32,18 +32,78 @@
  *
  * \author Manuele Fanelli <qwert@develer.com>
  *
- * \brief Script for Luminary Micro LM3S1968 Cortex M3 family processors.
+ * \brief Script for Cortex M3 family processors.
  *
  */
 
-/*
- * Define memory configuration for LM3S1968 board
- */
-MEMORY
-{
-        rom(rx) : org = 0x00000000, len = 256k
-        ram(rwx) : org = 0x20000000, len = 64k
-}
+OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
+OUTPUT_ARCH(arm)
 
-INCLUDE "bertos/cpu/cortex-m3/scripts/cortex-m3_ram.ld"
+/*
+ * Define stack size here
+ */
+STACK_SIZE = 0x1000;
+
+/*
+ * Allocate section memory
+ */
+SECTIONS
+{
+	.text :
+	{
+		KEEP(*(.vectors));
+		. = ALIGN (4);
+		KEEP(*(.init));
+		. = ALIGN (4);
+		*(.rodata .rodata.*);
+		. = ALIGN (4);
+		*(.text .text.*);
+		. = ALIGN (4);
+		*(.glue_7t);
+		. = ALIGN(4);
+		*(.glue_7);
+		. = ALIGN(4);
+	} > ram
+
+	__text_end = .;
+	PROVIDE (__text_end = .);
+
+	.data : AT (__text_end)
+	{
+		. = ALIGN (0x400);
+		PROVIDE (__data_start = .);
+		*(vtable)
+		*(.data .data.*)
+		. = ALIGN (4);
+		_edata = .;
+		PROVIDE (__data_end = .);
+	} > ram
+
+	.bss :
+	{
+		PROVIDE (__bss_start = .);
+		*(.bss .bss.*)
+		. = ALIGN(4);
+		*(COMMON)
+		. = ALIGN(4);
+		PROVIDE (__bss_end = .);
+	} > ram
+
+	/*
+	 * Allocated stack at the end of bss section.
+	 * Data heap is allocate at end of stack.
+	 */
+	PROVIDE (__msp_start = .);
+	. = ALIGN(8);
+	. += STACK_SIZE;
+	PROVIDE (__msp_end = .);
+
+	PROVIDE (__psp_start = .);
+	. = ALIGN(8);
+	. += STACK_SIZE;
+	PROVIDE (__psp_end = .);
+
+	PROVIDE (__heap_start = .);
+	. = ALIGN(8);
+}
 

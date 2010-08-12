@@ -35,4 +35,13 @@
  * \author Andrea Righi <arighi@develer.com>
  */
 
-INCLUDE bertos/cpu/cortex-m3/scripts/lm3s1968_rom.ld
+/*/
+ * Define memory configuration for LM3S8962 board
+ */
+MEMORY
+{
+	rom(rx) : org = 0x00000000, len = 256k
+	ram(rwx) : org = 0x20000000, len = 64k
+}
+
+INCLUDE "bertos/cpu/cortex-m3/scripts/cortex-m3_rom.ld"
