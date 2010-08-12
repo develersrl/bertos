@@ -268,7 +268,7 @@ bool xmodem_recv(KFile *ch, KFile *fd)
 			if (last_block_done < blocknr)
 			{
 				/* Call user function to flush the buffer */
-				if (kfile_write(fd, block_buffer, blocksize))
+				if (kfile_write(fd, block_buffer, blocksize) == (size_t)blocksize)
 				{
 					/* Acknowledge block and clear error counter */
 					kfile_putc(XM_ACK, ch);
