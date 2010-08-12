@@ -174,7 +174,6 @@ static size_t stm32_flash_writeDirect(struct KBlock *blk, block_idx_t idx, const
 	uint32_t addr = idx * blk->blk_size;
 	const uint8_t *buf = (const uint8_t *)_buf;
 
-	kprintf("idx[%ld],size[%u]\n", idx, size);
 	while (size)
 	{
 		uint16_t data = (*(buf + 1) << 8) | *buf;
@@ -243,8 +242,8 @@ void flash_hw_init(Flash *fls)
 	fls->blk.priv.buf = flash_buf;
 
 	/* Load the first block in the cache */
-	void *a = 0;
-	memcpy(fls->blk.priv.buf, a, fls->blk.blk_size);
+	void *flash_start = 0x0;
+	memcpy(fls->blk.priv.buf, flash_start, fls->blk.blk_size);
 }
 
 void flash_hw_initUnbuffered(Flash *fls)
