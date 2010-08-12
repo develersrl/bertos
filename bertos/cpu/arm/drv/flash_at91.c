@@ -142,7 +142,7 @@ static size_t at91_flash_readDirect(struct KBlock *blk, block_idx_t idx, void *b
 	ASSERT(offset == 0);
 	ASSERT(size == blk->blk_size);
 
-	memcpy(buf, (void *)(idx * blk->blk_size), size);
+	memcpy(buf, (void *)(idx * blk->blk_size +  FLASH_BASE), size);
 	return size;
 }
 
@@ -151,7 +151,7 @@ static size_t at91_flash_writeDirect(struct KBlock *blk, block_idx_t idx, const 
 	ASSERT(offset == 0);
 	ASSERT(size == blk->blk_size);
 
-	uint32_t *addr = (uint32_t *)(idx * blk->blk_size);
+	uint32_t *addr = (uint32_t *)(idx * blk->blk_size +  FLASH_BASE);
 	const uint8_t *buf = (const uint8_t *)_buf;
 
 	while (size)
@@ -164,7 +164,7 @@ static size_t at91_flash_writeDirect(struct KBlock *blk, block_idx_t idx, const 
 
 		size -= 4;
 		buf += 4;
-		addr += 4;
+		addr++;
 	}
 
 	flash_sendWRcmd(idx);
@@ -223,7 +223,6 @@ static void common_init(Flash *fls)
 
 	fls->blk.blk_size = FLASH_PAGE_SIZE_BYTES;
 	fls->blk.blk_cnt = FLASH_MEM_SIZE / FLASH_PAGE_SIZE_BYTES;
-
 }
 
 void flash_hw_init(Flash *fls)
@@ -232,6 +231,9 @@ void flash_hw_init(Flash *fls)
 	fls->blk.priv.vt = &flash_at91_buffered_vt;
 	fls->blk.priv.flags |= KB_BUFFERED | KB_PARTIAL_WRITE;
 	fls->blk.priv.buf = flash_buf;
+
+	/* Load the first block in the cache */
+	memcpy(fls->blk.priv.buf, (void *)(FLASH_BASE), fls->blk.blk_size);
 }
 
 void flash_hw_initUnbuffered(Flash *fls)
