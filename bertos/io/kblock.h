@@ -364,5 +364,6 @@ int kblock_swLoad(struct KBlock *b, block_idx_t index);
 int kblock_swStore(struct KBlock *b, block_idx_t index);
 size_t kblock_swReadBuf(struct KBlock *b, void *buf, size_t offset, size_t size);
 size_t kblock_swWriteBuf(struct KBlock *b, const void *buf, size_t offset, size_t size);
+int kblock_swClose(struct KBlock *b);
 
 #endif /* IO_KBLOCK_H */

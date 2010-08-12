@@ -258,3 +258,8 @@ size_t kblock_swWriteBuf(struct KBlock *b, const void *buf, size_t offset, size_
 	memcpy((uint8_t *)b->priv.buf + offset, buf, size);
 	return size;
 }
+
+int kblock_swClose(UNUSED_ARG(struct KBlock, *b))
+{
+	return 0;
+}
