@@ -63,7 +63,7 @@ typedef struct KFileBlock
  * Init a KFile over KBlock.
  * After this you can access your KBlock device with a handy KFile interface.
  *
- * \note The block device must support partial block write in order support
+ * \note The block device must support partial block write in order to support
  *       random write access.
  *
  * \param fb KFileBlock context.
