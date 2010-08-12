@@ -165,15 +165,19 @@ INLINE bool stm32_writeWord(struct KBlock *blk, uint32_t addr, uint16_t data)
 
 static size_t stm32_flash_writeDirect(struct KBlock *blk, block_idx_t idx, const void *_buf, size_t offset, size_t size)
 {
+	ASSERT(offset == 0);
+	ASSERT(size == blk->blk_size);
+
 	if (!stm32_erasePage(blk, (idx * blk->blk_size)))
 		return 0;
 
 	uint32_t addr = idx * blk->blk_size;
 	const uint8_t *buf = (const uint8_t *)_buf;
 
+	kprintf("idx[%ld],size[%u]\n", idx, size);
 	while (size)
 	{
-		uint16_t data = ((*buf + 1) << 8) | *buf;
+		uint16_t data = (*(buf + 1) << 8) | *buf;
 		if (!stm32_writeWord(blk, addr, data))
 			return 0;
 
@@ -195,6 +199,8 @@ static const KBlockVTable flash_stm32_buffered_vt =
 	.load = kblock_swLoad,
 	.store = kblock_swStore,
 
+	.close = kblock_swClose,
+
 	.error = stm32_flash_error,
 	.clearerr = stm32_flash_clearerror,
 };
@@ -203,6 +209,8 @@ static const KBlockVTable flash_stm32_unbuffered_vt =
 {
 	.readDirect = stm32_flash_readDirect,
 	.writeDirect = stm32_flash_writeDirect,
+
+	.close = kblock_swClose,
 
 	.error = stm32_flash_error,
 	.clearerr = stm32_flash_clearerror,
@@ -233,6 +241,10 @@ void flash_hw_init(Flash *fls)
 	fls->blk.priv.vt = &flash_stm32_buffered_vt;
 	fls->blk.priv.flags |= KB_BUFFERED | KB_PARTIAL_WRITE;
 	fls->blk.priv.buf = flash_buf;
+
+	/* Load the first block in the cache */
+	void *a = 0;
+	memcpy(fls->blk.priv.buf, a, fls->blk.blk_size);
 }
 
 void flash_hw_initUnbuffered(Flash *fls)
