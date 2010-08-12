@@ -36,7 +36,7 @@
 * \author Daniele Basile <asterix@develer.com>
 *
 * $WIZ$ module_name = "flash"
-* $WIZ$ module_depends = "kfile"
+* $WIZ$ module_depends = "kfile", "kfile_block", "kblock"
 */
 
 #ifndef DRV_FLASH_H
