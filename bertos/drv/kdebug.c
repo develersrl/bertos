@@ -274,11 +274,11 @@ void kdump(const void *_buf, size_t len)
 {
 	const unsigned char *buf = (const unsigned char *)_buf;
 
-	kprintf("Dumping buffer at addr [%p], %z bytes", buf, len);
+	kprintf("Dumping buffer at addr [%p], %zu bytes", buf, len);
 	size_t i=0;
 	while (len--)
 	{
-		if ((i % 16) == 0)
+		if ((i++ % 16) == 0)
 			kputs("\n");
 		kprintf("%02X ", *buf++);
 	}
