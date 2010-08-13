@@ -40,6 +40,8 @@
 
 #if CPU_ARM_AT91
 	#include "flash_at91.h"
+#elif CPU_ARM_LPC2
+	#include "flash_lpc2.h"
 /*#elif  Add other ARM families here */
 #else
 	#error Unknown CPU
