@@ -89,4 +89,9 @@ INLINE void init_bitarray(BitArray *ctx, uint8_t *array, size_t size)
 	ctx->array = array;
 }
 
+
+int bitarray_testSetup(void);
+int bitarray_testRun(void);
+int bitarray_testTearDown(void);
+
 #endif /* STRUCT_BITARRAY_H */
