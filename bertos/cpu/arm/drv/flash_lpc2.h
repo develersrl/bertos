@@ -26,13 +26,13 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2009 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
  * \author Daniele Basile <asterix@develer.com>
  *
- * \brief At91sam7 Internal flash read/write driver.
+ * \brief NPX lpc23xx embedded flash read/write driver.
  *
  *
  */
