@@ -36,8 +36,12 @@
  */
 
 #include "flash_lm3s.h"
-#include "cfg/log.h"
+#include "cfg/cfg_emb_flash.h"
 
+// Define log settings for cfg/log.h
+#define LOG_LEVEL    CONFIG_FLASH_EMB_LOG_LEVEL
+#define LOG_FORMAT   CONFIG_FLASH_EMB_LOG_FORMAT
+#include <cfg/log.h>
 #include <cfg/macros.h>
 
 #include <io/kblock.h>
@@ -55,13 +59,13 @@ struct FlashHardware
 	int status;
 };
 
-static bool flash_wait(struct KBlock *blk)
+static bool flash_wait(struct KBlock *blk, uint32_t event)
 {
 	Flash *fls = FLASH_CAST(blk);
 	ticks_t start = timer_clock();
 	while (true)
 	{
-		if (!(FLASH_FMC_R & FLASH_FMC_ERASE))
+		if (!(FLASH_FMC_R & event))
 			break;
 
 		if (FLASH_FCRIS_R & FLASH_FCRIS_ARIS)
@@ -91,7 +95,7 @@ static int lm3s_erasePage(struct KBlock *blk, uint32_t addr)
 	FLASH_FMA_R = (volatile uint32_t)addr;
 	FLASH_FMC_R = FLASH_FMC_WRKEY | FLASH_FMC_ERASE;
 
-	return flash_wait(blk);
+	return flash_wait(blk, FLASH_FMC_ERASE);
 }
 
 static int lm3s_writeWord(struct KBlock *blk, uint32_t addr, uint32_t data)
@@ -102,12 +106,12 @@ static int lm3s_writeWord(struct KBlock *blk, uint32_t addr, uint32_t data)
 	FLASH_FMD_R = (volatile uint32_t)data;
 	FLASH_FMC_R = FLASH_FMC_WRKEY | FLASH_FMC_WRITE;
 
-	return flash_wait(blk);
+	return flash_wait(blk, FLASH_FMC_WRITE);
 }
 
 static size_t lm3s_flash_readDirect(struct KBlock *blk, block_idx_t idx, void *buf, size_t offset, size_t size)
 {
-	ASSERT(offest == 0);
+	ASSERT(offset == 0);
 	ASSERT(size == blk->blk_size);
 
 	memcpy(buf, (void *)(idx * blk->blk_size), size);
@@ -165,6 +169,8 @@ static const KBlockVTable flash_lm3s_buffered_vt =
 	.load = kblock_swLoad,
 	.store = kblock_swStore,
 
+	.close = kblock_swClose,
+
 	.error = lm3s_flash_error,
 	.clearerr = lm3s_flash_clearerror,
 };
@@ -173,6 +179,8 @@ static const KBlockVTable flash_lm3s_unbuffered_vt =
 {
 	.readDirect = lm3s_flash_readDirect,
 	.writeDirect = lm3s_flash_writeDirect,
+
+	.close = kblock_swClose,
 
 	.error = lm3s_flash_error,
 	.clearerr = lm3s_flash_clearerror,
@@ -201,6 +209,10 @@ void flash_hw_init(Flash *fls)
 	fls->blk.priv.vt = &flash_lm3s_buffered_vt;
 	fls->blk.priv.flags |= KB_BUFFERED | KB_PARTIAL_WRITE;
 	fls->blk.priv.buf = flash_buf;
+
+	/* Load the first block in the cache */
+	void *flash_start = 0x0;
+	memcpy(fls->blk.priv.buf, flash_start, fls->blk.blk_size);
 }
 
 void flash_hw_initUnbuffered(Flash *fls)
