@@ -34,6 +34,8 @@
  * \author Daniele Basile <asterix@develer.com>
  *
  * \brief NPX lpc23xx embedded flash read/write driver.
+ *
+ * notest: arm
  */
 
 #include "flash_lpc2.h"
