@@ -41,31 +41,6 @@
 #include <cfg/compiler.h>
 
 #include <cpu/detect.h>
-
-
-/* Embedded flash programming defines. */
-#define IAP_ADDRESS 0x7ffffff1
-
-typedef enum IapCommands
-{
-	PREPARE_SECTOR_FOR_WRITE = 50,
-	COPY_RAM_TO_FLASH = 51,
-	ERASE_SECTOR = 52,
-	BLANK_CHECK_SECTOR = 53,
-	READ_PART_ID = 54,
-	READ_BOOT_VER = 55,
-	COMPARE = 56,
-	REINVOKE_ISP = 57,
-} IapCommands;
-
-#if CPU_ARM_LPC2378
-	#define FLASH_MEM_SIZE         (504 * 1024L)
-	#define FLASH_PAGE_SIZE_BYTES   4096
-	#define FLASH_PAGE_4K_CNT         14
-#else
-	#error Unknown CPU
-#endif
-
 /* Vectored Interrupt Controller (VIC) */
 #define VIC_BASE_ADDR	0xFFFFF000
 #define VICIRQStatus   (*(reg32_t *)(VIC_BASE_ADDR + 0x000))
