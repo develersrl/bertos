@@ -193,8 +193,8 @@ def mkGenerator(project_info):
             cpu_mk_parameters.append("%s = %s" %(key.replace("MK", mk_data["$pname"]), value))
     mk_data["$cpuparameters"] = "\n".join(cpu_mk_parameters)
     mk_data["$csrc"], mk_data["$pcsrc"], mk_data["$cppasrc"], mk_data["$cxxsrc"], mk_data["$asrc"], mk_data["$constants"] = csrcGenerator(project_info)
-    mk_data["$prefix"] = replaceSeparators(project_info.info("TOOLCHAIN")["path"].split("gcc")[0])
-    mk_data["$suffix"] = replaceSeparators(project_info.info("TOOLCHAIN")["path"].split("gcc")[1])
+    mk_data["$prefix"] = replaceSeparators(project_info.info("TOOLCHAIN")["path"].rsplit("gcc", 1)[0])
+    mk_data["$suffix"] = replaceSeparators(project_info.info("TOOLCHAIN")["path"].rsplit("gcc", 1)[1])
     mk_data["$hwpath"] = relpath.relpath(project_info.info("PROJECT_HW_PATH"), project_info.info("PROJECT_PATH"))
     for key in mk_data:
         makefile = makefile.replace(key, mk_data[key])
