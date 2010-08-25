@@ -32,7 +32,7 @@
  *
  * \brief AFSK1200 modem.
  *
- * \author Francesco Sacchi <asterix@develer.com>
+ * \author Francesco Sacchi <batt@develer.com>
  */
 
 #include "afsk.h"

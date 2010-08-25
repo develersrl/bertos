@@ -32,7 +32,7 @@
  *
  * \brief AFSK1200 modem.
  *
- * \author Francesco Sacchi <asterix@develer.com>
+ * \author Francesco Sacchi <batt@develer.com>
  *
  * $WIZ$ module_name = "afsk"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_afsk.h"
@@ -46,8 +46,10 @@
 #include "cfg/cfg_afsk.h"
 #include "hw/hw_afsk.h"
 
-#include <io/kfile.h>
 #include <cfg/compiler.h>
+
+#include <io/kfile.h>
+
 #include <struct/fifobuf.h>
 
 
