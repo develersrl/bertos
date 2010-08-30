@@ -9,7 +9,7 @@ kernel_PROGRAMMER_PORT = none
 
 # Files included by the user.
 kernel_USER_CSRC = \
-	$(kernel_SRC_PATH)/../bertos/cpu/cortex-m3/drv/ssi_lm3s.c \
+	bertos/cpu/cortex-m3/drv/ssi_lm3s.c \
 	$(kernel_SRC_PATH)/main.c \
 	#
 

@@ -9,7 +9,7 @@ empty_PROGRAMMER_PORT = none
 
 # Files included by the user.
 empty_USER_CSRC = \
-	$(empty_SRC_PATH)/../bertos/cpu/cortex-m3/drv/ssi_lm3s.c \
+	bertos/cpu/cortex-m3/drv/ssi_lm3s.c \
 	$(empty_SRC_PATH)/main.c \
 	#
 
