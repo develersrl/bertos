@@ -246,6 +246,18 @@
 		#define CPU_RAM_START       0x100
 	#endif
 
+#elif CPU_MSP430
+
+	#define CPU_REG_BITS            16
+	#define CPU_REGS_CNT            12
+	#define CPU_BYTE_ORDER          CPU_LITTLE_ENDIAN
+	#define CPU_HARVARD		        0
+
+	/// Valid pointers should be >= than this value (used for debug)
+	#define CPU_RAM_START     	    0x200
+
+	#define NOP                     __asm__ __volatile__ ("nop")
+
 #else
 	#error No CPU_... defined.
 #endif

@@ -486,8 +486,8 @@ typedef unsigned char sigmask_t; /**< Type for signal masks. */
 		typedef long ssize_t;
 	#elif CPU_ARM || CPU_CM3
 		typedef int ssize_t;
-	#elif CPU_AVR
-		/* 16bit (missing in avr-libc's sys/types.h). */
+	#elif CPU_AVR || CPU_MSP430
+		/* 16bit (missing in avr-/msp430-libc's sys/types.h). */
 		typedef int ssize_t;
 	#else
 		#error Unknown CPU

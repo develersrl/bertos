@@ -120,6 +120,14 @@
 	#define SIZEOF_CPUSTACK_T 1
 	#define SIZEOF_CPUALIGNED_T SIZEOF_CPUSTACK_T
 
+#elif CPU_MSP430
+
+	typedef uint16_t cpu_flags_t;
+	typedef uint16_t cpu_stack_t;
+	typedef cpu_stack_t cpu_aligned_stack_t;
+	#define SIZEOF_CPUSTACK_T 2
+	#define SIZEOF_CPUALIGNED_T SIZEOF_CPUSTACK_T
+
 #else
 	#error No CPU_... defined.
 #endif

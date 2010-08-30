@@ -604,7 +604,7 @@ NEXT_FLAG:
 			case 'p':
 			case 'X':
 				if (format_flag == 'p')
-#if defined(__AVR__) || defined(__I196__) /* 16bit pointers */
+#if defined(__AVR__) || defined(__I196__) || defined(__MSP430__) /* 16bit pointers */
 					ulong = (unsigned long)(unsigned short)va_arg(ap, char *);
 #else /* 32bit pointers */
 					ulong = (unsigned long)va_arg(ap, char *);

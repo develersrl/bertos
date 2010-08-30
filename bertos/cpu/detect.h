@@ -363,13 +363,26 @@
 	#define CPU_AVR_ATMEGA1280      0
 #endif
 
+#if defined (__MSP430__)
+	#define CPU_MSP430              1
+	#define CPU_ID                  msp430
+
+	#if defined(__MSP430_2274__)
+		#define CPU_MSP430_2274     1
+	#else
+		#define CPU_MSP430_2274     0
+	#endif
+#else
+	#define CPU_MSP430              0
+#endif
+
 
 /* Self-check for the detection: only one CPU must be detected */
-#if CPU_ARM + CPU_CM3 + CPU_I196 + CPU_X86 + CPU_PPC + CPU_DSP56K + CPU_AVR == 0
+#if CPU_ARM + CPU_CM3 + CPU_I196 + CPU_X86 + CPU_PPC + CPU_DSP56K + CPU_AVR + CPU_MSP430 == 0
 	#error Unknown CPU
 #elif !defined(CPU_ID)
 	#error CPU_ID not defined
-#elif CPU_ARM + CPU_CM3 + CPU_I196 + CPU_X86 + CPU_PPC + CPU_DSP56K + CPU_AVR != 1
+#elif CPU_ARM + CPU_CM3 + CPU_I196 + CPU_X86 + CPU_PPC + CPU_DSP56K + CPU_AVR + CPU_MSP430 != 1
 	#error Internal CPU configuration error
 #endif
 

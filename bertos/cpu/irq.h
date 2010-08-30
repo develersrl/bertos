@@ -527,6 +527,13 @@
 		#define ISR_PROTO_CONTEXT_SWITCH(vect) ISR(vect)
 	#endif
 
+#elif CPU_MSP430
+
+	/* Get the compiler defined macros */
+	#include <signal.h>
+	#define IRQ_DISABLE         dint()
+	#define IRQ_ENABLE          eint()
+
 #else
 	#error No CPU_... defined.
 #endif

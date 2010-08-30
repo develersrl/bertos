@@ -91,6 +91,12 @@
 	#define CPU_STACK_GROWS_UPWARD  0
 	#define CPU_SP_ON_EMPTY_SLOT    1
 
+#elif CPU_MSP430
+
+	#define CPU_SAVED_REGS_CNT     16
+	#define CPU_STACK_GROWS_UPWARD  1
+	#define CPU_SP_ON_EMPTY_SLOT    0
+
 #else
 	#error No CPU_... defined.
 #endif
