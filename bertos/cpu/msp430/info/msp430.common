@@ -48,7 +48,7 @@ CPU_DESC = [ "Texas Instruments MSP430 Microcontroller ",
              "16-bit RISC Architecture"]
 
 # Type of the toolchain we should use to compile the source for this CPU.
-TOOLCHAIN = "mspgcc"
+TOOLCHAIN = "msp430"
 
 # Special CPU related tags.
 CPU_TAGS = ["Von Neumann", TOOLCHAIN]
