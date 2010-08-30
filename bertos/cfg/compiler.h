@@ -531,7 +531,22 @@ typedef unsigned char sigmask_t; /**< Type for signal masks. */
 	 *
 	 * \note This macro is non-standard, but implements a very common idiom
 	 */
-	#define countof(a)  (sizeof(a) / sizeof(*(a)))
+	#if defined(__GNUC__) && !defined(__cplusplus)
+		/*
+		 * Perform a compile time type checking: countof() can only
+		 * work with static arrays, so throw a compile time error if a
+		 * pointer is passed as argument.
+		 *
+		 * NOTE: the construct __builtin_types_compatible_p() is only
+		 * available for C.
+		 */
+		#define countof(a) (sizeof(a) / sizeof(*(a)) + \
+			sizeof(typeof(int[1 - 2 * \
+				!!__builtin_types_compatible_p(typeof(a), \
+						typeof(&a[0]))])) * 0)
+	#else
+		#define countof(a)  (sizeof(a) / sizeof(*(a)))
+	#endif
 #endif
 #ifndef alignof
 	/**
