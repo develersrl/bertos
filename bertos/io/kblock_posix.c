@@ -95,11 +95,10 @@ static int kblockposix_error(struct KBlock *b)
 }
 
 
-static int kblockposix_claererr(struct KBlock *b)
+static void kblockposix_claererr(struct KBlock *b)
 {
 	KBlockPosix *f = KBLOCKPOSIX_CAST(b);
 	clearerr(f->fp);
-	return 0;
 }
 
 

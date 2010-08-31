@@ -105,7 +105,7 @@ INLINE void bitarray_dump(BitArray *ctx)
 		kprintf("%d", bitarray_check(ctx, i++));
 		if (j == 7)
 		{
-			kprintf("..%02x [%d] %d\n", ctx->array[i / 8], len, i);
+			kprintf("..%02x [%zu]\n", ctx->array[i / 8], len);
 			j = 0;
 			continue;
 		}

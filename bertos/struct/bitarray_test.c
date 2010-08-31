@@ -58,7 +58,7 @@ int bitarray_testRun(void)
 	memset(test1, 0xaa, sizeof(test1));
 	bitarray_dump(&ctx);
 
-	for (int i = 0; i < bitarray_size(&ctx); i++)
+	for (size_t i = 0; i < bitarray_size(&ctx); i++)
 	{
 		if (!((bool)(i % 2) == bitarray_check(&ctx, i)))
 		{
@@ -68,7 +68,7 @@ int bitarray_testRun(void)
 	}
 
 	memset(test1, 0, sizeof(test1));
-	for (int i = 0; i < bitarray_size(&ctx); i++)
+	for (size_t i = 0; i < bitarray_size(&ctx); i++)
 	{
 		if ((i % 2) == 0)
 			bitarray_clear(&ctx, i);
@@ -77,7 +77,7 @@ int bitarray_testRun(void)
 	}
 
 	bitarray_dump(&ctx);
-	for (int i = 0; i < bitarray_size(&ctx); i++)
+	for (size_t i = 0; i < bitarray_size(&ctx); i++)
 	{
 		if (!((bool)(i % 2) == bitarray_check(&ctx, i)))
 		{
