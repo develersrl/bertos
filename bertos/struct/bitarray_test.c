@@ -43,68 +43,81 @@
 
 #include <string.h>
 
-ALLOC_BITARRAY(test1, 31);
-BitArray ctx;
+#define TEST1_LEN   31
+#define TEST2_LEN   17
+
+ALLOC_BITARRAY(test1, TEST1_LEN);
+ALLOC_BITARRAY(test2, TEST2_LEN);
+
 
 int bitarray_testSetup(void)
 {
 	kdbg_init();
-	init_bitarray(&ctx, test1, sizeof(test1));
 	return 0;
 }
 
 int bitarray_testRun(void)
 {
 	memset(test1, 0xaa, sizeof(test1));
-	bitarray_dump(&ctx);
 
-	for (size_t i = 0; i < bitarray_size(&ctx); i++)
+	bitarray_dump(test1, TEST1_LEN);
+	for (size_t i = 0; i < TEST1_LEN; i++)
 	{
-		if (!((bool)(i % 2) == bitarray_check(&ctx, i)))
-		{
-			kprintf("Error!\n");
-			return -1;
-		}
+		if (!((bool)(i % 2) == bitarray_check(i, test1, TEST1_LEN)))
+			goto error;
 	}
 
 	memset(test1, 0, sizeof(test1));
-	for (size_t i = 0; i < bitarray_size(&ctx); i++)
+	for (size_t i = 0; i < TEST1_LEN; i++)
 	{
 		if ((i % 2) == 0)
-			bitarray_clear(&ctx, i);
+			bitarray_clear(i, test1, TEST1_LEN);
 		else
-			bitarray_set(&ctx, i);
+			bitarray_set(i, test1, TEST1_LEN);
 	}
 
-	bitarray_dump(&ctx);
-	for (size_t i = 0; i < bitarray_size(&ctx); i++)
+	bitarray_dump(test1, TEST1_LEN);
+	for (size_t i = 0; i < TEST1_LEN; i++)
 	{
-		if (!((bool)(i % 2) == bitarray_check(&ctx, i)))
-		{
-			kprintf("Error!\n");
-			return -1;
-		}
+		if (!((bool)(i % 2) == bitarray_check(i, test1, TEST1_LEN)))
+		goto error;
 	}
 
 	memset(test1, 0, sizeof(test1));
-	bitarray_set(&ctx, 0);
-	bitarray_dump(&ctx);
-	if (!bitarray_check(&ctx, 0))
-	{
-		kprintf("Error!\n");
-		return -1;
-	}
+	bitarray_set(0, test1, TEST1_LEN);
+	bitarray_dump(test1, TEST1_LEN);
+	if (!bitarray_check(0, test1, TEST1_LEN))
+		goto error;
 
 	memset(test1, 0, sizeof(test1));
-	bitarray_set(&ctx, bitarray_size(&ctx));
-	bitarray_dump(&ctx);
-	if (!bitarray_check(&ctx, bitarray_size(&ctx)))
-	{
-		kprintf("Error!\n");
-		return -1;
-	}
+	bitarray_set(TEST1_LEN, test1, TEST1_LEN);
+	bitarray_dump(test1, TEST1_LEN);
+	if (!bitarray_check(TEST1_LEN, test1, TEST1_LEN))
+		goto error;
+
+	kprintf("Test 2\n");
+	memset(test2, 0xFF, sizeof(test2));
+	bitarray_dump(test2, TEST2_LEN);
+	if (!bitarray_full(test2, TEST2_LEN))
+		goto error;
+
+	memset(test2, 0xFF, sizeof(test2));
+	bitarray_clear(5, test2, TEST2_LEN);
+	bitarray_dump(test2, TEST2_LEN);
+	if (bitarray_full(test2, TEST2_LEN))
+		goto error;
+
+	memset(test2, 0xFF, sizeof(test2));
+	bitarray_clear(13, test2, TEST2_LEN);
+	bitarray_dump(test2, TEST2_LEN);
+	if (bitarray_full(test2, TEST2_LEN))
+		goto error;
 
 	return 0;
+
+error:
+	kprintf("Error!\n");
+	return -1;
 }
 
 int bitarray_testTearDown(void)

@@ -45,72 +45,100 @@
 
 #include <cpu/types.h>
 
-typedef struct BitArray
-{
-	size_t size;
-	uint8_t *array;
-
-} BitArray;
-
 
 #define ALLOC_BITARRAY(name, size)   uint8_t name[DIV_ROUNDUP((size), 8)]
+#define BIT_ARRAY_SIZE(name)         (sizeof((name)) * 8)
 
-
-INLINE void bitarray_set(BitArray *ctx, int idx)
+INLINE void bitarray_set(int idx, uint8_t *bit_array, size_t len)
 {
-	ASSERT((size_t)idx <= ctx->size);
+	ASSERT((size_t)idx <= len);
 	int page = idx / 8;
 	uint8_t bit = idx % 8;
 
-	ctx->array[page] |= BV(bit);
+	bit_array[page] |= BV(bit);
 }
 
-INLINE void bitarray_clear(BitArray *ctx, int idx)
+INLINE void bitarray_clear(int idx, uint8_t *bit_array, size_t len)
 {
-	ASSERT((size_t)idx <= ctx->size);
+	ASSERT((size_t)idx <= len);
 	int page = idx / 8;
 	uint8_t bit = idx % 8;
 
-	ctx->array[page] &= ~BV(bit);
+	bit_array[page] &= ~BV(bit);
 }
 
-INLINE bool bitarray_check(BitArray *ctx, int idx)
+INLINE void bitarray_setOffset(int idx, int offset, uint8_t *bit_array, size_t len)
 {
-	ASSERT((size_t)idx <= ctx->size);
+	ASSERT((size_t)idx <= len);
+
+	for (int i = idx; i < offset + idx; i++)
+		bitarray_set(i, bit_array, len);
+}
+
+
+INLINE void bitarray_clearOffset(int idx, int offset, uint8_t *bit_array, size_t len)
+{
+	ASSERT((size_t)idx <= len);
+
+	for (int i = idx; i < offset + idx; i++)
+		bitarray_clear(i, bit_array, len);
+}
+
+INLINE bool bitarray_check(int idx, uint8_t *bit_array, size_t len)
+{
+	ASSERT((size_t)idx <= len);
 	int page = idx / 8;
 	uint8_t bit = idx % 8;
 
-	return (ctx->array[page] & BV(bit));
+	return (bit_array[page] & BV(bit));
 }
 
-INLINE void init_bitarray(BitArray *ctx, uint8_t *array, size_t size)
+INLINE bool bitarray_full(uint8_t *bit_array, size_t len)
 {
-	ctx->size = size * 8;
-	ctx->array = array;
+	int count = len;
+	for (size_t page = 0; page <= len / 8; page++)
+	{
+		if (count < 8)
+		{
+			for (size_t i = page * 8; i <= len; i++)
+				if (!bitarray_check(i, bit_array, len))
+					return 0;
+				count--;
+		}
+		else
+		{
+			if (!(bit_array[page] == 0xff))
+				return 0;
+		}
+		count -= 8;
+	}
+
+	return 1;
 }
 
-INLINE size_t bitarray_size(BitArray *ctx)
-{
-	return ctx->size;
-}
 
-INLINE void bitarray_dump(BitArray *ctx)
+INLINE void bitarray_dump(uint8_t *bit_array, size_t len)
 {
+	kprintf("bitarray size[%zu]bits\n", len);
+
 	int i = 0;
 	int j = 0;
-	size_t len = ctx->size;
-	kprintf("bitarray size[%zu]\n", ctx->size);
-	while (len--)
+	int count = len;
+
+	while (count--)
 	{
-		kprintf("%d", bitarray_check(ctx, i++));
+		kprintf("%d", bitarray_check(i++, bit_array, len));
 		if (j == 7)
 		{
-			kprintf("..%02x [%zu]\n", ctx->array[i / 8], len);
+			kprintf("..%02x [%d]\n", bit_array[(i / 8) - 1], i);
 			j = 0;
 			continue;
 		}
 		j++;
 	}
+
+	if (j != 0)
+		kprintf("..%02x [%d]\n", bit_array[i / 8], i);
 }
 
 int bitarray_testSetup(void);
