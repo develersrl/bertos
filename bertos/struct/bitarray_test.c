@@ -41,7 +41,9 @@
 #include <cfg/test.h>
 #include <cfg/debug.h>
 
-ALLOC_BITARRAY(test1, 128);
+#include <string.h>
+
+ALLOC_BITARRAY(test1, 31);
 BitArray ctx;
 
 int bitarray_testSetup(void)
@@ -53,6 +55,55 @@ int bitarray_testSetup(void)
 
 int bitarray_testRun(void)
 {
+	memset(test1, 0xaa, sizeof(test1));
+	bitarray_dump(&ctx);
+
+	for (int i = 0; i < bitarray_size(&ctx); i++)
+	{
+		if (!((bool)(i % 2) == bitarray_check(&ctx, i)))
+		{
+			kprintf("Error!\n");
+			return -1;
+		}
+	}
+
+	memset(test1, 0, sizeof(test1));
+	for (int i = 0; i < bitarray_size(&ctx); i++)
+	{
+		if ((i % 2) == 0)
+			bitarray_clear(&ctx, i);
+		else
+			bitarray_set(&ctx, i);
+	}
+
+	bitarray_dump(&ctx);
+	for (int i = 0; i < bitarray_size(&ctx); i++)
+	{
+		if (!((bool)(i % 2) == bitarray_check(&ctx, i)))
+		{
+			kprintf("Error!\n");
+			return -1;
+		}
+	}
+
+	memset(test1, 0, sizeof(test1));
+	bitarray_set(&ctx, 0);
+	bitarray_dump(&ctx);
+	if (!bitarray_check(&ctx, 0))
+	{
+		kprintf("Error!\n");
+		return -1;
+	}
+
+	memset(test1, 0, sizeof(test1));
+	bitarray_set(&ctx, bitarray_size(&ctx));
+	bitarray_dump(&ctx);
+	if (!bitarray_check(&ctx, bitarray_size(&ctx)))
+	{
+		kprintf("Error!\n");
+		return -1;
+	}
+
 	return 0;
 }
 

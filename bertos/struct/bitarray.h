@@ -53,14 +53,14 @@ typedef struct BitArray
 } BitArray;
 
 
-#define ALLOC_BITARRAY(name, size)   uint8_t name[DIV_ROUNDUP((size),8)]
+#define ALLOC_BITARRAY(name, size)   uint8_t name[DIV_ROUNDUP((size), 8)]
 
 
 INLINE void bitarray_set(BitArray *ctx, int idx)
 {
 	ASSERT((size_t)idx <= ctx->size);
 	int page = idx / 8;
-	int bit = idx % 8;
+	uint8_t bit = idx % 8;
 
 	ctx->array[page] |= BV(bit);
 }
@@ -69,7 +69,7 @@ INLINE void bitarray_clear(BitArray *ctx, int idx)
 {
 	ASSERT((size_t)idx <= ctx->size);
 	int page = idx / 8;
-	int bit = idx % 8;
+	uint8_t bit = idx % 8;
 
 	ctx->array[page] &= ~BV(bit);
 }
@@ -78,17 +78,40 @@ INLINE bool bitarray_check(BitArray *ctx, int idx)
 {
 	ASSERT((size_t)idx <= ctx->size);
 	int page = idx / 8;
-	int bit = idx % 8;
+	uint8_t bit = idx % 8;
 
 	return (ctx->array[page] & BV(bit));
 }
 
 INLINE void init_bitarray(BitArray *ctx, uint8_t *array, size_t size)
 {
-	ctx->size = size;
+	ctx->size = size * 8;
 	ctx->array = array;
 }
 
+INLINE size_t bitarray_size(BitArray *ctx)
+{
+	return ctx->size;
+}
+
+INLINE void bitarray_dump(BitArray *ctx)
+{
+	int i = 0;
+	int j = 0;
+	size_t len = ctx->size;
+	kprintf("bitarray size[%zu]\n", ctx->size);
+	while (len--)
+	{
+		kprintf("%d", bitarray_check(ctx, i++));
+		if (j == 7)
+		{
+			kprintf("..%02x [%d] %d\n", ctx->array[i / 8], len, i);
+			j = 0;
+			continue;
+		}
+		j++;
+	}
+}
 
 int bitarray_testSetup(void);
 int bitarray_testRun(void);
