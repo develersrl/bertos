@@ -49,10 +49,14 @@
 ALLOC_BITARRAY(test1, TEST1_LEN);
 ALLOC_BITARRAY(test2, TEST2_LEN);
 
+BitArray bitx1;
+BitArray bitx2;
 
 int bitarray_testSetup(void)
 {
 	kdbg_init();
+	init_bitarray(&bitx1, TEST1_LEN, test1, sizeof(test1));
+	init_bitarray(&bitx2, TEST2_LEN, test2, sizeof(test2));
 	return 0;
 }
 
@@ -60,10 +64,10 @@ int bitarray_testRun(void)
 {
 	memset(test1, 0xaa, sizeof(test1));
 
-	bitarray_dump(test1, TEST1_LEN);
+	bitarray_dump(&bitx1);
 	for (size_t i = 0; i < TEST1_LEN; i++)
 	{
-		if (!((bool)(i % 2) == bitarray_check(i, test1, TEST1_LEN)))
+		if (!((bool)(i % 2) == bitarray_check(&bitx1,i)))
 			goto error;
 	}
 
@@ -71,46 +75,46 @@ int bitarray_testRun(void)
 	for (size_t i = 0; i < TEST1_LEN; i++)
 	{
 		if ((i % 2) == 0)
-			bitarray_clear(i, test1, TEST1_LEN);
+			bitarray_clear(&bitx1,i);
 		else
-			bitarray_set(i, test1, TEST1_LEN);
+			bitarray_set(&bitx1, i);
 	}
 
-	bitarray_dump(test1, TEST1_LEN);
+	bitarray_dump(&bitx1);
 	for (size_t i = 0; i < TEST1_LEN; i++)
 	{
-		if (!((bool)(i % 2) == bitarray_check(i, test1, TEST1_LEN)))
+		if (!((bool)(i % 2) == bitarray_check(&bitx1, i)))
 		goto error;
 	}
 
 	memset(test1, 0, sizeof(test1));
-	bitarray_set(0, test1, TEST1_LEN);
-	bitarray_dump(test1, TEST1_LEN);
-	if (!bitarray_check(0, test1, TEST1_LEN))
+	bitarray_set(&bitx1, 0);
+	bitarray_dump(&bitx1);
+	if (!bitarray_check(&bitx1, 0))
 		goto error;
 
 	memset(test1, 0, sizeof(test1));
-	bitarray_set(TEST1_LEN, test1, TEST1_LEN);
-	bitarray_dump(test1, TEST1_LEN);
-	if (!bitarray_check(TEST1_LEN, test1, TEST1_LEN))
+	bitarray_set(&bitx1, TEST1_LEN);
+	bitarray_dump(&bitx1);
+	if (!bitarray_check(&bitx1, TEST1_LEN))
 		goto error;
 
 	kprintf("Test 2\n");
 	memset(test2, 0xFF, sizeof(test2));
-	bitarray_dump(test2, TEST2_LEN);
-	if (!bitarray_full(test2, TEST2_LEN))
+	bitarray_dump(&bitx2);
+	if (!bitarray_full(&bitx2))
 		goto error;
 
 	memset(test2, 0xFF, sizeof(test2));
-	bitarray_clear(5, test2, TEST2_LEN);
-	bitarray_dump(test2, TEST2_LEN);
-	if (bitarray_full(test2, TEST2_LEN))
+	bitarray_clear(&bitx2, 5);
+	bitarray_dump(&bitx2);
+	if (bitarray_full(&bitx2))
 		goto error;
 
 	memset(test2, 0xFF, sizeof(test2));
-	bitarray_clear(13, test2, TEST2_LEN);
-	bitarray_dump(test2, TEST2_LEN);
-	if (bitarray_full(test2, TEST2_LEN))
+	bitarray_clear(&bitx2, 13);
+	bitarray_dump(&bitx2);
+	if (bitarray_full(&bitx2))
 		goto error;
 
 	return 0;
