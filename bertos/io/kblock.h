@@ -92,9 +92,13 @@ typedef struct KBlockVTable
 } KBlockVTable;
 
 
-#define KB_BUFFERED    BV(0) ///< Internal flag: true if the KBlock has a buffer
-#define KB_CACHE_DIRTY BV(1) ///< Internal flag: true if the cache is dirty
-#define KB_PARTIAL_WRITE BV(2) ///< Internal flag: true if the device allows partial block write
+#define KB_BUFFERED        BV(0) ///< Internal flag: true if the KBlock has a buffer
+#define KB_CACHE_DIRTY     BV(1) ///< Internal flag: true if the cache is dirty
+#define KB_PARTIAL_WRITE   BV(2) ///< Internal flag: true if the device allows partial block write
+
+#define KB_WRITE_ONCE      BV(3) ///< Allow only the one write on select block.
+#define KB_OPEN_BUFF       BV(4) ///< Open flash memory using page caching, allowing the modification and partial write.
+#define KB_OPEN_UNBUFF     BV(5) ///< Open flash memory whitout memory caching.
 
 /**
  * KBlock private members.
