@@ -90,7 +90,7 @@ INLINE void stm32_gpioPinWrite(struct stm32_gpio *base, uint32_t pins, bool val)
  */
 INLINE uint8_t stm32_gpioPinRead(struct stm32_gpio *base, uint32_t pins)
 {
-	return !!(base->IDR & pins);
+	return (base->IDR & pins);
 }
 
 /**
