@@ -234,11 +234,11 @@ static void common_init(Flash *fls)
 }
 
 
-void flash_hw_init(Flash *fls)
+void flash_hw_init(Flash *fls, int flags)
 {
 	common_init(fls);
 	fls->blk.priv.vt = &flash_stm32_buffered_vt;
-	fls->blk.priv.flags |= KB_BUFFERED | KB_PARTIAL_WRITE;
+	fls->blk.priv.flags |= KB_BUFFERED | KB_PARTIAL_WRITE | flags;
 	fls->blk.priv.buf = flash_buf;
 
 	/* Load the first block in the cache */
@@ -246,8 +246,9 @@ void flash_hw_init(Flash *fls)
 	memcpy(fls->blk.priv.buf, flash_start, fls->blk.blk_size);
 }
 
-void flash_hw_initUnbuffered(Flash *fls)
+void flash_hw_initUnbuffered(Flash *fls, int flags)
 {
 	common_init(fls);
 	fls->blk.priv.vt = &flash_stm32_unbuffered_vt;
+	fls->blk.priv.flags |= flags;
 }
