@@ -51,6 +51,14 @@
 #include <io/kfile.h>
 #include <io/kfile_block.h>
 
+#include <cpu/attr.h>
+
+#if COMPILER_C99
+	#define flash_init(...)           PP_CAT(flash_init ## _, COUNT_PARMS(__VA_ARGS__)) (__VA_ARGS__)
+#else
+	#define flash_init(args...)       PP_CAT(flash_init ## _, COUNT_PARMS(args)) (args)
+#endif
+
 /*
  * Embedded flash error flags
  */
@@ -91,24 +99,21 @@ INLINE Flash *FLASH_CAST(KBlock *fls)
 	return (Flash *)fls;
 }
 
-void flash_hw_init(Flash *fls);
-void flash_hw_initUnbuffered(Flash *fls);
+void flash_hw_init(Flash *fls, int flags);
+void flash_hw_initUnbuffered(Flash *fls, int flags);
 
 #include CPU_HEADER(flash)
 
-INLINE void flash_init(Flash *fls)
-{
-	flash_hw_init(fls);
+#define flash_init_2(fls, flags)    (flags & KB_OPEN_UNBUFF) ? \
+										flash_hw_initUnbuffered(fls, flags) : flash_hw_init(fls, flags)
 
-	#if !CONFIG_FLASH_DISABLE_OLD_API
-		kfileblock_init(&fls->fdblk, &fls->blk);
-	#endif /* !CONFIG_FLASH_DISABLE_OLD_API */
-}
-
-INLINE void flash_initUnbuffered(Flash *fls)
+#if !CONFIG_FLASH_DISABLE_OLD_API
+INLINE DEPRECATED void flash_init_1(Flash *fls)
 {
-	flash_hw_initUnbuffered(fls);
+	flash_hw_init(fls, 0);
+	kfileblock_init(&fls->fdblk, &fls->blk);
 }
+#endif /* !CONFIG_FLASH_DISABLE_OLD_API */
 
 #include CPU_HEADER(flash)
 
