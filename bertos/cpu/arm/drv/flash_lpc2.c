@@ -58,6 +58,8 @@
 #include <drv/timer.h>
 #include <drv/flash.h>
 
+#include <struct/bitarray.h>
+
 #include <string.h>
 
 /* Embedded flash programming defines. */
@@ -77,8 +79,8 @@ typedef enum IapCommands
 
 #if CPU_ARM_LPC2378
 	#define FLASH_MEM_SIZE         (504 * 1024L)
-	#define FLASH_PAGE_SIZE_BYTES   4096
-	#define FLASH_PAGE_4K_CNT         14
+	#define FLASH_PAGE_SIZE_BYTES          4096
+	#define FLASH_REAL_PAGE_CNT              28
 #else
 	#error Unknown CPU
 #endif
@@ -88,6 +90,34 @@ typedef enum IapCommands
 struct FlashHardware
 {
 	uint8_t status;
+};
+
+#define FLASH_PAGE_CNT  FLASH_MEM_SIZE / FLASH_PAGE_SIZE_BYTES
+
+ALLOC_BITARRAY(page_dirty, FLASH_PAGE_CNT);
+
+uint8_t erase_group[] = {
+
+	4096 / FLASH_PAGE_SIZE_BYTES, 4096 / FLASH_PAGE_SIZE_BYTES,
+	4096 / FLASH_PAGE_SIZE_BYTES, 4096 / FLASH_PAGE_SIZE_BYTES,
+
+	4096 / FLASH_PAGE_SIZE_BYTES, 4096 / FLASH_PAGE_SIZE_BYTES,
+	4096 / FLASH_PAGE_SIZE_BYTES, 4096 / FLASH_PAGE_SIZE_BYTES,
+
+	32768 / FLASH_PAGE_SIZE_BYTES, 32768 / FLASH_PAGE_SIZE_BYTES,
+	32768 / FLASH_PAGE_SIZE_BYTES, 32768 / FLASH_PAGE_SIZE_BYTES,
+
+	32768 / FLASH_PAGE_SIZE_BYTES, 32768 / FLASH_PAGE_SIZE_BYTES,
+	32768 / FLASH_PAGE_SIZE_BYTES, 32768 / FLASH_PAGE_SIZE_BYTES,
+
+	32768 / FLASH_PAGE_SIZE_BYTES, 32768 / FLASH_PAGE_SIZE_BYTES,
+	32768 / FLASH_PAGE_SIZE_BYTES, 32768 / FLASH_PAGE_SIZE_BYTES,
+
+	32768 / FLASH_PAGE_SIZE_BYTES, 32768 / FLASH_PAGE_SIZE_BYTES,
+	4096 / FLASH_PAGE_SIZE_BYTES, 4096 / FLASH_PAGE_SIZE_BYTES,
+
+	4096 / FLASH_PAGE_SIZE_BYTES, 4096 / FLASH_PAGE_SIZE_BYTES,
+	4096 / FLASH_PAGE_SIZE_BYTES, 4096 / FLASH_PAGE_SIZE_BYTES,
 };
 
 typedef struct IapCmd
@@ -146,25 +176,10 @@ static uint32_t addr_to_sector(size_t addr)
 	return 0;
 }
 
-static uint32_t addr_to_pageaddr(size_t addr)
-{
-	if (addr < 4096 * 8)
-		return addr % 4096;
-	else if (addr < 4096 * 8 + 32768L * 14)
-		return (addr - 4096 * 8) % 32768;
-	else if (addr < 4096 * 8 + 32768L * 14 + 4096 * 6)
-		return (addr - 4096 * 8 - 32768L * 14) % 4096;
-
-	ASSERT(0);
-	return 0;
-}
-
 static size_t lpc2_flash_readDirect(struct KBlock *blk, block_idx_t idx, void *buf, size_t offset, size_t size)
 {
 	ASSERT(offset == 0);
 	ASSERT(size == blk->blk_size);
-
-	ASSERT(sector_size(idx) <= FLASH_PAGE_SIZE_BYTES);
 
 	memcpy(buf, (void *)(idx * blk->blk_size), size);
 	return size;
@@ -173,79 +188,106 @@ static size_t lpc2_flash_readDirect(struct KBlock *blk, block_idx_t idx, void *b
 static size_t lpc2_flash_writeDirect(struct KBlock *blk, block_idx_t idx, const void *_buf, size_t offset, size_t size)
 {
 	ASSERT(offset == 0);
-	ASSERT(size == blk->blk_size);
-	ASSERT(sector_size(idx) <= FLASH_PAGE_SIZE_BYTES);
+	ASSERT(FLASH_PAGE_SIZE_BYTES == size);
 
 	Flash *fls = FLASH_CAST(blk);
+	if (!(fls->blk.priv.flags & KB_WRITE_ONCE))
+		ASSERT(sector_size(idx) <= FLASH_PAGE_SIZE_BYTES);
+
 	const uint8_t *buf = (const uint8_t *)_buf;
 	cpu_flags_t flags;
 
 	//Compute page address of current page.
-	uint32_t addr = sector_addr(idx);
+	uint32_t addr = idx * blk->blk_size;
+	uint32_t sector = addr_to_sector(addr);
+	// Compute the first page index in the sector to manage the status
+	int idx_sector = sector_addr(sector) /  blk->blk_size;
 
-	LOG_INFO("Writing page %ld...\n", idx);
-
+	LOG_INFO("Writing page[%ld]sector[%ld]idx[%d]\n", idx, sector, idx_sector);
 	IRQ_SAVE_DISABLE(flags);
 
 	IapCmd cmd;
 	IapRes res;
 	cmd.cmd = PREPARE_SECTOR_FOR_WRITE;
-	cmd.param[0] = cmd.param[1] = idx;
+	cmd.param[0] = cmd.param[1] = sector;
 	iap(&cmd, &res);
+
 	if (res.status != CMD_SUCCESS)
+		goto flash_error;
+
+	if ((fls->blk.priv.flags & KB_WRITE_ONCE) &&
+			bitarray_blockFull(idx_sector, erase_group[sector], page_dirty, FLASH_PAGE_CNT))
 	{
-		LOG_ERR("%ld\n", res.status);
-		fls->hw->status |= FLASH_WR_ERR;
-		return 0;
+		kputs("blocchi pieni\n");
+		ASSERT(0);
+		goto flash_error;
 	}
 
-	cmd.cmd = ERASE_SECTOR;
-	cmd.param[0] = cmd.param[1] = idx;
-	cmd.param[2] = CPU_FREQ / 1000;
+	bool erase = false;
+	if ((fls->blk.priv.flags & KB_WRITE_ONCE) &&
+			bitarray_blockEmpty(idx_sector, erase_group[sector], page_dirty, FLASH_PAGE_CNT))
+		erase = true;
+
+	if (!(fls->blk.priv.flags & KB_WRITE_ONCE))
+		erase = true;
+
+	if (erase)
+	{
+		cmd.cmd = ERASE_SECTOR;
+		cmd.param[0] = cmd.param[1] = sector;
+		cmd.param[2] = CPU_FREQ / 1000;
+		iap(&cmd, &res);
+
+		if (res.status != CMD_SUCCESS)
+			goto flash_error;
+	}
+
+	LOG_INFO("Writing page [%ld], addr [%ld] in sector[%ld]\n", idx, addr, sector);
+	cmd.cmd = PREPARE_SECTOR_FOR_WRITE;
+	cmd.param[0] = cmd.param[1] = sector;
 	iap(&cmd, &res);
+
 	if (res.status != CMD_SUCCESS)
+		goto flash_error;
+
+	if (fls->blk.priv.flags & KB_WRITE_ONCE)
 	{
-		LOG_ERR("%ld\n", res.status);
-		fls->hw->status |= FLASH_WR_ERR;
-		return 0;
+		if (bitarray_check(idx, page_dirty, FLASH_PAGE_CNT))
+		{
+			ASSERT(0);
+			goto flash_error;
+		}
+		else
+			bitarray_set(idx, page_dirty, FLASH_PAGE_CNT);
 	}
 
-	while (size)
-	{
-		LOG_INFO("Writing page %ld, addr %ld, size %d\n", idx, addr, size);
-		cmd.cmd = PREPARE_SECTOR_FOR_WRITE;
-		cmd.param[0] = cmd.param[1] = idx;
-		iap(&cmd, &res);
-		if (res.status != CMD_SUCCESS)
-		{
-			LOG_ERR("%ld\n", res.status);
-			fls->hw->status |= FLASH_WR_ERR;
-			return 0;
-		}
+	cmd.cmd = COPY_RAM_TO_FLASH;
+	cmd.param[0] = addr;
+	cmd.param[1] = (uint32_t)buf;
+	cmd.param[2] = FLASH_PAGE_SIZE_BYTES;
+	cmd.param[3] = CPU_FREQ / 1000;
+	iap(&cmd, &res);
 
-		cmd.cmd = COPY_RAM_TO_FLASH;
-		cmd.param[0] = addr;
-		cmd.param[1] = (uint32_t)buf;
-		cmd.param[2] = 4096;
-		cmd.param[3] = CPU_FREQ / 1000;
-		iap(&cmd, &res);
-		if (res.status != CMD_SUCCESS)
-		{
-			LOG_ERR("%ld\n", res.status);
-			fls->hw->status |= FLASH_WR_ERR;
-			return 0;
-		}
-
-		size -= 4096;
-		addr += 4096;
-		buf += 4096 / sizeof(uint32_t);
-	}
+	if (res.status != CMD_SUCCESS)
+		goto flash_error;
 
 	IRQ_RESTORE(flags);
 	LOG_INFO("Done\n");
 
 	return blk->blk_size;
+
+flash_error:
+	LOG_ERR("%ld\n", res.status);
+	fls->hw->status |= FLASH_WR_ERR;
+	return 0;
 }
+
+static int lpc2_flash_close(UNUSED_ARG(struct KBlock, *blk))
+{
+	memset(page_dirty, 0, sizeof(page_dirty));
+	return 0;
+}
+
 
 static int lpc2_flash_error(struct KBlock *blk)
 {
@@ -269,7 +311,7 @@ static const KBlockVTable flash_lpc2_buffered_vt =
 	.load = kblock_swLoad,
 	.store = kblock_swStore,
 
-	.close = kblock_swClose,
+	.close = lpc2_flash_close,
 
 	.error = lpc2_flash_error,
 	.clearerr = lpc2_flash_clearerror,
@@ -280,7 +322,7 @@ static const KBlockVTable flash_lpc2_unbuffered_vt =
 	.readDirect = lpc2_flash_readDirect,
 	.writeDirect = lpc2_flash_writeDirect,
 
-	.close = kblock_swClose,
+	.close = lpc2_flash_close,
 
 	.error = lpc2_flash_error,
 	.clearerr = lpc2_flash_clearerror,
@@ -297,25 +339,24 @@ static void common_init(Flash *fls)
 	fls->hw = &flash_lpc2_hw;
 
 	fls->blk.blk_size = FLASH_PAGE_SIZE_BYTES;
-	fls->blk.blk_cnt = 28;
+	fls->blk.blk_cnt = FLASH_MEM_SIZE / FLASH_PAGE_SIZE_BYTES;
 }
 
-void flash_hw_init(Flash *fls)
+void flash_hw_init(Flash *fls, int flags)
 {
 	common_init(fls);
 	fls->blk.priv.vt = &flash_lpc2_buffered_vt;
-	fls->blk.priv.flags |= KB_BUFFERED | KB_PARTIAL_WRITE;
+	fls->blk.priv.flags |= KB_BUFFERED | KB_PARTIAL_WRITE | flags;
 	fls->blk.priv.buf = flash_buf;
 
 	/* Load the first block in the cache */
 	void *flash_start = 0x0;
 	memcpy(fls->blk.priv.buf, flash_start, fls->blk.blk_size);
-
-	kprintf("page[%d]\n", sector_addr(22));
 }
 
-void flash_hw_initUnbuffered(Flash *fls)
+void flash_hw_initUnbuffered(Flash *fls, int flags)
 {
 	common_init(fls);
 	fls->blk.priv.vt = &flash_lpc2_unbuffered_vt;
+	fls->blk.priv.flags |= flags;
 }
