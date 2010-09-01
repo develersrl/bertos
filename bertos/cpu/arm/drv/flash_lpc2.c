@@ -95,6 +95,7 @@ struct FlashHardware
 #define FLASH_PAGE_CNT  FLASH_MEM_SIZE / FLASH_PAGE_SIZE_BYTES
 
 ALLOC_BITARRAY(page_dirty, FLASH_PAGE_CNT);
+static BitArray lpc2_bitx;
 
 uint8_t erase_group[] = {
 
@@ -216,7 +217,7 @@ static size_t lpc2_flash_writeDirect(struct KBlock *blk, block_idx_t idx, const 
 		goto flash_error;
 
 	if ((fls->blk.priv.flags & KB_WRITE_ONCE) &&
-			bitarray_blockFull(idx_sector, erase_group[sector], page_dirty, FLASH_PAGE_CNT))
+			bitarray_blockFull(&lpc2_bitx, idx_sector, erase_group[sector]))
 	{
 		kputs("blocchi pieni\n");
 		ASSERT(0);
@@ -225,7 +226,7 @@ static size_t lpc2_flash_writeDirect(struct KBlock *blk, block_idx_t idx, const 
 
 	bool erase = false;
 	if ((fls->blk.priv.flags & KB_WRITE_ONCE) &&
-			bitarray_blockEmpty(idx_sector, erase_group[sector], page_dirty, FLASH_PAGE_CNT))
+			bitarray_blockEmpty(&lpc2_bitx, idx_sector, erase_group[sector]))
 		erase = true;
 
 	if (!(fls->blk.priv.flags & KB_WRITE_ONCE))
@@ -252,13 +253,13 @@ static size_t lpc2_flash_writeDirect(struct KBlock *blk, block_idx_t idx, const 
 
 	if (fls->blk.priv.flags & KB_WRITE_ONCE)
 	{
-		if (bitarray_check(idx, page_dirty, FLASH_PAGE_CNT))
+		if (bitarray_check(&lpc2_bitx, idx))
 		{
 			ASSERT(0);
 			goto flash_error;
 		}
 		else
-			bitarray_set(idx, page_dirty, FLASH_PAGE_CNT);
+			bitarray_set(&lpc2_bitx, idx);
 	}
 
 	cmd.cmd = COPY_RAM_TO_FLASH;
@@ -340,6 +341,8 @@ static void common_init(Flash *fls)
 
 	fls->blk.blk_size = FLASH_PAGE_SIZE_BYTES;
 	fls->blk.blk_cnt = FLASH_MEM_SIZE / FLASH_PAGE_SIZE_BYTES;
+
+	init_bitarray(&lpc2_bitx, FLASH_PAGE_CNT, page_dirty, sizeof(page_dirty));
 }
 
 void flash_hw_init(Flash *fls, int flags)
