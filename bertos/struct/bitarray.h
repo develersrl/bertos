@@ -116,6 +116,35 @@ INLINE bool bitarray_full(uint8_t *bit_array, size_t len)
 	return 1;
 }
 
+/*
+ * Ugly!.. reformat it.
+ */
+INLINE bool bitarray_blockFull(int idx, int offset, uint8_t *bit_array, size_t len)
+{
+	ASSERT((size_t)(idx + offset) <= len);
+
+	for (int i = idx; i <= idx + offset; i++)
+		if (!bitarray_check(i, bit_array, len))
+			return 0;
+
+	return 1;
+}
+
+
+/*
+ * Ugly!.. reformat it.
+ */
+INLINE bool bitarray_blockEmpty(int idx, int offset, uint8_t *bit_array, size_t len)
+{
+	ASSERT((size_t)(idx + offset) <= len);
+
+	for (int i = idx; i <= idx + offset; i++)
+		if (bitarray_check(i, bit_array, len))
+			return 0;
+
+	return 1;
+}
+
 
 INLINE void bitarray_dump(uint8_t *bit_array, size_t len)
 {
