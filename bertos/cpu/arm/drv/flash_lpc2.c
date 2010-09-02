@@ -217,7 +217,7 @@ static size_t lpc2_flash_writeDirect(struct KBlock *blk, block_idx_t idx, const 
 		goto flash_error;
 
 	if ((fls->blk.priv.flags & KB_WRITE_ONCE) &&
-			bitarray_blockFull(&lpc2_bitx, idx_sector, erase_group[sector]))
+			bitarray_isRangeFull(&lpc2_bitx, idx_sector, erase_group[sector]))
 	{
 		kputs("blocchi pieni\n");
 		ASSERT(0);
@@ -226,7 +226,7 @@ static size_t lpc2_flash_writeDirect(struct KBlock *blk, block_idx_t idx, const 
 
 	bool erase = false;
 	if ((fls->blk.priv.flags & KB_WRITE_ONCE) &&
-			bitarray_blockEmpty(&lpc2_bitx, idx_sector, erase_group[sector]))
+			bitarray_isRangeEmpty(&lpc2_bitx, idx_sector, erase_group[sector]))
 		erase = true;
 
 	if (!(fls->blk.priv.flags & KB_WRITE_ONCE))
@@ -253,7 +253,7 @@ static size_t lpc2_flash_writeDirect(struct KBlock *blk, block_idx_t idx, const 
 
 	if (fls->blk.priv.flags & KB_WRITE_ONCE)
 	{
-		if (bitarray_check(&lpc2_bitx, idx))
+		if (bitarray_test(&lpc2_bitx, idx))
 		{
 			ASSERT(0);
 			goto flash_error;

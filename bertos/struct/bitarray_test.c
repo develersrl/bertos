@@ -67,7 +67,7 @@ int bitarray_testRun(void)
 	bitarray_dump(&bitx1);
 	for (size_t i = 0; i < TEST1_LEN; i++)
 	{
-		if (!((bool)(i % 2) == bitarray_check(&bitx1,i)))
+		if (!((bool)(i % 2) == bitarray_test(&bitx1,i)))
 			goto error;
 	}
 
@@ -83,38 +83,38 @@ int bitarray_testRun(void)
 	bitarray_dump(&bitx1);
 	for (size_t i = 0; i < TEST1_LEN; i++)
 	{
-		if (!((bool)(i % 2) == bitarray_check(&bitx1, i)))
+		if (!((bool)(i % 2) == bitarray_test(&bitx1, i)))
 		goto error;
 	}
 
 	memset(test1, 0, sizeof(test1));
 	bitarray_set(&bitx1, 0);
 	bitarray_dump(&bitx1);
-	if (!bitarray_check(&bitx1, 0))
+	if (!bitarray_test(&bitx1, 0))
 		goto error;
 
 	memset(test1, 0, sizeof(test1));
 	bitarray_set(&bitx1, TEST1_LEN);
 	bitarray_dump(&bitx1);
-	if (!bitarray_check(&bitx1, TEST1_LEN))
+	if (!bitarray_test(&bitx1, TEST1_LEN))
 		goto error;
 
 	kprintf("Test 2\n");
 	memset(test2, 0xFF, sizeof(test2));
 	bitarray_dump(&bitx2);
-	if (!bitarray_full(&bitx2))
+	if (!bitarray_isFull(&bitx2))
 		goto error;
 
 	memset(test2, 0xFF, sizeof(test2));
 	bitarray_clear(&bitx2, 5);
 	bitarray_dump(&bitx2);
-	if (bitarray_full(&bitx2))
+	if (bitarray_isFull(&bitx2))
 		goto error;
 
 	memset(test2, 0xFF, sizeof(test2));
 	bitarray_clear(&bitx2, 13);
 	bitarray_dump(&bitx2);
-	if (bitarray_full(&bitx2))
+	if (bitarray_isFull(&bitx2))
 		goto error;
 
 	return 0;

@@ -75,7 +75,7 @@ INLINE void bitarray_clear(BitArray *bitx, int idx)
 	bitx->array[page] &= ~BV(bit);
 }
 
-INLINE void bitarray_setOffset(BitArray *bitx, int idx, int offset)
+INLINE void bitarray_setRange(BitArray *bitx, int idx, int offset)
 {
 	ASSERT((size_t)idx <= bitx->bitarray_len);
 
@@ -84,7 +84,7 @@ INLINE void bitarray_setOffset(BitArray *bitx, int idx, int offset)
 }
 
 
-INLINE void bitarray_clearOffset(BitArray *bitx, int idx, int offset)
+INLINE void bitarray_clearRange(BitArray *bitx, int idx, int offset)
 {
 	ASSERT((size_t)idx <= bitx->bitarray_len);
 
@@ -92,7 +92,7 @@ INLINE void bitarray_clearOffset(BitArray *bitx, int idx, int offset)
 		bitarray_clear(bitx, i);
 }
 
-INLINE bool bitarray_check(BitArray *bitx, int idx)
+INLINE bool bitarray_test(BitArray *bitx, int idx)
 {
 	ASSERT((size_t)idx <= bitx->bitarray_len);
 	int page = idx / 8;
@@ -104,7 +104,7 @@ INLINE bool bitarray_check(BitArray *bitx, int idx)
 /*
  * Ugly!.. reformat it.
  */
-INLINE bool bitarray_full(BitArray *bitx)
+INLINE bool bitarray_isFull(BitArray *bitx)
 {
 	int count = bitx->size;
 	for (size_t page = 0; page <= bitx->size / 8; page++)
@@ -112,7 +112,7 @@ INLINE bool bitarray_full(BitArray *bitx)
 		if (count < 8)
 		{
 			for (size_t i = page * 8; i <= bitx->bitarray_len; i++)
-				if (!bitarray_check(bitx, i))
+				if (!bitarray_test(bitx, i))
 					return 0;
 				count--;
 		}
@@ -130,12 +130,12 @@ INLINE bool bitarray_full(BitArray *bitx)
 /*
  * Ugly!.. reformat it.
  */
-INLINE bool bitarray_blockFull(BitArray *bitx, int idx, int offset)
+INLINE bool bitarray_isRangeFull(BitArray *bitx, int idx, int offset)
 {
 	ASSERT((size_t)(idx + offset) <= bitx->bitarray_len);
 
 	for (int i = idx; i <= idx + offset; i++)
-		if (!bitarray_check(bitx, i))
+		if (!bitarray_test(bitx, i))
 			return 0;
 
 	return 1;
@@ -144,12 +144,12 @@ INLINE bool bitarray_blockFull(BitArray *bitx, int idx, int offset)
 /*
  * Ugly!.. reformat it.
  */
-INLINE bool bitarray_blockEmpty(BitArray *bitx, int idx, int offset)
+INLINE bool bitarray_isRangeEmpty(BitArray *bitx, int idx, int offset)
 {
 	ASSERT((size_t)(idx + offset) <= bitx->bitarray_len);
 
 	for (int i = idx; i <= idx + offset; i++)
-		if (bitarray_check(bitx, i))
+		if (bitarray_test(bitx, i))
 			return 0;
 
 	return 1;
@@ -166,7 +166,7 @@ INLINE void bitarray_dump(BitArray *bitx)
 
 	while (count--)
 	{
-		kprintf("%d", bitarray_check(bitx, i++));
+		kprintf("%d", bitarray_test(bitx, i++));
 		if (j == 7)
 		{
 			kprintf("..%02x [%d]\n", bitx->array[(i / 8) - 1], i);
