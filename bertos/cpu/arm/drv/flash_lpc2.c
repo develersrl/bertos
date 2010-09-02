@@ -94,7 +94,7 @@ struct FlashHardware
 
 #define FLASH_PAGE_CNT  FLASH_MEM_SIZE / FLASH_PAGE_SIZE_BYTES
 
-ALLOC_BITARRAY(page_dirty, FLASH_PAGE_CNT);
+BITARRAY_ALLOC(page_dirty, FLASH_PAGE_CNT);
 static BitArray lpc2_bitx;
 
 uint8_t erase_group[] = {

@@ -46,8 +46,8 @@
 #define TEST1_LEN   31
 #define TEST2_LEN   17
 
-ALLOC_BITARRAY(test1, TEST1_LEN);
-ALLOC_BITARRAY(test2, TEST2_LEN);
+BITARRAY_ALLOC(test1, TEST1_LEN);
+BITARRAY_ALLOC(test2, TEST2_LEN);
 
 BitArray bitx1;
 BitArray bitx2;

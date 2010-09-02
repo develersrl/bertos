@@ -52,8 +52,8 @@ typedef struct BitArray
 	uint8_t *array;
 } BitArray;
 
-#define ALLOC_BITARRAY(name, size)   uint8_t name[DIV_ROUNDUP((size), 8)]
-#define BIT_ARRAY_SIZE(name)         (sizeof((name)) * 8)
+#define BITARRAY_ALLOC(name, size)   uint8_t name[DIV_ROUNDUP((size), 8)]
+#define BITARRAY_SIZE(name)         (sizeof((name)) * 8)
 
 INLINE void bitarray_set(BitArray *bitx, int idx)
 {
