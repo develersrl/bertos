@@ -203,7 +203,7 @@ static void common_init(Flash *fls)
 }
 
 
-void flash_hw_init(Flash *fls, int flags);
+void flash_hw_init(Flash *fls, int flags)
 {
 	common_init(fls);
 	fls->blk.priv.vt = &flash_lm3s_buffered_vt;
