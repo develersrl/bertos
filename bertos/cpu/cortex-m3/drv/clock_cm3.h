@@ -30,63 +30,20 @@
  *
  * -->
  *
- * \brief Cortex-M3 architecture's entry point
+ * \brief Low-level Clock module for ARM Cortex-m3 (interface).
  *
- * \author Andrea Righi <arighi@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
+ *
  */
 
-#include "cfg/cfg_proc.h" /* CONFIG_KERN_PREEMPT */
-#include "switch_ctx_cm3.h"
+#include <cpu/detect.h>
 
-#include <cfg/compiler.h>
-#include <cfg/debug.h>
-
-#include <cpu/attr.h> /* PAUSE */
-#include <cpu/irq.h> /* IRQ_DISABLE */
-#include <cpu/types.h>
-
-#include <drv/irq_cm3.h>
-#include <drv/clock_cm3.h>
-
-#include <kern/proc_p.h>
-
-#include <io/cm3.h>
-
-extern size_t __text_end, __data_start, __data_end, __bss_start, __bss_end;
-
-extern void __init2(void);
-
-/* Architecture's entry point */
-void __init2(void)
-{
-	/*
-	 * The main application expects IRQs disabled.
-	 */
-	IRQ_DISABLE;
-
-	/* Set the appropriate clocking configuration */
-	clock_init();
-
-	/* Initialize IRQ vector table in RAM */
-	sysirq_init();
-
-#if (CONFIG_KERN && CONFIG_KERN_PREEMPT)
-	/*
-	 * Voluntary context switch handler.
-	 *
-	 * This software interrupt can always be triggered and must be
-	 * dispatched as soon as possible, thus we just disable IRQ priority
-	 * for it.
-	 */
-	sysirq_setHandler(FAULT_SVCALL, svcall_handler);
-	sysirq_setPriority(FAULT_SVCALL, IRQ_PRIO_MAX);
-	/*
-	 * Preemptible context switch handler
-	 *
-	 * The priority of this IRQ must be the lowest priority in the system
-	 * in order to run last in the interrupt service routines' chain.
-	 */
-	sysirq_setHandler(FAULT_PENDSV, pendsv_handler);
-	sysirq_setPriority(FAULT_PENDSV, IRQ_PRIO_MIN);
+#if CPU_CM3_LM3S
+	#include "clock_lm3s.h"
+#elif CPU_CM3_STM32
+	#include "clock_stm32.h"
+/*#elif  Add other Cortex-M3 CPUs here */
+#else
+	#error Unknown CPU
 #endif
-}
+
