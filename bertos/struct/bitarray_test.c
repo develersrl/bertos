@@ -55,8 +55,8 @@ BitArray bitx2;
 int bitarray_testSetup(void)
 {
 	kdbg_init();
-	init_bitarray(&bitx1, TEST1_LEN, test1, sizeof(test1));
-	init_bitarray(&bitx2, TEST2_LEN, test2, sizeof(test2));
+	bitarray_init(&bitx1, TEST1_LEN, test1, sizeof(test1));
+	bitarray_init(&bitx2, TEST2_LEN, test2, sizeof(test2));
 	return 0;
 }
 

@@ -342,7 +342,7 @@ static void common_init(Flash *fls)
 	fls->blk.blk_size = FLASH_PAGE_SIZE_BYTES;
 	fls->blk.blk_cnt = FLASH_MEM_SIZE / FLASH_PAGE_SIZE_BYTES;
 
-	init_bitarray(&lpc2_bitx, FLASH_PAGE_CNT, page_dirty, sizeof(page_dirty));
+	bitarray_init(&lpc2_bitx, FLASH_PAGE_CNT, page_dirty, sizeof(page_dirty));
 }
 
 void flash_hw_init(Flash *fls, int flags)

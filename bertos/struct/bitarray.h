@@ -175,7 +175,7 @@ INLINE void bitarray_dump(BitArray *bitx)
 		kprintf("..%02x [%d]\n", bitx->array[i / 8], i);
 }
 
-INLINE void init_bitarray(BitArray *bitx, size_t bitarray_len, uint8_t *array, size_t size)
+INLINE void bitarray_init(BitArray *bitx, size_t bitarray_len, uint8_t *array, size_t size)
 {
 	bitx->size = size;
 	bitx->array = array;
