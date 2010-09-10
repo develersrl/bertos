@@ -47,9 +47,9 @@
 
 typedef struct BitArray
 {
-	size_t size;
-	size_t bitarray_len;
-	uint8_t *array;
+	size_t size;          /// Size in bytes of the bitarray
+	size_t bitarray_len;  /// Number of bits used
+	uint8_t *array;       /// Pointer to memory occupied by the bitarray
 } BitArray;
 
 #define BITARRAY_ALLOC(name, size)   uint8_t name[DIV_ROUNDUP((size), 8)]
@@ -101,28 +101,23 @@ INLINE bool bitarray_test(BitArray *bitx, int idx)
 	return (bitx->array[page] & BV(bit));
 }
 
-/*
- * Ugly!.. reformat it.
+/**
+ * Check if the bitarray is full
+ *
+ * Only \a bitarray_len bits are tested.
  */
 INLINE bool bitarray_isFull(BitArray *bitx)
 {
-	int count = bitx->size;
-	for (size_t page = 0; page <= bitx->size / 8; page++)
+	// test full bytes except the last one
+	for (size_t page = 0; page <= bitx->size - 2; page++)
 	{
-		if (count < 8)
-		{
-			for (size_t i = page * 8; i <= bitx->bitarray_len; i++)
-				if (!bitarray_test(bitx, i))
-					return 0;
-				count--;
-		}
-		else
-		{
-			if (!(bitx->array[page] == 0xff))
-				return 0;
-		}
-		count -= 8;
+		if (!(bitx->array[page] == 0xff))
+			return 0;
 	}
+	// test the last byte using the correct bitmask
+	uint8_t mask = BV(bitx->bitarray_len >> 3) - 1;
+	if (!(bitx->array[bitx->size - 1] & mask))
+		return 0;
 
 	return 1;
 }
