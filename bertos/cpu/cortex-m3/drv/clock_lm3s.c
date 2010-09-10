@@ -97,6 +97,27 @@ void clock_init(void)
 	unsigned long clk;
 	int i;
 
+	/*
+	 * PLL may not function properly at default LDO setting.
+	 *
+	 * Description:
+	 *
+	 * In designs that enable and use the PLL module, unstable device
+	 * behavior may occur with the LDO set at its default of 2.5 volts or
+	 * below (minimum of 2.25 volts). Designs that do not use the PLL
+	 * module are not affected.
+	 *
+	 * Workaround: Prior to enabling the PLL module, it is recommended that
+	 * the default LDO voltage setting of 2.5 V be adjusted to 2.75 V using
+	 * the LDO Power Control (LDOPCTL) register.
+	 *
+	 * Silicon Revision Affected: A1, A2
+	 *
+	 * See also: Stellaris LM3S1968 A2 Errata documentation.
+	 */
+	if (REVISION_IS_A1 | REVISION_IS_A2)
+		HWREG(SYSCTL_LDOPCTL) = SYSCTL_LDOPCTL_2_75V;
+
 	rcc = HWREG(SYSCTL_RCC);
 	rcc2 = HWREG(SYSCTL_RCC2);
 
