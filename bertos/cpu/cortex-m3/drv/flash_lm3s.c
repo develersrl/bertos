@@ -111,7 +111,7 @@ static int lm3s_writeWord(struct KBlock *blk, uint32_t addr, uint32_t data)
 
 static size_t lm3s_flash_readDirect(struct KBlock *blk, block_idx_t idx, void *buf, size_t offset, size_t size)
 {
-	memcpy(buf, (void *)(idx * blk->blk_size), size);
+	memcpy(buf, (void *)(idx * blk->blk_size + offset), size);
 	return size;
 }
 

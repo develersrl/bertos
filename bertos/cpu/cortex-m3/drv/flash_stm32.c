@@ -139,7 +139,7 @@ static void stm32_flash_clearerror(struct KBlock *blk)
 
 static size_t stm32_flash_readDirect(struct KBlock *blk, block_idx_t idx, void *buf, size_t offset, size_t size)
 {
-	memcpy(buf, (void *)(idx * blk->blk_size), size);
+	memcpy(buf, (void *)(idx * blk->blk_size + offset), size);
 	return size;
 }
 
