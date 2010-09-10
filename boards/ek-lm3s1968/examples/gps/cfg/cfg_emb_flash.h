@@ -27,45 +27,47 @@
  * the GNU General Public License.
  *
  * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
- *
  * -->
  *
- * \brief Configuration file for thermo module.
- *
  * \author Daniele Basile <asterix@develer.com>
+ *
+ * \brief Configuration file for embedded flash module.
  */
 
-#ifndef CFG_THERMO_H
-#define CFG_THERMO_H
+#ifndef CFG_EMB_FLASH_H
+#define CFG_EMB_FLASH_H
 
 /**
  * Module logging level.
+ *
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_level"
  */
-#define CONFIG_THERMO_LOG_LEVEL        LOG_LVL_ERR
+#define CONFIG_FLASH_EMB_LOG_LEVEL      LOG_LVL_INFO
+
 /**
- * Module logging format.
+ * module logging format.
+ *
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_format"
  */
-#define CONFIG_THERMO_LOG_FORMAT       LOG_FMT_TERSE
+#define CONFIG_FLASH_EMB_LOG_FORMAT     LOG_FMT_TERSE
 
 
 /**
- * Interval at which thermo control is performed [ms].
+ * Write emb flash timeout.
+ * For how many milliseconds the cpu wait
+ * to complete write operation.
  *
  * $WIZ$ type = "int"
- * $WIZ$ min = 1
  */
-#define CONFIG_THERMO_INTERVAL_MS        100
+#define CONFIG_FLASH_WR_TIMEOUT      100
 
 /**
- * Number of different samples we interpolate over to get the hifi temperature.
+ * Check this to disable embedded flash deprecated API support.
  *
- * $WIZ$ type = "int"
- * $WIZ$ min = 1
+ * $WIZ$ type = "boolean"
  */
-#define CONFIG_THERMO_HIFI_NUM_SAMPLES    10
+#define CONFIG_FLASH_DISABLE_OLD_API       1
 
-#endif /* CFG_THERMO_H */
+#endif /* CFG_FLASH_AT91_H */

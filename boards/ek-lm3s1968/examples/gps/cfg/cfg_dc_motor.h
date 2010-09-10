@@ -63,4 +63,49 @@
  */
 #define DC_MOTOR_LOG_FORMAT     LOG_FMT_TERSE
 
+
+/**
+ * Min value of DC motor speed.
+ * \note Generally this value is the min value of the ADC conversion,
+ * if you use it.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_DC_MOTOR_MIN_SPEED              0
+
+
+/**
+ * Max value of DC motor speed.
+ * \note Generally this value is the max value of the ADC conversion,
+ * if you use it.
+ *
+ * $WIZ$ type = "int"
+ * $WIZ$ max = 65535
+ */
+#define CONFIG_DC_MOTOR_MAX_SPEED         65535
+
+
+/**
+ * Sampling period in millisecond.
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_DC_MOTOR_SAMPLE_PERIOD     40
+
+/**
+ * Amount of millisecond before to read sample.
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_DC_MOTOR_SAMPLE_DELAY       2
+
+/**
+ * This control set which mode the driver use to lock share
+ * resources when we use the preempitive kernel.
+ * If we set to 1 we use the semaphore module otherwise the
+ * driver disable the switch context every time we need to access
+ * to shared sources.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_DC_MOTOR_USE_SEM            1
+
 #endif /* CFG_DC_MOTOR_H */

@@ -32,7 +32,6 @@
  *
  * \brief Configuration file for formatted write module.
  *
- *
  * \author Daniele Basile <asterix@develer.com>
  */
 

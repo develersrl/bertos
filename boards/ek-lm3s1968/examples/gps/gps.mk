@@ -21,21 +21,23 @@ gps_HW_PATH = boards/ek-lm3s1968
 gps_WIZARD_CSRC = \
 	bertos/kern/sem.c \
 	bertos/mware/formatwr.c \
+	bertos/io/kblock.c \
 	bertos/net/nmea.c \
+	bertos/io/kfile_block.c \
 	bertos/drv/kbd.c \
 	bertos/gfx/line.c \
 	bertos/drv/lcd_rit128x96.c \
 	bertos/cpu/cortex-m3/hw/switch_ctx_cm3.c \
-	bertos/kern/kfile.c \
+	bertos/kern/signal.c \
+	bertos/io/kfile.c \
 	bertos/gfx/text_format.c \
-	bertos/struct/heap.c \
+	bertos/drv/timer.c \
 	bertos/drv/ser.c \
 	bertos/mware/hex.c \
 	bertos/net/nmeap/src/nmeap01.c \
 	bertos/gfx/text.c \
 	bertos/cpu/cortex-m3/drv/timer_cm3.c \
-	bertos/drv/timer.c \
-	bertos/kern/signal.c \
+	bertos/struct/heap.c \
 	bertos/kern/proc.c \
 	bertos/mware/event.c \
 	bertos/gfx/bitmap.c \
@@ -91,13 +93,13 @@ gps_ASRC = $(gps_CPU_ASRC) $(gps_WIZARD_ASRC) $(gps_USER_ASRC)
 gps_CPU_CPPASRC = bertos/cpu/cortex-m3/hw/crt_cm3.S bertos/cpu/cortex-m3/hw/vectors_cm3.S 
 gps_CPU_CPPAFLAGS = -g -gdwarf-2 -mthumb -mno-thumb-interwork
 gps_CPU_CPPFLAGS = -O0 -g3 -gdwarf-2 -mthumb -mno-thumb-interwork -fno-strict-aliasing -fwrapv -fverbose-asm -Ibertos/cpu/cortex-m3/ -D__ARM_LM3S1968__
-gps_CPU_CSRC = bertos/cpu/cortex-m3/hw/init_lm3s.c bertos/cpu/cortex-m3/drv/irq_cm3.c bertos/cpu/cortex-m3/drv/gpio_lm3s.c bertos/cpu/cortex-m3/drv/clock_lm3s.c 
+gps_CPU_CSRC = bertos/cpu/cortex-m3/hw/init_cm3.c bertos/cpu/cortex-m3/drv/irq_cm3.c bertos/cpu/cortex-m3/drv/gpio_lm3s.c bertos/cpu/cortex-m3/drv/clock_lm3s.c 
 gps_PROGRAMMER_CPU = lm3s
+gps_CPU_LDFLAGS = -mthumb -mno-thumb-interwork -nostartfiles -Wl,--no-warn-mismatch -T bertos/cpu/cortex-m3/scripts/lm3s1968_rom.ld
 gps_STOPFLASH_SCRIPT = bertos/prg_scripts/arm/stopopenocd.sh
 gps_CPU = cortex-m3
 gps_STOPDEBUG_SCRIPT = bertos/prg_scripts/arm/stopopenocd.sh
 gps_DEBUG_SCRIPT = bertos/prg_scripts/arm/debug.sh
-gps_CPU_LDFLAGS = -mthumb -mno-thumb-interwork -nostartfiles -Wl,--no-warn-mismatch -T bertos/cpu/cortex-m3/scripts/lm3s1968_rom.ld
-gps_FLASH_SCRIPT = bertos/prg_scripts/arm/flash-cortex.sh
+gps_FLASH_SCRIPT = bertos/prg_scripts/arm/flash-lm3s.sh
 
 include $(gps_SRC_PATH)/gps_user.mk

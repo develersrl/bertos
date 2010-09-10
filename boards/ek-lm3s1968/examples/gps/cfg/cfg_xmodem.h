@@ -32,12 +32,25 @@
  *
  * \brief Configuration file for xmodem module.
  *
- *
  * \author Daniele Basile <asterix@develer.com>
  */
 
 #ifndef CFG_XMODEM_H
 #define CFG_XMODEM_H
+
+/**
+ * Module logging level.
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
+ */
+#define CONFIG_XMODEM_LOG_LEVEL        LOG_LVL_ERR
+/**
+ * Module logging format.
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define CONFIG_XMODEM_LOG_FORMAT       LOG_FMT_TERSE
+
 
 /// Enable Rx. $WIZ$ type = "boolean"
 #define CONFIG_XMODEM_RECV   1

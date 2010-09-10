@@ -45,6 +45,9 @@
 #include <drv/flash.h>
 #include <drv/kbd.h>
 
+#include <io/kblock.h>
+#include <io/kfile_block.h>
+
 #include <kern/proc.h>
 #include <kern/sem.h>
 
@@ -83,29 +86,39 @@ static long target_lat, target_lon;
 
 /* Storage stuff */
 #define GPS_POS_MAGIC 0xdeadbeef
-static Flash flash;
+static Flash flash_blk;
+static KFileBlock flash;
+
+struct SettingsData
+{
+	uint32_t magic;
+	long target_lat, target_lon;
+};
 
 static void flash_load_target(void)
 {
-	uint32_t magic;
+	struct SettingsData data;
 
-	kfile_seek(&flash.fd, -FLASH_PAGE_SIZE_BYTES, KSM_SEEK_END);
-	kfile_read(&flash.fd, &magic, sizeof(magic));
-	if (magic == GPS_POS_MAGIC)
+	kfile_seek(&flash.fd, -sizeof(data), KSM_SEEK_END);
+	kfile_read(&flash.fd, &data, sizeof(data));
+
+	if (data.magic == GPS_POS_MAGIC)
 	{
-		kfile_read(&flash.fd, &target_lat, sizeof(target_lat));
-		kfile_read(&flash.fd, &target_lon, sizeof(target_lon));
+		target_lat = data.target_lat;
+		target_lon = data.target_lon;
 	}
 }
 
 static void flash_save_target(void)
 {
-	const uint32_t magic = GPS_POS_MAGIC;
+	struct SettingsData data;
 
-	kfile_seek(&flash.fd, -FLASH_PAGE_SIZE_BYTES, KSM_SEEK_END);
-	kfile_write(&flash.fd, &magic, sizeof(magic));
-	kfile_write(&flash.fd, &target_lat, sizeof(target_lat));
-	kfile_write(&flash.fd, &target_lon, sizeof(target_lon));
+	data.magic = GPS_POS_MAGIC;
+	data.target_lat = target_lat;
+	data.target_lon = target_lon;
+
+	kfile_seek(&flash.fd, -sizeof(data), KSM_SEEK_END);
+	kfile_write(&flash.fd, &data, sizeof(data));
 	kfile_flush(&flash.fd);
 }
 
@@ -451,7 +464,7 @@ static void gps_data(Bitmap *bm)
 						ABS(lon) % 1000000L,
 						lon >= 0 ? 'E' : 'W');
 				text_xprintf(bm, 2, 0, TEXT_FILL,
-						"Alt. %d", gga.altitude);
+						"Alt. %ld", gga.altitude);
 				text_xprintf(bm, 3, 0, TEXT_FILL,
 						"Speed: %d", vtg.km_speed);
 				if (gga.quality < countof(gps_fix))
@@ -531,7 +544,8 @@ static void init(void)
 	scrsvr_timestamp = ticks_to_ms(timer_clock_unlocked());
 	LED_INIT();
 
-	flash_init(&flash);
+	flash_init(&flash_blk, 0);
+	kfileblock_init(&flash, &flash_blk.blk);
 	flash_load_target();
 
 	ser_init(&ser_port, SER_UART1);
