@@ -71,9 +71,6 @@ struct FlashHardware;
 
 static size_t avr_flash_readDirect(struct KBlock *blk, block_idx_t idx, void *buf, size_t offset, size_t size)
 {
-	ASSERT(offset == 0);
-	ASSERT(size == blk->blk_size);
-
 	memcpy_P(buf, (const void *)(uint16_t)(idx * blk->blk_size), size);
 	return blk->blk_size;
 }

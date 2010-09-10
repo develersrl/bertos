@@ -179,9 +179,6 @@ static uint32_t addr_to_sector(size_t addr)
 
 static size_t lpc2_flash_readDirect(struct KBlock *blk, block_idx_t idx, void *buf, size_t offset, size_t size)
 {
-	ASSERT(offset == 0);
-	ASSERT(size == blk->blk_size);
-
 	memcpy(buf, (void *)(idx * blk->blk_size), size);
 	return size;
 }
