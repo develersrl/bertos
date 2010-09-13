@@ -43,7 +43,7 @@
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_level"
  */
-#define CONFIG_FLASH_EMB_LOG_LEVEL      LOG_LVL_INFO
+#define CONFIG_FLASH_EMB_LOG_LEVEL      LOG_LVL_ERR
 
 /**
  * module logging format.

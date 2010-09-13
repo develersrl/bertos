@@ -34,14 +34,15 @@ gps_WIZARD_CSRC = \
 	bertos/drv/timer.c \
 	bertos/drv/ser.c \
 	bertos/mware/hex.c \
+	bertos/struct/heap.c \
 	bertos/net/nmeap/src/nmeap01.c \
+	bertos/cpu/cortex-m3/drv/flash_lm3s.c \
 	bertos/gfx/text.c \
 	bertos/cpu/cortex-m3/drv/timer_cm3.c \
-	bertos/struct/heap.c \
+	bertos/cpu/cortex-m3/drv/ser_lm3s.c \
 	bertos/kern/proc.c \
 	bertos/mware/event.c \
 	bertos/gfx/bitmap.c \
-	bertos/cpu/cortex-m3/drv/ser_lm3s.c \
 	bertos/mware/sprintf.c \
 	#
 
