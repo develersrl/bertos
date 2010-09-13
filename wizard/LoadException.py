@@ -28,7 +28,6 @@
 #
 # Copyright 2008 Develer S.r.l. (http://www.develer.com/)
 #
-# $Id: DefineException.py 2645 2009-04-23 09:28:13Z duplo $
 #
 # Author: Lorenzo Berni <duplo@develer.com>
 #

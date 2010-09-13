@@ -28,7 +28,6 @@
 #
 # Copyright 2008 Develer S.r.l. (http://www.develer.com/)
 #
-# $Id: qvariant_converter.py 2506 2009-04-15 08:29:07Z duplo $
 #
 # Author: Lorenzo Berni <duplo@develer.com>
 #

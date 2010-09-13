@@ -28,7 +28,6 @@
 #
 # Copyright 2009 Develer S.r.l. (http://www.develer.com/)
 #
-# $Id$
 #
 # Author: Lorenzo Berni <duplo@develer.com>
 #

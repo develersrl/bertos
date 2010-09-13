@@ -28,7 +28,6 @@
 #
 # Copyright 2008 Develer S.r.l. (http://www.develer.com/)
 #
-# $Id: const.py 2907 2009-09-08 14:02:04Z duplo $
 #
 # Author: Lorenzo Berni <duplo@develer.com>
 #

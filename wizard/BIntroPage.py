@@ -28,7 +28,6 @@
 #
 # Copyright 2008 Develer S.r.l. (http://www.develer.com/)
 #
-# $Id: BFolderPage.py 2669 2009-04-25 07:58:45Z duplo $
 #
 # Author: Lorenzo Berni <duplo@develer.com>
 #
