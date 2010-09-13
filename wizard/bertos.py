@@ -121,7 +121,7 @@ def main():
     datadir = DATA_DIR
     qrc, rcc = os.path.join(datadir, 'bertos.qrc'), os.path.join(datadir, 'bertos.rcc')
     if not (hasattr(sys, "frozen") and sys.frozen) and newer(qrc, rcc):
-        os.system("rcc -binary %s -o %s" %(qrc, rcc))
+        os.system("rcc -binary \"%s\" -o \"%s\"" %(qrc, rcc))
     QResource.registerResource(rcc)
     if len(sys.argv) == 3 and sys.argv[1] == "--edit":
         editProject(os.path.abspath(sys.argv[2]))

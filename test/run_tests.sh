@@ -13,7 +13,7 @@
 #  2 - build warnings
 #  3 - execution output
 #  4 - build commands
-VERBOSE=${VERBOSE:-1}
+VERBOSE=${VERBOSE:-3}
 
 CC=gcc
 #FIXME: -Ibertos/emul should not be needed
@@ -24,7 +24,7 @@ CFLAGS="-W -Wall -Wextra -Wundef -Wpointer-arith -Wcast-qual -Wcast-align -Wwrit
 CXX=g++
 CXXFLAGS="$CFLAGS"
 
-TESTS=${TESTS:-`find . \
+TESTS?=${TESTS:-`find . \
 	\( -name .svn -prune -o -name .git -prune -o -name .hg  -prune \) \
 	-o -name "*_test.c" -print` }
 
