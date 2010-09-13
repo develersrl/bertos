@@ -87,7 +87,7 @@ static void init(void)
 	/* Initialize the keypad driver */
 	kbd_init();
 	/* Initialize the internal flash memory */
-        flash_init(&flash);
+	flash_init(&flash, 0);
 
 	/*
 	 * Kernel initialization: processes (allow to create and dispatch
