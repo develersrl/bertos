@@ -136,10 +136,15 @@ class BFolderPage(BWizardPage):
         if stored_folder != "":
             self._destination_folder = stored_folder
         elif os.name == "nt":
-            from win32com.shell import shell, shellcon
-            self._destination_folder = shell.SHGetFolderPath(0, shellcon.CSIDL_PERSONAL, 0, 0)
-            del shell
-            del shellcon
+            def _winGetSpecialFolder(csidl):
+                from ctypes import windll, create_unicode_buffer
+                MAX_PATH = 4096
+                buf = create_unicode_buffer(MAX_PATH)
+                if not windll.shell32.SHGetSpecialFolderPathW(0, buf, csidl, False):
+                    raise WindowsError("cannot get special folder location")
+                return buf.value
+            CSIDL_PERSONAL = 5
+            self._destination_folder = _winGetSpecialFolder(CSIDL_PERSONAL)
         else:
             self._destination_folder = os.path.expanduser("~")
         self.pageContent.directoryEdit.setText(self._destination_folder)
