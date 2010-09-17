@@ -26,24 +26,24 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
- * \author Francesco Sacchi <batt@develer.com>
+ * \author Stefano Fedrigo <aleph@develer.com>
  *
- * \brief Low-level kdebug module for Cortex-M3 (inplementation).
+ * \brief Linker script for AT91SAM3N4 Cortex M3 processor.
+ *
  */
 
-#include <cpu/detect.h>
+/*
+ * Memory configuration for AT91SAM3N4.
+ */
+MEMORY
+{
+        rom(rx) : org = 0x0, len = 256k
+        ram(rwx) : org = 0x20000000, len = 24k
+}
 
-#if CPU_CM3_LM3S
-	#include "kdebug_lm3s.c"
-#elif CPU_CM3_STM32
-	#include "kdebug_stm32.c"
-#elif CPU_CM3_AT91SAM3
-	#include "kdebug_sam3.c"
-/*#elif  Add other families here */
-#else
-	#error Unknown CPU
-#endif
+INCLUDE "bertos/cpu/cortex-m3/scripts/cortex-m3_ram.ld"
+

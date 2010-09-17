@@ -30,20 +30,20 @@
  *
  * -->
  *
- * \author Francesco Sacchi <batt@develer.com>
- *
- * \brief Low-level kdebug module for Cortex-M3 (inplementation).
+ * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-#include <cpu/detect.h>
+#ifndef SAM3_H
+#define SAM3_H
 
-#if CPU_CM3_LM3S
-	#include "kdebug_lm3s.c"
-#elif CPU_CM3_STM32
-	#include "kdebug_stm32.c"
-#elif CPU_CM3_AT91SAM3
-	#include "kdebug_sam3.c"
-/*#elif  Add other families here */
-#else
-	#error Unknown CPU
-#endif
+// TODO: refactor common cortex-m3 regs
+
+#include <cpu/detect.h>
+#include <cfg/compiler.h>
+
+#include "sam3_memmap.h"
+#include "sam3_gpio.h"
+#include "sam3_nvic.h"
+#include "sam3_uart.h"
+
+#endif /* SAM3_H */
