@@ -252,6 +252,16 @@ typedef struct usb_string_descriptor
 #define USB_CLASS_APP_SPEC		0xfe
 #define USB_CLASS_VENDOR_SPEC		0xff
 
+/* USB Device subclasses */
+#define USB_CDC_SUBCLASS_ACM                    0x02
+#define USB_CDC_SUBCLASS_ETHERNET               0x06
+#define USB_CDC_SUBCLASS_WHCM                   0x08
+#define USB_CDC_SUBCLASS_DMM                    0x09
+#define USB_CDC_SUBCLASS_MDLM                   0x0a
+#define USB_CDC_SUBCLASS_OBEX                   0x0b
+#define USB_CDC_SUBCLASS_EEM                    0x0c
+#define USB_CDC_SUBCLASS_NCM                    0x0d
+
 /* Device configuration descriptor */
 typedef struct usb_config_descriptor
 {
