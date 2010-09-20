@@ -611,9 +611,6 @@ static void __usb_ep_io(int EP)
 	cpu_flags_t flags;						\
 	stm32_usb_io_status_t ret;					\
 									\
-	/* NOTE: buffer must be 4-bytes aligned */			\
-	ASSERT(!((size_t)__buf & 0x03));				\
-									\
 	/* Fill EP descriptor */					\
 	IRQ_SAVE_DISABLE(flags);					\
 	if (__size < 0)							\
