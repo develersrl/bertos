@@ -357,7 +357,7 @@ DEFINE_TIMER_ISR
 
 	/* Perform hw IRQ handling */
 	timer_hw_irq();
-	
+
 	TIMER_STROBE_OFF;
 }
 
