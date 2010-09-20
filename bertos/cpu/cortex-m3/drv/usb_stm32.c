@@ -1555,6 +1555,17 @@ static void USB_StandardRequestHandler(void)
 	}
 }
 
+/* USB setup packet: class/vendor request handler */
+static void USB_EventHandler(void)
+{
+	/*
+	 * TODO: get the appropriate usb_dev in function of the endpoint
+	 * address.
+	 */
+	if (usb_dev->event_cb)
+		usb_dev->event_cb(&setup_packet);
+}
+
 /* USB setup packet handler */
 static void USB_SetupHandler(void)
 {
@@ -1570,11 +1581,13 @@ static void USB_SetupHandler(void)
 	case USB_TYPE_CLASS:
 		LOG_INFO("%s: bmRequestType=%02x (Class)\n",
 				__func__, setup_packet.mRequestType);
+		USB_EventHandler();
 		break;
 	/* Vendor */
 	case USB_TYPE_VENDOR:
 		LOG_INFO("%s: bmRequestType=%02x (Vendor)\n",
 				__func__, setup_packet.mRequestType);
+		USB_EventHandler();
 		break;
 	case USB_TYPE_RESERVED:
 		LOG_INFO("%s: bmRequestType=%02x (Reserved)\n",
@@ -1589,6 +1602,7 @@ static void USB_SetupHandler(void)
 	}
 }
 
+/* USB: low-level hardware initialization */
 static void usb_hw_reset(void)
 {
 	unsigned int i;
