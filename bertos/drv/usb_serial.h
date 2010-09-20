@@ -42,9 +42,35 @@
 #ifndef USB_SERIAL_H
 #define USB_SERIAL_H
 
-ssize_t usb_serial_read(void *buf, ssize_t size);
-ssize_t usb_serial_write(const void *buf, ssize_t size);
+#include <io/kfile.h>
 
-int usb_serial_init(void);
+typedef uint32_t usbser_status_t;
+
+typedef struct USBSerial
+{
+        /** KFile structure implementation **/
+        KFile fd;
+        /** Logical port number */
+        unsigned int unit;
+#ifdef _DEBUG
+	/** Used for debugging only */
+        bool is_open;
+#endif
+        /** Holds the status flags. Set to 0 when no errors have occurred. */
+        usbser_status_t status;
+} USBSerial;
+
+/**
+ * ID for usb-serial.
+ */
+#define KFT_USB_SERIAL MAKE_ID('U', 'S', 'B', 'S')
+
+INLINE USBSerial *USB_SERIAL_CAST(KFile *fd)
+{
+        ASSERT(fd->_type == KFT_USB_SERIAL);
+        return (USBSerial *)fd;
+}
+
+int usb_serial_init(struct USBSerial *fds, int unit);
 
 #endif /* USB_SERIAL_H */
