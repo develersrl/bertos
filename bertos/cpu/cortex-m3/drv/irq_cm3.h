@@ -44,6 +44,8 @@
 	#include <io/lm3s.h>
 #elif CPU_CM3_STM32
 	#include <io/stm32.h>
+#elif CPU_CM3_AT91SAM3
+	#include <io/sam3.h>
 /*#elif  Add other families here */
 #else
 	#error Unknown CPU

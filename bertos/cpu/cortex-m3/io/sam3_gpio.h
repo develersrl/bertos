@@ -99,4 +99,19 @@
 #define GPIO_SCHMITT  0x100  //< Schmitt Trigger Register
 /*\}*/
 
+/**
+ * UART I/O pins
+ */
+/*\{*/
+#ifdef CPU_CM3_AT91SAM3U
+	#define GPIO_UART0_RX_PIN   BV(11)
+	#define GPIO_UART0_TX_PIN   BV(12)
+#else
+	#define GPIO_UART0_RX_PIN   BV(9)
+	#define GPIO_UART0_TX_PIN   BV(10)
+	#define GPIO_UART1_RX_PIN   BV(2)
+	#define GPIO_UART1_TX_PIN   BV(3)
+#endif
+/*\}*/
+
 #endif /* SAM3_GPIO_H */

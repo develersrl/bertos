@@ -38,6 +38,7 @@
 #include <cfg/cfg_debug.h>
 #include <cfg/macros.h> /* for BV() */
 
+#include <io/sam3_ints.h>
 #include <io/sam3_gpio.h>
 #include <io/sam3_pmc.h>
 #include <io/sam3_uart.h>
@@ -47,16 +48,12 @@
 	#define UART_BASE       UART0_BASE
 	#define UART_INT        INT_UART0
 	#define UART_GPIO_BASE  GPIO_PORTA_BASE
-	#ifdef CPU_CM3_AT91SAM3U
-		#define UART_PINS       (BV(12) | BV(11))
-	#else
-		#define UART_PINS       (BV(10) | BV(9))
-	#endif
+	#define UART_PINS       (GPIO_UART0_RX_PIN | GPIO_UART0_TX_PIN)
 #elif (CONFIG_KDEBUG_PORT == 1) && !defined(CPU_CM3_AT91SAM3U)
 	#define UART_BASE       UART1_BASE
 	#define UART_INT        INT_UART1
 	#define UART_GPIO_BASE  GPIO_PORTB_BASE
-	#define UART_PINS       (BV(3) | BV(2))
+	#define UART_PINS       (GPIO_UART1_RX_PIN | GPIO_UART1_TX_PIN)
 #else
 	#error "UART port not supported in this board"
 #endif

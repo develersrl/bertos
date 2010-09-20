@@ -275,5 +275,4 @@
 #define UART_PTSR_TXTEN   BV(8)  //< Transmitter Transfer Enable
 /*\}*/
 
-
 #endif /* SAM3_UART_H */

@@ -36,34 +36,6 @@
 #ifndef SAM3_PMC_H
 #define SAM3_PMC_H
 
-// FIXME: move these in sam3(?)_int.h
-#define INT_SUPC     0  ///< SAM3N Supply Controller (SUPC)
-#define INT_RSTC     1  ///< SAM3N Reset Controller (RSTC)
-#define INT_RTC      2  ///< SAM3N Real Time Clock (RTC)
-#define INT_RTT      3  ///< SAM3N Real Time Timer (RTT)
-#define INT_WDT      4  ///< SAM3N Watchdog Timer (WDT)
-#define INT_PMC      5  ///< SAM3N Power Management Controller (PMC)
-#define INT_EFC      6  ///< SAM3N Enhanced Flash Controller (EFC)
-#define INT_UART0    8  ///< SAM3N UART 0 (UART0)
-#define INT_UART1    9  ///< SAM3N UART 1 (UART1)
-#define INT_PIOA    11  ///< SAM3N Parallel I/O Controller A (PIOA)
-#define INT_PIOB    12  ///< SAM3N Parallel I/O Controller B (PIOB)
-#define INT_PIOC    13  ///< SAM3N Parallel I/O Controller C (PIOC)
-#define INT_USART0  14  ///< SAM3N USART 0 (USART0)
-#define INT_USART1  15  ///< SAM3N USART 1 (USART1)
-#define INT_TWI0    19  ///< SAM3N Two Wire Interface 0 (TWI0)
-#define INT_TWI1    20  ///< SAM3N Two Wire Interface 1 (TWI1)
-#define INT_SPI     21  ///< SAM3N Serial Peripheral Interface (SPI)
-#define INT_TC0     23  ///< SAM3N Timer/Counter 0 (TC0)
-#define INT_TC1     24  ///< SAM3N Timer/Counter 1 (TC1)
-#define INT_TC2     25  ///< SAM3N Timer/Counter 2 (TC2)
-#define INT_TC3     26  ///< SAM3N Timer/Counter 3 (TC3)
-#define INT_TC4     27  ///< SAM3N Timer/Counter 4 (TC4)
-#define INT_TC5     28  ///< SAM3N Timer/Counter 5 (TC5)
-#define INT_ADC     29  ///< SAM3N Analog To Digital Converter (ADC)
-#define INT_DACC    30  ///< SAM3N Digital To Analog Converter (DACC)
-#define INT_PWM     31  ///< SAM3N Pulse Width Modulation (PWM)
-
 /**
  * PMC registers.
  */

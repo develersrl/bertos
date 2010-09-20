@@ -42,6 +42,7 @@
 #include <cfg/compiler.h>
 
 #include "sam3_memmap.h"
+#include "sam3_ints.h"
 #include "sam3_gpio.h"
 #include "sam3_nvic.h"
 #include "sam3_uart.h"
