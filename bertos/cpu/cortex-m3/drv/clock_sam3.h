@@ -30,22 +30,14 @@
  *
  * -->
  *
- * \brief Low-level Clock module for ARM Cortex-m3 (interface).
+ * \brief Low-level clocking driver for AT91SAM3.
  *
- * \author Daniele Basile <asterix@develer.com>
- *
+ * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-#include <cpu/detect.h>
+#ifndef DRV_AT91SAM3_CLOCK_H
+#define DRV_AT91SAM3_CLOCK_H
 
-#if CPU_CM3_LM3S
-	#include "clock_lm3s.h"
-#elif CPU_CM3_STM32
-	#include "clock_stm32.h"
-#elif CPU_CM3_AT91SAM3
-	#include "clock_sam3.h"
-/*#elif  Add other Cortex-M3 CPUs here */
-#else
-	#error Unknown CPU
-#endif
+void clock_init(void);
 
+#endif /* DRV_AT91SAM3_CLOCK_H */
