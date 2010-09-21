@@ -355,6 +355,13 @@
 	#define SPI_SCK_BIT   PB5
 	#define SPI_MOSI_BIT  PB3
 	#define SPI_MISO_BIT  PB4
+#elif CPU_AVR_ATMEGA32
+	#define SPI_PORT      PORTB
+	#define SPI_DDR       DDRB
+	#define SPI_SS_BIT    PB4
+	#define SPI_SCK_BIT   PB7
+	#define SPI_MOSI_BIT  PB5
+	#define SPI_MISO_BIT  PB6
 #else
 	#error Unknown architecture
 #endif
@@ -375,7 +382,7 @@
 	#define USART0_UDRE_vect USART_UDRE_vect
 	#define USART0_RX_vect USART_RX_vect
 	#define USART0_TX_vect USART_TX_vect
-#elif CPU_AVR_ATMEGA8
+#elif CPU_AVR_ATMEGA8 || CPU_AVR_ATMEGA32
 	#define AVR_HAS_UART1 0
 	#define AVR_HAS_UART2 0
 	#define AVR_HAS_UART3 0
@@ -385,9 +392,11 @@
 	#define UDR0   UDR
 	#define UBRR0L UBRRL
 	#define UBRR0H UBRRH
+	#define UPM01  UPM1
+	#define UPM00  UPM0
 	#define USART0_UDRE_vect USART_UDRE_vect
-	#define USART0_RX_vect USART_RX_vect
-	#define USART0_TX_vect USART_TX_vect
+	#define USART0_RX_vect USART_RXC_vect
+	#define USART0_TX_vect USART_TXC_vect
 #elif CPU_AVR_ATMEGA103
 	#define AVR_HAS_UART1 0
 	#define AVR_HAS_UART2 0
