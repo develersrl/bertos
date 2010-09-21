@@ -256,7 +256,7 @@ static int usb_serial_close(struct KFile *fd)
 /**
  * Initialize an USB serial port.
  *
- * \param fd KFile Serial struct interface.
+ * \param fds KFile Serial struct interface.
  * \param unit Serial unit to open.
  */
 static int usb_serial_open(struct USBSerial *fds, int unit)
