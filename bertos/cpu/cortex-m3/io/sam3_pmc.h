@@ -46,9 +46,9 @@
 #define PMC_PCER_R  (*((reg32_t *)0x400E0410))   ///< Peripheral Clock Enable Register
 #define PMC_PCDR_R  (*((reg32_t *)0x400E0414))   ///< Peripheral Clock Disable Register
 #define PMC_PCSR_R  (*((reg32_t *)0x400E0418))   ///< Peripheral Clock Status Register
-#define PMC_MOR_R   (*((reg32_t *)0x400E0420))   ///< Main Oscillator Register
-#define PMC_MCFR_R  (*((reg32_t *)0x400E0424))   ///< Main Clock Frequency Register
-#define PMC_PLLR_R  (*((reg32_t *)0x400E0428))   ///< PLL Register
+#define CKGR_MOR_R  (*((reg32_t *)0x400E0420))   ///< Main Oscillator Register
+#define CKGR_MCFR_R (*((reg32_t *)0x400E0424))   ///< Main Clock Frequency Register
+#define CKGR_PLLR_R (*((reg32_t *)0x400E0428))   ///< PLL Register
 #define PMC_MCKR_R  (*((reg32_t *)0x400E0430))   ///< Master Clock Register
 #define PMC_PCK_R   (*((reg32_t *)0x400E0440))   ///< Programmable Clock 0 Register
 #define PMC_IER_R   (*((reg32_t *)0x400E0460))   ///< Interrupt Enable Register
@@ -262,13 +262,13 @@
  */
 /*\{*/
 #define CKGR_PLLR_DIV_M           0xff   ///< Divider mask
-#define CKGR_PLLR_DIV(value)      ((CKGR_PLLR_DIV_M & (value))
+#define CKGR_PLLR_DIV(value)      (CKGR_PLLR_DIV_M & (value))
 #define CKGR_PLLR_PLLCOUNT_S      8
 #define CKGR_PLLR_PLLCOUNT_M      (0x3f << CKGR_PLLR_PLLCOUNT_S)   ///< PLL Counter mask
-#define CKGR_PLLR_PLLCOUNT(value) ((CKGR_PLLR_PLLCOUNT_M & ((value) << CKGR_PLLR_PLLCOUNT_S)))
+#define CKGR_PLLR_PLLCOUNT(value) (CKGR_PLLR_PLLCOUNT_M & ((value) << CKGR_PLLR_PLLCOUNT_S))
 #define CKGR_PLLR_MUL_S           16
 #define CKGR_PLLR_MUL_M           (0x7ff << CKGR_PLLR_MUL_S)   ///< PLL Multiplier mask
-#define CKGR_PLLR_MUL(value)      ((CKGR_PLLR_MUL_M & ((value) << CKGR_PLLR_MUL_S)))
+#define CKGR_PLLR_MUL(value)      (CKGR_PLLR_MUL_M & ((value) << CKGR_PLLR_MUL_S))
 #define CKGR_PLLR_STUCKTO1        BV(29)
 /*\}*/
 

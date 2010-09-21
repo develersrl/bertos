@@ -33,8 +33,8 @@
  * \brief AT91SAM3 memory map.
  */
 
-#ifndef STM32_MEMMAP_H
-#define STM32_MEMMAP_H
+#ifndef SAM3_MEMMAP_H
+#define SAM3_MEMMAP_H
 
 /* Peripheral and SRAM base address in the alias region */
 #define PERIPH_BB_BASE        (0x42000000)
@@ -141,4 +141,4 @@
 #define NVIC_BASE             (SCS_BASE + 0x0100)
 #define SCB_BASE              (SCS_BASE + 0x0D00)
 
-#endif /* STM32_MEMMAP_H */
+#endif /* SAM3_MEMMAP_H */
