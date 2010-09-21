@@ -54,4 +54,4 @@
  */
 #define USB_SERIAL_LOG_FORMAT     LOG_FMT_TERSE
 
-#endif /* CFG_USB_H */
+#endif /* CFG_USB_SERIAL_H */
