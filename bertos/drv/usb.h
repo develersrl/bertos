@@ -89,6 +89,7 @@ enum usb_device_state {
  */
 #define USB_DIR_OUT			0		/* to device */
 #define USB_DIR_IN			0x80		/* to host */
+#define USB_DIR_MASK			0x80
 
 /*
  * USB types, the second of three bRequestType fields
@@ -310,7 +311,7 @@ typedef struct usb_endpoint_descriptor
  * Endpoints
  */
 #define USB_ENDPOINT_NUMBER_MASK	0x0f	/* in bEndpointAddress */
-#define USB_ENDPOINT_DIR_MASK		0x80
+#define USB_ENDPOINT_DIR_MASK		USB_DIR_MASK
 
 #define USB_ENDPOINT_SYNCTYPE		0x0c
 #define USB_ENDPOINT_SYNC_NONE		(0 << 2)
