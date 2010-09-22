@@ -251,7 +251,7 @@ static void usb_hid_event_cb(usb_ctrlrequest_t *ctrl)
 	}
 }
 
-/* Global usb-serial descriptor that identifies the usb-serial device */
+/* Global usb-mouse descriptor that identifies the usb-mouse device */
 static struct usb_device usb_mouse = {
 	.device = &usb_hid_device_descriptor,
 	.config = usb_hid_config,
