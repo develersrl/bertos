@@ -1147,7 +1147,6 @@ ssize_t usb_ep_write(int ep, const void *buffer, ssize_t size)
 	if (ep_num == CTRL_ENP_IN)
 	{
 		size = usb_size(size, setup_packet.wLength);
-		LOG_INFO("%s: size = %d\n", __func__, size);
 		if (!size)
 			USB_StatusHandler(ep_num);
 		else
@@ -1677,13 +1676,8 @@ static void usb_hw_reset(void)
 	usb_set_address(0);
 
 	/* Enable all the device interrupts */
-#if 0
 	usb->CNTR = bmCTRM | bmRESETM | bmSOFM | bmERRM | bmPMAOVRM |
 			bmSUSPM | bmWKUPM;
-#else
-	/* XXX: disable frame interrupts for now (too much noise!) */
-	usb->CNTR = bmCTRM | bmRESETM | bmERRM | bmPMAOVRM | bmSUSPM | bmWKUPM;
-#endif
 }
 
 /* Handle a correct transfer under ISR */
@@ -1773,9 +1767,13 @@ static void usb_isr(void)
 	}
 	if (interrupt.SOF)
 	{
+#if 0
+		/*
+		 * XXX: disable logging of frame interrupts (too much noise!)
+		 */
 		uint16_t frame_nr = usb->FNR & 0x0fff;
-
 		LOG_INFO("%s: frame %#x\n", __func__, frame_nr);
+#endif
 		usb->ISTR = ~bmSOFM;
 	}
 	if (interrupt.WKUP)
