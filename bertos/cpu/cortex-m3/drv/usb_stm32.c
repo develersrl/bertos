@@ -929,13 +929,13 @@ static void USB_StallCtrlEP(void)
  */
 static int usb_find_interface(uint32_t num, uint32_t alt)
 {
-	usb_interface_descriptor_t *id;
+	const usb_interface_descriptor_t *id;
 	int i;
 
 	for (i = 0; ; i++)
 	{
 		/* TODO: support more than one configuration per device */
-		id = (usb_interface_descriptor_t *)usb_dev->config[i];
+		id = (const usb_interface_descriptor_t *)usb_dev->config[i];
 		if (id == NULL)
 			break;
 		if (id->bDescriptorType != USB_DT_INTERFACE)
@@ -953,7 +953,7 @@ static int usb_find_interface(uint32_t num, uint32_t alt)
 static void
 usb_configure_ep_interface(unsigned int num, unsigned int alt, bool enable)
 {
-	usb_endpoint_descriptor_t *epd;
+	const usb_endpoint_descriptor_t *epd;
 	int i, start;
 
 	/*
@@ -976,7 +976,7 @@ usb_configure_ep_interface(unsigned int num, unsigned int alt, bool enable)
 	 */
 	for (i = start + 1; ; i++)
 	{
-		epd = (usb_endpoint_descriptor_t *)usb_dev->config[i];
+		epd = (const usb_endpoint_descriptor_t *)usb_dev->config[i];
 		if ((epd == NULL) || (epd->bDescriptorType == USB_DT_INTERFACE))
 			break;
 		if (epd->bDescriptorType != USB_DT_ENDPOINT)
@@ -1343,10 +1343,11 @@ static int usb_get_configuration_descriptor(int id)
 
 static int usb_get_string_descriptor(unsigned int id)
 {
-	usb_string_descriptor_t *lang_str;
+	const usb_string_descriptor_t *lang_str;
 	unsigned int lang_id, str_id;
 	uint16_t w_index_lo = usb_le16_to_cpu(setup_packet.wIndex) & 0x00ff;
-	uint16_t w_index_hi = (usb_le16_to_cpu(setup_packet.wIndex) & 0xff00) >> 8;
+	uint16_t w_index_hi = (usb_le16_to_cpu(setup_packet.wIndex) &
+						0xff00) >> 8;
 
 	ASSERT(usb_dev->strings != NULL);
 	ASSERT(usb_dev->strings[0] != NULL);
@@ -1357,8 +1358,8 @@ static int usb_get_string_descriptor(unsigned int id)
 		/* Find Language index */
 		for (lang_id = 0; ; lang_id++)
 		{
-			usb_string_descriptor_t *str = usb_dev->strings[lang_id];
-
+			const usb_string_descriptor_t *str =
+						usb_dev->strings[lang_id];
 			if (UNLIKELY(str == NULL))
 				return -USB_NODEV_ERROR;
 			if ((str->data[0] == w_index_lo) &&

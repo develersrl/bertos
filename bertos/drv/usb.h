@@ -330,8 +330,8 @@ typedef struct usb_endpoint_descriptor
 struct usb_device
 {
 	usb_device_descriptor_t *device;
-	usb_descriptor_header_t **config;
-	usb_string_descriptor_t **strings;
+	const usb_descriptor_header_t **config;
+	const usb_string_descriptor_t **strings;
 
 	/* Callbacks */
 	void (*event_cb)(usb_ctrlrequest_t *);

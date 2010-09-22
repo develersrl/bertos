@@ -84,7 +84,7 @@ static usb_device_descriptor_t usb_serial_device_descriptor =
 	.bNumConfigurations = 1,
 };
 
-static usb_config_descriptor_t usb_serial_config_descriptor =
+static const usb_config_descriptor_t usb_serial_config_descriptor =
 {
 	.bLength = sizeof(usb_serial_config_descriptor),
 	.bDescriptorType = USB_DT_CONFIG,
@@ -95,7 +95,7 @@ static usb_config_descriptor_t usb_serial_config_descriptor =
 	.bMaxPower = 50, /* 100 mA */
 };
 
-static usb_interface_descriptor_t usb_serial_interface_descriptor =
+static const usb_interface_descriptor_t usb_serial_interface_descriptor =
 {
 	.bLength = sizeof(usb_serial_interface_descriptor),
 	.bDescriptorType = USB_DT_INTERFACE,
@@ -108,7 +108,7 @@ static usb_interface_descriptor_t usb_serial_interface_descriptor =
 	.iInterface = 0,
 };
 
-static usb_endpoint_descriptor_t usb_serial_ep_report_descriptor =
+static const usb_endpoint_descriptor_t usb_serial_ep_report_descriptor =
 {
 	.bLength = sizeof(usb_serial_ep_report_descriptor),
 	.bDescriptorType = USB_DT_ENDPOINT,
@@ -118,7 +118,7 @@ static usb_endpoint_descriptor_t usb_serial_ep_report_descriptor =
 	.bInterval = 1,
 };
 
-static usb_endpoint_descriptor_t usb_serial_ep_in_descriptor =
+static const usb_endpoint_descriptor_t usb_serial_ep_in_descriptor =
 {
 	.bLength = sizeof(usb_serial_ep_in_descriptor),
 	.bDescriptorType = USB_DT_ENDPOINT,
@@ -128,7 +128,7 @@ static usb_endpoint_descriptor_t usb_serial_ep_in_descriptor =
 	.bInterval = 0,
 };
 
-static usb_endpoint_descriptor_t usb_serial_ep_out_descriptor =
+static const usb_endpoint_descriptor_t usb_serial_ep_out_descriptor =
 {
 	.bLength = sizeof(usb_serial_ep_in_descriptor),
 	.bDescriptorType = USB_DT_ENDPOINT,
@@ -138,13 +138,13 @@ static usb_endpoint_descriptor_t usb_serial_ep_out_descriptor =
 	.bInterval = 0,
 };
 
-static usb_descriptor_header_t *usb_serial_config[] =
+static const usb_descriptor_header_t *usb_serial_config[] =
 {
-	(usb_descriptor_header_t *)&usb_serial_config_descriptor,
-	(usb_descriptor_header_t *)&usb_serial_interface_descriptor,
-	(usb_descriptor_header_t *)&usb_serial_ep_report_descriptor,
-	(usb_descriptor_header_t *)&usb_serial_ep_in_descriptor,
-	(usb_descriptor_header_t *)&usb_serial_ep_out_descriptor,
+	(const usb_descriptor_header_t *)&usb_serial_config_descriptor,
+	(const usb_descriptor_header_t *)&usb_serial_interface_descriptor,
+	(const usb_descriptor_header_t *)&usb_serial_ep_report_descriptor,
+	(const usb_descriptor_header_t *)&usb_serial_ep_in_descriptor,
+	(const usb_descriptor_header_t *)&usb_serial_ep_out_descriptor,
 	NULL,
 };
 
@@ -156,7 +156,7 @@ static DEFINE_USB_STRING(product_str,
 static DEFINE_USB_STRING(serial_str,
 		USB_STRING("0", "0", "1"));
 
-static usb_string_descriptor_t *usb_serial_strings[] =
+static const usb_string_descriptor_t *usb_serial_strings[] =
 {
 	(usb_string_descriptor_t *)&language_str,
 	(usb_string_descriptor_t *)&manufacturer_str,
