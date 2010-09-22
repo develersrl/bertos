@@ -1101,7 +1101,7 @@ ssize_t usb_ep_read(int ep, void *buffer, ssize_t size)
 	/* Non-blocking read for EP0 */
 	if (ep_num == CTRL_ENP_OUT)
 	{
-		size = usb_size(size, setup_packet.wLength);
+		size = usb_size(size, usb_le16_to_cpu(setup_packet.wLength));
 		if (!size)
 			USB_StatusHandler(ep_num);
 		else
@@ -1146,7 +1146,7 @@ ssize_t usb_ep_write(int ep, const void *buffer, ssize_t size)
 	/* Non-blocking write for EP0 */
 	if (ep_num == CTRL_ENP_IN)
 	{
-		size = usb_size(size, setup_packet.wLength);
+		size = usb_size(size, usb_le16_to_cpu(setup_packet.wLength));
 		if (!size)
 			USB_StatusHandler(ep_num);
 		else
@@ -1297,7 +1297,7 @@ static int usb_get_device_descriptor(int id)
 	usb_dev->device->bMaxPacketSize0 = USB_EP0_MAX_SIZE;
 	__usb_ep_write(CTRL_ENP_IN, (const uint8_t *)usb_dev->device,
 			usb_size(usb_dev->device->bLength,
-			setup_packet.wLength),
+				usb_le16_to_cpu(setup_packet.wLength)),
 			USB_StatusHandler);
 	return 0;
 }
@@ -1332,7 +1332,7 @@ static int usb_get_configuration_descriptor(int id)
 	__usb_ep_write(CTRL_ENP_IN,
 			usb_cfg_buffer,
 			usb_size(p - usb_cfg_buffer,
-				setup_packet.wLength),
+				usb_le16_to_cpu(setup_packet.wLength)),
 			USB_StatusHandler);
 	return 0;
 }
@@ -1371,7 +1371,8 @@ static int usb_get_string_descriptor(unsigned int id)
 	}
 	__usb_ep_write(CTRL_ENP_IN,
 			lang_str,
-			usb_size(lang_str->bLength, setup_packet.wLength),
+			usb_size(lang_str->bLength,
+				usb_le16_to_cpu(setup_packet.wLength)),
 			USB_StatusHandler);
 	return 0;
 }
