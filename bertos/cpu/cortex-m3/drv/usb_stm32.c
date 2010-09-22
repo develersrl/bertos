@@ -1098,20 +1098,23 @@ ssize_t usb_ep_read(int ep, void *buffer, ssize_t size)
 {
 	int ep_num = USB_EpLogToPhysAdd(ep);
 
+	/* Non-blocking read for EP0 */
+	if (ep_num == CTRL_ENP_OUT)
+	{
+		size = usb_size(size, setup_packet.wLength);
+		if (!size)
+			USB_StatusHandler(ep_num);
+		else
+			__usb_ep_read(ep_num, buffer, size,
+					USB_StatusHandler);
+		return size;
+	}
 	if (UNLIKELY(!size))
 		return 0;
 	size = MIN(size, USB_RX_MAX_SIZE);
 	rx_done = false;
 	rx_size = 0;
 
-	/* Non-blocking read for EP0 */
-	if (ep_num == CTRL_ENP_OUT)
-	{
-		size = usb_size(size, setup_packet.wLength);
-		__usb_ep_write(ep_num, buffer, size,
-				USB_StatusHandler);
-		return size;
-	}
 	/* Blocking read */
 	__usb_ep_read(ep_num, buffer, size, usb_ep_read_complete);
 	while (!rx_done)
@@ -1140,20 +1143,24 @@ ssize_t usb_ep_write(int ep, const void *buffer, ssize_t size)
 {
 	int ep_num = USB_EpLogToPhysAdd(ep);
 
+	/* Non-blocking write for EP0 */
+	if (ep_num == CTRL_ENP_IN)
+	{
+		size = usb_size(size, setup_packet.wLength);
+		LOG_INFO("%s: size = %d\n", __func__, size);
+		if (!size)
+			USB_StatusHandler(ep_num);
+		else
+			__usb_ep_write(ep_num, buffer, size,
+					USB_StatusHandler);
+		return size;
+	}
 	if (UNLIKELY(!size))
 		return 0;
 	size = MIN(size, USB_TX_MAX_SIZE);
 	tx_done = false;
 	tx_size = 0;
 
-	/* Non-blocking write for EP0 */
-	if (ep_num == CTRL_ENP_IN)
-	{
-		size = usb_size(size, setup_packet.wLength);
-		__usb_ep_write(ep_num, buffer, size,
-				USB_StatusHandler);
-		return size;
-	}
 	/* Blocking write */
 	__usb_ep_write(ep_num, buffer, size, usb_ep_write_complete);
 	while (!tx_done)
