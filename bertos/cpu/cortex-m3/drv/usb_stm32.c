@@ -781,6 +781,8 @@ static int usb_ep_configure(const usb_endpoint_descriptor_t *epd, bool enable)
 		/* Set Ep Address */
 		EpCtrlSet_EA(hw, EP >> 1);
 		ep_hw->hw = hw;
+		LOG_INFO("%s: EP%d-%s configured\n",
+				__func__, EP >> 1, EP & 1 ? "IN" : "OUT");
 
 		/* Low-level endpoint configuration */
 		usb_ep_low_level_config(EP, Offset, MaxPacketSizeTmp);
@@ -975,8 +977,10 @@ usb_configure_ep_interface(unsigned int num, unsigned int alt, bool enable)
 	for (i = start + 1; ; i++)
 	{
 		epd = (usb_endpoint_descriptor_t *)usb_dev->config[i];
-		if ((epd == NULL) || (epd->bDescriptorType != USB_DT_ENDPOINT))
+		if ((epd == NULL) || (epd->bDescriptorType == USB_DT_INTERFACE))
 			break;
+		if (epd->bDescriptorType != USB_DT_ENDPOINT)
+			continue;
 		if (UNLIKELY(usb_ep_configure(epd, enable) < 0))
 		{
 			LOG_ERR("%s: out of memory, can't initialize EP\n",
