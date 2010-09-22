@@ -446,7 +446,15 @@ static void __usb_ep_io(int EP)
 	bool CurrentBuffer;
 	stm32_usb_ep_t *epd = &ep_cnfg[EP];
 
-	ASSERT(epd->hw);
+	if (UNLIKELY(epd->hw == NULL))
+	{
+		LOG_ERR("%s: invalid endpoint (EP%d-%s)\n",
+				__func__,
+				EP >> 1,
+				(EP & 0x01) ? "IN" : "OUT");
+		ASSERT(0);
+		return;
+	}
 	if (epd->status != BEGIN_SERVICED && epd->status != NO_SERVICED)
 		return;
 
@@ -605,6 +613,20 @@ static void __usb_ep_io(int EP)
 	}
 }
 
+/*
+ * Return the lower value from Host expected size and size and set a flag
+ * STM32_USB_EP_ZERO_POSSIBLE when size is lower that host expected size.
+ */
+static size_t usb_size(size_t size, size_t host_size)
+{
+	if (size < host_size)
+	{
+		ep_cnfg[CTRL_ENP_IN].flags |= STM32_USB_EP_ZERO_POSSIBLE;
+		return size;
+	}
+	return host_size;
+}
+
 /* Configure an EP descriptor before performing a I/O operation */
 #define USB_EP_IO(__EP, __op, __buf, __size, __complete)		\
 ({									\
@@ -675,72 +697,6 @@ __usb_ep_write(int ep, const void *buffer, ssize_t size, void (*complete)(int))
 	}
 	ASSERT(ep & 0x01);
 	return USB_EP_IO(ep, write, buffer, size, complete);
-}
-
-static bool rx_done;
-static size_t rx_size;
-
-static void usb_ep_read_complete(int ep)
-{
-	if (UNLIKELY(ep >= ENP_MAX_NUMB))
-	{
-		ASSERT(0);
-		return;
-	}
-	ASSERT(!(ep & 0x01));
-
-	rx_done = true;
-	rx_size = ep_cnfg[ep].size;
-}
-
-ssize_t usb_ep_read(int ep, void *buffer, ssize_t size)
-{
-	if (UNLIKELY(!size))
-		return 0;
-	size = MIN(size, USB_RX_MAX_SIZE);
-	rx_done = false;
-	rx_size = 0;
-
-	/* Blocking read */
-	__usb_ep_read(USB_EpLogToPhysAdd(ep), buffer, size,
-				usb_ep_read_complete);
-	while (!rx_done)
-		cpu_relax();
-
-	return rx_size;
-}
-
-static bool tx_done;
-static size_t tx_size;
-
-static void usb_ep_write_complete(int ep)
-{
-	if (UNLIKELY(ep >= ENP_MAX_NUMB))
-	{
-		ASSERT(0);
-		return;
-	}
-	ASSERT(ep & 0x01);
-
-	tx_done = true;
-	tx_size = ep_cnfg[ep].size;
-}
-
-ssize_t usb_ep_write(int ep, const void *buffer, ssize_t size)
-{
-	if (UNLIKELY(!size))
-		return 0;
-	size = MIN(size, USB_TX_MAX_SIZE);
-	tx_done = false;
-	tx_size = 0;
-
-	/* Blocking write */
-	__usb_ep_write(USB_EpLogToPhysAdd(ep), buffer, size,
-				usb_ep_write_complete);
-	while (!tx_done)
-		cpu_relax();
-
-	return tx_size;
 }
 
 static void usb_ep_low_level_config(int ep, uint16_t offset, uint16_t size)
@@ -1122,6 +1078,90 @@ static void USB_StatusHandler(UNUSED_ARG(int, EP))
 	}
 }
 
+static bool rx_done;
+static size_t rx_size;
+
+static void usb_ep_read_complete(int ep)
+{
+	if (UNLIKELY(ep >= ENP_MAX_NUMB))
+	{
+		ASSERT(0);
+		return;
+	}
+	ASSERT(!(ep & 0x01));
+
+	rx_done = true;
+	rx_size = ep_cnfg[ep].size;
+}
+
+ssize_t usb_ep_read(int ep, void *buffer, ssize_t size)
+{
+	int ep_num = USB_EpLogToPhysAdd(ep);
+
+	if (UNLIKELY(!size))
+		return 0;
+	size = MIN(size, USB_RX_MAX_SIZE);
+	rx_done = false;
+	rx_size = 0;
+
+	/* Non-blocking read for EP0 */
+	if (ep_num == CTRL_ENP_OUT)
+	{
+		size = usb_size(size, setup_packet.wLength);
+		__usb_ep_write(ep_num, buffer, size,
+				USB_StatusHandler);
+		return size;
+	}
+	/* Blocking read */
+	__usb_ep_read(ep_num, buffer, size, usb_ep_read_complete);
+	while (!rx_done)
+		cpu_relax();
+
+	return rx_size;
+}
+
+static bool tx_done;
+static size_t tx_size;
+
+static void usb_ep_write_complete(int ep)
+{
+	if (UNLIKELY(ep >= ENP_MAX_NUMB))
+	{
+		ASSERT(0);
+		return;
+	}
+	ASSERT(ep & 0x01);
+
+	tx_done = true;
+	tx_size = ep_cnfg[ep].size;
+}
+
+ssize_t usb_ep_write(int ep, const void *buffer, ssize_t size)
+{
+	int ep_num = USB_EpLogToPhysAdd(ep);
+
+	if (UNLIKELY(!size))
+		return 0;
+	size = MIN(size, USB_TX_MAX_SIZE);
+	tx_done = false;
+	tx_size = 0;
+
+	/* Non-blocking write for EP0 */
+	if (ep_num == CTRL_ENP_IN)
+	{
+		size = usb_size(size, setup_packet.wLength);
+		__usb_ep_write(ep_num, buffer, size,
+				USB_StatusHandler);
+		return size;
+	}
+	/* Blocking write */
+	__usb_ep_write(ep_num, buffer, size, usb_ep_write_complete);
+	while (!tx_done)
+		cpu_relax();
+
+	return tx_size;
+}
+
 /* Global variable to handle the following non-blocking I/O operations */
 static uint32_t InData;
 
@@ -1132,7 +1172,8 @@ static int UsbDevStatus(uint16_t index)
 		return -USB_NODEV_ERROR;
 
 	InData = ((uint32_t)udc.feature) & 0xff;
-	__usb_ep_write(CTRL_ENP_IN, (uint8_t *)&InData, 2, USB_StatusHandler);
+	__usb_ep_write(CTRL_ENP_IN,
+			(uint8_t *)&InData, sizeof(InData), USB_StatusHandler);
 
 	return 0;
 }
@@ -1141,7 +1182,8 @@ static int UsbDevStatus(uint16_t index)
 static int UsbInterfaceStatus(UNUSED_ARG(uint16_t, index))
 {
 	InData = 0;
-	__usb_ep_write(CTRL_ENP_IN, (uint8_t *)&InData, 2, USB_StatusHandler);
+	__usb_ep_write(CTRL_ENP_IN,
+			(uint8_t *)&InData, sizeof(InData), USB_StatusHandler);
 
 	return 0;
 }
@@ -1154,7 +1196,8 @@ static int UsbEpStatus(uint16_t index)
 
 	InData = 0;
 	USB_GetStallEP(USB_EpLogToPhysAdd(index), (bool *)&InData);
-	__usb_ep_write(CTRL_ENP_IN, (uint8_t *)&InData, 2, USB_StatusHandler);
+	__usb_ep_write(CTRL_ENP_IN,
+			(uint8_t *)&InData, sizeof(InData), USB_StatusHandler);
 
 	return 0;
 }
@@ -1238,20 +1281,6 @@ static void USB_GetStatusHandler(void)
 		ep_cnfg[CTRL_ENP_OUT].status = STALLED;
 		break;
 	}
-}
-
-/*
- * Return the lower value from Host expected size and size and set a flag
- * STM32_USB_EP_ZERO_POSSIBLE when size is lower that host expected size.
- */
-static size_t usb_size(size_t size, size_t host_size)
-{
-	if (size < host_size)
-	{
-		ep_cnfg[CTRL_ENP_IN].flags |= STM32_USB_EP_ZERO_POSSIBLE;
-		return size;
-	}
-	return host_size;
 }
 
 static int usb_get_device_descriptor(int id)
