@@ -26,16 +26,13 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2003, 2004, 2005, 2006, 2008 Develer S.r.l. (http://www.develer.com/)
- * Copyright 2000 Bernie Innocenti
- * All Rights Reserved.
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ *
  * -->
  *
- * \brief Keyboard hardware-specific definitions
+ * \author Andrea Righi <arighi@develer.com>
  *
- *
- * \author Francesco Sacchi <batt@develer.com>
- * \author Stefano Fedrigo <a@develer.com>
+ * \brief Keyboard driver of the STM32-P103 evaluation board
  */
 
 #ifndef HW_KBD_H
@@ -44,14 +41,15 @@
 #include "hw/kbd_map.h"
 
 #include <cfg/macros.h>
+#include <drv/gpio_stm32.h>
 
-#warning TODO:This is an example implementation, you must implement it!
-
-#define K_RPT_MASK (K_UP | K_DOWN | K_OK | K_CANCEL)
+#define K_RPT_MASK (K_WAKEUP)
 
 #define KBD_HW_INIT \
 	do { \
-			/* Put here code to init hw */ \
+		stm32_gpioPinConfig((struct stm32_gpio *)GPIOA_BASE, \
+					BV(0), GPIO_MODE_IN_FLOATING, \
+					GPIO_SPEED_50MHZ); \
 	} while (0)
 
 EXTERN_C int emul_kbdReadCols(void);
@@ -62,10 +60,7 @@ EXTERN_C int emul_kbdReadCols(void);
  */
 INLINE keymask_t kbd_readkeys(void)
 {
-	/* Implement me! */
-
-	//Only for test remove when implement this function
-	return 0;
+	return stm32_gpioPinRead((struct stm32_gpio *)GPIOA_BASE, BV(0));
 }
 
 #endif /* HW_KBD_H */

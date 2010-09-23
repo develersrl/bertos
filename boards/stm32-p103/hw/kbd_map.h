@@ -26,25 +26,19 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2003, 2004, 2005, 2006, 2008 Develer S.r.l. (http://www.develer.com/)
- * Copyright 2000 Bernie Innocenti
- * All Rights Reserved.
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ *
  * -->
  *
- * \brief Keyboard map definitions.
+ * \author Andrea Righi <arighi@develer.com>
  *
- *
- * \author Francesco Sacchi <batt@develer.com>
- * \author Stefano Fedrigo <a@develer.com>
+ * \brief Keyboard map definitions for the STM32-P103 evaluation board
  */
 
 #ifndef HW_KBD_MAP_H
 #define HW_KBD_MAP_H
 
 #include <cfg/macros.h>
-
-#warning TODO:This is an example implentation, you must implement it!
-
 
 /**
  * Type for keyboard mask.
@@ -55,10 +49,7 @@ typedef uint16_t keymask_t;
  * \name Keycodes.
  */
 /*@{*/
-#define K_UP       BV(0)
-#define K_DOWN     BV(1)
-#define K_OK       BV(2)
-#define K_CANCEL   BV(3)
+#define K_WAKEUP   BV(0)
 
 #define K_REPEAT   BV(13) /**< This is a repeated keyevent. */
 #define K_TIMEOUT  BV(14) /**< Fake key event for timeouts. */
