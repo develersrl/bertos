@@ -178,7 +178,7 @@ static int usb_serial_hw_init(void)
 #if CONFIG_KERN
 	MOD_CHECK(proc);
 #endif
-	if (usb_device_register(&usb_serial) < 0)
+	if (usb_deviceRegister(&usb_serial) < 0)
 		return -1;
 	LOG_INFO("usb-serial: registered new USB interface driver\n");
 	return 0;
@@ -197,7 +197,7 @@ static size_t usb_serial_write(struct KFile *fd,
 	/* Silent compiler warnings if _DEBUG is not enabled */
 	(void)fd;
 	ASSERT(fds->is_open);
-	return usb_ep_write(usb_serial_ep_in_descriptor.bEndpointAddress,
+	return usb_endpointWrite(usb_serial_ep_in_descriptor.bEndpointAddress,
 				buf, size);
 }
 
@@ -213,7 +213,7 @@ static size_t usb_serial_read(struct KFile *fd, void *buf, size_t size)
 	/* Silent compiler warnings if _DEBUG is not enabled */
 	(void)fd;
 	ASSERT(fds->is_open);
-	return usb_ep_read(usb_serial_ep_out_descriptor.bEndpointAddress,
+	return usb_endpointRead(usb_serial_ep_out_descriptor.bEndpointAddress,
 				buf, size);
 }
 
@@ -293,7 +293,7 @@ static struct KFile *usb_serial_reopen(struct KFile *fd)
  *
  * \return 0 if OK, a negative value in case of error.
  */
-int usb_serial_init(struct USBSerial *fds, int unit)
+int usb_serialInit(struct USBSerial *fds, int unit)
 {
 	memset(fds, 0, sizeof(*fds));
 

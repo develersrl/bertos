@@ -137,20 +137,20 @@ static stm32_udc_t udc;
 static UsbDevice *usb_dev;
 
 /* USB packet memory management: list of allocated chunks */
-static pack_mem_slot_t *pPacketMemUse;
+static pack_mem_slot_t *mem_use;
 
 /* USB packet memory management: memory buffer metadata */
 #define EP_MAX_SLOTS	16
-static pack_mem_slot_t PacketMemBuff[EP_MAX_SLOTS];
+static pack_mem_slot_t memory_buffer[EP_MAX_SLOTS];
 
 /* Allocate a free block of the packet memory */
 static pack_mem_slot_t *usb_malloc(void)
 {
 	unsigned int i;
 
-	for (i = 0; i < countof(PacketMemBuff); i++)
-		if (PacketMemBuff[i].Size == 0)
-			return &PacketMemBuff[i];
+	for (i = 0; i < countof(memory_buffer); i++)
+		if (memory_buffer[i].Size == 0)
+			return &memory_buffer[i];
 	return NULL;
 }
 
@@ -161,92 +161,92 @@ static void usb_free(pack_mem_slot_t *pPntr)
 }
 
 /* Allocate a free chunk of the packet memory (inside a block) */
-static bool USB_AllocateBuffer(uint16_t *pOffset, uint32_t *pPacketSize,
+static bool usb_alloc_buffer(uint16_t *pOffset, uint32_t *size,
                             int EndPoint)
 {
-	pack_mem_slot_t *pPacketMem = pPacketMemUse,
-			*pPacketMemNext, *pPacketMemUseNew;
-	uint32_t MaxPacketSize = *pPacketSize;
+	pack_mem_slot_t *mem = mem_use,
+			*memNext, *mem_useNew;
+	uint32_t max_size = *size;
 
 	/*
 	 * Packet size alignment:
 	 *  - fine-granularity allocation: size alignment by 2;
 	 *  - coarse-granularity allocation: size alignment by 32.
 	 */
-	if (MaxPacketSize < 62)
-		MaxPacketSize = ALIGN_UP(MaxPacketSize, 2);
+	if (max_size < 62)
+		max_size = ALIGN_UP(max_size, 2);
 	else
-		MaxPacketSize = ALIGN_UP(MaxPacketSize, 32);
+		max_size = ALIGN_UP(max_size, 32);
 	/*
 	 * Finding free memory chunks from the allocated blocks of the USB
 	 * packet memory.
 	 */
 	*pOffset = 0;
-	while (pPacketMem != NULL)
+	while (mem != NULL)
 	{
 		/* Offset alignment by 4 */
-		*pOffset = ALIGN_UP(pPacketMem->Start + pPacketMem->Size, 4);
-		pPacketMemNext = pPacketMem->next;
-		if ((pPacketMem->next == NULL) ||
-				(pPacketMemNext->Start >=
-					*pOffset + MaxPacketSize))
+		*pOffset = ALIGN_UP(mem->Start + mem->Size, 4);
+		memNext = mem->next;
+		if ((mem->next == NULL) ||
+				(memNext->Start >=
+					*pOffset + max_size))
 			break;
-		pPacketMem = pPacketMem->next;
+		mem = mem->next;
 	}
 	/* Check for out-of-memory condition */
-	if ((*pOffset + MaxPacketSize) >= USB_BDT_OFFSET)
+	if ((*pOffset + max_size) >= USB_BDT_OFFSET)
 		return false;
 	/*
 	 * Allocate a new memory block, next to the last allocated block.
 	 */
-	pPacketMemUseNew = usb_malloc();
-	if (pPacketMemUseNew == NULL)
+	mem_useNew = usb_malloc();
+	if (mem_useNew == NULL)
 		return false;
 	/* Insert the block to the list of allocated blocks */
-	if (pPacketMemUse == NULL)
+	if (mem_use == NULL)
 	{
-		pPacketMemUse = pPacketMemUseNew;
-		pPacketMemUse->next = NULL;
+		mem_use = mem_useNew;
+		mem_use->next = NULL;
 	}
 	else
 	{
-		pPacketMemUseNew->next = pPacketMem->next;
-		pPacketMem->next = pPacketMemUseNew;
+		mem_useNew->next = mem->next;
+		mem->next = mem_useNew;
 	}
 	/* Update block's metadata */
-	pPacketMemUseNew->ep_addr = EndPoint;
-	pPacketMemUseNew->Start = *pOffset;
-	pPacketMemUseNew->Size = MaxPacketSize;
+	mem_useNew->ep_addr = EndPoint;
+	mem_useNew->Start = *pOffset;
+	mem_useNew->Size = max_size;
 
-	*pPacketSize = MaxPacketSize;
+	*size = max_size;
 
 	return true;
 }
 
 /* Release a chunk of the packet memory (inside a block) */
-static void USB_ReleaseBuffer(int EndPoint)
+static void usb_free_buffer(int EndPoint)
 {
-	pack_mem_slot_t *pPacketMem, *pPacketMemPrev = NULL;
-	pPacketMem = pPacketMemUse;
+	pack_mem_slot_t *mem, *memPrev = NULL;
+	mem = mem_use;
 
-	while (pPacketMem != NULL)
+	while (mem != NULL)
 	{
-		if (pPacketMem->ep_addr == EndPoint)
+		if (mem->ep_addr == EndPoint)
 		{
-			if (UNLIKELY(pPacketMemPrev == NULL))
+			if (UNLIKELY(memPrev == NULL))
 			{
 				/* Free the first element of the list */
-				pPacketMemUse = pPacketMemUse->next;
-				usb_free(pPacketMem);
-				pPacketMem = pPacketMemUse;
+				mem_use = mem_use->next;
+				usb_free(mem);
+				mem = mem_use;
 				continue;
 			}
-			pPacketMemPrev->next = pPacketMem->next;
-			usb_free(pPacketMem);
+			memPrev->next = mem->next;
+			usb_free(mem);
 		}
 		else
-			pPacketMemPrev = pPacketMem;
-		pPacketMem = pPacketMemPrev->next;
+			memPrev = mem;
+		mem = memPrev->next;
 	}
 }
 
@@ -286,7 +286,7 @@ static void usb_resume(void)
 }
 
 /* Convert logical EP address to physical EP address */
-static int USB_EpLogToPhysAdd(uint8_t ep_addr)
+static int usb_ep_logical_to_hw(uint8_t ep_addr)
 {
 	int addr = (ep_addr & 0x0f) << 1;
 	return (ep_addr & 0x80) ? addr + 1 : addr;
@@ -746,9 +746,9 @@ static int usb_ep_configure(const UsbEndpointDesc *epd, bool enable)
 	stm32_usb_ep_t *ep_hw;
 	reg32_t *hw;
 	uint16_t Offset;
-	uint32_t MaxPacketSizeTmp;
+	uint32_t size;
 
-	EP = USB_EpLogToPhysAdd(epd->bEndpointAddress);
+	EP = usb_ep_logical_to_hw(epd->bEndpointAddress);
 	ep_hw = &ep_cnfg[EP];
 
 	if (enable)
@@ -757,8 +757,8 @@ static int usb_ep_configure(const UsbEndpointDesc *epd, bool enable)
 		 * Allocate packet memory for EP buffer/s calculate actual size
 		 * only for the OUT EPs.
 		 */
-		MaxPacketSizeTmp = epd->wMaxPacketSize;
-		if (!USB_AllocateBuffer(&Offset, &MaxPacketSizeTmp, EP))
+		size = epd->wMaxPacketSize;
+		if (!usb_alloc_buffer(&Offset, &size, EP))
 			return -USB_MEMORY_FULL;
 
 		/* Set EP status */
@@ -785,7 +785,7 @@ static int usb_ep_configure(const UsbEndpointDesc *epd, bool enable)
 				__func__, EP >> 1, EP & 1 ? "IN" : "OUT");
 
 		/* Low-level endpoint configuration */
-		usb_ep_low_level_config(EP, Offset, MaxPacketSizeTmp);
+		usb_ep_low_level_config(EP, Offset, size);
 
 		/* Set EP Kind & enable */
 		switch (ep_hw->type)
@@ -847,7 +847,7 @@ static int usb_ep_configure(const UsbEndpointDesc *epd, bool enable)
 			EpCtrlClr_CTR_RX(hw);
 		}
 		/* Release buffer */
-		USB_ReleaseBuffer(EP);
+		usb_free_buffer(EP);
 		ep_cnfg[EP].hw = NULL;
 	}
 	return 0;
@@ -1085,7 +1085,7 @@ static void USB_StatusHandler(UNUSED_ARG(int, EP))
 static bool rx_done;
 static size_t rx_size;
 
-static void usb_ep_read_complete(int ep)
+static void usb_endpointRead_complete(int ep)
 {
 	if (UNLIKELY(ep >= ENP_MAX_NUMB))
 	{
@@ -1098,9 +1098,9 @@ static void usb_ep_read_complete(int ep)
 	rx_size = ep_cnfg[ep].size;
 }
 
-ssize_t usb_ep_read(int ep, void *buffer, ssize_t size)
+ssize_t usb_endpointRead(int ep, void *buffer, ssize_t size)
 {
-	int ep_num = USB_EpLogToPhysAdd(ep);
+	int ep_num = usb_ep_logical_to_hw(ep);
 
 	/* Non-blocking read for EP0 */
 	if (ep_num == CTRL_ENP_OUT)
@@ -1120,7 +1120,7 @@ ssize_t usb_ep_read(int ep, void *buffer, ssize_t size)
 	rx_size = 0;
 
 	/* Blocking read */
-	__usb_ep_read(ep_num, buffer, size, usb_ep_read_complete);
+	__usb_ep_read(ep_num, buffer, size, usb_endpointRead_complete);
 	while (!rx_done)
 		cpu_relax();
 
@@ -1130,7 +1130,7 @@ ssize_t usb_ep_read(int ep, void *buffer, ssize_t size)
 static bool tx_done;
 static size_t tx_size;
 
-static void usb_ep_write_complete(int ep)
+static void usb_endpointWrite_complete(int ep)
 {
 	if (UNLIKELY(ep >= ENP_MAX_NUMB))
 	{
@@ -1143,9 +1143,9 @@ static void usb_ep_write_complete(int ep)
 	tx_size = ep_cnfg[ep].size;
 }
 
-ssize_t usb_ep_write(int ep, const void *buffer, ssize_t size)
+ssize_t usb_endpointWrite(int ep, const void *buffer, ssize_t size)
 {
-	int ep_num = USB_EpLogToPhysAdd(ep);
+	int ep_num = usb_ep_logical_to_hw(ep);
 
 	/* Non-blocking write for EP0 */
 	if (ep_num == CTRL_ENP_IN)
@@ -1165,7 +1165,7 @@ ssize_t usb_ep_write(int ep, const void *buffer, ssize_t size)
 	tx_size = 0;
 
 	/* Blocking write */
-	__usb_ep_write(ep_num, buffer, size, usb_ep_write_complete);
+	__usb_ep_write(ep_num, buffer, size, usb_endpointWrite_complete);
 	while (!tx_done)
 		cpu_relax();
 
@@ -1205,7 +1205,7 @@ static int UsbEpStatus(uint16_t index)
 		return -USB_NODEV_ERROR;
 
 	InData = 0;
-	USB_GetStallEP(USB_EpLogToPhysAdd(index), (bool *)&InData);
+	USB_GetStallEP(usb_ep_logical_to_hw(index), (bool *)&InData);
 	__usb_ep_write(CTRL_ENP_IN,
 			(uint8_t *)&InData, sizeof(uint16_t),
 			USB_StatusHandler);
@@ -1657,10 +1657,10 @@ static void usb_hw_reset(void)
 		ep_cnfg[i].hw = NULL;
 
 	/* Initialize USB memory */
-	for (i = 0; i < countof(PacketMemBuff); i++)
-		PacketMemBuff[i].Size = 0;
+	for (i = 0; i < countof(memory_buffer); i++)
+		memory_buffer[i].Size = 0;
 	usb->BTABLE = USB_BDT_OFFSET;
-	pPacketMemUse = NULL;
+	mem_use = NULL;
 
 	/* Endpoint initialization */
 	ret = usb_ep_configure(&USB_CtrlEpDescr0, true);
@@ -1861,7 +1861,7 @@ static void usb_init(void)
 }
 
 /* Register an upper layer USB device into the driver */
-int usb_device_register(UsbDevice *dev)
+int usb_deviceRegister(UsbDevice *dev)
 {
 #if CONFIG_KERN
 	MOD_CHECK(proc);

@@ -217,13 +217,13 @@ static void usb_hid_event_cb(UsbCtrlRequest *ctrl)
 		{
 		case HID_DT_HID:
 			LOG_INFO("%s: HID_DT_HID\n", __func__);
-			usb_ep_write(USB_DIR_IN | 0,
+			usb_endpointWrite(USB_DIR_IN | 0,
 					&usb_hid_descriptor,
 					sizeof(usb_hid_descriptor));
 			break;
 		case HID_DT_REPORT:
 			LOG_INFO("%s: HID_DT_REPORT\n", __func__);
-			usb_ep_write(USB_DIR_IN | 0,
+			usb_endpointWrite(USB_DIR_IN | 0,
 					&hid_report_descriptor,
 					sizeof(hid_report_descriptor));
 			hid_keyboard_configured = true;
@@ -238,14 +238,14 @@ static void usb_hid_event_cb(UsbCtrlRequest *ctrl)
 		break;
 	case HID_REQ_SET_REPORT:
 		LOG_INFO("%s: HID_REQ_SET_REPORT\n", __func__);
-		usb_ep_write(USB_DIR_IN | 0, NULL, 0);
+		usb_endpointWrite(USB_DIR_IN | 0, NULL, 0);
 		break;
 	case HID_REQ_GET_IDLE:
 		LOG_INFO("%s: HID_REQ_GET_IDLE\n", __func__);
 		break;
 	case HID_REQ_SET_IDLE:
 		LOG_INFO("%s: HID_REQ_SET_IDLE\n", __func__);
-		usb_ep_write(USB_DIR_IN | 0, NULL, 0);
+		usb_endpointWrite(USB_DIR_IN | 0, NULL, 0);
 		break;
 	case HID_REQ_GET_PROTOCOL:
 		LOG_INFO("%s: HID_REQ_GET_PROTOCOL\n", __func__);
@@ -271,7 +271,7 @@ static UsbDevice usb_keyboard = {
 /* Low-level usb-hid device initialization */
 static int usb_keyboard_hw_init(void)
 {
-	if (usb_device_register(&usb_keyboard) < 0)
+	if (usb_deviceRegister(&usb_keyboard) < 0)
 		return -1;
 	LOG_INFO("usb-hid: registered new USB keyboard device\n");
 	return 0;
@@ -282,7 +282,7 @@ void usb_keyboard_send_event(uint8_t mod, uint8_t code)
 {
 	report[0] = mod;
 	report[2] = code;
-	usb_ep_write(USB_HID_REPORT_EP, &report, sizeof(report));
+	usb_endpointWrite(USB_HID_REPORT_EP, &report, sizeof(report));
 }
 
 /*

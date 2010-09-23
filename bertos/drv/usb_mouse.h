@@ -42,7 +42,7 @@
 #ifndef USB_MOUSE_H
 #define USB_MOUSE_H
 
-void usb_mouse_send_event(int8_t x, int8_t y, int8_t buttons);
-int usb_mouse_init(int unit);
+void usb_mouseSendEvent(int8_t x, int8_t y, int8_t buttons);
+int usb_mouseInit(int unit);
 
 #endif /* USB_MOUSE_H */

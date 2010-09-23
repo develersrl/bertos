@@ -71,6 +71,6 @@ INLINE USBSerial *USB_SERIAL_CAST(KFile *fd)
         return (USBSerial *)fd;
 }
 
-int usb_serial_init(struct USBSerial *fds, int unit);
+int usb_serialInit(struct USBSerial *fds, int unit);
 
 #endif /* USB_SERIAL_H */

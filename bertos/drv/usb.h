@@ -457,18 +457,18 @@ INLINE int usb_endpointIsIsocOut(const struct UsbEndpointDesc *epd)
 }
 
 /*
- * usb_ep_read - configure endponint and perform the read operation
+ * usb_endpointRead - configure endponint and perform the read operation
  */
-ssize_t usb_ep_read(int ep, void *buffer, ssize_t size);
+ssize_t usb_endpointRead(int ep, void *buffer, ssize_t size);
 
 /*
- * usb_ep_write - configure endponint and perform the write operation
+ * usb_endpointWrite - configure endponint and perform the write operation
  */
-ssize_t usb_ep_write(int ep, const void *buffer, ssize_t size);
+ssize_t usb_endpointWrite(int ep, const void *buffer, ssize_t size);
 
 /*
- * usb_device_register - register a generic USB device driver
+ * usb_deviceRegister - register a generic USB device driver
  */
-int usb_device_register(UsbDevice *dev);
+int usb_deviceRegister(UsbDevice *dev);
 
 #endif /* USB_H */

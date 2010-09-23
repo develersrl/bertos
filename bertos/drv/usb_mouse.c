@@ -212,13 +212,13 @@ static void usb_hid_event_cb(UsbCtrlRequest *ctrl)
 		{
 		case HID_DT_HID:
 			LOG_INFO("%s: HID_DT_HID\n", __func__);
-			usb_ep_write(USB_DIR_IN | 0,
+			usb_endpointWrite(USB_DIR_IN | 0,
 					&usb_hid_descriptor,
 					sizeof(usb_hid_descriptor));
 			break;
 		case HID_DT_REPORT:
 			LOG_INFO("%s: HID_DT_REPORT\n", __func__);
-			usb_ep_write(USB_DIR_IN | 0,
+			usb_endpointWrite(USB_DIR_IN | 0,
 					&hid_report_descriptor,
 					sizeof(hid_report_descriptor));
 			hid_mouse_configured = true;
@@ -236,7 +236,7 @@ static void usb_hid_event_cb(UsbCtrlRequest *ctrl)
 		break;
 	case HID_REQ_SET_IDLE:
 		LOG_INFO("%s: HID_REQ_SET_IDLE\n", __func__);
-		usb_ep_write(USB_DIR_IN | 0, NULL, 0);
+		usb_endpointWrite(USB_DIR_IN | 0, NULL, 0);
 		break;
 	case HID_REQ_GET_PROTOCOL:
 		LOG_INFO("%s: HID_REQ_GET_PROTOCOL\n", __func__);
@@ -262,19 +262,19 @@ static UsbDevice usb_mouse = {
 /* Low-level usb-hid device initialization */
 static int usb_mouse_hw_init(void)
 {
-	if (usb_device_register(&usb_mouse) < 0)
+	if (usb_deviceRegister(&usb_mouse) < 0)
 		return -1;
 	LOG_INFO("usb-hid: registered new USB mouse device\n");
 	return 0;
 }
 
 /* Send a mouse event */
-void usb_mouse_send_event(int8_t x, int8_t y, int8_t buttons)
+void usb_mouseSendEvent(int8_t x, int8_t y, int8_t buttons)
 {
 	report.x = x;
 	report.y = y;
 	report.buttons = buttons;
-	usb_ep_write(USB_HID_REPORT_EP, &report, sizeof(report));
+	usb_endpointWrite(USB_HID_REPORT_EP, &report, sizeof(report));
 }
 
 /*
@@ -282,7 +282,7 @@ void usb_mouse_send_event(int8_t x, int8_t y, int8_t buttons)
  *
  * TODO: support more than one device at the same time.
  */
-int usb_mouse_init(UNUSED_ARG(int, unit))
+int usb_mouseInit(UNUSED_ARG(int, unit))
 {
 #if CONFIG_KERN
 	MOD_CHECK(proc);
