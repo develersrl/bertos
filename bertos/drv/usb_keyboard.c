@@ -238,6 +238,7 @@ static void usb_hid_event_cb(usb_ctrlrequest_t *ctrl)
 		break;
 	case HID_REQ_SET_REPORT:
 		LOG_INFO("%s: HID_REQ_SET_REPORT\n", __func__);
+		usb_ep_write(USB_DIR_IN | 0, NULL, 0);
 		break;
 	case HID_REQ_GET_IDLE:
 		LOG_INFO("%s: HID_REQ_GET_IDLE\n", __func__);
