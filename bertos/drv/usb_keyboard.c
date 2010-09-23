@@ -68,7 +68,7 @@
 
 #define USB_HID_REPORT_EP	(USB_DIR_IN | 1)
 
-static usb_device_descriptor_t usb_hid_device_descriptor =
+static UsbDeviceDesc usb_hid_device_descriptor =
 {
 	.bLength = sizeof(usb_hid_device_descriptor),
 	.bDescriptorType = USB_DT_DEVICE,
@@ -85,7 +85,7 @@ static usb_device_descriptor_t usb_hid_device_descriptor =
 	.bNumConfigurations = 1,
 };
 
-static const usb_config_descriptor_t usb_hid_config_descriptor =
+static const UsbConfigDesc usb_hid_config_descriptor =
 {
 	.bLength = sizeof(usb_hid_config_descriptor),
 	.bDescriptorType = USB_DT_CONFIG,
@@ -96,7 +96,7 @@ static const usb_config_descriptor_t usb_hid_config_descriptor =
 	.bMaxPower = 50, /* 100 mA */
 };
 
-static const usb_interface_descriptor_t usb_hid_interface_descriptor =
+static const UsbInterfaceDesc usb_hid_interface_descriptor =
 {
 	.bLength = sizeof(usb_hid_interface_descriptor),
 	.bDescriptorType = USB_DT_INTERFACE,
@@ -162,7 +162,7 @@ static const usb_hid_descriptor_t usb_hid_descriptor =
 	.wDescriptorLength = usb_cpu_to_le16(sizeof(hid_report_descriptor)),
 };
 
-static const usb_endpoint_descriptor_t usb_hid_ep_descriptor =
+static const UsbEndpointDesc usb_hid_ep_descriptor =
 {
 	.bLength = sizeof(usb_hid_ep_descriptor),
 	.bDescriptorType = USB_DT_ENDPOINT,
@@ -172,12 +172,12 @@ static const usb_endpoint_descriptor_t usb_hid_ep_descriptor =
 	.bInterval = 10, /* resolution in ms */
 };
 
-static const usb_descriptor_header_t *usb_hid_config[] =
+static const UsbDescHeader *usb_hid_config[] =
 {
-	(const usb_descriptor_header_t *)&usb_hid_config_descriptor,
-	(const usb_descriptor_header_t *)&usb_hid_interface_descriptor,
-	(const usb_descriptor_header_t *)&usb_hid_descriptor,
-	(const usb_descriptor_header_t *)&usb_hid_ep_descriptor,
+	(const UsbDescHeader *)&usb_hid_config_descriptor,
+	(const UsbDescHeader *)&usb_hid_interface_descriptor,
+	(const UsbDescHeader *)&usb_hid_descriptor,
+	(const UsbDescHeader *)&usb_hid_ep_descriptor,
 	NULL,
 };
 
@@ -188,11 +188,11 @@ static DEFINE_USB_STRING(product_str,
 		USB_STRING("U", "S", "B", " ",
 				"K", "e", "y", "b", "o", "a", "r", "d"));
 
-static const usb_string_descriptor_t *usb_hid_strings[] =
+static const UsbStringDesc *usb_hid_strings[] =
 {
-	(usb_string_descriptor_t *)&language_str,
-	(usb_string_descriptor_t *)&manufacturer_str,
-	(usb_string_descriptor_t *)&product_str,
+	(UsbStringDesc *)&language_str,
+	(UsbStringDesc *)&manufacturer_str,
+	(UsbStringDesc *)&product_str,
 	NULL,
 };
 
@@ -200,7 +200,7 @@ static uint8_t report[8];
 
 static bool hid_keyboard_configured;
 
-static void usb_hid_event_cb(usb_ctrlrequest_t *ctrl)
+static void usb_hid_event_cb(UsbCtrlRequest *ctrl)
 {
 	uint16_t value = usb_le16_to_cpu(ctrl->wValue);
 	uint16_t index = usb_le16_to_cpu(ctrl->wIndex);
@@ -261,7 +261,7 @@ static void usb_hid_event_cb(usb_ctrlrequest_t *ctrl)
 }
 
 /* Global usb-keyboard descriptor that identifies the usb-keyboard device */
-static struct usb_device usb_keyboard = {
+static UsbDevice usb_keyboard = {
 	.device = &usb_hid_device_descriptor,
 	.config = usb_hid_config,
 	.strings = usb_hid_strings,

@@ -152,24 +152,24 @@ enum usb_device_state {
  *
  * It matches the different fields of the USB 2.0 spec. section 9.3, table 9-2.
  */
-typedef struct usb_ctrlrequest
+typedef struct UsbCtrlRequest
 {
 	uint8_t mRequestType;
 	uint8_t bRequest;
 	uint16_t wValue;
 	uint16_t wIndex;
 	uint16_t wLength;
-} PACKED usb_ctrlrequest_t;
+} PACKED UsbCtrlRequest;
 
 /* All standard descriptors have these 2 fields at the beginning */
-typedef struct usb_descriptor_header
+typedef struct UsbDescHeader
 {
 	uint8_t bLength;
 	uint8_t bDescriptorType;
-} PACKED usb_descriptor_header_t;
+} PACKED UsbDescHeader;
 
 /* Device descriptor */
-typedef struct usb_device_descriptor
+typedef struct UsbDeviceDesc
 {
 	uint8_t bLength;
 	uint8_t bDescriptorType;
@@ -185,15 +185,15 @@ typedef struct usb_device_descriptor
 	uint8_t iProduct;
 	uint8_t iSerialNumber;
 	uint8_t bNumConfigurations;
-} PACKED usb_device_descriptor_t;
+} PACKED UsbDeviceDesc;
 
 /* USB string descriptor */
-typedef struct usb_string_descriptor
+typedef struct UsbStringDesc
 {
 	uint8_t bLength;
 	uint8_t bDescriptorType;
 	uint8_t data[0];
-} PACKED usb_string_descriptor_t;
+} PACKED UsbStringDesc;
 
 /*
  * Macros to define USB strings
@@ -221,7 +221,7 @@ typedef struct usb_string_descriptor
 
 #define DEFINE_USB_STRING(__name, __text)			\
 	struct {						\
-		usb_descriptor_header_t __header;		\
+		UsbDescHeader __header;		\
 		uint8_t __body[sizeof(__text)];			\
 	} PACKED __name = {					\
 		.__header = {					\
@@ -264,7 +264,7 @@ typedef struct usb_string_descriptor
 #define USB_CDC_SUBCLASS_NCM                    0x0d
 
 /* Device configuration descriptor */
-typedef struct usb_config_descriptor
+typedef struct UsbConfigDesc
 {
 	uint8_t bLength;
 	uint8_t bDescriptorType;
@@ -274,7 +274,7 @@ typedef struct usb_config_descriptor
 	uint8_t iConfiguration;
 	uint8_t bmAttributes;
 	uint8_t bMaxPower;
-} PACKED usb_config_descriptor_t;
+} PACKED UsbConfigDesc;
 
 /* from config descriptor bmAttributes */
 #define USB_CONFIG_ATT_ONE		(1 << 7)	/* must be set */
@@ -283,7 +283,7 @@ typedef struct usb_config_descriptor
 #define USB_CONFIG_ATT_BATTERY		(1 << 4)	/* battery powered */
 
 /* Device interface descriptor */
-typedef struct usb_interface_descriptor
+typedef struct UsbInterfaceDesc
 {
 	uint8_t bLength;
 	uint8_t bDescriptorType;
@@ -294,10 +294,10 @@ typedef struct usb_interface_descriptor
 	uint8_t bInterfaceSubClass;
 	uint8_t bInterfaceProtocol;
 	uint8_t iInterface;
-} PACKED usb_interface_descriptor_t;
+} PACKED UsbInterfaceDesc;
 
 /* Endpoint descriptor */
-typedef struct usb_endpoint_descriptor
+typedef struct UsbEndpointDesc
 {
 	uint8_t bLength;
 	uint8_t bDescriptorType;
@@ -305,7 +305,7 @@ typedef struct usb_endpoint_descriptor
 	uint8_t bmAttributes;
 	uint16_t wMaxPacketSize;
 	uint8_t bInterval;
-} PACKED usb_endpoint_descriptor_t;
+} PACKED UsbEndpointDesc;
 
 /*
  * Endpoints
@@ -327,133 +327,133 @@ typedef struct usb_endpoint_descriptor
 #define USB_ENDPOINT_MAX_ADJUSTABLE	0x80
 
 /* USB: generic device descriptor */
-struct usb_device
+typedef struct UsbDevice
 {
-	usb_device_descriptor_t *device;
-	const usb_descriptor_header_t **config;
-	const usb_string_descriptor_t **strings;
+	UsbDeviceDesc *device;
+	const UsbDescHeader **config;
+	const UsbStringDesc **strings;
 
 	/* Callbacks */
-	void (*event_cb)(usb_ctrlrequest_t *);
+	void (*event_cb)(UsbCtrlRequest *);
 
 	/* Private data */
 	bool configured;
-};
+} UsbDevice;
 
 /*
- * usb_endpoint_num - get the endpoint's number
+ * usb_endpointNum - get the endpoint's number
  */
-INLINE int usb_endpoint_num(const usb_endpoint_descriptor_t *epd)
+INLINE int usb_endpointNum(const UsbEndpointDesc *epd)
 {
 	return epd->bEndpointAddress & USB_ENDPOINT_NUMBER_MASK;
 }
 
 /*
- * usb_endpoint_type - get the endpoint's transfer type
+ * usb_endpointType - get the endpoint's transfer type
  */
-INLINE int usb_endpoint_type(const struct usb_endpoint_descriptor *epd)
+INLINE int usb_endpointType(const struct UsbEndpointDesc *epd)
 {
 	return epd->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK;
 }
 
 /*
- * usb_endpoint_dir_in - check if the endpoint has IN direction
+ * usb_endpointDirIn - check if the endpoint has IN direction
  */
-INLINE int usb_endpoint_dir_in(const struct usb_endpoint_descriptor *epd)
+INLINE int usb_endpointDirIn(const struct UsbEndpointDesc *epd)
 {
 	return ((epd->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN);
 }
 
 /*
- * usb_endpoint_dir_out - check if the endpoint has OUT direction
+ * usb_endpointDirOut - check if the endpoint has OUT direction
  */
-INLINE int usb_endpoint_dir_out(const struct usb_endpoint_descriptor *epd)
+INLINE int usb_endpointDirOut(const struct UsbEndpointDesc *epd)
 {
 	return ((epd->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_OUT);
 }
 
 /*
- * usb_endpoint_xfer_bulk - check if the endpoint has bulk transfer type
+ * usb_endpointXferBulk - check if the endpoint has bulk transfer type
  */
-INLINE int usb_endpoint_xfer_bulk(const struct usb_endpoint_descriptor *epd)
+INLINE int usb_endpointXferBulk(const struct UsbEndpointDesc *epd)
 {
 	return ((epd->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK) ==
 		USB_ENDPOINT_XFER_BULK);
 }
 
 /*
- * usb_endpoint_xfer_control - check if the endpoint has control transfer type
+ * usb_endpointXferControl - check if the endpoint has control transfer type
  */
-INLINE int usb_endpoint_xfer_control(const struct usb_endpoint_descriptor *epd)
+INLINE int usb_endpointXferControl(const struct UsbEndpointDesc *epd)
 {
 	return ((epd->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK) ==
 		USB_ENDPOINT_XFER_CONTROL);
 }
 
 /*
- * usb_endpoint_xfer_int - check if the endpoint has interrupt transfer type
+ * usb_endpointXferInt - check if the endpoint has interrupt transfer type
  */
-INLINE int usb_endpoint_xfer_int(const struct usb_endpoint_descriptor *epd)
+INLINE int usb_endpointXferInt(const struct UsbEndpointDesc *epd)
 {
 	return ((epd->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK) ==
 		USB_ENDPOINT_XFER_INT);
 }
 
 /*
- * usb_endpoint_xfer_isoc - check if the endpoint has isochronous transfer type
+ * usb_endpointXferIsoc - check if the endpoint has isochronous transfer type
  */
-INLINE int usb_endpoint_xfer_isoc(const struct usb_endpoint_descriptor *epd)
+INLINE int usb_endpointXferIsoc(const struct UsbEndpointDesc *epd)
 {
 	return ((epd->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK) ==
 		USB_ENDPOINT_XFER_ISOC);
 }
 
 /*
- * usb_endpoint_is_bulk_in - check if the endpoint is bulk IN
+ * usb_endpointIsBulkIn - check if the endpoint is bulk IN
  */
-INLINE int usb_endpoint_is_bulk_in(const struct usb_endpoint_descriptor *epd)
+INLINE int usb_endpointIsBulkIn(const struct UsbEndpointDesc *epd)
 {
-	return usb_endpoint_xfer_bulk(epd) && usb_endpoint_dir_in(epd);
+	return usb_endpointXferBulk(epd) && usb_endpointDirIn(epd);
 }
 
 /*
- * usb_endpoint_is_bulk_out - check if the endpoint is bulk OUT
+ * usb_endpointIsBulkOut - check if the endpoint is bulk OUT
  */
-INLINE int usb_endpoint_is_bulk_out(const struct usb_endpoint_descriptor *epd)
+INLINE int usb_endpointIsBulkOut(const struct UsbEndpointDesc *epd)
 {
-	return usb_endpoint_xfer_bulk(epd) && usb_endpoint_dir_out(epd);
+	return usb_endpointXferBulk(epd) && usb_endpointDirOut(epd);
 }
 
 /*
- * usb_endpoint_is_int_in - check if the endpoint is interrupt IN
+ * usb_endpointIsIntIn - check if the endpoint is interrupt IN
  */
-INLINE int usb_endpoint_is_int_in(const struct usb_endpoint_descriptor *epd)
+INLINE int usb_endpointIsIntIn(const struct UsbEndpointDesc *epd)
 {
-	return usb_endpoint_xfer_int(epd) && usb_endpoint_dir_in(epd);
+	return usb_endpointXferInt(epd) && usb_endpointDirIn(epd);
 }
 
 /*
- * usb_endpoint_is_int_out - check if the endpoint is interrupt OUT
+ * usb_endpointIsIntOut - check if the endpoint is interrupt OUT
  */
-INLINE int usb_endpoint_is_int_out(const struct usb_endpoint_descriptor *epd)
+INLINE int usb_endpointIsIntOut(const struct UsbEndpointDesc *epd)
 {
-	return usb_endpoint_xfer_int(epd) && usb_endpoint_dir_out(epd);
+	return usb_endpointXferInt(epd) && usb_endpointDirOut(epd);
 }
 
 /*
- * usb_endpoint_is_isoc_in - check if the endpoint is isochronous IN
+ * usb_endpointIsIsocIn - check if the endpoint is isochronous IN
  */
-INLINE int usb_endpoint_is_isoc_in(const struct usb_endpoint_descriptor *epd)
+INLINE int usb_endpointIsIsocIn(const struct UsbEndpointDesc *epd)
 {
-	return usb_endpoint_xfer_isoc(epd) && usb_endpoint_dir_in(epd);
+	return usb_endpointXferIsoc(epd) && usb_endpointDirIn(epd);
 }
 
 /*
- * usb_endpoint_is_isoc_out - check if the endpoint is isochronous OUT
+ * usb_endpointIsIsocOut - check if the endpoint is isochronous OUT
  */
-INLINE int usb_endpoint_is_isoc_out(const struct usb_endpoint_descriptor *epd)
+INLINE int usb_endpointIsIsocOut(const struct UsbEndpointDesc *epd)
 {
-	return usb_endpoint_xfer_isoc(epd) && usb_endpoint_dir_out(epd);
+	return usb_endpointXferIsoc(epd) && usb_endpointDirOut(epd);
 }
 
 /*
@@ -469,6 +469,6 @@ ssize_t usb_ep_write(int ep, const void *buffer, ssize_t size);
 /*
  * usb_device_register - register a generic USB device driver
  */
-int usb_device_register(struct usb_device *dev);
+int usb_device_register(UsbDevice *dev);
 
 #endif /* USB_H */

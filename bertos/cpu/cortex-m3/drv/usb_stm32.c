@@ -87,7 +87,7 @@ static struct stm32_usb *usb = (struct stm32_usb *)USB_BASE_ADDR;
 static stm32_usb_ep_t ep_cnfg[ENP_MAX_NUMB];
 
 /* USB EP0 control descriptor */
-static const usb_endpoint_descriptor_t USB_CtrlEpDescr0 =
+static const UsbEndpointDesc USB_CtrlEpDescr0 =
 {
 	.bLength = sizeof(USB_CtrlEpDescr0),
 	.bDescriptorType = USB_DT_ENDPOINT,
@@ -98,7 +98,7 @@ static const usb_endpoint_descriptor_t USB_CtrlEpDescr0 =
 };
 
 /* USB EP1 control descriptor */
-static const usb_endpoint_descriptor_t USB_CtrlEpDescr1 =
+static const UsbEndpointDesc USB_CtrlEpDescr1 =
 {
 	.bLength = sizeof(USB_CtrlEpDescr1),
 	.bDescriptorType = USB_DT_ENDPOINT,
@@ -109,7 +109,7 @@ static const usb_endpoint_descriptor_t USB_CtrlEpDescr1 =
 };
 
 /* USB setup packet */
-static usb_ctrlrequest_t setup_packet;
+static UsbCtrlRequest setup_packet;
 
 /* USB device controller: max supported interfaces */
 #define USB_MAX_INTERFACE	1
@@ -123,7 +123,7 @@ typedef struct stm32_udc
 {
 	uint8_t state;
 	uint32_t cfg_id;
-	const usb_config_descriptor_t *cfg;
+	const UsbConfigDesc *cfg;
 	uint32_t interfaces;
 	uint32_t alt[USB_MAX_INTERFACE];
 	uint32_t address;
@@ -134,7 +134,7 @@ typedef struct stm32_udc
 static stm32_udc_t udc;
 
 /* Generic USB Device Controller structure */
-static struct usb_device *usb_dev;
+static UsbDevice *usb_dev;
 
 /* USB packet memory management: list of allocated chunks */
 static pack_mem_slot_t *pPacketMemUse;
@@ -740,7 +740,7 @@ static void usb_ep_low_level_config(int ep, uint16_t offset, uint16_t size)
 }
 
 /* Enable/Disable an endpoint */
-static int usb_ep_configure(const usb_endpoint_descriptor_t *epd, bool enable)
+static int usb_ep_configure(const UsbEndpointDesc *epd, bool enable)
 {
 	int EP;
 	stm32_usb_ep_t *ep_hw;
@@ -767,7 +767,7 @@ static int usb_ep_configure(const usb_endpoint_descriptor_t *epd, bool enable)
 		ep_hw->flags = 0;
 
 		/* Set endpoint type */
-		ep_hw->type = usb_endpoint_type(epd);
+		ep_hw->type = usb_endpointType(epd);
 		/* Init EP max packet size */
 		ep_hw->max_size = epd->wMaxPacketSize;
 
@@ -929,13 +929,13 @@ static void USB_StallCtrlEP(void)
  */
 static int usb_find_interface(uint32_t num, uint32_t alt)
 {
-	const usb_interface_descriptor_t *id;
+	const UsbInterfaceDesc *id;
 	int i;
 
 	for (i = 0; ; i++)
 	{
 		/* TODO: support more than one configuration per device */
-		id = (const usb_interface_descriptor_t *)usb_dev->config[i];
+		id = (const UsbInterfaceDesc *)usb_dev->config[i];
 		if (id == NULL)
 			break;
 		if (id->bDescriptorType != USB_DT_INTERFACE)
@@ -953,7 +953,7 @@ static int usb_find_interface(uint32_t num, uint32_t alt)
 static void
 usb_configure_ep_interface(unsigned int num, unsigned int alt, bool enable)
 {
-	const usb_endpoint_descriptor_t *epd;
+	const UsbEndpointDesc *epd;
 	int i, start;
 
 	/*
@@ -976,7 +976,7 @@ usb_configure_ep_interface(unsigned int num, unsigned int alt, bool enable)
 	 */
 	for (i = start + 1; ; i++)
 	{
-		epd = (const usb_endpoint_descriptor_t *)usb_dev->config[i];
+		epd = (const UsbEndpointDesc *)usb_dev->config[i];
 		if ((epd == NULL) || (epd->bDescriptorType == USB_DT_INTERFACE))
 			break;
 		if (epd->bDescriptorType != USB_DT_ENDPOINT)
@@ -1311,8 +1311,8 @@ static uint8_t usb_cfg_buffer[USB_BUFSIZE];
 
 static int usb_get_configuration_descriptor(int id)
 {
-	const usb_config_descriptor_t **config =
-			(const usb_config_descriptor_t **)usb_dev->config;
+	const UsbConfigDesc **config =
+			(const UsbConfigDesc **)usb_dev->config;
 	uint8_t *p = usb_cfg_buffer;
 	int i;
 
@@ -1331,7 +1331,7 @@ static int usb_get_configuration_descriptor(int id)
 			return -USB_BUF_OVERFLOW;
 		}
 	}
-	((usb_config_descriptor_t *)usb_cfg_buffer)->wTotalLength =
+	((UsbConfigDesc *)usb_cfg_buffer)->wTotalLength =
 					usb_cpu_to_le16(p - usb_cfg_buffer);
 	__usb_ep_write(CTRL_ENP_IN,
 			usb_cfg_buffer,
@@ -1343,7 +1343,7 @@ static int usb_get_configuration_descriptor(int id)
 
 static int usb_get_string_descriptor(unsigned int id)
 {
-	const usb_string_descriptor_t *lang_str;
+	const UsbStringDesc *lang_str;
 	unsigned int lang_id, str_id;
 	uint16_t w_index_lo = usb_le16_to_cpu(setup_packet.wIndex) & 0x00ff;
 	uint16_t w_index_hi = (usb_le16_to_cpu(setup_packet.wIndex) &
@@ -1358,7 +1358,7 @@ static int usb_get_string_descriptor(unsigned int id)
 		/* Find Language index */
 		for (lang_id = 0; ; lang_id++)
 		{
-			const usb_string_descriptor_t *str =
+			const UsbStringDesc *str =
 						usb_dev->strings[lang_id];
 			if (UNLIKELY(str == NULL))
 				return -USB_NODEV_ERROR;
@@ -1423,7 +1423,7 @@ static void UsbGetDescriptor(void)
 }
 
 /* USB setup packet: class/vendor request handler */
-static void usb_event_handler(struct usb_device *dev)
+static void usb_event_handler(UsbDevice *dev)
 {
 	/*
 	 * TODO: get the appropriate usb_dev in function of the endpoint
@@ -1484,14 +1484,14 @@ static void USB_GetConfigurationHandler(void)
 		ep_cnfg[CTRL_ENP_OUT].status = STALLED;
 }
 
-static const usb_config_descriptor_t *usb_find_configuration(int num)
+static const UsbConfigDesc *usb_find_configuration(int num)
 {
-	const usb_config_descriptor_t *cfg;
+	const UsbConfigDesc *cfg;
 	int i;
 
 	for (i = 0; ; i++)
 	{
-		cfg = (const usb_config_descriptor_t *)usb_dev->config[i];
+		cfg = (const UsbConfigDesc *)usb_dev->config[i];
 		if (cfg == NULL)
 			break;
 		if (cfg->bDescriptorType != USB_DT_CONFIG)
@@ -1504,7 +1504,7 @@ static const usb_config_descriptor_t *usb_find_configuration(int num)
 
 static int UsbSetConfigurationState(uint32_t Configuration)
 {
-	const usb_config_descriptor_t *pCnfg;
+	const UsbConfigDesc *pCnfg;
 	unsigned int i;
 
 	if (Configuration)
@@ -1861,7 +1861,7 @@ static void usb_init(void)
 }
 
 /* Register an upper layer USB device into the driver */
-int usb_device_register(struct usb_device *dev)
+int usb_device_register(UsbDevice *dev)
 {
 #if CONFIG_KERN
 	MOD_CHECK(proc);
