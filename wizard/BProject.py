@@ -383,8 +383,11 @@ class BProject(object):
             self._mergeSources(self.bertos_maindir, self.srcdir, self.old_srcdir)
             # Copy all the hw files
             self._writeHwFiles(self.bertos_srcdir, self.hwdir)
-            # Destination wizard mk file
-            self._writeWizardMkFile()
+
+        # Destination wizard mk file (it seems that this file need to be
+        # rewritten also if the project is a preset)...
+        self._writeWizardMkFile()
+
         # Set properly the autoenabled parameters
         self._setupAutoenabledParameters()
         # Copy all the configuration files

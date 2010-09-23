@@ -181,7 +181,8 @@ def mkGenerator(project_info):
     Generates the mk file for the current project.
     """
     makefile = open(os.path.join(const.DATA_DIR, "mktemplates/template.mk"), "r").read()
-    destination = os.path.join(project_info.prjdir, os.path.basename(project_info.prjdir) + ".mk")
+    prjdir = os.path.abspath(project_info.prjdir)
+    destination = os.path.join(prjdir, os.path.basename(prjdir) + ".mk")
     mk_data = {}
     mk_data["$pname"] = project_info.info("PROJECT_NAME")
     mk_data["$ppath"] = relpath.relpath(project_info.info("PROJECT_SRC_PATH"), project_info.info("PROJECT_PATH"))
