@@ -144,11 +144,12 @@ static const usb_hid_descriptor_t usb_hid_descriptor =
 {
 	.bLength = sizeof(usb_hid_descriptor),
 	.bDescriptorType = HID_DT_HID,
-	.bcdHID = usb_cpu_to_le16(0x0110),
+	.bcdHID = usb_cpu_to_le16((uint16_t)0x0110),
 	.bCountryCode = 0,
 	.bNumDescriptors = 1,
 	.bDescriptorHidType = HID_DT_REPORT,
-	.wDescriptorLength = usb_cpu_to_le16(sizeof(hid_report_descriptor)),
+	.wDescriptorLength =
+		usb_cpu_to_le16((uint16_t)sizeof(hid_report_descriptor)),
 };
 
 static const UsbEndpointDesc usb_hid_ep_descriptor =
@@ -157,7 +158,7 @@ static const UsbEndpointDesc usb_hid_ep_descriptor =
 	.bDescriptorType = USB_DT_ENDPOINT,
 	.bEndpointAddress = USB_HID_REPORT_EP,
 	.bmAttributes = USB_ENDPOINT_XFER_INT,
-	.wMaxPacketSize = usb_cpu_to_le16(4),
+	.wMaxPacketSize = usb_cpu_to_le16((uint16_t)4),
 	.bInterval = 10, /* resolution in ms */
 };
 

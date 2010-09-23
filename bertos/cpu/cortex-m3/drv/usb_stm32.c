@@ -1308,6 +1308,7 @@ static int usb_get_device_descriptor(int id)
 
 #define USB_BUFSIZE (128)
 static uint8_t usb_cfg_buffer[USB_BUFSIZE];
+STATIC_ASSERT(USB_BUFSIZE < (1 << (sizeof(uint16_t) * 8)));
 
 static int usb_get_configuration_descriptor(int id)
 {
@@ -1332,7 +1333,7 @@ static int usb_get_configuration_descriptor(int id)
 		}
 	}
 	((UsbConfigDesc *)usb_cfg_buffer)->wTotalLength =
-					usb_cpu_to_le16(p - usb_cfg_buffer);
+			usb_cpu_to_le16((uint16_t)(p - usb_cfg_buffer));
 	__usb_ep_write(CTRL_ENP_IN,
 			usb_cfg_buffer,
 			usb_size(p - usb_cfg_buffer,

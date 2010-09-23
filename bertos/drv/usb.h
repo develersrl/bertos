@@ -47,27 +47,10 @@
 
 #include <cpu/byteorder.h>
 
-/*
- * Handle CPU endianess
- *
- * TODO: consider to move this stuff in compiler.h
- */
-#define usb_bswap16(x) (((x & 0xff) << 8) | (x >> 8))
-#define usb_bswap32(x) ((usb_bswap16(x & 0xffff) << 16) | usb_bswap16(x >> 16))
-
-#if CPU_BYTE_ORDER == CPU_LITTLE_ENDIAN
-#define usb_cpu_to_le16(x) (x)
-#define usb_le16_to_cpu(x) (x)
-#define usb_cpu_to_le32(x) (x)
-#define usb_le32_to_cpu(x) (x)
-#elif CPU_BYTE_ORDER == CPU_BIG_ENDIAN
-#define usb_cpu_to_le16(x) usb_bswap16(x)
-#define usb_le16_to_cpu(x) usb_bswap16(x)
-#define usb_cpu_to_le32(x) usb_bswap32(x)
-#define usb_le32_to_cpu(x) usb_bswap32(x)
-#else
-#error "unrecognized CPU endianness"
-#endif
+#define usb_cpu_to_le16(x)	cpu_to_le16(x)
+#define usb_le16_to_cpu(x)	le16_to_cpu(x)
+#define usb_cpu_to_le32(x)	cpu_to_le32(x)
+#define usb_le32_to_cpu(x)	le32_to_cpu(x)
 
 /* State of a USB device */
 enum usb_device_state {

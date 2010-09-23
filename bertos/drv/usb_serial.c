@@ -114,7 +114,7 @@ static const UsbEndpointDesc usb_serial_ep_report_descriptor =
 	.bDescriptorType = USB_DT_ENDPOINT,
 	.bEndpointAddress = USB_DIR_IN | 1,
 	.bmAttributes = USB_ENDPOINT_XFER_INT,
-	.wMaxPacketSize = usb_cpu_to_le16(8),
+	.wMaxPacketSize = usb_cpu_to_le16((uint16_t)8),
 	.bInterval = 1,
 };
 
@@ -124,7 +124,7 @@ static const UsbEndpointDesc usb_serial_ep_in_descriptor =
 	.bDescriptorType = USB_DT_ENDPOINT,
 	.bEndpointAddress = USB_DIR_IN | 3,
 	.bmAttributes = USB_ENDPOINT_XFER_BULK,
-	.wMaxPacketSize = usb_cpu_to_le16(64),
+	.wMaxPacketSize = usb_cpu_to_le16((uint16_t)64),
 	.bInterval = 0,
 };
 
@@ -134,7 +134,7 @@ static const UsbEndpointDesc usb_serial_ep_out_descriptor =
 	.bDescriptorType = USB_DT_ENDPOINT,
 	.bEndpointAddress = USB_DIR_OUT | 2,
 	.bmAttributes = USB_ENDPOINT_XFER_BULK,
-	.wMaxPacketSize = usb_cpu_to_le16(64),
+	.wMaxPacketSize = usb_cpu_to_le16((uint16_t)64),
 	.bInterval = 0,
 };
 
