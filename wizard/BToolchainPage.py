@@ -229,17 +229,12 @@ class BToolchainPage(BWizardPage):
         new_data = qvariant_converter.getStringDict(self.pageContent.toolchainList.item(index).data(Qt.UserRole))
         new_data.update(infos)
         item.setData(Qt.UserRole, qvariant_converter.convertStringDict(new_data))
-        item.setIcon(QIcon(":/images/ok.png"))
-        self._valid_items.append(item)
-        if "version" in infos and "target" in infos:
-            item.setText("GCC " + infos["version"] + " - " + infos["target"].strip())
-
-    def _differentTargetItem(self, index, infos):
-        item = self.pageContent.toolchainList.item(index)
-        new_data = qvariant_converter.getStringDict(self.pageContent.toolchainList.item(index).data(Qt.UserRole))
-        new_data.update(infos)
-        item.setData(Qt.UserRole, qvariant_converter.convertStringDict(new_data))
-        item.setIcon(QIcon(":/images/warning.png"))
+        needed = self.projectInfo("CPU_INFOS")
+        if "target" in infos and infos["target"].find(needed["TOOLCHAIN"]) != -1:
+            item.setIcon(QIcon(":/images/ok.png"))
+            self._valid_items.append(item)
+        else:
+            item.setIcon(QIcon(":/images/warning.png"))
         if "version" in infos and "target" in infos:
             item.setText("GCC " + infos["version"] + " - " + infos["target"].strip())
 
@@ -257,26 +252,11 @@ class BToolchainPage(BWizardPage):
         filename = qvariant_converter.getStringDict(self.pageContent.toolchainList.item(i).data(Qt.UserRole))["path"]
         info = self._toolchain_manager.validateToolchain(filename)
 
-        valid = []
-        different_target = []
-        invalid = []
-
         # Add the item in the list with the appropriate associate data.
-        needed = self.projectInfo("CPU_INFOS")
         if info:
-            if "target" in info and info["target"].find(needed["TOOLCHAIN"]) != -1:
-                valid.append(info)
-            else:
-                different_target.append(info)
-        else:
-            invalid.append(info)
-
-        for i, info in enumerate(valid):
             self._validItem(i, info)
-        for i, info in enumerate(different_target):
-            self._differentTargetItem(i + len(valid), info)
-        for i, info in enumerate(invalid):
-            self._invalidItem(i + len(valid) + len(different_target))
+        else:
+            self._invalidItem(i)
     
     def isDefaultToolchain(self, toolchain):
         """
