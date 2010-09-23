@@ -148,8 +148,7 @@ static const uint8_t hid_report_descriptor[] =
 	0x19, 0x00, // Usage Minimum (0)
 	0x29, 0x65, // Usage Maximum (101)
 	0x81, 0x00, // Input (Data, Array)
-	0xC0,   // End Collection
-	0xC0    // End Collection
+	0xC0, // End Collection
 };
 
 static const usb_hid_descriptor_t usb_hid_descriptor =
