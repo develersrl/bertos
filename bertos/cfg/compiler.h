@@ -580,6 +580,13 @@ typedef unsigned char sigmask_t; /**< Type for signal masks. */
 #define STATIC_ASSERT(condition)  \
 	UNUSED_VAR(extern char, STATIC_ASSERTION_FAILED__[(condition) ? 1 : -1])
 
+/**
+ * Issue a compilation error if \a __cond is false (this can be used inside an
+ * expression).
+ */
+#define STATIC_ASSERT_EXPR(__cond) \
+	(sizeof(struct { int STATIC_ASSERTION_FAILED__:!!(__cond); }) * 0)
+
 #ifndef ASSERT_TYPE_EQUAL
 	/** Ensure two variables have the same type. */
 	#define ASSERT_TYPE_EQUAL(var1, var2)  \
