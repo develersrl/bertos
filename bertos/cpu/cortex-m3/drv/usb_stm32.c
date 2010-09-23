@@ -1178,46 +1178,37 @@ static uint32_t InData;
 /* Get device status */
 static int UsbDevStatus(uint16_t index)
 {
-	size_t size;
-
 	if (index)
 		return -USB_NODEV_ERROR;
 
 	InData = ((uint32_t)udc.feature) & 0xff;
-	size = usb_size(sizeof(InData), usb_le16_to_cpu(setup_packet.wLength));
 	__usb_ep_write(CTRL_ENP_IN,
-			(uint8_t *)&InData, size, USB_StatusHandler);
-
+			(uint8_t *)&InData, sizeof(uint16_t),
+			USB_StatusHandler);
 	return 0;
 }
 
 /* Get interface status */
 static int UsbInterfaceStatus(UNUSED_ARG(uint16_t, index))
 {
-	size_t size;
-
 	InData = 0;
-	size = usb_size(sizeof(InData), usb_le16_to_cpu(setup_packet.wLength));
 	__usb_ep_write(CTRL_ENP_IN,
-			(uint8_t *)&InData, size, USB_StatusHandler);
-
+			(uint8_t *)&InData, sizeof(uint16_t),
+			USB_StatusHandler);
 	return 0;
 }
 
 /* Get endpoint status */
 static int UsbEpStatus(uint16_t index)
 {
-	size_t size;
-
 	if ((index & 0x7F) > 16)
 		return -USB_NODEV_ERROR;
 
 	InData = 0;
 	USB_GetStallEP(USB_EpLogToPhysAdd(index), (bool *)&InData);
-	size = usb_size(sizeof(InData), usb_le16_to_cpu(setup_packet.wLength));
 	__usb_ep_write(CTRL_ENP_IN,
-			(uint8_t *)&InData, size, USB_StatusHandler);
-
+			(uint8_t *)&InData, sizeof(uint16_t),
+			USB_StatusHandler);
 	return 0;
 }
 
