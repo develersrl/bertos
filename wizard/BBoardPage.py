@@ -106,6 +106,10 @@ class BBoardPage(BWizardPage):
         preset_list = preset_list["children"]
         preset_list = sorted(preset_list.values(), _cmp)
         self.setItems(preset_list)
+        project_from_preset = self.projectInfo("PROJECT_FROM_PRESET")
+        project_board = self.projectInfo("PROJECT_BOARD")
+        if not (project_from_preset and project_board):
+            self.pageContent.boardList.setCurrentRow(0)
 
     ####
 
