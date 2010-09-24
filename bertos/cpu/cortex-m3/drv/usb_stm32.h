@@ -59,32 +59,22 @@
 
 /* Offset of the buffer descriptor table inside the packet memory */
 #define USB_BDT_OFFSET \
-	((USB_PACKET_MEMORY_SIZE - (sizeof(stm32_usb_bd_t) * ENP_MAX_NUMB)) & ~7)
+	((USB_PACKET_MEMORY_SIZE - (sizeof(stm32_UsbBd) * ENP_MAX_NUMB)) & ~7)
 
-#define addr2usbmem(Offset) \
-	(USB_PACKET_MEMORY_BASE + ((Offset << 1) & ~3) + (Offset & 1))
+#define USB_MEM_ADDR(offset) \
+	(USB_PACKET_MEMORY_BASE + ((offset << 1) & ~3) + (offset & 1))
 
-#define ReadEpDTB(Slot, Offset) \
-	(*((uint16_t *)(addr2usbmem((USB_BDT_OFFSET + \
-					(Slot) * sizeof(stm32_usb_bd_t) + \
-					(Offset))))))
+#define EP_DTB_READ(slot, offset) \
+	(*((uint16_t *)(USB_MEM_ADDR((USB_BDT_OFFSET + \
+					(slot) * sizeof(stm32_UsbBd) + \
+					(offset))))))
 
-#define WriteEpDTB(Slot, Offset, Data)  (ReadEpDTB(Slot, Offset) = Data)
+#define EP_DTB_WRITE(slot, offset, data)  (EP_DTB_READ(slot, offset) = data)
 
-#define AddrTxOffset    0
-#define CountTxOffset   2
-#define AddrRxOffset    4
-#define CountRxOffset   6
-
-#define ReadEpDTB_AddrRx(Slot)  ReadEpDTB(Slot,AddrRxOffset)
-#define ReadEpDTB_CountRx(Slot) ReadEpDTB(Slot,CountRxOffset)
-#define ReadEpDTB_AddrTx(Slot)  ReadEpDTB(Slot,AddrTxOffset)
-#define ReadEpDTB_CountTx(Slot) ReadEpDTB(Slot,CountTxOffset)
-
-#define WriteEpDTB_AddrRx(Slot,Data)  WriteEpDTB(Slot,AddrRxOffset,Data)
-#define WriteEpDTB_CountRx(Slot,Data) WriteEpDTB(Slot,CountRxOffset,Data)
-#define WriteEpDTB_AddrTx(Slot,Data)  WriteEpDTB(Slot,AddrTxOffset,Data)
-#define WriteEpDTB_CountTx(Slot,Data) WriteEpDTB(Slot,CountTxOffset,Data)
+#define ADDR_TX_OFFSET	offsetof(stm32_UsbBd, AddrTx)
+#define COUNT_TX_OFFSET	offsetof(stm32_UsbBd, CountTx)
+#define ADDR_RX_OFFSET	offsetof(stm32_UsbBd, AddrRx)
+#define COUNT_RX_OFFSET	offsetof(stm32_UsbBd, CountRx)
 
 #define USB_CTRL_RW_MASK          0x070F
 #define USB_CTRL_CLEAR_ONLY_MASK  0x8080
@@ -120,7 +110,7 @@ enum stm32_usb_error
 };
 
 /* STM32 USB endpoint types */
-enum stm32_usb_ep_type
+enum stm32_UsbEpype
 {
 	EP_BULK = 0,
 	EP_CTRL,
@@ -157,10 +147,10 @@ typedef enum
 	EP_STALL,
 	EP_NAK,
 	EP_VALID
-} ep_state_t;
+} stm32_UsbEpState;
 
 /* STM32 USB supported endpoints */
-typedef enum
+typedef enum stm32_UsbEP
 {
 	CTRL_ENP_OUT = 0, CTRL_ENP_IN,
 	ENP1_OUT, ENP1_IN,
@@ -180,28 +170,28 @@ typedef enum
 	ENP15_OUT, ENP15_IN,
 
 	ENP_MAX_NUMB
-} stm32_usb_endpoint_t;
+} stm32_UsbEP;
 
 /* STM32 USB packet memory slot */
-typedef struct pack_mem_slot_t
+typedef struct stm32_UsbMemSlot
 {
-	stm32_usb_endpoint_t ep_addr;
+	stm32_UsbEP ep_addr;
 	uint16_t Start;
 	uint16_t Size;
-	struct pack_mem_slot_t *next;
-} pack_mem_slot_t;
+	struct stm32_UsbMemSlot *next;
+} stm32_UsbMemSlot;
 
 /* STM32 USB buffer descriptor (packet memory) */
-typedef struct
+typedef struct stm32_UsbBd
 {
 	uint16_t AddrTx;
 	uint16_t CountTx;
 	uint16_t AddrRx;
 	uint16_t CountRx;
-} PACKED stm32_usb_bd_t;
+} PACKED stm32_UsbBd;
 
 /* STM32 USB endpoint I/O status */
-typedef enum
+typedef enum stm32_UsbIoStatus
 {
 	NOT_READY = 0,
 	NO_SERVICED,
@@ -211,10 +201,10 @@ typedef enum
 	BUFFER_OVERRUN,
 	SETUP_OVERWRITE,
 	STALLED,
-} stm32_usb_io_status_t;
+} stm32_UsbIoStatus;
 
 /* STM32 USB hardware endpoint descriptor */
-typedef struct
+typedef struct stm32_UsbEp
 {
 	reg32_t *hw;
 	uint8_t type;
@@ -222,7 +212,7 @@ typedef struct
 	ssize_t max_size;
 	ssize_t offset;
 	ssize_t size;
-	stm32_usb_io_status_t status;
+	stm32_UsbIoStatus status;
 	union
 	{
 		uint8_t *read_buffer;
@@ -230,7 +220,7 @@ typedef struct
 	};
 	int32_t avail_data;
 	uint8_t flags;
-} stm32_usb_ep_t;
+} stm32_UsbEp;
 
 /* STM32 USB hardware endpoint flags */
 #define STM32_USB_EP_AVAIL_DATA		BV(0)

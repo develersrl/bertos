@@ -84,7 +84,7 @@ struct stm32_usb
 static struct stm32_usb *usb = (struct stm32_usb *)USB_BASE_ADDR;
 
 /* Endpoint descriptors: used for handling requests to use with endpoints */
-static stm32_usb_ep_t ep_cnfg[ENP_MAX_NUMB];
+static stm32_UsbEp ep_cnfg[ENP_MAX_NUMB];
 
 /* USB EP0 control descriptor */
 static const UsbEndpointDesc USB_CtrlEpDescr0 =
@@ -137,14 +137,14 @@ static stm32_udc_t udc;
 static UsbDevice *usb_dev;
 
 /* USB packet memory management: list of allocated chunks */
-static pack_mem_slot_t *mem_use;
+static stm32_UsbMemSlot *mem_use;
 
 /* USB packet memory management: memory buffer metadata */
 #define EP_MAX_SLOTS	16
-static pack_mem_slot_t memory_buffer[EP_MAX_SLOTS];
+static stm32_UsbMemSlot memory_buffer[EP_MAX_SLOTS];
 
 /* Allocate a free block of the packet memory */
-static pack_mem_slot_t *usb_malloc(void)
+static stm32_UsbMemSlot *usb_malloc(void)
 {
 	unsigned int i;
 
@@ -155,7 +155,7 @@ static pack_mem_slot_t *usb_malloc(void)
 }
 
 /* Release a block of the packet memory */
-static void usb_free(pack_mem_slot_t *pPntr)
+static void usb_free(stm32_UsbMemSlot *pPntr)
 {
 	pPntr->Size = 0;
 }
@@ -164,7 +164,7 @@ static void usb_free(pack_mem_slot_t *pPntr)
 static bool usb_alloc_buffer(uint16_t *pOffset, uint32_t *size,
                             int EndPoint)
 {
-	pack_mem_slot_t *mem = mem_use,
+	stm32_UsbMemSlot *mem = mem_use,
 			*memNext, *mem_useNew;
 	uint32_t max_size = *size;
 
@@ -226,7 +226,7 @@ static bool usb_alloc_buffer(uint16_t *pOffset, uint32_t *size,
 /* Release a chunk of the packet memory (inside a block) */
 static void usb_free_buffer(int EndPoint)
 {
-	pack_mem_slot_t *mem, *memPrev = NULL;
+	stm32_UsbMemSlot *mem, *memPrev = NULL;
 	mem = mem_use;
 
 	while (mem != NULL)
@@ -293,7 +293,7 @@ static int usb_ep_logical_to_hw(uint8_t ep_addr)
 }
 
 /* Set EP address */
-static void EpCtrlSet_EA(reg32_t *reg, uint32_t val)
+static void ep_ctrl_set_ea(reg32_t *reg, uint32_t val)
 {
 	val &= 0x0f;
 	val |= *reg & 0x0700;
@@ -302,13 +302,13 @@ static void EpCtrlSet_EA(reg32_t *reg, uint32_t val)
 }
 
 /* Get EP IN status */
-static uint32_t EpCtrlGet_STAT_TX(reg32_t *reg)
+static uint32_t ep_ctrl_get_stat_tx(reg32_t *reg)
 {
 	return (*reg & (0x3UL << 4)) >> 4;
 }
 
 /* Set EP IN state */
-static void EpCtrlSet_STAT_TX(reg32_t *reg, ep_state_t val)
+static void ep_ctrl_set_stat_tx(reg32_t *reg, stm32_UsbEpState val)
 {
 	uint32_t state;
 	int i;
@@ -319,7 +319,7 @@ static void EpCtrlSet_STAT_TX(reg32_t *reg, ep_state_t val)
 	 */
 	for (i = 0; i < 2; i++)
 	{
-		if (EpCtrlGet_STAT_TX(reg) == val)
+		if (ep_ctrl_get_stat_tx(reg) == val)
 			return;
 		state = val;
 		state <<= 4;
@@ -332,7 +332,7 @@ static void EpCtrlSet_STAT_TX(reg32_t *reg, ep_state_t val)
 }
 
 /* Set EP DTOG_TX bit (IN) */
-static void EpCtrlSet_DTOG_TX(reg32_t *reg, uint32_t val)
+static void ep_ctrl_set_dtog_tx(reg32_t *reg, uint32_t val)
 {
 	val = val ? (*reg ^ (1UL << 6)) : *reg;
 	/* Clear the toggle bits without DTOG_TX (6) */
@@ -342,7 +342,7 @@ static void EpCtrlSet_DTOG_TX(reg32_t *reg, uint32_t val)
 }
 
 /* Clear EP CTR_TX bit (IN) */
-static void EpCtrlClr_CTR_TX(reg32_t *reg)
+static void ep_ctrl_clr_ctr_tx(reg32_t *reg)
 {
 	uint32_t val = *reg;
 
@@ -353,7 +353,7 @@ static void EpCtrlClr_CTR_TX(reg32_t *reg)
 }
 
 /* Clear EP CTR_RX bit (OUT) */
-static void EpCtrlClr_CTR_RX(reg32_t *reg)
+static void ep_ctrl_clr_ctr_rx(reg32_t *reg)
 {
 	uint32_t val = *reg;
 	val &= ~(USB_CTRL_TOGGLE_MASK | 1UL << 15);
@@ -363,7 +363,7 @@ static void EpCtrlClr_CTR_RX(reg32_t *reg)
 }
 
 /* Set EP KIND bit */
-static void EpCtrlSet_EP_KIND(reg32_t *reg, uint32_t val)
+static void ep_ctrl_set_ep_kind(reg32_t *reg, uint32_t val)
 {
 	val = val ? (1UL << 8) : 0;
 	val |= *reg & ~(USB_CTRL_TOGGLE_MASK | (1UL << 8));
@@ -372,7 +372,7 @@ static void EpCtrlSet_EP_KIND(reg32_t *reg, uint32_t val)
 }
 
 /* Set EP type */
-static int EpCtrlSet_EP_TYPE(reg32_t *reg, uint8_t val)
+static int ep_ctrl_set_ep_type(reg32_t *reg, uint8_t val)
 {
 	uint32_t type;
 
@@ -391,14 +391,14 @@ static int EpCtrlSet_EP_TYPE(reg32_t *reg, uint8_t val)
 }
 
 /* Get EP STAT_RX (OUT) */
-static uint32_t EpCtrlGet_STAT_RX(reg32_t *reg)
+static uint32_t ep_ctrl_get_stat_rx(reg32_t *reg)
 {
 	uint32_t val = *reg & (0x3UL << 12);
 	return val >> 12;
 }
 
 /* Set EP STAT_RX (OUT) */
-static void EpCtrlSet_STAT_RX(reg32_t *reg, ep_state_t val)
+static void ep_ctrl_set_stat_rx(reg32_t *reg, stm32_UsbEpState val)
 {
 	uint32_t state;
 	int i;
@@ -409,7 +409,7 @@ static void EpCtrlSet_STAT_RX(reg32_t *reg, ep_state_t val)
 	 */
 	for (i = 0; i < 2; i++)
 	{
-		if (EpCtrlGet_STAT_RX(reg) == val)
+		if (ep_ctrl_get_stat_rx(reg) == val)
 			return;
 		state = val;
 		state <<= 12;
@@ -422,7 +422,7 @@ static void EpCtrlSet_STAT_RX(reg32_t *reg, ep_state_t val)
 }
 
 /* Set DTOG_RX bit */
-static void EpCtrlSet_DTOG_RX(reg32_t *reg, uint32_t val)
+static void ep_ctrl_set_dtog_rx(reg32_t *reg, uint32_t val)
 {
 	val = val ? (*reg ^ (1UL << 14)) : *reg;
 	/* Clear the toggle bits without DTOG_RX (14) */
@@ -432,7 +432,7 @@ static void EpCtrlSet_DTOG_RX(reg32_t *reg, uint32_t val)
 }
 
 /* Get EP SETUP bit */
-static uint32_t EpCtrlGet_SETUP(reg32_t *reg)
+static uint32_t ep_ctrl_get_setup(reg32_t *reg)
 {
 	uint32_t val = *reg & (1UL << 11);
 	return val ? 1 : 0;
@@ -443,8 +443,7 @@ static void __usb_ep_io(int EP)
 {
 	ssize_t Count, CountHold, Offset;
 	uint32_t *pDst, *pSrc, Data;
-	bool CurrentBuffer;
-	stm32_usb_ep_t *epd = &ep_cnfg[EP];
+	stm32_UsbEp *epd = &ep_cnfg[EP];
 
 	if (UNLIKELY(epd->hw == NULL))
 	{
@@ -480,15 +479,14 @@ static void __usb_ep_io(int EP)
 				epd->flags |= STM32_USB_EP_ZERO_PACKET;
 			Offset = epd->offset;
 			epd->offset += Count;
-			CurrentBuffer = true;
 			switch (epd->type)
 			{
 			case USB_ENDPOINT_XFER_CONTROL:
 			case USB_ENDPOINT_XFER_INT:
-				pDst = (uint32_t *)addr2usbmem(ReadEpDTB_AddrTx(EP >> 1));
+				pDst = (uint32_t *)USB_MEM_ADDR(EP_DTB_READ(EP >> 1, ADDR_TX_OFFSET));
 				break;
 			case USB_ENDPOINT_XFER_BULK:
-				pDst = (uint32_t *)addr2usbmem(ReadEpDTB_AddrTx(EP >> 1));
+				pDst = (uint32_t *)USB_MEM_ADDR(EP_DTB_READ(EP >> 1, ADDR_TX_OFFSET));
 				break;
 			case USB_ENDPOINT_XFER_ISOC:
 				LOG_ERR("%s: isochronous transfer not supported\n",
@@ -511,12 +509,8 @@ static void __usb_ep_io(int EP)
 				*pDst++ = Data;
 			}
 
-			if (CurrentBuffer)
-				WriteEpDTB_CountTx(EP >> 1, CountHold);
-			else
-				WriteEpDTB_CountRx(EP >> 1, CountHold);
-
-			EpCtrlSet_STAT_TX(epd->hw, EP_VALID);
+			EP_DTB_WRITE(EP >> 1, COUNT_TX_OFFSET, CountHold);
+			ep_ctrl_set_stat_tx(epd->hw, EP_VALID);
 
 			--ep_cnfg[EP].avail_data;
 			Count = epd->size - epd->offset;
@@ -540,15 +534,15 @@ static void __usb_ep_io(int EP)
 			case USB_ENDPOINT_XFER_CONTROL:
 			case USB_ENDPOINT_XFER_INT:
 				/* Get received bytes number */
-				Count = ReadEpDTB_CountRx(EP >> 1) & 0x3FF;
+				Count = EP_DTB_READ(EP >> 1, COUNT_RX_OFFSET) & 0x3FF;
 				/* Get address of the USB packet buffer for corresponding EP */
-				pSrc = (uint32_t *)addr2usbmem(ReadEpDTB_AddrRx(EP >> 1));
+				pSrc = (uint32_t *)USB_MEM_ADDR(EP_DTB_READ(EP >> 1, ADDR_RX_OFFSET));
 				break;
 			case USB_ENDPOINT_XFER_BULK:
 				/* Get received bytes number */
-				Count = ReadEpDTB_CountRx(EP >> 1) & 0x3FF;
+				Count = EP_DTB_READ(EP >> 1, COUNT_RX_OFFSET) & 0x3FF;
 				/* Get address of the USB packet buffer for corresponding EP */
-				pSrc = (uint32_t *)addr2usbmem(ReadEpDTB_AddrRx(EP >> 1));
+				pSrc = (uint32_t *)USB_MEM_ADDR(EP_DTB_READ(EP >> 1, ADDR_RX_OFFSET));
 				break;
 			case USB_ENDPOINT_XFER_ISOC:
 				LOG_ERR("%s: isochronous transfer not supported\n",
@@ -589,7 +583,7 @@ static void __usb_ep_io(int EP)
 				}
 			}
 
-			EpCtrlSet_STAT_RX(epd->hw, EP_VALID);
+			ep_ctrl_set_stat_rx(epd->hw, EP_VALID);
 
 			--ep_cnfg[EP].avail_data;
 
@@ -631,7 +625,7 @@ static size_t usb_size(size_t size, size_t host_size)
 #define USB_EP_IO(__EP, __op, __buf, __size, __complete)		\
 ({									\
 	cpu_flags_t flags;						\
-	stm32_usb_io_status_t ret;					\
+	stm32_UsbIoStatus ret;					\
 									\
 	/* Fill EP descriptor */					\
 	IRQ_SAVE_DISABLE(flags);					\
@@ -674,7 +668,7 @@ out:									\
 })
 
 /* Configure and endponint and perform a read operation */
-static stm32_usb_io_status_t
+static stm32_UsbIoStatus
 __usb_ep_read(int ep, void *buffer, ssize_t size, void (*complete)(int))
 {
 	if (UNLIKELY(ep >= ENP_MAX_NUMB))
@@ -687,7 +681,7 @@ __usb_ep_read(int ep, void *buffer, ssize_t size, void (*complete)(int))
 }
 
 /* Configure and endponint and perform a write operation */
-static stm32_usb_io_status_t
+static stm32_UsbIoStatus
 __usb_ep_write(int ep, const void *buffer, ssize_t size, void (*complete)(int))
 {
 	if (UNLIKELY(ep >= ENP_MAX_NUMB))
@@ -701,21 +695,21 @@ __usb_ep_write(int ep, const void *buffer, ssize_t size, void (*complete)(int))
 
 static void usb_ep_low_level_config(int ep, uint16_t offset, uint16_t size)
 {
-	stm32_usb_ep_t *epc = &ep_cnfg[ep];
+	stm32_UsbEp *epc = &ep_cnfg[ep];
 
 	/* IN EP */
 	if (ep & 0x01)
 	{
 		/* Disable EP */
-		EpCtrlSet_STAT_TX(epc->hw, EP_DISABLED);
+		ep_ctrl_set_stat_tx(epc->hw, EP_DISABLED);
 		/* Clear Tx toggle */
-		EpCtrlSet_DTOG_TX(epc->hw, 0);
+		ep_ctrl_set_dtog_tx(epc->hw, 0);
 		/* Clear Correct Transfer for transmission flag */
-		EpCtrlClr_CTR_TX(epc->hw);
+		ep_ctrl_clr_ctr_tx(epc->hw);
 
 		/* Update EP description table */
-		WriteEpDTB_AddrTx(ep >> 1, offset);
-		WriteEpDTB_CountTx(ep >> 1, 0);
+		EP_DTB_WRITE(ep >> 1, ADDR_TX_OFFSET, offset);
+		EP_DTB_WRITE(ep >> 1, COUNT_TX_OFFSET, 0);
 	}
 	/* OUT EP */
 	else
@@ -723,19 +717,19 @@ static void usb_ep_low_level_config(int ep, uint16_t offset, uint16_t size)
 		uint16_t rx_count = 0;
 
 		/* Disable EP */
-		EpCtrlSet_STAT_RX(epc->hw, EP_DISABLED);
+		ep_ctrl_set_stat_rx(epc->hw, EP_DISABLED);
 		/* Clear Rx toggle */
-		EpCtrlSet_DTOG_RX(epc->hw, 0);
+		ep_ctrl_set_dtog_rx(epc->hw, 0);
 		/* Clear Correct Transfer for reception flag */
-		EpCtrlClr_CTR_RX(epc->hw);
+		ep_ctrl_clr_ctr_rx(epc->hw);
 		/* Descriptor block size field */
 		rx_count |= (size > 62) << 15;
 		/* Descriptor number of blocks field */
 		rx_count |= (((size > 62) ?  (size >> 5) - 1 : size >> 1) &
 				0x1f) << 10;
 		/* Update EP description table */
-		WriteEpDTB_AddrRx(ep >> 1, offset);
-		WriteEpDTB_CountRx(ep >> 1, rx_count);
+		EP_DTB_WRITE(ep >> 1, ADDR_RX_OFFSET, offset);
+		EP_DTB_WRITE(ep >> 1, COUNT_RX_OFFSET, rx_count);
 	}
 }
 
@@ -743,7 +737,7 @@ static void usb_ep_low_level_config(int ep, uint16_t offset, uint16_t size)
 static int usb_ep_configure(const UsbEndpointDesc *epd, bool enable)
 {
 	int EP;
-	stm32_usb_ep_t *ep_hw;
+	stm32_UsbEp *ep_hw;
 	reg32_t *hw;
 	uint16_t Offset;
 	uint32_t size;
@@ -779,7 +773,7 @@ static int usb_ep_configure(const UsbEndpointDesc *epd, bool enable)
 		hw += EP >> 1;
 
 		/* Set Ep Address */
-		EpCtrlSet_EA(hw, EP >> 1);
+		ep_ctrl_set_ea(hw, EP >> 1);
 		ep_hw->hw = hw;
 		LOG_INFO("%s: EP%d-%s configured\n",
 				__func__, EP >> 1, EP & 1 ? "IN" : "OUT");
@@ -792,18 +786,18 @@ static int usb_ep_configure(const UsbEndpointDesc *epd, bool enable)
 		{
 		case USB_ENDPOINT_XFER_CONTROL:
 			LOG_INFO("EP%d: CONTROL IN\n", EP >> 1);
-			EpCtrlSet_EP_TYPE(hw, EP_CTRL);
-			EpCtrlSet_EP_KIND(hw, 0);
+			ep_ctrl_set_ep_type(hw, EP_CTRL);
+			ep_ctrl_set_ep_kind(hw, 0);
 			break;
 		case USB_ENDPOINT_XFER_INT:
 			LOG_INFO("EP%d: INTERRUPT IN\n", EP >> 1);
-			EpCtrlSet_EP_TYPE(hw, EP_INTERRUPT);
-			EpCtrlSet_EP_KIND(hw, 0);
+			ep_ctrl_set_ep_type(hw, EP_INTERRUPT);
+			ep_ctrl_set_ep_kind(hw, 0);
 			break;
 		case USB_ENDPOINT_XFER_BULK:
 			LOG_INFO("EP%d: BULK IN\n", EP >> 1);
-			EpCtrlSet_EP_TYPE(hw, EP_BULK);
-			EpCtrlSet_EP_KIND(hw, 0);
+			ep_ctrl_set_ep_type(hw, EP_BULK);
+			ep_ctrl_set_ep_kind(hw, 0);
 			break;
 		case USB_ENDPOINT_XFER_ISOC:
 			LOG_ERR("EP%d: ISOCHRONOUS IN: not supported\n", EP >> 1);
@@ -815,14 +809,14 @@ static int usb_ep_configure(const UsbEndpointDesc *epd, bool enable)
 		if (EP & 0x01)
 		{
 			/* Enable EP */
-			EpCtrlSet_STAT_TX(hw, EP_NAK);
+			ep_ctrl_set_stat_tx(hw, EP_NAK);
 			/* Clear Correct Transfer for transmission flag */
-			EpCtrlClr_CTR_TX(hw);
+			ep_ctrl_clr_ctr_tx(hw);
 		}
 		else
 		{
 			/* Enable EP */
-			EpCtrlSet_STAT_RX(hw, EP_VALID);
+			ep_ctrl_set_stat_rx(hw, EP_VALID);
 		}
 	}
 	else if (ep_cnfg[EP].hw)
@@ -834,17 +828,17 @@ static int usb_ep_configure(const UsbEndpointDesc *epd, bool enable)
 		if (EP & 0x01)
 		{
 			/* Disable IN EP */
-			EpCtrlSet_STAT_TX(hw, EP_DISABLED);
+			ep_ctrl_set_stat_tx(hw, EP_DISABLED);
 			/* Clear Correct Transfer for reception flag */
-			EpCtrlClr_CTR_TX(hw);
+			ep_ctrl_clr_ctr_tx(hw);
 		}
 		/* OUT EP */
 		else
 		{
 			/* Disable OUT EP */
-			EpCtrlSet_STAT_RX(hw, EP_DISABLED);
+			ep_ctrl_set_stat_rx(hw, EP_DISABLED);
 			/* Clear Correct Transfer for reception flag */
-			EpCtrlClr_CTR_RX(hw);
+			ep_ctrl_clr_ctr_rx(hw);
 		}
 		/* Release buffer */
 		usb_free_buffer(EP);
@@ -854,20 +848,20 @@ static int usb_ep_configure(const UsbEndpointDesc *epd, bool enable)
 }
 
 /* Get EP stall/unstall */
-static int USB_GetStallEP(int EP, bool *pStall)
+static int usb_ep_get_stall(int EP, bool *pStall)
 {
 	if (ep_cnfg[EP].hw == NULL)
 		return -USB_NODEV_ERROR;
 
 	*pStall = (EP & 0x01) ?
-		(EpCtrlGet_STAT_TX(ep_cnfg[EP].hw) == EP_STALL):  /* IN EP  */
-		(EpCtrlGet_STAT_RX(ep_cnfg[EP].hw) == EP_STALL);  /* OUT EP */
+		(ep_ctrl_get_stat_tx(ep_cnfg[EP].hw) == EP_STALL):  /* IN EP  */
+		(ep_ctrl_get_stat_rx(ep_cnfg[EP].hw) == EP_STALL);  /* OUT EP */
 
 	return USB_OK;
 }
 
 /* Set EP stall/unstall */
-static int USB_SetStallEP(int EP, bool Stall)
+static int usb_ep_set_stall(int EP, bool Stall)
 {
 	if (ep_cnfg[EP].hw == NULL)
 		return -USB_NODEV_ERROR;
@@ -878,13 +872,13 @@ static int USB_SetStallEP(int EP, bool Stall)
 		if (EP & 0x01)
 		{
 			/* IN EP */
-			EpCtrlSet_STAT_TX(ep_cnfg[EP].hw, EP_STALL);
+			ep_ctrl_set_stat_tx(ep_cnfg[EP].hw, EP_STALL);
 			ep_cnfg[EP].avail_data = 1;
 		}
 		else
 		{
 			/* OUT EP */
-			EpCtrlSet_STAT_RX(ep_cnfg[EP].hw, EP_STALL);
+			ep_ctrl_set_stat_rx(ep_cnfg[EP].hw, EP_STALL);
 			ep_cnfg[EP].avail_data = 0;
 		}
 	}
@@ -896,31 +890,31 @@ static int USB_SetStallEP(int EP, bool Stall)
 			/* IN EP */
 			ep_cnfg[EP].avail_data = 1;
 			/* reset Data Toggle bit */
-			EpCtrlSet_DTOG_TX(ep_cnfg[EP].hw, 0);
-			EpCtrlSet_STAT_TX(ep_cnfg[EP].hw, EP_NAK);
+			ep_ctrl_set_dtog_tx(ep_cnfg[EP].hw, 0);
+			ep_ctrl_set_stat_tx(ep_cnfg[EP].hw, EP_NAK);
 		}
 		else
 		{
 			/* OUT EP */
 			ep_cnfg[EP].avail_data = 0;
 			/* reset Data Toggle bit */
-			EpCtrlSet_DTOG_RX(ep_cnfg[EP].hw, 0);
-			EpCtrlSet_STAT_RX(ep_cnfg[EP].hw, EP_VALID);
+			ep_ctrl_set_dtog_rx(ep_cnfg[EP].hw, 0);
+			ep_ctrl_set_stat_rx(ep_cnfg[EP].hw, EP_VALID);
 		}
 	}
 	return USB_OK;
 }
 
 /* Stall both directions of the control EP */
-static void USB_StallCtrlEP(void)
+static void usb_ep_set_stall_ctrl(void)
 {
 	ep_cnfg[CTRL_ENP_IN].avail_data = 1;
 	ep_cnfg[CTRL_ENP_IN].status = STALLED;
 	ep_cnfg[CTRL_ENP_OUT].avail_data = 0;
 	ep_cnfg[CTRL_ENP_OUT].status = STALLED;
 
-	USB_SetStallEP(CTRL_ENP_IN, true);
-	USB_SetStallEP(CTRL_ENP_OUT, true);
+	usb_ep_set_stall(CTRL_ENP_IN, true);
+	usb_ep_set_stall(CTRL_ENP_OUT, true);
 }
 
 /*
@@ -1033,7 +1027,7 @@ static void usb_set_device_state(int state)
 }
 
 /* Setup packet: set address status phase end handler */
-static void USB_AddStatusEndHandler(UNUSED_ARG(int, EP))
+static void usb_add_status_handler_end(UNUSED_ARG(int, EP))
 {
 	uint16_t w_value;
 
@@ -1051,34 +1045,34 @@ static void USB_AddStatusEndHandler(UNUSED_ARG(int, EP))
 }
 
 /* Prepare status phase */
-static void USB_StatusPhase(bool in)
+static void usb_status_phase(bool in)
 {
 	if (in)
 		__usb_ep_write(CTRL_ENP_IN, NULL, 0, NULL);
 }
 
 /* Setup packet: status phase end handler */
-static void USB_StatusEndHandler(UNUSED_ARG(int, EP))
+static void usb_status_handler_end(UNUSED_ARG(int, EP))
 {
 	__usb_ep_write(CTRL_ENP_IN, NULL, -1, NULL);
 	__usb_ep_read(CTRL_ENP_OUT, NULL, -1, NULL);
 }
 
 /* Address status handler */
-static void USB_StatusHandler(UNUSED_ARG(int, EP))
+static void usb_status_handler(UNUSED_ARG(int, EP))
 {
 	if (setup_packet.mRequestType & USB_DIR_IN)
 	{
-		USB_StatusPhase(false);
-		ep_cnfg[CTRL_ENP_OUT].complete = USB_StatusEndHandler;
+		usb_status_phase(false);
+		ep_cnfg[CTRL_ENP_OUT].complete = usb_status_handler_end;
 	}
 	else
 	{
-		USB_StatusPhase(true);
+		usb_status_phase(true);
 		ep_cnfg[CTRL_ENP_IN].complete =
 			(setup_packet.bRequest == USB_REQ_SET_ADDRESS) ?
-				USB_AddStatusEndHandler :
-				USB_StatusEndHandler;
+				usb_add_status_handler_end :
+				usb_status_handler_end;
 	}
 }
 
@@ -1107,10 +1101,10 @@ ssize_t usb_endpointRead(int ep, void *buffer, ssize_t size)
 	{
 		size = usb_size(size, usb_le16_to_cpu(setup_packet.wLength));
 		if (!size)
-			USB_StatusHandler(ep_num);
+			usb_status_handler(ep_num);
 		else
 			__usb_ep_read(ep_num, buffer, size,
-					USB_StatusHandler);
+					usb_status_handler);
 		return size;
 	}
 	if (UNLIKELY(!size))
@@ -1152,10 +1146,10 @@ ssize_t usb_endpointWrite(int ep, const void *buffer, ssize_t size)
 	{
 		size = usb_size(size, usb_le16_to_cpu(setup_packet.wLength));
 		if (!size)
-			USB_StatusHandler(ep_num);
+			usb_status_handler(ep_num);
 		else
 			__usb_ep_write(ep_num, buffer, size,
-					USB_StatusHandler);
+					usb_status_handler);
 		return size;
 	}
 	if (UNLIKELY(!size))
@@ -1176,7 +1170,7 @@ ssize_t usb_endpointWrite(int ep, const void *buffer, ssize_t size)
 static uint32_t InData;
 
 /* Get device status */
-static int UsbDevStatus(uint16_t index)
+static int usb_send_device_status(uint16_t index)
 {
 	if (index)
 		return -USB_NODEV_ERROR;
@@ -1184,36 +1178,36 @@ static int UsbDevStatus(uint16_t index)
 	InData = ((uint32_t)udc.feature) & 0xff;
 	__usb_ep_write(CTRL_ENP_IN,
 			(uint8_t *)&InData, sizeof(uint16_t),
-			USB_StatusHandler);
+			usb_status_handler);
 	return 0;
 }
 
 /* Get interface status */
-static int UsbInterfaceStatus(UNUSED_ARG(uint16_t, index))
+static int usb_send_interface_status(UNUSED_ARG(uint16_t, index))
 {
 	InData = 0;
 	__usb_ep_write(CTRL_ENP_IN,
 			(uint8_t *)&InData, sizeof(uint16_t),
-			USB_StatusHandler);
+			usb_status_handler);
 	return 0;
 }
 
 /* Get endpoint status */
-static int UsbEpStatus(uint16_t index)
+static int usb_send_ep_status(uint16_t index)
 {
 	if ((index & 0x7F) > 16)
 		return -USB_NODEV_ERROR;
 
 	InData = 0;
-	USB_GetStallEP(usb_ep_logical_to_hw(index), (bool *)&InData);
+	usb_ep_get_stall(usb_ep_logical_to_hw(index), (bool *)&InData);
 	__usb_ep_write(CTRL_ENP_IN,
 			(uint8_t *)&InData, sizeof(uint16_t),
-			USB_StatusHandler);
+			usb_status_handler);
 	return 0;
 }
 
 /* USB setup packet: GET_STATUS request handler */
-static void USB_GetStatusHandler(void)
+static void usb_get_status_handler(void)
 {
 	uint16_t w_value = usb_le16_to_cpu(setup_packet.wValue);
 	uint16_t w_index = usb_le16_to_cpu(setup_packet.wIndex);
@@ -1253,7 +1247,7 @@ static void USB_GetStatusHandler(void)
 	switch (setup_packet.mRequestType & USB_RECIP_MASK)
 	{
 	case USB_RECIP_DEVICE:
-		if (UsbDevStatus(w_index) < 0)
+		if (usb_send_device_status(w_index) < 0)
 		{
 			LOG_WARN("%s: GET_STATUS: invalid UsbRecipientDevice\n",
 					__func__);
@@ -1264,7 +1258,7 @@ static void USB_GetStatusHandler(void)
 				__func__, setup_packet.mRequestType);
 		break;
 	case USB_RECIP_INTERFACE:
-		if (UsbInterfaceStatus(w_index) < 0)
+		if (usb_send_interface_status(w_index) < 0)
 		{
 			LOG_WARN("%s: GET_STATUS: invalid UsbRecipientInterface\n",
 					__func__);
@@ -1275,7 +1269,7 @@ static void USB_GetStatusHandler(void)
 				__func__, setup_packet.mRequestType);
 		break;
 	case USB_RECIP_ENDPOINT:
-		if (UsbEpStatus(w_index) < 0)
+		if (usb_send_ep_status(w_index) < 0)
 		{
 			LOG_WARN("%s: GET_STATUS: invalid UsbRecipientEndpoint\n",
 					__func__);
@@ -1302,10 +1296,16 @@ static int usb_get_device_descriptor(int id)
 	__usb_ep_write(CTRL_ENP_IN, (const uint8_t *)usb_dev->device,
 			usb_size(usb_dev->device->bLength,
 				usb_le16_to_cpu(setup_packet.wLength)),
-			USB_StatusHandler);
+			usb_status_handler);
 	return 0;
 }
 
+/*
+ * TODO: refactor this part to remove this temporary buffer.
+ *
+ * It would be better to define all the USB descriptors in the right order and
+ * send them as a contiguous buffer directly from the flash / rodata memory.
+ */
 #define USB_BUFSIZE (128)
 static uint8_t usb_cfg_buffer[USB_BUFSIZE];
 STATIC_ASSERT(USB_BUFSIZE < (1 << (sizeof(uint16_t) * 8)));
@@ -1338,7 +1338,7 @@ static int usb_get_configuration_descriptor(int id)
 			usb_cfg_buffer,
 			usb_size(p - usb_cfg_buffer,
 				usb_le16_to_cpu(setup_packet.wLength)),
-			USB_StatusHandler);
+			usb_status_handler);
 	return 0;
 }
 
@@ -1379,11 +1379,11 @@ static int usb_get_string_descriptor(unsigned int id)
 			lang_str,
 			usb_size(lang_str->bLength,
 				usb_le16_to_cpu(setup_packet.wLength)),
-			USB_StatusHandler);
+			usb_status_handler);
 	return 0;
 }
 
-static void UsbGetDescriptor(void)
+static void usb_get_descriptor(void)
 {
 	uint16_t w_value_lo = usb_le16_to_cpu(setup_packet.wValue) & 0x00ff;
 	uint16_t w_value_hi = (usb_le16_to_cpu(setup_packet.wValue) & 0xff00) >> 8;
@@ -1435,14 +1435,14 @@ static void usb_event_handler(UsbDevice *dev)
 }
 
 /* USB setup packet: GET_DESCRIPTOR handler */
-static void UBS_GetDescriptorHandler(void)
+static void usb_get_descriptor_handler(void)
 {
 	LOG_INFO("%s: GET_DESCRIPTOR: RECIP = %d\n",
 			__func__,
 			setup_packet.mRequestType & USB_RECIP_MASK);
 	if ((setup_packet.mRequestType & USB_RECIP_MASK) ==
 			USB_RECIP_DEVICE)
-		UsbGetDescriptor();
+		usb_get_descriptor();
 	/* Getting descriptor for a device is a standard request */
 	else if ((setup_packet.mRequestType & USB_DIR_MASK) == USB_DIR_IN)
 		usb_event_handler(usb_dev);
@@ -1451,7 +1451,7 @@ static void UBS_GetDescriptorHandler(void)
 }
 
 /* USB setup packet: SET_ADDRESS handler */
-static void USB_SetAddressHandler(void)
+static void usb_set_address_handler(void)
 {
 	uint16_t w_value = usb_le16_to_cpu(setup_packet.wValue);
 	uint16_t w_index = usb_le16_to_cpu(setup_packet.wIndex);
@@ -1463,13 +1463,13 @@ static void USB_SetAddressHandler(void)
 			((setup_packet.mRequestType & USB_RECIP_MASK) ==
 					USB_RECIP_DEVICE) &&
 			(w_index == 0) && (w_length == 0) && (w_value < 128))
-		USB_StatusHandler(CTRL_ENP_IN);
+		usb_status_handler(CTRL_ENP_IN);
 	else
 		ep_cnfg[CTRL_ENP_OUT].status = STALLED;
 }
 
 /* USB setup packet: GET_CONFIGURATION handler */
-static void USB_GetConfigurationHandler(void)
+static void usb_get_config_handler(void)
 {
 	uint16_t w_value = usb_le16_to_cpu(setup_packet.wValue);
 	uint16_t w_index = usb_le16_to_cpu(setup_packet.wIndex);
@@ -1479,7 +1479,7 @@ static void USB_GetConfigurationHandler(void)
 			(w_value == 0) && (w_index == 0) && (w_value == 1))
 	{
 		InData = udc.cfg_id;
-		__usb_ep_write(CTRL_ENP_IN, (uint8_t *)&InData, 1, USB_StatusHandler);
+		__usb_ep_write(CTRL_ENP_IN, (uint8_t *)&InData, 1, usb_status_handler);
 	}
 	else
 		ep_cnfg[CTRL_ENP_OUT].status = STALLED;
@@ -1503,15 +1503,15 @@ static const UsbConfigDesc *usb_find_configuration(int num)
 	return NULL;
 }
 
-static int UsbSetConfigurationState(uint32_t Configuration)
+static int usb_set_config_state(uint32_t conf)
 {
 	const UsbConfigDesc *pCnfg;
 	unsigned int i;
 
-	if (Configuration)
+	if (conf)
 	{
 		/* Find configuration descriptor */
-		pCnfg = usb_find_configuration(Configuration);
+		pCnfg = usb_find_configuration(conf);
 		if (pCnfg == NULL)
 			return -USB_NODEV_ERROR;
 
@@ -1521,7 +1521,7 @@ static int UsbSetConfigurationState(uint32_t Configuration)
 		udc.cfg = pCnfg;
 
 		/* Set Interface and Alternative Setting */
-		udc.cfg_id = Configuration;
+		udc.cfg_id = conf;
 		/* Set self-powered state */
 		if (pCnfg->bmAttributes & USB_CONFIG_ATT_SELFPOWER)
 			udc.feature |= STM32_UDC_FEATURE_SELFPOWERED;
@@ -1543,7 +1543,7 @@ static int UsbSetConfigurationState(uint32_t Configuration)
 }
 
 /* USB setup packet: SET_CONFIGURATION handler */
-static void USB_SetConfigurationHandler(void)
+static void usb_set_config_handler(void)
 {
 	uint16_t w_value = usb_le16_to_cpu(setup_packet.wValue);
 	uint16_t w_index = usb_le16_to_cpu(setup_packet.wIndex);
@@ -1553,19 +1553,19 @@ static void USB_SetConfigurationHandler(void)
 			__func__, w_value);
 	if ((udc.state >= USB_STATE_ADDRESS) &&
 			(w_index == 0) && (w_length == 0) &&
-			(UsbSetConfigurationState(w_value & 0xff) == 0))
-		USB_StatusHandler(CTRL_ENP_OUT);
+			(usb_set_config_state(w_value & 0xff) == 0))
+		usb_status_handler(CTRL_ENP_OUT);
 	else
 		ep_cnfg[CTRL_ENP_OUT].status = STALLED;
 }
 
 /* USB setup packet: standard request handler */
-static void USB_StandardRequestHandler(void)
+static void usb_standard_request_handler(void)
 {
 	switch (setup_packet.bRequest)
 	{
 	case USB_REQ_GET_STATUS:
-		USB_GetStatusHandler();
+		usb_get_status_handler();
 		break;
 	case USB_REQ_CLEAR_FEATURE:
 		LOG_INFO("%s: bRequest=%d (CLEAR_FEATURE)\n",
@@ -1576,20 +1576,20 @@ static void USB_StandardRequestHandler(void)
 				__func__, setup_packet.bRequest);
 		break;
 	case USB_REQ_SET_ADDRESS:
-		USB_SetAddressHandler();
+		usb_set_address_handler();
 		break;
 	case USB_REQ_GET_DESCRIPTOR:
-		UBS_GetDescriptorHandler();
+		usb_get_descriptor_handler();
 		break;
 	case USB_REQ_SET_DESCRIPTOR:
 		LOG_INFO("%s: bRequest=%d (SET_DESCRIPTOR)\n",
 				__func__, setup_packet.bRequest);
 		break;
 	case USB_REQ_GET_CONFIGURATION:
-		USB_GetConfigurationHandler();
+		usb_get_config_handler();
 		break;
 	case USB_REQ_SET_CONFIGURATION:
-		USB_SetConfigurationHandler();
+		usb_set_config_handler();
 		break;
 	case USB_REQ_GET_INTERFACE:
 		LOG_INFO("%s: bRequest=%d (GET_INTERFACE)\n",
@@ -1612,7 +1612,7 @@ static void USB_StandardRequestHandler(void)
 }
 
 /* USB setup packet handler */
-static void USB_SetupHandler(void)
+static void usb_setup_handler(void)
 {
 	switch (setup_packet.mRequestType & USB_TYPE_MASK)
 	{
@@ -1620,7 +1620,7 @@ static void USB_SetupHandler(void)
 	case USB_TYPE_STANDARD:
 		LOG_INFO("%s: bmRequestType=%02x (Standard)\n",
 				__func__, setup_packet.mRequestType);
-		USB_StandardRequestHandler();
+		usb_standard_request_handler();
 		break;
 	/* Class */
 	case USB_TYPE_CLASS:
@@ -1701,13 +1701,13 @@ static void usb_isr_correct_transfer(stm32_usb_irq_status_t interrupt)
 	ASSERT(ep_cnfg[EP].hw);
 	/* IN EP */
 	if (EP & 0x01)
-		EpCtrlClr_CTR_TX(ep_cnfg[EP].hw);
+		ep_ctrl_clr_ctr_tx(ep_cnfg[EP].hw);
 	else
-		EpCtrlClr_CTR_RX(ep_cnfg[EP].hw);
+		ep_ctrl_clr_ctr_rx(ep_cnfg[EP].hw);
 	if (EP == CTRL_ENP_OUT)
 	{
 		/* Determinate type of packet (only for control EP) */
-		bool SetupPacket = EpCtrlGet_SETUP(ep_cnfg[CTRL_ENP_OUT].hw);
+		bool SetupPacket = ep_ctrl_get_setup(ep_cnfg[CTRL_ENP_OUT].hw);
 
 		if (SetupPacket)
 		{
@@ -1719,10 +1719,10 @@ static void usb_isr_correct_transfer(stm32_usb_irq_status_t interrupt)
 
 			/* reset EP IO ctrl */
 			if (setup_packet.mRequestType & USB_DIR_IN)
-				USB_StatusHandler(CTRL_ENP_OUT);
-			USB_SetupHandler();
+				usb_status_handler(CTRL_ENP_OUT);
+			usb_setup_handler();
 			if (ep_cnfg[CTRL_ENP_OUT].status == STALLED)
-				USB_StallCtrlEP();
+				usb_ep_set_stall_ctrl();
 		}
 		else
 		{
