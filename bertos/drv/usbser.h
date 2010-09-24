@@ -32,26 +32,45 @@
  *
  * \author Andrea Righi <arighi@develer.com>
  *
- * \brief Configuration file for the USB serial driver module
+ * \brief Generic USB serial device driver.
+ *
+ * $WIZ$ module_name = "usbser"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_usbser.h"
+ * $WIZ$ module_depends = "usb"
  */
 
-#ifndef CFG_USB_SERIAL_H
-#define CFG_USB_SERIAL_H
+#ifndef USBSER_H
+#define USBSER_H
+
+#include <io/kfile.h>
+
+typedef uint32_t usbser_status_t;
+
+typedef struct USBSerial
+{
+        /** KFile structure implementation **/
+        KFile fd;
+        /** Logical port number */
+        unsigned int unit;
+#ifdef _DEBUG
+	/** Used for debugging only */
+        bool is_open;
+#endif
+        /** Holds the status flags. Set to 0 when no errors have occurred. */
+        usbser_status_t status;
+} USBSerial;
 
 /**
- * Module logging level.
- *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_level"
+ * ID for usb-serial.
  */
-#define USB_SERIAL_LOG_LEVEL      LOG_LVL_INFO
+#define KFT_USB_SERIAL MAKE_ID('U', 'S', 'B', 'S')
 
-/**
- * module logging format.
- *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_format"
- */
-#define USB_SERIAL_LOG_FORMAT     LOG_FMT_TERSE
+INLINE USBSerial *USB_SERIAL_CAST(KFile *fd)
+{
+        ASSERT(fd->_type == KFT_USB_SERIAL);
+        return (USBSerial *)fd;
+}
 
-#endif /* CFG_USB_SERIAL_H */
+int usbser_init(struct USBSerial *fds, int unit);
+
+#endif /* USBSER_H */

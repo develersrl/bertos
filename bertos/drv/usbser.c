@@ -36,7 +36,7 @@
  *
  */
 
-#include "cfg/cfg_usb_serial.h"
+#include "cfg/cfg_usbser.h"
 
 #define LOG_LEVEL  USB_SERIAL_LOG_LEVEL
 #define LOG_FORMAT USB_SERIAL_LOG_FORMAT
@@ -55,7 +55,7 @@
 
 #include <string.h> /* memcpy() */
 
-#include "drv/usb_serial.h"
+#include "drv/usbser.h"
 
 #define USB_SERIAL_VENDOR_ID	0x05f9
 #define USB_SERIAL_PRODUCT_ID	0xffff
@@ -293,7 +293,7 @@ static struct KFile *usb_serial_reopen(struct KFile *fd)
  *
  * \return 0 if OK, a negative value in case of error.
  */
-int usb_serialInit(struct USBSerial *fds, int unit)
+int usbser_init(struct USBSerial *fds, int unit)
 {
 	memset(fds, 0, sizeof(*fds));
 
