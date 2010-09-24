@@ -40,6 +40,7 @@
 
 #include <sec/mac.h>
 #include <sec/hash.h>
+#include <alloca.h>
 
 typedef struct HMAC_Context
 {
@@ -49,6 +50,9 @@ typedef struct HMAC_Context
 } HMAC_Context;
 
 void HMAC_init(HMAC_Context* hmac, Hash *h);
+
+#define HMAC_stackinit(...) \
+	({ HMAC_Context *ctx = alloca(sizeof(HMAC_Context)); HMAC_init(ctx, ##__VA_ARGS__); &ctx->m; })
 
 int HMAC_testSetup(void);
 int HMAC_testRun(void);

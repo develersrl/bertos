@@ -94,7 +94,7 @@ static void MD5_update(Hash *h, const void* vbuf, size_t len)
  * Final wrapup - pad to 64-byte boundary with the bit pattern
  * 1 0* (64-bit count of bits processed, MSB-first)
  */
-uint8_t* MD5_final(struct Hash *h)
+static uint8_t* MD5_final(struct Hash *h)
 {
 	MD5_Context *ctx = (MD5_Context *)h;
     unsigned count;

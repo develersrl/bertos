@@ -41,6 +41,7 @@
 
 #include <cfg/compiler.h>
 #include <sec/hash.h>
+#include <alloca.h>
 
 /**
  * Context for SHA1 computation.
@@ -53,6 +54,9 @@ typedef struct {
 } SHA1_Context;
 
 void SHA1_init(SHA1_Context *context);
+
+#define SHA1_stackinit(...) \
+	({ SHA1_Context *ctx = alloca(sizeof(SHA1_Context)); SHA1_init(ctx, ##__VA_ARGS__); &ctx->h; })
 
 int SHA1_testSetup(void);
 int SHA1_testRun(void);

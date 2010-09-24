@@ -30,10 +30,10 @@
  *
  * -->
  *
- * \brief SHA-1 Hashing algorithm.
+ * \brief MD5 Hashing algorithm.
  * \author Giovanni Bajo <rasky@develer.com>
  *
- * $WIZ$ module_name = "sha1"
+ * $WIZ$ module_name = "md5"
  */
 
 #ifndef SEC_HASH_MD5_H
@@ -41,6 +41,7 @@
 
 #include <sec/hash.h>
 #include <cfg/compiler.h>
+#include <alloca.h>
 
 typedef struct
 {
@@ -52,6 +53,9 @@ typedef struct
 } MD5_Context;
 
 void MD5_init(MD5_Context *ctx);
+
+#define MD5_stackinit(...) \
+	({ MD5_Context *ctx = alloca(sizeof(MD5_Context)); MD5_init(ctx , ##__VA_ARGS__); &ctx->h; })
 
 int MD5_testSetup(void);
 int MD5_testRun(void);

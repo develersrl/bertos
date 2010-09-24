@@ -151,42 +151,24 @@ const struct Test_HMAC tests_hmac_sha1[] =
    },
 };
 
-static void algo_run_tests(HMAC_Context *hmac, const struct Test_HMAC *t, int count)
+static void algo_run_tests(Mac *mac, const struct Test_HMAC *t, int count)
 {
 	for (int i=0; i<count; ++i, ++t)
 	{
-		mac_set_key(&hmac->m, (const uint8_t*)t->key, t->key_len);
-		mac_begin(&hmac->m);
-		mac_update(&hmac->m, (const uint8_t*)t->data, t->data_len);
-		ASSERT(memcmp(mac_final(&hmac->m), t->digest, mac_digest_len(&hmac->m)) == 0);
+		mac_set_key(mac, (const uint8_t*)t->key, t->key_len);
+		mac_begin(mac);
+		mac_update(mac, (const uint8_t*)t->data, t->data_len);
+		ASSERT(memcmp(mac_final(mac), t->digest, mac_digest_len(mac)) == 0);
 	}
 }
 
 int HMAC_testRun(void)
 {
-	if (1)
-	{
-		MD5_Context md5;
-		MD5_init(&md5);
+	algo_run_tests(HMAC_stackinit(MD5_stackinit()),
+				   tests_hmac_md5, countof(tests_hmac_md5));
 
-		HMAC_Context hmac;
-		HMAC_init(&hmac, &md5.h);
-
-		algo_run_tests(&hmac, tests_hmac_md5, countof(tests_hmac_md5));
-	}
-
-	if (1)
-	{
-		SHA1_Context sha1;
-		SHA1_init(&sha1);
-
-		HMAC_Context hmac;
-		HMAC_init(&hmac, &sha1.h);
-
-		algo_run_tests(&hmac, tests_hmac_sha1, countof(tests_hmac_sha1));
-	}
-	
-	return 0;
+	algo_run_tests(HMAC_stackinit(SHA1_stackinit()),
+				   tests_hmac_sha1, countof(tests_hmac_sha1));
 }
 
 TEST_MAIN(HMAC);
