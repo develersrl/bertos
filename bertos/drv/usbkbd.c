@@ -36,7 +36,7 @@
  *
  */
 
-#include "cfg/cfg_usb_keyboard.h"
+#include "cfg/cfg_usbkbd.h"
 
 #define LOG_LEVEL  USB_KEYBOARD_LOG_LEVEL
 #define LOG_FORMAT USB_KEYBOARD_LOG_FORMAT
@@ -52,7 +52,7 @@
 #include <drv/usb.h>
 
 #include "drv/usb_hid.h"
-#include "drv/usb_keyboard.h"
+#include "drv/usbkbd.h"
 
 /*
  * HID device configuration (usb-keyboard)
@@ -279,7 +279,7 @@ static int usb_keyboard_hw_init(void)
 }
 
 /* Send a keyboard event */
-void usb_keyboardSendEvent(uint8_t mod, uint8_t code)
+void usbkbd_sendEvent(uint8_t mod, uint8_t code)
 {
 	report[0] = mod;
 	report[2] = code;
@@ -291,7 +291,7 @@ void usb_keyboardSendEvent(uint8_t mod, uint8_t code)
  *
  * TODO: support more than one device at the same time.
  */
-int usb_keyboardInit(UNUSED_ARG(int, unit))
+int usbkbd_init(UNUSED_ARG(int, unit))
 {
 #if CONFIG_KERN
 	MOD_CHECK(proc);

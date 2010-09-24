@@ -32,11 +32,11 @@
  *
  * \author Andrea Righi <arighi@develer.com>
  *
- * \brief Configuration file for the usb-keyboard driver module
+ * \brief Configuration file for the usbkbd driver module
  */
 
-#ifndef CFG_USB_KEYBOARD_H
-#define CFG_USB_KEYBOARD_H
+#ifndef CFG_USBKBD_H
+#define CFG_USBKBD_H
 
 /**
  * Module logging level.

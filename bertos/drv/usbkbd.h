@@ -34,15 +34,15 @@
  *
  * \brief Generic USB keyboard device driver.
  *
- * $WIZ$ module_name = "usb_keyboard"
- * $WIZ$ module_configuration = "bertos/cfg/cfg_usb_keyboard.h"
+ * $WIZ$ module_name = "usbkbd"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_usbkbd.h"
  * $WIZ$ module_depends = "usb"
  */
 
-#ifndef USB_KEYBOARD_H
-#define USB_KEYBOARD_H
+#ifndef USBKBD_H
+#define USBKBD_H
 
-void usb_keyboardSendEvent(uint8_t mod, uint8_t code);
-int usb_keyboardInit(int unit);
+void usbkbd_sendEvent(uint8_t mod, uint8_t code);
+int usbkbd_init(int unit);
 
-#endif /* USB_KEYBOARD_H */
+#endif /* USBKBD_H */
