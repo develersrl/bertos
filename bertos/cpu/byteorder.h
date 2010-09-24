@@ -40,6 +40,8 @@
 
 #include <cfg/compiler.h>
 #include <cpu/attr.h>
+#include <cpu/detect.h>
+#include <cfg/macros.h>
 
 /**
  * Swap upper and lower bytes in a 16-bit value.
@@ -47,22 +49,27 @@
 #define SWAB16(x) ((uint16_t)(ROTR((x), 8) + \
 		STATIC_ASSERT_EXPR(sizeof(x) == sizeof(uint16_t))))
 
-#if GNUC_PREREQ(4, 3)
+/*
+ * On Cortex-M3, GCC 4.4 builtin implementation is slower than our own
+ * rot-based implementation.
+ */
+#if GNUC_PREREQ(4, 3) && !CPU_CM3
 #define SWAB32(x) ((uint32_t)(__builtin_bswap32((x) + \
 		STATIC_ASSERT_EXPR(sizeof(x) == sizeof(uint32_t)))))
-#define SWAB64(x) ((uint64_t)(__builtin_bswap64((x) + \
-		STATIC_ASSERT_EXPR(sizeof(x) == sizeof(uint64_t)))))
 #else
 /**
  * Reverse bytes in a 32-bit value (e.g.: 0x12345678 -> 0x78563412).
  */
-#define SWAB32(x) ((uint32_t)(						\
-	(((uint32_t)(x) & (uint32_t)0x000000ffUL) << 24) |		\
-	(((uint32_t)(x) & (uint32_t)0x0000ff00UL) <<  8) |		\
-	(((uint32_t)(x) & (uint32_t)0x00ff0000UL) >>  8) |		\
-	(((uint32_t)(x) & (uint32_t)0xff000000UL) >> 24) +		\
-		STATIC_ASSERT_EXPR(sizeof(x) == sizeof(uint32_t))))
+#define SWAB32(x) ((uint32_t)(( \
+	(ROTR(x, 8) & 0xFF00FF00) | \
+	(ROTL(x, 8) & 0x00FF00FF))) + \
+		STATIC_ASSERT_EXPR(sizeof(x) == sizeof(uint32_t)))
+#endif
 
+#if GNUC_PREREQ(4, 3)
+#define SWAB64(x) ((uint64_t)(__builtin_bswap64((x) + \
+		STATIC_ASSERT_EXPR(sizeof(x) == sizeof(uint64_t)))))
+#else
 /**
  * Reverse bytes in a 64-bit value.
  */
