@@ -248,5 +248,5 @@ void MD5_init(MD5_Context *ctx)
 	ctx->h.update = MD5_update;
 	ctx->h.final = MD5_final;
 	ctx->h.digest_len = 16;
-	ctx->h.block_len = 16;
+	ctx->h.block_len = 64;
 }

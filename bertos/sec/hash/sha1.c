@@ -54,8 +54,8 @@
 #include <stdlib.h>
 #include <sec/util.h>
 
-#define SHA1_BLOCK_LEN          16
-#define SHA1_DIGEST_LEN         16
+#define SHA1_BLOCK_LEN          64
+#define SHA1_DIGEST_LEN         20
 
 static void SHA1Transform(uint32_t state[5], const uint8_t buffer[64]);
 
