@@ -30,7 +30,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Additional search directories:</string>
+      <string>Additional directories containing toolchain binaries:</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
