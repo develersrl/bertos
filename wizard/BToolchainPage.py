@@ -169,7 +169,9 @@ class BToolchainPage(BWizardPage):
         try:
             QApplication.instance().setOverrideCursor(Qt.WaitCursor)
             for i in range(self.pageContent.toolchainList.count()):
-                self.validateToolchain(i)
+                data = qvariant_converter.getStringDict(self.pageContent.toolchainList.item(i).data(Qt.UserRole))
+                self.validateToolchain(data["path"])
+            self._populateToolchainList()
         finally:
             QApplication.instance().restoreOverrideCursor()
 
@@ -182,19 +184,37 @@ class BToolchainPage(BWizardPage):
         self.pageContent.toolchainList.clear()
         self._valid_items = []
         toolchains = self._toolchain_manager.predefined_toolchains + self._toolchain_manager.toolchains
-        sel_toolchain = self.projectInfo("TOOLCHAIN")
+        toolchain_dict = {
+            'valid': [],
+            'non-valid': [],
+            'unknown': [],
+            'unverified': [],
+        }
         for key, value in toolchains:
             if os.path.exists(key):
-                item = QListWidgetItem(key)
                 item_data = {"path":key}
                 if value:
                     item_data.update(value)
-                item.setData(Qt.UserRole, qvariant_converter.convertStringDict(item_data))
-                self.pageContent.toolchainList.addItem(item)
-                if sel_toolchain and sel_toolchain["path"] == key:
-                    self.pageContent.toolchainList.setCurrentItem(item)
                 if value is not None:
-                    self.validateToolchain(self.pageContent.toolchainList.row(item))
+                    k, data = self.validateToolchain(key)
+                    item_data.update(data)
+                    toolchain_dict[k].append(item_data)
+                else:
+                    toolchain_dict["unverified"].append(item_data)
+        self._processItems(toolchain_dict["valid"], self._validItem)
+        self._processItems(toolchain_dict["non-valid"], self._invalidItem)
+        self._processItems(toolchain_dict["unknown"], self._unknownItem)
+        self._processItems(toolchain_dict["unverified"])
+
+    def _processItems(self, item_list, procedure=lambda x: None):
+        sel_toolchain = self.projectInfo("TOOLCHAIN")
+        for item_data in item_list:
+            item = QListWidgetItem(item_data["path"])
+            item.setData(Qt.UserRole, qvariant_converter.convertStringDict(item_data))
+            self.pageContent.toolchainList.addItem(item)
+            procedure(item)
+            if sel_toolchain and sel_toolchain["path"] == item_data["path"]:
+                self.pageContent.toolchainList.setCurrentItem(item)
 
     def currentToolchain(self):
         selected_toolchain = qvariant_converter.getStringDict(self.pageContent.toolchainList.currentItem().data(Qt.UserRole))
@@ -221,42 +241,41 @@ class BToolchainPage(BWizardPage):
         self._populateToolchainList()
         self.showMessage(self.tr("Toolchain search result."), self.tr("%1 toolchains found").arg(len(toolchain_list)))
 
-    def _validItem(self, index, infos):
+    def _validItem(self, item):
         """
         Sets the item at index as a valid item and associates the given info to it.
         """
-        item = self.pageContent.toolchainList.item(index)
-        new_data = qvariant_converter.getStringDict(self.pageContent.toolchainList.item(index).data(Qt.UserRole))
-        new_data.update(infos)
-        item.setData(Qt.UserRole, qvariant_converter.convertStringDict(new_data))
-        needed = self.projectInfo("CPU_INFOS")
-        if "target" in infos and infos["target"].find(needed["TOOLCHAIN"]) != -1:
-            item.setIcon(QIcon(":/images/ok.png"))
-            self._valid_items.append(item)
-        else:
-            item.setIcon(QIcon(":/images/warning.png"))
-        if "version" in infos and "target" in infos:
-            item.setText("GCC " + infos["version"] + " - " + infos["target"].strip())
+        data = qvariant_converter.getStringDict(item.data(Qt.UserRole))
+        item.setIcon(QIcon(":/images/ok.png"))
+        self._valid_items.append(item)
+        if "version" in data and "target" in data:
+            item.setText("GCC " + data["version"] + " - " + data["target"].strip())
 
-    def _invalidItem(self, index):
+    def _invalidItem(self, item):
+        data = qvariant_converter.getStringDict(item.data(Qt.UserRole))
+        item.setIcon(QIcon(":/images/warning.png"))
+        if "version" in data and "target" in data:
+            item.setText("GCC " + data["version"] + " - " + data["target"].strip())
+
+    def _unknownItem(self, item):
         """
         Sets the item at index as an invalid item.
         """
-        item = self.pageContent.toolchainList.item(index)
         item.setIcon(QIcon(":/images/error.png"))
 
-    def validateToolchain(self, i):
+    def validateToolchain(self, filename):
         """
         Toolchain validation procedure.
         """
-        filename = qvariant_converter.getStringDict(self.pageContent.toolchainList.item(i).data(Qt.UserRole))["path"]
         info = self._toolchain_manager.validateToolchain(filename)
-
-        # Add the item in the list with the appropriate associate data.
         if info:
-            self._validItem(i, info)
+            needed = self.projectInfo("CPU_INFOS")
+            if "target" in info and info["target"].find(needed["TOOLCHAIN"]) != -1:
+                return 'valid', info
+            else:
+                return 'non-valid', info
         else:
-            self._invalidItem(i)
+            return 'unknown', {'path': filename}
     
     def isDefaultToolchain(self, toolchain):
         """
