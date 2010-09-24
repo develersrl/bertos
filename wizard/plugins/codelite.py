@@ -82,7 +82,7 @@ def findSources(path):
     if not path.endswith(os.sep):
         path += os.sep
     file_dict = {}
-    for root, dirs, files in os.walk(path):
+    for root, dirs, files in os.walk(path, followlinks=True):
         if root.find("svn") == -1:
             file_dict[root.replace(path, "")] = {"dirs": [], "files": []}
             for dir in dirs:
