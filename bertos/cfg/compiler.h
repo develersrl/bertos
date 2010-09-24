@@ -540,10 +540,10 @@ typedef unsigned char sigmask_t; /**< Type for signal masks. */
 		 * NOTE: the construct __builtin_types_compatible_p() is only
 		 * available for C.
 		 */
-		#define countof(a) (sizeof(a) / sizeof(*(a)) + \
-			sizeof(typeof(int[1 - 2 * \
-				!!__builtin_types_compatible_p(typeof(a), \
-						typeof(&a[0]))])) * 0)
+		#define countof(a) (sizeof(a) / sizeof(*(a)) +		\
+				STATIC_ASSERT_EXPR(			\
+					!__builtin_types_compatible_p(	\
+						typeof(a), typeof(&a[0]))))
 	#else
 		#define countof(a)  (sizeof(a) / sizeof(*(a)))
 	#endif
