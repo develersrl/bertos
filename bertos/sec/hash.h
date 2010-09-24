@@ -50,29 +50,54 @@ typedef struct Hash
 	uint8_t block_len;
 } Hash;
 
+/**
+ * Initialize a hash computation.
+ */
 INLINE void hash_begin(Hash *h)
 {
 	ASSERT(h->begin);
 	h->begin(h);
 }
 
+/**
+ * Add some data to the computation.
+ */
 INLINE void hash_update(Hash *h, const void* data, size_t len)
 {
 	ASSERT(h->update);
 	h->update(h, data, len);
 }
 
+/**
+ * Finalize the hash computation and return the digest.
+ * 
+ * \note This function must be called exactly once per each computation.
+ * Calling it twice leads to undefined behaviour.
+ * 
+ * \note The pointer returned is within the hash context structure \a h, so it
+ * has the same lifetime as the hash instance. The data will be invalidated 
+ * as soon as \a hash_begin is called again on the same instance.
+ */
 INLINE uint8_t* hash_final(Hash *h)
 {
 	ASSERT(h->final);
 	return h->final(h);
 }
 
+/**
+ * Return the digest length in bytes.
+ */
 INLINE int hash_digest_len(Hash *h)
 {
 	return h->digest_len;
 }
 
+/*
+ * Return the internal block length in bytes.
+ * 
+ * Hash functions operate on a fixed-size block. This information is useful
+ * for composite functions like HMAC to adjust their internal operations.
+ */
 INLINE int hash_block_len(Hash *h)
 {
 	return h->block_len;
