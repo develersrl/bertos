@@ -36,7 +36,7 @@
  *
  */
 
-#include "cfg/cfg_usb_mouse.h"
+#include "cfg/cfg_usbmouse.h"
 
 #define LOG_LEVEL  USB_MOUSE_LOG_LEVEL
 #define LOG_FORMAT USB_MOUSE_LOG_FORMAT
@@ -52,7 +52,7 @@
 #include <drv/usb.h>
 
 #include "drv/usb_hid.h"
-#include "drv/usb_mouse.h"
+#include "drv/usbmouse.h"
 
 /*
  * HID device configuration (usb-mouse)
@@ -270,7 +270,7 @@ static int usb_mouse_hw_init(void)
 }
 
 /* Send a mouse event */
-void usb_mouseSendEvent(int8_t x, int8_t y, int8_t buttons)
+void usbmouse_sendEvent(int8_t x, int8_t y, int8_t buttons)
 {
 	report.x = x;
 	report.y = y;
@@ -283,7 +283,7 @@ void usb_mouseSendEvent(int8_t x, int8_t y, int8_t buttons)
  *
  * TODO: support more than one device at the same time.
  */
-int usb_mouseInit(UNUSED_ARG(int, unit))
+int usbmouse_init(UNUSED_ARG(int, unit))
 {
 #if CONFIG_KERN
 	MOD_CHECK(proc);

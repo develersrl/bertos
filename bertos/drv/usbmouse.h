@@ -34,15 +34,15 @@
  *
  * \brief Generic USB mouse device driver.
  *
- * $WIZ$ module_name = "usb_mouse"
- * $WIZ$ module_configuration = "bertos/cfg/cfg_usb_mouse.h"
+ * $WIZ$ module_name = "usbmouse"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_usbmouse.h"
  * $WIZ$ module_depends = "usb"
  */
 
-#ifndef USB_MOUSE_H
-#define USB_MOUSE_H
+#ifndef USBMOUSE_H
+#define USBMOUSE_H
 
-void usb_mouseSendEvent(int8_t x, int8_t y, int8_t buttons);
-int usb_mouseInit(int unit);
+void usbmouse_sendEvent(int8_t x, int8_t y, int8_t buttons);
+int usbmouse_init(int unit);
 
-#endif /* USB_MOUSE_H */
+#endif /* USBMOUSE_H */

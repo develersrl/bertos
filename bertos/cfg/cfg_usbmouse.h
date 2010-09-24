@@ -32,11 +32,11 @@
  *
  * \author Andrea Righi <arighi@develer.com>
  *
- * \brief Configuration file for the usb-mouse driver module
+ * \brief Configuration file for the usbmouse driver module
  */
 
-#ifndef CFG_USB_MOUSE_H
-#define CFG_USB_MOUSE_H
+#ifndef CFG_USBMOUSE_H
+#define CFG_USBMOUSE_H
 
 /**
  * Module logging level.
@@ -54,4 +54,4 @@
  */
 #define USB_MOUSE_LOG_FORMAT     LOG_FMT_TERSE
 
-#endif /* CFG_USB_MOUSE_H */
+#endif /* CFG_USBMOUSE_H */
