@@ -140,7 +140,7 @@ static const uint8_t hid_report_descriptor[] =
 	0xC0    // End Collection
 };
 
-static const usb_hid_descriptor_t usb_hid_descriptor =
+static const usb_HidDesc usb_hid_descriptor =
 {
 	.bLength = sizeof(usb_hid_descriptor),
 	.bDescriptorType = HID_DT_HID,

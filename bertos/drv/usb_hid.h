@@ -65,7 +65,7 @@
 /*
  * USB HID descriptor
  */
-typedef struct usb_hid_descriptor
+typedef struct usb_HidDesc
 {
 	uint8_t bLength;
 	uint8_t bDescriptorType;
@@ -74,6 +74,6 @@ typedef struct usb_hid_descriptor
 	uint8_t bNumDescriptors;
 	uint8_t bDescriptorHidType;
 	uint16_t wDescriptorLength;
-} PACKED usb_hid_descriptor_t;
+} PACKED usb_HidDesc;
 
 #endif /* USB_HID_H */

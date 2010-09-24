@@ -42,7 +42,7 @@
 #ifndef USB_KEYBOARD_H
 #define USB_KEYBOARD_H
 
-void usb_keyboard_send_event(uint8_t mod, uint8_t code);
-int usb_keyboard_init(int unit);
+void usb_keyboardSendEvent(uint8_t mod, uint8_t code);
+int usb_keyboardInit(int unit);
 
 #endif /* USB_KEYBOARD_H */

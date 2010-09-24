@@ -151,7 +151,7 @@ static const uint8_t hid_report_descriptor[] =
 	0xC0, // End Collection
 };
 
-static const usb_hid_descriptor_t usb_hid_descriptor =
+static const usb_HidDesc usb_hid_descriptor =
 {
 	.bLength = sizeof(usb_hid_descriptor),
 	.bDescriptorType = HID_DT_HID,
@@ -279,7 +279,7 @@ static int usb_keyboard_hw_init(void)
 }
 
 /* Send a keyboard event */
-void usb_keyboard_send_event(uint8_t mod, uint8_t code)
+void usb_keyboardSendEvent(uint8_t mod, uint8_t code)
 {
 	report[0] = mod;
 	report[2] = code;
@@ -291,7 +291,7 @@ void usb_keyboard_send_event(uint8_t mod, uint8_t code)
  *
  * TODO: support more than one device at the same time.
  */
-int usb_keyboard_init(UNUSED_ARG(int, unit))
+int usb_keyboardInit(UNUSED_ARG(int, unit))
 {
 #if CONFIG_KERN
 	MOD_CHECK(proc);
