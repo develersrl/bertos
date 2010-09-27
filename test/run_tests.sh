@@ -94,21 +94,24 @@ for src in $TESTS; do
 
 	[ $VERBOSE -gt 0 ] && echo "Preparing $name..."
 	[ $VERBOSE -gt 4 ] && echo " $PREPARECMD"
-	if $PREPARECMD 2>&1 >>$buildout; then
+	if $PREPARECMD 2>&1 | tee -a >>$buildout $testdir/$name.prep; then
 		[ $VERBOSE -gt 0 ] && echo "Building $name..."
 		[ $VERBOSE -gt 4 ] && echo " $BUILDCMD"
-		if $BUILDCMD 2>&1 >>$buildout; then
+		if $BUILDCMD 2>&1 | tee -a >>$buildout $testdir/$name.build; then
 			[ $VERBOSE -gt 0 ] && echo "Running $name..."
-			if ! $exe 2>&1 >>$runout; then
+			if ! $exe 2>&1 | tee -a >>$runout $testdir/$name.out; then
 				echo "FAILED [RUN]: $name"
+				cat $testdir/$name.out
 				exit 2
 			fi
 		else
 			echo "FAILED [BUILD]: $name"
+			cat $testdir/$name.build
 			exit 3
 		fi
 	else
 		echo "FAILED [PREPARING]: $name"
+		cat $testdir/$name.prep
 		exit 4
 	fi
 done
