@@ -49,6 +49,7 @@
 #include "lm3s_uart.h"
 #include "lm3s_ssi.h"
 #include "lm3s_i2c.h"
+#include "lm3s_adc.h"
 
 
 #if CPU_CM3_LM3S1968
