@@ -37,6 +37,7 @@
 *
 * $WIZ$ module_name = "flash"
 * $WIZ$ module_depends = "kfile", "kfile_block", "kblock"
+* $WIZ$ module_configuration = "bertos/cfg/cfg_emb_flash.h"
 */
 
 #ifndef DRV_FLASH_H
