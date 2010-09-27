@@ -73,7 +73,7 @@ runout='/dev/null'
 [ "$VERBOSE" -ge 3 ] && runout='/dev/stdout'
 
 # Needed to get build/exec result code rather than tee's
-#set -o pipefail
+set -o pipefail
 
 rm -rf "${TESTOUT}.old"
 if [ -d "${TESTOUT}" ] ; then
