@@ -1096,6 +1096,12 @@ ssize_t usb_endpointRead(int ep, void *buffer, ssize_t size)
 {
 	int ep_num = usb_ep_logical_to_hw(ep);
 
+	if (UNLIKELY((size_t)buffer & 0x03))
+	{
+		LOG_ERR("unaligned buffer @ %p\n", buffer);
+		ASSERT(0);
+	}
+
 	/* Non-blocking read for EP0 */
 	if (ep_num == CTRL_ENP_OUT)
 	{
@@ -1140,6 +1146,12 @@ static void usb_endpointWrite_complete(int ep)
 ssize_t usb_endpointWrite(int ep, const void *buffer, ssize_t size)
 {
 	int ep_num = usb_ep_logical_to_hw(ep);
+
+	if (UNLIKELY((size_t)buffer & 0x03))
+	{
+		LOG_ERR("unaligned buffer @ %p\n", buffer);
+		ASSERT(0);
+	}
 
 	/* Non-blocking write for EP0 */
 	if (ep_num == CTRL_ENP_IN)
