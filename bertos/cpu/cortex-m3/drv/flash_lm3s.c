@@ -117,6 +117,7 @@ static size_t lm3s_flash_readDirect(struct KBlock *blk, block_idx_t idx, void *b
 
 static size_t lm3s_flash_writeDirect(struct KBlock *blk, block_idx_t idx, const void *_buf, size_t offset, size_t size)
 {
+	(void)offset;
 	ASSERT(offset == 0);
 	ASSERT(size == blk->blk_size);
 
