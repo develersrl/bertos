@@ -66,8 +66,6 @@ INLINE void hw_initIntTemp(void)
 	HWREG(ADC0_BASE + ADC_O_ACTSS) = 0;
 	/* Set trigger event to programmed (for all sequence) */
 	HWREG(ADC0_BASE + ADC_O_EMUX) = 0;
-
-	HWREG(ADC0_BASE + ADC_O_SSMUX3) = 1;
 	/* Enalbe read of temperature sensor */
 	HWREG(ADC0_BASE + ADC_O_SSCTL3) = BV(3);
 	/* Enable sequence S03 (single sample on select channel) */
