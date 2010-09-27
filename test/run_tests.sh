@@ -101,12 +101,15 @@ for src in $TESTS; do
 			[ $VERBOSE -gt 0 ] && echo "Running $name..."
 			if ! $exe 2>&1 | tee >$runout $testdir/$name.out; then
 				echo "FAILED [RUN]: $name"
+				exit 2
 			fi
 		else
 			echo "FAILED [BUILD]: $name"
+			exit 3
 		fi
 	else
 		echo "FAILED [PREPARING]: $name"
+		exit 4
 	fi
 done
 
