@@ -73,7 +73,7 @@ runout='/dev/null'
 [ "$VERBOSE" -ge 3 ] && runout='/dev/stdout'
 
 # Needed to get build/exec result code rather than tee's
-set -o pipefail
+#set -o pipefail
 
 rm -rf "${TESTOUT}.old"
 if [ -d "${TESTOUT}" ] ; then
@@ -94,12 +94,12 @@ for src in $TESTS; do
 
 	[ $VERBOSE -gt 0 ] && echo "Preparing $name..."
 	[ $VERBOSE -gt 4 ] && echo " $PREPARECMD"
-	if $PREPARECMD 2>&1 | tee >$buildout $testdir/$name.prep; then
+	if $PREPARECMD 2>&1 >>$buildout; then
 		[ $VERBOSE -gt 0 ] && echo "Building $name..."
 		[ $VERBOSE -gt 4 ] && echo " $BUILDCMD"
-		if $BUILDCMD 2>&1 | tee >$buildout $testdir/$name.build; then
+		if $BUILDCMD 2>&1 >>$buildout; then
 			[ $VERBOSE -gt 0 ] && echo "Running $name..."
-			if ! $exe 2>&1 | tee >$runout $testdir/$name.out; then
+			if ! $exe 2>&1 >>$runout; then
 				echo "FAILED [RUN]: $name"
 				exit 2
 			fi
