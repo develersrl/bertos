@@ -149,7 +149,11 @@ class BModulePage(BWizardPage):
                     self.pageContent.propertyTable.setRowCount(index + 1)
                     item = QTableWidgetItem(configurations[property]["brief"])
                     item.setFlags(item.flags() & ~Qt.ItemIsSelectable)
-                    item.setToolTip(property)
+                    tooltip = property
+                    description = configurations[property].get("description", None)
+                    if description:
+                        tooltip = tooltip + ": " + description
+                    item.setToolTip(tooltip)
                     item.setData(Qt.UserRole, qvariant_converter.convertString(property))
                     self.pageContent.propertyTable.setItem(index, 0, item)
                     if "type" in configurations[property]["informations"] and configurations[property]["informations"]["type"] == "boolean":
