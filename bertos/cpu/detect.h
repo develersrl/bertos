@@ -40,7 +40,7 @@
 	|| defined(__ARM4TM__) /* IAR: defined for all cores >= 4tm */
 	#define CPU_ARM 1
 	#define CPU_ID	arm
-	#define CPU_CORE_NAME 		 "ARM"
+	#define CPU_CORE_NAME 		 "ARM7TDMI"
 
 	// AT91SAM7S core family
 	#if defined(__ARM_AT91SAM7S32__)
@@ -415,7 +415,7 @@
 #if defined (__MSP430__)
 	#define CPU_MSP430              1
 	#define CPU_ID                  msp430
-	#define CPU_CORE_NAME           "MSP430"
+	#define CPU_CORE_NAME           "MSP430F2274"
 
 	#if defined(__MSP430_2274__)
 		#define CPU_MSP430_2274     1
