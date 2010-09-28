@@ -51,6 +51,9 @@ INLINE uint16_t hw_readRawTemp(void)
 	/* Trig the temperature sampling */
 	HWREG(ADC0_BASE + ADC_O_PSSI) |= ADC_PSSI_SS3;
 
+	/* Poll untill acquisition end */
+	while (!(HWREG(ADC0_BASE + ADC_O_SSFSTAT3) & ADC_SSFSTAT3_FULL));
+
 	return (uint16_t)HWREG(ADC0_BASE + ADC_O_SSFIFO3);
 }
 
@@ -61,6 +64,9 @@ INLINE uint16_t hw_readIntTemp(void)
 {
 	/* Trig the temperature sampling */
 	HWREG(ADC0_BASE + ADC_O_PSSI) |= ADC_PSSI_SS3;
+
+	/* Poll untill acquisition end */
+	while (!(HWREG(ADC0_BASE + ADC_O_SSFSTAT3) & ADC_SSFSTAT3_FULL));
 
 	return (uint16_t)(14750 - ADC_RANGECONV(HWREG(ADC0_BASE + ADC_O_SSFIFO3), 0, 300) * 75);
 }
