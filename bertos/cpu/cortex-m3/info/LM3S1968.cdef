@@ -58,7 +58,10 @@ MK_CPU_CSRC += DRV_DIR + "gpio_lm3s.c " + DRV_DIR + "clock_lm3s.c "
 
 # Short description of the cpu.
 CPU_DESC += [ "256 Kbytes on-chip flash memory",
-		"64 Kbytes on-chip SRAM memory" ]
+	      "64 Kbytes on-chip SRAM memory",
+	      "3 UARTs interfaces",
+	      "2 I2C interfaces",
+	      "2 ADC x8 channel 10-bit" ]
 
 # GCC flags for this cpu.
 MK_CPU_CPPFLAGS += " -D__ARM_LM3S1968__"

@@ -58,7 +58,10 @@ MK_CPU_CSRC += DRV_DIR + "gpio_stm32.c " + DRV_DIR + "clock_stm32.c "
 
 # Short description of the cpu.
 CPU_DESC += [ "128 Kbytes on-chip flash memory",
-		"20 Kbytes on-chip SRAM memory" ]
+	      "20 Kbytes on-chip SRAM memory",
+	      "2 UARTs interfaces",
+	      "2 I2C interfaces",
+	      "2 ADC x16 channel 12-bit" ]
 
 # GCC flags for this cpu.
 MK_CPU_CPPFLAGS += " -D__ARM_STM32F103RB__"
