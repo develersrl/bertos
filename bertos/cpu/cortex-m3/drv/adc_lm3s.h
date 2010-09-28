@@ -45,15 +45,13 @@
 /**
  * ADC config define.
  */
-#define ADC_MUX_MAXCH         17 //Max number of channel for ADC.
-#define ADC_BITS              10 //Bit resolution for ADC converter.
-
-/**
- * Define PIO controller for enable ADC function.
- * \{
- */
-
-/*\}*/
+#if CPU_CM3_LM3S1968
+	#define ADC_MUX_MAXCH          8 //Max number of channel for ADC.
+	#define ADC_BITS              10 //Bit resolution for ADC converter.
+#elif CPU_CM3_LM3S8962
+	#define ADC_MUX_MAXCH          4 //Max number of channel for ADC.
+	#define ADC_BITS              10 //Bit resolution for ADC convert
+#endif
 
 /**
  * Init the ADC pins.

@@ -62,10 +62,19 @@
 #include <cfg/log.h>
 
 #include <drv/adc.h>
-#include <drv/clock_stm32.h>
-#include <drv/gpio_stm32.h>
+#include <drv/timer.h>
+#include <drv/clock_lm3s.h>
 
 #include <io/lm3s.h>
+
+/* Select witch ADC use */
+#if CPU_CM3_LM3S1968 || CPU_CM3_LM3S8962
+	#define ADC_BASE            ADC0_BASE
+	#define SYSCTL_RCGC_R       SYSCTL_RCGC0_R
+	#define SYSCTL_RCGC_ADC     SYSCTL_RCGC0_ADC0
+#else
+	#error Unknow ADC register for select cpu core
+#endif
 
 
 #if CONFIG_KERN
@@ -96,12 +105,19 @@
 		sig_post(adc_process, SIG_ADC_COMPLETE);
 
 		/* Clear the status bit */
+		HWREG(ADC_BASE + ADC_O_ISC) |= ADC_ISC_IN3;
+
 	}
 
 	static void adc_enable_irq(void)
 	{
+		/* Clear all pending irq */
+		HWREG(ADC_BASE + ADC_O_ISC) = 0;
 		/* Register the IRQ handler */
-		//sysirq_setHandler(ADC_IRQHANDLER, adc_conversion_end_irq);
+		sysirq_setHandler(INT_ADC3, adc_conversion_end_irq);
+		/* Enable IRQ */
+		HWREG(ADC_BASE + ADC_O_SSCTL3) |= ADC_SSCTL3_IE0;
+		HWREG(ADC_BASE + ADC_O_IM) |= ADC_IM_MASK3;
 	}
 
 #endif /* CONFIG_KERN */
@@ -115,7 +131,12 @@
  */
 void adc_hw_select_ch(uint8_t ch)
 {
-	/* We sample only from one channel */
+	/* Select channel that we want read */
+	HWREG(ADC_BASE + ADC_O_SSMUX3) = ch;
+	/* Make single acquisition */
+	HWREG(ADC_BASE + ADC_O_SSCTL3) |= ADC_SSCTL3_END0;
+	/* Enable sequence S03 (single sample on select channel) */
+	HWREG(ADC_BASE + ADC_O_ACTSS) |= ADC_ACTSS_ASEN3;
 }
 
 /**
@@ -132,7 +153,7 @@ uint16_t adc_hw_read(void)
 	#endif
 
 	/* Start convertion */
-    adc->CR2 |= CR2_EXTTRIG_SWSTRT_SET;
+	HWREG(ADC0_BASE + ADC_O_PSSI) |= ADC_PSSI_SS3;
 
 	#if CONFIG_KERN
 		/* Ensure IRQs enabled. */
@@ -140,16 +161,16 @@ uint16_t adc_hw_read(void)
 		sig_wait(SIG_ADC_COMPLETE);
 
 		/* Prevent race condition in case of preemptive kernel */
-
+		uint16_t ret = (uint16_t)HWREG(ADC_BASE + ADC_O_SSFIFO3);
 		MEMORY_BARRIER;
 		adc_process = NULL;
 		return ret;
 	#else
 		/* Wait in polling until conversion is done */
-		//while (!(adc->SR & BV(SR_EOC)));
+		while (!(HWREG(ADC_BASE + ADC_O_SSFSTAT3) & ADC_SSFSTAT3_FULL));
 
 		/* Return the last converted data */
-		return 0;
+		return (uint16_t)HWREG(ADC_BASE + ADC_O_SSFIFO3);
 	#endif
 }
 
@@ -158,9 +179,19 @@ uint16_t adc_hw_read(void)
  */
 void adc_hw_init(void)
 {
+	/* Enable ADC0 clock */
+	SYSCTL_RCGC_R |= SYSCTL_RCGC_ADC;
 
+	/*
+	 * We wait some time because the clock is istable
+	 * and that could cause system hardfault
+	 */
+	lm3s_busyWait(10);
 
-
+	/* Disable all sequence */
+	HWREG(ADC_BASE + ADC_O_ACTSS) = 0;
+	/* Set trigger event to programmed (for all sequence) */
+	HWREG(ADC_BASE + ADC_O_EMUX) = 0;
 
 	#if CONFIG_KERN
 		adc_enable_irq();
