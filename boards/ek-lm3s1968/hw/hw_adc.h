@@ -49,14 +49,25 @@
 INLINE uint16_t hw_readRawTemp(void)
 {
 	/* Trig the temperature sampling */
-	HWREG(ADC0_BASE + ADC_O_PSSI) = BV(3);
+	HWREG(ADC0_BASE + ADC_O_PSSI) |= ADC_PSSI_SS3;
 
 	return (uint16_t)HWREG(ADC0_BASE + ADC_O_SSFIFO3);
 }
 
+/*
+ * Return the cpu core temperature in degrees C*100
+ */
+INLINE uint16_t hw_readIntTemp(void)
+{
+	/* Trig the temperature sampling */
+	HWREG(ADC0_BASE + ADC_O_PSSI) |= ADC_PSSI_SS3;
+
+	return (uint16_t)(14750 - ADC_RANGECONV(HWREG(ADC0_BASE + ADC_O_SSFIFO3), 0, 300) * 75);
+}
+
 INLINE void hw_initIntTemp(void)
 {
-
+	/* Enable ADC0 clock */
 	SYSCTL_RCGC0_R |= SYSCTL_RCGC0_ADC0;
 
 	/* Why this??? */
@@ -67,9 +78,9 @@ INLINE void hw_initIntTemp(void)
 	/* Set trigger event to programmed (for all sequence) */
 	HWREG(ADC0_BASE + ADC_O_EMUX) = 0;
 	/* Enalbe read of temperature sensor */
-	HWREG(ADC0_BASE + ADC_O_SSCTL3) = BV(3);
+	HWREG(ADC0_BASE + ADC_O_SSCTL3) |= ADC_SSCTL3_TS0;
 	/* Enable sequence S03 (single sample on select channel) */
-	HWREG(ADC0_BASE + ADC_O_ACTSS) = BV(3);
+	HWREG(ADC0_BASE + ADC_O_ACTSS) |= ADC_ACTSS_ASEN3;
 }
 
 #endif /* HW_ADC_H */
