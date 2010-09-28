@@ -38,7 +38,9 @@
 
 #include <cpu/detect.h>
 
-#if CPU_CM3_STM32
+#if CPU_CM3_LM3S
+	#include "adc_lm3s.h"
+#elif CPU_CM3_STM32
 	#include "adc_stm32.h"
 /*#elif  Add other ARM families here */
 #else
