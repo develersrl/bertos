@@ -30,13 +30,13 @@
  *
  * -->
  *
- * \brief Script for Luminary Micro LM3S8968 Cortex M3 family processors.
+ * \brief Script for Luminary Micro LM3S8962 Cortex M3 family processors.
  *
  * \author Andrea Righi <arighi@develer.com>
  */
 
 /*
- * Define memory configuration for LM3S1968 board
+ * Define memory configuration for LM3S8962 board
  */
 MEMORY
 {

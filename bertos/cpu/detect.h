@@ -259,7 +259,7 @@
 	#define CPU_CM3 0
 	#define CPU_CM3_LM3S 0
 	#define CPU_CM3_LM3S1968 0
-	#define CPU_CM3_LM3S8968 0
+	#define CPU_CM3_LM3S8962 0
 
 	#define CPU_CM3_STM32 0
 	#define CPU_CM3_STM32F103RB 0
