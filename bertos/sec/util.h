@@ -3,6 +3,7 @@
 
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
+#include <string.h>
 
 /**
  * Purge local variables, by zeroing them.
