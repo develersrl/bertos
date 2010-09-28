@@ -51,13 +51,6 @@
 #define ADC_BITS              12 //Bit resolution for ADC converter.
 
 /**
- * Define PIO controller for enable ADC function.
- * \{
- */
-
-/*\}*/
-
-/**
  * Init the ADC pins.
  * Implement it if necessary.
  */
