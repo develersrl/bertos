@@ -45,9 +45,12 @@
  */
 enum
 {
+#if CPU_CM3_LM3S1968
 	I2C0,
 	I2C1,
-
+#elif CPU_CM3_LM3S8962
+	I2C0,
+#enif
 	I2C_CNT  /**< Number of serial ports */
 };
 

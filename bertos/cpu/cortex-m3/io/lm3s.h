@@ -51,24 +51,25 @@
 #include "lm3s_i2c.h"
 #include "lm3s_adc.h"
 
-
 #if CPU_CM3_LM3S1968
-	#define GPIO_I2C0_SCL_PIN	BV(2)
-	#define GPIO_I2C0_SDA_PIN	BV(3)
+    #define GPIO_I2C0_SCL_PIN   BV(2)
+    #define GPIO_I2C0_SDA_PIN   BV(3)
 
-	#define GPIO_I2C1_SCL_PIN	BV(6)
-	#define GPIO_I2C1_SDA_PIN	BV(7)
+    #define GPIO_I2C1_SCL_PIN   BV(6)
+    #define GPIO_I2C1_SDA_PIN   BV(7)
+#elif CPU_CM3_LM3S8962
+    #define GPIO_I2C0_SCL_PIN   BV(2)
+    #define GPIO_I2C0_SDA_PIN   BV(3)
 #else
-	#error No i2c pins are defined for select cpu
+    #error No i2c pins are defined for select cpu
 #endif
 
-
 /* Flash memory mapping */
-#if CPU_CM3_LM3S1968
-	#define FLASH_SIZE               0x40000 //< 256KiB
-	#define FLASH_PAGE_SIZE          0x400   //< 1KiB
+#if CPU_CM3_LM3S1968 || CPU_CM3_LM3S8962
+    #define FLASH_SIZE               0x40000 //< 256KiB
+    #define FLASH_PAGE_SIZE          0x400   //< 1KiB
 #else
-	#error No embedded definition for select cpu
+    #error No embedded definition for select cpu
 #endif
 
 #endif /* LM3S_H */
