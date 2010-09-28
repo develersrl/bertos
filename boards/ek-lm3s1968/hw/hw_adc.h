@@ -39,7 +39,7 @@
 #define HW_ADC_H
 
 #include <drv/adc.h>
-#include <drv/timer.h>
+#include <drv/clock_lm3s.h>
 
 #include <io/cm3.h>
 
@@ -76,8 +76,11 @@ INLINE void hw_initIntTemp(void)
 	/* Enable ADC0 clock */
 	SYSCTL_RCGC0_R |= SYSCTL_RCGC0_ADC0;
 
-	/* Why this??? */
-	timer_udelay(1);
+	/*
+	 * We wait some time because the clock is istable
+	 * and that could cause system hardfault
+	 */
+	lm3s_busyWait(10);
 
 	/* Disable all sequence */
 	HWREG(ADC0_BASE + ADC_O_ACTSS) = 0;
