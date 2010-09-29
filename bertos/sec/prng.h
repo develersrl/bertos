@@ -32,7 +32,7 @@
  *
  * \brief Generic interface for cryptographically-secure pseudo-RNG
  * \author Giovanni Bajo <rasky@develer.com>
- * 
+ *
  */
 
 #ifndef SEC_PRNG_H
@@ -42,15 +42,16 @@
 #include <cfg/debug.h>
 
 typedef struct PRNG
-{   
+{
     void (*reseed)(struct PRNG *ctx, const uint8_t *seed);
     void (*generate)(struct PRNG *ctx, uint8_t *data, size_t len);
-    size_t seed_len;	
+    uint8_t seed_len;
+	uint8_t seeded;
 } PRNG;
 
 /**
  * Feed a new seed into the PRNG.
- * 
+ *
  * \note: Being a cryptographically-secure PRNG, the seed will be
  * mixed to the current state of the generator, so it is NOT possible
  * to generate the same sequence simply by using the same seed. If you
@@ -60,6 +61,7 @@ INLINE void prng_reseed(PRNG *ctx, const uint8_t *seed)
 {
     ASSERT(ctx->reseed);
     ctx->reseed(ctx, seed);
+	ctx->seeded = 1;
 }
 
 /**
@@ -77,6 +79,7 @@ INLINE size_t prng_seed_len(PRNG *ctx)
 INLINE void prng_generate(PRNG *ctx, uint8_t *data, size_t len)
 {
     ASSERT(ctx->generate);
+	ASSERT(ctx->seeded);
     ctx->generate(ctx, data, len);
 }
 

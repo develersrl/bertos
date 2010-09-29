@@ -173,6 +173,7 @@ void isaac_init(IsaacContext *ctx)
 	ctx->prng.reseed = isaac_reseed;
 	ctx->prng.generate = isaac_generate;
 	ctx->prng.seed_len = sizeof(ctx->randrsl) / 2;
+	ctx->prng.seeded = 0;
 
 	ctx->randcnt = CONFIG_ISAAC_RANDSIZ*4;
 	memset(ctx->randrsl, 0, sizeof(ctx->randrsl));

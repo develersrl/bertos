@@ -123,4 +123,5 @@ void x917_init(X917Context *ctx)
 	ctx->rng.reseed = x917_reseed;
 	ctx->rng.generate = x917_generate;
 	ctx->rng.seed_len = sizeof(ctx->key) + sizeof(ctx->state);
+	ctx->rng.seeded = 0;
 }
