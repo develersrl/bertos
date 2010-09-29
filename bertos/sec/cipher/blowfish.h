@@ -52,10 +52,10 @@ typedef struct BlowfishContext
 } BlowfishContext;
 
 void blowfish_init(BlowfishContext *ctx);
-#if 0
+
 #define blowfish_stackinit(...) \
 	({ BlowfishContext *ctx = alloca(sizeof(BlowfishContext)); blowfish_init(ctx, ##__VA_ARGS__); &ctx->c; })
-#endif
+
 int blowfish_testSetup(void);
 int blowfish_testRun(void);
 int blowfish_testTearDown(void);
