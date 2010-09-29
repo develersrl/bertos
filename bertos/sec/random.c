@@ -48,13 +48,14 @@
 #include <sec/prng/isaac.h>
 #include <sec/prng/x917.h>
 #include <sec/prng/yarrow.h>
+#include <sec/entropy/yarrow_pool.h>
 
 /********************************************************************************/
 /* Configuration of the random module                                           */
 /********************************************************************************/
 
-#define POOL_CONTEXT          PP_CAT(PP_CAT(PRNG_NAMEU, CONFIG_RANDOM_POOL), Context)
-#define POOL_INIT             PP_CAT(PP_CAT(PRNG_NAMEL, CONFIG_RANDOM_POOL), _init)
+#define POOL_CONTEXT          PP_CAT(PP_CAT(POOL_NAMEU, CONFIG_RANDOM_POOL), Context)
+#define POOL_INIT             PP_CAT(PP_CAT(POOL_NAMEL, CONFIG_RANDOM_POOL), _init)
 
 #define EXTRACTOR_STACKINIT   PP_CAT(PP_CAT(EXTRACTOR_NAME, CONFIG_RANDOM_EXTRACTOR), _stackinit)
 
@@ -95,7 +96,7 @@ static bool initialized = 0;
 static void optional_reseeding(void)
 {
 #if CONFIG_RANDOM_POOL != POOL_NONE
-	static ticks_t last_reseed = 0;
+	static ticks_t last_reseed = -1000;
 
 	// We don't allow more than 10 reseedings per second
 	// (as suggested by Fortuna)
