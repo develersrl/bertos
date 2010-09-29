@@ -53,8 +53,8 @@
 /* Configuration of the random module                                           */
 /********************************************************************************/
 
-#define POOL_CONTEXT          PP_CAT(PP_CAT(PRNG_NAME, CONFIG_RANDOM_POOL), Context)
-#define POOL_INIT             PP_CAT(PP_CAT(PRNG_NAME, CONFIG_RANDOM_POOL), _init)
+#define POOL_CONTEXT          PP_CAT(PP_CAT(PRNG_NAMEU, CONFIG_RANDOM_POOL), Context)
+#define POOL_INIT             PP_CAT(PP_CAT(PRNG_NAMEL, CONFIG_RANDOM_POOL), _init)
 
 #define EXTRACTOR_STACKINIT   PP_CAT(PP_CAT(EXTRACTOR_NAME, CONFIG_RANDOM_EXTRACTOR), _stackinit)
 
@@ -68,7 +68,7 @@
 
 #if CONFIG_RANDOM_POOL != POOL_NONE
 static POOL_CONTEXT epool_ctx;
-static EntropyPool_Context * const epool = (EntropyPool_Context *)&epool_ctx;
+static EntropyPool * const epool = (EntropyPool *)&epool_ctx;
 #endif
 
 static PRNG_CONTEXT prng_ctx;
