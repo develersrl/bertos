@@ -47,7 +47,8 @@
 
 #define POOL_NONE       0
 #define POOL_YARROW     1
-#define POOL_NAME1      Yarrow
+#define POOL_NAMEU1     YarrowPool
+#define POOL_NAMEL1     yarrowpool
 
 #define PRNG_ISAAC      1
 #define PRNG_X917       2

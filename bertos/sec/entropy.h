@@ -32,7 +32,7 @@
  *
  * \brief Entropy pool generic interface
  * \author Giovanni Bajo <rasky@develer.com>
- * 
+ *
  */
 
 #ifndef SEC_ENTROPY_H
@@ -49,15 +49,15 @@
  */
 #define CONFIG_ENTROPY_NUM_SOURCES   8
 
-typedef struct EntropyPool_Context
+typedef struct EntropyPool
 {
-    void (*add_entropy)(struct EntropyPool_Context *ctx, int source_idx,
+    void (*add_entropy)(struct EntropyPool *ctx, int source_idx,
                         const uint8_t *data, size_t len,
                         int entropy);
-    bool (*seeding_ready)(struct EntropyPool_Context *ctx);
-    void (*make_seed)(struct EntropyPool_Context *ctx, uint8_t *out, size_t len);
+    bool (*seeding_ready)(struct EntropyPool *ctx);
+    void (*make_seed)(struct EntropyPool *ctx, uint8_t *out, size_t len);
 
-} EntropyPool_Context;
+} EntropyPool;
 
 
 /**
@@ -66,33 +66,33 @@ typedef struct EntropyPool_Context
  * bytes. \a entropy is the number of bits of estimated entropy in the
  * samples. \a source_idx is the index of the entropy source.
  */
-INLINE void entropy_add(EntropyPool_Context *e, int source_idx, 
+INLINE void entropy_add(EntropyPool *e, int source_idx,
                  const uint8_t *data, size_t len,
                  int entropy)
 {
     ASSERT(e->add_entropy);
-    e->add_entropy(e, source_idx, data, len, entropy); 
+    e->add_entropy(e, source_idx, data, len, entropy);
 }
 
 /**
  * Check if the generator is ready to produce a new seed.
  */
-INLINE bool entropy_seeding_ready(EntropyPool_Context *ctx)
+INLINE bool entropy_seeding_ready(EntropyPool *ctx)
 {
     ASSERT(ctx->seeding_ready);
-    return ctx->seeding_ready(ctx); 	
+    return ctx->seeding_ready(ctx);
 }
 
 /**
  * Generate a new seed of the specified length.
- * 
+ *
  * \note This should not be abused to generate a very long seed, since the pool
  * cannot hold lots of entropy.
  */
-INLINE void entropy_make_seed(EntropyPool_Context *ctx, uint8_t *out, size_t len)
+INLINE void entropy_make_seed(EntropyPool *ctx, uint8_t *out, size_t len)
 {
     ASSERT(ctx->make_seed);
-    ctx->make_seed(ctx, out, len); 	
+    ctx->make_seed(ctx, out, len);
 }
 
 #endif /* SEC_ENTROPY_H */
