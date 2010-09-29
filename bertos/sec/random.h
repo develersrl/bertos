@@ -75,7 +75,7 @@
  *     paper, its seeding will not be safe (though still entropic
  *     to allow different sequences to be generated after each reset).
  */
-#define RANDOM_SECURITY_LEVEL          RANDOM_SECURITY_MEDIUM // FIXME: RANDOM_SECURITY_STRONG
+#define RANDOM_SECURITY_LEVEL          RANDOM_SECURITY_STRONG
 
 
 void random_init(void);
