@@ -65,8 +65,8 @@ INLINE uint32_t evaluate_pll(void)
 		{
 			// RC oscillator set to 12 MHz
 			freq = 12000000 / div * (1 + mul);
-			if (ABS(CPU_FREQ - freq) < best_delta) {
-				best_delta = ABS(CPU_FREQ - freq);
+			if (ABS((int)CPU_FREQ - freq) < best_delta) {
+				best_delta = ABS((int)CPU_FREQ - freq);
 				best_mul = mul;
 				best_div = div;
 			}
