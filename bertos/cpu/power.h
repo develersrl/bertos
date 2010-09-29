@@ -68,6 +68,7 @@
  */
 INLINE void cpu_relax(void)
 {
+	MEMORY_BARRIER;
 #if CONFIG_KERN
 	if (proc_preemptAllowed())
 		proc_yield();
