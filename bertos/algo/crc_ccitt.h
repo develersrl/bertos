@@ -55,11 +55,7 @@ extern const uint16_t crc_ccitt_tab[256];
  */
 INLINE uint16_t updcrc_ccitt(uint8_t c, uint16_t oldcrc)
 {
-#if CPU_HARVARD
-	return (oldcrc >> 8) ^ pgm_read_uint16_t(&crc_ccitt_tab[(oldcrc ^ c) & 0xff]);
-#else
-	return (oldcrc >> 8) ^ crc_ccitt_tab[(oldcrc ^ c) & 0xff];
-#endif
+	return (oldcrc >> 8) ^ pgm_read16(&crc_ccitt_tab[(oldcrc ^ c) & 0xff]);
 }
 
 /** CRC-CCITT init value */

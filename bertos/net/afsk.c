@@ -105,11 +105,7 @@ INLINE uint8_t sin_sample(uint16_t idx)
 	uint16_t new_idx = idx % (SIN_LEN / 2);
 	new_idx = (new_idx >= (SIN_LEN / 4)) ? (SIN_LEN / 2 - new_idx - 1) : new_idx;
 
-	#if CPU_HARVARD
-		uint8_t data = pgm_read_char(&sin_table[new_idx]);
-	#else
-		uint8_t data = sin_table[new_idx];
-	#endif
+	uint8_t data = pgm_read8(&sin_table[new_idx]);
 
 	return (idx >= (SIN_LEN / 2)) ? (255 - data) : data;
 }

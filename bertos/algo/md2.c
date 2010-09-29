@@ -59,7 +59,7 @@
 	* Official array of 256 byte pemutation contructed from digits of pi, defined
 	* in the RFC 1319.
 	*/
-	static const uint8_t PGM_ATTR md2_perm[256] =
+	static const uint8_t PROGMEM md2_perm[256] =
 	{
 	41, 46, 67, 201, 162, 216, 124, 1, 61, 54, 84, 161, 236, 240, 6,
 	19, 98, 167, 5, 243, 192, 199, 115, 140, 152, 147, 43, 217, 188,
@@ -81,7 +81,7 @@
 	31, 26, 219, 153, 141, 51, 159, 17, 131, 20
 	};
 
-	#define MD2_PERM(x) PGM_READ_CHAR(&md2_perm[x])
+	#define MD2_PERM(x) pgm_read8(&md2_perm[x])
 #else
 	/**
 	 * Md2_perm() function generate an array of 256 "casual" permutation.
