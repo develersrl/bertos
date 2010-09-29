@@ -58,6 +58,7 @@
 
 #include "usb_stm32.h"
 
+#define ALIGNED(x)	__attribute__ ((__aligned__(x)))
 #define ALIGN_UP(value, align)	(((value) & ((align) - 1)) ? \
 				(((value) + ((align) - 1)) & ~((align) - 1)) : \
 				(value))
@@ -146,6 +147,15 @@ static stm32_UsbMemSlot *mem_use;
 /* USB packet memory management: memory buffer metadata */
 #define EP_MAX_SLOTS	16
 static stm32_UsbMemSlot memory_buffer[EP_MAX_SLOTS];
+
+/* Endpoint TX and RX buffers */
+/// \cond
+/* XXX: use the empty cond section to silent a buggy doxygen warning */
+static bool rx_done, tx_done;
+static size_t rx_size, tx_size;
+static uint8_t rx_buffer[_MIN(CONFIG_USB_RXBUFSIZE, USB_RX_MAX_SIZE)] ALIGNED(4);
+static uint8_t tx_buffer[_MIN(CONFIG_USB_TXBUFSIZE, USB_TX_MAX_SIZE)] ALIGNED(4);
+/// \endcond
 
 /* Allocate a free block of the packet memory */
 static stm32_UsbMemSlot *usb_malloc(void)
@@ -1092,11 +1102,6 @@ static void usb_status_handler(UNUSED_ARG(int, EP))
 	}
 }
 
-static bool rx_done;
-static size_t rx_size;
-static uint8_t rx_buffer[_MIN(CONFIG_USB_RXBUFSIZE, USB_RX_MAX_SIZE)]
-		__attribute__ ((__aligned__(4)));
-
 static void usb_endpointRead_complete(int ep)
 {
 	if (UNLIKELY(ep >= ENP_MAX_NUMB))
@@ -1150,11 +1155,6 @@ ssize_t usb_endpointRead(int ep, void *buffer, ssize_t size)
 
 	return rx_size;
 }
-
-static bool tx_done;
-static size_t tx_size;
-static uint8_t tx_buffer[_MIN(CONFIG_USB_TXBUFSIZE, USB_TX_MAX_SIZE)]
-		__attribute__ ((__aligned__(4)));
 
 static void usb_endpointWrite_complete(int ep)
 {
