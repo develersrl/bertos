@@ -32,7 +32,7 @@
  *
  * \brief ISAAC implementation
  * \author Giovanni Bajo <rasky@develer.com>
- * 
+ *
  */
 
 #ifndef SEC_PRNG_ISAAC_H
@@ -42,7 +42,7 @@
 
 /**
  * Size of the internal ISAAC state (in 32-bit words).
- * 
+ *
  * ISAAC is known to generate unbiased data as follows:
  *   * 3 words: 2^37 unbiased values
  *   * 4 words: 2^45 unbiased values
@@ -50,14 +50,14 @@
  *   * 6 words: 2^61 unbiased values
  *   * 7 words: 2^69 unbiased values
  *   * 8 words: 2^77 unbiased values
- * 
+ *
  * The period of the generator is usually much longer, but it is
  * obviously uninteresting for a CSPRNG.
  */
 #define CONFIG_ISAAC_RANDSIZL   (3)
 #define CONFIG_ISAAC_RANDSIZ    (1<<(CONFIG_ISAAC_RANDSIZL))
 
-typedef struct
+typedef struct IsaacContext
 {
 	PRNG prng;
 	uint32_t randcnt;
@@ -66,12 +66,12 @@ typedef struct
 	uint32_t randa;
 	uint32_t randb;
 	uint32_t randc;
-} ISAAC_Context;
+} IsaacContext;
 
-void ISAAC_init(ISAAC_Context *ctx);
+void isaac_init(IsaacContext *ctx);
 
-#define ISAAC_stackinit(...) \
-	({ ISAAC_Context *ctx = alloca(sizeof(ISAAC_Context)); ISAAC_init(ctx , ##__VA_ARGS__); &ctx->prng; })
+#define isaac_stackinit(...) \
+	({ IsaacContext *ctx = alloca(sizeof(IsaacContext)); isaac_init(ctx , ##__VA_ARGS__); &ctx->prng; })
 
 
 #endif /* SEC_PRNG_ISAAC_H */

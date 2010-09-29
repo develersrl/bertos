@@ -52,7 +52,7 @@
 #define PRNG_ISAAC      1
 #define PRNG_X917       2
 #define PRNG_YARROW     3
-#define PRNG_NAMEU1     ISAAC
+#define PRNG_NAMEU1     Isaac
 #define PRNG_NAMEL1     isaac
 #define PRNG_NAMEU2     X917
 #define PRNG_NAMEL2     x917

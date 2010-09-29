@@ -32,7 +32,7 @@
  *
  * \brief ISAAC implementation
  * \author Giovanni Bajo <rasky@develer.com>
- * 
+ *
  */
 
 /*
@@ -65,7 +65,7 @@ typedef uint8_t ub1;
   *(r++) = b = ind(mm,y>>CONFIG_ISAAC_RANDSIZL) + x; \
 }
 
-static void isaac(ISAAC_Context *ctx)
+static void isaac(IsaacContext *ctx)
 {
 	register ub4 a,b,x,y,*m,*mm,*m2,*r,*mend;
 	mm=ctx->randmem; r=ctx->randrsl;
@@ -100,9 +100,9 @@ static void isaac(ISAAC_Context *ctx)
    h^=a>>9;  c+=h; a+=b; \
 }
 
-static void ISAAC_reseed(PRNG *ctx_, const uint8_t *seed)
+static void isaac_reseed(PRNG *ctx_, const uint8_t *seed)
 {
-	ISAAC_Context *ctx = (ISAAC_Context *)ctx_;
+	IsaacContext *ctx = (IsaacContext *)ctx_;
 	int i;
 	ub4 a,b,c,d,e,f,g,h;
 	ub4 *m,*r;
@@ -141,23 +141,23 @@ static void ISAAC_reseed(PRNG *ctx_, const uint8_t *seed)
 	}
 }
 
-static void ISAAC_generate(PRNG *ctx_, uint8_t *data, size_t len)
+static void isaac_generate(PRNG *ctx_, uint8_t *data, size_t len)
 {
-	ISAAC_Context *ctx = (ISAAC_Context *)ctx_;
+	IsaacContext *ctx = (IsaacContext *)ctx_;
 
 	STATIC_ASSERT(sizeof(ctx->randrsl) == CONFIG_ISAAC_RANDSIZ*4);
 
 	while (len)
 	{
 		ASSERT(ctx->randcnt <= CONFIG_ISAAC_RANDSIZ*4);
-		
+
 		if (ctx->randcnt == CONFIG_ISAAC_RANDSIZ*4)
 		{
 			isaac(ctx);
-			ctx->randcnt = 0;			
+			ctx->randcnt = 0;
 		}
-		
-		size_t L = MIN(len, CONFIG_ISAAC_RANDSIZ*4 - (size_t)ctx->randcnt);	
+
+		size_t L = MIN(len, CONFIG_ISAAC_RANDSIZ*4 - (size_t)ctx->randcnt);
 		memcpy(data, (uint8_t*)ctx->randrsl + ctx->randcnt, L);
 		data += L;
 		ctx->randcnt += L;
@@ -168,10 +168,10 @@ static void ISAAC_generate(PRNG *ctx_, uint8_t *data, size_t len)
 
 /**********************************************************************/
 
-void ISAAC_init(ISAAC_Context *ctx)
+void isaac_init(IsaacContext *ctx)
 {
-	ctx->prng.reseed = ISAAC_reseed;
-	ctx->prng.generate = ISAAC_generate;
+	ctx->prng.reseed = isaac_reseed;
+	ctx->prng.generate = isaac_generate;
 	ctx->prng.seed_len = sizeof(ctx->randrsl) / 2;
 
 	ctx->randcnt = CONFIG_ISAAC_RANDSIZ*4;
