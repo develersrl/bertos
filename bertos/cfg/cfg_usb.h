@@ -54,4 +54,18 @@
  */
 #define USB_LOG_FORMAT     LOG_FMT_TERSE
 
+/**
+ * Size of the USB outbound buffer [bytes].
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 2
+ */
+#define CONFIG_USB_TXBUFSIZE  64
+
+/**
+ * Size of the USB inbound buffer [bytes].
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 2
+ */
+#define CONFIG_USB_RXBUFSIZE  64
+
 #endif /* CFG_USB_H */
