@@ -54,7 +54,7 @@ CPU_DEFAULT_FREQ = "48000000UL"
 CPU_TAGS += ["sam3"]
 
 # Additional hw drivers.
-#MK_CPU_CSRC += DRV_DIR + "gpio_sam3.c " + DRV_DIR + "clock_sam3.c "
+MK_CPU_CSRC += DRV_DIR + "clock_sam3.c "
 
 # Short description of the cpu.
 CPU_DESC += [ "256 Kbytes on-chip flash memory",
