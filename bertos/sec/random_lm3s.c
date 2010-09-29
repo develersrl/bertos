@@ -36,6 +36,7 @@
  */
 
 #include "random_p.h"
+#include <cpu/power.h>
 #include <io/cm3.h>
 #include <drv/clock_lm3s.h>
 
@@ -47,7 +48,8 @@ INLINE uint16_t hw_readRawTemp(void)
     /* Trig the temperature sampling */
     HWREG(ADC0_BASE + ADC_O_PSSI) |= ADC_PSSI_SS3;
 
-	while (!(HWREG(ADC0_BASE + ADC_O_SSFSTAT3) & ADC_SSFSTAT3_FULL));
+	while (!(HWREG(ADC0_BASE + ADC_O_SSFSTAT3) & ADC_SSFSTAT3_FULL))
+		cpu_relax();
 
     return (uint16_t)HWREG(ADC0_BASE + ADC_O_SSFIFO3);
 }
