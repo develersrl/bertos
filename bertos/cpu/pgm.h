@@ -56,7 +56,7 @@
 #if CPU_AVR
 
 	#ifdef __AVR_ENHANCED__
-		#define pgm_read_char(addr) \
+		#define pgm_read8(addr) \
 		({ \
 			uint16_t __addr16 = (uint16_t)(addr); \
 			uint8_t __result; \
@@ -68,7 +68,7 @@
 			); \
 			__result; \
 		})
-		#define pgm_read_uint16_t(addr) \
+		#define pgm_read16(addr) \
 		({ \
 			uint16_t __addr16 = (uint16_t)(addr); \
 			uint16_t __result; \
@@ -85,7 +85,7 @@
 
 	#else /* !__AVR_ENHANCED__ */
 
-		#define pgm_read_char(addr) \
+		#define pgm_read8(addr) \
 		({ \
 			uint16_t __addr16 = (uint16_t)(addr); \
 			uint8_t __result; \
@@ -99,7 +99,7 @@
 			); \
 			__result; \
 		})
-		#define pgm_read_uint16_t(addr) \
+		#define pgm_read16(addr) \
 		({ \
 			uint16_t __addr16 = (uint16_t)(addr); \
 			uint16_t __result; \
@@ -119,12 +119,7 @@
 
 	#endif /* !__AVR_ENHANCED__ */
 
-	#if SIZEOF_INT == 2
-		#define pgm_read_int(addr) ((int)pgm_read_uint16_t(addr))
-	#else
-		#error Missing support for CPU word size != 16bit
-	#endif
-
+	#define pgm_read32(addr)	((uint32_t)(pgm_read16(addr) | (((uint32_t)pgm_read16(((const uint8_t *)(addr)) + 2)) << 16)))
 	#ifndef PROGMEM
 	#define PROGMEM  __attribute__((__progmem__))
 	#endif
@@ -137,6 +132,25 @@
 
 #elif CPU_HARVARD
 	#error Missing CPU support
+#endif
+
+
+#if !CPU_HARVARD
+	#define pgm_read8(a)     (*(const uint8_t  *)(a))
+	#define pgm_read16(a)    (*(const uint16_t *)(a))
+	#define pgm_read32(a)    (*(const uint32_t *)(a))
+#endif
+
+#define pgm_read_char(a)        pgm_read8(a)
+#define pgm_read_uint16_t(addr) pgm_read16(addr)
+
+
+#if SIZEOF_INT == 2
+	#define pgm_read_int(addr) ((int)pgm_read16(addr))
+#elif SIZEOF_INT == 4
+	#define pgm_read_int(addr) ((int)pgm_read32(addr))
+#else
+	#error Missing support for CPU word size!
 #endif
 
 #ifndef PSTR
@@ -196,16 +210,23 @@ typedef PROGMEM uint32_t pgm_uint32_t;
  * \{
  */
 #ifdef _PROGMEM
-	#define PGM_READ_CHAR(s) pgm_read_char(s)
+	#define PGM_READ8(a)     pgm_read8(a)
+	#define PGM_READ16(a)    pgm_read16(a)
+	#define PGM_READ32(a)    pgm_read32(a)
 	#define PGM_FUNC(x)      PFUNC(x)
 	#define PGM_STR(x)       PSTR(x)
 	#define PGM_ATTR         PROGMEM
 #else
-	#define PGM_READ_CHAR(s) (*(s))
+	#define PGM_READ8(a)     (*(const uint8_t  *)(a))
+	#define PGM_READ16(a)    (*(const uint16_t *)(a))
+	#define PGM_READ32(a)    (*(const uint32_t *)(a))
 	#define PGM_FUNC(x)      x
 	#define PGM_STR(x)       x
 	#define PGM_ATTR         /* nothing */
 #endif
+
+#define PGM_READ_CHAR(addr)      PGM_READ8(addr)
+
 /* \} */
 
 
