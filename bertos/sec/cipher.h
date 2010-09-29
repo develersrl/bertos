@@ -117,7 +117,7 @@ INLINE void cipher_ecb_decrypt(BlockCipher *c, void *block)
  */
 INLINE void cipher_cbc_begin(BlockCipher *c, void *iv)
 {
-	c->buf = ivbuf;
+	c->buf = iv;
 }
 
 /**
