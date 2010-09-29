@@ -94,8 +94,6 @@ static void yarrow_reseed(PRNG *ctx_, const uint8_t *seed)
 	hash_update(h, seed, ctx->prng.seed_len);
 	hash_update(h, ctx->curkey, sizeof(ctx->curkey));
 	memcpy(ctx->curkey, hash_final(h), sizeof(ctx->curkey));
-	kprintf("Yarrow reseeding:");
-	kdump(ctx->curkey, sizeof(ctx->curkey));
 
 	// Reset the counter for the sequence
 	memset(ctx->counter, 0, sizeof(ctx->counter));
