@@ -43,7 +43,7 @@
 
 typedef struct BlockCipher
 {
-	void (*set_key)(struct BlockCipher *c, const void *key);
+	void (*set_key)(struct BlockCipher *c, const void *key, size_t len);
 	void (*enc_block)(struct BlockCipher *c, void *block);
 	void (*dec_block)(struct BlockCipher *c, void *block);
 
@@ -54,7 +54,10 @@ typedef struct BlockCipher
 
 
 /**
- * Return the key length (in bytes)
+ * Return the key length (in bytes).
+ *
+ * In case of ciphers that allow a variabile key size with a fixed state
+ * (eg: Blowfish), this returns the preferred key length.
  */
 INLINE size_t cipher_key_len(BlockCipher *c)
 {
@@ -73,12 +76,29 @@ INLINE size_t cipher_block_len(BlockCipher *c)
  * Set the current key used by the cipher.
  *
  * \note the buffer pointed by \a key is not modified and it is
- * not needed anymore after this call returns.
+ * not needed anymore after this call returns. Its lenght must match
+ * the value returned by \a cipher_key_len().
  */
 INLINE void cipher_set_key(BlockCipher *c, const void *key)
 {
 	ASSERT(c->set_key);
-	c->set_key(c, key);
+	c->set_key(c, key, c->key_len);
+}
+
+/**
+ * Set the current key (of variable size) used by the cipher.
+ *
+ * This function is useful for ciphers that allow a variable size for the key
+ * (even with a fixed state). For all the other ciphers, the length must
+ * match the value returned by \a cipher_key_len().
+ *
+ * \note the buffer pointed by \a key is not modified and it is
+ * not needed anymore after this call returns.
+ */
+INLINE void cipher_set_vkey(BlockCipher *c, const void *key, size_t len)
+{
+	ASSERT(c->set_key);
+	c->set_key(c, key, len);
 }
 
 /*********************************************************************************/
