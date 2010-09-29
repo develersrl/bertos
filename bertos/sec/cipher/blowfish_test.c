@@ -166,9 +166,11 @@ int blowfish_testTearDown(void)
 
 int blowfish_testRun(void)
 {
+	// NOTE: we use a static variable here to avoid stack overflows due to the huge
+	// context structure of blowfish.
 	static BlowfishContext ctx;
 	blowfish_init(&ctx);
-	BlockCipher *c = &ctx.c; //blowfish_stackinit();
+	BlockCipher *c = &ctx.c;
 
 	for (int i=0; i<NUM_VARIABLE_KEY_TESTS; ++i)
 	{
