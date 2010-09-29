@@ -130,10 +130,14 @@ enum usb_device_state {
 #define USB_DT_CS_INTERFACE		(USB_TYPE_CLASS | USB_DT_INTERFACE)
 #define USB_DT_CS_ENDPOINT		(USB_TYPE_CLASS | USB_DT_ENDPOINT)
 
-/*
+/**
+ *
+ * USB Control Request descriptor
+ *
  * This structure is used to send control requests to a USB device.
  *
- * It matches the different fields of the USB 2.0 spec. section 9.3, table 9-2.
+ * It matches the different fields of the USB 2.0 specification (section 9.3,
+ * table 9-2).
  */
 typedef struct UsbCtrlRequest
 {
@@ -144,14 +148,22 @@ typedef struct UsbCtrlRequest
 	uint16_t wLength;
 } PACKED UsbCtrlRequest;
 
-/* All standard descriptors have these 2 fields at the beginning */
+/**
+ * USB common descriptor header.
+ *
+ * \note All the USB standard descriptors have these 2 fields at the beginning.
+ */
 typedef struct UsbDescHeader
 {
 	uint8_t bLength;
 	uint8_t bDescriptorType;
 } PACKED UsbDescHeader;
 
-/* Device descriptor */
+/**
+ * USB Device descriptor
+ *
+ * \note See USB 2.0 specification.
+ */
 typedef struct UsbDeviceDesc
 {
 	uint8_t bLength;
@@ -170,7 +182,11 @@ typedef struct UsbDeviceDesc
 	uint8_t bNumConfigurations;
 } PACKED UsbDeviceDesc;
 
-/* USB string descriptor */
+/**
+ * USB string descriptor.
+ *
+ * \note See USB 2.0 specification.
+ */
 typedef struct UsbStringDesc
 {
 	uint8_t bLength;
@@ -178,11 +194,6 @@ typedef struct UsbStringDesc
 	uint8_t data[0];
 } PACKED UsbStringDesc;
 
-/*
- * Macros to define USB strings
- *
- * TODO: add comment.
- */
 #define USB_STRING_1(__a, ...) __a "\x00"
 #define USB_STRING_2(__a, ...) __a "\x00" USB_STRING_1(__VA_ARGS__)
 #define USB_STRING_3(__a, ...) __a "\x00" USB_STRING_2(__VA_ARGS__)
@@ -200,18 +211,35 @@ typedef struct UsbStringDesc
 #define USB_STRING_15(__a, ...) __a "\x00" USB_STRING_14(__VA_ARGS__)
 #define USB_STRING_16(__a, ...) __a "\x00" USB_STRING_15(__VA_ARGS__)
 
+/**
+ * Pack a list with a variable number of elements into a UTF-16LE USB string.
+ *
+ * \note The macro is recursively defined according the number of elements
+ * passed as argument. At the moment we support strings with up to 16
+ * characters.
+ */
 #define USB_STRING(...) PP_CAT(USB_STRING_, PP_COUNT(__VA_ARGS__))(__VA_ARGS__)
 
-#define DEFINE_USB_STRING(__name, __text)			\
-	struct {						\
-		UsbDescHeader __header;		\
-		uint8_t __body[sizeof(__text)];			\
-	} PACKED __name = {					\
-		.__header = {					\
-			.bLength = sizeof(__name),		\
-			.bDescriptorType = USB_DT_STRING,	\
-		},						\
-		.__body = {__text},				\
+/**
+ * Define and initialize an USB string descriptor.
+ *
+ * This macro is reuquired to properly declare and initialize a constant USB
+ * string in UTF-16LE format.
+ *
+ * The structure must contain the standard common USB header (UsbDescHeader)
+ * and the UTF-16LE string all packed in a contiguous memory region.
+ */
+#define DEFINE_USB_STRING(__name, __text)				\
+	struct {							\
+		UsbDescHeader __header;					\
+		uint8_t __body[sizeof(__text)];				\
+	} PACKED __name = {						\
+		.__header = {						\
+			.bLength =					\
+				cpu_to_le16((uint16_t)sizeof(__name)),	\
+			.bDescriptorType = USB_DT_STRING,		\
+		},							\
+		.__body = {__text},					\
 	}
 
 /*
@@ -246,7 +274,11 @@ typedef struct UsbStringDesc
 #define USB_CDC_SUBCLASS_EEM                    0x0c
 #define USB_CDC_SUBCLASS_NCM                    0x0d
 
-/* Device configuration descriptor */
+/**
+ * Device configuration descriptor
+ *
+ * \note See USB 2.0 specification.
+ */
 typedef struct UsbConfigDesc
 {
 	uint8_t bLength;
@@ -265,7 +297,11 @@ typedef struct UsbConfigDesc
 #define USB_CONFIG_ATT_WAKEUP		(1 << 5)	/* can wakeup */
 #define USB_CONFIG_ATT_BATTERY		(1 << 4)	/* battery powered */
 
-/* Device interface descriptor */
+/**
+ * Device interface descriptor
+ *
+ * \note See USB 2.0 specification.
+ */
 typedef struct UsbInterfaceDesc
 {
 	uint8_t bLength;
@@ -279,7 +315,11 @@ typedef struct UsbInterfaceDesc
 	uint8_t iInterface;
 } PACKED UsbInterfaceDesc;
 
-/* Endpoint descriptor */
+/**
+ * Endpoint descriptor
+ *
+ * \note See USB 2.0 specification.
+ */
 typedef struct UsbEndpointDesc
 {
 	uint8_t bLength;
@@ -309,54 +349,56 @@ typedef struct UsbEndpointDesc
 #define USB_ENDPOINT_XFER_INT		3
 #define USB_ENDPOINT_MAX_ADJUSTABLE	0x80
 
-/* USB: generic device descriptor */
+/**
+ * USB: generic device descriptor
+ */
 typedef struct UsbDevice
 {
-	UsbDeviceDesc *device;
-	const UsbDescHeader **config;
-	const UsbStringDesc **strings;
+	UsbDeviceDesc *device;              ///< USB 2.0 device descriptor
+	const UsbDescHeader **config;       ///< USB 2.0 configuration descriptors
+	const UsbStringDesc **strings;      ///< USB strings
 
 	/* Callbacks */
-	void (*event_cb)(UsbCtrlRequest *);
+	void (*event_cb)(UsbCtrlRequest *); ///< Called to handle control requests.
 
 	/* Private data */
-	bool configured;
+	bool configured;                    ///< True when the device has been correctly initialized.
 } UsbDevice;
 
-/*
- * usb_endpointNum - get the endpoint's number
+/**
+ * Get the endpoint's address number of \a epd.
  */
 INLINE int usb_endpointNum(const UsbEndpointDesc *epd)
 {
 	return epd->bEndpointAddress & USB_ENDPOINT_NUMBER_MASK;
 }
 
-/*
- * usb_endpointType - get the endpoint's transfer type
+/**
+ * Get the transfer type of the endpoint \a epd.
  */
 INLINE int usb_endpointType(const struct UsbEndpointDesc *epd)
 {
 	return epd->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK;
 }
 
-/*
- * usb_endpointDirIn - check if the endpoint has IN direction
+/**
+ * Check if the endpoint \a epd has IN direction.
  */
 INLINE int usb_endpointDirIn(const struct UsbEndpointDesc *epd)
 {
 	return ((epd->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN);
 }
 
-/*
- * usb_endpointDirOut - check if the endpoint has OUT direction
+/**
+ * Check if the endpoint \a epd has OUT direction.
  */
 INLINE int usb_endpointDirOut(const struct UsbEndpointDesc *epd)
 {
 	return ((epd->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_OUT);
 }
 
-/*
- * usb_endpointXferBulk - check if the endpoint has bulk transfer type
+/**
+ * Check if the endpoint \a epd has bulk transfer type.
  */
 INLINE int usb_endpointXferBulk(const struct UsbEndpointDesc *epd)
 {
@@ -364,8 +406,8 @@ INLINE int usb_endpointXferBulk(const struct UsbEndpointDesc *epd)
 		USB_ENDPOINT_XFER_BULK);
 }
 
-/*
- * usb_endpointXferControl - check if the endpoint has control transfer type
+/**
+ * Check if the endpoint \a epd has control transfer type.
  */
 INLINE int usb_endpointXferControl(const struct UsbEndpointDesc *epd)
 {
@@ -373,8 +415,8 @@ INLINE int usb_endpointXferControl(const struct UsbEndpointDesc *epd)
 		USB_ENDPOINT_XFER_CONTROL);
 }
 
-/*
- * usb_endpointXferInt - check if the endpoint has interrupt transfer type
+/**
+ * Check if the endpoint \a epd has interrupt transfer type.
  */
 INLINE int usb_endpointXferInt(const struct UsbEndpointDesc *epd)
 {
@@ -382,8 +424,8 @@ INLINE int usb_endpointXferInt(const struct UsbEndpointDesc *epd)
 		USB_ENDPOINT_XFER_INT);
 }
 
-/*
- * usb_endpointXferIsoc - check if the endpoint has isochronous transfer type
+/**
+ * Check if the endpoint \a epd has isochronous transfer type.
  */
 INLINE int usb_endpointXferIsoc(const struct UsbEndpointDesc *epd)
 {
@@ -391,66 +433,72 @@ INLINE int usb_endpointXferIsoc(const struct UsbEndpointDesc *epd)
 		USB_ENDPOINT_XFER_ISOC);
 }
 
-/*
- * usb_endpointIsBulkIn - check if the endpoint is bulk IN
+/**
+ * Check if the endpoint \a epd is bulk IN.
  */
 INLINE int usb_endpointIsBulkIn(const struct UsbEndpointDesc *epd)
 {
 	return usb_endpointXferBulk(epd) && usb_endpointDirIn(epd);
 }
 
-/*
- * usb_endpointIsBulkOut - check if the endpoint is bulk OUT
+/**
+ * Check if the endpoint \a epd is bulk OUT.
  */
 INLINE int usb_endpointIsBulkOut(const struct UsbEndpointDesc *epd)
 {
 	return usb_endpointXferBulk(epd) && usb_endpointDirOut(epd);
 }
 
-/*
- * usb_endpointIsIntIn - check if the endpoint is interrupt IN
+/**
+ * Check if the endpoint \a epd is interrupt IN.
  */
 INLINE int usb_endpointIsIntIn(const struct UsbEndpointDesc *epd)
 {
 	return usb_endpointXferInt(epd) && usb_endpointDirIn(epd);
 }
 
-/*
- * usb_endpointIsIntOut - check if the endpoint is interrupt OUT
+/**
+ * Check if the endpoint \a epd is interrupt OUT.
  */
 INLINE int usb_endpointIsIntOut(const struct UsbEndpointDesc *epd)
 {
 	return usb_endpointXferInt(epd) && usb_endpointDirOut(epd);
 }
 
-/*
- * usb_endpointIsIsocIn - check if the endpoint is isochronous IN
+/**
+ * Check if the endpoint \a epd is isochronous IN.
  */
 INLINE int usb_endpointIsIsocIn(const struct UsbEndpointDesc *epd)
 {
 	return usb_endpointXferIsoc(epd) && usb_endpointDirIn(epd);
 }
 
-/*
- * usb_endpointIsIsocOut - check if the endpoint is isochronous OUT
+/**
+ * Check if the endpoint \a epd is isochronous OUT.
  */
 INLINE int usb_endpointIsIsocOut(const struct UsbEndpointDesc *epd)
 {
 	return usb_endpointXferIsoc(epd) && usb_endpointDirOut(epd);
 }
 
-/*
- * usb_endpointRead - configure endponint and perform the read operation
+/**
+ * Read up to \a size bytes from the USB endpoint identified by the address
+ * \a ep and store them in \a buffer.
+ *
+ * \return number of bytes actually read.
  */
 ssize_t usb_endpointRead(int ep, void *buffer, ssize_t size);
 
-/*
- * usb_endpointWrite - configure endponint and perform the write operation
+/**
+ * Write up to \a size bytes from the buffer pointed \a buffer to the USB
+ * endpoint identified by the address \a ep.
+ *
+ * \return number of bytes actually wrote.
  */
 ssize_t usb_endpointWrite(int ep, const void *buffer, ssize_t size);
 
-/*
- * usb_deviceRegister - register a generic USB device driver
+/**
+ * Register a generic USB device driver \a dev in the USB controller.
  */
 int usb_deviceRegister(UsbDevice *dev);
 
