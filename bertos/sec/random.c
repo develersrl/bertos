@@ -46,18 +46,20 @@
 #include <sec/util.h>
 #include <sec/hash/sha1.h>
 #include <sec/prng/isaac.h>
+#include <sec/prng/x917.h>
+#include <sec/prng/yarrow.h>
 
 /********************************************************************************/
 /* Configuration of the random module                                           */
 /********************************************************************************/
 
-#define POOL_CONTEXT          PP_CAT(PP_CAT(PRNG_NAME, CONFIG_RANDOM_POOL), _Context)
+#define POOL_CONTEXT          PP_CAT(PP_CAT(PRNG_NAME, CONFIG_RANDOM_POOL), Context)
 #define POOL_INIT             PP_CAT(PP_CAT(PRNG_NAME, CONFIG_RANDOM_POOL), _init)
 
 #define EXTRACTOR_STACKINIT   PP_CAT(PP_CAT(EXTRACTOR_NAME, CONFIG_RANDOM_EXTRACTOR), _stackinit)
 
-#define PRNG_CONTEXT          PP_CAT(PP_CAT(PRNG_NAME, CONFIG_RANDOM_PRNG), _Context)
-#define PRNG_INIT             PP_CAT(PP_CAT(PRNG_NAME, CONFIG_RANDOM_PRNG), _init)
+#define PRNG_CONTEXT          PP_CAT(PP_CAT(PRNG_NAMEU, CONFIG_RANDOM_PRNG), Context)
+#define PRNG_INIT             PP_CAT(PP_CAT(PRNG_NAMEL, CONFIG_RANDOM_PRNG), _init)
 
 
 /********************************************************************************/
@@ -81,11 +83,11 @@ static bool initialized = 0;
 
 /*
  * Reseed the PRNG if there is enough entropy available at this time.
- * 
- * Some designs (eg: fortuna) suggest to artificially limit the frequency of 
+ *
+ * Some designs (eg: fortuna) suggest to artificially limit the frequency of
  * this operation to something like 0.1s, to avoid attacks that try to exhaust
  * the entropy pool.
- * 
+ *
  * We don't believe such attacks are available in an embedded system (as an attacker
  * does not have a way to ask random numbers from the pool) but we will play safe
  * here in case eg. the user does something wrong.
@@ -95,19 +97,19 @@ static void optional_reseeding(void)
 #if CONFIG_RANDOM_POOL != POOL_NONE
 	static ticks_t last_reseed = 0;
 
-	// We don't allow more than 10 reseedings per second 
+	// We don't allow more than 10 reseedings per second
 	// (as suggested by Fortuna)
 	ticks_t current = timer_clock();
 	if (ticks_to_ms(current - last_reseed) < 100)
 		return;
-	
+
 	if (entropy_seeding_ready(epool))
 	{
 		uint8_t seed[prng_seed_len(prng)];
-		
+
 		entropy_make_seed(epool, seed, sizeof(seed));
 		prng_reseed(prng, seed);
-		
+
 		last_reseed = current;
 		PURGE(seed);
 	}
@@ -117,7 +119,7 @@ static void optional_reseeding(void)
 
 /*
  * Perform the initial seeding of the PRNG.
- * 
+ *
  * At startup, we want to immediately seed the PRNG to a point where it can
  * generate safe-enough random numbers. To do this, we rely on a hw-dependent
  * function to pull entropy from available hw sources, and then feed it
@@ -134,7 +136,7 @@ static void initial_seeding(void)
 		random_pull_entropy(buf, sizeof(buf));
 		entropy_add(epool, 0, buf, sizeof(buf), sizeof(buf)*8);
 	} while (!entropy_seeding_ready(epool));
-	
+
 	optional_reseeding();
 
 #elif CONFIG_RANDOM_EXTRACTOR != EXTRACTOR_NONE

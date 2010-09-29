@@ -52,9 +52,12 @@
 #define PRNG_ISAAC      1
 #define PRNG_X917       2
 #define PRNG_YARROW     3
-#define PRNG_NAME1      ISAAC
-#define PRNG_NAME2      X917
-#define PRNG_NAME3      Yarrow
+#define PRNG_NAMEU1     ISAAC
+#define PRNG_NAMEL1     isaac
+#define PRNG_NAMEU2     X917
+#define PRNG_NAMEL2     x917
+#define PRNG_NAMEU3     Yarrow
+#define PRNG_NAMEL3     yarrow
 
 #define EXTRACTOR_NONE  0
 #define EXTRACTOR_SHA1  1
@@ -63,11 +66,11 @@
 #if RANDOM_SECURITY_LEVEL == RANDOM_SECURITY_STRONG
 	#define CONFIG_RANDOM_POOL          POOL_YARROW
 	#define CONFIG_RANDOM_EXTRACTOR     EXTRACTOR_NONE   // not required with a pool
-	#define CONFIG_RANDOM_PRNG          PRNG_ISAAC   // FIXME: PRNG_YARROW
+	#define CONFIG_RANDOM_PRNG          PRNG_YARROW
 #elif RANDOM_SECURITY_LEVEL == RANDOM_SECURITY_MEDIUM
 	#define CONFIG_RANDOM_POOL          POOL_NONE
 	#define CONFIG_RANDOM_EXTRACTOR     EXTRACTOR_SHA1
-	#define CONFIG_RANDOM_PRNG          PRNG_ISAAC   // FIXME: PRNG_X917
+	#define CONFIG_RANDOM_PRNG          PRNG_X917
 #elif RANDOM_SECURITY_LEVEL == RANDOM_SECURITY_MINIMUM
 	#define CONFIG_RANDOM_POOL          POOL_NONE
 	#define CONFIG_RANDOM_EXTRACTOR     EXTRACTOR_NONE
@@ -92,7 +95,7 @@ enum EntropySource
 /*
  * Add entropy to the global entropy pool.
  */
-void random_add_entropy(enum EntropySource source_idx, 
+void random_add_entropy(enum EntropySource source_idx,
 	   				    const uint8_t *data, size_t len,
 						int entropy);
 
@@ -100,11 +103,11 @@ void random_add_entropy(enum EntropySource source_idx,
 /*
  * Add entropy to the global interrupt pool based on the IRQ
  * call time.
- * 
+ *
  * This function can be called from interrupt handlers that are
- * triggered at unpredictable intervals (so it should not be 
+ * triggered at unpredictable intervals (so it should not be
  * called from clock-driven interrupts like ADC, PWM, etc.).
- * 
+ *
  */
 void random_add_entropy_irq(int irq);
 

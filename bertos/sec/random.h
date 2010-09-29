@@ -46,28 +46,28 @@
 
 /**
  * Configure the security level required by the application.
- * 
+ *
  * Application developers are suggested to keep the strongest
  * setting (default) unless there are memory or code size issues.
- * 
+ *
  * Available settings are:
- * 
+ *
  *   * \a RANDOM_SECURITY_STRONG: The random library will use
  *     an entropy pool, automatically feeded by drivers, to gather
  *     entropy from hardware sources. Data from the pool will
  *     be used to reseed a secure random number generator. Moreover,
  *     the generator will be automatically initialised
- *     with enough entropy to generate safe random numbers even 
+ *     with enough entropy to generate safe random numbers even
  *     immediately after hw reset.
  *     The overall structure is the same as used by modern
  * 	   desktop PCs for generating secure random numbers.
- * 
+ *
  *  * \a RANDOM_SECURITY_MEDIUM: This intermediate settings will
- *     avoid usage of an entropy pool, to reduce memory and code 
+ *     avoid usage of an entropy pool, to reduce memory and code
  *     usage. The security of this settings relies only on the
  *     good behaviour of the random number generator (even though
  *     it will be well-seeded at startup).
- * 
+ *
  *  * \a RANDOM_SECURITY_MINIMUM: This is the lighter setting that
  *     allows minimal memory and code usage, and it suggested only
  *     for extremely constrained systems, that only generates few
@@ -93,14 +93,14 @@ INLINE uint16_t random_gen16(void)
 {
 	uint8_t x;
 	random_gen(&x, 2);
-	return x;	
+	return x;
 }
 
 INLINE uint32_t random_gen32(void)
 {
 	uint8_t x;
 	random_gen(&x, 4);
-	return x;		
+	return x;
 }
 
 #endif /* SEC_RANDOM_H */
