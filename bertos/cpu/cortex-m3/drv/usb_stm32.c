@@ -61,6 +61,10 @@
 #define ALIGN_UP(value, align)	(((value) & ((align) - 1)) ? \
 				(((value) + ((align) - 1)) & ~((align) - 1)) : \
 				(value))
+
+/* XXX: redefine this to make it usable within C expression */
+#define _MIN(a,b)	(((a) < (b)) ? (a) : (b))
+
 /* STM32 USB registers */
 struct stm32_usb
 {
@@ -1078,6 +1082,8 @@ static void usb_status_handler(UNUSED_ARG(int, EP))
 
 static bool rx_done;
 static size_t rx_size;
+static uint8_t rx_buffer[_MIN(CONFIG_USB_RXBUFSIZE, USB_RX_MAX_SIZE)]
+		__attribute__ ((__aligned__(4)));
 
 static void usb_endpointRead_complete(int ep)
 {
@@ -1095,6 +1101,7 @@ static void usb_endpointRead_complete(int ep)
 ssize_t usb_endpointRead(int ep, void *buffer, ssize_t size)
 {
 	int ep_num = usb_ep_logical_to_hw(ep);
+	ssize_t max_size = sizeof(rx_buffer);
 
 	if (UNLIKELY((size_t)buffer & 0x03))
 	{
@@ -1106,29 +1113,42 @@ ssize_t usb_endpointRead(int ep, void *buffer, ssize_t size)
 	if (ep_num == CTRL_ENP_OUT)
 	{
 		size = usb_size(size, usb_le16_to_cpu(setup_packet.wLength));
+		if (UNLIKELY(size > max_size))
+		{
+			LOG_ERR("%s: rx_buffer exceeded, try to enlarge CONFIG_USB_RXBUFSIZE\n",
+					__func__);
+			ASSERT(0);
+			return -USB_BUF_OVERFLOW;
+		}
 		if (!size)
 			usb_status_handler(ep_num);
 		else
-			__usb_ep_read(ep_num, buffer, size,
+		{
+			__usb_ep_read(ep_num, rx_buffer, size,
 					usb_status_handler);
+			memcpy(buffer, rx_buffer, size);
+		}
 		return size;
 	}
 	if (UNLIKELY(!size))
 		return 0;
-	size = MIN(size, USB_RX_MAX_SIZE);
+	size = MIN(size, max_size);
 	rx_done = false;
 	rx_size = 0;
 
 	/* Blocking read */
-	__usb_ep_read(ep_num, buffer, size, usb_endpointRead_complete);
+	__usb_ep_read(ep_num, rx_buffer, size, usb_endpointRead_complete);
 	while (!rx_done)
 		cpu_relax();
+	memcpy(buffer, rx_buffer, rx_size);
 
 	return rx_size;
 }
 
 static bool tx_done;
 static size_t tx_size;
+static uint8_t tx_buffer[_MIN(CONFIG_USB_TXBUFSIZE, USB_TX_MAX_SIZE)]
+		__attribute__ ((__aligned__(4)));
 
 static void usb_endpointWrite_complete(int ep)
 {
@@ -1146,6 +1166,7 @@ static void usb_endpointWrite_complete(int ep)
 ssize_t usb_endpointWrite(int ep, const void *buffer, ssize_t size)
 {
 	int ep_num = usb_ep_logical_to_hw(ep);
+	ssize_t max_size = sizeof(tx_buffer);
 
 	if (UNLIKELY((size_t)buffer & 0x03))
 	{
@@ -1157,21 +1178,32 @@ ssize_t usb_endpointWrite(int ep, const void *buffer, ssize_t size)
 	if (ep_num == CTRL_ENP_IN)
 	{
 		size = usb_size(size, usb_le16_to_cpu(setup_packet.wLength));
+		if (UNLIKELY(size > max_size))
+		{
+			LOG_ERR("%s: tx_buffer exceeded, try to enlarge CONFIG_USB_TXBUFSIZE\n",
+					__func__);
+			ASSERT(0);
+			return -USB_BUF_OVERFLOW;
+		}
 		if (!size)
 			usb_status_handler(ep_num);
 		else
-			__usb_ep_write(ep_num, buffer, size,
+		{
+			memcpy(tx_buffer, buffer, size);
+			__usb_ep_write(ep_num, tx_buffer, size,
 					usb_status_handler);
+		}
 		return size;
 	}
 	if (UNLIKELY(!size))
 		return 0;
-	size = MIN(size, USB_TX_MAX_SIZE);
+	size = MIN(size, max_size);
 	tx_done = false;
 	tx_size = 0;
 
 	/* Blocking write */
-	__usb_ep_write(ep_num, buffer, size, usb_endpointWrite_complete);
+	memcpy(tx_buffer, buffer, size);
+	__usb_ep_write(ep_num, tx_buffer, size, usb_endpointWrite_complete);
 	while (!tx_done)
 		cpu_relax();
 
@@ -1545,6 +1577,7 @@ static int usb_set_config_state(uint32_t conf)
 			udc.alt[i] = 0;
 		usb_set_device_state(USB_STATE_CONFIGURED);
 		usb_dev->configured = true;
+		LOG_INFO("%s: device configured\n", __func__);
 	}
 	else
 	{
