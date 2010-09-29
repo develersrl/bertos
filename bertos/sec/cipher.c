@@ -64,16 +64,21 @@ static void ctr_increment(void *buf, size_t len)
 			return;
 }
 
+void cipher_ctr_step(BlockCipher *c, void *block)
+{
+	memcpy(block, c->buf, c->block_len);
+	c->enc_block(c, block);
+	ctr_increment(c->buf, c->block_len);
+}
+
 void cipher_ctr_encrypt(BlockCipher *c, void *block)
 {
 	uint8_t temp[c->block_len];
 
-	memcpy(temp, c->buf, c->block_len);
-	c->enc_block(c, temp);
+	cipher_ctr_step(c, temp);
 	xor_block(block, block, temp, c->block_len);
 
 	PURGE(temp);
-	ctr_increment(c->buf, c->block_len);
 }
 
 void cipher_ctr_decrypt(BlockCipher *c, void *block)

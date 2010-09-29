@@ -149,13 +149,23 @@ INLINE void cipher_ctr_begin(BlockCipher *c, void *counter)
 }
 
 /**
- * Encrypt a block (in-place) using the current key in CBC mode.
+ * Encrypt a block (in-place) using the current key in CTR mode.
  */
 void cipher_ctr_encrypt(BlockCipher *c, void *block);
 
 /**
- * Decrypt a block (in-place) using the current key in CBC mode.
+ * Decrypt a block (in-place) using the current key in CTR mode.
  */
 void cipher_ctr_decrypt(BlockCipher *c, void *block);
+
+/**
+ * Generate the crypted stream block in CTR mode for the current
+ * counter, and then bump it.
+ *
+ * This function is basically the core CTR operation, without the final
+ * XOR pass with the plaintext or ciphertext. For normal CTR usage,
+ * you never need to call it.
+ */
+void cipher_ctr_step(BlockCipher *c, void *block);
 
 #endif /* SEC_CIPHER_H */
