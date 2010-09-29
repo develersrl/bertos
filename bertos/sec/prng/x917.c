@@ -103,17 +103,24 @@ static void x917_reseed(PRNG *ctx_, const uint8_t *seed)
 	//     of the seed, and use the result as new seed.
 	//   * Generate and throw away a block to update the state.
 	X917Context *ctx = (X917Context *)ctx_;
+	const size_t klen = sizeof(ctx->key);
+	const size_t blen = sizeof(ctx->state);
 
-	size_t klen = sizeof(ctx->key);
-	size_t blen = sizeof(ctx->state);
+	if (!ctx->rng.seeded)
+	{
+		memcpy(ctx->key, seed, klen);
+		memcpy(ctx->state, seed+klen, blen);
+	}
+	else
+	{
+		uint8_t buf[klen];
+		x917_generate(ctx_, buf, klen);
 
-	uint8_t buf[klen];
-	x917_generate(ctx_, buf, klen);
+		xor_block(ctx->key, buf, seed, klen);
+		xor_block(ctx->state, ctx->state, seed+klen, blen);
 
-	xor_block(ctx->key, buf, seed, klen);
-	xor_block(ctx->state, ctx->state, seed+klen, blen);
-
-	PURGE(buf);
+		PURGE(buf);
+	}
 }
 
 /*********************************************************************/
