@@ -35,7 +35,8 @@ void prng_benchmark(PRNG *prng, const char *hname, int numbytes)
 	for (int j=0;j<2048;++j) {
 		for (int i=0; i<(numbytes+511)/512-1; ++i)
 			prng_generate(prng, buf, 512);
-		prng_generate(prng, buf, numbytes%512);
+		if (numbytes % 512)
+			prng_generate(prng, buf, numbytes%512);
 	}
 
 	t = timer_clock() - t;
