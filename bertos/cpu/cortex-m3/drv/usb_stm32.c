@@ -675,12 +675,18 @@ out:									\
 static stm32_UsbIoStatus
 __usb_ep_read(int ep, void *buffer, ssize_t size, void (*complete)(int))
 {
-	if (UNLIKELY(ep >= ENP_MAX_NUMB))
+	if (UNLIKELY((ep >= ENP_MAX_NUMB) || (ep & 0x01)))
 	{
+		LOG_ERR("%s: invalid EP number %d\n", __func__, ep);
 		ASSERT(0);
 		return STALLED;
 	}
-	ASSERT(!(ep & 0x01));
+	if (UNLIKELY((size_t)buffer & 0x03))
+	{
+		LOG_ERR("%s: unaligned buffer @ %p\n", __func__, buffer);
+		ASSERT(0);
+		return STALLED;
+	}
 	return USB_EP_IO(ep, read, buffer, size, complete);
 }
 
@@ -688,12 +694,18 @@ __usb_ep_read(int ep, void *buffer, ssize_t size, void (*complete)(int))
 static stm32_UsbIoStatus
 __usb_ep_write(int ep, const void *buffer, ssize_t size, void (*complete)(int))
 {
-	if (UNLIKELY(ep >= ENP_MAX_NUMB))
+	if (UNLIKELY((ep >= ENP_MAX_NUMB) || !(ep & 0x01)))
 	{
+		LOG_ERR("%s: invalid EP number %d\n", __func__, ep);
 		ASSERT(0);
 		return STALLED;
 	}
-	ASSERT(ep & 0x01);
+	if (UNLIKELY((size_t)buffer & 0x03))
+	{
+		LOG_ERR("%s: unaligned buffer @ %p\n", __func__, buffer);
+		ASSERT(0);
+		return STALLED;
+	}
 	return USB_EP_IO(ep, write, buffer, size, complete);
 }
 
@@ -1103,12 +1115,6 @@ ssize_t usb_endpointRead(int ep, void *buffer, ssize_t size)
 	int ep_num = usb_ep_logical_to_hw(ep);
 	ssize_t max_size = sizeof(rx_buffer);
 
-	if (UNLIKELY((size_t)buffer & 0x03))
-	{
-		LOG_ERR("unaligned buffer @ %p\n", buffer);
-		ASSERT(0);
-	}
-
 	/* Non-blocking read for EP0 */
 	if (ep_num == CTRL_ENP_OUT)
 	{
@@ -1167,12 +1173,6 @@ ssize_t usb_endpointWrite(int ep, const void *buffer, ssize_t size)
 {
 	int ep_num = usb_ep_logical_to_hw(ep);
 	ssize_t max_size = sizeof(tx_buffer);
-
-	if (UNLIKELY((size_t)buffer & 0x03))
-	{
-		LOG_ERR("unaligned buffer @ %p\n", buffer);
-		ASSERT(0);
-	}
 
 	/* Non-blocking write for EP0 */
 	if (ep_num == CTRL_ENP_IN)
