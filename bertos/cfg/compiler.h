@@ -209,6 +209,7 @@
 	#define RESTRICT                __restrict__
 	#define MUST_CHECK              __attribute__((warn_unused_result))
 	#define PACKED                  __attribute__((packed))
+	#define ALIGNED(x)              __attribute__ ((__aligned__(x)))
 	#if CPU_ARM | CPU_CM3
 		#define NAKED		__attribute__((naked))
 	#else
@@ -359,6 +360,9 @@
 #endif
 #ifndef PACKED
 #define PACKED                 /* nothing */
+#endif
+#ifndef ALIGNED
+#define ALIGNED                /* nothing */
 #endif
 #ifndef MEMORY_BARRIER
 #define MEMORY_BARRIER         /* nothing */
