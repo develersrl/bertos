@@ -50,8 +50,7 @@
 #define USB_DISC_PIN	(1 << 11)
 
 #define USB_EP0_MAX_SIZE	8
-#define USB_RX_MAX_SIZE		64
-#define USB_TX_MAX_SIZE		64
+#define USB_XFER_MAX_SIZE	64
 
 /* USB packet memory organization */
 #define USB_PACKET_MEMORY_BASE		0x40006000

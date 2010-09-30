@@ -153,8 +153,7 @@ static stm32_UsbMemSlot memory_buffer[EP_MAX_SLOTS];
 /* XXX: use the empty cond section to silent a buggy doxygen warning */
 static bool rx_done, tx_done;
 static size_t rx_size, tx_size;
-static uint8_t rx_buffer[_MIN(CONFIG_USB_RXBUFSIZE, USB_RX_MAX_SIZE)] ALIGNED(4);
-static uint8_t tx_buffer[_MIN(CONFIG_USB_TXBUFSIZE, USB_TX_MAX_SIZE)] ALIGNED(4);
+static uint8_t ep_buffer[_MIN(CONFIG_USB_BUFSIZE, USB_XFER_MAX_SIZE)] ALIGNED(4);
 /// \endcond
 
 /* Allocate a free block of the packet memory */
@@ -1118,7 +1117,7 @@ static void usb_endpointRead_complete(int ep)
 ssize_t usb_endpointRead(int ep, void *buffer, ssize_t size)
 {
 	int ep_num = usb_ep_logical_to_hw(ep);
-	ssize_t max_size = sizeof(rx_buffer);
+	ssize_t max_size = sizeof(ep_buffer);
 
 	/* Non-blocking read for EP0 */
 	if (ep_num == CTRL_ENP_OUT)
@@ -1126,7 +1125,7 @@ ssize_t usb_endpointRead(int ep, void *buffer, ssize_t size)
 		size = usb_size(size, usb_le16_to_cpu(setup_packet.wLength));
 		if (UNLIKELY(size > max_size))
 		{
-			LOG_ERR("%s: rx_buffer exceeded, try to enlarge CONFIG_USB_RXBUFSIZE\n",
+			LOG_ERR("%s: ep_buffer exceeded, try to enlarge CONFIG_USB_BUFSIZE\n",
 					__func__);
 			ASSERT(0);
 			return -USB_BUF_OVERFLOW;
@@ -1135,9 +1134,9 @@ ssize_t usb_endpointRead(int ep, void *buffer, ssize_t size)
 			usb_status_handler(ep_num);
 		else
 		{
-			__usb_ep_read(ep_num, rx_buffer, size,
+			__usb_ep_read(ep_num, ep_buffer, size,
 					usb_status_handler);
-			memcpy(buffer, rx_buffer, size);
+			memcpy(buffer, ep_buffer, size);
 		}
 		return size;
 	}
@@ -1148,10 +1147,10 @@ ssize_t usb_endpointRead(int ep, void *buffer, ssize_t size)
 	rx_size = 0;
 
 	/* Blocking read */
-	__usb_ep_read(ep_num, rx_buffer, size, usb_endpointRead_complete);
+	__usb_ep_read(ep_num, ep_buffer, size, usb_endpointRead_complete);
 	while (!rx_done)
 		cpu_relax();
-	memcpy(buffer, rx_buffer, rx_size);
+	memcpy(buffer, ep_buffer, rx_size);
 
 	return rx_size;
 }
@@ -1172,7 +1171,7 @@ static void usb_endpointWrite_complete(int ep)
 ssize_t usb_endpointWrite(int ep, const void *buffer, ssize_t size)
 {
 	int ep_num = usb_ep_logical_to_hw(ep);
-	ssize_t max_size = sizeof(tx_buffer);
+	ssize_t max_size = sizeof(ep_buffer);
 
 	/* Non-blocking write for EP0 */
 	if (ep_num == CTRL_ENP_IN)
@@ -1180,7 +1179,7 @@ ssize_t usb_endpointWrite(int ep, const void *buffer, ssize_t size)
 		size = usb_size(size, usb_le16_to_cpu(setup_packet.wLength));
 		if (UNLIKELY(size > max_size))
 		{
-			LOG_ERR("%s: tx_buffer exceeded, try to enlarge CONFIG_USB_TXBUFSIZE\n",
+			LOG_ERR("%s: ep_buffer exceeded, try to enlarge CONFIG_USB_BUFSIZE\n",
 					__func__);
 			ASSERT(0);
 			return -USB_BUF_OVERFLOW;
@@ -1189,8 +1188,8 @@ ssize_t usb_endpointWrite(int ep, const void *buffer, ssize_t size)
 			usb_status_handler(ep_num);
 		else
 		{
-			memcpy(tx_buffer, buffer, size);
-			__usb_ep_write(ep_num, tx_buffer, size,
+			memcpy(ep_buffer, buffer, size);
+			__usb_ep_write(ep_num, ep_buffer, size,
 					usb_status_handler);
 		}
 		return size;
@@ -1202,8 +1201,8 @@ ssize_t usb_endpointWrite(int ep, const void *buffer, ssize_t size)
 	tx_size = 0;
 
 	/* Blocking write */
-	memcpy(tx_buffer, buffer, size);
-	__usb_ep_write(ep_num, tx_buffer, size, usb_endpointWrite_complete);
+	memcpy(ep_buffer, buffer, size);
+	__usb_ep_write(ep_num, ep_buffer, size, usb_endpointWrite_complete);
 	while (!tx_done)
 		cpu_relax();
 
