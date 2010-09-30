@@ -42,6 +42,7 @@
 
 #include <cfg/compiler.h>
 #include <drv/usb.h>
+#include <drv/usb_endpoint.h>
 
 #define USB_BASE_ADDR			0x40005C00
 
@@ -52,13 +53,16 @@
 #define USB_EP0_MAX_SIZE	8
 #define USB_XFER_MAX_SIZE	64
 
+#define EP_MAX_SLOTS	USB_EP_MAX
+#define EP_MAX_NUM	(EP_MAX_SLOTS << 1)
+
 /* USB packet memory organization */
 #define USB_PACKET_MEMORY_BASE		0x40006000
 #define USB_PACKET_MEMORY_SIZE		512
 
 /* Offset of the buffer descriptor table inside the packet memory */
 #define USB_BDT_OFFSET \
-	((USB_PACKET_MEMORY_SIZE - (sizeof(stm32_UsbBd) * ENP_MAX_NUMB)) & ~7)
+	((USB_PACKET_MEMORY_SIZE - (sizeof(stm32_UsbBd) * EP_MAX_HW_NUM)) & ~7)
 
 #define USB_MEM_ADDR(offset) \
 	(USB_PACKET_MEMORY_BASE + ((offset << 1) & ~3) + (offset & 1))
@@ -168,7 +172,7 @@ typedef enum stm32_UsbEP
 	ENP14_OUT, ENP14_IN,
 	ENP15_OUT, ENP15_IN,
 
-	ENP_MAX_NUMB
+	EP_MAX_HW_NUM
 } stm32_UsbEP;
 
 /* STM32 USB packet memory slot */

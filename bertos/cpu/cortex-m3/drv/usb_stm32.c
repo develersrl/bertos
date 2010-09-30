@@ -92,7 +92,7 @@ struct stm32_usb
 static struct stm32_usb *usb = (struct stm32_usb *)USB_BASE_ADDR;
 
 /* Endpoint descriptors: used for handling requests to use with endpoints */
-static stm32_UsbEp ep_cnfg[ENP_MAX_NUMB];
+static stm32_UsbEp ep_cnfg[EP_MAX_NUM];
 
 /* USB EP0 control descriptor */
 static const UsbEndpointDesc USB_CtrlEpDescr0 =
@@ -148,8 +148,7 @@ static UsbDevice *usb_dev;
 static stm32_UsbMemSlot *mem_use;
 
 /* USB packet memory management: memory buffer metadata */
-#define EP_MAX_SLOTS	16
-static stm32_UsbMemSlot memory_buffer[EP_MAX_SLOTS];
+static stm32_UsbMemSlot memory_buffer[EP_MAX_HW_NUM >> 1];
 
 /* Endpoint TX and RX buffers */
 /// \cond
@@ -687,7 +686,7 @@ out:									\
 static stm32_UsbIoStatus
 __usb_ep_read(int ep, void *buffer, ssize_t size, void (*complete)(int))
 {
-	if (UNLIKELY((ep >= ENP_MAX_NUMB) || (ep & 0x01)))
+	if (UNLIKELY((ep >= EP_MAX_NUM) || (ep & 0x01)))
 	{
 		LOG_ERR("%s: invalid EP number %d\n", __func__, ep);
 		ASSERT(0);
@@ -706,7 +705,7 @@ __usb_ep_read(int ep, void *buffer, ssize_t size, void (*complete)(int))
 static stm32_UsbIoStatus
 __usb_ep_write(int ep, const void *buffer, ssize_t size, void (*complete)(int))
 {
-	if (UNLIKELY((ep >= ENP_MAX_NUMB) || !(ep & 0x01)))
+	if (UNLIKELY((ep >= EP_MAX_NUM) || !(ep & 0x01)))
 	{
 		LOG_ERR("%s: invalid EP number %d\n", __func__, ep);
 		ASSERT(0);
@@ -1106,7 +1105,7 @@ static void usb_status_handler(UNUSED_ARG(int, EP))
 
 static void usb_endpointRead_complete(int ep)
 {
-	if (UNLIKELY(ep >= ENP_MAX_NUMB))
+	if (UNLIKELY(ep >= EP_MAX_NUM))
 	{
 		ASSERT(0);
 		return;
@@ -1160,7 +1159,7 @@ ssize_t usb_endpointRead(int ep, void *buffer, ssize_t size)
 
 static void usb_endpointWrite_complete(int ep)
 {
-	if (UNLIKELY(ep >= ENP_MAX_NUMB))
+	if (UNLIKELY(ep >= EP_MAX_NUM))
 	{
 		ASSERT(0);
 		return;
