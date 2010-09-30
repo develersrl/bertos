@@ -62,7 +62,7 @@
 
 /* Offset of the buffer descriptor table inside the packet memory */
 #define USB_BDT_OFFSET \
-	((USB_PACKET_MEMORY_SIZE - (sizeof(stm32_UsbBd) * EP_MAX_HW_NUM)) & ~7)
+	((USB_PACKET_MEMORY_SIZE - (sizeof(stm32_UsbBd) * EP_MAX_NUM)) & ~7)
 
 #define USB_MEM_ADDR(offset) \
 	(USB_PACKET_MEMORY_BASE + ((offset << 1) & ~3) + (offset & 1))
