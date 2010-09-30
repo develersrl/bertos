@@ -32,7 +32,7 @@
  *
  * \brief Generic interface for message authentication algorithms.
  * \author Giovanni Bajo <rasky@develer.com>
- * 
+ *
  */
 
 #ifndef SEC_MAC_H
@@ -44,10 +44,10 @@
 typedef struct Mac {
 	uint8_t digest_len;
 	uint8_t key_len;
-	
-	void (*set_key)(struct Mac *m, const uint8_t* key, size_t len); 
+
+	void (*set_key)(struct Mac *m, const void *key, size_t len);
 	void (*begin)(struct Mac *m);
-	void (*update)(struct Mac *m, const uint8_t *data, size_t len);
+	void (*update)(struct Mac *m, const void *data, size_t len);
 	uint8_t* (*final)(struct Mac *m);
 } Mac;
 

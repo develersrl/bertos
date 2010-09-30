@@ -32,7 +32,7 @@
  *
  * \brief HMAC implementation
  * \author Giovanni Bajo <rasky@develer.com>
- * 
+ *
  */
 
 #include "hmac.h"
@@ -40,20 +40,20 @@
 #include <string.h>
 
 
-static void HMAC_set_key(Mac *m, const uint8_t *key, size_t key_len)
+static void HMAC_set_key(Mac *m, const void *key, size_t key_len)
 {
 	HMAC_Context *ctx = (HMAC_Context *)m;
 
 	memset(ctx->key, 0, ctx->m.key_len);
 	if (key_len <= ctx->m.key_len)
-		memcpy(ctx->key, key, key_len);		
+		memcpy(ctx->key, key, key_len);
 	else
 	{
 		hash_begin(ctx->h);
 		hash_update(ctx->h, key, key_len);
 		memcpy(ctx->key, hash_final(ctx->h), hash_digest_len(ctx->h));
 	}
-	
+
 	xor_block_const(ctx->key, ctx->key, 0x5C, ctx->m.key_len);
 }
 
@@ -61,13 +61,13 @@ static void HMAC_begin(Mac *m)
 {
 	HMAC_Context *ctx = (HMAC_Context *)m;
 	int klen = ctx->m.key_len;
-	
+
 	xor_block_const(ctx->key, ctx->key, 0x36^0x5C, klen);
 	hash_begin(ctx->h);
 	hash_update(ctx->h, ctx->key, klen);
 }
 
-static void HMAC_update(Mac *m, const uint8_t *data, size_t len)
+static void HMAC_update(Mac *m, const void *data, size_t len)
 {
 	HMAC_Context *ctx = (HMAC_Context *)m;
 	hash_update(ctx->h, data, len);
@@ -80,12 +80,12 @@ static uint8_t *HMAC_final(Mac *m)
 
 	uint8_t temp[hlen];
 	memcpy(temp, hash_final(ctx->h), hlen);
-	
+
 	xor_block_const(ctx->key, ctx->key, 0x5C^0x36, ctx->m.key_len);
 	hash_begin(ctx->h);
 	hash_update(ctx->h, ctx->key, ctx->m.key_len);
 	hash_update(ctx->h, temp, hlen);
-	
+
 	PURGE(temp);
 	return hash_final(ctx->h);
 }
@@ -100,6 +100,6 @@ void HMAC_init(HMAC_Context *ctx, Hash *h)
 	ctx->m.set_key = HMAC_set_key;
 	ctx->m.begin = HMAC_begin;
 	ctx->m.update = HMAC_update;
-	ctx->m.final = HMAC_final;	
+	ctx->m.final = HMAC_final;
 	ASSERT(sizeof(ctx->key) >= ctx->m.key_len);
 }
