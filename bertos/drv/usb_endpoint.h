@@ -42,6 +42,10 @@
 #ifndef USB_ENDPOINT_H
 #define USB_ENDPOINT_H
 
+#include "cfg/cfg_usbser.h"
+#include "cfg/cfg_usbkbd.h"
+#include "cfg/cfg_usbmouse.h"
+
 /* Enpoint allocation (according to the compile-time options) */
 enum {
 	USB_CTRL_ENDPOINT = 0, /* This must be always allocated */
