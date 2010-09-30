@@ -39,6 +39,13 @@
 #define CFG_USBKBD_H
 
 /**
+ * Enable the usbkbd module.
+ *
+ * $WIZ$ type = "autoenabled"
+ */
+#define CONFIG_USBKBD 0
+
+/**
  * Module logging level.
  *
  * $WIZ$ type = "enum"

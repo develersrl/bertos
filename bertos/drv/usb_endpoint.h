@@ -32,33 +32,31 @@
  *
  * \author Andrea Righi <arighi@develer.com>
  *
- * \brief Configuration file for the USB serial driver module
- */
-
-#ifndef CFG_USBSER_H
-#define CFG_USBSER_H
-
-/**
- * Enable the usb-serial module.
+ * \brief USB endpoint allocations
  *
- * $WIZ$ type = "autoenabled"
- */
-#define CONFIG_USBSER 0
-
-/**
- * Module logging level.
+ * This file defines how the endpoints are allocated among the supported USB
+ * device drivers in BeRTOs.
  *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_level"
  */
-#define USB_SERIAL_LOG_LEVEL      LOG_LVL_INFO
 
-/**
- * module logging format.
- *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_format"
- */
-#define USB_SERIAL_LOG_FORMAT     LOG_FMT_TERSE
+#ifndef USB_ENDPOINT_H
+#define USB_ENDPOINT_H
 
-#endif /* CFG_USBSER_H */
+/* Enpoint allocation (according to the compile-time options) */
+enum {
+	USB_CTRL_ENDPOINT = 0, /* This must be always allocated */
+#if (defined(CONFIG_USBSER) && CONFIG_USBSER)
+	USB_SERIAL_EP_REPORT,
+	USB_SERIAL_EP_OUT,
+	USB_SERIAL_EP_IN,
+#endif
+#if (defined(CONFIG_USBKBD) && CONFIG_USBKBD)
+	USB_KBD_EP_REPORT,
+#endif
+#if (defined(CONFIG_USBMOUSE) && CONFIG_USBMOUSE)
+	USB_MOUSE_EP_REPORT,
+#endif
+	USB_EP_MAX, /* Number of allocated endpoints */
+};
+
+#endif /* USB_ENDPOINT_H */

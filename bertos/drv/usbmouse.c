@@ -50,6 +50,7 @@
 #include <cpu/power.h> // cpu_relax()
 
 #include <drv/usb.h>
+#include <drv/usb_endpoint.h>
 
 #include "drv/usb_hid.h"
 #include "drv/usbmouse.h"
@@ -66,7 +67,7 @@
 #define USB_STRING_MANUFACTURER 1
 #define USB_STRING_PRODUCT	2
 
-#define USB_HID_REPORT_EP	(USB_DIR_IN | 1)
+#define USB_HID_REPORT_EP	(USB_DIR_IN | USB_MOUSE_EP_REPORT)
 
 static UsbDeviceDesc usb_hid_device_descriptor =
 {

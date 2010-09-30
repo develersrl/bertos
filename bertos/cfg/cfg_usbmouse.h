@@ -39,6 +39,13 @@
 #define CFG_USBMOUSE_H
 
 /**
+ * Enable the usbmouse module.
+ *
+ * $WIZ$ type = "autoenabled"
+ */
+#define CONFIG_USBMOUSE 0
+
+/**
  * Module logging level.
  *
  * $WIZ$ type = "enum"
