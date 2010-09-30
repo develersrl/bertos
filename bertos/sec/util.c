@@ -32,7 +32,7 @@
  *
  * \brief Generic utilities.
  * \author Giovanni Bajo <rasky@develer.com>
- * 
+ *
  */
 
 #include "util.h"
@@ -48,10 +48,10 @@
 void password2key(const char *pwd, size_t pwd_len,
 				  uint8_t *key, size_t key_len)
 {
-	Kdf *kdf = PBKDF2_stackinit(HMAC_stackinit(SHA1_stackinit()));
-		
+	Kdf *kdf = PBKDF2_stackinit(hmac_stackinit(SHA1_stackinit()));
+
 	kdf_begin(kdf, pwd, pwd_len, (uint8_t*)SALT, sizeof(SALT));
 	kdf_read(kdf, key, key_len);
-	
+
 	// FIXME: how to purge the stack?
 }

@@ -1,18 +1,18 @@
 
-#include <sec/mac/hmac.h>
+#include "hmac.h"
 #include <cfg/test.h>
 #include <cfg/debug.h>
 #include <sec/hash/sha1.h>
 #include <sec/hash/md5.h>
 #include <string.h>
 
-int HMAC_testSetup(void)
+int hmac_testSetup(void)
 {
 	kdbg_init();
 	return 0;
 }
 
-int HMAC_testTearDown(void)
+int hmac_testTearDown(void)
 {
 	return 0;
 }
@@ -28,13 +28,13 @@ struct Test_HMAC
 
 const struct Test_HMAC tests_hmac_md5[] =
 {
-	{ 
+	{
 		"\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b", 16,
 		"Hi There", 8,
 		"\x92\x94\x72\x7a\x36\x38\xbb\x1c\x13\xf4\x8e\xf8\x15\x8b\xfc\x9d",
 	},
 	{
-		"Jefe", 4, 
+		"Jefe", 4,
 		"what do ya want for nothing?", 28,
 		"\x75\x0c\x78\x3e\x6a\xb0\xb5\x03\xea\xa8\x6e\x31\x0a\x5d\xb7\x38",
 	},
@@ -100,7 +100,7 @@ const struct Test_HMAC tests_hmac_sha1[] =
 		"Jefe", 4,
 		"what do ya want for nothing?", 28,
 		"\xef\xfc\xdf\x6a\xe5\xeb\x2f\xa2\xd2\x74\x16\xd5\xf1\x84\xdf\x9c\x25\x9a\x7c\x79",
-	},	
+	},
 	{
 		"\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa", 20,
 		"\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd"
@@ -162,13 +162,15 @@ static void algo_run_tests(Mac *mac, const struct Test_HMAC *t, int count)
 	}
 }
 
-int HMAC_testRun(void)
+int hmac_testRun(void)
 {
-	algo_run_tests(HMAC_stackinit(MD5_stackinit()),
+	algo_run_tests(hmac_stackinit(MD5_stackinit()),
 				   tests_hmac_md5, countof(tests_hmac_md5));
 
-	algo_run_tests(HMAC_stackinit(SHA1_stackinit()),
+	algo_run_tests(hmac_stackinit(SHA1_stackinit()),
 				   tests_hmac_sha1, countof(tests_hmac_sha1));
+
+	return 0;
 }
 
 TEST_MAIN(HMAC);

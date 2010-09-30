@@ -40,9 +40,9 @@
 #include <string.h>
 
 
-static void HMAC_set_key(Mac *m, const void *key, size_t key_len)
+static void hmac_set_key(Mac *m, const void *key, size_t key_len)
 {
-	HMAC_Context *ctx = (HMAC_Context *)m;
+	HmacContext *ctx = (HmacContext *)m;
 
 	memset(ctx->key, 0, ctx->m.key_len);
 	if (key_len <= ctx->m.key_len)
@@ -57,9 +57,9 @@ static void HMAC_set_key(Mac *m, const void *key, size_t key_len)
 	xor_block_const(ctx->key, ctx->key, 0x5C, ctx->m.key_len);
 }
 
-static void HMAC_begin(Mac *m)
+static void hmac_begin(Mac *m)
 {
-	HMAC_Context *ctx = (HMAC_Context *)m;
+	HmacContext *ctx = (HmacContext *)m;
 	int klen = ctx->m.key_len;
 
 	xor_block_const(ctx->key, ctx->key, 0x36^0x5C, klen);
@@ -67,15 +67,15 @@ static void HMAC_begin(Mac *m)
 	hash_update(ctx->h, ctx->key, klen);
 }
 
-static void HMAC_update(Mac *m, const void *data, size_t len)
+static void hmac_update(Mac *m, const void *data, size_t len)
 {
-	HMAC_Context *ctx = (HMAC_Context *)m;
+	HmacContext *ctx = (HmacContext *)m;
 	hash_update(ctx->h, data, len);
 }
 
-static uint8_t *HMAC_final(Mac *m)
+static uint8_t *hmac_final(Mac *m)
 {
-	HMAC_Context *ctx = (HMAC_Context *)m;
+	HmacContext *ctx = (HmacContext *)m;
 	int hlen = hash_digest_len(ctx->h);
 
 	uint8_t temp[hlen];
@@ -92,14 +92,14 @@ static uint8_t *HMAC_final(Mac *m)
 
 /*********************************************************************/
 
-void HMAC_init(HMAC_Context *ctx, Hash *h)
+void hmac_init(HmacContext *ctx, Hash *h)
 {
 	ctx->h = h;
 	ctx->m.key_len = hash_block_len(h);
 	ctx->m.digest_len = hash_digest_len(h);
-	ctx->m.set_key = HMAC_set_key;
-	ctx->m.begin = HMAC_begin;
-	ctx->m.update = HMAC_update;
-	ctx->m.final = HMAC_final;
+	ctx->m.set_key = hmac_set_key;
+	ctx->m.begin = hmac_begin;
+	ctx->m.update = hmac_update;
+	ctx->m.final = hmac_final;
 	ASSERT(sizeof(ctx->key) >= ctx->m.key_len);
 }

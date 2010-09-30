@@ -32,7 +32,7 @@
  *
  * \brief HMAC (RFC 2104) implementation
  * \author Giovanni Bajo <rasky@develer.com>
- * 
+ *
  */
 
 #ifndef SEC_MAC_HMAC_H
@@ -42,20 +42,20 @@
 #include <sec/hash.h>
 #include <alloca.h>
 
-typedef struct HMAC_Context
+typedef struct HmacContext
 {
 	Mac m;
-	Hash *h;	
+	Hash *h;
 	uint8_t key[64];
-} HMAC_Context;
+} HmacContext;
 
-void HMAC_init(HMAC_Context* hmac, Hash *h);
+void hmac_init(HmacContext* hmac, Hash *h);
 
-#define HMAC_stackinit(...) \
-	({ HMAC_Context *ctx = alloca(sizeof(HMAC_Context)); HMAC_init(ctx, ##__VA_ARGS__); &ctx->m; })
+#define hmac_stackinit(...) \
+	({ HmacContext *ctx = alloca(sizeof(HmacContext)); hmac_init(ctx, ##__VA_ARGS__); &ctx->m; })
 
-int HMAC_testSetup(void);
-int HMAC_testRun(void);
-int HMAC_testTearDown(void);
+int hmac_testSetup(void);
+int hmac_testRun(void);
+int hmac_testTearDown(void);
 
 #endif /* SEC_MAC_HMAC_H */
