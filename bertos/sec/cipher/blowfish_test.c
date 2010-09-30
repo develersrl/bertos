@@ -37,6 +37,7 @@
 
 #include "blowfish.h"
 #include <cpu/byteorder.h>
+#include <string.h>
 
 /*
  *  Author     :  Randy L. Milbert
