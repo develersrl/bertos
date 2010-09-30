@@ -58,13 +58,7 @@
 
 #include "usb_stm32.h"
 
-/* XXX: consider to move this to cfg/compiler.h */
-#define ALIGNED(x)	__attribute__ ((__aligned__(x)))
-
 /* XXX: consider to move this to cfg/macros.h */
-#define ALIGN_UP(value, align)	(((value) & ((align) - 1)) ? \
-				(((value) + ((align) - 1)) & ~((align) - 1)) : \
-				(value))
 
 /* XXX: redefine this to make it usable within C expression */
 #define _MIN(a,b)	(((a) < (b)) ? (a) : (b))
