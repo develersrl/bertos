@@ -119,10 +119,21 @@ def main():
     app.settings = QSettings("Develer", "Bertos Configurator")
     # Development utility lines, to be removed for production
     datadir = DATA_DIR
-    qrc, bertos_rc = os.path.join(datadir, 'bertos.qrc'), os.path.join(datadir, 'bertos_rc.py')
-    if not (hasattr(sys, "frozen") and sys.frozen) and newer(qrc, bertos_rc):
-        os.system("pyrcc4 \"%s\" -o \"%s\"" %(qrc, bertos_rc))
-    import bertos_rc
+
+    # Something seems to not work, on Windows, using pyrcc4 with BeRTOS Wizard
+    # resources. So I'm restoring the old rcc-based resource generation
+    # system.
+    #
+    # qrc, bertos_rc = os.path.join(datadir, 'bertos.qrc'), os.path.join(datadir, 'bertos_rc.py')
+    # if not (hasattr(sys, "frozen") and sys.frozen) and newer(qrc, bertos_rc):
+    #     os.system("pyrcc4 \"%s\" -o \"%s\"" %(qrc, bertos_rc))
+    # import bertos_rc
+
+    qrc, rcc = os.path.join(datadir, 'bertos.qrc'), os.path.join(datadir, 'bertos.rcc') 
+    if not (hasattr(sys, "frozen") and sys.frozen) and newer(qrc, rcc): 
+        os.system("rcc -binary \"%s\" -o \"%s\"" %(qrc, rcc)) 
+    QResource.registerResource(rcc) 
+    
     if len(sys.argv) == 3 and sys.argv[1] == "--edit":
         editProject(os.path.abspath(sys.argv[2]))
     else:
