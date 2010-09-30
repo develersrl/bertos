@@ -44,30 +44,28 @@ static void x917_next(X917Context *ctx, BlockCipher *cipher, uint8_t *out)
 {
 	const size_t blen = cipher_block_len(cipher);
 
-	union
+	struct
 	{
-		uint8_t bytes[blen];
-		struct
-		{
-			time_t t0;
-			hptime_t t1;
-		} data;
+		time_t t0;
+		hptime_t t1;
+		uint8_t padding[blen - sizeof(time_t) - sizeof(hptime_t)];
 	} DT;
 
-	ASSERT(sizeof(DT.bytes) >= sizeof(ticks_t) + sizeof(hptime_t));
+	ASSERT(sizeof(DT) == blen);
 
-	DT.data.t0 = timer_clock();
-	DT.data.t1 = timer_hw_hpread();
+	memset(&DT, 0, sizeof(DT));
+	DT.t0 = timer_clock();
+	DT.t1 = timer_hw_hpread();
 
-	cipher_ecb_encrypt(cipher, DT.bytes);
+	cipher_ecb_encrypt(cipher, &DT);
 
-	xor_block(out, DT.bytes, ctx->state, blen);
+	xor_block(out, (uint8_t*)&DT, ctx->state, blen);
 	cipher_ecb_encrypt(cipher, out);
 
-	xor_block(ctx->state, DT.bytes, out, blen);
+	xor_block(ctx->state, (uint8_t*)&DT, out, blen);
 	cipher_ecb_encrypt(cipher, ctx->state);
 
-	PURGE(DT.bytes);
+	PURGE(DT);
 }
 
 
