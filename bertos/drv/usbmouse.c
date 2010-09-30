@@ -172,17 +172,17 @@ static const UsbDescHeader *usb_hid_config[] =
 	NULL,
 };
 
-static DEFINE_USB_STRING(language_str, "\x09\x04"); // Language ID: en_US
-static DEFINE_USB_STRING(manufacturer_str,
+static const DEFINE_USB_STRING(language_str, "\x09\x04"); // Language ID: en_US
+static const DEFINE_USB_STRING(manufacturer_str,
 		USB_STRING("B", "e", "R", "T", "O", "S"));
-static DEFINE_USB_STRING(product_str,
+static const DEFINE_USB_STRING(product_str,
 		USB_STRING("U", "S", "B", " ", "M", "o", "u", "s", "e"));
 
 static const UsbStringDesc *usb_hid_strings[] =
 {
-	(UsbStringDesc *)&language_str,
-	(UsbStringDesc *)&manufacturer_str,
-	(UsbStringDesc *)&product_str,
+	(const UsbStringDesc *)&language_str,
+	(const UsbStringDesc *)&manufacturer_str,
+	(const UsbStringDesc *)&product_str,
 	NULL,
 };
 

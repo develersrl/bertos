@@ -149,20 +149,20 @@ static const UsbDescHeader *usb_serial_config[] =
 	NULL,
 };
 
-static DEFINE_USB_STRING(language_str, "\x09\x04"); // Language ID: en_US
-static DEFINE_USB_STRING(manufacturer_str,
+static const DEFINE_USB_STRING(language_str, "\x09\x04"); // Language ID: en_US
+static const DEFINE_USB_STRING(manufacturer_str,
 		USB_STRING("B", "e", "R", "T", "O", "S"));
-static DEFINE_USB_STRING(product_str,
+static const DEFINE_USB_STRING(product_str,
 		USB_STRING("U", "S", "B", "-", "s", "e", "r", "i", "a", "l"));
-static DEFINE_USB_STRING(serial_str,
+static const DEFINE_USB_STRING(serial_str,
 		USB_STRING("0", "0", "1"));
 
 static const UsbStringDesc *usb_serial_strings[] =
 {
-	(UsbStringDesc *)&language_str,
-	(UsbStringDesc *)&manufacturer_str,
-	(UsbStringDesc *)&product_str,
-	(UsbStringDesc *)&serial_str,
+	(const UsbStringDesc *)&language_str,
+	(const UsbStringDesc *)&manufacturer_str,
+	(const UsbStringDesc *)&product_str,
+	(const UsbStringDesc *)&serial_str,
 	NULL,
 };
 
