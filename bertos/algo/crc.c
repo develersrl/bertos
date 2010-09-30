@@ -38,8 +38,14 @@
 
 #include "crc.h"
 
-/**
- * crctab calculated by Mark G. Mendel, Network Systems Corporation
+/*
+ * The boot on AVR cpu is placed at the end of flash memory, but the avr
+ * address memory by byte and the pointers are 16bits long, so we are able
+ * to address 64Kbyte memory max. For this reason we can't read the crctab
+ * from flash, because it is placed at the end of memory. This is true every
+ * time we have an AVR cpu with more that 64Kbyte of flash. To fix this problem
+ * we let the compiler copy the table in RAM at startup. Obviously this solution
+ * is not efficent, but for now this is the only way.
  */
 #if CPU_HARVARD && !(defined(ARCH_BOOT) && (ARCH & ARCH_BOOT))
 	#define CRC_TABLE const uint16_t PROGMEM crc16tab[256]
@@ -47,6 +53,9 @@
 	#define CRC_TABLE const uint16_t crc16tab[256]
 #endif
 
+/**
+ * crctab calculated by Mark G. Mendel, Network Systems Corporation
+ */
 CRC_TABLE = {
 	0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7,
 	0x8108, 0x9129, 0xa14a, 0xb16b, 0xc18c, 0xd1ad, 0xe1ce, 0xf1ef,
