@@ -54,6 +54,8 @@
 #include <drv/timer.h>
 #include <drv/usb.h>
 
+#include <mware/event.h>
+
 #include <string.h> /* memcpy() */
 
 #include "usb_stm32.h"
@@ -148,7 +150,6 @@ static stm32_UsbMemSlot memory_buffer[EP_MAX_NUM];
 /* Endpoint TX and RX buffers */
 /// \cond
 /* XXX: use the empty cond section to silent a buggy doxygen warning */
-static bool rx_done, tx_done;
 static size_t rx_size, tx_size;
 
 #define EP_BUFFER_SIZE _MIN(CONFIG_USB_BUFSIZE, USB_XFER_MAX_SIZE)
@@ -156,6 +157,8 @@ STATIC_ASSERT(!(EP_BUFFER_SIZE & 0x03));
 
 static uint8_t ep_buffer[EP_MAX_NUM][EP_BUFFER_SIZE] ALIGNED(4);
 /// \endcond
+
+static Event usb_event_done[EP_MAX_SLOTS];
 
 /* Allocate a free block of the packet memory */
 static stm32_UsbMemSlot *usb_malloc(void)
@@ -1111,7 +1114,7 @@ static void usb_endpointRead_complete(int ep)
 	}
 	ASSERT(!(ep & 0x01));
 
-	rx_done = true;
+	event_do(&usb_event_done[ep >> 1]);
 	rx_size = ep_cnfg[ep].size;
 }
 
@@ -1144,14 +1147,13 @@ ssize_t usb_endpointRead(int ep, void *buffer, ssize_t size)
 	if (UNLIKELY(!size))
 		return 0;
 	size = MIN(size, max_size);
-	rx_done = false;
+	event_initGeneric(&usb_event_done[ep_num >> 1]);
 	rx_size = 0;
 
 	/* Blocking read */
 	__usb_ep_read(ep_num, ep_buffer[ep_num], size,
 				usb_endpointRead_complete);
-	while (!rx_done)
-		cpu_relax();
+	event_wait(&usb_event_done[ep_num >> 1]);
 	memcpy(buffer, ep_buffer[ep_num], rx_size);
 
 	return rx_size;
@@ -1166,7 +1168,7 @@ static void usb_endpointWrite_complete(int ep)
 	}
 	ASSERT(ep & 0x01);
 
-	tx_done = true;
+	event_do(&usb_event_done[ep >> 1]);
 	tx_size = ep_cnfg[ep].size;
 }
 
@@ -1199,15 +1201,14 @@ ssize_t usb_endpointWrite(int ep, const void *buffer, ssize_t size)
 	if (UNLIKELY(!size))
 		return 0;
 	size = MIN(size, max_size);
-	tx_done = false;
+	event_initGeneric(&usb_event_done[ep_num >> 1]);
 	tx_size = 0;
 
 	/* Blocking write */
 	memcpy(ep_buffer[ep_num], buffer, size);
 	__usb_ep_write(ep_num, ep_buffer[ep_num], size,
 				usb_endpointWrite_complete);
-	while (!tx_done)
-		cpu_relax();
+	event_wait(&usb_event_done[ep_num >> 1]);
 
 	return tx_size;
 }
@@ -1579,6 +1580,7 @@ static int usb_set_config_state(uint32_t conf)
 			udc.alt[i] = 0;
 		usb_set_device_state(USB_STATE_CONFIGURED);
 		usb_dev->configured = true;
+		event_do(&usb_event_done[0]);
 		LOG_INFO("%s: device configured\n", __func__);
 	}
 	else
@@ -1915,8 +1917,11 @@ int usb_deviceRegister(UsbDevice *dev)
 	MOD_CHECK(proc);
 #endif
 	usb_dev = dev;
+	usb_dev->configured = false;
+
+	event_initGeneric(&usb_event_done[0]);
 	usb_init();
-	while (!usb_dev->configured)
-		cpu_relax();
+	event_wait(&usb_event_done[0]);
+
 	return 0;
 }
