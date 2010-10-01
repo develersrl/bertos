@@ -44,6 +44,9 @@
 #include <cfg/compiler.h>
 #include "cfg/cfg_proc.h"
 #include "cfg/cfg_signal.h"
+#include "cfg/cfg_timer.h"
+
+#include <cpu/power.h> /* cpu_relax() */
 
 #if CONFIG_KERN
 	#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
@@ -75,12 +78,19 @@ typedef struct Event
 			Hook  func;         /* Pointer to softint hook */
 			void *user_data;    /* Data to be passed back to user hook */
 		} Int;
+
+		struct
+		{
+			bool completed;             /* Generic event completion */
+		} Gen;
 	} Ev;
 } Event;
 
 void event_hook_ignore(Event *event);
 void event_hook_signal(Event *event);
 void event_hook_softint(Event *event);
+void event_hook_generic(Event *event);
+void event_hook_generic_timeout(Event *event);
 
 /** Initialize the event \a e as a no-op */
 #define event_initNone(e) \
@@ -126,6 +136,76 @@ INLINE Event event_createSignal(struct Process *proc, sigbit_t bit)
 }
 
 #endif
+
+/**
+ * Prevent the compiler from optimizing access to the variable \a x, enforcing
+ * a refetch from memory. This also forbid from reordering successing instances
+ * of ACCESS_SAFE().
+ *
+ * TODO: move this to cfg/compiler.h
+ */
+#define ACCESS_SAFE(x) (*(volatile typeof(x) *)&(x))
+
+#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
+/** Initialize the generic sleepable event \a e */
+#define event_initGeneric(e) \
+	event_initSignal(e, proc_current(), SIG_SINGLE)
+#else
+#define event_initGeneric(e) \
+	((e)->action = event_hook_generic, (e)->Ev.Gen.completed = false)
+#endif
+
+/**
+ * Create a generic sleepable event.
+ *
+ * \return the properly initialized generic event structure.
+ */
+INLINE Event event_createGeneric(void)
+{
+	Event e;
+	event_initGeneric(&e);
+	return e;
+}
+
+/**
+ * Wait the completion of event \a e.
+ */
+INLINE void event_wait(Event *e)
+{
+#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
+	sig_wait(e->Ev.Sig.sig_bit);
+#else
+	while (ACCESS_SAFE(e->Ev.Gen.completed) == false)
+		cpu_relax();
+#endif
+}
+
+#if CONFIG_TIMER_EVENTS
+#include <drv/timer.h> /* timer_clock() */
+
+/* TODO: move these macros to drv/timer.h */
+#define TIMER_AFTER(x, y) ((long)(y) - (long)(x) < 0)
+#define TIMER_BEFORE(x, y) TIMER_AFTER(y, x)
+
+/**
+ * Wait the completion of event \a e or \a timeout elapses.
+ */
+INLINE bool event_waitTimeout(Event *e, ticks_t timeout)
+{
+#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
+	return (sig_waitTimeout(e->Ev.Sig.sig_bit, timeout) & SIG_TIMEOUT) ?
+				false : true;
+#else
+	ticks_t end = timer_clock() + timeout;
+
+	while ((ACCESS_SAFE(e->Ev.Gen.completed) == false) ||
+			TIMER_AFTER(timer_clock(), end))
+		cpu_relax();
+
+	return e->Ev.Gen.completed;
+#endif
+}
+#endif /* CONFIG_TIMER_EVENTS */
 
 /** Trigger an event */
 INLINE void event_do(struct Event *e)

@@ -38,12 +38,14 @@
 
 
 #include "event.h"
+#include "cfg/cfg_signal.h"
+#include "cfg/cfg_timer.h"
 
 void event_hook_ignore(UNUSED_ARG(Event *, e))
 {
 }
 
-#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
+#if CONFIG_KERN_SIGNALS
 void event_hook_signal(Event *e)
 {
 	sig_post((e)->Ev.Sig.sig_proc, (e)->Ev.Sig.sig_bit);
@@ -54,3 +56,15 @@ void event_hook_softint(Event *e)
 {
 	e->Ev.Int.func(e->Ev.Int.user_data);
 }
+
+void event_hook_generic(Event *e)
+{
+	e->Ev.Gen.completed = true;
+}
+
+#if CONFIG_TIMER_EVENTS
+void event_hook_generic_timeout(Event *e)
+{
+	e->Ev.Gen.completed = true;
+}
+#endif
