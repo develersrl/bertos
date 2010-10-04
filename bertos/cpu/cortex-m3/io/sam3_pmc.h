@@ -253,7 +253,7 @@
  * Defines for bit fields in CKGR_MCFR register.
  */
 /*\{*/
-#define CKGR_MCFR_MAINF_M   0xffffu   ///< Main Clock Frequency mask
+#define CKGR_MCFR_MAINF_M   0xffff    ///< Main Clock Frequency mask
 #define CKGR_MCFR_MAINFRDY  BV(16)    ///< Main Clock Ready
 /*\}*/
 
@@ -281,15 +281,15 @@
 #define   PMC_MCKR_CSS_MAIN_CLK  0x1   ///< Main Clock is selected
 #define   PMC_MCKR_CSS_PLL_CLK   0x2   ///< PLL Clock is selected
 #define PMC_MCKR_PRES_S          4
-#define PMC_MCKR_PRES_M          (0x7u << PMC_MCKR_PRES_S)    ///< Processor Clock Prescaler mask
-#define   PMC_MCKR_PRES_CLK      (0x0u << PMC_MCKR_PRES_S)   ///< Selected clock
-#define   PMC_MCKR_PRES_CLK_2    (0x1u << PMC_MCKR_PRES_S)   ///< Selected clock divided by 2
-#define   PMC_MCKR_PRES_CLK_4    (0x2u << PMC_MCKR_PRES_S)   ///< Selected clock divided by 4
-#define   PMC_MCKR_PRES_CLK_8    (0x3u << PMC_MCKR_PRES_S)   ///< Selected clock divided by 8
-#define   PMC_MCKR_PRES_CLK_16   (0x4u << PMC_MCKR_PRES_S)   ///< Selected clock divided by 16
-#define   PMC_MCKR_PRES_CLK_32   (0x5u << PMC_MCKR_PRES_S)   ///< Selected clock divided by 32
-#define   PMC_MCKR_PRES_CLK_64   (0x6u << PMC_MCKR_PRES_S)   ///< Selected clock divided by 64
-#define   PMC_MCKR_PRES_CLK_3    (0x7u << PMC_MCKR_PRES_S)   ///< Selected clock divided by 3
+#define PMC_MCKR_PRES_M          (0x7 << PMC_MCKR_PRES_S)    ///< Processor Clock Prescaler mask
+#define   PMC_MCKR_PRES_CLK      (0x0 << PMC_MCKR_PRES_S)   ///< Selected clock
+#define   PMC_MCKR_PRES_CLK_2    (0x1 << PMC_MCKR_PRES_S)   ///< Selected clock divided by 2
+#define   PMC_MCKR_PRES_CLK_4    (0x2 << PMC_MCKR_PRES_S)   ///< Selected clock divided by 4
+#define   PMC_MCKR_PRES_CLK_8    (0x3 << PMC_MCKR_PRES_S)   ///< Selected clock divided by 8
+#define   PMC_MCKR_PRES_CLK_16   (0x4 << PMC_MCKR_PRES_S)   ///< Selected clock divided by 16
+#define   PMC_MCKR_PRES_CLK_32   (0x5 << PMC_MCKR_PRES_S)   ///< Selected clock divided by 32
+#define   PMC_MCKR_PRES_CLK_64   (0x6 << PMC_MCKR_PRES_S)   ///< Selected clock divided by 64
+#define   PMC_MCKR_PRES_CLK_3    (0x7 << PMC_MCKR_PRES_S)   ///< Selected clock divided by 3
 #define PMC_MCKR_PLLDIV2         BV(12)   ///< PLL Divisor by 2
 /*\}*/
 
@@ -303,14 +303,14 @@
 #define   PMC_PCK_CSS_PLL      0x2   ///< PLL Clock is selected
 #define   PMC_PCK_CSS_MCK      0x4   ///< Master Clock is selected
 #define PMC_PCK_PRES_S 4
-#define PMC_PCK_PRES_M         (0x7u << PMC_PCK_PRES_S)   ///< Programmable Clock Prescaler
-#define   PMC_PCK_PRES_CLK     (0x0u << PMC_PCK_PRES_S)   ///< Selected clock
-#define   PMC_PCK_PRES_CLK_2   (0x1u << PMC_PCK_PRES_S)   ///< Selected clock divided by 2
-#define   PMC_PCK_PRES_CLK_4   (0x2u << PMC_PCK_PRES_S)   ///< Selected clock divided by 4
-#define   PMC_PCK_PRES_CLK_8   (0x3u << PMC_PCK_PRES_S)   ///< Selected clock divided by 8
-#define   PMC_PCK_PRES_CLK_16  (0x4u << PMC_PCK_PRES_S)   ///< Selected clock divided by 16
-#define   PMC_PCK_PRES_CLK_32  (0x5u << PMC_PCK_PRES_S)   ///< Selected clock divided by 32
-#define   PMC_PCK_PRES_CLK_64  (0x6u << PMC_PCK_PRES_S)   ///< Selected clock divided by 64
+#define PMC_PCK_PRES_M         (0x7 << PMC_PCK_PRES_S)   ///< Programmable Clock Prescaler
+#define   PMC_PCK_PRES_CLK     (0x0 << PMC_PCK_PRES_S)   ///< Selected clock
+#define   PMC_PCK_PRES_CLK_2   (0x1 << PMC_PCK_PRES_S)   ///< Selected clock divided by 2
+#define   PMC_PCK_PRES_CLK_4   (0x2 << PMC_PCK_PRES_S)   ///< Selected clock divided by 4
+#define   PMC_PCK_PRES_CLK_8   (0x3 << PMC_PCK_PRES_S)   ///< Selected clock divided by 8
+#define   PMC_PCK_PRES_CLK_16  (0x4 << PMC_PCK_PRES_S)   ///< Selected clock divided by 16
+#define   PMC_PCK_PRES_CLK_32  (0x5 << PMC_PCK_PRES_S)   ///< Selected clock divided by 32
+#define   PMC_PCK_PRES_CLK_64  (0x6 << PMC_PCK_PRES_S)   ///< Selected clock divided by 64
 /*\}*/
 
 /**

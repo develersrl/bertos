@@ -41,6 +41,8 @@
 #include <cpu/detect.h>
 #include <cfg/compiler.h>
 
+#include "sam3_sysctl.h"
+#include "sam3_pmc.h"
 #include "sam3_memmap.h"
 #include "sam3_ints.h"
 #include "sam3_gpio.h"
