@@ -72,8 +72,9 @@ void cipher_benchmark(BlockCipher *c, const char *cname, int numbytes)
 	t = timer_clock() - t;
 
 	utime_t usec = ticks_to_us(t) / CYCLES;
-	kprintf("%s @ %ldMhz: Encryption with %s-CBC of %d bytes: %lu.%lu ms\n",
+	kprintf("%s @ %ldMhz: %s-CBC of %d bytes: %lu.%lu ms (%d KiB/s)\n",
 			CPU_CORE_NAME, CPU_FREQ/1000000,
 			cname, numbytes,
-			(usec/1000), (usec % 1000));
+			(usec/1000), (usec % 1000),
+			(uint32_t)(numbytes * (CYCLES * 1000000 / 1024) / ticks_to_us(t)));
 }
