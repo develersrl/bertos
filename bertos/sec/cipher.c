@@ -85,3 +85,19 @@ void cipher_ctr_decrypt(BlockCipher *c, void *block)
 {
 	cipher_ctr_encrypt(c, block);
 }
+
+static void ofb_step(BlockCipher *c)
+{
+	c->enc_block(c, c->buf);
+}
+
+void cipher_ofb_encrypt(BlockCipher *c, void *block)
+{
+	ofb_step(c);
+	xor_block(block, block, c->buf, c->block_len);
+}
+
+void cipher_ofb_decrypt(BlockCipher *c, void *block)
+{
+	cipher_ofb_encrypt(c, block);
+}

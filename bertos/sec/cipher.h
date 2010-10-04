@@ -188,4 +188,32 @@ void cipher_ctr_decrypt(BlockCipher *c, void *block);
  */
 void cipher_ctr_step(BlockCipher *c, void *block);
 
+
+/*********************************************************************************/
+/* OFB mode                                                                      */
+/*********************************************************************************/
+
+/**
+ * Initialize OFB by setting the IV.
+ *
+ * \note the memory pointed by \a iv will be used and modified by the CBC
+ * functions. It is caller's responsibility to keep it available until there is
+ * no more OFB work to do.
+ */
+INLINE void cipher_ofb_begin(BlockCipher *c, void *iv)
+{
+	c->buf = iv;
+}
+
+/**
+ * Encrypt a block (in-place) using the current key in OFB mode.
+ */
+void cipher_ofb_encrypt(BlockCipher *c, void *block);
+
+/**
+ * Decrypt a block (in-place) using the current key in OFB mode.
+ */
+void cipher_ofb_decrypt(BlockCipher *c, void *block);
+
+
 #endif /* SEC_CIPHER_H */
