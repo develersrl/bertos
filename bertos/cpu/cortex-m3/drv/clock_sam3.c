@@ -30,18 +30,27 @@
  *
  * -->
  *
- * \brief AT91SAM3 clocking driver.
+ * \brief ATSAM3 clock setup.
  *
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
 #include "clock_sam3.h"
 #include <io/sam3_pmc.h>
+#include <io/sam3_sysctl.h>
 #include <cfg/compiler.h>
 #include <cfg/macros.h>
 
-/* Value to use when writing CKGR_MOR, to unlock write */
-#define CKGR_KEY  0x37
+
+/* Frequency of board main oscillator */
+#define BOARDOSC_FREQ  12000000
+
+/* Main crystal oscillator startup time, optimal value for CPU_FREQ == 48 MHz */
+#define BOARD_OSC_COUNT  (CKGR_MOR_MOSCXTST(0x8))
+
+/* Timer countdown timeout for clock initialization operations */
+#define CLOCK_TIMEOUT    0xFFFFFFFF
+
 
 /*
  * Try to evaluate the correct divider and multiplier value depending
@@ -63,8 +72,7 @@ INLINE uint32_t evaluate_pll(void)
 	{
 		for (div = 1; div <= 24; div++)
 		{
-			// RC oscillator set to 12 MHz
-			freq = 12000000 / div * (1 + mul);
+			freq = BOARDOSC_FREQ / div * (1 + mul);
 			if (ABS((int)CPU_FREQ - freq) < best_delta) {
 				best_delta = ABS((int)CPU_FREQ - freq);
 				best_mul = mul;
@@ -80,14 +88,42 @@ INLINE uint32_t evaluate_pll(void)
 
 void clock_init(void)
 {
-	/* Enable and configure internal Fast RC oscillator */
-	CKGR_MOR_R =
-		CKGR_MOR_KEY(CKGR_KEY)       // Unlock key
-		| CKGR_MOR_MOSCRCEN          // Main On-Chip RC oscillator enable
-		| CKGR_MOR_MOSCRCF_12MHZ;    // RC oscillator frequency
+	uint32_t timeout;
 
-	/* Master clock: select PLL clock and no prescaling */
+	// Select external slow clock
+	if (!(SUPC_SR_R & SUPC_SR_OSCSEL))
+	{
+		SUPC_CR_R = SUPC_CR_XTALSEL | SUPC_CR_KEY(0xA5);
+		while (!(SUPC_SR_R & SUPC_SR_OSCSEL));
+	}
+
+	// Initialize main oscillator
+	if (!(CKGR_MOR_R & CKGR_MOR_MOSCSEL))
+	{
+		CKGR_MOR_R = CKGR_MOR_KEY(0x37) | BOARD_OSC_COUNT | CKGR_MOR_MOSCRCEN | CKGR_MOR_MOSCXTEN;
+		timeout = CLOCK_TIMEOUT;
+		while (!(PMC_SR_R & PMC_SR_MOSCXTS) && --timeout);
+	}
+
+	// Switch to external oscillator
+	CKGR_MOR_R = CKGR_MOR_KEY(0x37) | BOARD_OSC_COUNT | CKGR_MOR_MOSCRCEN | CKGR_MOR_MOSCXTEN | CKGR_MOR_MOSCSEL;
+	timeout = CLOCK_TIMEOUT;
+	while (!(PMC_SR_R & PMC_SR_MOSCSELS) && --timeout);
+
+	PMC_MCKR_R = (PMC_MCKR_R & ~(uint32_t)PMC_MCKR_CSS_M) | PMC_MCKR_CSS_MAIN_CLK;
+	timeout = CLOCK_TIMEOUT;
+	while (!(PMC_SR_R & PMC_SR_MCKRDY) && --timeout);
+
+	// Initialize and enable PLL clock
+	CKGR_PLLR_R = evaluate_pll() | CKGR_PLLR_STUCKTO1 | CKGR_PLLR_PLLCOUNT(0x1);
+	timeout = CLOCK_TIMEOUT;
+	while (!(PMC_SR_R & PMC_SR_LOCK) && --timeout);
+
+	PMC_MCKR_R = PMC_MCKR_CSS_MAIN_CLK;
+	timeout = CLOCK_TIMEOUT;
+	while (!(PMC_SR_R & PMC_SR_MCKRDY) && --timeout);
+
 	PMC_MCKR_R = PMC_MCKR_CSS_PLL_CLK;
-
-	CKGR_PLLR_R = evaluate_pll();
+	timeout = CLOCK_TIMEOUT;
+	while (!(PMC_SR_R & PMC_SR_MCKRDY) && --timeout);
 }
