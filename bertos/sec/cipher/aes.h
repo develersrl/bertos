@@ -41,26 +41,27 @@
 #define SEC_CIPHER_AES_H
 
 #include <sec/cipher.h>
+#include <sec/util.h>
 #include <alloca.h>
 
 typedef struct
 {
 	BlockCipher c;
-	int num_rounds;
+	uint32_t status;
 	uint8_t expkey[44*4];
 } AES128_Context;
 
 typedef struct
 {
 	BlockCipher c;
-	int num_rounds;
+	uint32_t status;
 	uint8_t expkey[52*4];
 } AES192_Context;
 
 typedef struct
 {
 	BlockCipher c;
-	int num_rounds;
+	uint32_t status;
 	uint8_t expkey[60*4];
 } AES256_Context;
 
