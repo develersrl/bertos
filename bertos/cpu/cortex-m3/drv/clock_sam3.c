@@ -38,6 +38,7 @@
 #include "clock_sam3.h"
 #include <io/sam3_pmc.h>
 #include <io/sam3_sysctl.h>
+#include <io/sam3_flash.h>
 #include <cfg/compiler.h>
 #include <cfg/macros.h>
 
@@ -89,6 +90,9 @@ INLINE uint32_t evaluate_pll(void)
 void clock_init(void)
 {
 	uint32_t timeout;
+
+	/* Set 4 wait states for flash access, needed for higher CPU clock rates */
+	EEFC_FMR_R = EEFC_FMR_FWS(3);
 
 	// Select external slow clock
 	if (!(SUPC_SR_R & SUPC_SR_OSCSEL))
