@@ -82,12 +82,16 @@ def newProject():
 
 def editProject(project_file):
     info_dict = {}
+    # Progress dialog.
+    p_dialog = QProgressDialog(QApplication.instance().tr("Wait project loading"), QApplication.instance().tr("Cancel"), 0, 0)
     while(True):
+        p_dialog.show()
         # Empty project is the default fallback.
         QApplication.instance().project = BProject()
         try:
             QApplication.instance().project = BProject(project_file, info_dict)
         except VersionException:
+            p_dialog.hide()
             QMessageBox.critical(
                 None,
                 QObject().tr("BeRTOS version not found!"),
@@ -99,6 +103,7 @@ def editProject(project_file):
                 info_dict["BERTOS_PATH"] = version
             continue
         except ToolchainException, exc:
+            p_dialog.hide()
             QMessageBox.critical(
                 None,
                 QObject().tr("Toolchain not found!"),
@@ -112,6 +117,7 @@ def editProject(project_file):
             continue
         break
     dialog = BEditingDialog()
+    p_dialog.hide()
     dialog.exec_()
 
 def main():
