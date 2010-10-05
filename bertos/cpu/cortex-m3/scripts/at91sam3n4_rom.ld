@@ -31,23 +31,19 @@
  * -->
  *
  * \author Stefano Fedrigo <aleph@develer.com>
+ *
+ * \brief Linker script for AT91SAM3N4 Cortex M3 processor.
+ *
  */
 
-#ifndef SAM3_H
-#define SAM3_H
+/*
+ * Memory configuration for AT91SAM3N4.
+ */
+MEMORY
+{
+        rom(rx) : org = 0x0, len = 256k
+        ram(rwx) : org = 0x20000000, len = 24k
+}
 
-// TODO: refactor common cortex-m3 regs
+INCLUDE "bertos/cpu/cortex-m3/scripts/cortex-m3_rom.ld"
 
-#include <cpu/detect.h>
-#include <cfg/compiler.h>
-
-#include "sam3_sysctl.h"
-#include "sam3_pmc.h"
-#include "sam3_memmap.h"
-#include "sam3_ints.h"
-#include "sam3_gpio.h"
-#include "sam3_nvic.h"
-#include "sam3_uart.h"
-#include "sam3_flash.h"
-
-#endif /* SAM3_H */
