@@ -1,6 +1,6 @@
 name = 'DevelGPS'
 description="""
-<h1DevelGPS</h1>
+<h1>DevelGPS</h1>
 
 <h2>Overview</h2>
 
