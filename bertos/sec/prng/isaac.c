@@ -107,9 +107,9 @@ static void isaac_reseed(PRNG *ctx_, const uint8_t *seed)
 	ub4 a,b,c,d,e,f,g,h;
 	ub4 *m,*r;
 
-	// Copy seed over half of randrsl, to reuse half of last-generated
-	// data as seed.
-	memcpy(ctx->randrsl, seed, sizeof(ctx->randrsl)/2);
+	// XOR the new seed over the current state, so to depend on
+	// the previously-generated output.
+	xor_block(ctx->randrsl, ctx->randrsl, seed, sizeof(ctx->randrsl));
 
 	ctx->randa = ctx->randb = ctx->randc = 0;
 	m=ctx->randmem;
@@ -172,7 +172,7 @@ void isaac_init(IsaacContext *ctx)
 {
 	ctx->prng.reseed = isaac_reseed;
 	ctx->prng.generate = isaac_generate;
-	ctx->prng.seed_len = sizeof(ctx->randrsl) / 2;
+	ctx->prng.seed_len = sizeof(ctx->randrsl);
 	ctx->prng.seeded = 0;
 
 	ctx->randcnt = CONFIG_ISAAC_RANDSIZ*4;
