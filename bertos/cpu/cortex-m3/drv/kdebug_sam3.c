@@ -81,7 +81,7 @@ INLINE void kdbg_hw_init(void)
 	HWREG(UART_GPIO_BASE + GPIO_ABCDSR2) &= ~UART_PINS;
 
 	/* Enable the peripheral clock */
-	PMC_PCER_R = UART_INT;
+	PMC_PCER_R |= BV(UART_INT);
 
 	/* Reset and disable receiver & transmitter */
 	HWREG(UART_BASE + UART_CR) = UART_CR_RSTRX | UART_CR_RSTTX | UART_CR_RXDIS | UART_CR_TXDIS;
