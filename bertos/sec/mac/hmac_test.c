@@ -173,4 +173,4 @@ int hmac_testRun(void)
 	return 0;
 }
 
-TEST_MAIN(HMAC);
+TEST_MAIN(hmac);

@@ -1,8 +1,9 @@
 
+#include "ripemd.h"
+
 #include <cfg/test.h>
 #include <cfg/debug.h>
 
-#include "RIPEMD.h"
 #include <string.h>
 
 int RIPEMD_testSetup(void)

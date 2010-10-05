@@ -65,7 +65,16 @@ SRC_LIST="
 	bertos/io/kblock_ram.c
 	bertos/io/kblock_posix.c
 	bertos/io/kfile.c
+	bertos/sec/cipher.c
 	bertos/sec/cipher/blowfish.c
+	bertos/sec/cipher/aes.c
+	bertos/sec/kdf/pbkdf1.c
+	bertos/sec/kdf/pbkdf2.c
+	bertos/sec/hash/sha1.c
+	bertos/sec/hash/md5.c
+	bertos/sec/hash/ripemd.c
+	bertos/sec/mac/hmac.c
+	bertos/sec/mac/omac.c
 "
 
 buildout='/dev/null'

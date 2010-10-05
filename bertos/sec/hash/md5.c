@@ -37,7 +37,7 @@ static void byteReverse(uint32_t *buf, unsigned longs)
 static void MD5_begin(Hash *h)
 {
 	MD5_Context *ctx = (MD5_Context *)h;
-	
+
     ctx->buf[0] = 0x67452301;
     ctx->buf[1] = 0xefcdab89;
     ctx->buf[2] = 0x98badcfe;
@@ -136,7 +136,7 @@ static uint8_t* MD5_final(struct Hash *h)
 	PURGE(ctx->in);
 	PURGE(ctx->bits);
 
-	return ctx->buf;
+	return (uint8_t *)ctx->buf;
 }
 
 

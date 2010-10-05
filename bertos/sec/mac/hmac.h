@@ -40,6 +40,7 @@
 
 #include <sec/mac.h>
 #include <sec/hash.h>
+
 #include <alloca.h>
 
 typedef struct HmacContext

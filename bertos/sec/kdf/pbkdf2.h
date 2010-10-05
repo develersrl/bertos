@@ -32,7 +32,7 @@
  *
  * \brief PBKDF2 implementation
  * \author Giovanni Bajo <rasky@develer.com>
- * 
+ *
  */
 
 #ifndef SEC_KDF_PBKDF2_H
@@ -41,7 +41,7 @@
 #include <sec/kdf.h>
 #include <sec/mac.h>
 
-typedef struct 
+typedef struct
 {
 	Kdf kdf;
 	Mac *mac;
