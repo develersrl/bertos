@@ -36,6 +36,10 @@
  */
 
 #include "blowfish.h"
+
+#include <cfg/debug.h>
+#include <cfg/test.h>
+
 #include <cpu/byteorder.h>
 #include <string.h>
 

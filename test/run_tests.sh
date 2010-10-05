@@ -65,6 +65,7 @@ SRC_LIST="
 	bertos/io/kblock_ram.c
 	bertos/io/kblock_posix.c
 	bertos/io/kfile.c
+	bertos/sec/cipher/blowfish.c
 "
 
 buildout='/dev/null'
