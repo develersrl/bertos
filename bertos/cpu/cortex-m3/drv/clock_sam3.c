@@ -92,7 +92,7 @@ void clock_init(void)
 	uint32_t timeout;
 
 	/* Set 4 wait states for flash access, needed for higher CPU clock rates */
-	EEFC_FMR_R = EEFC_FMR_FWS(3);
+	EEFC_FMR = EEFC_FMR_FWS(3);
 
 	// Select external slow clock
 	if (!(SUPC_SR_R & SUPC_SR_OSCSEL))
