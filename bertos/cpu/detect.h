@@ -218,6 +218,9 @@
 		#define CPU_CM3_AT91SAM3N   1
 		#define CPU_CM3_AT91SAM3N4  1
 		#define CPU_NAME            "AT91SAM3N4"
+
+		#define CPU_CM3_AT91SAM3N2  0
+		#define CPU_CM3_AT91SAM3N1  0
 	#else
 		#define CPU_CM3_AT91SAM3N4  0
 	#endif
@@ -238,7 +241,7 @@
 		#if CPU_CM3_AT91SAM3N + 0 != 1
 			#error AT91SAM3 Cortex-M3 CPU configuration error
 		#endif
-		#if CPU_CM3_AT91SAM3N4 + 0 != 1
+		#if CPU_CM3_AT91SAM3N4 + CPU_CM3_AT91SAM3N2 + CPU_CM3_AT91SAM3N1 + 0 != 1
 			#error AT91SAM3 Cortex-M3 CPU configuration error
 		#endif
 		#define CPU_CM3_LM3S        0
