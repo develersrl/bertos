@@ -79,14 +79,5 @@
 	#define GPIO_UART1_TX_PIN   BV(3)
 #endif
 /*\}*/
-#if 0
-#include "sam3_sysctl.h"
-#include "sam3_pmc.h"
-#include "sam3_memmap.h"
-#include "sam3_ints.h"
-#include "sam3_gpio.h"
-#include "sam3_uart.h"
-#include "sam3_flash.h"
-#endif
 
 #endif /* SAM3_H */
