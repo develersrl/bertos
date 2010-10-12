@@ -36,18 +36,57 @@
 #ifndef SAM3_H
 #define SAM3_H
 
-// TODO: refactor common cortex-m3 regs
-
 #include <cpu/detect.h>
 #include <cfg/compiler.h>
 
+#if CPU_CM3_AT91SAM3N
+	/*
+	 * Redefine CPU detect macros for compatibility with stock
+	 * Atmel IO include file.
+	 */
+	#if CPU_CM3_AT91SAM3N4
+		#define sam3n4
+	#elif CPU_CM3_AT91SAM3N2
+		#define sam3n2
+	#elif CPU_CM3_AT91SAM3N1
+		#define sam3n1
+	#endif
+	#include "sam3n.h"
+#else
+	#error Unimplemented CPU
+#endif
+
+#include "sam3_nvic.h"
+
+/**
+ * Total number of interrupts.
+ */
+/*\{*/
+#define NUM_INTERRUPTS  32
+/*\}*/
+
+/**
+ * UART PIO pins
+ */
+/*\{*/
+#ifdef CPU_CM3_AT91SAM3U
+	#define GPIO_UART0_RX_PIN   BV(11)
+	#define GPIO_UART0_TX_PIN   BV(12)
+#else
+	#define GPIO_UART0_RX_PIN   BV(9)
+	#define GPIO_UART0_TX_PIN   BV(10)
+	#define GPIO_UART1_RX_PIN   BV(2)
+	#define GPIO_UART1_TX_PIN   BV(3)
+#endif
+/*\}*/
+#if 0
 #include "sam3_sysctl.h"
 #include "sam3_pmc.h"
 #include "sam3_memmap.h"
 #include "sam3_ints.h"
 #include "sam3_gpio.h"
-#include "sam3_nvic.h"
 #include "sam3_uart.h"
 #include "sam3_flash.h"
+#endif
 
 #endif /* SAM3_H */
