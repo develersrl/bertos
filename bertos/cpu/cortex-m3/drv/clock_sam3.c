@@ -89,6 +89,9 @@ void clock_init(void)
 {
 	uint32_t timeout;
 
+	/* Disable watchdog */
+	WDT_MR = WDT_MR_WDDIS;
+
 	/* Set 4 wait states for flash access, needed for higher CPU clock rates */
 	EFC_FMR = EEFC_FMR_FWS(3);
 
