@@ -340,7 +340,7 @@ class BModulePage(BWizardPage):
             maximum = int(informations["max"])
         spin_box.setRange(minimum, maximum)
         spin_box.setSuffix(suff)
-        spin_box.setValue(int(value.replace("L", "").replace("U", ""), 0))
+        spin_box.setValue(int(value.replace("L", "").replace("U", "")))
         self._control_group.addControl(index, spin_box)
         
     
