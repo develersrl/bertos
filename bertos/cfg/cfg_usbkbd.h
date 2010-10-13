@@ -61,4 +61,18 @@
  */
 #define USB_KEYBOARD_LOG_FORMAT     LOG_FMT_TERSE
 
+/**
+ * USB vendor ID (please change this in your project, using a valid ID number!).
+ *
+ * $WIZ$ type = "hex"
+ */
+#define USB_KEYBOARD_VENDOR_ID      0x046d
+
+/**
+ * USB product ID (please change this in your project, using a valid ID number!).
+ *
+ * $WIZ$ type = "hex"
+ */
+#define USB_KEYBOARD_PRODUCT_ID     0xffff
+
 #endif /* CFG_USB_KEYBOARD_H */

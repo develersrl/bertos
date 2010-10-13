@@ -58,8 +58,8 @@
 /*
  * HID device configuration (usb-mouse)
  */
-#define USB_HID_VENDOR_ID	0xffff /* custom */
-#define USB_HID_PRODUCT_ID	0x0000
+#define USB_HID_VENDOR_ID	USB_MOUSE_VENDOR_ID
+#define USB_HID_PRODUCT_ID	USB_MOUSE_PRODUCT_ID
 
 #define USB_HID_INTERFACES	1
 #define USB_HID_ENDPOINTS	1

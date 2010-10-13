@@ -61,4 +61,18 @@
  */
 #define USB_MOUSE_LOG_FORMAT     LOG_FMT_TERSE
 
+/**
+ * USB vendor ID (please change this in your project, using a valid ID number!).
+ *
+ * $WIZ$ type = "hex"
+ */
+#define USB_MOUSE_VENDOR_ID      0xffff
+
+/**
+ * USB product ID (please change this in your project, using a valid ID number!).
+ *
+ * $WIZ$ type = "hex"
+ */
+#define USB_MOUSE_PRODUCT_ID     0x0000
+
 #endif /* CFG_USBMOUSE_H */
