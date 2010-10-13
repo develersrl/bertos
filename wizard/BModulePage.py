@@ -162,6 +162,8 @@ class BModulePage(BWizardPage):
                         self.insertComboBox(index, configurations[property]["value"], configurations[property]["informations"]["value_list"])
                     elif "type" in configurations[property]["informations"] and configurations[property]["informations"]["type"] == "int":
                         self.insertSpinBox(index, configurations[property]["value"], configurations[property]["informations"])
+                    elif "type" in configurations[property]["informations"] and configurations[property]["informations"]["type"] == "hex":
+                        self.insertLineEdit(index, configurations[property]["value"], configurations[property]["informations"])
                     else:
                         # Not defined type, rendered as a text field
                         self.pageContent.propertyTable.setItem(index, 1, QTableWidgetItem(configurations[property]["value"]))
@@ -338,10 +340,22 @@ class BModulePage(BWizardPage):
             maximum = int(informations["max"])
         spin_box.setRange(minimum, maximum)
         spin_box.setSuffix(suff)
-        spin_box.setValue(int(value.replace("L", "").replace("U", "")))
+        spin_box.setValue(int(value.replace("L", "").replace("U", ""), 0))
         self._control_group.addControl(index, spin_box)
         
     
+    def insertLineEdit(self, index, value, informations):
+        """
+        Inserts in the table at index a line edit for hexadecimal property
+        setted to value.
+        """
+        edit_box = QLineEdit()
+        edit_validator = QRegExpValidator(QRegExp(r"^0x[0-9A-Fa-f]+$"), edit_box)
+        edit_box.setValidator(edit_validator)
+        self.pageContent.propertyTable.setCellWidget(index, 1, edit_box)
+        edit_box.setText(value)
+        self._control_group.addControl(index, edit_box)
+
     def currentModule(self):
         """
         Retuns the current module name.
