@@ -218,6 +218,8 @@ class BModulePage(BWizardPage):
                 configurations[configuration][property]["value"] = "1"
             else:
                 configurations[configuration][property]["value"] = "0"
+        elif configurations[configuration][property]["informations"]["type"] == "hex":
+            configurations[configuration][property]["value"] = unicode(self.pageContent.propertyTable.cellWidget(index, 1).text())
         self.setProjectInfo("CONFIGURATIONS", configurations)
         if self.moduleItem(self.currentModule()).checkState(0) == Qt.Checked:
             self.dependencyCheck(self.moduleItem(self.currentModule()))
@@ -604,6 +606,8 @@ class QControlGroup(QObject):
             self.connect(control, SIGNAL("currentIndexChanged(int)"), lambda: self.stateChanged(id))
         elif type(control) == QDoubleSpinBox:
             self.connect(control, SIGNAL("valueChanged(double)"), lambda: self.stateChanged(id))
+        elif type(control) == QLineEdit:
+            self.connect(control, SIGNAL("textChanged(QString)"), lambda: self.stateChanged(id))
     
     def clear(self):
         """
