@@ -34,16 +34,27 @@
  * \author Luca Ottaviano <lottaviano@develer.com>
  */
 
+
+/*
+ * TODO: Revise the public api of this module to be more generic. Evalutate to
+ * implement the more generic layer to be common to all I2S BeRTOS drivers.
+ */
 #include "i2s_at91.h"
+#include "cfg/cfg_i2s.h"
+
+// Define log settings for cfg/log.h.
+#define LOG_LEVEL         I2S_LOG_LEVEL
+#define LOG_FORMAT        I2S_LOG_FORMAT
+#include <cfg/log.h>
 
 #include <drv/timer.h>
-#include <cfg/log.h>
 #include <io/arm.h>
 
 #define DATALEN (15 & SSC_DATLEN_MASK)
 // FIXME: this is not correct for 16 <= DATALEN < 24
 #define PDC_DIV ((DATALEN / 8) + 1)
-/* PDC_DIV must be 1, 2 or 4, which are the bytes that are transferred
+/*
+ * PDC_DIV must be 1, 2 or 4, which are the bytes that are transferred
  * each time the PDC reads from memory.
  */
 STATIC_ASSERT(PDC_DIV % 2 == 0);

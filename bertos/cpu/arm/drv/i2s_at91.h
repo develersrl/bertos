@@ -59,10 +59,9 @@
  * $WIZ$ module_supports = "at91"
  */
 
-#ifndef I2S_H
-#define I2S_H
+#ifndef DRV_I2S_AT91_H
+#define DRV_I2S_AT91_H
 
-#include "cfg/cfg_i2s.h"
 
 #include <cfg/compiler.h>
 #include <cfg/macros.h>
@@ -113,4 +112,4 @@ INLINE bool i2s_isPlaying(void)
 	return !(SSC_SR & BV(SSC_TXEMPTY));
 }
 
-#endif /* I2S_H */
+#endif /* DRV_I2S_AT91_H */
