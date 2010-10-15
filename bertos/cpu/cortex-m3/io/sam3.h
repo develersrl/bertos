@@ -79,12 +79,11 @@
 
 #include "sam3_sysctl.h"
 #include "sam3_pmc.h"
-#include "sam3_memmap.h"
 #include "sam3_ints.h"
 #include "sam3_pio.h"
 #include "sam3_nvic.h"
 #include "sam3_uart.h"
-#include "sam3_us.h"
+#include "sam3_usart.h"
 #include "sam3_spi.h"
 #include "sam3_flash.h"
 #include "sam3_wdt.h"
