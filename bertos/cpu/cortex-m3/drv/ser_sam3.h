@@ -26,24 +26,56 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003,2004 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2000 Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
  *
- * \brief Low-level serial module for Cortex-M3 (interface).
+ * \brief High level serial I/O API
  *
- * \author Andrea Righi <arighi@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
  */
 
-#include <cpu/detect.h>
+#ifndef SER_SAM3_H
+#define SER_SAM3_H
 
-#if CPU_CM3_LM3S
-	#include "ser_lm3s.h"
-#elif CPU_CM3_STM32
-	#include "ser_stm32.h"
-#elif CPU_CM3_AT91SAM3
-	#include "ser_sam3.h"
-/*#elif  Add other Cortex-M3 CPUs here */
-#else
-	#error Unknown CPU
+#include <cfg/macros.h> /* BV() */
+#include <cfg/compiler.h>  /* uint32_t */
+#include <cpu/detect.h>  /* CPU_* */
+
+/** \name Serial Error/status flags. */
+/*\{*/
+typedef uint32_t serstatus_t;
+
+/* Software errors */
+#define SERRF_RXFIFOOVERRUN  BV(0)  /**< Rx FIFO buffer overrun */
+#define SERRF_RXTIMEOUT      BV(1)  /**< Receive timeout */
+#define SERRF_TXTIMEOUT      BV(2)  /**< Transmit timeout */
+
+/*
+ * Hardware errors.
+ * These flags map directly to the ARM USART Channel Status Register (US_CSR).
+ */
+#define SERRF_RXSROVERRUN    BV(5)  /**< Rx shift register overrun */
+#define SERRF_FRAMEERROR     BV(6)  /**< Stop bit missing */
+#define SERRF_PARITYERROR    BV(7)  /**< Parity error */
+#define SERRF_NOISEERROR     0      /**< Unsupported */
+/*\}*/
+
+/**
+ * \name Serial hw numbers
+ *
+ * \{
+ */
+enum
+{
+	SER_UART0,
+#if !CPU_CM3_AT91SAM3U
+	SER_UART1,
 #endif
+	SER_SPI0,
+	SER_CNT  /**< Number of serial ports */
+};
+/*\}*/
+
+#endif /* SER_SAM3_H */
