@@ -30,7 +30,14 @@
  *
  * -->
  *
- * \brief AT91SAM3 NVIC hardware.
+ * \brief ATSAM3 NVIC hardware.
+ *
+ * This file does not follow the BeRTOS AT91 register naming convention,
+ * because the NVIC subsystem is in common with other Cortex-M3 ports.
+ * Take care when using bit definition macros, they don't define bit numbers
+ * but values, i.e. you must not use BV().  Moreover register names have
+ * the _R suffix and offsets don't have the _OFF one.
+ * Someday we will fix this incoherence...
  */
 
 #ifndef SAM3_NVIC_H
