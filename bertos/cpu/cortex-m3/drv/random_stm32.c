@@ -35,7 +35,7 @@
  *
  */
 
-#include "random_p.h"
+#include <sec/random_p.h>
 
 #include <cpu/power.h>
 
