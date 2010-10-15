@@ -42,24 +42,24 @@
 
 
 #if CONFIG_KDEBUG_PORT == 0
-	#define UART_BASE       UART0
-	#define UART_INT        UART0_IRQn
-	#define UART_PIO_BASE   PIOA
-	#define UART_PINS       (GPIO_UART0_RX_PIN | GPIO_UART0_TX_PIN)
+	#define UART_BASE       UART0_BASE
+	#define UART_INT        INT_UART0
+	#define UART_PIO_BASE   PIOA_BASE
+	#define UART_PINS       (BV(RXD0) | BV(TXD0))
 #elif (CONFIG_KDEBUG_PORT == 1) && !defined(CPU_CM3_AT91SAM3U)
-	#define UART_BASE       UART1
-	#define UART_INT        UART1_IRQn
-	#define UART_PIO_BASE   PIOB
-	#define UART_PINS       (GPIO_UART1_RX_PIN | GPIO_UART1_TX_PIN)
+	#define UART_BASE       UART1_BASE
+	#define UART_INT        INT_UART1
+	#define UART_PIO_BASE   PIOB_BASE
+	#define UART_PINS       (BV(RXD1) | BV(TXD1))
 #else
 	#error "UART port not supported in this board"
 #endif
 
 // TODO: refactor serial simple functions and use them, see lm3s kdebug
-#define KDBG_WAIT_READY()     while (!(UART_BASE->UART_SR & UART_SR_TXRDY)) {}
-#define KDBG_WAIT_TXDONE()    while (!(UART_BASE->UART_SR & UART_SR_TXEMPTY)) {}
+#define KDBG_WAIT_READY()     while (!(HWREG(UART_BASE + UART_SR_OFF) & BV(UART_SR_TXRDY))) {}
+#define KDBG_WAIT_TXDONE()    while (!(HWREG(UART_BASE + UART_SR_OFF) & BV(UART_SR_TXEMPTY))) {}
 
-#define KDBG_WRITE_CHAR(c)    do { UART_BASE->UART_THR = (c); } while(0)
+#define KDBG_WRITE_CHAR(c)    do { HWREG(UART_BASE + UART_THR_OFF) = (c); } while(0)
 
 /* Debug unit is used only for debug purposes so does not generate interrupts. */
 #define KDBG_MASK_IRQ(old)    do { (void)old; } while(0)
@@ -73,22 +73,22 @@ typedef uint32_t kdbg_irqsave_t;
 INLINE void kdbg_hw_init(void)
 {
 	/* Disable PIO mode and set appropriate UART pins peripheral mode */
-	UART_PIO_BASE->PIO_PDR = UART_PINS;
-	UART_PIO_BASE->PIO_ABCDSR[0] &= ~UART_PINS;
-	UART_PIO_BASE->PIO_ABCDSR[1] &= ~UART_PINS;
+	HWREG(UART_PIO_BASE + PIO_PDR_OFF) = UART_PINS;
+	HWREG(UART_PIO_BASE + PIO_ABCDSR1_OFF) &= ~UART_PINS;
+	HWREG(UART_PIO_BASE + PIO_ABCDSR2_OFF) &= ~UART_PINS;
 
 	/* Enable the peripheral clock */
 	PMC_PCER |= BV(UART_INT);
 
 	/* Reset and disable receiver & transmitter */
-	UART_BASE->UART_CR = UART_CR_RSTRX | UART_CR_RSTTX | UART_CR_RXDIS | UART_CR_TXDIS;
+	HWREG(UART_BASE + UART_CR_OFF) = BV(UART_CR_RSTRX) | BV(UART_CR_RSTTX) | BV(UART_CR_RXDIS) | BV(UART_CR_TXDIS);
 
 	/* Set mode: normal, no parity */
-	UART_BASE->UART_MR = UART_MR_PAR_NO;
+	HWREG(UART_BASE + UART_MR_OFF) = UART_MR_PAR_NO;
 
 	/* Set baud rate */
-	UART_BASE->UART_BRGR = CPU_FREQ / CONFIG_KDEBUG_BAUDRATE / 16;
+	HWREG(UART_BASE + UART_BRGR_OFF) = CPU_FREQ / CONFIG_KDEBUG_BAUDRATE / 16;
 
 	/* Enable receiver & transmitter */
-	UART_BASE->UART_CR = UART_CR_RXEN | UART_CR_TXEN;
+	HWREG(UART_BASE + UART_CR_OFF) = BV(UART_CR_RXEN) | BV(UART_CR_TXEN);
 }

@@ -36,9 +36,12 @@
  */
 
 #include "clock_sam3.h"
-#include <io/sam3.h>
 #include <cfg/compiler.h>
 #include <cfg/macros.h>
+#include <io/sam3_pmc.h>
+#include <io/sam3_sysctl.h>
+#include <io/sam3_flash.h>
+#include <io/sam3_wdt.h>
 
 
 /* Frequency of board main oscillator */
@@ -90,45 +93,45 @@ void clock_init(void)
 	uint32_t timeout;
 
 	/* Disable watchdog */
-	WDT_MR = WDT_MR_WDDIS;
+	WDT_MR = BV(WDT_WDDIS);
 
 	/* Set 4 wait states for flash access, needed for higher CPU clock rates */
-	EFC_FMR = EEFC_FMR_FWS(3);
+	EEFC_FMR = EEFC_FMR_FWS(3);
 
 	// Select external slow clock
-	if (!(SUPC_SR & SUPC_SR_OSCSEL))
+	if (!(SUPC_SR & BV(SUPC_SR_OSCSEL)))
 	{
-		SUPC_CR = SUPC_CR_XTALSEL | SUPC_CR_KEY(0xA5);
-		while (!(SUPC_SR & SUPC_SR_OSCSEL));
+		SUPC_CR = BV(SUPC_CR_XTALSEL) | SUPC_CR_KEY(0xA5);
+		while (!(SUPC_SR & BV(SUPC_SR_OSCSEL)));
 	}
 
 	// Initialize main oscillator
-	if (!(PMC_MOR & CKGR_MOR_MOSCSEL))
+	if (!(CKGR_MOR & BV(CKGR_MOR_MOSCSEL)))
 	{
-		PMC_MOR = CKGR_MOR_KEY(0x37) | BOARD_OSC_COUNT | CKGR_MOR_MOSCRCEN | CKGR_MOR_MOSCXTEN;
+		CKGR_MOR = CKGR_MOR_KEY(0x37) | BOARD_OSC_COUNT | BV(CKGR_MOR_MOSCRCEN) | BV(CKGR_MOR_MOSCXTEN);
 		timeout = CLOCK_TIMEOUT;
-		while (!(PMC_SR & PMC_SR_MOSCXTS) && --timeout);
+		while (!(PMC_SR & BV(PMC_SR_MOSCXTS)) && --timeout);
 	}
 
 	// Switch to external oscillator
-	PMC_MOR = CKGR_MOR_KEY(0x37) | BOARD_OSC_COUNT | CKGR_MOR_MOSCRCEN | CKGR_MOR_MOSCXTEN | CKGR_MOR_MOSCSEL;
+	CKGR_MOR = CKGR_MOR_KEY(0x37) | BOARD_OSC_COUNT | BV(CKGR_MOR_MOSCRCEN) | BV(CKGR_MOR_MOSCXTEN) | BV(CKGR_MOR_MOSCSEL);
 	timeout = CLOCK_TIMEOUT;
-	while (!(PMC_SR & PMC_SR_MOSCSELS) && --timeout);
+	while (!(PMC_SR & BV(PMC_SR_MOSCSELS)) && --timeout);
 
-	PMC_MCKR = (PMC_MCKR & ~(uint32_t)PMC_MCKR_CSS_Msk) | PMC_MCKR_CSS_MAIN_CLK;
+	PMC_MCKR = (PMC_MCKR & ~(uint32_t)PMC_MCKR_CSS_MASK) | PMC_MCKR_CSS_MAIN_CLK;
 	timeout = CLOCK_TIMEOUT;
-	while (!(PMC_SR & PMC_SR_MCKRDY) && --timeout);
+	while (!(PMC_SR & BV(PMC_SR_MCKRDY)) && --timeout);
 
 	// Initialize and enable PLL clock
-	PMC_PLLR = evaluate_pll() | CKGR_PLLR_STUCKTO1 | CKGR_PLLR_PLLCOUNT(0x1);
+	CKGR_PLLR = evaluate_pll() | BV(CKGR_PLLR_STUCKTO1) | CKGR_PLLR_PLLCOUNT(0x1);
 	timeout = CLOCK_TIMEOUT;
-	while (!(PMC_SR & PMC_SR_LOCK) && --timeout);
+	while (!(PMC_SR & BV(PMC_SR_LOCK)) && --timeout);
 
 	PMC_MCKR = PMC_MCKR_CSS_MAIN_CLK;
 	timeout = CLOCK_TIMEOUT;
-	while (!(PMC_SR & PMC_SR_MCKRDY) && --timeout);
+	while (!(PMC_SR & BV(PMC_SR_MCKRDY)) && --timeout);
 
 	PMC_MCKR = PMC_MCKR_CSS_PLL_CLK;
 	timeout = CLOCK_TIMEOUT;
-	while (!(PMC_SR & PMC_SR_MCKRDY) && --timeout);
+	while (!(PMC_SR & BV(PMC_SR_MCKRDY)) && --timeout);
 }
