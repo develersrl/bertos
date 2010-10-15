@@ -61,4 +61,9 @@ INLINE uint16_t hw_readIntTemp(void)
 	return (temp / 10);
 }
 
+INLINE uint16_t hw_readRawTemp(void)
+{
+	return (uint16_t)ADC_RANGECONV(adc_read(ADC_TEMP_CH), 0, 3300);
+}
+
 #endif /* HW_ADC_H */

@@ -97,7 +97,7 @@ enum EntropySource
  * Add entropy to the global entropy pool.
  */
 void random_add_entropy(enum EntropySource source_idx,
-	   				    const uint8_t *data, size_t len,
+					    const uint8_t *data, size_t len,
 						int entropy);
 
 

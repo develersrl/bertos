@@ -32,13 +32,15 @@
  *
  * \brief LM3 backend implementation entropy pulling.
  * \author Giovanni Bajo <rasky@develer.com>
- *
  */
 
 #include "random_p.h"
+
 #include <cpu/power.h>
+
 #include <io/cm3.h>
-#include <drv/clock_lm3s.h>
+
+#include <drv/clock_cm3.h>
 
 /*
  * Return the cpu core temperature in raw format
@@ -78,14 +80,14 @@ void random_pull_entropy(uint8_t *entropy, size_t len)
 	// to consider it "entropic". It does not really matter because it will
 	// go through a randomness extractor anyway.
 	hw_initIntTemp();
-	
+
 	for (size_t j=0; j<len; j++)
 	{
 		uint8_t accum = 0;
 		for (int b=0; b<8; ++b)
 			if (hw_readRawTemp() & 1)
 				accum |= 1<<b;
-		
+
 		*entropy++ = accum;
 	}
 }

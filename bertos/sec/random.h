@@ -60,7 +60,7 @@
  *     with enough entropy to generate safe random numbers even
  *     immediately after hw reset.
  *     The overall structure is the same as used by modern
- * 	   desktop PCs for generating secure random numbers.
+ *	   desktop PCs for generating secure random numbers.
  *
  *  * \a RANDOM_SECURITY_MEDIUM: This intermediate settings will
  *     avoid usage of an entropy pool, to reduce memory and code
