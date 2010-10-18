@@ -221,6 +221,8 @@
 
 		#define CPU_CM3_AT91SAM3S   0
 		#define CPU_CM3_AT91SAM3U   0
+		#define CPU_CM3_AT91SAM3N2  0
+		#define CPU_CM3_AT91SAM3N1  0
 	#else
 		#define CPU_CM3_AT91SAM3N4  0
 	#endif
