@@ -181,10 +181,23 @@
 	* Default TXINIT macro - invoked in spi_init()
 	* The default is no action.
 	*/
-	#define SER_SPI0_BUS_TXINIT do { \
-		/* Disable PIO on SPI pins */ \
-		PIOA_PDR = BV(SPI0_SPCK) | BV(SPI0_MOSI) | BV(SPI0_MISO); \
-	} while (0)
+	#if CPU_CM3_AT91SAM3
+		#define SER_SPI0_BUS_TXINIT do { \
+			/* Disable PIO on SPI pins */ \
+			PIOA_PDR = BV(SPI0_SPCK) | BV(SPI0_MOSI) | BV(SPI0_MISO) | BV(30); \
+			/* PIO is peripheral A */ \
+			PIOA_ABCDSR1 &= ~(BV(SPI0_SPCK) | BV(SPI0_MOSI) | BV(SPI0_MISO)); \
+			PIOA_ABCDSR2 &= ~(BV(SPI0_SPCK) | BV(SPI0_MOSI) | BV(SPI0_MISO)); \
+			/* Peripheral B for chip select for display */ \
+			PIOA_ABCDSR1 |= BV(30); \
+			PIOA_ABCDSR2 &= ~BV(30); \
+		} while (0)
+	#else
+		#define SER_SPI0_BUS_TXINIT do { \
+			/* Disable PIO on SPI pins */ \
+			PIOA_PDR = BV(SPI0_SPCK) | BV(SPI0_MOSI) | BV(SPI0_MISO); \
+		} while (0)
+	#endif
 #endif
 
 #ifndef SER_SPI0_BUS_TXCLOSE
@@ -349,8 +362,8 @@ static void uart0_init(
 
 	SER_UART0_BUS_TXINIT;
 
-	sysirq_setPriority(US0_ID, SERIRQ_PRIORITY);
-	sysirq_setHandler(US0_ID, uart0_irq_dispatcher);
+	sysirq_setPriority(INT_US0, SERIRQ_PRIORITY);
+	sysirq_setHandler(INT_US0, uart0_irq_dispatcher);
 
 	SER_STROBE_INIT;
 }
@@ -439,8 +452,8 @@ static void uart1_init(
 
 	SER_UART1_BUS_TXINIT;
 
-	sysirq_setPriority(US1_ID, SERIRQ_PRIORITY);
-	sysirq_setHandler(US1_ID, uart1_irq_dispatcher);
+	sysirq_setPriority(INT_US1, SERIRQ_PRIORITY);
+	sysirq_setHandler(INT_US1, uart1_irq_dispatcher);
 
 	SER_STROBE_INIT;
 }
@@ -519,7 +532,7 @@ static void spi0_init(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(struc
 	 * Set SPI to master mode, fixed peripheral select, chip select directly connected to a peripheral device,
 	 * SPI clock set to MCK, mode fault detection disabled, loopback disable, NPCS0 active, Delay between CS = 0
 	 */
-	SPI0_MR = BV(SPI_MSTR) | BV(SPI_MODFDIS);
+	SPI0_MR = BV(SPI_MSTR) | BV(SPI_MODFDIS); // | SPI_PCS_2;
 
 	/*
 	 * Set SPI mode.
@@ -531,8 +544,8 @@ static void spi0_init(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(struc
 	/* Disable all irqs */
 	SPI0_IDR = 0xFFFFFFFF;
 
-	sysirq_setPriority(SPI0_ID, SERIRQ_PRIORITY);
-	sysirq_setHandler(SPI0_ID, spi0_irq_handler);
+	//sysirq_setPriority(INT_SPI0, SERIRQ_PRIORITY);
+	sysirq_setHandler(INT_SPI0, spi0_irq_handler);
 	PMC_PCER = BV(SPI0_ID);
 
 	/* Enable interrupt on tx buffer empty */
@@ -605,8 +618,8 @@ static void spi1_init(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(struc
 	/* Disable all SPI irqs */
 	SPI1_IDR = 0xFFFFFFFF;
 
-	sysirq_setPriority(SPI1_ID, SERIRQ_PRIORITY);
-	sysirq_setHandler(SPI1_ID, spi1_irq_dispatcher);
+	sysirq_setPriority(INT_SPI1, SERIRQ_PRIORITY);
+	sysirq_setHandler(INT_SPI1, spi1_irq_dispatcher);
 	PMC_PCER = BV(SPI1_ID);
 
 	/* Enable interrupt on tx buffer empty */
