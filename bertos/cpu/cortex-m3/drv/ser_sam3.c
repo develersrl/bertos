@@ -35,6 +35,7 @@
  *
  *
  * \author Daniele Basile <asterix@develer.com>
+ * \author Stefano Fedrigo <aleph@develer.com>
  */
 
 #include "hw/hw_ser.h"  /* Required for bus macros overrides */
@@ -188,7 +189,7 @@
 			/* PIO is peripheral A */ \
 			PIOA_ABCDSR1 &= ~(BV(SPI0_SPCK) | BV(SPI0_MOSI) | BV(SPI0_MISO)); \
 			PIOA_ABCDSR2 &= ~(BV(SPI0_SPCK) | BV(SPI0_MOSI) | BV(SPI0_MISO)); \
-			/* Peripheral B for chip select for display */ \
+			/* Peripheral B for chip select for display (FIXME: move away from driver) */ \
 			PIOA_ABCDSR1 |= BV(30); \
 			PIOA_ABCDSR2 &= ~BV(30); \
 		} while (0)
@@ -548,9 +549,6 @@ static void spi0_init(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(struc
 	sysirq_setHandler(INT_SPI0, spi0_irq_handler);
 	PMC_PCER = BV(SPI0_ID);
 
-	/* Enable interrupt on tx buffer empty */
-	SPI0_IER = BV(SPI_TXEMPTY);
-
 	/* Enable SPI */
 	SPI0_CR = BV(SPI_SPIEN);
 
@@ -580,6 +578,8 @@ static void spi0_starttx(struct SerialHardware *_hw)
 	{
 		hw->sending = true;
 		SPI0_TDR = fifo_pop(&ser_handles[SER_SPI0]->txfifo);
+		/* Enable interrupt on tx buffer empty */
+		SPI0_IER = BV(SPI_TXEMPTY);
 	}
 
 	IRQ_RESTORE(flags);
@@ -622,9 +622,6 @@ static void spi1_init(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(struc
 	sysirq_setHandler(INT_SPI1, spi1_irq_dispatcher);
 	PMC_PCER = BV(SPI1_ID);
 
-	/* Enable interrupt on tx buffer empty */
-	SPI1_IER = BV(SPI_TXEMPTY);
-
 	/* Enable SPI */
 	SPI1_CR = BV(SPI_SPIEN);
 
@@ -654,6 +651,8 @@ static void spi1_starttx(struct SerialHardware *_hw)
 	{
 		hw->sending = true;
 		SPI1_TDR = fifo_pop(&ser_handles[SER_SPI1]->txfifo);
+		/* Enable interrupt on tx buffer empty */
+		SPI1_IER = BV(SPI_TXEMPTY);
 	}
 
 	IRQ_RESTORE(flags);
@@ -935,7 +934,11 @@ static DECLARE_ISR(spi0_irq_handler)
 	if (!fifo_isempty(&ser_handles[SER_SPI0]->txfifo))
 		SPI0_TDR = fifo_pop(&ser_handles[SER_SPI0]->txfifo);
 	else
+	{
 		UARTDescs[SER_SPI0].sending = false;
+		/* Disable interrupt on tx buffer empty */
+		SPI0_IDR = BV(SPI_TXEMPTY);
+	}
 
 	SER_INT_ACK;
 
@@ -965,7 +968,11 @@ static DECLARE_ISR(spi1_irq_handler)
 	if (!fifo_isempty(&ser_handles[SER_SPI1]->txfifo))
 		SPI1_TDR = fifo_pop(&ser_handles[SER_SPI1]->txfifo);
 	else
+	{
 		UARTDescs[SER_SPI1].sending = false;
+		/* Disable interrupt on tx buffer empty */
+		SPI1_IDR = BV(SPI_TXEMPTY);
+	}
 
 	SER_INT_ACK;
 
