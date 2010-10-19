@@ -37,42 +37,59 @@
 #define SAM3_INTS_H
 
 /**
+ * Defines for the fault assignments.
+ */
+/*\{*/
+#define FAULT_NMI               2           ///< NMI fault
+#define FAULT_HARD              3           ///< Hard fault
+#define FAULT_MPU               4           ///< MPU fault
+#define FAULT_BUS               5           ///< Bus fault
+#define FAULT_USAGE             6           ///< Usage fault
+#define FAULT_SVCALL            11          ///< SVCall
+#define FAULT_DEBUG             12          ///< Debug monitor
+#define FAULT_PENDSV            14          ///< PendSV
+#define FAULT_SYSTICK           15          ///< System Tick
+/*\}*/
+
+/**
  * Defines for the interrupt assignments.
  */
 /*\{*/
-#define INT_SUPC     0  ///< Supply Controller (SUPC)
-#define INT_RSTC     1  ///< Reset Controller (RSTC)
-#define INT_RTC      2  ///< Real Time Clock (RTC)
-#define INT_RTT      3  ///< Real Time Timer (RTT)
-#define INT_WDT      4  ///< Watchdog Timer (WDT)
-#define INT_PMC      5  ///< Power Management Controller (PMC)
-#define INT_EFC      6  ///< Enhanced Flash Controller (EFC)
-#define INT_UART0    8  ///< UART 0 (UART0)
-#define INT_UART1    9  ///< UART 1 (UART1)
-#define INT_PIOA    11  ///< Parallel I/O Controller A (PIOA)
-#define INT_PIOB    12  ///< Parallel I/O Controller B (PIOB)
-#define INT_PIOC    13  ///< Parallel I/O Controller C (PIOC)
-#define INT_USART0  14  ///< USART 0 (USART0)
-#define INT_USART1  15  ///< USART 1 (USART1)
-#define INT_TWI0    19  ///< Two Wire Interface 0 (TWI0)
-#define INT_TWI1    20  ///< Two Wire Interface 1 (TWI1)
-#define INT_SPI     21  ///< Serial Peripheral Interface (SPI)
-#define INT_TC0     23  ///< Timer/Counter 0 (TC0)
-#define INT_TC1     24  ///< Timer/Counter 1 (TC1)
-#define INT_TC2     25  ///< Timer/Counter 2 (TC2)
-#define INT_TC3     26  ///< Timer/Counter 3 (TC3)
-#define INT_TC4     27  ///< Timer/Counter 4 (TC4)
-#define INT_TC5     28  ///< Timer/Counter 5 (TC5)
-#define INT_ADC     29  ///< Analog To Digital Converter (ADC)
-#define INT_DACC    30  ///< Digital To Analog Converter (DACC)
-#define INT_PWM     31  ///< Pulse Width Modulation (PWM)
+#define INT_PERIPH_BASE  16
+
+#define INT_SUPC    (INT_PERIPH_BASE + SUPC_ID)   ///< Supply Controller (SUPC)
+#define INT_RSTC    (INT_PERIPH_BASE + RSTC_ID)   ///< Reset Controller (RSTC)
+#define INT_RTC     (INT_PERIPH_BASE + RTC_ID)    ///< Real Time Clock (RTC)
+#define INT_RTT     (INT_PERIPH_BASE + RTT_ID)    ///< Real Time Timer (RTT)
+#define INT_WDT     (INT_PERIPH_BASE + WDT_ID)    ///< Watchdog Timer (WDT)
+#define INT_PMC     (INT_PERIPH_BASE + PMC_ID)    ///< Power Management Controller (PMC)
+#define INT_EFC     (INT_PERIPH_BASE + EFC_ID)    ///< Enhanced Flash Controller (EFC)
+#define INT_UART0   (INT_PERIPH_BASE + UART0_ID)  ///< UART 0 (UART0)
+#define INT_UART1   (INT_PERIPH_BASE + UART1_ID)  ///< UART 1 (UART1)
+#define INT_PIOA    (INT_PERIPH_BASE + PIOA_ID)   ///< Parallel I/O Controller A (PIOA)
+#define INT_PIOB    (INT_PERIPH_BASE + PIOB_ID)   ///< Parallel I/O Controller B (PIOB)
+#define INT_PIOC    (INT_PERIPH_BASE + PIOC_ID)   ///< Parallel I/O Controller C (PIOC)
+#define INT_US0     (INT_PERIPH_BASE + US0_ID)    ///< USART 0 (USART0)
+#define INT_US1     (INT_PERIPH_BASE + US1_ID)    ///< USART 1 (USART1)
+#define INT_TWI0    (INT_PERIPH_BASE + TWI0_ID)   ///< Two Wire Interface 0 (TWI0)
+#define INT_TWI1    (INT_PERIPH_BASE + TWI1_ID)   ///< Two Wire Interface 1 (TWI1)
+#define INT_SPI0    (INT_PERIPH_BASE + SPI0_ID)   ///< Serial Peripheral Interface (SPI)
+#define INT_TC0     (INT_PERIPH_BASE + TC0_ID)    ///< Timer/Counter 0 (TC0)
+#define INT_TC1     (INT_PERIPH_BASE + TC1_ID)    ///< Timer/Counter 1 (TC1)
+#define INT_TC2     (INT_PERIPH_BASE + TC2_ID)    ///< Timer/Counter 2 (TC2)
+#define INT_TC3     (INT_PERIPH_BASE + TC3_ID)    ///< Timer/Counter 3 (TC3)
+#define INT_TC4     (INT_PERIPH_BASE + TC4_ID)    ///< Timer/Counter 4 (TC4)
+#define INT_TC5     (INT_PERIPH_BASE + TC5_ID)    ///< Timer/Counter 5 (TC5)
+#define INT_ADC     (INT_PERIPH_BASE + ADC_ID)    ///< Analog To Digital Converter (ADC)
+#define INT_DACC    (INT_PERIPH_BASE + DACC_ID)   ///< Digital To Analog Converter (DACC)
+#define INT_PWM     (INT_PERIPH_BASE + PWM_ID)    ///< Pulse Width Modulation (PWM)
 /*\}*/
 
 /**
  * Total number of interrupts.
  */
 /*\{*/
-#define NUM_INTERRUPTS  32
+#define NUM_INTERRUPTS  48
 /*\}*/
 
 #endif /* SAM3_INTS_H */

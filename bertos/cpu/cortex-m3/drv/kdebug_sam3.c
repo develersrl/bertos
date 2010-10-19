@@ -43,12 +43,12 @@
 
 #if CONFIG_KDEBUG_PORT == 0
 	#define UART_BASE       UART0_BASE
-	#define UART_INT        INT_UART0
+	#define UART_ID         UART0_ID
 	#define UART_PIO_BASE   PIOA_BASE
 	#define UART_PINS       (BV(RXD0) | BV(TXD0))
 #elif (CONFIG_KDEBUG_PORT == 1) && !defined(CPU_CM3_AT91SAM3U)
 	#define UART_BASE       UART1_BASE
-	#define UART_INT        INT_UART1
+	#define UART_ID         UART1_ID
 	#define UART_PIO_BASE   PIOB_BASE
 	#define UART_PINS       (BV(RXD1) | BV(TXD1))
 #else
@@ -78,7 +78,7 @@ INLINE void kdbg_hw_init(void)
 	HWREG(UART_PIO_BASE + PIO_ABCDSR2_OFF) &= ~UART_PINS;
 
 	/* Enable the peripheral clock */
-	PMC_PCER |= BV(UART_INT);
+	PMC_PCER = BV(UART_ID);
 
 	/* Reset and disable receiver & transmitter */
 	HWREG(UART_BASE + UART_CR_OFF) = BV(UART_CR_RSTRX) | BV(UART_CR_RSTTX) | BV(UART_CR_RXDIS) | BV(UART_CR_TXDIS);

@@ -40,36 +40,40 @@
 #include <cfg/compiler.h>
 
 /*
- * Peripherals IDs, same as interrupt numbers.
+ * Peripherals IDs.
  */
-#define SUPC_ID    INT_SUPC     ///< Supply Controller (SUPC)
-#define RSTC_ID    INT_RSTC     ///< Reset Controller (RSTC)
-#define RTC_ID     INT_RTC      ///< Real Time Clock (RTC)
-#define RTT_ID     INT_RTT      ///< Real Time Timer (RTT)
-#define WDT_ID     INT_WDT      ///< Watchdog Timer (WDT)
-#define PMC_ID     INT_PMC      ///< Power Management Controller (PMC)
-#define EFC_ID     INT_EFC      ///< Enhanced Flash Controller (EFC)
-#define UART0_ID   INT_UART0    ///< UART 0 (UART0)
-#define UART1_ID   INT_UART1    ///< UART 1 (UART1)
-#define UART2_ID   INT_UART2    ///< UART 0 (UART0)
-#define UART3_ID   INT_UART3    ///< UART 1 (UART1)
-#define PIOA_ID    INT_PIOA     ///< Parallel I/O Controller A (PIOA)
-#define PIOB_ID    INT_PIOB     ///< Parallel I/O Controller B (PIOB)
-#define PIOC_ID    INT_PIOC     ///< Parallel I/O Controller C (PIOC)
-#define US0_ID     INT_USART0   ///< USART 0 (USART0)
-#define US1_ID     INT_USART1   ///< USART 1 (USART1)
-#define TWI0_ID    INT_TWI0     ///< Two Wire Interface 0 (TWI0)
-#define TWI1_ID    INT_TWI1     ///< Two Wire Interface 1 (TWI1)
-#define SPI0_ID    INT_SPI      ///< Serial Peripheral Interface (SPI)
-#define TC0_ID     INT_TC0      ///< Timer/Counter 0 (TC0)
-#define TC1_ID     INT_TC1      ///< Timer/Counter 1 (TC1)
-#define TC2_ID     INT_TC2      ///< Timer/Counter 2 (TC2)
-#define TC3_ID     INT_TC3      ///< Timer/Counter 3 (TC3)
-#define TC4_ID     INT_TC4      ///< Timer/Counter 4 (TC4)
-#define TC5_ID     INT_TC5      ///< Timer/Counter 5 (TC5)
-#define ADC_ID     INT_ADC      ///< Analog To Digital Converter (ADC)
-#define DACC_ID    INT_DACC     ///< Digital To Analog Converter (DACC)
-#define PWM_ID     INT_PWM      ///< Pulse Width Modulation (PWM)
+/*\{*/
+#if CPU_CM3_AT91SAM3N
+	#define SUPC_ID      0   ///< Supply Controller (SUPC)
+	#define RSTC_ID      1   ///< Reset Controller (RSTC)
+	#define RTC_ID       2   ///< Real Time Clock (RTC)
+	#define RTT_ID       3   ///< Real Time Timer (RTT)
+	#define WDT_ID       4   ///< Watchdog Timer (WDT)
+	#define PMC_ID       5   ///< Power Management Controller (PMC)
+	#define EFC_ID       6   ///< Enhanced Flash Controller (EFC)
+	#define UART0_ID     8   ///< UART 0 (UART0)
+	#define UART1_ID     9   ///< UART 1 (UART1)
+	#define PIOA_ID     11   ///< Parallel I/O Controller A (PIOA)
+	#define PIOB_ID     12   ///< Parallel I/O Controller B (PIOB)
+	#define PIOC_ID     13   ///< Parallel I/O Controller C (PIOC)
+	#define US0_ID      14   ///< USART 0 (USART0)
+	#define US1_ID      15   ///< USART 1 (USART1)
+	#define TWI0_ID     19   ///< Two Wire Interface 0 (TWI0)
+	#define TWI1_ID     20   ///< Two Wire Interface 1 (TWI1)
+	#define SPI0_ID     21   ///< Serial Peripheral Interface (SPI)
+	#define TC0_ID      23   ///< Timer/Counter 0 (TC0)
+	#define TC1_ID      24   ///< Timer/Counter 1 (TC1)
+	#define TC2_ID      25   ///< Timer/Counter 2 (TC2)
+	#define TC3_ID      26   ///< Timer/Counter 3 (TC3)
+	#define TC4_ID      27   ///< Timer/Counter 4 (TC4)
+	#define TC5_ID      28   ///< Timer/Counter 5 (TC5)
+	#define ADC_ID      29   ///< Analog To Digital Converter (ADC)
+	#define DACC_ID     30   ///< Digital To Analog Converter (DACC)
+	#define PWM_ID      31   ///< Pulse Width Modulation (PWM)
+#else
+	#error Peripheral IDs undefined
+#endif
+/*\}*/
 
 /*
  * Hardware features for drivers.
