@@ -533,14 +533,19 @@ static void spi0_init(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(struc
 	 * Set SPI to master mode, fixed peripheral select, chip select directly connected to a peripheral device,
 	 * SPI clock set to MCK, mode fault detection disabled, loopback disable, NPCS0 active, Delay between CS = 0
 	 */
-	SPI0_MR = BV(SPI_MSTR) | BV(SPI_MODFDIS); // | SPI_PCS_2;
+	SPI0_MR = BV(SPI_MSTR) | BV(SPI_MODFDIS);
 
 	/*
 	 * Set SPI mode.
 	 * At reset clock division factor is set to 0, that is
 	 * *forbidden*. Set SPI clock to minimum to keep it valid.
+	 * Set all possible chip select registers in case user manually
+	 * change chip select.
 	 */
 	SPI0_CSR0 = BV(SPI_NCPHA) | (255 << SPI_SCBR_SHIFT);
+	SPI0_CSR1 = BV(SPI_NCPHA) | (255 << SPI_SCBR_SHIFT);
+	SPI0_CSR2 = BV(SPI_NCPHA) | (255 << SPI_SCBR_SHIFT);
+	SPI0_CSR3 = BV(SPI_NCPHA) | (255 << SPI_SCBR_SHIFT);
 
 	/* Disable all irqs */
 	SPI0_IDR = 0xFFFFFFFF;
@@ -579,7 +584,7 @@ static void spi0_starttx(struct SerialHardware *_hw)
 		hw->sending = true;
 		SPI0_TDR = fifo_pop(&ser_handles[SER_SPI0]->txfifo);
 		/* Enable interrupt on tx buffer empty */
-		SPI0_IER = BV(SPI_TXEMPTY);
+		SPI0_IER = BV(SPI_TDRE);
 	}
 
 	IRQ_RESTORE(flags);
@@ -612,8 +617,13 @@ static void spi1_init(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(struc
 	 * Set SPI mode.
 	 * At reset clock division factor is set to 0, that is
 	 * *forbidden*. Set SPI clock to minimum to keep it valid.
+	 * Set all possible chip select registers in case user manually
+	 * change chip select.
 	 */
 	SPI1_CSR0 = BV(SPI_NCPHA) | (255 << SPI_SCBR_SHIFT);
+	SPI1_CSR1 = BV(SPI_NCPHA) | (255 << SPI_SCBR_SHIFT);
+	SPI1_CSR2 = BV(SPI_NCPHA) | (255 << SPI_SCBR_SHIFT);
+	SPI1_CSR3 = BV(SPI_NCPHA) | (255 << SPI_SCBR_SHIFT);
 
 	/* Disable all SPI irqs */
 	SPI1_IDR = 0xFFFFFFFF;
@@ -652,7 +662,7 @@ static void spi1_starttx(struct SerialHardware *_hw)
 		hw->sending = true;
 		SPI1_TDR = fifo_pop(&ser_handles[SER_SPI1]->txfifo);
 		/* Enable interrupt on tx buffer empty */
-		SPI1_IER = BV(SPI_TXEMPTY);
+		SPI1_IER = BV(SPI_TDRE);
 	}
 
 	IRQ_RESTORE(flags);
@@ -937,7 +947,7 @@ static DECLARE_ISR(spi0_irq_handler)
 	{
 		UARTDescs[SER_SPI0].sending = false;
 		/* Disable interrupt on tx buffer empty */
-		SPI0_IDR = BV(SPI_TXEMPTY);
+		SPI0_IDR = BV(SPI_TDRE);
 	}
 
 	SER_INT_ACK;
@@ -971,7 +981,7 @@ static DECLARE_ISR(spi1_irq_handler)
 	{
 		UARTDescs[SER_SPI1].sending = false;
 		/* Disable interrupt on tx buffer empty */
-		SPI1_IDR = BV(SPI_TXEMPTY);
+		SPI1_IDR = BV(SPI_TDRE);
 	}
 
 	SER_INT_ACK;
