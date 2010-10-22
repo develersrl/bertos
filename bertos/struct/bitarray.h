@@ -144,6 +144,9 @@ INLINE bool bitarray_test(BitArray *bitx, int idx)
  * Check if the bitarray is full
  *
  * Only \a bitarray_len bits are tested.
+ *
+ * \param bitx BitArray to test
+ * \return True if \a bitx is full, false otherwise
  */
 INLINE bool bitarray_isFull(BitArray *bitx)
 {
@@ -170,6 +173,7 @@ INLINE bool bitarray_isFull(BitArray *bitx)
  * \param bitx BitArray context
  * \param idx Starting bit
  * \param offset Number of bits to test
+ * \return True if range is full, false otherwise
  */
 INLINE bool bitarray_isRangeFull(BitArray *bitx, int idx, int offset)
 {
@@ -191,6 +195,7 @@ INLINE bool bitarray_isRangeFull(BitArray *bitx, int idx, int offset)
  * \param bitx BitArray context
  * \param idx Starting bit
  * \param offset Number of bits to test
+ * \return True if range is empty, false otherwise
  */
 INLINE bool bitarray_isRangeEmpty(BitArray *bitx, int idx, int offset)
 {
