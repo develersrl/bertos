@@ -34,6 +34,8 @@
  *
  * \brief Generic USB mouse device driver.
  *
+ * \attention The API is work in progress and may change in future versions.
+ *
  * $WIZ$ module_name = "usbmouse"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_usbmouse.h"
  * $WIZ$ module_depends = "usb"

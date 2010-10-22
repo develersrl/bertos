@@ -37,6 +37,8 @@
  * This file holds USB constants and structures that are needed for USB device
  * APIs, as defined in the USB 2.0 specification.
  *
+ * \attention The API is work in progress and may change in future versions.
+ *
  * $WIZ$ module_name = "usb"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_usb.h"
  * $WIZ$ module_supports = "stm32"

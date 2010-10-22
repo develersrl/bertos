@@ -34,6 +34,10 @@
  *
  * \brief Generic USB serial device driver.
  *
+ * This driver exports a USB-serial converter. It provides a KFile interface
+ * to access the data.
+ * \attention The API is work in progress and may change in future versions.
+ *
  * $WIZ$ module_name = "usbser"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_usbser.h"
  * $WIZ$ module_depends = "usb"

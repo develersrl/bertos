@@ -34,6 +34,10 @@
  *
  * \brief Generic USB keyboard device driver.
  *
+ * This module allows to create virtual keyboards.
+ *
+ * \attention The API is work in progress and may change in future versions.
+ *
  * $WIZ$ module_name = "usbkbd"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_usbkbd.h"
  * $WIZ$ module_depends = "usb"
