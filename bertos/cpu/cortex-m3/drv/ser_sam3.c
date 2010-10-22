@@ -185,13 +185,10 @@
 	#if CPU_CM3_AT91SAM3
 		#define SER_SPI0_BUS_TXINIT do { \
 			/* Disable PIO on SPI pins */ \
-			PIOA_PDR = BV(SPI0_SPCK) | BV(SPI0_MOSI) | BV(SPI0_MISO) | BV(30); \
+			PIOA_PDR = BV(SPI0_SPCK) | BV(SPI0_MOSI) | BV(SPI0_MISO); \
 			/* PIO is peripheral A */ \
 			PIOA_ABCDSR1 &= ~(BV(SPI0_SPCK) | BV(SPI0_MOSI) | BV(SPI0_MISO)); \
 			PIOA_ABCDSR2 &= ~(BV(SPI0_SPCK) | BV(SPI0_MOSI) | BV(SPI0_MISO)); \
-			/* Peripheral B for chip select for display (FIXME: move away from driver) */ \
-			PIOA_ABCDSR1 |= BV(30); \
-			PIOA_ABCDSR2 &= ~BV(30); \
 		} while (0)
 	#else
 		#define SER_SPI0_BUS_TXINIT do { \
@@ -540,7 +537,7 @@ static void spi0_init(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(struc
 	 * At reset clock division factor is set to 0, that is
 	 * *forbidden*. Set SPI clock to minimum to keep it valid.
 	 * Set all possible chip select registers in case user manually
-	 * change chip select.
+	 * change CPS field in SPI_MR.
 	 */
 	SPI0_CSR0 = BV(SPI_NCPHA) | (255 << SPI_SCBR_SHIFT);
 	SPI0_CSR1 = BV(SPI_NCPHA) | (255 << SPI_SCBR_SHIFT);
@@ -584,7 +581,7 @@ static void spi0_starttx(struct SerialHardware *_hw)
 		hw->sending = true;
 		SPI0_TDR = fifo_pop(&ser_handles[SER_SPI0]->txfifo);
 		/* Enable interrupt on tx buffer empty */
-		SPI0_IER = BV(SPI_TDRE);
+		SPI0_IER = BV(SPI_TXEMPTY);
 	}
 
 	IRQ_RESTORE(flags);
@@ -662,7 +659,7 @@ static void spi1_starttx(struct SerialHardware *_hw)
 		hw->sending = true;
 		SPI1_TDR = fifo_pop(&ser_handles[SER_SPI1]->txfifo);
 		/* Enable interrupt on tx buffer empty */
-		SPI1_IER = BV(SPI_TDRE);
+		SPI1_IER = BV(SPI_TXEMPTY);
 	}
 
 	IRQ_RESTORE(flags);
@@ -947,7 +944,7 @@ static DECLARE_ISR(spi0_irq_handler)
 	{
 		UARTDescs[SER_SPI0].sending = false;
 		/* Disable interrupt on tx buffer empty */
-		SPI0_IDR = BV(SPI_TDRE);
+		SPI0_IDR = BV(SPI_TXEMPTY);
 	}
 
 	SER_INT_ACK;
@@ -981,7 +978,7 @@ static DECLARE_ISR(spi1_irq_handler)
 	{
 		UARTDescs[SER_SPI1].sending = false;
 		/* Disable interrupt on tx buffer empty */
-		SPI1_IDR = BV(SPI_TDRE);
+		SPI1_IDR = BV(SPI_TXEMPTY);
 	}
 
 	SER_INT_ACK;
