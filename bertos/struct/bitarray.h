@@ -52,9 +52,19 @@ typedef struct BitArray
 	uint8_t *array;       /// Pointer to memory occupied by the bitarray
 } BitArray;
 
+/**
+ * Convenience macro to create a memory area for the BitArray.
+ * \param name Name of the variable.
+ * \param size Number of bits requested. It will be rounded to the nearest
+ *             byte
+ */
 #define BITARRAY_ALLOC(name, size)   uint8_t name[DIV_ROUNDUP((size), 8)]
-#define BITARRAY_SIZE(name)         (sizeof((name)) * 8)
 
+/**
+ * Set one bit into the bit array.
+ * \param bitx BitArray context
+ * \param idx The bit to set
+ */
 INLINE void bitarray_set(BitArray *bitx, int idx)
 {
 	ASSERT((size_t)idx <= bitx->bitarray_len);
@@ -65,6 +75,11 @@ INLINE void bitarray_set(BitArray *bitx, int idx)
 	bitx->array[page] |= BV(bit);
 }
 
+/**
+ * Clear one bit in the bit array.
+ * \param bitx BitArray context
+ * \param idx The bit to clear
+ */
 INLINE void bitarray_clear(BitArray *bitx, int idx)
 {
 	ASSERT((size_t)idx <= bitx->bitarray_len);
@@ -75,6 +90,15 @@ INLINE void bitarray_clear(BitArray *bitx, int idx)
 	bitx->array[page] &= ~BV(bit);
 }
 
+/**
+ * Set a range of bits.
+ *
+ * The range starts from \a idx (inclusive) and spans \a offset bits.
+ *
+ * \param bitx BitArray context
+ * \param idx Starting bit
+ * \param offset Number of bit to set
+ */
 INLINE void bitarray_setRange(BitArray *bitx, int idx, int offset)
 {
 	ASSERT((size_t)idx <= bitx->bitarray_len);
@@ -83,7 +107,15 @@ INLINE void bitarray_setRange(BitArray *bitx, int idx, int offset)
 		bitarray_set(bitx, i);
 }
 
-
+/**
+ * Clear a range of bits.
+ *
+ * The range starts from \a idx (inclusive) and spans \a offset bits.
+ *
+ * \param bitx BitArray context
+ * \param idx Starting bit
+ * \param offset Number of bits to clear
+ */
 INLINE void bitarray_clearRange(BitArray *bitx, int idx, int offset)
 {
 	ASSERT((size_t)idx <= bitx->bitarray_len);
@@ -92,6 +124,13 @@ INLINE void bitarray_clearRange(BitArray *bitx, int idx, int offset)
 		bitarray_clear(bitx, i);
 }
 
+/**
+ * Test a bit.
+ *
+ * \param bitx BitArray context
+ * \param idx Bit to test
+ * \return True if bit is set, false otherwise.
+ */
 INLINE bool bitarray_test(BitArray *bitx, int idx)
 {
 	ASSERT((size_t)idx <= bitx->bitarray_len);
@@ -125,6 +164,13 @@ INLINE bool bitarray_isFull(BitArray *bitx)
 /*
  * Ugly!.. reformat it.
  */
+/**
+ * Test if a range of bit is full.
+ *
+ * \param bitx BitArray context
+ * \param idx Starting bit
+ * \param offset Number of bits to test
+ */
 INLINE bool bitarray_isRangeFull(BitArray *bitx, int idx, int offset)
 {
 	ASSERT((size_t)(idx + offset) <= bitx->bitarray_len);
@@ -139,6 +185,13 @@ INLINE bool bitarray_isRangeFull(BitArray *bitx, int idx, int offset)
 /*
  * Ugly!.. reformat it.
  */
+/**
+ * Test if a range of bit is empty.
+ *
+ * \param bitx BitArray context
+ * \param idx Starting bit
+ * \param offset Number of bits to test
+ */
 INLINE bool bitarray_isRangeEmpty(BitArray *bitx, int idx, int offset)
 {
 	ASSERT((size_t)(idx + offset) <= bitx->bitarray_len);
@@ -150,7 +203,12 @@ INLINE bool bitarray_isRangeEmpty(BitArray *bitx, int idx, int offset)
 	return 1;
 }
 
-
+/**
+ * Print on debug serial a BitArray.
+ * \note This module does not use the logging module, so you
+ *       can't decide the logging level.
+ * \param bitx BitArray to be printed.
+ */
 INLINE void bitarray_dump(BitArray *bitx)
 {
 	kprintf("bitarray size[%zu]bits on [%zu]bytes\n", bitx->bitarray_len, bitx->size);
@@ -175,6 +233,22 @@ INLINE void bitarray_dump(BitArray *bitx)
 		kprintf("..%02x [%d]\n", bitx->array[i / 8], i);
 }
 
+/**
+ * Init a BitArray.
+ *
+ * The BitArray uses an external array for storage. You can use the macro
+ * BITARRAY_ALLOC to declare an appropriate memory size. Example usage:
+ * \code
+ * BITARRAY_ALLOC(bits_mem, 17);
+ * BitArray bits;
+ * bitarray_init(&bits, 17, bits_mem, sizeof(bits_mem))
+ * \endcode
+ *
+ * \param bitx BitArray context
+ * \param bitarray_len Number of bits in the BitArray
+ * \param array Memory area for the BitArray
+ * \param size Size (in bytes) of the memory area \a array
+ */
 INLINE void bitarray_init(BitArray *bitx, size_t bitarray_len, uint8_t *array, size_t size)
 {
 	bitx->size = size;
