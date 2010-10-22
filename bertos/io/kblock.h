@@ -72,7 +72,7 @@ typedef void   (* kblock_clearerr_t)    (struct KBlock *b);
 typedef int    (* kblock_close_t)       (struct KBlock *b);
 /* \} */
 
-/**
+/*
  * Table of interface functions for a KBlock device.
  */
 typedef struct KBlockVTable
@@ -85,10 +85,10 @@ typedef struct KBlockVTable
 	kblock_load_t  load;
 	kblock_store_t store;
 
-	kblock_error_t    error;    ///< \sa kblock_error()
-	kblock_clearerr_t clearerr; ///< \sa kblock_clearerr()
+	kblock_error_t    error;    // \sa kblock_error()
+	kblock_clearerr_t clearerr; // \sa kblock_clearerr()
 
-	kblock_close_t  close; ///< \sa kblock_close()
+	kblock_close_t  close; // \sa kblock_close()
 } KBlockVTable;
 
 
@@ -100,20 +100,20 @@ typedef struct KBlockVTable
 #define KB_OPEN_BUFF       BV(4) ///< Open flash memory using page caching, allowing the modification and partial write.
 #define KB_OPEN_UNBUFF     BV(5) ///< Open flash memory whitout memory caching.
 
-/**
+/*
  * KBlock private members.
  * These are the private members of the KBlock interface, please do not
  * access these directly, use the KBlock API.
  */
 typedef struct KBlockPriv
 {
-	DB(id_t type);         ///< Used to keep track, at runtime, of the class type.
-	int flags;             ///< Status and error flags.
-	void *buf;             ///< Pointer to the page buffer for RAM-cached KBlocks.
-	block_idx_t blk_start; ///< Start block number when the device is trimmed. \sa kblock_trim().
-	block_idx_t curr_blk;  ///< Current cached block number in cached KBlocks.
+	DB(id_t type);         // Used to keep track, at runtime, of the class type.
+	int flags;             // Status and error flags.
+	void *buf;             // Pointer to the page buffer for RAM-cached KBlocks.
+	block_idx_t blk_start; // Start block number when the device is trimmed. \sa kblock_trim().
+	block_idx_t curr_blk;  // Current cached block number in cached KBlocks.
 
-	const struct KBlockVTable *vt; ///< Virtual table of interface functions.
+	const struct KBlockVTable *vt; // Virtual table of interface functions.
 } KBlockPriv;
 
 /**
