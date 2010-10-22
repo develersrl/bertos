@@ -51,4 +51,7 @@ CPU_DESC += [ "32 Kbytes Flash",
 # If we use the GCC compiler we should pass some flags.
 CORE_CPU = "msp430x2274"
 
+# GCC flags for this cpu.
+MK_CPU_CPPFLAGS += " -D__MSP430F2274__"
+
 include("msp430_post.common")
