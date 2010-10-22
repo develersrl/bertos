@@ -78,7 +78,7 @@ void pwm_setPolarity(PwmDev dev, bool pol);
 void pwm_enable(PwmDev dev, bool state);
 void pwm_init(void);
 
-/**
+/*
  * Test function prototypes.
  *
  * See pwm_test.c for implemntation of these functions.

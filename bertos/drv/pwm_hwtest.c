@@ -77,7 +77,7 @@
 #define PWM_DUTY_INC   200  // Incremental value for duty
 
 
-/**
+/*
  * Simple struct to store
  * the testing value.
  */
@@ -113,7 +113,7 @@ static PwmTest pwm_test_cfg[PWM_CNT] =
         {        3,    false, 100000UL, 0xCCCC }  /*    100KHz, 80% duty */
 };
 
-/**
+/*
  * Setup all needed to test PWM on AT91
  *
  */
@@ -127,7 +127,7 @@ int pwm_testSetup(void)
 }
 
 
-/**
+/*
  * Test suit for genation of pwm waveform.
  *
  */
@@ -204,7 +204,7 @@ void NORETURN pwm_testRun(void)
         }
 }
 
-/**
+/*
  * End a PWM Test.
  * (Unused)
  */
