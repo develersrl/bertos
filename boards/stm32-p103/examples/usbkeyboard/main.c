@@ -46,10 +46,12 @@
  *
  * Example (keyboard detection on Linux):
  *
+ * \verbatim
  * [24388.400573] usb 1-8.1.3: new full speed USB device using ehci_hcd and address 32
  * [24388.623957] usb 1-8.1.3: configuration #1 chosen from 1 choice
  * [24388.685827] input: BeRTOS USB Keyboard as /devices/pci0000:00/0000:00:1d.7/usb1/1-8/1-8.1/1-8.1.3/1-8.1.3:1.0/input/input18
  * [24388.688953] generic-usb 0003:FFFF:0000.0007: input,hidraw3: USB HID v1.10 Keyboard [BeRTOS USB Keyboard] on usb-0000:00:1d.7-8.1.3/input0
+ * \endverbatim
  *
  */
 
