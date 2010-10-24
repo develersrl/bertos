@@ -195,11 +195,9 @@ kfile_off_t kfile_genericSeek(struct KFile *fd, kfile_off_t offset, KSeekMode wh
 		break;
 	}
 
-	#if LOG_LEVEL >= LOG_LVL_INFO
 	/* Bound check */
 	if (seek_pos + offset > fd->size)
 		LOG_INFO("seek outside EOF\n");
-	#endif
 
 	fd->seek_pos = seek_pos + offset;
 
