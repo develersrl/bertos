@@ -121,61 +121,59 @@ typedef enum KSeekMode
 	KSM_SEEK_END, ///< Seek from file end.
 } KSeekMode;
 
-/**
+/*
  * Prototypes for KFile access functions.
  * I/O file functions must be ANSI compliant.
  * \note A KFile user can choose which function subset to implement,
  *       but has to set to NULL unimplemented features.
- * \{
  */
 
-/**
+/*
  * Read from file.
  * \return the number of bytes read.
  */
 typedef size_t (*ReadFunc_t) (struct KFile *fd, void *buf, size_t size);
 
-/**
+/*
  * Write to file.
  * \return the number of bytes written.
  */
 typedef size_t (*WriteFunc_t) (struct KFile *fd, const void *buf, size_t size);
 
-/**
+/*
  * Seek into file (if seekable).
  * \return the new file offset or EOF on errors.
  */
 typedef kfile_off_t (*SeekFunc_t) (struct KFile *fd, kfile_off_t offset, KSeekMode whence);
 
-/**
+/*
  * Close and reopen file \a fd.
  * The reopening is done with the former file parameters and access modes.
  */
 typedef struct KFile * (*ReOpenFunc_t) (struct KFile *fd);
 
-/**
+/*
  * Close file.
  * \return 0 on success, EOF on errors.
  */
 typedef int (*CloseFunc_t) (struct KFile *fd);
 
-/**
+/*
  * Flush file I/O.
  * \return 0 on success, EOF on errors.
  */
 typedef int (*FlushFunc_t) (struct KFile *fd);
 
-/**
+/*
  * Get file error mask.
  * \return 0 on success or file error code, device specific.
  */
 typedef int (*ErrorFunc_t) (struct KFile *fd);
 
-/**
+/*
  * Clear errors.
  */
 typedef void (*ClearErrFunc_t) (struct KFile *fd);
-/* \} */
 
 /**
  * Context data for callback functions which operate on
@@ -194,25 +192,29 @@ typedef struct KFile
 	FlushFunc_t    flush;
 	ErrorFunc_t    error;
 	ClearErrFunc_t clearerr;
-	DB(id_t _type); ///< Used to keep track, at runtime, of the class type.
+	DB(id_t _type); // Used to keep track, at runtime, of the class type.
 
 	/* NOTE: these must _NOT_ be size_t on 16bit CPUs! */
 	kfile_off_t    seek_pos;
 	kfile_off_t    size;
 } KFile;
 
-/**
+/*
  * Generic implementation of kfile_seek.
  */
 kfile_off_t kfile_genericSeek(struct KFile *fd, kfile_off_t offset, KSeekMode whence);
 
-/**
+/*
  * Generic implementation of kfile_reopen.
  */
 struct KFile * kfile_genericReopen(struct KFile *fd);
 
 int kfile_genericClose(struct KFile *fd);
 
+/** @name KFile access functions
+ * Interface functions for KFile access.
+ * @{
+ */
 int kfile_putc(int c, struct KFile *fd); ///< Generic putc implementation using kfile_write.
 int kfile_getc(struct KFile *fd);  ///< Generic getc implementation using kfile_read.
 int kfile_printf(struct KFile *fd, const char *format, ...);
@@ -223,9 +225,15 @@ void kfile_resync(KFile *fd, mtime_t delay);
 void kfile_init(struct KFile *fd);
 
 /**
- * Interface functions for KFile access.
- * \note Remember to change following functions if KFile interface changes.
- * \{
+ * Read \a size bytes from file \a fd into \a buf.
+ *
+ * \note This function will block if there are less than \a size bytes
+ *       to read.
+ *
+ * \param fd KFile context.
+ * \param buf User provided buffer.
+ * \param size Number of bytes to read.
+ * \return Number of bytes read.
  */
 INLINE size_t kfile_read(struct KFile *fd, void *buf, size_t size)
 {
@@ -233,6 +241,16 @@ INLINE size_t kfile_read(struct KFile *fd, void *buf, size_t size)
 	return fd->read(fd, buf, size);
 }
 
+/**
+ * Write \a size bytes from buffer \a buf into KFile \a fd.
+ *
+ * Return value may be less than \a size.
+ *
+ * \param fd KFile context.
+ * \param buf User provided data.
+ * \param size Number of bytes to write.
+ * \return Number of bytes written.
+ */
 INLINE size_t kfile_write(struct KFile *fd, const void *buf, size_t size)
 {
 	ASSERT(fd->write);
@@ -251,6 +269,16 @@ INLINE int kfile_close(struct KFile *fd)
 	return fd->close(fd);
 }
 
+/**
+ * Seek into file (if seekable).
+ *
+ * Move \a fd file seek position of \a offset bytes from \a whence.
+ *
+ * \param fd KFile context.
+ * \param offset Offset bytes to move from position \a whence.
+ * \param whence Position where to start the seek.
+ * \return Current postion in the file.
+ */
 INLINE kfile_off_t kfile_seek(struct KFile *fd, kfile_off_t offset, KSeekMode whence)
 {
 	ASSERT(fd->seek);
@@ -274,9 +302,9 @@ INLINE void kfile_clearerr(struct KFile *fd)
 	ASSERT(fd->clearerr);
 	fd->clearerr(fd);
 }
-/* \} */
+/* @} */
 
-/**
+/*
  * Kfile test function.
  */
 int kfile_testSetup(void);
