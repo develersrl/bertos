@@ -215,14 +215,6 @@ int kfile_genericClose(struct KFile *fd);
  * Interface functions for KFile access.
  * @{
  */
-int kfile_putc(int c, struct KFile *fd); ///< Generic putc implementation using kfile_write.
-int kfile_getc(struct KFile *fd);  ///< Generic getc implementation using kfile_read.
-int kfile_printf(struct KFile *fd, const char *format, ...);
-int kfile_print(struct KFile *fd, const char *s);
-int kfile_gets(struct KFile *fd, char *buf, int size);
-int kfile_gets_echo(struct KFile *fd, char *buf, int size, bool echo);
-void kfile_resync(KFile *fd, mtime_t delay);
-void kfile_init(struct KFile *fd);
 
 /**
  * Read \a size bytes from file \a fd into \a buf.
@@ -240,6 +232,8 @@ INLINE size_t kfile_read(struct KFile *fd, void *buf, size_t size)
 	ASSERT(fd->read);
 	return fd->read(fd, buf, size);
 }
+int kfile_gets(struct KFile *fd, char *buf, int size);
+int kfile_gets_echo(struct KFile *fd, char *buf, int size, bool echo);
 
 /**
  * Write \a size bytes from buffer \a buf into KFile \a fd.
@@ -257,17 +251,8 @@ INLINE size_t kfile_write(struct KFile *fd, const void *buf, size_t size)
 	return fd->write(fd, buf, size);
 }
 
-INLINE KFile * kfile_reopen(struct KFile *fd)
-{
-	ASSERT(fd->reopen);
-	return fd->reopen(fd);
-}
-
-INLINE int kfile_close(struct KFile *fd)
-{
-	ASSERT(fd->close);
-	return fd->close(fd);
-}
+int kfile_printf(struct KFile *fd, const char *format, ...);
+int kfile_print(struct KFile *fd, const char *s);
 
 /**
  * Seek into file (if seekable).
@@ -285,23 +270,59 @@ INLINE kfile_off_t kfile_seek(struct KFile *fd, kfile_off_t offset, KSeekMode wh
 	return fd->seek(fd, offset, whence);
 }
 
+/**
+ * Close and reopen file \a fd.
+ * The reopening is done with the former file parameters and access modes.
+ */
+INLINE KFile * kfile_reopen(struct KFile *fd)
+{
+	ASSERT(fd->reopen);
+	return fd->reopen(fd);
+}
+
+/**
+ * Close file.
+ * \return 0 on success, EOF on errors.
+ */
+INLINE int kfile_close(struct KFile *fd)
+{
+	ASSERT(fd->close);
+	return fd->close(fd);
+}
+
+/**
+ * Flush file I/O.
+ * \return 0 on success, EOF on errors.
+ */
 INLINE int kfile_flush(struct KFile *fd)
 {
 	ASSERT(fd->flush);
 	return fd->flush(fd);
 }
 
+/**
+ * Get file error mask.
+ * \return 0 on success or file error code, device specific.
+ */
 INLINE int kfile_error(struct KFile *fd)
 {
 	ASSERT(fd->error);
 	return fd->error(fd);
 }
 
+/**
+ * Clear errors.
+ */
 INLINE void kfile_clearerr(struct KFile *fd)
 {
 	ASSERT(fd->clearerr);
 	fd->clearerr(fd);
 }
+
+int kfile_putc(int c, struct KFile *fd); ///< Generic putc implementation using kfile_write.
+int kfile_getc(struct KFile *fd);  ///< Generic getc implementation using kfile_read.
+void kfile_resync(KFile *fd, mtime_t delay);
+void kfile_init(struct KFile *fd);
 /* @} */
 
 /*
