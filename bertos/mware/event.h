@@ -30,12 +30,13 @@
  * Copyright 1999, 2001, 2003 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
+ * \addtogroup event_handling
+ *
  * \brief Events handling
  *
  * This module implements a common system for executing
  * a user defined action calling a hook function.
  *
- *  NOTE: Generic completion events
  *
  *  Device drivers often need to wait the completion of some event, usually to
  *  allow the hardware to accomplish some asynchronous task.
@@ -64,7 +65,7 @@
  *  behaviour with or without the kernel.
  *
  *  Example usage (wait for a generic device driver initialization):
- *  \verbatim
+ *  \code
  *  static Event e;
  *
  *  static void irq_handler(void)
@@ -82,7 +83,7 @@
  *      // Wait for the completion of the event
  *      event_wait(&e);
  *  }
- *  \endverbatim
+ *  \endcode
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
@@ -105,6 +106,11 @@
 	/* Forward decl */
 	struct Process;
 #endif
+
+/**
+ * \defgroup event_handling Events handling module
+ * \{
+ */
 
 
 /// User defined callback type
@@ -218,6 +224,10 @@ INLINE Event event_createGeneric(void)
 
 /**
  * Wait the completion of event \a e.
+ *
+ * This function releases the CPU the application is configured to use
+ * the kernel, otherwise it's just a busy wait.
+ * \note It's forbidden to use this function inside irq handling functions.
  */
 INLINE void event_wait(Event *e)
 {
@@ -241,6 +251,8 @@ INLINE void event_wait(Event *e)
 
 /**
  * Wait the completion of event \a e or \a timeout elapses.
+ *
+ * \note It's forbidden to use this function inside irq handling functions.
  */
 INLINE bool event_waitTimeout(Event *e, ticks_t timeout)
 {
@@ -264,10 +276,19 @@ INLINE bool event_waitTimeout(Event *e, ticks_t timeout)
 }
 #endif /* CONFIG_TIMER_EVENTS */
 
-/** Trigger an event */
+/**
+ * Trigger an event.
+ *
+ * Execute the callback function associated with event \a e.
+ *
+ * This function can be used also in interrupt routines, but only if the
+ * event was created as a signal or generic event.
+ */
 INLINE void event_do(struct Event *e)
 {
 	e->action(e);
 }
+
+/** \} */
 
 #endif /* KERN_EVENT_H */
