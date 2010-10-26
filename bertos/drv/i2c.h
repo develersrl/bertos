@@ -198,88 +198,6 @@ enum
 	I2C_BITBANG_CNT  /**< Number of i2c ports */
 };
 
-/**
- * \defgroup old_i2c_api Old I2C API
- * \ingroup i2c_driver
- *
- * This is the old and deprecated I2C API. It is maintained for backward
- * compatibility only, don't use it in new projects.
- * @{
- */
-#if !CONFIG_I2C_DISABLE_OLD_API
-
-/**
- * \ingroup old_i2c_api
- * I2C Backends.
- * Sometimes your cpu does not have a builtin
- * i2c driver or you don't want, for some reason, to
- * use that.
- * With this you can choose, at compile time, which backend to use.
- * @{
- */
-#define I2C_BACKEND_BUILTIN 0 ///< Uses cpu builtin i2c driver
-#define I2C_BACKEND_BITBANG 1 ///< Uses emulated bitbang driver
-/**@}*/
-
-/**
- * \name I2c builtin prototypes.
- * \ingroup old_i2c_api
- * Do NOT use these function directly, instead,
- * you can call the ones named without "_builtin_"
- * and specify in cfg_i2c.h (CONFIG_I2C_BACKEND)
- * that you want the builtin backend.
- * @{
- */
-bool i2c_builtin_start_w(uint8_t id);
-bool i2c_builtin_start_r(uint8_t id);
-void i2c_builtin_stop(void);
-bool i2c_builtin_put(uint8_t _data);
-int i2c_builtin_get(bool ack);
-/**@}*/
-
-/**
- * \name I2c bitbang prototypes.
- * \ingroup old_i2c_api
- * Do NOT use these function directly, instead,
- * you can call the ones named without "_bitbang_"
- * and specify in cfg_i2c.h (CONFIG_I2C_BACKEND)
- * that you want the bitbang backend.
- * @{
- */
-bool i2c_bitbang_start_w(uint8_t id);
-bool i2c_bitbang_start_r(uint8_t id);
-void i2c_bitbang_stop(void);
-bool i2c_bitbang_put(uint8_t _data);
-int i2c_bitbang_get(bool ack);
-/**@}*/
-
-#ifndef CONFIG_I2C_BACKEND
-#define  CONFIG_I2C_BACKEND  I2C_BACKEND_BUILTIN
-#endif
-
-#if CONFIG_I2C_BACKEND == I2C_BACKEND_BUILTIN
-	#define i2c_start_w_1   i2c_builtin_start_w
-	#define i2c_start_r_1   i2c_builtin_start_r
-	#define i2c_stop        i2c_builtin_stop
-	#define i2c_put         i2c_builtin_put
-	#define i2c_get         i2c_builtin_get
-#elif CONFIG_I2C_BACKEND == I2C_BACKEND_BITBANG
-	#define i2c_start_w_1   i2c_bitbang_start_w
-	#define i2c_start_r_1   i2c_bitbang_start_r
-	#define i2c_stop        i2c_bitbang_stop
-	#define i2c_put         i2c_bitbang_put
-	#define i2c_get         i2c_bitbang_get
-#else
-	#error Unsupported i2c backend.
-#endif
-
-
-bool i2c_send(const void *_buf, size_t count);
-bool i2c_recv(void *_buf, size_t count);
-
-#endif /* !CONFIG_I2C_DISABLE_OLD_API */
-/**@}*/
-
 /** \defgroup i2c_api I2C driver API
  * \ingroup i2c_driver
  * \{
@@ -522,7 +440,87 @@ INLINE int i2c_error(I2c *i2c)
 /**@}*/
 /**\}*/ // i2c_api
 
+/**
+ * \defgroup old_i2c_api Old I2C API
+ * \ingroup i2c_driver
+ *
+ * This is the old and deprecated I2C API. It is maintained for backward
+ * compatibility only, don't use it in new projects.
+ * @{
+ */
 #if !CONFIG_I2C_DISABLE_OLD_API
+
+/**
+ * \ingroup old_i2c_api
+ * I2C Backends.
+ * Sometimes your cpu does not have a builtin
+ * i2c driver or you don't want, for some reason, to
+ * use that.
+ * With this you can choose, at compile time, which backend to use.
+ * @{
+ */
+#define I2C_BACKEND_BUILTIN 0 ///< Uses cpu builtin i2c driver
+#define I2C_BACKEND_BITBANG 1 ///< Uses emulated bitbang driver
+/**@}*/
+
+/**
+ * \name I2c builtin prototypes.
+ * \ingroup old_i2c_api
+ * Do NOT use these function directly, instead,
+ * you can call the ones named without "_builtin_"
+ * and specify in cfg_i2c.h (CONFIG_I2C_BACKEND)
+ * that you want the builtin backend.
+ * @{
+ */
+bool i2c_builtin_start_w(uint8_t id);
+bool i2c_builtin_start_r(uint8_t id);
+void i2c_builtin_stop(void);
+bool i2c_builtin_put(uint8_t _data);
+int i2c_builtin_get(bool ack);
+/**@}*/
+
+/**
+ * \name I2c bitbang prototypes.
+ * \ingroup old_i2c_api
+ * Do NOT use these function directly, instead,
+ * you can call the ones named without "_bitbang_"
+ * and specify in cfg_i2c.h (CONFIG_I2C_BACKEND)
+ * that you want the bitbang backend.
+ * @{
+ */
+bool i2c_bitbang_start_w(uint8_t id);
+bool i2c_bitbang_start_r(uint8_t id);
+void i2c_bitbang_stop(void);
+bool i2c_bitbang_put(uint8_t _data);
+int i2c_bitbang_get(bool ack);
+/**@}*/
+
+#ifndef CONFIG_I2C_BACKEND
+#define  CONFIG_I2C_BACKEND  I2C_BACKEND_BUILTIN
+#endif
+
+#if CONFIG_I2C_BACKEND == I2C_BACKEND_BUILTIN
+	#define i2c_start_w_1   i2c_builtin_start_w
+	#define i2c_start_r_1   i2c_builtin_start_r
+	#define i2c_stop        i2c_builtin_stop
+	#define i2c_put         i2c_builtin_put
+	#define i2c_get         i2c_builtin_get
+#elif CONFIG_I2C_BACKEND == I2C_BACKEND_BITBANG
+	#define i2c_start_w_1   i2c_bitbang_start_w
+	#define i2c_start_r_1   i2c_bitbang_start_r
+	#define i2c_stop        i2c_bitbang_stop
+	#define i2c_put         i2c_bitbang_put
+	#define i2c_get         i2c_bitbang_get
+#else
+	#error Unsupported i2c backend.
+#endif
+
+
+bool i2c_send(const void *_buf, size_t count);
+bool i2c_recv(void *_buf, size_t count);
+
+/**@}*/
+
 
 extern I2c local_i2c_old_api;
 
