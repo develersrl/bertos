@@ -35,6 +35,55 @@
  * This module implements a common system for executing
  * a user defined action calling a hook function.
  *
+ *  NOTE: Generic completion events
+ *
+ *  Device drivers often need to wait the completion of some event, usually to
+ *  allow the hardware to accomplish some asynchronous task.
+ *
+ *  A common approach is to place a busy wait with a cpu_relax() loop that invokes
+ *  the architecture-specific instructions to say that we're not doing much with
+ *  the processor.
+ *
+ *  Although technically correct, the busy loop degrades the overall system
+ *  performance in presence of multiple processes and power consumption.
+ *
+ *  With the kernel the natural way to implement such wait/complete mechanism is to
+ *  use signals via sig_wait() and sig_post()/sig_send().
+ *
+ *  However, signals in BeRTOS are only available in presence of the kernel (that
+ *  is just a compile-time option). This means that each device driver must provide
+ *  two different interfaces to implement the wait/complete semantic: one with the
+ *  kernel and another without the kernel.
+ *
+ *  The purpose of the completion events is to provide a generic interface to
+ *  implement a synchronization mechanism to block the execution of code until a
+ *  specific event happens.
+ *
+ *  This interface does not depend on the presence of the kernel and it
+ *  automatically uses the appropriate event backend to provide the same
+ *  behaviour with or without the kernel.
+ *
+ *  Example usage (wait for a generic device driver initialization):
+ *  \verbatim
+ *  static Event e;
+ *
+ *  static void irq_handler(void)
+ *  {
+ *      // Completion event has happened, resume the execution of init()
+ *      event_do(&e);
+ *  }
+ *
+ *  static void init(void)
+ *  {
+ *      // Declare the generic completion event
+ *      event_initGeneric(&e);
+ *      // Submit the hardware initialization request
+ *      async_hw_init();
+ *      // Wait for the completion of the event
+ *      event_wait(&e);
+ *  }
+ *  \endverbatim
+ *
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
 
