@@ -72,11 +72,10 @@
 #include "hw/hw_ili9225.h"
 
 #include <drv/timer.h>
-#include <drv/ser.h>
 #include <io/kfile.h>
 
 
-static struct Serial *spi;
+static struct KFile *spi;
 
 
 struct lcd_ili9225_reg
@@ -134,7 +133,7 @@ static void lcd_cmd(uint8_t cmd)
 {
 	LCD_CS_LOW();
 	LCD_RS_LOW();
-	kfile_write(&spi->fd, &cmd, sizeof(cmd));
+	kfile_write(spi, &cmd, sizeof(cmd));
 }
 
 static void lcd_data(uint16_t data)
@@ -143,10 +142,10 @@ static void lcd_data(uint16_t data)
 	bytes[0] = data >> 8;
 	bytes[1] = data & 0xFF;
 
-	kfile_flush(&spi->fd);
+	kfile_flush(spi);
 	LCD_RS_HIGH();
-	kfile_write(&spi->fd, bytes, 2);
-	kfile_flush(&spi->fd);
+	kfile_write(spi, bytes, 2);
+	kfile_flush(spi);
 	LCD_CS_HIGH();
 }
 
@@ -274,7 +273,7 @@ void lcd_ili9225_backlight(unsigned level)
 /**
  * Display initialization.
  */
-void lcd_ili9225_init(struct Serial *_spi)
+void lcd_ili9225_init(struct KFile *_spi)
 {
 	unsigned i;
 

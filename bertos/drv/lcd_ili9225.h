@@ -48,9 +48,9 @@
 #define LCD_BACKLIGHT_MAX  15
 
 // Fwd decl
-struct Serial;
+struct KFile;
 
-void lcd_ili9225_init(struct Serial *spi);
+void lcd_ili9225_init(struct KFile *spi);
 void lcd_ili9225_on(void);
 void lcd_ili9225_off(void);
 void lcd_ili9225_backlight(unsigned level);
