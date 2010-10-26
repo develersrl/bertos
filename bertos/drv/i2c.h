@@ -452,11 +452,12 @@ INLINE int i2c_error(I2c *i2c)
 
 /**
  * \ingroup old_i2c_api
- * I2C Backends.
+ * \name I2C Backends.
  * Sometimes your cpu does not have a builtin
  * i2c driver or you don't want, for some reason, to
  * use that.
  * With this you can choose, at compile time, which backend to use.
+ * Set the CONFIG_I2C_BACKEND configuration variable in cfg_i2c.h
  * @{
  */
 #define I2C_BACKEND_BUILTIN 0 ///< Uses cpu builtin i2c driver
