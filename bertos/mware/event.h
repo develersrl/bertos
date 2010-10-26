@@ -149,7 +149,7 @@ INLINE Event event_createSignal(struct Process *proc, sigbit_t bit)
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 /** Initialize the generic sleepable event \a e */
 #define event_initGeneric(e) \
-	event_initSignal(e, proc_current(), SIG_SINGLE)
+	event_initSignal(e, proc_current(), SIG_SYSTEM5)
 #else
 #define event_initGeneric(e) \
 	((e)->action = event_hook_generic, (e)->Ev.Gen.completed = false)
@@ -173,10 +173,13 @@ INLINE Event event_createGeneric(void)
 INLINE void event_wait(Event *e)
 {
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
+	e->Ev.Sig.sig_proc = proc_current();
 	sig_wait(e->Ev.Sig.sig_bit);
 #else
 	while (ACCESS_SAFE(e->Ev.Gen.completed) == false)
 		cpu_relax();
+	e->Ev.Gen.completed = false;
+	MEMORY_BARRIER;
 #endif
 }
 
@@ -193,16 +196,21 @@ INLINE void event_wait(Event *e)
 INLINE bool event_waitTimeout(Event *e, ticks_t timeout)
 {
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
+	e->Ev.Sig.sig_proc = proc_current();
 	return (sig_waitTimeout(e->Ev.Sig.sig_bit, timeout) & SIG_TIMEOUT) ?
 				false : true;
 #else
 	ticks_t end = timer_clock() + timeout;
+	bool ret;
 
 	while ((ACCESS_SAFE(e->Ev.Gen.completed) == false) ||
 			TIMER_AFTER(timer_clock(), end))
 		cpu_relax();
+	ret = e->Ev.Gen.completed;
+	e->Ev.Gen.completed = false;
+	MEMORY_BARRIER;
 
-	return e->Ev.Gen.completed;
+	return ret;
 #endif
 }
 #endif /* CONFIG_TIMER_EVENTS */
