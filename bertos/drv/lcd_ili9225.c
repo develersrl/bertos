@@ -30,7 +30,7 @@
  *
  * -->
  *
- * \brief ILI9225B 176x220 graphic driver
+ * \brief ILI9225B 4 wire interface graphic driver
  *
  * \author Stefano Fedrigo <aleph@develer.com>
  *
@@ -73,9 +73,17 @@
 
 #include <drv/timer.h>
 #include <io/kfile.h>
+#include <cpu/byteorder.h>
 
 
 static struct KFile *spi;
+
+/*
+ * Display row buffer.  When refreshing display one full row of
+ * graphics data is transferred with DMA, to speed up transfer and
+ * reduce CPU usage.
+ */
+static uint16_t lcd_row[LCD_WIDTH];
 
 
 struct lcd_ili9225_reg
@@ -136,23 +144,21 @@ static void lcd_cmd(uint8_t cmd)
 	kfile_write(spi, &cmd, sizeof(cmd));
 }
 
-static void lcd_data(uint16_t data)
+static void lcd_data(uint16_t *data, size_t count)
 {
-	char bytes[2];
-	bytes[0] = data >> 8;
-	bytes[1] = data & 0xFF;
-
 	kfile_flush(spi);
 	LCD_RS_HIGH();
-	kfile_write(spi, bytes, 2);
+	kfile_write(spi, data, count*2);
 	kfile_flush(spi);
 	LCD_CS_HIGH();
 }
 
 static void lcd_regWrite(uint8_t reg, uint16_t data)
 {
+	uint16_t word = cpu_to_be16(data);
+
 	lcd_cmd(reg);
-	lcd_data(data);
+	lcd_data(&word, 1);
 }
 
 static void lcd_startBlit(uint8_t x, uint8_t y, uint8_t width, uint8_t height)
@@ -184,7 +190,6 @@ void lcd_ili9225_blitRaw(UNUSED_ARG(const uint8_t *, data),
  */
 void lcd_ili9225_blitBitmap(const Bitmap *bm)
 {
-	//uint16_t lcd_row[bm->width];
 	uint8_t mask;
 	int i, l, r;
 
@@ -197,10 +202,12 @@ void lcd_ili9225_blitBitmap(const Bitmap *bm)
 			for (i = 0; i < bm->width; i++)
 			{
 				if (bm->raster[l * bm->width + i] & mask)
-					lcd_regWrite(0x22, 0xffff);
+					lcd_row[i] = 0x0000;
 				else
-					lcd_regWrite(0x22, 0x0000);
+					lcd_row[i] = 0xFFFF;
 			}
+			lcd_cmd(0x22);
+			lcd_data(lcd_row, bm->width);
 		}
 	}
 
@@ -209,10 +216,12 @@ void lcd_ili9225_blitBitmap(const Bitmap *bm)
 		for (i = 0; i < bm->width; i++)
 		{
 			if (bm->raster[l * bm->width + i] & mask)
-				lcd_regWrite(0x22, 0xffff);
+				lcd_row[i] = 0x0000;
 			else
-				lcd_regWrite(0x22, 0x0000);
+				lcd_row[i] = 0xFFFF;
 		}
+		lcd_cmd(0x22);
+		lcd_data(lcd_row, bm->width);
 	}
 }
 

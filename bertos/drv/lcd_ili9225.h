@@ -30,7 +30,7 @@
  *
  * -->
  *
- * \brief ILI9225B 176x220 graphic driver
+ * \brief ILI9225B 4 wire interface graphic driver
  *
  * $WIZ$ module_name = "lcd_ili9225"
  * $WIZ$ module_hw = "bertos/hw/hw_ili9225.h"
