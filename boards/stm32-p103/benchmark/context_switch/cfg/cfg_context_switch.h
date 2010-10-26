@@ -60,7 +60,7 @@
  * Debug console port.
  * $WIZ$ type = "int"; min = 0
  */
-#define CONFIG_CTX_DEBUG_PORT 0
+#define CONFIG_CTX_DEBUG_PORT 1
 
 /**
  * Baudrate for the debug console.
