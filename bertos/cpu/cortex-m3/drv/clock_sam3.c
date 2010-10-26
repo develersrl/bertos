@@ -38,10 +38,7 @@
 #include "clock_sam3.h"
 #include <cfg/compiler.h>
 #include <cfg/macros.h>
-#include <io/sam3_pmc.h>
-#include <io/sam3_sysctl.h>
-#include <io/sam3_flash.h>
-#include <io/sam3_wdt.h>
+#include <io/sam3.h>
 
 
 /* Frequency of board main oscillator */
@@ -134,4 +131,7 @@ void clock_init(void)
 	PMC_MCKR = PMC_MCKR_CSS_PLL_CLK;
 	timeout = CLOCK_TIMEOUT;
 	while (!(PMC_SR & BV(PMC_SR_MCKRDY)) && --timeout);
+
+	/* Enable clock on PIO for inputs */
+	PMC_PCER = BV(PIOA_ID) | BV(PIOB_ID) | BV(PIOC_ID);
 }
