@@ -79,6 +79,24 @@
  * Hardware features for drivers.
  */
 #define USART_HAS_PDC  1
+#define SPI_HAS_PDC    1
+
+/* PDC registers */
+#define PERIPH_RPR_OFF  0x100  // Receive Pointer Register.
+#define PERIPH_RCR_OFF  0x104  // Receive Counter Register.
+#define PERIPH_TPR_OFF  0x108  // Transmit Pointer Register.
+#define PERIPH_TCR_OFF  0x10C  // Transmit Counter Register.
+#define PERIPH_RNPR_OFF 0x110  // Receive Next Pointer Register.
+#define PERIPH_RNCR_OFF 0x114  // Receive Next Counter Register.
+#define PERIPH_TNPR_OFF 0x118  // Transmit Next Pointer Register.
+#define PERIPH_TNCR_OFF 0x11C  // Transmit Next Counter Register.
+#define PERIPH_PTCR_OFF 0x120  // PDC Transfer Control Register.
+#define PERIPH_PTSR_OFF 0x124  // PDC Transfer Status Register.
+
+#define PDC_RXTEN  0
+#define PDC_RXTDIS 1
+#define PDC_TXTEN  8
+#define PDC_TXTDIS 9
 
 
 #include "sam3_sysctl.h"
