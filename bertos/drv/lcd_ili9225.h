@@ -45,7 +45,6 @@
 
 #define LCD_WIDTH          176
 #define LCD_HEIGHT         220
-#define LCD_BACKLIGHT_MAX  15
 
 // Fwd decl
 struct KFile;
@@ -53,7 +52,6 @@ struct KFile;
 void lcd_ili9225_init(struct KFile *spi);
 void lcd_ili9225_on(void);
 void lcd_ili9225_off(void);
-void lcd_ili9225_backlight(unsigned level);
 void lcd_ili9225_blitRaw(const uint8_t *data,
 		uint8_t x, uint8_t y, uint8_t width, uint8_t height);
 void lcd_ili9225_blitBitmap(const Bitmap *bm);

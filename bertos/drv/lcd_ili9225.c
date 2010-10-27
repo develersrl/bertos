@@ -253,33 +253,6 @@ static void lcd_reset(void)
 }
 
 /**
- * Set display backlight intensity.
- */
-void lcd_ili9225_backlight(unsigned level)
-{
-    unsigned i;
-
-    if (level > LCD_BACKLIGHT_MAX)
-	    level = LCD_BACKLIGHT_MAX;
-
-    // Switch off backlight
-    LCD_BACKLIGHT_LOW();
-    timer_delay(1);
-
-    // Set new level
-    for (i = 0; i <= level; i++)
-    {
-	    LCD_BACKLIGHT_LOW();
-	    LCD_BACKLIGHT_LOW();
-	    LCD_BACKLIGHT_LOW();
-
-	    LCD_BACKLIGHT_HIGH();
-	    LCD_BACKLIGHT_HIGH();
-	    LCD_BACKLIGHT_HIGH();
-    }
-}
-
-/**
  * Display initialization.
  */
 void lcd_ili9225_init(struct KFile *_spi)
