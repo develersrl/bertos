@@ -33,7 +33,7 @@
  *
  * \author Francesco Sacchi <batt@develer.com>
  *
- * ATSAM3 Parallel input/output controller.
+ * Atmel SAM3 Parallel input/output controller.
  * This file is based on NUT/OS implementation. See license below.
  */
 

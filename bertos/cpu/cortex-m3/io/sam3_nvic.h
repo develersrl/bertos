@@ -30,7 +30,7 @@
  *
  * -->
  *
- * \brief ATSAM3 NVIC hardware.
+ * \brief Atmel SAM3 NVIC hardware.
  *
  * This file does not follow the BeRTOS AT91 register naming convention,
  * because the NVIC subsystem is in common with other Cortex-M3 ports.

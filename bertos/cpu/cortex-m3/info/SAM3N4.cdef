@@ -61,5 +61,5 @@ CPU_DESC += [ "256 Kbytes on-chip flash memory",
 		"24 Kbytes on-chip SRAM memory" ]
 
 # GCC flags for this cpu.
-MK_CPU_CPPFLAGS += " -D__ARM_AT91SAM3N4__"
-MK_CPU_LDFLAGS += " -T " + SCRIPT_DIR + "at91sam3n4_ram.ld"
+MK_CPU_CPPFLAGS += " -D__ARM_SAM3N4__"
+MK_CPU_LDFLAGS += " -T " + SCRIPT_DIR + "sam3n4_ram.ld"

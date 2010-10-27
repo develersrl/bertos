@@ -30,14 +30,14 @@
  *
  * -->
  *
- * \brief Low-level clocking driver for AT91SAM3.
+ * \brief Low-level clocking driver for SAM3.
  *
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-#ifndef DRV_AT91SAM3_CLOCK_H
-#define DRV_AT91SAM3_CLOCK_H
+#ifndef DRV_SAM3_CLOCK_H
+#define DRV_SAM3_CLOCK_H
 
 void clock_init(void);
 
-#endif /* DRV_AT91SAM3_CLOCK_H */
+#endif /* DRV_SAM3_CLOCK_H */

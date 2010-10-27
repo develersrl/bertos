@@ -30,7 +30,7 @@
  *
  * -->
  *
- * \brief AT91SAM3 UART hardware.
+ * \brief SAM3 UART hardware.
  */
 
 #ifndef SAM3_UART_H
@@ -41,7 +41,7 @@
  */
 /*\{*/
 #define UART0_BASE  0x400E0600
-#ifndef CPU_CM3_AT91SAM3U
+#ifndef CPU_CM3_SAM3U
 	#define UART1_BASE  0x400E0800
 #endif
 /*\}*/

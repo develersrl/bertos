@@ -33,7 +33,7 @@
  *
  * \author Daniele Basile <asterix@develer.com>
  *
- * ATSAM3 USART User interface.
+ * Atmel SAM3 USART User interface.
  * This file is based on NUT/OS implementation. See license below.
  */
 /*
@@ -74,7 +74,7 @@
 /**
  * USART base addresses.
  */
-#if CPU_CM3_AT91SAM3U
+#if CPU_CM3_SAM3U
 	#define USART0_BASE  0x40090000
 	#define USART1_BASE  0x40094000
 	#define USART2_BASE  0x40098000

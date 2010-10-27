@@ -33,7 +33,7 @@
  *
  * \author Francesco Sacchi <batt@develer.com>
  *
- * ATSAM3 SPI register definitions.
+ * Atmel SAM3 SPI register definitions.
  * This file is based on NUT/OS implementation. See license below.
 
  */

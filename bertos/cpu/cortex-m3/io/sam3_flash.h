@@ -30,7 +30,7 @@
  *
  * -->
  *
- * \brief ATSAM3 enhanced embedded flash controller definitions.
+ * \brief Atmel SAM3 enhanced embedded flash controller definitions.
  */
 
 #ifndef SAM3_FLASH_H

@@ -30,7 +30,7 @@
  *
  * -->
  *
- * \brief Atmel's ATSAM3 registers definitions.
+ * \brief Atmel's SAM3 registers definitions.
  *
  * This file derives from the one included in Atmel softpack, and defines
  * registers not yet written in standard BeRTOS include file (io/sam3_*.h) with
@@ -4316,21 +4316,21 @@ typedef struct {
 #define IROM_ADDR   (0x00800000u) /* Internal ROM base address */
 #define IRAM_ADDR   (0x20000000u) /* Internal RAM base address */
 
-#if CPU_CM3_AT91SAM3N1
+#if CPU_CM3_SAM3N1
 #define IFLASH_SIZE 0x10000
 #define IFLASH_PAGE_SIZE              (256) /* Internal FLASH 0 Page Size: 256 bytes */
 #define IFLASH_LOCK_REGION_SIZE     (16384) /* Internal FLASH 0 Lock Region Size: 16 Kbytes */
 #define IFLASH_NB_OF_PAGES            (256) /* Internal FLASH 0 Number of Pages: 256 */
 #define IFLASH_NB_OF_LOCK_BITS          (4) /* Internal FLASH 0 Number of Lock Bits: 4 */
 #define IRAM_SIZE 0x2000
-#elif CPU_CM3_AT91SAM3N2
+#elif CPU_CM3_SAM3N2
 #define IFLASH_SIZE 0x20000
 #define IFLASH_PAGE_SIZE              (256) /* Internal FLASH 0 Page Size: 256 bytes */
 #define IFLASH_LOCK_REGION_SIZE     (16384) /* Internal FLASH 0 Lock Region Size: 16 Kbytes */
 #define IFLASH_NB_OF_PAGES            (512) /* Internal FLASH 0 Number of Pages: 512 */
 #define IFLASH_NB_OF_LOCK_BITS          (8) /* Internal FLASH 0 Number of Lock Bits: 8 */
 #define IRAM_SIZE 0x4000
-#elif CPU_CM3_AT91SAM3N4
+#elif CPU_CM3_SAM3N4
 #define IFLASH_SIZE 0x40000
 #define IFLASH_PAGE_SIZE              (256) /* Internal FLASH 0 Page Size: 256 bytes */
 #define IFLASH_LOCK_REGION_SIZE     (16384) /* Internal FLASH 0 Lock Region Size: 16 Kbytes */

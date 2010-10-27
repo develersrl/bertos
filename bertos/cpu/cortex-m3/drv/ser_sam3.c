@@ -119,7 +119,7 @@
 
 /* End USART0 macros */
 
-#if !CPU_CM3_AT91SAM3U
+#if !CPU_CM3_SAM3U
 
 	#ifndef SER_UART1_BUS_TXINIT
 		/**
@@ -134,7 +134,7 @@
 			#define SER_UART1_BUS_TXINIT do { \
 				PIOA_PDR = BV(RXD1) | BV(TXD1); \
 			} while (0)
-		#elif CPU_CM3_AT91SAM3
+		#elif CPU_CM3_SAM3
 			#define SER_UART1_BUS_TXINIT do { \
 				PIOB_PDR = BV(RXD1) | BV(TXD1); \
 			} while (0)
@@ -182,7 +182,7 @@
 	* Default TXINIT macro - invoked in spi_init()
 	* The default is no action.
 	*/
-	#if CPU_CM3_AT91SAM3
+	#if CPU_CM3_SAM3
 		#define SER_SPI0_BUS_TXINIT do { \
 			/* Disable PIO on SPI pins */ \
 			PIOA_PDR = BV(SPI0_SPCK) | BV(SPI0_MOSI) | BV(SPI0_MISO); \
@@ -279,7 +279,7 @@ INLINE void sysirq_setPriority(sysirq_t irq, int prio)
 	AIC_EOICR = 0; \
 } while (0)
 
-#elif CPU_CM3_AT91SAM3
+#elif CPU_CM3_SAM3
 
 /** Inform hw that we have served the IRQ */
 #define SER_INT_ACK do { /* nop */ } while (0)
@@ -296,7 +296,7 @@ extern struct Serial *ser_handles[SER_CNT];
 /* TX and RX buffers */
 static unsigned char uart0_txbuffer[CONFIG_UART0_TXBUFSIZE];
 static unsigned char uart0_rxbuffer[CONFIG_UART0_RXBUFSIZE];
-#if !CPU_CM3_AT91SAM3U
+#if !CPU_CM3_SAM3U
 static unsigned char uart1_txbuffer[CONFIG_UART1_TXBUFSIZE];
 static unsigned char uart1_rxbuffer[CONFIG_UART1_RXBUFSIZE];
 #endif
@@ -330,7 +330,7 @@ struct ArmSerial
 };
 
 static ISR_PROTO(uart0_irq_dispatcher);
-#if !CPU_CM3_AT91SAM3U
+#if !CPU_CM3_SAM3U
 static ISR_PROTO(uart1_irq_dispatcher);
 #endif
 static ISR_PROTO(spi0_irq_handler);

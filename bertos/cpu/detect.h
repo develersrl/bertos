@@ -213,42 +213,42 @@
 		#define CPU_CM3_STM32F103RB 0
 	#endif
 
-	#if defined (__ARM_AT91SAM3N4__)
-		#define CPU_CM3_AT91SAM3    1
-		#define CPU_CM3_AT91SAM3N   1
-		#define CPU_CM3_AT91SAM3N4  1
-		#define CPU_NAME            "AT91SAM3N4"
+	#if defined (__ARM_SAM3N4__)
+		#define CPU_CM3_SAM3    1
+		#define CPU_CM3_SAM3N   1
+		#define CPU_CM3_SAM3N4  1
+		#define CPU_NAME        "SAM3N4"
 
-		#define CPU_CM3_AT91SAM3S   0
-		#define CPU_CM3_AT91SAM3U   0
-		#define CPU_CM3_AT91SAM3N2  0
-		#define CPU_CM3_AT91SAM3N1  0
+		#define CPU_CM3_SAM3S   0
+		#define CPU_CM3_SAM3U   0
+		#define CPU_CM3_SAM3N2  0
+		#define CPU_CM3_SAM3N1  0
 	#else
-		#define CPU_CM3_AT91SAM3N4  0
+		#define CPU_CM3_SAM3N4  0
 	#endif
 
-	#if defined (__ARM_AT91SAM3S4__)
-		#define CPU_CM3_AT91SAM3    1
-		#define CPU_CM3_AT91SAM3S   1
-		#define CPU_CM3_AT91SAM3S4  1
-		#define CPU_NAME            "AT91SAM3S4"
+	#if defined (__ARM_SAM3S4__)
+		#define CPU_CM3_SAM3    1
+		#define CPU_CM3_SAM3S   1
+		#define CPU_CM3_SAM3S4  1
+		#define CPU_NAME        "SAM3S4"
 
-		#define CPU_CM3_AT91SAM3N   0
-		#define CPU_CM3_AT91SAM3U   0
+		#define CPU_CM3_SAM3N   0
+		#define CPU_CM3_SAM3U   0
 	#else
-		#define CPU_CM3_AT91SAM3S4  0
+		#define CPU_CM3_SAM3S4  0
 	#endif
 
-	#if defined (__ARM_AT91SAM3U4__)
-		#define CPU_CM3_AT91SAM3    1
-		#define CPU_CM3_AT91SAM3U   1
-		#define CPU_CM3_AT91SAM3U4  1
-		#define CPU_NAME            "AT91SAM3U4"
+	#if defined (__ARM_SAM3U4__)
+		#define CPU_CM3_SAM3    1
+		#define CPU_CM3_SAM3U   1
+		#define CPU_CM3_SAM3U4  1
+		#define CPU_NAME        "SAM3U4"
 
-		#define CPU_CM3_AT91SAM3N   0
-		#define CPU_CM3_AT91SAM3S   0
+		#define CPU_CM3_SAM3N   0
+		#define CPU_CM3_SAM3S   0
 	#else
-		#define CPU_CM3_AT91SAM3U4  0
+		#define CPU_CM3_SAM3U4  0
 	#endif
 
 	#if defined (CPU_CM3_LM3S)
@@ -256,19 +256,19 @@
 			#error Luminary Cortex-M3 CPU configuration error
 		#endif
 		#define CPU_CM3_STM32       0
-		#define CPU_CM3_AT91SAM3    0
+		#define CPU_CM3_SAM3        0
 	#elif defined (CPU_CM3_STM32)
 		#if CPU_CM3_STM32F103RB + 0 != 1
 			#error STM32 Cortex-M3 CPU configuration error
 		#endif
 		#define CPU_CM3_LM3S        0
-		#define CPU_CM3_AT91SAM3    0
-	#elif defined (CPU_CM3_AT91SAM3)
-		#if CPU_CM3_AT91SAM3N + 0 != 1
-			#error AT91SAM3 Cortex-M3 CPU configuration error
+		#define CPU_CM3_SAM3        0
+	#elif defined (CPU_CM3_SAM3)
+		#if CPU_CM3_SAM3N + 0 != 1
+			#error SAM3 Cortex-M3 CPU configuration error
 		#endif
-		#if CPU_CM3_AT91SAM3N4 + CPU_CM3_AT91SAM3S4 + CPU_CM3_AT91SAM3U4 + 0 != 1
-			#error AT91SAM3 Cortex-M3 CPU configuration error
+		#if CPU_CM3_SAM3N4 + CPU_CM3_SAM3S4 + CPU_CM3_SAM3U4 + 0 != 1
+			#error SAM3 Cortex-M3 CPU configuration error
 		#endif
 		#define CPU_CM3_LM3S        0
 		#define CPU_CM3_STM32       0
@@ -276,11 +276,11 @@
 	#else
 		#define CPU_CM3_LM3S        0
 		#define CPU_CM3_STM32       0
-		#define CPU_CM3_AT91SAM3    0
+		#define CPU_CM3_SAM3        0
 	#endif
 
 
-	#if CPU_CM3_LM3S + CPU_CM3_STM32 + CPU_CM3_AT91SAM3 + 0 /* Add other Cortex-M3 families here */ != 1
+	#if CPU_CM3_LM3S + CPU_CM3_STM32 + CPU_CM3_SAM3 + 0 /* Add other Cortex-M3 families here */ != 1
 		#error Cortex-M3 CPU configuration error
 	#endif
 
@@ -293,9 +293,9 @@
 	#define CPU_CM3_STM32 0
 	#define CPU_CM3_STM32F103RB 0
 
-	#define CPU_CM3_AT91SAM3 0
-	#define CPU_CM3_AT91SAM3N 0
-	#define CPU_CM3_AT91SAM3N4 0
+	#define CPU_CM3_SAM3 0
+	#define CPU_CM3_SAM3N 0
+	#define CPU_CM3_SAM3N4 0
 #endif
 
 #if (defined(__IAR_SYSTEMS_ICC__) || defined(__IAR_SYSTEMS_ICC)) \

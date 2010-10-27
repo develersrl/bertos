@@ -171,7 +171,7 @@
 	#define CPU_HARVARD            0
 
 	/// Valid pointers should be >= than this value (used for debug)
-	#if (CPU_CM3_LM3S1968 || CPU_CM3_LM3S8962 || CPU_CM3_STM32F103RB || CPU_CM3_AT91SAM3)
+	#if (CPU_CM3_LM3S1968 || CPU_CM3_LM3S8962 || CPU_CM3_STM32F103RB || CPU_CM3_SAM3)
 		#define CPU_RAM_START 0x20000000
 	#else
 		#warning Fix CPU_RAM_START address for your Cortex-M3, default value set to 0x20000000

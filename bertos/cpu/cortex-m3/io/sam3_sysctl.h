@@ -30,7 +30,7 @@
  *
  * -->
  *
- * \brief ATSAM3 system controller registers.
+ * \brief Atmel SAM3 system controller registers.
  */
 
 #ifndef SAM3_SYSCTL_H

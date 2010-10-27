@@ -30,7 +30,7 @@
  *
  * -->
  *
- * \brief ATSAM3 clock setup.
+ * \brief Atmel SAM3 clock setup.
  *
  * \author Stefano Fedrigo <aleph@develer.com>
  */

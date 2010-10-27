@@ -30,7 +30,7 @@
  *
  * -->
  *
- * \brief AT91SAM3 interrupt definitions.
+ * \brief SAM3 interrupt definitions.
  */
 
 #ifndef SAM3_INTS_H

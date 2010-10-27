@@ -32,7 +32,7 @@
  *
  * \author Francesco Sacchi <batt@develer.com>
  *
- * ATSAM3 Watchdog.
+ * Atmel SAM3 Watchdog.
  * This file is based on NUT/OS implementation. See license below.
  */
 

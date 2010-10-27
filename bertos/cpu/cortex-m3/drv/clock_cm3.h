@@ -42,7 +42,7 @@
 	#include "clock_lm3s.h"
 #elif CPU_CM3_STM32
 	#include "clock_stm32.h"
-#elif CPU_CM3_AT91SAM3
+#elif CPU_CM3_SAM3
 	#include "clock_sam3.h"
 /*#elif  Add other Cortex-M3 CPUs here */
 #else

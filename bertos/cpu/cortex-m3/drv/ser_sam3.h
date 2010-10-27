@@ -70,7 +70,7 @@ typedef uint32_t serstatus_t;
 enum
 {
 	SER_UART0,
-#if !CPU_CM3_AT91SAM3U
+#if !CPU_CM3_SAM3U
 	SER_UART1,
 #endif
 	SER_SPI0,

@@ -32,12 +32,12 @@
  *
  * \author Stefano Fedrigo <aleph@develer.com>
  *
- * \brief Linker script for AT91SAM3N4 Cortex M3 processor.
+ * \brief Linker script for Atmel SAM3N4 Cortex M3 processor.
  *
  */
 
 /*
- * Memory configuration for AT91SAM3N4.
+ * Memory configuration for SAM3N4.
  */
 MEMORY
 {

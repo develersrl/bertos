@@ -43,7 +43,7 @@
  * Peripherals IDs.
  */
 /*\{*/
-#if CPU_CM3_AT91SAM3N
+#if CPU_CM3_SAM3N
 	#define SUPC_ID      0   ///< Supply Controller (SUPC)
 	#define RSTC_ID      1   ///< Reset Controller (RSTC)
 	#define RTC_ID       2   ///< Real Time Clock (RTC)
@@ -114,7 +114,7 @@
  * UART I/O pins
  */
 /*\{*/
-#if CPU_CM3_AT91SAM3U
+#if CPU_CM3_SAM3U
 	#define RXD0   11
 	#define TXD0   12
 #else
@@ -129,7 +129,7 @@
  * PIO I/O pins
  */
 /*\{*/
-#if CPU_CM3_AT91SAM3U
+#if CPU_CM3_SAM3U
 	#define SPI0_SPCK   15
 	#define SPI0_MOSI   14
 	#define SPI0_MISO   13

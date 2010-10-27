@@ -30,7 +30,7 @@
  *
  * -->
  *
- * \brief AT91SAM3 PMC hardware.
+ * \brief SAM3 PMC hardware.
  */
 
 #ifndef SAM3_PMC_H
