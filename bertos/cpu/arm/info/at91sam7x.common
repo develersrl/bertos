@@ -32,7 +32,7 @@
 #
 # -->
 #
-# Cpu info of the AT91SAM7X256.
+# General CPU info denfinition for AT91SAM7X architecture.
 #
 # This file contain all info for the BeRTOS wizard.
 #
@@ -40,14 +40,8 @@
 #
 #
 
-# Import the common settings for the AT91SAM7X family.
-include("at91sam7x.common")
+# Import the common settings for the path.
+include("at91sam7.common")
 
-# Short description of the cpu.
-CPU_DESC += [ "256 Kbytes internal flash memory",
-	      "64 Kbytes internal SRAM memory" ]
-
-# GCC flags for this cpu.
-MK_CPU_CPPFLAGS += " -D__ARM_AT91SAM7X256__"
-MK_CPU_LDFLAGS += " -T " + SCRIPT_DIR + "at91sam7_256_rom.ld"
-
+# Special CPU related tags.
+CPU_TAGS += ["at91sam7x"]

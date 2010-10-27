@@ -40,8 +40,8 @@
 #
 #
 
-# Import the common settings for the AT91SAM7 family.
-include("at91sam7.common")
+# Import the common settings for the AT91SAM7S family.
+include("at91sam7s.common")
 
 # Short description of the cpu.
 CPU_DESC += [ "512 Kbytes internal flash memory",
