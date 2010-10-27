@@ -48,7 +48,6 @@
 #define LCD_CS_PIN         0 /* Implement me! */
 #define LCD_RESET_PIN      0 /* Implement me! */
 #define LCD_RS_PIN         0 /* Implement me! */
-#define LCD_BACKLIGHT_PIN  0 /* Implement me! */
 /*@}*/
 
 /**
@@ -61,8 +60,6 @@
 #define LCD_RESET_LOW()      do { /* Implement me! */ } while (0)
 #define LCD_RS_HIGH()        do { /* Implement me! */ } while (0)
 #define LCD_RS_LOW()         do { /* Implement me! */ } while (0)
-#define LCD_BACKLIGHT_HIGH() do { /* Implement me! */ } while (0)
-#define LCD_BACKLIGHT_LOW()  do { /* Implement me! */ } while (0)
 /*@}*/
 
 /**
