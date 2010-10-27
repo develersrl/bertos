@@ -25,7 +25,7 @@ armtest_CPPASRC = $(arm_ASRC)
 armtest_PREFIX = arm-none-eabi-
 
 armtest_CPPAFLAGS = -O0 -g -gdwarf-2 -g
-armtest_CPPFLAGS = -O0 -D'ARCH=ARCH_NIGHTTEST' -D__ARM_AT91SAM7S256__ -D'CPU_FREQ=(48023000UL)' -D'WIZ_AUTOGEN' -g3 -gdwarf-2 -fverbose-asm -Iexamples/test -Ibertos/cpu/arm
+armtest_CPPFLAGS = -O0 -D'ARCH=ARCH_NIGHTTEST' -D__ARM_AT91SAM7X256__ -D'CPU_FREQ=(48023000UL)' -D'WIZ_AUTOGEN' -g3 -gdwarf-2 -fverbose-asm -Iexamples/test -Ibertos/cpu/arm
 armtest_LDFLAGS = -nostartfiles -T bertos/cpu/arm/scripts/at91sam7_256_rom.ld -Wl,--no-warn-mismatch
 
 armtest_CPU = arm7tdmi
