@@ -90,6 +90,7 @@ typedef enum IapCommands
 struct FlashHardware
 {
 	uint8_t status;
+	int flags;
 };
 
 #define FLASH_PAGE_CNT  FLASH_MEM_SIZE / FLASH_PAGE_SIZE_BYTES
@@ -189,7 +190,7 @@ static size_t lpc2_flash_writeDirect(struct KBlock *blk, block_idx_t idx, const 
 	ASSERT(FLASH_PAGE_SIZE_BYTES == size);
 
 	Flash *fls = FLASH_CAST(blk);
-	if (!(fls->blk.priv.flags & KB_WRITE_ONCE))
+	if (!(fls->hw->flags & FLASH_WRITE_ONCE))
 		ASSERT(sector_size(idx) <= FLASH_PAGE_SIZE_BYTES);
 
 	const uint8_t *buf = (const uint8_t *)_buf;
@@ -213,7 +214,7 @@ static size_t lpc2_flash_writeDirect(struct KBlock *blk, block_idx_t idx, const 
 	if (res.status != CMD_SUCCESS)
 		goto flash_error;
 
-	if ((fls->blk.priv.flags & KB_WRITE_ONCE) &&
+	if ((fls->hw->flags & FLASH_WRITE_ONCE) &&
 			bitarray_isRangeFull(&lpc2_bitx, idx_sector, erase_group[sector]))
 	{
 		kputs("blocchi pieni\n");
@@ -222,11 +223,11 @@ static size_t lpc2_flash_writeDirect(struct KBlock *blk, block_idx_t idx, const 
 	}
 
 	bool erase = false;
-	if ((fls->blk.priv.flags & KB_WRITE_ONCE) &&
+	if ((fls->hw->flags & FLASH_WRITE_ONCE) &&
 			bitarray_isRangeEmpty(&lpc2_bitx, idx_sector, erase_group[sector]))
 		erase = true;
 
-	if (!(fls->blk.priv.flags & KB_WRITE_ONCE))
+	if (!(fls->hw->flags & FLASH_WRITE_ONCE))
 		erase = true;
 
 	if (erase)
@@ -248,7 +249,7 @@ static size_t lpc2_flash_writeDirect(struct KBlock *blk, block_idx_t idx, const 
 	if (res.status != CMD_SUCCESS)
 		goto flash_error;
 
-	if (fls->blk.priv.flags & KB_WRITE_ONCE)
+	if (fls->hw->flags & FLASH_WRITE_ONCE)
 	{
 		if (bitarray_test(&lpc2_bitx, idx))
 		{
@@ -275,6 +276,7 @@ static size_t lpc2_flash_writeDirect(struct KBlock *blk, block_idx_t idx, const 
 	return blk->blk_size;
 
 flash_error:
+	IRQ_RESTORE(flags);
 	LOG_ERR("%ld\n", res.status);
 	fls->hw->status |= FLASH_WR_ERR;
 	return 0;
@@ -329,12 +331,13 @@ static const KBlockVTable flash_lpc2_unbuffered_vt =
 static struct FlashHardware flash_lpc2_hw;
 static uint8_t flash_buf[FLASH_PAGE_SIZE_BYTES];
 
-static void common_init(Flash *fls)
+static void common_init(Flash *fls, int flags)
 {
 	memset(fls, 0, sizeof(*fls));
 	DB(fls->blk.priv.type = KBT_FLASH);
 
 	fls->hw = &flash_lpc2_hw;
+	fls->hw->flags = flags;
 
 	fls->blk.blk_size = FLASH_PAGE_SIZE_BYTES;
 	fls->blk.blk_cnt = FLASH_MEM_SIZE / FLASH_PAGE_SIZE_BYTES;
@@ -344,10 +347,11 @@ static void common_init(Flash *fls)
 
 void flash_hw_init(Flash *fls, int flags)
 {
-	common_init(fls);
+	common_init(fls, flags);
 	fls->blk.priv.vt = &flash_lpc2_buffered_vt;
-	fls->blk.priv.flags |= KB_BUFFERED | KB_PARTIAL_WRITE | flags;
+	fls->blk.priv.flags |= KB_BUFFERED | KB_PARTIAL_WRITE;
 	fls->blk.priv.buf = flash_buf;
+
 
 	/* Load the first block in the cache */
 	void *flash_start = 0x0;
@@ -356,7 +360,6 @@ void flash_hw_init(Flash *fls, int flags)
 
 void flash_hw_initUnbuffered(Flash *fls, int flags)
 {
-	common_init(fls);
+	common_init(fls, flags);
 	fls->blk.priv.vt = &flash_lpc2_unbuffered_vt;
-	fls->blk.priv.flags |= flags;
 }

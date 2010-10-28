@@ -161,19 +161,18 @@ static void common_init(Flash *fls)
 }
 
 
-void flash_hw_init(Flash *fls, int flags)
+void flash_hw_init(Flash *fls, UNUSED_ARG(int, flags))
 {
 	common_init(fls);
 	fls->blk.priv.vt = &flash_avr_buffered_vt;
-	fls->blk.priv.flags |= KB_BUFFERED | KB_PARTIAL_WRITE | flags;
+	fls->blk.priv.flags |= KB_BUFFERED | KB_PARTIAL_WRITE;
 	fls->blk.priv.buf = flash_buf;
 }
 
-void flash_hw_initUnbuffered(Flash *fls, int flags)
+void flash_hw_initUnbuffered(Flash *fls, UNUSED_ARG(int, flags))
 {
 	common_init(fls);
 	fls->blk.priv.vt = &flash_avr_unbuffered_vt;
-	fls->blk.priv.flags |= flags;
 }
 
 

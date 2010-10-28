@@ -55,9 +55,9 @@
 #include <cpu/attr.h>
 
 #if COMPILER_C99
-	#define flash_init(...)           PP_CAT(flash_init ## _, COUNT_PARMS(__VA_ARGS__)) (__VA_ARGS__)
+	#define flash_init(...)           PP_CAT(flash_init_, COUNT_PARMS(__VA_ARGS__)) (__VA_ARGS__)
 #else
-	#define flash_init(args...)       PP_CAT(flash_init ## _, COUNT_PARMS(args)) (args)
+	#define flash_init(args...)       PP_CAT(flash_init_, COUNT_PARMS(args)) (args)
 #endif
 
 /*
@@ -92,7 +92,7 @@ typedef struct Flash
 #define KBT_FLASH MAKE_ID('F', 'L', 'A', 'S')
 
 /**
-* Convert + ASSERT from generic KFile to Flash.
+* Convert + ASSERT from generic KBlock to Flash.
 */
 INLINE Flash *FLASH_CAST(KBlock *fls)
 {
@@ -105,7 +105,10 @@ void flash_hw_initUnbuffered(Flash *fls, int flags);
 
 #include CPU_HEADER(flash)
 
-#define flash_init_2(fls, flags)    (flags & KB_OPEN_UNBUFF) ? \
+#define FLASH_WRITE_ONCE   BV(0) ///< Allow only one write per block.
+#define FLASH_BUFFERED     BV(1) ///< Open flash memory using page caching, allowing the modification and partial write.
+
+#define flash_init_2(fls, flags)    (flags & FLASH_BUFFERED) ? \
 										flash_hw_initUnbuffered(fls, flags) : flash_hw_init(fls, flags)
 
 #if !CONFIG_FLASH_DISABLE_OLD_API
@@ -116,7 +119,4 @@ INLINE DEPRECATED void flash_init_1(Flash *fls)
 }
 #endif /* !CONFIG_FLASH_DISABLE_OLD_API */
 
-#include CPU_HEADER(flash)
-
 #endif /* DRV_FLASH_H */
-
