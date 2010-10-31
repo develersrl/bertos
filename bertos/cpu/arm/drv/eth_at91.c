@@ -71,6 +71,8 @@
  */
 uint8_t mac_addr[] = { 0x11, 0x22, 0x33, 0x44, 0x55, 0x66 };
 
+/* Silent Doxygen bug... */
+#ifndef __doxygen__
 static volatile BufDescriptor tx_buf_tab[EMAC_TX_DESCRIPTORS];
 /*
  * NOTE: this buffer should be declared as 'volatile' because it is read by the
@@ -88,6 +90,7 @@ static volatile BufDescriptor rx_buf_tab[EMAC_RX_DESCRIPTORS];
  */
 static uint8_t rx_buf[EMAC_RX_BUFFERS * EMAC_RX_BUFSIZ] ALIGNED(8);
 static int rx_buf_idx = 0;
+#endif
 
 static Event recv_wait, send_wait;
 
