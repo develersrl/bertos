@@ -50,7 +50,7 @@ COFFCONVERT=$(OBJCOPY) \
 	--change-section-address .noinit-0x800000 \
 	--change-section-address .eeprom-0x810000
 
-INCDIR  = -I. -Ibertos 
+INCDIR  = -I. -Ibertos -Ibertos/net/lwip/src/include -Ibertos/net/lwip/src/include/ipv4
 LIBDIR  = lib
 OBJDIR  = obj
 OUTDIR  = images
