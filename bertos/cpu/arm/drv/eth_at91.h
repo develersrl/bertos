@@ -110,12 +110,12 @@
 	| BV(PHY_RXCLK_10BTSER_BIT)
 // \}
 
-#define EMAC_TX_BUFSIZ          1518
-#define EMAC_TX_BUFFERS         1
+#define EMAC_TX_BUFSIZ          1518  //!!! Don't change this
+#define EMAC_TX_BUFFERS         1     //!!! Don't change this
 #define EMAC_TX_DESCRIPTORS     EMAC_TX_BUFFERS
 
-#define EMAC_RX_BUFFERS         32
-#define EMAC_RX_BUFSIZ          128
+#define EMAC_RX_BUFFERS         32    //!!! Don't change this
+#define EMAC_RX_BUFSIZ          128   //!!! Don't change this
 #define EMAC_RX_DESCRIPTORS	EMAC_RX_BUFFERS
 
 // Flag to manage local tx buffer
@@ -155,9 +155,6 @@
 #define EMAC_RSR_BITS	(BV(EMAC_BNA) | BV(EMAC_REC) | BV(EMAC_OVR))
 #define EMAC_TSR_BITS	(BV(EMAC_UBR) | BV(EMAC_COL) | BV(EMAC_RLES) | \
 			BV(EMAC_BEX) | BV(EMAC_COMP) | BV(EMAC_UND))
-
-#define EMAC_RX_INTS	(BV(EMAC_RCOMP) | BV(EMAC_ROVR) | BV(EMAC_RXUBR))
-#define EMAC_TX_INTS	(BV(EMAC_TCOMP))
 
 typedef struct BufDescriptor
 {

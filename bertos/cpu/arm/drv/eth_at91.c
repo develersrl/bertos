@@ -64,33 +64,38 @@
 
 #include "eth_at91.h"
 
+#define EMAC_RX_INTS	(BV(EMAC_RCOMP) | BV(EMAC_ROVR) | BV(EMAC_RXUBR))
+#define EMAC_TX_INTS	(BV(EMAC_TCOMP) | BV(EMAC_TXUBR) | BV(EMAC_RLEX))
+
 /*
  * MAC address configuration (please change this in your project!).
  *
  * TODO: make this paramater user-configurable from the Wizard.
  */
-uint8_t mac_addr[] = { 0x11, 0x22, 0x33, 0x44, 0x55, 0x66 };
+const uint8_t mac_addr[] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55 };
 
 /* Silent Doxygen bug... */
 #ifndef __doxygen__
-static volatile BufDescriptor tx_buf_tab[EMAC_TX_DESCRIPTORS];
 /*
  * NOTE: this buffer should be declared as 'volatile' because it is read by the
  * hardware. However, this is accessed only via memcpy() that should guarantee
  * coherency when copying from/to buffers.
  */
 static uint8_t tx_buf[EMAC_TX_BUFFERS * EMAC_TX_BUFSIZ] ALIGNED(8);
-static int tx_buf_idx = 0;
+static volatile BufDescriptor tx_buf_tab[EMAC_TX_DESCRIPTORS] ALIGNED(8);
 
-static volatile BufDescriptor rx_buf_tab[EMAC_RX_DESCRIPTORS];
 /*
  * NOTE: this buffer should be declared as 'volatile' because it is wrote by
  * the hardware. However, this is accessed only via memcpy() that should
  * guarantee coherency when copying from/to buffers.
  */
 static uint8_t rx_buf[EMAC_RX_BUFFERS * EMAC_RX_BUFSIZ] ALIGNED(8);
-static int rx_buf_idx = 0;
+static volatile BufDescriptor rx_buf_tab[EMAC_RX_DESCRIPTORS] ALIGNED(8);
 #endif
+
+static int tx_buf_idx;
+static int tx_buf_offset;
+static int rx_buf_idx;
 
 static Event recv_wait, send_wait;
 
@@ -102,13 +107,15 @@ static DECLARE_ISR(emac_irqHandler)
 	/* Receiver interrupt */
 	if ((isr & EMAC_RX_INTS))
 	{
-		event_do(&recv_wait);
+		if (isr & BV(EMAC_RCOMP))
+			event_do(&recv_wait);
 		EMAC_RSR = EMAC_RX_INTS;
 	}
 	/* Transmitter interrupt */
 	if (isr & EMAC_TX_INTS)
 	{
-		event_do(&send_wait);
+		if (isr & BV(EMAC_TCOMP))
+			event_do(&send_wait);
 		EMAC_TSR = EMAC_TX_INTS;
 	}
 	AIC_EOICR = 0;
@@ -260,39 +267,65 @@ static int emac_start(void)
 	return 0;
 }
 
-ssize_t eth_send(const uint8_t *buf, size_t len)
- {
+ssize_t eth_putFrame(const uint8_t *buf, size_t len)
+{
 	size_t wr_len;
-	int idx;
 
 	if (UNLIKELY(!len))
 		return -1;
 	ASSERT(len <= sizeof(tx_buf));
 
         /* Check if the transmit buffer is available */
-	idx = tx_buf_idx;
-        while (!(tx_buf_tab[idx].stat & TXS_USED))
-                event_wait(&send_wait);
-
-	if (++tx_buf_idx >= EMAC_TX_DESCRIPTORS)
-		tx_buf_idx = 0;
+	while (!(tx_buf_tab[tx_buf_idx].stat & TXS_USED))
+		event_wait(&send_wait);
 
         /* Copy the data into the buffer and prepare descriptor */
-        wr_len = MIN(len, (size_t)EMAC_TX_BUFSIZ);
-        memcpy((uint8_t *)tx_buf_tab[idx].addr, buf, wr_len);
-        tx_buf_tab[idx].stat = (wr_len & RXS_LENGTH_FRAME) |
-			((idx == EMAC_TX_DESCRIPTORS - 1) ?
-				TXS_WRAP : 0) |
-			TXS_LAST_BUFF;
-	EMAC_NCR |= BV(EMAC_TSTART);
+        wr_len = MIN(len, (size_t)EMAC_TX_BUFSIZ - tx_buf_offset);
+        memcpy((uint8_t *)tx_buf_tab[tx_buf_idx].addr + tx_buf_offset,
+				buf, wr_len);
+	tx_buf_offset += wr_len;
 
 	return wr_len;
 }
 
-static size_t eth_getFrameLen(void)
+void eth_sendFrame(void)
+{
+        tx_buf_tab[tx_buf_idx].stat = (tx_buf_offset & TXS_LENGTH_FRAME) |
+			TXS_LAST_BUFF |
+			((tx_buf_idx == EMAC_TX_DESCRIPTORS - 1) ?  TXS_WRAP : 0);
+	EMAC_NCR |= BV(EMAC_TSTART);
+
+	tx_buf_offset = 0;
+	if (++tx_buf_idx >= EMAC_TX_DESCRIPTORS)
+		tx_buf_idx = 0;
+}
+
+ssize_t eth_send(const uint8_t *buf, size_t len)
+ {
+	if (UNLIKELY(!len))
+		return -1;
+
+	len = eth_putFrame(buf, len);
+	eth_sendFrame();
+
+	return len;
+}
+
+static void eth_buf_realign(int idx)
+{
+	/* Empty buffer found. Realign. */
+	do {
+		rx_buf_tab[rx_buf_idx].addr &= ~RXBUF_OWNERSHIP;
+		if (++rx_buf_idx >= EMAC_RX_BUFFERS)
+			rx_buf_idx = 0;
+	} while (idx != rx_buf_idx);
+}
+
+static size_t __eth_getFrameLen(void)
 {
 	int idx, n = EMAC_RX_BUFFERS;
 
+skip:
 	/* Skip empty buffers */
 	while ((n > 0) && !(rx_buf_tab[rx_buf_idx].addr & RXBUF_OWNERSHIP))
 	{
@@ -314,57 +347,63 @@ static size_t eth_getFrameLen(void)
 			rx_buf_idx = 0;
 		n--;
 	}
-	if (UNLIKELY(!(rx_buf_tab[rx_buf_idx].stat & RXS_SOF)))
+	if (UNLIKELY(!n))
 	{
 		LOG_INFO("no SOF found\n");
 		return 0;
 	}
 	/* Search end of frame to evaluate the total frame size */
 	idx = rx_buf_idx;
-	while ((n > 0) && (rx_buf_tab[idx].addr & RXBUF_OWNERSHIP))
+restart:
+	while (n > 0)
 	{
+		if (UNLIKELY(!(rx_buf_tab[idx].addr & RXBUF_OWNERSHIP)))
+		{
+			/* Empty buffer found. Realign. */
+			eth_buf_realign(idx);
+			goto skip;
+		}
+		if (rx_buf_tab[idx].stat & RXS_EOF)
+			return rx_buf_tab[idx].stat & RXS_LENGTH_FRAME;
 		if (UNLIKELY((idx != rx_buf_idx) &&
 				(rx_buf_tab[idx].stat & RXS_SOF)))
 		{
 			/* Another start of frame found. Realign. */
-			do {
-				rx_buf_tab[rx_buf_idx].addr &= ~RXBUF_OWNERSHIP;
-				if (++rx_buf_idx >= EMAC_RX_BUFFERS)
-					rx_buf_idx = 0;
-			} while (idx != rx_buf_idx);
+			eth_buf_realign(idx);
+			goto restart;
 		}
-		if (rx_buf_tab[idx].stat & RXS_EOF)
-			return rx_buf_tab[idx].stat & RXS_LENGTH_FRAME;
 		if (++idx >= EMAC_RX_BUFFERS)
 			idx = 0;
 		n--;
 	}
-
 	LOG_INFO("no EOF found\n");
 	return 0;
 }
 
-ssize_t eth_recv(uint8_t *buf, size_t len)
+size_t eth_getFrameLen(void)
+{
+	size_t len;
+
+	/* Check if there is at least one available frame in the buffer */
+	while (1)
+	{
+		len = __eth_getFrameLen();
+		if (LIKELY(len))
+			break;
+		/* Wait for RX interrupt */
+		event_wait(&recv_wait);
+	}
+	return len;
+}
+
+ssize_t eth_getFrame(uint8_t *buf, size_t len)
 {
 	uint8_t *addr;
 	size_t rd_len = 0;
 
 	if (UNLIKELY(!len))
 		return -1;
-	ASSERT(len <= sizeof(tx_buf));
-
-	/* Check if there is at least one available frame in the buffer */
-	while (1)
-	{
-		size_t frame_len = MIN(len, eth_getFrameLen());
-		if (frame_len)
-		{
-			len = frame_len;
-			break;
-		}
-		/* Wait for RX interrupt */
-		event_wait(&recv_wait);
-	}
+	ASSERT(len <= sizeof(rx_buf));
 
 	/* Copy data from the RX buffer */
 	addr = (uint8_t *)(rx_buf_tab[rx_buf_idx].addr & BUF_ADDRMASK);
@@ -391,7 +430,16 @@ ssize_t eth_recv(uint8_t *buf, size_t len)
 		if (++rx_buf_idx >= EMAC_RX_DESCRIPTORS)
 			rx_buf_idx = 0;
 	}
+
 	return rd_len;
+}
+
+ssize_t eth_recv(uint8_t *buf, size_t len)
+{
+	if (UNLIKELY(!len))
+		return -1;
+	len = MIN(len, eth_getFrameLen());
+	return len ? eth_getFrame(buf, len) : 0;
 }
 
 int eth_init()

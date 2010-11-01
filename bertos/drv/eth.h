@@ -119,10 +119,17 @@ INLINE bool eth_addrCmp(const uint8_t *addr1, const uint8_t *addr2)
 			(addr1[5] ^ addr2[5]));
 }
 
+ssize_t eth_putFrame(const uint8_t *buf, size_t len);
+void eth_sendFrame(void);
+
+size_t eth_getFrameLen(void);
+ssize_t eth_getFrame(uint8_t *buf, size_t len);
+
 ssize_t eth_send(const uint8_t *buf, size_t len);
 ssize_t eth_recv(uint8_t *buf, size_t len);
+
 int eth_init(void);
 
-extern uint8_t mac_addr[ETH_ADDR_LEN];
+extern const uint8_t mac_addr[ETH_ADDR_LEN];
 
 #endif /* DRV_ETH_H */
