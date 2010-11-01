@@ -42,6 +42,7 @@ WIZARD_DIR="./wizard"
 APP_DIR="./examples ./boards"
 FAT_DIR="${BERTOS_DIR}/fs/fatfs"
 NMEA_DIR="${BERTOS_DIR}/net/nmeap"
+LWIP_DIR="${BERTOS_DIR}/net/lwip ${BERTOS_DIR}/net/lwip.c"
 
 if [ $# \< 2 ] ; then
 	printf "You must specify a cpu target, and source file type!\n"
@@ -50,7 +51,7 @@ if [ $# \< 2 ] ; then
 	exit 1
 fi
 CPU_TARGET=$1
-EXCLUDE_DIRS="$COPY_DIR $CPU_DIR $APP_DIR $OS_DIR $WIZARD_DIR $EMUL_DIR $FAT_DIR $NMEA_DIR ${BERTOS_DIR}/sec"
+EXCLUDE_DIRS="$COPY_DIR $CPU_DIR $APP_DIR $OS_DIR $WIZARD_DIR $EMUL_DIR $FAT_DIR $NMEA_DIR $LWIP_DIR ${BERTOS_DIR}/sec"
 EXCLUDE_CMD="\.svn -prune "
 for i in $EXCLUDE_DIRS; do 
 	EXCLUDE_CMD="$EXCLUDE_CMD -o -path $i -prune ";
