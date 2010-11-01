@@ -41,6 +41,7 @@
 #include <cfg/compiler.h>
 #include <cpu/attr.h>
 #include <cpu/detect.h>
+#include <cpu/types.h>
 #include <cfg/macros.h>
 
 /**
@@ -167,6 +168,37 @@ INLINE float net_to_host_float(float x)
 {
 	return be_float_to_cpu(x);
 }
+
+#if CPU_ARM
+INLINE cpu_atomic_t
+cpu_atomic_xchg(volatile cpu_atomic_t *ptr, cpu_atomic_t val)
+{
+	cpu_atomic_t ret;
+
+	asm volatile(
+		"swp     %0, %1, [%2]"
+
+		: "=&r" (ret)
+		: "r" (val), "r" (ptr)
+		: "memory", "cc");
+
+	return ret;
+}
+#else /* CPU_ARM */
+#include <cpu/irq.h>
+
+INLINE cpu_atomic_t
+cpu_atomic_xchg(volatile cpu_atomic_t *ptr, cpu_atomic_t val)
+{
+	cpu_atomic_t ret;
+
+	ATOMIC(
+		ret = *ptr;
+		*ptr = val;
+	);
+	return ret;
+}
+#endif /* CPU_ARM */
 
 #ifdef __cplusplus
 
