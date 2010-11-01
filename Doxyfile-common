@@ -587,6 +587,7 @@ EXCLUDE                = doc \
                          .svn \
                          qtext/qextftp.cpp \
                          wizard \
+                         bertos/net/lwip \
                          testout \
                          testout.old
 
