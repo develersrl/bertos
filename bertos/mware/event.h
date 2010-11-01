@@ -256,23 +256,23 @@ INLINE void event_wait(Event *e)
  */
 INLINE bool event_waitTimeout(Event *e, ticks_t timeout)
 {
+	bool ret;
+
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 	e->Ev.Sig.sig_proc = proc_current();
-	return (sig_waitTimeout(e->Ev.Sig.sig_bit, timeout) & SIG_TIMEOUT) ?
+	ret = (sig_waitTimeout(e->Ev.Sig.sig_bit, timeout) & SIG_TIMEOUT) ?
 				false : true;
 #else
 	ticks_t end = timer_clock() + timeout;
-	bool ret;
 
 	while ((ACCESS_SAFE(e->Ev.Gen.completed) == false) ||
 			TIMER_AFTER(timer_clock(), end))
 		cpu_relax();
 	ret = e->Ev.Gen.completed;
 	e->Ev.Gen.completed = false;
-	MEMORY_BARRIER;
-
-	return ret;
 #endif
+	MEMORY_BARRIER;
+	return ret;
 }
 #endif /* CONFIG_TIMER_EVENTS */
 
