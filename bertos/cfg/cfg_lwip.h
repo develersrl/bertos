@@ -1,7 +1,38 @@
 /**
- * @file
+ * \file
+ * <!--
+ * This file is part of BeRTOS.
  *
- * lwIP Options Configuration
+ * Bertos is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * As a special exception, you may use this file as part of a free software
+ * library without restriction.  Specifically, if other files instantiate
+ * templates or use macros or inline functions from this file, or you compile
+ * this file and link it with other files to produce an executable, this
+ * file does not by itself cause the resulting executable to be covered by
+ * the GNU General Public License.  This exception does not however
+ * invalidate any other reasons why the executable file might be covered by
+ * the GNU General Public License.
+ *
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ *
+ * -->
+ *
+ * \author Andrea Righi <arighi@develer.com>
+ *
+ * \brief Configuration file for the lwIP TCP/IP stack module
  */
 
 /*
@@ -35,15 +66,8 @@
  * Author: Adam Dunkels <adam@sics.se>
  *
  */
-#ifndef __LWIP_OPT_H__
-#define __LWIP_OPT_H__
-
-/*
- * Include user defined options first. Anything not defined in these files
- * will be set to standard values. Override anything you dont like!
- */
-#include "lwipopts.h"
-#include "lwip/debug.h"
+#ifndef CFG_LWIP_H
+#define CFG_LWIP_H
 
 /*
    -----------------------------------------------
@@ -57,7 +81,7 @@
  * allocation and deallocation.
  */
 #ifndef SYS_LIGHTWEIGHT_PROT
-#define SYS_LIGHTWEIGHT_PROT            0
+#define SYS_LIGHTWEIGHT_PROT            1
 #endif
 
 /** 
@@ -99,10 +123,10 @@
 #endif
 
 /**
-* MEMP_MEM_MALLOC==1: Use mem_malloc/mem_free instead of the lwip pool allocator.
-* Especially useful with MEM_LIBC_MALLOC but handle with care regarding execution
-* speed and usage from interrupts!
-*/
+ * Use mem_malloc/mem_free instead of the lwip pool allocator.
+ *
+ * $WIZ$ type = "boolean"
+ */
 #ifndef MEMP_MEM_MALLOC
 #define MEMP_MEM_MALLOC                 0
 #endif
@@ -113,37 +137,37 @@
  *    2 byte alignment -> #define MEM_ALIGNMENT 2
  */
 #ifndef MEM_ALIGNMENT
-#define MEM_ALIGNMENT                   1
+#define MEM_ALIGNMENT                   4
 #endif
 
 /**
- * MEM_SIZE: the size of the heap memory. If the application will send
- * a lot of data that needs to be copied, this should be set high.
+ * The size of the lwIP heap memory.
+ *
+ * If the application will send a lot of data that needs to be copied, this
+ * should be set high.
+ *
+ * $WIZ$ type = "int"; min = 1600
  */
-#ifndef MEM_SIZE
 #define MEM_SIZE                        1600
-#endif
 
 /**
- * MEMP_OVERFLOW_CHECK: memp overflow protection reserves a configurable
- * amount of bytes before and after each memp element in every pool and fills
- * it with a prominent default value.
+ * Dynamic pool memory overflow protection check level.
+ *
  *    MEMP_OVERFLOW_CHECK == 0 no checking
  *    MEMP_OVERFLOW_CHECK == 1 checks each element when it is freed
  *    MEMP_OVERFLOW_CHECK >= 2 checks each element in every pool every time
  *      memp_malloc() or memp_free() is called (useful but slow!)
+ *
+ *  $WIZ$ type = "int"; min = "0"; max = "2"
  */
-#ifndef MEMP_OVERFLOW_CHECK
 #define MEMP_OVERFLOW_CHECK             0
-#endif
 
 /**
- * MEMP_SANITY_CHECK==1: run a sanity check after each memp_free() to make
- * sure that there are no cycles in the linked lists.
+ * Run a sanity check after each memp_free().
+ *
+ * $WIZ$ type = "boolean"
  */
-#ifndef MEMP_SANITY_CHECK
 #define MEMP_SANITY_CHECK               0
-#endif
 
 /**
  * MEM_USE_POOLS==1: Use an alternative to malloc() by allocating from a set
@@ -283,7 +307,7 @@
  * (requires NO_SYS==0)
  */
 #ifndef MEMP_NUM_SYS_TIMEOUT
-#define MEMP_NUM_SYS_TIMEOUT            3
+#define MEMP_NUM_SYS_TIMEOUT            8
 #endif
 
 /**
@@ -333,11 +357,11 @@
    ---------------------------------
 */
 /**
- * LWIP_ARP==1: Enable ARP functionality.
+ * Enable ARP functionality.
+ *
+ * $WIZ$ type = "boolean"
  */
-#ifndef LWIP_ARP
 #define LWIP_ARP                        1
-#endif
 
 /**
  * ARP_TABLE_SIZE: Number of active MAC-IP address pairs cached.
@@ -400,22 +424,18 @@
 #endif
 
 /**
- * IP_REASSEMBLY==1: Reassemble incoming fragmented IP packets. Note that
- * this option does not affect outgoing packet sizes, which can be controlled
- * via IP_FRAG.
+ * Reassemble incoming fragmented IP packets.
+ *
+ * $WIZ$ type = "boolean"
  */
-#ifndef IP_REASSEMBLY
 #define IP_REASSEMBLY                   1
-#endif
 
 /**
- * IP_FRAG==1: Fragment outgoing IP packets if their size exceeds MTU. Note
- * that this option does not affect incoming packet sizes, which can be
- * controlled via IP_REASSEMBLY.
+ * Fragment outgoing IP packets if their size exceeds MTU.
+ *
+ * $WIZ$ type = "boolean"
  */
-#ifndef IP_FRAG
 #define IP_FRAG                         1
-#endif
 
 /**
  * IP_REASS_MAXAGE: Maximum time (in multiples of IP_TMR_INTERVAL - so seconds, normally)
@@ -483,12 +503,11 @@
    ----------------------------------
 */
 /**
- * LWIP_ICMP==1: Enable ICMP module inside the IP stack.
- * Be careful, disable that make your product non-compliant to RFC1122
+ * Enable ICMP module inside the IP stack.
+ *
+ * $WIZ$ type = "boolean"
  */
-#ifndef LWIP_ICMP
 #define LWIP_ICMP                       1
-#endif
 
 /**
  * ICMP_TTL: Default value for Time-To-Live used by ICMP packets.
@@ -517,11 +536,11 @@
    ---------------------------------
 */
 /**
- * LWIP_RAW==1: Enable application layer to hook into the IP layer itself.
+ * Enable application layer to hook into the IP layer itself.
+ *
+ * $WIZ$ type = "boolean"
  */
-#ifndef LWIP_RAW
 #define LWIP_RAW                        1
-#endif
 
 /**
  * LWIP_RAW==1: Enable application layer to hook into the IP layer itself.
@@ -536,11 +555,11 @@
    ----------------------------------
 */
 /**
- * LWIP_DHCP==1: Enable DHCP module.
+ * Enable DHCP module. UDP must be also available.
+ *
+ * $WIZ$ type = "boolean"
  */
-#ifndef LWIP_DHCP
-#define LWIP_DHCP                       0
-#endif
+#define LWIP_DHCP                       1
 
 /**
  * DHCP_DOES_ARP_CHECK==1: Do an ARP check on the offered address.
@@ -586,12 +605,11 @@
    ----------------------------------
 */
 /**
- * LWIP_SNMP==1: Turn on SNMP module. UDP must be available for SNMP
- * transport.
+ * Turn on SNMP module. UDP must be also available.
+ *
+ * $WIZ$ type = "boolean"
  */
-#ifndef LWIP_SNMP
 #define LWIP_SNMP                       0
-#endif
 
 /**
  * SNMP_CONCURRENT_REQUESTS: Number of concurrent requests the module will
@@ -631,11 +649,11 @@
    ----------------------------------
 */
 /**
- * LWIP_IGMP==1: Turn on IGMP module. 
+ * Turn on IGMP module.
+ *
+ * $WIZ$ type = "boolean"
  */
-#ifndef LWIP_IGMP
 #define LWIP_IGMP                       0
-#endif
 
 /*
    ----------------------------------
@@ -643,12 +661,11 @@
    ----------------------------------
 */
 /**
- * LWIP_DNS==1: Turn on DNS module. UDP must be available for DNS
- * transport.
+ * Turn on DNS module. UDP must be available for DNS transport.
+ *
+ * $WIZ$ type = "boolean"
  */
-#ifndef LWIP_DNS
 #define LWIP_DNS                        0
-#endif
 
 /** DNS maximum number of entries to maintain locally. */
 #ifndef DNS_TABLE_SIZE
@@ -708,11 +725,11 @@
    ---------------------------------
 */
 /**
- * LWIP_UDP==1: Turn on UDP.
+ * Turn on UDP.
+ *
+ * $WIZ$ type = "boolean"
  */
-#ifndef LWIP_UDP
 #define LWIP_UDP                        1
-#endif
 
 /**
  * LWIP_UDPLITE==1: Turn on UDP-Lite. (Requires LWIP_UDP)
@@ -741,11 +758,11 @@
    ---------------------------------
 */
 /**
- * LWIP_TCP==1: Turn on TCP.
+ * Turn on TCP.
+ *
+ * $WIZ$ type = "boolean"
  */
-#ifndef LWIP_TCP
 #define LWIP_TCP                        1
-#endif
 
 /**
  * TCP_TTL: Default Time-To-Live value.
@@ -812,7 +829,7 @@
  * TCP_SND_BUF: TCP sender buffer space (bytes). 
  */
 #ifndef TCP_SND_BUF
-#define TCP_SND_BUF                     256
+#define TCP_SND_BUF                     (2 * TCP_MSS)
 #endif
 
 /**
@@ -863,22 +880,6 @@
 #define TCP_WND_UPDATE_THRESHOLD   (TCP_WND / 4)
 #endif
 
-/**
- * LWIP_EVENT_API and LWIP_CALLBACK_API: Only one of these should be set to 1.
- *     LWIP_EVENT_API==1: The user defines lwip_tcp_event() to receive all
- *         events (accept, sent, etc) that happen in the system.
- *     LWIP_CALLBACK_API==1: The PCB callback function is called directly
- *         for the event.
- */
-#ifndef LWIP_EVENT_API
-#define LWIP_EVENT_API                  0
-#define LWIP_CALLBACK_API               1
-#else 
-// #define LWIP_EVENT_API                  1
-// #define LWIP_CALLBACK_API               0
-#endif
-
-
 /*
    ----------------------------------
    ---------- Pbuf options ----------
@@ -908,19 +909,18 @@
    ------------------------------------------------
 */
 /**
- * LWIP_NETIF_HOSTNAME==1: use DHCP_OPTION_HOSTNAME with netif's hostname
- * field.
+ * Use DHCP_OPTION_HOSTNAME with netif's hostname field.
+ *
+ * $WIZ$ type = "boolean"
  */
-#ifndef LWIP_NETIF_HOSTNAME
-#define LWIP_NETIF_HOSTNAME             0
-#endif
+#define LWIP_NETIF_HOSTNAME             1
 
 /**
- * LWIP_NETIF_API==1: Support netif api (in netifapi.c)
+ * Support netif api (in netifapi.c)
+ *
+ * $WIZ$ type = "boolean"
  */
-#ifndef LWIP_NETIF_API
 #define LWIP_NETIF_API                  0
-#endif
 
 /**
  * LWIP_NETIF_STATUS_CALLBACK==1: Support a callback function whenever an interface
@@ -1001,11 +1001,11 @@
    ------------------------------------
 */
 /**
- * LWIP_HAVE_LOOPIF==1: Support loop interface (127.0.0.1) and loopif.c
+ * Support loop interface (127.0.0.1) and loopif.c
+ *
+ * $WIZ$ type = "boolean"
  */
-#ifndef LWIP_HAVE_LOOPIF
 #define LWIP_HAVE_LOOPIF                0
-#endif
 
 /*
    ------------------------------------
@@ -1013,11 +1013,11 @@
    ------------------------------------
 */
 /**
- * LWIP_HAVE_SLIPIF==1: Support slip interface and slipif.c
+ * Support slip interface and slipif.c
+ *
+ * $WIZ$ type = "boolean"
  */
-#ifndef LWIP_HAVE_SLIPIF
 #define LWIP_HAVE_SLIPIF                0
-#endif
 
 /*
    ------------------------------------
@@ -1037,7 +1037,7 @@
  * sys_thread_new() when the thread is created.
  */
 #ifndef TCPIP_THREAD_STACKSIZE
-#define TCPIP_THREAD_STACKSIZE          0
+#define TCPIP_THREAD_STACKSIZE          (KERN_MINSTACKSIZE * 3)
 #endif
 
 /**
@@ -1046,7 +1046,7 @@
  * sys_thread_new() when the thread is created.
  */
 #ifndef TCPIP_THREAD_PRIO
-#define TCPIP_THREAD_PRIO               1
+#define TCPIP_THREAD_PRIO               0
 #endif
 
 /**
@@ -1121,7 +1121,7 @@
  * sys_thread_new() when the thread is created.
  */
 #ifndef DEFAULT_THREAD_STACKSIZE
-#define DEFAULT_THREAD_STACKSIZE        0
+#define DEFAULT_THREAD_STACKSIZE        (KERN_MINSTACKSIZE * 3)
 #endif
 
 /**
@@ -1183,11 +1183,11 @@
 #endif
 
 /**
- * LWIP_NETCONN==1: Enable Netconn API (require to use api_lib.c)
+ * Enable Netconn API (require to use api_lib.c)
+ *
+ * $WIZ$ type = "boolean"
  */
-#ifndef LWIP_NETCONN
 #define LWIP_NETCONN                    1
-#endif
 
 /*
    ------------------------------------
@@ -1195,28 +1195,27 @@
    ------------------------------------
 */
 /**
- * LWIP_SOCKET==1: Enable Socket API (require to use sockets.c)
+ * Enable Socket API (require to use sockets.c)
+ *
+ * $WIZ$ type = "boolean"
  */
-#ifndef LWIP_SOCKET
 #define LWIP_SOCKET                     1
-#endif
 
 /**
- * LWIP_COMPAT_SOCKETS==1: Enable BSD-style sockets functions names.
- * (only used if you use sockets.c)
+ * Enable BSD-style sockets functions names.
+ *
+ * NOTE: do not change this!!!
  */
 #ifndef LWIP_COMPAT_SOCKETS
-#define LWIP_COMPAT_SOCKETS             1
+#define LWIP_COMPAT_SOCKETS             0
 #endif
 
 /**
- * LWIP_POSIX_SOCKETS_IO_NAMES==1: Enable POSIX-style sockets functions names.
- * Disable this option if you use a POSIX operating system that uses the same
- * names (read, write & close). (only used if you use sockets.c)
+ * Enable POSIX-style sockets functions names.
+ *
+ * $WIZ$ type = "boolean"
  */
-#ifndef LWIP_POSIX_SOCKETS_IO_NAMES
 #define LWIP_POSIX_SOCKETS_IO_NAMES     1
-#endif
 
 /**
  * LWIP_TCP_KEEPALIVE==1: Enable TCP_KEEPIDLE, TCP_KEEPINTVL and TCP_KEEPCNT
@@ -1264,7 +1263,7 @@
  * LWIP_STATS==1: Enable statistics collection in lwip_stats.
  */
 #ifndef LWIP_STATS
-#define LWIP_STATS                      1
+#define LWIP_STATS                      0
 #endif
 
 #if LWIP_STATS
@@ -1359,6 +1358,7 @@
 #else
 
 #define LINK_STATS                      0
+#define ETHARP_STATS                    0
 #define IP_STATS                        0
 #define IPFRAG_STATS                    0
 #define ICMP_STATS                      0
@@ -1378,18 +1378,18 @@
    ---------------------------------
 */
 /**
- * PPP_SUPPORT==1: Enable PPP.
+ * Enable PPP.
+ *
+ * $WIZ$ type = "boolean"
  */
-#ifndef PPP_SUPPORT
 #define PPP_SUPPORT                     0
-#endif
 
 /**
- * PPPOE_SUPPORT==1: Enable PPP Over Ethernet
+ * Enable PPP Over Ethernet.
+ *
+ * $WIZ$ type = "boolean"
  */
-#ifndef PPPOE_SUPPORT
 #define PPPOE_SUPPORT                   0
-#endif
 
 /**
  * PPPOS_SUPPORT==1: Enable PPP Over Serial
@@ -1588,6 +1588,11 @@
    ---------- Debugging options ----------
    ---------------------------------------
 */
+
+#ifdef _DEBUG
+#define LWIP_DEBUG
+#endif
+
 /**
  * LWIP_DBG_MIN_LEVEL: After masking, the value of the debug is
  * compared against this value. If it is smaller, then debugging
@@ -1837,4 +1842,7 @@
 #define DNS_DEBUG                       LWIP_DBG_OFF
 #endif
 
-#endif /* __LWIP_OPT_H__ */
+/* Custom definitions: !!!DO NOT CHANGE THIS SECTION!!! */
+#define LWIP_TIMEVAL_PRIVATE            0
+
+#endif /* CFG_LWIP_H */
