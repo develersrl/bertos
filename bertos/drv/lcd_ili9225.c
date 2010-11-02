@@ -225,6 +225,32 @@ void lcd_ili9225_blitBitmap(const Bitmap *bm)
 	}
 }
 
+/*
+ * Blit a 24 bit color raw raster directly on screen
+ */
+void lcd_ili9225_blitBitmap24(int x, int y, int width, int height, const char *bmp)
+{
+	int l, r;
+
+	lcd_startBlit(x, y, width, height);
+
+	for (l = 0; l < height; l++)
+	{
+		for (r = 0; r < width; r++)
+		{
+			lcd_row[r] =
+				(((uint16_t)bmp[1] << 11) & 0xE000) |
+				(((uint16_t)bmp[2] <<  5) & 0x1F00) |
+				(((uint16_t)bmp[0] <<  0) & 0x00F8) |
+				(((uint16_t)bmp[1] >>  5) & 0x0007);
+			bmp += 3;
+		}
+
+		lcd_cmd(0x22);
+		lcd_data(lcd_row, width);
+	}
+}
+
 /**
  * Turn off display.
  */

@@ -55,5 +55,6 @@ void lcd_ili9225_off(void);
 void lcd_ili9225_blitRaw(const uint8_t *data,
 		uint8_t x, uint8_t y, uint8_t width, uint8_t height);
 void lcd_ili9225_blitBitmap(const Bitmap *bm);
+void lcd_ili9225_blitBitmap24(int x, int y, int width, int height, const char *bmp);
 
 #endif /* LCD_ILI9225_H */
