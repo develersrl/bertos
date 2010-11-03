@@ -39,6 +39,30 @@
 /* Ensure that the lwIP compile-time options are included first. */
 #include "cfg/cfg_lwip.h"
 
+/* Core lwIP TCP/IP stack */
+#if LWIP_DHCP
+#include "lwip/src/core/dhcp.c"
+#endif
+#if LWIP_DNS
+#include "lwip/src/core/dns.c"
+#endif
+#include "lwip/src/core/init.c"
+#include "lwip/src/core/mem.c"
+#include "lwip/src/core/memp.c"
+#include "lwip/src/core/netif.c"
+#include "lwip/src/core/pbuf.c"
+#include "lwip/src/core/raw.c"
+#include "lwip/src/core/stats.c"
+#include "lwip/src/core/sys.c"
+#if LWIP_TCP
+#include "lwip/src/core/tcp.c"
+#include "lwip/src/core/tcp_in.c"
+#include "lwip/src/core/tcp_out.c"
+#endif
+#if LWIP_UDP
+#include "lwip/src/core/udp.c"
+#endif
+
 /* lwIP high-level API code */
 #include "lwip/src/api/api_lib.c"
 #include "lwip/src/api/api_msg.c"
@@ -49,26 +73,16 @@
 #include "lwip/src/api/sockets.c"
 #include "lwip/src/api/tcpip.c"
 
-/* Core lwIP TCP/IP stack */
-#include "lwip/src/core/dhcp.c"
-#include "lwip/src/core/dns.c"
-#include "lwip/src/core/init.c"
-#include "lwip/src/core/mem.c"
-#include "lwip/src/core/memp.c"
-#include "lwip/src/core/netif.c"
-#include "lwip/src/core/pbuf.c"
-#include "lwip/src/core/raw.c"
-#include "lwip/src/core/stats.c"
-#include "lwip/src/core/sys.c"
-#include "lwip/src/core/tcp.c"
-#include "lwip/src/core/tcp_in.c"
-#include "lwip/src/core/tcp_out.c"
-#include "lwip/src/core/udp.c"
-
 /* lwIP IPV4 implementation */
+#if LWIP_AUTOIP
 #include "lwip/src/core/ipv4/autoip.c"
+#endif
+#if LWIP_ICMP
 #include "lwip/src/core/ipv4/icmp.c"
+#endif
+#if LWIP_IGMP
 #include "lwip/src/core/ipv4/igmp.c"
+#endif
 #include "lwip/src/core/ipv4/inet.c"
 #include "lwip/src/core/ipv4/inet_chksum.c"
 #include "lwip/src/core/ipv4/ip.c"
@@ -76,18 +90,23 @@
 #include "lwip/src/core/ipv4/ip_frag.c"
 
 /* lwIP SNMP implementation */
+#if LWIP_SNMP
 #include "lwip/src/core/snmp/asn1_dec.c"
 #include "lwip/src/core/snmp/asn1_enc.c"
 #include "lwip/src/core/snmp/mib2.c"
 #include "lwip/src/core/snmp/mib_structs.c"
 #include "lwip/src/core/snmp/msg_in.c"
 #include "lwip/src/core/snmp/msg_out.c"
+#endif
 
 /* lwIP network interface */
+#if LWIP_ARP
 #include "lwip/src/netif/etharp.c"
+#endif
 #include "lwip/src/netif/loopif.c"
 
 /* lwIP PPP implementation */
+#if PPP_SUPPORT
 #include "lwip/src/netif/ppp/auth.c"
 #include "lwip/src/netif/ppp/chap.c"
 #include "lwip/src/netif/ppp/chpms.c"
@@ -101,6 +120,7 @@
 #include "lwip/src/netif/ppp/ppp_oe.c"
 #include "lwip/src/netif/ppp/randm.c"
 #include "lwip/src/netif/ppp/vj.c"
+#endif
 
 /* BeRTOS-specific lwIP interface/porting layer */
 #include "lwip/src/netif/ethernetif.c"
