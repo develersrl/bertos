@@ -336,10 +336,23 @@ static void thread_trampoline(void)
 	thread_node->entry(thread_node->arg);
 }
 
+#if !CONFIG_KERN_HEAP
+/*
+ * NOTE: threads are never destroyed, consequently these stacks are never
+ * deallocated. So, the stack allocator can be implemented as a simple index
+ * that is atomically incremented at each allocation.
+ */
+static cpu_stack_t thread_stack[MAX_THREAD_CNT]
+			[DEFAULT_THREAD_STACKSIZE / sizeof(cpu_stack_t)]
+				ALIGNED(sizeof(cpu_stack_t));
+static int last_stack;
+#endif
+
 sys_thread_t sys_thread_new(char *name, void (* thread)(void *arg),
 				void *arg, int stacksize, int prio)
 {
 	ThreadNode *thread_node;
+	cpu_stack_t *stackbase;
 
 	proc_forbid();
 	thread_node = (ThreadNode *)list_remHead(&free_thread);
@@ -354,8 +367,14 @@ sys_thread_t sys_thread_new(char *name, void (* thread)(void *arg),
 	thread_node->entry = thread;
 	thread_node->arg = arg;
 
+	#if !CONFIG_KERN_HEAP
+		ASSERT(stacksize <= DEFAULT_THREAD_STACKSIZE);
+		PROC_ATOMIC(stackbase = &thread_stack[last_stack++]);
+	#else
+		stackbase = NULL;
+	#endif
 	thread_node->pid = proc_new_with_name(name, thread_trampoline,
-				(void *)thread_node, stacksize, NULL);
+				(void *)thread_node, stacksize, stackbase);
 	if (thread_node->pid == NULL)
 		return NULL;
 

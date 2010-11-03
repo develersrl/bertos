@@ -35,7 +35,7 @@
  *
  * $WIZ$ module_name = "lwip"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_lwip.h"
- * $WIZ$ module_depends = "kern", "signal", "msg", "event", "eth", "heap"
+ * $WIZ$ module_depends = "kern", "signal", "msg", "event", "eth"
  */
 
 #ifndef NET_LWIP_H
