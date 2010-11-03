@@ -357,11 +357,11 @@
    ---------------------------------
 */
 /**
- * Enable ARP functionality.
- *
- * $WIZ$ type = "boolean"
+ * LWIP_ARP==1: Enable ARP functionality.
  */
+#ifndef LWIP_ARP
 #define LWIP_ARP                        1
+#endif
 
 /**
  * ARP_TABLE_SIZE: Number of active MAC-IP address pairs cached.

@@ -100,9 +100,7 @@
 #endif
 
 /* lwIP network interface */
-#if LWIP_ARP
 #include "lwip/src/netif/etharp.c"
-#endif
 #include "lwip/src/netif/loopif.c"
 
 /* lwIP PPP implementation */
