@@ -425,7 +425,11 @@ ssize_t eth_getFrame(uint8_t *buf, size_t len)
 			rd_len += EMAC_RX_BUFSIZ;
 		else
 			rd_len += len - rd_len;
-		ASSERT(rx_buf_tab[rx_buf_idx].addr & RXBUF_OWNERSHIP);
+		if (UNLIKELY(!(rx_buf_tab[rx_buf_idx].addr & RXBUF_OWNERSHIP)))
+		{
+			LOG_INFO("bad frame found\n");
+			return 0;
+		}
 		rx_buf_tab[rx_buf_idx].addr &= ~RXBUF_OWNERSHIP;
 		if (++rx_buf_idx >= EMAC_RX_DESCRIPTORS)
 			rx_buf_idx = 0;
