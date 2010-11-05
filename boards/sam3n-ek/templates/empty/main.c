@@ -41,6 +41,8 @@
 #include "hw/hw_led.h"
 #include "hw/hw_lcd.h"
 
+#include <cfg/debug.h>
+
 #include <cpu/irq.h>
 #include <cpu/arm/drv/spi_dma_at91.h>
 
@@ -85,6 +87,7 @@ static void init(void)
 
 int main(void)
 {
+	/* Hardware initialization */
 	init();
 
 
