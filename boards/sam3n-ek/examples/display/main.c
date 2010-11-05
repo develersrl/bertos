@@ -88,26 +88,6 @@ static Process *hp_proc, *lp_proc, *led_proc;
 static hptime_t start, end;
 
 
-INLINE void led_on(int idx)
-{
-	if (idx == 0)
-		LED_BLUE_ON();
-	else if (idx == 1)
-		LED_GREEN_ON();
-	else if (idx == 2)
-		LED_AMBER_ON();
-}
-
-INLINE void led_off(int idx)
-{
-	if (idx == 0)
-		LED_BLUE_OFF();
-	else if (idx == 1)
-		LED_GREEN_OFF();
-	else if (idx == 2)
-		LED_AMBER_OFF();
-}
-
 static bool led_blinking;
 
 static void NORETURN led_process(void)
@@ -118,14 +98,14 @@ static void NORETURN led_process(void)
 	{
 		if (!led_blinking)
 		{
-			led_off(0);
-			led_off(1);
-			led_off(2);
+			LED_OFF(0);
+			LED_OFF(1);
+			LED_OFF(2);
 			sig_wait(SIG_USER0);
 		}
-		led_on(i % 3);
-		led_off((i-1) % 3);
-		timer_delay(100);
+		LED_ON(i % 3);
+		LED_OFF((i-1) % 3);
+		timer_delay(200);
 	}
 }
 
