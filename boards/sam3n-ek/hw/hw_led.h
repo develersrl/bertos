@@ -45,8 +45,12 @@
 #define LED_AMBER_PIN      BV(25)  // Port A
 #define LED_GREEN_PIN      BV(14)  // Port B
 
-#define LED_ON(led)  (PIOA_CODR = led)
-#define LED_OFF(led)  (PIOA_SODR = led)
+#define LED_BLUE_ON(led)    (PIOA_CODR = LED_BLUE_PIN)
+#define LED_BLUE_OFF(led)   (PIOA_SODR = LED_BLUE_PIN)
+#define LED_AMBER_ON(led)   (PIOA_CODR = LED_AMBER_PIN)
+#define LED_AMBER_OFF(led)  (PIOA_SODR = LED_AMBER_PIN)
+#define LED_GREEN_ON(led)   (PIOB_CODR = LED_GREEN_PIN)
+#define LED_GREEN_OFF(led)  (PIOB_SODR = LED_GREEN_PIN)
 
 #define LED_INIT() \
 	do { \
