@@ -81,21 +81,21 @@ static hptime_t start, end;
 INLINE void led_on(int idx)
 {
 	if (idx == 0)
-		LED_ON(LED_BLUE_PIN);
+		LED_BLUE_ON();
 	else if (idx == 1)
-		LED_ON(LED_GREEN_PIN);
+		LED_GREEN_ON();
 	else if (idx == 2)
-		LED_ON(LED_AMBER_PIN);
+		LED_AMBER_ON();
 }
 
 INLINE void led_off(int idx)
 {
 	if (idx == 0)
-		LED_OFF(LED_BLUE_PIN);
+		LED_BLUE_OFF();
 	else if (idx == 1)
-		LED_OFF(LED_GREEN_PIN);
+		LED_GREEN_OFF();
 	else if (idx == 2)
-		LED_OFF(LED_AMBER_PIN);
+		LED_AMBER_OFF();
 }
 
 static bool led_blinking;
