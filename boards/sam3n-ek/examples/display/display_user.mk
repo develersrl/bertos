@@ -44,4 +44,5 @@ display_USER_CPPAFLAGS = \
 display_USER_CPPFLAGS = \
 	-fno-strict-aliasing \
 	-fwrapv \
+	-O2 \
 	#
