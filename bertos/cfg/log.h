@@ -30,6 +30,7 @@
  *
  * -->
  *
+ * \addtogroup logging
  * \brief Logging system module.
  *
  * This module implement a simple interface to use the multi level logging system.
@@ -39,20 +40,29 @@
  *  - warning message
  *  - info message (lowest)
  *
- * With this priority system we can log only the message that have egual or major
- * priority than log level that you has been configurate. Further you can have a
- * differ log level for each module that you want. To do this you just need to
- * define LOG_LEVEL in cfg of select module.
- * When you set a log level, the system logs only the message that have priority
- * egual or major that you have define, but the other logs function are not include
- * at compile time, so all used logs function are linked, but the other no.
+ * With this priority system we log only the messages that have priority higher
+ * or equal to the log level that has been configurated; messages below the
+ * selected log level are not included at compile time, so no time and space
+ * is wasted on unused functions.
  *
- * To use logging system you should include this module in your drive and use
- * a LOG_ERROR, LOG_WARNING and LOG_INFO macros to set the level log of the message.
+ * Furthermore you can define different log levels for each module. To do this
+ * you just need to define LOG_LEVEL in the configuration file for the
+ * selected module.
+ *
+ * This module provides two types of macros:
+ *
+ *  - LOG_* macros: these macros allow formatted output, using the same format
+ *                  as kprintf
+ *  - LOG_*B macros: these macros allow to optionally compile a block of code
+ *                   depending on the logging level chosen
+ *
+ * To use the logging system you should include this module in your driver
+ * and use one of the LOG_ERR, LOG_WARN and LOG_INFO macros to output error
+ * messages.
  * Then you should define a LOG_LEVEL and LOG_VERBOSE costant in your
  * \c cfg/cfg_\<your_cfg_module_name\>.h using the follow policy:
  *
- * - in your file \c cfg/cfg_\<cfg_module_name\>.h, you define the logging
+ * - in your file \c cfg/cfg_\<cfg_module_name\>.h, define the logging
  *   level and verbosity mode for your specific module:
  *
  * \code
@@ -63,10 +73,9 @@
  *	#define <cfg_module_name>_LOG_FORMAT   LOG_FMT_VERBOSE
  * \endcode
  *
- * - then, in the module that you use a logging macros you should define
- *   a LOG_LEVEL and LOG_FORMAT using the previous value that you have define
- *   in cfg_<cfg_module_name>.h header. After this you should include the cfg/log.h
- *   module:
+ * - then, in the module where you use the logging macros you should define
+ *   the macros LOG_LEVEL and LOG_FORMAT and you should include cfg/log.h
+ *   module, as demonstrated in the following example:
  *
  * \code
  *	// Define log settings for cfg/log.h.
@@ -75,13 +84,13 @@
  *	#include <cfg/log.h>
  * \endcode
  *
- * if you include a log.h module without define the LOG_LEVEL and LOG_VERBOSE
- * macros, the module use the default setting (see below).
+ * if you include a log.h module without defining the LOG_LEVEL and LOG_VERBOSE
+ * macros, the module uses the default settings.
  *
- * WARNING: when use the log.h module, and you want to set a your log level
- * make sure to include this module after a \c cfg_<cfg_module_name>.h, because the
- * LOG_LEVEL and LOG_VERBOSE macros must be defined before to include log module,
- * otherwise the log module use a default settings.
+ * WARNING: when using the log.h module make sure to include this module after
+ * a \c cfg_<cfg_module_name>.h, because the LOG_LEVEL and LOG_VERBOSE macros
+ * must be defined before including the log module. Otherwise the log module
+ * will use the default settings.
  *
  * \author Daniele Basile <asterix@develer.com>
  *
@@ -93,6 +102,10 @@
 
 #include <cfg/debug.h>
 
+/**
+ * \defgroup logging Logging facilities
+ * \{
+ */
 
 // Use a default setting if nobody defined a log level
 #ifndef LOG_LEVEL
@@ -109,10 +122,9 @@
  *
  * When you choose a log level messages you choose
  * also which print function are linked.
- * If you choose a low level of log you link all log function (error, warning and info),
- * but if choose a hight level you link only that have the priority egual or hight.
- * The priority level go from error (highest) to info (lowest) (see cfg/debug.h
- * for more detail).
+ * When using a log level, you link all log functions that have a priority
+ * higher or equal than the level you chose.
+ * The priority level go from error (highest) to info (lowest).
  *
  * $WIZ$ log_level = "LOG_LVL_NONE", "LOG_LVL_ERR", "LOG_LVL_WARN", "LOG_LVL_INFO"
  * \{
@@ -145,7 +157,13 @@
 #endif
 
 #if LOG_LEVEL >= LOG_LVL_ERR
+	/**
+	 * Output an error message
+	 */
 	#define LOG_ERR(str,...)       LOG_PRINT("ERR", str, ## __VA_ARGS__)
+	/**
+	 * Define a code block that will be compiled only when LOG_LEVEL >= LOG_LVL_ERR
+	 */
 	#define LOG_ERRB(x)            x
 #else
 	INLINE void LOG_ERR(UNUSED_ARG(const char *, fmt), ...) { /* nop */ }
@@ -153,7 +171,13 @@
 #endif
 
 #if LOG_LEVEL >= LOG_LVL_WARN
+	/**
+	 * Output a warning message
+	 */
 	#define LOG_WARN(str,...)       LOG_PRINT("WARN", str, ## __VA_ARGS__)
+	/**
+	 * Define a code block that will be compiled only when LOG_LEVEL >= LOG_LVL_WARN
+	 */
 	#define LOG_WARNB(x)            x
 #else
 	INLINE void LOG_WARN(UNUSED_ARG(const char *, fmt), ...) { /* nop */ }
@@ -161,12 +185,19 @@
 #endif
 
 #if LOG_LEVEL >= LOG_LVL_INFO
+	/**
+	 * Output an informative message
+	 */
 	#define LOG_INFO(str,...)       LOG_PRINT("INFO", str, ## __VA_ARGS__)
+	/**
+	 * Define a code block that will be compiled only when LOG_LEVEL >= LOG_LVL_INFO
+	 */
 	#define LOG_INFOB(x)            x
 #else
 	INLINE void LOG_INFO(UNUSED_ARG(const char *, fmt), ...) { /* nop */ }
 	#define LOG_INFOB(x)            /* Nothing */
 #endif
+/** \} */
 
 
 #endif /* CFG_LOG_H */
