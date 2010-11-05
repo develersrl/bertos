@@ -49,22 +49,24 @@
 #include <drv/lcd_ili9225.h>
 
 
-struct SpiDmaAt91 spi;
-static uint8_t raster[RAST_SIZE(LCD_WIDTH, LCD_HEIGHT)];
+/* Bitmap to display on the OLED display */
 static Bitmap lcd_bitmap;
-static int lcd_brightness = LCD_BACKLIGHT_MAX;
+/* Raster associated to the Bitmap image */
+static uint8_t raster[RAST_SIZE(LCD_WIDTH, LCD_HEIGHT)];
+/* LCD spi context with DMA access */
+struct SpiDmaAt91 spi;
 
 static void init(void)
 {
     /* Enable all the interrupts */
     IRQ_ENABLE;
 
-    /* Initialize debugging module (allow kprintf(), etc.) */
-    kdbg_init();
-    /* Initialize system timer */
-    timer_init();
-    /* Initialize LED driver */
-    LED_INIT();
+	/* Initialize debugging module (allow kprintf(), etc.) */
+	kdbg_init();
+	/* Initialize system timer */
+	timer_init();
+	/* Initialize LED driver */
+	LED_INIT();
 	/* Init spi on dma to drive lcd */
 	spi_dma_init(&spi);
 	spi_dma_setclock(LCD_SPICLOCK);
@@ -72,13 +74,13 @@ static void init(void)
 	lcd_ili9225_init(&spi.fd);
 	/* Init the backligth display leds */
 	LCD_BACKLIGHT_INIT();
-	lcd_setBacklight(lcd_brightness);
-    /* Draw an empty Bitmap on the screen */
-    gfx_bitmapInit(&lcd_bitmap, raster, LCD_WIDTH, LCD_HEIGHT);
-    /* Refresh the display */
+	lcd_setBacklight(LCD_BACKLIGHT_MAX);
+	/* Draw an empty Bitmap on the screen */
+	gfx_bitmapInit(&lcd_bitmap, raster, LCD_WIDTH, LCD_HEIGHT);
+	/* Refresh the display */
 	lcd_ili9225_blitBitmap(&lcd_bitmap);
-    /* Initialize the keypad driver */
-    kbd_init();
+	/* Initialize the keypad driver */
+	kbd_init();
 }
 
 int main(void)
