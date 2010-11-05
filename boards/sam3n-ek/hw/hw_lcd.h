@@ -33,11 +33,40 @@
  * \brief Atmel SAM3N-EK testcase
  *
  * \author Luca Ottaviano <lottaviano@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
  */
+
+#ifndef HW_LCD_H
+#define HW_LCD_H
+
+#include <io/cm3.h>
+
+#include <cpu/attr.h>
+#include <cpu/types.h>
 
 #define LCD_BACKLIGHT_MAX  15
 #define LCD_BACKLIGHT_PIN  BV(13)    // Port C
 #define LCD_SPICLOCK       12000000  // Minimum cycle len = 80 ns according specs
+
+
+#define LCD_BACKLIGHT_LEVEL_UP() \
+	do \
+	{ \
+		PIOC_CODR = LCD_BACKLIGHT_PIN; \
+		NOP;NOP;NOP;NOP;NOP; \
+		PIOC_SODR = LCD_BACKLIGHT_PIN; \
+		NOP;NOP;NOP;NOP;NOP; \
+	} while(0)
+
+
+INLINE void lcd_setBacklight(uint8_t level)
+{
+	if (level > LCD_BACKLIGHT_MAX)
+		level = LCD_BACKLIGHT_MAX;
+
+	for (uint8_t i = level; i <= LCD_BACKLIGHT_MAX; i++)
+		LCD_BACKLIGHT_LEVEL_UP();
+}
 
 #define LCD_BACKLIGHT_INIT() \
 	do { \
@@ -46,14 +75,4 @@
 		PIOC_PER = LCD_BACKLIGHT_PIN; \
 	} while(0)
 
-#define LCD_BACKLIGHT_LEVEL_UP() \
-	do \
-	{ \
-		PIOC_CODR = LCD_BACKLIGHT_PIN; \
-		PIOC_CODR = LCD_BACKLIGHT_PIN; \
-		PIOC_CODR = LCD_BACKLIGHT_PIN; \
-		PIOC_SODR = LCD_BACKLIGHT_PIN; \
-		PIOC_SODR = LCD_BACKLIGHT_PIN; \
-		PIOC_SODR = LCD_BACKLIGHT_PIN; \
-	} while(0)
-
+#endif /* HW_LCD_H */
