@@ -35,21 +35,31 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-#include "hw/hw_led.h"
-#include "hw/hw_lcd.h"
 #include "bitmaps.h"
 
+#include "hw/hw_led.h"
+#include "hw/hw_lcd.h"
+
+#include <cfg/debug.h>
+
 #include <cpu/irq.h>
+
 #include <drv/timer.h>
 #include <drv/kbd.h>
-#include <cpu/arm/drv/spi_dma_at91.h>
 #include <drv/lcd_ili9225.h>
+
+#include <cpu/arm/drv/spi_dma_at91.h>
+
 #include <gfx/gfx.h>
 #include <gfx/font.h>
 #include <gfx/text.h>
+
 #include <gui/menu.h>
+
 #include <icons/logo.h>
+
 #include <io/kfile.h>
+
 #include <kern/signal.h>
 #include <kern/proc.h>
 
@@ -60,13 +70,13 @@
 #define PROC_STACK_SIZE	KERN_MINSTACKSIZE * 2
 
 #if CONFIG_KERN_HEAP
-#define hp_stack NULL
-#define lp_stack NULL
-#define led_stack NULL
+	#define hp_stack NULL
+	#define lp_stack NULL
+	#define led_stack NULL
 #else
-static PROC_DEFINE_STACK(hp_stack, PROC_STACK_SIZE);
-static PROC_DEFINE_STACK(lp_stack, PROC_STACK_SIZE);
-static PROC_DEFINE_STACK(led_stack, PROC_STACK_SIZE);
+	static PROC_DEFINE_STACK(hp_stack, PROC_STACK_SIZE);
+	static PROC_DEFINE_STACK(lp_stack, PROC_STACK_SIZE);
+	static PROC_DEFINE_STACK(led_stack, PROC_STACK_SIZE);
 #endif
 
 struct SpiDmaAt91 spi;
@@ -277,17 +287,6 @@ static void uptime(Bitmap *bm)
 /*
  * Lcd
  */
-static void setBacklight(unsigned level)
-{
-	unsigned i;
-
-	if (level > LCD_BACKLIGHT_MAX)
-		level = LCD_BACKLIGHT_MAX;
-
-	for (i = level; i <= LCD_BACKLIGHT_MAX; i++)
-		LCD_BACKLIGHT_LEVEL_UP();
-}
-
 static void setBrightness(Bitmap *bm)
 {
 	while (1)
@@ -306,7 +305,7 @@ static void setBrightness(Bitmap *bm)
 		{
 			if (++lcd_brightness > LCD_BACKLIGHT_MAX)
 				lcd_brightness = 0;
-			setBacklight(lcd_brightness);
+			lcd_setBacklight(lcd_brightness);
 		}
 	}
 }
@@ -361,7 +360,7 @@ int main(void)
 	spi_dma_setclock(LCD_SPICLOCK);
 	lcd_ili9225_init(&spi.fd);
 	LCD_BACKLIGHT_INIT();
-	setBacklight(lcd_brightness);
+	lcd_setBacklight(lcd_brightness);
 
 	gfx_bitmapInit(&lcd_bitmap, raster, LCD_WIDTH, LCD_HEIGHT);
 	gfx_setFont(&lcd_bitmap, &font_luBS14);
