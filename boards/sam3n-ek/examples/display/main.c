@@ -35,6 +35,10 @@
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
+#include "hw/hw_led.h"
+#include "hw/hw_lcd.h"
+#include "bitmaps.h"
+
 #include <cpu/irq.h>
 #include <drv/timer.h>
 #include <drv/kbd.h>
@@ -48,20 +52,6 @@
 #include <io/kfile.h>
 #include <kern/signal.h>
 #include <kern/proc.h>
-
-#include "hw/hw_spi.h"
-#include "bitmaps.h"
-
-
-// Lcd
-#define LCD_BACKLIGHT_MAX  15
-#define LCD_BACKLIGHT_PIN  BV(13)    // Port C
-#define LCD_SPICLOCK       12000000  // Minimum cycle len = 80 ns according specs
-
-// Leds
-#define LED_BLUE_PIN       BV(23)  // Port A
-#define LED_AMBER_PIN      BV(25)  // Port A
-#define LED_GREEN_PIN      BV(14)  // Port B
 
 // Keyboard
 #define KEY_MASK (K_LEFT | K_RIGHT)
@@ -88,38 +78,24 @@ static Process *hp_proc, *lp_proc, *led_proc;
 static hptime_t start, end;
 
 
-/*
- * Leds
- */
-static void led_init(void)
-{
-	PIOA_SODR = LED_BLUE_PIN | LED_AMBER_PIN;
-	PIOA_OER = LED_BLUE_PIN | LED_AMBER_PIN;
-	PIOA_PER = LED_BLUE_PIN | LED_AMBER_PIN;
-
-	PIOB_SODR = LED_GREEN_PIN;
-	PIOB_OER = LED_GREEN_PIN;
-	PIOB_PER = LED_GREEN_PIN;
-}
-
 INLINE void led_on(int idx)
 {
 	if (idx == 0)
-		PIOA_CODR = LED_BLUE_PIN;
+		LED_ON(LED_BLUE_PIN);
 	else if (idx == 1)
-		PIOB_CODR = LED_GREEN_PIN;
+		LED_ON(LED_GREEN_PIN);
 	else if (idx == 2)
-		PIOA_CODR = LED_AMBER_PIN;
+		LED_ON(LED_AMBER_PIN);
 }
 
 INLINE void led_off(int idx)
 {
 	if (idx == 0)
-		PIOA_SODR = LED_BLUE_PIN;
+		LED_OFF(LED_BLUE_PIN);
 	else if (idx == 1)
-		PIOB_SODR = LED_GREEN_PIN;
+		LED_OFF(LED_GREEN_PIN);
 	else if (idx == 2)
-		PIOA_SODR = LED_AMBER_PIN;
+		LED_OFF(LED_AMBER_PIN);
 }
 
 static bool led_blinking;
@@ -301,13 +277,6 @@ static void uptime(Bitmap *bm)
 /*
  * Lcd
  */
-static void initBacklight(void)
-{
-	PIOC_OER = LCD_BACKLIGHT_PIN;
-	PIOC_SODR = LCD_BACKLIGHT_PIN;
-	PIOC_PER = LCD_BACKLIGHT_PIN;
-}
-
 static void setBacklight(unsigned level)
 {
 	unsigned i;
@@ -316,15 +285,7 @@ static void setBacklight(unsigned level)
 		level = LCD_BACKLIGHT_MAX;
 
 	for (i = level; i <= LCD_BACKLIGHT_MAX; i++)
-	{
-		PIOC_CODR = LCD_BACKLIGHT_PIN;
-		PIOC_CODR = LCD_BACKLIGHT_PIN;
-		PIOC_CODR = LCD_BACKLIGHT_PIN;
-
-		PIOC_SODR = LCD_BACKLIGHT_PIN;
-		PIOC_SODR = LCD_BACKLIGHT_PIN;
-		PIOC_SODR = LCD_BACKLIGHT_PIN;
-	}
+		LCD_BACKLIGHT_LEVEL_UP();
 }
 
 static void setBrightness(Bitmap *bm)
@@ -392,14 +353,14 @@ int main(void)
 	IRQ_ENABLE;
 
 	kdbg_init();
-	led_init();
+	LED_INIT();
 	timer_init();
 	proc_init();
 
 	spi_dma_init(&spi);
 	spi_dma_setclock(LCD_SPICLOCK);
 	lcd_ili9225_init(&spi.fd);
-	initBacklight();
+	LCD_BACKLIGHT_INIT();
 	setBacklight(lcd_brightness);
 
 	gfx_bitmapInit(&lcd_bitmap, raster, LCD_WIDTH, LCD_HEIGHT);
