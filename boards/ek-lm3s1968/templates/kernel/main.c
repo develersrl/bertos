@@ -128,4 +128,6 @@ int main(void)
 		monitor_report();
 		timer_delay(1000);
 	}
+
+	return 0;
 }
