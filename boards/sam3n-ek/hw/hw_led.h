@@ -38,19 +38,44 @@
 #ifndef HW_LED_H
 #define HW_LED_H
 
+#include <io/cm3.h>
+
 #include <cfg/macros.h>
+
+#define LED_BLUE     0
+#define LED_GREEN    1
+#define LED_AMBER    2
 
 // Leds
 #define LED_BLUE_PIN       BV(23)  // Port A
 #define LED_AMBER_PIN      BV(25)  // Port A
 #define LED_GREEN_PIN      BV(14)  // Port B
 
-#define LED_BLUE_ON(led)    (PIOA_CODR = LED_BLUE_PIN)
-#define LED_BLUE_OFF(led)   (PIOA_SODR = LED_BLUE_PIN)
-#define LED_AMBER_ON(led)   (PIOA_CODR = LED_AMBER_PIN)
-#define LED_AMBER_OFF(led)  (PIOA_SODR = LED_AMBER_PIN)
-#define LED_GREEN_ON(led)   (PIOB_CODR = LED_GREEN_PIN)
-#define LED_GREEN_OFF(led)  (PIOB_SODR = LED_GREEN_PIN)
+#define LED_ON(led) \
+	do { \
+		if (led == LED_BLUE) \
+			PIOA_CODR = LED_BLUE_PIN; \
+		else if (led == LED_GREEN) \
+			PIOB_CODR = LED_GREEN_PIN; \
+		else if (led == LED_AMBER) \
+			PIOA_CODR = LED_AMBER_PIN; \
+		else \
+			ASSERT(0); \
+	} while (0)
+
+
+#define LED_OFF(led) \
+	do { \
+		if (led == LED_BLUE) \
+			PIOA_SODR = LED_BLUE_PIN; \
+		else if (led == LED_GREEN) \
+			PIOB_SODR = LED_GREEN_PIN; \
+		else if (led == LED_AMBER) \
+			PIOA_SODR = LED_AMBER_PIN; \
+		else \
+			ASSERT(0); \
+	} while (0)
+
 
 #define LED_INIT() \
 	do { \
