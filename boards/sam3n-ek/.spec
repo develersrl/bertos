@@ -7,7 +7,7 @@ description = '''
 	<tr>
 		<td rowspan="4"><img src="$path/.image.png"/></td>
 		<td><b>CPU</b></td>
-		<td>Atmel ATSAM3N4</td>
+		<td>Atmel SAM3N4</td>
 	</tr>
 	<tr>
 		<td><b>Clock</b></td>
@@ -20,11 +20,11 @@ description = '''
 
 	<tr>
 		<td><b>Peripherals</b></td>
-		<td>timers, ADC, UART, SPI, I&#178;C, PWM, DMA, SSC</td>
+		<td>timers, UART, SPI, DMA, LCD display</td>
 	</tr>
 </table>
 </p>
 <p>
-SAM3N-EK&#174; is based on Atmel AT91SAM3N4 Cortex-M3 CPU.
+SAM3N-EK&#174; is based on Atmel SAM3N4 Cortex-M3 CPU.
 </p>
 ''' 
