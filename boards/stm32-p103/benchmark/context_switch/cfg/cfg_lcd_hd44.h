@@ -51,5 +51,19 @@
  */
 #define CONFIG_LCD_ADDRESS_FAST    1
 
+/**
+ * Number of columns in LCD display. 
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "lcd_hd44_cols"
+ */
+#define CONFIG_LCD_COLS	LCD_HD44_COLS_16
+
+/**
+ * Number of rows in LCD display. 
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "lcd_hd44_rows"
+ */
+#define CONFIG_LCD_ROWS	LCD_HD44_ROWS_2
+
 #endif /* CFG_LCD_H */
 
