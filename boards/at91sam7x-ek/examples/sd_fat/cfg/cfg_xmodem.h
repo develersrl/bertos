@@ -32,7 +32,6 @@
  *
  * \brief Configuration file for xmodem module.
  *
- *
  * \author Daniele Basile <asterix@develer.com>
  */
 

@@ -263,7 +263,7 @@ int main(void)
 		INISetting ini_set;
 		memset(&ini_set, 0, sizeof(ini_set));
 
-		sd_ok = sd_init(&sd, &spi_dma.fd, 1);
+		sd_ok = sd_init(&sd, &spi_dma.fd, 0);
 
 		if (sd_ok)
 		{
