@@ -106,9 +106,9 @@ void flash_hw_initUnbuffered(Flash *fls, int flags);
 #include CPU_HEADER(flash)
 
 #define FLASH_WRITE_ONCE   BV(0) ///< Allow only one write per block.
-#define FLASH_BUFFERED     BV(1) ///< Open flash memory using page caching, allowing the modification and partial write.
+#define FLASH_UNBUFFERED   BV(1) ///< Open flash memory disabling page caching, no modification and partial write are allowed.
 
-#define flash_init_2(fls, flags)    (flags & FLASH_BUFFERED) ? \
+#define flash_init_2(fls, flags)    (flags & FLASH_UNBUFFERED) ? \
 										flash_hw_initUnbuffered(fls, flags) : flash_hw_init(fls, flags)
 
 #if !CONFIG_FLASH_DISABLE_OLD_API

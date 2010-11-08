@@ -44,12 +44,15 @@
 #ifndef DRV_SD_H
 #define DRV_SD_H
 
+#include "cfg/cfg_sd.h"
+
 #include <io/kfile.h>
 #include <io/kblock.h>
 
 #include <fs/fatfs/diskio.h>
 
-#include "cfg/cfg_sd.h"
+
+#define SD_UNBUFFERED     BV(0) ///< Open SD memory disabling page caching, no modification and partial write are allowed.
 
 /**
  * SD Card context structure.
@@ -99,7 +102,7 @@ bool sd_initBuf(Sd *sd, KFile *ch);
 	 *
 	 * \return true if initialization succeds, false otherwise.
 	 */
-	#define sd_init(sd, ch, buffered) ((buffered) ? sd_initBuf((sd), (ch)) : sd_initUnbuf((sd), (ch)))
+	#define sd_init(sd, ch, buffered) ((buffered & SD_UNBUFFERED) ? sd_initUnbuf((sd), (ch)) : sd_initBuf((sd), (ch)))
 
 #endif
 
