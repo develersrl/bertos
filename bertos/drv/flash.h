@@ -33,6 +33,26 @@
 * \addtogroup drv_emb_flash
 * \brief Embedded flash for cpu.
 *
+* This module allows to access in reading and writing to the internal
+* flash memory of the micro. It is a block device, so it must be
+* accessed using the KBlock interface functions (see kblock.h).
+*
+* Once you have opened the flash for writing, you may want to use
+* kblock_trim() to avoid overwriting data on other flash banks.
+*
+* Example usage:
+* \code
+* Flash fls;
+* flash_init(&fls.blk, 0);
+* // enable access only on desired blocks
+* // start block = 50, num blocks = 20
+* kblock_trim(&fls, 50, 20);
+* // ...
+* // now write to the flash
+* // block number is automatically converted
+* kblock_write(&fls.blk, 0, buf, 0, 128);
+* \endcode
+*
 * \author Francesco Sacchi <batt@develer.com>
 * \author Daniele Basile <asterix@develer.com>
 *
@@ -96,7 +116,7 @@ struct FlashHardware;
  */
 typedef struct Flash
 {
-	KBlock blk;
+	KBlock blk;                  ///< KBlock context
 	struct FlashHardware *hw;
 	#if !CONFIG_FLASH_DISABLE_OLD_API
 	union {
@@ -106,7 +126,7 @@ typedef struct Flash
 	#endif /* !CONFIG_FLASH_DISABLE_OLD_API */
 } Flash;
 
-/**
+/*
  * ID for FLASH
  */
 #define KBT_FLASH MAKE_ID('F', 'L', 'A', 'S')
