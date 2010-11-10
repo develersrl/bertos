@@ -30,7 +30,9 @@
  *
  * -->
  *
- * \addtogroup logging
+ * \defgroup logging Logging facilities
+ * \ingroup core
+ * \{
  * \brief Logging system module.
  *
  * This module implement a simple interface to use the multi level logging system.
@@ -101,11 +103,6 @@
 #define CFG_LOG_H
 
 #include <cfg/debug.h>
-
-/**
- * \defgroup logging Logging facilities
- * \{
- */
 
 // Use a default setting if nobody defined a log level
 #ifndef LOG_LEVEL

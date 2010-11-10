@@ -31,6 +31,9 @@
  *
  * -->
  *
+ * \defgroup kern_sem Mutually exclusive semaphores
+ * \ingroup kern
+ * \{
  * \brief Mutually exclusive semaphores.
  *        Shared locking not supported in this implementation.
  *
@@ -69,6 +72,7 @@ bool sem_attempt(struct Semaphore *s);
 void sem_obtain(struct Semaphore *s);
 void sem_release(struct Semaphore *s);
 /* \} */
+/* \} */ //defgroup kern_sem
 
 int sem_testRun(void);
 int sem_testSetup(void);

@@ -32,15 +32,14 @@
  * -->
  *
  *
- * This module implements a common system for executing
- * a user defined action calling a hook function.
- *
- *
- * \author Bernie Innocenti <bernie@codewiz.org>
+ * \defgroup kern_msg Message box IPC
+ * \ingroup kern
+ * \{
  *
  * \brief Simple inter-process messaging system
  *
- * Handle queues of messages associated an action.
+ * This module implements a common system for executing
+ * a user defined action calling a hook function.
  *
  * A message port is an abstraction used to exchange information
  * asynchronously between processes or other entities such as
@@ -179,6 +178,8 @@
  *	}
  * \endcode
  *
+ * \author Bernie Innocenti <bernie@codewiz.org>
+ *
  * $WIZ$ module_name = "msg"
  * $WIZ$ module_depends = "event", "signal", "kernel"
  */
@@ -289,6 +290,8 @@ INLINE void msg_reply(Msg *msg)
 {
 	msg_put(msg->replyPort, msg);
 }
+
+/** \} */ //defgroup kern_msg
 
 int msg_testRun(void);
 int msg_testSetup(void);

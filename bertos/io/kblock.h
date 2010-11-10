@@ -30,9 +30,46 @@
  *
  * -->
  *
- * \author Francesco Sacchi <batt@develer.com>
+ * \defgroup io_kblock KBlock interface
+ * \ingroup core
+ * \{
  *
  * \brief KBlock interface
+ *
+ * A block device is a device which can only be read/written
+ * with data blocks of constant size: flash memories,
+ * SD cards, hard disks, etc...
+ * This interface is designed to adapt to most block devices and
+ * use peculiar features in order to save CPU time and memory space.
+ *
+ * There is no init function because you do not have to use this
+ * structure directly, specific implementations will supply their own init
+ * functions.
+ *
+ * Error handling is done in a way similar to standard C library: whenever a
+ * function (eg. kblock_flush()) returns error, you need to check the error
+ * code, which is implementation specific.
+ *
+ * Example of code flow:
+ * \code
+ * // init a KBlock-derived class
+ * Flash fls;
+ * flash_init(&fls.blk, 0);
+ *
+ * // use kblock_* functions to access the derived class
+ * kblock_write(&fls.blk, ...);
+ * if (kblock_flush(&fls.blk) == EOF)
+ * {
+ *     // oops, error occurred!
+ *     int err = kblock_error(&fls.blk);
+ *     // handle Flash specific error conditions
+ *     // ...
+ *     // clear error condition
+ *     kblock_clearerr(&fls.blk);
+ * }
+ * \endcode
+ *
+ * \author Francesco Sacchi <batt@develer.com>
  *
  * $WIZ$ module_name = "kblock"
  */
@@ -116,15 +153,6 @@ typedef struct KBlockPriv
 /**
  * KBlock: interface for a generic block device.
  *
- * A block device is a device which can only be read/written
- * with data blocks of constant size: flash memories,
- * SD cards, hard disks, etc...
- *
- * This interface is designed to adapt to most block devices and
- * use peculiar features in order to save CPU time and memory space.
- *
- * You do not have to use this structure directly, specific implementations
- * will be supplied in the peripheral drivers.
  */
 typedef struct KBlock
 {
@@ -366,5 +394,8 @@ int kblock_swStore(struct KBlock *b, block_idx_t index);
 size_t kblock_swReadBuf(struct KBlock *b, void *buf, size_t offset, size_t size);
 size_t kblock_swWriteBuf(struct KBlock *b, const void *buf, size_t offset, size_t size);
 int kblock_swClose(struct KBlock *b);
+
+/** \} */ //defgroup io_kblock
+
 
 #endif /* IO_KBLOCK_H */

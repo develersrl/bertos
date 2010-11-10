@@ -204,6 +204,9 @@ size_t heap_freeSpace(struct Heap *h)
 
 #if CONFIG_HEAP_MALLOC
 
+/**
+ * Standard malloc interface
+ */
 void *heap_malloc(struct Heap* h, size_t size)
 {
 	size_t *mem;
@@ -215,6 +218,9 @@ void *heap_malloc(struct Heap* h, size_t size)
 	return mem;
 }
 
+/**
+ * Standard calloc interface
+ */
 void *heap_calloc(struct Heap* h, size_t size)
 {
 	void *mem;

@@ -30,6 +30,12 @@
  * Copyright 1999, 2000, 2001, 2008 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
+ * \defgroup kern Kernel facilities
+ * \{
+ *
+ * \defgroup kern_proc Process (Threads) management
+ * \{
+ *
  * \brief BeRTOS Kernel core (Process scheduler).
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
@@ -396,5 +402,7 @@ INLINE struct Process *proc_current(void)
 		#error No cpu_stack_t size supported!
 	#endif
 #endif
+/** \} */ //defgroup kern_proc
+/** \} */ //defgroup kern
 
 #endif /* KERN_PROC_H */

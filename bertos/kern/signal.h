@@ -31,6 +31,10 @@
  *
  * -->
  *
+ * \defgroup kern_signal Kernel signals
+ * \ingroup kern
+ * \{
+ *
  * \brief Signal module for IPC.
  *
  *
@@ -82,5 +86,7 @@ int signal_testTearDown(void);
 #define SIG_SYSTEM6  BV(6)  /**< Reserved for system use */
 #define SIG_SINGLE   BV(7)  /**< Used to wait for a single event */
 /*\}*/
+
+/* \} */ //defgroup kern_signal
 
 #endif /* KERN_SIGNAL_H */

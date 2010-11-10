@@ -30,6 +30,10 @@
  * Copyright 2000, 2008 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
+ * \defgroup drv_timers Timer module
+ * \ingroup core
+ * \{
+ *
  * \brief Hardware independent timer driver.
  *
  * All timer related functions are implemented in this module. You have several options to use timers:
@@ -312,5 +316,7 @@ INLINE void timer_setSignal(Timer *timer, struct Process *proc, sigmask_t sigs)
 #define timer_set_event_signal timer_setSignal
 
 #endif /* CONFIG_KERN_SIGNALS */
+
+/** \} */ //defgroup drv_timers
 
 #endif /* DRV_TIMER_H */

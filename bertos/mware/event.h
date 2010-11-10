@@ -30,7 +30,9 @@
  * Copyright 1999, 2001, 2003 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
- * \addtogroup event_handling
+ * \defgroup event_handling Event handling module
+ * \ingroup core
+ * \{
  *
  * \brief Events handling
  *
@@ -106,12 +108,6 @@
 	/* Forward decl */
 	struct Process;
 #endif
-
-/**
- * \defgroup event_handling Events handling module
- * \{
- */
-
 
 /// User defined callback type
 typedef void (*Hook)(void *);

@@ -30,6 +30,10 @@
  * Copyright 1999, 2000, 2001, 2008 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
+ * \defgroup heap Embedded optimized memory allocator
+ * \ingroup core
+ * \{
+ *
  * \brief Heap subsystem (public interface).
  *
  * \todo Heap memory could be defined as an array of MemChunk, and used
@@ -101,11 +105,18 @@ size_t heap_freeSpace(struct Heap *h);
 
 #if CONFIG_HEAP_MALLOC
 
+/**
+ * \name Compatibility interface with C standard library
+ * \{
+ */
 void *heap_malloc(struct Heap* heap, size_t size);
 void *heap_calloc(struct Heap* heap, size_t size);
 void heap_free(struct Heap* heap, void * mem);
+/** \} */
 
 #endif
+
+/** \} */ //defgroup heap
 
 int heap_testSetup(void);
 int heap_testRun(void);

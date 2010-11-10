@@ -31,6 +31,13 @@
  *
  * -->
  *
+ * \defgroup core BeRTOS core functionality
+ * \{
+ *
+ * \defgroup io_kfile KFile interface
+ * \ingroup core
+ * \{
+ *
  * \brief Virtual KFile I/O interface.
  *
  * KFile is a simple, generic interface for file I/O.  It uses an
@@ -325,6 +332,8 @@ void kfile_resync(KFile *fd, mtime_t delay);
 void kfile_init(struct KFile *fd);
 /* @} */
 
+/** \} */ //Defgroup io_kfile
+
 /*
  * Kfile test function.
  */
@@ -332,6 +341,7 @@ int kfile_testSetup(void);
 int kfile_testRun(void);
 int kfile_testRunGeneric(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size);
 int kfile_testTearDown(void);
+/** \} */ //defgroup core
 
 
 #endif /* KERN_KFILE_H */
