@@ -38,6 +38,51 @@
  *
  * \brief BeRTOS Kernel core (Process scheduler).
  *
+ * This is the core kernel module. It allows you to create new processes
+ * (which are called \b threads in other systems) and set the priority of
+ * each process.
+ *
+ * A process needs a work area (called \b stack) to run. To create a process,
+ * you need to declare a stack area, then create the process.
+ * You may also pass NULL for the stack area, if you have enabled kernel heap:
+ * in this case the stack will be automatically allocated.
+ *
+ * Example:
+ * \code
+ * PROC_DEFINE_STACK(stack1, 200);
+ *
+ * void NORETURN proc1_run(void)
+ * {
+ *    while (1)
+ *    {
+ *       LOG_INFO("I'm alive!\n");
+ *       timer_delay(1000);
+ *    }
+ * }
+ *
+ *
+ * int main()
+ * {
+ *    Process *p1 = proc_new(proc1_run, NULL, stack1, sizeof(stack1));
+ *    // here the process is already running
+ *    proc_setPri(p1, 2);
+ *    // ...
+ * }
+ * \endcode
+ *
+ * The Process struct must be regarded as an opaque data type, do not access
+ * any of its members directly.
+ *
+ * The entry point function should be declared as NORETURN, because it will
+ * remove a warning and enable compiler optimizations.
+ *
+ * You can temporarily disable preemption calling proc_forbid(); remember
+ * to enable it again calling proc_permit().
+ *
+ * \note You should hardly need to manually release the CPU; however you
+ *       can do it using the cpu_relax() function. It is illegal to release
+ *       the CPU with preemption disabled.
+ *
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * $WIZ$ module_name = "kernel"
@@ -143,7 +188,7 @@ struct Process *proc_new_with_name(const char *name, void (*entry)(void), iptr_t
  */
 void proc_exit(void);
 
-/**
+/*
  * Public scheduling class methods.
  */
 void proc_yield(void);
