@@ -50,8 +50,10 @@ class BWizard(QWizard):
     def __init__(self, page_list):
         self._current = None
         QWizard.__init__(self)
-        geometry = QApplication.instance().settings.value("geometry", QVariant()).toRect()
-        self.setGeometry(geometry)
+        geometry = QApplication.instance().settings.value("geometry", None)
+        if geometry:
+            geometry = geometry.toRect()
+            self.setGeometry(geometry)
         self.setWindowTitle(self.tr("Create a BeRTOS project - rev.%1").arg(wizard_version))
         self.setWindowIcon(QIcon(":/images/appicon.png"))
         self.setOption(QWizard.DisabledBackButtonOnLastPage, True)
