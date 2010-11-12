@@ -50,7 +50,8 @@ class BWizard(QWizard):
     def __init__(self, page_list):
         self._current = None
         QWizard.__init__(self)
-        geometry = QApplication.instance().settings.value("geometry", None)
+        # Hardcoded default position (to avoid (0,0) origin)
+        geometry = QApplication.instance().settings.value("geometry", QVariant(QRect(QPoint(200, 200), QSize(800, 600))))
         if geometry:
             geometry = geometry.toRect()
             self.setGeometry(geometry)
