@@ -1,0 +1,86 @@
+/*!
+<!--
+This document is automatically processed by Doxygen (http://www.doxygen.org/).
+Don't remove special formatting tags.
+This section won't be processed unless enabled.
+
+See STATUS for further information and tips about Doxygen tags.
+-->
+\page oop Object Oriented Programming
+
+BeRTOS uses object oriented programming concepts for the base interfaces.
+If used in the right way, OOP elegantly solves a broad range of problems
+linked with the creation of common and reusable interfaces that allow
+you to save development time and precious memory space.
+Have a look at <a href="">KFile tutorial</a> on BeRTOS web site for
+a more complete introduction to object oriented programming.
+
+<h2>OOP in C</h2>
+Object oriented programming in C requires a context struct and a few interface
+functions that operate on that context.
+The base class is implemented with a struct with a few function pointers
+that point to the implementation specific for the context.
+
+Inherited classes are created by defining a struct with the following
+members:
+ \li a base class member
+ \li context specific members
+
+Then you can call interface functions by simply using the base class member
+as the context of the function.
+Note that base classes usually don't have an init function, because they are
+not meant to be used directly and it wouldn't make sense anyway, since they
+provide no functionality, only the interface.
+The usage pattern requires you to declare a context (eg. Flash), initialize
+the context with a specific function call (eg. flash_init()) then use the
+interface funtions to access the context.
+
+To make an example, in BeRTOS the Serial driver is a derived class of the
+KFile interface.
+The KFile interface defines a few interface functions, which can be used to
+extract data from the Serial context.
+\code
+// declare the serial context
+Serial ser;
+// read buffer
+uint8_t buf[20];
+
+int main()
+{
+   // initialize the serial driver
+   ser_init(&ser, SER_UART0);
+   ser_setbaudrate(115200);
+   // now access using the interface functions
+   // read...
+   kfile_read(&ser.fd, buf, 20);
+   // ...and write
+   kfile_printf(&ser.fd, "Writing to serial using KFile interface...\n");
+   // close the driver
+   kfile_close(&ser.fd);
+}
+\endcode
+
+
+*/
+
+/*!
+ * \defgroup drivers BeRTOS peripherals drivers
+ *
+ * This section includes all BeRTOS drivers. They may be internal CPU drivers
+ * or CPU independent drivers
+ */
+
+
+/*!
+ * \defgroup core BeRTOS core functionality
+ *
+ * This section includes BeRTOS core functionalities and interfaces.
+ */
+
+
+/*!
+ * \defgroup kern Kernel facilities
+ *
+ * This section describes the kernel facilities and the synchronization
+ * primitives available in BeRTOS.
+ */

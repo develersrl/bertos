@@ -29,8 +29,10 @@
 * Copyright 2005 Develer S.r.l. (http://www.develer.com/)
 * -->
 *
+* \defgroup drv_emb_flash Embedded flash driver
+* \ingroup drivers
+* \{
 *
-* \addtogroup drv_emb_flash
 * \brief Embedded flash for cpu.
 *
 * This module allows to access in reading and writing to the internal
@@ -75,11 +77,6 @@
 
 #include <cpu/attr.h>
 
-/**
- * \defgroup drv_emb_flash Embedded flash driver
- * \ingroup drivers
- * \{
- */
 #if COMPILER_C99
 	#define flash_init(...)           PP_CAT(flash_init_, COUNT_PARMS(__VA_ARGS__)) (__VA_ARGS__)
 #else

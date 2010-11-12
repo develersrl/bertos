@@ -30,7 +30,9 @@
  *
  * -->
  *
- * \addtogroup i2c_api
+ * \defgroup i2c_driver I2C driver
+ * \ingroup drivers
+ * \{
  * \brief I2C generic driver functions.
  *
  * Some hardware requires you to declare the number of transferred
@@ -103,8 +105,6 @@
 
 #define I2C_READBIT BV(0)
 
-/** \defgroup i2c_driver I2C driver
- */
 
 /*
  * The following macros are needed to maintain compatibility with older i2c API.
@@ -539,6 +539,6 @@ INLINE void i2c_init_0(void)
 }
 #endif /* !CONFIG_I2C_DISABLE_OLD_API */
 
-
+/** \} */ //defgroup i2c_driver
 
 #endif

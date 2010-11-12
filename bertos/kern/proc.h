@@ -30,10 +30,8 @@
  * Copyright 1999, 2000, 2001, 2008 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
- * \defgroup kern Kernel facilities
- * \{
- *
  * \defgroup kern_proc Process (Threads) management
+ * \ingroup kern
  * \{
  *
  * \brief BeRTOS Kernel core (Process scheduler).
@@ -448,6 +446,5 @@ INLINE struct Process *proc_current(void)
 	#endif
 #endif
 /** \} */ //defgroup kern_proc
-/** \} */ //defgroup kern
 
 #endif /* KERN_PROC_H */

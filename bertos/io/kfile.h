@@ -31,9 +31,6 @@
  *
  * -->
  *
- * \defgroup core BeRTOS core functionality
- * \{
- *
  * \defgroup io_kfile KFile interface
  * \ingroup core
  * \{
@@ -341,7 +338,6 @@ int kfile_testSetup(void);
 int kfile_testRun(void);
 int kfile_testRunGeneric(KFile *fd, uint8_t *test_buf, uint8_t *save_buf, size_t size);
 int kfile_testTearDown(void);
-/** \} */ //defgroup core
 
 
 #endif /* KERN_KFILE_H */
