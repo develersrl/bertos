@@ -94,6 +94,9 @@ class BProject(object):
             self.infos["PROJECT_SRC_PATH"] = os.path.join(self.infos["PROJECT_PATH"], self.infos["PROJECT_NAME"])
         self.infos["PROJECT_HW_PATH"] = os.path.join(self.infos["PROJECT_PATH"], project_data.get("PROJECT_HW_PATH", self.infos["PROJECT_PATH"]))
 
+        self.infos["PROJECT_SRC_PATH_FROM_MAKEFILE"] = project_data.get("PROJECT_SRC_PATH_FROM_MAKEFILE")
+        self.infos["PROJECT_HW_PATH_FROM_MAKEFILE"] = project_data.get("PROJECT_HW_PATH_FROM_MAKEFILE")
+
         linked_sources_path = project_data["BERTOS_PATH"]
         sources_abspath = os.path.abspath(os.path.join(project_dir, linked_sources_path))
         project_data["BERTOS_PATH"] = sources_abspath

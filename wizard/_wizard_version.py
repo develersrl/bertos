@@ -42,8 +42,10 @@
 #   1 - SOURCES_PATH used instead of BERTOS_PATH
 #   2 - Use the old makefile templates (into /mktemplates/old) and the old logic
 #       Instead of the new one.
-#   3 - Current version.
+#   3 - Use default PROJECT_SRC_PATH_FROM_MAKEFILE and PROJECT_HW_PATH_FROM_MAKEFILE
+#   4 - Current version.
+#
 
 
 # NOTE: Change this variable may cause the wizard to not work properly. 
-WIZARD_VERSION = 3
+WIZARD_VERSION = 4

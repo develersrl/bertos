@@ -97,5 +97,10 @@ def updateProject(project_data):
         bertos_utils.mkGenerator = _mkGenerator
         bertos_utils.userMkGenerator = _userMkGenerator
         bertos_utils.makefileGenerator = _makefileGenerator
+    if wizard_version < 4:
+        # Use default PROJECT_SRC_PATH_FROM_MAKEFILE and
+        # PROJECT_HW_PATH_FROM_MAKEFILE
+        project_data["PROJECT_SRC_PATH_FROM_MAKEFILE"] = project_data["PROJECT_SRC_PATH"]
+        project_data["PROJECT_HW_PATH_FROM_MAKEFILE"] = project_data["PROJECT_HW_PATH"]
     return project_data
 
