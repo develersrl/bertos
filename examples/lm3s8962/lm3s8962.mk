@@ -32,7 +32,7 @@ lm3s8962_CSRC = \
 	bertos/drv/ser.c \
 	bertos/drv/kbd.c \
 	bertos/drv/lcd_rit128x96.c \
-	bertos/kern/kfile.c \
+	bertos/io/kfile.c \
 	bertos/kern/monitor.c \
 	bertos/kern/proc_test.c \
 	bertos/kern/proc.c \
