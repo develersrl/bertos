@@ -27,52 +27,41 @@
  * the GNU General Public License.
  *
  * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
- *
+ * All Rights Reserved.
  * -->
  *
- * \author Andrea Righi <arighi@develer.com>
+ * \brief Configuration file for Menu module.
  *
- * \brief Configuration file for the usbkbd driver module
+ * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef CFG_USBKBD_H
-#define CFG_USBKBD_H
+#ifndef CFG_MENU_H
+#define CFG_MENU_H
 
 /**
- * Enable the usbkbd module.
- *
- * $WIZ$ type = "autoenabled"
+ * Enable button bar behind menus
+ * $WIZ$ type = "boolean"
  */
-#define CONFIG_USBKBD 1
+#define CONFIG_MENU_MENUBAR        0
 
 /**
- * Module logging level.
- *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_level"
+ * Level Edit Timeout
+ * $WIZ$ type = "boolean"
  */
-#define USB_KEYBOARD_LOG_LEVEL      LOG_LVL_INFO
+#define CONFIG_LEVELEDIT_TIMEOUT   0
 
 /**
- * module logging format.
- *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_format"
+ * Menu timeout
+ * $WIZ$ type = "boolean"
  */
-#define USB_KEYBOARD_LOG_FORMAT     LOG_FMT_TERSE
+#define CONFIG_MENU_TIMEOUT        0
 
 /**
- * USB vendor ID (please change this in your project, using a valid ID number!).
- *
- * $WIZ$ type = "hex"
+ * Enable smooth scrolling in menus
+ * $WIZ$ type = "boolean"
  */
-#define USB_KEYBOARD_VENDOR_ID      0x046d
+#define CONFIG_MENU_SMOOTH         1
 
-/**
- * USB product ID (please change this in your project, using a valid ID number!).
- *
- * $WIZ$ type = "hex"
- */
-#define USB_KEYBOARD_PRODUCT_ID     0xffff
 
-#endif /* CFG_USB_KEYBOARD_H */
+#endif /* CFG_MENU_H */
+

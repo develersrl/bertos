@@ -43,7 +43,7 @@
  *
  * $WIZ$ type = "autoenabled"
  */
-#define CONFIG_USBSER 0
+#define CONFIG_USBSER 1
 
 /**
  * Module logging level.
@@ -60,5 +60,19 @@
  * $WIZ$ value_list = "log_format"
  */
 #define USB_SERIAL_LOG_FORMAT     LOG_FMT_TERSE
+
+/**
+ * USB vendor ID (please change this in your project, using a valid ID number!).
+ *
+ * $WIZ$ type = "hex"
+ */
+#define USB_SERIAL_VENDOR_ID      0x05f9
+
+/**
+ * USB product ID (please change this in your project, using a valid ID number!).
+ *
+ * $WIZ$ type = "hex"
+ */
+#define USB_SERIAL_PRODUCT_ID     0xffff
 
 #endif /* CFG_USBSER_H */
