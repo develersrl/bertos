@@ -10,7 +10,7 @@ aprs_PROGRAMMER_PORT = none
 # Files included by the user.
 aprs_USER_CSRC = \
 	$(aprs_SRC_PATH)/main.c \
-	$(aprs_SRC_PATH)/hw/hw_afsk.c \
+	$(aprs_HW_PATH)/hw/hw_afsk.c \
 	#
 
 # Files included by the user.

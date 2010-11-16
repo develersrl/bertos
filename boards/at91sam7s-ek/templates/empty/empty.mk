@@ -21,7 +21,7 @@ empty_HW_PATH = boards/at91sam7s-ek
 empty_WIZARD_CSRC = \
 	bertos/cpu/arm/drv/timer_at91.c \
 	bertos/kern/signal.c \
-	bertos/kern/kfile.c \
+	bertos/io/kfile.c \
 	bertos/kern/sem.c \
 	bertos/cpu/arm/drv/sysirq_at91.c \
 	bertos/struct/heap.c \

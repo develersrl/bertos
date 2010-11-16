@@ -21,7 +21,7 @@ context_switch_HW_PATH = boards/triface
 context_switch_WIZARD_CSRC = \
 	bertos/benchmark/context_switch.c \
 	bertos/kern/signal.c \
-	bertos/kern/kfile.c \
+	bertos/io/kfile.c \
 	bertos/struct/heap.c \
 	bertos/mware/formatwr.c \
 	bertos/mware/event.c \

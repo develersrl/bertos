@@ -26,7 +26,7 @@ kernel_WIZARD_CSRC = \
 	bertos/struct/heap.c \
 	bertos/kern/monitor.c \
 	bertos/drv/timer.c \
-	bertos/kern/kfile.c \
+	bertos/io/kfile.c \
 	bertos/kern/proc.c \
 	bertos/mware/formatwr.c \
 	bertos/mware/hex.c \

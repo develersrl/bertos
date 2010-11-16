@@ -26,7 +26,7 @@ empty_WIZARD_CSRC = \
 	bertos/struct/heap.c \
 	bertos/mware/formatwr.c \
 	bertos/drv/timer.c \
-	bertos/kern/kfile.c \
+	bertos/io/kfile.c \
 	bertos/kern/proc.c \
 	bertos/mware/hex.c \
 	bertos/kern/signal.c \

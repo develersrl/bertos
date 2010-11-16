@@ -22,7 +22,7 @@ context_switch_WIZARD_CSRC = \
 	bertos/cpu/arm/drv/timer_at91.c \
 	bertos/benchmark/context_switch.c \
 	bertos/kern/signal.c \
-	bertos/kern/kfile.c \
+	bertos/io/kfile.c \
 	bertos/cpu/arm/drv/sysirq_at91.c \
 	bertos/struct/heap.c \
 	bertos/cpu/arm/drv/ser_arm.c \

@@ -33,7 +33,7 @@ kernel_WIZARD_CSRC = \
 	bertos/gfx/line.c \
 	bertos/cpu/cortex-m3/drv/ser_lm3s.c \
 	bertos/fonts/luBS14.c \
-	bertos/kern/kfile.c \
+	bertos/io/kfile.c \
 	bertos/kern/proc.c \
 	bertos/mware/formatwr.c \
 	bertos/drv/ser.c \

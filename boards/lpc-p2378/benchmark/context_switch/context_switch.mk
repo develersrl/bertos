@@ -21,7 +21,7 @@ context_switch_HW_PATH = boards/ek-lpc-p2378
 context_switch_WIZARD_CSRC = \
 	bertos/benchmark/context_switch.c \
 	bertos/kern/signal.c \
-	bertos/kern/kfile.c \
+	bertos/io/kfile.c \
 	bertos/cpu/arm/drv/timer_lpc2.c \
 	bertos/mware/formatwr.c \
 	bertos/struct/heap.c \

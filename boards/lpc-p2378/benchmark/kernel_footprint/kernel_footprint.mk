@@ -25,7 +25,7 @@ kernel_footprint_WIZARD_CSRC = \
 	bertos/drv/timer.c \
 	bertos/mware/formatwr.c \
 	bertos/cpu/arm/drv/timer_arm.c \
-	bertos/kern/kfile.c \
+	bertos/io/kfile.c \
 	bertos/mware/event.c \
 	bertos/kern/proc.c \
 	bertos/benchmark/kernel_footprint.c \
