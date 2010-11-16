@@ -65,7 +65,9 @@ class BFolderPage(BWizardPage):
             self.setProjectInfo("PROJECT_PATH", unicode(self.pageContent.projectPath.text()))
             self.setProjectInfo("PROJECT_NAME", os.path.basename(unicode(self.pageContent.projectPath.text())))
             self.setProjectInfo("PROJECT_SRC_PATH", os.path.join(self.projectInfo("PROJECT_PATH"), self.projectInfo("PROJECT_NAME")))
+            self.setProjectInfo("PROJECT_SRC_PATH_FROM_MAKEFILE", os.path.join(self.projectInfo("PROJECT_PATH"), self.projectInfo("PROJECT_NAME")))
             self.setProjectInfo("PROJECT_HW_PATH", os.path.join(self.projectInfo("PROJECT_PATH"), self.projectInfo("PROJECT_NAME")))
+            self.setProjectInfo("PROJECT_HW_PATH_FROM_MAKEFILE", os.path.join(self.projectInfo("PROJECT_PATH"), self.projectInfo("PROJECT_NAME")))
             return True
         else:
             return False
