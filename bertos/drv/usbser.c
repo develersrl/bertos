@@ -36,6 +36,8 @@
  *
  */
 
+#include "usbser.h"
+
 #include "cfg/cfg_usbser.h"
 
 #define LOG_LEVEL  USB_SERIAL_LOG_LEVEL
@@ -56,7 +58,6 @@
 
 #include <string.h> /* memcpy() */
 
-#include "drv/usbser.h"
 
 #define USB_SERIAL_INTERFACES	1
 #define USB_SERIAL_ENDPOINTS	3

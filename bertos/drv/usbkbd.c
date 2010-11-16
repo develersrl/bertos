@@ -36,6 +36,9 @@
  *
  */
 
+#include "usb_hid.h"
+#include "usbkbd.h"
+
 #include "cfg/cfg_usbkbd.h"
 
 #define LOG_LEVEL  USB_KEYBOARD_LOG_LEVEL
@@ -52,8 +55,6 @@
 #include <drv/usb.h>
 #include <drv/usb_endpoint.h>
 
-#include "drv/usb_hid.h"
-#include "drv/usbkbd.h"
 
 /*
  * HID device configuration (usb-keyboard)

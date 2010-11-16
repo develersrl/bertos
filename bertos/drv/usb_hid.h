@@ -38,6 +38,8 @@
 #ifndef USB_HID_H
 #define USB_HID_H
 
+#include <cpu/types.h>
+
 /*
  * USB HID interface subclass and protocol codes
  */

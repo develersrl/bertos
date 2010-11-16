@@ -36,6 +36,9 @@
  *
  */
 
+#include "usb_hid.h"
+#include "usbmouse.h"
+
 #include "cfg/cfg_usbmouse.h"
 
 #define LOG_LEVEL  USB_MOUSE_LOG_LEVEL
@@ -52,8 +55,6 @@
 #include <drv/usb.h>
 #include <drv/usb_endpoint.h>
 
-#include "drv/usb_hid.h"
-#include "drv/usbmouse.h"
 
 /*
  * HID device configuration (usb-mouse)
