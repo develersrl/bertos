@@ -134,7 +134,7 @@ def projectFileGenerator(project_info):
     project_src_relpath = relpath.relpath(project_info.info("PROJECT_SRC_PATH"), directory)
     project_data["PROJECT_SRC_PATH"] = project_src_relpath
     project_data["PROJECT_SRC_PATH_FROM_MAKEFILE"] = project_info.info("PROJECT_SRC_PATH_FROM_MAKEFILE")
-    project_data["TOOLCHAIN"] = project_info.info("TOOLCHAIN")
+    project_data["TOOLCHAIN"] = {'path': project_info.info("TOOLCHAIN")['path']}
     project_data["CPU_NAME"] = project_info.info("CPU_NAME")
     project_data["SELECTED_FREQ"] = project_info.info("SELECTED_FREQ")
     project_data["OUTPUT"] = project_info.info("OUTPUT")
