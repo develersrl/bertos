@@ -69,6 +69,9 @@
  * }
  * \endcode
  *
+ * \note The KBlock interface is optimized for block reads. If you need a
+ * file-like access, you can use \ref kfile_block.
+ *
  * \author Francesco Sacchi <batt@develer.com>
  *
  * $WIZ$ module_name = "kblock"

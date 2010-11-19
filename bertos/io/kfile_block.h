@@ -30,11 +30,32 @@
  *
  * -->
  *
+ * \defgroup kfile_block KFile interface over KBlock
+ * \ingroup core
+ * \{
+ *
  * \brief KFile interface over a KBlock.
  *
  * With this module, you can access a KBlock device
  * with the handy KFile interface.
  * In order to achieve this, the block device must support partial block write.
+ *
+ * Make sure you have trimmed the KBlock to avoid overwriting something.
+ * Example:
+ * \code
+ * // init a derived instance of KBlock
+ * // any will do.
+ * Flash flash;
+ * flash_init(&flash, 0);
+ * kblock_trim(&flash.blk, trim_start, internal_flash.blk.blk_cnt - trim_start);
+ *
+ * // now create and initialize the kfile_block instance
+ * KFileBlock kfb;
+ * kfileblock_init(&kfb, &flash.blk);
+ *
+ * // now you can access the Flash in a file like fashion
+ * kfile_read(&kfb.fd, buf, 20);
+ * \endcode
  *
  * \author Francesco Sacchi <batt@develer.com>
  * \author Daniele Basile <asterix@develer.com>
@@ -70,5 +91,7 @@ typedef struct KFileBlock
  * \param blk block device to be accessed with a KFile interface.
  */
 void kfileblock_init(KFileBlock *fb, KBlock *blk);
+
+/** \} */ //defgroup kfile_block
 
 #endif /* IO_KFILE_KBLOCK_H */
