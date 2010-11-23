@@ -40,6 +40,9 @@
  * with the handy KFile interface.
  * In order to achieve this, the block device must support partial block write.
  *
+ * Error codes returned by kfile_error() are specific of the underlying
+ * KBlock implementation.
+ *
  * Make sure you have trimmed the KBlock to avoid overwriting something.
  * Example:
  * \code
