@@ -100,7 +100,6 @@ INLINE void kblock_setDirty(struct KBlock *b, bool dirty)
 }
 
 
-
 size_t kblock_read(struct KBlock *b, block_idx_t idx, void *buf, size_t offset, size_t size)
 {
 	ASSERT(b);
@@ -147,6 +146,20 @@ static bool kblock_loadPage(struct KBlock *b, block_idx_t idx)
 		b->priv.curr_blk = idx;
 	}
 	return true;
+}
+
+
+int kblock_trim(struct KBlock *b, block_idx_t start, block_idx_t count)
+{
+	ASSERT(start + count <= b->blk_cnt);
+
+	if (!kblock_loadPage(b, start))
+		return EOF;
+
+	b->priv.blk_start += start;
+	b->priv.curr_blk = 0; // adjust logical address
+	b->blk_cnt = count;
+	return 0;
 }
 
 

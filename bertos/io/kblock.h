@@ -195,13 +195,9 @@ typedef struct KBlock
  * \param start The index of the start block for the limiting window in logical addressing units.
  * \param count The number of blocks to be used.
  *
+ * \return 0 if all is OK, EOF on errors.
  */
-INLINE void kblock_trim(struct KBlock *b, block_idx_t start, block_idx_t count)
-{
-	ASSERT(start + count <= b->blk_cnt);
-	b->priv.blk_start += start;
-	b->blk_cnt = count;
-}
+int kblock_trim(struct KBlock *b, block_idx_t start, block_idx_t count);
 
 
 #define KB_ASSERT_METHOD(b, method) \
