@@ -34,6 +34,8 @@
  *
  * \brief Generic USB mouse device driver.
  *
+ * notest: avr
+ * notest: arm
  */
 
 #include "usb_hid.h"
