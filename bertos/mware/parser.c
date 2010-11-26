@@ -55,21 +55,11 @@
 
 #include "parser.h"
 
-#include "cfg/cfg_parser.h"
-
 #include <io/kfile.h>
 #include <struct/hashtable.h>
 
 #include <stdlib.h> // atol(), NULL
 #include <string.h> // strchr(), strcmp()
-
-//TODO:
-#define CONFIG_INTERNAL_COMMANDS  0
-
-#define ARG_SEP_S " "
-#define ARG_SEP_C ' '
-
-#define MAX_COMMANDS_NUMBER  128  // 64
 
 /// Hashtable hook to extract the key from a command
 static const void* get_key_from_command(const void* cmd, uint8_t* length);
@@ -163,83 +153,6 @@ static bool parseArgs(const char *fmt, const char *input, parms argv[])
 	return true;
 }
 
-
-#ifdef UNUSED_CODE
-/**
- * \brief Command result formatting and printing.
- *
- * Prints out on device fd the values contained
- * in the array result, using the format specified
- * in fmt.
- *
- * \param ch     Channel handle.
- * \param fmt     Values format string.
- * \param result  Array containing result to be printed.
- *
- * \return -1 in case of errors, otherwise 0.
- */
-static int printResult(KFile *ch, const char *fmt, parms result[])
-{
-	long n;
-	char repeat_cnt = 0;
-
-	while (*fmt)
-	{
-		if (*fmt >= '0' && *fmt <= '9')
-		{
-			/* Collect repeat count digit (left to right order) */
-			repeat_cnt = (repeat_cnt * 10) + (*fmt - '0');
-		}
-		else
-		{
-			/* Set default repeat cnt of 1 when not specified */
-			if (repeat_cnt == 0)
-				repeat_cnt = 1;
-
-			/* Loop repeat_cnt times */
-			do
-			{
-				switch (*fmt)
-				{
-					case 'd':
-						kfile_printf(ch, ARG_SEP_S "%ld", (*result).l);
-						result++;
-						break;
-					case 'c':
-						kfile_print(ch, ARG_SEP_S);
-						kfile_print(ch, (*result).s);
-						result++;
-						break;
-					case 's':
-						kfile_printf(ch, ARG_SEP_S "%s", (*result).s);
-						result++;
-						break;
-					case 'n':
-						n = (*result++).l;
-						kfile_printf(ch, ARG_SEP_S "%ld", n);
-						while (n--) {
-							kfile_printf(ch, ARG_SEP_S "%ld", (*result).l);
-							result++;
-						}
-						break;
-					default:
-						break;
-				}
-			}
-			while (--repeat_cnt);
-		}
-
-		/* Skip to next format char */
-		++fmt;
-
-	} /* while (*fmt) */
-
-
-	kfile_print(ch, "\r\n");
-	return 0;
-}
-#endif /* UNUSED_CODE */
-
 /// Hook provided by the parser for matching of command names (TAB completion) for readline
 const char* parser_rl_match(UNUSED_ARG(void *,dummy), const char *word, int word_len)
 {
@@ -266,6 +179,7 @@ const char* parser_rl_match(UNUSED_ARG(void *,dummy), const char *word, int word
 	return found;
 }
 
+#if CONFIG_ENABLE_COMPAT_BEHAVIOUR
 bool parser_get_cmd_id(const char* line, unsigned long* ID)
 {
 	const char *begin = line, *end = line;
@@ -281,16 +195,17 @@ bool parser_get_cmd_id(const char* line, unsigned long* ID)
 
 	return true;
 }
+#endif
 
 const struct CmdTemplate* parser_get_cmd_template(const char *input)
 {
-//	const struct CmdTemplate *cmdp;
-//	int cmdlen;
 	const char *begin = input, *end = input;
 
+#if CONFIG_ENABLE_COMPAT_BEHAVIOUR
 	// Skip the ID, and get the command
 	if (!get_word(&begin, &end))
 		return NULL;
+#endif
 	if (!get_word(&begin, &end))
 		return NULL;
 
@@ -301,9 +216,11 @@ static const char *skip_to_params(const char *input, const struct CmdTemplate *c
 {
 	const char *begin = input, *end = input;
 
+#if CONFIG_ENABLE_COMPAT_BEHAVIOUR
 	// Skip the ID, and get the command
 	if (!get_word(&begin, &end))
 		return NULL;
+#endif
 	if (!get_word(&begin, &end))
 		return NULL;
 
@@ -356,41 +273,8 @@ void parser_register_cmd(const struct CmdTemplate* cmd)
 	ht_insert(&commands, cmd);
 }
 
-#if CONFIG_INTERNAL_COMMANDS
-#warning FIXME:This code use boost lib, if you compile with internal command you must fix it.
-static ResultCode cmd_help(void)
-{
-#ifdef _DEBUG
-
-	// FIXME: There is no way at the moment to access the serial port. Dump
-	//  this through JTAG for now
-	for (HashIterator iter = ht_iter_begin(&commands);
-		!ht_iter_cmp(iter, ht_iter_end(&commands));
-		iter = ht_iter_next(iter))
-	{
-		struct CmdTemplate* cmd = (struct CmdTemplate*)ht_iter_get(iter);
-		kprintf("%-20s", cmd->name);
-		for (unsigned j = 0; cmd->arg_fmt[j]; ++j)
-			kprintf("%c ", 'a' + j);
-		kprintf("\r\n");
-	}
-#endif
-
-	return RC_OK;
-}
-
-#include "cmd_hunk.h"
-DECLARE_CMD_HUNK(help, (NIL), (NIL));
-
-#endif // CONFIG_INTERNAL_COMMANDS
-
-
 void parser_init(void)
 {
 	// Initialize the hashtable used to store the command description
 	ht_init(&commands);
-
-#if CONFIG_INTERNAL_COMMANDS
-	parser_register_cmd(&CMD_HUNK_TEMPLATE(help));
-#endif
 }
