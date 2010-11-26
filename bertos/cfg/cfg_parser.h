@@ -43,14 +43,14 @@
  * $WIZ$ type = "int"
  * $WIZ$ min = 0
  */
-#define PARSER_MAX_ARGS       4
+#define CONFIG_PARSER_MAX_ARGS       4
 
 /**
  * Max number of commands
  * $WIZ$ type = "int"
  * $WIZ$ min = 8
  */
-#define MAX_COMMANDS_NUMBER  16
+#define CONFIG_MAX_COMMANDS_NUMBER  16
 
 /**
  * Enable compatibility behaviour.

@@ -65,7 +65,7 @@
 static const void* get_key_from_command(const void* cmd, uint8_t* length);
 
 /// Hashtable that handles the commands that can be executed
-DECLARE_HASHTABLE_STATIC(commands, MAX_COMMANDS_NUMBER, get_key_from_command);
+DECLARE_HASHTABLE_STATIC(commands, CONFIG_MAX_COMMANDS_NUMBER, get_key_from_command);
 
 
 /**
@@ -230,7 +230,7 @@ static const char *skip_to_params(const char *input, const struct CmdTemplate *c
 	return end;
 }
 
-bool parser_get_cmd_arguments(const char* input, const struct CmdTemplate* cmdp, parms args[PARSER_MAX_ARGS])
+bool parser_get_cmd_arguments(const char* input, const struct CmdTemplate* cmdp, parms args[CONFIG_PARSER_MAX_ARGS])
 {
 	input = skip_to_params(input, cmdp);
 	if (!input)
@@ -253,7 +253,7 @@ static const void* get_key_from_command(const void* cmd, uint8_t* length)
 bool parser_process_line(const char* input)
 {
 	const struct CmdTemplate *cmdp;
-	parms args[PARSER_MAX_ARGS];
+	parms args[CONFIG_PARSER_MAX_ARGS];
 
 	cmdp = parser_get_cmd_template(input);
 	if (!cmdp)

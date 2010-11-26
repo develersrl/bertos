@@ -135,7 +135,7 @@ bool parser_process_line(const char* line);
  *
  * \return False if the command returned an error, true otherwise
  */
-INLINE bool parser_execute_cmd(const struct CmdTemplate* templ, parms args[PARSER_MAX_ARGS])
+INLINE bool parser_execute_cmd(const struct CmdTemplate* templ, parms args[CONFIG_PARSER_MAX_ARGS])
 {
 	return (templ->func(args) == 0);
 }
@@ -167,7 +167,7 @@ const struct CmdTemplate* parser_get_cmd_template(const char* line);
  *
  * \return True if everything OK, false in case of parsing error.
  */
-bool parser_get_cmd_arguments(const char* line, const struct CmdTemplate* templ, parms args[PARSER_MAX_ARGS]);
+bool parser_get_cmd_arguments(const char* line, const struct CmdTemplate* templ, parms args[CONFIG_PARSER_MAX_ARGS]);
 
 
 #if CONFIG_ENABLE_COMPAT_BEHAVIOUR
