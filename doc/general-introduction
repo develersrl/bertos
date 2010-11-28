@@ -84,3 +84,10 @@ int main()
  * This section describes the kernel facilities and the synchronization
  * primitives available in BeRTOS.
  */
+
+/*!
+ * \defgroup mware Middleware facilities
+ *
+ * This section describes various algorithms and standalone code
+ * useful in day to day programming.
+ */

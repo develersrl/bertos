@@ -30,11 +30,79 @@
  * All Rights Reserved.
  * -->
  *
+ * \defgroup parser Simple RPC machinery
+ * \ingroup mware
+ * \{
+ *
+ * \brief Channel protocol parser and commands.
+ *
+ * This module provides a simple text based RPC implementation.
+ * Often there is the need to give a command to the device and receive results
+ * back. Each command may have a variable number of input and output
+ * parameters, with variable type, and a return code which indicates if the
+ * command was successfully executed or not; this module provides the machinery
+ * to facilitate the above RPC scenario.
+ * You will need to write the RPC input and reply code as well as
+ * the definition of the commands.
+ *
+ * Commands are defined using a CmdTemplate struct containing:
+ * - command name: the string that will be matched by the parser;
+ * - command arguments: a string representing type and number of input
+ *   arguments;
+ * - command output: a string representing type and number of output arguments;
+ * - function callback: function implementing the command.
+ *
+ * Once you have declared the commands, you need to register them in the
+ * parser with the function parser_register_cmd().
+ * You are strongly encouraged to use MAKE_CMD() (or alternatively
+ * MAKE_TEMPLATE()) and REGISTER_CMD() to declare and register commands.
+ *
+ * A command line can be parsed with the following steps:
+ * - find the corresponding command template with parser_get_cmd_template()
+ * - extract command arguments with parser_get_cmd_arguments()
+ * - execute the command with parser_execute_cmd()
+ *
+ * You can also provide interactive command line completion using
+ * parser_rl_match().
+ *
+ * Example:
+ * \code
+ * // Declare a buzzer command
+ * MAKE_CMD(beep, "d", "",
+ * ({
+ * 	buz_beep(args[1].l);
+ * 	RC_OK;
+ * }), 0)
+ *
+ * // initialize the parser
+ * parser_init();
+ * REGISTER_CMD(beep);
+ *
+ * // parse an input line
+ * char buf[80];
+ * // read line from somewhere
+ * rpc_get(buf);
+ * // now parse the line
+ * const struct CmdTemplate *templ;
+ * templ = parser_get_cmd_template(buf);
+ *
+ * // Take arguments (optionally check errors)
+ * parms args[PARSER_MAX_ARGS];
+ * parser_get_cmd_arguments(buf, templ, args);
+ * //Execute command
+ * if(!parser_execute_cmd(templ, args))
+ * {
+ * 	// error
+ * }
+ * // Now args contain the outputs of the function, you can send it
+ * // back to the caller
+ * rpc_reply(args)
+ *
+ * \endcode
+ *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  * \author Giovanni Bajo <rasky@develer.com>
- *
- * \brief Channel protocol parser and commands.
  *
  * $WIZ$ module_name = "parser"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_parser.h"
@@ -86,6 +154,62 @@ struct CmdTemplate
 	uint16_t   flags;          ///< Currently unused.
 };
 
+#define REGISTER_FUNCTION parser_register_cmd
+
+/**
+ * Utility function to register a command.
+ *
+ * \param NAME Command name to register
+ */
+#define REGISTER_CMD(NAME) REGISTER_FUNCTION(&cmd_ ## NAME ## _template)
+
+/**
+ * Utility macro to create a command template.
+ *
+ * It requires that a callback function with name \a cmd_NAME
+ * is already defined.
+ * \param NAME Command name
+ * \param ARGS Input arguments
+ * \param RES Output arguments
+ * \param FLAGS Command flags
+ */
+#define MAKE_TEMPLATE(NAME, ARGS, RES, FLAGS)          \
+const struct CmdTemplate cmd_ ## NAME ## _template =   \
+{                                                      \
+	#NAME, ARGS, RES, cmd_ ## NAME, FLAGS          \
+};
+
+/**
+ * Utility macro to create command templates and callback functions.
+ *
+ * Example for a version command:
+ * \code
+ * MAKE_CMD(ver, "", "ddd",
+ * ({
+ * 	args[1].l = VERS_MAJOR;
+ * 	args[2].l = VERS_MINOR;
+ * 	args[3].l = VERS_REV;
+ * 	RC_OK;
+ * }), 0);
+ * \endcode
+ *
+ * Remember that input and output parameters start from index 1, since
+ * args[0] is the command itself.
+ * The last line is the return value of the function.
+ *
+ * \param NAME Command name matched by the parser
+ * \param ARGS Input arguments to the command
+ * \param RES Output arguments of the command
+ * \param BODY Command body, expressed with C 'statement expression'
+ * \param FLAGS Command flags
+ */
+#define MAKE_CMD(NAME, ARGS, RES, BODY, FLAGS)  \
+static ResultCode cmd_ ## NAME (parms *args)    \
+{                                               \
+	return (ResultCode)BODY;                \
+}                                               \
+MAKE_TEMPLATE(NAME, ARGS, RES, FLAGS)
+
 /**
  * Initialize the parser module
  *
@@ -130,6 +254,9 @@ bool parser_process_line(const char* line);
 /**
  * Execute a command with its arguments, and fetch its results.
  *
+ * The \a args paramenter is value-result: it provides input arguments to
+ * the callback function and it stores output values on return.
+ *
  * \param templ Template of the command to be executed
  * \param args Arguments for the command, and will contain the results
  *
@@ -161,6 +288,9 @@ const struct CmdTemplate* parser_get_cmd_template(const char* line);
 /**
  * Extract the arguments for the command contained in the text line.
  *
+ * The first argument will always be the command name, so the actual arguments
+ * will start at index 1.
+ *
  * \param line Text line to be processed (ASCIIZ)
  * \param templ Command template for this line
  * \param args Will contain the extracted parameters
@@ -184,5 +314,6 @@ bool parser_get_cmd_id(const char* line, unsigned long* ID);
 #endif
 
 
+/** \} */ // defgroup parser
 #endif /* MWARE_PARSER_H */
 
