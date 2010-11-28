@@ -55,6 +55,8 @@
 
 #include "parser.h"
 
+#include "cfg/cfg_parser.h"
+
 #include <io/kfile.h>
 #include <struct/hashtable.h>
 
