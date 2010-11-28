@@ -4,41 +4,41 @@
 #
 
 # Programmer interface configuration, see http://dev.bertos.org/wiki/ProgrammerInterface for help
-aprs_PROGRAMMER_TYPE = none
-aprs_PROGRAMMER_PORT = none
+arduino_aprs_PROGRAMMER_TYPE = none
+arduino_aprs_PROGRAMMER_PORT = none
 
 # Files included by the user.
-aprs_USER_CSRC = \
-	$(aprs_SRC_PATH)/main.c \
-	$(aprs_HW_PATH)/hw/hw_afsk.c \
+arduino_aprs_USER_CSRC = \
+	$(arduino_aprs_SRC_PATH)/main.c \
+	$(arduino_aprs_HW_PATH)/hw/hw_afsk.c \
 	#
 
 # Files included by the user.
-aprs_USER_PCSRC = \
+arduino_aprs_USER_PCSRC = \
 	#
 
 # Files included by the user.
-aprs_USER_CPPASRC = \
+arduino_aprs_USER_CPPASRC = \
 	#
 
 # Files included by the user.
-aprs_USER_CXXSRC = \
+arduino_aprs_USER_CXXSRC = \
 	#
 
 # Files included by the user.
-aprs_USER_ASRC = \
+arduino_aprs_USER_ASRC = \
 	#
 
 # Flags included by the user.
-aprs_USER_LDFLAGS = \
+arduino_aprs_USER_LDFLAGS = \
 	#
 
 # Flags included by the user.
-aprs_USER_CPPAFLAGS = \
+arduino_aprs_USER_CPPAFLAGS = \
 	#
 
 # Flags included by the user.
-aprs_USER_CPPFLAGS = \
+arduino_aprs_USER_CPPFLAGS = \
 	-fno-strict-aliasing \
 	-fwrapv \
 	#
