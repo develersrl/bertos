@@ -26,45 +26,53 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ *
  * -->
  *
- * \brief Configuration file for Debug module.
+ * \author Andrea Righi <arighi@develer.com>
  *
+ * \brief Configuration file for the USB serial driver module
+ */
+
+#ifndef CFG_USBSER_H
+#define CFG_USBSER_H
+
+/**
+ * Enable the usb-serial module.
  *
- * \author Daniele Basile <asterix@develer.com>
+ * $WIZ$ type = "autoenabled"
  */
-
-#ifndef CFG_DEBUG_H
-#define CFG_DEBUG_H
+#define CONFIG_USBSER 0
 
 /**
- * Debug console port.
- * $WIZ$ type = "int"; min = 0
- */
-#define CONFIG_KDEBUG_PORT 0
-
-/**
- * Baudrate for the debug console.
- * $WIZ$ type = "int"; min = 300
- */
-#define CONFIG_KDEBUG_BAUDRATE  115200UL
-
-/**
- * Clock source for the UART module. You need to write the code to reprogram the respective clock at the required frequency in your project before calling kdbg_init().
+ * Module logging level.
  *
  * $WIZ$ type = "enum"
- * $WIZ$ value_list = "kdbg_clk_src"
- * $WIZ$ supports = "msp430"
+ * $WIZ$ value_list = "log_level"
  */
-#define CONFIG_KDEBUG_CLOCK_SOURCE  KDBG_UART_SMCLK
+#define USB_SERIAL_LOG_LEVEL      LOG_LVL_INFO
 
 /**
- * Clock frequency. (Only if different from MCLK's frequency, otherwise leave it zero)
- * $WIZ$ type = "int"; min = 0
- * $WIZ$ supports = "msp430"
+ * module logging format.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
  */
-#define CONFIG_KDEBUG_CLOCK_FREQ 0UL
+#define USB_SERIAL_LOG_FORMAT     LOG_FMT_TERSE
 
-#endif /* CFG_DEBUG_H */
+/**
+ * USB vendor ID (please change this in your project, using a valid ID number!).
+ *
+ * $WIZ$ type = "hex"
+ */
+#define USB_SERIAL_VENDOR_ID      0x05f9
+
+/**
+ * USB product ID (please change this in your project, using a valid ID number!).
+ *
+ * $WIZ$ type = "hex"
+ */
+#define USB_SERIAL_PRODUCT_ID     0xffff
+
+#endif /* CFG_USBSER_H */
