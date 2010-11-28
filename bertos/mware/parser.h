@@ -100,6 +100,8 @@
  *
  * \endcode
  *
+ * <b>Configuration file</b>: cfg_parser.h
+ *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  * \author Giovanni Bajo <rasky@develer.com>
