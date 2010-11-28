@@ -70,8 +70,8 @@
  * // Declare a buzzer command
  * MAKE_CMD(beep, "d", "",
  * ({
- * 	buz_beep(args[1].l);
- * 	RC_OK;
+ *	buz_beep(args[1].l);
+ *	RC_OK;
  * }), 0)
  *
  * // initialize the parser
@@ -92,7 +92,7 @@
  * //Execute command
  * if(!parser_execute_cmd(templ, args))
  * {
- * 	// error
+ *	// error
  * }
  * // Now args contain the outputs of the function, you can send it
  * // back to the caller
