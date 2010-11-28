@@ -26,45 +26,50 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2009 Develer S.r.l. (http://www.develer.com/)
  * All Rights Reserved.
  * -->
  *
- * \brief Configuration file for Debug module.
+ * \brief Configuration file Secure Digital module.
  *
  *
- * \author Daniele Basile <asterix@develer.com>
+ * \author Francesco Sacchi <batt@develer.com>
  */
 
-#ifndef CFG_DEBUG_H
-#define CFG_DEBUG_H
+#ifndef CFG_SD_H
+#define CFG_SD_H
 
 /**
- * Debug console port.
- * $WIZ$ type = "int"; min = 0
- */
-#define CONFIG_KDEBUG_PORT 0
-
-/**
- * Baudrate for the debug console.
- * $WIZ$ type = "int"; min = 300
- */
-#define CONFIG_KDEBUG_BAUDRATE  115200UL
-
-/**
- * Clock source for the UART module. You need to write the code to reprogram the respective clock at the required frequency in your project before calling kdbg_init().
+ * Module logging level.
  *
  * $WIZ$ type = "enum"
- * $WIZ$ value_list = "kdbg_clk_src"
- * $WIZ$ supports = "msp430"
+ * $WIZ$ value_list = "log_level"
  */
-#define CONFIG_KDEBUG_CLOCK_SOURCE  KDBG_UART_SMCLK
+#define SD_LOG_LEVEL      LOG_LVL_ERR
 
 /**
- * Clock frequency. (Only if different from MCLK's frequency, otherwise leave it zero)
- * $WIZ$ type = "int"; min = 0
- * $WIZ$ supports = "msp430"
+ * Module logging format.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
  */
-#define CONFIG_KDEBUG_CLOCK_FREQ 0UL
+#define SD_LOG_FORMAT     LOG_FMT_VERBOSE
 
-#endif /* CFG_DEBUG_H */
+
+/**
+ * Enable autoassignment of SD driver to disk drive number 0 of FatFs module.
+ * $WIZ$ type = "boolean"
+ * $WIZ$ conditional_deps = "fat"
+ */
+#define CONFIG_SD_AUTOASSIGN_FAT   1
+
+/**
+ * Enable backward compatibility for sd_init().
+ * If enabled, sd_init() will allocate internally an Sd context,
+ * otherwise sd_init() will need the context to be passed explicitly.
+ *
+ * $WIZ$ type = "boolean"
+ */
+#define CONFIG_SD_OLD_INIT   1
+
+#endif /* CFG_SD_H */
