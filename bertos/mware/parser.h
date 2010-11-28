@@ -217,13 +217,6 @@ MAKE_TEMPLATE(NAME, ARGS, RES, FLAGS)
  */
 void parser_init(void);
 
-
-/**
- * Register a new command into the parser
- *
- * \param cmd Command template describing the command
- *
- */
 void parser_register_cmd(const struct CmdTemplate* cmd);
 
 
@@ -236,20 +229,7 @@ void parser_register_cmd(const struct CmdTemplate* cmd);
  */
 const char* parser_rl_match(void* dummy, const char* word, int word_len);
 
-
-/**
- * \brief Command input handler.
- *
- * Process the input, calling the requested command
- * (if found) and calling printResult() to give out
- * the result (on device specified with parameter fd).
- *
- * \param line Text line to be processed (ASCIIZ)
- *
- * \return true if everything is OK, false in case of errors
- */
 bool parser_process_line(const char* line);
-
 
 /**
  * Execute a command with its arguments, and fetch its results.
@@ -267,38 +247,9 @@ INLINE bool parser_execute_cmd(const struct CmdTemplate* templ, parms args[CONFI
 	return (templ->func(args) == 0);
 }
 
-
-/**
- * Find the template for the command contained in the text line.
- * The template can be used to tokenize the command and interpret
- * it.
- *
- * This function can be used to find out which command is contained
- * in a given text line without parsing all the parameters and
- * executing it.
- *
- * \param line Text line to be processed (ASCIIZ)
- *
- * \return The command template associated with the command contained
- * in the line, or NULL if the command is invalid.
- */
 const struct CmdTemplate* parser_get_cmd_template(const char* line);
 
-
-/**
- * Extract the arguments for the command contained in the text line.
- *
- * The first argument will always be the command name, so the actual arguments
- * will start at index 1.
- *
- * \param line Text line to be processed (ASCIIZ)
- * \param templ Command template for this line
- * \param args Will contain the extracted parameters
- *
- * \return True if everything OK, false in case of parsing error.
- */
 bool parser_get_cmd_arguments(const char* line, const struct CmdTemplate* templ, parms args[CONFIG_PARSER_MAX_ARGS]);
-
 
 #if CONFIG_ENABLE_COMPAT_BEHAVIOUR
 /**

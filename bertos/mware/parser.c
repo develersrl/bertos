@@ -197,6 +197,20 @@ bool parser_get_cmd_id(const char* line, unsigned long* ID)
 }
 #endif
 
+/**
+ * Find the template for the command contained in the text line.
+ * The template can be used to tokenize the command and interpret
+ * it.
+ *
+ * This function can be used to find out which command is contained
+ * in a given text line without parsing all the parameters and
+ * executing it.
+ *
+ * \param line Text line to be processed (ASCIIZ)
+ *
+ * \return The command template associated with the command contained
+ * in the line, or NULL if the command is invalid.
+ */
 const struct CmdTemplate* parser_get_cmd_template(const char *input)
 {
 	const char *begin = input, *end = input;
@@ -230,6 +244,18 @@ static const char *skip_to_params(const char *input, const struct CmdTemplate *c
 	return end;
 }
 
+/**
+ * Extract the arguments for the command contained in the text line.
+ *
+ * The first argument will always be the command name, so the actual arguments
+ * will start at index 1.
+ *
+ * \param line Text line to be processed (ASCIIZ)
+ * \param templ Command template for this line
+ * \param args Will contain the extracted parameters
+ *
+ * \return True if everything OK, false in case of parsing error.
+ */
 bool parser_get_cmd_arguments(const char* input, const struct CmdTemplate* cmdp, parms args[CONFIG_PARSER_MAX_ARGS])
 {
 	input = skip_to_params(input, cmdp);
@@ -250,6 +276,15 @@ static const void* get_key_from_command(const void* cmd, uint8_t* length)
 	return c->name;
 }
 
+/**
+ * \brief Command input handler.
+ *
+ * Process the input, calling the requested command (if found).
+ *
+ * \param line Text line to be processed (ASCIIZ)
+ *
+ * \return true if everything is OK, false in case of errors
+ */
 bool parser_process_line(const char* input)
 {
 	const struct CmdTemplate *cmdp;
@@ -268,6 +303,11 @@ bool parser_process_line(const char* input)
 	return true;
 }
 
+/**
+ * Register a new command into the parser
+ *
+ * \param cmd Command template describing the command
+ */
 void parser_register_cmd(const struct CmdTemplate* cmd)
 {
 	ht_insert(&commands, cmd);
