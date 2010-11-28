@@ -32,8 +32,6 @@
  *
  * \brief Configuration file for I2C module.
  *
- * \version $Id$
- *
  * \author Daniele Basile <asterix@develer.com>
  */
 
@@ -58,16 +56,11 @@
 #define CONFIG_I2C_START_TIMEOUT 100
 
 /**
- * I2C backend the driver should use.
+ * Check this to disable I2c deprecated API support.
  *
- * I2C_BACKEND_BUILTIN: Use (if present) the builtin i2c hardware.
- * I2C_BACKEND_BITBANG: Use the emulated bitbang driver.
- * \see drv/i2c.h for more information.
- *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "i2c_backend"
+ * $WIZ$ type = "boolean"
  */
-#define CONFIG_I2C_BACKEND I2C_BACKEND_BUILTIN
+#define CONFIG_I2C_DISABLE_OLD_API   0
 
 /**
  * Module logging level.

@@ -32,7 +32,6 @@
  *
  * \brief Configuration file for the ADC module.
  *
- * \version $Id$
  * \author Daniele Basile <asterix@develer.com>
  */
 
@@ -57,9 +56,12 @@
 
 /**
  * Clock Frequency for ADC conversion.
+ * This frequency will be rounded down to an integer
+ * submultiple of CPU_FREQ.
  *
  * $WIZ$ type = "int"
  * $WIZ$ supports = "at91"
+ * $WIZ$ max = 5000000
  */
 #define CONFIG_ADC_CLOCK        4800000UL
 
@@ -67,16 +69,16 @@
  * Minimum time for starting up a conversion [us].
  *
  * $WIZ$ type = "int"
- * $WIZ$ min = 0
+ * $WIZ$ min = 20
  * $WIZ$ supports = "at91"
  */
 #define CONFIG_ADC_STARTUP_TIME 20
 
 /**
- * Minimum time for sample and hold [us].
+ * Minimum time for sample and hold [ns].
  *
  * $WIZ$ type = "int"
- * $WIZ$ min = 0
+ * $WIZ$ min = 600
  * $WIZ$ supports = "at91"
  */
 #define CONFIG_ADC_SHTIME       834
