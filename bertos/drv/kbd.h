@@ -31,8 +31,14 @@
  *
  * -->
  *
+ * \defgroup kbd Keyboard handling driver
+ * \ingroup drivers
+ * \{
  * \brief Keyboard driver.
  *
+ * <b>Configuration file</b>: cfg_kbd.h
+ *
+ * <b>HAL files</b>: hw_kbd.h, kbd_map.h
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  * \author Francesco Sacchi <batt@develer.com>
@@ -98,4 +104,5 @@ keymask_t kbd_setRepeatMask(keymask_t mask);
 	};
 #endif
 
+/** \} */ //defgroup kbd
 #endif /* DRV_KBD_H */
