@@ -31,6 +31,9 @@
  * All Rights Reserved.
  * -->
  *
+ * \defgroup menu Menu handling module
+ * \ingroup gui
+ * \{
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  *
@@ -128,4 +131,5 @@ iptr_t menu_handle(const struct Menu *menu);
 int menu_setFlags(struct Menu *menu, int idx, int flags);
 int menu_clearFlags(struct Menu *menu, int idx, int flags);
 
+/** \} */ //defgroup menu
 #endif /* GUI_MENU_H */

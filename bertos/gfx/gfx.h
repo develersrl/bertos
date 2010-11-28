@@ -30,6 +30,9 @@
  * Copyright 1999 Bernie Innocenti <bernie@codewiz.org>
  *
  *
+ * \defgroup gfx Graphics routines
+ * \ingroup graphics
+ * \{
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
  *
@@ -234,4 +237,5 @@ void gfx_vline(Bitmap *bm, vcoord_t x1, vcoord_t y1, vcoord_t x2, vcoord_t y2);
 
 EXTERN_C_END
 
+/** \} */ //defgroup gfx
 #endif /* GFX_GFX_H */

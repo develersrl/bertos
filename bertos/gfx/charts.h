@@ -31,6 +31,9 @@
  *
  * -->
  *
+ * \defgroup chart Chart graphical routines
+ * \ingroup graphics
+ * \{
  * \brief Simple charts on top of mware/gfx routines (interface).
  *
  * Configuration:
@@ -95,4 +98,5 @@ void chart_drawAxis(Bitmap *bm);
 void chart_drawCurve(Bitmap *bm, const chart_y_t *curve_y, int curve_cnt);
 void chart_drawDots(Bitmap *bm, const chart_x_t *dots_x, const chart_y_t *dots_y, int cnt);
 
+/** \} */ //defgroup charts
 #endif /* GFX_CHARTS_H */

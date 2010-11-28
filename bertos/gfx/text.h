@@ -31,6 +31,9 @@
  *
  * -->
  *
+ * \defgroup text Text handling on graphical displays.
+ * \ingroup graphics
+ * \{
  * \brief Text graphic routines (interface)
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
@@ -119,4 +122,5 @@ int text_vwidthf_P(struct Bitmap *bm, const char * PROGMEM fmt, va_list ap);
 int text_widthf_P(struct Bitmap *bm, const char * PROGMEM fmt, ...);
 #endif /* CPU_HARVARD */
 
+/** \} */ //defgroup text
 #endif /* GFX_TEXT_H */
