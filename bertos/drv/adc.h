@@ -30,7 +30,12 @@
  *
  * -->
  *
+ * \defgroup adc Generic ADC driver
+ * \ingroup drivers
+ * \{
  * \brief Analog to Digital Converter driver (ADC).
+ *
+ * <b>Configuration file</b>: cfg_adc.h
  *
  * \author Francesco Sacchi <batt@develer.com>
  *
@@ -67,4 +72,5 @@ void adc_init(void);
  */
 #define ADC_RANGECONV(data, y1, y2) (((((int32_t)(data)) * ((y2) - (y1))) / ((1 << ADC_BITS) - 1)) + (y1))
 
+/** \} */ //defgroup adc
 #endif /* DRV_ADC_H */
