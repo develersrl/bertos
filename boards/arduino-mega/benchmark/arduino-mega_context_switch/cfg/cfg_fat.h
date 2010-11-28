@@ -32,7 +32,6 @@
  *
  * \brief Configuration file for Fat module.
  *
- * \version $Id$
  *
  * \author Luca Ottaviano <lottaviano@develer.com>
  * \author Francesco Sacchi <batt@develer.com>
@@ -40,6 +39,23 @@
 
 #ifndef CFG_FAT_H
 #define CFG_FAT_H
+
+/**
+ * Module logging level.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
+ */
+#define FAT_LOG_LEVEL      LOG_LVL_ERR
+
+/**
+ * Module logging format.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define FAT_LOG_FORMAT     LOG_FMT_VERBOSE
+
 
 /**
  * Use word alignment to access FAT structure.

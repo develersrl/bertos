@@ -38,7 +38,27 @@
 #ifndef CFG_PARSER_H
 #define CFG_PARSER_H
 
+/**
+ * Max number of arguments and results for each command
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 0
+ */
+#define CONFIG_PARSER_MAX_ARGS       4
 
+/**
+ * Max number of commands
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 8
+ */
+#define CONFIG_MAX_COMMANDS_NUMBER  16
+
+/**
+ * Enable compatibility behaviour.
+ *
+ * Skip the first word from incoming commands. Don't enable in new projects.
+ * $WIZ$ type = "boolean"
+ */
+#define CONFIG_ENABLE_COMPAT_BEHAVIOUR 1
 
 #endif /* CFG_PARSER_H */
 
