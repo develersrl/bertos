@@ -10,7 +10,7 @@ arduino-mega_aprs_PROGRAMMER_PORT = none
 # Files included by the user.
 arduino-mega_aprs_USER_CSRC = \
 	$(arduino-mega_aprs_SRC_PATH)/main.c \
-	$(arduino-mega_aprs_SRC_PATH)/hw/hw_afsk.c \
+	$(arduino-mega_aprs_HW_PATH)/hw/hw_afsk.c \
 	#
 
 # Files included by the user.
