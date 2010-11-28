@@ -46,6 +46,10 @@
 
 #include "hw/hw_input.h"
 
+#include "cfg/cfg_parser.h"
+#include <cfg/compiler.h>
+#include <cfg/debug.h>
+
 #include <drv/adc.h>
 #include <drv/timer.h>
 #include <drv/ser.h>
@@ -55,9 +59,6 @@
 
 #include <mware/readline.h>
 #include <mware/parser.h>
-
-#include <cfg/compiler.h>
-#include <cfg/debug.h>
 
 #include <io/kfile.h>
 
@@ -149,7 +150,7 @@ static void protocol_parse(KFile *fd, const char *buf)
 		return;
 	}
 
-	parms args[PARSER_MAX_ARGS];
+	parms args[CONFIG_PARSER_MAX_ARGS];
 
 	/* Args Check.  TODO: Handle different case. see doc/PROTOCOL .  */
 	if (!parser_get_cmd_arguments(buf, templ, args))
