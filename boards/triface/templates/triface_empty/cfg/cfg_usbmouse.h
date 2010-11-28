@@ -26,41 +26,53 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ *
  * -->
  *
- * \brief Configuration file for parser module.
+ * \author Andrea Righi <arighi@develer.com>
  *
- * \author Daniele Basile <asterix@develer.com>
+ * \brief Configuration file for the usbmouse driver module
  */
 
-#ifndef CFG_PARSER_H
-#define CFG_PARSER_H
+#ifndef CFG_USBMOUSE_H
+#define CFG_USBMOUSE_H
 
 /**
- * Max number of arguments and results for each command
- * $WIZ$ type = "int"
- * $WIZ$ min = 0
- */
-#define CONFIG_PARSER_MAX_ARGS       4
-
-/**
- * Max number of commands
- * $WIZ$ type = "int"
- * $WIZ$ min = 8
- */
-#define CONFIG_MAX_COMMANDS_NUMBER  16
-
-/**
- * Enable compatibility behaviour.
+ * Enable the usbmouse module.
  *
- * Skip the first word from incoming commands. Don't enable in new projects.
- * $WIZ$ type = "boolean"
+ * $WIZ$ type = "autoenabled"
  */
-#define CONFIG_ENABLE_COMPAT_BEHAVIOUR 1
+#define CONFIG_USBMOUSE 0
 
-#endif /* CFG_PARSER_H */
+/**
+ * Module logging level.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
+ */
+#define USB_MOUSE_LOG_LEVEL      LOG_LVL_INFO
 
+/**
+ * module logging format.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define USB_MOUSE_LOG_FORMAT     LOG_FMT_TERSE
 
+/**
+ * USB vendor ID (please change this in your project, using a valid ID number!).
+ *
+ * $WIZ$ type = "hex"
+ */
+#define USB_MOUSE_VENDOR_ID      0xffff
 
+/**
+ * USB product ID (please change this in your project, using a valid ID number!).
+ *
+ * $WIZ$ type = "hex"
+ */
+#define USB_MOUSE_PRODUCT_ID     0x0000
+
+#endif /* CFG_USBMOUSE_H */

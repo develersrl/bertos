@@ -27,40 +27,47 @@
  * the GNU General Public License.
  *
  * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
  * -->
  *
- * \brief Configuration file for parser module.
- *
  * \author Daniele Basile <asterix@develer.com>
- */
-
-#ifndef CFG_PARSER_H
-#define CFG_PARSER_H
-
-/**
- * Max number of arguments and results for each command
- * $WIZ$ type = "int"
- * $WIZ$ min = 0
- */
-#define CONFIG_PARSER_MAX_ARGS       4
-
-/**
- * Max number of commands
- * $WIZ$ type = "int"
- * $WIZ$ min = 8
- */
-#define CONFIG_MAX_COMMANDS_NUMBER  16
-
-/**
- * Enable compatibility behaviour.
  *
- * Skip the first word from incoming commands. Don't enable in new projects.
+ * \brief Configuration file for embedded flash module.
+ */
+
+#ifndef CFG_EMB_FLASH_H
+#define CFG_EMB_FLASH_H
+
+/**
+ * Module logging level.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
+ */
+#define CONFIG_FLASH_EMB_LOG_LEVEL      LOG_LVL_INFO
+
+/**
+ * module logging format.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define CONFIG_FLASH_EMB_LOG_FORMAT     LOG_FMT_TERSE
+
+
+/**
+ * Write emb flash timeout.
+ * For how many milliseconds the cpu wait
+ * to complete write operation.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_FLASH_WR_TIMEOUT      100
+
+/**
+ * Check this to disable embedded flash deprecated API support.
+ *
  * $WIZ$ type = "boolean"
  */
-#define CONFIG_ENABLE_COMPAT_BEHAVIOUR 1
+#define CONFIG_FLASH_DISABLE_OLD_API       0
 
-#endif /* CFG_PARSER_H */
-
-
-
+#endif /* CFG_FLASH_AT91_H */

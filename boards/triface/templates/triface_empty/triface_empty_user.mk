@@ -4,40 +4,40 @@
 #
 
 # Programmer interface configuration, see http://dev.bertos.org/wiki/ProgrammerInterface for help
-empty_PROGRAMMER_TYPE = none
-empty_PROGRAMMER_PORT = none
+triface_empty_PROGRAMMER_TYPE = none
+triface_empty_PROGRAMMER_PORT = none
 
 # Files included by the user.
-empty_USER_CSRC = \
-	$(empty_SRC_PATH)/main.c \
+triface_empty_USER_CSRC = \
+	$(triface_empty_SRC_PATH)/main.c \
 	#
 
 # Files included by the user.
-empty_USER_PCSRC = \
+triface_empty_USER_PCSRC = \
 	#
 
 # Files included by the user.
-empty_USER_CPPASRC = \
+triface_empty_USER_CPPASRC = \
 	#
 
 # Files included by the user.
-empty_USER_CXXSRC = \
+triface_empty_USER_CXXSRC = \
 	#
 
 # Files included by the user.
-empty_USER_ASRC = \
+triface_empty_USER_ASRC = \
 	#
 
 # Flags included by the user.
-empty_USER_LDFLAGS = \
+triface_empty_USER_LDFLAGS = \
 	#
 
 # Flags included by the user.
-empty_USER_CPPAFLAGS = \
+triface_empty_USER_CPPAFLAGS = \
 	#
 
 # Flags included by the user.
-empty_USER_CPPFLAGS = \
+triface_empty_USER_CPPFLAGS = \
 	-fno-strict-aliasing \
 	-fwrapv \
 	#

@@ -26,41 +26,53 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ *
  * -->
  *
- * \brief Configuration file for parser module.
+ * \author Andrea Righi <arighi@develer.com>
  *
- * \author Daniele Basile <asterix@develer.com>
+ * \brief Configuration file for the usbkbd driver module
  */
 
-#ifndef CFG_PARSER_H
-#define CFG_PARSER_H
+#ifndef CFG_USBKBD_H
+#define CFG_USBKBD_H
 
 /**
- * Max number of arguments and results for each command
- * $WIZ$ type = "int"
- * $WIZ$ min = 0
- */
-#define CONFIG_PARSER_MAX_ARGS       4
-
-/**
- * Max number of commands
- * $WIZ$ type = "int"
- * $WIZ$ min = 8
- */
-#define CONFIG_MAX_COMMANDS_NUMBER  16
-
-/**
- * Enable compatibility behaviour.
+ * Enable the usbkbd module.
  *
- * Skip the first word from incoming commands. Don't enable in new projects.
- * $WIZ$ type = "boolean"
+ * $WIZ$ type = "autoenabled"
  */
-#define CONFIG_ENABLE_COMPAT_BEHAVIOUR 1
+#define CONFIG_USBKBD 0
 
-#endif /* CFG_PARSER_H */
+/**
+ * Module logging level.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
+ */
+#define USB_KEYBOARD_LOG_LEVEL      LOG_LVL_INFO
 
+/**
+ * module logging format.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define USB_KEYBOARD_LOG_FORMAT     LOG_FMT_TERSE
 
+/**
+ * USB vendor ID (please change this in your project, using a valid ID number!).
+ *
+ * $WIZ$ type = "hex"
+ */
+#define USB_KEYBOARD_VENDOR_ID      0x046d
 
+/**
+ * USB product ID (please change this in your project, using a valid ID number!).
+ *
+ * $WIZ$ type = "hex"
+ */
+#define USB_KEYBOARD_PRODUCT_ID     0xffff
+
+#endif /* CFG_USB_KEYBOARD_H */

@@ -26,41 +26,50 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2009 Develer S.r.l. (http://www.develer.com/)
  * All Rights Reserved.
  * -->
  *
- * \brief Configuration file for parser module.
+ * \brief Configuration file Secure Digital module.
  *
- * \author Daniele Basile <asterix@develer.com>
- */
-
-#ifndef CFG_PARSER_H
-#define CFG_PARSER_H
-
-/**
- * Max number of arguments and results for each command
- * $WIZ$ type = "int"
- * $WIZ$ min = 0
- */
-#define CONFIG_PARSER_MAX_ARGS       4
-
-/**
- * Max number of commands
- * $WIZ$ type = "int"
- * $WIZ$ min = 8
- */
-#define CONFIG_MAX_COMMANDS_NUMBER  16
-
-/**
- * Enable compatibility behaviour.
  *
- * Skip the first word from incoming commands. Don't enable in new projects.
+ * \author Francesco Sacchi <batt@develer.com>
+ */
+
+#ifndef CFG_SD_H
+#define CFG_SD_H
+
+/**
+ * Module logging level.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
+ */
+#define SD_LOG_LEVEL      LOG_LVL_ERR
+
+/**
+ * Module logging format.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define SD_LOG_FORMAT     LOG_FMT_VERBOSE
+
+
+/**
+ * Enable autoassignment of SD driver to disk drive number 0 of FatFs module.
+ * $WIZ$ type = "boolean"
+ * $WIZ$ conditional_deps = "fat"
+ */
+#define CONFIG_SD_AUTOASSIGN_FAT   1
+
+/**
+ * Enable backward compatibility for sd_init().
+ * If enabled, sd_init() will allocate internally an Sd context,
+ * otherwise sd_init() will need the context to be passed explicitly.
+ *
  * $WIZ$ type = "boolean"
  */
-#define CONFIG_ENABLE_COMPAT_BEHAVIOUR 1
+#define CONFIG_SD_OLD_INIT   1
 
-#endif /* CFG_PARSER_H */
-
-
-
+#endif /* CFG_SD_H */

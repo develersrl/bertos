@@ -26,41 +26,39 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ *
  * -->
  *
- * \brief Configuration file for parser module.
+ * \author Andrea Righi <arighi@develer.com>
  *
- * \author Daniele Basile <asterix@develer.com>
+ * \brief Configuration file for the USB driver module
  */
 
-#ifndef CFG_PARSER_H
-#define CFG_PARSER_H
+#ifndef CFG_USB_H
+#define CFG_USB_H
 
 /**
- * Max number of arguments and results for each command
- * $WIZ$ type = "int"
- * $WIZ$ min = 0
- */
-#define CONFIG_PARSER_MAX_ARGS       4
-
-/**
- * Max number of commands
- * $WIZ$ type = "int"
- * $WIZ$ min = 8
- */
-#define CONFIG_MAX_COMMANDS_NUMBER  16
-
-/**
- * Enable compatibility behaviour.
+ * Module logging level.
  *
- * Skip the first word from incoming commands. Don't enable in new projects.
- * $WIZ$ type = "boolean"
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
  */
-#define CONFIG_ENABLE_COMPAT_BEHAVIOUR 1
+#define USB_LOG_LEVEL      LOG_LVL_INFO
 
-#endif /* CFG_PARSER_H */
+/**
+ * module logging format.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define USB_LOG_FORMAT     LOG_FMT_TERSE
 
+/**
+ * Size of the USB buffer used for endpoint transfers [bytes].
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 2
+ */
+#define CONFIG_USB_BUFSIZE  64
 
-
+#endif /* CFG_USB_H */
