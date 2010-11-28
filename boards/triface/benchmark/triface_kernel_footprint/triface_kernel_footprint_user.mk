@@ -4,41 +4,40 @@
 #
 
 # Programmer interface configuration, see http://dev.bertos.org/wiki/ProgrammerInterface for help
-context_switch_PROGRAMMER_TYPE = none
-context_switch_PROGRAMMER_PORT = none
+triface_kernel_footprint_PROGRAMMER_TYPE = none
+triface_kernel_footprint_PROGRAMMER_PORT = none
 
 # Files included by the user.
-context_switch_USER_CSRC = \
-	$(context_switch_SRC_PATH)/main.c \
+triface_kernel_footprint_USER_CSRC = \
+	$(triface_kernel_footprint_SRC_PATH)/main.c \
 	#
 
 # Files included by the user.
-context_switch_USER_PCSRC = \
+triface_kernel_footprint_USER_PCSRC = \
 	#
 
 # Files included by the user.
-context_switch_USER_CPPASRC = \
+triface_kernel_footprint_USER_CPPASRC = \
 	#
 
 # Files included by the user.
-context_switch_USER_CXXSRC = \
+triface_kernel_footprint_USER_CXXSRC = \
 	#
 
 # Files included by the user.
-context_switch_USER_ASRC = \
+triface_kernel_footprint_USER_ASRC = \
 	#
 
 # Flags included by the user.
-context_switch_USER_LDFLAGS = \
+triface_kernel_footprint_USER_LDFLAGS = \
 	#
 
 # Flags included by the user.
-context_switch_USER_CPPAFLAGS = \
+triface_kernel_footprint_USER_CPPAFLAGS = \
 	#
 
 # Flags included by the user.
-context_switch_USER_CPPFLAGS = \
+triface_kernel_footprint_USER_CPPFLAGS = \
 	-fno-strict-aliasing \
 	-fwrapv \
-	-O2 \
 	#
