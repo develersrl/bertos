@@ -206,7 +206,7 @@ bool parser_get_cmd_id(const char* line, unsigned long* ID)
  * in a given text line without parsing all the parameters and
  * executing it.
  *
- * \param line Text line to be processed (ASCIIZ)
+ * \param input Text line to be processed (ASCIIZ)
  *
  * \return The command template associated with the command contained
  * in the line, or NULL if the command is invalid.
@@ -250,8 +250,8 @@ static const char *skip_to_params(const char *input, const struct CmdTemplate *c
  * The first argument will always be the command name, so the actual arguments
  * will start at index 1.
  *
- * \param line Text line to be processed (ASCIIZ)
- * \param templ Command template for this line
+ * \param input Text line to be processed (ASCIIZ)
+ * \param cmdp Command template for this line
  * \param args Will contain the extracted parameters
  *
  * \return True if everything OK, false in case of parsing error.
@@ -281,7 +281,7 @@ static const void* get_key_from_command(const void* cmd, uint8_t* length)
  *
  * Process the input, calling the requested command (if found).
  *
- * \param line Text line to be processed (ASCIIZ)
+ * \param input Text line to be processed (ASCIIZ)
  *
  * \return true if everything is OK, false in case of errors
  */
