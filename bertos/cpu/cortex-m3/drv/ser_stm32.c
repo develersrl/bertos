@@ -96,6 +96,7 @@ static const struct gpio_uart_info gpio_uart[SER_CNT] =
 		.sysctl_gpio = RCC_APB2_GPIOA,
 		.sysctl_usart = RCC_APB1_USART2,
 	},
+#if CPU_CM3_STM32F103RB
 	/* UART3 */
 	{
 		.base = GPIOB_BASE,
@@ -104,6 +105,7 @@ static const struct gpio_uart_info gpio_uart[SER_CNT] =
 		.sysctl_gpio = RCC_APB2_GPIOB,
 		.sysctl_usart = RCC_APB1_USART3,
 	},
+#endif
 };
 
 #define USART1_PORT                0
@@ -337,7 +339,9 @@ static void stm32_uartIRQDisable(int port)
 /* UART port instances */
 UART_PORT(1)
 UART_PORT(2)
+#if CPU_CM3_STM32F103RB
 UART_PORT(3)
+#endif
 
 static struct CM3Serial UARTDesc[SER_CNT] =
 {
@@ -365,6 +369,7 @@ static struct CM3Serial UARTDesc[SER_CNT] =
 		.base = USART2_BASE,
 		.irq = USART2_IRQHANDLER,
 	},
+#if CPU_CM3_STM32F103RB
 	{
 		.hw = {
 			.table = &USART3_VT,
@@ -377,6 +382,7 @@ static struct CM3Serial UARTDesc[SER_CNT] =
 		.base = USART3_BASE,
 		.irq = USART3_IRQHANDLER,
 	},
+#endif
 };
 
 struct SerialHardware *ser_hw_getdesc(int port)
