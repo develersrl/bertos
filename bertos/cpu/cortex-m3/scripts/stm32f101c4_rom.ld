@@ -30,59 +30,20 @@
  *
  * -->
  *
- * \brief STM32F10XX registers definition.
+ * \author Stefano Fedrigo <aleph@develer.com>
+ *
+ * \brief Script for STM32F101C4 cpu.
+ *
  */
 
-#ifndef STM32_H
-#define STM32_H
+/*
+ * Define memory configuration for STM32F101C4
+ */
+MEMORY
+{
+	rom(rx) : org = 0x00000000, len = 16k
+	ram(rwx) : org = 0x20000000, len = 4k
+}
 
-#include <cfg/compiler.h>
-#include <cfg/macros.h>
+INCLUDE "bertos/cpu/cortex-m3/scripts/cortex-m3_rom.ld"
 
-#include <cpu/types.h>
-
-#include <io/stm32_memmap.h>
-
-#include "stm32_nvic.h"
-#include "stm32_ints.h"
-#include "stm32_gpio.h"
-#include "stm32_uart.h"
-#include "stm32_adc.h"
-#include "stm32_i2c.h"
-#include "stm32_flash.h"
-
-#if CPU_CM3_STM32F101C4
-	#define GPIO_USART1_TX_PIN	BV(9)
-	#define GPIO_USART1_RX_PIN	BV(10)
-	#define GPIO_USART2_TX_PIN	BV(2)
-	#define GPIO_USART2_RX_PIN	BV(3)
-#elif CPU_CM3_STM32F103RB
-	#define GPIO_USART1_TX_PIN	BV(9)
-	#define GPIO_USART1_RX_PIN	BV(10)
-	#define GPIO_USART2_TX_PIN	BV(2)
-	#define GPIO_USART2_RX_PIN	BV(3)
-	#define GPIO_USART3_TX_PIN	BV(10)
-	#define GPIO_USART3_RX_PIN	BV(11)
-#else
-	#error No USART pins are defined for select cpu
-#endif
-
-#if CPU_CM3_STM32F101C4
-	#define GPIO_I2C1_SCL_PIN	BV(6)
-	#define GPIO_I2C1_SDA_PIN	BV(7)
-#elif CPU_CM3_STM32F103RB
-	#define GPIO_I2C1_SCL_PIN	BV(6)
-	#define GPIO_I2C1_SDA_PIN	BV(7)
-	#define GPIO_I2C2_SCL_PIN	BV(10)
-	#define GPIO_I2C2_SDA_PIN	BV(11)
-#else
-	#error No i2c pins are defined for select cpu
-#endif
-
-#if CPU_CM3_STM32F101C4 || CPU_CM3_STM32F103RB
-	#define FLASH_PAGE_SIZE   1024
-#else
-	#error No embedded definition for select cpu
-#endif
-
-#endif /* STM32_H */
