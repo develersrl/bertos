@@ -174,24 +174,19 @@
 		}
 		#define asm_switch_context cm3_preempt_switch_context
 
-		#define CPU_PUSH_CALL_FRAME(sp, func) \
-			do { \
-				CPU_PUSH_WORD((sp), 0x01000000);		/* xPSR    */	\
-				CPU_PUSH_WORD((sp), (cpu_stack_t)(func));	/* pc      */	\
-				CPU_PUSH_WORD((sp), 0);				/* lr      */	\
-				CPU_PUSH_WORD((sp), 0);				/* ip	   */	\
-				CPU_PUSH_WORD((sp), 0);				/* r3      */	\
-				CPU_PUSH_WORD((sp), 0);				/* r2      */	\
-				CPU_PUSH_WORD((sp), 0);				/* r1      */	\
-				CPU_PUSH_WORD((sp), 0);				/* r0      */	\
-				CPU_PUSH_WORD((sp), 0xfffffffd);		/* lr_exc  */	\
-			} while (0);
-
 		#define CPU_CREATE_NEW_STACK(stack) \
 			do { \
 				size_t i; \
 				/* Initialize process stack frame */ \
-				CPU_PUSH_CALL_FRAME(stack, proc_entry); \
+				CPU_PUSH_WORD((stack), 0x01000000);		/* xPSR    */	\
+				CPU_PUSH_WORD((stack), (cpu_stack_t)proc_entry);	/* pc      */	\
+				CPU_PUSH_WORD((stack), 0);				/* lr      */	\
+				CPU_PUSH_WORD((stack), 0);				/* ip	   */	\
+				CPU_PUSH_WORD((stack), 0);				/* r3      */	\
+				CPU_PUSH_WORD((stack), 0);				/* r2      */	\
+				CPU_PUSH_WORD((stack), 0);				/* r1      */	\
+				CPU_PUSH_WORD((stack), 0);				/* r0      */	\
+				CPU_PUSH_WORD((stack), 0xfffffffd);		/* lr_exc  */	\
 				/* Push a clean set of CPU registers for asm_switch_context() */ \
 				for (i = 0; i < CPU_SAVED_REGS_CNT; i++) \
 					CPU_PUSH_WORD(stack, CPU_REG_INIT_VALUE(i)); \
@@ -251,7 +246,9 @@
 			CPU_PUSH_WORD((sp), 0);                  /* CR -> 4(SP) */ \
 		} while (0)
 
-#else
+#endif
+
+#ifndef CPU_PUSH_CALL_FRAME
 	#define CPU_PUSH_CALL_FRAME(sp, func) \
 		CPU_PUSH_WORD((sp), (cpu_stack_t)(func))
 #endif
