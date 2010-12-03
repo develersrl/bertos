@@ -164,7 +164,7 @@
 #elif CPU_CM3
 
 	#if CONFIG_KERN_PREEMPT
-		INLINE void asm_switch_context(cpu_stack_t **new_sp, cpu_stack_t **old_sp)
+		INLINE void cm3_preempt_switch_context(cpu_stack_t **new_sp, cpu_stack_t **old_sp)
 		{
 			register cpu_stack_t **__new_sp asm ("r0") = new_sp;
 			register cpu_stack_t **__old_sp asm ("r1") = old_sp;
@@ -172,7 +172,7 @@
 			asm volatile ("svc #0"
 				: : "r"(__new_sp), "r"(__old_sp) : "memory", "cc");
 		}
-		#define asm_switch_context asm_switch_context
+		#define asm_switch_context cm3_preempt_switch_context
 
 		#define CPU_PUSH_CALL_FRAME(sp, func) \
 			do { \
