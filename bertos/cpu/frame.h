@@ -193,12 +193,6 @@
 				CPU_PUSH_WORD(stack, IRQ_PRIO_DISABLED); \
 			} while (0)
 
-	#else /* !CONFIG_KERN_PREEMPT */
-		#define CPU_PUSH_CALL_FRAME(sp, func) \
-			do { \
-				CPU_PUSH_WORD((sp), 0x01000000);		/* xPSR    */	\
-				CPU_PUSH_WORD((sp), (cpu_stack_t)(func));	/* pc      */	\
-			} while (0);
 	#endif /* CONFIG_KERN_PREEMPT */
 
 #elif CPU_AVR
