@@ -223,6 +223,12 @@ int kfile_genericClose(struct KFile *fd);
 /**
  * Read \a size bytes from file \a fd into \a buf.
  *
+ * This function reads at most the number of requested bytes into the
+ * provided buffer.
+ * The value returned may be less than the requested bytes in case EOF is
+ * reached OR an error occurred. You need to check the error conditions
+ * using kfile_error() to understand which case happened.
+ *
  * \note This function will block if there are less than \a size bytes
  *       to read.
  *
