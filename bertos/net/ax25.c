@@ -210,8 +210,9 @@ static void ax25_sendCall(AX25Ctx *ctx, const AX25Call *addr, bool last)
 		for (unsigned i = 0; i < sizeof(addr->call) - len; i++)
 			ax25_putchar(ctx, ' ' << 1);
 
+	/* Bits6:5 should be set to 1 for all SSIDs (0x60) */
 	/* The bit0 of last call SSID should be set to 1 */
-	uint8_t ssid = addr->ssid << 1 | (last ? 0x01 : 0);
+	uint8_t ssid = 0x60 | (addr->ssid << 1) | (last ? 0x01 : 0);
 	ax25_putchar(ctx, ssid);
 }
 
