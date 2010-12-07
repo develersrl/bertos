@@ -106,6 +106,11 @@ typedef struct AX25Call
  */
 #define AX25_MAX_RPT 8
 
+/*
+ * Has to be lesser than 8 in order to fit in one byte
+ * change AX25Msg.rpt_flags if you need more repeaters.
+ */
+STATIC_ASSERT(AX25_MAX_RPT <= 8);
 
 /**
  * AX25 Message.
@@ -118,12 +123,15 @@ typedef struct AX25Msg
 	#if CONFIG_AX25_RPT_LST
 	AX25Call rpt_lst[AX25_MAX_RPT]; ///< List of repeaters
 	uint8_t rpt_cnt; ///< Number of repeaters in this message
+	uint8_t rpt_flags; ///< Has-been-repeated flags for each repeater (bit-mapped)
+	#define AX25_REPEATED(msg, idx) ((msg)->rpt_flags & BV(idx))
 	#endif
 	uint16_t ctrl; ///< AX25 control field
 	uint8_t pid;   ///< AX25 PID field
 	const uint8_t *info; ///< Pointer to the info field (payload) of the message
 	size_t len;    ///< Payload length
 } AX25Msg;
+
 
 #define AX25_CTRL_UI      0x03
 #define AX25_PID_NOLAYER3 0xF0

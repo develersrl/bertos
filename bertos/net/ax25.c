@@ -50,6 +50,17 @@
 #include <string.h> //memset, memcmp
 #include <ctype.h>  //isalnum, toupper
 
+#if CONFIG_AX25_RPT_LST
+	#define AX25_SET_REPEATED(msg, idx, val) \
+		do \
+		{ \
+			if (val) \
+				(msg)->rpt_flags |= BV(idx) ; \
+			else \
+				(msg)->rpt_flags &= ~BV(idx) ; \
+		} while(0) 
+#endif
+
 #define DECODE_CALL(buf, addr) \
 	for (unsigned i = 0; i < sizeof((addr)); i++) \
 	{ \
@@ -76,7 +87,12 @@ static void ax25_decode(AX25Ctx *ctx)
 		{
 			DECODE_CALL(buf, msg.rpt_lst[msg.rpt_cnt].call);
 			msg.rpt_lst[msg.rpt_cnt].ssid = (*buf >> 1) & 0x0F;
-			LOG_INFO("RPT%d[%.6s-%d]\n", msg.rpt_cnt, msg.rpt_lst[msg.rpt_cnt].call, msg.rpt_lst[msg.rpt_cnt].ssid);
+			AX25_SET_REPEATED(&msg, msg.rpt_cnt, (*buf & 0x80));
+
+			LOG_INFO("RPT%d[%.6s-%d]%c\n", msg.rpt_cnt, 
+				msg.rpt_lst[msg.rpt_cnt].call, 
+				msg.rpt_lst[msg.rpt_cnt].ssid,
+				(AX25_REPEATED(&msg, msg.rpt_cnt) ? '*' : ' '));
 		}
 	#else
 		while (!(*buf++ & 0x01))
@@ -210,6 +226,7 @@ static void ax25_sendCall(AX25Ctx *ctx, const AX25Call *addr, bool last)
 		for (unsigned i = 0; i < sizeof(addr->call) - len; i++)
 			ax25_putchar(ctx, ' ' << 1);
 
+	/* The bit7 "has-been-repeated" flag is not implemented here */
 	/* Bits6:5 should be set to 1 for all SSIDs (0x60) */
 	/* The bit0 of last call SSID should be set to 1 */
 	uint8_t ssid = 0x60 | (addr->ssid << 1) | (last ? 0x01 : 0);
@@ -282,7 +299,10 @@ void ax25_print(KFile *ch, const AX25Msg *msg)
 	{
 		kfile_putc(',', ch);
 		print_call(ch, &msg->rpt_lst[i]);
-		// TODO: add * to the trasmitting digi
+		/* Print a '*' if packet has already been transmitted 
+		 * by this repeater */
+		if (AX25_REPEATED(msg, i))
+			kfile_putc('*', ch);
 	}
 	#endif
 
