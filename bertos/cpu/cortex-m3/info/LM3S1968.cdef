@@ -65,4 +65,4 @@ CPU_DESC += [ "256 Kbytes on-chip flash memory",
 
 # GCC flags for this cpu.
 MK_CPU_CPPFLAGS += " -D__ARM_LM3S1968__"
-MK_CPU_LDFLAGS += " -T " + SCRIPT_DIR + "lm3s1968_rom.ld"
+MK_CPU_LDFLAGS += " -Wl,-dT " + SCRIPT_DIR + "lm3s1968_rom.ld"
