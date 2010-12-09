@@ -30,6 +30,10 @@
  * Copyright 2001, 2008 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
+ * \defgroup fifobuf FIFO buffer
+ * \ingroup struct
+ * \{
+ *
  * \brief General pourpose FIFO buffer implemented with a ring buffer
  *
  * \li \c begin points to the first buffer element;
@@ -353,5 +357,7 @@ void fifo_pushblock(FIFOBuffer *fb, unsigned char *block, size_t len)
 	}
 }
 #endif
+
+/** \} */ /* defgroup fifobuf */
 
 #endif /* STRUCT_FIFO_H */

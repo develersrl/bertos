@@ -101,3 +101,7 @@ int main()
  * \defgroup gui BeRTOS GUI toolkit
  *
  */
+
+/*!
+ * \defgroup struct Embedded optimized general purpose data types
+ */
