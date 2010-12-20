@@ -175,20 +175,11 @@ $(1)_OBJ    := $$($(1)_COBJ) $$($(1)_CXXOBJ) $$($(1)_PCOBJ) $$($(1)_AOBJ) $$($(1
 $(1)_SRC    := $$($(1)_CSRC) $$($(1)_CXXSRC) $$($(1)_PCSRC) $$($(1)_ASRC) $$($(1)_CPPASRC)
 OBJ         += $$($(1)_OBJ)
 
-# Sometimes $(CC) is actually set to a C++ compiler in disguise, and it
-# would whine if we passed it C-only flags.  Checking for the presence of
-# "++" in the name is a kludge that seems to work mostly.
-ifeq (++,$$(findstring ++,$$($(1)_CC)))
-        $(1)_REAL_CFLAGS = $$(CXXFLAGS)
-else
-	$(1)_REAL_CFLAGS = $$(CFLAGS)
-endif
-
 # Compile: instructions to create assembler and/or object files from C source
 $$($(1)_COBJ) : $$(OBJDIR)/$(1)/%.o : %.c
 	$L "$(1): Compiling $$< (C)"
 	@$$(MKDIR_P) $$(dir $$@)
-	$Q $$($(1)_CC) -c $$($(1)_REAL_CFLAGS) $$($(1)_CFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$($$(*F)_CFLAGS) $$< -o $$@
+	$Q $$($(1)_CC) -c $$(CFLAGS) $$($(1)_CFLAGS) $$($(1)_CPPFLAGS) $$(CPPFLAGS) $$($$(*F)_CFLAGS) $$< -o $$@
 
 # Compile: instructions to create assembler and/or object files from C++ source
 $$($(1)_CXXOBJ) : $$(OBJDIR)/$(1)/%.o : %.cpp

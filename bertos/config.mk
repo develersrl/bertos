@@ -82,12 +82,14 @@ WARNFLAGS = \
 C_WARNFLAGS = \
 	-Wmissing-prototypes -Wstrict-prototypes
 
+C_COMPILER_STD = -std=gnu99
+
 # Default C preprocessor flags (for C, C++ and cpp+as)
 CPPFLAGS = $(INCDIR)
 
 # Default C compiler flags
 CFLAGS = $(OPTCFLAGS) $(DEBUGCFLAGS) $(WARNFLAGS) $(C_WARNFLAGS) \
-	$(DEP_FLAGS) $(LIST_FLAGS) -std=gnu99
+	$(DEP_FLAGS) $(LIST_FLAGS) $(C_COMPILER_STD)
 
 # Default C++ compiler flags
 CXXFLAGS = $(OPTCFLAGS) $(DEBUGCFLAGS) $(WARNFLAGS) \
