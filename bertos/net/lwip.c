@@ -34,6 +34,11 @@
  * \author Andrea Righi	<arighi@develer.com>
  */
 
+/*
+ * Required by arm-2010.09-51-arm-none-eabi toolchain
+ */
+#define __LINUX_ERRNO_EXTENSIONS__
+
 /* XXX: exclude all the lwIP stuff from the BeRTOS documentation for now  */
 #ifndef __doxygen__
 /* Ensure that the lwIP compile-time options are included first. */
