@@ -48,7 +48,7 @@
 	storage name; \
 	INLINE void name##_init(void (*init_func)(type*)) \
 	{ \
-		int i; \
+		size_t i; \
 		LIST_INIT(&name); \
 		for (i=0;i<countof(name##_items);++i) \
 		{ \
@@ -66,7 +66,7 @@
 	DECLARE_POOL_WITH_STORAGE(name, type, num, static List)
 
 #define pool_init(name, init_func)     (*(name##_init))(init_func)
-#define pool_alloc(name)               REMHEAD(name)
+#define pool_alloc(name)               list_remHead(name)
 #define pool_free(name, elem)          ADDHEAD(name, (Node*)elem)
 #define pool_empty(name)               ISLISTEMPTY(name)
 
