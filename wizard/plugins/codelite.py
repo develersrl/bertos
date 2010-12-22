@@ -83,7 +83,7 @@ def findSources(path):
         path += os.sep
     file_dict = {}
     # also follow all symlinks under POSIX OSes
-    if os.name == 'posix':
+    if os.name == 'posix' and sys.version_info >= (2, 6):
         file_list = os.walk(path, followlinks=True)
     else:
         file_list = os.walk(path)
