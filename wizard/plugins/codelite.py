@@ -32,7 +32,7 @@
 # Author: Lorenzo Berni <duplo@develer.com>
 #
 
-import os
+import os, sys
 
 import const
 
