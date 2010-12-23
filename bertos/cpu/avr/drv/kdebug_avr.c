@@ -73,7 +73,7 @@
 	#endif
 
 	#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281 || CPU_AVR_ATMEGA1280 \
-	    || CPU_AVR_ATMEGA168 || CPU_AVR_ATMEGA328P
+	    || CPU_AVR_ATMEGA168 || CPU_AVR_ATMEGA328P || CPU_AVR_ATMEGA2560
 		#define UCR UCSR0B
 		#define UDR UDR0
 		#define USR UCSR0A
@@ -330,7 +330,7 @@ INLINE void kdbg_hw_init(void)
 				#error CONFIG_KDEBUG_PORT must be either 0 or 1
 			#endif
 
-		#elif CPU_AVR_ATMEGA1280
+		#elif CPU_AVR_ATMEGA1280 || CPU_AVR_ATMEGA2560
 			#if CONFIG_KDEBUG_PORT == 0
 				UBRR0H = (uint8_t)(period>>8);
 				UBRR0L = (uint8_t)period;

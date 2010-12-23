@@ -384,7 +384,7 @@ void i2c_hw_init(I2c *i2c, int dev, uint32_t clock)
 		 * probably due to some unwanted interaction between the
 		 * port pin and the TWI lines.
 		 */
-	#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281 || CPU_AVR_ATMEGA1280
+	#if CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281 || CPU_AVR_ATMEGA1280 || CPU_AVR_ATMEGA2560
 		PORTD |= BV(PD0) | BV(PD1);
 		DDRD  |= BV(PD0) | BV(PD1);
 	#elif CPU_AVR_ATMEGA8

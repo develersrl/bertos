@@ -86,7 +86,7 @@ typedef uint8_t serstatus_t;
  */
 enum
 {
-#if  CPU_AVR_ATMEGA1280
+#if  CPU_AVR_ATMEGA1280 || CPU_AVR_ATMEGA2560
 	SER_UART0,
 	SER_UART1,
 	SER_UART2,

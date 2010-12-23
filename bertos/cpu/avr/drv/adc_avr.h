@@ -39,7 +39,7 @@
 
 #include <cfg/compiler.h>
 
-#if CPU_AVR_ATMEGA1280
+#if CPU_AVR_ATMEGA1280 || CPU_AVR_ATMEGA2560
 	/* 16 channels aivailable */
 	#define ADC_MUX_MAXCH 15
 #else
