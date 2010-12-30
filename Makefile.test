@@ -39,6 +39,6 @@ include ./boards/stm32-p103/examples/usbmouse/usbmouse.mk
 include ./boards/stm32-p103/examples/usbkeyboard/usbkeyboard.mk
 include ./boards/ek-lm3s1968/examples/gps/gps.mk
 include ./boards/at91sam7x-ek/examples/sd_fat/sd_fat.mk
-include ./boards/at91sam7x-ek/examples/tcp_server/tcp_server.mk
+#include ./boards/at91sam7x-ek/examples/tcp_server/tcp_server.mk
 
 include bertos/rules.mk
