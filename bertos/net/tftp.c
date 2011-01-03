@@ -33,6 +33,8 @@
  * \brief TFTP protocol implementation
  *
  * \author Luca Ottaviano <lottaviano@develer.com>
+ *
+ * notest:all
  */
 
 #include "tftp.h"
