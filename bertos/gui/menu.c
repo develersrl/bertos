@@ -269,10 +269,7 @@ static void menu_layout(
 		/* Only print visible items */
 		if (!(item->flags & MIF_HIDDEN))
 		{
-			/* Check if a special render function is supplied, otherwise use defaults */
-			#if (ARCH & ARCH_NIGHTTEST)
-				#warning __FILTER_NEXT_WARNING__
-			#endif
+			#warning __FILTER_NEXT_WARNING__
 			RenderHook renderhook = (item->flags & MIF_RENDERHOOK) ? (RenderHook)item->label : menu_defaultRenderHook;
 
 			/* Render menuitem */

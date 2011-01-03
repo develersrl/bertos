@@ -295,7 +295,7 @@ int nmeap_tokenize(nmeap_context_t *context)
  */
 int nmeap_process(nmeap_context_t *context)
 {
-    int id;
+    int id = 0;
     int i;
     nmeap_sentence_t *s;
 
