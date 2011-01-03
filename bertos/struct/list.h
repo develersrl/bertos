@@ -30,7 +30,48 @@
  * Copyright 2001, 2008 Bernie Innocenti <bernie@codewiz.org>
  * -->
  *
+ * \defgroup list General purpose lists
+ * \ingroup struct
+ * \{
+ *
  * \brief General pourpose double-linked lists
+ *
+ * Lists contain nodes. You can put any custom struct into any list as long
+ * as it has a Node struct inside it. If you make the Node struct the first
+ * member of your data type, you can simply cast it to (Node *) when passing
+ * it to list functions.
+ *
+ * Lists must be initialized before use with LIST_INIT(). You can then add
+ * objects using ADDHEAD() and ADDTAIL() macros, and remove them with
+ * list_remHead() and list_remTail().
+ *
+ * You can create lists with priorities by using PriNode instead of Node as
+ * the base member struct.
+ * Use LIST_ENQUEUE() and LIST_ENQUEUE_HEAD() to insert a priority node into
+ * a list.
+ *
+ * To iterate over a list, use the macros FOREACH_NODE() and REVERSE_FOREACH_NODE()
+ * in this way:
+ * \code
+ * struct Foo
+ * {
+ *     Node n;
+ *     int a;
+ * }
+ *
+ * int main()
+ * {
+ *        List foo_list;
+ *        static Foo foo1, foo2;
+ *        Foo *fp;
+ *
+ *        LIST_INIT(&foo_list);
+ *        ADDHEAD(&foo_list, (Node *)&foo1);
+ *        INSERT_BEFORE(&foo_list, (Node *)&foo2);
+ *        FOREACH_NODE(fp, &foo_list)
+ *            fp->a = 10;
+ * }
+ * \endcode
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
@@ -348,5 +389,7 @@ INLINE Node *list_remTail(List *l)
 	INVALIDATE_NODE(n);
 	return n;
 }
+
+/** \} */ //defgroup list
 
 #endif /* STRUCT_LIST_H */
