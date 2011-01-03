@@ -30,6 +30,10 @@
  *
  * -->
  *
+ * \defgroup debug Debugging facilities and macros
+ * \ingroup core
+ * \{
+ *
  * \brief Simple debug facilities for hosted and embedded C/C++ applications.
  *
  * Debug output goes to stderr in hosted applications.
@@ -160,7 +164,13 @@
 	#endif /* !CPU_HARVARD */
 
 	#if !CONFIG_KDEBUG_ASSERT_NO_TEXT
+		/**
+		 * Assert a pre-condition on code.
+		 */
 		#define ASSERT(x)         ((void)(LIKELY(x) ? 0 : __bassert(#x, THIS_FILE, __LINE__)))
+		/**
+		 * Assert a pre-condition and give explanation message when assert fails
+		 */
 		#define ASSERT2(x, help)  ((void)(LIKELY(x) ? 0 : __bassert(help " (" #x ")", THIS_FILE, __LINE__)))
 	#else
 		#define ASSERT(x)         ((void)(LIKELY(x) ? 0 : __bassert("", THIS_FILE, __LINE__)))
@@ -323,5 +333,7 @@
 	#endif
 
 #endif /* _DEBUG */
+
+/** \} */ // defgroup debug
 
 #endif /* BERTOS_DEBUG_H */
