@@ -68,6 +68,6 @@
 #define pool_init(name, init_func)     (*(name##_init))(init_func)
 #define pool_alloc(name)               list_remHead(name)
 #define pool_free(name, elem)          ADDHEAD(name, (Node*)elem)
-#define pool_empty(name)               ISLISTEMPTY(name)
+#define pool_empty(name)               LIST_EMPTY(name)
 
 #endif /* STRUCT_POOL_H */
