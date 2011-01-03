@@ -7,8 +7,8 @@ default: all
 
 include bertos/config.mk
 
-#include ./examples/test/avrtest.mk
-#include ./examples/test/armtest.mk
+include ./examples/test/avrtest.mk
+include ./examples/test/armtest.mk
 
 #include ./boards/arduino/examples/arduino_aprs/arduino_aprs.mk
 #include ./boards/arduino/benchmark/arduino_context_switch/arduino_context_switch.mk
