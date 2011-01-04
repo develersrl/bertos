@@ -532,9 +532,7 @@ iptr_t menu_handle(const struct Menu *menu)
 
 	/* Store currently selected item before leaving. */
 	if (menu->flags & MF_SAVESEL)
-		#if (ARCH & ARCH_NIGHTTEST)
-			#warning __FILTER_NEXT_WARNING__
-		#endif
+		#warning __FILTER_NEXT_WARNING__
 		CONST_CAST(struct Menu *, menu)->selected = selected;
 
 	return result;
