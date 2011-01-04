@@ -19,6 +19,9 @@ It has a modular structure: its components can be used in very different
 environments, from 8-bit processor to Linux and Win32 hosted application
 (for debug purpose), using a wide range of compilers.
 
+Have a look at \ref short_introduction page for a quick overview of
+the BeRTOS system.
+
 \section history History and Motivation
 
 BeRTOS was born as a extremely modular, highly optimized and fine-tuned
@@ -36,6 +39,8 @@ To achieve the highest possible reusability, most BeRTOS components are
 designed for fine-grained modularity and minimal external dependencies.
 Most non-essential features can be configured out for applications with small
 memory footprint requirements.
+
+The basic design principles are explained in the \ref oop page.
 
 \section features Features
 
