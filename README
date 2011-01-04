@@ -1,0 +1,14 @@
+This is the source code of BeRTOS operating system.
+
+You can generate the documentation using doxygen with the file Doxyfile-offline:
+$ doxygen Doxyfile-offline
+
+You can read the latest documentation online at the following address:
+http://dev.bertos.org/doxygen
+
+Tutorials can be found here:
+http://www.bertos.org/use/tutorial-front-page
+
+The support forum is located at forum.bertos.org.
+
+Have fun with BeRTOS!
