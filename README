@@ -2,6 +2,8 @@ This is the source code of BeRTOS operating system.
 
 You can generate the documentation using doxygen with the file Doxyfile-offline:
 $ doxygen Doxyfile-offline
+You can read the generated documentation by opening the file
+doc/offline-reference/html/index.html
 
 You can read the latest documentation online at the following address:
 http://dev.bertos.org/doxygen
