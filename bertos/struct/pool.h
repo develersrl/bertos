@@ -59,6 +59,16 @@
 	INLINE void name##_init(void (*init_func)(type*)) \
 	/**/
 
+/**
+ * \brief Helper macro to declare a Pool data type.
+ *
+ * Data type inserted into the pool must be a \code Node * \endcode
+ * type.
+ *
+ * \param name Variable name of the pool.
+ * \param type Data type held by the pool.
+ * \param num Number of elements in pool.
+ */
 #define DECLARE_POOL(name, type, num) \
 	DECLARE_POOL_WITH_STORAGE(name, type, num, List)
 
@@ -66,8 +76,38 @@
 	DECLARE_POOL_WITH_STORAGE(name, type, num, static List)
 
 #define pool_init(name, init_func)     (*(name##_init))(init_func)
+
+/**
+ * \brief Allocate an element from the pool.
+ *
+ * The returned element is of type \code Node * \endcode, it's safe to
+ * cast it to the type contained in the pool.
+ *
+ * \note If the element was recycled with pool_free(), it will not be reset,
+ * so don't assume that the element has specific values.
+ *
+ * \param name Pointer to pool to alloc from.
+ * \return Element of the type present in the pool.
+ */
 #define pool_alloc(name)               list_remHead(name)
+
+/**
+ * \brief Recycle an element into the pool
+ *
+ * \note Element fields are not reset to its original values, keep that in
+ * mind when you alloc nodes.
+ *
+ * \param name Pointer to pool where the node should be recycled.
+ * \param elem Element to be recycled.
+ */
 #define pool_free(name, elem)          ADDHEAD(name, (Node*)elem)
+
+/**
+ * \brief Test if the pool is empty
+ *
+ * \param name Pointer to pool.
+ * \return True if the pool is empty, false otherwise.
+ */
 #define pool_empty(name)               LIST_EMPTY(name)
 
 #endif /* STRUCT_POOL_H */
