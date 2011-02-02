@@ -246,6 +246,16 @@ int kfile_gets(struct KFile *fd, char *buf, int size);
 int kfile_gets_echo(struct KFile *fd, char *buf, int size, bool echo);
 
 /**
+ * Copy \a size bytes from file \a src to \a dst.
+ * 
+ * \param src Source KFile.
+ * \param dst Destionation KFile.
+ * \param size number of bytes to copy.
+ * \return the number of bytes copied.
+ */
+kfile_off_t kfile_copy(KFile *src, KFile *dst, kfile_off_t size);
+
+/**
  * Write \a size bytes from buffer \a buf into KFile \a fd.
  *
  * Return value may be less than \a size.

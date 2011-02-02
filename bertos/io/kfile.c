@@ -167,6 +167,29 @@ int kfile_gets_echo(struct KFile *fd, char *buf, int size, bool echo)
 #endif /* !CONFIG_KFILE_GETS */
 
 
+kfile_off_t kfile_copy(KFile *src, KFile *dst, kfile_off_t size)
+{
+	char buf[32];
+	kfile_off_t cp_len = 0;
+
+	while (size)
+	{
+		size_t len = MIN(sizeof(buf), (size_t)size);
+		if (kfile_read(src, buf, len) != len)
+			break;
+			
+		size_t wr_len = kfile_write(dst, buf, len);
+		cp_len += wr_len;
+		size -= len;
+		
+		if (wr_len != len)
+			break;
+	}
+		
+	return cp_len;
+}
+
+
 /**
  * Move \a fd file seek position of \a offset bytes from \a whence.
  *
