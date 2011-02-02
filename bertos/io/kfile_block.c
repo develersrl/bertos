@@ -62,6 +62,8 @@ INLINE KFileBlock * KFILEBLOCK_CAST(KFile *fd)
 	while (size) \
 	{ \
 		block_idx_t id = (fd)->seek_pos / fb->blk->blk_size; \
+		if (id >= fb->blk->blk_cnt) \
+			break; \
 		size_t offset = (fd)->seek_pos % fb->blk->blk_size; \
 		size_t count = MIN(size, (size_t)(fb->blk->blk_size - offset)); \
 		size_t ret_len = kblock_##dir(fb->blk, id, buf, offset, count); \
