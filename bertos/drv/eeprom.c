@@ -181,9 +181,8 @@ static size_t eeprom_write(KBlock *blk, block_idx_t idx, const void *buf, size_t
 
 	STATIC_ASSERT(countof(addr_buf) <= sizeof(e2addr_t));
 
-
 	/* clamp size to memory limit (otherwise may roll back) */
-	ASSERT(idx <= blk->blk_cnt);
+	ASSERT(idx < blk->priv.blk_start + blk->blk_cnt);
 	size = MIN(size, blk->blk_size - offset);
 
 	if (mem_info[eep->type].has_dev_addr)
@@ -230,7 +229,7 @@ static size_t eeprom_readDirect(struct KBlock *_blk, block_idx_t idx, void *_buf
 	STATIC_ASSERT(countof(addr_buf) <= sizeof(e2addr_t));
 
 	/* clamp size to memory limit (otherwise may roll back) */
-	ASSERT(idx <= blk->blk.blk_cnt);
+	ASSERT(idx < blk->blk.priv.blk_start + blk->blk.blk_cnt);
 	size = MIN(size, blk->blk.blk_size - offset);
 
 	e2dev_addr_t dev_addr;
