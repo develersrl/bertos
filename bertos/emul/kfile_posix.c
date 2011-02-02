@@ -41,13 +41,18 @@
 static size_t kfile_posix_read(struct KFile *_fd, void *buf, size_t size)
 {
 	KFilePosix *fd = KFILEPOSIX_CAST(_fd);
-	return fread(buf, sizeof(uint8_t), size, fd->fp);
+	size_t len = fread(buf, sizeof(uint8_t), size, fd->fp);
+	fd->fd.seek_pos += len;
+	return len;
 }
 
 static size_t kfile_posix_write(struct KFile *_fd, const void *buf, size_t size)
 {
 	KFilePosix *fd = KFILEPOSIX_CAST(_fd);
-	return fwrite(buf, sizeof(uint8_t), size, fd->fp);
+	size_t len = fwrite(buf, sizeof(uint8_t), size, fd->fp);
+	fd->fd.seek_pos += len;
+	fd->fd.size = MAX(fd->fd.size, fd->fd.seek_pos);
+	return len;
 }
 
 static kfile_off_t kfile_posix_seek(struct KFile *_fd, kfile_off_t offset, KSeekMode whence)
@@ -73,7 +78,8 @@ static kfile_off_t kfile_posix_seek(struct KFile *_fd, kfile_off_t offset, KSeek
 	if (err)
 		return err;
 
-	return ftell(fd->fp);
+	fd->fd.seek_pos = ftell(fd->fp);
+	return fd->fd.seek_pos;
 }
 
 static int kfile_posix_close(struct KFile *_fd)
@@ -99,5 +105,8 @@ FILE *kfile_posix_init(KFilePosix *file, const char *filename, const char *mode)
 	file->fd.flush = kfile_posix_flush;
 
 	file->fp = fopen(filename, mode);
+	fseek(file->fp, 0, SEEK_END);
+	file->fd.size = ftell(file->fp);
+	fseek(file->fp, 0, SEEK_SET);
 	return file->fp;
 }
