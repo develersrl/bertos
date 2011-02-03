@@ -153,8 +153,11 @@ int kblock_trim(struct KBlock *b, block_idx_t start, block_idx_t count)
 {
 	ASSERT(start + count <= b->blk_cnt);
 
-	if (!kblock_loadPage(b, start))
-		return EOF;
+	if (kblock_buffered(b))
+	{
+		if (!kblock_loadPage(b, start))
+			return EOF;
+	}
 
 	b->priv.blk_start += start;
 	b->priv.curr_blk = 0; // adjust logical address
