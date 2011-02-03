@@ -286,15 +286,10 @@ void timer_busyWait(hptime_t delay)
 	hptime_t now, prev = timer_hw_hpread();
 	hptime_t delta;
 
-	for(;;)
+	for (;;)
 	{
 		now = timer_hw_hpread();
-		/*
-		 * We rely on hptime_t being unsigned here to
-		 * reduce the modulo to an AND in the common
-		 * case of TIMER_HW_CNT.
-		 */
-		delta = (now - prev) % TIMER_HW_CNT;
+		delta = (now < prev) ? (TIMER_HW_CNT - prev + now) : (now - prev);
 		if (delta >= delay)
 			break;
 		delay -= delta;
