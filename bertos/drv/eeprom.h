@@ -36,6 +36,7 @@
  * \author Bernie Innocenti <bernie@codewiz.org>
  *
  * $WIZ$ module_name = "eeprom"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_eeprom.h"
  * $WIZ$ module_depends = "kfile", "kfile_block", "kblock", "i2c"
  */
 
