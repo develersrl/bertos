@@ -293,7 +293,7 @@ static uint8_t i2c_bitbang_getc(struct I2c *i2c)
 	return data;
 }
 
-static void i2c_bitbang_putc(struct I2c *i2c, uint8_t _data)
+INLINE void i2c_bitbang_putcStop(struct I2c *i2c, uint8_t _data, bool stop)
 {
 	/* Add ACK bit */
 	uint16_t data = (_data << 1) | 1;
@@ -342,10 +342,15 @@ static void i2c_bitbang_putc(struct I2c *i2c, uint8_t _data)
 		i2c->errors |= I2C_NO_ACK;
 
 	/* Generate stop condition (if requested) */
-	if (((i2c->xfer_size == 1) && (i2c->flags & I2C_STOP)) || i2c->errors)
+	if (stop || i2c->errors)
 		i2c_bitbang_stop_1(i2c);
 }
 
+static void i2c_bitbang_putc(struct I2c *i2c, uint8_t data)
+{
+	i2c_bitbang_putcStop(i2c, data,
+		(i2c->xfer_size == 1) && (i2c->flags & I2C_STOP));
+}
 
 static void i2c_bitbang_start_2(struct I2c *i2c, uint16_t slave_addr)
 {
@@ -358,12 +363,12 @@ static void i2c_bitbang_start_2(struct I2c *i2c, uint16_t slave_addr)
 	 * Loop on the select write sequence: when the device is busy
 	 * writing previously sent data it will reply to the SLA_W
 	 * control byte with a NACK.  In this case, we must
-	 * keep trying until the deveice responds with an ACK.
+	 * keep trying until the device responds with an ACK.
 	 */
 	ticks_t start = timer_clock();
 	while (i2c_bitbang_start_1(i2c))
 	{
-		i2c_bitbang_putc(i2c, slave_addr);
+		i2c_bitbang_putcStop(i2c, slave_addr, false);
 
 		if (!(i2c->errors & I2C_NO_ACK))
 			return;
