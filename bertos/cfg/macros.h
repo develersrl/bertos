@@ -192,8 +192,7 @@
 
 /**
  * Perform an integer division rounding the result to the upper int value.
- * \note \a divisor should preferibly be a costant, otherwise this macro generates
- * 2 division. Also divisor is evaluated twice.
+ * \note \a divisor is evaluated twice.
  */
 #define DIV_ROUNDUP(dividend, divisor)  (((dividend) + (divisor) - 1) / (divisor))
 
