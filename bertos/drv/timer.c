@@ -289,7 +289,27 @@ void timer_busyWait(hptime_t delay)
 	for (;;)
 	{
 		now = timer_hw_hpread();
-		delta = (now < prev) ? (TIMER_HW_CNT - prev + now) : (now - prev);
+		/*
+		 * The timer counter may wrap here and "prev" can become
+		 * greater than "now". So, be sure to always evaluate a
+		 * coherent timer difference:
+		 *
+		 * 0     prev            now   TIMER_HW_CNT
+		 * |_____|_______________|_____|
+		 *        ^^^^^^^^^^^^^^^
+		 * delta = now - prev
+		 *
+		 * 0     now             prev  TIMER_HW_CNT
+		 * |_____|_______________|_____|
+		 *  ^^^^^                 ^^^^^
+		 * delta = (TIMER_HW_CNT - prev) + now
+		 *
+		 * NOTE: TIMER_HW_CNT can be any value, not necessarily a power
+		 * of 2. For this reason the "%" operator is not suitable for
+		 * the generic case.
+		 */
+		delta = (now < prev) ? ((hptime_t)TIMER_HW_CNT - prev + now) :
+						(now - prev);
 		if (delta >= delay)
 			break;
 		delay -= delta;
