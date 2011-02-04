@@ -240,6 +240,14 @@
 #define RCC_APB2_SPI1              (0x00001000)
 #define RCC_APB2_USART1            (0x00004000)
 #define RCC_APB2_ALL               (0x00005E7D)
+
+/**
+ * RCC register:  BCDR
+ */
+#define RCC_BDCR_LSEON             (0x00000001)
+#define RCC_BDCR_LSERDY            (0x00000002)
+#define RCC_BDCR_RTCSEL            (0x00000300)
+#define RCC_BDCR_RTCEN             (0x00008000)
 /*\}*/
 
 /* Crystal frequency of the main oscillator (8MHz) */
