@@ -118,6 +118,9 @@ void rtc_setTime(uint32_t val)
 /* Initialize the RTC clock */
 int rtc_init(void)
 {
+#if CONFIG_KERN
+	MOD_CHECK(proc);
+#endif
 	/* Enable clock for Power interface */
 	RCC->APB1ENR |= RCC_APB1_PWR;
 
