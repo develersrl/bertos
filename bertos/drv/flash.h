@@ -45,10 +45,10 @@
 * Example usage:
 * \code
 * Flash fls;
-* flash_init(&fls.blk, 0);
+* flash_init(&fls, 0);
 * // enable access only on desired blocks
 * // start block = 50, num blocks = 20
-* kblock_trim(&fls, 50, 20);
+* kblock_trim(&fls.blk, 50, 20);
 * // ...
 * // now write to the flash
 * // block number is automatically converted
