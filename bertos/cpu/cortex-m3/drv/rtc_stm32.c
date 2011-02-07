@@ -38,6 +38,7 @@
 #include "clock_stm32.h"
 
 #include <cfg/compiler.h>
+#include <cfg/module.h>
 #include <cfg/debug.h>
 
 #include <io/stm32.h>
