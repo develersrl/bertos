@@ -117,7 +117,7 @@ static const UsbEndpointDesc USB_CtrlEpDescr1 =
 static UsbCtrlRequest setup_packet;
 
 /* USB device controller: max supported interfaces */
-#define USB_MAX_INTERFACE	1
+#define USB_MAX_INTERFACE	CONFIG_USB_INTERFACE_MAX
 
 /* USB device controller features */
 #define STM32_UDC_FEATURE_SELFPOWERED	BV(0)
