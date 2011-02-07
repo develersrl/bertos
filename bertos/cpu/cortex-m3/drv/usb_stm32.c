@@ -814,22 +814,27 @@ static int usb_ep_configure(const UsbEndpointDesc *epd, bool enable)
 		switch (ep_hw->type)
 		{
 		case USB_ENDPOINT_XFER_CONTROL:
-			LOG_INFO("EP%d: CONTROL IN\n", EP >> 1);
+			LOG_INFO("EP%d: CONTROL %s\n", EP >> 1,
+					EP & 1 ? "IN" : "OUT");
 			ep_ctrl_set_ep_type(hw, EP_CTRL);
 			ep_ctrl_set_ep_kind(hw, 0);
 			break;
 		case USB_ENDPOINT_XFER_INT:
-			LOG_INFO("EP%d: INTERRUPT IN\n", EP >> 1);
+			LOG_INFO("EP%d: INTERRUPT %s\n", EP >> 1,
+					EP & 1 ? "IN" : "OUT");
 			ep_ctrl_set_ep_type(hw, EP_INTERRUPT);
 			ep_ctrl_set_ep_kind(hw, 0);
 			break;
 		case USB_ENDPOINT_XFER_BULK:
-			LOG_INFO("EP%d: BULK IN\n", EP >> 1);
+			LOG_INFO("EP%d: BULK %s\n", EP >> 1,
+					EP & 1 ? "IN" : "OUT");
 			ep_ctrl_set_ep_type(hw, EP_BULK);
 			ep_ctrl_set_ep_kind(hw, 0);
 			break;
 		case USB_ENDPOINT_XFER_ISOC:
-			LOG_ERR("EP%d: ISOCHRONOUS IN: not supported\n", EP >> 1);
+			LOG_ERR("EP%d: ISOCHRONOUS %s: not supported\n",
+					EP >> 1,
+					EP & 1 ? "IN" : "OUT");
 			/* Fallback to default */
 		default:
 			ASSERT(0);
