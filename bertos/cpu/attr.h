@@ -190,6 +190,11 @@
 	#define PAUSE       asm volatile ("wfi" ::: "memory")
 	#define BREAKPOINT  /* asm("bkpt 0") DOES NOT WORK */
 
+	/*
+	 * Function attribute to move it into ram memory.
+	 */
+	#define RAM_FUNC __attribute__((section(".data")))
+
 #elif CPU_PPC
 
 	#define CPU_REG_BITS           (CPU_PPC32 ? 32 : 64)
