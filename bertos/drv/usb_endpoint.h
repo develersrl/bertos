@@ -74,6 +74,6 @@ enum {
  * special endpoint 0. In conclusion, the number of endpoints must be always
  * greater than the number of interfaces.
  */
-STATIC_ASSERT(USB_EP_MAX > CONFIG_USB_INTERFACE_MAX);
+STATIC_ASSERT(USB_EP_MAX >= CONFIG_USB_INTERFACE_MAX);
 
 #endif /* USB_ENDPOINT_H */
