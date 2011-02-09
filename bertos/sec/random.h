@@ -33,18 +33,21 @@
  * \brief High-level random number generation functions.
  * \author Giovanni Bajo <rasky@develer.com>
  *
+ * $WIZ$ module_name = "random"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_random.h"
+ * $WIZ$ module_supports = "stm32 or lm3s"
  */
 
 #ifndef SEC_RANDOM_H
 #define SEC_RANDOM_H
 
+#include "cfg/cfg_random.h"
 #include <cfg/compiler.h>
 
-#define RANDOM_SECURITY_MINIMUM        0
-#define RANDOM_SECURITY_MEDIUM         1
-#define RANDOM_SECURITY_STRONG         2
-
 /**
+ * \name Security level definition
+ *
+ *
  * Configure the security level required by the application.
  *
  * Application developers are suggested to keep the strongest
@@ -74,9 +77,14 @@
  *     random numbers. Even if the generator is still secure on
  *     paper, its seeding will not be safe (though still entropic
  *     to allow different sequences to be generated after each reset).
+ *
+ * $WIZ$ random_level = "RANDOM_SECURITY_MINIMUM", "RANDOM_SECURITY_MEDIUM", "RANDOM_SECURITY_STRONG"
+ * \{
  */
-#define RANDOM_SECURITY_LEVEL          RANDOM_SECURITY_STRONG
-
+#define RANDOM_SECURITY_MINIMUM        0
+#define RANDOM_SECURITY_MEDIUM         1
+#define RANDOM_SECURITY_STRONG         2
+/** \} */
 
 void random_init(void);
 

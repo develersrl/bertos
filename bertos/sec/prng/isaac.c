@@ -48,6 +48,7 @@ MODIFIED:
 
 #include "isaac.h"
 #include <sec/prng.h>
+#include <sec/util.h>
 #include <cfg/compiler.h>
 #include <cfg/macros.h>
 #include <string.h>
