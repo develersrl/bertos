@@ -35,6 +35,7 @@
  *
  * $WIZ$ module_name = "random"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_random.h"
+ * $WIZ$ module_depends = "isaac", "cipher", "sha1", "yarrow", "yarrow_pool", "x917", "aes"
  * $WIZ$ module_supports = "stm32 or lm3s"
  */
 
