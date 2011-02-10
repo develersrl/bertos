@@ -74,7 +74,7 @@ enum
  * \param pins mask of pins that we want set or clear
  * \param val true to set selected pins of false to clear they.
  */
-INLINE void stm32_gpioPinWrite(struct stm32_gpio *base, uint32_t pins, bool val)
+INLINE void stm32_gpioPinWrite(struct stm32_gpio *base, uint16_t pins, bool val)
 {
 	if (val)
 		base->BSRR |= pins;
@@ -88,7 +88,7 @@ INLINE void stm32_gpioPinWrite(struct stm32_gpio *base, uint32_t pins, bool val)
  * \param base gpio register address
  * \param pins mask of pins that we want read
  */
-INLINE uint8_t stm32_gpioPinRead(struct stm32_gpio *base, uint32_t pins)
+INLINE uint16_t stm32_gpioPinRead(struct stm32_gpio *base, uint16_t pins)
 {
 	return (base->IDR & pins);
 }
