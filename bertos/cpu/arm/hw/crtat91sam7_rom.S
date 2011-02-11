@@ -73,18 +73,18 @@
 #include "cfg/cfg_arch.h"
 
 
-#if CPU_FREQ != 48023000L
+#if CPU_FREQ != 48054857L
 	/* Avoid errors on nightly test */
 	#if !defined(ARCH_NIGHTTEST) || !(ARCH & ARCH_NIGHTTEST)
-		#warning Clock registers set for 48.023MHz operation, revise following code if you want a different clock.
+		#warning Clock registers set for 48.055MHz operation, revise following code if you want a different clock.
 	#endif
 #endif
 
 
 #if CPU_ARM_SAM7S_LARGE || CPU_ARM_SAM7X
 	/*
-	 * With a 18.420MHz cristal, master clock is:
-	 * (((18.420 * PLL_MUL_VAL + 1) / PLL_DIV_VAL) / AT91MCK_PRES) = 48.023MHz
+	 * With a 18.432MHz cristal, master clock is:
+	 * (((18.432 * (PLL_MUL_VAL + 1)) / PLL_DIV_VAL) / AT91MCK_PRES) = 48.055MHz
 	 */
 	#define PLL_MUL_VAL  72  /**< Real multiplier value is PLL_MUL_VAL + 1! */
 	#define PLL_DIV_VAL  14

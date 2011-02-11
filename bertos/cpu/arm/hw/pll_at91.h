@@ -141,7 +141,7 @@
 int main(int argc, char *argv[])
 {
     int32_t m, d, k;
-    PLL_CALC(18420000, 48023000, &m, &d, &k);
+    PLL_CALC(18432000, 48054857, &m, &d, &k);
 
     if (__builtin_constant_p(m) && __builtin_constant_p(k) && __builtin_constant_p(d))
         printf("SUCCESS -- compile time evaluation\n");

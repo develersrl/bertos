@@ -61,7 +61,7 @@ MK_PROGRAMMER_CPU = "at91sam7"
 MK_CPU = CORE_CPU
 
 # CPU default clock frequency
-CPU_DEFAULT_FREQ = "48023000UL"
+CPU_DEFAULT_FREQ = "48054857UL"
 
 # Special CPU related tags.
 CPU_TAGS = ["at91", CORE_CPU, TOOLCHAIN]
