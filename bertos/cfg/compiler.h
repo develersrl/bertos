@@ -603,4 +603,11 @@ typedef unsigned char sigmask_t; /**< Type for signal masks. */
 			do { (void)(&(var) == (type *)0); } while(0)
 #endif
 
+/**
+ * Prevent the compiler from optimizing access to the variable \a x, enforcing
+ * a refetch from memory. This also forbid from reordering successing instances
+ * of ACCESS_SAFE().
+ */
+#define ACCESS_SAFE(x) (*(volatile typeof(x) *)&(x))
+
 #endif /* BERTOS_COMPILER_H */

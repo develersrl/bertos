@@ -188,15 +188,6 @@ INLINE Event event_createSignal(struct Process *proc, sigbit_t bit)
 
 #endif
 
-/**
- * Prevent the compiler from optimizing access to the variable \a x, enforcing
- * a refetch from memory. This also forbid from reordering successing instances
- * of ACCESS_SAFE().
- *
- * TODO: move this to cfg/compiler.h
- */
-#define ACCESS_SAFE(x) (*(volatile typeof(x) *)&(x))
-
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 /** Initialize the generic sleepable event \a e */
 #define event_initGeneric(e) \
