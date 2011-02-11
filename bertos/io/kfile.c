@@ -177,15 +177,15 @@ kfile_off_t kfile_copy(KFile *src, KFile *dst, kfile_off_t size)
 		size_t len = MIN(sizeof(buf), (size_t)size);
 		if (kfile_read(src, buf, len) != len)
 			break;
-			
+
 		size_t wr_len = kfile_write(dst, buf, len);
 		cp_len += wr_len;
 		size -= len;
-		
+
 		if (wr_len != len)
 			break;
 	}
-		
+
 	return cp_len;
 }
 

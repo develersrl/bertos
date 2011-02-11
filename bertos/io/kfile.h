@@ -247,7 +247,7 @@ int kfile_gets_echo(struct KFile *fd, char *buf, int size, bool echo);
 
 /**
  * Copy \a size bytes from file \a src to \a dst.
- * 
+ *
  * \param src Source KFile.
  * \param dst Destionation KFile.
  * \param size number of bytes to copy.
