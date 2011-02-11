@@ -1495,11 +1495,8 @@ static void usb_get_descriptor_handler(void)
 	if ((setup_packet.mRequestType & USB_RECIP_MASK) ==
 			USB_RECIP_DEVICE)
 		usb_get_descriptor();
-	/* Getting descriptor for a device is a standard request */
-	else if ((setup_packet.mRequestType & USB_DIR_MASK) == USB_DIR_IN)
-		usb_event_handler(usb_dev);
 	else
-		ep_cnfg[CTRL_ENP_OUT].status = STALLED;
+		usb_event_handler(usb_dev);
 }
 
 /* USB setup packet: SET_ADDRESS handler */
