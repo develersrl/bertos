@@ -75,4 +75,11 @@
  */
 #define CONFIG_USB_EP_MAX  0
 
+/**
+ * Maximum packet size of the control endpoint 0 [bytes].
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 8
+ */
+#define CONFIG_EP0_MAX_SIZE 8
+
 #endif /* CFG_USB_H */

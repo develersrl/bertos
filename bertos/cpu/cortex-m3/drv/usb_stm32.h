@@ -50,7 +50,7 @@
 #define USB_DP_PIN	(1 << 12)
 #define USB_DISC_PIN	(1 << 11)
 
-#define USB_EP0_MAX_SIZE	8
+#define USB_EP0_MAX_SIZE	CONFIG_EP0_MAX_SIZE
 #define USB_XFER_MAX_SIZE	64
 
 #define EP_MAX_SLOTS	USB_EP_MAX
