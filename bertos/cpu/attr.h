@@ -215,7 +215,7 @@
 	#define CPU_REG_BITS            16
 	#define CPU_REGS_CNT            FIXME
 	#define CPU_BYTE_ORDER          CPU_BIG_ENDIAN
-	#define CPU_HARVARD		1
+	#define CPU_HARVARD             1
 
 	/* Memory is word-addessed in the DSP56K */
 	#define CPU_BITS_PER_CHAR  16
@@ -259,7 +259,7 @@
 	#define CPU_HARVARD		        0
 
 	/// Valid pointers should be >= than this value (used for debug)
-	#define CPU_RAM_START     	    0x200
+	#define CPU_RAM_START           0x200
 
 	#define NOP                     __asm__ __volatile__ ("nop")
 
