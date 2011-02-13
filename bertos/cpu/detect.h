@@ -231,6 +231,7 @@
 		#define CPU_CM3_SAM3U   0
 		#define CPU_CM3_SAM3N2  0
 		#define CPU_CM3_SAM3N1  0
+		#define CPU_CM3_SAM3X   0
 	#else
 		#define CPU_CM3_SAM3N4  0
 	#endif
@@ -243,6 +244,7 @@
 
 		#define CPU_CM3_SAM3N   0
 		#define CPU_CM3_SAM3U   0
+		#define CPU_CM3_SAM3X   0
 	#else
 		#define CPU_CM3_SAM3S4  0
 	#endif
@@ -255,8 +257,22 @@
 
 		#define CPU_CM3_SAM3N   0
 		#define CPU_CM3_SAM3S   0
+		#define CPU_CM3_SAM3X   0
 	#else
 		#define CPU_CM3_SAM3U4  0
+	#endif
+
+	#if defined (__ARM_SAM3X8__)
+		#define CPU_CM3_SAM3    1
+		#define CPU_CM3_SAM3X   1
+		#define CPU_CM3_SAM3X8  1
+		#define CPU_NAME        "SAM3X8"
+
+		#define CPU_CM3_SAM3N   0
+		#define CPU_CM3_SAM3S   0
+		#define CPU_CM3_SAM3U   0
+	#else
+		#define CPU_CM3_SAM3X8  0
 	#endif
 
 	#if defined (CPU_CM3_LM3S)
@@ -272,10 +288,10 @@
 		#define CPU_CM3_LM3S        0
 		#define CPU_CM3_SAM3        0
 	#elif defined (CPU_CM3_SAM3)
-		#if CPU_CM3_SAM3N + 0 != 1
+		#if CPU_CM3_SAM3N + CPU_CM3_SAM3U + CPU_CM3_SAM3S + CPU_CM3_SAM3X + 0 != 1
 			#error SAM3 Cortex-M3 CPU configuration error
 		#endif
-		#if CPU_CM3_SAM3N4 + CPU_CM3_SAM3S4 + CPU_CM3_SAM3U4 + 0 != 1
+		#if CPU_CM3_SAM3N4 + CPU_CM3_SAM3S4 + CPU_CM3_SAM3U4 + CPU_CM3_SAM3X8 + 0 != 1
 			#error SAM3 Cortex-M3 CPU configuration error
 		#endif
 		#define CPU_CM3_LM3S        0
@@ -305,6 +321,8 @@
 	#define CPU_CM3_SAM3 0
 	#define CPU_CM3_SAM3N 0
 	#define CPU_CM3_SAM3N4 0
+	#define CPU_CM3_SAM3X 0
+	#define CPU_CM3_SAM3X8 0
 #endif
 
 #if (defined(__IAR_SYSTEMS_ICC__) || defined(__IAR_SYSTEMS_ICC)) \
