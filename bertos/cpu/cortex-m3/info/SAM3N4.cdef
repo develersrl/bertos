@@ -28,15 +28,15 @@
 # invalidate any other reasons why the executable file might be covered by
 # the GNU General Public License.
 #
-# Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+# Copyright 2010,2011 Develer S.r.l. (http://www.develer.com/)
 #
 # -->
 #
-# General CPU info denfinition for Cortex-M3-based LM3S1968 board.
+# General CPU info definitions for Cortex-M3-based Atmel SAM3N4 cpu.
 #
 # This file contain all info for the BeRTOS wizard.
 #
-# \author Andrea Righi <arighi@develer.com>
+# \author Stefano Fedrigo <aleph@develer.com>
 #
 #
 
