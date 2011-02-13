@@ -42,6 +42,7 @@
 
 
 /* Frequency of board main oscillator */
+// TODO: wizard config
 #define BOARDOSC_FREQ  12000000
 
 /* Main crystal oscillator startup time, optimal value for CPU_FREQ == 48 MHz */
@@ -80,8 +81,7 @@ INLINE uint32_t evaluate_pll(void)
 		}
 	}
 
-	// Bit 29 must always be set to 1
-	return CKGR_PLLR_DIV(best_div) | CKGR_PLLR_MUL(best_mul) | BV(29);
+	return CKGR_PLLR_DIV(best_div) | CKGR_PLLR_MUL(best_mul);
 }
 
 
@@ -92,15 +92,21 @@ void clock_init(void)
 	/* Disable watchdog */
 	WDT_MR = BV(WDT_WDDIS);
 
-	/* Set 4 wait states for flash access, needed for higher CPU clock rates */
-	EEFC_FMR = EEFC_FMR_FWS(3);
+#if CPU_CM3_SAM3X
+	/* Set wait states for flash access, needed for higher CPU clock rates */
+	EEFC0_FMR = EEFC_FMR_FWS(2);
+	EEFC1_FMR = EEFC_FMR_FWS(2);
+#else
+	EEFC0_FMR = EEFC_FMR_FWS(3);
 
+	// TODO: check if this is needed in sam3n-ek too, very slow start-up
 	// Select external slow clock
 	if (!(SUPC_SR & BV(SUPC_SR_OSCSEL)))
 	{
 		SUPC_CR = BV(SUPC_CR_XTALSEL) | SUPC_CR_KEY(0xA5);
 		while (!(SUPC_SR & BV(SUPC_SR_OSCSEL)));
 	}
+#endif
 
 	// Initialize main oscillator
 	if (!(CKGR_MOR & BV(CKGR_MOR_MOSCSEL)))
@@ -133,5 +139,11 @@ void clock_init(void)
 	while (!(PMC_SR & BV(PMC_SR_MCKRDY)) && --timeout);
 
 	/* Enable clock on PIO for inputs */
+	// TODO: move this in gpio_init() for better power management?
+#if CPU_CM3_SAM3X
+	PMC_PCER = BV(PIOA_ID) | BV(PIOB_ID) | BV(PIOC_ID)
+		| BV(PIOD_ID) | BV(PIOE_ID) | BV(PIOF_ID);
+#else
 	PMC_PCER = BV(PIOA_ID) | BV(PIOB_ID) | BV(PIOC_ID);
+#endif
 }
