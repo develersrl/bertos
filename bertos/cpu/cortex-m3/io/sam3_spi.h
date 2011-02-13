@@ -78,6 +78,9 @@
  * SPI base addresses.
  */
 #define SPI0_BASE  0x40008000
+#if CPU_CM3_SAM3X
+	#define SPI1_BASE  0x4000C000
+#endif
 
 /**
  * SPI Control Register

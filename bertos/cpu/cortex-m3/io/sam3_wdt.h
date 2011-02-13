@@ -73,7 +73,11 @@
 #define SAM3_WDT_H
 
 /** Watch Dog registers base address */
-#define WDT_BASE  0x400E1450
+#if CPU_CM3_SAM3N
+	#define WDT_BASE  0x400E1450
+#elif CPU_CM3_SAM3X
+	#define WDT_BASE  0x400E1A50
+#endif
 
 /** Watch Dog Control Register */
 /*\{*/

@@ -37,9 +37,15 @@
 #define SAM3_FLASH_H
 
 /**
- * EEFC base register address.
+ * EEFC base registers addresses.
  */
-#define EEFC_BASE  0x400E0A00
+/*\{*/
+#define EEFC0_BASE  0x400E0A00
+#ifdef CPU_CM3_SAM3X
+	#define EEFC1_BASE  0x400E0C00
+#endif
+/*\}*/
+
 
 /**
  * EFC register offsets.
@@ -55,10 +61,17 @@
  * EEFC registers.
  */
 /*\{*/
-#define EEFC_FMR  (*((reg32_t *)(EEFC_BASE + EEFC_FMR_OFF)))  ///< Flash Mode Register
-#define EEFC_FCR  (*((reg32_t *)(EEFC_BASE + EEFC_FCR_OFF)))  ///< Flash Command Register
-#define EEFC_FSR  (*((reg32_t *)(EEFC_BASE + EEFC_FSR_OFF)))  ///< Flash Status Register
-#define EEFC_FRR  (*((reg32_t *)(EEFC_BASE + EEFC_FRR_OFF)))  ///< Flash Result Register
+#define EEFC0_FMR  (*((reg32_t *)(EEFC0_BASE + EEFC_FMR_OFF)))  ///< Flash Mode Register
+#define EEFC0_FCR  (*((reg32_t *)(EEFC0_BASE + EEFC_FCR_OFF)))  ///< Flash Command Register
+#define EEFC0_FSR  (*((reg32_t *)(EEFC0_BASE + EEFC_FSR_OFF)))  ///< Flash Status Register
+#define EEFC0_FRR  (*((reg32_t *)(EEFC0_BASE + EEFC_FRR_OFF)))  ///< Flash Result Register
+
+#ifdef CPU_CM3_SAM3X
+	#define EEFC1_FMR  (*((reg32_t *)(EEFC1_BASE + EEFC_FMR_OFF)))  ///< Flash Mode Register
+	#define EEFC1_FCR  (*((reg32_t *)(EEFC1_BASE + EEFC_FCR_OFF)))  ///< Flash Command Register
+	#define EEFC1_FSR  (*((reg32_t *)(EEFC1_BASE + EEFC_FSR_OFF)))  ///< Flash Status Register
+	#define EEFC1_FRR  (*((reg32_t *)(EEFC1_BASE + EEFC_FRR_OFF)))  ///< Flash Result Register
+#endif
 /*\}*/
 
 

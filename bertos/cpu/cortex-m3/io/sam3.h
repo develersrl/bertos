@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2010,2011 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
@@ -50,7 +50,7 @@
 	#define RTT_ID       3   ///< Real Time Timer (RTT)
 	#define WDT_ID       4   ///< Watchdog Timer (WDT)
 	#define PMC_ID       5   ///< Power Management Controller (PMC)
-	#define EFC_ID       6   ///< Enhanced Flash Controller (EFC)
+	#define EEFC0_ID     6   ///< Enhanced Flash Controller
 	#define UART0_ID     8   ///< UART 0 (UART0)
 	#define UART1_ID     9   ///< UART 1 (UART1)
 	#define PIOA_ID     11   ///< Parallel I/O Controller A (PIOA)
@@ -70,6 +70,52 @@
 	#define ADC_ID      29   ///< Analog To Digital Converter (ADC)
 	#define DACC_ID     30   ///< Digital To Analog Converter (DACC)
 	#define PWM_ID      31   ///< Pulse Width Modulation (PWM)
+#elif CPU_CM3_SAM3X
+	#define SUPC_ID        0   ///< Supply Controller (SUPC)
+	#define RSTC_ID        1   ///< Reset Controller (RSTC)
+	#define RTC_ID         2   ///< Real Time Clock (RTC)
+	#define RTT_ID         3   ///< Real Time Timer (RTT)
+	#define WDT_ID         4   ///< Watchdog Timer (WDT)
+	#define PMC_ID         5   ///< Power Management Controller (PMC)
+	#define EEFC0_ID       6   ///< Enhanced Flash Controller
+	#define EEFC1_ID       7   ///< Enhanced Flash Controller
+	#define UART0_ID       8   ///< UART 0 (UART0)
+	#define SMC_SDRAMC_ID  9   ///< Satic memory controller / SDRAM controller
+	#define SDRAMC_ID     10   ///< Satic memory controller / SDRAM controller
+	#define PIOA_ID       11   ///< Parallel I/O Controller A
+	#define PIOB_ID       12   ///< Parallel I/O Controller B
+	#define PIOC_ID       13   ///< Parallel I/O Controller C
+	#define PIOD_ID       14   ///< Parallel I/O Controller D
+	#define PIOE_ID       15   ///< Parallel I/O Controller E
+	#define PIOF_ID       16   ///< Parallel I/O Controller F
+	#define US0_ID        17   ///< USART 0
+	#define US1_ID        18   ///< USART 1
+	#define US2_ID        19   ///< USART 2
+	#define US3_ID        20   ///< USART 3
+	#define HSMCI_ID      21   ///< High speed multimedia card interface
+	#define TWI0_ID       22   ///< Two Wire Interface 0
+	#define TWI1_ID       23   ///< Two Wire Interface 1
+	#define SPI0_ID       24   ///< Serial Peripheral Interface
+	#define SPI1_ID       25   ///< Serial Peripheral Interface
+	#define SSC_ID        26   ///< Synchronous serial controller
+	#define TC0_ID        27   ///< Timer/Counter 0
+	#define TC1_ID        28   ///< Timer/Counter 1
+	#define TC2_ID        29   ///< Timer/Counter 2
+	#define TC3_ID        30   ///< Timer/Counter 3
+	#define TC4_ID        31   ///< Timer/Counter 4
+	#define TC5_ID        32   ///< Timer/Counter 5
+	#define TC6_ID        33   ///< Timer/Counter 6
+	#define TC7_ID        34   ///< Timer/Counter 7
+	#define TC8_ID        35   ///< Timer/Counter 8
+	#define PWM_ID        36   ///< Pulse width modulation controller
+	#define ADC_ID        37   ///< ADC controller
+	#define DACC_ID       38   ///< DAC controller
+	#define DMAC_ID       39   ///< DMA controller
+	#define UOTGHS_ID     40   ///< USB OTG high speed
+	#define TRNG_ID       41   ///< True random number generator
+	#define EMAC_ID       42   ///< Ethernet MAC
+    #define CAN0_ID       43   ///< CAN controller 0
+    #define CAN1_ID       44   ///< CAN controller 1
 #else
 	#error Peripheral IDs undefined
 #endif
@@ -117,6 +163,9 @@
 #if CPU_CM3_SAM3U
 	#define RXD0   11
 	#define TXD0   12
+#elif CPU_CM3_SAM3X
+	#define RXD0    8
+	#define TXD0    9
 #else
 	#define RXD0    9
 	#define TXD0   10
@@ -133,6 +182,10 @@
 	#define SPI0_SPCK   15
 	#define SPI0_MOSI   14
 	#define SPI0_MISO   13
+#elif CPU_CM3_SAM3X
+	#define SPI0_SPCK   27
+	#define SPI0_MOSI   26
+	#define SPI0_MISO   25
 #else
 	#define SPI0_SPCK   14
 	#define SPI0_MOSI   13

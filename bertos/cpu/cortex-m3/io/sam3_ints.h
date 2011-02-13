@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2010,2011 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
@@ -57,39 +57,90 @@
 /*\{*/
 #define INT_PERIPH_BASE  16
 
-#define INT_SUPC    (INT_PERIPH_BASE + SUPC_ID)   ///< Supply Controller (SUPC)
-#define INT_RSTC    (INT_PERIPH_BASE + RSTC_ID)   ///< Reset Controller (RSTC)
-#define INT_RTC     (INT_PERIPH_BASE + RTC_ID)    ///< Real Time Clock (RTC)
-#define INT_RTT     (INT_PERIPH_BASE + RTT_ID)    ///< Real Time Timer (RTT)
-#define INT_WDT     (INT_PERIPH_BASE + WDT_ID)    ///< Watchdog Timer (WDT)
-#define INT_PMC     (INT_PERIPH_BASE + PMC_ID)    ///< Power Management Controller (PMC)
-#define INT_EFC     (INT_PERIPH_BASE + EFC_ID)    ///< Enhanced Flash Controller (EFC)
-#define INT_UART0   (INT_PERIPH_BASE + UART0_ID)  ///< UART 0 (UART0)
-#define INT_UART1   (INT_PERIPH_BASE + UART1_ID)  ///< UART 1 (UART1)
-#define INT_PIOA    (INT_PERIPH_BASE + PIOA_ID)   ///< Parallel I/O Controller A (PIOA)
-#define INT_PIOB    (INT_PERIPH_BASE + PIOB_ID)   ///< Parallel I/O Controller B (PIOB)
-#define INT_PIOC    (INT_PERIPH_BASE + PIOC_ID)   ///< Parallel I/O Controller C (PIOC)
-#define INT_US0     (INT_PERIPH_BASE + US0_ID)    ///< USART 0 (USART0)
-#define INT_US1     (INT_PERIPH_BASE + US1_ID)    ///< USART 1 (USART1)
-#define INT_TWI0    (INT_PERIPH_BASE + TWI0_ID)   ///< Two Wire Interface 0 (TWI0)
-#define INT_TWI1    (INT_PERIPH_BASE + TWI1_ID)   ///< Two Wire Interface 1 (TWI1)
-#define INT_SPI0    (INT_PERIPH_BASE + SPI0_ID)   ///< Serial Peripheral Interface (SPI)
-#define INT_TC0     (INT_PERIPH_BASE + TC0_ID)    ///< Timer/Counter 0 (TC0)
-#define INT_TC1     (INT_PERIPH_BASE + TC1_ID)    ///< Timer/Counter 1 (TC1)
-#define INT_TC2     (INT_PERIPH_BASE + TC2_ID)    ///< Timer/Counter 2 (TC2)
-#define INT_TC3     (INT_PERIPH_BASE + TC3_ID)    ///< Timer/Counter 3 (TC3)
-#define INT_TC4     (INT_PERIPH_BASE + TC4_ID)    ///< Timer/Counter 4 (TC4)
-#define INT_TC5     (INT_PERIPH_BASE + TC5_ID)    ///< Timer/Counter 5 (TC5)
-#define INT_ADC     (INT_PERIPH_BASE + ADC_ID)    ///< Analog To Digital Converter (ADC)
-#define INT_DACC    (INT_PERIPH_BASE + DACC_ID)   ///< Digital To Analog Converter (DACC)
-#define INT_PWM     (INT_PERIPH_BASE + PWM_ID)    ///< Pulse Width Modulation (PWM)
-/*\}*/
+#if CPU_CM3_SAM3N
+	#define INT_SUPC        (INT_PERIPH_BASE + SUPC_ID)
+	#define INT_RSTC        (INT_PERIPH_BASE + RSTC_ID)
+	#define INT_RTC         (INT_PERIPH_BASE + RTC_ID)
+	#define INT_RTT         (INT_PERIPH_BASE + RTT_ID)
+	#define INT_WDT         (INT_PERIPH_BASE + WDT_ID)
+	#define INT_PMC         (INT_PERIPH_BASE + PMC_ID)
+	#define INT_EFC         (INT_PERIPH_BASE + EFC_ID)
+	#define INT_UART0       (INT_PERIPH_BASE + UART0_ID)
+	#define INT_UART1       (INT_PERIPH_BASE + UART1_ID)
+	#define INT_PIOA        (INT_PERIPH_BASE + PIOA_ID)
+	#define INT_PIOB        (INT_PERIPH_BASE + PIOB_ID)
+	#define INT_PIOC        (INT_PERIPH_BASE + PIOC_ID)
+	#define INT_US0         (INT_PERIPH_BASE + US0_ID)
+	#define INT_US1         (INT_PERIPH_BASE + US1_ID)
+	#define INT_TWI0        (INT_PERIPH_BASE + TWI0_ID)
+	#define INT_TWI1        (INT_PERIPH_BASE + TWI1_ID)
+	#define INT_SPI0        (INT_PERIPH_BASE + SPI0_ID)
+	#define INT_TC0         (INT_PERIPH_BASE + TC0_ID)
+	#define INT_TC1         (INT_PERIPH_BASE + TC1_ID)
+	#define INT_TC2         (INT_PERIPH_BASE + TC2_ID)
+	#define INT_TC3         (INT_PERIPH_BASE + TC3_ID)
+	#define INT_TC4         (INT_PERIPH_BASE + TC4_ID)
+	#define INT_TC5         (INT_PERIPH_BASE + TC5_ID)
+	#define INT_ADC         (INT_PERIPH_BASE + ADC_ID)
+	#define INT_DACC        (INT_PERIPH_BASE + DACC_ID)
+	#define INT_PWM         (INT_PERIPH_BASE + PWM_ID)
 
-/**
- * Total number of interrupts.
- */
-/*\{*/
-#define NUM_INTERRUPTS  48
+	// Total number of interrupts.
+	#define NUM_INTERRUPTS  48
+
+#elif CPU_CM3_SAM3X
+	#define INT_SUPC        (INT_PERIPH_BASE + SUPC_ID)
+	#define INT_RSTC        (INT_PERIPH_BASE + RSTC_ID)
+	#define INT_RTC         (INT_PERIPH_BASE + RTC_ID)
+	#define INT_RTT         (INT_PERIPH_BASE + RTT_ID)
+	#define INT_WDT         (INT_PERIPH_BASE + WDT_ID)
+	#define INT_PMC         (INT_PERIPH_BASE + PMC_ID)
+	#define INT_EEFC0       (INT_PERIPH_BASE + EEFC0_ID)
+	#define INT_EEFC1       (INT_PERIPH_BASE + EEFC1_ID)
+	#define INT_UART0       (INT_PERIPH_BASE + UART0_ID)
+	#define INT_SMC_SDRAMC  (INT_PERIPH_BASE + SMC_SDRAMC_ID)
+	#define INT_SDRAMC      (INT_PERIPH_BASE + SDRAMC_ID)
+	#define INT_PIOA        (INT_PERIPH_BASE + PIOA_ID)
+	#define INT_PIOB        (INT_PERIPH_BASE + PIOB_ID)
+	#define INT_PIOC        (INT_PERIPH_BASE + PIOC_ID)
+	#define INT_PIOD        (INT_PERIPH_BASE + PIOD_ID)
+	#define INT_PIOE        (INT_PERIPH_BASE + PIOE_ID)
+	#define INT_PIOF        (INT_PERIPH_BASE + PIOF_ID)
+	#define INT_US0         (INT_PERIPH_BASE + US0_ID)
+	#define INT_US1         (INT_PERIPH_BASE + US1_ID)
+	#define INT_US2         (INT_PERIPH_BASE + US2_ID)
+	#define INT_US3         (INT_PERIPH_BASE + US3_ID)
+	#define INT_HSMCI       (INT_PERIPH_BASE + HSMCI_ID)
+	#define INT_TWI0        (INT_PERIPH_BASE + TWI0_ID)
+	#define INT_TWI1        (INT_PERIPH_BASE + TWI1_ID)
+	#define INT_SPI0        (INT_PERIPH_BASE + SPI0_ID)
+	#define INT_SPI1        (INT_PERIPH_BASE + SPI1_ID)
+	#define INT_SSC         (INT_PERIPH_BASE + SSC_ID)
+	#define INT_TC0         (INT_PERIPH_BASE + TC0_ID)
+	#define INT_TC1         (INT_PERIPH_BASE + TC1_ID)
+	#define INT_TC2         (INT_PERIPH_BASE + TC2_ID)
+	#define INT_TC3         (INT_PERIPH_BASE + TC3_ID)
+	#define INT_TC4         (INT_PERIPH_BASE + TC4_ID)
+	#define INT_TC5         (INT_PERIPH_BASE + TC5_ID)
+	#define INT_TC6         (INT_PERIPH_BASE + TC6_ID)
+	#define INT_TC7         (INT_PERIPH_BASE + TC7_ID)
+	#define INT_TC8         (INT_PERIPH_BASE + TC8_ID)
+	#define INT_PWM         (INT_PERIPH_BASE + PWM_ID)
+	#define INT_ADC         (INT_PERIPH_BASE + ADC_ID)
+	#define INT_DACC        (INT_PERIPH_BASE + DACC_ID)
+	#define INT_DMAC        (INT_PERIPH_BASE + DMAC_ID)
+	#define INT_UOTGHS      (INT_PERIPH_BASE + UOTGHS_ID)
+	#define INT_TRNG        (INT_PERIPH_BASE + TRNG_ID)
+	#define INT_EMAC        (INT_PERIPH_BASE + EMAC_ID)
+	#define INT_CAN0        (INT_PERIPH_BASE + CAN0_ID)
+	#define INT_CAN1        (INT_PERIPH_BASE + CAN1_ID)
+
+	// Total number of interrupts.
+	#define NUM_INTERRUPTS  61
+
+#else
+	#error Peripheral IDs undefined
+#endif
 /*\}*/
 
 #endif /* SAM3_INTS_H */

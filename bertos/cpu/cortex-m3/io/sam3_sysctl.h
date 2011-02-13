@@ -37,7 +37,11 @@
 #define SAM3_SYSCTL_H
 
 /** Supply controller base */
-#define SUPC_BASE  0x400E1410
+#if CPU_CM3_SAM3X
+	#define SUPC_BASE  0x400E1A10
+#else
+	#define SUPC_BASE  0x400E1410
+#endif
 
 /**
  * Supply controller offsets.

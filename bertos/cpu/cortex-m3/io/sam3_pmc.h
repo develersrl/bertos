@@ -37,7 +37,11 @@
 #define SAM3_PMC_H
 
 /** PMC registers base. */
-#define PMC_BASE  0x400E0400
+#if CPU_CM3_SAM3X
+	#define PMC_BASE  0x400E0600
+#else
+	#define PMC_BASE  0x400E0400
+#endif
 
 /**
  * PMC register offsets.

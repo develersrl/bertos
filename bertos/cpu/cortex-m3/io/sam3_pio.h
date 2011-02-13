@@ -79,6 +79,12 @@
 #define PIOA_BASE  0x400E0E00
 #define PIOB_BASE  0x400E1000
 #define PIOC_BASE  0x400E1200
+
+#if CPU_CM3_SAM3X
+	#define PIOD_BASE  0x400E1400
+	#define PIOE_BASE  0x400E1600
+	#define PIOF_BASE  0x400E1800
+#endif
 /*\}*/
 
 /** PIO Register Offsets */

@@ -40,9 +40,13 @@
  * UART registers base addresses.
  */
 /*\{*/
-#define UART0_BASE  0x400E0600
-#ifndef CPU_CM3_SAM3U
+#if CPU_CM3_SAM3N
+	#define UART0_BASE  0x400E0600
+#elif CPU_CM3_SAM3U
+	#define UART0_BASE  0x400E0600
 	#define UART1_BASE  0x400E0800
+#elif CPU_CM3_SAM3X
+	#define UART0_BASE  0x400E0800
 #endif
 /*\}*/
 
