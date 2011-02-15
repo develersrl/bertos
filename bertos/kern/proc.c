@@ -323,8 +323,9 @@ struct Process *proc_new_with_name(UNUSED_ARG(const char *, name), void (*entry)
 #else // CONFIG_KERN_HEAP
 
 	/* Stack must have been provided by the user */
-	ASSERT_VALID_PTR(stack_base);
-	ASSERT(stack_size);
+	ASSERT2(IS_VALID_PTR(stack_base), "Invalid stack pointer. Did you forget to \
+		enable CONFIG_KERN_HEAP?");
+	ASSERT2(stack_size, "Stack size cannot be 0.");
 
 #endif // CONFIG_KERN_HEAP
 

@@ -177,6 +177,7 @@
 		#define ASSERT2(x, help)  ((void)ASSERT(x))
 	#endif
 
+	#define IS_VALID_PTR(p) (LIKELY((void *)(p) >= (void *)CPU_RAM_START))
 	/**
 	 * Check that the given pointer is either NULL or pointing to valid memory.
 	 *
@@ -186,8 +187,8 @@
 	 *
 	 * \see ASSERT_VALID_PTR_OR_NULL()
 	 */
-	#define ASSERT_VALID_PTR(p) ((void)(LIKELY((void *)(p) >= (void *)CPU_RAM_START) \
-		? 0 : __invalid_ptr(p, #p, THIS_FILE, __LINE__)))
+	#define ASSERT_VALID_PTR(p) (IS_VALID_PTR(p) \
+		? 0 : __invalid_ptr(p, #p, THIS_FILE, __LINE__))
 
 	/**
 	 * Check that the given pointer is not pointing to invalid memory.
@@ -293,6 +294,7 @@
 		#define ASSERT(x)  ((void)0)
 	#endif /* ASSERT */
 	#define ASSERT2(x, help)             ((void)0)
+	#define IS_VALID_PTR(p)              (1)
 	#define ASSERT_VALID_PTR(p)          ((void)0)
 	#define ASSERT_VALID_PTR_OR_NULL(p)  ((void)0)
 	#define ASSERT_VALID_OBJ(_t, _o)     ((void)0)
