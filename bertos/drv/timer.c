@@ -252,7 +252,7 @@ void timer_delayTicks(ticks_t delay)
 
 #if CONFIG_KERN_SIGNALS
 	Timer t;
-
+	DB(t.magic = TIMER_MAGIC_INACTIVE;)
 	if (proc_preemptAllowed())
 	{
 		ASSERT(!sig_check(SIG_SINGLE));
