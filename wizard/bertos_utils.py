@@ -340,11 +340,16 @@ def replaceSeparators(path):
 
 def getSystemPath():
     path = os.environ["PATH"]
-    if os.name == "nt":
-        path = path.split(";")
-    else:
-        path = path.split(":")
+    path = path.split(os.pathsep)
     return path
+
+def findInPath(file, path=None):
+    if path is None:
+        path = os.environ.get('PATH', '')
+    if type(path) is type(''):
+        path = path.split(os.pathsep)
+    return filter(os.path.exists, map(lambda dir, file=file: os.path.join(dir, file), path))
+
 
 def findToolchains(path_list):
     toolchains = []

@@ -150,7 +150,7 @@ class BProject(object):
         toolchain = toolchain
         if forced_toolchain:
             toolchain = forced_toolchain
-        if os.path.exists(toolchain["path"]):
+        if os.path.exists(toolchain["path"]) or bertos_utils.findInPath(toolchain["path"]):
             self.infos["TOOLCHAIN"] = toolchain
         else:
             raise ToolchainException(self)
