@@ -57,7 +57,7 @@ typedef uint32_t ub4;
 typedef uint16_t ub2;
 typedef uint8_t ub1;
 
-#define ind(mm,x)  (*(ub4 *)((ub1 *)(mm) + ((x) & ((CONFIG_ISAAC_RANDSIZ-1)<<2))))
+#define ind(mm,x)  (*(ub4 *)((size_t)(mm) + ((x) & ((CONFIG_ISAAC_RANDSIZ-1)<<2))))
 #define rngstep(mix,a,b,mm,m,m2,r,x) \
 { \
   x = *m;  \
