@@ -72,6 +72,9 @@ SECTIONS
 		. = ALIGN (0x400);
 		PROVIDE (__data_start = .);
 		*(vtable)
+		. = ALIGN (4);
+		*(.ramfunc)
+		. = ALIGN (4);
 		*(.data .data.*)
 		. = ALIGN (4);
 		_edata = .;

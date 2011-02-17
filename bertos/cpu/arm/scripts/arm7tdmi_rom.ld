@@ -82,6 +82,9 @@ SECTIONS
 	.data : AT (_etext)
 	{
 		PROVIDE (__data_start = .);
+		. = ALIGN (4);
+		*(.ramfunc)
+		. = ALIGN (4);
 		*(.data .data.*)
 		. = ALIGN (4);
 		_edata = .;

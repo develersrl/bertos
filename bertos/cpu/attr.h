@@ -144,7 +144,7 @@
 			 * to get them transparently copied to SRAM for zero-wait-state
 			 * operation.
 			 */
-			#define FAST_FUNC __attribute__((section(".data")))
+			#define FAST_FUNC __attribute__((section(".ramfunc")))
 
 			/**
 			 * Data attribute to move constant data to fast memory storage.
@@ -161,7 +161,7 @@
 		/*
 		 * Function attribute to move it into ram memory.
 		 */
-		#define RAM_FUNC __attribute__((section(".data")))
+		#define RAM_FUNC __attribute__((section(".ramfunc")))
 
 	#endif /* !__IAR_SYSTEMS_ICC_ */
 #elif CPU_CM3
@@ -193,7 +193,7 @@
 	/*
 	 * Function attribute to move it into ram memory.
 	 */
-	#define RAM_FUNC __attribute__((section(".data")))
+	#define RAM_FUNC __attribute__((section(".ramfunc")))
 
 #elif CPU_PPC
 
