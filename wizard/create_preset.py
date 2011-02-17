@@ -149,6 +149,8 @@ hw_path  = os.path.relpath(hw_path, bertos_path)
 # Src path and hw path relatively to the BeRTOS Makefile.
 s["PROJECT_SRC_PATH_FROM_MAKEFILE"] = src_path
 s["PROJECT_HW_PATH_FROM_MAKEFILE"] = hw_path
+toolchain = s["TOOLCHAIN"]["path"]
+s["TOOLCHAIN"]["path"] = os.path.basename(toolchain)
 
 pprint.pprint(s)
 p = open(preset_dir + "/project.bertos", "w")
