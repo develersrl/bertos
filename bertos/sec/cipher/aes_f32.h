@@ -440,7 +440,9 @@ static void lazy_expandKeyEnc256(uint32_t *k)
 	}
 }
 
-static const void (*lazy_expandKeyEnc[3])(uint32_t *k) =
+typedef void (*lazy_expand_handler)(uint32_t *);
+
+static const lazy_expand_handler lazy_expandKeyEnc[3] =
 {
 	lazy_expandKeyEnc128, lazy_expandKeyEnc192, lazy_expandKeyEnc256,
 };
