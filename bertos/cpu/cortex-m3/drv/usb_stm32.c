@@ -160,6 +160,9 @@ static uint8_t ep_buffer[EP_MAX_NUM][EP_BUFFER_SIZE] ALIGNED(4);
 
 static Event usb_event_done[EP_MAX_SLOTS];
 
+/* Check if we're running in atomic (non-sleepable) context or not */
+static volatile bool in_atomic = false;
+
 /* Allocate a free block of the packet memory */
 static stm32_UsbMemSlot *usb_malloc(void)
 {
@@ -1129,7 +1132,7 @@ ssize_t usb_endpointRead(int ep, void *buffer, ssize_t size)
 	ssize_t max_size = sizeof(ep_buffer[ep_num]);
 
 	/* Non-blocking read for EP0 */
-	if (ep_num == CTRL_ENP_OUT)
+	if (in_atomic && (ep_num == CTRL_ENP_OUT))
 	{
 		size = usb_size(size, usb_le16_to_cpu(setup_packet.wLength));
 		if (UNLIKELY(size > max_size))
@@ -1183,7 +1186,7 @@ ssize_t usb_endpointWrite(int ep, const void *buffer, ssize_t size)
 	ssize_t max_size = sizeof(ep_buffer[ep_num]);
 
 	/* Non-blocking write for EP0 */
-	if (ep_num == CTRL_ENP_IN)
+	if (in_atomic && (ep_num == CTRL_ENP_IN))
 	{
 		size = usb_size(size, usb_le16_to_cpu(setup_packet.wLength));
 		if (UNLIKELY(size > max_size))
@@ -1806,6 +1809,9 @@ static void usb_isr(void)
 	interrupt.status = usb->ISTR;
 	interrupt.status &= usb->CNTR | 0x1f;
 
+	/* Set the context as atomic */
+	in_atomic = true;
+
 	if (interrupt.PMAOVR)
 	{
 		LOG_WARN("%s: DMA overrun / underrun\n", __func__);
@@ -1855,6 +1861,7 @@ static void usb_isr(void)
 	{
 		usb_isr_correct_transfer(interrupt);
 	}
+	in_atomic = false;
 }
 
 /* USB: hardware initialization */
