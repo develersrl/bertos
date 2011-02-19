@@ -362,6 +362,14 @@
  */
 typedef uint32_t id_t;
 
+/**
+ * Check if a pointer is aligned to a certain power-of-2 size
+ */
+INLINE bool is_aligned(const void *addr, size_t size)
+{
+	return ((size_t)addr & (size - 1)) == 0;
+}
+
 /** \} */ //defgroup macros
 
 #endif /* MACROS_H */

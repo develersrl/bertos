@@ -1,6 +1,7 @@
 #ifndef SEC_UTIL_H
 #define SEC_UTIL_H
 
+#include <cfg/macros.h>
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
 #include <string.h>
@@ -31,12 +32,6 @@
  */
 void password2key(const char *pwd, size_t pwd_len,
 				  uint8_t *key, size_t key_len);
-
-/* Check if a pointer is aligned to a certain power-of-2 size */
-INLINE bool __is_aligned(const void *addr, size_t size)
-{
-	return ((size_t)addr & (size - 1)) == 0;
-}
 
 INLINE void xor_block_8(uint8_t *out,
 		const uint8_t *in1, const uint8_t *in2, size_t len)
@@ -83,9 +78,9 @@ INLINE void xor_block_const_32(uint32_t *out, const uint32_t *in,
  */
 INLINE void xor_block(void *out, const void *in1, const void *in2, size_t len)
 {
-	if (__is_aligned(out, sizeof(uint32_t)) &&
-			__is_aligned(in1, sizeof(uint32_t)) &&
-			__is_aligned(in2, sizeof(uint32_t)))
+	if (is_aligned(out, sizeof(uint32_t)) &&
+			is_aligned(in1, sizeof(uint32_t)) &&
+			is_aligned(in2, sizeof(uint32_t)))
 	{
 		uint32_t *obuf = (uint32_t *)((size_t)out);
 		const uint32_t *ibuf1 = (const uint32_t *)((size_t)in1);
@@ -108,8 +103,8 @@ INLINE void xor_block(void *out, const void *in1, const void *in2, size_t len)
  */
 INLINE void xor_block_const(uint8_t *out, const uint8_t *in, uint8_t k, size_t len)
 {
-	if (__is_aligned(out, sizeof(uint32_t)) &&
-			__is_aligned(in, sizeof(uint32_t)))
+	if (is_aligned(out, sizeof(uint32_t)) &&
+			is_aligned(in, sizeof(uint32_t)))
 	{
 		uint32_t *obuf = (uint32_t *)((size_t)out);
 		const uint32_t *ibuf = (const uint32_t *)((size_t)in);
