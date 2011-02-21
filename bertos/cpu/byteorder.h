@@ -132,7 +132,7 @@ INLINE float swab_float(float x)
 	/* Avoid breaking strict aliasing rules.  */
 	char *cx = (char *)(&x);
 	STATIC_ASSERT(sizeof(float) == 4);
-	#define BYTEORDER_SWAP(a, b) ((a) ^= (b) ^= (a) ^= (b))
+	#define BYTEORDER_SWAP(a, b) do { (a) ^= (b); (b) ^= (a); (a) ^= (b); } while(0)
 	BYTEORDER_SWAP(cx[0], cx[3]);
 	BYTEORDER_SWAP(cx[1], cx[2]);
 	#undef BYTEORDER_SWAP
