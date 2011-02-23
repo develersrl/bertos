@@ -127,6 +127,16 @@
 #define USART_HAS_PDC  1
 #define SPI_HAS_PDC    1
 
+#if CPU_CM3_SAM3X || CPU_CM3_SAM3U
+	#define USART_PORTS    1
+	#define UART_PORTS     4
+#elif CPU_CM3_SAM3N || CPU_CM3_SAM3S
+	#define USART_PORTS    2
+	#define UART_PORTS     2
+#else
+	#error undefined U(S)ART_PORTS for this cpu
+#endif
+
 /* PDC registers */
 #define PERIPH_RPR_OFF  0x100  // Receive Pointer Register.
 #define PERIPH_RCR_OFF  0x104  // Receive Counter Register.
@@ -157,20 +167,40 @@
 #include "sam3_wdt.h"
 
 /**
- * UART I/O pins
+ * U(S)ART I/O pins
  */
 /*\{*/
 #if CPU_CM3_SAM3U
-	#define RXD0   11
-	#define TXD0   12
+	#define URXD0   11  // Port A
+	#define UTXD0   12  // Port A
+	#define RXD0    19  // Port A
+	#define TXD0    18  // Port A
+	#define RXD1    21  // Port A
+	#define TXD1    20  // Port A
+	#define RXD2    23  // Port A
+	#define TXD2    22  // Port A
+	#define RXD3    13  // Port C
+	#define TXD3    12  // Port C
 #elif CPU_CM3_SAM3X
-	#define RXD0    8
-	#define TXD0    9
-#else
-	#define RXD0    9
-	#define TXD0   10
-	#define RXD1    2
-	#define TXD1    3
+	#define URXD0    8  // Port A
+	#define UTXD0    9  // Port A
+	#define RXD0    10  // Port A
+	#define TXD0    11  // Port A
+	#define RXD1    12  // Port A
+	#define TXD1    13  // Port A
+	#define RXD2    21  // Port B
+	#define TXD2    20  // Port B
+	#define RXD3     5  // Port D
+	#define TXD3     4  // Port D
+#elif CPU_CM3_SAM3N || CPU_CM3_SAM3S
+	#define URXD0    9  // Port A
+	#define UTXD0   10  // Port A
+	#define URXD1    2  // Port B
+	#define UTXD1    3  // Port B
+	#define RXD0     5  // Port A
+	#define TXD0     6  // Port A
+	#define RXD1    21  // Port A
+	#define TXD1    22  // Port A
 #endif
 /*\}*/
 

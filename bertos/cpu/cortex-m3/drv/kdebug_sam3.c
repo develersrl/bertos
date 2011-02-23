@@ -45,12 +45,12 @@
 	#define UART_BASE       UART0_BASE
 	#define UART_ID         UART0_ID
 	#define UART_PIO_BASE   PIOA_BASE
-	#define UART_PINS       (BV(RXD0) | BV(TXD0))
-#elif (CONFIG_KDEBUG_PORT == 1) && !defined(CPU_CM3_SAM3U)
+	#define UART_PINS       (BV(URXD0) | BV(UTXD0))
+#elif (CONFIG_KDEBUG_PORT == 1) && UART_PORTS > 1
 	#define UART_BASE       UART1_BASE
 	#define UART_ID         UART1_ID
 	#define UART_PIO_BASE   PIOB_BASE
-	#define UART_PINS       (BV(RXD1) | BV(TXD1))
+	#define UART_PINS       (BV(URXD1) | BV(UTXD1))
 #else
 	#error "UART port not supported in this board"
 #endif
