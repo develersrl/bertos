@@ -49,7 +49,7 @@ enum
 {
 	SER_UART1 = 0,
 	SER_UART2,
-#if CPU_CM3_STM32F103RB
+#if CPU_CM3_STM32F103RB || CPU_CM3_STM32F103RE
 	SER_UART3,
 #endif
 	SER_CNT //< Number of serial ports

@@ -56,7 +56,7 @@
 	#define GPIO_USART1_RX_PIN	BV(10)
 	#define GPIO_USART2_TX_PIN	BV(2)
 	#define GPIO_USART2_RX_PIN	BV(3)
-#elif CPU_CM3_STM32F103RB
+#elif CPU_CM3_STM32F103RB || CPU_CM3_STM32F103RE
 	#define GPIO_USART1_TX_PIN	BV(9)
 	#define GPIO_USART1_RX_PIN	BV(10)
 	#define GPIO_USART2_TX_PIN	BV(2)
@@ -70,7 +70,7 @@
 #if CPU_CM3_STM32F101C4
 	#define GPIO_I2C1_SCL_PIN	BV(6)
 	#define GPIO_I2C1_SDA_PIN	BV(7)
-#elif CPU_CM3_STM32F103RB
+#elif CPU_CM3_STM32F103RB || CPU_CM3_STM32F103RE
 	#define GPIO_I2C1_SCL_PIN	BV(6)
 	#define GPIO_I2C1_SDA_PIN	BV(7)
 	#define GPIO_I2C2_SCL_PIN	BV(10)
@@ -79,7 +79,7 @@
 	#error No i2c pins are defined for select cpu
 #endif
 
-#if CPU_CM3_STM32F101C4 || CPU_CM3_STM32F103RB
+#if CPU_CM3_STM32F101C4 || CPU_CM3_STM32F103RB || CPU_CM3_STM32F103RE
 	#define FLASH_PAGE_SIZE   1024
 #else
 	#error No embedded definition for select cpu
