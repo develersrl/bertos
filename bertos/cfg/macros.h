@@ -196,6 +196,42 @@
  */
 #define DIV_ROUNDUP(dividend, divisor)  (((dividend) + (divisor) - 1) / (divisor))
 
+
+/**
+ * Perform a multiply between the integer \a a and the float constant \a f.
+ *
+ * This macro can be used in order to avoid floating point arithmetics
+ * in expressions like this:
+ * \code
+ * int a, b;
+ * a = b * 0.5579652750;
+ * \endcode
+ *
+ * This macro rounds the floating point constant to a fraction,
+ * usign (2 ^ prec) as the denominator.
+ * For instance, with prec = 8, the constant 0.5579652750 will be rounded to:
+ * (143 / 256) = 0.55859375
+ * So, the former code will be transformed to:
+ * \code
+ * a = b * 143 / 256;
+ * \endcode
+ *
+ * Since the denominator is a power of 2, we rely on the compiler to optimize
+ * this to a right shift.
+ * So, when you have to multiply an integer by a float constant, this macro
+ * will not use the floating point arithmentics.
+ * The operation will be converted to a mul + shift, with a huge performance boost.
+ *
+ * \note \a f MUST be a constant in order gain performance benefits.
+ *
+ * \param a integer you want to multiply
+ * \param f floating point constant which you want to multply with \a a
+ * \param prec conversion precision, ranges from 1 to the number of bits in a long.
+ *             The higher, the better the approximation of the float constant will be.
+ */
+#define INT_MULT(a, f, prec) (((a) * (long)((f) * (1 << (prec)) + 0.5)) >> (prec))
+
+
 /** Round up \a x to an even multiple of the 2's power \a pad. */
 #define ROUND_UP2(x, pad) (((x) + ((pad) - 1)) & ~((pad) - 1))
 
