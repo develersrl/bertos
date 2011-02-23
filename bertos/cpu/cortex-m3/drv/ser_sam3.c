@@ -91,6 +91,7 @@
 	#endif
 	#define SER_UART0_BUS_TXINIT do { \
 		PIOA_PDR = BV(RXD0) | BV(TXD0); \
+		PIO_PERIPH_SEL(PIOA_BASE, BV(RXD0) | BV(TXD0), PIO_PERIPH_A); \
 	} while (0)
 #endif
 
@@ -132,6 +133,7 @@
 		#endif
 		#define SER_UART1_BUS_TXINIT do { \
 			PIOA_PDR = BV(RXD1) | BV(TXD1); \
+			PIO_PERIPH_SEL(PIOA_BASE, BV(RXD1) | BV(TXD1), PIO_PERIPH_A); \
 		} while (0)
 	#endif
 
@@ -178,9 +180,8 @@
 		#define SER_SPI0_BUS_TXINIT do { \
 			/* Disable PIO on SPI pins */ \
 			PIOA_PDR = BV(SPI0_SPCK) | BV(SPI0_MOSI) | BV(SPI0_MISO); \
-			/* PIO is peripheral A */ \
-			PIOA_ABCDSR1 &= ~(BV(SPI0_SPCK) | BV(SPI0_MOSI) | BV(SPI0_MISO)); \
-			PIOA_ABCDSR2 &= ~(BV(SPI0_SPCK) | BV(SPI0_MOSI) | BV(SPI0_MISO)); \
+			/* SPI is peripheral A on SAM3X,A,N,S,U */ \
+			PIO_PERIPH_SEL(PIOA_BASE, BV(SPI0_SPCK) | BV(SPI0_MOSI) | BV(SPI0_MISO), PIO_PERIPH_A); \
 		} while (0)
 	#else
 		#define SER_SPI0_BUS_TXINIT do { \

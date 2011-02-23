@@ -72,10 +72,12 @@ typedef uint32_t kdbg_irqsave_t;
 
 INLINE void kdbg_hw_init(void)
 {
-	/* Disable PIO mode and set appropriate UART pins peripheral mode */
+	/*
+	 * Disable PIO mode and set appropriate UART pins peripheral mode.
+	 * SAM3X,A,N,S,U: all of them has all UARTs on peripheral A.
+	 */
 	HWREG(UART_PIO_BASE + PIO_PDR_OFF) = UART_PINS;
-	HWREG(UART_PIO_BASE + PIO_ABCDSR1_OFF) &= ~UART_PINS;
-	HWREG(UART_PIO_BASE + PIO_ABCDSR2_OFF) &= ~UART_PINS;
+	PIO_PERIPH_SEL(UART_PIO_BASE, UART_PINS, PIO_PERIPH_A);
 
 	/* Enable the peripheral clock */
 	PMC_PCER = BV(UART_ID);
