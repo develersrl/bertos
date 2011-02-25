@@ -171,36 +171,70 @@
  */
 /*\{*/
 #if CPU_CM3_SAM3U
-	#define URXD0   11  // Port A
-	#define UTXD0   12  // Port A
-	#define RXD0    19  // Port A
-	#define TXD0    18  // Port A
-	#define RXD1    21  // Port A
-	#define TXD1    20  // Port A
-	#define RXD2    23  // Port A
-	#define TXD2    22  // Port A
-	#define RXD3    13  // Port C
-	#define TXD3    12  // Port C
+	#define UART0_PORT   PIOA_BASE
+	#define USART0_PORT  PIOA_BASE
+	#define USART1_PORT  PIOA_BASE
+	#define USART2_PORT  PIOA_BASE
+	#define USART3_PORT  PIOC_BASE
+
+	#define UART0_PERIPH   PIO_PERIPH_A
+	#define USART0_PERIPH  PIO_PERIPH_A
+	#define USART1_PERIPH  PIO_PERIPH_A
+	#define USART2_PERIPH  PIO_PERIPH_A
+	#define USART3_PERIPH  PIO_PERIPH_B
+
+	#define URXD0   11
+	#define UTXD0   12
+	#define RXD0    19
+	#define TXD0    18
+	#define RXD1    21
+	#define TXD1    20
+	#define RXD2    23
+	#define TXD2    22
+	#define RXD3    13
+	#define TXD3    12
 #elif CPU_CM3_SAM3X
-	#define URXD0    8  // Port A
-	#define UTXD0    9  // Port A
-	#define RXD0    10  // Port A
-	#define TXD0    11  // Port A
-	#define RXD1    12  // Port A
-	#define TXD1    13  // Port A
-	#define RXD2    21  // Port B
-	#define TXD2    20  // Port B
-	#define RXD3     5  // Port D
-	#define TXD3     4  // Port D
+	#define UART0_PORT   PIOA_BASE
+	#define USART0_PORT  PIOA_BASE
+	#define USART1_PORT  PIOA_BASE
+	#define USART2_PORT  PIOB_BASE
+	#define USART3_PORT  PIOD_BASE
+
+	#define UART0_PERIPH   PIO_PERIPH_A
+	#define USART0_PERIPH  PIO_PERIPH_A
+	#define USART1_PERIPH  PIO_PERIPH_A
+	#define USART2_PERIPH  PIO_PERIPH_A
+	#define USART3_PERIPH  PIO_PERIPH_B
+
+	#define URXD0    8
+	#define UTXD0    9
+	#define RXD0    10
+	#define TXD0    11
+	#define RXD1    12
+	#define TXD1    13
+	#define RXD2    21
+	#define TXD2    20
+	#define RXD3     5
+	#define TXD3     4
 #elif CPU_CM3_SAM3N || CPU_CM3_SAM3S
-	#define URXD0    9  // Port A
-	#define UTXD0   10  // Port A
-	#define URXD1    2  // Port B
-	#define UTXD1    3  // Port B
-	#define RXD0     5  // Port A
-	#define TXD0     6  // Port A
-	#define RXD1    21  // Port A
-	#define TXD1    22  // Port A
+	#define UART0_PORT   PIOA_BASE
+	#define UART1_PORT   PIOB_BASE
+	#define USART0_PORT  PIOA_BASE
+	#define USART1_PORT  PIOA_BASE
+
+	#define UART0_PERIPH   PIO_PERIPH_A
+	#define UART1_PERIPH   PIO_PERIPH_A
+	#define USART0_PERIPH  PIO_PERIPH_A
+	#define USART1_PERIPH  PIO_PERIPH_A
+
+	#define URXD0    9
+	#define UTXD0   10
+	#define URXD1    2
+	#define UTXD1    3
+	#define RXD0     5
+	#define TXD0     6
+	#define RXD1    21
+	#define TXD1    22
 #endif
 /*\}*/
 

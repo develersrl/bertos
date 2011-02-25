@@ -91,7 +91,7 @@
 	#endif
 	#define SER_UART0_BUS_TXINIT do { \
 		PIOA_PDR = BV(RXD0) | BV(TXD0); \
-		PIO_PERIPH_SEL(PIOA_BASE, BV(RXD0) | BV(TXD0), PIO_PERIPH_A); \
+		PIO_PERIPH_SEL(PIOA_BASE, BV(RXD0) | BV(TXD0), USART0_PERIPH); \
 	} while (0)
 #endif
 
@@ -133,7 +133,7 @@
 		#endif
 		#define SER_UART1_BUS_TXINIT do { \
 			PIOA_PDR = BV(RXD1) | BV(TXD1); \
-			PIO_PERIPH_SEL(PIOA_BASE, BV(RXD1) | BV(TXD1), PIO_PERIPH_A); \
+			PIO_PERIPH_SEL(PIOA_BASE, BV(RXD1) | BV(TXD1), USART1_PERIPH); \
 		} while (0)
 	#endif
 

@@ -41,15 +41,17 @@
 #include <io/sam3.h>
 
 
-#if CONFIG_KDEBUG_PORT == 0
+#if (CONFIG_KDEBUG_PORT == 0)
 	#define UART_BASE       UART0_BASE
 	#define UART_ID         UART0_ID
-	#define UART_PIO_BASE   PIOA_BASE
+	#define UART_PIO_BASE   UART0_PORT
+	#define UART_PERIPH     UART0_PERIPH
 	#define UART_PINS       (BV(URXD0) | BV(UTXD0))
 #elif (CONFIG_KDEBUG_PORT == 1) && UART_PORTS > 1
 	#define UART_BASE       UART1_BASE
 	#define UART_ID         UART1_ID
-	#define UART_PIO_BASE   PIOB_BASE
+	#define UART_PIO_BASE   UART1_PORT
+	#define UART_PERIPH     UART1_PERIPH
 	#define UART_PINS       (BV(URXD1) | BV(UTXD1))
 #else
 	#error "UART port not supported in this board"
@@ -77,7 +79,7 @@ INLINE void kdbg_hw_init(void)
 	 * SAM3X,A,N,S,U: all of them has all UARTs on peripheral A.
 	 */
 	HWREG(UART_PIO_BASE + PIO_PDR_OFF) = UART_PINS;
-	PIO_PERIPH_SEL(UART_PIO_BASE, UART_PINS, PIO_PERIPH_A);
+	PIO_PERIPH_SEL(UART_PIO_BASE, UART_PINS, UART_PERIPH);
 
 	/* Enable the peripheral clock */
 	PMC_PCER = BV(UART_ID);
