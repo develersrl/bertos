@@ -148,15 +148,12 @@ static stm32_UsbMemSlot *mem_use;
 static stm32_UsbMemSlot memory_buffer[EP_MAX_NUM];
 
 /* Endpoint TX and RX buffers */
-/// \cond
-/* XXX: use the empty cond section to silent a buggy doxygen warning */
 static size_t rx_size, tx_size;
 
 #define EP_BUFFER_SIZE _MIN(CONFIG_USB_BUFSIZE, USB_XFER_MAX_SIZE)
 STATIC_ASSERT(!(EP_BUFFER_SIZE & 0x03));
 
 static uint8_t ep_buffer[EP_MAX_NUM][EP_BUFFER_SIZE] ALIGNED(4);
-/// \endcond
 
 static Event usb_event_done[EP_MAX_SLOTS];
 
