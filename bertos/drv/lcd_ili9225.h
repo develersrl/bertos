@@ -34,6 +34,7 @@
  *
  * $WIZ$ module_name = "lcd_ili9225"
  * $WIZ$ module_hw = "bertos/hw/hw_ili9225.h"
+ * $WIZ$ module_depends = "timer", "kfile"
  */
 
 #ifndef LCD_ILI9225_H
