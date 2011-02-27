@@ -157,6 +157,7 @@
 
 #include "sam3_sysctl.h"
 #include "sam3_pmc.h"
+#include "sam3_smc.h"
 #include "sam3_ints.h"
 #include "sam3_pio.h"
 #include "sam3_nvic.h"
