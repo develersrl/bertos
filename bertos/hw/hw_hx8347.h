@@ -51,7 +51,8 @@
  */
 INLINE void hx8347_cmd(uint8_t cmd)
 {
-    /* Implement me */
+	/* Implement me */
+	(void)cmd;
 }
 
 /**
@@ -59,7 +60,8 @@ INLINE void hx8347_cmd(uint8_t cmd)
  */
 INLINE void hx8347_write(uint16_t data)
 {
-    /* Implement me */
+	/* Implement me */
+	(void)data;
 }
 
 /**
@@ -67,7 +69,8 @@ INLINE void hx8347_write(uint16_t data)
  */
 INLINE uint16_t hx8347_read(void)
 {
-    /* Implement me */
+	/* Implement me */
+	return 0;
 }
 
 /**
