@@ -30,7 +30,7 @@
  *
  * -->
  *
- * \brief Himax HX8347 graphic driver
+ * \brief Himax HX8347 LCD controller driver
  *
  * \author Stefano Fedrigo <aleph@develer.com>
  *
