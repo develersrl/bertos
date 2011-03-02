@@ -183,15 +183,26 @@ static void bufferWrite(const uint16_t *buf, uint16_t size)
 		hx8347_write(buf[i]);
 }
 
-static void lcd_startBlit(uint16_t x, uint16_t y, uint16_t width, uint16_t height)
+static void lcd_setCursor(uint16_t x, uint16_t y)
 {
-	ASSERT((x + width) <= LCD_WIDTH);
-	ASSERT((y + height) <= LCD_HEIGHT);
-
 	regWrite(0x02, x >> 8);
 	regWrite(0x03, x & 0xff);
 	regWrite(0x06, y >> 8);
 	regWrite(0x07, y & 0xff);
+}
+
+static void lcd_setWindow(uint16_t x, uint16_t y, uint16_t width, uint16_t height)
+{
+	ASSERT(x + width <= LCD_WIDTH);
+	ASSERT(y + height <= LCD_HEIGHT);
+	ASSERT(width > 0);
+	ASSERT(height > 0);
+
+	// Window right and bottom limits are inclusive
+	width--;
+	height--;
+
+	lcd_setCursor(x, y);
 
 	regWrite(0x04, (x + width) >> 8);
 	regWrite(0x05, (x + width) & 0xff);
@@ -207,7 +218,8 @@ void lcd_hx8347_blitBitmap(const Bitmap *bm)
 	uint8_t mask;
 	int i, l, r;
 
-	lcd_startBlit(0, 0, bm->width, bm->height);
+	lcd_setWindow(0, 0, bm->width, bm->height);
+	hx8347_cmd(0x22);
 
 	for (l = 0; l < bm->height / 8; l++)
 	{
@@ -220,7 +232,6 @@ void lcd_hx8347_blitBitmap(const Bitmap *bm)
 				else
 					lcd_row[i] = 0xFFFF;
 			}
-			hx8347_cmd(0x22);
 			bufferWrite(lcd_row, bm->width);
 		}
 	}
@@ -234,11 +245,10 @@ void lcd_hx8347_blitBitmap(const Bitmap *bm)
 			else
 				lcd_row[i] = 0xFFFF;
 		}
-		hx8347_cmd(0x22);
 		bufferWrite(lcd_row, bm->width);
 	}
 }
-#if 0
+
 /*
  * Blit a 24 bit color raw raster directly on screen
  */
@@ -246,25 +256,23 @@ void lcd_hx8347_blitBitmap24(int x, int y, int width, int height, const char *bm
 {
 	int l, r;
 
-	lcd_startBlit(x, y, width, height);
+	lcd_setWindow(x, y, width, height);
+	hx8347_cmd(0x22);
 
 	for (l = 0; l < height; l++)
 	{
 		for (r = 0; r < width; r++)
 		{
 			lcd_row[r] =
-				(((uint16_t)bmp[1] << 11) & 0xE000) |
-				(((uint16_t)bmp[2] <<  5) & 0x1F00) |
-				(((uint16_t)bmp[0] <<  0) & 0x00F8) |
-				(((uint16_t)bmp[1] >>  5) & 0x0007);
+				(((uint16_t)bmp[0] << 8) & 0xF800) |
+				(((uint16_t)bmp[1] << 3) & 0x07E0) |
+				(((uint16_t)bmp[2] >> 3) & 0x001F);
 			bmp += 3;
 		}
-
-		lcd_cmd(0x22);
-		lcd_data(lcd_row, width);
+		bufferWrite(lcd_row, width);
 	}
 }
-#endif
+
 /**
  * Turn off display.
  */
