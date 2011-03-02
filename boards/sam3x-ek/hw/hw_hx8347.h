@@ -46,6 +46,7 @@
 
 #include "cfg/macros.h"
 #include <io/sam3.h>
+#include <drv/timer.h>
 
 
 /*
@@ -137,7 +138,7 @@ INLINE void hx8347_busInit(void)
 	PIO_PERIPH_SEL(LCD_RS_PORT, LCD_RS_PIN, LCD_RS_PERIPH);
 
     // Enable peripheral clock
-	PMC_PCER = SMC_SDRAMC_ID;
+	PMC_PCER = BV(SMC_SDRAMC_ID);
 
     // Static memory controller configuration
     SMC_SETUP2 =
