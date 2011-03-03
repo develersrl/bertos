@@ -459,6 +459,14 @@ typedef const void * const_iptr_t;
 typedef unsigned char sigbit_t;  /**< Type for signal bits. */
 typedef unsigned char sigmask_t; /**< Type for signal masks. */
 
+/**
+ * Signal structure
+ */
+typedef struct Signal
+{
+	sigmask_t    wait;    /**< Signals the process is waiting for */
+	sigmask_t    recv;    /**< Received signals */
+} Signal;
 
 /**
  * \name Standard type definitions.

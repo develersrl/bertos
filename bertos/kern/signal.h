@@ -51,32 +51,55 @@
 #include <cfg/compiler.h>
 #include <cfg/macros.h>    // BV()
 
-/* Fwd decl */
-struct Process;
-
-/**
- * Signal structure
- */
-typedef struct Signal
-{
-	sigmask_t    wait;    /**< Signals the process is waiting for */
-	sigmask_t    recv;    /**< Received signals */
-} Signal;
+#include <kern/proc.h>
 
 /* Inter-process Communication services */
-sigmask_t sig_check(sigmask_t sigs);
-void sig_send(struct Process *proc, sigmask_t sig);
-void sig_post(struct Process *proc, sigmask_t sig);
+sigmask_t sig_checkSignal(Signal *s, sigmask_t sigs);
+
+INLINE sigmask_t sig_check(sigmask_t sigs)
+{
+	Process *proc = proc_current();
+	return sig_checkSignal(&proc->sig, sigs);
+}
+
+void sig_sendSignal(Signal *s, struct Process *proc, sigmask_t sig);
+
+INLINE void sig_send(struct Process *proc, sigmask_t sig)
+{
+	sig_sendSignal(&proc->sig, proc, sig);
+}
+
+void sig_postSignal(Signal *s, struct Process *proc, sigmask_t sig);
+
+INLINE void sig_post(struct Process *proc, sigmask_t sig)
+{
+	sig_postSignal(&proc->sig, proc, sig);
+}
+
 /*
  * XXX: this is provided for backword compatibility, consider to make this
  * deprecated for the future.
  */
 INLINE void sig_signal(struct Process *proc, sigmask_t sig)
 {
-	sig_post(proc, sig);
+	sig_postSignal(&proc->sig, proc, sig);
 }
-sigmask_t sig_wait(sigmask_t sigs);
-sigmask_t sig_waitTimeout(sigmask_t sigs, ticks_t timeout);
+
+sigmask_t sig_waitSignal(Signal *s, sigmask_t sigs);
+
+INLINE sigmask_t sig_wait(sigmask_t sigs)
+{
+	Process *proc = proc_current();
+	return sig_waitSignal(&proc->sig, sigs);
+}
+
+sigmask_t sig_waitTimeoutSignal(Signal *s, sigmask_t sigs, ticks_t timeout);
+
+INLINE sigmask_t sig_waitTimeout(sigmask_t sigs, ticks_t timeout)
+{
+	Process *proc = proc_current();
+	return sig_waitTimeoutSignal(&proc->sig, sigs, timeout);
+}
 
 int signal_testRun(void);
 int signal_testSetup(void);

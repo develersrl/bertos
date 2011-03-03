@@ -146,14 +146,14 @@ CONFIG_DEPEND(CONFIG_KERN_SIGNALS, CONFIG_KERN);
  *
  * \return the signals that have occurred.
  */
-sigmask_t sig_check(sigmask_t sigs)
+sigmask_t sig_checkSignal(Signal *s, sigmask_t sigs)
 {
 	sigmask_t result;
 	cpu_flags_t flags;
 
 	IRQ_SAVE_DISABLE(flags);
-	result = current_process->sig.recv & sigs;
-	current_process->sig.recv &= ~sigs;
+	result = s->recv & sigs;
+	s->recv &= ~sigs;
 	IRQ_RESTORE(flags);
 
 	return result;
@@ -164,7 +164,7 @@ sigmask_t sig_check(sigmask_t sigs)
  * Sleep until any of the signals in \a sigs occurs.
  * \return the signal(s) that have awoken the process.
  */
-sigmask_t sig_wait(sigmask_t sigs)
+sigmask_t sig_waitSignal(Signal *s, sigmask_t sigs)
 {
 	sigmask_t result;
 
@@ -184,13 +184,13 @@ sigmask_t sig_wait(sigmask_t sigs)
 	IRQ_DISABLE;
 
 	/* Loop until we get at least one of the signals */
-	while (!(result = current_process->sig.recv & sigs))
+	while (!(result = s->recv & sigs))
 	{
 		/*
 		 * Tell "them" that we want to be awaken when any of these
 		 * signals arrives.
 		 */
-		current_process->sig.wait = sigs;
+		s->wait = sigs;
 
 		/* Go to sleep and proc_switch() to another process. */
 		proc_switch();
@@ -200,12 +200,12 @@ sigmask_t sig_wait(sigmask_t sigs)
 		 * least one of the signals we were expecting must have been
 		 * delivered to us.
 		 */
-		ASSERT(!current_process->sig.wait);
-		ASSERT(current_process->sig.recv & sigs);
+		ASSERT(!s->wait);
+		ASSERT(s->recv & sigs);
 	}
 
 	/* Signals found: clear them and return */
-	current_process->sig.recv &= ~sigs;
+	s->recv &= ~sigs;
 
 	IRQ_ENABLE;
 	return result;
@@ -220,13 +220,13 @@ sigmask_t sig_wait(sigmask_t sigs)
  * \return the signal(s) that have awoken the process.
  * \note Caller must check return value to check which signal awoke the process.
  */
-sigmask_t sig_waitTimeout(sigmask_t sigs, ticks_t timeout)
+sigmask_t sig_waitTimeoutSignal(Signal *s, sigmask_t sigs, ticks_t timeout)
 {
 	Timer t;
 	sigmask_t res;
 	cpu_flags_t flags;
 
-	ASSERT(!sig_check(SIG_TIMEOUT));
+	ASSERT(!sig_checkSignal(s, SIG_TIMEOUT));
 	ASSERT(!(sigs & SIG_TIMEOUT));
 	/* IRQ are needed to run timer */
 	ASSERT(IRQ_ENABLED());
@@ -234,11 +234,11 @@ sigmask_t sig_waitTimeout(sigmask_t sigs, ticks_t timeout)
 	timer_set_event_signal(&t, proc_current(), SIG_TIMEOUT);
 	timer_setDelay(&t, timeout);
 	timer_add(&t);
-	res = sig_wait(SIG_TIMEOUT | sigs);
+	res = sig_waitSignal(s, SIG_TIMEOUT | sigs);
 
 	IRQ_SAVE_DISABLE(flags);
 	/* Remove timer if sigs occur before timer signal */
-	if (!(res & SIG_TIMEOUT) && !sig_check(SIG_TIMEOUT))
+	if (!(res & SIG_TIMEOUT) && !sig_checkSignal(s, SIG_TIMEOUT))
 		timer_abort(&t);
 	IRQ_RESTORE(flags);
 	return res;
@@ -246,21 +246,21 @@ sigmask_t sig_waitTimeout(sigmask_t sigs, ticks_t timeout)
 
 #endif // CONFIG_TIMER_EVENTS
 
-INLINE void __sig_signal(Process *proc, sigmask_t sigs, bool wakeup)
+INLINE void __sig_signal(Signal *s, Process *proc, sigmask_t sigs, bool wakeup)
 {
 	cpu_flags_t flags;
 
 	IRQ_SAVE_DISABLE(flags);
 
 	/* Set the signals */
-	proc->sig.recv |= sigs;
+	s->recv |= sigs;
 
 	/* Check if process needs to be awoken */
-	if (proc->sig.recv & proc->sig.wait)
+	if (s->recv & s->wait)
 	{
 		ASSERT(proc != current_process);
 
-		proc->sig.wait = 0;
+		s->wait = 0;
 		if (wakeup)
 			proc_wakeup(proc);
 		else
@@ -279,13 +279,13 @@ INLINE void __sig_signal(Process *proc, sigmask_t sigs, bool wakeup)
  * \note This function can't be called from IRQ context, use sig_post()
  * instead.
  */
-void sig_send(Process *proc, sigmask_t sigs)
+void sig_sendSignal(Signal *s, Process *proc, sigmask_t sigs)
 {
 	ASSERT_USER_CONTEXT();
 	IRQ_ASSERT_ENABLED();
 	ASSERT(proc_preemptAllowed());
 
-	__sig_signal(proc, sigs, true);
+	__sig_signal(s, proc, sigs, true);
 }
 
 /**
@@ -294,9 +294,9 @@ void sig_send(Process *proc, sigmask_t sigs)
  *
  * \note This call is interrupt safe.
  */
-void sig_post(Process *proc, sigmask_t sigs)
+void sig_postSignal(Signal *s, Process *proc, sigmask_t sigs)
 {
-	__sig_signal(proc, sigs, false);
+	__sig_signal(s, proc, sigs, false);
 }
 
 #endif /* CONFIG_KERN_SIGNALS */

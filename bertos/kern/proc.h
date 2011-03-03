@@ -104,8 +104,6 @@
 #include <cpu/types.h> // cpu_stack_t
 #include <cpu/frame.h> // CPU_SAVED_REGS_CNT
 
-#include <kern/signal.h>
-
 /*
  * WARNING: struct Process is considered private, so its definition can change any time
  * without notice. DO NOT RELY on any field defined here, use only the interface
