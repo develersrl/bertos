@@ -43,6 +43,7 @@
 
 #include "detect.h"
 #include "attr.h"
+#include <limits.h>
 #include <cfg/compiler.h> /* for uintXX_t */
 
 #if CPU_I196
