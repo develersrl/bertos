@@ -72,6 +72,11 @@ static void init(void)
 	kdbg_init();
 	/* Initialize system timer */
 	timer_init();
+	/*
+	 * Kernel initialization: processes (allow to create and dispatch
+	 * processes using proc_new()).
+	 */
+	proc_init();
 	/* Initialize UART1 */
 	ser_init(&out, SER_UART1);
 	/* Configure UART1 to work at 115.200 bps */
@@ -88,12 +93,6 @@ static void init(void)
 	kbd_init();
 	/* Initialize the internal flash memory */
 	flash_init(&flash, 0);
-
-	/*
-	 * Kernel initialization: processes (allow to create and dispatch
-	 * processes using proc_new()).
-	 */
-	proc_init();
 }
 
 static void NORETURN led_process(void)
