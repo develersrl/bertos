@@ -123,6 +123,12 @@ typedef struct Event
 			struct Process *sig_proc;  /* Process to be signalled */
 			sigbit_t        sig_bit;   /* Signal to send */
 		} Sig;
+
+		struct
+		{
+			struct Process *sig_proc;  /* Process to be signalled */
+			Signal          sig;       /* Signal structure */
+		} SigGen;
 #endif
 		struct
 		{
@@ -141,6 +147,7 @@ void event_hook_ignore(Event *event);
 void event_hook_signal(Event *event);
 void event_hook_softint(Event *event);
 void event_hook_generic(Event *event);
+void event_hook_generic_signal(Event *event);
 void event_hook_generic_timeout(Event *event);
 
 /** Initialize the event \a e as a no-op */
@@ -190,12 +197,19 @@ INLINE Event event_createSignal(struct Process *proc, sigbit_t bit)
 
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 /** Initialize the generic sleepable event \a e */
-#define event_initGeneric(e) \
-	event_initSignal(e, proc_current(), SIG_SYSTEM5)
+#define event_initGeneric(e)					\
+	((e)->action = event_hook_generic_signal,		\
+		(e)->Ev.SigGen.sig_proc = proc_current(),	\
+		(e)->Ev.SigGen.sig.wait = 0, (e)->Ev.SigGen.sig.recv = 0)
 #else
 #define event_initGeneric(e) \
 	((e)->action = event_hook_generic, (e)->Ev.Gen.completed = false)
 #endif
+
+/**
+ * Signal used to implement generic events.
+ */
+#define EVENT_GENERIC_SIGNAL	SIG_SYSTEM5
 
 /**
  * Create a generic sleepable event.
@@ -220,7 +234,7 @@ INLINE void event_wait(Event *e)
 {
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 	e->Ev.Sig.sig_proc = proc_current();
-	sig_wait(e->Ev.Sig.sig_bit);
+	sig_waitSignal(&e->Ev.SigGen.sig, EVENT_GENERIC_SIGNAL);
 #else
 	while (ACCESS_SAFE(e->Ev.Gen.completed) == false)
 		cpu_relax();
@@ -247,7 +261,8 @@ INLINE bool event_waitTimeout(Event *e, ticks_t timeout)
 
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 	e->Ev.Sig.sig_proc = proc_current();
-	ret = (sig_waitTimeout(e->Ev.Sig.sig_bit, timeout) & SIG_TIMEOUT) ?
+	ret = (sig_waitTimeoutSignal(&e->Ev.SigGen.sig,
+				EVENT_GENERIC_SIGNAL, timeout) & SIG_TIMEOUT) ?
 				false : true;
 #else
 	ticks_t end = timer_clock() + timeout;

@@ -50,6 +50,13 @@ void event_hook_signal(Event *e)
 {
 	sig_post((e)->Ev.Sig.sig_proc, (e)->Ev.Sig.sig_bit);
 }
+
+void event_hook_generic_signal(Event *e)
+{
+	sig_postSignal(&e->Ev.SigGen.sig,
+				e->Ev.SigGen.sig_proc,
+				EVENT_GENERIC_SIGNAL);
+}
 #endif
 
 void event_hook_softint(Event *e)
