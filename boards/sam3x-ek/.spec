@@ -11,7 +11,7 @@ description = '''
 	</tr>
 	<tr>
 		<td><b>Clock</b></td>
-		<td>72 MHz</td>
+		<td>84 MHz</td>
 	</tr>
 	<tr>
 		<td><b>Memory</b></td>
