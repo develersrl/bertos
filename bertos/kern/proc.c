@@ -183,8 +183,8 @@ static void proc_initStruct(Process *proc)
 	(void)proc;
 
 #if CONFIG_KERN_SIGNALS
-	proc->sig_recv = 0;
-	proc->sig_wait = 0;
+	proc->sig.recv = 0;
+	proc->sig.wait = 0;
 #endif
 
 #if CONFIG_KERN_HEAP

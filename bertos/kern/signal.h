@@ -54,6 +54,15 @@
 /* Fwd decl */
 struct Process;
 
+/**
+ * Signal structure
+ */
+typedef struct Signal
+{
+	sigmask_t    wait;    /**< Signals the process is waiting for */
+	sigmask_t    recv;    /**< Received signals */
+} Signal;
+
 /* Inter-process Communication services */
 sigmask_t sig_check(sigmask_t sigs);
 void sig_send(struct Process *proc, sigmask_t sig);

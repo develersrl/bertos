@@ -152,8 +152,8 @@ sigmask_t sig_check(sigmask_t sigs)
 	cpu_flags_t flags;
 
 	IRQ_SAVE_DISABLE(flags);
-	result = current_process->sig_recv & sigs;
-	current_process->sig_recv &= ~sigs;
+	result = current_process->sig.recv & sigs;
+	current_process->sig.recv &= ~sigs;
 	IRQ_RESTORE(flags);
 
 	return result;
@@ -184,13 +184,13 @@ sigmask_t sig_wait(sigmask_t sigs)
 	IRQ_DISABLE;
 
 	/* Loop until we get at least one of the signals */
-	while (!(result = current_process->sig_recv & sigs))
+	while (!(result = current_process->sig.recv & sigs))
 	{
 		/*
 		 * Tell "them" that we want to be awaken when any of these
 		 * signals arrives.
 		 */
-		current_process->sig_wait = sigs;
+		current_process->sig.wait = sigs;
 
 		/* Go to sleep and proc_switch() to another process. */
 		proc_switch();
@@ -200,12 +200,12 @@ sigmask_t sig_wait(sigmask_t sigs)
 		 * least one of the signals we were expecting must have been
 		 * delivered to us.
 		 */
-		ASSERT(!current_process->sig_wait);
-		ASSERT(current_process->sig_recv & sigs);
+		ASSERT(!current_process->sig.wait);
+		ASSERT(current_process->sig.recv & sigs);
 	}
 
 	/* Signals found: clear them and return */
-	current_process->sig_recv &= ~sigs;
+	current_process->sig.recv &= ~sigs;
 
 	IRQ_ENABLE;
 	return result;
@@ -253,14 +253,14 @@ INLINE void __sig_signal(Process *proc, sigmask_t sigs, bool wakeup)
 	IRQ_SAVE_DISABLE(flags);
 
 	/* Set the signals */
-	proc->sig_recv |= sigs;
+	proc->sig.recv |= sigs;
 
 	/* Check if process needs to be awoken */
-	if (proc->sig_recv & proc->sig_wait)
+	if (proc->sig.recv & proc->sig.wait)
 	{
 		ASSERT(proc != current_process);
 
-		proc->sig_wait = 0;
+		proc->sig.wait = 0;
 		if (wakeup)
 			proc_wakeup(proc);
 		else

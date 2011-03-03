@@ -104,6 +104,8 @@
 #include <cpu/types.h> // cpu_stack_t
 #include <cpu/frame.h> // CPU_SAVED_REGS_CNT
 
+#include <kern/signal.h>
+
 /*
  * WARNING: struct Process is considered private, so its definition can change any time
  * without notice. DO NOT RELY on any field defined here, use only the interface
@@ -122,8 +124,7 @@ typedef struct Process
 	iptr_t       user_data;   /**< Custom data passed to the process */
 
 #if CONFIG_KERN_SIGNALS
-	sigmask_t    sig_wait;    /**< Signals the process is waiting for */
-	sigmask_t    sig_recv;    /**< Received signals */
+	Signal       sig;
 #endif
 
 #if CONFIG_KERN_HEAP
