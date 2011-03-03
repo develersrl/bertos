@@ -33,7 +33,6 @@
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
  */
-
 #include <cfg/macros.h>
 
 #include <emul/emul.h>
@@ -303,10 +302,10 @@ int main(int argc, char *argv[])
 	emul_init(&argc, argv);
 
 	timer_init();
+	proc_init();
 	buz_init();
 	kbd_init();
 	lcd_gfx_qt_init(&lcd_bitmap);
-	proc_init();
 	monitor_start(KERN_MINSTACKSIZE, monitor_stack);
 
 	menu_handle(&main_menu);
