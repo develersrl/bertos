@@ -36,9 +36,10 @@
 #ifndef SAM3_SMC_H
 #define SAM3_SMC_H
 
-#if !CPU_CM3_SAM3X && !CPU_CM3_SAM3U
-	#error SMC registers undefined for current cpu
-#endif
+/*
+ * SMC registers defined only for SAM3X/A and U for now
+ */
+#if CPU_CM3_SAM3X || CPU_CM3_SAM3U
 
 /** SMC registers base. */
 #define SMC_BASE  0x400E0000
@@ -265,5 +266,7 @@
 #define SMC_MODE_TDF_CYCLES(x)        (SMC_MODE_TDF_CYCLES_MASK & ((x) << SMC_MODE_TDF_CYCLES_SHIFT))
 #define SMC_MODE_TDF_MODE             BV(20)
 /*\}*/
+
+#endif /* CPU_CM3_SAM3X || CPU_CM3_SAM3U */
 
 #endif /* SAM3_SMC_H */
