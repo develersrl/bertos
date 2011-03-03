@@ -42,25 +42,31 @@
 
 
 /* Frequency of board main oscillator */
-// TODO: wizard config
 #define BOARDOSC_FREQ  12000000
-
-/* Main crystal oscillator startup time, optimal value for CPU_FREQ == 48 MHz */
-#define BOARD_OSC_COUNT  (CKGR_MOR_MOSCXTST(0x8))
 
 /* Timer countdown timeout for clock initialization operations */
 #define CLOCK_TIMEOUT    0xFFFFFFFF
 
+
+#if CPU_FREQ == 84000000 || CPU_FREQ == 48000000
+
+INLINE uint32_t evaluate_pll(void)
+{
+	return CKGR_PLLR_MUL(CPU_FREQ / BOARDOSC_FREQ * 2 - 1) | CKGR_PLLR_DIV(2);
+}
+
+#else
+
+#warning CPU clock frequency non-standard setting: multiplier and divider values \
+ will be computed at runtime: effective computed frequency could be different \
+ from expected.
 
 /*
  * Try to evaluate the correct divider and multiplier value depending
  * on the desired CPU frequency.
  *
  * We try all combinations in a certain range of divider and multiplier
- * values.  The range can change, with better match with "strange"
- * frequencies, but boot time will be longer.
- *
- * Limits for SAM3N: divider [1,255], multiplier [1,2047].
+ * values.  Start with higher multipliers and divisors, generally better.
  */
 INLINE uint32_t evaluate_pll(void)
 {
@@ -68,9 +74,9 @@ INLINE uint32_t evaluate_pll(void)
 	int best_delta = CPU_FREQ;
 	int freq = 0;
 
-	for (mul = 1; mul <= 8; mul++)
+	for (mul = 13; mul > 0; mul--)
 	{
-		for (div = 1; div <= 24; div++)
+		for (div = 24; div > 0; div--)
 		{
 			freq = BOARDOSC_FREQ / div * (1 + mul);
 			if (ABS((int)CPU_FREQ - freq) < best_delta) {
@@ -84,6 +90,7 @@ INLINE uint32_t evaluate_pll(void)
 	return CKGR_PLLR_DIV(best_div) | CKGR_PLLR_MUL(best_mul);
 }
 
+#endif /* CPU_FREQ */
 
 void clock_init(void)
 {
@@ -92,41 +99,29 @@ void clock_init(void)
 	/* Disable watchdog */
 	WDT_MR = BV(WDT_WDDIS);
 
-#if CPU_CM3_SAM3X
 	/* Set wait states for flash access, needed for higher CPU clock rates */
-	EEFC0_FMR = EEFC_FMR_FWS(2);
-	EEFC1_FMR = EEFC_FMR_FWS(2);
-#else
 	EEFC0_FMR = EEFC_FMR_FWS(3);
-
-	// TODO: check if this is needed in sam3n-ek too, very slow start-up
-	// Select external slow clock
-	if (!(SUPC_SR & BV(SUPC_SR_OSCSEL)))
-	{
-		SUPC_CR = BV(SUPC_CR_XTALSEL) | SUPC_CR_KEY(0xA5);
-		while (!(SUPC_SR & BV(SUPC_SR_OSCSEL)));
-	}
+#ifdef EEFC1_FMR
+	EEFC1_FMR = EEFC_FMR_FWS(3);
 #endif
 
 	// Initialize main oscillator
 	if (!(CKGR_MOR & BV(CKGR_MOR_MOSCSEL)))
 	{
-		CKGR_MOR = CKGR_MOR_KEY(0x37) | BOARD_OSC_COUNT | BV(CKGR_MOR_MOSCRCEN) | BV(CKGR_MOR_MOSCXTEN);
+		CKGR_MOR = CKGR_MOR_KEY(0x37) | CKGR_MOR_MOSCXTST(0x8)
+			| BV(CKGR_MOR_MOSCRCEN) | BV(CKGR_MOR_MOSCXTEN);
 		timeout = CLOCK_TIMEOUT;
 		while (!(PMC_SR & BV(PMC_SR_MOSCXTS)) && --timeout);
 	}
 
 	// Switch to external oscillator
-	CKGR_MOR = CKGR_MOR_KEY(0x37) | BOARD_OSC_COUNT | BV(CKGR_MOR_MOSCRCEN) | BV(CKGR_MOR_MOSCXTEN) | BV(CKGR_MOR_MOSCSEL);
+	CKGR_MOR = CKGR_MOR_KEY(0x37) | CKGR_MOR_MOSCXTST(0x8)
+		| BV(CKGR_MOR_MOSCRCEN) | BV(CKGR_MOR_MOSCXTEN) | BV(CKGR_MOR_MOSCSEL);
 	timeout = CLOCK_TIMEOUT;
-	while (!(PMC_SR & BV(PMC_SR_MOSCSELS)) && --timeout);
-
-	PMC_MCKR = (PMC_MCKR & ~(uint32_t)PMC_MCKR_CSS_MASK) | PMC_MCKR_CSS_MAIN_CLK;
-	timeout = CLOCK_TIMEOUT;
-	while (!(PMC_SR & BV(PMC_SR_MCKRDY)) && --timeout);
+	while (!(PMC_SR & BV(PMC_SR_MOSCXTS)) && --timeout);
 
 	// Initialize and enable PLL clock
-	CKGR_PLLR = evaluate_pll() | BV(CKGR_PLLR_STUCKTO1) | CKGR_PLLR_PLLCOUNT(0x1);
+	CKGR_PLLR = evaluate_pll() | BV(CKGR_PLLR_STUCKTO1) | CKGR_PLLR_PLLCOUNT(0x2);
 	timeout = CLOCK_TIMEOUT;
 	while (!(PMC_SR & BV(PMC_SR_LOCK)) && --timeout);
 
@@ -140,7 +135,7 @@ void clock_init(void)
 
 	/* Enable clock on PIO for inputs */
 	// TODO: move this in gpio_init() for better power management?
-#if CPU_CM3_SAM3X
+#ifdef PIOF_ID
 	PMC_PCER = BV(PIOA_ID) | BV(PIOB_ID) | BV(PIOC_ID)
 		| BV(PIOD_ID) | BV(PIOE_ID) | BV(PIOF_ID);
 #else
