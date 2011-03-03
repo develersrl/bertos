@@ -47,6 +47,7 @@
 #include <cfg/module.h>
 
 #include <drv/timer.h>
+#include <mware/event.h>
 #include <drv/kbd.h>
 
 
@@ -83,6 +84,8 @@
 /** Status for keyboard repeat state machine */
 static enum { KS_IDLE, KS_REPDELAY, KS_REPEAT } kbd_rptStatus;
 
+/** Used to notify the occurrence of a key pressed event */
+static Event key_pressed;
 
 static volatile keymask_t kbd_buf; /**< Single entry keyboard buffer */
 static volatile keymask_t kbd_cnt; /**< Number of keypress events in \c kbd_buf */
@@ -203,7 +206,13 @@ keymask_t kbd_get(void)
 {
 	keymask_t key;
 
-	while (!(key = kbd_peek())) {}
+	#if CONFIG_KBD_POLL == KBD_POLL_SOFTINT
+		event_wait(&key_pressed);
+		key = kbd_peek();
+	#else
+		while (!(key = kbd_peek()))
+			cpu_relax();
+	#endif
 
 	return key;
 }
@@ -216,18 +225,10 @@ keymask_t kbd_get(void)
  */
 keymask_t kbd_get_timeout(mtime_t timeout)
 {
-	keymask_t key;
-
-	ticks_t start = timer_clock();
-	ticks_t stop  = ms_to_ticks(timeout);
-	do
-	{
-		if ((key = kbd_peek()))
-			return key;
-	}
-	while (timer_clock() - start < stop);
-
-	return K_TIMEOUT;
+	if (event_waitTimeout(&key_pressed, timeout))
+		return kbd_peek();
+	else
+		return K_TIMEOUT;
 }
 
 
@@ -278,6 +279,9 @@ static keymask_t kbd_defHandlerFunc(keymask_t key)
 		/* Force a single event in kbd buffer */
 		kbd_buf = key;
 		kbd_cnt = 1;
+		#if CONFIG_KBD_POLL == KBD_POLL_SOFTINT
+			event_do(&key_pressed);
+		#endif
 
 		#if CONFIG_KBD_OBSERVER
 			observer_notify(&kbd_subject, KBD_EVENT_KEY, &key);
@@ -471,6 +475,12 @@ void kbd_init(void)
 #if CONFIG_KBD_POLL == KBD_POLL_SOFTINT
 
 	MOD_CHECK(timer);
+	#if CONFIG_KERN
+		MOD_CHECK(proc);
+	#endif
+
+	/* Initialize the keyboard event (key pressed) */
+	event_initGeneric(&key_pressed);
 
 	/* Add kbd handler to soft timers list */
 	event_initSoftint(&kbd_timer.expire, kbd_softint, NULL);
