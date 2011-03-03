@@ -246,10 +246,6 @@ INLINE void event_wait(Event *e)
 #if CONFIG_TIMER_EVENTS
 #include <drv/timer.h> /* timer_clock() */
 
-/* TODO: move these macros to drv/timer.h */
-#define TIMER_AFTER(x, y) ((long)(y) - (long)(x) < 0)
-#define TIMER_BEFORE(x, y) TIMER_AFTER(y, x)
-
 /**
  * Wait the completion of event \a e or \a timeout elapses.
  *

@@ -100,6 +100,9 @@ STATIC_ASSERT(sizeof(hptime_t) == SIZEOF_HPTIME_T);
 
 extern volatile ticks_t _clock;
 
+#define TIMER_AFTER(x, y) ((long)(y) - (long)(x) < 0)
+#define TIMER_BEFORE(x, y) TIMER_AFTER(y, x)
+
 /**
  * \brief Return the system tick counter (expressed in ticks)
  *
