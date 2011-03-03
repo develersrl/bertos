@@ -53,6 +53,8 @@
 
 #include <kern/proc.h>
 
+#if CONFIG_KERN_SIGNALS
+
 /* Inter-process Communication services */
 sigmask_t sig_checkSignal(Signal *s, sigmask_t sigs);
 
@@ -62,16 +64,16 @@ INLINE sigmask_t sig_check(sigmask_t sigs)
 	return sig_checkSignal(&proc->sig, sigs);
 }
 
-void sig_sendSignal(Signal *s, struct Process *proc, sigmask_t sig);
+void sig_sendSignal(Signal *s, Process *proc, sigmask_t sig);
 
-INLINE void sig_send(struct Process *proc, sigmask_t sig)
+INLINE void sig_send(Process *proc, sigmask_t sig)
 {
 	sig_sendSignal(&proc->sig, proc, sig);
 }
 
-void sig_postSignal(Signal *s, struct Process *proc, sigmask_t sig);
+void sig_postSignal(Signal *s, Process *proc, sigmask_t sig);
 
-INLINE void sig_post(struct Process *proc, sigmask_t sig)
+INLINE void sig_post(Process *proc, sigmask_t sig)
 {
 	sig_postSignal(&proc->sig, proc, sig);
 }
@@ -80,7 +82,7 @@ INLINE void sig_post(struct Process *proc, sigmask_t sig)
  * XXX: this is provided for backword compatibility, consider to make this
  * deprecated for the future.
  */
-INLINE void sig_signal(struct Process *proc, sigmask_t sig)
+INLINE void sig_signal(Process *proc, sigmask_t sig)
 {
 	sig_postSignal(&proc->sig, proc, sig);
 }
@@ -100,6 +102,8 @@ INLINE sigmask_t sig_waitTimeout(sigmask_t sigs, ticks_t timeout)
 	Process *proc = proc_current();
 	return sig_waitTimeoutSignal(&proc->sig, sigs, timeout);
 }
+
+#endif /* CONFIG_KERN_SIGNALS */
 
 int signal_testRun(void);
 int signal_testSetup(void);
