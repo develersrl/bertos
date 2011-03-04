@@ -82,7 +82,7 @@ INLINE void kdbg_hw_init(void)
 	PIO_PERIPH_SEL(UART_PIO_BASE, UART_PINS, UART_PERIPH);
 
 	/* Enable the peripheral clock */
-	PMC_PCER = BV(UART_ID);
+	pmc_periphEnable(UART_ID);
 
 	/* Reset and disable receiver & transmitter */
 	HWREG(UART_BASE + UART_CR_OFF) = BV(UART_CR_RSTRX) | BV(UART_CR_RSTTX) | BV(UART_CR_RXDIS) | BV(UART_CR_TXDIS);

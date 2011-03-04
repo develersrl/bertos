@@ -135,10 +135,12 @@ void clock_init(void)
 
 	/* Enable clock on PIO for inputs */
 	// TODO: move this in gpio_init() for better power management?
+	pmc_periphEnable(PIOA_ID);
+	pmc_periphEnable(PIOB_ID);
+	pmc_periphEnable(PIOC_ID);
 #ifdef PIOF_ID
-	PMC_PCER = BV(PIOA_ID) | BV(PIOB_ID) | BV(PIOC_ID)
-		| BV(PIOD_ID) | BV(PIOE_ID) | BV(PIOF_ID);
-#else
-	PMC_PCER = BV(PIOA_ID) | BV(PIOB_ID) | BV(PIOC_ID);
+	pmc_periphEnable(PIOD_ID);
+	pmc_periphEnable(PIOE_ID);
+	pmc_periphEnable(PIOF_ID);
 #endif
 }

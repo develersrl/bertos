@@ -36,6 +36,10 @@
 #ifndef SAM3_PMC_H
 #define SAM3_PMC_H
 
+#include <cfg/macros.h>
+#include <cfg/debug.h>
+
+
 /** PMC registers base. */
 #if CPU_CM3_SAM3X
 	#define PMC_BASE  0x400E0600
@@ -47,27 +51,48 @@
  * PMC register offsets.
  */
 /*\{*/
-#define PMC_SCER_OFF  0x00   ///< System Clock Enable Register
-#define PMC_SCDR_OFF  0x04   ///< System Clock Disable Register
-#define PMC_SCSR_OFF  0x08   ///< System Clock Status Register
-#define PMC_PCER_OFF  0x10   ///< Peripheral Clock Enable Register
-#define PMC_PCDR_OFF  0x14   ///< Peripheral Clock Disable Register
-#define PMC_PCSR_OFF  0x18   ///< Peripheral Clock Status Register
-#define PMC_MOR_OFF   0x20   ///< Main Oscillator Register
-#define PMC_MCFR_OFF  0x24   ///< Main Clock Frequency Register
-#define PMC_PLLR_OFF  0x28   ///< PLL Register
-#define PMC_MCKR_OFF  0x30   ///< Master Clock Register
-#define PMC_PCK_OFF   0x40   ///< Programmable Clock 0 Register
-#define PMC_IER_OFF   0x60   ///< Interrupt Enable Register
-#define PMC_IDR_OFF   0x64   ///< Interrupt Disable Register
-#define PMC_SR_OFF    0x68   ///< Status Register
-#define PMC_IMR_OFF   0x6C   ///< Interrupt Mask Register
-#define PMC_FSMR_OFF  0x70   ///< Fast Startup Mode Register
-#define PMC_FSPR_OFF  0x74   ///< Fast Startup Polarity Register
-#define PMC_FOCR_OFF  0x78   ///< Fault Output Clear Register
-#define PMC_WPMR_OFF  0xE4   ///< Write Protect Mode Register
-#define PMC_WPSR_OFF  0xE8   ///< Write Protect Status Register
-#define PMC_OCR_OFF   0x110  ///< Oscillator Calibration Register
+#define PMC_SCER_OFF  0x00         ///< System Clock Enable Register
+#define PMC_SCDR_OFF  0x04         ///< System Clock Disable Register
+#define PMC_SCSR_OFF  0x08         ///< System Clock Status Register
+#define PMC_MOR_OFF   0x20         ///< Main Oscillator Register
+#define PMC_MCFR_OFF  0x24         ///< Main Clock Frequency Register
+#define PMC_MCKR_OFF  0x30         ///< Master Clock Register
+#define PMC_IER_OFF   0x60         ///< Interrupt Enable Register
+#define PMC_IDR_OFF   0x64         ///< Interrupt Disable Register
+#define PMC_SR_OFF    0x68         ///< Status Register
+#define PMC_IMR_OFF   0x6C         ///< Interrupt Mask Register
+#define PMC_FSMR_OFF  0x70         ///< Fast Startup Mode Register
+#define PMC_FSPR_OFF  0x74         ///< Fast Startup Polarity Register
+#define PMC_FOCR_OFF  0x78         ///< Fault Output Clear Register
+#define PMC_WPMR_OFF  0xE4         ///< Write Protect Mode Register
+#define PMC_WPSR_OFF  0xE8         ///< Write Protect Status Register
+
+#if CPU_CM3_SAM3N
+	#define PMC_PCER_OFF   0x10    ///< Peripheral Clock Enable Register
+	#define PMC_PCDR_OFF   0x14    ///< Peripheral Clock Disable Register
+	#define PMC_PCSR_OFF   0x18    ///< Peripheral Clock Status Register
+	#define PMC_PLLR_OFF   0x28    ///< PLL Register
+	#define PMC_PCK_OFF    0x40    ///< Programmable Clock 0 Register
+	#define PMC_OCR_OFF    0x110   ///< Oscillator Calibration Register
+#elif CPU_CM3_SAM3X
+	#define PMC_PCER0_OFF  0x10    ///< Peripheral Clock Enable Register
+	#define PMC_PCDR0_OFF  0x14    ///< Peripheral Clock Disable Register
+	#define PMC_PCSR0_OFF  0x18    ///< Peripheral Clock Status Register
+	#define PMC_UCKR_OFF   0x1C    ///< UTMI clock register
+	#define PMC_PLLAR_OFF  0x28    ///< PLL Register
+	#define PMC_USB_OFF    0x38    ///< USB clock register
+	#define PMC_PCK0_OFF   0x40    ///< Programmable Clock 0 Register
+	#define PMC_PCK1_OFF   0x44    ///< Programmable Clock 1 Register
+	#define PMC_PCK2_OFF   0x48    ///< Programmable Clock 2 Register
+	#define PMC_PCER1_OFF  0x100   ///< Peripheral Clock Enable Register
+	#define PMC_PCDR1_OFF  0x104   ///< Peripheral Clock Disable Register
+	#define PMC_PCSR1_OFF  0x108   ///< Peripheral Clock Status Register
+	#define PMC_PCR_OFF    0x10C   ///< Oscillator Calibration Register
+
+	#define PMC_PLLROFF    PMC_PLLAR_OFF
+#else
+	#warning Some PMC registers undefined for the selected CPU
+#endif
 /*\}*/
 
 /**
@@ -77,14 +102,9 @@
 #define PMC_SCER  (*((reg32_t *)(PMC_BASE + PMC_SCER_OFF)))   ///< System Clock Enable Register
 #define PMC_SCDR  (*((reg32_t *)(PMC_BASE + PMC_SCDR_OFF)))   ///< System Clock Disable Register
 #define PMC_SCSR  (*((reg32_t *)(PMC_BASE + PMC_SCSR_OFF)))   ///< System Clock Status Register
-#define PMC_PCER  (*((reg32_t *)(PMC_BASE + PMC_PCER_OFF)))   ///< Peripheral Clock Enable Register
-#define PMC_PCDR  (*((reg32_t *)(PMC_BASE + PMC_PCDR_OFF)))   ///< Peripheral Clock Disable Register
-#define PMC_PCSR  (*((reg32_t *)(PMC_BASE + PMC_PCSR_OFF)))   ///< Peripheral Clock Status Register
 #define CKGR_MOR  (*((reg32_t *)(PMC_BASE + PMC_MOR_OFF )))   ///< Main Oscillator Register
 #define CKGR_MCFR (*((reg32_t *)(PMC_BASE + PMC_MCFR_OFF)))   ///< Main Clock Frequency Register
-#define CKGR_PLLR (*((reg32_t *)(PMC_BASE + PMC_PLLR_OFF)))   ///< PLL Register
 #define PMC_MCKR  (*((reg32_t *)(PMC_BASE + PMC_MCKR_OFF)))   ///< Master Clock Register
-#define PMC_PCK   (*((reg32_t *)(PMC_BASE + PMC_PCK_OFF )))   ///< Programmable Clock 0 Register
 #define PMC_IER   (*((reg32_t *)(PMC_BASE + PMC_IER_OFF )))   ///< Interrupt Enable Register
 #define PMC_IDR   (*((reg32_t *)(PMC_BASE + PMC_IDR_OFF )))   ///< Interrupt Disable Register
 #define PMC_SR    (*((reg32_t *)(PMC_BASE + PMC_SR_OFF  )))   ///< Status Register
@@ -94,8 +114,84 @@
 #define PMC_FOCR  (*((reg32_t *)(PMC_BASE + PMC_FOCR_OFF)))   ///< Fault Output Clear Register
 #define PMC_WPMR  (*((reg32_t *)(PMC_BASE + PMC_WPMR_OFF)))   ///< Write Protect Mode Register
 #define PMC_WPSR  (*((reg32_t *)(PMC_BASE + PMC_WPSR_OFF)))   ///< Write Protect Status Register
-#define PMC_OCR   (*((reg32_t *)(PMC_BASE + PMC_OCR_OFF )))   ///< Oscillator Calibration Register
+
+#if CPU_CM3_SAM3N
+	#define PMC_PCER   (*((reg32_t *)(PMC_BASE + PMC_PCER_OFF)))  ///< Peripheral Clock Enable Register
+	#define PMC_PCDR   (*((reg32_t *)(PMC_BASE + PMC_PCDR_OFF)))  ///< Peripheral Clock Disable Register
+	#define PMC_PCSR   (*((reg32_t *)(PMC_BASE + PMC_PCSR_OFF)))  ///< Peripheral Clock Status Register
+	#define CKGR_PLLR  (*((reg32_t *)(PMC_BASE + PMC_PLLR_OFF)))  ///< PLL Register
+	#define PMC_PCK    (*((reg32_t *)(PMC_BASE + PMC_PCK_OFF )))  ///< Programmable Clock 0 Register
+	#define PMC_OCR    (*((reg32_t *)(PMC_BASE + PMC_OCR_OFF )))  ///< Oscillator Calibration Register
+#elif CPU_CM3_SAM3X
+	#define PMC_PCER0  (*((reg32_t *)(PMC_BASE + PMC_PCER0_OFF)))     ///< Peripheral Clock Enable Register
+	#define PMC_PCDR0  (*((reg32_t *)(PMC_BASE + PMC_PCDR0_OFF)))     ///< Peripheral Clock Disable Register
+	#define PMC_PCSR0  (*((reg32_t *)(PMC_BASE + PMC_PCSR0_OFF)))     ///< Peripheral Clock Status Register
+	#define PMC_UCKR   (*((reg32_t *)(PMC_BASE + PMC_UCKR _OFF)))     ///< UTMI clock register
+	#define CKGR_PLLAR (*((reg32_t *)(PMC_BASE + PMC_PLLAR_OFF)))     ///< PLL Register
+	#define PMC_USB_O  (*((reg32_t *)(PMC_BASE + PMC_USB_O_OFF)))     ///< USB clock register
+	#define PMC_PCK0   (*((reg32_t *)(PMC_BASE + PMC_PCK0 _OFF)))     ///< Programmable Clock 0 Register
+	#define PMC_PCK1   (*((reg32_t *)(PMC_BASE + PMC_PCK1 _OFF)))     ///< Programmable Clock 1 Register
+	#define PMC_PCK2   (*((reg32_t *)(PMC_BASE + PMC_PCK2 _OFF)))     ///< Programmable Clock 2 Register
+	#define PMC_PCER1  (*((reg32_t *)(PMC_BASE + PMC_PCER1_OFF)))     ///< Peripheral Clock Enable Register
+	#define PMC_PCDR1  (*((reg32_t *)(PMC_BASE + PMC_PCDR1_OFF)))     ///< Peripheral Clock Disable Register
+	#define PMC_PCSR1  (*((reg32_t *)(PMC_BASE + PMC_PCSR1_OFF)))     ///< Peripheral Clock Status Register
+	#define PMC_PCR    (*((reg32_t *)(PMC_BASE + PMC_PCR  _OFF)))     ///< Oscillator Calibration Register
+
+	#define CKGR_PLLR  CKGR_PLLAR
+#endif
 /*\}*/
+
+/**
+ * Enable a peripheral clock.
+ *
+ * \param id  peripheral id of the peripheral whose clock is enabled
+ */
+#ifdef PMC_PCER1
+
+INLINE void pmc_periphEnable(unsigned id)
+{
+	ASSERT(id < 64);
+	if (id < 32)
+		PMC_PCER0 = BV(id);
+	else
+		PMC_PCER1 = BV(id - 32);
+}
+
+#else
+
+INLINE void pmc_periphEnable(unsigned id)
+{
+	ASSERT(id < 32);
+	PMC_PCER = BV(id);
+}
+
+#endif
+
+/**
+ * Disable a peripheral clock.
+ *
+ * \param id  peripheral id of the peripheral whose clock is enabled
+ */
+#ifdef PMC_PCER1
+
+INLINE void pmc_periphDisable(unsigned id)
+{
+	ASSERT(id < 64);
+	if (id < 32)
+		PMC_PCDR0 = BV(id);
+	else
+		PMC_PCDR1 = BV(id - 32);
+}
+
+#else
+
+INLINE void pmc_periphDisable(unsigned id)
+{
+	ASSERT(id < 32);
+	PMC_PCDR = BV(id);
+}
+
+#endif
 
 /**
  * Defines for bit fields in PMC_SCER register.
@@ -122,114 +218,6 @@
 #define PMC_SCSR_PCK0  8   ///< Programmable Clock 0 Output Status
 #define PMC_SCSR_PCK1  9   ///< Programmable Clock 1 Output Status
 #define PMC_SCSR_PCK2  10  ///< Programmable Clock 2 Output Status
-/*\}*/
-
-/**
- * Defines for bit fields in PMC_PCER register.
- */
-/*\{*/
-#define PMC_PCER_PID2    2    ///< Peripheral Clock 2 Enable
-#define PMC_PCER_PID3    3    ///< Peripheral Clock 3 Enable
-#define PMC_PCER_PID4    4    ///< Peripheral Clock 4 Enable
-#define PMC_PCER_PID5    5    ///< Peripheral Clock 5 Enable
-#define PMC_PCER_PID6    6    ///< Peripheral Clock 6 Enable
-#define PMC_PCER_PID7    7    ///< Peripheral Clock 7 Enable
-#define PMC_PCER_PID8    8    ///< Peripheral Clock 8 Enable
-#define PMC_PCER_PID9    9    ///< Peripheral Clock 9 Enable
-#define PMC_PCER_PID10  10   ///< Peripheral Clock 10 Enable
-#define PMC_PCER_PID11  11   ///< Peripheral Clock 11 Enable
-#define PMC_PCER_PID12  12   ///< Peripheral Clock 12 Enable
-#define PMC_PCER_PID13  13   ///< Peripheral Clock 13 Enable
-#define PMC_PCER_PID14  14   ///< Peripheral Clock 14 Enable
-#define PMC_PCER_PID15  15   ///< Peripheral Clock 15 Enable
-#define PMC_PCER_PID16  16   ///< Peripheral Clock 16 Enable
-#define PMC_PCER_PID17  17   ///< Peripheral Clock 17 Enable
-#define PMC_PCER_PID18  18   ///< Peripheral Clock 18 Enable
-#define PMC_PCER_PID19  19   ///< Peripheral Clock 19 Enable
-#define PMC_PCER_PID20  20   ///< Peripheral Clock 20 Enable
-#define PMC_PCER_PID21  21   ///< Peripheral Clock 21 Enable
-#define PMC_PCER_PID22  22   ///< Peripheral Clock 22 Enable
-#define PMC_PCER_PID23  23   ///< Peripheral Clock 23 Enable
-#define PMC_PCER_PID24  24   ///< Peripheral Clock 24 Enable
-#define PMC_PCER_PID25  25   ///< Peripheral Clock 25 Enable
-#define PMC_PCER_PID26  26   ///< Peripheral Clock 26 Enable
-#define PMC_PCER_PID27  27   ///< Peripheral Clock 27 Enable
-#define PMC_PCER_PID28  28   ///< Peripheral Clock 28 Enable
-#define PMC_PCER_PID29  29   ///< Peripheral Clock 29 Enable
-#define PMC_PCER_PID30  30   ///< Peripheral Clock 30 Enable
-#define PMC_PCER_PID31  31   ///< Peripheral Clock 31 Enable
-/*\}*/
-
-/**
- * Defines for bit fields in PMC_PCDR register.
- */
-/*\{*/
-#define PMC_PCDR_PID2    2   ///< Peripheral Clock 2 Disable
-#define PMC_PCDR_PID3    3   ///< Peripheral Clock 3 Disable
-#define PMC_PCDR_PID4    4   ///< Peripheral Clock 4 Disable
-#define PMC_PCDR_PID5    5   ///< Peripheral Clock 5 Disable
-#define PMC_PCDR_PID6    6   ///< Peripheral Clock 6 Disable
-#define PMC_PCDR_PID7    7   ///< Peripheral Clock 7 Disable
-#define PMC_PCDR_PID8    8   ///< Peripheral Clock 8 Disable
-#define PMC_PCDR_PID9    9   ///< Peripheral Clock 9 Disable
-#define PMC_PCDR_PID10  10  ///< Peripheral Clock 10 Disable
-#define PMC_PCDR_PID11  11  ///< Peripheral Clock 11 Disable
-#define PMC_PCDR_PID12  12  ///< Peripheral Clock 12 Disable
-#define PMC_PCDR_PID13  13  ///< Peripheral Clock 13 Disable
-#define PMC_PCDR_PID14  14  ///< Peripheral Clock 14 Disable
-#define PMC_PCDR_PID15  15  ///< Peripheral Clock 15 Disable
-#define PMC_PCDR_PID16  16  ///< Peripheral Clock 16 Disable
-#define PMC_PCDR_PID17  17  ///< Peripheral Clock 17 Disable
-#define PMC_PCDR_PID18  18  ///< Peripheral Clock 18 Disable
-#define PMC_PCDR_PID19  19  ///< Peripheral Clock 19 Disable
-#define PMC_PCDR_PID20  20  ///< Peripheral Clock 20 Disable
-#define PMC_PCDR_PID21  21  ///< Peripheral Clock 21 Disable
-#define PMC_PCDR_PID22  22  ///< Peripheral Clock 22 Disable
-#define PMC_PCDR_PID23  23  ///< Peripheral Clock 23 Disable
-#define PMC_PCDR_PID24  24  ///< Peripheral Clock 24 Disable
-#define PMC_PCDR_PID25  25  ///< Peripheral Clock 25 Disable
-#define PMC_PCDR_PID26  26  ///< Peripheral Clock 26 Disable
-#define PMC_PCDR_PID27  27  ///< Peripheral Clock 27 Disable
-#define PMC_PCDR_PID28  28  ///< Peripheral Clock 28 Disable
-#define PMC_PCDR_PID29  29  ///< Peripheral Clock 29 Disable
-#define PMC_PCDR_PID30  30  ///< Peripheral Clock 30 Disable
-#define PMC_PCDR_PID31  31  ///< Peripheral Clock 31 Disable
-/*\}*/
-
-/**
- * Defines for bit fields in PMC_PCSR register.
- */
-/*\{*/
-#define PMC_PCSR_PID2    2   ///< Peripheral Clock 2 Status
-#define PMC_PCSR_PID3    3   ///< Peripheral Clock 3 Status
-#define PMC_PCSR_PID4    4   ///< Peripheral Clock 4 Status
-#define PMC_PCSR_PID5    5   ///< Peripheral Clock 5 Status
-#define PMC_PCSR_PID6    6   ///< Peripheral Clock 6 Status
-#define PMC_PCSR_PID7    7   ///< Peripheral Clock 7 Status
-#define PMC_PCSR_PID8    8   ///< Peripheral Clock 8 Status
-#define PMC_PCSR_PID9    9   ///< Peripheral Clock 9 Status
-#define PMC_PCSR_PID10  10  ///< Peripheral Clock 10 Status
-#define PMC_PCSR_PID11  11  ///< Peripheral Clock 11 Status
-#define PMC_PCSR_PID12  12  ///< Peripheral Clock 12 Status
-#define PMC_PCSR_PID13  13  ///< Peripheral Clock 13 Status
-#define PMC_PCSR_PID14  14  ///< Peripheral Clock 14 Status
-#define PMC_PCSR_PID15  15  ///< Peripheral Clock 15 Status
-#define PMC_PCSR_PID16  16  ///< Peripheral Clock 16 Status
-#define PMC_PCSR_PID17  17  ///< Peripheral Clock 17 Status
-#define PMC_PCSR_PID18  18  ///< Peripheral Clock 18 Status
-#define PMC_PCSR_PID19  19  ///< Peripheral Clock 19 Status
-#define PMC_PCSR_PID20  20  ///< Peripheral Clock 20 Status
-#define PMC_PCSR_PID21  21  ///< Peripheral Clock 21 Status
-#define PMC_PCSR_PID22  22  ///< Peripheral Clock 22 Status
-#define PMC_PCSR_PID23  23  ///< Peripheral Clock 23 Status
-#define PMC_PCSR_PID24  24  ///< Peripheral Clock 24 Status
-#define PMC_PCSR_PID25  25  ///< Peripheral Clock 25 Status
-#define PMC_PCSR_PID26  26  ///< Peripheral Clock 26 Status
-#define PMC_PCSR_PID27  27  ///< Peripheral Clock 27 Status
-#define PMC_PCSR_PID28  28  ///< Peripheral Clock 28 Status
-#define PMC_PCSR_PID29  29  ///< Peripheral Clock 29 Status
-#define PMC_PCSR_PID30  30  ///< Peripheral Clock 30 Status
-#define PMC_PCSR_PID31  31  ///< Peripheral Clock 31 Status
 /*\}*/
 
 /**

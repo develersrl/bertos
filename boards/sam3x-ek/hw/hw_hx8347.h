@@ -91,7 +91,7 @@
  */
 INLINE void hx8347_cmd(uint8_t cmd)
 {
-    LCD_IR = cmd;
+	LCD_IR = cmd;
 }
 
 /**
@@ -99,7 +99,7 @@ INLINE void hx8347_cmd(uint8_t cmd)
  */
 INLINE void hx8347_write(uint16_t data)
 {
-    LCD_D = data;
+	LCD_D = data;
 }
 
 /**
@@ -107,7 +107,7 @@ INLINE void hx8347_write(uint16_t data)
  */
 INLINE uint16_t hx8347_read(void)
 {
-    return LCD_D;
+	return LCD_D;
 }
 
 /**
@@ -116,7 +116,7 @@ INLINE uint16_t hx8347_read(void)
  */
 INLINE void hx8347_busInit(void)
 {
-    // Configure pins: disable PIO...
+	// Configure pins: disable PIO...
 	HWREG(LCD_DATABUS_PORT + PIO_PDR_OFF) = LCD_DATABUS_PINS;
 	HWREG(LCD_NRD_PORT     + PIO_PDR_OFF) = LCD_NRD_PIN;
 	HWREG(LCD_NWE_PORT     + PIO_PDR_OFF) = LCD_NWE_PIN;
@@ -137,27 +137,27 @@ INLINE void hx8347_busInit(void)
 	PIO_PERIPH_SEL(LCD_NCS2_PORT, LCD_NCS2_PIN, LCD_NCS2_PERIPH);
 	PIO_PERIPH_SEL(LCD_RS_PORT, LCD_RS_PIN, LCD_RS_PERIPH);
 
-    // Enable peripheral clock
-	PMC_PCER = BV(SMC_SDRAMC_ID);
+	// Enable peripheral clock
+	pmc_periphEnable(SMC_SDRAMC_ID);
 
-    // Static memory controller configuration
-    SMC_SETUP2 =
+	// Static memory controller configuration
+	SMC_SETUP2 =
 		SMC_SETUP_NWE_SETUP(CLOCKS_PER_NS(10)) |
 		SMC_SETUP_NCS_WR_SETUP(CLOCKS_PER_NS(10)) |
 		SMC_SETUP_NRD_SETUP(CLOCKS_PER_NS(90)) |
 		SMC_SETUP_NCS_RD_SETUP(CLOCKS_PER_NS(90));
 
-    SMC_PULSE2 =
+	SMC_PULSE2 =
 		SMC_PULSE_NWE_PULSE(CLOCKS_PER_NS(35)) |
 		SMC_PULSE_NCS_WR_PULSE(CLOCKS_PER_NS(35)) |
 		SMC_PULSE_NRD_PULSE(CLOCKS_PER_NS(355)) |
 		SMC_PULSE_NCS_RD_PULSE(CLOCKS_PER_NS(355));
 
-    SMC_CYCLE2 =
+	SMC_CYCLE2 =
 		SMC_CYCLE_NWE_CYCLE(CLOCKS_PER_NS(100)) |
 		SMC_CYCLE_NRD_CYCLE(CLOCKS_PER_NS(460));
 
-    SMC_MODE2 =
+	SMC_MODE2 =
 		SMC_MODE_WRITE_MODE | SMC_MODE_READ_MODE | SMC_MODE_DBW;
 }
 

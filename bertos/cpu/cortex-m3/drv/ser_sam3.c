@@ -338,7 +338,7 @@ static void uart0_init(
 	UNUSED_ARG(struct Serial *, ser))
 {
 	US0_IDR = 0xFFFFFFFF;
-	PMC_PCER = BV(US0_ID);
+	pmc_periphEnable(US0_ID);
 
 	/*
 	 * - Reset USART0
@@ -431,7 +431,7 @@ static void uart1_init(
 	UNUSED_ARG(struct Serial *, ser))
 {
 	US1_IDR = 0xFFFFFFFF;
-	PMC_PCER = BV(US1_ID);
+	pmc_periphEnable(US1_ID);
 
 	/*
 	 * - Reset USART1
@@ -547,7 +547,7 @@ static void spi0_init(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(struc
 
 	//sysirq_setPriority(INT_SPI0, SERIRQ_PRIORITY);
 	sysirq_setHandler(INT_SPI0, spi0_irq_handler);
-	PMC_PCER = BV(SPI0_ID);
+	pmc_periphEnable(SPI0_ID);
 
 	/* Enable SPI */
 	SPI0_CR = BV(SPI_SPIEN);
@@ -625,7 +625,7 @@ static void spi1_init(UNUSED_ARG(struct SerialHardware *, _hw), UNUSED_ARG(struc
 
 	sysirq_setPriority(INT_SPI1, SERIRQ_PRIORITY);
 	sysirq_setHandler(INT_SPI1, spi1_irq_dispatcher);
-	PMC_PCER = BV(SPI1_ID);
+	pmc_periphEnable(SPI1_ID);
 
 	/* Enable SPI */
 	SPI1_CR = BV(SPI_SPIEN);
