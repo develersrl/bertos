@@ -117,10 +117,15 @@ int signal_testTearDown(void);
 #define SIG_USER1    BV(1)  /**< Free for user usage */
 #define SIG_USER2    BV(2)  /**< Free for user usage */
 #define SIG_USER3    BV(3)  /**< Free for user usage */
-#define SIG_TIMEOUT  BV(4)  /**< Reserved for timeout use */
-#define SIG_SYSTEM5  BV(5)  /**< Reserved for system use */
-#define SIG_SYSTEM6  BV(6)  /**< Reserved for system use */
-#define SIG_SINGLE   BV(7)  /**< Used to wait for a single event */
+#define SIG_SINGLE   BV(4)  /**< Used to wait for a single event */
+#define SIG_SYSTEM5  BV(5)  /**< Reserved for internal system use */
+#define SIG_SYSTEM6  BV(6)  /**< Reserved for internal system use */
+#define SIG_TIMEOUT  BV(7)  /**< Reserved for timeout use */
+
+/**
+ * Max number of signals that can be used by drivers or user applications.
+ */
+#define SIG_USER_MAX SIG_SINGLE
 /*\}*/
 
 /* \} */ //defgroup kern_signal
