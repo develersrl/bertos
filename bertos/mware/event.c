@@ -69,11 +69,3 @@ void event_hook_generic(Event *e)
 	e->Ev.Gen.completed = true;
 	MEMORY_BARRIER;
 }
-
-#if CONFIG_TIMER_EVENTS
-void event_hook_generic_timeout(Event *e)
-{
-	e->Ev.Gen.completed = true;
-	MEMORY_BARRIER;
-}
-#endif

@@ -148,7 +148,6 @@ void event_hook_signal(Event *event);
 void event_hook_softint(Event *event);
 void event_hook_generic(Event *event);
 void event_hook_generic_signal(Event *event);
-void event_hook_generic_timeout(Event *event);
 
 /** Initialize the event \a e as a no-op */
 #define event_initNone(e) \
