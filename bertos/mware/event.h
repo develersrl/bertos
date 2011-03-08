@@ -286,58 +286,7 @@ INLINE void event_wait(Event *e)
 #endif
 }
 
-/**
- * Wait for multiple events
- *
- * On success return the offset in the \a evs vector of the Event that
- * happened, -1 if the timeout expires.
- *
- * NOTE: timeout == 0 means no timeout.
- */
-#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
-INLINE int event_select(Event **evs, int n, ticks_t timeout)
-{
-	sigmask_t mask = (1 << n) - 1;
-	int i;
-
-	ASSERT(n <= SIG_USER_MAX);
-	for (i = 0; i < n; i++)
-	{
-		Event *e = evs[i];
-		/* Map each event to a distinct signal bit */
-		event_initSignal(e, proc_current(), 1 << i);
-	}
-	mask = timeout ? sig_waitTimeout(mask, timeout) : sig_wait(mask);
-	i = UINT8_LOG2(mask);
-
-	return i < n ? i : -1;
-}
-#else
-INLINE int event_select(Event **evs, int n, ticks_t timeout)
-{
-	ticks_t end = timer_clock() + timeout;
-	int i;
-
-	while (1)
-	{
-		for (i = 0; i < n; i++)
-		{
-			Event *e = evs[i];
-			if (ACCESS_SAFE(e->Ev.Gen.completed) == true)
-			{
-				e->Ev.Gen.completed = false;
-				MEMORY_BARRIER;
-				return i;
-			}
-		}
-		if (timeout && TIMER_AFTER(timer_clock(), end))
-			break;
-		cpu_relax();
-	}
-	return -1;
-}
-#endif
-
+int event_select(Event **evs, int n, ticks_t timeout);
 
 #if CONFIG_TIMER_EVENTS
 #include <drv/timer.h> /* timer_clock() */
