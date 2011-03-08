@@ -310,6 +310,18 @@ void synctimer_poll(List* q);
 
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 
+/** Set the timer so that it sends a event notification when it expires */
+INLINE void timer_setEvent(Timer *timer)
+{
+	event_initGeneric(&timer->expire);
+}
+
+/** Wait until the timer expires */
+INLINE void timer_waitEvent(Timer *timer)
+{
+	event_wait(&timer->expire);
+}
+
 /** Set the timer so that it sends a signal when it expires */
 INLINE void timer_setSignal(Timer *timer, struct Process *proc, sigmask_t sigs)
 {
