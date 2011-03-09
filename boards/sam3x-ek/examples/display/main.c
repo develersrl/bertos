@@ -54,7 +54,6 @@
 #include <kern/signal.h>
 #include <kern/proc.h>
 
-#warning FIX PMC
 
 // Keyboard
 #define KEY_MASK (K_LEFT | K_RIGHT)
