@@ -46,6 +46,7 @@
 #include "hw/hw_dc_motor.h"
 
 #include "cfg/cfg_dc_motor.h"
+#include "cfg/cfg_pwm.h"
 #include <cfg/macros.h>
 
 #include <algo/pid_control.h>
@@ -70,7 +71,7 @@ typedef struct DCMotorConfig
 	PidCfg pid_cfg;         ///< Pid control.
 	bool pid_enable;        ///< Flag to disable or enable pid control.
 
-	PwmDev pwm_dev;         ///< Pwm channel.
+	unsigned pwm_dev;       ///< Pwm channel.
 	pwm_freq_t freq;        ///< Pwm waveform frequency.
 
 	adc_ch_t adc_ch;        ///< ADC channel.
@@ -92,14 +93,18 @@ typedef struct DCMotorConfig
  */
 typedef struct DCMotor
 {
-	const DCMotorConfig *cfg; ///< All configuration for select DC motor.
-	PidContext pid_ctx;       ///< Pid control.
+	const DCMotorConfig *cfg; // All configuration for select DC motor.
+	PidContext pid_ctx;       // Pid control.
 
-	int index;                ///< DC motor id.
-	uint32_t status;          ///< Status of select DC motor
-	dc_speed_t tgt_speed;     ///< Target speed for select DC motor
+#if !CFG_PWM_ENABLE_OLD_API
+	Pwm pwm;                  // Pwm context
+#endif
 
-	ticks_t expire_time;      ///< Amount of time that  dc motor run
+	int index;                // DC motor id.
+	uint32_t status;          // Status of select DC motor
+	dc_speed_t tgt_speed;     // Target speed for select DC motor
+
+	ticks_t expire_time;      // Amount of time that  dc motor run
 
 } DCMotor;
 

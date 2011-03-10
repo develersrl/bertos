@@ -40,44 +40,64 @@
 #ifndef DRV_PWM_AT91_H
 #define DRV_PWM_AT91_H
 
-#include "hw/pwm_map.h"
-
 #include <cfg/compiler.h>
 #include <cfg/macros.h>
 
+#include "cfg/cfg_pwm.h"
+
 #include <io/arm.h>
 
+#if CFG_PWM_ENABLE_OLD_API
 
-#define PWM_HW_MAX_PRESCALER_STEP         10
-#define PWM_HW_MAX_PERIOD             0xFFFF
+	#include "hw/pwm_map.h"
 
-/**
- * Type definition for pwm period.
- */
-typedef uint16_t pwm_period_t;
+	/**
+	 * Type definition for pwm period.
+	 */
+	typedef uint16_t pwm_period_t;
 
-/**
- * Structur definition for pwm driver.
- */
-typedef struct PwmChannel
-{
-	bool duty_zero;         ///< True if duty cyle is zero, false otherwise.
-	bool pol;               ///< PWM polarty flag.
-	int pwm_pin;            ///< PWM pin.
-	reg32_t *mode_reg;      ///< PWM mode register.
-	reg32_t *duty_reg;      ///< PWM duty cycle register.
-	reg32_t *period_reg;    ///< PWM periodic register.
-	reg32_t *update_reg;    ///< Update setting register for PWM.
+	/**
+	 * Structur definition for pwm driver.
+	 */
+	typedef struct PwmChannel
+	{
+		bool duty_zero;         ///< True if duty cyle is zero, false otherwise.
+		bool pol;               ///< PWM polarty flag.
+		int pwm_pin;            ///< PWM pin.
+		reg32_t *mode_reg;      ///< PWM mode register.
+		reg32_t *duty_reg;      ///< PWM duty cycle register.
+		reg32_t *period_reg;    ///< PWM periodic register.
+		reg32_t *update_reg;    ///< Update setting register for PWM.
 
-} PwmChannel;
+	} PwmChannel;
 
 
-void pwm_hw_init(void);
-void pwm_hw_setFrequency(PwmDev dev, uint32_t freq);
-void pwm_hw_setDutyUnlock(PwmDev dev, uint16_t duty);
-void pwm_hw_disable(PwmDev dev);
-void pwm_hw_enable(PwmDev dev);
-void pwm_hw_setPolarity(PwmDev dev, bool pol);
-pwm_period_t pwm_hw_getPeriod(PwmDev dev);
+	void pwm_hw_init(void);
+	void pwm_hw_setFrequency(PwmDev dev, uint32_t freq);
+	void pwm_hw_setDutyUnlock(PwmDev dev, uint16_t duty);
+	void pwm_hw_disable(PwmDev dev);
+	void pwm_hw_enable(PwmDev dev);
+	void pwm_hw_setPolarity(PwmDev dev, bool pol);
+	pwm_period_t pwm_hw_getPeriod(PwmDev dev);
+
+#else
+	#include <drv/pwm.h>
+
+	typedef uint16_t pwm_hwreg_t;
+
+	struct PwmChannelRegs; //fwd decl
+
+	typedef struct PwmHardware
+	{
+		uint32_t pwm_pin;       ///< PWM pin.
+		volatile struct PwmChannelRegs *base;
+	} PwmHardware;
+
+	pwm_hwreg_t pwm_hw_getPeriod(Pwm *ctx);
+	void pwm_hw_setFrequency(struct Pwm *ctx, pwm_freq_t freq);
+	void pwm_hw_setDuty(Pwm *ctx, pwm_hwreg_t duty);
+	void pwm_hw_init(struct Pwm *ctx, unsigned ch);
+
+#endif
 
 #endif /* DRV_ADC_AT91_H */

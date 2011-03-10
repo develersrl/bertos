@@ -121,7 +121,9 @@ int dc_motor_testSetUp(void)
 	kdbg_init();
 	timer_init();
 	proc_init();
+#if !CFG_PWM_ENABLE_OLD_API
 	pwm_init();
+#endif
 	adc_init();
 
 	return 0;

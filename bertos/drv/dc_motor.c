@@ -46,6 +46,7 @@
 
 #include "dc_motor.h"
 #include "hw/hw_dc_motor.h"
+#include "cfg/cfg_pwm.h"
 
 // Define logging setting (for cfg/log.h module).
 #define LOG_LEVEL         DC_MOTOR_LOG_LEVEL
@@ -63,6 +64,18 @@
 #include <cpu/power.h>
 
 #include <string.h>
+
+#if CFG_PWM_ENABLE_OLD_API
+	#define PWM_ENABLE(dcm, en)    pwm_enable((dcm)->cfg->pwm_dev, (en))
+	#define PWM_SETDUTY(dcm, duty) pwm_setDuty((dcm)->cfg->pwm_dev, (duty))
+	#define PWM_SETFREQ(dcm, freq) pwm_setFrequency((dcm)->cfg->pwm_dev, (freq))
+	#define PWM_SETPOL(dcm, pol)   pwm_setPolarity((dcm)->cfg->pwm_dev, (pol))
+#else
+	#define PWM_ENABLE(dcm, en)    pwm_enable(&(dcm)->pwm, (en))
+	#define PWM_SETDUTY(dcm, duty) pwm_setDuty(&(dcm)->pwm, (duty))
+	#define PWM_SETFREQ(dcm, freq) pwm_setFrequency(&(dcm)->pwm, (freq))
+	#define PWM_SETPOL(dcm, pol)   pwm_setPolarity(&(dcm)->pwm, (pol))
+#endif
 
 /**
  * Define status bit for DC motor device.
@@ -164,7 +177,7 @@ static void dc_motor_stop(int index)
 
 	dcm->status &= ~DC_MOTOR_ACTIVE;
 	dcm->expire_time = DC_MOTOR_NO_EXPIRE;
-	pwm_enable(dcm->cfg->pwm_dev, false);
+	PWM_ENABLE(dcm, false);
 
 	if (dcm->cfg->braked)
 	{
@@ -202,7 +215,7 @@ static void dc_motor_do(int index)
 	 * To set dc motor direction we must also set the
 	 * PWM polarity according with dc motor driver chip
 	 */
-	pwm_setPolarity(dcm->cfg->pwm_dev, dcm->status & DC_MOTOR_DIR);
+	PWM_SETPOL(dcm, dcm->status & DC_MOTOR_DIR);
 	DC_MOTOR_SET_DIR(dcm->index, dcm->status & DC_MOTOR_DIR);
 
 	//Compute next value for reaching target speed from current position
@@ -235,10 +248,10 @@ static void dc_motor_do(int index)
 	);
 
 	//Apply the compute duty value
-	pwm_setDuty(dcm->cfg->pwm_dev, new_pid);
+	PWM_SETDUTY(dcm, new_pid);
 
 	//Restart dc motor
-	pwm_enable(dcm->cfg->pwm_dev, true);
+	PWM_ENABLE(dcm, true);
 
 	DC_MOTOR_ENABLE(dcm->index);
 	DC_MOTOR_UNLOCK;
@@ -315,7 +328,7 @@ static void NORETURN dc_motor_poll(void)
 			if (dcm_all[i].status & DC_MOTOR_ACTIVE)
 			{
 				DC_MOTOR_DISABLE(dcm_all[i].index);
-				pwm_enable(dcm_all[i].cfg->pwm_dev, false);
+				PWM_ENABLE(&dcm_all[i], false);
 			}
 			DC_MOTOR_UNLOCK;
 		}
@@ -440,9 +453,11 @@ void dc_motor_setup(int index, DCMotorConfig *dcm_conf)
 	 * Clear the status.
 	 */
 	dcm->status = 0;
-
-	pwm_setFrequency(dcm->cfg->pwm_dev, dcm->cfg->freq);
-	pwm_enable(dcm->cfg->pwm_dev, false);
+#if !CFG_PWM_ENABLE_OLD_API
+	pwm_init(&dcm->pwm, dcm_conf->pwm_dev);
+#endif
+	PWM_SETFREQ(dcm, dcm->cfg->freq);
+	PWM_ENABLE(dcm, false);
 
 	//Set default direction for DC motor
 	DC_MOTOR_SET_DIR(dcm->index, dcm->cfg->dir);
