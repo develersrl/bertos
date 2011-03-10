@@ -30,7 +30,7 @@
  *
  * -->
  *
- * \brief Atmel SAM3X-EK simple demo
+ * \brief Atmel SAM3X-EK testcase
  *
  * \author Stefano Fedrigo <aleph@develer.com>
  */
@@ -39,9 +39,11 @@
 
 #include "hw/hw_led.h"
 #include "hw/hw_lcd.h"
+#include "hw/hw_sdram.h"
 
 #include <cfg/debug.h>
 #include <cpu/irq.h>
+#include <struct/heap.h>
 #include <drv/timer.h>
 #include <drv/kbd.h>
 #include <drv/lcd_hx8347.h>
@@ -71,8 +73,9 @@
 	static PROC_DEFINE_STACK(led_stack, PROC_STACK_SIZE);
 #endif
 
+static struct Heap heap;
 static uint8_t raster[RAST_SIZE(LCD_WIDTH, LCD_HEIGHT)];
-static Bitmap lcd_bitmap;
+static Bitmap *lcd_bitmap;
 extern Font font_gohu;
 static int lcd_brightness = LCD_BACKLIGHT_MAX;
 static Process *hp_proc, *lp_proc, *led_proc;
@@ -208,14 +211,16 @@ static void res_process(void)
 	{
 		/* Show context switch (in clock cycles) */
 		c = spinner[i % countof(spinner)];
-		text_xprintf(&lcd_bitmap, 3, 0, TEXT_CENTER | TEXT_FILL, "%c Context switch %c", c, c);
-		text_xprintf(&lcd_bitmap, 5, 0, TEXT_FILL, " %lu clock cycles", end - start);
+		text_xprintf(lcd_bitmap, 3, 0, TEXT_CENTER | TEXT_FILL, "%c Context switch %c", c, c);
+		text_xprintf(lcd_bitmap, 5, 0, TEXT_FILL, " %lu clock cycles", end - start);
 		/* Show context switch (in usec) */
-		text_xprintf(&lcd_bitmap, 6, 0, TEXT_FILL,
+		text_xprintf(lcd_bitmap, 6, 0, TEXT_FILL,
 			" %lu.%lu usec",
 				((end - start) * 1000000) / CPU_FREQ,
 				((end - start) * (100000000 / CPU_FREQ)) % 100);
-		lcd_hx8347_blitBitmap(&lcd_bitmap);
+		text_xprintf(lcd_bitmap, 8, 0, TEXT_FILL,
+			" Free heap memory: %u bytes", heap_freeSpace(&heap));
+		lcd_hx8347_blitBitmap(lcd_bitmap);
 		timer_delay(5);
 		if (kbd_peek() & KEY_MASK)
 			break;
@@ -225,7 +230,7 @@ static void res_process(void)
 static void context_switch_test(Bitmap *bm)
 {
 	const Font *old_font = bm->font;
-	gfx_setFont(&lcd_bitmap, &font_gohu);
+	gfx_setFont(lcd_bitmap, &font_gohu);
 
 	gfx_bitmapClear(bm);
 	text_xprintf(bm, 0, 0, TEXT_FILL,
@@ -234,7 +239,7 @@ static void context_switch_test(Bitmap *bm)
 
 	res_process();
 
-	gfx_setFont(&lcd_bitmap, old_font);
+	gfx_setFont(lcd_bitmap, old_font);
 }
 
 static void uptime(Bitmap *bm)
@@ -246,7 +251,7 @@ static void uptime(Bitmap *bm)
 		ticks_t clock = ticks_to_ms(timer_clock_unlocked());
 
 		/* Display uptime (in ticks) */
-		text_xprintf(&lcd_bitmap, 2, 0, TEXT_FILL | TEXT_CENTER,
+		text_xprintf(lcd_bitmap, 2, 0, TEXT_FILL | TEXT_CENTER,
 				"seconds: %lu", clock / 1000);
 		lcd_hx8347_blitBitmap(bm);
 		timer_delay(5);
@@ -305,34 +310,50 @@ static void NORETURN soft_reset(Bitmap * bm)
 
 static struct MenuItem main_items[] =
 {
-	{ (const_iptr_t)"LED blinking", 0, (MenuHook)led_test, (iptr_t)&lcd_bitmap },
-	{ (const_iptr_t)"Graphics demo", 0, (MenuHook)show_logo, (iptr_t)&lcd_bitmap },
-	{ (const_iptr_t)"Bouncing logo", 0, (MenuHook)bouncing_logo, (iptr_t)&lcd_bitmap },
-	{ (const_iptr_t)"Screen saver demo", 0, (MenuHook)screen_saver, (iptr_t)&lcd_bitmap },
-	{ (const_iptr_t)"Scheduling test", 0, (MenuHook)context_switch_test, (iptr_t)&lcd_bitmap },
-	{ (const_iptr_t)"Show uptime", 0, (MenuHook)uptime, (iptr_t)&lcd_bitmap },
-	{ (const_iptr_t)"Display brightness", 0, (MenuHook)setBrightness, (iptr_t)&lcd_bitmap },
-	{ (const_iptr_t)"Reboot", 0, (MenuHook)soft_reset, (iptr_t)&lcd_bitmap },
+	{ (const_iptr_t)"LED blinking", 0, (MenuHook)led_test, NULL },
+	{ (const_iptr_t)"Graphics demo", 0, (MenuHook)show_logo, NULL },
+	{ (const_iptr_t)"Bouncing logo", 0, (MenuHook)bouncing_logo, NULL },
+	{ (const_iptr_t)"Screen saver demo", 0, (MenuHook)screen_saver, NULL },
+	{ (const_iptr_t)"Scheduling test", 0, (MenuHook)context_switch_test, NULL },
+	{ (const_iptr_t)"Show uptime", 0, (MenuHook)uptime, NULL },
+	{ (const_iptr_t)"Display brightness", 0, (MenuHook)setBrightness, NULL },
+	{ (const_iptr_t)"Reboot", 0, (MenuHook)soft_reset, NULL },
 	{ (const_iptr_t)0, 0, NULL, (iptr_t)0 }
 };
-static struct Menu main_menu = { main_items, "BeRTOS", MF_STICKY | MF_SAVESEL, &lcd_bitmap, 0, lcd_hx8347_blitBitmap };
+static struct Menu main_menu = { main_items, "BeRTOS", MF_STICKY | MF_SAVESEL, NULL, 0, lcd_hx8347_blitBitmap };
 
 
 int main(void)
 {
+	unsigned i;
+
 	IRQ_ENABLE;
 
 	kdbg_init();
 	LED_INIT();
 	timer_init();
 	proc_init();
+	sdram_init();
+
+	heap_init(&heap, (void *)SDRAM_BASE, SDRAM_SIZE);
+	lcd_bitmap = heap_allocmem(&heap, RAST_SIZE(LCD_WIDTH, LCD_HEIGHT));
+	if (lcd_bitmap)
+		kprintf("Allocated memory for display raster, addr 0x%x\n", (unsigned)lcd_bitmap);
+	else
+	{
+		kprintf("Error allocating memory for LCD raster!\n");
+		return 0;
+	}
+	for (i = 0; main_items[i].label; i++)
+		main_items[i].userdata = lcd_bitmap;
+	main_menu.bitmap = lcd_bitmap;
 
 	lcd_hx8347_init();
 	lcd_setBacklight(lcd_brightness);
 
-	gfx_bitmapInit(&lcd_bitmap, raster, LCD_WIDTH, LCD_HEIGHT);
-	gfx_setFont(&lcd_bitmap, &font_luBS14);
-	lcd_hx8347_blitBitmap(&lcd_bitmap);
+	gfx_bitmapInit(lcd_bitmap, raster, LCD_WIDTH, LCD_HEIGHT);
+	gfx_setFont(lcd_bitmap, &font_luBS14);
+	lcd_hx8347_blitBitmap(lcd_bitmap);
 
 	kbd_init();
 

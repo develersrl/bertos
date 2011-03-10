@@ -20,7 +20,7 @@ description = '''
 
 	<tr>
 		<td><b>Peripherals</b></td>
-		<td>timers, UART, LCD display</td>
+		<td>timers, UART, SDRAM, LCD display</td>
 	</tr>
 </table>
 </p>
