@@ -450,6 +450,9 @@
 	#endif
 #endif
 
+/** User defined callback type */
+typedef void (*Hook)(void *);
+
 /** Bulk storage large enough for both pointers or integers. */
 typedef void * iptr_t;
 

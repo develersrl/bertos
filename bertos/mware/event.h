@@ -153,9 +153,6 @@
 	struct Process;
 #endif
 
-/// User defined callback type
-typedef void (*Hook)(void *);
-
 typedef struct Event
 {
 	void (*action)(struct Event *);
