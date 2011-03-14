@@ -147,12 +147,20 @@ INLINE sigmask_t sig_wait(sigmask_t sigs)
 	return sig_waitSignal(&proc->sig, sigs);
 }
 
-sigmask_t sig_waitTimeoutSignal(Signal *s, sigmask_t sigs, ticks_t timeout);
+sigmask_t sig_waitTimeoutSignal(Signal *s, sigmask_t sigs, ticks_t timeout,
+				Hook func, iptr_t data);
 
+/**
+ * Sleep until any of the signals in \a sigs or \a timeout ticks elapse.
+ * If the timeout elapse a SIG_TIMEOUT is added to the received signal(s).
+ * \return the signal(s) that have awoken the process.
+ * \note Caller must check return value to check which signal awoke the process.
+ */
 INLINE sigmask_t sig_waitTimeout(sigmask_t sigs, ticks_t timeout)
 {
 	Process *proc = proc_current();
-	return sig_waitTimeoutSignal(&proc->sig, sigs, timeout);
+	return sig_waitTimeoutSignal(&proc->sig, sigs, timeout,
+			NULL, NULL);
 }
 
 #endif /* CONFIG_KERN_SIGNALS */

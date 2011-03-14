@@ -191,13 +191,9 @@ sigmask_t sig_waitSignal(Signal *s, sigmask_t sigs)
 #if CONFIG_TIMER_EVENTS
 
 #include <drv/timer.h>
-/**
- * Sleep until any of the signals in \a sigs or \a timeout ticks elapse.
- * If the timeout elapse a SIG_TIMEOUT is added to the received signal(s).
- * \return the signal(s) that have awoken the process.
- * \note Caller must check return value to check which signal awoke the process.
- */
-sigmask_t sig_waitTimeoutSignal(Signal *s, sigmask_t sigs, ticks_t timeout)
+
+sigmask_t sig_waitTimeoutSignal(Signal *s, sigmask_t sigs, ticks_t timeout,
+				Hook func, iptr_t data)
 {
 	Timer t;
 	sigmask_t res;
@@ -208,7 +204,10 @@ sigmask_t sig_waitTimeoutSignal(Signal *s, sigmask_t sigs, ticks_t timeout)
 	/* IRQ are needed to run timer */
 	ASSERT(IRQ_ENABLED());
 
-	timer_set_event_signal(&t, proc_current(), SIG_TIMEOUT);
+	if (func)
+		timer_setSoftint(&t, func, data);
+	else
+		timer_set_event_signal(&t, proc_current(), SIG_TIMEOUT);
 	timer_setDelay(&t, timeout);
 	timer_add(&t);
 	res = sig_waitSignal(s, SIG_TIMEOUT | sigs);
