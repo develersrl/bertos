@@ -67,6 +67,7 @@ static bool flash_wait(struct KBlock *blk)
 	ticks_t start = timer_clock();
 	while (true)
 	{
+		cpu_relax();
 		if (!(EMB_FLASH->SR & FLASH_FLAG_BSY))
 			break;
 
@@ -90,8 +91,6 @@ static bool flash_wait(struct KBlock *blk)
 			LOG_ERR("Timeout..\n");
 			return false;
 		}
-
-		cpu_relax();
 	}
 
 	return true;
