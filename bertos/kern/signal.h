@@ -51,12 +51,38 @@
 #include <cfg/compiler.h>
 #include <cfg/macros.h>    // BV()
 
+#include <cpu/irq.h>
+
 #include <kern/proc.h>
 
 #if CONFIG_KERN_SIGNALS
 
-/* Inter-process Communication services */
-sigmask_t sig_checkSignal(Signal *s, sigmask_t sigs);
+INLINE sigmask_t __sig_checkSignal(Signal *s, sigmask_t sigs)
+{
+	sigmask_t result;
+
+	result = s->recv & sigs;
+	s->recv &= ~sigs;
+
+	return result;
+}
+
+/**
+ * Check if any of the signals in \a sigs has occurred and clear them.
+ *
+ * \return the signals that have occurred.
+ */
+INLINE sigmask_t sig_checkSignal(Signal *s, sigmask_t sigs)
+{
+	cpu_flags_t flags;
+	sigmask_t result;
+
+	IRQ_SAVE_DISABLE(flags);
+	result = __sig_checkSignal(s, sigs);
+	IRQ_RESTORE(flags);
+
+	return result;
+}
 
 INLINE sigmask_t sig_check(sigmask_t sigs)
 {

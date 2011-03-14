@@ -141,29 +141,6 @@
 // Check config dependencies
 CONFIG_DEPEND(CONFIG_KERN_SIGNALS, CONFIG_KERN);
 
-/**
- * Check if any of the signals in \a sigs has occurred and clear them.
- *
- * \return the signals that have occurred.
- */
-sigmask_t sig_checkSignal(Signal *s, sigmask_t sigs)
-{
-	sigmask_t result;
-	cpu_flags_t flags;
-
-	IRQ_SAVE_DISABLE(flags);
-	result = s->recv & sigs;
-	s->recv &= ~sigs;
-	IRQ_RESTORE(flags);
-
-	return result;
-}
-
-
-/**
- * Sleep until any of the signals in \a sigs occurs.
- * \return the signal(s) that have awoken the process.
- */
 sigmask_t sig_waitSignal(Signal *s, sigmask_t sigs)
 {
 	sigmask_t result;
