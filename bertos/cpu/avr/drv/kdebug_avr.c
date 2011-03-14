@@ -355,6 +355,7 @@ INLINE void kdbg_hw_init(void)
 			#if CONFIG_KDEBUG_PORT == 0
 				UBRR0H = (uint8_t)(period>>8);
 				UBRR0L = (uint8_t)period;
+				UCSR0A = 0; /* The Arduino Uno bootloader turns on U2X0 */
 				KDBG_UART0_BUS_INIT;
 			#else
 				#error Only CONFIG_KDEBUG_PORT 0 is supported for this cpu

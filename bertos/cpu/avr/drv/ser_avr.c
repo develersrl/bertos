@@ -146,6 +146,7 @@
 	 * - Enable only the RX complete interrupt
 	 */
 	#define SER_UART0_BUS_TXINIT do { \
+		UCSR0A = 0; /* The Arduino Uno bootloader turns on U2X0 */ \
 		UCSR0B = BV(BIT_RXCIE0) | BV(BIT_RXEN0) | BV(BIT_TXEN0); \
 	} while (0)
 #endif
