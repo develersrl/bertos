@@ -144,13 +144,10 @@
 
 #include <cpu/power.h> /* cpu_relax() */
 
-#if CONFIG_KERN
-	#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
-		#include <kern/signal.h>
-	#endif
-
-	/* Forward decl */
-	struct Process;
+#if CONFIG_KERN && CONFIG_KERN_SIGNALS
+#include <kern/signal.h>
+/* Forward decl */
+struct Process;
 #endif
 
 typedef struct Event
@@ -158,18 +155,13 @@ typedef struct Event
 	void (*action)(struct Event *);
 	union
 	{
-#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
+#if CONFIG_KERN && CONFIG_KERN_SIGNALS
 		struct
 		{
 			struct Process *sig_proc;  /* Process to be signalled */
 			sigbit_t        sig_bit;   /* Signal to send */
+			Signal          sig;       /* Local signal structure (used by generic event) */
 		} Sig;
-
-		struct
-		{
-			struct Process *sig_proc;  /* Process to be signalled */
-			Signal          sig;       /* Signal structure */
-		} SigGen;
 #endif
 		struct
 		{
@@ -195,7 +187,6 @@ void event_hook_generic_signal(Event *event);
 	((e)->action = event_hook_ignore)
 
 /** Same as event_initNone(), but returns the initialized event */
-INLINE Event event_createNone(void);
 INLINE Event event_createNone(void)
 {
 	Event e;
@@ -217,8 +208,7 @@ INLINE Event event_createSoftint(Hook func, void *user_data)
 	return e;
 }
 
-#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
-
+#if CONFIG_KERN && CONFIG_KERN_SIGNALS
 /** Initialize the event \a e with a signal (send signal \a s to process \a p) */
 #define event_initSignal(e,p,s) \
 	((e)->action = event_hook_signal,(e)->Ev.Sig.sig_proc = (p), (e)->Ev.Sig.sig_bit = (s))
@@ -233,23 +223,21 @@ INLINE Event event_createSignal(struct Process *proc, sigbit_t bit)
 	return e;
 }
 
-#endif
+/**
+ * Signal used to implement generic events.
+ */
+#define EVENT_GENERIC_SIGNAL	SIG_SYSTEM6
 
-#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
 /** Initialize the generic sleepable event \a e */
 #define event_initGeneric(e)					\
 	((e)->action = event_hook_generic_signal,		\
-		(e)->Ev.SigGen.sig_proc = proc_current(),	\
-		(e)->Ev.SigGen.sig.wait = 0, (e)->Ev.SigGen.sig.recv = 0)
+		(e)->Ev.Sig.sig_proc = proc_current(),		\
+		(e)->Ev.Sig.sig_bit = EVENT_GENERIC_SIGNAL,	\
+		(e)->Ev.Sig.sig.wait = 0, (e)->Ev.Sig.sig.recv = 0)
 #else
 #define event_initGeneric(e) \
 	((e)->action = event_hook_generic, (e)->Ev.Gen.completed = false)
 #endif
-
-/**
- * Signal used to implement generic events.
- */
-#define EVENT_GENERIC_SIGNAL	SIG_SYSTEM5
 
 /**
  * Create a generic sleepable event.
@@ -272,9 +260,9 @@ INLINE Event event_createGeneric(void)
  */
 INLINE void event_wait(Event *e)
 {
-#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
+#if CONFIG_KERN_SIGNALS
 	e->Ev.Sig.sig_proc = proc_current();
-	sig_waitSignal(&e->Ev.SigGen.sig, EVENT_GENERIC_SIGNAL);
+	sig_waitSignal(&e->Ev.Sig.sig, EVENT_GENERIC_SIGNAL);
 #else
 	while (ACCESS_SAFE(e->Ev.Gen.completed) == false)
 		cpu_relax();
@@ -283,38 +271,24 @@ INLINE void event_wait(Event *e)
 #endif
 }
 
+/**
+ * Wait for multiple events
+ *
+ * On success return the offset in the \a evs vector of the Event that
+ * happened, -1 if the timeout expires.
+ *
+ * NOTE: timeout == 0 means no timeout.
+ *
+ * \attention The API is work in progress and may change in future versions.
+ */
 int event_select(Event **evs, int n, ticks_t timeout);
-
-#if CONFIG_TIMER_EVENTS
-#include <drv/timer.h> /* timer_clock() */
 
 /**
  * Wait the completion of event \a e or \a timeout elapses.
  *
  * \note It's forbidden to use this function inside irq handling functions.
  */
-INLINE bool event_waitTimeout(Event *e, ticks_t timeout)
-{
-	bool ret;
-
-#if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
-	e->Ev.Sig.sig_proc = proc_current();
-	ret = (sig_waitTimeoutSignal(&e->Ev.SigGen.sig,
-				EVENT_GENERIC_SIGNAL, timeout) & SIG_TIMEOUT) ?
-				false : true;
-#else
-	ticks_t end = timer_clock() + timeout;
-
-	while ((ACCESS_SAFE(e->Ev.Gen.completed) == false) ||
-			TIMER_AFTER(timer_clock(), end))
-		cpu_relax();
-	ret = e->Ev.Gen.completed;
-	e->Ev.Gen.completed = false;
-#endif
-	MEMORY_BARRIER;
-	return ret;
-}
-#endif /* CONFIG_TIMER_EVENTS */
+bool event_waitTimeout(Event *e, ticks_t timeout);
 
 /**
  * Trigger an event.
