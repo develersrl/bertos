@@ -246,16 +246,6 @@ INLINE void __sig_signal(Signal *s, Process *proc, sigmask_t sigs, bool wakeup)
 	IRQ_RESTORE(flags);
 }
 
-/**
- * Send the signals \a sigs to the process \a proc and immeditaly dispatch it
- * for execution.
- *
- * The process will be awoken if it was waiting for any of them and immediately
- * dispatched for execution.
- *
- * \note This function can't be called from IRQ context, use sig_post()
- * instead.
- */
 void sig_sendSignal(Signal *s, Process *proc, sigmask_t sigs)
 {
 	ASSERT_USER_CONTEXT();
@@ -265,12 +255,6 @@ void sig_sendSignal(Signal *s, Process *proc, sigmask_t sigs)
 	__sig_signal(s, proc, sigs, true);
 }
 
-/**
- * Send the signals \a sigs to the process \a proc.
- * The process will be awoken if it was waiting for any of them.
- *
- * \note This call is interrupt safe.
- */
 void sig_postSignal(Signal *s, Process *proc, sigmask_t sigs)
 {
 	__sig_signal(s, proc, sigs, false);
