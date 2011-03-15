@@ -458,7 +458,20 @@ struct AvrSerial
 	volatile bool sending;
 };
 
+static uint16_t uart_period(unsigned long bps)
+{
+	uint16_t period = DIV_ROUND(CPU_FREQ / 16UL, bps) - 1;
 
+	#ifdef _DEBUG
+		long skew = bps - (long)(period + 1) * (CPU_FREQ / 16);
+		/* 8N1 is reliable within 3% skew */
+		if ((unsigned long)ABS(skew) > bps / (100 / 3))
+			kprintf("Baudrate off by %ldbps\n", skew);
+	#endif
+
+	//DB(kprintf("uart_period(bps=%lu): period=%u\n", bps, period);)
+	return period;
+}
 
 /*
  * Callbacks
@@ -495,15 +508,12 @@ static void uart0_enabletxirq(struct SerialHardware *_hw)
 
 static void uart0_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned long rate)
 {
-	/* Compute baud-rate period */
-	uint16_t period = DIV_ROUND(CPU_FREQ / 16UL, rate) - 1;
+	uint16_t period = uart_period(rate);
 
 #if !CPU_AVR_ATMEGA103
-	UBRR0H = (period) >> 8;
+	UBRR0H = period >> 8;
 #endif
-	UBRR0L = (period);
-
-	//DB(kprintf("uart0_setbaudrate(rate=%lu): period=%d\n", rate, period);)
+	UBRR0L = period;
 }
 
 static void uart0_setparity(UNUSED_ARG(struct SerialHardware *, _hw), int parity)
@@ -548,13 +558,9 @@ static void uart1_enabletxirq(struct SerialHardware *_hw)
 
 static void uart1_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned long rate)
 {
-	/* Compute baud-rate period */
-	uint16_t period = DIV_ROUND(CPU_FREQ / 16UL, rate) - 1;
-
-	UBRR1H = (period) >> 8;
-	UBRR1L = (period);
-
-	//DB(kprintf("uart1_setbaudrate(rate=%ld): period=%d\n", rate, period);)
+	uint16_t period = uart_period(rate);
+	UBRR1H = period >> 8;
+	UBRR1L = period;
 }
 
 static void uart1_setparity(UNUSED_ARG(struct SerialHardware *, _hw), int parity)
@@ -599,13 +605,9 @@ static void uart2_enabletxirq(struct SerialHardware *_hw)
 
 static void uart2_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned long rate)
 {
-	/* Compute baud-rate period */
-	uint16_t period = DIV_ROUND(CPU_FREQ / 16UL, rate) - 1;
-
-	UBRR2H = (period) >> 8;
-	UBRR2L = (period);
-
-	//DB(kprintf("uart2_setbaudrate(rate=%ld): period=%d\n", rate, period);)
+	uint16_t period = uart_period(rate);
+	UBRR2H = period >> 8;
+	UBRR2L = period;
 }
 
 static void uart2_setparity(UNUSED_ARG(struct SerialHardware *, _hw), int parity)
@@ -650,13 +652,9 @@ static void uart3_enabletxirq(struct SerialHardware *_hw)
 
 static void uart3_setbaudrate(UNUSED_ARG(struct SerialHardware *, _hw), unsigned long rate)
 {
-	/* Compute baud-rate period */
-	uint16_t period = DIV_ROUND(CPU_FREQ / 16UL, rate) - 1;
-
-	UBRR3H = (period) >> 8;
-	UBRR3L = (period);
-
-	//DB(kprintf("uart3_setbaudrate(rate=%ld): period=%d\n", rate, period);)
+	uint16_t period = uart_period(rate);
+	UBRR3H = period >> 8;
+	UBRR3L = period;
 }
 
 static void uart3_setparity(UNUSED_ARG(struct SerialHardware *, _hw), int parity)
