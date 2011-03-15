@@ -487,17 +487,41 @@ INLINE int usb_endpointIsIsocOut(const struct UsbEndpointDesc *epd)
  * Read up to \a size bytes from the USB endpoint identified by the address
  * \a ep and store them in \a buffer.
  *
- * \return number of bytes actually read.
+ * The \a timeout is an upper bound on the amount of time (in ticks) elapsed
+ * before returns. If \a timeout is zero, the the function returns immediatly
+ * and it basically works in non-blocking fashion. A negative value for \a
+ * timeout means that the function can block indefinitely.
+ *
+ * \return number of bytes actually read, or a negative value in case of
+ * errors.
  */
-ssize_t usb_endpointRead(int ep, void *buffer, ssize_t size);
+ssize_t usb_endpointReadTimeout(int ep, void *buffer, ssize_t size,
+				ticks_t timeout);
+
+INLINE ssize_t usb_endpointRead(int ep, void *buffer, ssize_t size)
+{
+	return usb_endpointReadTimeout(ep, buffer, size, -1);
+}
 
 /**
  * Write up to \a size bytes from the buffer pointed \a buffer to the USB
  * endpoint identified by the address \a ep.
  *
- * \return number of bytes actually wrote.
+ * The \a timeout is an upper bound on the amount of time (in ticks) elapsed
+ * before returns. If \a timeout is zero, the the function returns immediatly
+ * and it basically works in non-blocking fashion. A negative value for \a
+ * timeout means that the function can block indefinitely.
+ *
+ * \return number of bytes actually wrote, or a negative value in case of
+ * errors.
  */
-ssize_t usb_endpointWrite(int ep, const void *buffer, ssize_t size);
+ssize_t usb_endpointWriteTimeout(int ep, const void *buffer, ssize_t size,
+				ticks_t timeout);
+
+INLINE ssize_t usb_endpointWrite(int ep, const void *buffer, ssize_t size)
+{
+	return usb_endpointWriteTimeout(ep, buffer, size, -1);
+}
 
 /**
  * Register a generic USB device driver \a dev in the USB controller.

@@ -1123,7 +1123,8 @@ static void usb_endpointRead_complete(int ep)
 	rx_size = ep_cnfg[ep].size;
 }
 
-ssize_t usb_endpointRead(int ep, void *buffer, ssize_t size)
+ssize_t usb_endpointReadTimeout(int ep, void *buffer, ssize_t size,
+				ticks_t timeout)
 {
 	int ep_num = usb_ep_logical_to_hw(ep);
 	ssize_t max_size = sizeof(ep_buffer[ep_num]);
@@ -1158,7 +1159,11 @@ ssize_t usb_endpointRead(int ep, void *buffer, ssize_t size)
 	/* Blocking read */
 	__usb_ep_read(ep_num, ep_buffer[ep_num], size,
 				usb_endpointRead_complete);
-	event_wait(&usb_event_done[ep_num >> 1]);
+	if (timeout < 0)
+		event_wait(&usb_event_done[ep_num >> 1]);
+	else
+		if (!event_waitTimeout(&usb_event_done[ep_num >> 1], timeout))
+			return 0;
 	memcpy(buffer, ep_buffer[ep_num], rx_size);
 
 	return rx_size;
@@ -1177,7 +1182,8 @@ static void usb_endpointWrite_complete(int ep)
 	tx_size = ep_cnfg[ep].size;
 }
 
-ssize_t usb_endpointWrite(int ep, const void *buffer, ssize_t size)
+ssize_t usb_endpointWriteTimeout(int ep, const void *buffer, ssize_t size,
+				ticks_t timeout)
 {
 	int ep_num = usb_ep_logical_to_hw(ep);
 	ssize_t max_size = sizeof(ep_buffer[ep_num]);
@@ -1213,7 +1219,11 @@ ssize_t usb_endpointWrite(int ep, const void *buffer, ssize_t size)
 	memcpy(ep_buffer[ep_num], buffer, size);
 	__usb_ep_write(ep_num, ep_buffer[ep_num], size,
 				usb_endpointWrite_complete);
-	event_wait(&usb_event_done[ep_num >> 1]);
+	if (timeout < 0)
+		event_wait(&usb_event_done[ep_num >> 1]);
+	else
+		if (!event_waitTimeout(&usb_event_done[ep_num >> 1], timeout))
+			return 0;
 
 	return tx_size;
 }
