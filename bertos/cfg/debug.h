@@ -55,16 +55,21 @@
 #include <cfg/os.h>
 #include <cfg/compiler.h>
 
+#include "cfg/cfg_debug.h"   /* CONFIG_KDEBUG_* */
 
 /*
  * Defaults for rarely used config stuff.
  */
-#ifndef CONFIG_KDEBUG_DISABLE_TRACE
-#define CONFIG_KDEBUG_DISABLE_TRACE  0
+#ifndef CONFIG_KDEBUG_TRACE
+#define CONFIG_KDEBUG_TRACE  1
 #endif
 
-#ifndef CONFIG_KDEBUG_ASSERT_NO_TEXT
-#define CONFIG_KDEBUG_ASSERT_NO_TEXT  0
+#ifndef CONFIG_KDEBUG_VERBOSE_ASSERT
+#define CONFIG_KDEBUG_VERBOSE_ASSERT  1
+#endif
+
+#ifndef CONFIG_KDEBUG_WALLS
+#define CONFIG_KDEBUG_WALLS  1
 #endif
 
 #if defined(__doxygen__)
@@ -127,7 +132,6 @@
 	 */
 	#define DB(x) x
 
-	#include "cfg/cfg_debug.h"   /* CONFIG_KDEBUG_ASSERT_NO_TEXT */
 	#include <cpu/attr.h>        /* CPU_HARVARD */
 
 	/* These are implemented in drv/kdebug.c */
@@ -163,7 +167,7 @@
 		int __check_wall(long *wall, int size, const char *name, const char *file, int line);
 	#endif /* !CPU_HARVARD */
 
-	#if !CONFIG_KDEBUG_ASSERT_NO_TEXT
+	#if CONFIG_KDEBUG_VERBOSE_ASSERT
 		/**
 		 * Assert a pre-condition on code.
 		 */
@@ -203,26 +207,13 @@
 		|| ((void *)(p) >= (void *)CPU_RAM_START)) \
 		? 0 : __invalid_ptr((p), #p, THIS_FILE, __LINE__)))
 
-	#if !CONFIG_KDEBUG_DISABLE_TRACE
+	#if CONFIG_KDEBUG_TRACE
 		#define TRACE  __trace(__func__)
 		#define TRACEMSG(msg,...) __tracemsg(__func__, msg, ## __VA_ARGS__)
 	#else
 		#define TRACE  do {} while(0)
 		#define TRACEMSG(...)  do {} while(0)
 	#endif
-
-
-	/**
-	 * \name Walls to detect data corruption
-	 * \{
-	 */
-	#define WALL_SIZE                    8
-	#define WALL_VALUE                   (long)0xABADCAFEL
-	#define DECLARE_WALL(name,size)      long name[(size) / sizeof(long)];
-	#define FWD_DECLARE_WALL(name,size)  extern long name[(size) / sizeof(long)];
-	#define INIT_WALL(name)              __init_wall((name), countof(name))
-	#define CHECK_WALL(name)             __check_wall((name), countof(name), #name, THIS_FILE, __LINE__)
-	/*\}*/
 
 	/**
 	 * Check that the given pointer actually points to an object
@@ -308,11 +299,6 @@
 		}
 	#endif
 
-	#define DECLARE_WALL(name, size)     /* nothing */
-	#define FWD_DECLARE_WALL(name, size) /* nothing */
-	#define INIT_WALL(name)              do {} while (0)
-	#define CHECK_WALL(name)             do {} while (0)
-
 	#define NEW_INSTANCE(CLASS)                do {} while (0)
 	#define DELETE_INSTANCE(CLASS)             do {} while (0)
 	#define ASSERT_ZERO_INSTANCES(CLASS)       do {} while (0)
@@ -335,6 +321,25 @@
 	#endif
 
 #endif /* _DEBUG */
+
+#if CONFIG_KDEBUG_WALLS
+	/**
+	 * \name Walls to detect data corruption
+	 * \{
+	 */
+	#define WALL_SIZE                    8
+	#define WALL_VALUE                   (long)0xABADCAFEL
+	#define DECLARE_WALL(name,size)      long name[(size) / sizeof(long)];
+	#define FWD_DECLARE_WALL(name,size)  extern long name[(size) / sizeof(long)];
+	#define INIT_WALL(name)              __init_wall((name), countof(name))
+	#define CHECK_WALL(name)             __check_wall((name), countof(name), #name, THIS_FILE, __LINE__)
+	/*\}*/
+#else
+	#define DECLARE_WALL(name, size)     /* nothing */
+	#define FWD_DECLARE_WALL(name, size) /* nothing */
+	#define INIT_WALL(name)              do {} while (0)
+	#define CHECK_WALL(name)             do {} while (0)
+#endif
 
 /** \} */ // defgroup debug
 
