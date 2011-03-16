@@ -36,7 +36,7 @@
  *
  * $WIZ$ module_name = "eth"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_eth.h"
- * $WIZ$ module_supports = "at91sam7x"
+ * $WIZ$ module_supports = "at91sam7x or sam3x"
  */
 
 #ifndef DRV_ETH_H
