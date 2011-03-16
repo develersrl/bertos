@@ -167,6 +167,8 @@
 #include "sam3_spi.h"
 #include "sam3_flash.h"
 #include "sam3_wdt.h"
+#include "sam3_emac.h"
+#include "sam3_rstc.h"
 
 /**
  * U(S)ART I/O pins
