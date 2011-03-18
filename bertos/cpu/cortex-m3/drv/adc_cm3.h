@@ -42,6 +42,8 @@
 	#include "adc_lm3s.h"
 #elif CPU_CM3_STM32
 	#include "adc_stm32.h"
+#elif CPU_CM3_SAM3X
+	#include "adc_sam3.h"
 /*#elif  Add other ARM families here */
 #else
 	#error Unknown CPU
