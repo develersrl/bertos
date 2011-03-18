@@ -83,24 +83,23 @@
  */
 #define ADC_STARTUP_MASK         0x000F0000   ///< Start up timer mask.
 #define ADC_STARTUP_SHIFT                16   ///< Start up timer shift.
-#define ADC_SUT0                          0   ///< 0 period of ADCClock.
-#define ADC_SUT1                          1   ///< 8 period of ADCClock.
-#define ADC_SUT2                          2   ///< 16 period of ADCClock.
-#define ADC_SUT3                          3   ///< 24 period of ADCClock.
-#define ADC_SUT4                          4   ///< 64 period of ADCClock.
-#define ADC_SUT5                          5   ///< 80 period of ADCClock.
-#define ADC_SUT6                          6   ///< 96 period of ADCClock.
-#define ADC_SUT7                          7   ///< 112 period of ADCClock.
-#define ADC_SUT8                          8   ///< 512 period of ADCClock.
-#define ADC_SUT9                          9   ///< 576 period of ADCClock.
-#define ADC_SUT10                         10   ///< 640 period of ADCClock.
-#define ADC_SUT11                         11   ///< 704 period of ADCClock.
-#define ADC_SUT12                         12   ///< 768 period of ADCClock.
-#define ADC_SUT13                         13   ///< 832 period of ADCClock.
-#define ADC_SUT14                         14   ///< 832 period of ADCClock.
-#define ADC_SUT15                         15   ///< 896 period of ADCClock.
-#define ADC_SUT16                         16   ///< 960 period of ADCClock.
 
+#define ADC_SUT0                          0   ///< 0 period of ADCClock.
+#define ADC_SUT8                          1   ///< 8 period of ADCClock.
+#define ADC_SUT16                         2   ///< 16 period of ADCClock.
+#define ADC_SUT24                         3   ///< 24 period of ADCClock.
+#define ADC_SUT64                         4   ///< 64 period of ADCClock.
+#define ADC_SUT80                         5   ///< 80 period of ADCClock.
+#define ADC_SUT96                         6   ///< 96 period of ADCClock.
+#define ADC_SUT112                        7   ///< 112 period of ADCClock.
+#define ADC_SUT512                        8   ///< 512 period of ADCClock.
+#define ADC_SUT576                        9   ///< 576 period of ADCClock.
+#define ADC_SUT640                        10   ///< 640 period of ADCClock.
+#define ADC_SUT704                        11   ///< 704 period of ADCClock.
+#define ADC_SUT768                        12   ///< 768 period of ADCClock.
+#define ADC_SUT832                        13   ///< 832 period of ADCClock.
+#define ADC_SUT896                        14   ///< 896 period of ADCClock.
+#define ADC_SUT960                        15   ///< 896 period of ADCClock.
 
 /**
  * Sample & hold time.
