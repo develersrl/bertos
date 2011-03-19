@@ -202,8 +202,10 @@ INLINE void sseg_off(void)
  * 	\param dgt the character that has to be displayed
  * 	\param n_dgt the digit where to disply the character of the display's digits.
  */
-INLINE void sseg_on(UNUSED_ARG(uint8_t, dgt), UNUSED_ARG(uint8_t, n_dgt))
+INLINE void sseg_on(uint8_t dgt, uint8_t n_dgt)
 {
+	(void) dgt;
+	(void) n_dgt;
 #ifdef CONFIG_LED_7SEG_CCAT
 /* Common Cathode */
 /* You have to implment it */
