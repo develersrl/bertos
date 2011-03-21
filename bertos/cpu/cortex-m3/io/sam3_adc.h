@@ -64,12 +64,12 @@
 #define ADC_TRGSEL_TIOA0         0x00000000    ///< TIOA output of the timer counter channel 0.
 #define ADC_TRGSEL_TIOA1         0x00000002    ///< TIOA output of the timer counter channel 1.
 #define ADC_TRGSEL_TIOA2         0x00000004    ///< TIOA output of the timer counter channel 2.
-#define ADC_TRGSEL_PWM0           0x0000000A    ///< PWM Event Line 0.
-#define ADC_TRGSEL_PWM1           0x0000000C    ///< PWM Event Line 1.
+#define ADC_TRGSEL_PWM0          0x0000000A    ///< PWM Event Line 0.
+#define ADC_TRGSEL_PWM1          0x0000000C    ///< PWM Event Line 1.
 
 #define ADC_LOWRES                        4   ///< Resolution 0: 12-bit, 1: 10-bit.
 #define ADC_SLEEP                         5   ///< Sleep mode.
-
+#define ADC_FREERUN                       7   ///< Freerun.
 
 /**
  * Prescaler rate selection.
@@ -81,19 +81,19 @@
 /**
  * Start up timer.
  */
-#define ADC_STARTUP_MASK         0x000F0000   ///< Start up timer mask.
-#define ADC_STARTUP_SHIFT                16   ///< Start up timer shift.
+#define ADC_STARTUP_MASK         0x000F0000    ///< Start up timer mask.
+#define ADC_STARTUP_SHIFT                16    ///< Start up timer shift.
 
-#define ADC_SUT0                          0   ///< 0 period of ADCClock.
-#define ADC_SUT8                          1   ///< 8 period of ADCClock.
-#define ADC_SUT16                         2   ///< 16 period of ADCClock.
-#define ADC_SUT24                         3   ///< 24 period of ADCClock.
-#define ADC_SUT64                         4   ///< 64 period of ADCClock.
-#define ADC_SUT80                         5   ///< 80 period of ADCClock.
-#define ADC_SUT96                         6   ///< 96 period of ADCClock.
-#define ADC_SUT112                        7   ///< 112 period of ADCClock.
-#define ADC_SUT512                        8   ///< 512 period of ADCClock.
-#define ADC_SUT576                        9   ///< 576 period of ADCClock.
+#define ADC_SUT0                          0    ///< 0 period of ADCClock.
+#define ADC_SUT8                          1    ///< 8 period of ADCClock.
+#define ADC_SUT16                         2    ///< 16 period of ADCClock.
+#define ADC_SUT24                         3    ///< 24 period of ADCClock.
+#define ADC_SUT64                         4    ///< 64 period of ADCClock.
+#define ADC_SUT80                         5    ///< 80 period of ADCClock.
+#define ADC_SUT96                         6    ///< 96 period of ADCClock.
+#define ADC_SUT112                        7    ///< 112 period of ADCClock.
+#define ADC_SUT512                        8    ///< 512 period of ADCClock.
+#define ADC_SUT576                        9    ///< 576 period of ADCClock.
 #define ADC_SUT640                        10   ///< 640 period of ADCClock.
 #define ADC_SUT704                        11   ///< 704 period of ADCClock.
 #define ADC_SUT768                        12   ///< 768 period of ADCClock.
@@ -102,15 +102,30 @@
 #define ADC_SUT960                        15   ///< 896 period of ADCClock.
 
 /**
- * Sample & hold time.
-  */
-#define ADC_SHTIME_MASK          0x0F000000   ///< Sample & hold time mask.
-#define ADC_SHTIME_SHIFT                 20   ///< Sample & hold time shift.
-#define ADC_AST3                          0   ///< 3 period of ADCClock
-#define ADC_AST5                          1   ///< 5 period of ADCClock
-#define ADC_AST9                          2   ///< 9 period of ADCClock
-#define ADC_AST17                         3   ///< 17 period of ADCClock
+ * Analog Settling Time
+ */
+#define ADC_SETTLING_MASK        0x00300000    ///< Analog Settling Time mask.
+#define ADC_SETTLING_SHIFT               20    ///< Analog Settling Time shift.
+#define ADC_AST3                          0    ///< 3 period of ADCClock
+#define ADC_AST5                          1    ///< 5 period of ADCClock
+#define ADC_AST9                          2    ///< 9 period of ADCClock
+#define ADC_AST17                         3    ///< 17 period of ADCClock
+
+/**
+ * Tracking Time.
+ * Tracking Time = (TRACKTIM + 1) * ADCClock periods.
+ */
+#define ADC_TRACKTIM_MASK          0x0F000000   ///< Tracking Time mask.
+#define ADC_TRACKTIM_SHIFT                 24   ///< Tracking Time shift.
+
+/**
+ * Transfer Period.
+ * Transfer Period = (TRANSFER * 2 + 3) ADCClock periods.
+ */
+#define ADC_TRANSFER_MASK          0x30000000   ///< Transfer Period mask.
+#define ADC_TRANSFER_SHIFT                 28   ///< Transfer Period shift.
 /* \} */
+
 
 /**
  * ADC channel enable register
@@ -129,6 +144,14 @@
  */
 #define ADC_CHSR_OFF             0x00000018     ///< Channel status register offeset.
 #define ADC_CHSR          (*((reg32_t *)(ADC_BASE + ADC_CHSR_OFF))) ///<  Channel status register address.
+
+
+/**
+ * ADC status register
+ */
+#define ADC_SR_OFF               0x0000001C     ///< Status register offeset.
+#define ADC_SR          (*((reg32_t *)(ADC_BASE + ADC_SR_OFF))) ///< Status register address.
+
 
 #define ADC_CH_MASK              0x000000FF    ///< Channel mask.
 #define ADC_CH0                           0    ///< Channel 0
@@ -191,10 +214,31 @@
 
 /**
  * ADC last convert data register.
+ * \{
  */
 #define ADC_LCDR_OFF             0x00000020     ///< Last converted data register offeset.
 #define ADC_LCDR          (*((reg32_t *)(ADC_BASE + ADC_LCDR_OFF))) ///< Last converted RAW data register.
 #define ADC_LDATA         (ADC_LCDR & 0xFFF)  ///< Last data converted register.
 #define ADC_CHNB          ((ADC_LCDR & 0xF000) >> 12) ///< Channel number.
+/* \} */
+
+
+/**
+ * ADC Channel data register.
+ * \{
+ */
+#define ADC_CDR_OFF             0x00000050     ///< Channel data register offeset.
+#define ADC_CDR          (*((reg32_t *)(ADC_BASE + ADC_CDR_OFF))) ///< Channel data register.
+/* \} */
+
+
+/**
+ * ADC Analog Control register.
+ * \{
+ */
+#define ADC_ACR_OFF              0x00000094     ///< Analog control register offeset.
+#define ADC_ACR          (*((reg32_t *)(ADC_BASE + ADC_ACR_OFF))) ///< Analog control register.
+#define ADC_TSON                          4     ///< Temperature Sensor On.
+/* \} */
 
 #endif /* SAM3_ADC_H */
