@@ -56,7 +56,6 @@
  */
 #define ADC_PRESCALER    (DIV_ROUNDUP(CPU_FREQ, 2 * CONFIG_ADC_CLOCK) - 1)
 #define ADC_CLOCK        (CPU_FREQ / ((ADC_PRESCALER + 1) * 2))
-#define ADC_STARTUPTIME  (((CONFIG_ADC_STARTUP_TIME * ADC_COMPUTED_CLOCK) / 8000000UL) - 1)
 
 void adc_hw_select_ch(uint8_t ch);
 uint16_t adc_hw_read(void);

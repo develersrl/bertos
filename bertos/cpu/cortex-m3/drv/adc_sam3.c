@@ -58,11 +58,21 @@
 #include <io/cm3.h>
 
 
+/* We use event to signal the end of conversion */
 static Event data_ready;
+/* The last converted data */
 static uint32_t data;
 
 /**
  * ADC ISR.
+ *
+ * The interrupt is connected to ready data, so when the
+ * adc ends the conversion we generate an event and then
+ * we return the converted value.
+ *
+ * \note to clear the Ready data bit and End of conversion
+ * bit we should read the Last Converted Data register, otherwise
+ * the ready data interrupt loop on this call.
  */
 static DECLARE_ISR(adc_conversion_end_irq)
 {
