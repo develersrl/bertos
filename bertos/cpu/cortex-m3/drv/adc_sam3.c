@@ -95,7 +95,6 @@ void adc_hw_select_ch(uint8_t ch)
 	ADC_CHER = BV(ch);
 }
 
-
 /**
  * Start an ADC convertion.
  */
@@ -120,7 +119,6 @@ void adc_hw_init(void)
 	/* Clock ADC peripheral */
 	pmc_periphEnable(ADC_ID);
 
-
 	 /* Reset adc controller */
 	ADC_CR = ADC_SWRST;
 
@@ -144,13 +142,13 @@ void adc_hw_init(void)
 	LOG_INFO("Computed ADC_CLOCK %ld\n", ADC_CLOCK);
 	ADC_MR |= ((ADC_PRESCALER << ADC_PRESCALER_SHIFT) & ADC_PRESCALER_MASK);
 	LOG_INFO("prescaler[%ld]\n", ADC_PRESCALER);
-	ADC_MR |= ((ADC_SUT512 << ADC_STARTUP_SHIFT) & ADC_STARTUP_MASK);
+	ADC_MR |= ((CONFIG_ADC_SUT << ADC_STARTUP_SHIFT) & ADC_STARTUP_MASK);
 	LOG_INFO("starup[%d]\n", ADC_SUT512);
-	ADC_MR |= ((ADC_AST17 << ADC_SETTLING_SHIFT) & ADC_SETTLING_MASK);
+	ADC_MR |= ((CONFIG_ADC_STTLING << ADC_SETTLING_SHIFT) & ADC_SETTLING_MASK);
 	LOG_INFO("sttime[%d]\n", ADC_AST17);
-	ADC_MR |= ((0 << ADC_TRACKTIM_SHIFT) & ADC_TRACKTIM_MASK);
+	ADC_MR |= ((CONFIG_ADC_TRACKTIM << ADC_TRACKTIM_SHIFT) & ADC_TRACKTIM_MASK);
 	LOG_INFO("tracking[%d]\n", 0);
-	ADC_MR |= ((1 << ADC_TRANSFER_SHIFT) & ADC_TRANSFER_MASK);
+	ADC_MR |= ((CONFIG_ADC_TRANSFER << ADC_TRANSFER_SHIFT) & ADC_TRANSFER_MASK);
 	LOG_INFO("tranfer[%d]\n", 1);
 
 	/* Register and enable irq for adc. */

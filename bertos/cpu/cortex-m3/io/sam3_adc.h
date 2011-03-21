@@ -34,6 +34,8 @@
  *
  * SAM3 Analog to Digital Converter.
  *
+ * $WIZ$
+ *
  */
 
 
@@ -84,6 +86,11 @@
 #define ADC_STARTUP_MASK         0x000F0000    ///< Start up timer mask.
 #define ADC_STARTUP_SHIFT                16    ///< Start up timer shift.
 
+/**
+ * Start up timer.
+ * $WIZ$ sam3_adc_sut = "ADC_SUT0","ADC_SUT8","ADC_SUT16","ADC_SUT24","ADC_SUT64","DC_SUT80","ADC_SUT96","ADC_SUT112","ADC_SUT512","ADC_SUT576","ADC_SUT640","ADC_SUT704","ADC_SUT768","ADC_SUT832","ADC_SUT896","ADC_SUT960"
+ * \{
+ */
 #define ADC_SUT0                          0    ///< 0 period of ADCClock.
 #define ADC_SUT8                          1    ///< 8 period of ADCClock.
 #define ADC_SUT16                         2    ///< 16 period of ADCClock.
@@ -100,9 +107,11 @@
 #define ADC_SUT832                        13   ///< 832 period of ADCClock.
 #define ADC_SUT896                        14   ///< 896 period of ADCClock.
 #define ADC_SUT960                        15   ///< 896 period of ADCClock.
+/** \} */
 
 /**
- * Analog Settling Time
+ * Analog Settling Time.
+ * $WIZ$ sam3_adc_stt = "ADC_AST3", "ADC_AST5", "ADC_AST9", "ADC_AST17"
  */
 #define ADC_SETTLING_MASK        0x00300000    ///< Analog Settling Time mask.
 #define ADC_SETTLING_SHIFT               20    ///< Analog Settling Time shift.
