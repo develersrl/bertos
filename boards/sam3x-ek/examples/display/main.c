@@ -39,20 +39,28 @@
 
 #include "hw/hw_led.h"
 #include "hw/hw_lcd.h"
+#include "hw/hw_adc.h"
 #include "hw/hw_sdram.h"
 
 #include <cfg/debug.h>
+
 #include <cpu/irq.h>
+
 #include <struct/heap.h>
+
 #include <drv/timer.h>
 #include <drv/kbd.h>
 #include <drv/lcd_hx8347.h>
+#include <drv/adc.h>
+
 #include <gfx/gfx.h>
 #include <gfx/font.h>
 #include <gfx/text.h>
 #include <gui/menu.h>
 #include <icons/logo.h>
+
 #include <io/kfile.h>
+
 #include <kern/signal.h>
 #include <kern/proc.h>
 
@@ -307,6 +315,26 @@ static void NORETURN soft_reset(Bitmap * bm)
 	UNREACHABLE();
 }
 
+static void read_adc(Bitmap *bm)
+{
+	gfx_bitmapClear(bm);
+	text_xprintf(bm, 0, 0, TEXT_FILL | TEXT_CENTER, "ADC Value");
+	while (1)
+	{
+		uint16_t value = ADC_RANGECONV(adc_read(1), 0, 3300);
+		uint16_t temp = hw_convertToDegree (adc_read(ADC_TEMPERATURE_CH));
+
+		text_xprintf(lcd_bitmap, 2, 0, TEXT_FILL | TEXT_CENTER,
+									"Volage on VR1: %d.%dV", value / 1000, value % 1000);
+		text_xprintf(lcd_bitmap, 3, 0, TEXT_FILL | TEXT_CENTER,
+									"CPU temperature: %d.%dC", temp / 10, temp % 10);
+		lcd_hx8347_blitBitmap(bm);
+		timer_delay(400);
+		if (kbd_peek() & KEY_MASK)
+			break;
+	}
+}
+
 
 static struct MenuItem main_items[] =
 {
@@ -318,6 +346,7 @@ static struct MenuItem main_items[] =
 	{ (const_iptr_t)"Show uptime", 0, (MenuHook)uptime, NULL },
 	{ (const_iptr_t)"Display brightness", 0, (MenuHook)setBrightness, NULL },
 	{ (const_iptr_t)"Reboot", 0, (MenuHook)soft_reset, NULL },
+	{ (const_iptr_t)"Read ADC value", 0, (MenuHook)read_adc, NULL },
 	{ (const_iptr_t)0, 0, NULL, (iptr_t)0 }
 };
 static struct Menu main_menu = { main_items, "BeRTOS", MF_STICKY | MF_SAVESEL, NULL, 0, lcd_hx8347_blitBitmap };
@@ -328,12 +357,15 @@ int main(void)
 	unsigned i;
 
 	IRQ_ENABLE;
-
 	kdbg_init();
 	LED_INIT();
 	timer_init();
 	proc_init();
 	sdram_init();
+	adc_init();
+
+	/* Enable the adc to read internal temperature sensor */
+	hw_enableTempRead();
 
 	heap_init(&heap, (void *)SDRAM_BASE, SDRAM_SIZE);
 	lcd_bitmap = heap_allocmem(&heap, RAST_SIZE(LCD_WIDTH, LCD_HEIGHT));
@@ -372,4 +404,5 @@ int main(void)
 		menu_handle(&main_menu);
 		cpu_relax();
 	}
+
 }
