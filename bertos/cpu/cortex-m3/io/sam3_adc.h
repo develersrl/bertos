@@ -248,6 +248,7 @@
 #define ADC_ACR_OFF              0x00000094     ///< Analog control register offeset.
 #define ADC_ACR          (*((reg32_t *)(ADC_BASE + ADC_ACR_OFF))) ///< Analog control register.
 #define ADC_TSON                          4     ///< Temperature Sensor On.
+#define ADC_TEMPERATURE_CH               15     ///< Channel where is the internal sensor temperature
 /* \} */
 
 #endif /* SAM3_ADC_H */
