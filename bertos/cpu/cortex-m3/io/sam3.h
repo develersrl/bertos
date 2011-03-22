@@ -170,6 +170,7 @@
 #include "sam3_emac.h"
 #include "sam3_rstc.h"
 #include "sam3_adc.h"
+#include "sam3_dacc.h"
 
 /**
  * U(S)ART I/O pins
