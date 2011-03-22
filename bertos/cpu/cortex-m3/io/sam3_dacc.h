@@ -6,7 +6,7 @@
  * Bertos is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * (at your option  any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2011 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2011 Develer S.r.l. (http://www.develer.com/
  *
  * -->
  *
@@ -49,7 +49,7 @@
  * \{
  */
 #define DACC_CR_OFF              0x00000000     ///< Control register offeset.
-#define DACC_CR          (*((reg32_t *)(DACC_BASE + DACC_CR_OFF))) ///< Control register address.
+#define DACC_CR          (*((reg32_t*) (DACC_BASE + DACC_CR_OFF)))    ///< Control register address.
 #define DACC_SWRST                        0      ///< Software reset.
 /* \} */
 
@@ -58,7 +58,7 @@
  * \{
  */
 #define DACC_MR_OFF              0x00000004     ///< Mode register offeset.
-#define DACC_MR          (*((reg32_t *)(DACC_BASE + DACC_MR_OFF))) ///< Mode register address.
+#define DACC_MR          (*((reg32_t*) (DACC_BASE + DACC_MR_OFF)))    ///< Mode register address.
 #define DACC_TRGEN                        0      ///< Trigger enable.
 #define DACC_TRGSEL_MASK               0x14      ///< Trigger selection mask.
 #define DACC_TRGSEL_SHIFT                 1      ///< Trigger selection shift.
@@ -112,19 +112,19 @@
  * DACC channel enable register
  */
 #define DACC_CHER_OFF             0x00000010     ///< Channel enable register offeset.
-#define DACC_CHER          (*((reg32_t *)(DACC_BASE + DACC_CHER_OFF))) ///< Channel enable register address.
+#define DACC_CHER          (*((reg32_t*) (DACC_BASE + DACC_CHER_OFF)))    ///< Channel enable register address.
 
 /**
  * DACC channel disable register
  */
 #define DACC_CHDR_OFF             0x00000014     ///< Channel disable register offeset.
-#define DACC_CHDR          (*((reg32_t *)(DACC_BASE + DACC_CHDR_OFF))) ///< Channel  disable register address.
+#define DACC_CHDR          (*((reg32_t*) (DACC_BASE + DACC_CHDR_OFF)))    ///< Channel  disable register address.
 
 /**
  * DACC channel status register
  */
 #define DACC_CHSR_OFF             0x00000018     ///< Channel status register offeset.
-#define DACC_CHSR          (*((reg32_t *)(DACC_BASE + DACC_CHSR_OFF))) ///< Channel  status register address.
+#define DACC_CHSR          (*((reg32_t*) (DACC_BASE + DACC_CHSR_OFF)))    ///< Channel  status register address.
 
 #define DACC_CH0                           0      ///< Channel 0.
 #define DACC_CH1                           1      ///< Channel 1.
@@ -134,37 +134,79 @@
  * DACC Conversion data register
  */
 #define DACC_CDR_OFF             0x00000020     ///< Conversion data register offeset.
-#define DACC_CDR          (*((reg32_t *)(DACC_BASE + DACC_CDR_OFF))) ///< Conversion data register address.
+#define DACC_CDR          (*((reg32_t*) (DACC_BASE + DACC_CDR_OFF)))    ///< Conversion data register address.
 
 
 /**
  * DACC Interrupt enable register
  */
 #define DACC_IER_OFF             0x00000024     ///< Interrupt enable register offeset.
-#define DACC_IER          (*((reg32_t *)(DACC_BASE + DACC_IER_OFF))) ///< Interrupt enable register address.
+#define DACC_IER          (*((reg32_t*) (DACC_BASE + DACC_IER_OFF)))    ///< Interrupt enable register address.
 
 /**
  * DACC Interrupt disable register
  */
 #define DACC_IDR_OFF             0x00000028     ///< Interrupt disable register offeset.
-#define DACC_IDR          (*((reg32_t *)(DACC_BASE + DACC_IDR_OFF))) ///< Interrupt disable register address.
+#define DACC_IDR          (*((reg32_t*) (DACC_BASE + DACC_IDR_OFF)))    ///< Interrupt disable register address.
 
 /**
  * DACC Interrupt disable register
  */
 #define DACC_IMR_OFF             0x0000002C     ///< Interrupt disable register offeset.
-#define DACC_IMR          (*((reg32_t *)(DACC_BASE + DACC_IMR_OFF))) ///< Interrupt disable register address.
+#define DACC_IMR          (*((reg32_t*) (DACC_BASE + DACC_IMR_OFF)))    ///< Interrupt disable register address.
 
 /**
  * DACC Interrupt status register
  */
 #define DACC_ISR_OFF             0x00000030    ///< Interrupt disable status offeset.
-#define DACC_ISR          (*((reg32_t *)(DACC_BASE + DACC_ISR_OFF))) ///< Interrupt status register address.
+#define DACC_ISR          (*((reg32_t*) (DACC_BASE + DACC_ISR_OFF)))    ///< Interrupt status register address.
 
 #define DACC_TXRDY                        0     ///< Transmit ready interrupt
 #define DACC_EOC                          1     ///< End of conversion interrupt
 #define DACC_ENDTX                        2     ///< End of transmit buffer interrupt
-#define DACC_TXBUFFE                      3     ///< Transmit buffer empty interrupt
+#define DACC_TXBUFE                       3     ///< Transmit buffer empty interrupt
 
+
+/**
+ * DMA controller for DACC
+ * DACC PDC register.
+ */
+#define DACC_RPR_OFF                     0x100 ///< Receive Pointer Register.
+#define DACC_RPR        (*((reg32_t*) (DACC_BASE + DACC_RPR_OFF)))    ///< Receive Pointer Register.
+
+#define DACC_RCR_OFF                     0x104 ///< Receive Counter Register.
+#define DACC_RCR       (*((reg32_t*) (DACC_BASE + DACC_RCR_OFF)))   ///<  Receive Counter Register.
+
+#define DACC_TPR_OFF                     0x108 ///< Transmit Pointer Register.
+#define DACC_TPR       (*((reg32_t*) (DACC_BASE + DACC_TPR_OFF)))   ///<  Transmit Pointer Register.
+
+#define DACC_TCR_OFF                     0x10C ///< Transmit Counter Register.
+#define DACC_TCR       (*((reg32_t*) (DACC_BASE + DACC_TCR_OFF)))   ///< Transmit Counter Register.
+
+#define DACC_RNPR_OFF                    0x110 ///< Receive Next Pointer Register.
+#define DACC_RNPR      (*((reg32_t*) (DACC_BASE + DACC_RNPR_OFF)))   ///< Receive Next Pointer Register.
+
+#define DACC_RNCR_OFF                    0x114 ///< Receive Next Counter Register.
+#define DACC_RNCR      (*((reg32_t*) (DACC_BASE + DACC_RNCR_OFF)))   ///< Receive Next Counter Register.
+
+#define DACC_TNPR_OFF                    0x118 ///< Transmit Next Pointer Register.
+#define DACC_TNPR      (*((reg32_t*) (DACC_BASE + DACC_TNPR_OFF)))   ///< Transmit Next Pointer Register.
+
+#define DACC_TNCR_OFF                    0x11C ///< Transmit Next Counter Register.
+#define DACC_TNCR      (*((reg32_t*) (DACC_BASE + DACC_TNCR_OFF)))   ///< Transmit Next Counter Register.
+
+#define DACC_PTCR_OFF                    0x120 ///< Transfer Control Register.
+#define DACC_PTCR      (*((reg32_t*) (DACC_BASE + DACC_PTCR_OFF)))  ///< Transfer Control Register.
+
+#define DACC_PTSR_OFF                    0x124 ///< Transfer Status Register.
+#define DACC_PTSR      (*((reg32_t*) (DACC_BASE + DACC_PTSR_OFF)))    ///< Transfer Status Register.
+
+
+#define DACC_PTCR_RXTEN               0  ///< DACC_PTCR  Receiver Transfer Enable.
+#define DACC_PTCR_RXTDIS              1  ///< DACC_PTCR  Receiver Transfer Disable.
+#define DACC_PTCR_TXTEN               8  ///< DACC_PTCR  Transmitter Transfer Enable.
+#define DACC_PTCR_TXTDIS              9  ///< DACC_PTCR  Transmitter Transfer Disable.
+#define DACC_PTSR_RXTEN               0  ///< DACC_PTSR  Receiver Transfer Enable.
+#define DACC_PTSR_TXTEN               8  ///< DACC_PTSR  Transmitter Transfer Enable.
 
 #endif /* SAM3_DACC_H */
