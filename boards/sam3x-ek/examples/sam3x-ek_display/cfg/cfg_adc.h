@@ -44,7 +44,7 @@
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_level"
  */
-#define ADC_LOG_LEVEL      LOG_LVL_INFO
+#define ADC_LOG_LEVEL      LOG_LVL_WARN
 
 /**
  * Module logging format.
@@ -52,7 +52,7 @@
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_format"
  */
-#define ADC_LOG_FORMAT     LOG_FMT_VERBOSE
+#define ADC_LOG_FORMAT     LOG_FMT_TERSE
 
 /**
  * Clock Frequency for ADC conversion.

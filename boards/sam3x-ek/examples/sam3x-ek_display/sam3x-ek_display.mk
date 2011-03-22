@@ -30,11 +30,13 @@ sam3x-ek_display_WIZARD_CSRC = \
 	bertos/mware/sprintf.c \
 	bertos/gfx/line.c \
 	bertos/drv/lcd_hx8347.c \
+	bertos/drv/adc.c \
 	bertos/gfx/text_format.c \
 	bertos/drv/kbd.c \
 	bertos/fonts/luBS14.c \
 	bertos/kern/signal.c \
 	bertos/kern/proc.c \
+	bertos/cpu/cortex-m3/drv/adc_sam3.c \
 	bertos/mware/hex.c \
 	bertos/gui/menu.c \
 	#
