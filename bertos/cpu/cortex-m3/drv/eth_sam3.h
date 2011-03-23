@@ -42,7 +42,7 @@
 
 // Settings and definition for DAVICOM 9161A
 // \{
-#define NIC_PHY_ADDR            31
+#define NIC_PHY_ADDR            0
 
 //Registry definition
 #define NIC_PHY_BMCR            0x00    //  Basic mode control register.

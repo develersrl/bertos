@@ -141,11 +141,13 @@ static DECLARE_ISR(emac_irqHandler)
  *
  * \return Contents of the specified register.
  */
-static uint16_t phy_hw_read(reg8_t reg)
+static uint16_t phy_hw_read(uint8_t phy_addr, reg8_t reg)
 {
 	// PHY read command.
-	EMAC_MAN = EMAC_SOF | EMAC_RW_READ | (NIC_PHY_ADDR << EMAC_PHYA_SHIFT)
-			| ((reg  << EMAC_REGA_SHIFT) & EMAC_REGA) | EMAC_CODE;
+	EMAC_MAN = EMAC_SOF | EMAC_RW_READ
+		| ((phy_addr << EMAC_PHYA_SHIFT) & EMAC_PHYA)
+		| ((reg  << EMAC_REGA_SHIFT) & EMAC_REGA)
+		| EMAC_CODE;
 
 	// Wait until PHY logic completed.
 	while (!(EMAC_NSR & BV(EMAC_IDLE)))
@@ -161,11 +163,13 @@ static uint16_t phy_hw_read(reg8_t reg)
  * \param reg PHY register number.
  * \param val Value to write.
  */
-static void phy_hw_write(reg8_t reg, uint16_t val)
+static void phy_hw_write(uint8_t phy_addr, reg8_t reg, uint16_t val)
 {
 	// PHY write command.
-	EMAC_MAN = EMAC_SOF | EMAC_RW_WRITE | (NIC_PHY_ADDR << EMAC_PHYA_SHIFT)
-			| ((reg  << EMAC_REGA_SHIFT) & EMAC_REGA) | EMAC_CODE | val;
+	EMAC_MAN = EMAC_SOF | EMAC_RW_WRITE
+		| ((phy_addr << EMAC_PHYA_SHIFT) & EMAC_PHYA)
+		| ((reg  << EMAC_REGA_SHIFT) & EMAC_REGA)
+		| EMAC_CODE | val;
 
 	// Wait until PHY logic completed.
 	while (!(EMAC_NSR & BV(EMAC_IDLE)))
@@ -175,6 +179,7 @@ static void phy_hw_write(reg8_t reg, uint16_t val)
 static int emac_reset(void)
 {
 	uint16_t phy_cr;
+	unsigned i;
 
 	// Enable devices
 	//PMC_PCER = BV(PIOA_ID);
@@ -220,7 +225,7 @@ static int emac_reset(void)
 
 	// Enable management port.
 	EMAC_NCR |= BV(EMAC_MPE);
-	EMAC_NCFGR |= EMAC_CLK_HCLK_32;
+	EMAC_NCFGR |= EMAC_CLK_HCLK_64;
 
 	// Set local MAC address.
 	EMAC_SA1L = (mac_addr[3] << 24) | (mac_addr[2] << 16) |
@@ -230,24 +235,46 @@ static int emac_reset(void)
 	// Wait for PHY ready
 	timer_delay(255);
 
+#if 0 // debug test
+	for (;;)
+	{
+		for (i = 0; i < 32; i++)
+		{
+			// Clear MII isolate.
+			phy_hw_read(i, NIC_PHY_BMCR);
+			phy_cr = phy_hw_read(i, NIC_PHY_BMCR);
+
+			phy_cr &= ~NIC_PHY_BMCR_ISOLATE;
+			phy_hw_write(i, NIC_PHY_BMCR, phy_cr);
+
+			phy_cr = phy_hw_read(i, NIC_PHY_BMCR);
+
+			LOG_INFO("%s: PHY ID %d %#04x %#04x\n",
+					__func__, i,
+					phy_hw_read(i, NIC_PHY_ID1), phy_hw_read(i, NIC_PHY_ID2));
+		}
+		timer_delay(1000);
+	}
+#endif
+
 	// Clear MII isolate.
-	phy_hw_read(NIC_PHY_BMCR);
-	phy_cr = phy_hw_read(NIC_PHY_BMCR);
+	phy_hw_read(NIC_PHY_ADDR, NIC_PHY_BMCR);
+	phy_cr = phy_hw_read(NIC_PHY_ADDR, NIC_PHY_BMCR);
 
 	phy_cr &= ~NIC_PHY_BMCR_ISOLATE;
-	phy_hw_write(NIC_PHY_BMCR, phy_cr);
+	phy_hw_write(NIC_PHY_ADDR, NIC_PHY_BMCR, phy_cr);
 
-	phy_cr = phy_hw_read(NIC_PHY_BMCR);
+	phy_cr = phy_hw_read(NIC_PHY_ADDR, NIC_PHY_BMCR);
 
 	LOG_INFO("%s: PHY ID %#04x %#04x\n",
 		__func__,
-		phy_hw_read(NIC_PHY_ID1), phy_hw_read(NIC_PHY_ID2));
+		phy_hw_read(NIC_PHY_ADDR, NIC_PHY_ID1), phy_hw_read(NIC_PHY_ADDR, NIC_PHY_ID2));
 
 	// Wait for auto negotiation completed.
-	phy_hw_read(NIC_PHY_BMSR);
+	phy_hw_read(NIC_PHY_ADDR, NIC_PHY_BMSR);
 	for (;;)
 	{
-		if (phy_hw_read(NIC_PHY_BMSR) & NIC_PHY_BMSR_ANCOMPL)
+		if (phy_hw_read(NIC_PHY_ADDR, NIC_PHY_BMSR) & NIC_PHY_BMSR_ANCOMPL)
 			break;
 		cpu_relax();
 	}
