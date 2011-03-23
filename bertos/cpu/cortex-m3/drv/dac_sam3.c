@@ -47,10 +47,33 @@
 #include <cfg/log.h>
 
 #include <drv/dac.h>
+
+#include <drv/irq_cm3.h>
+
 #include <io/cm3.h>
 
-int dac_write(int ch, buf, len)
+#include <string.h>
+
+int dac_write(int ch, void *buf, size_t len)
 {
+	ASSERT(ch <= 1);
+
+	DACC_MR |= (ch << DACC_USER_SEL_SHIFT) & DACC_USER_SEL_MASK;
+	DACC_CHER |= BV(ch);
+
+	kprintf("mr: %08lx\n", DACC_MR);
+
+	if (len <= sizeof(uint32_t))
+	{
+		memcpy((void *)DACC_CDR, buf, len);
+	}
+	else
+	{
+		DACC_TPR = (uint32_t)buf ;
+		DACC_TCR = len ;
+		DACC_PTCR |= BV(DACC_PTCR_TXTEN);
+	}
+
 	return 0;
 }
 
@@ -64,12 +87,7 @@ void dac_init(void)
 
 	/* Refresh period */
 	DACC_MR |= (16 << DACC_REFRESH_SHIFT) & DACC_REFRESH_MASK;
-	/* Select channel */
-	DACC_MR |= (DACC_CH1 << DACC_USER_SEL_SHIFT) & DACC_USER_SEL_MASK;
 	/* Start up */
 	DACC_MR |= (DACC_MR_STARTUP_0 << DACC_STARTUP_SHIFT) & DACC_STARTUP_MASK;
 
-	kprintf("mr: %08lx\n", DACC_MR);
-	/* Register and enable irq for adc. */
-	sysirq_setHandler(INT_DACC, dac);
 }
