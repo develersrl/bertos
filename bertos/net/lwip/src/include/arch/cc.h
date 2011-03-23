@@ -71,7 +71,7 @@ typedef int mem_ptr_t;
 
 
 /* Define (sn)printf formatters for these lwIP types */
-#if CPU_ARM_AT91 || (ARCH & ARCH_EMUL)
+#if CPU_ARM_AT91 || CPU_CM3_SAM3 || (ARCH & ARCH_EMUL)
 	#define U16_F "hu"
 	#define S16_F "d"
 	#define X16_F "x"
