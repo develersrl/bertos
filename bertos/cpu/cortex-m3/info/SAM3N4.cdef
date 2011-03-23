@@ -51,7 +51,7 @@ MK_FLASH_SCRIPT = PRG_SCRIPTS_DIR + "arm/flash-sam3.sh"
 CPU_DEFAULT_FREQ = "48000000UL"
 
 # Special CPU related tags.
-CPU_TAGS += ["sam3"]
+CPU_TAGS += ["sam3n"]
 
 # Additional hw drivers.
 MK_CPU_CSRC += DRV_DIR + "clock_sam3.c "
