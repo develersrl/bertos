@@ -30,7 +30,7 @@
  *
  * -->
  *
- * \athor Daniele Basile <asterix@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
  *
  * SAM3 Timer conter
  *
