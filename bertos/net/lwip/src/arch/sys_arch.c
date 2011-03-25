@@ -380,6 +380,9 @@ sys_thread_t sys_thread_new(char *name, void (* thread)(void *arg),
 
 	#if CONFIG_KERN_PRI
 		proc_setPri(thread_node->pid, prio);
+	#else
+		/* Avoid warnings when priorities are disabled */
+		(void) prio;
 	#endif
 
 	return thread_node->pid;
