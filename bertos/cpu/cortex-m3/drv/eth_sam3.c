@@ -181,25 +181,34 @@ static int emac_reset(void)
 	uint16_t phy_cr;
 	unsigned i;
 
-	// Enable devices
-	//PMC_PCER = BV(PIOA_ID);
-	//PMC_PCER = BV(PIOB_ID);
-	//PMC_PCER = BV(EMAC_ID);
-	// TOOD: Implement in sam7x
-	pmc_periphEnable(PIOA_ID);
-	pmc_periphEnable(PIOB_ID);
-	pmc_periphEnable(EMAC_ID);
-
-	// Disable TESTMODE
-	PIOB_PUDR = BV(PHY_RXDV_TESTMODE_BIT);
 #if CPU_ARM_AT91
-	// Disable RMII
+	// Enable devices
+	PMC_PCER = BV(PIOA_ID);
+	PMC_PCER = BV(PIOB_ID);
+	PMC_PCER = BV(EMAC_ID);
+
+	// Disable TESTMODE and RMII
+	PIOB_PUDR = BV(PHY_RXDV_TESTMODE_BIT);
 	PIOB_PUDR = BV(PHY_COL_RMII_BIT);
 
 	// Disable PHY power down.
 	PIOB_PER  = BV(PHY_PWRDN_BIT);
 	PIOB_OER  = BV(PHY_PWRDN_BIT);
 	PIOB_CODR = BV(PHY_PWRDN_BIT);
+#else
+	pmc_periphEnable(PIOA_ID);
+	pmc_periphEnable(PIOB_ID);
+	pmc_periphEnable(PIOC_ID);
+	pmc_periphEnable(PIOD_ID);
+	pmc_periphEnable(EMAC_ID);
+
+	// Disable TESTMODE and RMII
+	PIOC_PUDR = BV(PHY_RXDV_TESTMODE_BIT);
+
+	// Disable PHY power down.
+	PIOD_PER  = BV(PHY_PWRDN_BIT);
+	PIOD_OER  = BV(PHY_PWRDN_BIT);
+	PIOD_CODR = BV(PHY_PWRDN_BIT);
 #endif
 
 	// Toggle external hardware reset pin.
@@ -214,11 +223,16 @@ static int emac_reset(void)
 	PIOB_ASR = PHY_MII_PINS;
 	PIOB_BSR = 0;
 	PIOB_PDR = PHY_MII_PINS;
+
 	// Enable receive and transmit clocks.
 	EMAC_USRIO = BV(EMAC_CLKEN);
 #else
-	PIO_PERIPH_SEL(PIOB_BASE, PHY_MII_PINS, PIO_PERIPH_A);
-	PIOB_PDR = PHY_MII_PINS;
+	PIO_PERIPH_SEL(PIOB_BASE, PHY_MII_PINS_PORTB, PIO_PERIPH_A);
+	PIOB_PDR = PHY_MII_PINS_PORTB;
+
+	PIO_PERIPH_SEL(PIOC_BASE, PHY_MII_PINS_PORTC, PIO_PERIPH_A);
+	PIOC_PDR = PHY_MII_PINS_PORTC;
+
 	// Enable receive, transmit clocks and RMII mode.
 	EMAC_USRIO = BV(EMAC_CLKEN) | BV(EMAC_RMII);
 #endif
@@ -233,7 +247,7 @@ static int emac_reset(void)
 	EMAC_SA1H = (mac_addr[5] << 8) | mac_addr[4];
 
 	// Wait for PHY ready
-	timer_delay(255);
+	timer_delay(500);
 
 #if 0 // debug test
 	for (;;)
@@ -258,26 +272,17 @@ static int emac_reset(void)
 #endif
 
 	// Clear MII isolate.
-	phy_hw_read(NIC_PHY_ADDR, NIC_PHY_BMCR);
+	//phy_hw_read(NIC_PHY_ADDR, NIC_PHY_BMCR);
 	phy_cr = phy_hw_read(NIC_PHY_ADDR, NIC_PHY_BMCR);
 
 	phy_cr &= ~NIC_PHY_BMCR_ISOLATE;
 	phy_hw_write(NIC_PHY_ADDR, NIC_PHY_BMCR, phy_cr);
 
-	phy_cr = phy_hw_read(NIC_PHY_ADDR, NIC_PHY_BMCR);
+	//phy_cr = phy_hw_read(NIC_PHY_ADDR, NIC_PHY_BMCR);
 
 	LOG_INFO("%s: PHY ID %#04x %#04x\n",
 		__func__,
 		phy_hw_read(NIC_PHY_ADDR, NIC_PHY_ID1), phy_hw_read(NIC_PHY_ADDR, NIC_PHY_ID2));
-
-	// Wait for auto negotiation completed.
-	phy_hw_read(NIC_PHY_ADDR, NIC_PHY_BMSR);
-	for (;;)
-	{
-		if (phy_hw_read(NIC_PHY_ADDR, NIC_PHY_BMSR) & NIC_PHY_BMSR_ANCOMPL)
-			break;
-		cpu_relax();
-	}
 
 	// Disable management port.
 	EMAC_NCR &= ~BV(EMAC_MPE);

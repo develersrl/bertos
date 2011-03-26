@@ -128,26 +128,31 @@
 #define PHY_TXEN_BIT            1
 #define PHY_TXD0_BIT            2
 #define PHY_TXD1_BIT            3
-#define PHY_RXDV_TESTMODE_BIT   4
 #define PHY_RXD0_AD0_BIT        5
 #define PHY_RXD1_AD1_BIT        6
 #define PHY_RXER_RXD4_RPTR_BIT  7
 #define PHY_MDC_BIT             8
 #define PHY_MDIO_BIT            9
+// Port C
+#define PHY_RXDV_TESTMODE_BIT   10
 // Port A
 #define PHY_MDINTR_BIT          5
+// Port D -- FIXME: Only on which revision?
+#define PHY_PWRDN_BIT           18
 
-#define PHY_MII_PINS \
+#define PHY_MII_PINS_PORTB \
 	BV(PHY_REFCLK_XT2_BIT) \
 	| BV(PHY_TXEN_BIT) \
 	| BV(PHY_TXD0_BIT) \
 	| BV(PHY_TXD1_BIT) \
-	| BV(PHY_RXDV_TESTMODE_BIT) \
 	| BV(PHY_RXD0_AD0_BIT) \
 	| BV(PHY_RXD1_AD1_BIT) \
 	| BV(PHY_RXER_RXD4_RPTR_BIT) \
 	| BV(PHY_MDC_BIT) \
 	| BV(PHY_MDIO_BIT)
+
+#define PHY_MII_PINS_PORTC \
+	BV(PHY_RXDV_TESTMODE_BIT)
 
 #endif /* CPU_ARM_AT91 */
 // \}
