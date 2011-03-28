@@ -32,7 +32,7 @@
  *
  * \author Daniele Basile <asterix@develer.com>
  *
- * SAM3 Timer conter
+ * SAM3 Timer counter
  *
  * $WIZ$
  */
