@@ -62,7 +62,6 @@ typedef void (*SetSamplingRate_t) (struct DacContext *ctx, uint32_t rate);
 typedef void (*DmaConversionBufFunc_t) (struct DacContext *ctx, void *buf, size_t len);
 typedef bool (*DmaConversionIsFinished_t) (struct DacContext *ctx);
 typedef void (*DmaStartStreamingFunc_t) (struct DacContext *ctx, void *buf, size_t len, size_t slicelen);
-typedef void *(*DmaWaitConversionFunc_t) (struct DacContext *ctx);
 typedef void (*DmaStopFunc_t) (struct DacContext *ctx);
 
 typedef struct DacContext
@@ -73,7 +72,6 @@ typedef struct DacContext
 	DmaConversionBufFunc_t conversion;
 	DmaConversionIsFinished_t isFinished;
 	DmaStartStreamingFunc_t start;
-	DmaWaitConversionFunc_t wait;
 	DmaStopFunc_t stop;
 	size_t slicelen;
 
@@ -129,12 +127,6 @@ INLINE void dac_dmaStartStreaming(struct DacContext *ctx, void *buf, size_t len,
 	ctx->start(ctx, buf, len, slicelen);
 }
 
-INLINE void *dac_dmaWaitConversion(struct DacContext *ctx)
-{
-	ASSERT(ctx->wait);
-	return ctx->wait(ctx);
-}
-
 INLINE void dac_dmaStop(struct DacContext *ctx)
 {
 	ASSERT(ctx->stop);
@@ -143,7 +135,7 @@ INLINE void dac_dmaStop(struct DacContext *ctx)
 
 #define dac_bits() DAC_BITS
 
-void dac_init(void);
+void dac_init(struct DacContext *ctx);
 
 /** \} */ //defgroup dac
 #endif /* DRV_DAC_H */

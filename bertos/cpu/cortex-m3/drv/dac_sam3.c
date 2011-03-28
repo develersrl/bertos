@@ -54,31 +54,59 @@
 
 #include <string.h>
 
-int dac_write(int ch, void *buf, size_t len)
+
+
+static int sam3x_dac_write(DacContext *ctx, unsigned channel, uint16_t sample)
 {
-	ASSERT(ch <= 1);
+	ASSERT(channel <= 1);
 
-	DACC_MR |= (ch << DACC_USER_SEL_SHIFT) & DACC_USER_SEL_MASK;
-	DACC_CHER |= BV(ch);
+	DACC_MR |= (channel << DACC_USER_SEL_SHIFT) & DACC_USER_SEL_MASK;
+	DACC_CHER |= BV(channel);
 
-	kprintf("mr: %08lx\n", DACC_MR);
-
-	if (len <= sizeof(uint32_t))
-	{
-		memcpy((void *)DACC_CDR, buf, len);
-	}
-	else
-	{
-		DACC_TPR = (uint32_t)buf ;
-		DACC_TCR = len ;
-		DACC_PTCR |= BV(DACC_PTCR_TXTEN);
-	}
+	DACC_CDR = sample ;
 
 	return 0;
 }
 
-void dac_init(void)
+static void sam3x_dac_setCh(struct DacContext *ctx, uint32_t mask)
 {
+}
+
+static void sam3x_dac_setSampleRate(struct DacContext *ctx, uint32_t rate)
+{
+}
+
+static void sam3x_dac_conversion(struct DacContext *ctx, void *buf, size_t len)
+{
+	DACC_TPR = (uint32_t)buf ;
+	DACC_TCR = len;
+	DACC_PTCR |= BV(DACC_PTCR_TXTEN);
+}
+
+static bool sam3x_dac_isFinished(struct DacContext *ctx)
+{
+}
+
+static void sam3x_dac_start(struct DacContext *ctx, void *buf, size_t len, size_t slicelen)
+{
+}
+
+static void sam3x_dac_stop(struct DacContext *ctx)
+{
+}
+
+
+void dac_init(struct DacContext *ctx)
+{
+	ctx->write = sam3x_dac_write;
+	ctx->setCh = sam3x_dac_setCh;
+	ctx->setSampleRate = sam3x_dac_setSampleRate;
+	ctx->conversion = sam3x_dac_conversion;
+	ctx->isFinished = sam3x_dac_isFinished;
+	ctx->start = sam3x_dac_start;
+	ctx->stop = sam3x_dac_stop;
+
+
 	/* Clock ADC peripheral */
 	pmc_periphEnable(DACC_ID);
 
