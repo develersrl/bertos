@@ -50,19 +50,98 @@
 
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
+#include <cfg/macros.h>
 #include <cpu/attr.h>
+#include CPU_HEADER(dac)
 
-int dac_write(int ch, void *buf, size_t len);
+struct DacContext;
 
-INLINE int dac_putHalfWord(int ch, uint16_t sample)
+typedef int (*DacWriteFunc_t) (struct DacContext *ctx, unsigned channel, uint16_t sample);
+typedef void (*SetChannelMaskFunc_t) (struct DacContext *ctx, uint32_t mask);
+typedef void (*SetSamplingRate_t) (struct DacContext *ctx, uint32_t rate);
+typedef void (*DmaConversionBufFunc_t) (struct DacContext *ctx, void *buf, size_t len);
+typedef bool (*DmaConversionIsFinished_t) (struct DacContext *ctx);
+typedef void (*DmaStartStreamingFunc_t) (struct DacContext *ctx, void *buf, size_t len, size_t slicelen);
+typedef void *(*DmaWaitConversionFunc_t) (struct DacContext *ctx);
+typedef void (*DmaStopFunc_t) (struct DacContext *ctx);
+
+typedef struct DacContext
 {
-	return dac_write(ch, &sample, sizeof(uint16_t));
+	DacWriteFunc_t write;
+	SetChannelMaskFunc_t setCh;
+	SetSamplingRate_t setSampleRate;
+	DmaConversionBufFunc_t conversion;
+	DmaConversionIsFinished_t isFinished;
+	DmaStartStreamingFunc_t start;
+	DmaWaitConversionFunc_t wait;
+	DmaStopFunc_t stop;
+	size_t slicelen;
+
+	DB(id_t _type);
+} DacContext;
+
+INLINE int dac_write(DacContext *ctx, unsigned channel, uint16_t sample)
+{
+	ASSERT(ctx->write);
+	return ctx->write(ctx, channel, sample);
 }
 
-INLINE int dac_putWord(int ch, uint32_t sample)
+INLINE void dac_setChannelMask(struct DacContext *ctx, uint32_t mask)
 {
-	return dac_write(ch, &sample, sizeof(uint32_t));
+	ASSERT(ctx->setCh);
+	ctx->setCh(ctx, mask);
 }
+
+INLINE void dac_setSamplingRate(struct DacContext *ctx, uint32_t rate)
+{
+	ASSERT(ctx->setSampleRate);
+	ctx->setSampleRate(ctx, rate);
+}
+
+/**
+ * Convert \param len samples stored into \param buf.
+ */
+INLINE void dac_dmaConversionBuffer(struct DacContext *ctx, void *buf, size_t len)
+{
+	ASSERT(ctx->conversion);
+	ctx->conversion(ctx, buf, len);
+}
+
+/**
+ * Check if a dma transfer is finished.
+ *
+ * Useful for kernel-less applications.
+ */
+INLINE bool dac_dmaIsFinished(struct DacContext *ctx)
+{
+	ASSERT(ctx->isFinished);
+	return ctx->isFinished(ctx);
+}
+
+/**
+ * \param slicelen Must be a divisor of len, ie. len % slicelen == 0.
+ */
+INLINE void dac_dmaStartStreaming(struct DacContext *ctx, void *buf, size_t len, size_t slicelen)
+{
+	ASSERT(ctx->start);
+	ASSERT(len % slicelen == 0);
+	ctx->slicelen = slicelen;
+	ctx->start(ctx, buf, len, slicelen);
+}
+
+INLINE void *dac_dmaWaitConversion(struct DacContext *ctx)
+{
+	ASSERT(ctx->wait);
+	return ctx->wait(ctx);
+}
+
+INLINE void dac_dmaStop(struct DacContext *ctx)
+{
+	ASSERT(ctx->stop);
+	ctx->stop(ctx);
+}
+
+#define dac_bits() DAC_BITS
 
 void dac_init(void);
 
