@@ -51,18 +51,21 @@
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
 #include <cfg/macros.h>
+
 #include <cpu/attr.h>
+
 #include CPU_HEADER(dac)
 
 struct DacContext;
+struct Dac;
 
-typedef int (*DacWriteFunc_t) (struct DacContext *ctx, unsigned channel, uint16_t sample);
-typedef void (*SetChannelMaskFunc_t) (struct DacContext *ctx, uint32_t mask);
-typedef void (*SetSamplingRate_t) (struct DacContext *ctx, uint32_t rate);
-typedef void (*DmaConversionBufFunc_t) (struct DacContext *ctx, void *buf, size_t len);
-typedef bool (*DmaConversionIsFinished_t) (struct DacContext *ctx);
-typedef void (*DmaStartStreamingFunc_t) (struct DacContext *ctx, void *buf, size_t len, size_t slicelen);
-typedef void (*DmaStopFunc_t) (struct DacContext *ctx);
+typedef int (*DacWriteFunc_t) (struct Dac *dac, unsigned channel, uint16_t sample);
+typedef void (*SetChannelMaskFunc_t) (struct Dac *dac, uint32_t mask);
+typedef void (*SetSamplingRate_t) (struct Dac *dac, uint32_t rate);
+typedef void (*DmaConversionBufFunc_t) (struct Dac *dac, void *buf, size_t len);
+typedef bool (*DmaConversionIsFinished_t) (struct Dac *dac);
+typedef void (*DmaStartStreamingFunc_t) (struct Dac *dac, void *buf, size_t len, size_t slicelen);
+typedef void (*DmaStopFunc_t) (struct Dac *dac);
 
 typedef struct DacContext
 {
@@ -76,33 +79,40 @@ typedef struct DacContext
 	size_t slicelen;
 
 	DB(id_t _type);
+
 } DacContext;
 
-INLINE int dac_write(DacContext *ctx, unsigned channel, uint16_t sample)
+typedef struct Dac
 {
-	ASSERT(ctx->write);
-	return ctx->write(ctx, channel, sample);
+	DacContext ctx;
+	struct DacHardware *hw;
+} Dac;
+
+INLINE int dac_write(Dac *dac, unsigned channel, uint16_t sample)
+{
+	ASSERT(dac->ctx.write);
+	return dac->ctx.write(dac, channel, sample);
 }
 
-INLINE void dac_setChannelMask(struct DacContext *ctx, uint32_t mask)
+INLINE void dac_setChannelMask(struct Dac *dac, uint32_t mask)
 {
-	ASSERT(ctx->setCh);
-	ctx->setCh(ctx, mask);
+	ASSERT(dac->ctx.setCh);
+	dac->ctx.setCh(dac, mask);
 }
 
-INLINE void dac_setSamplingRate(struct DacContext *ctx, uint32_t rate)
+INLINE void dac_setSamplingRate(Dac *dac, uint32_t rate)
 {
-	ASSERT(ctx->setSampleRate);
-	ctx->setSampleRate(ctx, rate);
+	ASSERT(dac->ctx.setSampleRate);
+	dac->ctx.setSampleRate(dac, rate);
 }
 
 /**
  * Convert \param len samples stored into \param buf.
  */
-INLINE void dac_dmaConversionBuffer(struct DacContext *ctx, void *buf, size_t len)
+INLINE void dac_dmaConversionBuffer(Dac *dac, void *buf, size_t len)
 {
-	ASSERT(ctx->conversion);
-	ctx->conversion(ctx, buf, len);
+	ASSERT(dac->ctx.conversion);
+	dac->ctx.conversion(dac, buf, len);
 }
 
 /**
@@ -110,32 +120,32 @@ INLINE void dac_dmaConversionBuffer(struct DacContext *ctx, void *buf, size_t le
  *
  * Useful for kernel-less applications.
  */
-INLINE bool dac_dmaIsFinished(struct DacContext *ctx)
+INLINE bool dac_dmaIsFinished(Dac *dac)
 {
-	ASSERT(ctx->isFinished);
-	return ctx->isFinished(ctx);
+	ASSERT(dac->ctx.isFinished);
+	return dac->ctx.isFinished(dac);
 }
 
 /**
  * \param slicelen Must be a divisor of len, ie. len % slicelen == 0.
  */
-INLINE void dac_dmaStartStreaming(struct DacContext *ctx, void *buf, size_t len, size_t slicelen)
+INLINE void dac_dmaStartStreaming(Dac *dac, void *buf, size_t len, size_t slicelen)
 {
-	ASSERT(ctx->start);
+	ASSERT(dac->ctx.start);
 	ASSERT(len % slicelen == 0);
-	ctx->slicelen = slicelen;
-	ctx->start(ctx, buf, len, slicelen);
+	dac->ctx.slicelen = slicelen;
+	dac->ctx.start(dac, buf, len, slicelen);
 }
 
-INLINE void dac_dmaStop(struct DacContext *ctx)
+INLINE void dac_dmaStop(Dac *dac)
 {
-	ASSERT(ctx->stop);
-	ctx->stop(ctx);
+	ASSERT(dac->ctx.stop);
+	dac->ctx.stop(dac);
 }
 
 #define dac_bits() DAC_BITS
 
-void dac_init(struct DacContext *ctx);
+void dac_init(Dac *dac);
 
 /** \} */ //defgroup dac
 #endif /* DRV_DAC_H */
