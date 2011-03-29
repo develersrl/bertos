@@ -74,6 +74,19 @@
 #define DACC_STARTUP_MASK        0x3F000000      ///< Startup time selection
 #define DACC_STARTUP_SHIFT               24      ///< Startup time selsection shift
 
+
+/**
+ * Trigger selection.
+ * $WIZ$ sam3x_dac_tc = "DACC_TRGSEL_TIO_CH0", "DACC_TRGSEL_TIO_CH1", "DACC_TRGSEL_TIO_CH2", "DACC_TRGSEL_PWM0", "DACC_TRGSEL_PWM1"
+ * \{
+ */
+ #define DACC_TRGSEL_TIO_CH0    1
+ #define DACC_TRGSEL_TIO_CH1    2
+ #define DACC_TRGSEL_TIO_CH2    3
+ #define DACC_TRGSEL_PWM0       4
+ #define DACC_TRGSEL_PWM1       5
+/* \} */
+
 #define DACC_MR_STARTUP_0                 0      ///< 0 periods of DACClock
 #define DACC_MR_STARTUP_8                 1      ///< 8 periods of DACClock
 #define DACC_MR_STARTUP_16                2      ///< 16 periods of of DACClock
