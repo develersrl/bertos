@@ -50,6 +50,8 @@
 #include <drv/dac.h>
 #include <drv/irq_cm3.h>
 
+#include <cpu/types.h>
+
 #include <io/cm3.h>
 
 #include <string.h>
@@ -57,6 +59,7 @@
 struct DacHardware
 {
 	uint16_t channels;
+	uint32_t rate;
 	bool end;
 };
 
@@ -90,42 +93,52 @@ struct DacHardware dac_hw;
 	#error unimplemented pwm triger select.
 #endif
 
-INLINE void tc_setup(uint32_t freq)
+INLINE void tc_setup(uint32_t freq, size_t n_sample)
 {
 	pmc_periphEnable(DAC_TC_ID);
 
-    /*  Disable TC clock */
-    DAC_TC_CCR = TC_CCR_CLKDIS;
-    /*  Disable interrupts */
-    DAC_TC_IDR = 0xFFFFFFFF;
-    /*  Clear status register */
-    volatile uint32_t dummy = DAC_TC_SR;
+	/*  Disable TC clock */
+	DAC_TC_CCR = TC_CCR_CLKDIS;
+	/*  Disable interrupts */
+	DAC_TC_IDR = 0xFFFFFFFF;
+	/*  Clear status register */
+	volatile uint32_t dummy = DAC_TC_SR;
 	(void)dummy;
 
 	/*
 	 * Setup the timer counter:
-	 * - select clock TCLK1
+	 * - select clock TCLK1 (MCK/2)
 	 * - enable wave form mode
 	 * - RA compare effect SET
 	 * - RC compare effect CLEAR
 	 * - UP mode with automatic trigger on RC Compare
 	 */
-    DAC_TC_CMR = BV(TC_TIMER_CLOCK1) | BV(TC_CMR_WAVE) | TC_CMR_ACPA_SET | TC_CMR_ACPC_CLEAR | BV(TC_CMR_CPCTRG);
+	DAC_TC_CMR = TC_TIMER_CLOCK1 | BV(TC_CMR_WAVE) | TC_CMR_ACPA_SET | TC_CMR_ACPC_CLEAR | BV(TC_CMR_CPCTRG);
 
-	/* Compute the sample frequency */
-    uint32_t rc = (CPU_FREQ / 8) / (freq * 1000);
-    DAC_TC_RC = rc;
-    DAC_TC_RA = 50 * rc / 100;
+	/*
+	 * Compute the sample frequency
+	 * the RC counter will update every MCK/2 (see above)
+	 * so to convert one sample at the user freq we generate
+	 * the trigger every TC_CLK / (numer_of_sample * user_freq)
+	 * where TC_CLK = MCK / 2.
+	 */
+	uint32_t rc = DIV_ROUND((CPU_FREQ / 2), n_sample * freq);
+	DAC_TC_RC = rc;
+	/* generate the square wave with duty = 50% */
+	DAC_TC_RA = DIV_ROUND(50 * rc, 100);
+
+	PIOB_PDR = BV(25);
+	PIO_PERIPH_SEL(PIOB_BASE, BV(25), PIO_PERIPH_B);
 }
 
 INLINE void tc_start(void)
 {
-    DAC_TC_CCR =  BV(TC_CCR_CLKEN)| BV(TC_CCR_SWTRG);
+	DAC_TC_CCR =  BV(TC_CCR_CLKEN)| BV(TC_CCR_SWTRG);
 }
 
 INLINE void tc_stop(void)
 {
-    DAC_TC_CCR =  BV(TC_CCR_CLKDIS);
+	DAC_TC_CCR =  BV(TC_CCR_CLKDIS);
 }
 
 static int sam3x_dac_write(struct Dac *dac, unsigned channel, uint16_t sample)
@@ -155,8 +168,7 @@ static void sam3x_dac_setSampleRate(struct Dac *dac, uint32_t rate)
 
 	/* Eneble hw trigger */
 	DACC_MR |= BV(DACC_TRGEN) | (CONFIG_DAC_TIMER << DACC_TRGSEL_SHIFT);
-	kprintf("%08lx\n", DACC_MR);
-	tc_setup(rate);
+	dac->hw->rate = rate;
 }
 
 static void sam3x_dac_conversion(struct Dac *dac, void *buf, size_t len)
@@ -169,7 +181,8 @@ static void sam3x_dac_conversion(struct Dac *dac, void *buf, size_t len)
 
 	DACC_CHER |= dac->hw->channels;
 
-	/* Start syncro timer for the dac */
+	/* setup timer and start it */
+	tc_setup(dac->hw->rate, len);
 	tc_start();
 
 	/* Setup dma and start it */
@@ -180,15 +193,21 @@ static void sam3x_dac_conversion(struct Dac *dac, void *buf, size_t len)
 
 static bool sam3x_dac_isFinished(struct Dac *dac)
 {
+	(void)dac;
 	return 0;
 }
 
 static void sam3x_dac_start(struct Dac *dac, void *buf, size_t len, size_t slicelen)
 {
+	(void)dac;
+	(void)buf;
+	(void)len;
+	(void)slicelen;
 }
 
 static void sam3x_dac_stop(struct Dac *dac)
 {
+	(void)dac;
 }
 
 

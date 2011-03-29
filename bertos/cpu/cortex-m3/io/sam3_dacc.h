@@ -49,7 +49,7 @@
  * \{
  */
 #define DACC_CR_OFF              0x00000000     ///< Control register offeset.
-#define DACC_CR          (*((reg32_t*) (DACC_BASE + DACC_CR_OFF)))    ///< Control register address.
+#define DACC_CR          (*((reg32_t*)(DACC_BASE + DACC_CR_OFF)))    ///< Control register address.
 #define DACC_SWRST                        0      ///< Software reset.
 /* \} */
 

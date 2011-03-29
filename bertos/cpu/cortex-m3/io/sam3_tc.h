@@ -71,6 +71,7 @@
 #define TC_CCR_SWTRG                 2 ///< Software Trigger Command
 
 #define TC_TIMER_CLOCK1              0 ///< Select timer clock TCLK1
+#define TC_TIMER_CLOCK2              1 ///< Select timer clock TCLK2
 
 #define TC0_SMMR0_OFF             0x08  ///< TC0 Stepper Motor Mode Register (channel = 0).
 #define TC0_SMMR0             (*((reg32_t*)(TC0_BASE + TC0_SMMR0_OFF)))  ///< TC0 Stepper Motor Mode Register (channel = 0).
