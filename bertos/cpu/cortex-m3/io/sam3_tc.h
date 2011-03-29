@@ -49,14 +49,14 @@
 /**
  * Timer conter control register
  */
-#define TC0_CCR0_OFF          0x00  ///< TC0 Channel Control Register (channel = 0).
+#define TC0_CCR0_OFF              0x00  ///< TC0 Channel Control Register (channel = 0).
 #define TC0_CCR0              (*((reg32_t*)(TC0_BASE + TC0_CCR0_OFF)))     ///< TC0 Channel Control Register (channel = 0).
 
-#define TC0_CMR0_OFF          0x04  ///< TC0 Channel Mode Register (channel = 0).
-#define TC0_CMR0              (*((reg32_t*)(TC0_BASE + TC0_SMMR0_OFF))) ///< TC0 Channel Mode Register (channel = 0).
+#define TC0_CMR0_OFF              0x04  ///< TC0 Channel Mode Register (channel = 0).
+#define TC0_CMR0              (*((reg32_t*)(TC0_BASE + TC0_CMR0_OFF))) ///< TC0 Channel Mode Register (channel = 0).
 
-#define TC_CMR_CPCTRG            14   ///< RC Compare Trigger Enable
-#define TC_CMR_WAVE              15   ///< Waveform mode is enabled
+#define TC_CMR_CPCTRG              14   ///< RC Compare Trigger Enable
+#define TC_CMR_WAVE                15   ///< Waveform mode is enabled
 
 #define TC_CMR_ACPA_SET          0x10000 ///< RA Compare Effect: set
 #define TC_CMR_ACPA_CLEAR        0x20000 ///< RA Compare Effect: clear
@@ -66,13 +66,13 @@
 #define TC_CMR_ACPC_CLEAR        0x80000 ///< RC Compare Effect: clear
 #define TC_CMR_ACPC_TOGGLE       0xC0000 ///< RC Compare Effect: toggle
 
-#define TC_CCR_CLKEN                   0 ///< Counter Clock Enable Command
-#define TC_CCR_CLKDIS                  1 ///< Counter Clock Disable Command
-#define TC_CCR_SWTRG                   2 ///< Software Trigger Command
+#define TC_CCR_CLKEN                 0 ///< Counter Clock Enable Command
+#define TC_CCR_CLKDIS                1 ///< Counter Clock Disable Command
+#define TC_CCR_SWTRG                 2 ///< Software Trigger Command
 
+#define TC_TIMER_CLOCK1              0 ///< Select timer clock TCLK1
 
-
-#define TC0_SMMR0_OFF         0x08  ///< TC0 Stepper Motor Mode Register (channel = 0).
+#define TC0_SMMR0_OFF             0x08  ///< TC0 Stepper Motor Mode Register (channel = 0).
 #define TC0_SMMR0             (*((reg32_t*)(TC0_BASE + TC0_SMMR0_OFF)))  ///< TC0 Stepper Motor Mode Register (channel = 0).
 
 #define TC0_CV0_OFF               0x10  ///< TC0 Conter Vale (channel = 0).
