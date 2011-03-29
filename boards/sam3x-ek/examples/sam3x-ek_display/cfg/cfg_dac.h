@@ -55,4 +55,34 @@
  */
 #define DAC_LOG_FORMAT     LOG_FMT_TERSE
 
+/**
+ * DAC Refresh Period = 1024*REFRESH/DACC Clock
+ *
+ * $WIZ$ type = "int"
+ * $WIZ$ supports = "sam3x"
+ * $WIZ$ min = 0
+ * $WIZ$ max = 65536
+ */
+#define CONFIG_DAC_REFRESH            16
+
+/**
+ * DAC Startup Time Selection.
+ * see datasheet table.
+ *
+ * $WIZ$ type = "int"
+ * $WIZ$ supports = "sam3x"
+ * $WIZ$ min = 0
+ * $WIZ$ max = 63
+ */
+#define CONFIG_DAC_STARTUP             0
+
+/**
+ * DAC Trigger Selection.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "sam3x_dac_tc"
+ * $WIZ$ supports = "sam3x"
+ */
+#define CONFIG_DAC_TIMER  DACC_TRGSEL_TIO_CH0
+
 #endif /* CFG_DAC_H */

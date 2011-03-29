@@ -27,62 +27,25 @@
  * the GNU General Public License.
  *
  * Copyright 2011 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ *
  * -->
  *
- * \brief Configuration file for DAC module.
- *
+ * \brief DAC hardware-specific definition
  *
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef CFG_DAC_H
-#define CFG_DAC_H
+#ifndef DRV_DAC_SAM3_H
+#define DRV_DAC_SAM3_H
+
+#include <drv/dac.h>
 
 /**
- * Module logging level.
- *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_level"
+ * DAC config define.
  */
-#define DAC_LOG_LEVEL      LOG_LVL_WARN
+#define DAC_MAXCH              2 //Max number of channel for ADC.
+#define DAC_BITS              12 //Bit resolution for ADC converter.
 
-/**
- * Module logging format.
- *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_format"
- */
-#define DAC_LOG_FORMAT     LOG_FMT_TERSE
+#define DAC_SAM3X MAKE_ID('S', 'D', '3', 'X')
 
-/**
- * DAC Refresh Period = 1024*REFRESH/DACC Clock
- *
- * $WIZ$ type = "int"
- * $WIZ$ supports = "sam3x"
- * $WIZ$ min = 0
- * $WIZ$ max = 65536
- */
-#define CONFIG_DAC_REFRESH            16
-
-/**
- * DAC Startup Time Selection.
- * see datasheet table.
- *
- * $WIZ$ type = "int"
- * $WIZ$ supports = "sam3x"
- * $WIZ$ min = 0
- * $WIZ$ max = 63
- */
-#define CONFIG_DAC_STARTUP             0
-
-/**
- * DAC Trigger Selection.
- *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "sam3x_dac_tc"
- * $WIZ$ supports = "sam3x"
- */
-#define CONFIG_DAC_TIMER  DACC_TRGSEL_TIO_CH0
-
-#endif /* CFG_DAC_H */
+#endif /* DRV_DAC_SAM3_H */

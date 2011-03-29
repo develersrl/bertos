@@ -35,6 +35,7 @@
  * \author Daniele Basile <asterix@develer.com>
  */
 
+#include "dac_sam3.h"
 
 #include "cfg/cfg_dac.h"
 
@@ -47,18 +48,91 @@
 #include <cfg/log.h>
 
 #include <drv/dac.h>
-
 #include <drv/irq_cm3.h>
 
 #include <io/cm3.h>
 
 #include <string.h>
 
-
-
-static int sam3x_dac_write(DacContext *ctx, unsigned channel, uint16_t sample)
+struct DacHardware
 {
-	ASSERT(channel <= 1);
+	uint16_t channels;
+	bool end;
+};
+
+struct DacHardware dac_hw;
+
+#if CONFIG_DAC_TIMER == DACC_TRGSEL_TIO_CH0 /* Select Timer counter TIO Channel 0 */
+	#define DAC_TC_ID         TC0_ID
+	#define DAC_TC_CCR        TC0_CCR0
+	#define DAC_TC_IDR        TC0_IDR0
+	#define DAC_TC_CMR        TC0_CMR0
+	#define DAC_TC_SR         TC0_SR0
+	#define DAC_TC_RA         TC0_RA0
+	#define DAC_TC_RC         TC0_RC0
+#elif CONFIG_DAC_TIMER == DACC_TRGSEL_TIO_CH1 /* Select Timer counter TIO Channel 1 */
+	#define DAC_TC_ID         TC1_ID
+	#define DAC_TC_CCR        TC0_CCR1
+	#define DAC_TC_IDR        TC0_IDR1
+	#define DAC_TC_CMR        TC0_CMR1
+	#define DAC_TC_SR         TC0_SR1
+	#define DAC_TC_RA         TC0_RA1
+	#define DAC_TC_RC         TC0_RC1
+#elif CONFIG_DAC_TIMER == DACC_TRGSEL_TIO_CH2 /* Select Timer counter TIO Channel 2 */
+	#define DAC_TC_ID         TC2_ID
+	#define DAC_TC_CCR        TC0_CCR2
+	#define DAC_TC_IDR        TC0_IDR2
+	#define DAC_TC_CMR        TC0_CMR2
+	#define DAC_TC_SR         TC0_SR2
+	#define DAC_TC_RA         TC0_RA2
+	#define DAC_TC_RC         TC0_RC2
+#elif CONFIG_DAC_TIMER == DACC_TRGSEL_PWM0 || CONFIG_DAC_TIMER == DACC_TRGSEL_PWM1
+	#error unimplemented pwm triger select.
+#endif
+
+INLINE void tc_setup(uint32_t freq)
+{
+	pmc_periphEnable(DAC_TC_ID);
+
+    /*  Disable TC clock */
+    DAC_TC_CCR = TC_CCR_CLKDIS;
+    /*  Disable interrupts */
+    DAC_TC_IDR = 0xFFFFFFFF;
+    /*  Clear status register */
+    volatile uint32_t dummy = DAC_TC_SR;
+	(void)dummy;
+
+	/*
+	 * Setup the timer counter:
+	 * - select clock TCLK1
+	 * - enable wave form mode
+	 * - RA compare effect SET
+	 * - RC compare effect CLEAR
+	 * - UP mode with automatic trigger on RC Compare
+	 */
+    DAC_TC_CMR = BV(TC_TIMER_CLOCK1) | BV(TC_CMR_WAVE) | TC_CMR_ACPA_SET | TC_CMR_ACPC_CLEAR | BV(TC_CMR_CPCTRG);
+
+	/* Compute the sample frequency */
+    uint32_t rc = (CPU_FREQ / 8) / (freq * 1000);
+    DAC_TC_RC = rc;
+    DAC_TC_RA = 50 * rc / 100;
+}
+
+INLINE void tc_start(void)
+{
+    DAC_TC_CCR =  BV(TC_CCR_CLKEN)| BV(TC_CCR_SWTRG);
+}
+
+INLINE void tc_stop(void)
+{
+    DAC_TC_CCR =  BV(TC_CCR_CLKDIS);
+}
+
+static int sam3x_dac_write(struct Dac *dac, unsigned channel, uint16_t sample)
+{
+	(void)dac;
+
+	ASSERT(channel <= DAC_MAXCH);
 
 	DACC_MR |= (channel << DACC_USER_SEL_SHIFT) & DACC_USER_SEL_MASK;
 	DACC_CHER |= BV(channel);
@@ -68,54 +142,78 @@ static int sam3x_dac_write(DacContext *ctx, unsigned channel, uint16_t sample)
 	return 0;
 }
 
-static void sam3x_dac_setCh(struct DacContext *ctx, uint32_t mask)
+static void sam3x_dac_setCh(struct Dac *dac, uint32_t mask)
 {
+	/* we have only the ch0 and ch1 */
+	ASSERT(mask < BV(3));
+	dac->hw->channels = mask;
 }
 
-static void sam3x_dac_setSampleRate(struct DacContext *ctx, uint32_t rate)
+static void sam3x_dac_setSampleRate(struct Dac *dac, uint32_t rate)
 {
+	(void)dac;
+
+	/* Eneble hw trigger */
+	DACC_MR |= BV(DACC_TRGEN) | (CONFIG_DAC_TIMER << DACC_TRGSEL_SHIFT);
+	kprintf("%08lx\n", DACC_MR);
+	tc_setup(rate);
 }
 
-static void sam3x_dac_conversion(struct DacContext *ctx, void *buf, size_t len)
+static void sam3x_dac_conversion(struct Dac *dac, void *buf, size_t len)
 {
+	if (dac->hw->channels & BV(DACC_CH0))
+		DACC_MR |= (DACC_CH0 << DACC_USER_SEL_SHIFT) & DACC_USER_SEL_MASK;
+
+	if (dac->hw->channels & BV(DACC_CH1))
+		DACC_MR |= (DACC_CH1 << DACC_USER_SEL_SHIFT) & DACC_USER_SEL_MASK;
+
+	DACC_CHER |= dac->hw->channels;
+
+	/* Start syncro timer for the dac */
+	tc_start();
+
+	/* Setup dma and start it */
 	DACC_TPR = (uint32_t)buf ;
 	DACC_TCR = len;
 	DACC_PTCR |= BV(DACC_PTCR_TXTEN);
 }
 
-static bool sam3x_dac_isFinished(struct DacContext *ctx)
+static bool sam3x_dac_isFinished(struct Dac *dac)
+{
+	return 0;
+}
+
+static void sam3x_dac_start(struct Dac *dac, void *buf, size_t len, size_t slicelen)
 {
 }
 
-static void sam3x_dac_start(struct DacContext *ctx, void *buf, size_t len, size_t slicelen)
-{
-}
-
-static void sam3x_dac_stop(struct DacContext *ctx)
+static void sam3x_dac_stop(struct Dac *dac)
 {
 }
 
 
-void dac_init(struct DacContext *ctx)
+void dac_init(struct Dac *dac)
 {
-	ctx->write = sam3x_dac_write;
-	ctx->setCh = sam3x_dac_setCh;
-	ctx->setSampleRate = sam3x_dac_setSampleRate;
-	ctx->conversion = sam3x_dac_conversion;
-	ctx->isFinished = sam3x_dac_isFinished;
-	ctx->start = sam3x_dac_start;
-	ctx->stop = sam3x_dac_stop;
 
+	/* Fill the virtual table */
+	dac->ctx.write = sam3x_dac_write;
+	dac->ctx.setCh = sam3x_dac_setCh;
+	dac->ctx.setSampleRate = sam3x_dac_setSampleRate;
+	dac->ctx.conversion = sam3x_dac_conversion;
+	dac->ctx.isFinished = sam3x_dac_isFinished;
+	dac->ctx.start = sam3x_dac_start;
+	dac->ctx.stop = sam3x_dac_stop;
+	dac->ctx._type = DAC_SAM3X;
+	dac->hw = &dac_hw;
 
-	/* Clock ADC peripheral */
+	/* Clock DAC peripheral */
 	pmc_periphEnable(DACC_ID);
 
+	/* Reset hw */
 	DACC_CR |= BV(DACC_SWRST);
 	DACC_MR = 0;
 
-	/* Refresh period */
-	DACC_MR |= (16 << DACC_REFRESH_SHIFT) & DACC_REFRESH_MASK;
-	/* Start up */
-	DACC_MR |= (DACC_MR_STARTUP_0 << DACC_STARTUP_SHIFT) & DACC_STARTUP_MASK;
-
+	/* Configure the dac */
+	DACC_MR |= (CONFIG_DAC_REFRESH << DACC_REFRESH_SHIFT) & DACC_REFRESH_MASK;
+	DACC_MR |= (CONFIG_DAC_STARTUP << DACC_STARTUP_SHIFT) & DACC_STARTUP_MASK;
 }
