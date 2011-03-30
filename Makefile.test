@@ -34,6 +34,7 @@ include ./boards/at91sam7s-ek/benchmark/at91sam7s-ek_context_switch/at91sam7s-ek
 include ./boards/at91sam7s-ek/benchmark/at91sam7s-ek_kernel_footprint/at91sam7s-ek_kernel_footprint.mk
 
 include ./boards/sam3x-ek/examples/sam3x-ek_display/sam3x-ek_display.mk
+include ./boards/sam3x-ek/examples/sam3x-ek_display/sam3x-ek_tcp_server.mk
 
 include ./boards/sam3n-ek/examples/display/display.mk
 include ./boards/stm32-p103/examples/usbserial/usbserial.mk
