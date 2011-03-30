@@ -197,12 +197,12 @@ static bool sam3x_dac_isFinished(struct Dac *dac)
 	return 0;
 }
 
-static void sam3x_dac_start(struct Dac *dac, void *buf, size_t len, size_t slicelen)
+static void sam3x_dac_start(struct Dac *dac, void *buf, size_t len, size_t slice_len)
 {
 	(void)dac;
 	(void)buf;
 	(void)len;
-	(void)slicelen;
+	(void)slice_len;
 }
 
 static void sam3x_dac_stop(struct Dac *dac)

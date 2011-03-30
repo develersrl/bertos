@@ -64,8 +64,9 @@ typedef void (*SetChannelMaskFunc_t) (struct Dac *dac, uint32_t mask);
 typedef void (*SetSamplingRate_t) (struct Dac *dac, uint32_t rate);
 typedef void (*DmaConversionBufFunc_t) (struct Dac *dac, void *buf, size_t len);
 typedef bool (*DmaConversionIsFinished_t) (struct Dac *dac);
-typedef void (*DmaStartStreamingFunc_t) (struct Dac *dac, void *buf, size_t len, size_t slicelen);
+typedef void (*DmaStartStreamingFunc_t) (struct Dac *dac, void *buf, size_t len, size_t slice_len);
 typedef void (*DmaStopFunc_t) (struct Dac *dac);
+typedef void (*DmaCallbackFunc_t) (struct Dac *dac);
 
 typedef struct DacContext
 {
@@ -76,7 +77,8 @@ typedef struct DacContext
 	DmaConversionIsFinished_t isFinished;
 	DmaStartStreamingFunc_t start;
 	DmaStopFunc_t stop;
-	size_t slicelen;
+	DmaCallbackFunc_t callback;
+	size_t slice_len;
 
 	DB(id_t _type);
 
@@ -106,7 +108,7 @@ INLINE void dac_setSamplingRate(Dac *dac, uint32_t rate)
 	dac->ctx.setSampleRate(dac, rate);
 }
 
-/**
+/*
  * Convert \param len samples stored into \param buf.
  */
 INLINE void dac_dmaConversionBuffer(Dac *dac, void *buf, size_t len)
@@ -115,7 +117,7 @@ INLINE void dac_dmaConversionBuffer(Dac *dac, void *buf, size_t len)
 	dac->ctx.conversion(dac, buf, len);
 }
 
-/**
+/*
  * Check if a dma transfer is finished.
  *
  * Useful for kernel-less applications.
@@ -126,15 +128,18 @@ INLINE bool dac_dmaIsFinished(Dac *dac)
 	return dac->ctx.isFinished(dac);
 }
 
-/**
+/*
  * \param slicelen Must be a divisor of len, ie. len % slicelen == 0.
  */
-INLINE void dac_dmaStartStreaming(Dac *dac, void *buf, size_t len, size_t slicelen)
+INLINE void dac_dmaStartStreaming(Dac *dac, void *buf, size_t len, size_t slice_len, DmaCallbackFunc_t *callback)
 {
 	ASSERT(dac->ctx.start);
-	ASSERT(len % slicelen == 0);
-	dac->ctx.slicelen = slicelen;
-	dac->ctx.start(dac, buf, len, slicelen);
+	ASSERT(len % slice_len == 0);
+	ASSERT(callback);
+
+	dac->ctx.callback = callback;
+	dac->ctx.slicelen = slice_len;
+	dac->ctx.start(dac, buf, len, slice_len);
 }
 
 INLINE void dac_dmaStop(Dac *dac)
