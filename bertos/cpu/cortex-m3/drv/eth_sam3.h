@@ -44,7 +44,7 @@
 // \{
 #define NIC_PHY_ADDR            0
 
-//Registry definition
+// Register bits definition
 #define NIC_PHY_BMCR            0x00    //  Basic mode control register.
 #define NIC_PHY_BMCR_COLTEST    0x0080  //  Collision test.
 #define NIC_PHY_BMCR_FDUPLEX    0x0100  //  Full duplex mode.
@@ -61,6 +61,11 @@
 #define NIC_PHY_BMSR_ANEGCAPABLE 0x0008  // Able to do auto-negotiation
 #define NIC_PHY_BMSR_LINKSTAT   0x0004  //  Link status.
 
+#define NIC_PHY_ANLPAR_10_HDX   BV(5)   //  10BASE-T half duplex
+#define NIC_PHY_ANLPAR_10_FDX   BV(6)   //  10BASE-T full duplex
+#define NIC_PHY_ANLPAR_TX_HDX   BV(7)   //  100BASE-TX half duplex
+#define NIC_PHY_ANLPAR_TX_FDX   BV(8)   //  100BASE-TX full duplex
+
 #define NIC_PHY_ID1             0x02    //  PHY identifier register 1.
 #define NIC_PHY_ID2             0x03    //  PHY identifier register 2.
 #define NIC_PHY_ANAR            0x04    //  Auto negotiation advertisement register.
@@ -74,7 +79,6 @@
  * See schematics for AT91SAM7X-EK evalution board.
  */
 // All pins in port B
-#define PHY_TXCLK_ISOLATE_BIT   0
 #define PHY_REFCLK_XT2_BIT      0
 #define PHY_TXEN_BIT            1
 #define PHY_TXD0_BIT            2
@@ -123,7 +127,6 @@
  * See schematics for SAM3X-EK evalution board.
  */
 // Port B
-#define PHY_TXCLK_ISOLATE_BIT   0
 #define PHY_REFCLK_XT2_BIT      0
 #define PHY_TXEN_BIT            1
 #define PHY_TXD0_BIT            2

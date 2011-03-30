@@ -77,7 +77,7 @@
  *
  * TODO: make this paramater user-configurable from the Wizard.
  */
-const uint8_t mac_addr[] = { 0x00, 0x23, 0x54, 0x6a, 0x77, 0x55 };
+const uint8_t mac_addr[] = { 0x00, 0x45, 0x56, 0x78, 0x9a, 0xbc };
 
 /* Silent Doxygen bug... */
 #ifndef __doxygen__
@@ -109,12 +109,9 @@ static DECLARE_ISR(emac_irqHandler)
 	/* Read interrupt status and disable interrupts. */
 	uint32_t isr = EMAC_ISR;
 
-	kprintf("irq: %x\n", isr);
-
 	/* Receiver interrupt */
 	if ((isr & EMAC_RX_INTS))
 	{
-		kprintf("emac: rx %x\n", isr);
 		if (isr & BV(EMAC_RCOMP))
 			event_do(&recv_wait);
 		EMAC_RSR = EMAC_RX_INTS;
@@ -123,12 +120,7 @@ static DECLARE_ISR(emac_irqHandler)
 	if (isr & EMAC_TX_INTS)
 	{
 		if (isr & BV(EMAC_TCOMP))
-		{
-			kprintf("emac: tcomp\n");
 			event_do(&send_wait);
-		}
-		if (isr & BV(EMAC_RLEX))
-			kprintf("emac: rlex\n");
 		EMAC_TSR = EMAC_TX_INTS;
 	}
 	//AIC_EOICR = 0;
@@ -157,6 +149,7 @@ static uint16_t phy_hw_read(uint8_t phy_addr, reg8_t reg)
 	return (uint16_t)(EMAC_MAN & EMAC_DATA);
 }
 
+#if 0
 /*
  * \brief Write value to PHY register.
  *
@@ -175,12 +168,58 @@ static void phy_hw_write(uint8_t phy_addr, reg8_t reg, uint16_t val)
 	while (!(EMAC_NSR & BV(EMAC_IDLE)))
 		cpu_relax();
 }
+#endif
+
+/*
+ * Check link speed and duplex as negotiated by the PHY
+ * and configure CPU EMAC accordingly.
+ * Requires active PHY maintenance mode.
+ */
+static void emac_autoNegotiation(void)
+{
+	uint16_t reg;
+	time_t start;
+
+	// Wait for auto-negotation to complete
+	start = timer_clock();
+	do {
+		reg = phy_hw_read(NIC_PHY_ADDR, NIC_PHY_BMSR);
+		if (timer_clock() - start > 2000)
+		{
+			kprintf("eth error: auto-negotiation timeout\n");
+			return;
+		}
+	}
+	while (!(reg & NIC_PHY_BMSR_ANCOMPL));
+
+	reg = phy_hw_read(NIC_PHY_ADDR, NIC_PHY_ANLPAR);
+
+	if ((reg & NIC_PHY_ANLPAR_TX_FDX) || (reg & NIC_PHY_ANLPAR_TX_HDX))
+	{
+		LOG_INFO("eth: 100BASE-TX\n");
+		EMAC_NCFGR |= BV(EMAC_SPD);
+	}
+	else
+	{
+		LOG_INFO("eth: 10BASE-T\n");
+		EMAC_NCFGR &= ~BV(EMAC_SPD);
+	}
+
+	if ((reg & NIC_PHY_ANLPAR_TX_FDX) || (reg & NIC_PHY_ANLPAR_10_FDX))
+	{
+		LOG_INFO("eth: full duplex\n");
+		EMAC_NCFGR |= BV(EMAC_FD);
+	}
+	else
+	{
+		LOG_INFO("eth: half duplex\n");
+		EMAC_NCFGR &= ~BV(EMAC_FD);
+	}
+}
+
 
 static int emac_reset(void)
 {
-	uint16_t phy_cr;
-	unsigned i;
-
 #if CPU_ARM_AT91
 	// Enable devices
 	PMC_PCER = BV(PIOA_ID);
@@ -246,49 +285,14 @@ static int emac_reset(void)
 				(mac_addr[1] << 8) | mac_addr[0];
 	EMAC_SA1H = (mac_addr[5] << 8) | mac_addr[4];
 
-	// Wait for PHY ready
-	timer_delay(500);
-
-#if 0 // debug test
-	for (;;)
-	{
-		for (i = 0; i < 32; i++)
-		{
-			// Clear MII isolate.
-			phy_hw_read(i, NIC_PHY_BMCR);
-			phy_cr = phy_hw_read(i, NIC_PHY_BMCR);
-
-			phy_cr &= ~NIC_PHY_BMCR_ISOLATE;
-			phy_hw_write(i, NIC_PHY_BMCR, phy_cr);
-
-			phy_cr = phy_hw_read(i, NIC_PHY_BMCR);
-
-			LOG_INFO("%s: PHY ID %d %#04x %#04x\n",
-					__func__, i,
-					phy_hw_read(i, NIC_PHY_ID1), phy_hw_read(i, NIC_PHY_ID2));
-		}
-		timer_delay(1000);
-	}
-#endif
-
-	// Clear MII isolate.
-	//phy_hw_read(NIC_PHY_ADDR, NIC_PHY_BMCR);
-	phy_cr = phy_hw_read(NIC_PHY_ADDR, NIC_PHY_BMCR);
-
-	phy_cr &= ~NIC_PHY_BMCR_ISOLATE;
-	phy_hw_write(NIC_PHY_ADDR, NIC_PHY_BMCR, phy_cr);
-
-	//phy_cr = phy_hw_read(NIC_PHY_ADDR, NIC_PHY_BMCR);
-
-	LOG_INFO("%s: PHY ID %#04x %#04x\n",
-		__func__,
-		phy_hw_read(NIC_PHY_ADDR, NIC_PHY_ID1), phy_hw_read(NIC_PHY_ADDR, NIC_PHY_ID2));
+	emac_autoNegotiation();
 
 	// Disable management port.
 	EMAC_NCR &= ~BV(EMAC_MPE);
 
 	return 0;
 }
+
 
 static int emac_start(void)
 {
