@@ -389,7 +389,7 @@ int nmeap_parse(nmeap_context_t *context,char ch)
     case 1:
         /* allow numbers even though it isn't usually done */
         /* a proprietary id might have a numeral */
-        if (isalnum(ch)) {
+        if (isalnum((unsigned char)ch)) {
             /* store name separately */
             context->input_name[context->input_count - 2] = ch;
             /* checksum */
@@ -428,7 +428,7 @@ int nmeap_parse(nmeap_context_t *context,char ch)
     /* LOOKING FOR FIRST CHECKSUM CHARACTER */
     case 3:
         /* must be upper case hex digit */
-        if (isxdigit(ch) && (ch <= 'F')) {
+        if (isxdigit((unsigned char)ch) && (ch <= 'F')) {
             /* got first checksum byte */
             context->input_state = 4;
             context->icks = HEXTOBIN(ch) << 4;
@@ -443,7 +443,7 @@ int nmeap_parse(nmeap_context_t *context,char ch)
         /* LOOKING FOR SECOND CHECKSUM CHARACTER */
     case 4:
         /* must be upper case hex digit */
-        if (isxdigit(ch) && (ch <= 'F')) {
+        if (isxdigit((unsigned char)ch) && (ch <= 'F')) {
             /* got second checksum byte */
             context->input_state = 5;
             context->icks += HEXTOBIN(ch);
