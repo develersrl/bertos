@@ -79,10 +79,10 @@ static int findSection(KFile *fd, const char *section, size_t section_len, char 
 static char *getKey(const char *line, char *key, size_t size)
 {
 	/* null-terminated string */
-	while (isspace(*line))
+	while (isspace((unsigned char)*line))
 		++line;
 	int i = 0;
-	while (*line != '=' && !isspace(*line) && size)
+	while (*line != '=' && !isspace((unsigned char)*line) && size)
 	{
 		key[i++] = *line;
 		++line;
@@ -99,7 +99,7 @@ static char *getValue(const char *line, char *value, size_t size)
 {
 	while (*line++ != '=')
 		;
-	while (isspace(*line))
+	while (isspace((unsigned char)*line))
 		++line;
 	int i = 0;
 	while (*line && size)

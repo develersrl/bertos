@@ -84,7 +84,7 @@ static uint32_t tokenToInt(const char *s, int precision)
 
 	for(i = 0; i < NMEAP_MAX_SENTENCE_LENGTH; i++)
 	{
-		char c = *s++;
+		unsigned char c = *s++;
 
 		if (c == '.')
 		{
@@ -413,7 +413,7 @@ int nmea_gpvtg(nmeap_context_t *context, nmeap_sentence_t *sentence)
 	 */
 	if (sentence->callout != 0)
 		(*sentence->callout)(context, vtg, context->user_data);
-	
+
 	return NMEA_GPVTG;
 }
 
