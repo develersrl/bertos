@@ -77,7 +77,7 @@ typedef struct DacContext
 	DmaConversionIsFinished_t isFinished;
 	DmaStartStreamingFunc_t start;
 	DmaStopFunc_t stop;
-	DmaCallbackFunc_t callback;
+	DmaCallbackFunc_t *callback;
 	size_t slice_len;
 
 	DB(id_t _type);
@@ -138,7 +138,7 @@ INLINE void dac_dmaStartStreaming(Dac *dac, void *buf, size_t len, size_t slice_
 	ASSERT(callback);
 
 	dac->ctx.callback = callback;
-	dac->ctx.slicelen = slice_len;
+	dac->ctx.slice_len = slice_len;
 	dac->ctx.start(dac, buf, len, slice_len);
 }
 
