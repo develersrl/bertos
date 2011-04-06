@@ -249,6 +249,32 @@
 /*\}*/
 
 /**
+ * Defines for bit fields in SMC_TIMINGS registers.
+ */
+/*\{*/
+#define SMC_TIMINGS_TCLR_SHIFT     0
+#define SMC_TIMINGS_TCLR_MASK      (0xf << SMC_TIMINGS_TCLR_SHIFT)
+#define SMC_TIMINGS_TCLR(value)    (SMC_TIMINGS_TCLR_MASK & ((value) << SMC_TIMINGS_TCLR_SHIFT))
+#define SMC_TIMINGS_TADL_SHIFT     4
+#define SMC_TIMINGS_TADL_MASK      (0xf << SMC_TIMINGS_TADL_SHIFT)
+#define SMC_TIMINGS_TADL(value)    (SMC_TIMINGS_TADL_MASK & ((value) << SMC_TIMINGS_TADL_SHIFT))
+#define SMC_TIMINGS_TAR_SHIFT      8
+#define SMC_TIMINGS_TAR_MASK       (0xf << SMC_TIMINGS_TAR_SHIFT)
+#define SMC_TIMINGS_TAR(value)     (SMC_TIMINGS_TAR_MASK & ((value) << SMC_TIMINGS_TAR_SHIFT))
+#define SMC_TIMINGS_OCMS           BV(12)
+#define SMC_TIMINGS_TRR_SHIFT      16
+#define SMC_TIMINGS_TRR_MASK       (0xf << SMC_TIMINGS_TRR_SHIFT)
+#define SMC_TIMINGS_TRR(value)     (SMC_TIMINGS_TRR_MASK & ((value) << SMC_TIMINGS_TRR_SHIFT))
+#define SMC_TIMINGS_TWB_SHIFT      24
+#define SMC_TIMINGS_TWB_MASK       (0xf << SMC_TIMINGS_TWB_SHIFT)
+#define SMC_TIMINGS_TWB(value)     (SMC_TIMINGS_TWB_MASK & ((value) << SMC_TIMINGS_TWB_SHIFT))
+#define SMC_TIMINGS_RBNSEL_SHIFT   28
+#define SMC_TIMINGS_RBNSEL_MASK    (0x7 << SMC_TIMINGS_RBNSEL_SHIFT)
+#define SMC_TIMINGS_RBNSEL(value)  (SMC_TIMINGS_RBNSEL_MASK & ((value) << SMC_TIMINGS_RBNSEL_SHIFT))
+#define SMC_TIMINGS_NFSEL          BV(31)
+/*\}*/
+
+/**
  * Defines for bit fields in SMC_MODE registers.
  */
 /*\{*/
