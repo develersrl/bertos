@@ -348,7 +348,7 @@ static cpu_stack_t thread_stack[MAX_THREAD_CNT]
 static int last_stack;
 #endif
 
-sys_thread_t sys_thread_new(char *name, void (* thread)(void *arg),
+sys_thread_t sys_thread_new(const char *name, void (* thread)(void *arg),
 				void *arg, int stacksize, int prio)
 {
 	ThreadNode *thread_node;
