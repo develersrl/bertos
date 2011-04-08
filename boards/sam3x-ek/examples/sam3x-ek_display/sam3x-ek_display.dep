@@ -1,0 +1,1684 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<project>
+  <fileVersion>2</fileVersion>
+  <fileChecksum>2569145385</fileChecksum>
+  <configuration>
+    <name>Debug</name>
+    <outputs>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cfg\compiler.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdint.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\irq_cm3.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\kdebug.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\event.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\text.o</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Product_string.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\io\kfile.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\icons\logo.h</file>
+      <file>$PROJ_DIR$\..\..\hw\hw_sdram.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\io\sam3_tc.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\kdebug.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\c\stddef.h</file>
+      <file>$PROJ_DIR$\cfg\cfg_debug.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\clock_sam3.o</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\struct\list.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\string.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Threads.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\switch_ctx_cm3.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\logo.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\irq_cm3.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\timer.pbi</file>
+      <file>$PROJ_DIR$\..\..\hw\hw_adc.h</file>
+      <file>$PROJ_DIR$\cfg\cfg_menu.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cfg\cfg_attr.h</file>
+      <file>$PROJ_DIR$\cfg\cfg_signal.h</file>
+      <file>$PROJ_DIR$\bitmaps.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\yvals.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\crt_cm3_iar.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\proc.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\text.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\irq.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\kbd.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\main.pbi</file>
+      <file>$PROJ_DIR$\Debug\Exe\display.out</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\io\sam3_dacc.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cfg\os.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\xencoding_limits.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\text_format.pbi</file>
+      <file>$PROJ_DIR$\..\..\hw\hw_kbd.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\text_format.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\heap.o</file>
+      <file>$PROJ_DIR$\cfg\cfg_heap.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\heap.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\luBS14.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\menu.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\signal.o</file>
+      <file>$TOOLKIT_DIR$\inc\c\ystdio.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\bitmaps.pbi</file>
+      <file>$PROJ_DIR$\cfg\cfg_gfx.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\main.o</file>
+      <file>$PROJ_DIR$\cfg\cfg_wdt.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\timer_cm3.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cfg\debug.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\intrinsics.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Product.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\hw\hw_timer.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Defaults.h</file>
+      <file>$PROJ_DIR$\cfg\cfg_proc.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\iar_cm3.o</file>
+      <file>$PROJ_DIR$\cfg\cfg_timer.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu</file>
+      <file>$PROJ_DIR$\Debug\Obj\bitmap.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\gohu.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cfg\log.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\switch_ctx_cm3.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\event.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\hex.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\timer_cm3.o</file>
+      <file>$TOOLKIT_DIR$\inc\c\ysizet.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\init_cm3.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\sam3x-ek_display.pbd</file>
+      <file>$PROJ_DIR$\..\..\..\..\..\bertos_sam3x_trunk\bertos\cpu\cortex-m3\scripts\sam3x8_rom.icf</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\adc_sam3.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\line.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\formatwr.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\luBS14.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\bitmap.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\lcd_hx8347.o</file>
+      <file>$TOOLKIT_DIR$\inc\c\ycheck.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\gohu.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\logo.o</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\power.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\types.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\adc.o</file>
+      <file>$TOOLKIT_DIR$\inc\c\float.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\kdebug_sam3.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\attr.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cfg\depend.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\hex.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\signal.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\proc.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\kbd.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\menu.o</file>
+      <file>$PROJ_DIR$\cfg\cfg_kbd.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\limits.h</file>
+      <file>$PROJ_DIR$\..\..\hw\kbd_map.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdarg.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\lcd_hx8347.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdio.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\adc.pbi</file>
+      <file>$PROJ_DIR$\..\..\hw\hw_hx8347.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdbool.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\formatwr.o</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cfg\cfg_arch.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\kdebug_sam3.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\sprintf.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\gfx\gfx_p.h</file>
+      <file>$PROJ_DIR$\cfg\cfg_formatwr.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\detect.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\gfx\font.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\timer.o</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\pgm.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\vectors_cm3_iar.o</file>
+      <file>$PROJ_DIR$\cfg\cfg_monitor.h</file>
+      <file>$PROJ_DIR$\..\..\hw\hw_led.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\clock_sam3.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\bitmaps.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\line.o</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\frame.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\gfx\gfx.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\init_cm3.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\sprintf.o</file>
+      <file>$PROJ_DIR$\..\..\hw\hw_lcd.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\irq.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\kfile.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\monitor.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\monitor.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\msg.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\preempt.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\proc.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\proc.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\proc_p.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\sem.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\sem.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\signal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\signal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\mware\event.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\mware\event.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\mware\formatwr.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\mware\formatwr.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\mware\hex.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\mware\hex.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\mware\sprintf.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\struct\heap.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\struct\heap.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\icons\logo.c</file>
+      <file>$PROJ_DIR$\..\..\..\sam3n-ek\examples\display\bitmaps.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\fonts\gohu.c</file>
+      <file>$PROJ_DIR$\main.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\io\sam3_spi.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\io\sam3_sysctl.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\io\sam3_uart.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\io\sam3x.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\io\sam3_usart.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\io\sam3_wdt.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\drv\adc.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\drv\adc.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\drv\kbd.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\drv\kbd.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\drv\kdebug.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\drv\lcd_hx8347.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\drv\lcd_hx8347.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\drv\timer.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\drv\timer.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\fonts\luBS14.bdf</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\fonts\luBS14.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\gfx\bitmap.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\gfx\line.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\gfx\text.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\gfx\text.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\gfx\text_format.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\gui\menu.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\gui\menu.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\coop.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\irq.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\adc_cm3.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cfg\module.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\hw\switch_ctx_cm3.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\hw\init_cm3.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\hw\vectors_cm3_iar.S</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\io\sam3_adc.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\io\cm3.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\io\sam3.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\io\sam3_emac.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\io\sam3_flash.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\io\sam3_ints.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\io\sam3_nvic.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\io\sam3_pio.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\io\sam3_pmc.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\io\sam3_rstc.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\io\sam3_sdramc.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\io\sam3_smc.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\clock_cm3.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\clock_sam3.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cfg\macros.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\clock_sam3.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\eth_sam3.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\eth_sam3.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\flash_cm3.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\i2c_cm3.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\drv\irq_cm3.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\irq_cm3.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\kdebug_cm3.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\kdebug_sam3.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\ser_cm3.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\ser_sam3.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\ser_sam3.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\timer_cm3.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\timer_cm3.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\hw\crt_cm3_iar.S</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\hw\switch_ctx_cm3.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\hw\iar_cm3.S</file>
+      <file>$TOOLKIT_DIR$\lib\rt7M_tl.a</file>
+      <file>$TOOLKIT_DIR$\lib\shb_l.a</file>
+      <file>$TOOLKIT_DIR$\lib\m7M_tl.a</file>
+      <file>$TOOLKIT_DIR$\lib\dl7M_tln.a</file>
+      <file>$PROJ_DIR$\bitmaps.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\adc_sam3.o</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Config_Normal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\hw\hw_cpufreq.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\adc_sam3.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\adc_sam3.h</file>
+      <file>$PROJ_DIR$\cfg\cfg_adc.h</file>
+      <file>$PROJ_DIR$\logo.c</file>
+      <file>$PROJ_DIR$\logo.h</file>
+    </outputs>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>ILINK</name>
+          <file> 34</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Debug\Exe\display.out</name>
+      <inputs>
+        <tool>
+          <name>ILINK</name>
+          <file> 72 84 218 77 117 14 28 66 103 80 41 89 59 70 20 92 3 105 78 118 81 44 50 93 29 46 122 65 5 40 111 68 113 214 213 215 216</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Debug\Obj\sam3x-ek_display.pbd</name>
+      <inputs>
+        <tool>
+          <name>BILINK</name>
+          <file> 100 221 62 48 116 4 75 63 43 67 121 2 32 11 86 98 74 19 76 33 45 91 90 106 18 30 38 21 52</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\adc_sam3.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 218</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 221</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 222 220 223 0 109 54 79 12 27 57 219 55 37 17 69 1 102 195 64 53 36 58 104 13 87 24 157 176 202 183 151 189 192 191 186 188 187 152 154 150 185 155 184 190 181 35 10 31 83 95 131 25 114 15 119 138 60 82 51 136 182</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 222 220 223 0 109 54 79 12 27 57 55 37 17 69 1 102 195 64 53 36 58 104 13 87 24 157 202 183 151 189 192 191 186 188 187 152 154 150 185 155 184 190 181 35 10 31 83 95 131 25 114 15 119 138 60 82 51 136 182</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\kern\proc.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 29</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 91</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 132 58 114 0 109 54 79 12 27 57 219 55 37 17 69 1 102 83 87 24 95 31 131 25 15 53 36 104 13 119 64 195 177 88 16 6</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 132 58 114 0 109 54 79 12 27 57 55 37 17 69 1 102 83 87 24 95 31 131 25 15 53 36 104 13 119 64 195 177 88 16 6</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\kern\signal.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 46</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 90</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 136 0 109 54 79 12 27 57 219 55 37 17 69 1 102 195 31 83 87 58 24 95 131 25 114 15 53 36 104 13 119 60 88 132 164 209 183 151 189 192 191 186 188 187 152 154 150 185 155 184 190 181 35 10 138 82 51</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 136 0 109 54 79 12 27 57 55 37 17 69 1 102 195 31 83 87 58 24 95 131 25 114 15 53 36 104 13 119 60 88 132 164 138 82 51</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\mware\event.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 66</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 4</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 138 0 109 54 79 12 27 57 219 55 37 17 69 1 102 58 25 60 82 51 131 114 15 53 36 104 13 87 24 83 95 119 136 195 31 164 209 183 151 189 192 191 186 188 187 152 154 150 185 155 184 190 181 35 10</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 138 0 109 54 79 12 27 57 55 37 17 69 1 102 58 25 60 82 51 131 114 15 53 36 104 13 87 24 83 95 119 136 195 31 164</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\mware\formatwr.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 103</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 75</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 140 108 87 109 58 24 97 79 27 57 219 55 37 17 53 36 104 0 54 12 69 1 102 13 112 83 95 142 85</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 140 108 87 109 58 24 97 79 27 57 55 37 17 53 36 104 0 54 12 69 1 102 13 112 83 95 142 85</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\mware\hex.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 89</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 67</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 142</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 142</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\mware\sprintf.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 122</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 106</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 140 108 87 109 58 24 97 79 27 57 219 55 37 17 112 0 54 12 69 1 102 83 95 99 47</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 140 108 87 109 58 24 97 79 27 57 55 37 17 112 0 54 12 69 1 102 83 95 99 47</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\struct\heap.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 41</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 43</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 145 42 0 109 54 79 12 27 57 219 55 37 17 69 1 102 195 53 36 58 104 13 87 24 16 6</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 145 42 0 109 54 79 12 27 57 55 37 17 69 1 102 195 53 36 58 104 13 87 24 16 6</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\icons\logo.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 81</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 19</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 8 120 49 0 109 54 79 12 27 57 219 55 37 17 69 1 102 87 58 24 112 83 95</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 8 120 49 0 109 54 79 12 27 57 55 37 17 69 1 102 87 58 24 112 83 95</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\sam3n-ek\examples\display\bitmaps.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 117</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 48</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\fonts\gohu.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 80</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 63</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 110 0 109 54 79 12 27 57 219 55 37 17 69 1 102 112 87 58 24 83 95</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 110 0 109 54 79 12 27 57 55 37 17 69 1 102 112 87 58 24 83 95</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\main.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 50</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 33</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 26 115 182 109 183 0 54 79 12 27 57 219 55 37 17 69 1 102 151 189 195 53 36 58 104 13 87 24 192 191 186 188 187 152 154 150 185 155 184 190 181 35 10 123 83 95 164 31 131 25 114 15 119 209 60 138 82 51 136 22 9 145 42 159 96 94 162 120 49 157 176 222 220 223 110 112 170 97 173 8 7</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 26 115 182 109 183 0 54 79 12 27 57 55 37 17 69 1 102 151 189 195 53 36 58 104 13 87 24 192 191 186 188 187 152 154 150 185 155 184 190 181 35 10 123 83 95 164 31 131 25 114 15 119 60 138 82 51 136 22 9 145 42 159 96 94 162 120 49 157 110 112 170 97 173 8 7</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\drv\adc.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 84</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 100</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 157 0 109 54 79 12 27 57 219 55 37 17 69 1 102 53 36 58 104 13 87 24 176 222 220 223 195 177</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 157 0 109 54 79 12 27 57 55 37 17 69 1 102 53 36 58 104 13 87 24 61 195 177</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\drv\kbd.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 92</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 32</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 39 195 0 109 54 79 12 27 57 219 55 37 17 69 1 102 188 96 94 53 36 58 104 13 87 24 177 164 31 83 95 131 25 114 15 119 209 60 183 151 189 192 191 186 187 152 154 150 185 155 184 190 181 35 10 138 82 51 136 159</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 39 195 0 109 54 79 12 27 57 55 37 17 69 1 102 188 96 94 53 36 58 104 13 87 24 177 164 31 83 95 131 25 114 15 119 60 138 82 51 136 159</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\drv\kdebug.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 3</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 11</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 13 195 0 109 54 79 12 27 57 219 55 37 17 69 1 102 53 36 58 104 87 24 83 95 140 108 97 112 203 204 183 151 189 192 191 186 188 187 152 154 150 185 155 184 190 181 35 10</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 13 195 0 109 54 79 12 27 57 55 37 17 69 1 102 53 36 58 104 87 24 83 95 140 108 97 112</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\drv\lcd_hx8347.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 78</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 98</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 162 120 49 0 109 54 79 12 27 57 219 55 37 17 69 1 102 87 58 24 83 95 101 195 183 151 189 53 36 104 13 192 191 186 188 187 152 154 150 185 155 184 190 181 35 10 164 31 131 25 114 15 119 209 60 138 82 51 136</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 162 120 49 0 109 54 79 12 27 57 55 37 17 69 1 102 87 58 24 83 95 101 195 183 151 189 53 36 104 13 192 191 186 188 187 152 154 150 185 155 184 190 181 35 10 164 31 131 25 114 15 119 60 138 82 51 136</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\drv\timer.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 111</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 21</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 164 36 58 104 195 0 109 54 79 12 27 57 219 55 37 17 69 1 102 87 24 31 83 95 131 25 114 15 53 13 119 209 60 183 151 189 192 191 186 188 187 152 154 150 185 155 184 190 181 35 10 138 82 51 136 56 177 132</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 164 36 58 104 195 0 109 54 79 12 27 57 55 37 17 69 1 102 87 24 31 83 95 131 25 114 15 53 13 119 60 138 82 51 136 56 177 132</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\fonts\luBS14.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 44</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 76</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 110 0 109 54 79 12 27 57 219 55 37 17 69 1 102 112 87 58 24 83 95</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 110 0 109 54 79 12 27 57 55 37 17 69 1 102 112 87 58 24 83 95</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\gfx\bitmap.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 77</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 62</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 120 49 0 109 54 79 12 27 57 219 55 37 17 69 1 102 87 58 24 107 195 53 36 104 13 16 6 110 112 83 95</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 120 49 0 109 54 79 12 27 57 55 37 17 69 1 102 87 58 24 107 195 53 36 104 13 16 6 110 112 83 95</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\gfx\line.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 118</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 74</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 120 49 0 109 54 79 12 27 57 219 55 37 17 69 1 102 87 58 24 107 53 36 104 13 195</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 120 49 0 109 54 79 12 27 57 55 37 17 69 1 102 87 58 24 107 53 36 104 13 195</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\gfx\text.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 5</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 30</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 120 49 0 109 54 79 12 27 57 219 55 37 17 69 1 102 87 58 24 110 112 83 95 170 195 97 107 53 36 104 13</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 120 49 0 109 54 79 12 27 57 55 37 17 69 1 102 87 58 24 110 112 83 95 170 195 97 107 53 36 104 13</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\gfx\text_format.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 40</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 38</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 170 0 109 54 79 12 27 57 219 55 37 17 69 1 102 195 87 58 24 120 49 97 140 108 110 112 83 95 99 47 16 6</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 170 0 109 54 79 12 27 57 55 37 17 69 1 102 195 87 58 24 120 49 97 140 108 110 112 83 95 99 47 16 6</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\gui\menu.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 93</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 45</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 173 0 109 54 79 12 27 57 219 55 37 17 69 1 102 120 49 87 58 24 23 104 53 36 13 110 112 83 95 170 195 97 159 96 94 15 16 6</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 173 0 109 54 79 12 27 57 55 37 17 69 1 102 120 49 87 58 24 23 104 53 36 13 110 112 83 95 170 195 97 159 96 94 15 16 6</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\hw\init_cm3.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 70</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 121</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 58 178 0 109 54 79 12 27 57 219 55 37 17 69 1 102 53 36 104 13 87 24 31 83 95 131 25 114 15 119 202 183 151 189 195 192 191 186 188 187 152 154 150 185 155 184 190 181 35 10 193 196 132 182</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 58 178 0 109 54 79 12 27 57 55 37 17 69 1 102 53 36 104 13 87 24 31 83 95 131 25 114 15 119 202 183 151 189 195 192 191 186 188 187 152 154 150 185 155 184 190 181 35 10 193 196 132 182</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\hw\vectors_cm3_iar.S</name>
+      <outputs>
+        <tool>
+          <name>AARM</name>
+          <file> 113</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\clock_sam3.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 14</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 116</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 196 0 109 54 79 12 27 57 219 55 37 17 69 1 102 195 183 151 189 53 36 58 104 13 87 24 192 191 186 188 187 152 154 150 185 155 184 190 181 35 10</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 196 0 109 54 79 12 27 57 55 37 17 69 1 102 195 183 151 189 53 36 58 104 13 87 24 192 191 186 188 187 152 154 150 185 155 184 190 181 35 10</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\drv\irq_cm3.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 20</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 2</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 202 0 109 54 79 12 27 57 219 55 37 17 69 1 102 183 151 189 195 53 36 58 104 13 87 24 192 191 186 188 187 152 154 150 185 155 184 190 181 35 10 64 31 83 95 131 25 114 15 119</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 202 0 109 54 79 12 27 57 55 37 17 69 1 102 183 151 189 195 53 36 58 104 13 87 24 192 191 186 188 187 152 154 150 185 155 184 190 181 35 10 64 31 83 95 131 25 114 15 119</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\kdebug_sam3.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 105</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 86</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 13 195 0 109 54 79 12 27 57 219 55 37 17 69 1 102 83 87 58 24 95 183 151 189 53 36 104 192 191 186 188 187 152 154 150 185 155 184 190 181 35 10</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 13 195 0 109 54 79 12 27 57 55 37 17 69 1 102 83 87 58 24 95 183 151 189 53 36 104 192 191 186 188 187 152 154 150 185 155 184 190 181 35 10</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\timer_cm3.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 68</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 52</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 209 60 109 31 83 87 58 24 95 79 27 57 219 55 37 17 0 54 12 69 1 102 131 25 114 15 53 36 104 13 119 183 151 189 195 192 191 186 188 187 152 154 150 185 155 184 190 181 35 10 202</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 209 60 109 31 83 87 58 24 95 79 27 57 55 37 17 0 54 12 69 1 102 131 25 114 15 53 36 104 13 119 183 151 189 195 192 191 186 188 187 152 154 150 185 155 184 190 181 35 10 202</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\hw\crt_cm3_iar.S</name>
+      <outputs>
+        <tool>
+          <name>AARM</name>
+          <file> 28</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\hw\switch_ctx_cm3.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 65</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 18</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 0 109 54 79 12 27 57 219 55 37 17 69 1 102 58 31 83 87 24 95 131 25 114 15 53 36 104 13 119 132 178</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 0 109 54 79 12 27 57 55 37 17 69 1 102 58 31 83 87 24 95 131 25 114 15 53 36 104 13 119 132 178</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\hw\iar_cm3.S</name>
+      <outputs>
+        <tool>
+          <name>AARM</name>
+          <file> 59</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\bitmaps.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 117</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 48</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\logo.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 81</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 19</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 225 120 49 0 109 54 79 12 27 57 219 55 37 17 69 1 102 87 58 24 112 83 95</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 225 120 49 0 109 54 79 12 27 57 55 37 17 69 1 102 87 58 24 112 83 95</file>
+        </tool>
+      </inputs>
+    </file>
+    <forcedrebuild>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\kern\monitor.c</name>
+      <tool>ICCARM</tool>
+    </forcedrebuild>
+    <forcedrebuild>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\kern\preempt.c</name>
+      <tool>ICCARM</tool>
+    </forcedrebuild>
+    <forcedrebuild>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\kern\sem.c</name>
+      <tool>ICCARM</tool>
+    </forcedrebuild>
+    <forcedrebuild>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\kern\coop.c</name>
+      <tool>ICCARM</tool>
+    </forcedrebuild>
+    <forcedrebuild>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\kern\irq.c</name>
+      <tool>ICCARM</tool>
+    </forcedrebuild>
+    <forcedrebuild>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\eth_sam3.c</name>
+      <tool>ICCARM</tool>
+    </forcedrebuild>
+    <forcedrebuild>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\kdebug_cm3.c</name>
+      <tool>ICCARM</tool>
+    </forcedrebuild>
+    <forcedrebuild>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\ser_sam3.c</name>
+      <tool>ICCARM</tool>
+    </forcedrebuild>
+  </configuration>
+  <configuration>
+    <name>Release</name>
+    <outputs>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Product_string.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\string.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Threads.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\yvals.h</file>
+      <file>$PROJ_DIR$\Release\Obj\iar_cm3.o</file>
+      <file>$PROJ_DIR$\Release\Obj\clock_sam3.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\luBS14.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\coop.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\kbd.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\ser_sam3.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\hex.o</file>
+      <file>$PROJ_DIR$\Release\Obj\event.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\monitor.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\eth_sam3.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\timer.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\kdebug_cm3.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\c\xencoding_limits.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\ystdio.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Product.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Defaults.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\ysizet.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\ycheck.h</file>
+      <file>$PROJ_DIR$\Release\Exe\sam3x-ek_display.out</file>
+      <file>$PROJ_DIR$\Release\Obj\formatwr.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\menu.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\sam3x-ek_display.pbd</file>
+      <file>$PROJ_DIR$\Release\Obj\hex.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\text.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\preempt.o</file>
+      <file>$PROJ_DIR$\Release\Obj\preempt.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\crt_cm3_iar.o</file>
+      <file>$PROJ_DIR$\Release\Obj\switch_ctx_cm3.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\bitmap.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\sprintf.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\signal.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdarg.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdio.h</file>
+      <file>$PROJ_DIR$\Release\Obj\init_cm3.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\proc.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\coop.o</file>
+      <file>$PROJ_DIR$\Release\Obj\lcd_hx8347.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\irq.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\main.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\gfx\gfx_p.h</file>
+      <file>$PROJ_DIR$\Release\Obj\kdebug_sam3.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\sem.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\text_format.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\line.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\irq_cm3.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\gfx\gfx.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\irq.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\monitor.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\monitor.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\preempt.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\proc.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\proc.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\proc_p.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\sem.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\sem.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\signal.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\signal.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\mware\event.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\mware\event.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\mware\formatwr.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\mware\formatwr.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\mware\hex.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\mware\hex.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\mware\sprintf.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\struct\heap.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\struct\heap.h</file>
+      <file>$PROJ_DIR$\main.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\drv\adc.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\drv\kbd.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\drv\lcd_hx8347.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\drv\lcd_hx8347.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\drv\timer.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\drv\timer.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\fonts\luBS14.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\gfx\bitmap.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\gfx\line.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\gfx\text.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\gfx\text.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\gfx\text_format.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\gui\menu.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\gui\menu.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\coop.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\kern\irq.c</file>
+      <file>$PROJ_DIR$\Release\Obj\adc.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\vectors_cm3_iar.o</file>
+      <file>$PROJ_DIR$\Release\Obj\timer_cm3.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\heap.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\hw\switch_ctx_cm3.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\hw\init_cm3.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\hw\vectors_cm3_iar.S</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\clock_sam3.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\clock_sam3.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\eth_sam3.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\eth_sam3.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\drv\irq_cm3.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\irq_cm3.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\kdebug_cm3.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\kdebug_sam3.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\ser_sam3.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\timer_cm3.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\timer_cm3.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\hw\crt_cm3_iar.S</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\hw\switch_ctx_cm3.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\hw\iar_cm3.S</file>
+    </outputs>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>ILINK</name>
+          <file> 22</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Release\Obj\sam3x-ek_display.pbd</name>
+      <inputs>
+        <tool>
+          <name>BILINK</name>
+          <file> 87 32 5 7 13 11 23 90 26 37 41 48 8 15 44 40 47 6 42 24 12 29 38 45 9 34 33 31 27 46 14 89</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\kern\monitor.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 12</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 52</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 52</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\kern\preempt.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 28</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 29</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\kern\proc.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 38</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 56</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 56 55 1 21 3 19 18 16 2 20 0</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\kern\sem.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 45</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 58</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 58</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\kern\signal.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 34</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 60</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 60</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\mware\event.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 11</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 62</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 62</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\mware\formatwr.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 23</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 64</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 64 35 21 3 19 18 16 2</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\mware\hex.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 10</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 26</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 66</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 66</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\mware\sprintf.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 33</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 36 21 3 19 18 16 2 20 17</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\struct\heap.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 90</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 69</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 69 1 21 3 19 18 16 2 20 0</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\main.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 42</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\drv\adc.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 87</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\drv\kbd.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 8</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\drv\lcd_hx8347.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 40</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 74</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 74</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\drv\timer.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 14</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 76</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 76</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\fonts\luBS14.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 6</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\gfx\bitmap.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 32</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 49</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 49 43 1 21 3 19 18 16 2 20 0</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\gfx\line.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 47</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 49</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 49 43</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\gfx\text.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 27</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\gfx\text_format.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 46</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 81</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 81 35 21 3 19 18 16 2 36 20 17 1 0</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\gui\menu.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 24</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 84</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 84 1 21 3 19 18 16 2 20 0</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\kern\coop.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 39</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 7</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\kern\irq.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 41</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 50</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 50</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\hw\init_cm3.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 37</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 91</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\hw\vectors_cm3_iar.S</name>
+      <outputs>
+        <tool>
+          <name>AARM</name>
+          <file> 88</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\clock_sam3.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 5</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 95</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 95</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\eth_sam3.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 13</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 1 21 3 19 18 16 2 20 0 97</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\drv\irq_cm3.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 48</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 99</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 99</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\kdebug_cm3.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 15</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\kdebug_sam3.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 44</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\ser_sam3.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 9</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\cpu\cortex-m3\drv\timer_cm3.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 89</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 104</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 104</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\hw\crt_cm3_iar.S</name>
+      <outputs>
+        <tool>
+          <name>AARM</name>
+          <file> 30</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\hw\switch_ctx_cm3.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 31</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 91</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\bertos\cpu\CORTEX-M3\hw\iar_cm3.S</name>
+      <outputs>
+        <tool>
+          <name>AARM</name>
+          <file> 4</file>
+        </tool>
+      </outputs>
+    </file>
+    <forcedrebuild>
+      <name>[MULTI_TOOL]</name>
+      <tool>ILINK</tool>
+    </forcedrebuild>
+  </configuration>
+</project>
+
+

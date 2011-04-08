@@ -72,7 +72,7 @@
  * Priority-based scheduling policy.
  * $WIZ$ type = "boolean"
  */
-#define CONFIG_KERN_PRI 0
+#define CONFIG_KERN_PRI 1
 
 /**
  * Dynamic memory allocation for processes.
