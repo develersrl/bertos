@@ -38,6 +38,8 @@
 #include <cfg/cfg_debug.h>
 #include <cfg/macros.h> /* for BV() */
 
+#include <cpu/types.h>
+
 #include <io/sam3.h>
 
 

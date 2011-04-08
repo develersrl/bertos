@@ -52,7 +52,9 @@
 
 #include <io/cm3.h>
 
+#ifndef __IAR_SYSTEMS_ICC__
 extern size_t __text_end, __data_start, __data_end, __bss_start, __bss_end;
+#endif
 
 extern void __init2(void);
 

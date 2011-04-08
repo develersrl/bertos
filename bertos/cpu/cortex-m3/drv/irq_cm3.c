@@ -41,8 +41,14 @@
 #include <cfg/log.h> /* LOG_ERR() */
 #include <cpu/irq.h>
 
+
+#ifdef __IAR_SYSTEMS_ICC__
+#pragma data_alignment=0x400
+static void (*irq_table[NUM_INTERRUPTS])(void);
+#else
 static void (*irq_table[NUM_INTERRUPTS])(void)
 			__attribute__((section("vtable")));
+#endif
 
 /* Priority register / IRQ number table */
 static const uint32_t nvic_prio_reg[] =
@@ -62,7 +68,11 @@ static NAKED NORETURN void unhandled_isr(void)
 {
 	register uint32_t reg;
 
+#ifdef __IAR_SYSTEMS_ICC__
+	reg = CPU_READ_IPSR();
+#else
 	asm volatile ("mrs %0, ipsr" : "=r"(reg));
+#endif
 	LOG_ERR("unhandled IRQ %lu\n", reg);
 	while (1)
 		PAUSE;

@@ -123,6 +123,8 @@ void NAKED pendsv_handler(void)
 		: "memory");
 }
 #else /* !CONFIG_KERN_PREEMPT */
+#ifdef __IAR_SYSTEMS_ICC__
+#else /* __IAR_SYSTEMS_ICC__ */
 void NAKED asm_switch_context(cpu_stack_t **new_sp, cpu_stack_t **old_sp)
 {
 	register cpu_stack_t **_new_sp asm("r0") = new_sp;
@@ -142,4 +144,5 @@ void NAKED asm_switch_context(cpu_stack_t **new_sp, cpu_stack_t **old_sp)
 		"bx lr"
 		: : "r"(_new_sp), "r"(_old_sp) : "ip", "memory");
 }
+#endif /* __IAR_SYSTEMS_ICC__ */
 #endif /* CONFIG_KERN_PREEMPT */
