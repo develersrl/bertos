@@ -99,7 +99,7 @@ INLINE Mt29f *FLASH_CAST(KBlock *fls)
 	return (Mt29f *)fls;
 }
 
-void mt29f_hw_init(Mt29f *fls, int flags);
-void mt29f_hw_initUnbuffered(Mt29f *fls, int flags);
+void mt29f_hw_init(Mt29f *fls);
+void mt29f_hw_initUnbuffered(Mt29f *fls);
 
 #endif /* DRV_MT29F_H */

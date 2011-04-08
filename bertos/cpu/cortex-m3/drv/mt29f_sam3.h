@@ -38,9 +38,20 @@
 #ifndef MT29F_SAM3_H
 #define MT29F_SAM3_H
 
+#include <drv/mt29f.h>
+
+
 // MT29F2G08AAD, FIXME: configurable
-#define MT29F_PAGE_SIZE  2048
-#define MT29F_SIZE       0x10000000  // 256 MB
+#define MT29F_PAGE_SIZE   0x800       // 2048 B
+#define MT29F_BLOCK_SIZE  0x20000     // 128 kB
+#define MT29F_SIZE        0x10000000  // 256 MB
+#define MT29F_CSID        NFC_CMD_CSID_0  // Chip select
+
+// Addresses for sending command, addresses and data bytes to flash
+#define MT29F_CMD_ADDR    0x60400000
+#define MT29F_ADDR_ADDR   0x60200000
+#define MT29F_DATA_ADDR   0x60000000
+
 
 /*
  * PIO definitions.
@@ -60,6 +71,10 @@
 #define MT29F_PIN_ALE       BV(21)
 #define MT29F_PINS_PORTD    (MT29F_PIN_CLE | MT29F_PIN_ALE)
 #define MT29F_PERIPH_PORTD  PIO_PERIPH_A
+
+
+int mt29f_blockErase(Mt29f *fls, size_t blk_offset);
+
 
 #endif /* MT29F_SAM3_H */
 
