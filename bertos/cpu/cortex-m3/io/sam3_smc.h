@@ -204,6 +204,63 @@
 /*\}*/
 
 /**
+ * NFC control addresses.
+ */
+/*\{*/
+#define NFC_SRAM_BASE_ADDR  0x20100000  ///< Base address of NFC SRAM
+#define NFC_CMD_BASE_ADDR   0x60000000  ///< Base address for NFC Address Command
+/*\}*/
+
+/**
+ * NFC address command values.
+ */
+/*\{*/
+#define NFC_CMD_CMD1           (0xFF <<  2)  ///< Command Register Value for Cycle 1
+#define NFC_CMD_CMD2           (0xFF << 10)  ///< Command Register Value for Cycle 2
+#define NFC_CMD_VCMD2          BV(18)        ///< Valid Cycle 2 Command
+#define NFC_CMD_ACYCLE_MASK    (0x7 << 19)   ///< Number of Address required for the current command
+#define NFC_CMD_ACYCLE_NONE    (0x0 << 19)   ///< No address cycle
+#define NFC_CMD_ACYCLE_ONE     (0x1 << 19)   ///< One address cycle
+#define NFC_CMD_ACYCLE_TWO     (0x2 << 19)   ///< Two address cycles
+#define NFC_CMD_ACYCLE_THREE   (0x3 << 19)   ///< Three address cycles
+#define NFC_CMD_ACYCLE_FOUR    (0x4 << 19)   ///< Four address cycles
+#define NFC_CMD_ACYCLE_FIVE    (0x5 << 19)   ///< Five address cycles
+#define NFC_CMD_CSID_MASK      (0x7 << 22)   ///< Chip Select Identifier
+#define NFC_CMD_CSID_0         (0x0 << 22)   ///< CS0
+#define NFC_CMD_CSID_1         (0x1 << 22)   ///< CS1
+#define NFC_CMD_CSID_2         (0x2 << 22)   ///< CS2
+#define NFC_CMD_CSID_3         (0x3 << 22)   ///< CS3
+#define NFC_CMD_CSID_4         (0x4 << 22)   ///< CS4
+#define NFC_CMD_CSID_5         (0x5 << 22)   ///< CS5
+#define NFC_CMD_CSID_6         (0x6 << 22)   ///< CS6
+#define NFC_CMD_CSID_7         (0x7 << 22)   ///< CS7
+#define NFC_CMD_NFCEN          BV(25)        ///< NFC Enable
+#define NFC_CMD_NFCWR          BV(26)        ///< NFC Write Enable
+#define NFC_CMD_NFCCMD         BV(27)        ///< NFC Command Enable
+/*\}*/
+
+
+/**
+ * Defines for bit fields in SMC_SR register.
+ */
+/*\{*/
+#define SMC_SR_SMCSTS        BV(0)
+#define SMC_SR_RB_RISE       BV(4)
+#define SMC_SR_RB_FALL       BV(5)
+#define SMC_SR_NFCBUSY       BV(8)
+#define SMC_SR_NFCWR         BV(11)
+#define SMC_SR_NFCSID_SHIFT  12
+#define SMC_SR_NFCSID_MASK   (0x7 << SMC_SR_NFCSID_SHIFT)
+#define SMC_SR_XFRDONE       BV(16)
+#define SMC_SR_CMDDONE       BV(17)
+#define SMC_SR_DTOE          BV(20)
+#define SMC_SR_UNDEF         BV(21)
+#define SMC_SR_AWB           BV(22)
+#define SMC_SR_NFCASE        BV(23)
+#define SMC_SR_RB_EDGE0      BV(24)
+/*\}*/
+
+/**
  * Defines for bit fields in SMC_SETUP registers.
  */
 /*\{*/
