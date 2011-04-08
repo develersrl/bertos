@@ -49,6 +49,8 @@
 #include <gfx/font.h>
 #include <gfx/text.h>
 
+#include <cpu/power.h>
+
 #include <drv/kbd.h>
 
 #include <string.h> /* strcpy() */
@@ -464,6 +466,7 @@ iptr_t menu_handle(const struct Menu *menu)
 
 		#if CONFIG_MENU_SMOOTH || (CONFIG_MENU_TIMEOUT != 0)
 			key = kbd_peek();
+			cpu_relax();
 		#else
 			key = kbd_get();
 		#endif
