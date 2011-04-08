@@ -37,12 +37,12 @@
 #define CPU_DETECT_H
 
 #if defined(__ARM_ARCH_4T__) /* GCC */ \
-	|| defined(__ARM4TM__) /* IAR: defined for all cores >= 4tm */
+	|| (defined(__ICCARM__) && (__CORE__== __ARM4TM__)) /* IAR: defined for all cores == 4tm */
 	#define CPU_ARM 1
 	#define CPU_ID	arm
 	#define CPU_CORE_NAME		 "ARM7TDMI"
 
-	// AT91SAM7S core family
+    // AT91SAM7S products serie
 	#if defined(__ARM_AT91SAM7S32__)
 		#define CPU_ARM_AT91         1
 		#define CPU_ARM_AT91SAM7S32  1
@@ -87,7 +87,7 @@
 		#define CPU_ARM_AT91SAM7S512 0
 	#endif
 
-	// AT91SAM7X core family
+	// AT91SAM7X products serie
 	#if defined(__ARM_AT91SAM7X128__)
 		#define CPU_ARM_AT91         1
 		#define CPU_ARM_SAM7X        1
@@ -183,7 +183,8 @@
 	#define CPU_ARM_LPC2378         0
 #endif
 
-#if defined(__ARM_ARCH_7M__)
+#if defined(__ARM_ARCH_7M__) /* GCC */ \
+    || (defined(__ICCARM__) && (__CORE__== __ARM7M__)) /* IAR: defined for all cores v7M */
 	/* Cortex-M3 */
 	#define CPU_CM3 1
 	#define CPU_ID	cm3
@@ -229,7 +230,7 @@
 		#define CPU_CM3_STM32F103RE 0
 	#endif
 
-
+	// AT91SAM3N products serie
 	#if defined (__ARM_SAM3N4__)
 		#define CPU_CM3_SAM3    1
 		#define CPU_CM3_SAM3N   1
@@ -245,6 +246,7 @@
 		#define CPU_CM3_SAM3N4  0
 	#endif
 
+	// AT91SAM3S products serie
 	#if defined (__ARM_SAM3S4__)
 		#define CPU_CM3_SAM3    1
 		#define CPU_CM3_SAM3S   1
@@ -258,6 +260,7 @@
 		#define CPU_CM3_SAM3S4  0
 	#endif
 
+	// AT91SAM3U products serie
 	#if defined (__ARM_SAM3U4__)
 		#define CPU_CM3_SAM3    1
 		#define CPU_CM3_SAM3U   1
@@ -271,6 +274,7 @@
 		#define CPU_CM3_SAM3U4  0
 	#endif
 
+	// AT91SAM3X products serie
 	#if defined (__ARM_SAM3X8__)
 		#define CPU_CM3_SAM3    1
 		#define CPU_CM3_SAM3X   1
@@ -326,7 +330,7 @@
 	#define CPU_CM3_STM32 0
 	#define CPU_CM3_STM32F103RB 0
 	#define CPU_CM3_STM32F101C4 0
-        #define CPU_CM3_STM32F103RE 0
+    #define CPU_CM3_STM32F103RE 0
 
 	#define CPU_CM3_SAM3 0
 	#define CPU_CM3_SAM3N 0
@@ -336,7 +340,7 @@
 #endif
 
 #if (defined(__IAR_SYSTEMS_ICC__) || defined(__IAR_SYSTEMS_ICC)) \
-	&& !defined(__ARM4TM__) /* IAR: if not ARM assume I196 */
+	&& !defined(__ICCARM__) /* IAR: if not ARM assume I196 */
 	#warning Assuming CPU is I196
 	#define CPU_I196		1
 	#define CPU_ID                  i196

@@ -178,13 +178,24 @@
 		#define CPU_RAM_START 0x20000000
 	#endif
 
-	#if defined(__ARMEB__)
-		#define CPU_BYTE_ORDER CPU_BIG_ENDIAN
-	#elif defined(__ARMEL__)
-		#define CPU_BYTE_ORDER CPU_LITTLE_ENDIAN
-	#else
-		#error Unable to detect Cortex-M3 endianess!
-	#endif
+    #if defined( __ICCARM__)
+        #if ((defined __LITTLE_ENDIAN__) && (__LITTLE_ENDIAN__ == 0))
+            #define CPU_BYTE_ORDER CPU_BIG_ENDIAN
+        #elif ((defined __LITTLE_ENDIAN__) && (__LITTLE_ENDIAN__ == 1))
+		    #define CPU_BYTE_ORDER CPU_LITTLE_ENDIAN
+        #else
+            #error Unable to detect Cortex-M3 endianess!
+        #endif
+
+	#define NOP            __no_operation()
+    #else
+        #if defined(__ARMEB__) // GCC
+            #define CPU_BYTE_ORDER CPU_BIG_ENDIAN
+        #elif defined(__ARMEL__) // GCC
+            #define CPU_BYTE_ORDER CPU_LITTLE_ENDIAN
+        #else
+            #error Unable to detect Cortex-M3 endianess!
+        #endif
 
 	#define NOP         asm volatile ("nop")
 	#define PAUSE       asm volatile ("wfi" ::: "memory")
@@ -194,6 +205,7 @@
 	 * Function attribute to move it into ram memory.
 	 */
 	#define RAM_FUNC __attribute__((section(".ramfunc")))
+    #endif
 
 #elif CPU_PPC
 
@@ -283,7 +295,7 @@
 
 #ifndef PAUSE
 	/// Generic PAUSE implementation.
-	#define PAUSE	{NOP; MEMORY_BARRIER;}
+	#define PAUSE	do {NOP; MEMORY_BARRIER;} while (0)
 #endif
 
 #endif /* CPU_ATTR_H */

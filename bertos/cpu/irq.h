@@ -72,7 +72,7 @@
 	 * NOTE: 0 means that an interrupt is not affected by the global IRQ
 	 * priority settings.
 	 */
-	#define IRQ_PRIO		0x80
+	#define IRQ_PRIO		    0x80
 	#define IRQ_PRIO_MIN		0xf0
 	#define IRQ_PRIO_MAX		0
 	/*
@@ -89,63 +89,94 @@
 	#define IRQ_PRIO_DISABLED	0x40
 	#define IRQ_PRIO_ENABLED	0
 
-	#define IRQ_DISABLE						\
-	({								\
-		register cpu_flags_t reg = IRQ_PRIO_DISABLED;		\
-		asm volatile (						\
-			"msr basepri, %0"				\
-			: : "r"(reg) : "memory", "cc");			\
-	})
+	#ifdef __IAR_SYSTEMS_ICC__
+		INLINE cpu_flags_t CPU_READ_FLAGS(void)
+		{
+			return __get_BASEPRI();
+		}
 
-	#define IRQ_ENABLE						\
-	({								\
-		register cpu_flags_t reg = IRQ_PRIO_ENABLED;		\
-		asm volatile (						\
-			"msr basepri, %0"				\
-			: : "r"(reg) : "memory", "cc");			\
-	})
+		INLINE void CPU_WRITE_FLAGS(cpu_flags_t flags)
+		{
+			__set_BASEPRI(flags);
+		}
 
-	#define CPU_READ_FLAGS()					\
-	({								\
-		register cpu_flags_t reg;				\
-		asm volatile (						\
-			"mrs %0, basepri"				\
-			 : "=r"(reg) : : "memory", "cc");		\
-		reg;							\
-	})
+		extern uint32_t CPU_READ_IPSR(void);
+		extern bool irq_running(void);
 
-	#define IRQ_SAVE_DISABLE(x)					\
-	({								\
-		x = CPU_READ_FLAGS();					\
-		IRQ_DISABLE;						\
-	})
+		#define IRQ_DISABLE	CPU_WRITE_FLAGS(IRQ_PRIO_DISABLED)
 
-	#define IRQ_RESTORE(x)						\
-	({								\
-		asm volatile (						\
-			"msr basepri, %0"				\
-			: : "r"(x) : "memory", "cc");			\
-	})
+		#define IRQ_ENABLE	CPU_WRITE_FLAGS(IRQ_PRIO_ENABLED)
+
+		#define IRQ_SAVE_DISABLE(x)					\
+		do {								\
+			x = CPU_READ_FLAGS();					\
+			IRQ_DISABLE;						\
+		} while (0)
+
+		#define IRQ_RESTORE(x)						\
+		do {								\
+			CPU_WRITE_FLAGS(x);					\
+		} while (0)
+	#else /* !__IAR_SYSTEMS_ICC__ */
+		#define IRQ_DISABLE						\
+		({								\
+			register cpu_flags_t reg = IRQ_PRIO_DISABLED;		\
+			asm volatile (						\
+				"msr basepri, %0"				\
+				: : "r"(reg) : "memory", "cc");			\
+		})
+
+		#define IRQ_ENABLE						\
+		({								\
+			register cpu_flags_t reg = IRQ_PRIO_ENABLED;		\
+			asm volatile (						\
+				"msr basepri, %0"				\
+				: : "r"(reg) : "memory", "cc");			\
+		})
+
+		#define CPU_READ_FLAGS()					\
+		({								\
+			register cpu_flags_t reg;				\
+			asm volatile (						\
+				"mrs %0, basepri"				\
+				 : "=r"(reg) : : "memory", "cc");		\
+			reg;							\
+		})
+
+		#define IRQ_SAVE_DISABLE(x)					\
+		({								\
+			x = CPU_READ_FLAGS();					\
+			IRQ_DISABLE;						\
+		})
+
+		#define IRQ_RESTORE(x)						\
+		({								\
+			asm volatile (						\
+				"msr basepri, %0"				\
+				: : "r"(x) : "memory", "cc");			\
+		})
+
+		INLINE bool irq_running(void)
+		{
+			register uint32_t ret;
+
+			/*
+			 * Check if the current stack pointer is the main stack or
+			 * process stack: we use the main stack only in Handler mode,
+			 * so this means we're running inside an ISR.
+			 */
+			asm volatile (
+				"mrs %0, msp\n\t"
+				"cmp sp, %0\n\t"
+				"ite ne\n\t"
+				"movne %0, #0\n\t"
+				"moveq %0, #1\n\t" : "=r"(ret) : : "cc");
+			return ret;
+		}
+	#endif /* __IAR_SYSTEMS_ICC__ */
 
 	#define IRQ_ENABLED() (CPU_READ_FLAGS() == IRQ_PRIO_ENABLED)
 
-	INLINE bool irq_running(void)
-	{
-		register uint32_t ret;
-
-		/*
-		 * Check if the current stack pointer is the main stack or
-		 * process stack: we use the main stack only in Handler mode,
-		 * so this means we're running inside an ISR.
-		 */
-		asm volatile (
-			"mrs %0, msp\n\t"
-			"cmp sp, %0\n\t"
-			"ite ne\n\t"
-			"movne %0, #0\n\t"
-			"moveq %0, #1\n\t" : "=r"(ret) : : "cc");
-		return ret;
-	}
 	#define IRQ_RUNNING() irq_running()
 
 	#if (CONFIG_KERN && CONFIG_KERN_PREEMPT)
