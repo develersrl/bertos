@@ -31,7 +31,7 @@
  *
  * -->
  *
- * \brief Low-level timer module for AVR (interface).
+ * \brief Low-level timer module for AVR MEGA (interface).
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Francesco Sacchi <batt@develer.com>
@@ -39,8 +39,8 @@
  *
  */
 
-#ifndef DRV_TIMER_AVR_H
-#define DRV_TIMER_AVR_H
+#ifndef DRV_TIMER_MEGA_H
+#define DRV_TIMER_MEGA_H
 
 #include <hw/hw_cpufreq.h>   /* CPU_FREQ */
 
@@ -170,4 +170,4 @@
 
 void timer_hw_init(void);
 
-#endif /* DRV_TIMER_AVR_H */
+#endif /* DRV_TIMER_MEGA_H */

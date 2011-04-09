@@ -34,14 +34,14 @@
  * \author Francesco Sacchi <batt@develer.com>
  * \author Luca Ottaviano <lottaviano@develer.com>
  *
- * \brief Low-level timer module for AVR (implementation).
+ * \brief Low-level timer module for AVR MEGA (implementation).
  *
  * This module is automatically included so no need to include
  * in test list.
  * notest: avr
  */
 
-#include <drv/timer_avr.h>
+#include <drv/timer_mega.h>
 #include <cfg/macros.h> // BV()
 
 #include <cpu/types.h>
