@@ -402,6 +402,7 @@
 	#define CPU_CORE_NAME           "AVR"
 
 	#if defined(__AVR_ATmega32__)
+		#define CPU_AVR_MEGA		1
 		#define CPU_AVR_ATMEGA32    1
 		#define CPU_NAME            "ATmega32"
 	#else
@@ -409,6 +410,7 @@
 	#endif
 
 	#if defined(__AVR_ATmega64__)
+		#define CPU_AVR_MEGA		1
 		#define CPU_AVR_ATMEGA64    1
 		#define CPU_NAME            "ATmega64"
 	#else
@@ -416,6 +418,7 @@
 	#endif
 
 	#if defined(__AVR_ATmega103__)
+		#define CPU_AVR_MEGA		1
 		#define CPU_AVR_ATMEGA103   1
 		#define CPU_NAME            "ATmega103"
 	#else
@@ -423,6 +426,7 @@
 	#endif
 
 	#if defined(__AVR_ATmega128__)
+		#define CPU_AVR_MEGA		1
 		#define CPU_AVR_ATMEGA128   1
 		#define CPU_NAME            "ATmega128"
 	#else
@@ -430,6 +434,7 @@
 	#endif
 
 	#if defined(__AVR_ATmega8__)
+		#define CPU_AVR_MEGA		1
 		#define CPU_AVR_ATMEGA8     1
 		#define CPU_NAME            "ATmega8"
 	#else
@@ -437,6 +442,7 @@
 	#endif
 
 	#if defined(__AVR_ATmega168__)
+		#define CPU_AVR_MEGA		1
 		#define CPU_AVR_ATMEGA168   1
 		#define CPU_NAME            "ATmega168"
 	#else
@@ -444,6 +450,7 @@
 	#endif
 
 	#if defined(__AVR_ATmega328P__)
+		#define CPU_AVR_MEGA		1
 		#define CPU_AVR_ATMEGA328P   1
 		#define CPU_NAME            "ATmega328P"
 	#else
@@ -451,6 +458,7 @@
 	#endif
 
 	#if defined(__AVR_ATmega1281__)
+		#define CPU_AVR_MEGA		1
 		#define CPU_AVR_ATMEGA1281  1
 		#define CPU_NAME            "ATmega1281"
 	#else
@@ -458,6 +466,7 @@
 	#endif
 
 	#if defined(__AVR_ATmega1280__)
+		#define CPU_AVR_MEGA		1
 		#define CPU_AVR_ATMEGA1280  1
 		#define CPU_NAME            "ATmega1280"
 	#else
@@ -465,19 +474,43 @@
 	#endif
 
 	#if defined(__AVR_ATmega2560__)
+		#define CPU_AVR_MEGA		1
 		#define CPU_AVR_ATMEGA2560  1
 		#define CPU_NAME            "ATmega2560"
 	#else
 		#define CPU_AVR_ATMEGA2560  0
 	#endif
 
+	#if defined(__AVR_ATxmega32D4__)
+		#define CPU_AVR_XMEGA		1
+		#define CPU_AVR_XMEGA_D		1
+		#define CPU_AVR_ATXMEGA32D4	1
+		#define CPU_NAME			"ATxmega32d4"
+	#else
+		#define CPU_AVR_ATXMEGA32D4	0
+	#endif
+
 	#if CPU_AVR_ATMEGA32 + CPU_AVR_ATMEGA64 + CPU_AVR_ATMEGA103 + CPU_AVR_ATMEGA128 \
 	  + CPU_AVR_ATMEGA8 + CPU_AVR_ATMEGA168 + CPU_AVR_ATMEGA328P + CPU_AVR_ATMEGA1281 \
-	  + CPU_AVR_ATMEGA1280 + CPU_AVR_ATMEGA2560 != 1
+	  + CPU_AVR_ATMEGA1280 + CPU_AVR_ATMEGA2560 + CPU_AVR_ATXMEGA32D4 != 1
 		#error AVR CPU configuration error
 	#endif
+
+	#if defined(CPU_AVR_XMEGA) && defined(CPU_AVR_MEGA)
+		#error CPU cannot be MEGA and XMEGA
+	#elif defined(CPU_AVR_MEGA)
+		#define CPU_AVR_XMEGA		0
+	#elif defined(CPU_AVR_XMEGA)
+		#define CPU_AVR_MEGA		0
+	#endif
+
+	#if CPU_AVR_MEGA + CPU_AVR_XMEGA != 1
+		#error AVR CPU configuration error
+	#endif
+
 #else
 	#define CPU_AVR                 0
+	#define CPU_AVR_MEGA			0
 	#define CPU_AVR_ATMEGA8         0
 	#define CPU_AVR_ATMEGA168       0
 	#define CPU_AVR_ATMEGA328P      0
@@ -488,6 +521,8 @@
 	#define CPU_AVR_ATMEGA1281      0
 	#define CPU_AVR_ATMEGA1280      0
 	#define CPU_AVR_ATMEGA2560      0
+	#define CPU_AVR_XMEGA			0
+	#define CPU_AVR_XMEGA_D			0
 #endif
 
 #if defined (__MSP430__)

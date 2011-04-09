@@ -78,6 +78,8 @@ asm_switch_context:
 	ld	r18,X+
 	ld	r19,X
 
+;FIXME: We probably need to safe the RAMP registers for some XMEGA devices / setups
+
 ; 	Set new stack pointer.
 ;	AVR is an 8 bit processor so
 ;	care must be taken when updating
