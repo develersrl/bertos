@@ -41,7 +41,7 @@
 #
 
 # Import the common settings for the path.
-include("avr.common")
+include("mega.common")
 
 # Short description of the cpu.
 CPU_DESC += [ "128 Kbyte in-System Programmable Flash",

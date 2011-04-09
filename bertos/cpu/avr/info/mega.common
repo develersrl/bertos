@@ -32,7 +32,7 @@
 #
 # -->
 #
-# Cpu info of the ATMega1281.
+# General CPU info denfinition AVR family.
 #
 # This file contain all info for the BeRTOS wizard.
 #
@@ -40,16 +40,9 @@
 #
 #
 
-
 # Import the common settings for the path.
-include("mega.common")
+include("avr.common")
 
-# Short description of the cpu.
-CPU_DESC += [ "128 Kbyte in-System Programmable Flash",
-	      "8 Kbytes internal SRAM memory",
-	      "4 Kbytes EEPROM memory" ]
+# Special CPU related tags.
+CPU_TAGS += ["mega"]
 
-# If we use the GCC compiler we should pass some flags.
-CORE_CPU = "atmega1281"
-
-include("avr_post.common")
