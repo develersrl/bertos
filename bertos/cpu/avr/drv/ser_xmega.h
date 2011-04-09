@@ -27,22 +27,25 @@
  * the GNU General Public License.
  *
  * Copyright 2007, 2010 Develer S.r.l. (http://www.develer.com/)
- *
+ * Copyright 2011 Onno <developer@gorgoz.org>
  * -->
  *
  *
- * \author Daniele Basile <asterix@develer.com>
- * \author Luca Ottaviano <lottaviano@develer.com>
+ * \brief Low-level serial module for AVR XMEGA (interface).
  *
- * \brief Low-level serial module for AVR MEGA(interface).
+ * This file is heavily inspired by the AVR implementation for BeRTOS,
+ * but uses a different approach for implementing the different debug
+ * ports, by using the USART_t structs.
+ *
+ * \author Onno <developer@gorgoz.org>
  *
  */
 
-#ifndef DRV_SER_MEGA_H
-#define DRV_SER_MEGA_H
+#ifndef DRV_SER_XMEGA_H
+#define DRV_SER_XMEGA_H
 
-#include <cfg/macros.h> /* BV() */
-#include <cfg/compiler.h>  /* uint32_t */
+#include <cfg/macros.h>   /* BV() */
+#include <cfg/compiler.h> /* uint8_t */
 
 typedef uint8_t serstatus_t;
 
@@ -53,58 +56,30 @@ typedef uint8_t serstatus_t;
 
 /*
 * Hardware errors.
-* These flags map directly to the AVR UART Status Register (USR).
+* These flags map directly to the AVR XMEGA UART Status Register.
 */
 #define SERRF_RXSROVERRUN    BV(3)  /**< Rx shift register overrun */
 #define SERRF_FRAMEERROR     BV(4)  /**< Stop bit missing */
-#define SERRF_PARITYERROR    BV(7)  /**< Parity error */
+#define SERRF_PARITYERROR    BV(2)  /**< Parity error */
 #define SERRF_NOISEERROR     0      /**< Unsupported */
 
-
-/**
- * SPI clock polarity.
- *
- * $WIZ$ ser_spi_pol = "SPI_NORMAL_LOW", "SPI_NORMAL_HIGH"
- * }
- */
-#define SPI_NORMAL_LOW      0
-#define SPI_NORMAL_HIGH     1
-
-/**
- * SPI clock phase.
- *
- * $WIZ$ ser_spi_phase = "SPI_SAMPLE_ON_FIRST_EDGE", "SPI_SAMPLE_ON_SECOND_EDGE"
- * }
- */
-#define SPI_SAMPLE_ON_FIRST_EDGE    0
-#define SPI_SAMPLE_ON_SECOND_EDGE   1
-
-/**
+/*
  * \name Serial hw numbers
  *
  * \{
  */
 enum
 {
-#if  CPU_AVR_ATMEGA1280 || CPU_AVR_ATMEGA2560
 	SER_UART0,
 	SER_UART1,
+#ifdef CPU_AVR_XMEGA_A
+	//the XMEGA A Family have 5 USART ports
 	SER_UART2,
 	SER_UART3,
-	SER_SPI,
-#elif  CPU_AVR_ATMEGA64 || CPU_AVR_ATMEGA128 || CPU_AVR_ATMEGA1281
-	SER_UART0,
-	SER_UART1,
-	SER_SPI,
-#elif CPU_AVR_ATMEGA103 || CPU_AVR_ATMEGA8 || CPU_AVR_ATMEGA32 || CPU_AVR_ATMEGA168 \
-		|| CPU_AVR_ATMEGA328P
-	SER_UART0,
-	SER_SPI,
-#else
-	#error unknown architecture
+	SER_UART4,
 #endif
 	SER_CNT  /**< Number of serial ports */
 };
 /*\}*/
 
-#endif /* DRV_SER_MEGA_H */
+#endif /* DRV_SER_XMEGA_H */

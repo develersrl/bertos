@@ -31,7 +31,7 @@
  *
  * -->
  *
- * \brief AVR UART and SPI I/O driver (Implementation)
+ * \brief AVR MEGA UART and SPI I/O driver (Implementation)
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
  * \author Stefano Fedrigo <aleph@develer.com>
