@@ -50,5 +50,7 @@ CPU_DESC += [ "32 Kbyte in-System Programmable Flash",
 
 # If we use the GCC compiler we should pass some flags.
 CORE_CPU = "atxmega32d4"
+HW_DIR = CPU_DIR + "avr/hw/"
+MK_CPU_CSRC = HW_DIR + "init_xmega.c"
 
 include("avr_post.common")
