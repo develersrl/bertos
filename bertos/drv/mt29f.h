@@ -74,6 +74,14 @@
 #include <cpu/attr.h>
 
 
+/**
+ * \name Error codes
+ * \{
+ */
+#define MT29F_ERR_ERASE    BV(1)   ///< Error erasing a block
+#define MT29F_ERR_WRITE    BV(2)   ///< Error writing a page
+/** \} */
+
 struct Mt29fHardware;
 
 /**

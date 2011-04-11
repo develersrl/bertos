@@ -82,13 +82,13 @@
 
 struct Mt29fHardware
 {
-	int boh;
+	uint8_t status;
 };
 
 
 /*
- * Translate flash memory offset in the five address cycles format
- * needed by NAND.
+ * Translate flash page index plus a byte offset
+ * in the five address cycles format needed by NAND.
  *
  * Cycles in x8 mode as the MT29F2G08AAD
  * CA = column addr, PA = page addr, BA = block addr
@@ -101,15 +101,17 @@ struct Mt29fHardware
  * Fourth   BA15  BA14  BA13  BA12  BA11  BA10  BA9   BA8
  * Fifth    LOW   LOW   LOW   LOW   LOW   LOW   LOW   BA16
  */
-static void mt29f_getAddrCycles(size_t offset, uint32_t *cycle0, uint32_t *cycle1234)
+static void mt29f_getAddrCycles(block_idx_t page, size_t offset, uint32_t *cycle0, uint32_t *cycle1234)
 {
+	uint32_t addr = (page * MT29F_PAGE_SIZE) + offset;
+
 	/*
 	 * offset nibbles  77776666 55554444 33332222 11110000
 	 * cycle1234       -------7 66665555 ----4444 33332222
 	 * cycle0          11110000
 	 */
-	*cycle0 = offset & 0xFF;
-	*cycle1234 = ((offset >> 8) & 0x00000fff) | ((offset >> 4) & 0x01ff0000);
+	*cycle0 = addr & 0xff;
+	*cycle1234 = ((addr >> 8) & 0x00000fff) | ((addr >> 4) & 0x01ff0000);
 }
 
 
@@ -123,9 +125,14 @@ INLINE bool mt29f_isCmdDone(void)
     return SMC_SR & SMC_SR_CMDDONE;
 }
 
-INLINE uint8_t mt29f_isReadyBusy(void)
+INLINE bool mt29f_isReadyBusy(void)
 {
     return SMC_SR & SMC_SR_RB_EDGE0;
+}
+
+INLINE bool mt29f_isTransferComplete(void)
+{
+	return SMC_SR & SMC_SR_XFRDONE;
 }
 
 
@@ -171,23 +178,24 @@ static bool mt29f_isOperationComplete(void)
 /**
  * Erase block at given offset.
  */
-int mt29f_blockErase(Mt29f *fls, size_t blk_offset)
+int mt29f_blockErase(Mt29f *fls, block_idx_t page)
 {
 	uint32_t cycle0;
 	uint32_t cycle1234;
 
-	mt29f_getAddrCycles(blk_offset, &cycle0, &cycle1234);
+	mt29f_getAddrCycles(page, 0, &cycle0, &cycle1234);
 
 	mt29f_sendCommand(
 		NFC_CMD_NFCCMD | MT29F_CSID | NFC_CMD_ACYCLE_THREE | NFC_CMD_VCMD2 |
 		(MT29F_CMD_ERASE_2 << 10) | (MT29F_CMD_ERASE_1 << 2),
-		cycle1234, 0);
+		0, cycle1234);
 
 	while (!mt29f_isReadyBusy());
 
 	if (!mt29f_isOperationComplete())
 	{
 		LOG_ERR("mt29f: error erasing block\n");
+		fls->hw->status |= MT29F_ERR_ERASE;
 		return -1;
 	}
 
@@ -197,23 +205,87 @@ int mt29f_blockErase(Mt29f *fls, size_t blk_offset)
 
 static size_t mt29f_readDirect(struct KBlock *blk, block_idx_t idx, void *buf, size_t offset, size_t size)
 {
+	uint32_t cycle0;
+	uint32_t cycle1234;
+
+	ASSERT(offset == 0);
+	ASSERT(size == blk->blk_size);
+
+	mt29f_getAddrCycles(idx, 0, &cycle0, &cycle1234);
+
+	mt29f_sendCommand(
+		NFC_CMD_NFCCMD | NFC_CMD_NFCEN | MT29F_CSID | NFC_CMD_ACYCLE_FIVE | NFC_CMD_VCMD2 |
+		(MT29F_CMD_READ_2 << 10) | (MT29F_CMD_READ_1 << 2),
+		cycle0, cycle1234);
+
+	while (!mt29f_isReadyBusy());
+	while (!mt29f_isTransferComplete());
+
+	if (!kblock_buffered(blk))
+	{
+		// Make sure user is not buffering just in NFC controller SRAM
+		ASSERT((buf < (void *)NFC_CMD_BASE_ADDR) || (buf > (void *)(NFC_CMD_BASE_ADDR + MT29F_PAGE_SIZE)));
+		memcpy(buf, (void *)NFC_CMD_BASE_ADDR, size);
+	}
+
+	return size;
 }
 
 
 static size_t mt29f_writeDirect(struct KBlock *blk, block_idx_t idx, const void *_buf, size_t offset, size_t size)
 {
+	Mt29f *fls = FLASH_CAST(blk);
+	uint32_t cycle0;
+	uint32_t cycle1234;
+
+	ASSERT(offset == 0);
+	ASSERT(size == blk->blk_size);
+
+	if (!kblock_buffered(blk))
+	{
+		// Make sure user is not buffering just in NFC controller SRAM
+		ASSERT((_buf < (void *)NFC_CMD_BASE_ADDR) || (_buf > (void *)(NFC_CMD_BASE_ADDR + MT29F_PAGE_SIZE)));
+		memcpy((void *)NFC_CMD_BASE_ADDR, _buf, size);
+	}
+
+	mt29f_getAddrCycles(idx, 0, &cycle0, &cycle1234);
+
+	mt29f_sendCommand(
+			NFC_CMD_NFCCMD | NFC_CMD_NFCWR | NFC_CMD_NFCEN | MT29F_CSID | NFC_CMD_ACYCLE_FIVE |
+			MT29F_CMD_WRITE_1 << 2,
+			cycle0, cycle1234);
+
+	while (!mt29f_isTransferComplete());
+
+	mt29f_sendCommand(
+			NFC_CMD_NFCCMD | MT29F_CSID | NFC_CMD_ACYCLE_NONE |
+			MT29F_CMD_WRITE_2 << 2,
+			0, 0);
+
+	while (!mt29f_isReadyBusy());
+
+	if (!mt29f_isOperationComplete())
+	{
+		LOG_ERR("mt29f: error writing page\n");
+		fls->hw->status |= MT29F_ERR_WRITE;
+		return 0;
+	}
+
+	return size;
 }
 
 
 static int mt29f_error(struct KBlock *blk)
 {
 	Mt29f *fls = FLASH_CAST(blk);
+	return fls->hw->status;
 }
 
 
 static void mt29f_clearerror(struct KBlock *blk)
 {
 	Mt29f *fls = FLASH_CAST(blk);
+	fls->hw->status = 0;
 }
 
 
@@ -311,7 +383,7 @@ void mt29f_hw_init(Mt29f *fls)
 {
 	common_init(fls);
 	fls->blk.priv.vt = &mt29f_buffered_vt;
-	fls->blk.priv.flags |= KB_BUFFERED | KB_PARTIAL_WRITE;
+	fls->blk.priv.flags |= KB_BUFFERED;
 	fls->blk.priv.buf = (void *)NFC_CMD_BASE_ADDR;
 
 	// Load the first block in the cache
