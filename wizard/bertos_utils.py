@@ -118,7 +118,7 @@ def projectFileGenerator(project_info):
     for module, information in project_info.info("MODULES").items():
         if information["enabled"]:
             enabled_modules.append(module)
-    project_data["ENABLED_MODULES"] = enabled_modules
+    project_data["ENABLED_MODULES"] = sorted(enabled_modules)
     if project_info.info("PRESET"):
         # For presets save again the BERTOS_PATH into project file
         project_data["PRESET"] = True
