@@ -283,7 +283,7 @@ def csrcGenerator(project_info):
     cxxsrc = " \\\n\t".join(cxxsrc) + " \\"
     asrc = set(asrc)
     asrc = " \\\n\t".join(asrc) + " \\"
-    constants = "\n".join([os.path.basename(project_info.info("PROJECT_PATH")) + "_" + key + " = " + unicode(value) for key, value in constants.items()])
+    constants = "\n".join([project_info.info("PROJECT_NAME") + "_" + key + " = " + unicode(value) for key, value in constants.items()])
     return csrc, pcsrc, cppasrc, cxxsrc, asrc, constants
 
 def findModuleFiles(module, project_info):
