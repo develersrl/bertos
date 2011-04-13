@@ -325,7 +325,7 @@ static void read_adc(Bitmap *bm)
 		uint16_t temp = hw_convertToDegree (adc_read(ADC_TEMPERATURE_CH));
 
 		text_xprintf(lcd_bitmap, 2, 0, TEXT_FILL | TEXT_CENTER,
-									"Volage on VR1: %d.%dV", value / 1000, value % 1000);
+									"Voltage on VR1: %d.%dV", value / 1000, value % 1000);
 		text_xprintf(lcd_bitmap, 3, 0, TEXT_FILL | TEXT_CENTER,
 									"CPU temperature: %d.%dC", temp / 10, temp % 10);
 		lcd_hx8347_blitBitmap(bm);
@@ -345,8 +345,8 @@ static struct MenuItem main_items[] =
 	{ (const_iptr_t)"Scheduling test", 0, (MenuHook)context_switch_test, NULL },
 	{ (const_iptr_t)"Show uptime", 0, (MenuHook)uptime, NULL },
 	{ (const_iptr_t)"Display brightness", 0, (MenuHook)setBrightness, NULL },
+	{ (const_iptr_t)"ADC demo", 0, (MenuHook)read_adc, NULL },
 	{ (const_iptr_t)"Reboot", 0, (MenuHook)soft_reset, NULL },
-	{ (const_iptr_t)"Read ADC value", 0, (MenuHook)read_adc, NULL },
 	{ (const_iptr_t)0, 0, NULL, (iptr_t)0 }
 };
 static struct Menu main_menu = { main_items, "BeRTOS", MF_STICKY | MF_SAVESEL, NULL, 0, lcd_hx8347_blitBitmap };
