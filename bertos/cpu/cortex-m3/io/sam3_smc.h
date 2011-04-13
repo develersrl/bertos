@@ -241,6 +241,43 @@
 
 
 /**
+ * Defines for bit fields in SMC_CFG register.
+ */
+/*\{*/
+#define SMC_CFG_PAGESIZE_SHIFT       0
+#define SMC_CFG_PAGESIZE_MASK        (0x3 << SMC_CFG_PAGESIZE_SHIFT)
+#define SMC_CFG_PAGESIZE_PS512_16    (0x0 << 0)
+#define SMC_CFG_PAGESIZE_PS1024_32   (0x1 << 0)
+#define SMC_CFG_PAGESIZE_PS2048_64   (0x2 << 0)
+#define SMC_CFG_PAGESIZE_PS4096_128  (0x3 << 0)
+#define SMC_CFG_WSPARE               (0x1 << 8)
+#define SMC_CFG_RSPARE               (0x1 << 9)
+#define SMC_CFG_EDGECTRL             (0x1 << 12)
+#define SMC_CFG_RBEDGE               (0x1 << 13)
+#define SMC_CFG_DTOCYC_SHIFT         16
+#define SMC_CFG_DTOCYC_MASK          (0xf << SMC_CFG_DTOCYC_SHIFT)
+#define SMC_CFG_DTOCYC(value)        (SMC_CFG_DTOCYC_MASK & ((value) << SMC_CFG_DTOCYC_SHIFT))
+#define SMC_CFG_DTOMUL_SHIFT         20
+#define SMC_CFG_DTOMUL_MASK          (0x7 << SMC_CFG_DTOMUL_SHIFT)
+#define SMC_CFG_DTOMUL_X1            (0x0 << 20)
+#define SMC_CFG_DTOMUL_X16           (0x1 << 20)
+#define SMC_CFG_DTOMUL_X128          (0x2 << 20)
+#define SMC_CFG_DTOMUL_X256          (0x3 << 20)
+#define SMC_CFG_DTOMUL_X1024         (0x4 << 20)
+#define SMC_CFG_DTOMUL_X4096         (0x5 << 20)
+#define SMC_CFG_DTOMUL_X65536        (0x6 << 20)
+#define SMC_CFG_DTOMUL_X1048576      (0x7 << 20)
+/*\}*/
+
+/**
+ * Defines for bit fields in SMC_CTRL register.
+ */
+/*\{*/
+#define SMC_CTRL_NFCEN   BV(0)
+#define SMC_CTRL_NFCDIS  BV(1)
+/*\}*/
+
+/**
  * Defines for bit fields in SMC_SR register.
  */
 /*\{*/
