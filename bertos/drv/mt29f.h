@@ -41,8 +41,8 @@
 *
 * Example usage:
 * \code
-* Flash fls;
-* flash_init(&fls, 0);
+* Mt29f fls;
+* mt29f_init(&fls);
 * // enable access only on desired blocks
 * // start block = 50, num blocks = 20
 * kblock_trim(&fls.blk, 50, 20);
@@ -78,8 +78,10 @@
  * \name Error codes
  * \{
  */
-#define MT29F_ERR_ERASE    BV(1)   ///< Error erasing a block
-#define MT29F_ERR_WRITE    BV(2)   ///< Error writing a page
+#define MT29F_ERR_ERASE     BV(1)   ///< Error erasing a block
+#define MT29F_ERR_WRITE     BV(2)   ///< Error writing a page
+#define MT29F_ERR_RD_TMOUT  BV(2)   ///< Read timeout
+#define MT29F_ERR_WR_TMOUT  BV(2)   ///< Write timeout
 /** \} */
 
 struct Mt29fHardware;
@@ -107,7 +109,8 @@ INLINE Mt29f *FLASH_CAST(KBlock *fls)
 	return (Mt29f *)fls;
 }
 
-void mt29f_hw_init(Mt29f *fls);
-void mt29f_hw_initUnbuffered(Mt29f *fls);
+void mt29f_init(Mt29f *fls);
+void mt29f_initUnbuffered(Mt29f *fls);
+int mt29f_blockErase(Mt29f *fls, block_idx_t page);
 
 #endif /* DRV_MT29F_H */

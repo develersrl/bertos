@@ -73,8 +73,5 @@
 #define MT29F_PERIPH_PORTD  PIO_PERIPH_A
 
 
-int mt29f_blockErase(Mt29f *fls, block_idx_t page);
-
-
 #endif /* MT29F_SAM3_H */
 

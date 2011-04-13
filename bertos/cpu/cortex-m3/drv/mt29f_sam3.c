@@ -56,6 +56,8 @@
 
 #include <string.h> /* memcpy() */
 
+// Timeout for read/write transfers in ms
+#define MT29F_XFER_TMOUT  1000
 
 // NAND flash status codes
 #define MT29F_STATUS_READY             BV(6)
@@ -130,9 +132,23 @@ INLINE bool mt29f_isReadyBusy(void)
     return SMC_SR & SMC_SR_RB_EDGE0;
 }
 
-INLINE bool mt29f_isTransferComplete(void)
+/*
+ * Wait for transfer to complete until timeout.
+ * If transfer completes return true, false in case of timeout.
+ */
+INLINE bool mt29f_waitTransferComplete(void)
 {
-	return SMC_SR & SMC_SR_XFRDONE;
+	time_t start = timer_clock();
+
+	while (!(SMC_SR & SMC_SR_XFRDONE))
+	{
+		cpu_relax();
+		if (timer_clock() - start > MT29F_XFER_TMOUT)
+			return false;
+	}
+
+	kprintf("xfer ok!!\n");
+	return true;
 }
 
 
@@ -167,16 +183,19 @@ static bool mt29f_isOperationComplete(void)
 }
 
 
-#if 0 //reset
+static void mt29f_reset(void)
+{
 	mt29f_sendCommand(
-			NFC_CMD_NFCCMD | MT29F_CSID | NFC_CMD_ACYCLE_NONE |
-			MT29F_CMD_RESET << 2,
-			0,                                     /* Dummy address cylce 1,2,3,4.*/
-			0                                      /* Dummy address cylce 0.*/
-#endif
+		NFC_CMD_NFCCMD | MT29F_CSID | NFC_CMD_ACYCLE_NONE |
+		MT29F_CMD_RESET << 2,
+		0, 0);
+
+	while (!mt29f_isReadyBusy());
+}
+
 
 /**
- * Erase block at given offset.
+ * Erase the whole block containing given page.
  */
 int mt29f_blockErase(Mt29f *fls, block_idx_t page)
 {
@@ -205,11 +224,14 @@ int mt29f_blockErase(Mt29f *fls, block_idx_t page)
 
 static size_t mt29f_readDirect(struct KBlock *blk, block_idx_t idx, void *buf, size_t offset, size_t size)
 {
+	Mt29f *fls = FLASH_CAST(blk);
 	uint32_t cycle0;
 	uint32_t cycle1234;
 
 	ASSERT(offset == 0);
 	ASSERT(size == blk->blk_size);
+
+	kprintf("read direct\n");
 
 	mt29f_getAddrCycles(idx, 0, &cycle0, &cycle1234);
 
@@ -219,14 +241,15 @@ static size_t mt29f_readDirect(struct KBlock *blk, block_idx_t idx, void *buf, s
 		cycle0, cycle1234);
 
 	while (!mt29f_isReadyBusy());
-	while (!mt29f_isTransferComplete());
-
-	if (!kblock_buffered(blk))
+	if (!mt29f_waitTransferComplete())
 	{
-		// Make sure user is not buffering just in NFC controller SRAM
-		ASSERT((buf < (void *)NFC_CMD_BASE_ADDR) || (buf > (void *)(NFC_CMD_BASE_ADDR + MT29F_PAGE_SIZE)));
-		memcpy(buf, (void *)NFC_CMD_BASE_ADDR, size);
+		LOG_ERR("mt29f: read timeout\n");
+		fls->hw->status |= MT29F_ERR_RD_TMOUT;
+		return 0;
 	}
+
+	if (!kblock_buffered(blk) && (buf != (void *)NFC_SRAM_BASE_ADDR))
+		memcpy(buf, (void *)NFC_SRAM_BASE_ADDR, size);
 
 	return size;
 }
@@ -241,12 +264,10 @@ static size_t mt29f_writeDirect(struct KBlock *blk, block_idx_t idx, const void 
 	ASSERT(offset == 0);
 	ASSERT(size == blk->blk_size);
 
-	if (!kblock_buffered(blk))
-	{
-		// Make sure user is not buffering just in NFC controller SRAM
-		ASSERT((_buf < (void *)NFC_CMD_BASE_ADDR) || (_buf > (void *)(NFC_CMD_BASE_ADDR + MT29F_PAGE_SIZE)));
-		memcpy((void *)NFC_CMD_BASE_ADDR, _buf, size);
-	}
+	kprintf("write direct\n");
+
+	if (!kblock_buffered(blk) && (_buf != (void *)NFC_SRAM_BASE_ADDR))
+		memcpy((void *)NFC_SRAM_BASE_ADDR, _buf, size);
 
 	mt29f_getAddrCycles(idx, 0, &cycle0, &cycle1234);
 
@@ -255,7 +276,12 @@ static size_t mt29f_writeDirect(struct KBlock *blk, block_idx_t idx, const void 
 			MT29F_CMD_WRITE_1 << 2,
 			cycle0, cycle1234);
 
-	while (!mt29f_isTransferComplete());
+	if (!mt29f_waitTransferComplete())
+	{
+		LOG_ERR("mt29f: write timeout\n");
+		fls->hw->status |= MT29F_ERR_WR_TMOUT;
+		return 0;
+	}
 
 	mt29f_sendCommand(
 			NFC_CMD_NFCCMD | MT29F_CSID | NFC_CMD_ACYCLE_NONE |
@@ -376,23 +402,36 @@ static void common_init(Mt29f *fls)
 
     SMC_MODE0 = SMC_MODE_READ_MODE
 		| SMC_MODE_WRITE_MODE;
+
+	SMC_CFG = SMC_CFG_PAGESIZE_PS2048_64
+		| SMC_CFG_EDGECTRL
+		| SMC_CFG_DTOMUL_X1048576
+		| SMC_CFG_DTOCYC(0xF);
+
+	// Disable SMC interrupts, reset and enable NFC controller
+	SMC_IDR = ~0;
+	SMC_CTRL = 0;
+	SMC_CTRL = SMC_CTRL_NFCEN;
+
+	mt29f_reset();
 }
 
 
-void mt29f_hw_init(Mt29f *fls)
+void mt29f_init(Mt29f *fls)
 {
 	common_init(fls);
 	fls->blk.priv.vt = &mt29f_buffered_vt;
 	fls->blk.priv.flags |= KB_BUFFERED;
-	fls->blk.priv.buf = (void *)NFC_CMD_BASE_ADDR;
+	fls->blk.priv.buf = (void *)NFC_SRAM_BASE_ADDR;
 
 	// Load the first block in the cache
-	void *start = 0x0;
-	memcpy(fls->blk.priv.buf, start, fls->blk.blk_size);
+	//mt29f_readDirect(&fls->blk, 0, (void *)NFC_SRAM_BASE_ADDR, 0, MT29F_PAGE_SIZE);
+	//debug
+	memset((void *)NFC_SRAM_BASE_ADDR, 0xbb, MT29F_PAGE_SIZE);
 }
 
 
-void mt29f_hw_initUnbuffered(Mt29f *fls)
+void mt29f_initUnbuffered(Mt29f *fls)
 {
 	common_init(fls);
 	fls->blk.priv.vt = &mt29f_unbuffered_vt;
