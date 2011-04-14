@@ -126,8 +126,6 @@
 		REG_TIFR0 = BV(BIT_OCF0A) | BV(TOV0);
 
 		/* Setup Timer/Counter interrupt */
-		ASSR = 0x00;                  /* Internal system clock */
-
 		REG_TCCR0A = 0;	// TCCR2 reg could be separate or a unique register with both A & B values, this is needed to
 		REG_TCCR0B = 0;
 
