@@ -112,5 +112,6 @@ INLINE Mt29f *FLASH_CAST(KBlock *fls)
 void mt29f_init(Mt29f *fls);
 void mt29f_initUnbuffered(Mt29f *fls);
 int mt29f_blockErase(Mt29f *fls, block_idx_t page);
+bool mt29f_getDevId(Mt29f *fls, uint8_t dev_id[5]);
 
 #endif /* DRV_MT29F_H */

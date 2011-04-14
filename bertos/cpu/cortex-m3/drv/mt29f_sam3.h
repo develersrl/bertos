@@ -47,12 +47,6 @@
 #define MT29F_SIZE        0x10000000  // 256 MB
 #define MT29F_CSID        NFC_CMD_CSID_0  // Chip select
 
-// Addresses for sending command, addresses and data bytes to flash
-#define MT29F_CMD_ADDR    0x60400000
-#define MT29F_ADDR_ADDR   0x60200000
-#define MT29F_DATA_ADDR   0x60000000
-
-
 /*
  * PIO definitions.
  */

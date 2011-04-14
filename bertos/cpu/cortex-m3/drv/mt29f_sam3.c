@@ -56,8 +56,8 @@
 
 #include <string.h> /* memcpy() */
 
-// Timeout for read/write transfers in ms
-#define MT29F_XFER_TMOUT  1000
+// Timeout for NAND operations in ms
+#define MT29F_TMOUT  100
 
 // NAND flash status codes
 #define MT29F_STATUS_READY             BV(6)
@@ -80,6 +80,11 @@
 #define MT29F_CMD_ERASE_2              0xD0
 #define MT29F_CMD_STATUS               0x70
 #define MT29F_CMD_RESET                0xFF
+
+// Addresses for sending command, addresses and data bytes to flash
+#define MT29F_CMD_ADDR    0x60400000
+#define MT29F_ADDR_ADDR   0x60200000
+#define MT29F_DATA_ADDR   0x60000000
 
 
 struct Mt29fHardware
@@ -114,6 +119,8 @@ static void mt29f_getAddrCycles(block_idx_t page, size_t offset, uint32_t *cycle
 	 */
 	*cycle0 = addr & 0xff;
 	*cycle1234 = ((addr >> 8) & 0x00000fff) | ((addr >> 4) & 0x01ff0000);
+
+	LOG_INFO("mt29f addr: %lx %lx\n", *cycle1234, *cycle0);
 }
 
 
@@ -127,27 +134,41 @@ INLINE bool mt29f_isCmdDone(void)
     return SMC_SR & SMC_SR_CMDDONE;
 }
 
-INLINE bool mt29f_isReadyBusy(void)
+static bool mt29f_waitReadyBusy(void)
 {
-    return SMC_SR & SMC_SR_RB_EDGE0;
+	time_t start = timer_clock();
+
+	while (!(SMC_SR & SMC_SR_RB_EDGE0))
+	{
+		cpu_relax();
+		if (timer_clock() - start > MT29F_TMOUT)
+		{
+			LOG_INFO("mt29f: R/B timeout\n");
+			return false;
+		}
+	}
+
+	return true;
 }
 
 /*
  * Wait for transfer to complete until timeout.
  * If transfer completes return true, false in case of timeout.
  */
-INLINE bool mt29f_waitTransferComplete(void)
+static bool mt29f_waitTransferComplete(void)
 {
 	time_t start = timer_clock();
 
 	while (!(SMC_SR & SMC_SR_XFRDONE))
 	{
 		cpu_relax();
-		if (timer_clock() - start > MT29F_XFER_TMOUT)
+		if (timer_clock() - start > MT29F_TMOUT)
+		{
+			LOG_INFO("mt29f: xfer complete timeout\n");
 			return false;
+		}
 	}
 
-	kprintf("xfer ok!!\n");
 	return true;
 }
 
@@ -155,13 +176,15 @@ INLINE bool mt29f_waitTransferComplete(void)
 /*
  * Send command to NAND and wait for completion.
  */
-static void mt29f_sendCommand(uint32_t cmd, uint32_t cycle0, uint32_t cycle1234)
+static void mt29f_sendCommand(uint32_t cmd,
+		int num_cycles, uint32_t cycle0, uint32_t cycle1234)
 {
 	reg32_t *cmd_addr;
 
 	while (mt29f_isBusy());
 
-	SMC_ADDR = cycle0;
+	if (num_cycles == 5)
+		SMC_ADDR = cycle0;
 
 	cmd_addr = (reg32_t *)(NFC_CMD_BASE_ADDR + cmd);
 	*cmd_addr = cycle1234;
@@ -176,7 +199,8 @@ static bool mt29f_isOperationComplete(void)
 
 	mt29f_sendCommand(
 		NFC_CMD_NFCCMD | MT29F_CSID | NFC_CMD_ACYCLE_NONE |
-		MT29F_CMD_STATUS << 2, 0, 0);
+		MT29F_CMD_STATUS << 2,
+		0, 0, 0);
 
 	status = (uint8_t)HWREG(MT29F_DATA_ADDR);
 	return (status & MT29F_STATUS_READY) && !(status & MT29F_STATUS_ERROR);
@@ -188,9 +212,9 @@ static void mt29f_reset(void)
 	mt29f_sendCommand(
 		NFC_CMD_NFCCMD | MT29F_CSID | NFC_CMD_ACYCLE_NONE |
 		MT29F_CMD_RESET << 2,
-		0, 0);
+		0, 0, 0);
 
-	while (!mt29f_isReadyBusy());
+	mt29f_waitReadyBusy();
 }
 
 
@@ -207,9 +231,9 @@ int mt29f_blockErase(Mt29f *fls, block_idx_t page)
 	mt29f_sendCommand(
 		NFC_CMD_NFCCMD | MT29F_CSID | NFC_CMD_ACYCLE_THREE | NFC_CMD_VCMD2 |
 		(MT29F_CMD_ERASE_2 << 10) | (MT29F_CMD_ERASE_1 << 2),
-		0, cycle1234);
+		3, 0, cycle1234 >> 8);
 
-	while (!mt29f_isReadyBusy());
+	mt29f_waitReadyBusy();
 
 	if (!mt29f_isOperationComplete())
 	{
@@ -222,6 +246,32 @@ int mt29f_blockErase(Mt29f *fls, block_idx_t page)
 }
 
 
+/**
+ * Read Device ID and configuration codes.
+ */
+bool mt29f_getDevId(Mt29f *fls, uint8_t dev_id[5])
+{
+	memset(dev_id, 0x66, 5);
+	memset((void *)NFC_SRAM_BASE_ADDR, 0x77, 2048);
+
+	mt29f_sendCommand(
+		NFC_CMD_NFCCMD | NFC_CMD_NFCEN | MT29F_CSID | NFC_CMD_ACYCLE_ONE |
+		MT29F_CMD_READID << 2,
+		1, 0, 0);
+
+	mt29f_waitReadyBusy();
+	if (!mt29f_waitTransferComplete())
+	{
+		LOG_ERR("mt29f: getDevId timeout\n");
+		fls->hw->status |= MT29F_ERR_RD_TMOUT;
+		return false;
+	}
+
+	memcpy(dev_id, (void *)NFC_SRAM_BASE_ADDR, 5);
+	return true;
+}
+
+
 static size_t mt29f_readDirect(struct KBlock *blk, block_idx_t idx, void *buf, size_t offset, size_t size)
 {
 	Mt29f *fls = FLASH_CAST(blk);
@@ -231,16 +281,16 @@ static size_t mt29f_readDirect(struct KBlock *blk, block_idx_t idx, void *buf, s
 	ASSERT(offset == 0);
 	ASSERT(size == blk->blk_size);
 
-	kprintf("read direct\n");
+	LOG_INFO("mt29f_readDirect\n");
 
 	mt29f_getAddrCycles(idx, 0, &cycle0, &cycle1234);
 
 	mt29f_sendCommand(
 		NFC_CMD_NFCCMD | NFC_CMD_NFCEN | MT29F_CSID | NFC_CMD_ACYCLE_FIVE | NFC_CMD_VCMD2 |
 		(MT29F_CMD_READ_2 << 10) | (MT29F_CMD_READ_1 << 2),
-		cycle0, cycle1234);
+		5, cycle0, cycle1234);
 
-	while (!mt29f_isReadyBusy());
+	mt29f_waitReadyBusy();
 	if (!mt29f_waitTransferComplete())
 	{
 		LOG_ERR("mt29f: read timeout\n");
@@ -264,7 +314,7 @@ static size_t mt29f_writeDirect(struct KBlock *blk, block_idx_t idx, const void 
 	ASSERT(offset == 0);
 	ASSERT(size == blk->blk_size);
 
-	kprintf("write direct\n");
+	LOG_INFO("mt29f_writeDirect\n");
 
 	if (!kblock_buffered(blk) && (_buf != (void *)NFC_SRAM_BASE_ADDR))
 		memcpy((void *)NFC_SRAM_BASE_ADDR, _buf, size);
@@ -274,7 +324,7 @@ static size_t mt29f_writeDirect(struct KBlock *blk, block_idx_t idx, const void 
 	mt29f_sendCommand(
 			NFC_CMD_NFCCMD | NFC_CMD_NFCWR | NFC_CMD_NFCEN | MT29F_CSID | NFC_CMD_ACYCLE_FIVE |
 			MT29F_CMD_WRITE_1 << 2,
-			cycle0, cycle1234);
+			5, cycle0, cycle1234);
 
 	if (!mt29f_waitTransferComplete())
 	{
@@ -286,9 +336,9 @@ static size_t mt29f_writeDirect(struct KBlock *blk, block_idx_t idx, const void 
 	mt29f_sendCommand(
 			NFC_CMD_NFCCMD | MT29F_CSID | NFC_CMD_ACYCLE_NONE |
 			MT29F_CMD_WRITE_2 << 2,
-			0, 0);
+			0, 0, 0);
 
-	while (!mt29f_isReadyBusy());
+	mt29f_waitReadyBusy();
 
 	if (!mt29f_isOperationComplete())
 	{
@@ -425,9 +475,7 @@ void mt29f_init(Mt29f *fls)
 	fls->blk.priv.buf = (void *)NFC_SRAM_BASE_ADDR;
 
 	// Load the first block in the cache
-	//mt29f_readDirect(&fls->blk, 0, (void *)NFC_SRAM_BASE_ADDR, 0, MT29F_PAGE_SIZE);
-	//debug
-	memset((void *)NFC_SRAM_BASE_ADDR, 0xbb, MT29F_PAGE_SIZE);
+	mt29f_readDirect(&fls->blk, 0, (void *)NFC_SRAM_BASE_ADDR, 0, MT29F_PAGE_SIZE);
 }
 
 
