@@ -110,15 +110,10 @@ struct Mt29fHardware
  */
 static void mt29f_getAddrCycles(block_idx_t page, size_t offset, uint32_t *cycle0, uint32_t *cycle1234)
 {
-	uint32_t addr = (page * MT29F_PAGE_SIZE) + offset;
+	ASSERT(offset < MT29F_PAGE_SIZE);
 
-	/*
-	 * offset nibbles  77776666 55554444 33332222 11110000
-	 * cycle1234       -------7 66665555 ----4444 33332222
-	 * cycle0          11110000
-	 */
-	*cycle0 = addr & 0xff;
-	*cycle1234 = ((addr >> 8) & 0x00000fff) | ((addr >> 4) & 0x01ff0000);
+	*cycle0 = offset & 0xff;
+	*cycle1234 = (page << 8) | ((offset >> 8) & 0xf);
 
 	LOG_INFO("mt29f addr: %lx %lx\n", *cycle1234, *cycle0);
 }
@@ -251,9 +246,6 @@ int mt29f_blockErase(Mt29f *fls, block_idx_t page)
  */
 bool mt29f_getDevId(Mt29f *fls, uint8_t dev_id[5])
 {
-	memset(dev_id, 0x66, 5);
-	memset((void *)NFC_SRAM_BASE_ADDR, 0x77, 2048);
-
 	mt29f_sendCommand(
 		NFC_CMD_NFCCMD | NFC_CMD_NFCEN | MT29F_CSID | NFC_CMD_ACYCLE_ONE |
 		MT29F_CMD_READID << 2,
