@@ -41,15 +41,15 @@
 *
 * Example usage:
 * \code
-* Mt29f fls;
-* mt29f_init(&fls);
+* Mt29f chip;
+* mt29f_init(&chip);
 * // enable access only on desired blocks
 * // start block = 50, num blocks = 20
-* kblock_trim(&fls.blk, 50, 20);
+* kblock_trim(&chip.blk, 50, 20);
 * // ...
 * // now write to the flash
 * // block number is automatically converted
-* kblock_write(&fls.blk, 0, buf, 0, 128);
+* kblock_write(&chip.blk, 0, buf, 0, 128);
 * \endcode
 *
 * \author Stefano Fedrigo <aleph@develer.com>
@@ -65,17 +65,13 @@
 #include "cfg/cfg_mt29f.h"
 
 #include <cfg/macros.h>
-#include <cfg/compiler.h>
+//#include <cfg/compiler.h>
 
-#include <io/kblock.h>
-#include <io/kfile.h>
-#include <io/kfile_block.h>
-
-#include <cpu/attr.h>
+//#include <cpu/attr.h>
 
 
 /**
- * \name Error codes
+ * \name Error codes.
  * \{
  */
 #define MT29F_ERR_ERASE     BV(1)   ///< Error erasing a block
@@ -84,34 +80,22 @@
 #define MT29F_ERR_WR_TMOUT  BV(2)   ///< Write timeout
 /** \} */
 
-struct Mt29fHardware;
 
 /**
- * MT29F KBlock context structure.
+ * MT29F context.
  */
 typedef struct Mt29f
 {
-	KBlock blk;                  ///< KBlock context
-	struct Mt29fHardware *hw;
+	uint8_t status;
 } Mt29f;
 
-/*
- * Kblock type ID.
- */
-#define KBT_MT29F MAKE_ID('M', 'T', '2', '9')
+void mt29f_init(Mt29f *chip);
+bool mt29f_getDevId(Mt29f *chip, uint8_t dev_id[5]);
+int mt29f_blockErase(Mt29f *chip, uint32_t blk);
+size_t mt29f_pageRead(Mt29f *chip, uint32_t page, void *buf, size_t offset, size_t size);
+size_t mt29f_pageWrite(Mt29f *chip, uint32_t page, const void *buf, size_t offset, size_t size);
+int mt29f_error(Mt29f *chip);
+void mt29f_clearError(Mt29f *chip);
 
-/**
- * Convert + ASSERT from generic KBlock to Flash.
- */
-INLINE Mt29f *FLASH_CAST(KBlock *fls)
-{
-	ASSERT(fls->priv.type == KBT_MT29F);
-	return (Mt29f *)fls;
-}
-
-void mt29f_init(Mt29f *fls);
-void mt29f_initUnbuffered(Mt29f *fls);
-int mt29f_blockErase(Mt29f *fls, block_idx_t page);
-bool mt29f_getDevId(Mt29f *fls, uint8_t dev_id[5]);
 
 #endif /* DRV_MT29F_H */
