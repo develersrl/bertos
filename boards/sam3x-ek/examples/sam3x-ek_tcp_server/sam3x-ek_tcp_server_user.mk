@@ -37,9 +37,11 @@ sam3x-ek_tcp_server_USER_CPPAFLAGS = \
 	#
 
 # Flags included by the user.
+# -Wno-cast-qual silences warnings from using lwip constants
 sam3x-ek_tcp_server_USER_CPPFLAGS = \
 	-Os \
 	-fno-strict-aliasing \
+	-Wno-cast-qual \
 	-fwrapv \
 	#
 
