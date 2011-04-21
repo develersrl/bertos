@@ -101,7 +101,7 @@
  * Fourth   BA15  BA14  BA13  BA12  BA11  BA10  BA9   BA8
  * Fifth    LOW   LOW   LOW   LOW   LOW   LOW   LOW   BA16
  */
-static void getAddrCycles(uint32_t page, size_t offset, uint32_t *cycle0, uint32_t *cycle1234)
+static void getAddrCycles(uint32_t page, uint16_t offset, uint32_t *cycle0, uint32_t *cycle1234)
 {
 	ASSERT(offset < MT29F_PAGE_SIZE);
 
@@ -257,16 +257,22 @@ bool mt29f_getDevId(Mt29f *chip, uint8_t dev_id[5])
 }
 
 
-size_t mt29f_pageRead(Mt29f *chip, uint32_t page, void *buf, size_t offset, size_t size)
+static bool checkEcc(void)
+{
+	// TODO: implement it actually...
+	LOG_INFO("ECC_SR1: 0x%lx\n", SMC_ECC_SR1);
+	return true;
+}
+
+
+static bool mt29f_readPage(Mt29f *chip, uint32_t page, uint16_t offset)
 {
 	uint32_t cycle0;
 	uint32_t cycle1234;
 
-	ASSERT(offset == 0);
+	LOG_INFO("mt29f_readPage: page 0x%lx off 0x%x\n", page, offset);
 
-	LOG_INFO("mt29f_pageRead\n");
-
-	getAddrCycles(page, 0, &cycle0, &cycle1234);
+	getAddrCycles(page, offset, &cycle0, &cycle1234);
 
 	sendCommand(
 		NFC_CMD_NFCCMD | NFC_CMD_NFCEN | MT29F_CSID | NFC_CMD_ACYCLE_FIVE | NFC_CMD_VCMD2 |
@@ -278,27 +284,51 @@ size_t mt29f_pageRead(Mt29f *chip, uint32_t page, void *buf, size_t offset, size
 	{
 		LOG_ERR("mt29f: read timeout\n");
 		chip->status |= MT29F_ERR_RD_TMOUT;
-		return 0;
+		return false;
 	}
 
-	memcpy(buf, (void *)NFC_SRAM_BASE_ADDR, size);
-
-	return size;
+	return true;
 }
 
 
-size_t mt29f_pageWrite(Mt29f *chip, uint32_t page, const void *buf, size_t offset, size_t size)
+/*
+ * Read page data and ECC, checking for errors and fixing them if
+ * possible.
+ */
+bool mt29f_read(Mt29f *chip, uint32_t page, void *buf, uint16_t size)
+{
+	ASSERT(size <= MT29F_DATA_SIZE);
+
+	if (!mt29f_readPage(chip, page, 0))
+		return false;
+
+	memcpy(buf, (void *)NFC_SRAM_BASE_ADDR, size);
+
+	checkEcc();
+
+	return true;
+}
+
+
+/*
+ * Write data in NFC SRAM buffer to a NAND page, starting at a given offset.
+ * Usually offset will be 0 to write data or MT29F_DATA_SIZE to write the spare
+ * area.
+ *
+ * According to datasheet to get ECC computed by hardware is sufficient
+ * to write the main area.  But it seems that in that way the last ECC_PR
+ * register is not generated.  The workaround is to write data and dummy (ff)
+ * spare data in one write, at this point the last ECC_PR is correct and
+ * ECC data can be written in the spare area with a second program operation.
+ */
+static bool mt29f_writePage(Mt29f *chip, uint32_t page, uint16_t offset)
 {
 	uint32_t cycle0;
 	uint32_t cycle1234;
 
-	ASSERT(offset == 0);
+	LOG_INFO("mt29f_writePage: page 0x%lx off 0x%x\n", page, offset);
 
-	LOG_INFO("mt29f_pageWrite\n");
-
-	memcpy((void *)NFC_SRAM_BASE_ADDR, buf, size);
-
-	getAddrCycles(page, 0, &cycle0, &cycle1234);
+	getAddrCycles(page, offset, &cycle0, &cycle1234);
 
 	sendCommand(
 			NFC_CMD_NFCCMD | NFC_CMD_NFCWR | NFC_CMD_NFCEN | MT29F_CSID | NFC_CMD_ACYCLE_FIVE |
@@ -309,7 +339,7 @@ size_t mt29f_pageWrite(Mt29f *chip, uint32_t page, const void *buf, size_t offse
 	{
 		LOG_ERR("mt29f: write timeout\n");
 		chip->status |= MT29F_ERR_WR_TMOUT;
-		return 0;
+		return false;
 	}
 
 	sendCommand(
@@ -323,10 +353,54 @@ size_t mt29f_pageWrite(Mt29f *chip, uint32_t page, const void *buf, size_t offse
 	{
 		LOG_ERR("mt29f: error writing page\n");
 		chip->status |= MT29F_ERR_WRITE;
-		return 0;
+		return false;
 	}
 
-	return size;
+	return true;
+}
+
+
+/*
+ * Write data in a page.
+ */
+static bool mt29f_writePageData(Mt29f *chip, uint32_t page, const void *buf, uint16_t size)
+{
+	ASSERT(size <= MT29F_DATA_SIZE);
+
+	memset((void *)NFC_SRAM_BASE_ADDR, 0xff, MT29F_PAGE_SIZE);
+	memcpy((void *)NFC_SRAM_BASE_ADDR, buf, size);
+
+	return mt29f_writePage(chip, page, 0);
+}
+
+
+/*
+ * Write the ECC for a page.
+ *
+ * ECC data are extracted from ECC_PRx registers and written
+ * in the page's spare area.
+ * For 2048 bytes pages and 1 ECC word each 256 bytes,
+ * 24 bytes of ECC data are stored.
+ */
+static bool mt29f_writePageEcc(Mt29f *chip, uint32_t page)
+{
+	int i;
+	uint32_t *buf = (uint32_t *)NFC_SRAM_BASE_ADDR;
+
+	memset((void *)NFC_SRAM_BASE_ADDR, 0xff, MT29F_SPARE_SIZE);
+
+	for (i = 0; i < MT29F_ECC_NWORDS; i++)
+		buf[i] = *((reg32_t *)(SMC_BASE + SMC_ECC_PR0_OFF) + i);
+
+	return mt29f_writePage(chip, page, MT29F_DATA_SIZE);
+}
+
+
+bool mt29f_write(Mt29f *chip, uint32_t page, const void *buf, uint16_t size)
+{
+	return
+		mt29f_writePageData(chip, page, buf, size) &&
+		mt29f_writePageEcc(chip, page);
 }
 
 
@@ -342,7 +416,7 @@ void mt29f_clearError(Mt29f *chip)
 }
 
 
-static void initPio(Mt29f *chip)
+static void initPio(void)
 {
 	/*
 	 * TODO: put following stuff in hw_ file dependent (and configurable cs?)
@@ -368,7 +442,7 @@ static void initPio(Mt29f *chip)
 }
 
 
-static void initSmc(Mt29f *chip)
+static void initSmc(void)
 {
     SMC_SETUP0 = SMC_SETUP_NWE_SETUP(0)
 		| SMC_SETUP_NCS_WR_SETUP(0)
@@ -397,7 +471,9 @@ static void initSmc(Mt29f *chip)
 	SMC_CFG = SMC_CFG_PAGESIZE_PS2048_64
 		| SMC_CFG_EDGECTRL
 		| SMC_CFG_DTOMUL_X1048576
-		| SMC_CFG_DTOCYC(0xF);
+		| SMC_CFG_DTOCYC(0xF)
+		| SMC_CFG_WSPARE
+		| SMC_CFG_RSPARE;
 
 	// Disable SMC interrupts, reset and enable NFC controller
 	SMC_IDR = ~0;
@@ -412,8 +488,8 @@ static void initSmc(Mt29f *chip)
 
 void mt29f_init(Mt29f *chip)
 {
-	initPio(chip);
-	initSmc(chip);
+	initPio();
+	initSmc();
 
 	mt29f_clearError(chip);
 

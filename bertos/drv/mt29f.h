@@ -92,8 +92,8 @@ typedef struct Mt29f
 void mt29f_init(Mt29f *chip);
 bool mt29f_getDevId(Mt29f *chip, uint8_t dev_id[5]);
 int mt29f_blockErase(Mt29f *chip, uint32_t blk);
-size_t mt29f_pageRead(Mt29f *chip, uint32_t page, void *buf, size_t offset, size_t size);
-size_t mt29f_pageWrite(Mt29f *chip, uint32_t page, const void *buf, size_t offset, size_t size);
+bool mt29f_read(Mt29f *chip, uint32_t page, void *buf, uint16_t size);
+bool mt29f_write(Mt29f *chip, uint32_t page, const void *buf, uint16_t size);
 int mt29f_error(Mt29f *chip);
 void mt29f_clearError(Mt29f *chip);
 

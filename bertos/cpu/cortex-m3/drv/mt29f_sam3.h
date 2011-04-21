@@ -42,9 +42,12 @@
 
 
 // MT29F2G08AAD, FIXME: configurable
-#define MT29F_PAGE_SIZE   0x800       // 2048 B
+#define MT29F_DATA_SIZE   0x800       // 2048 B
+#define MT29F_SPARE_SIZE  0x40        // 64 B
+#define MT29F_PAGE_SIZE   (MT29F_DATA_SIZE + MT29F_SPARE_SIZE)
 #define MT29F_BLOCK_SIZE  0x20000     // 128 kB
 #define MT29F_SIZE        0x10000000  // 256 MB
+#define MT29F_ECC_NWORDS  (MT29F_DATA_SIZE / 256)
 #define MT29F_CSID        NFC_CMD_CSID_0  // Chip select
 
 /*
