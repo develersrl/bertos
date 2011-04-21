@@ -298,6 +298,31 @@
 /*\}*/
 
 /**
+ * Defines for bit fields in SMC_ECC_CTRL register
+ */
+/*\{*/
+#define SMC_ECC_CTRL_RST    BV(0)
+#define SMC_ECC_CTRL_SWRST  BV(1)
+/*\}*/
+
+/**
+ * Defines for bit fields in SMC_ECC_MD register
+ */
+/*\{*/
+#define SMC_ECC_MD_ECC_PAGESIZE_SHIFT        0
+#define SMC_ECC_MD_ECC_PAGESIZE_MASK         0x3
+#define SMC_ECC_MD_ECC_PAGESIZE_PS512_16     0x0
+#define SMC_ECC_MD_ECC_PAGESIZE_PS1024_32    0x1
+#define SMC_ECC_MD_ECC_PAGESIZE_PS2048_64    0x2
+#define SMC_ECC_MD_ECC_PAGESIZE_PS4096_128   0x3
+#define SMC_ECC_MD_TYPCORREC_SHIFT           4
+#define SMC_ECC_MD_TYPCORREC_MASK            (0x3 << SMC_ECC_MD_TYPCORREC_SHIFT)
+#define SMC_ECC_MD_TYPCORREC_CPAGE           (0x0 << SMC_ECC_MD_TYPCORREC_SHIFT)
+#define SMC_ECC_MD_TYPCORREC_C256B           (0x1 << SMC_ECC_MD_TYPCORREC_SHIFT)
+#define SMC_ECC_MD_TYPCORREC_C512B           (0x2 << SMC_ECC_MD_TYPCORREC_SHIFT)
+/*\}*/
+
+/**
  * Defines for bit fields in SMC_SETUP registers.
  */
 /*\{*/
