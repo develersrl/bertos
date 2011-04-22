@@ -317,15 +317,6 @@ static struct sys_timeouts lwip_system_timeouts; // Default timeouts list for lw
 
 struct sys_timeouts *sys_arch_timeouts(void)
 {
-	ThreadNode *thread_node;
-	struct Process *curr_pid = proc_current();
-
-	FOREACH_NODE(thread_node, &used_thread)
-	{
-		if (thread_node->pid == curr_pid)
-			return &(thread_node->timeout);
-	}
-
 	return &lwip_system_timeouts;
 }
 
