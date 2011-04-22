@@ -158,6 +158,8 @@ INLINE void timer_addToList(Timer *timer, List *queue)
  * When the delay indicated by the timer expires, the timer
  * device will execute the event associated with it.
  *
+ * You should not call this function on an already running timer.
+ *
  * \note Interrupt safe
  */
 void timer_add(Timer *timer)

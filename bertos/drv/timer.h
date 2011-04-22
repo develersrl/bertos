@@ -291,7 +291,12 @@ INLINE void timer_setSoftint(Timer *timer, Hook func, iptr_t user_data)
 	event_initSoftint(&timer->expire, func, user_data);
 }
 
-/** Set the timer delay (the time before the event will be triggered) */
+/**
+ * Set the timer delay (the time before the event will be triggered)
+ *
+ * \note It's illegal to change the delay of the timer when it's
+ * still running.
+ */
 INLINE void timer_setDelay(Timer *timer, ticks_t delay)
 {
 	timer->_delay = delay;
