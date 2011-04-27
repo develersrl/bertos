@@ -225,15 +225,8 @@
 #define NFC_CMD_ACYCLE_THREE   (0x3 << 19)   ///< Three address cycles
 #define NFC_CMD_ACYCLE_FOUR    (0x4 << 19)   ///< Four address cycles
 #define NFC_CMD_ACYCLE_FIVE    (0x5 << 19)   ///< Five address cycles
-#define NFC_CMD_CSID_MASK      (0x7 << 22)   ///< Chip Select Identifier
-#define NFC_CMD_CSID_0         (0x0 << 22)   ///< CS0
-#define NFC_CMD_CSID_1         (0x1 << 22)   ///< CS1
-#define NFC_CMD_CSID_2         (0x2 << 22)   ///< CS2
-#define NFC_CMD_CSID_3         (0x3 << 22)   ///< CS3
-#define NFC_CMD_CSID_4         (0x4 << 22)   ///< CS4
-#define NFC_CMD_CSID_5         (0x5 << 22)   ///< CS5
-#define NFC_CMD_CSID_6         (0x6 << 22)   ///< CS6
-#define NFC_CMD_CSID_7         (0x7 << 22)   ///< CS7
+#define NFC_CMD_CSID_SHIFT     22            ///< Chip Select shift
+#define NFC_CMD_CSID_MASK      (0x7 << NFC_CMD_CSID_SHIFT)   ///< Chip Select mask
 #define NFC_CMD_NFCEN          BV(25)        ///< NFC Enable
 #define NFC_CMD_NFCWR          BV(26)        ///< NFC Write Enable
 #define NFC_CMD_NFCCMD         BV(27)        ///< NFC Command Enable

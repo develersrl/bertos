@@ -86,10 +86,11 @@
  */
 typedef struct Mt29f
 {
+	uint8_t chip_select;
 	uint8_t status;
 } Mt29f;
 
-void mt29f_init(Mt29f *chip);
+void mt29f_init(Mt29f *chip, uint8_t chip_select);
 bool mt29f_getDevId(Mt29f *chip, uint8_t dev_id[5]);
 int mt29f_blockErase(Mt29f *chip, uint32_t blk);
 bool mt29f_read(Mt29f *chip, uint32_t page, void *buf, uint16_t size);

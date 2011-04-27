@@ -48,7 +48,6 @@
 #define MT29F_BLOCK_SIZE  0x20000     // 128 kB
 #define MT29F_SIZE        0x10000000  // 256 MB
 #define MT29F_ECC_NWORDS  (MT29F_DATA_SIZE / 256)
-#define MT29F_CSID        NFC_CMD_CSID_0  // Chip select
 
 /*
  * PIO definitions.

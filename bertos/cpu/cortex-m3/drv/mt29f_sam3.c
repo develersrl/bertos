@@ -85,6 +85,9 @@
 #define MT29F_ADDR_ADDR   0x60200000
 #define MT29F_DATA_ADDR   0x60000000
 
+// Get chip select mask for command register
+#define MT29F_CSID(chip)  (((chip)->chip_select << NFC_CMD_CSID_SHIFT) & NFC_CMD_CSID_MASK)
+
 
 /*
  * Translate flash page index plus a byte offset
@@ -181,12 +184,12 @@ static void sendCommand(uint32_t cmd,
 }
 
 
-static bool isOperationComplete(void)
+static bool isOperationComplete(Mt29f *chip)
 {
 	uint8_t status;
 
-	sendCommand(
-		NFC_CMD_NFCCMD | MT29F_CSID | NFC_CMD_ACYCLE_NONE |
+	sendCommand(MT29F_CSID(chip) |
+		NFC_CMD_NFCCMD | NFC_CMD_ACYCLE_NONE |
 		MT29F_CMD_STATUS << 2,
 		0, 0, 0);
 
@@ -195,10 +198,10 @@ static bool isOperationComplete(void)
 }
 
 
-static void chipReset(void)
+static void chipReset(Mt29f *chip)
 {
-	sendCommand(
-		NFC_CMD_NFCCMD | MT29F_CSID | NFC_CMD_ACYCLE_NONE |
+	sendCommand(MT29F_CSID(chip) |
+		NFC_CMD_NFCCMD | NFC_CMD_ACYCLE_NONE |
 		MT29F_CMD_RESET << 2,
 		0, 0, 0);
 
@@ -216,14 +219,14 @@ int mt29f_blockErase(Mt29f *chip, uint32_t page)
 
 	getAddrCycles(page, 0, &cycle0, &cycle1234);
 
-	sendCommand(
-		NFC_CMD_NFCCMD | MT29F_CSID | NFC_CMD_ACYCLE_THREE | NFC_CMD_VCMD2 |
+	sendCommand(MT29F_CSID(chip) |
+		NFC_CMD_NFCCMD | NFC_CMD_ACYCLE_THREE | NFC_CMD_VCMD2 |
 		(MT29F_CMD_ERASE_2 << 10) | (MT29F_CMD_ERASE_1 << 2),
 		3, 0, cycle1234 >> 8);
 
 	waitReadyBusy();
 
-	if (!isOperationComplete())
+	if (!isOperationComplete(chip))
 	{
 		LOG_ERR("mt29f: error erasing block\n");
 		chip->status |= MT29F_ERR_ERASE;
@@ -239,8 +242,8 @@ int mt29f_blockErase(Mt29f *chip, uint32_t page)
  */
 bool mt29f_getDevId(Mt29f *chip, uint8_t dev_id[5])
 {
-	sendCommand(
-		NFC_CMD_NFCCMD | NFC_CMD_NFCEN | MT29F_CSID | NFC_CMD_ACYCLE_ONE |
+	sendCommand(MT29F_CSID(chip) |
+		NFC_CMD_NFCCMD | NFC_CMD_NFCEN | NFC_CMD_ACYCLE_ONE |
 		MT29F_CMD_READID << 2,
 		1, 0, 0);
 
@@ -259,9 +262,15 @@ bool mt29f_getDevId(Mt29f *chip, uint8_t dev_id[5])
 
 static bool checkEcc(void)
 {
-	// TODO: implement it actually...
-	LOG_INFO("ECC_SR1: 0x%lx\n", SMC_ECC_SR1);
-	return true;
+	uint32_t sr1 = SMC_ECC_SR1;
+
+	if (sr1)
+	{
+		LOG_INFO("ECC error, ECC_SR1=0x%lx\n", sr1);
+		return false;
+	}
+	else
+		return true;
 }
 
 
@@ -274,8 +283,8 @@ static bool mt29f_readPage(Mt29f *chip, uint32_t page, uint16_t offset)
 
 	getAddrCycles(page, offset, &cycle0, &cycle1234);
 
-	sendCommand(
-		NFC_CMD_NFCCMD | NFC_CMD_NFCEN | MT29F_CSID | NFC_CMD_ACYCLE_FIVE | NFC_CMD_VCMD2 |
+	sendCommand(MT29F_CSID(chip) |
+		NFC_CMD_NFCCMD | NFC_CMD_NFCEN | NFC_CMD_ACYCLE_FIVE | NFC_CMD_VCMD2 |
 		(MT29F_CMD_READ_2 << 10) | (MT29F_CMD_READ_1 << 2),
 		5, cycle0, cycle1234);
 
@@ -292,8 +301,8 @@ static bool mt29f_readPage(Mt29f *chip, uint32_t page, uint16_t offset)
 
 
 /*
- * Read page data and ECC, checking for errors and fixing them if
- * possible.
+ * Read page data and ECC, checking for errors.
+ * TODO: fix errors with ECC when possible.
  */
 bool mt29f_read(Mt29f *chip, uint32_t page, void *buf, uint16_t size)
 {
@@ -304,9 +313,7 @@ bool mt29f_read(Mt29f *chip, uint32_t page, void *buf, uint16_t size)
 
 	memcpy(buf, (void *)NFC_SRAM_BASE_ADDR, size);
 
-	checkEcc();
-
-	return true;
+	return checkEcc();
 }
 
 
@@ -330,8 +337,8 @@ static bool mt29f_writePage(Mt29f *chip, uint32_t page, uint16_t offset)
 
 	getAddrCycles(page, offset, &cycle0, &cycle1234);
 
-	sendCommand(
-			NFC_CMD_NFCCMD | NFC_CMD_NFCWR | NFC_CMD_NFCEN | MT29F_CSID | NFC_CMD_ACYCLE_FIVE |
+	sendCommand(MT29F_CSID(chip) |
+			NFC_CMD_NFCCMD | NFC_CMD_NFCWR | NFC_CMD_NFCEN | NFC_CMD_ACYCLE_FIVE |
 			MT29F_CMD_WRITE_1 << 2,
 			5, cycle0, cycle1234);
 
@@ -342,14 +349,14 @@ static bool mt29f_writePage(Mt29f *chip, uint32_t page, uint16_t offset)
 		return false;
 	}
 
-	sendCommand(
-			NFC_CMD_NFCCMD | MT29F_CSID | NFC_CMD_ACYCLE_NONE |
+	sendCommand(MT29F_CSID(chip) |
+			NFC_CMD_NFCCMD | NFC_CMD_ACYCLE_NONE |
 			MT29F_CMD_WRITE_2 << 2,
 			0, 0, 0);
 
 	waitReadyBusy();
 
-	if (!isOperationComplete())
+	if (!isOperationComplete(chip))
 	{
 		LOG_ERR("mt29f: error writing page\n");
 		chip->status |= MT29F_ERR_WRITE;
@@ -419,7 +426,7 @@ void mt29f_clearError(Mt29f *chip)
 static void initPio(void)
 {
 	/*
-	 * TODO: put following stuff in hw_ file dependent (and configurable cs?)
+	 * TODO: put following stuff in hw_ file dependent
 	 * Parameters for MT29F8G08AAD
 	 */
 	pmc_periphEnable(PIOA_ID);
@@ -486,13 +493,14 @@ static void initSmc(void)
 }
 
 
-void mt29f_init(Mt29f *chip)
+void mt29f_init(Mt29f *chip, uint8_t chip_select)
 {
+	memset(chip, 0, sizeof(Mt29f));
+
+	chip->chip_select = chip_select;
+
 	initPio();
 	initSmc();
-
-	mt29f_clearError(chip);
-
-	chipReset();
+	chipReset(chip);
 }
 
