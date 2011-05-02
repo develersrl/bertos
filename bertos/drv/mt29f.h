@@ -33,29 +33,11 @@
 *
 * This module allows read/write access to Micron MT29F serial
 * NANDs.
-* It is a block device, so it must be accessed using the KBlock
-* interface functions (see kblock.h).
-*
-* Once you have opened the flash for writing, you may want to use
-* kblock_trim() to avoid overwriting data on other flash banks.
-*
-* Example usage:
-* \code
-* Mt29f chip;
-* mt29f_init(&chip);
-* // enable access only on desired blocks
-* // start block = 50, num blocks = 20
-* kblock_trim(&chip.blk, 50, 20);
-* // ...
-* // now write to the flash
-* // block number is automatically converted
-* kblock_write(&chip.blk, 0, buf, 0, 128);
-* \endcode
 *
 * \author Stefano Fedrigo <aleph@develer.com>
 *
 * $WIZ$ module_name = "mt29f"
-* $WIZ$ module_depends = "kfile", "kfile_block", "kblock"
+* $WIZ$ module_depends = "kfile", "kfile_block", "kblock", "heap"
 * $WIZ$ module_configuration = "bertos/cfg/cfg_mt29f.h"
 */
 
@@ -63,11 +45,7 @@
 #define DRV_MT29F_H
 
 #include "cfg/cfg_mt29f.h"
-
 #include <cfg/macros.h>
-//#include <cfg/compiler.h>
-
-//#include <cpu/attr.h>
 
 
 /**
@@ -86,13 +64,18 @@
  */
 typedef struct Mt29f
 {
-	uint8_t chip_select;
-	uint8_t status;
+	uint8_t   chip_select;
+	uint8_t   status;
+
+	uint16_t *block_map;    // For bad blocks remapping
+	uint16_t  remap_start;  // First unused remap block
 } Mt29f;
 
-void mt29f_init(Mt29f *chip, uint8_t chip_select);
+struct Heap;
+
+bool mt29f_init(Mt29f *chip, struct Heap *heap, uint8_t chip_select);
 bool mt29f_getDevId(Mt29f *chip, uint8_t dev_id[5]);
-int mt29f_blockErase(Mt29f *chip, uint32_t blk);
+int mt29f_blockErase(Mt29f *chip, uint16_t block);
 bool mt29f_read(Mt29f *chip, uint32_t page, void *buf, uint16_t size);
 bool mt29f_write(Mt29f *chip, uint32_t page, const void *buf, uint16_t size);
 int mt29f_error(Mt29f *chip);

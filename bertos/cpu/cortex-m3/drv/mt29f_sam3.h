@@ -42,12 +42,22 @@
 
 
 // MT29F2G08AAD, FIXME: configurable
-#define MT29F_DATA_SIZE   0x800       // 2048 B
-#define MT29F_SPARE_SIZE  0x40        // 64 B
-#define MT29F_PAGE_SIZE   (MT29F_DATA_SIZE + MT29F_SPARE_SIZE)
-#define MT29F_BLOCK_SIZE  0x20000     // 128 kB
-#define MT29F_SIZE        0x10000000  // 256 MB
-#define MT29F_ECC_NWORDS  (MT29F_DATA_SIZE / 256)
+#define MT29F_DATA_SIZE         0x800       // 2048 B
+#define MT29F_SPARE_SIZE        0x40        // 64 B
+#define MT29F_PAGE_SIZE         (MT29F_DATA_SIZE + MT29F_SPARE_SIZE)
+#define MT29F_PAGES_PER_BLOCK   64
+#define MT29F_NUM_BLOCKS        2048
+#define MT29F_ECC_NWORDS        (MT29F_DATA_SIZE / 256)
+#define MT29F_REMAP_TAG_OFFSET  0x38
+#define MT29F_REMAP_TAG         0x3e10c8ed
+// Used to setup a dummy remup
+#define MT29F_NULL_REMAP        0xfffe
+
+// Number of reserved block for remapping
+#define MT29F_NUM_REMAP_BLOCKS  128
+// Number of usable blocks, and index of first remapping block
+#define MT29F_NUM_USER_BLOCKS   (MT29F_NUM_BLOCKS - MT29F_NUM_REMAP_BLOCKS)
+
 
 /*
  * PIO definitions.
