@@ -279,17 +279,26 @@ bool mt29f_getDevId(Mt29f *chip, uint8_t dev_id[5])
 }
 
 
-static bool checkEcc(void)
+static bool checkEcc(Mt29f *chip)
 {
-	uint32_t sr1 = SMC_ECC_SR1;
+	struct RemapInfo *remap_info = (struct RemapInfo *)(NFC_SRAM_BASE_ADDR + MT29F_REMAP_TAG_OFFSET);
 
-	if (sr1)
+	/*
+	 * Check for ECC hardware status only if a valid RemapInfo structure is found.
+	 * That guarantees we wrote the block and a valid ECC is present.
+	 */
+	if (remap_info->tag == MT29F_REMAP_TAG)
 	{
-		LOG_INFO("ECC error, ECC_SR1=0x%lx\n", sr1);
-		return false;
+		uint32_t sr1 = SMC_ECC_SR1;
+		if (sr1)
+		{
+			LOG_INFO("ECC error, ECC_SR1=0x%lx\n", sr1);
+			chip->status |= MT29F_ERR_ECC;
+			return false;
+		}
 	}
-	else
-		return true;
+
+	return true;
 }
 
 
@@ -425,12 +434,9 @@ static bool mt29f_writePageSpare(Mt29f *chip, uint32_t page)
 	if (chip->block_map[blk] != blk)
 		page = chip->block_map[blk] * MT29F_PAGES_PER_BLOCK + page_in_blk;
 
-	// Write remap tag in first page in block
-	if (page_in_blk == 0)
-	{
-		remap_info->tag = MT29F_REMAP_TAG;
-		remap_info->mapped_blk = blk;
-	}
+	// Write remap tag
+	remap_info->tag = MT29F_REMAP_TAG;
+	remap_info->mapped_blk = blk;
 
 	return mt29f_writePage(chip, page, MT29F_DATA_SIZE);
 }
