@@ -37,7 +37,7 @@
 * \author Stefano Fedrigo <aleph@develer.com>
 *
 * $WIZ$ module_name = "mt29f"
-* $WIZ$ module_depends = "kfile", "kfile_block", "kblock", "heap"
+* $WIZ$ module_depends = "timer", "kblock", "heap"
 * $WIZ$ module_configuration = "bertos/cfg/cfg_mt29f.h"
 */
 
@@ -46,6 +46,7 @@
 
 #include "cfg/cfg_mt29f.h"
 #include <cfg/macros.h>
+#include <io/kblock.h>
 
 
 /**
@@ -54,8 +55,9 @@
  */
 #define MT29F_ERR_ERASE     BV(1)   ///< Error erasing a block
 #define MT29F_ERR_WRITE     BV(2)   ///< Error writing a page
-#define MT29F_ERR_RD_TMOUT  BV(2)   ///< Read timeout
-#define MT29F_ERR_WR_TMOUT  BV(2)   ///< Write timeout
+#define MT29F_ERR_RD_TMOUT  BV(3)   ///< Read timeout
+#define MT29F_ERR_WR_TMOUT  BV(4)   ///< Write timeout
+#define MT29F_ERR_ECC       BV(5)   ///< Unrecoverable ECC error
 /** \} */
 
 
@@ -64,6 +66,8 @@
  */
 typedef struct Mt29f
 {
+	KBlock    kblock;
+
 	uint8_t   chip_select;
 	uint8_t   status;
 
@@ -71,15 +75,29 @@ typedef struct Mt29f
 	uint16_t  remap_start;  // First unused remap block
 } Mt29f;
 
+/*
+ * Kblock id.
+ */
+#define KBT_NAND  MAKE_ID('N', 'A', 'N', 'D')
+
+/**
+* Convert + ASSERT from generic KBlock to NAND context.
+*/
+INLINE Mt29f *MT29F_CAST(KBlock *kb)
+{
+	ASSERT(kb->priv.type == KBT_NAND);
+	return (Mt29f *)kb;
+}
+
 struct Heap;
 
-bool mt29f_init(Mt29f *chip, struct Heap *heap, uint8_t chip_select);
+// Kblock interface
+bool mt29f_init(Mt29f *chip, struct Heap *heap, unsigned chip_select);
+bool mt29f_initUnbuffered(Mt29f *chip, struct Heap *heap, unsigned chip_select);
+
+// Private functions: use at your own risk, could change in any moment
 bool mt29f_getDevId(Mt29f *chip, uint8_t dev_id[5]);
 int mt29f_blockErase(Mt29f *chip, uint16_t block);
-bool mt29f_read(Mt29f *chip, uint32_t page, void *buf, uint16_t size);
-bool mt29f_write(Mt29f *chip, uint32_t page, const void *buf, uint16_t size);
-int mt29f_error(Mt29f *chip);
-void mt29f_clearError(Mt29f *chip);
 
 
 #endif /* DRV_MT29F_H */

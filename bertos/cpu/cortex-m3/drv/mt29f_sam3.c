@@ -332,7 +332,7 @@ static bool mt29f_readPage(Mt29f *chip, uint32_t page, uint16_t offset)
  * Read page data and ECC, checking for errors.
  * TODO: fix errors with ECC when possible.
  */
-bool mt29f_read(Mt29f *chip, uint32_t page, void *buf, uint16_t size)
+static bool mt29f_read(Mt29f *chip, uint32_t page, void *buf, uint16_t size)
 {
 	ASSERT(size <= MT29F_DATA_SIZE);
 
@@ -341,7 +341,7 @@ bool mt29f_read(Mt29f *chip, uint32_t page, void *buf, uint16_t size)
 
 	memcpy(buf, (void *)NFC_SRAM_BASE_ADDR, size);
 
-	return checkEcc();
+	return checkEcc(chip);
 }
 
 
@@ -442,23 +442,11 @@ static bool mt29f_writePageSpare(Mt29f *chip, uint32_t page)
 }
 
 
-bool mt29f_write(Mt29f *chip, uint32_t page, const void *buf, uint16_t size)
+static bool mt29f_write(Mt29f *chip, uint32_t page, const void *buf, uint16_t size)
 {
 	return
 		mt29f_writePageData(chip, page, buf, size) &&
 		mt29f_writePageSpare(chip, page);
-}
-
-
-int mt29f_error(Mt29f *chip)
-{
-	return chip->status;
-}
-
-
-void mt29f_clearError(Mt29f *chip)
-{
-	chip->status = 0;
 }
 
 
@@ -728,9 +716,13 @@ static void initSmc(void)
 }
 
 
-bool mt29f_init(Mt29f *chip, struct Heap *heap, uint8_t chip_select)
+static bool commonInit(Mt29f *chip, struct Heap *heap, unsigned chip_select)
 {
 	memset(chip, 0, sizeof(Mt29f));
+
+	DB(chip->kblock.priv.type = KBT_NAND);
+	chip->kblock.blk_size = MT29F_BLOCK_SIZE;
+	chip->kblock.blk_cnt  = MT29F_NUM_USER_BLOCKS;
 
 	chip->chip_select = chip_select;
 	chip->block_map = heap_allocmem(heap, MT29F_NUM_USER_BLOCKS * sizeof(*chip->block_map));
@@ -747,4 +739,117 @@ bool mt29f_init(Mt29f *chip, struct Heap *heap, uint8_t chip_select)
 
 	return true;
 }
+
+
+/**************** Kblock interface ****************/
+
+
+static size_t mt29f_writeDirect(struct KBlock *kblk, block_idx_t idx, const void *buf, size_t offset, size_t size)
+{
+	ASSERT(offset <= MT29F_BLOCK_SIZE);
+	ASSERT(offset % MT29F_DATA_SIZE == 0);
+	ASSERT(size <= MT29F_BLOCK_SIZE);
+	ASSERT(size % MT29F_DATA_SIZE == 0);
+
+	while (offset < size)
+	{
+		uint32_t page = (idx * MT29F_PAGES_PER_BLOCK) + (offset / MT29F_DATA_SIZE);
+
+		if (!mt29f_write(MT29F_CAST(kblk), page, buf, MT29F_DATA_SIZE))
+			break;
+
+		offset += MT29F_DATA_SIZE;
+		buf = (const char *)buf + MT29F_DATA_SIZE;
+	}
+
+	return offset;
+}
+
+
+static size_t mt29f_readDirect(struct KBlock *kblk, block_idx_t idx, void *buf, size_t offset, size_t size)
+{
+	ASSERT(offset <= MT29F_BLOCK_SIZE);
+	ASSERT(offset % MT29F_DATA_SIZE == 0);
+	ASSERT(size <= MT29F_BLOCK_SIZE);
+	ASSERT(size % MT29F_DATA_SIZE == 0);
+
+	while (offset < size)
+	{
+		uint32_t page = (idx * MT29F_PAGES_PER_BLOCK) + (offset / MT29F_DATA_SIZE);
+
+		if (!mt29f_read(MT29F_CAST(kblk), page, buf, MT29F_DATA_SIZE))
+			break;
+
+		offset += MT29F_DATA_SIZE;
+		buf = (char *)buf + MT29F_DATA_SIZE;
+	}
+
+	return offset;
+}
+
+
+static int mt29f_error(struct KBlock *kblk)
+{
+	Mt29f *chip = MT29F_CAST(kblk);
+	return chip->status;
+}
+
+
+static void mt29f_clearError(struct KBlock *kblk)
+{
+	Mt29f *chip = MT29F_CAST(kblk);
+	chip->status = 0;
+}
+
+
+static const KBlockVTable mt29f_buffered_vt =
+{
+	.readDirect = mt29f_readDirect,
+	.writeDirect = mt29f_writeDirect,
+
+	.readBuf = kblock_swReadBuf,
+	.writeBuf = kblock_swWriteBuf,
+	.load = kblock_swLoad,
+	.store = kblock_swStore,
+
+	.error = mt29f_error,
+	.clearerr = mt29f_clearError,
+};
+
+static const KBlockVTable mt29f_unbuffered_vt =
+{
+	.readDirect = mt29f_readDirect,
+	.writeDirect = mt29f_writeDirect,
+
+	.error = mt29f_error,
+	.clearerr = mt29f_clearError,
+};
+
+
+bool mt29f_init(Mt29f *chip, struct Heap *heap, unsigned chip_select)
+{
+	if (!commonInit(chip, heap, chip_select))
+		return false;
+
+	chip->kblock.priv.vt = &mt29f_buffered_vt;
+	chip->kblock.priv.flags |= KB_BUFFERED;
+
+	chip->kblock.priv.buf = heap_allocmem(heap, MT29F_BLOCK_SIZE);
+	if (!chip->kblock.priv.buf)
+	{
+		LOG_ERR("mt29f: error allocating block buffer\n");
+		return false;
+	}
+
+	// Load the first block in the cache
+	return mt29f_readDirect(&chip->kblock, 0, chip->kblock.priv.buf, 0, MT29F_DATA_SIZE);
+}
+
+
+bool mt29f_initUnbuffered(Mt29f *chip, struct Heap *heap, unsigned chip_select)
+{
+	chip->kblock.priv.vt = &mt29f_unbuffered_vt;
+	return commonInit(chip, heap, chip_select);
+}
+
 
