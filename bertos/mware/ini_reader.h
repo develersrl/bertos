@@ -30,6 +30,10 @@
  *
  * -->
  *
+ * \defgroup ini_reader Ini file reader
+ * \ingroup mware
+ * \{
+ *
  * \brief Ini file reader module.
  *
  * The format accepted is:
@@ -70,4 +74,6 @@ int ini_getString(KFile *fd, const char *section, const char *key, const char *d
 int ini_reader_testSetup(void);
 int ini_reader_testRun(void);
 int ini_reader_testTearDown(void);
+
+/** \} */ // defgroup ini_reader
 #endif /* INI_READER_H */
