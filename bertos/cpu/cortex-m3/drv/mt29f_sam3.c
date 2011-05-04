@@ -86,6 +86,13 @@
 // Get chip select mask for command register
 #define MT29F_CSID(chip)  (((chip)->chip_select << NFC_CMD_CSID_SHIFT) & NFC_CMD_CSID_MASK)
 
+// Get block from page
+#define PAGE(blk)            ((blk) * MT29F_PAGES_PER_BLOCK)
+
+// Page from block and page in block
+#define BLOCK(page)          ((uint16_t)((page) / MT29F_PAGES_PER_BLOCK))
+#define PAGE_IN_BLOCK(page)  ((uint16_t)((page) % MT29F_PAGES_PER_BLOCK))
+
 
 /*
  * Remap info written in the first page of each block
@@ -236,7 +243,14 @@ int mt29f_blockErase(Mt29f *chip, uint16_t block)
 	uint32_t cycle0;
 	uint32_t cycle1234;
 
-	getAddrCycles(block * MT29F_PAGES_PER_BLOCK, 0, &cycle0, &cycle1234);
+	uint16_t remapped_block = chip->block_map[block];
+	if (block != remapped_block)
+	{
+		LOG_INFO("mt29f_blockErase: remapped block: blk %d->%d\n", block, remapped_block);
+		block = remapped_block;
+	}
+
+	getAddrCycles(PAGE(block), 0, &cycle0, &cycle1234);
 
 	sendCommand(MT29F_CSID(chip) |
 		NFC_CMD_NFCCMD | NFC_CMD_ACYCLE_THREE | NFC_CMD_VCMD2 |
@@ -334,7 +348,14 @@ static bool mt29f_readPage(Mt29f *chip, uint32_t page, uint16_t offset)
  */
 static bool mt29f_read(Mt29f *chip, uint32_t page, void *buf, uint16_t size)
 {
-	ASSERT(size <= MT29F_DATA_SIZE);
+	uint32_t remapped_page = PAGE(chip->block_map[BLOCK(page)]) + PAGE_IN_BLOCK(page);
+
+	if (page != remapped_page)
+	{
+		LOG_INFO("mt29f_read: remapped block: blk %d->%d, pg %ld->%ld\n",
+				BLOCK(page), chip->block_map[BLOCK(page)], page, remapped_page);
+		page = remapped_page;
+	}
 
 	if (!mt29f_readPage(chip, page, 0))
 		return false;
@@ -361,7 +382,7 @@ static bool mt29f_writePage(Mt29f *chip, uint32_t page, uint16_t offset)
 	uint32_t cycle0;
 	uint32_t cycle1234;
 
-	LOG_INFO("mt29f_writePage: page 0x%lx off 0x%x\n", page, offset);
+	//LOG_INFO("mt29f_writePage: page 0x%lx off 0x%x\n", page, offset);
 
 	getAddrCycles(page, offset, &cycle0, &cycle1234);
 
@@ -421,8 +442,7 @@ static bool mt29f_writePageSpare(Mt29f *chip, uint32_t page)
 {
 	int i;
 	uint32_t *buf = (uint32_t *)NFC_SRAM_BASE_ADDR;
-	uint16_t  blk = page / MT29F_PAGES_PER_BLOCK;
-	uint16_t  page_in_blk = page % MT29F_PAGES_PER_BLOCK;
+	uint16_t blk = BLOCK(page);
 	struct RemapInfo *remap_info = (struct RemapInfo *)(NFC_SRAM_BASE_ADDR + MT29F_REMAP_TAG_OFFSET);
 
 	memset((void *)NFC_SRAM_BASE_ADDR, 0xff, MT29F_SPARE_SIZE);
@@ -432,7 +452,7 @@ static bool mt29f_writePageSpare(Mt29f *chip, uint32_t page)
 
 	// Check for remapped block
 	if (chip->block_map[blk] != blk)
-		page = chip->block_map[blk] * MT29F_PAGES_PER_BLOCK + page_in_blk;
+		page = PAGE(chip->block_map[blk]) + PAGE_IN_BLOCK(page);
 
 	// Write remap tag
 	remap_info->tag = MT29F_REMAP_TAG;
@@ -444,6 +464,15 @@ static bool mt29f_writePageSpare(Mt29f *chip, uint32_t page)
 
 static bool mt29f_write(Mt29f *chip, uint32_t page, const void *buf, uint16_t size)
 {
+	uint32_t remapped_page = PAGE(chip->block_map[BLOCK(page)]) + PAGE_IN_BLOCK(page);
+
+	if (page != remapped_page)
+	{
+		LOG_INFO("mt29f_write: remapped block: blk %d->%d, pg %ld->%ld\n",
+				BLOCK(page), chip->block_map[BLOCK(page)], page, remapped_page);
+		page = remapped_page;
+	}
+
 	return
 		mt29f_writePageData(chip, page, buf, size) &&
 		mt29f_writePageSpare(chip, page);
@@ -461,7 +490,7 @@ static bool blockIsGood(Mt29f *chip, uint16_t blk)
 	bool good;
 
 	// Check first byte in spare area of first page in block
-	mt29f_readPage(chip, blk * MT29F_PAGES_PER_BLOCK, MT29F_DATA_SIZE);
+	mt29f_readPage(chip, PAGE(blk), MT29F_DATA_SIZE);
 	good = *first_byte == 0xFF;
 
 	if (!good)
@@ -479,7 +508,7 @@ static int getBadBlockFromRemapBlock(Mt29f *chip, uint16_t dest_blk)
 {
 	struct RemapInfo *remap_info = (struct RemapInfo *)NFC_SRAM_BASE_ADDR;
 
-	if (!mt29f_readPage(chip, dest_blk * MT29F_PAGES_PER_BLOCK, MT29F_DATA_SIZE + MT29F_REMAP_TAG_OFFSET))
+	if (!mt29f_readPage(chip, PAGE(dest_blk), MT29F_DATA_SIZE + MT29F_REMAP_TAG_OFFSET))
 		return -1;
 
 	if (remap_info->tag == MT29F_REMAP_TAG)
@@ -499,13 +528,13 @@ static bool setMapping(Mt29f *chip, uint32_t src_blk, uint32_t dest_blk)
 
 	LOG_INFO("mt29f, setMapping(): src=%ld dst=%ld\n", src_blk, dest_blk);
 
-	if (!mt29f_readPage(chip, dest_blk * MT29F_PAGES_PER_BLOCK, MT29F_DATA_SIZE + MT29F_REMAP_TAG_OFFSET))
+	if (!mt29f_readPage(chip, PAGE(dest_blk), MT29F_DATA_SIZE + MT29F_REMAP_TAG_OFFSET))
 		return false;
 
 	remap_info->tag = MT29F_REMAP_TAG;
 	remap_info->mapped_blk = src_blk;
 
-	return mt29f_writePage(chip, dest_blk * MT29F_PAGES_PER_BLOCK, MT29F_DATA_SIZE + MT29F_REMAP_TAG_OFFSET);
+	return mt29f_writePage(chip, PAGE(dest_blk), MT29F_DATA_SIZE + MT29F_REMAP_TAG_OFFSET);
 }
 
 
@@ -637,9 +666,9 @@ static void mt29f_ruinSomeBlocks(Mt29f *chip)
 		LOG_INFO("mt29f: erasing block %d\n", bads[i]);
 		mt29f_blockErase(chip, bads[i]);
 
-		LOG_INFO("mt29f: marking page %d as bad\n", bads[i] * MT29F_PAGES_PER_BLOCK);
+		LOG_INFO("mt29f: marking page %d as bad\n", PAGE(bads[i]));
 		memset((void *)NFC_SRAM_BASE_ADDR, 0, MT29F_SPARE_SIZE);
-		mt29f_writePage(chip, bads[i] * MT29F_PAGES_PER_BLOCK, MT29F_DATA_SIZE);
+		mt29f_writePage(chip, PAGE(bads[i]), MT29F_DATA_SIZE);
 	}
 }
 
@@ -720,9 +749,9 @@ static bool commonInit(Mt29f *chip, struct Heap *heap, unsigned chip_select)
 {
 	memset(chip, 0, sizeof(Mt29f));
 
-	DB(chip->kblock.priv.type = KBT_NAND);
-	chip->kblock.blk_size = MT29F_BLOCK_SIZE;
-	chip->kblock.blk_cnt  = MT29F_NUM_USER_BLOCKS;
+	DB(chip->fd.priv.type = KBT_NAND);
+	chip->fd.blk_size = MT29F_BLOCK_SIZE;
+	chip->fd.blk_cnt  = MT29F_NUM_USER_BLOCKS;
 
 	chip->chip_select = chip_select;
 	chip->block_map = heap_allocmem(heap, MT29F_NUM_USER_BLOCKS * sizeof(*chip->block_map));
@@ -751,9 +780,13 @@ static size_t mt29f_writeDirect(struct KBlock *kblk, block_idx_t idx, const void
 	ASSERT(size <= MT29F_BLOCK_SIZE);
 	ASSERT(size % MT29F_DATA_SIZE == 0);
 
+	LOG_INFO("mt29f_writeDirect: blk=%ld\n", idx);
+
+	mt29f_blockErase(MT29F_CAST(kblk), idx);
+
 	while (offset < size)
 	{
-		uint32_t page = (idx * MT29F_PAGES_PER_BLOCK) + (offset / MT29F_DATA_SIZE);
+		uint32_t page = PAGE(idx) + (offset / MT29F_DATA_SIZE);
 
 		if (!mt29f_write(MT29F_CAST(kblk), page, buf, MT29F_DATA_SIZE))
 			break;
@@ -773,9 +806,11 @@ static size_t mt29f_readDirect(struct KBlock *kblk, block_idx_t idx, void *buf, 
 	ASSERT(size <= MT29F_BLOCK_SIZE);
 	ASSERT(size % MT29F_DATA_SIZE == 0);
 
+	LOG_INFO("mt29f_readDirect: blk=%ld\n", idx);
+
 	while (offset < size)
 	{
-		uint32_t page = (idx * MT29F_PAGES_PER_BLOCK) + (offset / MT29F_DATA_SIZE);
+		uint32_t page = PAGE(idx) + (offset / MT29F_DATA_SIZE);
 
 		if (!mt29f_read(MT29F_CAST(kblk), page, buf, MT29F_DATA_SIZE))
 			break;
@@ -831,24 +866,24 @@ bool mt29f_init(Mt29f *chip, struct Heap *heap, unsigned chip_select)
 	if (!commonInit(chip, heap, chip_select))
 		return false;
 
-	chip->kblock.priv.vt = &mt29f_buffered_vt;
-	chip->kblock.priv.flags |= KB_BUFFERED;
+	chip->fd.priv.vt = &mt29f_buffered_vt;
+	chip->fd.priv.flags |= KB_BUFFERED;
 
-	chip->kblock.priv.buf = heap_allocmem(heap, MT29F_BLOCK_SIZE);
-	if (!chip->kblock.priv.buf)
+	chip->fd.priv.buf = heap_allocmem(heap, MT29F_BLOCK_SIZE);
+	if (!chip->fd.priv.buf)
 	{
 		LOG_ERR("mt29f: error allocating block buffer\n");
 		return false;
 	}
 
 	// Load the first block in the cache
-	return mt29f_readDirect(&chip->kblock, 0, chip->kblock.priv.buf, 0, MT29F_DATA_SIZE);
+	return mt29f_readDirect(&chip->fd, 0, chip->fd.priv.buf, 0, MT29F_DATA_SIZE);
 }
 
 
 bool mt29f_initUnbuffered(Mt29f *chip, struct Heap *heap, unsigned chip_select)
 {
-	chip->kblock.priv.vt = &mt29f_unbuffered_vt;
+	chip->fd.priv.vt = &mt29f_unbuffered_vt;
 	return commonInit(chip, heap, chip_select);
 }
 

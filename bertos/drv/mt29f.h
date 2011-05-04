@@ -66,10 +66,10 @@
  */
 typedef struct Mt29f
 {
-	KBlock    kblock;
+	KBlock    fd;           // KBlock descriptor
 
-	uint8_t   chip_select;
-	uint8_t   status;
+	uint8_t   chip_select;  // Chip select where NAND is connected
+	uint8_t   status;       // Status bitmap
 
 	uint16_t *block_map;    // For bad blocks remapping
 	uint16_t  remap_start;  // First unused remap block
