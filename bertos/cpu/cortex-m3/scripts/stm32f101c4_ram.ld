@@ -37,6 +37,12 @@
  */
 
 /*
+ * Define stack size here
+ * Variable used in the cortex-m3_ram.ld file
+ */
+STACK_SIZE = 0x200;
+
+/*
  * Define memory configuration for STM32F101C4
  */
 MEMORY

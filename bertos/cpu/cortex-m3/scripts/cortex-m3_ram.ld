@@ -39,10 +39,6 @@
 OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
 
-/*
- * Define stack size here
- */
-STACK_SIZE = 0x1000;
 
 /*
  * Allocate section memory
@@ -92,6 +88,7 @@ SECTIONS
 	/*
 	 * Allocated stack at the end of bss section.
 	 * Data heap is allocate at end of stack.
+	 * STACK_SIZE variable is defined in the CPU specific linker script file.
 	 */
 	PROVIDE (__msp_start = .);
 	. = ALIGN(8);

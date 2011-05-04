@@ -37,6 +37,12 @@
  */
 
 /*
+ * Define stack size here
+ * Variable used in the cortex-m3_ram.ld file
+ */
+STACK_SIZE = 0x1000;
+
+/*
  * Memory configuration for SAM3N4.
  */
 MEMORY

@@ -37,6 +37,12 @@
  */
 
 /*
+ * Define stack size here
+ * Variable used in the cortex-m3_rom.ld file
+ */
+STACK_SIZE = 0x1000;
+
+/*
  * Define memory configuration for LM3S1968 board
  */
 MEMORY

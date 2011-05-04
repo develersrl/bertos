@@ -35,6 +35,12 @@
  * \author Andrea Righi <arighi@develer.com>
  */
 
+/*
+ * Define stack size here
+ * Variable used in the cortex-m3_rom.ld file
+ */
+STACK_SIZE = 0x1000;
+
 /*/
  * Define memory configuration for LM3S8962 board
  */

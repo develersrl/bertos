@@ -37,6 +37,11 @@
  *
  */
 
+/*
+ * Define stack size here
+ * Variable used in the cortex-m3_rom.ld file
+ */
+STACK_SIZE = 0x400;
 
 /*
  * Define memory configuration for STM32F100RB
