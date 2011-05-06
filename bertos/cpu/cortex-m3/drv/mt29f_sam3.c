@@ -877,8 +877,11 @@ bool mt29f_init(Mt29f *chip, struct Heap *heap, unsigned chip_select)
 
 bool mt29f_initUnbuffered(Mt29f *chip, struct Heap *heap, unsigned chip_select)
 {
+	if (!commonInit(chip, heap, chip_select))
+		return false;
+
 	chip->fd.priv.vt = &mt29f_unbuffered_vt;
-	return commonInit(chip, heap, chip_select);
+	return true;
 }
 
 
