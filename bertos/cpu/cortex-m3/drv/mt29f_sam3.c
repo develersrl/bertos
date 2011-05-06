@@ -432,17 +432,18 @@ static bool mt29f_writePageData(Mt29f *chip, uint32_t page, const void *buf, uin
 
 /*
  * Write the spare area in a page: ECC and remap block index.
+ * \param page           the page to be written
+ * \parma original_page  if different from page, it's the page that's being remapped
  *
  * ECC data are extracted from ECC_PRx registers and written
  * in the page's spare area.
  * For 2048 bytes pages and 1 ECC word each 256 bytes,
  * 24 bytes of ECC data are stored.
  */
-static bool mt29f_writePageSpare(Mt29f *chip, uint32_t page)
+static bool mt29f_writePageSpare(Mt29f *chip, uint32_t page, uint32_t original_page)
 {
 	int i;
 	uint32_t *buf = (uint32_t *)NFC_SRAM_BASE_ADDR;
-	uint16_t blk = BLOCK(page);
 	struct RemapInfo *remap_info = (struct RemapInfo *)(NFC_SRAM_BASE_ADDR + MT29F_REMAP_TAG_OFFSET);
 
 	memset((void *)NFC_SRAM_BASE_ADDR, 0xff, MT29F_SPARE_SIZE);
@@ -450,13 +451,9 @@ static bool mt29f_writePageSpare(Mt29f *chip, uint32_t page)
 	for (i = 0; i < MT29F_ECC_NWORDS; i++)
 		buf[i] = *((reg32_t *)(SMC_BASE + SMC_ECC_PR0_OFF) + i);
 
-	// Check for remapped block
-	if (chip->block_map[blk] != blk)
-		page = PAGE(chip->block_map[blk]) + PAGE_IN_BLOCK(page);
-
 	// Write remap tag
 	remap_info->tag = MT29F_REMAP_TAG;
-	remap_info->mapped_blk = blk;
+	remap_info->mapped_blk = BLOCK(original_page);
 
 	return mt29f_writePage(chip, page, MT29F_DATA_SIZE);
 }
@@ -467,15 +464,12 @@ static bool mt29f_write(Mt29f *chip, uint32_t page, const void *buf, uint16_t si
 	uint32_t remapped_page = PAGE(chip->block_map[BLOCK(page)]) + PAGE_IN_BLOCK(page);
 
 	if (page != remapped_page)
-	{
 		LOG_INFO("mt29f_write: remapped block: blk %d->%d, pg %ld->%ld\n",
 				BLOCK(page), chip->block_map[BLOCK(page)], page, remapped_page);
-		page = remapped_page;
-	}
 
 	return
-		mt29f_writePageData(chip, page, buf, size) &&
-		mt29f_writePageSpare(chip, page);
+		mt29f_writePageData(chip, remapped_page, buf, size) &&
+		mt29f_writePageSpare(chip, remapped_page, page);
 }
 
 
@@ -491,7 +485,7 @@ static bool blockIsGood(Mt29f *chip, uint16_t blk)
 
 	// Check first byte in spare area of first page in block
 	mt29f_readPage(chip, PAGE(blk), MT29F_DATA_SIZE);
-	good = *first_byte == 0xFF;
+	good = *first_byte != 0;
 
 	if (!good)
 		LOG_INFO("mt29f: bad block %d\n", blk);
@@ -576,10 +570,10 @@ static bool chipIsMarked(Mt29f *chip)
  */
 static void initBlockMap(Mt29f *chip)
 {
-	unsigned b, last;
+	int b, last;
 
 	// Default is for each block to not be remapped
-	for (b = 0; b < MT29F_NUM_USER_BLOCKS; b++)
+	for (b = 0; b < MT29F_NUM_BLOCKS; b++)
 		chip->block_map[b] = b;
 	chip->remap_start = MT29F_NUM_USER_BLOCKS;
 
@@ -590,15 +584,12 @@ static void initBlockMap(Mt29f *chip)
 		// Scan for assigned blocks in remap area
 		for (b = last = MT29F_NUM_USER_BLOCKS; b < MT29F_NUM_BLOCKS; b++)
 		{
-			if (blockIsGood(chip, b))
+			int remapped_blk = getBadBlockFromRemapBlock(chip, b);
+			if (remapped_blk != -1 && remapped_blk != b)
 			{
-				int remapped_blk = getBadBlockFromRemapBlock(chip, b);
-				if (remapped_blk != -1 && remapped_blk != MT29F_NULL_REMAP)
-				{
-					LOG_INFO("mt29f: found remapped block %d->%d\n", remapped_blk, b);
-					chip->block_map[remapped_blk] = b;
-					last = b + 1;
-				}
+				LOG_INFO("mt29f: found remapped block %d->%d\n", remapped_blk, b);
+				chip->block_map[remapped_blk] = b;
+				last = b + 1;
 			}
 		}
 		chip->remap_start = last;
@@ -626,7 +617,7 @@ static void initBlockMap(Mt29f *chip)
 		 */
 		if (!remapped_anything)
 		{
-			setMapping(chip, MT29F_NULL_REMAP, MT29F_NUM_USER_BLOCKS);
+			setMapping(chip, MT29F_NUM_USER_BLOCKS, MT29F_NUM_USER_BLOCKS);
 			LOG_INFO("mt29f: no bad block founds, marked NAND\n");
 		}
 	}
@@ -636,18 +627,21 @@ static void initBlockMap(Mt29f *chip)
 #ifdef _DEBUG
 
 /*
- * Erase all blocks.
+ * Reset bad blocks map and erase all blocks.
  * DON'T USE on production chips: this function will try to erase
  * factory marked bad blocks too.
  */
 static void mt29f_wipe(Mt29f *chip)
 {
 	int b;
+
 	for (b = 0; b < MT29F_NUM_BLOCKS; b++)
 	{
 		LOG_INFO("mt29f: erasing block %d\n", b);
+		chip->block_map[b] = b;
 		mt29f_blockErase(chip, b);
 	}
+	chip->remap_start = MT29F_NUM_USER_BLOCKS;
 }
 
 /*
@@ -754,7 +748,7 @@ static bool commonInit(Mt29f *chip, struct Heap *heap, unsigned chip_select)
 	chip->fd.blk_cnt  = MT29F_NUM_USER_BLOCKS;
 
 	chip->chip_select = chip_select;
-	chip->block_map = heap_allocmem(heap, MT29F_NUM_USER_BLOCKS * sizeof(*chip->block_map));
+	chip->block_map = heap_allocmem(heap, MT29F_NUM_BLOCKS * sizeof(*chip->block_map));
 	if (!chip->block_map)
 	{
 		LOG_ERR("mt29f: error allocating block map\n");

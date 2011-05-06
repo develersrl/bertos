@@ -51,8 +51,6 @@
 #define MT29F_ECC_NWORDS        (MT29F_DATA_SIZE / 256)
 #define MT29F_REMAP_TAG_OFFSET  0x38
 #define MT29F_REMAP_TAG         0x3e10c8ed
-// Used to setup a dummy remup
-#define MT29F_NULL_REMAP        0xfffe
 
 // Number of reserved block for remapping
 #define MT29F_NUM_REMAP_BLOCKS  128
