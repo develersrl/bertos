@@ -882,7 +882,7 @@ bool mt29f_init(Mt29f *chip, struct Heap *heap, unsigned chip_select)
 	}
 
 	// Load the first block in the cache
-	return mt29f_readDirect(&chip->fd, 0, chip->fd.priv.buf, 0, MT29F_DATA_SIZE);
+	return mt29f_readDirect(&chip->fd, 0, chip->fd.priv.buf, 0, chip->fd.blk_size);
 }
 
 
