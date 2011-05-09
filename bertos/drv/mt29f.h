@@ -95,9 +95,14 @@ struct Heap;
 bool mt29f_init(Mt29f *chip, struct Heap *heap, unsigned chip_select);
 bool mt29f_initUnbuffered(Mt29f *chip, struct Heap *heap, unsigned chip_select);
 
-// Private functions: use at your own risk, could change in any moment
+// NAND specific functions
 bool mt29f_getDevId(Mt29f *chip, uint8_t dev_id[5]);
 int mt29f_blockErase(Mt29f *chip, uint16_t block);
+void mt29f_format(Mt29f *chip);
+
+#ifdef _DEBUG
+void mt29f_ruinSomeBlocks(Mt29f *chip);
+#endif
 
 
 #endif /* DRV_MT29F_H */

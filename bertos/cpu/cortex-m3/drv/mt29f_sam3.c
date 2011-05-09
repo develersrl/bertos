@@ -624,14 +624,13 @@ static void initBlockMap(Mt29f *chip)
 }
 
 
-#ifdef _DEBUG
-
-/*
+/**
  * Reset bad blocks map and erase all blocks.
- * DON'T USE on production chips: this function will try to erase
- * factory marked bad blocks too.
+ *
+ * \note DON'T USE on production chips: this function will try to erase
+ *       factory marked bad blocks too.
  */
-static void mt29f_wipe(Mt29f *chip)
+void mt29f_format(Mt29f *chip)
 {
 	int b;
 
@@ -644,10 +643,12 @@ static void mt29f_wipe(Mt29f *chip)
 	chip->remap_start = MT29F_NUM_USER_BLOCKS;
 }
 
+#ifdef _DEBUG
+
 /*
  * Create some bad blocks, erasing them and writing the bad block mark.
  */
-static void mt29f_ruinSomeBlocks(Mt29f *chip)
+void mt29f_ruinSomeBlocks(Mt29f *chip)
 {
 	int bads[] = { 7, 99, 555, 1003, 1004, 1432 };
 	unsigned i;
