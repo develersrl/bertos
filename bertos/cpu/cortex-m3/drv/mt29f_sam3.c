@@ -346,9 +346,11 @@ static bool mt29f_readPage(Mt29f *chip, uint32_t page, uint16_t offset)
  * Read page data and ECC, checking for errors.
  * TODO: fix errors with ECC when possible.
  */
-static bool mt29f_read(Mt29f *chip, uint32_t page, void *buf, uint16_t size)
+static bool mt29f_read(Mt29f *chip, uint32_t page, void *buf, uint16_t offset, uint16_t size)
 {
 	uint32_t remapped_page = PAGE(chip->block_map[BLOCK(page)]) + PAGE_IN_BLOCK(page);
+
+	//LOG_INFO("mt29f_read: page=%ld, offset=%d, size=%d\n", page, offset, size);
 
 	if (page != remapped_page)
 	{
@@ -360,7 +362,7 @@ static bool mt29f_read(Mt29f *chip, uint32_t page, void *buf, uint16_t size)
 	if (!mt29f_readPage(chip, page, 0))
 		return false;
 
-	memcpy(buf, (void *)NFC_SRAM_BASE_ADDR, size);
+	memcpy(buf, (void *)(NFC_SRAM_BASE_ADDR + offset), size);
 
 	return checkEcc(chip);
 }
@@ -775,7 +777,7 @@ static size_t mt29f_writeDirect(struct KBlock *kblk, block_idx_t idx, const void
 	ASSERT(size <= MT29F_BLOCK_SIZE);
 	ASSERT(size % MT29F_DATA_SIZE == 0);
 
-	LOG_INFO("mt29f_writeDirect: blk=%ld\n", idx);
+	//LOG_INFO("mt29f_writeDirect: idx=%ld offset=%d size=%d\n", idx, offset, size);
 
 	mt29f_blockErase(MT29F_CAST(kblk), idx);
 
@@ -796,25 +798,30 @@ static size_t mt29f_writeDirect(struct KBlock *kblk, block_idx_t idx, const void
 
 static size_t mt29f_readDirect(struct KBlock *kblk, block_idx_t idx, void *buf, size_t offset, size_t size)
 {
-	ASSERT(offset <= MT29F_BLOCK_SIZE);
-	ASSERT(offset % MT29F_DATA_SIZE == 0);
+	uint32_t page;
+	size_t   read_size;
+	size_t   read_offset;
+	size_t   nread = 0;
+
+	ASSERT(offset < MT29F_BLOCK_SIZE);
 	ASSERT(size <= MT29F_BLOCK_SIZE);
-	ASSERT(size % MT29F_DATA_SIZE == 0);
 
-	LOG_INFO("mt29f_readDirect: blk=%ld\n", idx);
+	//LOG_INFO("mt29f_readDirect: idx=%ld offset=%d size=%d\n", idx, offset, size);
 
-	while (offset < size)
+	while (nread < size)
 	{
-		uint32_t page = PAGE(idx) + (offset / MT29F_DATA_SIZE);
+		page        = PAGE(idx) + (offset / MT29F_DATA_SIZE);
+		read_offset = offset % MT29F_DATA_SIZE;
+		read_size   = MIN(size, MT29F_DATA_SIZE - read_offset);
 
-		if (!mt29f_read(MT29F_CAST(kblk), page, buf, MT29F_DATA_SIZE))
+		if (!mt29f_read(MT29F_CAST(kblk), page, (char *)buf + nread, read_offset, read_size))
 			break;
 
-		offset += MT29F_DATA_SIZE;
-		buf = (char *)buf + MT29F_DATA_SIZE;
+		offset += read_size;
+		nread  += read_size;
 	}
 
-	return offset;
+	return nread;
 }
 
 
@@ -856,6 +863,9 @@ static const KBlockVTable mt29f_unbuffered_vt =
 };
 
 
+/**
+ * Initialize NAND kblock driver in buffered mode.
+ */
 bool mt29f_init(Mt29f *chip, struct Heap *heap, unsigned chip_select)
 {
 	if (!commonInit(chip, heap, chip_select))
@@ -876,6 +886,9 @@ bool mt29f_init(Mt29f *chip, struct Heap *heap, unsigned chip_select)
 }
 
 
+/**
+ * Initialize NAND kblock driver in unbuffered mode.
+ */
 bool mt29f_initUnbuffered(Mt29f *chip, struct Heap *heap, unsigned chip_select)
 {
 	if (!commonInit(chip, heap, chip_select))
@@ -884,5 +897,4 @@ bool mt29f_initUnbuffered(Mt29f *chip, struct Heap *heap, unsigned chip_select)
 	chip->fd.priv.vt = &mt29f_unbuffered_vt;
 	return true;
 }
-
 
