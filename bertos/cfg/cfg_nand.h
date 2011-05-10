@@ -31,11 +31,11 @@
  *
  * \author Stefano Fedrigo <aleph@develer.com>
  *
- * \brief Configuration file for MT29F driver module.
+ * \brief Configuration file for NAND driver module.
  */
 
-#ifndef CFG_MT29F_H
-#define CFG_MT29F_H
+#ifndef CFG_NAND_H
+#define CFG_NAND_H
 
 /**
  * Page data size
@@ -44,7 +44,7 @@
  *
  * $WIZ$ type = "int"
  */
-#define CONFIG_MT29F_DATA_SIZE         2048
+#define CONFIG_NAND_DATA_SIZE         2048
 
 /**
  * Page spare area size
@@ -53,7 +53,7 @@
  *
  * $WIZ$ type = "int"
  */
-#define CONFIG_MT29F_SPARE_SIZE        64
+#define CONFIG_NAND_SPARE_SIZE        64
 
 /**
  * Pages per block
@@ -62,7 +62,7 @@
  *
  * $WIZ$ type = "int"
  */
-#define CONFIG_MT29F_PAGES_PER_BLOCK   64
+#define CONFIG_NAND_PAGES_PER_BLOCK   64
 
 /**
  * Number of blocks
@@ -71,7 +71,7 @@
  *
  * $WIZ$ type = "int"
  */
-#define CONFIG_MT29F_NUM_BLOCK        2048
+#define CONFIG_NAND_NUM_BLOCK        2048
 
 /**
  * Number of reserved blocks
@@ -80,7 +80,7 @@
  *
  * $WIZ$ type = "int"
  */
-#define CONFIG_MT29F_NUM_REMAP_BLOCKS  128
+#define CONFIG_NAND_NUM_REMAP_BLOCKS  128
 
 /**
  * NAND operations timeout
@@ -90,7 +90,7 @@
  *
  * $WIZ$ type = "int"
  */
-#define CONFIG_MT29F_TMOUT      100
+#define CONFIG_NAND_TMOUT      100
 
 /**
  * Module logging level
@@ -98,7 +98,7 @@
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_level"
  */
-#define CONFIG_MT29F_LOG_LEVEL      LOG_LVL_INFO
+#define CONFIG_NAND_LOG_LEVEL      LOG_LVL_INFO
 
 /**
  * Module logging format
@@ -106,6 +106,6 @@
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_format"
  */
-#define CONFIG_MT29F_LOG_FORMAT     LOG_FMT_TERSE
+#define CONFIG_NAND_LOG_FORMAT     LOG_FMT_TERSE
 
-#endif /* CFG_MT29F_H */
+#endif /* CFG_NAND_H */

@@ -30,13 +30,13 @@
  *
  * -->
  *
- * \brief Micron MT29F serial NAND driver for SAM3's static memory controller.
+ * \brief NAND driver for SAM3's static memory controller.
  *
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-#include "mt29f_sam3.h"
-#include <drv/mt29f.h>
+#include "nand_sam3.h"
+#include <drv/nand.h>
 #include <cfg/log.h>
 #include <cfg/macros.h>
 #include <io/sam3.h>
@@ -50,21 +50,21 @@
 /*
  * PIO definitions.
  */
-#define MT29F_PIN_CE        BV(6)
-#define MT29F_PIN_RB        BV(2)
-#define MT29F_PINS_PORTA    (MT29F_PIN_CE | MT29F_PIN_RB)
-#define MT29F_PERIPH_PORTA  PIO_PERIPH_B
+#define NAND_PIN_CE        BV(6)
+#define NAND_PIN_RB        BV(2)
+#define NAND_PINS_PORTA    (NAND_PIN_CE | NAND_PIN_RB)
+#define NAND_PERIPH_PORTA  PIO_PERIPH_B
 
-#define MT29F_PIN_OE        BV(19)
-#define MT29F_PIN_WE        BV(20)
-#define MT29F_PIN_IO        0x0000FFFF
-#define MT29F_PINS_PORTC    (MT29F_PIN_OE | MT29F_PIN_WE | MT29F_PIN_IO)
-#define MT29F_PERIPH_PORTC  PIO_PERIPH_A
+#define NAND_PIN_OE        BV(19)
+#define NAND_PIN_WE        BV(20)
+#define NAND_PIN_IO        0x0000FFFF
+#define NAND_PINS_PORTC    (NAND_PIN_OE | NAND_PIN_WE | NAND_PIN_IO)
+#define NAND_PERIPH_PORTC  PIO_PERIPH_A
 
-#define MT29F_PIN_CLE       BV(9)
-#define MT29F_PIN_ALE       BV(8)
-#define MT29F_PINS_PORTD    (MT29F_PIN_CLE | MT29F_PIN_ALE)
-#define MT29F_PERIPH_PORTD  PIO_PERIPH_A
+#define NAND_PIN_CLE       BV(9)
+#define NAND_PIN_ALE       BV(8)
+#define NAND_PINS_PORTD    (NAND_PIN_CLE | NAND_PIN_ALE)
+#define NAND_PERIPH_PORTD  PIO_PERIPH_A
 
 
 /*
@@ -72,7 +72,7 @@
  * signal.
  * Return true for edge detection, false in case of timeout.
  */
-bool mt29f_waitReadyBusy(UNUSED_ARG(Mt29f *, chip), time_t timeout)
+bool nand_waitReadyBusy(UNUSED_ARG(Mt29f *, chip), time_t timeout)
 {
 	time_t start = timer_clock();
 
@@ -81,7 +81,7 @@ bool mt29f_waitReadyBusy(UNUSED_ARG(Mt29f *, chip), time_t timeout)
 		cpu_relax();
 		if (timer_clock() - start > timeout)
 		{
-			LOG_INFO("mt29f: R/B timeout\n");
+			LOG_INFO("nand: R/B timeout\n");
 			return false;
 		}
 	}
@@ -93,7 +93,7 @@ bool mt29f_waitReadyBusy(UNUSED_ARG(Mt29f *, chip), time_t timeout)
  * Wait for transfer to complete until timeout.
  * If transfer completes return true, false in case of timeout.
  */
-bool mt29f_waitTransferComplete(UNUSED_ARG(Mt29f *, chip), time_t timeout)
+bool nand_waitTransferComplete(UNUSED_ARG(Mt29f *, chip), time_t timeout)
 {
 	time_t start = timer_clock();
 
@@ -102,7 +102,7 @@ bool mt29f_waitTransferComplete(UNUSED_ARG(Mt29f *, chip), time_t timeout)
 		cpu_relax();
 		if (timer_clock() - start > timeout)
 		{
-			LOG_INFO("mt29f: xfer complete timeout\n");
+			LOG_INFO("nand: xfer complete timeout\n");
 			return false;
 		}
 	}
@@ -114,7 +114,7 @@ bool mt29f_waitTransferComplete(UNUSED_ARG(Mt29f *, chip), time_t timeout)
 /*
  * Send command to NAND and wait for completion.
  */
-void mt29f_sendCommand(Mt29f *chip,
+void nand_sendCommand(Mt29f *chip,
 		uint32_t cmd1, uint32_t cmd2,
 		int num_cycles, uint32_t cycle0, uint32_t cycle1234)
 {
@@ -133,11 +133,11 @@ void mt29f_sendCommand(Mt29f *chip,
 		| cmd2 << 10;
 
 	// Check for commands transferring data
-	if (cmd1 == MT29F_CMD_WRITE_1 || cmd1 == MT29F_CMD_READ_1 || cmd1 == MT29F_CMD_READID)
+	if (cmd1 == NAND_CMD_WRITE_1 || cmd1 == NAND_CMD_READ_1 || cmd1 == NAND_CMD_READID)
 		cmd_val |= NFC_CMD_NFCEN;
 
 	// Check for commands writing data
-	if (cmd1 == MT29F_CMD_WRITE_1)
+	if (cmd1 == NAND_CMD_WRITE_1)
 		cmd_val |= NFC_CMD_NFCWR;
 
 	// Check for two command cycles
@@ -157,25 +157,25 @@ void mt29f_sendCommand(Mt29f *chip,
  * NOTE: this is global between different chip selects, so returns
  * the status register of the last used NAND chip.
  */
-uint8_t mt29f_getChipStatus(UNUSED_ARG(Mt29f *, chip))
+uint8_t nand_getChipStatus(UNUSED_ARG(Mt29f *, chip))
 {
 	return (uint8_t)HWREG(NFC_CMD_BASE_ADDR);
 }
 
 
-void *mt29f_dataBuffer(UNUSED_ARG(Mt29f *, chip))
+void *nand_dataBuffer(UNUSED_ARG(Mt29f *, chip))
 {
 	return (void *)NFC_SRAM_BASE_ADDR;
 }
 
 
-bool mt29f_checkEcc(Mt29f *chip)
+bool nand_checkEcc(Mt29f *chip)
 {
 	uint32_t sr1 = SMC_ECC_SR1;
 	if (sr1)
 	{
 		LOG_INFO("ECC error, ECC_SR1=0x%lx\n", sr1);
-		chip->status |= MT29F_ERR_ECC;
+		chip->status |= NAND_ERR_ECC;
 		return false;
 	}
 	else
@@ -192,7 +192,7 @@ bool mt29f_checkEcc(Mt29f *chip)
  * \param ecc       pointer to buffer where computed ECC is stored
  * \param ecc_size  max size for ecc buffer
  */
-void mt29f_computeEcc(UNUSED_ARG(Mt29f *, chip),
+void nand_computeEcc(UNUSED_ARG(Mt29f *, chip),
 		UNUSED_ARG(const void *, buf), UNUSED_ARG(size_t, size), uint32_t *ecc, size_t ecc_size)
 {
 	size_t i;
@@ -201,7 +201,7 @@ void mt29f_computeEcc(UNUSED_ARG(Mt29f *, chip),
 }
 
 
-void mt29f_hwInit(UNUSED_ARG(Mt29f *, chip))
+void nand_hwInit(UNUSED_ARG(Mt29f *, chip))
 {
 	// FIXME: Parameters specific for MT29F8G08AAD
 
@@ -210,17 +210,17 @@ void mt29f_hwInit(UNUSED_ARG(Mt29f *, chip))
 	pmc_periphEnable(PIOC_ID);
 	pmc_periphEnable(PIOD_ID);
 
-	PIO_PERIPH_SEL(PIOA_BASE, MT29F_PINS_PORTA, MT29F_PERIPH_PORTA);
-	PIOA_PDR = MT29F_PINS_PORTA;
-	PIOA_PUER = MT29F_PINS_PORTA;
+	PIO_PERIPH_SEL(PIOA_BASE, NAND_PINS_PORTA, NAND_PERIPH_PORTA);
+	PIOA_PDR = NAND_PINS_PORTA;
+	PIOA_PUER = NAND_PINS_PORTA;
 
-	PIO_PERIPH_SEL(PIOC_BASE, MT29F_PINS_PORTC, MT29F_PERIPH_PORTC);
-	PIOC_PDR = MT29F_PINS_PORTC;
-	PIOC_PUER = MT29F_PINS_PORTC;
+	PIO_PERIPH_SEL(PIOC_BASE, NAND_PINS_PORTC, NAND_PERIPH_PORTC);
+	PIOC_PDR = NAND_PINS_PORTC;
+	PIOC_PUER = NAND_PINS_PORTC;
 
-	PIO_PERIPH_SEL(PIOD_BASE, MT29F_PINS_PORTD, MT29F_PERIPH_PORTD);
-	PIOD_PDR = MT29F_PINS_PORTD;
-	PIOD_PUER = MT29F_PINS_PORTD;
+	PIO_PERIPH_SEL(PIOD_BASE, NAND_PINS_PORTD, NAND_PERIPH_PORTD);
+	PIOD_PDR = NAND_PINS_PORTD;
+	PIOD_PUER = NAND_PINS_PORTD;
 
     pmc_periphEnable(SMC_SDRAMC_ID);
 

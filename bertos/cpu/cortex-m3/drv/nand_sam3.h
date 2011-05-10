@@ -30,14 +30,14 @@
  *
  * -->
  *
- * \brief Micron MT29F serial NAND driver for SAM3's static memory controller (interface).
+ * \brief NAND driver for SAM3's static memory controller (interface).
  *
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-#ifndef MT29F_SAM3_H
-#define MT29F_SAM3_H
+#ifndef NAND_SAM3_H
+#define NAND_SAM3_H
 
 
-#endif /* MT29F_SAM3_H */
+#endif /* NAND_SAM3_H */
 
