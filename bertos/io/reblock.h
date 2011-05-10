@@ -33,6 +33,9 @@
  * \brief KBlock block size reducer
  *
  * \author Stefano Fedrigo <aleph@develer.com>
+ *
+ * $WIZ$ module_name = "reblock"
+ * $WIZ$ module_depends = "kblock"
  */
 
 #ifndef REBLOCK_H
