@@ -38,45 +38,6 @@
 #ifndef MT29F_SAM3_H
 #define MT29F_SAM3_H
 
-#include <drv/mt29f.h>
-
-
-// MT29F2G08AAD, FIXME: configurable
-#define MT29F_DATA_SIZE         0x800       // 2048 B
-#define MT29F_SPARE_SIZE        0x40        // 64 B
-#define MT29F_PAGE_SIZE         (MT29F_DATA_SIZE + MT29F_SPARE_SIZE)
-#define MT29F_PAGES_PER_BLOCK   64
-#define MT29F_BLOCK_SIZE        (MT29F_DATA_SIZE * MT29F_PAGES_PER_BLOCK)
-#define MT29F_NUM_BLOCKS        2048
-#define MT29F_ECC_NWORDS        (MT29F_DATA_SIZE / 256)
-#define MT29F_REMAP_TAG_OFFSET  0x38
-#define MT29F_REMAP_TAG         0x3e10c8ed
-
-// Number of reserved block for remapping
-#define MT29F_NUM_REMAP_BLOCKS  128
-// Number of usable blocks, and index of first remapping block
-#define MT29F_NUM_USER_BLOCKS   (MT29F_NUM_BLOCKS - MT29F_NUM_REMAP_BLOCKS)
-
-
-/*
- * PIO definitions.
- */
-#define MT29F_PIN_CE        BV(6)
-#define MT29F_PIN_RB        BV(2)
-#define MT29F_PINS_PORTA    (MT29F_PIN_CE | MT29F_PIN_RB)
-#define MT29F_PERIPH_PORTA  PIO_PERIPH_B
-
-#define MT29F_PIN_OE        BV(19)
-#define MT29F_PIN_WE        BV(20)
-#define MT29F_PIN_IO        0x0000FFFF
-#define MT29F_PINS_PORTC    (MT29F_PIN_OE | MT29F_PIN_WE | MT29F_PIN_IO)
-#define MT29F_PERIPH_PORTC  PIO_PERIPH_A
-
-#define MT29F_PIN_CLE       BV(9)
-#define MT29F_PIN_ALE       BV(8)
-#define MT29F_PINS_PORTD    (MT29F_PIN_CLE | MT29F_PIN_ALE)
-#define MT29F_PERIPH_PORTD  PIO_PERIPH_A
-
 
 #endif /* MT29F_SAM3_H */
 

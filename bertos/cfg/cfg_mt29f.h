@@ -38,7 +38,62 @@
 #define CFG_MT29F_H
 
 /**
- * Module logging level.
+ * Page data size
+ *
+ * Size of the data section of a programmable page in bytes.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_MT29F_DATA_SIZE         2048
+
+/**
+ * Page spare area size
+ *
+ * Size of the spare section of a programmable page in bytes.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_MT29F_SPARE_SIZE        64
+
+/**
+ * Pages per block
+ *
+ * Number of pages in a erase block.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_MT29F_PAGES_PER_BLOCK   64
+
+/**
+ * Number of blocks
+ *
+ * Total number of erase blocks in one NAND chip.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_MT29F_NUM_BLOCK        2048
+
+/**
+ * Number of reserved blocks
+ *
+ * Blocks reserved for remapping defective NAND blocks.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_MT29F_NUM_REMAP_BLOCKS  128
+
+/**
+ * NAND operations timeout
+ *
+ * How many milliseconds the cpu waits for
+ * completion of NAND operations.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_MT29F_TMOUT      100
+
+/**
+ * Module logging level
  *
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_level"
@@ -46,22 +101,11 @@
 #define CONFIG_MT29F_LOG_LEVEL      LOG_LVL_INFO
 
 /**
- * module logging format.
+ * Module logging format
  *
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_format"
  */
 #define CONFIG_MT29F_LOG_FORMAT     LOG_FMT_TERSE
-
-#if 0
-/**
- * Write emb flash timeout.
- * For how many milliseconds the cpu wait
- * to complete write operation.
- *
- * $WIZ$ type = "int"
- */
-#define CONFIG_FLASH_WR_TIMEOUT      100
-#endif
 
 #endif /* CFG_MT29F_H */

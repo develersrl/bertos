@@ -31,9 +31,6 @@
 *
 * \brief Micron MT29F serial NAND driver
 *
-* This module allows read/write access to Micron MT29F serial
-* NANDs.
-*
 * \author Stefano Fedrigo <aleph@develer.com>
 *
 * $WIZ$ module_name = "mt29f"
@@ -49,6 +46,10 @@
 #include <io/kblock.h>
 
 
+// Define log settings for cfg/log.h
+#define LOG_LEVEL    CONFIG_MT29F_LOG_LEVEL
+#define LOG_FORMAT   CONFIG_MT29F_LOG_FORMAT
+
 /**
  * \name Error codes.
  * \{
@@ -59,6 +60,39 @@
 #define MT29F_ERR_WR_TMOUT  BV(4)   ///< Write timeout
 #define MT29F_ERR_ECC       BV(5)   ///< Unrecoverable ECC error
 /** \} */
+
+#define MT29F_PAGE_SIZE         (CONFIG_MT29F_DATA_SIZE + CONFIG_MT29F_SPARE_SIZE)
+#define MT29F_BLOCK_SIZE        (CONFIG_MT29F_DATA_SIZE * CONFIG_MT29F_PAGES_PER_BLOCK)
+
+// Number of usable blocks, and index of first remapping block
+#define MT29F_NUM_USER_BLOCKS   (CONFIG_MT29F_NUM_BLOCK - CONFIG_MT29F_NUM_REMAP_BLOCKS)
+
+
+// NAND commands
+#define MT29F_CMD_READ_1               0x00
+#define MT29F_CMD_READ_2               0x30
+#define MT29F_CMD_COPYBACK_READ_1      0x00
+#define MT29F_CMD_COPYBACK_READ_2      0x35
+#define MT29F_CMD_COPYBACK_PROGRAM_1   0x85
+#define MT29F_CMD_COPYBACK_PROGRAM_2   0x10
+#define MT29F_CMD_RANDOM_OUT           0x05
+#define MT29F_CMD_RANDOM_OUT_2         0xE0
+#define MT29F_CMD_RANDOM_IN            0x85
+#define MT29F_CMD_READID               0x90
+#define MT29F_CMD_WRITE_1              0x80
+#define MT29F_CMD_WRITE_2              0x10
+#define MT29F_CMD_ERASE_1              0x60
+#define MT29F_CMD_ERASE_2              0xD0
+#define MT29F_CMD_STATUS               0x70
+#define MT29F_CMD_RESET                0xFF
+
+
+// Get block from page
+#define PAGE(blk)            ((blk) * CONFIG_MT29F_PAGES_PER_BLOCK)
+
+// Page from block and page in block
+#define BLOCK(page)          ((uint16_t)((page) / CONFIG_MT29F_PAGES_PER_BLOCK))
+#define PAGE_IN_BLOCK(page)  ((uint16_t)((page) % CONFIG_MT29F_PAGES_PER_BLOCK))
 
 
 /**
@@ -104,5 +138,15 @@ void mt29f_format(Mt29f *chip);
 void mt29f_ruinSomeBlocks(Mt29f *chip);
 #endif
 
+// Hardware specific functions, implemented by cpu specific module
+bool mt29f_waitReadyBusy(Mt29f *chip, time_t timeout);
+bool mt29f_waitTransferComplete(Mt29f *chip, time_t timeout);
+void mt29f_sendCommand(Mt29f *chip, uint32_t cmd1, uint32_t cmd2,
+		int num_cycles, uint32_t cycle0, uint32_t cycle1234);
+uint8_t mt29f_getChipStatus(Mt29f *chip);
+void *mt29f_dataBuffer(Mt29f *chip);
+bool mt29f_checkEcc(Mt29f *chip);
+void mt29f_computeEcc(Mt29f *chip, const void *buf, size_t size, uint32_t *ecc, size_t ecc_size);
+void mt29f_hwInit(Mt29f *chip);
 
 #endif /* DRV_MT29F_H */
