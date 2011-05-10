@@ -98,7 +98,7 @@
 /**
  * NAND context.
  */
-typedef struct Mt29f
+typedef struct Nand
 {
 	KBlock    fd;           // KBlock descriptor
 
@@ -107,7 +107,7 @@ typedef struct Mt29f
 
 	uint16_t *block_map;    // For bad blocks remapping
 	uint16_t  remap_start;  // First unused remap block
-} Mt29f;
+} Nand;
 
 /*
  * Kblock id.
@@ -117,36 +117,36 @@ typedef struct Mt29f
 /**
 * Convert + ASSERT from generic KBlock to NAND context.
 */
-INLINE Mt29f *NAND_CAST(KBlock *kb)
+INLINE Nand *NAND_CAST(KBlock *kb)
 {
 	ASSERT(kb->priv.type == KBT_NAND);
-	return (Mt29f *)kb;
+	return (Nand *)kb;
 }
 
 struct Heap;
 
 // Kblock interface
-bool nand_init(Mt29f *chip, struct Heap *heap, unsigned chip_select);
-bool nand_initUnbuffered(Mt29f *chip, struct Heap *heap, unsigned chip_select);
+bool nand_init(Nand *chip, struct Heap *heap, unsigned chip_select);
+bool nand_initUnbuffered(Nand *chip, struct Heap *heap, unsigned chip_select);
 
 // NAND specific functions
-bool nand_getDevId(Mt29f *chip, uint8_t dev_id[5]);
-int nand_blockErase(Mt29f *chip, uint16_t block);
-void nand_format(Mt29f *chip);
+bool nand_getDevId(Nand *chip, uint8_t dev_id[5]);
+int nand_blockErase(Nand *chip, uint16_t block);
+void nand_format(Nand *chip);
 
 #ifdef _DEBUG
-void nand_ruinSomeBlocks(Mt29f *chip);
+void nand_ruinSomeBlocks(Nand *chip);
 #endif
 
 // Hardware specific functions, implemented by cpu specific module
-bool nand_waitReadyBusy(Mt29f *chip, time_t timeout);
-bool nand_waitTransferComplete(Mt29f *chip, time_t timeout);
-void nand_sendCommand(Mt29f *chip, uint32_t cmd1, uint32_t cmd2,
+bool nand_waitReadyBusy(Nand *chip, time_t timeout);
+bool nand_waitTransferComplete(Nand *chip, time_t timeout);
+void nand_sendCommand(Nand *chip, uint32_t cmd1, uint32_t cmd2,
 		int num_cycles, uint32_t cycle0, uint32_t cycle1234);
-uint8_t nand_getChipStatus(Mt29f *chip);
-void *nand_dataBuffer(Mt29f *chip);
-bool nand_checkEcc(Mt29f *chip);
-void nand_computeEcc(Mt29f *chip, const void *buf, size_t size, uint32_t *ecc, size_t ecc_size);
-void nand_hwInit(Mt29f *chip);
+uint8_t nand_getChipStatus(Nand *chip);
+void *nand_dataBuffer(Nand *chip);
+bool nand_checkEcc(Nand *chip);
+void nand_computeEcc(Nand *chip, const void *buf, size_t size, uint32_t *ecc, size_t ecc_size);
+void nand_hwInit(Nand *chip);
 
 #endif /* DRV_NAND_H */

@@ -72,7 +72,7 @@
  * signal.
  * Return true for edge detection, false in case of timeout.
  */
-bool nand_waitReadyBusy(UNUSED_ARG(Mt29f *, chip), time_t timeout)
+bool nand_waitReadyBusy(UNUSED_ARG(Nand *, chip), time_t timeout)
 {
 	time_t start = timer_clock();
 
@@ -93,7 +93,7 @@ bool nand_waitReadyBusy(UNUSED_ARG(Mt29f *, chip), time_t timeout)
  * Wait for transfer to complete until timeout.
  * If transfer completes return true, false in case of timeout.
  */
-bool nand_waitTransferComplete(UNUSED_ARG(Mt29f *, chip), time_t timeout)
+bool nand_waitTransferComplete(UNUSED_ARG(Nand *, chip), time_t timeout)
 {
 	time_t start = timer_clock();
 
@@ -114,7 +114,7 @@ bool nand_waitTransferComplete(UNUSED_ARG(Mt29f *, chip), time_t timeout)
 /*
  * Send command to NAND and wait for completion.
  */
-void nand_sendCommand(Mt29f *chip,
+void nand_sendCommand(Nand *chip,
 		uint32_t cmd1, uint32_t cmd2,
 		int num_cycles, uint32_t cycle0, uint32_t cycle1234)
 {
@@ -157,19 +157,19 @@ void nand_sendCommand(Mt29f *chip,
  * NOTE: this is global between different chip selects, so returns
  * the status register of the last used NAND chip.
  */
-uint8_t nand_getChipStatus(UNUSED_ARG(Mt29f *, chip))
+uint8_t nand_getChipStatus(UNUSED_ARG(Nand *, chip))
 {
 	return (uint8_t)HWREG(NFC_CMD_BASE_ADDR);
 }
 
 
-void *nand_dataBuffer(UNUSED_ARG(Mt29f *, chip))
+void *nand_dataBuffer(UNUSED_ARG(Nand *, chip))
 {
 	return (void *)NFC_SRAM_BASE_ADDR;
 }
 
 
-bool nand_checkEcc(Mt29f *chip)
+bool nand_checkEcc(Nand *chip)
 {
 	uint32_t sr1 = SMC_ECC_SR1;
 	if (sr1)
@@ -192,7 +192,7 @@ bool nand_checkEcc(Mt29f *chip)
  * \param ecc       pointer to buffer where computed ECC is stored
  * \param ecc_size  max size for ecc buffer
  */
-void nand_computeEcc(UNUSED_ARG(Mt29f *, chip),
+void nand_computeEcc(UNUSED_ARG(Nand *, chip),
 		UNUSED_ARG(const void *, buf), UNUSED_ARG(size_t, size), uint32_t *ecc, size_t ecc_size)
 {
 	size_t i;
@@ -201,7 +201,7 @@ void nand_computeEcc(UNUSED_ARG(Mt29f *, chip),
 }
 
 
-void nand_hwInit(UNUSED_ARG(Mt29f *, chip))
+void nand_hwInit(UNUSED_ARG(Nand *, chip))
 {
 	// FIXME: Parameters specific for MT29F8G08AAD
 

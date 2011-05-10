@@ -89,14 +89,14 @@ static void getAddrCycles(uint32_t page, uint16_t offset, uint32_t *cycle0, uint
 }
 
 
-static void chipReset(Mt29f *chip)
+static void chipReset(Nand *chip)
 {
 	nand_sendCommand(chip, NAND_CMD_RESET, 0, 0, 0, 0);
 	nand_waitReadyBusy(chip, CONFIG_NAND_TMOUT);
 }
 
 
-static bool isOperationComplete(Mt29f *chip)
+static bool isOperationComplete(Nand *chip)
 {
 	uint8_t status;
 
@@ -110,7 +110,7 @@ static bool isOperationComplete(Mt29f *chip)
 /**
  * Erase the whole block.
  */
-int nand_blockErase(Mt29f *chip, uint16_t block)
+int nand_blockErase(Nand *chip, uint16_t block)
 {
 	uint32_t cycle0;
 	uint32_t cycle1234;
@@ -142,7 +142,7 @@ int nand_blockErase(Mt29f *chip, uint16_t block)
 /**
  * Read Device ID and configuration codes.
  */
-bool nand_getDevId(Mt29f *chip, uint8_t dev_id[5])
+bool nand_getDevId(Nand *chip, uint8_t dev_id[5])
 {
 	nand_sendCommand(chip, NAND_CMD_READID, 0, 1, 0, 0);
 
@@ -159,7 +159,7 @@ bool nand_getDevId(Mt29f *chip, uint8_t dev_id[5])
 }
 
 
-static bool nand_readPage(Mt29f *chip, uint32_t page, uint16_t offset)
+static bool nand_readPage(Nand *chip, uint32_t page, uint16_t offset)
 {
 	uint32_t cycle0;
 	uint32_t cycle1234;
@@ -186,7 +186,7 @@ static bool nand_readPage(Mt29f *chip, uint32_t page, uint16_t offset)
  * Read page data and ECC, checking for errors.
  * TODO: fix errors with ECC when possible.
  */
-static bool nand_read(Mt29f *chip, uint32_t page, void *buf, uint16_t offset, uint16_t size)
+static bool nand_read(Nand *chip, uint32_t page, void *buf, uint16_t offset, uint16_t size)
 {
 	struct RemapInfo remap_info;
 	uint32_t remapped_page = PAGE(chip->block_map[BLOCK(page)]) + PAGE_IN_BLOCK(page);
@@ -228,7 +228,7 @@ static bool nand_read(Mt29f *chip, uint32_t page, void *buf, uint16_t offset, ui
  * spare data in one write, at this point the last ECC_PR is correct and
  * ECC data can be written in the spare area with a second program operation.
  */
-static bool nand_writePage(Mt29f *chip, uint32_t page, uint16_t offset)
+static bool nand_writePage(Nand *chip, uint32_t page, uint16_t offset)
 {
 	uint32_t cycle0;
 	uint32_t cycle1234;
@@ -272,7 +272,7 @@ static bool nand_writePage(Mt29f *chip, uint32_t page, uint16_t offset)
  * For 2048 bytes pages and 1 ECC word each 256 bytes,
  * 24 bytes of ECC data are stored.
  */
-static bool nand_write(Mt29f *chip, uint32_t page, const void *buf, size_t size)
+static bool nand_write(Nand *chip, uint32_t page, const void *buf, size_t size)
 {
 	struct RemapInfo remap_info;
 	uint32_t *nand_buf = (uint32_t *)nand_dataBuffer(chip);
@@ -308,7 +308,7 @@ static bool nand_write(Mt29f *chip, uint32_t page, const void *buf, size_t size)
  * that bad block are marked with "00" bytes on the spare area of the
  * first page in block.
  */
-static bool blockIsGood(Mt29f *chip, uint16_t blk)
+static bool blockIsGood(Nand *chip, uint16_t blk)
 {
 	uint8_t *first_byte = (uint8_t *)nand_dataBuffer(chip);
 	bool good;
@@ -328,7 +328,7 @@ static bool blockIsGood(Mt29f *chip, uint16_t blk)
  * Return the main partition block remapped on given block in the remap
  * partition (dest_blk).
  */
-static int getBadBlockFromRemapBlock(Mt29f *chip, uint16_t dest_blk)
+static int getBadBlockFromRemapBlock(Nand *chip, uint16_t dest_blk)
 {
 	struct RemapInfo *remap_info = (struct RemapInfo *)nand_dataBuffer(chip);
 
@@ -346,7 +346,7 @@ static int getBadBlockFromRemapBlock(Mt29f *chip, uint16_t dest_blk)
  * Set a block remapping: src_blk (a block in main data partition) is remappend
  * on dest_blk (block in reserved remapped blocks partition).
  */
-static bool setMapping(Mt29f *chip, uint32_t src_blk, uint32_t dest_blk)
+static bool setMapping(Nand *chip, uint32_t src_blk, uint32_t dest_blk)
 {
 	struct RemapInfo *remap_info = (struct RemapInfo *)nand_dataBuffer(chip);
 
@@ -366,7 +366,7 @@ static bool setMapping(Mt29f *chip, uint32_t src_blk, uint32_t dest_blk)
  * Get a new block from the remap partition to use as a substitute
  * for a bad block.
  */
-static uint16_t getFreeRemapBlock(Mt29f *chip)
+static uint16_t getFreeRemapBlock(Nand *chip)
 {
 	int blk;
 
@@ -387,7 +387,7 @@ static uint16_t getFreeRemapBlock(Mt29f *chip)
 /*
  * Check if NAND is initialized.
  */
-static bool chipIsMarked(Mt29f *chip)
+static bool chipIsMarked(Nand *chip)
 {
 	return getBadBlockFromRemapBlock(chip, NAND_NUM_USER_BLOCKS) != -1;
 }
@@ -398,7 +398,7 @@ static bool chipIsMarked(Mt29f *chip)
  * All bad blocks found are remapped to the remap partition: each
  * block in the remap partition used to remap bad blocks is marked.
  */
-static void initBlockMap(Mt29f *chip)
+static void initBlockMap(Nand *chip)
 {
 	int b, last;
 
@@ -460,7 +460,7 @@ static void initBlockMap(Mt29f *chip)
  * \note DON'T USE on production chips: this function will try to erase
  *       factory marked bad blocks too.
  */
-void nand_format(Mt29f *chip)
+void nand_format(Nand *chip)
 {
 	int b;
 
@@ -478,7 +478,7 @@ void nand_format(Mt29f *chip)
 /*
  * Create some bad blocks, erasing them and writing the bad block mark.
  */
-void nand_ruinSomeBlocks(Mt29f *chip)
+void nand_ruinSomeBlocks(Nand *chip)
 {
 	int bads[] = { 7, 99, 555, 1003, 1004, 1432 };
 	unsigned i;
@@ -499,9 +499,9 @@ void nand_ruinSomeBlocks(Mt29f *chip)
 
 #endif
 
-static bool commonInit(Mt29f *chip, struct Heap *heap, unsigned chip_select)
+static bool commonInit(Nand *chip, struct Heap *heap, unsigned chip_select)
 {
-	memset(chip, 0, sizeof(Mt29f));
+	memset(chip, 0, sizeof(Nand));
 
 	DB(chip->fd.priv.type = KBT_NAND);
 	chip->fd.blk_size = NAND_BLOCK_SIZE;
@@ -583,14 +583,14 @@ static size_t nand_readDirect(struct KBlock *kblk, block_idx_t idx, void *buf, s
 
 static int nand_error(struct KBlock *kblk)
 {
-	Mt29f *chip = NAND_CAST(kblk);
+	Nand *chip = NAND_CAST(kblk);
 	return chip->status;
 }
 
 
 static void nand_clearError(struct KBlock *kblk)
 {
-	Mt29f *chip = NAND_CAST(kblk);
+	Nand *chip = NAND_CAST(kblk);
 	chip->status = 0;
 }
 
@@ -622,7 +622,7 @@ static const KBlockVTable nand_unbuffered_vt =
 /**
  * Initialize NAND kblock driver in buffered mode.
  */
-bool nand_init(Mt29f *chip, struct Heap *heap, unsigned chip_select)
+bool nand_init(Nand *chip, struct Heap *heap, unsigned chip_select)
 {
 	if (!commonInit(chip, heap, chip_select))
 		return false;
@@ -645,7 +645,7 @@ bool nand_init(Mt29f *chip, struct Heap *heap, unsigned chip_select)
 /**
  * Initialize NAND kblock driver in unbuffered mode.
  */
-bool nand_initUnbuffered(Mt29f *chip, struct Heap *heap, unsigned chip_select)
+bool nand_initUnbuffered(Nand *chip, struct Heap *heap, unsigned chip_select)
 {
 	if (!commonInit(chip, heap, chip_select))
 		return false;
