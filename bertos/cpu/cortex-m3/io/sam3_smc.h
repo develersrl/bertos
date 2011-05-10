@@ -218,6 +218,7 @@
 #define NFC_CMD_CMD1           (0xFF <<  2)  ///< Command Register Value for Cycle 1
 #define NFC_CMD_CMD2           (0xFF << 10)  ///< Command Register Value for Cycle 2
 #define NFC_CMD_VCMD2          BV(18)        ///< Valid Cycle 2 Command
+#define NFC_CMD_ACYCLE_SHIFT   19
 #define NFC_CMD_ACYCLE_MASK    (0x7 << 19)   ///< Number of Address required for the current command
 #define NFC_CMD_ACYCLE_NONE    (0x0 << 19)   ///< No address cycle
 #define NFC_CMD_ACYCLE_ONE     (0x1 << 19)   ///< One address cycle
