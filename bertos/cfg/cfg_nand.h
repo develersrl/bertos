@@ -98,7 +98,7 @@
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_level"
  */
-#define CONFIG_NAND_LOG_LEVEL      LOG_LVL_INFO
+#define CONFIG_NAND_LOG_LEVEL      LOG_LVL_WARN
 
 /**
  * Module logging format
