@@ -222,7 +222,7 @@ void dac_init(struct Dac *dac)
 	dac->ctx.isFinished = sam3x_dac_isFinished;
 	dac->ctx.start = sam3x_dac_start;
 	dac->ctx.stop = sam3x_dac_stop;
-	dac->ctx._type = DAC_SAM3X;
+	DB(dac->ctx._type = DAC_SAM3X;)
 	dac->hw = &dac_hw;
 
 	/* Clock DAC peripheral */
