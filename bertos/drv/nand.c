@@ -29,23 +29,46 @@
 * Copyright 2011 Develer S.r.l. (http://www.develer.com/)
 * -->
 *
-* \brief NAND driver
+* \brief ONFI 1.0 compliant NAND kblock driver
 *
-* This module allows read/write access to ONFI 1.0 compliant NANDs.
+* Defective blocks are remapped in a reserved area of configurable size
+* at the bottom of the NAND.
+* At the moment there is no wear-leveling block translation: kblock's blocks
+* are mapped directly on NAND erase blocks: when a (k)block is written the
+* corresponding erase block is erased and all pages within are rewritten.
+* Partial write is not possible: it's recommended to use buffered mode.
+*
+* The driver needs to format the NAND before use. If the initialization code
+* detects a fresh memory it does a bad block scan and a formatting.
+* Format info isn't stored in NAND in a global structure: each block has its
+* info written in the spare area of its first page.  These info contais a tag
+* to detect formatted blocks and an index for bad block remapping (struct
+* RemapInfo).
+*
+* The ECC for each page is written in the spare area too.
+*
+* Works only in 8 bit data mode and NAND parameters are not
+* detected at run-time, but hand-configured in cfg_nand.h.
+*
+* Heap is needed to allocate the tipically large buffer necessary
+* to erase and write a block.
 *
 * \author Stefano Fedrigo <aleph@develer.com>
 */
 
 #include "nand.h"
-
 #include <cfg/log.h>
 #include <struct/heap.h>
 #include <string.h> // memset
 
 
 /*
- * Remap info written in the first page of each block
- * used to remap bad blocks.
+ * Remap info written in the first page of each block.
+ *
+ * This structure is used in blocks of the reserved area to store
+ * which block the block containing the structure is remapping.
+ * It's stored in all other blocks too to mark a formatted block.
+ * In this case the member mapped_blk has non meaning.
  */
 struct RemapInfo
 {
@@ -53,21 +76,47 @@ struct RemapInfo
 	uint16_t mapped_blk;  // Bad block the block containing this info is remapping
 };
 
+// Where RemapInfo is stored in the spare area
 #define NAND_REMAP_TAG_OFFSET  (CONFIG_NAND_SPARE_SIZE - sizeof(struct RemapInfo))
+
+// Fixed tag to detect RemapInfo
 #define NAND_REMAP_TAG         0x3e10c8ed
 
+/*
+ * Number of ECC words computed for a page.
+ *
+ * For 2048 bytes pages and 1 ECC word each 256 bytes,
+ * 24 bytes of ECC data are stored.
+ */
 #define NAND_ECC_NWORDS        (CONFIG_NAND_DATA_SIZE / 256)
 
-// NAND flash status codes
+// Total page size (user data + spare) in bytes
+#define NAND_PAGE_SIZE         (CONFIG_NAND_DATA_SIZE + CONFIG_NAND_SPARE_SIZE)
+
+// Erase block size in bytes
+#define NAND_BLOCK_SIZE        (CONFIG_NAND_DATA_SIZE * CONFIG_NAND_PAGES_PER_BLOCK)
+
+// Number of usable blocks, and index of first remapping block
+#define NAND_NUM_USER_BLOCKS   (CONFIG_NAND_NUM_BLOCK - CONFIG_NAND_NUM_REMAP_BLOCKS)
+
+// ONFI NAND status codes
 #define NAND_STATUS_READY  BV(6)
 #define NAND_STATUS_ERROR  BV(0)
 
 
+// Get block from page
+#define PAGE(blk)            ((blk) * CONFIG_NAND_PAGES_PER_BLOCK)
+
+// Page from block and page in block
+#define BLOCK(page)          ((uint16_t)((page) / CONFIG_NAND_PAGES_PER_BLOCK))
+#define PAGE_IN_BLOCK(page)  ((uint16_t)((page) % CONFIG_NAND_PAGES_PER_BLOCK))
+
+
 /*
- * Translate flash page index plus a byte offset
+ * Translate page index plus a byte offset
  * in the five address cycles format needed by NAND.
  *
- * Cycles in x8 mode as the MT29F2G08AAD
+ * Cycles in x8 mode.
  * CA = column addr, PA = page addr, BA = block addr
  *
  * Cycle    I/O7  I/O6  I/O5  I/O4  I/O3  I/O2  I/O1  I/O0
@@ -210,23 +259,20 @@ static bool nand_read(Nand *chip, uint32_t page, void *buf, uint16_t offset, uin
 	 * That guarantees the page is written by us and a valid ECC is present.
 	 */
 	memcpy(&remap_info, (char *)buf + NAND_REMAP_TAG_OFFSET, sizeof(remap_info));
-	if (remap_info.tag == NAND_REMAP_TAG)
-		return nand_checkEcc(chip);
+	if (remap_info.tag == NAND_REMAP_TAG && !nand_checkEcc(chip))
+	{
+		chip->status |= NAND_ERR_ECC;
+		return false;
+	}
 	else
 		return true;
 }
 
 
 /*
- * Write data in NFC SRAM buffer to a NAND page, starting at a given offset.
+ * Write data stored in nand_dataBuffer() to a NAND page, starting at a given offset.
  * Usually offset will be 0 to write data or CONFIG_NAND_DATA_SIZE to write the spare
  * area.
- *
- * According to datasheet to get ECC computed by hardware is sufficient
- * to write the main area.  But it seems that in that way the last ECC_PR
- * register is not generated.  The workaround is to write data and dummy (ff)
- * spare data in one write, at this point the last ECC_PR is correct and
- * ECC data can be written in the spare area with a second program operation.
  */
 static bool nand_writePage(Nand *chip, uint32_t page, uint16_t offset)
 {
@@ -267,10 +313,12 @@ static bool nand_writePage(Nand *chip, uint32_t page, uint16_t offset)
  * \param page           the page to be written
  * \parma original_page  if different from page, it's the page that's being remapped
  *
- * ECC data are extracted from ECC_PRx registers and written
- * in the page's spare area.
- * For 2048 bytes pages and 1 ECC word each 256 bytes,
- * 24 bytes of ECC data are stored.
+ * Implementation note for SAM3 NFC controller:
+ * according to datasheet to get ECC computed by hardware is sufficient
+ * to write the main area.  But it seems that in that way the last ECC_PR
+ * register is not generated.  The workaround is to write data and dummy (ff)
+ * spare data in one write, at this point the last ECC_PR is correct and
+ * ECC data can be written in the spare area with a second program operation.
  */
 static bool nand_write(Nand *chip, uint32_t page, const void *buf, size_t size)
 {
@@ -343,7 +391,7 @@ static int getBadBlockFromRemapBlock(Nand *chip, uint16_t dest_blk)
 
 
 /*
- * Set a block remapping: src_blk (a block in main data partition) is remappend
+ * Set a block remapping: src_blk (a block in main data partition) is remapped
  * on dest_blk (block in reserved remapped blocks partition).
  */
 static bool setMapping(Nand *chip, uint32_t src_blk, uint32_t dest_blk)
@@ -395,7 +443,7 @@ static bool chipIsMarked(Nand *chip)
 
 /*
  * Initialize NAND (format). Scan NAND for factory marked bad blocks.
- * All bad blocks found are remapped to the remap partition: each
+ * All found bad blocks are remapped to the remap partition: each
  * block in the remap partition used to remap bad blocks is marked.
  */
 static void initBlockMap(Nand *chip)
@@ -442,7 +490,7 @@ static void initBlockMap(Nand *chip)
 		}
 
 		/*
-	     * If no bad blocks are found (we're lucky!) write a dummy
+	     * If no bad blocks are found (we're lucky!) write anyway a dummy
 		 * remap to mark NAND and detect we already scanned it next time.
 		 */
 		if (!remapped_anything)

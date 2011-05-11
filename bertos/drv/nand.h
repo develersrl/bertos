@@ -29,7 +29,7 @@
 * Copyright 2011 Develer S.r.l. (http://www.develer.com/)
 * -->
 *
-* \brief NAND driver
+* \brief ONFI 1.0 compliant NAND kblock driver
 *
 * \author Stefano Fedrigo <aleph@develer.com>
 *
@@ -42,7 +42,6 @@
 #define DRV_NAND_H
 
 #include "cfg/cfg_nand.h"
-#include <cfg/macros.h>
 #include <io/kblock.h>
 
 
@@ -60,12 +59,6 @@
 #define NAND_ERR_WR_TMOUT  BV(4)   ///< Write timeout
 #define NAND_ERR_ECC       BV(5)   ///< Unrecoverable ECC error
 /** \} */
-
-#define NAND_PAGE_SIZE         (CONFIG_NAND_DATA_SIZE + CONFIG_NAND_SPARE_SIZE)
-#define NAND_BLOCK_SIZE        (CONFIG_NAND_DATA_SIZE * CONFIG_NAND_PAGES_PER_BLOCK)
-
-// Number of usable blocks, and index of first remapping block
-#define NAND_NUM_USER_BLOCKS   (CONFIG_NAND_NUM_BLOCK - CONFIG_NAND_NUM_REMAP_BLOCKS)
 
 
 // NAND commands
@@ -85,14 +78,6 @@
 #define NAND_CMD_ERASE_2              0xD0
 #define NAND_CMD_STATUS               0x70
 #define NAND_CMD_RESET                0xFF
-
-
-// Get block from page
-#define PAGE(blk)            ((blk) * CONFIG_NAND_PAGES_PER_BLOCK)
-
-// Page from block and page in block
-#define BLOCK(page)          ((uint16_t)((page) / CONFIG_NAND_PAGES_PER_BLOCK))
-#define PAGE_IN_BLOCK(page)  ((uint16_t)((page) % CONFIG_NAND_PAGES_PER_BLOCK))
 
 
 /**

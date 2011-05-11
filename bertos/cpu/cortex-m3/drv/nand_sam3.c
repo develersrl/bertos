@@ -30,21 +30,16 @@
  *
  * -->
  *
- * \brief NAND driver for SAM3's static memory controller.
+ * \brief NAND driver hardware implementation for SAM3's static memory controller.
  *
  * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-#include "nand_sam3.h"
 #include <drv/nand.h>
 #include <cfg/log.h>
-#include <cfg/macros.h>
 #include <io/sam3.h>
 #include <drv/timer.h>
-#include <cpu/power.h> /* cpu_relax() */
-#include <cpu/types.h>
-
-#include <string.h> /* memcpy, memset */
+#include <cpu/power.h> // cpu_relax()
 
 
 /*
@@ -88,6 +83,7 @@ bool nand_waitReadyBusy(UNUSED_ARG(Nand *, chip), time_t timeout)
 
 	return true;
 }
+
 
 /*
  * Wait for transfer to complete until timeout.
@@ -163,19 +159,25 @@ uint8_t nand_getChipStatus(UNUSED_ARG(Nand *, chip))
 }
 
 
+/*
+ * Return pointer to buffer where data are read to or written from
+ * by nand_sendCommand().
+ */
 void *nand_dataBuffer(UNUSED_ARG(Nand *, chip))
 {
 	return (void *)NFC_SRAM_BASE_ADDR;
 }
 
 
-bool nand_checkEcc(Nand *chip)
+/*
+ * Extract ECC data from ECC_PRx registers.
+ */
+bool nand_checkEcc(UNUSED_ARG(Nand *, chip))
 {
 	uint32_t sr1 = SMC_ECC_SR1;
 	if (sr1)
 	{
 		LOG_INFO("ECC error, ECC_SR1=0x%lx\n", sr1);
-		chip->status |= NAND_ERR_ECC;
 		return false;
 	}
 	else
@@ -201,6 +203,9 @@ void nand_computeEcc(UNUSED_ARG(Nand *, chip),
 }
 
 
+/*
+ * Low-level hardware driver initialization.
+ */
 void nand_hwInit(UNUSED_ARG(Nand *, chip))
 {
 	// FIXME: Parameters specific for MT29F8G08AAD
