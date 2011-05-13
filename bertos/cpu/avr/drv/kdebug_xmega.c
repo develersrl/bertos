@@ -39,6 +39,7 @@
  * ports, by using the USART_t structs.
  *
  * \author Onno <developer@gorgoz.org>
+ * notest:all
  */
 
 #include <hw/hw_cpufreq.h>	/* for CPU_FREQ */
@@ -108,7 +109,7 @@
 
 /*
  * \name KDBG macros
- * 
+ *
  * Used to set or alter the KDB_USART operation,
  * enable the usart or send a byte.
  * Some of these methods are called/included from kdbg_hw_init()
@@ -144,7 +145,7 @@
 
 /*
  * To restore the USART state, to registers need to be restored
- * These registers (CTRLA and CTRLB) can be saved to the 
+ * These registers (CTRLA and CTRLB) can be saved to the
  * kdbg_avr_xmaga_irqsave structure
  */
 struct kdbg_avr_xmega_irqsave

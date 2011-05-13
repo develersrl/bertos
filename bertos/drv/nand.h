@@ -36,6 +36,7 @@
 * $WIZ$ module_name = "nand"
 * $WIZ$ module_depends = "timer", "kblock", "heap"
 * $WIZ$ module_configuration = "bertos/cfg/cfg_nand.h"
+*
 */
 
 #ifndef DRV_NAND_H

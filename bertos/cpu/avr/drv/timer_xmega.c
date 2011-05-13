@@ -41,7 +41,7 @@
  *
  * This module is automatically included so no need to include
  * in test list.
- * notest: xmega
+ * notest: all
  */
 
 #include <drv/timer_xmega.h>

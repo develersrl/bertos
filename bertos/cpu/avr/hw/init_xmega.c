@@ -34,6 +34,7 @@
  * \author Luca Ottaviano <lottaviano@develer.com>
  *
  * \brief AVR XMega initialization routine.
+ * notest:all
  */
 #include <cfg/macros.h>
 #include <avr/io.h>

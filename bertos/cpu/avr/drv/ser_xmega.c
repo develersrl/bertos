@@ -38,6 +38,7 @@
  * ports, by using the USART_t structs.
  *
  * \author Onno <developer@gorgoz.org>
+ * notest:all
  */
 
 #include "hw/hw_ser.h"     /* Required for bus macros overrides */

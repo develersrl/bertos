@@ -54,6 +54,8 @@
 * to erase and write a block.
 *
 * \author Stefano Fedrigo <aleph@develer.com>
+*
+* notest: avr
 */
 
 #include "nand.h"

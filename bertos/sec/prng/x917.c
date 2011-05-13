@@ -33,6 +33,7 @@
  * \brief ANSI X9.17 PRNG implementation
  * \author Giovanni Bajo <rasky@develer.com>
  *
+ * notest:avr
  */
 
 #include "x917.h"
