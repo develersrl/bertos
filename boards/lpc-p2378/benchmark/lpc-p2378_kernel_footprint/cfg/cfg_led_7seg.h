@@ -1,5 +1,5 @@
 /**
- * \file
+ * \file cfg_led_7seg.h
  * <!--
  * This file is part of BeRTOS.
  *
@@ -26,45 +26,55 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \brief Configuration file for Debug module.
+ * \brief Configuration file for led 7 segment display.
  *
+ * \author Fabio Bizzi <fbizzi@bizzi.org>
  *
- * \author Daniele Basile <asterix@develer.com>
- */
-
-#ifndef CFG_DEBUG_H
-#define CFG_DEBUG_H
-
-/**
- * Debug console port.
- * $WIZ$ type = "int"; min = 0
- */
-#define CONFIG_KDEBUG_PORT 0
-
-/**
- * Baudrate for the debug console.
- * $WIZ$ type = "int"; min = 300
- */
-#define CONFIG_KDEBUG_BAUDRATE  115200UL
-
-/**
- * Clock source for the UART module. You need to write the code to reprogram the respective clock at the required frequency in your project before calling kdbg_init().
+ * \addtogroup SevenSegDisplay 7 Segments LED Displays Driver
+ * \{
  *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "kdbg_clk_src"
- * $WIZ$ supports = "msp430"
  */
-#define CONFIG_KDEBUG_CLOCK_SOURCE  KDBG_UART_SMCLK
+
+#ifndef CFG_LED_7SEG_H
+#define CFG_LED_7SEG_H
 
 /**
- * Clock frequency. (Only if different from MCLK's frequency, otherwise leave it zero)
- * $WIZ$ type = "int"; min = 0
- * $WIZ$ supports = "msp430"
+ * Use a Common Cathode display.
+ * $WIZ$ type = "boolean"
  */
-#define CONFIG_KDEBUG_CLOCK_FREQ 0UL
+#define CONFIG_LED_7SEG_CCAT       0
 
-#endif /* CFG_DEBUG_H */
+/**
+ * Number of digit present in the LED display.
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 1
+ * $WIZ$ max = 8
+ */
+#define CONFIG_LED_7SEG_DIGIT      4
+
+/**
+ * Max lenght of the string to be displayed.
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 16
+ * $WIZ$ max = 255
+ */
+#define CONFIG_LED_7SEG_STRLEN     255
+
+/**
+ * Default scrolling speed (ms * CONFIG_LED_7SEG_RTIME).
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_LED_7SEG_SSPEED      10
+
+/**
+ * Default refresh time (ms).
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_LED_7SEG_RTIME      5
+
+#endif /* CFG_LED_7SEG_H */
+ /** \} */ //defgroup drivers
+
