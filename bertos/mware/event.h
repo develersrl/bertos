@@ -132,15 +132,17 @@
  * \endcode
  *
  * \author Bernie Innocenti <bernie@codewiz.org>
+ *
+ * $WIZ$ module_name = "event"
  */
 
 #ifndef KERN_EVENT_H
 #define KERN_EVENT_H
 
-#include <cfg/compiler.h>
 #include "cfg/cfg_proc.h"
 #include "cfg/cfg_signal.h"
 #include "cfg/cfg_timer.h"
+#include <cfg/compiler.h>
 
 #include <cpu/power.h> /* cpu_relax() */
 
