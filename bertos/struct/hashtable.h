@@ -30,7 +30,9 @@
  * Copyright 2004 Giovanni Bajo
  * -->
  *
- * \author Giovanni Bajo <rasky@develer.com>
+ * \defgroup hashtable Hash table implementation
+ * \ingroup struct
+ * \{
  *
  * \brief Portable hash table
  *
@@ -49,6 +51,8 @@
  * The data stored within the table must be a pointer. The NULL pointer is used as
  * a marker for a free node, so it is invalid to store a NULL pointer in the table
  * with \c ht_insert().
+ *
+ * \author Giovanni Bajo <rasky@develer.com>
  *
  * $WIZ$ module_name = "hashtable"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_hashtable.h"
@@ -288,5 +292,7 @@ INLINE HashIterator ht_iter_next(HashIterator h)
 int hashtable_testSetup(void);
 int hashtable_testRun(void);
 int hashtable_testTearDown(void);
+
+/** \} */ // \defgroup hashtable
 
 #endif /* STRUCT_HASHTABLE_H */

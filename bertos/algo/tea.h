@@ -33,7 +33,7 @@
  * \brief TEA Tiny Encription Algorith functions.
  *
  * Documentation for TEA is available at
- * http://www.cl.cam.ac.uk/ftp/users/djw3/tea.ps.
+ * http://en.wikipedia.org/wiki/Tiny_Encryption_Algorithm
  *
  * \author Francesco Sacchi <batt@develer.com>
  *

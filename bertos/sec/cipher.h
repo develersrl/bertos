@@ -196,7 +196,7 @@ void cipher_ctr_step(BlockCipher *c, void *block);
 /**
  * Initialize OFB by setting the IV.
  *
- * \note the memory pointed by \a iv will be used and modified by the CBC
+ * \note the memory pointed by \a iv will be used and modified by the OFB
  * functions. It is caller's responsibility to keep it available until there is
  * no more OFB work to do.
  */

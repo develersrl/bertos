@@ -12,7 +12,8 @@ BeRTOS uses object oriented programming concepts for the base interfaces.
 If used in the right way, OOP elegantly solves a broad range of problems
 linked with the creation of common and reusable interfaces that allow
 you to save development time and precious memory space.
-Have a look at <a href="">KFile tutorial</a> on BeRTOS web site for
+Have a look at <a href="http://www.bertos.org/use/tutorial-front-page/drivers-kfile-interface/">
+KFile tutorial</a> on BeRTOS web site for
 a more complete introduction to object oriented programming.
 
 <h2>OOP in C</h2>
