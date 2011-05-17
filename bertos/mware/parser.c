@@ -309,10 +309,11 @@ bool parser_process_line(const char* input)
  * Register a new command into the parser
  *
  * \param cmd Command template describing the command
+ * \return true if registration was successful, false otherwise
  */
-void parser_register_cmd(const struct CmdTemplate* cmd)
+bool parser_register_cmd(const struct CmdTemplate* cmd)
 {
-	ht_insert(&commands, cmd);
+	return ht_insert(&commands, cmd);
 }
 
 void parser_init(void)
