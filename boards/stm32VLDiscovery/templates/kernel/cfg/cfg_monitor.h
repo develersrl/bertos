@@ -42,6 +42,6 @@
  * Process monitor.
  * $WIZ$ type = "autoenabled"
  */
-#define CONFIG_KERN_MONITOR 0
+#define CONFIG_KERN_MONITOR 1
 
 #endif /*  CFG_MONITOR_H */
