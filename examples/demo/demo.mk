@@ -60,6 +60,7 @@ demo_CSRC = \
 	bertos/kern/proc.c \
 	bertos/kern/proc_test.c \
 	bertos/kern/sem.c \
+	bertos/kern/sem_test.c \
 	bertos/kern/signal.c \
 	bertos/kern/monitor.c \
 	bertos/verstag.c

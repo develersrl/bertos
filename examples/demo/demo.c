@@ -40,6 +40,7 @@
 
 #include <kern/irq.h>
 #include <kern/proc.h>
+#include <kern/sem.h>
 #include <kern/monitor.h>
 #include <kern/msg.h>
 
@@ -227,6 +228,12 @@ void proc_demo(void)
 	proc_testRun();
 }
 
+void sem_demo(void)
+{
+	sem_testRun();
+	sem_testTearDown();
+}
+
 void timer_demo(void)
 {
 	timer_testRun();
@@ -283,6 +290,7 @@ static struct MenuItem main_items[] =
 	{ (const_iptr_t)"Bounce!",     0, (MenuHook)bouncing_logo,(iptr_t)&lcd_bitmap    },
 	{ (const_iptr_t)"Hello World", 0, (MenuHook)hello_world,  (iptr_t)&lcd_bitmap    },
 	{ (const_iptr_t)"Scheduling",  0, (MenuHook)proc_demo,    (iptr_t)&lcd_bitmap    },
+	{ (const_iptr_t)"Semaphores",  0, (MenuHook)sem_demo,     (iptr_t)&lcd_bitmap    },
 	{ (const_iptr_t)"Timer Test",  0, (MenuHook)timer_demo,   (iptr_t)&lcd_bitmap    },
 	{ (const_iptr_t)"Menu MX",     0, (MenuHook)menu_handle,  (iptr_t)&mx_menu       },
 	{ (const_iptr_t)"Display",     0, (MenuHook)menu_handle,  (iptr_t)&display_menu  },
