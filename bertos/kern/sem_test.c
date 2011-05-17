@@ -152,7 +152,7 @@ Semaphore s1, s2;
 unsigned int loops = 0;	// For counting iterations
 int finishing_time[8];
 
-enum ProcType {NONE, S1, S2, S1S2};
+typedef enum ProcType {NONE, S1, S2, S1S2} ProcType;
 /*
  * Macros for the processes of the priority inversion test.
  */
