@@ -78,6 +78,13 @@ extern REGISTER Process	*current_process;
 extern REGISTER List     proc_ready_list;
 
 #if CONFIG_KERN_PRI
+# if CONFIG_KERN_PRI_INHERIT
+	#define __prio_orig(proc) (proc->orig_pri)
+	#define __prio_inh(proc) (LIST_EMPTY(&(proc)->inh_list) ? INT_MIN : \
+					((PriNode *)LIST_HEAD(&proc->inh_list))->pri)
+	#define __prio_proc(proc) (__prio_inh(proc) > __prio_orig(proc) ? \
+					__prio_inh(proc) : __prio_orig(proc))
+# endif
 	#define prio_next()	(LIST_EMPTY(&proc_ready_list) ? INT_MIN : \
 					((PriNode *)LIST_HEAD(&proc_ready_list))->pri)
 	#define prio_proc(proc)	(proc->link.pri)

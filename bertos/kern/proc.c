@@ -193,6 +193,12 @@ static void proc_initStruct(Process *proc)
 
 #if CONFIG_KERN_PRI
 	proc->link.pri = 0;
+
+# if CONFIG_KERN_PRI_INHERIT
+	proc->orig_pri = proc->inh_link.pri = proc->link.pri;
+	proc->inh_blocked_by = NULL;
+	LIST_INIT(&proc->inh_list);
+# endif
 #endif
 }
 
@@ -439,10 +445,33 @@ void proc_rename(struct Process *proc, const char *name)
  */
 void proc_setPri(struct Process *proc, int pri)
 {
+#if CONFIG_KERN_PRI_INHERIT
+	int new_pri;
+
+	/*
+	 * Whatever it will happen below, this is the new
+	 * original priority of the process, i.e., the priority
+	 * it has without taking inheritance under account.
+	 */
+	proc->orig_pri = pri;
+
+	/* If not changing anything we can just leave */
+	if ((new_pri = __prio_proc(proc)) == proc->link.pri)
+		return;
+
+	/*
+	 * Actual process priority is the highest among its
+	 * own priority and the one of the top-priority
+	 * process that it is blocking (returned by
+	 * __prio_proc()).
+	 */
+	proc->link.pri = new_pri;
+#else
 	if (proc->link.pri == pri)
 		return;
 
 	proc->link.pri = pri;
+#endif // CONFIG_KERN_PRI_INHERIT
 
 	if (proc != current_process)
 		ATOMIC(sched_reenqueue(proc));

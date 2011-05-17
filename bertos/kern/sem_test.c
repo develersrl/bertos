@@ -57,6 +57,8 @@
  * $test$: echo "#define CONFIG_KERN 1" >> $cfgdir/cfg_proc.h
  * $test$: echo  "#undef CONFIG_KERN_PRI" >> $cfgdir/cfg_proc.h
  * $test$: echo "#define CONFIG_KERN_PRI 1" >> $cfgdir/cfg_proc.h
+ * $test$: echo  "#undef CONFIG_KERN_PRI_INHERIT" >> $cfgdir/cfg_proc.h
+ * $test$: echo "#define CONFIG_KERN_PRI_INHERIT 1" >> $cfgdir/cfg_proc.h
  * $test$: cp bertos/cfg/cfg_sem.h $cfgdir/
  * $test$: echo  "#undef CONFIG_KERN_SEMAPHORES" >> $cfgdir/cfg_sem.h
  * $test$: echo "#define CONFIG_KERN_SEMAPHORES 1" >> $cfgdir/cfg_sem.h

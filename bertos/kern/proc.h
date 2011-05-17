@@ -92,6 +92,7 @@
 #ifndef KERN_PROC_H
 #define KERN_PROC_H
 
+#include "sem.h"
 #include "cfg/cfg_proc.h"
 #include "cfg/cfg_signal.h"
 #include "cfg/cfg_monitor.h"
@@ -115,6 +116,12 @@ typedef struct Process
 {
 #if CONFIG_KERN_PRI
 	PriNode      link;        /**< Link Process into scheduler lists */
+# if CONFIG_KERN_PRI_INHERIT
+	PriNode      inh_link;    /**< Link Process into priority inheritance lists */
+	List         inh_list;    /**< Priority inheritance list for this Process */
+	Semaphore    *inh_blocked_by;  /**< Semaphore blocking this Process */
+	int          orig_pri;    /**< Process priority without considering inheritance */
+# endif
 #else
 	Node         link;        /**< Link Process into scheduler lists */
 #endif

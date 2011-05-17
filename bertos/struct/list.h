@@ -216,6 +216,21 @@ typedef struct _PriNode
 		(n) = (TYPEOF_OR_VOIDPTR(n))(((Node *)(n))->pred) \
 	)
 
+/**
+ * Iterate on the list safely against node removal.
+ *
+ * This macro generates a "for" statement using the following parameters:
+ * \param n   Node pointer to be used in each iteration.
+ * \param p   Temporal storage for the iterator.
+ * \param l   Pointer to list.
+ */
+#define FOREACH_NODE_SAFE(n, p, l) \
+	for( \
+		(n) = (TYPEOF_OR_VOIDPTR(n))LIST_HEAD(l), (p) = ((Node *)(n))->succ; \
+		((Node *)(n))->succ; \
+		(n) = (p), (p) = (TYPEOF_OR_VOIDPTR(n))(((Node *)(n))->succ) \
+	)
+
 /** Initialize a list. */
 #define LIST_INIT(l) \
 	do { \

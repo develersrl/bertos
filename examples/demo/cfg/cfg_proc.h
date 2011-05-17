@@ -81,6 +81,12 @@
 #define CONFIG_KERN_PRI 1
 
 /**
+ * Priority-inheritance protocol.
+ * $WIZ$ type = "boolean"
+ */
+#define CONFIG_KERN_PRI_INHERIT 1
+
+/**
  * Time sharing quantum (a prime number prevents interference effects) [ms].
  *
  * $WIZ$ type = "int"
