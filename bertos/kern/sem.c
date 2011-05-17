@@ -58,6 +58,19 @@ INLINE void sem_verify(struct Semaphore *s)
 #define proc_updatePri(proc) (proc_setPri(proc, (proc)->orig_pri))
 
 
+/**
+ * Priority inheritance update algorithm.
+ *
+ * The algorithm checks and boosts the priority of the semaphore's
+ * current owner and also processes in that block the owner, which
+ * form a chain of blocking processes.
+ *
+ * Note that the priority of a process in the chain of blocked
+ * processes is always greater or equal than the priority of a process
+ * before in the chain. See the diagram below:
+ * P1  --. S1 ---> P2 --. S2 ---> P3
+ * prio_proc(P2) >= prio_proc(P1) always.
+ */
 INLINE void pri_inheritBlock(Semaphore *s)
 {
 	Process *owner = s->owner;
@@ -99,6 +112,15 @@ INLINE void pri_inheritBlock(Semaphore *s)
 }
 
 
+/**
+ * Priority inheritance unblock algorithm.
+ *
+ * Pass the priority inheritance list from the current owner to the
+ * process that will take ownership of the semaphore next, potentially
+ * boosting its priority.
+ *
+ * \param proc The process that will take ownership of the semaphore.
+ */
 INLINE void pri_inheritUnblock(Semaphore *s, Process *proc)
 {
 	Process *owner = s->owner;
