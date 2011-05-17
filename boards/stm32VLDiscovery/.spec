@@ -1,4 +1,4 @@
-name = "ST Microeletronics STM32VLDiscovery"
+name = "STM32VLDiscovery"
 description = '''
 <h1 align="center">ST Microeletronics STM32VLDiscovery</h1>
 
