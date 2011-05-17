@@ -158,7 +158,7 @@ typedef enum ProcType {NONE, S1, S2, S1S2} ProcType;
  */
 #define PROC_INV_TEST(num) static void proc_semInvTest##num(void) \
 { \
-	ProcType p_type = (ProcType)((long) proc_currentUserData()); \
+	ProcType p_type = (ProcType)((int) proc_currentUserData()); \
 	int mult = p_type == NONE ? 5 : 1; \
 	unsigned int i, local_count = 0; \
 	ticks_t start; \
@@ -244,7 +244,7 @@ PROC_TEST_STACK(6)
 PROC_TEST_STACK(7)
 PROC_TEST_STACK(8)
 
-int sem_ser_test(void)
+static int sem_ser_test(void)
 {
 	ticks_t start_time = timer_clock();
 
@@ -290,7 +290,7 @@ int sem_ser_test(void)
 
 #if CONFIG_KERN_PRI
 
-int sem_inv_test(void)
+static int sem_inv_test(void)
 {
 	int i, orig_pri = proc_current()->link.pri;
 	ticks_t fake, start_time;
@@ -338,7 +338,7 @@ int sem_inv_test(void)
 		if (sem_attempt(&sem)) {
 			if (global_count >= loops*7 + loops*5) {
 				for (i = 0; i < 8; i++)
-					kprintf("> Main: I-O latency of %d = %dms\n", i+1, ms_to_ticks(finishing_time[i]));
+					kprintf("> Main: I-O latency of %d = %ldms\n", i+1, ms_to_ticks(finishing_time[i]));
 				kputs("> Main: Test Finished..Ok!\n");
 				return 0;
 			}

@@ -92,10 +92,10 @@
 #ifndef KERN_PROC_H
 #define KERN_PROC_H
 
-#include "sem.h"
 #include "cfg/cfg_proc.h"
 #include "cfg/cfg_signal.h"
 #include "cfg/cfg_monitor.h"
+#include "sem.h"
 
 #include <struct/list.h> // Node, PriNode
 
@@ -104,6 +104,13 @@
 
 #include <cpu/types.h> // cpu_stack_t
 #include <cpu/frame.h> // CPU_SAVED_REGS_CNT
+
+/* The following silents warnings on nightly tests. We need to regenerate
+ * all the projects before this can be removed.
+ */
+#ifndef CONFIG_KERN_PRI_INHERIT
+#define CONFIG_KERN_PRI_INHERIT 0
+#endif
 
 /*
  * WARNING: struct Process is considered private, so its definition can change any time
