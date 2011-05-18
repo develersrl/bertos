@@ -69,7 +69,9 @@
 #define HW_SAM3X_SDRAM_H
 
 #include "cfg/macros.h"
+#include <cpu/types.h>
 #include <io/sam3.h>
+#include <drv/timer.h>
 
 /*
  * SDRAM properties
