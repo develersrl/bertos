@@ -66,7 +66,7 @@ typedef void (*DmaConversionBufFunc_t) (struct Dac *dac, void *buf, size_t len);
 typedef bool (*DmaConversionIsFinished_t) (struct Dac *dac);
 typedef void (*DmaStartStreamingFunc_t) (struct Dac *dac, void *buf, size_t len, size_t slice_len);
 typedef void (*DmaStopFunc_t) (struct Dac *dac);
-typedef void (*DmaCallbackFunc_t) (struct Dac *dac);
+typedef void (*DmaCallbackFunc_t) (struct Dac *dac, void *_buf, size_t len);
 
 typedef struct DacContext
 {
@@ -77,7 +77,7 @@ typedef struct DacContext
 	DmaConversionIsFinished_t isFinished;
 	DmaStartStreamingFunc_t start;
 	DmaStopFunc_t stop;
-	DmaCallbackFunc_t *callback;
+	DmaCallbackFunc_t callback;
 	size_t slice_len;
 
 	DB(id_t _type);
@@ -131,7 +131,7 @@ INLINE bool dac_dmaIsFinished(Dac *dac)
 /*
  * \param slicelen Must be a divisor of len, ie. len % slicelen == 0.
  */
-INLINE void dac_dmaStartStreaming(Dac *dac, void *buf, size_t len, size_t slice_len, DmaCallbackFunc_t *callback)
+INLINE void dac_dmaStartStreaming(Dac *dac, void *buf, size_t len, size_t slice_len, DmaCallbackFunc_t callback)
 {
 	ASSERT(dac->ctx.start);
 	ASSERT(len % slice_len == 0);
