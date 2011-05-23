@@ -48,9 +48,12 @@
 #include <cfg/log.h>
 
 #include <drv/dac.h>
+#include <cpu/irq.h>
 #include <drv/irq_cm3.h>
 
 #include <cpu/types.h>
+
+#include <mware/event.h>
 
 #include <io/cm3.h>
 
@@ -64,6 +67,10 @@ struct DacHardware
 };
 
 struct DacHardware dac_hw;
+
+
+/* We use event to signal the end of conversion */
+static Event buff_emtpy;
 
 #if CONFIG_DAC_TIMER == DACC_TRGSEL_TIO_CH0 /* Select Timer counter TIO Channel 0 */
 	#define DAC_TC_ID         TC0_ID
@@ -93,12 +100,13 @@ struct DacHardware dac_hw;
 	#error unimplemented pwm triger select.
 #endif
 
-INLINE void tc_setup(uint32_t freq, size_t n_sample)
+
+INLINE void tc_init(void)
 {
 	pmc_periphEnable(DAC_TC_ID);
 
 	/*  Disable TC clock */
-	DAC_TC_CCR = TC_CCR_CLKDIS;
+	DAC_TC_CCR = BV(TC_CCR_CLKDIS);
 	/*  Disable interrupts */
 	DAC_TC_IDR = 0xFFFFFFFF;
 	/*  Clear status register */
@@ -115,6 +123,14 @@ INLINE void tc_setup(uint32_t freq, size_t n_sample)
 	 */
 	DAC_TC_CMR = TC_TIMER_CLOCK1 | BV(TC_CMR_WAVE) | TC_CMR_ACPA_SET | TC_CMR_ACPC_CLEAR | BV(TC_CMR_CPCTRG);
 
+
+	/* Setup the pio: TODO: fix for more generic */
+	PIOB_PDR = BV(25);
+	PIO_PERIPH_SEL(PIOB_BASE, BV(25), PIO_PERIPH_B);
+}
+
+INLINE void tc_setup(uint32_t freq, size_t n_sample)
+{
 	/*
 	 * Compute the sample frequency
 	 * the RC counter will update every MCK/2 (see above)
@@ -126,14 +142,11 @@ INLINE void tc_setup(uint32_t freq, size_t n_sample)
 	DAC_TC_RC = rc;
 	/* generate the square wave with duty = 50% */
 	DAC_TC_RA = DIV_ROUND(50 * rc, 100);
-
-	PIOB_PDR = BV(25);
-	PIO_PERIPH_SEL(PIOB_BASE, BV(25), PIO_PERIPH_B);
 }
 
 INLINE void tc_start(void)
 {
-	DAC_TC_CCR =  BV(TC_CCR_CLKEN)| BV(TC_CCR_SWTRG);
+	DAC_TC_CCR = BV(TC_CCR_CLKEN)| BV(TC_CCR_SWTRG);
 }
 
 INLINE void tc_stop(void)
@@ -160,12 +173,19 @@ static void sam3x_dac_setCh(struct Dac *dac, uint32_t mask)
 	/* we have only the ch0 and ch1 */
 	ASSERT(mask < BV(3));
 	dac->hw->channels = mask;
+
+	if (mask & BV(DACC_CH0))
+		DACC_MR |= (DACC_CH0 << DACC_USER_SEL_SHIFT) & DACC_USER_SEL_MASK;
+
+	if (mask & BV(DACC_CH1))
+		DACC_MR |= (DACC_CH1 << DACC_USER_SEL_SHIFT) & DACC_USER_SEL_MASK;
+
+	DACC_CHER |= mask;
+
 }
 
 static void sam3x_dac_setSampleRate(struct Dac *dac, uint32_t rate)
 {
-	(void)dac;
-
 	/* Eneble hw trigger */
 	DACC_MR |= BV(DACC_TRGEN) | (CONFIG_DAC_TIMER << DACC_TRGSEL_SHIFT);
 	dac->hw->rate = rate;
@@ -173,46 +193,117 @@ static void sam3x_dac_setSampleRate(struct Dac *dac, uint32_t rate)
 
 static void sam3x_dac_conversion(struct Dac *dac, void *buf, size_t len)
 {
-	if (dac->hw->channels & BV(DACC_CH0))
-		DACC_MR |= (DACC_CH0 << DACC_USER_SEL_SHIFT) & DACC_USER_SEL_MASK;
-
-	if (dac->hw->channels & BV(DACC_CH1))
-		DACC_MR |= (DACC_CH1 << DACC_USER_SEL_SHIFT) & DACC_USER_SEL_MASK;
-
-	DACC_CHER |= dac->hw->channels;
-
 	/* setup timer and start it */
 	tc_setup(dac->hw->rate, len);
 	tc_start();
 
 	/* Setup dma and start it */
-	DACC_TPR = (uint32_t)buf ;
+	DACC_TPR = (uint32_t)buf;
 	DACC_TCR = len;
 	DACC_PTCR |= BV(DACC_PTCR_TXTEN);
 }
 
-static bool sam3x_dac_isFinished(struct Dac *dac)
+static uint16_t *sample_buff;
+static size_t next_idx = 0;
+static size_t chunk_size = 0;
+static size_t remaing_size = 0;
+
+static DECLARE_ISR(irq_dac)
 {
-	(void)dac;
-	return 0;
+	if (DACC_ISR & BV(DACC_ENDTX))
+	{
+		if (remaing_size > 0)
+		{
+			DACC_TNPR = (uint32_t)&sample_buff[next_idx];
+			DACC_TNCR = chunk_size;
+
+			remaing_size -= chunk_size;
+			next_idx += chunk_size;
+		}
+		else
+			/* Clear the pending irq when the dma ends the conversion */
+			DACC_TCR = 1;
+	}
+	event_do(&buff_emtpy);
 }
 
-static void sam3x_dac_start(struct Dac *dac, void *buf, size_t len, size_t slice_len)
+
+static bool sam3x_dac_isFinished(struct Dac *dac)
 {
-	(void)dac;
-	(void)buf;
-	(void)len;
-	(void)slice_len;
+	return dac->hw->end;
+}
+
+static void sam3x_dac_start(struct Dac *dac, void *_buf, size_t len, size_t slice_len)
+{
+	ASSERT(dac);
+	ASSERT(len >= slice_len);
+
+	/* Reset the previous status. */
+	dac->hw->end = false;
+
+	sample_buff = (uint16_t *)_buf;
+	next_idx = 0;
+	chunk_size = slice_len;
+	remaing_size = len;
+
+
+	/* Program the dma with the first and second chunk of samples and update counter */
+	dac->ctx.callback(dac, &sample_buff[0], chunk_size);
+	DACC_TPR = (uint32_t)&sample_buff[0];
+	DACC_TCR = chunk_size;
+	remaing_size -= chunk_size;
+	next_idx += chunk_size;
+
+	if (chunk_size <= remaing_size)
+	{
+		dac->ctx.callback(dac, &sample_buff[next_idx], chunk_size);
+
+		DACC_TNPR = (uint32_t)&sample_buff[next_idx];
+		DACC_TNCR = chunk_size;
+
+		remaing_size -= chunk_size;
+		next_idx += chunk_size;
+
+	}
+
+	DACC_PTCR |= BV(DACC_PTCR_TXTEN);
+	DACC_IER = BV(DACC_ENDTX);
+
+	/* Set up timer and trig the conversions */
+	tc_setup(dac->hw->rate, len);
+	tc_start();
+
+	while (1)
+	{
+		event_wait(&buff_emtpy);
+		if (remaing_size <= 0)
+		{
+			DAC_TC_CCR = BV(TC_CCR_CLKDIS);
+			dac->hw->end = true;
+			next_idx = 0;
+			chunk_size = 0;
+			remaing_size = 0;
+			break;
+		}
+
+		dac->ctx.callback(dac, &sample_buff[next_idx], chunk_size);
+	}
 }
 
 static void sam3x_dac_stop(struct Dac *dac)
 {
-	(void)dac;
+	dac->hw->end = false;
+	/* Disable the irq, timer and channel */
+	DACC_IDR = BV(DACC_ENDTX);
+	DACC_PTCR |= BV(DACC_PTCR_TXTDIS);
+	DAC_TC_CCR = BV(TC_CCR_CLKDIS);
 }
 
 
 void dac_init(struct Dac *dac)
 {
+	/* Initialize the dataready event */
+	event_initGeneric(&buff_emtpy);
 
 	/* Fill the virtual table */
 	dac->ctx.write = sam3x_dac_write;
@@ -235,4 +326,9 @@ void dac_init(struct Dac *dac)
 	/* Configure the dac */
 	DACC_MR |= (CONFIG_DAC_REFRESH << DACC_REFRESH_SHIFT) & DACC_REFRESH_MASK;
 	DACC_MR |= (CONFIG_DAC_STARTUP << DACC_STARTUP_SHIFT) & DACC_STARTUP_MASK;
+
+	DACC_IDR = 0xFFFFFFFF;
+	sysirq_setHandler(INT_DACC, irq_dac);
+
+	tc_init();
 }
