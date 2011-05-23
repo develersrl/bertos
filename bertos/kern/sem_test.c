@@ -158,7 +158,7 @@ typedef enum ProcType {NONE, S1, S2, S1S2} ProcType;
  */
 #define PROC_INV_TEST(num) static void proc_semInvTest##num(void) \
 { \
-	ProcType p_type = (ProcType)((int) proc_currentUserData()); \
+	ProcType p_type = (ProcType)((ssize_t) proc_currentUserData()); \
 	int mult = p_type == NONE ? 5 : 1; \
 	unsigned int i, local_count = 0; \
 	ticks_t start; \
@@ -338,7 +338,7 @@ static int sem_inv_test(void)
 		if (sem_attempt(&sem)) {
 			if (global_count >= loops*7 + loops*5) {
 				for (i = 0; i < 8; i++)
-					kprintf("> Main: I-O latency of %d = %ldms\n", i+1, ms_to_ticks(finishing_time[i]));
+					kprintf("> Main: I-O latency of %d = %ldms\n", i+1, (long) ms_to_ticks(finishing_time[i]));
 				kputs("> Main: Test Finished..Ok!\n");
 				return 0;
 			}
