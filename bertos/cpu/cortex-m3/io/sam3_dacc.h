@@ -165,8 +165,8 @@
 /**
  * DACC Interrupt disable register
  */
-#define DACC_IMR_OFF             0x0000002C     ///< Interrupt disable register offeset.
-#define DACC_IMR          (*((reg32_t*) (DACC_BASE + DACC_IMR_OFF)))    ///< Interrupt disable register address.
+#define DACC_IMR_OFF             0x0000002C     ///< Interrupt mask register offeset.
+#define DACC_IMR          (*((reg32_t*) (DACC_BASE + DACC_IMR_OFF)))    ///< Interrupt mask register address.
 
 /**
  * DACC Interrupt status register
@@ -176,7 +176,7 @@
 
 #define DACC_TXRDY                        0     ///< Transmit ready interrupt
 #define DACC_EOC                          1     ///< End of conversion interrupt
-#define DACC_ENDTX                        2     ///< End of transmit buffer interrupt
+#define DACC_ENDTX                        2     ///< End of DMA Interrupt Flag
 #define DACC_TXBUFE                       3     ///< Transmit buffer empty interrupt
 
 
