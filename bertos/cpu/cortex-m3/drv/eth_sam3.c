@@ -72,13 +72,6 @@
 #define EMAC_RX_INTS	(BV(EMAC_RCOMP) | BV(EMAC_ROVR) | BV(EMAC_RXUBR))
 #define EMAC_TX_INTS	(BV(EMAC_TCOMP) | BV(EMAC_TXUBR) | BV(EMAC_RLEX))
 
-/*
- * MAC address configuration (please change this in your project!).
- *
- * TODO: make this paramater user-configurable from the Wizard.
- */
-const uint8_t mac_addr[] = { 0x00, 0x45, 0x56, 0x78, 0x9a, 0xbc };
-
 /* Silent Doxygen bug... */
 #ifndef __doxygen__
 /*

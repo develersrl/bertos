@@ -37,12 +37,13 @@
  * $WIZ$ module_name = "eth"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_eth.h"
  * $WIZ$ module_supports = "at91sam7x or sam3x"
- * $WIZ$ module_depends = "timer"
+ * $WIZ$ module_hw = "bertos/hw/hw_eth.h", "bertos/hw/hw_eth.c"
  */
 
 #ifndef DRV_ETH_H
 #define DRV_ETH_H
 
+#include "hw/hw_eth.h"
 #include <cpu/types.h>
 
 #define ETH_ADDR_LEN	6
@@ -130,7 +131,5 @@ ssize_t eth_send(const uint8_t *buf, size_t len);
 ssize_t eth_recv(uint8_t *buf, size_t len);
 
 int eth_init(void);
-
-extern const uint8_t mac_addr[ETH_ADDR_LEN];
 
 #endif /* DRV_ETH_H */
