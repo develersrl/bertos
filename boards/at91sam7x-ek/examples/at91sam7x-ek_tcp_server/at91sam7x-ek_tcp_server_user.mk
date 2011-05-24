@@ -4,41 +4,53 @@
 #
 
 # Programmer interface configuration, see http://dev.bertos.org/wiki/ProgrammerInterface for help
-tcp_server_PROGRAMMER_TYPE = none
-tcp_server_PROGRAMMER_PORT = none
+at91sam7x-ek_tcp_server_PROGRAMMER_TYPE = none
+at91sam7x-ek_tcp_server_PROGRAMMER_PORT = none
 
 # Files included by the user.
-tcp_server_USER_CSRC = \
-	$(tcp_server_SRC_PATH)/main.c \
+at91sam7x-ek_tcp_server_USER_CSRC = \
+	$(at91sam7x-ek_tcp_server_SRC_PATH)/main.c \
 	#
 
 # Files included by the user.
-tcp_server_USER_PCSRC = \
+at91sam7x-ek_tcp_server_USER_PCSRC = \
 	#
 
 # Files included by the user.
-tcp_server_USER_CPPASRC = \
+at91sam7x-ek_tcp_server_USER_CPPASRC = \
 	#
 
 # Files included by the user.
-tcp_server_USER_CXXSRC = \
+at91sam7x-ek_tcp_server_USER_CXXSRC = \
 	#
 
 # Files included by the user.
-tcp_server_USER_ASRC = \
+at91sam7x-ek_tcp_server_USER_ASRC = \
 	#
 
 # Flags included by the user.
-tcp_server_USER_LDFLAGS = \
+at91sam7x-ek_tcp_server_USER_LDFLAGS = \
 	#
 
 # Flags included by the user.
-tcp_server_USER_CPPAFLAGS = \
+at91sam7x-ek_tcp_server_USER_CPPAFLAGS = \
 	#
 
 # Flags included by the user.
-tcp_server_USER_CPPFLAGS = \
+at91sam7x-ek_tcp_server_USER_CPPFLAGS = \
 	-Os \
 	-fno-strict-aliasing \
 	-fwrapv \
+	-Wno-cast-qual \
+	#
+
+# Silence very annoying lwip warnings
+lwip_CFLAGS = \
+	-Wno-cast-align \
+	-Wno-cast-qual \
+	-Wno-sign-compare \
+	-Wno-format \
+	-Wno-unused-value \
+	-Wno-conversion \
+	-Wno-missing-noreturn \
 	#

@@ -26,41 +26,39 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ *
  * -->
  *
- * \brief Configuration file for parser module.
+ * \brief Configuration file for the Eeprom module.
  *
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef CFG_PARSER_H
-#define CFG_PARSER_H
+#ifndef CFG_EEPROM_H
+#define CFG_EEPROM_H
 
 /**
- * Max number of arguments and results for each command
- * $WIZ$ type = "int"
- * $WIZ$ min = 0
- */
-#define CONFIG_PARSER_MAX_ARGS       4
-
-/**
- * Max number of commands
- * $WIZ$ type = "int"
- * $WIZ$ min = 8
- */
-#define CONFIG_MAX_COMMANDS_NUMBER  16
-
-/**
- * Enable compatibility behaviour.
+ * Module logging level.
  *
- * Skip the first word from incoming commands. Don't enable in new projects.
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
+ */
+#define EEPROM_LOG_LEVEL      LOG_LVL_INFO
+
+/**
+ * Module logging format.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define EEPROM_LOG_FORMAT     LOG_FMT_TERSE
+
+/**
+ * Check this to disable Eeprom deprecated API support.
+ *
  * $WIZ$ type = "boolean"
  */
-#define CONFIG_ENABLE_COMPAT_BEHAVIOUR 1
+#define CONFIG_EEPROM_DISABLE_OLD_API  0
 
-#endif /* CFG_PARSER_H */
-
-
-
+#endif /* CFG_EEPROM_H */

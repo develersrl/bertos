@@ -133,8 +133,10 @@
 
 /**
  * MEM_ALIGNMENT: should be set to the alignment of the CPU
+ * \verbatim
  *    4 byte alignment -> #define MEM_ALIGNMENT 4
  *    2 byte alignment -> #define MEM_ALIGNMENT 2
+ * \endverbatim
  */
 #ifndef MEM_ALIGNMENT
 #define MEM_ALIGNMENT                   4
@@ -357,11 +359,11 @@
    ---------------------------------
 */
 /**
- * Enable ARP functionality.
- *
- * $WIZ$ type = "boolean"
+ * LWIP_ARP==1: Enable ARP functionality.
  */
+#ifndef LWIP_ARP
 #define LWIP_ARP                        1
+#endif
 
 /**
  * ARP_TABLE_SIZE: Number of active MAC-IP address pairs cached.
@@ -701,12 +703,16 @@
 
 /** DNS_LOCAL_HOSTLIST: Implements a local host-to-address list. If enabled,
  *  you have to define
+ *  \code
  *    #define DNS_LOCAL_HOSTLIST_INIT {{"host1", 0x123}, {"host2", 0x234}}
+ *  \endcode
  *  (an array of structs name/address, where address is an u32_t in network
  *  byte order).
  *
  *  Instead, you can also use an external function:
+ *  \code
  *  #define DNS_LOOKUP_LOCAL_EXTERN(x) extern u32_t my_lookup_function(const char *name)
+ *  \endcode
  *  that returns the IP address or INADDR_NONE if not found.
  */
 #ifndef DNS_LOCAL_HOSTLIST
@@ -1200,6 +1206,13 @@
  * $WIZ$ type = "boolean"
  */
 #define LWIP_SOCKET                     0
+#if LWIP_SOCKET
+	/*
+	 * The sockets.c file requires this macro to be defined to really
+	 * set errno on errors.
+	 */
+	#define ERRNO
+#endif
 
 /**
  * Enable BSD-style sockets functions names.
@@ -1211,11 +1224,13 @@
 #endif
 
 /**
- * Enable POSIX-style sockets functions names.
- *
- * $WIZ$ type = "boolean"
+ * LWIP_POSIX_SOCKETS_IO_NAMES==1: Enable POSIX-style sockets functions names.
+ * Disable this option if you use a POSIX operating system that uses the same
+ * names (read, write & close). (only used if you use sockets.c)
  */
+#ifndef LWIP_POSIX_SOCKETS_IO_NAMES
 #define LWIP_POSIX_SOCKETS_IO_NAMES     0
+#endif
 
 /**
  * LWIP_TCP_KEEPALIVE==1: Enable TCP_KEEPIDLE, TCP_KEEPINTVL and TCP_KEEPCNT

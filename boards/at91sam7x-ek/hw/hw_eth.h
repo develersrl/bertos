@@ -26,41 +26,19 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * Copyright 2011 Develer S.r.l. (http://www.develer.com/)
+ *
  * -->
  *
- * \brief Configuration file for parser module.
+ * \brief MAC address definition
  *
- * \author Daniele Basile <asterix@develer.com>
+ * \author Luca Ottaviano <lottaviano@develer.com>
  */
+#ifndef HW_ETH_H
+#define HW_ETH_H
 
-#ifndef CFG_PARSER_H
-#define CFG_PARSER_H
+#include <cfg/compiler.h>
 
-/**
- * Max number of arguments and results for each command
- * $WIZ$ type = "int"
- * $WIZ$ min = 0
- */
-#define CONFIG_PARSER_MAX_ARGS       4
+extern uint8_t mac_addr[6];
 
-/**
- * Max number of commands
- * $WIZ$ type = "int"
- * $WIZ$ min = 8
- */
-#define CONFIG_MAX_COMMANDS_NUMBER  16
-
-/**
- * Enable compatibility behaviour.
- *
- * Skip the first word from incoming commands. Don't enable in new projects.
- * $WIZ$ type = "boolean"
- */
-#define CONFIG_ENABLE_COMPAT_BEHAVIOUR 1
-
-#endif /* CFG_PARSER_H */
-
-
-
+#endif // HW_ETH_H
