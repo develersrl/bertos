@@ -1,5 +1,5 @@
 /**
- * \file
+ * \file cfg_led_7seg.h
  * <!--
  * This file is part of BeRTOS.
  *
@@ -26,39 +26,55 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \brief Configuration file for PWM module.
+ * \brief Configuration file for led 7 segment display.
  *
- * \author Daniele Basile <asterix@develer.com>
+ * \author Fabio Bizzi <fbizzi@bizzi.org>
+ *
+ * \addtogroup SevenSegDisplay 7 Segments LED Displays Driver
+ * \{
+ *
  */
 
-#ifndef CFG_PWM_H
-#define CFG_PWM_H
+#ifndef CFG_LED_7SEG_H
+#define CFG_LED_7SEG_H
 
 /**
- * Module logging level.
- *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_level"
- */
-#define PWM_LOG_LEVEL      LOG_LVL_INFO
-
-/**
- * Module logging format.
- *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_format"
- */
-#define PWM_LOG_FORMAT     LOG_FMT_VERBOSE
-
-/**
- * Enable the OLD pwm API.
- * Not recommended for new projects.
- *
+ * Use a Common Cathode display.
  * $WIZ$ type = "boolean"
  */
-#define CFG_PWM_ENABLE_OLD_API	1
+#define CONFIG_LED_7SEG_CCAT       0
 
-#endif /* CFG_PWM_H */
+/**
+ * Number of digit present in the LED display.
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 1
+ * $WIZ$ max = 8
+ */
+#define CONFIG_LED_7SEG_DIGIT      4
+
+/**
+ * Max lenght of the string to be displayed.
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 16
+ * $WIZ$ max = 255
+ */
+#define CONFIG_LED_7SEG_STRLEN     255
+
+/**
+ * Default scrolling speed (ms * CONFIG_LED_7SEG_RTIME).
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_LED_7SEG_SSPEED      10
+
+/**
+ * Default refresh time (ms).
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_LED_7SEG_RTIME      5
+
+#endif /* CFG_LED_7SEG_H */
+ /** \} */ //defgroup drivers
+
