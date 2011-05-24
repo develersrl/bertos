@@ -11,10 +11,10 @@ include ./examples/test/avrtest.mk
 include ./examples/test/armtest.mk
 
 include ./boards/arduino/examples/arduino_aprs/arduino_aprs.mk
-#include ./boards/arduino/benchmark/arduino_context_switch/arduino_context_switch.mk
-#include ./boards/arduino/benchmark/arduino_kernel_footprint/arduino_kernel_footprint.mk
-#include ./boards/arduino/templates/arduino_kernel/arduino_kernel.mk
-#include ./boards/arduino/templates/arduino_empty/arduino_empty.mk
+include ./boards/arduino/benchmark/arduino_context_switch/arduino_context_switch.mk
+include ./boards/arduino/benchmark/arduino_kernel_footprint/arduino_kernel_footprint.mk
+include ./boards/arduino/templates/arduino_kernel/arduino_kernel.mk
+include ./boards/arduino/templates/arduino_empty/arduino_empty.mk
 
 #include ./boards/arduino-mega/examples/arduino-mega_aprs/arduino-mega_aprs.mk
 #include ./boards/arduino-mega/benchmark/arduino-mega_context_switch/arduino-mega_context_switch.mk
