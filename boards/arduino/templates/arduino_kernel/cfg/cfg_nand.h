@@ -26,88 +26,86 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2001, 2004 Develer S.r.l. (http://www.develer.com/)
- * Copyright 1999, 2000, 2001, 2008 Bernie Innocenti <bernie@codewiz.org>
+ * Copyright 2011 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \brief Kernel configuration parameters
+ * \author Stefano Fedrigo <aleph@develer.com>
  *
- * \author Bernie Innocenti <bernie@codewiz.org>
+ * \brief Configuration file for NAND driver module.
  */
 
-#ifndef CFG_PROC_H
-#define CFG_PROC_H
+#ifndef CFG_NAND_H
+#define CFG_NAND_H
 
 /**
- * Enable the multithreading kernel.
+ * Page data size
  *
- * $WIZ$ type = "autoenabled"
- */
-#define CONFIG_KERN 1
-
-/**
- * Kernel interrupt supervisor. WARNING: Experimental, still incomplete!
- * $WIZ$ type = "boolean"
- * $WIZ$ supports = "False"
- */
-#define CONFIG_KERN_IRQ 0
-
-/**
- * Preemptive process scheduling.
- *
- * $WIZ$ type = "boolean"
- * $WIZ$ conditional_deps = "timer"
- */
-#define CONFIG_KERN_PREEMPT 0
-
-/**
- * Time sharing quantum (a prime number prevents interference effects) [ms].
+ * Size of the data section of a programmable page in bytes.
  *
  * $WIZ$ type = "int"
- * $WIZ$ min = 1
  */
-#define CONFIG_KERN_QUANTUM 11
+#define CONFIG_NAND_DATA_SIZE         2048
 
 /**
- * Priority-based scheduling policy.
- * $WIZ$ type = "boolean"
- */
-#define CONFIG_KERN_PRI 1
-
-/**
- * Priority-inheritance protocol.
- * $WIZ$ type = "boolean"
- */
-#define CONFIG_KERN_PRI_INHERIT 0
-
-/**
- * Dynamic memory allocation for processes.
- * $WIZ$ type = "boolean"
- * $WIZ$ conditional_deps = "heap"
- */
-#define CONFIG_KERN_HEAP 1
-
-/**
- * Size of the dynamic memory pool used by processes.
+ * Page spare area size
+ *
+ * Size of the spare section of a programmable page in bytes.
+ *
  * $WIZ$ type = "int"
- * $WIZ$ min = 0
  */
-#define CONFIG_KERN_HEAP_SIZE 1024L
+#define CONFIG_NAND_SPARE_SIZE        64
 
 /**
- * Module logging level.
+ * Pages per block
+ *
+ * Number of pages in a erase block.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_NAND_PAGES_PER_BLOCK   64
+
+/**
+ * Number of blocks
+ *
+ * Total number of erase blocks in one NAND chip.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_NAND_NUM_BLOCK        2048
+
+/**
+ * Number of reserved blocks
+ *
+ * Blocks reserved for remapping defective NAND blocks.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_NAND_NUM_REMAP_BLOCKS  128
+
+/**
+ * NAND operations timeout
+ *
+ * How many milliseconds the cpu waits for
+ * completion of NAND operations.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_NAND_TMOUT      100
+
+/**
+ * Module logging level
  *
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_level"
  */
-#define KERN_LOG_LEVEL LOG_LVL_ERR
+#define CONFIG_NAND_LOG_LEVEL      LOG_LVL_WARN
 
 /**
- * Module logging format.
+ * Module logging format
  *
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_format"
  */
-#define KERN_LOG_FORMAT LOG_FMT_VERBOSE
+#define CONFIG_NAND_LOG_FORMAT     LOG_FMT_TERSE
 
-#endif /*  CFG_PROC_H */
+#endif /* CFG_NAND_H */

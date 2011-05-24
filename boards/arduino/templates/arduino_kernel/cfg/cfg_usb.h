@@ -61,4 +61,25 @@
  */
 #define CONFIG_USB_BUFSIZE  64
 
+/**
+ * Maximum number of USB device interfaces (default = 1).
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 1
+ */
+#define CONFIG_USB_INTERFACE_MAX  1
+
+/**
+ * Maximum number of allocated endpoints (0 = auto).
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 0
+ */
+#define CONFIG_USB_EP_MAX  0
+
+/**
+ * Maximum packet size of the control endpoint 0 [bytes].
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 8
+ */
+#define CONFIG_EP0_MAX_SIZE 8
+
 #endif /* CFG_USB_H */

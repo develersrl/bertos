@@ -1,5 +1,5 @@
 /**
- * \file
+ * \file cfg_led_7seg.h
  * <!--
  * This file is part of BeRTOS.
  *
@@ -26,88 +26,55 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2001, 2004 Develer S.r.l. (http://www.develer.com/)
- * Copyright 1999, 2000, 2001, 2008 Bernie Innocenti <bernie@codewiz.org>
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \brief Kernel configuration parameters
+ * \brief Configuration file for led 7 segment display.
  *
- * \author Bernie Innocenti <bernie@codewiz.org>
+ * \author Fabio Bizzi <fbizzi@bizzi.org>
+ *
+ * \addtogroup SevenSegDisplay 7 Segments LED Displays Driver
+ * \{
+ *
  */
 
-#ifndef CFG_PROC_H
-#define CFG_PROC_H
+#ifndef CFG_LED_7SEG_H
+#define CFG_LED_7SEG_H
 
 /**
- * Enable the multithreading kernel.
- *
- * $WIZ$ type = "autoenabled"
- */
-#define CONFIG_KERN 1
-
-/**
- * Kernel interrupt supervisor. WARNING: Experimental, still incomplete!
+ * Use a Common Cathode display.
  * $WIZ$ type = "boolean"
- * $WIZ$ supports = "False"
  */
-#define CONFIG_KERN_IRQ 0
+#define CONFIG_LED_7SEG_CCAT       0
 
 /**
- * Preemptive process scheduling.
- *
- * $WIZ$ type = "boolean"
- * $WIZ$ conditional_deps = "timer"
- */
-#define CONFIG_KERN_PREEMPT 0
-
-/**
- * Time sharing quantum (a prime number prevents interference effects) [ms].
- *
+ * Number of digit present in the LED display.
  * $WIZ$ type = "int"
  * $WIZ$ min = 1
+ * $WIZ$ max = 8
  */
-#define CONFIG_KERN_QUANTUM 11
+#define CONFIG_LED_7SEG_DIGIT      4
 
 /**
- * Priority-based scheduling policy.
- * $WIZ$ type = "boolean"
- */
-#define CONFIG_KERN_PRI 1
-
-/**
- * Priority-inheritance protocol.
- * $WIZ$ type = "boolean"
- */
-#define CONFIG_KERN_PRI_INHERIT 0
-
-/**
- * Dynamic memory allocation for processes.
- * $WIZ$ type = "boolean"
- * $WIZ$ conditional_deps = "heap"
- */
-#define CONFIG_KERN_HEAP 1
-
-/**
- * Size of the dynamic memory pool used by processes.
+ * Max lenght of the string to be displayed.
  * $WIZ$ type = "int"
- * $WIZ$ min = 0
+ * $WIZ$ min = 16
+ * $WIZ$ max = 255
  */
-#define CONFIG_KERN_HEAP_SIZE 1024L
+#define CONFIG_LED_7SEG_STRLEN     255
 
 /**
- * Module logging level.
- *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_level"
+ * Default scrolling speed (ms * CONFIG_LED_7SEG_RTIME).
+ * $WIZ$ type = "int"
  */
-#define KERN_LOG_LEVEL LOG_LVL_ERR
+#define CONFIG_LED_7SEG_SSPEED      10
 
 /**
- * Module logging format.
- *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_format"
+ * Default refresh time (ms).
+ * $WIZ$ type = "int"
  */
-#define KERN_LOG_FORMAT LOG_FMT_VERBOSE
+#define CONFIG_LED_7SEG_RTIME      5
 
-#endif /*  CFG_PROC_H */
+#endif /* CFG_LED_7SEG_H */
+ /** \} */ //defgroup drivers
+
