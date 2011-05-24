@@ -248,22 +248,22 @@ static void ethernetif_input(struct netif *netif)
 	/* move received packet into a new pbuf */
 	p = low_level_input(netif);
 	/* no packet could be read, silently ignore this */
-	if (p == NULL) return;
-
+	if (p == NULL)
+		return;
+	/* points to packet payload, which starts with an Ethernet header */
 	ethhdr = p->payload;
 
 	switch (htons(ethhdr->type))
 	{
-	case ETHTYPE_ARP:
-	        etharp_arp_input(netif, ethernetif->ethaddr, p);
-		break;
-
+	/* IP or ARP packet? */
 	case ETHTYPE_IP:
-#if DHCP_DOES_ARP_CHECK
-		etharp_ip_input(netif, p);
-#endif
-		pbuf_header(p, (int16_t) - sizeof(struct eth_hdr));
-
+	case ETHTYPE_ARP:
+#if PPPOE_SUPPORT
+	/* PPPoE packet? */
+	case ETHTYPE_PPPOEDISC:
+	case ETHTYPE_PPPOE:
+#endif /* PPPOE_SUPPORT */
+		/* full packet send to tcpip_thread to process */
 		if (netif->input(p, netif) != ERR_OK)
 		{
 			LWIP_DEBUGF(NETIF_DEBUG, ("ethernetif_input: IP input error\n"));
@@ -271,12 +271,14 @@ static void ethernetif_input(struct netif *netif)
 			p = NULL;
 		}
 		break;
+
 	default:
 		pbuf_free(p);
 		p = NULL;
 		break;
 	}
 }
+
 
 static NORETURN void ethernetif_loop(void *arg)
 {
