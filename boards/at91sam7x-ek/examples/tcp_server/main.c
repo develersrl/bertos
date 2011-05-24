@@ -88,7 +88,7 @@ static void init(void)
 	tcpip_init(NULL, NULL);
 
 	/* Bring up the network interface */
-	netif_add(&netif, &ipaddr, &netmask, &gw, NULL, ethernetif_init, ip_input);
+	netif_add(&netif, &ipaddr, &netmask, &gw, NULL, ethernetif_init, tcpip_input);
 	netif_set_default(&netif);
 	netif_set_up(&netif);
 }
@@ -118,13 +118,16 @@ int main(void)
 	proc_new(monitor_process, NULL, KERN_MINSTACKSIZE * 2, NULL);
 
 	dhcp_start(&netif);
+	/*
+	 * Here we wait for an ip address, but it's not strictly
+	 * necessary. The address is obtained in background and
+	 * as long as we don't use network functions, we could go
+	 * on with initialization
+	 */
 	while (!netif.ip_addr.addr)
-	{
-		dhcp_fine_tmr();
-		timer_delay(DHCP_FINE_TIMER_MSECS);
-	}
-	kprintf(">>> dhcp ok: ip = %#x (kernel %s)\n",
-		(unsigned int)netif.ip_addr.addr,
+		timer_delay(200);
+	kprintf(">>> dhcp ok: ip = ip = %s (kernel %s)\n",
+		ip_ntoa(&netif.ip_addr.addr),
 		CONFIG_KERN_PREEMPT ? "preempt" : "coop");
 
 	server = netconn_new(NETCONN_TCP);
