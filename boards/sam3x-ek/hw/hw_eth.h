@@ -27,62 +27,18 @@
  * the GNU General Public License.
  *
  * Copyright 2011 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ *
  * -->
  *
- * \brief Configuration file for DAC module.
+ * \brief MAC address definition
  *
- *
- * \author Daniele Basile <asterix@develer.com>
+ * \author Luca Ottaviano <lottaviano@develer.com>
  */
+#ifndef HW_ETH_H
+#define HW_ETH_H
 
-#ifndef CFG_DAC_H
-#define CFG_DAC_H
+#include <cfg/compiler.h>
 
-/**
- * Module logging level.
- *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_level"
- */
-#define DAC_LOG_LEVEL      LOG_LVL_WARN
+extern uint8_t mac_addr[6];
 
-/**
- * Module logging format.
- *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_format"
- */
-#define DAC_LOG_FORMAT     LOG_FMT_TERSE
-
-/**
- * DAC Refresh Period = 1024*REFRESH/DACC Clock
- *
- * $WIZ$ type = "int"
- * $WIZ$ supports = "sam3x"
- * $WIZ$ min = 0
- * $WIZ$ max = 65536
- */
-#define CONFIG_DAC_REFRESH            16
-
-/**
- * DAC Startup Time Selection.
- * see datasheet table.
- *
- * $WIZ$ type = "int"
- * $WIZ$ supports = "sam3x"
- * $WIZ$ min = 0
- * $WIZ$ max = 63
- */
-#define CONFIG_DAC_STARTUP             0
-
-/**
- * DAC Trigger Selection.
- *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "sam3x_dac_tc"
- * $WIZ$ supports = "sam3x"
- */
-#define CONFIG_DAC_TIMER  DACC_TRGSEL_TIO_CH0
-
-#endif /* CFG_DAC_H */
+#endif // HW_ETH_H

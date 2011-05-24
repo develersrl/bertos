@@ -1206,6 +1206,13 @@
  * $WIZ$ type = "boolean"
  */
 #define LWIP_SOCKET                     1
+#if LWIP_SOCKET
+	/*
+	 * The sockets.c file requires this macro to be defined to really
+	 * set errno on errors.
+	 */
+	#define ERRNO
+#endif
 
 /**
  * Enable BSD-style sockets functions names.
