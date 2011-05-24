@@ -79,7 +79,7 @@ static void init(void)
 	tcpip_init(NULL, NULL);
 
 	/* Bring up the network interface */
-	netif_add(&netif, &ipaddr, &netmask, &gw, NULL, ethernetif_init, ip_input);
+	netif_add(&netif, &ipaddr, &netmask, &gw, NULL, ethernetif_init, tcpip_input);
 	netif_set_default(&netif);
 	netif_set_up(&netif);
 }
@@ -110,10 +110,7 @@ int main(void)
 
 	dhcp_start(&netif);
 	while (!netif.ip_addr.addr)
-	{
-		dhcp_fine_tmr();
 		timer_delay(DHCP_FINE_TIMER_MSECS);
-	}
 	kprintf(">>> dhcp ok: ip = %d.%d.%d.%d (kernel %s)\n",
 		(int)(netif.ip_addr.addr >>  0 & 0xff),
 		(int)(netif.ip_addr.addr >>  8 & 0xff),
