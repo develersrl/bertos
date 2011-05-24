@@ -509,6 +509,7 @@
 		#error CPU cannot be MEGA and XMEGA
 	#elif defined(CPU_AVR_MEGA)
 		#define CPU_AVR_XMEGA		0
+		#define CPU_AVR_XMEGA_D		0
 	#elif defined(CPU_AVR_XMEGA)
 		#define CPU_AVR_MEGA		0
 	#endif
