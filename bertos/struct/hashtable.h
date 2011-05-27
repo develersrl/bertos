@@ -133,7 +133,8 @@ typedef struct
 
 /** Exactly like \c DECLARE_HASHTABLE, but the variable will be declared as static. */
 #define DECLARE_HASHTABLE_STATIC(name, size, hook_gk) \
-	static const void* name##_nodes[1 << UINT32_LOG2(size)]; \
+	enum { name##_SIZE = (1 << UINT32_LOG2(size)), }; \
+	static const void* name##_nodes[name##_SIZE]; \
 	static struct HashTable name = \
 		{ \
 			.mem = name##_nodes, \
@@ -155,8 +156,10 @@ typedef struct
 
 	/** Exactly like \c DECLARE_HASHTABLE_INTERNALKEY, but the variable will be declared as static. */
 	#define DECLARE_HASHTABLE_INTERNALKEY_STATIC(name, size) \
-		static uint8_t name##_keys[(1 << UINT32_LOG2(size)) * (INTERNAL_KEY_MAX_LENGTH + 1)]; \
-		static const void* name##_nodes[1 << UINT32_LOG2(size)]; \
+		enum { name##_KEYS = ((1 << UINT32_LOG2(size)) * (INTERNAL_KEY_MAX_LENGTH + 1)), \
+			name##_SIZE = (1 << UINT32_LOG2(size)), }; \
+		static uint8_t name##_keys[name##_KEYS]; \
+		static const void* name##_nodes[name##_SIZE]; \
 		static struct HashTable name = \
 			{ \
 				.mem = name##_nodes, \
