@@ -25,8 +25,8 @@ include ./boards/arduino/templates/arduino_empty/arduino_empty.mk
 include ./boards/triface/examples/triface/triface.mk
 #include ./boards/triface/benchmark/triface_context_switch/triface_context_switch.mk
 #include ./boards/triface/benchmark/triface_kernel_footprint/triface_kernel_footprint.mk
-#include ./boards/triface/templates/triface_empty/triface_empty.mk
-#include ./boards/triface/templates/triface_kernel/triface_kernel.mk
+include ./boards/triface/templates/triface_empty/triface_empty.mk
+include ./boards/triface/templates/triface_kernel/triface_kernel.mk
 
 include ./boards/at91sam7s-ek/templates/at91sam7s-ek_empty/at91sam7s-ek_empty.mk
 include ./boards/at91sam7s-ek/templates/at91sam7s-ek_kernel/at91sam7s-ek_kernel.mk

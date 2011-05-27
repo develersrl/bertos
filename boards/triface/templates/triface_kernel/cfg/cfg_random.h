@@ -26,16 +26,17 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2011 Develer S.r.l. (http://www.develer.com/)
+ *
  * -->
  *
- * \brief Configuration file for PWM module.
+ * \author Andrea Righi <arighi@develer.com>
  *
- * \author Daniele Basile <asterix@develer.com>
+ * \brief Configuration file for the "random" module
  */
 
-#ifndef CFG_PWM_H
-#define CFG_PWM_H
+#ifndef CFG_RANDOM_H
+#define CFG_RANDOM_H
 
 /**
  * Module logging level.
@@ -43,22 +44,22 @@
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_level"
  */
-#define PWM_LOG_LEVEL      LOG_LVL_INFO
+#define RANDOM_LOG_LEVEL      LOG_LVL_INFO
 
 /**
- * Module logging format.
+ * module logging format.
  *
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_format"
  */
-#define PWM_LOG_FORMAT     LOG_FMT_VERBOSE
+#define RANDOM_LOG_FORMAT     LOG_FMT_TERSE
 
 /**
- * Enable the OLD pwm API.
- * Not recommended for new projects.
+ * Random security level.
  *
- * $WIZ$ type = "boolean"
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "random_level"
  */
-#define CFG_PWM_ENABLE_OLD_API	1
+#define RANDOM_SECURITY_LEVEL          RANDOM_SECURITY_MINIMUM
 
-#endif /* CFG_PWM_H */
+#endif /* CFG_RANDOM_H */
