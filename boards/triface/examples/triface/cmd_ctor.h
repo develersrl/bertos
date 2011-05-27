@@ -41,8 +41,6 @@
 
 #define REGISTER_FUNCTION parser_register_cmd
 
-#define REGISTER_CMD(NAME) REGISTER_FUNCTION(&cmd_ ## NAME ## _template)
-
 #define MAKE_TEMPLATE(NAME, ARGS, RES, FLAGS)				\
 const struct CmdTemplate cmd_ ## NAME ## _template =			\
 {									\

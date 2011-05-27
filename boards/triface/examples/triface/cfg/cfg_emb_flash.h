@@ -29,13 +29,13 @@
  * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \brief Configuration file for PWM module.
- *
  * \author Daniele Basile <asterix@develer.com>
+ *
+ * \brief Configuration file for embedded flash module.
  */
 
-#ifndef CFG_PWM_H
-#define CFG_PWM_H
+#ifndef CFG_EMB_FLASH_H
+#define CFG_EMB_FLASH_H
 
 /**
  * Module logging level.
@@ -43,22 +43,31 @@
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_level"
  */
-#define PWM_LOG_LEVEL      LOG_LVL_INFO
+#define CONFIG_FLASH_EMB_LOG_LEVEL      LOG_LVL_INFO
 
 /**
- * Module logging format.
+ * module logging format.
  *
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_format"
  */
-#define PWM_LOG_FORMAT     LOG_FMT_VERBOSE
+#define CONFIG_FLASH_EMB_LOG_FORMAT     LOG_FMT_TERSE
+
 
 /**
- * Enable the OLD pwm API.
- * Not recommended for new projects.
+ * Write emb flash timeout.
+ * For how many milliseconds the cpu wait
+ * to complete write operation.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_FLASH_WR_TIMEOUT      100
+
+/**
+ * Check this to disable embedded flash deprecated API support.
  *
  * $WIZ$ type = "boolean"
  */
-#define CFG_PWM_ENABLE_OLD_API	1
+#define CONFIG_FLASH_DISABLE_OLD_API       0
 
-#endif /* CFG_PWM_H */
+#endif /* CFG_FLASH_AT91_H */

@@ -26,16 +26,17 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ *
  * -->
  *
- * \brief Configuration file for PWM module.
+ * \author Andrea Righi <arighi@develer.com>
  *
- * \author Daniele Basile <asterix@develer.com>
+ * \brief Configuration file for the generic ethernet driver module
  */
 
-#ifndef CFG_PWM_H
-#define CFG_PWM_H
+#ifndef CFG_ETH_H
+#define CFG_ETH_H
 
 /**
  * Module logging level.
@@ -43,22 +44,14 @@
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_level"
  */
-#define PWM_LOG_LEVEL      LOG_LVL_INFO
+#define ETH_LOG_LEVEL      LOG_LVL_WARN
 
 /**
- * Module logging format.
+ * module logging format.
  *
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_format"
  */
-#define PWM_LOG_FORMAT     LOG_FMT_VERBOSE
+#define ETH_LOG_FORMAT     LOG_FMT_TERSE
 
-/**
- * Enable the OLD pwm API.
- * Not recommended for new projects.
- *
- * $WIZ$ type = "boolean"
- */
-#define CFG_PWM_ENABLE_OLD_API	1
-
-#endif /* CFG_PWM_H */
+#endif /* CFG_ETH_H */

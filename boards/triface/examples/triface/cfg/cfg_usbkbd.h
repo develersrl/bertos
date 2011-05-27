@@ -26,16 +26,24 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ *
  * -->
  *
- * \brief Configuration file for PWM module.
+ * \author Andrea Righi <arighi@develer.com>
  *
- * \author Daniele Basile <asterix@develer.com>
+ * \brief Configuration file for the usbkbd driver module
  */
 
-#ifndef CFG_PWM_H
-#define CFG_PWM_H
+#ifndef CFG_USBKBD_H
+#define CFG_USBKBD_H
+
+/**
+ * Enable the usbkbd module.
+ *
+ * $WIZ$ type = "autoenabled"
+ */
+#define CONFIG_USBKBD 0
 
 /**
  * Module logging level.
@@ -43,22 +51,28 @@
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_level"
  */
-#define PWM_LOG_LEVEL      LOG_LVL_INFO
+#define USB_KEYBOARD_LOG_LEVEL      LOG_LVL_INFO
 
 /**
- * Module logging format.
+ * module logging format.
  *
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_format"
  */
-#define PWM_LOG_FORMAT     LOG_FMT_VERBOSE
+#define USB_KEYBOARD_LOG_FORMAT     LOG_FMT_TERSE
 
 /**
- * Enable the OLD pwm API.
- * Not recommended for new projects.
+ * USB vendor ID (please change this in your project, using a valid ID number!).
  *
- * $WIZ$ type = "boolean"
+ * $WIZ$ type = "hex"
  */
-#define CFG_PWM_ENABLE_OLD_API	1
+#define USB_KEYBOARD_VENDOR_ID      0x046d
 
-#endif /* CFG_PWM_H */
+/**
+ * USB product ID (please change this in your project, using a valid ID number!).
+ *
+ * $WIZ$ type = "hex"
+ */
+#define USB_KEYBOARD_PRODUCT_ID     0xffff
+
+#endif /* CFG_USB_KEYBOARD_H */

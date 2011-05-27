@@ -26,16 +26,24 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ *
  * -->
  *
- * \brief Configuration file for PWM module.
+ * \author Andrea Righi <arighi@develer.com>
  *
- * \author Daniele Basile <asterix@develer.com>
+ * \brief Configuration file for the USB serial driver module
  */
 
-#ifndef CFG_PWM_H
-#define CFG_PWM_H
+#ifndef CFG_USBSER_H
+#define CFG_USBSER_H
+
+/**
+ * Enable the usb-serial module.
+ *
+ * $WIZ$ type = "autoenabled"
+ */
+#define CONFIG_USBSER 0
 
 /**
  * Module logging level.
@@ -43,22 +51,28 @@
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_level"
  */
-#define PWM_LOG_LEVEL      LOG_LVL_INFO
+#define USB_SERIAL_LOG_LEVEL      LOG_LVL_INFO
 
 /**
- * Module logging format.
+ * module logging format.
  *
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_format"
  */
-#define PWM_LOG_FORMAT     LOG_FMT_VERBOSE
+#define USB_SERIAL_LOG_FORMAT     LOG_FMT_TERSE
 
 /**
- * Enable the OLD pwm API.
- * Not recommended for new projects.
+ * USB vendor ID (please change this in your project, using a valid ID number!).
  *
- * $WIZ$ type = "boolean"
+ * $WIZ$ type = "hex"
  */
-#define CFG_PWM_ENABLE_OLD_API	1
+#define USB_SERIAL_VENDOR_ID      0x05f9
 
-#endif /* CFG_PWM_H */
+/**
+ * USB product ID (please change this in your project, using a valid ID number!).
+ *
+ * $WIZ$ type = "hex"
+ */
+#define USB_SERIAL_PRODUCT_ID     0xffff
+
+#endif /* CFG_USBSER_H */
