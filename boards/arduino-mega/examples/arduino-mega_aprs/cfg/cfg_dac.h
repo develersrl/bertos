@@ -26,16 +26,18 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2011 Develer S.r.l. (http://www.develer.com/)
+ * All Rights Reserved.
  * -->
  *
- * \brief Configuration file for PWM module.
+ * \brief Configuration file for DAC module.
+ *
  *
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef CFG_PWM_H
-#define CFG_PWM_H
+#ifndef CFG_DAC_H
+#define CFG_DAC_H
 
 /**
  * Module logging level.
@@ -43,7 +45,7 @@
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_level"
  */
-#define PWM_LOG_LEVEL      LOG_LVL_INFO
+#define DAC_LOG_LEVEL      LOG_LVL_WARN
 
 /**
  * Module logging format.
@@ -51,14 +53,36 @@
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_format"
  */
-#define PWM_LOG_FORMAT     LOG_FMT_VERBOSE
+#define DAC_LOG_FORMAT     LOG_FMT_TERSE
 
 /**
- * Enable the OLD pwm API.
- * Not recommended for new projects.
+ * DAC Refresh Period = 1024*REFRESH/DACC Clock
  *
- * $WIZ$ type = "boolean"
+ * $WIZ$ type = "int"
+ * $WIZ$ supports = "sam3x"
+ * $WIZ$ min = 0
+ * $WIZ$ max = 65536
  */
-#define CFG_PWM_ENABLE_OLD_API	1
+#define CONFIG_DAC_REFRESH            16
 
-#endif /* CFG_PWM_H */
+/**
+ * DAC Startup Time Selection.
+ * see datasheet table.
+ *
+ * $WIZ$ type = "int"
+ * $WIZ$ supports = "sam3x"
+ * $WIZ$ min = 0
+ * $WIZ$ max = 63
+ */
+#define CONFIG_DAC_STARTUP             0
+
+/**
+ * DAC Trigger Selection.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "sam3x_dac_tc"
+ * $WIZ$ supports = "sam3x"
+ */
+#define CONFIG_DAC_TIMER  DACC_TRGSEL_TIO_CH0
+
+#endif /* CFG_DAC_H */
