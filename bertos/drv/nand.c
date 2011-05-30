@@ -135,8 +135,6 @@ static void getAddrCycles(uint32_t page, uint16_t offset, uint32_t *cycle0, uint
 
 	*cycle0 = offset & 0xff;
 	*cycle1234 = (page << 8) | ((offset >> 8) & 0xf);
-
-	//LOG_INFO("nand addr: %lx %lx\n", *cycle1234, *cycle0);
 }
 
 
@@ -487,7 +485,7 @@ static void initBlockMap(Nand *chip)
 				chip->block_map[b] = getFreeRemapBlock(chip);
 				setMapping(chip, b, chip->block_map[b]);
 				remapped_anything = true;
-				LOG_INFO("nand: found new bad block %d, remapped to %d\n", b, chip->block_map[b]);
+				LOG_WARN("nand: found new bad block %d, remapped to %d\n", b, chip->block_map[b]);
 			}
 		}
 
@@ -583,7 +581,7 @@ static size_t nand_writeDirect(struct KBlock *kblk, block_idx_t idx, const void 
 	ASSERT(size <= NAND_BLOCK_SIZE);
 	ASSERT(size % CONFIG_NAND_DATA_SIZE == 0);
 
-	//LOG_INFO("nand_writeDirect: idx=%ld offset=%d size=%d\n", idx, offset, size);
+	LOG_INFO("nand_writeDirect: idx=%ld offset=%d size=%d\n", idx, offset, size);
 
 	nand_blockErase(NAND_CAST(kblk), idx);
 
@@ -612,7 +610,7 @@ static size_t nand_readDirect(struct KBlock *kblk, block_idx_t idx, void *buf, s
 	ASSERT(offset < NAND_BLOCK_SIZE);
 	ASSERT(size <= NAND_BLOCK_SIZE);
 
-	//LOG_INFO("nand_readDirect: idx=%ld offset=%d size=%d\n", idx, offset, size);
+	LOG_INFO("nand_readDirect: idx=%ld offset=%d size=%d\n", idx, offset, size);
 
 	while (nread < size)
 	{
