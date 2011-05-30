@@ -272,10 +272,13 @@
 	#define TWI0_PORT   PIOA_BASE
 	#define TWI1_PORT   PIOA_BASE
 
-	#define TWI0_TWCK   18
+	#define TWI0_PERIPH  PIO_PERIPH_A
+	#define TWI1_PERIPH  PIO_PERIPH_A
+
 	#define TWI0_TWD    17
-	#define TWI1_TWCK   13
+	#define TWI0_TWCK   18
 	#define TWI1_TWD    12
+	#define TWI1_TWCK   13
 #endif
 
 /*\}*/
