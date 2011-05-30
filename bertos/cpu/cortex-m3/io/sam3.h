@@ -246,7 +246,7 @@
 /*\}*/
 
 /**
- * PIO I/O pins
+ * SPI I/O pins
  */
 /*\{*/
 #if CPU_CM3_SAM3U
@@ -262,5 +262,21 @@
 	#define SPI0_MOSI   13
 	#define SPI0_MISO   12
 #endif
+/*\}*/
+
+/**
+ * TWI I/O pins
+ */
+/*\{*/
+#if CPU_CM3_SAM3X
+	#define TWI0_PORT   PIOA_BASE
+	#define TWI1_PORT   PIOA_BASE
+
+	#define TWI0_TWCK   18
+	#define TWI0_TWD    17
+	#define TWI1_TWCK   13
+	#define TWI1_TWD    12
+#endif
+
 /*\}*/
 #endif /* SAM3_H */
