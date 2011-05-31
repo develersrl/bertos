@@ -172,6 +172,7 @@
 #include "sam3_adc.h"
 #include "sam3_dacc.h"
 #include "sam3_tc.h"
+#include "sam3_twi.h"
 
 /**
  * U(S)ART I/O pins
