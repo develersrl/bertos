@@ -26,26 +26,28 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2011 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
- * \brief Low-level I2C module for ARM Cortex-m3 (interface).
+ * \brief TWI driver for SAM3 (interface)
  *
- * \author Daniele Basile <asterix@develer.com>
- *
+ * \author Stefano Fedrigo <aleph@develer.com>
  */
 
-#include <cpu/detect.h>
+#ifndef DRV_I2C_SAM3_H
+#define DRV_I2C_SAM3_H
 
-#if CPU_CM3_LM3S
-	#include "i2c_lm3s.h"
-#elif CPU_CM3_STM32
-	#include "i2c_stm32.h"
-#elif CPU_CM3_SAM3
-	#include "i2c_sam3.h"
-/*#elif  Add other Cortex-M3 CPUs here */
-#else
-	#error Unknown CPU
-#endif
+/**
+ * \name I2C devices enum
+ */
+enum
+{
+	I2C0,
+	I2C1,
+
+	I2C_CNT  /**< Number of ports */
+};
+
+#endif /* DRV_I2C_SAM3_H */
 
