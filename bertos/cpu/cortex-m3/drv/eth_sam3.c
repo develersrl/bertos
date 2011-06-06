@@ -234,13 +234,8 @@ static int emac_reset(void)
 	pmc_periphEnable(PIOD_ID);
 	pmc_periphEnable(EMAC_ID);
 
-	// Disable TESTMODE and RMII
-	PIOC_PUDR = BV(PHY_RXDV_TESTMODE_BIT);
-
-	// Disable PHY power down.
-	PIOD_PER  = BV(PHY_PWRDN_BIT);
-	PIOD_OER  = BV(PHY_PWRDN_BIT);
-	PIOD_CODR = BV(PHY_PWRDN_BIT);
+	// Disable TESTMODE
+	PIOB_PUDR = BV(PHY_RXDV_TESTMODE_BIT);
 #endif
 
 	// Toggle external hardware reset pin.
@@ -261,9 +256,6 @@ static int emac_reset(void)
 #else
 	PIO_PERIPH_SEL(PIOB_BASE, PHY_MII_PINS_PORTB, PIO_PERIPH_A);
 	PIOB_PDR = PHY_MII_PINS_PORTB;
-
-	PIO_PERIPH_SEL(PIOC_BASE, PHY_MII_PINS_PORTC, PIO_PERIPH_A);
-	PIOC_PDR = PHY_MII_PINS_PORTC;
 
 	// Enable receive, transmit clocks and RMII mode.
 	EMAC_USRIO = BV(EMAC_CLKEN) | BV(EMAC_RMII);
