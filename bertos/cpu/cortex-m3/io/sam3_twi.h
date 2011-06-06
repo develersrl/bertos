@@ -40,6 +40,12 @@
 #if CPU_CM3_SAM3X
 	#define TWI0_BASE  0x4008C000
 	#define TWI1_BASE  0x40090000
+#elif CPU_CM3_SAM3N || CPU_CM3_SAM3S
+	#define TWI0_BASE  0x40018000
+	#define TWI1_BASE  0x4001C000
+#elif CPU_CM3_SAM3U
+	#define TWI0_BASE  0x40084000
+	#define TWI1_BASE  0x40088000
 #else
 	#error TWI registers not defined for selected CPU
 #endif

@@ -280,6 +280,28 @@
 	#define TWI0_TWCK   18
 	#define TWI1_TWD    12
 	#define TWI1_TWCK   13
+#elif CPU_CM3_SAM3N || CPU_CM3_SAM3S
+	#define TWI0_PORT   PIOA_BASE
+	#define TWI1_PORT   PIOB_BASE
+
+	#define TWI0_PERIPH  PIO_PERIPH_A
+	#define TWI1_PERIPH  PIO_PERIPH_A
+
+	#define TWI0_TWD    3
+	#define TWI0_TWCK   4
+	#define TWI1_TWD    4
+	#define TWI1_TWCK   5
+#elif CPU_CM3_SAM3U
+	#define TWI0_PORT   PIOA_BASE
+	#define TWI1_PORT   PIOA_BASE
+
+	#define TWI0_PERIPH  PIO_PERIPH_A
+	#define TWI1_PERIPH  PIO_PERIPH_A
+
+	#define TWI0_TWD    9
+	#define TWI0_TWCK   10
+	#define TWI1_TWD    24
+	#define TWI1_TWCK   25
 #endif
 
 /*\}*/
