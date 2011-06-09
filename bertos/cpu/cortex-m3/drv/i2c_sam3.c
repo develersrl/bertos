@@ -99,11 +99,11 @@ INLINE void waitXferComplete(I2c *i2c)
 }
 
 /*
- * Send STOP condition.
+ * Set STOP condition bit, to send stop after next sent byte.
  */
-INLINE void sendStop(I2c *i2c)
+INLINE void setStop(I2c *i2c)
 {
-	HWREG(i2c->hw->base + TWI_CR_OFF) |= TWI_CR_STOP;
+	HWREG(i2c->hw->base + TWI_CR_OFF) = TWI_CR_STOP;
 }
 
 /*
@@ -142,7 +142,7 @@ static void i2c_sam3_putc(I2c *i2c, const uint8_t data)
 	{
 		LOG_ERR("i2c: write start timeout\n");
 		i2c->errors |= I2C_START_TIMEOUT;
-		sendStop(i2c);
+		setStop(i2c);
 		waitXferComplete(i2c);
 		return;
 	}
@@ -150,21 +150,23 @@ static void i2c_sam3_putc(I2c *i2c, const uint8_t data)
 
 	if ((i2c->xfer_size == 1) && (I2C_TEST_STOP(i2c->flags) == I2C_STOP))
 	{
-		sendStop(i2c);
+		setStop(i2c);
 		waitXferComplete(i2c);
 	}
 }
 
 static uint8_t i2c_sam3_getc(I2c *i2c)
 {
+	uint8_t data;
+
+	if ((i2c->xfer_size == 1) && (I2C_TEST_STOP(i2c->flags) == I2C_STOP))
+		setStop(i2c);
+
 	if (i2c->hw->first_xtranf)
 	{
 		HWREG(i2c->hw->base + TWI_CR_OFF) = TWI_CR_START;
 		i2c->hw->first_xtranf = false;
 	}
-
-	if ((i2c->xfer_size == 1) && (I2C_TEST_STOP(i2c->flags) == I2C_STOP))
-		sendStop(i2c);
 
 	if (!waitRxRdy(i2c, CONFIG_I2C_START_TIMEOUT))
 	{
@@ -173,7 +175,12 @@ static uint8_t i2c_sam3_getc(I2c *i2c)
 		return 0xFF;
 	}
 
-	return HWREG(i2c->hw->base + TWI_RHR_OFF);
+	data = HWREG(i2c->hw->base + TWI_RHR_OFF);
+
+	if ((i2c->xfer_size == 1) && (I2C_TEST_STOP(i2c->flags) == I2C_STOP))
+		waitXferComplete(i2c);
+
+	return data;
 }
 
 static void i2c_setClock(I2c *i2c, int clock)
