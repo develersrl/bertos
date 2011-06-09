@@ -121,9 +121,9 @@ static void i2c_sam3_start(struct I2c *i2c, uint16_t slave_addr)
 	i2c->hw->first_xtranf = true;
 
 	if (I2C_TEST_START(i2c->flags) == I2C_START_R)
-		HWREG(i2c->hw->base + TWI_MMR_OFF) = TWI_MMR_DADR(slave_addr) | TWI_MMR_MREAD;
+		HWREG(i2c->hw->base + TWI_MMR_OFF) = TWI_MMR_DADR(slave_addr >> 1) | TWI_MMR_MREAD;
 	else
-		HWREG(i2c->hw->base + TWI_MMR_OFF) = TWI_MMR_DADR(slave_addr);
+		HWREG(i2c->hw->base + TWI_MMR_OFF) = TWI_MMR_DADR(slave_addr >> 1);
 }
 
 static void i2c_sam3_putc(I2c *i2c, const uint8_t data)
