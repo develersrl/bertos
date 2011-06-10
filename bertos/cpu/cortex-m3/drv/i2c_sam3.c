@@ -98,13 +98,6 @@ INLINE void waitXferComplete(I2c *i2c)
 		cpu_relax();
 }
 
-/*
- * Set STOP condition bit, to send stop after next sent byte.
- */
-INLINE void setStop(I2c *i2c)
-{
-	HWREG(i2c->hw->base + TWI_CR_OFF) = TWI_CR_STOP;
-}
 
 /*
  * The start is not performed when we call the start function
@@ -137,36 +130,38 @@ static void i2c_sam3_putc(I2c *i2c, const uint8_t data)
 
 	HWREG(i2c->hw->base + TWI_THR_OFF) = data;
 
+	if ((i2c->xfer_size == 1) && (I2C_TEST_STOP(i2c->flags) == I2C_STOP))
+		HWREG(i2c->hw->base + TWI_CR_OFF) = TWI_CR_STOP;
+
 	// On first byte sent wait for start timeout
 	if (i2c->hw->first_xtranf && !waitTxRdy(i2c, CONFIG_I2C_START_TIMEOUT))
 	{
 		LOG_ERR("i2c: write start timeout\n");
 		i2c->errors |= I2C_START_TIMEOUT;
-		setStop(i2c);
+		HWREG(i2c->hw->base + TWI_CR_OFF) = TWI_CR_STOP;
 		waitXferComplete(i2c);
 		return;
 	}
 	i2c->hw->first_xtranf = false;
 
 	if ((i2c->xfer_size == 1) && (I2C_TEST_STOP(i2c->flags) == I2C_STOP))
-	{
-		setStop(i2c);
 		waitXferComplete(i2c);
-	}
 }
 
 static uint8_t i2c_sam3_getc(I2c *i2c)
 {
 	uint8_t data;
-
-	if ((i2c->xfer_size == 1) && (I2C_TEST_STOP(i2c->flags) == I2C_STOP))
-		setStop(i2c);
+	uint32_t cr = 0;
 
 	if (i2c->hw->first_xtranf)
 	{
-		HWREG(i2c->hw->base + TWI_CR_OFF) = TWI_CR_START;
+		cr |= TWI_CR_START;
 		i2c->hw->first_xtranf = false;
 	}
+	if ((i2c->xfer_size == 1) && (I2C_TEST_STOP(i2c->flags) == I2C_STOP))
+		cr |= TWI_CR_STOP;
+
+	HWREG(i2c->hw->base + TWI_CR_OFF) = cr;
 
 	if (!waitRxRdy(i2c, CONFIG_I2C_START_TIMEOUT))
 	{
@@ -223,14 +218,11 @@ struct I2cHardware i2c_sam3_hw[I2C_CNT];
  */
 void i2c_hw_init(I2c *i2c, int dev, uint32_t clock)
 {
-	uint8_t dummy;
-
 	ASSERT(dev < I2C_CNT);
 
 	i2c->hw = &i2c_sam3_hw[dev];
 	i2c->vt = &i2c_sam3_vt;
 
-	// Configure I/O pins
 	pmc_periphEnable(PIOA_ID);
 
 	switch (dev)
@@ -252,18 +244,10 @@ void i2c_hw_init(I2c *i2c, int dev, uint32_t clock)
 			return;
 	}
 
-	/*
-	 * Reset sequence: enable slave mode, reset, read RHR,
-	 * disable slave and master modes.
-	 */
-	HWREG(i2c->hw->base + TWI_CR_OFF) = TWI_CR_SVEN;
-	HWREG(i2c->hw->base + TWI_CR_OFF) = TWI_CR_SWRST;
-	dummy = HWREG(i2c->hw->base + TWI_RHR_OFF);
-	HWREG(i2c->hw->base + TWI_CR_OFF) = TWI_CR_SVDIS;
-	HWREG(i2c->hw->base + TWI_CR_OFF) = TWI_CR_MSDIS;
 
-	// Set master mode
-	HWREG(i2c->hw->base + TWI_CR_OFF) = TWI_CR_MSEN;
+	// Reset and set master mode
+	HWREG(i2c->hw->base + TWI_CR_OFF) = TWI_CR_SWRST;
+	HWREG(i2c->hw->base + TWI_CR_OFF) = TWI_CR_MSEN | TWI_CR_SVDIS;
 
 	i2c_setClock(i2c, clock);
 }
