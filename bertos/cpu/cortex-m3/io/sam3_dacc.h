@@ -41,6 +41,8 @@
 #ifndef SAM3_DACC_H
 #define SAM3_DACC_H
 
+#include <io/cm3.h>
+
 /** DACC registers base. */
 #define DACC_BASE               0x400C8000
 
@@ -184,35 +186,16 @@
  * DMA controller for DACC
  * DACC PDC register.
  */
-#define DACC_RPR_OFF                     0x100 ///< Receive Pointer Register.
-#define DACC_RPR        (*((reg32_t*) (DACC_BASE + DACC_RPR_OFF)))    ///< Receive Pointer Register.
-
-#define DACC_RCR_OFF                     0x104 ///< Receive Counter Register.
-#define DACC_RCR       (*((reg32_t*) (DACC_BASE + DACC_RCR_OFF)))   ///<  Receive Counter Register.
-
-#define DACC_TPR_OFF                     0x108 ///< Transmit Pointer Register.
-#define DACC_TPR       (*((reg32_t*) (DACC_BASE + DACC_TPR_OFF)))   ///<  Transmit Pointer Register.
-
-#define DACC_TCR_OFF                     0x10C ///< Transmit Counter Register.
-#define DACC_TCR       (*((reg32_t*) (DACC_BASE + DACC_TCR_OFF)))   ///< Transmit Counter Register.
-
-#define DACC_RNPR_OFF                    0x110 ///< Receive Next Pointer Register.
-#define DACC_RNPR      (*((reg32_t*) (DACC_BASE + DACC_RNPR_OFF)))   ///< Receive Next Pointer Register.
-
-#define DACC_RNCR_OFF                    0x114 ///< Receive Next Counter Register.
-#define DACC_RNCR      (*((reg32_t*) (DACC_BASE + DACC_RNCR_OFF)))   ///< Receive Next Counter Register.
-
-#define DACC_TNPR_OFF                    0x118 ///< Transmit Next Pointer Register.
-#define DACC_TNPR      (*((reg32_t*) (DACC_BASE + DACC_TNPR_OFF)))   ///< Transmit Next Pointer Register.
-
-#define DACC_TNCR_OFF                    0x11C ///< Transmit Next Counter Register.
-#define DACC_TNCR      (*((reg32_t*) (DACC_BASE + DACC_TNCR_OFF)))   ///< Transmit Next Counter Register.
-
-#define DACC_PTCR_OFF                    0x120 ///< Transfer Control Register.
-#define DACC_PTCR      (*((reg32_t*) (DACC_BASE + DACC_PTCR_OFF)))  ///< Transfer Control Register.
-
-#define DACC_PTSR_OFF                    0x124 ///< Transfer Status Register.
-#define DACC_PTSR      (*((reg32_t*) (DACC_BASE + DACC_PTSR_OFF)))    ///< Transfer Status Register.
+#define DACC_RPR       (*((reg32_t*) (DACC_BASE + PERIPH_RPR_OFF)))  ///< Receive Pointer Register.
+#define DACC_RCR       (*((reg32_t*) (DACC_BASE + PERIPH_RCR_OFF)))  ///<  Receive Counter Register.
+#define DACC_TPR       (*((reg32_t*) (DACC_BASE + PERIPH_TPR_OFF)))  ///<  Transmit Pointer Register.
+#define DACC_TCR       (*((reg32_t*) (DACC_BASE + PERIPH_TCR_OFF)))  ///< Transmit Counter Register.
+#define DACC_RNPR      (*((reg32_t*) (DACC_BASE + PERIPH_RNPR_OFF))) ///< Receive Next Pointer Register.
+#define DACC_RNCR      (*((reg32_t*) (DACC_BASE + PERIPH_RNCR_OFF))) ///< Receive Next Counter Register.
+#define DACC_TNPR      (*((reg32_t*) (DACC_BASE + PERIPH_TNPR_OFF))) ///< Transmit Next Pointer Register.
+#define DACC_TNCR      (*((reg32_t*) (DACC_BASE + PERIPH_TNCR_OFF))) ///< Transmit Next Counter Register.
+#define DACC_PTCR      (*((reg32_t*) (DACC_BASE + PERIPH_PTCR_OFF))) ///< Transfer Control Register.
+#define DACC_PTSR      (*((reg32_t*) (DACC_BASE + PERIPH_PTSR_OFF))) ///< Transfer Status Register.
 
 
 #define DACC_PTCR_RXTEN               0  ///< DACC_PTCR  Receiver Transfer Enable.

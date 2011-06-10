@@ -137,25 +137,8 @@
 	#error undefined U(S)ART_PORTS for this cpu
 #endif
 
-/* PDC registers */
-#define PERIPH_RPR_OFF  0x100  // Receive Pointer Register.
-#define PERIPH_RCR_OFF  0x104  // Receive Counter Register.
-#define PERIPH_TPR_OFF  0x108  // Transmit Pointer Register.
-#define PERIPH_TCR_OFF  0x10C  // Transmit Counter Register.
-#define PERIPH_RNPR_OFF 0x110  // Receive Next Pointer Register.
-#define PERIPH_RNCR_OFF 0x114  // Receive Next Counter Register.
-#define PERIPH_TNPR_OFF 0x118  // Transmit Next Pointer Register.
-#define PERIPH_TNCR_OFF 0x11C  // Transmit Next Counter Register.
-#define PERIPH_PTCR_OFF 0x120  // PDC Transfer Control Register.
-#define PERIPH_PTSR_OFF 0x124  // PDC Transfer Status Register.
-
-#define PDC_RXTEN  0
-#define PDC_RXTDIS 1
-#define PDC_TXTEN  8
-#define PDC_TXTDIS 9
-
-
 #include "sam3_sysctl.h"
+#include "sam3_pdc.h"
 #include "sam3_pmc.h"
 #include "sam3_smc.h"
 #include "sam3_sdramc.h"
@@ -173,6 +156,7 @@
 #include "sam3_dacc.h"
 #include "sam3_tc.h"
 #include "sam3_twi.h"
+#include "sam3_ssc.h"
 
 /**
  * U(S)ART I/O pins
@@ -302,6 +286,20 @@
 	#define TWI0_TWCK   10
 	#define TWI1_TWD    24
 	#define TWI1_TWCK   25
+#endif
+
+#if CPU_CM3_SAM3X
+	#define SSC_PORT            PIOA_BASE
+	#define SSC_RECV_PERIPH     PIO_PERIPH_A
+	#define SSC_TRAN_PERIPH     PIO_PERIPH_B
+	#define SSC_RD              18
+	#define SSC_RF              17
+	#define SSC_RK              19
+	#define SSC_TD              16
+	#define SSC_TF              15
+	#define SSC_TK              14
+#else
+	#error no ssc pins are defined for this cpu
 #endif
 
 /*\}*/
