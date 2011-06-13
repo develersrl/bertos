@@ -48,7 +48,7 @@
 #include <drv/kbd.h>
 #include <drv/lcd_ili9225.h>
 
-#include <cpu/arm/drv/spi_dma_at91.h>
+#include <drv/spi_dma.h>
 
 #include <gfx/gfx.h>
 #include <gfx/font.h>
@@ -79,7 +79,7 @@
 	static PROC_DEFINE_STACK(led_stack, PROC_STACK_SIZE);
 #endif
 
-struct SpiDmaAt91 spi;
+struct SpiDma spi;
 static uint8_t raster[RAST_SIZE(LCD_WIDTH, LCD_HEIGHT)];
 static Bitmap lcd_bitmap;
 extern Font font_gohu;

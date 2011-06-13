@@ -13,7 +13,7 @@ display_USER_CSRC = \
 	$(display_SRC_PATH)/bitmaps.c \
 	bertos/icons/logo.c \
 	bertos/fonts/gohu.c \
-	bertos/cpu/arm/drv/spi_dma_at91.c \
+	bertos/cpu/cortex-m3/drv/spi_dma_sam3.c \
 	#
 
 # Files included by the user.

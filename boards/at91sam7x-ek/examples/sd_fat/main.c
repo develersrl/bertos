@@ -104,7 +104,7 @@
 #include <drv/sd.h>
 #include <drv/ser.h>
 #include <drv/tmp123.h>
-#include <drv/spi_dma_at91.h>
+#include <drv/spi_dma.h>
 #include <drv/mpxx6115a.h>
 #include <drv/adc.h>
 
@@ -207,7 +207,7 @@ typedef struct INISetting
 /*
  * Static definition for application devices.
  */
-static SpiDmaAt91 spi_dma;
+static SpiDma spi_dma;
 static Serial temp_sensor_bus;
 static Serial log_port;
 static Sd sd;

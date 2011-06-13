@@ -44,7 +44,7 @@
 #include <cfg/debug.h>
 
 #include <cpu/irq.h>
-#include <cpu/arm/drv/spi_dma_at91.h>
+#include <drv/spi_dma.h>
 
 #include <drv/timer.h>
 #include <drv/kbd.h>
@@ -56,7 +56,7 @@ static Bitmap lcd_bitmap;
 /* Raster associated to the Bitmap image */
 static uint8_t raster[RAST_SIZE(LCD_WIDTH, LCD_HEIGHT)];
 /* LCD spi context with DMA access */
-struct SpiDmaAt91 spi;
+struct SpiDma spi;
 
 static void init(void)
 {
