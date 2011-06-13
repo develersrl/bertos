@@ -26,41 +26,40 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * Copyright 2011 Develer S.r.l. (http://www.develer.com/)
+ *
  * -->
  *
- * \brief Configuration file for parser module.
+ * \author Andrea Righi <arighi@develer.com>
  *
- * \author Daniele Basile <asterix@develer.com>
+ * \brief Configuration file for the "random" module
  */
 
-#ifndef CFG_PARSER_H
-#define CFG_PARSER_H
+#ifndef CFG_RANDOM_H
+#define CFG_RANDOM_H
 
 /**
- * Max number of arguments and results for each command
- * $WIZ$ type = "int"
- * $WIZ$ min = 0
- */
-#define CONFIG_PARSER_MAX_ARGS       4
-
-/**
- * Max number of commands
- * $WIZ$ type = "int"
- * $WIZ$ min = 8
- */
-#define CONFIG_MAX_COMMANDS_NUMBER  16
-
-/**
- * Enable compatibility behaviour.
+ * Module logging level.
  *
- * Skip the first word from incoming commands. Don't enable in new projects.
- * $WIZ$ type = "boolean"
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
  */
-#define CONFIG_ENABLE_COMPAT_BEHAVIOUR 1
+#define RANDOM_LOG_LEVEL      LOG_LVL_INFO
 
-#endif /* CFG_PARSER_H */
+/**
+ * module logging format.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define RANDOM_LOG_FORMAT     LOG_FMT_TERSE
 
+/**
+ * Random security level.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "random_level"
+ */
+#define RANDOM_SECURITY_LEVEL          RANDOM_SECURITY_MINIMUM
 
-
+#endif /* CFG_RANDOM_H */

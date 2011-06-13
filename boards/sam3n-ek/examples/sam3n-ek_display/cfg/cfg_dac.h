@@ -26,42 +26,63 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2011 Develer S.r.l. (http://www.develer.com/)
  * All Rights Reserved.
  * -->
  *
- * \brief Configuration file for Menu module.
+ * \brief Configuration file for DAC module.
+ *
  *
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef CFG_MENU_H
-#define CFG_MENU_H
+#ifndef CFG_DAC_H
+#define CFG_DAC_H
 
 /**
- * Enable button bar behind menus
- * $WIZ$ type = "boolean"
+ * Module logging level.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
  */
-#define CONFIG_MENU_MENUBAR        0
+#define DAC_LOG_LEVEL      LOG_LVL_WARN
 
 /**
- * Level Edit Timeout
- * $WIZ$ type = "boolean"
+ * Module logging format.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
  */
-#define CONFIG_LEVELEDIT_TIMEOUT   0
+#define DAC_LOG_FORMAT     LOG_FMT_TERSE
 
 /**
- * Menu timeout
- * $WIZ$ type = "boolean"
+ * DAC Refresh Period = 1024*REFRESH/DACC Clock
+ *
+ * $WIZ$ type = "int"
+ * $WIZ$ supports = "sam3x"
+ * $WIZ$ min = 0
+ * $WIZ$ max = 65536
  */
-#define CONFIG_MENU_TIMEOUT        0
+#define CONFIG_DAC_REFRESH            16
 
 /**
- * Enable smooth scrolling in menus
- * $WIZ$ type = "boolean"
+ * DAC Startup Time Selection.
+ * see datasheet table.
+ *
+ * $WIZ$ type = "int"
+ * $WIZ$ supports = "sam3x"
+ * $WIZ$ min = 0
+ * $WIZ$ max = 63
  */
-#define CONFIG_MENU_SMOOTH         1
+#define CONFIG_DAC_STARTUP             0
 
+/**
+ * DAC Trigger Selection.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "sam3x_dac_tc"
+ * $WIZ$ supports = "sam3x"
+ */
+#define CONFIG_DAC_TIMER  DACC_TRGSEL_TIO_CH0
 
-#endif /* CFG_MENU_H */
-
+#endif /* CFG_DAC_H */

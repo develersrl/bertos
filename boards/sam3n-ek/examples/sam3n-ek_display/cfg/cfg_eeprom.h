@@ -26,73 +26,17 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2001, 2004 Develer S.r.l. (http://www.develer.com/)
- * Copyright 1999, 2000, 2001, 2008 Bernie Innocenti <bernie@codewiz.org>
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ *
  * -->
  *
- * \brief Kernel configuration parameters
+ * \brief Configuration file for the Eeprom module.
  *
- * \author Bernie Innocenti <bernie@codewiz.org>
+ * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef CFG_PROC_H
-#define CFG_PROC_H
-
-/**
- * Enable the multithreading kernel.
- *
- * $WIZ$ type = "autoenabled"
- */
-#define CONFIG_KERN 1
-
-/**
- * Kernel interrupt supervisor. WARNING: Experimental, still incomplete!
- * $WIZ$ type = "boolean"
- * $WIZ$ supports = "False"
- */
-#define CONFIG_KERN_IRQ 0
-
-/**
- * Preemptive process scheduling.
- *
- * $WIZ$ type = "boolean"
- * $WIZ$ conditional_deps = "timer"
- */
-#define CONFIG_KERN_PREEMPT 1
-
-/**
- * Time sharing quantum (a prime number prevents interference effects) [ms].
- *
- * $WIZ$ type = "int"
- * $WIZ$ min = 1
- */
-#define CONFIG_KERN_QUANTUM 11
-
-/**
- * Priority-based scheduling policy.
- * $WIZ$ type = "boolean"
- */
-#define CONFIG_KERN_PRI 1
-
-/**
- * Priority-inheritance protocol.
- * $WIZ$ type = "boolean"
- */
-#define CONFIG_KERN_PRI_INHERIT 0
-
-/**
- * Dynamic memory allocation for processes.
- * $WIZ$ type = "boolean"
- * $WIZ$ conditional_deps = "heap"
- */
-#define CONFIG_KERN_HEAP 1
-
-/**
- * Size of the dynamic memory pool used by processes.
- * $WIZ$ type = "int"
- * $WIZ$ min = 0
- */
-#define CONFIG_KERN_HEAP_SIZE 4096L
+#ifndef CFG_EEPROM_H
+#define CFG_EEPROM_H
 
 /**
  * Module logging level.
@@ -100,7 +44,7 @@
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_level"
  */
-#define KERN_LOG_LEVEL LOG_LVL_ERR
+#define EEPROM_LOG_LEVEL      LOG_LVL_INFO
 
 /**
  * Module logging format.
@@ -108,6 +52,13 @@
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_format"
  */
-#define KERN_LOG_FORMAT LOG_FMT_VERBOSE
+#define EEPROM_LOG_FORMAT     LOG_FMT_TERSE
 
-#endif /*  CFG_PROC_H */
+/**
+ * Check this to disable Eeprom deprecated API support.
+ *
+ * $WIZ$ type = "boolean"
+ */
+#define CONFIG_EEPROM_DISABLE_OLD_API  0
+
+#endif /* CFG_EEPROM_H */
