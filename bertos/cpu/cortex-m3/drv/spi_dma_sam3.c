@@ -36,8 +36,6 @@
  * \author Luca Ottaviano <lottaviano@develer.com>
  */
 
-#include <drv/spi_dma.h>
-
 #include "cfg/cfg_spi_dma.h"
 #include "hw/hw_spi_dma.h"
 
@@ -48,6 +46,8 @@
 #include <struct/kfile_fifo.h>
 
 #include <drv/timer.h>
+#include <drv/spi_dma.h>
+
 
 #include <cpu/attr.h>
 #include <cpu/power.h>
