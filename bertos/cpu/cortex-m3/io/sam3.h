@@ -290,6 +290,7 @@
 
 #if CPU_CM3_SAM3X
 	#define SSC_PORT            PIOA_BASE
+	#define SSC_PIO_PDR         PIOA_PDR
 	#define SSC_RECV_PERIPH     PIO_PERIPH_A
 	#define SSC_TRAN_PERIPH     PIO_PERIPH_B
 	#define SSC_RD              18
@@ -298,6 +299,39 @@
 	#define SSC_TD              16
 	#define SSC_TF              15
 	#define SSC_TK              14
+#elif CPU_CM3_SAM3N
+	#define SSC_PORT            /* None! */
+	#define SSC_PIO_PDR         /* None! */
+	#define SSC_RECV_PERIPH     /* None! */
+	#define SSC_TRAN_PERIPH     /* None! */
+	#define SSC_RD              /* None! */
+	#define SSC_RF              /* None! */
+	#define SSC_RK              /* None! */
+	#define SSC_TD              /* None! */
+	#define SSC_TF              /* None! */
+	#define SSC_TK              /* None! */
+#elif CPU_CM3_SAM3S
+	#define SSC_PORT            PIOA_BASE
+	#define SSC_PIO_PDR         PIOA_PDR
+	#define SSC_RECV_PERIPH     PIO_PERIPH_A
+	#define SSC_TRAN_PERIPH     PIO_PERIPH_A
+	#define SSC_RD              18
+	#define SSC_RF              20
+	#define SSC_RK              19
+	#define SSC_TD              17
+	#define SSC_TF              15
+	#define SSC_TK              16
+#elif CPU_CM3_SAM3U
+	#define SSC_PORT            PIOA_BASE
+	#define SSC_PIO_PDR         PIOA_PDR
+	#define SSC_RECV_PERIPH     PIO_PERIPH_A
+	#define SSC_TRAN_PERIPH     PIO_PERIPH_A
+	#define SSC_RD              27
+	#define SSC_RF              31
+	#define SSC_RK              29
+	#define SSC_TD              26
+	#define SSC_TF              30
+	#define SSC_TK              28
 #else
 	#error no ssc pins are defined for this cpu
 #endif
