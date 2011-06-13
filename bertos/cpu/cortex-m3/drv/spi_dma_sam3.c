@@ -41,7 +41,7 @@
 #include "cfg/cfg_spi_dma.h"
 #include "hw/hw_spi_dma.h"
 
-#include <io/at91sam7.h>
+#include <io/cm3.h>
 #include <io/kfile.h>
 
 #include <struct/fifobuf.h>
@@ -79,10 +79,10 @@ static int spi_dma_flush(UNUSED_ARG(struct KFile *, fd))
 
 static size_t spi_dma_write(struct KFile *fd, const void *_buf, size_t size)
 {
-	SPI0_PTCR = BV(PDC_TXTDIS);
+	SPI0_PTCR = BV(PDC_PTCR_TXTDIS);
 	SPI0_TPR = (reg32_t)_buf;
 	SPI0_TCR = size;
-	SPI0_PTCR = BV(PDC_TXTEN);
+	SPI0_PTCR = BV(PDC_PTSR_TXTEN);
 	spi_dma_flush(fd);
 	return size;
 }
@@ -104,7 +104,7 @@ static size_t spi_dma_read(UNUSED_ARG(struct KFile *, fd), void *_buf, size_t si
 	{
 		count = MIN(size, (size_t)CONFIG_SPI_DMA_MAX_RX);
 
-		SPI0_PTCR = BV(PDC_TXTDIS) | BV(PDC_RXTDIS);
+		SPI0_PTCR = BV(PDC_PTCR_TXTDIS) | BV(PDC_PTCR_RXTDIS);
 
 		SPI0_RPR = (reg32_t)buf;
 		SPI0_RCR = count;
@@ -115,7 +115,7 @@ static size_t spi_dma_read(UNUSED_ARG(struct KFile *, fd), void *_buf, size_t si
 		*buf = SPI0_RDR;
 
 		/* Start transfer */
-		SPI0_PTCR = BV(PDC_RXTEN) | BV(PDC_TXTEN);
+		SPI0_PTCR = BV(PDC_PTCR_RXTEN) | BV(PDC_PTCR_TXTEN);
 
 		/* wait for transfer to finish */
 		while (!(SPI0_SR & BV(SPI_ENDRX)))
@@ -125,7 +125,7 @@ static size_t spi_dma_read(UNUSED_ARG(struct KFile *, fd), void *_buf, size_t si
 		total_rx += count;
 		buf += count;
 	}
-	SPI0_PTCR = BV(PDC_RXTDIS) | BV(PDC_TXTDIS);
+	SPI0_PTCR = BV(PDC_PTCR_RXTDIS) | BV(PDC_PTCR_TXTDIS);
 
 	return total_rx;
 }
