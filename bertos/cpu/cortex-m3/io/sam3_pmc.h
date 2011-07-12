@@ -126,16 +126,16 @@
 	#define PMC_PCER0  (*((reg32_t *)(PMC_BASE + PMC_PCER0_OFF)))     ///< Peripheral Clock Enable Register
 	#define PMC_PCDR0  (*((reg32_t *)(PMC_BASE + PMC_PCDR0_OFF)))     ///< Peripheral Clock Disable Register
 	#define PMC_PCSR0  (*((reg32_t *)(PMC_BASE + PMC_PCSR0_OFF)))     ///< Peripheral Clock Status Register
-	#define PMC_UCKR   (*((reg32_t *)(PMC_BASE + PMC_UCKR _OFF)))     ///< UTMI clock register
+	#define PMC_UCKR   (*((reg32_t *)(PMC_BASE + PMC_UCKR_OFF)))     ///< UTMI clock register
 	#define CKGR_PLLAR (*((reg32_t *)(PMC_BASE + PMC_PLLAR_OFF)))     ///< PLL Register
 	#define PMC_USB_O  (*((reg32_t *)(PMC_BASE + PMC_USB_O_OFF)))     ///< USB clock register
-	#define PMC_PCK0   (*((reg32_t *)(PMC_BASE + PMC_PCK0 _OFF)))     ///< Programmable Clock 0 Register
-	#define PMC_PCK1   (*((reg32_t *)(PMC_BASE + PMC_PCK1 _OFF)))     ///< Programmable Clock 1 Register
-	#define PMC_PCK2   (*((reg32_t *)(PMC_BASE + PMC_PCK2 _OFF)))     ///< Programmable Clock 2 Register
+	#define PMC_PCK0   (*((reg32_t *)(PMC_BASE + PMC_PCK0_OFF)))     ///< Programmable Clock 0 Register
+	#define PMC_PCK1   (*((reg32_t *)(PMC_BASE + PMC_PCK1_OFF)))     ///< Programmable Clock 1 Register
+	#define PMC_PCK2   (*((reg32_t *)(PMC_BASE + PMC_PCK2_OFF)))     ///< Programmable Clock 2 Register
 	#define PMC_PCER1  (*((reg32_t *)(PMC_BASE + PMC_PCER1_OFF)))     ///< Peripheral Clock Enable Register
 	#define PMC_PCDR1  (*((reg32_t *)(PMC_BASE + PMC_PCDR1_OFF)))     ///< Peripheral Clock Disable Register
 	#define PMC_PCSR1  (*((reg32_t *)(PMC_BASE + PMC_PCSR1_OFF)))     ///< Peripheral Clock Status Register
-	#define PMC_PCR    (*((reg32_t *)(PMC_BASE + PMC_PCR  _OFF)))     ///< Oscillator Calibration Register
+	#define PMC_PCR    (*((reg32_t *)(PMC_BASE + PMC_PCR_OFF)))     ///< Oscillator Calibration Register
 
 	#define CKGR_PLLR  CKGR_PLLAR
 #endif
