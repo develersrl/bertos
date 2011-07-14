@@ -140,6 +140,7 @@
 #include "sam3_sysctl.h"
 #include "sam3_pdc.h"
 #include "sam3_pmc.h"
+#include "sam3_dmac.h"
 #include "sam3_smc.h"
 #include "sam3_sdramc.h"
 #include "sam3_ints.h"
