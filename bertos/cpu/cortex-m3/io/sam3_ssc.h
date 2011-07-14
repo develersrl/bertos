@@ -129,6 +129,7 @@
 #define SSC_FSOS_TOGGLE             0x00500000  ///< Toggling at each start.
 #define SSC_FSDEN                           23  ///< Frame sync. data enable.
 #define SSC_FSEDGE                          24  ///< Frame sync. edge detection.
+#define SSC_FSLEN_EXT                       26  ///<
 /*\}*/
 
 /**

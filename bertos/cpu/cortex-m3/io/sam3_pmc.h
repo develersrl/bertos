@@ -95,6 +95,25 @@
 #endif
 /*\}*/
 
+
+/**
+ * Programmable clock ids.
+ * \{
+ */
+#define  PMC_PCK0_ID   8
+#define  PMC_PCK1_ID   9
+#define  PMC_PCK2_ID  10
+/*\}*/
+
+/**
+ * Programmable clock status.
+ * \{
+ */
+#define PMC_PCKRDY0                          8  ///< Programmable clock 0 ready.
+#define PMC_PCKRDY1                          9  ///< Programmable clock 1 ready.
+#define PMC_PCKRDY2                         10  ///< Programmable clock 2 ready.
+/*\}*/
+
 /**
  * PMC registers.
  */
@@ -231,9 +250,9 @@ INLINE void pmc_periphDisable(unsigned id)
 #define CKGR_MOR_MOSCRCF_SHIFT    4
 #define CKGR_MOR_MOSCRCF_MASK     (0x7 << CKGR_MOR_MOSCRCF_SHIFT)   ///< Main On-Chip RC Oscillator Frequency Selection
 #define CKGR_MOR_MOSCRCF(value)   ((CKGR_MOR_MOSCRCF_MASK & ((value) << CKGR_MOR_MOSCRCF_SHIFT)))
-#define   CKGR_MOR_MOSCRCF_4MHZ   (0x0 << CKGR_MOR_MOSCRCF_SHIFT)
-#define   CKGR_MOR_MOSCRCF_8MHZ   (0x1 << CKGR_MOR_MOSCRCF_SHIFT)
-#define   CKGR_MOR_MOSCRCF_12MHZ  (0x2 << CKGR_MOR_MOSCRCF_SHIFT)
+#define CKGR_MOR_MOSCRCF_4MHZ   (0x0 << CKGR_MOR_MOSCRCF_SHIFT)
+#define CKGR_MOR_MOSCRCF_8MHZ   (0x1 << CKGR_MOR_MOSCRCF_SHIFT)
+#define CKGR_MOR_MOSCRCF_12MHZ  (0x2 << CKGR_MOR_MOSCRCF_SHIFT)
 #define CKGR_MOR_MOSCXTST_SHIFT   8
 #define CKGR_MOR_MOSCXTST_MASK    (0xff << CKGR_MOR_MOSCXTST_SHIFT)   ///< Main Crystal Oscillator Start-up Time
 #define CKGR_MOR_MOSCXTST(value)  ((CKGR_MOR_MOSCXTST_MASK & ((value) << CKGR_MOR_MOSCXTST_SHIFT)))
@@ -271,12 +290,12 @@ INLINE void pmc_periphDisable(unsigned id)
  * Defines for bit fields in PMC_MCKR register.
  */
 /*\{*/
-#define PMC_MCKR_CSS_MASK        0x3   ///< Master Clock Source Selection mask
+#define   PMC_MCKR_CSS_MASK        0x3   ///< Master Clock Source Selection mask
 #define   PMC_MCKR_CSS_SLOW_CLK  0x0   ///< Slow Clock is selected
 #define   PMC_MCKR_CSS_MAIN_CLK  0x1   ///< Main Clock is selected
 #define   PMC_MCKR_CSS_PLL_CLK   0x2   ///< PLL Clock is selected
-#define PMC_MCKR_PRES_SHIFT      4
-#define PMC_MCKR_PRES_MASK       (0x7 << PMC_MCKR_PRES_SHIFT)    ///< Processor Clock Prescaler mask
+#define   PMC_MCKR_PRES_SHIFT      4
+#define   PMC_MCKR_PRES_MASK       (0x7 << PMC_MCKR_PRES_SHIFT)    ///< Processor Clock Prescaler mask
 #define   PMC_MCKR_PRES_CLK      (0x0 << PMC_MCKR_PRES_SHIFT)   ///< Selected clock
 #define   PMC_MCKR_PRES_CLK_2    (0x1 << PMC_MCKR_PRES_SHIFT)   ///< Selected clock divided by 2
 #define   PMC_MCKR_PRES_CLK_4    (0x2 << PMC_MCKR_PRES_SHIFT)   ///< Selected clock divided by 4
@@ -285,20 +304,20 @@ INLINE void pmc_periphDisable(unsigned id)
 #define   PMC_MCKR_PRES_CLK_32   (0x5 << PMC_MCKR_PRES_SHIFT)   ///< Selected clock divided by 32
 #define   PMC_MCKR_PRES_CLK_64   (0x6 << PMC_MCKR_PRES_SHIFT)   ///< Selected clock divided by 64
 #define   PMC_MCKR_PRES_CLK_3    (0x7 << PMC_MCKR_PRES_SHIFT)   ///< Selected clock divided by 3
-#define PMC_MCKR_PLLDIV2         12   ///< PLL Divisor by 2
+#define   PMC_MCKR_PLLDIV2         12   ///< PLL Divisor by 2
 /*\}*/
 
 /**
  * Defines for bit fields in PMC_PCK[3] register.
  */
 /*\{*/
-#define PMC_PCK_CSS_MASK       0x7   ///< Master Clock Source Selection mask
+#define   PMC_PCK_CSS_MASK     0x7   ///< Master Clock Source Selection mask
 #define   PMC_PCK_CSS_SLOW     0x0   ///< Slow Clock is selected
 #define   PMC_PCK_CSS_MAIN     0x1   ///< Main Clock is selected
 #define   PMC_PCK_CSS_PLL      0x2   ///< PLL Clock is selected
 #define   PMC_PCK_CSS_MCK      0x4   ///< Master Clock is selected
-#define PMC_PCK_PRES_SHIFT 4
-#define PMC_PCK_PRES_MASK      (0x7 << PMC_PCK_PRES_SHIFT)   ///< Programmable Clock Prescaler
+#define   PMC_PCK_PRES_SHIFT     4
+#define   PMC_PCK_PRES_MASK    (0x7 << PMC_PCK_PRES_SHIFT)   ///< Programmable Clock Prescaler
 #define   PMC_PCK_PRES_CLK     (0x0 << PMC_PCK_PRES_SHIFT)   ///< Selected clock
 #define   PMC_PCK_PRES_CLK_2   (0x1 << PMC_PCK_PRES_SHIFT)   ///< Selected clock divided by 2
 #define   PMC_PCK_PRES_CLK_4   (0x2 << PMC_PCK_PRES_SHIFT)   ///< Selected clock divided by 4
