@@ -43,6 +43,13 @@
 #ifndef DRV_WM8731_H
 #define DRV_WM8731_H
 
-void wm8731_init(void);
+#include <drv/i2c.h>
+
+typedef struct Wm8731
+{
+	I2c *i2c;
+} Wm8731;
+
+void wm8731_init(Wm8731 *ctx, I2c *i2c);
 
 #endif /* DRV_WM8731_H */

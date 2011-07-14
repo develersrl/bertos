@@ -39,6 +39,11 @@
 #include "hw/hw_wm8731.h"
 #include "cfg/cfg_wm8731.h"
 
+// Define logging setting (for cfg/log.h module).
+#define LOG_LEVEL   WM8731_LOG_LEVEL
+#define LOG_FORMAT  WM8731_LOG_FORMAT
+#include <cfg/log.h>
+
 #include <cpu/irq.h>
 
 #include <drv/i2c.h>
@@ -144,25 +149,24 @@
 
 
 
-static void wm8731_write(uint8_t reg, uint16_t value)
+static void wm8731_write(Wm8731 *ctx, uint8_t reg, uint16_t value)
 {
 
-	uint16_t tmp = ((reg & 0x7f) << 9) | (value & 0x1ff);
-	uint8_t msb = (tmp & 0xFF00) >> 8;
-	uint8_t lsb = tmp & 0xFF;
+	uint16_t tmp = ((reg & 0x7F) << 9) | (value & 0x1FF);
 
-	kprintf("msb: %0x lsb: %0x\n", msb, lsb);
-/*
-	i2c_start_w(&i2c, CODEC_ADDR, 2, I2C_STOP);
-	i2c_putc(&i2c, msb);
-	i2c_putc(&i2c, lsb);
+	i2c_start_w(ctx->i2c, CODEC_ADDR, 2, I2C_STOP);
+	i2c_putc(ctx->i2c, (uint8_t)((tmp & 0xFF00) >> 8));
+	i2c_putc(ctx->i2c, (uint8_t)(tmp & 0xFF));
 
+	if (i2c_error(ctx->i2c))
+		LOG_ERR("Error while send command to codec.\n");
 
-	if (i2c_error(&i2c))
-		kputs("Errore!\n");
-*/
 }
 
-void wm8731_init(void)
+void wm8731_init(Wm8731 *ctx, I2c *i2c);
 {
+	ctx->i2c = i2c;
+
+	WM8731_PIN_INIT();
+	WM8731_MCLK_INIT();
 }

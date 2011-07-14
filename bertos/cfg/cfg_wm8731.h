@@ -38,6 +38,19 @@
 #ifndef CFG_WM8731_H
 #define CFG_WM8731_H
 
+/**
+ * Module logging level.
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
+ */
+#define WM8731_LOG_LEVEL      LOG_LVL_INFO
+
+/**
+ * Module logging format.
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define WM8731_LOG_FORMAT     LOG_FMT_TERSE
 
 
 #endif /* CFG_WM8731_H */
