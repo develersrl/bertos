@@ -53,4 +53,53 @@
 #define WM8731_LOG_FORMAT     LOG_FMT_TERSE
 
 
+/**
+ * Digital control: ADC High pass filter
+ * $WIZ$ type = "boolean"
+ */
+#define CONFIG_WM8731_DAPC     0
+
+
+/**
+ * Digital control: De-emphasis control
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "wm8731_deemp"
+ */
+#define CONFIG_WM8731_DEEMP     WM8731_DEEMP_DISABLE
+
+/**
+ * Digital control: DAC soft mute control
+ * $WIZ$ type = "boolean"
+ */
+#define CONFIG_WM8731_DACMU     0
+
+
+/**
+ * Analog control: Microphone boost
+ * $WIZ$ type = "boolean"
+ */
+#define CONFIG_WM8731_MICBOOST     0
+
+/**
+ * Analog control: Microphone/Line Input select to ADC
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "wm8731_insel"
+ */
+#define CONFIG_WM8731_INSEL     WM8731_INSEL_MIC
+
+
+/**
+ * Analog control: out selector
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "wm8731_bypass"
+ */
+#define CONFIG_WM8731_BYPASS     WM8731_BYPASS
+
+/**
+ * Analog control: Side tone attenuation
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "wm8731_sideatt"
+ */
+#define CONFIG_WM8731_SIDEATT     WM8731_SIDEATT_6dB
+
 #endif /* CFG_WM8731_H */

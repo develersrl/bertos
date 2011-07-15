@@ -36,6 +36,8 @@
  *
  */
 
+#include "wm8731.h"
+
 #include "hw/hw_wm8731.h"
 #include "cfg/cfg_wm8731.h"
 
@@ -43,110 +45,11 @@
 #define LOG_LEVEL   WM8731_LOG_LEVEL
 #define LOG_FORMAT  WM8731_LOG_FORMAT
 #include <cfg/log.h>
+#include <cfg/macros.h>
 
 #include <cpu/irq.h>
 
 #include <drv/i2c.h>
-
-/* Reset register*/
-#define WM8731_REG_RESET                           0x0F
-
-/* Left Line in register */
-#define WM8731_REG_LEFT_LINEIN                     0x0
-#define WM8731_LINVOL_BITS_MASK                    0xF // Left line input volume control
-#define WM8731_LINMUTE_BIT                           7 // Left line input mute to ADC
-#define WM8731_LRINBOTH_BIT                          8 // Left to right channel line input volume and mute data load control
-
-/* Right Line in register */
-#define WM8731_REG_RIGHT_LINEIN                    0x1
-#define WM8731_RINVOL_BITS_MASK                    0xF // Right line input volume control
-#define WM8731_RINMUTE_BIT                           7 // Right line input mute to ADC
-#define WM8731_RLINBOTH_BIT                          8 // Right to right channel line input volume and mute data load control
-
-/* Left Headphone out register*/
-#define WM8731_REG_LEFT_HPOUT                      0x2
-#define WM8731_LHPVOL_BITS_MASK                    0x7 // Left chnnel headphone output volume control
-#define WM8731_LZCEN_BIT                             7 // Left channel zero cross detect enable
-#define WM8731_LRHPBOTH_BIT                          8 // Left to right channel headphone volume, mute and zero cross data load control
-
-/* Right Headphone out register*/
-#define WM8731_REG_RIGHT_HPOUT                      0x3
-#define WM8731_RHPVOL_BITS_MASK                     0x7 // Right chnnel headphone output volume control
-#define WM8731_RZCEN_BIT                              7 // Right channel zero cross detect enable
-#define WM8731_RLHPBOTH_BIT                           8 // Right to right channel headphone volume, mute and zero cross data load control
-
-/* Analogue audio path control register*/
-#define WM8731_REG_ANALOGUE_PATH_CTRL              0x4
-#define WM8731_MICBOOST                              0 // Microphone Input Level Boost
-#define WM8731_MUTEMIC                               1 // Line input Mute to ADC
-#define WM8731_INSEL                                 2 // Microphone/Line Select to ADC
-#define WM8731_BYPASS                                3 // Bypass switch
-#define WM8731_DACSEL                                4 // DAC select
-#define WM8731_SIDETONE                              5 // Side tone switch
-#define WM8731_SIDEATT_MASK                       0xC0 // Side tone attenuation
-#define WM8731_SIDEATT_15dB                       0xC0 // -15dB
-#define WM8731_SIDEATT_12dB                       0x80 // -12dB
-#define WM8731_SIDEATT_9dB                        0x40 // -9dB
-#define WM8731_SIDEATT_6dB                        0x00 // -6dB
-
-
-/* Digital audio path control register*/
-#define WM8731_REG_DIGITAL_PATH_CTRL               0x5
-#define WM8731_ADCHPD                                0 // ADC high pass filter enable
-#define WM8731_DEEMP_MASK                          0x6 // De-emphasis controll
-#define WM8731_DEEMP_48kHz                         0x6 // 48kHz
-#define WM8731_DEEMP_44k1Hz                        0x4 // 44.1kHz
-#define WM8731_DEEMP_32kHz                         0x2 // 32kHz
-#define WM8731_DEEMP_DISABLE                       0x0 // Disable
-#define WM8731_DACMU                                 3 // DAC Soft Mute control
-
-/* Power down control register*/
-#define WM8731_REG_PWDOWN_CTRL                     0x6
-#define WM8731_LINEINPD_BIT                          0 // LineIn power down
-#define WM8731_MICPD_BIT                             1 // Mic power down
-#define WM8731_ADCPD_BIT                             2 // ADC power down
-#define WM8731_DACPD_BIT                             3 // DAC power down
-#define WM8731_OUTPD_BIT                             4 // OUT power down
-#define WM8731_OSCBIT                                5 // OSC power down
-#define WM8731_CLKOUTPD_BIT                          6 // CLKOUT powerdown
-#define WM8731_POWEROFF_BIT                          7 // Power off device
-
-/* Interface format register*/
-#define WM8731_REG_DA_INTERFACE_FORMAT             0x7
-#define WM8731_FORMAT_BITS_MASK                    0x3 // Format
-#define WM8731_FORMAT_MSB_LEFT_JUSTIFIED           0x0 // MSB-First, left justified
-#define WM8731_FORMAT_MSB_RIGHT_JUSTIFIED          0x1 // MSB-First, right justified
-#define WM8731_FORMAT_I2S                          0x2 //I2S Format, MSB-First left-1 justified
-#define WM8731_FORMAT_DSP                          0x3 //DSP Mode, frame sync + 2 data packed words
-#define WM8731_IWL_BITS                            0xC // Input audio data bit length select
-#define WM8731_IWL_16_BIT                          0x0 // 16 bit
-#define WM8731_IWL_20_BIT                          0x4 // 20 bit
-#define WM8731_IWL_24_BIT                          0x8 // 24 bit
-#define WM8731_IWL_32_BIT                          0xC // 32 bit
-#define WM8731_IRP_BITS                              4 //  DACLRC phase control
-#define WM8731_IRSWAP_BIT                            5 //  DAC Left right clock swap
-#define WM8731_MS_BIT                                6 //  Master slave mode control
-#define WM8731_BCLKINV_BIT                           7 // Bit clock invert
-
-/* Sampling control*/
-#define WM8731_REG_SAMPLECTRL                      0x8
-#define WM8731_USBNORMAL_BIT                         0 // Mode select, usb mode, normal mode
-#define WM8731_BOSR_BIT                              1 // Base over-sampling rate
-#define WM8731_SR_BITS_MASK                       0x3C // Sample rate control
-#define WM8731_CLKIDIV2_BIT                          6 // Core clock divider select
-#define WM8731_CLKODIV2_BIT                          7 // CLKOUT divider select
-
-/* Active control register*/
-#define WM8731_REG_ACTIVE_CTRL                     0x9
-#define WM8731_ACTIVE_BIT                            0 // Activate interface
-
-/*
- * Codec has 7-bit address, the eighth is the R/W bit, so we
- * write the codec address with one bit shifted left
- */
-#define CODEC_ADDR 0x36
-
-
 
 
 static void wm8731_write(Wm8731 *ctx, uint8_t reg, uint16_t value)
@@ -154,7 +57,7 @@ static void wm8731_write(Wm8731 *ctx, uint8_t reg, uint16_t value)
 
 	uint16_t tmp = ((reg & 0x7F) << 9) | (value & 0x1FF);
 
-	i2c_start_w(ctx->i2c, CODEC_ADDR, 2, I2C_STOP);
+	i2c_start_w(ctx->i2c, ctx->addr, 2, I2C_STOP);
 	i2c_putc(ctx->i2c, (uint8_t)((tmp & 0xFF00) >> 8));
 	i2c_putc(ctx->i2c, (uint8_t)(tmp & 0xFF));
 
@@ -163,10 +66,101 @@ static void wm8731_write(Wm8731 *ctx, uint8_t reg, uint16_t value)
 
 }
 
-void wm8731_init(Wm8731 *ctx, I2c *i2c);
+void wm8731_setVolume(Wm8731 *ctx, uint16_t device, uint8_t volume)
+{
+	uint16_t value;
+
+	if (device & WM8731_LINE_IN_RX)
+	{
+		if (!volume)
+			wm8731_write(ctx, WM8731_REG_RIGHT_LINEIN, BV(WM8731_LINMUTE_BIT));
+
+		value = DIV_ROUND(volume * WM8731_LINVOL_BITS_MASK, 100) & WM8731_LINVOL_BITS_MASK;
+
+		wm8731_write(ctx, WM8731_REG_RIGHT_LINEIN, ~BV(WM8731_LINMUTE_BIT));
+		wm8731_write(ctx, WM8731_REG_RIGHT_LINEIN, value);
+		LOG_INFO("Set LINE IN Rx vol[%d]%% raw[%d]\n", volume, value);
+	}
+
+	if (device & WM8731_LINE_IN_LX)
+	{
+		if (!volume)
+			wm8731_write(ctx, WM8731_REG_LEFT_LINEIN, BV(WM8731_LINMUTE_BIT));
+
+		value = DIV_ROUND(volume * WM8731_RINVOL_BITS_MASK, 100) & WM8731_RINVOL_BITS_MASK;
+
+		wm8731_write(ctx, WM8731_REG_LEFT_LINEIN, ~BV(WM8731_LINMUTE_BIT));
+		wm8731_write(ctx, WM8731_REG_LEFT_LINEIN, value);
+		LOG_INFO("Set LINE IN Lx vol[%d]%% raw[%d]\n", volume, value);
+	}
+
+
+	if (device & WM8731_HEADPHONE_RX)
+	{
+		value = DIV_ROUND(volume * WM8731_RHPVOL_BITS_MASK, 100) & WM8731_LHPVOL_BITS_MASK;
+		wm8731_write(ctx, WM8731_REG_RIGHT_HPOUT, value | BV(WM8731_RZCEN_BIT));
+		LOG_INFO("Set HEADPHONE Rx vol[%d]%% raw[%d]\n", volume, value);
+	}
+
+
+	if (device & WM8731_HEADPHONE_LX)
+	{
+		value = DIV_ROUND(volume * WM8731_LHPVOL_BITS_MASK, 100) & WM8731_LHPVOL_BITS_MASK;
+		wm8731_write(ctx, WM8731_REG_LEFT_HPOUT, value  | BV(WM8731_LZCEN_BIT));
+		LOG_INFO("Set HEADPHONE Lx vol[%d]%% raw[%d]\n", volume, value);
+	}
+
+}
+
+void wm8731_powerOn(Wm8731 *ctx)
+{
+	LOG_INFO("Power on codec\n");
+	wm8731_write(ctx, WM8731_REG_PWDOWN_CTRL, ~BV(WM8731_POWEROFF_BIT) & 0x7F);
+}
+
+void wm8731_powerOff(Wm8731 *ctx)
+{
+	LOG_INFO("Power off codec\n");
+	wm8731_write(ctx, WM8731_REG_PWDOWN_CTRL, BV(WM8731_POWEROFF_BIT) & 0x7F);
+}
+
+void wm8731_powerOnDevices(Wm8731 *ctx, uint16_t device)
+{
+	wm8731_write(ctx, WM8731_REG_PWDOWN_CTRL, ~device & 0x7F);
+	LOG_INFO("Turn on the devices[%x]\n", ~device & 0x7F);
+}
+
+void wm8731_powerOffDevices(Wm8731 *ctx, uint16_t device)
+{
+	wm8731_write(ctx, WM8731_REG_PWDOWN_CTRL, device & 0x7F);
+	LOG_INFO("Turn off the devices[%x]\n", device);
+}
+
+void wm8731_init(Wm8731 *ctx, I2c *i2c, uint8_t codec_addr)
 {
 	ctx->i2c = i2c;
+	ctx->addr = codec_addr;
 
 	WM8731_PIN_INIT();
 	WM8731_MCLK_INIT();
+
+	LOG_INFO("Init WM8731 codec.\n");
+
+	/* Reset codec and active it */
+	wm8731_write(ctx, WM8731_REG_RESET, 0);
+
+
+	/* Configure the codec */
+	wm8731_write(ctx, WM8731_REG_DIGITAL_PATH_CTRL, CONFIG_WM8731_DEEMP | CONFIG_WM8731_DAPC |
+						(CONFIG_WM8731_DACMU << WM8731_DACMU));
+	wm8731_write(ctx, WM8731_REG_ANALOGUE_PATH_CTRL, (CONFIG_WM8731_MICBOOST ? WM8731_MICBOOST : ~WM8731_MICBOOST) |
+						CONFIG_WM8731_INSEL | CONFIG_WM8731_BYPASS | CONFIG_WM8731_SIDEATT);
+
+	wm8731_write(ctx, WM8731_REG_DA_INTERFACE_FORMAT, 0x2);
+	wm8731_write(ctx, WM8731_REG_SAMPLECTRL, 0x6);
+
+	wm8731_write(ctx, WM8731_REG_ACTIVE_CTRL, 1);
+
+	/* By default we turn on all devices and disable only the outclock */
+	wm8731_write(ctx, WM8731_REG_PWDOWN_CTRL, 0x47);
 }

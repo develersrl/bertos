@@ -36,20 +36,152 @@
  *
  * $WIZ$ module_name = "wm8731"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_wm8731.h"
- * $WIZ$ module_depends = "i2c"
  * $WIZ$ module_hw = "bertos/hw/hw_wm8731.h"
+ * $WIZ$ module_depends = "i2c"
+ *
  */
 
 #ifndef DRV_WM8731_H
 #define DRV_WM8731_H
 
+#include <cpu/types.h>
+
 #include <drv/i2c.h>
+
+/* Reset register*/
+#define WM8731_REG_RESET                           0x0F
+
+/* Left Line in register */
+#define WM8731_REG_LEFT_LINEIN                     0x0
+#define WM8731_LINVOL_BITS_MASK                    0xF // Left line input volume control
+#define WM8731_LINMUTE_BIT                           7 // Left line input mute to ADC
+#define WM8731_LRINBOTH_BIT                          8 // Left to right channel line input volume and mute data load control
+
+/* Right Line in register */
+#define WM8731_REG_RIGHT_LINEIN                    0x1
+#define WM8731_RINVOL_BITS_MASK                    0xF // Right line input volume control
+#define WM8731_RINMUTE_BIT                           7 // Right line input mute to ADC
+#define WM8731_RLINBOTH_BIT                          8 // Right to right channel line input volume and mute data load control
+
+/* Left Headphone out register*/
+#define WM8731_REG_LEFT_HPOUT                      0x2
+#define WM8731_LHPVOL_BITS_MASK                    0x7 // Left channel headphone output volume control
+#define WM8731_LZCEN_BIT                             7 // Left channel zero cross detect enable
+#define WM8731_LRHPBOTH_BIT                          8 // Left to right channel headphone volume, mute and zero cross data load control
+
+/* Right Headphone out register*/
+#define WM8731_REG_RIGHT_HPOUT                      0x3
+#define WM8731_RHPVOL_BITS_MASK                     0x7 // Right channel headphone output volume control
+#define WM8731_RZCEN_BIT                              7 // Right channel zero cross detect enable
+#define WM8731_RLHPBOTH_BIT                           8 // Right to right channel headphone volume, mute and zero cross data load control
+
+/* Analogue audio path control register*/
+#define WM8731_REG_ANALOGUE_PATH_CTRL              0x4
+#define WM8731_MICBOOST                          BV(0) // Microphone Input Level Boost
+#define WM8731_MUTEMIC                               1 // Line input Mute to ADC
+/**
+ * Input selector
+ * $WIZ$ wm8731_insel = "WM8731_INSEL_MIC", "WM8731_INSEL_LINEIN"
+ */
+#define WM8731_INSEL                                 2 // Microphone/Line Select to ADC
+#define WM8731_INSEL_MIC              BV(WM8731_INSEL) // Microphone Select to ADC
+#define WM8731_INSEL_LINEIN          ~BV(WM8731_INSEL) // Line in Select to ADC
+/**
+ * Input to output
+ * $WIZ$ wm8731_bypass = "WM8731_BYPASS", "WM8731_DACSEL", "WM8731_SIDETONE"
+ */
+#define WM8731_BYPASS                            BV(3) // Bypass switch
+#define WM8731_DACSEL                            BV(4) // DAC select
+#define WM8731_SIDETONE                          BV(5) // Side tone switch
+/**
+ * Side tone attenuation
+ * $WIZ$ wm8731_sideatt = "WM8731_SIDEATT_15dB", "WM8731_SIDEATT_12dB", "WM8731_SIDEATT_9dB", "WM8731_SIDEATT_6dB"
+ */
+#define WM8731_SIDEATT_MASK                       0xC0 // Side tone attenuation
+#define WM8731_SIDEATT_15dB                       0xC0 // -15dB
+#define WM8731_SIDEATT_12dB                       0x80 // -12dB
+#define WM8731_SIDEATT_9dB                        0x40 // -9dB
+#define WM8731_SIDEATT_6dB                        0x00 // -6dB
+
+
+/* Digital audio path control register*/
+#define WM8731_REG_DIGITAL_PATH_CTRL               0x5
+#define WM8731_ADCHPD                                0 // ADC high pass filter enable
+/**
+ * De-emphasis control
+ * $WIZ$ wm8731_deemp = "WM8731_DEEMP_48kHz", "WM8731_DEEMP_44k1Hz", "WM8731_DEEMP_32kHz", "WM8731_DEEMP_DISABLE"
+ */
+#define WM8731_DEEMP_MASK                          0x6 // De-emphasis control
+#define WM8731_DEEMP_48kHz                         0x6 // 48kHz
+#define WM8731_DEEMP_44k1Hz                        0x4 // 44.1kHz
+#define WM8731_DEEMP_32kHz                         0x2 // 32kHz
+#define WM8731_DEEMP_DISABLE                       0x0 // Disable
+#define WM8731_DACMU                                 3 // DAC Soft Mute control
+
+/* Power down control register*/
+#define WM8731_REG_PWDOWN_CTRL                     0x6
+#define WM8731_LINEINPD                           BV(0) ///< LineIn power down
+#define WM8731_MICPD                              BV(1) ///< Mic power down
+#define WM8731_ADCPD                              BV(2) ///< ADC power down
+#define WM8731_DACPD                              BV(3) ///< DAC power down
+#define WM8731_OUTPD                              BV(4) ///< OUT power down
+#define WM8731_OSCBIT                             BV(5) ///< OSC power down
+#define WM8731_CLKOUTPD                           BV(6) ///< CLKOUT powerdown
+#define WM8731_POWEROFF_BIT                          7 // Power off device
+
+/* Interface format register*/
+#define WM8731_REG_DA_INTERFACE_FORMAT             0x7
+#define WM8731_FORMAT_BITS_MASK                    0x3 // Format
+#define WM8731_FORMAT_MSB_LEFT_JUSTIFIED           0x0 // MSB-First, left justified
+#define WM8731_FORMAT_MSB_RIGHT_JUSTIFIED          0x1 // MSB-First, right justified
+#define WM8731_FORMAT_I2S                          0x2 //I2S Format, MSB-First left-1 justified
+#define WM8731_FORMAT_DSP                          0x3 //DSP Mode, frame sync + 2 data packed words
+#define WM8731_IWL_BITS                            0xC // Input audio data bit length select
+#define WM8731_IWL_16_BIT                          0x0 // 16 bit
+#define WM8731_IWL_20_BIT                          0x4 // 20 bit
+#define WM8731_IWL_24_BIT                          0x8 // 24 bit
+#define WM8731_IWL_32_BIT                          0xC // 32 bit
+#define WM8731_IRP_BITS                              4 //  DACLRC phase control
+#define WM8731_IRSWAP_BIT                            5 //  DAC Left right clock swap
+#define WM8731_MS_BIT                                6 //  Master slave mode control
+#define WM8731_BCLKINV_BIT                           7 // Bit clock invert
+
+/* Sampling control*/
+#define WM8731_REG_SAMPLECTRL                      0x8
+#define WM8731_USBNORMAL_BIT                         0 // Mode select, usb mode, normal mode
+#define WM8731_BOSR_BIT                              1 // Base over-sampling rate
+#define WM8731_SR_BITS_MASK                       0x3C // Sample rate control
+#define WM8731_CLKIDIV2_BIT                          6 // Core clock divider select
+#define WM8731_CLKODIV2_BIT                          7 // CLKOUT divider select
+
+/* Active control register*/
+#define WM8731_REG_ACTIVE_CTRL                     0x9
+#define WM8731_ACTIVE_BIT                            0 // Activate interface
+
 
 typedef struct Wm8731
 {
 	I2c *i2c;
+	uint8_t addr;
 } Wm8731;
 
-void wm8731_init(Wm8731 *ctx, I2c *i2c);
+
+
+#define 	WM8731_LINE_IN_RX     BV(0)
+#define 	WM8731_LINE_IN_LX     BV(1)
+#define 	WM8731_HEADPHONE_RX   BV(2)
+#define 	WM8731_HEADPHONE_LX   BV(3)
+
+/**
+ * Set the volume of select device (line in Rx/Lx, Headphone Rx/Lx).
+ * The volume is express in %, and the volume range is 0-100%.
+ */
+void wm8731_setVolume(Wm8731 *ctx, uint16_t device, uint8_t volume);
+void wm8731_powerOn(Wm8731 *ctx);
+void wm8731_powerOff(Wm8731 *ctx);
+void wm8731_powerOnDevices(Wm8731 *ctx, uint16_t device);
+void wm8731_powerOffDevices(Wm8731 *ctx, uint16_t device);
+
+void wm8731_init(Wm8731 *ctx, I2c *i2c, uint8_t codec_addr);
 
 #endif /* DRV_WM8731_H */
