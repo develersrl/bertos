@@ -93,7 +93,7 @@
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "wm8731_bypass"
  */
-#define CONFIG_WM8731_BYPASS     WM8731_BYPASS
+#define CONFIG_WM8731_BYPASS     WM8731_DACSEL
 
 /**
  * Analog control: Side tone attenuation
@@ -101,5 +101,33 @@
  * $WIZ$ value_list = "wm8731_sideatt"
  */
 #define CONFIG_WM8731_SIDEATT     WM8731_SIDEATT_6dB
+
+
+/**
+ * Digital Audio interface format.
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "wm8731_fmt"
+ */
+#define CONFIG_WM8731_INTERFACE_FORMAT    WM8731_FORMAT_I2S
+
+/**
+ * Digital Audio data bit length.
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "wm8731_databit"
+ */
+#define CONFIG_WM8731_IWL_BITS            WM8731_IWL_16_BIT
+
+/**
+ * Enable Master mode.
+ * $WIZ$ type = "boolean"
+ */
+#define CONFIG_WM8731_MS     0
+
+
+/**
+ * Data sampling rate, refer to datasheet for this value.
+ * $WIZ$ type = "hex"
+ */
+#define CONFIG_WM8731_SAMPLING_RATES     0x6
 
 #endif /* CFG_WM8731_H */

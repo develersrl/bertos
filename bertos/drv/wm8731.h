@@ -77,7 +77,7 @@
 
 /* Analogue audio path control register*/
 #define WM8731_REG_ANALOGUE_PATH_CTRL              0x4
-#define WM8731_MICBOOST                          BV(0) // Microphone Input Level Boost
+#define WM8731_MICBOOST                              0 // Microphone Input Level Boost
 #define WM8731_MUTEMIC                               1 // Line input Mute to ADC
 /**
  * Input selector
@@ -131,11 +131,19 @@
 
 /* Interface format register*/
 #define WM8731_REG_DA_INTERFACE_FORMAT             0x7
+/**
+ * Audio format
+ * $WIZ$ wm8731_fmt = "WM8731_FORMAT_MSB_LEFT_JUSTIFIED", "WM8731_FORMAT_MSB_RIGHT_JUSTIFIED", "WM8731_FORMAT_I2S", "WM8731_FORMAT_DSP"
+ */
 #define WM8731_FORMAT_BITS_MASK                    0x3 // Format
 #define WM8731_FORMAT_MSB_LEFT_JUSTIFIED           0x0 // MSB-First, left justified
 #define WM8731_FORMAT_MSB_RIGHT_JUSTIFIED          0x1 // MSB-First, right justified
 #define WM8731_FORMAT_I2S                          0x2 //I2S Format, MSB-First left-1 justified
 #define WM8731_FORMAT_DSP                          0x3 //DSP Mode, frame sync + 2 data packed words
+/**
+ * Audio format
+ * $WIZ$ wm8731_databit = "WM8731_IWL_16_BIT", "WM8731_IWL_20_BIT", "WM8731_IWL_24_BIT", "WM8731_IWL_32_BIT"
+ */
 #define WM8731_IWL_BITS                            0xC // Input audio data bit length select
 #define WM8731_IWL_16_BIT                          0x0 // 16 bit
 #define WM8731_IWL_20_BIT                          0x4 // 20 bit
