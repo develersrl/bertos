@@ -66,48 +66,33 @@ static void wm8731_write(Wm8731 *ctx, uint8_t reg, uint16_t value)
 
 }
 
+#define RANGECONV(data, y1, y2) (((((int32_t)(data)) * ((y2) - (y1))) / ((1 << 8) - 1)) + (y1))
 void wm8731_setVolume(Wm8731 *ctx, uint16_t device, uint8_t volume)
 {
 	uint16_t value;
 
-	if (device & WM8731_LINE_IN_RX)
+	if (device & WM8731_LINE_IN)
 	{
 		if (!volume)
-			wm8731_write(ctx, WM8731_REG_RIGHT_LINEIN, BV(WM8731_LINMUTE_BIT));
+		{
+			wm8731_write(ctx, WM8731_REG_RIGHT_LINEIN, BV(WM8731_LINMUTE_BIT) | BV(WM8731_RLINBOTH_BIT));
+			wm8731_write(ctx, WM8731_REG_LEFT_LINEIN, BV(WM8731_LINMUTE_BIT) | BV(WM8731_LRINBOTH_BIT));
+		}
 
-		value = DIV_ROUND(volume * WM8731_LINVOL_BITS_MASK, 100) & WM8731_LINVOL_BITS_MASK;
+		value = DIV_ROUND(volume * WM8731_LINVOL_BITS_MASK, 100);
 
-		wm8731_write(ctx, WM8731_REG_RIGHT_LINEIN, ~BV(WM8731_LINMUTE_BIT));
-		wm8731_write(ctx, WM8731_REG_RIGHT_LINEIN, value);
-		LOG_INFO("Set LINE IN Rx vol[%d]%% raw[%d]\n", volume, value);
+		wm8731_write(ctx, WM8731_REG_RIGHT_LINEIN, ~BV(WM8731_LINMUTE_BIT) | value);
+		wm8731_write(ctx, WM8731_REG_LEFT_LINEIN, ~BV(WM8731_RINMUTE_BIT) | value);
+		LOG_INFO("Set LINE IN vol[%d]%% raw[%d]\n", volume, value);
 	}
 
-	if (device & WM8731_LINE_IN_LX)
+	if (device & WM8731_HEADPHONE)
 	{
-		if (!volume)
-			wm8731_write(ctx, WM8731_REG_LEFT_LINEIN, BV(WM8731_LINMUTE_BIT));
+		value = DIV_ROUND(volume * WM8731_RHPVOL_BITS_MASK, 100);
 
-		value = DIV_ROUND(volume * WM8731_RINVOL_BITS_MASK, 100) & WM8731_RINVOL_BITS_MASK;
-
-		wm8731_write(ctx, WM8731_REG_LEFT_LINEIN, ~BV(WM8731_LINMUTE_BIT));
-		wm8731_write(ctx, WM8731_REG_LEFT_LINEIN, value);
-		LOG_INFO("Set LINE IN Lx vol[%d]%% raw[%d]\n", volume, value);
-	}
-
-
-	if (device & WM8731_HEADPHONE_RX)
-	{
-		value = DIV_ROUND(volume * WM8731_RHPVOL_BITS_MASK, 100) & WM8731_LHPVOL_BITS_MASK;
-		wm8731_write(ctx, WM8731_REG_RIGHT_HPOUT, value | BV(WM8731_RZCEN_BIT));
-		LOG_INFO("Set HEADPHONE Rx vol[%d]%% raw[%d]\n", volume, value);
-	}
-
-
-	if (device & WM8731_HEADPHONE_LX)
-	{
-		value = DIV_ROUND(volume * WM8731_LHPVOL_BITS_MASK, 100) & WM8731_LHPVOL_BITS_MASK;
-		wm8731_write(ctx, WM8731_REG_LEFT_HPOUT, value  | BV(WM8731_LZCEN_BIT));
-		LOG_INFO("Set HEADPHONE Lx vol[%d]%% raw[%d]\n", volume, value);
+		wm8731_write(ctx, WM8731_REG_RIGHT_HPOUT, value | BV(WM8731_RZCEN_BIT) | BV(WM8731_RLHPBOTH_BIT));
+		wm8731_write(ctx, WM8731_REG_LEFT_HPOUT, value  | BV(WM8731_LZCEN_BIT) | BV(WM8731_LRHPBOTH_BIT));
+		LOG_INFO("Set HEADPHONE vol[%d]%% raw[%d]\n", volume, value);
 	}
 
 }

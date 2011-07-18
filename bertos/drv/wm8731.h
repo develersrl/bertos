@@ -53,25 +53,25 @@
 
 /* Left Line in register */
 #define WM8731_REG_LEFT_LINEIN                     0x0
-#define WM8731_LINVOL_BITS_MASK                    0xF // Left line input volume control
+#define WM8731_LINVOL_BITS_MASK                   0x1F // Left line input volume control
 #define WM8731_LINMUTE_BIT                           7 // Left line input mute to ADC
 #define WM8731_LRINBOTH_BIT                          8 // Left to right channel line input volume and mute data load control
 
 /* Right Line in register */
 #define WM8731_REG_RIGHT_LINEIN                    0x1
-#define WM8731_RINVOL_BITS_MASK                    0xF // Right line input volume control
+#define WM8731_RINVOL_BITS_MASK                   0x1F // Right line input volume control
 #define WM8731_RINMUTE_BIT                           7 // Right line input mute to ADC
 #define WM8731_RLINBOTH_BIT                          8 // Right to right channel line input volume and mute data load control
 
 /* Left Headphone out register*/
 #define WM8731_REG_LEFT_HPOUT                      0x2
-#define WM8731_LHPVOL_BITS_MASK                    0x7 // Left channel headphone output volume control
+#define WM8731_LHPVOL_BITS_MASK                   0x7F // Left channel headphone output volume control
 #define WM8731_LZCEN_BIT                             7 // Left channel zero cross detect enable
 #define WM8731_LRHPBOTH_BIT                          8 // Left to right channel headphone volume, mute and zero cross data load control
 
 /* Right Headphone out register*/
 #define WM8731_REG_RIGHT_HPOUT                      0x3
-#define WM8731_RHPVOL_BITS_MASK                     0x7 // Right channel headphone output volume control
+#define WM8731_RHPVOL_BITS_MASK                    0x7F // Right channel headphone output volume control
 #define WM8731_RZCEN_BIT                              7 // Right channel zero cross detect enable
 #define WM8731_RLHPBOTH_BIT                           8 // Right to right channel headphone volume, mute and zero cross data load control
 
@@ -174,11 +174,13 @@ typedef struct Wm8731
 } Wm8731;
 
 
-
-#define 	WM8731_LINE_IN_RX     BV(0)
-#define 	WM8731_LINE_IN_LX     BV(1)
-#define 	WM8731_HEADPHONE_RX   BV(2)
-#define 	WM8731_HEADPHONE_LX   BV(3)
+/**
+ * Devices which is possible to set volume
+ * \}
+ */
+#define 	WM8731_LINE_IN        BV(0)
+#define 	WM8731_HEADPHONE      BV(1)
+/* \} */
 
 /**
  * Set the volume of select device (line in Rx/Lx, Headphone Rx/Lx).
