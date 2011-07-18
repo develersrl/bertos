@@ -183,7 +183,7 @@ typedef struct Wm8731
 /* \} */
 
 /**
- * Set the volume of select device (line in Rx/Lx, Headphone Rx/Lx).
+ * Set the volume of select device line in or Headphone.
  * The volume is express in %, and the volume range is 0-100%.
  */
 void wm8731_setVolume(Wm8731 *ctx, uint16_t device, uint8_t volume);
