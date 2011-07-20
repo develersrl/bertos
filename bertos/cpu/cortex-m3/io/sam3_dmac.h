@@ -346,9 +346,9 @@
 #define    DMAC_CTRLB_IEN                               30 ///< (DMAC_CTRLB).
 
 /* DMAC_CFG : (DMAC Offset: N/A) DMAC Channel Configuration Register*/
-#define    DMAC_CFG_SRC_PER_MASK 0xf ///< (DMAC_CFG) Source with Peripheral identifier.
-#define    DMAC_CFG_DST_PER_MASK 0xf0 ///< (DMAC_CFG) Destination with Peripheral identifier.
-#define    DMAC_CFG_DST_PER_SHIFT 4 ///< (DMAC_CFG) Destination with Peripheral identifier.
+#define    DMAC_CFG_SRC_PER_MASK       0xf ///< (DMAC_CFG) Source with Peripheral identifier.
+#define    DMAC_CFG_DST_PER_MASK      0xf0 ///< (DMAC_CFG) Destination with Peripheral identifier.
+#define    DMAC_CFG_DST_PER_SHIFT        4 ///< (DMAC_CFG) Destination with Peripheral identifier.
 #define    DMAC_CFG_SRC_H2SEL            9 ///< (DMAC_CFG) Software or Hardware Selection for the Source.
 #define    DMAC_CFG_DST_H2SEL           13 ///< (DMAC_CFG) Software or Hardware Selection for the Destination.
 #define    DMAC_CFG_SOD                 16 ///< (DMAC_CFG) Stop On Done.
