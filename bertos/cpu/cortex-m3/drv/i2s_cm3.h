@@ -30,24 +30,17 @@
  *
  * -->
  *
- * \brief I2S driver functions.
+ * \brief Low-level I2S module for ARM (interface).
  *
  * \author Daniele Basile <asterix@develer.com>
+ *
  */
 
-#ifndef DRV_I2S_SAM3_H
-#define DRV_I2S_SAM3_H
+#include <cpu/detect.h>
 
-#include <io/cm3.h>
-
-enum
-{
-	SSC0,
-
-	SSC_CNT
-};
-
-
-#define I2S_SAM3X MAKE_ID('I', '2', 'S', '3')
-
-#endif /* DRV_I2S_SAM3_H */
+#if CPU_CM3_SAM3X
+	#include "i2s_sam3.h"
+/*#elif  Add other ARM families here */
+#else
+	#error Unknown CPU
+#endif

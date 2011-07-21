@@ -35,11 +35,6 @@
  */
 
 
-/*
- * TODO: Revise the public api of this module to be more generic. Evalutate to
- * implement the more generic layer to be common to all I2S BeRTOS drivers.
- */
-#include "i2s_sam3.h"
 #include "cfg/cfg_i2s.h"
 
 // Define log settings for cfg/log.h.
@@ -48,58 +43,139 @@
 #include <cfg/log.h>
 
 #include <drv/timer.h>
-#include <drv/irq_cm3.h>
-
+#include <drv/i2s.h>
 #include <cpu/irq.h>
 
 #include <io/cm3.h>
 
-
-
-#define DATALEN (15 & SSC_DATLEN_MASK)
-#define BITS_PER_CHANNEL 16
-#define N_OF_CHANNEL 2
-// TODO: check the computed value?
-/* The last parameter (2) is due to the hadware on at91sam7s. */
-#define MCK_DIV (CPU_FREQ / (44100 * BITS_PER_CHANNEL * N_OF_CHANNEL* 2))
-
-#define CONFIG_DELAY 0
-#define CONFIG_PERIOD 15
-#define CONFIG_DATNB  1
-#define CONFIG_FSLEN 15
-
-
-#define DELAY ((CONFIG_DELAY << SSC_STTDLY_SHIFT) & SSC_STTDLY_MASK)
-#define PERIOD ((CONFIG_PERIOD << (SSC_PERIOD_SHIFT)) & SSC_PERIOD_MASK)
-#define DATNB ((CONFIG_DATNB << SSC_DATNB_SHIFT) & SSC_DATNB_MASK)
-#define FSLEN ((CONFIG_FSLEN << SSC_FSLEN_SHIFT) & SSC_FSLEN_MASK)
-
-
-
-void i2s_stop(void)
+struct I2sHardware
 {
+};
+
+struct I2sHardware i2s_hw;
+
+
+/* We divite for 2 because the min clock for i2s i MCLK/2 */
+#define MCK_DIV     (CPU_FREQ / (48000 * CONFIG_WORD_BIT_SIZE * CONFIG_CHANNEL_NUM * 2))
+#define DATALEN     ((CONFIG_WORD_BIT_SIZE - 1) & SSC_DATLEN_MASK)
+#define DELAY       ((CONFIG_DELAY << SSC_STTDLY_SHIFT) & SSC_STTDLY_MASK)
+#define PERIOD      ((CONFIG_PERIOD << (SSC_PERIOD_SHIFT)) & SSC_PERIOD_MASK)
+#define DATNB       ((CONFIG_WORD_PER_FRAME << SSC_DATNB_SHIFT) & SSC_DATNB_MASK)
+#define FSLEN       ((CONFIG_FRAME_SYNC_SIZE << SSC_FSLEN_SHIFT) & SSC_FSLEN_MASK)
+#define EXTRA_FSLEN (CONFIG_EXTRA_FRAME_SYNC_SIZE << SSC_FSLEN_EXT)
+
+
+static void sam3_i2s_txStop(I2s *i2s)
+{
+	(void)i2s;
 	SSC_CR = BV(SSC_TXDIS);
 }
 
-
-bool i2s_start(void)
+static void sam3_i2s_txWait(I2s *i2s)
 {
+	(void)i2s;
+}
 
-	/* enable output */
-	SSC_CR = BV(SSC_TXEN);
+static void sam3_i2s_txStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
+{
+	(void)i2s;
+	(void)buf;
+	(void)len;
+	(void)slice_len;
+}
 
-	return true;
+static void sam3_i2s_rxStop(I2s *i2s)
+{
+	(void)i2s;
+	SSC_CR = BV(SSC_TXDIS);
+}
+
+static void sam3_i2s_rxWait(I2s *i2s)
+{
+	(void)i2s;
+}
+
+static void sam3_i2s_rxStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
+{
+	(void)i2s;
+	(void)buf;
+	(void)len;
+	(void)slice_len;
 }
 
 
+static bool sam3_i2s_isTxFinish(struct I2s *i2s)
+{
+	(void)i2s;
+	return false;
+}
+
+static bool sam3_i2s_isRxFinish(struct I2s *i2s)
+{
+	(void)i2s;
+	return false;
+}
+
+static void sam3_i2s_txBuf(struct I2s *i2s, void *buf, size_t len)
+{
+	(void)i2s;
+	(void)buf;
+	(void)len;
+}
+
+static void sam3_i2s_rxBuf(struct I2s *i2s, void *buf, size_t len)
+{
+	(void)i2s;
+	(void)buf;
+	(void)len;
+}
+
+static int sam3_i2s_write(struct I2s *i2s, uint32_t sample)
+{
+	(void)i2s;
+	while(!(SSC_SR & BV(SSC_TXRDY)));
+	SSC_THR = sample;
+	return 0;
+}
+
+
+
+static uint32_t sam3_i2s_read(struct I2s *i2s)
+{
+	(void)i2s;
+	while(!(SSC_SR & BV(SSC_RXRDY)));
+	return SSC_RHR;
+}
+
+/*
 static DECLARE_ISR(irq_ssc)
 {
 }
-
-void i2s_init(void)
+*/
+void i2s_init(I2s *i2s, int channel)
 {
+	(void)channel;
+	i2s->ctx.write = sam3_i2s_write;
+	i2s->ctx.tx_buf = sam3_i2s_txBuf;
+	i2s->ctx.tx_isFinish = sam3_i2s_isTxFinish;
+	i2s->ctx.tx_start = sam3_i2s_txStart;
+	i2s->ctx.tx_wait = sam3_i2s_txWait;
+	i2s->ctx.tx_stop = sam3_i2s_txStop;
+
+	i2s->ctx.read = sam3_i2s_read;
+	i2s->ctx.rx_buf = sam3_i2s_rxBuf;
+	i2s->ctx.rx_isFinish = sam3_i2s_isRxFinish;
+	i2s->ctx.rx_start = sam3_i2s_rxStart;
+	i2s->ctx.rx_wait = sam3_i2s_rxWait;
+	i2s->ctx.rx_stop = sam3_i2s_rxStop;
+
+	DB(i2s->ctx._type = I2S_SAM3X;)
+	i2s->hw = &i2s_hw;
+
 	PIOA_PDR = BV(SSC_TK) | BV(SSC_TF) | BV(SSC_TD);
 	PIO_PERIPH_SEL(SSC_PORT, BV(SSC_TK) | BV(SSC_TF) | BV(SSC_TD), PIO_PERIPH_B);
+
+	/* clock the ssc */
 	pmc_periphEnable(SSC_ID);
 
 	/* reset device */
@@ -124,5 +200,8 @@ void i2s_init(void)
 	 * - MSB
 	 * - Frame sync output selection negative
 	 */
-	SSC_TFMR = DATALEN | DATNB | FSLEN | BV(SSC_MSBF) | SSC_FSOS_POSITIVE;
+	SSC_TFMR = DATALEN | DATNB | FSLEN | EXTRA_FSLEN | BV(SSC_MSBF) | SSC_FSOS_POSITIVE;
+
+	SSC_IDR = 0xFFFFFFFF;
+	SSC_CR = BV(SSC_TXEN) | BV(SSC_RXEN);
 }
