@@ -146,5 +146,5 @@ void wm8731_init(Wm8731 *ctx, I2c *i2c, uint8_t codec_addr)
 
 	/* By default we turn on all devices and disable only the outclock */
 	wm8731_write(ctx, WM8731_REG_ACTIVE_CTRL, 1);
-	wm8731_write(ctx, WM8731_REG_PWDOWN_CTRL, 0x47);
+	wm8731_write(ctx, WM8731_REG_PWDOWN_CTRL, 0x40);
 }
