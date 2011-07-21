@@ -173,7 +173,9 @@ void i2s_init(I2s *i2s, int channel)
 	i2s->hw = &i2s_hw;
 
 	PIOA_PDR = BV(SSC_TK) | BV(SSC_TF) | BV(SSC_TD);
-	PIO_PERIPH_SEL(SSC_PORT, BV(SSC_TK) | BV(SSC_TF) | BV(SSC_TD), PIO_PERIPH_B);
+	PIO_PERIPH_SEL(PIOA_BASE, BV(SSC_TK) | BV(SSC_TF) | BV(SSC_TD), PIO_PERIPH_B);
+	PIOB_PDR = BV(SSC_RD) | BV(SSC_RF);
+	PIO_PERIPH_SEL(PIOB_BASE, BV(SSC_RD) | BV(SSC_RF), PIO_PERIPH_A);
 
 	/* clock the ssc */
 	pmc_periphEnable(SSC_ID);
@@ -201,6 +203,12 @@ void i2s_init(I2s *i2s, int channel)
 	 * - Frame sync output selection negative
 	 */
 	SSC_TFMR = DATALEN | DATNB | FSLEN | EXTRA_FSLEN | BV(SSC_MSBF) | SSC_FSOS_POSITIVE;
+
+
+	// Receiver should start on TX and take the clock from TK
+    SSC_RCMR = SSC_CKS_CLK | BV(SSC_CKI) | SSC_CKO_CONT | SSC_CKG_NONE | DELAY | PERIOD | SSC_START_TX;
+    SSC_RFMR = DATALEN | DATNB | FSLEN  | EXTRA_FSLEN | BV(SSC_MSBF) | SSC_FSOS_POSITIVE;
+
 
 	SSC_IDR = 0xFFFFFFFF;
 	SSC_CR = BV(SSC_TXEN) | BV(SSC_RXEN);
