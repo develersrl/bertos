@@ -56,6 +56,12 @@
  */
 #define I2S_LOG_FORMAT     LOG_FMT_TERSE
 
+/**
+ * Length of each play buffer.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_PLAY_BUF_LEN    8192
 
 /**
  * Sampling frequency of the audio file.
