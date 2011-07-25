@@ -44,26 +44,26 @@
 #define HSMCI_BASE         0x40000000U
 
 
-#define HSMCI_CR            (*((reg32_t *)(HSMCI_BASE + 0x000))); ///< (Hsmci Offset: 0x00) Control Register
-#define HSMCI_MR            (*((reg32_t *)(HSMCI_BASE + 0x004))); ///< (Hsmci Offset: 0x04) Mode Register
-#define HSMCI_DTOR          (*((reg32_t *)(HSMCI_BASE + 0x008))); ///< (Hsmci Offset: 0x08) Data Timeout Register
-#define HSMCI_SDCR          (*((reg32_t *)(HSMCI_BASE + 0x00C))); ///< (Hsmci Offset: 0x0C) SD/SDIO Card Register
-#define HSMCI_ARGR          (*((reg32_t *)(HSMCI_BASE + 0x010))); ///< (Hsmci Offset: 0x10) Argument Register
-#define HSMCI_CMDR          (*((reg32_t *)(HSMCI_BASE + 0x014))); ///< (Hsmci Offset: 0x14) Command Register
-#define HSMCI_BLKR          (*((reg32_t *)(HSMCI_BASE + 0x018))); ///< (Hsmci Offset: 0x18) Block Register
-#define HSMCI_CSTOR         (*((reg32_t *)(HSMCI_BASE + 0x01C))); ///< (Hsmci Offset: 0x1C) Completion Signal Timeout Register
-#define HSMCI_RSPR          (*((reg32_t *)(HSMCI_BASE + 0x020))); ///< (Hsmci Offset: 0x20) Response Register
-#define HSMCI_RDR           (*((reg32_t *)(HSMCI_BASE + 0x030))); ///< (Hsmci Offset: 0x30) Receive Data Register
-#define HSMCI_TDR           (*((reg32_t *)(HSMCI_BASE + 0x034))); ///< (Hsmci Offset: 0x34) Transmit Data Register
-#define HSMCI_SR            (*((reg32_t *)(HSMCI_BASE + 0x040))); ///< (Hsmci Offset: 0x40) Status Register
-#define HSMCI_IER           (*((reg32_t *)(HSMCI_BASE + 0x044))); ///< (Hsmci Offset: 0x44) Interrupt Enable Register
-#define HSMCI_IDR           (*((reg32_t *)(HSMCI_BASE + 0x048))); ///< (Hsmci Offset: 0x48) Interrupt Disable Register
-#define HSMCI_IMR           (*((reg32_t *)(HSMCI_BASE + 0x04C))); ///< (Hsmci Offset: 0x4C) Interrupt Mask Register
-#define HSMCI_DMA           (*((reg32_t *)(HSMCI_BASE + 0x050))); ///< (Hsmci Offset: 0x50) DMA Configuration Register
-#define HSMCI_CFG           (*((reg32_t *)(HSMCI_BASE + 0x054))); ///< (Hsmci Offset: 0x54) Configuration Register
-#define HSMCI_WPMR          (*((reg32_t *)(HSMCI_BASE + 0x0E4))); ///< (Hsmci Offset: 0xE4) Write Protection Mode Register
-#define HSMCI_WPSR          (*((reg32_t *)(HSMCI_BASE + 0x0E8))); ///< (Hsmci Offset: 0xE8) Write Protection Status Register
-#define HSMCI_FIFO          (*((reg32_t *)(HSMCI_BASE + 0x200))); ///< (Hsmci Offset: 0x200) FIFO Memory Aperture0
+#define HSMCI_CR            (*((reg32_t *)(HSMCI_BASE + 0x000))) ///< (Hsmci Offset: 0x00) Control Register
+#define HSMCI_MR            (*((reg32_t *)(HSMCI_BASE + 0x004))) ///< (Hsmci Offset: 0x04) Mode Register
+#define HSMCI_DTOR          (*((reg32_t *)(HSMCI_BASE + 0x008))) ///< (Hsmci Offset: 0x08) Data Timeout Register
+#define HSMCI_SDCR          (*((reg32_t *)(HSMCI_BASE + 0x00C))) ///< (Hsmci Offset: 0x0C) SD/SDIO Card Register
+#define HSMCI_ARGR          (*((reg32_t *)(HSMCI_BASE + 0x010))) ///< (Hsmci Offset: 0x10) Argument Register
+#define HSMCI_CMDR          (*((reg32_t *)(HSMCI_BASE + 0x014))) ///< (Hsmci Offset: 0x14) Command Register
+#define HSMCI_BLKR          (*((reg32_t *)(HSMCI_BASE + 0x018))) ///< (Hsmci Offset: 0x18) Block Register
+#define HSMCI_CSTOR         (*((reg32_t *)(HSMCI_BASE + 0x01C))) ///< (Hsmci Offset: 0x1C) Completion Signal Timeout Register
+#define HSMCI_RSPR          (*((reg32_t *)(HSMCI_BASE + 0x020))) ///< (Hsmci Offset: 0x20) Response Register
+#define HSMCI_RDR           (*((reg32_t *)(HSMCI_BASE + 0x030))) ///< (Hsmci Offset: 0x30) Receive Data Register
+#define HSMCI_TDR           (*((reg32_t *)(HSMCI_BASE + 0x034))) ///< (Hsmci Offset: 0x34) Transmit Data Register
+#define HSMCI_SR            (*((reg32_t *)(HSMCI_BASE + 0x040))) ///< (Hsmci Offset: 0x40) Status Register
+#define HSMCI_IER           (*((reg32_t *)(HSMCI_BASE + 0x044))) ///< (Hsmci Offset: 0x44) Interrupt Enable Register
+#define HSMCI_IDR           (*((reg32_t *)(HSMCI_BASE + 0x048))) ///< (Hsmci Offset: 0x48) Interrupt Disable Register
+#define HSMCI_IMR           (*((reg32_t *)(HSMCI_BASE + 0x04C))) ///< (Hsmci Offset: 0x4C) Interrupt Mask Register
+#define HSMCI_DMA           (*((reg32_t *)(HSMCI_BASE + 0x050))) ///< (Hsmci Offset: 0x50) DMA Configuration Register
+#define HSMCI_CFG           (*((reg32_t *)(HSMCI_BASE + 0x054))) ///< (Hsmci Offset: 0x54) Configuration Register
+#define HSMCI_WPMR          (*((reg32_t *)(HSMCI_BASE + 0x0E4))) ///< (Hsmci Offset: 0xE4) Write Protection Mode Register
+#define HSMCI_WPSR          (*((reg32_t *)(HSMCI_BASE + 0x0E8))) ///< (Hsmci Offset: 0xE8) Write Protection Status Register
+#define HSMCI_FIFO          (*((reg32_t *)(HSMCI_BASE + 0x200))) ///< (Hsmci Offset: 0x200) FIFO Memory Aperture0
 
 
 /* HSMCI_CR : (HSMCI Offset: 0x00) Control Register */
@@ -75,7 +75,7 @@
 
 /* HSMCI_MR : (HSMCI Offset: 0x04) Mode Register */
 #define HSMCI_MR_CLKDIV_MASK     0xff ///< (HSMCI_MR) Clock Divider
-#define HSMCI_MR_PWSDIV_SHIFT    (0x7u << 8) ///< (HSMCI_MR) Power Saving Divider
+#define HSMCI_MR_PWSDIV_SHIFT       8 ///< (HSMCI_MR) Power Saving Divider
 #define HSMCI_MR_PWSDIV_MASK     (0x7u << HSMCI_MR_PWSDIV_SHIFT) ///< (HSMCI_MR) Power Saving Divider
 #define HSMCI_MR_RDPROOF           11 ///< (HSMCI_MR)
 #define HSMCI_MR_WRPROOF           12 ///< (HSMCI_MR)
