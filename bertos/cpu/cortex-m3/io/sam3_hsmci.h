@@ -53,6 +53,9 @@
 #define HSMCI_BLKR          (*((reg32_t *)(HSMCI_BASE + 0x018))) ///< (Hsmci Offset: 0x18) Block Register
 #define HSMCI_CSTOR         (*((reg32_t *)(HSMCI_BASE + 0x01C))) ///< (Hsmci Offset: 0x1C) Completion Signal Timeout Register
 #define HSMCI_RSPR          (*((reg32_t *)(HSMCI_BASE + 0x020))) ///< (Hsmci Offset: 0x20) Response Register
+#define HSMCI_RSPR1         (*((reg32_t *)(HSMCI_BASE + 0x024))) ///< (Hsmci Offset: 0x24) Response Register
+#define HSMCI_RSPR2         (*((reg32_t *)(HSMCI_BASE + 0x028))) ///< (Hsmci Offset: 0x28) Response Register
+#define HSMCI_RSPR3         (*((reg32_t *)(HSMCI_BASE + 0x02C))) ///< (Hsmci Offset: 0x2C) Response Register
 #define HSMCI_RDR           (*((reg32_t *)(HSMCI_BASE + 0x030))) ///< (Hsmci Offset: 0x30) Receive Data Register
 #define HSMCI_TDR           (*((reg32_t *)(HSMCI_BASE + 0x034))) ///< (Hsmci Offset: 0x34) Transmit Data Register
 #define HSMCI_SR            (*((reg32_t *)(HSMCI_BASE + 0x040))) ///< (Hsmci Offset: 0x40) Status Register
