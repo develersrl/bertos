@@ -412,8 +412,8 @@ static const KBlockVTable sd_buffered_vt =
 #define SD_SEND_OP_COND      0x41
 #define SD_SEND_OP_COND_CRC  0xF9
 
-#define SD_START_DELAY  ms_to_ticks(10)
-#define SD_INIT_TIMEOUT ms_to_ticks(1000)
+#define SD_START_DELAY  10
+#define SD_INIT_TIMEOUT 1000
 #define SD_IDLE_RETRIES 4
 
 static bool sd_blockInit(Sd *sd, KFile *ch)
