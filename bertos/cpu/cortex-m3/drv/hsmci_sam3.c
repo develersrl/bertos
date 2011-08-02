@@ -96,8 +96,9 @@ void hsmci_readResp(void *resp, size_t len)
 	ASSERT(resp);
 	uint32_t *r = (uint32_t *)resp;
 
-	kprintf("size %d %d\n",(len / sizeof(HSMCI_RSPR)),  sizeof(HSMCI_RSPR));
-	for (size_t i = 0; i < (len / sizeof(HSMCI_RSPR)); i++)
+	kprintf("size %d \n", sizeof(HSMCI_RSPR));
+
+	for (size_t i = 0; i < len ; i++)
 		r[i] = HSMCI_RSPR;
 }
 
