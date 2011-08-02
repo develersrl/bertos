@@ -51,6 +51,48 @@
 
 #include <fs/fatfs/diskio.h>
 
+#ifdef CPU_CM3_SAM3X8
+
+typedef struct SDcid
+{
+    uint8_t        manfid;
+    uint8_t        prod_name[8];
+    uint32_t       serial;
+    uint16_t       oemid;
+    uint32_t       year_off;
+    uint8_t        m_rev;
+    uint8_t        l_rev;
+}SDcid;
+
+typedef struct SDcsd
+{
+	uint8_t     structure;
+    uint8_t     ccc;          ///< Card command classes
+    uint32_t    erase_size;  ///< The size of an erasable sector, in write block len
+	uint32_t    capacity;     ///< Card size in byte
+    uint32_t    blk_len;      ///< Block data size len in byte
+	uint32_t    blk_num;      ///< Number of block in card
+	uint32_t  	write_blk_bits; ///< Max write block length in bits
+	uint32_t  	read_blk_bits;  ///< Max read block length in bits
+    uint8_t     read_partial:1,
+                read_misalign:1,
+                write_partial:1,
+                write_misalign:1;
+} SDcsd;
+
+int sd_decode_csd(SDcsd *csd, uint32_t *resp, size_t len);
+void sd_dump_csd(SDcsd *csd);
+void sd_decode_cid(SDcid *cid, uint32_t *resp, size_t len);
+void sd_dump_cid(SDcid *cid);
+void sd_send_init(void);
+void sd_go_idle(void);
+int sd_send_if_cond(void);
+int sd_send_app_op_cond(void);
+int sd_get_cid(uint32_t *resp, size_t len);
+int sd_get_csd(uint32_t *resp, size_t len);
+int sd_app_status(void);
+#endif
+
 
 #define SD_UNBUFFERED     BV(0) ///< Open SD memory disabling page caching, no modification and partial write are allowed.
 
@@ -117,6 +159,5 @@ INLINE Sd *SD_CAST(KBlock *b)
 	ASSERT(b->priv.type == KBT_SD);
 	return (Sd *)b;
 }
-
 
 #endif /* DRV_SD_H */

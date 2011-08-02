@@ -500,6 +500,343 @@ static bool sd_blockInit(Sd *sd, KFile *ch)
 	return true;
 }
 
+#ifdef CPU_CM3_SAM3X8
+
+#include <drv/hsmci_sam3.h>
+
+/* SD commands                           type  argument     response */
+  /* class 0 */
+/* This is basically the same command as for MMC with some quirks. */
+#define SD_SEND_RELATIVE_ADDR     3   /* bcr                     R6  */
+#define SD_SEND_IF_COND           8   /* bcr  [11:0] See below   R7  */
+#define SD_SWITCH_VOLTAGE         11  /* ac                      R1  */
+
+  /* class 10 */
+#define SD_SWITCH                 6   /* adtc [31:0] See below   R1  */
+
+  /* class 5 */
+#define SD_ERASE_WR_BLK_START    32   /* ac   [31:0] data addr   R1  */
+#define SD_ERASE_WR_BLK_END      33   /* ac   [31:0] data addr   R1  */
+
+  /* Application commands */
+#define SD_APP_SET_BUS_WIDTH      6   /* ac   [1:0] bus width    R1  */
+#define SD_APP_SD_STATUS         13   /* adtc                    R1  */
+#define SD_APP_SEND_NUM_WR_BLKS  22   /* adtc                    R1  */
+#define SD_APP_OP_COND           41   /* bcr  [31:0] OCR         R3  */
+#define SD_APP_SEND_SCR          51   /* adtc                    R1  */
+
+/* OCR bit definitions */
+#define SD_OCR_S18R     (1 << 24)    /* 1.8V switching request */
+#define SD_ROCR_S18A        SD_OCR_S18R  /* 1.8V switching accepted by card */
+#define SD_OCR_XPC      (1 << 28)    /* SDXC power control */
+
+/*
+ * SD_SWITCH argument format:
+ *
+ *      [31] Check (0) or switch (1)
+ *      [30:24] Reserved (0)
+ *      [23:20] Function group 6
+ *      [19:16] Function group 5
+ *      [15:12] Function group 4
+ *      [11:8] Function group 3
+ *      [7:4] Function group 2
+ *      [3:0] Function group 1
+ */
+
+/*
+ * SD_SEND_IF_COND argument format:
+ *
+ *  [31:12] Reserved (0)
+ *  [11:8] Host Voltage Supply Flags
+ *  [7:0] Check Pattern (0xAA)
+ */
+
+/*
+ * SCR field definitions
+ */
+
+#define SCR_SPEC_VER_0      0   /* Implements system specification 1.0 - 1.01 */
+#define SCR_SPEC_VER_1      1   /* Implements system specification 1.10 */
+#define SCR_SPEC_VER_2      2   /* Implements system specification 2.00-3.0X */
+
+#define UNSTUFF_BITS(resp, start, size)                   \
+    ({                              \
+        const uint32_t __size = size;                \
+        const uint32_t __mask = (__size < 32 ? 1 << __size : 0) - 1; \
+        const uint32_t __off = 3 - ((start) / 32);           \
+        const uint32_t __shft = (start) & 31;            \
+        uint32_t __res;                      \
+                                    \
+        __res = resp[__off] >> __shft;              \
+        if (__size + __shft > 32)               \
+            __res |= resp[__off-1] << ((32 - __shft) % 32); \
+        __res & __mask;                     \
+    })
+
+
+#define BCD_TO_INT_32BIT(bcd)  ((uint32_t )((bcd) & 0xf) * 1 +  \
+								(((bcd) >> 4) & 0xf)  * 10 +      \
+								(((bcd) >> 8) & 0xf)  * 100 +     \
+								(((bcd) >> 12) & 0xf) * 1000 +   \
+								(((bcd) >> 16) & 0xf) * 10000 +   \
+								(((bcd) >> 20) & 0xf) * 100000 +  \
+								(((bcd) >> 24) & 0xf) * 1000000 + \
+								(((bcd) >> 28) & 0xf) * 10000000) \
+
+
+static void dump(uint32_t *r, size_t len)
+{
+	ASSERT(r);
+	kputs("r [ ");
+	for (size_t i = 0; i < len; i++)
+		kprintf("%lx ", r[i]);
+	kputs("]\n");
+}
+
+
+int sd_decode_csd(SDcsd *csd, uint32_t *resp, size_t len)
+{
+	ASSERT(csd);
+	ASSERT(resp);
+	ASSERT(len >= 4);
+
+    csd->structure = UNSTUFF_BITS(resp, 126, 2);
+	csd->ccc = UNSTUFF_BITS(resp, 84, 12);
+
+    if (csd->structure == 0)
+	{
+		kprintf("csize %ld\n", UNSTUFF_BITS(resp, 62, 12));
+		kprintf("csize_mul %ld\n", UNSTUFF_BITS(resp, 47, 3));
+		kprintf("bit read %ld %ld\n", csd->read_blk_bits = UNSTUFF_BITS(resp, 80, 4), csd->read_blk_bits);
+
+		// (C_size + 1) x 2^(C_SIZE_MUL+2)
+		csd->blk_num = (1 + UNSTUFF_BITS(resp, 62, 12)) << (UNSTUFF_BITS(resp, 47, 3) + 2);
+
+		csd->read_blk_bits = UNSTUFF_BITS(resp, 80, 4);
+		csd->write_blk_bits = UNSTUFF_BITS(resp, 22, 4);
+
+		csd->blk_len = 1 << csd->read_blk_bits;
+        csd->capacity  = csd->blk_num * csd->blk_len;
+
+        csd->read_partial = UNSTUFF_BITS(resp, 79, 1);
+        csd->read_misalign = UNSTUFF_BITS(resp, 77, 1);
+
+        csd->write_misalign = UNSTUFF_BITS(resp, 78, 1);
+        csd->write_partial = UNSTUFF_BITS(resp, 21, 1);
+
+        if (UNSTUFF_BITS(resp, 46, 1))
+		{
+            csd->erase_size = 1;
+        }
+		else if(csd->write_blk_bits >= 9)
+		{
+            csd->erase_size = UNSTUFF_BITS(resp, 39, 7) + 1;
+            csd->erase_size <<= csd->write_blk_bits - 9;
+        }
+
+		return 0;
+	}
+	else if (csd->structure == 1)
+	{
+		kprintf("csize %ld\n", UNSTUFF_BITS(resp, 48, 22));
+        csd->capacity  = (1 + UNSTUFF_BITS(resp, 48, 22)) << 10;
+
+		csd->write_blk_bits = 9;
+		csd->write_partial = 0;
+        csd->write_misalign = 0;
+
+		csd->read_blk_bits = 9;
+		csd->read_partial = 0;
+        csd->read_misalign = 0;
+
+        csd->erase_size = 1;
+		// the block size if fixed to 512kb
+		csd->blk_len = (1 << csd->write_blk_bits) << 10;
+
+        return 0;
+	}
+    else
+	{
+        kprintf("Unrecognised CSD structure version %d\n", csd->structure);
+        return -1;
+    }
+
+    return 0;
+}
+
+
+void sd_dump_csd(SDcsd *csd)
+{
+	ASSERT(csd);
+
+	kprintf("VERSION: %d.0\n", csd->structure ? 2 : 1);
+    kprintf("CARD COMMAND CLASS: %d\n", csd->ccc);
+	kprintf("WRITE BLK LEN BITS: %ld\n", csd->write_blk_bits);
+	kprintf("READ BLK LEN BITS: %ld\n", csd->read_blk_bits);
+	kprintf("ERASE SIZE: %ld\n", csd->erase_size);
+	kprintf("BLK NUM: %ld\n", csd->blk_num);
+	kprintf("BLK LEN: %ld\n", csd->blk_len);
+	kprintf("CAPACITY %ld\n", csd->capacity);
+	kprintf("FLAG Write: WP %d, W MISALIGN %d\n", csd->write_partial, csd->write_misalign);
+	kprintf("FLAG Read: RP %d, R MISALIGN %d\n", csd->read_partial, csd->read_misalign);
+
+}
+
+
+void sd_decode_cid(SDcid *cid, uint32_t *resp, size_t len)
+{
+	ASSERT(cid);
+	ASSERT(resp);
+	ASSERT(len >= 4);
+
+	cid->manfid        = UNSTUFF_BITS(resp, 120, 8);
+    cid->oemid         = UNSTUFF_BITS(resp, 104, 16);
+    cid->prod_name[0]      = UNSTUFF_BITS(resp, 96, 8);
+    cid->prod_name[1]      = UNSTUFF_BITS(resp, 88, 8);
+    cid->prod_name[2]      = UNSTUFF_BITS(resp, 80, 8);
+    cid->prod_name[3]      = UNSTUFF_BITS(resp, 72, 8);
+    cid->prod_name[4]      = UNSTUFF_BITS(resp, 64, 8);
+    cid->m_rev         = UNSTUFF_BITS(resp, 60, 4);
+    cid->l_rev         = UNSTUFF_BITS(resp, 56, 4);
+    cid->serial        = UNSTUFF_BITS(resp, 24, 32);
+    cid->year_off      = UNSTUFF_BITS(resp, 8, 12);
+}
+
+void sd_dump_cid(SDcid *cid)
+{
+	ASSERT(cid);
+
+	kprintf("MANFID: %d\n", cid->manfid);
+    kprintf("OEMID: %d\n", cid->oemid);
+	kprintf("SERIAL: %ld\n", cid->serial);
+    kprintf("PROD_NAME: %s\n", cid->prod_name);
+    kprintf("REV: %d.%d\n", cid->m_rev, cid->l_rev);
+    kprintf("OFF,Y,M: %lx, %ld\n", cid->year_off, BCD_TO_INT_32BIT(cid->year_off));
+}
+
+void sd_send_init(void)
+{
+	if (hsmci_sendCmd(0, 0, HSMCI_CMDR_SPCMD_INIT | HSMCI_CMDR_RSPTYP_NORESP))
+		kprintf("INIT Errore %lx\n", HSMCI_SR);
+}
+
+
+void sd_go_idle(void)
+{
+	for (int i = 0; i < 10; i++)
+		if (hsmci_sendCmd(0, 0, HSMCI_CMDR_RSPTYP_NORESP))
+			kprintf("0 Errore %lx\n", HSMCI_SR);
+}
+
+int sd_send_if_cond(void)
+{
+	if (hsmci_sendCmd(8, CMD8_V_RANGE_27V_36V, HSMCI_CMDR_RSPTYP_48_BIT))
+	{
+		kprintf("8 Errore %lx\n", HSMCI_SR);
+		return -1;
+	}
+	else
+	{
+		uint32_t r = HSMCI_RSPR;
+		if ((r & 0xFFF) == CMD8_V_RANGE_27V_36V)
+		{
+			kprintf("8 ok: %lx\n", r);
+			return 0;
+		}
+		kprintf("8 ko: %lx\n", r);
+	}
+	return -1;
+}
+
+int sd_send_app_op_cond(void)
+{
+	for (int i = 0; i < 10; i++)
+	{
+
+		if (hsmci_sendCmd(55, 0, HSMCI_CMDR_RSPTYP_48_BIT))
+		{
+			kprintf("55 Errore %lx\n", HSMCI_SR);
+			return -1;
+		}
+		else
+		{
+			kprintf("55 Risposta %lx\n", HSMCI_RSPR);
+		}
+
+		if (hsmci_sendCmd(41, SD_HOST_VOLTAGE_RANGE | SD_OCR_CCS, HSMCI_CMDR_RSPTYP_48_BIT))// se cmd 8 va ok.
+		//if (hsmci_sendCmd(41, SD_HOST_VOLTAGE_RANGE, HSMCI_CMDR_RSPTYP_48_BIT))
+		{
+			kprintf("41 Errore %lx\n", HSMCI_SR);
+			return -1;
+		}
+		else
+		{
+			if (HSMCI_RSPR & SD_OCR_BUSY)
+			{
+				kputs("sd power up!\n");
+				return 0;
+			}
+
+			kputs("sd not ready.\n");
+			continue;
+		}
+
+		timer_delay(10);
+	}
+	return -1;
+}
+
+int sd_get_cid(uint32_t *resp, size_t len)
+{
+	if (hsmci_sendCmd(2, 0, HSMCI_CMDR_RSPTYP_136_BIT))
+	{
+		kprintf("2 Errore %lx\n", HSMCI_SR);
+		return -1;
+	}
+	else
+	{
+		hsmci_readResp(resp, len);
+		dump(resp, len);
+	}
+
+	return 0;
+}
+
+int sd_get_csd(uint32_t *resp, size_t len)
+{
+	if (hsmci_sendCmd(9, 0, HSMCI_CMDR_RSPTYP_136_BIT))
+	{
+		kprintf("9 Errore %lx\n", HSMCI_SR);
+		return -1;
+	}
+	else
+	{
+		hsmci_readResp(resp, len);
+		dump(resp, len);
+	}
+	return 0;
+}
+
+int sd_app_status(void)
+{
+	if (hsmci_sendCmd(13, 0, HSMCI_CMDR_RSPTYP_48_BIT))
+	{
+		kprintf("13 Errore %lx\n", HSMCI_SR);
+		return -1;
+	}
+	else
+	{
+		uint32_t status = HSMCI_RSPR;
+		kprintf("13 r: %lx\n", status);
+		if (status & SD_OCR_BUSY)
+			return 1;
+	}
+	return 0;
+}
+
+#endif
+
+
 bool sd_initUnbuf(Sd *sd, KFile *ch)
 {
 	if (sd_blockInit(sd, ch))
@@ -526,4 +863,6 @@ bool sd_initBuf(Sd *sd, KFile *ch)
 	else
 		return false;
 }
+
+
 
