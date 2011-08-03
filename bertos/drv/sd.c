@@ -413,7 +413,7 @@ static const KBlockVTable sd_buffered_vt =
 #define SD_SEND_OP_COND_CRC  0xF9
 
 #define SD_START_DELAY  10
-#define SD_INIT_TIMEOUT 1000
+#define SD_INIT_TIMEOUT ms_to_ticks(2000)
 #define SD_IDLE_RETRIES 4
 
 static bool sd_blockInit(Sd *sd, KFile *ch)
@@ -584,16 +584,6 @@ static bool sd_blockInit(Sd *sd, KFile *ch)
 								(((bcd) >> 28) & 0xf) * 10000000) \
 
 
-static void dump(uint32_t *r, size_t len)
-{
-	ASSERT(r);
-	kputs("r [ ");
-	for (size_t i = 0; i < len; i++)
-		kprintf("%lx ", r[i]);
-	kputs("]\n");
-}
-
-
 int sd_decode_csd(SDcsd *csd, uint32_t *resp, size_t len)
 {
 	ASSERT(csd);
@@ -723,9 +713,8 @@ void sd_send_init(void)
 
 void sd_go_idle(void)
 {
-	for (int i = 0; i < 10; i++)
-		if (hsmci_sendCmd(0, 0, HSMCI_CMDR_RSPTYP_NORESP))
-			kprintf("0 Errore %lx\n", HSMCI_SR);
+	if (hsmci_sendCmd(0, 0, HSMCI_CMDR_RSPTYP_NORESP))
+		kprintf("0 Errore %lx\n", HSMCI_SR);
 }
 
 int sd_send_if_cond(void)
@@ -750,39 +739,35 @@ int sd_send_if_cond(void)
 
 int sd_send_app_op_cond(void)
 {
-	for (int i = 0; i < 10; i++)
+	if (hsmci_sendCmd(55, 0, HSMCI_CMDR_RSPTYP_48_BIT))
 	{
-
-		if (hsmci_sendCmd(55, 0, HSMCI_CMDR_RSPTYP_48_BIT))
-		{
-			kprintf("55 Errore %lx\n", HSMCI_SR);
-			return -1;
-		}
-		else
-		{
-			kprintf("55 Risposta %lx\n", HSMCI_RSPR);
-		}
-
-		if (hsmci_sendCmd(41, SD_HOST_VOLTAGE_RANGE | SD_OCR_CCS, HSMCI_CMDR_RSPTYP_48_BIT))// se cmd 8 va ok.
-		//if (hsmci_sendCmd(41, SD_HOST_VOLTAGE_RANGE, HSMCI_CMDR_RSPTYP_48_BIT))
-		{
-			kprintf("41 Errore %lx\n", HSMCI_SR);
-			return -1;
-		}
-		else
-		{
-			if (HSMCI_RSPR & SD_OCR_BUSY)
-			{
-				kputs("sd power up!\n");
-				return 0;
-			}
-
-			kputs("sd not ready.\n");
-			continue;
-		}
-
-		timer_delay(10);
+		kprintf("55 Errore %lx\n", HSMCI_SR);
+		return -1;
 	}
+	else
+	{
+		kprintf("55 Risposta %lx\n", HSMCI_RSPR);
+	}
+
+//	if (hsmci_sendCmd(41, SD_HOST_VOLTAGE_RANGE, HSMCI_CMDR_RSPTYP_48_BIT))
+	if (hsmci_sendCmd(41, SD_HOST_VOLTAGE_RANGE | SD_OCR_CCS, HSMCI_CMDR_RSPTYP_48_BIT))// se cmd 8 va ok.
+	{
+		kprintf("41 Errore %lx\n", HSMCI_SR);
+		return -1;
+	}
+	else
+	{
+		uint32_t status = HSMCI_RSPR;
+		kprintf("41 reply[%0lx]\n", status);
+		if (status & SD_OCR_BUSY)
+		{
+			kprintf("sd power up! Hight Capability [%ld]\n", status & SD_OCR_CCS);
+			return 0;
+		}
+
+		kputs("sd not ready.\n");
+	}
+
 	return -1;
 }
 
@@ -794,10 +779,7 @@ int sd_get_cid(uint32_t *resp, size_t len)
 		return -1;
 	}
 	else
-	{
 		hsmci_readResp(resp, len);
-		dump(resp, len);
-	}
 
 	return 0;
 }
@@ -810,14 +792,12 @@ int sd_get_csd(uint32_t *resp, size_t len)
 		return -1;
 	}
 	else
-	{
 		hsmci_readResp(resp, len);
-		dump(resp, len);
-	}
+
 	return 0;
 }
 
-int sd_app_status(void)
+int sd_app_status(uint32_t *resp, size_t len)
 {
 	if (hsmci_sendCmd(13, 0, HSMCI_CMDR_RSPTYP_48_BIT))
 	{
@@ -825,13 +805,41 @@ int sd_app_status(void)
 		return -1;
 	}
 	else
-	{
-		uint32_t status = HSMCI_RSPR;
-		kprintf("13 r: %lx\n", status);
-		if (status & SD_OCR_BUSY)
-			return 1;
-	}
+		hsmci_readResp(resp, len);
+
 	return 0;
+}
+
+int sd_send_relative_addr(uint32_t *resp, size_t len)
+{
+
+	if (hsmci_sendCmd(3, 0, HSMCI_CMDR_RSPTYP_48_BIT))
+	{
+		kprintf("3 Errore %lx\n", HSMCI_SR);
+		return -1;
+	}
+	else
+		hsmci_readResp(resp, len);
+
+	return 0;
+}
+
+void sd_decode_addr(SDAddr *addr, uint32_t *resp, size_t len)
+{
+	ASSERT(addr);
+	ASSERT(resp);
+	(void)len;
+
+	kprintf("%0lx\n", resp[0] >> 16);
+	addr->rca        = UNSTUFF_BITS(resp, 16, 16);
+    addr->status     = UNSTUFF_BITS(resp, 0, 16);
+}
+
+void sd_dump_addr(SDAddr *addr)
+{
+	ASSERT(addr);
+	kprintf("RCA: %0lx\n", addr->rca);
+	kprintf("STATUS: %0lx\n", addr->status);
 }
 
 #endif

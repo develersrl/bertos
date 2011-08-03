@@ -80,6 +80,13 @@ typedef struct SDcsd
                 write_misalign:1;
 } SDcsd;
 
+
+typedef struct SDAddr
+{
+	uint32_t rca;
+	uint32_t status;
+} SDAddr;
+
 int sd_decode_csd(SDcsd *csd, uint32_t *resp, size_t len);
 void sd_dump_csd(SDcsd *csd);
 void sd_decode_cid(SDcid *cid, uint32_t *resp, size_t len);
@@ -90,7 +97,10 @@ int sd_send_if_cond(void);
 int sd_send_app_op_cond(void);
 int sd_get_cid(uint32_t *resp, size_t len);
 int sd_get_csd(uint32_t *resp, size_t len);
-int sd_app_status(void);
+int sd_app_status(uint32_t *resp, size_t len);
+int sd_send_relative_addr(uint32_t *resp, size_t len);
+void sd_decode_addr(SDAddr *addr, uint32_t *resp, size_t len);
+void sd_dump_addr(SDAddr *addr);
 #endif
 
 
