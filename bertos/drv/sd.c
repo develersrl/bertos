@@ -500,7 +500,7 @@ static bool sd_blockInit(Sd *sd, KFile *ch)
 	return true;
 }
 
-#ifdef CPU_CM3_SAM3X8
+#if CPU_CM3_SAM3X8
 
 #include <drv/hsmci_sam3.h>
 
@@ -698,7 +698,7 @@ void sd_decode_cid(SDcid *cid, uint32_t *resp, size_t len)
     cid->prod_name[4]      = UNSTUFF_BITS(resp, 64, 8);
     cid->m_rev         = UNSTUFF_BITS(resp, 60, 4);
     cid->l_rev         = UNSTUFF_BITS(resp, 56, 4);
-    cid->serial        = UNSTUFF_BITS(resp, 24, 32);
+    cid->serial        = (uint32_t)UNSTUFF_BITS(resp, 24, 32);
     cid->year_off      = UNSTUFF_BITS(resp, 8, 12);
 }
 

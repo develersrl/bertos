@@ -51,7 +51,7 @@
 
 #include <fs/fatfs/diskio.h>
 
-#ifdef CPU_CM3_SAM3X8
+#if CPU_CM3_SAM3X8
 
 typedef struct SDcid
 {
