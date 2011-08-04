@@ -61,13 +61,13 @@
 
 
 #define HSMCI_RESP_ERROR_MASK   (BV(HSMCI_SR_RINDE) | BV(HSMCI_SR_RDIRE) \
-	| BV(HSMCI_SR_RCRCE)| BV(HSMCI_SR_RENDE)| BV(HSMCI_SR_RTOE))
+	  | BV(HSMCI_SR_RENDE)| BV(HSMCI_SR_RTOE))
 
-
+#define HSMCI_READY_MASK     (BV(HSMCI_SR_CMDRDY) | BV(HSMCI_SR_NOTBUSY))
 #define HSMCI_WAIT()\
 	do { \
 		cpu_relax(); \
-	} while (!(HSMCI_SR & (BV(HSMCI_SR_CMDRDY) | BV(HSMCI_SR_NOTBUSY) | BV(HSMCI_SR_XFRDONE))))
+	} while (!(HSMCI_SR & BV(HSMCI_SR_CMDRDY)))
 
 #define HSMCI_ERROR()   (HSMCI_SR & HSMCI_ERROR_MASK)
 
@@ -88,15 +88,17 @@ do { \
 
 static DECLARE_ISR(hsmci_irq)
 {
-	kprintf("irq stato %lx\n", HSMCI_SR);
+	if (HSMCI_SR & BV(HSMCI_IER_RTOE))
+	{
+		HSMCI_ARGR = 0;
+		HSMCI_CMDR = 0 | HSMCI_CMDR_RSPTYP_NORESP | BV(HSMCI_CMDR_OPDCMD);
+	}
 }
 
 void hsmci_readResp(void *resp, size_t len)
 {
 	ASSERT(resp);
 	uint32_t *r = (uint32_t *)resp;
-
-	kprintf("size %d \n", sizeof(HSMCI_RSPR));
 
 	for (size_t i = 0; i < len ; i++)
 		r[i] = HSMCI_RSPR;
@@ -108,18 +110,19 @@ bool hsmci_sendCmd(uint8_t index, uint32_t argument, uint32_t reply_type)
 	HSMCI_WAIT();
 
 	HSMCI_ARGR = argument;
-	HSMCI_CMDR = index | reply_type | BV(HSMCI_CMDR_OPDCMD);
+	HSMCI_CMDR = index | reply_type | BV(HSMCI_CMDR_MAXLAT) | BV(HSMCI_CMDR_OPDCMD);
 
-	uint32_t status;
-	do {
-		status = HSMCI_SR;
+	uint32_t status = HSMCI_SR;
+	while (!(status & BV(HSMCI_SR_CMDRDY)))
+	{
 		if (status & HSMCI_RESP_ERROR_MASK)
 			return status;
 
 		cpu_relax();
-	} while (!(status & (BV(HSMCI_SR_CMDRDY) | BV(HSMCI_SR_NOTBUSY) | BV(HSMCI_SR_XFRDONE))));
 
-	timer_delay(1);
+		status = HSMCI_SR;
+	}
+
 	STROBE_OFF();
 	return 0;
 }
@@ -144,5 +147,5 @@ void hsmci_init(Hsmci *hsmci)
 
 	sysirq_setHandler(INT_HSMCI, hsmci_irq);
 	HSMCI_CR = BV(HSMCI_CR_MCIEN);
-
+	//HSMCI_IER = BV(HSMCI_IER_RTOE);
 }

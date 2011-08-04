@@ -66,9 +66,26 @@
                                    SD_OCR_VDD_31_32 | \
                                    SD_OCR_VDD_32_33)
 
+#define HSMCI_CHECK_BUSY() \
+	do { \
+		cpu_relax(); \
+	} while (!(HSMCI_SR & BV(HSMCI_SR_NOTBUSY)))
+
+
+
 typedef struct Hsmci
 {
 } Hsmci;
+
+INLINE void hsmci_enableIrq(void)
+{
+	HSMCI_IER = BV(HSMCI_IER_RTOE);
+}
+
+INLINE void hsmci_disableIrq(void)
+{
+	HSMCI_IDR = BV(HSMCI_IER_RTOE);
+}
 
 void hsmci_readResp(void *resp, size_t len);
 bool hsmci_sendCmd(uint8_t index, uint32_t argument, uint32_t reply_type);
