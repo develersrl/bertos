@@ -80,19 +80,12 @@ typedef struct SDcsd
                 write_misalign:1;
 } SDcsd;
 
-void sd_dump_csd(SDcsd *csd);
-void sd_dump_cid(SDcid *cid);
 
-void sd_send_init(void);
-void sd_go_idle(void);
-int sd_send_if_cond(void);
-int sd_send_app_op_cond(void);
+#define SD_READY_FOR_DATA         BV(8)
+#define SD_CARD_IS_LOCKED         BV(25)
 
-int sd_get_cid(SDcid *cid);
-int sd_get_csd(SDcsd *csd, uint32_t addr);
-
-int sd_app_status(uint32_t *resp, size_t len);
-int sd_send_relative_addr(uint32_t *addr);
+#define SD_SEND_CID_RCA     0
+#define SD_SEND_ALL_CID   BV(0)
 
 #endif
 
@@ -104,14 +97,58 @@ int sd_send_relative_addr(uint32_t *addr);
  */
 typedef struct Sd
 {
+
 	KBlock b;   ///< KBlock base class
 	KFile *ch;  ///< SPI communication channel
 	uint16_t r1;  ///< Last status data received from SD
 	uint16_t tranfer_len; ///< Lenght for the read/write commands, cached in order to increase speed.
+
+	#if CPU_CM3_SAM3X8
+	SDcid cid;
+	SDcsd csd;
+	uint32_t addr;
+	uint32_t status;
+	#endif
+
 } Sd;
 
 bool sd_initUnbuf(Sd *sd, KFile *ch);
 bool sd_initBuf(Sd *sd, KFile *ch);
+
+
+#if CPU_CM3_SAM3X8
+
+void sd_dumpCsd(Sd *sd);
+void sd_dumpCid(Sd *sd);
+
+void sd_sendInit(void);
+void sd_goIdle(void);
+int sd_sendIfCond(void);
+int sd_sendAppOpCond(void);
+
+int sd_getCid(Sd *sd, uint32_t addr, uint8_t flag);
+int sd_getCsd(Sd *sd);
+int sd_getSrc(Sd *sd);
+
+int sd_appStatus(Sd *sd);
+int sd_getRelativeAddr(Sd *sd);
+
+int sd_selectCard(Sd *sd);
+int sd_setBusWidth(Sd *sd, size_t len);
+int sd_set_BlockLen(Sd *sd, size_t len);
+
+INLINE int sd_setBus4bit(Sd *sd)
+{
+	return sd_setBusWidth(sd, 1);
+}
+
+INLINE int sd_setBus1bit(Sd *sd)
+{
+	return sd_setBusWidth(sd, 0);
+}
+
+#endif
+
 
 #if CONFIG_SD_OLD_INIT
 	#if !(ARCH & ARCH_NIGHTTEST)
@@ -164,3 +201,4 @@ INLINE Sd *SD_CAST(KBlock *b)
 }
 
 #endif /* DRV_SD_H */
+
