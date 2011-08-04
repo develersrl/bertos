@@ -583,8 +583,19 @@ static bool sd_blockInit(Sd *sd, KFile *ch)
 								(((bcd) >> 24) & 0xf) * 1000000 + \
 								(((bcd) >> 28) & 0xf) * 10000000) \
 
+LOG_INFOB(
+static void dump(const char *label, uint32_t *r, size_t len)
+{
+	ASSERT(r);
+	kprintf("%s [ ", label);
+	for (size_t i = 0; i < len; i++)
+		kprintf("%lx ", r[i]);
+	kputs("]\n");
+}
+)
 
-int sd_decode_csd(SDcsd *csd, uint32_t *resp, size_t len)
+
+static int sd_decode_csd(SDcsd *csd, uint32_t *resp, size_t len)
 {
 	ASSERT(csd);
 	ASSERT(resp);
@@ -593,12 +604,8 @@ int sd_decode_csd(SDcsd *csd, uint32_t *resp, size_t len)
     csd->structure = UNSTUFF_BITS(resp, 126, 2);
 	csd->ccc = UNSTUFF_BITS(resp, 84, 12);
 
-    if (csd->structure == 0)
+    if (csd->structure == 0) /* Version 1.00 layer */
 	{
-		kprintf("csize %ld\n", UNSTUFF_BITS(resp, 62, 12));
-		kprintf("csize_mul %ld\n", UNSTUFF_BITS(resp, 47, 3));
-		kprintf("bit read %ld %ld\n", csd->read_blk_bits = UNSTUFF_BITS(resp, 80, 4), csd->read_blk_bits);
-
 		// (C_size + 1) x 2^(C_SIZE_MUL+2)
 		csd->blk_num = (1 + UNSTUFF_BITS(resp, 62, 12)) << (UNSTUFF_BITS(resp, 47, 3) + 2);
 
@@ -626,7 +633,7 @@ int sd_decode_csd(SDcsd *csd, uint32_t *resp, size_t len)
 
 		return 0;
 	}
-	else if (csd->structure == 1)
+	else if (csd->structure == 1) /* Version 2.00 layer */
 	{
 		kprintf("csize %ld\n", UNSTUFF_BITS(resp, 48, 22));
         csd->capacity  = (1 + UNSTUFF_BITS(resp, 48, 22)) << 10;
@@ -659,69 +666,50 @@ void sd_dump_csd(SDcsd *csd)
 {
 	ASSERT(csd);
 
-	kprintf("VERSION: %d.0\n", csd->structure ? 2 : 1);
-    kprintf("CARD COMMAND CLASS: %d\n", csd->ccc);
-	kprintf("WRITE BLK LEN BITS: %ld\n", csd->write_blk_bits);
-	kprintf("READ BLK LEN BITS: %ld\n", csd->read_blk_bits);
-	kprintf("ERASE SIZE: %ld\n", csd->erase_size);
-	kprintf("BLK NUM: %ld\n", csd->blk_num);
-	kprintf("BLK LEN: %ld\n", csd->blk_len);
-	kprintf("CAPACITY %ld\n", csd->capacity);
-	kprintf("FLAG Write: WP %d, W MISALIGN %d\n", csd->write_partial, csd->write_misalign);
-	kprintf("FLAG Read: RP %d, R MISALIGN %d\n", csd->read_partial, csd->read_misalign);
+	LOG_INFO("VERSION: %d.0\n", csd->structure ? 2 : 1);
+    LOG_INFO("CARD COMMAND CLASS: %d\n", csd->ccc);
+	LOG_INFO("WRITE BLK LEN BITS: %ld\n", csd->write_blk_bits);
+	LOG_INFO("READ BLK LEN BITS: %ld\n", csd->read_blk_bits);
+	LOG_INFO("ERASE SIZE: %ld\n", csd->erase_size);
+	LOG_INFO("BLK NUM: %ld\n", csd->blk_num);
+	LOG_INFO("BLK LEN: %ld\n", csd->blk_len);
+	LOG_INFO("CAPACITY %ld\n", csd->capacity);
+	LOG_INFO("FLAG Write: WP %d, W MISALIGN %d\n", csd->write_partial, csd->write_misalign);
+	LOG_INFO("FLAG Read: RP %d, R MISALIGN %d\n", csd->read_partial, csd->read_misalign);
 
-}
-
-
-void sd_decode_cid(SDcid *cid, uint32_t *resp, size_t len)
-{
-	ASSERT(cid);
-	ASSERT(resp);
-	ASSERT(len >= 4);
-
-	cid->manfid        = UNSTUFF_BITS(resp, 120, 8);
-    cid->oemid         = UNSTUFF_BITS(resp, 104, 16);
-    cid->prod_name[0]      = UNSTUFF_BITS(resp, 96, 8);
-    cid->prod_name[1]      = UNSTUFF_BITS(resp, 88, 8);
-    cid->prod_name[2]      = UNSTUFF_BITS(resp, 80, 8);
-    cid->prod_name[3]      = UNSTUFF_BITS(resp, 72, 8);
-    cid->prod_name[4]      = UNSTUFF_BITS(resp, 64, 8);
-    cid->m_rev         = UNSTUFF_BITS(resp, 60, 4);
-    cid->l_rev         = UNSTUFF_BITS(resp, 56, 4);
-    cid->serial        = (uint32_t)UNSTUFF_BITS(resp, 24, 32);
-    cid->year_off      = UNSTUFF_BITS(resp, 8, 12);
 }
 
 void sd_dump_cid(SDcid *cid)
 {
 	ASSERT(cid);
 
-	kprintf("MANFID: %d\n", cid->manfid);
-    kprintf("OEMID: %d\n", cid->oemid);
-	kprintf("SERIAL: %ld\n", cid->serial);
-    kprintf("PROD_NAME: %s\n", cid->prod_name);
-    kprintf("REV: %d.%d\n", cid->m_rev, cid->l_rev);
-    kprintf("OFF,Y,M: %lx, %ld\n", cid->year_off, BCD_TO_INT_32BIT(cid->year_off));
+	LOG_INFO("MANFID: %d\n", cid->manfid);
+    LOG_INFO("OEMID: %d\n", cid->oemid);
+	LOG_INFO("SERIAL: %ld\n", cid->serial);
+    LOG_INFO("PROD_NAME: %s\n", cid->prod_name);
+    LOG_INFO("REV: %d.%d\n", cid->m_rev, cid->l_rev);
+    LOG_INFO("OFF,Y,M: %lx, %ld %ld\n", cid->year_off, (BCD_TO_INT_32BIT(cid->year_off) / 12) + 2000,
+												(BCD_TO_INT_32BIT(cid->year_off) % 12));
 }
 
 void sd_send_init(void)
 {
 	if (hsmci_sendCmd(0, 0, HSMCI_CMDR_SPCMD_INIT | HSMCI_CMDR_RSPTYP_NORESP))
-		kprintf("INIT Errore %lx\n", HSMCI_SR);
+		LOG_ERR("INIT: %lx\n", HSMCI_SR);
 }
 
 
 void sd_go_idle(void)
 {
 	if (hsmci_sendCmd(0, 0, HSMCI_CMDR_RSPTYP_NORESP))
-		kprintf("0 Errore %lx\n", HSMCI_SR);
+		LOG_ERR("GO_IDLE: %lx\n", HSMCI_SR);
 }
 
 int sd_send_if_cond(void)
 {
 	if (hsmci_sendCmd(8, CMD8_V_RANGE_27V_36V, HSMCI_CMDR_RSPTYP_48_BIT))
 	{
-		kprintf("8 Errore %lx\n", HSMCI_SR);
+		LOG_ERR("IF_COND %lx\n", HSMCI_SR);
 		return -1;
 	}
 	else
@@ -729,10 +717,10 @@ int sd_send_if_cond(void)
 		uint32_t r = HSMCI_RSPR;
 		if ((r & 0xFFF) == CMD8_V_RANGE_27V_36V)
 		{
-			kprintf("8 ok: %lx\n", r);
+			LOG_INFO("IF_COND: %lx\n", r);
 			return 0;
 		}
-		kprintf("8 ko: %lx\n", r);
+		LOG_ERR("IF_COND: %lx\n", r);
 	}
 	return -1;
 }
@@ -741,58 +729,85 @@ int sd_send_app_op_cond(void)
 {
 	if (hsmci_sendCmd(55, 0, HSMCI_CMDR_RSPTYP_48_BIT))
 	{
-		kprintf("55 Errore %lx\n", HSMCI_SR);
+		LOG_ERR("APP_CMD %lx\n", HSMCI_SR);
 		return -1;
 	}
 	else
 	{
-		kprintf("55 Risposta %lx\n", HSMCI_RSPR);
+		LOG_INFO("APP_CMD %lx\n", HSMCI_RSPR);
 	}
 
-//	if (hsmci_sendCmd(41, SD_HOST_VOLTAGE_RANGE, HSMCI_CMDR_RSPTYP_48_BIT))
 	if (hsmci_sendCmd(41, SD_HOST_VOLTAGE_RANGE | SD_OCR_CCS, HSMCI_CMDR_RSPTYP_48_BIT))// se cmd 8 va ok.
 	{
-		kprintf("41 Errore %lx\n", HSMCI_SR);
+		LOG_ERR("APP_OP_COND %lx\n", HSMCI_SR);
 		return -1;
 	}
 	else
 	{
 		uint32_t status = HSMCI_RSPR;
-		kprintf("41 reply[%0lx]\n", status);
 		if (status & SD_OCR_BUSY)
 		{
-			kprintf("sd power up! Hight Capability [%ld]\n", status & SD_OCR_CCS);
+			LOG_INFO("SD power up! Hight Capability [%d]\n", (bool)(status & SD_OCR_CCS));
 			return 0;
 		}
 
-		kputs("sd not ready.\n");
+		LOG_ERR("sd not ready.\n");
 	}
 
 	return -1;
 }
 
-int sd_get_cid(uint32_t *resp, size_t len)
+int sd_get_cid(SDcid *cid)
 {
+	ASSERT(cid);
+	memset(cid, 0, sizeof(cid));
+
 	if (hsmci_sendCmd(2, 0, HSMCI_CMDR_RSPTYP_136_BIT))
 	{
-		kprintf("2 Errore %lx\n", HSMCI_SR);
+		LOG_ERR("GET_CID %lx\n", HSMCI_SR);
 		return -1;
 	}
 	else
-		hsmci_readResp(resp, len);
+	{
+		uint32_t resp[4];
+		hsmci_readResp(resp, 4);
+		LOG_INFOB(dump("CID", resp, 4););
+
+		cid->manfid        = UNSTUFF_BITS(resp, 120, 8);
+		cid->oemid         = UNSTUFF_BITS(resp, 104, 16);
+		cid->prod_name[0]      = UNSTUFF_BITS(resp, 96, 8);
+		cid->prod_name[1]      = UNSTUFF_BITS(resp, 88, 8);
+		cid->prod_name[2]      = UNSTUFF_BITS(resp, 80, 8);
+		cid->prod_name[3]      = UNSTUFF_BITS(resp, 72, 8);
+		cid->prod_name[4]      = UNSTUFF_BITS(resp, 64, 8);
+		cid->m_rev         = UNSTUFF_BITS(resp, 60, 4);
+		cid->l_rev         = UNSTUFF_BITS(resp, 56, 4);
+		cid->serial        = (uint32_t)UNSTUFF_BITS(resp, 24, 32);
+		cid->year_off      = UNSTUFF_BITS(resp, 8, 12);
+	}
 
 	return 0;
 }
 
-int sd_get_csd(uint32_t *resp, size_t len)
+int sd_get_csd(SDcsd *csd, uint32_t addr)
 {
-	if (hsmci_sendCmd(9, 0, HSMCI_CMDR_RSPTYP_136_BIT))
+	ASSERT(csd);
+	memset(csd, 0, sizeof(csd));
+
+	uint32_t arg = (addr << 16) & 0xFFFF0000;
+	kprintf("Send to rca: %lx\n", arg);
+	if (hsmci_sendCmd(9, arg, HSMCI_CMDR_RSPTYP_136_BIT))
 	{
-		kprintf("9 Errore %lx\n", HSMCI_SR);
+		LOG_ERR("GET_CSD %lx\n", HSMCI_SR);
 		return -1;
 	}
 	else
-		hsmci_readResp(resp, len);
+	{
+		uint32_t resp[4];
+		hsmci_readResp(resp, 4);
+		LOG_INFOB(dump("CSD", resp, 4););
+		sd_decode_csd(csd, resp, 4);
+	}
 
 	return 0;
 }
@@ -801,7 +816,7 @@ int sd_app_status(uint32_t *resp, size_t len)
 {
 	if (hsmci_sendCmd(13, 0, HSMCI_CMDR_RSPTYP_48_BIT))
 	{
-		kprintf("13 Errore %lx\n", HSMCI_SR);
+		LOG_ERR("STATUS: %lx\n", HSMCI_SR);
 		return -1;
 	}
 	else
@@ -810,36 +825,23 @@ int sd_app_status(uint32_t *resp, size_t len)
 	return 0;
 }
 
-int sd_send_relative_addr(uint32_t *resp, size_t len)
+int sd_send_relative_addr(uint32_t *addr)
 {
 
 	if (hsmci_sendCmd(3, 0, HSMCI_CMDR_RSPTYP_48_BIT))
 	{
-		kprintf("3 Errore %lx\n", HSMCI_SR);
+		LOG_ERR("RCA: %lx\n", HSMCI_SR);
 		return -1;
 	}
 	else
-		hsmci_readResp(resp, len);
+	{
+		hsmci_readResp(addr, 1);
+		LOG_INFOB(dump("RCA", addr, 1););
+		*addr = *addr >> 16;
+
+	}
 
 	return 0;
-}
-
-void sd_decode_addr(SDAddr *addr, uint32_t *resp, size_t len)
-{
-	ASSERT(addr);
-	ASSERT(resp);
-	(void)len;
-
-	kprintf("%0lx\n", resp[0] >> 16);
-	addr->rca        = UNSTUFF_BITS(resp, 16, 16);
-    addr->status     = UNSTUFF_BITS(resp, 0, 16);
-}
-
-void sd_dump_addr(SDAddr *addr)
-{
-	ASSERT(addr);
-	kprintf("RCA: %0lx\n", addr->rca);
-	kprintf("STATUS: %0lx\n", addr->status);
 }
 
 #endif
