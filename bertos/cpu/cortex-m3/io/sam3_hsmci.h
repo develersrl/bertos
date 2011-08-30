@@ -163,6 +163,7 @@
 #define   HSMCI_BLKR_BCNT_BYTE         0x4 ///< (HSMCI_BLKR) SDIO ByteFrom 1 to 512 bytes: Value 0 corresponds to a 512-byte transfer.Values from 0x200 to 0xFFFF are forbidden.
 #define   HSMCI_BLKR_BCNT_BLOCK        0x5 ///< (HSMCI_BLKR) SDIO BlockFrom 1 to 511 blocks: Value 0 corresponds to an infinite block transfer.Values from 0x200 to 0xFFFF are forbidden.
 #define   HSMCI_BLKR_BLKLEN_MASK       0xffff0000 ///< (HSMCI_BLKR) Data Block Length
+#define   HSMCI_BLKR_BLKLEN_SHIFT      16
 
 
 /* HSMCI_CSTOR : (HSMCI Offset: 0x1C) Completion Signal Timeout Register */
