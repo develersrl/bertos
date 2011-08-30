@@ -69,6 +69,12 @@
 		cpu_relax(); \
 	} while (!(HSMCI_SR & BV(HSMCI_SR_CMDRDY)))
 
+
+#define HSMCI_WAIT_DATA_RDY()\
+	do { \
+		cpu_relax(); \
+	} while (!(HSMCI_SR & BV(HSMCI_SR_RXRDY)))
+
 #define HSMCI_ERROR()   (HSMCI_SR & HSMCI_ERROR_MASK)
 
 #define HSMCI_HW_INIT()  \
@@ -127,6 +133,37 @@ bool hsmci_sendCmd(uint8_t index, uint32_t argument, uint32_t reply_type)
 	return 0;
 }
 
+void hsmci_setBlkSize(size_t blk_size)
+{
+	HSMCI_DMA = BV(HSMCI_DMA_DMAEN);
+	HSMCI_BLKR = (blk_size << HSMCI_BLKR_BLKLEN_SHIFT);
+}
+
+bool hsmci_read(uint32_t *buf, size_t word_num)
+{
+	ASSERT(buf);
+	ASSERT(!(DMAC_CHSR & BV(DMAC_CHSR_ENA0)));
+
+	kprintf("DMAC status %08lx channel st %08lx\n", DMAC_EBCISR, DMAC_CHSR);
+
+	DMAC_SADDR0 = 0x40000200U;
+	DMAC_DADDR0 = (uint32_t)buf;
+	DMAC_DSCR0 = 0;
+
+	DMAC_CTRLA0 = word_num | DMAC_CTRLA_SRC_WIDTH_WORD | DMAC_CTRLA_DST_WIDTH_WORD;
+	DMAC_CTRLB0 = (BV(DMAC_CTRLB_SRC_DSCR) | DMAC_CTRLB_FC_PER2MEM_DMA_FC |
+					DMAC_CTRLB_SRC_INCR_FIXED | DMAC_CTRLB_DST_INCR_INCREMENTING | BV(DMAC_CTRLB_IEN));
+
+	ASSERT(!(DMAC_CHSR & BV(DMAC_CHSR_ENA0)));
+	DMAC_CHER = BV(DMAC_CHER_ENA0);
+
+	while (!(HSMCI_SR & BV(HSMCI_SR_XFRDONE)))
+		cpu_relax();
+
+	DMAC_CHDR = BV(DMAC_CHDR_DIS0);
+	return 0;
+}
+
 void hsmci_init(Hsmci *hsmci)
 {
 	(void)hsmci;
@@ -141,11 +178,23 @@ void hsmci_init(Hsmci *hsmci)
 
 	HSMCI_DTOR = 0xFF | HSMCI_DTOR_DTOMUL_1048576;
 	HSMCI_CSTOR = 0xFF | HSMCI_CSTOR_CSTOMUL_1048576;
-	HSMCI_MR = HSMCI_CLK_DIV | ((0x7u << HSMCI_MR_PWSDIV_SHIFT) & HSMCI_MR_PWSDIV_MASK);
+	HSMCI_MR = HSMCI_CLK_DIV | ((0x7u << HSMCI_MR_PWSDIV_SHIFT) & HSMCI_MR_PWSDIV_MASK) | BV(HSMCI_MR_RDPROOF);
 	HSMCI_SDCR = 0;
 	HSMCI_CFG = BV(HSMCI_CFG_FIFOMODE) | BV(HSMCI_CFG_FERRCTRL);
 
 	sysirq_setHandler(INT_HSMCI, hsmci_irq);
 	HSMCI_CR = BV(HSMCI_CR_MCIEN);
+	HSMCI_DMA &= ~BV(HSMCI_DMA_DMAEN);
+
+	//init DMAC
+	DMAC_EBCIDR = 0x3FFFFF;
+	DMAC_CHDR = BV(DMAC_CHDR_DIS0);
+
+	DMAC_CFG0 = 0;
+	DMAC_CFG0 = BV(DMAC_CFG_SRC_H2SEL) | DMAC_CFG_FIFOCFG_ALAP_CFG | BV(DMAC_CFG_SOD);
+
+	pmc_periphEnable(DMAC_ID);
+	DMAC_EN = BV(DMAC_EN_ENABLE);
+
 	//HSMCI_IER = BV(HSMCI_IER_RTOE);
 }

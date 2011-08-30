@@ -38,8 +38,10 @@
 #ifndef DRV_HSMCI_SAM3_H
 #define DRV_HSMCI_SAM3_H
 
-#include <io/cm3.h>
 #include <cfg/macros.h>
+#include <cfg/debug.h>
+
+#include <io/cm3.h>
 
 #define CMD8_V_RANGE_CHECK_PAT    0xAA
 #define CMD8_V_RANGE_27V_36V      (0x100 | CMD8_V_RANGE_CHECK_PAT)
@@ -87,8 +89,19 @@ INLINE void hsmci_disableIrq(void)
 	HSMCI_IDR = BV(HSMCI_IER_RTOE);
 }
 
+INLINE void hsmci_setBusWidth(size_t len)
+{
+	ASSERT((len == 8) || (len == 4) || (len == 1));
+	HSMCI_SDCR = (len << HSMCI_SDCR_SDCBUS_SHIFT) & HSMCI_SDCR_SDCBUS_MASK;
+}
+
 void hsmci_readResp(void *resp, size_t len);
 bool hsmci_sendCmd(uint8_t index, uint32_t argument, uint32_t reply_type);
+
+void hsmci_setBlkSize(size_t blk_size);
+bool hsmci_read(uint32_t *buf, size_t word_num);
+
+
 
 void hsmci_init(Hsmci *hsmci);
 
