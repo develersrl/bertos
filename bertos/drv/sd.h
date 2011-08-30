@@ -134,8 +134,12 @@ int sd_appStatus(Sd *sd);
 int sd_getRelativeAddr(Sd *sd);
 
 int sd_selectCard(Sd *sd);
+int sd_deSelectCard(Sd *sd);
 int sd_setBusWidth(Sd *sd, size_t len);
 int sd_set_BlockLen(Sd *sd, size_t len);
+
+int sd_readSingleBlock(Sd *sd, size_t index, void *_buf, size_t len);
+
 
 INLINE int sd_setBus4bit(Sd *sd)
 {

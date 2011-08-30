@@ -589,10 +589,20 @@ LOG_INFOB(
 static void dump(const char *label, uint32_t *r, size_t len)
 {
 	ASSERT(r);
-	kprintf("%s [ ", label);
-	for (size_t i = 0; i < len; i++)
-		kprintf("%lx ", r[i]);
-	kputs("]\n");
+	size_t i;
+	int j = 0;
+	kprintf("\n%s [\n", label);
+	for (i = 0; i < len; i++)
+	{
+		if (j == 5)
+		{
+			kputs("\n");
+			j = 0;
+		}
+		kprintf("%08lx ", r[i]);
+		j++;
+	}
+	kprintf("\n] len=%d\n\n", i);
 }
 )
 
@@ -830,24 +840,6 @@ int sd_getCsd(Sd *sd)
 	return 0;
 }
 
-int sd_appStatus(Sd *sd)
-{
-	ASSERT(sd);
-	LOG_INFO("Send to RCA: %lx\n", SD_ADDR_TO_RCA(sd->addr));
-	if (hsmci_sendCmd(13, SD_ADDR_TO_RCA(sd->addr), HSMCI_CMDR_RSPTYP_48_BIT))
-	{
-		LOG_ERR("STATUS: %lx\n", HSMCI_SR);
-		return -1;
-	}
-	else
-	{
-		hsmci_readResp(&(sd->status), 1);
-		LOG_INFOB(dump("STATUS", &(sd->status), 1););
-	}
-
-	return 0;
-}
-
 int sd_getRelativeAddr(Sd *sd)
 {
 	ASSERT(sd);
@@ -867,55 +859,105 @@ int sd_getRelativeAddr(Sd *sd)
 	return 0;
 }
 
-int sd_selectCard(Sd *sd)
+#define SD_STATUS_APP_CMD      BV(5)
+#define SD_STATUS_READY        BV(8)
+#define SD_STATUS_CURR_MASK    0x1E00
+#define SD_STATUS_CURR_SHIFT   9
+
+#define SD_GET_STATE(status)    (uint8_t)(((status) & SD_STATUS_CURR_MASK) >> SD_STATUS_CURR_SHIFT)
+
+int sd_appStatus(Sd *sd)
+{
+	ASSERT(sd);
+	LOG_INFO("Send to RCA: %lx\n", SD_ADDR_TO_RCA(sd->addr));
+	if (hsmci_sendCmd(13, SD_ADDR_TO_RCA(sd->addr), HSMCI_CMDR_RSPTYP_48_BIT))
+	{
+		LOG_ERR("STATUS: %lx\n", HSMCI_SR);
+		return -1;
+	}
+
+	hsmci_readResp(&(sd->status), 1);
+	LOG_INFOB(dump("STATUS", &(sd->status), 1););
+
+	LOG_INFO("State[%d]\n", SD_GET_STATE(sd->status));
+
+	if (sd->status & SD_STATUS_READY)
+		return 0;
+
+	return -1;
+}
+
+
+INLINE int sd_cardSelection(Sd *sd, size_t rca)
 {
 	ASSERT(sd);
 	LOG_INFO("Select RCA: %lx\n", SD_ADDR_TO_RCA(sd->addr));
-	if (hsmci_sendCmd(7, SD_ADDR_TO_RCA(sd->addr), HSMCI_CMDR_RSPTYP_R1B))
+	if (hsmci_sendCmd(7, rca, HSMCI_CMDR_RSPTYP_R1B))
 	{
 		LOG_ERR("SELECT_SD: %lx\n", HSMCI_SR);
 		return -1;
 	}
-	else
-	{
-		HSMCI_CHECK_BUSY();
 
-		hsmci_readResp(&(sd->status), 1);
-		LOG_INFOB(dump("SELECT_SD", &(sd->status), 1););
-	}
+	HSMCI_CHECK_BUSY();
+	hsmci_readResp(&(sd->status), 1);
+	LOG_INFOB(dump("SELECT_SD", &(sd->status), 1););
 
-	return 0;
+	LOG_INFO("State[%d]\n", SD_GET_STATE(sd->status));
+
+	if (sd->status & SD_STATUS_READY)
+		return 0;
+
+	return -1;
 }
+
+int sd_selectCard(Sd *sd)
+{
+	return sd_cardSelection(sd, SD_ADDR_TO_RCA(sd->addr));
+}
+
+int sd_deSelectCard(Sd *sd)
+{
+	uint32_t rca = 0;
+	if (!sd->addr)
+		rca = SD_ADDR_TO_RCA(sd->addr + 1);
+
+	return sd_cardSelection(sd, rca);
+}
+
 
 int sd_setBusWidth(Sd *sd, size_t len)
 {
 	ASSERT(sd);
 
-	if (hsmci_sendCmd(55, 0, HSMCI_CMDR_RSPTYP_48_BIT))
+	if (hsmci_sendCmd(55, SD_ADDR_TO_RCA(sd->addr), HSMCI_CMDR_RSPTYP_48_BIT))
 	{
 		LOG_ERR("APP_CMD %lx\n", HSMCI_SR);
 		return -1;
 	}
-	else
-	{
-		LOG_INFO("APP_CMD %lx\n", HSMCI_RSPR);
-	}
 
+	uint32_t status = HSMCI_RSPR;
+	if (status & (SD_STATUS_APP_CMD | SD_STATUS_READY))
+	{
+		hsmci_setBusWidth(len);
 
-	if (hsmci_sendCmd(6, len, HSMCI_CMDR_RSPTYP_48_BIT))
-	{
-		LOG_ERR("SET_BUS_WIDTH: %lx\n", HSMCI_SR);
-		return -1;
-	}
-	else
-	{
+		if (hsmci_sendCmd(6, len, HSMCI_CMDR_RSPTYP_48_BIT))
+		{
+			LOG_ERR("SET_BUS_WIDTH CMD: %lx\n", HSMCI_SR);
+			return -1;
+		}
+
 		hsmci_readResp(&(sd->status), 1);
-		LOG_INFOB(dump("SET_BUS_WIDTH", &(sd->status), 1););
-
 		HSMCI_CHECK_BUSY();
+
+		LOG_INFOB(dump("SET_BUS_WIDTH", &(sd->status), 1););
+		LOG_INFO("State[%d]\n", SD_GET_STATE(sd->status));
+
+		if (sd->status & SD_STATUS_READY)
+			return 0;
 	}
 
-	return 0;
+	LOG_ERR("SET_BUS_WIDTH REP %lx\n", status);
+	return -1;
 }
 
 
@@ -925,18 +967,53 @@ int sd_set_BlockLen(Sd *sd, size_t len)
 
 	if (hsmci_sendCmd(16, len, HSMCI_CMDR_RSPTYP_48_BIT))
 	{
-		LOG_ERR("SET_BUS_WIDTH: %lx\n", HSMCI_SR);
+		LOG_ERR("SET_BLK_LEN: %lx\n", HSMCI_SR);
 		return -1;
 	}
-	else
-	{
-		hsmci_readResp(&(sd->status), 1);
-		LOG_INFOB(dump("SET_BUS_WIDTH", &(sd->status), 1););
 
-		HSMCI_CHECK_BUSY();
+	hsmci_readResp(&(sd->status), 1);
+	HSMCI_CHECK_BUSY();
+
+	LOG_INFOB(dump("SET_BLK_LEN", &(sd->status), 1););
+	LOG_INFO("State[%d]\n", SD_GET_STATE(sd->status));
+
+	sd->csd.blk_len = len;
+
+	if (sd->status & SD_STATUS_READY)
+		return 0;
+
+	return -1;
+}
+
+int sd_readSingleBlock(Sd *sd, size_t index, void *_buf, size_t len)
+{
+	ASSERT(sd);
+	ASSERT(_buf);
+	ASSERT(!(len % sd->csd.blk_len));
+
+	uint32_t *buf = (uint32_t *)_buf;
+
+	hsmci_setBlkSize(sd->csd.blk_len);
+
+	if (hsmci_sendCmd(17, index * sd->csd.blk_len, HSMCI_CMDR_RSPTYP_48_BIT))
+	{
+		LOG_ERR("SIGLE_BLK_READ: %lx\n", HSMCI_SR);
+		return -1;
+	}
+	hsmci_readResp(&(sd->status), 1);
+	HSMCI_CHECK_BUSY();
+
+	LOG_INFOB(dump("SIGLE_BLK_READ", &(sd->status), 1););
+	LOG_INFO("State[%d]\n", SD_GET_STATE(sd->status));
+
+	if (sd->status & SD_STATUS_READY)
+	{
+		hsmci_read(buf, len / sizeof(uint32_t));
+		LOG_INFOB(dump("BLK", buf, 8););
+		return len;
 	}
 
-	return 0;
+	return -1;
 }
 
 
