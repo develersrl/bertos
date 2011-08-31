@@ -45,18 +45,30 @@
 
 #define TEST1_LEN   31
 #define TEST2_LEN   17
+#define TEST3_LEN   16
+#define TEST4_LEN   23
+#define TEST5_LEN   72
 
 BITARRAY_ALLOC(test1, TEST1_LEN);
 BITARRAY_ALLOC(test2, TEST2_LEN);
+BITARRAY_ALLOC(test3, TEST3_LEN);
+BITARRAY_ALLOC(test4, TEST4_LEN);
+BITARRAY_ALLOC(test5, TEST5_LEN);
 
 BitArray bitx1;
 BitArray bitx2;
+BitArray bitx3;
+BitArray bitx4;
+BitArray bitx5;
 
 int bitarray_testSetup(void)
 {
 	kdbg_init();
 	bitarray_init(&bitx1, TEST1_LEN, test1, sizeof(test1));
 	bitarray_init(&bitx2, TEST2_LEN, test2, sizeof(test2));
+	bitarray_init(&bitx3, TEST3_LEN, test3, sizeof(test3));
+	bitarray_init(&bitx4, TEST4_LEN, test4, sizeof(test4));
+	bitarray_init(&bitx5, TEST5_LEN, test5, sizeof(test5));
 	return 0;
 }
 
@@ -115,6 +127,40 @@ int bitarray_testRun(void)
 	bitarray_clear(&bitx2, 13);
 	bitarray_dump(&bitx2);
 	if (bitarray_isFull(&bitx2))
+		goto error;
+
+	kprintf("Test 3\n");
+	bitarray_set(&bitx3, 12);
+	bitarray_dump(&bitx3);
+	int pos = 0;
+	pos = bitarray_firstSetBit(&bitx3);
+	if (pos != 12)
+		goto error;
+
+	kprintf("Test 4\n");
+	bitarray_set(&bitx4, TEST4_LEN);
+	bitarray_dump(&bitx4);
+	pos = 0;
+	pos = bitarray_firstSetBit(&bitx4);
+	if (pos != 23)
+		goto error;
+
+	kprintf("Test 5\n");
+	bitarray_set(&bitx5, 71);
+	bitarray_dump(&bitx5);
+	pos = 0;
+	pos = bitarray_firstSetBit(&bitx5);
+	kprintf("pos %d\n", pos);
+	if (pos != 71)
+		goto error;
+
+	kprintf("Test 6\n");
+	bitarray_clear(&bitx5, 71);
+	bitarray_set(&bitx5, 5);
+	bitarray_dump(&bitx5);
+	pos = 0;
+	pos = bitarray_firstSetBit(&bitx5);
+	if (pos != 5)
 		goto error;
 
 	return 0;

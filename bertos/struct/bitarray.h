@@ -238,6 +238,8 @@ INLINE void bitarray_dump(BitArray *bitx)
 		kprintf("..%02x [%d]\n", bitx->array[i / 8], i);
 }
 
+int bitarray_firstSetBit(BitArray *bitx);
+
 /**
  * Init a BitArray.
  *
