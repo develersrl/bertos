@@ -50,43 +50,29 @@ static const uint8_t DeBruijn_coefficents[32] =
  * Return the position of the first bit non zero in bitarray
  *
  * \param bitx BitArray context
- * \param idx Starting bit
- * \param offset Number of bits to test
  * \return Position in bitarray when firt bit non zero occur,  -1 otherwise
  */
 int bitarray_firstSetBit(BitArray *bitx)
 {
 	ASSERT(bitx);
 
-	uint32_t *b = (uint32_t *)bitx->array;
-	int pos =  -1;
-	int curr = 0;
-	int i = 0;
+	uint8_t *b = bitx->array;
 	size_t bytes = bitx->size;
+	int curr = 0;
 
 	while (bytes)
 	{
-		if (bytes < 4)
-		{
-			uint32_t data = 0;
-			memcpy(&data, &b[i], bytes);
+		uint32_t data = 0;
+		size_t len = MIN(bytes, (size_t)4);
+		memcpy(&data, b, len);
 
-			if (data == 0)
-				return -1;
-
+		if (data)
 			return (DeBruijn_coefficents[((uint32_t)((data & -data) * 0x077CB531U)) >> 27] + curr);
-		}
-
-		if (b[i])
-		{
-			pos = DeBruijn_coefficents[((uint32_t)((b[i] & -b[i]) * 0x077CB531U)) >> 27] + curr;
-			break;
-		}
 
 		bytes -= 4;
 		curr += 32;
-		i++;
+		b += len;
 	}
 
-	return pos;
+	return -1;
 }
