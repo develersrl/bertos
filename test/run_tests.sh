@@ -46,6 +46,7 @@ SRC_LIST="
 	bertos/struct/kfile_fifo.c
 	bertos/struct/heap.c
 	bertos/struct/hashtable.c
+	bertos/struct/bitarray.c
 	bertos/fs/fatfs/ff.c
 	bertos/emul/diskio_emul.c
 	bertos/fs/fat.c
