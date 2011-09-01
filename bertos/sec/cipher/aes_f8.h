@@ -357,7 +357,7 @@ static void AES_expandKey(BlockCipher *c_, const void *key, size_t len)
 	ASSERT(len == c->c.key_len);
 
 	uint8_t tmp0, tmp1, tmp2, tmp3, tmp4;
-	uint32_t idx, idx_mod_nk, idx_div_nk;
+	int idx, idx_mod_nk, idx_div_nk;
 	int Nk = c->c.key_len/4;
 	int Nr = c->num_rounds;
 
@@ -400,7 +400,7 @@ static void AES_expandKey(BlockCipher *c_, const void *key, size_t len)
 static void AES_encrypt(BlockCipher *c_, void *block)
 {
 	AES_Context *c = (AES_Context *)c_;
-	uint8_t Nr = c->num_rounds;
+	uint32_t Nr = c->num_rounds;
 	uint32_t round;
 
 	AddRoundKey (block, c->expkey);
