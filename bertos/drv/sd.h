@@ -153,6 +153,7 @@ int sd_setBusWidth(Sd *sd, size_t len);
 int sd_set_BlockLen(Sd *sd, size_t len);
 void sd_setHightSpeed(Sd *sd);
 int sd_readSingleBlock(Sd *sd, size_t index, uint32_t *buf, size_t words);
+int sd_writeSingleBlock(Sd *sd, size_t index, uint32_t *buf, size_t words);
 
 
 INLINE int sd_setBus4bit(Sd *sd)

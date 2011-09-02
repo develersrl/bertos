@@ -1090,9 +1090,40 @@ int sd_readSingleBlock(Sd *sd, size_t index, uint32_t *buf, size_t words)
 }
 
 
+int sd_writeSingleBlock(Sd *sd, size_t index, uint32_t *buf, size_t words)
+{
+	ASSERT(sd);
+	ASSERT(buf);
+
+	hsmci_prgTxDMA(buf, words, sd->csd.blk_len);
+
+	if (hsmci_sendCmd(24, index * sd->csd.blk_len, HSMCI_CMDR_RSPTYP_48_BIT |
+						HSMCI_CMDR_TRCMD_START_DATA | HSMCI_CMDR_TRTYP_SINGLE))
+	{
+		LOG_ERR("SIGLE_BLK_WRITE: %lx\n", HSMCI_SR);
+		return -1;
+	}
+	hsmci_readResp(&(sd->status), 1);
+
+	LOG_INFOB(dump("SIGLE_BLK_WR", &(sd->status), 1););
+	LOG_INFO("State[%d]\n", SD_GET_STATE(sd->status));
+
+	if (sd->status & SD_STATUS_READY)
+	{
+		hsmci_waitTransfer();
+		LOG_INFOB(dump("BLK", buf, words););
+
+		return words;
+	}
+
+	return -1;
+}
+
+
 
 void sd_setHightSpeed(Sd *sd)
 {
+	(void)sd;
 	hsmci_setSpeed(2100000, true);
 }
 
