@@ -43,10 +43,20 @@
 
 #include <io/cm3.h>
 
+/** DMA Transfer Descriptor as well as Linked List Item */
+typedef struct DmacDesc
+{
+    uint32_t src_addr;     /**< Source buffer address */
+    uint32_t dst_addr;     /**< Destination buffer address */
+    uint32_t ctrl_a;       /**< Control A register settings */
+    uint32_t ctrl_b;       /**< Control B register settings */
+    uint32_t dsc_addr;     /**< Next descriptor address */
+} DmacDesc;
 
 
-#define HSMCI_INIT_SPEED  400000
-#define HSMCI_CLK_DIV     ((CPU_FREQ / (HSMCI_INIT_SPEED << 1)) - 1)
+
+
+#define HSMCI_CLK_DIV(RATE)     ((CPU_FREQ / (RATE << 1)) - 1)
 
 #define HSMCI_ERROR_MASK   (BV(HSMCI_SR_RINDE)    | \
 							BV(HSMCI_SR_RDIRE)    | \
@@ -62,6 +72,8 @@
 
 #define HSMCI_RESP_ERROR_MASK   (BV(HSMCI_SR_RINDE) | BV(HSMCI_SR_RDIRE) \
 	  | BV(HSMCI_SR_RENDE)| BV(HSMCI_SR_RTOE))
+
+#define HSMCI_DATA_ERROR_MASK   (BV(HSMCI_SR_DCRCE) | BV(HSMCI_SR_DTOE))
 
 #define HSMCI_READY_MASK     (BV(HSMCI_SR_CMDRDY) | BV(HSMCI_SR_NOTBUSY))
 #define HSMCI_WAIT()\
@@ -94,20 +106,30 @@ do { \
 
 static DECLARE_ISR(hsmci_irq)
 {
-	if (HSMCI_SR & BV(HSMCI_IER_RTOE))
+	uint32_t status = HSMCI_SR;
+	if (status & BV(HSMCI_IER_DMADONE))
 	{
-		HSMCI_ARGR = 0;
-		HSMCI_CMDR = 0 | HSMCI_CMDR_RSPTYP_NORESP | BV(HSMCI_CMDR_OPDCMD);
+		kputs("\n\nfatto\n\n");
 	}
 }
 
-void hsmci_readResp(void *resp, size_t len)
+
+static DECLARE_ISR(dmac_irq)
+{
+	uint32_t stat = DMAC_EBCISR;
+
+	if (stat & BV(DMAC_EBCISR_ERR3))
+	{
+		kprintf("err %08lx\n", stat);
+	}
+}
+
+void hsmci_readResp(uint32_t *resp, size_t len)
 {
 	ASSERT(resp);
-	uint32_t *r = (uint32_t *)resp;
 
 	for (size_t i = 0; i < len ; i++)
-		r[i] = HSMCI_RSPR;
+		resp[i] = HSMCI_RSPR;
 }
 
 bool hsmci_sendCmd(uint8_t index, uint32_t argument, uint32_t reply_type)
@@ -116,7 +138,7 @@ bool hsmci_sendCmd(uint8_t index, uint32_t argument, uint32_t reply_type)
 	HSMCI_WAIT();
 
 	HSMCI_ARGR = argument;
-	HSMCI_CMDR = index | reply_type | BV(HSMCI_CMDR_MAXLAT) | BV(HSMCI_CMDR_OPDCMD);
+	HSMCI_CMDR = index | reply_type | BV(HSMCI_CMDR_MAXLAT);// | BV(HSMCI_CMDR_OPDCMD);
 
 	uint32_t status = HSMCI_SR;
 	while (!(status & BV(HSMCI_SR_CMDRDY)))
@@ -133,35 +155,84 @@ bool hsmci_sendCmd(uint8_t index, uint32_t argument, uint32_t reply_type)
 	return 0;
 }
 
-void hsmci_setBlkSize(size_t blk_size)
+INLINE void hsmci_setBlockSize(size_t blk_size)
 {
-	HSMCI_DMA = BV(HSMCI_DMA_DMAEN);
-	HSMCI_BLKR = (blk_size << HSMCI_BLKR_BLKLEN_SHIFT);
+	HSMCI_IER = BV(HSMCI_IER_DMADONE);
+	HSMCI_DMA |= BV(HSMCI_DMA_DMAEN);
+	HSMCI_BLKR = blk_size << HSMCI_BLKR_BLKLEN_SHIFT;
 }
 
-bool hsmci_read(uint32_t *buf, size_t word_num)
+void hsmci_prgTxDMA(uint32_t *buf, size_t word_num, size_t blk_size)
 {
-	ASSERT(buf);
-	ASSERT(!(DMAC_CHSR & BV(DMAC_CHSR_ENA0)));
 
-	kprintf("DMAC status %08lx channel st %08lx\n", DMAC_EBCISR, DMAC_CHSR);
+	hsmci_setBlockSize(blk_size);
 
-	DMAC_SADDR0 = 0x40000200U;
-	DMAC_DADDR0 = (uint32_t)buf;
+	DMAC_CHDR = BV(DMAC_CHDR_DIS0);
+
+	DMAC_SADDR0 = (uint32_t)buf;
+	DMAC_DADDR0 = (uint32_t)&HSMCI_TDR;
 	DMAC_DSCR0 = 0;
 
-	DMAC_CTRLA0 = word_num | DMAC_CTRLA_SRC_WIDTH_WORD | DMAC_CTRLA_DST_WIDTH_WORD;
-	DMAC_CTRLB0 = (BV(DMAC_CTRLB_SRC_DSCR) | DMAC_CTRLB_FC_PER2MEM_DMA_FC |
-					DMAC_CTRLB_SRC_INCR_FIXED | DMAC_CTRLB_DST_INCR_INCREMENTING | BV(DMAC_CTRLB_IEN));
+	DMAC_CTRLA0 = (word_num & DMAC_CTRLA_BTSIZE_MASK) |
+		DMAC_CTRLA_SRC_WIDTH_WORD | DMAC_CTRLA_DST_WIDTH_WORD;
+	DMAC_CTRLB0 = (BV(DMAC_CTRLB_SRC_DSCR) | BV(DMAC_CTRLB_DST_DSCR) | DMAC_CTRLB_FC_MEM2PER_DMA_FC |
+					DMAC_CTRLB_DST_INCR_FIXED | DMAC_CTRLB_SRC_INCR_INCREMENTING | BV(DMAC_CTRLB_IEN));
+
+	kprintf("SDDR %08lx\n", DMAC_SADDR0);
+	kprintf("DDDR %08lx\n", DMAC_DADDR0);
+	kprintf("CTRA %08lx\n", DMAC_CTRLA0);
+	kprintf("CTRB %08lx\n", DMAC_CTRLB0);
+	kprintf("EBCI %08lx\n", DMAC_EBCISR);
+	kprintf("CHSR %08lx\n", DMAC_CHSR);
 
 	ASSERT(!(DMAC_CHSR & BV(DMAC_CHSR_ENA0)));
 	DMAC_CHER = BV(DMAC_CHER_ENA0);
 
-	while (!(HSMCI_SR & BV(HSMCI_SR_XFRDONE)))
-		cpu_relax();
+}
+
+void hsmci_prgRxDMA(uint32_t *buf, size_t word_num, size_t blk_size)
+{
+	hsmci_setBlockSize(blk_size);
 
 	DMAC_CHDR = BV(DMAC_CHDR_DIS0);
-	return 0;
+
+	DMAC_SADDR0 = (uint32_t)&HSMCI_RDR;
+	DMAC_DADDR0 = (uint32_t)buf;
+	DMAC_DSCR0 = 0;
+
+	DMAC_CTRLA0 = (word_num & DMAC_CTRLA_BTSIZE_MASK) |
+		DMAC_CTRLA_SRC_WIDTH_WORD | DMAC_CTRLA_DST_WIDTH_WORD;
+	DMAC_CTRLB0 = (BV(DMAC_CTRLB_SRC_DSCR) | BV(DMAC_CTRLB_DST_DSCR) | DMAC_CTRLB_FC_PER2MEM_DMA_FC |
+					DMAC_CTRLB_DST_INCR_INCREMENTING | DMAC_CTRLB_SRC_INCR_FIXED | BV(DMAC_CTRLB_IEN));
+
+	kprintf("SDDR %08lx\n", DMAC_SADDR0);
+	kprintf("DDDR %08lx\n", DMAC_DADDR0);
+	kprintf("CTRA %08lx\n", DMAC_CTRLA0);
+	kprintf("CTRB %08lx\n", DMAC_CTRLB0);
+	kprintf("EBCI %08lx\n", DMAC_EBCISR);
+	kprintf("CHSR %08lx\n", DMAC_CHSR);
+
+	ASSERT(!(DMAC_CHSR & BV(DMAC_CHSR_ENA0)));
+	DMAC_CHER = BV(DMAC_CHER_ENA0);
+}
+
+
+void hsmci_waitTransfer(void)
+{
+	while (!(HSMCI_SR & BV(HSMCI_SR_XFRDONE)))
+		cpu_relax();
+}
+
+void hsmci_setSpeed(uint32_t data_rate, int flag)
+{
+	if (flag)
+		HSMCI_CFG |= BV(HSMCI_CFG_HSMODE);
+	else
+		HSMCI_CFG &= ~BV(HSMCI_CFG_HSMODE);
+
+	HSMCI_MR = HSMCI_CLK_DIV(data_rate) | ((0x7u << HSMCI_MR_PWSDIV_SHIFT) & HSMCI_MR_PWSDIV_MASK);
+
+	timer_delay(10);
 }
 
 void hsmci_init(Hsmci *hsmci)
@@ -178,23 +249,23 @@ void hsmci_init(Hsmci *hsmci)
 
 	HSMCI_DTOR = 0xFF | HSMCI_DTOR_DTOMUL_1048576;
 	HSMCI_CSTOR = 0xFF | HSMCI_CSTOR_CSTOMUL_1048576;
-	HSMCI_MR = HSMCI_CLK_DIV | ((0x7u << HSMCI_MR_PWSDIV_SHIFT) & HSMCI_MR_PWSDIV_MASK) | BV(HSMCI_MR_RDPROOF);
-	HSMCI_SDCR = 0;
+	HSMCI_MR = HSMCI_CLK_DIV(HSMCI_INIT_SPEED) | ((0x7u << HSMCI_MR_PWSDIV_SHIFT) & HSMCI_MR_PWSDIV_MASK) | BV(HSMCI_MR_RDPROOF);
 	HSMCI_CFG = BV(HSMCI_CFG_FIFOMODE) | BV(HSMCI_CFG_FERRCTRL);
 
 	sysirq_setHandler(INT_HSMCI, hsmci_irq);
 	HSMCI_CR = BV(HSMCI_CR_MCIEN);
-	HSMCI_DMA &= ~BV(HSMCI_DMA_DMAEN);
+	HSMCI_DMA = 0;
+
 
 	//init DMAC
 	DMAC_EBCIDR = 0x3FFFFF;
-	DMAC_CHDR = BV(DMAC_CHDR_DIS0);
-
-	DMAC_CFG0 = 0;
-	DMAC_CFG0 = BV(DMAC_CFG_SRC_H2SEL) | DMAC_CFG_FIFOCFG_ALAP_CFG | BV(DMAC_CFG_SOD);
+	DMAC_CHDR = 0x1F;
+	DMAC_CFG0 = BV(DMAC_CFG_SRC_H2SEL) | DMAC_CFG_FIFOCFG_ALAP_CFG | (0x1 << DMAC_CFG_AHB_PROT_SHIFT);
 
 	pmc_periphEnable(DMAC_ID);
 	DMAC_EN = BV(DMAC_EN_ENABLE);
+	sysirq_setHandler(INT_DMAC, dmac_irq);
 
-	//HSMCI_IER = BV(HSMCI_IER_RTOE);
+	DMAC_EBCIER = BV(DMAC_EBCIER_BTC0) | BV(DMAC_EBCIER_ERR0);
+
 }

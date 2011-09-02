@@ -74,6 +74,7 @@
 	} while (!(HSMCI_SR & BV(HSMCI_SR_NOTBUSY)))
 
 
+#define HSMCI_INIT_SPEED  400000
 
 typedef struct Hsmci
 {
@@ -91,15 +92,24 @@ INLINE void hsmci_disableIrq(void)
 
 INLINE void hsmci_setBusWidth(size_t len)
 {
-	ASSERT((len == 8) || (len == 4) || (len == 1));
-	HSMCI_SDCR = (len << HSMCI_SDCR_SDCBUS_SHIFT) & HSMCI_SDCR_SDCBUS_MASK;
+	int sdcsel= 0;
+	if (len == 4)
+		sdcsel = 2;
+	if (len == 8)
+		sdcsel = 3;
+
+	HSMCI_SDCR = (sdcsel << HSMCI_SDCR_SDCBUS_SHIFT) & HSMCI_SDCR_SDCBUS_MASK;
 }
 
-void hsmci_readResp(void *resp, size_t len);
+void hsmci_readResp(uint32_t *resp, size_t len);
 bool hsmci_sendCmd(uint8_t index, uint32_t argument, uint32_t reply_type);
 
-void hsmci_setBlkSize(size_t blk_size);
-bool hsmci_read(uint32_t *buf, size_t word_num);
+void hsmci_prgRxDMA(uint32_t *buf, size_t word_num, size_t blk_size);
+void hsmci_prgTxDMA(uint32_t *buf, size_t word_num, size_t blk_size);
+void hsmci_waitTransfer(void);
+
+void hsmci_setSpeed(uint32_t data_rate, int flag);
+
 
 
 
