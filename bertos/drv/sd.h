@@ -70,6 +70,7 @@ typedef struct SDcsd
     uint8_t     ccc;          ///< Card command classes
     uint32_t    erase_size;  ///< The size of an erasable sector, in write block len
 	uint32_t    capacity;     ///< Card size in byte
+	uint32_t    max_data_rate; ///< Step rate, usec
     uint32_t    blk_len;      ///< Block data size len in byte
 	uint32_t    blk_num;      ///< Number of block in card
 	uint32_t  	write_blk_bits; ///< Max write block length in bits
@@ -79,6 +80,15 @@ typedef struct SDcsd
                 write_partial:1,
                 write_misalign:1;
 } SDcsd;
+
+typedef struct SDssr
+{
+	uint8_t    bus_width;
+	uint8_t    card_type;
+	uint8_t    speed_class;
+	uint8_t    au_size;
+	uint8_t    erase_size;
+} SDssr;
 
 
 #define SD_READY_FOR_DATA         BV(8)
@@ -106,6 +116,7 @@ typedef struct Sd
 	#if CPU_CM3_SAM3X8
 	SDcid cid;
 	SDcsd csd;
+	SDssr ssr;
 	uint32_t addr;
 	uint32_t status;
 	#endif
@@ -120,6 +131,7 @@ bool sd_initBuf(Sd *sd, KFile *ch);
 
 void sd_dumpCsd(Sd *sd);
 void sd_dumpCid(Sd *sd);
+void sd_dumpSsr(Sd *sd);
 
 void sd_sendInit(void);
 void sd_goIdle(void);
@@ -133,22 +145,24 @@ int sd_getSrc(Sd *sd);
 int sd_appStatus(Sd *sd);
 int sd_getRelativeAddr(Sd *sd);
 
+int sd_getStatus(Sd *sd, uint32_t *buf, size_t words);
+
 int sd_selectCard(Sd *sd);
 int sd_deSelectCard(Sd *sd);
 int sd_setBusWidth(Sd *sd, size_t len);
 int sd_set_BlockLen(Sd *sd, size_t len);
-
-int sd_readSingleBlock(Sd *sd, size_t index, void *_buf, size_t len);
+void sd_setHightSpeed(Sd *sd);
+int sd_readSingleBlock(Sd *sd, size_t index, uint32_t *buf, size_t words);
 
 
 INLINE int sd_setBus4bit(Sd *sd)
 {
-	return sd_setBusWidth(sd, 1);
+	return sd_setBusWidth(sd, 4);
 }
 
 INLINE int sd_setBus1bit(Sd *sd)
 {
-	return sd_setBusWidth(sd, 0);
+	return sd_setBusWidth(sd, 1);
 }
 
 #endif

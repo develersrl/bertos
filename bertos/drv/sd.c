@@ -599,13 +599,22 @@ static void dump(const char *label, uint32_t *r, size_t len)
 			kputs("\n");
 			j = 0;
 		}
-		kprintf("%08lx ", r[i]);
+		kprintf("%08lx", r[i]);
 		j++;
 	}
 	kprintf("\n] len=%d\n\n", i);
 }
 )
 
+static const uint32_t tran_exp[] = {
+    10000,      100000,     1000000,    10000000,
+    0,      0,      0,      0
+};
+
+static const uint8_t tran_mant[] = {
+    0,  10, 12, 13, 15, 20, 25, 30,
+    35, 40, 45, 50, 55, 60, 70, 80,
+};
 
 static int sd_decodeCsd(SDcsd *csd, uint32_t *resp, size_t len)
 {
@@ -616,6 +625,7 @@ static int sd_decodeCsd(SDcsd *csd, uint32_t *resp, size_t len)
     csd->structure = UNSTUFF_BITS(resp, 126, 2);
 	csd->ccc = UNSTUFF_BITS(resp, 84, 12);
 
+    csd->max_data_rate  = tran_exp[UNSTUFF_BITS(resp, 96, 3)] * tran_mant[UNSTUFF_BITS(resp, 99, 4)];
 
 	/*
 	 * CSD structure:
@@ -691,6 +701,7 @@ void sd_dumpCsd(Sd *sd)
 
 	LOG_INFO("VERSION: %d.0\n", sd->csd.structure ? 2 : 1);
     LOG_INFO("CARD COMMAND CLASS: %d\n", sd->csd.ccc);
+	LOG_INFO("MAX DATA RATE: %ld\n", sd->csd.max_data_rate);
 	LOG_INFO("WRITE BLK LEN BITS: %ld\n", sd->csd.write_blk_bits);
 	LOG_INFO("READ BLK LEN BITS: %ld\n", sd->csd.read_blk_bits);
 	LOG_INFO("ERASE SIZE: %ld\n", sd->csd.erase_size);
@@ -715,8 +726,22 @@ void sd_dumpCid(Sd *sd)
 												(BCD_TO_INT_32BIT(sd->cid.year_off) % 12));
 }
 
+void sd_dumpSsr(Sd *sd)
+{
+	ASSERT(sd);
+
+	LOG_INFO("BUS_WIDTH: %d\n", sd->ssr.bus_width);
+    LOG_INFO("TYPE: %d\n", sd->ssr.card_type);
+	LOG_INFO("AU_TYPE: %d\n", sd->ssr.au_size);
+	LOG_INFO("ERASE_SIZE: %d\n", sd->ssr.erase_size);
+	LOG_INFO("SPEED_CLASS: %d\n", sd->ssr.speed_class);
+}
+
+
 void sd_sendInit(void)
 {
+	hsmci_init(NULL); //TODO: REMOVE IT!
+
 	if (hsmci_sendCmd(0, 0, HSMCI_CMDR_SPCMD_INIT | HSMCI_CMDR_RSPTYP_NORESP))
 		LOG_ERR("INIT: %lx\n", HSMCI_SR);
 }
@@ -724,6 +749,7 @@ void sd_sendInit(void)
 
 void sd_goIdle(void)
 {
+	hsmci_setSpeed(HSMCI_INIT_SPEED, false);
 	if (hsmci_sendCmd(0, 0, HSMCI_CMDR_RSPTYP_NORESP))
 		LOG_ERR("GO_IDLE: %lx\n", HSMCI_SR);
 }
@@ -848,13 +874,11 @@ int sd_getRelativeAddr(Sd *sd)
 		LOG_ERR("RCA: %lx\n", HSMCI_SR);
 		return -1;
 	}
-	else
-	{
-		hsmci_readResp(&sd->addr, 1);
-		LOG_INFOB(dump("RCA", &sd->addr, 1););
 
-		sd->addr = sd->addr >> 16;
-	}
+	hsmci_readResp(&sd->addr, 1);
+	sd->addr = sd->addr >> 16;
+
+	LOG_INFOB(dump("RCA", &sd->addr, 1););
 
 	return 0;
 }
@@ -940,14 +964,17 @@ int sd_setBusWidth(Sd *sd, size_t len)
 	{
 		hsmci_setBusWidth(len);
 
-		if (hsmci_sendCmd(6, len, HSMCI_CMDR_RSPTYP_48_BIT))
+		uint8_t arg = 0;
+		if (len == 4)
+			arg = 2;
+
+		if (hsmci_sendCmd(6, arg, HSMCI_CMDR_RSPTYP_48_BIT))
 		{
 			LOG_ERR("SET_BUS_WIDTH CMD: %lx\n", HSMCI_SR);
 			return -1;
 		}
 
 		hsmci_readResp(&(sd->status), 1);
-		HSMCI_CHECK_BUSY();
 
 		LOG_INFOB(dump("SET_BUS_WIDTH", &(sd->status), 1););
 		LOG_INFO("State[%d]\n", SD_GET_STATE(sd->status));
@@ -972,7 +999,6 @@ int sd_set_BlockLen(Sd *sd, size_t len)
 	}
 
 	hsmci_readResp(&(sd->status), 1);
-	HSMCI_CHECK_BUSY();
 
 	LOG_INFOB(dump("SET_BLK_LEN", &(sd->status), 1););
 	LOG_INFO("State[%d]\n", SD_GET_STATE(sd->status));
@@ -985,35 +1011,89 @@ int sd_set_BlockLen(Sd *sd, size_t len)
 	return -1;
 }
 
-int sd_readSingleBlock(Sd *sd, size_t index, void *_buf, size_t len)
+int sd_getStatus(Sd *sd, uint32_t *buf, size_t words)
 {
 	ASSERT(sd);
-	ASSERT(_buf);
-	ASSERT(!(len % sd->csd.blk_len));
 
-	uint32_t *buf = (uint32_t *)_buf;
+	// Status reply with 512bit data, so the block size in byte is 64
+	hsmci_prgRxDMA(buf, words, 64);
 
-	hsmci_setBlkSize(sd->csd.blk_len);
+	if (hsmci_sendCmd(55, SD_ADDR_TO_RCA(sd->addr), HSMCI_CMDR_RSPTYP_48_BIT))
+	{
+		LOG_ERR("APP_CMD %lx\n", HSMCI_SR);
+		return -1;
+	}
 
-	if (hsmci_sendCmd(17, index * sd->csd.blk_len, HSMCI_CMDR_RSPTYP_48_BIT))
+	uint32_t status = HSMCI_RSPR;
+	if (status & (SD_STATUS_APP_CMD | SD_STATUS_READY))
+	{
+		if (hsmci_sendCmd(13, 0, HSMCI_CMDR_RSPTYP_48_BIT |
+				BV(HSMCI_CMDR_TRDIR) | HSMCI_CMDR_TRCMD_START_DATA | HSMCI_CMDR_TRTYP_SINGLE))
+		{
+			LOG_ERR("STATUS CMD: %lx\n", HSMCI_SR);
+			return -1;
+		}
+
+		hsmci_readResp(&(sd->status), 1);
+		LOG_INFOB(dump("STATUS", &(sd->status), 1););
+		LOG_INFO("State[%d]\n", SD_GET_STATE(sd->status));
+
+		if (sd->status & SD_STATUS_READY)
+		{
+			hsmci_waitTransfer();
+
+			LOG_INFOB(dump("STATUS", buf, words););
+			memset(&(sd->ssr), 0, sizeof(SDssr));
+
+			sd->ssr.bus_width  = UNSTUFF_BITS(buf, 510, 2);
+			sd->ssr.card_type  = UNSTUFF_BITS(buf, 480, 16);
+			sd->ssr.au_size  = UNSTUFF_BITS(buf, 432, 8);
+			sd->ssr.speed_class  = UNSTUFF_BITS(buf, 440, 8);
+			sd->ssr.erase_size = UNSTUFF_BITS(buf, 408, 24);
+
+			return 0;
+		}
+	}
+
+	return -1;
+}
+
+
+
+int sd_readSingleBlock(Sd *sd, size_t index, uint32_t *buf, size_t words)
+{
+	ASSERT(sd);
+	ASSERT(buf);
+
+	hsmci_prgRxDMA(buf, words, sd->csd.blk_len);
+
+	if (hsmci_sendCmd(17, index * sd->csd.blk_len, HSMCI_CMDR_RSPTYP_48_BIT |
+			BV(HSMCI_CMDR_TRDIR) | HSMCI_CMDR_TRCMD_START_DATA | HSMCI_CMDR_TRTYP_SINGLE))
 	{
 		LOG_ERR("SIGLE_BLK_READ: %lx\n", HSMCI_SR);
 		return -1;
 	}
 	hsmci_readResp(&(sd->status), 1);
-	HSMCI_CHECK_BUSY();
 
 	LOG_INFOB(dump("SIGLE_BLK_READ", &(sd->status), 1););
 	LOG_INFO("State[%d]\n", SD_GET_STATE(sd->status));
 
 	if (sd->status & SD_STATUS_READY)
 	{
-		hsmci_read(buf, len / sizeof(uint32_t));
-		LOG_INFOB(dump("BLK", buf, 8););
-		return len;
+		hsmci_waitTransfer();
+		LOG_INFOB(dump("BLK", buf, words););
+
+		return words;
 	}
 
 	return -1;
+}
+
+
+
+void sd_setHightSpeed(Sd *sd)
+{
+	hsmci_setSpeed(2100000, true);
 }
 
 
