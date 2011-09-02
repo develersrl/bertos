@@ -355,6 +355,7 @@
 #define    DMAC_CFG_LOCK_IF             20 ///< (DMAC_CFG) Interface Lock.
 #define    DMAC_CFG_LOCK_B              21 ///< (DMAC_CFG) Bus Lock.
 #define    DMAC_CFG_LOCK_IF_L           22 ///< (DMAC_CFG) Master Interface Arbiter Lock.
+#define    DMAC_CFG_AHB_PROT_SHIFT      24 ///< (DMAC_CFG) AHB Protection.
 #define    DMAC_CFG_AHB_PROT_MASK      0x7000000 ///< (DMAC_CFG) AHB Protection.
 #define    DMAC_CFG_FIFOCFG_MASK      0x70000000 ///< (DMAC_CFG) FIFO Configuration.
 #define    DMAC_CFG_FIFOCFG_ALAP_CFG  0x00000000 ///< (DMAC_CFG) The largest defined length AHB burst is performed on the destination AHB interface..
