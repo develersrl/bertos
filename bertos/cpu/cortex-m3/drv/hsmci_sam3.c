@@ -167,6 +167,18 @@ void hsmci_prgTxDMA(uint32_t *buf, size_t word_num, size_t blk_size)
 
 	hsmci_setBlockSize(blk_size);
 
+	//init DMAC
+	DMAC_EBCIDR = 0x3FFFFF;
+	DMAC_CHDR = 0x1F;
+	DMAC_CFG0 = BV(DMAC_CFG_DST_H2SEL) | DMAC_CFG_FIFOCFG_ALAP_CFG | (0x1 << DMAC_CFG_AHB_PROT_SHIFT);
+
+	pmc_periphEnable(DMAC_ID);
+	DMAC_EN = BV(DMAC_EN_ENABLE);
+	sysirq_setHandler(INT_DMAC, dmac_irq);
+
+	DMAC_EBCIER = BV(DMAC_EBCIER_BTC0) | BV(DMAC_EBCIER_ERR0);
+
+
 	DMAC_CHDR = BV(DMAC_CHDR_DIS0);
 
 	DMAC_SADDR0 = (uint32_t)buf;
@@ -193,6 +205,17 @@ void hsmci_prgTxDMA(uint32_t *buf, size_t word_num, size_t blk_size)
 void hsmci_prgRxDMA(uint32_t *buf, size_t word_num, size_t blk_size)
 {
 	hsmci_setBlockSize(blk_size);
+
+	//init DMAC
+	DMAC_EBCIDR = 0x3FFFFF;
+	DMAC_CHDR = 0x1F;
+	DMAC_CFG0 = BV(DMAC_CFG_SRC_H2SEL) | DMAC_CFG_FIFOCFG_ALAP_CFG | (0x1 << DMAC_CFG_AHB_PROT_SHIFT);
+
+	pmc_periphEnable(DMAC_ID);
+	DMAC_EN = BV(DMAC_EN_ENABLE);
+	sysirq_setHandler(INT_DMAC, dmac_irq);
+
+	DMAC_EBCIER = BV(DMAC_EBCIER_BTC0) | BV(DMAC_EBCIER_ERR0);
 
 	DMAC_CHDR = BV(DMAC_CHDR_DIS0);
 
@@ -255,17 +278,5 @@ void hsmci_init(Hsmci *hsmci)
 	sysirq_setHandler(INT_HSMCI, hsmci_irq);
 	HSMCI_CR = BV(HSMCI_CR_MCIEN);
 	HSMCI_DMA = 0;
-
-
-	//init DMAC
-	DMAC_EBCIDR = 0x3FFFFF;
-	DMAC_CHDR = 0x1F;
-	DMAC_CFG0 = BV(DMAC_CFG_SRC_H2SEL) | DMAC_CFG_FIFOCFG_ALAP_CFG | (0x1 << DMAC_CFG_AHB_PROT_SHIFT);
-
-	pmc_periphEnable(DMAC_ID);
-	DMAC_EN = BV(DMAC_EN_ENABLE);
-	sysirq_setHandler(INT_DMAC, dmac_irq);
-
-	DMAC_EBCIER = BV(DMAC_EBCIER_BTC0) | BV(DMAC_EBCIER_ERR0);
 
 }
