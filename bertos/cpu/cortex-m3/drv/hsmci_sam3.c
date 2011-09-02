@@ -109,7 +109,6 @@ static DECLARE_ISR(hsmci_irq)
 	uint32_t status = HSMCI_SR;
 	if (status & BV(HSMCI_IER_DMADONE))
 	{
-		kputs("\n\nfatto\n\n");
 	}
 }
 
@@ -138,7 +137,7 @@ bool hsmci_sendCmd(uint8_t index, uint32_t argument, uint32_t reply_type)
 	HSMCI_WAIT();
 
 	HSMCI_ARGR = argument;
-	HSMCI_CMDR = index | reply_type | BV(HSMCI_CMDR_MAXLAT);// | BV(HSMCI_CMDR_OPDCMD);
+	HSMCI_CMDR = index | reply_type | BV(HSMCI_CMDR_MAXLAT);
 
 	uint32_t status = HSMCI_SR;
 	while (!(status & BV(HSMCI_SR_CMDRDY)))
@@ -157,7 +156,6 @@ bool hsmci_sendCmd(uint8_t index, uint32_t argument, uint32_t reply_type)
 
 INLINE void hsmci_setBlockSize(size_t blk_size)
 {
-	HSMCI_IER = BV(HSMCI_IER_DMADONE);
 	HSMCI_DMA |= BV(HSMCI_DMA_DMAEN);
 	HSMCI_BLKR = blk_size << HSMCI_BLKR_BLKLEN_SHIFT;
 }
@@ -167,35 +165,17 @@ void hsmci_prgTxDMA(uint32_t *buf, size_t word_num, size_t blk_size)
 
 	hsmci_setBlockSize(blk_size);
 
-	//init DMAC
-	DMAC_EBCIDR = 0x3FFFFF;
-	DMAC_CHDR = 0x1F;
-	DMAC_CFG0 = BV(DMAC_CFG_DST_H2SEL) | DMAC_CFG_FIFOCFG_ALAP_CFG | (0x1 << DMAC_CFG_AHB_PROT_SHIFT);
-
-	pmc_periphEnable(DMAC_ID);
-	DMAC_EN = BV(DMAC_EN_ENABLE);
-	sysirq_setHandler(INT_DMAC, dmac_irq);
-
-	DMAC_EBCIER = BV(DMAC_EBCIER_BTC0) | BV(DMAC_EBCIER_ERR0);
-
-
 	DMAC_CHDR = BV(DMAC_CHDR_DIS0);
 
 	DMAC_SADDR0 = (uint32_t)buf;
 	DMAC_DADDR0 = (uint32_t)&HSMCI_TDR;
 	DMAC_DSCR0 = 0;
 
+	DMAC_CFG0 = BV(DMAC_CFG_DST_H2SEL) | DMAC_CFG_FIFOCFG_ALAP_CFG | (0x1 << DMAC_CFG_AHB_PROT_SHIFT);
 	DMAC_CTRLA0 = (word_num & DMAC_CTRLA_BTSIZE_MASK) |
 		DMAC_CTRLA_SRC_WIDTH_WORD | DMAC_CTRLA_DST_WIDTH_WORD;
 	DMAC_CTRLB0 = (BV(DMAC_CTRLB_SRC_DSCR) | BV(DMAC_CTRLB_DST_DSCR) | DMAC_CTRLB_FC_MEM2PER_DMA_FC |
 					DMAC_CTRLB_DST_INCR_FIXED | DMAC_CTRLB_SRC_INCR_INCREMENTING | BV(DMAC_CTRLB_IEN));
-
-	kprintf("SDDR %08lx\n", DMAC_SADDR0);
-	kprintf("DDDR %08lx\n", DMAC_DADDR0);
-	kprintf("CTRA %08lx\n", DMAC_CTRLA0);
-	kprintf("CTRB %08lx\n", DMAC_CTRLB0);
-	kprintf("EBCI %08lx\n", DMAC_EBCISR);
-	kprintf("CHSR %08lx\n", DMAC_CHSR);
 
 	ASSERT(!(DMAC_CHSR & BV(DMAC_CHSR_ENA0)));
 	DMAC_CHER = BV(DMAC_CHER_ENA0);
@@ -206,34 +186,17 @@ void hsmci_prgRxDMA(uint32_t *buf, size_t word_num, size_t blk_size)
 {
 	hsmci_setBlockSize(blk_size);
 
-	//init DMAC
-	DMAC_EBCIDR = 0x3FFFFF;
-	DMAC_CHDR = 0x1F;
-	DMAC_CFG0 = BV(DMAC_CFG_SRC_H2SEL) | DMAC_CFG_FIFOCFG_ALAP_CFG | (0x1 << DMAC_CFG_AHB_PROT_SHIFT);
-
-	pmc_periphEnable(DMAC_ID);
-	DMAC_EN = BV(DMAC_EN_ENABLE);
-	sysirq_setHandler(INT_DMAC, dmac_irq);
-
-	DMAC_EBCIER = BV(DMAC_EBCIER_BTC0) | BV(DMAC_EBCIER_ERR0);
-
 	DMAC_CHDR = BV(DMAC_CHDR_DIS0);
 
 	DMAC_SADDR0 = (uint32_t)&HSMCI_RDR;
 	DMAC_DADDR0 = (uint32_t)buf;
 	DMAC_DSCR0 = 0;
 
+	DMAC_CFG0 = BV(DMAC_CFG_SRC_H2SEL) | DMAC_CFG_FIFOCFG_ALAP_CFG | (0x1 << DMAC_CFG_AHB_PROT_SHIFT);
 	DMAC_CTRLA0 = (word_num & DMAC_CTRLA_BTSIZE_MASK) |
 		DMAC_CTRLA_SRC_WIDTH_WORD | DMAC_CTRLA_DST_WIDTH_WORD;
 	DMAC_CTRLB0 = (BV(DMAC_CTRLB_SRC_DSCR) | BV(DMAC_CTRLB_DST_DSCR) | DMAC_CTRLB_FC_PER2MEM_DMA_FC |
 					DMAC_CTRLB_DST_INCR_INCREMENTING | DMAC_CTRLB_SRC_INCR_FIXED | BV(DMAC_CTRLB_IEN));
-
-	kprintf("SDDR %08lx\n", DMAC_SADDR0);
-	kprintf("DDDR %08lx\n", DMAC_DADDR0);
-	kprintf("CTRA %08lx\n", DMAC_CTRLA0);
-	kprintf("CTRB %08lx\n", DMAC_CTRLB0);
-	kprintf("EBCI %08lx\n", DMAC_EBCISR);
-	kprintf("CHSR %08lx\n", DMAC_CHSR);
 
 	ASSERT(!(DMAC_CHSR & BV(DMAC_CHSR_ENA0)));
 	DMAC_CHER = BV(DMAC_CHER_ENA0);
@@ -279,4 +242,14 @@ void hsmci_init(Hsmci *hsmci)
 	HSMCI_CR = BV(HSMCI_CR_MCIEN);
 	HSMCI_DMA = 0;
 
+	//init DMAC
+	DMAC_EBCIDR = 0x3FFFFF;
+	DMAC_CHDR = 0x1F;
+
+
+	pmc_periphEnable(DMAC_ID);
+	DMAC_EN = BV(DMAC_EN_ENABLE);
+	sysirq_setHandler(INT_DMAC, dmac_irq);
+
+	DMAC_EBCIER = BV(DMAC_EBCIER_BTC0) | BV(DMAC_EBCIER_ERR0);
 }
