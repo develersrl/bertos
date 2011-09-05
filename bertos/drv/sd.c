@@ -235,396 +235,9 @@ static int16_t sd_getCSD(Sd *sd, CardCSD *csd)
 		return EOF;
 }
 
-
-#define SD_READ_SINGLEBLOCK 0x51
-
-static size_t sd_readDirect(struct KBlock *b, block_idx_t idx, void *buf, size_t offset, size_t size)
-{
-
-	Sd *sd = SD_CAST(b);
-	LOG_INFO("reading from block %ld, offset %d, size %d\n", idx, offset, size);
-
-	if (sd->tranfer_len != size)
-	{
-		if ((sd->r1 = sd_setBlockLen(sd, size)))
-		{
-			LOG_ERR("setBlockLen failed: %04X\n", sd->r1);
-			return 0;
-		}
-		sd->tranfer_len = size;
-	}
-
-	SD_SELECT(sd);
-
-	sd->r1 = sd_sendCommand(sd, SD_READ_SINGLEBLOCK, idx * SD_DEFAULT_BLOCKLEN + offset, 0);
-
-	if (sd->r1)
-	{
-		LOG_ERR("read single block failed: %04X\n", sd->r1);
-		sd_select(sd, false);
-		return 0;
-	}
-
-	bool res = sd_getBlock(sd, buf, size);
-	sd_select(sd, false);
-	if (!res)
-	{
-		LOG_ERR("read single block failed reading data\n");
-		return 0;
-	}
-	else
-		return size;
-}
-
-#define SD_WRITE_SINGLEBLOCK 0x58
-#define SD_DATA_ACCEPTED     0x05
-
-static size_t sd_writeDirect(KBlock *b, block_idx_t idx, const void *buf, size_t offset, size_t size)
-{
-	Sd *sd = SD_CAST(b);
-	KFile *fd = sd->ch;
-	ASSERT(offset == 0);
-	ASSERT(size == SD_DEFAULT_BLOCKLEN);
-
-	LOG_INFO("writing block %ld\n", idx);
-	if (sd->tranfer_len != SD_DEFAULT_BLOCKLEN)
-	{
-		if ((sd->r1 = sd_setBlockLen(sd, SD_DEFAULT_BLOCKLEN)))
-		{
-			LOG_ERR("setBlockLen failed: %04X\n", sd->r1);
-			return 0;
-		}
-		sd->tranfer_len = SD_DEFAULT_BLOCKLEN;
-	}
-
-	SD_SELECT(sd);
-
-	sd->r1 = sd_sendCommand(sd, SD_WRITE_SINGLEBLOCK, idx * SD_DEFAULT_BLOCKLEN, 0);
-
-	if (sd->r1)
-	{
-		LOG_ERR("write single block failed: %04X\n", sd->r1);
-		sd_select(sd, false);
-		return 0;
-	}
-
-	kfile_putc(SD_STARTTOKEN, fd);
-	kfile_write(fd, buf, SD_DEFAULT_BLOCKLEN);
-	/* send fake crc */
-	kfile_putc(0, fd);
-	kfile_putc(0, fd);
-
-	uint8_t dataresp = kfile_getc(fd);
-	sd_select(sd, false);
-
-	if ((dataresp & 0x1f) != SD_DATA_ACCEPTED)
-	{
-		LOG_ERR("write block %ld failed: %02X\n", idx, dataresp);
-		return EOF;
-	}
-
-	return SD_DEFAULT_BLOCKLEN;
-}
-
-void sd_writeTest(Sd *sd)
-{
-	uint8_t buf[SD_DEFAULT_BLOCKLEN];
-	memset(buf, 0, sizeof(buf));
-
-	for (block_idx_t i = 0; i < sd->b.blk_cnt; i++)
-	{
-		LOG_INFO("writing block %ld: %s\n", i, (sd_writeDirect(&sd->b, i, buf, 0, SD_DEFAULT_BLOCKLEN) == SD_DEFAULT_BLOCKLEN) ? "OK" : "FAIL");
-	}
-}
-
-
-bool sd_test(Sd *sd)
-{
-	uint8_t buf[SD_DEFAULT_BLOCKLEN];
-
-	if (sd_readDirect(&sd->b, 0, buf, 0, sd->b.blk_size) != sd->b.blk_size)
-		return false;
-
-	kputchar('\n');
-	for (int i = 0; i < SD_DEFAULT_BLOCKLEN; i++)
-	{
-		kprintf("%02X ", buf[i]);
-		buf[i] = i;
-		if (!((i+1) % 16))
-			kputchar('\n');
-	}
-
-	if (sd_writeDirect(&sd->b, 0, buf, 0, SD_DEFAULT_BLOCKLEN) != SD_DEFAULT_BLOCKLEN)
-		return false;
-
-	memset(buf, 0, sizeof(buf));
-	if (sd_readDirect(&sd->b, 0, buf, 0, sd->b.blk_size) != sd->b.blk_size)
-		return false;
-
-	kputchar('\n');
-	for (block_idx_t i = 0; i < sd->b.blk_size; i++)
-	{
-		kprintf("%02X ", buf[i]);
-		buf[i] = i;
-		if (!((i+1) % 16))
-			kputchar('\n');
-	}
-
-	return true;
-}
-
-static int sd_error(KBlock *b)
-{
-	Sd *sd = SD_CAST(b);
-	return sd->r1;
-}
-
-static void sd_clearerr(KBlock *b)
-{
-	Sd *sd = SD_CAST(b);
-	sd->r1 = 0;
-}
-
-static const KBlockVTable sd_unbuffered_vt =
-{
-	.readDirect = sd_readDirect,
-	.writeDirect = sd_writeDirect,
-
-	.error = sd_error,
-	.clearerr = sd_clearerr,
-};
-
-static const KBlockVTable sd_buffered_vt =
-{
-	.readDirect = sd_readDirect,
-	.writeDirect = sd_writeDirect,
-
-	.readBuf = kblock_swReadBuf,
-	.writeBuf = kblock_swWriteBuf,
-	.load = kblock_swLoad,
-	.store = kblock_swStore,
-
-	.error = sd_error,
-	.clearerr = sd_clearerr,
-};
-
-#define SD_GO_IDLE_STATE     0x40
-#define SD_GO_IDLE_STATE_CRC 0x95
-#define SD_SEND_OP_COND      0x41
-#define SD_SEND_OP_COND_CRC  0xF9
-
-#define SD_START_DELAY  10
-#define SD_INIT_TIMEOUT ms_to_ticks(2000)
-#define SD_IDLE_RETRIES 4
-
-static bool sd_blockInit(Sd *sd, KFile *ch)
-{
-	ASSERT(sd);
-	ASSERT(ch);
-	memset(sd, 0, sizeof(*sd));
-	DB(sd->b.priv.type = KBT_SD);
-	sd->ch = ch;
-
-
-#if CPU_CM3_SAM3X8
-
-	/* Wait a few moments for supply voltage to stabilize */
-	timer_delay(SD_START_DELAY);
-
-	sd_sendInit();
-	sd_goIdle();
-
-	sd_sendIfCond(sd);
-
-	ticks_t start = timer_clock();
-	bool sd_power_on = false;
-	do
-	{
-		if (!sd_sendAppOpCond(sd))
-		{
-			sd_power_on = true;
-			break;
-		}
-		cpu_relax();
-	}
-	while (timer_clock() - start < SD_INIT_TIMEOUT);
-
-
-	if (sd_power_on)
-	{
-
-		if(!sd_getCid(sd, 0, SD_SEND_ALL_CID))
-		{
-			sd_dumpCid(sd);
-		}
-
-		if (!sd_getRelativeAddr(sd))
-		{
-			LOG_INFO("RCA: %0lx\n", sd->addr);
-		}
-
-
-		if (!sd_getCsd(sd))
-		{
-			sd_dumpCsd(sd);
-		}
-
-		if (!sd_appStatus(sd))
-		{
-			LOG_INFO("STATUS: %ld\n", sd->status);
-		}
-
-		if (sd->status & SD_CARD_IS_LOCKED)
-		{
-			LOG_INFO("SD is locked!\n");
-		}
-		else if (sd->status & SD_READY_FOR_DATA)
-		{
-			sd_selectCard(sd);
-			sd_set_BlockLen(sd, SD_DEFAULT_BLOCKLEN);
-			sd_setBus4bit(sd);
-			sd_setHightSpeed(sd);
-			sd_deSelectCard(sd);
-		}
-
-	}
-#else
-	SD_CS_INIT();
-	SD_CS_OFF();
-
-	/* Wait a few moments for supply voltage to stabilize */
-	timer_delay(SD_START_DELAY);
-
-	/* Give 80 clk pulses to wake up the card */
-	for (int i = 0; i < 10; i++)
-		kfile_putc(0xff, ch);
-	kfile_flush(ch);
-
-	for (int i = 0; i < SD_IDLE_RETRIES; i++)
-	{
-		SD_SELECT(sd);
-		sd->r1 = sd_sendCommand(sd, SD_GO_IDLE_STATE, 0, SD_GO_IDLE_STATE_CRC);
-		sd_select(sd, false);
-
-		if (sd->r1 == SD_IN_IDLE)
-			break;
-	}
-
-	if (sd->r1 != SD_IN_IDLE)
-	{
-		LOG_ERR("go_idle_state failed: %04X\n", sd->r1);
-		return false;
-	}
-
-	ticks_t start = timer_clock();
-
-	/* Wait for card to start */
-	do
-	{
-		SD_SELECT(sd);
-		sd->r1 = sd_sendCommand(sd, SD_SEND_OP_COND, 0, SD_SEND_OP_COND_CRC);
-		sd_select(sd, false);
-		cpu_relax();
-	}
-	while (sd->r1 != 0 && timer_clock() - start < SD_INIT_TIMEOUT);
-
-	if (sd->r1)
-	{
-		LOG_ERR("send_op_cond failed: %04X\n", sd->r1);
-		return false;
-	}
-
-	sd->r1 = sd_setBlockLen(sd, SD_DEFAULT_BLOCKLEN);
-	sd->tranfer_len = SD_DEFAULT_BLOCKLEN;
-
-	if (sd->r1)
-	{
-		LOG_ERR("setBlockLen failed: %04X\n", sd->r1);
-		return false;
-	}
-
-	/* Avoid warning for uninitialized csd use (gcc bug?) */
-	CardCSD csd = csd;
-
-	sd->r1 = sd_getCSD(sd, &csd);
-
-	if (sd->r1)
-	{
-		LOG_ERR("getCSD failed: %04X\n", sd->r1);
-		return false;
-	}
-
-	sd->b.blk_size = SD_DEFAULT_BLOCKLEN;
-	sd->b.blk_cnt = csd.block_num * (csd.block_len / SD_DEFAULT_BLOCKLEN);
-	LOG_INFO("blk_size %d, blk_cnt %ld\n", sd->b.blk_size, sd->b.blk_cnt);
-#endif
-
-#if CONFIG_SD_AUTOASSIGN_FAT
-	disk_assignDrive(&sd->b, 0);
-#endif
-
-	return true;
-}
-
 #if CPU_CM3_SAM3X8
 
 #include <drv/hsmci_sam3.h>
-
-/* SD commands                           type  argument     response */
-  /* class 0 */
-/* This is basically the same command as for MMC with some quirks. */
-#define SD_SEND_RELATIVE_ADDR     3   /* bcr                     R6  */
-#define SD_SEND_IF_COND           8   /* bcr  [11:0] See below   R7  */
-#define SD_SWITCH_VOLTAGE         11  /* ac                      R1  */
-
-  /* class 10 */
-#define SD_SWITCH                 6   /* adtc [31:0] See below   R1  */
-
-  /* class 5 */
-#define SD_ERASE_WR_BLK_START    32   /* ac   [31:0] data addr   R1  */
-#define SD_ERASE_WR_BLK_END      33   /* ac   [31:0] data addr   R1  */
-
-  /* Application commands */
-#define SD_APP_SET_BUS_WIDTH      6   /* ac   [1:0] bus width    R1  */
-#define SD_APP_SD_STATUS         13   /* adtc                    R1  */
-#define SD_APP_SEND_NUM_WR_BLKS  22   /* adtc                    R1  */
-#define SD_APP_OP_COND           41   /* bcr  [31:0] OCR         R3  */
-#define SD_APP_SEND_SCR          51   /* adtc                    R1  */
-
-/* OCR bit definitions */
-#define SD_OCR_S18R     (1 << 24)    /* 1.8V switching request */
-#define SD_ROCR_S18A    SD_OCR_S18R  /* 1.8V switching accepted by card */
-#define SD_OCR_XPC      (1 << 28)    /* SDXC power control */
-
-/*
- * SD_SWITCH argument format:
- *
- *      [31] Check (0) or switch (1)
- *      [30:24] Reserved (0)
- *      [23:20] Function group 6
- *      [19:16] Function group 5
- *      [15:12] Function group 4
- *      [11:8] Function group 3
- *      [7:4] Function group 2
- *      [3:0] Function group 1
- */
-
-/*
- * SD_SEND_IF_COND argument format:
- *
- *  [31:12] Reserved (0)
- *  [11:8] Host Voltage Supply Flags
- *  [7:0] Check Pattern (0xAA)
- */
-
-/*
- * SCR field definitions
- */
-
-#define SCR_SPEC_VER_0      0   /* Implements system specification 1.0 - 1.01 */
-#define SCR_SPEC_VER_1      1   /* Implements system specification 1.10 */
-#define SCR_SPEC_VER_2      2   /* Implements system specification 2.00-3.0X */
-
 
 #define SD_ADDR_TO_RCA(addr)    (uint32_t)(((addr) << 16) & 0xFFFF0000)
 #define SD_GET_STATE(status)    (uint8_t)(((status) & SD_STATUS_CURR_MASK) >> SD_STATUS_CURR_SHIFT)
@@ -649,19 +262,21 @@ static void dump(const char *label, uint32_t *r, size_t len)
 			kputs("\n");
 			j = 0;
 		}
-		kprintf("%08lx", r[i]);
+		kprintf("%08lx ", r[i]);
 		j++;
 	}
 	kprintf("\n] len=%d\n\n", i);
 }
 )
 
-static const uint32_t tran_exp[] = {
+static const uint32_t tran_exp[] =
+{
     10000,      100000,     1000000,    10000000,
     0,      0,      0,      0
 };
 
-static const uint8_t tran_mant[] = {
+static const uint8_t tran_mant[] =
+{
     0,  10, 12, 13, 15, 20, 25, 30,
     35, 40, 45, 50, 55, 60, 70, 80,
 };
@@ -1018,7 +633,6 @@ int sd_deSelectCard(Sd *sd)
 
 }
 
-
 int sd_setBusWidth(Sd *sd, size_t len)
 {
 	ASSERT(sd);
@@ -1129,20 +743,40 @@ int sd_getStatus(Sd *sd, uint32_t *buf, size_t words)
 }
 
 
-
-int sd_readSingleBlock(Sd *sd, size_t index, uint32_t *buf, size_t words)
+void sd_setHightSpeed(Sd *sd)
 {
-	ASSERT(sd);
+	(void)sd;
+	hsmci_setSpeed(2100000, true);
+}
+
+#endif
+
+
+#define SD_START_DELAY  10
+#define SD_INIT_TIMEOUT ms_to_ticks(2000)
+#define SD_IDLE_RETRIES 4
+
+#if CPU_CM3_SAM3X8
+
+static size_t sd_SdReadDirect(struct KBlock *b, block_idx_t idx, void *buf, size_t offset, size_t size)
+{
 	ASSERT(buf);
+	Sd *sd = SD_CAST(b);
+	LOG_INFO("reading from block %ld, offset %d, size %d\n", idx, offset, size);
 
-	hsmci_prgRxDMA(buf, words, sd->csd.blk_len);
+	if (sd_selectCard(sd) < 0)
+		return -1;
 
-	if (hsmci_sendCmd(17, index * sd->csd.blk_len, HSMCI_CMDR_RSPTYP_48_BIT |
+	hsmci_prgRxDMA(buf, size / 4, sd->csd.blk_len);
+
+	if (hsmci_sendCmd(17, idx * sd->csd.blk_len + offset, HSMCI_CMDR_RSPTYP_48_BIT |
 			BV(HSMCI_CMDR_TRDIR) | HSMCI_CMDR_TRCMD_START_DATA | HSMCI_CMDR_TRTYP_SINGLE))
 	{
 		LOG_ERR("SIGLE_BLK_READ: %lx\n", HSMCI_SR);
+		sd_deSelectCard(sd);
 		return -1;
 	}
+
 	hsmci_readResp(&(sd->status), 1);
 
 	LOG_INFOB(dump("SIGLE_BLK_READ", &(sd->status), 1););
@@ -1151,26 +785,34 @@ int sd_readSingleBlock(Sd *sd, size_t index, uint32_t *buf, size_t words)
 	if (sd->status & SD_STATUS_READY)
 	{
 		hsmci_waitTransfer();
-		return words;
+		sd_deSelectCard(sd);
+		return size;
 	}
 
+	sd_deSelectCard(sd);
 	return -1;
 }
 
-
-int sd_writeSingleBlock(Sd *sd, size_t index, uint32_t *buf, size_t words)
+static size_t sd_SdWriteDirect(KBlock *b, block_idx_t idx, const void *buf, size_t offset, size_t size)
 {
-	ASSERT(sd);
 	ASSERT(buf);
+	Sd *sd = SD_CAST(b);
+	const uint32_t *_buf = (const uint32_t *)buf;
+	LOG_INFO("reading from block %ld, offset %d, size %d\n", idx, offset, size);
 
-	hsmci_prgTxDMA(buf, words, sd->csd.blk_len);
+	if (sd_selectCard(sd) < 0)
+		return 0;
 
-	if (hsmci_sendCmd(24, index * sd->csd.blk_len, HSMCI_CMDR_RSPTYP_48_BIT |
+	hsmci_prgTxDMA(_buf, size / 4, sd->csd.blk_len);
+
+	if (hsmci_sendCmd(24, idx * sd->csd.blk_len + offset, HSMCI_CMDR_RSPTYP_48_BIT |
 						HSMCI_CMDR_TRCMD_START_DATA | HSMCI_CMDR_TRTYP_SINGLE))
 	{
 		LOG_ERR("SIGLE_BLK_WRITE: %lx\n", HSMCI_SR);
+		sd_deSelectCard(sd);
 		return -1;
 	}
+
 	hsmci_readResp(&(sd->status), 1);
 
 	LOG_INFOB(dump("SIGLE_BLK_WR", &(sd->status), 1););
@@ -1179,23 +821,355 @@ int sd_writeSingleBlock(Sd *sd, size_t index, uint32_t *buf, size_t words)
 	if (sd->status & SD_STATUS_READY)
 	{
 		hsmci_waitTransfer();
-		return words;
+		sd_deSelectCard(sd);
+		return size;
 	}
 
+	sd_deSelectCard(sd);
 	return -1;
 }
 
 
-
-void sd_setHightSpeed(Sd *sd)
+static int sd_SdError(KBlock *b)
 {
-	(void)sd;
-	hsmci_setSpeed(2100000, true);
+	Sd *sd = SD_CAST(b);
+	return 0;//sd->status;
+}
+
+static void sd_SdClearerr(KBlock *b)
+{
+	Sd *sd = SD_CAST(b);
+	sd->status = 0;
 }
 
 
+
+static bool sd_SdBlockInit(Sd *sd)
+{
+	/* Wait a few moments for supply voltage to stabilize */
+	timer_delay(SD_START_DELAY);
+
+	sd_sendInit();
+	sd_goIdle();
+
+	sd_sendIfCond(sd);
+
+	ticks_t start = timer_clock();
+	bool sd_power_on = false;
+	do
+	{
+		if (!sd_sendAppOpCond(sd))
+		{
+			sd_power_on = true;
+			break;
+		}
+		cpu_relax();
+	}
+	while (timer_clock() - start < SD_INIT_TIMEOUT);
+
+
+	if (sd_power_on)
+	{
+
+		if(sd_getCid(sd, 0, SD_SEND_ALL_CID) < 0)
+			return false;
+		else
+		{
+			sd_dumpCid(sd);
+		}
+
+		if (sd_getRelativeAddr(sd) < 0)
+			return false;
+		else
+		{
+			LOG_INFO("RCA: %0lx\n", sd->addr);
+		}
+
+
+		if (sd_getCsd(sd) < 0)
+			return false;
+		else
+		{
+			sd_dumpCsd(sd);
+		}
+
+		if (sd_appStatus(sd) < 0)
+		{
+			LOG_INFO("STATUS: %ld\n", sd->status);
+			return false;
+		}
+
+		if (sd->status & SD_CARD_IS_LOCKED)
+		{
+			LOG_INFO("SD is locked!\n");
+			return false;
+		}
+
+		if (sd->status & SD_READY_FOR_DATA)
+		{
+			sd_selectCard(sd);
+			sd_set_BlockLen(sd, SD_DEFAULT_BLOCKLEN);
+			sd_setBus4bit(sd);
+			sd_setHightSpeed(sd);
+			sd_deSelectCard(sd);
+
+			sd->b.blk_size = SD_DEFAULT_BLOCKLEN;
+			sd->b.blk_cnt = sd->csd.blk_num * (sd->csd.blk_len / SD_DEFAULT_BLOCKLEN);
+			LOG_INFO("blk_size %d, blk_cnt %ld\n", sd->b.blk_size, sd->b.blk_cnt);
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+#else
+
+#define SD_READ_SINGLEBLOCK 0x51
+
+static size_t sd_SpiReadDirect(struct KBlock *b, block_idx_t idx, void *buf, size_t offset, size_t size)
+{
+
+	Sd *sd = SD_CAST(b);
+	LOG_INFO("reading from block %ld, offset %d, size %d\n", idx, offset, size);
+
+	if (sd->tranfer_len != size)
+	{
+		if ((sd->r1 = sd_setBlockLen(sd, size)))
+		{
+			LOG_ERR("setBlockLen failed: %04X\n", sd->r1);
+			return 0;
+		}
+		sd->tranfer_len = size;
+	}
+
+	SD_SELECT(sd);
+
+	sd->r1 = sd_sendCommand(sd, SD_READ_SINGLEBLOCK, idx * SD_DEFAULT_BLOCKLEN + offset, 0);
+
+	if (sd->r1)
+	{
+		LOG_ERR("read single block failed: %04X\n", sd->r1);
+		sd_select(sd, false);
+		return 0;
+	}
+
+	bool res = sd_getBlock(sd, buf, size);
+	sd_select(sd, false);
+	if (!res)
+	{
+		LOG_ERR("read single block failed reading data\n");
+		return 0;
+	}
+	else
+		return size;
+}
+
+#define SD_WRITE_SINGLEBLOCK 0x58
+#define SD_DATA_ACCEPTED     0x05
+
+static size_t sd_SpiWriteDirect(KBlock *b, block_idx_t idx, const void *buf, size_t offset, size_t size)
+{
+	Sd *sd = SD_CAST(b);
+	KFile *fd = sd->ch;
+	ASSERT(offset == 0);
+	ASSERT(size == SD_DEFAULT_BLOCKLEN);
+
+	LOG_INFO("writing block %ld\n", idx);
+	if (sd->tranfer_len != SD_DEFAULT_BLOCKLEN)
+	{
+		if ((sd->r1 = sd_setBlockLen(sd, SD_DEFAULT_BLOCKLEN)))
+		{
+			LOG_ERR("setBlockLen failed: %04X\n", sd->r1);
+			return 0;
+		}
+		sd->tranfer_len = SD_DEFAULT_BLOCKLEN;
+	}
+
+	SD_SELECT(sd);
+
+	sd->r1 = sd_sendCommand(sd, SD_WRITE_SINGLEBLOCK, idx * SD_DEFAULT_BLOCKLEN, 0);
+
+	if (sd->r1)
+	{
+		LOG_ERR("write single block failed: %04X\n", sd->r1);
+		sd_select(sd, false);
+		return 0;
+	}
+
+	kfile_putc(SD_STARTTOKEN, fd);
+	kfile_write(fd, buf, SD_DEFAULT_BLOCKLEN);
+	/* send fake crc */
+	kfile_putc(0, fd);
+	kfile_putc(0, fd);
+
+	uint8_t dataresp = kfile_getc(fd);
+	sd_select(sd, false);
+
+	if ((dataresp & 0x1f) != SD_DATA_ACCEPTED)
+	{
+		LOG_ERR("write block %ld failed: %02X\n", idx, dataresp);
+		return EOF;
+	}
+
+	return SD_DEFAULT_BLOCKLEN;
+}
+
+static int sd_SpiError(KBlock *b)
+{
+	Sd *sd = SD_CAST(b);
+	return sd->r1;
+}
+
+static void sd_SpiClearerr(KBlock *b)
+{
+	Sd *sd = SD_CAST(b);
+	sd->r1 = 0;
+}
+
+
+
+#define SD_GO_IDLE_STATE     0x40
+#define SD_GO_IDLE_STATE_CRC 0x95
+#define SD_SEND_OP_COND      0x41
+#define SD_SEND_OP_COND_CRC  0xF9
+
+static bool sd_SpiBlockInit(Sd *sd, KFile *ch)
+{
+	sd->ch = ch;
+
+	SD_CS_INIT();
+	SD_CS_OFF();
+
+	/* Wait a few moments for supply voltage to stabilize */
+	timer_delay(SD_START_DELAY);
+
+	/* Give 80 clk pulses to wake up the card */
+	for (int i = 0; i < 10; i++)
+		kfile_putc(0xff, ch);
+	kfile_flush(ch);
+
+	for (int i = 0; i < SD_IDLE_RETRIES; i++)
+	{
+		SD_SELECT(sd);
+		sd->r1 = sd_sendCommand(sd, SD_GO_IDLE_STATE, 0, SD_GO_IDLE_STATE_CRC);
+		sd_select(sd, false);
+
+		if (sd->r1 == SD_IN_IDLE)
+			break;
+	}
+
+	if (sd->r1 != SD_IN_IDLE)
+	{
+		LOG_ERR("go_idle_state failed: %04X\n", sd->r1);
+		return false;
+	}
+
+	ticks_t start = timer_clock();
+
+	/* Wait for card to start */
+	do
+	{
+		SD_SELECT(sd);
+		sd->r1 = sd_sendCommand(sd, SD_SEND_OP_COND, 0, SD_SEND_OP_COND_CRC);
+		sd_select(sd, false);
+		cpu_relax();
+	}
+	while (sd->r1 != 0 && timer_clock() - start < SD_INIT_TIMEOUT);
+
+	if (sd->r1)
+	{
+		LOG_ERR("send_op_cond failed: %04X\n", sd->r1);
+		return false;
+	}
+
+	sd->r1 = sd_setBlockLen(sd, SD_DEFAULT_BLOCKLEN);
+	sd->tranfer_len = SD_DEFAULT_BLOCKLEN;
+
+	if (sd->r1)
+	{
+		LOG_ERR("setBlockLen failed: %04X\n", sd->r1);
+		return false;
+	}
+
+	/* Avoid warning for uninitialized csd use (gcc bug?) */
+	CardCSD csd = csd;
+
+	sd->r1 = sd_getCSD(sd, &csd);
+
+	if (sd->r1)
+	{
+		LOG_ERR("getCSD failed: %04X\n", sd->r1);
+		return false;
+	}
+
+	sd->b.blk_size = SD_DEFAULT_BLOCKLEN;
+	sd->b.blk_cnt = csd.block_num * (csd.block_len / SD_DEFAULT_BLOCKLEN);
+	LOG_INFO("blk_size %d, blk_cnt %ld\n", sd->b.blk_size, sd->b.blk_cnt);
+	return true;
+}
 #endif
 
+
+static bool sd_blockInit(Sd *sd, KFile *ch)
+{
+	ASSERT(sd);
+	ASSERT(ch);
+	memset(sd, 0, sizeof(*sd));
+	DB(sd->b.priv.type = KBT_SD);
+
+#if CPU_CM3_SAM3X8
+	if (!sd_SdBlockInit(sd))
+		return false;
+#else
+	if (!sd_SpiBlockInit(sd, ch))
+		return false;
+#endif
+
+#if CONFIG_SD_AUTOASSIGN_FAT
+	disk_assignDrive(&sd->b, 0);
+#endif
+
+	return true;
+}
+
+#if CPU_CM3_SAM3X8
+#define sd_writeDirect     sd_SdWriteDirect
+#define sd_readDirect      sd_SdReadDirect
+#define sd_error           sd_SdError
+#define sd_clearerr        sd_SdClearerr
+
+#else
+#define sd_writeDirect     sd_SpiWriteDirect
+#define sd_readDirect      sd_SpiReadDirect
+#define sd_error           sd_SpiError
+#define sd_clearerr        sd_SpiClearerr
+
+#endif
+
+static const KBlockVTable sd_unbuffered_vt =
+{
+	.readDirect = sd_readDirect,
+	.writeDirect = sd_writeDirect,
+
+	.error = sd_error,
+	.clearerr = sd_clearerr,
+};
+
+static const KBlockVTable sd_buffered_vt =
+{
+	.readDirect = sd_readDirect,
+	.writeDirect = sd_writeDirect,
+
+	.readBuf = kblock_swReadBuf,
+	.writeBuf = kblock_swWriteBuf,
+	.load = kblock_swLoad,
+	.store = kblock_swStore,
+
+	.error = sd_error,
+	.clearerr = sd_clearerr,
+};
 
 bool sd_initUnbuf(Sd *sd, KFile *ch)
 {
@@ -1222,6 +1196,54 @@ bool sd_initBuf(Sd *sd, KFile *ch)
 	}
 	else
 		return false;
+}
+
+
+void sd_writeTest(Sd *sd)
+{
+	uint8_t buf[SD_DEFAULT_BLOCKLEN];
+	memset(buf, 0, sizeof(buf));
+
+	for (block_idx_t i = 0; i < sd->b.blk_cnt; i++)
+	{
+		LOG_INFO("writing block %ld: %s\n", i, (sd_writeDirect(&sd->b, i, buf, 0, SD_DEFAULT_BLOCKLEN) == SD_DEFAULT_BLOCKLEN) ? "OK" : "FAIL");
+	}
+}
+
+
+bool sd_test(Sd *sd)
+{
+	uint8_t buf[SD_DEFAULT_BLOCKLEN];
+
+	if (sd_readDirect(&sd->b, 0, buf, 0, sd->b.blk_size) != sd->b.blk_size)
+		return false;
+
+	kputchar('\n');
+	for (int i = 0; i < SD_DEFAULT_BLOCKLEN; i++)
+	{
+		kprintf("%02X ", buf[i]);
+		buf[i] = i;
+		if (!((i+1) % 16))
+			kputchar('\n');
+	}
+
+	if (sd_writeDirect(&sd->b, 0, buf, 0, SD_DEFAULT_BLOCKLEN) != SD_DEFAULT_BLOCKLEN)
+		return false;
+
+	memset(buf, 0, sizeof(buf));
+	if (sd_readDirect(&sd->b, 0, buf, 0, sd->b.blk_size) != sd->b.blk_size)
+		return false;
+
+	kputchar('\n');
+	for (block_idx_t i = 0; i < sd->b.blk_size; i++)
+	{
+		kprintf("%02X ", buf[i]);
+		buf[i] = i;
+		if (!((i+1) % 16))
+			kputchar('\n');
+	}
+
+	return true;
 }
 
 

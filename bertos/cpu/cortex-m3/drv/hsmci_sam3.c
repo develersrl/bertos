@@ -160,7 +160,7 @@ INLINE void hsmci_setBlockSize(size_t blk_size)
 	HSMCI_BLKR = blk_size << HSMCI_BLKR_BLKLEN_SHIFT;
 }
 
-void hsmci_prgTxDMA(uint32_t *buf, size_t word_num, size_t blk_size)
+void hsmci_prgTxDMA(const uint32_t *buf, size_t word_num, size_t blk_size)
 {
 
 	hsmci_setBlockSize(blk_size);
