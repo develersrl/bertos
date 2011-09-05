@@ -58,17 +58,6 @@ typedef struct DmacDesc
 
 #define HSMCI_CLK_DIV(RATE)     ((CPU_FREQ / (RATE << 1)) - 1)
 
-#define HSMCI_ERROR_MASK   (BV(HSMCI_SR_RINDE)    | \
-							BV(HSMCI_SR_RDIRE)    | \
-							BV(HSMCI_SR_RCRCE)    | \
-							BV(HSMCI_SR_RENDE)    | \
-							BV(HSMCI_SR_RTOE)     | \
-							BV(HSMCI_SR_DCRCE)    | \
-							BV(HSMCI_SR_DTOE)     | \
-							BV(HSMCI_SR_CSTOE)    | \
-							BV(HSMCI_SR_BLKOVRE)  | \
-							BV(HSMCI_SR_ACKRCVE))
-
 
 #define HSMCI_RESP_ERROR_MASK   (BV(HSMCI_SR_RINDE) | BV(HSMCI_SR_RDIRE) \
 	  | BV(HSMCI_SR_RENDE)| BV(HSMCI_SR_RTOE))
@@ -86,8 +75,6 @@ typedef struct DmacDesc
 	do { \
 		cpu_relax(); \
 	} while (!(HSMCI_SR & BV(HSMCI_SR_RXRDY)))
-
-#define HSMCI_ERROR()   (HSMCI_SR & HSMCI_ERROR_MASK)
 
 #define HSMCI_HW_INIT()  \
 do { \
