@@ -35,7 +35,7 @@
  * \author Francesco Sacchi <batt@develer.com>
  *
  * $WIZ$ module_name = "sd"
- * $WIZ$ module_depends = "kfile", "timer", "kblock"
+ * $WIZ$ module_depends = "kfile", "timer", "kblock", "sd_spi"
  * $WIZ$ module_hw = "bertos/hw/hw_sd.h"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_sd.h"
  */
@@ -99,6 +99,18 @@ typedef struct SDssr
 
 #endif
 
+#define SD_START_DELAY  10
+#define SD_INIT_TIMEOUT ms_to_ticks(2000)
+#define SD_IDLE_RETRIES 4
+#define SD_DEFAULT_BLOCKLEN 512
+
+/**
+ * $WIZ$ sd_mode = "SD_SDMMC_MODE", "SD_SPI_MODE"
+ * \{
+ */
+#define SD_SDMMC_MODE  0
+#define SD_SPI_MODE    1
+/** \} */
 
 #define SD_UNBUFFERED     BV(0) ///< Open SD memory disabling page caching, no modification and partial write are allowed.
 
@@ -123,9 +135,11 @@ typedef struct Sd
 
 } Sd;
 
-bool sd_initUnbuf(Sd *sd, KFile *ch);
-bool sd_initBuf(Sd *sd, KFile *ch);
+bool sd_hw_initUnbuf(Sd *sd, KFile *ch);
+bool sd_hw_initBuf(Sd *sd, KFile *ch);
 
+bool sd_spi_initUnbuf(Sd *sd, KFile *ch);
+bool sd_spi_initBuf(Sd *sd, KFile *ch);
 
 #if CPU_CM3_SAM3X8
 
@@ -187,7 +201,11 @@ INLINE int sd_setBus1bit(Sd *sd)
 	 *
 	 * \see CONFIG_SD_OLD_INIT.
 	 */
-	#define sd_init(ch) {static struct Sd sd; sd_initUnbuf(&sd, (ch));}
+	#if CONFIG_SD_MODE == SD_SPI_MODE
+		#define sd_init(ch) {static struct Sd sd; sd_spi_initUnbuf(&sd, (ch));}
+	#else
+		#define sd_init(ch) {static struct Sd sd; sd_hw_initUnbuf(&sd, (ch));}
+	#endif
 
 #else
 
@@ -203,7 +221,11 @@ INLINE int sd_setBus1bit(Sd *sd)
 	 *
 	 * \return true if initialization succeds, false otherwise.
 	 */
-	#define sd_init(sd, ch, buffered) ((buffered & SD_UNBUFFERED) ? sd_initUnbuf((sd), (ch)) : sd_initBuf((sd), (ch)))
+	#if CONFIG_SD_MODE == SD_SPI_MODE
+		#define sd_init(sd, ch, buffered) ((buffered & SD_UNBUFFERED) ? sd_spi_initUnbuf((sd), (ch)) : sd_spi_initBuf((sd), (ch)))
+	#else
+		#define sd_init(sd, ch, buffered) ((buffered & SD_UNBUFFERED) ? sd_hw_initUnbuf((sd), (ch)) : sd_hw_initBuf((sd), (ch)))
+	#endif
 
 #endif
 
