@@ -135,8 +135,8 @@ void sd_dumpSsr(Sd *sd);
 
 void sd_sendInit(void);
 void sd_goIdle(void);
-int sd_sendIfCond(void);
-int sd_sendAppOpCond(void);
+int sd_sendIfCond(Sd *sd);
+int sd_sendAppOpCond(Sd *sd);
 
 int sd_getCid(Sd *sd, uint32_t addr, uint8_t flag);
 int sd_getCsd(Sd *sd);

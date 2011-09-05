@@ -240,6 +240,7 @@ static int16_t sd_getCSD(Sd *sd, CardCSD *csd)
 
 static size_t sd_readDirect(struct KBlock *b, block_idx_t idx, void *buf, size_t offset, size_t size)
 {
+
 	Sd *sd = SD_CAST(b);
 	LOG_INFO("reading from block %ld, offset %d, size %d\n", idx, offset, size);
 
@@ -424,6 +425,70 @@ static bool sd_blockInit(Sd *sd, KFile *ch)
 	DB(sd->b.priv.type = KBT_SD);
 	sd->ch = ch;
 
+
+#if CPU_CM3_SAM3X8
+
+	/* Wait a few moments for supply voltage to stabilize */
+	timer_delay(SD_START_DELAY);
+
+	sd_sendInit();
+	sd_goIdle();
+
+	sd_sendIfCond(sd);
+
+	ticks_t start = timer_clock();
+	bool sd_power_on = false;
+	do
+	{
+		if (!sd_sendAppOpCond(sd))
+		{
+			sd_power_on = true;
+			break;
+		}
+		cpu_relax();
+	}
+	while (timer_clock() - start < SD_INIT_TIMEOUT);
+
+
+	if (sd_power_on)
+	{
+
+		if(!sd_getCid(sd, 0, SD_SEND_ALL_CID))
+		{
+			sd_dumpCid(sd);
+		}
+
+		if (!sd_getRelativeAddr(sd))
+		{
+			LOG_INFO("RCA: %0lx\n", sd->addr);
+		}
+
+
+		if (!sd_getCsd(sd))
+		{
+			sd_dumpCsd(sd);
+		}
+
+		if (!sd_appStatus(sd))
+		{
+			LOG_INFO("STATUS: %ld\n", sd->status);
+		}
+
+		if (sd->status & SD_CARD_IS_LOCKED)
+		{
+			LOG_INFO("SD is locked!\n");
+		}
+		else if (sd->status & SD_READY_FOR_DATA)
+		{
+			sd_selectCard(sd);
+			sd_set_BlockLen(sd, SD_DEFAULT_BLOCKLEN);
+			sd_setBus4bit(sd);
+			sd_setHightSpeed(sd);
+			sd_deSelectCard(sd);
+		}
+
+	}
+#else
 	SD_CS_INIT();
 	SD_CS_OFF();
 
@@ -492,6 +557,7 @@ static bool sd_blockInit(Sd *sd, KFile *ch)
 	sd->b.blk_size = SD_DEFAULT_BLOCKLEN;
 	sd->b.blk_cnt = csd.block_num * (csd.block_len / SD_DEFAULT_BLOCKLEN);
 	LOG_INFO("blk_size %d, blk_cnt %ld\n", sd->b.blk_size, sd->b.blk_cnt);
+#endif
 
 #if CONFIG_SD_AUTOASSIGN_FAT
 	disk_assignDrive(&sd->b, 0);
@@ -527,7 +593,7 @@ static bool sd_blockInit(Sd *sd, KFile *ch)
 
 /* OCR bit definitions */
 #define SD_OCR_S18R     (1 << 24)    /* 1.8V switching request */
-#define SD_ROCR_S18A        SD_OCR_S18R  /* 1.8V switching accepted by card */
+#define SD_ROCR_S18A    SD_OCR_S18R  /* 1.8V switching accepted by card */
 #define SD_OCR_XPC      (1 << 28)    /* SDXC power control */
 
 /*
@@ -559,31 +625,15 @@ static bool sd_blockInit(Sd *sd, KFile *ch)
 #define SCR_SPEC_VER_1      1   /* Implements system specification 1.10 */
 #define SCR_SPEC_VER_2      2   /* Implements system specification 2.00-3.0X */
 
-#define UNSTUFF_BITS(resp, start, size)                   \
-    ({                              \
-        const uint32_t __size = size;                \
-        const uint32_t __mask = (__size < 32 ? 1 << __size : 0) - 1; \
-        const uint32_t __off = 3 - ((start) / 32);           \
-        const uint32_t __shft = (start) & 31;            \
-        uint32_t __res;                      \
-                                    \
-        __res = resp[__off] >> __shft;              \
-        if (__size + __shft > 32)               \
-            __res |= resp[__off-1] << ((32 - __shft) % 32); \
-        __res & __mask;                     \
-    })
-
 
 #define SD_ADDR_TO_RCA(addr)    (uint32_t)(((addr) << 16) & 0xFFFF0000)
+#define SD_GET_STATE(status)    (uint8_t)(((status) & SD_STATUS_CURR_MASK) >> SD_STATUS_CURR_SHIFT)
 
-#define BCD_TO_INT_32BIT(bcd)  ((uint32_t )((bcd) & 0xf) * 1 +  \
-								(((bcd) >> 4) & 0xf)  * 10 +      \
-								(((bcd) >> 8) & 0xf)  * 100 +     \
-								(((bcd) >> 12) & 0xf) * 1000 +   \
-								(((bcd) >> 16) & 0xf) * 10000 +   \
-								(((bcd) >> 20) & 0xf) * 100000 +  \
-								(((bcd) >> 24) & 0xf) * 1000000 + \
-								(((bcd) >> 28) & 0xf) * 10000000) \
+#define SD_STATUS_APP_CMD      BV(5)
+#define SD_STATUS_READY        BV(8)
+#define SD_STATUS_CURR_MASK    0x1E00
+#define SD_STATUS_CURR_SHIFT   9
+
 
 LOG_INFOB(
 static void dump(const char *label, uint32_t *r, size_t len)
@@ -754,53 +804,51 @@ void sd_goIdle(void)
 		LOG_ERR("GO_IDLE: %lx\n", HSMCI_SR);
 }
 
-int sd_sendIfCond(void)
+int sd_sendIfCond(Sd *sd)
 {
 	if (hsmci_sendCmd(8, CMD8_V_RANGE_27V_36V, HSMCI_CMDR_RSPTYP_48_BIT))
 	{
 		LOG_ERR("IF_COND %lx\n", HSMCI_SR);
 		return -1;
 	}
-	else
+	hsmci_readResp(&(sd->status), 1);
+	if (((sd->status) & 0xFFF) == CMD8_V_RANGE_27V_36V)
 	{
-		uint32_t r = HSMCI_RSPR;
-		if ((r & 0xFFF) == CMD8_V_RANGE_27V_36V)
-		{
-			LOG_INFO("IF_COND: %lx\n", r);
-			return 0;
-		}
-		LOG_ERR("IF_COND: %lx\n", r);
+		LOG_INFO("IF_COND: %lx\n", (sd->status));
+		return 0;
 	}
+	LOG_ERR("IF_COND: %lx\n", (sd->status));
+
 	return -1;
 }
 
-int sd_sendAppOpCond(void)
+int sd_sendAppOpCond(Sd *sd)
 {
 	if (hsmci_sendCmd(55, 0, HSMCI_CMDR_RSPTYP_48_BIT))
 	{
 		LOG_ERR("APP_CMD %lx\n", HSMCI_SR);
 		return -1;
 	}
-	else
-	{
-		LOG_INFO("APP_CMD %lx\n", HSMCI_RSPR);
-	}
 
-	if (hsmci_sendCmd(41, SD_HOST_VOLTAGE_RANGE | SD_OCR_CCS, HSMCI_CMDR_RSPTYP_48_BIT))// se cmd 8 va ok.
+	hsmci_readResp(&(sd->status), 1);
+	if ((sd->status) & (SD_STATUS_APP_CMD | SD_STATUS_READY))
 	{
-		LOG_ERR("APP_OP_COND %lx\n", HSMCI_SR);
-		return -1;
-	}
-	else
-	{
-		uint32_t status = HSMCI_RSPR;
-		if (status & SD_OCR_BUSY)
+		if (hsmci_sendCmd(41, SD_HOST_VOLTAGE_RANGE | SD_OCR_CCS, HSMCI_CMDR_RSPTYP_48_BIT))// se cmd 8 va ok.
 		{
-			LOG_INFO("SD power up! Hight Capability [%d]\n", (bool)(status & SD_OCR_CCS));
-			return 0;
+			LOG_ERR("APP_OP_COND %lx\n", HSMCI_SR);
+			return -1;
 		}
+		else
+		{
+			hsmci_readResp(&(sd->status), 1);
+			if ((sd->status) & SD_OCR_BUSY)
+			{
+				LOG_INFO("SD power up! Hight Capability [%d]\n", (bool)((sd->status) & SD_OCR_CCS));
+				return 0;
+			}
 
-		LOG_ERR("sd not ready.\n");
+			LOG_ERR("sd not ready.\n");
+		}
 	}
 
 	return -1;
@@ -883,13 +931,6 @@ int sd_getRelativeAddr(Sd *sd)
 	return 0;
 }
 
-#define SD_STATUS_APP_CMD      BV(5)
-#define SD_STATUS_READY        BV(8)
-#define SD_STATUS_CURR_MASK    0x1E00
-#define SD_STATUS_CURR_SHIFT   9
-
-#define SD_GET_STATE(status)    (uint8_t)(((status) & SD_STATUS_CURR_MASK) >> SD_STATUS_CURR_SHIFT)
-
 int sd_appStatus(Sd *sd)
 {
 	ASSERT(sd);
@@ -912,10 +953,10 @@ int sd_appStatus(Sd *sd)
 }
 
 
-INLINE int sd_cardSelection(Sd *sd, size_t rca)
+INLINE int sd_cardSelection(Sd *sd, uint32_t rca)
 {
 	ASSERT(sd);
-	LOG_INFO("Select RCA: %lx\n", SD_ADDR_TO_RCA(sd->addr));
+	LOG_INFO("Select RCA: %lx\n", rca);
 	if (hsmci_sendCmd(7, rca, HSMCI_CMDR_RSPTYP_R1B))
 	{
 		LOG_ERR("SELECT_SD: %lx\n", HSMCI_SR);
@@ -936,16 +977,45 @@ INLINE int sd_cardSelection(Sd *sd, size_t rca)
 
 int sd_selectCard(Sd *sd)
 {
-	return sd_cardSelection(sd, SD_ADDR_TO_RCA(sd->addr));
+	ASSERT(sd);
+	uint32_t rca = SD_ADDR_TO_RCA(sd->addr);
+	LOG_INFO("Select RCA: %lx\n", rca);
+	if (hsmci_sendCmd(7, rca, HSMCI_CMDR_RSPTYP_R1B))
+	{
+		LOG_ERR("SELECT_SD: %lx\n", HSMCI_SR);
+		return -1;
+	}
+
+	HSMCI_CHECK_BUSY();
+	hsmci_readResp(&(sd->status), 1);
+
+	LOG_INFOB(dump("SELECT_SD", &(sd->status), 1););
+	LOG_INFO("State[%d]\n", SD_GET_STATE(sd->status));
+
+	if (sd->status & SD_STATUS_READY)
+		return 0;
+
+	return -1;
 }
 
 int sd_deSelectCard(Sd *sd)
 {
+	ASSERT(sd);
+
 	uint32_t rca = 0;
 	if (!sd->addr)
 		rca = SD_ADDR_TO_RCA(sd->addr + 1);
 
-	return sd_cardSelection(sd, rca);
+	LOG_INFO("Select RCA: %lx\n", rca);
+
+	if (hsmci_sendCmd(7, rca, HSMCI_CMDR_RSPTYP_NORESP))
+	{
+		LOG_ERR("DESELECT_SD: %lx\n", HSMCI_SR);
+		return -1;
+	}
+
+	return 0;
+
 }
 
 
@@ -959,8 +1029,8 @@ int sd_setBusWidth(Sd *sd, size_t len)
 		return -1;
 	}
 
-	uint32_t status = HSMCI_RSPR;
-	if (status & (SD_STATUS_APP_CMD | SD_STATUS_READY))
+	hsmci_readResp(&(sd->status), 1);
+	if ((sd->status) & (SD_STATUS_APP_CMD | SD_STATUS_READY))
 	{
 		hsmci_setBusWidth(len);
 
@@ -983,7 +1053,7 @@ int sd_setBusWidth(Sd *sd, size_t len)
 			return 0;
 	}
 
-	LOG_ERR("SET_BUS_WIDTH REP %lx\n", status);
+	LOG_ERR("SET_BUS_WIDTH REP %lx\n", (sd->status));
 	return -1;
 }
 
@@ -1081,8 +1151,6 @@ int sd_readSingleBlock(Sd *sd, size_t index, uint32_t *buf, size_t words)
 	if (sd->status & SD_STATUS_READY)
 	{
 		hsmci_waitTransfer();
-		LOG_INFOB(dump("BLK", buf, words););
-
 		return words;
 	}
 
@@ -1111,8 +1179,6 @@ int sd_writeSingleBlock(Sd *sd, size_t index, uint32_t *buf, size_t words)
 	if (sd->status & SD_STATUS_READY)
 	{
 		hsmci_waitTransfer();
-		LOG_INFOB(dump("BLK", buf, words););
-
 		return words;
 	}
 
