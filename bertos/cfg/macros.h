@@ -406,6 +406,41 @@ INLINE bool is_aligned(const void *addr, size_t size)
 	return ((size_t)addr & (size - 1)) == 0;
 }
 
+/**
+ * Convert one 32bit bcd numbert to int.
+ */
+#define BCD_TO_INT_32BIT(bcd)  \
+	((uint32_t )((bcd) & 0xf) * 1 +  \
+	(((bcd) >> 4) & 0xf)  * 10 +      \
+	(((bcd) >> 8) & 0xf)  * 100 +     \
+	(((bcd) >> 12) & 0xf) * 1000 +   \
+	(((bcd) >> 16) & 0xf) * 10000 +   \
+	(((bcd) >> 20) & 0xf) * 100000 +  \
+	(((bcd) >> 24) & 0xf) * 1000000 + \
+	(((bcd) >> 28) & 0xf) * 10000000) \
+
+/**
+ * Extract chunk of bit from gived array (uint32_t type).
+ * \param resp array of bit 32bit aligned
+ * \param start bit position in array
+ * \param size of bit chuck from start
+ * \return uint32_t chunk value.
+ */
+#define UNSTUFF_BITS(resp, start, size)                   \
+    ({                              \
+        const uint32_t __size = size;                \
+        const uint32_t __mask = (__size < 32 ? 1 << __size : 0) - 1; \
+        const uint32_t __off = 3 - ((start) / 32);           \
+        const uint32_t __shft = (start) & 31;            \
+        uint32_t __res;                      \
+                                    \
+        __res = resp[__off] >> __shft;              \
+        if (__size + __shft > 32)               \
+            __res |= resp[__off-1] << ((32 - __shft) % 32); \
+        __res & __mask;                     \
+    })
+
+
 /** \} */ //defgroup macros
 
 #endif /* MACROS_H */
