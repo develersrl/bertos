@@ -36,10 +36,12 @@
 
 
 #include "hsmci_sam3.h"
+#include "hw/hw_sd.h"
 
 #include <drv/timer.h>
-#include <cpu/irq.h>
 #include <drv/irq_cm3.h>
+
+#include <cpu/irq.h>
 
 #include <io/cm3.h>
 
@@ -52,9 +54,6 @@ typedef struct DmacDesc
     uint32_t ctrl_b;       /**< Control B register settings */
     uint32_t dsc_addr;     /**< Next descriptor address */
 } DmacDesc;
-
-
-
 
 #define HSMCI_CLK_DIV(RATE)     ((CPU_FREQ / (RATE << 1)) - 1)
 
@@ -76,21 +75,6 @@ typedef struct DmacDesc
 		cpu_relax(); \
 	} while (!(HSMCI_SR & BV(HSMCI_SR_RXRDY)))
 
-#define HSMCI_HW_INIT()  \
-do { \
-	PIOA_PDR = BV(19) | BV(20) | BV(21) | BV(22) | BV(23) | BV(24); \
-	PIO_PERIPH_SEL(PIOA_BASE, BV(19) | BV(20) | BV(21) | BV(22) | BV(23) | BV(24), PIO_PERIPH_A); \
-} while (0)
-
-
-#define STROBE_ON()   PIOB_SODR = BV(13)
-#define STROBE_OFF()  PIOB_CODR = BV(13)
-#define STROBE_INIT() \
-	do { \
-		PIOB_OER = BV(13); \
-		PIOB_PER = BV(13); \
-	} while(0)
-
 static DECLARE_ISR(hsmci_irq)
 {
 	uint32_t status = HSMCI_SR;
@@ -98,7 +82,6 @@ static DECLARE_ISR(hsmci_irq)
 	{
 	}
 }
-
 
 static DECLARE_ISR(dmac_irq)
 {
@@ -120,7 +103,6 @@ void hsmci_readResp(uint32_t *resp, size_t len)
 
 bool hsmci_sendCmd(uint8_t index, uint32_t argument, uint32_t reply_type)
 {
-	STROBE_ON();
 	HSMCI_WAIT();
 
 	HSMCI_ARGR = argument;
@@ -137,7 +119,6 @@ bool hsmci_sendCmd(uint8_t index, uint32_t argument, uint32_t reply_type)
 		status = HSMCI_SR;
 	}
 
-	STROBE_OFF();
 	return 0;
 }
 
@@ -212,8 +193,7 @@ void hsmci_init(Hsmci *hsmci)
 {
 	(void)hsmci;
 
-	HSMCI_HW_INIT();
-	STROBE_INIT();
+	SD_PIN_INIT();
 
 	pmc_periphEnable(HSMCI_ID);
 	HSMCI_CR = BV(HSMCI_CR_SWRST);
@@ -232,7 +212,6 @@ void hsmci_init(Hsmci *hsmci)
 	//init DMAC
 	DMAC_EBCIDR = 0x3FFFFF;
 	DMAC_CHDR = 0x1F;
-
 
 	pmc_periphEnable(DMAC_ID);
 	DMAC_EN = BV(DMAC_EN_ENABLE);
