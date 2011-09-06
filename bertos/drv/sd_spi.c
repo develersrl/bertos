@@ -189,7 +189,7 @@ static int16_t sd_setBlockLen(Sd *sd, uint32_t newlen)
 
 #define SD_SEND_CSD 0x49
 
-static int16_t sd_getCSD(Sd *sd, SDcsd *csd)
+static int16_t sd_getCSD(Sd *sd, SdCSD *csd)
 {
 	SD_SELECT(sd);
 
@@ -406,7 +406,7 @@ static bool sd_blockInit(Sd *sd, KFile *ch)
 	}
 
 	/* Avoid warning for uninitialized csd use (gcc bug?) */
-	SDcsd csd = csd;
+	SdCSD csd = csd;
 
 	sd->status = sd_getCSD(sd, &csd);
 

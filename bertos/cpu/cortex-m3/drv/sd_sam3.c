@@ -83,22 +83,22 @@ static const uint8_t tran_mant[] =
 };
 
 
-void sd_dumpCsd(SDcsd *csd);
-void sd_dumpCid(SDcid *cid);
-void sd_dumpSsr(SDssr *ssr);
+void sd_dumpCsd(SdCSD *csd);
+void sd_dumpCid(SdCID *cid);
+void sd_dumpSsr(SdSSR *ssr);
 
 void sd_sendInit(void);
 void sd_goIdle(void);
 int sd_sendIfCond(Sd *sd);
 int sd_sendAppOpCond(Sd *sd);
 
-int sd_getCid(Sd *sd, SDcid *cid, uint32_t addr, uint8_t flag);
-int sd_getCsd(Sd *sd, SDcsd *csd);
+int sd_getCid(Sd *sd, SdCID *cid, uint32_t addr, uint8_t flag);
+int sd_getCsd(Sd *sd, SdCSD *csd);
 int sd_getSrc(Sd *sd);
 
 int sd_appStatus(Sd *sd);
 int sd_getRelativeAddr(Sd *sd);
-int sd_getStatus(Sd *sd, SDssr *ssr, uint32_t *buf, size_t words);
+int sd_getStatus(Sd *sd, SdSSR *ssr, uint32_t *buf, size_t words);
 
 int sd_selectCard(Sd *sd);
 int sd_deSelectCard(Sd *sd);
@@ -139,7 +139,7 @@ static void dump(const char *label, uint32_t *r, size_t len)
 }
 )
 
-void sd_dumpCsd(SDcsd *csd)
+void sd_dumpCsd(SdCSD *csd)
 {
 	ASSERT(csd);
 
@@ -157,7 +157,7 @@ void sd_dumpCsd(SDcsd *csd)
 
 }
 
-void sd_dumpCid(SDcid *cid)
+void sd_dumpCid(SdCID *cid)
 {
 	ASSERT(cid);
 
@@ -170,7 +170,7 @@ void sd_dumpCid(SDcid *cid)
 												(BCD_TO_INT_32BIT(cid->year_off) % 12));
 }
 
-void sd_dumpSsr(SDssr *ssr)
+void sd_dumpSsr(SdSSR *ssr)
 {
 	ASSERT(ssr);
 
@@ -182,7 +182,7 @@ void sd_dumpSsr(SDssr *ssr)
 }
 
 
-static int sd_decodeCsd(SDcsd *csd, uint32_t *resp, size_t len)
+static int sd_decodeCsd(SdCSD *csd, uint32_t *resp, size_t len)
 {
 	ASSERT(csd);
 	ASSERT(resp);
@@ -327,11 +327,11 @@ int sd_sendAppOpCond(Sd *sd)
 }
 
 
-int sd_getCid(Sd *sd, SDcid *cid, uint32_t addr, uint8_t flag)
+int sd_getCid(Sd *sd, SdCID *cid, uint32_t addr, uint8_t flag)
 {
 	ASSERT(sd);
 	ASSERT(cid);
-	memset(cid, 0, sizeof(SDcid));
+	memset(cid, 0, sizeof(SdCID));
 
 	uint8_t idx = 9; // CMD9 get cid from gived sd address (RCA)
 	if (flag & SD_SEND_ALL_CID)
@@ -365,11 +365,11 @@ int sd_getCid(Sd *sd, SDcid *cid, uint32_t addr, uint8_t flag)
 	return 0;
 }
 
-int sd_getCsd(Sd *sd, SDcsd *csd)
+int sd_getCsd(Sd *sd, SdCSD *csd)
 {
 	ASSERT(sd);
 	ASSERT(csd);
-	memset(csd, 0, sizeof(SDcsd));
+	memset(csd, 0, sizeof(SdCSD));
 
 	LOG_INFO("Send to RCA: %lx\n", SD_ADDR_TO_RCA(sd->addr));
 	if (hsmci_sendCmd(9, SD_ADDR_TO_RCA(sd->addr), HSMCI_CMDR_RSPTYP_136_BIT))
@@ -553,7 +553,7 @@ int sd_set_BlockLen(Sd *sd, size_t len)
 	return -1;
 }
 
-int sd_getStatus(Sd *sd, SDssr *ssr, uint32_t *buf, size_t words)
+int sd_getStatus(Sd *sd, SdSSR *ssr, uint32_t *buf, size_t words)
 {
 	ASSERT(sd);
 	ASSERT(ssr);
@@ -586,7 +586,7 @@ int sd_getStatus(Sd *sd, SDssr *ssr, uint32_t *buf, size_t words)
 			hsmci_waitTransfer();
 
 			LOG_INFOB(dump("STATUS", buf, words););
-			memset(ssr, 0, sizeof(SDssr));
+			memset(ssr, 0, sizeof(SdSSR));
 			ssr->bus_width  = UNSTUFF_BITS(buf, 510, 2);
 			ssr->card_type  = UNSTUFF_BITS(buf, 480, 16);
 			ssr->au_size  = UNSTUFF_BITS(buf, 432, 8);
@@ -722,7 +722,7 @@ static bool sd_blockInit(Sd *sd, KFile *ch)
 
 	if (sd_power_on)
 	{
-		SDcid cid;
+		SdCID cid;
 		if(sd_getCid(sd, &cid, 0, SD_SEND_ALL_CID) < 0)
 			return false;
 		else
@@ -737,7 +737,7 @@ static bool sd_blockInit(Sd *sd, KFile *ch)
 			LOG_INFO("RCA: %0lx\n", sd->addr);
 		}
 
-		SDcsd csd;
+		SdCSD csd;
 		if (sd_getCsd(sd, &csd) < 0)
 			return false;
 		else

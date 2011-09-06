@@ -51,7 +51,7 @@
 
 #include <fs/fatfs/diskio.h>
 
-typedef struct SDcid
+typedef struct SdCID
 {
 	uint8_t        manfid;
 	uint8_t        prod_name[8];
@@ -60,9 +60,9 @@ typedef struct SDcid
 	uint32_t       year_off;
 	uint8_t        m_rev;
 	uint8_t        l_rev;
-}SDcid;
+}SdCID;
 
-typedef struct SDcsd
+typedef struct SdCSD
 {
 	uint8_t     structure;
 	uint8_t     ccc;          ///< Card command classes
@@ -77,16 +77,16 @@ typedef struct SDcsd
 				read_misalign:1,
 				write_partial:1,
 				write_misalign:1;
-} SDcsd;
+} SdCSD;
 
-typedef struct SDssr
+typedef struct SdSSR
 {
 	uint8_t    bus_width;
 	uint8_t    card_type;
 	uint8_t    speed_class;
 	uint8_t    au_size;
 	uint8_t    erase_size;
-} SDssr;
+} SdSSR;
 
 #define SD_START_DELAY  10
 #define SD_INIT_TIMEOUT ms_to_ticks(2000)
