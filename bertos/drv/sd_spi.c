@@ -53,16 +53,12 @@
 
 #include <string.h> /* memset */
 
-/**
- * Card Specific Data
- * read directly from the card.
- */
-typedef struct CardCSD
+
+struct SdHardware
 {
-	uint16_t block_len;  ///< Length of a block
-	uint32_t block_num;  ///< Number of block on the card
-	uint16_t capacity;   ///< Card capacity in MB
-} CardCSD;
+	uint16_t tranfer_len; ///< Lenght for the read/write commands, cached in order to increase speed.
+};
+
 
 #define SD_IN_IDLE    0x01
 #define SD_STARTTOKEN 0xFE
@@ -185,15 +181,15 @@ static int16_t sd_setBlockLen(Sd *sd, uint32_t newlen)
 {
 	SD_SELECT(sd);
 
-	sd->r1 = sd_sendCommand(sd, SD_SETBLOCKLEN, newlen, 0);
+	sd->status = sd_sendCommand(sd, SD_SETBLOCKLEN, newlen, 0);
 
 	sd_select(sd, false);
-	return sd->r1;
+	return sd->status;
 }
 
 #define SD_SEND_CSD 0x49
 
-static int16_t sd_getCSD(Sd *sd, CardCSD *csd)
+static int16_t sd_getCSD(Sd *sd, SDcsd *csd)
 {
 	SD_SELECT(sd);
 
@@ -201,7 +197,7 @@ static int16_t sd_getCSD(Sd *sd, CardCSD *csd)
 
 	if (r1)
 	{
-		LOG_ERR("send_csd failed: %04X\n", sd->r1);
+		LOG_ERR("send_csd failed: %08lX\n", sd->status);
 		sd_select(sd, false);
 		return r1;
 	}
@@ -245,23 +241,23 @@ static size_t sd_SpiReadDirect(struct KBlock *b, block_idx_t idx, void *buf, siz
 	Sd *sd = SD_CAST(b);
 	LOG_INFO("reading from block %ld, offset %d, size %d\n", idx, offset, size);
 
-	if (sd->tranfer_len != size)
+	if (sd->hw->tranfer_len != size)
 	{
-		if ((sd->r1 = sd_setBlockLen(sd, size)))
+		if ((sd->status = sd_setBlockLen(sd, size)))
 		{
-			LOG_ERR("setBlockLen failed: %04X\n", sd->r1);
+			LOG_ERR("setBlockLen failed: %08lX\n", sd->status);
 			return 0;
 		}
-		sd->tranfer_len = size;
+		sd->hw->tranfer_len = size;
 	}
 
 	SD_SELECT(sd);
 
-	sd->r1 = sd_sendCommand(sd, SD_READ_SINGLEBLOCK, idx * SD_DEFAULT_BLOCKLEN + offset, 0);
+	sd->status = sd_sendCommand(sd, SD_READ_SINGLEBLOCK, idx * SD_DEFAULT_BLOCKLEN + offset, 0);
 
-	if (sd->r1)
+	if (sd->status)
 	{
-		LOG_ERR("read single block failed: %04X\n", sd->r1);
+		LOG_ERR("read single block failed: %08lX\n", sd->status);
 		sd_select(sd, false);
 		return 0;
 	}
@@ -288,23 +284,23 @@ static size_t sd_SpiWriteDirect(KBlock *b, block_idx_t idx, const void *buf, siz
 	ASSERT(size == SD_DEFAULT_BLOCKLEN);
 
 	LOG_INFO("writing block %ld\n", idx);
-	if (sd->tranfer_len != SD_DEFAULT_BLOCKLEN)
+	if (sd->hw->tranfer_len != SD_DEFAULT_BLOCKLEN)
 	{
-		if ((sd->r1 = sd_setBlockLen(sd, SD_DEFAULT_BLOCKLEN)))
+		if ((sd->status = sd_setBlockLen(sd, SD_DEFAULT_BLOCKLEN)))
 		{
-			LOG_ERR("setBlockLen failed: %04X\n", sd->r1);
+			LOG_ERR("setBlockLen failed: %08lX\n", sd->status);
 			return 0;
 		}
-		sd->tranfer_len = SD_DEFAULT_BLOCKLEN;
+		sd->hw->tranfer_len = SD_DEFAULT_BLOCKLEN;
 	}
 
 	SD_SELECT(sd);
 
-	sd->r1 = sd_sendCommand(sd, SD_WRITE_SINGLEBLOCK, idx * SD_DEFAULT_BLOCKLEN, 0);
+	sd->status = sd_sendCommand(sd, SD_WRITE_SINGLEBLOCK, idx * SD_DEFAULT_BLOCKLEN, 0);
 
-	if (sd->r1)
+	if (sd->status)
 	{
-		LOG_ERR("write single block failed: %04X\n", sd->r1);
+		LOG_ERR("write single block failed: %08lX\n", sd->status);
 		sd_select(sd, false);
 		return 0;
 	}
@@ -330,13 +326,13 @@ static size_t sd_SpiWriteDirect(KBlock *b, block_idx_t idx, const void *buf, siz
 static int sd_SpiError(KBlock *b)
 {
 	Sd *sd = SD_CAST(b);
-	return sd->r1;
+	return sd->status;
 }
 
 static void sd_SpiClearerr(KBlock *b)
 {
 	Sd *sd = SD_CAST(b);
-	sd->r1 = 0;
+	sd->status = 0;
 }
 
 
@@ -369,16 +365,16 @@ static bool sd_blockInit(Sd *sd, KFile *ch)
 	for (int i = 0; i < SD_IDLE_RETRIES; i++)
 	{
 		SD_SELECT(sd);
-		sd->r1 = sd_sendCommand(sd, SD_GO_IDLE_STATE, 0, SD_GO_IDLE_STATE_CRC);
+		sd->status = sd_sendCommand(sd, SD_GO_IDLE_STATE, 0, SD_GO_IDLE_STATE_CRC);
 		sd_select(sd, false);
 
-		if (sd->r1 == SD_IN_IDLE)
+		if (sd->status == SD_IN_IDLE)
 			break;
 	}
 
-	if (sd->r1 != SD_IN_IDLE)
+	if (sd->status != SD_IN_IDLE)
 	{
-		LOG_ERR("go_idle_state failed: %04X\n", sd->r1);
+		LOG_ERR("go_idle_state failed: %08lX\n", sd->status);
 		return false;
 	}
 
@@ -388,35 +384,35 @@ static bool sd_blockInit(Sd *sd, KFile *ch)
 	do
 	{
 		SD_SELECT(sd);
-		sd->r1 = sd_sendCommand(sd, SD_SEND_OP_COND, 0, SD_SEND_OP_COND_CRC);
+		sd->status = sd_sendCommand(sd, SD_SEND_OP_COND, 0, SD_SEND_OP_COND_CRC);
 		sd_select(sd, false);
 		cpu_relax();
 	}
-	while (sd->r1 != 0 && timer_clock() - start < SD_INIT_TIMEOUT);
+	while (sd->status != 0 && timer_clock() - start < SD_INIT_TIMEOUT);
 
-	if (sd->r1)
+	if (sd->status)
 	{
-		LOG_ERR("send_op_cond failed: %04X\n", sd->r1);
+		LOG_ERR("send_op_cond failed: %08lX\n", sd->status);
 		return false;
 	}
 
-	sd->r1 = sd_setBlockLen(sd, SD_DEFAULT_BLOCKLEN);
-	sd->tranfer_len = SD_DEFAULT_BLOCKLEN;
+	sd->status = sd_setBlockLen(sd, SD_DEFAULT_BLOCKLEN);
+	sd->hw->tranfer_len = SD_DEFAULT_BLOCKLEN;
 
-	if (sd->r1)
+	if (sd->status)
 	{
-		LOG_ERR("setBlockLen failed: %04X\n", sd->r1);
+		LOG_ERR("setBlockLen failed: %08lX\n", sd->status);
 		return false;
 	}
 
 	/* Avoid warning for uninitialized csd use (gcc bug?) */
-	CardCSD csd = csd;
+	SDcsd csd = csd;
 
-	sd->r1 = sd_getCSD(sd, &csd);
+	sd->status = sd_getCSD(sd, &csd);
 
-	if (sd->r1)
+	if (sd->status)
 	{
-		LOG_ERR("getCSD failed: %04X\n", sd->r1);
+		LOG_ERR("getCSD failed: %08lX\n", sd->status);
 		return false;
 	}
 
@@ -454,11 +450,14 @@ static const KBlockVTable sd_buffered_vt =
 	.clearerr = sd_SpiClearerr,
 };
 
+struct SdHardware sd_spi_hw;
+
 bool sd_spi_initUnbuf(Sd *sd, KFile *ch)
 {
 	if (sd_blockInit(sd, ch))
 	{
 		sd->b.priv.vt = &sd_unbuffered_vt;
+		sd->hw = &sd_spi_hw;
 		return true;
 	}
 	else
@@ -475,6 +474,7 @@ bool sd_spi_initBuf(Sd *sd, KFile *ch)
 		sd->b.priv.flags |= KB_BUFFERED | KB_PARTIAL_WRITE;
 		sd->b.priv.vt = &sd_buffered_vt;
 		sd->b.priv.vt->load(&sd->b, 0);
+		sd->hw = &sd_spi_hw;
 		return true;
 	}
 	else
