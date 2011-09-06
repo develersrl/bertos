@@ -82,8 +82,8 @@ INLINE void hsmci_setBusWidth(size_t len)
 void hsmci_readResp(uint32_t *resp, size_t len);
 bool hsmci_sendCmd(uint8_t index, uint32_t argument, uint32_t reply_type);
 
-void hsmci_prgRxDMA(uint32_t *buf, size_t word_num, size_t blk_size);
-void hsmci_prgTxDMA(const uint32_t *buf, size_t word_num, size_t blk_size);
+void hsmci_read(uint32_t *buf, size_t word_num, size_t blk_size);
+void hsmci_write(const uint32_t *buf, size_t word_num, size_t blk_size);
 void hsmci_waitTransfer(void);
 
 void hsmci_setSpeed(uint32_t data_rate, int flag);

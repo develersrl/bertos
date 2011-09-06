@@ -576,7 +576,7 @@ int sd_getStatus(Sd *sd, SdSSR *ssr, uint32_t *buf, size_t words)
 	ASSERT(ssr);
 
 	// Status reply with 512bit data, so the block size in byte is 64
-	hsmci_prgRxDMA(buf, words, 64);
+	hsmci_read(buf, words, 64);
 
 	if (hsmci_sendCmd(55, SD_ADDR_TO_RCA(sd->addr), HSMCI_CMDR_RSPTYP_48_BIT))
 	{
@@ -584,8 +584,8 @@ int sd_getStatus(Sd *sd, SdSSR *ssr, uint32_t *buf, size_t words)
 		return -1;
 	}
 
-	uint32_t status = HSMCI_RSPR;
-	if (status & (SD_STATUS_APP_CMD | SD_STATUS_READY))
+	hsmci_readResp(&(sd->status), 1);
+	if (sd->status & (SD_STATUS_APP_CMD | SD_STATUS_READY))
 	{
 		if (hsmci_sendCmd(13, 0, HSMCI_CMDR_RSPTYP_48_BIT |
 				BV(HSMCI_CMDR_TRDIR) | HSMCI_CMDR_TRCMD_START_DATA | HSMCI_CMDR_TRTYP_SINGLE))
@@ -634,7 +634,7 @@ static size_t sd_SdReadDirect(struct KBlock *b, block_idx_t idx, void *buf, size
 	if (sd_selectCard(sd) < 0)
 		return -1;
 
-	hsmci_prgRxDMA(buf, size / 4, sd->b.blk_size);
+	hsmci_read(buf, size / 4, sd->b.blk_size);
 
 	if (hsmci_sendCmd(17, idx * sd->b.blk_size + offset, HSMCI_CMDR_RSPTYP_48_BIT |
 			BV(HSMCI_CMDR_TRDIR) | HSMCI_CMDR_TRCMD_START_DATA | HSMCI_CMDR_TRTYP_SINGLE))
@@ -670,7 +670,7 @@ static size_t sd_SdWriteDirect(KBlock *b, block_idx_t idx, const void *buf, size
 	if (sd_selectCard(sd) < 0)
 		return 0;
 
-	hsmci_prgTxDMA(_buf, size / 4, sd->b.blk_size);
+	hsmci_write(_buf, size / 4, sd->b.blk_size);
 
 	if (hsmci_sendCmd(24, idx * sd->b.blk_size + offset, HSMCI_CMDR_RSPTYP_48_BIT |
 						HSMCI_CMDR_TRCMD_START_DATA | HSMCI_CMDR_TRTYP_SINGLE))

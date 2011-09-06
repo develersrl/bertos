@@ -40,20 +40,12 @@
 
 #include <drv/timer.h>
 #include <drv/irq_cm3.h>
+#include <drv/dmac_sam3.h>
 
 #include <cpu/irq.h>
 
 #include <io/cm3.h>
 
-/** DMA Transfer Descriptor as well as Linked List Item */
-typedef struct DmacDesc
-{
-    uint32_t src_addr;     /**< Source buffer address */
-    uint32_t dst_addr;     /**< Destination buffer address */
-    uint32_t ctrl_a;       /**< Control A register settings */
-    uint32_t ctrl_b;       /**< Control B register settings */
-    uint32_t dsc_addr;     /**< Next descriptor address */
-} DmacDesc;
 
 #define HSMCI_CLK_DIV(RATE)     ((CPU_FREQ / (RATE << 1)) - 1)
 
@@ -75,6 +67,9 @@ typedef struct DmacDesc
 		cpu_relax(); \
 	} while (!(HSMCI_SR & BV(HSMCI_SR_RXRDY)))
 
+
+static Dmac dmac;
+
 static DECLARE_ISR(hsmci_irq)
 {
 	uint32_t status = HSMCI_SR;
@@ -83,15 +78,6 @@ static DECLARE_ISR(hsmci_irq)
 	}
 }
 
-static DECLARE_ISR(dmac_irq)
-{
-	uint32_t stat = DMAC_EBCISR;
-
-	if (stat & BV(DMAC_EBCISR_ERR3))
-	{
-		kprintf("err %08lx\n", stat);
-	}
-}
 
 void hsmci_readResp(uint32_t *resp, size_t len)
 {
@@ -122,52 +108,39 @@ bool hsmci_sendCmd(uint8_t index, uint32_t argument, uint32_t reply_type)
 	return 0;
 }
 
-INLINE void hsmci_setBlockSize(size_t blk_size)
+void hsmci_write(const uint32_t *buf, size_t word_num, size_t blk_size)
 {
 	HSMCI_DMA |= BV(HSMCI_DMA_DMAEN);
 	HSMCI_BLKR = blk_size << HSMCI_BLKR_BLKLEN_SHIFT;
-}
 
-void hsmci_prgTxDMA(const uint32_t *buf, size_t word_num, size_t blk_size)
-{
-
-	hsmci_setBlockSize(blk_size);
-
-	DMAC_CHDR = BV(DMAC_CHDR_DIS0);
-
-	DMAC_SADDR0 = (uint32_t)buf;
-	DMAC_DADDR0 = (uint32_t)&HSMCI_TDR;
-	DMAC_DSCR0 = 0;
-
-	DMAC_CFG0 = BV(DMAC_CFG_DST_H2SEL) | DMAC_CFG_FIFOCFG_ALAP_CFG | (0x1 << DMAC_CFG_AHB_PROT_SHIFT);
-	DMAC_CTRLA0 = (word_num & DMAC_CTRLA_BTSIZE_MASK) |
-		DMAC_CTRLA_SRC_WIDTH_WORD | DMAC_CTRLA_DST_WIDTH_WORD;
-	DMAC_CTRLB0 = (BV(DMAC_CTRLB_SRC_DSCR) | BV(DMAC_CTRLB_DST_DSCR) | DMAC_CTRLB_FC_MEM2PER_DMA_FC |
-					DMAC_CTRLB_DST_INCR_FIXED | DMAC_CTRLB_SRC_INCR_INCREMENTING | BV(DMAC_CTRLB_IEN));
+	uint32_t cfg = BV(DMAC_CFG_DST_H2SEL);
+	uint32_t ctrla = DMAC_CTRLA_SRC_WIDTH_WORD | DMAC_CTRLA_DST_WIDTH_WORD;
+	uint32_t ctrlb = BV(DMAC_CTRLB_SRC_DSCR) | BV(DMAC_CTRLB_DST_DSCR) |
+						DMAC_CTRLB_FC_MEM2PER_DMA_FC |
+						DMAC_CTRLB_DST_INCR_FIXED | DMAC_CTRLB_SRC_INCR_INCREMENTING;
 
 	ASSERT(!(DMAC_CHSR & BV(DMAC_CHSR_ENA0)));
 	DMAC_CHER = BV(DMAC_CHER_ENA0);
 
+	dmac_setSources(&dmac, 0, (uint32_t)buf, (uint32_t)&HSMCI_TDR,  word_num);
+	dmac_configureDmac(&dmac, 0, cfg, ctrla, ctrlb);
+	dmac_start(&dmac, 0);
 }
 
-void hsmci_prgRxDMA(uint32_t *buf, size_t word_num, size_t blk_size)
+void hsmci_read(uint32_t *buf, size_t word_num, size_t blk_size)
 {
-	hsmci_setBlockSize(blk_size);
+	HSMCI_DMA |= BV(HSMCI_DMA_DMAEN);
+	HSMCI_BLKR = blk_size << HSMCI_BLKR_BLKLEN_SHIFT;
 
-	DMAC_CHDR = BV(DMAC_CHDR_DIS0);
+	uint32_t cfg = BV(DMAC_CFG_SRC_H2SEL);
+	uint32_t ctrla = DMAC_CTRLA_SRC_WIDTH_WORD | DMAC_CTRLA_DST_WIDTH_WORD;
+	uint32_t ctrlb = BV(DMAC_CTRLB_SRC_DSCR) | BV(DMAC_CTRLB_DST_DSCR) |
+						DMAC_CTRLB_FC_PER2MEM_DMA_FC |
+						DMAC_CTRLB_DST_INCR_INCREMENTING | DMAC_CTRLB_SRC_INCR_FIXED;
 
-	DMAC_SADDR0 = (uint32_t)&HSMCI_RDR;
-	DMAC_DADDR0 = (uint32_t)buf;
-	DMAC_DSCR0 = 0;
-
-	DMAC_CFG0 = BV(DMAC_CFG_SRC_H2SEL) | DMAC_CFG_FIFOCFG_ALAP_CFG | (0x1 << DMAC_CFG_AHB_PROT_SHIFT);
-	DMAC_CTRLA0 = (word_num & DMAC_CTRLA_BTSIZE_MASK) |
-		DMAC_CTRLA_SRC_WIDTH_WORD | DMAC_CTRLA_DST_WIDTH_WORD;
-	DMAC_CTRLB0 = (BV(DMAC_CTRLB_SRC_DSCR) | BV(DMAC_CTRLB_DST_DSCR) | DMAC_CTRLB_FC_PER2MEM_DMA_FC |
-					DMAC_CTRLB_DST_INCR_INCREMENTING | DMAC_CTRLB_SRC_INCR_FIXED | BV(DMAC_CTRLB_IEN));
-
-	ASSERT(!(DMAC_CHSR & BV(DMAC_CHSR_ENA0)));
-	DMAC_CHER = BV(DMAC_CHER_ENA0);
+	dmac_setSources(&dmac, 0, (uint32_t)&HSMCI_RDR, (uint32_t)buf, word_num);
+	dmac_configureDmac(&dmac, 0, cfg, ctrla, ctrlb);
+	dmac_start(&dmac, 0);
 }
 
 
@@ -209,13 +182,5 @@ void hsmci_init(Hsmci *hsmci)
 	HSMCI_CR = BV(HSMCI_CR_MCIEN);
 	HSMCI_DMA = 0;
 
-	//init DMAC
-	DMAC_EBCIDR = 0x3FFFFF;
-	DMAC_CHDR = 0x1F;
-
-	pmc_periphEnable(DMAC_ID);
-	DMAC_EN = BV(DMAC_EN_ENABLE);
-	sysirq_setHandler(INT_DMAC, dmac_irq);
-
-	DMAC_EBCIER = BV(DMAC_EBCIER_BTC0) | BV(DMAC_EBCIER_ERR0);
+	dmac_init(&dmac);
 }
