@@ -34,10 +34,27 @@
  *
  *
  * \author Luca Ottaviano <lottaviano@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
  */
 
 #ifndef CFG_I2S_H
 #define CFG_I2S_H
+
+/**
+ * Module logging level.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
+ */
+#define I2S_LOG_LEVEL      LOG_LVL_INFO
+
+/**
+ * Module logging format.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define I2S_LOG_FORMAT     LOG_FMT_TERSE
 
 /**
  * Length of each play buffer.
@@ -56,19 +73,65 @@
 #define CONFIG_SAMPLE_FREQ     44100UL
 
 /**
- * Module logging level.
+ * Sample bits per channel.
  *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_level"
+ * $WIZ$ type = "int"
+ * * $WIZ$ min = 8
+ * $WIZ$ max = 32
  */
-#define I2S_LOG_LEVEL      LOG_LVL_INFO
+#define CONFIG_WORD_BIT_SIZE               16
 
 /**
- * Module logging format.
+ * Number of channel.
  *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_format"
+ * $WIZ$ type = "int"
  */
-#define I2S_LOG_FORMAT     LOG_FMT_TERSE
+#define CONFIG_CHANNEL_NUM                  2
+
+/**
+ * Size of trasmit start delay
+ *
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 0
+ * $WIZ$ max = 255
+ */
+#define CONFIG_DELAY                        0
+
+/**
+ * Generate frame sync every 2 x CONFIG_PERIOD bits (zero based)
+ *
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 0
+ * $WIZ$ max = 512
+ */
+#define CONFIG_PERIOD                      15
+
+/**
+ * Number of words transmitted in frame
+ *
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 0
+ * $WIZ$ max = 16
+ */
+#define CONFIG_WORD_PER_FRAME               1
+
+/**
+ * Size of Synchro data register (zero based)
+ *
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 0
+ * $WIZ$ max = 15
+ */
+#define CONFIG_FRAME_SYNC_SIZE             15
+
+
+/**
+ * Extra Size of Synchro data register (CONFIG_FRAME_SYNC_SIZE + CONFIG_EXTRA_FRAME_SYNC_SIZE * 16 + 1) (zero based)
+ *
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 0
+ * $WIZ$ max = 15
+ */
+#define CONFIG_EXTRA_FRAME_SYNC_SIZE       0
 
 #endif /* CFG_I2S_H */

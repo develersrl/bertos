@@ -26,41 +26,86 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * Copyright 2011 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \brief Configuration file for parser module.
+ * \author Stefano Fedrigo <aleph@develer.com>
  *
- * \author Daniele Basile <asterix@develer.com>
+ * \brief Configuration file for NAND driver module.
  */
 
-#ifndef CFG_PARSER_H
-#define CFG_PARSER_H
+#ifndef CFG_NAND_H
+#define CFG_NAND_H
 
 /**
- * Max number of arguments and results for each command
- * $WIZ$ type = "int"
- * $WIZ$ min = 0
- */
-#define CONFIG_PARSER_MAX_ARGS       4
-
-/**
- * Max number of commands
- * $WIZ$ type = "int"
- * $WIZ$ min = 8
- */
-#define CONFIG_MAX_COMMANDS_NUMBER  16
-
-/**
- * Enable compatibility behaviour.
+ * Page data size
  *
- * Skip the first word from incoming commands. Don't enable in new projects.
- * $WIZ$ type = "boolean"
+ * Size of the data section of a programmable page in bytes.
+ *
+ * $WIZ$ type = "int"
  */
-#define CONFIG_ENABLE_COMPAT_BEHAVIOUR 1
+#define CONFIG_NAND_DATA_SIZE         2048
 
-#endif /* CFG_PARSER_H */
+/**
+ * Page spare area size
+ *
+ * Size of the spare section of a programmable page in bytes.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_NAND_SPARE_SIZE        64
 
+/**
+ * Pages per block
+ *
+ * Number of pages in a erase block.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_NAND_PAGES_PER_BLOCK   64
 
+/**
+ * Number of blocks
+ *
+ * Total number of erase blocks in one NAND chip.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_NAND_NUM_BLOCK        2048
 
+/**
+ * Number of reserved blocks
+ *
+ * Blocks reserved for remapping defective NAND blocks.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_NAND_NUM_REMAP_BLOCKS  128
+
+/**
+ * NAND operations timeout
+ *
+ * How many milliseconds the cpu waits for
+ * completion of NAND operations.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_NAND_TMOUT      100
+
+/**
+ * Module logging level
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
+ */
+#define CONFIG_NAND_LOG_LEVEL      LOG_LVL_WARN
+
+/**
+ * Module logging format
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define CONFIG_NAND_LOG_FORMAT     LOG_FMT_TERSE
+
+#endif /* CFG_NAND_H */

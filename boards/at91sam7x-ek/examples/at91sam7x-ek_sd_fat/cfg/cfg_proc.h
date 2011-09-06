@@ -75,6 +75,12 @@
 #define CONFIG_KERN_PRI 0
 
 /**
+ * Priority-inheritance protocol.
+ * $WIZ$ type = "boolean"
+ */
+#define CONFIG_KERN_PRI_INHERIT 0
+
+/**
  * Dynamic memory allocation for processes.
  * $WIZ$ type = "boolean"
  * $WIZ$ conditional_deps = "heap"
