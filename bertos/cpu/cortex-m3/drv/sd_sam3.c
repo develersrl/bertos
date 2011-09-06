@@ -60,20 +60,62 @@
 #define SD_STATUS_CURR_MASK    0x1E00
 #define SD_STATUS_CURR_SHIFT   9
 
+#define SD_READY_FOR_DATA         BV(8)
+#define SD_CARD_IS_LOCKED         BV(25)
+
+#define SD_SEND_CID_RCA     0
+#define SD_SEND_ALL_CID   BV(0)
+
+
 #define SD_ADDR_TO_RCA(addr)    (uint32_t)(((addr) << 16) & 0xFFFF0000)
 #define SD_GET_STATE(status)    (uint8_t)(((status) & SD_STATUS_CURR_MASK) >> SD_STATUS_CURR_SHIFT)
 
 static const uint32_t tran_exp[] =
 {
-    10000,      100000,     1000000,    10000000,
-    0,      0,      0,      0
+	10000,      100000,     1000000,    10000000,
+	0,      0,      0,      0
 };
 
 static const uint8_t tran_mant[] =
 {
-    0,  10, 12, 13, 15, 20, 25, 30,
-    35, 40, 45, 50, 55, 60, 70, 80,
+	0,  10, 12, 13, 15, 20, 25, 30,
+	35, 40, 45, 50, 55, 60, 70, 80,
 };
+
+
+void sd_dumpCsd(SDcsd *csd);
+void sd_dumpCid(SDcid *cid);
+void sd_dumpSsr(SDssr *ssr);
+
+void sd_sendInit(void);
+void sd_goIdle(void);
+int sd_sendIfCond(Sd *sd);
+int sd_sendAppOpCond(Sd *sd);
+
+int sd_getCid(Sd *sd, SDcid *cid, uint32_t addr, uint8_t flag);
+int sd_getCsd(Sd *sd, SDcsd *csd);
+int sd_getSrc(Sd *sd);
+
+int sd_appStatus(Sd *sd);
+int sd_getRelativeAddr(Sd *sd);
+int sd_getStatus(Sd *sd, SDssr *ssr, uint32_t *buf, size_t words);
+
+int sd_selectCard(Sd *sd);
+int sd_deSelectCard(Sd *sd);
+int sd_setBusWidth(Sd *sd, size_t len);
+int sd_set_BlockLen(Sd *sd, size_t len);
+void sd_setHightSpeed(Sd *sd);
+
+
+INLINE int sd_setBus4bit(Sd *sd)
+{
+	return sd_setBusWidth(sd, 4);
+}
+
+INLINE int sd_setBus1bit(Sd *sd)
+{
+	return sd_setBusWidth(sd, 1);
+}
 
 
 LOG_INFOB(
@@ -97,6 +139,48 @@ static void dump(const char *label, uint32_t *r, size_t len)
 }
 )
 
+void sd_dumpCsd(SDcsd *csd)
+{
+	ASSERT(csd);
+
+	LOG_INFO("VERSION: %d.0\n", csd->structure ? 2 : 1);
+	LOG_INFO("CARD COMMAND CLASS: %d\n", csd->ccc);
+	LOG_INFO("MAX DATA RATE: %ld\n", csd->max_data_rate);
+	LOG_INFO("WRITE BLK LEN BITS: %ld\n", csd->write_blk_bits);
+	LOG_INFO("READ BLK LEN BITS: %ld\n", csd->read_blk_bits);
+	LOG_INFO("ERASE SIZE: %ld\n", csd->erase_size);
+	LOG_INFO("BLK NUM: %ld\n", csd->block_num);
+	LOG_INFO("BLK LEN: %ld\n", csd->block_len);
+	LOG_INFO("CAPACITY %ld\n", csd->capacity);
+	LOG_INFO("FLAG Write: WP %d, W MISALIGN %d\n", csd->write_partial, csd->write_misalign);
+	LOG_INFO("FLAG Read: RP %d, R MISALIGN %d\n", csd->read_partial, csd->read_misalign);
+
+}
+
+void sd_dumpCid(SDcid *cid)
+{
+	ASSERT(cid);
+
+	LOG_INFO("MANFID: %d\n", cid->manfid);
+	LOG_INFO("OEMID: %d\n", cid->oemid);
+	LOG_INFO("SERIAL: %ld\n", cid->serial);
+	LOG_INFO("PROD_NAME: %s\n", cid->prod_name);
+	LOG_INFO("REV: %d.%d\n", cid->m_rev, cid->l_rev);
+	LOG_INFO("OFF,Y,M: %lx, %ld %ld\n", cid->year_off, (BCD_TO_INT_32BIT(cid->year_off) / 12) + 2000,
+												(BCD_TO_INT_32BIT(cid->year_off) % 12));
+}
+
+void sd_dumpSsr(SDssr *ssr)
+{
+	ASSERT(ssr);
+
+	LOG_INFO("BUS_WIDTH: %d\n", ssr->bus_width);
+	LOG_INFO("TYPE: %d\n", ssr->card_type);
+	LOG_INFO("AU_TYPE: %d\n", ssr->au_size);
+	LOG_INFO("ERASE_SIZE: %d\n", ssr->erase_size);
+	LOG_INFO("SPEED_CLASS: %d\n", ssr->speed_class);
+}
+
 
 static int sd_decodeCsd(SDcsd *csd, uint32_t *resp, size_t len)
 {
@@ -104,10 +188,10 @@ static int sd_decodeCsd(SDcsd *csd, uint32_t *resp, size_t len)
 	ASSERT(resp);
 	ASSERT(len >= 4);
 
-    csd->structure = UNSTUFF_BITS(resp, 126, 2);
+	csd->structure = UNSTUFF_BITS(resp, 126, 2);
 	csd->ccc = UNSTUFF_BITS(resp, 84, 12);
 
-    csd->max_data_rate  = tran_exp[UNSTUFF_BITS(resp, 96, 3)] * tran_mant[UNSTUFF_BITS(resp, 99, 4)];
+	csd->max_data_rate  = tran_exp[UNSTUFF_BITS(resp, 96, 3)] * tran_mant[UNSTUFF_BITS(resp, 99, 4)];
 
 	/*
 	 * CSD structure:
@@ -119,106 +203,62 @@ static int sd_decodeCsd(SDcsd *csd, uint32_t *resp, size_t len)
 	 * - >1: not defined.
 	 */
 
-    if (csd->structure == 0)
+	if (csd->structure == 0)
 	{
 		// (C_size + 1) x 2^(C_SIZE_MUL+2)
-		csd->blk_num = (1 + UNSTUFF_BITS(resp, 62, 12)) << (UNSTUFF_BITS(resp, 47, 3) + 2);
+		csd->block_num = (1 + UNSTUFF_BITS(resp, 62, 12)) << (UNSTUFF_BITS(resp, 47, 3) + 2);
 
 		csd->read_blk_bits = UNSTUFF_BITS(resp, 80, 4);
 		csd->write_blk_bits = UNSTUFF_BITS(resp, 22, 4);
 
-		csd->blk_len = 1 << csd->read_blk_bits;
-        csd->capacity  = csd->blk_num * csd->blk_len;
+		csd->block_len = 1 << csd->read_blk_bits;
+		csd->capacity  = csd->block_num * csd->block_len;
 
-        csd->read_partial = UNSTUFF_BITS(resp, 79, 1);
-        csd->read_misalign = UNSTUFF_BITS(resp, 77, 1);
+		csd->read_partial = UNSTUFF_BITS(resp, 79, 1);
+		csd->read_misalign = UNSTUFF_BITS(resp, 77, 1);
 
-        csd->write_misalign = UNSTUFF_BITS(resp, 78, 1);
-        csd->write_partial = UNSTUFF_BITS(resp, 21, 1);
+		csd->write_misalign = UNSTUFF_BITS(resp, 78, 1);
+		csd->write_partial = UNSTUFF_BITS(resp, 21, 1);
 
-        if (UNSTUFF_BITS(resp, 46, 1))
+		if (UNSTUFF_BITS(resp, 46, 1))
 		{
-            csd->erase_size = 1;
-        }
+			csd->erase_size = 1;
+		}
 		else if(csd->write_blk_bits >= 9)
 		{
-            csd->erase_size = UNSTUFF_BITS(resp, 39, 7) + 1;
-            csd->erase_size <<= csd->write_blk_bits - 9;
-        }
+			csd->erase_size = UNSTUFF_BITS(resp, 39, 7) + 1;
+			csd->erase_size <<= csd->write_blk_bits - 9;
+		}
 
 		return 0;
 	}
 	else if (csd->structure == 1)
 	{
 		kprintf("csize %ld\n", UNSTUFF_BITS(resp, 48, 22));
-        csd->capacity  = (1 + UNSTUFF_BITS(resp, 48, 22)) << 10;
+		csd->capacity  = (1 + UNSTUFF_BITS(resp, 48, 22)) << 10;
 
 		csd->write_blk_bits = 9;
 		csd->write_partial = 0;
-        csd->write_misalign = 0;
+		csd->write_misalign = 0;
 
 		csd->read_blk_bits = 9;
 		csd->read_partial = 0;
-        csd->read_misalign = 0;
+		csd->read_misalign = 0;
 
-        csd->erase_size = 1;
+		csd->erase_size = 1;
 		// the block size if fixed to 512kb
-		csd->blk_len = (1 << csd->write_blk_bits) << 10;
+		csd->block_len = (1 << csd->write_blk_bits) << 10;
 
-        return 0;
+		return 0;
 	}
-    else
+	else
 	{
-        kprintf("Unrecognised CSD structure version %d\n", csd->structure);
-        return -1;
-    }
+		kprintf("Unrecognised CSD structure version %d\n", csd->structure);
+		return -1;
+	}
 
-    return 0;
+	return 0;
 }
-
-
-void sd_dumpCsd(Sd *sd)
-{
-	ASSERT(sd);
-
-	LOG_INFO("VERSION: %d.0\n", sd->csd.structure ? 2 : 1);
-    LOG_INFO("CARD COMMAND CLASS: %d\n", sd->csd.ccc);
-	LOG_INFO("MAX DATA RATE: %ld\n", sd->csd.max_data_rate);
-	LOG_INFO("WRITE BLK LEN BITS: %ld\n", sd->csd.write_blk_bits);
-	LOG_INFO("READ BLK LEN BITS: %ld\n", sd->csd.read_blk_bits);
-	LOG_INFO("ERASE SIZE: %ld\n", sd->csd.erase_size);
-	LOG_INFO("BLK NUM: %ld\n", sd->csd.blk_num);
-	LOG_INFO("BLK LEN: %ld\n", sd->csd.blk_len);
-	LOG_INFO("CAPACITY %ld\n", sd->csd.capacity);
-	LOG_INFO("FLAG Write: WP %d, W MISALIGN %d\n", sd->csd.write_partial, sd->csd.write_misalign);
-	LOG_INFO("FLAG Read: RP %d, R MISALIGN %d\n", sd->csd.read_partial, sd->csd.read_misalign);
-
-}
-
-void sd_dumpCid(Sd *sd)
-{
-	ASSERT(sd);
-
-	LOG_INFO("MANFID: %d\n", sd->cid.manfid);
-    LOG_INFO("OEMID: %d\n", sd->cid.oemid);
-	LOG_INFO("SERIAL: %ld\n", sd->cid.serial);
-    LOG_INFO("PROD_NAME: %s\n", sd->cid.prod_name);
-    LOG_INFO("REV: %d.%d\n", sd->cid.m_rev, sd->cid.l_rev);
-    LOG_INFO("OFF,Y,M: %lx, %ld %ld\n", sd->cid.year_off, (BCD_TO_INT_32BIT(sd->cid.year_off) / 12) + 2000,
-												(BCD_TO_INT_32BIT(sd->cid.year_off) % 12));
-}
-
-void sd_dumpSsr(Sd *sd)
-{
-	ASSERT(sd);
-
-	LOG_INFO("BUS_WIDTH: %d\n", sd->ssr.bus_width);
-    LOG_INFO("TYPE: %d\n", sd->ssr.card_type);
-	LOG_INFO("AU_TYPE: %d\n", sd->ssr.au_size);
-	LOG_INFO("ERASE_SIZE: %d\n", sd->ssr.erase_size);
-	LOG_INFO("SPEED_CLASS: %d\n", sd->ssr.speed_class);
-}
-
 
 void sd_sendInit(void)
 {
@@ -287,10 +327,11 @@ int sd_sendAppOpCond(Sd *sd)
 }
 
 
-int sd_getCid(Sd *sd, uint32_t addr, uint8_t flag)
+int sd_getCid(Sd *sd, SDcid *cid, uint32_t addr, uint8_t flag)
 {
 	ASSERT(sd);
-	memset(&(sd->cid), 0, sizeof(SDcid));
+	ASSERT(cid);
+	memset(cid, 0, sizeof(SDcid));
 
 	uint8_t idx = 9; // CMD9 get cid from gived sd address (RCA)
 	if (flag & SD_SEND_ALL_CID)
@@ -308,26 +349,27 @@ int sd_getCid(Sd *sd, uint32_t addr, uint8_t flag)
 		hsmci_readResp(resp, 4);
 		LOG_INFOB(dump("CID", resp, 4););
 
-		sd->cid.manfid        = UNSTUFF_BITS(resp, 120, 8);
-		sd->cid.oemid         = UNSTUFF_BITS(resp, 104, 16);
-		sd->cid.prod_name[0]      = UNSTUFF_BITS(resp, 96, 8);
-		sd->cid.prod_name[1]      = UNSTUFF_BITS(resp, 88, 8);
-		sd->cid.prod_name[2]      = UNSTUFF_BITS(resp, 80, 8);
-		sd->cid.prod_name[3]      = UNSTUFF_BITS(resp, 72, 8);
-		sd->cid.prod_name[4]      = UNSTUFF_BITS(resp, 64, 8);
-		sd->cid.m_rev         = UNSTUFF_BITS(resp, 60, 4);
-		sd->cid.l_rev         = UNSTUFF_BITS(resp, 56, 4);
-		sd->cid.serial        = (uint32_t)UNSTUFF_BITS(resp, 24, 32);
-		sd->cid.year_off      = UNSTUFF_BITS(resp, 8, 12);
+		cid->manfid        = UNSTUFF_BITS(resp, 120, 8);
+		cid->oemid         = UNSTUFF_BITS(resp, 104, 16);
+		cid->prod_name[0]      = UNSTUFF_BITS(resp, 96, 8);
+		cid->prod_name[1]      = UNSTUFF_BITS(resp, 88, 8);
+		cid->prod_name[2]      = UNSTUFF_BITS(resp, 80, 8);
+		cid->prod_name[3]      = UNSTUFF_BITS(resp, 72, 8);
+		cid->prod_name[4]      = UNSTUFF_BITS(resp, 64, 8);
+		cid->m_rev         = UNSTUFF_BITS(resp, 60, 4);
+		cid->l_rev         = UNSTUFF_BITS(resp, 56, 4);
+		cid->serial        = (uint32_t)UNSTUFF_BITS(resp, 24, 32);
+		cid->year_off      = UNSTUFF_BITS(resp, 8, 12);
 	}
 
 	return 0;
 }
 
-int sd_getCsd(Sd *sd)
+int sd_getCsd(Sd *sd, SDcsd *csd)
 {
 	ASSERT(sd);
-	memset(&(sd->csd), 0, sizeof(SDcsd));
+	ASSERT(csd);
+	memset(csd, 0, sizeof(SDcsd));
 
 	LOG_INFO("Send to RCA: %lx\n", SD_ADDR_TO_RCA(sd->addr));
 	if (hsmci_sendCmd(9, SD_ADDR_TO_RCA(sd->addr), HSMCI_CMDR_RSPTYP_136_BIT))
@@ -340,7 +382,7 @@ int sd_getCsd(Sd *sd)
 		uint32_t resp[4];
 		hsmci_readResp(resp, 4);
 		LOG_INFOB(dump("CSD", resp, 4););
-		sd_decodeCsd(&(sd->csd), resp, 4);
+		sd_decodeCsd(csd, resp, 4);
 	}
 
 	return 0;
@@ -503,7 +545,7 @@ int sd_set_BlockLen(Sd *sd, size_t len)
 	LOG_INFOB(dump("SET_BLK_LEN", &(sd->status), 1););
 	LOG_INFO("State[%d]\n", SD_GET_STATE(sd->status));
 
-	sd->csd.blk_len = len;
+	sd->b.blk_size = len;
 
 	if (sd->status & SD_STATUS_READY)
 		return 0;
@@ -511,9 +553,10 @@ int sd_set_BlockLen(Sd *sd, size_t len)
 	return -1;
 }
 
-int sd_getStatus(Sd *sd, uint32_t *buf, size_t words)
+int sd_getStatus(Sd *sd, SDssr *ssr, uint32_t *buf, size_t words)
 {
 	ASSERT(sd);
+	ASSERT(ssr);
 
 	// Status reply with 512bit data, so the block size in byte is 64
 	hsmci_prgRxDMA(buf, words, 64);
@@ -543,13 +586,12 @@ int sd_getStatus(Sd *sd, uint32_t *buf, size_t words)
 			hsmci_waitTransfer();
 
 			LOG_INFOB(dump("STATUS", buf, words););
-			memset(&(sd->ssr), 0, sizeof(SDssr));
-
-			sd->ssr.bus_width  = UNSTUFF_BITS(buf, 510, 2);
-			sd->ssr.card_type  = UNSTUFF_BITS(buf, 480, 16);
-			sd->ssr.au_size  = UNSTUFF_BITS(buf, 432, 8);
-			sd->ssr.speed_class  = UNSTUFF_BITS(buf, 440, 8);
-			sd->ssr.erase_size = UNSTUFF_BITS(buf, 408, 24);
+			memset(ssr, 0, sizeof(SDssr));
+			ssr->bus_width  = UNSTUFF_BITS(buf, 510, 2);
+			ssr->card_type  = UNSTUFF_BITS(buf, 480, 16);
+			ssr->au_size  = UNSTUFF_BITS(buf, 432, 8);
+			ssr->speed_class  = UNSTUFF_BITS(buf, 440, 8);
+			ssr->erase_size = UNSTUFF_BITS(buf, 408, 24);
 
 			return 0;
 		}
@@ -575,9 +617,9 @@ static size_t sd_SdReadDirect(struct KBlock *b, block_idx_t idx, void *buf, size
 	if (sd_selectCard(sd) < 0)
 		return -1;
 
-	hsmci_prgRxDMA(buf, size / 4, sd->csd.blk_len);
+	hsmci_prgRxDMA(buf, size / 4, sd->b.blk_size);
 
-	if (hsmci_sendCmd(17, idx * sd->csd.blk_len + offset, HSMCI_CMDR_RSPTYP_48_BIT |
+	if (hsmci_sendCmd(17, idx * sd->b.blk_size + offset, HSMCI_CMDR_RSPTYP_48_BIT |
 			BV(HSMCI_CMDR_TRDIR) | HSMCI_CMDR_TRCMD_START_DATA | HSMCI_CMDR_TRTYP_SINGLE))
 	{
 		LOG_ERR("SIGLE_BLK_READ: %lx\n", HSMCI_SR);
@@ -611,9 +653,9 @@ static size_t sd_SdWriteDirect(KBlock *b, block_idx_t idx, const void *buf, size
 	if (sd_selectCard(sd) < 0)
 		return 0;
 
-	hsmci_prgTxDMA(_buf, size / 4, sd->csd.blk_len);
+	hsmci_prgTxDMA(_buf, size / 4, sd->b.blk_size);
 
-	if (hsmci_sendCmd(24, idx * sd->csd.blk_len + offset, HSMCI_CMDR_RSPTYP_48_BIT |
+	if (hsmci_sendCmd(24, idx * sd->b.blk_size + offset, HSMCI_CMDR_RSPTYP_48_BIT |
 						HSMCI_CMDR_TRCMD_START_DATA | HSMCI_CMDR_TRTYP_SINGLE))
 	{
 		LOG_ERR("SIGLE_BLK_WRITE: %lx\n", HSMCI_SR);
@@ -680,11 +722,12 @@ static bool sd_blockInit(Sd *sd, KFile *ch)
 
 	if (sd_power_on)
 	{
-		if(sd_getCid(sd, 0, SD_SEND_ALL_CID) < 0)
+		SDcid cid;
+		if(sd_getCid(sd, &cid, 0, SD_SEND_ALL_CID) < 0)
 			return false;
 		else
 		{
-			sd_dumpCid(sd);
+			sd_dumpCid(&cid);
 		}
 
 		if (sd_getRelativeAddr(sd) < 0)
@@ -694,12 +737,14 @@ static bool sd_blockInit(Sd *sd, KFile *ch)
 			LOG_INFO("RCA: %0lx\n", sd->addr);
 		}
 
-
-		if (sd_getCsd(sd) < 0)
+		SDcsd csd;
+		if (sd_getCsd(sd, &csd) < 0)
 			return false;
 		else
 		{
-			sd_dumpCsd(sd);
+			sd->b.blk_cnt = csd.block_num * (csd.block_len / SD_DEFAULT_BLOCKLEN);
+			LOG_INFO("blk_size %d, blk_cnt %ld\n", sd->b.blk_size, sd->b.blk_cnt);
+			sd_dumpCsd(&csd);
 		}
 
 		if (sd_appStatus(sd) < 0)
@@ -721,10 +766,6 @@ static bool sd_blockInit(Sd *sd, KFile *ch)
 			sd_setBus4bit(sd);
 			sd_setHightSpeed(sd);
 			sd_deSelectCard(sd);
-
-			sd->b.blk_size = SD_DEFAULT_BLOCKLEN;
-			sd->b.blk_cnt = sd->csd.blk_num * (sd->csd.blk_len / SD_DEFAULT_BLOCKLEN);
-			LOG_INFO("blk_size %d, blk_cnt %ld\n", sd->b.blk_size, sd->b.blk_cnt);
 
 			#if CONFIG_SD_AUTOASSIGN_FAT
 				disk_assignDrive(&sd->b, 0);
