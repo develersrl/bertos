@@ -51,34 +51,32 @@
 
 #include <fs/fatfs/diskio.h>
 
-#if CPU_CM3_SAM3X8
-
 typedef struct SDcid
 {
-    uint8_t        manfid;
-    uint8_t        prod_name[8];
-    uint32_t       serial;
-    uint16_t       oemid;
-    uint32_t       year_off;
-    uint8_t        m_rev;
-    uint8_t        l_rev;
+	uint8_t        manfid;
+	uint8_t        prod_name[8];
+	uint32_t       serial;
+	uint16_t       oemid;
+	uint32_t       year_off;
+	uint8_t        m_rev;
+	uint8_t        l_rev;
 }SDcid;
 
 typedef struct SDcsd
 {
 	uint8_t     structure;
-    uint8_t     ccc;          ///< Card command classes
-    uint32_t    erase_size;  ///< The size of an erasable sector, in write block len
+	uint8_t     ccc;          ///< Card command classes
+	uint32_t    erase_size;  ///< The size of an erasable sector, in write block len
 	uint32_t    capacity;     ///< Card size in byte
 	uint32_t    max_data_rate; ///< Step rate, usec
-    uint32_t    blk_len;      ///< Block data size len in byte
-	uint32_t    blk_num;      ///< Number of block in card
+	uint32_t    block_len;      ///< Block data size len in byte
+	uint32_t    block_num;      ///< Number of block in card
 	uint32_t  	write_blk_bits; ///< Max write block length in bits
 	uint32_t  	read_blk_bits;  ///< Max read block length in bits
-    uint8_t     read_partial:1,
-                read_misalign:1,
-                write_partial:1,
-                write_misalign:1;
+	uint8_t     read_partial:1,
+				read_misalign:1,
+				write_partial:1,
+				write_misalign:1;
 } SDcsd;
 
 typedef struct SDssr
@@ -89,15 +87,6 @@ typedef struct SDssr
 	uint8_t    au_size;
 	uint8_t    erase_size;
 } SDssr;
-
-
-#define SD_READY_FOR_DATA         BV(8)
-#define SD_CARD_IS_LOCKED         BV(25)
-
-#define SD_SEND_CID_RCA     0
-#define SD_SEND_ALL_CID   BV(0)
-
-#endif
 
 #define SD_START_DELAY  10
 #define SD_INIT_TIMEOUT ms_to_ticks(2000)
@@ -114,25 +103,17 @@ typedef struct SDssr
 
 #define SD_UNBUFFERED     BV(0) ///< Open SD memory disabling page caching, no modification and partial write are allowed.
 
+struct SdHardware* hw;
 /**
  * SD Card context structure.
  */
 typedef struct Sd
 {
-
 	KBlock b;   ///< KBlock base class
 	KFile *ch;  ///< SPI communication channel
-	uint16_t r1;  ///< Last status data received from SD
-	uint16_t tranfer_len; ///< Lenght for the read/write commands, cached in order to increase speed.
-
-	#if CPU_CM3_SAM3X8
-	SDcid cid;
-	SDcsd csd;
-	SDssr ssr;
+	struct SdHardware* hw;
 	uint32_t addr;
 	uint32_t status;
-	#endif
-
 } Sd;
 
 bool sd_hw_initUnbuf(Sd *sd, KFile *ch);
@@ -140,47 +121,6 @@ bool sd_hw_initBuf(Sd *sd, KFile *ch);
 
 bool sd_spi_initUnbuf(Sd *sd, KFile *ch);
 bool sd_spi_initBuf(Sd *sd, KFile *ch);
-
-#if CPU_CM3_SAM3X8
-
-void sd_dumpCsd(Sd *sd);
-void sd_dumpCid(Sd *sd);
-void sd_dumpSsr(Sd *sd);
-
-void sd_sendInit(void);
-void sd_goIdle(void);
-int sd_sendIfCond(Sd *sd);
-int sd_sendAppOpCond(Sd *sd);
-
-int sd_getCid(Sd *sd, uint32_t addr, uint8_t flag);
-int sd_getCsd(Sd *sd);
-int sd_getSrc(Sd *sd);
-
-int sd_appStatus(Sd *sd);
-int sd_getRelativeAddr(Sd *sd);
-
-int sd_getStatus(Sd *sd, uint32_t *buf, size_t words);
-
-int sd_selectCard(Sd *sd);
-int sd_deSelectCard(Sd *sd);
-int sd_setBusWidth(Sd *sd, size_t len);
-int sd_set_BlockLen(Sd *sd, size_t len);
-void sd_setHightSpeed(Sd *sd);
-int sd_readSingleBlock(Sd *sd, size_t index, uint32_t *buf, size_t words);
-int sd_writeSingleBlock(Sd *sd, size_t index, uint32_t *buf, size_t words);
-
-
-INLINE int sd_setBus4bit(Sd *sd)
-{
-	return sd_setBusWidth(sd, 4);
-}
-
-INLINE int sd_setBus1bit(Sd *sd)
-{
-	return sd_setBusWidth(sd, 1);
-}
-
-#endif
 
 // For old compatibility.
 #ifndef CONFIG_SD_MODE
