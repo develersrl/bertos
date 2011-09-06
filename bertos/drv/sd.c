@@ -47,6 +47,11 @@
 
 #include <string.h>
 
+
+#ifdef SD_INCLUDE_SPI_SOURCE
+	#include <drv/sd_spi.c>
+#endif
+
 void sd_writeTest(Sd *sd)
 {
 	uint8_t buf[SD_DEFAULT_BLOCKLEN];

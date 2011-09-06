@@ -182,8 +182,14 @@ INLINE int sd_setBus1bit(Sd *sd)
 
 #endif
 
+// For old compatibility.
+#ifndef CONFIG_SD_MODE
+	#define CONFIG_SD_MODE  SD_SPI_MODE
+	#define SD_INCLUDE_SPI_SOURCE
+#endif
 
 #if CONFIG_SD_OLD_INIT
+
 	#if !(ARCH & ARCH_NIGHTTEST)
 		#warning "Deprecated: this API will be removed in the next major release,"
 		#warning "please disable CONFIG_SD_OLD_INIT and pass explicitly the SD context to sd_init()."
