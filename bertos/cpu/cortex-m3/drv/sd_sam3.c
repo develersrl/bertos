@@ -60,6 +60,32 @@
 #define SD_STATUS_READY        BV(8)
 #define SD_CARD_IS_LOCKED      BV(25)
 
+#define SD_OCR_CCS              BV(30)     /**< SD Card Capacity Status (CCS) */
+#define SD_OCR_BUSY             BV(31)     /**< SD/MMC Card power up status bit (busy) */
+
+#define SD_OCR_VDD_27_28        BV(15)
+#define SD_OCR_VDD_28_29        BV(16)
+#define SD_OCR_VDD_29_30        BV(17)
+#define SD_OCR_VDD_30_31        BV(18)
+#define SD_OCR_VDD_31_32        BV(19)
+#define SD_OCR_VDD_32_33        BV(20)
+
+
+#define SD_HOST_VOLTAGE_RANGE     (SD_OCR_VDD_27_28 | \
+                                   SD_OCR_VDD_28_29 | \
+                                   SD_OCR_VDD_29_30 | \
+                                   SD_OCR_VDD_30_31 | \
+                                   SD_OCR_VDD_31_32 | \
+                                   SD_OCR_VDD_32_33)
+
+
+#define CMD8_V_RANGE_CHECK_PAT    0xAA
+#define CMD8_V_RANGE_27V_36V      (0x100 | CMD8_V_RANGE_CHECK_PAT)
+#define CMD8_V_RANGE_LOW          (0x1000 | CMD8_V_RANGE_CHECK_PAT)
+#define CMD8_V_ECHO_REPLY         0xFF
+#define CMD8_SUPP_V_RANGE_REPLY   0xFF00
+
+
 #define SD_GET_ERRORS(status)   ((status) & 0xFFF80000)
 #define SD_ADDR_TO_RCA(addr)    (uint32_t)(((addr) << 16) & 0xFFFF0000)
 #define SD_GET_STATE(status)    (uint8_t)(((status) & 0x1E00) >> 9)
@@ -595,7 +621,7 @@ int sd_getStatus(Sd *sd, SdSSR *ssr, uint32_t *buf, size_t words)
 void sd_setHightSpeed(Sd *sd)
 {
 	(void)sd;
-	hsmci_setSpeed(2100000, true);
+	hsmci_setSpeed(HSMCI_HIGH_SPEED, HSMCI_HS_MODE);
 }
 
 

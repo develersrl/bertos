@@ -43,31 +43,6 @@
 
 #include <io/cm3.h>
 
-#define CMD8_V_RANGE_CHECK_PAT    0xAA
-#define CMD8_V_RANGE_27V_36V      (0x100 | CMD8_V_RANGE_CHECK_PAT)
-#define CMD8_V_RANGE_LOW          (0x1000 | CMD8_V_RANGE_CHECK_PAT)
-#define CMD8_V_ECHO_REPLY         0xFF
-#define CMD8_SUPP_V_RANGE_REPLY   0xFF00
-
-
-#define SD_OCR_CCS              BV(30)     /**< SD Card Capacity Status (CCS) */
-#define SD_OCR_BUSY             BV(31)     /**< SD/MMC Card power up status bit (busy) */
-
-#define SD_OCR_VDD_27_28        BV(15)
-#define SD_OCR_VDD_28_29        BV(16)
-#define SD_OCR_VDD_29_30        BV(17)
-#define SD_OCR_VDD_30_31        BV(18)
-#define SD_OCR_VDD_31_32        BV(19)
-#define SD_OCR_VDD_32_33        BV(20)
-
-
-#define SD_HOST_VOLTAGE_RANGE     (SD_OCR_VDD_27_28 | \
-                                   SD_OCR_VDD_28_29 | \
-                                   SD_OCR_VDD_29_30 | \
-                                   SD_OCR_VDD_30_31 | \
-                                   SD_OCR_VDD_31_32 | \
-                                   SD_OCR_VDD_32_33)
-
 #define HSMCI_CHECK_BUSY() \
 	do { \
 		cpu_relax(); \
@@ -75,6 +50,9 @@
 
 
 #define HSMCI_INIT_SPEED  400000
+#define HSMCI_HIGH_SPEED  2100000
+
+#define HSMCI_HS_MODE     BV(0)
 
 typedef struct Hsmci
 {

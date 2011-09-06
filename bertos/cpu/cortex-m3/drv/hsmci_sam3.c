@@ -179,7 +179,7 @@ void hsmci_waitTransfer(void)
 
 void hsmci_setSpeed(uint32_t data_rate, int flag)
 {
-	if (flag)
+	if (flag & HSMCI_HS_MODE)
 		HSMCI_CFG |= BV(HSMCI_CFG_HSMODE);
 	else
 		HSMCI_CFG &= ~BV(HSMCI_CFG_HSMODE);
