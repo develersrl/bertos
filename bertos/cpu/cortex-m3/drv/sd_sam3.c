@@ -55,20 +55,14 @@
 #include <string.h> /* memset */
 
 
+#define SD_SEND_ALL_CID        BV(0)
 #define SD_STATUS_APP_CMD      BV(5)
 #define SD_STATUS_READY        BV(8)
-#define SD_STATUS_CURR_MASK    0x1E00
-#define SD_STATUS_CURR_SHIFT   9
+#define SD_CARD_IS_LOCKED      BV(25)
 
-#define SD_READY_FOR_DATA         BV(8)
-#define SD_CARD_IS_LOCKED         BV(25)
-
-#define SD_SEND_CID_RCA     0
-#define SD_SEND_ALL_CID   BV(0)
-
-
+#define SD_GET_ERRORS(status)   ((status) & 0xFFF80000)
 #define SD_ADDR_TO_RCA(addr)    (uint32_t)(((addr) << 16) & 0xFFFF0000)
-#define SD_GET_STATE(status)    (uint8_t)(((status) & SD_STATUS_CURR_MASK) >> SD_STATUS_CURR_SHIFT)
+#define SD_GET_STATE(status)    (uint8_t)(((status) & 0x1E00) >> 9)
 
 static const uint32_t tran_exp[] =
 {
@@ -318,11 +312,8 @@ int sd_sendAppOpCond(Sd *sd)
 				LOG_INFO("SD power up! Hight Capability [%d]\n", (bool)((sd->status) & SD_OCR_CCS));
 				return 0;
 			}
-
-			LOG_ERR("sd not ready.\n");
 		}
 	}
-
 	return -1;
 }
 
@@ -683,7 +674,7 @@ static size_t sd_SdWriteDirect(KBlock *b, block_idx_t idx, const void *buf, size
 static int sd_SdError(KBlock *b)
 {
 	Sd *sd = SD_CAST(b);
-	return 0;//sd->status;
+	return SD_GET_ERRORS(sd->status);
 }
 
 static void sd_SdClearerr(KBlock *b)
@@ -694,6 +685,7 @@ static void sd_SdClearerr(KBlock *b)
 
 static bool sd_blockInit(Sd *sd, KFile *ch)
 {
+	(void)ch;
 	ASSERT(sd);
 	memset(sd, 0, sizeof(*sd));
 	DB(sd->b.priv.type = KBT_SD);
@@ -759,7 +751,7 @@ static bool sd_blockInit(Sd *sd, KFile *ch)
 			return false;
 		}
 
-		if (sd->status & SD_READY_FOR_DATA)
+		if (sd->status & SD_STATUS_READY)
 		{
 			sd_selectCard(sd);
 			sd_set_BlockLen(sd, SD_DEFAULT_BLOCKLEN);
@@ -774,7 +766,7 @@ static bool sd_blockInit(Sd *sd, KFile *ch)
 			return true;
 		}
 	}
-
+	LOG_ERR("SD not ready.\n");
 	return false;
 }
 
