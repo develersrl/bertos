@@ -37,6 +37,7 @@ sd_fat_WIZARD_CSRC = \
 	bertos/struct/kfile_fifo.c \
 	bertos/mware/formatwr.c \
 	bertos/drv/sd.c \
+	bertos/drv/sd_spi.c \
 	bertos/io/kblock.c \
 	bertos/mware/event.c \
 	bertos/cpu/arm/drv/sysirq_at91.c \
