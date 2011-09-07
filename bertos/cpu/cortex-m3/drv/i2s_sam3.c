@@ -44,6 +44,8 @@
 
 #include <drv/timer.h>
 #include <drv/i2s.h>
+#include <drv/dmac_sam3.h>
+
 #include <cpu/irq.h>
 
 #include <io/cm3.h>
@@ -53,7 +55,7 @@ struct I2sHardware
 };
 
 struct I2sHardware i2s_hw;
-
+static Dmac dmac;
 
 /* We divite for 2 because the min clock for i2s i MCLK/2 */
 #define MCK_DIV     (CPU_FREQ / (48000 * CONFIG_WORD_BIT_SIZE * CONFIG_CHANNEL_NUM * 2))
@@ -79,8 +81,6 @@ static void sam3_i2s_txWait(I2s *i2s)
 static void sam3_i2s_txStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 {
 	(void)i2s;
-	(void)buf;
-	(void)len;
 	(void)slice_len;
 }
 
@@ -107,27 +107,49 @@ static void sam3_i2s_rxStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 static bool sam3_i2s_isTxFinish(struct I2s *i2s)
 {
 	(void)i2s;
-	return false;
+	return dmac_isDone(&dmac);
 }
 
 static bool sam3_i2s_isRxFinish(struct I2s *i2s)
 {
 	(void)i2s;
-	return false;
+	return dmac_isDone(&dmac);;
 }
 
 static void sam3_i2s_txBuf(struct I2s *i2s, void *buf, size_t len)
 {
 	(void)i2s;
-	(void)buf;
-	(void)len;
+
+	uint32_t cfg = BV(DMAC_CFG_DST_H2SEL) |
+				((3 << DMAC_CFG_DST_PER_SHIFT) & DMAC_CFG_DST_PER_MASK) | (3 & DMAC_CFG_SRC_PER_MASK);
+	uint32_t ctrla = DMAC_CTRLA_SRC_WIDTH_HALF_WORD | DMAC_CTRLA_DST_WIDTH_HALF_WORD;
+	uint32_t ctrlb = BV(DMAC_CTRLB_SRC_DSCR) | BV(DMAC_CTRLB_DST_DSCR) |
+				DMAC_CTRLB_FC_MEM2PER_DMA_FC |
+				DMAC_CTRLB_DST_INCR_FIXED | DMAC_CTRLB_SRC_INCR_INCREMENTING;
+
+	dmac_setSources(&dmac, (uint32_t)buf, (uint32_t)&SSC_THR);
+	dmac_configureDmac(&dmac, len, cfg, ctrla, ctrlb);
+	dmac_start(&dmac);
+
+	SSC_CR = BV(SSC_TXEN);
 }
 
 static void sam3_i2s_rxBuf(struct I2s *i2s, void *buf, size_t len)
 {
 	(void)i2s;
-	(void)buf;
-	(void)len;
+
+	uint32_t cfg = BV(DMAC_CFG_SRC_H2SEL) |
+				((3 << DMAC_CFG_DST_PER_SHIFT) & DMAC_CFG_DST_PER_MASK) | (3 & DMAC_CFG_SRC_PER_MASK);
+	uint32_t ctrla = DMAC_CTRLA_SRC_WIDTH_HALF_WORD | DMAC_CTRLA_DST_WIDTH_HALF_WORD;
+	uint32_t ctrlb = BV(DMAC_CTRLB_SRC_DSCR) | BV(DMAC_CTRLB_DST_DSCR) |
+						DMAC_CTRLB_FC_PER2MEM_DMA_FC |
+						DMAC_CTRLB_DST_INCR_INCREMENTING | DMAC_CTRLB_SRC_INCR_FIXED;
+
+	dmac_setSources(&dmac, (uint32_t)&SSC_RHR, (uint32_t)buf);
+	dmac_configureDmac(&dmac, len, cfg, ctrla, ctrlb);
+	dmac_start(&dmac);
+
+	SSC_CR = BV(SSC_RXEN);
 }
 
 static int sam3_i2s_write(struct I2s *i2s, uint32_t sample)
@@ -137,8 +159,6 @@ static int sam3_i2s_write(struct I2s *i2s, uint32_t sample)
 	SSC_THR = sample;
 	return 0;
 }
-
-
 
 static uint32_t sam3_i2s_read(struct I2s *i2s)
 {
@@ -211,5 +231,7 @@ void i2s_init(I2s *i2s, int channel)
 
 
 	SSC_IDR = 0xFFFFFFFF;
-	SSC_CR = BV(SSC_TXEN) | BV(SSC_RXEN);
+	SSC_CR = BV(SSC_TXDIS) | BV(SSC_RXDIS);
+
+	dmac_init(&dmac, 1);
 }
