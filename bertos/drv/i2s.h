@@ -162,7 +162,6 @@ INLINE void i2s_dmaTxStop(I2s *i2s)
 	i2s->ctx.tx_stop(i2s);
 }
 
-
 INLINE void i2s_dmaStartRxStreaming(I2s *i2s, void *buf, size_t len, size_t slice_len, i2s_dma_callback_t callback)
 {
 	ASSERT(i2s->ctx.rx_start);
@@ -173,8 +172,6 @@ INLINE void i2s_dmaStartRxStreaming(I2s *i2s, void *buf, size_t len, size_t slic
 	i2s->ctx.rx_slice_len = slice_len;
 	i2s->ctx.rx_start(i2s, buf, len, slice_len);
 }
-
-
 
 INLINE void i2s_dmaRxStop(I2s *i2s)
 {
