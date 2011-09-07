@@ -49,25 +49,33 @@ typedef struct DmacDesc
 {
     uint32_t src_addr;     ///< Source buffer address
     uint32_t dst_addr;     ///< Destination buffer address
-    uint32_t ctrl_a;       ///< Control A register settings
-    uint32_t ctrl_b;       ///< Control B register settings
+    uint32_t ctrla;       ///< Control A register settings
+    uint32_t ctrlb;       ///< Control B register settings
     uint32_t dsc_addr;     ///< Next descriptor address
 } DmacDesc;
 
 typedef struct Dmac
 {
+	DmacDesc lli;
+	uint8_t ch;
 	uint8_t errors;
 	size_t transfer_size;
 } Dmac;
 
 #define DMAC_ERR_CH_ALREDY_ON    BV(0)
 
-void dmac_setSources(Dmac *dmac, uint8_t ch, uint32_t src, uint32_t dst, size_t transfer_size);
-void dmac_configureDmac(Dmac *dmac, uint8_t ch, uint32_t cfg, uint32_t ctrla, uint32_t ctrlb);
-int dmac_start(Dmac *dmac, uint8_t ch);
-bool dmac_isDone(Dmac *dmac, uint8_t ch);
-bool dmac_waitDone(Dmac *dmac, uint8_t ch);
+void dmac_setSourcesLLI(Dmac *dmac, DmacDesc *lli, uint32_t src, uint32_t dst, uint32_t desc);
+void dmac_configureDmacLLI(Dmac *dmac, DmacDesc *lli, size_t transfer_size, uint32_t cfg, uint32_t ctrla, uint32_t ctrlb);
+bool dmac_isLLIDone(Dmac *dmac);
+bool dmac_waitLLIDone(Dmac *dmac);
 
-void dmac_init(Dmac *dmac);
+void dmac_setSources(Dmac *dmac, uint32_t src, uint32_t dst);
+void dmac_configureDmac(Dmac *dmac, size_t transfer_size, uint32_t cfg, uint32_t ctrla, uint32_t ctrlb);
+int dmac_start(Dmac *dmac);
+bool dmac_isDone(Dmac *dmac);
+bool dmac_waitDone(Dmac *dmac);
+int dmac_error(Dmac *dmac);
+
+void dmac_init(Dmac *dmac, int channel);
 
 #endif /* DRV_DMAC_SAM3_H */

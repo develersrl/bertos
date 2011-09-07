@@ -35,17 +35,14 @@
  */
 
 #include "dmac_sam3.h"
-
-#include "hsmci_sam3.h"
-#include "hw/hw_sd.h"
-
-#include <drv/timer.h>
 #include <drv/irq_cm3.h>
 
 #include <cpu/irq.h>
 #include <cpu/power.h>
 
 #include <io/cm3.h>
+
+#include <string.h>
 
 struct DmacCh
 {
@@ -110,66 +107,106 @@ struct DmacCh dmac_ch[] =
 	},
 };
 
-void dmac_setSources(Dmac *dmac, uint8_t ch, uint32_t src, uint32_t dst, size_t transfer_size)
+void dmac_setSourcesLLI(Dmac *dmac, DmacDesc *lli, uint32_t src, uint32_t dst, uint32_t desc)
 {
-	ASSERT(ch <= DMAC_CHANNEL_CNT);
+	ASSERT(lli);
+	DMAC_CHDR = BV(dmac->ch);
 
-	DMAC_CHDR = BV(ch);
-
-	*dmac_ch[ch].src = src;
-	*dmac_ch[ch].dst = dst;
-	*dmac_ch[ch].desc = 0;
-	dmac->transfer_size = transfer_size;
+	lli->src_addr = src;
+	lli->dst_addr = dst;
+	lli->dsc_addr = desc;
 }
 
-void dmac_configureDmac(Dmac *dmac, uint8_t ch, uint32_t cfg, uint32_t ctrla, uint32_t ctrlb)
+void dmac_configureDmacLLI(Dmac *dmac, DmacDesc *lli, size_t transfer_size, uint32_t cfg, uint32_t ctrla, uint32_t ctrlb)
 {
-	ASSERT(ch <= DMAC_CHANNEL_CNT);
+	DMAC_CHDR = BV(dmac->ch);
 
-	DMAC_CHDR = BV(ch);
-
-	*dmac_ch[ch].cfg = cfg | DMAC_CFG_FIFOCFG_ALAP_CFG | (0x1 << DMAC_CFG_AHB_PROT_SHIFT);
-	*dmac_ch[ch].ctrla = ctrla | (dmac->transfer_size & DMAC_CTRLA_BTSIZE_MASK);
-	*dmac_ch[ch].ctrlb = ctrlb | BV(DMAC_CTRLB_IEN);
+	*dmac_ch[dmac->ch].cfg = cfg | DMAC_CFG_FIFOCFG_ALAP_CFG | (0x1 << DMAC_CFG_AHB_PROT_SHIFT);
+	lli->ctrla = ctrla | (transfer_size & DMAC_CTRLA_BTSIZE_MASK);
+	lli->ctrlb = ctrlb | BV(DMAC_CTRLB_IEN);
+	*dmac_ch[dmac->ch].desc = (uint32_t)lli;
 }
 
-int dmac_start(Dmac *dmac, uint8_t ch)
+void dmac_setSources(Dmac *dmac, uint32_t src, uint32_t dst)
 {
-	ASSERT(ch <= DMAC_CHANNEL_CNT);
+	DMAC_CHDR = BV(dmac->ch);
 
-	if (DMAC_CHSR & BV(ch))
+	*dmac_ch[dmac->ch].src = src;
+	*dmac_ch[dmac->ch].dst = dst;
+	*dmac_ch[dmac->ch].desc = 0;
+}
+
+void dmac_configureDmac(Dmac *dmac, size_t transfer_size, uint32_t cfg, uint32_t ctrla, uint32_t ctrlb)
+{
+	DMAC_CHDR = BV(dmac->ch);
+
+	*dmac_ch[dmac->ch].cfg = cfg | DMAC_CFG_FIFOCFG_ALAP_CFG | (0x1 << DMAC_CFG_AHB_PROT_SHIFT);
+	*dmac_ch[dmac->ch].ctrla = ctrla | (transfer_size & DMAC_CTRLA_BTSIZE_MASK);
+	*dmac_ch[dmac->ch].ctrlb = ctrlb | BV(DMAC_CTRLB_IEN);
+}
+
+int dmac_start(Dmac *dmac)
+{
+	if (DMAC_CHSR & BV(dmac->ch))
 	{
 		dmac->errors |= DMAC_ERR_CH_ALREDY_ON;
 		return -1;
 	}
-
-	DMAC_CHER = BV(ch);
+	DMAC_CHER = BV(dmac->ch);
 	return 0;
 }
 
-bool dmac_isDone(Dmac *dmac, uint8_t ch)
+
+bool dmac_isLLIDone(Dmac *dmac)
 {
-	(void)dmac;
-	return (DMAC_EBCISR |= BV(ch));
+	return (DMAC_EBCIMR |= (BV(dmac->ch) << DMAC_EBCISR_CBTC0));
 }
 
-bool dmac_waitDone(Dmac *dmac, uint8_t ch)
+bool dmac_waitLLIDone(Dmac *dmac)
 {
-	(void)dmac;
-	while(!(DMAC_EBCISR |= BV(ch)))
+	while(!(DMAC_EBCIMR |= (BV(dmac->ch) << DMAC_EBCISR_CBTC0)))
 		cpu_relax();
 
+	DMAC_CHDR = BV(dmac->ch);
 	return true;
+}
+
+bool dmac_isDone(Dmac *dmac)
+{
+	return (DMAC_EBCIMR |= BV(dmac->ch));
+}
+
+bool dmac_waitDone(Dmac *dmac)
+{
+	while(!(DMAC_EBCIMR |= BV(dmac->ch)))
+		cpu_relax();
+
+	DMAC_CHDR = BV(dmac->ch);
+	return true;
+}
+
+int dmac_error(Dmac *dmac)
+{
+	uint32_t err = ((DMAC_EBCISR & 0x3F0000) | dmac->errors);
+	dmac->errors = 0;
+	return err;
 }
 
 static DECLARE_ISR(dmac_irq)
 {
+	uint32_t status = DMAC_EBCISR;
+	if(status & 0x3f3f)
+	{
+		kputs("Ends\n");
+	}
+
 }
 
-void dmac_init(Dmac *dmac)
+void dmac_init(Dmac *dmac, int channel)
 {
-	(void)dmac;
-
+	ASSERT(channel <= DMAC_CHANNEL_CNT);
+	memset(dmac, 0, sizeof(dmac));
+	dmac->ch = channel;
 	//init DMAC
 	DMAC_EBCIDR = 0x3FFFFF;
 	DMAC_CHDR = 0x1F;
@@ -177,4 +214,6 @@ void dmac_init(Dmac *dmac)
 	pmc_periphEnable(DMAC_ID);
 	DMAC_EN = BV(DMAC_EN_ENABLE);
 	sysirq_setHandler(INT_DMAC, dmac_irq);
+
+	DMAC_EBCIER = (BV(dmac->ch) << DMAC_EBCIER_BTC0) | (BV(dmac->ch) << DMAC_EBCIDR_BTC0);
 }
