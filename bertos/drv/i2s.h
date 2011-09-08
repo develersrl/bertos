@@ -151,8 +151,8 @@ INLINE void i2s_dmaStartTxStreaming(I2s *i2s, void *buf, size_t len, size_t slic
 	ASSERT(len % slice_len == 0);
 	ASSERT(callback);
 
-	i2s->ctx.rx_callback = callback;
-	i2s->ctx.rx_slice_len = slice_len;
+	i2s->ctx.tx_callback = callback;
+	i2s->ctx.tx_slice_len = slice_len;
 	i2s->ctx.tx_start(i2s, buf, len, slice_len);
 }
 
