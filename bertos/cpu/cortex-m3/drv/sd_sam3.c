@@ -85,6 +85,7 @@
 #define CMD8_V_ECHO_REPLY         0xFF
 #define CMD8_SUPP_V_RANGE_REPLY   0xFF00
 
+#define SD_STATUS_ERROR          BV(19)
 
 #define SD_GET_ERRORS(status)   ((status) & 0xFFF80000)
 #define SD_ADDR_TO_RCA(addr)    (uint32_t)(((addr) << 16) & 0xFFFF0000)
@@ -310,7 +311,6 @@ int sd_sendIfCond(Sd *sd)
 		return 0;
 	}
 	LOG_ERR("IF_COND: %lx\n", (sd->status));
-
 	return -1;
 }
 
@@ -340,6 +340,7 @@ int sd_sendAppOpCond(Sd *sd)
 			}
 		}
 	}
+
 	return -1;
 }
 
@@ -429,6 +430,7 @@ int sd_appStatus(Sd *sd)
 	if (hsmci_sendCmd(13, SD_ADDR_TO_RCA(sd->addr), HSMCI_CMDR_RSPTYP_48_BIT))
 	{
 		LOG_ERR("STATUS: %lx\n", HSMCI_SR);
+		sd->status |= SD_STATUS_ERROR;
 		return -1;
 	}
 
@@ -451,6 +453,7 @@ INLINE int sd_cardSelection(Sd *sd, uint32_t rca)
 	if (hsmci_sendCmd(7, rca, HSMCI_CMDR_RSPTYP_R1B))
 	{
 		LOG_ERR("SELECT_SD: %lx\n", HSMCI_SR);
+		sd->status |= SD_STATUS_ERROR;
 		return -1;
 	}
 
@@ -628,11 +631,16 @@ void sd_setHightSpeed(Sd *sd)
 static size_t sd_SdReadDirect(struct KBlock *b, block_idx_t idx, void *buf, size_t offset, size_t size)
 {
 	ASSERT(buf);
+	ASSERT(!((uint32_t)buf & 0x3));
+
 	Sd *sd = SD_CAST(b);
 	LOG_INFO("reading from block %ld, offset %d, size %d\n", idx, offset, size);
 
 	if (sd_selectCard(sd) < 0)
+	{
+		sd->status |= SD_STATUS_ERROR;
 		return -1;
+	}
 
 	hsmci_read(buf, size / 4, sd->b.blk_size);
 
@@ -663,12 +671,17 @@ static size_t sd_SdReadDirect(struct KBlock *b, block_idx_t idx, void *buf, size
 static size_t sd_SdWriteDirect(KBlock *b, block_idx_t idx, const void *buf, size_t offset, size_t size)
 {
 	ASSERT(buf);
+	ASSERT(!((uint32_t)buf & 0x3));
+
 	Sd *sd = SD_CAST(b);
 	const uint32_t *_buf = (const uint32_t *)buf;
 	LOG_INFO("reading from block %ld, offset %d, size %d\n", idx, offset, size);
 
 	if (sd_selectCard(sd) < 0)
-		return 0;
+	{
+		sd->status |= SD_STATUS_ERROR;
+		return -1;
+	}
 
 	hsmci_write(_buf, size / 4, sd->b.blk_size);
 
