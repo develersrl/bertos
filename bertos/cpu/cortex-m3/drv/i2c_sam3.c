@@ -194,7 +194,7 @@ static void i2c_setClock(I2c *i2c, int clock)
 	}
 
 	ASSERT(ck_div < 8);
-	LOG_INFO("i2c: using CKDIV = %lu and CLDIV/CHDIV = %lu\n\n", ck_div, cl_div);
+	LOG_INFO("i2c: using CKDIV = %lu and CLDIV/CHDIV = %lu\n", ck_div, cl_div);
 
 	HWREG(i2c->hw->base + TWI_CWGR_OFF) = 0;
 	HWREG(i2c->hw->base + TWI_CWGR_OFF) = (ck_div << 16) | (cl_div << 8) | cl_div;
