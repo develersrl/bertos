@@ -41,6 +41,9 @@
 #include <cfg/macros.h>
 
 #include <cpu/types.h>
+#include <drv/irq_cm3.h>
+
+typedef void (*dmac_handler_t)(void);
 
 /**
  * DMA Transfer Descriptor as well as Linked List Item
@@ -57,25 +60,26 @@ typedef struct DmacDesc
 typedef struct Dmac
 {
 	DmacDesc lli;
-	uint8_t ch;
 	uint8_t errors;
 	size_t transfer_size;
+	dmac_handler_t handler;
 } Dmac;
 
 #define DMAC_ERR_CH_ALREDY_ON    BV(0)
 
-void dmac_setSourcesLLI(Dmac *dmac, DmacDesc *lli, uint32_t src, uint32_t dst, uint32_t desc);
-void dmac_configureDmacLLI(Dmac *dmac, DmacDesc *lli, size_t transfer_size, uint32_t cfg, uint32_t ctrla, uint32_t ctrlb);
-bool dmac_isLLIDone(Dmac *dmac);
-bool dmac_waitLLIDone(Dmac *dmac);
+void dmac_setSourcesLLI(int ch, DmacDesc *lli, uint32_t src, uint32_t dst, uint32_t desc);
+void dmac_configureDmacLLI(int ch, DmacDesc *lli, size_t transfer_size, uint32_t cfg, uint32_t ctrla, uint32_t ctrlb);
+bool dmac_isLLIDone(int ch);
+bool dmac_waitLLIDone(int ch);
 
-void dmac_setSources(Dmac *dmac, uint32_t src, uint32_t dst);
-void dmac_configureDmac(Dmac *dmac, size_t transfer_size, uint32_t cfg, uint32_t ctrla, uint32_t ctrlb);
-int dmac_start(Dmac *dmac);
-bool dmac_isDone(Dmac *dmac);
-bool dmac_waitDone(Dmac *dmac);
-int dmac_error(Dmac *dmac);
-
-void dmac_init(Dmac *dmac, int channel);
+void dmac_setSources(int ch, uint32_t src, uint32_t dst);
+void dmac_configureDmac(int ch, size_t transfer_size, uint32_t cfg, uint32_t ctrla, uint32_t ctrlb);
+int dmac_start(int ch);
+int dmac_stop(int ch);
+bool dmac_isDone(int ch);
+bool dmac_waitDone(int ch);
+int dmac_error(int ch);
+bool dmac_enableCh(int ch, dmac_handler_t handler);
+void dmac_init(void);
 
 #endif /* DRV_DMAC_SAM3_H */
