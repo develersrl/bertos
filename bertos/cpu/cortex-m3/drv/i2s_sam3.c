@@ -46,16 +46,22 @@
 #include <drv/i2s.h>
 #include <drv/dmac_sam3.h>
 
+#include <mware/event.h>
+
 #include <cpu/irq.h>
 
 #include <io/cm3.h>
 
+
+#define I2S_DMAC_CH    1
+
 struct I2sHardware
 {
+	bool end;
 };
 
 struct I2sHardware i2s_hw;
-static Dmac dmac;
+static Event data_ready;
 
 /* We divite for 2 because the min clock for i2s i MCLK/2 */
 #define MCK_DIV     (CPU_FREQ / (48000 * CONFIG_WORD_BIT_SIZE * CONFIG_CHANNEL_NUM * 2))
@@ -67,10 +73,33 @@ static Dmac dmac;
 #define EXTRA_FSLEN (CONFIG_EXTRA_FRAME_SYNC_SIZE << SSC_FSLEN_EXT)
 
 
+DmacDesc lli0;
+DmacDesc lli1;
+DmacDesc *curr;
+DmacDesc *next;
+DmacDesc *prev;
+
+static uint8_t *sample_buff;
+static size_t next_idx = 0;
+static size_t chunk_size = 0;
+static size_t remaing_size = 0;
+
+static uint32_t cfg;
+static uint32_t ctrla;
+static uint32_t ctrlb;
+
+
 static void sam3_i2s_txStop(I2s *i2s)
 {
 	(void)i2s;
 	SSC_CR = BV(SSC_TXDIS);
+	dmac_stop(I2S_DMAC_CH);
+
+	i2s->hw->end = true;
+	remaing_size = 0;
+	kprintf("stop\n");
+
+	event_do(&data_ready);
 }
 
 static void sam3_i2s_txWait(I2s *i2s)
@@ -78,10 +107,93 @@ static void sam3_i2s_txWait(I2s *i2s)
 	(void)i2s;
 }
 
+static void i2s_dmac_irq(void)
+{
+	prev = curr;
+	curr = next;
+	next = prev;
+
+	dmac_setSourcesLLI(I2S_DMAC_CH, curr, (uint32_t)&sample_buff[next_idx], (uint32_t)&SSC_THR, (uint32_t)next);
+	dmac_configureDmacLLI(I2S_DMAC_CH, curr, chunk_size / 2, cfg, ctrla, ctrlb);
+
+	event_do(&data_ready);
+}
+
 static void sam3_i2s_txStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 {
-	(void)i2s;
-	(void)slice_len;
+	ASSERT(buf);
+	ASSERT(len >= slice_len);
+	ASSERT(!(len % slice_len));
+
+	i2s->hw->end = false;
+
+	sample_buff = (uint8_t *)buf;
+	next_idx = 0;
+	chunk_size = slice_len;
+	remaing_size = len;
+
+	//Confing DMAC
+	uint32_t cfg = BV(DMAC_CFG_DST_H2SEL) |
+				((3 << DMAC_CFG_DST_PER_SHIFT) & DMAC_CFG_DST_PER_MASK) | (3 & DMAC_CFG_SRC_PER_MASK);
+	uint32_t ctrla = DMAC_CTRLA_SRC_WIDTH_HALF_WORD | DMAC_CTRLA_DST_WIDTH_HALF_WORD;
+	uint32_t ctrlb = BV(DMAC_CTRLB_SRC_DSCR) |
+				DMAC_CTRLB_FC_MEM2PER_DMA_FC |
+				DMAC_CTRLB_DST_INCR_FIXED | DMAC_CTRLB_SRC_INCR_INCREMENTING;
+
+
+	/* Program the dma with the first and second chunk of samples and update counter */
+	i2s->ctx.tx_callback(i2s, &sample_buff[0], chunk_size);
+
+	curr = &lli0;
+	prev = &lli0;
+	next = &lli1;
+
+	dmac_setSourcesLLI(I2S_DMAC_CH, curr, (uint32_t)&sample_buff[0], (uint32_t)&SSC_THR,(uint32_t)next);
+	dmac_configureDmacLLI(I2S_DMAC_CH, curr, chunk_size / 2, cfg, ctrla, ctrlb);
+
+	remaing_size -= chunk_size;
+	next_idx += chunk_size;
+
+	if (chunk_size <= remaing_size)
+	{
+		i2s->ctx.tx_callback(i2s, &sample_buff[next_idx], chunk_size);
+
+		prev = curr;
+		curr = next;
+		next = prev;
+
+		dmac_setSourcesLLI(I2S_DMAC_CH, curr, (uint32_t)&sample_buff[next_idx], (uint32_t)&SSC_THR,(uint32_t)next);
+		dmac_configureDmacLLI(I2S_DMAC_CH, curr, chunk_size / 2, cfg, ctrla, ctrlb);
+
+		remaing_size -= chunk_size;
+		next_idx += chunk_size;
+	}
+
+	if (dmac_start(I2S_DMAC_CH) < 0)
+		kprintf("start erros[%x]\n", dmac_error(I2S_DMAC_CH));
+
+	SSC_CR = BV(SSC_TXEN);
+
+	while (1)
+	{
+		event_wait(&data_ready);
+		if (i2s->hw->end)
+			break;
+
+		remaing_size -= chunk_size;
+		next_idx += chunk_size;
+
+		if (remaing_size <= 0)
+		{
+			remaing_size = len;
+			next_idx = 0;
+		}
+
+		if (dmac_start(I2S_DMAC_CH) < 0)
+			kprintf("start erros[%x]\n", dmac_error(I2S_DMAC_CH));
+
+		i2s->ctx.tx_callback(i2s, &sample_buff[next_idx], chunk_size);
+	}
 }
 
 static void sam3_i2s_rxStop(I2s *i2s)
@@ -107,13 +219,13 @@ static void sam3_i2s_rxStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 static bool sam3_i2s_isTxFinish(struct I2s *i2s)
 {
 	(void)i2s;
-	return dmac_isDone(&dmac);
+	return i2s->hw->end;//dmac_isDone(&dmac);
 }
 
 static bool sam3_i2s_isRxFinish(struct I2s *i2s)
 {
 	(void)i2s;
-	return dmac_isDone(&dmac);;
+	return dmac_isDone(I2S_DMAC_CH);
 }
 
 static void sam3_i2s_txBuf(struct I2s *i2s, void *buf, size_t len)
@@ -127,9 +239,9 @@ static void sam3_i2s_txBuf(struct I2s *i2s, void *buf, size_t len)
 				DMAC_CTRLB_FC_MEM2PER_DMA_FC |
 				DMAC_CTRLB_DST_INCR_FIXED | DMAC_CTRLB_SRC_INCR_INCREMENTING;
 
-	dmac_setSources(&dmac, (uint32_t)buf, (uint32_t)&SSC_THR);
-	dmac_configureDmac(&dmac, len, cfg, ctrla, ctrlb);
-	dmac_start(&dmac);
+	dmac_setSources(I2S_DMAC_CH, (uint32_t)buf, (uint32_t)&SSC_THR);
+	dmac_configureDmac(I2S_DMAC_CH, len / 2, cfg, ctrla, ctrlb);
+	dmac_start(I2S_DMAC_CH);
 
 	SSC_CR = BV(SSC_TXEN);
 }
@@ -139,15 +251,15 @@ static void sam3_i2s_rxBuf(struct I2s *i2s, void *buf, size_t len)
 	(void)i2s;
 
 	uint32_t cfg = BV(DMAC_CFG_SRC_H2SEL) |
-				((3 << DMAC_CFG_DST_PER_SHIFT) & DMAC_CFG_DST_PER_MASK) | (3 & DMAC_CFG_SRC_PER_MASK);
+				((4 << DMAC_CFG_DST_PER_SHIFT) & DMAC_CFG_DST_PER_MASK) | (4 & DMAC_CFG_SRC_PER_MASK);
 	uint32_t ctrla = DMAC_CTRLA_SRC_WIDTH_HALF_WORD | DMAC_CTRLA_DST_WIDTH_HALF_WORD;
 	uint32_t ctrlb = BV(DMAC_CTRLB_SRC_DSCR) | BV(DMAC_CTRLB_DST_DSCR) |
 						DMAC_CTRLB_FC_PER2MEM_DMA_FC |
 						DMAC_CTRLB_DST_INCR_INCREMENTING | DMAC_CTRLB_SRC_INCR_FIXED;
 
-	dmac_setSources(&dmac, (uint32_t)&SSC_RHR, (uint32_t)buf);
-	dmac_configureDmac(&dmac, len, cfg, ctrla, ctrlb);
-	dmac_start(&dmac);
+	dmac_setSources(I2S_DMAC_CH, (uint32_t)&SSC_RHR, (uint32_t)buf);
+	dmac_configureDmac(I2S_DMAC_CH, len / 2, cfg, ctrla, ctrlb);
+	dmac_start(I2S_DMAC_CH);
 
 	SSC_CR = BV(SSC_RXEN);
 }
@@ -155,6 +267,7 @@ static void sam3_i2s_rxBuf(struct I2s *i2s, void *buf, size_t len)
 static int sam3_i2s_write(struct I2s *i2s, uint32_t sample)
 {
 	(void)i2s;
+	SSC_CR = BV(SSC_TXEN);
 	while(!(SSC_SR & BV(SSC_TXRDY)));
 	SSC_THR = sample;
 	return 0;
@@ -163,15 +276,16 @@ static int sam3_i2s_write(struct I2s *i2s, uint32_t sample)
 static uint32_t sam3_i2s_read(struct I2s *i2s)
 {
 	(void)i2s;
+	SSC_CR = BV(SSC_RXEN);
 	while(!(SSC_SR & BV(SSC_RXRDY)));
 	return SSC_RHR;
 }
 
-/*
+
 static DECLARE_ISR(irq_ssc)
 {
 }
-*/
+
 void i2s_init(I2s *i2s, int channel)
 {
 	(void)channel;
@@ -233,5 +347,6 @@ void i2s_init(I2s *i2s, int channel)
 	SSC_IDR = 0xFFFFFFFF;
 	SSC_CR = BV(SSC_TXDIS) | BV(SSC_RXDIS);
 
-	dmac_init(&dmac, 1);
+	dmac_enableCh(I2S_DMAC_CH, i2s_dmac_irq);
+	event_initGeneric(&data_ready);
 }
