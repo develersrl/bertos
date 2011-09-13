@@ -53,7 +53,7 @@
 #include <io/cm3.h>
 
 
-#define I2S_DMAC_CH    1
+#define I2S_DMAC_CH    3
 
 struct I2sHardware
 {
@@ -62,16 +62,6 @@ struct I2sHardware
 
 struct I2sHardware i2s_hw;
 static Event data_ready;
-
-/* We divite for 2 because the min clock for i2s i MCLK/2 */
-#define MCK_DIV     (CPU_FREQ / (48000 * CONFIG_WORD_BIT_SIZE * CONFIG_CHANNEL_NUM * 2))
-#define DATALEN     ((CONFIG_WORD_BIT_SIZE - 1) & SSC_DATLEN_MASK)
-#define DELAY       ((CONFIG_DELAY << SSC_STTDLY_SHIFT) & SSC_STTDLY_MASK)
-#define PERIOD      ((CONFIG_PERIOD << (SSC_PERIOD_SHIFT)) & SSC_PERIOD_MASK)
-#define DATNB       ((CONFIG_WORD_PER_FRAME << SSC_DATNB_SHIFT) & SSC_DATNB_MASK)
-#define FSLEN       ((CONFIG_FRAME_SYNC_SIZE << SSC_FSLEN_SHIFT) & SSC_FSLEN_MASK)
-#define EXTRA_FSLEN (CONFIG_EXTRA_FRAME_SYNC_SIZE << SSC_FSLEN_EXT)
-
 
 DmacDesc lli0;
 DmacDesc lli1;
@@ -83,6 +73,7 @@ static uint8_t *sample_buff;
 static size_t next_idx = 0;
 static size_t chunk_size = 0;
 static size_t remaing_size = 0;
+static bool single_transfer;
 
 static uint32_t cfg;
 static uint32_t ctrla;
@@ -97,7 +88,6 @@ static void sam3_i2s_txStop(I2s *i2s)
 
 	i2s->hw->end = true;
 	remaing_size = 0;
-	kprintf("stop\n");
 
 	event_do(&data_ready);
 }
@@ -109,14 +99,21 @@ static void sam3_i2s_txWait(I2s *i2s)
 
 static void i2s_dmac_irq(void)
 {
-	prev = curr;
-	curr = next;
-	next = prev;
+	if (single_transfer)
+	{
+		single_transfer = false;
+	}
+	else
+	{
+		prev = curr;
+		curr = next;
+		next = prev;
 
-	dmac_setSourcesLLI(I2S_DMAC_CH, curr, (uint32_t)&sample_buff[next_idx], (uint32_t)&SSC_THR, (uint32_t)next);
-	dmac_configureDmacLLI(I2S_DMAC_CH, curr, chunk_size / 2, cfg, ctrla, ctrlb);
+		dmac_setSourcesLLI(I2S_DMAC_CH, curr, (uint32_t)&sample_buff[next_idx], (uint32_t)&SSC_THR, (uint32_t)next);
+		dmac_configureDmacLLI(I2S_DMAC_CH, curr, chunk_size / 2, cfg, ctrla, ctrlb);
 
-	event_do(&data_ready);
+		event_do(&data_ready);
+	}
 }
 
 static void sam3_i2s_txStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
@@ -126,6 +123,7 @@ static void sam3_i2s_txStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 	ASSERT(!(len % slice_len));
 
 	i2s->hw->end = false;
+	single_transfer = false;
 
 	sample_buff = (uint8_t *)buf;
 	next_idx = 0;
@@ -219,7 +217,7 @@ static void sam3_i2s_rxStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 static bool sam3_i2s_isTxFinish(struct I2s *i2s)
 {
 	(void)i2s;
-	return i2s->hw->end;//dmac_isDone(&dmac);
+	return i2s->hw->end;
 }
 
 static bool sam3_i2s_isRxFinish(struct I2s *i2s)
@@ -232,6 +230,8 @@ static void sam3_i2s_txBuf(struct I2s *i2s, void *buf, size_t len)
 {
 	(void)i2s;
 
+	single_transfer = true;
+
 	uint32_t cfg = BV(DMAC_CFG_DST_H2SEL) |
 				((3 << DMAC_CFG_DST_PER_SHIFT) & DMAC_CFG_DST_PER_MASK) | (3 & DMAC_CFG_SRC_PER_MASK);
 	uint32_t ctrla = DMAC_CTRLA_SRC_WIDTH_HALF_WORD | DMAC_CTRLA_DST_WIDTH_HALF_WORD;
@@ -240,7 +240,7 @@ static void sam3_i2s_txBuf(struct I2s *i2s, void *buf, size_t len)
 				DMAC_CTRLB_DST_INCR_FIXED | DMAC_CTRLB_SRC_INCR_INCREMENTING;
 
 	dmac_setSources(I2S_DMAC_CH, (uint32_t)buf, (uint32_t)&SSC_THR);
-	dmac_configureDmac(I2S_DMAC_CH, len / 2, cfg, ctrla, ctrlb);
+	dmac_configureDmac(I2S_DMAC_CH, len, cfg, ctrla, ctrlb);
 	dmac_start(I2S_DMAC_CH);
 
 	SSC_CR = BV(SSC_TXEN);
@@ -285,6 +285,18 @@ static uint32_t sam3_i2s_read(struct I2s *i2s)
 static DECLARE_ISR(irq_ssc)
 {
 }
+
+
+
+
+/* We divite for 2 because the min clock for i2s i MCLK/2 */
+#define MCK_DIV     (CPU_FREQ / (CONFIG_SAMPLE_FREQ * CONFIG_WORD_BIT_SIZE * CONFIG_CHANNEL_NUM * 2))
+#define DATALEN     ((CONFIG_WORD_BIT_SIZE - 1) & SSC_DATLEN_MASK)
+#define DELAY       ((CONFIG_DELAY << SSC_STTDLY_SHIFT) & SSC_STTDLY_MASK)
+#define PERIOD      ((CONFIG_PERIOD << (SSC_PERIOD_SHIFT)) & SSC_PERIOD_MASK)
+#define DATNB       ((CONFIG_WORD_PER_FRAME << SSC_DATNB_SHIFT) & SSC_DATNB_MASK)
+#define FSLEN       ((CONFIG_FRAME_SYNC_SIZE << SSC_FSLEN_SHIFT) & SSC_FSLEN_MASK)
+#define EXTRA_FSLEN (CONFIG_EXTRA_FRAME_SYNC_SIZE << SSC_FSLEN_EXT)
 
 void i2s_init(I2s *i2s, int channel)
 {
@@ -336,16 +348,15 @@ void i2s_init(I2s *i2s, int channel)
 	 * - MSB
 	 * - Frame sync output selection negative
 	 */
-	SSC_TFMR = DATALEN | DATNB | FSLEN | EXTRA_FSLEN | BV(SSC_MSBF) | SSC_FSOS_POSITIVE;
+	SSC_TFMR = DATALEN | DATNB | FSLEN | EXTRA_FSLEN | BV(SSC_MSBF) | SSC_FSOS_NEGATIVE;
 
 
 	// Receiver should start on TX and take the clock from TK
     SSC_RCMR = SSC_CKS_CLK | BV(SSC_CKI) | SSC_CKO_CONT | SSC_CKG_NONE | DELAY | PERIOD | SSC_START_TX;
-    SSC_RFMR = DATALEN | DATNB | FSLEN  | EXTRA_FSLEN | BV(SSC_MSBF) | SSC_FSOS_POSITIVE;
+    SSC_RFMR = DATALEN | DATNB | FSLEN  | EXTRA_FSLEN | BV(SSC_MSBF) | SSC_FSOS_NEGATIVE;
 
 
 	SSC_IDR = 0xFFFFFFFF;
-	SSC_CR = BV(SSC_TXDIS) | BV(SSC_RXDIS);
 
 	dmac_enableCh(I2S_DMAC_CH, i2s_dmac_irq);
 	event_initGeneric(&data_ready);
