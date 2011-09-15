@@ -276,14 +276,16 @@ static void sam3x_dac_start(struct Dac *dac, void *_buf, size_t len, size_t slic
 	while (1)
 	{
 		event_wait(&buff_emtpy);
+		if (dac->hw->end)
+			break;
+
+		remaing_size -= chunk_size;
+		next_idx += chunk_size;
+
 		if (remaing_size <= 0)
 		{
-			DAC_TC_CCR = BV(TC_CCR_CLKDIS);
-			dac->hw->end = true;
+			remaing_size = len;
 			next_idx = 0;
-			chunk_size = 0;
-			remaing_size = 0;
-			break;
 		}
 
 		dac->ctx.callback(dac, &sample_buff[next_idx], chunk_size);
@@ -293,10 +295,16 @@ static void sam3x_dac_start(struct Dac *dac, void *_buf, size_t len, size_t slic
 static void sam3x_dac_stop(struct Dac *dac)
 {
 	dac->hw->end = false;
+	next_idx = 0;
+	remaing_size = 0;
+	chunk_size = 0;
+
 	/* Disable the irq, timer and channel */
 	DACC_IDR = BV(DACC_ENDTX);
 	DACC_PTCR |= BV(DACC_PTCR_TXTDIS);
 	DAC_TC_CCR = BV(TC_CCR_CLKDIS);
+
+	event_do(&buff_emtpy);
 }
 
 
