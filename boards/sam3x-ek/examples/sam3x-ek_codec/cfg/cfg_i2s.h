@@ -70,7 +70,7 @@
  * $WIZ$ min =  32000
  * $WIZ$ max = 192000
  */
-#define CONFIG_SAMPLE_FREQ     48000UL
+#define CONFIG_SAMPLE_FREQ     44100UL
 
 /**
  * Sample bits per channel.
