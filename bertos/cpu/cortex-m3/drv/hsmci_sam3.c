@@ -159,10 +159,6 @@ void hsmci_setSpeed(uint32_t data_rate, int flag)
 	timer_delay(10);
 }
 
-static void hsmci_dmac_irq(void)
-{
-}
-
 void hsmci_init(Hsmci *hsmci)
 {
 	(void)hsmci;
