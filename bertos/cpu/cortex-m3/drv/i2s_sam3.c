@@ -69,16 +69,12 @@ DmacDesc *curr;
 DmacDesc *next;
 DmacDesc *prev;
 
-static uint8_t *sample_buff;
+static int16_t *sample_buff;
 static size_t next_idx = 0;
 static size_t chunk_size = 0;
 static size_t remaing_size = 0;
+static size_t transfer_size = 0;
 static bool single_transfer;
-
-static uint32_t cfg;
-static uint32_t ctrla;
-static uint32_t ctrlb;
-
 
 static void sam3_i2s_txStop(I2s *i2s)
 {
@@ -95,25 +91,55 @@ static void sam3_i2s_txStop(I2s *i2s)
 static void sam3_i2s_txWait(I2s *i2s)
 {
 	(void)i2s;
+	event_wait(&data_ready);
 }
 
-static void i2s_dmac_irq(void)
+bool error = false;
+uint32_t cfg;
+uint32_t ctrla;
+uint32_t ctrlb;
+
+
+static void i2s_dmac_irq(uint32_t status)
 {
+	PIOA_SODR = BV(13);
 	if (single_transfer)
 	{
 		single_transfer = false;
 	}
 	else
 	{
-		prev = curr;
-		curr = next;
-		next = prev;
+		if (status & (BV(I2S_DMAC_CH) << DMAC_EBCIDR_ERR0))
+		{
+			error = true;
+			DMAC_CHDR = BV(I2S_DMAC_CH);
+			kprintf("irq_err[%08lx]\n", DMAC_EBCISR);
+		}
+		else
+		{
+			prev = curr;
+			curr = next;
+			next = prev;
 
-		dmac_setSourcesLLI(I2S_DMAC_CH, curr, (uint32_t)&sample_buff[next_idx], (uint32_t)&SSC_THR, (uint32_t)next);
-		dmac_configureDmacLLI(I2S_DMAC_CH, curr, chunk_size / 2, cfg, ctrla, ctrlb);
+			curr->src_addr = (uint32_t)&sample_buff[next_idx];
+			curr->dst_addr = (uint32_t)&SSC_THR;
+			curr->dsc_addr = (uint32_t)next;
+			curr->ctrla    = ctrla | (chunk_size & 0xffff);
+			curr->ctrlb    = ctrlb & ~BV(DMAC_CTRLB_IEN);
 
-		event_do(&data_ready);
+			remaing_size -= chunk_size;
+			next_idx += chunk_size;
+
+			if (remaing_size <= 0)
+			{
+				remaing_size = transfer_size;
+				next_idx = 0;
+			}
+
+		}
 	}
+	event_do(&data_ready);
+	PIOA_CODR = BV(13);
 }
 
 static void sam3_i2s_txStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
@@ -125,72 +151,84 @@ static void sam3_i2s_txStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 	i2s->hw->end = false;
 	single_transfer = false;
 
-	sample_buff = (uint8_t *)buf;
+	sample_buff = (int16_t *)buf;
 	next_idx = 0;
-	chunk_size = slice_len;
-	remaing_size = len;
+	chunk_size = slice_len / 2;
+	remaing_size = len / 2;
+	transfer_size = len / 2;
+
 
 	//Confing DMAC
-	uint32_t cfg = BV(DMAC_CFG_DST_H2SEL) |
-				((3 << DMAC_CFG_DST_PER_SHIFT) & DMAC_CFG_DST_PER_MASK) | (3 & DMAC_CFG_SRC_PER_MASK);
-	uint32_t ctrla = DMAC_CTRLA_SRC_WIDTH_HALF_WORD | DMAC_CTRLA_DST_WIDTH_HALF_WORD;
-	uint32_t ctrlb = BV(DMAC_CTRLB_SRC_DSCR) |
-				DMAC_CTRLB_FC_MEM2PER_DMA_FC |
-				DMAC_CTRLB_DST_INCR_FIXED | DMAC_CTRLB_SRC_INCR_INCREMENTING;
 
+	DMAC_CHDR = BV(I2S_DMAC_CH);
+	kprintf("Start streaming [%08lx]\n", DMAC_EBCISR);
 
-	/* Program the dma with the first and second chunk of samples and update counter */
-	i2s->ctx.tx_callback(i2s, &sample_buff[0], chunk_size);
+	cfg = BV(DMAC_CFG_DST_H2SEL) | BV(DMAC_CFG_SOD) |
+					((3 << DMAC_CFG_DST_PER_SHIFT) & DMAC_CFG_DST_PER_MASK) | (3 & DMAC_CFG_SRC_PER_MASK);
 
-	curr = &lli0;
+	ctrla = DMAC_CTRLA_SRC_WIDTH_HALF_WORD |
+					 DMAC_CTRLA_DST_WIDTH_HALF_WORD;
+
+	ctrlb = DMAC_CTRLB_FC_MEM2PER_DMA_FC |
+					DMAC_CTRLB_DST_INCR_FIXED |
+					DMAC_CTRLB_SRC_INCR_INCREMENTING;
+
 	prev = &lli0;
+	curr = &lli0;
 	next = &lli1;
 
-	dmac_setSourcesLLI(I2S_DMAC_CH, curr, (uint32_t)&sample_buff[0], (uint32_t)&SSC_THR,(uint32_t)next);
-	dmac_configureDmacLLI(I2S_DMAC_CH, curr, chunk_size / 2, cfg, ctrla, ctrlb);
+	i2s->ctx.tx_callback(i2s, &sample_buff[0], chunk_size * 2);
+
+	lli0.src_addr = (uint32_t)&sample_buff[0];
+	lli0.dst_addr = (uint32_t)&SSC_THR;
+	lli0.dsc_addr = (uint32_t)next;
+	lli0.ctrla    = ctrla | (chunk_size & 0xffff) ;
+	lli0.ctrlb    = ctrlb & ~BV(DMAC_CTRLB_IEN);
 
 	remaing_size -= chunk_size;
 	next_idx += chunk_size;
 
 	if (chunk_size <= remaing_size)
 	{
-		i2s->ctx.tx_callback(i2s, &sample_buff[next_idx], chunk_size);
+		i2s->ctx.tx_callback(i2s, &sample_buff[next_idx], chunk_size * 2);
 
 		prev = curr;
 		curr = next;
 		next = prev;
 
-		dmac_setSourcesLLI(I2S_DMAC_CH, curr, (uint32_t)&sample_buff[next_idx], (uint32_t)&SSC_THR,(uint32_t)next);
-		dmac_configureDmacLLI(I2S_DMAC_CH, curr, chunk_size / 2, cfg, ctrla, ctrlb);
+		lli1.src_addr = (uint32_t)&sample_buff[next_idx];
+		lli1.dst_addr = (uint32_t)&SSC_THR;
+		lli1.dsc_addr = (uint32_t)next;
+		lli1.ctrla    = ctrla | (chunk_size & 0xffff);
+		lli1.ctrlb    = ctrlb & ~BV(DMAC_CTRLB_IEN);
 
 		remaing_size -= chunk_size;
 		next_idx += chunk_size;
 	}
 
+	dmac_configureDmaCfgLLI(I2S_DMAC_CH, &lli0, cfg);
+
 	if (dmac_start(I2S_DMAC_CH) < 0)
 		kprintf("start erros[%x]\n", dmac_error(I2S_DMAC_CH));
 
+	error = false;
 	SSC_CR = BV(SSC_TXEN);
+	PIOA_CODR = BV(13);
 
 	while (1)
 	{
 		event_wait(&data_ready);
+		if (error)
+		{
+			kputs("Errore\n");
+			break;
+		}
+
 		if (i2s->hw->end)
 			break;
 
-		remaing_size -= chunk_size;
-		next_idx += chunk_size;
-
-		if (remaing_size <= 0)
-		{
-			remaing_size = len;
-			next_idx = 0;
-		}
-
-		if (dmac_start(I2S_DMAC_CH) < 0)
-			kprintf("start erros[%x]\n", dmac_error(I2S_DMAC_CH));
-
-		i2s->ctx.tx_callback(i2s, &sample_buff[next_idx], chunk_size);
+		i2s->ctx.tx_callback(i2s, &sample_buff[next_idx], chunk_size * 2);
+		cpu_relax();
 	}
 }
 
