@@ -115,23 +115,22 @@ static Event data_ready;
 static Dmac dmac[DMAC_CHANNEL_CNT];
 static uint8_t dmac_ch_enabled;
 
-void dmac_setSourcesLLI(int ch, DmacDesc *lli, uint32_t src, uint32_t dst, uint32_t desc)
-{
-	ASSERT(lli);
-	DMAC_CHDR = BV(ch);
-
-	lli->src_addr = src;
-	lli->dst_addr = dst;
-	lli->dsc_addr = desc;
-}
-
 void dmac_configureDmacLLI(int ch, DmacDesc *lli, size_t transfer_size, uint32_t cfg, uint32_t ctrla, uint32_t ctrlb)
 {
 	DMAC_CHDR = BV(ch);
 
 	*dmac_ch[ch].cfg = cfg | DMAC_CFG_FIFOCFG_ALAP_CFG | (0x1 << DMAC_CFG_AHB_PROT_SHIFT);
 	lli->ctrla = ctrla | (transfer_size & DMAC_CTRLA_BTSIZE_MASK);
-	lli->ctrlb = ctrlb & ~BV(DMAC_CTRLB_IEN);
+	lli->ctrlb = ctrlb;// & ~BV(DMAC_CTRLB_IEN);
+	*dmac_ch[ch].desc = (uint32_t)lli;
+}
+
+
+void dmac_configureDmaCfgLLI(int ch, DmacDesc *lli, uint32_t cfg)
+{
+	DMAC_CHDR = BV(ch);
+
+	*dmac_ch[ch].cfg = cfg | DMAC_CFG_FIFOCFG_ALAP_CFG | (0x1 << DMAC_CFG_AHB_PROT_SHIFT);
 	*dmac_ch[ch].desc = (uint32_t)lli;
 }
 
@@ -207,27 +206,16 @@ int dmac_error(int ch)
 static DECLARE_ISR(dmac_irq)
 {
 	uint32_t status = DMAC_EBCISR;
-	uint32_t irq_ch = (status & dmac_ch_enabled) & 0xFF;
-	//kprintf(" %08lx %08lx\n", status, irq_ch);
+	uint32_t irq_ch = (status & (((dmac_ch_enabled |
+								(dmac_ch_enabled << DMAC_EBCIDR_ERR0) >> DMAC_EBCIDR_ERR0) |
+								(dmac_ch_enabled << DMAC_EBCIDR_CBTC0) >> DMAC_EBCIDR_CBTC0) & 0xFF));
 	if (irq_ch)
-		for(int i = 0; i < 8; i++)
+		for(int i = 0; i < 6; i++)
 		{
 			if (BV(i) & irq_ch)
 				if(dmac[i].handler)
-					dmac[i].handler();
+					dmac[i].handler(status);
 		}
-/*
-	irq_ch = (status & (dmac_ch_enabled << DMAC_EBCIDR_CBTC0)) >> DMAC_EBCIDR_CBTC0;
-	//kprintf("c %08lx %08lx\n", status, irq_ch);
-	if (irq_ch)
-		for(int i = 0; i < 8; i++)
-		{
-			if (BV(i) & irq_ch)
-				if(dmac[i].handler)
-					dmac[i].handler();
-		}
-*/
-
 }
 
 bool dmac_enableCh(int ch, dmac_handler_t handler)
@@ -238,7 +226,7 @@ bool dmac_enableCh(int ch, dmac_handler_t handler)
 	if (handler)
 	{
 		dmac[ch].handler = handler;
-		DMAC_EBCIER |= (BV(ch) << DMAC_EBCIER_BTC0) | (BV(ch) << DMAC_EBCIDR_CBTC0);
+		DMAC_EBCIER |= (BV(ch) << DMAC_EBCIER_BTC0) | (BV(ch) << DMAC_EBCIDR_CBTC0) | (BV(ch) << DMAC_EBCIDR_ERR0);
 		kprintf("Init dmac ch[%08lx]\n", DMAC_EBCIMR);
 	}
 
