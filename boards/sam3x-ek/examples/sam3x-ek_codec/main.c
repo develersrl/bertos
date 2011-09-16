@@ -73,32 +73,7 @@
  */
 #define CODEC_ADDR 0x36
 
-// SD fat filesystem context
-FATFS fs;
-FatFile log_file;
-FatFile acq_file;
 
-static I2c i2c;
-static I2s i2s;
-//static Wm8731 wm8731_ctx;
-
-static void init(void)
-{
-	IRQ_ENABLE;
-	kdbg_init();
-	kprintf("sam3x %s: %d times\n", VERS_HOST, VERS_BUILD);
-
-	timer_init();
-	LED_INIT();
-
-	dmac_init();
-	i2c_init(&i2c, I2C_BITBANG0, CONFIG_I2C_FREQ);
-	i2s_init(&i2s, SSC0);
-	adc_init();
-
-//	wm8731_init(&wm8731_ctx, &i2c, CODEC_ADDR);
-//	wm8731_setVolume(&wm8731_ctx, WM8731_HEADPHONE, (uint8_t)ADC_RANGECONV(adc_read(1), 0, 100));
-}
 
 typedef struct WavHdr
 {
@@ -120,13 +95,43 @@ typedef struct WavHdr
 
 
 //#define FILE_NAME  "input0.wav"
-#define FILE_NAME  "sample.wav"
+//#define FILE_NAME  "due.wav"
+//#define FILE_NAME  "sample.wav"
 //#define FILE_NAME  "testaa"
+#define FILE_NAME  "outfile.wav"
 #define ACQ_FILE_NAME  "acq.wav"
-uint8_t uno[512];
-uint8_t tre[512];
-int16_t due[5120];
+
+uint8_t tmp[4096];
+
+// SD fat filesystem context
+FATFS fs;
+FatFile log_file;
+FatFile acq_file;
+
+static I2c i2c;
+static I2s i2s;
+static Wm8731 wm8731_ctx;
+
+static void init(void)
+{
+	IRQ_ENABLE;
+	kdbg_init();
+	kprintf("sam3x %s: %d times\n", VERS_HOST, VERS_BUILD);
+
+	timer_init();
+	LED_INIT();
+
+	adc_init();
+	dmac_init();
+	i2c_init(&i2c, I2C_BITBANG0, CONFIG_I2C_FREQ);
+	i2s_init(&i2s, SSC0);
+
+	wm8731_init(&wm8731_ctx, &i2c, CODEC_ADDR);
+	wm8731_setVolume(&wm8731_ctx, WM8731_HEADPHONE, 0);
+}
+
 size_t count = 0;
+
 static void codec(struct I2s *i2s, void *_buf, size_t len)
 {
 	count += kfile_read(&log_file.fd, _buf, len);
@@ -137,7 +142,6 @@ static void codec(struct I2s *i2s, void *_buf, size_t len)
 		count = 0;
 	}
 }
-
 
 static int wav_check(KFile *fd)
 {
@@ -175,7 +179,7 @@ static int wav_check(KFile *fd)
 	}
 
 
-	if (le32_to_cpu(header.sample_rate) != 48000)
+	if (le32_to_cpu(header.sample_rate) != 44100)
 	{
 		kprintf("Sample rate not valid, found [%ld]\n", le32_to_cpu(header.sample_rate));
 		goto error;
@@ -192,53 +196,19 @@ error:
 	return 1;
 }
 
-#include <drv/eeprom.h>
-static Eeprom eep;
 int main(void)
 {
 	init();
 
-	eeprom_init(&eep, &i2c, EEPROM_24XX512, 0x51, false);
-
 	for (;;)
 	{
-
 		if (SD_CARD_PRESENT())
 		{
-
-			memset(uno, 0xcc, eep.blk.blk_size);
-//			kblock_write(&eep.blk, 0, uno, 0, eep.blk.blk_size);
-
-			memset(tre, 0xaa, eep.blk.blk_size);
-			kblock_read(&eep.blk, 0, uno, 0, eep.blk.blk_size);
-
-			kprintf("blk[%d]\n", eep.blk.blk_size);
-			if (!memcmp(uno, tre, eep.blk.blk_size))
-			{
-				kputs("ok!\n");
-				for (size_t i = 0; i < eep.blk.blk_size; i++)
-					kprintf("%x ", tre[i]);
-				kputs("fine\n");
-			}
-			else
-				kputs("Error\n");
-				for (size_t i = 0; i < eep.blk.blk_size; i++)
-					kprintf("%x ", tre[i]);
-				kputs("fine\n");
-/*
-			uint16_t vol = ADC_RANGECONV(adc_read(1), 0, 100);
-			if (prev != vol)
-			{
-				prev = vol;
-				wm8731_setVolume(&wm8731_ctx, WM8731_HEADPHONE, (uint8_t)vol);
-			}
-*/
 			timer_delay(10);
 			Sd sd;
 			bool sd_ok = sd_init(&sd, NULL, 0);
 			FRESULT result;
 
-			memset(due, 0xbb, sizeof(due));
 			if (sd_ok)
 			{
 				kprintf("Mount FAT filesystem.\n");
@@ -255,32 +225,14 @@ int main(void)
 					if (result == FR_OK)
 					{
 						kprintf("Opened log file '%s' size %ld\n", FILE_NAME, log_file.fat_file.fsize);
+						wm8731_setVolume(&wm8731_ctx, WM8731_HEADPHONE, adc_read(1));
 						if (wav_check(&log_file.fd) >= 0)
 						{
-							//int len = kfile_read(&log_file.fd, due, 1024);
-							//i2s_dmaTxBuffer(&i2s, due, len);
-
-							/*
-							kprintf("len %d\n", len);
-							for (size_t i=0; i < sizeof(due); i++)
-								kprintf("%x ", due[i]);
-							kputs("\n");
-							 */
-
-							//count = log_file.fat_file.fsize - sizeof(WavHdr);
-							//count = log_file.fat_file.fsize;
-							while (count)
-							{
-								int len = kfile_read(&log_file.fd, due, sizeof(due));
-								i2s_dmaTxBuffer(&i2s, due, len);
-								i2s_dmaTxWait(&i2s);
-								//for (int i = 0; i < len / 2; i++)
-									//i2s_write(&i2s, (due[i]));
-								count -= len;
-							}
-
-							i2s_dmaStartTxStreaming(&i2s, due, sizeof(due), 1024, codec);
+							kputs("Wav file play..\n");
+							i2s_dmaStartTxStreaming(&i2s, tmp, sizeof(tmp), sizeof(tmp) / 4, codec);
 						}
+
+						wm8731_setVolume(&wm8731_ctx, WM8731_HEADPHONE, 0);
 
 						// Flush data and close the files.
 						kfile_flush(&log_file.fd);
@@ -298,6 +250,7 @@ int main(void)
 				}
 				f_mount(0, NULL);
 			}
+
 			timer_delay(5000);
 		}
 		else
