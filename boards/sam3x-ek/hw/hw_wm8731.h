@@ -55,7 +55,7 @@
 		PIO_PERIPH_SEL(PIOB_BASE, BV(22), PIO_PERIPH_B); \
 		/* Prescale the cpu clock to the frequenzy that we want. */\
 		/* (multiply value of audio sample  rate) */\
-		PMC_PCK0 = PMC_PCK_CSS_PLL | PMC_PCK_PRES_CLK_4; \
+		PMC_PCK0 = PMC_PCK_CSS_PLL | PMC_PCK_PRES_CLK_8; \
 		/* Enable the clock and wait until it starts correctly */ \
 		PMC_SCER = BV(PMC_PCK0_ID); \
 		while ((PMC_SR & BV(PMC_PCKRDY0)) == 0); \
