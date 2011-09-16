@@ -145,6 +145,13 @@ INLINE void i2s_dmaRxBuffer(I2s *i2s, void *buf, size_t len)
 }
 
 
+INLINE void i2s_dmaTxWait(I2s *i2s)
+{
+	ASSERT(i2s->ctx.tx_wait);
+	i2s->ctx.tx_wait(i2s);
+}
+
+
 INLINE void i2s_dmaStartTxStreaming(I2s *i2s, void *buf, size_t len, size_t slice_len, i2s_dma_callback_t callback)
 {
 	ASSERT(i2s->ctx.tx_start);
