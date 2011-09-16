@@ -111,22 +111,10 @@ struct DmacCh dmac_ch[] =
 
 
 /* We use event to signal the end of conversion */
-static Event data_ready;
 static Dmac dmac[DMAC_CHANNEL_CNT];
 static uint8_t dmac_ch_enabled;
 
-void dmac_configureDmacLLI(int ch, DmacDesc *lli, size_t transfer_size, uint32_t cfg, uint32_t ctrla, uint32_t ctrlb)
-{
-	DMAC_CHDR = BV(ch);
-
-	*dmac_ch[ch].cfg = cfg | DMAC_CFG_FIFOCFG_ALAP_CFG | (0x1 << DMAC_CFG_AHB_PROT_SHIFT);
-	lli->ctrla = ctrla | (transfer_size & DMAC_CTRLA_BTSIZE_MASK);
-	lli->ctrlb = ctrlb;// & ~BV(DMAC_CTRLB_IEN);
-	*dmac_ch[ch].desc = (uint32_t)lli;
-}
-
-
-void dmac_configureDmaCfgLLI(int ch, DmacDesc *lli, uint32_t cfg)
+void dmac_setLLITransfer(int ch, DmacDesc *lli, uint32_t cfg)
 {
 	DMAC_CHDR = BV(ch);
 

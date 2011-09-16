@@ -72,6 +72,11 @@ DmacDesc *curr;
 DmacDesc *next;
 DmacDesc *prev;
 
+bool error = false;
+uint32_t cfg;
+uint32_t ctrla;
+uint32_t ctrlb;
+
 static int16_t *sample_buff;
 static size_t next_idx = 0;
 static size_t chunk_size = 0;
@@ -96,11 +101,6 @@ static void sam3_i2s_txWait(I2s *i2s)
 	(void)i2s;
 	event_wait(&data_ready);
 }
-
-bool error = false;
-uint32_t cfg;
-uint32_t ctrla;
-uint32_t ctrlb;
 
 static void i2s_dmac_irq(uint32_t status)
 {
@@ -203,7 +203,7 @@ static void sam3_i2s_txStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 		next_idx += chunk_size;
 	}
 
-	dmac_configureDmaCfgLLI(I2S_DMAC_CH, &lli0, cfg);
+	dmac_setLLITransfer(I2S_DMAC_CH, &lli0, cfg);
 
 	if (dmac_start(I2S_DMAC_CH) < 0)
 	{
@@ -213,7 +213,7 @@ static void sam3_i2s_txStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 
 	error = false;
 	SSC_CR = BV(SSC_TXEN);
-	PIOA_CODR = BV(13);
+	I2S_STROBE_OFF();
 
 	while (1)
 	{

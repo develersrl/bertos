@@ -67,20 +67,7 @@ typedef struct Dmac
 
 #define DMAC_ERR_CH_ALREDY_ON    BV(0)
 
-INLINE void dmac_setSourcesLLI(int ch, DmacDesc *lli, uint32_t src, uint32_t dst, uint32_t desc)
-{
-	ASSERT(lli);
-	DMAC_CHDR = BV(ch);
-
-	lli->src_addr = src;
-	lli->dst_addr = dst;
-	lli->dsc_addr = desc;
-}
-
-void dmac_configureDmaCfgLLI(int ch, DmacDesc *lli, uint32_t cfg);
-void dmac_setSourcesLLI(int ch, DmacDesc *lli, uint32_t src, uint32_t dst, uint32_t desc);
-void dmac_configureDmacLLI(int ch, DmacDesc *lli, size_t transfer_size, uint32_t cfg, uint32_t ctrla, uint32_t ctrlb);
-
+void dmac_setLLITransfer(int ch, DmacDesc *lli, uint32_t cfg);
 void dmac_setSources(int ch, uint32_t src, uint32_t dst);
 void dmac_configureDmac(int ch, size_t transfer_size, uint32_t cfg, uint32_t ctrla, uint32_t ctrlb);
 int dmac_start(int ch);
