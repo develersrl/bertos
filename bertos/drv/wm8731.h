@@ -161,6 +161,13 @@
 #define WM8731_SR_BITS_MASK                       0x3C // Sample rate control
 #define WM8731_CLKIDIV2_BIT                          6 // Core clock divider select
 #define WM8731_CLKODIV2_BIT                          7 // CLKOUT divider select
+/**
+ * Sampling rate control
+ * $WIZ$ wm8731_sample_rate = "WM8731_NORMAL_256FS_48KHZ", "WM8731_NORMAL_256FS_44_1KHZ", "WM8731_NORMAL_384FS_44_1KHZ"
+ */
+#define WM8731_NORMAL_256FS_48KHZ      0
+#define WM8731_NORMAL_256FS_44_1KHZ    0x20
+#define WM8731_NORMAL_384FS_44_1KHZ    0x22
 
 /* Active control register*/
 #define WM8731_REG_ACTIVE_CTRL                     0x9
