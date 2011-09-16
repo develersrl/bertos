@@ -61,8 +61,9 @@ static void wm8731_write(Wm8731 *ctx, uint8_t reg, uint16_t value)
 	i2c_putc(ctx->i2c, (uint8_t)((tmp & 0xFF00) >> 8));
 	i2c_putc(ctx->i2c, (uint8_t)(tmp & 0xFF));
 
-	if (i2c_error(ctx->i2c))
-		LOG_ERR("Error while send command to codec.\n");
+	int err = i2c_error(ctx->i2c);
+	if (err)
+		LOG_ERR("Error[%d] while send command to codec.\n", err);
 
 }
 
