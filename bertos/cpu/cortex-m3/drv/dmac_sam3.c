@@ -56,7 +56,7 @@ struct DmacCh
 	reg32_t *ctrlb;
 };
 
-#define DMAC_CHANNEL_CNT   5
+#define DMAC_CHANNEL_CNT   6
 struct DmacCh dmac_ch[] =
 {
 	{
@@ -163,37 +163,10 @@ int dmac_start(int ch)
 	return 0;
 }
 
-int dmac_stop(int ch)
+void dmac_stop(int ch)
 {
 	DMAC_CHDR = BV(ch);
-	return 0;
-}
-
-bool dmac_isLLIDone(int ch)
-{
-	return (DMAC_EBCIMR |= (BV(ch) << DMAC_EBCISR_CBTC0));
-}
-
-bool dmac_waitLLIDone(int ch)
-{
-	while(!(DMAC_EBCIMR |= (BV(ch) << DMAC_EBCISR_CBTC0)))
-		cpu_relax();
-
-	DMAC_CHDR = BV(ch);
-	return true;
-}
-
-bool dmac_isDone(int ch)
-{
-	//event_wait(&data_ready);
-	return (*dmac_ch[ch].ctrla & BV(31));//(DMAC_CHSR |= (BV(dmac->ch) << DMAC_CHSR_EMPT0));
-}
-
-bool dmac_waitDone(int ch)
-{
-	event_wait(&data_ready);
-	DMAC_CHDR = BV(ch);
-	return true;
+	dmac_ch_enabled &= ~BV(ch);
 }
 
 int dmac_error(int ch)

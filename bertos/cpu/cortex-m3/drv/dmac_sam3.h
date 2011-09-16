@@ -80,15 +80,11 @@ INLINE void dmac_setSourcesLLI(int ch, DmacDesc *lli, uint32_t src, uint32_t dst
 void dmac_configureDmaCfgLLI(int ch, DmacDesc *lli, uint32_t cfg);
 void dmac_setSourcesLLI(int ch, DmacDesc *lli, uint32_t src, uint32_t dst, uint32_t desc);
 void dmac_configureDmacLLI(int ch, DmacDesc *lli, size_t transfer_size, uint32_t cfg, uint32_t ctrla, uint32_t ctrlb);
-bool dmac_isLLIDone(int ch);
-bool dmac_waitLLIDone(int ch);
 
 void dmac_setSources(int ch, uint32_t src, uint32_t dst);
 void dmac_configureDmac(int ch, size_t transfer_size, uint32_t cfg, uint32_t ctrla, uint32_t ctrlb);
 int dmac_start(int ch);
-int dmac_stop(int ch);
-bool dmac_isDone(int ch);
-bool dmac_waitDone(int ch);
+void dmac_stop(int ch);
 int dmac_error(int ch);
 bool dmac_enableCh(int ch, dmac_handler_t handler);
 void dmac_init(void);
