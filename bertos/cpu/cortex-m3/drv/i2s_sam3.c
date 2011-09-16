@@ -35,6 +35,9 @@
  */
 
 
+
+#include "hw/hw_i2s.h"
+
 #include "cfg/cfg_i2s.h"
 
 // Define log settings for cfg/log.h.
@@ -99,10 +102,9 @@ uint32_t cfg;
 uint32_t ctrla;
 uint32_t ctrlb;
 
-
 static void i2s_dmac_irq(uint32_t status)
 {
-	PIOA_SODR = BV(13);
+	I2S_STROBE_ON();
 	if (single_transfer)
 	{
 		single_transfer = false;
@@ -112,8 +114,8 @@ static void i2s_dmac_irq(uint32_t status)
 		if (status & (BV(I2S_DMAC_CH) << DMAC_EBCIDR_ERR0))
 		{
 			error = true;
+			// Disable to reset channel and clear fifo
 			DMAC_CHDR = BV(I2S_DMAC_CH);
-			kprintf("irq_err[%08lx]\n", DMAC_EBCISR);
 		}
 		else
 		{
@@ -135,11 +137,10 @@ static void i2s_dmac_irq(uint32_t status)
 				remaing_size = transfer_size;
 				next_idx = 0;
 			}
-
 		}
 	}
 	event_do(&data_ready);
-	PIOA_CODR = BV(13);
+	I2S_STROBE_OFF();
 }
 
 static void sam3_i2s_txStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
@@ -159,19 +160,15 @@ static void sam3_i2s_txStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 
 
 	//Confing DMAC
-
 	DMAC_CHDR = BV(I2S_DMAC_CH);
-	kprintf("Start streaming [%08lx]\n", DMAC_EBCISR);
+	reg32_t reg = DMAC_EBCISR;
+
+	LOG_INFO("Start streaming [%08lx]\n", reg);
 
 	cfg = BV(DMAC_CFG_DST_H2SEL) | BV(DMAC_CFG_SOD) |
-					((3 << DMAC_CFG_DST_PER_SHIFT) & DMAC_CFG_DST_PER_MASK) | (3 & DMAC_CFG_SRC_PER_MASK);
-
-	ctrla = DMAC_CTRLA_SRC_WIDTH_HALF_WORD |
-					 DMAC_CTRLA_DST_WIDTH_HALF_WORD;
-
-	ctrlb = DMAC_CTRLB_FC_MEM2PER_DMA_FC |
-					DMAC_CTRLB_DST_INCR_FIXED |
-					DMAC_CTRLB_SRC_INCR_INCREMENTING;
+		((3 << DMAC_CFG_DST_PER_SHIFT) & DMAC_CFG_DST_PER_MASK) | (3 & DMAC_CFG_SRC_PER_MASK);
+	ctrla = DMAC_CTRLA_SRC_WIDTH_HALF_WORD | DMAC_CTRLA_DST_WIDTH_HALF_WORD;
+	ctrlb = DMAC_CTRLB_FC_MEM2PER_DMA_FC | DMAC_CTRLB_DST_INCR_FIXED | DMAC_CTRLB_SRC_INCR_INCREMENTING;
 
 	prev = &lli0;
 	curr = &lli0;
@@ -182,7 +179,7 @@ static void sam3_i2s_txStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 	lli0.src_addr = (uint32_t)&sample_buff[0];
 	lli0.dst_addr = (uint32_t)&SSC_THR;
 	lli0.dsc_addr = (uint32_t)next;
-	lli0.ctrla    = ctrla | (chunk_size & 0xffff) ;
+	lli0.ctrla    = ctrla | (chunk_size & 0xffff);
 	lli0.ctrlb    = ctrlb & ~BV(DMAC_CTRLB_IEN);
 
 	remaing_size -= chunk_size;
@@ -209,7 +206,10 @@ static void sam3_i2s_txStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 	dmac_configureDmaCfgLLI(I2S_DMAC_CH, &lli0, cfg);
 
 	if (dmac_start(I2S_DMAC_CH) < 0)
-		kprintf("start erros[%x]\n", dmac_error(I2S_DMAC_CH));
+	{
+		LOG_ERR("DMAC start[%x]\n", dmac_error(I2S_DMAC_CH));
+		return;
+	}
 
 	error = false;
 	SSC_CR = BV(SSC_TXEN);
@@ -220,7 +220,7 @@ static void sam3_i2s_txStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 		event_wait(&data_ready);
 		if (error)
 		{
-			kputs("Errore\n");
+			LOG_ERR("Errow while streaming.\n");
 			break;
 		}
 
@@ -261,7 +261,7 @@ static bool sam3_i2s_isTxFinish(struct I2s *i2s)
 static bool sam3_i2s_isRxFinish(struct I2s *i2s)
 {
 	(void)i2s;
-	return dmac_isDone(I2S_DMAC_CH);
+	return 0;
 }
 
 static void sam3_i2s_txBuf(struct I2s *i2s, void *buf, size_t len)
@@ -305,8 +305,11 @@ static void sam3_i2s_rxBuf(struct I2s *i2s, void *buf, size_t len)
 static int sam3_i2s_write(struct I2s *i2s, uint32_t sample)
 {
 	(void)i2s;
+
 	SSC_CR = BV(SSC_TXEN);
-	while(!(SSC_SR & BV(SSC_TXRDY)));
+	while(!(SSC_SR & BV(SSC_TXRDY)))
+		cpu_relax();
+
 	SSC_THR = sample;
 	return 0;
 }
@@ -314,17 +317,13 @@ static int sam3_i2s_write(struct I2s *i2s, uint32_t sample)
 static uint32_t sam3_i2s_read(struct I2s *i2s)
 {
 	(void)i2s;
+
 	SSC_CR = BV(SSC_RXEN);
-	while(!(SSC_SR & BV(SSC_RXRDY)));
+	while(!(SSC_SR & BV(SSC_RXRDY)))
+		cpu_relax();
+
 	return SSC_RHR;
 }
-
-
-static DECLARE_ISR(irq_ssc)
-{
-}
-
-
 
 
 /* We divite for 2 because the min clock for i2s i MCLK/2 */
@@ -355,6 +354,8 @@ void i2s_init(I2s *i2s, int channel)
 
 	DB(i2s->ctx._type = I2S_SAM3X;)
 	i2s->hw = &i2s_hw;
+
+	I2S_STROBE_INIT();
 
 	PIOA_PDR = BV(SSC_TK) | BV(SSC_TF) | BV(SSC_TD);
 	PIO_PERIPH_SEL(PIOA_BASE, BV(SSC_TK) | BV(SSC_TF) | BV(SSC_TD), PIO_PERIPH_B);
