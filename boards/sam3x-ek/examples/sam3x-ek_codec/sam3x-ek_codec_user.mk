@@ -44,4 +44,5 @@ sam3x-ek_codec_USER_CPPAFLAGS = \
 sam3x-ek_codec_USER_CPPFLAGS = \
 	-fno-strict-aliasing \
 	-fwrapv \
+	-O2
 	#
