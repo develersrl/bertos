@@ -126,8 +126,9 @@
 
 /**
  * Data sampling rate, refer to datasheet for this value.
- * $WIZ$ type = "hex"
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "wm8731_sample_rate"
  */
-#define CONFIG_WM8731_SAMPLING_RATES     0x6
+#define CONFIG_WM8731_SAMPLING_RATES     WM8731_NORMAL_256FS_44_1KHZ
 
 #endif /* CFG_WM8731_H */
