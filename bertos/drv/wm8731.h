@@ -168,6 +168,7 @@
 #define WM8731_NORMAL_256FS_48KHZ      0
 #define WM8731_NORMAL_256FS_44_1KHZ    0x20
 #define WM8731_NORMAL_384FS_44_1KHZ    0x22
+#define WM8731_NORMAL_128FS_44_1KHZ    0x3E
 
 /* Active control register*/
 #define WM8731_REG_ACTIVE_CTRL                     0x9
