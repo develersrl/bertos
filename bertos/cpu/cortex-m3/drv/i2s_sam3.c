@@ -113,13 +113,11 @@
 #define I2S_STATUS_ERR              BV(0)
 #define I2S_STATUS_SINGLE_TRASF     BV(1)
 #define I2S_STATUS_TX               BV(2)
-#define I2S_STATUS_RX               BV(3)
-struct I2sHardware
-{
-	bool end;
-};
+#define I2S_STATUS_END_TX           BV(3)
+#define I2S_STATUS_RX               BV(4)
+#define I2S_STATUS_END_RX           BV(5)
 
-struct I2sHardware i2s_hw;
+
 static Event data_ready;
 
 DmacDesc lli0;
@@ -132,7 +130,6 @@ static uint8_t i2s_status;
 static uint8_t *sample_buff;
 static size_t next_idx = 0;
 static size_t chunk_size = 0;
-static size_t remaing_size = 0;
 static size_t transfer_size = 0;
 
 static void sam3_i2s_txStop(I2s *i2s)
@@ -141,11 +138,10 @@ static void sam3_i2s_txStop(I2s *i2s)
 	SSC_CR = BV(SSC_TXDIS);
 	dmac_stop(I2S_DMAC_CH);
 
-	i2s->hw->end = true;
-	remaing_size = 0;
 	next_idx = 0;
 	transfer_size = 0;
 
+	i2s_status |= I2S_STATUS_END_TX;
 	i2s_status &= ~I2S_STATUS_TX;
 
 	event_do(&data_ready);
@@ -195,14 +191,6 @@ static void i2s_dmac_irq(uint32_t status)
 				curr->ctrlb    = I2S_RX_DMAC_CTRLB & ~BV(DMAC_CTRLB_IEN);
 			}
 
-			remaing_size -= chunk_size;
-			next_idx += chunk_size;
-
-			if (remaing_size <= 0)
-			{
-				remaing_size = transfer_size;
-				next_idx = 0;
-			}
 		}
 	}
 	event_do(&data_ready);
@@ -216,13 +204,12 @@ static void sam3_i2s_txStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 	ASSERT(len >= slice_len);
 	ASSERT(!(len % slice_len));
 
-	i2s->hw->end = false;
-	i2s_status &= ~I2S_STATUS_SINGLE_TRASF;
+	i2s_status &= ~(I2S_STATUS_END_TX | I2S_STATUS_SINGLE_TRASF);
 
 	sample_buff = (uint8_t *)buf;
 	next_idx = 0;
 	chunk_size = slice_len;
-	remaing_size = len;
+	size_t remaing_size = len;
 	transfer_size = len;
 
 
@@ -272,17 +259,29 @@ static void sam3_i2s_txStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 	while (1)
 	{
 		event_wait(&data_ready);
+
+		remaing_size -= chunk_size;
+		next_idx += chunk_size;
+
+		if (remaing_size <= 0)
+		{
+			remaing_size = transfer_size;
+			next_idx = 0;
+		}
+
 		if (i2s_status & I2S_STATUS_ERR)
 		{
 			LOG_ERR("Error while streaming.\n");
 			break;
 		}
 
-		if (i2s->hw->end)
+		if (i2s_status & I2S_STATUS_END_TX)
 		{
 			LOG_INFO("Stop streaming.\n");
 			break;
 		}
+
+
 
 		i2s->ctx.tx_callback(i2s, &sample_buff[next_idx], chunk_size);
 		cpu_relax();
@@ -295,8 +294,7 @@ static void sam3_i2s_rxStop(I2s *i2s)
 	SSC_CR = BV(SSC_RXDIS) | BV(SSC_TXDIS);
 	dmac_stop(I2S_DMAC_CH);
 
-	i2s->hw->end = true;
-	remaing_size = 0;
+	i2s_status |= I2S_STATUS_END_RX;
 	next_idx = 0;
 	transfer_size = 0;
 
@@ -317,13 +315,12 @@ static void sam3_i2s_rxStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 	ASSERT(len >= slice_len);
 	ASSERT(!(len % slice_len));
 
-	i2s->hw->end = false;
-	i2s_status &= ~I2S_STATUS_SINGLE_TRASF;
+	i2s_status &= ~(I2S_STATUS_END_RX | I2S_STATUS_SINGLE_TRASF);
 
 	sample_buff = (uint8_t *)buf;
 	next_idx = 0;
 	chunk_size = slice_len;
-	remaing_size = len;
+	size_t remaing_size = len;
 	transfer_size = len;
 
 	memset(&lli0, 0, sizeof(DmacDesc));
@@ -370,13 +367,23 @@ static void sam3_i2s_rxStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 	while (1)
 	{
 		event_wait(&data_ready);
+
+		remaing_size -= chunk_size;
+		next_idx += chunk_size;
+
+		if (remaing_size <= 0)
+		{
+			remaing_size = transfer_size;
+			next_idx = 0;
+		}
+
 		if (i2s_status & I2S_STATUS_ERR)
 		{
 			LOG_ERR("Error while streaming.\n");
 			break;
 		}
 
-		if (i2s->hw->end)
+		if (i2s_status & I2S_STATUS_END_RX)
 		{
 			LOG_INFO("Stop streaming.\n");
 			break;
@@ -389,12 +396,14 @@ static void sam3_i2s_rxStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 
 static bool sam3_i2s_isTxFinish(struct I2s *i2s)
 {
-	return i2s->hw->end;
+	(void)i2s;
+	return (i2s_status & I2S_STATUS_END_TX);
 }
 
 static bool sam3_i2s_isRxFinish(struct I2s *i2s)
 {
-	return i2s->hw->end;
+	(void)i2s;
+	return (i2s_status & I2S_STATUS_END_RX);
 }
 
 static void sam3_i2s_txBuf(struct I2s *i2s, void *buf, size_t len)
@@ -473,7 +482,6 @@ void i2s_init(I2s *i2s, int channel)
 	i2s->ctx.rx_stop = sam3_i2s_rxStop;
 
 	DB(i2s->ctx._type = I2S_SAM3X;)
-	i2s->hw = &i2s_hw;
 
 	I2S_STROBE_INIT();
 
