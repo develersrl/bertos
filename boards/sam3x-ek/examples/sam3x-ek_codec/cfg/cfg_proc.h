@@ -43,7 +43,7 @@
  *
  * $WIZ$ type = "autoenabled"
  */
-#define CONFIG_KERN 0
+#define CONFIG_KERN 1
 
 /**
  * Kernel interrupt supervisor. WARNING: Experimental, still incomplete!
@@ -72,7 +72,7 @@
  * Priority-based scheduling policy.
  * $WIZ$ type = "boolean"
  */
-#define CONFIG_KERN_PRI 0
+#define CONFIG_KERN_PRI 1
 
 /**
  * Priority-inheritance protocol.

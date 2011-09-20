@@ -43,7 +43,7 @@
  * Enable malloc/free like API.
  * $WIZ$ type = "boolean"
  */
-#define CONFIG_HEAP_MALLOC     1
+#define CONFIG_HEAP_MALLOC     0
 
 #endif /* CFG_HEAP_H */
 

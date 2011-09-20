@@ -93,7 +93,7 @@
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "wm8731_bypass"
  */
-#define CONFIG_WM8731_BYPASS      WM8731_DACSEL
+#define CONFIG_WM8731_BYPASS     WM8731_DACSEL
 
 /**
  * Analog control: Side tone attenuation
@@ -126,8 +126,7 @@
 
 /**
  * Data sampling rate, refer to datasheet for this value.
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "wm8731_sample_rate"
+ * $WIZ$ type = "hex"
  */
 #define CONFIG_WM8731_SAMPLING_RATES     WM8731_NORMAL_256FS_44_1KHZ
 
