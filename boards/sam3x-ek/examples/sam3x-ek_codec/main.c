@@ -83,6 +83,7 @@
 #include <verstag.h>
 #include <buildrev.h>
 
+#include <stdio.h>
 #include <string.h>
 
 // Keyboard
@@ -95,10 +96,10 @@
 #define CODEC_ADDR 0x36
 
 // Kernel
-static PROC_DEFINE_STACK(play_proc_stack, 2048);
+static PROC_DEFINE_STACK(play_proc_stack, 1024);
+static PROC_DEFINE_STACK(rec_proc_stack, 1024);
 MsgPort proc_play_inPort;
-
-#define PLAY_SIGNAL    SIG_USER3
+MsgPort proc_rec_inPort;
 
 #define MAX_ITEM_NODES    30
 #define MAX_ITEMS_ROW     15
@@ -110,11 +111,11 @@ typedef struct FileItemNode
 	char file_name[13];
 } FileItemNode;
 
-typedef struct PlayMsg
+typedef struct AudioMsg
 {
 	Msg msg;
 	char file_name[13];
-} PlayMsg;
+} AudioMsg;
 
 FileItemNode item_nodes[MAX_ITEM_NODES];
 
@@ -137,6 +138,8 @@ static int lcd_brightness = LCD_BACKLIGHT_MAX;
 static uint16_t headphone_volume = 90;
 static size_t played_size = 0;
 static bool is_playing = false;
+static bool is_recording = false;
+static int recorderd_file_idx;
 
 static void codec_play(struct I2s *i2s, void *_buf, size_t len)
 {
@@ -152,13 +155,8 @@ static void codec_play(struct I2s *i2s, void *_buf, size_t len)
 
 static void codec_rec(struct I2s *i2s, void *_buf, size_t len)
 {
-	played_size += kfile_write(&rec_file.fd, _buf, len);
-	if (played_size >= 1024 * 1024)
-	{
-		kprintf("stop %d\n", played_size);
-		i2s_dmaRxStop(i2s);
-		played_size = 0;
-	}
+	(void)i2s;
+	kfile_write(&rec_file.fd, _buf, len);
 }
 
 static void NORETURN play_proc(void)
@@ -166,8 +164,8 @@ static void NORETURN play_proc(void)
 	while (1)
 	{
 		event_wait(&proc_play_inPort.event);
-		PlayMsg *play;
-		play = (PlayMsg *)msg_get(&proc_play_inPort);
+		AudioMsg *play;
+		play = (AudioMsg *)msg_get(&proc_play_inPort);
 		if (play && SD_CARD_PRESENT())
 		{
 			timer_delay(10);
@@ -217,13 +215,67 @@ static void NORETURN play_proc(void)
 				f_mount(0, NULL);
 			}
 		}
-		kputs("no message\n");
 	}
 }
 
+
+static void NORETURN rec_proc(void)
+{
+	while (1)
+	{
+		event_wait(&proc_rec_inPort.event);
+		AudioMsg *rec;
+		rec = (AudioMsg *)msg_get(&proc_rec_inPort);
+		if (rec && SD_CARD_PRESENT())
+		{
+			timer_delay(10);
+
+			bool sd_ok = sd_init(&sd, NULL, 0);
+			FRESULT result;
+
+			if (sd_ok)
+			{
+				kprintf("Mount FAT filesystem.\n");
+
+				result = f_mount(0, &fs);
+				if (result != FR_OK)
+				{
+					kprintf("Mounting FAT volumes error[%d]\n", result);
+					sd_ok = false;
+				}
+
+				if (sd_ok)
+				{
+					result = fatfile_open(&rec_file, rec->file_name,  FA_CREATE_ALWAYS | FA_WRITE);
+					if (result == FR_OK)
+					{
+						kprintf("Open file: %s size %ld\n", rec->file_name, rec_file.fat_file.fsize);
+						WavHdr wav;
+						wav_writeHdr(&wav, 1, CONFIG_CHANNEL_NUM, CONFIG_SAMPLE_FREQ, CONFIG_WORD_BIT_SIZE);
+						kfile_write(&rec_file.fd, &wav, sizeof(WavHdr));
+						kputs("Rec Wav file..\n");
+						is_recording = true;
+						i2s_dmaStartRxStreaming(&i2s, tmp, sizeof(tmp), sizeof(tmp) / 4, codec_rec);
+
+						// Flush data and close the files.
+						kfile_flush(&rec_file.fd);
+						kfile_close(&rec_file.fd);
+					}
+					else
+					{
+						kprintf("Unable to open file: '%s' error[%d]\n", rec->file_name, result);
+					}
+				}
+				f_mount(0, NULL);
+			}
+		}
+	}
+}
+
+
 INLINE void start_play(char *file_name)
 {
-	PlayMsg play_msg;
+	AudioMsg play_msg;
 	memcpy(play_msg.file_name, file_name, sizeof(play_msg.file_name));
 	msg_put(&proc_play_inPort, &play_msg.msg);
 }
@@ -235,6 +287,19 @@ INLINE void stop_play(void)
 	is_playing = false;
 }
 
+
+INLINE void start_rec(char *file_name)
+{
+	AudioMsg rec_msg;
+	memcpy(rec_msg.file_name, file_name, sizeof(rec_msg.file_name));
+	msg_put(&proc_rec_inPort, &rec_msg.msg);
+}
+
+INLINE void stop_rec(void)
+{
+	i2s_dmaRxStop(&i2s);
+	is_recording = false;
+}
 
 INLINE FileItemNode *select_item(Bitmap *bm, List *file_list, int select_idx)
 {
@@ -280,7 +345,7 @@ INLINE FileItemNode *select_item(Bitmap *bm, List *file_list, int select_idx)
 	return select_node;
 }
 
-static void sd_explorer(Bitmap *bm)
+static void play_menu(Bitmap *bm)
 {
 	List file_list;
 	LIST_INIT(&file_list);
@@ -369,7 +434,6 @@ static void sd_explorer(Bitmap *bm)
 				idx = 0;
 
 			selected_node = select_item(bm, &file_list, idx);
-			kprintf("lidx[%d] %s\n", idx, selected_node->file_name);
 		}
 		if (key & K_RIGHT)
 		{
@@ -385,6 +449,56 @@ static void sd_explorer(Bitmap *bm)
 		cpu_relax();
 	}
 }
+
+
+static void rec_menu(Bitmap *bm)
+{
+	gfx_bitmapClear(bm);
+	text_style(bm, STYLEF_BOLD | STYLEF_UNDERLINE, STYLEF_BOLD | STYLEF_UNDERLINE);
+	text_xprintf(bm, 0, 0, TEXT_CENTER | TEXT_FILL, "Microphone recorder.");
+	text_style(bm, 0, STYLEF_MASK);
+	text_xprintf(bm, 2, 0, TEXT_NORMAL, "Press RIGHT button to start recording");
+	text_xprintf(bm, 3, 0, TEXT_NORMAL, "and to stop it re-press RIGHT button.");
+	lcd_hx8347_blitBitmap(bm);
+
+	ticks_t start= 0;
+	while (1)
+	{
+		keymask_t key = kbd_peek();
+		if (key & K_LEFT)
+		{
+			break;
+		}
+		if (key & K_RIGHT)
+		{
+			char file_name[13];
+			memset(file_name, 0, sizeof(file_name));
+			sprintf(file_name, "REC%d.WAV", recorderd_file_idx);
+			kprintf("rec %s\n", file_name);
+
+			if (!is_recording)
+			{
+				start_rec(file_name);
+				text_xprintf(bm, 5, 0, TEXT_CENTER | TEXT_FILL, "Start recording on file: %s", file_name);
+				lcd_hx8347_blitBitmap(bm);
+				start = timer_clock();
+			}
+			else
+			{
+				stop_rec();
+				recorderd_file_idx++;
+				text_xprintf(bm, 5, 0, TEXT_CENTER | TEXT_FILL, "Stop recording: %s", file_name);
+				mtime_t elaps = ticks_to_ms(timer_clock() - start);
+				text_xprintf(bm, 6, 0, TEXT_CENTER | TEXT_FILL, "Recorded: %ld.%ldsec", elaps / 1000, elaps % 1000);
+				lcd_hx8347_blitBitmap(bm);
+			}
+		}
+
+		cpu_relax();
+	}
+}
+
+
 
 /*
  * Lcd
@@ -455,7 +569,8 @@ static void NORETURN soft_reset(Bitmap * bm)
 
 static struct MenuItem main_items[] =
 {
-	{ (const_iptr_t)"Play SD file",       0, (MenuHook)sd_explorer,   (iptr_t)&lcd_bitmap },
+	{ (const_iptr_t)"Play SD file",       0, (MenuHook)play_menu,     (iptr_t)&lcd_bitmap },
+	{ (const_iptr_t)"Record file on SD",  0, (MenuHook)rec_menu,      (iptr_t)&lcd_bitmap },
 	{ (const_iptr_t)"Set brightness",     0, (MenuHook)setBrightness, (iptr_t)&lcd_bitmap },
 	{ (const_iptr_t)"Set volume",         0, (MenuHook)setVolume,     (iptr_t)&lcd_bitmap },
 	{ (const_iptr_t)"Reboot",             0, (MenuHook)soft_reset,    (iptr_t)&lcd_bitmap },
@@ -497,7 +612,9 @@ int main(void)
 	kbd_init();
 
 	proc_new(play_proc, NULL, sizeof(play_proc_stack), play_proc_stack);
+	proc_new(rec_proc, NULL, sizeof(rec_proc_stack), rec_proc_stack);
 	msg_initPort(&proc_play_inPort, event_createGeneric());
+	msg_initPort(&proc_rec_inPort, event_createGeneric());
 
 	lcd_hx8347_blitBitmap24(10, 52, BMP_LOGO_WIDTH, BMP_LOGO_HEIGHT, bmp_logo);
 	timer_delay(500);
