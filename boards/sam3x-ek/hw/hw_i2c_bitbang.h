@@ -120,7 +120,7 @@ INLINE bool i2c_sclIn(int dev)
 INLINE void i2c_halfbitDelay(int dev)
 {
 	(void)(dev);
-	timer_udelay(1);
+	timer_udelay(10);
 	cpu_relax();
 }
 
