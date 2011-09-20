@@ -30,42 +30,67 @@
  *
  * -->
  *
- * \author Stefano Federico <aleph@develer.com>
+ * \brief Atmel SAM3X-EK testcase
  *
- * \brief Empty project.
- *
- * This is a minimalist project, it just initializes the hardware of the
- * supported board and proposes an empty main.
+ * \author Stefano Fedrigo <aleph@develer.com>
  */
 
+#include "bitmaps.h"
+
 #include "hw/hw_led.h"
+#include "hw/hw_lcd.h"
+#include "hw/hw_adc.h"
+#include "hw/hw_sdram.h"
 #include "hw/hw_sd.h"
+
 #include "cfg/cfg_i2s.h"
 
 #include <cfg/debug.h>
 
 #include <cpu/irq.h>
+#include <cpu/irq.h>
 #include <cpu/byteorder.h>
 
-#include <io/kfile.h>
-#include <io/kfile_block.h>
-
+#include <drv/kbd.h>
 #include <drv/i2c.h>
 #include <drv/i2s.h>
 #include <drv/sd.h>
-#include <drv/eeprom.h>
 #include <drv/timer.h>
 #include <drv/lcd_hx8347.h>
 #include <drv/adc.h>
 #include <drv/wm8731.h>
 #include <drv/dmac_sam3.h>
+#include <drv/sd.h>
+
+#include <gfx/gfx.h>
+#include <gfx/font.h>
+#include <gfx/text.h>
+#include <gui/menu.h>
+#include <icons/logo.h>
+
+#include <io/kfile.h>
+#include <io/kfile_block.h>
+
+#include <kern/signal.h>
+#include <kern/proc.h>
 
 #include <fs/fat.h>
+
+#include <struct/list.h>
 
 #include <verstag.h>
 #include <buildrev.h>
 
 #include <string.h>
+
+// Keyboard
+#define KEY_MASK (K_LEFT | K_RIGHT)
+
+// Kernel
+#define PROC_STACK_SIZE	KERN_MINSTACKSIZE * 2
+
+static PROC_DEFINE_STACK(hp_stack, PROC_STACK_SIZE);
+static PROC_DEFINE_STACK(lp_stack, PROC_STACK_SIZE);
 
 /*
  * Codec has 7-bit address, the eighth is the R/W bit, so we
@@ -94,12 +119,13 @@ typedef struct WavHdr
 } WavHdr;
 
 
-//#define FILE_NAME  "input0.wav"
-//#define FILE_NAME  "due.wav"
-//#define FILE_NAME  "sample.wav"
-//#define FILE_NAME  "testaa"
-#define FILE_NAME  "outfile.wav"
-#define ACQ_FILE_NAME  "acq.wav"
+static uint8_t raster[RAST_SIZE(LCD_WIDTH, LCD_HEIGHT)];
+static Bitmap lcd_bitmap;
+extern Font font_gohu;
+static int lcd_brightness = LCD_BACKLIGHT_MAX;
+static Process *hp_proc, *lp_proc;
+static hptime_t start, end;
+
 
 uint8_t tmp[4096];
 
@@ -112,36 +138,133 @@ static I2c i2c;
 static I2s i2s;
 static Wm8731 wm8731_ctx;
 
-static void init(void)
+
+static void screen_saver(Bitmap *bm)
 {
-	IRQ_ENABLE;
-	kdbg_init();
-	kprintf("sam3x %s: %d times\n", VERS_HOST, VERS_BUILD);
+	int x1, y1, x2, y2;
+	int i;
 
-	timer_init();
-	LED_INIT();
-
-	adc_init();
-	dmac_init();
-	i2c_init(&i2c, I2C_BITBANG0, CONFIG_I2C_FREQ);
-	i2s_init(&i2s, SSC0);
-
-	wm8731_init(&wm8731_ctx, &i2c, CODEC_ADDR);
-	wm8731_setVolume(&wm8731_ctx, WM8731_HEADPHONE, 0);
-}
-
-size_t count = 0;
-
-static void codec(struct I2s *i2s, void *_buf, size_t len)
-{
-	count += kfile_read(&log_file.fd, _buf, len);
-	if (count >= log_file.fat_file.fsize - sizeof(WavHdr))
+	for (i = 0; ; i++)
 	{
-		kprintf("stop %d\n", count);
-		i2s_dmaTxStop(i2s);
-		count = 0;
+		x1 = i % LCD_WIDTH;
+		y1 = i % LCD_HEIGHT;
+
+		x2 = LCD_WIDTH - i % LCD_WIDTH;
+		y2 = LCD_HEIGHT - i % LCD_HEIGHT;
+
+		gfx_bitmapClear(bm);
+		gfx_rectDraw(bm, x1, y1, x2, y2);
+		lcd_hx8347_blitBitmap(bm);
+		if (kbd_peek() & KEY_MASK)
+			break;
 	}
 }
+
+
+INLINE hptime_t get_hp_ticks(void)
+{
+	return (timer_clock_unlocked() * TIMER_HW_CNT) + timer_hw_hpread();
+}
+
+static void NORETURN hp_process(void)
+{
+	while (1)
+	{
+		sig_wait(SIG_USER0);
+		end = get_hp_ticks();
+		timer_delay(100);
+		sig_send(lp_proc, SIG_USER0);
+	}
+}
+
+static void NORETURN lp_process(void)
+{
+	while (1)
+	{
+		start = get_hp_ticks();
+		sig_send(hp_proc, SIG_USER0);
+		sig_wait(SIG_USER0);
+	}
+}
+
+/*
+ * Lcd
+ */
+static void setBrightness(Bitmap *bm)
+{
+	while (1)
+	{
+		gfx_bitmapClear(bm);
+		text_xprintf(bm, 1, 0, TEXT_FILL | TEXT_CENTER, "Brightness: %d", lcd_brightness);
+		text_xprintf(bm, 3, 0, TEXT_FILL | TEXT_CENTER, "RIGHT key: change");
+		text_xprintf(bm, 4, 0, TEXT_FILL | TEXT_CENTER, "LEFT  key: back  ");
+		lcd_hx8347_blitBitmap(bm);
+
+		keymask_t mask = kbd_get();
+
+		if (mask & K_LEFT)
+			break;
+		else if (mask & K_RIGHT)
+		{
+			if (++lcd_brightness > LCD_BACKLIGHT_MAX)
+				lcd_brightness = 0;
+			lcd_setBacklight(lcd_brightness);
+		}
+	}
+}
+
+
+static void NORETURN soft_reset(Bitmap * bm)
+{
+	int i;
+
+	gfx_bitmapClear(bm);
+	for (i = 5; i; --i)
+	{
+		text_xprintf(bm, 2, 0, TEXT_FILL | TEXT_CENTER, "%d", i);
+		lcd_hx8347_blitBitmap(bm);
+		timer_delay(1000);
+	}
+	text_xprintf(bm, 2, 0, TEXT_FILL | TEXT_CENTER, "REBOOT");
+	lcd_hx8347_blitBitmap(bm);
+	timer_delay(1000);
+
+	/* Perform a software reset request */
+	HWREG(NVIC_APINT) = NVIC_APINT_VECTKEY | NVIC_APINT_SYSRESETREQ;
+	UNREACHABLE();
+}
+
+static void read_adc(Bitmap *bm)
+{
+	gfx_bitmapClear(bm);
+	text_xprintf(bm, 0, 0, TEXT_FILL | TEXT_CENTER, "ADC Value");
+	while (1)
+	{
+		uint16_t value = ADC_RANGECONV(adc_read(1), 0, 3300);
+		uint16_t temp = hw_convertToDegree (adc_read(ADC_TEMPERATURE_CH));
+
+		text_xprintf(&lcd_bitmap, 2, 0, TEXT_FILL | TEXT_CENTER,
+									"Voltage on VR1: %d.%dV", value / 1000, value % 1000);
+		text_xprintf(&lcd_bitmap, 3, 0, TEXT_FILL | TEXT_CENTER,
+									"CPU temperature: %d.%dC", temp / 10, temp % 10);
+		lcd_hx8347_blitBitmap(bm);
+		timer_delay(400);
+		if (kbd_peek() & KEY_MASK)
+			break;
+	}
+}
+#define FILE_NAME  "outfile.wav"
+#define ACQ_FILE_NAME  FILE_NAME
+
+
+uint8_t tmp[4096];
+
+// SD fat filesystem context
+FATFS fs;
+FatFile log_file;
+FatFile acq_file;
+
+
 
 static int wav_check(KFile *fd)
 {
@@ -196,75 +319,338 @@ error:
 	return 1;
 }
 
-int main(void)
+
+static int wav_writeHdr(KFile *fd, uint16_t rate, uint16_t channels, uint16_t bits)
 {
-	init();
+	WavHdr header;
 
-	for (;;)
-	{
-		if (SD_CARD_PRESENT())
-		{
-			timer_delay(10);
-			Sd sd;
-			bool sd_ok = sd_init(&sd, NULL, 0);
-			FRESULT result;
+	memcpy(&header.chunk_id, "RIFF", 4);
+	memcpy(&header.format, "WAVE", 4);
+	header.audio_format = cpu_to_le16((uint16_t)1);
+	header.num_channels = cpu_to_le16(channels);
+	header.sample_rate = cpu_to_le16(rate);
+	header.bits_per_sample = cpu_to_le16(bits);
 
-			if (sd_ok)
-			{
-				kprintf("Mount FAT filesystem.\n");
-				result = f_mount(0, &fs);
-				if (result != FR_OK)
-				{
-					kprintf("Mounting FAT volumes error[%d]\n", result);
-					sd_ok = false;
-				}
-
-				if (sd_ok)
-				{
-					result = fatfile_open(&log_file, FILE_NAME,  FA_OPEN_EXISTING | FA_READ);
-					if (result == FR_OK)
-					{
-						kprintf("Opened log file '%s' size %ld\n", FILE_NAME, log_file.fat_file.fsize);
-						wm8731_setVolume(&wm8731_ctx, WM8731_HEADPHONE, adc_read(1));
-						if (wav_check(&log_file.fd) >= 0)
-						{
-							kputs("Wav file play..\n");
-							i2s_dmaStartTxStreaming(&i2s, tmp, sizeof(tmp), sizeof(tmp) / 4, codec);
-						}
-
-						wm8731_setVolume(&wm8731_ctx, WM8731_HEADPHONE, 0);
-
-						// Flush data and close the files.
-						kfile_flush(&log_file.fd);
-						kfile_close(&log_file.fd);
-					}
-					else
-					{
-						kprintf("Unable to open file: '%s' error[%d]\n", FILE_NAME, result);
-					}
-
-					//Unmount always to prevent accidental sd remove.
-					f_mount(0, NULL);
-					kprintf("Umount\n");
-
-				}
-				f_mount(0, NULL);
-			}
-
-			timer_delay(5000);
-		}
-		else
-		{
-			kputs("No card insert..\n");
-			timer_delay(500);
-		}
-	}
+	kfile_seek(fd, 0, KSM_SEEK_SET);
+	kfile_write(fd, &header, sizeof(header));
 
 	return 0;
 }
 
+size_t count = 0;
+static void codec_play(struct I2s *i2s, void *_buf, size_t len)
+{
+	count += kfile_read(&log_file.fd, _buf, len);
+	if (count >= log_file.fat_file.fsize - sizeof(WavHdr))
+	{
+		kprintf("stop %d\n", count);
+		i2s_dmaTxStop(i2s);
+		count = 0;
+	}
+}
+
+static void codec_rec(struct I2s *i2s, void *_buf, size_t len)
+{
+	count += kfile_write(&acq_file.fd, _buf, len);
+	if (count >= 1024 * 1024)
+	{
+		kprintf("stop %d\n", count);
+		i2s_dmaRxStop(i2s);
+		count = 0;
+	}
+}
 
 
 
+#define MAX_ITEM_NODES    30
+#define MAX_ITEMS_ROW     15
+#define NEXT_ITEM_COL     10
+
+typedef struct FileItemNode
+{
+	Node n;
+	char file_name[13];
+} FileItemNode;
+
+FileItemNode item_nodes[MAX_ITEM_NODES];
+static Sd sd;
+
+static void wav_play(Bitmap *bm, char *file_name)
+{
+	gfx_bitmapClear(bm);
+
+	kprintf("Mount FAT filesystem.\n");
+	FRESULT result = f_mount(0, &fs);
+	bool sd_ok = true;
+	if (result != FR_OK)
+	{
+		kprintf("Mounting FAT volumes error[%d]\n", result);
+		sd_ok = false;
+	}
+
+	if (sd_ok)
+	{
+		result = fatfile_open(&log_file, file_name,  FA_OPEN_EXISTING | FA_READ);
+		if (result == FR_OK)
+		{
+			text_xprintf(bm, 1, 0, TEXT_CENTER, "Play wav file: %s", file_name);
+			text_xprintf(bm, 2, 0, TEXT_CENTER, "File: %ld", log_file.fat_file.fsize);
+			text_xprintf(bm, 3, 0, TEXT_CENTER, "Volume level %ld", ADC_RANGECONV(adc_read(1), 0, 100));
+			kprintf("Open file: %s\n", file_name);
+			wm8731_setVolume(&wm8731_ctx, WM8731_HEADPHONE, ADC_RANGECONV(adc_read(1), 0, 100));
+
+			lcd_hx8347_blitBitmap(bm);
+			if (wav_check(&log_file.fd) >= 0)
+			{
+				kputs("Wav file play..\n");
+				i2s_dmaStartTxStreaming(&i2s, tmp, sizeof(tmp), sizeof(tmp) / 4, codec_play);
+			}
+
+			wm8731_setVolume(&wm8731_ctx, WM8731_HEADPHONE, 0);
+
+			// Flush data and close the files.
+			kfile_flush(&log_file.fd);
+			kfile_close(&log_file.fd);
+		}
+		else
+		{
+			kprintf("Unable to open file: '%s' error[%d]\n", FILE_NAME, result);
+		}
+	}
+	f_mount(0, NULL);
+
+	lcd_hx8347_blitBitmap(bm);
+}
 
 
+INLINE FileItemNode *refresh_cursor(Bitmap *bm, List *file_list, int select_idx)
+{
+	FileItemNode *item;
+	FileItemNode *select_node;
+	int col = 0;
+	int row = 0;
+
+	gfx_bitmapClear(bm);
+	select_node = (FileItemNode *)LIST_HEAD(file_list);
+    FOREACH_NODE(item, file_list)
+	{
+		if (row > MAX_ITEMS_ROW)
+		{
+			row = 1;
+			col = NEXT_ITEM_COL;
+		}
+
+		text_style(bm, 0, STYLEF_MASK);
+		if (select_idx <= MAX_ITEMS_ROW)
+		{
+			if (row == select_idx && col == 0)
+				text_style(bm, STYLEF_INVERT, STYLEF_INVERT);
+				select_node = item;
+		}
+		else
+		{
+			if (row == (select_idx - MAX_ITEMS_ROW) && col == NEXT_ITEM_COL)
+				text_style(bm, STYLEF_INVERT, STYLEF_INVERT);
+				select_node = item;
+		}
+
+		text_xprintf(bm, row, col, TEXT_NORMAL, "%s", item->file_name);
+		row++;
+	}
+
+	lcd_hx8347_blitBitmap(bm);
+
+	return select_node;
+}
+
+static void sd_explorer(Bitmap *bm)
+{
+	List file_list;
+	LIST_INIT(&file_list);
+	int file_list_size = 0;
+	gfx_bitmapClear(bm);
+
+	memcpy (&item_nodes[0].file_name, "<- Return..", sizeof(item_nodes[0].file_name));
+	ADDTAIL(&file_list, &item_nodes[0].n);
+
+	if (SD_CARD_PRESENT())
+	{
+		timer_delay(10);
+
+		bool sd_ok = sd_init(&sd, NULL, 0);
+		FRESULT result;
+
+		if (sd_ok)
+		{
+			kprintf("Mount FAT filesystem.\n");
+
+			result = f_mount(0, &fs);
+			if (result != FR_OK)
+			{
+				kprintf("Mounting FAT volumes error[%d]\n", result);
+				sd_ok = false;
+			}
+
+			if (sd_ok)
+			{
+				FILINFO fno;
+				DIR dir;
+
+				kputs("open dir\n");
+				/* Open the directory */
+				result = f_opendir(&dir, "/");
+				if (result == FR_OK)
+				{
+					// First element is reserved for "return" label
+					for (int i = 1;; i++)
+					{
+						/* Read a directory item */
+						result = f_readdir(&dir, &fno);
+						if (result != FR_OK || fno.fname[0] == 0)
+							break;  /* Break on error or end of dir */
+						if (fno.fname[0] == '.')
+							continue; /* Ignore dot entry */
+
+						if (fno.fattrib & AM_DIR)
+							continue;
+						else
+						{
+							if (i < MAX_ITEM_NODES)
+							{
+								memcpy (&item_nodes[i].file_name, fno.fname, sizeof(item_nodes[i].file_name));
+								ADDTAIL(&file_list, &item_nodes[i].n);
+								file_list_size++;
+							}
+							else
+							{
+								kputs("No enought spase to show file list..\n");
+								break;
+							}
+						}
+					}
+				}
+			}
+			f_mount(0, NULL);
+			kprintf("Umount\n");
+		}
+	}
+	else
+	{
+		kputs("No card insert..\n");
+		text_xprintf(bm, 5, 0, TEXT_CENTER | TEXT_FILL, "%s", "No card insert..");
+	}
+
+	int idx = 0;
+	FileItemNode *selected_node = refresh_cursor(bm, &file_list, idx);
+	while (1)
+	{
+		keymask_t key = kbd_peek();
+		if (key & K_LEFT)
+		{
+			idx++;
+			if (idx > file_list_size)
+				idx = 0;
+
+			selected_node = refresh_cursor(bm, &file_list, idx);
+			kprintf("lidx[%d]\n", idx);
+		}
+		if (key & K_RIGHT)
+		{
+			kprintf("ridx[%d]\n", idx);
+			wav_play(bm, selected_node->file_name);
+			if (idx == 0)
+				break;
+		}
+	}
+}
+
+static void test_draw(Bitmap *bm)
+{
+	gfx_bitmapClear(bm);
+	text_xprintf(bm, 0, 0, TEXT_NORMAL, "%s\n", "12345678.123");
+	text_xprintf(bm, 0, 10, TEXT_NORMAL, "%s\n", "12345678.123");
+	text_xprintf(bm, 1, 0, TEXT_NORMAL, "%s\n", "12345678.123");
+	text_xprintf(bm, 2, 0, TEXT_NORMAL, "%s\n", "12345678.123");
+	text_xprintf(bm, 3, 0, TEXT_NORMAL, "%s\n", "12345678.123");
+	lcd_hx8347_blitBitmap(bm);
+
+	timer_delay(400);
+	while (1)
+		if (kbd_peek() & KEY_MASK)
+			break;
+}
+
+static struct MenuItem sub_items[] =
+{
+	{ (const_iptr_t)"un", 0, (MenuHook)0, NULL },
+	{ (const_iptr_t)"du", 0, (MenuHook)0, NULL },
+	{ (const_iptr_t)"tr", 0, (MenuHook)0, NULL },
+	{ (const_iptr_t)0, 0, NULL, (iptr_t)0 }
+};
+static struct Menu sub_menu = { sub_items, "BeRTOS", MF_SAVESEL, &lcd_bitmap, 0, lcd_hx8347_blitBitmap };
+
+static struct MenuItem main_items[] =
+{
+	{ (const_iptr_t)"Screen saver demo",  0, (MenuHook)screen_saver,  &lcd_bitmap },
+	{ (const_iptr_t)"Display brightness", 0, (MenuHook)setBrightness, &lcd_bitmap },
+	{ (const_iptr_t)"SD dir",             0, (MenuHook)sd_explorer,   (iptr_t)&lcd_bitmap },
+	{ (const_iptr_t)"Reboot",             0, (MenuHook)soft_reset,    &lcd_bitmap },
+	{ (const_iptr_t)0,                    0, NULL,                    (iptr_t)0   }
+};
+static struct Menu main_menu = { main_items, "BeRTOS", MF_STICKY | MF_SAVESEL, &lcd_bitmap, 0, lcd_hx8347_blitBitmap };
+
+
+int main(void)
+{
+	IRQ_ENABLE;
+	kdbg_init();
+
+	LED_INIT();
+	timer_init();
+
+	proc_init();
+	sdram_init();
+	adc_init();
+
+	kprintf("sam3x %s: %d times\n", VERS_HOST, VERS_BUILD);
+
+	dmac_init();
+	i2c_init(&i2c, I2C_BITBANG0, CONFIG_I2C_FREQ);
+	i2s_init(&i2s, SSC0);
+
+	wm8731_init(&wm8731_ctx, &i2c, CODEC_ADDR);
+	wm8731_setVolume(&wm8731_ctx, WM8731_HEADPHONE, 0);
+
+	kprintf("CPU Frequecy:%ld\n", CPU_FREQ);
+
+
+	/* Enable the adc to read internal temperature sensor */
+	hw_enableTempRead();
+
+
+	lcd_hx8347_init();
+	lcd_setBacklight(lcd_brightness);
+
+	gfx_bitmapInit(&lcd_bitmap, raster, LCD_WIDTH, LCD_HEIGHT);
+	gfx_setFont(&lcd_bitmap, &font_luBS14);
+	lcd_hx8347_blitBitmap(&lcd_bitmap);
+
+	kbd_init();
+
+	hp_proc = proc_new(hp_process, NULL, PROC_STACK_SIZE, hp_stack);
+	lp_proc = proc_new(lp_process, NULL, PROC_STACK_SIZE, lp_stack);
+
+	proc_setPri(hp_proc, 2);
+	proc_setPri(lp_proc, 1);
+
+	lcd_hx8347_blitBitmap24(10, 52, BMP_LOGO_WIDTH, BMP_LOGO_HEIGHT, bmp_logo);
+	timer_delay(500);
+
+
+	while (1)
+	{
+		menu_handle(&main_menu);
+		cpu_relax();
+	}
+
+}
