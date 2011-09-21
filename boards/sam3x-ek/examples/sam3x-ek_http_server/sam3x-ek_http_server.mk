@@ -41,6 +41,7 @@ sam3x-ek_http_server_WIZARD_CSRC = \
 	bertos/mware/event.c \
 	bertos/mware/formatwr.c \
 	bertos/mware/hex.c \
+	bertos/mware/sprintf.c \
 	bertos/net/lwip.c \
 	bertos/struct/heap.c \
 	$(sam3x-ek_http_server_HW_PATH)/hw/hw_eth.c \

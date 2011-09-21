@@ -38,6 +38,8 @@
 #include "bertos.c"
 
 #include "hw/hw_sd.h"
+#include "hw/hw_adc.h"
+#include "hw/hw_sdram.h"
 
 #include <cfg/debug.h>
 
@@ -48,6 +50,7 @@
 #include <drv/ser.h>
 #include <drv/sd.h>
 #include <drv/dmac_sam3.h>
+#include <drv/adc.h>
 
 #include <kern/proc.h>
 #include <kern/monitor.h>
@@ -62,17 +65,28 @@
 
 #include <fs/fat.h>
 
+#include <stdio.h>
 #include <string.h>
 
 /* Network interface global variables */
 static struct ip_addr ipaddr, netmask, gw;
 static struct netif netif;
 
-
 // SD fat filesystem context
 static Sd sd;
 static FATFS fs;
 static FatFile in_file;
+
+typedef struct BoardStatus
+{
+	char local_ip[sizeof("123.123.123.123")];
+	char last_connected_ip[sizeof("123.123.123.123")];
+	uint16_t internal_temp;
+	ticks_t up_time;
+	size_t tot_req;
+} BoardStatus;
+
+static BoardStatus status;
 
 static void init(void)
 {
@@ -89,6 +103,7 @@ static void init(void)
 	 * processes using proc_new()).
 	 */
 	proc_init();
+	sdram_init();
 
 	/* Initialize TCP/IP stack */
 	tcpip_init(NULL, NULL);
@@ -99,20 +114,19 @@ static void init(void)
 	netif_set_up(&netif);
 
 	dmac_init();
+
+	adc_init();
+	/* Enable the adc to read internal temperature sensor */
+	hw_enableTempRead();
 }
 
-static int tot_req;
-
-static NORETURN void monitor_process(void)
+static NORETURN void status_process(void)
 {
-	int start = tot_req;
-
 	while (1)
 	{
-		//monitor_report();
-		kprintf("tot_req=%d [%d reqs/s]\n", tot_req, tot_req - start);
-		start = tot_req;
-		timer_delay(10000);
+		status.internal_temp = hw_convertToDegree(adc_read(ADC_TEMPERATURE_CH));
+		status.up_time++;
+		timer_delay(1000);
 	}
 }
 
@@ -121,6 +135,7 @@ static void get_fileName(char *revc_buf, char *name, size_t len)
 	char *p = strstr(revc_buf, "GET");
 	if (p)
 	{
+		//skip the "/" in get string request
 		p += sizeof("GET") + 1;
 		for (size_t i = 0; *p != ' '; i++,p++)
 		{
@@ -168,7 +183,7 @@ int main(void)
 	/* Hardware initialization */
 	init();
 
-	proc_new(monitor_process, NULL, KERN_MINSTACKSIZE * 2, NULL);
+	proc_new(status_process, NULL, KERN_MINSTACKSIZE * 2, NULL);
 
 	dhcp_start(&netif);
 	while (!netif.ip_addr.addr)
@@ -181,20 +196,20 @@ int main(void)
 
 	while (1)
 	{
-
 		struct netconn *client;
 		struct netbuf *rx_buf_conn;
 		char *rx_buf;
 		u16_t len;
 
 		client = netconn_accept(server);
-		kprintf("remote ip = %d.%d.%d.%d\n", IP_ADDR_TO_INT_TUPLE(client->pcb.ip->remote_ip.addr));
-		kprintf("local ip = %d.%d.%d.%d\n", IP_ADDR_TO_INT_TUPLE(client->pcb.ip->local_ip.addr));
-
 		if (!client)
 			continue;
 
-		tot_req++;
+		//Update board status.
+		sprintf(status.local_ip, "%d.%d.%d.%d", IP_ADDR_TO_INT_TUPLE(client->pcb.ip->remote_ip.addr));
+		sprintf(status.last_connected_ip, "%d.%d.%d.%d", IP_ADDR_TO_INT_TUPLE(client->pcb.ip->local_ip.addr));
+		status.tot_req++;
+
 		rx_buf_conn = netconn_recv(client);
 		if (rx_buf_conn)
 		{
@@ -202,6 +217,8 @@ int main(void)
 			if (rx_buf)
 			{
 				memset(file_name, 0, sizeof(file_name));
+				memset(tx_buf, 0, sizeof(tx_buf));
+
 				get_fileName(rx_buf, file_name, sizeof(file_name));
 
 				kprintf("%s\n", file_name);
@@ -211,6 +228,14 @@ int main(void)
 				if (!strcmp("bertos_jpg.jpg", file_name))
 				{
 					netconn_write(client, bertos_jpg, sizeof(bertos_jpg), NETCONN_NOCOPY);
+				}
+				else if (!strcmp("status", file_name))
+				{
+					sprintf((char *)tx_buf, "[ %s, %s, %d.%d, %ld, %d ]", status.local_ip, status.last_connected_ip,
+																status.internal_temp / 10, status.internal_temp % 10,
+																status.up_time, status.tot_req);
+
+					netconn_write(client, tx_buf, strlen((char *)tx_buf), NETCONN_COPY);
 				}
 				else if (SD_CARD_PRESENT())
 				{
@@ -228,8 +253,6 @@ int main(void)
 
 						if (sd_ok)
 						{
-							memset(tx_buf, 0, sizeof(tx_buf));
-
 							result = fatfile_open(&in_file, file_name,  FA_OPEN_EXISTING | FA_READ);
 
 							size_t count = 0;
