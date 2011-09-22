@@ -26,16 +26,21 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2010,2011 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2011 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
  * \author Andrea Righi <arighi@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
  *
- * \brief lwIP TCP/IP echo server listening on port 80.
+ * \brief Simple Http server.
+ *
+ * This simple web server read the site's pages from SD card, and manage
+ * the cases where SD is not present or page not found, using embedded pages.
+ * Quering from browser the /status page, the server return a json dictionary where are store
+ * some board status info, like board temperature, up-time, etc.
  */
 
-#include "bertos.c"
 
 #include "hw/hw_sd.h"
 #include "hw/hw_adc.h"
@@ -64,6 +69,8 @@
 #include <lwip/dhcp.h>
 
 #include <fs/fat.h>
+
+#include <icons/bertos.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -152,7 +159,7 @@ static const char http_html_hdr_404[] = "HTTP/1.1 404 Not Found\r\nContent-type:
 static const char http_file_not_found[] = "\
 <!DOCTYPE html PUBLIC \"-//IETF//DTD HTML 2.0//EN\"> \
 <html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=ISO-8859-1\"> \
-<title>404 Not Found</title></head><body><img src=\"bertos_jpg.jpg\"><h1>404 Not Found</h1>\
+<title>404 Not Found</title></head><body><img src=\"bertos_logo_jpg.jpg\"><h1>404 Not Found</h1>\
 <p>The requested URL was not found on this server.</p><hr>\
 <address>BeRTOS simple HTTP server</address></body></html>";
 
@@ -160,7 +167,7 @@ static const char http_file_not_found[] = "\
 static const char http_sd_not_present[] = " \
 <!DOCTYPE html PUBLIC \"-//IETF//DTD HTML 2.0//EN\">  \
 <html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=ISO-8859-1\">  \
-<title>BeRTOS simple HTTP Server</title></head><body><img src=\"bertos_jpg.jpg\"> \
+<title>BeRTOS simple HTTP Server</title></head><body><img src=\"bertos_logo_jpg.jpg\"> \
 <h1>BeRTOS simple HTTP Server</h1><p>Simple Http server, the site's pages are stored on SD card, check it if is present.</p><hr>\
 <a href=\"http://www.bertos.org\">www.BeRTOS.org</a></body></html> \
 ";
@@ -225,9 +232,9 @@ int main(void)
 				if (strlen(file_name) == 0)
 					strcpy(file_name, "index.htm");
 
-				if (!strcmp("bertos_jpg.jpg", file_name))
+				if (!strcmp("bertos_logo_jpg.jpg", file_name))
 				{
-					netconn_write(client, bertos_jpg, sizeof(bertos_jpg), NETCONN_NOCOPY);
+					netconn_write(client, bertos_logo_jpg, bertos_logo_jpg_len, NETCONN_NOCOPY);
 				}
 				else if (!strcmp("status", file_name))
 				{

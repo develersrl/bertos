@@ -33,6 +33,7 @@ sam3x-ek_http_server_WIZARD_CSRC = \
 	bertos/fs/fat.c \
 	bertos/fs/fatfs/diskio.c \
 	bertos/fs/fatfs/ff.c \
+	bertos/icons/bertos.c \
 	bertos/io/kblock.c \
 	bertos/io/kfile.c \
 	bertos/kern/monitor.c \
