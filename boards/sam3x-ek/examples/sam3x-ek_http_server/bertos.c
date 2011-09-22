@@ -1,4 +1,42 @@
-unsigned char bertos_jpg[] = {
+/**
+ * \file
+ * <!--
+ * This file is part of BeRTOS.
+ *
+ * Bertos is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * As a special exception, you may use this file as part of a free software
+ * library without restriction.  Specifically, if other files instantiate
+ * templates or use macros or inline functions from this file, or you compile
+ * this file and link it with other files to produce an executable, this
+ * file does not by itself cause the resulting executable to be covered by
+ * the GNU General Public License.  This exception does not however
+ * invalidate any other reasons why the executable file might be covered by
+ * the GNU General Public License.
+ *
+ * Copyright 2011 Develer S.r.l. (http://www.develer.com/)
+ *
+ * -->
+ *
+ * \author Danile Basile <asterix@develer.com>
+ *
+ * \brief JPEG binary BeRTOS logo dump.
+ */
+#include "bertos.h"
+
+const unsigned char bertos_logo_jpg[] = {
   0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01,
   0x01, 0x01, 0x00, 0x48, 0x00, 0x48, 0x00, 0x00, 0xff, 0xdb, 0x00, 0x43,
   0x00, 0x05, 0x03, 0x04, 0x04, 0x04, 0x03, 0x05, 0x04, 0x04, 0x04, 0x05,
@@ -494,4 +532,5 @@ unsigned char bertos_jpg[] = {
   0x4a, 0x22, 0x52, 0x94, 0xa2, 0x25, 0x29, 0x4a, 0x22, 0x52, 0x94, 0xa2,
   0x2f, 0xff, 0xd9
 };
-unsigned int bertos_jpg_len = 5919;
+
+const unsigned int bertos_logo_jpg_len = 5919;
