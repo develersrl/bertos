@@ -322,7 +322,7 @@ static void read_adc(Bitmap *bm)
 	while (1)
 	{
 		uint16_t value = ADC_RANGECONV(adc_read(1), 0, 3300);
-		uint16_t temp = hw_convertToDegree (adc_read(ADC_TEMPERATURE_CH));
+		uint16_t temp = hw_convertToDegree(adc_read(ADC_TEMPERATURE_CH));
 
 		text_xprintf(lcd_bitmap, 2, 0, TEXT_FILL | TEXT_CENTER,
 									"Voltage on VR1: %d.%dV", value / 1000, value % 1000);
