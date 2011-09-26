@@ -524,7 +524,6 @@ int sd_setBusWidth(Sd *sd, size_t len)
 	hsmci_readResp(&(sd->status), 1);
 	if ((sd->status) & (SD_STATUS_APP_CMD | SD_STATUS_READY))
 	{
-		hsmci_setBusWidth(len);
 
 		uint8_t arg = 0;
 		if (len == 4)
@@ -542,7 +541,10 @@ int sd_setBusWidth(Sd *sd, size_t len)
 		LOG_INFO("State[%d]\n", SD_GET_STATE(sd->status));
 
 		if (sd->status & SD_STATUS_READY)
+		{
+			hsmci_setBusWidth(len);
 			return 0;
+		}
 	}
 
 	LOG_ERR("SET_BUS_WIDTH REP %lx\n", (sd->status));
@@ -636,19 +638,13 @@ static size_t sd_SdReadDirect(struct KBlock *b, block_idx_t idx, void *buf, size
 	Sd *sd = SD_CAST(b);
 	LOG_INFO("reading from block %ld, offset %d, size %d\n", idx, offset, size);
 
-	if (sd_selectCard(sd) < 0)
-	{
-		sd->status |= SD_STATUS_ERROR;
-		return -1;
-	}
-
+	hsmci_waitTransfer();
 	hsmci_read(buf, size / 4, sd->b.blk_size);
 
 	if (hsmci_sendCmd(17, idx * sd->b.blk_size + offset, HSMCI_CMDR_RSPTYP_48_BIT |
 			BV(HSMCI_CMDR_TRDIR) | HSMCI_CMDR_TRCMD_START_DATA | HSMCI_CMDR_TRTYP_SINGLE))
 	{
 		LOG_ERR("SIGLE_BLK_READ: %lx\n", HSMCI_SR);
-		sd_deSelectCard(sd);
 		return -1;
 	}
 
@@ -660,11 +656,8 @@ static size_t sd_SdReadDirect(struct KBlock *b, block_idx_t idx, void *buf, size
 	if (sd->status & SD_STATUS_READY)
 	{
 		hsmci_waitTransfer();
-		sd_deSelectCard(sd);
 		return size;
 	}
-
-	sd_deSelectCard(sd);
 	return -1;
 }
 
@@ -675,21 +668,15 @@ static size_t sd_SdWriteDirect(KBlock *b, block_idx_t idx, const void *buf, size
 
 	Sd *sd = SD_CAST(b);
 	const uint32_t *_buf = (const uint32_t *)buf;
-	LOG_INFO("reading from block %ld, offset %d, size %d\n", idx, offset, size);
+	LOG_INFO("writing block %ld, offset %d, size %d\n", idx, offset, size);
 
-	if (sd_selectCard(sd) < 0)
-	{
-		sd->status |= SD_STATUS_ERROR;
-		return -1;
-	}
-
+	hsmci_waitTransfer();
 	hsmci_write(_buf, size / 4, sd->b.blk_size);
 
 	if (hsmci_sendCmd(24, idx * sd->b.blk_size + offset, HSMCI_CMDR_RSPTYP_48_BIT |
 						HSMCI_CMDR_TRCMD_START_DATA | HSMCI_CMDR_TRTYP_SINGLE))
 	{
 		LOG_ERR("SIGLE_BLK_WRITE: %lx\n", HSMCI_SR);
-		sd_deSelectCard(sd);
 		return -1;
 	}
 
@@ -700,12 +687,9 @@ static size_t sd_SdWriteDirect(KBlock *b, block_idx_t idx, const void *buf, size
 
 	if (sd->status & SD_STATUS_READY)
 	{
-		hsmci_waitTransfer();
-		sd_deSelectCard(sd);
 		return size;
 	}
 
-	sd_deSelectCard(sd);
 	return -1;
 }
 
@@ -796,7 +780,6 @@ static bool sd_blockInit(Sd *sd, KFile *ch)
 			sd_set_BlockLen(sd, SD_DEFAULT_BLOCKLEN);
 			sd_setBus4bit(sd);
 			sd_setHightSpeed(sd);
-			sd_deSelectCard(sd);
 
 			#if CONFIG_SD_AUTOASSIGN_FAT
 				disk_assignDrive(&sd->b, 0);
