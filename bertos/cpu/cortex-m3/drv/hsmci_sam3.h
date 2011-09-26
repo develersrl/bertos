@@ -50,7 +50,7 @@
 
 
 #define HSMCI_INIT_SPEED  400000
-#define HSMCI_HIGH_SPEED  2100000
+#define HSMCI_HIGH_SPEED  25000000
 
 #define HSMCI_HS_MODE     BV(0)
 
@@ -87,8 +87,6 @@ void hsmci_write(const uint32_t *buf, size_t word_num, size_t blk_size);
 void hsmci_waitTransfer(void);
 
 void hsmci_setSpeed(uint32_t data_rate, int flag);
-
-
 
 
 void hsmci_init(Hsmci *hsmci);
