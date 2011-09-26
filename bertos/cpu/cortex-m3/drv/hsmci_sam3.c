@@ -42,6 +42,8 @@
 #include <drv/irq_cm3.h>
 #include <drv/dmac_sam3.h>
 
+#include <mware/event.h>
+
 #include <cpu/irq.h>
 
 #include <io/cm3.h>
@@ -68,15 +70,7 @@
 	} while (!(HSMCI_SR & BV(HSMCI_SR_RXRDY)))
 
 
-#define HSMCI_DMAC_CH    0
-
-static DECLARE_ISR(hsmci_irq)
-{
-	uint32_t status = HSMCI_SR;
-	if (status & BV(HSMCI_IER_DMADONE))
-	{
-	}
-}
+#define HSMCI_DMAC_CH    3
 
 
 void hsmci_readResp(uint32_t *resp, size_t len)
@@ -108,19 +102,38 @@ bool hsmci_sendCmd(uint8_t index, uint32_t argument, uint32_t reply_type)
 	return 0;
 }
 
+#define HSMCI_WRITE_DMAC_CFG  (BV(DMAC_CFG_DST_H2SEL) | \
+							   BV(DMAC_CFG_SOD) | \
+						     ((0 << DMAC_CFG_DST_PER_SHIFT) & DMAC_CFG_DST_PER_MASK) | \
+						      (0 & DMAC_CFG_SRC_PER_MASK))
+
+#define HSMCI_WRITE_DMAC_CTRLB  (BV(DMAC_CTRLB_SRC_DSCR) | BV(DMAC_CTRLB_DST_DSCR) | \
+								DMAC_CTRLB_FC_MEM2PER_DMA_FC | \
+								DMAC_CTRLB_DST_INCR_FIXED | DMAC_CTRLB_SRC_INCR_INCREMENTING)
+
+#define HSMCI_WRITE_DMAC_CTRLA  (DMAC_CTRLA_SRC_WIDTH_WORD | \
+								DMAC_CTRLA_DST_WIDTH_WORD)
+
+#define HSMCI_READ_DMAC_CFG  (BV(DMAC_CFG_SRC_H2SEL) | \
+							  BV(DMAC_CFG_SOD) | \
+							((0 << DMAC_CFG_DST_PER_SHIFT) & DMAC_CFG_DST_PER_MASK) | \
+							 (0 & DMAC_CFG_SRC_PER_MASK))
+
+#define HSMCI_READ_DMAC_CTRLB  (BV(DMAC_CTRLB_SRC_DSCR) | BV(DMAC_CTRLB_DST_DSCR) | \
+								DMAC_CTRLB_FC_PER2MEM_DMA_FC | \
+								DMAC_CTRLB_DST_INCR_INCREMENTING | DMAC_CTRLB_SRC_INCR_FIXED)
+
+#define HSMCI_READ_DMAC_CTRLA  (DMAC_CTRLA_SRC_WIDTH_WORD | \
+								DMAC_CTRLA_DST_WIDTH_WORD)
+
+
 void hsmci_write(const uint32_t *buf, size_t word_num, size_t blk_size)
 {
 	HSMCI_DMA |= BV(HSMCI_DMA_DMAEN);
-	HSMCI_BLKR = blk_size << HSMCI_BLKR_BLKLEN_SHIFT;
-
-	uint32_t cfg = BV(DMAC_CFG_DST_H2SEL);
-	uint32_t ctrla = DMAC_CTRLA_SRC_WIDTH_WORD | DMAC_CTRLA_DST_WIDTH_WORD;
-	uint32_t ctrlb = BV(DMAC_CTRLB_SRC_DSCR) | BV(DMAC_CTRLB_DST_DSCR) |
-						DMAC_CTRLB_FC_MEM2PER_DMA_FC |
-						DMAC_CTRLB_DST_INCR_FIXED | DMAC_CTRLB_SRC_INCR_INCREMENTING;
+	HSMCI_BLKR = (blk_size << HSMCI_BLKR_BLKLEN_SHIFT) & ~0x30000;
 
 	dmac_setSources(HSMCI_DMAC_CH, (uint32_t)buf, (uint32_t)&HSMCI_TDR);
-	dmac_configureDmac(HSMCI_DMAC_CH, word_num, cfg, ctrla, ctrlb);
+	dmac_configureDmac(HSMCI_DMAC_CH, word_num, HSMCI_WRITE_DMAC_CFG, HSMCI_WRITE_DMAC_CTRLA, HSMCI_WRITE_DMAC_CTRLB);
 	dmac_start(HSMCI_DMAC_CH);
 }
 
@@ -129,14 +142,8 @@ void hsmci_read(uint32_t *buf, size_t word_num, size_t blk_size)
 	HSMCI_DMA |= BV(HSMCI_DMA_DMAEN);
 	HSMCI_BLKR = blk_size << HSMCI_BLKR_BLKLEN_SHIFT;
 
-	uint32_t cfg = BV(DMAC_CFG_SRC_H2SEL);
-	uint32_t ctrla = DMAC_CTRLA_SRC_WIDTH_WORD | DMAC_CTRLA_DST_WIDTH_WORD;
-	uint32_t ctrlb = BV(DMAC_CTRLB_SRC_DSCR) | BV(DMAC_CTRLB_DST_DSCR) |
-						DMAC_CTRLB_FC_PER2MEM_DMA_FC |
-						DMAC_CTRLB_DST_INCR_INCREMENTING | DMAC_CTRLB_SRC_INCR_FIXED;
-
 	dmac_setSources(HSMCI_DMAC_CH, (uint32_t)&HSMCI_RDR, (uint32_t)buf);
-	dmac_configureDmac(HSMCI_DMAC_CH, word_num, cfg, ctrla, ctrlb);
+	dmac_configureDmac(HSMCI_DMAC_CH, word_num, HSMCI_READ_DMAC_CFG, HSMCI_READ_DMAC_CTRLA, HSMCI_READ_DMAC_CTRLB);
 	dmac_start(HSMCI_DMAC_CH);
 }
 
@@ -154,7 +161,9 @@ void hsmci_setSpeed(uint32_t data_rate, int flag)
 	else
 		HSMCI_CFG &= ~BV(HSMCI_CFG_HSMODE);
 
-	HSMCI_MR = HSMCI_CLK_DIV(data_rate) | ((0x7u << HSMCI_MR_PWSDIV_SHIFT) & HSMCI_MR_PWSDIV_MASK);
+	HSMCI_DTOR = 0xF8 | HSMCI_DTOR_DTOMUL_1;
+	HSMCI_CSTOR = 0xF8 | HSMCI_CSTOR_CSTOMUL_1;
+	HSMCI_MR = HSMCI_CLK_DIV(data_rate) | BV(HSMCI_MR_RDPROOF) | BV(HSMCI_MR_WRPROOF);
 
 	timer_delay(10);
 }
@@ -172,10 +181,9 @@ void hsmci_init(Hsmci *hsmci)
 
 	HSMCI_DTOR = 0xFF | HSMCI_DTOR_DTOMUL_1048576;
 	HSMCI_CSTOR = 0xFF | HSMCI_CSTOR_CSTOMUL_1048576;
-	HSMCI_MR = HSMCI_CLK_DIV(HSMCI_INIT_SPEED) | ((0x7u << HSMCI_MR_PWSDIV_SHIFT) & HSMCI_MR_PWSDIV_MASK) | BV(HSMCI_MR_RDPROOF);
+	HSMCI_MR = HSMCI_CLK_DIV(HSMCI_INIT_SPEED) | BV(HSMCI_MR_RDPROOF) | BV(HSMCI_MR_WRPROOF);
 	HSMCI_CFG = BV(HSMCI_CFG_FIFOMODE) | BV(HSMCI_CFG_FERRCTRL);
 
-	sysirq_setHandler(INT_HSMCI, hsmci_irq);
 	HSMCI_CR = BV(HSMCI_CR_MCIEN);
 	HSMCI_DMA = 0;
 
