@@ -136,7 +136,7 @@ void dmac_configureDmac(int ch, size_t transfer_size, uint32_t cfg, uint32_t ctr
 {
 	DMAC_CHDR = BV(ch);
 
-	*dmac_ch[ch].cfg = cfg | DMAC_CFG_FIFOCFG_ALAP_CFG | (0x1 << DMAC_CFG_AHB_PROT_SHIFT) | BV(DMAC_CFG_SOD);
+	*dmac_ch[ch].cfg = cfg | DMAC_CFG_FIFOCFG_ALAP_CFG | (0x1 << DMAC_CFG_AHB_PROT_SHIFT);
 	*dmac_ch[ch].ctrla = ctrla | (transfer_size & DMAC_CTRLA_BTSIZE_MASK);
 	*dmac_ch[ch].ctrlb = ctrlb & ~BV(DMAC_CTRLB_IEN);
 }
