@@ -58,7 +58,7 @@
 #include <string.h>
 
 
-#define I2S_DMAC_CH    3
+#define I2S_DMAC_CH    0
 #define I2S_CACHED_CHUNK_SIZE 2
 
 
@@ -142,7 +142,6 @@ static void sam3_i2s_txStop(I2s *i2s)
 
 	i2s_status |= I2S_STATUS_END_TX;
 	i2s_status &= ~I2S_STATUS_TX;
-
 	event_do(&data_ready);
 }
 
@@ -234,9 +233,11 @@ static void sam3_i2s_txStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 		remaing_size -= chunk_size;
 		next_idx += chunk_size;
 
-		if (chunk_size >= remaing_size)
-			break;
-
+		if (remaing_size <= 0)
+		{
+			remaing_size = transfer_size;
+			next_idx = 0;
+		}
 	}
 
 	dmac_setLLITransfer(I2S_DMAC_CH, prev, I2S_TX_DMAC_CFG);
@@ -339,8 +340,11 @@ static void sam3_i2s_rxStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 		remaing_size -= chunk_size;
 		next_idx += chunk_size;
 
-		if (chunk_size >= remaing_size)
-			break;
+		if (remaing_size <= 0)
+		{
+			remaing_size = transfer_size;
+			next_idx = 0;
+		}
 	}
 
 	dmac_setLLITransfer(I2S_DMAC_CH, prev, I2S_RX_DMAC_CFG);
