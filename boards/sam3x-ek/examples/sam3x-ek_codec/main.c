@@ -119,7 +119,7 @@ typedef struct AudioMsg
 
 FileItemNode item_nodes[MAX_ITEM_NODES];
 
-uint8_t tmp[4096];
+uint8_t tmp[10240];
 
 // SD fat filesystem context
 FATFS fs;
@@ -137,6 +137,7 @@ extern Font font_gohu;
 static int lcd_brightness = LCD_BACKLIGHT_MAX;
 static uint16_t headphone_volume = 90;
 static size_t played_size = 0;
+static size_t recorded_size = 0;
 static bool is_playing = false;
 static bool is_recording = false;
 static int recorderd_file_idx;
@@ -153,10 +154,14 @@ static void codec_play(struct I2s *i2s, void *_buf, size_t len)
 	}
 }
 
-static void codec_rec(struct I2s *i2s, void *_buf, size_t len)
+static void codec_rec(struct I2s *i2s, void *buf, size_t len)
 {
 	(void)i2s;
-	kfile_write(&rec_file.fd, _buf, len);
+	ASSERT(buf);
+	ASSERT(len != 0);
+	ASSERT(&rec_file.fd);
+
+	recorded_size += kfile_write(&rec_file.fd, buf, len);
 }
 
 static void NORETURN play_proc(void)
@@ -198,7 +203,7 @@ static void NORETURN play_proc(void)
 
 							wm8731_setVolume(&wm8731_ctx, WM8731_HEADPHONE, headphone_volume);
 							is_playing = true;
-							i2s_dmaStartTxStreaming(&i2s, tmp, sizeof(tmp), sizeof(tmp) / 4, codec_play);
+							i2s_dmaStartTxStreaming(&i2s, tmp, sizeof(tmp), sizeof(tmp) / 2, codec_play);
 
 							wm8731_setVolume(&wm8731_ctx, WM8731_HEADPHONE, 0);
 						}
@@ -250,12 +255,18 @@ static void NORETURN rec_proc(void)
 					if (result == FR_OK)
 					{
 						kprintf("Open file: %s size %ld\n", rec->file_name, rec_file.fat_file.fsize);
-						WavHdr wav;
-						wav_writeHdr(&wav, 1, CONFIG_CHANNEL_NUM, CONFIG_SAMPLE_FREQ, CONFIG_WORD_BIT_SIZE);
-						kfile_write(&rec_file.fd, &wav, sizeof(WavHdr));
 						kputs("Rec Wav file..\n");
 						is_recording = true;
-						i2s_dmaStartRxStreaming(&i2s, tmp, sizeof(tmp), sizeof(tmp) / 4, codec_rec);
+						// Leave place for wav header
+						kfile_seek(&rec_file.fd, sizeof(WavHdr), KSM_SEEK_SET);
+
+						i2s_dmaStartRxStreaming(&i2s, tmp, sizeof(tmp), sizeof(tmp) / 2, codec_rec);
+
+						// write header
+						WavHdr wav;
+						wav_writeHdr(&wav, recorded_size, 1, CONFIG_CHANNEL_NUM, CONFIG_SAMPLE_FREQ, CONFIG_WORD_BIT_SIZE);
+						kfile_seek(&rec_file.fd, 0, KSM_SEEK_SET);
+						kfile_write(&rec_file.fd, &wav, sizeof(WavHdr));
 
 						// Flush data and close the files.
 						kfile_flush(&rec_file.fd);
@@ -275,6 +286,8 @@ static void NORETURN rec_proc(void)
 
 INLINE void start_play(char *file_name)
 {
+	played_size = 0;
+
 	AudioMsg play_msg;
 	memcpy(play_msg.file_name, file_name, sizeof(play_msg.file_name));
 	msg_put(&proc_play_inPort, &play_msg.msg);
@@ -283,13 +296,14 @@ INLINE void start_play(char *file_name)
 INLINE void stop_play(void)
 {
 	i2s_dmaTxStop(&i2s);
-	played_size = 0;
 	is_playing = false;
 }
 
 
 INLINE void start_rec(char *file_name)
 {
+	recorded_size = 0;
+
 	AudioMsg rec_msg;
 	memcpy(rec_msg.file_name, file_name, sizeof(rec_msg.file_name));
 	msg_put(&proc_rec_inPort, &rec_msg.msg);
@@ -480,6 +494,7 @@ static void rec_menu(Bitmap *bm)
 			{
 				start_rec(file_name);
 				text_xprintf(bm, 5, 0, TEXT_CENTER | TEXT_FILL, "Start recording on file: %s", file_name);
+				text_xprintf(bm, 6, 0, TEXT_CENTER | TEXT_FILL, " ");
 				lcd_hx8347_blitBitmap(bm);
 				start = timer_clock();
 			}
