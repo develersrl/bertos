@@ -67,6 +67,20 @@
 						((3 << DMAC_CFG_DST_PER_SHIFT) & DMAC_CFG_DST_PER_MASK) | \
 						 (4 & DMAC_CFG_SRC_PER_MASK))
 
+#define I2S_TX_DMAC_CTRLB  (DMAC_CTRLB_FC_MEM2PER_DMA_FC | \
+							DMAC_CTRLB_DST_INCR_FIXED | \
+							DMAC_CTRLB_SRC_INCR_INCREMENTING)
+
+
+#define I2S_RX_DMAC_CFG  (BV(DMAC_CFG_SRC_H2SEL) | \
+						  BV(DMAC_CFG_SOD) | \
+						((3 << DMAC_CFG_DST_PER_SHIFT) & DMAC_CFG_DST_PER_MASK) | \
+						 (4 & DMAC_CFG_SRC_PER_MASK))
+
+#define I2S_RX_DMAC_CTRLB  (DMAC_CTRLB_FC_PER2MEM_DMA_FC | \
+						    DMAC_CTRLB_DST_INCR_INCREMENTING | \
+							DMAC_CTRLB_SRC_INCR_FIXED)
+
 
 #if CONFIG_WORD_BIT_SIZE == 32
 	#define I2S_TX_DMAC_CTRLA  (DMAC_CTRLA_SRC_WIDTH_WORD | \
@@ -79,7 +93,7 @@
 	#define I2S_TX_DMAC_CTRLA  (DMAC_CTRLA_SRC_WIDTH_HALF_WORD | \
 								DMAC_CTRLA_DST_WIDTH_HALF_WORD)
 	#define I2S_RX_DMAC_CTRLA  (DMAC_CTRLA_SRC_WIDTH_HALF_WORD | \
-							DMAC_CTRLA_DST_WIDTH_HALF_WORD)
+								DMAC_CTRLA_DST_WIDTH_HALF_WORD)
 	#define I2S_WORD_BYTE_SIZE      2
 
 #elif  CONFIG_WORD_BIT_SIZE == 8
@@ -87,27 +101,12 @@
 	#define I2S_TX_DMAC_CTRLA  (DMAC_CTRLA_SRC_WIDTH_BYTE | \
 								DMAC_CTRLA_DST_WIDTH_BYTE)
 	#define I2S_RX_DMAC_CTRLA  (DMAC_CTRLA_SRC_WIDTH_BYTE | \
-							DMAC_CTRLA_DST_WIDTH_HALF_WORD)
+								DMAC_CTRLA_DST_WIDTH_BYTE)
 	#define I2S_WORD_BYTE_SIZE      1
 
 #else
 	#error Wrong i2s word size.
 #endif
-
-
-#define I2S_TX_DMAC_CTRLB  (DMAC_CTRLB_FC_MEM2PER_DMA_FC | \
-									 DMAC_CTRLB_DST_INCR_FIXED | \
-									DMAC_CTRLB_SRC_INCR_INCREMENTING)
-
-#define I2S_RX_DMAC_CFG  (BV(DMAC_CFG_SRC_H2SEL) | \
-						  BV(DMAC_CFG_SOD) | \
-						((4 << DMAC_CFG_DST_PER_SHIFT) & DMAC_CFG_DST_PER_MASK) | \
-						 (4 & DMAC_CFG_SRC_PER_MASK))
-
-#define I2S_RX_DMAC_CTRLB  (DMAC_CTRLB_FC_PER2MEM_DMA_FC | \
-						    DMAC_CTRLB_DST_INCR_INCREMENTING | \
-							DMAC_CTRLB_SRC_INCR_FIXED)
-
 
 
 #define I2S_STATUS_ERR              BV(0)
@@ -155,7 +154,6 @@ static void sam3_i2s_txWait(I2s *i2s)
 
 static void i2s_dmac_irq(uint32_t status)
 {
-	I2S_STROBE_ON();
 	if (i2s_status & I2S_STATUS_SINGLE_TRASF)
 	{
 		i2s_status &= ~I2S_STATUS_SINGLE_TRASF;
@@ -194,7 +192,6 @@ static void i2s_dmac_irq(uint32_t status)
 		}
 	}
 	event_do(&data_ready);
-	I2S_STROBE_OFF();
 }
 
 
@@ -237,7 +234,7 @@ static void sam3_i2s_txStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 		remaing_size -= chunk_size;
 		next_idx += chunk_size;
 
-		if (chunk_size > remaing_size)
+		if (chunk_size >= remaing_size)
 			break;
 
 	}
@@ -254,12 +251,11 @@ static void sam3_i2s_txStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 	i2s_status |= I2S_STATUS_TX;
 
 	SSC_CR = BV(SSC_TXEN);
-	I2S_STROBE_OFF();
 
 	while (1)
 	{
 		event_wait(&data_ready);
-
+		I2S_STROBE_ON();
 		remaing_size -= chunk_size;
 		next_idx += chunk_size;
 
@@ -281,10 +277,8 @@ static void sam3_i2s_txStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 			break;
 		}
 
-
-
 		i2s->ctx.tx_callback(i2s, &sample_buff[next_idx], chunk_size);
-		cpu_relax();
+		I2S_STROBE_OFF();
 	}
 }
 
@@ -336,7 +330,6 @@ static void sam3_i2s_rxStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 		curr = next;
 		next = prev;
 
-		i2s->ctx.rx_callback(i2s, &sample_buff[next_idx], chunk_size);
 		curr->src_addr = (uint32_t)&SSC_RHR;
 		curr->dst_addr = (uint32_t)&sample_buff[next_idx];
 		curr->dsc_addr = (uint32_t)next;
@@ -346,10 +339,10 @@ static void sam3_i2s_rxStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 		remaing_size -= chunk_size;
 		next_idx += chunk_size;
 
-		if (chunk_size > remaing_size)
+		if (chunk_size >= remaing_size)
 			break;
-
 	}
+
 	dmac_setLLITransfer(I2S_DMAC_CH, prev, I2S_RX_DMAC_CFG);
 
 	if (dmac_start(I2S_DMAC_CH) < 0)
@@ -361,12 +354,13 @@ static void sam3_i2s_rxStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 	i2s_status &= ~I2S_STATUS_ERR;
 	i2s_status |= I2S_STATUS_RX;
 
-	SSC_CR = BV(SSC_RXEN) | BV(SSC_TXEN);
-	I2S_STROBE_OFF();
+	SSC_CR = BV(SSC_TXEN) | BV(SSC_RXEN);
 
 	while (1)
 	{
 		event_wait(&data_ready);
+		I2S_STROBE_ON();
+		i2s->ctx.rx_callback(i2s, &sample_buff[next_idx], chunk_size);
 
 		remaing_size -= chunk_size;
 		next_idx += chunk_size;
@@ -388,8 +382,7 @@ static void sam3_i2s_rxStart(I2s *i2s, void *buf, size_t len, size_t slice_len)
 			LOG_INFO("Stop streaming.\n");
 			break;
 		}
-		i2s->ctx.rx_callback(i2s, &sample_buff[next_idx], chunk_size);
-		cpu_relax();
+		I2S_STROBE_OFF();
 	}
 }
 
@@ -428,7 +421,7 @@ static void sam3_i2s_rxBuf(struct I2s *i2s, void *buf, size_t len)
 	dmac_configureDmac(I2S_DMAC_CH, len / I2S_WORD_BYTE_SIZE, I2S_RX_DMAC_CFG, I2S_RX_DMAC_CTRLA, I2S_RX_DMAC_CTRLB);
 	dmac_start(I2S_DMAC_CH);
 
-	SSC_CR = BV(SSC_RXEN);
+	SSC_CR = BV(SSC_TXEN) | BV(SSC_RXEN);
 }
 
 static int sam3_i2s_write(struct I2s *i2s, uint32_t sample)
