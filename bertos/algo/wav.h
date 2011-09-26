@@ -47,13 +47,14 @@
 
 #include <string.h>
 
+
 typedef struct WavHdr
 {
 	char chunk_id[4];
 	uint32_t chunk_size;
 	char format[4];
 
-	char subchunk1_id[4];
+	uint8_t subchunk1_id[4];
 	uint32_t subchunk1_size;
 	uint16_t audio_format;
 	uint16_t num_channels;
@@ -62,8 +63,10 @@ typedef struct WavHdr
 	uint16_t block_align;
 	uint16_t bits_per_sample;
 
-	uint8_t subchunk2[8];
-} WavHdr;
+	uint8_t subchunk2_id[4];
+	uint32_t subchunk2_size;
+
+} PACKED WavHdr;
 
 INLINE int wav_checkHdr(WavHdr *wav, uint16_t audio_format, uint16_t num_channels, uint16_t sample_rate, uint16_t bits_per_sample)
 {
@@ -112,16 +115,28 @@ error:
 }
 
 
-INLINE void wav_writeHdr(WavHdr *wav, uint16_t audio_format, uint16_t num_channels, uint16_t sample_rate, uint16_t bits_per_sample)
+INLINE void wav_writeHdr(WavHdr *wav, size_t sample_num, uint16_t audio_format, uint16_t num_channels, uint32_t sample_rate, uint16_t bits_per_sample)
 {
 	ASSERT(wav);
 
+	uint32_t sub2 = sample_num * num_channels * bits_per_sample / 8;
+
 	memcpy(&wav->chunk_id, "RIFF", 4);
 	memcpy(&wav->format, "WAVE", 4);
+
+	memcpy(&wav->subchunk1_id, "fmt ", 4);
+	wav->subchunk1_size = cpu_to_le32(16);
+
+	memcpy(&wav->subchunk2_id, "data", 4);
+	wav->subchunk2_size = cpu_to_le32(sub2);
+
 	wav->audio_format = cpu_to_le16(audio_format);
 	wav->num_channels = cpu_to_le16(num_channels);
-	wav->sample_rate = cpu_to_le16(sample_rate);
+	wav->sample_rate = cpu_to_le32(sample_rate);
 	wav->bits_per_sample = cpu_to_le16(bits_per_sample);
+
+	wav->chunk_size = cpu_to_le32(36 + sub2);
+	kprintf("CHUNK_SIZE %ld\n", 36 + sub2);
 }
 
 #endif /* ALGO_WAV_H */
