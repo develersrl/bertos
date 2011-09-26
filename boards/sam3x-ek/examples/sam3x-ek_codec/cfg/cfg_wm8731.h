@@ -65,7 +65,7 @@
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "wm8731_deemp"
  */
-#define CONFIG_WM8731_DEEMP     WM8731_DEEMP_DISABLE
+#define CONFIG_WM8731_DEEMP     WM8731_DEEMP_44k1Hz
 
 /**
  * Digital control: DAC soft mute control
@@ -93,14 +93,14 @@
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "wm8731_bypass"
  */
-#define CONFIG_WM8731_BYPASS     WM8731_DACSEL
+#define CONFIG_WM8731_BYPASS             WM8731_DACSEL
 
 /**
  * Analog control: Side tone attenuation
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "wm8731_sideatt"
  */
-#define CONFIG_WM8731_SIDEATT     WM8731_SIDEATT_6dB
+#define CONFIG_WM8731_SIDEATT            WM8731_SIDEATT_6dB
 
 
 /**
