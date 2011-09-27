@@ -159,6 +159,7 @@
 #include "sam3_twi.h"
 #include "sam3_ssc.h"
 #include "sam3_hsmci.h"
+#include "sam3_chipid.h"
 
 /**
  * U(S)ART I/O pins
@@ -337,6 +338,18 @@
 #else
 	#error no ssc pins are defined for this cpu
 #endif
+
+
+#if CPU_CM3_SAM3X8
+	#define FLASH_MEM_SIZE          0x80000UL ///< Internal flash memory size
+	#define FLASH_PAGE_SIZE_BYTES         256 ///< Size of cpu flash memory page in bytes
+	#define FLASH_BANKS_NUM                 2 ///< Number of flash banks
+	#define FLASH_PAGES_FOR_BANK         1024 ///< Number pages for each bank
+	#define FLASH_BASE                    0x0
+#else
+	#error no internal flash info are defined for this cpu
+#endif
+
 
 /*\}*/
 #endif /* SAM3_H */

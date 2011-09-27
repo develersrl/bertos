@@ -61,11 +61,6 @@
 #include <string.h>
 
 
-#define FLASH_MEM_SIZE          0x80000UL ///< Internal flash memory size
-#define FLASH_PAGE_SIZE_BYTES         256 ///< Size of cpu flash memory page in bytes
-#define FLASH_BANKS_NUM                 2 ///< Number of flash banks
-#define FLASH_BASE                    0x0
-
 struct FlashHardware
 {
 	uint8_t status;
@@ -79,7 +74,7 @@ struct FlashHardware
  *       executing code from flash while a writing process
  *       is in progress is forbidden.
  */
-RAM_FUNC NOINLINE static void write_page(uint32_t page)
+RAM_FUNC NOINLINE static void write_page_bank0(uint32_t page)
 {
 	// Send the 'write page' command
 	EEFC0_FCR = EEFC_FCR_FKEY | EFC_FCR_FCMD_EWP | EEFC_FCR_FARG(page);
@@ -90,6 +85,20 @@ RAM_FUNC NOINLINE static void write_page(uint32_t page)
 		//NOP;
 	}
 }
+
+#if FLASH_BANKS_NUM > 1
+RAM_FUNC NOINLINE static void write_page_bank1(uint32_t page)
+{
+	// Send the 'write page' command
+	EEFC1_FCR = EEFC_FCR_FKEY | EFC_FCR_FCMD_EWP | EEFC_FCR_FARG(page);
+
+	// Wait for the end of command
+	while(!(EEFC1_FSR & BV(EEFC_FSR_FRDY)))
+	{
+		//NOP;
+	}
+}
+#endif
 
 
 /**
@@ -104,10 +113,20 @@ INLINE void flash_sendWRcmd(uint32_t page)
 
 	LOG_INFO("Writing page %ld...\n", page);
 
-	IRQ_SAVE_DISABLE(flags);
-	write_page(page);
+	if (page > FLASH_PAGES_FOR_BANK)
+	{
+		page = page - FLASH_PAGES_FOR_BANK;
+		IRQ_SAVE_DISABLE(flags);
+		write_page_bank1(page);
+		IRQ_RESTORE(flags);
+	}
+	else
+	{
+		IRQ_SAVE_DISABLE(flags);
+		write_page_bank0(page);
+		IRQ_RESTORE(flags);
+	}
 
-	IRQ_RESTORE(flags);
 	LOG_INFO("Done\n");
 }
 
@@ -142,6 +161,7 @@ static bool flash_getStatus(struct KBlock *blk)
 
 	return true;
 }
+
 
 static size_t sam3_flash_readDirect(struct KBlock *blk, block_idx_t idx, void *buf, size_t offset, size_t size)
 {
