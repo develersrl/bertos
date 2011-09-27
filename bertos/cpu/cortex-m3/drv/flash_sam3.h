@@ -26,24 +26,18 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2011 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
- * \brief Low-level flash module for Cortex-M3 (interface).
- *
  * \author Daniele Basile <asterix@develer.com>
+ *
+ * \brief SAM3 Internal flash read/write driver.
+ *
+ *
  */
 
-#include <cpu/detect.h>
+#ifndef FLASH_SAM3_H
+#define FLASH_SAM3_H
 
-#if CPU_CM3_LM3S
-	#include "flash_lm3s.h"
-#elif CPU_CM3_STM32
-	#include "flash_stm32.h"
-#elif CPU_CM3_SAM3
-	#include "flash_sam3.h"
-/*#elif  Add other Cortex-M3 CPUs here */
-#else
-	#error Unknown CPU
-#endif
+#endif /* FLASH_SAM3_H */
