@@ -75,11 +75,27 @@ struct FlashHardware
  */
 RAM_FUNC NOINLINE static void write_page(uint32_t page)
 {
+	reg32_t *fcr, *fsr;
+
+	#if CPU_ARM_AT91SAM7S512 || CPU_ARM_AT91SAM7X512
+	if (page >= (FLASH_MEM_SIZE / FLASH_PAGE_SIZE_BYTES / 2))
+	{
+		fcr = &MC_FCR1;
+		fsr = &MC_FSR1;
+		page &= 0x3FF;
+	}
+	else
+	#endif
+	{
+		fcr = &MC_FCR;
+		fsr = &MC_FSR;
+	}
+
 	// Send the 'write page' command
-	MC_FCR = MC_KEY | MC_FCMD_WP | (MC_PAGEN_MASK & (page << 8));
+	*fcr = MC_KEY | MC_FCMD_WP | (MC_PAGEN_MASK & (page << 8));
 
 	// Wait for the end of command
-	while(!(MC_FSR & BV(MC_FRDY)))
+	while(!(*fsr & BV(MC_FRDY)))
 	{
 		//NOP;
 	}
@@ -133,6 +149,23 @@ static bool flash_getStatus(struct KBlock *blk)
 		LOG_ERR("wr protect..\n");
 		return false;
 	}
+	#if CPU_ARM_AT91SAM7X512 || CPU_ARM_AT91SAM7S512
+		/* Check also EFC1 for larger devices */
+		if(MC_FSR1 & BV(MC_PROGE))
+		{
+			fls->hw->status |= FLASH_WR_ERR;
+			LOG_ERR("flash not erased..\n");
+			return false;
+		}
+
+		if(MC_FSR1 & BV(MC_LOCKE))
+		{
+			fls->hw->status |= FLASH_WR_PROTECT;
+			LOG_ERR("wr protect..\n");
+			return false;
+		}
+
+	#endif
 
 	return true;
 }
