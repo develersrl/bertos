@@ -74,7 +74,7 @@ struct FlashHardware
  *       executing code from flash while a writing process
  *       is in progress is forbidden.
  */
-RAM_FUNC NOINLINE static void write_page_bank0(uint32_t page)
+RAM_FUNC NOINLINE static void write_page_bank(uint32_t page)
 {
 	// Send the 'write page' command
 	EEFC0_FCR = EEFC_FCR_FKEY | EFC_FCR_FCMD_EWP | EEFC_FCR_FARG(page);
@@ -111,57 +111,29 @@ INLINE void flash_sendWRcmd(uint32_t page)
 {
 	cpu_flags_t flags;
 
-	LOG_INFO("Writing page %ld...\n", page);
-
-	if (page > FLASH_PAGES_FOR_BANK)
+	#if FLASH_BANKS_NUM > 1
+	if (page >= FLASH_PAGES_FOR_BANK)
 	{
-		page = page - FLASH_PAGES_FOR_BANK;
+		page &= 0x3FF;
+		LOG_INFO("Writing page %ld...\n", page);
+
 		IRQ_SAVE_DISABLE(flags);
 		write_page_bank1(page);
 		IRQ_RESTORE(flags);
 	}
 	else
+	#endif
 	{
+		LOG_INFO("Writing page %ld...\n", page);
+
 		IRQ_SAVE_DISABLE(flags);
-		write_page_bank0(page);
+		write_page_bank(page);
 		IRQ_RESTORE(flags);
 	}
 
+
 	LOG_INFO("Done\n");
 }
-
-/**
- * Return true if no error are occurred after flash memory
- * read or write operation, otherwise return error code.
- */
-static bool flash_getStatus(struct KBlock *blk)
-{
-	Flash *fls = FLASH_CAST(blk);
-	/*
-	 * This bit is set to one if an invalid command and/or a bad keywords was/were
-	 * written in the Flash Command Register.
-	 */
-	if(EEFC0_FSR & BV(EEFC_FSR_FCMDE))
-	{
-		fls->hw->status |= FLASH_WR_ERR;
-		LOG_ERR("flash not erased..\n");
-		return false;
-	}
-
-	/*
-	 * This bit is set to one if we programming of at least one locked lock
-	 * region.
-	 */
-	if(EEFC0_FSR & BV(EEFC_FSR_FLOCKE))
-	{
-		fls->hw->status |= FLASH_WR_PROTECT;
-		LOG_ERR("wr protect..\n");
-		return false;
-	}
-
-	return true;
-}
-
 
 static size_t sam3_flash_readDirect(struct KBlock *blk, block_idx_t idx, void *buf, size_t offset, size_t size)
 {
@@ -192,8 +164,28 @@ static size_t sam3_flash_writeDirect(struct KBlock *blk, block_idx_t idx, const 
 
 	flash_sendWRcmd(idx);
 
-	if (!flash_getStatus(blk))
+	Flash *fls = FLASH_CAST(blk);
+	uint32_t status = (uint32_t)&EEFC0_FSR;
+	#if FLASH_BANKS_NUM > 1
+		if (idx > FLASH_PAGES_FOR_BANK)
+		{
+			status = (uint32_t)&EEFC1_FSR;
+		}
+	#endif
+
+	if(status & BV(EEFC_FSR_FCMDE))
+	{
+		fls->hw->status |= FLASH_WR_ERR;
+		LOG_ERR("flash not erased..\n");
 		return 0;
+	}
+
+	if(status & BV(EEFC_FSR_FLOCKE))
+	{
+		fls->hw->status |= FLASH_WR_PROTECT;
+		LOG_ERR("wr protect..\n");
+		return 0;
+	}
 
 	return blk->blk_size;
 }
