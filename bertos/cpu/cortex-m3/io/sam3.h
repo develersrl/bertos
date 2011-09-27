@@ -345,7 +345,7 @@
 	#define FLASH_PAGE_SIZE_BYTES         256 ///< Size of cpu flash memory page in bytes
 	#define FLASH_BANKS_NUM                 2 ///< Number of flash banks
 	#define FLASH_PAGES_FOR_BANK         1024 ///< Number pages for each bank
-	#define FLASH_BASE                    0x0
+	#define FLASH_BASE                0x80000 ///< Start address for bank 0
 #else
 	#error no internal flash info are defined for this cpu
 #endif
