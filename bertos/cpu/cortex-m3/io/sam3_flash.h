@@ -91,14 +91,26 @@
  * Defines for bit fields in EEFC_FCR register.
  */
 /*\{*/
-#define EEFC_FCR_FCMD_MASK    0xff                        ///< Flash Command
-#define EEFC_FCR_FCMD(value)  (EEFC_FCR_FCMD_MASK & (value))
+#define EFC_FCR_FCMD_MASK     0x000000FF      ///< Flash command mask.
+#define EFC_FCR_FCMD_GETD     0x00000000      ///< Get flash Descriptor.
+#define EFC_FCR_FCMD_WP       0x00000001      ///< Write page.
+#define EFC_FCR_FCMD_WPL      0x00000002      ///< Write page and lock.
+#define EFC_FCR_FCMD_EWP      0x00000003      ///< Erase page and write page.
+#define EFC_FCR_FCMD_EWPL     0x00000004      ///< Erase page and write page then lock.
+#define EFC_FCR_FCMD_EA       0x00000005      ///< Erase all.
+#define EFC_FCR_FCMD_SLB      0x00000008      ///< Set lock bit.
+#define EFC_FCR_FCMD_CLB      0x00000009      ///< Clear lock bit.
+#define EFC_FCR_FCMD_GLB      0x0000000A      ///< Get lock bit.
+#define EFC_FCR_FCMD_SGPB     0x0000000B      ///< Set GPNVM bit.
+#define EFC_FCR_FCMD_CGPB     0x0000000C      ///< Clear GPNVM bit.
+#define EFC_FCR_FCMD_GGPB     0x0000000D      ///< Get GPNVM bit.
+#define EFC_FCR_FCMD_STUI     0x0000000E      ///< Start read uniqune identifier.
+#define EFC_FCR_FCMD_SPUI     0x0000000F      ///< Stop read uniqune identifier.
+#define EFC_FCR_FCMD_GCALB    0x00000010      ///< Get CALIB bit.
 #define EEFC_FCR_FARG_SHIFT   8
 #define EEFC_FCR_FARG_MASK    (0xffff << EEFC_FCR_FARG_SHIFT) ///< Flash Command Argument
 #define EEFC_FCR_FARG(value)  (EEFC_FCR_FARG_MASK & ((value) << EEFC_FCR_FARG_SHIFT))
-#define EEFC_FCR_FKEY_SHIFT   24
-#define EEFC_FCR_FKEY_MASK    (0xff << EEFC_FCR_FKEY_SHIFT)   ///< Flash Writing Protection Key
-#define EEFC_FCR_FKEY(value)  (EEFC_FCR_FKEY_MASK & ((value) << EEFC_FCR_FKEY_SHIFT))
+#define EEFC_FCR_FKEY          0x5A000000      ///< Writing protect key.
 /*\}*/
 
 /**
