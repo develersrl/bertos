@@ -115,7 +115,7 @@ INLINE void flash_sendWRcmd(uint32_t page)
 	if (page >= FLASH_PAGES_FOR_BANK)
 	{
 		page &= 0x3FF;
-		LOG_INFO("Writing page %ld...\n", page);
+		LOG_INFO("Writing page %ld on bank 1\n", page);
 
 		IRQ_SAVE_DISABLE(flags);
 		write_page_bank1(page);
@@ -124,7 +124,7 @@ INLINE void flash_sendWRcmd(uint32_t page)
 	else
 	#endif
 	{
-		LOG_INFO("Writing page %ld...\n", page);
+		LOG_INFO("Writing page %ld on bank 0\n", page);
 
 		IRQ_SAVE_DISABLE(flags);
 		write_page_bank(page);
