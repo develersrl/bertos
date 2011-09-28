@@ -45,8 +45,15 @@
 #define SD_CS_ON()   do { /* implement me */} while(0)
 #define SD_CS_OFF()  do { /* implement me */} while(0)
 
-#define SD_PIN_INIT()      do { /* implement me */} while(0)
-#define SD_CARD_PRESENT()  true /* implement me */
+#include <io/cm3.h>
+
+#define SD_STROBE_ON()   do { PIOE_SODR = BV(0); } while(0)
+#define SD_STROBE_OFF()  do { PIOE_CODR = BV(0); } while(0)
+
+#define SD_STROBE_INIT() do { /* implement me */} while(0)
+#define SD_PIN_INIT()    do { /* implement me */} while(0)
+
+#define SD_CARD_PRESENT() (!(PIOE_PDSR & BV(6)))
 #define SD_WRITE_PROTECT() false /* implement me */
 
 #endif /* HW_SD_H */
