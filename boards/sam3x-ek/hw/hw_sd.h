@@ -45,6 +45,16 @@
 
 #include <io/cm3.h>
 
+#define SD_STROBE_ON()   do { PIOE_SODR = BV(0); } while(0)
+#define SD_STROBE_OFF()  do { PIOE_CODR = BV(0); } while(0)
+
+#define SD_STROBE_INIT() \
+	do { \
+		PIOE_PER = BV(0); \
+		PIOE_OER = BV(0);\
+		PIOE_CODR = BV(0); \
+	} while(0)
+
 #define SD_PIN_INIT()  \
 do { \
 	PIOA_PDR = BV(19) | BV(20) | BV(21) | BV(22) | BV(23) | BV(24); \
