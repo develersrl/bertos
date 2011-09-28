@@ -46,6 +46,7 @@
 
 #include <drv/timer.h>
 #include <drv/lcd_hx8347.h>
+#include <drv/dmac_sam3.h>
 
 static void init(void)
 {
@@ -56,6 +57,7 @@ static void init(void)
 	timer_init();
 	LED_INIT();
 	lcd_hx8347_init();
+	dmac_init();
 }
 
 int main(void)
