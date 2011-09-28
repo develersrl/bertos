@@ -441,7 +441,7 @@ static void play_menu(Bitmap *bm)
 	while (1)
 	{
 		keymask_t key = kbd_peek();
-		if (key & K_LEFT)
+		if ((key & K_LEFT) && !is_playing)
 		{
 			idx++;
 			if (idx > file_list_size)
