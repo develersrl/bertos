@@ -346,6 +346,18 @@
 	#define FLASH_BANKS_NUM                 2 ///< Number of flash banks
 	#define FLASH_PAGES_FOR_BANK         1024 ///< Number pages for each bank
 	#define FLASH_BASE                0x80000 ///< Start address for bank 0
+#elif CPU_CM3_SAM3U4
+	#define FLASH_MEM_SIZE          0x40000UL ///< Internal flash memory size
+	#define FLASH_PAGE_SIZE_BYTES         256 ///< Size of cpu flash memory page in bytes
+	#define FLASH_BANKS_NUM                 2 ///< Number of flash banks
+	#define FLASH_PAGES_FOR_BANK          512 ///< Number pages for each bank
+	#define FLASH_BASE                0x80000 ///< Start address for bank 0
+#elif CPU_CM3_SAM3N4 || CPU_CM3_SAM3S4
+	#define FLASH_MEM_SIZE          0x40000UL ///< Internal flash memory size
+	#define FLASH_PAGE_SIZE_BYTES         256 ///< Size of cpu flash memory page in bytes
+	#define FLASH_BANKS_NUM                 1 ///< Number of flash banks
+	#define FLASH_PAGES_FOR_BANK         1024 ///< Number pages for each bank
+	#define FLASH_BASE               0x400000 ///< Start address for bank 0
 #else
 	#error no internal flash info are defined for this cpu
 #endif
