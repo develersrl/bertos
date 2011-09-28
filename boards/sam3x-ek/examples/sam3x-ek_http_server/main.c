@@ -171,9 +171,28 @@ static int cgi_logo(char *revc_buf, struct netconn *client)
 	return 0;
 }
 
+static int cgi_temp(char *revc_buf, struct netconn *client)
+{
+	(void)revc_buf;
+
+	sprintf((char *)tx_buf, "[ %d.%d ]", status.internal_temp / 10, status.internal_temp % 10);
+
+	http_sendOk(client);
+	netconn_write(client, tx_buf, strlen((char *)tx_buf), NETCONN_COPY);
+	return 0;
+}
+
+static int cgi_echo(char *revc_buf, struct netconn *client)
+{
+	http_sendOk(client);
+	netconn_write(client, revc_buf, strlen((char *)revc_buf), NETCONN_COPY);
+	return 0;
+}
 
 static HttpCGI cgi_table[] =
 {
+	{ "echo",                cgi_echo   },
+	{ "temp",                cgi_temp   },
 	{ "status",              cgi_status },
 	{ "bertos_logo_jpg.jpg", cgi_logo   },
 	{ NULL, NULL }
