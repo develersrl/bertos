@@ -35,6 +35,9 @@ include ./boards/at91sam7s-ek/benchmark/at91sam7s-ek_kernel_footprint/at91sam7s-
 
 include ./boards/sam3x-ek/examples/sam3x-ek_display/sam3x-ek_display.mk
 include ./boards/sam3x-ek/examples/sam3x-ek_tcp_server/sam3x-ek_tcp_server.mk
+include ./boards/sam3x-ek/examples/sam3x-ek_http_server/sam3x-ek_http_server.mk
+include ./boards/sam3x-ek/examples/sam3x-ek_sd_bootloader/sam3x-ek_sd_bootloader.mk
+include ./boards/sam3x-ek/examples/sam3x-ek_codec/sam3x-ek_codec.mk
 
 include ./boards/sam3n-ek/examples/sam3n-ek_display/sam3n-ek_display.mk
 
