@@ -52,16 +52,17 @@
 #define LOG_VERBOSITY     HTTP_LOG_FORMAT
 #include <cfg/log.h>
 
-#include <drv/sd.h>
-
-#include <fs/fat.h>
-
 #include <stdio.h>
 #include <string.h>
 
 
 static const char http_html_hdr_200[] = "HTTP/1.1 200 OK\r\nContent-type: text/html\r\n\r\n";
 static const char http_html_hdr_404[] = "HTTP/1.1 404 Not Found\r\nContent-type: text/html\r\n\r\n";
+static const char http_html_hdr_500[] = "HTTP/1.1 500 Internal Server Error\r\nContent-type: text/html\r\n\r\n";
+
+static HttpCGI *cgi_table;
+static http_handler_t http_callback;
+
 
 void http_sendOk(struct netconn *client)
 {
@@ -73,6 +74,10 @@ void http_sendFileNotFound(struct netconn *client)
 	netconn_write(client, http_html_hdr_404, sizeof(http_html_hdr_404) - 1, NETCONN_NOCOPY);
 }
 
+void http_sendInternalErr(struct netconn *client)
+{
+	netconn_write(client, http_html_hdr_500, sizeof(http_html_hdr_500) - 1, NETCONN_NOCOPY);
+}
 
 static void get_fileName(const char *revc_buf, size_t recv_len, char *name, size_t len)
 {
@@ -112,30 +117,52 @@ static void get_fileName(const char *revc_buf, size_t recv_len, char *name, size
 	name[i + 1] = '\0';
 }
 
-static http_gci_handler_t cgi_search(const char *name,  HttpCGI *table)
+INLINE const char *get_ext(const char *name)
 {
-	for (int i = 0; table[i].name; i++)
-	{
-		if (!strcmp(table[i].name, name))
-			return table[i].handler;
-	}
+	const char *ext = strstr(name, ".");
+	if(ext && (ext + 1))
+		return (ext + 1);
+
 	return NULL;
 }
 
-static uint8_t tx_buf[2048];
-static char file_name[80];
-
-void http_server(struct netconn *server, struct HttpCGI *table)
+static http_handler_t cgi_search(const char *name,  HttpCGI *table)
 {
-	// SD fat filesystem context
-	Sd sd;
-	FATFS fs;
-	FatFile in_file;
+	if (!table)
+		return NULL;
+
+	int i = 0;
+	const char *ext = get_ext(name);
+	LOG_INFO("EXT %s\n", ext);
+	while(table[i].name)
+	{
+		if (ext && table[i].type == CGI_MATCH_EXT)
+		{
+			LOG_INFO("Match all ext %s\n", ext);
+			if (!strcmp(table[i].name, ext))
+				break;
+		}
+		else /* (table[i].type == CGI_MATCH_NAME) */
+		{
+			LOG_INFO("Match all name %s\n", name);
+			if (!strcmp(table[i].name, name))
+				break;
+		}
+
+		i++;
+	}
+
+	return table[i].handler;
+}
+
+static char req_string[80];
+
+void http_poll(struct netconn *server)
+{
 	struct netconn *client;
 	struct netbuf *rx_buf_conn;
 	char *rx_buf;
-	u16_t len;
-	FRESULT result;
+	uint16_t len;
 
 	client = netconn_accept(server);
 	if (!client)
@@ -145,73 +172,28 @@ void http_server(struct netconn *server, struct HttpCGI *table)
 	if (rx_buf_conn)
 	{
 		netbuf_data(rx_buf_conn, (void **)&rx_buf, &len);
-
 		if (rx_buf)
 		{
-			memset(file_name, 0, sizeof(file_name));
-			get_fileName(rx_buf, len, file_name, sizeof(file_name));
+			memset(req_string, 0, sizeof(req_string));
+			get_fileName(rx_buf, len, req_string, sizeof(req_string));
 
-			LOG_INFO("Search %s\n", file_name);
-			if (file_name[0] == '\0')
-				strcpy(file_name, HTTP_DEFAULT_PAGE);
+			LOG_INFO("Search %s\n", req_string);
+			if (req_string[0] == '\0')
+				strcpy(req_string, HTTP_DEFAULT_PAGE);
 
-			http_gci_handler_t cgi = cgi_search(file_name,  table);
+			http_handler_t cgi = cgi_search(req_string, cgi_table);
 			if (cgi)
 			{
-				cgi(client, rx_buf, len);
-			}
-			else if (SD_CARD_PRESENT())
-			{
-				bool sd_ok = sd_init(&sd, NULL, 0);
-				if (sd_ok)
+				if (cgi(client, req_string, rx_buf, len) < 0)
 				{
-					LOG_INFO("Mount FAT filesystem.\n");
-					result = f_mount(0, &fs);
-					if (result != FR_OK)
-					{
-						LOG_ERR("Mounting FAT volumes error[%d]\n", result);
-						sd_ok = false;
-						f_mount(0, NULL);
-					}
-
-					if (sd_ok)
-					{
-						result = fatfile_open(&in_file, file_name,  FA_OPEN_EXISTING | FA_READ);
-
-						size_t count = 0;
-						if (result == FR_OK)
-						{
-							LOG_INFO("Opened file '%s' size %ld\n", file_name, in_file.fat_file.fsize);
-
-							http_sendOk(client);
-
-							while (count < in_file.fat_file.fsize)
-							{
-								int len = kfile_read(&in_file.fd, tx_buf, sizeof(tx_buf));
-								netconn_write(client, tx_buf, len, NETCONN_COPY);
-								count += len;
-							}
-
-							kfile_flush(&in_file.fd);
-							kfile_close(&in_file.fd);
-
-							LOG_INFO("Sent: %d\n", count);
-						}
-						else
-						{
-							LOG_ERR("Unable to open file: '%s' error[%d]\n",  file_name, result);
-							http_sendFileNotFound(client);
-							netconn_write(client, http_file_not_found, http_file_not_found_len - 1, NETCONN_NOCOPY);
-						}
-					}
+					LOG_ERR("Internal server error\n");
+					http_sendInternalErr(client);
+					netconn_write(client, http_server_error, http_server_error_len - 1, NETCONN_NOCOPY);
 				}
-				f_mount(0, NULL);
-				LOG_INFO("Umount FAT filesystem.\n");
 			}
 			else
 			{
-				http_sendFileNotFound(client);
-				netconn_write(client, http_sd_not_present, http_sd_not_present_len, NETCONN_NOCOPY);
+				http_callback(client, req_string, rx_buf, len);
 			}
 		}
 		netconn_close(client);
@@ -219,3 +201,12 @@ void http_server(struct netconn *server, struct HttpCGI *table)
 	}
 	netconn_delete(client);
 }
+
+void http_init(http_handler_t default_callback, struct HttpCGI *table)
+{
+	ASSERT(default_callback);
+
+	cgi_table = table;
+	http_callback = default_callback;
+}
+

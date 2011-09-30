@@ -52,16 +52,24 @@
 #include <lwip/tcpip.h>
 #include <lwip/dhcp.h>
 
-typedef int (*http_gci_handler_t)(struct netconn *client, char *revc_buf, size_t revc_len);
+typedef int (*http_handler_t)(struct netconn *client, const char *name, char *revc_buf, size_t revc_len);
 
 typedef struct HttpCGI
 {
+	unsigned type;
 	const char *name;
-	http_gci_handler_t handler;
+	http_handler_t handler;
 } HttpCGI;
+
+#define CGI_MATCH_NONE   0
+#define CGI_MATCH_NAME   1
+#define CGI_MATCH_EXT    2
 
 void http_sendOk(struct netconn *client);
 void http_sendFileNotFound(struct netconn *client);
-void http_server(struct netconn *server, struct HttpCGI *gci);
+void http_sendInternalErr(struct netconn *client);
+
+void http_poll(struct netconn *server);
+void http_init(http_handler_t default_callback, struct HttpCGI *table);
 
 #endif /* NET_HTTP_H */
