@@ -42,10 +42,15 @@
  */
 
 
+#include "hw/hw_http.h"
 #include "hw/hw_sd.h"
 #include "hw/hw_adc.h"
 #include "hw/hw_sdram.h"
 
+// Define logging setting (for cfg/log.h module).
+#define LOG_LEVEL         3
+#define LOG_VERBOSITY     0
+#include <cfg/log.h>
 #include <cfg/debug.h>
 
 #include <cpu/irq.h>
@@ -142,11 +147,13 @@ static NORETURN void status_process(void)
 		(int)((addr) >> 24 & 0xff)
 
 
-static uint8_t tx_buf[1024];
+static uint8_t tx_buf[2048];
 
-static int cgi_status(char *revc_buf, struct netconn *client)
+static int cgi_status(struct netconn *client, const char *name, char *revc_buf, size_t revc_len)
 {
 	(void)revc_buf;
+	(void)revc_len;
+	(void)name;
 
 	//Update board status.
 	sprintf(status.last_connected_ip, "%d.%d.%d.%d", IP_ADDR_TO_INT_TUPLE(client->pcb.ip->remote_ip.addr));
@@ -162,18 +169,22 @@ static int cgi_status(char *revc_buf, struct netconn *client)
 	return 0;
 }
 
-static int cgi_logo(char *revc_buf, struct netconn *client)
+static int cgi_logo(struct netconn *client, const char *name, char *revc_buf, size_t revc_len)
 {
 	(void)revc_buf;
+	(void)revc_len;
+	(void)name;
 
 	http_sendOk(client);
 	netconn_write(client, bertos_logo_jpg, bertos_logo_jpg_len, NETCONN_NOCOPY);
 	return 0;
 }
 
-static int cgi_temp(char *revc_buf, struct netconn *client)
+static int cgi_temp(struct netconn *client, const char *name, char *revc_buf, size_t revc_len)
 {
 	(void)revc_buf;
+	(void)revc_len;
+	(void)name;
 
 	sprintf((char *)tx_buf, "[ %d.%d ]", status.internal_temp / 10, status.internal_temp % 10);
 
@@ -182,20 +193,122 @@ static int cgi_temp(char *revc_buf, struct netconn *client)
 	return 0;
 }
 
-static int cgi_echo(char *revc_buf, struct netconn *client)
+static int cgi_echo(struct netconn *client, const char *name, char *revc_buf, size_t revc_len)
 {
+	(void)name;
+
 	http_sendOk(client);
-	netconn_write(client, revc_buf, strlen((char *)revc_buf), NETCONN_COPY);
+	netconn_write(client, revc_buf, revc_len, NETCONN_COPY);
 	return 0;
+}
+
+static int http_htmPageLoad(struct netconn *client, const char *name, char *revc_buf, size_t revc_len)
+{
+	(void)revc_buf;
+	(void)revc_len;
+
+	if (SD_CARD_PRESENT())
+	{
+
+		// SD fat filesystem context
+		Sd sd;
+		FATFS fs;
+		FatFile in_file;
+		FRESULT result;
+
+		bool sd_ok = sd_init(&sd, NULL, 0);
+		if (sd_ok)
+		{
+			LOG_INFO("Mount FAT filesystem.\n");
+			result = f_mount(0, &fs);
+			if (result != FR_OK)
+			{
+				LOG_ERR("Mounting FAT volumes error[%d]\n", result);
+				sd_ok = false;
+				f_mount(0, NULL);
+			}
+
+			if (sd_ok)
+			{
+				result = fatfile_open(&in_file, name,  FA_OPEN_EXISTING | FA_READ);
+
+				size_t count = 0;
+				if (result == FR_OK)
+				{
+					LOG_INFO("Opened file '%s' size %ld\n", name, in_file.fat_file.fsize);
+
+					http_sendOk(client);
+
+					while (count < in_file.fat_file.fsize)
+					{
+						int len = kfile_read(&in_file.fd, tx_buf, sizeof(tx_buf));
+						netconn_write(client, tx_buf, len, NETCONN_COPY);
+						count += len;
+					}
+
+					kfile_flush(&in_file.fd);
+					kfile_close(&in_file.fd);
+
+					LOG_INFO("Sent: %d\n", count);
+				}
+				else
+				{
+					LOG_ERR("Unable to open file: '%s' error[%d]\n",  name, result);
+					http_sendFileNotFound(client);
+					netconn_write(client, http_file_not_found, http_file_not_found_len - 1, NETCONN_NOCOPY);
+				}
+			}
+		}
+		f_mount(0, NULL);
+		LOG_INFO("Umount FAT filesystem.\n");
+	}
+	else
+	{
+		http_sendFileNotFound(client);
+		netconn_write(client, http_sd_not_present, http_sd_not_present_len, NETCONN_NOCOPY);
+	}
+
+	return 0;
+}
+
+static int cgi_chipInfo(struct netconn *client, const char *name, char *revc_buf, size_t revc_len)
+{
+	(void)revc_buf;
+	(void)revc_len;
+	(void)name;
+
+	sprintf((char *)tx_buf, "[ %s, %s, %s, %s, %s ]",
+	chipid_eproc_name(CHIPID_EPRCOC()),
+	chipid_archnames(CHIPID_ARCH()),
+	chipid_sramsize(CHIPID_SRAMSIZ()),
+	chipid_nvpsize(CHIPID_NVPSIZ()),
+	chipid_nvptype(CHIPID_NVTYP()));
+
+	http_sendOk(client);
+	netconn_write(client, tx_buf, strlen((char *)tx_buf), NETCONN_COPY);
+
+	return 0;
+}
+
+static int cgi_error(struct netconn *client, const char *name, char *revc_buf, size_t revc_len)
+{
+	(void)revc_buf;
+	(void)revc_len;
+	(void)name;
+	(void)client;
+
+	return -1;
 }
 
 static HttpCGI cgi_table[] =
 {
-	{ "echo",                cgi_echo   },
-	{ "temp",                cgi_temp   },
-	{ "status",              cgi_status },
-	{ "bertos_logo_jpg.jpg", cgi_logo   },
-	{ NULL, NULL }
+	{ CGI_MATCH_NAME, "echo",                cgi_echo          },
+	{ CGI_MATCH_NAME, "temp",                cgi_temp          },
+	{ CGI_MATCH_NAME, "status",              cgi_status        },
+	{ CGI_MATCH_NAME, "chipinfo",            cgi_chipInfo      },
+	{ CGI_MATCH_NAME, "error_test",          cgi_error         },
+	{ CGI_MATCH_NAME, "bertos_logo_jpg",     cgi_logo          },
+	{ CGI_MATCH_NONE,  NULL,                 NULL              }
 };
 
 
@@ -203,9 +316,9 @@ int main(void)
 {
 	struct netconn *server;
 
-
 	/* Hardware initialization */
 	init();
+	http_init(http_htmPageLoad, cgi_table);
 
 	proc_new(status_process, NULL, KERN_MINSTACKSIZE * 2, NULL);
 
@@ -220,6 +333,6 @@ int main(void)
 
 	while (1)
 	{
-		http_server(server, cgi_table);
+		http_poll(server);
 	}
 }
