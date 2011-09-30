@@ -40,7 +40,7 @@
 const char http_file_not_found[] = "\
 <!DOCTYPE html PUBLIC \"-//IETF//DTD HTML 2.0//EN\"> \
 <html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=ISO-8859-1\"> \
-<title>404 Not Found</title></head><body><img src=\"bertos_logo_jpg.jpg\"><h1>404 Not Found</h1>\
+<title>404 Not Found</title></head><body><img src=\"bertos_logo_jpg\"><h1>404 Not Found</h1>\
 <p>The requested URL was not found on this server.</p><hr>\
 <address>BeRTOS simple HTTP server</address></body></html>";
 
@@ -49,8 +49,17 @@ const size_t http_file_not_found_len = sizeof(http_file_not_found);
 const char http_sd_not_present[] = " \
 <!DOCTYPE html PUBLIC \"-//IETF//DTD HTML 2.0//EN\">  \
 <html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=ISO-8859-1\">  \
-<title>BeRTOS simple HTTP Server</title></head><body><img src=\"bertos_logo_jpg.jpg\"> \
+<title>BeRTOS simple HTTP Server</title></head><body><img src=\"bertos_logo_jpg\"> \
 <h1>BeRTOS simple HTTP Server</h1><p>Simple Http server, the site's pages are stored on SD card, check it if is present.</p><hr>\
 <a href=\"http://www.bertos.org\">www.BeRTOS.org</a></body></html> \
 ";
 const size_t http_sd_not_present_len = sizeof(http_sd_not_present);
+
+const char http_server_error[] = " \
+<!DOCTYPE html PUBLIC \"-//IETF//DTD HTML 2.0//EN\"> \
+<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=ISO-8859-1\"> \
+<title>404 Not Found</title></head><body><img src=\"bertos_logo_jpg\"><h1>500 Internal Server error</h1>\
+<p>The internal server error was occur while processing the requested page.</p><hr>\
+<address>BeRTOS simple HTTP server</address></body></html>";
+
+const size_t http_server_error_len = sizeof(http_server_error_len);

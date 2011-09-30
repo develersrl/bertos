@@ -46,4 +46,7 @@ extern const size_t http_file_not_found_len;
 extern const char http_sd_not_present[];
 extern const size_t http_sd_not_present_len;
 
+extern const char http_server_error[];
+extern const size_t http_server_error_len;
+
 #endif /*  HW_HTTP_H */
