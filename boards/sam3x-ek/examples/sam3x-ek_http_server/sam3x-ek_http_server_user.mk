@@ -12,6 +12,7 @@ sam3x-ek_http_server_USER_CSRC = \
 	$(sam3x-ek_http_server_SRC_PATH)/main.c \
 	bertos/cpu/cortex-m3/drv/dmac_sam3.c \
 	bertos/cpu/cortex-m3/drv/hsmci_sam3.c \
+	bertos/cpu/cortex-m3/io/sam3_chipid.c \
 	#
 
 # Files included by the user.
