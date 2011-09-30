@@ -63,17 +63,29 @@ static const char http_html_hdr_500[] = "HTTP/1.1 500 Internal Server Error\r\nC
 static HttpCGI *cgi_table;
 static http_handler_t http_callback;
 
-
+/**
+ * Send on \param client socket
+ * the 200 Ok http header
+ */
 void http_sendOk(struct netconn *client)
 {
 	netconn_write(client, http_html_hdr_200, sizeof(http_html_hdr_200) - 1, NETCONN_NOCOPY);
 }
 
+
+/**
+ * Send on \param client socket
+ * the 404 File not found http header
+ */
 void http_sendFileNotFound(struct netconn *client)
 {
 	netconn_write(client, http_html_hdr_404, sizeof(http_html_hdr_404) - 1, NETCONN_NOCOPY);
 }
 
+/**
+ * Send on \param client socket
+ * the 500 internal server error http header
+ */
 void http_sendInternalErr(struct netconn *client)
 {
 	netconn_write(client, http_html_hdr_500, sizeof(http_html_hdr_500) - 1, NETCONN_NOCOPY);
@@ -157,6 +169,12 @@ static http_handler_t cgi_search(const char *name,  HttpCGI *table)
 
 static char req_string[80];
 
+/**
+ * Http polling function.
+ *
+ * Call this functions to process each client connections.
+ *
+ */
 void http_poll(struct netconn *server)
 {
 	struct netconn *client;
@@ -202,6 +220,18 @@ void http_poll(struct netconn *server)
 	netconn_delete(client);
 }
 
+/**
+ * Init the http server.
+ *
+ * The simply http server call for each client request the default_callback function. The
+ * user should define this callback to manage the client request, i.e. reading site's page
+ * from SD card. The user can define the cgi_table, where associate one callback to the user string.
+ * In this way the user could filter some client request and redirect they to custom callback, i.e.
+ * the client could request status of the device only loading the particular page name.
+ *
+ * \param default_callback fuction that server call for all request, that does'nt match cgi table.
+ * \param table of callcack to call when client request a particular page.
+ */
 void http_init(http_handler_t default_callback, struct HttpCGI *table)
 {
 	ASSERT(default_callback);
