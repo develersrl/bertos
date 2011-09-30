@@ -88,16 +88,16 @@ bool hsmci_sendCmd(uint8_t index, uint32_t argument, uint32_t reply_type)
 	HSMCI_ARGR = argument;
 	HSMCI_CMDR = index | reply_type | BV(HSMCI_CMDR_MAXLAT);
 
-	uint32_t status = HSMCI_SR;
-	while (!(status & BV(HSMCI_SR_CMDRDY)))
-	{
+	uint32_t status;
+	do {
+		status = HSMCI_SR;
+
 		if (status & HSMCI_RESP_ERROR_MASK)
 			return status;
 
 		cpu_relax();
 
-		status = HSMCI_SR;
-	}
+	} while (!(status & BV(HSMCI_SR_CMDRDY)));
 
 	return 0;
 }
