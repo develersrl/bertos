@@ -56,14 +56,15 @@ typedef int (*http_handler_t)(struct netconn *client, const char *name, char *re
 
 typedef struct HttpCGI
 {
-	unsigned type;
-	const char *name;
-	http_handler_t handler;
+	unsigned type;          ///< Strategy to find string in the cgi table.
+	const char *name;       ///< Request string from GET request
+	http_handler_t handler; ///< Callback to process the special request
 } HttpCGI;
 
+
 #define CGI_MATCH_NONE   0
-#define CGI_MATCH_NAME   1
-#define CGI_MATCH_EXT    2
+#define CGI_MATCH_NAME   1  ///< Select item in table only if string match
+#define CGI_MATCH_EXT    2  ///< Select item in table if the extention match
 
 void http_sendOk(struct netconn *client);
 void http_sendFileNotFound(struct netconn *client);

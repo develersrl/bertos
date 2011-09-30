@@ -37,8 +37,7 @@
  *
  * This simple web server read the site's pages from SD card, and manage
  * the cases where SD is not present or page not found, using embedded pages.
- * Quering from browser the /status page, the server return a json dictionary where are store
- * some board status info, like board temperature, up-time, etc.
+ * Quering from browser some cgi page, the server return a json dictionary.
  */
 
 
@@ -140,6 +139,7 @@ static NORETURN void status_process(void)
 	}
 }
 
+/* Macro to unpack the ip addres from lwip format */
 #define IP_ADDR_TO_INT_TUPLE(addr) \
 		(int)((addr) >>  0 & 0xff), \
 		(int)((addr) >>  8 & 0xff), \
@@ -149,6 +149,9 @@ static NORETURN void status_process(void)
 
 static uint8_t tx_buf[2048];
 
+/*
+ * Return a JSON string of board status.
+ */
 static int cgi_status(struct netconn *client, const char *name, char *revc_buf, size_t revc_len)
 {
 	(void)revc_buf;
@@ -180,6 +183,9 @@ static int cgi_logo(struct netconn *client, const char *name, char *revc_buf, si
 	return 0;
 }
 
+/*
+ * Return the internal micro temperature string.
+ */
 static int cgi_temp(struct netconn *client, const char *name, char *revc_buf, size_t revc_len)
 {
 	(void)revc_buf;
@@ -193,6 +199,9 @@ static int cgi_temp(struct netconn *client, const char *name, char *revc_buf, si
 	return 0;
 }
 
+/*
+ * Reply to client the request string.
+ */
 static int cgi_echo(struct netconn *client, const char *name, char *revc_buf, size_t revc_len)
 {
 	(void)name;
@@ -202,6 +211,15 @@ static int cgi_echo(struct netconn *client, const char *name, char *revc_buf, si
 	return 0;
 }
 
+
+/*
+ * Default function that http server call every client request, if it doesn't match a cgi table.
+ * In this implementation all client request are associate to real file stored on FAT file
+ * sistem on SD card. If the file there is not on SD card the server reply to client the
+ * error File not found, and send an harcoded page. In the same way, the server reply
+ * error page if the SD card is not present.
+ *
+ */
 static int http_htmPageLoad(struct netconn *client, const char *name, char *revc_buf, size_t revc_len)
 {
 	(void)revc_buf;
@@ -271,6 +289,10 @@ static int http_htmPageLoad(struct netconn *client, const char *name, char *revc
 	return 0;
 }
 
+/*
+ * Return to client a string that display the CHIP ID information.
+ * See datasheet for more detail.
+ */
 static int cgi_chipInfo(struct netconn *client, const char *name, char *revc_buf, size_t revc_len)
 {
 	(void)revc_buf;
@@ -300,6 +322,9 @@ static int cgi_error(struct netconn *client, const char *name, char *revc_buf, s
 	return -1;
 }
 
+/*
+ * Static cgi table where we associate callback to page.
+ */
 static HttpCGI cgi_table[] =
 {
 	{ CGI_MATCH_NAME, "echo",                cgi_echo          },
