@@ -52,7 +52,7 @@
 #include <lwip/tcpip.h>
 #include <lwip/dhcp.h>
 
-typedef int (*http_gci_handler_t)(char *revc_buf, struct netconn *client);
+typedef int (*http_gci_handler_t)(struct netconn *client, char *revc_buf, size_t revc_len);
 
 typedef struct HttpCGI
 {

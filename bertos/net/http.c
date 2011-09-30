@@ -74,20 +74,42 @@ void http_sendFileNotFound(struct netconn *client)
 }
 
 
-static void get_fileName(char *revc_buf, char *name, size_t len)
+static void get_fileName(const char *revc_buf, size_t recv_len, char *name, size_t len)
 {
+	int i = 0;
 	char *p = strstr(revc_buf, "GET");
 	if (p)
 	{
+		//Find the end of the page request.
+		char *stop = strstr(revc_buf, "HTTP");
+		if (!stop)
+		{
+			LOG_ERR("Bad GET request\n");
+			name[0] = '\0';
+			return;
+		}
+
 		//skip the "/" in get string request
 		p += sizeof("GET") + 1;
-		for (size_t i = 0; *p != ' '; i++,p++)
+
+		while (p != stop)
 		{
-			if (i > len)
+			if ((size_t)i == len || (size_t)i >= recv_len)
+			{
+				name[i] = '\0';
 				break;
-			name[i] = *p;
+			}
+
+			name[i++] = *(p++);
 		}
 	}
+
+	//Trail white space in the string.
+	while ( --i >= 0 )
+		if (name[i] != ' ' && name[i] != '\t' && name[i] != '\n')
+			break;
+
+	name[i + 1] = '\0';
 }
 
 static http_gci_handler_t cgi_search(const char *name,  HttpCGI *table)
@@ -123,19 +145,20 @@ void http_server(struct netconn *server, struct HttpCGI *table)
 	if (rx_buf_conn)
 	{
 		netbuf_data(rx_buf_conn, (void **)&rx_buf, &len);
+
 		if (rx_buf)
 		{
 			memset(file_name, 0, sizeof(file_name));
-			get_fileName(rx_buf, file_name, sizeof(file_name));
+			get_fileName(rx_buf, len, file_name, sizeof(file_name));
 
 			LOG_INFO("Search %s\n", file_name);
-			if (strlen(file_name) == 0)
+			if (file_name[0] == '\0')
 				strcpy(file_name, HTTP_DEFAULT_PAGE);
 
 			http_gci_handler_t cgi = cgi_search(file_name,  table);
 			if (cgi)
 			{
-				cgi(rx_buf, client);
+				cgi(client, rx_buf, len);
 			}
 			else if (SD_CARD_PRESENT())
 			{
