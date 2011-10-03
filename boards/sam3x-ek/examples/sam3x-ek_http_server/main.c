@@ -161,7 +161,7 @@ static int cgi_status(struct netconn *client, const char *name, char *revc_buf, 
 	//Update board status.
 	sprintf(status.last_connected_ip, "%d.%d.%d.%d", IP_ADDR_TO_INT_TUPLE(client->pcb.ip->remote_ip.addr));
 	sprintf(status.local_ip, "%d.%d.%d.%d", IP_ADDR_TO_INT_TUPLE(client->pcb.ip->local_ip.addr));
-	sprintf((char *)tx_buf, "[ %s, %s, %d.%d, %ld, %d ]", status.local_ip, status.last_connected_ip,
+	sprintf((char *)tx_buf, "[ \"%s\", \"%s\", %d.%d, %ld, %d ]", status.local_ip, status.last_connected_ip,
 															status.internal_temp / 10, status.internal_temp % 10,
 															status.up_time, status.tot_req);
 
@@ -215,7 +215,7 @@ static int cgi_uptime(struct netconn *client, const char *name, char *revc_buf, 
 	uint32_t h = m / 60;
 	uint32_t s = status.up_time  - (m * 60) - (h * 3600);
 
-	sprintf((char *)tx_buf, "['%ldh %ldm %lds']", h, m, s);
+	sprintf((char *)tx_buf, "[\"%ldh %ldm %lds\"]", h, m, s);
 
 	http_sendOk(client);
 	netconn_write(client, tx_buf, strlen((char *)tx_buf), NETCONN_COPY);
@@ -232,7 +232,7 @@ static int cgi_resistor(struct netconn *client, const char *name, char *revc_buf
 	(void)name;
 
 	uint16_t volt = ADC_RANGECONV(adc_read(1), 0, 3300);
-	sprintf((char *)tx_buf, "[ '%d.%dV' ]",  volt / 1000, volt % 1000);
+	sprintf((char *)tx_buf, "[ \"%d.%dV\" ]",  volt / 1000, volt % 1000);
 
 	http_sendOk(client);
 	netconn_write(client, tx_buf, strlen((char *)tx_buf), NETCONN_COPY);
@@ -352,7 +352,8 @@ static int cgi_chipInfo(struct netconn *client, const char *name, char *revc_buf
 	(void)revc_len;
 	(void)name;
 
-	sprintf((char *)tx_buf, "[ %s, %s, %s, %s, %s ]",
+	sprintf((char *)tx_buf, "{ \"core_name\":\"%s\", \"arch_name\":\"%s\", \"sram_size\":\"%s\",\
+								\"flash_size\":\"%s\", \"mem_boot_type\":\"%s\" }",
 	chipid_eproc_name(CHIPID_EPRCOC()),
 	chipid_archnames(CHIPID_ARCH()),
 	chipid_sramsize(CHIPID_SRAMSIZ()),
@@ -376,7 +377,7 @@ static HttpCGI cgi_table[] =
 	{ CGI_MATCH_NAME, "get_resistor",        cgi_resistor      },
 	{ CGI_MATCH_NAME, "set_led",             cgi_led           },
 	{ CGI_MATCH_WORD, "status",              cgi_status        },
-	{ CGI_MATCH_WORD, "chipinfo",            cgi_chipInfo      },
+	{ CGI_MATCH_NAME, "get_chipinfo",        cgi_chipInfo      },
 	{ CGI_MATCH_NAME, "bertos_logo_jpg",     cgi_logo          },
 	{ CGI_MATCH_NONE,  NULL,                 NULL              }
 };
