@@ -90,7 +90,7 @@ typedef struct BoardStatus
 	char local_ip[sizeof("123.123.123.123")];
 	char last_connected_ip[sizeof("123.123.123.123")];
 	uint16_t internal_temp;
-	ticks_t up_time;
+	uint32_t up_time;
 	size_t tot_req;
 } BoardStatus;
 
@@ -192,10 +192,62 @@ static int cgi_temp(struct netconn *client, const char *name, char *revc_buf, si
 	(void)revc_len;
 	(void)name;
 
-	sprintf((char *)tx_buf, "[ %d.%d ]", status.internal_temp / 10, status.internal_temp % 10);
+	sprintf((char *)tx_buf, "[%d.%d]", status.internal_temp / 10, status.internal_temp % 10);
 
 	http_sendOk(client);
 	netconn_write(client, tx_buf, strlen((char *)tx_buf), NETCONN_COPY);
+	return 0;
+}
+
+
+/*
+ * Return the board uptime.
+ */
+static int cgi_uptime(struct netconn *client, const char *name, char *revc_buf, size_t revc_len)
+{
+	(void)revc_buf;
+	(void)revc_len;
+	(void)name;
+
+
+
+	uint32_t m = status.up_time / 60;
+	uint32_t h = m / 60;
+	uint32_t s = status.up_time  - (m * 60) - (h * 3600);
+
+	sprintf((char *)tx_buf, "['%ldh %ldm %lds']", h, m, s);
+
+	http_sendOk(client);
+	netconn_write(client, tx_buf, strlen((char *)tx_buf), NETCONN_COPY);
+	return 0;
+}
+
+/*
+ * Return the VR1 potentiometer voltage.
+ */
+static int cgi_resistor(struct netconn *client, const char *name, char *revc_buf, size_t revc_len)
+{
+	(void)revc_buf;
+	(void)revc_len;
+	(void)name;
+
+	uint16_t volt = ADC_RANGECONV(adc_read(1), 0, 3300);
+	sprintf((char *)tx_buf, "[ '%d.%dV' ]",  volt / 1000, volt % 1000);
+
+	http_sendOk(client);
+	netconn_write(client, tx_buf, strlen((char *)tx_buf), NETCONN_COPY);
+	return 0;
+}
+
+/*
+ * Reply to client the request string.
+ */
+static int cgi_led(struct netconn *client, const char *name, char *revc_buf, size_t revc_len)
+{
+	(void)name;
+
+	http_sendOk(client);
+	netconn_write(client, revc_buf, revc_len, NETCONN_COPY);
 	return 0;
 }
 
@@ -210,6 +262,7 @@ static int cgi_echo(struct netconn *client, const char *name, char *revc_buf, si
 	netconn_write(client, revc_buf, revc_len, NETCONN_COPY);
 	return 0;
 }
+
 
 
 /*
@@ -312,26 +365,18 @@ static int cgi_chipInfo(struct netconn *client, const char *name, char *revc_buf
 	return 0;
 }
 
-static int cgi_error(struct netconn *client, const char *name, char *revc_buf, size_t revc_len)
-{
-	(void)revc_buf;
-	(void)revc_len;
-	(void)name;
-	(void)client;
-
-	return -1;
-}
-
 /*
  * Static cgi table where we associate callback to page.
  */
 static HttpCGI cgi_table[] =
 {
-	{ CGI_MATCH_NAME, "echo",                cgi_echo          },
-	{ CGI_MATCH_NAME, "temp",                cgi_temp          },
-	{ CGI_MATCH_NAME, "status",              cgi_status        },
-	{ CGI_MATCH_NAME, "chipinfo",            cgi_chipInfo      },
-	{ CGI_MATCH_NAME, "error_test",          cgi_error         },
+	{ CGI_MATCH_WORD, "echo",                cgi_echo          },
+	{ CGI_MATCH_NAME, "get_temperature",     cgi_temp          },
+	{ CGI_MATCH_NAME, "get_uptime",          cgi_uptime        },
+	{ CGI_MATCH_NAME, "get_resistor",        cgi_resistor      },
+	{ CGI_MATCH_NAME, "set_led",             cgi_led           },
+	{ CGI_MATCH_WORD, "status",              cgi_status        },
+	{ CGI_MATCH_WORD, "chipinfo",            cgi_chipInfo      },
 	{ CGI_MATCH_NAME, "bertos_logo_jpg",     cgi_logo          },
 	{ CGI_MATCH_NONE,  NULL,                 NULL              }
 };
