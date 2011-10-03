@@ -38,6 +38,8 @@
  * the cases where SD is not present or page not found, using embedded pages.
  * Quering from browser the /status page, the server return a json dictionary where are store
  * some board status info, like board temperature, up-time, etc.
+ *
+ * notest: avr
  */
 
 #include "http.h"
@@ -97,7 +99,7 @@ static void get_fileName(const char *revc_buf, size_t recv_len, char *name, size
 	char *p = strstr(revc_buf, "GET");
 	if (p)
 	{
-		//Find the end of the page request.
+		/* Find the end of the page request. */
 		char *stop = strstr(revc_buf, "HTTP");
 		if (!stop)
 		{
@@ -106,7 +108,7 @@ static void get_fileName(const char *revc_buf, size_t recv_len, char *name, size
 			return;
 		}
 
-		//skip the "/" in get string request
+		/* skip the "/" in get string request */
 		p += sizeof("GET") + 1;
 
 		while (p != stop)
@@ -121,7 +123,7 @@ static void get_fileName(const char *revc_buf, size_t recv_len, char *name, size
 		}
 	}
 
-	//Trail white space in the string.
+	/* Trail white space in the string. */
 	while ( --i >= 0 )
 		if (name[i] != ' ' && name[i] != '\t' && name[i] != '\n')
 			break;
