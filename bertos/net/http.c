@@ -83,6 +83,9 @@ void http_decodeUri(const char *raw_buf, size_t raw_len, char *decodec_buf, size
 	char value;
 	for (size_t i = 0; i < raw_len; i++)
 	{
+		if (!len)
+			return;
+
 		if (raw_buf[i] == '%')
 		{
 			if (i + 2 < raw_len)
@@ -92,12 +95,14 @@ void http_decodeUri(const char *raw_buf, size_t raw_len, char *decodec_buf, size
 				if (value)
 				{
 					*decodec_buf++ = value;
+					len--;
 					i += 2;
 					continue;
 				}
 			}
 		}
 		*decodec_buf++ = raw_buf[i];
+		len--;
 	}
 }
 
