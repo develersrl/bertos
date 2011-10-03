@@ -59,13 +59,69 @@
 #include <string.h>
 
 
-static const char http_html_hdr_200[] = "HTTP/1.1 200 OK\r\nContent-type: text/html\r\n\r\n";
-static const char http_html_hdr_404[] = "HTTP/1.1 404 Not Found\r\nContent-type: text/html\r\n\r\n";
-static const char http_html_hdr_500[] = "HTTP/1.1 500 Internal Server Error\r\nContent-type: text/html\r\n\r\n";
+static const char http_html_hdr_200[] = "HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n";
+static const char http_html_hdr_404[] = "HTTP/1.0 404 Not Found\r\nContent-type: text/html\r\n\r\n";
+static const char http_html_hdr_500[] = "HTTP/1.0 500 Internal Server Error\r\nContent-type: text/html\r\n\r\n";
 
 static HttpCGI *cgi_table;
 static http_handler_t http_callback;
 
+/**
+ * Get key value from tokenized buffer
+ */
+int http_getValue(char *tolenized_buf, size_t tolenized_buf_len, const char *key, char *value, size_t len)
+{
+	if (!tolenized_buf || !key || !value)
+		return -1;
+
+	char *p = tolenized_buf;
+	size_t value_len = 0;
+
+	memset(value, 0, len);
+
+	for (size_t i = 0; i < tolenized_buf_len; i++)
+	{
+		if (!strcmp(key, p))
+		{
+			/* skip key */
+			size_t jump = strlen(p) + 1;
+			p += jump;
+
+			value_len = strlen(p);
+			if (value_len >= len)
+				return -1;
+
+			strcpy(value, p);
+			break;
+		}
+		/* jump to next pair */
+		p += strlen(p) + 1;
+	}
+
+	return value_len;
+}
+
+/**
+ * tokenize a buffer
+ */
+int http_tokenizeGetRequest(char *raw_buf, size_t raw_len)
+{
+	size_t token = 0;
+
+    for(size_t i = 0; (i < raw_len) && raw_buf; i++)
+	{
+		if (raw_buf[i] == '&')
+		{
+			token++;
+			raw_buf[i] = '\0';
+		}
+
+		if (raw_buf[i] == '=')
+			raw_buf[i] = '\0';
+    }
+
+    return token + 1;
+}
 
 static char http_hexToAscii(char first, char second)
 {
@@ -110,15 +166,15 @@ void http_getPageName(const char *recv_buf, size_t recv_len, char *page_name, si
 {
 	int i = 0;
 	bool str_ok = false;
-
-	if (recv_buf && (recv_len > sizeof("GET /")))
+	const char *p = recv_buf;
+	if (p && (recv_len > sizeof("GET /")))
 	{
-		if (*recv_buf++ == 'G' &&
-			*recv_buf++ == 'E' && *recv_buf++ == 'T')
+		if (*p++ == 'G' &&
+			*p++ == 'E' && *p++ == 'T')
 			{
 				str_ok = true;
 				/* skip the space and "/" */
-				recv_buf += 2;
+				p += 2;
 			}
 	}
 
@@ -126,7 +182,7 @@ void http_getPageName(const char *recv_buf, size_t recv_len, char *page_name, si
 	{
 		while ((size_t)i < recv_len)
 		{
-			char ch = *(recv_buf++);
+			char ch = *(p++);
 			if (ch == ' ' || ch == '\t' || ch == '\n')
 				break;
 			if((size_t)i == len - 1)

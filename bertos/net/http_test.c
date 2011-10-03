@@ -73,6 +73,8 @@ static const char uri_check[] = "test[]!@;'\"\\. ";
 static const char uri1[] = "!*'();:@&=%2B%24%2C/?#%5B%5D%3C%3E%7E.%22%7B%7D%7C%5C-%60_%5E%25";
 static const char uri_check1[] = "!*'();:@&=+$,/?#[]<>~.\"{}|\\-`_^%";
 
+static char token_str[] = "var1=1&var2=2&var3=3&var4=4";
+static char token_str1[] = "var1=1&var2=2&=3&var4=";
 
 int http_testSetup(void)
 {
@@ -135,6 +137,55 @@ int http_testRun(void)
 	{
 		kprintf("error 5 %s\n", decoded1);
 		goto error;
+	}
+
+
+	int len = http_tokenizeGetRequest(token_str, sizeof(token_str));
+	if (len != 4)
+	{
+		kprintf("error 6 len %d expect %d\n", len, 4);
+		goto error;
+	}
+
+	char value[80];
+	http_getValue(token_str, sizeof(token_str), "var1", value, sizeof(value));
+	if (strcmp(value, "1"))
+	{
+		kprintf("error 6 value %s expect %s\n", value, "1");
+		goto error;
+
+	}
+
+	http_getValue(token_str, sizeof(token_str), "var4", value, sizeof(value));
+	if (strcmp(value, "4"))
+	{
+		kprintf("error 6 value %s expect %s\n", value, "4");
+		goto error;
+
+	}
+
+
+	len = http_tokenizeGetRequest(token_str1, sizeof(token_str1));
+	if (len != 4)
+	{
+		kprintf("error 7 len %d expect %d\n", len, 4);
+		goto error;
+	}
+
+	http_getValue(token_str1, sizeof(token_str1), "var1", value, sizeof(value));
+	if (strcmp(value, "1"))
+	{
+		kprintf("error 7 value %s expect %s\n", value, "1");
+		goto error;
+
+	}
+
+	http_getValue(token_str1, sizeof(token_str1), "var4", value, sizeof(value));
+	if (strcmp(value, ""))
+	{
+		kprintf("error 7 value %s expect %s\n", value, "");
+		goto error;
+
 	}
 
 	return 0;
