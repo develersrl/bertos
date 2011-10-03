@@ -55,6 +55,7 @@
 #include <cfg/log.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 
@@ -64,6 +65,83 @@ static const char http_html_hdr_500[] = "HTTP/1.1 500 Internal Server Error\r\nC
 
 static HttpCGI *cgi_table;
 static http_handler_t http_callback;
+
+
+static char http_hexToAscii(char first, char second)
+{
+	char hex[5], *stop;
+	hex[0] = '0';
+	hex[1] = 'x';
+	hex[2] = first;
+	hex[3] = second;
+	hex[4] = 0;
+	return strtol(hex, &stop, 16);
+}
+
+void http_decodeUri(const char *raw_buf, size_t raw_len, char *decodec_buf, size_t len)
+{
+	char value;
+	for (size_t i = 0; i < raw_len; i++)
+	{
+		if (raw_buf[i] == '%')
+		{
+			if (i + 2 < raw_len)
+			{
+				/* convert hex value after % */
+				value = http_hexToAscii(raw_buf[i + 1], raw_buf[i + 2]);
+				if (value)
+				{
+					*decodec_buf++ = value;
+					i += 2;
+					continue;
+				}
+			}
+		}
+		*decodec_buf++ = raw_buf[i];
+	}
+}
+
+void http_getPageName(const char *recv_buf, size_t recv_len, char *page_name, size_t len)
+{
+	int i = 0;
+	bool str_ok = false;
+
+	if (recv_buf && (recv_len > sizeof("GET /")))
+	{
+		if (*recv_buf++ == 'G' &&
+			*recv_buf++ == 'E' && *recv_buf++ == 'T')
+			{
+				str_ok = true;
+				/* skip the space and "/" */
+				recv_buf += 2;
+			}
+	}
+
+	if (str_ok)
+	{
+		while ((size_t)i < recv_len)
+		{
+			char ch = *(recv_buf++);
+			if (ch == ' ' || ch == '\t' || ch == '\n')
+				break;
+			if((size_t)i == len - 1)
+				break;
+			page_name[i++] = ch;
+		}
+	}
+
+	page_name[i] = '\0';
+}
+
+INLINE const char *get_ext(const char *name)
+{
+	const char *ext = strstr(name, ".");
+	if(ext && (ext + 1))
+		return (ext + 1);
+
+	return NULL;
+}
+
 
 /**
  * Send on \param client socket
@@ -91,47 +169,6 @@ void http_sendFileNotFound(struct netconn *client)
 void http_sendInternalErr(struct netconn *client)
 {
 	netconn_write(client, http_html_hdr_500, sizeof(http_html_hdr_500) - 1, NETCONN_NOCOPY);
-}
-
-void http_getPageName(const char *revc_buf, size_t recv_len, char *page_name, size_t len)
-{
-	int i = 0;
-	bool str_ok = false;
-
-	if (revc_buf && (recv_len > sizeof("GET /")))
-	{
-		if (*revc_buf++ == 'G' &&
-			*revc_buf++ == 'E' && *revc_buf++ == 'T')
-			{
-				str_ok = true;
-				/* skip the space and "/" */
-				revc_buf += 2;
-			}
-	}
-
-	if (str_ok)
-	{
-		while ((size_t)i < recv_len)
-		{
-			char ch = *(revc_buf++);
-			if (ch == ' ' || ch == '\t' || ch == '\n')
-				break;
-			if((size_t)i == len - 1)
-				break;
-			page_name[i++] = ch;
-		}
-	}
-
-	page_name[i] = '\0';
-}
-
-INLINE const char *get_ext(const char *name)
-{
-	const char *ext = strstr(name, ".");
-	if(ext && (ext + 1))
-		return (ext + 1);
-
-	return NULL;
 }
 
 static http_handler_t cgi_search(const char *name,  HttpCGI *table)

@@ -66,6 +66,14 @@ Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8 \
 Accept-Encoding: gzip,deflate,sdch Accept-Language: it-IT,it;q=0.8,en-US;\
 q=0.6,en;q=0.4 Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3";
 
+
+static const char uri[] = "test%5B%5D!@;'%22%5C.%20";
+static const char uri_check[] = "test[]!@;'\"\\. ";
+
+static const char uri1[] = "!*'();:@&=%2B%24%2C/?#%5B%5D%3C%3E%7E.%22%7B%7D%7C%5C-%60_%5E%25";
+static const char uri_check1[] = "!*'();:@&=+$,/?#[]<>~.\"{}|\\-`_^%";
+
+
 int http_testSetup(void)
 {
 	kdbg_init();
@@ -78,26 +86,56 @@ int http_testRun(void)
 	memset(name, 0, sizeof(name));
 	http_getPageName(get_str, sizeof(get_str), name, sizeof(name));
 
-	if (!strcmp("/test/page1", name))
+	if (strcmp("test/page1", name))
+	{
+		kprintf("error 0 %s\n", name);
 		goto error;
+	}
 
 	http_getPageName(get_str1, sizeof(get_str1), name, sizeof(name));
 
-	kprintf("1 name %s\n", name);
-	if (!strcmp("/test/page1", name))
+	if (strcmp("test/page1", name))
+	{
+		kprintf("error 1 %s\n", name);
 		goto error;
+	}
+
 
 	http_getPageName(get_str2, sizeof(get_str2), name, sizeof(name));
 
-	kprintf("2 name %s\n", name);
 	if (name[0] != '\0')
+	{
+		kprintf("error 2 %s\n", name);
 		goto error;
+	}
+
 
 	http_getPageName(get_str2, sizeof(get_str2), name, sizeof(name));
 
-	kprintf("3 name %s\n", name);
 	if (name[0] != '\0')
+	{
+		kprintf("error 3 %s\n", name);
 		goto error;
+	}
+
+
+	char decoded[sizeof(uri)];
+	http_decodeUri(uri,sizeof(uri), decoded, sizeof(uri));
+
+	if (strcmp(decoded, uri_check))
+	{
+		kprintf("error 4 %s\n", decoded);
+		goto error;
+	}
+
+	char decoded1[sizeof(uri1)];
+	http_decodeUri(uri1,sizeof(uri1), decoded1, sizeof(uri1));
+
+	if (strcmp(decoded1, uri_check1))
+	{
+		kprintf("error 5 %s\n", decoded1);
+		goto error;
+	}
 
 	return 0;
 

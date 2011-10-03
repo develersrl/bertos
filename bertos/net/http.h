@@ -60,7 +60,8 @@ typedef struct HttpCGI
 #define CGI_MATCH_EXT    2  ///< Select item in table if the extention match
 #define CGI_MATCH_NAME   3  ///< Select item in table if the string is content
 
-void http_getPageName(const char *revc_buf, size_t recv_len, char *page_name, size_t len);
+void http_getPageName(const char *recv_buf, size_t recv_len, char *page_name, size_t len);
+void http_decodeUri(const char *raw_buf, size_t raw_len, char *decodec_buf, size_t len);
 
 void http_sendOk(struct netconn *client);
 void http_sendFileNotFound(struct netconn *client);
