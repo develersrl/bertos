@@ -43,14 +43,7 @@
 #ifndef NET_HTTP_H
 #define NET_HTTP_H
 
-
-#include <netif/ethernetif.h>
-
-#include <lwip/ip.h>
-#include <lwip/ip_addr.h>
-#include <lwip/netif.h>
 #include <lwip/tcpip.h>
-#include <lwip/dhcp.h>
 
 typedef int (*http_handler_t)(struct netconn *client, const char *name, char *revc_buf, size_t revc_len);
 
@@ -66,11 +59,17 @@ typedef struct HttpCGI
 #define CGI_MATCH_NAME   1  ///< Select item in table only if string match
 #define CGI_MATCH_EXT    2  ///< Select item in table if the extention match
 
+void http_getPageName(const char *revc_buf, size_t recv_len, char *page_name, size_t len);
+
 void http_sendOk(struct netconn *client);
 void http_sendFileNotFound(struct netconn *client);
 void http_sendInternalErr(struct netconn *client);
 
 void http_poll(struct netconn *server);
 void http_init(http_handler_t default_callback, struct HttpCGI *table);
+
+int http_testSetup(void);
+int http_testRun(void);
+int http_testTearDown(void);
 
 #endif /* NET_HTTP_H */

@@ -93,42 +93,35 @@ void http_sendInternalErr(struct netconn *client)
 	netconn_write(client, http_html_hdr_500, sizeof(http_html_hdr_500) - 1, NETCONN_NOCOPY);
 }
 
-static void get_fileName(const char *revc_buf, size_t recv_len, char *name, size_t len)
+void http_getPageName(const char *revc_buf, size_t recv_len, char *page_name, size_t len)
 {
 	int i = 0;
-	char *p = strstr(revc_buf, "GET");
-	if (p)
+	bool str_ok = false;
+
+	if (revc_buf && (recv_len > sizeof("GET /")))
 	{
-		/* Find the end of the page request. */
-		char *stop = strstr(revc_buf, "HTTP");
-		if (!stop)
-		{
-			LOG_ERR("Bad GET request\n");
-			name[0] = '\0';
-			return;
-		}
-
-		/* skip the "/" in get string request */
-		p += sizeof("GET") + 1;
-
-		while (p != stop)
-		{
-			if ((size_t)i == len || (size_t)i >= recv_len)
+		if (*revc_buf++ == 'G' &&
+			*revc_buf++ == 'E' && *revc_buf++ == 'T')
 			{
-				name[i] = '\0';
-				break;
+				str_ok = true;
+				revc_buf += 2;
 			}
+	}
 
-			name[i++] = *(p++);
+	if (str_ok)
+	{
+		while ((size_t)i < recv_len)
+		{
+			char ch = *(revc_buf++);
+			if (ch == ' ' || ch == '\t' || ch == '\n')
+				break;
+			if((size_t)i == len - 1)
+				break;
+			page_name[i++] = ch;
 		}
 	}
 
-	/* Trail white space in the string. */
-	while ( --i >= 0 )
-		if (name[i] != ' ' && name[i] != '\t' && name[i] != '\n')
-			break;
-
-	name[i + 1] = '\0';
+	page_name[i] = '\0';
 }
 
 INLINE const char *get_ext(const char *name)
@@ -195,7 +188,7 @@ void http_poll(struct netconn *server)
 		if (rx_buf)
 		{
 			memset(req_string, 0, sizeof(req_string));
-			get_fileName(rx_buf, len, req_string, sizeof(req_string));
+			http_getPageName(rx_buf, len, req_string, sizeof(req_string));
 
 			LOG_INFO("Search %s\n", req_string);
 			if (req_string[0] == '\0')
