@@ -152,6 +152,7 @@ void http_decodeUri(const char *raw_buf, size_t raw_len, char *decodec_buf, size
 				{
 					*decodec_buf++ = value;
 					len--;
+					/* decoded two digit of hex value, go to next value*/
 					i += 2;
 					continue;
 				}
