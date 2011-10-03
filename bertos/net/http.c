@@ -104,6 +104,7 @@ void http_getPageName(const char *revc_buf, size_t recv_len, char *page_name, si
 			*revc_buf++ == 'E' && *revc_buf++ == 'T')
 			{
 				str_ok = true;
+				/* skip the space and "/" */
 				revc_buf += 2;
 			}
 	}
@@ -149,9 +150,15 @@ static http_handler_t cgi_search(const char *name,  HttpCGI *table)
 			if (!strcmp(table[i].name, ext))
 				break;
 		}
-		else /* (table[i].type == CGI_MATCH_NAME) */
+		else if (table[i].type == CGI_MATCH_NAME)
 		{
 			LOG_INFO("Match all name %s\n", name);
+			if (strstr(name, table[i].name) != NULL)
+				break;
+		}
+		else /* (table[i].type == CGI_MATCH_WORD) */
+		{
+			LOG_INFO("Match all word %s\n", name);
 			if (!strcmp(table[i].name, name))
 				break;
 		}

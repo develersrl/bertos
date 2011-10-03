@@ -56,8 +56,9 @@ typedef struct HttpCGI
 
 
 #define CGI_MATCH_NONE   0
-#define CGI_MATCH_NAME   1  ///< Select item in table only if string match
+#define CGI_MATCH_WORD   1  ///< Select item in table only if string match
 #define CGI_MATCH_EXT    2  ///< Select item in table if the extention match
+#define CGI_MATCH_NAME   3  ///< Select item in table if the string is content
 
 void http_getPageName(const char *revc_buf, size_t recv_len, char *page_name, size_t len);
 
