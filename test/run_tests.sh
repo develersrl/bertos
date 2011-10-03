@@ -18,7 +18,7 @@ VERBOSE=${VERBOSE:-1}
 CC=gcc
 #FIXME: -Ibertos/emul should not be needed
 CFLAGS="-W -Wall -Wextra -Wundef -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wsign-compare -Wmissing-noreturn \
--O0 -g3 -ggdb -Ibertos -Ibertos/emul -std=gnu99 -fno-builtin -D_DEBUG -DARCH=(ARCH_EMUL|ARCH_UNITTEST) \
+-O0 -g3 -ggdb -Ibertos -Ibertos/emul -Ibertos/net/lwip/src/include -Ibertos/net/lwip/src/include/ipv4 -std=gnu99 -fno-builtin -D_DEBUG -DARCH=(ARCH_EMUL|ARCH_UNITTEST) \
 -DCPU_FREQ=(12288000UL) -ffunction-sections -fdata-sections -Wl,--gc-sections"
 
 CXX=g++
@@ -61,6 +61,7 @@ SRC_LIST="
 	bertos/net/afsk.c
 	bertos/net/nmeap/src/nmeap01.c
 	bertos/net/nmea.c
+	bertos/net/http.c
 	bertos/cfg/kfile_debug.c
 	bertos/io/kblock.c
 	bertos/io/kblock_ram.c
