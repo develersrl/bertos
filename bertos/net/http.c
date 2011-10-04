@@ -97,13 +97,13 @@ int http_getValue(char *tolenized_buf, size_t tolenized_buf_len, const char *key
 				return -1;
 
 			strcpy(value, decoded_str);
-			break;
+			return value_len;
 		}
 		/* jump to next pair */
 		p += token_len + 1;
 	}
 
-	return value_len;
+	return -1;
 }
 
 /**
@@ -250,7 +250,7 @@ static http_handler_t cgi_search(const char *name,  HttpCGI *table)
 
 	int i = 0;
 	const char *ext = get_ext(name);
-	LOG_INFO("EXT %s\n", ext);
+	LOG_INFO("EXT %s\n", ext ? "none" : ext);
 	while(table[i].name)
 	{
 		if (ext && table[i].type == CGI_MATCH_EXT)

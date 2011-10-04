@@ -59,8 +59,6 @@ typedef struct HttpCGI
 #define CGI_MATCH_EXT    2  ///< Select item in table if the extention match
 #define CGI_MATCH_NAME   3  ///< Select item in table if the string is content
 
-#define HTTP_MAX_GET_TOKENS  5
-
 int http_getValue(char *tolenized_buf, size_t tolenized_buf_len, const char *key, char *value, size_t len);
 int http_tokenizeGetRequest(char *raw_buf, size_t raw_len);
 void http_getPageName(const char *recv_buf, size_t recv_len, char *page_name, size_t len);
