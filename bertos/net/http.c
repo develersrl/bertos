@@ -65,6 +65,7 @@ static const char http_html_hdr_500[] = "HTTP/1.0 500 Internal Server Error\r\nC
 
 static HttpCGI *cgi_table;
 static http_handler_t http_callback;
+static char decoded_str[80];
 
 /**
  * Get key value from tokenized buffer
@@ -81,21 +82,25 @@ int http_getValue(char *tolenized_buf, size_t tolenized_buf_len, const char *key
 
 	for (size_t i = 0; i < tolenized_buf_len; i++)
 	{
-		if (!strcmp(key, p))
+		size_t token_len = strlen(p);
+		http_decodeUrl(p, token_len, decoded_str, sizeof(decoded_str));
+
+		if (!strcmp(key, decoded_str))
 		{
 			/* skip key */
-			size_t jump = strlen(p) + 1;
-			p += jump;
+			p += token_len + 1;
 
-			value_len = strlen(p);
+			http_decodeUrl(p, strlen(p), decoded_str, sizeof(decoded_str));
+			value_len = strlen(decoded_str);
+
 			if (value_len >= len)
 				return -1;
 
-			strcpy(value, p);
+			strcpy(value, decoded_str);
 			break;
 		}
 		/* jump to next pair */
-		p += strlen(p) + 1;
+		p += token_len + 1;
 	}
 
 	return value_len;
@@ -134,9 +139,13 @@ static char http_hexToAscii(char first, char second)
 	return strtol(hex, &stop, 16);
 }
 
-void http_decodeUri(const char *raw_buf, size_t raw_len, char *decodec_buf, size_t len)
+void http_decodeUrl(const char *raw_buf, size_t raw_len, char *decodec_buf, size_t len)
 {
+	ASSERT(decodec_buf);
+
 	char value;
+	memset(decodec_buf, 0, len);
+
 	for (size_t i = 0; i < raw_len; i++)
 	{
 		if (!len)
@@ -158,7 +167,9 @@ void http_decodeUri(const char *raw_buf, size_t raw_len, char *decodec_buf, size
 				}
 			}
 		}
-		*decodec_buf++ = raw_buf[i];
+
+		/* Manage special case of '+', that it should be convert in space */
+		*decodec_buf++ = (raw_buf[i] == '+' ? ' ' : raw_buf[i]);
 		len--;
 	}
 }
@@ -170,13 +181,12 @@ void http_getPageName(const char *recv_buf, size_t recv_len, char *page_name, si
 	const char *p = recv_buf;
 	if (p && (recv_len > sizeof("GET /")))
 	{
-		if (*p++ == 'G' &&
-			*p++ == 'E' && *p++ == 'T')
-			{
-				str_ok = true;
-				/* skip the space and "/" */
-				p += 2;
-			}
+		if (*p++ == 'G' && *p++ == 'E' && *p++ == 'T')
+		{
+			str_ok = true;
+			/* skip the space and "/" */
+			p += 2;
+		}
 	}
 
 	if (str_ok)

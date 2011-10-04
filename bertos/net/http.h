@@ -64,7 +64,7 @@ typedef struct HttpCGI
 int http_getValue(char *tolenized_buf, size_t tolenized_buf_len, const char *key, char *value, size_t len);
 int http_tokenizeGetRequest(char *raw_buf, size_t raw_len);
 void http_getPageName(const char *recv_buf, size_t recv_len, char *page_name, size_t len);
-void http_decodeUri(const char *raw_buf, size_t raw_len, char *decodec_buf, size_t len);
+void http_decodeUrl(const char *raw_buf, size_t raw_len, char *decodec_buf, size_t len);
 
 void http_sendOk(struct netconn *client);
 void http_sendFileNotFound(struct netconn *client);

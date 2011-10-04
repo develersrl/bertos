@@ -33,6 +33,8 @@
  * \brief HTTP Server test
  *
  * \author Daniele Basile <asterix@develer.com>
+ *
+ * notest: avr
  */
 
 #include <cfg/compiler.h>
@@ -73,8 +75,12 @@ static const char uri_check[] = "test[]!@;'\"\\. ";
 static const char uri1[] = "!*'();:@&=%2B%24%2C/?#%5B%5D%3C%3E%7E.%22%7B%7D%7C%5C-%60_%5E%25";
 static const char uri_check1[] = "!*'();:@&=+$,/?#[]<>~.\"{}|\\-`_^%";
 
+static const char uri2[] = "test+test1+test2";
+static const char uri_check2[] = "test test1 test2";
+
 static char token_str[] = "var1=1&var2=2&var3=3&var4=4";
 static char token_str1[] = "var1=1&var2=2&=3&var4=";
+static char token_str2[] = "var1=test+test&var2=2&var3=test%5B%5D!@;'%22%5C.%20&var4=4";
 
 int http_testSetup(void)
 {
@@ -122,7 +128,7 @@ int http_testRun(void)
 
 
 	char decoded[sizeof(uri)];
-	http_decodeUri(uri,sizeof(uri), decoded, sizeof(uri));
+	http_decodeUrl(uri,sizeof(uri), decoded, sizeof(uri));
 
 	if (strcmp(decoded, uri_check))
 	{
@@ -131,7 +137,7 @@ int http_testRun(void)
 	}
 
 	char decoded1[sizeof(uri1)];
-	http_decodeUri(uri1,sizeof(uri1), decoded1, sizeof(uri1));
+	http_decodeUrl(uri1,sizeof(uri1), decoded1, sizeof(uri1));
 
 	if (strcmp(decoded1, uri_check1))
 	{
@@ -139,6 +145,14 @@ int http_testRun(void)
 		goto error;
 	}
 
+	char decoded2[sizeof(uri2)];
+	http_decodeUrl(uri2,sizeof(uri2), decoded2, sizeof(uri2));
+
+	if (strcmp(decoded2, uri_check2))
+	{
+		kprintf("error 5 %s\n", decoded2);
+		goto error;
+	}
 
 	int len = http_tokenizeGetRequest(token_str, sizeof(token_str));
 	if (len != 4)
@@ -172,7 +186,11 @@ int http_testRun(void)
 		goto error;
 	}
 
-	http_getValue(token_str1, sizeof(token_str1), "var1", value, sizeof(value));
+	if (http_getValue(token_str1, sizeof(token_str1), "var1", value, sizeof(value)) < 0)
+	{
+		kprintf("error 7 during get key %s\n", "var1");
+		goto error;
+	}
 	if (strcmp(value, "1"))
 	{
 		kprintf("error 7 value %s expect %s\n", value, "1");
@@ -180,10 +198,47 @@ int http_testRun(void)
 
 	}
 
-	http_getValue(token_str1, sizeof(token_str1), "var4", value, sizeof(value));
+	if (http_getValue(token_str1, sizeof(token_str1), "var4", value, sizeof(value)) < 0)
+	{
+		kprintf("error 7 during get key %s\n", "var4");
+		goto error;
+	}
+
 	if (strcmp(value, ""))
 	{
 		kprintf("error 7 value %s expect %s\n", value, "");
+		goto error;
+
+	}
+
+	len = http_tokenizeGetRequest(token_str2, sizeof(token_str2));
+	if (len != 4)
+	{
+		kprintf("error 8 len %d expect %d\n", len, 4);
+		goto error;
+	}
+
+	if (http_getValue(token_str2, sizeof(token_str2), "var3", value, sizeof(value)) < 0)
+	{
+		kprintf("error 8 during get key %s\n", "var3");
+		goto error;
+	}
+
+	if (strcmp(value, "test[]!@;'\"\\. "))
+	{
+		kprintf("error 8 value %s expect %s\n", value, "test[]!@;'\"\\. ");
+		goto error;
+
+	}
+
+	if (http_getValue(token_str2, sizeof(token_str2), "var1", value, sizeof(value)) < 0)
+	{
+		kprintf("error 7 during get key %s\n", "var1");
+		goto error;
+	}
+	if (strcmp(value, "test test"))
+	{
+		kprintf("error 7 value %s expect %s\n", value, "test test");
 		goto error;
 
 	}
