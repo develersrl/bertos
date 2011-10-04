@@ -58,8 +58,8 @@ const size_t http_sd_not_present_len = sizeof(http_sd_not_present);
 const char http_server_error[] = " \
 <!DOCTYPE html PUBLIC \"-//IETF//DTD HTML 2.0//EN\"> \
 <html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=ISO-8859-1\"> \
-<title>404 Not Found</title></head><body><img src=\"bertos_logo_jpg\"><h1>500 Internal Server error</h1>\
+<title>500 Internal Server error</title></head><body><img src=\"bertos_logo_jpg\"><h1>500 Internal Server error</h1>\
 <p>The internal server error was occur while processing the requested page.</p><hr>\
 <address>BeRTOS simple HTTP server</address></body></html>";
 
-const size_t http_server_error_len = sizeof(http_server_error_len);
+const size_t http_server_error_len = sizeof(http_server_error);
