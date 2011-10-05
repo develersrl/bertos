@@ -44,6 +44,7 @@
 #define NET_HTTP_H
 
 #include <lwip/tcpip.h>
+#include <lwip/api.h>
 
 typedef int (*http_handler_t)(struct netconn *client, const char *name, char *revc_buf, size_t revc_len);
 
