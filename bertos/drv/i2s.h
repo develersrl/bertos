@@ -48,6 +48,7 @@
 #ifndef DRV_I2S_H
 #define DRV_I2S_H
 
+#warning __FILTER_NEXT_WARNING__
 #warning This API is ALPHA! we could change it..
 
 #include <cfg/compiler.h>
