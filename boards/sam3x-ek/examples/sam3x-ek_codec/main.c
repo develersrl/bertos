@@ -30,9 +30,10 @@
  *
  * -->
  *
- * \brief Atmel SAM3X-EK testcase
+ * \brief Atmel SAM3X-EK wav player example.
  *
  * \author Stefano Fedrigo <aleph@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
  */
 
 #include "bitmaps.h"
