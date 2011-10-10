@@ -53,4 +53,7 @@ CORE_CPU = "atxmega32d4"
 HW_DIR = CPU_DIR + "avr/hw/"
 MK_CPU_CSRC = HW_DIR + "init_xmega.c"
 
+# Special CPU related tags.
+CPU_TAGS += ["xmega32d"]
+
 include("avr_post.common")
