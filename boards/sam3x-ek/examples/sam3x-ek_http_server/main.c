@@ -202,13 +202,15 @@ static int cgi_status(struct netconn *client, const char *name, char *recv_buf, 
 	sprintf(status.last_connected_ip, "%d.%d.%d.%d", IP_ADDR_TO_INT_TUPLE(client->pcb.ip->remote_ip.addr));
 	sprintf(status.local_ip, "%d.%d.%d.%d", IP_ADDR_TO_INT_TUPLE(client->pcb.ip->local_ip.addr));
 
-	sprintf((char *)tx_buf,	"{ \"local_ip\":\"%s\",\"last_connected_ip\":\"%s\", \"temp\":%d.%d,\"volt\":%d.%d,\"up_time\":%ld,\"tot_req\":%d }",
+	sprintf((char *)tx_buf,	"{ \"local_ip\":\"%s\",\"last_connected_ip\":\"%s\", \"temp\":%d.%d,\"volt\":%d.%d,\"up_time\":%ld,\"tot_req\":%d, \
+\"leds\":{ \"0\":\"%d\", \"1\":\"%d\", \"2\":\"%d\"}}",
 								status.local_ip, status.last_connected_ip,
 								status.internal_temp / 10, status.internal_temp % 10,
 								volt / 1000, volt % 1000,
-								status.up_time, status.tot_req);
-
-
+								status.up_time, status.tot_req,
+								GET_LED_STATUS(status.led_status, 0),
+								GET_LED_STATUS(status.led_status, 1),
+								GET_LED_STATUS(status.led_status, 2));
 
 	http_sendOk(client, HTTP_CONTENT_JSON);
 	netconn_write(client, tx_buf, strlen((char *)tx_buf), NETCONN_COPY);
