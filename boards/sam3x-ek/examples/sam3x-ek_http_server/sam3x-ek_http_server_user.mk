@@ -4,12 +4,13 @@
 #
 
 # Programmer interface configuration, see http://dev.bertos.org/wiki/ProgrammerInterface for help
-sam3x-ek_http_server_PROGRAMMER_TYPE = none
+sam3x-ek_http_server_PROGRAMMER_TYPE = jlink
 sam3x-ek_http_server_PROGRAMMER_PORT = none
 
 # Files included by the user.
 sam3x-ek_http_server_USER_CSRC = \
 	$(sam3x-ek_http_server_SRC_PATH)/main.c \
+	$(sam3x-ek_http_server_SRC_PATH)/bitmaps.c \
 	bertos/cpu/cortex-m3/drv/dmac_sam3.c \
 	bertos/cpu/cortex-m3/drv/hsmci_sam3.c \
 	bertos/cpu/cortex-m3/io/sam3_chipid.c \

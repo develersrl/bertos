@@ -30,10 +30,16 @@ sam3x-ek_http_server_WIZARD_CSRC = \
 	bertos/drv/sd.c \
 	bertos/drv/sd_spi.c \
 	bertos/drv/timer.c \
+	bertos/fonts/luBS14.c \
 	bertos/fs/fat.c \
 	bertos/fs/fatfs/diskio.c \
 	bertos/fs/fatfs/ff.c \
+	bertos/gfx/bitmap.c \
+	bertos/gfx/line.c \
+	bertos/gfx/text.c \
+	bertos/gfx/text_format.c \
 	bertos/icons/bertos.c \
+	bertos/icons/logo.c \
 	bertos/io/kblock.c \
 	bertos/io/kfile.c \
 	bertos/kern/monitor.c \
@@ -43,8 +49,8 @@ sam3x-ek_http_server_WIZARD_CSRC = \
 	bertos/mware/formatwr.c \
 	bertos/mware/hex.c \
 	bertos/mware/sprintf.c \
-	bertos/net/lwip.c \
 	bertos/net/http.c \
+	bertos/net/lwip.c \
 	bertos/struct/heap.c \
 	$(sam3x-ek_http_server_HW_PATH)/hw/hw_eth.c \
 	$(sam3x-ek_http_server_HW_PATH)/hw/hw_http.c \

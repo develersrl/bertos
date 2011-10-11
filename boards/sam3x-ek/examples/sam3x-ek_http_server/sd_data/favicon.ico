@@ -1,0 +1,498 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>BeRTOS &mdash; Not only kernel</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="robots" content="index,follow" />
+    <link rel="stylesheet" type="text/css" media="screen,projection,print" href="/static/68316ff93494032110aa34911de1c66d9d49037c/bertos/s/site.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="/static/68316ff93494032110aa34911de1c66d9d49037c/bertos/s/jquery-ui/jquery-ui-1.7.2.custom.css" />
+    <link rel="stylesheet" type="text/css" media="print" href="/static/68316ff93494032110aa34911de1c66d9d49037c/bertos/s/print.css" />
+    <link rel="alternate" type="application/rss+xml" title="Ultimi post" href="/blog/feeds/latest/" />
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js"></script>
+    
+    
+    
+    
+    <script type="text/javascript" src="/static/68316ff93494032110aa34911de1c66d9d49037c/bertos/j/jquery.qtip-1.0.0-rc3.min.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            $('div.details')
+                .each(function() {
+                    $(this)
+                        .parent()
+                        .append('<img class="info-icon" src="/static/68316ff93494032110aa34911de1c66d9d49037c/bertos/i/icon-info.png" width="15" height="15" alt="Info" />')
+                        .children('img.info-icon')
+                        .qtip({
+                            content: this.innerHTML,
+                            position: {
+                                corner: {
+                                    target: 'topRight',
+                                    tooltip: 'bottomLeft'
+                                }
+                            },
+                            style: {
+                                background: '#D4EBD3',
+                                color: '#333',
+                                border: {
+                                    width: 4,
+                                    radius: 0,
+                                    color: '#3E9A3C'
+                                },      
+                                tip: 'bottomLeft'
+                            }
+                        })
+                });
+        });
+    </script>
+
+    <meta name="description" content="" />
+    <meta name="keywords" content="codelite plugin, debug target arm, driver embedded, driver real time, embedded rtos, embedded wizard, free real time kernel, free rtos, kernel open source, kernel real time, librerie embedded, open source rtos, real time rtos, sistema operativo open source, sistema operativo real time, sistema real time, toolchain arm, toolchain avr, windows installer, windows sdk" />
+    
+
+    <script type="text/javascript" src="/static/68316ff93494032110aa34911de1c66d9d49037c/bertos/j/jquery.cycle.all.min.js"></script>
+    
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#ten-reasons ul').cycle({
+                fx: 'scrollLeft',
+                delay: 1000,
+                timeout: 18000,
+                speed: 1000,
+                next: '#cycle-control .right-arrow',
+                pause: 1
+            });
+        });
+    </script>
+    
+
+</head>
+<body>
+    <div id="header">
+        <div class="container clear">
+            <div class="column span-4">
+                <div id="logo">
+                    <a href="/">
+<img src="/media/web-stuff/avatars/bertos-en.png" alt="free embedded operating system" width="300" height="135"/>
+</a>
+                </div>
+            </div>
+            <div class="column prepend-1 span-7 last">
+                <div id="nav">
+                    
+    <ul class="">
+        
+        
+        <li class="">
+            <a href="/discover/" title="Discover">Discover</a>
+        </li>
+        
+        <li class="">
+            <a href="/use/" title="Use">Use</a>
+        </li>
+        
+        <li class="">
+            <a href="/download-en/" title="Download">Download</a>
+        </li>
+        
+        <li class="">
+            <a href="/support/" title="Support">Support</a>
+        </li>
+        
+        <li class="">
+            <a href="/blog/">blog</a>
+        </li>
+    </ul>
+
+                </div>
+            </div>
+            <!-- empty DIV, see: http://www.brunildo.org/test/IE_raf3.html -->
+            <div></div>
+            <div id="nav2">
+                
+                <span class="lang">
+			<form action="/i18n/setlang/" method="post">
+                        Language
+                        <select name="language">
+                        
+                            <option value="en" selected="selected">English</option>
+                        
+                            <option value="it">Italiano</option>
+                        
+                        </select>
+                   </form>
+                   <script type="text/javascript">
+                       $(function() {
+                           $("span.lang select").change(function() {
+                               $("span.lang form").submit();
+                           })
+                       });
+                   </script>
+                </span><a id="link-trac" href="http://dev.bertos.org/">Developers&#8217; Site</a><a id="link-api" href="http://doc.bertos.org/">Documentation</a><a id="link-forum" href="http://forum.bertos.org/">Forum</a>
+                
+            </div>
+        </div>
+    </div>
+
+    <div id="main">
+        <div class="container clear">
+        
+        <div id="splash" class="clear">
+            <div class="column span-8">
+                <h1>BeRTOS is a real time open source operating system supplied with drivers and libraries designed for the rapid development of embedded software.
+<br />
+<br />
+Perfect for building commercial applications with no license costs nor royalties, BeRTOS allows you to cut the economic investment for your products.</h1>
+            </div>
+            <div class="column span-4 last">
+            
+            
+                <a href="/download/"><img src="/static/68316ff93494032110aa34911de1c66d9d49037c/bertos/i/download-src.png" alt="Download Source Code (.zip/.tar)" width="300" height="250"/></a>
+            
+            
+            </div>
+        </div>
+
+        
+<div id="ten-reasons">
+
+    <h2>10 reasons to use BeRTOS</h2>
+
+    <ul>
+        
+        <li class="clear">
+            <img src="/media/web-stuff/motivi/1.png" alt="1" />     
+            <h3>Ready made drivers and libraries</h3>
+            <p>BeRTOS includes in its libraries tens algorithms and drivers ready for your applications. Do you need to drive a motor? Use a display? Use a Flash memory? No problem thanks to our ready made set of libraries!<br /><a href="http://www.bertos.org/discover/" title="discover how to save time with bertos">Discover ready-to-use libraries &rarr;</a></p>
+        </li>
+        
+        <li style="display: none" class="clear">
+            <img src="/media/web-stuff/motivi/2.png" alt="2" />     
+            <h3>Free support and constant updates</h3>
+            <p>BeRTOS community can resolve quickly and effectively any problem in short times! You can find daily updates, tests and new developments on the Developer's Trac (dev.bertos.org). <br /><a href="http://www.bertos.org/support/" title="">Discover our support services &rarr;</a></p>
+        </li>
+        
+        <li style="display: none" class="clear">
+            <img src="/media/web-stuff/motivi/3.png" alt="3" />     
+            <h3>Full documentation</h3>
+            <p>Full documentation for every BeRTOS module is available online. A technical mailing list is also available. <br /><a href="http://doc.bertos.org/" title="online documentation">See BeRTOS online documentation &rarr;</a></p>
+        </li>
+        
+        <li style="display: none" class="clear">
+            <img src="/media/web-stuff/motivi/4.png" alt="4" />     
+            <h3>Premium support</h3>
+            <p>Premium support is available, as well as full documentation and training courses held by Develer, which contributes to maintain and constantly develop BeRTOS. <br />
+<a href="http://www.bertos.org/supporto/" title="servizi di supporto premium">BeRTOS Support Service &rarr;</a></p>
+        </li>
+        
+        <li style="display: none" class="clear">
+            <img src="/media/web-stuff/motivi/5.png" alt="5" />     
+            <h3>Reliability and performance</h3>
+            <p>BeRTOS on average is from 25% to 30% faster compared to competitors when testing on similar systems. The system is mature and stable, with minimal overhead for each process and low memory footprint, so that it's used also in medical devices.<br /><a href="http://www.bertos.org/discover/benchmarks/" title="See our benchmarks">See all benchmarks &rarr;</a></p>
+        </li>
+        
+        <li style="display: none" class="clear">
+            <img src="/media/web-stuff/motivi/6.png" alt="6" />     
+            <h3>It&#39;s free</h3>
+            <p>With BeRTOS you don't need to pay royalties nor licenses. You have full freedom on your application code thanks to our licensing terms. BeRTOS shifts funding focus from software to product development, so all the investment is done after the device is available and starts to generate profits. <br /><a href="http://www.bertos.org/download-en/" title="download bertos free">Download BeRTOS now &rarr;</a></p>
+        </li>
+        
+        <li style="display: none" class="clear">
+            <img src="/media/web-stuff/motivi/7.png" alt="7" />     
+            <h3>Not only kernel</h3>
+            <p>BeRTOS is not only an embedded kernel, but it's a full operating system with also a file system! It also includes all the drivers you may need and you don't need to write them from scratch! It includes a complete display management and an emulator to write applications! <br /><a href="http://www.bertos.org/use/" title="Not only Kernel">More features &rarr;</a></p>
+        </li>
+        
+        <li style="display: none" class="clear">
+            <img src="/media/web-stuff/motivi/8.png" alt="8" />     
+            <h3>Lowest time to market</h3>
+            <p>BeRTOS guarantees a quick time to market, thanks to a complete feature set and easy-to-use development tools that contribute to cut down project's realization time. The reduced necessity to develop customized solutions can save you many development hours. <br /><a href="http://www.bertos.org/discover/" title="discover other features">Discover other features &rarr;</a></p>
+        </li>
+        
+        <li style="display: none" class="clear">
+            <img src="/media/web-stuff/motivi/9.png" alt="9" />     
+            <h3>Innovative licensing terms</h3>
+            <p>Each BeRTOS component is immediately available, customizable and usable every time and without limitations. BeRTOS has no impact on your budget, you just need to write that your system is developed with our free rtos! <br /><a href="http://www.bertos.org/discover/license/" title="discover our special license">Discover our license &rarr;</a></p>
+        </li>
+        
+        <li style="display: none" class="clear">
+            <img src="/media/web-stuff/motivi/10.png" alt="10" />     
+            <h3>Source code sharing</h3>
+            <p>BeRTOS licensing terms allow developers to use the source code without development, debug and support costs. Furthermore, each developer can create and make available commercial and free derivatives of the operating system without paying licenses nor royalties. <br /><a href="http://www.bertos.org/discover/license/" title="bertos special license">Discover BeRTOS License &rarr;</a></p>
+        </li>
+        
+    </ul>
+
+    <div id="cycle-control">
+        <span class="right-arrow">&rarr;</span>
+    </div>
+
+</div>
+
+
+
+        <div class="column span-6">
+<div id="learn-more" class="box">
+    <h2>Focus On</h2>
+    <h3>Online</h3>
+    <dl>
+        
+            <dt>
+                <a href="/use/tutorial-front-page/kernel-process-management/">Kernel: process management</a>
+                
+                    <span>Mod</span>
+                
+            </dt>
+            <dd>Learn how to create processes and synchronize them.</dd>
+        
+            <dt>
+                <a href="/use/tutorial-front-page/drivers-kfile-subclass/">Drivers: KFile Subclass</a>
+                
+                    <span>Mod</span>
+                
+            </dt>
+            <dd>A full example on how KFile subclassing works. </dd>
+        
+            <dt>
+                <a href="/use/tutorial-front-page/installation-instructions/">Installation instructions</a>
+                
+                    <span>Mod</span>
+                
+            </dt>
+            <dd>This page provides installation instructions for BeRTOS open source version for Windows, Mac and Linux.</dd>
+        
+            <dt>
+                <a href="/use/tutorial-front-page/basic-hal/">Basic: Hardware Abstraction Layer (HAL)</a>
+                
+                    <span>Mod</span>
+                
+            </dt>
+            <dd>This tutorial explains BeRTOS' Hardware Abstraction Layer and how it fits into the development process.</dd>
+        
+            <dt>
+                <a href="/use/tutorial-front-page/drivers-usb-device/">Drivers: USB device</a>
+                
+                    <span>Mod</span>
+                
+            </dt>
+            <dd>BeRTOS: USB device development tutorial with example. This howto describes all the required steps to implement a complete USB device driver from scratch using the BeRTOS API.</dd>
+        
+            <dt>
+                <a href="/use/tutorial-front-page/installing-usbserial-driver-ek-lm3s1968-windows/">Windows: installing USB/Serial for EKLM3S1968</a>
+                
+                    <span>Mod</span>
+                
+            </dt>
+            <dd>USB/Serial driver install guide for EK-LM3S1968 development board.
+
+
+</dd>
+        
+            <dt>
+                <a href="/use/examples-projects/sd-card-datalogger-atmel-sam7/">SD Card Datalogger [SAM7]</a>
+                
+                    <span>Mod</span>
+                
+            </dt>
+            <dd>The logger measures and stores temperature and pressure readings on a SD card using the FAT filesystem, so the user can easily download the stored data by plugging the SD card straight into a PC. </dd>
+        
+            <dt>
+                <a href="/use/examples-projects/triface-plc-control-board/">Triface PLC Control Board [AVR]</a>
+                
+                    <span>Mod</span>
+                
+            </dt>
+            <dd>The purpose of this project is to implement an interactive shell on the UART port to manage all the devices present on the board.</dd>
+        
+            <dt>
+                <a href="/use/examples-projects/ek-lm3s1968-develgps/">DevelGPS [Stellaris]</a>
+                
+                    <span class="doc-status-new">New</span>
+                
+            </dt>
+            <dd>purpose of project implement a portable GPS locator / geocaching finder with Cortex-M3 based Luminary Micro LM3S1968 evaluation board</dd>
+        
+            <dt>
+                <a href="/use/examples-projects/arduino-aprs/">Arduino APRS [AVR]</a>
+                
+                    <span class="doc-status-new">New</span>
+                
+            </dt>
+            <dd>Example usage of BeRTOS on Arduino Duemilanove, ham radio, AFSK modem</dd>
+        
+    </dl>
+
+    
+    <h3>Download</h3>
+    <dl>
+        
+        <dt>
+            <a href="http://www.bertos.org/media/web-stuff/website/example/bin/triface.zip"><img src="/static/68316ff93494032110aa34911de1c66d9d49037c/bertos/i/icon-pdf.png" alt="PDF document" width="16" height="16"/> Triface PLC Board binary files and source code</a>
+        </dt>
+        <dd>Complete source code and binary files ready to download for Triface PLC Board example.</dd>
+        
+        <dt>
+            <a href="http://www.bertos.org/media/web-stuff/website/example/bin/aprs.zip"><img src="/static/68316ff93494032110aa34911de1c66d9d49037c/bertos/i/icon-pdf.png" alt="PDF document" width="16" height="16"/> APRS binary file and source code</a>
+        </dt>
+        <dd>Complete source code and binary file ready to download for Arduino APRS project.</dd>
+        
+        <dt>
+            <a href="http://www.bertos.org/media/web-stuff/website/example/bin/develgps.zip"><img src="/static/68316ff93494032110aa34911de1c66d9d49037c/bertos/i/icon-pdf.png" alt="PDF document" width="16" height="16"/> DevelGPS binary file and source code</a>
+        </dt>
+        <dd>Complete source code and binary file ready to download for DevelGPS project.</dd>
+        
+    </dl>
+    
+</div>
+
+</div>
+
+        <div class="column span-6 last">
+            
+<div id="latest-tweets"  class="box">
+	<h2>Last tweets</h2>
+	<ul>
+		
+		
+		<li>digitalfanatics.org today speaks about BeRTOS: <a href="http://ow.ly/6pB4P">http://ow.ly/6pB4P</a> <a href="http://twitter.com/search?q=%23usb">#usb</a> <a href="http://twitter.com/search?q=%23sdk">#sdk</a> &bull; <a rel="bookmark" class="d" href="http://twitter.com/bertos/status/112081598593253376">09-09-11 @ 10:35</a>
+		</li>
+		
+		<li>Added support for STM32F100RB CPU, contributed by Andrea Scalise. <a href="http://dvlr.it/3Ltk">http://dvlr.it/3Ltk</a> &bull; <a rel="bookmark" class="d" href="http://twitter.com/bertos/status/72208834977988611">22-05-11 @ 09:55</a>
+		</li>
+		
+		<li>Experimental support for IAR compiler with Cortex-M3 is added in BeRTOS trunk. <a href="http://dvlr.it/59Zw">http://dvlr.it/59Zw</a> &bull; <a rel="bookmark" class="d" href="http://twitter.com/bertos/status/71953539756335104">21-05-11 @ 17:00</a>
+		</li>
+		
+	</ul>
+	<div class="more">
+		<a href="http://twitter.com/bertos">Other tweets &rarr;</a>
+	</div>
+</div>
+
+
+            <hr />
+            
+<div id="latest-posts" class="box">
+    <h2>From BeRTOS blog</h2>
+    
+    <ul>
+        
+        <li>
+            <h4>17 Aug 2011</h4>                   
+            <h3><a rel="bookmark" href="/blog/promo/usb-product-ids-our-customers-free">USB product IDs to our customers for free!</a></h3>
+            Starting from BeRTOS SDK 2.7 we have decided to award two USB product IDs to our customers.
+            <p>
+                <span class="continue">
+		    <a href="http://www.bertos.org/blog/promo/usb-product-ids-our-customers-free">Continue &rarr;</a>
+                </span>
+            </p>
+        </li>
+        
+        <li>
+            <h4>08 Aug 2011</h4>                   
+            <h3><a rel="bookmark" href="/blog/embedded/bertos-27-released">BeRTOS 2.7 released</a></h3>
+            TCP/IP network stack, Atmel SAM3X support, experimental IAR port for Cortex-M3, AVR XMega cpu family supported.
+            <p>
+                <span class="continue">
+		    <a href="http://www.bertos.org/blog/embedded/bertos-27-released">Continue &rarr;</a>
+                </span>
+            </p>
+        </li>
+        
+    </ul>
+	<div class="more">
+	    <a href="/blog/">Other posts &rarr;</a>
+	</div>    
+</div>
+
+        </div>
+
+        </div>
+    </div>
+
+    <div id="footer">
+        
+        <div class="container clear">
+            <div id="footer-nav">
+                
+    
+    
+    <a href="/discover/license/">License</a> |
+    
+    <a href="/support/outlaws/">We are outlaws</a> |
+    
+    <a href="/privacy-policy/">Privacy Policy</a> |
+    
+    <a href="/contacts/">Contacts</a> 
+    
+
+    
+<script type="text/javascript">
+    var hblProto = document.location.protocol == 'https:' ? "https:" : "http:";
+    document.write(unescape('%3Cscript src=\'' + hblProto + '//static.olark.com/js/wc.js\' type=\'text/javascript\'%3E%3C/script%3E'));
+</script>
+<script type="text/javascript">
+    wc_init("7928-235-10-7846", wc_config());
+    /*
+    $(function() {
+        config = wc_config();
+        config.vars["start_hidden"] = 1;
+        wc_init("7928-235-10-7846", config);
+        $('#chat-button').click(function(e) {
+            e.preventDefault();
+            var w = window.habla_window;
+            w.show();
+            w.expand();
+        });
+    });
+    */
+</script>
+
+
+            </div>
+            
+            <div class="column span-4">
+                <h3><a href="http://dev.bertos.org/">Developer's Trac</a></h3>
+                <p>On the developers website you will find all the information to contribute to BeRTOS development community, milestones, the possibility to open tickets to the community, the changelog and all the details on every feature.</p>
+            </div>
+            <div class="column span-4">
+                <h3><a href="https://www.develer.com/newsletter/?p=subscribe&amp;id=7">Subscribe the Newsletter</a></h3>
+                <p>If you're interested in following all the news about the free RTOS BeRTOS and to all related activities, subscribe to the newsletter and you'll receive the news directly in your email box.</p>
+            </div>
+            <div class="column span-4 last">
+                <h3><a href="http://forum.bertos.org/">Support Forum</a></h3>
+                <p>With the forum will be easier for users to find information and ask for
+help. In the forum you can find also two special areas dedicated to
+feature requests and to announce your own BeRTOS project!</p>
+            </div>
+            
+            <hr />
+            <div class="column span-8">
+                <div id="social">
+                    <a href="http://www.facebook.com/pages/BeRTOS/88946824252"><img src="/static/68316ff93494032110aa34911de1c66d9d49037c/bertos/i/icon-facebook.png" alt="icon-facebook" width="16" height="16"/>&nbsp;Join us on Facebook</a> &mdash;
+                    <a href="http://twitter.com/dev_bertos"><img src="/static/68316ff93494032110aa34911de1c66d9d49037c/bertos/i/icon-twitter.png" alt="icon-facebook" width="16" height="16"/>&nbsp;Follow us on Twitter</a>
+                </div>
+            </div>
+            <div class="column span-4 last">
+                <div id="copyright">
+                    <a rel="license" href="http://creativecommons.org/licenses/by-nd/2.5/it/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-nd/2.5/it/80x15.png" /></a> <span xmlns:dc="http://purl.org/dc/elements/1.1/" property="dc:title">BeRTOS website</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="http://www.develer.com/" property="cc:attributionName" rel="cc:attributionURL">Develer</a>.
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+<script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+    var pageTracker = _gat._getTracker("UA-4447090-1");
+    pageTracker._trackPageview();
+} catch(err) {}
+</script>
+
+</body>
+</html>

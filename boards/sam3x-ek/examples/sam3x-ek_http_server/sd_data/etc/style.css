@@ -1,0 +1,171 @@
+
+
+
+
+body {
+	font-family:  helvetica;
+	margin: 0px;
+	padding: 0px;
+	font-size: 0.9em;
+	color:#296628;
+	background-color: #cccccc;
+}
+
+#header h1,#header h3, #header div, #header img {
+	display: inline-block;
+	vertical-align: top;
+	
+}
+
+#header {
+	border-style: solid;
+	border-color: #3E9A3C;
+	border-width: 1px;
+	border-top-width: 10px;
+	border-bottom-width: 10px;
+	/*border-top-left-radius: 10px;
+	border-top-right-radius: 10px;*/
+}
+
+
+#header h1 {
+	color:#3E9A3C;
+	margin-top: 35px;
+	text-shadow:3px 3px 1px #eee;
+	margin-bottom: -10px;
+}
+
+#header h3 {
+	margin-top: 0px;
+	color:#F58220;
+}
+
+#conteiner {
+	width: 800px;
+	margin:0px auto;
+	background-color: #ffffff;
+	
+}
+
+#footer {
+	padding: 15px;
+	background-color: #3E9A3C;
+	color:#FFFFFF;
+}
+
+#footer a {
+	color:#FCAF17;
+}
+
+
+.content {
+	padding: 15px;
+	border-style: solid;
+	border-color: #3E9A3C;
+	border-width: 0px 1px 1px 1px;
+}
+
+
+
+.control {
+	display: inline-block;
+	min-width: 250px;
+}
+
+.led-on {
+	color:#FFFFFF;
+	font-size: 0.9em;
+	cursor:pointer;
+	width:55px;
+	display:inline-block;
+	background-color:#3E9A3C;
+	border: 1px solid #3E9A3C;
+	padding: 2px;
+	margin: 5px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;	
+}
+
+.led-on span {
+	background-color:#FFFFFF;
+	float:right;
+	width: 17px;
+	height: 17px;
+	margin-left: 5px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	display: inline-block;
+}
+
+.led-off {
+	color:#FFFFFF;
+	font-size: 0.9em;
+	cursor:pointer;
+	width:55px;
+	display:inline-block;
+	background-color:#F58220;
+	border: 1px solid #F58220;
+	padding: 2px;
+	margin: 5px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;	
+}
+
+.led-off span {
+	background-color:#FFFFFF;
+	width: 17px;
+	height: 17px;
+	margin-right: 5px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	display: inline-block;
+}
+
+.trigger {
+	width:200px;
+	display:inline-block;
+	border: 1px solid #3E9A3C;
+	padding: 1px;
+	margin: 5px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;	
+}
+
+.trigger span {
+	background-color:#3E9A3C;
+	width: 0px;;
+	height: 17px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	display: inline-block;
+}
+
+#temperature-plot{
+	height: 250px;
+	margin: 15px;
+}
+
+
+.box {
+	color:#FFFFFF;
+	font-size: 0.9em;
+	width:55px;
+	display:inline-block;
+	background-color:#3E9A3C;
+	border: 1px solid #3E9A3C;
+	padding: 2px;
+	margin: 5px;
+	text-align:center;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;	
+}
+
+
+

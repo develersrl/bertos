@@ -41,10 +41,14 @@
  */
 
 
+#include "bitmaps.h"
+
 #include "hw/hw_http.h"
 #include "hw/hw_sd.h"
 #include "hw/hw_adc.h"
 #include "hw/hw_sdram.h"
+#include "hw/hw_led.h"
+#include "hw/hw_lcd.h"
 
 // Define logging setting (for cfg/log.h module).
 #define LOG_LEVEL         3
@@ -60,6 +64,7 @@
 #include <drv/sd.h>
 #include <drv/dmac_sam3.h>
 #include <drv/adc.h>
+#include <drv/lcd_hx8347.h>
 
 #include <kern/proc.h>
 #include <kern/monitor.h>
@@ -74,12 +79,24 @@
 #include <lwip/tcpip.h>
 #include <lwip/dhcp.h>
 
+#include <gfx/gfx.h>
+#include <gfx/font.h>
+#include <gfx/text.h>
+
 #include <fs/fat.h>
 
 #include <icons/bertos.h>
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
+/* Macro to unpack the ip addres from lwip format in 4 int*/
+#define IP_ADDR_TO_INT_TUPLE(addr) \
+		(int)((addr) >>  0 & 0xff), \
+		(int)((addr) >>  8 & 0xff), \
+		(int)((addr) >> 16 & 0xff), \
+		(int)((addr) >> 24 & 0xff)
 
 /* Network interface global variables */
 static struct ip_addr ipaddr, netmask, gw;
@@ -95,6 +112,10 @@ typedef struct BoardStatus
 } BoardStatus;
 
 static BoardStatus status;
+static uint8_t raster[RAST_SIZE(LCD_WIDTH, LCD_HEIGHT)];
+static Bitmap lcd_bitmap;
+extern Font font_gohu;
+static int lcd_brightness = LCD_BACKLIGHT_MAX;
 
 
 static void init(void)
@@ -113,6 +134,26 @@ static void init(void)
 	 */
 	proc_init();
 	sdram_init();
+	dmac_init();
+	adc_init();
+
+	/* Enable the adc to read internal temperature sensor */
+	hw_enableTempRead();
+
+	LED_INIT();
+
+	lcd_hx8347_init();
+	lcd_setBacklight(lcd_brightness);
+
+	gfx_bitmapInit(&lcd_bitmap, raster, LCD_WIDTH, LCD_HEIGHT);
+	gfx_setFont(&lcd_bitmap, &font_luBS14);
+
+	lcd_hx8347_blitBitmap(&lcd_bitmap);
+	lcd_hx8347_blitBitmap24(10, 52, BMP_LOGO_WIDTH, BMP_LOGO_HEIGHT, bmp_logo);
+	timer_delay(3000);
+
+	text_xprintf(&lcd_bitmap, 1, 0, TEXT_CENTER, "Brightness: %d", lcd_brightness);
+	lcd_hx8347_blitBitmap(&lcd_bitmap);
 
 	/* Initialize TCP/IP stack */
 	tcpip_init(NULL, NULL);
@@ -122,29 +163,20 @@ static void init(void)
 	netif_set_default(&netif);
 	netif_set_up(&netif);
 
-	dmac_init();
-
-	adc_init();
-	/* Enable the adc to read internal temperature sensor */
-	hw_enableTempRead();
 }
 
-static NORETURN void status_process(void)
+static NORETURN void proc_displayRefresh(void)
 {
 	while (1)
 	{
+
+		//LOG_INFO("Refresh display\n");
 		status.internal_temp = hw_convertToDegree(adc_read(ADC_TEMPERATURE_CH));
 		status.up_time++;
+
 		timer_delay(1000);
 	}
 }
-
-/* Macro to unpack the ip addres from lwip format */
-#define IP_ADDR_TO_INT_TUPLE(addr) \
-		(int)((addr) >>  0 & 0xff), \
-		(int)((addr) >>  8 & 0xff), \
-		(int)((addr) >> 16 & 0xff), \
-		(int)((addr) >> 24 & 0xff)
 
 
 static uint8_t tx_buf[2048];
@@ -152,30 +184,37 @@ static uint8_t tx_buf[2048];
 /*
  * Return a JSON string of board status.
  */
-static int cgi_status(struct netconn *client, const char *name, char *revc_buf, size_t revc_len)
+static int cgi_status(struct netconn *client, const char *name, char *recv_buf, size_t recv_len)
 {
-	(void)revc_buf;
-	(void)revc_len;
+	(void)recv_buf;
+	(void)recv_len;
 	(void)name;
 
+	status.tot_req++;
+	uint16_t volt = ADC_RANGECONV(adc_read(1), 0, 3300);
 	//Update board status.
 	sprintf(status.last_connected_ip, "%d.%d.%d.%d", IP_ADDR_TO_INT_TUPLE(client->pcb.ip->remote_ip.addr));
 	sprintf(status.local_ip, "%d.%d.%d.%d", IP_ADDR_TO_INT_TUPLE(client->pcb.ip->local_ip.addr));
-	sprintf((char *)tx_buf, "[ \"%s\", \"%s\", %d.%d, %ld, %d ]", status.local_ip, status.last_connected_ip,
-															status.internal_temp / 10, status.internal_temp % 10,
-															status.up_time, status.tot_req);
+	sprintf((char *)tx_buf, "{ \"local_ip\":\"%s\", \"last_connected_ip\":\"%s\", \
+								\"temp\":%d.%d, \
+								\"volt\":%d.%d, \
+								\"up_time\":%ld, \"tot_req\":%d }",
+								status.local_ip, status.last_connected_ip,
+								status.internal_temp / 10, status.internal_temp % 10,
+								volt / 1000, volt % 1000,
+								status.up_time, status.tot_req);
 
-	status.tot_req++;
+
 
 	http_sendOk(client);
 	netconn_write(client, tx_buf, strlen((char *)tx_buf), NETCONN_COPY);
 	return 0;
 }
 
-static int cgi_logo(struct netconn *client, const char *name, char *revc_buf, size_t revc_len)
+static int cgi_logo(struct netconn *client, const char *name, char *recv_buf, size_t recv_len)
 {
-	(void)revc_buf;
-	(void)revc_len;
+	(void)recv_buf;
+	(void)recv_len;
 	(void)name;
 
 	http_sendOk(client);
@@ -186,10 +225,10 @@ static int cgi_logo(struct netconn *client, const char *name, char *revc_buf, si
 /*
  * Return the internal micro temperature string.
  */
-static int cgi_temp(struct netconn *client, const char *name, char *revc_buf, size_t revc_len)
+static int cgi_temp(struct netconn *client, const char *name, char *recv_buf, size_t recv_len)
 {
-	(void)revc_buf;
-	(void)revc_len;
+	(void)recv_buf;
+	(void)recv_len;
 	(void)name;
 
 	sprintf((char *)tx_buf, "[%d.%d]", status.internal_temp / 10, status.internal_temp % 10);
@@ -203,10 +242,10 @@ static int cgi_temp(struct netconn *client, const char *name, char *revc_buf, si
 /*
  * Return the board uptime.
  */
-static int cgi_uptime(struct netconn *client, const char *name, char *revc_buf, size_t revc_len)
+static int cgi_uptime(struct netconn *client, const char *name, char *recv_buf, size_t recv_len)
 {
-	(void)revc_buf;
-	(void)revc_len;
+	(void)recv_buf;
+	(void)recv_len;
 	(void)name;
 
 
@@ -225,13 +264,14 @@ static int cgi_uptime(struct netconn *client, const char *name, char *revc_buf, 
 /*
  * Return the VR1 potentiometer voltage.
  */
-static int cgi_resistor(struct netconn *client, const char *name, char *revc_buf, size_t revc_len)
+static int cgi_resistor(struct netconn *client, const char *name, char *recv_buf, size_t recv_len)
 {
-	(void)revc_buf;
-	(void)revc_len;
+	(void)recv_buf;
+	(void)recv_len;
 	(void)name;
 
 	uint16_t volt = ADC_RANGECONV(adc_read(1), 0, 3300);
+	kprintf("volt %d\n", volt);
 	sprintf((char *)tx_buf, "[ \"%d.%dV\" ]",  volt / 1000, volt % 1000);
 
 	http_sendOk(client);
@@ -239,27 +279,78 @@ static int cgi_resistor(struct netconn *client, const char *name, char *revc_buf
 	return 0;
 }
 
+
+#define CGI_LED_ID_KEY    "n"
+#define CGI_LED_CMD_KEY   "set"
+
+static char key_value[80];
+
 /*
  * Reply to client the request string.
  */
-static int cgi_led(struct netconn *client, const char *name, char *revc_buf, size_t revc_len)
+static int cgi_led(struct netconn *client, const char *name, char *recv_buf, size_t recv_len)
 {
+	(void)recv_buf;
+	(void)recv_len;
 	(void)name;
 
+	char *query_str = strstr(name, "?") + 1;
+	size_t query_str_len = strlen(query_str);
+	int led_id;
+	int led_cmd;
+
+	int len = http_tokenizeGetRequest(query_str, query_str_len);
+
+	LOG_INFO("Found %d key/value pair\n", len);
+
+	if (http_getValue(query_str, query_str_len, CGI_LED_ID_KEY, key_value, sizeof(key_value)) < 0)
+	{
+		LOG_ERR("key %s, not found\n", CGI_LED_ID_KEY);
+		goto error;
+	}
+
+	LOG_INFO("Found key %s = %s\n", CGI_LED_ID_KEY, key_value);
+	led_id = atoi(key_value);
+
+
+	if (http_getValue(query_str, query_str_len, CGI_LED_CMD_KEY, key_value, sizeof(key_value)) < 0)
+	{
+		LOG_ERR("key %s, not found\n", CGI_LED_CMD_KEY);
+		goto error;
+	}
+
+	LOG_INFO("Found key %s = %s\n", CGI_LED_CMD_KEY, key_value);
+	led_cmd = atoi(key_value);
+
+	if (led_cmd)
+	{
+		LED_ON(led_id);
+	}
+	else
+	{
+		LED_OFF(led_id);
+	}
+
+	sprintf((char *)tx_buf, "{\"n\":%d, \"set\":,%d}", led_id, led_cmd);
+
 	http_sendOk(client);
-	netconn_write(client, revc_buf, revc_len, NETCONN_COPY);
+	netconn_write(client, tx_buf, strlen((char *)tx_buf), NETCONN_COPY);
+	return 0;
+
+error:
+	http_sendInternalErr(client);
 	return 0;
 }
 
 /*
  * Reply to client the request string.
  */
-static int cgi_echo(struct netconn *client, const char *name, char *revc_buf, size_t revc_len)
+static int cgi_echo(struct netconn *client, const char *name, char *recv_buf, size_t recv_len)
 {
 	(void)name;
 
 	http_sendOk(client);
-	netconn_write(client, revc_buf, revc_len, NETCONN_COPY);
+	netconn_write(client, recv_buf, recv_len, NETCONN_COPY);
 	return 0;
 }
 
@@ -273,10 +364,10 @@ static int cgi_echo(struct netconn *client, const char *name, char *revc_buf, si
  * error page if the SD card is not present.
  *
  */
-static int http_htmPageLoad(struct netconn *client, const char *name, char *revc_buf, size_t revc_len)
+static int http_htmPageLoad(struct netconn *client, const char *name, char *recv_buf, size_t recv_len)
 {
-	(void)revc_buf;
-	(void)revc_len;
+	(void)recv_buf;
+	(void)recv_len;
 
 	if (SD_CARD_PRESENT())
 	{
@@ -308,7 +399,7 @@ static int http_htmPageLoad(struct netconn *client, const char *name, char *revc
 				{
 					LOG_INFO("Opened file '%s' size %ld\n", name, in_file.fat_file.fsize);
 
-					http_sendOk(client);
+					//http_sendOk(client);
 
 					while (count < in_file.fat_file.fsize)
 					{
@@ -346,10 +437,10 @@ static int http_htmPageLoad(struct netconn *client, const char *name, char *revc
  * Return to client a string that display the CHIP ID information.
  * See datasheet for more detail.
  */
-static int cgi_chipInfo(struct netconn *client, const char *name, char *revc_buf, size_t revc_len)
+static int cgi_chipInfo(struct netconn *client, const char *name, char *recv_buf, size_t recv_len)
 {
-	(void)revc_buf;
-	(void)revc_len;
+	(void)recv_buf;
+	(void)recv_len;
 	(void)name;
 
 	sprintf((char *)tx_buf, "{ \"core_name\":\"%s\", \"arch_name\":\"%s\", \"sram_size\":\"%s\",\
@@ -366,6 +457,17 @@ static int cgi_chipInfo(struct netconn *client, const char *name, char *revc_buf
 	return 0;
 }
 
+
+static int cgi_error(struct netconn *client, const char *name, char *recv_buf, size_t recv_len)
+{
+	(void)client;
+	(void)name;
+	(void)recv_buf;
+	(void)recv_len;
+
+	return -1;
+}
+
 /*
  * Static cgi table where we associate callback to page.
  */
@@ -376,6 +478,7 @@ static HttpCGI cgi_table[] =
 	{ CGI_MATCH_NAME, "get_uptime",          cgi_uptime        },
 	{ CGI_MATCH_NAME, "get_resistor",        cgi_resistor      },
 	{ CGI_MATCH_NAME, "set_led",             cgi_led           },
+	{ CGI_MATCH_NAME, "error",               cgi_error         },
 	{ CGI_MATCH_WORD, "status",              cgi_status        },
 	{ CGI_MATCH_NAME, "get_chipinfo",        cgi_chipInfo      },
 	{ CGI_MATCH_NAME, "bertos_logo_jpg",     cgi_logo          },
@@ -391,7 +494,7 @@ int main(void)
 	init();
 	http_init(http_htmPageLoad, cgi_table);
 
-	proc_new(status_process, NULL, KERN_MINSTACKSIZE * 2, NULL);
+	proc_new(proc_displayRefresh, NULL, KERN_MINSTACKSIZE * 2, NULL);
 
 	dhcp_start(&netif);
 	while (!netif.ip_addr.addr)
