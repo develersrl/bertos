@@ -5,12 +5,12 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<title>BeRTOS web server example</title>
 		<link rel="stylesheet" type="text/css" media="screen" href="etc/style.css" />
-		<script type="text/javascript" src="etc/js/jquery.js"></script> 
-		<!--[if lte IE 8]><script type="text/javascript" src="etc/js/excan.js"></script><![endif]-->  
+		<script type="text/javascript" src="etc/js/jquery.js"></script>
+		<!--[if lte IE 8]><script type="text/javascript" src="etc/js/excan.js"></script><![endif]-->
 		<script type="text/javascript" src="etc/js/jqflot.js"></script>
 		<script type="text/javascript">
 			$(document).ready(function() {
-				
+
 				$.ajax({
 					  url: "get_chipinfo",
 					  dataType :'json',
@@ -25,101 +25,101 @@
 					  dataType :'json',
 					  success: function(data){
 					    	$.each(data,function(k,v){
-							
+
 							if (v == 1) {
 								$('#led-'+k).addClass('led-on').removeClass('led-off').text('ON').append("<span>&nbsp;</span>");
 		   					} else {
 		   						$('#led-'+k).addClass('led-off').removeClass('led-on').text('OFF').prepend("<span>&nbsp;</span>");
 			   				}
-					    		
+
 					    	});
 					  }
 					});
-				
+
    				var set_led_status = function(elm,status) {
-   					
+
    					if (status == 1) {
 						elm.addClass('led-on').removeClass('led-off').text('ON').append("<span>&nbsp;</span>");
    					} else {
    						elm.addClass('led-off').removeClass('led-on').text('OFF').prepend("<span>&nbsp;</span>");
 	   				}
-   					  					
+
    					$.ajax({
 					  url: "set_led",
 					  data:{'n':elm.attr('name'),'set':status},
 					  dataType :'json',
 					  success: function(){
-					  		
+
 					  }
 					});
    				}
-   				
-   				
+
+
    				$("span[id^=led]").click(function(){
-   					var elm = $(this); 
+   					var elm = $(this);
    					if (elm.hasClass('led-on')) {
    						set_led_status(elm,0);
    					} else {
    						set_led_status(elm,1);
    					}
    				});
-   				
-   				
+
+
    				var options = {
-			        series: { shadowSize: 0 }, 
+			        series: { shadowSize: 0 },
 			        yaxis: { min: 0},
 			        xaxis: {min:0}
 			    };
-   				
-   				var temperature_data = [];
-   				var plot_temperature = $.plot($("#temperature-plot"), [temperature_data], options);
-   				
- 				
+
+				var temperature_data = [];
+				var plot_temperature = $.plot($("#temperature-plot"), [temperature_data], options);
+
+
 			    function updateStatus() {
-			    	
-			    	$.ajax({
+
+			$.ajax({
 					  url: "status",
 					  dataType :'json',
 					  success: function(data){
-					  	 
-					  	 $('#trigger-value').width(200*(parseFloat(data['volt'])/3.5));
-					  	 $('#uptime').text(data['up_time']+' sec'); 
-					  	 $('#temperature').text(data['temp']+' °C');
-					  	 temperature_data.push([data['up_time'],data['temp']]);
-					  	 
-					  	 var o = plot_temperature.getAxes().xaxis.options;
-					  	 o.max = Math.max(25,data['up_time']);
-					  	 o.min = Math.max(0,(o.max - 25));
-					  	 plot_temperature.setData([temperature_data]);
+
+						 $('#trigger-value').width(200*(parseFloat(data['volt'])/3.5));
+						 $('#uptime').text(data['up_time']+' sec');
+						 $('#temperature').text(data['temp']+' °C');
+						 temperature_data.push([data['up_time'],data['temp']]);
+
+						 var o = plot_temperature.getAxes().xaxis.options;
+						 o.max = Math.max(25,data['up_time']);
+						 o.min = Math.max(0,(o.max - 25));
+						 plot_temperature.setData([temperature_data]);
 						 plot_temperature.setupGrid();
 						 plot_temperature.draw();
-						 setTimeout(updateStatus, 5000);
-					  		
+						 setTimeout(updateStatus, 1000);
+
 					  }
 					});
-					
+
 			    }
-			    
+
 			   updateStatus();
-   					
-   				
- 			});
-			
-		</script> 
+
+
+			});
+
+		</script>
 	</head>
 	<body>
-		
+
 		<div id="wrapper">
 			<div id="conteiner">
 				<div id="header">
-					
+
 					<img src="etc/img/bertos.png" alt="BeRTOS Logo" />
-					
+
 					<div>
 						<h1>web server example</h1><br/>
 						<h3>Remotely control your board via web browser</h3>
 					</div>
-					
+
 				</div>
 				<div class="content">
 					<b>Hardware Info:</b><br>
@@ -139,19 +139,19 @@
 						<span id="led-0" name="0" class="led-off">--</span><span id="led-1" name="1" class="led-off">--</span><span id="led-2" name="2" class="led-off">--</span>
 					</div>
 					<div class="control">
-						<b>Trigger Value:</b><br/>
+						<b>Potentiometer Value:</b><br/>
 						<span class="trigger"><span id="trigger-value" >&nbsp;</span></span>
 					</div>
 				</div>
-				<div class="content">					
+				<div class="content">
 						<b>Controller temperature:</b><br/>
 						<div id="temperature-plot"></div>
 				</div>
-				<div id="footer">					
+				<div id="footer">
 						Please visit <a href="http://www.bertos.org">www.berots.org</a> for more info
 				</div>
 			</div>
 		</div>
-		
+
 	</body>
 </html>
