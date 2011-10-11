@@ -59,7 +59,7 @@
 
 
 /* We use event to signal the end of conversion */
-static Event data_ready;
+static Event adc_data_ready;
 /* The last converted data */
 static uint32_t data;
 
@@ -76,11 +76,10 @@ static uint32_t data;
  */
 static DECLARE_ISR(adc_conversion_end_irq)
 {
-	data = 0;
 	if (ADC_ISR & BV(ADC_DRDY))
 	{
 		data = ADC_LDATA;
-		event_do(&data_ready);
+		event_do(&adc_data_ready);
 	}
 }
 
@@ -101,7 +100,7 @@ void adc_hw_select_ch(uint8_t ch)
 uint16_t adc_hw_read(void)
 {
 	ADC_CR = BV(ADC_START);
-	event_wait(&data_ready);
+	event_wait(&adc_data_ready);
 	return(data);
 }
 
@@ -114,13 +113,13 @@ void adc_hw_init(void)
 	IRQ_ASSERT_ENABLED();
 
 	/* Initialize the dataready event */
-	event_initGeneric(&data_ready);
+	event_initGeneric(&adc_data_ready);
 
 	/* Clock ADC peripheral */
 	pmc_periphEnable(ADC_ID);
 
 	 /* Reset adc controller */
-	ADC_CR = ADC_SWRST;
+	ADC_CR |= BV(ADC_SWRST);
 
 	/*
 	 * Set adc mode register:

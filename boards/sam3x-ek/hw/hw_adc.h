@@ -47,7 +47,7 @@
 INLINE void hw_enableTempRead(void)
 {
 
-	ADC_ACR = BV(ADC_TSON);
+	ADC_ACR |= BV(ADC_TSON);
 }
 
 
