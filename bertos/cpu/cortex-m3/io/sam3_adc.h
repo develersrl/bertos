@@ -162,7 +162,7 @@
 #define ADC_SR          (*((reg32_t *)(ADC_BASE + ADC_SR_OFF))) ///< Status register address.
 
 
-#define ADC_CH_MASK              0x000000FF    ///< Channel mask.
+#define ADC_CH_MASK              0x0000FFFF    ///< Channel mask.
 #define ADC_CH0                           0    ///< Channel 0
 #define ADC_CH1                           1    ///< Channel 1
 #define ADC_CH2                           2    ///< Channel 2
