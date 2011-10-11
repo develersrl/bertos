@@ -18,6 +18,21 @@
 					    	$.each(data,function(k,v){
 					    		$('#'+k).text(v);
 					    	});
+   					  }
+					});
+				$.ajax({
+					  url: "get_ledStatus",
+					  dataType :'json',
+					  success: function(data){
+					    	$.each(data,function(k,v){
+							
+							if (v == 1) {
+								$('#led-'+k).addClass('led-on').removeClass('led-off').text('ON').append("<span>&nbsp;</span>");
+		   					} else {
+		   						$('#led-'+k).addClass('led-off').removeClass('led-on').text('OFF').prepend("<span>&nbsp;</span>");
+			   				}
+					    		
+					    	});
 					  }
 					});
 				
@@ -52,7 +67,7 @@
    				
    				var options = {
 			        series: { shadowSize: 0 }, 
-			        yaxis: { min: 0, max: 100 },
+			        yaxis: { min: 0},
 			        xaxis: {min:0}
 			    };
    				
@@ -73,12 +88,12 @@
 					  	 temperature_data.push([data['up_time'],data['temp']]);
 					  	 
 					  	 var o = plot_temperature.getAxes().xaxis.options;
-					  	 o.max = Math.max(15,data['up_time']);
-					  	 o.min = Math.max(0,(o.max - 15));
+					  	 o.max = Math.max(25,data['up_time']);
+					  	 o.min = Math.max(0,(o.max - 25));
 					  	 plot_temperature.setData([temperature_data]);
-			        	 plot_temperature.setupGrid();
-			        	 plot_temperature.draw();
-			        	 setTimeout(updateStatus, 5000);
+						 plot_temperature.setupGrid();
+						 plot_temperature.draw();
+						 setTimeout(updateStatus, 5000);
 					  		
 					  }
 					});
@@ -110,9 +125,9 @@
 					<b>Hardware Info:</b><br>
 					<b>Core name:</b><span id="core_name"></span>
 					<b>Arch name:</b><span id="arch_name"></span>
-					<b>Sram size</b><span id="sram_size"></span>
-					<b>Flash size</b><span id="flash_size"></span>
-					<b>Mem boot type</b><span id="mem_boot_type"></span>
+					<b>Sram size:</b><span id="sram_size"></span>
+					<b>Flash size:</b><span id="flash_size"></span>
+					<b>Mem boot type:</b><span id="mem_boot_type"></span>
 				</div>
 				<div class="content">
 					<div class="control">
@@ -121,7 +136,7 @@
 					</div>
 					<div class="control">
 						<b>Led status:</b><br/>
-						<span id="led-1" name="0" class="led-off"><span>&nbsp;</span>OFF</span></span><span id="led-2" name="1" class="led-off"><span>&nbsp;</span>OFF</span></span><span id="led-3" name="2" class="led-off"><span>&nbsp;</span>OFF</span>
+						<span id="led-0" name="0" class="led-off">--</span><span id="led-1" name="1" class="led-off">--</span><span id="led-2" name="2" class="led-off">--</span>
 					</div>
 					<div class="control">
 						<b>Trigger Value:</b><br/>
@@ -133,7 +148,7 @@
 						<div id="temperature-plot"></div>
 				</div>
 				<div id="footer">					
-						Please visit <a href="www.bertos.org">www.berots.org</a> for more info
+						Please visit <a href="http://www.bertos.org">www.berots.org</a> for more info
 				</div>
 			</div>
 		</div>
