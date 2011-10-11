@@ -55,6 +55,20 @@ typedef struct HttpCGI
 	http_handler_t handler; ///< Callback to process the special request
 } HttpCGI;
 
+enum
+{
+	HTTP_CONTENT_JSON = 0,
+	HTTP_CONTENT_HTML,
+	HTTP_CONTENT_CSS,
+	HTTP_CONTENT_JS,
+	HTTP_CONTENT_PNG,
+	HTTP_CONTENT_JPEG,
+	HTTP_CONTENT_GIF,
+	HTTP_CONTENT_PLAIN,
+
+	HTTP_CONTENT_CNT
+};
+
 #define CGI_MATCH_NONE   0
 #define CGI_MATCH_WORD   1  ///< Select item in table only if string match
 #define CGI_MATCH_EXT    2  ///< Select item in table if the extention match
@@ -64,10 +78,11 @@ int http_getValue(char *tolenized_buf, size_t tolenized_buf_len, const char *key
 int http_tokenizeGetRequest(char *raw_buf, size_t raw_len);
 void http_getPageName(const char *recv_buf, size_t recv_len, char *page_name, size_t len);
 void http_decodeUrl(const char *raw_buf, size_t raw_len, char *decodec_buf, size_t len);
+int http_searchContentType(const char *name);
 
-void http_sendOk(struct netconn *client);
-void http_sendFileNotFound(struct netconn *client);
-void http_sendInternalErr(struct netconn *client);
+void http_sendOk(struct netconn *client, int content_type);
+void http_sendFileNotFound(struct netconn *client, int content_type);
+void http_sendInternalErr(struct netconn *client, int content_type);
 
 void http_poll(struct netconn *server);
 void http_init(http_handler_t default_callback, struct HttpCGI *table);

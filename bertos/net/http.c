@@ -58,10 +58,21 @@
 #include <stdlib.h>
 #include <string.h>
 
+static struct {	const char *key; const char *content; } http_content_type[] =
+{
+	{"",    "Content-type: application/json\r\n\r\n"},
+	{"htm", "Content-type: text/html\r\n\r\n"},
+	{"css", "Content-type: text/css\r\n\r\n"},
+	{"js",  "Content-type: text/javascript\r\n\r\n"},
+	{"png", "Content-type: image/png\r\n\r\n"},
+	{"jpg", "Content-type: image/jpeg\r\n\r\n"},
+	{"gif", "Content-type: image/gif\r\n\r\n"},
+	{"txt", "Content-type: text/plain\r\n\r\n"},
+};
 
-static const char http_html_hdr_200[] = "HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n";
-static const char http_html_hdr_404[] = "HTTP/1.0 404 Not Found\r\nContent-type: text/html\r\n\r\n";
-static const char http_html_hdr_500[] = "HTTP/1.0 500 Internal Server Error\r\nContent-type: text/html\r\n\r\n";
+static const char http_html_hdr_200[] = "HTTP/1.0 200 OK\r\n";
+static const char http_html_hdr_404[] = "HTTP/1.0 404 Not Found\r\n";
+static const char http_html_hdr_500[] = "HTTP/1.0 500 Internal Server Error\r\n";
 
 static HttpCGI *cgi_table;
 static http_handler_t http_callback;
@@ -214,14 +225,41 @@ INLINE const char *get_ext(const char *name)
 	return NULL;
 }
 
+int http_searchContentType(const char *name)
+{
+	if (!name)
+		return 0;
+
+	const char *ext = get_ext(name);
+	LOG_INFO("Ext: %s\n", !ext ? "none" : ext);
+
+	if (!ext)
+		return 0;
+
+	if (!strcmp(ext, "ico"))
+		return HTTP_CONTENT_JPEG;
+
+	for (int i = 0; i < HTTP_CONTENT_CNT; i++)
+	{
+		if (!strcmp(ext, http_content_type[i].key))
+			return i;
+	}
+
+	return 0;
+}
+
 
 /**
  * Send on \param client socket
  * the 200 Ok http header
  */
-void http_sendOk(struct netconn *client)
+void http_sendOk(struct netconn *client, int content_type)
 {
-	netconn_write(client, http_html_hdr_200, sizeof(http_html_hdr_200) - 1, NETCONN_NOCOPY);
+	ASSERT(content_type < HTTP_CONTENT_CNT);
+
+	netconn_write(client, http_html_hdr_200, sizeof(http_html_hdr_200) - 1, NETCONN_COPY);
+	netconn_write(client, http_content_type[content_type].content,
+			strlen(http_content_type[content_type].content), NETCONN_COPY);
 }
 
 
@@ -229,18 +267,26 @@ void http_sendOk(struct netconn *client)
  * Send on \param client socket
  * the 404 File not found http header
  */
-void http_sendFileNotFound(struct netconn *client)
+void http_sendFileNotFound(struct netconn *client, int content_type)
 {
-	netconn_write(client, http_html_hdr_404, sizeof(http_html_hdr_404) - 1, NETCONN_NOCOPY);
+	ASSERT(content_type < HTTP_CONTENT_CNT);
+
+	netconn_write(client, http_html_hdr_404, sizeof(http_html_hdr_404) - 1, NETCONN_COPY);
+	netconn_write(client, http_content_type[content_type].content,
+			strlen(http_content_type[content_type].content), NETCONN_COPY);
 }
 
 /**
  * Send on \param client socket
  * the 500 internal server error http header
  */
-void http_sendInternalErr(struct netconn *client)
+void http_sendInternalErr(struct netconn *client, int content_type)
 {
-	netconn_write(client, http_html_hdr_500, sizeof(http_html_hdr_500) - 1, NETCONN_NOCOPY);
+	ASSERT(content_type < HTTP_CONTENT_CNT);
+
+	netconn_write(client, http_html_hdr_500, sizeof(http_html_hdr_500) - 1, NETCONN_COPY);
+	netconn_write(client, http_content_type[content_type].content,
+			strlen(http_content_type[content_type].content), NETCONN_COPY);
 }
 
 static http_handler_t cgi_search(const char *name,  HttpCGI *table)
@@ -250,26 +296,35 @@ static http_handler_t cgi_search(const char *name,  HttpCGI *table)
 
 	int i = 0;
 	const char *ext = get_ext(name);
-	LOG_INFO("EXT %s\n", ext ? "none" : ext);
+
 	while(table[i].name)
 	{
 		if (ext && table[i].type == CGI_MATCH_EXT)
 		{
-			LOG_INFO("Match all ext %s\n", ext);
+
 			if (!strcmp(table[i].name, ext))
+			{
+				LOG_INFO("Match all ext %s\n", ext);
 				break;
+			}
 		}
 		else if (table[i].type == CGI_MATCH_NAME)
 		{
-			LOG_INFO("Match all name %s\n", name);
+
 			if (strstr(name, table[i].name) != NULL)
+			{
+				LOG_INFO("Match all name %s\n", name);
 				break;
+			}
 		}
 		else /* (table[i].type == CGI_MATCH_WORD) */
 		{
-			LOG_INFO("Match all word %s\n", name);
+
 			if (!strcmp(table[i].name, name))
+			{
+				LOG_INFO("Match all word %s\n", name);
 				break;
+			}
 		}
 
 		i++;
@@ -316,7 +371,7 @@ void http_poll(struct netconn *server)
 				if (cgi(client, req_string, rx_buf, len) < 0)
 				{
 					LOG_ERR("Internal server error\n");
-					http_sendInternalErr(client);
+					http_sendInternalErr(client, HTTP_CONTENT_HTML);
 					netconn_write(client, http_server_error, http_server_error_len - 1, NETCONN_NOCOPY);
 				}
 			}

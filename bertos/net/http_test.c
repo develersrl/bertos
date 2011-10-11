@@ -82,6 +82,34 @@ static char token_str[] = "var1=1&var2=2&var3=3&var4=4";
 static char token_str1[] = "var1=1&var2=2&=3&var4=";
 static char token_str2[] = "var1=test+test&var2=2&var3=test%5B%5D!@;'%22%5C.%20&var4=4";
 
+static struct {const char *content;} contents[] =
+{
+	{"one/two/three/test"},
+	{"one/two/three.htm"},
+	{"one/test.css"},
+	{"one/two/test.js"},
+	{"one/two/test.png"},
+	{"one/two/test.ico"},
+	{"one/two/test.jpg"},
+	{"one/two/test.gif"},
+};
+
+
+static int contents_check_type[] =
+{
+	HTTP_CONTENT_JSON,
+	HTTP_CONTENT_HTML,
+	HTTP_CONTENT_CSS,
+	HTTP_CONTENT_JS,
+	HTTP_CONTENT_PNG,
+	HTTP_CONTENT_JPEG,
+	HTTP_CONTENT_JPEG,
+	HTTP_CONTENT_GIF,
+};
+
+#define CONTENT_TEST_CNT  8
+
+
 int http_testSetup(void)
 {
 	kdbg_init();
@@ -241,6 +269,18 @@ int http_testRun(void)
 		kprintf("error 7 value %s expect %s\n", value, "test test");
 		goto error;
 
+	}
+
+
+	for (int i = 0; i < CONTENT_TEST_CNT; i++)
+	{
+		int type = http_searchContentType(contents[i].content);
+		if (type != contents_check_type[i])
+		{
+			kprintf("error 8-%d return type %d expect %d\n", i, type, contents_check_type[i]);
+			kprintf("error 8-%d ext %s\n", i, contents[i].content);
+			goto error;
+		}
 	}
 
 	return 0;
