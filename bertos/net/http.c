@@ -250,8 +250,8 @@ int http_searchContentType(const char *name)
 
 
 /**
- * Send on \param client socket
- * the 200 Ok http header
+ * Send on \param client socket the 200 Ok http header with
+ * select \param content_type
  */
 void http_sendOk(struct netconn *client, int content_type)
 {
@@ -264,8 +264,8 @@ void http_sendOk(struct netconn *client, int content_type)
 
 
 /**
- * Send on \param client socket
- * the 404 File not found http header
+ * Send on \param client socket the 404 File not found http header with
+ * select \param content_type
  */
 void http_sendFileNotFound(struct netconn *client, int content_type)
 {
@@ -277,8 +277,8 @@ void http_sendFileNotFound(struct netconn *client, int content_type)
 }
 
 /**
- * Send on \param client socket
- * the 500 internal server error http header
+ * Send on \param client socket the 500 internal server error http header with
+ * select \param content_type
  */
 void http_sendInternalErr(struct netconn *client, int content_type)
 {
