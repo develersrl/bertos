@@ -238,13 +238,6 @@ static int emac_reset(void)
 	PIOB_PUDR = BV(PHY_RXDV_TESTMODE_BIT);
 #endif
 
-	// Toggle external hardware reset pin.
-	RSTC_MR = RSTC_KEY | (1 << RSTC_ERSTL_SHIFT) | BV(RSTC_URSTEN);
-	RSTC_CR = RSTC_KEY | BV(RSTC_EXTRST);
-
-	while ((RSTC_SR & BV(RSTC_NRSTL)) == 0)
-		cpu_relax();
-
 	// Configure MII ports.
 #if CPU_ARM_AT91
 	PIOB_ASR = PHY_MII_PINS;
