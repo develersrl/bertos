@@ -304,7 +304,7 @@ static http_handler_t cgi_search(const char *name,  HttpCGI *table)
 
 			if (!strcmp(table[i].name, ext))
 			{
-				LOG_INFO("Match all ext %s\n", ext);
+				LOG_INFO("Match all ext: %s\n", ext);
 				break;
 			}
 		}
@@ -313,7 +313,7 @@ static http_handler_t cgi_search(const char *name,  HttpCGI *table)
 
 			if (strstr(name, table[i].name) != NULL)
 			{
-				LOG_INFO("Match all name %s\n", name);
+				LOG_INFO("Match all name: %s\n", name);
 				break;
 			}
 		}
@@ -322,7 +322,7 @@ static http_handler_t cgi_search(const char *name,  HttpCGI *table)
 
 			if (!strcmp(table[i].name, name))
 			{
-				LOG_INFO("Match all word %s\n", name);
+				LOG_INFO("Word match: %s\n", name);
 				break;
 			}
 		}
@@ -361,7 +361,7 @@ void http_poll(struct netconn *server)
 			memset(req_string, 0, sizeof(req_string));
 			http_getPageName(rx_buf, len, req_string, sizeof(req_string));
 
-			LOG_INFO("Search %s\n", req_string);
+			LOG_INFO("Search: %s\n", req_string);
 			if (req_string[0] == '\0')
 				strcpy(req_string, HTTP_DEFAULT_PAGE);
 
