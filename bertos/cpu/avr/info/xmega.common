@@ -28,9 +28,12 @@
 # invalidate any other reasons why the executable file might be covered by
 # the GNU General Public License.
 #
+# Copyright 2008 Develer S.r.l. (http://www.develer.com/)
+# Copyright 2011 Onno <developer@gorgoz.org>
+#
 # -->
 #
-# Cpu info of the ATxmega32D4.
+# General CPU info definition AVR Xmega family.
 #
 # This file contain all info for the BeRTOS wizard.
 #
@@ -38,20 +41,16 @@
 #
 #
 
-
 # Import the common settings for the path.
-include("xmega.common")
-
-# Short description of the cpu.
-CPU_DESC += [ "32 Kbyte in-System Programmable Flash",
-	      "4 Kbyte Boot Code Section with Independent Lock Bits",
-	      "4 Kbyte internal SRAM memory",
-	      "1 Kbyte EEPROM memory" ]
-
-# If we use the GCC compiler we should pass some flags.
-CORE_CPU = "atxmega32d4"
+include("avr.common")
 
 # Special CPU related tags.
-CPU_TAGS += ["xmega32d"]
+CPU_TAGS += ["xmega"]
 
-include("avr_post.common")
+# CPU default clock frequency
+# Set to 2Mhz as by default the Internal 2Mhz clock is used
+CPU_DEFAULT_FREQ = "2000000UL"
+
+# Add additional init routines for the Xmega to the source
+HW_DIR = CPU_DIR + "avr/hw/"
+MK_CPU_CSRC = HW_DIR + "init_xmega.c"
