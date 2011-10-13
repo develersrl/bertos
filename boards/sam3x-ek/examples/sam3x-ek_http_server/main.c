@@ -68,6 +68,7 @@
 
 #include <kern/proc.h>
 #include <kern/monitor.h>
+#include <struct/heap.h>
 
 #include <net/http.h>
 
@@ -119,9 +120,10 @@ typedef struct BoardStatus
 
 static BoardStatus status;
 static uint8_t raster[RAST_SIZE(LCD_WIDTH, LCD_HEIGHT)];
-static Bitmap lcd_bitmap;
+static Bitmap *lcd_bitmap;
 extern Font font_gohu;
 static int lcd_brightness = LCD_BACKLIGHT_MAX;
+static struct Heap heap;
 
 
 static void init(void)
@@ -145,21 +147,23 @@ static void init(void)
 
 	/* Enable the adc to read internal temperature sensor */
 	hw_enableTempRead();
-
 	LED_INIT();
+
+	heap_init(&heap, (void *)SDRAM_BASE, SDRAM_SIZE);
+	lcd_bitmap = heap_allocmem(&heap, RAST_SIZE(LCD_WIDTH, LCD_HEIGHT));
+	if (lcd_bitmap)
+		kprintf("Allocated memory for display raster, addr 0x%x\n", (unsigned)lcd_bitmap);
+	else
+	{
+		kprintf("Error allocating memory for LCD raster!\n");
+	}
 
 	lcd_hx8347_init();
 	lcd_setBacklight(lcd_brightness);
 
-	gfx_bitmapInit(&lcd_bitmap, raster, LCD_WIDTH, LCD_HEIGHT);
-	gfx_setFont(&lcd_bitmap, &font_luBS14);
-
-	lcd_hx8347_blitBitmap(&lcd_bitmap);
-	lcd_hx8347_blitBitmap24(10, 52, BMP_LOGO_WIDTH, BMP_LOGO_HEIGHT, bmp_logo);
-	timer_delay(3000);
-
-	text_xprintf(&lcd_bitmap, 1, 0, TEXT_CENTER, "Brightness: %d", lcd_brightness);
-	lcd_hx8347_blitBitmap(&lcd_bitmap);
+	gfx_bitmapInit(lcd_bitmap, raster, LCD_WIDTH, LCD_HEIGHT);
+	gfx_setFont(lcd_bitmap, &font_luBS14);
+	lcd_hx8347_blitBitmap(lcd_bitmap);
 
 	/* Initialize TCP/IP stack */
 	tcpip_init(NULL, NULL);
@@ -169,6 +173,8 @@ static void init(void)
 	netif_set_default(&netif);
 	netif_set_up(&netif);
 
+	lcd_hx8347_blitBitmap24(10, 52, BMP_LOGO_WIDTH, BMP_LOGO_HEIGHT, bmp_logo);
+	timer_delay(3000);
 }
 
 static NORETURN void proc_displayRefresh(void)
