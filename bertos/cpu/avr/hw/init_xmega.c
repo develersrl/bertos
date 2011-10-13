@@ -32,6 +32,7 @@
  *
  *
  * \author Luca Ottaviano <lottaviano@develer.com>
+ * \author Onno <developer@gorgoz.org>
  *
  * \brief AVR XMega initialization routine.
  * notest:all
@@ -39,12 +40,12 @@
 #include <cfg/macros.h>
 #include <avr/io.h>
 
-void __init(void) NAKED __attribute__ ((section (".init3")));
+void init_xmega(void) NAKED __attribute__ ((constructor));
 
 /*
  * Initialize all interrupt priorities present in AVR XMega CPU.
  */
-void __init(void)
+void init_xmega(void)
 {
 	PMIC.CTRL |= PMIC_LOLVLEX_bm | PMIC_MEDLVLEX_bm | PMIC_HILVLEX_bm;
 }
