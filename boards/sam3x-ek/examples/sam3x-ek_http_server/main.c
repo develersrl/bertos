@@ -124,6 +124,7 @@ static Bitmap *lcd_bitmap;
 extern Font font_gohu;
 static int lcd_brightness = LCD_BACKLIGHT_MAX;
 static struct Heap heap;
+static uint8_t tx_buf[2048];
 
 
 static void init(void)
@@ -174,46 +175,46 @@ static void init(void)
 	netif_set_up(&netif);
 }
 
-static void sec_to_hms(uint32_t sec_time, uint32_t *h, uint32_t *m,  uint32_t *s)
+static int sec_to_strDhms(uint32_t sec_time, char *str, size_t len)
 {
-	*m = sec_time / 60;
-	*h = (*m) / 60;
-	*s = sec_time - ((*m) * 60) - ((*h) * 3600);
+    uint32_t h = (sec_time / 3600);
+    uint32_t d = h / 24;
+    uint32_t m = ((sec_time - (h * 3600)) / 60);
+    uint32_t s = (sec_time - (m * 60) - (h * 3600));
+
+    if (len < sizeof("xxxxd xxh xxm xxs"))
+        return -1;
+
+    sprintf(str, "%ldd %ldh %ldm %lds", d, (h >= 24) ? h - 24 : h, m, s);
+
+    return 0;
 }
+
 
 static NORETURN void proc_displayRefresh(void)
 {
 	while (1)
 	{
 		//LOG_INFO("Refresh display\n");
-		uint32_t m;
-		uint32_t h;
-		uint32_t s;
+
 		status.internal_temp = hw_convertToDegree(adc_read(ADC_TEMPERATURE_CH));
-		status.up_time += 5;
-		sec_to_hms(status.up_time, &h, &m, &s);
+		status.up_time += 2;
+		sec_to_strDhms(status.up_time, (char *)tx_buf, sizeof(tx_buf));
 
-		text_xprintf(lcd_bitmap, 11, 0, TEXT_FILL, " ");
-		text_xprintf(lcd_bitmap, 11, 0, 0, "Board ip: %s", status.local_ip);
-
-		text_xprintf(lcd_bitmap, 12, 0, TEXT_FILL, " ");
-		text_xprintf(lcd_bitmap, 12, 0, 0, "Last connected ip: %s", status.last_connected_ip);
-
-		text_xprintf(lcd_bitmap, 13, 0, TEXT_FILL, " ");
-		text_xprintf(lcd_bitmap, 13, 0, 0, "Temperature: %d.%dC",	status.internal_temp / 10, status.internal_temp % 10);
-
-		text_xprintf(lcd_bitmap, 14, 0, TEXT_FILL, " ");
-		text_xprintf(lcd_bitmap, 14, 0, 0, "Up time: %ldh %ldm %lds", h, m, s);
+		gfx_bitmapClear(lcd_bitmap);
+		text_style(lcd_bitmap, STYLEF_BOLD | STYLEF_UNDERLINE, STYLEF_BOLD | STYLEF_UNDERLINE);
+		text_xprintf(lcd_bitmap, 0, 0, TEXT_CENTER | TEXT_FILL, "BeRTOS Simple Http Server");
+		text_style(lcd_bitmap, 0, STYLEF_MASK);
+		text_xprintf(lcd_bitmap, 2, 0, 0, "Board ip: %s", status.local_ip);
+		text_xprintf(lcd_bitmap, 3, 0, 0, "Last connected ip: %s", status.last_connected_ip);
+		text_xprintf(lcd_bitmap, 4, 0, 0, "Temperature: %d.%dC",	status.internal_temp / 10, status.internal_temp % 10);
+		text_xprintf(lcd_bitmap, 5, 0, 0, "Up time: %s", tx_buf);
 
 		lcd_hx8347_blitBitmap(lcd_bitmap);
-		lcd_hx8347_blitBitmap24(10, 0, BMP_LOGO_WIDTH, BMP_LOGO_HEIGHT, bmp_logo);
 
-		timer_delay(5000);
+		timer_delay(2000);
 	}
 }
-
-
-static uint8_t tx_buf[2048];
 
 /*
  * Return a JSON string of board status.
@@ -225,17 +226,17 @@ static int cgi_status(struct netconn *client, const char *name, char *recv_buf, 
 	(void)name;
 
 	status.tot_req++;
-	uint16_t volt = ADC_RANGECONV(adc_read(1), 0, 3300);
+	uint16_t volt = adc_read(1);
+
 	//Update board status.
 	sprintf(status.last_connected_ip, "%d.%d.%d.%d", IP_ADDR_TO_INT_TUPLE(client->pcb.ip->remote_ip.addr));
 	sprintf(status.local_ip, "%d.%d.%d.%d", IP_ADDR_TO_INT_TUPLE(client->pcb.ip->local_ip.addr));
 
-	sprintf((char *)tx_buf,	"{ \"local_ip\":\"%s\",\"last_connected_ip\":\"%s\", \"temp\":%d.%d,\"volt\":%d.%d,\"up_time\":%ld,\"tot_req\":%d, \
+	sprintf((char *)tx_buf,	"{ \"local_ip\":\"%s\",\"last_connected_ip\":\"%s\", \"temp\":%d.%d,\"volt\":%d,\"up_time\":%d,\"tot_req\":%d, \
 \"leds\":{ \"0\":\"%d\", \"1\":\"%d\", \"2\":\"%d\"}}",
 								status.local_ip, status.last_connected_ip,
 								status.internal_temp / 10, status.internal_temp % 10,
-								volt / 1000, volt % 1000,
-								status.up_time, status.tot_req,
+								volt, status.up_time, status.tot_req,
 								GET_LED_STATUS(status.led_status, 0),
 								GET_LED_STATUS(status.led_status, 1),
 								GET_LED_STATUS(status.led_status, 2));
@@ -282,12 +283,7 @@ static int cgi_uptime(struct netconn *client, const char *name, char *recv_buf, 
 	(void)recv_len;
 	(void)name;
 
-	uint32_t m;
-	uint32_t h;
-	uint32_t s;
-	sec_to_hms(status.up_time, &h, &m, &s);
-
-	sprintf((char *)tx_buf, "[\"%ldh %ldm %lds\"]", h, m, s);
+	sec_to_strDhms(status.up_time, (char *)tx_buf, sizeof(tx_buf));
 
 	http_sendOk(client, HTTP_CONTENT_JSON);
 	netconn_write(client, tx_buf, strlen((char *)tx_buf), NETCONN_COPY);
@@ -409,21 +405,24 @@ static int cgi_displayMsg(struct netconn *client, const char *name, char *recv_b
 
 	LOG_INFO("Found %d key/value pair\n", len);
 
-	if (http_getValue(query_str, query_str_len, CGI_MSG_CMD_KEY, key_value, sizeof(key_value)) < 0)
+	if (http_getValue(query_str, query_str_len, CGI_MSG_CMD_KEY, key_value, sizeof(key_value)) > 0)
 	{
-		LOG_ERR("key %s, not found\n", CGI_MSG_CMD_KEY);
-		goto error;
+
+		LOG_INFO("Found key %s = %s\n", CGI_MSG_CMD_KEY, key_value);
+
+		gfx_bitmapClear(lcd_bitmap);
+		text_style(lcd_bitmap, STYLEF_BOLD | STYLEF_UNDERLINE, STYLEF_BOLD | STYLEF_UNDERLINE);
+		text_xprintf(lcd_bitmap, 0, 0, TEXT_CENTER | TEXT_FILL, "BeRTOS Simple Http Server");
+		text_style(lcd_bitmap, 0, STYLEF_MASK);
+		text_xprintf(lcd_bitmap, 2, 0, TEXT_CENTER | TEXT_FILL, "Your message:");
+		text_xprintf(lcd_bitmap, 10, 0, TEXT_CENTER, "%s", key_value);
+
+		lcd_hx8347_blitBitmap(lcd_bitmap);
+
+		http_sendOk(client, HTTP_CONTENT_JSON);
+		return 0;
 	}
 
-	LOG_INFO("Found key %s = %s\n", CGI_MSG_CMD_KEY, key_value);
-
-	text_xprintf(lcd_bitmap, 10, 0, TEXT_FILL, " ");
-	text_xprintf(lcd_bitmap, 10, 0, TEXT_CENTER, "%s", key_value);
-
-	http_sendOk(client, HTTP_CONTENT_JSON);
-	return 0;
-
-error:
 	http_sendInternalErr(client, HTTP_CONTENT_JSON);
 	return 0;
 }
@@ -582,7 +581,7 @@ int main(void)
 	init();
 	http_init(http_htmPageLoad, cgi_table);
 
-	proc_new(proc_displayRefresh, NULL, KERN_MINSTACKSIZE * 2, NULL);
+	lcd_hx8347_blitBitmap24(12, 52, BMP_LOGO_WIDTH, BMP_LOGO_HEIGHT, bmp_logo);
 
 	dhcp_start(&netif);
 	while (!netif.ip_addr.addr)
@@ -592,10 +591,11 @@ int main(void)
 	sprintf(status.last_connected_ip, "%d.%d.%d.%d", IP_ADDR_TO_INT_TUPLE(0));
 	kprintf("dhcp ok: ip = %s", status.local_ip);
 
-	text_xprintf(lcd_bitmap, 12, 0, 0, "Board ip: %s", status.local_ip);
-
+	text_xprintf(lcd_bitmap, 14, 0, 0, "Board ip: %s", status.local_ip);
 	lcd_hx8347_blitBitmap(lcd_bitmap);
-	lcd_hx8347_blitBitmap24(12, 0, BMP_LOGO_WIDTH, BMP_LOGO_HEIGHT, bmp_logo);
+
+
+	proc_new(proc_displayRefresh, NULL, KERN_MINSTACKSIZE * 2, NULL);
 
 	server = netconn_new(NETCONN_TCP);
 	netconn_bind(server, IP_ADDR_ANY, 80);
