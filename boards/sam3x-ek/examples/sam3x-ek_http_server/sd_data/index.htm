@@ -82,8 +82,8 @@
 					  dataType :'json',
 					  success: function(data){
 
-						 $('#trigger-value').width(200*(parseFloat(data['volt'])/3.5));
-						 $('#uptime').text(data['up_time']+' sec');
+						 $('#potentiometer').width(200*(parseInt(data['volt'])/4096));
+						 $('#uptime').text(data['up_time'] +' sec');
 						 $('#temperature').text(data['temp']+' °C');
 						 temperature_data.push([data['up_time'],data['temp']]);
 
@@ -140,7 +140,7 @@
 					</div>
 					<div class="control">
 						<b>Potentiometer Value:</b><br/>
-						<span class="trigger"><span id="trigger-value" >&nbsp;</span></span>
+						<span class="trigger"><span id="potentiometer">&nbsp;</span></span>
 					</div>
 				</div>
 				<div class="content">
