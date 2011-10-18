@@ -82,14 +82,16 @@
 					  dataType :'json',
 					  success: function(data){
 
-						 $('#potentiometer').width(200*(parseInt(data['volt'])/4096));
+						 $('#potentiometer').width(200*(parseInt(data['volt'])/4095));
 						 $('#uptime').text(data['up_time'] +' sec');
 						 $('#temperature').text(data['temp']+' °C');
 						 temperature_data.push([data['up_time'],data['temp']]);
 
-						 var o = plot_temperature.getAxes().xaxis.options;
-						 o.max = Math.max(25,data['up_time']);
-						 o.min = Math.max(0,(o.max - 25));
+						 var x = plot_temperature.getAxes().xaxis.options;
+						 var y = plot_temperature.getAxes().yaxis.options;
+						 x.max = Math.max(25,data['up_time']);
+						 x.min = Math.max(0,(x.max - 25));
+						 y.autoscale = true;
 						 plot_temperature.setData([temperature_data]);
 						 plot_temperature.setupGrid();
 						 plot_temperature.draw();
