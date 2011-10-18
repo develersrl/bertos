@@ -304,7 +304,7 @@ static http_handler_t cgi_search(const char *name,  HttpCGI *table)
 
 			if (!strcmp(table[i].name, ext))
 			{
-				LOG_INFO("Match all ext: %s\n", ext);
+				LOG_INFO("Match ext: %s\n", ext);
 				break;
 			}
 		}
@@ -313,7 +313,7 @@ static http_handler_t cgi_search(const char *name,  HttpCGI *table)
 
 			if (strstr(name, table[i].name) != NULL)
 			{
-				LOG_INFO("Match all name: %s\n", name);
+				LOG_INFO("Match string: %s\n", name);
 				break;
 			}
 		}
