@@ -198,7 +198,7 @@ static NORETURN void proc_displayRefresh(void)
 		//LOG_INFO("Refresh display\n");
 
 		status.internal_temp = hw_convertToDegree(adc_read(ADC_TEMPERATURE_CH));
-		status.up_time += 2;
+		status.up_time += 1;
 		sec_to_strDhms(status.up_time, (char *)tx_buf, sizeof(tx_buf));
 
 		gfx_bitmapClear(lcd_bitmap);
@@ -212,7 +212,7 @@ static NORETURN void proc_displayRefresh(void)
 
 		lcd_hx8347_blitBitmap(lcd_bitmap);
 
-		timer_delay(2000);
+		timer_delay(1000);
 	}
 }
 
@@ -232,7 +232,7 @@ static int cgi_status(struct netconn *client, const char *name, char *recv_buf, 
 	sprintf(status.last_connected_ip, "%d.%d.%d.%d", IP_ADDR_TO_INT_TUPLE(client->pcb.ip->remote_ip.addr));
 	sprintf(status.local_ip, "%d.%d.%d.%d", IP_ADDR_TO_INT_TUPLE(client->pcb.ip->local_ip.addr));
 
-	sprintf((char *)tx_buf,	"{ \"local_ip\":\"%s\",\"last_connected_ip\":\"%s\", \"temp\":%d.%d,\"volt\":%d,\"up_time\":%d,\"tot_req\":%d, \
+	sprintf((char *)tx_buf,	"{ \"local_ip\":\"%s\",\"last_connected_ip\":\"%s\", \"temp\":%d.%d,\"volt\":%d,\"up_time\":%ld,\"tot_req\":%d, \
 \"leds\":{ \"0\":\"%d\", \"1\":\"%d\", \"2\":\"%d\"}}",
 								status.local_ip, status.last_connected_ip,
 								status.internal_temp / 10, status.internal_temp % 10,
@@ -240,6 +240,9 @@ static int cgi_status(struct netconn *client, const char *name, char *recv_buf, 
 								GET_LED_STATUS(status.led_status, 0),
 								GET_LED_STATUS(status.led_status, 1),
 								GET_LED_STATUS(status.led_status, 2));
+
+
+
 
 	http_sendOk(client, HTTP_CONTENT_JSON);
 	netconn_write(client, tx_buf, strlen((char *)tx_buf), NETCONN_COPY);
@@ -589,7 +592,7 @@ int main(void)
 
 	sprintf(status.local_ip, "%d.%d.%d.%d", IP_ADDR_TO_INT_TUPLE(netif.ip_addr.addr));
 	sprintf(status.last_connected_ip, "%d.%d.%d.%d", IP_ADDR_TO_INT_TUPLE(0));
-	kprintf("dhcp ok: ip = %s", status.local_ip);
+	LOG_INFO("dhcp ok: ip = %s\", status.local_ip);
 
 	text_xprintf(lcd_bitmap, 14, 0, 0, "Board ip: %s", status.local_ip);
 	lcd_hx8347_blitBitmap(lcd_bitmap);
