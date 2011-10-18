@@ -592,7 +592,7 @@ int main(void)
 
 	sprintf(status.local_ip, "%d.%d.%d.%d", IP_ADDR_TO_INT_TUPLE(netif.ip_addr.addr));
 	sprintf(status.last_connected_ip, "%d.%d.%d.%d", IP_ADDR_TO_INT_TUPLE(0));
-	LOG_INFO("dhcp ok: ip = %s\", status.local_ip);
+	LOG_INFO("dhcp ok: ip = %s\n", status.local_ip);
 
 	text_xprintf(lcd_bitmap, 14, 0, 0, "Board ip: %s", status.local_ip);
 	lcd_hx8347_blitBitmap(lcd_bitmap);
