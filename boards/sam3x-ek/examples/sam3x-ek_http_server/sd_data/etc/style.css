@@ -14,7 +14,7 @@ body {
 #header h1,#header h3, #header div, #header img {
 	display: inline-block;
 	vertical-align: top;
-	
+
 }
 
 #header {
@@ -44,7 +44,7 @@ body {
 	width: 800px;
 	margin:0px auto;
 	background-color: #ffffff;
-	
+
 }
 
 #footer {
@@ -84,7 +84,7 @@ body {
 	margin: 5px;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
-	border-radius: 5px;	
+	border-radius: 5px;
 }
 
 .led-on span {
@@ -99,19 +99,37 @@ body {
 	display: inline-block;
 }
 
+#led-0.led-on {
+	background-color:#0BC713;
+	color:#000000;
+	border: 1px solid #09580D;
+}
+
+#led-1.led-on {
+	background-color:#FAC52B;
+	color:#000000;
+	border: 1px solid #BB9010;
+}
+
+#led-2.led-on {
+	background-color:#1FC2E2;
+	color:#000000;
+	border: 1px solid #00697E;
+}
+
 .led-off {
 	color:#FFFFFF;
 	font-size: 0.9em;
 	cursor:pointer;
 	width:55px;
 	display:inline-block;
-	background-color:#F58220;
-	border: 1px solid #F58220;
+	background-color:#A7A7A7;
+	border: 1px solid #A7A7A7;
 	padding: 2px;
 	margin: 5px;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
-	border-radius: 5px;	
+	border-radius: 5px;
 }
 
 .led-off span {
@@ -133,7 +151,7 @@ body {
 	margin: 5px;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
-	border-radius: 5px;	
+	border-radius: 5px;
 }
 
 .trigger span {
@@ -164,8 +182,12 @@ body {
 	text-align:center;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
-	border-radius: 5px;	
+	border-radius: 5px;
 }
 
+.label {
+ width: 150px;
+ display: inline-block;
+}
 
 

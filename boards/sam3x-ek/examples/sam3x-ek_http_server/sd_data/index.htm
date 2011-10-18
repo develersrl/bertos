@@ -10,32 +10,16 @@
 		<script type="text/javascript" src="etc/js/jqflot.js"></script>
 		<script type="text/javascript">
 			$(document).ready(function() {
-
 				$.ajax({
 					  url: "get_chipinfo",
 					  dataType :'json',
+					  async: false,
 					  success: function(data){
 					    	$.each(data,function(k,v){
 					    		$('#'+k).text(v);
 					    	});
    					  }
 					});
-				$.ajax({
-					  url: "get_ledStatus",
-					  dataType :'json',
-					  success: function(data){
-					    	$.each(data,function(k,v){
-
-							if (v == 1) {
-								$('#led-'+k).addClass('led-on').removeClass('led-off').text('ON').append("<span>&nbsp;</span>");
-		   					} else {
-		   						$('#led-'+k).addClass('led-off').removeClass('led-on').text('OFF').prepend("<span>&nbsp;</span>");
-			   				}
-
-					    	});
-					  }
-					});
-
    				var set_led_status = function(elm,status) {
 
    					if (status == 1) {
@@ -43,68 +27,68 @@
    					} else {
    						elm.addClass('led-off').removeClass('led-on').text('OFF').prepend("<span>&nbsp;</span>");
 	   				}
-
-   					$.ajax({
+   				}
+   				$("span[id^=led]").click(function(){
+   					var elm = $(this);
+					if (elm.hasClass('led-off')) {
+						var status = 1;
+					} else {
+						var status = 0;
+					}
+					set_led_status(elm, status);
+					$.ajax({
 					  url: "set_led",
+					  async: false,
 					  data:{'n':elm.attr('name'),'set':status},
 					  dataType :'json',
 					  success: function(){
-
 					  }
 					});
-   				}
-
-
-   				$("span[id^=led]").click(function(){
-   					var elm = $(this);
-   					if (elm.hasClass('led-on')) {
-   						set_led_status(elm,0);
-   					} else {
-   						set_led_status(elm,1);
-   					}
    				});
-
-
    				var options = {
 			        series: { shadowSize: 0 },
-			        yaxis: { min: 0},
-			        xaxis: {min:0}
+			        yaxis:  { min: 0},
+			        xaxis:  {min:0}
 			    };
 
 				var temperature_data = [];
-				var plot_temperature = $.plot($("#temperature-plot"), [temperature_data], options);
-
+				var plot_temperature = $.plot($("#temperature-plot"), [{label: "Temperature", data:temperature_data}], options);
 
 			    function updateStatus() {
 
 			$.ajax({
 					  url: "status",
+					  async: false,
 					  dataType :'json',
 					  success: function(data){
 
 						 $('#potentiometer').width(200*(parseInt(data['volt'])/4095));
+						 $('#potentiometer-value').text(data['volt'])
 						 $('#uptime').text(data['up_time'] +' sec');
 						 $('#temperature').text(data['temp']+' °C');
+						 $('#local_ip').text(data['local_ip']);
+						 $('#last_connected_ip').text(data['last_connected_ip']);
+						 $('#tot_req').text(data['tot_req']);
+
+						 $.each(data['leds'], function (key,v) {
+							set_led_status($('#led-' + key), v);
+							});
+
 						 temperature_data.push([data['up_time'],data['temp']]);
 
 						 var x = plot_temperature.getAxes().xaxis.options;
 						 var y = plot_temperature.getAxes().yaxis.options;
 						 x.max = Math.max(25,data['up_time']);
 						 x.min = Math.max(0,(x.max - 25));
-						 y.autoscale = true;
-						 plot_temperature.setData([temperature_data]);
+
+						 plot_temperature.setData([{label: "Temperature", data:temperature_data}]);
 						 plot_temperature.setupGrid();
 						 plot_temperature.draw();
 						 setTimeout(updateStatus, 1000);
-
 					  }
 					});
-
 			    }
-
 			   updateStatus();
-
-
 			});
 
 		</script>
@@ -125,16 +109,21 @@
 				</div>
 				<div class="content">
 					<b>Hardware Info:</b><br>
-					<b>Core name:</b><span id="core_name"></span>
-					<b>Arch name:</b><span id="arch_name"></span>
-					<b>Sram size:</b><span id="sram_size"></span>
-					<b>Flash size:</b><span id="flash_size"></span>
-					<b>Mem boot type:</b><span id="mem_boot_type"></span>
+					<b>CPU Core:</b><span id="core_name">--</span><br>
+					<b>Chip name:</b><span id="arch_name">--</span><br>
+					<b>SRAM size:</b><span id="sram_size">--</span><br>
+					<b>Flash size:</b><span id="flash_size">--</span><br>
+					<b>Boot from memory:</b><span id="mem_boot_type">--</span>
+					<br>
+					<b>Connections Info:</b><br>
+					<b>Board IP:</b><span id="local_ip">--</span><br>
+					<b>Your IP:</b><span id="last_connected_ip">--</span><br>
+					<b>Total status requests:</b><span id="tot_req">--</span><br>
 				</div>
 				<div class="content">
 					<div class="control">
-						<b>BeRTOS uptime:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b><span id="uptime" class="box">--</span><br>
-						<b>Current temperature:</b><span id="temperature" class="box">--</span><br/>
+						<b class="label">BeRTOS uptime:</b><span id="uptime" class="box">--</span><br>
+						<b class="label">Current temperature:</b><span id="temperature" class="box">--</span><br/>
 					</div>
 					<div class="control">
 						<b>Led status:</b><br/>
@@ -142,7 +131,7 @@
 					</div>
 					<div class="control">
 						<b>Potentiometer Value:</b><br/>
-						<span class="trigger"><span id="potentiometer">&nbsp;</span></span>
+						<span class="trigger"><span id="potentiometer">&nbsp;</span></span>&nbsp;<span id="potentiometer-value">--</span>
 					</div>
 				</div>
 				<div class="content">
