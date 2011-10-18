@@ -1,7 +1,3 @@
-
-
-
-
 body {
 	font-family:  helvetica;
 	margin: 0px;
@@ -14,7 +10,8 @@ body {
 #header h1,#header h3, #header div, #header img {
 	display: inline-block;
 	vertical-align: top;
-
+	zoom:1;
+	*display:inline;
 }
 
 #header {
@@ -47,13 +44,13 @@ body {
 
 }
 
-#footer {
+.footer {
 	padding: 15px;
 	background-color: #3E9A3C;
 	color:#FFFFFF;
 }
 
-#footer a {
+.footer a {
 	color:#FCAF17;
 }
 
@@ -65,39 +62,56 @@ body {
 	border-width: 0px 1px 1px 1px;
 }
 
-
-
 .control {
 	display: inline-block;
 	min-width: 250px;
+	zoom:1;
+	*display:inline;
 }
 
-.led-on {
-	color:#FFFFFF;
-	font-size: 0.9em;
+.led {
 	cursor:pointer;
+	font-size: 0.9em;
 	width:55px;
-	display:inline-block;
-	background-color:#3E9A3C;
-	border: 1px solid #3E9A3C;
 	padding: 2px;
 	margin: 5px;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
 	border-radius: 5px;
+	display:inline-block;
 }
 
-.led-on span {
-	background-color:#FFFFFF;
-	float:right;
+.led span {
 	width: 17px;
 	height: 17px;
-	margin-left: 5px;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
 	border-radius: 5px;
+	background-color:#FFFFFF;
+}
+
+.led-on {
+	color:#FFFFFF;
+	background-color:#3E9A3C;
+	border: 1px solid #3E9A3C;
+}
+
+.led-on span {
+	margin-left: 15px;
 	display: inline-block;
 }
+
+.led-off {
+	color:#FFFFFF;
+	background-color:#A7A7A7;
+	border: 1px solid #A7A7A7;
+}
+
+.led-off span {
+	margin-right: 5px;
+	display: inline-block;
+}
+
 
 #led-0.led-on {
 	background-color:#0BC713;
@@ -117,31 +131,6 @@ body {
 	border: 1px solid #00697E;
 }
 
-.led-off {
-	color:#FFFFFF;
-	font-size: 0.9em;
-	cursor:pointer;
-	width:55px;
-	display:inline-block;
-	background-color:#A7A7A7;
-	border: 1px solid #A7A7A7;
-	padding: 2px;
-	margin: 5px;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
-	border-radius: 5px;
-}
-
-.led-off span {
-	background-color:#FFFFFF;
-	width: 17px;
-	height: 17px;
-	margin-right: 5px;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
-	border-radius: 5px;
-	display: inline-block;
-}
 
 .trigger {
 	width:200px;
@@ -164,9 +153,9 @@ body {
 	display: inline-block;
 }
 
-#temperature-plot{
+.temperature-plot{
 	height: 250px;
-	margin: 15px;
+	margin: 15px 15px 0px 15px;
 }
 
 
@@ -186,8 +175,6 @@ body {
 }
 
 .label {
- width: 150px;
- display: inline-block;
+ 	width: 150px;
+ 	display: inline-block;
 }
-
-
