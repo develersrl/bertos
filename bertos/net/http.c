@@ -361,7 +361,6 @@ void http_poll(struct netconn *server)
 			memset(req_string, 0, sizeof(req_string));
 			http_getPageName(rx_buf, len, req_string, sizeof(req_string));
 
-			LOG_INFO("Search: %s\n", req_string);
 			if (req_string[0] == '\0')
 				strcpy(req_string, HTTP_DEFAULT_PAGE);
 
