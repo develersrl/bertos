@@ -35,7 +35,7 @@
  * \ingroup drivers
  * \{
  *
- * \brief 7 segments LED displays (headers)
+ * \brief 7 segments LED displays Driver
  *
  * Here you find the prototypes and the data structures that
  * format and holds the text that has to be displayed by the
@@ -70,8 +70,7 @@
  * static Seven_Seg display;
  * // ...
  * sevenseg_init(&display);
- * while (!sevenseg_isReady(&display))
- *    ;
+ * while (!sevenseg_isReady(&display));
  * sevenseg_unlock(&display);
  * sevenseg_setBlink(&display,false,0);
  * sevenseg_setRunonce(&display,false);
@@ -94,12 +93,15 @@
 #include <drv/timer.h>
 #include <mware/event.h>
 
-/**
- * \name Numbers and Letters Table.
- * \note These tables contain all the printable
- *       characters on a 7 segment digit encoded
- *       for common cathode and common anode
- *       display type.
+/*
+ * Numbers and Letters Table
+ * Segments definitions
+ * Segments macro
+ *
+ * These tables contain all the printable
+ * characters on a 7 segment digit encoded
+ * for common cathode and common anode
+ * display type.
  *
  * 0, 1, 2, 3, 4, 5, 6, 7, 8,
  * 9, ., -, A, B, C, D, E, F,
@@ -107,7 +109,11 @@
  * P, Q, R, S, T, U, V, W, X,
  * Y, Z, SPACE
  *
- * \{
+ * Follows the Segments definitions for the
+ * graphic digits routines and the macro that
+ * set the graphic digit with the appropriate
+ * segment.
+ *
  */
 #if CONFIG_LED_7SEG_CCAT
 		static const uint8_t segstable[] =
@@ -118,6 +124,16 @@
 				0x73, 0x67, 0x50, 0x6d, 0x78, 0x3e, 0x2a, 0x6a, 0x76,
 				0x6e, 0x5b, 0x0
         };
+		#define SEGMENT_EMPTY (0x00)
+		#define SEGMENT_A (0x01)
+		#define SEGMENT_B (0x02)
+		#define SEGMENT_C (0x04)
+		#define SEGMENT_D (0x08)
+		#define SEGMENT_E (0x10)
+		#define SEGMENT_F (0x20)
+		#define SEGMENT_G (0x40)
+		#define SEGMENT_P (0x80)
+		#define SET_SEGMENT(var, segment) (var |= segment)
 #else
 		static const uint8_t segstable[] =
         {
@@ -127,8 +143,17 @@
 				0x8c, 0x98, 0xaf, 0x92, 0x87, 0xc1, 0xd5, 0x95, 0x89,
 				0x91, 0xa4, 0xff
 		};
+		#define SEGMENT_EMPTY (0xFF)
+		#define SEGMENT_A (0xFE)
+		#define SEGMENT_B (0xFD)
+		#define SEGMENT_C (0xFB)
+		#define SEGMENT_D (0xF7)
+		#define SEGMENT_E (0xEF)
+		#define SEGMENT_F (0xDF)
+		#define SEGMENT_G (0xBF)
+		#define SEGMENT_P (0x7F)
+		#define SET_SEGMENT(var, segment) (var &= segment)
 #endif
-/**\} */
 
 /**
  * Context data for Display functions

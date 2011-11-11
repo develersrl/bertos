@@ -55,7 +55,7 @@ static Timer sseg_trefresh;
  * This is the procedure that prints the seven_seg structure'string to the display.
  * It prints a single digit at time and does all the checks to a proper display.
  * It is called by the wrapper function fired by the timer set in the init procedure.
- * 
+ *
  * param SS The void pointer that holds the pointer to the data structure
  *
  */
@@ -174,50 +174,125 @@ static void sseg_refresh_wrapper(void *VSS)
  */
 INLINE uint8_t sseg_tabcheck(char source)
 {
+	/* If no legal character is recognized return a "space" */
 	uint8_t hexchar=38;
 
 	/* Numbers */
-	if ((((int)source) > 47) && (((int)source) < 58))
+	if ((source > 47) && (source < 58))
 		hexchar = source-48;
 	else
 		/* Capital Letters */
-		if ((((int)source) > 64) && (((int)source) < 91))
+		if ((source > 64) && (source < 91))
 			hexchar = source-53;
 		else
 			/* Letters */
-			if ((((int)source) > 96) && (((int)source) < 123))
+			if ((source > 96) && (source < 123))
 				hexchar = source-85;
 			else
 				/* Minus */
-				if (((int)source) == 45)
+				if (source == 45)
 					hexchar = 11;
 				else
 					/* Space */
-					if (((int)source) == 32)
+					if (source == 32)
 						hexchar = 38;
 					else
 						/* Dot */
-						if (((int)source) == 46)
+						if (source == 46)
 							hexchar = 10;
 	return hexchar;
+}
+
+/*
+ * FUNCTION: sseg_digitbuild
+ *
+ * This function return the hex value of the graphic digit
+ * from a list of segments (ex. ACDP).
+ *
+ * param source The string of segments
+ */
+INLINE uint8_t sseg_digitbuild(const char *gstring, size_t start, size_t stop)
+{
+	/* the default "space" char returned if no "legal" segments recognized */
+	uint8_t graphdigit = SEGMENT_EMPTY;
+	size_t x;
+
+	/* Main cicle */
+	for (x=start;x<=stop;x++)
+	{
+		switch (gstring[x])
+		{
+			case 'A':
+			case 'a':
+						SET_SEGMENT(graphdigit, SEGMENT_A);
+						break;
+			case 'B':
+			case 'b':
+						SET_SEGMENT(graphdigit, SEGMENT_B);
+						break;
+			case 'C':
+			case 'c':
+						SET_SEGMENT(graphdigit, SEGMENT_C);
+						break;
+			case 'D':
+			case 'd':
+						SET_SEGMENT(graphdigit, SEGMENT_D);
+						break;
+			case 'E':
+			case 'e':
+						SET_SEGMENT(graphdigit, SEGMENT_E);
+						break;
+			case 'F':
+			case 'f':
+						SET_SEGMENT(graphdigit, SEGMENT_F);
+						break;
+			case 'G':
+			case 'g':
+						SET_SEGMENT(graphdigit, SEGMENT_G);
+						break;
+			case 'P':
+			case 'p':
+						SET_SEGMENT(graphdigit, SEGMENT_P);
+						break;
+		}
+	}
+	return graphdigit;
 }
 
 /**
  * \brief Print a string on the display
  *
  * This is the procedure that fills the seven_seg structure with the translated
- * string to display. It swaps also the structures to display the new text when
- * all the data is ready to display.
+ * string to display.
+ *
+ * To print a string simply call the procedure with a text string as the second parameter.
+ * Unrecognized characters are printed as a space
+ *
+ * To print "graphic" digits you have to enter them as a sequence of segments between "<>"
+ * for example:
+ * \code
+ * sevenseg_print(display,"<bf>Test Graphic<bf>");
+ * \endcode
+ * This example will print "Test Graphic"
+ *
+ * This is the segments table:
+ * \code
+ *   ___
+ * F| A |B
+ *  |___|
+ *  | G |
+ * E|___|C oP
+ *    D
+ * \endcode
  *
  * \param SS Pointer to the SevenSeg structure
  * \param sstring String to be displayed
  *
- *  \return 0 if all went well, -1 if the display is locked, -2 if the string too long.
+ *  \return 0 if all went well, -1 if the display is locked, -2 if the string too long -3 if the string is malformed.
  */
 int sevenseg_print(SevenSeg *SS, const char *sstring)
 {
-	size_t string_lenght;
-	unsigned int x,y,dotnumber;
+	size_t x,y,string_lenght,dotnumber,graph_digit_num,bracket_num,startgraph,stopgraph;
 	bool dotjump = false;
 	uint8_t hexchar;
 
@@ -229,25 +304,58 @@ int sevenseg_print(SevenSeg *SS, const char *sstring)
 	if (sizeof(&sstring) > (CONFIG_LED_7SEG_STRLEN-(2*CONFIG_LED_7SEG_DIGIT)))
 		return -2;
 
-	/* get the string length and set the number of dots in the string to 0 */
+	/* get the string length and set the number of dots and graphic in the string to 0 */
 	string_lenght = strlen(sstring);
 	dotnumber = 0;
+	graph_digit_num = 0;
+	bracket_num = 0;
 
-	/* check if there are some dots in the string and report the number in dotnumber */
-	for (x=0;x<(unsigned int)string_lenght;x++)
+	/* check if there are some dots an graphics in the string and report the number in dotnumber and graphnumber */
+	for (x=0;x<string_lenght;x++)
 	{
-		if (((int)sstring[x]) == 46)
-			dotnumber++;
+		/* If the first char is a "lonely" dot it has to be counted as a character */
+		if ((sstring[x] == '.') & (x > 0))
+		{
+			/* If the previuos charachter is not a dot or a space we have a dot that
+			 * has to be considered as a part of a previous character so we have to
+			 * to count it */
+			if ((sstring[x-1] != '.') & (sstring[x-1] != ' '))
+				dotnumber++;
+		}
+		/* If we have a "<" or a ">" we have a graphic char */
+		if (sstring[x] == '<')
+		{
+			bracket_num++;
+			x++;
+			while ((sstring[x] != '>') & (x<string_lenght))
+			{
+				x++;
+				graph_digit_num++;
+			}
+				bracket_num++;
+		}
 	}
+	graph_digit_num+=bracket_num;
+	/* if graphoc is > 0 and is not pair we have a malformed string so exit with error */
+		if (bracket_num > 0)
+		{
+			if (bracket_num & 1)
+				return -3;
+			else
+				/* Set the number of characters that compose the graphic
+				 * to remove from the string, we subtract the "real" number
+				 * of graphic character to display */
+				graph_digit_num-=(bracket_num/2);
+		}
 
 	/* If the *REAL* lenght of the string is less or equal than the number of digits */
-	if (((int)string_lenght-dotnumber) <= CONFIG_LED_7SEG_DIGIT)
+	if ((string_lenght-dotnumber-graph_digit_num) <= CONFIG_LED_7SEG_DIGIT)
 	{
 		/* If the *REAL* lenght of the string is less than number of digits */
-		if (((int)string_lenght-dotnumber) < CONFIG_LED_7SEG_DIGIT)
+		if ((string_lenght-dotnumber-graph_digit_num) < CONFIG_LED_7SEG_DIGIT)
 		{
 			/* Fill the left side of the string with blanks */
-			for (x=0; x<(CONFIG_LED_7SEG_DIGIT-((int)string_lenght-dotnumber)); x++)
+			for (x=0; x<(CONFIG_LED_7SEG_DIGIT-(string_lenght-dotnumber-graph_digit_num)); x++)
 				SS->string[x] = segstable[38];
 			y = x;
 		}
@@ -268,39 +376,63 @@ int sevenseg_print(SevenSeg *SS, const char *sstring)
 	}
 	/* Here we start to fill the string with the Hex 7seg characters values */
 	hexchar = 0;
-	for (x=0; x<(unsigned int)string_lenght; x++)
+	for (x=0; x<string_lenght; x++)
 	{
-		hexchar = sseg_tabcheck(sstring[x]);
-		/* do we have a dot? */
-		if (hexchar == 10)
+		/* check if the charcter is a graphic character delimiter */
+		if (sstring[x] == '<')
 		{
-			/* If we are at the first character of the string it has to be forced
-			 * as "lonly" dot ;) */
-			if (x > 0)
-			{
-#if CONFIG_LED_7SEG_CCAT
-				SS->string[y-1] = SS->string[y-1] | segstable[(int)hexchar];
-#else
-				SS->string[y-1] = SS->string[y-1] & segstable[(int)hexchar];
-#endif
-				dotjump = true;
-			}
+			x++;
+			/* set the first character of the graphic "string" to be passed to sseg_digitbuild */
+			startgraph = x;
+			/* if we have an empty graphic char we return an error */
+			if (sstring[x] == '>')
+				return -3;
+			while (sstring[x] != '>')
+				x++;
+			/* set the last character of the graphic "string" to be passed to sseg_digitbuild */
+			stopgraph = x-1;
+			/* if we have a graphic char bigger than 8 (all the segments of the digit) we return an error */
+			if (stopgraph-startgraph > 7)
+				return -3;
+			/* fill the destination string with the graphic digit returned by sseg_digitbuild */
+			SS->string[y] = sseg_digitbuild(sstring,startgraph,stopgraph);
+			/* set next digit */
+			y++;
 		}
-		/* If the last character was a dot and we aren't at the first character of the string
-		 * we have just inserted it */
-		if (dotjump)
-			dotjump = false;
-		/* Let's put the character in the structure's string */
 		else
 		{
-			SS->string[y] = segstable[(int)hexchar];
-			y++;
+			hexchar = sseg_tabcheck(sstring[x]);
+			/* do we have a dot? */
+			if (hexchar == 10)
+			{
+				/* If we are at the first character of the string it has to be forced
+				* as "lonly" dot ;) */
+				if ((x > 0) & ((sstring[x-1] != '.') & (sstring[x-1] != ' ')))
+				{
+#if CONFIG_LED_7SEG_CCAT
+					SS->string[y-1] = SS->string[y-1] | segstable[hexchar];
+#else
+					SS->string[y-1] = SS->string[y-1] & segstable[hexchar];
+#endif
+					dotjump = true;
+				}
+			}
+			/* If the last character was a dot and we aren't at the first character of the string
+			* we have just inserted it */
+			if (dotjump)
+				dotjump = false;
+			/* Let's put the character in the structure's string */
+			else
+			{
+				SS->string[y] = segstable[hexchar];
+				y++;
+			}
 		}
 	}
 	/* If we have the string length bigger than the display we need to fill
 	 * the entire right side of the string with blanks to end the scroll
 	 * to the rigthest side of the display */
-	if (((int)string_lenght-dotnumber) > CONFIG_LED_7SEG_DIGIT)
+	if ((string_lenght-dotnumber-graph_digit_num) > CONFIG_LED_7SEG_DIGIT)
 	{
 		for (x=0; x<CONFIG_LED_7SEG_DIGIT; x++)
 		{
