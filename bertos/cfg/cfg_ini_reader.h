@@ -45,4 +45,6 @@
  */
 #define CONFIG_INI_MAX_LINE_LEN 64
 
+#define CONFIG_INI_CASE_INSENSITIVE	0
+
 #endif /* CFG_INI_READER_H */

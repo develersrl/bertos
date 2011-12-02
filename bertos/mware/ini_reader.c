@@ -65,7 +65,11 @@ static int findSection(KFile *fd, const char *section, size_t section_len, char 
 			continue;
 
 		/* did we find the correct section? */
+#if CONFIG_INI_CASE_INSENSITIVE
+		if(strncasecmp(&line[1], section, section_len))
+#else
 		if(strncmp(&line[1], section, section_len))
+#endif
 			continue;
 		else
 			return 0;
@@ -127,7 +131,11 @@ static int findKey(KFile *fd, const char *key, char *line, size_t size)
 		char curr_key[30];
 		getKey(line, curr_key, 30);
 		/* check key */
+#if CONFIG_INI_CASE_INSENSITIVE
+		if (!strcasecmp(curr_key, key))
+#else
 		if (!strcmp(curr_key, key))
+#endif
 			return 0;
 	}
 	while (err != EOF && *line != '[');
