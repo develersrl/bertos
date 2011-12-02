@@ -251,7 +251,9 @@
 /*\}*/
 
 /* Crystal frequency of the main oscillator (8MHz) */
+#ifndef PLL_VCO
 #define PLL_VCO                    8000000
+#endif
 
 /* Reset and Clock Controller registers */
 struct RCC
