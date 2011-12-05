@@ -103,10 +103,12 @@ FILE *kfile_posix_init(KFilePosix *file, const char *filename, const char *mode)
 	file->fd.close = kfile_posix_close;
 	file->fd.seek = kfile_posix_seek;
 	file->fd.flush = kfile_posix_flush;
-
 	file->fp = fopen(filename, mode);
-	fseek(file->fp, 0, SEEK_END);
-	file->fd.size = ftell(file->fp);
-	fseek(file->fp, 0, SEEK_SET);
+	if (file->fp)
+	{
+		fseek(file->fp, 0, SEEK_END);
+		file->fd.size = ftell(file->fp);
+		fseek(file->fp, 0, SEEK_SET);
+	}
 	return file->fp;
 }
