@@ -21,9 +21,9 @@ S'path'
 p10
 Varm-none-eabi-gcc
 p11
-ssS'PROJECT_SRC_PATH_FROM_MAKEFILE'
+ssS'PROJECT_HW_PATH_FROM_MAKEFILE'
 p12
-Vboards/at91sam7x-ek/examples/at91sam7x-ek_sd_fat
+Vboards/at91sam7x-ek
 p13
 sS'ENABLED_MODULES'
 p14
@@ -67,9 +67,9 @@ p33
 sS'PRESET'
 p34
 I01
-sS'PROJECT_HW_PATH_FROM_MAKEFILE'
+sS'PROJECT_SRC_PATH_FROM_MAKEFILE'
 p35
-Vboards/at91sam7x-ek
+Vboards/at91sam7x-ek/examples/at91sam7x-ek_sd_fat
 p36
 sS'OUTPUT'
 p37
