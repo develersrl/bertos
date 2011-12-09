@@ -63,11 +63,11 @@ MOD_DEFINE(kfile_test);
 #define BUF_TEST_LEN     3209
 
 // Buffer for test
-uint8_t test_buf[BUF_TEST_LEN];
-uint8_t test_buf_save[BUF_TEST_LEN];
+static uint8_t test_buf[BUF_TEST_LEN];
+static uint8_t test_buf_save[BUF_TEST_LEN];
 
-uint8_t test_disk[BUF_TEST_LEN];
-KFileMem mem;
+static uint8_t test_disk[BUF_TEST_LEN];
+static KFileMem mem;
 
 /*
  * Help function to init disk and the buffers.
