@@ -184,6 +184,21 @@
 #endif
 #endif
 
+#ifndef UINTPTR_MAX
+/*
+ * uintptr_t: unsigned integer type large exactly as a pointer.
+ */
+#if SIZEOF_PTR == 2
+	typedef uint16_t uintptr_t;
+#elif SIZEOF_PTR == 4
+	typedef uint32_t uintptr_t;
+#elif SIZEOF_PTR == 8
+	typedef uint64_t uintptr_t;
+#else
+	#error "SIZEOF_PTR size not supported."
+#endif
+#endif
+
 #ifndef SIZEOF_SIZE_T
 #if CPU_REG_BITS < 32
 	#define SIZEOF_SIZE_T   2
@@ -214,8 +229,7 @@
 #define CPU_BITS_PER_PTR    (SIZEOF_PTR * CPU_BITS_PER_CHAR)
 #endif
 
-
-/*\}*/
+/** \} */
 
 #ifndef INT_MAX
 	#define INT_MAX	((int)((unsigned int)~0 >> 1))

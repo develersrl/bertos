@@ -405,7 +405,7 @@
 	#define EXTERN_C_BEGIN  /* nothing */
 	#define EXTERN_C_END    /* nothing */
 	#define EXTERN_CONST    const
-	#define CONST_CAST(TYPE,EXPR)   ((TYPE)(EXPR)) /* FIXME: How can we suppress the warning in C? */
+	#define CONST_CAST(TYPE, EXPR)   ((TYPE)(uintptr_t)(EXPR))
 #endif
 
 
