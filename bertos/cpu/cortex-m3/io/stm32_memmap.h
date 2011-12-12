@@ -48,6 +48,8 @@
 #define FLASH_BASE            (0x40022000)
 /* Flash Option Bytes base address */
 #define OB_BASE               (0x1FFFF800)
+/* Device ID register */
+#define DEVICE_ID_BASE		  (0x1FFFF7E8)
 
 /* Peripheral memory map */
 #define APB1PERIPH_BASE       (PERIPH_BASE)
