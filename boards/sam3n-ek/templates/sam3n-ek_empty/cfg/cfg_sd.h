@@ -64,6 +64,14 @@
 #define CONFIG_SD_AUTOASSIGN_FAT   1
 
 /**
+ * SD bus mode.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "sd_mode"
+ */
+#define CONFIG_SD_MODE     SD_SPI_MODE
+
+/**
  * Enable backward compatibility for sd_init().
  * If enabled, sd_init() will allocate internally an Sd context,
  * otherwise sd_init() will need the context to be passed explicitly.

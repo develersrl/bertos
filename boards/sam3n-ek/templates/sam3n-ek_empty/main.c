@@ -44,8 +44,8 @@
 #include <cfg/debug.h>
 
 #include <cpu/irq.h>
-#include <drv/spi_dma.h>
 
+#include <drv/spi_dma.h>
 #include <drv/timer.h>
 #include <drv/kbd.h>
 #include <drv/lcd_ili9225.h>
