@@ -39,6 +39,8 @@ include ./boards/sam3x-ek/examples/sam3x-ek_http_server/sam3x-ek_http_server.mk
 include ./boards/sam3x-ek/examples/sam3x-ek_sd_bootloader/sam3x-ek_sd_bootloader.mk
 include ./boards/sam3x-ek/examples/sam3x-ek_codec/sam3x-ek_codec.mk
 
+include ./boards/sam3n-ek/templates/sam3n-ek_empty/sam3n-ek_empty.mk
+include ./boards/sam3n-ek/templates/sam3n-ek_kernel/sam3n-ek_kernel.mk
 include ./boards/sam3n-ek/examples/sam3n-ek_display/sam3n-ek_display.mk
 
 include ./boards/stm32-p103/examples/usbserial/usbserial.mk
