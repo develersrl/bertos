@@ -44,7 +44,7 @@
 include("cm3.common")
 
 # CPU type used for flashing/debugging
-MK_PROGRAMMER_CPU = "sam3"
+MK_PROGRAMMER_CPU = "sam3n"
 MK_FLASH_SCRIPT = PRG_SCRIPTS_DIR + "arm/flash-sam3.sh"
 
 # CPU default clock frequency
