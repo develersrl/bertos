@@ -9,7 +9,7 @@ sam3n-ek_empty_DEBUG = 1
 # Our target application
 TRG += sam3n-ek_empty
 
-sam3n-ek_empty_PREFIX = "/localhome/toolchain/arm/bin/arm-none-eabi-"
+sam3n-ek_empty_PREFIX = "arm-none-eabi-"
 
 sam3n-ek_empty_SUFFIX = ""
 

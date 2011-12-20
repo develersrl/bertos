@@ -9,7 +9,7 @@ sam3n-ek_kernel_DEBUG = 1
 # Our target application
 TRG += sam3n-ek_kernel
 
-sam3n-ek_kernel_PREFIX = "/localhome/toolchain/arm/bin/arm-none-eabi-"
+sam3n-ek_kernel_PREFIX = "arm-none-eabi-"
 
 sam3n-ek_kernel_SUFFIX = ""
 
