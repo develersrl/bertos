@@ -82,6 +82,6 @@ sam3x-ek_empty_STOPFLASH_SCRIPT = bertos/prg_scripts/arm/stopopenocd.sh
 sam3x-ek_empty_CPU = cortex-m3
 sam3x-ek_empty_STOPDEBUG_SCRIPT = bertos/prg_scripts/arm/stopopenocd.sh
 sam3x-ek_empty_DEBUG_SCRIPT = bertos/prg_scripts/arm/debug.sh
-sam3x-ek_empty_FLASH_SCRIPT = bertos/prg_scripts/arm/flash-sam3.sh
+sam3x-ek_empty_FLASH_SCRIPT = bertos/prg_scripts/arm/flash-sam3x.sh
 
 include $(sam3x-ek_empty_SRC_PATH)/sam3x-ek_empty_user.mk
