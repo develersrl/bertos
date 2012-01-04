@@ -51,4 +51,20 @@
  */
 #define CONFIG_KDEBUG_BAUDRATE  115200UL
 
+/**
+ * Clock source for the UART module. You need to write the code to reprogram the respective clock at the required frequency in your project before calling kdbg_init().
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "kdbg_clk_src"
+ * $WIZ$ supports = "msp430"
+ */
+#define CONFIG_KDEBUG_CLOCK_SOURCE  KDBG_UART_SMCLK
+
+/**
+ * Clock frequency. (Only if different from MCLK's frequency, otherwise leave it zero)
+ * $WIZ$ type = "int"; min = 0
+ * $WIZ$ supports = "msp430"
+ */
+#define CONFIG_KDEBUG_CLOCK_FREQ 0UL
+
 #endif /* CFG_DEBUG_H */
