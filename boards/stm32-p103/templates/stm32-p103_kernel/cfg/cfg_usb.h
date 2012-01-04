@@ -26,29 +26,60 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2009 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ *
  * -->
  *
- * \brief Configuration file for ini reader module.
+ * \author Andrea Righi <arighi@develer.com>
  *
- *
- * \author Luca Ottaviano <lottaviano@develer.com>
+ * \brief Configuration file for the USB driver module
  */
 
-#ifndef CFG_INI_READER_H
-#define CFG_INI_READER_H
+#ifndef CFG_USB_H
+#define CFG_USB_H
 
 /**
- * Maximum ini file line length (chars).
- * $WIZ$ type = "int"; min = 1
+ * Module logging level.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
  */
-#define CONFIG_INI_MAX_LINE_LEN 64
+#define USB_LOG_LEVEL      LOG_LVL_INFO
 
 /**
- * Make case insensitive comparisons.
- * $WIZ$ type = "boolean"
+ * module logging format.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
  */
-#define CONFIG_INI_CASE_INSENSITIVE	0
+#define USB_LOG_FORMAT     LOG_FMT_TERSE
 
-#endif /* CFG_INI_READER_H */
+/**
+ * Size of the USB buffer used for endpoint transfers [bytes].
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 2
+ */
+#define CONFIG_USB_BUFSIZE  64
+
+/**
+ * Maximum number of USB device interfaces (default = 1).
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 1
+ */
+#define CONFIG_USB_INTERFACE_MAX  1
+
+/**
+ * Maximum number of allocated endpoints (0 = auto).
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 0
+ */
+#define CONFIG_USB_EP_MAX  0
+
+/**
+ * Maximum packet size of the control endpoint 0 [bytes].
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 8
+ */
+#define CONFIG_EP0_MAX_SIZE 8
+
+#endif /* CFG_USB_H */

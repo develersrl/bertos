@@ -26,29 +26,39 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2009 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ *
  * -->
  *
- * \brief Configuration file for ini reader module.
+ * \brief Configuration file for the Eeprom module.
  *
- *
- * \author Luca Ottaviano <lottaviano@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef CFG_INI_READER_H
-#define CFG_INI_READER_H
+#ifndef CFG_EEPROM_H
+#define CFG_EEPROM_H
 
 /**
- * Maximum ini file line length (chars).
- * $WIZ$ type = "int"; min = 1
+ * Module logging level.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
  */
-#define CONFIG_INI_MAX_LINE_LEN 64
+#define EEPROM_LOG_LEVEL      LOG_LVL_INFO
 
 /**
- * Make case insensitive comparisons.
+ * Module logging format.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define EEPROM_LOG_FORMAT     LOG_FMT_TERSE
+
+/**
+ * Check this to disable Eeprom deprecated API support.
+ *
  * $WIZ$ type = "boolean"
  */
-#define CONFIG_INI_CASE_INSENSITIVE	0
+#define CONFIG_EEPROM_DISABLE_OLD_API  0
 
-#endif /* CFG_INI_READER_H */
+#endif /* CFG_EEPROM_H */
