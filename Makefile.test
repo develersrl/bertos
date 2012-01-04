@@ -33,6 +33,10 @@ include ./boards/at91sam7s-ek/templates/at91sam7s-ek_kernel/at91sam7s-ek_kernel.
 include ./boards/at91sam7s-ek/benchmark/at91sam7s-ek_context_switch/at91sam7s-ek_context_switch.mk
 include ./boards/at91sam7s-ek/benchmark/at91sam7s-ek_kernel_footprint/at91sam7s-ek_kernel_footprint.mk
 
+include ./boards/at91sam7x-ek/templates/at91sam7x-ek_empty/at91sam7x-ek_empty.mk
+include ./boards/at91sam7x-ek/templates/at91sam7x-ek_kernel/at91sam7x-ek_kernel.mk
+include ./boards/at91sam7x-ek/benchmark/at91sam7x-ek_context_switch/at91sam7x-ek_context_switch.mk
+include ./boards/at91sam7x-ek/benchmark/at91sam7x-ek_kernel_footprint/at91sam7x-ek_kernel_footprint.mk
 include ./boards/at91sam7x-ek/examples/at91sam7x-ek_sd_fat/at91sam7x-ek_sd_fat.mk
 include ./boards/at91sam7x-ek/examples/at91sam7x-ek_tcp_server/at91sam7x-ek_tcp_server.mk
 
