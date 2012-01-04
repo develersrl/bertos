@@ -26,29 +26,48 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2009 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \brief Configuration file for ini reader module.
+ * \author Daniele Basile <asterix@develer.com>
  *
- *
- * \author Luca Ottaviano <lottaviano@develer.com>
+ * \brief Configuration file for embedded flash module.
  */
 
-#ifndef CFG_INI_READER_H
-#define CFG_INI_READER_H
+#ifndef CFG_EMB_FLASH_H
+#define CFG_EMB_FLASH_H
 
 /**
- * Maximum ini file line length (chars).
- * $WIZ$ type = "int"; min = 1
+ * Module logging level.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
  */
-#define CONFIG_INI_MAX_LINE_LEN 64
+#define CONFIG_FLASH_EMB_LOG_LEVEL      LOG_LVL_INFO
 
 /**
- * Make case insensitive comparisons.
+ * module logging format.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define CONFIG_FLASH_EMB_LOG_FORMAT     LOG_FMT_TERSE
+
+
+/**
+ * Write emb flash timeout.
+ * For how many milliseconds the cpu wait
+ * to complete write operation.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_FLASH_WR_TIMEOUT      100
+
+/**
+ * Check this to disable embedded flash deprecated API support.
+ *
  * $WIZ$ type = "boolean"
  */
-#define CONFIG_INI_CASE_INSENSITIVE	0
+#define CONFIG_FLASH_DISABLE_OLD_API       0
 
-#endif /* CFG_INI_READER_H */
+#endif /* CFG_FLASH_AT91_H */
