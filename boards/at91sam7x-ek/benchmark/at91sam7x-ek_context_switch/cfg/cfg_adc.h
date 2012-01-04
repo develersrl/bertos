@@ -56,9 +56,12 @@
 
 /**
  * Clock Frequency for ADC conversion.
+ * This frequency will be rounded down to an integer
+ * submultiple of CPU_FREQ.
  *
  * $WIZ$ type = "int"
  * $WIZ$ supports = "at91"
+ * $WIZ$ max = 5000000
  */
 #define CONFIG_ADC_CLOCK        4800000UL
 
@@ -66,16 +69,16 @@
  * Minimum time for starting up a conversion [us].
  *
  * $WIZ$ type = "int"
- * $WIZ$ min = 0
+ * $WIZ$ min = 20
  * $WIZ$ supports = "at91"
  */
 #define CONFIG_ADC_STARTUP_TIME 20
 
 /**
- * Minimum time for sample and hold [us].
+ * Minimum time for sample and hold [ns].
  *
  * $WIZ$ type = "int"
- * $WIZ$ min = 0
+ * $WIZ$ min = 600
  * $WIZ$ supports = "at91"
  */
 #define CONFIG_ADC_SHTIME       834
@@ -105,5 +108,42 @@
  * $WIZ$ type = "boolean"
  */
 #define CONFIG_ADC_STROBE  0
+
+
+/**
+ * Start up timer[s] = startup value / ADCClock [Hz]
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "sam3_adc_sut"
+ * $WIZ$ supports = "sam3"
+ */
+#define CONFIG_ADC_SUT         ADC_SUT512
+
+/**
+ * Analog Settling Time[s] = settling value / ADCClock[Hz]
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "sam3_adc_stt"
+ * $WIZ$ supports = "sam3"
+ */
+#define CONFIG_ADC_STTLING     ADC_AST17
+
+/**
+ * Tracking Time[s] = (TRACKTIM + 1) / ADCClock[Hz]
+ *
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 0
+ * $WIZ$ supports = "sam3"
+ */
+#define CONFIG_ADC_TRACKTIM    0
+
+/**
+ * Transfer Period[s] = (TRANSFER * 2 + 3) ADCClock[Hz]
+ *
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 0
+ * $WIZ$ supports = "sam3"
+ */
+#define CONFIG_ADC_TRANSFER    1
 
 #endif /* CFG_ADC_H */

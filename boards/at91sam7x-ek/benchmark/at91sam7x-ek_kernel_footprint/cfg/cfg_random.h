@@ -26,29 +26,40 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2009 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * Copyright 2011 Develer S.r.l. (http://www.develer.com/)
+ *
  * -->
  *
- * \brief Configuration file for ini reader module.
+ * \author Andrea Righi <arighi@develer.com>
  *
- *
- * \author Luca Ottaviano <lottaviano@develer.com>
+ * \brief Configuration file for the "random" module
  */
 
-#ifndef CFG_INI_READER_H
-#define CFG_INI_READER_H
+#ifndef CFG_RANDOM_H
+#define CFG_RANDOM_H
 
 /**
- * Maximum ini file line length (chars).
- * $WIZ$ type = "int"; min = 1
+ * Module logging level.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
  */
-#define CONFIG_INI_MAX_LINE_LEN 64
+#define RANDOM_LOG_LEVEL      LOG_LVL_INFO
 
 /**
- * Make case insensitive comparisons.
- * $WIZ$ type = "boolean"
+ * module logging format.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
  */
-#define CONFIG_INI_CASE_INSENSITIVE	0
+#define RANDOM_LOG_FORMAT     LOG_FMT_TERSE
 
-#endif /* CFG_INI_READER_H */
+/**
+ * Random security level.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "random_level"
+ */
+#define RANDOM_SECURITY_LEVEL          RANDOM_SECURITY_MINIMUM
+
+#endif /* CFG_RANDOM_H */

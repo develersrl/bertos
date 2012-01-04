@@ -26,29 +26,53 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2009 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ *
  * -->
  *
- * \brief Configuration file for ini reader module.
+ * \author Andrea Righi <arighi@develer.com>
  *
- *
- * \author Luca Ottaviano <lottaviano@develer.com>
+ * \brief Configuration file for the usbmouse driver module
  */
 
-#ifndef CFG_INI_READER_H
-#define CFG_INI_READER_H
+#ifndef CFG_USBMOUSE_H
+#define CFG_USBMOUSE_H
 
 /**
- * Maximum ini file line length (chars).
- * $WIZ$ type = "int"; min = 1
+ * Enable the usbmouse module.
+ *
+ * $WIZ$ type = "autoenabled"
  */
-#define CONFIG_INI_MAX_LINE_LEN 64
+#define CONFIG_USBMOUSE 0
 
 /**
- * Make case insensitive comparisons.
- * $WIZ$ type = "boolean"
+ * Module logging level.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
  */
-#define CONFIG_INI_CASE_INSENSITIVE	0
+#define USB_MOUSE_LOG_LEVEL      LOG_LVL_INFO
 
-#endif /* CFG_INI_READER_H */
+/**
+ * module logging format.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define USB_MOUSE_LOG_FORMAT     LOG_FMT_TERSE
+
+/**
+ * USB vendor ID (please change this in your project, using a valid ID number!).
+ *
+ * $WIZ$ type = "hex"
+ */
+#define USB_MOUSE_VENDOR_ID      0xffff
+
+/**
+ * USB product ID (please change this in your project, using a valid ID number!).
+ *
+ * $WIZ$ type = "hex"
+ */
+#define USB_MOUSE_PRODUCT_ID     0x0000
+
+#endif /* CFG_USBMOUSE_H */

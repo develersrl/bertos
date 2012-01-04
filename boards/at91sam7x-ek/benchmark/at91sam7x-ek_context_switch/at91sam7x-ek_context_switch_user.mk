@@ -4,40 +4,40 @@
 #
 
 # Programmer interface configuration, see http://dev.bertos.org/wiki/ProgrammerInterface for help
-context_switch_PROGRAMMER_TYPE = none
-context_switch_PROGRAMMER_PORT = none
+at91sam7x-ek_context_switch_PROGRAMMER_TYPE = none
+at91sam7x-ek_context_switch_PROGRAMMER_PORT = none
 
 # Files included by the user.
-context_switch_USER_CSRC = \
-	$(context_switch_SRC_PATH)/main.c \
+at91sam7x-ek_context_switch_USER_CSRC = \
+	$(at91sam7x-ek_context_switch_SRC_PATH)/main.c \
 	#
 
 # Files included by the user.
-context_switch_USER_PCSRC = \
+at91sam7x-ek_context_switch_USER_PCSRC = \
 	#
 
 # Files included by the user.
-context_switch_USER_CPPASRC = \
+at91sam7x-ek_context_switch_USER_CPPASRC = \
 	#
 
 # Files included by the user.
-context_switch_USER_CXXSRC = \
+at91sam7x-ek_context_switch_USER_CXXSRC = \
 	#
 
 # Files included by the user.
-context_switch_USER_ASRC = \
+at91sam7x-ek_context_switch_USER_ASRC = \
 	#
 
 # Flags included by the user.
-context_switch_USER_LDFLAGS = \
+at91sam7x-ek_context_switch_USER_LDFLAGS = \
 	#
 
 # Flags included by the user.
-context_switch_USER_CPPAFLAGS = \
+at91sam7x-ek_context_switch_USER_CPPAFLAGS = \
 	#
 
 # Flags included by the user.
-context_switch_USER_CPPFLAGS = \
+at91sam7x-ek_context_switch_USER_CPPFLAGS = \
 	-fno-strict-aliasing \
 	-fwrapv \
 	-O2 \

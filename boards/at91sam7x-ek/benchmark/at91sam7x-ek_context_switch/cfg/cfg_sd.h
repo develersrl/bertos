@@ -30,25 +30,54 @@
  * All Rights Reserved.
  * -->
  *
- * \brief Configuration file for ini reader module.
+ * \brief Configuration file Secure Digital module.
  *
  *
- * \author Luca Ottaviano <lottaviano@develer.com>
+ * \author Francesco Sacchi <batt@develer.com>
  */
 
-#ifndef CFG_INI_READER_H
-#define CFG_INI_READER_H
+#ifndef CFG_SD_H
+#define CFG_SD_H
 
 /**
- * Maximum ini file line length (chars).
- * $WIZ$ type = "int"; min = 1
+ * Module logging level.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
  */
-#define CONFIG_INI_MAX_LINE_LEN 64
+#define SD_LOG_LEVEL      LOG_LVL_ERR
 
 /**
- * Make case insensitive comparisons.
+ * Module logging format.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define SD_LOG_FORMAT     LOG_FMT_VERBOSE
+
+
+/**
+ * Enable autoassignment of SD driver to disk drive number 0 of FatFs module.
+ * $WIZ$ type = "boolean"
+ * $WIZ$ conditional_deps = "fat"
+ */
+#define CONFIG_SD_AUTOASSIGN_FAT   1
+
+/**
+ * SD bus mode.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "sd_mode"
+ */
+#define CONFIG_SD_MODE     SD_SPI_MODE
+
+/**
+ * Enable backward compatibility for sd_init().
+ * If enabled, sd_init() will allocate internally an Sd context,
+ * otherwise sd_init() will need the context to be passed explicitly.
+ *
  * $WIZ$ type = "boolean"
  */
-#define CONFIG_INI_CASE_INSENSITIVE	0
+#define CONFIG_SD_OLD_INIT   1
 
-#endif /* CFG_INI_READER_H */
+#endif /* CFG_SD_H */

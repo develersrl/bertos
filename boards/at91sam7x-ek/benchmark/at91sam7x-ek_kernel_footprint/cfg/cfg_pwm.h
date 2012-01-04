@@ -53,4 +53,12 @@
  */
 #define PWM_LOG_FORMAT     LOG_FMT_VERBOSE
 
+/**
+ * Enable the OLD pwm API.
+ * Not recommended for new projects.
+ *
+ * $WIZ$ type = "boolean"
+ */
+#define CFG_PWM_ENABLE_OLD_API	1
+
 #endif /* CFG_PWM_H */

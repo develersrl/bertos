@@ -26,45 +26,86 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ * Copyright 2011 Develer S.r.l. (http://www.develer.com/)
  * -->
  *
- * \brief Configuration file for Debug module.
+ * \author Stefano Fedrigo <aleph@develer.com>
  *
+ * \brief Configuration file for NAND driver module.
+ */
+
+#ifndef CFG_NAND_H
+#define CFG_NAND_H
+
+/**
+ * Page data size
  *
- * \author Daniele Basile <asterix@develer.com>
+ * Size of the data section of a programmable page in bytes.
+ *
+ * $WIZ$ type = "int"
  */
-
-#ifndef CFG_DEBUG_H
-#define CFG_DEBUG_H
+#define CONFIG_NAND_DATA_SIZE         2048
 
 /**
- * Debug console port.
- * $WIZ$ type = "int"; min = 0
+ * Page spare area size
+ *
+ * Size of the spare section of a programmable page in bytes.
+ *
+ * $WIZ$ type = "int"
  */
-#define CONFIG_KDEBUG_PORT 0
+#define CONFIG_NAND_SPARE_SIZE        64
 
 /**
- * Baudrate for the debug console.
- * $WIZ$ type = "int"; min = 300
+ * Pages per block
+ *
+ * Number of pages in a erase block.
+ *
+ * $WIZ$ type = "int"
  */
-#define CONFIG_KDEBUG_BAUDRATE  115200UL
+#define CONFIG_NAND_PAGES_PER_BLOCK   64
 
 /**
- * Clock source for the UART module. You need to write the code to reprogram the respective clock at the required frequency in your project before calling kdbg_init().
+ * Number of blocks
+ *
+ * Total number of erase blocks in one NAND chip.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_NAND_NUM_BLOCK        2048
+
+/**
+ * Number of reserved blocks
+ *
+ * Blocks reserved for remapping defective NAND blocks.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_NAND_NUM_REMAP_BLOCKS  128
+
+/**
+ * NAND operations timeout
+ *
+ * How many milliseconds the cpu waits for
+ * completion of NAND operations.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_NAND_TMOUT      100
+
+/**
+ * Module logging level
  *
  * $WIZ$ type = "enum"
- * $WIZ$ value_list = "kdbg_clk_src"
- * $WIZ$ supports = "msp430"
+ * $WIZ$ value_list = "log_level"
  */
-#define CONFIG_KDEBUG_CLOCK_SOURCE  KDBG_UART_SMCLK
+#define CONFIG_NAND_LOG_LEVEL      LOG_LVL_WARN
 
 /**
- * Clock frequency. (Only if different from MCLK's frequency, otherwise leave it zero)
- * $WIZ$ type = "int"; min = 0
- * $WIZ$ supports = "msp430"
+ * Module logging format
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
  */
-#define CONFIG_KDEBUG_CLOCK_FREQ 0UL
+#define CONFIG_NAND_LOG_FORMAT     LOG_FMT_TERSE
 
-#endif /* CFG_DEBUG_H */
+#endif /* CFG_NAND_H */
