@@ -33,6 +33,9 @@ include ./boards/at91sam7s-ek/templates/at91sam7s-ek_kernel/at91sam7s-ek_kernel.
 include ./boards/at91sam7s-ek/benchmark/at91sam7s-ek_context_switch/at91sam7s-ek_context_switch.mk
 include ./boards/at91sam7s-ek/benchmark/at91sam7s-ek_kernel_footprint/at91sam7s-ek_kernel_footprint.mk
 
+include ./boards/at91sam7x-ek/examples/at91sam7x-ek_sd_fat/at91sam7x-ek_sd_fat.mk
+include ./boards/at91sam7x-ek/examples/at91sam7x-ek_tcp_server/at91sam7x-ek_tcp_server.mk
+
 include ./boards/sam3x-ek/examples/sam3x-ek_display/sam3x-ek_display.mk
 include ./boards/sam3x-ek/examples/sam3x-ek_tcp_server/sam3x-ek_tcp_server.mk
 include ./boards/sam3x-ek/examples/sam3x-ek_http_server/sam3x-ek_http_server.mk
@@ -43,11 +46,14 @@ include ./boards/sam3n-ek/templates/sam3n-ek_empty/sam3n-ek_empty.mk
 include ./boards/sam3n-ek/templates/sam3n-ek_kernel/sam3n-ek_kernel.mk
 include ./boards/sam3n-ek/examples/sam3n-ek_display/sam3n-ek_display.mk
 
+include ./boards/stm32-p103/templates/stm32-p103_empty/stm32-p103_empty.mk
+include ./boards/stm32-p103/templates/stm32-p103_kernel/stm32-p103_kernel.mk
+include ./boards/stm32-p103/benchmark/stm32-p103_context_switch/stm32-p103_context_switch.mk
+include ./boards/stm32-p103/benchmark/stm32-p103_kernel_footprint/stm32-p103_kernel_footprint.mk
 include ./boards/stm32-p103/examples/usbserial/usbserial.mk
 include ./boards/stm32-p103/examples/usbmouse/usbmouse.mk
 include ./boards/stm32-p103/examples/usbkeyboard/usbkeyboard.mk
+
 include ./boards/ek-lm3s1968/examples/gps/gps.mk
-include ./boards/at91sam7x-ek/examples/at91sam7x-ek_sd_fat/at91sam7x-ek_sd_fat.mk
-include ./boards/at91sam7x-ek/examples/at91sam7x-ek_tcp_server/at91sam7x-ek_tcp_server.mk
 
 include bertos/rules.mk
