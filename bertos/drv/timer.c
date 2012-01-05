@@ -404,15 +404,12 @@ void timer_init(void)
 
 #if (ARCH & ARCH_EMUL) || (CPU_ARM_AT91)
 /**
- * Stop timer (only used by emulator)
+ * Stop timer
  */
 void timer_cleanup(void)
 {
 	MOD_CLEANUP(timer);
 
 	timer_hw_cleanup();
-
-	// Hmmm... apparently, the demo app does not cleanup properly
-	//ASSERT(LIST_EMPTY(&timers_queue));
 }
-#endif /* ARCH_EMUL */
+#endif
