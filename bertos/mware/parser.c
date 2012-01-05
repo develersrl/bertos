@@ -137,7 +137,9 @@ static bool parseArgs(const char *fmt, const char *input, parms argv[])
 				break;
 
 			case 's':
-				(*argv++).s = begin;
+				(*argv).str.p = begin;
+				(*argv).str.sz = end - begin;
+				argv++;
 				break;
 
 			default:
@@ -264,7 +266,7 @@ bool parser_get_cmd_arguments(const char* input, const struct CmdTemplate* cmdp,
 	if (!input)
 		return false;
 
-	args[0].s = cmdp->name;
+	args[0].str.p = cmdp->name;
 	if (!parseArgs(cmdp->arg_fmt, input, args + 1))
 		return false;
 

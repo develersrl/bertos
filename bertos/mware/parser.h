@@ -131,8 +131,14 @@ typedef enum
 	RC_SKIP   = 2   ///< Skip following commands
 } ResultCode;
 
+typedef struct
+{
+	const char *p;
+	int sz;
+} str_parm;
+
 /** union that contains parameters passed to and from commands */
-typedef union { long l; const char *s; } parms;
+typedef union { long l; str_parm str; } parms;
 /** pointer to commands */
 typedef ResultCode (*CmdFuncPtr)(parms args_results[]);
 
