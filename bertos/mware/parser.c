@@ -89,17 +89,31 @@ DECLARE_HASHTABLE_STATIC(commands, CONFIG_MAX_COMMANDS_NUMBER, get_key_from_comm
  * \return True if a word was extracted, false if we got to the end
  * of the string without extracting any word.
  */
-static bool get_word(const char **begin, const char **end)
+bool get_word(const char **begin, const char **end)
 {
 	const char *cur = *end;
+	bool open_quote = false;
 
 	while ((*cur == ' ' || *cur == '\t') && *cur)
 		++cur;
 
+	if (*cur == '"')
+		open_quote = true;
+
 	*begin = cur;
 
-	while ((*cur != ' ' && *cur != '\t') && *cur)
+	if (open_quote)
+	{
 		++cur;
+		while (*cur != '"' && *cur)
+			++cur;
+		if (*cur != '"')
+			return false;
+		++cur;
+	}
+	else
+		while ((*cur != ' ' && *cur != '\t') && *cur)
+			++cur;
 
 	*end = cur;
 
@@ -139,6 +153,12 @@ static bool parseArgs(const char *fmt, const char *input, parms argv[])
 			case 's':
 				(*argv).str.p = begin;
 				(*argv).str.sz = end - begin;
+				/* Remove the quotes from argument */
+				if (*begin == '"' && *(end - 1) == '"')
+				{
+					(*argv).str.p += 1;
+					(*argv).str.sz -= 2;
+				}
 				argv++;
 				break;
 

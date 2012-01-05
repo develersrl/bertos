@@ -263,6 +263,7 @@ INLINE bool parser_execute_cmd(const struct CmdTemplate* templ, parms args[CONFI
 const struct CmdTemplate* parser_get_cmd_template(const char* line);
 
 bool parser_get_cmd_arguments(const char* line, const struct CmdTemplate* templ, parms args[CONFIG_PARSER_MAX_ARGS]);
+bool get_word(const char **begin, const char **end);
 
 #if CONFIG_ENABLE_COMPAT_BEHAVIOUR
 /**
