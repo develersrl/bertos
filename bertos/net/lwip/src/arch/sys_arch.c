@@ -360,7 +360,7 @@ sys_thread_t sys_thread_new(const char *name, void (* thread)(void *arg),
 
 	#if !CONFIG_KERN_HEAP
 		ASSERT(stacksize <= DEFAULT_THREAD_STACKSIZE);
-		PROC_ATOMIC(stackbase = &thread_stack[last_stack++]);
+		PROC_ATOMIC(stackbase = thread_stack[last_stack++]);
 	#else
 		stackbase = NULL;
 	#endif
