@@ -71,6 +71,10 @@
  */
 int ini_getString(KFile *fd, const char *section, const char *key, const char *default_value, char *buf, size_t size);
 
+
+int ini_getInteger(KFile *fd, const char *section, const char *key, long default_value, long *val, int base);
+int ini_setString(KFile *in, KFile *out, const char *section, const char *key, const char *value);
+
 int ini_reader_testSetup(void);
 int ini_reader_testRun(void);
 int ini_reader_testTearDown(void);

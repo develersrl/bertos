@@ -39,19 +39,40 @@
 #include "cfg/cfg_ini_reader.h"
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h> //strtol
 #include <ctype.h>
+
+static bool lineEmpty(const char *line)
+{
+	while (*line)
+	{
+		if (!isspace((unsigned char)*line++))
+			return false;
+	}
+	return true;
+}
 
 /*
  * Returns when the line containing the section is found.
- * The file pointer is positioned at the start of the next line.
+ * The file pointer is positioned at the start of the next line or
+ * after the last non-empty line if the section is not found.
  * Returns EOF if no section was found, 0 otherwise.
  */
 static int findSection(KFile *fd, const char *section, size_t section_len, char *line, size_t size)
 {
-	while (kfile_gets(fd, line, size) != EOF)
+	kfile_off_t last_full = fd->seek_pos;
+
+	int err;
+	do
 	{
 		char *ptr = line;
 		unsigned i;
+		err = kfile_gets(fd, line, size);
+
+		/* Remember the last filled line in file */
+		if (!lineEmpty(line))
+			last_full = fd->seek_pos;
+
 		/* accept only sections that begin at first char */
 		if (*ptr++ != '[')
 			continue;
@@ -65,15 +86,14 @@ static int findSection(KFile *fd, const char *section, size_t section_len, char 
 			continue;
 
 		/* did we find the correct section? */
-#if CONFIG_INI_CASE_INSENSITIVE
-		if(strncasecmp(&line[1], section, section_len))
-#else
 		if(strncmp(&line[1], section, section_len))
-#endif
 			continue;
 		else
 			return 0;
 	}
+	while (err != EOF);
+
+	kfile_seek(fd, last_full, KSM_SEEK_SET);
 	return EOF;
 }
 
@@ -125,20 +145,29 @@ static char *getValue(const char *line, char *value, size_t size)
 static int findKey(KFile *fd, const char *key, char *line, size_t size)
 {
 	int err;
+	char curr_key[30];
+	kfile_off_t last_full = fd->seek_pos;
+	kfile_off_t key_pos = fd->seek_pos;
+
 	do
 	{
 		err = kfile_gets(fd, line, size);
-		char curr_key[30];
+
 		getKey(line, curr_key, 30);
 		/* check key */
-#if CONFIG_INI_CASE_INSENSITIVE
-		if (!strcasecmp(curr_key, key))
-#else
 		if (!strcmp(curr_key, key))
-#endif
+		{
+			kfile_seek(fd, key_pos, KSM_SEEK_SET);
 			return 0;
+		}
+
+		/* Remember the last filled line in the section */
+		if (!lineEmpty(line) && *line != '[')
+			last_full = fd->seek_pos;
+		key_pos = fd->seek_pos;
 	}
 	while (err != EOF && *line != '[');
+	kfile_seek(fd, last_full, KSM_SEEK_SET);
 	return EOF;
 }
 
@@ -167,3 +196,118 @@ error:
 		buf[size - 1] = '\0';
 	return EOF;
 }
+
+int ini_getInteger(KFile *fd, const char *section, const char *key, long default_value, long *val, int base)
+{
+	char buf[CONFIG_INI_MAX_LINE_LEN];
+
+	if (ini_getString(fd, section, key, "", buf, sizeof(buf)) == EOF)
+		goto error;
+
+	char **endptr = NULL;
+	*val = strtol(buf, endptr, base);
+
+	if (buf[0] == 0 || **endptr != 0)
+		goto error;
+
+	return 0;
+
+error:
+	*val = default_value;
+	return EOF;
+}
+
+/*
+ * Return the position immediatly following the last non-empty line in the file,
+ * starting from current position.
+ * The file seek position is unchanged at function exit.
+ */
+static kfile_off_t findLastLine(KFile *fd, char *line, size_t size)
+{
+	kfile_off_t start = fd->seek_pos;
+	kfile_off_t last_full = start;
+
+	int err;
+	do
+	{
+		err = kfile_gets(fd, line, size);
+		if (!lineEmpty(line))
+			last_full = fd->seek_pos;
+	}
+	while (err != EOF);
+	kfile_seek(fd, start, KSM_SEEK_SET);
+	return last_full;
+}
+
+int ini_setString(KFile *in, KFile *out, const char *section, const char *key, const char *value)
+{
+	char line[CONFIG_INI_MAX_LINE_LEN];
+
+	if (kfile_seek(in, 0, KSM_SEEK_SET) == EOF)
+	    return EOF;
+
+	if (kfile_seek(out, 0, KSM_SEEK_SET) == EOF)
+	    return EOF;
+
+	bool section_found = false;
+	bool key_found = false;
+	if (findSection(in, section, strlen(section), line, CONFIG_INI_MAX_LINE_LEN) != EOF)
+	{
+		section_found = true;
+		key_found = (findKey(in, key, line, CONFIG_INI_MAX_LINE_LEN) != EOF);
+	}
+
+	kfile_off_t len = in->seek_pos;
+
+	/* Copy until key */
+	if (kfile_seek(in, 0, KSM_SEEK_SET) == EOF)
+			return EOF;
+	if (kfile_copy(in, out, len) != len)
+			return EOF;
+
+	if (!section_found && value)
+	{
+		if ((size_t)kfile_printf(out, "\n[%s]\n", section) != (strlen(section) + 4))
+			return EOF;
+	}
+	if (value)
+	{
+		if ((size_t)kfile_printf(out, "%s=%s\n", key, value) != (strlen(key) + strlen(value) + 2))
+			return EOF;
+	}
+
+	/* Skip the old line with the key */
+	if (key_found)
+		kfile_gets(in, line, CONFIG_INI_MAX_LINE_LEN);
+
+	/*
+	 * Copy the rest of the input file.
+	 * Do not return error if the copied bytes are less than expected
+	 * but at least enough to write the last non-empty line.
+	 * This is needed for example if the out KFile is of fixed size (like memories).
+	 */
+	len = in->size - in->seek_pos;
+	kfile_off_t bytes_needed = findLastLine(in, line, CONFIG_INI_MAX_LINE_LEN) - in->seek_pos;
+	if (kfile_copy(in, out, len) < bytes_needed)
+		return EOF;
+
+	/*
+	 * Clear the rest of the out file in order to wipe out garbage if the resulting
+	 * file is shorter than before.
+	 */
+	kfile_off_t fill = out->size - out->seek_pos;
+
+	if (fill--)
+	{
+		if (kfile_putc('\n', out) == EOF)
+			return EOF;
+		while (fill--)
+		{
+			if (kfile_putc(' ', out) == EOF)
+				return EOF;
+		}
+	}
+
+	return 0;
+}
+
