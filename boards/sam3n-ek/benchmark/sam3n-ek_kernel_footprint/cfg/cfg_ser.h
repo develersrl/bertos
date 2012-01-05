@@ -160,14 +160,14 @@
  *
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "ser_order_bit"
- * $WIZ$ supports = "avr"
+ * $WIZ$ supports = "avr and not xmega32d"
  */
 #define CONFIG_SPI_DATA_ORDER	SER_MSB_FIRST
 
 /**
  * SPI clock division factor.
  * $WIZ$ type = "int"
- * $WIZ$ supports = "avr"
+ * $WIZ$ supports = "avr and not xmega32d"
  */
 #define CONFIG_SPI_CLOCK_DIV	16
 
@@ -175,7 +175,7 @@
  * SPI clock polarity: normal low or normal high.
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "ser_spi_pol"
- * $WIZ$ supports = "avr"
+ * $WIZ$ supports = "avr and not xmega32d"
  */
 #define CONFIG_SPI_CLOCK_POL        SPI_NORMAL_LOW
 
@@ -184,7 +184,7 @@
  * sample on second clock edge.
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "ser_spi_phase"
- * $WIZ$ supports = "avr"
+ * $WIZ$ supports = "avr and not xmega32d"
  */
 #define CONFIG_SPI_CLOCK_PHASE	    SPI_SAMPLE_ON_FIRST_EDGE
 

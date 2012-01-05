@@ -109,4 +109,41 @@
  */
 #define CONFIG_ADC_STROBE  0
 
+
+/**
+ * Start up timer[s] = startup value / ADCClock [Hz]
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "sam3_adc_sut"
+ * $WIZ$ supports = "sam3"
+ */
+#define CONFIG_ADC_SUT         ADC_SUT512
+
+/**
+ * Analog Settling Time[s] = settling value / ADCClock[Hz]
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "sam3_adc_stt"
+ * $WIZ$ supports = "sam3"
+ */
+#define CONFIG_ADC_STTLING     ADC_AST17
+
+/**
+ * Tracking Time[s] = (TRACKTIM + 1) / ADCClock[Hz]
+ *
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 0
+ * $WIZ$ supports = "sam3"
+ */
+#define CONFIG_ADC_TRACKTIM    0
+
+/**
+ * Transfer Period[s] = (TRANSFER * 2 + 3) ADCClock[Hz]
+ *
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 0
+ * $WIZ$ supports = "sam3"
+ */
+#define CONFIG_ADC_TRANSFER    1
+
 #endif /* CFG_ADC_H */

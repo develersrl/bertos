@@ -4,40 +4,40 @@
 #
 
 # Programmer interface configuration, see http://dev.bertos.org/wiki/ProgrammerInterface for help
-kernel_footprint_PROGRAMMER_TYPE = none
-kernel_footprint_PROGRAMMER_PORT = none
+sam3n-ek_kernel_footprint_PROGRAMMER_TYPE = none
+sam3n-ek_kernel_footprint_PROGRAMMER_PORT = none
 
 # Files included by the user.
-kernel_footprint_USER_CSRC = \
-	$(kernel_footprint_SRC_PATH)/main.c \
+sam3n-ek_kernel_footprint_USER_CSRC = \
+	$(sam3n-ek_kernel_footprint_SRC_PATH)/main.c \
 	#
 
 # Files included by the user.
-kernel_footprint_USER_PCSRC = \
+sam3n-ek_kernel_footprint_USER_PCSRC = \
 	#
 
 # Files included by the user.
-kernel_footprint_USER_CPPASRC = \
+sam3n-ek_kernel_footprint_USER_CPPASRC = \
 	#
 
 # Files included by the user.
-kernel_footprint_USER_CXXSRC = \
+sam3n-ek_kernel_footprint_USER_CXXSRC = \
 	#
 
 # Files included by the user.
-kernel_footprint_USER_ASRC = \
+sam3n-ek_kernel_footprint_USER_ASRC = \
 	#
 
 # Flags included by the user.
-kernel_footprint_USER_LDFLAGS = \
+sam3n-ek_kernel_footprint_USER_LDFLAGS = \
 	#
 
 # Flags included by the user.
-kernel_footprint_USER_CPPAFLAGS = \
+sam3n-ek_kernel_footprint_USER_CPPAFLAGS = \
 	#
 
 # Flags included by the user.
-kernel_footprint_USER_CPPFLAGS = \
+sam3n-ek_kernel_footprint_USER_CPPFLAGS = \
 	-fno-strict-aliasing \
 	-fwrapv \
 	#
