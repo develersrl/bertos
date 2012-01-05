@@ -250,6 +250,9 @@
 /** Check if \a x is an integer power of 2. */
 #define IS_POW2(x)     (!(bool)((x) & ((x)-1)))
 
+/** Check if \a x is aligned to \a byte_count bytes */
+#define IS_ALIGNED(x, byte_count) ((uintptr_t)(const void *)(x) % (byte_count) == 0)
+
 /** Calculate a compile-time log2 for a uint8_t */
 #define UINT8_LOG2(x) \
 	((x) < 2 ? 0 : \
