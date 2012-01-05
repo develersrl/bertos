@@ -151,13 +151,13 @@ static bool parseArgs(const char *fmt, const char *input, parms argv[])
 				break;
 
 			case 's':
-				(*argv).str.p = begin;
-				(*argv).str.sz = end - begin;
+				(*argv).s.p = begin;
+				(*argv).s.sz = end - begin;
 				/* Remove the quotes from argument */
 				if (*begin == '"' && *(end - 1) == '"')
 				{
-					(*argv).str.p += 1;
-					(*argv).str.sz -= 2;
+					(*argv).s.p += 1;
+					(*argv).s.sz -= 2;
 				}
 				argv++;
 				break;
@@ -286,7 +286,7 @@ bool parser_get_cmd_arguments(const char* input, const struct CmdTemplate* cmdp,
 	if (!input)
 		return false;
 
-	args[0].str.p = cmdp->name;
+	args[0].s.p = cmdp->name;
 	if (!parseArgs(cmdp->arg_fmt, input, args + 1))
 		return false;
 

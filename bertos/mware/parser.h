@@ -138,7 +138,7 @@ typedef struct
 } str_parm;
 
 /** union that contains parameters passed to and from commands */
-typedef union { long l; str_parm str; } parms;
+typedef union { long l; str_parm s; } parms;
 /** pointer to commands */
 typedef ResultCode (*CmdFuncPtr)(parms args_results[]);
 
