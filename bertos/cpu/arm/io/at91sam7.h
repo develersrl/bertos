@@ -369,6 +369,7 @@
 	#define PWM_PIO_PDR     PIOB_PDR
 	#define PWM_PIO_PER     PIOB_PER
 	#define PWM_PIO_CODR    PIOB_CODR
+	#define PWM_PIO_SODR    PIOB_SODR
 	#define PWM_PIO_OER     PIOB_OER
 	#define PWM_PIO_ABSR    PIOB_ASR
 
@@ -381,6 +382,7 @@
 	#define PWM_PIO_PDR     PIOA_PDR
 	#define PWM_PIO_PER     PIOA_PER
 	#define PWM_PIO_CODR    PIOA_CODR
+	#define PWM_PIO_SODR    PIOA_SODR
 	#define PWM_PIO_OER     PIOA_OER
 	#define PWM_PIO_ABSR    PIOA_BSR
 
