@@ -75,6 +75,11 @@
 		IRQ_RESTORE(flags);
 	}
 
+	void timer_hw_cleanup(void)
+	{
+		PIT_MR &= ~BV(PITEN);
+		sysirq_setEnable(SYSIRQ_PIT, false);
+	}
 #else
 	#error Unimplemented value for CONFIG_TIMER
 #endif /* CONFIG_TIMER */

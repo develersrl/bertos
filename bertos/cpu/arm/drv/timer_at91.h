@@ -103,6 +103,7 @@
 #endif /* CONFIG_TIMER */
 
 void timer_hw_init(void);
+void timer_hw_cleanup(void);
 
 
 #endif /* DRV_TIMER_AT91_H */

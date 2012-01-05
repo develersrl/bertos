@@ -402,7 +402,7 @@ void timer_init(void)
 }
 
 
-#if (ARCH & ARCH_EMUL)
+#if (ARCH & ARCH_EMUL) || (CPU_ARM_AT91)
 /**
  * Stop timer (only used by emulator)
  */
