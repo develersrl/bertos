@@ -41,4 +41,6 @@
 
 extern uint8_t mac_addr[6];
 
-#endif // HW_ETH_H
+#define PHY_HW_INIT() do { /* Implement me! */ } while (0)
+
+#endif /* HW_ETH_H */

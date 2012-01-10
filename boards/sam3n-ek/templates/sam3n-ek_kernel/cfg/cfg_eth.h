@@ -54,4 +54,13 @@
  */
 #define ETH_LOG_FORMAT     LOG_FMT_TERSE
 
+/**
+ * Select the supported phy chip.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "phy_chip_list"
+ */
+#define CONFIG_PHY_CHIP     DAVICOM_DM9161A
+
+
 #endif /* CFG_ETH_H */

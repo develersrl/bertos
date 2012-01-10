@@ -44,14 +44,18 @@
 #define DRV_ETH_H
 
 #include "hw/hw_eth.h"
+#include "cfg/cfg_eth.h"
+
+#include <drv/phy.h>
+
 #include <cpu/types.h>
+
 
 #define ETH_ADDR_LEN	6
 #define ETH_HEAD_LEN	14
 #define ETH_DATA_LEN	1500
 #define ETH_FRAME_LEN	(ETH_HEAD_LEN + ETH_DATA_LEN)
-
-#define ETH_TYPE_IP	0x0800
+#define ETH_TYPE_IP     0x0800
 
 typedef union Ethernet
 {

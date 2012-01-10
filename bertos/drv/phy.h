@@ -26,41 +26,40 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2011 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
- * \author Andrea Righi <arighi@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
  *
- * \brief Configuration file for the generic ethernet driver module
+ * \brief PHY chip interface.
+ *
+ * $WIZ$
  */
 
-#ifndef CFG_ETH_H
-#define CFG_ETH_H
+#ifndef DRV_PHY_H
+#define DRV_PHY_H
+
+#include <cfg/cfg_eth.h>
 
 /**
- * Module logging level.
+ * \name Supported PHY chip.
  *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_level"
- */
-#define ETH_LOG_LEVEL      LOG_LVL_WARN
-
-/**
- * module logging format.
+ * List of supported PHY chip.
  *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_format"
+ * $WIZ$ phy_chip_list = "DAVICOM_DM9161A", "NATIONAL_DP3848I"
+ * \{
  */
-#define ETH_LOG_FORMAT     LOG_FMT_TERSE
+#define DAVICOM_DM9161A          0
+#define NATIONAL_DP3848I         1
+/** \} */
 
-/**
- * Select the supported phy chip.
- *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "phy_chip_list"
- */
-#define CONFIG_PHY_CHIP     DAVICOM_DM9161A
+#if CONFIG_PHY_CHIP == DAVICOM_DM9161A
+	#include <drv/dm9161a.h>
+#elif CONFIG_PHY_CHIP == NATIONAL_DP3848I
+	#include <drv/dp8348i.h>
+#else
+	#error No supported PHY chip was select.
+#endif
 
-
-#endif /* CFG_ETH_H */
+#endif /* DRV_PHY_H */

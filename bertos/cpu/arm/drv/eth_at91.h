@@ -39,9 +39,8 @@
 #ifndef ETH_AT91_H
 #define ETH_AT91_H
 
-// Settings and definition for DAVICOM 9161A
+// Settings and definition for PHY registers
 // \{
-#define NIC_PHY_ADDR            31
 
 //Registry definition
 #define NIC_PHY_BMCR            0x00    //  Basic mode control register.
@@ -66,48 +65,44 @@
 #define NIC_PHY_ANLPAR          0x05    //  Auto negotiation link partner availability register.
 #define NIC_PHY_ANER            0x06    //  Auto negotiation expansion register.
 
-// Pin definition for DAVICOM 9161A
-// See schematic for at91sam7x-ek evalution board
-#define PHY_TXCLK_ISOLATE_BIT   0
-#define PHY_REFCLK_XT2_BIT      0
-#define PHY_TXEN_BIT            1
-#define PHY_TXD0_BIT            2
-#define PHY_TXD1_BIT            3
-#define PHY_CRS_AD4_BIT         4
-#define PHY_RXD0_AD0_BIT        5
-#define PHY_RXD1_AD1_BIT        6
-#define PHY_RXER_RXD4_RPTR_BIT  7
-#define PHY_MDC_BIT             8
-#define PHY_MDIO_BIT            9
-#define PHY_TXD2_BIT            10
-#define PHY_TXD3_BIT            11
-#define PHY_TXER_TXD4_BIT       12
-#define PHY_RXD2_AD2_BIT        13
-#define PHY_RXD3_AD3_BIT        14
-#define PHY_RXDV_TESTMODE_BIT   15
-#define PHY_COL_RMII_BIT        16
-#define PHY_RXCLK_10BTSER_BIT   17
-#define PHY_PWRDN_BIT           18
-#define PHY_MDINTR_BIT          26
+/* Pin definition MII/RMII PHY interdace */
+#define PHY_TXCLK_BIT      BV(0)
+#define PHY_TXEN_BIT       BV(1)
+#define PHY_TXD0_BIT       BV(2)
+#define PHY_TXD1_BIT       BV(3)
+#define PHY_CRS_BIT        BV(4)
+#define PHY_RXD0_BIT       BV(5)
+#define PHY_RXD1_BIT       BV(6)
+#define PHY_RXER_BIT       BV(7)
+#define PHY_MDC_BIT        BV(8)
+#define PHY_MDIO_BIT       BV(9)
+#define PHY_TXD2_BIT       BV(10)
+#define PHY_TXD3_BIT       BV(11)
+#define PHY_TXER_BIT       BV(12)
+#define PHY_RXD2_BIT       BV(13)
+#define PHY_RXD3_BIT       BV(14)
+#define PHY_RXDV_BIT       BV(15)
+#define PHY_COL_BIT        BV(16)
+#define PHY_RXCLK_BIT      BV(17)
 
-#define PHY_MII_PINS   BV(PHY_REFCLK_XT2_BIT) \
-	| BV(PHY_TXEN_BIT) \
-	| BV(PHY_TXD0_BIT) \
-	| BV(PHY_TXD1_BIT) \
-	| BV(PHY_CRS_AD4_BIT) \
-	| BV(PHY_RXD0_AD0_BIT) \
-	| BV(PHY_RXD1_AD1_BIT) \
-	| BV(PHY_RXER_RXD4_RPTR_BIT) \
-	| BV(PHY_MDC_BIT) \
-	| BV(PHY_MDIO_BIT) \
-	| BV(PHY_TXD2_BIT) \
-	| BV(PHY_TXD3_BIT) \
-	| BV(PHY_TXER_TXD4_BIT) \
-	| BV(PHY_RXD2_AD2_BIT) \
-	| BV(PHY_RXD3_AD3_BIT) \
-	| BV(PHY_RXDV_TESTMODE_BIT) \
-	| BV(PHY_COL_RMII_BIT) \
-	| BV(PHY_RXCLK_10BTSER_BIT)
+#define PHY_MII_PINS   \
+	( PHY_TXEN_BIT \
+	| PHY_TXD0_BIT \
+	| PHY_TXD1_BIT \
+	| PHY_CRS_BIT \
+	| PHY_RXD0_BIT \
+	| PHY_RXD1_BIT \
+	| PHY_RXER_BIT \
+	| PHY_MDC_BIT \
+	| PHY_MDIO_BIT \
+	| PHY_TXD2_BIT \
+	| PHY_TXD3_BIT \
+	| PHY_TXER_BIT \
+	| PHY_RXD2_BIT \
+	| PHY_RXD3_BIT \
+	| PHY_RXDV_BIT \
+	| PHY_COL_BIT \
+	| PHY_RXCLK_BIT)
 // \}
 
 #define EMAC_TX_BUFSIZ          1518  //!!! Don't change this

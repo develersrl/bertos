@@ -121,7 +121,7 @@ static DECLARE_ISR(emac_irqHandler)
  *
  * \return Contents of the specified register.
  */
-static uint16_t phy_hw_read(reg8_t reg)
+static uint16_t phy_hw_read(uint8_t reg)
 {
 	// PHY read command.
 	EMAC_MAN = EMAC_SOF | EMAC_RW_READ | (NIC_PHY_ADDR << EMAC_PHYA_SHIFT)
@@ -141,7 +141,7 @@ static uint16_t phy_hw_read(reg8_t reg)
  * \param reg PHY register number.
  * \param val Value to write.
  */
-static void phy_hw_write(reg8_t reg, uint16_t val)
+static void phy_hw_write(uint8_t reg, uint16_t val)
 {
 	// PHY write command.
 	EMAC_MAN = EMAC_SOF | EMAC_RW_WRITE | (NIC_PHY_ADDR << EMAC_PHYA_SHIFT)
@@ -152,79 +152,109 @@ static void phy_hw_write(reg8_t reg, uint16_t val)
 		cpu_relax();
 }
 
-static int emac_reset(void)
+INLINE void phy_manageEnable(bool en)
 {
-	uint16_t phy_cr;
+		if (en)
+		{
+			/* Enable management port. */
+			EMAC_NCR |= BV(EMAC_MPE);
+			EMAC_NCFGR |= EMAC_CLK_HCLK_32;
+		}
+		else
+		{
+			/* Disable management port */
+			EMAC_NCR &= ~BV(EMAC_MPE);
+		}
+}
 
-	// Enable devices
-	PMC_PCER = BV(PIOA_ID);
-	PMC_PCER = BV(PIOB_ID);
-	PMC_PCER = BV(EMAC_ID);
-
-	// Disable RMII and TESTMODE by disabling pull-ups.
-	PIOB_PUDR = BV(PHY_COL_RMII_BIT) | BV(PHY_RXDV_TESTMODE_BIT);
-
-	// Disable PHY power down.
-	PIOB_PER  = BV(PHY_PWRDN_BIT);
-	PIOB_OER  = BV(PHY_PWRDN_BIT);
-	PIOB_CODR = BV(PHY_PWRDN_BIT);
-
-	// Toggle external hardware reset pin.
+INLINE void phy_resetPulse(void)
+{
+	/* Toggle external hardware reset pin. */
 	RSTC_MR = RSTC_KEY | (1 << RSTC_ERSTL_SHIFT) | BV(RSTC_URSTEN);
 	RSTC_CR = RSTC_KEY | BV(RSTC_EXTRST);
 
 	while ((RSTC_SR & BV(RSTC_NRSTL)) == 0)
 		cpu_relax();
+}
 
-	// Configure MII port.
+INLINE void phy_pinThreeState(void)
+{
+	PIOB_PUDR = PHY_MII_PINS;
+	PIOB_ODR = PHY_MII_PINS;
+	PIOB_PER = PHY_MII_PINS;
+}
+
+INLINE void phy_pinGpio(void)
+{
+	PIOB_PUDR = PHY_MII_PINS;
+	PIOB_OWER = PHY_MII_PINS;
+	PIOB_OER  = PHY_MII_PINS;
+	PIOB_PER  = PHY_MII_PINS;
+}
+
+INLINE void phy_pinMac(void)
+{
+	PIOB_ODR = PHY_MII_PINS;
+	PIOB_OWDR = PHY_MII_PINS;
 	PIOB_ASR = PHY_MII_PINS;
 	PIOB_BSR = 0;
+	PIOB_PUDR = PHY_MII_PINS;
 	PIOB_PDR = PHY_MII_PINS;
+}
 
-	// Enable receive and transmit clocks.
+INLINE void phy_pinSet(uint32_t state)
+{
+	PIOB_ODSR = state;
+}
+
+#define AUTONEGOTIATION_TIMEOUT 5000
+
+static void emac_reset(void)
+{
+	/* Enable devices */
+	PMC_PCER = BV(EMAC_ID);
+
+	/* Enable receive and transmit clocks. */
 	EMAC_USRIO = BV(EMAC_CLKEN);
 
-	// Enable management port.
-	EMAC_NCR |= BV(EMAC_MPE);
-	EMAC_NCFGR |= EMAC_CLK_HCLK_32;
-
-	// Set local MAC address.
+	/* Set local MAC address. */
 	EMAC_SA1L = (mac_addr[3] << 24) | (mac_addr[2] << 16) |
 				(mac_addr[1] << 8) | mac_addr[0];
 	EMAC_SA1H = (mac_addr[5] << 8) | mac_addr[4];
+	phy_manageEnable(true);
 
-	// Wait for PHY ready
-	timer_delay(255);
+	PHY_HW_INIT();
 
-	// Clear MII isolate.
-	phy_hw_read(NIC_PHY_BMCR);
-	phy_cr = phy_hw_read(NIC_PHY_BMCR);
+	PHY_INIT();
+	phy_pinMac();
+
+	/* Clear MII isolate. */
+	uint16_t phy_cr = phy_hw_read(NIC_PHY_BMCR);
 
 	phy_cr &= ~NIC_PHY_BMCR_ISOLATE;
 	phy_hw_write(NIC_PHY_BMCR, phy_cr);
 
-	phy_cr = phy_hw_read(NIC_PHY_BMCR);
+	uint32_t phy_id = phy_hw_read(NIC_PHY_ID1) << 16
+		| phy_hw_read(NIC_PHY_ID2);
+	ASSERT((phy_id & 0xFFFFFFF0) == (NIC_PHY_ID & 0xFFFFFFF0));
+	LOG_INFO("PHY ID %#08lx\n", phy_id);
 
-	LOG_INFO("%s: PHY ID %#04x %#04x\n",
-		__func__,
-		phy_hw_read(NIC_PHY_ID1), phy_hw_read(NIC_PHY_ID2));
-
-	// Wait for auto negotiation completed.
-	phy_hw_read(NIC_PHY_BMSR);
-	for (;;)
+	ticks_t start = timer_clock();
+	/* Wait for auto negotiation completed. */
+	while (1)
 	{
 		if (phy_hw_read(NIC_PHY_BMSR) & NIC_PHY_BMSR_ANCOMPL)
 			break;
 		cpu_relax();
+		if (timer_clock() - start > ms_to_ticks(AUTONEGOTIATION_TIMEOUT))
+		{
+			LOG_ERR("Autonegotiation timeout\n");
+			break;
+		}
 	}
-
-	// Disable management port.
-	EMAC_NCR &= ~BV(EMAC_MPE);
-
-	return 0;
 }
 
-static int emac_start(void)
+static void emac_start(void)
 {
 	uint32_t addr;
 	int i;
@@ -256,8 +286,6 @@ static int emac_start(void)
 
 	/* Enable receiver, transmitter and statistics. */
 	EMAC_NCR |= BV(EMAC_TE) | BV(EMAC_RE) | BV(EMAC_WESTAT);
-
-	return 0;
 }
 
 ssize_t eth_putFrame(const uint8_t *buf, size_t len)
