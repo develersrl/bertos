@@ -85,7 +85,9 @@ typedef struct KbdHandler
 
 void kbd_init(void);
 keymask_t kbd_peek(void);
+keymask_t kbd_peekMask(keymask_t mask);
 keymask_t kbd_get(void);
+keymask_t kbd_getMask(keymask_t mask);
 keymask_t kbd_get_timeout(mtime_t timeout);
 void kbd_addHandler(struct KbdHandler *handler);
 void kbd_remHandler(struct KbdHandler *handler);

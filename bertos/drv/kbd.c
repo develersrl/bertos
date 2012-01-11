@@ -177,6 +177,12 @@ static void kbd_softint(UNUSED_ARG(iptr_t, arg))
  */
 keymask_t kbd_peek(void)
 {
+	return kbd_peekMask((keymask_t)0xFFFFFFFFFFFFFFFFULL);
+}
+
+
+keymask_t kbd_peekMask(keymask_t mask)
+{
 	keymask_t key = 0;
 
 #if CONFIG_KBD_SCHED
@@ -187,10 +193,12 @@ keymask_t kbd_peek(void)
 
 	/* Extract an event from the keyboard buffer */
 	IRQ_DISABLE;
-	if (kbd_cnt)
+	if (kbd_cnt && (kbd_buf & mask))
 	{
-		--kbd_cnt;
-		key = kbd_buf;
+		key = kbd_buf & mask;
+		kbd_buf &= ~mask;
+		if (!kbd_buf)
+			--kbd_cnt;
 	}
 	IRQ_ENABLE;
 
@@ -204,13 +212,22 @@ keymask_t kbd_peek(void)
  */
 keymask_t kbd_get(void)
 {
+	return kbd_getMask((keymask_t)0xFFFFFFFFFFFFFFFFULL);
+}
+
+keymask_t kbd_getMask(keymask_t mask)
+{
 	keymask_t key;
 
 	#if CONFIG_KBD_POLL == KBD_POLL_SOFTINT
-		event_wait(&key_pressed);
-		key = kbd_peek();
+		do
+		{
+			event_wait(&key_pressed);
+			key = kbd_peekMask(mask);
+		}
+		while (!key);
 	#else
-		while (!(key = kbd_peek()))
+		while (!(key = kbd_peekMask(mask)))
 			cpu_relax();
 	#endif
 
