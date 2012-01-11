@@ -74,7 +74,6 @@ deg_t lm75_read_1(uint8_t sens_addr)
 deg_t lm75_read_2(I2c *i2c, uint8_t sens_addr)
 {
 	uint8_t data[2];
-	int16_t degree;
 	int16_t deci_degree;
 
 	i2c_start_w(i2c, SELECT_ADDRESS(sens_addr), 1, I2C_NOSTOP);
@@ -85,10 +84,11 @@ deg_t lm75_read_2(I2c *i2c, uint8_t sens_addr)
 	if (i2c_error(i2c))
 		return EOF;
 
-	degree = (int16_t)data[0];
-	deci_degree = (int16_t)(((data[1] >> 7) & 1 ) * 5);
+	deci_degree = ((data[0] << 8) | data[1]);
+	deci_degree >>= 7;
+	deci_degree *= 5;
 
-	LOG_INFO("[%d.%d C]\n", degree, deci_degree);
+	LOG_INFO("[%d.%d C]\n", deci_degree / 10, ABS(deci_degree % 10));
 
-	return degree * 10 + deci_degree;
+	return deci_degree;
 }
