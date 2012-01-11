@@ -486,7 +486,7 @@ int eth_init()
 	/* Set the vector. */
 	AIC_SVR(EMAC_ID) = emac_irqHandler;
 	/* Initialize to edge triggered with defined priority. */
-	AIC_SMR(EMAC_ID) = AIC_SRCTYPE_INT_EDGE_TRIGGERED | 7;
+	AIC_SMR(EMAC_ID) = AIC_SRCTYPE_INT_EDGE_TRIGGERED | 6;
 	/* Clear pending interrupt */
 	AIC_ICCR = BV(EMAC_ID);
 	/* Enable the system IRQ */
