@@ -128,7 +128,8 @@ typedef enum
 	RC_ERROR  = -1, ///< Reply with error.
 	RC_OK     = 0,  ///< No reply (ignore reply arguments).
 	RC_REPLY  = 1,  ///< Reply command arguments.
-	RC_SKIP   = 2   ///< Skip following commands
+	RC_SKIP   = 2,  ///< Skip following commands
+	RC_CLAMPED = 3, ///< argument values have been clamped.
 } ResultCode;
 
 typedef struct
