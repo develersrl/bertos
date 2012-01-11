@@ -520,7 +520,7 @@ int fletcher32_testRun(void)
 		tot += strlen(tstbufs[t]);
 
 		//kdump(tstbufs[t], strlen(tstbufs[t]));
-		kprintf("f1 %08X, f2 %08X\n", f1, f2);
+		kprintf("f1 %04lX, f2 %04lX\n", f1, f2);
 		ASSERT(f1 == f2);
 	}
 
@@ -536,7 +536,7 @@ int fletcher32_testRun(void)
 	uint32_t ft1 = fletcher32_final(&ft);
 	//kdump(start, tot);
 	free(start);
-	kprintf("ft1 %08X, ft2 %08X\n", ft1, ft2);
+	kprintf("ft1 %04lX, ft2 %04lX\n", ft1, ft2);
 	ASSERT(ft1 == ft2);
 	return 0;
 }

@@ -31,6 +31,9 @@ TESTS=${TESTS:-`find . \
 TESTOUT="testout"
 SRC_LIST="
 	bertos/algo/ramp.c
+	bertos/algo/crc_ccitt.c
+	bertos/algo/crc.c
+	bertos/algo/fletcher32.c
 	bertos/drv/kdebug.c
 	bertos/drv/timer.c
 	bertos/kern/monitor.c
@@ -54,8 +57,6 @@ SRC_LIST="
 	bertos/emul/switch_ctx_emul.S
 	bertos/mware/ini_reader.c
 	bertos/emul/kfile_posix.c
-	bertos/algo/crc_ccitt.c
-	bertos/algo/crc.c
 	bertos/struct/kfile_mem.c
 	bertos/net/ax25.c
 	bertos/net/afsk.c

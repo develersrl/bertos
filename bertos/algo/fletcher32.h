@@ -50,4 +50,8 @@ void fletcher32_init(Fletcher32 *f);
 void fletcher32_update(Fletcher32 *f, const void *_buf, size_t len);
 uint32_t fletcher32_final(Fletcher32 *f);
 
+int fletcher32_testSetup(void);
+int fletcher32_testTearDown(void);
+int fletcher32_testRun(void);
+
 #endif /* ALGO_FLETCHER32_H */
