@@ -67,23 +67,26 @@ static void MD5_update(Hash *h, const void* vbuf, size_t len)
 
     /* Handle any leading odd-sized chunks */
 
-    if (t) {
+    if (t)
+	{
         uint8_t *p = (uint8_t*) ctx->in + t;
 
         t = 64 - t;
-        if (len < t) {
+        if (len < t)
+		{
             memcpy(p, buf, len);
             return;
         }
         memcpy(p, buf, t);
-	byteReverse(aligned_ptr, 16);
-	MD5Transform(ctx->buf, aligned_ptr);
+		byteReverse(aligned_ptr, 16);
+		MD5Transform(ctx->buf, aligned_ptr);
         buf += t;
         len -= t;
     }
     /* Process data in 64-byte chunks */
 
-    while (len >= 64) {
+    while (len >= 64)
+	{
         memcpy(ctx->in, buf, 64);
         byteReverse(aligned_ptr, 16);
         MD5Transform(ctx->buf, aligned_ptr);
@@ -122,7 +125,8 @@ static uint8_t* MD5_final(struct Hash *h)
     count = 64 - 1 - count;
 
     /* Pad out to 56 mod 64 */
-    if (count < 8) {
+    if (count < 8)
+	{
         /* Two lots of padding:  Pad the first block to 64 bytes */
         memset(p, 0, count);
         byteReverse(aligned_ptr, 16);
@@ -130,10 +134,13 @@ static uint8_t* MD5_final(struct Hash *h)
 
         /* Now fill the next block with 56 bytes */
         memset(ctx->in, 0, 56);
-    } else {
+    }
+	else
+	{
         /* Pad block to 56 bytes */
         memset(p, 0, count - 8);
     }
+
     byteReverse(aligned_ptr, 14);
 
     /* Append length in bits and transform */
