@@ -49,12 +49,10 @@
 	INLINE void wdt_stop(void) { WDT_MR = BV(WDT_WDDIS); }
 	INLINE void wdt_reset(void)
 	{
-		#if (ARCH & ARCH_BOOT)
-			WDT_CR = WDT_KEY | BV(WDT_WDRSTT);
-		#endif
+		WDT_CR = WDT_KEY | BV(WDT_WDRSTT);
 	}
 #else
 	#error "Missing watchdog support for yout CPU"
 #endif
 
-#endif //DRV_WDT_ARM_H
+#endif /* DRV_WDT_ARM_H */
