@@ -40,11 +40,21 @@
 #define DRV_WDT_ARM_H
 
 #include <cfg/compiler.h> // INLINE
+#include <cfg/macros.h> // BV
 
-#warning TODO: This module is not implemented for at91 CPUs
+#if CPU_ARM_AT91
+	#include <io/arm.h>
 
-INLINE void wdt_start(uint32_t _timeout) { (void) _timeout; /* implement me */ }
-INLINE void wdt_stop(void) { /*implement me */ }
-INLINE void wdt_reset(void) { /* implement me */ }
+	INLINE void wdt_start(uint32_t _timeout) { (void) _timeout; /* implement me */ }
+	INLINE void wdt_stop(void) { WDT_MR = BV(WDT_WDDIS); }
+	INLINE void wdt_reset(void)
+	{
+		#if (ARCH & ARCH_BOOT)
+			WDT_CR = WDT_KEY | BV(WDT_WDRSTT);
+		#endif
+	}
+#else
+	#error "Missing watchdog support for yout CPU"
+#endif
 
 #endif //DRV_WDT_ARM_H

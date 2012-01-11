@@ -39,6 +39,8 @@
 #include <io/arm.h>
 #include <cfg/macros.h>
 
+#include "cfg/cfg_wdt.h"
+
 #define USE_FIXED_PLL 1
 
 #define XTAL_FREQ 18432000UL
@@ -171,8 +173,10 @@ void __init1(void)
 	AIC_EOICR = 0xFFFFFFFF;
 	AIC_IDCR =  0xFFFFFFFF;
 
-        /* The watchdog is enabled after processor reset. Disable it. */
-	WDT_MR = BV(WDT_WDDIS);
+	#if CONFIG_WATCHDOG == 0
+		/* The watchdog is enabled after processor reset. Disable it. */
+		WDT_MR = BV(WDT_WDDIS);
+	#endif
 
         /*
          * Enable the main oscillator. Set startup time of 6 * 8 slow
