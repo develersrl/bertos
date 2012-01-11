@@ -254,9 +254,19 @@ INLINE struct Process *proc_current(void)
 
 #if CONFIG_KERN_PRI
 	void proc_setPri(struct Process *proc, int pri);
+
+	INLINE int proc_pri(struct Process *proc)
+	{
+		return proc->link.pri;
+	}
 #else
 	INLINE void proc_setPri(UNUSED_ARG(struct Process *,proc), UNUSED_ARG(int, pri))
 	{
+	}
+
+	INLINE int proc_pri(UNUSED_ARG(struct Process *, proc))
+	{
+		return 0;
 	}
 #endif
 
