@@ -236,7 +236,7 @@ static void emac_reset(void)
 
 	uint32_t phy_id = phy_hw_read(NIC_PHY_ID1) << 16
 		| phy_hw_read(NIC_PHY_ID2);
-	ASSERT((phy_id & 0xFFFFFFF0) == (NIC_PHY_ID & 0xFFFFFFF0));
+	//ASSERT((phy_id & 0xFFFFFFF0) == (NIC_PHY_ID & 0xFFFFFFF0));
 	LOG_INFO("PHY ID %#08lx\n", phy_id);
 
 	ticks_t start = timer_clock();
