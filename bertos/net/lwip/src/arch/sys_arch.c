@@ -153,6 +153,7 @@ u32_t sys_arch_sem_wait(sys_sem_t sem, u32_t timeout)
 		mutex_obtain(sem);
 		return ticks_to_ms(timer_clock() - start);
 	}
+
 	do
 	{
 		cpu_relax();
@@ -197,6 +198,7 @@ sys_mbox_t sys_mbox_new(UNUSED_ARG(int, size))
 		return SYS_MBOX_NULL;
 	}
 	msg_initPort(&port->port, event_createGeneric());
+	port->port.event.Ev.Sig.sig_proc = NULL;
 
 	return (sys_mbox_t)(&port->port);
 }
@@ -225,7 +227,13 @@ err_t sys_mbox_trypost(sys_mbox_t mbox, void *data)
 	if (UNLIKELY(!msg))
 		return ERR_MEM;
 	msg->data = data;
-	msg_put(mbox, &msg->msg);
+
+	msg_lockPort(mbox);
+	ADDTAIL(&mbox->queue, &msg->msg.link);
+	msg_unlockPort(mbox);
+
+	if (mbox->event.Ev.Sig.sig_proc)
+		event_do(&mbox->event);
 
 	return ERR_OK;
 }
@@ -257,13 +265,22 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t mbox, void **data, u32_t timeout)
 		msg = msg_get(mbox);
 		if (LIKELY(msg))
 			break;
+
+		mbox->event.Ev.Sig.sig_proc = proc_current();
 		/* Slow path */
 		if (!timeout)
 			event_wait(&mbox->event);
-		else if (!event_waitTimeout(&mbox->event,
+		else
+		{
+			if (!event_waitTimeout(&mbox->event,
 					ms_to_ticks(timeout)))
-			return SYS_ARCH_TIMEOUT;
+			{
+				mbox->event.Ev.Sig.sig_proc = NULL;
+				return SYS_ARCH_TIMEOUT;
+			}
+		}
 	}
+	mbox->event.Ev.Sig.sig_proc = NULL;
 	if (data)
 		*data = containerof(msg, IpMsg, msg)->data;
 
