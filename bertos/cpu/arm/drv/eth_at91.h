@@ -39,71 +39,7 @@
 #ifndef ETH_AT91_H
 #define ETH_AT91_H
 
-// Settings and definition for PHY registers
-// \{
-
-//Registry definition
-#define NIC_PHY_BMCR            0x00    //  Basic mode control register.
-#define NIC_PHY_BMCR_COLTEST    0x0080  //  Collision test.
-#define NIC_PHY_BMCR_FDUPLEX    0x0100  //  Full duplex mode.
-#define NIC_PHY_BMCR_ANEGSTART  0x0200  //  Restart auto negotiation.
-#define NIC_PHY_BMCR_ISOLATE    0x0400  //  Isolate from MII.
-#define NIC_PHY_BMCR_PWRDN      0x0800  //  Power-down.
-#define NIC_PHY_BMCR_ANEGENA    0x1000  //  Enable auto negotiation.
-#define NIC_PHY_BMCR_100MBPS    0x2000  //  Select 100 Mbps.
-#define NIC_PHY_BMCR_LOOPBACK   0x4000  //  Enable loopback mode.
-#define NIC_PHY_BMCR_RESET      0x8000  //  Software reset.
-
-#define NIC_PHY_BMSR            0x01    //  Basic mode status register.
-#define NIC_PHY_BMSR_ANCOMPL    0x0020  //  Auto negotiation complete.
-#define NIC_PHY_BMSR_ANEGCAPABLE 0x0008  // Able to do auto-negotiation
-#define NIC_PHY_BMSR_LINKSTAT   0x0004  //  Link status.
-
-#define NIC_PHY_ID1             0x02    //  PHY identifier register 1.
-#define NIC_PHY_ID2             0x03    //  PHY identifier register 2.
-#define NIC_PHY_ANAR            0x04    //  Auto negotiation advertisement register.
-#define NIC_PHY_ANLPAR          0x05    //  Auto negotiation link partner availability register.
-#define NIC_PHY_ANER            0x06    //  Auto negotiation expansion register.
-
-/* Pin definition MII/RMII PHY interdace */
-#define PHY_TXCLK_BIT      BV(0)
-#define PHY_TXEN_BIT       BV(1)
-#define PHY_TXD0_BIT       BV(2)
-#define PHY_TXD1_BIT       BV(3)
-#define PHY_CRS_BIT        BV(4)
-#define PHY_RXD0_BIT       BV(5)
-#define PHY_RXD1_BIT       BV(6)
-#define PHY_RXER_BIT       BV(7)
-#define PHY_MDC_BIT        BV(8)
-#define PHY_MDIO_BIT       BV(9)
-#define PHY_TXD2_BIT       BV(10)
-#define PHY_TXD3_BIT       BV(11)
-#define PHY_TXER_BIT       BV(12)
-#define PHY_RXD2_BIT       BV(13)
-#define PHY_RXD3_BIT       BV(14)
-#define PHY_RXDV_BIT       BV(15)
-#define PHY_COL_BIT        BV(16)
-#define PHY_RXCLK_BIT      BV(17)
-
-#define PHY_MII_PINS   \
-	( PHY_TXEN_BIT \
-	| PHY_TXD0_BIT \
-	| PHY_TXD1_BIT \
-	| PHY_CRS_BIT \
-	| PHY_RXD0_BIT \
-	| PHY_RXD1_BIT \
-	| PHY_RXER_BIT \
-	| PHY_MDC_BIT \
-	| PHY_MDIO_BIT \
-	| PHY_TXD2_BIT \
-	| PHY_TXD3_BIT \
-	| PHY_TXER_BIT \
-	| PHY_RXD2_BIT \
-	| PHY_RXD3_BIT \
-	| PHY_RXDV_BIT \
-	| PHY_COL_BIT \
-	| PHY_RXCLK_BIT)
-// \}
+#include <cpu/types.h>
 
 #define EMAC_TX_BUFSIZ          1518  //!!! Don't change this
 #define EMAC_TX_BUFFERS         1     //!!! Don't change this

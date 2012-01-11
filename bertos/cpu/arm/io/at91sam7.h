@@ -432,4 +432,54 @@
 #endif
 /*\}*/
 
+
+/**
+ * Pin definition MII/RMII PHY interdace
+ */
+#if CPU_ARM_SAM7X
+	#define PHY_TXCLK_BIT      BV(0)
+	#define PHY_TXEN_BIT       BV(1)
+	#define PHY_TXD0_BIT       BV(2)
+	#define PHY_TXD1_BIT       BV(3)
+	#define PHY_CRS_BIT        BV(4)
+	#define PHY_RXD0_BIT       BV(5)
+	#define PHY_RXD1_BIT       BV(6)
+	#define PHY_RXER_BIT       BV(7)
+	#define PHY_MDC_BIT        BV(8)
+	#define PHY_MDIO_BIT       BV(9)
+	#define PHY_TXD2_BIT       BV(10)
+	#define PHY_TXD3_BIT       BV(11)
+	#define PHY_TXER_BIT       BV(12)
+	#define PHY_RXD2_BIT       BV(13)
+	#define PHY_RXD3_BIT       BV(14)
+	#define PHY_RXDV_BIT       BV(15)
+	#define PHY_COL_BIT        BV(16)
+	#define PHY_RXCLK_BIT      BV(17)
+
+#elif CPU_ARM_SAM7S_LARGE
+	/* No ethernet interface is present on this cpu */
+#else
+	#error No MII/RMII PHY pins interface was define for select CPU.
+#endif
+
+#define PHY_MII_PINS   \
+	( PHY_TXEN_BIT \
+	| PHY_TXD0_BIT \
+	| PHY_TXD1_BIT \
+	| PHY_CRS_BIT \
+	| PHY_RXD0_BIT \
+	| PHY_RXD1_BIT \
+	| PHY_RXER_BIT \
+	| PHY_MDC_BIT \
+	| PHY_MDIO_BIT \
+	| PHY_TXD2_BIT \
+	| PHY_TXD3_BIT \
+	| PHY_TXER_BIT \
+	| PHY_RXD2_BIT \
+	| PHY_RXD3_BIT \
+	| PHY_RXDV_BIT \
+	| PHY_COL_BIT \
+	| PHY_RXCLK_BIT)
+// \}
+
 #endif /* AT91SAM7_H */

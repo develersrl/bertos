@@ -363,5 +363,36 @@
 #endif
 
 
-/*\}*/
+#if CPU_CM3_SAM3X8
+	// Port B
+	#define PHY_REFCLK_XT2_BIT      0
+	#define PHY_TXEN_BIT            1
+	#define PHY_TXD0_BIT            2
+	#define PHY_TXD1_BIT            3
+	#define PHY_RXDV_TESTMODE_BIT   4
+	#define PHY_RXD0_AD0_BIT        5
+	#define PHY_RXD1_AD1_BIT        6
+	#define PHY_RXER_RXD4_RPTR_BIT  7
+	#define PHY_MDC_BIT             8
+	#define PHY_MDIO_BIT            9
+	// Port A
+	#define PHY_MDINTR_BIT          5
+#elif (CPU_CM3_SAM3U || CPU_CM3_SAM3N)
+	/* No ethernet interface is present on this cpu */
+#else
+	#error No MII/RMII PHY pins interface was define for select CPU.
+#endif
+
+#define PHY_MII_PINS_PORTB \
+	BV(PHY_REFCLK_XT2_BIT) \
+	| BV(PHY_TXEN_BIT) \
+	| BV(PHY_TXD0_BIT) \
+	| BV(PHY_TXD1_BIT) \
+	| BV(PHY_RXD0_AD0_BIT) \
+	| BV(PHY_RXD1_AD1_BIT) \
+	| BV(PHY_RXER_RXD4_RPTR_BIT) \
+	| BV(PHY_MDC_BIT) \
+	| BV(PHY_MDIO_BIT)
+
+
 #endif /* SAM3_H */

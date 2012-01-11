@@ -37,6 +37,7 @@
   * \author Stefano Fedrigo <aleph@develer.com>
   */
 
+#include "eth_sam3.h"
 #include "cfg/cfg_eth.h"
 
 #define LOG_LEVEL  ETH_LOG_LEVEL
@@ -49,25 +50,19 @@
 #include <cfg/macros.h>
 #include <cfg/compiler.h>
 
-// TODO: unify includes
-//#include <io/at91sam7.h>
-//#include <io/arm.h>
-//#include <io/include.h>
-#include <io/sam3.h>
+#include <io/cm3.h>
+
 #include <drv/irq_cm3.h>
+#include <drv/timer.h>
+#include <drv/eth.h>
 
 #include <cpu/power.h>
 #include <cpu/types.h>
 #include <cpu/irq.h>
 
-#include <drv/timer.h>
-#include <drv/eth.h>
-
 #include <mware/event.h>
 
 #include <string.h>
-
-#include "eth_sam3.h"
 
 #define EMAC_RX_INTS	(BV(EMAC_RCOMP) | BV(EMAC_ROVR) | BV(EMAC_RXUBR))
 #define EMAC_TX_INTS	(BV(EMAC_TCOMP) | BV(EMAC_TXUBR) | BV(EMAC_RLEX))

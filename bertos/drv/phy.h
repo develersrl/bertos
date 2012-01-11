@@ -42,6 +42,59 @@
 
 #include <cfg/cfg_eth.h>
 
+/*
+ * Common PHY settings
+ */
+
+/**
+ * Basic mode control settings.
+ *
+ *\{
+ */
+#define NIC_PHY_BMCR            0x00    ///<  Basic mode control register address.
+
+#define NIC_PHY_BMCR_COLTEST    BV(7)   ///<  Collision test.
+#define NIC_PHY_BMCR_FDUPLEX    BV(8)   ///<  Full duplex mode.
+#define NIC_PHY_BMCR_ANEGSTART  BV(9)   ///<  Restart auto negotiation.
+#define NIC_PHY_BMCR_ISOLATE    BV(10)  ///<  Isolate from MII.
+#define NIC_PHY_BMCR_PWRDN      BV(11)  ///<  Power-down.
+#define NIC_PHY_BMCR_ANEGENA    BV(12)  ///<  Enable auto negotiation.
+#define NIC_PHY_BMCR_100MBPS    BV(13)  ///<  Select 100 Mbps.
+#define NIC_PHY_BMCR_LOOPBACK   BV(14)  ///<  Enable loopback mode.
+#define NIC_PHY_BMCR_RESET      BV(15)  ///<  Software reset.
+/* \} */
+
+/**
+ * Basic mode status settings.
+ *
+ *\{
+ */
+#define NIC_PHY_BMSR             0x01    ///<  Basic mode status register.
+
+#define NIC_PHY_BMSR_ANCOMPL     BV(5)  ///< Auto negotiation complete.
+#define NIC_PHY_BMSR_ANEGCAPABLE BV(3)  ///< Able to do auto-negotiation
+#define NIC_PHY_BMSR_LINKSTAT    BV(2)  ///<  Link status.
+/* \} */
+
+#define NIC_PHY_ID1              0x02    ///<  PHY identifier register 1.
+#define NIC_PHY_ID2              0x03    ///<  PHY identifier register 2.
+#define NIC_PHY_ANAR             0x04    ///<  Auto negotiation advertisement register.
+#define NIC_PHY_ANLPAR           0x05    ///<  Auto negotiation link partner availability register.
+
+/**
+ * Auto negotiation expansion settings.
+ *
+ *\{
+ */
+#define NIC_PHY_ANER            0x06    //  Auto negotiation expansion register address.
+
+#define NIC_PHY_ANLPAR_10_HDX   BV(5)   ///<  10BASE-T half duplex
+#define NIC_PHY_ANLPAR_10_FDX   BV(6)   ///<  10BASE-T full duplex
+#define NIC_PHY_ANLPAR_TX_HDX   BV(7)   ///<  100BASE-TX half duplex
+#define NIC_PHY_ANLPAR_TX_FDX   BV(8)   ///<  100BASE-TX full duplex
+/* \} */
+
+
 /**
  * \name Supported PHY chip.
  *
