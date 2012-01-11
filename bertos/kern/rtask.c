@@ -45,6 +45,8 @@
 #define LOG_FORMAT RTASK_LOG_FORMAT
 #include <cfg/log.h>
 
+#include <cpu/types.h>
+
 #include <drv/timer.h>
 
 #include <struct/pool.h>

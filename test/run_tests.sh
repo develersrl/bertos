@@ -41,6 +41,7 @@ SRC_LIST="
 	bertos/kern/signal.c
 	bertos/kern/sem.c
 	bertos/kern/preempt.c
+	bertos/kern/rtask.c
 	bertos/mware/event.c
 	bertos/mware/formatwr.c
 	bertos/mware/hex.c

@@ -49,7 +49,7 @@
  *
  * $WIZ$ type = "int"
  */
-#define CONFIG_RTASK_STACK 256
+#define CONFIG_RTASK_STACK KERN_MINSTACKSIZE
 
 /**
  * Module logging level.
