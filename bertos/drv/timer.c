@@ -127,10 +127,6 @@ INLINE void timer_addToList(Timer *timer, List *queue)
 	ASSERT(timer->magic != TIMER_MAGIC_ACTIVE);
 	DB(timer->magic = TIMER_MAGIC_ACTIVE;)
 
-
-	/* Calculate expiration time for this timer */
-	timer->tick = _clock + timer->_delay;
-
 	/*
 	 * Search for the first node whose expiration time is
 	 * greater than the timer we want to add.
@@ -158,13 +154,16 @@ INLINE void timer_addToList(Timer *timer, List *queue)
  * When the delay indicated by the timer expires, the timer
  * device will execute the event associated with it.
  *
- * You should not call this function on an already running timer.
- *
  * \note Interrupt safe
  */
 void timer_add(Timer *timer)
 {
-	ATOMIC(timer_addToList(timer, &timers_queue));
+	ATOMIC(
+		/* Calculate expiration time for this timer */
+		timer->tick = _clock + timer->_delay;
+
+		timer_addToList(timer, &timers_queue);
+	);
 }
 
 /**
@@ -214,8 +213,17 @@ INLINE void timer_poll(List *queue)
  */
 void synctimer_add(Timer *timer, List *queue)
 {
+	timer->tick = timer_clock() + timer->_delay;
+
 	timer_addToList(timer, queue);
 }
+
+void synctimer_readd(Timer *timer, List *queue)
+{
+	timer->tick += timer->_delay;
+	timer_addToList(timer, queue);
+}
+
 
 /**
  * Simple synchronous timer based scheduler polling routine.
@@ -257,10 +265,11 @@ void timer_delayTicks(ticks_t delay)
 	DB(t.magic = TIMER_MAGIC_INACTIVE;)
 	if (proc_preemptAllowed())
 	{
-		timer_setEvent(&t);
+		ASSERT(!sig_check(SIG_SINGLE));
+		timer_setSignal(&t, proc_current(), SIG_SINGLE);
 		timer_setDelay(&t, delay);
 		timer_add(&t);
-		timer_waitEvent(&t);
+		sig_wait(SIG_SINGLE);
 	}
 	else
 #endif /* !CONFIG_KERN_SIGNALS */

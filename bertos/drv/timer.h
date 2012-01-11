@@ -62,6 +62,7 @@
 #include <cpu/attr.h>
 #include <cpu/irq.h>
 
+#include <string.h>
 
 /*
  * Include platform-specific binding header if we're hosted.
@@ -310,22 +311,76 @@ void synctimer_add(Timer *timer, List* q);
 
 void synctimer_poll(List* q);
 
+/**
+ * Extract the timeout for the next event.
+ *
+ * \return Timeout of the next event (may be 0), or -1 on errors.
+ */
+INLINE ticks_t synctimer_nextTimeout(List *q)
+{
+	ticks_t timeout = -1;
+
+	if (!LIST_EMPTY(q))
+	{
+		Timer *expiring_timer = (Timer *)LIST_HEAD(q);
+		timeout = MAX(expiring_timer->tick - timer_clock(), (ticks_t)0);
+	}
+	return timeout;
+}
+
+/*
+ * Explicitly mark a timer as executed.
+ *
+ * When a timer is marked as executed, it is inactive until the next
+ * call to synctimer_add().
+ * Normally you shouldn't need to call this function explicitly, as all
+ * timers in this module are designed to stop themselves after a while
+ * (eg. retransmission timer will stop after a few retransmissions).
+ * The only exception is at startup, where you should mark all timers
+ * as executed to avoid spurious events.
+ *
+ * \note We can't rely on REMOVE() of synctimer_poll() since in release mode
+ * it is empty.
+ */
+INLINE void synctimer_executed(Timer *t)
+{
+	memset(&t->link, 0, sizeof(Node));
+}
+
+/*
+ * Test if a timer is active.
+ *
+ * In the general case it should be ATOMIC() and timer.link should always
+ * be memset() to 0.
+ */
+INLINE bool synctimer_active(Timer *t)
+{
+	return !(t->link.pred == NULL && t->link.succ == NULL);
+}
+
+
+INLINE void synctimer_stop(Timer *timer)
+{
+	if (synctimer_active(timer))
+	{
+		timer_abort(timer);
+		synctimer_executed(timer);
+	}
+}
+
+INLINE void synctimer_restart(Timer *timer, List *list, mtime_t timeout)
+{
+	synctimer_stop(timer);
+
+	timer_setDelay(timer, ms_to_ticks(timeout));
+	synctimer_add(timer, list);
+}
+
+void synctimer_readd(Timer *timer, List *queue);
 
 #endif /* CONFIG_TIMER_EVENTS */
 
 #if defined(CONFIG_KERN_SIGNALS) && CONFIG_KERN_SIGNALS
-
-/** Set the timer so that it sends a event notification when it expires */
-INLINE void timer_setEvent(Timer *timer)
-{
-	event_initGeneric(&timer->expire);
-}
-
-/** Wait until the timer expires */
-INLINE void timer_waitEvent(Timer *timer)
-{
-	event_wait(&timer->expire);
-}
 
 /** Set the timer so that it sends a signal when it expires */
 INLINE void timer_setSignal(Timer *timer, struct Process *proc, sigmask_t sigs)
