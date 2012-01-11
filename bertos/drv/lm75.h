@@ -55,6 +55,13 @@
 #if COMPILER_C99
 	#define lm75_read(...)        PP_CAT(lm75_read ## _, COUNT_PARMS(__VA_ARGS__)) (__VA_ARGS__)
 #else
+	/**
+	 * Read temperature from LM75 sensor.
+	 *
+	 * \note: Do not call this function faster than once every ~200ms, otherwise
+	 *        the sensor will not have time to perform conversions and will
+	 *        always return the same temperature value.
+	 */
 	#define lm75_read(args...)    PP_CAT(lm75_read ## _, COUNT_PARMS(args)) (args)
 #endif
 
