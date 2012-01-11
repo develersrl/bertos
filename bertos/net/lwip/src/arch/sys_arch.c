@@ -1,7 +1,7 @@
 #include "cfg/cfg_lwip.h"
 
-#define LOG_LEVEL  3
-#define LOG_FORMAT 0
+#define LOG_LEVEL  3 //INFO
+#define LOG_FORMAT 0 //TERSE
 #include <cfg/log.h>
 
 #include <drv/timer.h>
@@ -211,8 +211,7 @@ void sys_mbox_free(sys_mbox_t mbox)
 
 void sys_mbox_post(sys_mbox_t mbox, void *data)
 {
-	if (UNLIKELY(sys_mbox_trypost(mbox, data) == ERR_MEM))
-		LOG_ERR("out of messages!\n");
+	sys_mbox_trypost(mbox, data);
 }
 
 /*
@@ -225,7 +224,10 @@ err_t sys_mbox_trypost(sys_mbox_t mbox, void *data)
 
 	PROC_ATOMIC(msg = (IpMsg *)list_remHead(&free_msg));
 	if (UNLIKELY(!msg))
+	{
+		LOG_ERR("out of messages!\n");
 		return ERR_MEM;
+	}
 	msg->data = data;
 
 	msg_lockPort(mbox);
@@ -376,6 +378,7 @@ sys_thread_t sys_thread_new(const char *name, void (* thread)(void *arg),
 	if (UNLIKELY(!thread_node))
 	{
 		proc_permit();
+		LOG_ERR("Out of threads!\n");
 		return NULL;
 	}
 	ADDHEAD(&used_thread, &thread_node->node);
