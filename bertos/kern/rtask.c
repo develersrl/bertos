@@ -145,7 +145,7 @@ RTask *rtask_add(rtask_cb_t cb, mtime_t delay, void *cb_data)
 		rt->callback = cb;
 		rt->user_data = cb_data;
 		timer_setSoftint(&rt->t, rtask_trampoline, rt);
-		timer_setDelay(&rt->t, delay);
+		timer_setDelay(&rt->t, ms_to_ticks(delay));
 		RTASK_ATOMIC(synctimer_add(&rt->t, &rt_list));
 		sig_send(process, NEW_TASK);
 	}
