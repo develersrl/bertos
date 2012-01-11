@@ -50,9 +50,10 @@
 #include <kern/rtask.h>
 #include <kern/proc.h>
 
+static int count = 0;
 static bool test1(void *data)
 {
-	kprintf("Funziona!\n");
+	count += (intptr_t)data;
 	return true;
 }
 
@@ -61,8 +62,13 @@ static bool test1(void *data)
  */
 int rtask_testRun(void)
 {
-	RTask *task = rtask_add(test1, 100, NULL);
-	return (task != NULL ? 0 : -1);
+	kprintf("Add task..\n");
+	ASSERT(rtask_add(test1, 50, (void *)1));
+	ASSERT(rtask_add(test1, 100, (void *)2));
+	ASSERT(rtask_add(test1, 200, (void *)4));
+	timer_delay(5000);
+	kprintf("count: %d\n", count);
+	return (count == ((5000/50) + (5000/100) *2 + (5000/200) * 4));
 }
 
 int rtask_testSetup(void)
