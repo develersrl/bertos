@@ -93,6 +93,19 @@ typedef struct FIFOBuffer
 
 
 /**
+ * Declare a static fifo buffer
+ */
+#define DECLARE_FIFO(_name, _ptr, _size)			\
+	FIFOBuffer _name =					\
+	{							\
+		.head = (_ptr),					\
+		.tail = (_ptr),					\
+		.begin = (_ptr),				\
+		.end = (_ptr) + (_size) - 1,			\
+	};							\
+	STATIC_ASSERT((_size) > 1)
+
+/**
  * Check whether the fifo is empty
  *
  * \note Calling fifo_isempty() is safe while a concurrent
