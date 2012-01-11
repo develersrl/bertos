@@ -47,7 +47,7 @@ void fletcher32_init(Fletcher32 *f)
 
 void fletcher32_update(Fletcher32 *f, const void *_buf, size_t len)
 {
-	uint16_t data;
+	uint16_t data = 0;
 	const uint8_t *buf = (const uint8_t *)_buf;
 	uint8_t last = buf[len-1];
 
