@@ -54,6 +54,11 @@ static void MD5_update(Hash *h, const void* vbuf, size_t len)
 {
 	MD5_Context *ctx = (MD5_Context *)h;
 	const char *buf = (const char *)vbuf;
+	uint32_t *aligned_ptr = NULL;
+	if (is_aligned(ctx->in, sizeof(uint32_t)))
+		aligned_ptr = (uint32_t *)((size_t)ctx->in);
+	else
+		ASSERT2(0, "Unaligned memory");
     uint32_t t;
 
     /* Update bitcount */
@@ -71,8 +76,8 @@ static void MD5_update(Hash *h, const void* vbuf, size_t len)
             return;
         }
         memcpy(p, buf, t);
-        byteReverse((uint32_t*)ctx->in, 16);
-        MD5Transform(ctx->buf, (uint32_t*)ctx->in);
+	byteReverse(aligned_ptr, 16);
+	MD5Transform(ctx->buf, aligned_ptr);
         buf += t;
         len -= t;
     }
@@ -80,8 +85,8 @@ static void MD5_update(Hash *h, const void* vbuf, size_t len)
 
     while (len >= 64) {
         memcpy(ctx->in, buf, 64);
-        byteReverse((uint32_t*)ctx->in, 16);
-        MD5Transform(ctx->buf, (uint32_t*)ctx->in);
+        byteReverse(aligned_ptr, 16);
+        MD5Transform(ctx->buf, aligned_ptr);
         buf += 64;
         len -= 64;
     }
@@ -99,6 +104,11 @@ static uint8_t* MD5_final(struct Hash *h)
 	MD5_Context *ctx = (MD5_Context *)h;
     unsigned count;
     unsigned char *p;
+	uint32_t *aligned_ptr = NULL;
+	if (is_aligned(ctx->in, sizeof(uint32_t)))
+		aligned_ptr = (uint32_t *)((size_t)ctx->in);
+	else
+		ASSERT2(0, "Unaligned memory");
 
     /* Compute number of bytes mod 64 */
     count = (ctx->bits >> 3) & 0x3F;
@@ -115,8 +125,8 @@ static uint8_t* MD5_final(struct Hash *h)
     if (count < 8) {
         /* Two lots of padding:  Pad the first block to 64 bytes */
         memset(p, 0, count);
-        byteReverse((uint32_t*)ctx->in, 16);
-        MD5Transform(ctx->buf, (uint32_t *) ctx->in);
+        byteReverse(aligned_ptr, 16);
+        MD5Transform(ctx->buf, aligned_ptr);
 
         /* Now fill the next block with 56 bytes */
         memset(ctx->in, 0, 56);
@@ -124,13 +134,13 @@ static uint8_t* MD5_final(struct Hash *h)
         /* Pad block to 56 bytes */
         memset(p, 0, count - 8);
     }
-    byteReverse((uint32_t*)ctx->in, 14);
+    byteReverse(aligned_ptr, 14);
 
     /* Append length in bits and transform */
-    ((uint32_t*) ctx->in)[14] = (uint32_t)ctx->bits;
-    ((uint32_t*) ctx->in)[15] = (uint32_t)(ctx->bits >> 32);
+    aligned_ptr[14] = (uint32_t)ctx->bits;
+    aligned_ptr[15] = (uint32_t)(ctx->bits >> 32);
 
-    MD5Transform(ctx->buf, (uint32_t *) ctx->in);
+    MD5Transform(ctx->buf, aligned_ptr);
     byteReverse((uint32_t*)ctx->buf, 4);
 
 	PURGE(ctx->in);
