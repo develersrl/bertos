@@ -288,6 +288,8 @@ int event_select(Event **evs, int n, ticks_t timeout);
 /**
  * Wait the completion of event \a e or \a timeout elapses.
  *
+ * \return true if the event triggered, false if timed out
+ *
  * \note It's forbidden to use this function inside irq handling functions.
  */
 bool event_waitTimeout(Event *e, ticks_t timeout);
