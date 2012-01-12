@@ -62,4 +62,9 @@ typedef struct RTask RTask;
 
 struct RTask *rtask_add(rtask_cb_t cb, mtime_t interval, void *cb_data);
 
+/* Test functions */
+int rtask_testRun(void);
+int rtask_testSetup(void);
+int rtask_testTearDown(void);
+
 #endif /* KERNEL_RTASK_H */
