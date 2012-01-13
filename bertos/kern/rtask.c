@@ -86,7 +86,8 @@ static Semaphore rtask_sem;
 		sem_release(&rtask_sem); \
 	} while (0)
 
-#warning "Remove synctimer_poll and use a list directly"
+
+//TODO: "Remove synctimer_poll and use a list directly"
 static NORETURN void rtask_proc(void)
 {
 	while (1)
