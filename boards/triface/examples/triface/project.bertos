@@ -21,9 +21,9 @@ S'path'
 p10
 Vavr-gcc
 p11
-ssS'PROJECT_SRC_PATH_FROM_MAKEFILE'
+ssS'PROJECT_HW_PATH_FROM_MAKEFILE'
 p12
-Vboards/triface/examples/triface
+Vboards/triface
 p13
 sS'ENABLED_MODULES'
 p14
@@ -69,9 +69,9 @@ p34
 sS'PRESET'
 p35
 I01
-sS'PROJECT_HW_PATH_FROM_MAKEFILE'
+sS'PROJECT_SRC_PATH_FROM_MAKEFILE'
 p36
-Vboards/triface
+Vboards/triface/examples/triface
 p37
 sS'OUTPUT'
 p38

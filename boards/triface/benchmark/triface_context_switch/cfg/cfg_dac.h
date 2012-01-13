@@ -26,29 +26,63 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2009 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2011 Develer S.r.l. (http://www.develer.com/)
  * All Rights Reserved.
  * -->
  *
- * \brief Configuration file for ini reader module.
+ * \brief Configuration file for DAC module.
  *
  *
- * \author Luca Ottaviano <lottaviano@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef CFG_INI_READER_H
-#define CFG_INI_READER_H
+#ifndef CFG_DAC_H
+#define CFG_DAC_H
 
 /**
- * Maximum ini file line length (chars).
- * $WIZ$ type = "int"; min = 1
+ * Module logging level.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
  */
-#define CONFIG_INI_MAX_LINE_LEN 64
+#define DAC_LOG_LEVEL      LOG_LVL_WARN
 
 /**
- * Make case insensitive comparisons.
- * $WIZ$ type = "boolean"
+ * Module logging format.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
  */
-#define CONFIG_INI_CASE_INSENSITIVE	0
+#define DAC_LOG_FORMAT     LOG_FMT_TERSE
 
-#endif /* CFG_INI_READER_H */
+/**
+ * DAC Refresh Period = 1024*REFRESH/DACC Clock
+ *
+ * $WIZ$ type = "int"
+ * $WIZ$ supports = "sam3x"
+ * $WIZ$ min = 0
+ * $WIZ$ max = 65536
+ */
+#define CONFIG_DAC_REFRESH            16
+
+/**
+ * DAC Startup Time Selection.
+ * see datasheet table.
+ *
+ * $WIZ$ type = "int"
+ * $WIZ$ supports = "sam3x"
+ * $WIZ$ min = 0
+ * $WIZ$ max = 63
+ */
+#define CONFIG_DAC_STARTUP             0
+
+/**
+ * DAC Trigger Selection.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "sam3x_dac_tc"
+ * $WIZ$ supports = "sam3x"
+ */
+#define CONFIG_DAC_TIMER  DACC_TRGSEL_TIO_CH0
+
+#endif /* CFG_DAC_H */
