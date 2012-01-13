@@ -54,19 +54,35 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-/*
+/**
  * \name Values for CONFIG_TIMER.
  *
  * Select which hardware timer interrupt to use for system clock and softtimers.
- * $WIZ$ timer_select = "TIMER_USE_TCC0", "TIMER_USE_TCC1", "TIMER_USE_TCD0", "TIMER_USE_TCE0", "TIMER_USE_TCD1", "TIMER_DEFAULT"
+ * $WIZ$ timer_select = "TIMER_USE_TCC0", "TIMER_USE_TCC1", "TIMER_USE_TCD0", "TIMER_USE_TCE0", "TIMER_USE_TCD1", "TIMER_USE_TCF0", "TIMER_USE_TCE1", "TIMER_USE_TCF1", "TIMER_DEFAULT"
  */
 #define TIMER_USE_TCC0	  1
 #define TIMER_USE_TCC1	  2
 #define TIMER_USE_TCD0	  3
 #define TIMER_USE_TCE0	  4
-// The XMEGA A Family has one extra timer
-#ifdef CPU_AVR_XMEGA_A
-	#define TIMER_USE_TCD1	  5
+#if CPU_AVR_XMEGA_A4 || CPU_AVR_XMEGA_A3 || CPU_AVR_XMEGA_A1
+	#define TIMER_USE_TCD1	5
+#else
+	#define TIMER_USE_TCD1	0
+#endif
+#if CPU_AVR_XMEGA_D3 || CPU_AVR_XMEGA_A3 || CPU_AVR_XMEGA_A1
+	#define TIMER_USE_TCF0	6
+#else
+	#define TIMER_USE_TCF0	0
+#endif
+#if CPU_AVR_XMEGA_A3 || CPU_AVR_XMEGA_A1
+	#define TIMER_USE_TCE1	7
+#else
+	#define TIMER_USE_TCE1	0
+#endif
+#if CPU_AVR_XMEGA_A1
+	#define TIMER_USE_TCF1	8
+#else
+	#define TIMER_USE_TCF1	0
 #endif
 
 #define TIMER_DEFAULT TIMER_USE_TCC1 ///< Default system timer
@@ -83,12 +99,21 @@
 #elif (CONFIG_TIMER == TIMER_USE_TCD0)
 	#define TIMER_OVF_VECT	TCD0_OVF_vect
 	#define TIMERCOUNTER	TCD0
-#elif (CONFIG_TIMER == TIMER_USE_TCE0)
-	#define TIMER_OVF_VECT	TCE0_OVF_vect
-	#define TIMERCOUNTER	TCE0
 #elif (CONFIG_TIMER == TIMER_USE_TCD1)
 	#define TIMER_OVF_VECT	TCD1_OVF_vect
 	#define TIMERCOUNTER	TCD1
+#elif (CONFIG_TIMER == TIMER_USE_TCE0)
+	#define TIMER_OVF_VECT	TCE0_OVF_vect
+	#define TIMERCOUNTER	TCE0
+#elif (CONFIG_TIMER == TIMER_USE_TCE1)
+	#define TIMER_OVF_VECT	TCE1_OVF_vect
+	#define TIMERCOUNTER	TCE1
+#elif (CONFIG_TIMER == TIMER_USE_TCF0)
+	#define TIMER_OVF_VECT	TCF0_OVF_vect
+	#define TIMERCOUNTER	TCF0
+#elif (CONFIG_TIMER == TIMER_USE_TCF1)
+	#define TIMER_OVF_VECT	TCF1_OVF_vect
+	#define TIMERCOUNTER	TCF1
 #else
 	#error Unimplemented value for CONFIG_TIMER
 #endif /* CONFIG_TIMER */

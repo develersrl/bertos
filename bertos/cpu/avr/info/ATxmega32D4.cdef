@@ -50,8 +50,7 @@ CPU_DESC += [ "32 Kbyte in-System Programmable Flash",
 
 # If we use the GCC compiler we should pass some flags.
 CORE_CPU = "atxmega32d4"
-
-# Special CPU related tags.
-CPU_TAGS += ["xmega32d"]
+# add a family tag for the wizard
+CPU_TAGS += ["xmegad4"]
 
 include("avr_post.common")

@@ -55,7 +55,8 @@
 
 /* Set KDBG_USART, KDBG_USART_PORT and KDBG_USART_TX_PIN_bm
  * according to the CONFIG_KDEBUG_PORT setting
- * The Xmega A and D families support at least 2 UARTS
+ * All Xmega families support at least 2 UARTS
+ * Some Xmega families suport more (D3->3, A4->5, A3->7, A1->8)
  */
 #if CONFIG_KDEBUG_PORT == 0
 	#define KDBG_USART              USARTC0
@@ -66,31 +67,57 @@
 	#define KDBG_USART_PORT         PORTD
 	#define KDBG_USART_TX_PIN_bm    PIN3_bm
 #endif
-/* Allow the configuration of the extra 3 UARTS for the
- * Xmega A family
- */
-#ifdef CPU_AVR_XMEGA_A
+#if CPU_AVR_XMEGA_D3 || CPU_AVR_XMEGA_A4 || CPU_AVR_XMEGA_A3 || CPU_AVR_XMEGA_A1
 	#if CONFIG_KDEBUG_PORT == 2
-		#define KDBG_USART              USARTC1
-		#define KDBG_USART_PORT         PORTC
-		#define KDBG_USART_TX_PIN_bm    PIN7_bm
-	#elif CONFIG_KDEBUG_PORT == 3
-		#define KDBG_USART              USARTD1
-		#define KDBG_USART_PORT         PORTD
-		#define KDBG_USART_TX_PIN_bm    PIN7_bm
-	#elif CONFIG_KDEBUG_PORT == 4
 		#define KDBG_USART              USARTE0
 		#define KDBG_USART_PORT         PORTE
 		#define KDBG_USART_TX_PIN_bm    PIN3_bm
 	#endif
 #endif
+#if CPU_AVR_XMEGA_A4 || CPU_AVR_XMEGA_A3 || CPU_AVR_XMEGA_A1
+	#if CONFIG_KDEBUG_PORT == 3
+		#define KDBG_USART              USARTC1
+		#define KDBG_USART_PORT         PORTC
+		#define KDBG_USART_TX_PIN_bm    PIN7_bm
+	#elif CONFIG_KDEBUG_PORT == 4
+		#define KDBG_USART              USARTD1
+		#define KDBG_USART_PORT         PORTD
+		#define KDBG_USART_TX_PIN_bm    PIN7_bm
+	#endif
+#endif
+#if CPU_AVR_XMEGA_A3 || CPU_AVR_XMEGA_A1
+	#if CONFIG_KDEBUG_PORT == 5
+		#define KDBG_USART              USARTE1
+		#define KDBG_USART_PORT         PORTE
+		#define KDBG_USART_TX_PIN_bm    PIN7_bm
+	#elif CONFIG_KDEBUG_PORT == 6
+		#define KDBG_USART              USARTF0
+		#define KDBG_USART_PORT         PORTF
+		#define KDBG_USART_TX_PIN_bm    PIN3_bm
+	#endif
+#endif
+#if CPU_AVR_XMEGA_A1
+	#if CONFIG_KDEBUG_PORT == 7
+		#define KDBG_USART              USARTF1
+		#define KDBG_USART_PORT         PORTF
+		#define KDBG_USART_TX_PIN_bm    PIN7_bm
+	#endif
+#endif
+
+
 /* Check if all required KDBG_ macros are defined
  */
 #ifndef KDBG_USART
-	#if CPU_AVR_XMEGA_D
+	#if CPU_AVR_XMEGA_D4
 		#error CONFIG_KDEBUG_PORT should be either 0 or 1
-	#elif CPU_AVR_XMEGA_A
+	#elif CPU_AVR_XMEGA_D3
+		#error CONFIG_KDEBUG_PORT should be either 0, 1 or 2
+	#elif CPU_AVR_XMEGA_A4
 		#error CONFIG_KDEBUG_PORT should be either 0, 1, 2, 3 or 4
+	#elif CPU_AVR_XMEGA_A3
+		#error CONFIG_KDEBUG_PORT should be either 0, 1, 2, 3, 4, 5 or 6
+	#elif CPU_AVR_XMEGA_A1
+		#error CONFIG_KDEBUG_PORT should be either 0, 1, 2, 3, 4, 5, 6 or 7
 	#endif
 #endif
 
@@ -195,7 +222,8 @@ typedef struct kdbg_avr_xmega_irqsave kdbg_irqsave_t;
 INLINE void kdbg_hw_init(void)
 {
 		//set transmit pin as output
-		KDBG_USART_PORT.OUT = KDBG_USART_PORT.OUT & ~KDBG_USART_TX_PIN_bm;
+		//KDBG_USART_PORT.OUTCLR = KDBG_USART_TX_PIN_bm;
+		KDBG_USART_PORT.OUTSET = KDBG_USART_TX_PIN_bm;
 		KDBG_USART_PORT.DIRSET = KDBG_USART_TX_PIN_bm;
 		//set 8 bits, no parity, 1 stop bit
 		KDBG_SET_FORMAT(USART_CHSIZE_8BIT_gc, USART_PMODE_DISABLED_gc, false);

@@ -44,8 +44,6 @@
 #include "hw/hw_ser.h"     /* Required for bus macros overrides */
 #include <hw/hw_cpufreq.h> /* CPU_FREQ */
 
-#include "cfg/cfg_ser.h"   /* Serialport configuration settings */
-
 #include <cfg/macros.h>    /* DIV_ROUND */
 #include <cfg/debug.h>     /* debug configuration */
 
@@ -312,17 +310,37 @@
 extern struct Serial *ser_handles[SER_CNT];
 
 /* TX and RX buffers */
-static unsigned char uart0_txbuffer[CONFIG_UART0_TXBUFSIZE];
-static unsigned char uart0_rxbuffer[CONFIG_UART0_RXBUFSIZE];
-static unsigned char uart1_txbuffer[CONFIG_UART1_TXBUFSIZE];
-static unsigned char uart1_rxbuffer[CONFIG_UART1_RXBUFSIZE];
-#ifdef CPU_AVR_XMEGA_A
-static unsigned char uart2_txbuffer[CONFIG_UART2_TXBUFSIZE];
-static unsigned char uart2_rxbuffer[CONFIG_UART2_RXBUFSIZE];
-static unsigned char uart3_txbuffer[CONFIG_UART3_TXBUFSIZE];
-static unsigned char uart3_rxbuffer[CONFIG_UART3_RXBUFSIZE];
-static unsigned char uart4_txbuffer[CONFIG_UART4_TXBUFSIZE];
-static unsigned char uart4_rxbuffer[CONFIG_UART4_RXBUFSIZE];
+#if IMPLEMENT_SER_UART0
+	static unsigned char uart0_txbuffer[CONFIG_UART0_TXBUFSIZE];
+	static unsigned char uart0_rxbuffer[CONFIG_UART0_RXBUFSIZE];
+#endif
+#if IMPLEMENT_SER_UART1
+	static unsigned char uart1_txbuffer[CONFIG_UART1_TXBUFSIZE];
+	static unsigned char uart1_rxbuffer[CONFIG_UART1_RXBUFSIZE];
+#endif
+#if IMPLEMENT_SER_UART2
+	static unsigned char uart2_txbuffer[CONFIG_UART2_TXBUFSIZE];
+	static unsigned char uart2_rxbuffer[CONFIG_UART2_RXBUFSIZE];
+#endif
+#if IMPLEMENT_SER_UART3
+	static unsigned char uart3_txbuffer[CONFIG_UART3_TXBUFSIZE];
+	static unsigned char uart3_rxbuffer[CONFIG_UART3_RXBUFSIZE];
+#endif
+#if IMPLEMENT_SER_UART4
+	static unsigned char uart4_txbuffer[CONFIG_UART4_TXBUFSIZE];
+	static unsigned char uart4_rxbuffer[CONFIG_UART4_RXBUFSIZE];
+#endif
+#if IMPLEMENT_SER_UART5
+	static unsigned char uart5_txbuffer[CONFIG_UART5_TXBUFSIZE];
+	static unsigned char uart5_rxbuffer[CONFIG_UART5_RXBUFSIZE];
+#endif
+#if IMPLEMENT_SER_UART6
+	static unsigned char uart6_txbuffer[CONFIG_UART6_TXBUFSIZE];
+	static unsigned char uart6_rxbuffer[CONFIG_UART6_RXBUFSIZE];
+#endif
+#if IMPLEMENT_SER_UART7
+	static unsigned char uart7_txbuffer[CONFIG_UART7_TXBUFSIZE];
+	static unsigned char uart7_rxbuffer[CONFIG_UART7_RXBUFSIZE];
 #endif
 
 /*
@@ -519,8 +537,23 @@ static const struct SerialHardwareVT UART_VT =
 	C99INIT(txSending, tx_sending)
 };
 
+/*
+ * Xmega UARTDesc data structure
+ * Contains all information required to manage a serial port.
+ *
+ * Serial ports are assigned (as far as present on the xmega family) as:
+ * SER_UART0 -> USARTC0
+ * SER_UART1 -> USARTD0
+ * SER_UART2 -> USARTE0
+ * SER_UART3 -> USARTC1
+ * SER_UART4 -> USARTD1
+ * SER_UART5 -> USARTE1
+ * SER_UART6 -> USARTF0
+ * SER_UART7 -> USARTF1
+ */
 static struct AvrxmegaSerial UARTDescs[SER_CNT] =
 {
+#if IMPLEMENT_SER_UART0
 	{
 		C99INIT(hw, /**/) {
 			C99INIT(table, &UART_VT),
@@ -535,6 +568,8 @@ static struct AvrxmegaSerial UARTDescs[SER_CNT] =
 		C99INIT(txpin, PIN3_bp),
 		C99INIT(rxpin, PIN2_bp),
 	},
+#endif
+#if IMPLEMENT_SER_UART1
 	{
 		C99INIT(hw, /**/) {
 			C99INIT(table, &UART_VT),
@@ -549,7 +584,8 @@ static struct AvrxmegaSerial UARTDescs[SER_CNT] =
 		C99INIT(txpin, PIN3_bp),
 		C99INIT(rxpin, PIN2_bp),
 	},
-#ifdef CPU_AVR_XMEGA_A
+#endif
+#if IMPLEMENT_SER_UART2
 	{
 		C99INIT(hw, /**/) {
 			C99INIT(table, &UART_VT),
@@ -559,11 +595,13 @@ static struct AvrxmegaSerial UARTDescs[SER_CNT] =
 			C99INIT(rxbuffer_size, sizeof(uart2_rxbuffer)),
 		},
 		C99INIT(sending, false),
-		C99INIT(usart, &USARTC1),
-		C99INIT(port, &PORTC),
-		C99INIT(txpin, PIN7_bp),
-		C99INIT(rxpin, PIN6_bp),
+		C99INIT(usart, &USARTE0),
+		C99INIT(port, &PORTE),
+		C99INIT(txpin, PIN3_bp),
+		C99INIT(rxpin, PIN2_bp),
 	},
+#endif
+#if IMPLEMENT_SER_UART3
 	{
 		C99INIT(hw, /**/) {
 			C99INIT(table, &UART_VT),
@@ -573,11 +611,13 @@ static struct AvrxmegaSerial UARTDescs[SER_CNT] =
 			C99INIT(rxbuffer_size, sizeof(uart3_rxbuffer)),
 		},
 		C99INIT(sending, false),
-		C99INIT(usart, &USARTD1),
-		C99INIT(port, &PORTD),
+		C99INIT(usart, &USARTC1),
+		C99INIT(port, &PORTC),
 		C99INIT(txpin, PIN7_bp),
 		C99INIT(rxpin, PIN6_bp),
 	},
+#endif
+#if IMPLEMENT_SER_UART4
 	{
 		C99INIT(hw, /**/) {
 			C99INIT(table, &UART_VT),
@@ -587,12 +627,60 @@ static struct AvrxmegaSerial UARTDescs[SER_CNT] =
 			C99INIT(rxbuffer_size, sizeof(uart4_rxbuffer)),
 		},
 		C99INIT(sending, false),
-		C99INIT(usart, &USARTE0),
+		C99INIT(usart, &USARTD1),
+		C99INIT(port, &PORTD),
+		C99INIT(txpin, PIN7_bp),
+		C99INIT(rxpin, PIN6_bp),
+	},
+#endif
+#if IMPLEMENT_SER_UART5
+	{
+		C99INIT(hw, /**/) {
+			C99INIT(table, &UART_VT),
+			C99INIT(txbuffer, uart5_txbuffer),
+			C99INIT(rxbuffer, uart5_rxbuffer),
+			C99INIT(txbuffer_size, sizeof(uart5_txbuffer)),
+			C99INIT(rxbuffer_size, sizeof(uart5_rxbuffer)),
+		},
+		C99INIT(sending, false),
+		C99INIT(usart, &USARTE1),
 		C99INIT(port, &PORTE),
+		C99INIT(txpin, PIN7_bp),
+		C99INIT(rxpin, PIN6_bp),
+	},
+#endif
+#if IMPLEMENT_SER_UART6
+	{
+		C99INIT(hw, /**/) {
+			C99INIT(table, &UART_VT),
+			C99INIT(txbuffer, uart6_txbuffer),
+			C99INIT(rxbuffer, uart6_rxbuffer),
+			C99INIT(txbuffer_size, sizeof(uart6_txbuffer)),
+			C99INIT(rxbuffer_size, sizeof(uart6_rxbuffer)),
+		},
+		C99INIT(sending, false),
+		C99INIT(usart, &USARTF0),
+		C99INIT(port, &PORTF),
 		C99INIT(txpin, PIN3_bp),
 		C99INIT(rxpin, PIN2_bp),
 	},
-#endif //CPU_AVR_XMEGA_A
+#endif
+#if IMPLEMENT_SER_UART7
+	{
+		C99INIT(hw, /**/) {
+			C99INIT(table, &UART_VT),
+			C99INIT(txbuffer, uart7_txbuffer),
+			C99INIT(rxbuffer, uart7_rxbuffer),
+			C99INIT(txbuffer_size, sizeof(uart7_txbuffer)),
+			C99INIT(rxbuffer_size, sizeof(uart7_rxbuffer)),
+		},
+		C99INIT(sending, false),
+		C99INIT(usart, &USARTF1),
+		C99INIT(port, &PORTF),
+		C99INIT(txpin, PIN7_bp),
+		C99INIT(rxpin, PIN6_bp),
+	}
+#endif
 };
 
 struct SerialHardware *ser_hw_getdesc(int unit)
@@ -629,61 +717,6 @@ DECLARE_ISR(_vector)										\
 {															\
 	usart_handleDreInterrupt( _usart );	\
 }
-
-USART_DRE_INTERRUPT_VECTOR(USARTC0_DRE_vect, SER_UART0)
-USART_DRE_INTERRUPT_VECTOR(USARTD0_DRE_vect, SER_UART1)
-#ifdef CPU_AVR_XMEGA_A
-	USART_DRE_INTERRUPT_VECTOR(USARTC1_DRE_vect, SER_UART2)
-	USART_DRE_INTERRUPT_VECTOR(USARTD1_DRE_VECT, SER_UART3)
-	USART_DRE_INTERRUPT_VECTOR(USARTE0_DRE_vect, SER_UART4)
-#endif
-
-#ifdef SER_UART_BUS_TXOFF
-	static inline void USART_handleTXCInterrupt(uint8_t usartNumber)
-	{
-		SER_STROBE_ON;
-		struct FIFOBuffer * const txfifo = &ser_handles[usartNumber]->txfifo;
-		if (fifo_isempty(txfifo))
-		{
-			SER_UART_BUS_TXOFF(UARTDescs[usartNumber].usart);
-			UARTDescs[usartNumber].sending = false;
-		}
-		else
-		{
-			SER_UART_BUS_TXBEGIN(UARTDescs[usartNumber].usart);
-		}
-		SER_STROBE_OFF;
-	}
-
-	/*
-	 * Serial port 0 TX complete interrupt handler.
-	 *
-	 * This IRQ is usually disabled.  The UDR-empty interrupt
-	 * enables it when there's no more data to transmit.
-	 * We need to wait until the last character has been
-	 * transmitted before switching the 485 transceiver to
-	 * receive mode.
-	 *
-	 * The txfifo might have been refilled by putchar() while
-	 * we were waiting for the transmission complete interrupt.
-	 * In this case, we must restart the UDR empty interrupt,
-	 * otherwise we'd stop the serial port with some data
-	 * still pending in the buffer.
-	 */
-	#define USART_TXC_INTERRUPT_VECTOR(_vector, _usart)	\
-	DECLARE_ISR(_vector)								\
-	{													\
-		USART_handleTXCInterrupt( _usart );				\
-	}
-
-	USART_TXC_INTERRUPT_VECTOR(USARTC0_TXC_vect, SER_UART0)
-	USART_TXC_INTERRUPT_VECTOR(USARTD0_TXC_vect, SER_UART1)
-	#ifdef CPU_AVR_XMEGA_A
-		USART_TXC_INTERRUPT_VECTOR(USARTC1_TXC_vect, SER_UART2)
-		USART_TXC_INTERRUPT_VECTOR(USARTD1_TXC_vect, SER_UART3)
-		USART_TXC_INTERRUPT_VECTOR(USARTE0_TXC_vect, SER_UART4)
-	#endif /* CPU_AVR_XMEGA_A */
-#endif /* SER_UART_BUS_TXOFF */
 
 /*
  * Serial RX complete interrupt handler.
@@ -727,10 +760,100 @@ DECLARE_ISR(_vector)								\
 {													\
 	USART_handleRXCInterrupt( _usart );				\
 }
-USART_RXC_INTERRUPT_VECTOR(USARTC0_RXC_vect, SER_UART0)
-USART_RXC_INTERRUPT_VECTOR(USARTD0_RXC_vect, SER_UART1)
-#ifdef CPU_AVR_XMEGA_A
-	USART_RXC_INTERRUPT_VECTOR(USARTC1_RXC_vect, SER_UART2)
-	USART_RXC_INTERRUPT_VECTOR(USARTD1_RXC_vect, SER_UART3)
-	USART_RXC_INTERRUPT_VECTOR(USARTE0_RXC_vect, SER_UART4)
+
+#if IMPLEMENT_SER_UART0
+	USART_DRE_INTERRUPT_VECTOR(USARTC0_DRE_vect, SER_UART0)
+	USART_RXC_INTERRUPT_VECTOR(USARTC0_RXC_vect, SER_UART0)
 #endif
+#if IMPLEMENT_SER_UART1
+	USART_DRE_INTERRUPT_VECTOR(USARTD0_DRE_vect, SER_UART1)
+	USART_RXC_INTERRUPT_VECTOR(USARTD0_RXC_vect, SER_UART1)
+#endif
+#if IMPLEMENT_SER_UART2
+	USART_DRE_INTERRUPT_VECTOR(USARTE0_DRE_vect, SER_UART2)
+	USART_RXC_INTERRUPT_VECTOR(USARTE0_RXC_vect, SER_UART2)
+#endif
+#if IMPLEMENT_SER_UART3
+	USART_DRE_INTERRUPT_VECTOR(USARTC1_DRE_vect, SER_UART3)
+	USART_RXC_INTERRUPT_VECTOR(USARTC1_RXC_vect, SER_UART3)
+#endif
+#if IMPLEMENT_SER_UART4
+	USART_DRE_INTERRUPT_VECTOR(USARTD1_DRE_vect, SER_UART4)
+	USART_RXC_INTERRUPT_VECTOR(USARTD1_RXC_vect, SER_UART4)
+#endif
+#if IMPLEMENT_SER_UART5
+	USART_DRE_INTERRUPT_VECTOR(USARTE1_DRE_vect, SER_UART5)
+	USART_RXC_INTERRUPT_VECTOR(USARTE1_RXC_vect, SER_UART5)
+#endif
+#if IMPLEMENT_SER_UART6
+	USART_DRE_INTERRUPT_VECTOR(USARTF0_DRE_vect, SER_UART6)
+	USART_RXC_INTERRUPT_VECTOR(USARTF0_RXC_vect, SER_UART6)
+#endif
+#if IMPLEMENT_SER_UART7
+	USART_DRE_INTERRUPT_VECTOR(USARTF1_DRE_vect, SER_UART7)
+	USART_RXC_INTERRUPT_VECTOR(USARTF1_RXC_vect, SER_UART7)
+#endif
+
+#ifdef SER_UART_BUS_TXOFF
+	static inline void USART_handleTXCInterrupt(uint8_t usartNumber)
+	{
+		SER_STROBE_ON;
+		struct FIFOBuffer * const txfifo = &ser_handles[usartNumber]->txfifo;
+		if (fifo_isempty(txfifo))
+		{
+			SER_UART_BUS_TXOFF(UARTDescs[usartNumber].usart);
+			UARTDescs[usartNumber].sending = false;
+		}
+		else
+		{
+			SER_UART_BUS_TXBEGIN(UARTDescs[usartNumber].usart);
+		}
+		SER_STROBE_OFF;
+	}
+
+	/*
+	 * Serial port 0 TX complete interrupt handler.
+	 *
+	 * This IRQ is usually disabled.  The UDR-empty interrupt
+	 * enables it when there's no more data to transmit.
+	 * We need to wait until the last character has been
+	 * transmitted before switching the 485 transceiver to
+	 * receive mode.
+	 *
+	 * The txfifo might have been refilled by putchar() while
+	 * we were waiting for the transmission complete interrupt.
+	 * In this case, we must restart the UDR empty interrupt,
+	 * otherwise we'd stop the serial port with some data
+	 * still pending in the buffer.
+	 */
+	#define USART_TXC_INTERRUPT_VECTOR(_vector, _usart)	\
+	DECLARE_ISR(_vector)								\
+	{													\
+		USART_handleTXCInterrupt( _usart );				\
+	}
+
+	#if IMPLEMENT_SER_UART0
+		USART_TXC_INTERRUPT_VECTOR(USARTC0_TXC_vect, SER_UART0)
+	#endif
+	#if IMPLEMENT_SER_UART1
+		USART_TXC_INTERRUPT_VECTOR(USARTD0_TXC_vect, SER_UART1)
+	#endif
+	#if IMPLEMENT_SER_UART2
+		USART_TXC_INTERRUPT_VECTOR(USARTE0_TXC_vect, SER_UART2)
+	#endif
+	#if IMPLEMENT_SER_UART3
+		USART_TXC_INTERRUPT_VECTOR(USARTC1_TXC_vect, SER_UART3)
+	#endif
+	#if IMPLEMENT_SER_UART4
+		USART_TXC_INTERRUPT_VECTOR(USARTD1_TXC_vect, SER_UART4)
+	#endif
+	#if IMPLEMENT_SER_UART5
+		USART_TXC_INTERRUPT_VECTOR(USARTE1_TXC_vect, SER_UART5)
+	#endif
+	#if IMPLEMENT_SER_UART6
+		USART_TXC_INTERRUPT_VECTOR(USARTF0_TXC_vect, SER_UART6)
+	#endif
+	#if IMPLEMENT_SER_UART7
+		USART_TXC_INTERRUPT_VECTOR(USARTF1_TXC_vect, SER_UART7)
+	#endif
+#endif /* SER_UART_BUS_TXOFF */
