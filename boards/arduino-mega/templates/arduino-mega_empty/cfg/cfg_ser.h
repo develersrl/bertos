@@ -45,6 +45,13 @@
  */
 
 /**
+ * Enable port 0
+ * $WIZ$ type = "boolean"
+ * $WIZ$ supports = "xmega"
+ */
+#define CONFIG_UART0_ENABLED 1
+
+/**
  * Size of the outbound FIFO buffer for port 0 [bytes].
  * $WIZ$ type = "int"
  * $WIZ$ min = 2
@@ -59,10 +66,17 @@
 #define CONFIG_UART0_RXBUFSIZE  32
 
 /**
+ * Enable port 1
+ * $WIZ$ type = "boolean"
+ * $WIZ$ supports = "xmega"
+ */
+#define CONFIG_UART1_ENABLED 1
+
+/**
  * Size of the outbound FIFO buffer for port 1 [bytes].
  * $WIZ$ type = "int"
  * $WIZ$ min = 2
- * $WIZ$ supports = "lm3s or lpc2 or (at91 and not atmega8 and not atmega168 and not atmega32)"
+ * $WIZ$ supports = "lm3s or lpc2 or xmega or (at91 and not atmega8 and not atmega168 and not atmega32)"
  */
 #define CONFIG_UART1_TXBUFSIZE  32
 
@@ -70,15 +84,22 @@
  * Size of the inbound FIFO buffer for port 1 [bytes].
  * $WIZ$ type = "int"
  * $WIZ$ min = 2
- * $WIZ$ supports = "lm3s or lpc2 or (at91 and not atmega8 and not atmega168 and not atmega32)"
+ * $WIZ$ supports = "lm3s or lpc2 or xmega or (at91 and not atmega8 and not atmega168 and not atmega32)"
  */
 #define CONFIG_UART1_RXBUFSIZE  32
+
+/**
+ * Enable port 2
+ * $WIZ$ type = "boolean"
+ * $WIZ$ supports = "xmega and (not xmegad4)"
+ */
+#define CONFIG_UART2_ENABLED 1
 
 /**
  * Size of the outbound FIFO buffer for port 2 [bytes].
  * $WIZ$ type = "int"
  * $WIZ$ min = 2
- * $WIZ$ supports = "lm3s or lpc2"
+ * $WIZ$ supports = "lm3s or lpc2 or (xmega and not xmegad4)"
  */
 #define CONFIG_UART2_TXBUFSIZE  32
 
@@ -86,15 +107,22 @@
  * Size of the inbound FIFO buffer for port 2 [bytes].
  * $WIZ$ type = "int"
  * $WIZ$ min = 2
- * $WIZ$ supports = "lm3s or lpc2"
+ * $WIZ$ supports = "lm3s or lpc2 or (xmega and not xmegad4)"
  */
 #define CONFIG_UART2_RXBUFSIZE  32
+
+/**
+ * Enable port 3
+ * $WIZ$ type = "boolean"
+ * $WIZ$ supports = "xmega and not xmegad4"
+ */
+#define CONFIG_UART3_ENABLED 1
 
 /**
  * Size of the outbound FIFO buffer for port 3 [bytes].
  * $WIZ$ type = "int"
  * $WIZ$ min = 2
- * $WIZ$ supports = "lpc2"
+ * $WIZ$ supports = "lpc2 or xmega and not xmegad4"
  */
 #define CONFIG_UART3_TXBUFSIZE  32
 
@@ -102,16 +130,107 @@
  * Size of the inbound FIFO buffer for port 3 [bytes].
  * $WIZ$ type = "int"
  * $WIZ$ min = 2
- * $WIZ$ supports = "lpc2"
+ * $WIZ$ supports = "lpc2 or xmega and not xmegad4"
  */
 #define CONFIG_UART3_RXBUFSIZE  32
 
+/**
+ * Enable port 4
+ * $WIZ$ type = "boolean"
+ * $WIZ$ supports = "xmega and not xmegad4"
+ */
+#define CONFIG_UART4_ENABLED 1
+
+/**
+ * Size of the outbound FIFO buffer for port 4 [bytes].
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 2
+ * $WIZ$ supports = "xmega and not xmegad4"
+ */
+#define CONFIG_UART4_TXBUFSIZE  32
+
+/**
+ * Size of the inbound FIFO buffer for port 4 [bytes].
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 2
+ * $WIZ$ supports = "xmega and not xmegad4"
+ */
+#define CONFIG_UART4_RXBUFSIZE  32
+
+/**
+ * Enable port 5
+ * $WIZ$ type = "boolean"
+ * $WIZ$ supports = "xmegaa1 or xmegaa3"
+ */
+#define CONFIG_UART5_ENABLED 1
+
+/**
+ * Size of the outbound FIFO buffer for port 5 [bytes].
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 2
+ * $WIZ$ supports = "xmegaa1 or xmegaa3"
+ */
+#define CONFIG_UART5_TXBUFSIZE  32
+
+/**
+ * Size of the inbound FIFO buffer for port 5 [bytes].
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 2
+ * $WIZ$ supports = "xmegaa1 or xmegaa3"
+ */
+#define CONFIG_UART5_RXBUFSIZE  32
+
+/**
+ * Enable port 6
+ * $WIZ$ type = "boolean"
+ * $WIZ$ supports = "xmegaa1 or xmegaa3"
+ */
+#define CONFIG_UART6_ENABLED 1
+
+/**
+ * Size of the outbound FIFO buffer for port 6 [bytes].
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 2
+ * $WIZ$ supports = "xmegaa1 or xmegaa3"
+ */
+#define CONFIG_UART6_TXBUFSIZE  32
+
+/**
+ * Size of the inbound FIFO buffer for port 6 [bytes].
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 2
+ * $WIZ$ supports = "xmegaa1 or xmegaa3"
+ */
+#define CONFIG_UART6_RXBUFSIZE  32
+
+/**
+ * Enable port 7
+ * $WIZ$ type = "boolean"
+ * $WIZ$ supports = "xmegaa1"
+ */
+#define CONFIG_UART7_ENABLED 1
+
+/**
+ * Size of the outbound FIFO buffer for port 7 [bytes].
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 2
+ * $WIZ$ supports = "xmegaa1"
+ */
+#define CONFIG_UART7_TXBUFSIZE  32
+
+/**
+ * Size of the inbound FIFO buffer for port 7 [bytes].
+ * $WIZ$ type = "int"
+ * $WIZ$ min = 2
+ * $WIZ$ supports = "xmegaa1"
+ */
+#define CONFIG_UART7_RXBUFSIZE  32
 
 /**
  * Size of the outbound FIFO buffer for SPI port [bytes].
  * $WIZ$ type = "int"
  * $WIZ$ min = 2
- * $WIZ$ supports = "avr"
+ * $WIZ$ supports = "avr and not xmega"
  */
 #define CONFIG_SPI_TXBUFSIZE    32
 
@@ -119,7 +238,7 @@
  * Size of the inbound FIFO buffer for SPI port [bytes].
  * $WIZ$ type = "int"
  * $WIZ$ min = 2
- * $WIZ$ supports = "avr"
+ * $WIZ$ supports = "avr and not xmega"
  */
 #define CONFIG_SPI_RXBUFSIZE    32
 
@@ -160,14 +279,14 @@
  *
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "ser_order_bit"
- * $WIZ$ supports = "avr"
+ * $WIZ$ supports = "avr and not xmega"
  */
 #define CONFIG_SPI_DATA_ORDER	SER_MSB_FIRST
 
 /**
  * SPI clock division factor.
  * $WIZ$ type = "int"
- * $WIZ$ supports = "avr"
+ * $WIZ$ supports = "avr and not xmega"
  */
 #define CONFIG_SPI_CLOCK_DIV	16
 
@@ -175,7 +294,7 @@
  * SPI clock polarity: normal low or normal high.
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "ser_spi_pol"
- * $WIZ$ supports = "avr"
+ * $WIZ$ supports = "avr and not xmega"
  */
 #define CONFIG_SPI_CLOCK_POL        SPI_NORMAL_LOW
 
@@ -184,7 +303,7 @@
  * sample on second clock edge.
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "ser_spi_phase"
- * $WIZ$ supports = "avr"
+ * $WIZ$ supports = "avr and not xmega"
  */
 #define CONFIG_SPI_CLOCK_PHASE	    SPI_SAMPLE_ON_FIRST_EDGE
 
