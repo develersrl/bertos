@@ -75,7 +75,7 @@ struct RTask
 	void *user_data;
 };
 
-DECLARE_POOL_STATIC(rtask_pool, RTask, CONFIG_RTASK_POOL_SIZE);
+DEFINE_POOL_STATIC(rtask_pool, RTask, CONFIG_RTASK_POOL_SIZE);
 static Process *process = NULL;
 static List rt_list;
 static Semaphore rtask_sem;

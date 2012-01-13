@@ -54,7 +54,7 @@
  *     // other members here...
  * } MyType;
  *
- * DECLARE_POOL(mypool, MyType, POOL_SIZE);
+ * DEFINE_POOL(mypool, MyType, POOL_SIZE);
  *
  * static void elem_init(MyType *e)
  * {
@@ -88,7 +88,7 @@
 #define EXTERN_POOL(name) \
 	extern List name
 
-#define DECLARE_POOL_WITH_STORAGE(name, type, num, storage) \
+#define DEFINE_POOL_WITH_STORAGE(name, type, num, storage) \
 	static type name##_items[num]; \
 	storage name; \
 	INLINE void name##_init(void (*init_func)(type*)) \
@@ -104,6 +104,9 @@
 	INLINE void name##_init(void (*init_func)(type*)) \
 	/**/
 
+/* For backwards compatibily */
+#define DECLARE_POOL_WITH_STORAGE DEFINE_POOL_WITH_STORAGE
+
 /**
  * \brief Helper macro to declare a Pool data type.
  *
@@ -114,16 +117,22 @@
  * \param type Data type held by the pool.
  * \param num Number of elements in pool.
  */
-#define DECLARE_POOL(name, type, num) \
-	DECLARE_POOL_WITH_STORAGE(name, type, num, List)
+#define DEFINE_POOL(name, type, num) \
+	DEFINE_POOL_WITH_STORAGE(name, type, num, List)
+
+/* For backwards compatibily */
+#define DECLARE_POOL DEFINE_POOL
 
 /**
  * \brief Static Pool declaration
  *
- * \sa DECLARE_POOL
+ * \sa DEFINE_POOL
  */
-#define DECLARE_POOL_STATIC(name, type, num) \
-	DECLARE_POOL_WITH_STORAGE(name, type, num, static List)
+#define DEFINE_POOL_STATIC(name, type, num) \
+	DEFINE_POOL_WITH_STORAGE(name, type, num, static List)
+
+/* For backwards compatibily */
+#define DECLARE_POOL_STATIC  DEFINE_POOL_STATIC
 
 /**
  * Initialize the pool \a name, calling \a init_func on each element.
