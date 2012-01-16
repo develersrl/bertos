@@ -92,13 +92,6 @@
 #include <stdio.h>
 #include <string.h>
 
-/* Macro to unpack the ip addres from lwip format in 4 int*/
-#define IP_ADDR_TO_INT_TUPLE(addr) \
-		(int)((addr) >>  0 & 0xff), \
-		(int)((addr) >>  8 & 0xff), \
-		(int)((addr) >> 16 & 0xff), \
-		(int)((addr) >> 24 & 0xff)
-
 /* Network interface global variables */
 static struct ip_addr ipaddr, netmask, gw;
 static struct netif netif;

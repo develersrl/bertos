@@ -446,5 +446,22 @@ INLINE bool is_aligned(const void *addr, size_t size)
 
 /** \} */ //defgroup macros
 
+
+/**
+ * Macro to unpack the ip addres from lwip format in 4 int
+ * \param struct ip_addr ip_addr;
+ * \return for int variable separated from comma
+ *
+ * \usage:
+ * \code
+ * LOG_INFO("dhcp ok: ip = %d.%d.%d.%d\n", IP_ADDR_TO_INT_TUPLE(netif.ip_addr.addr));
+ * \endcode
+ */
+#define IP_ADDR_TO_INT_TUPLE(addr) \
+		(int)((addr) >>  0 & 0xff), \
+		(int)((addr) >>  8 & 0xff), \
+		(int)((addr) >> 16 & 0xff), \
+		(int)((addr) >> 24 & 0xff)
+
 #endif /* MACROS_H */
 
