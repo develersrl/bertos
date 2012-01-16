@@ -110,7 +110,7 @@
 #if CONFIG_PHY_CHIP == DAVICOM_DM9161A
 	#include <drv/dm9161a.h>
 #elif CONFIG_PHY_CHIP == NATIONAL_DP3848I
-	#include <drv/dp8348i.h>
+	#include <drv/dp83848i.h>
 #else
 	#error No supported PHY chip was select.
 #endif
