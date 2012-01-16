@@ -67,7 +67,7 @@
  *
  * $WIZ$ module_name = "syslog"
  * $WIZ$ module_configuration = "bertos/cfg/cfg_syslog.h"
- * $WIZ$ module_depends = "lwip", "kfile"
+ * $WIZ$ module_depends = "lwip", "debug"
  */
 
 #ifndef NET_SYSLOG_H

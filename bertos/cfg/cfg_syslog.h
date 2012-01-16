@@ -41,19 +41,19 @@
 /**
  * Enable the net logging.
  *
- * $WIZ$ type = "bool"
+ * $WIZ$ type = "autoenabled"
  */
-#define CONFIG_SYSLOG_NET     1
+#define CONFIG_SYSLOG_NET     0
 
 /**
- * Enable the serial logging.
+ * Log also on serial.
  *
- * $WIZ$ type = "bool"
+ * $WIZ$ type = "boolean"
  */
 #define CONFIG_SYSLOG_SERIAL  1
 
 /**
- * Destination port of log messages
+ * Destination port of log messages.
  *
  * $WIZ$ type = "int"
  */
