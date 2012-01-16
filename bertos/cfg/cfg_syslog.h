@@ -39,19 +39,32 @@
 #define CFG_SYSLOG_H
 
 /**
- * Module logging level.
+ * Enable the net logging.
  *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_level"
+ * $WIZ$ type = "bool"
  */
-#define SYSLOG_LOG_LEVEL    LOG_LVL_WARN
+#define CONFIG_SYSLOG_NET     1
 
 /**
- * Module logging format.
+ * Enable the serial logging.
  *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "log_format"
+ * $WIZ$ type = "bool"
  */
-#define SYSLOG_LOG_FORMAT   LOG_FMT_VERBOSE
+#define CONFIG_SYSLOG_SERIAL  1
+
+/**
+ * Destination port of log messages
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_SYSLOG_PORT    514
+
+/**
+ * Max log message length.
+ *
+ * $WIZ$ type = "int"
+ */
+#define CONFIG_SYSLOG_BUFSIZE 256
+
 
 #endif /* CFG_SYSLOG_H */

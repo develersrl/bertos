@@ -145,12 +145,33 @@
 #define LOG_FMT_TERSE     0
 /** \} */
 
-#if LOG_FORMAT == LOG_FMT_VERBOSE
-	#define LOG_PRINT(str_level, str,...)    kprintf("%s():%d:%s: " str, __func__, __LINE__, str_level, ## __VA_ARGS__)
-#elif LOG_FORMAT == LOG_FMT_TERSE
-	#define LOG_PRINT(str_level, str,...)    kprintf("%s: " str, str_level, ## __VA_ARGS__)
+#include "cfg/cfg_syslog.h"
+
+/* For backward compatibility */
+#ifndef CONFIG_SYSLOG_NET
+	#define CONFIG_SYSLOG_NET 0
+#endif
+
+#if CONFIG_SYSLOG_NET
+	#include <net/syslog.h>
+
+	#if LOG_FORMAT == LOG_FMT_VERBOSE
+		#define LOG_PRINT(str_level, str,...)    syslog_printf("<182>%d-%s():%d:%s: " str, syslog_count(), __func__, __LINE__, str_level, ## __VA_ARGS__)
+	#elif LOG_FORMAT == LOG_FMT_TERSE
+		#define LOG_PRINT(str_level, str,...)    syslog_printf("<182>%d-%s: " str, syslog_count(), str_level, ## __VA_ARGS__)
+	#else
+		#error No LOG_FORMAT defined
+	#endif
+
 #else
-	#error No LOG_FORMAT defined
+	#if LOG_FORMAT == LOG_FMT_VERBOSE
+		#define LOG_PRINT(str_level, str,...)    kprintf("%s():%d:%s: " str, __func__, __LINE__, str_level, ## __VA_ARGS__)
+	#elif LOG_FORMAT == LOG_FMT_TERSE
+		#define LOG_PRINT(str_level, str,...)    kprintf("%s: " str, str_level, ## __VA_ARGS__)
+	#else
+		#error No LOG_FORMAT defined
+	#endif
+
 #endif
 
 #if LOG_LEVEL >= LOG_LVL_ERR

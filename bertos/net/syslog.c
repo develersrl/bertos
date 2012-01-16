@@ -40,16 +40,99 @@
 #include "syslog.h"
 
 #include "cfg/cfg_syslog.h"
-#define LOG_LEVEL   SYSLOG_LOG_LEVEL
-#define LOG_FORMAT  SYSLOG_LOG_FORMAT
-#include <cfg/log.h>
+
+#include <cpu/byteorder.h> // host_to_net16
+
+#include <lwip/ip_addr.h>
+#include <lwip/netif.h>
+#include <lwip/netbuf.h>
+#include <lwip/tcpip.h>
+
+#include <stdarg.h>
+#include <stdio.h>
+
+static char syslog_message[CONFIG_SYSLOG_BUFSIZE];
+static SysLog *local_syslog_ctx;
 
 /**
- * Init
- *
+ * Return the number of log message has been sent.
  */
-int syslog_init(void)
+uint32_t syslog_count(void)
 {
-	return 0;
+	return local_syslog_ctx->syslog_cnt;
 }
 
+/**
+ * Get the current syslog server address, in lwip ip_address format.
+ */
+struct ip_addr syslog_ip(void)
+{
+	return local_syslog_ctx->server_addr;
+}
+
+/**
+ * Change the current syslog server ip address.
+ * \param lwip ip_address (you could use the macro IP4_ADDR() to get it form ip address)
+ */
+void syslog_setIp(struct ip_addr addr)
+{
+	local_syslog_ctx->server_addr = addr;
+}
+
+
+/**
+ * Print the log message on upd socket and serial if you configure the
+ * macro CONFIG_SYSLOG_SERIAL in cfg_syslog.h,
+ */
+int syslog_printf(const char *fmt, ...)
+{
+	va_list ap;
+	va_start(ap, fmt);
+	int len = vsnprintf(syslog_message, sizeof(syslog_message), fmt, ap);
+	va_end(ap);
+	syslog_message[sizeof(syslog_message) - 1] = 0;
+
+	#if CONFIG_SYSLOG_SERIAL
+		kputs(syslog_message);
+	#endif
+
+	if (local_syslog_ctx == NULL)
+	{
+		kputs("SysLog not init\n");
+		return -1;
+	}
+
+	local_syslog_ctx->syslog_server = netconn_new(NETCONN_UDP);
+	if (local_syslog_ctx->syslog_server == NULL)
+	{
+		kputs("Unable to alloc UDP connetions\n");
+		return -1;
+	}
+
+	netbuf_ref(local_syslog_ctx->send_buf, syslog_message, len);
+	if (netconn_sendto(local_syslog_ctx->syslog_server, local_syslog_ctx->send_buf,
+						&(local_syslog_ctx->server_addr), CONFIG_SYSLOG_PORT) != ERR_OK)
+	{
+		kputs("Unable to send log!\n");
+	}
+
+	local_syslog_ctx->syslog_cnt++;
+	netconn_delete(local_syslog_ctx->syslog_server);
+
+	return len;
+}
+
+/**
+ * Init the syslog message.
+ *
+ * \param syslog context
+ * \param lwip ip_address (you could use the macro IP4_ADDR() to get it form ip address)
+ */
+void syslog_init(SysLog *syslog_ctx, struct ip_addr addr)
+{
+	memset(syslog_ctx, 0, sizeof(syslog_ctx));
+	syslog_ctx->server_addr = addr;
+	syslog_ctx->send_buf = netbuf_new();
+
+	local_syslog_ctx = syslog_ctx;
+}

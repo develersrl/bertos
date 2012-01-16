@@ -30,10 +30,36 @@
  *
  * -->
  *
- * \brief SYSLOG
+ * \brief SYSLOG log all debug message in the BeRTOS code, with the
+ * respective log level, to one syslog server on the udp protocol.
  *
  * The usage pattern is as follows:
  * \code
+ *  // Init the network, es using dhcp:
+ *
+ * 	// Initialize TCP/IP stack
+ *	tcpip_init(NULL, NULL);
+ *
+ *	// Bring up the network interface
+ *	netif_add(&netif, &ipaddr, &netmask, &gw, NULL, ethernetif_init, tcpip_input);
+ *	netif_set_default(&netif);
+ *	netif_set_up(&netif);
+ *
+ *	dhcp_start(&netif);
+ *	while (!netif.ip_addr.addr)
+ *   	timer_delay(DHCP_FINE_TIMER_MSECS);
+ *
+ *  // lwip address struct
+ * 	struct ip_addr server_addr;
+ *  // convert address to ip_address
+ * 	IP4_ADDR(&server_addr, 192, 168, 0, 2);
+ *
+ *  // init the syslog module
+ *	syslog_init(&syslog, server_addr);
+ *
+ * // now all LOG_*(message) are logged on
+ * // syslog server.
+ * // see the cfg_syslog.h for all settings.
  * \endcode
  *
  *
@@ -47,6 +73,25 @@
 #ifndef NET_SYSLOG_H
 #define NET_SYSLOG_H
 
-int syslog_init(void);
+#include <lwip/netif.h>
+#include <lwip/ip_addr.h>
+
+typedef struct SysLog
+{
+	struct netconn *syslog_server;
+	struct netbuf *send_buf;
+	struct ip_addr server_addr;
+
+	uint32_t syslog_cnt;
+} SysLog;
+
+
+uint32_t syslog_count(void);
+struct ip_addr syslog_ip(void);
+void syslog_setIp(struct ip_addr addr);
+
+int syslog_printf(const char *fmt, ...);
+
+void syslog_init(SysLog *syslog_ctx, struct ip_addr addr);
 
 #endif /* NET_SYSLOG_H */
