@@ -449,11 +449,11 @@ INLINE bool is_aligned(const void *addr, size_t size)
 
 /**
  * Macro to unpack the ip addres from lwip format in 4 int
- * \param struct ip_addr ip_addr;
+ * \param addr is struct ip_addr ip_addr;
  * \return for int variable separated from comma
  *
- * \usage:
  * \code
+ * //Upack into 4 int the lwip ip address
  * LOG_INFO("dhcp ok: ip = %d.%d.%d.%d\n", IP_ADDR_TO_INT_TUPLE(netif.ip_addr.addr));
  * \endcode
  */

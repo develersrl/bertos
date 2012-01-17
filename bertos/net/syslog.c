@@ -72,7 +72,7 @@ struct ip_addr syslog_ip(void)
 
 /**
  * Change the current syslog server ip address.
- * \param lwip ip_address (you could use the macro IP4_ADDR() to get it form ip address)
+ * \param addr lwip ip_address (you could use the macro IP4_ADDR() to get it form ip address)
  */
 void syslog_setIp(struct ip_addr addr)
 {
@@ -125,8 +125,8 @@ int syslog_printf(const char *fmt, ...)
 /**
  * Init the syslog message.
  *
- * \param syslog context
- * \param lwip ip_address (you could use the macro IP4_ADDR() to get it form ip address)
+ * \param syslog_ctx syslog context
+ * \param addr lwip ip_address (you could use the macro IP4_ADDR() to get it form ip address)
  */
 void syslog_init(SysLog *syslog_ctx, struct ip_addr addr)
 {
