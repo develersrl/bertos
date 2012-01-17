@@ -152,7 +152,7 @@
 	#define CONFIG_SYSLOG_NET 0
 #endif
 
-#if CONFIG_SYSLOG_NET
+#if (CONFIG_SYSLOG_NET && !ARCH_NIGHTTEST)
 	#include <net/syslog.h>
 
 	#if LOG_FORMAT == LOG_FMT_VERBOSE
