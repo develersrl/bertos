@@ -72,6 +72,9 @@ q=0.6,en;q=0.4 Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3";
 static const char uri[] = "test%5B%5D!@;'%22%5C.%20";
 static const char uri_check[] = "test[]!@;'\"\\. ";
 
+static const char uri0[] = "12345";
+static const char uri_check0[] = "1234";
+
 static const char uri1[] = "!*'();:@&=%2B%24%2C/?#%5B%5D%3C%3E%7E.%22%7B%7D%7C%5C-%60_%5E%25";
 static const char uri_check1[] = "!*'();:@&=+$,/?#[]<>~.\"{}|\\-`_^%";
 
@@ -154,6 +157,15 @@ int http_testRun(void)
 		goto error;
 	}
 
+
+	char decoded0[5];
+	http_decodeUrl(uri0, 6, decoded0, 5);
+
+	if (strcmp(decoded0, uri_check0))
+	{
+		kprintf("error 04 %s\n", decoded0);
+		goto error;
+	}
 
 	char decoded[sizeof(uri)];
 	http_decodeUrl(uri,sizeof(uri), decoded, sizeof(uri));

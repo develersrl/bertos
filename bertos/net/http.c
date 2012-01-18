@@ -101,8 +101,7 @@ int http_getValue(char *tolenized_buf, size_t tolenized_buf_len, const char *key
 			/* skip key */
 			p += token_len + 1;
 
-			http_decodeUrl(p, strlen(p), decoded_str, sizeof(decoded_str));
-			value_len = strlen(decoded_str);
+			value_len = http_decodeUrl(p, strlen(p), decoded_str, sizeof(decoded_str));
 
 			if (value_len >= len)
 				return -1;
@@ -150,17 +149,18 @@ static char http_hexToAscii(char first, char second)
 	return strtol(hex, &stop, 16);
 }
 
-void http_decodeUrl(const char *raw_buf, size_t raw_len, char *decodec_buf, size_t len)
+size_t http_decodeUrl(const char *raw_buf, size_t raw_len, char *decodec_buf, size_t len)
 {
 	ASSERT(decodec_buf);
 
 	char value;
+	size_t i;
 	memset(decodec_buf, 0, len);
 
-	for (size_t i = 0; i < raw_len; i++)
+	for (i = 0; i < raw_len; i++)
 	{
-		if (!len)
-			return;
+		if (len <= 1)
+			return i;
 
 		if (raw_buf[i] == '%')
 		{
@@ -183,6 +183,8 @@ void http_decodeUrl(const char *raw_buf, size_t raw_len, char *decodec_buf, size
 		*decodec_buf++ = (raw_buf[i] == '+' ? ' ' : raw_buf[i]);
 		len--;
 	}
+
+	return i;
 }
 
 void http_getPageName(const char *recv_buf, size_t recv_len, char *page_name, size_t len)
@@ -219,7 +221,7 @@ void http_getPageName(const char *recv_buf, size_t recv_len, char *page_name, si
 INLINE const char *get_ext(const char *name)
 {
 	const char *ext = strstr(name, ".");
-	if(ext && (ext + 1))
+	if((ext != NULL) && ((ext + 1) != '\0'))
 		return (ext + 1);
 
 	return NULL;
@@ -257,9 +259,9 @@ void http_sendOk(struct netconn *client, int content_type)
 {
 	ASSERT(content_type < HTTP_CONTENT_CNT);
 
-	netconn_write(client, http_html_hdr_200, sizeof(http_html_hdr_200) - 1, NETCONN_COPY);
+	netconn_write(client, http_html_hdr_200, sizeof(http_html_hdr_200) - 1, NETCONN_NOCOPY);
 	netconn_write(client, http_content_type[content_type].content,
-			strlen(http_content_type[content_type].content), NETCONN_COPY);
+			strlen(http_content_type[content_type].content), NETCONN_NOCOPY);
 }
 
 
@@ -271,9 +273,9 @@ void http_sendFileNotFound(struct netconn *client, int content_type)
 {
 	ASSERT(content_type < HTTP_CONTENT_CNT);
 
-	netconn_write(client, http_html_hdr_404, sizeof(http_html_hdr_404) - 1, NETCONN_COPY);
+	netconn_write(client, http_html_hdr_404, sizeof(http_html_hdr_404) - 1, NETCONN_NOCOPY);
 	netconn_write(client, http_content_type[content_type].content,
-			strlen(http_content_type[content_type].content), NETCONN_COPY);
+			strlen(http_content_type[content_type].content), NETCONN_NOCOPY);
 }
 
 /**
@@ -284,9 +286,9 @@ void http_sendInternalErr(struct netconn *client, int content_type)
 {
 	ASSERT(content_type < HTTP_CONTENT_CNT);
 
-	netconn_write(client, http_html_hdr_500, sizeof(http_html_hdr_500) - 1, NETCONN_COPY);
+	netconn_write(client, http_html_hdr_500, sizeof(http_html_hdr_500) - 1, NETCONN_NOCOPY);
 	netconn_write(client, http_content_type[content_type].content,
-			strlen(http_content_type[content_type].content), NETCONN_COPY);
+			strlen(http_content_type[content_type].content), NETCONN_NOCOPY);
 }
 
 static http_handler_t cgi_search(const char *name,  HttpCGI *table)
