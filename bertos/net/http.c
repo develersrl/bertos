@@ -221,7 +221,7 @@ void http_getPageName(const char *recv_buf, size_t recv_len, char *page_name, si
 INLINE const char *get_ext(const char *name)
 {
 	const char *ext = strstr(name, ".");
-	if((ext != NULL) && ((ext + 1) != '\0'))
+	if(ext != NULL && ext[1] != '\0')
 		return (ext + 1);
 
 	return NULL;
