@@ -41,7 +41,6 @@
  */
 
 #include "protocol.h"
-#include "cmd_ctor.h"  // MAKE_CMD, REGISTER_CMD
 #include "verstag.h"
 
 #include "hw/hw_input.h"
