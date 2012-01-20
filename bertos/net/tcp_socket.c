@@ -130,6 +130,15 @@ static KFile *tcpsocket_reopen(KFile *fd)
 	return NULL;
 }
 
+/*
+ * Read data from socket.
+ *
+ * The read return the bytes that had been received if they are less than we request too.
+ * Otherwise if the byte that we want read are less that the received bytes, we return only
+ * the requested bytes. To get the remaning bytes we need to make an others read, until the
+ * buffer is empty.
+ * When there are not any more bytes, a new read takes data from remote socket.
+ */
 static size_t tcpsocket_read(KFile *fd, void *buf, size_t len)
 {
 	TcpSocket *socket = TCPSOCKET_CAST(fd);

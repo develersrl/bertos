@@ -48,16 +48,16 @@
 
 typedef struct TcpSocket
 {
-	KFile fd;
-	struct netconn *sock;
-	struct netbuf *rx_buf_conn;
-	size_t remaning_data_len;
+	KFile fd;                         ///< KFile context.
+	struct netconn *sock;             ///< Current sockect connection pointer.
+	struct netbuf *rx_buf_conn;       ///< Current received buffer from socket.
+	size_t remaning_data_len;         ///< Number of bytes to read from the received buffer.
 
-	struct ip_addr *local_addr;
-	struct ip_addr *remote_addr;
-	uint16_t port;
+	struct ip_addr *local_addr;       ///< Device Ip.
+	struct ip_addr *remote_addr;      ///< Ip address which we want to connect.
+	uint16_t port;                    ///< Number port to connect.
 
-	int error;
+	int error;                        ///< Error status.
 } TcpSocket;
 
 #define KFT_TCPSOCKET MAKE_ID('T', 'S', 'C', 'K')
