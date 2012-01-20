@@ -59,7 +59,9 @@ typedef struct TcpSocket
 	struct ip_addr *local_addr;
 	struct ip_addr *remote_addr;
 	uint16_t port;
-	uint16_t error;
+	int error;
+	size_t remaning_data_len;
+	struct netbuf *rx_buf_conn;
 } TcpSocket;
 
 #define KFT_TCPSOCKET MAKE_ID('T', 'S', 'C', 'K')

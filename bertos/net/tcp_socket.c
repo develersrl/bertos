@@ -40,7 +40,7 @@
 
 #include "tcp_socket.h"
 
-#define LOG_LEVEL   LOG_LVL_WARN
+#define LOG_LEVEL   LOG_LVL_INFO
 #define LOG_FORMAT  LOG_FMT_TERSE
 #include <cfg/log.h>
 #include <cpu/byteorder.h>
@@ -53,6 +53,7 @@
 
 static int tcpConnect(TcpSocket *socket)
 {
+	socket->remaning_data_len = 0;
 	socket->sock = netconn_new(NETCONN_TCP);
 	ASSERT(socket->sock);
 
@@ -121,9 +122,42 @@ static int tcpsocket_close(KFile *fd)
 static size_t tcpsocket_read(KFile *fd, void *buf, size_t len)
 {
 	TcpSocket *socket = TCPSOCKET_CAST(fd);
-	uint16_t recv_len = 0;
+	char *_buf;
+	uint16_t read_len = 0;
+	uint16_t recv_data_len = 0;
+	size_t _len = 0;
 
-	// Try reconnecting if our socket isn't valid
+	if (socket->remaning_data_len == 0)
+	{
+		LOG_INFO("No byte left.\n");
+		if (socket->rx_buf_conn)
+			netbuf_delete(socket->rx_buf_conn);
+	}
+	else if (socket->remaning_data_len > 0)
+	{
+		LOG_INFO("Return stored bytes.\n");
+		ASSERT(socket->rx_buf_conn);
+		netbuf_data(socket->rx_buf_conn, (void **)&_buf, &recv_data_len);
+
+		if (_buf)
+		{
+			ASSERT((recv_data_len - socket->remaning_data_len) > 0);
+			_len = MIN((size_t)(socket->remaning_data_len), len);
+			memcpy((char *)buf, &_buf[recv_data_len - socket->remaning_data_len], _len);
+
+			socket->remaning_data_len -= _len;
+			return _len;
+		}
+		else
+		{
+			LOG_ERR("No valid data to read\n");
+			socket->remaning_data_len = 0;
+			netbuf_delete(socket->rx_buf_conn);
+			return 0;
+		}
+	}
+
+	/* Try reconnecting if our socket isn't valid */
 	if (!socket->sock)
 	{
 		if (!reconnect(socket))
@@ -132,36 +166,45 @@ static size_t tcpsocket_read(KFile *fd, void *buf, size_t len)
 
 	while (len)
 	{
-		struct netbuf *rx_buf_conn = netconn_recv(socket->sock);
-		if (rx_buf_conn)
-		{
-			netbuf_data(rx_buf_conn, (void **)&buf, &recv_len);
+		LOG_INFO("Get bytes from socket.\n");
+		socket->rx_buf_conn = netconn_recv(socket->sock);
+		socket->error = netconn_err(socket->sock);
 
-			socket->error |= ERR_RECV_DATA;
-			return recv_len;
+		if (socket->error != ERR_OK)
+		{
+			LOG_ERR("While recv %d\n", socket->error);
+			socket->rx_buf_conn = NULL;
+			return 0;
 		}
 
-		// Do we have an EOF condition? If so, bailout.
-		if (recv_len == 0 && len != 0)
+		if (socket->rx_buf_conn)
 		{
-			LOG_INFO("Connection reset by peer\n");
-			socket->error = 0;
+			netbuf_data(socket->rx_buf_conn, (void **)&_buf, &recv_data_len);
+			if (_buf)
+			{
+				socket->remaning_data_len = recv_data_len;
+				_len = MIN((size_t)recv_data_len, len);
+				memcpy(buf, _buf, _len);
+				socket->remaning_data_len -= _len;
+			}
 
-			if (tcpsocket_close(fd) == EOF)
-				LOG_ERR("Error closing socket, leak detected\n");
-
-			return recv_len;
+			if (socket->remaning_data_len <= 0)
+			{
+				netbuf_delete(socket->rx_buf_conn);
+				return _len;
+			}
 		}
-		len -= recv_len;
+
+		len -= _len;
+		read_len += _len;
 	}
 
-	return recv_len;
+	return read_len;
 }
 
 static size_t tcpsocket_write(KFile *fd, const void *buf, size_t len)
 {
 	TcpSocket *socket = TCPSOCKET_CAST(fd);
-	ssize_t result;
 
 	// Try reconnecting if our socket isn't valid
 	if (!socket->sock)
@@ -170,7 +213,7 @@ static size_t tcpsocket_write(KFile *fd, const void *buf, size_t len)
 			return 0;
 	}
 
-	result = netconn_write(socket->sock, buf, len, NETCONN_COPY);
+	int result = netconn_write(socket->sock, buf, len, NETCONN_COPY);
 	if (result != ERR_OK)
 	{
 		LOG_ERR("While writing %d\n", result);
