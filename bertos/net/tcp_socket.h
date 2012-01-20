@@ -46,22 +46,18 @@
 #include <lwip/netif.h>
 #include <lwip/ip_addr.h>
 
-#define ERR_TCP_NOTCONN    BV(0);
-#define ERR_CONN_RESET     BV(1);
-#define ERR_CONN_CLOSE     BV(2);
-#define ERR_RECV_DATA      BV(3);
-
-
 typedef struct TcpSocket
 {
 	KFile fd;
 	struct netconn *sock;
+	struct netbuf *rx_buf_conn;
+	size_t remaning_data_len;
+
 	struct ip_addr *local_addr;
 	struct ip_addr *remote_addr;
 	uint16_t port;
+
 	int error;
-	size_t remaning_data_len;
-	struct netbuf *rx_buf_conn;
 } TcpSocket;
 
 #define KFT_TCPSOCKET MAKE_ID('T', 'S', 'C', 'K')
@@ -71,7 +67,6 @@ INLINE TcpSocket *TCPSOCKET_CAST(KFile *fd)
 	ASSERT(fd->_type == KFT_TCPSOCKET);
 	return (TcpSocket *)fd;
 }
-
 
 void tcpsocket_init(TcpSocket *socket, struct ip_addr *local_addr, struct ip_addr *remote_addr, uint16_t port);
 

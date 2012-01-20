@@ -51,102 +51,117 @@
 #include <lwip/netbuf.h>
 #include <lwip/tcpip.h>
 
-static int tcpConnect(TcpSocket *socket)
-{
-	socket->remaning_data_len = 0;
-	socket->sock = netconn_new(NETCONN_TCP);
-	ASSERT(socket->sock);
 
-	if(netconn_bind(socket->sock, socket->local_addr, socket->port) != ERR_OK)
+INLINE int close_socket(TcpSocket *socket)
+{
+	/* Clean all previuos states */
+	netbuf_delete(socket->rx_buf_conn);
+	socket->rx_buf_conn = NULL;
+	socket->remaning_data_len = 0;
+	socket->error = 0;
+
+	if (!socket->sock)
+		return 0;
+
+	/* Close socket if was opened */
+	socket->error = netconn_delete(socket->sock);
+	socket->sock = NULL;
+
+	if (socket->error != ERR_OK)
+	{
+		LOG_ERR("Closing socket\n");
+		return -1;
+	}
+
+	return 0;
+}
+
+static bool tcpsocket_reconnect(TcpSocket *socket)
+{
+	LOG_INFO("Reconnecting...\n");
+
+	/* Close socket if was opened */
+	close_socket(socket);
+
+	/* Start with new connection */
+	socket->sock = netconn_new(NETCONN_TCP);
+	if(!socket->sock)
+	{
+		LOG_ERR("Unabe to alloc new connection\n");
+		socket->error = -1;
+		goto error;
+	}
+
+	socket->error = netconn_bind(socket->sock, socket->local_addr, socket->port);
+	if(socket->error != ERR_OK)
 	{
 		LOG_ERR("Connection error\n");
 		goto error;
 	}
 
-	if(netconn_connect(socket->sock, socket->remote_addr, socket->port) != ERR_OK)
+	socket->error = netconn_connect(socket->sock, socket->remote_addr, socket->port);
+	if(socket->error != ERR_OK)
 	{
 		LOG_ERR("Cannot create socket\n");
 		goto error;
 	}
 
-	LOG_INFO("connected ip=%d.%d.%d.%d\n", IP_ADDR_TO_INT_TUPLE(socket->local_addr->addr));
-	return 0;
+	LOG_INFO("connected ip=%d.%d.%d.%d\n", IP_ADDR_TO_INT_TUPLE(socket->remote_addr->addr));
+	return true;
 
 error:
 	netconn_delete(socket->sock);
 	socket->sock = NULL;
-	return -1;
-}
-
-
-static bool reconnect(TcpSocket *socket)
-{
-	LOG_INFO("Reconnecting...\n");
-	// Release old socket if needed
-	if (socket->sock)
-	{
-		if (netconn_delete(socket->sock) != ERR_OK)
-			LOG_ERR("Error closing socket\n");
-
-		socket->sock = NULL;
-	}
-
-	// Connect to our peer peer
-	if (tcpConnect(socket) < 0)
-	{
-		LOG_ERR("Reconnect error!\n");
-		socket->error |= ERR_TCP_NOTCONN;
-		return false;
-	}
-
-	LOG_INFO("Reconnecting DONE!\n");
-
-	return true;
+	return false;
 }
 
 static int tcpsocket_close(KFile *fd)
 {
 	TcpSocket *socket = TCPSOCKET_CAST(fd);
-	int ret = netconn_delete(socket->sock);
-	socket->sock = NULL;
+	return close_socket(socket);
+}
 
-	if (ret)
-	{
-		LOG_ERR("Close error\n");
-		socket->error |= ERR_CONN_CLOSE;
-		return EOF;
-	}
-	return 0;
+static KFile *tcpsocket_reopen(KFile *fd)
+{
+	TcpSocket *socket = TCPSOCKET_CAST(fd);
+	if (tcpsocket_reconnect(socket))
+		return fd;
+
+	return NULL;
 }
 
 static size_t tcpsocket_read(KFile *fd, void *buf, size_t len)
 {
 	TcpSocket *socket = TCPSOCKET_CAST(fd);
-	char *_buf;
-	uint16_t read_len = 0;
-	uint16_t recv_data_len = 0;
-	size_t _len = 0;
 
-	if (socket->remaning_data_len == 0)
+	char *data;
+	uint16_t read_len = 0;
+
+	if (socket->remaning_data_len <= 0)
 	{
 		LOG_INFO("No byte left.\n");
-		if (socket->rx_buf_conn)
-			netbuf_delete(socket->rx_buf_conn);
+		netbuf_delete(socket->rx_buf_conn);
 	}
-	else if (socket->remaning_data_len > 0)
+	else /* We had byte into buffer use that */
 	{
-		LOG_INFO("Return stored bytes.\n");
-		ASSERT(socket->rx_buf_conn);
-		netbuf_data(socket->rx_buf_conn, (void **)&_buf, &recv_data_len);
-
-		if (_buf)
+		LOG_INFO("Read stored bytes.\n");
+		if (!socket->rx_buf_conn)
 		{
-			ASSERT((recv_data_len - socket->remaning_data_len) > 0);
-			_len = MIN((size_t)(socket->remaning_data_len), len);
-			memcpy((char *)buf, &_buf[recv_data_len - socket->remaning_data_len], _len);
+			LOG_ERR("Byte stored are corrupted!\n");
+			socket->remaning_data_len = 0;
+			return 0;
+		}
+		uint16_t tot_data_len = 0;
+		netbuf_data(socket->rx_buf_conn, (void **)&data, &tot_data_len);
 
-			socket->remaning_data_len -= _len;
-			return _len;
+		if (data)
+		{
+			ASSERT(((int)tot_data_len - (int)socket->remaning_data_len) >= 0);
+			size_t chunk_len = MIN((size_t)(socket->remaning_data_len), len);
+			memcpy((char *)buf, &data[tot_data_len - socket->remaning_data_len], chunk_len);
+
+			socket->remaning_data_len -= chunk_len;
+			return chunk_len;
 		}
 		else
 		{
@@ -158,45 +173,49 @@ static size_t tcpsocket_read(KFile *fd, void *buf, size_t len)
 	}
 
 	/* Try reconnecting if our socket isn't valid */
-	if (!socket->sock)
-	{
-		if (!reconnect(socket))
-			return 0;
-	}
+	LOG_INFO("sock[%s]\n", socket->sock ? "valido":"nullo");
+	if (!socket->sock && !tcpsocket_reconnect(socket))
+		return 0;
+	LOG_INFO("sock1[%s]\n", socket->sock ? "valido":"nullo");
 
 	while (len)
 	{
 		LOG_INFO("Get bytes from socket.\n");
 		socket->rx_buf_conn = netconn_recv(socket->sock);
-		socket->error = netconn_err(socket->sock);
 
+		socket->error = netconn_err(socket->sock);
 		if (socket->error != ERR_OK)
 		{
 			LOG_ERR("While recv %d\n", socket->error);
-			socket->rx_buf_conn = NULL;
+			close_socket(socket);
 			return 0;
 		}
 
+		size_t chunk_len = 0;
+		uint16_t data_len = 0;
 		if (socket->rx_buf_conn)
 		{
-			netbuf_data(socket->rx_buf_conn, (void **)&_buf, &recv_data_len);
-			if (_buf)
+			netbuf_data(socket->rx_buf_conn, (void **)&data, &data_len);
+
+			if (data)
 			{
-				socket->remaning_data_len = recv_data_len;
-				_len = MIN((size_t)recv_data_len, len);
-				memcpy(buf, _buf, _len);
-				socket->remaning_data_len -= _len;
+				chunk_len = MIN((size_t)data_len, len);
+				memcpy(buf, data, chunk_len);
+
+				socket->remaning_data_len = data_len - chunk_len;
 			}
 
 			if (socket->remaning_data_len <= 0)
 			{
 				netbuf_delete(socket->rx_buf_conn);
-				return _len;
+				socket->rx_buf_conn = NULL;
+				socket->remaning_data_len = 0;
+				return chunk_len;
 			}
 		}
 
-		len -= _len;
-		read_len += _len;
+		len -= chunk_len;
+		read_len += chunk_len;
 	}
 
 	return read_len;
@@ -206,25 +225,15 @@ static size_t tcpsocket_write(KFile *fd, const void *buf, size_t len)
 {
 	TcpSocket *socket = TCPSOCKET_CAST(fd);
 
-	// Try reconnecting if our socket isn't valid
-	if (!socket->sock)
-	{
-		if (!reconnect(socket))
-			return 0;
-	}
+	/* Try reconnecting if our socket isn't valid */
+	if (!socket->sock && !tcpsocket_reconnect(socket))
+		return 0;
 
-	int result = netconn_write(socket->sock, buf, len, NETCONN_COPY);
-	if (result != ERR_OK)
+	socket->error = netconn_write(socket->sock, buf, len, NETCONN_COPY);
+	if (socket->error != ERR_OK)
 	{
-		LOG_ERR("While writing %d\n", result);
-		if (result == ERR_RST)
-		{
-			LOG_INFO("Connection close\n");
-
-			if (tcpsocket_close(fd) == EOF)
-				LOG_ERR("Error closing socket, leak detected\n");
-			return 0;
-		}
+		LOG_ERR("While writing %d\n", socket->error);
+		close_socket(socket);
 		return 0;
 	}
 
@@ -256,5 +265,6 @@ void tcpsocket_init(TcpSocket *socket, struct ip_addr *local_addr, struct ip_add
 	socket->fd.close = tcpsocket_close;
 	socket->fd.write = tcpsocket_write;
 	socket->fd.clearerr = tcpsocket_clearerr;
+	socket->fd.reopen = tcpsocket_reopen;
 
 }
