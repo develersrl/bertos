@@ -40,8 +40,10 @@
 
 #include "tcp_socket.h"
 
-#define LOG_LEVEL   LOG_LVL_INFO
-#define LOG_FORMAT  LOG_FMT_TERSE
+#include "cfg/cfg_tcpsocket.h"
+
+#define LOG_LEVEL   TCPSOCKET_LOG_LEVEL
+#define LOG_FORMAT  TCPSOCKET_LOG_FORMAT
 #include <cfg/log.h>
 #include <cpu/byteorder.h>
 
@@ -182,10 +184,8 @@ static size_t tcpsocket_read(KFile *fd, void *buf, size_t len)
 	}
 
 	/* Try reconnecting if our socket isn't valid */
-	LOG_INFO("sock[%s]\n", socket->sock ? "valido":"nullo");
 	if (!socket->sock && !tcpsocket_reconnect(socket))
 		return 0;
-	LOG_INFO("sock1[%s]\n", socket->sock ? "valido":"nullo");
 
 	while (len)
 	{
