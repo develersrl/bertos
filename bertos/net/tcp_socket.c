@@ -34,6 +34,8 @@
  *
  * \author Luca Ottaviano <lottaviano@develer.com>
  * \author Daniele Basile <asterix@develer.com>
+ *
+ * notest:avr
  */
 
 #include "tcp_socket.h"
@@ -44,6 +46,7 @@
 #include <cpu/byteorder.h>
 
 #include <lwip/ip_addr.h>
+#include <lwip/api.h>
 #include <lwip/netif.h>
 #include <lwip/netbuf.h>
 #include <lwip/tcpip.h>
