@@ -46,10 +46,12 @@
 #include <lwip/netif.h>
 #include <lwip/ip_addr.h>
 
+typedef void (*tcphandler_t)(KFile *fd);
+
 typedef struct TcpSocket
 {
 	KFile fd;                         ///< KFile context.
-	struct netconn *sock;             ///< Current sockect connection pointer.
+	struct netconn *sock;             ///< Current socket connection.
 	struct netbuf *rx_buf_conn;       ///< Current received buffer from socket.
 	size_t remaning_data_len;         ///< Number of bytes to read from the received buffer.
 
@@ -58,6 +60,9 @@ typedef struct TcpSocket
 	uint16_t port;                    ///< Number port to connect.
 
 	int error;                        ///< Error status.
+
+	struct netconn *server_sock;      ///< Server sockect connection.
+	tcphandler_t handler;             ///< TCP handler when are in server mode.
 } TcpSocket;
 
 #define KFT_TCPSOCKET MAKE_ID('T', 'S', 'C', 'K')
@@ -69,5 +74,8 @@ INLINE TcpSocket *TCPSOCKET_CAST(KFile *fd)
 }
 
 void tcpsocket_init(TcpSocket *socket, struct ip_addr *local_addr, struct ip_addr *remote_addr, uint16_t port);
+
+void tcpsocket_serverPoll(KFile *fd);
+void tcpsocket_serverInit(TcpSocket *socket, struct ip_addr *local_addr, struct ip_addr *remote_addr, uint16_t port, tcphandler_t handler);
 
 #endif /* NET_TCP_SOCKET_H */

@@ -85,6 +85,11 @@ static bool tcpsocket_reconnect(TcpSocket *socket)
 	/* Close socket if was opened */
 	close_socket(socket);
 
+	/* If we are in server mode we do nothing */
+	if (socket->handler)
+		return true;
+
+
 	/* Start with new connection */
 	socket->sock = netconn_new(NETCONN_TCP);
 	if(!socket->sock)
@@ -261,9 +266,27 @@ static void tcpsocket_clearerr(KFile *fd)
 	socket->error = 0;
 }
 
+void tcpsocket_serverPoll(KFile *fd)
+{
+	TcpSocket *socket = TCPSOCKET_CAST(fd);
+
+
+	if (!socket->sock)
+		socket->sock = netconn_accept(socket->server_sock);
+
+	if (!socket->sock)
+	{
+		LOG_ERR("Unable to connect with client\n");
+		return;
+	}
+
+	socket->handler(fd);
+}
+
 void tcpsocket_init(TcpSocket *socket, struct ip_addr *local_addr, struct ip_addr *remote_addr, uint16_t port)
 {
-	socket->sock = NULL;
+	memset(socket, 0, sizeof(TcpSocket));
+
 	socket->local_addr = local_addr;
 	socket->remote_addr = remote_addr;
 	socket->port = port;
@@ -276,4 +299,16 @@ void tcpsocket_init(TcpSocket *socket, struct ip_addr *local_addr, struct ip_add
 	socket->fd.clearerr = tcpsocket_clearerr;
 	socket->fd.reopen = tcpsocket_reopen;
 
+}
+
+void tcpsocket_serverInit(TcpSocket *socket, struct ip_addr *local_addr, struct ip_addr *listen_addr, uint16_t port, tcphandler_t handler)
+{
+	tcpsocket_init(socket, local_addr, listen_addr, port);
+	socket->handler = handler;
+
+	socket->server_sock = netconn_new(NETCONN_TCP);
+	socket->error = netconn_bind(socket->server_sock, listen_addr, port);
+	socket->error = netconn_listen(socket->server_sock);
+	if(socket->error != ERR_OK)
+		LOG_ERR("Init server\n");
 }
