@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2006, 2012 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000 Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
@@ -48,7 +48,6 @@
 #include <cfg/debug.h>
 
 #include <drv/timer.h>
-#include <drv/ser.h>
 
 #include <mware/readline.h>
 #include <mware/parser.h>
@@ -58,18 +57,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Define the format string for ADC
-#define ADC_FORMAT_STR "dddd"
-#define ADC_CHANNEL_NUM    4
-
 // DEBUG: set to 1 to force interactive mode
 #define FORCE_INTERACTIVE         1
 
 /**
  * True if we are in interactive mode, false if we are in protocol mode.
  * In interactive mode, commands are read through readline() (prompt,
- * completion, history) without IDs, and replies/errors are sent to the serial
- * output.
+ * completion, history) and replies/errors are sent to the output channel.
  * In protocol mode, we implement the default protocol
  */
 static bool interactive;
@@ -77,7 +71,6 @@ static bool interactive;
 /// Readline context, used for interactive mode.
 static struct RLContext rl_ctx;
 
-uint8_t reg_status_dout;
 /**
  * Send a NAK asking the host to send the current message again.
  *
@@ -121,7 +114,8 @@ static bool protocol_reply(KFile *fd, const struct CmdTemplate *t,
 
 		else
 		{
-			abort();
+			//abort();
+			kprintf("errore\n");
 		}
 	}
 	kfile_printf(fd, "\r\n");
@@ -167,20 +161,16 @@ static void protocol_parse(KFile *fd, const char *buf)
 
 void protocol_run(KFile *fd)
 {
-	/**
-	 * \todo to be removed, we could probably access the serial FIFO
-	 * directly
-	 */
 	static char linebuf[80];
 
 	if (!interactive)
 	{
 		kfile_gets(fd, linebuf, sizeof(linebuf));
 
-		// reset serial port error anyway
+		/* Clear errors on channel */
 		kfile_clearerr(fd);
 
-		// check message minimum length
+		/* check message minimum length */
 		if (linebuf[0])
 		{
 			/* If we enter lines beginning with sharp(#)
@@ -204,7 +194,7 @@ void protocol_run(KFile *fd)
 		const char *buf;
 
 		/*
-		 * Read a line from serial. We use a temporary buffer
+		 * Read a line from channel. We use a temporary buffer
 		 * because otherwise we would have to extract a message
 		 * from the port immediately: there might not be any
 		 * available, and one might get free while we read
@@ -276,8 +266,6 @@ void protocol_init(KFile *fd)
 	rl_sethook_clear(&rl_ctx, (clear_hook)kfile_clearerr,fd);
 
 	parser_init();
-
 	protocol_registerCmds();
-
 	protocol_prompt(fd);
 }
