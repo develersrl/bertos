@@ -31,8 +31,41 @@
  *
  * -->
  *
- * \brief Implementation of the command protocol between the board and the host
+ * \brief Protocol module.
  *
+ * This module supply a simple ascii protocol to send commands to
+ * the device like pc "terminal". To use it we need to define all command
+ * that we want supply, and then we should register they using a user defined
+ * function. All commands can take arguments or/and return a value.
+ *
+ * \code
+ * #include "verstag.h"
+ * #include <mware/parser.h>
+ *
+ * //Define a function ver, that return 3 int.
+ * //This macro will expand into a fuction named "ver" that not take
+ * //an input and return 3 int (ddd).
+ * MAKE_CMD(ver, "", "ddd",
+ * ({
+ *	args[1].l = VERS_MAJOR;
+ *	args[2].l = VERS_MINOR;
+ *	args[3].l = VERS_REV;
+ *	0;
+ * }), 0);
+ *
+ *
+ * //Define the function to pass at protocol_init, to register
+ * //all defined protocol function.
+ * static void protocol_registerCmds(void)
+ * {
+ * 	  REGISTER_CMD(ver);
+ * }
+ *
+ *
+ * //Init the protocol module whit comunication channel and
+ * //the callback to register the defined protocol functions.
+ * protocol_init(&socket.fd, protocol_registerCmds);
+ * \endcode
  *
  * \author Giovanni Bajo <rasky@develer.com>
  * \author Marco Benelli <marco@develer.com>
@@ -41,9 +74,9 @@
  */
 
 #include "protocol.h"
-#include "verstag.h"
 
 #include "cfg/cfg_parser.h"
+
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
 
@@ -95,8 +128,7 @@ static void protocol_prompt(KFile *fd)
  * Print args on s, with format specified in t->result_fmt.
  * Return number of valid arguments or -1 in case of error.
  */
-static bool protocol_reply(KFile *fd, const struct CmdTemplate *t,
-			  const parms *args)
+static bool protocol_reply(KFile *fd, const struct CmdTemplate *t, const parms *args)
 {
 	unsigned short offset = strlen(t->arg_fmt) + 1;
 	unsigned short nres = strlen(t->result_fmt);
@@ -231,30 +263,9 @@ void protocol_run(KFile *fd)
 	}
 }
 
-/*
- * Commands.
- * TODO: Command declarations and definitions should be in another file(s).
- * Maybe we should use CMD_HUNK_TEMPLATE.
- *
- */
-
-MAKE_CMD(ver, "", "ddd",
-({
-	args[1].l = VERS_MAJOR;
-	args[2].l = VERS_MINOR;
-	args[3].l = VERS_REV;
-	0;
-}), 0);
-
-
-/* Register commands.  */
-static void protocol_registerCmds(void)
-{
-	REGISTER_CMD(ver);
-}
 
 /* Initialization: readline context, parser and register commands.  */
-void protocol_init(KFile *fd)
+void protocol_init(KFile *fd, protocol_t cmds_register)
 {
 	interactive = FORCE_INTERACTIVE;
 
@@ -266,6 +277,8 @@ void protocol_init(KFile *fd)
 	rl_sethook_clear(&rl_ctx, (clear_hook)kfile_clearerr,fd);
 
 	parser_init();
-	protocol_registerCmds();
+	ASSERT(cmds_register);
+	cmds_register();
+
 	protocol_prompt(fd);
 }

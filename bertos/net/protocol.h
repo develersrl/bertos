@@ -26,25 +26,26 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2006, 2012 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000 Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
  *
- * \brief Implementation of the command protocol between the board and the host
+ * \brief Protocol parser interface.
  *
  * \author Marco Benelli <marco@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
  */
 
 
 #ifndef NET_PROTOCOL_H
 #define NET_PROTOCOL_H
 
-#include <drv/sipo.h>
-
 #include <io/kfile.h>
 
-void protocol_init(KFile *fd);
+typedef void (*protocol_t)(void);
+
 void protocol_run(KFile *fd);
+void protocol_init(KFile *fd, protocol_t cmds_register);
 
 #endif /* NET_PROTOCOL_H */
