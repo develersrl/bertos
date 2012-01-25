@@ -35,8 +35,8 @@
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef I2C_AVR_H
-#define I2C_AVR_H
+#ifndef I2C_MEGA_H
+#define I2C_MEGA_H
 
 #include <drv/i2c.h>
 
@@ -50,5 +50,5 @@ enum
 	I2C_CNT  /**< Number of serial ports */
 };
 
-#endif /* I2C_LM3S_H */
+#endif /* I2C_MEGA_H */
 
