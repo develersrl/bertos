@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2003, 2004, 2006, 2008, 2010 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2006, 2008, 2010, 2012 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000 Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
@@ -49,7 +49,7 @@
  * the automatic opendoor, reading the tag key that will pass on the rfid reader.
  */
 
-#include "protocol.h"
+#include "cmd.h"
 
 #include "hw/hw_input.h"
 
@@ -62,10 +62,13 @@
 #include <drv/wdt_avr.h>
 
 #include <mware/parser.h>
+
 #include <net/keytag.h>
+#include <net/protocol.h>
 
 static Serial fd_ser;
 static Serial tag_ser;
+static Sipo fd_sipo;
 
 static void init(void)
 {
@@ -87,6 +90,9 @@ int main(void)
 	/* Initialize Tag serial port and data structure */
 	TagPacket pkt;
 
+	/* SPI Port Initialization */
+    sipo_init(&fd_sipo, TRIFACE_DOUT, SIPO_DATAORDER_LSB | SIPO_START_LOW | SIPO_LOW_TO_HIGH);
+
 	/* Open the main communication port */
 	ser_init(&fd_ser, SER_UART1);
 	ser_setbaudrate(&fd_ser, 115200);
@@ -98,7 +104,7 @@ int main(void)
 	/* Init the tag parser */
 	keytag_init(&pkt, &fd_ser.fd, &tag_ser.fd);
 
-	protocol_init(&fd_ser.fd);
+	protocol_init(&fd_ser.fd, cmd_register);
 
 	while (1)
 	{

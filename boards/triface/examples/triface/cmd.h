@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2003, 2004, 2006 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2003, 2004, 2006, 2012 Develer S.r.l. (http://www.develer.com/)
  * Copyright 2000 Bernie Innocenti <bernie@codewiz.org>
  *
  * -->
@@ -37,14 +37,12 @@
  */
 
 
-#ifndef PROTOCOL_H
-#define PROTOCOL_H
+#ifndef TRIFACE_CMD_H
+#define TRIFACE_CMD_H
 
 #include <drv/sipo.h>
 
-#include <io/kfile.h>
+void cmd_register(void);
+void cmd_init(Sipo *sipo);
 
-void protocol_init(KFile *fd);
-void protocol_run(KFile *fd);
-
-#endif // PROTOOCOL_H
+#endif /* TRIFACE_CMD_H */

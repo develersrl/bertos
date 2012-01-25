@@ -10,7 +10,8 @@ triface_PROGRAMMER_PORT = none
 # Files included by the user.
 triface_USER_CSRC = \
     $(triface_SRC_PATH)/main.c \
-    $(triface_SRC_PATH)/protocol.c \
+	$(triface_SRC_PATH)/cmd.c \
+	bertos/net/protocol.c \
     #
 
 # Files included by the user.
