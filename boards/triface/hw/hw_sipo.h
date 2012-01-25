@@ -97,7 +97,6 @@ typedef enum SipoMap
 #define SIPO_LOAD(device, load_pol) \
 	do { \
 		(void)device; \
-		(void)load_pol; \
 		SLOAD_OUT_HIGH; \
 		SLOAD_OUT_LOW; \
 	}while(0)

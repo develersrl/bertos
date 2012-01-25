@@ -42,20 +42,46 @@
  * $WIZ$ module_hw = "bertos/hw/hw_sipo.h"
  */
 
-
-
-
-
 #ifndef DRV_SIPO_H
 #define DRV_SIPO_H
 
 #include "hw/hw_sipo.h"
+#include "cfg/cfg_sipo.h"
 
 #include <io/kfile.h>
+
+
+/*
+ * The following macros are needed to maintain compatibility with older sipo API.
+ * They can be safely removed once the old API is removed.
+ */
+
+ /**
+  * \addtogroup sipo_api
+  * \{
+  */
+#if COMPILER_C99
+	#define sipo_init(...)           PP_CAT(sipo_init ## _, COUNT_PARMS(__VA_ARGS__)) (__VA_ARGS__)
+#else
+	/**
+	 * Initialize SIPO module.
+	 *
+	 * To initialize the module you can write this code:
+	 * \code
+	 * Sipo ctx;
+	 * sipo_init(&ctx, settings);
+	 * \endcode
+	 */
+	#define sipo_init(args...)       PP_CAT(sipo_init ## _, COUNT_PARMS(args)) (args)
+
+#endif
+/**\}*/
+
 
 #define SIPO_DATAORDER_START_LSB        1
 #define SIPO_DATAORDER_START_MSB     0x80
 
+#if !CONFIG_SIPO_DISABLE_OLD_API
 /**
  * Define enum to set sipo data order.
  */
@@ -97,6 +123,31 @@ typedef struct Sipo
 	SipoBitOrder bit_order;   ///< Set the order of pushed bits in sipo.
 
 } Sipo;
+#else /* New api */
+
+#define SIPO_DATAORDER      BV(0)
+#define SIPO_DATAORDER_MSB  BV(0) ///< MSB sipo data order setting
+#define SIPO_DATAORDER_LSB     0  ///< LSB sipo data order setting
+
+#define SIPO_CLOCK_POL      BV(1)
+#define SIPO_START_LOW      BV(1) ///< sipo clock start level high setting
+#define SIPO_START_HIGH        0  ///< sipo clock start level low setting
+
+#define SIPO_LOAD_LEV       BV(2)
+#define SIPO_LOW_TO_HIGH    BV(2) ///< sipo load high signal level setting.
+#define SIPO_HIGH_TO_LOW       0  ///< sipo load low signal level setting.
+
+/**
+ * Sipo KFile context structure.
+ */
+typedef struct Sipo
+{
+	KFile fd;                 ///< File descriptor.
+	SipoMap device;           ///< Descriptor of the device that we want drive.
+	uint8_t settings;
+} Sipo;
+
+#endif
 
 /**
  * ID for sipo.
@@ -112,7 +163,8 @@ INLINE Sipo * SIPO_CAST(KFile *fd)
 	return (Sipo *)fd;
 }
 
-void sipo_init(Sipo *fd);
+void sipo_init_1(Sipo *fd);
+void sipo_init_3(Sipo *fd, SipoMap dev, uint8_t settings);
 
-#endif // DRV_SIPO_H
+#endif /* DRV_SIPO_H */
 
