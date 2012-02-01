@@ -266,6 +266,13 @@ static void tcpsocket_clearerr(KFile *fd)
 	socket->error = 0;
 }
 
+
+/**
+ * Process all recieved connection from socket.
+ *
+ * \param fd opened tcp socket server kfile context.
+ *
+ */
 void tcpsocket_serverPoll(KFile *fd)
 {
 	TcpSocket *socket = TCPSOCKET_CAST(fd);
@@ -283,6 +290,18 @@ void tcpsocket_serverPoll(KFile *fd)
 	socket->handler(fd);
 }
 
+/**
+ * Init tcp socket connection whit kfile interface.
+ *
+ * \note the real connection will be performed only when we do the first kfile_read().
+ * The read function is blocking and recieve timeout is not settable, this depends to the
+ * current version of lwip.
+ *
+ * \param socket tcp socket context.
+ * \param local_addr device ip address.
+ * \param remote_addr ip address that we would connect.
+ * \param port tcp port that we would connect.
+ */
 void tcpsocket_init(TcpSocket *socket, struct ip_addr *local_addr, struct ip_addr *remote_addr, uint16_t port)
 {
 	memset(socket, 0, sizeof(TcpSocket));
@@ -301,6 +320,22 @@ void tcpsocket_init(TcpSocket *socket, struct ip_addr *local_addr, struct ip_add
 
 }
 
+/**
+ * Init tcp server whit kfile interface.
+ *
+ * Start a tcp server on registered ethernet interface, and it calls the user handler
+ * when recieve data from accepted connection socket.
+ *
+ * \note Use the tcpsocket_serverPoll() function to process al connections.
+ *
+ * \param socket tcp socket context.
+ * \param local_addr device ip address.
+ * \param listen_addr ip address to listen
+ * \param port tcp socket port to listen
+ * \param handler user handler that server calls every time we recive a data from
+ * socket. To the handler the server will pass the kfile context and user could choose
+ * to make an explicit connection close, otherwise the server keep alive the connection.
+ */
 void tcpsocket_serverInit(TcpSocket *socket, struct ip_addr *local_addr, struct ip_addr *listen_addr, uint16_t port, tcphandler_t handler)
 {
 	tcpsocket_init(socket, local_addr, listen_addr, port);

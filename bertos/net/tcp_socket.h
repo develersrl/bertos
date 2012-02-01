@@ -34,6 +34,10 @@
  *
  * \author Luca Ottaviano <lottaviano@develer.com>
  * \author Daniele Basile <asterix@develer.com>
+ *
+ * $WIZ$ module_name = "tcp_socket"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_tcpsocket.h"
+ * $WIZ$ module_depends = "lwip", "debug"
  */
 
 #ifndef NET_TCP_SOCKET_H
@@ -46,6 +50,9 @@
 #include <lwip/netif.h>
 #include <lwip/ip_addr.h>
 
+/**
+ * Handler protype for tcp server.
+ */
 typedef void (*tcphandler_t)(KFile *fd);
 
 typedef struct TcpSocket
