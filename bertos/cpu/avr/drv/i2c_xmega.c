@@ -34,15 +34,14 @@
  * \brief Driver for the AVR ATXMega TWI (implementation) based on the ATMega version
  *
  * \author Onno <developer@gorgoz.org>
+ * notest:all
  */
 
 #include "cfg/cfg_i2c.h"
 
-#include <hw/hw_cpufreq.h>  /* CPU_FREQ */
 
 #define LOG_LEVEL  I2C_LOG_LEVEL
 #define LOG_FORMAT I2C_LOG_FORMAT
-
 #include <cfg/log.h>
 
 #include <cfg/debug.h>
@@ -51,13 +50,16 @@
 
 #include <cpu/detect.h>
 #include <cpu/irq.h>
+#include <cpu/types.h>
+
 #include <drv/timer.h>
 #include <drv/i2c.h>
 
 #include <cpu/power.h>
 
-#include <stdbool.h>
+#include <avr/io.h>
 #include <util/twi.h> //AVRLIBC TWI bit mask definitions
+#include <stdbool.h>
 
 #if !CONFIG_I2C_DISABLE_OLD_API
 	#error I2C_OLD_API is not implemented
@@ -68,7 +70,7 @@
  */
 struct I2cHardware
 {
-	volatile TWI_t* twi;
+	volatile TWI_t *twi;
 };
 
 /* Baud register setting calculation. Formula described in datasheet. */
@@ -91,6 +93,7 @@ struct I2cHardware
 #define MASTER_STATE_IS_OWNER(TWI)	(((TWI)->MASTER.STATUS & TWI_MASTER_BUSSTATE_gm) == TWI_MASTER_BUSSTATE_OWNER_gc)
 #define MASTER_STATE_IS_BUSY(TWI)	(((TWI)->MASTER.STATUS & TWI_MASTER_BUSSTATE_gm) == TWI_MASTER_BUSSTATE_BUSY_gc)
 #define MASTER_STATE_IS_UNKOWN(TWI)	(((TWI)->MASTER.STATUS & TWI_MASTER_BUSSTATE_gm) == TWI_MASTER_BUSSTATE_UNKNOWN_gc)
+
 // Wait until ready for the next transaction
 #define WAIT_UNTIL_READY_FOR_TRANSACTION(TWI) \
 		do { \
@@ -107,6 +110,7 @@ struct I2cHardware
 #define NACK_RECEIVED(TWI) (((TWI)->MASTER.STATUS & TWI_MASTER_RXACK_bm) != 0)
 #define CLEAR_BUSERROR(TWI) ((TWI)->MASTER.STATUS |= TWI_MASTER_BUSERR_bm)
 #define SET_IDLESTATE(TWI)	((TWI)->MASTER.STATUS = ((TWI)->MASTER.STATUS & (~TWI_MASTER_BUSSTATE_gm)) | TWI_MASTER_BUSSTATE_IDLE_gc)
+
 /**
  * Send STOP condition.
  */
@@ -125,11 +129,12 @@ static void i2c_xmega_start(I2c *i2c, uint16_t slave_addr)
 	 */
 	ticks_t start = timer_clock();
 	volatile TWI_t *twi = i2c->hw->twi;
-	bool stopLoop = false;
+	bool stop_loop = false;
 
 	//check if there is a buserror
 	//if so, try to clear it!
-	if(BUSERR_OCCURED(twi)){
+	if (BUSERR_OCCURED(twi))
+	{
 		LOG_WARN("Clearing BusError from TWI device\r\n");
 		CLEAR_BUSERROR(twi);
 		LOG_WARN("Forcing TWI Device to IDLE state\r\n");
@@ -137,7 +142,7 @@ static void i2c_xmega_start(I2c *i2c, uint16_t slave_addr)
 		LOG_WARN("Current status is: %d\r\n", twi->MASTER.STATUS);
 	}
 
-	while(!stopLoop)
+	while (!stop_loop)
 	{
 		//Wait until we are in IDLE state.
 		//Due to a set timeout, we will always retun to IDLE state
@@ -146,11 +151,11 @@ static void i2c_xmega_start(I2c *i2c, uint16_t slave_addr)
 
 		//Write the address
 		//This will first generate the start condition
-		if(I2C_TEST_START(i2c->flags) == I2C_START_W)
+		if (I2C_TEST_START(i2c->flags) == I2C_START_W)
 		{
 			//start a write action
-			uint8_t writeAddress = ((uint8_t)slave_addr << 1) & ~0x01;
-			twi->MASTER.ADDR = writeAddress;
+			uint8_t write_address = ((uint8_t)slave_addr << 1) & ~0x01;
+			twi->MASTER.ADDR = write_address;
 
 			//Wait until the write interrupt flag is set.
 			//this will also be set when an error occurs.
@@ -158,8 +163,8 @@ static void i2c_xmega_start(I2c *i2c, uint16_t slave_addr)
 		}
 		else
 		{
-			uint8_t readAddress = ((uint8_t)slave_addr << 1) | 0x01;
-			twi->MASTER.ADDR = readAddress;
+			uint8_t read_address = ((uint8_t)slave_addr << 1) | 0x01;
+			twi->MASTER.ADDR = read_address;
 
 			//Wait until the read or write interrupt flag is set.
 			//In this case, a write interrupt flag is set on an error
@@ -169,34 +174,36 @@ static void i2c_xmega_start(I2c *i2c, uint16_t slave_addr)
 
 
 		//check if Arbitration Lost of Buserror has occured
-		if( ARBLOST_OR_BUSERR_OCCURED(twi) )
+		if (ARBLOST_OR_BUSERR_OCCURED(twi))
 		{
-			if(ARBLOST_OCCURED(twi))
+			if (ARBLOST_OCCURED(twi))
 			{
 				i2c->errors |= I2C_ARB_LOST;
 			}
-			if(BUSERR_OCCURED(twi))
+
+			if (BUSERR_OCCURED(twi))
 			{
 				i2c->errors |= I2C_ERR;
 			}
 			LOG_ERR("Start error [%x]\n", twi->MASTER.STATUS);
+
 			// reset i2c
 			i2c->xfer_size = 0;
 			// try to send a stop signal
 			i2c_hw_stop(twi);
-			stopLoop = true;
+			stop_loop = true;
 		}
 		else if (ACK_RECEIVED(twi))
 		{
 			//ack received
-			stopLoop = true;
+			stop_loop = true;
 		}
 		else
 		{
 			//nack received
 			//ignore if writing, the slave device might just be busy
 			//with a precious command.
-			if(I2C_TEST_START(i2c->flags) == I2C_START_W)
+			if (I2C_TEST_START(i2c->flags) == I2C_START_W)
 			{
 				//Just check if the start timeout has occured
 				if (timer_clock() - start > ms_to_ticks(CONFIG_I2C_START_TIMEOUT))
@@ -204,7 +211,7 @@ static void i2c_xmega_start(I2c *i2c, uint16_t slave_addr)
 					LOG_ERR("Start timeout\n");
 					i2c->errors |= I2C_START_TIMEOUT;
 					i2c_hw_stop(twi);
-					stopLoop = true;
+					stop_loop = true;
 				}
 			}
 			else
@@ -213,7 +220,7 @@ static void i2c_xmega_start(I2c *i2c, uint16_t slave_addr)
 				LOG_ERR("Start addr NACK[%x]\n", twi->MASTER.STATUS);
 				i2c->errors |= I2C_NO_ACK;
 				i2c_hw_stop(twi);
-				stopLoop = true;
+				stop_loop = true;
 			}
 		}
 	}
@@ -227,16 +234,18 @@ static void i2c_xmega_putc(I2c *i2c, const uint8_t data)
 
 	WAIT_UNTIL_WRITE_INTERRUPT_SET(twi);
 
-	if(ARBLOST_OR_BUSERR_OCCURED(twi))
+	if (ARBLOST_OR_BUSERR_OCCURED(twi))
 	{
-		if(ARBLOST_OCCURED(twi))
+		if (ARBLOST_OCCURED(twi))
 		{
 			i2c->errors |= I2C_ARB_LOST;
 		}
-		if(BUSERR_OCCURED(twi))
+
+		if (BUSERR_OCCURED(twi))
 		{
 			i2c->errors |= I2C_ERR;
 		}
+
 		LOG_ERR("Data write error [%x]\n", twi->MASTER.STATUS);
 		i2c_hw_stop(twi);
 	}
@@ -258,19 +267,22 @@ static uint8_t i2c_xmega_getc(I2c *i2c)
 	volatile TWI_t *twi = i2c->hw->twi;
 
 	//check if the RIF flag is set
-	if(READ_INTERRUPT_FLAG_IS_SET(twi))
+	if (READ_INTERRUPT_FLAG_IS_SET(twi))
 	{
 		//read the available data
 		uint8_t data = twi->MASTER.DATA;
 		//if this is the last byte to receive, send nack otherwise ack.
-		if(i2c->xfer_size == 1){
+		if (i2c->xfer_size == 1)
+		{
 			//nack needs to be send
 			//check if a stop needs to be generated afther the ack, of a repeat start.
-			if(I2C_TEST_STOP(i2c->flags) == I2C_STOP)
+			if (I2C_TEST_STOP(i2c->flags) == I2C_STOP)
 			{
 				//send nack and stop
 				twi->MASTER.CTRLC = TWI_MASTER_ACKACT_bm | TWI_MASTER_CMD_STOP_gc;
-			} else {
+			}
+			else
+			{
 				//only set the nack. The repeated start will be send on the next
 				//call to i2c_xmega_start
 				twi->MASTER.CTRLC = TWI_MASTER_ACKACT_bm;
@@ -285,16 +297,18 @@ static uint8_t i2c_xmega_getc(I2c *i2c)
 			//a read interrupt on an ack
 			WAIT_UNTIL_READ_OR_WRITE_INTERRUPT_SET(twi);
 			//check if Arbitration Lost of Buserror has occured
-			if( ARBLOST_OR_BUSERR_OCCURED(twi))
+			if ( ARBLOST_OR_BUSERR_OCCURED(twi))
 			{
-				if(ARBLOST_OCCURED(twi))
+				if (ARBLOST_OCCURED(twi))
 				{
 					i2c->errors |= I2C_ARB_LOST;
 				}
-				if(BUSERR_OCCURED(twi))
+
+				if (BUSERR_OCCURED(twi))
 				{
 					i2c->errors |= I2C_ERR;
 				}
+
 				LOG_ERR("Data error [%x]\n", twi->MASTER.STATUS);
 				i2c_hw_stop(twi);
 				return 0xFF;
