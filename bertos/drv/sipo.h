@@ -29,6 +29,9 @@
  * Copyright 2009 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
+ * \defgroup sipo_driver SIPO driver
+ * \ingroup drivers
+ * \{
  *
  * \brief Generic Serial-in, Parallel-out implementation (SIPO).
  *
@@ -165,6 +168,8 @@ INLINE Sipo * SIPO_CAST(KFile *fd)
 
 void sipo_init_1(Sipo *fd);
 void sipo_init_3(Sipo *fd, SipoMap dev, uint8_t settings);
+
+/** \} */ //defgroup sipo_driver
 
 #endif /* DRV_SIPO_H */
 

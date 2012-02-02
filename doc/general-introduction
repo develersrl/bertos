@@ -172,3 +172,10 @@ value.
 /*!
  * \defgroup struct Embedded optimized general purpose data types
  */
+
+/*!
+ * \defgroup net Network utilities
+ *
+ * This section describes various utilities to be used in BeRTOS to
+ * write application with network.
+ */
