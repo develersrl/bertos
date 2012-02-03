@@ -43,7 +43,7 @@
 #define HW_SIPO_H
 
 /**
- * Map sipo connection on board.
+ * Sipo ids map.
  */
 typedef enum SipoMap
 {

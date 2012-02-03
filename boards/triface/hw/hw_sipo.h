@@ -46,7 +46,7 @@
 #include <avr/io.h>
 
 /**
- * Mapping sipo connection on board.
+ * Sipo ids map.
  * See schematics for more info.
  */
 typedef enum SipoMap
@@ -58,78 +58,104 @@ typedef enum SipoMap
 
 
 
-//Set output pin for sipo
-#define SCK_OUT            (DDRB |= BV(PB1))  // Shift register clock input pin
+//Sets pin for sipo
+#define SCK_OUT            (DDRB |= BV(PB1))  // Clock pin
 #define SOUT_OUT           (DDRB |= BV(PB2))  // Serial data input pin
-#define SLOAD_OUT          (DDRB |= BV(PB3))  // Storage register clock input pin
+#define SLOAD_OUT          (DDRB |= BV(PB3))  // Storage register pin
 #define OE_OUT             (DDRG |= BV(PG3))  // Output enable pin
 
-//Define output level
-#define SCK_HIGH           (PORTB |= BV(PB1))
-#define SCK_LOW            (PORTB &= ~BV(PB1))
-#define SOUT_OUT_HIGH      (PORTB |= BV(PB2))
-#define SOUT_OUT_LOW       (PORTB &= ~BV(PB2))
-#define SLOAD_OUT_HIGH     (PORTB |= BV(PB3))
-#define SLOAD_OUT_LOW      (PORTB &= ~BV(PB3))
-#define OE_LOW             (PORTG &= BV(PG3))
+//Define logic levels
+#define SIPO_SCK           PB1
+#define SIPO_SLOAD         PB3
 
 /**
- * Define the macros needed to set the serial input bit of SIPO device
- * low or high.
+ * Macros to drive serial input of sipo.
  */
-#define SIPO_SI_HIGH()    SOUT_OUT_HIGH
-#define SIPO_SI_LOW()     SOUT_OUT_LOW
+#define SIPO_SI_HIGH()    (PORTB |= BV(PB2))
+#define SIPO_SI_LOW()     (PORTB &= ~BV(PB2))
 
 /**
- * Drive pin to load the bit, presented in serial-in pin,
- * into sipo shift register.
+ * Define generic macro to set pins logic level
+ */
+#define SIPO_SET_LEVEL_LOW(pin)  do { PORTB &= ~BV((pin)); } while (0)
+#define SIPO_SET_LEVEL_HIGH(pin) do { PORTB |= BV((pin)); } while (0)
+
+
+/**
+ * Generate one low pulse on select line.
+ */
+#define PULSE_LOW(pin) \
+	do { \
+		SIPO_SET_LEVEL_LOW(pin); \
+		NOP;NOP;NOP;NOP; \
+		SIPO_SET_LEVEL_HIGH(pin); \
+	} while (0)
+
+/**
+ * Generate one hight pulse on select line.
+ */
+#define PULSE_HIGH(pin) \
+	do { \
+		SIPO_SET_LEVEL_HIGH(pin); \
+		NOP;NOP;NOP;NOP; \
+		SIPO_SET_LEVEL_LOW(pin); \
+	} while (0)
+
+/**
+ * Clock pulse to shift bits into sipo
  */
 #define SIPO_SI_CLOCK(clk_pol) \
-	do{ \
-		(void)clk_pol; \
-		SCK_HIGH; \
-		SCK_LOW; \
-	}while(0)
+	do { \
+		if(clk_pol) \
+			PULSE_LOW(SIPO_SCK); \
+		else \
+			PULSE_HIGH(SIPO_SCK); \
+	} while (0)
 
 /**
- * Clock the content of shift register to output.
+ * Load stored sipo bits to output.
  */
 #define SIPO_LOAD(device, load_pol) \
 	do { \
-		(void)device; \
-		SLOAD_OUT_HIGH; \
-		SLOAD_OUT_LOW; \
-	}while(0)
+		if(load_pol) \
+			PULSE_LOW(SIPO_SLOAD); \
+		else \
+			PULSE_HIGH(SIPO_SLOAD); \
+	} while(0)
+
 
 /**
- * Enable the shift register output.
+ * Enable the sipo output
  */
-#define SIPO_ENABLE() OE_LOW;
+#define SIPO_ENABLE() (PORTG &= BV(PG3));
 
 /**
- * Set logic level for load signal
+ * Set load signal level.
  */
 #define SIPO_SET_LD_LEVEL(device, load_pol) \
 	do { \
 		(void)device; \
 		if(load_pol) \
-			SLOAD_OUT_HIGH; \
+			SIPO_SET_LEVEL_HIGH(SIPO_SLOAD); \
 		else \
-			SLOAD_OUT_LOW; \
+			SIPO_SET_LEVEL_LOW(SIPO_SLOAD); \
 	} while (0)
 
 
 /**
- * Sel logic level for clock signal
+ * Set clock signal level.
  */
 #define SIPO_SET_CLK_LEVEL(clock_pol) \
 	do { \
 		if(clock_pol) \
-			SCK_HIGH; \
+			SIPO_SET_LEVEL_HIGH(SIPO_SCK); \
 		else \
-			SCK_LOW; \
+			SIPO_SET_LEVEL_LOW(SIPO_SCK); \
 	} while (0)
 
+/**
+ * Set serial sipo input level.
+ */
 #define SIPO_SET_SI_LEVEL()     SIPO_SI_LOW()
 
 /**

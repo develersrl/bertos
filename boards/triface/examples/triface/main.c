@@ -92,6 +92,8 @@ int main(void)
 
 	/* SPI Port Initialization */
     sipo_init(&fd_sipo, TRIFACE_DOUT, SIPO_DATAORDER_LSB | SIPO_START_LOW | SIPO_LOW_TO_HIGH);
+	/* Set up the device commands */
+	cmd_init(&fd_sipo);
 
 	/* Open the main communication port */
 	ser_init(&fd_ser, SER_UART1);

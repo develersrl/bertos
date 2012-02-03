@@ -129,16 +129,16 @@ typedef struct Sipo
 #else /* New api */
 
 #define SIPO_DATAORDER      BV(0)
-#define SIPO_DATAORDER_MSB  BV(0) ///< MSB sipo data order setting
-#define SIPO_DATAORDER_LSB     0  ///< LSB sipo data order setting
+#define SIPO_DATAORDER_MSB  BV(0) ///< Set MSB sipo data order setting
+#define SIPO_DATAORDER_LSB     0  ///< Set LSB sipo data order setting
 
 #define SIPO_CLOCK_POL      BV(1)
-#define SIPO_START_LOW      BV(1) ///< sipo clock start level high setting
-#define SIPO_START_HIGH        0  ///< sipo clock start level low setting
+#define SIPO_START_LOW      BV(1) ///< Set sipo clock start level high setting
+#define SIPO_START_HIGH        0  ///< Set sipo clock start level low setting
 
 #define SIPO_LOAD_LEV       BV(2)
-#define SIPO_LOW_TO_HIGH    BV(2) ///< sipo load high signal level setting.
-#define SIPO_HIGH_TO_LOW       0  ///< sipo load low signal level setting.
+#define SIPO_LOW_TO_HIGH    BV(2) ///< Set sipo load high signal level setting.
+#define SIPO_HIGH_TO_LOW       0  ///< Set sipo load low signal level setting.
 
 /**
  * Sipo KFile context structure.
@@ -147,7 +147,7 @@ typedef struct Sipo
 {
 	KFile fd;                 ///< File descriptor.
 	SipoMap device;           ///< Descriptor of the device that we want drive.
-	uint8_t settings;
+	uint8_t settings;		  ///< Sipo signal configuration.
 } Sipo;
 
 #endif
