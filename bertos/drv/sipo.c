@@ -102,6 +102,9 @@ static size_t sipo_write(struct KFile *_fd, const void *_buf, size_t size)
 	// We finsh to load bytes, so load it.
 	SIPO_LOAD(fd->load_device, fd->load_pol);
 
+	// Enable the sipo output
+	SIPO_ENABLE();
+
 	return write_len;
 }
 
@@ -130,6 +133,9 @@ static size_t sipo_write(struct KFile *_fd, const void *_buf, size_t size)
 	// We finsh to load bytes, so load it.
 	SIPO_LOAD(fd->device, fd->settings & SIPO_LOAD_LEV);
 
+	// Enable the sipo output
+	SIPO_ENABLE();
+
 	return write_len;
 }
 #endif
@@ -145,23 +151,32 @@ INLINE void init(Sipo *fd)
 	// Set up SIPO writing functions.
 	fd->fd.write = sipo_write;
 
+	// Init all pins to manage the shift register
 	SIPO_INIT_PIN();
-
-	/* Enable sipo output */
-	SIPO_ENABLE();
 }
 
-/**
- * Initialize the SIPO
- */
+
 #if !CONFIG_SIPO_DISABLE_OLD_API
 
-void sipo_init_1(Sipo *fd)
+/**
+ * Init sipo module.
+ *
+ * \param fg sipo context.
+ */
+DEPRECATED void sipo_init_1(Sipo *fd)
 {
 	init(fd);
 }
 #else /* New api */
 
+/**
+ * Init sipo module.
+ *
+ * \param fd sipo context.
+ * \param dev sipo device to manage (usally defined in hw_sipo.h)
+ * \param settings signal settings to manage the sipo device.
+ *
+ */
 void sipo_init_3(Sipo *fd, SipoMap dev, uint8_t settings)
 {
 	memset(fd, 0, sizeof(fd));
