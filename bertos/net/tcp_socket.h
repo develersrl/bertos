@@ -51,7 +51,7 @@
 #include <lwip/ip_addr.h>
 
 /**
- * Handler protype for tcp server.
+ * Handler protoype for tcp server.
  */
 typedef void (*tcphandler_t)(KFile *fd);
 

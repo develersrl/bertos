@@ -268,7 +268,7 @@ static void tcpsocket_clearerr(KFile *fd)
 
 
 /**
- * Process all recieved connection from socket.
+ * Process all received connection from socket.
  *
  * \param fd opened tcp socket server kfile context.
  *
@@ -291,10 +291,10 @@ void tcpsocket_serverPoll(KFile *fd)
 }
 
 /**
- * Init tcp socket connection whit kfile interface.
+ * Init tcp socket connection with kfile interface.
  *
  * \note the real connection will be performed only when we do the first kfile_read().
- * The read function is blocking and recieve timeout is not settable, this depends to the
+ * The read function is blocking and receive timeout is not settable, this depends to the
  * current version of lwip.
  *
  * \param socket tcp socket context.
@@ -324,7 +324,7 @@ void tcpsocket_init(TcpSocket *socket, struct ip_addr *local_addr, struct ip_add
  * Init tcp server whit kfile interface.
  *
  * Start a tcp server on registered ethernet interface, and it calls the user handler
- * when recieve data from accepted connection socket.
+ * when receive data from accepted connection socket.
  *
  * \note Use the tcpsocket_serverPoll() function to process al connections.
  *
