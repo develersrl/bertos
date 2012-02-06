@@ -92,15 +92,13 @@
 
 #include <io/kfile.h>
 
-#define CLI_OK_CMD           0
-#define CLI_INVALID_CMD     -1
-#define CLI_MISSING_PARAM   -2
-#define CLI_TO_MANY_PARAM   -3
-#define CLI_MALFORM_CMD     -4
-#define CLI_ERR_EXE_CMD     -5
-#define CLI_INVALID_RET_FMT -6
+#define CLI_OK_CMD           0 ///< No error.
+#define CLI_INVALID_CMD     -1 ///< Invalid command.
+#define CLI_INVALID_ARGS    -2 ///< Invalid number of arguments for current command.
+#define CLI_ERR_EXE_CMD     -3 ///< Command execution error.
+#define CLI_INVALID_RET_FMT -4 ///< Invalid command return formart.
 
-typedef void (*cli_t)(void);
+typedef void (*cli_t)(void); ///< Register command function prototype.
 
 void cli_poll(KFile *fd);
 void cli_init(KFile *fd, cli_t cmds_register);

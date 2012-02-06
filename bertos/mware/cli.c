@@ -118,8 +118,7 @@ static void cli_parse(KFile *fd, const char *buf)
 
 	parms args[CONFIG_PARSER_MAX_ARGS];
 
-	int ret = parser_get_cmd_arguments(buf, templ, args);
-	if (!ret)
+	if (!parser_get_cmd_arguments(buf, templ, args))
 	{
 		REPLY(fd, CLI_MISSING_PARAM, "Invalid arguments.");
 		return;
