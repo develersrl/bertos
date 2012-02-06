@@ -45,7 +45,7 @@
 
 typedef void (*protocol_t)(void);
 
-void protocol_run(KFile *fd);
+void protocol_poll(KFile *fd);
 void protocol_init(KFile *fd, protocol_t cmds_register);
 
 #endif /* NET_PROTOCOL_H */
