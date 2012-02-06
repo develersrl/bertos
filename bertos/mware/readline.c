@@ -155,9 +155,10 @@ INLINE void rl_putc(const struct RLContext* ctx, char ch)
 		ctx->put(ch, ctx->put_param);
 }
 
-/** Read a character from the IO into \a ch. This function also takes
- *  care of converting the ANSI escape sequences into one of the codes
- *  defined in \c RL_KEYS.
+/**
+ * Read a character from the IO into \a ch. This function also takes
+ * care of converting the ANSI escape sequences into one of the codes
+ * defined in \c RL_KEYS.
  */
 static bool rl_getc(const struct RLContext* ctx, int* ch)
 {
@@ -178,21 +179,22 @@ static bool rl_getc(const struct RLContext* ctx, int* ch)
 		if (ctx->get(ctx->get_param) != 0x5B)
 			return rl_getc(ctx, ch);
 
-		/* To be added:
-			* Home:        0x1b 0x5B 0x31 0x7E
-			* F6:          0x1b 0x5B 0x31 0x37 0x7E
-			* F7:          0x1b 0x5B 0x31 0x38 0x7E
-			* F8:          0x1b 0x5B 0x31 0x39 0x7E
-			* Ins:         0x1b 0x5B 0x32 0x7E
-			* F9:          0x1b 0x5B 0x32 0x30 0x7E
-			* F10:         0x1b 0x5B 0x32 0x31 0x7E
-			* F11:         0x1b 0x5B 0x32 0x33 0x7E
-			* F12:         0x1b 0x5B 0x32 0x34 0x7E
-			* Del:         0x1b 0x5B 0x33 0x7E
-			* End:         0x1b 0x5B 0x34 0x7E
-			* PgUp:        0x1b 0x5B 0x35 0x7E
-			* PgDn:        0x1b 0x5B 0x36 0x7E
-		*/
+		/*
+		 * To be added:
+		 * Home:        0x1b 0x5B 0x31 0x7E
+		 * F6:          0x1b 0x5B 0x31 0x37 0x7E
+		 * F7:          0x1b 0x5B 0x31 0x38 0x7E
+		 * F8:          0x1b 0x5B 0x31 0x39 0x7E
+		 * Ins:         0x1b 0x5B 0x32 0x7E
+		 * F9:          0x1b 0x5B 0x32 0x30 0x7E
+		 * F10:         0x1b 0x5B 0x32 0x31 0x7E
+		 * F11:         0x1b 0x5B 0x32 0x33 0x7E
+		 * F12:         0x1b 0x5B 0x32 0x34 0x7E
+		 * Del:         0x1b 0x5B 0x33 0x7E
+		 * End:         0x1b 0x5B 0x34 0x7E
+		 * PgUp:        0x1b 0x5B 0x35 0x7E
+		 * PgDn:        0x1b 0x5B 0x36 0x7E
+		 */
 
 		c = ctx->get(ctx->get_param);
 		switch (c)
@@ -260,12 +262,14 @@ INLINE bool is_history_end(struct RLContext* ctx, int i)
 INLINE bool is_history_past_end(struct RLContext* ctx, int i)
 { return ctx->history + i >= ctx->real_history + HISTORY_SIZE; }
 
-/** Insert \a num_chars characters from \a ch into the history buffer at the
- *  position indicated by \a curpos. If needed, remove old history to make room.
- *  Returns true if everything was successful, false if there was no room to
- *  add the characters.
- *  \note \a num_chars can be 0, in which case we just make sure the line is
- *  correctly zero-terminated (ASCIIZ format).
+/**
+ * Insert \a num_chars characters from \a ch into the history buffer at the
+ * position indicated by \a curpos. If needed, remove old history to make room.
+ * Returns true if everything was successful, false if there was no room to
+ * add the characters.
+ *
+ * \note \a num_chars can be 0, in which case we just make sure the line is
+ * correctly zero-terminated (ASCIIZ format).
  */
 static bool insert_chars(struct RLContext* ctx, size_t *curpos, const char* ch, int num_chars)
 {
@@ -389,7 +393,7 @@ const char* rl_readline(struct RLContext* ctx)
 		}
 
 		// Backspace cancels a character, or it is ignored if at
-		//  the start of the line
+		// the start of the line
 		if (c == '\b')
 		{
 			if (ctx->history[ctx->line_pos] != '\0')
@@ -431,9 +435,6 @@ const char* rl_readline(struct RLContext* ctx)
 	const char *buf = &ctx->history[ctx->line_pos + 1];
 
 	ctx->line_pos = ctx->history_pos;
-
-	if (ctx->prompt)
-		rl_puts(ctx, ctx->prompt);
 
 	insert_chars(ctx, &ctx->line_pos, NULL, 0);
 

@@ -30,7 +30,7 @@
  * All Rights Reserved.
  * -->
  *
- * \defgroup parser Simple RPC machinery
+ * \defgroup parser Simple Remote Procedure Call (RPC) machinery
  * \ingroup mware
  * \{
  *

@@ -244,6 +244,7 @@ const struct CmdTemplate* parser_get_cmd_template(const char *input)
 	if (!get_word(&begin, &end))
 		return NULL;
 #endif
+
 	if (!get_word(&begin, &end))
 		return NULL;
 
@@ -259,6 +260,7 @@ static const char *skip_to_params(const char *input, const struct CmdTemplate *c
 	if (!get_word(&begin, &end))
 		return NULL;
 #endif
+
 	if (!get_word(&begin, &end))
 		return NULL;
 
