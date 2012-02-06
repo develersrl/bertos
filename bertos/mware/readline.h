@@ -30,7 +30,10 @@
  * Copyright (C) 2004 Develer S.r.l. (http://www.develer.com/)
  * All Rights Reserved.
  * -->
- *
+ * \defgroup readline Line editing support with history
+ * \ingroup mware
+ * \{
+
  * \brief Line editing support with history
  *
  * This file implements a kernel for line editing through a terminal, with history of the typed lines.
@@ -39,6 +42,36 @@
  * \li Abstracted from I/O. The user must provide hooks for getc and putc functions.
  * \li Basic support for ANSI escape sequences for input of special codes.
  * \li Support for command name completion (through a hook).
+ *
+ * Rationale for basic implementation choices:
+ *
+ * \li The history is implemented storing consecutive ASCIIZ strings within an array of memory. When
+ * the history is full, the first (oldest) line is cancelled and the whole buffer is memmoved to
+ * overwrite it and make room. while this is is obviously not the fastest algorithm (which would
+ * require the use of a circular buffer) it is surely good enough for this module, which does not
+ * aim at fast performances (line editing does not require to be blazingly fast).
+ *
+ * \li The first character in the history is always \c \\0, and it is used as a guard. By 'wasting' it
+ * in this way, the code actually gets much simpler in that we remove many checks when moving
+ * backward (\c i>0 and similar).
+ *
+ * \li While editing, the current index points to the position of the buffer which contains the
+ * last character typed in (exactly like a stack pointer). This also allows to simplify calculations
+ * and to make easier using the last byte of history.
+ *
+ * \li While editing, the current line is always kept null-terminated. This is important because
+ * if the user press ENTER, we must have room to add a \c \\0 to terminate the line. If the line
+ * is as long as the whole history buffer, there would not be space for it. By always keeping the
+ * \c \\0 at the end, we properly ensure this without making index checks harder.
+ *
+ * \li When removing a line from the history (see \c pop_history()), instead of updating all the
+ * indices we have around, we move backward the pointer to the history we use. This way, we don't
+ * have to update anything. This means that we keep two pointers to the history: \c real_history
+ * always points to the physical start, while \c history is the adjusted pointer (that is
+ * dereference to read/write to it).
+ *
+ * \todo Use up/down to move through history  The history line will be copied to the current line,
+ * making sure there is room for it.
  *
  *
  * \author Giovanni Bajo <rasky@develer.com>
@@ -121,5 +154,7 @@ void rl_refresh(struct RLContext* ctx);
 int readline_testSetup(void);
 int readline_testRun(void);
 int readline_testTearDown(void);
+
+/** \} */ //defgroup readline.
 
 #endif /* MWARE_READLINE_H */
