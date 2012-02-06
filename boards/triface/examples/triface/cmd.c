@@ -44,11 +44,14 @@
 #include "verstag.h"
 
 #include "hw/hw_input.h"
+
 #include "cfg/cfg_parser.h"
+
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
 
 #include <mware/parser.h>
+
 #include <drv/adc.h>
 #include <drv/timer.h>
 #include <drv/ser.h>
