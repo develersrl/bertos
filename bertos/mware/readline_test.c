@@ -46,7 +46,7 @@
 #include <stdio.h>
 
 
-char* test1_in = "a\nb\nc\nd\ne\nf\ng\nh\ni\nj\nk\nl\nm\nn\no\np\nq\nr\ns\nt\nu\nv\nw\nx\ny\nz\n";
+char test1_in[] = "a\nb\nc\nd\ne\nf\ng\nh\ni\nj\nk\nl\nm\nn\no\np\nq\nr\ns\nt\nu\nv\nw\nx\ny\nz\n";
 char test1_hist[HISTORY_SIZE] = "\0l\0m\0n\0o\0p\0q\0r\0s\0t\0u\0v\0w\0x\0y\0z";
 
 /** Perform the unit test for the readline library */
@@ -61,6 +61,7 @@ static struct RLContext test_ctx;
 static char* test_getc_ptr;
 static int test_getc(void* data)
 {
+	(void)data;
 	return *test_getc_ptr++;
 }
 
