@@ -43,6 +43,14 @@
 
 #include <io/kfile.h>
 
+#define PROTOCOL_OK_CMD           0
+#define PROTOCOL_INVALID_CMD     -1
+#define PROTOCOL_MISSING_PARAM   -2
+#define PROTOCOL_TO_MANY_PARAM   -3
+#define PROTOCOL_MALFORM_CMD     -4
+#define PROTOCOL_ERR_EXE_CMD     -5
+#define PROTOCOL_INVALID_RET_FMT -6
+
 typedef void (*protocol_t)(void);
 
 void protocol_poll(KFile *fd);

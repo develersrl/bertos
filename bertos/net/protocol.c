@@ -81,22 +81,16 @@
 #define LOG_LEVEL   PROTOCOL_LOG_LEVEL
 #define LOG_FORMAT  PROTOCOL_LOG_FORMAT
 #include <cfg/log.h>
-
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
-
-#include <drv/timer.h>
 
 #include <mware/readline.h>
 #include <mware/parser.h>
 
 #include <io/kfile.h>
 
-#include <stdlib.h>
-#include <string.h>
 
-//Readline context, used for interactive mode.
-static struct RLContext rl_ctx;
+static struct RLContext rl_ctx;  // Readline context.
 
 /**
  * Send a NAK asking the host to send the current message again.
@@ -104,12 +98,13 @@ static struct RLContext rl_ctx;
  * \a fd kfile handler for serial.
  * \a err human-readable description of the error for debug purposes.
  */
-INLINE void NAK(KFile *fd, const char *err)
+INLINE void REPLY(KFile *fd, int err_code, const char *err)
 {
 #if PROTOCOL_LOG_LEVEL  == LOG_LVL_INFO
-	kfile_printf(fd, "NAK \"%s\"\r\n", err);
+	kfile_printf(fd, "%d %s\r\n", err_code, err);
 #else
-	kfile_printf(fd, "NAK\r\n");
+	(void)err;
+	kfile_printf(fd, "%d\r\n", err_code);
 #endif
 }
 
@@ -150,27 +145,28 @@ static void protocol_parse(KFile *fd, const char *buf)
 	templ = parser_get_cmd_template(buf);
 	if (!templ)
 	{
-		kfile_print(fd, "-1 Invalid command.\r\n");
+		REPLY(fd, PROTOCOL_INVALID_CMD, "Invalid command.");
 		return;
 	}
 
 	parms args[CONFIG_PARSER_MAX_ARGS];
 
-	/* Args Check.  TODO: Handle different case. see doc/PROTOCOL .  */
-	if (!parser_get_cmd_arguments(buf, templ, args))
+	int ret = parser_get_cmd_arguments(buf, templ, args);
+	if (!ret)
 	{
-		kfile_print(fd, "-2 Invalid arguments.\r\n");
+		REPLY(fd, PROTOCOL_MISSING_PARAM, "Invalid arguments.");
 		return;
 	}
 
 	/* Execute. */
 	if(!parser_execute_cmd(templ, args))
 	{
-		NAK(fd, "Error in executing command.");
+		REPLY(fd, PROTOCOL_ERR_EXE_CMD, "Error in executing command.");
 	}
+
 	if (!protocol_reply(fd, templ, args))
 	{
-		NAK(fd, "Invalid return format.");
+		REPLY(fd, PROTOCOL_INVALID_RET_FMT, "Invalid return format.");
 	}
 
 	return;
