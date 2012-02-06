@@ -161,7 +161,7 @@ INLINE void init(Sipo *fd)
 /**
  * Init sipo module.
  *
- * \param fg sipo context.
+ * \param fd sipo context.
  */
 DEPRECATED void sipo_init_1(Sipo *fd)
 {
