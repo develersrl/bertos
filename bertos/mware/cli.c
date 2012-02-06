@@ -120,7 +120,7 @@ static void cli_parse(KFile *fd, const char *buf)
 
 	if (!parser_get_cmd_arguments(buf, templ, args))
 	{
-		REPLY(fd, CLI_MISSING_PARAM, "Invalid arguments.");
+		REPLY(fd, CLI_INVALID_ARGS, "Invalid arguments.");
 		return;
 	}
 
