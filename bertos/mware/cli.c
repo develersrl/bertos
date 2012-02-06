@@ -31,41 +31,7 @@
  *
  * -->
  *
- * \brief Protocol module.
- *
- * This module supply a simple ascii protocol to send commands to
- * the device like pc "terminal". To use it we need to define all command
- * that we want supply, and then we should register they using a user defined
- * function. All commands can take arguments or/and return a value.
- *
- * \code
- * #include "verstag.h"
- * #include <mware/parser.h>
- *
- * //Define a function ver, that return 3 int.
- * //This macro will expand into a fuction named "ver" that not take
- * //an input and return 3 int (ddd).
- * MAKE_CMD(ver, "", "ddd",
- * ({
- *	args[1].l = VERS_MAJOR;
- *	args[2].l = VERS_MINOR;
- *	args[3].l = VERS_REV;
- *	0;
- * }), 0);
- *
- *
- * //Define the function to pass at protocol_init, to register
- * //all defined protocol function.
- * static void protocol_registerCmds(void)
- * {
- * 	  REGISTER_CMD(ver);
- * }
- *
- *
- * //Init the protocol module whit comunication channel and
- * //the callback to register the defined protocol functions.
- * protocol_init(&socket.fd, protocol_registerCmds);
- * \endcode
+ * \brief Command-line interface (CLI) module.
  *
  * \author Giovanni Bajo <rasky@develer.com>
  * \author Marco Benelli <marco@develer.com>
@@ -73,13 +39,13 @@
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#include "protocol.h"
+#include "cli.h"
 
 #include "cfg/cfg_parser.h"
-#include "cfg/cfg_protocol.h"
+#include "cfg/cfg_cli.h"
 
-#define LOG_LEVEL   PROTOCOL_LOG_LEVEL
-#define LOG_FORMAT  PROTOCOL_LOG_FORMAT
+#define LOG_LEVEL   CLI_LOG_LEVEL
+#define LOG_FORMAT  CLI_LOG_FORMAT
 #include <cfg/log.h>
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
@@ -89,18 +55,19 @@
 
 #include <io/kfile.h>
 
-
 static struct RLContext rl_ctx;  // Readline context.
 
-/**
- * Send a NAK asking the host to send the current message again.
+/*
+ * Reply macro.
+ * Send error message to client.
  *
  * \a fd kfile handler for serial.
+ * \a err int error code.
  * \a err human-readable description of the error for debug purposes.
  */
 INLINE void REPLY(KFile *fd, int err_code, const char *err)
 {
-#if PROTOCOL_LOG_LEVEL  == LOG_LVL_INFO
+#if CLI_LOG_LEVEL  == LOG_LVL_INFO
 	kfile_printf(fd, "%d %s\r\n", err_code, err);
 #else
 	(void)err;
@@ -112,7 +79,7 @@ INLINE void REPLY(KFile *fd, int err_code, const char *err)
  * Print args on s, with format specified in t->result_fmt.
  * Return number of valid arguments or -1 in case of error.
  */
-static bool protocol_reply(KFile *fd, const struct CmdTemplate *t, const parms *args)
+static bool cli_reply(KFile *fd, const struct CmdTemplate *t, const parms *args)
 {
 	unsigned short offset = strlen(t->arg_fmt) + 1;
 	unsigned short nres = strlen(t->result_fmt);
@@ -137,7 +104,7 @@ static bool protocol_reply(KFile *fd, const struct CmdTemplate *t, const parms *
 	return true;
 }
 
-static void protocol_parse(KFile *fd, const char *buf)
+static void cli_parse(KFile *fd, const char *buf)
 {
 	const struct CmdTemplate *templ;
 
@@ -145,7 +112,7 @@ static void protocol_parse(KFile *fd, const char *buf)
 	templ = parser_get_cmd_template(buf);
 	if (!templ)
 	{
-		REPLY(fd, PROTOCOL_INVALID_CMD, "Invalid command.");
+		REPLY(fd, CLI_INVALID_CMD, "Invalid command.");
 		return;
 	}
 
@@ -154,25 +121,25 @@ static void protocol_parse(KFile *fd, const char *buf)
 	int ret = parser_get_cmd_arguments(buf, templ, args);
 	if (!ret)
 	{
-		REPLY(fd, PROTOCOL_MISSING_PARAM, "Invalid arguments.");
+		REPLY(fd, CLI_MISSING_PARAM, "Invalid arguments.");
 		return;
 	}
 
 	/* Execute. */
 	if(!parser_execute_cmd(templ, args))
 	{
-		REPLY(fd, PROTOCOL_ERR_EXE_CMD, "Error in executing command.");
+		REPLY(fd, CLI_ERR_EXE_CMD, "Error in executing command.");
 	}
 
-	if (!protocol_reply(fd, templ, args))
+	if (!cli_reply(fd, templ, args))
 	{
-		REPLY(fd, PROTOCOL_INVALID_RET_FMT, "Invalid return format.");
+		REPLY(fd, CLI_INVALID_RET_FMT, "Invalid return format.");
 	}
 
 	return;
 }
 
-void protocol_poll(KFile *fd)
+void cli_poll(KFile *fd)
 {
 	const char *buf = rl_readline(&rl_ctx);
 
@@ -198,17 +165,24 @@ void protocol_poll(KFile *fd)
 	}
 	else
 	{
-		protocol_parse(fd, buf);
+		cli_parse(fd, buf);
 	}
 
 	rl_refresh(&rl_ctx);
 }
 
 
-/*
- * Initialization: readline context, parser and register commands.
+/**
+ * Init CLI module.
+ *
+ * This module use the readline and parser module. The first one
+ * manage all command line, while the parser tokenize the given command and
+ * call related callback if it exist.
+ *
+ * \param fd pointer to kfile channel context
+ * \param cmds_register user function to register the defined commands.
  */
-void protocol_init(KFile *fd, protocol_t cmds_register)
+void cli_init(KFile *fd, cli_t cmds_register)
 {
 	ASSERT(cmds_register);
 
@@ -216,7 +190,7 @@ void protocol_init(KFile *fd, protocol_t cmds_register)
 	cmds_register();
 
 	rl_init_ctx(&rl_ctx);
-	rl_setprompt(&rl_ctx, CONFIG_PROMT_STR);
+	rl_setprompt(&rl_ctx, CONFIG_CLI_PROMT_STR);
 	rl_sethook_get(&rl_ctx, (getc_hook)kfile_getc, fd);
 	rl_sethook_put(&rl_ctx, (putc_hook)kfile_putc, fd);
 	rl_sethook_match(&rl_ctx, parser_rl_match, NULL);

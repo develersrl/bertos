@@ -31,29 +31,80 @@
  *
  * -->
  *
- * \brief Protocol parser interface.
+ * \defgroup cli_module Command-line interface (CLI) module.
+ * \ingroup mware
+ * \{
+ *
+ * \brief Command-line interface (CLI) parser interface.
+ *
+ * This module supply a simple ascii CLI to send commands to
+ * the device like pc "terminal". To use it we need to define all command
+ * that we want supply, and then we should register they using a user defined
+ * function. All commands can take arguments or/and return a value.
+ *
+ * \code
+ * #include "verstag.h"
+ * #include <mware/parser.h>
+ * #include <mware/cli.h>
+ *
+ * //Define a function ver, that return 3 int.
+ * //This macro will expand into a fuction named "ver" that not take
+ * //an input and return 3 int (ddd).
+ * MAKE_CMD(ver, "", "ddd",
+ * ({
+ *	args[1].l = VERS_MAJOR;
+ *	args[2].l = VERS_MINOR;
+ *	args[3].l = VERS_REV;
+ *	0;
+ * }), 0);
+ *
+ * //Define the function to pass at cli_init, to register
+ * //all defined cli function.
+ * static void cli_registerCmds(void)
+ * {
+ * 	  REGISTER_CMD(ver);
+ * }
+ *
+ *
+ * //Init the cli module whit comunication channel context and
+ * //the register command function.
+ * cli_init(&fd, cli_registerCmds);
+ *
+ * //To process all message that come from channel call the poll function
+ * while (1)
+ * {
+ *    cli_poll(&fd);
+ * }
+ *
+ * \endcode
  *
  * \author Marco Benelli <marco@develer.com>
  * \author Daniele Basile <asterix@develer.com>
+ *
+ * $WIZ$ module_name = "cli"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_cli.h"
+ * $WIZ$ module_depends = "kfile", "parser", "readline"
  */
 
 
-#ifndef NET_PROTOCOL_H
-#define NET_PROTOCOL_H
+#ifndef MWARE_CLI_H
+#define MWARE_CLI_H
 
 #include <io/kfile.h>
 
-#define PROTOCOL_OK_CMD           0
-#define PROTOCOL_INVALID_CMD     -1
-#define PROTOCOL_MISSING_PARAM   -2
-#define PROTOCOL_TO_MANY_PARAM   -3
-#define PROTOCOL_MALFORM_CMD     -4
-#define PROTOCOL_ERR_EXE_CMD     -5
-#define PROTOCOL_INVALID_RET_FMT -6
+#define CLI_OK_CMD           0
+#define CLI_INVALID_CMD     -1
+#define CLI_MISSING_PARAM   -2
+#define CLI_TO_MANY_PARAM   -3
+#define CLI_MALFORM_CMD     -4
+#define CLI_ERR_EXE_CMD     -5
+#define CLI_INVALID_RET_FMT -6
 
-typedef void (*protocol_t)(void);
+typedef void (*cli_t)(void);
 
-void protocol_poll(KFile *fd);
-void protocol_init(KFile *fd, protocol_t cmds_register);
+void cli_poll(KFile *fd);
+void cli_init(KFile *fd, cli_t cmds_register);
 
-#endif /* NET_PROTOCOL_H */
+/** \} */ //defgroup cli_module.
+
+#endif /* MWARE_CLI_H */
