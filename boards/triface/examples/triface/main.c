@@ -62,9 +62,10 @@
 #include <drv/wdt_avr.h>
 
 #include <mware/parser.h>
+#include <mware/cli.h>
 
 #include <net/keytag.h>
-#include <net/protocol.h>
+
 
 static Serial fd_ser;
 static Serial tag_ser;
@@ -106,11 +107,11 @@ int main(void)
 	/* Init the tag parser */
 	keytag_init(&pkt, &fd_ser.fd, &tag_ser.fd);
 
-	protocol_init(&fd_ser.fd, cmd_register);
+	cli_init(&fd_ser.fd, cmd_register);
 
 	while (1)
 	{
-		protocol_poll(&fd_ser.fd);
+		cli_poll(&fd_ser.fd);
 
 		uint8_t buf[CONFIG_TAG_MAX_LEN];
 		int len;
