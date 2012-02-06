@@ -138,8 +138,16 @@ static void cli_parse(KFile *fd, const char *buf)
 	return;
 }
 
+static bool is_connect_first_time = true;
 void cli_poll(KFile *fd)
 {
+	/* Print ready promt at first time that we connect */
+	if (is_connect_first_time)
+	{
+		rl_refresh(&rl_ctx);
+		is_connect_first_time = false;
+	}
+
 	const char *buf = rl_readline(&rl_ctx);
 
 	if((buf == NULL))
@@ -161,13 +169,14 @@ void cli_poll(KFile *fd)
 	{
 		rl_clear_history(&rl_ctx);
 		kfile_close(fd);
+		is_connect_first_time = true;
 	}
 	else
 	{
 		cli_parse(fd, buf);
+		rl_refresh(&rl_ctx);
 	}
 
-	rl_refresh(&rl_ctx);
 }
 
 
@@ -194,5 +203,4 @@ void cli_init(KFile *fd, cli_t cmds_register)
 	rl_sethook_put(&rl_ctx, (putc_hook)kfile_putc, fd);
 	rl_sethook_match(&rl_ctx, parser_rl_match, NULL);
 	rl_sethook_clear(&rl_ctx, (clear_hook)kfile_clearerr,fd);
-	rl_refresh(&rl_ctx);
 }
