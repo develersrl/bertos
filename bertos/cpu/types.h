@@ -184,7 +184,11 @@
 #endif
 #endif
 
-#ifndef UINTPTR_MAX
+/*
+ * GCC doesn't provide an appropriate macro for [u]intptr_t
+ * For now, use __PTRDIFF_TYPE__
+ */
+#if !defined(__PTRDIFF_TYPE__)
 /*
  * uintptr_t: unsigned integer type large exactly as a pointer.
  */
