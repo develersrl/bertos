@@ -117,4 +117,9 @@ const char* rl_readline(struct RLContext* ctx);
 
 void rl_refresh(struct RLContext* ctx);
 
+/* Test prototype */
+int readline_testSetup(void);
+int readline_testRun(void);
+int readline_testTearDown(void);
+
 #endif /* MWARE_READLINE_H */

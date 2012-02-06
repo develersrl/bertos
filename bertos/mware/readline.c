@@ -66,7 +66,6 @@
  * \author Giovanni Bajo <rasky@develer.com>
  */
 
-
 #include "readline.h"
 
 #include <cfg/compiler.h>
@@ -74,12 +73,8 @@
 
 #include <stdio.h>
 
-/// Enable compilation of the unit test code
-#define DEBUG_UNIT_TEST       0
-
 /// Enable dump of the history after each line
 #define DEBUG_DUMP_HISTORY    0
-
 
 /** Special keys (escape sequences converted to a single code) */
 enum RL_KEYS {
@@ -442,57 +437,4 @@ const char* rl_readline(struct RLContext* ctx)
 	//  to return the first character
 	return buf;
 }
-
-
-#if DEBUG_UNIT_TEST
-
-/** Perform the unit test for the readline library */
-void rl_test(void);
-
-#if HISTORY_SIZE != 32
-	#error This test needs HISTORY_SIZE to be set at 32
-#endif
-
-static struct RLContext test_ctx;
-
-static char* test_getc_ptr;
-static int test_getc(void* data)
-{
-	return *test_getc_ptr++;
-}
-
-/** Perform a readline test. The function pipes the characters from \a input_buffer
- *  through the I/O to \c rl_readline(). After the whole string is sent, \c do_test()
- *  checks if the current history within the context match \a expected_history.
- */
-static bool do_test(char* input_buffer, char* expected_history)
-{
-	rl_init_ctx(&test_ctx);
-	rl_sethook_get(&test_ctx, test_getc, NULL);
-
-	test_getc_ptr = input_buffer;
-	while (*test_getc_ptr)
-		rl_readline(&test_ctx);
-
-	if (memcmp(test_ctx.real_history, expected_history, HISTORY_SIZE) != 0)
-	{
-		ASSERT2(0, "history compare failed");
-		return false;
-	}
-
-	return true;
-}
-
-void rl_test(void)
-{
-	char* test1_in = "a\nb\nc\nd\ne\nf\ng\nh\ni\nj\nk\nl\nm\nn\no\np\nq\nr\ns\nt\nu\nv\nw\nx\ny\nz\n";
-	char test1_hist[HISTORY_SIZE] = "\0l\0m\0n\0o\0p\0q\0r\0s\0t\0u\0v\0w\0x\0y\0z";
-
-	if (!do_test(test1_in, test1_hist))
-		return;
-
-	kprintf("rl_test successful\n");
-}
-
-#endif /* DEBUG_UNIT_TEST */
 

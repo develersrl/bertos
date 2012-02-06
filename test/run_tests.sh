@@ -46,6 +46,7 @@ SRC_LIST="
 	bertos/mware/formatwr.c
 	bertos/mware/hex.c
 	bertos/mware/sprintf.c
+	bertos/mware/readline.c
 	bertos/os/hptime.c
 	bertos/struct/kfile_fifo.c
 	bertos/struct/heap.c
