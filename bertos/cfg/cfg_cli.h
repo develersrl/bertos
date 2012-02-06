@@ -52,7 +52,7 @@
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_format"
  */
-#define CLI_LOG_FORMAT     LOG_FMT_VERBOSE
+#define CLI_LOG_FORMAT     LOG_FMT_TERSE
 
 
 /**

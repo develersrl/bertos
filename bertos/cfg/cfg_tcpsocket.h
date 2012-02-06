@@ -44,7 +44,7 @@
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_level"
  */
-#define TCPSOCKET_LOG_LEVEL      LOG_LVL_INFO
+#define TCPSOCKET_LOG_LEVEL      LOG_LVL_ERR
 
 /**
  * Module logging format.
@@ -52,6 +52,6 @@
  * $WIZ$ type = "enum"
  * $WIZ$ value_list = "log_format"
  */
-#define TCPSOCKET_LOG_FORMAT     LOG_FMT_VERBOSE
+#define TCPSOCKET_LOG_FORMAT     LOG_FMT_TERSE
 
 #endif /* CFG_TCPSOCKET_H */
