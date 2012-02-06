@@ -271,8 +271,7 @@ static void menu_layout(
 		/* Only print visible items */
 		if (!(item->flags & MIF_HIDDEN))
 		{
-			#warning __FILTER_NEXT_WARNING__
-			RenderHook renderhook = (item->flags & MIF_RENDERHOOK) ? (RenderHook)item->label : menu_defaultRenderHook;
+			RenderHook renderhook = (item->flags & MIF_RENDERHOOK) ? CONST_CAST(RenderHook, item->label) : menu_defaultRenderHook;
 
 			/* Render menuitem */
 			renderhook(menu->bitmap, ypos++, (i == selected), item);
@@ -535,7 +534,6 @@ iptr_t menu_handle(const struct Menu *menu)
 
 	/* Store currently selected item before leaving. */
 	if (menu->flags & MF_SAVESEL)
-		#warning __FILTER_NEXT_WARNING__
 		CONST_CAST(struct Menu *, menu)->selected = selected;
 
 	return result;
