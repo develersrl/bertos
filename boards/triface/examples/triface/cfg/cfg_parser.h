@@ -58,7 +58,7 @@
  * Skip the first word from incoming commands. Don't enable in new projects.
  * $WIZ$ type = "boolean"
  */
-#define CONFIG_ENABLE_COMPAT_BEHAVIOUR 1
+#define CONFIG_ENABLE_COMPAT_BEHAVIOUR 0
 
 #endif /* CFG_PARSER_H */
 

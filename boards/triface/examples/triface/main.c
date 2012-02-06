@@ -110,7 +110,7 @@ int main(void)
 
 	while (1)
 	{
-		protocol_run(&fd_ser.fd);
+		protocol_poll(&fd_ser.fd);
 
 		uint8_t buf[CONFIG_TAG_MAX_LEN];
 		int len;
