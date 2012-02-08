@@ -90,6 +90,8 @@
 #ifndef MWARE_CLI_H
 #define MWARE_CLI_H
 
+#include <mware/readline.h>
+
 #include <io/kfile.h>
 
 #define CLI_OK_CMD           0 ///< No error.
@@ -98,10 +100,21 @@
 #define CLI_ERR_EXE_CMD     -3 ///< Command execution error.
 #define CLI_INVALID_RET_FMT -4 ///< Invalid command return formart.
 
-typedef void (*cli_t)(void); ///< Register command function prototype.
+typedef void (*cli_t)(void);                ///< Register command function prototype.
+typedef bool (*cli_check_t)(KFile *fd);          ///<
+typedef void (*cli_handshake_t)(KFile *fd); ///< Handshake fuction prototype.
+
+typedef struct CLI
+{
+	KFile *fd;                 ///< Kfile communication channel context
+	struct RLContext rl_ctx;   ///< Readline context.
+	cli_handshake_t handshake; ///< Custom function to be call every new session.
+	cli_check_t check_newSession; ///<
+	bool is_new_session;       ///< Flag to trac new session.
+} CLI;
 
 void cli_poll(KFile *fd);
-void cli_init(KFile *fd, cli_t cmds_register);
+void cli_init(CLI *cli, KFile *ch, cli_t cmds_register, cli_handshake_t handshake, cli_check_t check_newSession);
 
 /** \} */ //defgroup cli_module.
 

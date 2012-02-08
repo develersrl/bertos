@@ -55,7 +55,7 @@
 
 #include <io/kfile.h>
 
-static struct RLContext rl_ctx;  // Readline context.
+static CLI *local_cli;
 
 /*
  * Reply macro.
@@ -104,7 +104,7 @@ static bool cli_reply(KFile *fd, const struct CmdTemplate *t, const parms *args)
 	return true;
 }
 
-static void cli_parse(KFile *fd, const char *buf)
+static void cli_parse(CLI *cli, const char *buf)
 {
 	const struct CmdTemplate *templ;
 
@@ -112,7 +112,7 @@ static void cli_parse(KFile *fd, const char *buf)
 	templ = parser_get_cmd_template(buf);
 	if (!templ)
 	{
-		REPLY(fd, CLI_INVALID_CMD, "Invalid command.");
+		REPLY(cli->fd, CLI_INVALID_CMD, "Invalid command.");
 		return;
 	}
 
@@ -120,35 +120,45 @@ static void cli_parse(KFile *fd, const char *buf)
 
 	if (!parser_get_cmd_arguments(buf, templ, args))
 	{
-		REPLY(fd, CLI_INVALID_ARGS, "Invalid arguments.");
+		REPLY(cli->fd, CLI_INVALID_ARGS, "Invalid arguments.");
 		return;
 	}
 
 	/* Execute. */
 	if(!parser_execute_cmd(templ, args))
 	{
-		REPLY(fd, CLI_ERR_EXE_CMD, "Error in executing command.");
+		REPLY(cli->fd, CLI_ERR_EXE_CMD, "Error in executing command.");
 	}
 
-	if (!cli_reply(fd, templ, args))
+	if (!cli_reply(cli->fd, templ, args))
 	{
-		REPLY(fd, CLI_INVALID_RET_FMT, "Invalid return format.");
+		REPLY(cli->fd, CLI_INVALID_RET_FMT, "Invalid return format.");
 	}
 
 	return;
 }
 
-static bool is_connect_first_time = true;
 void cli_poll(KFile *fd)
 {
-	/* Print ready promt at first time that we connect */
-	if (is_connect_first_time)
+	/* Check with user function if session was end */
+	if (!local_cli->is_new_session && local_cli->check_newSession)
 	{
-		rl_refresh(&rl_ctx);
-		is_connect_first_time = false;
+		if (local_cli->check_newSession(fd))
+			local_cli->is_new_session = true;
 	}
 
-	const char *buf = rl_readline(&rl_ctx);
+	/* Print ready promt at first time that we connect */
+	if (local_cli->is_new_session)
+	{
+		/* If defined call the custom procedure for new session */
+		if (local_cli->handshake)
+			local_cli->handshake(local_cli->fd);
+
+		rl_refresh(&local_cli->rl_ctx);
+		local_cli->is_new_session = false;
+	}
+
+	const char *buf = rl_readline(&local_cli->rl_ctx);
 
 	if((buf == NULL))
 		return;
@@ -160,21 +170,21 @@ void cli_poll(KFile *fd)
 	they are stripped out from commands */
 	if (buf[0] == '#')
 	{
-		rl_refresh(&rl_ctx);
+		rl_refresh(&local_cli->rl_ctx);
 		return;
 	}
 
 	/* Close connetion on exit command */
 	if (!strcmp(buf, "exit") || !strcmp(buf, "quit"))
 	{
-		rl_clear_history(&rl_ctx);
-		kfile_close(fd);
-		is_connect_first_time = true;
+		rl_clear_history(&local_cli->rl_ctx);
+		kfile_close(local_cli->fd);
+		local_cli->is_new_session = true;
 	}
 	else
 	{
-		cli_parse(fd, buf);
-		rl_refresh(&rl_ctx);
+		cli_parse(local_cli, buf);
+		rl_refresh(&local_cli->rl_ctx);
 	}
 
 }
@@ -189,18 +199,26 @@ void cli_poll(KFile *fd)
  *
  * \param fd pointer to kfile channel context
  * \param cmds_register user function to register the defined commands.
+ * \param handshake custom fuction for negotiate beetwen the server and client
+ * every new session, NULL to skip any init sequence.
  */
-void cli_init(KFile *fd, cli_t cmds_register)
+void cli_init(CLI *cli, KFile *ch, cli_t cmds_register, cli_handshake_t handshake, cli_check_t check_newSession)
 {
 	ASSERT(cmds_register);
 
 	parser_init();
 	cmds_register();
 
-	rl_init_ctx(&rl_ctx);
-	rl_setprompt(&rl_ctx, CONFIG_CLI_PROMT_STR);
-	rl_sethook_get(&rl_ctx, (getc_hook)kfile_getc, fd);
-	rl_sethook_put(&rl_ctx, (putc_hook)kfile_putc, fd);
-	rl_sethook_match(&rl_ctx, parser_rl_match, NULL);
-	rl_sethook_clear(&rl_ctx, (clear_hook)kfile_clearerr,fd);
+	local_cli = cli;
+
+	cli->fd = ch;
+	cli->handshake = handshake;
+	cli->check_newSession = check_newSession;
+	cli->is_new_session = true;
+
+	rl_init_ctx(&cli->rl_ctx);
+	rl_setprompt(&cli->rl_ctx, CONFIG_CLI_PROMT_STR);
+	rl_sethook_get(&cli->rl_ctx, (getc_hook)kfile_getc, cli->fd);
+	rl_sethook_put(&cli->rl_ctx, (putc_hook)kfile_putc, cli->fd);
+	rl_sethook_match(&cli->rl_ctx, parser_rl_match, NULL);
 }
