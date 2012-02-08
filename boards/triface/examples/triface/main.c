@@ -70,6 +70,7 @@
 static Serial fd_ser;
 static Serial tag_ser;
 static Sipo fd_sipo;
+static CLI cli;
 
 static void init(void)
 {
@@ -107,7 +108,7 @@ int main(void)
 	/* Init the tag parser */
 	keytag_init(&pkt, &fd_ser.fd, &tag_ser.fd);
 
-	cli_init(&fd_ser.fd, cmd_register);
+	cli_init(&cli, &fd_ser.fd, cmd_register, NULL, NULL);
 
 	while (1)
 	{
