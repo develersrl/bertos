@@ -54,33 +54,25 @@
 #include <lwip/tcpip.h>
 
 
-INLINE int close_socket(TcpSocket *socket)
+INLINE void close_socket(TcpSocket *socket)
 {
 	/* Clean all previuos states */
 	netbuf_delete(socket->rx_buf_conn);
 	socket->rx_buf_conn = NULL;
 	socket->remaning_data_len = 0;
-	socket->error = 0;
 
 	if (!socket->sock)
-		return 0;
+		return;
 
 	/* Close socket if was opened */
-	socket->error = netconn_delete(socket->sock);
+	netconn_delete(socket->sock);
 	socket->sock = NULL;
-
-	if (socket->error != ERR_OK)
-	{
-		LOG_ERR("Closing socket\n");
-		return -1;
-	}
-
-	return 0;
+	return;
 }
 
 static bool tcpsocket_reconnect(TcpSocket *socket)
 {
-	LOG_INFO("Reconnecting...\n");
+	LOG_INFO("Reconnecting..\n");
 
 	/* Close socket if was opened */
 	close_socket(socket);
@@ -88,7 +80,6 @@ static bool tcpsocket_reconnect(TcpSocket *socket)
 	/* If we are in server mode we do nothing */
 	if (socket->handler)
 		return true;
-
 
 	/* Start with new connection */
 	socket->sock = netconn_new(NETCONN_TCP);
@@ -125,7 +116,9 @@ error:
 static int tcpsocket_close(KFile *fd)
 {
 	TcpSocket *socket = TCPSOCKET_CAST(fd);
-	return close_socket(socket);
+	close_socket(socket);
+	socket->error = 0;
+	return 0;
 }
 
 static KFile *tcpsocket_reopen(KFile *fd)
@@ -277,7 +270,6 @@ void tcpsocket_serverPoll(KFile *fd)
 {
 	TcpSocket *socket = TCPSOCKET_CAST(fd);
 
-
 	if (!socket->sock)
 		socket->sock = netconn_accept(socket->server_sock);
 
@@ -344,6 +336,7 @@ void tcpsocket_serverInit(TcpSocket *socket, struct ip_addr *local_addr, struct 
 	socket->server_sock = netconn_new(NETCONN_TCP);
 	socket->error = netconn_bind(socket->server_sock, listen_addr, port);
 	socket->error = netconn_listen(socket->server_sock);
+
 	if(socket->error != ERR_OK)
 		LOG_ERR("Init server\n");
 }
