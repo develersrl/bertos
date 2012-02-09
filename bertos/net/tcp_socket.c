@@ -64,7 +64,7 @@ INLINE void close_socket(TcpSocket *socket)
 	if (!socket->sock)
 		return;
 
-	/* Close socket if was opened */
+	/* Close socket if was open */
 	netconn_delete(socket->sock);
 	socket->sock = NULL;
 	return;
@@ -72,14 +72,14 @@ INLINE void close_socket(TcpSocket *socket)
 
 static bool tcpsocket_reconnect(TcpSocket *socket)
 {
-	LOG_INFO("Reconnecting..\n");
+	LOG_ERR("Reconnecting..\n");
 
-	/* Close socket if was opened */
+	/* Close socket if was open */
 	close_socket(socket);
 
 	/* If we are in server mode we do nothing */
 	if (socket->handler)
-		return true;
+		return false;
 
 	/* Start with new connection */
 	socket->sock = netconn_new(NETCONN_TCP);
@@ -182,7 +182,7 @@ static size_t tcpsocket_read(KFile *fd, void *buf, size_t len)
 	}
 
 	/* Try reconnecting if our socket isn't valid */
-	if (!socket->sock && !tcpsocket_reconnect(socket))
+	if ((socket->sock == NULL) && !tcpsocket_reconnect(socket))
 		return 0;
 
 	while (len)
@@ -233,7 +233,7 @@ static size_t tcpsocket_write(KFile *fd, const void *buf, size_t len)
 	TcpSocket *socket = TCPSOCKET_CAST(fd);
 
 	/* Try reconnecting if our socket isn't valid */
-	if (!socket->sock && !tcpsocket_reconnect(socket))
+	if ((socket->sock == NULL) && !tcpsocket_reconnect(socket))
 		return 0;
 
 	socket->error = netconn_write(socket->sock, buf, len, NETCONN_COPY);
