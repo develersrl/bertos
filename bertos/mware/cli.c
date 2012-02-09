@@ -138,6 +138,12 @@ static void cli_parse(CLI *cli, const char *buf)
 	return;
 }
 
+/**
+ * CLI poll function.
+ *
+ * Call this function to process all incoming message from
+ * fd channel.
+ */
 void cli_poll(KFile *fd)
 {
 	/* Check with user function if session was end */
@@ -186,7 +192,6 @@ void cli_poll(KFile *fd)
 		cli_parse(local_cli, buf);
 		rl_refresh(&local_cli->rl_ctx);
 	}
-
 }
 
 
@@ -197,10 +202,12 @@ void cli_poll(KFile *fd)
  * manage all command line, while the parser tokenize the given command and
  * call related callback if it exist.
  *
+ * \param cli cli context
  * \param fd pointer to kfile channel context
  * \param cmds_register user function to register the defined commands.
  * \param handshake custom fuction for negotiate beetwen the server and client
  * every new session, NULL to skip any init sequence.
+ * \param check_newSession custom funtion should return true if we are in new session, false otherwise.
  */
 void cli_init(CLI *cli, KFile *ch, cli_t cmds_register, cli_handshake_t handshake, cli_check_t check_newSession)
 {
