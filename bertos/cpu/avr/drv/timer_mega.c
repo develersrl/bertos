@@ -49,7 +49,9 @@
 
 #include <avr/io.h>
 
-#if CPU_AVR_ATMEGA1281 || CPU_AVR_ATMEGA1280 || CPU_AVR_ATMEGA168 || CPU_AVR_ATMEGA328P || CPU_AVR_ATMEGA2560
+#if CPU_AVR_ATMEGA1281 || CPU_AVR_ATMEGA1280 || CPU_AVR_ATMEGA168 \
+	|| CPU_AVR_ATMEGA328P || CPU_AVR_ATMEGA2560 \
+	|| CPU_AVR_ATMEGA324P || CPU_AVR_ATMEGA644P
 	#define REG_TIFR0 TIFR0
 	#define REG_TIFR1 TIFR1
 	#define REG_TIFR2 TIFR2
@@ -137,7 +139,7 @@
 			#endif
 
 		TCNT0 = 0x00;                 /* Initialization of Timer/Counter */
-		REG_OCR0A = OCR_DIVISOR;           /* Timer/Counter Output Compare Register */
+		REG_OCR0A = (uint8_t)OCR_DIVISOR;           /* Timer/Counter Output Compare Register */
 
 		/* Enable timer interrupts: Timer/Counter2 Output Compare (OCIE2) */
 		REG_TIMSK0 &= ~BV(TOIE0);
@@ -214,7 +216,8 @@
 
 #elif (CONFIG_TIMER == TIMER_ON_OVERFLOW3)
 
-	#if CPU_AVR_ATMEGA168 || CPU_AVR_ATMEGA328P || CPU_AVR_ATMEGA32
+	#if CPU_AVR_ATMEGA168 || CPU_AVR_ATMEGA328P || CPU_AVR_ATMEGA32 \
+		|| CPU_AVR_ATMEGA324P || CPU_AVR_ATMEGA644P
 		#error For select target there is not TIMER_ON_OVERFLOW3, please select an other one.
 	#endif
 

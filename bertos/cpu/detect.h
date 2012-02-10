@@ -466,12 +466,28 @@
 		#define CPU_AVR_ATMEGA168   0
 	#endif
 
+	#if defined(__AVR_ATmega324P__)
+		#define CPU_AVR_MEGA		1
+		#define CPU_AVR_ATMEGA324P  1
+		#define CPU_NAME            "ATmega324P"
+	#else
+		#define CPU_AVR_ATMEGA324P  0
+	#endif
+	
+	#if defined(__AVR_ATmega644P__)
+		#define CPU_AVR_MEGA		1
+		#define CPU_AVR_ATMEGA644P  1
+		#define CPU_NAME            "ATmega644P"
+	#else
+		#define CPU_AVR_ATMEGA644P  0
+	#endif
+	
 	#if defined(__AVR_ATmega328P__)
 		#define CPU_AVR_MEGA		1
-		#define CPU_AVR_ATMEGA328P   1
+		#define CPU_AVR_ATMEGA328P  1
 		#define CPU_NAME            "ATmega328P"
 	#else
-		#define CPU_AVR_ATMEGA328P   0
+		#define CPU_AVR_ATMEGA328P  0
 	#endif
 
 	#if defined(__AVR_ATmega1281__)
@@ -553,7 +569,8 @@
 	#if CPU_AVR_ATMEGA32 + CPU_AVR_ATMEGA64 + CPU_AVR_ATMEGA103 + CPU_AVR_ATMEGA128 \
 	  + CPU_AVR_ATMEGA8 + CPU_AVR_ATMEGA168 + CPU_AVR_ATMEGA328P + CPU_AVR_ATMEGA1281 \
 	  + CPU_AVR_ATMEGA1280 + CPU_AVR_ATMEGA2560 + CPU_AVR_ATXMEGA128A1 + CPU_AVR_ATXMEGA64A3 \
-	  + CPU_AVR_ATXMEGA32A4 + CPU_AVR_ATXMEGA32D4 != 1
+	  + CPU_AVR_ATXMEGA32A4 + CPU_AVR_ATXMEGA32D4 + CPU_AVR_ATMEGA324P + CPU_AVR_ATMEGA644P != 1
+
 		#error AVR CPU configuration error
 	#endif
 
@@ -586,6 +603,8 @@
 	#define CPU_AVR_ATMEGA328P      0
 	#define CPU_AVR_ATMEGA32        0
 	#define CPU_AVR_ATMEGA64        0
+	#define CPU_AVR_ATMEGA324P      0
+	#define CPU_AVR_ATMEGA644P      0
 	#define CPU_AVR_ATMEGA103       0
 	#define CPU_AVR_ATMEGA128       0
 	#define CPU_AVR_ATMEGA1281      0

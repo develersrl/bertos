@@ -390,7 +390,7 @@ void i2c_hw_init(I2c *i2c, int dev, uint32_t clock)
 	#elif CPU_AVR_ATMEGA8
 		PORTC |= BV(PC4) | BV(PC5);
 		DDRC  |= BV(PC4) | BV(PC5);
-	#elif CPU_AVR_ATMEGA32
+	#elif CPU_AVR_ATMEGA32 || CPU_AVR_ATMEGA324P || CPU_AVR_ATMEGA644P
 		PORTC |= BV(PC1) | BV(PC0);
 		DDRC  |= BV(PC1) | BV(PC0);
 	#else
