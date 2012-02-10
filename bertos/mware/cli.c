@@ -143,6 +143,8 @@ static void cli_parse(CLI *cli, const char *buf)
  *
  * Call this function to process all incoming message from
  * fd channel.
+ *
+ * \param fd kfile channel context.
  */
 void cli_poll(KFile *fd)
 {
@@ -203,7 +205,7 @@ void cli_poll(KFile *fd)
  * call related callback if it exist.
  *
  * \param cli cli context
- * \param fd pointer to kfile channel context
+ * \param ch pointer to kfile channel context
  * \param cmds_register user function to register the defined commands.
  * \param handshake custom fuction for negotiate beetwen the server and client
  * every new session, NULL to skip any init sequence.
