@@ -66,12 +66,12 @@ static void flash25_waitReady(Flash25 *fd)
 
 	while (1)
 	{
-		CS_ENABLE();
+		SS_ACTIVE();
 
 		kfile_putc(FLASH25_RDSR, fd->channel);
 		stat = kfile_getc(fd->channel);
 
-		CS_DISABLE();
+		SS_INACTIVE();
 
 		if (!(stat & RDY_BIT))
 			break;

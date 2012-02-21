@@ -32,83 +32,49 @@
  *
  * \brief Hardware macro definition.
  *
- *
  * \author Daniele Basile <asterix@develer.com>
  */
 
 #ifndef HW_SPI_H
 #define HW_SPI_H
 
-#warning TODO:This is an example implentation, you must implement it!
-
-#include <cfg/macros.h>
+#warning TODO:This is an example implementation, you must implement it!
 
 /**
  * SPI pin definition.
- *
- * \note CS is assert when level
- * is low.
- *
- * \{
  */
-#define CS       /* pin */   ///Connect to CS pin of Flash memory.
-#define SCK      /* pin */   ///Connect to SCK pin of Flash memory.
-#define MOSI     /* pin */   ///Connect to SI pin of Flash memory.
-#define MISO     /* pin */   ///Connect to SO pin of Flash memory.
-#define SPI_PORT /* pin */   ///Micro pin PORT register.
-#define SPI_PIN  /* pin */   ///Micro pin PIN register.
-#define SPI_DDR  /* pin */   ///Micro pin DDR register.
+#define CS       /* Implement me! */
+#define SCK      /* Implement me! */
+#define MOSI     /* Implement me! */
+#define MISO     /* Implement me! */
 /*\}*/
 
-/**
- * Pin logic level.
- *
- * \{
- */
 #define MOSI_LOW()       do { /* Implement me! */ } while(0)
 #define MOSI_HIGH()      do { /* Implement me! */ } while(0)
-#define MISO_HIGH()      do { /* Implement me! */ } while(0)
-#define SCK_LOW()        do { /* Implement me! */ } while(0)
-#define SCK_HIGH()       do { /* Implement me! */ } while(0)
-#define CS_LOW()         do { /* Implement me! */ } while(0)
-#define CS_HIGH()        do { /* Implement me! */ } while(0)
-/*\}*/
 
-/**
- * SPI pin commands.
- *
- * \{
- */
-#define CS_ENABLE()      CS_LOW()
-#define CS_DISABLE()     CS_HIGH()
-#define SS_ACTIVE()      CS_LOW()
-#define SS_INACTIVE()    CS_HIGH()
-#define SCK_INACTIVE()   SCK_LOW()
-#define SCK_ACTIVE()     SCK_HIGH()
-#define CS_OUT()         do { /* Implement me! */ } while(0)
-#define MOSI_IN()        do { /* Implement me! */ } while(0)
-#define MOSI_OUT()       do { /* Implement me! */ } while(0)
-#define IS_MISO_HIGH()	 (false /* Implement me! */ )
-#define MISO_IN()        do { /* Implement me! */ } while(0)
-#define MISO_OUT()       do { /* Implement me! */ } while(0)
-#define SCK_OUT()        do { /* Implement me! */ } while(0)
+#define SS_ACTIVE()      do { /* Implement me! */ } while(0)
+#define SS_INACTIVE()    do { /* Implement me! */ } while(0)
+
+#define SCK_INACTIVE()   do { /* Implement me! */ } while(0)
+#define SCK_ACTIVE()     do { /* Implement me! */ } while(0)
+
+#define IS_MISO_HIGH()	 (false/* Implement me! */)
 
 #define SCK_PULSE()\
-	do {\
-			SCK_HIGH();\
-			SCK_LOW();\
-	} while (0)
-/*\}*/
+	do { \
+			SCK_ACTIVE();\
+			/* NOP; */ \
+			SCK_INACTIVE();\
+	} while(0)
 
 
 #define SPI_HW_INIT() \
-	CS_DISABLE();\
-	MOSI_LOW();\
-	SCK_LOW();\
-	MISO_IN();\
-	MOSI_OUT();\
-	SCK_OUT();\
-	CS_OUT();
+	do { \
+		/* Init pins here! */ \
+		SS_INACTIVE(); \
+		MOSI_LOW(); \
+		SCK_INACTIVE(); \
+	} while(0)
 
 #endif /* HW_SPI_H */
 
