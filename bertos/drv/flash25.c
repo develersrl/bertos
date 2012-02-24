@@ -85,11 +85,11 @@ static void flash25_waitReady(Flash25 *fd)
  */
 static void flash25_sendCmd(Flash25 *fd, Flash25Opcode cmd)
 {
-	CS_ENABLE();
+	SS_ACTIVE();
 
 	kfile_putc(cmd, fd->channel);
 
-	CS_DISABLE();
+	SS_INACTIVE();
 }
 
 /**
@@ -105,7 +105,7 @@ static bool flash25_pin_init(Flash25 *fd)
 
 	SPI_HW_INIT();
 
-	CS_ENABLE();
+	SS_ACTIVE();
 	/*
 	 * Send read id productor opcode on
 	 * comunication channel
@@ -116,7 +116,7 @@ static bool flash25_pin_init(Flash25 *fd)
 	manufacturer = kfile_getc(fd->channel);
 	device_id = kfile_getc(fd->channel);
 
-	CS_DISABLE();
+	SS_INACTIVE();
 
 	if((FLASH25_MANUFACTURER_ID == manufacturer) &&
 		(FLASH25_DEVICE_ID == device_id))
@@ -176,7 +176,7 @@ static size_t flash25_read(struct KFile *_fd, void *buf, size_t size)
 	size = MIN((kfile_off_t)size, fd->fd.size - fd->fd.seek_pos);
 
 	//kprintf("Reading at addr[%lu], size[%d]\n", fd->seek_pos, size);
-	CS_ENABLE();
+	SS_ACTIVE();
 
 	kfile_putc(FLASH25_READ, fd->channel);
 
@@ -190,7 +190,7 @@ static size_t flash25_read(struct KFile *_fd, void *buf, size_t size)
 
 	kfile_read(fd->channel, data, size);
 
-	CS_DISABLE();
+	SS_INACTIVE();
 
 	fd->fd.seek_pos += size;
 
@@ -256,7 +256,7 @@ static size_t flash25_write(struct KFile *_fd, const void *_buf, size_t size)
 		 */
 		flash25_sendCmd(fd, FLASH25_WREN);
 
-		CS_ENABLE();
+		SS_ACTIVE();
 		kfile_putc(FLASH25_PROGRAM, fd->channel);
 
 		/*
@@ -268,7 +268,7 @@ static size_t flash25_write(struct KFile *_fd, const void *_buf, size_t size)
 
 		kfile_write(fd->channel, data, wr_len);
 
-		CS_DISABLE();
+		SS_INACTIVE();
 
 		data += wr_len;
 		fd->fd.seek_pos += wr_len;
@@ -298,7 +298,7 @@ void flash25_sectorErase(Flash25 *fd, Flash25Sector sector)
 	 */
 	DB(ticks_t start_time = timer_clock());
 
-	CS_ENABLE();
+	SS_ACTIVE();
 
 	/*
 	 * To erase a sector of serial flash memory we must first
@@ -316,7 +316,7 @@ void flash25_sectorErase(Flash25 *fd, Flash25Sector sector)
 	 */
 	kfile_putc(sector, fd->channel);
 
-	CS_DISABLE();
+	SS_INACTIVE();
 
 	/*
 	 * We check serial flash memory state, and wait until ready-flag
