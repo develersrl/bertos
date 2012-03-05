@@ -49,7 +49,6 @@
 	#elif CPU_AVR_XMEGA
 		#include "i2c_xmega.c"
 	/*#elif  Add other AVR families here */
-
 	#else
 		#error Unknown CPU
 	#endif
