@@ -33,6 +33,8 @@
  *
  * \author Tóth Balázs <balazs.toth@jarkon.hu>
  *
+ * notest:avr
+ * notest:arm
  */
 
 #ifndef WIZ_AUTOGEN

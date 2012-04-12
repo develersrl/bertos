@@ -33,6 +33,9 @@
  * \defgroup pcint Pin change interrupt implementation
  *
  * \author Tóth Balázs <balazs.toth@jarkon.hu>
+ *
+ * notest:avr
+ * notest:arm
  */
 
 #include "pcint.h"
