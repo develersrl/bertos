@@ -45,6 +45,10 @@
 #ifndef CPU_FRAME_H
 #define CPU_FRAME_H
 
+#if CPU_AVR_ATMEGA2560
+	#include <avr/io.h> // for EIND
+#endif
+
 #include <cpu/detect.h>
 
 #include "cfg/cfg_arch.h"      /* ARCH_EMUL */
@@ -86,8 +90,12 @@
 	#define CPU_SP_ON_EMPTY_SLOT	0
 
 #elif CPU_AVR
-
-	#define CPU_SAVED_REGS_CNT     18
+	
+	#if CPU_AVR_ATMEGA2560
+		#define CPU_SAVED_REGS_CNT     20 // Mega 2560 requires EIND and RAMPZ to be saved
+	#else
+		#define CPU_SAVED_REGS_CNT	18
+	#endif
 	#define CPU_STACK_GROWS_UPWARD  0
 	#define CPU_SP_ON_EMPTY_SLOT    1
 
@@ -201,12 +209,22 @@
 	 * memory accesses are big-endian (actually, it's a 8-bit CPU, so there is
 	 * no natural endianess).
 	 */
-	#define CPU_PUSH_CALL_FRAME(sp, func) \
-		do { \
-			uint16_t funcaddr = (uint16_t)(func); \
-			CPU_PUSH_WORD((sp), funcaddr); \
-			CPU_PUSH_WORD((sp), funcaddr>>8); \
-		} while (0)
+	#if CPU_AVR_ATMEGA2560
+		#define CPU_PUSH_CALL_FRAME(sp, func) \
+			do { \
+				uint16_t funcaddr = (uint16_t)(func); \
+				CPU_PUSH_WORD((sp), funcaddr); \
+				CPU_PUSH_WORD((sp), funcaddr>>8); \
+				CPU_PUSH_WORD((sp), EIND); \
+			} while (0)
+	#else
+		#define CPU_PUSH_CALL_FRAME(sp, func) \
+			do { \
+				uint16_t funcaddr = (uint16_t)(func); \
+				CPU_PUSH_WORD((sp), funcaddr); \
+				CPU_PUSH_WORD((sp), funcaddr>>8); \
+			} while (0)
+	#endif
 
 	/*
 	 * If the kernel is in idle-spinning, the processor executes:

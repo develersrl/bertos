@@ -39,6 +39,8 @@
 
 #include <avr/io.h>
 
+#include <cpu/detect.h>
+
 /* void asm_switch_context(void **new_sp [r24:r25], void **save_sp [r22:r23]) */
 .globl asm_switch_context
 asm_switch_context:
@@ -69,6 +71,14 @@ asm_switch_context:
 	push	r28
 	push	r29
 
+#if CPU_AVR_ATMEGA2560
+	lds r30, 0x3c ;  Load EIND register into register 30
+	lds r31, 0x3b ; Load RAMPZ register into register 31
+	
+	push	r30 ; Push EIND
+	push	r31 ; Push RAMPZ
+#endif
+
 	in	r18,SPL-__SFR_OFFSET	; r18:r19 = SP
 	in	r19,SPH-__SFR_OFFSET
 	movw	r26,r22			; X = save_sp
@@ -92,6 +102,14 @@ asm_switch_context:
 	out	SPL-__SFR_OFFSET,r18	; SP = *new_sp
 	out	SPH-__SFR_OFFSET,r19
 	out	SREG-__SFR_OFFSET,r0	; Restore previous IRQ state
+
+#if CPU_AVR_ATMEGA2560
+	pop r31 ; Pop RAMPZ
+	pop r30 ; Pop EIND
+	
+	sts 0x3b, r31 ; Store RAMPZ
+	sts 0x3c, r30 ; Store EIND
+#endif
 
 	pop	r29
 	pop	r28
