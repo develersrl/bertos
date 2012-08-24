@@ -43,12 +43,11 @@
 #define MAX31855_HW_CS_EN()    /* Implement me!  I need to enable SPI CS! */
 #define MAX31855_HW_CS_DIS()   /* Implement me!  I need to disable SPI CS! */
 
+/* If your hardware needs some magic to make the SPI port
+ * work, here would be an excellent place for it.
+ */
 #define MAX31855_HW_INIT() \
-	do { \
-	/* If your hardware needs some magic to make the SPI port
-     * work, here would be an excellent place for it.
-     */
-	} while (0)
+	do { } while (0)
 
 #endif /* HW_MAX31855_H */
 
