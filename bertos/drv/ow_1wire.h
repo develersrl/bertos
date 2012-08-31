@@ -1,0 +1,110 @@
+/**
+ * \file
+ * <!--
+ * This file is part of BeRTOS.
+ *
+ * Bertos is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * As a special exception, you may use this file as part of a free software
+ * library without restriction.  Specifically, if other files instantiate
+ * templates or use macros or inline functions from this file, or you compile
+ * this file and link it with other files to produce an executable, this
+ * file does not by itself cause the resulting executable to be covered by
+ * the GNU General Public License.  This exception does not however
+ * invalidate any other reasons why the executable file might be covered by
+ * the GNU General Public License.
+ *
+ *  Copyright (C) 2011 Robin Gilks
+ * -->
+ *
+ * \defgroup onewire_driver 1-wire driver
+ * \ingroup drivers
+ * \{
+ *
+ * \brief Bit bang driver for Dallas 1-wire chips
+ *
+ * \author Robin Gilks <g8ecj@gilks.org>
+ *
+ * $WIZ$ module_name = "1wire"
+ * $WIZ$ module_hw = "bertos/hw/hw_1wire.h"
+ * $WIZ$ module_configuration = "bertos/cfg/cfg_1wire.h"
+ * \} 
+ */
+
+#ifndef OW_1WIRE_H_
+#define OW_1WIRE_H_
+
+#include <stdint.h>
+#include <stdbool.h>
+
+#include "cfg/cfg_1wire.h"
+
+
+/**
+ * \name Data direction register
+ *
+ * $WIZ$ onewire_ddr_list = "DDRB", "DDRD"
+ */
+
+/**
+ * \name One-wire I/O pin.
+ *
+ * $WIZ$ onewire_pin_list = "PD0", "PD1", "PD2", "PD3", "PD4", "PD5", "PD6", "PD7", "PB0", "PB1", "PB2", "PB3", "PB4", "PB5"
+ */
+
+/**
+ * \name One-wire input port
+ *
+ * $WIZ$ onewire_portin_list = "PINB", "PIND"
+ */
+
+/**
+ * \name One-wire output port
+ *
+ * $WIZ$ onewire_portout_list = "PORTB", "PORTD"
+ */
+
+
+
+uint8_t ow_reset(void);
+bool ow_busy(void);
+
+uint8_t ow_bit_io(uint8_t b);
+uint8_t ow_byte_wr(uint8_t b);
+uint8_t ow_byte_rd(void);
+
+uint8_t ow_rom_search(uint8_t diff, uint8_t * id);
+
+void ow_command(uint8_t command, uint8_t * id);
+void ow_command_with_parasite_enable(uint8_t command, uint8_t * id);
+uint8_t ow_byte_wr_with_parasite_enable(uint8_t b);
+
+void ow_block(uint8_t * buff, uint8_t len);
+
+void ow_set_bus(volatile uint8_t * in, volatile uint8_t * out, volatile uint8_t * ddr, uint8_t pin);
+
+
+#define OW_MATCH_ROM    0x55  ///< command to match ROM address
+#define OW_SKIP_ROM     0xCC  ///< command to skip trying to match ROM address
+#define OW_SEARCH_ROM   0xF0  ///< initiate a search for devices
+
+#define OW_SEARCH_FIRST 0xFF  ///< start of new search
+#define OW_PRESENCE_ERR 0xFF  ///< search failed with presence error
+#define OW_DATA_ERR     0xFE  ///< search failed with data error
+#define OW_LAST_DEVICE  0x00  ///< last device found - search effectively done!
+
+#define OW_ROMCODE_SIZE 8     ///< rom-code (serial number) size including Family & CRC
+
+#endif /* OW_1WIRE_H_ */
