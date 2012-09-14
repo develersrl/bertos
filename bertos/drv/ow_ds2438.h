@@ -62,6 +62,7 @@ typedef struct Result
 	int16_t Temp;           ///< Temperature
 	uint16_t Volts;         ///< Voltage on Vdd or Vad pin
 	int16_t Amps;           ///< Current, depends on extrenal shunt to interpret the actual value
+	uint16_t Charge;        ///< Charge value in amp-hrs
 	uint8_t ICA;            ///< Integrated Current Accumulator (records up to 32x/sec)
 	uint16_t CCA;           ///< Charging Current Accumulator
 	uint16_t DCA;           ///< Discharge Current Accumulator

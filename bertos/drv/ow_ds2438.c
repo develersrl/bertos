@@ -182,6 +182,7 @@ ow_ds2438_readall(uint8_t id[], Result_t * result, float shunt)
 	if (!ReadPage(id, 1, page_data))
 		return false;
 	result->ICA = page_data[4];
+	result->Charge = (uint16_t) ((float) (result->ICA + 0.5) / (float) (2048.0 * shunt));	// beware of rounding errors here!!
 
 	if (!ReadPage(id, 7, page_data))
 		return false;
