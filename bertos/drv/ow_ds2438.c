@@ -137,7 +137,7 @@ WritePage(uint8_t id[], int page_num, uint8_t * tx_buf, int tx_len)
  * \return 'true' if the read was complete
  */
 
-static int
+int
 ow_ds2438_setup(uint8_t id[], int config)
 {
 	uint8_t send_block[10];
@@ -167,11 +167,12 @@ ow_ds2438_setup(uint8_t id[], int config)
  */
 
 int
-ow_ds2438_init(uint8_t id[], CTX2438_t * context, int config, float shunt, uint16_t charge)
+ow_ds2438_init(uint8_t id[], CTX2438_t * context, float shunt, uint16_t charge)
 {
 	context->shunt = shunt;
 	context->Charge = charge;
-	if (!ow_ds2438_setup(id, config))
+
+	if (!ow_ds2438_setup(id, CONF2438_IAD | CONF2438_CA | CONF2438_EE))
 		return false;
 	// initialise the ICA register to the middle of its range
 	if (!ow_ds2438_setICA(id, ICAREF))

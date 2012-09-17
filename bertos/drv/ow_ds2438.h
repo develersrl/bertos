@@ -73,7 +73,8 @@ typedef struct
 	float shunt;            ///< value of the shunt resistor used to measure current and charge
 } CTX2438_t;
 
-int ow_ds2438_init(uint8_t id[], CTX2438_t * context, int config, float shunt, uint16_t charge);
+int ow_ds2438_init(uint8_t id[], CTX2438_t * context, float shunt, uint16_t charge);
+int ow_ds2438_setup(uint8_t id[], int config);
 void ow_ds2438_doconvert(uint8_t id[]);
 int ow_ds2438_readall(uint8_t id[], CTX2438_t * context);
 int ow_ds2438_calibrate(uint8_t id[], int offset);
