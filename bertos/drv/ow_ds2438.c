@@ -42,6 +42,16 @@
 #include <stdbool.h>
 
 
+
+
+
+// values used to track battery charge when ICA doesn't have enough range
+#define ICAREF    120
+#define ICABAND    20
+
+static int ow_ds2438_setICA(uint8_t id[], uint8_t value);
+
+
 /**
  * Reads a page of EEPROM/SRAM via the scratchpad
  * \param id       the serial number for the part that the read is to be done on.
@@ -117,90 +127,17 @@ WritePage(uint8_t id[], int page_num, uint8_t * tx_buf, int tx_len)
 	return true;
 }
 
-
 /**
- * Sets the DS2438 to trigger all readable values
- *
- */
-
-void
-ow_ds2438_startall(uint8_t id[])
-{
-	uint8_t busybyte;
-
-	// start temperature conversion
-	ow_command(0x44, id);
-	busybyte = ow_byte_rd();
-	while (busybyte == 0)
-		busybyte = ow_byte_rd();
-
-	// start voltage conversion
-	ow_command(0xB4, id);
-	busybyte = ow_byte_rd();
-	while (busybyte == 0)
-		busybyte = ow_byte_rd();
-
-}
-
-/**
- * Sets the DS2438 to read all values
+ * Sets the DS2438 configuration register and initialises the charge variables
  *
  * \param id       the serial number for the part that the read is to be done on.
- * \param result  pointer to a structure of results
- * \param shunt    the value of the shunt resistor being used to measure current
- *
- * \return 'true' if the read was complete
- */
-
-int
-ow_ds2438_readall(uint8_t id[], Result_t * result, float shunt)
-{
-	uint8_t page_data[10];
-	int16_t t;
-	int32_t lt;
-
-	if (!ReadPage(id, 0, page_data))
-		return false;
-
-	t = (page_data[2] << 8) | page_data[1];
-	// Scale up by 100 to keep the following arithmetic as integer. Note we have to go to 32 bits here!
-	lt = t * 100L;
-	// now for a bit of magic!
-	// There are 8 bits to 1 deg but the 38 has 12 bits but the 3 LSBs are not used 
-	// so shift by 8 to scale the value and get the resolution to the correct place
-	result->Temp = lt >> 8;
-
-	// voltage can only be positive!! 10mV resolution gives us 2 decimal places
-	result->Volts = ((page_data[4] << 8) | page_data[3]);
-
-	// This is the voltage across the shunt resistor in units of 0.2441mV
-	t = page_data[6] << 8 | page_data[5];
-	// We get passed the shunt resistor value as we're the only ones who know what the algorithm is
-	// for calculating amps from the measured value.
-	result->Amps = (int16_t) ((float) t / (4096 * shunt) * 100);
-
-	if (!ReadPage(id, 1, page_data))
-		return false;
-	result->ICA = page_data[4];
-	result->Charge = (uint16_t) ((float) (result->ICA + 0.5) / (float) (2048.0 * shunt));	// beware of rounding errors here!!
-
-	if (!ReadPage(id, 7, page_data))
-		return false;
-	result->CCA = ((page_data[5] << 8) | page_data[4]) / (64.0 * shunt);
-	result->DCA = ((page_data[7] << 8) | page_data[6]) / (64.0 * shunt);
-
-	return true;
-}
-
-/**
- * Sets the DS2438 configuration register
- *
- * \param id       the serial number for the part that the read is to be done on.
+ * \param context  pointer to the context for this device. The charge value must be initialised by the app
  * \param config   value to write to the config register to set the mode
  *
  * \return 'true' if the read was complete
  */
-int
+
+static int
 ow_ds2438_setup(uint8_t id[], int config)
 {
 	uint8_t send_block[10];
@@ -222,6 +159,131 @@ ow_ds2438_setup(uint8_t id[], int config)
 }
 
 /**
+ * Sets the internal 16 bit value for the IAC register from the amp-hr charge value
+ * \param id       the serial number for the part that the read is to be done on.
+ * \param context  pointer to the context for this device. The charge value must be initialised by the app
+ *
+ * \return true if all OK else return false
+ */
+
+int
+ow_ds2438_init(uint8_t id[], CTX2438_t * context, int config, float shunt, uint16_t charge)
+{
+	context->shunt = shunt;
+	context->Charge = charge;
+	if (!ow_ds2438_setup(id, config))
+		return false;
+	// initialise the ICA register to the middle of its range
+	if (!ow_ds2438_setICA(id, ICAREF))
+		return false;
+
+	context->lastICA = ICAREF;
+	context->fullICA = (uint16_t) ((float) (charge) * (float) (2048.0 * shunt));  // beware of rounding errors here!!
+
+	return true;
+
+}
+
+
+/**
+ * Sets the DS2438 to trigger all readable values
+ * Blocking.
+ *
+ * \param id       the serial number for the part that the read is to be done on.
+ */
+
+void
+ow_ds2438_doconvert(uint8_t id[])
+{
+	uint8_t busybyte;
+
+	// start temperature conversion
+	ow_command(0x44, id);
+	busybyte = ow_byte_rd();
+	while (busybyte == 0)
+		busybyte = ow_byte_rd();
+
+	// start voltage conversion
+	ow_command(0xB4, id);
+	busybyte = ow_byte_rd();
+	while (busybyte == 0)
+		busybyte = ow_byte_rd();
+
+}
+
+/**
+ * Sets the DS2438 to read all values
+ * the ICA register, being only 8 bits wide, is not big enough to cover the charge
+ * range of a large battery bank. For this reason we take the changes that
+ * occur in it and use them to adjust a 16 bit variable. We keep the ICA register
+ * in the centre of its range to avoid overflow.
+ * We keep a copy of our 16bit pseudo ICA register in EEPROM so it is non-volatile
+ *
+ * \param id       the serial number for the part that the read is to be done on.
+ * \param result   pointer to a structure of results
+ * \param shunt    the value of the shunt resistor being used to measure current
+ *
+ * \return 'true' if the read was complete
+ */
+
+int
+ow_ds2438_readall(uint8_t id[], CTX2438_t * context)
+{
+	uint8_t page_data[10];
+	int16_t t;
+	int32_t lt;
+	uint8_t ICA;
+
+	if (!ReadPage(id, 0, page_data))
+		return false;
+
+	t = (page_data[2] << 8) | page_data[1];
+	// Scale up by 100 to keep the following arithmetic as integer. Note we have to go to 32 bits here!
+	lt = t * 100L;
+	// now for a bit of magic!
+	// There are 8 bits to 1 deg but the 38 has 12 bits but the 3 LSBs are not used 
+	// so shift by 8 to scale the value and get the resolution to the correct place
+	context->Temp = lt >> 8;
+
+	// voltage can only be positive!! 10mV resolution gives us 2 decimal places
+	context->Volts = ((page_data[4] << 8) | page_data[3]);
+
+	// This is the voltage across the shunt resistor in units of 0.2441mV
+	t = page_data[6] << 8 | page_data[5];
+	// We get passed the shunt resistor value as we're the only ones who know what the algorithm is
+	// for calculating amps from the measured value.
+	context->Amps = (int16_t) ((float) t / (4096 * context->shunt) * 100);
+
+	if (!ReadPage(id, 1, page_data))
+		return false;
+
+	ICA = page_data[4];
+
+	if (!ReadPage(id, 7, page_data))
+		return false;
+	context->CCA = ((page_data[5] << 8) | page_data[4]) / (64.0 * context->shunt);
+	context->DCA = ((page_data[7] << 8) | page_data[6]) / (64.0 * context->shunt);
+
+
+	context->fullICA += ICA - context->lastICA;
+	context->lastICA = ICA;
+	if ((ICA <= ICAREF - ICABAND) || (ICA >= ICAREF + ICABAND))
+	{
+		// if discharging adjust ICA down by the efficiency of the charge cycle
+		if (ICA <= ICAREF - ICABAND)
+			context->fullICA -= (ICABAND * (1 - ((float) context->DCA / (float) context->CCA)));
+
+		context->lastICA = ICAREF;
+		ow_ds2438_setICA(id, ICAREF);
+	}
+
+	context->Charge = (uint16_t) ((float) (context->fullICA) / (float) (2048.0 * context->shunt));  // beware of rounding errors here!!
+
+	return true;
+}
+
+
+/**
  * Sets the offset register and clears the threshold
  * \param id       the serial number for the part that the read is to be done on.
  * \param offset   does automatic if zero else sets value blindly
@@ -233,9 +295,17 @@ int
 ow_ds2438_calibrate(uint8_t id[], int offset)
 {
 
-	uint8_t rec_block[20];
+	uint8_t rec_block[10];
+	uint8_t config;
 	int i;
 
+
+	// Get the Status/Configuration page
+	if (!ReadPage(id, 0, rec_block))
+		return false;
+
+	// save the config for when we have done
+	config = rec_block[0];
 
 	// turn off current sensing
 	ow_ds2438_setup(id, 0);
@@ -281,7 +351,7 @@ ow_ds2438_calibrate(uint8_t id[], int offset)
 	if (!WritePage(id, 1, rec_block, 8))
 		return false;
 
-	return true;
+	return (ow_ds2438_setup(id, config));
 
 }
 
@@ -292,7 +362,7 @@ ow_ds2438_calibrate(uint8_t id[], int offset)
  *
  * \return true if all OK else return false
  */
-int
+static int
 ow_ds2438_setICA(uint8_t id[], uint8_t value)
 {
 	uint8_t page_data[10];
@@ -312,18 +382,23 @@ ow_ds2438_setICA(uint8_t id[], uint8_t value)
 
 }
 
+
+
 /**
  * Sets the CCA and DCA registers
  * \param id       the serial number for the part that the read is to be done on.
- * \param cca    what to write to the CCA register
- * \param dca    what to write to the DCA register
  *
  * \return true if all OK else return false
  */
 int
-ow_ds2438_setCCADCA(uint8_t id[], int cca, int dca)
+ow_ds2438_setCCADCA(uint8_t id[], CTX2438_t * context)
 {
 	uint8_t page_data[10];
+	int32_t cca, dca;
+
+	cca = context->CCA * (float) (64.0 * context->shunt);
+	dca = context->DCA * (float) (64.0 * context->shunt);
+
 
 	// Get registers from page 7
 	if (!ReadPage(id, 7, page_data))
@@ -333,12 +408,12 @@ ow_ds2438_setCCADCA(uint8_t id[], int cca, int dca)
 	if (cca >= 0)
 	{
 		page_data[4] = cca & 0xff;
-		page_data[5] = cca >> 8;
+		page_data[5] = (cca >> 8) & 0xff;
 	}
 	if (dca >= 0)
 	{
 		page_data[6] = dca & 0xff;
-		page_data[7] = dca >> 8;
+		page_data[7] = (dca >> 8) & 0xff;
 	}
 
 	// Write the page back

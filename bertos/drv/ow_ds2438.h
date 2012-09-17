@@ -41,6 +41,8 @@
 
 #include <stdint.h>
 
+#include "drv/ow_1wire.h"
+
 
 #define SBATTERY_FAM  0x26
 
@@ -54,25 +56,27 @@
 #define CONF2438_ALL  0x7f
 
 /**
- * Results from reading evreything from a DS2438 chip
+ * Results from reading everything from a DS2438 chip, also tracks charge accumulator on a particular chip
  */
 
-typedef struct Result
+typedef struct 
 {
 	int16_t Temp;           ///< Temperature
 	uint16_t Volts;         ///< Voltage on Vdd or Vad pin
 	int16_t Amps;           ///< Current, depends on extrenal shunt to interpret the actual value
 	uint16_t Charge;        ///< Charge value in amp-hrs
-	uint8_t ICA;            ///< Integrated Current Accumulator (records up to 32x/sec)
 	uint16_t CCA;           ///< Charging Current Accumulator
 	uint16_t DCA;           ///< Discharge Current Accumulator
-} Result_t;
+// internal variables
+	uint16_t fullICA;       ///< internal representation of value read expanded to 16 bits
+	uint8_t lastICA;        ///< last value read from the chip
+	float shunt;            ///< value of the shunt resistor used to measure current and charge
+} CTX2438_t;
 
-int ow_ds2438_setup(uint8_t id[], int config);
-void ow_ds2438_startall(uint8_t id[]);
-int ow_ds2438_readall(uint8_t id[], Result_t * result, float shunt);
+int ow_ds2438_init(uint8_t id[], CTX2438_t * context, int config, float shunt, uint16_t charge);
+void ow_ds2438_doconvert(uint8_t id[]);
+int ow_ds2438_readall(uint8_t id[], CTX2438_t * context);
 int ow_ds2438_calibrate(uint8_t id[], int offset);
-int ow_ds2438_setICA(uint8_t id[], uint8_t value);
-int ow_ds2438_setCCADCA(uint8_t id[], int cca, int dca);
+int ow_ds2438_setCCADCA(uint8_t id[], CTX2438_t * context);
 
 #endif

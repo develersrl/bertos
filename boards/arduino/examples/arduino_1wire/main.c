@@ -58,6 +58,7 @@ uint8_t ids[4][OW_ROMCODE_SIZE];	// only expect to find 3 actually!!
 int8_t battid = -1, gpioid = -1, thermid = -1;
 
 static Serial ser;
+static CTX2438_t Result;
 
 
 
@@ -108,12 +109,14 @@ init (void)
 	}
 }
 
+// current sense shunt resistor
 #define RSHUNT 0.1
+// initial amount of charge
+#define CHARGE 50
 
 int
 main (void)
 {
-	Result_t Result;
 	uint8_t read = 0xff;
 	int16_t temperature, diff;
 	uint8_t bits = 9;
@@ -142,13 +145,14 @@ main (void)
 			}
 			if (battid >= 0)
 			{
-				ow_ds2438_setup (ids[battid], CONF2438_IAD | CONF2438_CA | CONF2438_EE);
+				ow_ds2438_init (ids[battid], &Result, CONF2438_IAD | CONF2438_CA | CONF2438_EE, RSHUNT, CHARGE);
 				start = timer_clock();
-				ow_ds2438_startall (ids[battid]);
-				if (!ow_ds2438_readall (ids[battid], &Result, RSHUNT))
+				ow_ds2438_doconvert (ids[battid]);
+				if (!ow_ds2438_readall (ids[battid], &Result))
 					continue;                   // bad read - exit fast!!
 				diff = timer_clock() - start;
 				kfile_printf(&ser.fd, "DS2438 Conversion: %dmS, Temperature: %2.2f, voltage %2.2f, current %2.2f\r\n", diff, (float)Result.Temp / 100.0, (float)Result.Volts / 100.0, (float)Result.Amps / 100.0);
+				kfile_printf(&ser.fd, "                         Charge %d amp-hrs\r\n", Result.Charge);
 			}
 			if (gpioid >= 0)
 			{
