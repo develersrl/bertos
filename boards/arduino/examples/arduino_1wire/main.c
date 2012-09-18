@@ -135,7 +135,7 @@ main (void)
 			{
 				ow_ds18x20_resolution(ids[thermid], bits);
 				start = timer_clock();
-				ow_ds18X20_start (false, ids[thermid]);
+				ow_ds18X20_start (ids[thermid], false);
 				while (ow_busy ());
 				ow_ds18X20_read_temperature (ids[thermid], &temperature);
 				diff = timer_clock() - start;
