@@ -51,29 +51,6 @@
 #include "cfg/cfg_1wire.h"
 
 
-/**
- * \name Data direction register
- *
- * $WIZ$ onewire_ddr_list = "DDRB", "DDRD"
- */
-
-/**
- * \name One-wire I/O pin.
- *
- * $WIZ$ onewire_pin_list = "PD0", "PD1", "PD2", "PD3", "PD4", "PD5", "PD6", "PD7", "PB0", "PB1", "PB2", "PB3", "PB4", "PB5"
- */
-
-/**
- * \name One-wire input port
- *
- * $WIZ$ onewire_portin_list = "PINB", "PIND"
- */
-
-/**
- * \name One-wire output port
- *
- * $WIZ$ onewire_portout_list = "PORTB", "PORTD"
- */
 
 #define OW_MATCH_ROM    0x55  // command to match ROM address
 #define OW_SKIP_ROM     0xCC  // command to skip trying to match ROM address
@@ -92,10 +69,12 @@
 	 * Initialisation is only required if more that 1 I/O line is being used for multiple busses
 	 *
 	 * It is expected that the only interface to this code is to search for devices and to define the bus
-	 * if multiple busses are inuse.
+	 * if multiple busses are in use.
+	 *
 	 * API usage example:
 	 * \code
 	 * uint8_t ids[4][OW_ROMCODE_SIZE];      // only expect to find 3 actually!!
+	 *
 	 * for (diff = OW_SEARCH_FIRST, cnt = 0; diff != OW_LAST_DEVICE; cnt++)
 	 * {
 	 * 	diff = ow_rom_search (diff, ids[cnt]);
@@ -141,5 +120,29 @@ void ow_set_bus(volatile uint8_t * in, volatile uint8_t * out, volatile uint8_t 
 	/** \} */ //defgroup 1wire_api
 
 /** \} */ //defgroup ow_driver
+
+/**
+ * \name Data direction register
+ *
+ * $WIZ$ onewire_ddr_list = "DDRB", "DDRD"
+ */
+
+/**
+ * \name One-wire I/O pin.
+ *
+ * $WIZ$ onewire_pin_list = "PD0", "PD1", "PD2", "PD3", "PD4", "PD5", "PD6", "PD7", "PB0", "PB1", "PB2", "PB3", "PB4", "PB5"
+ */
+
+/**
+ * \name One-wire input port
+ *
+ * $WIZ$ onewire_portin_list = "PINB", "PIND"
+ */
+
+/**
+ * \name One-wire output port
+ *
+ * $WIZ$ onewire_portout_list = "PORTB", "PORTD"
+ */
 
 #endif /* OW_1WIRE_H_ */

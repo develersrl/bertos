@@ -159,7 +159,7 @@ ow_ds2438_setup(uint8_t id[], int config)
 }
 
 /**
- * Sets the internal 16 bit value for the IAC register from the amp-hr charge value
+ * Sets the internal 16 bit fake ICA register from the amp-hr charge value
  * \param id       the serial number for the part that the read is to be done on.
  * \param context  pointer to the context for this device. 
  * \param shunt    the value of the current measuring shunt resistor in ohms
