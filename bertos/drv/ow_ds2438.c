@@ -27,6 +27,7 @@
  * the GNU General Public License.
  *
  *  Copyright (C) 2011 Robin Gilks
+ * -->
  *
  * \brief Driver for Dallas battery monitor  1-wire device
  *
@@ -131,7 +132,6 @@ WritePage(uint8_t id[], int page_num, uint8_t * tx_buf, int tx_len)
  * Sets the DS2438 configuration register and initialises the charge variables
  *
  * \param id       the serial number for the part that the read is to be done on.
- * \param context  pointer to the context for this device. The charge value must be initialised by the app
  * \param config   value to write to the config register to set the mode
  *
  * \return 'true' if the read was complete
@@ -161,7 +161,9 @@ ow_ds2438_setup(uint8_t id[], int config)
 /**
  * Sets the internal 16 bit value for the IAC register from the amp-hr charge value
  * \param id       the serial number for the part that the read is to be done on.
- * \param context  pointer to the context for this device. The charge value must be initialised by the app
+ * \param context  pointer to the context for this device. 
+ * \param shunt    the value of the current measuring shunt resistor in ohms
+ * \param charge   initial charge in the battery (we then track it)
  *
  * \return true if all OK else return false
  */
@@ -188,7 +190,7 @@ ow_ds2438_init(uint8_t id[], CTX2438_t * context, float shunt, uint16_t charge)
 
 /**
  * Sets the DS2438 to trigger all readable values
- * Blocking.
+ * \note This function blocks until the conversions are complete
  *
  * \param id       the serial number for the part that the read is to be done on.
  */
@@ -221,8 +223,7 @@ ow_ds2438_doconvert(uint8_t id[])
  * We keep a copy of our 16bit pseudo ICA register in EEPROM so it is non-volatile
  *
  * \param id       the serial number for the part that the read is to be done on.
- * \param result   pointer to a structure of results
- * \param shunt    the value of the shunt resistor being used to measure current
+ * \param context  context pointer to a structure of results
  *
  * \return 'true' if the read was complete
  */
@@ -388,6 +389,7 @@ ow_ds2438_setICA(uint8_t id[], uint8_t value)
 /**
  * Sets the CCA and DCA registers
  * \param id       the serial number for the part that the read is to be done on.
+ * \param context  context pointer that contains the DCA and CCA values in amp-hrs to be written 
  *
  * \return true if all OK else return false
  */

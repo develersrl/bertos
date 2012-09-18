@@ -27,6 +27,11 @@
  * the GNU General Public License.
  *
  *  Copyright (C) 2011 Robin Gilks
+ * -->
+ *
+ * \addtogroup ow_driver 1-wire driver
+ * \ingroup drivers
+ * \{
  *
  * \brief Driver for Dallas battery monitor 1-wire device
  *
@@ -55,6 +60,23 @@
 #define CONF2438_ADB  0x40
 #define CONF2438_ALL  0x7f
 
+
+	/**
+	 * \defgroup battery_api DS2438 API
+	 * With this driver you can read the parameters of a DS2438 battery monitor chip.
+	 * You can initialise the module to sync the charge value to that with the actual battery.
+	 *
+	 * API usage example:
+	 * \code
+	 * static CTX2438_t BatteryCtx;   // declare a context structure
+	 * ow_ds2438_init (ids[battid], &BatteryCtx, RSHUNT, CHARGE);  set the current charge state of the battery and the value of the shunt resistor
+	 * ow_ds2438_doconvert (ids[battid]);          // do the current and temperature conversions
+	 * if (!ow_ds2438_readall (ids[battid], &BatteryCtx))
+	 * BatteryCtx.Temp BatteryCtx.Volts BatteryCtx.Amps BatteryCtx.Charge etc contain the values requested
+	 * \endcode
+	 * \{
+
+
 /**
  * Results from reading everything from a DS2438 chip, also tracks charge accumulator on a particular chip
  */
@@ -79,5 +101,8 @@ void ow_ds2438_doconvert(uint8_t id[]);
 int ow_ds2438_readall(uint8_t id[], CTX2438_t * context);
 int ow_ds2438_calibrate(uint8_t id[], int offset);
 int ow_ds2438_setCCADCA(uint8_t id[], CTX2438_t * context);
+	/** \} */ //defgroup battery_api
+
+/** \} */ //addtogroup ow_driver
 
 #endif

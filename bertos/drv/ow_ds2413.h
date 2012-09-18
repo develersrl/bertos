@@ -27,6 +27,12 @@
  * the GNU General Public License.
  *
  *  Copyright (C) 2011 Robin Gilks
+ * -->
+ *
+ * \addtogroup ow_driver 1-wire driver
+ * \ingroup drivers
+ * \{
+ *
  *
  * \brief Driver for Dallas dual GPIO 1-wire device
  *
@@ -44,7 +50,24 @@
 
 #define SSWITCH_FAM  0x3A
 
+	/**
+	 * \defgroup gpio_api DS2413 API
+	 * With this driver you can read and set the state of the I/O lines
+	 * No initialisation is required.
+	 *
+	 * API usage example:
+	 * \code
+	 * read = ow_ds2413_read (ids[gpioid]);       // read state of both lines
+	 * if (!ow_ds2413_write (ids[gpioid], 2))     // set output bit on one of the lines low
+	 * \endcode
+	 * \{
+	 */
+
 uint8_t ow_ds2413_read(uint8_t id[]);
 uint8_t ow_ds2413_write(uint8_t id[], uint8_t state);
+
+	/** \} */ //defgroup gpio_api
+
+/** \} */ //addtogroup ow_driver
 
 #endif

@@ -17,25 +17,20 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * As a special exception, you may use this file as part of a free software
- * library without restriction.  Specifically, if other files instantiate
- * templates or use macros or inline functions from this file, or you compile
- * this file and link it with other files to produce an executable, this
- * file does not by itself cause the resulting executable to be covered by
- * the GNU General Public License.  This exception does not however
- * invalidate any other reasons why the executable file might be covered by
- * the GNU General Public License.
- *
- * Copyright 2004, 2005 Develer S.r.l. (http://www.develer.com/)
- * All Rights Reserved.
+ *  Copyright (C) 2011 Robin Gilks
  * -->
+ *
+ * \addtogroup ow_driver 1-wire driver
+ * \ingroup drivers
+ * \{
+ *
  *
  * \brief Driver for Dallas 1-wire devices
  *
  *
  * \author Peter Dannegger (danni(at)specs.de)
  * \author Martin Thomas (mthomas(at)rhrk.uni-kl.de)
- * \author Robin Gilks
+ * \author Robin Gilks <g8ecj@gilks.org>
  *
  * $WIZ$ module_name = "hw_1wire"
  */
@@ -50,6 +45,38 @@
 
 #warning TODO:This is an example implementation, you must implement it!
 
+	/**
+	 * \defgroup hw_1wire_api Hardware API
+	 * Access to this low level driver is mostly from the device specific layer. However, some functions - especially the 
+	 * ow_set_bus() function operates at the lowest level.
+	 *
+	 * This functionality is especially useful when devices are hardwired and so removes the need to scan them for their addresses.
+	 *
+	 * API usage example:
+	 * \code
+	 * switch (sensor)
+	 * {
+	 * case SENSOR_LOW:
+	 *    // low level sensor (ground) on PE4
+	 *    ow_set_bus (&PINE, &PORTE, &DDRE, PE4);
+	 *    if (ow_busy ())                 // see if the conversion is complete
+	 *    {
+	 *       ow_ds18X20_read_temperature (NULL, &temperature_low);       // read the result
+	 *       ow_ds18X20_start (NULL, false]);            // start the conversion process again
+	 *    }
+	 *    break;
+	 * case SENSOR_HIGH:
+	 *    // high level (roof) sensor on PE5
+	 *    ow_set_bus (&PINE, &PORTE, &DDRE, PE5);
+	 *    if (ow_busy ())                 // see if the conversion is complete
+	 *    {
+	 *       ow_ds18X20_read_temperature (NULL, &temperature_hi);       // read the result
+	 *       ow_ds18X20_start (NULL, false);            // start the conversion process again
+	 *    }
+	 *    break;
+	 * \endcode
+	 * \{
+	 */
 
 /**
  * Get the state of an input pin
@@ -119,11 +146,8 @@ void ow_set_bus (volatile uint8_t * in, volatile uint8_t * out, volatile uint8_t
 	(void) pin;
 }
 
+	/** \} */ //defgroup hw_1wire_api
 
-
-
-
-
-
+/** \} */ //addtogroup ow_driver
 
 #endif

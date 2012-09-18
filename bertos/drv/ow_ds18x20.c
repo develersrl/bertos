@@ -27,6 +27,7 @@
  * the GNU General Public License.
  *
  *  Copyright (C) 2011 Robin Gilks
+ * -->
  *
  * \brief Driver for Dallas DS18X20 series temperature sensors
  *

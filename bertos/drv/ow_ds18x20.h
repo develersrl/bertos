@@ -27,6 +27,12 @@
  * the GNU General Public License.
  *
  *  Copyright (C) 2011 Robin Gilks
+ * -->
+ *
+ * \addtogroup ow_driver 1-wire driver
+ * \ingroup drivers
+ * \{
+ *
  *
  * \brief Driver for Dallas 1-wire temperature sensors
  *
@@ -50,10 +56,27 @@
 #define DS18B20_FAMILY_CODE       0x28
 #define DS1822_FAMILY_CODE        0x22
 
-
+	/**
+	 * \defgroup temp_api DS18x20 API
+	 * With this driver you can read the temperature and set the resolution.
+	 * No initialisation is required.
+	 *
+	 * API usage example:
+	 * \code
+	 * ow_ds18x20_resolution(ids[thermid], bits);         // set resolution to 9-12 bits
+	 * ow_ds18X20_start (ids[thermid], false);            // start the conversion process
+	 * while (ow_busy ());                                // wait for the conversion to complete
+	 * ow_ds18X20_read_temperature (ids[thermid], &temperature);       // read the result
+	 * \endcode
+	 * \{
+	 */
+ 
 bool ow_ds18X20_start(uint8_t id[], bool parasitic);
 bool ow_ds18x20_resolution(uint8_t id[], uint8_t bits);
 bool ow_ds18X20_read_temperature(uint8_t id[], int16_t * temperature);
 
+	/** \} */ //defgroup temp_api
+
+/** \} */ //addtogroup ow_driver
 
 #endif
