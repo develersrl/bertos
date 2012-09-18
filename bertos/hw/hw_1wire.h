@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
- *  Copyright (C) 2011 Robin Gilks
+ *  Copyright (C) 2012 Robin Gilks
  * -->
  *
  * \addtogroup ow_driver 1-wire driver
@@ -59,7 +59,7 @@
 	 * case SENSOR_LOW:
 	 *    // low level sensor (ground) on PE4
 	 *    ow_set_bus (&PINE, &PORTE, &DDRE, PE4);
-	 *    if (ow_busy ())                 // see if the conversion is complete
+	 *    if (!ow_busy ())                 // see if the conversion is complete
 	 *    {
 	 *       ow_ds18X20_read_temperature (NULL, &temperature_low);       // read the result
 	 *       ow_ds18X20_start (NULL, false]);            // start the conversion process again
@@ -68,7 +68,7 @@
 	 * case SENSOR_HIGH:
 	 *    // high level (roof) sensor on PE5
 	 *    ow_set_bus (&PINE, &PORTE, &DDRE, PE5);
-	 *    if (ow_busy ())                 // see if the conversion is complete
+	 *    if (!ow_busy ())                 // see if the conversion is complete
 	 *    {
 	 *       ow_ds18X20_read_temperature (NULL, &temperature_hi);       // read the result
 	 *       ow_ds18X20_start (NULL, false);            // start the conversion process again

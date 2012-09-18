@@ -52,16 +52,16 @@
 
 
 
-#define OW_MATCH_ROM    0x55  // command to match ROM address
-#define OW_SKIP_ROM     0xCC  // command to skip trying to match ROM address
-#define OW_SEARCH_ROM   0xF0  // initiate a search for devices
+#define OW_MATCH_ROM    0x55     ///< command to match ROM address
+#define OW_SKIP_ROM     0xCC     ///< command to skip trying to match ROM address
+#define OW_SEARCH_ROM   0xF0     ///< initiate a search for devices
 
-#define OW_SEARCH_FIRST 0xFF  // start of new search
-#define OW_PRESENCE_ERR 0xFF  // search failed with presence error
-#define OW_DATA_ERR     0xFE  // search failed with data error
-#define OW_LAST_DEVICE  0x00  // last device found - search effectively done!
+#define OW_SEARCH_FIRST 0xFF     ///< start of new search
+#define OW_PRESENCE_ERR 0xFF     ///< search failed with presence error
+#define OW_DATA_ERR     0xFE     ///< search failed with data error
+#define OW_LAST_DEVICE  0x00     //< last device found - search effectively done!
 
-#define OW_ROMCODE_SIZE 8     // rom-code (serial number) size including Family & CRC
+#define OW_ROMCODE_SIZE 8        ///< rom-code (serial number) size including Family & CRC
 
 	/**
 	 * \defgroup 1wire_api 1-wire API
