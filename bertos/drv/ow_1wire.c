@@ -17,10 +17,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
- *  Copyright (C) 2012 Robin Gilks
+ *  Copyright (C) 2012 Robin Gilks, Peter Dannegger, Martin Thomas
+ * -->
  *
  * \brief Bit bang driver for Dallas 1-wire chips
  *
+ * \author Peter Dannegger (danni(at)specs.de)
+ * \author Martin Thomas (mthomas(at)rhrk.uni-kl.de)
  * \author Robin Gilks <g8ecj@gilks.org>
  *
  */

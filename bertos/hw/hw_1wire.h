@@ -46,7 +46,7 @@
 #warning TODO:This is an example implementation, you must implement it!
 
 	/**
-	 * \defgroup hw_1wire_api Hardware API
+	 * \defgroup 1wirehw_api Hardware API
 	 * Access to this low level driver is mostly from the device specific layer. However, some functions - especially the 
 	 * ow_set_bus() function operates at the lowest level.
 	 *
@@ -146,7 +146,7 @@ void ow_set_bus (volatile uint8_t * in, volatile uint8_t * out, volatile uint8_t
 	(void) pin;
 }
 
-	/** \} */ //defgroup hw_1wire_api
+	/** \} */ //defgroup 1wirehw_api
 
 /** \} */ //addtogroup ow_driver
 
