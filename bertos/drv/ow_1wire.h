@@ -51,7 +51,7 @@
 #define OW_SEARCH_FIRST 0xFF     ///< start of new search
 #define OW_PRESENCE_ERR 0xFF     ///< search failed with presence error
 #define OW_DATA_ERR     0xFE     ///< search failed with data error
-#define OW_LAST_DEVICE  0x00     //< last device found - search effectively done!
+#define OW_LAST_DEVICE  0x00     ///< last device found - search effectively done!
 
 #define OW_ROMCODE_SIZE 8        ///< rom-code (serial number) size including Family & CRC
 
