@@ -90,7 +90,7 @@ int ow_ds2438_init(uint8_t id[], CTX2438_t * context, float shunt, uint16_t char
 int ow_ds2438_setup(uint8_t id[], int config);
 void ow_ds2438_doconvert(uint8_t id[]);
 int ow_ds2438_readall(uint8_t id[], CTX2438_t * context);
-int ow_ds2438_calibrate(uint8_t id[], int offset);
+int ow_ds2438_calibrate(uint8_t id[], CTX2438_t * context, int16_t offset);
 int ow_ds2438_setCCADCA(uint8_t id[], CTX2438_t * context);
 	/** \} */ //defgroup battery_api
 

@@ -281,18 +281,19 @@ ow_ds2438_readall(uint8_t id[], CTX2438_t * context)
 /**
  * Sets the offset register and clears the threshold
  * \param id       the serial number for the part that the read is to be done on.
- * \param offset   does automatic if zero else sets value blindly
+ * \param context  context pointer to a structure of results
+ * \param offset   does automatic zeroing according to spec sheet and then adds the current offset supplied
  *
  * \return true if all OK else return false
  */
 
 int
-ow_ds2438_calibrate(uint8_t id[], int offset)
+ow_ds2438_calibrate(uint8_t id[], CTX2438_t * context, int16_t offset)
 {
 
 	uint8_t rec_block[10];
 	uint8_t config;
-	int i;
+	int16_t regval;
 
 
 	// Get the Status/Configuration page
@@ -331,16 +332,18 @@ ow_ds2438_calibrate(uint8_t id[], int offset)
 	// wait for the ADC to stop
 	timer_delay(40);
 
-	i = (rec_block[6] << 8) | rec_block[5];
+	regval = (rec_block[6] << 8) | rec_block[5];
 	// get a clean copy of what is in page 1
 	if (!ReadPage(id, 1, rec_block))
 		return false;
 
-	if (offset)
-		i = offset;
-	i = (0 - i) << 3;
-	rec_block[5] = i & 0xff;
-	rec_block[6] = i >> 8;
+	// offset comes to us in Amps * 100. Convert to 0.2441mV units and account for the 3 bit shift in the register
+	offset = offset * (float) (4096.0 * context->shunt * 8.0 / 100.0);
+
+	regval = (0 - regval) << 3;
+	regval += offset;
+	rec_block[5] = regval & 0xff;
+	rec_block[6] = regval >> 8;
 
 	// Write the page back
 	if (!WritePage(id, 1, rec_block, 8))
