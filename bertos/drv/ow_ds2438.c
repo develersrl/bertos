@@ -28,10 +28,12 @@
 #include "ow_ds2438.h"
 
 #include "drv/ow_1wire.h"
+#include <cfg/log.h>
 
 #include <algo/crc8.h>
 #include <drv/timer.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 
 
@@ -259,17 +261,24 @@ ow_ds2438_readall(uint8_t id[], CTX2438_t * context)
 	context->CCA = ((page_data[5] << 8) | page_data[4]) / (64.0 * context->shunt);
 	context->DCA = ((page_data[7] << 8) | page_data[6]) / (64.0 * context->shunt);
 
-
-	context->fullICA += ICA - context->lastICA;
-	context->lastICA = ICA;
-	if ((ICA <= ICAREF - ICABAND) || (ICA >= ICAREF + ICABAND))
+	// a miss-read would likely return more than a change of 1 so only allow 2 or less
+	if (abs(ICA - context->lastICA) <= 2)
 	{
-		// if discharging adjust ICA down by the efficiency of the charge cycle
-		if (ICA <= ICAREF - ICABAND)
-			context->fullICA -= (ICABAND * (1 - ((float) context->DCA / (float) context->CCA)));
+		context->fullICA += ICA - context->lastICA;
+		context->lastICA = ICA;
+		if ((ICA <= ICAREF - ICABAND) || (ICA >= ICAREF + ICABAND))
+		{
+			// if discharging adjust ICA down by the efficiency of the charge cycle
+			if (ICA <= ICAREF - ICABAND)
+				context->fullICA -= (ICABAND * (1 - ((float) context->DCA / (float) context->CCA)));
 
-		context->lastICA = ICAREF;
-		ow_ds2438_setICA(id, ICAREF);
+			context->lastICA = ICAREF;
+			ow_ds2438_setICA(id, ICAREF);
+		}
+	}
+	else
+	{
+		LOG_INFO("Bad ICA read of %u, expecting closer to %u\r\n", ICA, context->lastICA);
 	}
 
 	context->Charge = (uint16_t) ((float) (context->fullICA) / (float) (2048.0 * context->shunt));  // beware of rounding errors here!!
