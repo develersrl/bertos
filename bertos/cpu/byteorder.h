@@ -87,11 +87,11 @@
 #endif
 
 #if CPU_BYTE_ORDER == CPU_LITTLE_ENDIAN
-#define cpu_to_le16(x) ((uint16_t)(x + \
+#define cpu_to_le16(x) ((uint16_t)((x) + \
 		STATIC_ASSERT_EXPR(sizeof(x) == sizeof(uint16_t))))
-#define cpu_to_le32(x) ((uint32_t)(x + \
+#define cpu_to_le32(x) ((uint32_t)((x) + \
 		STATIC_ASSERT_EXPR(sizeof(x) == sizeof(uint32_t))))
-#define cpu_to_le64(x) ((uint64_t)(x + \
+#define cpu_to_le64(x) ((uint64_t)((x) + \
 		STATIC_ASSERT_EXPR(sizeof(x) == sizeof(uint64_t))))
 #define cpu_to_be16(x) SWAB16(x)
 #define cpu_to_be32(x) SWAB32(x)
@@ -100,11 +100,11 @@
 #define cpu_to_le16(x) SWAB16(x)
 #define cpu_to_le32(x) SWAB32(x)
 #define cpu_to_le64(x) SWAB64(x)
-#define cpu_to_be16(x) ((uint16_t)(x + \
+#define cpu_to_be16(x) ((uint16_t)((x) + \
 		STATIC_ASSERT_EXPR(sizeof(x) == sizeof(uint16_t))))
-#define cpu_to_be32(x) ((uint32_t)(x + \
+#define cpu_to_be32(x) ((uint32_t)((x) + \
 		STATIC_ASSERT_EXPR(sizeof(x) == sizeof(uint32_t))))
-#define cpu_to_be64(x) ((uint64_t)(x + \
+#define cpu_to_be64(x) ((uint64_t)((x) + \
 		STATIC_ASSERT_EXPR(sizeof(x) == sizeof(uint64_t))))
 #else
 #error "unrecognized CPU endianness"
