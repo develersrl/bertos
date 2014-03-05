@@ -32,7 +32,9 @@
  *
  * \brief Fletcher-32 checksum algorithm
  *
- * \author Bernie Innocenti <batt@develer.com>
+ * \author Francesco Sacchi <batt@develer.com>
+ *
+ * $WIZ$ module_name = "fletcher32"
  */
 
 #ifndef ALGO_FLETCHER32_H

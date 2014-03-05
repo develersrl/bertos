@@ -36,6 +36,7 @@
  */
 
 #include "fletcher32.h"
+
 #include <cfg/macros.h> //MIN()
 
 void fletcher32_init(Fletcher32 *f)
