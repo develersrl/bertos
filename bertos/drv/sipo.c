@@ -179,7 +179,7 @@ DEPRECATED void sipo_init_1(Sipo *fd)
  */
 void sipo_init_3(Sipo *fd, SipoMap dev, uint8_t settings)
 {
-	memset(fd, 0, sizeof(fd));
+	memset(fd, 0, sizeof(Sipo));
 	fd->settings = settings;
 	fd->device = dev;
 	init(fd);
