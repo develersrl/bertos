@@ -44,9 +44,12 @@ def validateToolchain(toolchain):
     if not os.path.exists(toolchain):
         return {}
     for tool in TOOLCHAIN_ITEMS:
-        toolchainpre  = toolchain.rsplit("gcc", 1)[0]
-        toolchainpost = toolchain.rsplit("gcc", 1)[1]
-        if not os.path.exists(toolchainpre + tool + toolchainpost):
+        try:
+            toolchainpre  = toolchain.rsplit("gcc", 1)[0]
+            toolchainpost = toolchain.rsplit("gcc", 1)[1]
+            if not os.path.exists(toolchainpre + tool + toolchainpost):
+                return {}
+        except IndexError:
             return {}
     validation_process = QProcess()
     validation_process.start(toolchain, ["-v"])
