@@ -56,7 +56,7 @@
 #include <cpu/attr.h>
 #include CPU_HEADER(adc)
 
-
+#define CONFIG_ADC_STREAMING_API   0
 
 /** Type for ADC return value. */
 typedef uint16_t adcread_t;

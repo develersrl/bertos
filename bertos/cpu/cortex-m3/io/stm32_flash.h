@@ -40,6 +40,8 @@
 
 #include <cpu/types.h>
 
+#if CPU_CM3_STM32F1
+
 /** Return the embedded flash size in kB */
 #define F_SIZE                   ((*(reg32_t *) 0x1FFFF7E0) & 0xFFFF)
 
@@ -155,7 +157,50 @@
 #define FLASH_FLAG_WRPRTERR      ((uint32_t)0x00000010)  /* FLASH Write protected error flag */
 #define FLASH_FLAG_OPTERR        ((uint32_t)0x00000001)  /* FLASH Option Byte error flag */
 
+#else
 
+/** Return the embedded flash size in kB */
+#define F_SIZE                   ((*(reg32_t *) 0x1FFF7A22) & 0xFFFF)
+
+/* Flash Control Register bits */
+#define CR_PG_SET                ((uint32_t)0x00000001)
+#define CR_PG_RESET              ((uint32_t)0xFFFFFFFE)
+
+#define CR_SER_SET               ((uint32_t)0x00000002)
+#define CR_SER_RESET             ((uint32_t)0xFFFFFFFD)
+
+#define CR_STRT_SET              ((uint32_t)0x00010000)
+#define CR_STRT_RESET            ((uint32_t)0xFFFEFFFF)
+
+/* FLASH Keys */
+#define FLASH_KEY1               ((uint32_t)0x45670123)
+#define FLASH_KEY2               ((uint32_t)0xCDEF89AB)
+
+/*******************  Bits definition for FLASH_ACR register  *****************/
+#define FLASH_ACR_LATENCY                    ((uint32_t)0x00000007)
+#define FLASH_ACR_LATENCY_0WS                ((uint32_t)0x00000000)
+#define FLASH_ACR_LATENCY_1WS                ((uint32_t)0x00000001)
+#define FLASH_ACR_LATENCY_2WS                ((uint32_t)0x00000002)
+#define FLASH_ACR_LATENCY_3WS                ((uint32_t)0x00000003)
+#define FLASH_ACR_LATENCY_4WS                ((uint32_t)0x00000004)
+#define FLASH_ACR_LATENCY_5WS                ((uint32_t)0x00000005)
+#define FLASH_ACR_LATENCY_6WS                ((uint32_t)0x00000006)
+#define FLASH_ACR_LATENCY_7WS                ((uint32_t)0x00000007)
+
+#define FLASH_ACR_PRFTEN                     ((uint32_t)0x00000100)
+#define FLASH_ACR_ICEN                       ((uint32_t)0x00000200)
+#define FLASH_ACR_DCEN                       ((uint32_t)0x00000400)
+#define FLASH_ACR_ICRST                      ((uint32_t)0x00000800)
+#define FLASH_ACR_DCRST                      ((uint32_t)0x00001000)
+#define FLASH_ACR_BYTE0_ADDRESS              ((uint32_t)0x40023C00)
+#define FLASH_ACR_BYTE2_ADDRESS              ((uint32_t)0x40023C03)
+
+/* FLASH Flags */
+#define FLASH_FLAG_BSY           BV(16)  /* FLASH Busy flag */
+#define FLASH_FLAGS_PGERR        (BV(7)|BV(6)|BV(5))  /* FLASH Program error flags */
+#define FLASH_FLAG_WRPRTERR      BV(4)  /* FLASH Write protected error flag */
+
+#endif
 
 /**
  * Embbeded flash configuration registers structure
@@ -167,10 +212,16 @@ struct stm32_flash
   reg32_t OPTKEYR;
   reg32_t SR;
   reg32_t CR;
+#if CPU_CM3_STM32F2
+  reg32_t OPTCR;
+#else
   reg32_t AR;
   reg32_t RESERVED;
   reg32_t OBR;
   reg32_t WRPR;
+#endif
 };
+
+#define FLASH ((struct stm32_flash*)FLASH_R_BASE)
 
 #endif /* STM32_FLASH_H */

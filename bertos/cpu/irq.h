@@ -72,7 +72,7 @@
 	 * NOTE: 0 means that an interrupt is not affected by the global IRQ
 	 * priority settings.
 	 */
-	#define IRQ_PRIO		    0x80
+	#define IRQ_PRIO			0x80
 	#define IRQ_PRIO_MIN		0xf0
 	#define IRQ_PRIO_MAX		0
 	/*

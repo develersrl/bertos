@@ -30,17 +30,20 @@
  *
  * -->
  *
- * \brief Low-level clocking driver for Cortex-M3 STM32.
- *
  * \author Andrea Righi <arighi@develer.com>
+ *
+ * \brief Script for STM32-P103 Cortex-M3 board.
+ *
  */
 
-#ifndef CLOCK_STM32_H
-#define CLOCK_STM32_H
+/*
+ * Define memory configuration for STM32F103R8
+ */
+MEMORY
+{
+	rom(rx) : org = 0x00000000, len = 1024k
+	ram(rwx) : org = 0x20000000, len = 128k
+}
 
-#include <cfg/compiler.h>
-#include <bertos/cpu/detect.h>
+INCLUDE "bertos/cpu/cortex-m3/scripts/cortex-m3_rom.ld"
 
-void clock_init(void);
-
-#endif /* CLOCK_STM32_h */

@@ -233,6 +233,7 @@
 #define CPU_BITS_PER_PTR    (SIZEOF_PTR * CPU_BITS_PER_CHAR)
 #endif
 
+
 /** \} */
 
 #ifndef INT_MAX

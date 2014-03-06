@@ -26,21 +26,56 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2012 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
- * \brief Low-level clocking driver for Cortex-M3 STM32.
  *
- * \author Andrea Righi <arighi@develer.com>
+ * \brief PWM hardware-specific definition
+ *
+ *
+ * \author Mattia Barbon <mattia@develer.com>
  */
 
-#ifndef CLOCK_STM32_H
-#define CLOCK_STM32_H
+#ifndef DRV_PWM_STM32_H
+#define DRV_PWM_STM32_H
 
 #include <cfg/compiler.h>
-#include <bertos/cpu/detect.h>
 
-void clock_init(void);
+#include "cfg/cfg_pwm.h"
 
-#endif /* CLOCK_STM32_h */
+#include <io/stm32.h>
+
+#if CFG_PWM_ENABLE_OLD_API
+
+	#error "Old PWM API not supported"
+
+#else
+	/*
+	 * This driver allows up to 36 channels (6 timers with 4 channels, 6 with 2 channels)
+	 * however the output frequency must be the same for channels on the same timer
+	 * and if using a timer for another purpose, the timer frequency will also set
+	 * PWM frequency
+	 */
+	#include <drv/pwm.h>
+
+	typedef uint16_t pwm_hwreg_t;
+
+	struct PwmTimer;
+
+	typedef struct PwmHardware
+	{
+		uint8_t gpio;
+		uint8_t gpio_pin;
+		uint8_t pwm_ctr;
+		struct PwmTimer *base;
+	} PwmHardware;
+
+	pwm_hwreg_t pwm_hw_getPeriod(Pwm *ctx);
+	void pwm_hw_setFrequency(struct Pwm *ctx, pwm_freq_t freq);
+	void pwm_hw_setDuty(Pwm *ctx, pwm_hwreg_t duty);
+	void pwm_hw_init(struct Pwm *ctx, unsigned ch);
+
+#endif
+
+#endif /* DRV_PWM_STM32_H */

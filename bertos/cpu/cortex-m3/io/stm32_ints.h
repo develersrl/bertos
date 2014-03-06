@@ -51,6 +51,7 @@
 #define EXTI2_IRQHANDLER                24  /* EXTI Line2 Interrupt */
 #define EXTI3_IRQHANDLER                25  /* EXTI Line3 Interrupt */
 #define EXTI4_IRQHANDLER                26  /* EXTI Line4 Interrupt */
+#if CPU_CM3_STM32F1
 #define DMACHANNEL1_IRQHANDLER          27  /* DMA Channel 1 global Interrupt */
 #define DMACHANNEL2_IRQHANDLER          28  /* DMA Channel 2 global Interrupt */
 #define DMACHANNEL3_IRQHANDLER          29  /* DMA Channel 3 global Interrupt */
@@ -58,6 +59,15 @@
 #define DMACHANNEL5_IRQHANDLER          31  /* DMA Channel 5 global Interrupt */
 #define DMACHANNEL6_IRQHANDLER          32  /* DMA Channel 6 global Interrupt */
 #define DMACHANNEL7_IRQHANDLER          33  /* DMA Channel 7 global Interrupt */
+#else
+#define DMA1STREAM0_IRQHANDLER          27  /* DMA1 Channel 1 global Interrupt */
+#define DMA1STREAM1_IRQHANDLER          28  /* DMA1 Channel 2 global Interrupt */
+#define DMA1STREAM2_IRQHANDLER          29  /* DMA1 Channel 3 global Interrupt */
+#define DMA1STREAM3_IRQHANDLER          30  /* DMA1 Channel 4 global Interrupt */
+#define DMA1STREAM4_IRQHANDLER          31  /* DMA1 Channel 5 global Interrupt */
+#define DMA1STREAM5_IRQHANDLER          32  /* DMA1 Channel 6 global Interrupt */
+#define DMA1STREAM6_IRQHANDLER          33  /* DMA1 Channel 7 global Interrupt */
+#endif
 #define ADC_IRQHANDLER                  34  /* ADC global Interrupt */
 #define USB_HP_CAN_TX_IRQHANDLER        35  /* USB High Priority or CAN TX Interrupts */
 #define USB_LP_CAN_RX0_IRQHANDLER       36  /* USB Low Priority or CAN RX0 Interrupts */
@@ -83,8 +93,29 @@
 #define EXTI15_10_IRQHANDLER            56  /* External Line[15:10] Interrupts */
 #define RTCALARM_IRQHANDLER             57  /* RTC Alarm through EXTI Line Interrupt */
 #define USBWAKEUP_IRQHANDLER            58  /* USB WakeUp from suspend through EXTI Line Interrupt */
+#if CPU_CM3_STM32F2
+#define DMA1STREAM7_IRQHANDLER          63  /* DMA Channel 7 global Interrupt */
+#endif
+#define TIM5_IRQHANDLER                 66  /* TIM5 global Interrupt */
+#if CPU_CM3_STM32F2
+#define DMA2STREAM0_IRQHANDLER          72  /* DMA Channel 7 global Interrupt */
+#define DMA2STREAM1_IRQHANDLER          73  /* DMA Channel 1 global Interrupt */
+#define DMA2STREAM2_IRQHANDLER          74  /* DMA Channel 2 global Interrupt */
+#define DMA2STREAM3_IRQHANDLER          75  /* DMA Channel 3 global Interrupt */
+#define DMA2STREAM4_IRQHANDLER          76  /* DMA Channel 4 global Interrupt */
+#endif
+#define ETH_IRQHANDLER                  77  /* Ethernet global Interrupt */
+#if CPU_CM3_STM32F2
+#define DMA2STREAM5_IRQHANDLER          84  /* DMA Channel 5 global Interrupt */
+#define DMA2STREAM6_IRQHANDLER          85  /* DMA Channel 6 global Interrupt */
+#define DMA2STREAM7_IRQHANDLER          86  /* DMA Channel 7 global Interrupt */
+#endif
 /*\}*/
 
+#if CPU_CM3_STM32F1
 #define NUM_INTERRUPTS  66
+#else
+#define NUM_INTERRUPTS  96
+#endif
 
 #endif /* STM32_INTS_H */

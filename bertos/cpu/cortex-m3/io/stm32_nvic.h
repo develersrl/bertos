@@ -142,6 +142,15 @@
 #define NVIC_PRI11              0xE000E42C  ///< IRQ 44 to 47 Priority Register
 #define NVIC_PRI12              0xE000E430  ///< IRQ 48 to 51 Priority Register
 #define NVIC_PRI13              0xE000E434  ///< IRQ 52 to 55 Priority Register
+#if CPU_CM3_STM32F2
+#define NVIC_PRI14              0xE000E438  ///< IRQ 56 to 59 Priority Register
+#define NVIC_PRI15              0xE000E43C  ///< IRQ 60 to 63 Priority Register
+#define NVIC_PRI16              0xE000E440  ///< IRQ 64 to 67 Priority Register
+#define NVIC_PRI17              0xE000E444  ///< IRQ 68 to 71 Priority Register
+#define NVIC_PRI18              0xE000E448  ///< IRQ 72 to 75 Priority Register
+#define NVIC_PRI19              0xE000E44C  ///< IRQ 76 to 79 Priority Register
+#define NVIC_PRI20              0xE000E450  ///< IRQ 80 Priority Register
+#endif
 #define NVIC_CPUID              0xE000ED00  ///< CPUID Base Register
 #define NVIC_INT_CTRL           0xE000ED04  ///< Interrupt Control State Register
 #define NVIC_VTABLE             0xE000ED08  ///< Vector Table Offset Register

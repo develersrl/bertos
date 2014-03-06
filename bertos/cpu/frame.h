@@ -90,7 +90,7 @@
 	#define CPU_SP_ON_EMPTY_SLOT	0
 
 #elif CPU_AVR
-	
+
 	#if CPU_AVR_ATMEGA2560
 		#define CPU_SAVED_REGS_CNT     20 // Mega 2560 requires EIND and RAMPZ to be saved
 	#else

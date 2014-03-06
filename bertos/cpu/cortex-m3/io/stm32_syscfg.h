@@ -26,21 +26,36 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2010 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2012 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
- * \brief Low-level clocking driver for Cortex-M3 STM32.
- *
- * \author Andrea Righi <arighi@develer.com>
+ * \brief STM32F2xx SYSCFG definition.
  */
 
-#ifndef CLOCK_STM32_H
-#define CLOCK_STM32_H
+#ifndef STM32_SYSCFG_H
+#define STM32_SYSCFG_H
 
 #include <cfg/compiler.h>
-#include <bertos/cpu/detect.h>
 
-void clock_init(void);
+#if CPU_CM3_STM32F1
+	#warning __FILTER_NEXT_WARNING__
+	#warning Not supported
+#elif CPU_CM3_STM32F2
 
-#endif /* CLOCK_STM32_h */
+struct stm32_syscfg
+{
+	reg32_t  MEMRMP;       /*!< SYSCFG memory remap register,                      Address offset: 0x00      */
+	reg32_t  PMC;          /*!< SYSCFG peripheral mode configuration register,     Address offset: 0x04      */
+	reg32_t  EXTICR[4];    /*!< SYSCFG external interrupt configuration registers, Address offset: 0x08-0x14 */
+	uint32_t RESERVED[2];  /*!< Reserved, 0x18-0x1C                                                          */
+	reg32_t  CMPCR;        /*!< SYSCFG Compensation cell control register,         Address offset: 0x20      */
+};
+
+#define SYSCFG ((struct stm32_syscfg *) SYSCFG_BASE)
+
+#else
+	#error Unknown CPU
+#endif
+
+#endif /* STM32_SYSCFG_H */

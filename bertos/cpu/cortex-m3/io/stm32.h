@@ -41,8 +41,9 @@
 
 #include <cpu/types.h>
 
-#include <io/stm32_memmap.h>
+#include "stm32_memmap.h"
 
+#include "stm32_rcc.h"
 #include "stm32_nvic.h"
 #include "stm32_ints.h"
 #include "stm32_gpio.h"
@@ -50,6 +51,13 @@
 #include "stm32_adc.h"
 #include "stm32_i2c.h"
 #include "stm32_flash.h"
+#include "stm32_dma.h"
+#include "stm32_spi.h"
+#include "stm32_timer.h"
+#if CPU_CM3_STM32F2
+#include "stm32_syscfg.h"
+#endif
+#include "stm32_exti.h"
 
 #if CPU_CM3_STM32F101C4
 	#define GPIO_USART1_TX_PIN	BV(9)
@@ -63,11 +71,13 @@
 	#define GPIO_USART2_RX_PIN	BV(3)
 	#define GPIO_USART3_TX_PIN	BV(10)
 	#define GPIO_USART3_RX_PIN	BV(11)
-#if CPU_CM3_STM32F102C4
-	#define GPIO_USART3_RTS_PIN	BV(14)
-	#define GPIO_USART3_CTS_PIN	BV(13)
-	#define GPIO_USART3_RING_PIN	BV(15)
-#endif
+#elif CPU_CM3_STM32F207IG
+	// nothing
+	#if CPU_CM3_STM32F102C4
+		#define GPIO_USART3_RTS_PIN	BV(14)
+		#define GPIO_USART3_CTS_PIN	BV(13)
+		#define GPIO_USART3_RING_PIN	BV(15)
+	#endif
 #else
 	#error No USART pins are defined for select cpu
 #endif
@@ -80,6 +90,8 @@
 	#define GPIO_I2C1_SDA_PIN	BV(7)
 	#define GPIO_I2C2_SCL_PIN	BV(10)
 	#define GPIO_I2C2_SDA_PIN	BV(11)
+#elif CPU_CM3_STM32F207IG
+	// nothing
 #else
 	#error No i2c pins are defined for select cpu
 #endif

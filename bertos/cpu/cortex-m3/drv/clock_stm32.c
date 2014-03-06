@@ -42,6 +42,8 @@
 
 #include <io/stm32.h>
 
+#if CPU_CM3_STM32F1
+
 struct RCC *RCC;
 
 INLINE int rcc_get_flag_status(uint32_t flag)
@@ -149,3 +151,126 @@ void clock_init(void)
 	/* Clock the system from the PLL */
 	rcc_set_clock_source(RCC_SYSCLK_PLLCLK);
 }
+#else /* CPU_CM3_STM32F2 */
+
+/* PLL_VCO = (HSE_VALUE or HSI_VALUE / PLL_M) * PLL_N */
+#define PLL_M      25
+#define PLL_N      212
+
+/* SYSCLK = PLL_VCO / PLL_P */
+#define PLL_P      2
+
+/* USB OTG FS, SDIO and RNG Clock =  PLL_VCO / PLLQ */
+#define PLL_Q      5
+
+/* PLLI2S_VCO = (HSE_VALUE Or HSI_VALUE / PLL_M) * PLLI2S_N
+   I2SCLK = PLLI2S_VCO / PLLI2S_R */
+#define PLLI2S_N   212
+#define PLLI2S_R   5
+
+
+
+#define HSE_STARTUP_TIMEOUT    ((uint16_t)0x0500)   /*!< Time out for HSE start up */
+
+void clock_init(void)
+{
+	/* Reset the RCC clock configuration to the default reset state ------------*/
+	/* Set HSION bit */
+	RCC->CR |= (uint32_t)0x00000001;
+
+	/* Reset CFGR register */
+	RCC->CFGR = 0x00000000;
+
+	/* Reset HSEON, CSSON and PLLON bits */
+	RCC->CR &= (uint32_t)0xFEF6FFFF;
+
+	/* Reset PLLCFGR register */
+	RCC->PLLCFGR = 0x24003010;
+
+	/* Reset HSEBYP bit */
+	RCC->CR &= (uint32_t)0xFFFBFFFF;
+
+	/* Disable all interrupts */
+	RCC->CIR = 0x00000000;
+
+	uint32_t StartUpCounter = 0, HSEStatus = 0;
+
+	/* Enable HSE */
+	RCC->CR |= ((uint32_t)RCC_CR_HSEON);
+
+	/* Wait till HSE is ready and if Time out is reached exit */
+	do
+	{
+		HSEStatus = RCC->CR & RCC_CR_HSERDY;
+		StartUpCounter++;
+	} while((HSEStatus == 0) && (StartUpCounter != HSE_STARTUP_TIMEOUT));
+
+	if ((RCC->CR & RCC_CR_HSERDY) != 0)
+	{
+		HSEStatus = (uint32_t)0x01;
+	}
+	else
+	{
+		HSEStatus = (uint32_t)0x00;
+	}
+
+	if (HSEStatus == (uint32_t)0x01)
+	{
+		/* HCLK = SYSCLK / 1*/
+		RCC->CFGR |= RCC_CFGR_HPRE_DIV1;
+
+		/* PCLK2 = HCLK / 2*/
+		RCC->CFGR |= RCC_CFGR_PPRE2_DIV2;
+
+		/* PCLK1 = HCLK / 4*/
+		RCC->CFGR |= RCC_CFGR_PPRE1_DIV4;
+
+		/* Configure the main PLL */
+		RCC->PLLCFGR = PLL_M | (PLL_N << 6) | (((PLL_P >> 1) -1) << 16) |
+					   (RCC_PLLCFGR_PLLSRC_HSE) | (PLL_Q << 24);
+
+		/* Enable the main PLL */
+		RCC->CR |= RCC_CR_PLLON;
+
+		/* Wait till the main PLL is ready */
+		while((RCC->CR & RCC_CR_PLLRDY) == 0)
+		{
+		}
+
+		/* Configure Flash prefetch, Instruction cache, Data cache and wait state */
+		FLASH->ACR = FLASH_ACR_PRFTEN |FLASH_ACR_ICEN |FLASH_ACR_DCEN |FLASH_ACR_LATENCY_3WS;
+
+		/* Select the main PLL as system clock source */
+		RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW));
+		RCC->CFGR |= RCC_CFGR_SW_PLL;
+
+		/* Wait till the main PLL is used as system clock source */
+		while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS ) != RCC_CFGR_SWS_PLL);
+		{
+		}
+	}
+	else
+	{ /* If HSE fails to start-up, the application will have wrong clock
+		 configuration. User can add here some code to deal with this error */
+	}
+
+
+	/******************************************************************************/
+	/*            I2S clock configuration (For devices Rev B and Y)               */
+	/******************************************************************************/
+	/* PLLI2S clock used as I2S clock source */
+	RCC->CFGR &= ~RCC_CFGR_I2SSRC;
+
+	/* Configure PLLI2S */
+	RCC->PLLI2SCFGR = (PLLI2S_N << 6) | (PLLI2S_R << 28);
+
+	/* Enable PLLI2S */
+	RCC->CR |= ((uint32_t)RCC_CR_PLLI2SON);
+
+	/* Wait till PLLI2S is ready */
+	while((RCC->CR & RCC_CR_PLLI2SRDY) == 0)
+	{
+	}
+}
+
+#endif

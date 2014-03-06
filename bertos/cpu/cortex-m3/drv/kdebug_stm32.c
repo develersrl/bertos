@@ -73,6 +73,7 @@ typedef uint32_t kdbg_irqsave_t;
 /* Initialize UART debug port */
 INLINE void kdbg_hw_init(void)
 {
+#if CPU_CM3_STM32F1
 	/* Enable clocking on AFIO */
 	RCC->APB2ENR |= RCC_APB2_AFIO;
 	/* Configure USART pins */
@@ -93,6 +94,17 @@ INLINE void kdbg_hw_init(void)
 				GPIO_MODE_AF_PP, GPIO_SPEED_50MHZ);
 #else
 	#error "UART port not supported in this board"
+#endif
+#elif CPU_CM3_STM32F207IG
+	RCC->APB1ENR |= RCC_APB1ENR_USART3EN; //ENABLE UART3
+	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;  //ENABLE GPIOC
+
+	GPIOC->AFR[1] |= 0x07 << 8; // PC10 as alternate function 7 (USART3TX)
+
+	GPIOC->MODER |= GPIO_MODER_MODER10_1; // PC10 As alternate function
+	GPIOC->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR10_1; //PC10 As fast speed 50MHz
+#else
+	#error
 #endif
 	/* Enable the USART by writing the UE bit */
 	UART_BASE->CR1 |= CR1_RUN_SET;

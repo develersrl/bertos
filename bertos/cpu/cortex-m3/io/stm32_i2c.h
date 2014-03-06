@@ -218,9 +218,21 @@
 #define CR2_LAST_RESET          ((uint16_t)0xEFFF)
 
 /* I2C FREQ mask */
+#if CPU_CM3_STM32F1
 #define CR2_FREQ_RESET          ((uint16_t)0xFFC0)
 
 #define CR2_FREQ_36MHZ          ((uint16_t)0x100100)
+#else
+#define CR2_FREQ_RESET          ((uint16_t)0x001F)
+
+#define CR2_FREQ_2MHZ           ((uint16_t)0x0002)
+#define CR2_FREQ_3MHZ           ((uint16_t)0x0003)
+#define CR2_FREQ_4MHZ           ((uint16_t)0x0003)
+/* ... */
+#define CR2_FREQ_26MHZ          ((uint16_t)0x001A)
+/* ... */
+#define CR2_FREQ_30MHZ          ((uint16_t)0x001E)
+#endif
 
 /* I2C ADD0 mask */
 #define OAR1_ADD0_SET           ((uint16_t)0x0001)
