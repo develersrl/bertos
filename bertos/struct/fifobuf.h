@@ -93,9 +93,9 @@ typedef struct FIFOBuffer
 
 
 /**
- * Define a static fifo buffer
+ * Declare a static fifo buffer
  */
-#define DEFINE_FIFO(_name, _ptr, _size)			\
+#define DECLARE_FIFO(_name, _ptr, _size)			\
 	FIFOBuffer _name =					\
 	{							\
 		.head = (_ptr),					\
