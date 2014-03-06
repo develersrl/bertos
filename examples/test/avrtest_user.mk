@@ -22,6 +22,7 @@ avrtest_USER_PCSRC = \
 
 # Files included by the user.
 avrtest_USER_CPPASRC = \
+    bertos/cpu/avr/hw/switch_ctx_avr.S
 	#
 
 # Files included by the user.
