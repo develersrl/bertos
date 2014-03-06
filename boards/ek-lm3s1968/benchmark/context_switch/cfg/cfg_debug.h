@@ -51,4 +51,19 @@
  */
 #define CONFIG_KDEBUG_BAUDRATE  115200UL
 
+
+
+/**
+ * Enable the kernel logger daemon
+ * $WIZ$ type = "boolean"
+ */
+#define CONFIG_KERN_LOGGER 0
+
+/**
+ * Buffer size used by the kernel logger daemon
+ * $WIZ$ type = "int"; min = 1
+ */
+#define CONFIG_KERN_LOGGER_BUFSIZE 256
+
 #endif /* CFG_DEBUG_H */
+
