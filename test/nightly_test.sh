@@ -36,6 +36,7 @@ TEST_DIR="test"
 BERTOS_DIR="bertos/"
 BERTOS_DIR_BAK="bertos.saved"
 OPTS=1
+MAKE_OPT=-j1
 if [ $# = 1 ] ; then
 	if [ $1 = "-h" ] ; then
 		printf "Nightly test help.\n"
@@ -71,7 +72,7 @@ done
 
 #Clean and launch make on all
 make -f ${MAKEFILE_TEST_DIR}/Makefile.test clean
-make -f ${MAKEFILE_TEST_DIR}/Makefile.test
+make $MAK_OPT -f ${MAKEFILE_TEST_DIR}/Makefile.test
 RET=$?
 if [ $OPTS = 1 ] ; then
 	#Restore original sources
