@@ -98,12 +98,14 @@ typedef int mem_ptr_t;
  * Platform specific diagnostic output
  */
 // not fatal, print a message
-#define LWIP_PLATFORM_DIAG(y)   kprintf y
+#define LWIP_PLATFORM_DIAG(y)   do { extern volatile bool lwip_kdebug; lwip_kdebug = true; kprintf y; lwip_kdebug = false; } while (0)
 
 // fatal, print message and abandon execution.
 #define LWIP_PLATFORM_ASSERT(y) \
 	do { \
+		extern volatile bool lwip_kdebug; lwip_kdebug = true; \
 		kprintf(y); \
+		lwip_kdebug = false; \
 		ASSERT(0); \
 	} while(0)
 
