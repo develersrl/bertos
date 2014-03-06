@@ -48,5 +48,6 @@
 #define ARCH_QT        (1<<3) ///< QT architecture
 #define ARCH_UNITTEST  (1<<4) ///< UNITTEST architecture
 #define ARCH_NIGHTTEST (1<<5) ///< NIGHTTEST architecture
+#define ARCH_BOOT      (1<<6) ///< BOOT architecture
 
 #endif /* CFG_ARCH_CONFIG_H */
