@@ -41,7 +41,7 @@
  * what is the exact disposition of the components, as handled by this
  * library:
  *
- *<pre>
+ *\code
  *                 o Vref
  *                 |
  *                 |                               o Vref
@@ -69,7 +69,7 @@
  * and ADCVAL as the result from the adc convertion (Not Vadc but just the value read
  * from the adc register), after various calculation, the expression of Rp is:
  *
- *<pre>
+ *\code
  *
  *            ADCVAL * Rser
  * Rp = ------------------------
@@ -78,7 +78,7 @@
  *</pre>
  *
  * And after that NTC obvisiously is:
- *<pre>
+ *\code
  *        Rpar * Rp
  * NTC = ----------
  *        Rpar - Rp
