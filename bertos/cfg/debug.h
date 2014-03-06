@@ -55,6 +55,7 @@
 #include <cfg/os.h>
 #include <cfg/compiler.h>
 
+#include <stdarg.h>
 #include "cfg/cfg_debug.h"   /* CONFIG_KDEBUG_* */
 
 /*
@@ -160,6 +161,7 @@
 	#else /* !CPU_HARVARD */
 		void kputs(const char *str);
 		void kprintf(const char *fmt, ...) FORMAT(__printf__, 1, 2);
+		void kvprintf(const char *fmt, va_list ap);
 		int __bassert(const char *cond, const char *file, int line);
 		void __trace(const char *func);
 		void __tracemsg(const char *func, const char *fmt, ...) FORMAT(__printf__, 2, 3);
@@ -340,6 +342,14 @@
 	#define INIT_WALL(name)              do {} while (0)
 	#define CHECK_WALL(name)             do {} while (0)
 #endif
+
+#if _DEBUG && CONFIG_KERN_LOGGER
+	bool klogger_init(void);
+	void klogger_exit(void);
+#else
+	INLINE bool klogger_init(void) { return true; }
+	INLINE void klogger_exit(void) { /* nop */ }
+#endif /* CONFIG_KERN_LOGGER */
 
 /** \} */ // defgroup debug
 

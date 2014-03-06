@@ -37,15 +37,26 @@
  */
 
 #include "cfg/cfg_debug.h"
+#include "cfg/cfg_arch.h"
+#include "cfg/cfg_netlog.h"
+
+#define LOG_LEVEL  NETLOG_LOG_LEVEL
+#define LOG_FORMAT NETLOG_LOG_FORMAT
+#include <cfg/log.h>
+
 #include <cfg/macros.h> /* for BV() */
 #include <cfg/debug.h>
 #include <cfg/os.h>
 
 #include <cpu/attr.h>
 #include <cpu/types.h>
+#include <cpu/power.h>
+#include <cpu/irq.h>
+#include <cpu/pgm.h>
 
 #include <mware/formatwr.h> /* for _formatted_write() */
-#include <cpu/pgm.h>
+
+#include <drv/timer.h>
 
 #ifdef _DEBUG
 
@@ -72,7 +83,6 @@
 	#include CPU_CSOURCE(kdebug)
 #endif
 
-
 void kdbg_init(void)
 {
 	/* Init debug hw */
@@ -80,11 +90,14 @@ void kdbg_init(void)
 	kputs("\n\n*** BeRTOS DBG START ***\n");
 }
 
+volatile bool lwip_kdebug = false;
+
+void PGM_FUNC(kvprintf)(const char * PGM_ATTR fmt, va_list ap);
 
 /**
  * Output one character to the debug console
  */
-static void __kputchar(char c, UNUSED_ARG(void *, unused))
+static void __raw_putchar(char c, UNUSED_ARG(void *, unused))
 {
 	/* Poll while serial buffer is still busy */
 	KDBG_WAIT_READY();
@@ -97,8 +110,114 @@ static void __kputchar(char c, UNUSED_ARG(void *, unused))
 	}
 
 	KDBG_WRITE_CHAR(c);
+#if !CONFIG_KERN_LOGGER && !(ARCH & ARCH_BOOT)
+	if (!IRQ_RUNNING() && !lwip_kdebug)
+		cpu_relax();
+#endif
 }
 
+#include <kern/signal.h>
+
+#if CONFIG_KERN && CONFIG_KERN_SIGNALS && CONFIG_KERN_LOGGER
+#include <cfg/module.h>
+#include <cpu/power.h>
+#include <kern/proc.h>
+#include <struct/fifobuf.h>
+
+#define KLOGGER_PRIO		INT_MIN
+#define KLOGGER_STACK_SIZE	KERN_MINSTACKSIZE
+
+#if CONFIG_KERN_HEAP
+#define klogger_stack	NULL
+#else /* !CONFIG_KERN_HEAP */
+PROC_DEFINE_STACK(klogger_stack, KLOGGER_STACK_SIZE);
+#endif
+
+static unsigned char log_buffer[CONFIG_KERN_LOGGER_BUFSIZE];
+static DECLARE_FIFO(log_ring, log_buffer, sizeof(log_buffer));
+
+static Process *klogger_proc;
+static bool klogger_should_stop;
+
+
+static void klogger(void)
+{
+	proc_setPri(proc_current(), KLOGGER_PRIO);
+
+	while (!klogger_should_stop)
+	{
+		static uint8_t ch;
+
+		sig_wait(SIG_SINGLE);
+
+		while (!fifo_isempty(&log_ring))
+		{
+			ch = fifo_pop(&log_ring);
+			__raw_putchar(ch, 0);
+			cpu_relax();
+		}
+	}
+	klogger_proc = NULL;
+}
+
+static void __kputchar(char c, UNUSED_ARG(void *, unused))
+{
+	/* Be sure circular buffer writers are serialized */
+	ATOMIC(
+		if (!fifo_isfull(&log_ring))
+			fifo_push(&log_ring, c);
+	);
+	if (klogger_proc)
+		sig_post(klogger_proc, SIG_SINGLE);
+}
+
+bool klogger_init(void)
+{
+	MOD_CHECK(proc);
+
+	kprintf("**** KLOGGER INIT ****\n");
+
+	klogger_should_stop = false;
+	klogger_proc = proc_new(klogger, NULL, KLOGGER_STACK_SIZE, klogger_stack);
+	/*
+	 * Wake-up the klogger immediately to flush all the messages from the
+	 * ring buffer.
+	 */
+	if (LIKELY(klogger_proc))
+		sig_post(klogger_proc, SIG_SINGLE);
+
+	return klogger_proc != NULL;
+}
+
+void klogger_exit(void)
+{
+	klogger_should_stop = true;
+	while (klogger_proc)
+		cpu_relax();
+	fifo_flush(&log_ring);
+}
+
+void kputchar(char c)
+{
+	__kputchar(c, 0);
+}
+
+void PGM_FUNC(kvprintf)(const char * PGM_ATTR fmt, va_list ap)
+{
+#if CONFIG_PRINTF
+	PROC_ATOMIC(PGM_FUNC(_formatted_write)(fmt, __kputchar, 0, ap));
+#else
+	/* A better than nothing printf() surrogate. */
+	PROC_ATOMIC(PGM_FUNC(kputs)(fmt));
+#endif /* CONFIG_PRINTF */
+}
+
+#else /* !CONFIG_KERN_LOGGER */
+
+static void __kputchar(char c, UNUSED_ARG(void *, unused))
+{
+	__raw_putchar(c, 0);
+}
 
 void kputchar(char c)
 {
@@ -113,7 +232,7 @@ void kputchar(char c)
 }
 
 
-static void PGM_FUNC(kvprintf)(const char * PGM_ATTR fmt, va_list ap)
+void PGM_FUNC(kvprintf)(const char * PGM_ATTR fmt, va_list ap)
 {
 #if CONFIG_PRINTF
 	/* Mask serial TX intr */
@@ -129,6 +248,8 @@ static void PGM_FUNC(kvprintf)(const char * PGM_ATTR fmt, va_list ap)
 	PGM_FUNC(kputs)(fmt);
 #endif /* CONFIG_PRINTF */
 }
+
+#endif /* CONFIG_KERN_LOGGER */
 
 void PGM_FUNC(kprintf)(const char * PGM_ATTR fmt, ...)
 {
@@ -190,10 +311,16 @@ static void klocation(const char * PGM_ATTR file, int line)
 
 int PGM_FUNC(__bassert)(const char * PGM_ATTR cond, const char * PGM_ATTR file, int line)
 {
-	klocation(file, line);
-	PGM_FUNC(kputs)(PGM_STR("Assertion failed: "));
-	PGM_FUNC(kputs)(cond);
-	kputchar('\n');
+	#if !CONFIG_LOG_NET
+		klocation(file, line);
+		PGM_FUNC(kputs)(PGM_STR("Assertion failed: "));
+		PGM_FUNC(kputs)(cond);
+		kputchar('\n');
+	#else
+		LOG_ERR("%s:%d: Assertion failed: %s\n", file, line, cond);
+		if (!IRQ_RUNNING())
+			timer_delay(500);
+	#endif
 	BREAKPOINT;
 	return 1;
 }
