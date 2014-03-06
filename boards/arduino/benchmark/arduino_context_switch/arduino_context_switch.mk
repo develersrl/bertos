@@ -4,7 +4,7 @@
 #
 
 # Constants automatically defined by the selected modules
-
+arduino_context_switch_DEBUG = 1
 
 # Our target application
 TRG += arduino_context_switch

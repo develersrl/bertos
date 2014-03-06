@@ -4,7 +4,7 @@
 #
 
 # Constants automatically defined by the selected modules
-
+kernel_footprint_DEBUG = 1
 
 # Our target application
 TRG += kernel_footprint

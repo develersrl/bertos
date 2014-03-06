@@ -4,7 +4,7 @@
 #
 
 # Constants automatically defined by the selected modules
-
+lpc-p2378_kernel_footprint_DEBUG = 1
 
 # Our target application
 TRG += lpc-p2378_kernel_footprint
