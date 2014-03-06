@@ -48,7 +48,6 @@
 #include <cpu/power.h>
 #include <drv/gpio_stm32.h>
 #include <drv/irq_cm3.h>
-#include <drv/clock_stm32.h>
 #include <drv/i2c.h>
 #include <drv/timer.h>
 
@@ -59,7 +58,12 @@ struct I2cHardware
 {
 	struct stm32_i2c *base;
 	uint32_t clk_i2c_en;
+#if CPU_CM3_STM32F1
 	uint32_t pin_mask;
+#else
+	uint8_t sda_gpio, sda_pin;
+	uint8_t scl_gpio, scl_pin;
+#endif
 	uint8_t cache[2];
 	bool cached;
 };
@@ -305,6 +309,7 @@ static const I2cVT i2c_stm32_vt =
 
 static struct I2cHardware i2c_stm32_hw[] =
 {
+#if CPU_CM3_STM32F1
 	{ /* I2C1 */
 		.base = (struct stm32_i2c *)I2C1_BASE,
 		.clk_i2c_en  = RCC_APB1_I2C1,
@@ -315,23 +320,60 @@ static struct I2cHardware i2c_stm32_hw[] =
 		.clk_i2c_en  = RCC_APB1_I2C2,
 		.pin_mask = (GPIO_I2C2_SCL_PIN | GPIO_I2C2_SDA_PIN),
 	},
+#elif CPU_CM3_STM32F2
+	{ /* I2C1 */
+		.base = (struct stm32_i2c *)I2C1_BASE,
+		.clk_i2c_en  = RCC_APB1ENR_I2C1EN,
+		.sda_gpio = 1,
+		.sda_pin = 9,
+		.scl_gpio = 1,
+		.scl_pin = 6,
+	},
+	{ /* I2C2 */
+		.base = (struct stm32_i2c *)I2C2_BASE,
+		.clk_i2c_en  = RCC_APB1ENR_I2C2EN,
+		.sda_gpio = 5,
+		.sda_pin = 0,
+		.scl_gpio = 5,
+		.scl_pin = 1,
+	},
+#else
+	#error "Unknown CPU"
+#endif
 };
+
+#if CPU_CM3_STM32F1
+#define I2C_FREQ CR2_FREQ_36MHZ
+#else
+#define I2C_FREQ CR2_FREQ_4MHZ
+#endif
 
 /**
  * Initialize I2C module.
  */
 void i2c_hw_init(I2c *i2c, int dev, uint32_t clock)
 {
-
 	i2c->hw = &i2c_stm32_hw[dev];
 	i2c->vt = &i2c_stm32_vt;
 
-	RCC->APB2ENR |= RCC_APB2_GPIOB;
 	RCC->APB1ENR |= i2c->hw->clk_i2c_en;
+
+#if CPU_CM3_STM32F1
+	RCC->APB2ENR |= RCC_APB2_GPIOB;
 
 	/* Set gpio to use I2C driver */
 	stm32_gpioPinConfig((struct stm32_gpio *)GPIOB_BASE, i2c->hw->pin_mask,
 				GPIO_MODE_AF_OD, GPIO_SPEED_50MHZ);
+
+#else
+	RCC_GPIO_ENABLE(i2c->hw->sda_gpio);
+	RCC_GPIO_ENABLE(i2c->hw->scl_gpio);
+
+	stm32_gpioPinConfig(GPIOx(i2c->hw->scl_gpio), BV(i2c->hw->scl_pin),
+			    GPIO_MODE_AF_OD | GPIO_AF_I2C, GPIO_SPEED_50MHZ);
+	stm32_gpioPinConfig(GPIOx(i2c->hw->sda_gpio), BV(i2c->hw->sda_pin),
+			    GPIO_MODE_AF_OD | GPIO_AF_I2C, GPIO_SPEED_50MHZ);
+#endif
 
 	/* Clear all needed registers */
 	i2c->hw->base->CR1 = 0;
@@ -341,13 +383,28 @@ void i2c_hw_init(I2c *i2c, int dev, uint32_t clock)
 	i2c->hw->base->OAR1 = 0;
 
 	/* Set PCLK1 frequency accornding to the master clock settings. See stm32_clock.c */
-	i2c->hw->base->CR2 |= CR2_FREQ_36MHZ;
+	i2c->hw->base->CR2 |= I2C_FREQ;
 
 	/* Configure spi in standard mode */
 	ASSERT2(clock >= 100000, "fast mode not supported");
 
-	i2c->hw->base->CCR |= (uint16_t)((CR2_FREQ_36MHZ * 1000000) / (clock << 1));
-	i2c->hw->base->TRISE |= (CR2_FREQ_36MHZ + 1);
+	i2c->hw->base->CCR |= (uint16_t)((I2C_FREQ * 1000000) / (clock << 1));
+	i2c->hw->base->TRISE |= (I2C_FREQ + 1);
 
 	i2c->hw->base->CR1 |= CR1_PE_SET;
+}
+
+void i2c_hw_cleanup(I2c *i2c, int dev)
+{
+	(void)dev;
+
+	stm32_gpioPinConfig(GPIOx(i2c->hw->scl_gpio), BV(i2c->hw->scl_pin),
+			    GPIO_MODE_IN_FLOATING, GPIO_SPEED_50MHZ);
+	stm32_gpioPinConfig(GPIOx(i2c->hw->sda_gpio), BV(i2c->hw->sda_pin),
+			    GPIO_MODE_IN_FLOATING, GPIO_SPEED_50MHZ);
+
+	RCC_GPIO_DISABLE(i2c->hw->sda_gpio);
+	RCC_GPIO_DISABLE(i2c->hw->scl_gpio);
+
+	RCC->APB1ENR &= ~i2c->hw->clk_i2c_en;
 }

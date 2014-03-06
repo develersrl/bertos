@@ -50,4 +50,6 @@ enum
 	I2C_CNT  /**< Number of serial ports */
 };
 
+void i2c_hw_cleanup(I2c *i2c, int dev);
+
 #endif /* I2C_STM32_H */

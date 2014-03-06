@@ -65,25 +65,9 @@ static bool flash_wait(struct KBlock *blk)
 {
 	Flash *fls = FLASH_CAST(blk);
 	ticks_t start = timer_clock();
-	while (true)
+	while (EMB_FLASH->SR & FLASH_FLAG_BSY)
 	{
 		cpu_relax();
-		if (!(EMB_FLASH->SR & FLASH_FLAG_BSY))
-			break;
-
-		if (EMB_FLASH->SR & FLASH_FLAG_PGERR)
-		{
-			fls->hw->status |= FLASH_NOT_ERASED;
-			LOG_ERR("flash not erased..\n");
-			return false;
-		}
-
-		if (EMB_FLASH->SR & FLASH_FLAG_WRPRTERR)
-		{
-			fls->hw->status |= FLASH_WR_PROTECT;
-			LOG_ERR("wr protect..\n");
-			return false;
-		}
 
 		if (timer_clock() - start > ms_to_ticks(CONFIG_FLASH_WR_TIMEOUT))
 		{
@@ -93,8 +77,39 @@ static bool flash_wait(struct KBlock *blk)
 		}
 	}
 
+#if CPU_CM3_STM32F1
+	if (EMB_FLASH->SR & FLASH_FLAG_PGERR)
+	{
+		fls->hw->status |= FLASH_NOT_ERASED;
+		LOG_ERR("flash not erased..\n");
+		return false;
+	}
+#else
+	if (EMB_FLASH->SR & FLASH_FLAGS_PGERR)
+	{
+		fls->hw->status |= FLASH_WR_ERR;
+		LOG_ERR("flash write error.. 0x%lx\n", EMB_FLASH->SR & FLASH_FLAGS_PGERR);
+		/* clear error flags */
+		EMB_FLASH->SR |= FLASH_FLAGS_PGERR;
+		return false;
+	}
+#endif
+
+	if (EMB_FLASH->SR & FLASH_FLAG_WRPRTERR)
+	{
+		fls->hw->status |= FLASH_WR_PROTECT;
+		LOG_ERR("wr protect..\n");
+#if CPU_CM3_STM32F2
+		/* clear error flag */
+		EMB_FLASH->SR |= FLASH_FLAG_WRPRTERR;
+#endif
+		return false;
+	}
+
 	return true;
 }
+
+#if CPU_CM3_STM32F1
 
 static bool stm32_erasePage(struct KBlock *blk, uint32_t page_add)
 {
@@ -110,6 +125,57 @@ static bool stm32_erasePage(struct KBlock *blk, uint32_t page_add)
 
 	return true;
 }
+
+#else
+
+/* F2xx processors have 4 x 16k sectors, 1 x 64k sector, 7 x 128k sectors */
+static uint16_t sector_boundaries[] = {
+	0,  16,
+	16, 32,
+	32, 48,
+	48, 64,
+	64, 128,
+	128 * 1, 128 * 2,
+	128 * 2, 128 * 3,
+	128 * 3, 128 * 4,
+	128 * 4, 128 * 5,
+	128 * 5, 128 * 6,
+	128 * 6, 128 * 7,
+	128 * 7, 128 * 8,
+};
+
+static int8_t stm32_sectorIndex(uint32_t page_add)
+{
+	/* check the adress is at Kb boundary */
+	if (page_add & 0x3ff)
+		return -1;
+
+	uint32_t page_kb = page_add >> 10;
+
+	for (size_t i = 0; i < countof(sector_boundaries); i += 2)
+		if (page_kb == sector_boundaries[i])
+			return i / 2;
+
+	return -1;
+}
+
+static bool stm32_eraseSector(struct KBlock *blk, uint8_t sector)
+{
+	/* clear error flags */
+	EMB_FLASH->SR |= FLASH_FLAGS_PGERR | FLASH_FLAG_WRPRTERR;
+
+	EMB_FLASH->CR |= CR_SER_SET;
+	EMB_FLASH->CR &= ~(0xf << 3);
+	EMB_FLASH->CR |= sector << 3;
+	EMB_FLASH->CR |= CR_STRT_SET;
+
+	if (!flash_wait(blk))
+		return false;
+
+	return true;
+}
+
+#endif
 
 #if 0
 // not used for now
@@ -150,6 +216,11 @@ INLINE bool stm32_writeWord(struct KBlock *blk, uint32_t addr, uint16_t data)
 {
 	ASSERT(!(addr % 2));
 
+#if CPU_CM3_STM32F2
+	/* clear error flags */
+	EMB_FLASH->SR |= FLASH_FLAGS_PGERR | FLASH_FLAG_WRPRTERR;
+#endif
+
 	EMB_FLASH->CR |= CR_PG_SET;
 
 	*(reg16_t *)addr = data;
@@ -162,13 +233,26 @@ INLINE bool stm32_writeWord(struct KBlock *blk, uint32_t addr, uint16_t data)
 	return true;
 }
 
+#if CPU_CM3_STM32F2
+DB(block_idx_t last_block);
+#endif
+
 static size_t stm32_flash_writeDirect(struct KBlock *blk, block_idx_t idx, const void *_buf, size_t offset, size_t size)
 {
 	ASSERT(offset == 0);
 	ASSERT(size == blk->blk_size);
 
+#if CPU_CM3_STM32F1
 	if (!stm32_erasePage(blk, (idx * blk->blk_size)))
 		return 0;
+#else
+	ASSERT(last_block < idx);
+
+	int sector = stm32_sectorIndex(idx * blk->blk_size);
+
+	if (sector != -1 && !stm32_eraseSector(blk, sector))
+		return 0;
+#endif
 
 	uint32_t addr = idx * blk->blk_size;
 	const uint8_t *buf = (const uint8_t *)_buf;
@@ -215,7 +299,6 @@ static const KBlockVTable flash_stm32_unbuffered_vt =
 };
 
 static struct FlashHardware flash_stm32_hw;
-static uint8_t flash_buf[FLASH_PAGE_SIZE];
 
 static void common_init(Flash *fls)
 {
@@ -224,14 +307,21 @@ static void common_init(Flash *fls)
 
 	fls->hw = &flash_stm32_hw;
 
-	fls->blk.blk_size = FLASH_PAGE_SIZE;
-	fls->blk.blk_cnt = (F_SIZE * 1024) / FLASH_PAGE_SIZE;
+	fls->blk.blk_size = FLASH_PAGE_SIZE_BYTES;
+	fls->blk.blk_cnt = (F_SIZE * 1024) / FLASH_PAGE_SIZE_BYTES;
 
 	/* Unlock flash memory for the FPEC Access */
 	EMB_FLASH->KEYR = FLASH_KEY1;
 	EMB_FLASH->KEYR = FLASH_KEY2;
+
+#if CPU_CM3_STM32F2
+	/* set program parallelism size to 16 */
+	EMB_FLASH->CR &= ~(0x3 << 8);
+	EMB_FLASH->CR |=  (0x1 << 8);
+#endif
 }
 
+static uint8_t flash_buf[FLASH_PAGE_SIZE_BYTES];
 
 void flash_hw_init(Flash *fls, UNUSED_ARG(int, flags))
 {

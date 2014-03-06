@@ -56,6 +56,7 @@
 int stm32_gpioPinConfig(struct stm32_gpio *base,
 			uint16_t pins, uint8_t mode, uint8_t speed)
 {
+#if CPU_CM3_STM32F1
 	uint32_t reg_mode = mode & 0x0f;
 	int i;
 
@@ -106,5 +107,41 @@ int stm32_gpioPinConfig(struct stm32_gpio *base,
 		}
 		base->CRH = reg;
 	}
+
 	return 0;
+#else
+	int gpio_af = (mode >> 0) & 0xf;
+	int gpio_mode = (mode >> 4) & 0x3;
+	int gpio_pp = (mode >> 6) & 0x1;
+	int gpio_pupd = (mode >> 7) & 0x3;
+
+	for (int i = 0; i < 16; i++)
+	{
+		if (pins & BV(i))
+		{
+			int i2 = i * 2;
+
+			base->MODER &= ~(0x3 << i2);
+			base->MODER |= gpio_mode << i2;
+
+			base->OTYPER &= ~(0x1 << i);
+			base->OTYPER |= gpio_pp << i;
+
+			base->PUPDR &= ~(0x3 << i2);
+			base->PUPDR |= gpio_pupd << i2;
+
+			base->OSPEEDR &= ~(0x3 << i2);
+			base->OSPEEDR |= speed << i2;
+
+			int af_offset = (i * 4) & 0x1f;
+			int af_idx = (i > 7) ? 1 : 0;
+
+			base->AFR[af_idx] &= ~(0xf << af_offset);
+			if (gpio_mode == (STM32_GPIO_MODE_AF >> 4))
+				base->AFR[af_idx] |= gpio_af << af_offset;
+		}
+	}
+
+	return 0;
+#endif
 }
