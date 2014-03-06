@@ -77,6 +77,7 @@
 #include "cfg/cfg_lwip.h"
 
 #include <drv/eth.h>
+#include <drv/timer.h>
 
 #include <cpu/irq.h>
 
@@ -239,11 +240,8 @@ static struct pbuf *low_level_input(UNUSED_ARG(struct netif *, netif))
  */
 static void ethernetif_input(struct netif *netif)
 {
-	struct ethernetif *ethernetif;
 	struct eth_hdr *ethhdr;
 	struct pbuf *p;
-
-	ethernetif = netif->state;
 
 	/* move received packet into a new pbuf */
 	p = low_level_input(netif);
@@ -264,7 +262,7 @@ static void ethernetif_input(struct netif *netif)
 	case ETHTYPE_PPPOE:
 #endif /* PPPOE_SUPPORT */
 		/* full packet send to tcpip_thread to process */
-		if (netif->input(p, netif) != ERR_OK)
+		if (netif->input(p, netif)!=ERR_OK)
 		{
 			LWIP_DEBUGF(NETIF_DEBUG, ("ethernetif_input: IP input error\n"));
 			pbuf_free(p);
