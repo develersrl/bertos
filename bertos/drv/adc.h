@@ -48,16 +48,141 @@
 #ifndef DRV_ADC_H
 #define DRV_ADC_H
 
+#include "cfg/cfg_adc.h"
+
 #include <cfg/compiler.h>
 #include <cfg/debug.h>
+#include <cfg/macros.h>
 #include <cpu/attr.h>
 #include CPU_HEADER(adc)
+
+
 
 /** Type for ADC return value. */
 typedef uint16_t adcread_t;
 
 /** Type for channel */
 typedef uint8_t adc_ch_t;
+
+struct AdcContext;
+
+typedef void (*streaming_hook_t) (struct AdcContext *ctx, void *buf, size_t slicelen);
+
+typedef adcread_t (*adc_read_t) (struct AdcContext *ctx, adc_ch_t channel);
+typedef void (*adc_set_channel_mask_t) (struct AdcContext *ctx, uint32_t mask);
+typedef void (*adc_set_sampling_rate_t) (struct AdcContext *ctx, uint32_t rate);
+//typedef void (*adc_set_streaming_hook_t) (struct AdcContext *ctx, size_t hook_slicelen, streaming_hook_t hook);
+typedef void (*adc_dma_acquire_buf_t) (struct AdcContext *ctx, void *buf, size_t len);
+typedef bool (*adc_dma_acquisition_finished_t) (struct AdcContext *ctx);
+typedef void (*adc_dma_start_streaming_t) (struct AdcContext *ctx);
+typedef void *(*adc_dma_wait_conversion_t) (struct AdcContext *ctx);
+typedef void (*adc_dma_stop_t) (struct AdcContext *ctx);
+
+typedef struct AdcContext
+{
+	adc_read_t read;
+#if CONFIG_ADC_STREAMING_API
+	adc_set_channel_mask_t set_ch;
+	adc_set_sampling_rate_t setSampleRate;
+	//adc_set_streaming_hook_t setStreamingHook;
+	adc_dma_acquire_buf_t acquire;
+	adc_dma_acquisition_finished_t isFinished;
+	adc_dma_start_streaming_t start;
+	adc_dma_wait_conversion_t wait;
+	adc_dma_stop_t stop;
+	uint8_t *base_buf;
+	uint8_t * volatile head;
+	uint8_t * volatile tail;
+	uint8_t * volatile sliceend;
+	size_t buf_len;
+	size_t slicelen;
+	size_t hook_slicelen;
+	streaming_hook_t streaming_hook;
+#endif
+	DB(id_t _type);
+} AdcContext;
+
+INLINE adcread_t adc_read2(AdcContext *ctx, adc_ch_t channel)
+{
+	ASSERT(ctx->read);
+	return ctx->read(ctx, channel);
+}
+
+#if CONFIG_ADC_STREAMING_API
+	INLINE void adc_setChannelMask(struct AdcContext *ctx, uint32_t mask)
+	{
+		ASSERT(ctx->set_ch);
+		ctx->set_ch(ctx, mask);
+	}
+
+	INLINE void adc_setSamplingRate(struct AdcContext *ctx, uint32_t rate)
+	{
+		ASSERT(ctx->setSampleRate);
+		ctx->setSampleRate(ctx, rate);
+	}
+
+	INLINE void adc_setStreamingHook(struct AdcContext *ctx, size_t hook_slicelen, streaming_hook_t hook)
+	{
+		//ASSERT(ctx->setStreamingHook);
+		ASSERT(hook_slicelen);
+		ASSERT(hook);
+
+		ctx->hook_slicelen = hook_slicelen;
+		ctx->streaming_hook = hook;
+		//ctx->setStreamingHook(ctx, hook_slicelen, hook);
+	}
+
+	INLINE void adc_dmaAcquireBuffer(struct AdcContext *ctx, void *buf, size_t len)
+	{
+		ASSERT(ctx->acquire);
+		ctx->acquire(ctx, buf, len);
+	}
+
+	/**
+	 * Check if a dma transfer is finished.
+	 *
+	 * Useful for kernel-less applications.
+	 */
+	INLINE bool adc_dmaIsFinished(struct AdcContext *ctx)
+	{
+		ASSERT(ctx->isFinished);
+		return ctx->isFinished(ctx);
+	}
+
+	/**
+	 * \param slicelen Must be a divisor of len, ie. len % slicelen == 0.
+	 */
+	INLINE void adc_dmaStartStreaming(struct AdcContext *ctx, void *buf, size_t len, size_t slicelen)
+	{
+		ASSERT(ctx->start);
+		ASSERT(len % slicelen == 0);
+		DB(
+			if (ctx->streaming_hook)
+			{
+				ASSERT(len % ctx->hook_slicelen == 0);
+				ASSERT(slicelen % ctx->hook_slicelen == 0);
+			}
+		);
+		ASSERT(buf);
+
+		ctx->buf_len = len;
+		ctx->base_buf = ctx->head = ctx->tail = buf;
+		ctx->slicelen = slicelen;
+		ctx->start(ctx);
+	}
+
+	INLINE void *adc_dmaWaitConversion(struct AdcContext *ctx)
+	{
+		ASSERT(ctx->wait);
+		return ctx->wait(ctx);
+	}
+
+	INLINE void adc_dmaStop(struct AdcContext *ctx)
+	{
+		ASSERT(ctx->stop);
+		ctx->stop(ctx);
+	}
+#endif
 
 #define adc_bits() ADC_BITS
 
