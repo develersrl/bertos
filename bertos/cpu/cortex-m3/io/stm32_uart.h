@@ -237,7 +237,7 @@ INLINE uint16_t evaluate_brr(struct stm32_usart *base, unsigned long cpu_freq, u
 	uint32_t freq, reg, div, frac;
 
 	/* NOTE: PCLK1 has been configured as CPU_FREQ / 2 */
-	freq = (base == (struct stm32_usart *)USART1_BASE) ? cpu_freq : cpu_freq / 2;
+	freq = (base == (struct stm32_usart *)USART1_BASE) ? cpu_freq / 2: cpu_freq / 4;
 	div = (0x19 * freq) / (0x04 * baud);
 	reg = (div / 0x64) << 0x04;
 	frac = div - (0x64 * (reg >> 0x04));
