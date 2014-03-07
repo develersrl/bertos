@@ -4,7 +4,7 @@
 #
 
 # Constants automatically defined by the selected modules
-at91sam7s-ek_kernel_footprint_DEBUG = 1
+
 
 # Our target application
 TRG += at91sam7s-ek_kernel_footprint

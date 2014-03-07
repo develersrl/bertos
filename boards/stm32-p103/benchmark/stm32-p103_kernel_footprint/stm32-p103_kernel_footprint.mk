@@ -4,7 +4,7 @@
 #
 
 # Constants automatically defined by the selected modules
-stm32-p103_kernel_footprint_DEBUG = 1
+
 
 # Our target application
 TRG += stm32-p103_kernel_footprint

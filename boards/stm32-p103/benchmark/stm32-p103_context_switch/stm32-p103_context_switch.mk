@@ -4,7 +4,7 @@
 #
 
 # Constants automatically defined by the selected modules
-stm32-p103_context_switch_DEBUG = 1
+
 
 # Our target application
 TRG += stm32-p103_context_switch

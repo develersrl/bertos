@@ -169,6 +169,11 @@
 		int __check_wall(long *wall, int size, const char *name, const char *file, int line);
 	#endif /* !CPU_HARVARD */
 
+	#if CONFIG_KERN_LOGGER
+		bool klogger_init(void);
+		void klogger_exit(void);
+	#endif
+
 	#if CONFIG_KDEBUG_VERBOSE_ASSERT
 		/**
 		 * Assert a pre-condition on code.
@@ -314,6 +319,11 @@
 	INLINE void kputs(UNUSED_ARG(const char *, str)) { /* nop */ }
 	INLINE void kdump(UNUSED_ARG(const void *, buf), UNUSED_ARG(size_t, len)) { /* nop */ }
 
+	#if CONFIG_KERN_LOGGER
+		INLINE bool klogger_init(void) { return true; }
+		INLINE void klogger_exit(void) { /* nop */ }
+	#endif /* CONFIG_KERN_LOGGER */
+
 	#if defined(__cplusplus) && COMPILER_VARIADIC_MACROS
 		/* G++ can't inline functions with variable arguments... */
 		#define kprintf(fmt,...) do { (void)(fmt); } while(0)
@@ -342,14 +352,6 @@
 	#define INIT_WALL(name)              do {} while (0)
 	#define CHECK_WALL(name)             do {} while (0)
 #endif
-
-#if _DEBUG && CONFIG_KERN_LOGGER
-	bool klogger_init(void);
-	void klogger_exit(void);
-#else
-	INLINE bool klogger_init(void) { return true; }
-	INLINE void klogger_exit(void) { /* nop */ }
-#endif /* CONFIG_KERN_LOGGER */
 
 /** \} */ // defgroup debug
 
