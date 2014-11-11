@@ -102,7 +102,7 @@ def convertBoolDict(dict_str_bool):
 
 def getDict(qvariant):
     a = []
-    dict_str_str = {}
+    dict_str_bool = {}
     if type(qvariant) == dict:
         return qvariant
 

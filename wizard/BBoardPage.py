@@ -64,7 +64,7 @@ class BBoardPage(BWizardPage):
         if self.selected:
             preset_path = qvariant_converter.getDict(self.selected.data(Qt.UserRole))
             preset_path = qvariant_converter.getStringDict(preset_path["info"])
-            preset_path = preset_path["path"]
+            preset_path = preset_path.get("path","")
             self.setProjectInfo("PROJECT_BOARD", preset_path)
             self.setProjectInfo("PROJECT_FROM_PRESET", True)
             self.setProjectInfo("PRESET_LOADED", False)
