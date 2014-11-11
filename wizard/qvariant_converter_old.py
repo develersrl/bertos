@@ -65,11 +65,17 @@ def convertStringList(string_list):
     return QVariant(QStringList(result))
 
 def getStringDict(qvariant):
+    a = []
+    dict_str_str = {}
+    if type(qvariant) == dict:
+        return qvariant
+
     a = str(qvariant.toByteArray())
     if len(a) == 0:
         dict_str_str = {}
     else:
         dict_str_str = pickle.loads(a)
+
     return dict_str_str
 
 def convertStringDict(dict_str_str):
@@ -95,11 +101,17 @@ def convertBoolDict(dict_str_bool):
     return QVariant(QByteArray(a))
 
 def getDict(qvariant):
+    a = []
+    dict_str_str = {}
+    if type(qvariant) == dict:
+        return qvariant
+
     a = str(qvariant.toByteArray())
     if len(a) == 0:
         dict_str_bool = {}
     else:
         dict_str_bool = pickle.loads(a)
+
     return dict_str_bool
 
 def convertDict(dict_str_variant):
