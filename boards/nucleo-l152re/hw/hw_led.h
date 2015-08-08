@@ -38,11 +38,31 @@
 #ifndef HW_LED_H
 #define HW_LED_H
 
-#warning FIXME: This is an example implementation, you must implement it
+#include <cfg/macros.h>
 
-#define LED_ON()   do { /* implement me */} while(0)
-#define LED_OFF()  do { /* implement me */} while(0)
+#include <io/stm32.h>
 
-#define LED_INIT()      do { /* implement me */} while(0)
+#include <drv/gpio_stm32.h>
+#include <drv/clock_stm32.h>
+
+#define LED_PIN             BV(5)
+#define LED_GPIO_BASE       ((struct stm32_gpio *)GPIOA_BASE)
+
+#define LED_ON()							\
+		do {							\
+			stm32_gpioPinWrite(LED_GPIO_BASE, LED_PIN, 1); \
+		} while (0)
+
+#define LED_OFF()							\
+		do {							\
+			stm32_gpioPinWrite(LED_GPIO_BASE, LED_PIN, 0); \
+		} while (0)
+
+#define LED_INIT() \
+	do { \
+		((struct RCC *)RCC_BASE)->AHBENR |= RCC_AHBENR_GPIOAEN; \
+		stm32_gpioPinConfig(LED_GPIO_BASE, LED_PIN, GPIO_MODE_OUT_PP, GPIO_SPEED_50MHZ); \
+		LED_OFF(); \
+	} while (0)
 
 #endif /* HW_LED_H */
