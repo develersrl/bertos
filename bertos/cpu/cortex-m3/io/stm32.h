@@ -45,6 +45,7 @@
 #include "stm32_memmap.h"
 
 #include "stm32_rcc.h"
+#include "stm32_pwr.h"
 #include "stm32_nvic.h"
 #include "stm32_ints.h"
 #include "stm32_gpio.h"

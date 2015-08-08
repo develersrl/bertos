@@ -151,6 +151,226 @@ void clock_init(void)
 	/* Clock the system from the PLL */
 	rcc_set_clock_source(RCC_SYSCLK_PLLCLK);
 }
+
+#elif CPU_CM3_STM32L1
+
+/* ===============         Settings  =======================*/
+
+#define STM32_HSI_ENABLED                   1
+#define STM32_LSI_ENABLED                   1
+#define STM32_HSE_ENABLED                   0
+#define STM32_LSE_ENABLED                   0
+#define STM32_ADC_CLOCK_ENABLED             1
+#define STM32_USB_CLOCK_ENABLED             1
+#define STM32_MSIRANGE                      STM32_MSIRANGE_2M
+#define STM32_SW                            STM32_SW_PLL
+#define STM32_PLLSRC                        STM32_PLLSRC_HSI
+#define STM32_PLLMUL_VALUE                  6
+#define STM32_PLLDIV_VALUE                  3
+#define STM32_HPRE                          STM32_HPRE_DIV1
+#define STM32_PPRE1                         STM32_PPRE1_DIV1
+#define STM32_PPRE2                         STM32_PPRE2_DIV1
+#define STM32_MCOSEL                        STM32_MCOSEL_NOCLOCK
+#define STM32_MCOPRE                        STM32_MCOPRE_DIV1
+#define STM32_RTCSEL                        STM32_RTCSEL_NOCLOCK
+#define STM32_RTCPRE                        STM32_RTCPRE_DIV2
+#define STM32_VOS                           STM32_VOS_1P8
+#define STM32_PVD_ENABLE                    0
+#define STM32_PLS                           STM32_PLS_LEV0
+#define STM32_ACTIVATE_PLL                  0
+
+/* ===============       End Settings  =======================*/
+
+/**
+ * @name    PWR_CR register bits definitions
+ * @{
+ */
+#define STM32_VOS_MASK          (3 << 11)   /**< Core voltage mask.         */
+#define STM32_VOS_1P8           (1 << 11)   /**< Core voltage 1.8 Volts.    */
+#define STM32_VOS_1P5           (2 << 11)   /**< Core voltage 1.5 Volts.    */
+#define STM32_VOS_1P2           (3 << 11)   /**< Core voltage 1.2 Volts.    */
+
+#define STM32_PLS_MASK          (7 << 5)    /**< PLS bits mask.             */
+#define STM32_PLS_LEV0          (0 << 5)    /**< PVD level 0.               */
+#define STM32_PLS_LEV1          (1 << 5)    /**< PVD level 1.               */
+#define STM32_PLS_LEV2          (2 << 5)    /**< PVD level 2.               */
+#define STM32_PLS_LEV3          (3 << 5)    /**< PVD level 3.               */
+#define STM32_PLS_LEV4          (4 << 5)    /**< PVD level 4.               */
+#define STM32_PLS_LEV5          (5 << 5)    /**< PVD level 5.               */
+#define STM32_PLS_LEV6          (6 << 5)    /**< PVD level 6.               */
+#define STM32_PLS_LEV7          (7 << 5)    /**< PVD level 7.               */
+/** @} */
+
+/* Voltage related limits.*/
+#if STM32_VOS == STM32_VOS_1P8
+/**
+ * @brief   Maximum HSE clock frequency at current voltage setting.
+ */
+#define STM32_HSECLK_MAX            32000000
+
+/**
+ * @brief   Maximum SYSCLK clock frequency at current voltage setting.
+ */
+#define STM32_SYSCLK_MAX            32000000
+
+/**
+ * @brief   Maximum VCO clock frequency at current voltage setting.
+ */
+#define STM32_PLLVCO_MAX            96000000
+
+/**
+ * @brief   Minimum VCO clock frequency at current voltage setting.
+ */
+#define STM32_PLLVCO_MIN            6000000
+
+/**
+ * @brief   Maximum APB1 clock frequency.
+ */
+#define STM32_PCLK1_MAX             32000000
+
+/**
+ * @brief   Maximum APB2 clock frequency.
+ */
+#define STM32_PCLK2_MAX             32000000
+
+/**
+ * @brief   Maximum frequency not requiring a wait state for flash accesses.
+ */
+#define STM32_0WS_THRESHOLD         16000000
+
+/**
+ * @brief   HSI availability at current voltage settings.
+ */
+#define STM32_HSI_AVAILABLE         1
+
+#elif STM32_VOS == STM32_VOS_1P5
+#define STM32_HSECLK_MAX            16000000
+#define STM32_SYSCLK_MAX            16000000
+#define STM32_PLLVCO_MAX            48000000
+#define STM32_PLLVCO_MIN            6000000
+#define STM32_PCLK1_MAX             16000000
+#define STM32_PCLK2_MAX             16000000
+#define STM32_0WS_THRESHOLD         8000000
+#define STM32_HSI_AVAILABLE         1
+#elif STM32_VOS == STM32_VOS_1P2
+#define STM32_HSECLK_MAX            4000000
+#define STM32_SYSCLK_MAX            4000000
+#define STM32_PLLVCO_MAX            24000000
+#define STM32_PLLVCO_MIN            6000000
+#define STM32_PCLK1_MAX             4000000
+#define STM32_PCLK2_MAX             4000000
+#define STM32_0WS_THRESHOLD         2000000
+#define STM32_HSI_AVAILABLE         0
+#else
+#error "invalid STM32_VOS value specified"
+#endif
+
+#define PWR ((struct PWR*)PWR_BASE)
+#define RCC ((struct RCC*)RCC_BASE)
+
+/**
+ * @brief   STM32L1xx voltage, clocks and PLL initialization.
+ * @note    All the involved constants come from the file @p board.h.
+ * @note    This function should be invoked just after the system reset.
+ *
+ * @special
+ */
+/**
+ * @brief   Clocks and internal voltage initialization.
+ */
+void clock_init(void)
+{
+	/* PWR clock enable.*/
+	RCC->APB1ENR = RCC_APB1ENR_PWREN;
+
+	/* Core voltage setup.*/
+	while ((PWR->CSR & PWR_CSR_VOSF) != 0)
+		;                           /* Waits until regulator is stable.         */
+	PWR->CR = STM32_VOS;
+	while ((PWR->CSR & PWR_CSR_VOSF) != 0)
+		;                           /* Waits until regulator is stable.         */
+
+	/* Initial clocks setup and wait for MSI stabilization, the MSI clock is
+	   always enabled because it is the fallback clock when PLL the fails.
+	   Trim fields are not altered from reset values.*/
+	RCC->CFGR  = 0;
+	RCC->ICSCR = (RCC->ICSCR & ~STM32_MSIRANGE_MASK) | STM32_MSIRANGE;
+	RCC->CR    = RCC_CR_MSION;
+	while ((RCC->CR & RCC_CR_MSIRDY) == 0)
+		;                           /* Waits until MSI is stable.               */
+
+#if STM32_HSI_ENABLED
+	/* HSI activation.*/
+	RCC->CR |= RCC_CR_HSION;
+	while ((RCC->CR & RCC_CR_HSIRDY) == 0)
+		;                           /* Waits until HSI is stable.               */
+#endif
+
+#if STM32_HSE_ENABLED
+#if defined(STM32_HSE_BYPASS)
+	/* HSE Bypass.*/
+	RCC->CR |= RCC_CR_HSEBYP;
+#endif
+	/* HSE activation.*/
+	RCC->CR |= RCC_CR_HSEON;
+	while ((RCC->CR & RCC_CR_HSERDY) == 0)
+		;                           /* Waits until HSE is stable.               */
+#endif
+
+#if STM32_LSI_ENABLED
+	/* LSI activation.*/
+	RCC->CSR |= RCC_CSR_LSION;
+	while ((RCC->CSR & RCC_CSR_LSIRDY) == 0)
+		;                           /* Waits until LSI is stable.               */
+#endif
+
+#if STM32_LSE_ENABLED
+	/* LSE activation, have to unlock the register.*/
+	if ((RCC->CSR & RCC_CSR_LSEON) == 0) {
+		PWR->CR |= PWR_CR_DBP;
+		RCC->CSR |= RCC_CSR_LSEON;
+		PWR->CR &= ~PWR_CR_DBP;
+	}
+	while ((RCC->CSR & RCC_CSR_LSERDY) == 0)
+		;                           /* Waits until LSE is stable.               */
+#endif
+
+#if STM32_ACTIVATE_PLL
+	/* PLL activation.*/
+	RCC->CFGR |= STM32_PLLDIV | STM32_PLLMUL | STM32_PLLSRC;
+	RCC->CR   |= RCC_CR_PLLON;
+	while (!(RCC->CR & RCC_CR_PLLRDY))
+		;                           /* Waits until PLL is stable.               */
+#endif
+
+	/* Other clock-related settings (dividers, MCO etc).*/
+	RCC->CR   |= STM32_RTCPRE;
+	RCC->CFGR |= STM32_MCOPRE | STM32_MCOSEL |
+		STM32_PPRE2 | STM32_PPRE1 | STM32_HPRE;
+	RCC->CSR  |= STM32_RTCSEL;
+
+	/* Flash setup and final clock selection.*/
+#if defined(STM32_FLASHBITS1)
+	FLASH->ACR = STM32_FLASHBITS1;
+#endif
+#if defined(STM32_FLASHBITS2)
+	FLASH->ACR = STM32_FLASHBITS2;
+#endif
+
+	/* Switching to the configured clock source if it is different from MSI.*/
+#if (STM32_SW != STM32_SW_MSI)
+	RCC->CFGR |= STM32_SW;        /* Switches on the selected clock source.   */
+	while ((RCC->CFGR & RCC_CFGR_SWS) != (STM32_SW << 2))
+		;
+#endif
+
+	/* SYSCFG clock enabled here because it is a multi-functional unit shared
+	   among multiple drivers.*/
+	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;                                                   \
+	RCC->APB2LPENR |= RCC_APB2ENR_SYSCFGEN;                                               \
+}
+
+
 #else /* CPU_CM3_STM32F2 */
 
 /* PLL_VCO = (HSE_VALUE or HSI_VALUE / PLL_M) * PLL_N */
