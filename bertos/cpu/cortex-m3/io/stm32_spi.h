@@ -41,6 +41,10 @@
 #if CPU_CM3_STM32F1
 	#warning __FILTER_NEXT_WARNING__
 	#warning Not supported
+
+#elif CPU_CM3_STM32L1
+	#warning "SPI NOT SUPPORTED!!"
+
 #elif CPU_CM3_STM32F2
 
 struct stm32_spi

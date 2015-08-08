@@ -30,7 +30,7 @@
  *
  * -->
  *
- * \brief STM32F10XX registers definition.
+ * \brief STM32XXXX registers definition.
  */
 
 #ifndef STM32_H
@@ -40,6 +40,7 @@
 #include <cfg/macros.h>
 
 #include <cpu/types.h>
+#include <cpu/detect.h>
 
 #include "stm32_memmap.h"
 
@@ -54,9 +55,11 @@
 #include "stm32_dma.h"
 #include "stm32_spi.h"
 #include "stm32_timer.h"
+
 #if CPU_CM3_STM32F2
-#include "stm32_syscfg.h"
+	#include "stm32_syscfg.h"
 #endif
+
 #include "stm32_exti.h"
 
 #if CPU_CM3_STM32F101C4
@@ -64,6 +67,7 @@
 	#define GPIO_USART1_RX_PIN	BV(10)
 	#define GPIO_USART2_TX_PIN	BV(2)
 	#define GPIO_USART2_RX_PIN	BV(3)
+
 #elif CPU_CM3_STM32F103RB || CPU_CM3_STM32F103RE || CPU_CM3_STM32F100RB || \
 		CPU_CM3_STM32F100C4 || CPU_CM3_STM32F102C4
 
@@ -82,6 +86,10 @@
 
 #elif CPU_CM3_STM32F207IG
 	// nothing
+
+#elif CPU_CM3_STM32L1
+	#warning "No usart pin defined."
+
 #else
 	#error No USART pins are defined for select cpu
 #endif
@@ -99,17 +107,25 @@
 
 #elif CPU_CM3_STM32F207IG
 	// nothing
+
+#elif CPU_CM3_STM32L1
+	#warning "No i2c pin defined."
+
 #else
 	#error No i2c pins are defined for select cpu
 #endif
 
 #if CPU_CM3_STM32F101C4 || CPU_CM3_STM32F103RB || CPU_CM3_STM32F103RE || \
 		CPU_CM3_STM32F100RB || CPU_CM3_STM32F100C4 || CPU_CM3_STM32F102C4
-
 	#define FLASH_PAGE_SIZE   1024
+
 #elif CPU_CM3_STM32F207IG
 	/* this does not match real (variable) sector size */
 	#define FLASH_PAGE_SIZE_BYTES   1024
+
+#elif CPU_CM3_STM32L1
+	#warning "No embedded definition."
+
 #else
 	#error No embedded definition for select cpu
 #endif

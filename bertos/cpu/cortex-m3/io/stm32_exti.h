@@ -110,12 +110,19 @@ INLINE void stm32_extiGpioConfig(uint8_t gpio, uint8_t pin)
 	SYSCFG->EXTICR[reg] &= ~(0xf << offset);
 	SYSCFG->EXTICR[reg] |= gpio << offset;
 }
+
+#elif CPU_CM3_STM32L1
+	#warning __FILTER_NEXT_WARNING__
+	#warning Not supported
 #else
-#error Unknown CPU
+	#error Unknown CPU
 #endif
 
+#elif CPU_CM3_STM32L1
+	#warning __FILTER_NEXT_WARNING__
+	#warning Not supported
 #else
-#error Unknown CPU
+	#error Unknown CPU
 #endif
 
 #endif /* STM32_EXTI_H */

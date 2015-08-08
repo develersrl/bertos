@@ -374,6 +374,45 @@ struct stm32_gpio
 #define GPIO_BSRR_BR_14                      ((uint32_t)0x40000000)
 #define GPIO_BSRR_BR_15                      ((uint32_t)0x80000000)
 
+/*******************  Bit definition for GPIO_LCKR register  ******************/
+#define GPIO_LCKR_LCK0             ((uint32_t)0x00000001)
+#define GPIO_LCKR_LCK1             ((uint32_t)0x00000002)
+#define GPIO_LCKR_LCK2             ((uint32_t)0x00000004)
+#define GPIO_LCKR_LCK3             ((uint32_t)0x00000008)
+#define GPIO_LCKR_LCK4             ((uint32_t)0x00000010)
+#define GPIO_LCKR_LCK5             ((uint32_t)0x00000020)
+#define GPIO_LCKR_LCK6             ((uint32_t)0x00000040)
+#define GPIO_LCKR_LCK7             ((uint32_t)0x00000080)
+#define GPIO_LCKR_LCK8             ((uint32_t)0x00000100)
+#define GPIO_LCKR_LCK9             ((uint32_t)0x00000200)
+#define GPIO_LCKR_LCK10            ((uint32_t)0x00000400)
+#define GPIO_LCKR_LCK11            ((uint32_t)0x00000800)
+#define GPIO_LCKR_LCK12            ((uint32_t)0x00001000)
+#define GPIO_LCKR_LCK13            ((uint32_t)0x00002000)
+#define GPIO_LCKR_LCK14            ((uint32_t)0x00004000)
+#define GPIO_LCKR_LCK15            ((uint32_t)0x00008000)
+#define GPIO_LCKR_LCKK             ((uint32_t)0x00010000)
+
+/*******************  Bit definition for GPIO_AFRL register  ******************/
+#define GPIO_AFRL_AFRL0            ((uint32_t)0x0000000F)
+#define GPIO_AFRL_AFRL1            ((uint32_t)0x000000F0)
+#define GPIO_AFRL_AFRL2            ((uint32_t)0x00000F00)
+#define GPIO_AFRL_AFRL3            ((uint32_t)0x0000F000)
+#define GPIO_AFRL_AFRL4            ((uint32_t)0x000F0000)
+#define GPIO_AFRL_AFRL5            ((uint32_t)0x00F00000)
+#define GPIO_AFRL_AFRL6            ((uint32_t)0x0F000000)
+#define GPIO_AFRL_AFRL7            ((uint32_t)0xF0000000)
+
+/*******************  Bit definition for GPIO_AFRH register  ******************/
+#define GPIO_AFRH_AFRH8            ((uint32_t)0x0000000F)
+#define GPIO_AFRH_AFRH9            ((uint32_t)0x000000F0)
+#define GPIO_AFRH_AFRH10           ((uint32_t)0x00000F00)
+#define GPIO_AFRH_AFRH11           ((uint32_t)0x0000F000)
+#define GPIO_AFRH_AFRH12           ((uint32_t)0x000F0000)
+#define GPIO_AFRH_AFRH13           ((uint32_t)0x00F00000)
+#define GPIO_AFRH_AFRH14           ((uint32_t)0x0F000000)
+#define GPIO_AFRH_AFRH15           ((uint32_t)0xF0000000)
+
 #define GPIO_AF_SYS                           0  /*<! System */
 
 #define GPIO_AF_TIM1                          1  /*<! TIM 1 */
