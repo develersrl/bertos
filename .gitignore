@@ -22,3 +22,4 @@ flash.log
 openocd.tmp
 doc/reference/
 /bertos/emul/timer_qt_moc.cpp
+*.swp
