@@ -498,6 +498,26 @@ extern struct RCC *RCC;
 #define  RCC_CIR_LSECSSC                     ((uint32_t)0x00400000)        /*!< LSE CSS Interrupt Clear */
 #define  RCC_CIR_CSSC                        ((uint32_t)0x00800000)        /*!< Clock Security System Interrupt Clear */
 
+/**
+ * @name    PWR_CR register bits definitions
+ * @{
+ */
+#define STM32_VOS_MASK          (3 << 11)   /**< Core voltage mask.         */
+#define STM32_VOS_1P8           (1 << 11)   /**< Core voltage 1.8 Volts.    */
+#define STM32_VOS_1P5           (2 << 11)   /**< Core voltage 1.5 Volts.    */
+#define STM32_VOS_1P2           (3 << 11)   /**< Core voltage 1.2 Volts.    */
+
+#define STM32_PLS_MASK          (7 << 5)    /**< PLS bits mask.             */
+#define STM32_PLS_LEV0          (0 << 5)    /**< PVD level 0.               */
+#define STM32_PLS_LEV1          (1 << 5)    /**< PVD level 1.               */
+#define STM32_PLS_LEV2          (2 << 5)    /**< PVD level 2.               */
+#define STM32_PLS_LEV3          (3 << 5)    /**< PVD level 3.               */
+#define STM32_PLS_LEV4          (4 << 5)    /**< PVD level 4.               */
+#define STM32_PLS_LEV5          (5 << 5)    /**< PVD level 5.               */
+#define STM32_PLS_LEV6          (6 << 5)    /**< PVD level 6.               */
+#define STM32_PLS_LEV7          (7 << 5)    /**< PVD level 7.               */
+/** @} */
+
 #define STM32_SW_MSI            (0 << 0)    /**< SYSCLK source is MSI.      */
 #define STM32_SW_HSI            (1 << 0)    /**< SYSCLK source is HSI.      */
 #define STM32_SW_HSE            (2 << 0)    /**< SYSCLK source is HSE.      */

@@ -160,13 +160,12 @@ void clock_init(void)
 #define STM32_LSI_ENABLED                   1
 #define STM32_HSE_ENABLED                   0
 #define STM32_LSE_ENABLED                   0
-#define STM32_ADC_CLOCK_ENABLED             1
-#define STM32_USB_CLOCK_ENABLED             1
 #define STM32_MSIRANGE                      STM32_MSIRANGE_2M
-#define STM32_SW                            STM32_SW_HSI
+#define STM32_SW                            STM32_SW_PLL //STM32_SW_HSI
 #define STM32_PLLSRC                        STM32_PLLSRC_HSI
-#define STM32_PLLMUL                        6
-#define STM32_PLLDIV                        3
+#define STM32_PLLMUL                        (2 << 18) // x6
+#define STM32_PLLDIV                        (2 << 22) // \3
+#define STM32_ACTIVATE_PLL                  1
 #define STM32_HPRE                          STM32_HPRE_DIV1
 #define STM32_PPRE1                         STM32_PPRE1_DIV1
 #define STM32_PPRE2                         STM32_PPRE2_DIV1
@@ -175,95 +174,10 @@ void clock_init(void)
 #define STM32_RTCSEL                        STM32_RTCSEL_NOCLOCK
 #define STM32_RTCPRE                        STM32_RTCPRE_DIV2
 #define STM32_VOS                           STM32_VOS_1P8
-#define STM32_PVD_ENABLE                    0
-#define STM32_PLS                           STM32_PLS_LEV0
-#define STM32_ACTIVATE_PLL                  0
+#define STM32_FLASHBITS1            0x00000004
+#define STM32_FLASHBITS2            0x00000007
 
 /* ===============       End Settings  =======================*/
-
-/**
- * @name    PWR_CR register bits definitions
- * @{
- */
-#define STM32_VOS_MASK          (3 << 11)   /**< Core voltage mask.         */
-#define STM32_VOS_1P8           (1 << 11)   /**< Core voltage 1.8 Volts.    */
-#define STM32_VOS_1P5           (2 << 11)   /**< Core voltage 1.5 Volts.    */
-#define STM32_VOS_1P2           (3 << 11)   /**< Core voltage 1.2 Volts.    */
-
-#define STM32_PLS_MASK          (7 << 5)    /**< PLS bits mask.             */
-#define STM32_PLS_LEV0          (0 << 5)    /**< PVD level 0.               */
-#define STM32_PLS_LEV1          (1 << 5)    /**< PVD level 1.               */
-#define STM32_PLS_LEV2          (2 << 5)    /**< PVD level 2.               */
-#define STM32_PLS_LEV3          (3 << 5)    /**< PVD level 3.               */
-#define STM32_PLS_LEV4          (4 << 5)    /**< PVD level 4.               */
-#define STM32_PLS_LEV5          (5 << 5)    /**< PVD level 5.               */
-#define STM32_PLS_LEV6          (6 << 5)    /**< PVD level 6.               */
-#define STM32_PLS_LEV7          (7 << 5)    /**< PVD level 7.               */
-/** @} */
-
-/* Voltage related limits.*/
-#if STM32_VOS == STM32_VOS_1P8
-/**
- * @brief   Maximum HSE clock frequency at current voltage setting.
- */
-#define STM32_HSECLK_MAX            32000000
-
-/**
- * @brief   Maximum SYSCLK clock frequency at current voltage setting.
- */
-#define STM32_SYSCLK_MAX            32000000
-
-/**
- * @brief   Maximum VCO clock frequency at current voltage setting.
- */
-#define STM32_PLLVCO_MAX            96000000
-
-/**
- * @brief   Minimum VCO clock frequency at current voltage setting.
- */
-#define STM32_PLLVCO_MIN            6000000
-
-/**
- * @brief   Maximum APB1 clock frequency.
- */
-#define STM32_PCLK1_MAX             32000000
-
-/**
- * @brief   Maximum APB2 clock frequency.
- */
-#define STM32_PCLK2_MAX             32000000
-
-/**
- * @brief   Maximum frequency not requiring a wait state for flash accesses.
- */
-#define STM32_0WS_THRESHOLD         16000000
-
-/**
- * @brief   HSI availability at current voltage settings.
- */
-#define STM32_HSI_AVAILABLE         1
-
-#elif STM32_VOS == STM32_VOS_1P5
-#define STM32_HSECLK_MAX            16000000
-#define STM32_SYSCLK_MAX            16000000
-#define STM32_PLLVCO_MAX            48000000
-#define STM32_PLLVCO_MIN            6000000
-#define STM32_PCLK1_MAX             16000000
-#define STM32_PCLK2_MAX             16000000
-#define STM32_0WS_THRESHOLD         8000000
-#define STM32_HSI_AVAILABLE         1
-#elif STM32_VOS == STM32_VOS_1P2
-#define STM32_HSECLK_MAX            4000000
-#define STM32_SYSCLK_MAX            4000000
-#define STM32_PLLVCO_MAX            24000000
-#define STM32_PLLVCO_MIN            6000000
-#define STM32_PCLK1_MAX             4000000
-#define STM32_PCLK2_MAX             4000000
-#define STM32_0WS_THRESHOLD         2000000
-#define STM32_HSI_AVAILABLE         0
-#else
-#error "invalid STM32_VOS value specified"
-#endif
 
 #define PWR ((struct PWR*)PWR_BASE)
 #define RCC ((struct RCC*)RCC_BASE)
@@ -282,6 +196,7 @@ void clock_init(void)
 {
 	/* PWR clock enable.*/
 	RCC->APB1ENR = RCC_APB1ENR_PWREN;
+
 
 	/* Core voltage setup.*/
 	while ((PWR->CSR & PWR_CSR_VOSF) != 0)
@@ -336,7 +251,6 @@ void clock_init(void)
 #endif
 
 #if STM32_ACTIVATE_PLL
-	/* PLL activation.*/
 	RCC->CFGR |= STM32_PLLDIV | STM32_PLLMUL | STM32_PLLSRC;
 	RCC->CR   |= RCC_CR_PLLON;
 	while (!(RCC->CR & RCC_CR_PLLRDY))
