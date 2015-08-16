@@ -166,16 +166,8 @@ void clock_init(void)
 #define STM32_PLLMUL                        (2 << 18) // x6
 #define STM32_PLLDIV                        (2 << 22) // \3
 #define STM32_ACTIVATE_PLL                  1
-#define STM32_HPRE                          STM32_HPRE_DIV1
-#define STM32_PPRE1                         STM32_PPRE1_DIV1
-#define STM32_PPRE2                         STM32_PPRE2_DIV1
-#define STM32_MCOSEL                        STM32_MCOSEL_NOCLOCK
-#define STM32_MCOPRE                        STM32_MCOPRE_DIV1
-#define STM32_RTCSEL                        STM32_RTCSEL_NOCLOCK
-#define STM32_RTCPRE                        STM32_RTCPRE_DIV2
-#define STM32_VOS                           STM32_VOS_1P8
-#define STM32_FLASHBITS1            0x00000004
-#define STM32_FLASHBITS2            0x00000007
+#define STM32_FLASHBITS1                    0x00000004
+#define STM32_FLASHBITS2                    0x00000007
 
 /* ===============       End Settings  =======================*/
 
@@ -201,7 +193,7 @@ void clock_init(void)
 	/* Core voltage setup.*/
 	while ((PWR->CSR & PWR_CSR_VOSF) != 0)
 		;                           /* Waits until regulator is stable.         */
-	PWR->CR = STM32_VOS;
+	PWR->CR = STM32_VOS_1P8;
 	while ((PWR->CSR & PWR_CSR_VOSF) != 0)
 		;                           /* Waits until regulator is stable.         */
 
@@ -258,10 +250,10 @@ void clock_init(void)
 #endif
 
 	/* Other clock-related settings (dividers, MCO etc).*/
-	RCC->CR   |= STM32_RTCPRE;
-	RCC->CFGR |= STM32_MCOPRE | STM32_MCOSEL |
-		STM32_PPRE2 | STM32_PPRE1 | STM32_HPRE;
-	RCC->CSR  |= STM32_RTCSEL;
+	RCC->CR   |= STM32_RTCPRE_DIV2;
+	RCC->CFGR |= STM32_MCOPRE_DIV1 | STM32_MCOSEL_NOCLOCK |
+		STM32_PPRE2_DIV1 | STM32_PPRE1_DIV1 | STM32_HPRE_DIV1;
+	RCC->CSR  |= STM32_RTCSEL_NOCLOCK;
 
 	/* Flash setup and final clock selection.*/
 #if defined(STM32_FLASHBITS1)
