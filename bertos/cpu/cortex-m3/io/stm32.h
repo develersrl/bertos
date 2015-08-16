@@ -53,15 +53,19 @@
 #include "stm32_adc.h"
 #include "stm32_i2c.h"
 #include "stm32_flash.h"
+#if CPU_CM3_STM32L1
+	// none
+#else
 #include "stm32_dma.h"
 #include "stm32_spi.h"
 #include "stm32_timer.h"
+#include "stm32_exti.h"
+#endif
 
 #if CPU_CM3_STM32F2
 	#include "stm32_syscfg.h"
 #endif
 
-#include "stm32_exti.h"
 
 #if CPU_CM3_STM32F101C4
 	#define GPIO_USART1_TX_PIN	BV(9)
@@ -89,8 +93,8 @@
 	// nothing
 
 #elif CPU_CM3_STM32L1
-	#warning "No usart pin defined."
-
+	#define GPIO_USART2_TX_PIN	BV(2)
+	#define GPIO_USART2_RX_PIN	BV(3)
 #else
 	#error No USART pins are defined for select cpu
 #endif
@@ -110,7 +114,7 @@
 	// nothing
 
 #elif CPU_CM3_STM32L1
-	#warning "No i2c pin defined."
+	// nothing
 
 #else
 	#error No i2c pins are defined for select cpu
@@ -125,8 +129,7 @@
 	#define FLASH_PAGE_SIZE_BYTES   1024
 
 #elif CPU_CM3_STM32L1
-	#warning "No embedded definition."
-
+	// nothing
 #else
 	#error No embedded definition for select cpu
 #endif
