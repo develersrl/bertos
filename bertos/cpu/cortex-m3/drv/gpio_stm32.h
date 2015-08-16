@@ -39,7 +39,6 @@
 #include <io/stm32.h>
 
 #if CPU_CM3_STM32F207IG || CPU_CM3_STM32L152RE
-#warning VERIFICARE MACRO CORRETTE PER L152
 enum
 {
 	STM32_GPIO_MODE_IN     = 0 << 4,
