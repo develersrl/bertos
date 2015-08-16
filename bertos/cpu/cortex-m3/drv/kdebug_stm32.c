@@ -74,27 +74,28 @@ typedef uint32_t kdbg_irqsave_t;
 INLINE void kdbg_hw_init(void)
 {
 #if CPU_CM3_STM32F1
-	/* Enable clocking on AFIO */
-	RCC->APB2ENR |= RCC_APB2_AFIO;
-	/* Configure USART pins */
-#if CONFIG_KDEBUG_PORT == 0
-	RCC->APB2ENR |= RCC_APB2_GPIOA;
-	RCC->APB2ENR |= RCC_APB2_USART1;
-	stm32_gpioPinConfig((struct stm32_gpio *)GPIOA_BASE, GPIO_USART1_TX_PIN,
-				GPIO_MODE_AF_PP, GPIO_SPEED_50MHZ);
-#elif CONFIG_KDEBUG_PORT == 1
-	RCC->APB2ENR |= RCC_APB2_GPIOA;
-	RCC->APB1ENR |= RCC_APB1_USART2;
-	stm32_gpioPinConfig((struct stm32_gpio *)GPIOA_BASE, GPIO_USART2_TX_PIN,
-				GPIO_MODE_AF_PP, GPIO_SPEED_50MHZ);
-#elif  CONFIG_KDEBUG_PORT == 2
-	RCC->APB2ENR |= RCC_APB2_GPIOB;
-	RCC->APB1ENR |= RCC_APB1_USART3;
-	stm32_gpioPinConfig((struct stm32_gpio *)GPIOB_BASE, GPIO_USART3_TX_PIN,
-				GPIO_MODE_AF_PP, GPIO_SPEED_50MHZ);
-#else
-	#error "UART port not supported in this board"
-#endif
+
+		/* Enable clocking on AFIO */
+		RCC->APB2ENR |= RCC_APB2_AFIO;
+		/* Configure USART pins */
+	#if CONFIG_KDEBUG_PORT == 0
+		RCC->APB2ENR |= RCC_APB2_GPIOA;
+		RCC->APB2ENR |= RCC_APB2_USART1;
+		stm32_gpioPinConfig((struct stm32_gpio *)GPIOA_BASE, GPIO_USART1_TX_PIN,
+					GPIO_MODE_AF_PP, GPIO_SPEED_50MHZ);
+	#elif CONFIG_KDEBUG_PORT == 1
+		RCC->APB2ENR |= RCC_APB2_GPIOA;
+		RCC->APB1ENR |= RCC_APB1_USART2;
+		stm32_gpioPinConfig((struct stm32_gpio *)GPIOA_BASE, GPIO_USART2_TX_PIN,
+					GPIO_MODE_AF_PP, GPIO_SPEED_50MHZ);
+	#elif  CONFIG_KDEBUG_PORT == 2
+		RCC->APB2ENR |= RCC_APB2_GPIOB;
+		RCC->APB1ENR |= RCC_APB1_USART3;
+		stm32_gpioPinConfig((struct stm32_gpio *)GPIOB_BASE, GPIO_USART3_TX_PIN,
+					GPIO_MODE_AF_PP, GPIO_SPEED_50MHZ);
+	#else
+		#error "UART port not supported in this board"
+	#endif
 
 #elif CPU_CM3_STM32F207IG
 	RCC->APB1ENR |= RCC_APB1ENR_USART3EN; //ENABLE UART3
@@ -104,16 +105,29 @@ INLINE void kdbg_hw_init(void)
 
 	GPIOC->MODER |= GPIO_MODER_MODER10_1; // PC10 As alternate function
 	GPIOC->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR10_1; //PC10 As fast speed 50MHz
+
 #elif CPU_CM3_STM32L152RE
-	#warning AGGIUNGERE SERIALE DI DEBUG!
+	((struct RCC *)RCC_BASE)->AHBENR |= RCC_AHBENR_GPIOAEN;
+	((struct RCC *)RCC_BASE)->APB1ENR |= RCC_APB1ENR_USART2EN;
+
+	((struct stm32_gpio *)GPIOA_BASE)->AFR[0] |= 0x07 << 8;
+	((struct stm32_gpio *)GPIOA_BASE)->MODER |= GPIO_MODER_MODER2_1;
+	((struct stm32_gpio *)GPIOA_BASE)->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR2;
+
 #else
 	#error
 #endif
 
 	/* Enable the USART by writing the UE bit */
 	UART_BASE->CR1 |= CR1_RUN_SET;
+
 	/* Configure the desired baud rate */
+#if CPU_CM3_STM32L152RE
+	UART_BASE->BRR = (uint16_t)(CPU_FREQ/CONFIG_KDEBUG_BAUDRATE);
+#else
 	UART_BASE->BRR = (uint16_t)evaluate_brr(UART_BASE, CPU_FREQ, CONFIG_KDEBUG_BAUDRATE);
+#endif
+
 	/* Set the Transmitter Enable bit in CR1 */
 	UART_BASE->CR1 |= USART_MODE_TX;
 }
