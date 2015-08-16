@@ -43,7 +43,7 @@
  * Debug console port.
  * $WIZ$ type = "int"; min = 0
  */
-#define CONFIG_KDEBUG_PORT 0
+#define CONFIG_KDEBUG_PORT 1
 
 /**
  * Baudrate for the debug console.
