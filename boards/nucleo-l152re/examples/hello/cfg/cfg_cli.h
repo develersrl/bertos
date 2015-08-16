@@ -60,6 +60,6 @@
  *
  * $WIZ$ type = "str"
  */
-#define CONFIG_CLI_PROMT_STR           ">> " "
+#define CONFIG_CLI_PROMT_STR           ">> "
 
 #endif /* CFG_CLI_H */
