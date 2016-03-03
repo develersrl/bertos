@@ -201,8 +201,6 @@ static const UsbStringDesc *usb_hid_strings[] =
 
 static uint8_t report[8];
 
-static bool hid_keyboard_configured;
-
 static void usb_hid_event_cb(UsbCtrlRequest *ctrl)
 {
 	uint16_t value = usb_le16_to_cpu(ctrl->wValue);
@@ -229,7 +227,6 @@ static void usb_hid_event_cb(UsbCtrlRequest *ctrl)
 			usb_endpointWrite(USB_DIR_IN | 0,
 					&hid_report_descriptor,
 					sizeof(hid_report_descriptor));
-			hid_keyboard_configured = true;
 			break;
 		default:
 			LOG_INFO("%s: unknown HID request\n", __func__);
@@ -299,7 +296,5 @@ int usbkbd_init(UNUSED_ARG(int, unit))
 	MOD_CHECK(proc);
 #endif
 	usb_keyboard_hw_init();
-	while (!hid_keyboard_configured)
-		cpu_relax();
 	return 0;
 }
