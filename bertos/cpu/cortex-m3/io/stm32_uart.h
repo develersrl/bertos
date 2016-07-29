@@ -207,20 +207,20 @@
 /* USART registers */
 struct stm32_usart
 {
-	reg16_t SR;
-	uint16_t _RESERVED0;
-	reg16_t DR;
-	uint16_t _RESERVED1;
-	reg16_t BRR;
-	uint16_t _RESERVED2;
-	reg16_t CR1;
-	uint16_t _RESERVED3;
-	reg16_t CR2;
-	uint16_t _RESERVED4;
-	reg16_t CR3;
-	uint16_t _RESERVED5;
-	reg16_t GTPR;
-	uint16_t _RESERVED6;
+    reg16_t SR;
+    uint16_t _RESERVED0;
+    reg16_t DR;
+    uint16_t _RESERVED1;
+    reg16_t BRR;
+    uint16_t _RESERVED2;
+    reg16_t CR1;
+    uint16_t _RESERVED3;
+    reg16_t CR2;
+    uint16_t _RESERVED4;
+    reg16_t CR3;
+    uint16_t _RESERVED5;
+    reg16_t GTPR;
+    uint16_t _RESERVED6;
 };
 
 /* USART mode */
@@ -234,16 +234,23 @@ struct stm32_usart
 
 INLINE uint16_t evaluate_brr(struct stm32_usart *base, unsigned long cpu_freq, unsigned long baud)
 {
-	uint32_t freq, reg, div, frac;
+    uint32_t freq, reg, div, frac;
 
-	/* NOTE: PCLK1 has been configured as CPU_FREQ / 2 */
-	freq = (base == (struct stm32_usart *)USART1_BASE) ? cpu_freq / 2: cpu_freq / 4;
-	div = (0x19 * freq) / (0x04 * baud);
-	reg = (div / 0x64) << 0x04;
-	frac = div - (0x64 * (reg >> 0x04));
-	reg |= ((frac * 0x10 + 0x32) / 0x64) & 0x0f;
+    /* NOTE: PCLK1 has been configured as CPU_FREQ / 2 */
+#if CPU_CM3_STM32F1
+    freq = (base == (struct stm32_usart *)USART1_BASE) ? cpu_freq: cpu_freq / 2;
+#elif CPU_CM3_STM32F2
+    freq = (base == (struct stm32_usart *)USART1_BASE) ? cpu_freq / 2: cpu_freq / 4;
+#else
+    #warning Check correct base clock frequency.
+#endif
 
-	return (uint16_t)reg;
+    div = (0x19 * freq) / (0x04 * baud);
+    reg = (div / 0x64) << 0x04;
+    frac = div - (0x64 * (reg >> 0x04));
+    reg |= ((frac * 0x10 + 0x32) / 0x64) & 0x0f;
+
+    return (uint16_t)reg;
 }
 
 #endif /* STM32_UART_H */
