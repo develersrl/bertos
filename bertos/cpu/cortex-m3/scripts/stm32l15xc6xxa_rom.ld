@@ -26,13 +26,13 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2011 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2016 Develer S.r.l. (http://www.develer.com/)
  *
  * -->
  *
- * \author Luca Ottaviano <lottaviano@develer.com>
+ * \author Daniele Basile <asterix@develer.com>
  *
- * \brief Script for STM32P103RE Cortex-M3 MCU.
+ * \brief Script for STM32L15xC6xxA Cortex-M3 MCU.
  *
  */
 
@@ -43,12 +43,12 @@
 STACK_SIZE = 0x1000;
 
 /*
- * Define memory configuration for STM32L152RE
+ * Define memory configuration for STM32L15xC6xxA
  */
 MEMORY
 {
-	rom(rx) : org = 0x00000000, len = 512k
-	ram(rwx) : org = 0x20000000, len = 80k
+	rom(rx) : org = 0x00000000, len = 32k
+	ram(rwx) : org = 0x20000000, len = 32k
 }
 
 INCLUDE "bertos/cpu/cortex-m3/scripts/cortex-m3_rom.ld"
