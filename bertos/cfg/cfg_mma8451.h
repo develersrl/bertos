@@ -61,4 +61,4 @@
  */
 #define CFG_MMA8451_TIMEOUT  100
 
-#endif /* CFG_AX25_H */
+#endif /* CFG_MMA8451_H */
