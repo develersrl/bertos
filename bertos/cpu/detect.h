@@ -311,6 +311,32 @@
 		#define CPU_CM3_STM32L152RE 0
 	#endif
 
+	#if defined (__ARM_STM32L151C6xxA__)
+		#define CPU_CM3_STM32          1
+		#define CPU_CM3_STM32L1        1
+		#define CPU_CM3_STM32L151C6xxA 1
+		#define CPU_NAME            "STM32L151C6xxA"
+
+		#define CPU_CM3_STM32F1     0
+		#define CPU_CM3_STM32F2     0
+
+	#else
+		#define CPU_CM3_STM32L151C6xxA 0
+	#endif
+
+	#if defined (__ARM_STM32L151C8xxA__)
+		#define CPU_CM3_STM32          1
+		#define CPU_CM3_STM32L1        1
+		#define CPU_CM3_STM32L151C8xxA 1
+		#define CPU_NAME            "STM32L151C8xxA"
+
+		#define CPU_CM3_STM32F1     0
+		#define CPU_CM3_STM32F2     0
+
+	#else
+		#define CPU_CM3_STM32L151C8xxA 0
+	#endif
+
 	// AT91SAM3N products serie
 	#if defined (__ARM_SAM3N4__)
 		#define CPU_CM3_SAM3    1
@@ -377,7 +403,7 @@
 		#define CPU_CM3_SAM3        0
 	#elif defined (CPU_CM3_STM32)
 		#if CPU_CM3_STM32F100RB + CPU_CM3_STM32F100C4 + CPU_CM3_STM32F101C4 + CPU_CM3_STM32F103RB + CPU_CM3_STM32F103RE + \
-			CPU_CM3_STM32F102C4 + CPU_CM3_STM32F207IG + CPU_CM3_STM32L152RE + 0 != 1
+			CPU_CM3_STM32F102C4 + CPU_CM3_STM32F207IG + CPU_CM3_STM32L152RE + CPU_CM3_STM32L151C6xxA + CPU_CM3_STM32L151C8xxA + 0 != 1
 			#error STM32 Cortex-M3 CPU configuration error
 		#endif
 		#define CPU_CM3_LM3S        0
