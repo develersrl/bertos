@@ -237,7 +237,7 @@ $$(OUTDIR)/$(1)_whole.elf: bumprev $$($(1)_SRC) $$($(1)_LDSCRIPT)
 
 # Flash target
 .PHONY: flash_$(1)
-flash_$(1): $(OUTDIR)/$(1).hex flash_$(1)_local
+flash_$(1): $(OUTDIR)/$(1).bin flash_$(1)_local
 	$L "$(1): Flashing target"
 	$Q if [ ! -f $$($(1)_FLASH_SCRIPT) ] ; then \
 		printf "CLDLG: No flash script found.\n" ; \
