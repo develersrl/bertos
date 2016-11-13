@@ -37,26 +37,16 @@
  * \author Francesco Sacchi <batt@develer.com>
  * \author Daniele Basile <asterix@develer.com>
  *
- * $WIZ$ module_name = "spi_bitbang"
- * $WIZ$ module_configuration = "bertos/cfg/cfg_spi_bitbang.h"
- * $WIZ$ module_hw = "bertos/hw/hw_spi.h"
  */
 
 
 #ifndef DRV_SPI_BITBANG_H
 #define DRV_SPI_BITBANG_H
 
-#include "cfg/cfg_spi_bitbang.h"
+#include "cfg/cfg_spi.h"
 
+#include <drv/spi.h>
 #include <cfg/compiler.h>
-
-/**
- * Define send and receive order bit.
- *
- * $WIZ$ ordet_bit_list = "SPI_LSB_FIRST", "SPI_MSB_FIRST"
- */
-#define SPI_LSB_FIRST 1
-#define SPI_MSB_FIRST 2
 
 #if CONFIG_SPI_DATAORDER == SPI_LSB_FIRST
 	#define  SPI_DATAORDER_START    1
@@ -66,11 +56,25 @@
 	#define  SPI_DATAORDER_SHIFT(i) ((i) >>= 1)
 #endif
 
+
+#if 0
+
+/**
+ * \defgroup old_spi_api Old SPI API
+ * \ingroup spi_driver
+ *
+ * This is the old and deprecated SPI API. It is maintained for backward
+ * compatibility only, don't use it in new projects.
+ * @{
+ */
+
 void spi_write(const void *buf, size_t len);
 void spi_read(void *buf, size_t len);
 uint8_t spi_sendRecv(uint8_t c);
 void spi_init(void);
 void spi_assertSS(void);
 void spi_deassertSS(void);
+
+#endif
 
 #endif /* DRV_SPI_BITBANG_H */

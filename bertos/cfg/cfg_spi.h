@@ -26,20 +26,49 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2008 Develer S.r.l. (http://www.develer.com/)
+ * Copyright 2015 Develer S.r.l. (http://www.develer.com/)
  * All Rights Reserved.
  * -->
  *
- * \brief Configuration file for SPI bitbang module.
+ * \brief Configuration file for SPI module.
  *
  *
  * \author Daniele Basile <asterix@develer.com>
  */
 
-#ifndef CFG_SPI_BITBANG_H
-#define CFG_SPI_BITBANG_H
+#ifndef CFG_SPI_H
+#define CFG_SPI_H
 
-#warning OLD File! all settings merged into cfg_spi.h
+/**
+ * Module logging level.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_level"
+ */
+#define SPI_LOG_LEVEL      LOG_LVL_INFO
 
-#endif /* CFG_SPI_BITBANG_H */
+/**
+ * Module logging format.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "log_format"
+ */
+#define SPI_LOG_FORMAT     LOG_FMT_TERSE
+
+/**
+ * NOP byte value
+ *
+ * $WIZ$ type = "hex"
+ */
+#define CONFING_SPI_NOP  0xFF
+
+/**
+ * Set data order for emulated SPI.
+ *
+ * $WIZ$ type = "enum"
+ * $WIZ$ value_list = "ordet_bit_list"
+ */
+#define CONFIG_SPI_DATAORDER  SPI_MSB_FIRST
+
+#endif /* CFG_SPI_H */
 

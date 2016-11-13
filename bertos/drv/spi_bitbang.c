@@ -40,29 +40,35 @@
 
 
 #include "spi_bitbang.h"
-#include "hw/hw_spi.h"
 
-#include "cfg/cfg_spi_bitbang.h"
+#include "hw/hw_spi.h"
+#include "cfg/cfg_spi.h"
+
 #include <cfg/module.h>
 
 #include <cpu/irq.h>
 
-void spi_assertSS(void)
+#include <drv/spi.h>
+
+INLINE void spi_bitbang_assertSS(Spi *spi)
 {
-	ATOMIC(SS_ACTIVE());
+	(void)spi;
+	ATOMIC(SPI_HW_SS_ACTIVE());
 }
 
-void spi_deassertSS(void)
+INLINE void spi_bitbang_deassertSS(Spi *spi)
 {
-	ATOMIC(SS_INACTIVE());
+	(void)spi;
+	ATOMIC(SPI_HW_SS_INACTIVE());
 }
 
 /**
  * Send byte \c c over MOSI line, CONFIG_SPI_DATAORDER first.
  * SS pin state is left unchanged.
  */
-uint8_t spi_sendRecv(uint8_t c)
+INLINE uint8_t spi_bitbang_sendRecv(Spi *spi, uint8_t c)
 {
+	(void)spi;
 	uint8_t data = 0;
 	uint8_t shift = SPI_DATAORDER_START;
 
@@ -72,49 +78,32 @@ uint8_t spi_sendRecv(uint8_t c)
 		{
 			/* Shift the i-th bit to MOSI */
 			if (c & shift)
-				MOSI_HIGH();
+				SPI_HW_MOSI_HIGH();
 			else
-				MOSI_LOW();
+				SPI_HW_MOSI_LOW();
 			/* Assert clock */
-			SCK_ACTIVE();
-			data |= IS_MISO_HIGH() ? shift : 0;
+			SPI_HW_SCK_ACTIVE();
+			data |= SPI_HW_IS_MISO_HIGH() ? shift : 0;
 			/* De-assert clock */
-			SCK_INACTIVE();
+			SPI_HW_SCK_INACTIVE();
 			SPI_DATAORDER_SHIFT(shift);
 		}
 	);
 	return data;
 }
 
-MOD_DEFINE(spi);
-void spi_init(void)
+static const SpiVT spi_bitbang_vt =
 {
-	ATOMIC(SPI_HW_INIT());
-	MOD_INIT(spi);
+	.assertSS = spi_bitbang_assertSS,
+	.deassertSS = spi_bitbang_deassertSS,
+	.sendRecv = spi_bitbang_sendRecv,
+};
+
+void spi_hw_bitbangInit(Spi *spi, int dev)
+{
+	(void)dev;
+	spi->vt = &spi_bitbang_vt;
+	ATOMIC(SPI_HW_BITBANG_INIT());
 }
 
-/**
- * Read \param len from spi, and put it in \param _buff .
- */
-void spi_read(void *_buff, size_t len)
-{
-	uint8_t *buff = (uint8_t *)_buff;
 
-	while (len--)
-		/* Read byte from spi and put it in buffer. */
-		*buff++ = spi_sendRecv(0);
-
-}
-
-/**
- * Write \param len to spi, and take it from \param _buff .
- */
-void spi_write(const void *_buff, size_t len)
-{
-	const uint8_t *buff = (const uint8_t *)_buff;
-
-	while (len--)
-		/* Write byte pointed at by *buff to spi */
-		spi_sendRecv(*buff++);
-
-}
