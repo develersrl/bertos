@@ -106,27 +106,35 @@ INLINE void kdbg_hw_init(void)
 	GPIOC->MODER |= GPIO_MODER_MODER10_1; // PC10 As alternate function
 	GPIOC->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR10_1; //PC10 As fast speed 50MHz
 
-#elif CPU_CM3_STM32L152RE
-	((struct RCC *)RCC_BASE)->AHBENR |= RCC_AHBENR_GPIOAEN;
-	((struct RCC *)RCC_BASE)->APB1ENR |= RCC_APB1ENR_USART2EN;
+#elif CPU_CM3_STM32L1
+	#if CONFIG_KDEBUG_PORT == 0
+		// Use UART 1 PA9
+		((struct RCC *)RCC_BASE)->AHBENR |= RCC_AHBENR_GPIOAEN;
+		((struct RCC *)RCC_BASE)->APB2ENR |= RCC_APB2ENR_USART1EN;
 
-	((struct stm32_gpio *)GPIOA_BASE)->AFR[0] |= 0x07 << 8;
-	((struct stm32_gpio *)GPIOA_BASE)->MODER |= GPIO_MODER_MODER2_1;
-	((struct stm32_gpio *)GPIOA_BASE)->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR2;
+		((struct stm32_gpio *)GPIOA_BASE)->AFR[1] = 0x7 << 4;
+		((struct stm32_gpio *)GPIOA_BASE)->MODER |= GPIO_MODER_MODER9_1;
+		((struct stm32_gpio *)GPIOA_BASE)->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR9;
+	#elif CONFIG_KDEBUG_PORT == 1
+		// Use UART 2 PA2
+		((struct RCC *)RCC_BASE)->AHBENR |= RCC_AHBENR_GPIOAEN;
+		((struct RCC *)RCC_BASE)->APB1ENR |= RCC_APB1ENR_USART2EN;
 
+		((struct stm32_gpio *)GPIOA_BASE)->AFR[0] |= 0x07 << 8;
+		((struct stm32_gpio *)GPIOA_BASE)->MODER |= GPIO_MODER_MODER2_1;
+		((struct stm32_gpio *)GPIOA_BASE)->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR2;
+	#else
+		#error Unkwon debug port
+	#endif
 #else
-	#error
+	#error Unsupported CPU
 #endif
 
 	/* Enable the USART by writing the UE bit */
 	UART_BASE->CR1 |= CR1_RUN_SET;
 
 	/* Configure the desired baud rate */
-#if CPU_CM3_STM32L152RE
-	UART_BASE->BRR = (uint16_t)(CPU_FREQ/CONFIG_KDEBUG_BAUDRATE);
-#else
 	UART_BASE->BRR = (uint16_t)evaluate_brr(UART_BASE, CPU_FREQ, CONFIG_KDEBUG_BAUDRATE);
-#endif
 
 	/* Set the Transmitter Enable bit in CR1 */
 	UART_BASE->CR1 |= USART_MODE_TX;

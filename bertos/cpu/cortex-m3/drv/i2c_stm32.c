@@ -53,10 +53,6 @@
 
 #include <io/stm32.h>
 
-#if CPU_CM3_STM32L1
-#define RCC ((struct RCC*)RCC_BASE)
-#endif
-
 struct I2cHardware
 {
 	struct stm32_i2c *base;
@@ -344,18 +340,18 @@ static struct I2cHardware i2c_stm32_hw[] =
 	{ /* I2C1 */
 		.base = (struct stm32_i2c *)I2C1_BASE,
 		.clk_i2c_en  = RCC_APB1ENR_I2C1EN,
-		.sda_gpio = 1,
+		.sda_gpio = 1, // Port B
 		.sda_pin = 9,
-		.scl_gpio = 1,
+		.scl_gpio = 1, // Port B
 		.scl_pin = 8,
 	},
 	{ /* I2C2 */
 		.base = (struct stm32_i2c *)I2C2_BASE,
 		.clk_i2c_en  = RCC_APB1ENR_I2C2EN,
-		.sda_gpio = 1,
+		.sda_gpio = 1, // Port B
 		.sda_pin = 11,
 		.scl_gpio = 10,
-		.scl_pin = 1,
+		.scl_pin = 1, // Port B
 	},
 #else
 	#error "Unknown CPU"
@@ -386,8 +382,8 @@ void i2c_hw_init(I2c *i2c, int dev, uint32_t clock)
 
 #else
 
-	RCC_GPIO_ENABLE(i2c->hw->sda_gpio);
-	RCC_GPIO_ENABLE(i2c->hw->scl_gpio);
+	RCC_GPIO_ENABLE((struct RCC *)RCC_BASE, i2c->hw->sda_gpio);
+	RCC_GPIO_ENABLE((struct RCC *)RCC_BASE, i2c->hw->scl_gpio);
 
 	stm32_gpioPinConfig(GPIOx(i2c->hw->scl_gpio), BV(i2c->hw->scl_pin),
 			    GPIO_MODE_AF_OD | GPIO_AF_I2C, GPIO_SPEED_50MHZ);
@@ -396,7 +392,7 @@ void i2c_hw_init(I2c *i2c, int dev, uint32_t clock)
 
 #endif
 
-	RCC->APB1ENR |= i2c->hw->clk_i2c_en;
+	((struct RCC *)RCC_BASE)->APB1ENR |= i2c->hw->clk_i2c_en;
 
 	/* Clear all needed registers */
 	i2c->hw->base->CR1 = 0;
@@ -426,9 +422,9 @@ void i2c_hw_cleanup(I2c *i2c, int dev)
 	stm32_gpioPinConfig(GPIOx(i2c->hw->sda_gpio), BV(i2c->hw->sda_pin),
 			    GPIO_MODE_IN_FLOATING, GPIO_SPEED_50MHZ);
 
-	RCC_GPIO_DISABLE(i2c->hw->sda_gpio);
-	RCC_GPIO_DISABLE(i2c->hw->scl_gpio);
+	RCC_GPIO_DISABLE((struct RCC *)RCC_BASE, i2c->hw->sda_gpio);
+	RCC_GPIO_DISABLE((struct RCC *)RCC_BASE, i2c->hw->scl_gpio);
 
-	RCC->APB1ENR &= ~i2c->hw->clk_i2c_en;
+	((struct RCC *)RCC_BASE)->APB1ENR &= ~i2c->hw->clk_i2c_en;
 }
 

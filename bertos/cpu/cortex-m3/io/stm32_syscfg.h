@@ -41,7 +41,7 @@
 #if CPU_CM3_STM32F1
 	#warning __FILTER_NEXT_WARNING__
 	#warning Not supported
-#elif CPU_CM3_STM32F2
+#elif CPU_CM3_STM32F2 || CPU_CM3_STM32L1
 
 struct stm32_syscfg
 {

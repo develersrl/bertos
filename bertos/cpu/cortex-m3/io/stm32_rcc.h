@@ -288,8 +288,8 @@ struct RCC
 	reg32_t CSR;           /*!< RCC Control/status register,                                  Address offset: 0x34 */
 };
 
-/* RCC registers base */
-extern struct RCC *RCC;
+#define RCC_GPIO_ENABLE(base, gpio) ((base)->AHBENR |= BV(gpio))
+#define RCC_GPIO_DISABLE(base, gpio) ((base)->AHBENR &= ~BV(gpio))
 
 /******************************************************************************/
 /*                                                                            */

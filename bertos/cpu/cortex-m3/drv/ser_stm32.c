@@ -80,6 +80,32 @@ struct gpio_uart_info
 /* Table to retrieve GPIO pins configuration to work as UART pins */
 static const struct gpio_uart_info gpio_uart[SER_CNT] =
 {
+#if CPU_CM3_STM32L1
+	/* UART1 */
+	{
+		.base = GPIOA_BASE,
+		.rx_pin = BV(10), // PA10
+		.tx_pin = BV(9), // PA9
+		.sysctl_gpio = 0, //GPIOA
+		.sysctl_usart = RCC_APB2ENR_USART1EN,
+	},
+	/* UART2 */
+	{
+		.base = GPIOA_BASE,
+		.rx_pin = BV(3), // PA3
+		.tx_pin = BV(2), // PA2
+		.sysctl_gpio = 0, //GPIOA
+		.sysctl_usart = RCC_APB1ENR_USART2EN,
+	},
+	/* UART3 */
+	{
+		.base = GPIOB_BASE,
+		.rx_pin = BV(11), // PB11
+		.tx_pin = BV(10), // PB10
+		.sysctl_gpio = 1, //GPIOB
+		.sysctl_usart = RCC_APB1ENR_USART3EN,
+	},
+#else
 	/* UART1 */
 	{
 		.base = GPIOA_BASE,
@@ -96,7 +122,7 @@ static const struct gpio_uart_info gpio_uart[SER_CNT] =
 		.sysctl_gpio = RCC_APB2_GPIOA,
 		.sysctl_usart = RCC_APB1_USART2,
 	},
-#if CPU_CM3_STM32F103RB || CPU_CM3_STM32F103RE
+	#if CPU_CM3_STM32F103RB || CPU_CM3_STM32F103RE
 	/* UART3 */
 	{
 		.base = GPIOB_BASE,
@@ -105,6 +131,7 @@ static const struct gpio_uart_info gpio_uart[SER_CNT] =
 		.sysctl_gpio = RCC_APB2_GPIOB,
 		.sysctl_usart = RCC_APB1_USART3,
 	},
+	#endif
 #endif
 };
 
@@ -149,9 +176,23 @@ void stm32_uartInit(int port)
 
 	ASSERT(port >= 0 && port < SER_CNT);
 
+#if CPU_CM3_STM32L1
+	RCC_GPIO_ENABLE((struct RCC *)RCC_BASE, gpio_uart[port].sysctl_gpio);
+
+	stm32_gpioPinConfig((struct stm32_gpio *)gpio_uart[port].base, \
+			gpio_uart[port].tx_pin | gpio_uart[port].rx_pin, \
+			GPIO_MODE_AF_PP | 7, GPIO_SPEED_50MHZ);
+
+	if (!port)
+		((struct RCC *)RCC_BASE)->APB2ENR |= gpio_uart[port].sysctl_usart;
+	else
+		((struct RCC *)RCC_BASE)->APB1ENR |= gpio_uart[port].sysctl_usart;
+
+#else
 	/* Enable clocking on AFIO */
 	RCC->APB2ENR |= RCC_APB2_AFIO;
 	RCC->APB2ENR |= gpio_uart[port].sysctl_gpio;
+
 
 	/* Configure USART pins */
 	if (port == USART1_PORT)
@@ -168,6 +209,7 @@ void stm32_uartInit(int port)
 
 	stm32_gpioPinConfig((struct stm32_gpio *)gpio_uart[port].base,  gpio_uart[port].rx_pin,
 				GPIO_MODE_IN_FLOATING, GPIO_SPEED_50MHZ);
+#endif
 
 	/* Clear control registry */
 	base->CR2 = 0;
@@ -178,7 +220,6 @@ void stm32_uartInit(int port)
 	/* Set serial param: 115.200 bps, no parity */
 	stm32_uartSetBaudRate(UARTDesc[port].base, 115200);
 	stm32_uartSetParity(UARTDesc[port].base, SER_PARITY_NONE);
-
 
 	/* Enable trasmision and receiver */
 	base->CR1 |= (BV(CR1_TE) | BV(CR1_RE));
@@ -339,7 +380,7 @@ static void stm32_uartIRQDisable(int port)
 /* UART port instances */
 UART_PORT(1)
 UART_PORT(2)
-#if CPU_CM3_STM32F103RB || CPU_CM3_STM32F103RE
+#if CPU_CM3_STM32F103RB || CPU_CM3_STM32F103RE || CPU_CM3_STM32L1
 UART_PORT(3)
 #endif
 
@@ -369,7 +410,7 @@ static struct CM3Serial UARTDesc[SER_CNT] =
 		.base = USART2_BASE,
 		.irq = USART2_IRQHANDLER,
 	},
-#if CPU_CM3_STM32F103RB || CPU_CM3_STM32F103RE
+#if CPU_CM3_STM32F103RB || CPU_CM3_STM32F103RE || CPU_CM3_STM32L1
 	{
 		.hw = {
 			.table = &USART3_VT,

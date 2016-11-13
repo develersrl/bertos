@@ -38,10 +38,12 @@
 
 #include <cfg/compiler.h>
 
-#if CPU_CM3_STM32F1 || CPU_CM3_STM32F2
+#if CPU_CM3_STM32F1 || CPU_CM3_STM32F2 || CPU_CM3_STM32L1
 
 #include "stm32_rcc.h"
 #include "stm32_syscfg.h"
+
+#include <drv/clock_stm32.h>
 
 struct stm32_exti
 {
@@ -96,12 +98,12 @@ struct stm32_exti
 #if CPU_CM3_STM32F1
 	#warning __FILTER_NEXT_WARNING__
 	#warning Not supported: Use AFIO instead of SYSCFG
-#elif CPU_CM3_STM32F2
+#elif CPU_CM3_STM32F2 || CPU_CM3_STM32L1
 /* enable GPIOx pin as input source for EXTIx interrupt */
 INLINE void stm32_extiGpioConfig(uint8_t gpio, uint8_t pin)
 {
 	/* enable SYSCFG clock */
-	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+	((struct RCC *)RCC_BASE)->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 
 	/* configure EXTI source */
 	int offset = (pin & 0x3) * 4;
@@ -111,9 +113,6 @@ INLINE void stm32_extiGpioConfig(uint8_t gpio, uint8_t pin)
 	SYSCFG->EXTICR[reg] |= gpio << offset;
 }
 
-#elif CPU_CM3_STM32L1
-	#warning __FILTER_NEXT_WARNING__
-	#warning Not supported
 #else
 	#error Unknown CPU
 #endif

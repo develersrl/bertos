@@ -53,16 +53,17 @@
 #include "stm32_adc.h"
 #include "stm32_i2c.h"
 #include "stm32_flash.h"
+#include "stm32_spi.h"
+#include "stm32_exti.h"
+
 #if CPU_CM3_STM32L1
 	// none
 #else
 #include "stm32_dma.h"
-#include "stm32_spi.h"
 #include "stm32_timer.h"
-#include "stm32_exti.h"
 #endif
 
-#if CPU_CM3_STM32F2
+#if CPU_CM3_STM32F2 || CPU_CM3_STM32L1
 	#include "stm32_syscfg.h"
 #endif
 
@@ -93,8 +94,7 @@
 	// nothing
 
 #elif CPU_CM3_STM32L1
-	#define GPIO_USART2_TX_PIN	BV(2)
-	#define GPIO_USART2_RX_PIN	BV(3)
+	// nothing
 #else
 	#error No USART pins are defined for select cpu
 #endif
