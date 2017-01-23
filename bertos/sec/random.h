@@ -94,21 +94,21 @@ void random_gen(uint8_t *out, size_t len);
 INLINE uint8_t random_gen8(void)
 {
 	uint8_t x;
-	random_gen(&x, 1);
+	random_gen(&x, sizeof(x));
 	return x;
 }
 
 INLINE uint16_t random_gen16(void)
 {
-	uint8_t x;
-	random_gen(&x, 2);
+	uint16_t x;
+	random_gen((uint8_t *)&x, sizeof(x));
 	return x;
 }
 
 INLINE uint32_t random_gen32(void)
 {
-	uint8_t x;
-	random_gen(&x, 4);
+	uint32_t x;
+	random_gen((uint8_t *)&x, sizeof(x));
 	return x;
 }
 
