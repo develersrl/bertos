@@ -429,6 +429,7 @@ PGM_FUNC(_formatted_write)(const char * PGM_ATTR format,
 				case ' ':
 					if (flags.plus_space_flag)
 						goto NEXT_FLAG;
+					/* FALLTHROUGH */
 				case '+':
 					flags.plus_space_flag = PSF_PLUS;
 					goto NEXT_FLAG;
@@ -600,6 +601,7 @@ NEXT_FLAG:
 #endif
 			case 'x':
 				hex = hex_tab;
+				/* FALLTHROUGH */
 			case 'u':
 			case 'p':
 			case 'X':
@@ -707,6 +709,7 @@ INTEGRAL_CONVERSION:
 				goto FLOATING_CONVERSION;
 			case 'f':
 				format_flag = 0;
+				/* FALLTHROUGH */
 			case 'e':
 			case 'E':
 				n = 0;
@@ -747,6 +750,7 @@ FLOATING_CONVERSION:
 
 			case '\0': /* Really bad place to find NUL in */
 				format--;
+				/* FALLTHROUGH */
 
 			default:
 				/* Undefined conversion! */
