@@ -46,6 +46,60 @@ struct PWR
 	reg32_t CSR;
 };
 
-#define PWR_CR_DBP	0x00000100
+#if CPU_CM3_STM32L1
+
+/******************************************************************************/
+/*                                                                            */
+/*                          Power Control (PWR)                               */
+/*                                                                            */
+/******************************************************************************/
+
+/********************  Bit definition for PWR_CR register  ********************/
+#define  PWR_CR_LPSDSR                       ((uint16_t)0x0001)     /*!< Low-power deepsleep/sleep/low power run */
+#define  PWR_CR_PDDS                         ((uint16_t)0x0002)     /*!< Power Down Deepsleep */
+#define  PWR_CR_CWUF                         ((uint16_t)0x0004)     /*!< Clear Wakeup Flag */
+#define  PWR_CR_CSBF                         ((uint16_t)0x0008)     /*!< Clear Standby Flag */
+#define  PWR_CR_PVDE                         ((uint16_t)0x0010)     /*!< Power Voltage Detector Enable */
+
+#define  PWR_CR_PLS                          ((uint16_t)0x00E0)     /*!< PLS[2:0] bits (PVD Level Selection) */
+#define  PWR_CR_PLS_0                        ((uint16_t)0x0020)     /*!< Bit 0 */
+#define  PWR_CR_PLS_1                        ((uint16_t)0x0040)     /*!< Bit 1 */
+#define  PWR_CR_PLS_2                        ((uint16_t)0x0080)     /*!< Bit 2 */
+
+/*!< PVD level configuration */
+#define  PWR_CR_PLS_LEV0                     ((uint16_t)0x0000)     /*!< PVD level 0 */
+#define  PWR_CR_PLS_LEV1                     ((uint16_t)0x0020)     /*!< PVD level 1 */
+#define  PWR_CR_PLS_LEV2                     ((uint16_t)0x0040)     /*!< PVD level 2 */
+#define  PWR_CR_PLS_LEV3                     ((uint16_t)0x0060)     /*!< PVD level 3 */
+#define  PWR_CR_PLS_LEV4                     ((uint16_t)0x0080)     /*!< PVD level 4 */
+#define  PWR_CR_PLS_LEV5                     ((uint16_t)0x00A0)     /*!< PVD level 5 */
+#define  PWR_CR_PLS_LEV6                     ((uint16_t)0x00C0)     /*!< PVD level 6 */
+#define  PWR_CR_PLS_LEV7                     ((uint16_t)0x00E0)     /*!< PVD level 7 */
+
+#define  PWR_CR_DBP                          ((uint16_t)0x0100)     /*!< Disable Backup Domain write protection */
+#define  PWR_CR_ULP                          ((uint16_t)0x0200)     /*!< Ultra Low Power mode */
+#define  PWR_CR_FWU                          ((uint16_t)0x0400)     /*!< Fast wakeup */
+
+#define  PWR_CR_VOS                          ((uint16_t)0x1800)     /*!< VOS[1:0] bits (Voltage scaling range selection) */
+#define  PWR_CR_VOS_0                        ((uint16_t)0x0800)     /*!< Bit 0 */
+#define  PWR_CR_VOS_1                        ((uint16_t)0x1000)     /*!< Bit 1 */
+#define  PWR_CR_LPRUN                        ((uint16_t)0x4000)     /*!< Low power run mode */
+
+/*******************  Bit definition for PWR_CSR register  ********************/
+#define  PWR_CSR_WUF                         ((uint16_t)0x0001)     /*!< Wakeup Flag */
+#define  PWR_CSR_SBF                         ((uint16_t)0x0002)     /*!< Standby Flag */
+#define  PWR_CSR_PVDO                        ((uint16_t)0x0004)     /*!< PVD Output */
+#define  PWR_CSR_VREFINTRDYF                 ((uint16_t)0x0008)     /*!< Internal voltage reference (VREFINT) ready flag */
+#define  PWR_CSR_VOSF                        ((uint16_t)0x0010)     /*!< Voltage Scaling select flag */
+#define  PWR_CSR_REGLPF                      ((uint16_t)0x0020)     /*!< Regulator LP flag */
+
+#define  PWR_CSR_EWUP1                       ((uint16_t)0x0100)     /*!< Enable WKUP pin 1 */
+#define  PWR_CSR_EWUP2                       ((uint16_t)0x0200)     /*!< Enable WKUP pin 2 */
+#define  PWR_CSR_EWUP3                       ((uint16_t)0x0400)     /*!< Enable WKUP pin 3 */
+
+
+#else
+	#define PWR_CR_DBP	0x00000100
+#endif
 
 #endif /* STM32_PWR_H */

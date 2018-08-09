@@ -268,8 +268,472 @@ struct RCC
 /* RCC registers base */
 extern struct RCC *RCC;
 
-#else /* CPU_CM3_STM32F2 */
+#elif CPU_CM3_STM32L1
 
+struct RCC
+{
+	reg32_t CR;            /*!< RCC clock control register,                                   Address offset: 0x00 */
+	reg32_t ICSCR;         /*!< RCC Internal clock sources calibration register,              Address offset: 0x04 */
+	reg32_t CFGR;          /*!< RCC Clock configuration register,                             Address offset: 0x08 */
+	reg32_t CIR;           /*!< RCC Clock interrupt register,                                 Address offset: 0x0C */
+	reg32_t AHBRSTR;       /*!< RCC AHB peripheral reset register,                            Address offset: 0x10 */
+	reg32_t APB2RSTR;      /*!< RCC APB2 peripheral reset register,                           Address offset: 0x14 */
+	reg32_t APB1RSTR;      /*!< RCC APB1 peripheral reset register,                           Address offset: 0x18 */
+	reg32_t AHBENR;        /*!< RCC AHB peripheral clock enable register,                     Address offset: 0x1C */
+	reg32_t APB2ENR;       /*!< RCC APB2 peripheral clock enable register,                    Address offset: 0x20 */
+	reg32_t APB1ENR;       /*!< RCC APB1 peripheral clock enable register,                    Address offset: 0x24 */
+	reg32_t AHBLPENR;      /*!< RCC AHB peripheral clock enable in low power mode register,   Address offset: 0x28 */
+	reg32_t APB2LPENR;     /*!< RCC APB2 peripheral clock enable in low power mode register,  Address offset: 0x2C */
+	reg32_t APB1LPENR;     /*!< RCC APB1 peripheral clock enable in low power mode register,  Address offset: 0x30 */
+	reg32_t CSR;           /*!< RCC Control/status register,                                  Address offset: 0x34 */
+};
+
+#define RCC_GPIO_ENABLE(base, gpio) ((base)->AHBENR |= BV(gpio))
+#define RCC_GPIO_DISABLE(base, gpio) ((base)->AHBENR &= ~BV(gpio))
+
+/******************************************************************************/
+/*                                                                            */
+/*                      Reset and Clock Control (RCC)                         */
+/*                                                                            */
+/******************************************************************************/
+/********************  Bit definition for RCC_CR register  ********************/
+#define  RCC_CR_HSION                        ((uint32_t)0x00000001)        /*!< Internal High Speed clock enable */
+#define  RCC_CR_HSIRDY                       ((uint32_t)0x00000002)        /*!< Internal High Speed clock ready flag */
+
+#define  RCC_CR_MSION                        ((uint32_t)0x00000100)        /*!< Internal Multi Speed clock enable */
+#define  RCC_CR_MSIRDY                       ((uint32_t)0x00000200)        /*!< Internal Multi Speed clock ready flag */
+
+#define  RCC_CR_HSEON                        ((uint32_t)0x00010000)        /*!< External High Speed clock enable */
+#define  RCC_CR_HSERDY                       ((uint32_t)0x00020000)        /*!< External High Speed clock ready flag */
+#define  RCC_CR_HSEBYP                       ((uint32_t)0x00040000)        /*!< External High Speed clock Bypass */
+
+#define  RCC_CR_PLLON                        ((uint32_t)0x01000000)        /*!< PLL enable */
+#define  RCC_CR_PLLRDY                       ((uint32_t)0x02000000)        /*!< PLL clock ready flag */
+#define  RCC_CR_CSSON                        ((uint32_t)0x10000000)        /*!< Clock Security System enable */
+
+#define  RCC_CR_RTCPRE                       ((uint32_t)0x60000000)        /*!< RTC/LCD Prescaler */
+#define  RCC_CR_RTCPRE_0                     ((uint32_t)0x20000000)        /*!< Bit0 */
+#define  RCC_CR_RTCPRE_1                     ((uint32_t)0x40000000)        /*!< Bit1 */
+
+#define STM32_RTCPRE_MASK       (3 << 29)   /**< RTCPRE mask.               */
+#define STM32_RTCPRE_DIV2       (0 << 29)   /**< HSE divided by 2.          */
+#define STM32_RTCPRE_DIV4       (1 << 29)   /**< HSE divided by 4.          */
+#define STM32_RTCPRE_DIV8       (2 << 29)   /**< HSE divided by 2.          */
+#define STM32_RTCPRE_DIV16      (3 << 29)   /**< HSE divided by 16.         */
+
+/********************  Bit definition for RCC_ICSCR register  *****************/
+#define STM32_MSIRANGE_MASK     (7 << 13)   /**< MSIRANGE field mask.       */
+#define STM32_MSIRANGE_64K      (0 << 13)   /**< 64kHz nominal.             */
+#define STM32_MSIRANGE_128K     (1 << 13)   /**< 128kHz nominal.            */
+#define STM32_MSIRANGE_256K     (2 << 13)   /**< 256kHz nominal.            */
+#define STM32_MSIRANGE_512K     (3 << 13)   /**< 512kHz nominal.            */
+#define STM32_MSIRANGE_1M       (4 << 13)   /**< 1MHz nominal.              */
+#define STM32_MSIRANGE_2M       (5 << 13)   /**< 2MHz nominal.              */
+#define STM32_MSIRANGE_4M       (6 << 13)   /**< 4MHz nominal               */
+
+#define  RCC_ICSCR_HSICAL                    ((uint32_t)0x000000FF)        /*!< Internal High Speed clock Calibration */
+#define  RCC_ICSCR_HSITRIM                   ((uint32_t)0x00001F00)        /*!< Internal High Speed clock trimming */
+
+#define  RCC_ICSCR_MSIRANGE                  ((uint32_t)0x0000E000)        /*!< Internal Multi Speed clock Range */
+#define  RCC_ICSCR_MSIRANGE_0                ((uint32_t)0x00000000)        /*!< Internal Multi Speed clock Range 65.536 KHz */
+#define  RCC_ICSCR_MSIRANGE_1                ((uint32_t)0x00002000)        /*!< Internal Multi Speed clock Range 131.072 KHz */
+#define  RCC_ICSCR_MSIRANGE_2                ((uint32_t)0x00004000)        /*!< Internal Multi Speed clock Range 262.144 KHz */
+#define  RCC_ICSCR_MSIRANGE_3                ((uint32_t)0x00006000)        /*!< Internal Multi Speed clock Range 524.288 KHz */
+#define  RCC_ICSCR_MSIRANGE_4                ((uint32_t)0x00008000)        /*!< Internal Multi Speed clock Range 1.048 MHz */
+#define  RCC_ICSCR_MSIRANGE_5                ((uint32_t)0x0000A000)        /*!< Internal Multi Speed clock Range 2.097 MHz */
+#define  RCC_ICSCR_MSIRANGE_6                ((uint32_t)0x0000C000)        /*!< Internal Multi Speed clock Range 4.194 MHz */
+#define  RCC_ICSCR_MSICAL                    ((uint32_t)0x00FF0000)        /*!< Internal Multi Speed clock Calibration */
+#define  RCC_ICSCR_MSITRIM                   ((uint32_t)0xFF000000)        /*!< Internal Multi Speed clock trimming */
+
+/********************  Bit definition for RCC_CFGR register  ******************/
+#define  RCC_CFGR_SW                         ((uint32_t)0x00000003)        /*!< SW[1:0] bits (System clock Switch) */
+#define  RCC_CFGR_SW_0                       ((uint32_t)0x00000001)        /*!< Bit 0 */
+#define  RCC_CFGR_SW_1                       ((uint32_t)0x00000002)        /*!< Bit 1 */
+
+/*!< SW configuration */
+#define  RCC_CFGR_SW_MSI                     ((uint32_t)0x00000000)        /*!< MSI selected as system clock */
+#define  RCC_CFGR_SW_HSI                     ((uint32_t)0x00000001)        /*!< HSI selected as system clock */
+#define  RCC_CFGR_SW_HSE                     ((uint32_t)0x00000002)        /*!< HSE selected as system clock */
+#define  RCC_CFGR_SW_PLL                     ((uint32_t)0x00000003)        /*!< PLL selected as system clock */
+
+#define  RCC_CFGR_SWS                        ((uint32_t)0x0000000C)        /*!< SWS[1:0] bits (System Clock Switch Status) */
+#define  RCC_CFGR_SWS_0                      ((uint32_t)0x00000004)        /*!< Bit 0 */
+#define  RCC_CFGR_SWS_1                      ((uint32_t)0x00000008)        /*!< Bit 1 */
+
+/*!< SWS configuration */
+#define  RCC_CFGR_SWS_MSI                    ((uint32_t)0x00000000)        /*!< MSI oscillator used as system clock */
+#define  RCC_CFGR_SWS_HSI                    ((uint32_t)0x00000004)        /*!< HSI oscillator used as system clock */
+#define  RCC_CFGR_SWS_HSE                    ((uint32_t)0x00000008)        /*!< HSE oscillator used as system clock */
+#define  RCC_CFGR_SWS_PLL                    ((uint32_t)0x0000000C)        /*!< PLL used as system clock */
+
+#define  RCC_CFGR_HPRE                       ((uint32_t)0x000000F0)        /*!< HPRE[3:0] bits (AHB prescaler) */
+#define  RCC_CFGR_HPRE_0                     ((uint32_t)0x00000010)        /*!< Bit 0 */
+#define  RCC_CFGR_HPRE_1                     ((uint32_t)0x00000020)        /*!< Bit 1 */
+#define  RCC_CFGR_HPRE_2                     ((uint32_t)0x00000040)        /*!< Bit 2 */
+#define  RCC_CFGR_HPRE_3                     ((uint32_t)0x00000080)        /*!< Bit 3 */
+
+/*!< HPRE configuration */
+#define  RCC_CFGR_HPRE_DIV1                  ((uint32_t)0x00000000)        /*!< SYSCLK not divided */
+#define  RCC_CFGR_HPRE_DIV2                  ((uint32_t)0x00000080)        /*!< SYSCLK divided by 2 */
+#define  RCC_CFGR_HPRE_DIV4                  ((uint32_t)0x00000090)        /*!< SYSCLK divided by 4 */
+#define  RCC_CFGR_HPRE_DIV8                  ((uint32_t)0x000000A0)        /*!< SYSCLK divided by 8 */
+#define  RCC_CFGR_HPRE_DIV16                 ((uint32_t)0x000000B0)        /*!< SYSCLK divided by 16 */
+#define  RCC_CFGR_HPRE_DIV64                 ((uint32_t)0x000000C0)        /*!< SYSCLK divided by 64 */
+#define  RCC_CFGR_HPRE_DIV128                ((uint32_t)0x000000D0)        /*!< SYSCLK divided by 128 */
+#define  RCC_CFGR_HPRE_DIV256                ((uint32_t)0x000000E0)        /*!< SYSCLK divided by 256 */
+#define  RCC_CFGR_HPRE_DIV512                ((uint32_t)0x000000F0)        /*!< SYSCLK divided by 512 */
+
+#define  RCC_CFGR_PPRE1                      ((uint32_t)0x00000700)        /*!< PRE1[2:0] bits (APB1 prescaler) */
+#define  RCC_CFGR_PPRE1_0                    ((uint32_t)0x00000100)        /*!< Bit 0 */
+#define  RCC_CFGR_PPRE1_1                    ((uint32_t)0x00000200)        /*!< Bit 1 */
+#define  RCC_CFGR_PPRE1_2                    ((uint32_t)0x00000400)        /*!< Bit 2 */
+
+/*!< PPRE1 configuration */
+#define  RCC_CFGR_PPRE1_DIV1                 ((uint32_t)0x00000000)        /*!< HCLK not divided */
+#define  RCC_CFGR_PPRE1_DIV2                 ((uint32_t)0x00000400)        /*!< HCLK divided by 2 */
+#define  RCC_CFGR_PPRE1_DIV4                 ((uint32_t)0x00000500)        /*!< HCLK divided by 4 */
+#define  RCC_CFGR_PPRE1_DIV8                 ((uint32_t)0x00000600)        /*!< HCLK divided by 8 */
+#define  RCC_CFGR_PPRE1_DIV16                ((uint32_t)0x00000700)        /*!< HCLK divided by 16 */
+
+#define  RCC_CFGR_PPRE2                      ((uint32_t)0x00003800)        /*!< PRE2[2:0] bits (APB2 prescaler) */
+#define  RCC_CFGR_PPRE2_0                    ((uint32_t)0x00000800)        /*!< Bit 0 */
+#define  RCC_CFGR_PPRE2_1                    ((uint32_t)0x00001000)        /*!< Bit 1 */
+#define  RCC_CFGR_PPRE2_2                    ((uint32_t)0x00002000)        /*!< Bit 2 */
+
+/*!< PPRE2 configuration */
+#define  RCC_CFGR_PPRE2_DIV1                 ((uint32_t)0x00000000)        /*!< HCLK not divided */
+#define  RCC_CFGR_PPRE2_DIV2                 ((uint32_t)0x00002000)        /*!< HCLK divided by 2 */
+#define  RCC_CFGR_PPRE2_DIV4                 ((uint32_t)0x00002800)        /*!< HCLK divided by 4 */
+#define  RCC_CFGR_PPRE2_DIV8                 ((uint32_t)0x00003000)        /*!< HCLK divided by 8 */
+#define  RCC_CFGR_PPRE2_DIV16                ((uint32_t)0x00003800)        /*!< HCLK divided by 16 */
+
+/*!< PLL entry clock source*/
+#define  RCC_CFGR_PLLSRC                     ((uint32_t)0x00010000)        /*!< PLL entry clock source */
+
+#define  RCC_CFGR_PLLSRC_HSI                 ((uint32_t)0x00000000)        /*!< HSI as PLL entry clock source */
+#define  RCC_CFGR_PLLSRC_HSE                 ((uint32_t)0x00010000)        /*!< HSE as PLL entry clock source */
+
+
+#define  RCC_CFGR_PLLMUL                     ((uint32_t)0x003C0000)        /*!< PLLMUL[3:0] bits (PLL multiplication factor) */
+#define  RCC_CFGR_PLLMUL_0                   ((uint32_t)0x00040000)        /*!< Bit 0 */
+#define  RCC_CFGR_PLLMUL_1                   ((uint32_t)0x00080000)        /*!< Bit 1 */
+#define  RCC_CFGR_PLLMUL_2                   ((uint32_t)0x00100000)        /*!< Bit 2 */
+#define  RCC_CFGR_PLLMUL_3                   ((uint32_t)0x00200000)        /*!< Bit 3 */
+
+/*!< PLLMUL configuration */
+#define  RCC_CFGR_PLLMUL3                    ((uint32_t)0x00000000)        /*!< PLL input clock * 3 */
+#define  RCC_CFGR_PLLMUL4                    ((uint32_t)0x00040000)        /*!< PLL input clock * 4 */
+#define  RCC_CFGR_PLLMUL6                    ((uint32_t)0x00080000)        /*!< PLL input clock * 6 */
+#define  RCC_CFGR_PLLMUL8                    ((uint32_t)0x000C0000)        /*!< PLL input clock * 8 */
+#define  RCC_CFGR_PLLMUL12                   ((uint32_t)0x00100000)        /*!< PLL input clock * 12 */
+#define  RCC_CFGR_PLLMUL16                   ((uint32_t)0x00140000)        /*!< PLL input clock * 16 */
+#define  RCC_CFGR_PLLMUL24                   ((uint32_t)0x00180000)        /*!< PLL input clock * 24 */
+#define  RCC_CFGR_PLLMUL32                   ((uint32_t)0x001C0000)        /*!< PLL input clock * 32 */
+#define  RCC_CFGR_PLLMUL48                   ((uint32_t)0x00200000)        /*!< PLL input clock * 48 */
+
+/*!< PLLDIV configuration */
+#define  RCC_CFGR_PLLDIV                     ((uint32_t)0x00C00000)        /*!< PLLDIV[1:0] bits (PLL Output Division) */
+#define  RCC_CFGR_PLLDIV_0                   ((uint32_t)0x00400000)        /*!< Bit0 */
+#define  RCC_CFGR_PLLDIV_1                   ((uint32_t)0x00800000)        /*!< Bit1 */
+
+
+/*!< PLLDIV configuration */
+#define  RCC_CFGR_PLLDIV1                    ((uint32_t)0x00000000)        /*!< PLL clock output = CKVCO / 1 */
+#define  RCC_CFGR_PLLDIV2                    ((uint32_t)0x00400000)        /*!< PLL clock output = CKVCO / 2 */
+#define  RCC_CFGR_PLLDIV3                    ((uint32_t)0x00800000)        /*!< PLL clock output = CKVCO / 3 */
+#define  RCC_CFGR_PLLDIV4                    ((uint32_t)0x00C00000)        /*!< PLL clock output = CKVCO / 4 */
+
+
+#define  RCC_CFGR_MCOSEL                     ((uint32_t)0x07000000)        /*!< MCO[2:0] bits (Microcontroller Clock Output) */
+#define  RCC_CFGR_MCOSEL_0                   ((uint32_t)0x01000000)        /*!< Bit 0 */
+#define  RCC_CFGR_MCOSEL_1                   ((uint32_t)0x02000000)        /*!< Bit 1 */
+#define  RCC_CFGR_MCOSEL_2                   ((uint32_t)0x04000000)        /*!< Bit 2 */
+
+/*!< MCO configuration */
+#define  RCC_CFGR_MCO_NOCLOCK                ((uint32_t)0x00000000)        /*!< No clock */
+#define  RCC_CFGR_MCO_SYSCLK                 ((uint32_t)0x01000000)        /*!< System clock selected */
+#define  RCC_CFGR_MCO_HSI                    ((uint32_t)0x02000000)        /*!< Internal 16 MHz RC oscillator clock selected */
+#define  RCC_CFGR_MCO_MSI                    ((uint32_t)0x03000000)        /*!< Internal Medium Speed RC oscillator clock selected */
+#define  RCC_CFGR_MCO_HSE                    ((uint32_t)0x04000000)        /*!< External 1-25 MHz oscillator clock selected */
+#define  RCC_CFGR_MCO_PLL                    ((uint32_t)0x05000000)        /*!< PLL clock divided */
+#define  RCC_CFGR_MCO_LSI                    ((uint32_t)0x06000000)        /*!< LSI selected */
+#define  RCC_CFGR_MCO_LSE                    ((uint32_t)0x07000000)        /*!< LSE selected */
+
+#define  RCC_CFGR_MCOPRE                     ((uint32_t)0x70000000)        /*!< MCOPRE[2:0] bits (Microcontroller Clock Output Prescaler) */
+#define  RCC_CFGR_MCOPRE_0                   ((uint32_t)0x10000000)        /*!< Bit 0 */
+#define  RCC_CFGR_MCOPRE_1                   ((uint32_t)0x20000000)        /*!< Bit 1 */
+#define  RCC_CFGR_MCOPRE_2                   ((uint32_t)0x40000000)        /*!< Bit 2 */
+
+/*!< MCO Prescaler configuration */
+#define  RCC_CFGR_MCO_DIV1                   ((uint32_t)0x00000000)        /*!< MCO Clock divided by 1 */
+#define  RCC_CFGR_MCO_DIV2                   ((uint32_t)0x10000000)        /*!< MCO Clock divided by 2 */
+#define  RCC_CFGR_MCO_DIV4                   ((uint32_t)0x20000000)        /*!< MCO Clock divided by 4 */
+#define  RCC_CFGR_MCO_DIV8                   ((uint32_t)0x30000000)        /*!< MCO Clock divided by 8 */
+#define  RCC_CFGR_MCO_DIV16                  ((uint32_t)0x40000000)        /*!< MCO Clock divided by 16 */
+
+/*!<******************  Bit definition for RCC_CIR register  ********************/
+#define  RCC_CIR_LSIRDYF                     ((uint32_t)0x00000001)        /*!< LSI Ready Interrupt flag */
+#define  RCC_CIR_LSERDYF                     ((uint32_t)0x00000002)        /*!< LSE Ready Interrupt flag */
+#define  RCC_CIR_HSIRDYF                     ((uint32_t)0x00000004)        /*!< HSI Ready Interrupt flag */
+#define  RCC_CIR_HSERDYF                     ((uint32_t)0x00000008)        /*!< HSE Ready Interrupt flag */
+#define  RCC_CIR_PLLRDYF                     ((uint32_t)0x00000010)        /*!< PLL Ready Interrupt flag */
+#define  RCC_CIR_MSIRDYF                     ((uint32_t)0x00000020)        /*!< MSI Ready Interrupt flag */
+#define  RCC_CIR_LSECSS                      ((uint32_t)0x00000040)        /*!< LSE CSS Interrupt flag */
+#define  RCC_CIR_CSSF                        ((uint32_t)0x00000080)        /*!< Clock Security System Interrupt flag */
+
+#define  RCC_CIR_LSIRDYIE                    ((uint32_t)0x00000100)        /*!< LSI Ready Interrupt Enable */
+#define  RCC_CIR_LSERDYIE                    ((uint32_t)0x00000200)        /*!< LSE Ready Interrupt Enable */
+#define  RCC_CIR_HSIRDYIE                    ((uint32_t)0x00000400)        /*!< HSI Ready Interrupt Enable */
+#define  RCC_CIR_HSERDYIE                    ((uint32_t)0x00000800)        /*!< HSE Ready Interrupt Enable */
+#define  RCC_CIR_PLLRDYIE                    ((uint32_t)0x00001000)        /*!< PLL Ready Interrupt Enable */
+#define  RCC_CIR_MSIRDYIE                    ((uint32_t)0x00002000)        /*!< MSI Ready Interrupt Enable */
+#define  RCC_CIR_LSECSSIE                    ((uint32_t)0x00004000)        /*!< LSE CSS Interrupt Enable */
+
+#define  RCC_CIR_LSIRDYC                     ((uint32_t)0x00010000)        /*!< LSI Ready Interrupt Clear */
+#define  RCC_CIR_LSERDYC                     ((uint32_t)0x00020000)        /*!< LSE Ready Interrupt Clear */
+#define  RCC_CIR_HSIRDYC                     ((uint32_t)0x00040000)        /*!< HSI Ready Interrupt Clear */
+#define  RCC_CIR_HSERDYC                     ((uint32_t)0x00080000)        /*!< HSE Ready Interrupt Clear */
+#define  RCC_CIR_PLLRDYC                     ((uint32_t)0x00100000)        /*!< PLL Ready Interrupt Clear */
+#define  RCC_CIR_MSIRDYC                     ((uint32_t)0x00200000)        /*!< MSI Ready Interrupt Clear */
+#define  RCC_CIR_LSECSSC                     ((uint32_t)0x00400000)        /*!< LSE CSS Interrupt Clear */
+#define  RCC_CIR_CSSC                        ((uint32_t)0x00800000)        /*!< Clock Security System Interrupt Clear */
+
+/**
+ * @name    PWR_CR register bits definitions
+ * @{
+ */
+#define STM32_VOS_MASK          (3 << 11)   /**< Core voltage mask.         */
+#define STM32_VOS_1P8           (1 << 11)   /**< Core voltage 1.8 Volts.    */
+#define STM32_VOS_1P5           (2 << 11)   /**< Core voltage 1.5 Volts.    */
+#define STM32_VOS_1P2           (3 << 11)   /**< Core voltage 1.2 Volts.    */
+
+#define STM32_PLS_MASK          (7 << 5)    /**< PLS bits mask.             */
+#define STM32_PLS_LEV0          (0 << 5)    /**< PVD level 0.               */
+#define STM32_PLS_LEV1          (1 << 5)    /**< PVD level 1.               */
+#define STM32_PLS_LEV2          (2 << 5)    /**< PVD level 2.               */
+#define STM32_PLS_LEV3          (3 << 5)    /**< PVD level 3.               */
+#define STM32_PLS_LEV4          (4 << 5)    /**< PVD level 4.               */
+#define STM32_PLS_LEV5          (5 << 5)    /**< PVD level 5.               */
+#define STM32_PLS_LEV6          (6 << 5)    /**< PVD level 6.               */
+#define STM32_PLS_LEV7          (7 << 5)    /**< PVD level 7.               */
+/** @} */
+
+#define STM32_SW_MSI            (0 << 0)    /**< SYSCLK source is MSI.      */
+#define STM32_SW_HSI            (1 << 0)    /**< SYSCLK source is HSI.      */
+#define STM32_SW_HSE            (2 << 0)    /**< SYSCLK source is HSE.      */
+#define STM32_SW_PLL            (3 << 0)    /**< SYSCLK source is PLL.      */
+
+#define STM32_HPRE_DIV1         (0 << 4)    /**< SYSCLK divided by 1.       */
+#define STM32_HPRE_DIV2         (8 << 4)    /**< SYSCLK divided by 2.       */
+#define STM32_HPRE_DIV4         (9 << 4)    /**< SYSCLK divided by 4.       */
+#define STM32_HPRE_DIV8         (10 << 4)   /**< SYSCLK divided by 8.       */
+#define STM32_HPRE_DIV16        (11 << 4)   /**< SYSCLK divided by 16.      */
+#define STM32_HPRE_DIV64        (12 << 4)   /**< SYSCLK divided by 64.      */
+#define STM32_HPRE_DIV128       (13 << 4)   /**< SYSCLK divided by 128.     */
+#define STM32_HPRE_DIV256       (14 << 4)   /**< SYSCLK divided by 256.     */
+#define STM32_HPRE_DIV512       (15 << 4)   /**< SYSCLK divided by 512.     */
+
+#define STM32_PPRE1_DIV1        (0 << 8)    /**< HCLK divided by 1.         */
+#define STM32_PPRE1_DIV2        (4 << 8)    /**< HCLK divided by 2.         */
+#define STM32_PPRE1_DIV4        (5 << 8)    /**< HCLK divided by 4.         */
+#define STM32_PPRE1_DIV8        (6 << 8)    /**< HCLK divided by 8.         */
+#define STM32_PPRE1_DIV16       (7 << 8)    /**< HCLK divided by 16.        */
+
+#define STM32_PPRE2_DIV1        (0 << 11)   /**< HCLK divided by 1.         */
+#define STM32_PPRE2_DIV2        (4 << 11)   /**< HCLK divided by 2.         */
+#define STM32_PPRE2_DIV4        (5 << 11)   /**< HCLK divided by 4.         */
+#define STM32_PPRE2_DIV8        (6 << 11)   /**< HCLK divided by 8.         */
+#define STM32_PPRE2_DIV16       (7 << 11)   /**< HCLK divided by 16.        */
+
+#define STM32_PLLSRC_HSI        (0 << 16)   /**< PLL clock source is HSI.   */
+#define STM32_PLLSRC_HSE        (1 << 16)   /**< PLL clock source is HSE.   */
+
+#define STM32_MCOSEL_NOCLOCK    (0 << 24)   /**< No clock on MCO pin.       */
+#define STM32_MCOSEL_SYSCLK     (1 << 24)   /**< SYSCLK on MCO pin.         */
+#define STM32_MCOSEL_HSI        (2 << 24)   /**< HSI clock on MCO pin.      */
+#define STM32_MCOSEL_MSI        (3 << 24)   /**< MSI clock on MCO pin.      */
+#define STM32_MCOSEL_HSE        (4 << 24)   /**< HSE clock on MCO pin.      */
+#define STM32_MCOSEL_PLL        (5 << 24)   /**< PLL clock on MCO pin.      */
+#define STM32_MCOSEL_LSI        (6 << 24)   /**< LSI clock on MCO pin.      */
+#define STM32_MCOSEL_LSE        (7 << 24)   /**< LSE clock on MCO pin.      */
+
+#define STM32_MCOPRE_DIV1       (0 << 28)   /**< MCO divided by 1.          */
+#define STM32_MCOPRE_DIV2       (1 << 28)   /**< MCO divided by 1.          */
+#define STM32_MCOPRE_DIV4       (2 << 28)   /**< MCO divided by 1.          */
+#define STM32_MCOPRE_DIV8       (3 << 28)   /**< MCO divided by 1.          */
+#define STM32_MCOPRE_DIV16      (4 << 28)   /**< MCO divided by 1.          */
+
+/*****************  Bit definition for RCC_AHBRSTR register  ******************/
+#define  RCC_AHBRSTR_GPIOARST                ((uint32_t)0x00000001)        /*!< GPIO port A reset */
+#define  RCC_AHBRSTR_GPIOBRST                ((uint32_t)0x00000002)        /*!< GPIO port B reset */
+#define  RCC_AHBRSTR_GPIOCRST                ((uint32_t)0x00000004)        /*!< GPIO port C reset */
+#define  RCC_AHBRSTR_GPIODRST                ((uint32_t)0x00000008)        /*!< GPIO port D reset */
+#define  RCC_AHBRSTR_GPIOERST                ((uint32_t)0x00000010)        /*!< GPIO port E reset */
+#define  RCC_AHBRSTR_GPIOHRST                ((uint32_t)0x00000020)        /*!< GPIO port H reset */
+#define  RCC_AHBRSTR_GPIOFRST                ((uint32_t)0x00000040)        /*!< GPIO port F reset */
+#define  RCC_AHBRSTR_GPIOGRST                ((uint32_t)0x00000080)        /*!< GPIO port G reset */
+#define  RCC_AHBRSTR_CRCRST                  ((uint32_t)0x00001000)        /*!< CRC reset */
+#define  RCC_AHBRSTR_FLITFRST                ((uint32_t)0x00008000)        /*!< FLITF reset */
+#define  RCC_AHBRSTR_DMA1RST                 ((uint32_t)0x01000000)        /*!< DMA1 reset */
+#define  RCC_AHBRSTR_DMA2RST                 ((uint32_t)0x02000000)        /*!< DMA2 reset */
+#define  RCC_AHBRSTR_AESRST                  ((uint32_t)0x08000000)        /*!< AES reset */
+#define  RCC_AHBRSTR_FSMCRST                 ((uint32_t)0x40000000)        /*!< FSMC reset */
+ 
+/*****************  Bit definition for RCC_APB2RSTR register  *****************/
+#define  RCC_APB2RSTR_SYSCFGRST              ((uint32_t)0x00000001)        /*!< System Configuration SYSCFG reset */
+#define  RCC_APB2RSTR_TIM9RST                ((uint32_t)0x00000004)        /*!< TIM9 reset */
+#define  RCC_APB2RSTR_TIM10RST               ((uint32_t)0x00000008)        /*!< TIM10 reset */
+#define  RCC_APB2RSTR_TIM11RST               ((uint32_t)0x00000010)        /*!< TIM11 reset */
+#define  RCC_APB2RSTR_ADC1RST                ((uint32_t)0x00000200)        /*!< ADC1 reset */
+#define  RCC_APB2RSTR_SDIORST                ((uint32_t)0x00000800)        /*!< SDIO reset */
+#define  RCC_APB2RSTR_SPI1RST                ((uint32_t)0x00001000)        /*!< SPI1 reset */
+#define  RCC_APB2RSTR_USART1RST              ((uint32_t)0x00004000)        /*!< USART1 reset */
+
+/*****************  Bit definition for RCC_APB1RSTR register  *****************/
+#define  RCC_APB1RSTR_TIM2RST                ((uint32_t)0x00000001)        /*!< Timer 2 reset */
+#define  RCC_APB1RSTR_TIM3RST                ((uint32_t)0x00000002)        /*!< Timer 3 reset */
+#define  RCC_APB1RSTR_TIM4RST                ((uint32_t)0x00000004)        /*!< Timer 4 reset */
+#define  RCC_APB1RSTR_TIM5RST                ((uint32_t)0x00000008)        /*!< Timer 5 reset */
+#define  RCC_APB1RSTR_TIM6RST                ((uint32_t)0x00000010)        /*!< Timer 6 reset */
+#define  RCC_APB1RSTR_TIM7RST                ((uint32_t)0x00000020)        /*!< Timer 7 reset */
+#define  RCC_APB1RSTR_LCDRST                 ((uint32_t)0x00000200)        /*!< LCD reset */
+#define  RCC_APB1RSTR_WWDGRST                ((uint32_t)0x00000800)        /*!< Window Watchdog reset */
+#define  RCC_APB1RSTR_SPI2RST                ((uint32_t)0x00004000)        /*!< SPI 2 reset */
+#define  RCC_APB1RSTR_SPI3RST                ((uint32_t)0x00008000)        /*!< SPI 3 reset */
+#define  RCC_APB1RSTR_USART2RST              ((uint32_t)0x00020000)        /*!< USART 2 reset */
+#define  RCC_APB1RSTR_USART3RST              ((uint32_t)0x00040000)        /*!< USART 3 reset */
+#define  RCC_APB1RSTR_UART4RST               ((uint32_t)0x00080000)        /*!< UART 4 reset */
+#define  RCC_APB1RSTR_UART5RST               ((uint32_t)0x00100000)        /*!< UART 5 reset */
+#define  RCC_APB1RSTR_I2C1RST                ((uint32_t)0x00200000)        /*!< I2C 1 reset */
+#define  RCC_APB1RSTR_I2C2RST                ((uint32_t)0x00400000)        /*!< I2C 2 reset */
+#define  RCC_APB1RSTR_USBRST                 ((uint32_t)0x00800000)        /*!< USB reset */
+#define  RCC_APB1RSTR_PWRRST                 ((uint32_t)0x10000000)        /*!< Power interface reset */
+#define  RCC_APB1RSTR_DACRST                 ((uint32_t)0x20000000)        /*!< DAC interface reset */
+#define  RCC_APB1RSTR_COMPRST                ((uint32_t)0x80000000)        /*!< Comparator interface reset */
+
+/******************  Bit definition for RCC_AHBENR register  ******************/
+#define  RCC_AHBENR_GPIOAEN                  ((uint32_t)0x00000001)        /*!< GPIO port A clock enable */
+#define  RCC_AHBENR_GPIOBEN                  ((uint32_t)0x00000002)        /*!< GPIO port B clock enable */
+#define  RCC_AHBENR_GPIOCEN                  ((uint32_t)0x00000004)        /*!< GPIO port C clock enable */
+#define  RCC_AHBENR_GPIODEN                  ((uint32_t)0x00000008)        /*!< GPIO port D clock enable */
+#define  RCC_AHBENR_GPIOEEN                  ((uint32_t)0x00000010)        /*!< GPIO port E clock enable */
+#define  RCC_AHBENR_GPIOHEN                  ((uint32_t)0x00000020)        /*!< GPIO port H clock enable */
+#define  RCC_AHBENR_GPIOFEN                  ((uint32_t)0x00000040)        /*!< GPIO port F clock enable */
+#define  RCC_AHBENR_GPIOGEN                  ((uint32_t)0x00000080)        /*!< GPIO port G clock enable */
+#define  RCC_AHBENR_CRCEN                    ((uint32_t)0x00001000)        /*!< CRC clock enable */
+#define  RCC_AHBENR_FLITFEN                  ((uint32_t)0x00008000)        /*!< FLITF clock enable (has effect only when
+                                                                                the Flash memory is in power down mode) */
+#define  RCC_AHBENR_DMA1EN                   ((uint32_t)0x01000000)        /*!< DMA1 clock enable */
+#define  RCC_AHBENR_DMA2EN                   ((uint32_t)0x02000000)        /*!< DMA2 clock enable */
+#define  RCC_AHBENR_AESEN                    ((uint32_t)0x08000000)        /*!< AES clock enable */
+#define  RCC_AHBENR_FSMCEN                   ((uint32_t)0x40000000)        /*!< FSMC clock enable */
+
+
+/******************  Bit definition for RCC_APB2ENR register  *****************/
+#define  RCC_APB2ENR_SYSCFGEN                ((uint32_t)0x00000001)         /*!< System Configuration SYSCFG clock enable */
+#define  RCC_APB2ENR_TIM9EN                  ((uint32_t)0x00000004)         /*!< TIM9 interface clock enable */
+#define  RCC_APB2ENR_TIM10EN                 ((uint32_t)0x00000008)         /*!< TIM10 interface clock enable */
+#define  RCC_APB2ENR_TIM11EN                 ((uint32_t)0x00000010)         /*!< TIM11 Timer clock enable */
+#define  RCC_APB2ENR_ADC1EN                  ((uint32_t)0x00000200)         /*!< ADC1 clock enable */
+#define  RCC_APB2ENR_SDIOEN                  ((uint32_t)0x00000800)         /*!< SDIO clock enable */
+#define  RCC_APB2ENR_SPI1EN                  ((uint32_t)0x00001000)         /*!< SPI1 clock enable */
+#define  RCC_APB2ENR_USART1EN                ((uint32_t)0x00004000)         /*!< USART1 clock enable */
+
+
+/*****************  Bit definition for RCC_APB1ENR register  ******************/
+#define  RCC_APB1ENR_TIM2EN                  ((uint32_t)0x00000001)        /*!< Timer 2 clock enabled*/
+#define  RCC_APB1ENR_TIM3EN                  ((uint32_t)0x00000002)        /*!< Timer 3 clock enable */
+#define  RCC_APB1ENR_TIM4EN                  ((uint32_t)0x00000004)        /*!< Timer 4 clock enable */
+#define  RCC_APB1ENR_TIM5EN                  ((uint32_t)0x00000008)        /*!< Timer 5 clock enable */
+#define  RCC_APB1ENR_TIM6EN                  ((uint32_t)0x00000010)        /*!< Timer 6 clock enable */
+#define  RCC_APB1ENR_TIM7EN                  ((uint32_t)0x00000020)        /*!< Timer 7 clock enable */
+#define  RCC_APB1ENR_LCDEN                   ((uint32_t)0x00000200)        /*!< LCD clock enable */
+#define  RCC_APB1ENR_WWDGEN                  ((uint32_t)0x00000800)        /*!< Window Watchdog clock enable */
+#define  RCC_APB1ENR_SPI2EN                  ((uint32_t)0x00004000)        /*!< SPI 2 clock enable */
+#define  RCC_APB1ENR_SPI3EN                  ((uint32_t)0x00008000)        /*!< SPI 3 clock enable */
+#define  RCC_APB1ENR_USART2EN                ((uint32_t)0x00020000)        /*!< USART 2 clock enable */
+#define  RCC_APB1ENR_USART3EN                ((uint32_t)0x00040000)        /*!< USART 3 clock enable */
+#define  RCC_APB1ENR_UART4EN                 ((uint32_t)0x00080000)        /*!< UART 4 clock enable */
+#define  RCC_APB1ENR_UART5EN                 ((uint32_t)0x00100000)        /*!< UART 5 clock enable */
+#define  RCC_APB1ENR_I2C1EN                  ((uint32_t)0x00200000)        /*!< I2C 1 clock enable */
+#define  RCC_APB1ENR_I2C2EN                  ((uint32_t)0x00400000)        /*!< I2C 2 clock enable */
+#define  RCC_APB1ENR_USBEN                   ((uint32_t)0x00800000)        /*!< USB clock enable */
+#define  RCC_APB1ENR_PWREN                   ((uint32_t)0x10000000)        /*!< Power interface clock enable */
+#define  RCC_APB1ENR_DACEN                   ((uint32_t)0x20000000)        /*!< DAC interface clock enable */
+#define  RCC_APB1ENR_COMPEN                  ((uint32_t)0x80000000)        /*!< Comparator interface clock enable */
+
+/******************  Bit definition for RCC_AHBLPENR register  ****************/
+#define  RCC_AHBLPENR_GPIOALPEN              ((uint32_t)0x00000001)        /*!< GPIO port A clock enabled in sleep mode */
+#define  RCC_AHBLPENR_GPIOBLPEN              ((uint32_t)0x00000002)        /*!< GPIO port B clock enabled in sleep mode */
+#define  RCC_AHBLPENR_GPIOCLPEN              ((uint32_t)0x00000004)        /*!< GPIO port C clock enabled in sleep mode */
+#define  RCC_AHBLPENR_GPIODLPEN              ((uint32_t)0x00000008)        /*!< GPIO port D clock enabled in sleep mode */
+#define  RCC_AHBLPENR_GPIOELPEN              ((uint32_t)0x00000010)        /*!< GPIO port E clock enabled in sleep mode */
+#define  RCC_AHBLPENR_GPIOHLPEN              ((uint32_t)0x00000020)        /*!< GPIO port H clock enabled in sleep mode */
+#define  RCC_AHBLPENR_GPIOFLPEN              ((uint32_t)0x00000040)        /*!< GPIO port F clock enabled in sleep mode */
+#define  RCC_AHBLPENR_GPIOGLPEN              ((uint32_t)0x00000080)        /*!< GPIO port G clock enabled in sleep mode */
+#define  RCC_AHBLPENR_CRCLPEN                ((uint32_t)0x00001000)        /*!< CRC clock enabled in sleep mode */
+#define  RCC_AHBLPENR_FLITFLPEN              ((uint32_t)0x00008000)        /*!< Flash Interface clock enabled in sleep mode
+                                                                                (has effect only when the Flash memory is
+                                                                                 in power down mode) */
+#define  RCC_AHBLPENR_SRAMLPEN               ((uint32_t)0x00010000)        /*!< SRAM clock enabled in sleep mode */
+#define  RCC_AHBLPENR_DMA1LPEN               ((uint32_t)0x01000000)        /*!< DMA1 clock enabled in sleep mode */
+#define  RCC_AHBLPENR_DMA2LPEN               ((uint32_t)0x02000000)        /*!< DMA2 clock enabled in sleep mode */
+#define  RCC_AHBLPENR_AESLPEN                ((uint32_t)0x08000000)        /*!< AES clock enabled in sleep mode */
+#define  RCC_AHBLPENR_FSMCLPEN               ((uint32_t)0x40000000)        /*!< FSMC clock enabled in sleep mode */
+
+/******************  Bit definition for RCC_APB2LPENR register  ***************/
+#define  RCC_APB2LPENR_SYSCFGLPEN            ((uint32_t)0x00000001)         /*!< System Configuration SYSCFG clock enabled in sleep mode */
+#define  RCC_APB2LPENR_TIM9LPEN              ((uint32_t)0x00000004)         /*!< TIM9 interface clock enabled in sleep mode */
+#define  RCC_APB2LPENR_TIM10LPEN             ((uint32_t)0x00000008)         /*!< TIM10 interface clock enabled in sleep mode */
+#define  RCC_APB2LPENR_TIM11LPEN             ((uint32_t)0x00000010)         /*!< TIM11 Timer clock enabled in sleep mode */
+#define  RCC_APB2LPENR_ADC1LPEN              ((uint32_t)0x00000200)         /*!< ADC1 clock enabled in sleep mode */
+#define  RCC_APB2LPENR_SDIOLPEN              ((uint32_t)0x00000800)         /*!< SDIO clock enabled in sleep mode */
+#define  RCC_APB2LPENR_SPI1LPEN              ((uint32_t)0x00001000)         /*!< SPI1 clock enabled in sleep mode */
+#define  RCC_APB2LPENR_USART1LPEN            ((uint32_t)0x00004000)         /*!< USART1 clock enabled in sleep mode */
+
+/*****************  Bit definition for RCC_APB1LPENR register  ****************/
+#define  RCC_APB1LPENR_TIM2LPEN              ((uint32_t)0x00000001)        /*!< Timer 2 clock enabled in sleep mode */
+#define  RCC_APB1LPENR_TIM3LPEN              ((uint32_t)0x00000002)        /*!< Timer 3 clock enabled in sleep mode */
+#define  RCC_APB1LPENR_TIM4LPEN              ((uint32_t)0x00000004)        /*!< Timer 4 clock enabled in sleep mode */
+#define  RCC_APB1LPENR_TIM5LPEN              ((uint32_t)0x00000008)        /*!< Timer 5 clock enabled in sleep mode */
+#define  RCC_APB1LPENR_TIM6LPEN              ((uint32_t)0x00000010)        /*!< Timer 6 clock enabled in sleep mode */
+#define  RCC_APB1LPENR_TIM7LPEN              ((uint32_t)0x00000020)        /*!< Timer 7 clock enabled in sleep mode */
+#define  RCC_APB1LPENR_LCDLPEN               ((uint32_t)0x00000200)        /*!< LCD clock enabled in sleep mode */
+#define  RCC_APB1LPENR_WWDGLPEN              ((uint32_t)0x00000800)        /*!< Window Watchdog clock enabled in sleep mode */
+#define  RCC_APB1LPENR_SPI2LPEN              ((uint32_t)0x00004000)        /*!< SPI 2 clock enabled in sleep mode */
+#define  RCC_APB1LPENR_SPI3LPEN              ((uint32_t)0x00008000)        /*!< SPI 3 clock enabled in sleep mode */
+#define  RCC_APB1LPENR_USART2LPEN            ((uint32_t)0x00020000)        /*!< USART 2 clock enabled in sleep mode */
+#define  RCC_APB1LPENR_USART3LPEN            ((uint32_t)0x00040000)        /*!< USART 3 clock enabled in sleep mode */
+#define  RCC_APB1LPENR_UART4LPEN             ((uint32_t)0x00080000)        /*!< UART 4 clock enabled in sleep mode */
+#define  RCC_APB1LPENR_UART5LPEN             ((uint32_t)0x00100000)        /*!< UART 5 clock enabled in sleep mode */
+#define  RCC_APB1LPENR_I2C1LPEN              ((uint32_t)0x00200000)        /*!< I2C 1 clock enabled in sleep mode */
+#define  RCC_APB1LPENR_I2C2LPEN              ((uint32_t)0x00400000)        /*!< I2C 2 clock enabled in sleep mode */
+#define  RCC_APB1LPENR_USBLPEN               ((uint32_t)0x00800000)        /*!< USB clock enabled in sleep mode */
+#define  RCC_APB1LPENR_PWRLPEN               ((uint32_t)0x10000000)        /*!< Power interface clock enabled in sleep mode */
+#define  RCC_APB1LPENR_DACLPEN               ((uint32_t)0x20000000)        /*!< DAC interface clock enabled in sleep mode */
+#define  RCC_APB1LPENR_COMPLPEN              ((uint32_t)0x80000000)        /*!< Comparator interface clock enabled in sleep mode*/
+
+/*******************  Bit definition for RCC_CSR register  ********************/
+#define  RCC_CSR_LSION                      ((uint32_t)0x00000001)        /*!< Internal Low Speed oscillator enable */
+#define  RCC_CSR_LSIRDY                     ((uint32_t)0x00000002)        /*!< Internal Low Speed oscillator Ready */
+
+#define  RCC_CSR_LSEON                      ((uint32_t)0x00000100)        /*!< External Low Speed oscillator enable */
+#define  RCC_CSR_LSERDY                     ((uint32_t)0x00000200)        /*!< External Low Speed oscillator Ready */
+#define  RCC_CSR_LSEBYP                     ((uint32_t)0x00000400)        /*!< External Low Speed oscillator Bypass */
+#define  RCC_CSR_LSECSSON                   ((uint32_t)0x00000800)        /*!< External Low Speed oscillator CSS Enable */
+#define  RCC_CSR_LSECSSD                    ((uint32_t)0x00001000)        /*!< External Low Speed oscillator CSS Detected */
+
+#define  RCC_CSR_RTCSEL                     ((uint32_t)0x00030000)        /*!< RTCSEL[1:0] bits (RTC clock source selection) */
+#define  RCC_CSR_RTCSEL_0                   ((uint32_t)0x00010000)        /*!< Bit 0 */
+#define  RCC_CSR_RTCSEL_1                   ((uint32_t)0x00020000)        /*!< Bit 1 */
+
+#define STM32_RTCSEL_MASK       (3 << 16)   /**< RTC source mask.           */
+#define STM32_RTCSEL_NOCLOCK    (0 << 16)   /**< No RTC source.             */
+#define STM32_RTCSEL_LSE        (1 << 16)   /**< RTC source is LSE.         */
+#define STM32_RTCSEL_LSI        (2 << 16)   /**< RTC source is LSI.         */
+#define STM32_RTCSEL_HSEDIV     (3 << 16)   /**< RTC source is HSE divided. */
+
+#else /* CPU_CM3_STM32F2 */
 
 /******************************************************************************/
 /*                                                                            */

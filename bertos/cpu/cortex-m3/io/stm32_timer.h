@@ -41,6 +41,10 @@
 #if CPU_CM3_STM32F1
 	#warning __FILTER_NEXT_WARNING__
 	#warning Not supported
+
+#elif CPU_CM3_STM32L1
+	#warning "TIMER NOT SUPPORTED!!"
+
 #elif CPU_CM3_STM32F2
 
 typedef struct stm32_tim_half

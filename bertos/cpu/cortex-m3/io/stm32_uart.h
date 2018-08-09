@@ -241,6 +241,10 @@ INLINE uint16_t evaluate_brr(struct stm32_usart *base, unsigned long cpu_freq, u
     freq = (base == (struct stm32_usart *)USART1_BASE) ? cpu_freq: cpu_freq / 2;
 #elif CPU_CM3_STM32F2
     freq = (base == (struct stm32_usart *)USART1_BASE) ? cpu_freq / 2: cpu_freq / 4;
+#elif CPU_CM3_STM32L152RE || CPU_CM3_STM32L151C6xxA || CPU_CM3_STM32L151C8xxA
+    /* NOTE: By default clock bus is not prescaled! (see clock_stm32.c) */
+    (void)base;
+    freq = cpu_freq;
 #else
     #warning Check correct base clock frequency.
 #endif

@@ -151,6 +151,132 @@ void clock_init(void)
 	/* Clock the system from the PLL */
 	rcc_set_clock_source(RCC_SYSCLK_PLLCLK);
 }
+
+#elif CPU_CM3_STM32L1
+
+/* ===============         Settings  =======================*/
+
+#define STM32_HSI_ENABLED                   1
+#define STM32_LSI_ENABLED                   1
+#define STM32_HSE_ENABLED                   0
+#define STM32_LSE_ENABLED                   0
+#define STM32_MSIRANGE                      STM32_MSIRANGE_2M
+#define STM32_SW                            STM32_SW_PLL //STM32_SW_HSI
+#define STM32_PLLSRC                        STM32_PLLSRC_HSI
+#define STM32_PLLMUL                        (2 << 18) // x6
+#define STM32_PLLDIV                        (2 << 22) // \3
+#define STM32_ACTIVATE_PLL                  1
+#define STM32_FLASHBITS1                    0x00000004
+#define STM32_FLASHBITS2                    0x00000007
+
+/* ===============       End Settings  =======================*/
+
+#define PWR ((struct PWR*)PWR_BASE)
+#define RCC ((struct RCC*)RCC_BASE)
+
+/**
+ * @brief   STM32L1xx voltage, clocks and PLL initialization.
+ * @note    All the involved constants come from the file @p board.h.
+ * @note    This function should be invoked just after the system reset.
+ *
+ * @special
+ */
+/**
+ * @brief   Clocks and internal voltage initialization.
+ */
+void clock_init(void)
+{
+	/* PWR clock enable.*/
+	RCC->APB1ENR = RCC_APB1ENR_PWREN;
+
+
+	/* Core voltage setup.*/
+	while ((PWR->CSR & PWR_CSR_VOSF) != 0)
+		;                           /* Waits until regulator is stable.         */
+	PWR->CR = STM32_VOS_1P8;
+	while ((PWR->CSR & PWR_CSR_VOSF) != 0)
+		;                           /* Waits until regulator is stable.         */
+
+	/* Initial clocks setup and wait for MSI stabilization, the MSI clock is
+	   always enabled because it is the fallback clock when PLL the fails.
+	   Trim fields are not altered from reset values.*/
+	RCC->CFGR  = 0;
+	RCC->ICSCR = (RCC->ICSCR & ~STM32_MSIRANGE_MASK) | STM32_MSIRANGE;
+	RCC->CR    = RCC_CR_MSION;
+	while ((RCC->CR & RCC_CR_MSIRDY) == 0)
+		;                           /* Waits until MSI is stable.               */
+
+#if STM32_HSI_ENABLED
+	/* HSI activation.*/
+	RCC->CR |= RCC_CR_HSION;
+	while ((RCC->CR & RCC_CR_HSIRDY) == 0)
+		;                           /* Waits until HSI is stable.               */
+#endif
+
+#if STM32_HSE_ENABLED
+#if defined(STM32_HSE_BYPASS)
+	/* HSE Bypass.*/
+	RCC->CR |= RCC_CR_HSEBYP;
+#endif
+	/* HSE activation.*/
+	RCC->CR |= RCC_CR_HSEON;
+	while ((RCC->CR & RCC_CR_HSERDY) == 0)
+		;                           /* Waits until HSE is stable.               */
+#endif
+
+#if STM32_LSI_ENABLED
+	/* LSI activation.*/
+	RCC->CSR |= RCC_CSR_LSION;
+	while ((RCC->CSR & RCC_CSR_LSIRDY) == 0)
+		;                           /* Waits until LSI is stable.               */
+#endif
+
+#if STM32_LSE_ENABLED
+	/* LSE activation, have to unlock the register.*/
+	if ((RCC->CSR & RCC_CSR_LSEON) == 0) {
+		PWR->CR |= PWR_CR_DBP;
+		RCC->CSR |= RCC_CSR_LSEON;
+		PWR->CR &= ~PWR_CR_DBP;
+	}
+	while ((RCC->CSR & RCC_CSR_LSERDY) == 0)
+		;                           /* Waits until LSE is stable.               */
+#endif
+
+#if STM32_ACTIVATE_PLL
+	RCC->CFGR |= STM32_PLLDIV | STM32_PLLMUL | STM32_PLLSRC;
+	RCC->CR   |= RCC_CR_PLLON;
+	while (!(RCC->CR & RCC_CR_PLLRDY))
+		;                           /* Waits until PLL is stable.               */
+#endif
+
+	/* Other clock-related settings (dividers, MCO etc).*/
+	RCC->CR   |= STM32_RTCPRE_DIV2;
+	RCC->CFGR |= STM32_MCOPRE_DIV1 | STM32_MCOSEL_NOCLOCK |
+		STM32_PPRE2_DIV1 | STM32_PPRE1_DIV1 | STM32_HPRE_DIV1;
+	RCC->CSR  |= STM32_RTCSEL_NOCLOCK;
+
+	/* Flash setup and final clock selection.*/
+#if defined(STM32_FLASHBITS1)
+	FLASH->ACR = STM32_FLASHBITS1;
+#endif
+#if defined(STM32_FLASHBITS2)
+	FLASH->ACR = STM32_FLASHBITS2;
+#endif
+
+	/* Switching to the configured clock source if it is different from MSI.*/
+#if (STM32_SW != STM32_SW_MSI)
+	RCC->CFGR |= STM32_SW;        /* Switches on the selected clock source.   */
+	while ((RCC->CFGR & RCC_CFGR_SWS) != (STM32_SW << 2))
+		;
+#endif
+
+	/* SYSCFG clock enabled here because it is a multi-functional unit shared
+	   among multiple drivers.*/
+	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;                                                   \
+	RCC->APB2LPENR |= RCC_APB2ENR_SYSCFGEN;                                               \
+}
+
+
 #else /* CPU_CM3_STM32F2 */
 
 /* PLL_VCO = (HSE_VALUE or HSI_VALUE / PLL_M) * PLL_N */

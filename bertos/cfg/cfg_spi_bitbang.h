@@ -39,13 +39,7 @@
 #ifndef CFG_SPI_BITBANG_H
 #define CFG_SPI_BITBANG_H
 
-/**
- * Set data order for emulated SPI.
- *
- * $WIZ$ type = "enum"
- * $WIZ$ value_list = "ordet_bit_list"
- */
-#define CONFIG_SPI_DATAORDER  SPI_LSB_FIRST
+#warning OLD File! all settings merged into cfg_spi.h
 
 #endif /* CFG_SPI_BITBANG_H */
 

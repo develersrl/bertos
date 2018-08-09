@@ -38,7 +38,7 @@
 
 #include <cpu/detect.h>
 
-#if CPU_CM3_STM32F1
+#if CPU_CM3_STM32F1 || CPU_CM3_STM32L1
 	#warning __FILTER_NEXT_WARNING__
 	#warning Not supported
 #elif CPU_CM3_STM32F2

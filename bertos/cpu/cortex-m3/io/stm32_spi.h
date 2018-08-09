@@ -41,7 +41,8 @@
 #if CPU_CM3_STM32F1
 	#warning __FILTER_NEXT_WARNING__
 	#warning Not supported
-#elif CPU_CM3_STM32F2
+
+#elif CPU_CM3_STM32F2 || CPU_CM3_STM32L1
 
 struct stm32_spi
 {
@@ -64,10 +65,6 @@ struct stm32_spi
 	reg16_t I2SPR;      /*!< SPI_I2S prescaler register,                         Address offset: 0x20 */
 	uint16_t RESERVED8; /*!< Reserved, 0x22                                                           */
 };
-
-#define SPI1 ((struct stm32_spi *) SPI1_BASE)
-#define SPI2 ((struct stm32_spi *) SPI2_BASE)
-#define SPI3 ((struct stm32_spi *) SPI3_BASE)
 
 /* Bit definition for SPI_CR1 register */
 #define SPI_CR1_CPHA                        ((uint16_t)0x0001)            /*!<Clock Phase */

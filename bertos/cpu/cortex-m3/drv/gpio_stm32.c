@@ -109,6 +109,7 @@ int stm32_gpioPinConfig(struct stm32_gpio *base,
 	}
 
 	return 0;
+
 #else
 	int gpio_af = (mode >> 0) & 0xf;
 	int gpio_mode = (mode >> 4) & 0x3;
